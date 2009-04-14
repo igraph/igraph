@@ -3733,7 +3733,7 @@ PyObject *igraphmodule_Graph_rewire(igraphmodule_GraphObject * self,
  * \brief Calculates shortest paths in a graph.
  * \return the shortest path lengths for the given vertices
  * \sa igraph_shortest_paths, igraph_shortest_paths_dijkstra,
- *     igraph_shortest_paths_bellman_ford
+ *     igraph_shortest_paths_bellman_ford, igraph_shortest_paths_johnson
  */
 PyObject *igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject * self,
                                             PyObject * args, PyObject * kwds)
@@ -3775,10 +3775,28 @@ PyObject *igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject * self,
     return igraphmodule_handle_igraph_error();
   }
 
-  if (weights && igraph_vector_min(weights) < 0)
-    e = igraph_shortest_paths_bellman_ford(&self->g, &res, from_vs, to_vs, weights, mode);
-  else
-    e = igraph_shortest_paths_dijkstra(&self->g, &res, from_vs, to_vs, weights, mode);
+  /* Select the most suitable algorithm */
+  if (weights) {
+    if (igraph_vector_min(weights) > 0) {
+      /* Only positive weights, use Dijkstra's algorithm */
+      e = igraph_shortest_paths_dijkstra(&self->g, &res, from_vs, to_vs, weights, mode);
+    } else {
+      /* There are negative weights. For a small number of sources, use Bellman-Ford.
+       * Otherwise, use Johnson's algorithm */
+      igraph_integer_t vs_size;
+      e = igraph_vs_size(&self->g, &from_vs, &vs_size);
+      if (!e) {
+        if (vs_size <= 100 || mode != IGRAPH_OUT) {
+          e = igraph_shortest_paths_bellman_ford(&self->g, &res, from_vs, to_vs, weights, mode);
+        } else {
+          e = igraph_shortest_paths_johnson(&self->g, &res, from_vs, to_vs, weights);
+        }
+      }
+    }
+  } else {
+    /* No weights, use a simple BFS */
+    e = igraph_shortest_paths(&self->g, &res, from_vs, to_vs, mode);
+  }
 
   if (e) {
     if (weights) igraph_vector_destroy(weights);
