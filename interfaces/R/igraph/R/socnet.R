@@ -509,7 +509,10 @@ tkigraph <- function() {
   cn <- rep("", ncol(tab))
   if (ncol(tab)>=3) { cn[3] <- "weight" }
   colnames(tab) <- cn
-  g <- graph.data.frame(tab, directed=TRUE)
+  read <- .tkigraph.dialogbox(TITLE="Importing an edge list",
+                              directed=list(name="Directed", type="boolean",
+                                default="FALSE"))
+  g <- graph.data.frame(tab, directed=read$directed)
   g <- set.graph.attribute(g, "name", "Imported edge list")
   .tkigraph.add.graph(g)
 }
