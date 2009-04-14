@@ -6175,18 +6175,21 @@ PyObject *igraphmodule_Graph_isomorphic_vf2(igraphmodule_GraphObject * self,
   igraph_bool_t result = 0;
   PyObject *o=Py_None, *return1=Py_False, *return2=Py_False;
   PyObject *color1_o=Py_None, *color2_o=Py_None;
+  PyObject *edge_color1_o=Py_None, *edge_color2_o=Py_None;
   igraphmodule_GraphObject *other;
   igraph_vector_t mapping_12, mapping_21;
   igraph_vector_t *map12=0, *map21=0;
   igraph_vector_long_t *color1=0, *color2=0;
+  igraph_vector_long_t *edge_color1=0, *edge_color2=0;
 
   static char *kwlist[] = {
-    "other", "color1", "color2", "return_mapping_12", "return_mapping_21", NULL
+    "other", "color1", "color2", "edge_color1", "edge_color2",
+    "return_mapping_12", "return_mapping_21", NULL
   };
 
   if (!PyArg_ParseTupleAndKeywords
-      (args, kwds, "|O!OOOO", kwlist, &igraphmodule_GraphType, &o,
-       &color1_o, &color2_o, &return1, &return2))
+      (args, kwds, "|O!OOOOOO", kwlist, &igraphmodule_GraphType, &o,
+       &color1_o, &color2_o, &edge_color1, &edge_color2, &return1, &return2))
     return NULL;
   if (o == Py_None) other=self; else other=(igraphmodule_GraphObject*)o;
 
@@ -6195,6 +6198,19 @@ PyObject *igraphmodule_Graph_isomorphic_vf2(igraphmodule_GraphObject * self,
   if (igraphmodule_attrib_to_vector_long_t(color2_o, other, &color2,
 	  ATTRIBUTE_TYPE_VERTEX)) {
     if (color1) { igraph_vector_long_destroy(color1); free(color1); }
+    return NULL;
+  }
+  if (igraphmodule_attrib_to_vector_long_t(edge_color1_o, self, &edge_color1,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    return NULL;
+  }
+  if (igraphmodule_attrib_to_vector_long_t(edge_color2_o, other, &edge_color2,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
     return NULL;
   }
 
@@ -6207,16 +6223,20 @@ PyObject *igraphmodule_Graph_isomorphic_vf2(igraphmodule_GraphObject * self,
 	map21 = &mapping_21;
   }
 
-  if (igraph_isomorphic_vf2(&self->g, &other->g, color1, color2,
+  if (igraph_isomorphic_vf2(&self->g, &other->g, color1, color2, edge_color1, edge_color2,
         &result, map12, map21)) {
     igraphmodule_handle_igraph_error();
     if (color1) { igraph_vector_long_destroy(color1); free(color1); }
     if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+    if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
     return NULL;
   }
 
   if (color1) { igraph_vector_long_destroy(color1); free(color1); }
   if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+  if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+  if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
 
   if (!map12 && !map21) {
     if (result) Py_RETURN_TRUE;
@@ -6259,13 +6279,15 @@ PyObject *igraphmodule_Graph_count_isomorphisms_vf2(igraphmodule_GraphObject *se
   igraph_integer_t result = 0;
   PyObject *o = Py_None;
   PyObject *color1_o=Py_None, *color2_o=Py_None;
+  PyObject *edge_color1_o=Py_None, *edge_color2_o=Py_None;
   igraphmodule_GraphObject *other;
   igraph_vector_long_t *color1=0, *color2=0;
-  static char *kwlist[] = { "other", "color1", "color2", NULL };
+  igraph_vector_long_t *edge_color1=0, *edge_color2=0;
+  static char *kwlist[] = { "other", "color1", "color2", "edge_color1", "edge_color2", NULL };
 
   if (!PyArg_ParseTupleAndKeywords
-      (args, kwds, "|O!OO", kwlist, &igraphmodule_GraphType, &o,
-       &color1_o, &color2_o))
+      (args, kwds, "|O!OOOO", kwlist, &igraphmodule_GraphType, &o,
+       &color1_o, &color2_o, &edge_color1_o, &edge_color2_o))
     return NULL;
   if (o == Py_None) other=self; else other=(igraphmodule_GraphObject*)o;
 
@@ -6276,17 +6298,34 @@ PyObject *igraphmodule_Graph_count_isomorphisms_vf2(igraphmodule_GraphObject *se
     if (color1) { igraph_vector_long_destroy(color1); free(color1); }
     return NULL;
   }
-
-  if (igraph_count_isomorphisms_vf2(&self->g, &other->g,
-        color1, color2, &result)) {
+  if (igraphmodule_attrib_to_vector_long_t(edge_color1_o, self, &edge_color1,
+	  ATTRIBUTE_TYPE_EDGE)) {
     if (color1) { igraph_vector_long_destroy(color1); free(color1); }
     if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    return NULL;
+  }
+  if (igraphmodule_attrib_to_vector_long_t(edge_color2_o, other, &edge_color2,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+    return NULL;
+  }
+
+  if (igraph_count_isomorphisms_vf2(&self->g, &other->g,
+        color1, color2, edge_color1, edge_color2, &result)) {
+    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+    if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
   if (color1) { igraph_vector_long_destroy(color1); free(color1); }
   if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+  if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+  if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
 
   return Py_BuildValue("l", (long)result);
 }
@@ -6302,16 +6341,19 @@ PyObject *igraphmodule_Graph_count_isomorphisms_vf2(igraphmodule_GraphObject *se
 PyObject *igraphmodule_Graph_get_isomorphisms_vf2(igraphmodule_GraphObject *self,
   PyObject *args, PyObject *kwds) {
   igraph_vector_ptr_t result;
-  PyObject *o = Py_None, *color1_o = Py_None, *color2_o = Py_None;
+  PyObject *o = Py_None;
+  PyObject *color1_o = Py_None, *color2_o = Py_None;
+  PyObject *edge_color1_o=Py_None, *edge_color2_o=Py_None;
   PyObject *res;
   long int i,n;
   igraphmodule_GraphObject *other;
   igraph_vector_long_t *color1=0, *color2=0;
-  static char *kwlist[] = { "other", "color1", "color2", NULL };
+  igraph_vector_long_t *edge_color1=0, *edge_color2=0;
+  static char *kwlist[] = { "other", "color1", "color2", "edge_color1", "edge_color2", NULL };
 
   if (!PyArg_ParseTupleAndKeywords
-      (args, kwds, "|O!OO", kwlist, &igraphmodule_GraphType, &o,
-         &color1_o, &color2_o))
+      (args, kwds, "|O!OOOO", kwlist, &igraphmodule_GraphType, &o,
+         &color1_o, &color2_o, &edge_color1_o, &edge_color2_o))
     return NULL;
   if (o == Py_None) other=self; else other=(igraphmodule_GraphObject*)o;
 
@@ -6322,24 +6364,43 @@ PyObject *igraphmodule_Graph_get_isomorphisms_vf2(igraphmodule_GraphObject *self
     if (color1) { igraph_vector_long_destroy(color1); free(color1); }
     return NULL;
   }
+  if (igraphmodule_attrib_to_vector_long_t(edge_color1_o, self, &edge_color1,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    return NULL;
+  }
+  if (igraphmodule_attrib_to_vector_long_t(edge_color2_o, other, &edge_color2,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+    return NULL;
+  }
 
   if (igraph_vector_ptr_init(&result, 0)) {
     if (color1) { igraph_vector_long_destroy(color1); free(color1); }
     if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+    if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
     return igraphmodule_handle_igraph_error();
   }
 
   if (igraph_get_isomorphisms_vf2(&self->g, &other->g,
-        color1, color2, &result)) {
+        color1, color2, edge_color1, edge_color2, &result)) {
     igraphmodule_handle_igraph_error();
     if (color1) { igraph_vector_long_destroy(color1); free(color1); }
     if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+    if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
     igraph_vector_ptr_destroy(&result);
     return NULL;
   }
 
   if (color1) { igraph_vector_long_destroy(color1); free(color1); }
   if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+  if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+  if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
 
   res = igraphmodule_vector_ptr_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
 
@@ -6364,14 +6425,17 @@ PyObject *igraphmodule_Graph_subisomorphic_vf2(igraphmodule_GraphObject * self,
   igraph_bool_t result = 0;
   PyObject *o, *return1=Py_False, *return2=Py_False;
   PyObject *color1_o=Py_None, *color2_o=Py_None;
+  PyObject *edge_color1_o=Py_None, *edge_color2_o=Py_None;
   igraphmodule_GraphObject *other;
   igraph_vector_t mapping_12, mapping_21, *map12=0, *map21=0;
   igraph_vector_long_t *color1=0, *color2=0;
-  static char *kwlist[] = { "other", "color1", "color2",
+  igraph_vector_long_t *edge_color1=0, *edge_color2=0;
+  static char *kwlist[] = { "other", "color1", "color2", "edge_color1", "edge_color2",
     "return_mapping_12", "return_mapping_21", NULL };
 
   if (!PyArg_ParseTupleAndKeywords
-      (args, kwds, "O!|OOOO", kwlist, &igraphmodule_GraphType, &o, &return1, &return2))
+      (args, kwds, "O!|OOOOOO", kwlist, &igraphmodule_GraphType, &o,
+       &color1_o, &color2_o, &edge_color1_o, &edge_color2_o, &return1, &return2))
     return NULL;
   other=(igraphmodule_GraphObject*)o;
 
@@ -6380,6 +6444,19 @@ PyObject *igraphmodule_Graph_subisomorphic_vf2(igraphmodule_GraphObject * self,
   if (igraphmodule_attrib_to_vector_long_t(color2_o, other, &color2,
 	  ATTRIBUTE_TYPE_VERTEX)) {
     if (color1) { igraph_vector_long_destroy(color1); free(color1); }
+    return NULL;
+  }
+  if (igraphmodule_attrib_to_vector_long_t(edge_color1_o, self, &edge_color1,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    return NULL;
+  }
+  if (igraphmodule_attrib_to_vector_long_t(edge_color2_o, other, &edge_color2,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
     return NULL;
   }
 
@@ -6392,16 +6469,20 @@ PyObject *igraphmodule_Graph_subisomorphic_vf2(igraphmodule_GraphObject * self,
 	map21 = &mapping_21;
   }
 
-  if (igraph_subisomorphic_vf2(&self->g, &other->g, color1, color2,
+  if (igraph_subisomorphic_vf2(&self->g, &other->g, color1, color2, edge_color1, edge_color2,
         &result, map12, map21)) {
     igraphmodule_handle_igraph_error();
     if (color1) { igraph_vector_long_destroy(color1); free(color1); }
     if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+    if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
     return NULL;
   }
 
   if (color1) { igraph_vector_long_destroy(color1); free(color1); }
   if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+  if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+  if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
 
   if (!map12 && !map21) {
     if (result) Py_RETURN_TRUE;
@@ -6442,14 +6523,17 @@ PyObject *igraphmodule_Graph_subisomorphic_vf2(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_count_subisomorphisms_vf2(igraphmodule_GraphObject *self,
   PyObject *args, PyObject *kwds) {
   igraph_integer_t result = 0;
-  PyObject *o, *color1_o = Py_None, *color2_o = Py_None;
+  PyObject *o = Py_None;
+  PyObject *color1_o = Py_None, *color2_o = Py_None;
+  PyObject *edge_color1_o=Py_None, *edge_color2_o=Py_None;
   igraph_vector_long_t *color1=0, *color2=0;
+  igraph_vector_long_t *edge_color1=0, *edge_color2=0;
   igraphmodule_GraphObject *other;
-  static char *kwlist[] = { "other", "color1", "color2", NULL };
+  static char *kwlist[] = { "other", "color1", "color2", "edge_color1", "edge_color2", NULL };
 
   if (!PyArg_ParseTupleAndKeywords
-      (args, kwds, "O!|OO", kwlist, &igraphmodule_GraphType, &o,
-         &color1_o, &color2_o))
+      (args, kwds, "O!|OOOO", kwlist, &igraphmodule_GraphType, &o,
+         &color1_o, &color2_o, &edge_color1_o, &edge_color2_o))
     return NULL;
   other=(igraphmodule_GraphObject*)o;
 
@@ -6460,17 +6544,34 @@ PyObject *igraphmodule_Graph_count_subisomorphisms_vf2(igraphmodule_GraphObject 
     if (color1) { igraph_vector_long_destroy(color1); free(color1); }
     return NULL;
   }
+  if (igraphmodule_attrib_to_vector_long_t(edge_color1_o, self, &edge_color1,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    return NULL;
+  }
+  if (igraphmodule_attrib_to_vector_long_t(edge_color2_o, other, &edge_color2,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+    return NULL;
+  }
 
   if (igraph_count_subisomorphisms_vf2(&self->g, &other->g, color1, color2,
-        &result)) {
+        edge_color1, edge_color2, &result)) {
     igraphmodule_handle_igraph_error();
     if (color1) { igraph_vector_long_destroy(color1); free(color1); }
     if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+    if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
     return NULL;
   }
 
   if (color1) { igraph_vector_long_destroy(color1); free(color1); }
   if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+  if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+  if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
 
   return Py_BuildValue("l", (long)result);
 }
@@ -6486,16 +6587,19 @@ PyObject *igraphmodule_Graph_count_subisomorphisms_vf2(igraphmodule_GraphObject 
 PyObject *igraphmodule_Graph_get_subisomorphisms_vf2(igraphmodule_GraphObject *self,
   PyObject *args, PyObject *kwds) {
   igraph_vector_ptr_t result;
-  PyObject *o, *color1_o=Py_None, *color2_o=Py_None;
+  PyObject *o;
+  PyObject *color1_o=Py_None, *color2_o=Py_None;
+  PyObject *edge_color1_o=Py_None, *edge_color2_o=Py_None;
   PyObject *res;
   long int i,n;
   igraphmodule_GraphObject *other;
   igraph_vector_long_t *color1=0, *color2=0;
-  static char *kwlist[] = { "other", "color1", "color2", NULL };
+  igraph_vector_long_t *edge_color1=0, *edge_color2=0;
+  static char *kwlist[] = { "other", "color1", "color2", "edge_color1", "edge_color2", NULL };
 
   if (!PyArg_ParseTupleAndKeywords
-      (args, kwds, "O!|OO", kwlist, &igraphmodule_GraphType, &o,
-       &color1_o, &color2_o))
+      (args, kwds, "O!|OOOO", kwlist, &igraphmodule_GraphType, &o,
+       &color1_o, &color2_o, &edge_color1_o, &edge_color2_o))
     return NULL;
 
   if (igraph_vector_ptr_init(&result, 0)) {
@@ -6511,18 +6615,35 @@ PyObject *igraphmodule_Graph_get_subisomorphisms_vf2(igraphmodule_GraphObject *s
     if (color1) { igraph_vector_long_destroy(color1); free(color1); }
     return NULL;
   }
+  if (igraphmodule_attrib_to_vector_long_t(edge_color1_o, self, &edge_color1,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    return NULL;
+  }
+  if (igraphmodule_attrib_to_vector_long_t(edge_color2_o, other, &edge_color2,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+    return NULL;
+  }
 
   if (igraph_get_subisomorphisms_vf2(&self->g, &other->g, color1, color2,
-        &result)) {
+        edge_color1, edge_color2, &result)) {
     igraphmodule_handle_igraph_error();
     if (color1) { igraph_vector_long_destroy(color1); free(color1); }
     if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+    if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
     igraph_vector_ptr_destroy(&result);
     return NULL;
   }
 
   if (color1) { igraph_vector_long_destroy(color1); free(color1); }
   if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+  if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+  if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
 
   res = igraphmodule_vector_ptr_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
 
@@ -10031,18 +10152,22 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  element of the 3-tuple.\n"},
   {"isomorphic_vf2", (PyCFunction) igraphmodule_Graph_isomorphic_vf2,
    METH_VARARGS | METH_KEYWORDS,
-   "isomorphic_vf2(other=None, return_mapping_12=False, return_mapping_21=False)\n\n"
+   "isomorphic_vf2(other=None, color1=None, color2=None, edge_color1=None,\n"
+   "  edge_color2=None, return_mapping_12=False, return_mapping_21=False)\n\n"
    "Checks whether the graph is isomorphic with another graph, using the\n"
    "VF2 isomorphism algorithm.\n\n"
+   "Vertex and edge colors may be used to restrict the isomorphisms, as only\n"
+   "vertices and edges with the same color will be allowed to match each other.\n\n"
    "@param other: the other graph with which we want to compare the graph.\n"
    "  If C{None}, the automorphjisms of the graph will be tested.\n"
    "@param color1: optional vector storing the coloring of the vertices of\n"
-   "  the first graph. It may be a list or a numeric attribute. The colors\n"
-   "  are used to restrict the isomorphisms, as only vertices with the\n"
-   "  same color will be allowed to match each other in the two graphs.\n"
-   "  If C{None}, all vertices have the same color.\n"
+   "  the first graph. If C{None}, all vertices have the same color.\n"
    "@param color2: optional vector storing the coloring of the vertices of\n"
    "  the second graph. If C{None}, all vertices have the same color.\n"
+   "@param edge_color1: optional vector storing the coloring of the edges of\n"
+   "  the first graph. If C{None}, all edges have the same color.\n"
+   "@param edge_color2: optional vector storing the coloring of the edges of\n"
+   "  the second graph. If C{None}, all edges have the same color.\n"
    "@param return_mapping_12: if C{True}, calculates the mapping which maps\n"
    "  the vertices of the first graph to the second.\n"
    "@param return_mapping_21: if C{True}, calculates the mapping which maps\n"
@@ -10057,47 +10182,59 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"count_isomorphisms_vf2",
    (PyCFunction) igraphmodule_Graph_count_isomorphisms_vf2,
    METH_VARARGS | METH_KEYWORDS,
-   "count_isomorphisms_vf2(other=None, color1=None, color2=None)\n\n"
+   "count_isomorphisms_vf2(other=None, color1=None, color2=None, edge_color1=None,\n"
+   "  edge_color2=None)\n\n"
    "Determines the number of isomorphisms between the graph and another one\n\n"
+   "Vertex and edge colors may be used to restrict the isomorphisms, as only\n"
+   "vertices and edges with the same color will be allowed to match each other.\n\n"
    "@param other: the other graph. If C{None}, the number of automorphisms\n"
    "  will be returned.\n"
    "@param color1: optional vector storing the coloring of the vertices of\n"
-   "  the first graph. It may be a list or a numeric attribute. The colors\n"
-   "  are used to restrict the isomorphisms, as only vertices with the\n"
-   "  same color will be allowed to match each other in the two graphs.\n"
-   "  If C{None}, all vertices have the same color.\n"
+   "  the first graph. If C{None}, all vertices have the same color.\n"
    "@param color2: optional vector storing the coloring of the vertices of\n"
    "  the second graph. If C{None}, all vertices have the same color.\n"
+   "@param edge_color1: optional vector storing the coloring of the edges of\n"
+   "  the first graph. If C{None}, all edges have the same color.\n"
+   "@param edge_color2: optional vector storing the coloring of the edges of\n"
+   "  the second graph. If C{None}, all edges have the same color.\n"
    "@return: the number of isomorphisms between the two given graphs (or the\n"
    "  number of automorphisms if C{other} is C{None}.\n"},
   {"get_isomorphisms_vf2", (PyCFunction) igraphmodule_Graph_get_isomorphisms_vf2,
    METH_VARARGS | METH_KEYWORDS,
-   "get_isomorphisms_vf2(other=None, color1=None, color2=None)\n\n"
+   "get_isomorphisms_vf2(other=None, color1=None, color2=None, edge_color1=None,\n"
+   "  edge_color2=None)\n\n"
    "Returns all isomorphisms between the graph and another one\n\n"
+   "Vertex and edge colors may be used to restrict the isomorphisms, as only\n"
+   "vertices and edges with the same color will be allowed to match each other.\n\n"
    "@param other: the other graph. If C{None}, the automorphisms\n"
    "  will be returned.\n"
    "@param color1: optional vector storing the coloring of the vertices of\n"
-   "  the first graph. It may be a list or a numeric attribute. The colors\n"
-   "  are used to restrict the isomorphisms, as only vertices with the\n"
-   "  same color will be allowed to match each other in the two graphs.\n"
-   "  If C{None}, all vertices have the same color.\n"
+   "  the first graph. If C{None}, all vertices have the same color.\n"
    "@param color2: optional vector storing the coloring of the vertices of\n"
    "  the second graph. If C{None}, all vertices have the same color.\n"
+   "@param edge_color1: optional vector storing the coloring of the edges of\n"
+   "  the first graph. If C{None}, all edges have the same color.\n"
+   "@param edge_color2: optional vector storing the coloring of the edges of\n"
+   "  the second graph. If C{None}, all edges have the same color.\n"
    "@return: a list of lists, each item of the list containing the mapping\n"
    "  from vertices of the second graph to the vertices of the first one\n"},
 
   {"subisomorphic_vf2", (PyCFunction) igraphmodule_Graph_subisomorphic_vf2,
    METH_VARARGS | METH_KEYWORDS,
-   "subisomorphic_vf2(other, color1=None, color2=None, return_mapping_12=False, return_mapping_21=False)\n\n"
+   "subisomorphic_vf2(other, color1=None, color2=None, edge_color1=None,\n"
+   "  edge_color2=None, return_mapping_12=False, return_mapping_21=False)\n\n"
    "Checks whether a subgraph of the graph is isomorphic with another graph.\n\n"
+   "Vertex and edge colors may be used to restrict the isomorphisms, as only\n"
+   "vertices and edges with the same color will be allowed to match each other.\n\n"
    "@param other: the other graph with which we want to compare the graph.\n"
    "@param color1: optional vector storing the coloring of the vertices of\n"
-   "  the first graph. It may be a list or a numeric attribute. The colors\n"
-   "  are used to restrict the isomorphisms, as only vertices with the\n"
-   "  same color will be allowed to match each other in the two graphs.\n"
-   "  If C{None}, all vertices have the same color.\n"
+   "  the first graph. If C{None}, all vertices have the same color.\n"
    "@param color2: optional vector storing the coloring of the vertices of\n"
    "  the second graph. If C{None}, all vertices have the same color.\n"
+   "@param edge_color1: optional vector storing the coloring of the edges of\n"
+   "  the first graph. If C{None}, all edges have the same color.\n"
+   "@param edge_color2: optional vector storing the coloring of the edges of\n"
+   "  the second graph. If C{None}, all edges have the same color.\n"
    "@param return_mapping_12: if C{True}, calculates the mapping which maps\n"
    "  the vertices of the first graph to the second. The mapping can contain\n"
    "  -1 if a given node is not mapped.\n"
@@ -10114,30 +10251,38 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"count_subisomorphisms_vf2",
    (PyCFunction) igraphmodule_Graph_count_subisomorphisms_vf2,
    METH_VARARGS | METH_KEYWORDS,
-   "count_subisomorphisms_vf2(other, color1=None, color2=None)\n\n"
+   "count_subisomorphisms_vf2(other, color1=None, color2=None,\n"
+   "  edge_color1=None, edge_color2=None)\n\n"
    "Determines the number of subisomorphisms between the graph and another one\n\n"
+   "Vertex and edge colors may be used to restrict the isomorphisms, as only\n"
+   "vertices and edges with the same color will be allowed to match each other.\n\n"
    "@param other: the other graph.\n"
    "@param color1: optional vector storing the coloring of the vertices of\n"
-   "  the first graph. It may be a list or a numeric attribute. The colors\n"
-   "  are used to restrict the isomorphisms, as only vertices with the\n"
-   "  same color will be allowed to match each other in the two graphs.\n"
-   "  If C{None}, all vertices have the same color.\n"
+   "  the first graph. If C{None}, all vertices have the same color.\n"
    "@param color2: optional vector storing the coloring of the vertices of\n"
    "  the second graph. If C{None}, all vertices have the same color.\n"
+   "@param edge_color1: optional vector storing the coloring of the edges of\n"
+   "  the first graph. If C{None}, all edges have the same color.\n"
+   "@param edge_color2: optional vector storing the coloring of the edges of\n"
+   "  the second graph. If C{None}, all edges have the same color.\n"
    "@return: the number of subisomorphisms between the two given graphs\n"},
   {"get_subisomorphisms_vf2",
    (PyCFunction) igraphmodule_Graph_get_subisomorphisms_vf2,
    METH_VARARGS | METH_KEYWORDS,
-   "get_subisomorphisms_vf2(other, color1=None, color2=None)\n\n"
+   "get_subisomorphisms_vf2(other, color1=None, color2=None,\n"
+   "  edge_color1=None, edge_color2=None)\n\n"
    "Returns all subisomorphisms between the graph and another one\n\n"
+   "Vertex and edge colors may be used to restrict the isomorphisms, as only\n"
+   "vertices and edges with the same color will be allowed to match each other.\n\n"
    "@param other: the other graph.\n"
    "@param color1: optional vector storing the coloring of the vertices of\n"
-   "  the first graph. It may be a list or a numeric attribute. The colors\n"
-   "  are used to restrict the isomorphisms, as only vertices with the\n"
-   "  same color will be allowed to match each other in the two graphs.\n"
-   "  If C{None}, all vertices have the same color.\n"
+   "  the first graph. If C{None}, all vertices have the same color.\n"
    "@param color2: optional vector storing the coloring of the vertices of\n"
    "  the second graph. If C{None}, all vertices have the same color.\n"
+   "@param edge_color1: optional vector storing the coloring of the edges of\n"
+   "  the first graph. If C{None}, all edges have the same color.\n"
+   "@param edge_color2: optional vector storing the coloring of the edges of\n"
+   "  the second graph. If C{None}, all edges have the same color.\n"
    "@return: a list of lists, each item of the list containing the mapping\n"
    "  from vertices of the second graph to the vertices of the first one\n"},
 

@@ -33,6 +33,14 @@ class IsomorphismTests(unittest.TestCase):
         g2.vs["color"] = [0,0,1,1,0,1,1,0]
         self.failUnless(not g1.isomorphic_vf2(g2, "color", "color"))
 
+        # Test VF2 with vertex and edge colors
+        self.failUnless(g1.isomorphic_vf2(g2,
+            color1=[0,1,0,1,0,1,0,1],
+            color2=[0,0,1,1,0,0,1,1]))
+        g1.es["color"] = range(12)
+        g2.es["color"] = [0]*6 + [1]*6
+        self.failUnless(not g1.isomorphic_vf2(g2, "color", "color", "color", "color"))
+
     def testCountIsomorphisms(self):
         g = Graph.Full(4)
         self.failUnless(g.count_automorphisms_vf2() == 24)
@@ -45,6 +53,8 @@ class IsomorphismTests(unittest.TestCase):
         self.failUnless(g3.count_isomorphisms_vf2() == 24)
         self.failUnless(g3.count_isomorphisms_vf2(color1="color", color2="color") == 4)
         self.failUnless(g3.count_isomorphisms_vf2(color1=[0,1,2,0], color2=(0,1,2,0)) == 2)
+        self.failUnless(g3.count_isomorphisms_vf2(edge_color1=[0,1,0,0,0,1],
+            edge_color2=[0,1,0,0,0,1]) == 2)
 
     def testGetIsomorphisms(self):
         g = Graph(6, [(0,1), (2,3), (4,5), (0,2), (2,4), (1,3), (3,5)])
@@ -69,6 +79,16 @@ class IsomorphismTests(unittest.TestCase):
         g2 = Graph.Lattice([2,2], circular=False)
         self.failUnless(g.count_subisomorphisms_vf2(g2) == 4*4*2)
         self.failUnless(g2.count_subisomorphisms_vf2(g) == 0)
+
+        # Test with vertex colors
+        g.vs["color"] = [0,0,0,0,1,0,0,0,0]
+        g2.vs["color"] = [1,0,0,0]
+        self.failUnless(g.count_subisomorphisms_vf2(g2, "color", "color") == 4*2)
+
+        # Test with edge colors
+        g.es["color"] = [1] + [0]*(g.ecount()-1)
+        g2.es["color"] = [1] + [0]*(g2.ecount()-1)
+        self.failUnless(g.count_subisomorphisms_vf2(g2, edge_color1="color", edge_color2="color") == 2)
 
     def testPermuteVertices(self):
         g1 = Graph(8, [(0, 4), (0, 5), (0, 6), \
