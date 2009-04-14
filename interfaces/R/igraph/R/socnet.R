@@ -153,7 +153,11 @@ tkigraph <- function() {
         })
   tkadd(centrality.menu, "command", label="Plot log-log degree distribution",
         command=function() {
-          .tkigraph.degree.dist()
+          .tkigraph.degree.dist(power=FALSE)
+        })
+  tkadd(centrality.menu, "command", label="Fit a power-law to degree distribution",
+        command=function() {
+          .tkigraph.degree.dist(power=TRUE)
         })
   tkadd(centrality.menu, "separator")
   tkadd(centrality.menu, "command", label="Closeness", command=function() {
@@ -1144,7 +1148,7 @@ tkigraph <- function() {
                      showmean=mv)
 }
 
-.tkigraph.degree.dist <- function() {
+.tkigraph.degree.dist <- function(power=FALSE) {
   gnos <- .tkigraph.get.selected()
   if (length(gnos)!=1) {
     .tkigraph.error("Please select exactly one graph")
@@ -1161,6 +1165,18 @@ tkigraph <- function() {
   h <- hist(deg, -1:max(deg), plot=FALSE)$density
   plot(0:max(deg), h, xlab="Degree", ylab="Relative frequency",
        type="b", main="Degree distribution", log="xy")
+
+  if (power) {
+    if (max(deg)<10) {
+      .tkigraph.error("Degrees are too small for a power-law fit")
+      return()
+    }
+    fit <- power.law.fit(deg, xmin=10)
+    lines(0:max(deg), (0:max(deg))^(-coef(fit)), col="red")
+    legend("topright", c(paste("exponent:", round(coef(fit), 2)),
+                         paste("standard error:", round(sqrt(vcov(fit)), 2))),
+           bty="n", cex=1.5)
+  }
 }
 
 .tkigraph.closeness <- function() {
