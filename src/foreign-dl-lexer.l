@@ -45,7 +45,9 @@
 */
 
 #include "config.h"
+#include "igraph.h"
 #include <stdlib.h>
+#include "foreign-dl-header.h"
 #include "foreign-dl-parser.h"
 extern long int igraph_dl_mylineno;
 extern int igraph_dl_mode;

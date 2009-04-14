@@ -46,6 +46,8 @@
 
 #include "config.h"
 #include "igraph.h"
+#include "memory.h"
+#include "foreign-dl-header.h"
 #include "foreign-dl-parser.h"
 #include <stdio.h>
 
@@ -53,15 +55,20 @@ extern int igraph_dl_eof;
 extern long int igraph_dl_mylineno;
 extern char *igraph_i_dl_errmsg;
 int igraph_dl_yyerror(char *s);
+extern igraph_i_dl_parsedata_t igraph_i_dl_data;
+int igraph_i_dl_add_str(char *newstr, int length);
+int igraph_i_dl_add_matcol();
 
+extern char *igraph_dl_yytext;
+extern int igraph_dl_yyleng;
+
+extern igraph_real_t igraph_pajek_get_number(const char *str, long int len);
+ 
 %}
 
 %output="y.tab.c"
 %name-prefix="igraph_dl_yy"
 %defines
-
-%union {
-}
 
 %token NUM
 %token NEWLINE
@@ -79,35 +86,45 @@ int igraph_dl_yyerror(char *s);
 
 %%
 
-input: DL NEQ NUM NEWLINE rest eof {} ;
+input: DL NEQ NUM NEWLINE rest eof { 
+  igraph_i_dl_data.n=igraph_pajek_get_number(igraph_dl_yytext, 
+					      igraph_dl_yyleng);  } ;
 
 eof: | EOFF;
 
-rest:    formfullmatrix {}
-      |  edgelist1  {} 
-      |  nodelist1  {}
+rest:    formfullmatrix { igraph_i_dl_data.type=IGRAPH_DL_MATRIX; }
+      |  edgelist1      { igraph_i_dl_data.type=IGRAPH_DL_EDGELIST1; }
+      |  nodelist1      { igraph_i_dl_data.type=IGRAPH_DL_NODELIST1; }
 ; 
 
 formfullmatrix:  FORMATFULLMATRIX newline fullmatrix {} | fullmatrix {} ;
 
 newline: | NEWLINE ;
 
-fullmatrix:   DATA newline fullmatrixdata {}
-            | LABELS newline labels newline DATA newline fullmatrixdata {}
-            | LABELSEMBEDDED newline DATA newline labeledfullmatrixdata {}
+fullmatrix:   DATA newline fullmatrixdata { }
+            | LABELS newline labels newline DATA newline fullmatrixdata {
+              }
+            | LABELSEMBEDDED newline DATA newline labeledfullmatrixdata {
+              }
 ;
 
 labels: 	    {}		/* nothing, empty matrix */
-            | labels newline LABEL {}
+            | labels newline LABEL { 
+	      igraph_i_dl_add_str(igraph_dl_yytext, igraph_dl_yyleng); }
 ;
 
-fullmatrixdata: {} | fullmatrixdata zerooneseq NEWLINE {} ;
+fullmatrixdata: {} | fullmatrixdata zerooneseq NEWLINE {
+  igraph_i_dl_add_matcol();
+ } ;
 
-zerooneseq: | zerooneseq zeroone {} ;
+zerooneseq: | zerooneseq zeroone {
+  igraph_vector_bool_push_back(&igraph_i_dl_data.zerooneseq,
+			       igraph_i_dl_data.zeroone);
+ } ;
 
-zeroone: DIGIT { } ;
+zeroone: DIGIT { igraph_i_dl_data.zeroone=igraph_dl_yytext[0]-'0'; } ;
 
-labeledfullmatrixdata: {} | reallabeledfullmatrixdata ;
+labeledfullmatrixdata: {} | reallabeledfullmatrixdata {} ;
 
 reallabeledfullmatrixdata: labelseq newline labeledmatrixlines {} ;
 
@@ -182,3 +199,27 @@ int igraph_dl_yyerror(char *s) {
   return 0;
 }
 
+int igraph_i_dl_add_str(char *newstr, int length) {
+  int tmp=newstr[length];
+  newstr[length]='\0';
+  IGRAPH_CHECK(igraph_strvector_add(&igraph_i_dl_data.labels, newstr));
+  newstr[length]=tmp;
+  return 0;
+}
+
+int igraph_i_dl_add_matcol() {
+  igraph_vector_bool_t *vec=&igraph_i_dl_data.zerooneseq;
+  igraph_matrix_bool_t *mat=&igraph_i_dl_data.matrix;
+  long int nrow=igraph_matrix_bool_nrow(mat);
+  long int ncol=igraph_matrix_bool_ncol(mat);
+  long int len=igraph_vector_bool_size(vec);
+  if (nrow==0) {
+    /* Trick to allocate all memory at once */
+    IGRAPH_CHECK(igraph_matrix_bool_resize(&igraph_i_dl_data.matrix, len, len));
+    IGRAPH_CHECK(igraph_matrix_bool_resize(&igraph_i_dl_data.matrix, len, 0));
+  }
+  IGRAPH_CHECK(igraph_matrix_bool_add_cols(mat, 1));
+  IGRAPH_CHECK(igraph_matrix_bool_set_col(mat, vec, ncol));
+  igraph_vector_bool_clear(vec);
+  return 0;
+}

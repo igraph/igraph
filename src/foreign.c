@@ -2727,11 +2727,14 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
 
 #undef CHECK
 
+#include "foreign-dl-header.h"
+
 extern FILE *igraph_dl_yyin;
 int igraph_dl_eof;
 long int igraph_dl_mylineno;
 char *igraph_i_dl_errmsg;
 extern igraph_i_dl_mode;
+igraph_i_dl_parsedata_t igraph_i_dl_data;
 
 int igraph_read_graph_dl(igraph_t *graph, FILE *instream) {
   
@@ -2741,11 +2744,27 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream) {
   igraph_dl_mylineno=1;
   igraph_dl_eof=0;
   igraph_i_dl_mode=0;
+
+  igraph_i_dl_data.n=-1;
+  IGRAPH_CHECK(igraph_vector_bool_init(&igraph_i_dl_data.zerooneseq, 0));
+  IGRAPH_FINALLY(igraph_vector_bool_destroy, &igraph_i_dl_data.zerooneseq);
+  IGRAPH_CHECK(igraph_matrix_bool_init(&igraph_i_dl_data.matrix, 0, 0));
+  IGRAPH_FINALLY(igraph_matrix_bool_destroy, &igraph_i_dl_data.matrix);
+  IGRAPH_CHECK(igraph_strvector_init(&igraph_i_dl_data.labels, 0));
+  IGRAPH_FINALLY(igraph_strvector_destroy, &igraph_i_dl_data.labels);
   
   i=igraph_dl_yyparse();
   if (i != 0) {
     IGRAPH_ERROR("Cannot read DL file", IGRAPH_PARSEERROR);
   }
+
+/*   igraph_matrix_bool_print(&igraph_i_dl_data.matrix, stdout); */
+/*   printf("-------\n"); */
+
+  igraph_strvector_destroy(&igraph_i_dl_data.labels);
+  igraph_matrix_bool_destroy(&igraph_i_dl_data.matrix);
+  igraph_vector_bool_destroy(&igraph_i_dl_data.zerooneseq);
+  IGRAPH_FINALLY_CLEAN(3);
   
   return 0;
 }
