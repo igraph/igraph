@@ -530,6 +530,70 @@ PyObject *igraphmodule_Graph_degree(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief The strength (weighted degree) of some vertices in an \c igraph.Graph
+ * \return the strength list as a Python object
+ * \sa igraph_strength
+ */
+PyObject *igraphmodule_Graph_strength(igraphmodule_GraphObject * self,
+                                      PyObject * args, PyObject * kwds)
+{
+  PyObject *list = Py_None;
+  PyObject *loops = Py_True;
+  PyObject *dtype_o = Py_None;
+  PyObject *weights_o = Py_None;
+  igraph_neimode_t dtype = IGRAPH_ALL;
+  igraph_vector_t result, *weights = 0;
+  igraph_vs_t vs;
+  igraph_bool_t return_single = 0;
+
+  static char *kwlist[] = { "vertices", "type", "loops", "weights", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOO", kwlist,
+                                   &list, &dtype_o, &loops, &weights_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_neimode_t(dtype_o, &dtype)) return NULL;
+
+  if (igraphmodule_PyObject_to_vs_t(list, &vs, &return_single)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_vector_init(&result, 0)) {
+    igraph_vs_destroy(&vs);
+    return NULL;
+  }
+
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    igraph_vs_destroy(&vs);
+    igraph_vector_destroy(&result);
+    return NULL;
+  }
+
+  if (igraph_strength(&self->g, &result, vs, dtype,
+        PyObject_IsTrue(loops), weights)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vs_destroy(&vs);
+    igraph_vector_destroy(&result);
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
+    return NULL;
+  }
+
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
+
+  if (!return_single)
+    list = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
+  else
+    list = PyInt_FromLong(VECTOR(result)[0]);
+
+  igraph_vector_destroy(&result);
+  igraph_vs_destroy(&vs);
+
+  return list;
+}
+
+/** \ingroup python_interface_graph
  * \brief Calculates the graph density
  * \return the density
  * \sa igraph_density
@@ -7731,6 +7795,26 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param type: the type of degree to be returned (L{OUT} for\n"
    "  out-degrees, L{IN} IN for in-degrees or L{ALL} for the sum of\n"
    "  them).\n" "@param loops: whether self-loops should be counted.\n"},
+
+  /* interface to igraph_degree */
+  {"strength", (PyCFunction) igraphmodule_Graph_strength,
+   METH_VARARGS | METH_KEYWORDS,
+   "strength(vertices, type=ALL, loops=True, weights=None)\n\n"
+   "Returns the strength (weighted degree) of some vertices from the graph\n\n"
+   "This method accepts a single vertex ID or a list of vertex IDs as a\n"
+   "parameter, and returns the strength (that is, the sum of the weights\n"
+   "of all adjacent edges) of the given vertices (in the\n"
+   "form of a single integer or a list, depending on the input\n"
+   "parameter).\n"
+   "\n"
+   "@param vertices: a single vertex ID or a list of vertex IDs\n"
+   "@param type: the type of degree to be returned (L{OUT} for\n"
+   "  out-degrees, L{IN} IN for in-degrees or L{ALL} for the sum of\n"
+   "  them).\n"
+   "@param loops: whether self-loops should be counted.\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name.\n"
+  },
 
   /* interface to igraph_is_loop */
   {"is_loop", (PyCFunction) igraphmodule_Graph_is_loop,
