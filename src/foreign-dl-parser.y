@@ -57,7 +57,6 @@ extern char *igraph_i_dl_errmsg;
 int igraph_dl_yyerror(char *s);
 extern igraph_i_dl_parsedata_t igraph_i_dl_data;
 int igraph_i_dl_add_str(char *newstr, int length);
-int igraph_i_dl_add_matcol();
 
 extern char *igraph_dl_yytext;
 extern int igraph_dl_yyleng;
@@ -102,10 +101,8 @@ formfullmatrix:  FORMATFULLMATRIX newline fullmatrix {} | fullmatrix {} ;
 newline: | NEWLINE ;
 
 fullmatrix:   DATA newline fullmatrixdata { }
-            | LABELS newline labels newline DATA newline fullmatrixdata {
-              }
-            | LABELSEMBEDDED newline DATA newline labeledfullmatrixdata {
-              }
+            | LABELS newline labels newline DATA newline fullmatrixdata { }
+            | LABELSEMBEDDED newline DATA newline labeledfullmatrixdata { }
 ;
 
 labels: 	    {}		/* nothing, empty matrix */
@@ -114,15 +111,21 @@ labels: 	    {}		/* nothing, empty matrix */
 ;
 
 fullmatrixdata: {} | fullmatrixdata zerooneseq NEWLINE {
-  igraph_i_dl_add_matcol();
+  igraph_i_dl_data.from += 1;
+  igraph_i_dl_data.to = 0;
  } ;
 
-zerooneseq: | zerooneseq zeroone {
-  igraph_vector_bool_push_back(&igraph_i_dl_data.zerooneseq,
-			       igraph_i_dl_data.zeroone);
- } ;
+zerooneseq: | zerooneseq zeroone { } ;
 
-zeroone: DIGIT { igraph_i_dl_data.zeroone=igraph_dl_yytext[0]-'0'; } ;
+zeroone: DIGIT {
+  if (igraph_dl_yytext[0]=='1') {
+    IGRAPH_CHECK(igraph_vector_push_back(&igraph_i_dl_data.edges, 
+					 igraph_i_dl_data.from));
+    IGRAPH_CHECK(igraph_vector_push_back(&igraph_i_dl_data.edges, 
+					 igraph_i_dl_data.to));
+  }
+  igraph_i_dl_data.to += 1;
+} ;
 
 labeledfullmatrixdata: {} | reallabeledfullmatrixdata {} ;
 
@@ -131,8 +134,10 @@ reallabeledfullmatrixdata: labelseq newline labeledmatrixlines {} ;
 labelseq: {} | labelseq newline LABEL {} ;
 
 labeledmatrixlines: labeledmatrixline {} 
-             | labeledmatrixlines labeledmatrixline {}
-;
+             | labeledmatrixlines labeledmatrixline { 
+	         igraph_i_dl_data.from += 1; 
+		 igraph_i_dl_data.to = 0;
+               };
 
 labeledmatrixline: LABEL zerooneseq NEWLINE {} ;
 
@@ -204,22 +209,5 @@ int igraph_i_dl_add_str(char *newstr, int length) {
   newstr[length]='\0';
   IGRAPH_CHECK(igraph_strvector_add(&igraph_i_dl_data.labels, newstr));
   newstr[length]=tmp;
-  return 0;
-}
-
-int igraph_i_dl_add_matcol() {
-  igraph_vector_bool_t *vec=&igraph_i_dl_data.zerooneseq;
-  igraph_matrix_bool_t *mat=&igraph_i_dl_data.matrix;
-  long int nrow=igraph_matrix_bool_nrow(mat);
-  long int ncol=igraph_matrix_bool_ncol(mat);
-  long int len=igraph_vector_bool_size(vec);
-  if (nrow==0) {
-    /* Trick to allocate all memory at once */
-    IGRAPH_CHECK(igraph_matrix_bool_resize(&igraph_i_dl_data.matrix, len, len));
-    IGRAPH_CHECK(igraph_matrix_bool_resize(&igraph_i_dl_data.matrix, len, 0));
-  }
-  IGRAPH_CHECK(igraph_matrix_bool_add_cols(mat, 1));
-  IGRAPH_CHECK(igraph_matrix_bool_set_col(mat, vec, ncol));
-  igraph_vector_bool_clear(vec);
   return 0;
 }

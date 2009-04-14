@@ -24,10 +24,9 @@ typedef enum { IGRAPH_DL_MATRIX,
 	       IGRAPH_DL_EDGELIST1, IGRAPH_DL_NODELIST1 } igraph_i_dl_type_t;
 
 typedef struct {
-  int zeroone;
   long int n;
-  igraph_vector_bool_t zerooneseq;
-  igraph_matrix_bool_t matrix;
+  long int from, to;
+  igraph_vector_t edges;
   igraph_strvector_t labels;
   igraph_i_dl_type_t type;
 } igraph_i_dl_parsedata_t;

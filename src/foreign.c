@@ -2746,10 +2746,9 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream) {
   igraph_i_dl_mode=0;
 
   igraph_i_dl_data.n=-1;
-  IGRAPH_CHECK(igraph_vector_bool_init(&igraph_i_dl_data.zerooneseq, 0));
-  IGRAPH_FINALLY(igraph_vector_bool_destroy, &igraph_i_dl_data.zerooneseq);
-  IGRAPH_CHECK(igraph_matrix_bool_init(&igraph_i_dl_data.matrix, 0, 0));
-  IGRAPH_FINALLY(igraph_matrix_bool_destroy, &igraph_i_dl_data.matrix);
+  igraph_i_dl_data.from=0;
+  igraph_i_dl_data.to=0;
+  IGRAPH_VECTOR_INIT_FINALLY(&igraph_i_dl_data.edges, 0);
   IGRAPH_CHECK(igraph_strvector_init(&igraph_i_dl_data.labels, 0));
   IGRAPH_FINALLY(igraph_strvector_destroy, &igraph_i_dl_data.labels);
   
@@ -2758,13 +2757,11 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream) {
     IGRAPH_ERROR("Cannot read DL file", IGRAPH_PARSEERROR);
   }
 
-/*   igraph_matrix_bool_print(&igraph_i_dl_data.matrix, stdout); */
-/*   printf("-------\n"); */
+/*   igraph_vector_print(&igraph_i_dl_data.edges, stdout); */
 
   igraph_strvector_destroy(&igraph_i_dl_data.labels);
-  igraph_matrix_bool_destroy(&igraph_i_dl_data.matrix);
-  igraph_vector_bool_destroy(&igraph_i_dl_data.zerooneseq);
-  IGRAPH_FINALLY_CLEAN(3);
+  igraph_vector_destroy(&igraph_i_dl_data.edges);
+  IGRAPH_FINALLY_CLEAN(2);
   
   return 0;
 }
