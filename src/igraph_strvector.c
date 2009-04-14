@@ -551,3 +551,16 @@ void igraph_strvector_remove_negidx(igraph_strvector_t *v, const igraph_vector_t
   v->len -= nremove;
 }
 
+int igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
+			   const char *sep) {
+
+  long int i, n=igraph_strvector_size(v);
+  if (n!=0) {
+    fprintf(file, "%s", STR(*v, 0));
+  }
+  for (i=1; i<n; i++) {
+    fprintf(file, "%s%s", sep, STR(*v, i));
+  }
+  return 0;
+
+}
