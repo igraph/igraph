@@ -151,6 +151,11 @@ tkigraph <- function() {
         command=function() {
           .tkigraph.degree("total")
         })
+  tkadd(centrality.menu, "command", label="Plot log-log degree distribution",
+        command=function() {
+          .tkigraph.degree.dist()
+        })
+  tkadd(centrality.menu, "separator")
   tkadd(centrality.menu, "command", label="Closeness", command=function() {
     .tkigraph.closeness()
   })
@@ -1137,6 +1142,25 @@ tkigraph <- function() {
                      plot.text="Plot distribution",
                      plot.command=plot.command,
                      showmean=mv)
+}
+
+.tkigraph.degree.dist <- function() {
+  gnos <- .tkigraph.get.selected()
+  if (length(gnos)!=1) {
+    .tkigraph.error("Please select exactly one graph")
+    return()
+  }
+  graphs <- get("graphs", .tkigraph.env)
+  read <- .tkigraph.dialogbox(TITLE="Choose degree type",
+                              type=list(name="Degree type",
+                                type="listbox", default="0",
+                                values=c("Out", "In", "Total")))
+  mode <- c("out", "in", "all")[read$type+1]
+  deg <- degree(graphs[[gnos]], mode=mode)
+  x11()
+  h <- hist(deg, -1:max(deg), plot=FALSE)$density
+  plot(0:max(deg), h, xlab="Degree", ylab="Relative frequency",
+       type="b", main="Degree distribution", log="xy")
 }
 
 .tkigraph.closeness <- function() {
