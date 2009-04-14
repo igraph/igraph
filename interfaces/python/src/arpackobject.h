@@ -25,8 +25,8 @@
 #define PYTHON_ARPACKOBJECT_H
 
 #include <Python.h>
+#include <igraph/arpack.h>
 #include "graphobject.h"
-#include "arpack.h"
 
 /**
  * \ingroup python_interface
@@ -35,7 +35,7 @@
 extern PyTypeObject igraphmodule_ARPACKOptionsType;
 
 /**
- * \ingroup python_interface_arpach
+ * \ingroup python_interface_arpack
  * \brief A structure representing ARPACK parameters
  */
 typedef struct {

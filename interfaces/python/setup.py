@@ -12,7 +12,7 @@ import glob
 from os import popen3, mkdir
 from shutil import copy2
 
-LIBIGRAPH_FALLBACK_INCLUDE_DIRS = ['/usr/include/igraph', '/usr/local/include/igraph']
+LIBIGRAPH_FALLBACK_INCLUDE_DIRS = ['/usr/include', '/usr/local/include']
 LIBIGRAPH_FALLBACK_LIBRARIES = ['igraph']
 LIBIGRAPH_FALLBACK_LIBRARY_DIRS = []
 
@@ -59,8 +59,9 @@ line, exit_code = get_output("pkg-config igraph")
 if exit_code>0:
     print "Using default include and library paths for compilation"
     print "If the compilation fails, please edit the LIBIGRAPH_FALLBACK_*"
-    print "variables in setup.py to point to the correct directories"
-    print "and libraries where the C core of igraph is installed"
+    print "variables in setup.py or include_dirs and library_dirs in "
+    print "setup.cfg to point to the correct directories and libraries"
+    print "where the C core of igraph is installed"
     print
     
 include_dirs.extend(detect_igraph_include_dirs())
@@ -94,10 +95,10 @@ benefit from the meta-package available on the igraph homepage.
 
 plat = get_platform()
 data_files = []
-if "macosx" in plat:
-    data_files = [('/usr/lib', ['/usr/local/lib/libigraph.dylib', \
-                                '/usr/local/lib/libigraph.0.dylib', \
-                                '/usr/local/lib/libigraph.0.0.0.dylib'])]
+# if "macosx" in plat:
+#     data_files = [('/usr/lib', ['/usr/local/lib/libigraph.dylib', \
+#                                 '/usr/local/lib/libigraph.0.dylib', \
+#                                 '/usr/local/lib/libigraph.0.0.0.dylib'])]
 
 setup(name = 'python-igraph',
       version = '0.5.1',

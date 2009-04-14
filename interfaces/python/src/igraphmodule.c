@@ -23,9 +23,7 @@
 
 #include <Python.h>
 #include <pythonrun.h>
-#include "igraph.h"
-#include "memory.h"
-#include "attributes.h"
+#include <igraph/igraph.h>
 #include "common.h"
 #include "error.h"
 #include "convert.h"
