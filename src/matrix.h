@@ -173,6 +173,13 @@ int FUNCTION(igraph_matrix,add_rows)(TYPE(igraph_matrix) *m, long int n);
 int FUNCTION(igraph_matrix,remove_col)(TYPE(igraph_matrix) *m, long int col);
 int FUNCTION(igraph_matrix,remove_row)(TYPE(igraph_matrix) *m, long int row);
 
+/*------------------------*/
+/* Print as text          */
+/*------------------------*/
+
+int FUNCTION(igraph_matrix,print)(TYPE(igraph_matrix) *m,
+				  FILE *file);
+
 /* ----------------------------------------------------------------------------*/
 /* For internal use only, may be removed, rewritten ... */
 /* ----------------------------------------------------------------------------*/
