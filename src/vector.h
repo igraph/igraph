@@ -198,6 +198,12 @@ void FUNCTION(igraph_vector,remove_section)(TYPE(igraph_vector) *v,
 
 void FUNCTION(igraph_vector,sort)(TYPE(igraph_vector) *v);
 
+/*-----------*/
+/* Printing  */
+/*-----------*/
+
+int FUNCTION(igraph_vector,print)(TYPE(igraph_vector) *v, FILE *file);
+
 /* ----------------------------------------------------------------------------*/
 /* For internal use only, may be removed, rewritten ... */
 /* ----------------------------------------------------------------------------*/
