@@ -88,7 +88,7 @@ int igraph_bfs(const igraph_t *graph,
   long int act_rank=0;
   long int pred_vec=-1;
 
-  if (root < 0 && root >= no_of_nodes) {
+  if (root < 0 || root >= no_of_nodes) {
     IGRAPH_ERROR("Invalid root vertex in BFS", IGRAPH_EINVAL);
   }
   
