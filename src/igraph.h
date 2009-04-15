@@ -1156,6 +1156,22 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *graphs,
 /* Visitor-like functions                             */
 /* -------------------------------------------------- */
 
+typedef igraph_bool_t igraph_bfshandler_t(const igraph_t *graph,
+					  igraph_integer_t vid, 
+					  igraph_integer_t pred, 
+					  igraph_integer_t succ,
+					  igraph_integer_t rank,
+					  igraph_integer_t dist,
+					  void *extra);
+
+int igraph_bfs(const igraph_t *graph, 
+	       igraph_integer_t root, igraph_neimode_t mode,
+	       igraph_vector_t *previsit, igraph_vector_t *postvisit,
+	       igraph_vector_t *prerank, igraph_vector_t *postrank,
+	       igraph_vector_t *pred, igraph_vector_t *succ,
+	       igraph_vector_t *dist, igraph_bfshandler_t *callback,
+	       void *extra);
+
 int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
 		 igraph_vector_t *vids, igraph_vector_t *layers,
 		 igraph_vector_t *parents);

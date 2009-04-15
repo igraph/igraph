@@ -25,6 +25,91 @@
 #include "memory.h"
 #include "config.h"
 
+int igraph_bfs(const igraph_t *graph, 
+	       igraph_integer_t root, igraph_neimode_t mode,
+	       igraph_vector_t *previsit, igraph_vector_t *postvisit,
+	       igraph_vector_t *prerank, igraph_vector_t *postrank,
+	       igraph_vector_t *pred, igraph_vector_t *succ,
+	       igraph_vector_t *dist, igraph_bfshandler_t *callback,
+	       void *extra) {
+  
+  igraph_dqueue_t Q;
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i;
+  igraph_vector_char_t added;
+  igraph_lazy_adjlist_t adjlist;
+  
+  long int act_prerank=0, act_postrank=0;
+  long int pred_vec=-1;
+  
+  if (!igraph_is_directed(graph)) { mode=IGRAPH_ALL; }
+
+  if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
+      mode != IGRAPH_ALL) {
+    IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+  }
+  
+  IGRAPH_CHECK(igraph_vector_char_init(&added, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_char_destroy, &added);
+  IGRAPH_CHECK(igraph_dqueue_init(&Q, 100));
+  IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);
+
+  IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, /*simplify=*/ 0));
+  IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
+
+  /* Resize result vectors */
+  if (previsit)  { igraph_vector_resize(previsit,  no_of_nodes); }
+  if (postvisit) { igraph_vector_resize(postvisit, no_of_nodes); }
+  if (prerank)   { igraph_vector_resize(prerank,   no_of_nodes); }
+  if (postrank)  { igraph_vector_resize(postrank,  no_of_nodes); }
+  if (pred)      { igraph_vector_resize(pred,      no_of_nodes); }
+  if (succ)      { igraph_vector_resize(succ,      no_of_nodes); }
+  if (dist)      { igraph_vector_resize(dist,      no_of_nodes); }
+
+  IGRAPH_CHECK(igraph_dqueue_push(&Q, root));
+  IGRAPH_CHECK(igraph_dqueue_push(&Q, 0));
+  if (prerank) { VECTOR(*prerank) [(long int)root] = act_prerank; }
+  if (previsit) { VECTOR(*previsit)[act_prerank++] = root; }
+
+  while (!igraph_dqueue_empty(&Q)) {
+    long int actvect=igraph_dqueue_pop(&Q);
+    long int actdist=igraph_dqueue_pop(&Q);
+    long int succ_vec;
+    igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, actvect);
+    long int i, n=igraph_vector_size(neis);    
+
+    if (pred) { VECTOR(*pred)[actvect] = pred_vec; }
+    if (postrank) { VECTOR(*postrank) [actvect] = act_postrank; }
+    if (postvisit) { VECTOR(*postvisit)[act_postrank++] = actvect; }
+    if (dist) { VECTOR(*dist)[actvect] = actdist; }
+
+    for (i=0; i<n; i++) {
+      long int nei=VECTOR(*neis)[i];
+      if (! VECTOR(added)[nei]) {
+	VECTOR(added)[nei] = 1;
+	IGRAPH_CHECK(igraph_dqueue_push(&Q, nei));
+	IGRAPH_CHECK(igraph_dqueue_push(&Q, actdist+1));
+      }
+    }
+
+    succ_vec = igraph_dqueue_empty(&Q) ? -1 : igraph_dqueue_head(&Q);
+    if (callback) {
+      callback(graph, actvect, pred_vec, succ_vec, act_postrank, actdist, extra);
+    }
+
+    if (succ) { VECTOR(*succ)[actvect] = succ_vec; }
+    
+    pred_vec=actvect;
+  }
+
+  igraph_lazy_adjlist_destroy(&adjlist);
+  igraph_dqueue_destroy(&Q);
+  igraph_vector_char_destroy(&added);
+  IGRAPH_FINALLY_CLEAN(3);
+  
+  return 0;
+}
+
 /**
  * \function igraph_i_bfs
  * \ingroup internal
