@@ -269,3 +269,92 @@ int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
 		 
   return 0;
 }
+
+int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
+	       igraph_neimode_t mode, igraph_vector_t *order,
+	       igraph_vector_t *order_out, igraph_vector_t *father,
+	       igraph_vector_t *dist, igraph_dfshandler_t *callback,
+	       void *extra) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_lazy_adjlist_t adjlist;
+  igraph_stack_t stack;
+  igraph_vector_char_t added;
+  long int actroot;
+  long int act_rank=0;
+
+  if (root < 0 || root >= no_of_nodes) { 
+    IGRAPH_ERROR("Invalid root vertex for DFS", IGRAPH_EINVAL);
+  }
+
+  if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
+      mode != IGRAPH_ALL) {
+    IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+  }
+  
+  if (!igraph_is_directed(graph)) { mode=IGRAPH_ALL; }
+
+  IGRAPH_CHECK(igraph_vector_char_init(&added, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_char_destroy, &added);
+  IGRAPH_CHECK(igraph_stack_init(&stack, 100));
+  IGRAPH_FINALLY(igraph_stack_destroy, &stack);
+  IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, /*simplify=*/ 0));  
+  IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
+
+  /* Resize result vectors and fill them with IGRAPH_NAN */
+  
+# define VINIT(v) if (v) {                      \
+    igraph_vector_resize(v, no_of_nodes);       \
+    igraph_vector_fill(v, IGRAPH_NAN); }
+  
+  VINIT(order);
+  VINIT(order_out);
+  VINIT(father);
+  VINIT(dist);
+
+# undef VINIT
+
+  IGRAPH_CHECK(igraph_stack_push(&stack, 0));
+  IGRAPH_CHECK(igraph_stack_push(&stack, root));
+  VECTOR(added)[(long int)root] = 1;
+  if (father) { VECTOR(*father)[(long int)root] = -1; }
+
+  for (actroot=0; actroot<no_of_nodes; actroot++) {
+
+    /* 'root' first, then all other vertices */
+    if (igraph_stack_empty(&stack)) {
+      if (VECTOR(added)[actroot]) { continue; }
+      IGRAPH_CHECK(igraph_stack_push(&stack, 0));
+      IGRAPH_CHECK(igraph_stack_push(&stack, actroot));
+      VECTOR(added)[actroot] = 1;
+      if (father) { VECTOR(*father)[actroot] = -1; }
+    }
+    
+    while (!igraph_stack_empty(&stack)) {
+      long int actvect=igraph_stack_pop(&stack);
+      long int actdist=igraph_stack_pop(&stack);
+      igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, actvect);
+      long int i, n=igraph_vector_size(neis);
+
+      if (order) { VECTOR(*order)[act_rank++] = actvect; }
+      if (dist) { VECTOR(*dist)[actvect] = actdist; }
+
+      for (i=n-1; i>=0; i--) {
+	long int nei=VECTOR(*neis)[i];
+	if (! VECTOR(added)[nei]) {
+	  VECTOR(added)[nei] = 1;
+	  IGRAPH_CHECK(igraph_stack_push(&stack, actdist+1));
+	  IGRAPH_CHECK(igraph_stack_push(&stack, nei));
+	  if (father) { VECTOR(*father)[nei] = actvect; }
+	}
+      }
+    }      
+  }
+
+  igraph_lazy_adjlist_destroy(&adjlist);
+  igraph_stack_destroy(&stack);
+  igraph_vector_char_destroy(&added);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  return 0;
+}

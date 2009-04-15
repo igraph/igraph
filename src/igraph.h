@@ -1206,6 +1206,17 @@ int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
 		 igraph_vector_t *vids, igraph_vector_t *layers,
 		 igraph_vector_t *parents);
 
+typedef igraph_bool_t igraph_dfshandler_t(const igraph_t *graph,
+					  igraph_integer_t vid, 
+					  igraph_integer_t dist,
+					  void *extra);
+
+int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
+	       igraph_neimode_t mode, igraph_vector_t *order,
+	       igraph_vector_t *order_out, igraph_vector_t *father,
+	       igraph_vector_t *dist, igraph_dfshandler_t *callback,
+	       void *extra);
+
 /* -------------------------------------------------- */
 /* Centrality                                         */
 /* -------------------------------------------------- */
