@@ -23,6 +23,17 @@
 
 #include <igraph.h>
 
+igraph_bool_t bfs_callback(const igraph_t *graph,
+			   igraph_integer_t vid, 
+			   igraph_integer_t pred, 
+			   igraph_integer_t succ,
+			   igraph_integer_t rank,
+			   igraph_integer_t dist,
+			   void *extra) {
+  printf(" %li", (long int) vid);
+  return 0;
+}		   
+
 int main() {
   
   igraph_t graph, ring;
@@ -56,6 +67,12 @@ int main() {
   igraph_vector_destroy(&pred);
   igraph_vector_destroy(&succ);
   igraph_vector_destroy(&dist);
+
+  /* Test the callback */
+
+  igraph_bfs(&graph, /*root=*/ 0, /*neimode=*/ IGRAPH_OUT, 
+	     0, 0, 0, 0, 0, 0, &bfs_callback, 0);
+  printf("\n");
   
   igraph_destroy(&graph);
   
