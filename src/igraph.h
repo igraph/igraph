@@ -1156,6 +1156,35 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *graphs,
 /* Visitor-like functions                             */
 /* -------------------------------------------------- */
 
+/**
+ * \typedef igraph_bfshandler_t
+ * Callback type for BFS function
+ * 
+ * \ref igraph_bfs() is able to call a callback function, whenever a
+ * new vertex is found, while doing the breadth-first search. This
+ * callback function must be of type \c igraph_bfshandler_t. It has
+ * the following arguments:
+ * \param graph The graph that that algorithm is working on. Of course
+ *   this must not be modified.
+ * \param vid The id of the vertex just found by the breadth-first
+ *   search.
+ * \param pred The id of the previous vertex visited. It is -1 if
+ *   there is no previous vertex, because the current vertex is the root
+ *   is a search tree.
+ * \param succ The id of the next vertex that will be visited. It is
+ *   -1 if there is no next vertex, because the current vertex is the
+ *   last one in a search tree.
+ * \param rank The rank of the current vertex, it starts with zero.
+ * \param dist The distance (number of hops) of the current vertex
+ *   from the root of the current search tree.
+ * \return A logical value, if TRUE (=non-zero), that is interpreted
+ *    as a request to stop the BFS and return to the caller. Please
+ *    note that such a premature termination may leave the result
+ *    vectors in an undefined state.
+ * 
+ * \sa \ref igraph_bfs()
+ */
+
 typedef igraph_bool_t igraph_bfshandler_t(const igraph_t *graph,
 					  igraph_integer_t vid, 
 					  igraph_integer_t pred, 

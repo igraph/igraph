@@ -25,6 +25,52 @@
 #include "memory.h"
 #include "config.h"
 
+/**
+ * \function igraph_bfs
+ * Breadth-first search
+ * 
+ * A simple breadth-first search, with a lot of different results and
+ * the possibility to call a callback whenever a vertex is visited.
+ * It is allowed to supply null pointers as the output arguments the
+ * user is not interested in, in this case they will be ignored.
+ * 
+ * </para><para>
+ * If not all vertices can be reached from the supplied root vertex,
+ * then additional root vertices will be used, in the order of their
+ * vertex ids.
+ * \param graph The input graph.
+ * \param root The id of the root vertex.
+ * \param mode For directed graphs is defines which edges to follow.
+ *        \c IGRAPH_OUT means following the direction of the edges,
+ *        \c IGRAPH_IN means the opposite, and 
+ *        \c IGRAPH_ALL ignores the direction of the edges.
+ *        This parameter is ignored for undirected graphs. 
+ * \param order If not null pointer, then the vertex ids of the graph are
+ *        stored here, in the same order as they were visited.
+ * \param rank If not a null pointer, then the rank of each vertex is
+ *        stored here.
+ * \param father If not a null pointer, then the id of the father of
+ *        each vertex is stored here.
+ * \param pred If not a null pointer, then the id of vertex that was
+ *        visited before the current one is stored here. If there is
+ *        no such vertex (the current vertex is the root of a search
+ *        tree), then -1 is stored.
+ * \param succ If not a null pointer, then the id of the vertex that
+ *        was visited after the current one is stored here. If there
+ *        is no such vertex (the current one is the last in a search
+ *        tree), then -1 is stored.
+ * \param dist If not null pointer, then the distance from the root of
+ *        the current search tree is stored here.
+ * \param callback If not null, then it should be a pointer to a
+ *        function of type \ref igraph_bfshandler_t. This function
+ *        will be called, whenever a new vertex is visited.
+ * \param extra Extra argument to pass to the callback function.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and
+ * edges.
+ */
+
 int igraph_bfs(const igraph_t *graph, 
 	       igraph_integer_t root, igraph_neimode_t mode,
 	       igraph_vector_t *order, igraph_vector_t *rank,
