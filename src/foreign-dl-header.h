@@ -27,6 +27,8 @@ typedef struct {
   long int n;
   long int from, to;
   igraph_vector_t edges;
+  igraph_vector_t weights;
   igraph_strvector_t labels;
+  igraph_trie_t trie;
   igraph_i_dl_type_t type;
 } igraph_i_dl_parsedata_t;

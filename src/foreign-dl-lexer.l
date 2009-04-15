@@ -115,11 +115,13 @@ whitespace [ \t\v\f]
 <FULLMATRIX>[^ \t\n\r\v\f,]+              { myprintf("label"); return LABEL; }
 <FULLMATRIX>{whitespace}                  { }
 
-<EDGELIST>{digit}+{whitespace}*         { myprintf("num "); return NUM; }
-<EDGELIST>[^ \t\n\r\v\f,]+{whitespace}* { myprintf("label "); return LABEL; }
+<EDGELIST>\-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)?  { myprintf("num "); return NUM; }
+<EDGELIST>[^ \t\n\r\v\f,]+                                 { myprintf("label "); return LABEL; }
+<EDGELIST>{whitespace}*                                    { }
 
-<NODELIST>{digit}+{whitespace}*         { myprintf("num3 "); return NUM; }
-<NODELIST>[^ \t\r\n\v\f,]+{whitespace}* { myprintf("label3 "); return LABEL; }
+<NODELIST>{digit}+                      { myprintf("num3 "); return NUM; }
+<NODELIST>[^ \t\r\n\v\f,]+              { myprintf("label3 "); return LABEL; }
+<NODELIST>{whitespace}*                 { }
 
 {whitespace}+                      { /* eaten up */ }
 
