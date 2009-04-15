@@ -657,3 +657,25 @@ count.multiple <- function(graph, eids=E(graph)) {
   .Call("R_igraph_count_multiple", graph, as.igraph.es(eids),
         PACKAGE="igraph")
 }
+
+graph.bfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
+                      previsit=FALSE, postvisit=TRUE, prerank=FALSE,
+                      postrank=FALSE, pred=FALSE, succ=FALSE, dist=FALSE,
+                      callback=NULL, extra=NULL, rho=parent.frame()) {
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object");
+  }
+
+  root <- as.numeric(root)
+  neimode <- igraph.match.arg(neimode)
+  if (!is.null(callback)) { callback <- as.function(callback) }
+  
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  .Call("R_igraph_bfs", graph, root, neimode, as.logical(previsit),
+        as.logical(postvisit), as.logical(prerank), as.logical(postrank),
+        as.logical(pred), as.logical(succ), as.logical(dist),
+        callback, extra, rho,
+        PACKAGE="igraph")
+  
+}

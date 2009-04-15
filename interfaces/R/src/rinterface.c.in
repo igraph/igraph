@@ -38,6 +38,7 @@ int igraph_free(void *p);
 SEXP R_igraph_vector_to_SEXP(igraph_vector_t *v);
 SEXP R_igraph_vector_bool_to_SEXP(igraph_vector_bool_t *v);
 SEXP R_igraph_vector_long_to_SEXP(igraph_vector_long_t *v);
+SEXP R_igraph_0orvector_to_SEXP(igraph_vector_t *v);
 SEXP R_igraph_0orvector_bool_to_SEXP(igraph_vector_bool_t *v);
 SEXP R_igraph_0orvector_long_to_SEXP(igraph_vector_long_t *v);
 SEXP R_igraph_matrix_to_SEXP(igraph_matrix_t *m);
@@ -6757,6 +6758,159 @@ SEXP R_igraph_is_chordal(SEXP graph, SEXP alpha, SEXP alpham1,
 
   UNPROTECT(1);
   return(result);
+}
+
+typedef struct {
+  SEXP graph, fun, extra, rho;
+} R_igraph_i_bfs_data_t;
+
+igraph_bool_t R_igraph_bfshandler(const igraph_t *graph,
+				  igraph_integer_t vid,
+				  igraph_integer_t pred,
+				  igraph_integer_t succ,
+				  igraph_integer_t rank,
+				  igraph_integer_t dist,
+				  void *extra) {
+  
+  R_igraph_i_bfs_data_t *data=extra;
+  SEXP arglist, R_fcall, result, names;
+  igraph_bool_t cres;
+
+  PROTECT(arglist=NEW_LIST(7));
+  PROTECT(names=NEW_CHARACTER(7));
+
+  SET_STRING_ELT(names, 0, mkChar("graph"));
+  SET_VECTOR_ELT(arglist, 0, data->graph);
+
+  SET_STRING_ELT(names, 1, mkChar("vid"));
+  SET_VECTOR_ELT(arglist, 1, NEW_INTEGER(1)); 
+  REAL(VECTOR_ELT(arglist, 1))[0] = vid;
+
+  SET_STRING_ELT(names, 2, mkChar("pred"));
+  SET_VECTOR_ELT(arglist, 2, NEW_INTEGER(1));
+  REAL(VECTOR_ELT(arglist, 2))[0] = pred;
+
+  SET_STRING_ELT(names, 3, mkChar("succ"));
+  SET_VECTOR_ELT(arglist, 3, NEW_INTEGER(1));
+  REAL(VECTOR_ELT(arglist, 3))[0] = succ;
+
+  SET_STRING_ELT(names, 4, mkChar("rank"));
+  SET_VECTOR_ELT(arglist, 4, NEW_INTEGER(1));
+  REAL(VECTOR_ELT(arglist, 4))[0] = rank;
+
+  SET_STRING_ELT(names, 5, mkChar("dist"));
+  SET_VECTOR_ELT(arglist, 5, NEW_INTEGER(1));
+  REAL(VECTOR_ELT(arglist, 5))[0] = dist;
+
+  SET_STRING_ELT(names, 6, mkChar("extra"));
+  SET_VECTOR_ELT(arglist, 6, data->extra);
+
+  SET_NAMES(arglist, names);
+
+  PROTECT(R_fcall = lang3(install("do.call"), data->fun, arglist));
+  PROTECT(result = eval(R_fcall, data->rho));
+  
+  cres=LOGICAL(result)[0];
+
+  UNPROTECT(4);
+  return cres;
+}
+
+SEXP R_igraph_bfs(SEXP graph, SEXP proot, SEXP pneimode,
+		  SEXP pprevisit, SEXP ppostvisit,
+		  SEXP pprerank, SEXP ppostrank,
+		  SEXP ppred, SEXP psucc, SEXP pdist, 
+		  SEXP pcallback, SEXP pextra, SEXP prho) {
+  
+  igraph_t g;
+  SEXP result, names;
+
+  igraph_integer_t root=REAL(proot)[0];
+  igraph_integer_t neimode=REAL(pneimode)[0];
+  igraph_vector_t previsit, postvisit, prerank, postrank, pred, succ, dist;
+  igraph_vector_t *p_previsit=0, *p_postvisit=0, *p_prerank=0, *p_postrank=0,
+    *p_pred=0, *p_succ=0, *p_dist=0;
+  void *callback=0;
+  R_igraph_i_bfs_data_t cb_data, *p_cb_data=0;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+
+  if (LOGICAL(pprevisit)[0]) { 
+    igraph_vector_init(&previsit, 0); p_previsit=&previsit;
+  }
+  if (LOGICAL(ppostvisit)[0]) { 
+    igraph_vector_init(&postvisit, 0); p_postvisit=&postvisit;
+  }
+  if (LOGICAL(pprerank)[0]) { 
+    igraph_vector_init(&prerank, 0); p_prerank=&prerank;
+  }
+  if (LOGICAL(ppostrank)[0]) { 
+    igraph_vector_init(&postrank, 0); p_postrank=&postrank;
+  }
+  if (LOGICAL(ppred)[0]) { 
+    igraph_vector_init(&pred, 0); p_pred=&pred;
+  }
+  if (LOGICAL(psucc)[0]) { 
+    igraph_vector_init(&succ, 0); p_succ=&succ;
+  }
+  if (LOGICAL(pdist)[0]) { 
+    igraph_vector_init(&dist, 0); p_dist=&dist;
+  }
+
+  if (!isNull(pcallback)) {
+    cb_data.graph=graph;
+    cb_data.fun=pcallback;
+    cb_data.extra=pextra;
+    cb_data.rho=prho;
+    callback=R_igraph_bfshandler;
+    p_cb_data = &cb_data;
+  }
+
+  igraph_bfs(&g, root, neimode, p_previsit, p_postvisit,
+	     p_prerank, p_postrank,
+	     p_pred, p_succ, p_dist, 
+	     (igraph_bfshandler_t*) callback, p_cb_data);
+
+  PROTECT(result=NEW_LIST(9));
+  PROTECT(names=NEW_CHARACTER(9));
+
+  SET_STRING_ELT(names, 0, mkChar("root"));
+  SET_VECTOR_ELT(result, 0, NEW_NUMERIC(1));
+  REAL(VECTOR_ELT(result, 0))[0] = root;
+
+  SET_STRING_ELT(names, 1, mkChar("neimode"));
+  SET_VECTOR_ELT(result, 1, NEW_CHARACTER(1));
+  if (neimode==1) { 
+    SET_STRING_ELT(VECTOR_ELT(result, 1), 0, mkChar("out"));
+  } else if (neimode==2) {
+    SET_STRING_ELT(VECTOR_ELT(result, 1), 0, mkChar("in"));
+  } else {
+    SET_STRING_ELT(VECTOR_ELT(result, 1), 0, mkChar("all"));
+  }
+  
+  SET_STRING_ELT(names, 2, mkChar("previsit"));
+  SET_VECTOR_ELT(result, 2, R_igraph_0orvector_to_SEXP(p_previsit));
+  SET_STRING_ELT(names, 3, mkChar("postvisit"));
+  SET_VECTOR_ELT(result, 3, R_igraph_0orvector_to_SEXP(p_postvisit));
+  SET_STRING_ELT(names, 4, mkChar("prerank"));
+  SET_VECTOR_ELT(result, 4, R_igraph_0orvector_to_SEXP(p_prerank));
+  SET_STRING_ELT(names, 5, mkChar("postrank"));
+  SET_VECTOR_ELT(result, 5, R_igraph_0orvector_to_SEXP(p_postrank));
+  SET_STRING_ELT(names, 6, mkChar("pred"));
+  SET_VECTOR_ELT(result, 6, R_igraph_0orvector_to_SEXP(p_pred));
+  SET_STRING_ELT(names, 7, mkChar("succ"));
+  SET_VECTOR_ELT(result, 7, R_igraph_0orvector_to_SEXP(p_succ));
+  SET_STRING_ELT(names, 8, mkChar("dist"));
+  SET_VECTOR_ELT(result, 8, R_igraph_0orvector_to_SEXP(p_dist));
+
+  SET_NAMES(result, names);
+  
+  R_igraph_after();
+  
+  UNPROTECT(2);
+  return result;
 }
 
 SEXP R_igraph_revolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
