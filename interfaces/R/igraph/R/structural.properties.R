@@ -668,7 +668,8 @@ graph.bfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
   }
 
   root <- as.numeric(root)
-  neimode <- igraph.match.arg(neimode)
+  neimode <- switch(igraph.match.arg(neimode),
+                    "out"=1, "in"=2, "all"=3, "total"=3)
   if (!is.null(callback)) { callback <- as.function(callback) }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
