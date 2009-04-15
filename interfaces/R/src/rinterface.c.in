@@ -6773,41 +6773,25 @@ igraph_bool_t R_igraph_bfshandler(const igraph_t *graph,
 				  void *extra) {
   
   R_igraph_i_bfs_data_t *data=extra;
-  SEXP arglist, R_fcall, result, names;
+  SEXP args, R_fcall, result, names;
   igraph_bool_t cres;
 
-  PROTECT(arglist=NEW_LIST(7));
-  PROTECT(names=NEW_CHARACTER(7));
+  PROTECT(args=NEW_NUMERIC(5));
+  PROTECT(names=NEW_CHARACTER(5));
 
-  SET_STRING_ELT(names, 0, mkChar("graph"));
-  SET_VECTOR_ELT(arglist, 0, data->graph);
+  SET_STRING_ELT(names, 0, mkChar("vid"));
+  SET_STRING_ELT(names, 1, mkChar("pred"));
+  SET_STRING_ELT(names, 2, mkChar("succ"));
+  SET_STRING_ELT(names, 3, mkChar("rank"));
+  SET_STRING_ELT(names, 4, mkChar("dist"));
+  REAL(args)[0]=vid;
+  REAL(args)[1]=pred;
+  REAL(args)[2]=succ;
+  REAL(args)[3]=rank;
+  REAL(args)[4]=dist;
+  SET_NAMES(args, names);
 
-  SET_STRING_ELT(names, 1, mkChar("vid"));
-  SET_VECTOR_ELT(arglist, 1, NEW_INTEGER(1)); 
-  REAL(VECTOR_ELT(arglist, 1))[0] = vid;
-
-  SET_STRING_ELT(names, 2, mkChar("pred"));
-  SET_VECTOR_ELT(arglist, 2, NEW_INTEGER(1));
-  REAL(VECTOR_ELT(arglist, 2))[0] = pred;
-
-  SET_STRING_ELT(names, 3, mkChar("succ"));
-  SET_VECTOR_ELT(arglist, 3, NEW_INTEGER(1));
-  REAL(VECTOR_ELT(arglist, 3))[0] = succ;
-
-  SET_STRING_ELT(names, 4, mkChar("rank"));
-  SET_VECTOR_ELT(arglist, 4, NEW_INTEGER(1));
-  REAL(VECTOR_ELT(arglist, 4))[0] = rank;
-
-  SET_STRING_ELT(names, 5, mkChar("dist"));
-  SET_VECTOR_ELT(arglist, 5, NEW_INTEGER(1));
-  REAL(VECTOR_ELT(arglist, 5))[0] = dist;
-
-  SET_STRING_ELT(names, 6, mkChar("extra"));
-  SET_VECTOR_ELT(arglist, 6, data->extra);
-
-  SET_NAMES(arglist, names);
-
-  PROTECT(R_fcall = lang3(install("do.call"), data->fun, arglist));
+  PROTECT(R_fcall = lang4(data->fun, data->graph, args, data->extra));
   PROTECT(result = eval(R_fcall, data->rho));
   
   cres=LOGICAL(result)[0];
