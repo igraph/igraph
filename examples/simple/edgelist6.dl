@@ -1,0 +1,11 @@
+DL n=5
+format = edgelist1
+labels:
+george, sally, jim, billy, jane
+labels embedded:
+data:
+george sally
+george jim       2
+sally jim
+billy george     1
+jane jim         1e-5

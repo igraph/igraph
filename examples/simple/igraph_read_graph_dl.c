@@ -30,6 +30,7 @@ int main() {
   const char *files[] = { "fullmatrix1.dl", "fullmatrix2.dl", 
 			  "fullmatrix3.dl", "fullmatrix4.dl",
 			  "edgelist1.dl", "edgelist2.dl", "edgelist3.dl",
+			  "edgelist4.dl", "edgelist5.dl", "edgelist6.dl",
 			  "nodelist1.dl", "nodelist2.dl" };
   int no_files=sizeof(files)/sizeof(const char*);
   int i, ret;
@@ -37,18 +38,20 @@ int main() {
   FILE *infile;
 
   for (i=0; i<no_files; i++) {
+    printf("Doing %s\n", files[i]);
     infile=fopen(files[i], "r");
     if (!infile) {
       printf("Cannot open file: %s\n", files[i]);
       exit(1+i);
     }
-    igraph_read_graph_dl(&g, infile);
+    igraph_read_graph_dl(&g, infile, /*directed=*/ 1);
     ret=fclose(infile);
     if (ret) {
       printf("Cannot close file: %s\n", files[i]);
       exit(11+i);
     }
-/*     igraph_destroy(&g); */
+    igraph_write_graph_edgelist(&g, stdout);
+    igraph_destroy(&g);
   }
 
   return 0;

@@ -67,7 +67,8 @@ write.graph.fromraw <- function(buffer, file) {
 }
 
 read.graph <- function(file, format=c("edgelist", "pajek", "ncol", "lgl",
-                               "graphml", "dimacs", "graphdb", "gml"), ...) {
+                               "graphml", "dimacs", "graphdb", "gml", "dl"),
+                       ...) {
 
   if (igraph.i.have.fmemopen) {
     file <- read.graph.toraw(file)
@@ -89,6 +90,7 @@ read.graph <- function(file, format=c("edgelist", "pajek", "ncol", "lgl",
                 "dimacs"=read.graph.dimacs(file, ...),
                 "graphdb"=read.graph.graphdb(file, ...),
                 "gml"=read.graph.gml(file, ...),
+                "dl"=read.graph.dl(file, ...),
                 stop(paste("Unknown file format:",format))
                 )
   res
@@ -337,6 +339,19 @@ write.graph.gml <- function(graph, file, id=NULL, creator=NULL, ...) {
   .Call("R_igraph_write_graph_gml", graph, file, id, creator,
         PACKAGE="igraph")
 }
+
+################################################################
+# UCINET DL
+################################################################
+
+read.graph.dl <- function(file, directed=TRUE, ...) {
+  if (length(list(...))>0) {
+    stop("Unknown arguments to read.graph (DL format)")
+  }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  .Call("R_igraph_read_graph_dl", file, as.logical(directed),
+        PACKAGE="igraph")
+}  
 
 ################################################################
 # Dot

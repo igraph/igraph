@@ -2727,25 +2727,134 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
 
 #undef CHECK
 
+#include "foreign-dl-header.h"
+
 extern FILE *igraph_dl_yyin;
 int igraph_dl_eof;
 long int igraph_dl_mylineno;
 char *igraph_i_dl_errmsg;
 extern igraph_i_dl_mode;
+igraph_i_dl_parsedata_t igraph_i_dl_data;
 
-int igraph_read_graph_dl(igraph_t *graph, FILE *instream) {
+/** 
+ * \function igraph_read_graph_dl
+ * \brief Read a file in the DL format of UCINET
+ * 
+ * This is a simple textual file format used by UCINET. See
+ * http://www.analytictech.com/networks/dataentry.htm for
+ * examples. All the forms described here are supported by
+ * igraph. Vertex names and edge weights are also supported and they
+ * are added as attributes. (If an attribute handler is attached.)
+ * 
+ * </para><para> Note the specification does not mention whether the
+ * format is case sensitive or not. For igraph DL files are case
+ * sensitive, i.e. \c Larry and \c larry are not the same.
+ * \param graph Pointer to an uninitialized graph object.
+ * \param instream The stream to read the DL file from.
+ * \param directed Logical scalar, whether to create a directed file.
+ * \return Error code.
+ * 
+ * Time complexity: linear in terms of the number of edges and
+ * vertices, except for the matrix format, which is quadratic in the
+ * number of vertices. 
+ */
+
+int igraph_read_graph_dl(igraph_t *graph, FILE *instream, 
+			 igraph_bool_t directed) {
   
   int i;
+  long int n, n2;
+  const igraph_strvector_t *namevec=0;
+  igraph_vector_ptr_t name, weight;
+  igraph_vector_ptr_t *pname=0, *pweight=0;
+  igraph_i_attribute_record_t namerec, weightrec;
+  const char *namestr="name", *weightstr="weight";
 
   igraph_dl_yyin=instream;
   igraph_dl_mylineno=1;
   igraph_dl_eof=0;
   igraph_i_dl_mode=0;
+
+  igraph_i_dl_data.n=-1;
+  igraph_i_dl_data.from=0;
+  igraph_i_dl_data.to=0;
+  IGRAPH_VECTOR_INIT_FINALLY(&igraph_i_dl_data.edges, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&igraph_i_dl_data.weights, 0);
+  IGRAPH_CHECK(igraph_strvector_init(&igraph_i_dl_data.labels, 0));
+  IGRAPH_FINALLY(igraph_strvector_destroy, &igraph_i_dl_data.labels);
+  IGRAPH_TRIE_INIT_FINALLY(&igraph_i_dl_data.trie, /*names=*/ 1);  
   
   i=igraph_dl_yyparse();
   if (i != 0) {
     IGRAPH_ERROR("Cannot read DL file", IGRAPH_PARSEERROR);
   }
+
+  /* Extend the weight vector, if needed */
+  n=igraph_vector_size(&igraph_i_dl_data.weights);
+  n2=igraph_vector_size(&igraph_i_dl_data.edges) / 2;
+  if (n != 0) {
+    igraph_vector_resize(&igraph_i_dl_data.weights, n2);
+    for (; n<n2; n++) {
+      VECTOR(igraph_i_dl_data.weights)[n] = IGRAPH_NAN;
+    }
+  }
+
+  /* Check number of vertices */
+  n=igraph_vector_max(&igraph_i_dl_data.edges);
+  if (n >= igraph_i_dl_data.n) {
+    IGRAPH_WARNING("More vertices than specified in `DL' file");
+    igraph_i_dl_data.n=n;
+  }
+
+  /* OK, everything is ready, create the graph */
+  IGRAPH_CHECK(igraph_empty(graph, 0, directed));
+  IGRAPH_FINALLY(igraph_destroy, graph);
+
+  /* Labels */
+  if (igraph_strvector_size(&igraph_i_dl_data.labels) != 0) {
+    namevec=(const igraph_strvector_t*) &igraph_i_dl_data.labels;
+  } else if (igraph_trie_size(&igraph_i_dl_data.trie) != 0) {
+    igraph_trie_getkeys(&igraph_i_dl_data.trie, &namevec);
+  }
+  if (namevec) {
+    IGRAPH_CHECK(igraph_vector_ptr_init(&name, 1));
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &name);
+    pname=&name;
+    namerec.name=namestr;
+    namerec.type=IGRAPH_ATTRIBUTE_STRING;
+    namerec.value=namevec;
+    VECTOR(name)[0]=&namerec;
+  }
+
+  /* Weights */
+  if (igraph_vector_size(&igraph_i_dl_data.weights) != 0) {
+    IGRAPH_CHECK(igraph_vector_ptr_init(&weight, 1));
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &name);
+    pweight=&weight;
+    weightrec.name=weightstr;
+    weightrec.type=IGRAPH_ATTRIBUTE_NUMERIC;
+    weightrec.value=&igraph_i_dl_data.weights;
+    VECTOR(weight)[0]=&weightrec;
+  }
+
+  IGRAPH_CHECK(igraph_add_vertices(graph, igraph_i_dl_data.n, pname));
+  IGRAPH_CHECK(igraph_add_edges(graph, &igraph_i_dl_data.edges, pweight));
+
+  if (pweight) {
+    igraph_vector_ptr_destroy(pweight);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  if (pname) {
+    igraph_vector_ptr_destroy(pname);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  igraph_trie_destroy(&igraph_i_dl_data.trie);
+  igraph_strvector_destroy(&igraph_i_dl_data.labels);
+  igraph_vector_destroy(&igraph_i_dl_data.edges);
+  igraph_vector_destroy(&igraph_i_dl_data.weights);
+  IGRAPH_FINALLY_CLEAN(4);
   
   return 0;
 }

@@ -928,6 +928,10 @@ igraph_read_graph_gml:
         PARAMS: OUT GRAPH graph, INFILE instream
         IGNORE: RR, RC, RNamespace
 
+igraph_read_graph_dl:
+        PARAMS: OUT GRAPH graph, INFILE instream, BOOLEAN directed=True
+        IGNORE: RR, RC, RNamespace
+
 igraph_write_graph_edgelist:
         PARAMS: GRAPH graph, OUTFILE outstream
         IGNORE: RR, RC, RNamespace

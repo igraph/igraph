@@ -1,0 +1,9 @@
+DL n=5
+format = edgelist1
+labels embedded:
+data:
+george sally     0.1
+george jim       0.5
+sally jim
+billy george     1
+jane jim 
