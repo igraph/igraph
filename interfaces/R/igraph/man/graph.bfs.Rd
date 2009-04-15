@@ -79,7 +79,7 @@ graph.bfs (graph, root, neimode = c("out", "in", "all", "total"),
 % \references{}
 \author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
 }
-% \seealso{}
+\seealso{ \code{\link{igraph.dfs}} for depth-first search.}
 \examples{
 ## Two rings
 graph.bfs(graph.ring(10) \%du\% graph.ring(10), 0, "out",
