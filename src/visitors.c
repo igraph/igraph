@@ -278,11 +278,12 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_lazy_adjlist_t adjlist;
-  igraph_stack_t stack, backs;
+  igraph_stack_t stack;
   igraph_vector_char_t added;
   long int actroot;
   long int act_rank=0;
   long int rank_out=0;
+  long int act_dist=0;
 
   if (root < 0 || root >= no_of_nodes) { 
     IGRAPH_ERROR("Invalid root vertex for DFS", IGRAPH_EINVAL);
@@ -302,11 +303,6 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
   IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, /*simplify=*/ 0));  
   IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
 
-  if (order_out) {
-    IGRAPH_CHECK(igraph_stack_init(&backs, 100));
-    IGRAPH_FINALLY(igraph_stack_destroy, &backs);
-  }
-
   /* Resize result vectors and fill them with IGRAPH_NAN */
   
 # define VINIT(v) if (v) {                      \
@@ -320,56 +316,51 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 
 # undef VINIT
 
-  IGRAPH_CHECK(igraph_stack_push(&stack, 0));
   IGRAPH_CHECK(igraph_stack_push(&stack, root));
   VECTOR(added)[(long int)root] = 1;
   if (father) { VECTOR(*father)[(long int)root] = -1; }
+  if (order) { VECTOR(*order)[act_rank++] = root; }
+  if (dist) { VECTOR(*dist)[(long int)root] = 0; }
 
   for (actroot=0; actroot<no_of_nodes; actroot++) {
 
     /* 'root' first, then all other vertices */
     if (igraph_stack_empty(&stack)) {
       if (VECTOR(added)[actroot]) { continue; }
-      IGRAPH_CHECK(igraph_stack_push(&stack, 0));
       IGRAPH_CHECK(igraph_stack_push(&stack, actroot));
       VECTOR(added)[actroot] = 1;
       if (father) { VECTOR(*father)[actroot] = -1; }
+      if (order) { VECTOR(*order)[act_rank++] = actroot; }
+      if (dist) { VECTOR(*dist)[actroot] = 0; }
     }
     
     while (!igraph_stack_empty(&stack)) {
-      long int actvect=igraph_stack_pop(&stack);
-      long int actdist=igraph_stack_pop(&stack);
+      long int actvect=igraph_stack_top(&stack);
       igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, actvect);
-      long int i, n=igraph_vector_size(neis);
-      igraph_bool_t isnew=0;
+      long int i, n=igraph_vector_size(neis)-1;
 
-      if (order_out) {
-	IGRAPH_CHECK(igraph_stack_push(&backs, actvect));
+      /* Search for a neighbor that was not yet visited */
+      igraph_bool_t any=0;
+      long int nei;
+      while (!any && !igraph_vector_empty(neis)) {
+	nei=igraph_vector_pop_back(neis);
+	any=!VECTOR(added)[nei];
       }
-      if (order) { VECTOR(*order)[act_rank++] = actvect; }
-      if (dist) { VECTOR(*dist)[actvect] = actdist; }
-
-      for (i=n-1; i>=0; i--) {
-	long int nei=VECTOR(*neis)[i];
-	if (! VECTOR(added)[nei]) {
-	  isnew=1;
-	  VECTOR(added)[nei] = 1;
-	  IGRAPH_CHECK(igraph_stack_push(&stack, actdist+1));
-	  IGRAPH_CHECK(igraph_stack_push(&stack, nei));
-	  if (father) { VECTOR(*father)[nei] = actvect; }
-	}
-      }
-      
-      /* Are we stepping back? */
-      if (order_out && !isnew) {
-	VECTOR(*order_out)[rank_out++] = igraph_stackpop(&backs);
+      if (any) {
+	/* There is such a neighbor, add it */
+	IGRAPH_CHECK(igraph_stack_push(&stack, nei));
+	VECTOR(added)[nei] = 1;
+	if (father) { VECTOR(*father)[ nei ] = actvect; }
+	if (order) { VECTOR(*order)[act_rank++] = nei; }
+	act_dist++;
+	if (dist) { VECTOR(*dist)[nei] = act_dist; }
+      } else {
+	/* There is no such neighbor, finished with the subtree */
+	igraph_stack_pop(&stack);
+	if (order_out) { VECTOR(*order_out)[rank_out++] = actvect; }
+	act_dist--;
       }
     }      
-  }
-
-  if (order_out) {
-    igraph_stack_destroy(&backs);
-    IGRAPH_FINALLY_CLEAN(1);
   }
 
   igraph_lazy_adjlist_destroy(&adjlist);
