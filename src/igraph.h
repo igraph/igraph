@@ -1178,9 +1178,10 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *graphs,
  * \param dist The distance (number of hops) of the current vertex
  *   from the root of the current search tree.
  * \return A logical value, if TRUE (=non-zero), that is interpreted
- *    as a request to stop the BFS and return to the caller. Please
- *    note that such a premature termination may leave the result
- *    vectors in an undefined state.
+ *    as a request to stop the BFS and return to the caller. If a BFS
+ *    is terminated like this, then all elements of the result vectors
+ *    that were not yet calculated at the point of the termination
+ *    contain \c IGRAPH_NAN.
  * 
  * \sa \ref igraph_bfs()
  */

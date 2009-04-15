@@ -103,13 +103,19 @@ int igraph_bfs(const igraph_t *graph,
   IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, /*simplify=*/ 0));
   IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
 
-  /* Resize result vectors */
-  if (order)     { igraph_vector_resize(order,     no_of_nodes); }
-  if (rank)      { igraph_vector_resize(rank,      no_of_nodes); }
-  if (father)    { igraph_vector_resize(father,    no_of_nodes); }
-  if (pred)      { igraph_vector_resize(pred,      no_of_nodes); }
-  if (succ)      { igraph_vector_resize(succ,      no_of_nodes); }
-  if (dist)      { igraph_vector_resize(dist,      no_of_nodes); }
+  /* Resize result vectors, and fill them with IGRAPH_NAN */
+
+# define VINIT(v) if (v) {                      \
+  igraph_vector_resize((v), no_of_nodes);	\
+  igraph_vector_fill((v), IGRAPH_NAN); }
+
+  VINIT(order);
+  VINIT(rank);
+  VINIT(father);
+  VINIT(pred);
+  VINIT(succ);
+  VINIT(dist);
+# undef VINIT
 
   IGRAPH_CHECK(igraph_dqueue_push(&Q, root));
   IGRAPH_CHECK(igraph_dqueue_push(&Q, 0));
@@ -153,7 +159,16 @@ int igraph_bfs(const igraph_t *graph,
 
       succ_vec = igraph_dqueue_empty(&Q) ? -1 : igraph_dqueue_head(&Q);
       if (callback) {
-	callback(graph, actvect, pred_vec, succ_vec, act_rank-1, actdist, extra);
+	igraph_bool_t terminate=
+	  callback(graph, actvect, pred_vec, succ_vec, 
+		   act_rank-1, actdist, extra);
+	if (terminate) {
+	  igraph_lazy_adjlist_destroy(&adjlist);
+	  igraph_dqueue_destroy(&Q);
+	  igraph_vector_char_destroy(&added);
+	  IGRAPH_FINALLY_CLEAN(3);
+	  return 0;
+	}
       }
 
       if (succ) { VECTOR(*succ)[actvect] = succ_vec; }
