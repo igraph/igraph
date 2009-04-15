@@ -33,6 +33,23 @@
 
 PyTypeObject igraphmodule_GraphType;
 
+#define CREATE_GRAPH(py_graph, c_graph) { \
+  py_graph = (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0); \
+  if (py_graph != NULL) { \
+    igraphmodule_Graph_init_internal(py_graph); \
+    py_graph->g = (c_graph); \
+  } \
+  RC_ALLOC("Graph", py_graph); \
+}
+#define CREATE_GRAPH_FROM_TYPE(py_graph, c_graph, py_type) { \
+  py_graph = (igraphmodule_GraphObject *) py_type->tp_alloc(py_type, 0); \
+  if (py_graph != NULL) { \
+    igraphmodule_Graph_init_internal(py_graph); \
+    py_graph->g = (c_graph); \
+  } \
+  RC_ALLOC("Graph", py_graph); \
+}
+
 /**********************************************************************
  * Basic implementation of igraph.Graph                               *
  **********************************************************************/
@@ -262,11 +279,7 @@ PyObject *igraphmodule_Graph_copy(igraphmodule_GraphObject * self)
     return NULL;
   }
 
-  result =
-    (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0);
-  igraphmodule_Graph_init_internal(result);
-  result->g = g;
-  RC_ALLOC("Graph", result);
+  CREATE_GRAPH(result, g);
 
   return (PyObject *) result;
 }
@@ -3101,11 +3114,7 @@ PyObject *igraphmodule_Graph_decompose(igraphmodule_GraphObject * self,
   list = PyList_New(n);
   for (i = 0; i < n; i++) {
     g = (igraph_t *) VECTOR(components)[i];
-    o =
-      (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0);
-    RC_ALLOC("Graph", self);
-    igraphmodule_Graph_init_internal(o);
-    o->g = *g;
+    CREATE_GRAPH(o, *g);
     PyList_SET_ITEM(list, i, (PyObject *) o);
     /* reference has been transferred by PyList_SET_ITEM, no need to DECREF
      *
@@ -3502,13 +3511,7 @@ PyObject *igraphmodule_Graph_linegraph(igraphmodule_GraphObject * self) {
     return NULL;
   }
 
-  result =
-    (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0);
-  RC_ALLOC("Graph", result);
-  if (result != NULL) {
-	result->g = lg;
-	igraphmodule_Graph_init_internal(result);
-  }
+  CREATE_GRAPH(result, lg);
 
   return (PyObject *) result;
 }
@@ -3692,10 +3695,8 @@ PyObject *igraphmodule_Graph_permute_vertices(igraphmodule_GraphObject *self,
   }
 
   igraph_vector_destroy(&perm);
-  result =
-    (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0);
-  RC_ALLOC("Graph", result);
-  if (result != NULL) result->g = pg;
+
+  CREATE_GRAPH(result, pg);
 
   return (PyObject *) result;
 }
@@ -3983,11 +3984,7 @@ PyObject *igraphmodule_Graph_spanning_tree(igraphmodule_GraphObject * self,
     return NULL;
   }
 
-  result = (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0);
-  RC_ALLOC("Graph", result);
-
-  if (result != NULL)
-    result->g = mst;
+  CREATE_GRAPH(result, mst);
 
   return (PyObject *) result;
 }
@@ -4077,11 +4074,7 @@ PyObject *igraphmodule_Graph_subgraph(igraphmodule_GraphObject * self,
     return NULL;
   }
 
-  result =
-    (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0);
-  RC_ALLOC("Graph", result);
-  if (result != NULL)
-    result->g = sg;
+  CREATE_GRAPH(result, sg);
 
   igraph_vs_destroy(&vs);
 
@@ -5429,12 +5422,8 @@ PyObject *igraphmodule_Graph_Read_DIMACS(PyTypeObject * type,
     return NULL;
   }
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  if (self != NULL) {
-    RC_ALLOC("Graph", self);
-    igraphmodule_Graph_init_internal(self);
-    self->g = g;
-  }
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+
   fclose(f);
   igraph_vector_destroy(&capacity);
 
@@ -5474,12 +5463,9 @@ PyObject *igraphmodule_Graph_Read_Edgelist(PyTypeObject * type,
     fclose(f);
     return NULL;
   }
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  if (self != NULL) {
-    RC_ALLOC("Graph", self);
-    igraphmodule_Graph_init_internal(self);
-    self->g = g;
-  }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+
   fclose(f);
 
   return (PyObject *) self;
@@ -5519,12 +5505,9 @@ PyObject *igraphmodule_Graph_Read_Ncol(PyTypeObject * type, PyObject * args,
     fclose(f);
     return NULL;
   }
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  if (self != NULL) {
-    RC_ALLOC("Graph", self);
-    igraphmodule_Graph_init_internal(self);
-    self->g = g;
-  }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+
   fclose(f);
 
   return (PyObject *) self;
@@ -5563,12 +5546,9 @@ PyObject *igraphmodule_Graph_Read_Lgl(PyTypeObject * type, PyObject * args,
     fclose(f);
     return NULL;
   }
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  if (self != NULL) {
-    RC_ALLOC("Graph", self);
-    igraphmodule_Graph_init_internal(self);
-    self->g = g;
-  }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+
   fclose(f);
 
   return (PyObject *) self;
@@ -5604,12 +5584,9 @@ PyObject *igraphmodule_Graph_Read_Pajek(PyTypeObject * type, PyObject * args,
     fclose(f);
     return NULL;
   }
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  if (self != NULL) {
-    RC_ALLOC("Graph", self);
-    igraphmodule_Graph_init_internal(self);
-    self->g = g;
-  }
+  
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+  
   fclose(f);
 
   return (PyObject *) self;
@@ -5643,12 +5620,9 @@ PyObject *igraphmodule_Graph_Read_GML(PyTypeObject * type,
     fclose(f);
     return NULL;
   }
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  if (self != NULL) {
-    RC_ALLOC("Graph", self);
-    igraphmodule_Graph_init_internal(self);
-    self->g = g;
-  }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+
   fclose(f);
 
   return (PyObject *) self;
@@ -5683,12 +5657,9 @@ PyObject *igraphmodule_Graph_Read_GraphML(PyTypeObject * type,
     fclose(f);
     return NULL;
   }
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  if (self != NULL) {
-    RC_ALLOC("Graph", self);
-    igraphmodule_Graph_init_internal(self);
-    self->g = g;
-  }
+  
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+  
   fclose(f);
 
   return (PyObject *) self;
@@ -6789,16 +6760,10 @@ PyObject *igraphmodule_Graph_disjoint_union(igraphmodule_GraphObject * self,
     }
   }
 
-  result =
-    (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0);
-  RC_ALLOC("Graph", result);
-  if (result != NULL) {
-    /* this is correct as long as attributes are not copied by the
-     * operator. if they are copied, the initialization should not empty
-     * the attribute hashes */
-    igraphmodule_Graph_init_internal(result);
-    result->g = g;
-  }
+  /* this is correct as long as attributes are not copied by the
+   * operator. if they are copied, the initialization should not empty
+   * the attribute hashes */
+  CREATE_GRAPH(result, g);
 
   return (PyObject *) result;
 }
@@ -6857,16 +6822,10 @@ PyObject *igraphmodule_Graph_union(igraphmodule_GraphObject * self,
     }
   }
 
-  result =
-    (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0);
-  RC_ALLOC("Graph", result);
-  if (result != NULL) {
-    /* this is correct as long as attributes are not copied by the
-     * operator. if they are copied, the initialization should not empty
-     * the attribute hashes */
-    igraphmodule_Graph_init_internal(result);
-    result->g = g;
-  }
+  /* this is correct as long as attributes are not copied by the
+   * operator. if they are copied, the initialization should not empty
+   * the attribute hashes */
+  CREATE_GRAPH(result, g);
 
   return (PyObject *) result;
 }
@@ -6925,16 +6884,10 @@ PyObject *igraphmodule_Graph_intersection(igraphmodule_GraphObject * self,
     }
   }
 
-  result =
-    (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0);
-  RC_ALLOC("Graph", result);
-  if (result != NULL) {
-    /* this is correct as long as attributes are not copied by the
-     * operator. if they are copied, the initialization should not empty
-     * the attribute hashes */
-    igraphmodule_Graph_init_internal(result);
-    result->g = g;
-  }
+  /* this is correct as long as attributes are not copied by the
+   * operator. if they are copied, the initialization should not empty
+   * the attribute hashes */
+  CREATE_GRAPH(result, g);
 
   return (PyObject *) result;
 }
@@ -6959,16 +6912,10 @@ PyObject *igraphmodule_Graph_difference(igraphmodule_GraphObject * self,
     return NULL;
   }
 
-  result =
-    (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0);
-  RC_ALLOC("Graph", result);
-  if (result != NULL) {
-    /* this is correct as long as attributes are not copied by the
-     * operator. if they are copied, the initialization should not empty
-     * the attribute hashes */
-    igraphmodule_Graph_init_internal(result);
-    result->g = g;
-  }
+  /* this is correct as long as attributes are not copied by the
+   * operator. if they are copied, the initialization should not empty
+   * the attribute hashes */
+  CREATE_GRAPH(result, g);
 
   return (PyObject *) result;
 }
@@ -6990,16 +6937,10 @@ PyObject *igraphmodule_Graph_complementer(igraphmodule_GraphObject * self,
     return NULL;
   }
 
-  result =
-    (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0);
-  RC_ALLOC("Graph", result);
-  if (result != NULL) {
-    /* this is correct as long as attributes are not copied by the
-     * operator. if they are copied, the initialization should not empty
-     * the attribute hashes */
-    igraphmodule_Graph_init_internal(result);
-    result->g = g;
-  }
+  /* this is correct as long as attributes are not copied by the
+   * operator. if they are copied, the initialization should not empty
+   * the attribute hashes */
+  CREATE_GRAPH(result, g);
 
   return (PyObject *) result;
 }
@@ -7017,16 +6958,10 @@ PyObject *igraphmodule_Graph_complementer_op(igraphmodule_GraphObject * self)
     return NULL;
   }
 
-  result =
-    (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0);
-  RC_ALLOC("Graph", result);
-  if (result != NULL) {
-    /* this is correct as long as attributes are not copied by the
-     * operator. if they are copied, the initialization should not empty
-     * the attribute hashes */
-    igraphmodule_Graph_init_internal(result);
-    result->g = g;
-  }
+  /* this is correct as long as attributes are not copied by the
+   * operator. if they are copied, the initialization should not empty
+   * the attribute hashes */
+  CREATE_GRAPH(result, g);
 
   return (PyObject *) result;
 }
@@ -7051,16 +6986,10 @@ PyObject *igraphmodule_Graph_compose(igraphmodule_GraphObject * self,
     return NULL;
   }
 
-  result =
-    (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0);
-  RC_ALLOC("Graph", result);
-  if (result != NULL) {
-    /* this is correct as long as attributes are not copied by the
-     * operator. if they are copied, the initialization should not empty
-     * the attribute hashes */
-    igraphmodule_Graph_init_internal(result);
-    result->g = g;
-  }
+  /* this is correct as long as attributes are not copied by the
+   * operator. if they are copied, the initialization should not empty
+   * the attribute hashes */
+  CREATE_GRAPH(result, g);
 
   return (PyObject *) result;
 }
@@ -7105,10 +7034,14 @@ PyObject *igraphmodule_Graph_bfs(igraphmodule_GraphObject * self,
   l1 = igraphmodule_vector_t_to_PyList(&vids, IGRAPHMODULE_TYPE_INT);
   l2 = igraphmodule_vector_t_to_PyList(&layers, IGRAPHMODULE_TYPE_INT);
   l3 = igraphmodule_vector_t_to_PyList(&parents, IGRAPHMODULE_TYPE_INT);
-  if (l1 && l2 && l3)
-    result = Py_BuildValue("OOO", l1, l2, l3);
-  else
+  if (l1 && l2 && l3) {
+    result = Py_BuildValue("NNN", l1, l2, l3);    /* references stolen */
+  } else {
+    if (l1) { Py_DECREF(l1); }
+    if (l2) { Py_DECREF(l2); }
+    if (l3) { Py_DECREF(l3); }
     result = NULL;
+  }
   igraph_vector_destroy(&vids);
   igraph_vector_destroy(&layers);
   igraph_vector_destroy(&parents);
@@ -7130,6 +7063,68 @@ PyObject *igraphmodule_Graph_bfsiter(igraphmodule_GraphObject * self,
     return NULL;
   if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
   return igraphmodule_BFSIter_new(self, root, mode, PyObject_IsTrue(adv));
+}
+
+/** \ingroup python_interface_graph
+ * \brief Unfolds a graph into a tree using BFS
+ */
+PyObject *igraphmodule_Graph_unfold_tree(igraphmodule_GraphObject * self,
+                                 PyObject * args, PyObject * kwds)
+{
+  static char *kwlist[] = { "roots", "mode", NULL };
+  igraphmodule_GraphObject *result_o;
+  PyObject *mapping_o, *mode_o=Py_None, *roots_o=Py_None;
+  igraph_neimode_t mode = IGRAPH_OUT;
+  igraph_vs_t vs;
+  igraph_vector_t mapping, vids;
+  igraph_t result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &roots_o, &mode_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
+  if (igraphmodule_PyObject_to_vs_t(roots_o, &vs, 0)) return NULL;
+
+  if (igraph_vector_init(&mapping, igraph_vcount(&self->g))) {
+    igraph_vs_destroy(&vs);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (igraph_vector_init(&vids, 0)) {
+    igraph_vs_destroy(&vs);
+    igraph_vector_destroy(&mapping);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (igraph_vs_as_vector(&self->g, vs, &vids)) {
+    igraph_vs_destroy(&vs);
+    igraph_vector_destroy(&vids);
+    igraph_vector_destroy(&mapping);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  igraph_vs_destroy(&vs);
+
+  if (igraph_unfold_tree(&self->g, &result, mode, &vids, &mapping)) {
+    igraph_vector_destroy(&vids);
+    igraph_vector_destroy(&mapping);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  igraph_vector_destroy(&vids);
+
+  mapping_o = igraphmodule_vector_t_to_PyList(&mapping, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&mapping);
+
+  if (!mapping_o) {
+    igraph_destroy(&result);
+    return NULL;
+  }
+
+  CREATE_GRAPH(result_o, result);
+
+  return Py_BuildValue("NN", result_o, mapping_o);
 }
 
 /**********************************************************************
@@ -7316,10 +7311,7 @@ PyObject *igraphmodule_Graph_mincut(igraphmodule_GraphObject * self,
     return 0;
   }
 
-  result = Py_BuildValue("dOOO", (double)value, cut_o, part_o, part2_o);
-  Py_DECREF(cut_o);
-  Py_DECREF(part_o);
-  Py_DECREF(part2_o);
+  result = Py_BuildValue("dNNN", (double)value, cut_o, part_o, part2_o);
   return result;
 }
 
@@ -7856,9 +7848,7 @@ PyObject *igraphmodule_Graph_community_leading_eigenvector(igraphmodule_GraphObj
   Py_INCREF(merges);
   }
 
-  res=Py_BuildValue("OO", cl, merges);
-  Py_DECREF(merges);
-  Py_DECREF(cl);
+  res=Py_BuildValue("NN", cl, merges);
 
   return res;
 }
@@ -9320,6 +9310,22 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  zero transitivity. If C{TRANSITIVITY_NAN} or C{\"nan\"}, these\n"
    "  vertices will be excluded from the average.\n"
    "@see: L{transitivity_undirected()}, L{transitivity_local_undirected()}\n"
+  },
+
+  /* interface to igraph_unfold_tree */
+  {"unfold_tree", (PyCFunction) igraphmodule_Graph_unfold_tree,
+   METH_VARARGS | METH_KEYWORDS,
+   "unfold_tree(sources=None, mode=OUT)\n\n"
+   "Unfolds the graph using a BFS to a tree by duplicating vertices as necessary.\n\n"
+   "@param sources: the source vertices to start the unfolding from. It should be a\n"
+   "  list of vertex indices, preferably one vertex from each connected component.\n"
+   "  You can use L{Graph.topological_sort} to determine a suitable set. A single\n"
+   "  vertex index is also accepted.\n"
+   "@param mode: which edges to follow during the BFS. C{OUT} follows outgoing edges,\n"
+   "  C{IN} follows incoming edges, C{ALL} follows both. Ignored for undirected\n"
+   "  graphs.\n"
+   "@return: the unfolded tree graph and a mapping from the new vertex indices to the\n"
+   "  old ones.\n"
   },
 
   /* interface to igraph_[st_]vertex_connectivity */
@@ -10794,3 +10800,6 @@ PyTypeObject igraphmodule_GraphType = {
   igraphmodule_Graph_new,       /* tp_new */
   0,                            /* tp_free */
 };
+
+#undef CREATE_GRAPH
+
