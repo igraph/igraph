@@ -35,7 +35,7 @@ int igraph_bfs(const igraph_t *graph,
   
   igraph_dqueue_t Q;
   long int no_of_nodes=igraph_vcount(graph);
-  long int i;
+  long int i, actroot;
   igraph_vector_char_t added;
   igraph_lazy_adjlist_t adjlist;
   
@@ -68,39 +68,56 @@ int igraph_bfs(const igraph_t *graph,
 
   IGRAPH_CHECK(igraph_dqueue_push(&Q, root));
   IGRAPH_CHECK(igraph_dqueue_push(&Q, 0));
+  VECTOR(added)[(long int) root] = 1;
+
   if (prerank) { VECTOR(*prerank) [(long int)root] = act_prerank; }
   if (previsit) { VECTOR(*previsit)[act_prerank++] = root; }
 
-  while (!igraph_dqueue_empty(&Q)) {
-    long int actvect=igraph_dqueue_pop(&Q);
-    long int actdist=igraph_dqueue_pop(&Q);
-    long int succ_vec;
-    igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, actvect);
-    long int i, n=igraph_vector_size(neis);    
+  for (actroot=0; actroot<no_of_nodes; actroot++) {
 
-    if (pred) { VECTOR(*pred)[actvect] = pred_vec; }
-    if (postrank) { VECTOR(*postrank) [actvect] = act_postrank; }
-    if (postvisit) { VECTOR(*postvisit)[act_postrank++] = actvect; }
-    if (dist) { VECTOR(*dist)[actvect] = actdist; }
+    /* 'root' first, then all other vertices */
+    if (igraph_dqueue_empty(&Q)) {
+      if (VECTOR(added)[actroot]) { continue; }
+      IGRAPH_CHECK(igraph_dqueue_push(&Q, actroot));
+      IGRAPH_CHECK(igraph_dqueue_push(&Q, 0));
+      VECTOR(added)[actroot] = 1;
 
-    for (i=0; i<n; i++) {
-      long int nei=VECTOR(*neis)[i];
-      if (! VECTOR(added)[nei]) {
-	VECTOR(added)[nei] = 1;
-	IGRAPH_CHECK(igraph_dqueue_push(&Q, nei));
-	IGRAPH_CHECK(igraph_dqueue_push(&Q, actdist+1));
+      if (prerank) { VECTOR(*prerank) [(long int)actroot] = act_prerank; }
+      if (previsit) { VECTOR(*previsit)[act_prerank++] = actroot; }
+    }
+      
+    while (!igraph_dqueue_empty(&Q)) {
+      long int actvect=igraph_dqueue_pop(&Q);
+      long int actdist=igraph_dqueue_pop(&Q);
+      long int succ_vec;
+      igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, actvect);
+      long int i, n=igraph_vector_size(neis);    
+      
+      if (pred) { VECTOR(*pred)[actvect] = pred_vec; }
+      if (postrank) { VECTOR(*postrank) [actvect] = act_postrank; }
+      if (postvisit) { VECTOR(*postvisit)[act_postrank++] = actvect; }
+      if (dist) { VECTOR(*dist)[actvect] = actdist; }
+      
+      for (i=0; i<n; i++) {
+	long int nei=VECTOR(*neis)[i];
+	if (! VECTOR(added)[nei]) {
+	  VECTOR(added)[nei] = 1;
+	  IGRAPH_CHECK(igraph_dqueue_push(&Q, nei));
+	  IGRAPH_CHECK(igraph_dqueue_push(&Q, actdist+1));
+	}
       }
-    }
 
-    succ_vec = igraph_dqueue_empty(&Q) ? -1 : igraph_dqueue_head(&Q);
-    if (callback) {
-      callback(graph, actvect, pred_vec, succ_vec, act_postrank, actdist, extra);
-    }
+      succ_vec = igraph_dqueue_empty(&Q) ? -1 : igraph_dqueue_head(&Q);
+      if (callback) {
+	callback(graph, actvect, pred_vec, succ_vec, act_postrank, actdist, extra);
+      }
 
-    if (succ) { VECTOR(*succ)[actvect] = succ_vec; }
-    
-    pred_vec=actvect;
-  }
+      if (succ) { VECTOR(*succ)[actvect] = succ_vec; }
+      pred_vec=actvect;
+
+    } /* while Q !empty */
+
+  } /* for actroot < no_of_nodes */
 
   igraph_lazy_adjlist_destroy(&adjlist);
   igraph_dqueue_destroy(&Q);
