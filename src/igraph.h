@@ -1167,6 +1167,7 @@ typedef igraph_bool_t igraph_bfshandler_t(const igraph_t *graph,
 int igraph_bfs(const igraph_t *graph, 
 	       igraph_integer_t root, igraph_neimode_t mode,
 	       igraph_vector_t *order, igraph_vector_t *rank,
+	       igraph_vector_t *father,
 	       igraph_vector_t *pred, igraph_vector_t *succ,
 	       igraph_vector_t *dist, igraph_bfshandler_t *callback,
 	       void *extra);

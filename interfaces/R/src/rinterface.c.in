@@ -6817,7 +6817,7 @@ igraph_bool_t R_igraph_bfshandler(const igraph_t *graph,
 }
 
 SEXP R_igraph_bfs(SEXP graph, SEXP proot, SEXP pneimode,
-		  SEXP porder, SEXP prank,
+		  SEXP porder, SEXP prank, SEXP pfather,
 		  SEXP ppred, SEXP psucc, SEXP pdist, 
 		  SEXP pcallback, SEXP pextra, SEXP prho) {
   
@@ -6826,8 +6826,9 @@ SEXP R_igraph_bfs(SEXP graph, SEXP proot, SEXP pneimode,
 
   igraph_integer_t root=REAL(proot)[0];
   igraph_integer_t neimode=REAL(pneimode)[0];
-  igraph_vector_t order, rank, pred, succ, dist;
-  igraph_vector_t *p_order=0, *p_rank=0, *p_pred=0, *p_succ=0, *p_dist=0;
+  igraph_vector_t order, rank, father, pred, succ, dist;
+  igraph_vector_t *p_order=0, *p_rank=0, *p_father=0, *p_pred=0, 
+    *p_succ=0, *p_dist=0;
   void *callback=0;
   R_igraph_i_bfs_data_t cb_data, *p_cb_data=0;
   
@@ -6840,6 +6841,9 @@ SEXP R_igraph_bfs(SEXP graph, SEXP proot, SEXP pneimode,
   }
   if (LOGICAL(prank)[0]) { 
     igraph_vector_init(&rank, 0); p_rank=&rank;
+  }
+  if (LOGICAL(pfather)[0]) { 
+    igraph_vector_init(&father, 0); p_father=&father;
   }
   if (LOGICAL(ppred)[0]) { 
     igraph_vector_init(&pred, 0); p_pred=&pred;
@@ -6860,11 +6864,12 @@ SEXP R_igraph_bfs(SEXP graph, SEXP proot, SEXP pneimode,
     p_cb_data = &cb_data;
   }
 
-  igraph_bfs(&g, root, neimode, p_order, p_rank, p_pred, p_succ, p_dist, 
+  igraph_bfs(&g, root, neimode, 
+	     p_order, p_rank, p_father, p_pred, p_succ, p_dist, 
 	     (igraph_bfshandler_t*) callback, p_cb_data);
 
-  PROTECT(result=NEW_LIST(7));
-  PROTECT(names=NEW_CHARACTER(7));
+  PROTECT(result=NEW_LIST(8));
+  PROTECT(names=NEW_CHARACTER(8));
 
   SET_STRING_ELT(names, 0, mkChar("root"));
   SET_VECTOR_ELT(result, 0, NEW_NUMERIC(1));
@@ -6884,12 +6889,14 @@ SEXP R_igraph_bfs(SEXP graph, SEXP proot, SEXP pneimode,
   SET_VECTOR_ELT(result, 2, R_igraph_0orvector_to_SEXP(p_order));
   SET_STRING_ELT(names, 3, mkChar("rank"));
   SET_VECTOR_ELT(result, 3, R_igraph_0orvector_to_SEXP(p_rank));
-  SET_STRING_ELT(names, 4, mkChar("pred"));
-  SET_VECTOR_ELT(result, 4, R_igraph_0orvector_to_SEXP(p_pred));
-  SET_STRING_ELT(names, 5, mkChar("succ"));
-  SET_VECTOR_ELT(result, 5, R_igraph_0orvector_to_SEXP(p_succ));
-  SET_STRING_ELT(names, 6, mkChar("dist"));
-  SET_VECTOR_ELT(result, 6, R_igraph_0orvector_to_SEXP(p_dist));
+  SET_STRING_ELT(names, 4, mkChar("father"));
+  SET_VECTOR_ELT(result, 4, R_igraph_0orvector_to_SEXP(p_father));
+  SET_STRING_ELT(names, 5, mkChar("pred"));
+  SET_VECTOR_ELT(result, 5, R_igraph_0orvector_to_SEXP(p_pred));
+  SET_STRING_ELT(names, 6, mkChar("succ"));
+  SET_VECTOR_ELT(result, 6, R_igraph_0orvector_to_SEXP(p_succ));
+  SET_STRING_ELT(names, 7, mkChar("dist"));
+  SET_VECTOR_ELT(result, 7, R_igraph_0orvector_to_SEXP(p_dist));
 
   SET_NAMES(result, names);
   

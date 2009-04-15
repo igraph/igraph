@@ -26,7 +26,7 @@
 int main() {
   
   igraph_t graph, ring;
-  igraph_vector_t order, rank, pred, succ, dist;
+  igraph_vector_t order, rank, father, pred, succ, dist;
   
   igraph_ring(&ring, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
   igraph_disjoint_union(&graph, &ring, &ring);
@@ -34,21 +34,25 @@ int main() {
   
   igraph_vector_init(&order, 0);
   igraph_vector_init(&rank, 0);
+  igraph_vector_init(&father, 0);
   igraph_vector_init(&pred, 0);
   igraph_vector_init(&succ, 0);
   igraph_vector_init(&dist, 0);
   
   igraph_bfs(&graph, /*root=*/0, /*neimode=*/ IGRAPH_OUT, 
-	     &order, &rank, &pred, &succ, &dist, /*callback=*/ 0, /*extra=*/ 0);
+	     &order, &rank, &father, &pred, &succ, &dist, 
+	     /*callback=*/ 0, /*extra=*/ 0);
   
   igraph_vector_print(&order, stdout);
   igraph_vector_print(&rank, stdout);
+  igraph_vector_print(&father, stdout);
   igraph_vector_print(&pred, stdout);
   igraph_vector_print(&succ, stdout);
   igraph_vector_print(&dist, stdout);
 
   igraph_vector_destroy(&order);
   igraph_vector_destroy(&rank);
+  igraph_vector_destroy(&father);
   igraph_vector_destroy(&pred);
   igraph_vector_destroy(&succ);
   igraph_vector_destroy(&dist);

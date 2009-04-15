@@ -28,6 +28,7 @@
 int igraph_bfs(const igraph_t *graph, 
 	       igraph_integer_t root, igraph_neimode_t mode,
 	       igraph_vector_t *order, igraph_vector_t *rank,
+	       igraph_vector_t *father,
 	       igraph_vector_t *pred, igraph_vector_t *succ,
 	       igraph_vector_t *dist, igraph_bfshandler_t *callback,
 	       void *extra) {
@@ -59,6 +60,7 @@ int igraph_bfs(const igraph_t *graph,
   /* Resize result vectors */
   if (order)     { igraph_vector_resize(order,     no_of_nodes); }
   if (rank)      { igraph_vector_resize(rank,      no_of_nodes); }
+  if (father)    { igraph_vector_resize(father,    no_of_nodes); }
   if (pred)      { igraph_vector_resize(pred,      no_of_nodes); }
   if (succ)      { igraph_vector_resize(succ,      no_of_nodes); }
   if (dist)      { igraph_vector_resize(dist,      no_of_nodes); }
@@ -66,6 +68,7 @@ int igraph_bfs(const igraph_t *graph,
   IGRAPH_CHECK(igraph_dqueue_push(&Q, root));
   IGRAPH_CHECK(igraph_dqueue_push(&Q, 0));
   VECTOR(added)[(long int) root] = 1;
+  if (father) { VECTOR(*father)[(long int) root] = -1; }
 
   for (actroot=0; actroot<no_of_nodes; actroot++) {
 
@@ -77,6 +80,7 @@ int igraph_bfs(const igraph_t *graph,
       IGRAPH_CHECK(igraph_dqueue_push(&Q, actroot));
       IGRAPH_CHECK(igraph_dqueue_push(&Q, 0));
       VECTOR(added)[actroot] = 1;
+      if (father) { VECTOR(*father)[actroot] = -1; }
     }
       
     while (!igraph_dqueue_empty(&Q)) {
@@ -89,7 +93,7 @@ int igraph_bfs(const igraph_t *graph,
       if (pred) { VECTOR(*pred)[actvect] = pred_vec; }
       if (rank) { VECTOR(*rank) [actvect] = act_rank; }
       if (order) { VECTOR(*order)[act_rank++] = actvect; }
-      if (dist) { VECTOR(*dist)[actvect] = actdist; }
+      if (dist) { VECTOR(*dist)[actvect] = actdist; }      
       
       for (i=0; i<n; i++) {
 	long int nei=VECTOR(*neis)[i];
@@ -97,6 +101,7 @@ int igraph_bfs(const igraph_t *graph,
 	  VECTOR(added)[nei] = 1;
 	  IGRAPH_CHECK(igraph_dqueue_push(&Q, nei));
 	  IGRAPH_CHECK(igraph_dqueue_push(&Q, actdist+1));
+	  if (father) { VECTOR(*father)[nei] = actvect; }
 	}
       }
 
