@@ -1156,9 +1156,9 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *graphs,
 /* Visitor-like functions                             */
 /* -------------------------------------------------- */
 
-int igraph_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
-	       igraph_vector_t *vids, igraph_vector_t *layers,
-	       igraph_vector_t *parents);
+int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
+		 igraph_vector_t *vids, igraph_vector_t *layers,
+		 igraph_vector_t *parents);
 
 /* -------------------------------------------------- */
 /* Centrality                                         */
