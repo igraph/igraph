@@ -202,6 +202,11 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
       \url{http://www.analytictech.com/networks/dataentry.htm} for
       examples. All formats mentioned here is supported by igraph.
 
+      Note the specification does not mention whether the
+      format is case sensitive or not. For igraph DL files are case
+      sensitive, i.e. \sQuote{Larry} and \sQuote{larry} are not the
+      same.
+      
       Additional arguments:
       \itemize{
 	\item{directed}{Logical scalar, whether to create a directed
