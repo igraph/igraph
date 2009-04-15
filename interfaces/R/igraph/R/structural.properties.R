@@ -659,8 +659,8 @@ count.multiple <- function(graph, eids=E(graph)) {
 }
 
 graph.bfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
-                      previsit=FALSE, postvisit=TRUE, prerank=FALSE,
-                      postrank=FALSE, pred=FALSE, succ=FALSE, dist=FALSE,
+                      order=TRUE, rank=FALSE,
+                      pred=FALSE, succ=FALSE, dist=FALSE,
                       callback=NULL, extra=NULL, rho=parent.frame()) {
 
   if (!is.igraph(graph)) {
@@ -672,8 +672,8 @@ graph.bfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
   if (!is.null(callback)) { callback <- as.function(callback) }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_bfs", graph, root, neimode, as.logical(previsit),
-        as.logical(postvisit), as.logical(prerank), as.logical(postrank),
+  .Call("R_igraph_bfs", graph, root, neimode,
+        as.logical(order), as.logical(rank),
         as.logical(pred), as.logical(succ), as.logical(dist),
         callback, extra, rho,
         PACKAGE="igraph")

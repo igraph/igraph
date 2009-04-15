@@ -27,8 +27,7 @@
 
 int igraph_bfs(const igraph_t *graph, 
 	       igraph_integer_t root, igraph_neimode_t mode,
-	       igraph_vector_t *previsit, igraph_vector_t *postvisit,
-	       igraph_vector_t *prerank, igraph_vector_t *postrank,
+	       igraph_vector_t *order, igraph_vector_t *rank,
 	       igraph_vector_t *pred, igraph_vector_t *succ,
 	       igraph_vector_t *dist, igraph_bfshandler_t *callback,
 	       void *extra) {
@@ -39,7 +38,7 @@ int igraph_bfs(const igraph_t *graph,
   igraph_vector_char_t added;
   igraph_lazy_adjlist_t adjlist;
   
-  long int act_prerank=0, act_postrank=0;
+  long int act_rank=0;
   long int pred_vec=-1;
   
   if (!igraph_is_directed(graph)) { mode=IGRAPH_ALL; }
@@ -58,10 +57,8 @@ int igraph_bfs(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
 
   /* Resize result vectors */
-  if (previsit)  { igraph_vector_resize(previsit,  no_of_nodes); }
-  if (postvisit) { igraph_vector_resize(postvisit, no_of_nodes); }
-  if (prerank)   { igraph_vector_resize(prerank,   no_of_nodes); }
-  if (postrank)  { igraph_vector_resize(postrank,  no_of_nodes); }
+  if (order)     { igraph_vector_resize(order,     no_of_nodes); }
+  if (rank)      { igraph_vector_resize(rank,      no_of_nodes); }
   if (pred)      { igraph_vector_resize(pred,      no_of_nodes); }
   if (succ)      { igraph_vector_resize(succ,      no_of_nodes); }
   if (dist)      { igraph_vector_resize(dist,      no_of_nodes); }
@@ -70,10 +67,9 @@ int igraph_bfs(const igraph_t *graph,
   IGRAPH_CHECK(igraph_dqueue_push(&Q, 0));
   VECTOR(added)[(long int) root] = 1;
 
-  if (prerank) { VECTOR(*prerank) [(long int)root] = act_prerank; }
-  if (previsit) { VECTOR(*previsit)[act_prerank++] = root; }
-
   for (actroot=0; actroot<no_of_nodes; actroot++) {
+
+    pred_vec=-1;
 
     /* 'root' first, then all other vertices */
     if (igraph_dqueue_empty(&Q)) {
@@ -81,9 +77,6 @@ int igraph_bfs(const igraph_t *graph,
       IGRAPH_CHECK(igraph_dqueue_push(&Q, actroot));
       IGRAPH_CHECK(igraph_dqueue_push(&Q, 0));
       VECTOR(added)[actroot] = 1;
-
-      if (prerank) { VECTOR(*prerank) [(long int)actroot] = act_prerank; }
-      if (previsit) { VECTOR(*previsit)[act_prerank++] = actroot; }
     }
       
     while (!igraph_dqueue_empty(&Q)) {
@@ -94,8 +87,8 @@ int igraph_bfs(const igraph_t *graph,
       long int i, n=igraph_vector_size(neis);    
       
       if (pred) { VECTOR(*pred)[actvect] = pred_vec; }
-      if (postrank) { VECTOR(*postrank) [actvect] = act_postrank; }
-      if (postvisit) { VECTOR(*postvisit)[act_postrank++] = actvect; }
+      if (rank) { VECTOR(*rank) [actvect] = act_rank; }
+      if (order) { VECTOR(*order)[act_rank++] = actvect; }
       if (dist) { VECTOR(*dist)[actvect] = actdist; }
       
       for (i=0; i<n; i++) {
@@ -109,7 +102,7 @@ int igraph_bfs(const igraph_t *graph,
 
       succ_vec = igraph_dqueue_empty(&Q) ? -1 : igraph_dqueue_head(&Q);
       if (callback) {
-	callback(graph, actvect, pred_vec, succ_vec, act_postrank, actdist, extra);
+	callback(graph, actvect, pred_vec, succ_vec, act_rank, actdist, extra);
       }
 
       if (succ) { VECTOR(*succ)[actvect] = succ_vec; }
