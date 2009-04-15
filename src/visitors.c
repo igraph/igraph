@@ -107,7 +107,7 @@ int igraph_bfs(const igraph_t *graph,
 
       succ_vec = igraph_dqueue_empty(&Q) ? -1 : igraph_dqueue_head(&Q);
       if (callback) {
-	callback(graph, actvect, pred_vec, succ_vec, act_rank, actdist, extra);
+	callback(graph, actvect, pred_vec, succ_vec, act_rank-1, actdist, extra);
       }
 
       if (succ) { VECTOR(*succ)[actvect] = succ_vec; }
