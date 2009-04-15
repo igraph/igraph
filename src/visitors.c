@@ -87,14 +87,18 @@ int igraph_bfs(const igraph_t *graph,
   
   long int act_rank=0;
   long int pred_vec=-1;
-  
-  if (!igraph_is_directed(graph)) { mode=IGRAPH_ALL; }
 
+  if (root < 0 && root >= no_of_nodes) {
+    IGRAPH_ERROR("Invalid root vertex in BFS", IGRAPH_EINVAL);
+  }
+  
   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
       mode != IGRAPH_ALL) {
     IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
   }
   
+  if (!igraph_is_directed(graph)) { mode=IGRAPH_ALL; }
+
   IGRAPH_CHECK(igraph_vector_char_init(&added, no_of_nodes));
   IGRAPH_FINALLY(igraph_vector_char_destroy, &added);
   IGRAPH_CHECK(igraph_dqueue_init(&Q, 100));
