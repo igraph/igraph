@@ -280,6 +280,7 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
   igraph_lazy_adjlist_t adjlist;
   igraph_stack_t stack;
   igraph_vector_char_t added;
+  igraph_vector_long_t nptr;
   long int actroot;
   long int act_rank=0;
   long int rank_out=0;
@@ -302,6 +303,8 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
   IGRAPH_FINALLY(igraph_stack_destroy, &stack);
   IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, /*simplify=*/ 0));  
   IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
+  IGRAPH_CHECK(igraph_vector_long_init(&nptr, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &nptr);
 
   /* Resize result vectors and fill them with IGRAPH_NAN */
   
@@ -337,14 +340,16 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
     while (!igraph_stack_empty(&stack)) {
       long int actvect=igraph_stack_top(&stack);
       igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, actvect);
-      long int i, n=igraph_vector_size(neis)-1;
+      long int i, n=igraph_vector_size(neis);
+      long int *ptr=igraph_vector_long_e_ptr(&nptr, actvect);
 
       /* Search for a neighbor that was not yet visited */
       igraph_bool_t any=0;
       long int nei;
-      while (!any && !igraph_vector_empty(neis)) {
-	nei=igraph_vector_pop_back(neis);
+      while (!any && (*ptr) <n) {
+	nei=VECTOR(*neis)[(*ptr)];
 	any=!VECTOR(added)[nei];
+	(*ptr) ++;
       }
       if (any) {
 	/* There is such a neighbor, add it */
@@ -363,10 +368,11 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
     }      
   }
 
+  igraph_vector_long_destroy(&nptr);
   igraph_lazy_adjlist_destroy(&adjlist);
   igraph_stack_destroy(&stack);
   igraph_vector_char_destroy(&added);
-  IGRAPH_FINALLY_CLEAN(3);
+  IGRAPH_FINALLY_CLEAN(4);
 
   return 0;
 }
