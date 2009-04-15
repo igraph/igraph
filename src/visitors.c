@@ -278,10 +278,11 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_lazy_adjlist_t adjlist;
-  igraph_stack_t stack;
+  igraph_stack_t stack, backs;
   igraph_vector_char_t added;
   long int actroot;
   long int act_rank=0;
+  long int rank_out=0;
 
   if (root < 0 || root >= no_of_nodes) { 
     IGRAPH_ERROR("Invalid root vertex for DFS", IGRAPH_EINVAL);
@@ -300,6 +301,11 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
   IGRAPH_FINALLY(igraph_stack_destroy, &stack);
   IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, /*simplify=*/ 0));  
   IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
+
+  if (order_out) {
+    IGRAPH_CHECK(igraph_stack_init(&backs, 100));
+    IGRAPH_FINALLY(igraph_stack_destroy, &backs);
+  }
 
   /* Resize result vectors and fill them with IGRAPH_NAN */
   
@@ -335,20 +341,35 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
       long int actdist=igraph_stack_pop(&stack);
       igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, actvect);
       long int i, n=igraph_vector_size(neis);
+      igraph_bool_t isnew=0;
 
+      if (order_out) {
+	IGRAPH_CHECK(igraph_stack_push(&backs, actvect));
+      }
       if (order) { VECTOR(*order)[act_rank++] = actvect; }
       if (dist) { VECTOR(*dist)[actvect] = actdist; }
 
       for (i=n-1; i>=0; i--) {
 	long int nei=VECTOR(*neis)[i];
 	if (! VECTOR(added)[nei]) {
+	  isnew=1;
 	  VECTOR(added)[nei] = 1;
 	  IGRAPH_CHECK(igraph_stack_push(&stack, actdist+1));
 	  IGRAPH_CHECK(igraph_stack_push(&stack, nei));
 	  if (father) { VECTOR(*father)[nei] = actvect; }
 	}
       }
+      
+      /* Are we stepping back? */
+      if (order_out && !isnew) {
+	VECTOR(*order_out)[rank_out++] = igraph_stackpop(&backs);
+      }
     }      
+  }
+
+  if (order_out) {
+    igraph_stack_destroy(&backs);
+    IGRAPH_FINALLY_CLEAN(1);
   }
 
   igraph_lazy_adjlist_destroy(&adjlist);
