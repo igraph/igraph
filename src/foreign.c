@@ -2794,12 +2794,24 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
     igraph_trie_getkeys(&igraph_i_dl_data.trie, &namevec);
   }
   if (namevec) {
-    /* TODO */
+    IGRAPH_CHECK(igraph_vector_ptr_init(&name, 1));
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &name);
+    pname=&name;
+    namerec.name=namestr;
+    namerec.type=IGRAPH_ATTRIBUTE_STRING;
+    namerec.value=namevec;
+    VECTOR(name)[0]=&namerec;
   }
 
   /* Weights */
   if (igraph_vector_size(&igraph_i_dl_data.weights) != 0) {
-    /* TODO */
+    IGRAPH_CHECK(igraph_vector_ptr_init(&weight, 1));
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &name);
+    pweight=&weight;
+    weightrec.name=weightstr;
+    weightrec.type=IGRAPH_ATTRIBUTE_NUMERIC;
+    weightrec.value=&igraph_i_dl_data.weights;
+    VECTOR(weight)[0]=&weightrec;
   }
 
   IGRAPH_CHECK(igraph_add_vertices(graph, igraph_i_dl_data.n, pname));

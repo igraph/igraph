@@ -4,13 +4,15 @@
 \alias{Pajek}
 \alias{GraphML}
 \alias{GML}
+\alias{DL}
+\alias{UCINET}
 \title{Reading foreign file formats}
 \description{The \code{read.graph} function is able to read graphs in
   various representations from a file, or from a http
   connection. Currently some simple formats are supported.}
 \usage{
 read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
-        "graphml", "dimacs", "graphdb", "gml"), \dots)
+        "graphml", "dimacs", "graphdb", "gml", "dl"), \dots)
 }
 \arguments{
   \item{file}{The connection to read from. This can be a local file, or
@@ -193,6 +195,18 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
       limitations of the GML parser.
 
       There are not additional argument for this format.
+    }
+    \item{DL}{
+      The DL format is a simple textual file format used by the UCINET
+      software. See
+      \url{http://www.analytictech.com/networks/dataentry.htm} for
+      examples. All formats mentioned here is supported by igraph.
+
+      Additional arguments:
+      \itemize{
+	\item{directed}{Logical scalar, whether to create a directed
+	  graph. The default is to make the graph directed.}
+      }
     }
     \item{ncol}{
       This format is used by the Large Graph Layout program
