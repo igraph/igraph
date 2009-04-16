@@ -553,6 +553,25 @@ igraph_strength:
         DEPS: vids ON graph, weights ON graph
 
 #######################################
+# Visitors
+#######################################
+
+igraph_bfs:
+        PARAMS: GRAPH graph, INTEGER root, NEIMODE mode=OUT, \
+                OUT VECTOR_OR_0 order, OUT VECTOR_OR_0 rank, \
+                OUT VECTOR_OT_0 father, \
+                OUT VECTOR_OR_0 pred, OUT VECTOR_OR_0 succ, \
+                OUT VECTOR_OR_0 dist, BFS_FUNC callback, EXTRA extra=NULL
+        IGNORE: RR, RC
+
+igraph_dfs:
+        PARAMS: GRAPH graph, INTEGER root, NEIMODE mode=OUT, \
+                OUT VECTOR_OR_0 order, OUT VECTOR_OR_0 order_out, \
+                OUT VECTOR_OR_0 dist, DFS_FUNC in_callback, \
+                DFS_FUNC out_callback, EXTRA extra=NULL
+        IGNORE: RR, RC
+
+#######################################
 # Bipartite graphs
 #######################################
 

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<chapter id="igraph-Visitors">
+<title>Graph visitors</title>
+
+<section><title>Breadth-first search</title>
+<!-- doxrox-include igraph_bfs -->
+<!-- doxrox-include igraph_bfshandler_t -->
+</section>
+
+<section><title>Depth-first search</title>
+<!-- doxrox-include igraph_dfs -->
+<!-- doxrox-include igraph_dfshandler_t -->
+</section>
+
+</chapter>

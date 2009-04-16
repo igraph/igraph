@@ -7026,7 +7026,7 @@ PyObject *igraphmodule_Graph_bfs(igraphmodule_GraphObject * self,
     igraph_vector_destroy(&vids); igraph_vector_destroy(&parents);
     return igraphmodule_handle_igraph_error();
   }
-  if (igraph_bfs
+  if (igraph_i_bfs
       (&self->g, (igraph_integer_t) vid, mode, &vids, &layers, &parents)) {
     igraphmodule_handle_igraph_error();
     return NULL;

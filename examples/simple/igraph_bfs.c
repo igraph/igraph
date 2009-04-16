@@ -40,14 +40,14 @@ int main() {
   igraph_vector_init(&vids, 0);
   igraph_vector_init(&layers, 0);
   igraph_vector_init(&parents, 0);
-  igraph_bfs(&g, 0, IGRAPH_ALL, &vids, &layers, &parents);
+  igraph_i_bfs(&g, 0, IGRAPH_ALL, &vids, &layers, &parents);
   vector_print(&vids);
   vector_print(&layers);
   vector_print(&parents);
   igraph_destroy(&g);  
 
   igraph_tree(&g, 20, 2, IGRAPH_TREE_UNDIRECTED);
-  igraph_bfs(&g, 0, IGRAPH_ALL, &vids, &layers, &parents);
+  igraph_i_bfs(&g, 0, IGRAPH_ALL, &vids, &layers, &parents);
   vector_print(&vids);
   vector_print(&layers);
   vector_print(&parents);
