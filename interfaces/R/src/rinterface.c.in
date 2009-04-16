@@ -5552,6 +5552,90 @@ SEXP R_igraph_spinglass_community(SEXP graph, SEXP pweights,
   return result;
 }
 
+SEXP R_igraph_community_negative(SEXP graph, SEXP pweights,
+				  SEXP pspins, SEXP pparupdate,
+				  SEXP pstarttemp, SEXP pstoptemp,
+				  SEXP pcoolfact, SEXP pupdate_rule,
+				  SEXP pgamma, SEXP plambda, SEXP pd_p, SEXP pd_n) {
+  igraph_t g;
+  igraph_vector_t weights;
+  igraph_integer_t spins=REAL(pspins)[0];
+  igraph_bool_t parupdate=LOGICAL(pparupdate)[0];
+  igraph_real_t starttemp=REAL(pstarttemp)[0];
+  igraph_real_t stoptemp=REAL(pstoptemp)[0];
+  igraph_real_t coolfact=REAL(pcoolfact)[0];
+  igraph_spincomm_update_t update_rule=REAL(pupdate_rule)[0];
+  igraph_real_t gamma=REAL(pgamma)[0];
+  igraph_real_t lambda=REAL(plambda)[0];
+  igraph_real_t modularity;
+  igraph_real_t temperature;
+  igraph_vector_t membership;
+  igraph_vector_t csize;
+  igraph_matrix_t adhesion;
+  igraph_matrix_t normalised_adhesion;
+  igraph_real_t polarization;
+  igraph_real_t d_p = REAL(pd_p)[0];
+  igraph_real_t d_n = REAL(pd_n)[0];  
+  SEXP result, names;
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_vector(pweights, &weights);
+  igraph_vector_init(&membership, 0);
+  igraph_vector_init(&csize, 0);
+  igraph_matrix_init(&adhesion, 0, 0);
+  igraph_matrix_init(&normalised_adhesion, 0, 0);
+    
+  igraph_community_negative(&g, &weights, 
+			     &modularity, &temperature, 
+			     &membership, &csize,
+				 &adhesion, &normalised_adhesion, &polarization,
+			     spins, parupdate, starttemp, stoptemp,
+			     coolfact, update_rule, gamma, lambda, d_p, d_n);
+  
+  PROTECT(result=NEW_LIST(4));
+  PROTECT(names=NEW_CHARACTER(4));
+  
+  SET_VECTOR_ELT(result, 0, NEW_NUMERIC(igraph_vector_size(&membership)));
+  SET_VECTOR_ELT(result, 1, NEW_NUMERIC(igraph_vector_size(&csize)));
+  SET_VECTOR_ELT(result, 2, NEW_NUMERIC(1));
+  SET_VECTOR_ELT(result, 3, NEW_NUMERIC(1));
+  //Don't insert (normalised) adhesion and polarization, yet
+  //They should be investigated further, and are not clear from the
+  //article.  
+  //SET_VECTOR_ELT(result, 4, NEW_NUMERIC(igraph_matrix_size(&adhesion)));
+  //SET_VECTOR_ELT(result, 5, NEW_NUMERIC(igraph_matrix_size(&normalised_adhesion)));    
+  //SET_VECTOR_ELT(result, 6, NEW_NUMERIC(1));
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("membership"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("csize"));
+  SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("modularity"));
+  SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("temperature"));
+  //SET_STRING_ELT(names, 4, CREATE_STRING_VECTOR("adhesion"));
+  //SET_STRING_ELT(names, 5, CREATE_STRING_VECTOR("normalised.adhesion"));
+  //SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("polarization"));
+  SET_NAMES(result, names);
+  igraph_vector_copy_to(&membership, REAL(VECTOR_ELT(result, 0)));
+  igraph_vector_copy_to(&csize, REAL(VECTOR_ELT(result, 1)));
+  REAL(VECTOR_ELT(result, 2))[0]=modularity;
+  REAL(VECTOR_ELT(result, 3))[0]=temperature;
+  
+  //SEXP mata = R_igraph_matrix_to_SEXP(&adhesion);
+  //SEXP matna = R_igraph_matrix_to_SEXP(&normalised_adhesion);
+  //VECTOR_ELT(result, 4) = mata;
+  //VECTOR_ELT(result, 5) = matna;
+  //REAL(VECTOR_ELT(result, 6))[0]=polarization;
+      
+  igraph_vector_destroy(&membership);
+  igraph_vector_destroy(&csize);
+  
+  igraph_matrix_destroy(&adhesion);
+  igraph_matrix_destroy(&normalised_adhesion);  
+  
+  R_igraph_after();
+  
+  UNPROTECT(2);
+  return result;
+}
+
 SEXP R_igraph_spinglass_my_community(SEXP graph, SEXP pweights,
 				     SEXP pvertex, SEXP pspins,
 				     SEXP pupdate_rule, SEXP pgamma) {
@@ -5566,6 +5650,7 @@ SEXP R_igraph_spinglass_my_community(SEXP graph, SEXP pweights,
   igraph_real_t adhesion;
   igraph_integer_t inner_links;
   igraph_integer_t outer_links;
+	
   SEXP result, names;
 
   R_igraph_before();

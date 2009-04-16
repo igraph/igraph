@@ -53,6 +53,7 @@
 #include "NetDataTypes.h"
 #include "NetRoutines.h"
 #include "pottsmodel_2.h"
+#include "pottsmodel_n.h"
 
 #include "igraph.h"
 #include "error.h"
@@ -451,4 +452,123 @@ int igraph_spinglass_my_community(const igraph_t *graph,
 					   cohesion, adhesion, inner_links, 
 					   outer_links, spins, update_rule,
 					   gamma);
+}
+
+int igraph_community_negative(const igraph_t *graph,
+			       const igraph_vector_t *weights,
+			       igraph_real_t *modularity,
+			       igraph_real_t *temperature,
+			       igraph_vector_t *membership, 
+			       igraph_vector_t *csize,
+				   igraph_matrix_t *adhesion,
+				   igraph_matrix_t *normalised_adhesion,
+				   igraph_real_t *polarization,				    
+			       igraph_integer_t spins,
+			       igraph_bool_t parupdate,
+			       igraph_real_t starttemp,
+			       igraph_real_t stoptemp,
+			       igraph_real_t coolfact,
+			       igraph_spincomm_update_t update_rule,
+			       igraph_real_t gamma,
+			       igraph_real_t lambda,				   
+				   igraph_real_t d_p,
+				   igraph_real_t d_n) {
+
+  unsigned long changes, runs;
+  igraph_bool_t use_weights=0;
+  bool zeroT;
+  double Q, kT, acc, prob;
+  ClusterList<NNode*> *cl_cur;
+  network *net;
+  PottsModelN *pm;
+  /* Check arguments */
+
+  if (spins < 2 || spins > 500) {
+    IGRAPH_ERROR("Invalid number of spins", IGRAPH_EINVAL);
+  }
+  if (update_rule != IGRAPH_SPINCOMM_UPDATE_SIMPLE &&
+      update_rule != IGRAPH_SPINCOMM_UPDATE_CONFIG) {
+    IGRAPH_ERROR("Invalid update rule", IGRAPH_EINVAL);
+  }
+  if (weights) {
+    if (igraph_vector_size(weights) != igraph_ecount(graph)) {
+      IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+    }
+    use_weights=1;
+  }
+  if (coolfact < 0 || coolfact>=1.0) {
+    IGRAPH_ERROR("Invalid cooling factor", IGRAPH_EINVAL);
+  }
+  if (gamma < 0.0) {
+    IGRAPH_ERROR("Invalid gamma value", IGRAPH_EINVAL);
+  }
+  if (starttemp/stoptemp<1.0) {
+    IGRAPH_ERROR("starttemp should be larger in absolute value than stoptemp",
+		 IGRAPH_EINVAL);
+  }
+  
+  /* Check whether we have a single component */
+  igraph_bool_t conn;
+  IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));
+  if (!conn) {
+    IGRAPH_ERROR("Cannot work with unconnected graph", IGRAPH_EINVAL);
+  }
+
+  net = new network;
+  net->node_list   =new DL_Indexed_List<NNode*>();
+  net->link_list   =new DL_Indexed_List<NLink*>();
+  net->cluster_list=new DL_Indexed_List<ClusterList<NNode*>*>();
+
+  /* Transform the igraph_t */
+  IGRAPH_CHECK(igraph_i_read_network(graph, weights,
+				     net, 0.0, use_weights, 0));
+	
+  bool directed = igraph_is_directed(graph);
+  
+  prob=2.0*net->sum_weights/double(net->node_list->Size())
+    /double(net->node_list->Size()-1);
+
+  pm=new PottsModelN(net,(unsigned int)spins, directed);
+
+  /* initialize the random number generator */
+  RNG_BEGIN();
+  
+  //Begin at a high enough temperature
+  kT=pm->FindStartTemp(gamma, lambda, starttemp);
+
+  /* assign random initial configuration */
+  pm->assign_initial_conf(true);
+
+  runs=0;
+  changes=1;
+  acc = 0;
+	while (changes>0 && (kT/stoptemp>1.0 || zeroT && runs<150)) 
+	{
+		
+		IGRAPH_ALLOW_INTERRUPTION(); /* This is not clean.... */
+		
+		runs++;
+		kT = kT*coolfact; 
+		acc=pm->HeatBathLookup(gamma, lambda, kT, 50);
+		if (acc<(1.0-1.0/double(spins))*0.001)
+			changes=0; 
+		else 
+			changes=1;
+		
+	} /* while loop */
+
+  pm->WriteClusters(modularity, temperature, csize, membership, adhesion, normalised_adhesion, polarization, kT, d_p, d_n, gamma, lambda);
+
+  while (net->link_list->Size()) delete net->link_list->Pop();
+  while (net->node_list->Size()) delete net->node_list->Pop();
+  while (net->cluster_list->Size())
+    {
+      cl_cur=net->cluster_list->Pop();
+      while (cl_cur->Size()) cl_cur->Pop();
+      delete cl_cur;
+    }
+  
+  RNG_END();
+
+  return 0;
 }
