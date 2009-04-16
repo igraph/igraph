@@ -474,9 +474,9 @@ rewire <- function(graph, mode="simple", niter=100) {
         PACKAGE="igraph")
 }
 
-bonpow <- function(graph, nodes=V(graph),
-                   loops=FALSE, exponent=1,
-                   rescale=FALSE, tol=1e-7){
+bonpow.dense <- function(graph, nodes=V(graph),
+                         loops=FALSE, exponent=1,
+                         rescale=FALSE, tol=1e-7){
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -498,6 +498,47 @@ bonpow <- function(graph, nodes=V(graph),
     ev <- ev*sqrt(n/sum((ev)^2))
   } 
   ev[as.numeric(nodes)+1]
+}
+
+bonpow.sparse <- function(graph, nodes=V(graph), loops=FALSE,
+                          exponent=1, rescale=FALSE, tol=1e-07) {
+
+  ## remove loops if requested
+  if (!loops) {
+    graph <- simplify(graph, remove.multiple=FALSE, remove.loops=TRUE)
+  }
+
+  ## sparse adjacency matrix
+  d <- get.adjacency(graph, sparse=TRUE)
+
+  ## sparse identity matrix
+  id <- spMatrix(vcount(graph), vcount(graph),
+                 i=1:vcount(graph), j=1:vcount(graph),
+                 x=rep(1, vcount(graph)))
+  id <- as(id, "dgCMatrix")
+
+  ## solve it
+  ev <- solve(id - exponent * d, tol=tol) %*% degree(graph, mode="out")
+
+  if (rescale) {
+    ev <- ev/sum(ev)
+  } else {
+    ev <- ev * sqrt(vcount(graph)/sum((ev)^2))
+  }
+
+  ev[as.numeric(nodes) + 1]
+}
+
+bonpow <- function(graph, nodes=V(graph),
+                   loops=FALSE, exponent=1,
+                   rescale=FALSE, tol=1e-7, sparse=TRUE){
+  if (sparse) {
+    if (require(Matrix)) {
+      return(bonpow.sparse(graph, nodes, loops, exponent, rescale, tol))
+    }
+  } 
+
+  bonpow.dense(graph, nodes, loops, exponent, rescale, tol)
 }
 
 alpha.centrality <- function(graph, nodes=V(graph), alpha=1,

@@ -11,7 +11,7 @@
 }
 \usage{
 bonpow(graph, nodes=V(graph), loops=FALSE, exponent=1,
-    rescale=FALSE, tol=1e-7)
+    rescale=FALSE, tol=1e-7, sparse=TRUE)
 }
 %- maybe also `usage' for other objects documented here.
 \arguments{
@@ -26,7 +26,10 @@ bonpow(graph, nodes=V(graph), loops=FALSE, exponent=1,
   \item{rescale}{ if true, centrality scores are rescaled such that they
     sum to 1. } 
   \item{tol}{ tolerance for near-singularities during matrix inversion
-    (see \code{\link{solve}}) } 
+    (see \code{\link{solve}}) }
+  \item{sparse}{Logical scalar, whether to use sparse matrices for the
+    calculation. The \sQuote{Matrix} package is required for sparse
+    matrix support}
 }
 \details{
 Bonacich's power centrality measure is defined by
