@@ -98,7 +98,8 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     gengraph_random.cpp decomposition.c bipartite.c \
 			     drl_layout_3d.cpp drl_graph_3d.cpp \
 			     DensityGrid_3d.cpp \
-			     foreign-dl-parser.y foreign-dl-lexer.l
+			     foreign-dl-parser.y foreign-dl-lexer.l \
+			     pottsmodel_n.cpp
 
 libigraph_la_CFLAGS        =
 libigraph_la_CXXFLAGS	   =
@@ -114,7 +115,7 @@ include_HEADERS = igraph.h types.h attributes.h error.h interrupt.h \
 		  dqueue.pmt dqueue.h heap.pmt heap.h arpack.h array.pmt \
 		  array.h arpack_internal.h f2c.h igraph_math.h
 		  drl_graph_3d.h drl_layout_3d.h drl_Node_3d.h \
-		  DensityGrid_3d.h
+		  DensityGrid_3d.h pottsmodel_n.h
 
 
 MAINTAINERCLEANFILES = Makefile.in foreign-lgl-parser.h foreign-ncol-parser.h
