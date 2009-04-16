@@ -683,7 +683,8 @@ graph.bfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
 
 graph.dfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
                       order=TRUE, order.out=FALSE, father=FALSE, dist=FALSE,
-                      callback=NULL, extra=NULL, rho=parent.frame()) {
+                      in.callback=NULL, out.callback=NULL, extra=NULL,
+                      rho=parent.frame()) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object");
@@ -692,12 +693,13 @@ graph.dfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
   root <- as.numeric(root)
   neimode <- switch(igraph.match.arg(neimode),
                     "out"=1, "in"=2, "all"=3, "total"=3)
-  if (!is.null(callback)) { callback <- as.function(callback) }
+  if (!is.null(in.callback)) { in.callback <- as.function(in.callback) }
+  if (!is.null(out.callback)) { out.callback <- as.function(out.callback) }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_dfs", graph, root, neimode,
         as.logical(order), as.logical(order.out), as.logical(father),
-        as.logical(dist), callback, extra, rho,
+        as.logical(dist), in.callback, out.callback, extra, rho,
         PACKAGE="igraph")
   
 }

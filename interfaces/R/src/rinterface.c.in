@@ -6891,13 +6891,14 @@ SEXP R_igraph_bfs(SEXP graph, SEXP proot, SEXP pneimode,
 }
 
 typedef struct {
-  SEXP graph, fun, extra, rho;
+  SEXP graph, fun_in, fun_out, extra, rho;
 } R_igraph_i_dfs_data_t;
 
 igraph_bool_t R_igraph_dfshandler(const igraph_t *graph,
 				  igraph_integer_t vid,
 				  igraph_integer_t dist,
-				  void *extra) {
+				  void *extra,
+				  int which) {
   
   R_igraph_i_dfs_data_t *data=extra;
   SEXP args, R_fcall, result, names;
@@ -6912,7 +6913,8 @@ igraph_bool_t R_igraph_dfshandler(const igraph_t *graph,
   REAL(args)[1]=dist;
   SET_NAMES(args, names);
 
-  PROTECT(R_fcall = lang4(data->fun, data->graph, args, data->extra));
+  PROTECT(R_fcall = lang4(which==0 ? data->fun_in : data->fun_out, 
+			  data->graph, args, data->extra));
   PROTECT(result = eval(R_fcall, data->rho));
   
   cres=LOGICAL(result)[0];
@@ -6921,9 +6923,27 @@ igraph_bool_t R_igraph_dfshandler(const igraph_t *graph,
   return cres;
 }
 
+igraph_bool_t R_igraph_dfshandler_in(const igraph_t *graph,
+				     igraph_integer_t vid,
+				     igraph_integer_t dist,
+				     void *extra) {
+
+  return R_igraph_dfshandler(graph, vid, dist, extra, 0);
+}
+
+
+igraph_bool_t R_igraph_dfshandler_out(const igraph_t *graph,
+				      igraph_integer_t vid,
+				      igraph_integer_t dist,
+				      void *extra) {
+
+  return R_igraph_dfshandler(graph, vid, dist, extra, 1);
+}
+
 SEXP R_igraph_dfs(SEXP graph, SEXP proot, SEXP pneimode,
 		  SEXP porder, SEXP porder_out, SEXP pfather, SEXP pdist, 
-		  SEXP pcallback, SEXP pextra, SEXP prho) {
+		  SEXP pin_callback, SEXP pout_callback, 
+		  SEXP pextra, SEXP prho) {
   
   igraph_t g;
   SEXP result, names;
@@ -6932,7 +6952,7 @@ SEXP R_igraph_dfs(SEXP graph, SEXP proot, SEXP pneimode,
   igraph_integer_t neimode=REAL(pneimode)[0];
   igraph_vector_t order, order_out, father, dist;
   igraph_vector_t *p_order=0, *p_order_out=0, *p_father=0, *p_dist=0;
-  void *callback=0;
+  void *in_callback=0, *out_callback=0;
   R_igraph_i_dfs_data_t cb_data, *p_cb_data=0;
   
   R_igraph_before();
@@ -6952,18 +6972,25 @@ SEXP R_igraph_dfs(SEXP graph, SEXP proot, SEXP pneimode,
     igraph_vector_init(&dist, 0); p_dist=&dist;
   }
 
-  if (!isNull(pcallback)) {
+  if (!isNull(pin_callback) || !isNull(pout_callback)) {
     cb_data.graph=graph;
-    cb_data.fun=pcallback;
+    cb_data.fun_in=pin_callback;
+    cb_data.fun_out=pout_callback;
     cb_data.extra=pextra;
     cb_data.rho=prho;
-    callback=R_igraph_dfshandler;
     p_cb_data = &cb_data;
+  }
+  if (!isNull(pin_callback)) {
+    in_callback=R_igraph_dfshandler_in;
+  }
+  if (!isNull(pout_callback)) {
+    out_callback=R_igraph_dfshandler_out;
   }
 
   igraph_dfs(&g, root, neimode, 
 	     p_order, p_order_out, p_father, p_dist, 
-	     (igraph_dfshandler_t*) callback, p_cb_data);
+	     (igraph_dfshandler_t*) in_callback, 
+	     (igraph_dfshandler_t*) out_callback, p_cb_data);
 
   PROTECT(result=NEW_LIST(6));
   PROTECT(names=NEW_CHARACTER(6));

@@ -273,7 +273,8 @@ int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
 int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 	       igraph_neimode_t mode, igraph_vector_t *order,
 	       igraph_vector_t *order_out, igraph_vector_t *father,
-	       igraph_vector_t *dist, igraph_dfshandler_t *callback,
+	       igraph_vector_t *dist, igraph_dfshandler_t *in_callback,
+	       igraph_dfshandler_t *out_callback,
 	       void *extra) {
   
   long int no_of_nodes=igraph_vcount(graph);
