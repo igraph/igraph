@@ -28,7 +28,8 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
                                 parupdate=FALSE, start.temp=1,
                                 stop.temp=0.01, cool.fact=0.99,
                                 update.rule=c("config", "random", "simple"),
-                                gamma=1.0) {
+                                gamma=1.0, implementation=c("orig", "neg"),
+                                lambda=1.0) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -45,12 +46,17 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
   update.rule <- igraph.match.arg(update.rule)
   update.rule <- switch(update.rule, "simple"=0, "random"=0, "config"=1)
 
+  wrange <- range(weights)
+  wp <- max(wrange, 0)
+  wn <- min(wrange, 0)
+  
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   if (is.null(vertex)) {    
     .Call("R_igraph_spinglass_community", graph, weights,
           as.numeric(spins), as.logical(parupdate), as.numeric(start.temp),
           as.numeric(stop.temp), as.numeric(cool.fact),
           as.numeric(update.rule), as.numeric(gamma),
+          as.numeric(wp), as.numeric(wn),
           PACKAGE="igraph")
   } else {
     .Call("R_igraph_spinglass_my_community", graph, weights,
@@ -58,56 +64,6 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
           as.numeric(update.rule), as.numeric(gamma),
           PACKAGE="igraph")
   }    
-}
-
-spinglass <- function(graph, weights=NULL, spins=25,
-                                parupdate=FALSE, start.temp=1,
-                                stop.temp=0.01, cool.fact=0.99,
-                                update.rule=c("config", "random", "simple"),
-                                gamma=1.0, lambda=1.0) {
-
-  if (!is.igraph(graph)) {
-    stop("Not a graph object")
-  }
-
-  if (is.null(weights)) {
-    if ("weight" %in% list.edge.attributes(graph)) {
-      weights <- as.numeric(E(graph)$weight)
-    } else {
-      weights <- as.numeric(rep(1, ecount(graph)))
-    }
-  }
-  
-	w_p = weights[weights > 0];
-	if (length(w_p) > 0)
-	{
-		d_p = max(w_p); 
-	}
-	else
-	{
-		d_p = 0;
-	}
-  
-    w_n = weights[weights < 0];
-	if (length(w_n) > 0)
-	{
-		d_n = -min(w_n);
-	}
-	else
-	{
-		d_n = 0;
-	}
-
-  update.rule <- igraph.match.arg(update.rule)
-  update.rule <- switch(update.rule, "simple"=0, "random"=0, "config"=1)
-
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-
-  .Call("R_igraph_community_negative", graph, weights,
-          as.numeric(spins), as.logical(parupdate), as.numeric(start.temp),
-          as.numeric(stop.temp), as.numeric(cool.fact),
-          as.numeric(update.rule), as.numeric(gamma), as.numeric(lambda), as.numeric(d_p), as.numeric(d_n),
-          PACKAGE="igraph")
 }
 
 walktrap.community <- function(graph, weights=E(graph)$weight, steps=4, merges=TRUE,
