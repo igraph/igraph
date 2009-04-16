@@ -307,6 +307,13 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
   IGRAPH_CHECK(igraph_vector_long_init(&nptr, no_of_nodes));
   IGRAPH_FINALLY(igraph_vector_long_destroy, &nptr);
 
+# define FREE_ALL() do { 			\
+  igraph_vector_long_destroy(&nptr);            \
+  igraph_lazy_adjlist_destroy(&adjlist);        \
+  igraph_stack_destroy(&stack);                 \
+  igraph_vector_char_destroy(&added);           \
+  IGRAPH_FINALLY_CLEAN(4); } while (0)
+
   /* Resize result vectors and fill them with IGRAPH_NAN */
   
 # define VINIT(v) if (v) {                      \
@@ -325,6 +332,10 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
   if (father) { VECTOR(*father)[(long int)root] = -1; }
   if (order) { VECTOR(*order)[act_rank++] = root; }
   if (dist) { VECTOR(*dist)[(long int)root] = 0; }
+  if (in_callback) {
+    igraph_bool_t terminate=in_callback(graph, root, 0, extra);
+    if (terminate) { FREE_ALL(); return 0; }
+  }
 
   for (actroot=0; actroot<no_of_nodes; actroot++) {
 
@@ -336,6 +347,11 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
       if (father) { VECTOR(*father)[actroot] = -1; }
       if (order) { VECTOR(*order)[act_rank++] = actroot; }
       if (dist) { VECTOR(*dist)[actroot] = 0; }
+
+      if (in_callback) {
+	igraph_bool_t terminate=in_callback(graph, actroot, 0, extra);
+	if (terminate) { FREE_ALL(); return 0; }
+      }
     }
     
     while (!igraph_stack_empty(&stack)) {
@@ -360,20 +376,28 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 	if (order) { VECTOR(*order)[act_rank++] = nei; }
 	act_dist++;
 	if (dist) { VECTOR(*dist)[nei] = act_dist; }
+
+	if (in_callback) {
+	  igraph_bool_t terminate=in_callback(graph, nei, act_dist, extra);
+	  if (terminate) { FREE_ALL(); return 0; }
+	}
+
       } else {
 	/* There is no such neighbor, finished with the subtree */
 	igraph_stack_pop(&stack);
 	if (order_out) { VECTOR(*order_out)[rank_out++] = actvect; }
 	act_dist--;
+
+	if (out_callback) {
+	  igraph_bool_t terminate=out_callback(graph, actvect, act_dist, extra);
+	  if (terminate) { FREE_ALL(); return 0; }
+	}
       }
     }      
   }
 
-  igraph_vector_long_destroy(&nptr);
-  igraph_lazy_adjlist_destroy(&adjlist);
-  igraph_stack_destroy(&stack);
-  igraph_vector_char_destroy(&added);
-  IGRAPH_FINALLY_CLEAN(4);
+  FREE_ALL();
+# undef FREE_ALL
 
   return 0;
 }
