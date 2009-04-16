@@ -5432,6 +5432,45 @@ PyObject *igraphmodule_Graph_Read_DIMACS(PyTypeObject * type,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Reads an UCINET DL file and creates a graph from it.
+ * \return the graph
+ * \sa igraph_read_graph_dl
+ */
+PyObject *igraphmodule_Graph_Read_DL(PyTypeObject * type,
+                                     PyObject * args, PyObject * kwds)
+{
+  igraphmodule_GraphObject *self;
+  char *fname = NULL;
+  FILE *f;
+  igraph_t g;
+  PyObject *directed = Py_True;
+
+  static char *kwlist[] = { "f", "directed", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords
+      (args, kwds, "s|O", kwlist, &fname, &directed))
+    return NULL;
+
+  f = fopen(fname, "r");
+  if (!f) {
+    PyErr_SetString(PyExc_IOError, strerror(errno));
+    return NULL;
+  }
+
+  if (igraph_read_graph_dl(&g, f, PyObject_IsTrue(directed))) {
+    igraphmodule_handle_igraph_error();
+    fclose(f);
+    return NULL;
+  }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+
+  fclose(f);
+
+  return (PyObject*)self;
+}
+
+/** \ingroup python_interface_graph
  * \brief Reads an edge list from a file and creates a graph from it.
  * \return the graph
  * \sa igraph_read_graph_edgelist
@@ -9942,7 +9981,15 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@return: the generated graph, the source and the target of the flow and the edge\n"
    "  capacities in a tuple\n"},
 
-  // interface to igraph_read_graph_edgelist
+  /* interface to igraph_read_graph_dl */
+  {"Read_DL", (PyCFunction) igraphmodule_Graph_Read_DL,
+   METH_VARARGS | METH_KEYWORDS | METH_CLASS,
+   "Read_DL(f, directed=True)\n\n"
+   "Reads an UCINET DL file and creates a graph based on it.\n\n"
+   "@param f: the name of the file\n"
+   "@param directed: whether the generated graph should be directed.\n"},
+
+  /* interface to igraph_read_graph_edgelist */
   {"Read_Edgelist", (PyCFunction) igraphmodule_Graph_Read_Edgelist,
    METH_VARARGS | METH_KEYWORDS | METH_CLASS,
    "Read_Edgelist(f, directed=True)\n\n"
