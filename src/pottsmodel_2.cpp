@@ -2084,7 +2084,7 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
 		IGRAPH_CHECK(igraph_vector_resize(membership, num_nodes));		
 		for (unsigned int i = 0; i < num_nodes; i++)
 		{
-			VECTOR(*membership)[ i ]= spin[i];
+			VECTOR(*membership)[ i ]= spin[i]-1;
 		}
 	}
 	
