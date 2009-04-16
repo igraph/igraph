@@ -7,7 +7,7 @@
 }
 \usage{
 alpha.centrality(graph, nodes=V(graph), alpha=1, loops=FALSE,
-                 exo=1, attr=NULL, tol=1e-7)
+                 exo=1, attr=NULL, tol=1e-7, sparse=TRUE)
 }
 \arguments{
   \item{graph}{The input graph, can be directed or undirected}
@@ -29,6 +29,9 @@ alpha.centrality(graph, nodes=V(graph), alpha=1, loops=FALSE,
     matrix. Supply \dQuote{weight} here if you have a weighted graph.}
   \item{tol}{Tolerance for near-singularities during matrix inversion,
     see \code{\link{solve}}.}
+  \item{sparse}{Logical scalar, whether to use sparse matrices for the
+    calculation. The \sQuote{Matrix} package is required for sparse
+    matrix support}
 }
 \details{
   The alpha centrality measure can be considered as a generalization of

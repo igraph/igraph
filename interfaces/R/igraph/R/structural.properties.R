@@ -541,9 +541,9 @@ bonpow <- function(graph, nodes=V(graph),
   bonpow.dense(graph, nodes, loops, exponent, rescale, tol)
 }
 
-alpha.centrality <- function(graph, nodes=V(graph), alpha=1,
-                             loops=FALSE, exo=1, weights=NULL,
-                             tol=1e-7) {
+alpha.centrality.dense <- function(graph, nodes=V(graph), alpha=1,
+                                   loops=FALSE, exo=1, weights=NULL,
+                                   tol=1e-7) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
@@ -577,6 +577,62 @@ alpha.centrality <- function(graph, nodes=V(graph), alpha=1,
   ev <- solve(id-alpha*d, tol=tol) %*% exo
   ev[as.numeric(nodes)+1]
 }
+
+alpha.centrality.sparse <- function(graph, nodes=V(graph), alpha=1,
+                                   loops=FALSE, exo=1, weights=NULL,
+                                   tol=1e-7) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  vc <- vcount(graph)
+
+  if (!loops) {
+    graph <- simplify(graph, remove.multiple=FALSE, remove.loops=TRUE)
+  }  
+
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
+    ## weights == NULL and there is a "weight" edge attribute
+    weights <- E(graph)$weight
+  } else if (is.null(weights)) {
+    ## weights == NULL, but there is no "weight" edge attribute
+    weights <- rep(1, ecount(graph))
+  } else if (any(!is.na(weights))) {
+    weights <- as.numeric(weights)
+    ## weights != NULL, but weights == rep(NA, x)
+    weights <- rep(1, ecount(graph))
+  }
+  
+  el <- get.edgelist(graph, names=FALSE)+1
+  M <- spMatrix(vc, vc, i=el[,2], j=el[,1], x=weights)
+  M <- as(M, "dgCMatrix")
+  
+  ## Create an identity matrix
+  M2 <- spMatrix(vc, vc, i=1:vc, j=1:vc, x=rep(1, vc))
+  M2 <- as(M2, "dgCMatrix")
+
+  ## exo
+  exo <- cbind(rep(exo, length=vc))
+
+  ## Solve the equation
+  M3 <- M2-alpha*M
+  r <- solve(M3, tol=tol, exo)
+  
+  r[ as.numeric(nodes)+1]
+}
+
+alpha.centrality <- function(graph, nodes=V(graph), alpha=1,
+                             loops=FALSE, exo=1, weights=NULL,
+                             tol=1e-7, sparse=TRUE) {
+  if (sparse) {
+    if (require(Matrix)) {
+      return(alpha.centrality.sparse(graph, nodes, alpha, loops,
+                                     exo, weights, tol))
+    }
+  } 
+  alpha.centrality.dense(graph, nodes, alpha, loops, exo, weights, tol)  
+}
+
 
 graph.density <- function(graph, loops=FALSE) {
 
