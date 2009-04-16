@@ -603,8 +603,17 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
 		
 	} /* while loop */
 
-/*   pm->WriteClusters(modularity, temperature, csize, membership, adhesion, normalised_adhesion, polarization, kT, d_p, d_n, gamma, lambda); */
-  pm->WriteClusters(modularity, temperature, csize, membership, 0, 0, 0, kT, d_p, d_n, gamma, lambda);
+  /* These are needed, otherwise 'modularity' is not calculated */
+  igraph_matrix_t adhesion, normalized_adhesion;
+  igraph_real_t polarization;
+  IGRAPH_MATRIX_INIT_FINALLY(&adhesion, 0, 0);
+  IGRAPH_MATRIX_INIT_FINALLY(&normalized_adhesion, 0, 0);
+  pm->WriteClusters(modularity, temperature, csize, membership, 
+		    &adhesion, &normalized_adhesion, &polarization, 
+		    kT, d_p, d_n, gamma, lambda);
+  igraph_matrix_destroy(&normalized_adhesion);
+  igraph_matrix_destroy(&adhesion);
+  IGRAPH_FINALLY_CLEAN(2);
 
   while (net->link_list->Size()) delete net->link_list->Pop();
   while (net->node_list->Size()) delete net->node_list->Pop();
