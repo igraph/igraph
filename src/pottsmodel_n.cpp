@@ -47,7 +47,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include "pottsmodel_n.h"
+#include "pottsmodel_2.h"
 #include "NetRoutines.h"
 
 #include "random.h"

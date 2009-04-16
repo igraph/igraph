@@ -53,7 +53,6 @@
 #include "NetDataTypes.h"
 #include "NetRoutines.h"
 #include "pottsmodel_2.h"
-#include "pottsmodel_n.h"
 
 #include "igraph.h"
 #include "error.h"
