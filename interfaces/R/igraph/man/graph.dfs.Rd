@@ -6,7 +6,7 @@
 \usage{
 graph.dfs (graph, root, neimode = c("out", "in", "all", "total"), 
     order = TRUE, order.out = FALSE, father = FALSE, dist = FALSE, 
-    callback = NULL, extra = NULL, rho = parent.frame()) 
+    in.callback = NULL, out.callback = NULL, extra = NULL, rho = parent.frame()) 
 }
 \arguments{
   \item{graph}{The input graph.}
@@ -24,15 +24,18 @@ graph.dfs (graph, root, neimode = c("out", "in", "all", "total"),
     vertices.}
   \item{dist}{Logical scalar, whether to return the distance from the
     root of the search tree.}
-  \item{callback}{If not \code{NULL}, then it must be callback
+  \item{in.callback}{If not \code{NULL}, then it must be callback
     function. This is called whenever a vertex is visited. See details
     below.}
+  \item{out.callback}{If not \code{NULL}, then it must be callback
+    function. This is called whenever the subtree of a vertex is
+    completed by the algorithm. See details below.}
   \item{extra}{Additional argument to supply to the callback function.}
   \item{rho}{The environment in which the callback function is
     evaluated.}
 }
 \details{
-  The callback function must have the following arguments:
+  The callback functions must have the following arguments:
   \describe{
     \item{graph}{The input graph is passed to the callback function
       here.}
@@ -41,12 +44,43 @@ graph.dfs (graph, root, neimode = c("out", "in", "all", "total"),
       its distance from the root of the search tree.}
     \item{extra}{The extra argument.}
   }
-  See examples below on how to use the callback function.
+  See examples below on how to use the callback functions.
 }
-\value{}
+\value{
+  A named list with the following entries:
+  \item{root}{Numeric scalar. The root vertex that was used as the
+    starting point of the search.}
+  \item{neimode}{Character scalar. The \code{neimode} argument of the
+    function call. Note that for undirected graphs this is always
+    \sQuote{all}, irrespectively of the supplied value.}
+  \item{order}{Numeric vector. The vertex ids, in the order in which
+    they were visited by the search.}
+  \item{order.out}{Numeric vector, the vertex ids, in the order of the
+    completion of their subtree.}
+  \item{father}{Numeric vector. The father of each vertex, i.e. the
+    vertex it was discovered from.}
+  \item{dist}{Numeric vector, for each vertex its distance from the root
+    of the search tree.}
+
+  Note that \code{order}, \code{order.out}, \code{father}, and
+  \code{dist} might be \code{NULL} if their corresponding argument is
+  \code{FALSE}, i.e. if their calculation is not requested.  
+}
 % \references{}
 \author{Gabor Csardi \email{Gabor.Csardi@unil.ch} }
 \seealso{ \code{\link{igraph.bfs}} for breadth-first search.}
 \examples{
+## A graph with two separate trees
+
+graph.dfs(graph.tree(10) %du% graph.tree(10), 0, "out",
+          TRUE, TRUE, TRUE, TRUE)
+
+## How to use a callback
+f <- function(graph, data, extra) {
+  print(data)
+  FALSE
+}
+tmp <- graph.dfs(graph.ring(10) %du% graph.ring(10), 0, "out",
+                 in.callback=f)
 }
 \keyword{graphs}
