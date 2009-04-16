@@ -100,6 +100,11 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
  * algorithm proposed by Joerg Reichardt and Stefan Bornholdt. 
  * The algorithm is described in their paper: Statistical Mechanics of 
  * Community Detection, http://arxiv.org/abs/cond-mat/0603718.
+ * 
+ * </para><para> From version 0.6 igraph also supports an extension to
+ * the algorithm that allows negative edge weights. This is described
+ * in  V.A. Traag and Jeroen Bruggeman: Community detection in networks 
+ * with positive and negative links, http://arxiv.org/abs/0811.2329.
  * \param graph The input graph, it may be directed but the direction
  *     of the edge is not used in the algorithm.
  * \param weights The vector giving the edge weights, it may be \c NULL, 
@@ -151,8 +156,20 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
  *     links contibute more to the energy function which is minimized
  *     in the algorithm. Bigger values make the missing links more
  *     important. (If my understanding is correct.)
- * \param implementation
- * \param lambda
+ * \param implementation Constant, chooses between the two
+ *     implementations of the spin-glass algorithm that are included
+ *     in igraph. \c IGRAPH_SPINCOMM_IMP_ORIG selects the original
+ *     implementation, this is faster, \c IGRAPH_SPINCOMM_INP_NEG selects
+ *     a new implementation by Vincent Traag that allows negative edge
+ *     weights.
+ * \param lambda Real number. Parameter for the \c
+ *     IGRAPH_SPINCOMM_IMP_NEG implementation. This
+ *     specifies the balance between the importance of present and
+ *     non-present negative weighted edges in a community. Smaller values of 
+ *     lambda, leads to communities with lesser negative intra-connectivity.
+ *     If this argument is set to zero, the algorithm reduces to a graph
+ *     coloring algorithm, using the number of spins as the number of
+ *     colors. 
  * \return Error code.
  * 
  * \sa igraph_community_spinglass_single() for calculating the community
