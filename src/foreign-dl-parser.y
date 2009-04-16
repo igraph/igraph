@@ -96,7 +96,9 @@ extern igraph_real_t igraph_pajek_get_number(const char *str, long int len);
 
 %%
 
-input: DL NEQ integer NEWLINE rest eof { igraph_i_dl_data.n=$3; };
+input: DL NEQ integer NEWLINE rest trail eof { igraph_i_dl_data.n=$3; };
+
+trail: | trail newline;
 
 eof: | EOFF;
 
