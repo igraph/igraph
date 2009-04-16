@@ -1220,7 +1220,6 @@ igraph_random_sample:
 
 igraph_convex_hull:
         PARAMS: MATRIX data, OUT VECTOR resverts, OUT MATRIX rescoords
-        IGNORE: RR, RC, RNamespace
 
 #######################################
 # (R)evolver
