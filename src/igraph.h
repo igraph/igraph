@@ -160,6 +160,9 @@ typedef enum { IGRAPH_DONT_SIMPLIFY=0,
 typedef enum { IGRAPH_TRANSITIVITY_NAN=0,
                IGRAPH_TRANSITIVITY_ZERO } igraph_transitivity_mode_t;
 
+typedef enum { IGRAPH_SPINCOMM_IMP_ORIG=0, 
+	       IGRAPH_SPINCOMM_IMP_NEG } igraph_spinglass_implementation_t;
+
 typedef igraph_real_t  igraph_scalar_function_t(const igraph_vector_t *var, 
 						const igraph_vector_t *par,
 						void* extra);
@@ -1301,20 +1304,15 @@ int igraph_community_spinglass(const igraph_t *graph,
 			       igraph_real_t stoptemp,
 			       igraph_real_t coolfact,
 			       igraph_spincomm_update_t update_rule,
-			       igraph_real_t gamma);
-int igraph_spinglass_community(const igraph_t *graph,
-			       const igraph_vector_t *weights,
-			       igraph_real_t *modularity,
-			       igraph_real_t *temperature,
-			       igraph_vector_t *membership, 
-			       igraph_vector_t *csize, 
-			       igraph_integer_t spins,
-			       igraph_bool_t parupdate,
-			       igraph_real_t starttemp,
-			       igraph_real_t stoptemp,
-			       igraph_real_t coolfact,
-			       igraph_spincomm_update_t update_rule,
-			       igraph_real_t gamma);
+			       igraph_real_t gamma, 
+			       /* the rest is for the NegSpin implementation */
+			       igraph_spinglass_implementation_t implementation,
+			       igraph_matrix_t *adhesion,
+			       igraph_matrix_t *normalised_adhesion,
+			       igraph_real_t *polarization,
+			       igraph_real_t lambda,
+			       igraph_real_t d_p,
+			       igraph_real_t d_n);
 
 int igraph_community_spinglass_single(const igraph_t *graph,
 				      const igraph_vector_t *weights,
@@ -1327,37 +1325,6 @@ int igraph_community_spinglass_single(const igraph_t *graph,
 				      igraph_integer_t spins,
 				      igraph_spincomm_update_t update_rule,
 				      igraph_real_t gamma);
-int igraph_spinglass_my_community(const igraph_t *graph,
-				  const igraph_vector_t *weights,
-				  igraph_integer_t vertex,
-				  igraph_vector_t *community,
-				  igraph_real_t *cohesion,
-				  igraph_real_t *adhesion,
-				  igraph_integer_t *inner_links,
-				  igraph_integer_t *outer_links,
-				  igraph_integer_t spins,
-				  igraph_spincomm_update_t update_rule,
-				  igraph_real_t gamma);
-
-int igraph_community_negative(const igraph_t *graph,
-			       const igraph_vector_t *weights,
-			       igraph_real_t *modularity,
-			       igraph_real_t *temperature,
-			       igraph_vector_t *membership, 
-			       igraph_vector_t *csize, 
-				   igraph_matrix_t *adhesion,
-				   igraph_matrix_t *normalised_adhesion,
-				   igraph_real_t *polarization,				   
-			       igraph_integer_t spins,
-			       igraph_bool_t parupdate,
-			       igraph_real_t starttemp,
-			       igraph_real_t stoptemp,
-			       igraph_real_t coolfact,
-			       igraph_spincomm_update_t update_rule,
-			       igraph_real_t gamma,
-				   igraph_real_t lambda,				   
-				   igraph_real_t d_p,
-				   igraph_real_t d_n);
 				   
 int igraph_community_walktrap(const igraph_t *graph, 
 			      const igraph_vector_t *weights,

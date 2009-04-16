@@ -59,6 +59,41 @@
 #include "random.h"
 #include "igraph_math.h"
 
+
+int igraph_i_community_spinglass_orig(const igraph_t *graph,
+				      const igraph_vector_t *weights,
+				      igraph_real_t *modularity,
+				      igraph_real_t *temperature,
+				      igraph_vector_t *membership, 
+				      igraph_vector_t *csize, 
+				      igraph_integer_t spins,
+				      igraph_bool_t parupdate,
+				      igraph_real_t starttemp,
+				      igraph_real_t stoptemp,
+				      igraph_real_t coolfact,
+				      igraph_spincomm_update_t update_rule,
+				      igraph_real_t gamma);
+
+int igraph_i_community_spinglass_negative(const igraph_t *graph,
+					  const igraph_vector_t *weights,
+					  igraph_real_t *modularity,
+					  igraph_real_t *temperature,
+					  igraph_vector_t *membership, 
+					  igraph_vector_t *csize,
+					  igraph_integer_t spins,
+					  igraph_bool_t parupdate,
+					  igraph_real_t starttemp,
+					  igraph_real_t stoptemp,
+					  igraph_real_t coolfact,
+					  igraph_spincomm_update_t update_rule,
+					  igraph_real_t gamma,
+					  igraph_matrix_t *adhesion,
+					  igraph_matrix_t *normalised_adhesion,
+					  igraph_real_t *polarization,
+					  igraph_real_t lambda,
+					  igraph_real_t d_p,
+					  igraph_real_t d_n);
+
 /**
  * \function igraph_community_spinglass
  * \brief Community detection based on statistical mechanics
@@ -118,6 +153,13 @@
  *     links contibute more to the energy function which is minimized
  *     in the algorithm. Bigger values make the missing links more
  *     important. (If my understanding is correct.)
+ * \param implementation
+ * \param adhesion
+ * \param normalized_adhesion
+ * \param polarization
+ * \param lambda
+ * \param d_p
+ * \param d_n
  * \return Error code.
  * 
  * \sa igraph_community_spinglass_single() for calculating the community
@@ -138,7 +180,55 @@ int igraph_community_spinglass(const igraph_t *graph,
 			       igraph_real_t stoptemp,
 			       igraph_real_t coolfact,
 			       igraph_spincomm_update_t update_rule,
-			       igraph_real_t gamma) {
+			       igraph_real_t gamma,
+			       /* the rest is for the NegSpin implementation */
+			       igraph_spinglass_implementation_t implementation,
+			       igraph_matrix_t *adhesion,
+			       igraph_matrix_t *normalised_adhesion,
+			       igraph_real_t *polarization,
+			       igraph_real_t lambda,
+			       igraph_real_t d_p,
+			       igraph_real_t d_n) {
+  
+  switch (implementation) {
+  case IGRAPH_SPINCOMM_IMP_ORIG:
+    return igraph_i_community_spinglass_orig(graph, weights, modularity, 
+					     temperature, membership, csize, 
+					     spins, parupdate, starttemp, 
+					     stoptemp, coolfact, update_rule, 
+					     gamma);
+    break;
+  case IGRAPH_SPINCOMM_IMP_NEG:
+    return igraph_i_community_spinglass_negative(graph, weights, modularity, 
+						 temperature, membership, csize, 
+						 spins, parupdate, starttemp, 
+						 stoptemp, coolfact, 
+						 update_rule, gamma, 
+						 adhesion, normalised_adhesion,
+						 polarization, lambda,
+						 d_p, d_n);
+    break;
+  default:
+    IGRAPH_ERROR("Unknown `implementation' in spinglass community finding",
+		 IGRAPH_EINVAL);
+  }
+  
+  return 0;
+}
+
+int igraph_i_community_spinglass_orig(const igraph_t *graph,
+				      const igraph_vector_t *weights,
+				      igraph_real_t *modularity,
+				      igraph_real_t *temperature,
+				      igraph_vector_t *membership, 
+				      igraph_vector_t *csize, 
+				      igraph_integer_t spins,
+				      igraph_bool_t parupdate,
+				      igraph_real_t starttemp,
+				      igraph_real_t stoptemp,
+				      igraph_real_t coolfact,
+				      igraph_spincomm_update_t update_rule,
+				      igraph_real_t gamma) {
 
   unsigned long changes, runs;
   igraph_bool_t use_weights=0;
@@ -258,27 +348,6 @@ int igraph_community_spinglass(const igraph_t *graph,
   delete pm;
 
   return 0;
-}
-
-int igraph_spinglass_community(const igraph_t *graph,
-			       const igraph_vector_t *weights,
-			       igraph_real_t *modularity,
-			       igraph_real_t *temperature,
-			       igraph_vector_t *membership, 
-			       igraph_vector_t *csize, 
-			       igraph_integer_t spins,
-			       igraph_bool_t parupdate,
-			       igraph_real_t starttemp,
-			       igraph_real_t stoptemp,
-			       igraph_real_t coolfact,
-			       igraph_spincomm_update_t update_rule,
-			       igraph_real_t gamma) {
-
-  IGRAPH_WARNING("This function was renamed to igraph_community_spinglass");
-  return igraph_community_spinglass(graph, weights, modularity, temperature,
-				    membership, csize, spins, parupdate,
-				    starttemp, stoptemp, coolfact, update_rule,
-				    gamma);
 }
 
 /**
@@ -434,44 +503,25 @@ int igraph_community_spinglass_single(const igraph_t *graph,
   return 0;
 }
 
-int igraph_spinglass_my_community(const igraph_t *graph,
-				  const igraph_vector_t *weights,
-				  igraph_integer_t vertex,
-				  igraph_vector_t *community,
-				  igraph_real_t *cohesion,
-				  igraph_real_t *adhesion,
-				  igraph_integer_t *inner_links,
-				  igraph_integer_t *outer_links,
-				  igraph_integer_t spins,
-				  igraph_spincomm_update_t update_rule,
-				  igraph_real_t gamma) {
-
-  IGRAPH_WARNING("this function was renamed to `igraph_community_spinglass_single");
-  return igraph_community_spinglass_single(graph, weights, vertex, community,
-					   cohesion, adhesion, inner_links, 
-					   outer_links, spins, update_rule,
-					   gamma);
-}
-
-int igraph_community_negative(const igraph_t *graph,
-			       const igraph_vector_t *weights,
-			       igraph_real_t *modularity,
-			       igraph_real_t *temperature,
-			       igraph_vector_t *membership, 
-			       igraph_vector_t *csize,
-				   igraph_matrix_t *adhesion,
-				   igraph_matrix_t *normalised_adhesion,
-				   igraph_real_t *polarization,				    
-			       igraph_integer_t spins,
-			       igraph_bool_t parupdate,
-			       igraph_real_t starttemp,
-			       igraph_real_t stoptemp,
-			       igraph_real_t coolfact,
-			       igraph_spincomm_update_t update_rule,
-			       igraph_real_t gamma,
-			       igraph_real_t lambda,				   
-				   igraph_real_t d_p,
-				   igraph_real_t d_n) {
+int igraph_i_community_spinglass_negative(const igraph_t *graph,
+					  const igraph_vector_t *weights,
+					  igraph_real_t *modularity,
+					  igraph_real_t *temperature,
+					  igraph_vector_t *membership, 
+					  igraph_vector_t *csize,
+					  igraph_integer_t spins,
+					  igraph_bool_t parupdate,
+					  igraph_real_t starttemp,
+					  igraph_real_t stoptemp,
+					  igraph_real_t coolfact,
+					  igraph_spincomm_update_t update_rule,
+					  igraph_real_t gamma,
+					  igraph_matrix_t *adhesion,
+					  igraph_matrix_t *normalised_adhesion,
+					  igraph_real_t *polarization,
+					  igraph_real_t lambda,
+					  igraph_real_t d_p,
+					  igraph_real_t d_n) {
 
   unsigned long changes, runs;
   igraph_bool_t use_weights=0;
