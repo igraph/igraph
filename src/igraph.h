@@ -1177,6 +1177,8 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *graphs,
  * \param rank The rank of the current vertex, it starts with zero.
  * \param dist The distance (number of hops) of the current vertex
  *   from the root of the current search tree.
+ * \param extra The extra argument that was passed to \ref
+ *   igraph_bfs().
  * \return A logical value, if TRUE (=non-zero), that is interpreted
  *    as a request to stop the BFS and return to the caller. If a BFS
  *    is terminated like this, then all elements of the result vectors
@@ -1205,6 +1207,31 @@ int igraph_bfs(const igraph_t *graph,
 int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
 		 igraph_vector_t *vids, igraph_vector_t *layers,
 		 igraph_vector_t *parents);
+
+/**
+ * \function igraph_dfshandler_t
+ * Callback type for the DFS function
+ * 
+ * \ref igraph_dfs() is able to call a callback function, whenever a
+ * new vertex is discovered, and/or whenever a subtree is
+ * completed. These callbacks must be of type \c
+ * igraph_dfshandler_t. They have the following arguments:
+ * \param graph The graph that that algorithm is working on. Of course
+ *   this must not be modified.
+ * \param vid The id of the vertex just found by the breadth-first
+ *   search.
+ * \param dist The distance (number of hops) of the current vertex
+ *   from the root of the current search tree.
+ * \param extra The extra argument that was passed to \ref
+ *   igraph_dfs().
+ * \return A logical value, if TRUE (=non-zero), that is interpreted
+ *    as a request to stop the DFS and return to the caller. If a DFS
+ *    is terminated like this, then all elements of the result vectors
+ *    that were not yet calculated at the point of the termination
+ *    contain \c IGRAPH_NAN.
+ * 
+ * \sa \ref igraph_dfs()
+ */
 
 typedef igraph_bool_t igraph_dfshandler_t(const igraph_t *graph,
 					  igraph_integer_t vid, 

@@ -12,4 +12,9 @@
 <!-- doxrox-include igraph_bfshandler_t -->
 </section>
 
+<section><title>Depth-first search</title>
+<!-- doxrox-include igraph_dfs -->
+<!-- doxrox-include igraph_dfshandler_t -->
+</section>
+
 </chapter>

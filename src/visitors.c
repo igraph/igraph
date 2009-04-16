@@ -270,6 +270,49 @@ int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
   return 0;
 }
 
+/**
+ * \function igraph_dfs
+ * Depth-first search
+ * 
+ * A simple depth-first search, with
+ * the possibility to call a callback whenever a vertex is discovered
+ * and/or whenever a subtree is finished.
+ * It is allowed to supply null pointers as the output arguments the
+ * user is not interested in, in this case they will be ignored.
+ * 
+ * </para><para>
+ * If not all vertices can be reached from the supplied root vertex,
+ * then additional root vertices will be used, in the order of their
+ * vertex ids.
+ * \param graph The input graph.
+ * \param root The id of the root vertex.
+ * \param mode For directed graphs is defines which edges to follow.
+ *        \c IGRAPH_OUT means following the direction of the edges,
+ *        \c IGRAPH_IN means the opposite, and 
+ *        \c IGRAPH_ALL ignores the direction of the edges.
+ *        This parameter is ignored for undirected graphs. 
+ * \param order If not null pointer, then the vertex ids of the graph are
+ *        stored here, in the same order as they were discovered.
+ * \param order_out If not a null pointer, then the vertex ids of the
+ *        graphs are stored here, in the order of the completion of
+ *        their subtree.
+ * \param father If not a null pointer, then the id of the father of
+ *        each vertex is stored here.
+ * \param dist If not null pointer, then the distance from the root of
+ *        the current search tree is stored here.
+ * \param in_callback If not null, then it should be a pointer to a
+ *        function of type \ref igraph_dfshandler_t. This function
+ *        will be called, whenever a new vertex is discovered.
+ * \param out_callback If not null, then it should be a pointer to a
+ *        function of type \ref igraph_dfshandler_t. This function
+ *        will be called, whenever the subtree of a vertex is completed.
+ * \param extra Extra argument to pass to the callback function(s).
+ * \return Error code.
+ *
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and
+ * edges.
+ */
+
 int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 	       igraph_neimode_t mode, igraph_vector_t *order,
 	       igraph_vector_t *order_out, igraph_vector_t *father,
