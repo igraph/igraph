@@ -10,12 +10,14 @@
 spinglass.community(graph, weights=NULL, vertex=NULL, spins=25,
                     parupdate=FALSE, start.temp=1, stop.temp=0.01,
                     cool.fact=0.99, update.rule=c("config", "random",
-                    "simple"), gamma=1)
+                    "simple"), gamma=1, implementation=c("orig", "neg"),
+                    lambda=1)
 }
 \usage{
 spinglass.community(graph, weights=NULL, spins=25, parupdate=FALSE,
                     start.temp=1, stop.temp=0.1, cool.fact=0.99,
-                    update.rule=c("config", "random", "simple"), gamma=1)
+                    update.rule=c("config", "random", "simple"),
+                    gamma=1, implementation=c("orig", "neg"), lambda=1)
 spinglass.community(graph, weights=NULL, vertex, spins=25,
                     update.rule=c("config", "random", "simple"), gamma=1)
 }
@@ -59,6 +61,19 @@ spinglass.community(graph, weights=NULL, vertex, spins=25,
     outside the community. The default 1.0 value makes existing and
     non-existing links equally important. Smaller values make the
     existing links, greater values the missing links more important.}
+  \item{implementation}{Character scalar. Currently igraph contains two
+    implementations for the Spin-glass community finding algorithm. The
+    faster original implementation is the default. The other
+    implementation, that takes into account negative weights, can be
+    chosen by supplying \sQuote{neg} here.}
+  \item{lambda}{Real constant, the lambda argument of the algorithm. This
+    specifies the balance between the importance of present and
+    non-present negative weighted edges in a community. Smaller values of 
+    lambda, leads to communities with lesser negative intra-connectivity.
+    If this argument is set to zero, the algorithm reduces to a graph
+    coloring algorithm, using the number of spins as the number of
+    colors. This argument is ignored if the \sQuote{orig} implementation
+    is chosen.}
   \item{vertex}{This parameter can be used to calculate the community of
       a given vertex without calculating all communities. Note that if
       this argument is present then some other arguments are ignored.}
@@ -66,8 +81,13 @@ spinglass.community(graph, weights=NULL, vertex, spins=25,
 \details{
   This function tries to find communities in a graph. A community is a
   set of nodes with many edges inside the community and  few edges
-  between outside it (ie. between the community itself and the rest of
-  the graph. 
+  between outside it (i.e. between the community itself and the rest of
+  the graph.)
+
+  This idea is reversed for edges having a negative weight, 
+  ie. few negative edges inside a community and many negative edges
+  between communities. Note that only the \sQuote{neg} implementation
+  supports negative edge weights.
 }
 \value{
   If the \code{vertex} argument is not given, ie. the first form is used
@@ -98,11 +118,20 @@ spinglass.community(graph, weights=NULL, vertex, spins=25,
   \url{http://arxiv.org/abs/cond-mat/0603718}
 
   M. E. J. Newman and M. Girvan: Finding and evaluating community
-  structure in networks, \emph{Phys. Rev. E} 69, 026113 (2004)  
+  structure in networks, \emph{Phys. Rev. E} 69, 026113 (2004)
+
+  V.A. Traag and Jeroen Bruggeman: Community detection in networks 
+  with positive and negative links, \url{http://arxiv.org/abs/0811.2329}
+  (2008).
+  
 }
 \author{Jorg Reichardt \email{lastname@physik.uni-wuerzburg.de} for the
   original code and Gabor Csardi \email{csardi@rmki.kfki.hu} for the
-  igraph glue code}
+  igraph glue code.
+  
+  Changes to the original function for including the
+  possibility of negative ties were implemented 
+  by Vincent Traag \email{vtraag@f-m.fm}.}}
 \seealso{\code{\link{clusters}}}
 \examples{
   g <- erdos.renyi.game(10, 5/10) \%du\% erdos.renyi.game(9, 5/9)

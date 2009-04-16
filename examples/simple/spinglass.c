@@ -49,7 +49,9 @@ int main() {
 			     0.01, /* stop temperature */
 			     0.99, /* cooling factor */
 			     IGRAPH_SPINCOMM_UPDATE_CONFIG,
-			     1.0); /* gamma */
+			     1.0, /* gamma */
+			     IGRAPH_SPINCOMM_IMP_ORIG,
+			     0);
 
 /*   printf("Modularity:  %f\n", modularity); */
 /*   printf("Temperature: %f\n", temperature); */

@@ -5499,7 +5499,8 @@ SEXP R_igraph_spinglass_community(SEXP graph, SEXP pweights,
 				  SEXP pspins, SEXP pparupdate,
 				  SEXP pstarttemp, SEXP pstoptemp,
 				  SEXP pcoolfact, SEXP pupdate_rule,
-				  SEXP pgamma) {
+				  SEXP pgamma, SEXP pimplementation, 
+				  SEXP plambda) {
   igraph_t g;
   igraph_vector_t weights;
   igraph_integer_t spins=REAL(pspins)[0];
@@ -5509,6 +5510,8 @@ SEXP R_igraph_spinglass_community(SEXP graph, SEXP pweights,
   igraph_real_t coolfact=REAL(pcoolfact)[0];
   igraph_spincomm_update_t update_rule=REAL(pupdate_rule)[0];
   igraph_real_t gamma=REAL(pgamma)[0];
+  igraph_real_t implementation=REAL(pimplementation)[0];
+  igraph_real_t lambda=REAL(plambda)[0];
   igraph_real_t modularity;
   igraph_real_t temperature;
   igraph_vector_t membership;
@@ -5525,7 +5528,8 @@ SEXP R_igraph_spinglass_community(SEXP graph, SEXP pweights,
 			     &modularity, &temperature, 
 			     &membership, &csize,
 			     spins, parupdate, starttemp, stoptemp,
-			     coolfact, update_rule, gamma);
+			     coolfact, update_rule, gamma,
+			     implementation, lambda);
   
   PROTECT(result=NEW_LIST(4));
   PROTECT(names=NEW_CHARACTER(4));
@@ -5566,6 +5570,7 @@ SEXP R_igraph_spinglass_my_community(SEXP graph, SEXP pweights,
   igraph_real_t adhesion;
   igraph_integer_t inner_links;
   igraph_integer_t outer_links;
+	
   SEXP result, names;
 
   R_igraph_before();
