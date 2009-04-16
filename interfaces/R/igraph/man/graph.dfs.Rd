@@ -71,16 +71,26 @@ graph.dfs (graph, root, neimode = c("out", "in", "all", "total"),
 \seealso{ \code{\link{igraph.bfs}} for breadth-first search.}
 \examples{
 ## A graph with two separate trees
-
-graph.dfs(graph.tree(10) %du% graph.tree(10), 0, "out",
+graph.dfs(graph.tree(10) \%du\% graph.tree(10), 0, "out",
           TRUE, TRUE, TRUE, TRUE)
 
 ## How to use a callback
-f <- function(graph, data, extra) {
-  print(data)
+f.in <- function(graph, data, extra) {
+  cat("in:", paste(collapse=", ", data), "\n")
   FALSE
 }
-tmp <- graph.dfs(graph.ring(10) %du% graph.ring(10), 0, "out",
-                 in.callback=f)
+f.out <- function(graph, data, extra) {
+  cat("out:", paste(collapse=", ", data), "\n")
+  FALSE
+}
+tmp <- graph.dfs(graph.tree(10), 0, "out",
+                 in.callback=f.in, out.callback=f.out)
+
+## Terminate after the first component, using a callback
+f.out <- function(graph, data, extra) {
+ data['vid'] == 0
+}
+tmp <- graph.dfs(graph.tree(10) \%du\% graph.tree(10), 0, out.callback=f.out)
+
 }
 \keyword{graphs}
