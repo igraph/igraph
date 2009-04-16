@@ -90,9 +90,7 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
 /* 					  igraph_matrix_t *adhesion, */
 /* 					  igraph_matrix_t *normalised_adhesion, */
 /* 					  igraph_real_t *polarization, */
-					  igraph_real_t lambda,
-					  igraph_real_t d_p,
-					  igraph_real_t d_n);
+					  igraph_real_t lambda);
 
 /**
  * \function igraph_community_spinglass
@@ -155,8 +153,6 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
  *     important. (If my understanding is correct.)
  * \param implementation
  * \param lambda
- * \param d_p
- * \param d_n
  * \return Error code.
  * 
  * \sa igraph_community_spinglass_single() for calculating the community
@@ -183,9 +179,7 @@ int igraph_community_spinglass(const igraph_t *graph,
 /* 			       igraph_matrix_t *adhesion, */
 /* 			       igraph_matrix_t *normalised_adhesion, */
 /* 			       igraph_real_t *polarization, */
-			       igraph_real_t lambda,
-			       igraph_real_t d_p,
-			       igraph_real_t d_n) {
+			       igraph_real_t lambda) {
   
   switch (implementation) {
   case IGRAPH_SPINCOMM_IMP_ORIG:
@@ -203,7 +197,7 @@ int igraph_community_spinglass(const igraph_t *graph,
 						 update_rule, gamma, 
 /* 						 adhesion, normalised_adhesion, */
 /* 						 polarization, */
-						 lambda, d_p, d_n);
+						 lambda);
     break;
   default:
     IGRAPH_ERROR("Unknown `implementation' in spinglass community finding",
@@ -516,9 +510,7 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
 /* 					  igraph_matrix_t *adhesion, */
 /* 					  igraph_matrix_t *normalised_adhesion, */
 /* 					  igraph_real_t *polarization, */
-					  igraph_real_t lambda,
-					  igraph_real_t d_p,
-					  igraph_real_t d_n) {
+					  igraph_real_t lambda) {
 
   unsigned long changes, runs;
   igraph_bool_t use_weights=0;
@@ -527,6 +519,8 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
   ClusterList<NNode*> *cl_cur;
   network *net;
   PottsModelN *pm;
+  igraph_real_t d_n;
+  igraph_real_t d_p;
 
   /* Check arguments */
 
@@ -560,6 +554,11 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
   if (!conn) {
     IGRAPH_ERROR("Cannot work with unconnected graph", IGRAPH_EINVAL);
   }
+  
+  igraph_vector_minmax(weights, &d_n, &d_p);
+  if (d_n > 0) { d_n=0; }
+  if (d_p < 0) { d_p=0; }
+  d_n = -d_n;
 
   net = new network;
   net->node_list   =new DL_Indexed_List<NNode*>();

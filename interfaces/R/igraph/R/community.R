@@ -45,18 +45,16 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
 
   update.rule <- igraph.match.arg(update.rule)
   update.rule <- switch(update.rule, "simple"=0, "random"=0, "config"=1)
+  implementation <- switch(igraph.match.arg(implementation),
+                                            "orig"=0, "neg"=1)
 
-  wrange <- range(weights)
-  wp <- max(wrange, 0)
-  wn <- min(wrange, 0)
-  
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   if (is.null(vertex)) {    
     .Call("R_igraph_spinglass_community", graph, weights,
           as.numeric(spins), as.logical(parupdate), as.numeric(start.temp),
           as.numeric(stop.temp), as.numeric(cool.fact),
           as.numeric(update.rule), as.numeric(gamma),
-          as.numeric(wp), as.numeric(wn),
+          as.numeric(implementation), as.numeric(lambda),
           PACKAGE="igraph")
   } else {
     .Call("R_igraph_spinglass_my_community", graph, weights,
