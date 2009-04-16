@@ -134,6 +134,8 @@ NULL:
 
 VECTORLIST:
 
+VECTORLIST_OR_0:
+
 ARPACKOPT:
     INCONV:
       INOUT: %I%.tmp <- igraph.arpack.default; %I%.tmp[ names(%I%) ] <- %I% ; %I% <- %I%.tmp

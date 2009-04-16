@@ -643,7 +643,9 @@ igraph_articulation_points:
         NAME-R: articulation.points
 
 igraph_biconnected_components:
-        PARAMS: GRAPH graph, OUT INTEGERPTR no, OUT VECTORLIST components, \
+        PARAMS: GRAPH graph, OUT INTEGERPTR no, OUT VECTORLIST_OR_0 tree_edges, \
+                OUT VECTORLIST_OR_0 component_edges, \
+                OUT VECTORLIST_OR_0 components, \
                 OUT VECTOR articulation_points
         NAME-R: biconnected.components
 

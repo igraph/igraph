@@ -965,7 +965,9 @@ int igraph_articulation_points(const igraph_t *graph,
 			       igraph_vector_t *res);
 int igraph_biconnected_components(const igraph_t *graph,
 				  igraph_integer_t *no,
-				  igraph_vector_ptr_t *list,
+				  igraph_vector_ptr_t *tree_edges,
+				  igraph_vector_ptr_t *component_edges,
+				  igraph_vector_ptr_t *components,
 				  igraph_vector_t *articulation_points);
 
 /* -------------------------------------------------- */
