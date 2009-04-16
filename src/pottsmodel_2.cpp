@@ -2006,17 +2006,17 @@ double PottsModelN::FindStartTemp(double gamma, double lambda, double ts)
 }
 
 long PottsModelN::WriteClusters(igraph_real_t *modularity,
-							   igraph_real_t *temperature,
-							   igraph_vector_t *community_size,
-							   igraph_vector_t *membership,
-							   igraph_matrix_t *adhesion,
-							   igraph_matrix_t *normalised_adhesion,
-							   igraph_real_t *polarization,
-							   double t,
-							   double d_p,
-							   double d_n,
-							   double gamma,
-							   double lambda)
+				igraph_real_t *temperature,
+				igraph_vector_t *community_size,
+				igraph_vector_t *membership,
+				igraph_matrix_t *adhesion,
+				igraph_matrix_t *normalised_adhesion,
+				igraph_real_t *polarization,
+				double t,
+				double d_p,
+				double d_n,
+				double gamma,
+				double lambda)
 {
 	#ifdef DEBUG
 	printf("Start writing clusters.\n");

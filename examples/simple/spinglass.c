@@ -51,7 +51,7 @@ int main() {
 			     IGRAPH_SPINCOMM_UPDATE_CONFIG,
 			     1.0, /* gamma */
 			     IGRAPH_SPINCOMM_IMP_ORIG,
-			     0, 0, 0, 0, 0, 0);
+			     0, 0, 0);
 
 /*   printf("Modularity:  %f\n", modularity); */
 /*   printf("Temperature: %f\n", temperature); */

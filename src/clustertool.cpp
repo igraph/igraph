@@ -87,9 +87,9 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
 					  igraph_real_t coolfact,
 					  igraph_spincomm_update_t update_rule,
 					  igraph_real_t gamma,
-					  igraph_matrix_t *adhesion,
-					  igraph_matrix_t *normalised_adhesion,
-					  igraph_real_t *polarization,
+/* 					  igraph_matrix_t *adhesion, */
+/* 					  igraph_matrix_t *normalised_adhesion, */
+/* 					  igraph_real_t *polarization, */
 					  igraph_real_t lambda,
 					  igraph_real_t d_p,
 					  igraph_real_t d_n);
@@ -154,9 +154,6 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
  *     in the algorithm. Bigger values make the missing links more
  *     important. (If my understanding is correct.)
  * \param implementation
- * \param adhesion
- * \param normalized_adhesion
- * \param polarization
  * \param lambda
  * \param d_p
  * \param d_n
@@ -183,9 +180,9 @@ int igraph_community_spinglass(const igraph_t *graph,
 			       igraph_real_t gamma,
 			       /* the rest is for the NegSpin implementation */
 			       igraph_spinglass_implementation_t implementation,
-			       igraph_matrix_t *adhesion,
-			       igraph_matrix_t *normalised_adhesion,
-			       igraph_real_t *polarization,
+/* 			       igraph_matrix_t *adhesion, */
+/* 			       igraph_matrix_t *normalised_adhesion, */
+/* 			       igraph_real_t *polarization, */
 			       igraph_real_t lambda,
 			       igraph_real_t d_p,
 			       igraph_real_t d_n) {
@@ -204,9 +201,9 @@ int igraph_community_spinglass(const igraph_t *graph,
 						 spins, parupdate, starttemp, 
 						 stoptemp, coolfact, 
 						 update_rule, gamma, 
-						 adhesion, normalised_adhesion,
-						 polarization, lambda,
-						 d_p, d_n);
+/* 						 adhesion, normalised_adhesion, */
+/* 						 polarization, */
+						 lambda, d_p, d_n);
     break;
   default:
     IGRAPH_ERROR("Unknown `implementation' in spinglass community finding",
@@ -516,9 +513,9 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
 					  igraph_real_t coolfact,
 					  igraph_spincomm_update_t update_rule,
 					  igraph_real_t gamma,
-					  igraph_matrix_t *adhesion,
-					  igraph_matrix_t *normalised_adhesion,
-					  igraph_real_t *polarization,
+/* 					  igraph_matrix_t *adhesion, */
+/* 					  igraph_matrix_t *normalised_adhesion, */
+/* 					  igraph_real_t *polarization, */
 					  igraph_real_t lambda,
 					  igraph_real_t d_p,
 					  igraph_real_t d_n) {
@@ -530,6 +527,7 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
   ClusterList<NNode*> *cl_cur;
   network *net;
   PottsModelN *pm;
+
   /* Check arguments */
 
   if (spins < 2 || spins > 500) {
@@ -606,7 +604,8 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
 		
 	} /* while loop */
 
-  pm->WriteClusters(modularity, temperature, csize, membership, adhesion, normalised_adhesion, polarization, kT, d_p, d_n, gamma, lambda);
+/*   pm->WriteClusters(modularity, temperature, csize, membership, adhesion, normalised_adhesion, polarization, kT, d_p, d_n, gamma, lambda); */
+  pm->WriteClusters(modularity, temperature, csize, membership, 0, 0, 0, kT, d_p, d_n, gamma, lambda);
 
   while (net->link_list->Size()) delete net->link_list->Pop();
   while (net->node_list->Size()) delete net->node_list->Pop();
