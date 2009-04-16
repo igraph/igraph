@@ -7011,7 +7011,7 @@ SEXP R_igraph_dfs(SEXP graph, SEXP proot, SEXP pneimode,
   
   SET_STRING_ELT(names, 2, mkChar("order"));
   SET_VECTOR_ELT(result, 2, R_igraph_0orvector_to_SEXP(p_order));
-  SET_STRING_ELT(names, 3, mkChar("order_out"));
+  SET_STRING_ELT(names, 3, mkChar("order.out"));
   SET_VECTOR_ELT(result, 3, R_igraph_0orvector_to_SEXP(p_order_out));
   SET_STRING_ELT(names, 4, mkChar("father"));
   SET_VECTOR_ELT(result, 4, R_igraph_0orvector_to_SEXP(p_father));
