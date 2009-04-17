@@ -1268,6 +1268,10 @@ int igraph_authority_score(const igraph_t *graph, igraph_vector_t *vector,
 			   const igraph_vector_t *weights,
 			   igraph_arpack_options_t *options);
 
+igraph_real_t igraph_centralization(const igraph_vector_t *scores,
+				    igraph_real_t theoretical_max,
+				    igraph_bool_t normalized);
+
 /* -------------------------------------------------- */
 /* Cocitation and other similarity measures           */
 /* -------------------------------------------------- */

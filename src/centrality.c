@@ -1927,4 +1927,34 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
   return 0;
 }
 
+/**
+ * \function igraph_centralization
+ * Calculate the centralization score from the node level scores
+ * 
+ * For a centrality score defined on the vertices of a graph, it is
+ * possible to define a graph level centralization index, by
+ * calculating the sum of the deviation 
+ */
+
+igraph_real_t igraph_centralization(const igraph_vector_t *scores,
+				    igraph_real_t theoretical_max,
+				    igraph_bool_t normalized) {
+  
+  long int no_of_nodes=igraph_vector_size(scores);
+  igraph_real_t maxscore=0.0;
+  igraph_real_t cent=0.0;
+  long int i;
+  
+  if (no_of_nodes != 0) {
+    maxscore <- igraph_vector_max(scores);
+    for (i=0; i<no_of_nodes; i++) {
+      cent += maxscore - VECTOR(*scores)[i];
+    }
+    if (normalized) { cent <- cent/theoretical_max; }
+  } else {
+    cent = IGRAPH_NAN;
+  }
+  
+  return cent;
+}
 
