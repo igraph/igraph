@@ -15,7 +15,13 @@
 Bipartite graphs have two kinds of vertices and edges are only allowed
 to connect opposite kinds. Think of the Hollywood movie graph with
 actors and movies. igraph 0.5.2 now contains some functions to deal
-with these kind of networks.
+with these kind of networks. See them in the R manual: 
+<a href="doc-0.5.2/R/graph.bipartite.html"><code>graph.bipartite()</code></a>,
+<a href="doc-0.5.2/R/graph.incidence.html"><code>graph.incidence()</code></a>,
+<a href="doc-0.5.2/R/get.incidence.html"><code>get.incidence()</code></a>,
+<a href="doc-0.5.2/R/bipartite.projection.html"><code>bipartite.projection()</code></a>,
+<a href="doc-0.5.2/R/is.bipartite.html"><code>is.bipartite()</code></a>;
+or in the <a href="doc-0.5.2/html/igraph-Bipartite.html">C reference manual.</a>
 </p>
 
 <h3><img src="images/icon_c.png"/>
@@ -27,7 +33,9 @@ with these kind of networks.
 This is a simple and intuitive community finding algorithm, published
 by Raghavan et al. in 2007 (see docs for full citation). It works by
 assigning labels to the vertices and then updating the labels based on
-majority voting among the neighbors.
+majority voting among the neighbors. See it in the 
+<a href="doc-0.5.2/R/label.propagation.community.html">R manual</a> or
+in the <a href="doc-0.5.2/html/ch17s07.html">C library reference.</a>
 </p>
 
 <h3><img src="images/icon_c.png"/>
@@ -38,7 +46,10 @@ majority voting among the neighbors.
 <p class="news">
 The DrL layout generator was extended to generate three dimensional
 layouts. Albeit slower than the regular 2D version, this is a nice
-addition for those who do visualization in 3D.
+addition for those who do visualization in 3D. See more in the 
+<a href="doc-0.5.2/R/layout.drl.html">R manual</a>
+or in the <a href="doc-0.5.2/html/ch14s01s04.html">C library reference
+manual.</a>
 </p>
 
 <h3><img src="images/icon_r.png"/>
@@ -47,7 +58,8 @@ addition for those who do visualization in 3D.
 <p class="news">
 A minimal, supported GUI is included now in the R package. It contains
 only a small fraction of igraph capabilities, but can be still useful,
-e.g. in teaching. You can start it by typing <code>tkigraph()</code>,
+e.g. in teaching. You can start it by typing 
+<a href="doc-0.5.2/R/tkigraph.html"><code>tkigraph()</code></a>,
 after loading the igraph package of course.
 </p>
 
@@ -59,7 +71,10 @@ after loading the igraph package of course.
 <p class="news">
 Johnson's algorithm is a good choice for finding all shortest paths in
 a network that has some negative edge weights, but no negative
-cycles.
+cycles. More in the 
+<a href="doc-0.5.2/R/shortest.paths.html">R docs</a>
+ and in the 
+<a href="doc-0.5.2/html/igraph_shortest_paths_johnson.html">C manual.</a>
 </p>
 
 <h3><img src="images/icon_c.png"/>
@@ -70,15 +85,21 @@ cycles.
 <p class="news">
 A new function was added to calculate the average degree of the
 neighbors of all or some vertices. It supports the edge weighted
-version of the measure as well.
+version of the measure as well. Details in the 
+<a href="doc-0.5.2/R/graph.knn.html">R manual</a> and in the 
+<a href="doc-0.5.2/html/igraph_avg_nearest_neighbor_degree.html">C reference.</a>
 </p>
 
 <h3><img src="images/icon_r.png"/>
   Curved edges in R plots</h3>
 
 <p class="news">
-Both <code>plot()</code> and <code>tkplot()</code> supports curved
-edges. See <code>?igraph.plotting</code> for more details.
+Both 
+<a href="doc-0.5.2/R/plot.graph.html"><code>plot()</code></a> and 
+<a href="doc-0.5.2/R/tkplot.html"><code>tkplot()</code></a> support curved
+edges. See 
+<a href="doc-0.5.2/R/plot.common.html"><code>?igraph.plotting</code></a> 
+for more details.
 </p>
 
 <h3><img src="images/icon_c.png"/>
