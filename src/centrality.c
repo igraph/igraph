@@ -1958,3 +1958,56 @@ igraph_real_t igraph_centralization(const igraph_vector_t *scores,
   return cent;
 }
 
+int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res, 
+				 const igraph_vs_t vids, 
+				 igraph_neimode_t mode, igraph_bool_t loops,
+				 igraph_real_t *centralization, 
+				 igraph_bool_t normalized) {
+  
+  igraph_integer_t no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t myscores;
+  igraph_vector_t *scores=res;
+  igraph_real_t theoretical_max;
+
+  if (!res) {
+    scores=&myscores;
+    IGRAPH_VECTOR_INIT_FINALLY(scores, 0);
+  }
+  
+  IGRAPH_CHECK(igraph_degree(graph, scores, vids, mode, loops));
+
+  if (igraph_is_directed(graph)) {
+    switch (mode) {
+    IGRAPH_IN:
+    IGRAPH_OUT:
+      if (!loops) {
+	theoretical_max = (no_of_nodes-1) * (no_of_nodes-1);
+      } else {
+	theoretical_max = (no_of_nodes-1) * no_of_nodes;
+      }
+      break;
+    IGRAPH_ALL:
+      if (!loops) {
+	theoretical_max = 2 * (no_of_nodes-1) * (no_of_nodes-2);
+      } else {
+	theoretical_max = 2 * (no_of_nodes-1) * (no_of_nodes-1);
+      }
+      break;
+    }
+  } else {
+    if (!loops) {
+      theoretical_max = (no_of_nodes-1) * (no_of_nodes-2);
+    } else {
+      theoretical_max = (no_of_nodes-1) * no_of_nodes;
+    }
+  }
+
+  *centralization = igraph_centralization(scores, theoretical_max, normalized);
+  
+  if (!res) {
+    igraph_vector_destroy(scores);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  return 0;
+}
