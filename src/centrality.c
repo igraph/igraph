@@ -1978,15 +1978,13 @@ igraph_real_t igraph_centralization(const igraph_vector_t *scores,
   long int i;
   
   if (no_of_nodes != 0) {
-    maxscore <- igraph_vector_max(scores);
-    for (i=0; i<no_of_nodes; i++) {
-      cent += maxscore - VECTOR(*scores)[i];
-    }
-    if (normalized) { cent <- cent/theoretical_max; }
+    maxscore = igraph_vector_max(scores);
+    cent = no_of_nodes * maxscore - igraph_vector_sum(scores);
+    if (normalized) { cent = cent/theoretical_max; }
   } else {
     cent = IGRAPH_NAN;
   }
-  
+
   return cent;
 }
 
@@ -2079,4 +2077,3 @@ int igraph_centralization_betweenness(const igraph_t *graph,
   
   return 0;
 }
-
