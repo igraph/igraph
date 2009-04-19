@@ -64,6 +64,9 @@ REAL:
   CTYPE: igraph_real_t
   INCONV:
     IN: %C%=REAL(%I%)[0];
+  OUTCONV:
+    OUT: PROTECT(%I%=NEW_NUMERIC(1)); \
+         REAL(%I%)[0]=%C%;
 
 REALPTR:
   CTYPE: igraph_real_t

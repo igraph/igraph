@@ -552,6 +552,19 @@ igraph_strength:
                 NEIMODE mode=ALL, BOOLEAN loops=True, EDGEWEIGHTS weights=NULL
         DEPS: vids ON graph, weights ON graph
 
+igraph_centralization:
+        PARAMS: VECTOR scores, REAL theoretical_max, BOOLEAN normalized=True
+        RETURN: REAL
+        NAME-R: centralize.scores
+
+igraph_centralization_degree:
+        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
+                NEIMODE mode=ALL, BOOLEAN loops=True, \
+                OUT REALPTR centralization, \
+                BOOLEAN normalized=True
+        DEPS: vids ON graph
+        NAME-R: centralization.degree
+
 #######################################
 # Visitors
 #######################################
