@@ -1933,7 +1933,39 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
  * 
  * For a centrality score defined on the vertices of a graph, it is
  * possible to define a graph level centralization index, by
- * calculating the sum of the deviation 
+ * calculating the sum of the deviation from the maximum centrality
+ * score. Consequently, the higher the centralization index of the
+ * graph, the more centralized the structure is.
+ * 
+ * </para><para>In order to make graphs of different sizes comparable,
+ * the centralization index is usually normalized to a number between
+ * zero and one, by dividing the (unnormalized) centralization score
+ * of the most centralized structure with the same number of vertices.
+ * 
+ * </para><para>For most centrality indices the most centralized
+ * structure is the star graph, a single center connected to all other
+ * nodes in the network. There are some variation depending on whether
+ * the graph is directed or not, whether loop edges are allowed, etc. 
+ * 
+ * </para><para>
+ * This function simply calculates the graph level index, if the node
+ * level scores and the theoretical maximum are given. It is called by
+ * all the measure-specific centralization functions.
+ * 
+ * \param scores A vector containing the node-level centrality
+ *     scores.
+ * \param theoretical_max The graph level centrality score of the most
+ *     centralized graph with the same number of vertices. Only used
+ *     if \c normalized set to true.
+ * \param normalized Boolean, whether to normalize the centralization
+ *     by dividing the supplied theoretical maximum.
+ * \return The graph level index.
+ * 
+ * \sa \ref igraph_centralization_degree(), \ref
+ * igraph_centralization_betweenness() for specific centralization
+ * functions.
+ * 
+ * Time complexity: O(n), the length of the score vector.
  */
 
 igraph_real_t igraph_centralization(const igraph_vector_t *scores,
