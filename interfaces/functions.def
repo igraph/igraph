@@ -572,6 +572,13 @@ igraph_centralization_betweenness:
         DEPS: vids ON graph
         NAME-R: centralization.betweenness
 
+igraph_centralization_closeness:
+        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
+                NEIMODE mode=OUT, OUT REALPTR centralization, \
+                BOOLEAN normalized=True
+        DEPS: vids ON graph
+        NAME-R: centralization.closeness
+
 #######################################
 # Visitors
 #######################################

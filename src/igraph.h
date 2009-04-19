@@ -1285,6 +1285,13 @@ int igraph_centralization_betweenness(const igraph_t *graph,
 				      igraph_real_t *centralization,
 				      igraph_bool_t normalized);
 
+int igraph_centralization_closeness(const igraph_t *graph, 
+				    igraph_vector_t *res, 
+				    const igraph_vs_t vids,
+				    igraph_neimode_t mode, 
+				    igraph_real_t *centralization,
+				    igraph_bool_t normalized);
+
 /* -------------------------------------------------- */
 /* Cocitation and other similarity measures           */
 /* -------------------------------------------------- */

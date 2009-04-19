@@ -2077,3 +2077,40 @@ int igraph_centralization_betweenness(const igraph_t *graph,
   
   return 0;
 }
+
+int igraph_centralization_closeness(const igraph_t *graph, 
+				    igraph_vector_t *res, 
+				    const igraph_vs_t vids,
+				    igraph_neimode_t mode, 
+				    igraph_real_t *centralization,
+				    igraph_bool_t normalized) {
+
+  igraph_integer_t no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t myscores;
+  igraph_vector_t *scores=res;
+  igraph_real_t theoretical_max;
+  
+  if (!res) {
+    scores=&myscores;
+    IGRAPH_VECTOR_INIT_FINALLY(scores, 0);
+  }
+  
+  IGRAPH_CHECK(igraph_closeness(graph, scores, vids, mode, 
+				/*weights=*/ 0));
+  
+  if (mode != IGRAPH_ALL && igraph_is_directed(graph)) {
+    theoretical_max = (no_of_nodes-1) * (1.0-1.0/no_of_nodes);
+  } else {
+    theoretical_max = (no_of_nodes-1) * (no_of_nodes-2) / (2.0*no_of_nodes-3);
+  }
+  
+  *centralization = igraph_centralization(scores, theoretical_max, normalized);
+  
+  if (!res) {
+    igraph_vector_destroy(scores);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  return 0;
+}
+
