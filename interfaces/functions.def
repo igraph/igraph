@@ -565,6 +565,13 @@ igraph_centralization_degree:
         DEPS: vids ON graph
         NAME-R: centralization.degree
 
+igraph_centralization_betweenness:
+        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
+                BOOLEAN directed=True, OUT REALPTR centralization, \
+                BOOLEAN normalized=True
+        DEPS: vids ON graph
+        NAME-R: centralization.betweenness
+
 #######################################
 # Visitors
 #######################################

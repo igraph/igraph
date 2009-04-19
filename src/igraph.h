@@ -1278,6 +1278,13 @@ int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res,
 				 igraph_real_t *centralization, 
 				 igraph_bool_t normalized);
 
+int igraph_centralization_betweenness(const igraph_t *graph, 
+				      igraph_vector_t *res,
+				      const igraph_vs_t vids,
+				      igraph_bool_t directed,
+				      igraph_real_t *centralization,
+				      igraph_bool_t normalized);
+
 /* -------------------------------------------------- */
 /* Cocitation and other similarity measures           */
 /* -------------------------------------------------- */
