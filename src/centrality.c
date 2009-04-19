@@ -2008,15 +2008,15 @@ int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res,
 
   if (igraph_is_directed(graph)) {
     switch (mode) {
-    IGRAPH_IN:
-    IGRAPH_OUT:
+    case IGRAPH_IN:
+    case IGRAPH_OUT:
       if (!loops) {
 	theoretical_max = (no_of_nodes-1) * (no_of_nodes-1);
       } else {
 	theoretical_max = (no_of_nodes-1) * no_of_nodes;
       }
       break;
-    IGRAPH_ALL:
+    case IGRAPH_ALL:
       if (!loops) {
 	theoretical_max = 2 * (no_of_nodes-1) * (no_of_nodes-2);
       } else {
