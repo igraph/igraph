@@ -2114,3 +2114,45 @@ int igraph_centralization_closeness(const igraph_t *graph,
   return 0;
 }
 
+int igraph_centralization_eigenvector_centrality(
+					 const igraph_t *graph,
+					 igraph_vector_t *vector,
+					 igraph_real_t *value,
+					 igraph_bool_t scale,
+					 igraph_arpack_options_t *options,
+					 igraph_real_t *centralization,
+					 igraph_bool_t normalized) {
+  
+  igraph_integer_t no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t myscores;
+  igraph_vector_t *scores=vector;
+  igraph_real_t realvalue, *myvalue=value;
+  igraph_real_t theoretical_max;
+  
+  if (!vector) {
+    scores=&myscores;
+    IGRAPH_VECTOR_INIT_FINALLY(scores, 0);
+  }
+  if (!value) {
+    myvalue=&realvalue;
+  }
+  
+  IGRAPH_CHECK(igraph_eigenvector_centrality(graph, scores, myvalue, scale,
+					     /*weights=*/ 0, options));
+  
+  if (igraph_is_directed(graph)) {
+    theoretical_max = no_of_nodes - 1;
+  } else {
+    theoretical_max = (no_of_nodes-2.0) / M_SQRT2;
+  }
+
+  *centralization = igraph_centralization(scores, theoretical_max, normalized);
+  
+  if (!vector) {
+    igraph_vector_destroy(scores);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  return 0;
+}
+  
