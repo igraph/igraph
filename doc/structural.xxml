@@ -63,6 +63,14 @@
 <!-- doxrox-include igraph_edge_betweenness_estimate -->
 </section>
 
+<section><title>Centralization</title>
+<!-- doxrox-include igraph_centralization -->
+<!-- doxrox-include igraph_centralization_degree -->
+<!-- doxrox-include igraph_centralization_betweenness -->
+<!-- doxrox-include igraph_centralization_closeness -->
+<!-- doxrox-include igraph_centralization_eigenvector_centrality -->
+</section>
+
 <section><title>Similarity Measures</title>
 <!-- doxrox-include igraph_bibcoupling -->
 <!-- doxrox-include igraph_cocitation -->

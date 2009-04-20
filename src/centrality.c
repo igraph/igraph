@@ -1962,8 +1962,10 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
  * \return The graph level index.
  * 
  * \sa \ref igraph_centralization_degree(), \ref
- * igraph_centralization_betweenness() for specific centralization
- * functions.
+ * igraph_centralization_betweenness(), \ref
+ * igraph_centralization_closeness(), and \ref
+ * igraph_centralization_eigenvector_centrality() for specific
+ * centralization functions.
  * 
  * Time complexity: O(n), the length of the score vector.
  */
@@ -1987,6 +1989,39 @@ igraph_real_t igraph_centralization(const igraph_vector_t *scores,
 
   return cent;
 }
+
+/**
+ * \function igraph_centralization_degree
+ * Calculate vertex degree and graph centralization
+ * 
+ * This function calculates the degree of the vertices by passing its
+ * arguments to \ref igraph_degree(); and it calculates the graph
+ * level centralization index based on the results by calling \ref
+ * igraph_centralization().
+ * \param graph The input graph.
+ * \param res A vector if you need the node-level degree scores, or a
+ *     null pointer otherwise.
+ * \param vids The vertices for which the degree is calculated and the
+ *     centralization is also performed based of these. Normally this
+ *     is \ref igraph_vss_all() to include each vertex exactly once.
+ * \param mode Constant the specifies the type of degree for directed
+ *     graphs. Possible values: \c IGRAPH_IN, \c IGRAPH_OUT and \c
+ *     IGRAPH_ALL. This argument is ignored for undirected graphs.
+ * \param loops Boolean, whether to consider loop edges when
+ *     calculating the degree (and the centralization).
+ * \param centralization Pointer to a real number, the centralization
+ *     score is placed here.
+ * \param normalized Boolean, whether to calculate a normalized
+ *     centralization score. See \ref igraph_centralization() for how
+ *     the normalization is done.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_centralization(), \ref igraph_degree().
+ * 
+ * Time complexity: the complexity of \ref igraph_degree() plus O(n),
+ * the number of vertices queried, for calculating the centralization
+ * score.
+ */
 
 int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res, 
 				 const igraph_vs_t vids, 
@@ -2042,6 +2077,36 @@ int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res,
   return 0;
 }
 
+/**
+ * \function igraph_centralization_betweenness
+ * Calculate vertex betweenness and graph centralization
+ * 
+ * This function calculates the betweenness centrality of the vertices
+ * by passing its arguments to \ref igraph_betweenness(); and it
+ * calculates the graph level centralization index based on the
+ * results by calling \ref igraph_centralization().
+ * \param graph The input graph.
+ * \param res A vector if you need the node-level betweenness scores, or a
+ *     null pointer otherwise.
+ * \param vids The vertices for which the betweenness is calculated and the
+ *     centralization is also performed based of these. Normally this
+ *     is \ref igraph_vss_all() to include each vertex exactly once.
+ * \param directed Boolean, whether to consider directed paths when
+ *     calculating betweenness.
+ * \param centralization Pointer to a real number, the centralization
+ *     score is placed here.
+ * \param normalized Boolean, whether to calculate a normalized
+ *     centralization score. See \ref igraph_centralization() for how
+ *     the normalization is done.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_centralization(), \ref igraph_betweenness().
+ * 
+ * Time complexity: the complexity of \ref igraph_betweenness() plus
+ * O(n), the number of vertices queried, for calculating the
+ * centralization score.
+ */
+
 int igraph_centralization_betweenness(const igraph_t *graph, 
 				      igraph_vector_t *res,
 				      const igraph_vs_t vids,
@@ -2078,6 +2143,38 @@ int igraph_centralization_betweenness(const igraph_t *graph,
   return 0;
 }
 
+/**
+ * \function igraph_centralization_closeness
+ * Calculate vertex closeness and graph centralization
+ * 
+ * This function calculates the closeness centrality of the vertices
+ * by passing its arguments to \ref igraph_closeness(); and it
+ * calculates the graph level centralization index based on the
+ * results by calling \ref igraph_centralization().
+ * \param graph The input graph.
+ * \param res A vector if you need the node-level closeness scores, or a
+ *     null pointer otherwise.
+ * \param vids The vertices for which the betweenness is calculated and the
+ *     centralization is also performed based of these. Normally this
+ *     is \ref igraph_vss_all() to include each vertex exactly once.
+ * \param mode Constant the specifies the type of closeness for directed
+ *     graphs. Possible values: \c IGRAPH_IN, \c IGRAPH_OUT and \c
+ *     IGRAPH_ALL. This argument is ignored for undirected graphs. See
+ *     \ref igraph_closeness() argument with the same name for more.
+ * \param centralization Pointer to a real number, the centralization
+ *     score is placed here.
+ * \param normalized Boolean, whether to calculate a normalized
+ *     centralization score. See \ref igraph_centralization() for how
+ *     the normalization is done.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_centralization(), \ref igraph_closeness().
+ * 
+ * Time complexity: the complexity of \ref igraph_closeness() plus
+ * O(n), the number of vertices queried, for calculating the
+ * centralization score.
+ */
+
 int igraph_centralization_closeness(const igraph_t *graph, 
 				    igraph_vector_t *res, 
 				    const igraph_vs_t vids,
@@ -2113,6 +2210,40 @@ int igraph_centralization_closeness(const igraph_t *graph,
   
   return 0;
 }
+
+/**
+ * \function igraph_centralization_eigenvector_centrality
+ * Calculate eigenvector centrality scores and graph centralization
+ * 
+ * This function calculates the eigenvector centrality of the vertices
+ * by passing its arguments to \ref igraph_eigenvector_centrality);
+ * and it calculates the graph level centralization index based on the
+ * results by calling \ref igraph_centralization().
+ * \param graph The input graph.
+ * \param vector A vector if you need the node-level eigenvector
+ *      centrality scores, or a null pointer otherwise.
+ * \param value If not a null pointer, then the leading eigenvalue is
+ *      stored here.
+ * \param scale If not zero then the result will be scaled, such that
+ *     the absolute value of the maximum centrality is one.
+ * \param options Options to ARPACK. See \ref igraph_arpack_options_t
+ *    for details. Note that the function overwrites the
+ *    <code>n</code> (number of vertices) parameter and 
+ *    it always starts the calculation from a non-random vector
+ *    calculated based on the degree of the vertices.
+ * \param centralization Pointer to a real number, the centralization
+ *     score is placed here.
+ * \param normalized Boolean, whether to calculate a normalized
+ *     centralization score. See \ref igraph_centralization() for how
+ *     the normalization is done.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_centralization(), \ref igraph_eigenvector_centrality().
+ * 
+ * Time complexity: the complexity of \ref
+ * igraph_eigenvector_centrality() plus O(|V|), the number of vertices
+ * for the calculating the centralization.
+ */
 
 int igraph_centralization_eigenvector_centrality(
 					 const igraph_t *graph,
