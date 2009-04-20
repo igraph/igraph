@@ -2270,11 +2270,15 @@ int igraph_centralization_eigenvector_centrality(
   
   IGRAPH_CHECK(igraph_eigenvector_centrality(graph, scores, myvalue, scale,
 					     /*weights=*/ 0, options));
-  
+
   if (igraph_is_directed(graph)) {
-    theoretical_max = no_of_nodes - 1;
+    theoretical_max = no_of_nodes - 1; 
   } else {
-    theoretical_max = (no_of_nodes-2.0) / M_SQRT2;
+    if (scale) { 
+      theoretical_max = no_of_nodes - 2;
+    } else {
+      theoretical_max = (no_of_nodes-2.0) / M_SQRT2;
+    }
   }
 
   *centralization = igraph_centralization(scores, theoretical_max, normalized);
