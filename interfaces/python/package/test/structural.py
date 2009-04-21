@@ -86,6 +86,11 @@ class DegreeTests(unittest.TestCase):
         self.failUnless(self.gdir.maxdegree(type=ALL) == 4)
         
     def testStrength(self):
+        # Turn off warnings about calling strength without weights
+        import warnings
+        warnings.filterwarnings("ignore", "No edge weights for strength calculation", \
+                RuntimeWarning)
+
         # No weights
         self.failUnless(self.gfull.strength() == [9] * 10)
         self.failUnless(self.gempty.strength() == [0] * 10)

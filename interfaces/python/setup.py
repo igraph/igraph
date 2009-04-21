@@ -6,27 +6,28 @@ except ImportError:
 from distutils.core import Extension
 from distutils.file_util import copy_file
 from distutils.util import get_platform
-from sys import version, exit
+from sys import version_info, exit
 import os.path
 import glob
-from os import popen3, mkdir
+from os import mkdir
 from shutil import copy2
+from subprocess import Popen, PIPE
 
 LIBIGRAPH_FALLBACK_INCLUDE_DIRS = ['/usr/include', '/usr/local/include']
 LIBIGRAPH_FALLBACK_LIBRARIES = ['igraph']
 LIBIGRAPH_FALLBACK_LIBRARY_DIRS = []
 
-if version < '2.3':
-    print "This module requires Python >= 2.3"
+if version_info < (2, 4):
+    print "This module requires Python >= 2.4"
     exit(0)
     
 def get_output(command):
     """Returns the output of a command returning a single line of output"""
-    to_child, from_child, err_child = popen3(command)
-    to_child.close()
-    err_child.close()
-    line=from_child.readline().strip()
-    exit_code=from_child.close()
+    p = Popen(command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    p.stdin.close()
+    p.stderr.close()
+    line=p.stdout.readline().strip()
+    exit_code=p.stdout.close()
     return line, exit_code
     
 def detect_igraph_include_dirs(default = LIBIGRAPH_FALLBACK_INCLUDE_DIRS):
@@ -87,7 +88,7 @@ From release 0.5, the C core of the igraph library is **not** included
 in the Python distribution - you must compile and install the C core
 separately. Windows installers already contain a compiled igraph DLL,
 so they should work out of the box. Linux users should refer to the
-`igraph homepage <http://cneurocvs.rmki.kfki.hu/igraph>`_ for
+`igraph homepage <http://igraph.sourceforge.net>`_ for
 compilation instructions (but check your distribution first, maybe
 there are pre-compiled packages available). OS X Leopard users may
 benefit from the meta-package available on the igraph homepage.
@@ -107,7 +108,7 @@ setup(name = 'python-igraph',
       license = 'GNU General Public License (GPL)',
 
       author = 'Tamas Nepusz',
-      author_email = 'ntamas@rmki.kfki.hu',
+      author_email = 'tamas@cs.rhul.ac.uk',
 
       ext_modules = [igraph_extension],
       package_dir = {'igraph': 'package'},

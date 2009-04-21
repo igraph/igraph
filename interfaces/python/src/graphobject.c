@@ -1434,6 +1434,49 @@ PyObject *igraphmodule_Graph_Barabasi(PyTypeObject * type,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Generates a bipartite graph
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_barabasi_game
+ */
+PyObject *igraphmodule_Graph_Bipartite(PyTypeObject * type,
+                                       PyObject * args, PyObject * kwds)
+{
+  igraphmodule_GraphObject *self;
+  igraph_t g;
+  igraph_vector_bool_t types;
+  igraph_vector_t edges;
+  PyObject *types_o, *edges_o, *directed = Py_False;
+
+  static char *kwlist[] = { "types", "edges", "directed", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "OO|O", kwlist,
+                                   &types_o, &edges_o, &directed))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vector_bool_t(types_o, &types))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vector_t(edges_o, &edges, 1, 1)) {
+    igraph_vector_bool_destroy(&types);
+    return NULL;
+  }
+
+  if (igraph_create_bipartite(&g, &types, &edges, PyObject_IsTrue(directed))) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&edges);
+    igraph_vector_bool_destroy(&types);
+    return NULL;
+  }
+
+  igraph_vector_destroy(&edges);
+  igraph_vector_bool_destroy(&types);
+  
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+
+  return (PyObject *) self;
+}
+
+/** \ingroup python_interface_graph
  * \brief Generates a De Bruijn graph
  * \sa igraph_kautz
  */
@@ -1737,13 +1780,12 @@ PyObject *igraphmodule_Graph_Full(PyTypeObject * type,
 {
   igraphmodule_GraphObject *self;
   long n;
-  PyObject *loops = NULL, *directed = NULL;
+  PyObject *loops = Py_False, *directed = Py_False;
 
   char *kwlist[] = { "n", "directed", "loops", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|O!O!", kwlist, &n,
-                                   &PyBool_Type, &directed,
-                                   &PyBool_Type, &loops))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|OO", kwlist, &n,
+                                   &directed, &loops))
     return NULL;
 
   if (n < 0) {
@@ -1765,6 +1807,54 @@ PyObject *igraphmodule_Graph_Full(PyTypeObject * type,
   }
 
   return (PyObject *) self;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Generates a full bipartite graph
+ * \sa igraph_full_bipartite
+ */
+PyObject *igraphmodule_Graph_Full_Bipartite(PyTypeObject * type,
+                                            PyObject * args, PyObject * kwds)
+{
+  igraphmodule_GraphObject *self;
+  igraph_t g;
+  igraph_vector_bool_t vertex_types;
+  igraph_neimode_t mode = IGRAPH_ALL;
+  long n1, n2;
+  PyObject *mode_o = Py_None, *directed = Py_False, *vertex_types_o = 0;
+
+  static char *kwlist[] = { "n1", "n2", "directed", "mode", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|OO", kwlist, &n1, &n2,
+                                   &directed, &mode_o))
+    return NULL;
+
+  if (n1 < 0 || n2 < 0) {
+    PyErr_SetString(PyExc_ValueError, "Number of vertices must be positive.");
+    return NULL;
+  }
+
+  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode))
+	  return NULL;
+
+  if (igraph_vector_bool_init(&vertex_types, n1+n2)) {
+    igraphmodule_handle_igraph_error();
+	return NULL;
+  }
+
+  if (igraph_full_bipartite(&g, &vertex_types, n1, n2,
+			  PyObject_IsTrue(directed), mode)) {
+	igraph_vector_bool_destroy(&vertex_types);
+    igraphmodule_handle_igraph_error();
+	return NULL;
+  }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+
+  vertex_types_o = igraphmodule_vector_bool_t_to_PyList(&vertex_types);
+  igraph_vector_bool_destroy(&vertex_types);
+  if (vertex_types_o == 0) return NULL;
+  return Py_BuildValue("NN", (PyObject *) self, vertex_types_o);
 }
 
 /** \ingroup python_interface_graph
@@ -1917,6 +2007,58 @@ PyObject *igraphmodule_Graph_Growing_Random(PyTypeObject * type,
   }
 
   return (PyObject *) self;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Generates a bipartite graph from an incidence matrix
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_incidence
+ */
+PyObject *igraphmodule_Graph_Incidence(PyTypeObject * type,
+                                       PyObject * args, PyObject * kwds) {
+  igraphmodule_GraphObject *self;
+  igraph_matrix_t matrix;
+  igraph_vector_bool_t vertex_types;
+  igraph_t g;
+  PyObject *matrix_o, *vertex_types_o;
+  PyObject *mode_o = Py_None, *directed = Py_False, *multiple = Py_False;
+  igraph_neimode_t mode = IGRAPH_OUT;
+
+  static char *kwlist[] = { "matrix", "directed", "mode", "multiple", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|OOO", kwlist, &PyList_Type, &matrix_o,
+			  &directed, &mode_o, &multiple))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
+
+  if (igraph_vector_bool_init(&vertex_types, 0)) {
+    igraphmodule_handle_igraph_error();
+	return NULL;
+  }
+
+  if (igraphmodule_PyList_to_matrix_t(matrix_o, &matrix)) {
+	igraph_vector_bool_destroy(&vertex_types);
+    PyErr_SetString(PyExc_TypeError,
+                    "Error while converting incidence matrix");
+    return NULL;
+  }
+
+  if (igraph_incidence(&g, &vertex_types, &matrix,
+			  PyObject_IsTrue(directed), mode, PyObject_IsTrue(multiple))) {
+	igraphmodule_handle_igraph_error();
+	igraph_matrix_destroy(&matrix);
+	igraph_vector_bool_destroy(&vertex_types);
+	return NULL;
+  }
+
+  igraph_matrix_destroy(&matrix);
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+
+  vertex_types_o = igraphmodule_vector_bool_t_to_PyList(&vertex_types);
+  igraph_vector_bool_destroy(&vertex_types);
+  if (vertex_types_o == 0) return NULL;
+  return Py_BuildValue("NN", (PyObject *) self, vertex_types_o);
 }
 
 /** \ingroup python_interface_graph
@@ -2856,6 +2998,72 @@ PyObject *igraphmodule_Graph_biconnected_components(igraphmodule_GraphObject *se
   }
   
   return result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Returns the one-mode projections of a bipartite graph
+ * \return the two projections as new igraph objects
+ * \sa igraph_bipartite_projection
+ */
+PyObject *igraphmodule_Graph_bipartite_projection(igraphmodule_GraphObject * self,
+		PyObject* args, PyObject* kwds) {
+  PyObject *types_o = Py_None;
+  igraphmodule_GraphObject *result1, *result2;
+  igraph_vector_bool_t* types = 0;
+  igraph_t g1, g2;
+  long probe1 = -1;
+
+  static char* kwlist[] = {"types", "probe1", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|l", kwlist, &types_o, &probe1))
+    return NULL;
+
+  if (igraphmodule_attrib_to_vector_bool_t(types_o, self, &types, ATTRIBUTE_TYPE_VERTEX))
+	return NULL;
+
+  if (igraph_bipartite_projection(&self->g, types, &g1, &g2, probe1)) {
+    if (types) { igraph_vector_bool_destroy(types); free(types); }
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (types) { igraph_vector_bool_destroy(types); free(types); }
+
+  CREATE_GRAPH(result1, g1);
+  CREATE_GRAPH(result2, g2);
+
+  return Py_BuildValue("NN", result1, result2);
+}
+
+/** \ingroup python_interface_graph
+ * \brief Returns the sizes of the two one-mode projections of a bipartite graph
+ * \return the two one-mode projections as new igraph objects
+ * \sa igraph_bipartite_projection_size
+ */
+PyObject *igraphmodule_Graph_bipartite_projection_size(igraphmodule_GraphObject * self,
+		PyObject* args, PyObject* kwds) {
+  PyObject *types_o = Py_None;
+  igraph_vector_bool_t* types = 0;
+  igraph_integer_t vcount1, vcount2, ecount1, ecount2;
+
+  static char* kwlist[] = {"types", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &types_o))
+    return NULL;
+
+  if (igraphmodule_attrib_to_vector_bool_t(types_o, self, &types, ATTRIBUTE_TYPE_VERTEX))
+	return NULL;
+
+  if (igraph_bipartite_projection_size(&self->g, types,
+			  &vcount1, &ecount1, &vcount2, &ecount2)) {
+    if (types) { igraph_vector_bool_destroy(types); free(types); }
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (types) { igraph_vector_bool_destroy(types); free(types); }
+
+  return Py_BuildValue("llll", (long)vcount1, (long)ecount1, (long)vcount2, (long)ecount2);
 }
 
 /** \ingroup python_interface_graph
@@ -5247,6 +5455,67 @@ PyObject *igraphmodule_Graph_get_adjacency(igraphmodule_GraphObject * self,
   result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_INT);
   igraph_matrix_destroy(&m);
   return result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Returns the incidence matrix of a bipartite graph.
+ * \return the incidence matrix as a Python list of lists
+ * \sa igraph_get_incidence
+ */
+PyObject *igraphmodule_Graph_get_incidence(igraphmodule_GraphObject * self,
+                                           PyObject * args, PyObject * kwds)
+{
+  static char *kwlist[] = { "types", NULL };
+  igraph_matrix_t matrix;
+  igraph_vector_t row_ids, col_ids;
+  igraph_vector_bool_t *types;
+  PyObject *matrix_o, *row_ids_o, *col_ids_o, *types_o;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &types_o))
+    return NULL;
+
+  if (igraph_vector_init(&row_ids, 0))
+	return NULL;
+
+  if (igraph_vector_init(&col_ids, 0)) {
+    igraph_vector_destroy(&row_ids);
+	return NULL;
+  }
+
+  if (igraphmodule_attrib_to_vector_bool_t(types_o, self, &types, ATTRIBUTE_TYPE_VERTEX)) {
+    igraph_vector_destroy(&row_ids);
+    igraph_vector_destroy(&col_ids);
+	return NULL;
+  }
+
+  if (igraph_matrix_init(&matrix, 1, 1)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&row_ids);
+    igraph_vector_destroy(&col_ids);
+    if (types) { igraph_vector_bool_destroy(types); free(types); }
+    return NULL;
+  }
+
+  if (igraph_get_incidence(&self->g, types, &matrix, &row_ids, &col_ids)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&row_ids);
+    igraph_vector_destroy(&col_ids);
+    if (types) { igraph_vector_bool_destroy(types); free(types); }
+    igraph_matrix_destroy(&matrix);
+    return NULL;
+  }
+  
+  if (types) { igraph_vector_bool_destroy(types); free(types); }
+
+  matrix_o = igraphmodule_matrix_t_to_PyList(&matrix, IGRAPHMODULE_TYPE_INT);
+  igraph_matrix_destroy(&matrix);
+
+  row_ids_o = igraphmodule_vector_t_to_PyList(&row_ids, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&row_ids);
+  col_ids_o = igraphmodule_vector_t_to_PyList(&col_ids, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&col_ids);
+
+  return Py_BuildValue("NNN", matrix_o, row_ids_o, col_ids_o);
 }
 
 /** \ingroup python_interface_graph
@@ -8422,6 +8691,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@ref: Barabasi, A-L and Albert, R. 1999. Emergence of scaling\n"
    "  in random networks. Science, 286 509-512."},
 
+  /* interface to igraph_create_bipartite */
+  {"_Bipartite", (PyCFunction) igraphmodule_Graph_Bipartite,
+   METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+   "_Bipartite(types, edges, directed=False)\n\n"
+   "Internal function, undocumented.\n\n"
+   "@see: Graph.Bipartite()\n\n"},
+
   /* interface to igraph_de_bruijn */
   {"De_Bruijn", (PyCFunction) igraphmodule_Graph_De_Bruijn,
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
@@ -8519,6 +8795,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param directed: whether to generate a directed graph.\n"
    "@param loops: whether self-loops are allowed.\n"},
 
+  /* interface to igraph_full_bipartite */
+  {"_Full_Bipartite", (PyCFunction) igraphmodule_Graph_Full_Bipartite,
+   METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+   "_Full_Bipartite(n1, n2, directed=False, loops=False)\n\n"
+   "Internal function, undocumented.\n\n"
+   "@see: Graph.Full_Bipartite()\n\n"},
+
   /* interface to igraph_grg_game */
   {"GRG", (PyCFunction) igraphmodule_Graph_GRG,
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
@@ -8544,6 +8827,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param directed: whether the graph should be directed.\n"
    "@param citation: whether the new edges should originate from the most\n"
    "   recently added vertex.\n"},
+
+  /* interface to igraph_incidence */
+  {"_Incidence", (PyCFunction) igraphmodule_Graph_Incidence,
+   METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+   "_Incidence(matrix, directed=False, mode=ALL, multiple=False)\n\n"
+   "Internal function, undocumented.\n\n"
+   "@see: Graph.Incidence()\n\n"},
 
   /* interface to igraph_kautz */
   {"Kautz", (PyCFunction) igraphmodule_Graph_Kautz,
@@ -8816,6 +9106,20 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  of the biconnected components (one spanning tree for each component)\n"
    "  and optionally the list of articulation points"
   },
+
+  /* interface to igraph_bipartite_projection */
+  {"bipartite_projection", (PyCFunction) igraphmodule_Graph_bipartite_projection,
+   METH_VARARGS | METH_KEYWORDS,
+   "bipartite_projection(types, probe1=-1)\n\n"
+   "Internal function, undocumented.\n\n"
+   "@see: Graph.bipartite_projection()\n"},
+
+  /* interface to igraph_bipartite_projection_size */
+  {"bipartite_projection_size", (PyCFunction) igraphmodule_Graph_bipartite_projection_size,
+   METH_VARARGS | METH_KEYWORDS,
+   "bipartite_projection_size(types)\n\n"
+   "Internal function, undocumented.\n\n"
+   "@see: Graph.bipartite_projection_size()\n"},
 
   /* interface to igraph_closeness */
   {"closeness", (PyCFunction) igraphmodule_Graph_closeness,
@@ -9358,7 +9662,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Unfolds the graph using a BFS to a tree by duplicating vertices as necessary.\n\n"
    "@param sources: the source vertices to start the unfolding from. It should be a\n"
    "  list of vertex indices, preferably one vertex from each connected component.\n"
-   "  You can use L{Graph.topological_sort} to determine a suitable set. A single\n"
+   "  You can use L{Graph.topological_sorting()} to determine a suitable set. A single\n"
    "  vertex index is also accepted.\n"
    "@param mode: which edges to follow during the BFS. C{OUT} follows outgoing edges,\n"
    "  C{IN} follows incoming edges, C{ALL} follows both. Ignored for undirected\n"
@@ -9921,6 +10225,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"get_edgelist", (PyCFunction) igraphmodule_Graph_get_edgelist,
    METH_NOARGS,
    "get_edgelist()\n\n" "Returns the edge list of a graph."},
+
+  /* interface to igraph_get_incidence */
+  {"get_incidence", (PyCFunction) igraphmodule_Graph_get_incidence,
+   METH_VARARGS | METH_KEYWORDS,
+   "get_incidence(types)\n\n"
+   "Internal function, undocumented.\n\n"
+   "@see: Graph.get_incidence()\n\n"},
 
   // interface to igraph_to_directed
   {"to_directed", (PyCFunction) igraphmodule_Graph_to_directed,

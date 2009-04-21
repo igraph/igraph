@@ -1082,6 +1082,110 @@ int igraphmodule_attrib_to_vector_long_t(PyObject *o, igraphmodule_GraphObject *
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts an attribute name or a sequence to a vector_bool_t
+ *
+ * This function is useful for the interface of igraph C calls accepting
+ * bipartite type vectors. The function checks the given Python object. If
+ * it is None, returns a null pointer instead of an \c igraph_vector_bool_t.
+ * If it is a sequence, it converts the sequence to a newly allocated
+ * \c igraph_vector_bool_t and return a pointer to it. Otherwise it interprets the
+ * object as an attribute name and returns the attribute values corresponding
+ * to the name as an \c igraph_vector_bool_t, or returns a null pointer if the attribute
+ * does not exist.
+ *
+ * Anything that evaluates to true using PyObject_IsTrue will be converted to
+ * true in the resulting vector. Only numeric attributes are supported.
+ * 
+ * Note that if the function returned a pointer to an \c igraph_vector_bool_t,
+ * it is the caller's responsibility to destroy the object and free its
+ * pointer after having finished using it.
+ *
+ * \param o the Python object being converted.
+ * \param self a Python Graph object being used when attributes are queried
+ * \param vptr the pointer to the allocated vector is returned here.
+ * \param attr_type the type of the attribute being handled
+ * \return 0 if everything was OK, nonzero otherwise.
+ */
+int igraphmodule_attrib_to_vector_bool_t(PyObject *o, igraphmodule_GraphObject *self,
+    igraph_vector_bool_t **vptr, int attr_type) {
+  igraph_vector_bool_t *result;
+
+  *vptr = 0;
+  if (attr_type != ATTRIBUTE_TYPE_EDGE && attr_type != ATTRIBUTE_TYPE_VERTEX)
+    return 1;
+  if (o == Py_None) return 0;
+  if (PyString_Check(o)) {
+    /* Check whether the attribute exists and is numeric */
+    igraph_attribute_type_t at;
+    igraph_attribute_elemtype_t et;
+    igraph_vector_t tmpvec;
+	long i, n;
+    char *name = PyString_AsString(o);
+    et = (attr_type == ATTRIBUTE_TYPE_VERTEX) ?
+      IGRAPH_ATTRIBUTE_VERTEX : IGRAPH_ATTRIBUTE_EDGE;
+    if (igraphmodule_i_attribute_get_type(&self->g, &at, et, name)) {
+      /* exception was set by igraphmodule_i_attribute_get_type */
+      return 1;
+    }
+    if (at != IGRAPH_ATTRIBUTE_NUMERIC) {
+      PyErr_SetString(PyExc_ValueError, "attribute values must be numeric");
+      return 1;
+    }
+    /* Now that the attribute type has been checked, allocate the target
+     * vector */
+    result = (igraph_vector_bool_t*)calloc(1, sizeof(igraph_vector_bool_t));
+    if (result==0) {
+      PyErr_NoMemory();
+      return 1;
+    }
+    igraph_vector_init(&tmpvec, 1);
+    if (attr_type == ATTRIBUTE_TYPE_VERTEX) {
+      if (igraphmodule_i_get_numeric_vertex_attr(&self->g, name,
+          igraph_vss_all(), &tmpvec)) {
+        /* exception has already been set, so return */
+        free(result);
+        return 1;
+      }
+    } else {
+      if (igraphmodule_i_get_numeric_edge_attr(&self->g, name,
+          igraph_ess_all(IGRAPH_EDGEORDER_ID), &tmpvec)) {
+        /* exception has already been set, so return */
+        free(result);
+        return 1;
+      }
+    }
+    /* Now tmpvec contains the original numeric attributes and we must convert
+     * everything to boolean */
+    n = igraph_vector_size(&tmpvec);
+    if (igraph_vector_bool_init(result, n)) {
+      PyErr_NoMemory();
+      igraph_vector_destroy(&tmpvec);
+      free(result);
+    }
+	for (i=0; i<n; i++) VECTOR(*result)[i] = (VECTOR(tmpvec)[i] != 0);
+    *vptr = result;
+    igraph_vector_destroy(&tmpvec);
+  } else if (PySequence_Check(o)) {
+    result = (igraph_vector_bool_t*)calloc(1, sizeof(igraph_vector_bool_t));
+    if (result==0) {
+      PyErr_NoMemory();
+      return 1;
+    }
+    if (igraphmodule_PyObject_to_vector_bool_t(o, result)) {
+      free(result);
+      return 1;
+    }
+    *vptr = result;
+  } else {
+    PyErr_SetString(PyExc_TypeError, "unhandled type");
+    return 1;
+  }
+
+  return 0;
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts two igraph \c igraph_vector_t vectors to a Python list of integer pairs
  * 
  * \param v1 the \c igraph_vector_t containing the 1st vector to be converted
