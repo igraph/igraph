@@ -8262,7 +8262,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
    "_Bipartite(types, edges, directed=False)\n\n"
    "Internal function, undocumented.\n\n"
-   "@see Graph.Bipartite\n\n"},
+   "@see: Graph.Bipartite()\n\n"},
 
   /* interface to igraph_de_bruijn */
   {"De_Bruijn", (PyCFunction) igraphmodule_Graph_De_Bruijn,
@@ -8366,7 +8366,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
    "_Full_Bipartite(n1, n2, directed=False, loops=False)\n\n"
    "Internal function, undocumented.\n\n"
-   "@see Graph.Full_Bipartite\n\n"},
+   "@see: Graph.Full_Bipartite()\n\n"},
 
   /* interface to igraph_grg_game */
   {"GRG", (PyCFunction) igraphmodule_Graph_GRG,
@@ -8399,7 +8399,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
    "_Incidence(matrix, directed=False, mode=ALL, multiple=False)\n\n"
    "Internal function, undocumented.\n\n"
-   "@see Graph.Incidence\n\n"},
+   "@see: Graph.Incidence()\n\n"},
 
   /* interface to igraph_kautz */
   {"Kautz", (PyCFunction) igraphmodule_Graph_Kautz,
@@ -8674,14 +8674,14 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    METH_VARARGS | METH_KEYWORDS,
    "bipartite_projection(types, probe1=-1)\n\n"
    "Internal function, undocumented.\n\n"
-   "@see: Graph.bipartite_projection\n"},
+   "@see: Graph.bipartite_projection()\n"},
 
   /* interface to igraph_bipartite_projection_size */
   {"bipartite_projection_size", (PyCFunction) igraphmodule_Graph_bipartite_projection_size,
    METH_VARARGS | METH_KEYWORDS,
    "bipartite_projection_size(types)\n\n"
    "Internal function, undocumented.\n\n"
-   "@see: Graph.bipartite_projection_size\n"},
+   "@see: Graph.bipartite_projection_size()\n"},
 
   /* interface to igraph_closeness */
   {"closeness", (PyCFunction) igraphmodule_Graph_closeness,
@@ -9203,7 +9203,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Unfolds the graph using a BFS to a tree by duplicating vertices as necessary.\n\n"
    "@param sources: the source vertices to start the unfolding from. It should be a\n"
    "  list of vertex indices, preferably one vertex from each connected component.\n"
-   "  You can use L{Graph.topological_sort} to determine a suitable set. A single\n"
+   "  You can use L{Graph.topological_sorting()} to determine a suitable set. A single\n"
    "  vertex index is also accepted.\n"
    "@param mode: which edges to follow during the BFS. C{OUT} follows outgoing edges,\n"
    "  C{IN} follows incoming edges, C{ALL} follows both. Ignored for undirected\n"
@@ -9752,7 +9752,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    METH_VARARGS | METH_KEYWORDS,
    "get_incidence(types)\n\n"
    "Internal function, undocumented.\n\n"
-   "@see Graph.get_indicence\n\n"},
+   "@see: Graph.get_incidence()\n\n"},
 
   // interface to igraph_to_directed
   {"to_directed", (PyCFunction) igraphmodule_Graph_to_directed,
