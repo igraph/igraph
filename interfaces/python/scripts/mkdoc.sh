@@ -21,7 +21,11 @@ echo "Removing existing documentation..."
 rm -rf html
 
 echo "Generating HTML documentation..."
-epydoc --html -o html -v --name="IGraph library" --url="http://cneurocvs.rmki.kfki.hu/igraph" $PACKAGES
+epydoc --html -o html -v \
+       --name="IGraph library" \
+	   --url="http://igraph.sourceforge.net" \
+	   --no-private \
+	   $PACKAGES
 
 PDF=0
 which latex >/dev/null && PDF=1
