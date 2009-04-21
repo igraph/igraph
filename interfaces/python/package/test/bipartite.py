@@ -2,6 +2,57 @@ import unittest
 from igraph import *
 
 class BipartiteTests(unittest.TestCase):
+    def testCreateBipartite(self):
+        g = Graph.Bipartite([0, 1]*5, [(0,1),(2,3),(4,5),(6,7),(8,9)])
+        self.failUnless(g.vcount() == 10 and g.ecount() == 5 and g.is_directed() == False)
+        self.failUnless(g.is_bipartite())
+        self.failUnless(g.vs["type"] == [False, True]*5)
+
+    def testFullBipartite(self):
+        g = Graph.Full_Bipartite(10, 5)
+        self.failUnless(g.vcount() == 15 and g.ecount() == 50 and g.is_directed() == False)
+        expected = sorted([(i, j) for i in xrange(10) for j in xrange(10, 15)])
+        self.failUnless(sorted(g.get_edgelist()) == expected)
+        self.failUnless(g.vs["type"] == [False]*10 + [True]*5)
+
+        g = Graph.Full_Bipartite(10, 5, directed=True, mode=OUT)
+        self.failUnless(g.vcount() == 15 and g.ecount() == 50 and g.is_directed() == True)
+        self.failUnless(sorted(g.get_edgelist()) == expected)
+        self.failUnless(g.vs["type"] == [False]*10 + [True]*5)
+
+        g = Graph.Full_Bipartite(10, 5, directed=True, mode=IN)
+        self.failUnless(g.vcount() == 15 and g.ecount() == 50 and g.is_directed() == True)
+        self.failUnless(sorted(g.get_edgelist()) == sorted([(i,j) for j, i in expected]))
+        self.failUnless(g.vs["type"] == [False]*10 + [True]*5)
+
+        g = Graph.Full_Bipartite(10, 5, directed=True)
+        self.failUnless(g.vcount() == 15 and g.ecount() == 100 and g.is_directed() == True)
+        expected.extend([(j, i) for i, j in expected])
+        expected.sort()
+        self.failUnless(sorted(g.get_edgelist()) == expected)
+        self.failUnless(g.vs["type"] == [False]*10 + [True]*5)
+
+    def testIncidence(self):
+        g = Graph.Incidence([[0, 1, 1], [1, 2, 0]])
+        self.failUnless(g.vcount() == 5 and g.ecount() == 4 and g.is_directed() == False)
+        self.failUnless(g.vs["type"] == [False]*2 + [True]*3)
+        self.failUnless(sorted(g.get_edgelist()) == [(0,3),(0,4),(1,2),(1,3)])
+
+        g = Graph.Incidence([[0, 1, 1], [1, 2, 0]], multiple=True)
+        self.failUnless(g.vcount() == 5 and g.ecount() == 5 and g.is_directed() == False)
+        self.failUnless(g.vs["type"] == [False]*2 + [True]*3)
+        self.failUnless(sorted(g.get_edgelist()) == [(0,3),(0,4),(1,2),(1,3),(1,3)])
+
+        g = Graph.Incidence([[0, 1, 1], [1, 2, 0]], directed=True)
+        self.failUnless(g.vcount() == 5 and g.ecount() == 4 and g.is_directed() == True)
+        self.failUnless(g.vs["type"] == [False]*2 + [True]*3)
+        self.failUnless(sorted(g.get_edgelist()) == [(0,3),(0,4),(1,2),(1,3)])
+
+        g = Graph.Incidence([[0, 1, 1], [1, 2, 0]], directed=True, mode="in")
+        self.failUnless(g.vcount() == 5 and g.ecount() == 4 and g.is_directed() == True)
+        self.failUnless(g.vs["type"] == [False]*2 + [True]*3)
+        self.failUnless(sorted(g.get_edgelist()) == [(2,1),(3,0),(3,1),(4,0)])
+
     def testIsBipartite(self):
         g = Graph.Star(10)
         self.failUnless(g.is_bipartite() == True)

@@ -1296,6 +1296,100 @@ class Graph(core.GraphBase):
     vs=property(_get_vs, doc="The vertex sequence of the graph")
     es=property(_get_es, doc="The edge sequence of the graph")
 
+    #############################################
+    # Friendlier interface for bipartite methods
+    @classmethod
+    def Bipartite(klass, types, *args, **kwds):
+        """Bipartite(types, edges, directed=False)
+
+        Creates a bipartite graph with the given vertex types and edges.
+        This is similar to the default constructor of the graph, the
+        only difference is that it checks whether all the edges go
+        between the two vertex classes and it assigns the type vector
+        to a C{type} attribute afterwards.
+
+        Examples:
+
+        >>> g = Graph.Bipartite([0, 1, 0, 1], [(0, 1), (2, 3), (0, 3)])
+        >>> g.is_bipartite()
+        True
+        >>> g.vs["type"]
+        [False, True, False, True]
+
+        @param types: the vertex types as a boolean list. Anything that
+          evaluates to C{False} will denote a vertex of the first kind,
+          anything that evaluates to C{True} will denote a vertex of the
+          second kind.
+        @param edges: the edges as a list of tuples.
+        @param directed: whether to create a directed graph. Bipartite
+          networks are usually undirected, so the default is C{False}
+
+        @return: the graph with a binary vertex attribute named C{"type"} that
+          stores the vertex classes.
+        """
+        result = klass._Bipartite(types, *args, **kwds)
+        result.vs["type"] = [bool(x) for x in types]
+        return result
+
+    @classmethod
+    def Full_Bipartite(klass, *args, **kwds):
+        """Full_Bipartite(n1, n2, directed=False, mode=ALL)
+
+        Generates a full bipartite graph (directed or undirected, with or
+        without loops).
+
+        >>> g = Graph.Full_Bipartite(2, 3)
+        >>> g.is_bipartite()
+        True
+        >>> g.vs["type"]
+        [False, False, True, True, True]
+
+        @param n1: the number of vertices of the first kind.
+        @param n2: the number of vertices of the second kind.
+        @param directed: whether tp generate a directed graph.
+        @param mode: if C{OUT}, then all vertices of the first kind are
+          connected to the others; C{IN} specifies the opposite direction,
+          C{ALL} creates mutual edges. Ignored for undirected graphs.
+
+        @return: the graph with a binary vertex attribute named C{"type"} that
+          stores the vertex classes.
+        """
+        result, types = klass._Full_Bipartite(*args, **kwds)
+        result.vs["type"] = types
+        return result
+
+    @classmethod
+    def Incidence(klass, *args, **kwds):
+        """Incidence(matrix, directed=False, mode=ALL, multiple=False)
+
+        Creates a bipartite graph from an incidence matrix.
+
+        Example:
+
+        >>> g = Graph.Incidence([[0, 1, 1], [1, 1, 0]])
+
+        @param matrix: the incidence matrix.
+        @param directed: whether to create a directed graph.
+        @param mode: defines the direction of edges in the graph. If
+          C{OUT}, then edges go from vertices of the first kind
+          (corresponding to rows of the matrix) to vertices of the
+          second kind (the columns of the matrix). If C{IN}, the
+          opposite direction is used. C{ALL} creates mutual edges.
+          Ignored for undirected graphs.
+        @param multiple: defines what to do with non-zero entries in the
+          matrix. If C{False}, non-zero entries will create an edge no matter
+          what the value is. If C{True}, non-zero entries are rounded up to
+          the nearest integer and this will be the number of multiple edges
+          created.
+
+        @return: the graph with a binary vertex attribute named C{"type"} that
+          stores the vertex classes.
+        """
+        result, types = klass._Incidence(*args, **kwds)
+        result.vs["type"] = types
+        return result
+
+
     ###################
     # Custom operators
 
