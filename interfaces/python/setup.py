@@ -9,8 +9,9 @@ from distutils.util import get_platform
 from sys import version, exit
 import os.path
 import glob
-from os import popen3, mkdir
+from os import mkdir
 from shutil import copy2
+from subprocess import Popen, PIPE
 
 LIBIGRAPH_FALLBACK_INCLUDE_DIRS = ['/usr/include', '/usr/local/include']
 LIBIGRAPH_FALLBACK_LIBRARIES = ['igraph']
@@ -22,11 +23,11 @@ if version < '2.3':
     
 def get_output(command):
     """Returns the output of a command returning a single line of output"""
-    to_child, from_child, err_child = popen3(command)
-    to_child.close()
-    err_child.close()
-    line=from_child.readline().strip()
-    exit_code=from_child.close()
+    p = Popen(command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    p.stdin.close()
+    p.stderr.close()
+    line=p.stdout.readline().strip()
+    exit_code=p.stdout.close()
     return line, exit_code
     
 def detect_igraph_include_dirs(default = LIBIGRAPH_FALLBACK_INCLUDE_DIRS):
