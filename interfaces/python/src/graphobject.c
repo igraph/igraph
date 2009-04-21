@@ -2984,6 +2984,72 @@ PyObject *igraphmodule_Graph_biconnected_components(igraphmodule_GraphObject *se
 }
 
 /** \ingroup python_interface_graph
+ * \brief Returns the one-mode projections of a bipartite graph
+ * \return the two projections as new igraph objects
+ * \sa igraph_bipartite_projection
+ */
+PyObject *igraphmodule_Graph_bipartite_projection(igraphmodule_GraphObject * self,
+		PyObject* args, PyObject* kwds) {
+  PyObject *types_o = Py_None;
+  igraphmodule_GraphObject *result1, *result2;
+  igraph_vector_bool_t* types = 0;
+  igraph_t g1, g2;
+  long probe1 = -1;
+
+  static char* kwlist[] = {"types", "probe1", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|l", kwlist, &types_o, &probe1))
+    return NULL;
+
+  if (igraphmodule_attrib_to_vector_bool_t(types_o, self, &types, ATTRIBUTE_TYPE_VERTEX))
+	return NULL;
+
+  if (igraph_bipartite_projection(&self->g, types, &g1, &g2, probe1)) {
+    if (types) { igraph_vector_bool_destroy(types); free(types); }
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (types) { igraph_vector_bool_destroy(types); free(types); }
+
+  CREATE_GRAPH(result1, g1);
+  CREATE_GRAPH(result2, g2);
+
+  return Py_BuildValue("NN", result1, result2);
+}
+
+/** \ingroup python_interface_graph
+ * \brief Returns the sizes of the two one-mode projections of a bipartite graph
+ * \return the two one-mode projections as new igraph objects
+ * \sa igraph_bipartite_projection_size
+ */
+PyObject *igraphmodule_Graph_bipartite_projection_size(igraphmodule_GraphObject * self,
+		PyObject* args, PyObject* kwds) {
+  PyObject *types_o = Py_None;
+  igraph_vector_bool_t* types = 0;
+  igraph_integer_t vcount1, vcount2, ecount1, ecount2;
+
+  static char* kwlist[] = {"types", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &types_o))
+    return NULL;
+
+  if (igraphmodule_attrib_to_vector_bool_t(types_o, self, &types, ATTRIBUTE_TYPE_VERTEX))
+	return NULL;
+
+  if (igraph_bipartite_projection_size(&self->g, types,
+			  &vcount1, &ecount1, &vcount2, &ecount2)) {
+    if (types) { igraph_vector_bool_destroy(types); free(types); }
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (types) { igraph_vector_bool_destroy(types); free(types); }
+
+  return Py_BuildValue("llll", (long)vcount1, (long)ecount1, (long)vcount2, (long)ecount2);
+}
+
+/** \ingroup python_interface_graph
  * \brief Calculates the closeness centrality of some nodes in a graph.
  * \return the closeness centralities as a list (or a single float)
  * \sa igraph_betweenness
@@ -5230,6 +5296,67 @@ PyObject *igraphmodule_Graph_get_adjacency(igraphmodule_GraphObject * self,
   result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_INT);
   igraph_matrix_destroy(&m);
   return result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Returns the incidence matrix of a bipartite graph.
+ * \return the incidence matrix as a Python list of lists
+ * \sa igraph_get_incidence
+ */
+PyObject *igraphmodule_Graph_get_incidence(igraphmodule_GraphObject * self,
+                                           PyObject * args, PyObject * kwds)
+{
+  static char *kwlist[] = { "types", NULL };
+  igraph_matrix_t matrix;
+  igraph_vector_t row_ids, col_ids;
+  igraph_vector_bool_t *types;
+  PyObject *matrix_o, *row_ids_o, *col_ids_o, *types_o;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &types_o))
+    return NULL;
+
+  if (igraph_vector_init(&row_ids, 0))
+	return NULL;
+
+  if (igraph_vector_init(&col_ids, 0)) {
+    igraph_vector_destroy(&row_ids);
+	return NULL;
+  }
+
+  if (igraphmodule_attrib_to_vector_bool_t(types_o, self, &types, ATTRIBUTE_TYPE_VERTEX)) {
+    igraph_vector_destroy(&row_ids);
+    igraph_vector_destroy(&col_ids);
+	return NULL;
+  }
+
+  if (igraph_matrix_init(&matrix, 1, 1)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&row_ids);
+    igraph_vector_destroy(&col_ids);
+    if (types) { igraph_vector_bool_destroy(types); free(types); }
+    return NULL;
+  }
+
+  if (igraph_get_incidence(&self->g, types, &matrix, &row_ids, &col_ids)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&row_ids);
+    igraph_vector_destroy(&col_ids);
+    if (types) { igraph_vector_bool_destroy(types); free(types); }
+    igraph_matrix_destroy(&matrix);
+    return NULL;
+  }
+  
+  if (types) { igraph_vector_bool_destroy(types); free(types); }
+
+  matrix_o = igraphmodule_matrix_t_to_PyList(&matrix, IGRAPHMODULE_TYPE_INT);
+  igraph_matrix_destroy(&matrix);
+
+  row_ids_o = igraphmodule_vector_t_to_PyList(&row_ids, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&row_ids);
+  col_ids_o = igraphmodule_vector_t_to_PyList(&col_ids, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&col_ids);
+
+  return Py_BuildValue("NNN", matrix_o, row_ids_o, col_ids_o);
 }
 
 /** \ingroup python_interface_graph
@@ -8542,6 +8669,20 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  and optionally the list of articulation points"
   },
 
+  /* interface to igraph_bipartite_projection */
+  {"bipartite_projection", (PyCFunction) igraphmodule_Graph_bipartite_projection,
+   METH_VARARGS | METH_KEYWORDS,
+   "bipartite_projection(types, probe1=-1)\n\n"
+   "Internal function, undocumented.\n\n"
+   "@see: Graph.bipartite_projection\n"},
+
+  /* interface to igraph_bipartite_projection_size */
+  {"bipartite_projection_size", (PyCFunction) igraphmodule_Graph_bipartite_projection_size,
+   METH_VARARGS | METH_KEYWORDS,
+   "bipartite_projection_size(types)\n\n"
+   "Internal function, undocumented.\n\n"
+   "@see: Graph.bipartite_projection_size\n"},
+
   /* interface to igraph_closeness */
   {"closeness", (PyCFunction) igraphmodule_Graph_closeness,
    METH_VARARGS | METH_KEYWORDS,
@@ -9605,6 +9746,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"get_edgelist", (PyCFunction) igraphmodule_Graph_get_edgelist,
    METH_NOARGS,
    "get_edgelist()\n\n" "Returns the edge list of a graph."},
+
+  /* interface to igraph_get_incidence */
+  {"get_incidence", (PyCFunction) igraphmodule_Graph_get_incidence,
+   METH_VARARGS | METH_KEYWORDS,
+   "get_incidence(types)\n\n"
+   "Internal function, undocumented.\n\n"
+   "@see Graph.get_indicence\n\n"},
 
   // interface to igraph_to_directed
   {"to_directed", (PyCFunction) igraphmodule_Graph_to_directed,

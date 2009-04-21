@@ -53,6 +53,25 @@ class BipartiteTests(unittest.TestCase):
         self.failUnless(g.vs["type"] == [False]*2 + [True]*3)
         self.failUnless(sorted(g.get_edgelist()) == [(2,1),(3,0),(3,1),(4,0)])
 
+    def testGetIncidence(self):
+        mat = [[0, 1, 1], [1, 1, 0]]
+        v1, v2 = [0, 1], [2, 3, 4]
+        g = Graph.Incidence(mat)
+        self.failUnless(g.get_incidence() == (mat, v1, v2))
+        g.vs["type2"] = g.vs["type"]
+        self.failUnless(g.get_incidence("type2") == (mat, v1, v2))
+        self.failUnless(g.get_incidence(g.vs["type2"]) == (mat, v1, v2))
+
+    def testBipartiteProjection(self):
+        g = Graph.Full_Bipartite(10, 5)
+        g1, g2 = g.bipartite_projection()
+        self.failUnless(g1.isomorphic(Graph.Full(10)))
+        self.failUnless(g2.isomorphic(Graph.Full(5)))
+        self.failUnless(g.bipartite_projection_size() == (10, 45, 5, 10))
+        g1, g2 = g.bipartite_projection(probe1=10)
+        self.failUnless(g1.isomorphic(Graph.Full(5)))
+        self.failUnless(g2.isomorphic(Graph.Full(10)))
+
     def testIsBipartite(self):
         g = Graph.Star(10)
         self.failUnless(g.is_bipartite() == True)

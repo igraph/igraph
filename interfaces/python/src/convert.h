@@ -61,6 +61,8 @@ PyObject* igraphmodule_vector_t_to_PyList(igraph_vector_t *v, igraphmodule_conv_
 PyObject* igraphmodule_vector_t_to_PyTuple(igraph_vector_t *v);
 int igraphmodule_attrib_to_vector_t(PyObject *o, igraphmodule_GraphObject *self,
   igraph_vector_t **vptr, int attr_type);
+int igraphmodule_attrib_to_vector_bool_t(PyObject *o, igraphmodule_GraphObject *self,
+  igraph_vector_bool_t **vptr, int attr_type);
 PyObject* igraphmodule_vector_t_pair_to_PyList(igraph_vector_t *v1,
 					       igraph_vector_t *v2);
 PyObject* igraphmodule_vector_t_to_PyList_pairs(igraph_vector_t *v);

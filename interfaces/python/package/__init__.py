@@ -1389,6 +1389,64 @@ class Graph(core.GraphBase):
         result.vs["type"] = types
         return result
 
+    def bipartite_projection(self, types="type", *args, **kwds):
+        """bipartite_projection(types="type", probe1=-1)
+
+        Projects a bipartite graph into two one-mode graphs. Edge directions
+        are ignored while projecting.
+
+        Examples:
+
+        >>> g = Graph.Full_Bipartite(10, 5)
+        >>> g1, g2 = g.bipartite_projection()
+        >>> g1.isomorphic(Graph.Full(10))
+        True
+        >>> g2.isomorphic(Graph.Full(5))
+        True
+        
+        @param types: an igraph vector containing the vertex types, or an attribute
+          name. Anything that evalulates to C{False} corresponds to vertices of the
+          first kind, everything else to the second kind.
+        @param probe1: this argument can be used to specify the order of the
+          projections in the resulting list. If given and non-negative, then it is
+          considered as a vertex ID; the projection containing the vertex will be
+          the first one in the result.
+        @return: a tuple containing the two projected one-mode graphs.
+        """
+        return super(Graph, self).bipartite_projection(types, *args, **kwds)
+
+    def bipartite_projection_size(self, types="type", *args, **kwds):
+        """bipartite_projection(types="type")
+
+        Calculates the number of vertices and edges in the bipartite projections
+        of this graph according to the specified vertex types. This is useful if
+        you have a bipartite graph and you want to estimate the amount of memory
+        you would need to calculate the projections themselves.
+        
+        @param types: an igraph vector containing the vertex types, or an attribute
+          name. Anything that evalulates to C{False} corresponds to vertices of the
+          first kind, everything else to the second kind.
+        @return: a 4-tuple containing the number of vertices and edges in the
+          first projection, followed by the number of vertices and edges in the
+          second projection.
+        """
+        return super(Graph, self).bipartite_projection_size(types, *args, **kwds)
+
+    def get_incidence(self, types="type", *args, **kwds):
+        """get_incidence(self, types="type")
+
+        Returns the incidence matrix of a bipartite graph. The incidence matrix
+        is an M{n} times M{m} matrix, where M{n} and M{m} are the number of vertices
+        in the two vertex classes.
+
+        @param types: an igraph vector containing the vertex types, or an attribute
+          name. Anything that evalulates to C{False} corresponds to vertices of the
+          first kind, everything else to the second kind.
+        @return: the incidence matrix and two lists in a triplet. The first list
+          define the mapping between row indices of the matrix and the
+          original vertex IDs. The second list is the same for the column indices.
+        """
+        return super(Graph, self).get_incidence(types, *args, **kwds)
 
     ###################
     # Custom operators
