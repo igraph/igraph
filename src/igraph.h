@@ -3118,6 +3118,9 @@ int igraph_adjlist_init_complementer(const igraph_t *graph,
 void igraph_adjlist_destroy(igraph_adjlist_t *al);
 void igraph_adjlist_sort(igraph_adjlist_t *al);
 int igraph_adjlist_simplify(igraph_adjlist_t *al);
+int igraph_adjlist_remove_duplicate(const igraph_t *graph, 
+				    igraph_adjlist_t *al);
+int igraph_adjlist_print(const igraph_adjlist_t *al, FILE *outfile);
 /* igraph_vector_t *igraph_adjlist_get(const igraph_adjlist_t *al,  */
 /* 			       igraph_integer_t no); */
 /**
@@ -3147,6 +3150,10 @@ int igraph_adjedgelist_init(const igraph_t *graph,
 			    igraph_adjedgelist_t *eal, 
 			    igraph_neimode_t mode);
 void igraph_adjedgelist_destroy(igraph_adjedgelist_t *ael);
+int igraph_adjedgelist_remove_duplicate(const igraph_t *graph,
+					igraph_adjedgelist_t *al);
+int igraph_adjedgelist_print(const igraph_adjedgelist_t *al, FILE *outfile);
+
 /**
  * \define igraph_adjedgelist_get
  * Query a vector in an adjedgelist
