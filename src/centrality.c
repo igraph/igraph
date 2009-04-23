@@ -1927,4 +1927,367 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
   return 0;
 }
 
+/**
+ * \function igraph_centralization
+ * Calculate the centralization score from the node level scores
+ * 
+ * For a centrality score defined on the vertices of a graph, it is
+ * possible to define a graph level centralization index, by
+ * calculating the sum of the deviation from the maximum centrality
+ * score. Consequently, the higher the centralization index of the
+ * graph, the more centralized the structure is.
+ * 
+ * </para><para>In order to make graphs of different sizes comparable,
+ * the centralization index is usually normalized to a number between
+ * zero and one, by dividing the (unnormalized) centralization score
+ * of the most centralized structure with the same number of vertices.
+ * 
+ * </para><para>For most centrality indices the most centralized
+ * structure is the star graph, a single center connected to all other
+ * nodes in the network. There are some variation depending on whether
+ * the graph is directed or not, whether loop edges are allowed, etc. 
+ * 
+ * </para><para>
+ * This function simply calculates the graph level index, if the node
+ * level scores and the theoretical maximum are given. It is called by
+ * all the measure-specific centralization functions.
+ * 
+ * \param scores A vector containing the node-level centrality
+ *     scores.
+ * \param theoretical_max The graph level centrality score of the most
+ *     centralized graph with the same number of vertices. Only used
+ *     if \c normalized set to true.
+ * \param normalized Boolean, whether to normalize the centralization
+ *     by dividing the supplied theoretical maximum.
+ * \return The graph level index.
+ * 
+ * \sa \ref igraph_centralization_degree(), \ref
+ * igraph_centralization_betweenness(), \ref
+ * igraph_centralization_closeness(), and \ref
+ * igraph_centralization_eigenvector_centrality() for specific
+ * centralization functions.
+ * 
+ * Time complexity: O(n), the length of the score vector.
+ */
 
+igraph_real_t igraph_centralization(const igraph_vector_t *scores,
+				    igraph_real_t theoretical_max,
+				    igraph_bool_t normalized) {
+  
+  long int no_of_nodes=igraph_vector_size(scores);
+  igraph_real_t maxscore=0.0;
+  igraph_real_t cent=0.0;
+  long int i;
+  
+  if (no_of_nodes != 0) {
+    maxscore = igraph_vector_max(scores);
+    cent = no_of_nodes * maxscore - igraph_vector_sum(scores);
+    if (normalized) { cent = cent/theoretical_max; }
+  } else {
+    cent = IGRAPH_NAN;
+  }
+
+  return cent;
+}
+
+/**
+ * \function igraph_centralization_degree
+ * Calculate vertex degree and graph centralization
+ * 
+ * This function calculates the degree of the vertices by passing its
+ * arguments to \ref igraph_degree(); and it calculates the graph
+ * level centralization index based on the results by calling \ref
+ * igraph_centralization().
+ * \param graph The input graph.
+ * \param res A vector if you need the node-level degree scores, or a
+ *     null pointer otherwise.
+ * \param vids The vertices for which the degree is calculated and the
+ *     centralization is also performed based of these. Normally this
+ *     is \ref igraph_vss_all() to include each vertex exactly once.
+ * \param mode Constant the specifies the type of degree for directed
+ *     graphs. Possible values: \c IGRAPH_IN, \c IGRAPH_OUT and \c
+ *     IGRAPH_ALL. This argument is ignored for undirected graphs.
+ * \param loops Boolean, whether to consider loop edges when
+ *     calculating the degree (and the centralization).
+ * \param centralization Pointer to a real number, the centralization
+ *     score is placed here.
+ * \param normalized Boolean, whether to calculate a normalized
+ *     centralization score. See \ref igraph_centralization() for how
+ *     the normalization is done.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_centralization(), \ref igraph_degree().
+ * 
+ * Time complexity: the complexity of \ref igraph_degree() plus O(n),
+ * the number of vertices queried, for calculating the centralization
+ * score.
+ */
+
+int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res, 
+				 const igraph_vs_t vids, 
+				 igraph_neimode_t mode, igraph_bool_t loops,
+				 igraph_real_t *centralization, 
+				 igraph_bool_t normalized) {
+  
+  igraph_integer_t no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t myscores;
+  igraph_vector_t *scores=res;
+  igraph_real_t theoretical_max;
+
+  if (!res) {
+    scores=&myscores;
+    IGRAPH_VECTOR_INIT_FINALLY(scores, 0);
+  }
+  
+  IGRAPH_CHECK(igraph_degree(graph, scores, vids, mode, loops));
+
+  if (igraph_is_directed(graph)) {
+    switch (mode) {
+    case IGRAPH_IN:
+    case IGRAPH_OUT:
+      if (!loops) {
+	theoretical_max = (no_of_nodes-1) * (no_of_nodes-1);
+      } else {
+	theoretical_max = (no_of_nodes-1) * no_of_nodes;
+      }
+      break;
+    case IGRAPH_ALL:
+      if (!loops) {
+	theoretical_max = 2 * (no_of_nodes-1) * (no_of_nodes-2);
+      } else {
+	theoretical_max = 2 * (no_of_nodes-1) * (no_of_nodes-1);
+      }
+      break;
+    }
+  } else {
+    if (!loops) {
+      theoretical_max = (no_of_nodes-1) * (no_of_nodes-2);
+    } else {
+      theoretical_max = (no_of_nodes-1) * no_of_nodes;
+    }
+  }
+
+  *centralization = igraph_centralization(scores, theoretical_max, normalized);
+  
+  if (!res) {
+    igraph_vector_destroy(scores);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  return 0;
+}
+
+/**
+ * \function igraph_centralization_betweenness
+ * Calculate vertex betweenness and graph centralization
+ * 
+ * This function calculates the betweenness centrality of the vertices
+ * by passing its arguments to \ref igraph_betweenness(); and it
+ * calculates the graph level centralization index based on the
+ * results by calling \ref igraph_centralization().
+ * \param graph The input graph.
+ * \param res A vector if you need the node-level betweenness scores, or a
+ *     null pointer otherwise.
+ * \param vids The vertices for which the betweenness is calculated and the
+ *     centralization is also performed based of these. Normally this
+ *     is \ref igraph_vss_all() to include each vertex exactly once.
+ * \param directed Boolean, whether to consider directed paths when
+ *     calculating betweenness.
+ * \param centralization Pointer to a real number, the centralization
+ *     score is placed here.
+ * \param normalized Boolean, whether to calculate a normalized
+ *     centralization score. See \ref igraph_centralization() for how
+ *     the normalization is done.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_centralization(), \ref igraph_betweenness().
+ * 
+ * Time complexity: the complexity of \ref igraph_betweenness() plus
+ * O(n), the number of vertices queried, for calculating the
+ * centralization score.
+ */
+
+int igraph_centralization_betweenness(const igraph_t *graph, 
+				      igraph_vector_t *res,
+				      const igraph_vs_t vids,
+				      igraph_bool_t directed,
+				      igraph_real_t *centralization,
+				      igraph_bool_t normalized) {
+  
+  igraph_integer_t no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t myscores;
+  igraph_vector_t *scores=res;
+  igraph_real_t theoretical_max;
+  
+  if (!res) {
+    scores=&myscores;
+    IGRAPH_VECTOR_INIT_FINALLY(scores, 0);
+  }
+  
+  IGRAPH_CHECK(igraph_betweenness(graph, scores, vids, directed, 
+				  /*weights=*/ 0));
+  
+  if (directed && igraph_is_directed(graph)) {
+    theoretical_max = (no_of_nodes-1) * (no_of_nodes-1) * (no_of_nodes-2);
+  } else {
+    theoretical_max = (no_of_nodes-1) * (no_of_nodes-1) * (no_of_nodes-2) / 2.0;
+  }
+  
+  *centralization = igraph_centralization(scores, theoretical_max, normalized);
+  
+  if (!res) {
+    igraph_vector_destroy(scores);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  return 0;
+}
+
+/**
+ * \function igraph_centralization_closeness
+ * Calculate vertex closeness and graph centralization
+ * 
+ * This function calculates the closeness centrality of the vertices
+ * by passing its arguments to \ref igraph_closeness(); and it
+ * calculates the graph level centralization index based on the
+ * results by calling \ref igraph_centralization().
+ * \param graph The input graph.
+ * \param res A vector if you need the node-level closeness scores, or a
+ *     null pointer otherwise.
+ * \param vids The vertices for which the betweenness is calculated and the
+ *     centralization is also performed based of these. Normally this
+ *     is \ref igraph_vss_all() to include each vertex exactly once.
+ * \param mode Constant the specifies the type of closeness for directed
+ *     graphs. Possible values: \c IGRAPH_IN, \c IGRAPH_OUT and \c
+ *     IGRAPH_ALL. This argument is ignored for undirected graphs. See
+ *     \ref igraph_closeness() argument with the same name for more.
+ * \param centralization Pointer to a real number, the centralization
+ *     score is placed here.
+ * \param normalized Boolean, whether to calculate a normalized
+ *     centralization score. See \ref igraph_centralization() for how
+ *     the normalization is done.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_centralization(), \ref igraph_closeness().
+ * 
+ * Time complexity: the complexity of \ref igraph_closeness() plus
+ * O(n), the number of vertices queried, for calculating the
+ * centralization score.
+ */
+
+int igraph_centralization_closeness(const igraph_t *graph, 
+				    igraph_vector_t *res, 
+				    const igraph_vs_t vids,
+				    igraph_neimode_t mode, 
+				    igraph_real_t *centralization,
+				    igraph_bool_t normalized) {
+
+  igraph_integer_t no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t myscores;
+  igraph_vector_t *scores=res;
+  igraph_real_t theoretical_max;
+  
+  if (!res) {
+    scores=&myscores;
+    IGRAPH_VECTOR_INIT_FINALLY(scores, 0);
+  }
+  
+  IGRAPH_CHECK(igraph_closeness(graph, scores, vids, mode, 
+				/*weights=*/ 0));
+  
+  if (mode != IGRAPH_ALL && igraph_is_directed(graph)) {
+    theoretical_max = (no_of_nodes-1) * (1.0-1.0/no_of_nodes);
+  } else {
+    theoretical_max = (no_of_nodes-1) * (no_of_nodes-2) / (2.0*no_of_nodes-3);
+  }
+  
+  *centralization = igraph_centralization(scores, theoretical_max, normalized);
+  
+  if (!res) {
+    igraph_vector_destroy(scores);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  return 0;
+}
+
+/**
+ * \function igraph_centralization_eigenvector_centrality
+ * Calculate eigenvector centrality scores and graph centralization
+ * 
+ * This function calculates the eigenvector centrality of the vertices
+ * by passing its arguments to \ref igraph_eigenvector_centrality);
+ * and it calculates the graph level centralization index based on the
+ * results by calling \ref igraph_centralization().
+ * \param graph The input graph.
+ * \param vector A vector if you need the node-level eigenvector
+ *      centrality scores, or a null pointer otherwise.
+ * \param value If not a null pointer, then the leading eigenvalue is
+ *      stored here.
+ * \param scale If not zero then the result will be scaled, such that
+ *     the absolute value of the maximum centrality is one.
+ * \param options Options to ARPACK. See \ref igraph_arpack_options_t
+ *    for details. Note that the function overwrites the
+ *    <code>n</code> (number of vertices) parameter and 
+ *    it always starts the calculation from a non-random vector
+ *    calculated based on the degree of the vertices.
+ * \param centralization Pointer to a real number, the centralization
+ *     score is placed here.
+ * \param normalized Boolean, whether to calculate a normalized
+ *     centralization score. See \ref igraph_centralization() for how
+ *     the normalization is done.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_centralization(), \ref igraph_eigenvector_centrality().
+ * 
+ * Time complexity: the complexity of \ref
+ * igraph_eigenvector_centrality() plus O(|V|), the number of vertices
+ * for the calculating the centralization.
+ */
+
+int igraph_centralization_eigenvector_centrality(
+					 const igraph_t *graph,
+					 igraph_vector_t *vector,
+					 igraph_real_t *value,
+					 igraph_bool_t scale,
+					 igraph_arpack_options_t *options,
+					 igraph_real_t *centralization,
+					 igraph_bool_t normalized) {
+  
+  igraph_integer_t no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t myscores;
+  igraph_vector_t *scores=vector;
+  igraph_real_t realvalue, *myvalue=value;
+  igraph_real_t theoretical_max;
+  
+  if (!vector) {
+    scores=&myscores;
+    IGRAPH_VECTOR_INIT_FINALLY(scores, 0);
+  }
+  if (!value) {
+    myvalue=&realvalue;
+  }
+  
+  IGRAPH_CHECK(igraph_eigenvector_centrality(graph, scores, myvalue, scale,
+					     /*weights=*/ 0, options));
+
+  if (igraph_is_directed(graph)) {
+    theoretical_max = no_of_nodes - 1; 
+  } else {
+    if (scale) { 
+      theoretical_max = no_of_nodes - 2;
+    } else {
+      theoretical_max = (no_of_nodes-2.0) / M_SQRT2;
+    }
+  }
+
+  *centralization = igraph_centralization(scores, theoretical_max, normalized);
+  
+  if (!vector) {
+    igraph_vector_destroy(scores);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  return 0;
+}
+  

@@ -1268,6 +1268,39 @@ int igraph_authority_score(const igraph_t *graph, igraph_vector_t *vector,
 			   const igraph_vector_t *weights,
 			   igraph_arpack_options_t *options);
 
+igraph_real_t igraph_centralization(const igraph_vector_t *scores,
+				    igraph_real_t theoretical_max,
+				    igraph_bool_t normalized);
+
+int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res, 
+				 const igraph_vs_t vids, 
+				 igraph_neimode_t mode, igraph_bool_t loops,
+				 igraph_real_t *centralization, 
+				 igraph_bool_t normalized);
+
+int igraph_centralization_betweenness(const igraph_t *graph, 
+				      igraph_vector_t *res,
+				      const igraph_vs_t vids,
+				      igraph_bool_t directed,
+				      igraph_real_t *centralization,
+				      igraph_bool_t normalized);
+
+int igraph_centralization_closeness(const igraph_t *graph, 
+				    igraph_vector_t *res, 
+				    const igraph_vs_t vids,
+				    igraph_neimode_t mode, 
+				    igraph_real_t *centralization,
+				    igraph_bool_t normalized);
+
+int igraph_centralization_eigenvector_centrality(
+					 const igraph_t *graph,
+					 igraph_vector_t *vector,
+					 igraph_real_t *value,
+					 igraph_bool_t scale,
+					 igraph_arpack_options_t *options,
+					 igraph_real_t *centralization,
+					 igraph_bool_t normalized);
+
 /* -------------------------------------------------- */
 /* Cocitation and other similarity measures           */
 /* -------------------------------------------------- */
