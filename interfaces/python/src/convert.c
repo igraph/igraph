@@ -816,6 +816,7 @@ int igraphmodule_attrib_to_vector_t(PyObject *o, igraphmodule_GraphObject *self,
       if (igraphmodule_i_get_numeric_vertex_attr(&self->g, name,
           igraph_vss_all(), result)) {
         /* exception has already been set, so return */
+		igraph_vector_destroy(result);
         free(result);
         return 1;
       }
@@ -823,6 +824,7 @@ int igraphmodule_attrib_to_vector_t(PyObject *o, igraphmodule_GraphObject *self,
       if (igraphmodule_i_get_numeric_edge_attr(&self->g, name,
           igraph_ess_all(IGRAPH_EDGEORDER_ID), result)) {
         /* exception has already been set, so return */
+		igraph_vector_destroy(result);
         free(result);
         return 1;
       }
