@@ -131,7 +131,7 @@ spinglass.community(graph, weights=NULL, vertex, spins=25,
   
   Changes to the original function for including the
   possibility of negative ties were implemented 
-  by Vincent Traag \email{vtraag@f-m.fm}.}}
+  by Vincent Traag \email{vtraag@f-m.fm}.}
 \seealso{\code{\link{clusters}}}
 \examples{
   g <- erdos.renyi.game(10, 5/10) \%du\% erdos.renyi.game(9, 5/9)

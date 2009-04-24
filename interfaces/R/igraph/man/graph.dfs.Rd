@@ -68,7 +68,7 @@ graph.dfs (graph, root, neimode = c("out", "in", "all", "total"),
 }
 % \references{}
 \author{Gabor Csardi \email{Gabor.Csardi@unil.ch} }
-\seealso{ \code{\link{igraph.bfs}} for breadth-first search.}
+\seealso{ \code{\link{graph.bfs}} for breadth-first search.}
 \examples{
 ## A graph with two separate trees
 graph.dfs(graph.tree(10) \%du\% graph.tree(10), 0, "out",

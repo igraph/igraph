@@ -33,7 +33,7 @@ graph.laplacian(graph, normalized=FALSE, weights=NULL)
   vertices i and j with weight w, and 0 otherwise. The weighted degree
   of a vertex is the sum of the weights of its adjacent edges.
 }
-\value{}
+\value{A numeric matrix.}
 % \references{}
 \author{ Gabor Csardi \email{csardi@rmki.kfki.hu}}
 % \seealso{}
