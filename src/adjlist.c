@@ -26,6 +26,7 @@
 #include "config.h"
 
 #include <string.h>   /* memset */
+#include <stdio.h>
 
 /**
  * \section about_adjlists
@@ -280,6 +281,69 @@ int igraph_adjlist_simplify(igraph_adjlist_t *al) {
   
   igraph_vector_destroy(&mark);
   IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
+int igraph_adjlist_remove_duplicate(const igraph_t *graph,
+				    igraph_adjlist_t *al) {
+  long int i;
+  long int n=al->length;
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v=&al->adjs[i];
+    long int j, p=1, l=igraph_vector_size(v);
+    for (j=1; j<l; j++) {
+      long int e=VECTOR(*v)[j];
+      /* Non-loop edges, and one end of loop edges are fine. */
+      /* We use here, that the vector is sorted and we also keep it sorted */
+      if (e != i || VECTOR(*v)[j-1] != e) {
+	VECTOR(*v)[p++] = e;
+      }
+    }
+    igraph_vector_resize(v, p);
+  }
+  
+  return 0;
+}
+
+int igraph_adjlist_print(const igraph_adjlist_t *al, FILE *outfile) {
+  long int i;
+  long int n=al->length;
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v=&al->adjs[i];
+    igraph_vector_print(v, outfile);
+  }
+  return 0;
+}
+
+int igraph_adjedgelist_remove_duplicate(const igraph_t *graph, 
+					igraph_adjedgelist_t *al) {
+  long int i;
+  long int n=al->length;
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v=&al->adjs[i];
+    long int j, p=1, l=igraph_vector_size(v);
+    for (j=1; j<l; j++) {
+      long int e=VECTOR(*v)[j];
+      /* Non-loop edges and one end of loop edges are fine. */
+      /* We use here, that the vector is sorted and we also keep it sorted */
+      if (IGRAPH_FROM(graph, e) != IGRAPH_TO(graph, e) ||
+	  VECTOR(*v)[j-1] != e) {
+	VECTOR(*v)[p++] = e;
+      }
+    }
+    igraph_vector_resize(v, p);
+  }
+  
+  return 0;
+}
+
+int igraph_adjedgelist_print(const igraph_adjedgelist_t *al, FILE *outfile) {
+  long int i;
+  long int n=al->length;
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v=&al->adjs[i];
+    igraph_vector_print(v, outfile);
+  }
   return 0;
 }
 
