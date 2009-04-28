@@ -2,7 +2,7 @@ include setup.cfg
 include src/*.h
 include test.py
 include MANIFEST.in
-include LICENSE
+include COPYING
 include debian/changelog
 include debian/control
 include debian/rules

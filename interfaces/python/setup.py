@@ -82,6 +82,7 @@ library, primarily aimed at complex network research and analysis.
 Graph plotting functionality is provided by the Cairo library, so make
 sure you install the Python bindings of Cairo if you want to generate
 publication-quality graph plots.
+
 See the `Cairo homepage <http://cairographics.org/pycairo>`_ for details.
 
 From release 0.5, the C core of the igraph library is **not** included
@@ -91,46 +92,48 @@ so they should work out of the box. Linux users should refer to the
 `igraph homepage <http://igraph.sourceforge.net>`_ for
 compilation instructions (but check your distribution first, maybe
 there are pre-compiled packages available). OS X Leopard users may
-benefit from the meta-package available on the igraph homepage.
+benefit from the meta-package in the Python Package Index.
 """
 
 plat = get_platform()
-data_files = []
-# if "macosx" in plat:
-#     data_files = [('/usr/lib', ['/usr/local/lib/libigraph.dylib', \
-#                                 '/usr/local/lib/libigraph.0.dylib', \
-#                                 '/usr/local/lib/libigraph.0.0.0.dylib'])]
+options = dict(
+    name = 'python-igraph',
+    version = '0.5.2',
+    description = 'High performance graph data structures and algorithms',
+    long_description = description,
+    license = 'GNU General Public License (GPL)',
 
-setup(name = 'python-igraph',
-      version = '0.5.2',
-      description = 'High performance graph data structures and algorithms',
-      long_description = description,
-      license = 'GNU General Public License (GPL)',
+    author = 'Tamas Nepusz',
+    author_email = 'tamas@cs.rhul.ac.uk',
 
-      author = 'Tamas Nepusz',
-      author_email = 'tamas@cs.rhul.ac.uk',
+    ext_modules = [igraph_extension],
+    package_dir = {'igraph': 'igraph'},
+    packages = ['igraph', 'igraph.test', 'igraph.app'],
+    scripts = ['scripts/igraph'],
+    test_suite = "igraph.test.suite",
 
-      ext_modules = [igraph_extension],
-      package_dir = {'igraph': 'igraph'},
-      packages = ['igraph', 'igraph.test', 'igraph.app'],
-      scripts = ['scripts/igraph'],
-      data_files = data_files,
-      test_suite = "igraph.test.suite",
-
-      platforms = 'ALL',
-      keywords = ['graph', 'network', 'mathematics', 'math', 'graph theory', 'discrete mathematics'],
-      classifiers = [
-        'Development Status :: 4 - Beta',
-        'Intended Audience :: Developers',
-        'Intended Audience :: Science/Research',
-        'Operating System :: OS Independent',
-        'Programming Language :: C',
-        'Programming Language :: Python',
-        'Topic :: Scientific/Engineering',
-        'Topic :: Scientific/Engineering :: Information Analysis',
-        'Topic :: Scientific/Engineering :: Mathematics',
-        'Topic :: Scientific/Engineering :: Physics',
-        'Topic :: Scientific/Engineering :: Bio-Informatics',
-        'Topic :: Software Development :: Libraries :: Python Modules'
-      ]
+    platforms = 'ALL',
+    keywords = ['graph', 'network', 'mathematics', 'math', 'graph theory', 'discrete mathematics'],
+    classifiers = [
+      'Development Status :: 4 - Beta',
+      'Intended Audience :: Developers',
+      'Intended Audience :: Science/Research',
+      'Operating System :: OS Independent',
+      'Programming Language :: C',
+      'Programming Language :: Python',
+      'Topic :: Scientific/Engineering',
+      'Topic :: Scientific/Engineering :: Information Analysis',
+      'Topic :: Scientific/Engineering :: Mathematics',
+      'Topic :: Scientific/Engineering :: Physics',
+      'Topic :: Scientific/Engineering :: Bio-Informatics',
+      'Topic :: Software Development :: Libraries :: Python Modules'
+    ]
 )
+
+if "macosx" in plat:
+    # OS X specific stuff to build the .mpkg installer
+    options["data_files"] = [ \
+            ('/usr/local/lib', [os.path.expanduser('~/lib/libigraph.0.dylib')])
+    ]
+
+setup(**options)
