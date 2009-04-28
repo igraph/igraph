@@ -111,7 +111,7 @@ setup(name = 'python-igraph',
       author_email = 'tamas@cs.rhul.ac.uk',
 
       ext_modules = [igraph_extension],
-      package_dir = {'igraph': 'package'},
+      package_dir = {'igraph': 'igraph'},
       packages = ['igraph', 'igraph.test', 'igraph.app'],
       scripts = ['scripts/igraph'],
       data_files = data_files,
