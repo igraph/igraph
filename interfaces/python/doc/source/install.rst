@@ -35,6 +35,51 @@ Installation from a binary package
 |igraph| on Windows
 -------------------
 
+There is a Windows installer for |igraph|'s Python interface on the
+`Python Package Index <http://pypi.python.org/pypi/python-igraph>`_.
+Download the one that is suitable for your Python version (currently
+there are binary packages for Python 2.4 and Python 2.5, though it
+might change in the future). To test the installed package, launch
+your favourite Python IDE and type the following:
+
+  >>> import igraph.test
+  >>> igraph.test.test()
+
+The above commands run the bundled test cases to ensure that everything
+is fine with your |igraph| installation.
+
+Graph plotting in |igraph| on Windows
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Graph plotting in |igraph| is implemented using a third-party package
+called `Cairo <http://www.cairographics.org>`_. If you want to create
+publication-quality plots in |igraph| on Windows, you must also install
+Cairo and its Python bindings. The Cairo project does not provide
+pre-compiled binaries for Windows, but other projects depending on
+Cairo do, so the preferred way to install Cairo on Windows along with
+its Python bindings is as follows:
+
+1. Get the Cairo DLLs from http://www.gtk.org/download-windows.
+   You will need ``cairo_1.8.6-1_win32.zip`` and the binary version
+   of ``libpng`` and ``zlib``. From ``cairo_1.8.6-1_win32.zip``,
+   you need ``libcairo-2.dll``; from ``libpng``, you need
+   ``libpng13.dll``; from ``zlib``, you need ``zlib1.dll``.
+   Version numbers may vary, so be adaptive! Put these DLLs to
+   somewhere where Windows can find them, e.g., into
+   ``C:\Windows\System32``.
+
+2. Get the latest PyCairo for Windows installer from
+   http://ftp.gnome.org/pub/GNOME/binaries/win32/pycairo/1.4. Make
+   sure you grab the one that matches your Python version.
+
+3. Run the PyCairo installer.
+
+Having done that, you can launch Python again and check if it worked:
+
+  >>> from igraph import * 
+  >>> g = Graph.Famous("petersen")
+  >>> plot(g)
+
 |igraph| on Linux
 -----------------
 
