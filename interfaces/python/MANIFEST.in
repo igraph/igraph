@@ -3,8 +3,9 @@ include src/*.h
 include test.py
 include MANIFEST.in
 include COPYING
-include debian/changelog
-include debian/control
+include debian/changelog.in
+include debian/control.in
+include debian/copyright.in
 include debian/rules
 include debian/prepare
 include scripts/mkdoc.sh

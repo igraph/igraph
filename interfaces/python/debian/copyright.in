@@ -1,6 +1,6 @@
 This package was debianized by Tamas Nepusz <ntamas@rmki.kfki.hu> on Tue, 10 Oct 2005 23:13:01 +0100.
 
-It was downloaded from http://switch.dl.sourceforge.net/sourceforge/igraph/igraph-@VERSION@.tar.gz
+It was downloaded from http://pypi.python.org/packages/source/p/python-igraph/python-igraph-@VERSION@.tar.gz
 
 Upstream Authors: Gabor Csardi, Tamas Nepusz
 
