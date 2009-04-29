@@ -39,7 +39,7 @@ build-stamp:
 	set -e; \
 	for python in $(PYVERS); do \
 	  python=$$(echo $$python | sed "s/$(PYDEF)/python/"); \
-	  $$python setup.py build --build-platlib=build/lib; \
+	  $$python setup.py build --prefix=/usr --build-platlib=build/lib; \
 	done
 	scripts/mkdoc.sh build/lib
 	touch build-stamp
@@ -64,7 +64,7 @@ install: build
 	set -e; \
 	for python in $(PYVERS); do \
 	  python=$$(echo $$python | sed "s/$(PYDEF)/python/"); \
-	  $$python setup.py install --root=debian/python-igraph; \
+	  $$python setup.py install --prefix=/usr --root=debian/python-igraph; \
 	done
 	dh_installdocs -ppython-igraph-doc build/lib/html/*
 
