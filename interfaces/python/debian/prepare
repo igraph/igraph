@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VER=`sed -n -e "s/^PACKAGE_VERSION='\\(.*\\)'$/\1/p" setup.py`
+VER=`sed -n -e "s/^[ \t]*version *= *'\\(.*\\)', *$/\1/p" setup.py`
 
 if test x$1 = xcvs; then
   VER="${VER}-cvs"`date +%Y%m%d`
