@@ -121,6 +121,9 @@
 				RelativePath=".\src\bfgs.c">
 			</File>
 			<File
+				RelativePath=".\src\bipartite.c">
+			</File>
+			<File
 				RelativePath=".\src\bliss.cc"
 				FileType="0">
 			</File>
