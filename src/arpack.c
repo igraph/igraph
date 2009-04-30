@@ -76,6 +76,8 @@ int igraph_i_arpack_err_dseupd(long int error) {
 
 int igraph_i_arpack_err_dnaupd(long int error) {
   switch (error) {
+  case  1:      return IGRAPH_ARPACK_MAXIT;
+  case  3:      return IGRAPH_ARPACK_NOSHIFT;
   case -1:      return IGRAPH_ARPACK_NPOS;
   case -2:      return IGRAPH_ARPACK_NEVNPOS;
   case -3:      return IGRAPH_ARPACK_NCVSMALL;
@@ -95,6 +97,7 @@ int igraph_i_arpack_err_dnaupd(long int error) {
 
 int igraph_i_arpack_err_dneupd(long int error) {
   switch (error) {
+  case  1:      return IGRAPH_ARPACK_REORDER;
   case -1:      return IGRAPH_ARPACK_NPOS;
   case -2:      return IGRAPH_ARPACK_NEVNPOS;
   case -3:      return IGRAPH_ARPACK_NCVSMALL;
@@ -376,7 +379,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     }
   }
   
-  if (options->info < 0) {
+  if (options->info != 0) {
     IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dsaupd(options->info));
   }
   
@@ -387,7 +390,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 		options->ipntr, workd, workl, &options->lworkl,
 		&options->ierr);
   
-  if (options->ierr < 0) {
+  if (options->ierr != 0) {
     IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dseupd(options->ierr));
   }    
   
@@ -485,6 +488,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     orignev=options->nev;
   char origwhich[2]={ options->which[0], options->which[1] };
   igraph_real_t origtol=options->tol;
+  long int d_size;
   
   /* Brush up options if needed */
   if (options->ldv == 0) { options->ldv=options->n; }
@@ -509,6 +513,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     workev = storage->workev;
     dr     = storage->d;
     di     = storage->di;
+    d_size = options->n;
     resid  = storage->resid;
     select = storage->select;
     
@@ -525,8 +530,9 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     v=igraph_Calloc(options->ldv * options->ncv, igraph_real_t); CHECKMEM(v);
     workl=igraph_Calloc(options->lworkl, igraph_real_t); CHECKMEM(workl);
     workd=igraph_Calloc(3*options->n, igraph_real_t); CHECKMEM(workd);
-    dr=igraph_Calloc(2*options->nev+1, igraph_real_t); CHECKMEM(dr);
-    di=igraph_Calloc(2*options->nev+1, igraph_real_t); CHECKMEM(di);
+    d_size = 2*options->nev+1 > options->ncv ? 2*options->nev+1 : options->ncv;
+    dr=igraph_Calloc(d_size, igraph_real_t); CHECKMEM(dr);
+    di=igraph_Calloc(d_size, igraph_real_t); CHECKMEM(di);
     resid=igraph_Calloc(options->n, igraph_real_t); CHECKMEM(resid);
     select=igraph_Calloc(options->ncv, long int); CHECKMEM(select);
     workev=igraph_Calloc(3*options->ncv, igraph_real_t); CHECKMEM(workev);
@@ -570,7 +576,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     }
   }
 
-  if (options->info < 0) {
+  if (options->info != 0 && options->info != 1) {
     IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dnaupd(options->info));
   }
 
@@ -582,7 +588,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 		options->ipntr, workd, workl, &options->lworkl,
 		&options->ierr);
 
-  if (options->ierr < 0) {
+  if (options->ierr != 0) {
     IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dneupd(options->info));
   }    
 

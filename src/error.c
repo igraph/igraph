@@ -69,7 +69,13 @@ static char *igraph_i_error_strings[]=
     /* 35 */ "LAPACK (dtrevc) error for calculating eigenvectors",
     /* 36 */ "Unknown ARPACK error",
     /* 37 */ "Negative loop detected while calculating shortest paths",
-    /* 38 */ "Internal error, likely a bug in igraph"
+    /* 38 */ "Internal error, likely a bug in igraph",
+    /* 39 */ "Maximum number of iterations reached",
+    /* 40 */ "No shifts could be applied during a cycle of the "
+             "Implicitly restarted Arnoldi iteration. One possibility "
+             "is to increase the size of NCV relative to NEV",
+    /* 41 */ "The Schur form computed by LAPACK routine dlahqr "
+             "could not be reordered by LAPACK routine dtrsen."
 };
 
 const char* igraph_strerror(const int igraph_errno) {

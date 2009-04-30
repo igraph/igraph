@@ -354,7 +354,10 @@ typedef enum {
   IGRAPH_ARPACK_LAPACK    = 35,
   IGRAPH_ARPACK_UNKNOWN   = 36,
   IGRAPH_ENEGLOOP         = 37,
-  IGRAPH_EINTERNAL        = 38
+  IGRAPH_EINTERNAL        = 38,
+  IGRAPH_ARPACK_MAXIT     = 39,
+  IGRAPH_ARPACK_NOSHIFT   = 40,
+  IGRAPH_ARPACK_REORDER   = 41
 } igraph_error_type_t;
 
 /**
