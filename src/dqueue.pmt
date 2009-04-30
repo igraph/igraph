@@ -185,6 +185,8 @@ BASE FUNCTION(igraph_dqueue,head) (TYPE(igraph_dqueue)* q) {
 BASE FUNCTION(igraph_dqueue,back) (TYPE(igraph_dqueue)* q) {
         assert(q != 0);
 	assert(q->stor_begin != 0);
+	if (q->end == q->stor_begin)
+		return *(q->stor_end-1);
 	return *(q->end-1);
 }
 
