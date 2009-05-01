@@ -67,6 +67,24 @@ Bugs corrected in the R interface
 - Fixed a bug in graph.adjacency() when the matrix is a sparse matrix
   of class "dgTMatrix"
 
+New in the Python interface
+---------------------------
+
+- Speeded up betweenness estimation
+- Johnson's shortest paths algorithm added (selected automatically
+  by Graph.shortest_paths() if needed)
+- Weighted degree (also called strength) calculation, Graph.strength()
+- Some new methods to support bipartite graphs: Graph.Bipartite(),
+  Graph.is_bipartite(), Graph.get_indicence(), Graph.Incidence(),
+  Graph.bipartite_projection(), Graph.bipartite_projection_size()
+- Added the label propagation community detection algorithm by
+  Raghavan et al., Graph.community_label_propagation()
+- Added a function to "unfold" a tree, Graph.unfold_tree()
+- setup.py script improvements
+- Graph plotting now supports edge_arrow_size and edge_arrow_width
+- Added Graph.Formula to create small graphs from a simple notation
+- VertexSeq and EdgeSeq objects can now be indexed by slices
+
 New in the C layer
 ------------------
 
