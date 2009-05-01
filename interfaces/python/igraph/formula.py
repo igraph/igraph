@@ -77,9 +77,82 @@ def generate_edges(formula):
 
 
 def Formula(klass, formula = None, attr = "name"):
-    """Generates a graph from a graph formula
+    """Graph.Formula(formula = None, attr = "name")
+    
+    Generates a graph from a graph formula
 
-    TODO"""
+    A graph formula is a simple string representation of a graph.
+    It is very handy for creating small graphs quickly. The string
+    consists of vertex names separated by edge operators. An edge
+    operator is a sequence of dashes (C{-}) that may or may not
+    start with an arrowhead (C{<} at the beginning of the sequence
+    or C{>} at the end of the sequence). The edge operators can
+    be arbitrarily long, i.e., you may use as many dashes to draw
+    them as you like. This makes a total of four different edge
+    operators:
+
+      - C{-----} makes an undirected edge
+      - C{<----} makes a directed edge pointing from the vertex
+        on the right hand side of the operator to the vertex on
+        the left hand side
+      - C{---->} is the opposite of C{<----}
+      - C{<--->} creates a mutual directed edge pair between
+        the two vertices
+
+    If you only use the undirected edge operator (C{-----}),
+    the graph will be undirected. Otherwise it will be directed.
+    Vertex names used in the formula will be assigned to the
+    C{name} vertex attribute of the graph.
+
+    Some simple examples:
+
+      >>> print Graph.Formula()           # empty graph
+      Undirected graph (|V| = 0, |E| = 0)
+      >>> g = Graph.Formula("A-B")        # undirected graph
+      >>> g.vs["name"]
+      ["A", "B"]
+      >>> print g
+      Undirected graph (|V| = 2, |E| = 1)
+      >>> g.get_edgelist()
+      >>> g2 = Graph.Formula("A-----------B")
+      >>> g2.isomorphic(g)
+      True
+      >>> g = Graph.Formula("A  --->  B") # directed graph
+      >>> g.vs["name"]
+      ["A", "B"]
+      >>> print g
+      Directed graph (|V| = 2, |E| = 1)
+      
+    If you have may disconnected componnets, you can separate them
+    with commas. You can also specify isolated vertices:
+
+      >>> g = Graph.Formula("A--B, C--D, E--F, G--H, I, J, K")
+      >>> print ", ".join(g.vs["name"])
+      A, B, C, D, E, F, G, H, I, J, K
+      >>> g.clusters().membership
+      [0, 0, 1, 1, 2, 2, 3, 3, 4, 5, 6]
+
+    The colon (C{:}) operator can be used to specify vertex sets.
+    If an edge operator connects two vertex sets, then every vertex
+    from the first vertex set will be connected to every vertex in
+    the second set:
+
+      >>> g = Graph.Formula("A:B:C:D --- E:F:G")
+      >>> g.isomorphic(Graph.Full_Bipartite(4, 3))
+      True
+
+    Note that you have to quote vertex names if they include spaces
+    or special characters:
+
+      >>> g = Graph.Formula('"this is" +- "a silly" -+ "graph here"')
+      >>> g.vs["name"]
+      ['this is', 'a silly', 'graph here']
+
+    @param formula: the formula itself
+    @param attr: name of the vertex attribute where the vertex names
+                 will be stored
+    @return: the constructed graph:
+    """
     
     # If we have no formula, return an empty graph
     if formula is None: return klass(0, vertex_attrs = {attr: []})
