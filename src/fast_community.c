@@ -841,7 +841,10 @@ int igraph_community_fastgreedy(const igraph_t *graph,
     communities.e[from].size = 0;
 
 	/* record what has been merged */
-	igraph_vector_ptr_clear(&communities.e[from].neis);
+	/* igraph_vector_ptr_clear is not enough here as it won't free
+	 * the memory consumed by communities.e[from].neis. Thanks
+	 * to Tom Gregorovic for pointing that out. */
+	igraph_vector_ptr_destroy(&communities.e[from].neis);
 	if (merges) {
 	  MATRIX(*merges, no_of_joins, 0) = communities.e[to].id;
 	  MATRIX(*merges, no_of_joins, 1) = communities.e[from].id;
