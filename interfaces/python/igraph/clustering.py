@@ -697,7 +697,7 @@ class VertexDendrogram(VertexClustering, Dendrogram):
             membership[idx] = v
  
         self._membership = membership
-        self._len = max(membership) - 1
+        self._len = max(membership) + 1
         return copy(membership)
 
     def __plot__(self, context, bbox, palette, *args, **kwds):
