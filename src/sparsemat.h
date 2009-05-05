@@ -25,13 +25,46 @@
 #define IGRAPH_SPARSEMAT_H
 
 #include "cs/cs.h"
+#include "types.h"
 
 typedef struct igraph_sparsemat_t {
   cs *cs;
 } igraph_sparsemat_t;
 
+typedef enum { IGRAPH_SPARSEMAT_TRIPLET, 
+	       IGRAPH_SPARSEMAT_CC        } igraph_sparsemat_type_t;
+
 int igraph_sparsemat_init(igraph_sparsemat_t *A, int rows, int cols, int nzmax);
 void igraph_sparsemat_destroy(igraph_sparsemat_t *A);
 int igraph_sparsemat_realloc(igraph_sparsemat_t *A, int nzmax);
+
+long int igraph_sparsemat_nrow(const igraph_sparsemat_t *A);
+long int igraph_sparsemat_ncol(const igraph_sparsemat_t *B);
+igraph_sparsemat_type_t igraph_sparsemat_type(const igraph_sparsemat_t *A);
+igraph_bool_t igraph_sparsemat_is_triplet(const igraph_sparsemat_t *A);
+igraph_bool_t igraph_sparsemat_is_cc(const igraph_sparsemat_t *A);
+
+int igraph_sparsemat_entry(igraph_sparsemat_t *A, int row, int col, 
+			   igraph_real_t elem);
+int igraph_sparsemat_compress(const igraph_sparsemat_t *A, 
+			      igraph_sparsemat_t *res);
+int igraph_sparsemat_transpose(const igraph_sparsemat_t *A, 
+			       igraph_sparsemat_t *res, int values);
+int igraph_sparsemat_dupl(igraph_sparsemat_t *A);
+int igraph_sparsemat_fkeep(igraph_sparsemat_t *A, 
+			   int (*fkeep)(int, int, igraph_real_t, void*),
+			   void *other);
+int igraph_sparsemat_dropzeros(igraph_sparsemat_t *A);
+int igraph_sparsemat_multiply(const igraph_sparsemat_t *A,
+			      const igraph_sparsemat_t *B,
+			      igraph_sparsemat_t *res);
+int igraph_sparsemat_add(const igraph_sparsemat_t *A, 
+			 const igraph_sparsemat_t *B,
+			 igraph_real_t alpha,
+			 igraph_real_t beta,
+			 igraph_sparsemat_t *res);
+int igraph_sparsemat_gaxpy(const igraph_sparsemat_t *A,
+			   const igraph_vector_t *x,
+			   igraph_vector_t *res);
 
 #endif

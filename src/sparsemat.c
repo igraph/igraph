@@ -49,3 +49,132 @@ void igraph_sparsemat_destroy(igraph_sparsemat_t *A) {
 int igraph_sparsemat_realloc(igraph_sparsemat_t *A, int nzmax) {
   return !cs_sprealloc(A->cs, nzmax);
 }
+
+long int igraph_sparsemat_nrow(const igraph_sparsemat_t *A) {
+  return A->cs->m;
+}
+
+long int igraph_sparsemat_ncol(const igraph_sparsemat_t *A) {
+  return A->cs->n;
+}
+
+igraph_sparsemat_type_t igraph_sparsemat_type(const igraph_sparsemat_t *A) {
+  return A->cs->nz < 0 ? IGRAPH_SPARSEMAT_CC : IGRAPH_SPARSEMAT_TRIPLET;
+}
+
+igraph_bool_t igraph_sparsemat_is_triplet(const igraph_sparsemat_t *A) {
+  return A->cs->nz >= 0;
+}
+
+igraph_bool_t igraph_sparsemat_is_cc(const igraph_sparsemat_t *A) {
+  return A->cs->nz < 0;
+}
+
+int igraph_sparsemat_entry(igraph_sparsemat_t *A, int row, int col, 
+			   igraph_real_t elem) {
+  
+  if (!cs_entry(A->cs, row, col, elem)) {
+    IGRAPH_ERROR("Cannot add entry to sparse matrix", 
+		 IGRAPH_FAILURE);
+  }
+
+  return 0;
+}
+
+int igraph_sparsemat_compress(const igraph_sparsemat_t *A, 
+			      igraph_sparsemat_t *res) {
+
+  if (! (res->cs=cs_compress(A->cs)) ) {
+    IGRAPH_ERROR("Cannot compress sparse matrix", IGRAPH_FAILURE);
+  }
+
+  return 0;
+}
+
+
+int igraph_sparsemat_transpose(const igraph_sparsemat_t *A, 
+			       igraph_sparsemat_t *res, 
+			       int values) {
+
+  if (! (res->cs=cs_transpose(A->cs, values)) ) {
+    IGRAPH_ERROR("Cannot transpose sparse matrix", IGRAPH_FAILURE);
+  }
+
+  return 0;
+}
+
+
+int igraph_sparsemat_dupl(igraph_sparsemat_t *A) {
+
+  if (!cs_dupl(A->cs)) {
+    IGRAPH_ERROR("Cannot transpose sparse matrix", IGRAPH_FAILURE);
+  }
+  
+  return 0;
+}
+
+
+int igraph_sparsemat_fkeep(igraph_sparsemat_t *A, 
+			   int (*fkeep)(int, int, igraph_real_t, void*),
+			   void *other) {
+  
+  if (!cs_fkeep(A->cs, fkeep, other)) {
+    IGRAPH_ERROR("Cannot filter sparse matrix", IGRAPH_FAILURE);
+  }
+
+  return 0;
+}
+
+
+int igraph_sparsemat_dropzeros(igraph_sparsemat_t *A) {
+
+  if (!cs_dropzeros(A->cs)) {
+    IGRAPH_ERROR("Cannot drop zeros from sparse matrix", IGRAPH_FAILURE);
+  }
+
+  return 0;
+}
+
+
+int igraph_sparsemat_multiply(const igraph_sparsemat_t *A,
+			      const igraph_sparsemat_t *B,
+			      igraph_sparsemat_t *res) {
+
+  if (! (res->cs=cs_multiply(A->cs, B->cs))) {
+    IGRAPH_ERROR("Cannot multiply matrices", IGRAPH_FAILURE);
+  }
+
+  return 0;
+}
+
+
+int igraph_sparsemat_add(const igraph_sparsemat_t *A, 
+			 const igraph_sparsemat_t *B,
+			 igraph_real_t alpha,
+			 igraph_real_t beta,
+			 igraph_sparsemat_t *res) {
+
+  if (! (res->cs=cs_add(A->cs, B->cs, alpha, beta))) {
+    IGRAPH_ERROR("Cannot add matrices", IGRAPH_FAILURE);
+  }
+  
+  return 0;
+}
+
+int igraph_sparsemat_gaxpy(const igraph_sparsemat_t *A,
+			   const igraph_vector_t *x,
+			   igraph_vector_t *res) {
+
+  if (A->cs->n != igraph_vector_size(x) || 
+      A->cs->m != igraph_vector_size(res)) {
+    IGRAPH_ERROR("Invalid matrix/vector size for multiplication",
+		 IGRAPH_EINVAL);
+  }
+  
+  if (! (cs_gaxpy(A->cs, VECTOR(*x), VECTOR(*res)))) {
+    IGRAPH_ERROR("Cannot perform sparse matrix vector multiplication",
+		 IGRAPH_FAILURE);
+  }
+  
+  return 0;
+}
