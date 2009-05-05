@@ -743,6 +743,14 @@ int igraph_diameter(const igraph_t *graph, igraph_integer_t *res,
 		    igraph_integer_t *from, igraph_integer_t *to,
 		    igraph_vector_t *path,
 		    igraph_bool_t directed, igraph_bool_t unconn);
+int igraph_diameter_dijkstra(const igraph_t *graph,
+			     const igraph_vector_t *weights,
+			     igraph_real_t *pres,
+			     igraph_integer_t *pfrom,
+			     igraph_integer_t *pto,
+			     igraph_vector_t *path,
+			     igraph_bool_t directed,
+			     igraph_bool_t unconn);
 int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph, 
 					    igraph_t *mst);
 int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,

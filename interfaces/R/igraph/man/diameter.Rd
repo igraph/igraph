@@ -7,18 +7,21 @@
 \description{The diameter of a graph is the length of the longest
   geodesic.}
 \usage{
-diameter(graph, directed = TRUE, unconnected = TRUE)
-get.diameter (graph, directed = TRUE, unconnected = TRUE) 
-farthest.nodes (graph, directed = TRUE, unconnected = TRUE) 
+diameter(graph, directed = TRUE, unconnected = TRUE, weights = NULL)
+get.diameter (graph, directed = TRUE, unconnected = TRUE, weights = NULL) 
+farthest.nodes (graph, directed = TRUE, unconnected = TRUE, weights = NULL) 
 }
 \arguments{
-  \item{graph}{The graph to analyize.}
+  \item{graph}{The graph to analyze.}
   \item{directed}{Logical, whether directed or undirected paths are to
     be considered. This is ignored for undirected graphs.}
   \item{unconnected}{Logical, what to do if the graph is unconnected. If
     FALSE, the function will return the largest possible diameter which
     is the number of vertices. If TRUE, the diameters of the connected
     components will be calculated and the largest one will be returned.}
+  \item{weights}{Optional positive weight vector for calculating
+    weighted distances. If the graph has a \code{weight} edge
+    attribute, then this is used by default.}
 }
 \details{The diameter is calculated by using a breadth-first search like
   method.
@@ -42,5 +45,14 @@ g <- graph.ring(10)
 g2 <- delete.edges(g, c(0,1,0,9))
 diameter(g2, unconnected=TRUE)
 diameter(g2, unconnected=FALSE)
+
+## Weighted diameter
+set.seed(1)
+g <- graph.ring(10)
+E(g)$weight <- sample(seq_len(ecount(g)))
+diameter(g)
+get.diameter(g)
+diameter(g, weights=NA)
+get.diameter(g, weights=NA)
 }
 \keyword{graphs}

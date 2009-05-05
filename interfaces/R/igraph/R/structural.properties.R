@@ -24,37 +24,68 @@
 # Structural properties
 ###################################################################
 
-diameter <- function(graph, directed=TRUE, unconnected=TRUE) {
+diameter <- function(graph, directed=TRUE, unconnected=TRUE, weights=NULL) {
   
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
 
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
+    weights <- E(graph)$weight
+  }
+  if (!is.null(weights) && any(!is.na(weights))) {
+    weights <- as.numeric(weights)
+  } else {
+    weights <- NULL
+  }
+  
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_diameter", graph, as.logical(directed),
-        as.logical(unconnected),
+        as.logical(unconnected), weights,
         PACKAGE="igraph")
 }
 
-get.diameter <- function(graph, directed=TRUE, unconnected=TRUE) {
+get.diameter <- function(graph, directed=TRUE, unconnected=TRUE,
+                         weights=NULL) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
+    weights <- E(graph)$weight
+  }
+  if (!is.null(weights) && any(!is.na(weights))) {
+    weights <- as.numeric(weights)
+  } else {
+    weights <- NULL
+  }
+
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_get_diameter", graph, as.logical(directed),
-        as.logical(unconnected),
+        as.logical(unconnected), weights,
         PACKAGE="igraph")
 }
 
-farthest.nodes <- function(graph, directed=TRUE, unconnected=TRUE) {
+farthest.nodes <- function(graph, directed=TRUE, unconnected=TRUE,
+                           weights=NULL) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
+    weights <- E(graph)$weight
+  }
+  if (!is.null(weights) && any(!is.na(weights))) {
+    weights <- as.numeric(weights)
+  } else {
+    weights <- NULL
+  }
+  
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_farthest_points", graph, as.logical(directed),
-        as.logical(unconnected),
+        as.logical(unconnected), weights,
         PACKAGE="igraph")
 }       
 

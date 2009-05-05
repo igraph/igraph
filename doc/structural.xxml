@@ -24,6 +24,7 @@
 <!-- doxrox-include igraph_average_path_length -->
 <!-- doxrox-include igraph_path_length_hist -->
 <!-- doxrox-include igraph_diameter -->
+<!-- doxrox-include igraph_diameter_dijkstra -->
 <!-- doxrox-include igraph_girth -->
 </section>
 
