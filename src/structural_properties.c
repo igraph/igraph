@@ -5091,3 +5091,162 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
   return 0;
 }
 
+/**
+ * \function igraph_diameter_dijkstra
+ * Weighted diameter using Dijkstra's algorithm, non-negative weights only
+ * 
+ * The diameter of a graph is its longest geodesic. I.e. the
+ * (weighted) shortest path is calculated for all pairs of vertices
+ * and the longest one is the diameter.
+ * \param graph The input graph, can be directed or undirected.
+ * \param pres Pointer to a real number, if not \c NULL then it will contain 
+ *        the diameter (the actual distance).
+ * \param pfrom Pointer to an integer, if not \c NULL it will be set to the 
+ *        source vertex of the diameter path.
+ * \param pto Pointer to an integer, if not \c NULL it will be set to the 
+ *        target vertex of the diameter path.
+ * \param path Pointer to an initialized vector. If not \c NULL the actual 
+ *        longest geodesic path will be stored here. The vector will be 
+ *        resized as needed.
+ * \param directed Boolean, whether to consider directed
+ *        paths. Ignored for undirected graphs.
+ * \param unconn What to do if the graph is not connected. If
+ *        \c TRUE the longest geodesic within a component
+ *        will be returned, otherwise \c IGRAPH_INFINITY is
+ *        returned.
+ * \return Error code.
+ *
+ * Time complexity: O(|V||E|*log|E|), |V| is the number of vertices,
+ * |E| is the number of edges.
+ */
+
+int igraph_diameter_dijkstra(const igraph_t *graph,
+			     const igraph_vector_t *weights,
+			     igraph_real_t *pres,
+			     igraph_integer_t *pfrom,
+			     igraph_integer_t *pto,
+			     igraph_vector_t *path,
+			     igraph_bool_t directed,
+			     igraph_bool_t unconn) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+
+  igraph_vector_t dist;
+  igraph_indheap_t Q;
+  igraph_adjedgelist_t adjlist;
+  igraph_vector_long_t already_added;
+  long int source;
+  igraph_integer_t dirmode = directed ? IGRAPH_OUT : IGRAPH_ALL;
+
+  long int from, to;
+  igraph_real_t res=0;
+  long int nodes_reached=0;
+  
+  if (!weights) {
+    return igraph_diameter(graph, pres, pfrom, pto, path, directed, unconn);
+  }
+
+  if (weights && igraph_vector_size(weights) != no_of_edges) {
+    IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+  }
+  
+  if (igraph_vector_min(weights) < 0) {
+    IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_CHECK(igraph_vector_long_init(&already_added, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &already_added);
+  IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
+  IGRAPH_CHECK(igraph_indheap_init(&Q, no_of_nodes));
+  IGRAPH_FINALLY(igraph_indheap_destroy, &Q);
+  IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjlist, dirmode));
+  IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjlist);
+  
+  for (source=0; source < no_of_nodes; source++) {
+
+    IGRAPH_PROGRESS("Weighted diameter: ", source*100.0/no_of_nodes, NULL);
+    IGRAPH_ALLOW_INTERRUPTION();
+
+    igraph_indheap_push_with_index(&Q, source, -0);
+    VECTOR(already_added)[source] = source+1;
+    VECTOR(dist)[source] = 1.0;
+
+    while (!igraph_indheap_empty(&Q)) {
+      long int minnei=igraph_indheap_max_index(&Q);
+      igraph_real_t mindist=-igraph_indheap_delete_max(&Q);
+      igraph_vector_t *neis;
+      long int nlen, j;
+      
+      if (mindist > res) {
+	res=mindist; from=source; to=minnei;
+      }
+      nodes_reached++;
+
+      neis=igraph_adjedgelist_get(&adjlist, minnei);
+      nlen=igraph_vector_size(neis);
+      for (j=0; j<nlen; j++) {
+	long int edge=VECTOR(*neis)[j];
+	long int to=IGRAPH_OTHER(graph, edge, minnei);
+	igraph_real_t altdist=mindist + VECTOR(*weights)[edge];
+	igraph_real_t curdist= (VECTOR(already_added)[to]==source+1) ? 
+	  VECTOR(dist)[to] : 0;
+	
+	if (curdist==0) {
+	  /* First non-finite distance */
+	  VECTOR(already_added)[to] = source+1;
+	  VECTOR(dist)[to] = altdist+1.0;
+	  IGRAPH_CHECK(igraph_indheap_push_with_index(&Q, to, -altdist));
+	} else if (altdist < curdist-1) {
+	  /* A shorter path */
+	  VECTOR(dist)[to] = altdist+1.0;
+	  IGRAPH_CHECK(igraph_indheap_modify(&Q, to, -altdist));
+	}
+      }
+      
+    } /* !igraph_indheap_empty(&Q) */
+
+    /* not connected, return infinity */
+    if (nodes_reached != no_of_nodes && !unconn) {
+      res=IGRAPH_INFINITY;
+      from=to=-1;
+      break;
+    }
+    
+  } /* source < no_of_nodes */
+  
+  igraph_adjedgelist_destroy(&adjlist);
+  igraph_indheap_destroy(&Q);
+  igraph_vector_destroy(&dist);
+  igraph_vector_long_destroy(&already_added);
+  IGRAPH_FINALLY_CLEAN(4);
+
+  IGRAPH_PROGRESS("Weighted diameter: ", 100.0, NULL);
+  
+  if (pres) {
+    *pres=res;
+  }
+  if (pfrom) {
+    *pfrom=from;
+  }
+  if (pto) {
+    *pto=to;
+  }
+  if (path) {
+    if (!igraph_finite(res)) {
+      igraph_vector_clear(path);
+    } else {
+      igraph_vector_ptr_t tmpptr;
+      igraph_vector_ptr_init(&tmpptr, 1);
+      IGRAPH_FINALLY(igraph_vector_ptr_destroy, &tmpptr);
+      VECTOR(tmpptr)[0]=path;
+      IGRAPH_CHECK(igraph_get_shortest_paths_dijkstra(graph, &tmpptr, from,
+						      igraph_vss_1(to), 
+						      weights, dirmode));
+      igraph_vector_ptr_destroy(&tmpptr);
+      IGRAPH_FINALLY_CLEAN(1);
+    }
+  }
+        
+  return 0;
+}

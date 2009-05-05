@@ -283,6 +283,14 @@ igraph_diameter:
                 BOOLEAN unconnected=True
         IGNORE: RR, RC, RNamespace
 
+igraph_diameter_dijkstra:
+        PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
+                OUT INTEGERPTR res, OUT INTEGERPTR from, \
+                OUT INTEGERPTR to, OUT VECTOR_OR_0 path, BOOLEAN directed=True, \
+                BOOLEAN unconnected=True
+        DEPS: weights ON graph
+        IGNORE: RR, RC, RNamespace
+
 igraph_minimum_spanning_tree_unweighted:
         PARAMS: GRAPH graph, OUT GRAPH mst
         IGNORE: RR, RC, RNamespace
