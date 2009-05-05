@@ -1,0 +1,13 @@
+#!/bin/sh
+
+DATE=`date -R`
+VER=`sed -n -e "s/^[ \t]*version *= *'\\(.*\\)', *$/\1/p" setup.py`
+
+if test x$1 = xcvs; then
+  VER="${VER}-cvs"`date +%Y%m%d`
+fi
+
+for i in copyright.in changelog.in control.in; do
+  cat debian/$i | sed -e "s/@VERSION@/$VER/g" | sed -e "s/@DATE@/$DATE/g" >debian/`basename $i .in`
+done
+

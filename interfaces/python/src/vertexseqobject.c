@@ -426,6 +426,7 @@ int igraphmodule_VertexSeq_set_attribute_values_mapping(igraphmodule_VertexSeqOb
           return -1;
         } /* PyList_SetItem stole a reference to the item automatically */ 
       }
+      igraph_vector_destroy(&vs);
     } else if (values != 0) {
       /* We don't have attributes with the given name yet. Create an entry
        * in the dict, create a new list, fill with None for vertices not in the

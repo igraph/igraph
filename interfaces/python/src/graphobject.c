@@ -2987,7 +2987,7 @@ PyObject *igraphmodule_Graph_biconnected_components(igraphmodule_GraphObject *se
 
   result = igraphmodule_vector_ptr_t_to_PyList(&components, IGRAPHMODULE_TYPE_INT);
   for (i=0; i<no; i++) igraph_vector_destroy(VECTOR(components)[i]);
-  igraph_vector_ptr_destroy(&components);
+  igraph_vector_ptr_destroy_all(&components);
 
   if (return_articulation_points) {
 	PyObject *result2;
@@ -4023,6 +4023,8 @@ PyObject *igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject * self,
     list = igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
   }
 
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
+
   igraph_matrix_destroy(&res);
   igraph_vs_destroy(&from_vs);
   igraph_vs_destroy(&to_vs);
@@ -4513,6 +4515,7 @@ PyObject *igraphmodule_Graph_is_bipartite(igraphmodule_GraphObject *self,
       // reference to types_o will be stolen by Py_BuildValue
       return Py_BuildValue("ON", Py_True, types_o);
     } else {
+      igraph_vector_bool_destroy(&types);
       return Py_BuildValue("OO", Py_False, Py_None);
     }
   } else {

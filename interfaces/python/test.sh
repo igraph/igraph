@@ -10,7 +10,7 @@ if [ x$1 == x-d -a -x /usr/bin/valgrind ]; then
 else
   PRE=""
 fi
-DYLD_LIBRARY_PATH=src/.libs LD_LIBRARY_PATH=src/.libs $PRE python $1 interfaces/python/test.py
+DYLD_LIBRARY_PATH=src/.libs LD_LIBRARY_PATH=src/.libs $PRE python $1 interfaces/python/setup.py test
 if [ x$FNAME != x ]; then rm -f $FNAME; fi
 
 exit 0
