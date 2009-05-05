@@ -53,6 +53,25 @@ endif
 F2C = f2c/d_sign.c f2c/etime_.c  f2c/pow_dd.c f2c/pow_di.c f2c/s_cmp.c \
 	f2c/s_copy.c f2c/d_lg10.c f2c/i_dnnt.c
 
+CS = cs/cs_add.c       cs/cs_happly.c    cs/cs_pvec.c         \
+	cs/cs_amd.c       cs/cs_house.c     cs/cs_qr.c        \
+	cs/cs_chol.c      cs/cs_ipvec.c     cs/cs_qrsol.c     \
+	cs/cs_cholsol.c   cs/cs_leaf.c      cs/cs_randperm.c  \
+	cs/cs_compress.c  cs/cs_load.c      cs/cs_reach.c     \
+	cs/cs_counts.c    cs/cs_lsolve.c    cs/cs_scatter.c   \
+	cs/cs_cumsum.c    cs/cs_ltsolve.c   cs/cs_scc.c       \
+	cs/cs_dfs.c       cs/cs_lu.c        cs/cs_schol.c     \
+	cs/cs_dmperm.c    cs/cs_lusol.c     cs/cs_spsolve.c   \
+	cs/cs_droptol.c   cs/cs_malloc.c    cs/cs_sqr.c       \
+	cs/cs_dropzeros.c cs/cs_maxtrans.c  cs/cs_symperm.c   \
+	cs/cs_dupl.c      cs/cs_multiply.c  cs/cs_tdfs.c      \
+	cs/cs_entry.c     cs/cs_norm.c      cs/cs_transpose.c \
+	cs/cs_ereach.c    cs/cs_permute.c   cs/cs_updown.c    \
+	cs/cs_etree.c     cs/cs_pinv.c      cs/cs_usolve.c    \
+	cs/cs_fkeep.c     cs/cs_post.c      cs/cs_util.c      \
+	cs/cs_gaxpy.c     cs/cs_print.c     cs/cs_utsolve.c   \
+	cs/cs.h	    cs/UFconfig.h
+
 libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     structural_properties.c components.c layout.c \
 			     structure_generators.c conversion.c \
@@ -90,7 +109,7 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     cattributes.c revolver_ml_cit.c zeroin.c bfgs.c math.c \
 			     forestfire.c $(ARPACK) $(BLAS) $(LAPACK) $(F2C) \
 			     arpack.c centrality.c drl_layout.cpp drl_parse.cpp \
-                             drl_graph.cpp DensityGrid.cpp \
+			     drl_graph.cpp DensityGrid.cpp \
 			     gengraph_box_list.cpp gengraph_degree_sequence.cpp \
 			     gengraph_graph_molloy_hash.cpp \
 			     gengraph_graph_molloy_optimized.cpp \
@@ -98,7 +117,8 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     gengraph_random.cpp decomposition.c bipartite.c \
 			     drl_layout_3d.cpp drl_graph_3d.cpp \
 			     DensityGrid_3d.cpp \
-			     foreign-dl-parser.y foreign-dl-lexer.l
+			     foreign-dl-parser.y foreign-dl-lexer.l \
+			     $(CS) sparsemat.h sparsemat.c
 
 libigraph_la_CFLAGS        =
 libigraph_la_CXXFLAGS	   =
