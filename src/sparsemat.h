@@ -95,4 +95,6 @@ int igraph_sparsemat_lusol(const igraph_sparsemat_t *A,
 int igraph_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
 		     igraph_bool_t directed);
 
+int igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *res);
+
 #endif

@@ -374,3 +374,21 @@ int igraph_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
     return(igraph_i_sparsemat_triplet(graph, A, directed));
   }
 }
+
+int igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *res) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  long int i;
+  
+  IGRAPH_CHECK(igraph_sparsemat_init(res, no_of_nodes, no_of_nodes, 
+				     no_of_edges));
+  for (i=0; i<no_of_edges; i++) {
+    IGRAPH_CHECK(igraph_sparsemat_entry(res, 
+					IGRAPH_FROM(graph, i), 
+					IGRAPH_TO(graph, i),
+					1.0));
+  }
+  
+  return 0;
+}
