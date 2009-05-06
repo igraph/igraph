@@ -279,7 +279,7 @@ int igraph_sparsemat_cholsol(const igraph_sparsemat_t *A,
   return 0;
 }
 
-int igraph_sprasemat_lusol(const igraph_sparsemat_t *A,
+int igraph_sparsemat_lusol(const igraph_sparsemat_t *A,
 			   const igraph_vector_t *b,
 			   igraph_vector_t *res,
 			   int order,
