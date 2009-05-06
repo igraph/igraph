@@ -301,3 +301,76 @@ int igraph_sparsemat_lusol(const igraph_sparsemat_t *A,
   return 0;
 }
 
+int igraph_i_sparsemat_cc(igraph_t *graph, const igraph_sparsemat_t *A,
+			  igraph_bool_t directed) {
+
+  igraph_vector_t edges;
+  long int no_of_nodes=A->cs->m;
+  long int no_of_edges=A->cs->nzmax;
+  int *p=A->cs->p;
+  int *i=A->cs->i;
+  long int from=0;
+  long int to=0;
+  long int e=0;
+  
+  if (no_of_nodes != A->cs->n) {
+    IGRAPH_ERROR("Cannot create graph object", IGRAPH_NONSQUARE);
+  }
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges*2);
+  
+  while (*p < no_of_edges) {
+    while (to < *(p+1)) {
+      VECTOR(edges)[e++] = from;
+      VECTOR(edges)[e++] = (*i);
+      to++;
+      i++;      
+    }
+    from++;
+    p++;
+  }
+
+  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
+int igraph_i_sparsemat_triplet(igraph_t *graph, const igraph_sparsemat_t *A,
+			       igraph_bool_t directed) {
+
+  igraph_vector_t edges;
+  long int no_of_nodes=A->cs->m;
+  long int no_of_edges=A->cs->nz;
+  int *i=A->cs->p;
+  int *j=A->cs->i;
+  long int e;
+  
+  if (no_of_nodes != A->cs->n) {
+    IGRAPH_ERROR("Cannot create graph object", IGRAPH_NONSQUARE);
+  }
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges*2);
+  
+  for (e=0; e<2*no_of_edges; i++, j++) {
+    VECTOR(edges)[e++] = (*i);
+    VECTOR(edges)[e++] = (*j);
+  }
+  
+  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
+int igraph_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
+		     igraph_bool_t directed) {
+  
+  if (A->cs->nz < 0) {
+    return(igraph_i_sparsemat_cc(graph, A, directed));
+  } else {
+    return(igraph_i_sparsemat_triplet(graph, A, directed));
+  }
+}
