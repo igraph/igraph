@@ -178,3 +178,126 @@ int igraph_sparsemat_gaxpy(const igraph_sparsemat_t *A,
   
   return 0;
 }
+
+int igraph_sparsemat_lsolve(const igraph_sparsemat_t *A,
+			    const igraph_vector_t *b,
+			    igraph_vector_t *res) {
+
+  if (A->cs->m != A->cs->n) {
+    IGRAPH_ERROR("Cannot perform lower triangular solve", IGRAPH_NONSQUARE);
+  }
+
+  if (res != b) {
+    IGRAPH_CHECK(igraph_vector_update(res, b));
+  }
+
+  if (! cs_lsolve(A->cs, VECTOR(*res))) {
+    IGRAPH_ERROR("Cannot perform lower triangular solve", IGRAPH_FAILURE);
+  }
+  
+  return 0;
+}
+
+int igraph_sparsemat_ltsolve(const igraph_sparsemat_t *A,
+			     const igraph_vector_t *b,
+			     igraph_vector_t *res) {
+  
+  if (A->cs->m != A->cs->n) {
+    IGRAPH_ERROR("Cannot perform transposed lower triangular solve",
+		 IGRAPH_NONSQUARE);
+  }
+  
+  if (res != b) {
+    IGRAPH_CHECK(igraph_vector_update(res,b));
+  }
+
+  if (!cs_ltsolve(A->cs, VECTOR(*res))) {
+    IGRAPH_ERROR("Cannot perform lower triangular solve", IGRAPH_FAILURE);
+  }
+  
+  return 0;
+}
+
+int igraph_sparsemat_usolve(const igraph_sparsemat_t *A,
+			    const igraph_vector_t *b,
+			    igraph_vector_t *res) {
+
+  if (A->cs->m != A->cs->n) {
+    IGRAPH_ERROR("Cannot perform upper triangular solve", IGRAPH_NONSQUARE);
+  }
+
+  if (res != b) {
+    IGRAPH_CHECK(igraph_vector_update(res, b));
+  }
+
+  if (! cs_usolve(A->cs, VECTOR(*res))) {
+    IGRAPH_ERROR("Cannot perform upper triangular solve", IGRAPH_FAILURE);
+  }
+  
+  return 0;
+}
+
+int igraph_sparsemat_utsolve(const igraph_sparsemat_t *A,
+			     const igraph_vector_t *b,
+			     igraph_vector_t *res) {
+  
+  if (A->cs->m != A->cs->n) {
+    IGRAPH_ERROR("Cannot perform transposed upper triangular solve",
+		 IGRAPH_NONSQUARE);
+  }
+
+  if (res != b) { 
+    IGRAPH_CHECK(igraph_vector_update(res,b));
+  }
+
+  if (!cs_utsolve(A->cs, VECTOR(*res))) {
+    IGRAPH_ERROR("Cannot perform transposed upper triangular solve", 
+		 IGRAPH_FAILURE);
+  }
+  
+  return 0;
+}
+
+int igraph_sparsemat_cholsol(const igraph_sparsemat_t *A,
+			     const igraph_vector_t *b,
+			     igraph_vector_t *res, 
+			     int order) {
+  
+  if (A->cs->m != A->cs->n) {
+    IGRAPH_ERROR("Cannot perform sparse symmetric solve",
+		 IGRAPH_NONSQUARE);
+  }
+
+  if (res != b) { 
+    IGRAPH_CHECK(igraph_vector_update(res,b));
+  }
+
+  if (! cs_cholsol(order, A->cs, VECTOR(*res))) {
+    IGRAPH_ERROR("Cannot perform sparse symmetric solve", IGRAPH_FAILURE);
+  }
+  
+  return 0;
+}
+
+int igraph_sprasemat_lusol(const igraph_sparsemat_t *A,
+			   const igraph_vector_t *b,
+			   igraph_vector_t *res,
+			   int order,
+			   igraph_real_t tol) {
+  
+  if (A->cs->m != A->cs->n) {
+    IGRAPH_ERROR("Cannot perform LU solve",
+		 IGRAPH_NONSQUARE);
+  }
+
+  if (res != b) { 
+    IGRAPH_CHECK(igraph_vector_update(res,b));
+  }
+
+  if (! cs_lusol(order, A->cs, VECTOR(*res), tol)) {
+    IGRAPH_ERROR("Cannot perform LU solve", IGRAPH_FAILURE);
+  }
+  
+  return 0;
+}
+

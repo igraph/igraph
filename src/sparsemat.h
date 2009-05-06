@@ -67,4 +67,27 @@ int igraph_sparsemat_gaxpy(const igraph_sparsemat_t *A,
 			   const igraph_vector_t *x,
 			   igraph_vector_t *res);
 
+int igraph_sparsemat_lsolve(const igraph_sparsemat_t *A,
+			    const igraph_vector_t *b,
+			    igraph_vector_t *res);
+int igraph_sparsemat_ltsolve(const igraph_sparsemat_t *A,
+			     const igraph_vector_t *b,
+			     igraph_vector_t *res);
+int igraph_sparsemat_usolve(const igraph_sparsemat_t *A,
+			    const igraph_vector_t *b,
+			    igraph_vector_t *res);
+int igraph_sparsemat_utsolve(const igraph_sparsemat_t *A,
+			     const igraph_vector_t *b,
+			     igraph_vector_t *res);
+
+int igraph_sparsemat_cholsol(const igraph_sparsemat_t *A,
+			     const igraph_vector_t *b,
+			     igraph_vector_t *res, 
+			     int order);
+
+int igraph_sprasemat_lusol(const igraph_sparsemat_t *A,
+			   const igraph_vector_t *b,
+			   igraph_vector_t *res,
+			   int order,
+			   igraph_real_t tol);
 #endif
