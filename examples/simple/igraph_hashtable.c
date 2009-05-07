@@ -22,6 +22,7 @@
 */
 
 #include <igraph.h>
+#include <igraph_types_internal.h>
 
 int main() {
 

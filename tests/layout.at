@@ -39,5 +39,5 @@ AT_CLEANUP
 
 AT_SETUP([Merging layouts (igraph_i_layout_merge):])
 AT_KEYWORDS([layout merge])
-AT_COMPILE_CHECK([simple/igraph_layout_merge.c])
+AT_COMPILE_CHECK([simple/igraph_layout_merge.c], [], [], [INTERNAL])
 AT_CLEANUP

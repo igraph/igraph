@@ -63,12 +63,12 @@ AT_CLEANUP
 
 AT_SETUP([Indexed heap (indheap_t): ])
 AT_KEYWORDS([indexed heap indheap_t])
-AT_COMPILE_CHECK([simple/indheap.c])
+AT_COMPILE_CHECK([simple/indheap.c], [], [], [INTERNAL])
 AT_CLEANUP
 
 AT_SETUP([Doubly indexed heap (d_indheap_t): ])
 AT_KEYWORDS([doubly indexed heap d_indheap_t])
-AT_COMPILE_CHECK([simple/d_indheap.c], [simple/d_indheap.out])
+AT_COMPILE_CHECK([simple/d_indheap.c], [simple/d_indheap.out], [], [INTERNAL])
 AT_CLEANUP
 
 AT_SETUP([String vector (igraph_strvector_t): ])
@@ -78,7 +78,8 @@ AT_CLEANUP
 
 AT_SETUP([Trie (igraph_trie_t): ])
 AT_KEYWORDS([trie igraph_trie_t])
-AT_COMPILE_CHECK([simple/igraph_trie.c], [simple/igraph_trie.out])
+AT_COMPILE_CHECK([simple/igraph_trie.c], [simple/igraph_trie.out], [], 
+		 [INTERNAL])
 AT_CLEANUP
 
 AT_SETUP([Partial Sum-Tree (igraph_psumtree_t): ])
@@ -93,20 +94,23 @@ AT_CLEANUP
 
 AT_SETUP([Hash table (string->string) (igraph_hashtable_t): ])
 AT_KEYWORDS([igraph_hashtable_t hash table])
-AT_COMPILE_CHECK([simple/igraph_hashtable.c], [simple/igraph_hashtable.out])
+AT_COMPILE_CHECK([simple/igraph_hashtable.c], [simple/igraph_hashtable.out],
+                 [], [INTERNAL])
 AT_CLEANUP
 
 AT_SETUP([Special heap for minimum cuts (igraph_i_cutheap_t): ])
 AT_KEYWORDS([heap minimum cut])
-AT_COMPILE_CHECK([simple/igraph_i_cutheap.c], [simple/igraph_i_cutheap.out])
+AT_COMPILE_CHECK([simple/igraph_i_cutheap.c], [simple/igraph_i_cutheap.out],
+                 [], [INTERNAL])
 AT_CLEANUP
 
 AT_SETUP([Set (igraph_set_t): ])
 AT_KEYWORDS([set igraph_set_t])
-AT_COMPILE_CHECK([simple/igraph_set.c], [simple/igraph_set.out])
+AT_COMPILE_CHECK([simple/igraph_set.c], [simple/igraph_set.out],
+                 [], [INTERNAL])
 AT_CLEANUP
 
 AT_SETUP([2-way heap (igraph_2wheap_t): ])
 AT_KEYWORDS([heap two-way 2-way igraph_2wheap_t])
-AT_COMPILE_CHECK([simple/2wheap.c])
+AT_COMPILE_CHECK([simple/2wheap.c], [], [], [INTERNAL])
 AT_CLEANUP
