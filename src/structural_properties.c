@@ -36,6 +36,7 @@
 #include "igraph_constructors.h"
 #include "igraph_conversion.h"
 #include "igraph_types_internal.h"
+#include "igraph_dqueue.h"
 #include "config.h"
 
 #include <string.h>

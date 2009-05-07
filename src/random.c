@@ -27,6 +27,8 @@
 
 #include <math.h>
 #include "igraph_math.h"
+#include "igraph_types.h"
+#include "igraph_vector.h"
 
 int igraph_rng_inited = 0;
 

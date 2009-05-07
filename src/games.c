@@ -30,6 +30,8 @@
 #include "igraph_constructors.h"
 #include "igraph_nongraph.h"
 #include "igraph_conversion.h"
+#include "igraph_psumtree.h"
+#include "igraph_dqueue.h"
 #include "config.h"
 
 #include <math.h>

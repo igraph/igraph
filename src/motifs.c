@@ -29,6 +29,7 @@
 #include "igraph_interface.h"
 #include "igraph_nongraph.h"
 #include "igraph_structural.h"
+#include "igraph_stack.h"
 #include "config.h"
 
 #include <string.h>

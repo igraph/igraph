@@ -35,6 +35,7 @@
 #endif
 
 #include "igraph_types.h"
+#include "igraph_vector.h"
 
 __BEGIN_DECLS
 

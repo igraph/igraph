@@ -36,6 +36,7 @@
 
 #include "igraph_constants.h"
 #include "igraph_types.h"
+#include "igraph_matrix.h"
 
 __BEGIN_DECLS
 

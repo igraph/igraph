@@ -31,6 +31,8 @@
 #include "igraph_interface.h"
 #include "igraph_interrupt.h"
 #include "igraph_components.h"
+#include "igraph_dqueue.h"
+#include "igraph_stack.h"
 #include "config.h"
 
 #include <string.h>

@@ -34,6 +34,12 @@
 # define __END_DECLS /* empty */
 #endif
 
+#include "igraph_constants.h"
+#include "igraph_types.h"
+#include "igraph_vector.h"
+#include "igraph_vector_ptr.h"
+#include "igraph_matrix.h"
+
 __BEGIN_DECLS
 
 int igraph_diameter(const igraph_t *graph, igraph_integer_t *res, 

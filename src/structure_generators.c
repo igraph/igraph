@@ -27,6 +27,7 @@
 #include "igraph_attributes.h"
 #include "igraph_adjlist.h"
 #include "igraph_interrupt.h"
+#include "igraph_dqueue.h"
 #include "config.h"
 
 #include <stdarg.h>

@@ -70,18 +70,6 @@ int igraph_finite(double x);
 #  define IGRAPH_NAN (igraph_i_fdiv(0.0, 0.0))
 #endif
 
-#include "igraph_vector.h"
-#include "igraph_matrix.h"
-#include "igraph_array.h"
-#include "igraph_dqueue.h"
-#include "igraph_stack.h"
-#include "igraph_heap.h"
-#include "igraph_vector_ptr.h"
-#include "igraph_spmatrix.h"
-#include "igraph_strvector.h"
-#include "igraph_psumtree.h"
-
 __END_DECLS
 
 #endif
-

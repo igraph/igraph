@@ -22,6 +22,7 @@
 */
 
 #include "igraph_types.h"
+#include "igraph_strvector.h"
 #include "igraph_memory.h"
 #include "igraph_random.h"
 #include "igraph_error.h"

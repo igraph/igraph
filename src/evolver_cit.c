@@ -25,6 +25,7 @@
 #include "igraph_memory.h"
 #include "igraph_random.h"
 #include "igraph_constructors.h"
+#include "igraph_psumtree.h"
 #include "config.h"
 
 #include <math.h>

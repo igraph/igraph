@@ -22,6 +22,8 @@
 */
 
 #include "igraph_types.h"
+#include "igraph_vector.h"
+#include "igraph_matrix.h"
 
 #ifndef ARPACK_H
 #define ARPACK_H

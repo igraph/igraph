@@ -34,8 +34,9 @@
 # define __END_DECLS /* empty */
 #endif
 
-__BEGIN_DECLS
+#include "igraph_vector.h"
 
+__BEGIN_DECLS
 
 typedef struct {
   igraph_vector_t v;

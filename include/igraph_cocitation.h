@@ -35,6 +35,7 @@
 #endif
 
 #include "igraph_types.h"
+#include "igraph_matrix.h"
 #include "igraph_datatype.h"
 #include "igraph_iterators.h"
 

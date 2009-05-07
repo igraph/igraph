@@ -22,6 +22,7 @@
 */
 
 #include "igraph_types.h"
+#include "igraph_dqueue.h"
 
 #define BASE_IGRAPH_REAL
 #include "igraph_pmt.h"

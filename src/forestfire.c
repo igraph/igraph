@@ -28,6 +28,7 @@
 #include "igraph_interrupt.h"
 #include "igraph_interface.h"
 #include "igraph_constructors.h"
+#include "igraph_dqueue.h"
 #include "config.h"
 
 typedef struct igraph_i_forest_fire_data_t {

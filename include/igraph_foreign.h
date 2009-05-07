@@ -36,6 +36,7 @@
 
 #include "igraph_datatype.h"
 #include "igraph_types.h"
+#include "igraph_strvector.h"
 
 #include <stdio.h>
 

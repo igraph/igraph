@@ -27,6 +27,9 @@
 #include "igraph_adjlist.h"
 #include "igraph_interrupt.h"
 #include "igraph_structural.h"
+#include "igraph_dqueue.h"
+#include "igraph_stack.h"
+#include "igraph_vector.h"
 #include "config.h"
 #include <string.h>
 #include <limits.h>
