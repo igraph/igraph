@@ -110,6 +110,12 @@ typedef int    igraph_bool_t;
 #include "igraph_pmt_off.h"
 #undef BASE_BOOL
 
+#define BASE_INT
+#include "igraph_pmt.h"
+#include "vector.h"
+#include "igraph_pmt_off.h"
+#undef BASE_INT
+
 /* These are for internal use only */
 int igraph_vector_order(const igraph_vector_t* v, const igraph_vector_t *v2,
 			igraph_vector_t* res, igraph_real_t maxval);

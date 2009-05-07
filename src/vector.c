@@ -48,6 +48,12 @@
 #include "igraph_pmt_off.h"
 #undef BASE_BOOL
 
+#define BASE_INT
+#include "igraph_pmt.h"
+#include "vector.pmt"
+#include "igraph_pmt_off.h"
+#undef BASE_INT
+
 int igraph_vector_order2(igraph_vector_t *v) {
 
   igraph_indheap_t heap;

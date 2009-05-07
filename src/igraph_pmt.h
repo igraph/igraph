@@ -74,6 +74,17 @@
 #define ZERO 0
 #define ONE 1
 
+#elif defined(BASE_INT)
+#define BASE int
+#define SHORT int
+#define ATOMIC int
+#define MULTIPLICITY 1
+#define IN_FORMAT "%d"
+#define OUT_FORMAT "%d"
+#define ATOMIC_IO int
+#define ZERO 0
+#define ONE 1
+
 #else
 #error unknown BASE_ directive
 #endif
