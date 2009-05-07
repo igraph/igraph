@@ -21,31 +21,12 @@
 
 */
 
-#ifndef RESTGAME_H
-#define RESTGAME_H
-
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
-__BEGIN_DECLS
+#ifndef IGRAPH_H
+#define IGRAPH_H
 
 #ifndef _GNU_SOURCE
 # define _GNU_SOURCE
 #endif
-
-#include "igraph_types.h"
-#include "igraph_error.h"
-#include "igraph_interrupt.h"
-#include "igraph_arpack.h"
-
-#include <stdio.h> 		/* FILE */
 
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
@@ -75,33 +56,6 @@ __BEGIN_DECLS
 #include "igraph_cocitation.h"
 #include "igraph_adjlist.h"
 #include "igraph_progress.h"
-
-/* -------------------------------------------------- */
-/* Eigenvectors and eigenvalues                       */
-/* -------------------------------------------------- */
-
-int igraph_eigen_tred2(const igraph_matrix_t *A,
-		       igraph_vector_t *D,
-		       igraph_vector_t *E,
-		       igraph_matrix_t *Z);
-
-int igraph_eigen_tql2(igraph_vector_t *D,
-		      igraph_vector_t *E,
-		      igraph_matrix_t *Z);
-
-int igraph_eigen_tred1(const igraph_matrix_t *A,
-		       igraph_vector_t *D,
-		       igraph_vector_t *E2);
-
-int igraph_eigen_tqlrat(igraph_vector_t *D,
-			igraph_vector_t *E2);
-
-int igraph_eigen_rs(const igraph_matrix_t *A,
-		    igraph_vector_t *values,
-		    igraph_matrix_t *vectors);
-
 #include "igraph_attributes.h"
 
-__END_DECLS
-  
 #endif
