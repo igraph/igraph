@@ -22,11 +22,15 @@
 
 */
 
-#include "igraph.h"
+#include "igraph_community.h"
 #include "igraph_memory.h"
 #include "igraph_random.h"
 #include "igraph_arpack.h"
 #include "igraph_arpack_internal.h"
+#include "igraph_adjlist.h"
+#include "igraph_interface.h"
+#include "igraph_interrupt.h"
+#include "igraph_components.h"
 #include "config.h"
 
 #include <string.h>

@@ -21,8 +21,11 @@
 
 */
 
-#include "igraph.h"
-#include "igraph_types.h"
+#include "igraph_conversion.h"
+#include "igraph_iterators.h"
+#include "igraph_interface.h"
+#include "igraph_attributes.h"
+#include "igraph_constructors.h"
 #include "config.h"
 
 /**

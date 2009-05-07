@@ -24,7 +24,6 @@
 #include "igraph_arpack.h"
 #include "igraph_arpack_internal.h"
 #include "igraph_memory.h"
-#include "igraph.h"
 
 #include <math.h>
 #include <stdio.h>

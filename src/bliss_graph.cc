@@ -27,6 +27,10 @@ Copyright (C) 2003-2006 Tommi Junttila
 #include "bliss_partition.hh"
 #include <limits.h>		// INT_MAX, etc
 
+#include "igraph_datatype.h"
+#include "igraph_interface.h"
+#include "igraph_topology.h"
+
 extern bool bliss_verbose;
 extern FILE *bliss_verbstr;
 

@@ -21,10 +21,12 @@
 
 */
 
-#include "igraph.h"
+#include "igraph_foreign.h"
 #include "config.h"
 #include <math.h>               /* isnan */
 #include "igraph_math.h"
+#include "igraph_attributes.h"
+#include "igraph_interface.h"
 
 #include <ctype.h>		/* isspace */
 #include <string.h>

@@ -21,8 +21,10 @@
 
 */
 
-#include "igraph.h"
+#include "igraph_visitor.h"
 #include "igraph_memory.h"
+#include "igraph_adjlist.h"
+#include "igraph_interface.h"
 #include "config.h"
 
 /**

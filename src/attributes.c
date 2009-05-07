@@ -23,7 +23,6 @@
 
 #include "igraph_attributes.h"
 #include "igraph_memory.h"
-#include "igraph.h"
 #include "config.h"
 
 int igraph_i_attribute_init(igraph_t *graph, void *attr) {

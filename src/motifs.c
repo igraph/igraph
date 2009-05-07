@@ -21,12 +21,30 @@
 
 */
 
-#include "igraph.h"
+#include "igraph_motifs.h"
 #include "igraph_memory.h"
 #include "igraph_random.h"
+#include "igraph_adjlist.h"
+#include "igraph_interrupt.h"
+#include "igraph_interface.h"
+#include "igraph_nongraph.h"
+#include "igraph_structural.h"
 #include "config.h"
 
 #include <string.h>
+
+extern unsigned int igraph_i_isoclass_3[];
+extern unsigned int igraph_i_isoclass_4[];
+extern unsigned int igraph_i_isoclass_3u[];
+extern unsigned int igraph_i_isoclass_4u[];
+extern unsigned int igraph_i_isoclass2_3[];
+extern unsigned int igraph_i_isoclass2_4[];
+extern unsigned int igraph_i_isoclass2_3u[];
+extern unsigned int igraph_i_isoclass2_4u[];
+extern unsigned int igraph_i_isoclass_3_idx[];
+extern unsigned int igraph_i_isoclass_4_idx[];
+extern unsigned int igraph_i_isoclass_3u_idx[];
+extern unsigned int igraph_i_isoclass_4u_idx[];
 
 /**
  * \function igraph_motifs_randesu

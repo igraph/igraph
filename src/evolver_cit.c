@@ -21,9 +21,10 @@
 
 */
 
-#include "igraph.h"
+#include "igraph_revolver.h"
 #include "igraph_memory.h"
 #include "igraph_random.h"
+#include "igraph_constructors.h"
 #include "config.h"
 
 #include <math.h>

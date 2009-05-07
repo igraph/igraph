@@ -3,7 +3,7 @@
 // position and density information
 
 #include "DensityGrid.h"
-#include "igraph.h"
+#include "igraph_layout.h"
 
 namespace drl {
 

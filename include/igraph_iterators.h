@@ -34,6 +34,8 @@
 # define __END_DECLS /* empty */
 #endif
 
+#include "igraph_constants.h"
+
 __BEGIN_DECLS
 
 /* -------------------------------------------------- */

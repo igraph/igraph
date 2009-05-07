@@ -21,9 +21,10 @@
 
 */
 
-#include "igraph.h"
+#include "igraph_iterators.h"
 #include "igraph_memory.h"
 #include "igraph_random.h"
+#include "igraph_interface.h"
 #include "config.h"
 
 #include <string.h>

@@ -24,8 +24,6 @@
 #ifndef REST_ATTRIBUTES_H
 #define REST_ATTRIBUTES_H
 
-#include "igraph.h"
-
 #undef __BEGIN_DECLS
 #undef __END_DECLS
 #ifdef __cplusplus
@@ -35,6 +33,10 @@
 # define __BEGIN_DECLS /* empty */
 # define __END_DECLS /* empty */
 #endif
+
+#include "igraph_datatype.h"
+#include "igraph_types.h"
+#include "igraph_iterators.h"
 
 __BEGIN_DECLS
 

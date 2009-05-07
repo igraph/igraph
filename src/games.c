@@ -21,9 +21,15 @@
 
 */
 
-#include "igraph.h"
+#include "igraph_interface.h"
+#include "igraph_games.h"
 #include "igraph_random.h"
 #include "igraph_memory.h"
+#include "igraph_interrupt.h"
+#include "igraph_attributes.h"
+#include "igraph_constructors.h"
+#include "igraph_nongraph.h"
+#include "igraph_conversion.h"
 #include "config.h"
 
 #include <math.h>

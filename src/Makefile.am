@@ -95,7 +95,7 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_foreign.h	../include/igraph_transitivity.h \
 		../include/igraph_games.h	../include/igraph_visitor.h   \
 		../include/igraph_interface.h	../include/igraph_adjlist.h   \
-		../include/igraph_progress.h
+		../include/igraph_progress.h	../include/igraph_constants.h
 
 libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     basic_query.c games.c cocitation.c iterators.c \
@@ -138,8 +138,8 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     DensityGrid_3d.cpp \
 			     foreign-dl-parser.y foreign-dl-lexer.l
 
-libigraph_la_CFLAGS        = -I$(top_srcdir)/include
-libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include
+libigraph_la_CFLAGS        = -I$(top_srcdir)/include -Wall
+libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -Wall
 libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(FLIBS) $(LAPACK_DLAMCH)
 

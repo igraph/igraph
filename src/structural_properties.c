@@ -21,10 +21,20 @@
 
 */
 
-#include "igraph.h"
+#include "igraph_structural.h"
+#include "igraph_transitivity.h"
+#include "igraph_paths.h"
 #include "igraph_math.h"
 #include "igraph_memory.h"
 #include "igraph_random.h"
+#include "igraph_adjlist.h"
+#include "igraph_interface.h"
+#include "igraph_progress.h"
+#include "igraph_interrupt.h"
+#include "igraph_centrality.h"
+#include "igraph_components.h"
+#include "igraph_constructors.h"
+#include "igraph_conversion.h"
 #include "config.h"
 
 #include <string.h>

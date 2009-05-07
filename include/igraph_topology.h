@@ -34,6 +34,10 @@
 # define __END_DECLS /* empty */
 #endif
 
+#include "igraph_constants.h"
+#include "igraph_datatype.h"
+#include "igraph_types.h"
+
 __BEGIN_DECLS
 
 int igraph_topological_sorting(const igraph_t *graph, igraph_vector_t *res,

@@ -34,6 +34,11 @@
 # define __END_DECLS /* empty */
 #endif
 
+#include "igraph_constants.h"
+#include "igraph_types.h"
+#include "igraph_datatype.h"
+#include "igraph_adjlist.h"
+
 __BEGIN_DECLS
 
 /* -------------------------------------------------- */
@@ -946,14 +951,6 @@ int igraph_revolver_error2_air(const igraph_t *graph,
 			       igraph_integer_t window,
 			       igraph_real_t *logprob,
 			       igraph_real_t *lognull);
-
-/* Should be moved to to types.h? */
-typedef struct igraph_lazy_adjedgelist_t {
-  const igraph_t *graph;
-  igraph_integer_t length;
-  igraph_vector_t **adjs;
-  igraph_neimode_t mode;
-} igraph_lazy_adjedgelist_t;
 
 /* Non-citation networks */
 

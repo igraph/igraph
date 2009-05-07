@@ -21,6 +21,7 @@
 #include "bliss_utils.hh"
 
 #include "igraph_types.h"
+#include "igraph_topology.h"
 
 #include <cstring>
 

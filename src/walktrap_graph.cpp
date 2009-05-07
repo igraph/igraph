@@ -32,6 +32,8 @@
 #include <cstring>		// strlen
 #include "walktrap_graph.h"
 
+#include "igraph_interface.h"
+
 using namespace std;
 
 

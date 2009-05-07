@@ -34,6 +34,10 @@
 # define __END_DECLS /* empty */
 #endif
 
+#include "igraph_constants.h"
+#include "igraph_types.h"
+#include "igraph_datatype.h"
+
 __BEGIN_DECLS
 
 typedef struct igraph_adjlist_t { 
@@ -138,6 +142,13 @@ void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al);
    (igraph_lazy_adjlist_get_real(al, no)))
 igraph_vector_t *igraph_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
 						igraph_integer_t no);
+
+typedef struct igraph_lazy_adjedgelist_t {
+  const igraph_t *graph;
+  igraph_integer_t length;
+  igraph_vector_t **adjs;
+  igraph_neimode_t mode;
+} igraph_lazy_adjedgelist_t;
 
 int igraph_lazy_adjedgelist_init(const igraph_t *graph,
 				   igraph_lazy_adjedgelist_t *al,

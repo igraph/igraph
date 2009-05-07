@@ -21,8 +21,10 @@
 
 */
 
-#include "igraph.h"
+#include "igraph_structural.h"
 #include "igraph_error.h"
+#include "igraph_adjlist.h"
+#include "igraph_interface.h"
 
 /**
  * \function igraph_maximum_cardinality_search

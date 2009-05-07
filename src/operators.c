@@ -21,9 +21,12 @@
 
 */
 
-#include "igraph.h"
+#include "igraph_operators.h"
 #include "igraph_error.h"
 #include "igraph_memory.h"
+#include "igraph_interrupt.h"
+#include "igraph_interface.h"
+#include "igraph_constructors.h"
 #include "config.h"
 
 /**

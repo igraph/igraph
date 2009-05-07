@@ -21,8 +21,12 @@
 
 */
 
-#include "igraph.h"
+#include "igraph_components.h"
 #include "igraph_memory.h"
+#include "igraph_interface.h"
+#include "igraph_adjlist.h"
+#include "igraph_interrupt.h"
+#include "igraph_structural.h"
 #include "config.h"
 #include <string.h>
 #include <limits.h>

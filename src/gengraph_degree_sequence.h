@@ -1,7 +1,8 @@
 #ifndef DEGREE_SEQUENCE_H
 #define DEGREE_SEQUENCE_H
 
-#include "igraph.h"
+#include "igraph_types.h"
+#include "igraph_datatype.h"
 
 namespace gengraph {
 

@@ -21,8 +21,13 @@
 
 */
 
-#include "igraph.h"
+#include "igraph_topology.h"
 #include "igraph_memory.h"
+#include "igraph_adjlist.h"
+#include "igraph_interface.h"
+#include "igraph_interrupt.h"
+#include "igraph_constructors.h"
+#include "igraph_conversion.h"
 #include "config.h"
 
 unsigned int igraph_i_isoclass_3[] = {  0, 1, 1, 3, 1, 5, 6, 7,

@@ -21,7 +21,7 @@
 
 */
 
-#include "igraph.h"
+#include "igraph_constructors.h"
 #include "atlas-edges.h"
 #include "config.h"
 

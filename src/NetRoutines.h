@@ -45,7 +45,8 @@
 #define NETROUTINES_H
 
 #include "NetDataTypes.h"
-#include "igraph.h"
+#include "igraph_types.h"
+#include "igraph_datatype.h"
 
 int igraph_i_read_network(const igraph_t *graph,
 			  const igraph_vector_t *weights,

@@ -21,9 +21,13 @@
 
 */
 
-#include "igraph.h"
+#include "igraph_games.h"
 #include "igraph_memory.h"
 #include "igraph_random.h"
+#include "igraph_progress.h"
+#include "igraph_interrupt.h"
+#include "igraph_interface.h"
+#include "igraph_constructors.h"
 #include "config.h"
 
 typedef struct igraph_i_forest_fire_data_t {

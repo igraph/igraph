@@ -34,6 +34,11 @@
 # define __END_DECLS /* empty */
 #endif
 
+#include "igraph_datatype.h"
+#include "igraph_types.h"
+
+#include <stdio.h>
+
 __BEGIN_DECLS
 
 /* -------------------------------------------------- */

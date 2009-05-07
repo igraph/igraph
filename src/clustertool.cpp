@@ -54,11 +54,13 @@
 #include "NetRoutines.h"
 #include "pottsmodel_2.h"
 
-#include "igraph.h"
+#include "igraph_community.h"
 #include "igraph_error.h"
 #include "igraph_random.h"
 #include "igraph_math.h"
-
+#include "igraph_interface.h"
+#include "igraph_components.h"
+#include "igraph_interrupt.h"
 
 int igraph_i_community_spinglass_orig(const igraph_t *graph,
 				      const igraph_vector_t *weights,
