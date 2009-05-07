@@ -4371,9 +4371,9 @@ PyObject *igraphmodule_Graph_vertex_connectivity(igraphmodule_GraphObject *self,
 	return NULL;
   }
 
-  if (res == IGRAPH_INFINITY) return Py_BuildValue("d", (double)res);
+  if (IGRAPH_FINITE(res)) return Py_BuildValue("d", (double)res);
   
-  result = res;
+  result = (long)res;
   return Py_BuildValue("l", result);
 }
 

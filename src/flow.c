@@ -25,6 +25,7 @@
 #include "error.h"
 #include "memory.h"
 #include "config.h"
+#include "igraph_math.h"
 
 #include <limits.h>
 #include <stdio.h>
