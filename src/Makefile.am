@@ -80,7 +80,22 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_stack.h 	../include/igraph_heap.h      \
 		../include/igraph_arpack.h 	../include/igraph_interrupt.h \
 		../include/igraph_attributes.h 	../include/igraph_error.h     \
-		../include/igraph_pmt.h 	../include/igraph_pmt_off.h 
+		../include/igraph_pmt.h 	../include/igraph_pmt_off.h   \
+		../include/igraph_adjlist.h	../include/igraph_iterators.h \
+		../include/igraph_bipartite.h	../include/igraph_layout.h    \
+		../include/igraph_centrality.h	../include/igraph_motifs.h    \
+		../include/igraph_cliques.h	../include/igraph_neighborhood.h \
+		../include/igraph_cocitation.h	../include/igraph_nongraph.h  \
+		../include/igraph_community.h	../include/igraph_operators.h \
+		../include/igraph_components.h	../include/igraph_paths.h     \
+		../include/igraph_constructors.h ../include/igraph_progress.h \
+		../include/igraph_conversion.h	../include/igraph_revolver.h  \
+		../include/igraph_datatype.h	../include/igraph_structural.h\
+		../include/igraph_flow.h	../include/igraph_topology.h  \
+		../include/igraph_foreign.h	../include/igraph_transitivity.h \
+		../include/igraph_games.h	../include/igraph_visitor.h   \
+		../include/igraph_interface.h	../include/igraph_adjlist.h   \
+		../include/igraph_progress.h
 
 libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     basic_query.c games.c cocitation.c iterators.c \
