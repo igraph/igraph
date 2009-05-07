@@ -53,6 +53,7 @@ extern int igraph_ncol_yyleng;
 char *igraph_i_ncol_errmsg=0;
 int igraph_ncol_yyerror(char *s);
 #include "igraph_types.h" 
+#include "igraph_types_internal.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "config.h"

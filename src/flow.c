@@ -31,6 +31,7 @@
 #include "igraph_constructors.h"
 #include "igraph_structural.h"
 #include "igraph_components.h"
+#include "igraph_types_internal.h"
 #include "config.h"
 
 #include <limits.h>

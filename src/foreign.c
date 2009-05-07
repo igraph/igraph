@@ -30,6 +30,7 @@
 #include "igraph_interface.h"
 #include "igraph_interrupt.h"
 #include "igraph_constructors.h"
+#include "igraph_types_internal.h"
 
 #include <ctype.h>		/* isspace */
 #include <string.h>

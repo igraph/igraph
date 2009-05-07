@@ -34,6 +34,7 @@
 #include "igraph_visitor.h"
 #include "igraph_topology.h"
 #include "igraph_components.h"
+#include "igraph_types_internal.h"
 #include "config.h"
 #include <math.h>
 #include "igraph_math.h"

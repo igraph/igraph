@@ -25,6 +25,7 @@
 #include "igraph_types.h"
 #include "igraph_memory.h"
 #include "igraph_interrupt.h"
+#include "igraph_types_internal.h"
 #include "config.h"
 #include <math.h>
 #include <stdarg.h>

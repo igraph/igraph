@@ -1,3 +1,4 @@
+/* -*- mode: C -*-  */
 /* 
    IGraph library.
    Copyright (C) 2009  Gabor Csardi <csardi@rmki.kfki.hu>
@@ -20,18 +21,37 @@
 
 */
 
-#include "igraph_types.h"
-#include "igraph_types_internal.h"
+#ifndef IGRAPH_PSUMTREE_H
+#define IGRAPH_PSUMTREE_H
 
-typedef enum { IGRAPH_DL_MATRIX, 
-	       IGRAPH_DL_EDGELIST1, IGRAPH_DL_NODELIST1 } igraph_i_dl_type_t;
+#undef __BEGIN_DECLS
+#undef __END_DECLS
+#ifdef __cplusplus
+# define __BEGIN_DECLS extern "C" {
+# define __END_DECLS }
+#else
+# define __BEGIN_DECLS /* empty */
+# define __END_DECLS /* empty */
+#endif
+
+__BEGIN_DECLS
+
 
 typedef struct {
-  long int n;
-  long int from, to;
-  igraph_vector_t edges;
-  igraph_vector_t weights;
-  igraph_strvector_t labels;
-  igraph_trie_t trie;
-  igraph_i_dl_type_t type;
-} igraph_i_dl_parsedata_t;
+  igraph_vector_t v;
+  long int size;
+  long int offset;
+} igraph_psumtree_t;
+int igraph_psumtree_init(igraph_psumtree_t *t, long int size);
+void igraph_psumtree_destroy(igraph_psumtree_t *t);
+igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, long int idx);
+long int igraph_psumtree_size(const igraph_psumtree_t *t);
+int igraph_psumtree_search(const igraph_psumtree_t *t, long int *idx,
+			   igraph_real_t elem);
+int igraph_psumtree_update(igraph_psumtree_t *t, long int idx, 
+			   igraph_real_t new_value);
+igraph_real_t igraph_psumtree_sum(const igraph_psumtree_t *t);
+
+__END_DECLS
+
+#endif

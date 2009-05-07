@@ -71,7 +71,8 @@ HEADERS_PRIVATE = atlas-edges.h \
 		igraph_math.h \
 		drl_graph_3d.h		drl_layout_3d.h \
 		drl_Node_3d.h 		DensityGrid_3d.h \
-		vector.pmt matrix.pmt stack.pmt dqueue.pmt heap.pmt array.pmt 
+		vector.pmt matrix.pmt stack.pmt dqueue.pmt heap.pmt array.pmt \
+		igraph_types_internal.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
@@ -95,7 +96,13 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_foreign.h	../include/igraph_transitivity.h \
 		../include/igraph_games.h	../include/igraph_visitor.h   \
 		../include/igraph_interface.h	../include/igraph_adjlist.h   \
-		../include/igraph_progress.h	../include/igraph_constants.h
+		../include/igraph_progress.h	../include/igraph_constants.h \
+		../include/igraph_vector_pmt.h	../include/igraph_matrix_pmt.h\
+		../include/igraph_array_pmt.h	../include/igraph_dqueue_pmt.h\
+		../include/igraph_stack_pmt.h	../include/igraph_heap_pmt.h  \
+		../include/igraph_vector_ptr.h	../include/igraph_spmatrix.h  \
+		../include/igraph_strvector.h	../include/igraph_psumtree.h
+
 
 libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     basic_query.c games.c cocitation.c iterators.c \

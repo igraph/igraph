@@ -27,6 +27,7 @@
 #include "igraph_math.h"
 #include "igraph_attributes.h"
 #include "igraph_interface.h"
+#include "igraph_types_internal.h"
 
 #include <ctype.h>		/* isspace */
 #include <string.h>

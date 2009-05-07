@@ -46,6 +46,7 @@
 
 #include "config.h"
 #include "igraph_math.h"
+#include "igraph_types_internal.h"
 #include "foreign-dl-header.h"
 #include "foreign-dl-parser.h"
 #include <stdio.h>

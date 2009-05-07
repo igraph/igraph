@@ -28,6 +28,7 @@
 #include "igraph_interface.h"
 #include "igraph_progress.h"
 #include "igraph_interrupt.h"
+#include "igraph_types_internal.h"
 #include "config.h"
 #include <math.h>
 #include <string.h>    /* memset */

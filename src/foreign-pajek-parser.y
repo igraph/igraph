@@ -47,6 +47,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "igraph_types.h"
+#include "igraph_types_internal.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "igraph_attributes.h"
