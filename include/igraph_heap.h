@@ -1,7 +1,7 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
+   Copyright (C) 2009  Gabor Csardi <csardi@rmki.kfki.hu>
    MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
    
    This program is free software; you can redistribute it and/or modify
@@ -21,25 +21,71 @@
 
 */
 
-typedef struct TYPE(igraph_heap) {
-  BASE* stor_begin;
-  BASE* stor_end;
-  BASE* end;
-  int destroy;
-} TYPE(igraph_heap);
+#ifndef IGRAPH_HEAP_H
+#define IGRAPH_HEAP_H
 
-int FUNCTION(igraph_heap,init)(TYPE(igraph_heap)* h, long int size);
-int FUNCTION(igraph_heap,init_array)(TYPE(igraph_heap) *t, BASE* data, long int len);
-void FUNCTION(igraph_heap,destroy)(TYPE(igraph_heap)* h);
-igraph_bool_t FUNCTION(igraph_heap,empty)(TYPE(igraph_heap)* h);
-int FUNCTION(igraph_heap,push)(TYPE(igraph_heap)* h, BASE elem);
-BASE FUNCTION(igraph_heap,top)(TYPE(igraph_heap)* h);
-BASE FUNCTION(igraph_heap,delete_top)(TYPE(igraph_heap)* h);
-long int FUNCTION(igraph_heap,size)(TYPE(igraph_heap)* h);
-int FUNCTION(igraph_heap,reserve)(TYPE(igraph_heap)* h, long int size);
+#undef __BEGIN_DECLS
+#undef __END_DECLS
+#ifdef __cplusplus
+# define __BEGIN_DECLS extern "C" {
+# define __END_DECLS }
+#else
+# define __BEGIN_DECLS /* empty */
+# define __END_DECLS /* empty */
+#endif
 
-void FUNCTION(igraph_heap,i_build)(BASE* arr, long int size, long int head);
-void FUNCTION(igraph_heap,i_shift_up)(BASE* arr, long int size, long int elem);
-void FUNCTION(igraph_heap,i_sink)(BASE* arr, long int size, long int head);
-void FUNCTION(igraph_heap,i_switch)(BASE* arr, long int e1, long int e2);
+__BEGIN_DECLS
 
+/* -------------------------------------------------- */
+/* Heap                                               */
+/* -------------------------------------------------- */
+
+/**
+ * Heap data type.
+ * \ingroup internal
+ */
+
+#define BASE_IGRAPH_REAL
+#define HEAP_TYPE_MAX
+#include "igraph_pmt.h"
+#include "igraph_heap_pmt.h"
+#include "igraph_pmt_off.h"
+#undef HEAP_TYPE_MAX
+#define HEAP_TYPE_MIN
+#include "igraph_pmt.h"
+#include "igraph_heap_pmt.h"
+#include "igraph_pmt_off.h"
+#undef HEAP_TYPE_MIN
+#undef BASE_IGRAPH_REAL
+
+#define BASE_LONG
+#define HEAP_TYPE_MAX
+#include "igraph_pmt.h"
+#include "igraph_heap_pmt.h"
+#include "igraph_pmt_off.h"
+#undef HEAP_TYPE_MAX
+#define HEAP_TYPE_MIN
+#include "igraph_pmt.h"
+#include "igraph_heap_pmt.h"
+#include "igraph_pmt_off.h"
+#undef HEAP_TYPE_MIN
+#undef BASE_LONG
+
+#define BASE_CHAR
+#define HEAP_TYPE_MAX
+#include "igraph_pmt.h"
+#include "igraph_heap_pmt.h"
+#include "igraph_pmt_off.h"
+#undef HEAP_TYPE_MAX
+#define HEAP_TYPE_MIN
+#include "igraph_pmt.h"
+#include "igraph_heap_pmt.h"
+#include "igraph_pmt_off.h"
+#undef HEAP_TYPE_MIN
+#undef BASE_CHAR
+
+#define IGRAPH_HEAP_NULL { 0,0,0 }
+
+__END_DECLS
+
+#endif

@@ -1,7 +1,7 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
+   Copyright (C) 2009  Gabor Csardi <csardi@rmki.kfki.hu>
    MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
    
    This program is free software; you can redistribute it and/or modify
@@ -21,23 +21,51 @@
 
 */
 
-/**
- * Stack data type.
- * \ingroup internal
- */
+#ifndef IGRAPH_STACK_H
+#define IGRAPH_STACK_H
 
-typedef struct TYPE(igraph_stack) {
-  BASE* stor_begin;
-  BASE* stor_end;
-  BASE* end;
-} TYPE(igraph_stack);
+#undef __BEGIN_DECLS
+#undef __END_DECLS
+#ifdef __cplusplus
+# define __BEGIN_DECLS extern "C" {
+# define __END_DECLS }
+#else
+# define __BEGIN_DECLS /* empty */
+# define __END_DECLS /* empty */
+#endif
 
-int FUNCTION(igraph_stack,init)(TYPE(igraph_stack)* s, long int size);
-void FUNCTION(igraph_stack,destroy)(TYPE(igraph_stack)* s);
-int FUNCTION(igraph_stack,reserve)(TYPE(igraph_stack)* s, long int size);
-igraph_bool_t FUNCTION(igraph_stack,empty)(TYPE(igraph_stack)* s);
-long int FUNCTION(igraph_stack,size)(TYPE(igraph_stack)* s);
-void FUNCTION(igraph_stack,clear)(TYPE(igraph_stack)* s);
-int FUNCTION(igraph_stack,push)(TYPE(igraph_stack)* s, BASE elem);
-BASE FUNCTION(igraph_stack,pop)(TYPE(igraph_stack)* s);
-BASE FUNCTION(igraph_stack,top)(const TYPE(igraph_stack)* s);
+__BEGIN_DECLS
+
+/* -------------------------------------------------- */
+/* Plain stack                                        */
+/* -------------------------------------------------- */
+
+#define BASE_IGRAPH_REAL
+#include "igraph_pmt.h"
+#include "igraph_stack_pmt.h"
+#include "igraph_pmt_off.h"
+#undef BASE_IGRAPH_REAL
+
+#define BASE_LONG
+#include "igraph_pmt.h"
+#include "igraph_stack_pmt.h"
+#include "igraph_pmt_off.h"
+#undef BASE_LONG
+
+#define BASE_CHAR
+#include "igraph_pmt.h"
+#include "igraph_stack_pmt.h"
+#include "igraph_pmt_off.h"
+#undef BASE_CHAR
+
+#define BASE_BOOL
+#include "igraph_pmt.h"
+#include "igraph_stack_pmt.h"
+#include "igraph_pmt_off.h"
+#undef BASE_BOOL
+
+#define IGRAPH_STACK_NULL { 0,0,0 }
+
+__END_DECLS
+
+#endif

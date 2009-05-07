@@ -1,7 +1,7 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
+   Copyright (C) 2009  Gabor Csardi <csardi@rmki.kfki.hu>
    MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
    
    This program is free software; you can redistribute it and/or modify
@@ -21,31 +21,49 @@
 
 */
 
-typedef struct TYPE(igraph_array3) {
-  TYPE(igraph_vector) data;
-  long int n1, n2, n3, n1n2;
-} TYPE(igraph_array3);
+#ifndef IGRAPH_ARRAY_H
+#define IGRAPH_ARRAY_H
 
-#ifndef IGRAPH_ARRAY3_INIT_FINALLY
-#define IGRAPH_ARRAY3_INIT_FINALLY(a, n1, n2, n3) \
-  do { IGRAPH_CHECK(igraph_array3_init(a, n1, n2, n3)); \
-  IGRAPH_FINALLY(igraph_array3_destroy, a); } while (0)
+#undef __BEGIN_DECLS
+#undef __END_DECLS
+#ifdef __cplusplus
+# define __BEGIN_DECLS extern "C" {
+# define __END_DECLS }
+#else
+# define __BEGIN_DECLS /* empty */
+# define __END_DECLS /* empty */
 #endif
 
-#ifndef ARRAY3
-#define ARRAY3(m,i,j,k) ((m).data.stor_begin[(m).n1n2*(k)+(m).n1*(j)+(i)])
-#endif
+__BEGIN_DECLS
 
-int FUNCTION(igraph_array3,init)(TYPE(igraph_array3) *a, long int n1, long int n2, 
-				 long int n3);
-void FUNCTION(igraph_array3,destroy)(TYPE(igraph_array3) *a);
-long int FUNCTION(igraph_array3,size)(const TYPE(igraph_array3) *a);
-long int FUNCTION(igraph_array3,n)(const TYPE(igraph_array3) *a, long int idx);
-int FUNCTION(igraph_array3,resize)(TYPE(igraph_array3) *a, long int n1, long int n2, 
-				   long int n3);
-void FUNCTION(igraph_array3,null)(TYPE(igraph_array3) *a);
-BASE FUNCTION(igraph_array3,sum)(const TYPE(igraph_array3) *a);
-void FUNCTION(igraph_array3,scale)(TYPE(igraph_array3) *a, BASE by);
-void FUNCTION(igraph_array3,fill)(TYPE(igraph_array3) *a, BASE e);
-int FUNCTION(igraph_array3,update)(TYPE(igraph_array3) *to, 
-				   const TYPE(igraph_array3) *from);
+/* -------------------------------------------------- */
+/* 3D array                                           */
+/* -------------------------------------------------- */
+
+#define BASE_IGRAPH_REAL
+#include "igraph_pmt.h"
+#include "igraph_array_pmt.h"
+#include "igraph_pmt_off.h"
+#undef BASE_IGRAPH_REAL
+
+#define BASE_LONG
+#include "igraph_pmt.h"
+#include "igraph_array_pmt.h"
+#include "igraph_pmt_off.h"
+#undef BASE_LONG
+
+#define BASE_CHAR
+#include "igraph_pmt.h"
+#include "igraph_array_pmt.h"
+#include "igraph_pmt_off.h"
+#undef BASE_CHAR
+
+#define BASE_BOOL
+#include "igraph_pmt.h"
+#include "igraph_array_pmt.h"
+#include "igraph_pmt_off.h"
+#undef BASE_BOOL
+
+__END_DECLS
+
+#endif

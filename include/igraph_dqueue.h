@@ -1,7 +1,7 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
+   Copyright (C) 2009  Gabor Csardi <csardi@rmki.kfki.hu>
    MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
    
    This program is free software; you can redistribute it and/or modify
@@ -21,26 +21,54 @@
 
 */
 
-/**
- * Double ended queue data type.
- * \ingroup internal
- */
+#ifndef IGRAPH_DQUEUE_H
+#define IGRAPH_DQUEUE_H
 
-typedef struct TYPE(igraph_dqueue) {
-  BASE *begin;
-  BASE *end;
-  BASE *stor_begin;
-  BASE *stor_end;
-} TYPE(igraph_dqueue);
+#undef __BEGIN_DECLS
+#undef __END_DECLS
+#ifdef __cplusplus
+# define __BEGIN_DECLS extern "C" {
+# define __END_DECLS }
+#else
+# define __BEGIN_DECLS /* empty */
+# define __END_DECLS /* empty */
+#endif
 
-int FUNCTION(igraph_dqueue,init)    (TYPE(igraph_dqueue)* q, long int size);
-void FUNCTION(igraph_dqueue,destroy) (TYPE(igraph_dqueue)* q);
-igraph_bool_t FUNCTION(igraph_dqueue,empty)   (TYPE(igraph_dqueue)* q);
-void FUNCTION(igraph_dqueue,clear)   (TYPE(igraph_dqueue)* q);
-igraph_bool_t FUNCTION(igraph_dqueue,full)    (TYPE(igraph_dqueue)* q);
-long int FUNCTION(igraph_dqueue,size)    (TYPE(igraph_dqueue)* q);
-BASE FUNCTION(igraph_dqueue,pop)     (TYPE(igraph_dqueue)* q);
-BASE FUNCTION(igraph_dqueue,pop_back)(TYPE(igraph_dqueue)* q);
-BASE FUNCTION(igraph_dqueue,head)    (TYPE(igraph_dqueue)* q);
-BASE FUNCTION(igraph_dqueue,back)    (TYPE(igraph_dqueue)* q);
-int FUNCTION(igraph_dqueue,push)    (TYPE(igraph_dqueue)* q, BASE elem);
+__BEGIN_DECLS
+
+/* -------------------------------------------------- */
+/* double ended queue, very useful                    */
+/* -------------------------------------------------- */
+
+#define BASE_IGRAPH_REAL
+#include "igraph_pmt.h"
+#include "igraph_dqueue_pmt.h"
+#include "igraph_pmt_off.h"
+#undef BASE_IGRAPH_REAL
+
+#define BASE_LONG
+#include "igraph_pmt.h"
+#include "igraph_dqueue_pmt.h"
+#include "igraph_pmt_off.h"
+#undef BASE_LONG
+
+#define BASE_CHAR
+#include "igraph_pmt.h"
+#include "igraph_dqueue_pmt.h"
+#include "igraph_pmt_off.h"
+#undef BASE_CHAR
+
+#define BASE_BOOL
+#include "igraph_pmt.h"
+#include "igraph_dqueue_pmt.h"
+#include "igraph_pmt_off.h"
+#undef BASE_BOOL
+
+#define IGRAPH_DQUEUE_NULL { 0,0,0,0 }
+#define IGRAPH_DQUEUE_INIT_FINALLY(v, size) \
+  do { IGRAPH_CHECK(igraph_dqueue_init(v, size)); \
+  IGRAPH_FINALLY(igraph_dqueue_destroy, v); } while (0)
+
+__END_DECLS
+
+#endif
