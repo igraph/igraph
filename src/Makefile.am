@@ -22,7 +22,7 @@ if INTERNAL_LAPACK
         lapack/dlasy2.c  lapack/dlarfx.c 
   noinst_LTLIBRARIES  = libdlamch.la
   libdlamch_la_SOURCES = lapack/dlamch.c
-  libdlamch_la_CFLAGS = $(FLOATSTORE)
+  libdlamch_la_CFLAGS = $(FLOATSTORE) -I$(top_srcdir)/include
   LAPACK_DLAMCH = libdlamch.la
 else 
   LAPACK = lapack/xerbla.c
@@ -100,21 +100,26 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     DensityGrid_3d.cpp \
 			     foreign-dl-parser.y foreign-dl-lexer.l
 
-libigraph_la_CFLAGS        =
-libigraph_la_CXXFLAGS	   =
+libigraph_la_CFLAGS        = -I$(top_srcdir)/include
+libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include
 libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(FLIBS) $(LAPACK_DLAMCH)
 
 includedir = $(prefix)/include/igraph
-include_HEADERS = igraph.h igraph_types.h igraph_attributes.h igraph_error.h igraph_interrupt.h \
-		  NetDataTypes.h NetRoutines.h pottsmodel_2.h \
-		  igraph_pmt.h igraph_pmt_off.h igraph_vector.h igraph_gml_tree.h \
-		  vector.pmt walktrap_graph.h walktrap_communities.h \
-		  walktrap_heap.h igraph_matrix.h matrix.pmt igraph_stack.h stack.pmt \
-		  dqueue.pmt igraph_dqueue.h heap.pmt igraph_heap.h igraph_arpack.h array.pmt \
-		  igraph_array.h igraph_arpack_internal.h igraph_f2c.h igraph_math.h
-		  drl_graph_3d.h drl_layout_3d.h drl_Node_3d.h \
-		  DensityGrid_3d.h
-
+include_HEADERS = NetDataTypes.h NetRoutines.h pottsmodel_2.h \
+		igraph_gml_tree.h \
+		vector.pmt walktrap_graph.h walktrap_communities.h \
+		walktrap_heap.h matrix.pmt stack.pmt \
+		dqueue.pmt heap.pmt array.pmt \
+		igraph_arpack_internal.h igraph_f2c.h igraph_math.h
+		drl_graph_3d.h drl_layout_3d.h drl_Node_3d.h \
+		DensityGrid_3d.h \
+		../include/igraph_arpack.h	../include/igraph_interrupt.h \
+		../include/igraph_array.h	../include/igraph_matrix.h    \
+		../include/igraph_attributes.h	../include/igraph_pmt.h       \
+		../include/igraph_dqueue.h	../include/igraph_pmt_off.h   \
+		../include/igraph_error.h	../include/igraph_stack.h     \
+		../include/igraph.h		../include/igraph_types.h     \
+		../include/igraph_heap.h	../include/igraph_vector.h
 
 MAINTAINERCLEANFILES = Makefile.in foreign-lgl-parser.h foreign-ncol-parser.h
