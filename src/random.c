@@ -21,8 +21,8 @@
 
 */
 
-#include "random.h"
-#include "error.h"
+#include "igraph_random.h"
+#include "igraph_error.h"
 #include "config.h"
 
 #include <math.h>

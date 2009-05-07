@@ -23,10 +23,10 @@
 */
 
 #include "igraph.h"
-#include "memory.h"
-#include "random.h"
-#include "arpack.h"
-#include "arpack_internal.h"
+#include "igraph_memory.h"
+#include "igraph_random.h"
+#include "igraph_arpack.h"
+#include "igraph_arpack_internal.h"
 #include "config.h"
 
 #include <string.h>

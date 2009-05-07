@@ -22,7 +22,7 @@
 */
 
 #include "igraph.h"
-#include "attributes.h"
+#include "igraph_attributes.h"
 
 /**
  * \section about_bipartite Bipartite networks in igraph

@@ -21,7 +21,7 @@
 
 */
 
-#include "types.h"
+#include "igraph_types.h"
 
 #ifndef ARPACK_H
 #define ARPACK_H

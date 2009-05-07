@@ -24,8 +24,8 @@
 #include "igraph.h"
 #include "config.h"
 #include "igraph_math.h"
-#include "gml_tree.h"
-#include "memory.h"
+#include "igraph_gml_tree.h"
+#include "igraph_memory.h"
 
 #include <ctype.h>		/* isspace */
 #include <string.h>

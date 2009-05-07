@@ -22,7 +22,7 @@
 */
 
 #include "igraph.h"
-#include "error.h"
+#include "igraph_error.h"
 
 /**
  * \function igraph_maximum_cardinality_search

@@ -21,9 +21,9 @@
 
 */
 
-#include "memory.h"
-#include "random.h"
-#include "error.h"
+#include "igraph_memory.h"
+#include "igraph_random.h"
+#include "igraph_error.h"
 
 #include <assert.h>
 #include <string.h> 		/* memcpy & co. */

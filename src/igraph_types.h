@@ -40,7 +40,7 @@ __BEGIN_DECLS
 # define _GNU_SOURCE
 #endif
 
-#include "error.h"
+#include "igraph_error.h"
 #include <stddef.h>
 #include <math.h>
 #include <stdio.h>
@@ -55,25 +55,25 @@ typedef int    igraph_bool_t;
 
 #define BASE_IGRAPH_REAL
 #include "igraph_pmt.h"
-#include "dqueue.h"
+#include "igraph_dqueue.h"
 #include "igraph_pmt_off.h"
 #undef BASE_IGRAPH_REAL
 
 #define BASE_LONG
 #include "igraph_pmt.h"
-#include "dqueue.h"
+#include "igraph_dqueue.h"
 #include "igraph_pmt_off.h"
 #undef BASE_LONG
 
 #define BASE_CHAR
 #include "igraph_pmt.h"
-#include "dqueue.h"
+#include "igraph_dqueue.h"
 #include "igraph_pmt_off.h"
 #undef BASE_CHAR
 
 #define BASE_BOOL
 #include "igraph_pmt.h"
-#include "dqueue.h"
+#include "igraph_dqueue.h"
 #include "igraph_pmt_off.h"
 #undef BASE_BOOL
 
@@ -88,25 +88,25 @@ typedef int    igraph_bool_t;
 
 #define BASE_IGRAPH_REAL
 #include "igraph_pmt.h"
-#include "vector.h"
+#include "igraph_vector.h"
 #include "igraph_pmt_off.h"
 #undef BASE_IGRAPH_REAL
 
 #define BASE_LONG
 #include "igraph_pmt.h"
-#include "vector.h"
+#include "igraph_vector.h"
 #include "igraph_pmt_off.h"
 #undef BASE_LONG
 
 #define BASE_CHAR
 #include "igraph_pmt.h"
-#include "vector.h"
+#include "igraph_vector.h"
 #include "igraph_pmt_off.h"
 #undef BASE_CHAR
 
 #define BASE_BOOL
 #include "igraph_pmt.h"
-#include "vector.h"
+#include "igraph_vector.h"
 #include "igraph_pmt_off.h"
 #undef BASE_BOOL
 
@@ -125,25 +125,25 @@ int igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
 
 #define BASE_IGRAPH_REAL
 #include "igraph_pmt.h"
-#include "matrix.h"
+#include "igraph_matrix.h"
 #include "igraph_pmt_off.h"
 #undef BASE_IGRAPH_REAL
 
 #define BASE_LONG
 #include "igraph_pmt.h"
-#include "matrix.h"
+#include "igraph_matrix.h"
 #include "igraph_pmt_off.h"
 #undef BASE_LONG
 
 #define BASE_CHAR
 #include "igraph_pmt.h"
-#include "matrix.h"
+#include "igraph_matrix.h"
 #include "igraph_pmt_off.h"
 #undef BASE_CHAR
 
 #define BASE_BOOL
 #include "igraph_pmt.h"
-#include "matrix.h"
+#include "igraph_matrix.h"
 #include "igraph_pmt_off.h"
 #undef BASE_BOOL
 
@@ -277,25 +277,25 @@ int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m);
 
 #define BASE_IGRAPH_REAL
 #include "igraph_pmt.h"
-#include "array.h"
+#include "igraph_array.h"
 #include "igraph_pmt_off.h"
 #undef BASE_IGRAPH_REAL
 
 #define BASE_LONG
 #include "igraph_pmt.h"
-#include "array.h"
+#include "igraph_array.h"
 #include "igraph_pmt_off.h"
 #undef BASE_LONG
 
 #define BASE_CHAR
 #include "igraph_pmt.h"
-#include "array.h"
+#include "igraph_array.h"
 #include "igraph_pmt_off.h"
 #undef BASE_CHAR
 
 #define BASE_BOOL
 #include "igraph_pmt.h"
-#include "array.h"
+#include "igraph_array.h"
 #include "igraph_pmt_off.h"
 #undef BASE_BOOL
 
@@ -305,25 +305,25 @@ int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m);
 
 #define BASE_IGRAPH_REAL
 #include "igraph_pmt.h"
-#include "stack.h"
+#include "igraph_stack.h"
 #include "igraph_pmt_off.h"
 #undef BASE_IGRAPH_REAL
 
 #define BASE_LONG
 #include "igraph_pmt.h"
-#include "stack.h"
+#include "igraph_stack.h"
 #include "igraph_pmt_off.h"
 #undef BASE_LONG
 
 #define BASE_CHAR
 #include "igraph_pmt.h"
-#include "stack.h"
+#include "igraph_stack.h"
 #include "igraph_pmt_off.h"
 #undef BASE_CHAR
 
 #define BASE_BOOL
 #include "igraph_pmt.h"
-#include "stack.h"
+#include "igraph_stack.h"
 #include "igraph_pmt_off.h"
 #undef BASE_BOOL
 
@@ -341,12 +341,12 @@ int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m);
 #define BASE_IGRAPH_REAL
 #define HEAP_TYPE_MAX
 #include "igraph_pmt.h"
-#include "heap.h"
+#include "igraph_heap.h"
 #include "igraph_pmt_off.h"
 #undef HEAP_TYPE_MAX
 #define HEAP_TYPE_MIN
 #include "igraph_pmt.h"
-#include "heap.h"
+#include "igraph_heap.h"
 #include "igraph_pmt_off.h"
 #undef HEAP_TYPE_MIN
 #undef BASE_IGRAPH_REAL
@@ -354,12 +354,12 @@ int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m);
 #define BASE_LONG
 #define HEAP_TYPE_MAX
 #include "igraph_pmt.h"
-#include "heap.h"
+#include "igraph_heap.h"
 #include "igraph_pmt_off.h"
 #undef HEAP_TYPE_MAX
 #define HEAP_TYPE_MIN
 #include "igraph_pmt.h"
-#include "heap.h"
+#include "igraph_heap.h"
 #include "igraph_pmt_off.h"
 #undef HEAP_TYPE_MIN
 #undef BASE_LONG
@@ -367,12 +367,12 @@ int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m);
 #define BASE_CHAR
 #define HEAP_TYPE_MAX
 #include "igraph_pmt.h"
-#include "heap.h"
+#include "igraph_heap.h"
 #include "igraph_pmt_off.h"
 #undef HEAP_TYPE_MAX
 #define HEAP_TYPE_MIN
 #include "igraph_pmt.h"
-#include "heap.h"
+#include "igraph_heap.h"
 #include "igraph_pmt_off.h"
 #undef HEAP_TYPE_MIN
 #undef BASE_CHAR

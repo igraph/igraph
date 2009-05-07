@@ -21,7 +21,7 @@
 
 */
 
-#include "types.h"
+#include "igraph_types.h"
 #include "config.h"
 
 #define BASE_IGRAPH_REAL

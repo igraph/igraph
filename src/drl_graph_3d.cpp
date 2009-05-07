@@ -11,7 +11,7 @@
 using namespace std;
 
 #include "drl_graph_3d.h"
-#include "random.h"
+#include "igraph_random.h"
 #ifdef MUSE_MPI
   #include <mpi.h>
 #endif

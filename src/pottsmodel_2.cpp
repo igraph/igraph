@@ -51,7 +51,7 @@
 
 using namespace std;
 
-#include "random.h"
+#include "igraph_random.h"
 #include "config.h"
 
 //#################################################################################################

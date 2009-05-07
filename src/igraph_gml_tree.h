@@ -35,7 +35,7 @@
 
 __BEGIN_DECLS
 
-#include "types.h"
+#include "igraph_types.h"
 
 typedef enum { IGRAPH_I_GML_TREE_TREE=0, 
 	       IGRAPH_I_GML_TREE_INTEGER,

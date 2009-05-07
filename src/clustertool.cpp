@@ -55,8 +55,8 @@
 #include "pottsmodel_2.h"
 
 #include "igraph.h"
-#include "error.h"
-#include "random.h"
+#include "igraph_error.h"
+#include "igraph_random.h"
 #include "igraph_math.h"
 
 

@@ -22,7 +22,7 @@
 */
 
 #include "igraph.h"
-#include "memory.h"
+#include "igraph_memory.h"
 #include "config.h"
 #include <string.h>
 #include <limits.h>

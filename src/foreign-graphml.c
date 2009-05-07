@@ -28,7 +28,7 @@
 
 #include <ctype.h>		/* isspace */
 #include <string.h>
-#include "memory.h"
+#include "igraph_memory.h"
 #include <stdarg.h> 		/* va_start & co */
 
 #if HAVE_LIBXML == 1

@@ -22,8 +22,8 @@
 */
 
 #include "igraph.h"
-#include "error.h"
-#include "memory.h"
+#include "igraph_error.h"
+#include "igraph_memory.h"
 #include "config.h"
 
 /**

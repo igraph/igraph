@@ -59,7 +59,7 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     measure_dynamics.c type_indexededgelist.c \
 			     error.c interrupt.c other.c foreign.c random.c \
 			     attributes.c \
-			     memory.h random.h \
+			     igraph_memory.h igraph_random.h \
 			     foreign-ncol-parser.y foreign-ncol-lexer.l \
 			     foreign-lgl-parser.y foreign-lgl-lexer.l \
 			     foreign-pajek-parser.y foreign-pajek-lexer.l \
@@ -106,13 +106,13 @@ libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(FLIBS) $(LAPACK_DLAMCH)
 
 includedir = $(prefix)/include/igraph
-include_HEADERS = igraph.h types.h attributes.h error.h interrupt.h \
+include_HEADERS = igraph.h igraph_types.h igraph_attributes.h igraph_error.h igraph_interrupt.h \
 		  NetDataTypes.h NetRoutines.h pottsmodel_2.h \
-		  igraph_pmt.h igraph_pmt_off.h vector.h gml_tree.h \
+		  igraph_pmt.h igraph_pmt_off.h igraph_vector.h igraph_gml_tree.h \
 		  vector.pmt walktrap_graph.h walktrap_communities.h \
-		  walktrap_heap.h matrix.h matrix.pmt stack.h stack.pmt \
-		  dqueue.pmt dqueue.h heap.pmt heap.h arpack.h array.pmt \
-		  array.h arpack_internal.h f2c.h igraph_math.h
+		  walktrap_heap.h igraph_matrix.h matrix.pmt igraph_stack.h stack.pmt \
+		  dqueue.pmt igraph_dqueue.h heap.pmt igraph_heap.h igraph_arpack.h array.pmt \
+		  igraph_array.h igraph_arpack_internal.h igraph_f2c.h igraph_math.h
 		  drl_graph_3d.h drl_layout_3d.h drl_Node_3d.h \
 		  DensityGrid_3d.h
 

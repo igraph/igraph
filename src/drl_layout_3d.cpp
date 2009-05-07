@@ -35,7 +35,7 @@ using namespace std;
 
 using namespace drl3d;
 #include "igraph.h"
-#include "random.h"
+#include "igraph_random.h"
 
 /**
  * \function igraph_layout_drl_3d

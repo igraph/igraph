@@ -22,7 +22,7 @@
 */
 
 #include "igraph.h"
-#include "types.h"
+#include "igraph_types.h"
 #include "config.h"
 
 /**

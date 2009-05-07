@@ -21,8 +21,8 @@
 
 */
 
-#include "attributes.h"
-#include "memory.h"
+#include "igraph_attributes.h"
+#include "igraph_memory.h"
 #include "igraph.h"
 #include "config.h"
 #include "igraph_math.h"

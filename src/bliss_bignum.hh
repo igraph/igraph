@@ -24,8 +24,8 @@
 #include "bliss_defs.hh"
 #include "igraph_math.h"
 
-#include "memory.h"
-#include "error.h"
+#include "igraph_memory.h"
+#include "igraph_error.h"
 
 /*
  * Simple class for big integers (or approximation of such) in order

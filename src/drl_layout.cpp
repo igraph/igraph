@@ -35,7 +35,7 @@ using namespace std;
 
 using namespace drl;
 #include "igraph.h"
-#include "random.h"
+#include "igraph_random.h"
 
 namespace drl {
 

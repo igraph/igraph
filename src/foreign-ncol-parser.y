@@ -52,9 +52,9 @@ extern char *igraph_ncol_yytext;
 extern int igraph_ncol_yyleng;
 char *igraph_i_ncol_errmsg=0;
 int igraph_ncol_yyerror(char *s);
-#include "types.h" 
-#include "memory.h"
-#include "error.h"
+#include "igraph_types.h" 
+#include "igraph_memory.h"
+#include "igraph_error.h"
 #include "config.h"
 extern igraph_vector_t *igraph_ncol_vector;
 extern igraph_vector_t *igraph_ncol_weights;

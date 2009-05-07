@@ -40,10 +40,10 @@ __BEGIN_DECLS
 # define _GNU_SOURCE
 #endif
 
-#include "types.h"
-#include "error.h"
-#include "interrupt.h"
-#include "arpack.h"
+#include "igraph_types.h"
+#include "igraph_error.h"
+#include "igraph_interrupt.h"
+#include "igraph_arpack.h"
 
 #include <stdio.h> 		/* FILE */
 
@@ -3257,7 +3257,7 @@ extern unsigned int igraph_i_isoclass_4_idx[];
 extern unsigned int igraph_i_isoclass_3u_idx[];
 extern unsigned int igraph_i_isoclass_4u_idx[];
 
-#include "attributes.h"
+#include "igraph_attributes.h"
 
 __END_DECLS
   
