@@ -55,13 +55,40 @@ endif
 F2C = f2c/d_sign.c f2c/etime_.c  f2c/pow_dd.c f2c/pow_di.c f2c/s_cmp.c \
 	f2c/s_copy.c f2c/d_lg10.c f2c/i_dnnt.c
 
-libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
+HEADERS_PRIVATE = atlas-edges.h \
+		bliss_bignum.hh		bliss_defs.hh \
+		bliss_eqrefhash.hh	bliss_graph.hh \
+		bliss_heap.hh		bliss_kqueue.hh \
+		bliss_kstack.hh		bliss_orbit.hh \
+		bliss_partition.hh	bliss_timer.hh \
+		bliss_utils.hh \
+		NetDataTypes.h		NetRoutines.h \
+		pottsmodel_2.h \
+		igraph_gml_tree.h \
+		walktrap_graph.h	walktrap_communities.h \
+		walktrap_heap.h \
+		igraph_arpack_internal.h	igraph_f2c.h \
+		igraph_math.h \
+		drl_graph_3d.h		drl_layout_3d.h \
+		drl_Node_3d.h 		DensityGrid_3d.h \
+		vector.pmt matrix.pmt stack.pmt dqueue.pmt heap.pmt array.pmt 
+
+HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
+		../include/igraph_random.h 	../include/igraph_types.h     \
+		../include/igraph_vector.h 	../include/igraph_matrix.h    \
+		../include/igraph_array.h 	../include/igraph_dqueue.h    \
+		../include/igraph_stack.h 	../include/igraph_heap.h      \
+		../include/igraph_arpack.h 	../include/igraph_interrupt.h \
+		../include/igraph_attributes.h 	../include/igraph_error.h     \
+		../include/igraph_pmt.h 	../include/igraph_pmt_off.h 
+
+libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
+			     basic_query.c games.c cocitation.c iterators.c \
 			     structural_properties.c components.c layout.c \
 			     structure_generators.c conversion.c \
 			     measure_dynamics.c type_indexededgelist.c \
 			     error.c interrupt.c other.c foreign.c random.c \
 			     attributes.c \
-			     igraph_memory.h igraph_random.h \
 			     foreign-ncol-parser.y foreign-ncol-lexer.l \
 			     foreign-lgl-parser.y foreign-lgl-lexer.l \
 			     foreign-pajek-parser.y foreign-pajek-lexer.l \
@@ -70,7 +97,7 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     igraph_strvector.c igraph_trie.c matrix.c \
 			     vector.c vector_ptr.c memory.c adjlist.c \
 			     visitors.c igraph_grid.c atlas.c topology.c \
-			     motifs.c progress.c atlas-edges.h operators.c \
+			     motifs.c progress.c operators.c \
 			     igraph_psumtree.c array.c igraph_hashtable.c \
 			     foreign-graphml.c flow.c igraph_buckets.c \
 			     NetDataTypes.cpp NetRoutines.cpp clustertool.cpp \
@@ -80,15 +107,9 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     walktrap_graph.cpp walktrap_communities.cpp \
 			     spmatrix.c community.c fast_community.c \
 			     evolver_cit.c gml_tree.c \
-			     bliss_bignum.hh bliss_kstack.hh \
-			     bliss_defs.hh bliss_orbit.cc \
-			     bliss_eqrefhash.cc bliss_orbit.hh \
-			     bliss_eqrefhash.hh bliss_partition.cc \
-			     bliss_graph.cc bliss_partition.hh \
-			     bliss_graph.hh bliss_timer.cc \
-			     bliss_heap.cc bliss_timer.hh \
-			     bliss_heap.hh bliss_utils.cc \
-			     bliss_kqueue.hh bliss_utils.hh bliss.cc \
+			     bliss_orbit.cc bliss_eqrefhash.cc \
+			     bliss_partition.cc bliss_graph.cc bliss_timer.cc \
+			     bliss_heap.cc bliss_utils.cc bliss.cc \
 			     cattributes.c revolver_ml_cit.c zeroin.c bfgs.c math.c \
 			     forestfire.c $(ARPACK) $(BLAS) $(LAPACK) $(F2C) \
 			     arpack.c centrality.c drl_layout.cpp drl_parse.cpp \
@@ -108,20 +129,6 @@ libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(FLIBS) $(LAPACK_DLAMCH)
 
 includedir = $(prefix)/include/igraph
-include_HEADERS = NetDataTypes.h NetRoutines.h pottsmodel_2.h \
-		igraph_gml_tree.h \
-		vector.pmt walktrap_graph.h walktrap_communities.h \
-		walktrap_heap.h matrix.pmt stack.pmt \
-		dqueue.pmt heap.pmt array.pmt \
-		igraph_arpack_internal.h igraph_f2c.h igraph_math.h
-		drl_graph_3d.h drl_layout_3d.h drl_Node_3d.h \
-		DensityGrid_3d.h \
-		../include/igraph_arpack.h	../include/igraph_interrupt.h \
-		../include/igraph_array.h	../include/igraph_matrix.h    \
-		../include/igraph_attributes.h	../include/igraph_pmt.h       \
-		../include/igraph_dqueue.h	../include/igraph_pmt_off.h   \
-		../include/igraph_error.h	../include/igraph_stack.h     \
-		../include/igraph.h		../include/igraph_types.h     \
-		../include/igraph_heap.h	../include/igraph_vector.h
+include_HEADERS = $(HEADERS_PUBLIC)
 
 MAINTAINERCLEANFILES = Makefile.in foreign-lgl-parser.h foreign-ncol-parser.h
