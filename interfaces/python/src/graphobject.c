@@ -1285,6 +1285,7 @@ PyObject *igraphmodule_Graph_convergence_field_size(igraphmodule_GraphObject *se
 PyObject *igraphmodule_Graph_Adjacency(PyTypeObject * type,
                                        PyObject * args, PyObject * kwds) {
   igraphmodule_GraphObject *self;
+  igraph_t g;
   igraph_matrix_t m;
   PyObject *matrix, *mode_o = Py_None;
   igraph_adjacency_t mode = IGRAPH_ADJ_DIRECTED;
@@ -1302,20 +1303,13 @@ PyObject *igraphmodule_Graph_Adjacency(PyTypeObject * type,
     return NULL;
   }
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_adjacency(&self->g, &m, mode)) {
-      igraphmodule_handle_igraph_error();
-			Py_DECREF(self);
-      igraph_matrix_destroy(&m);
-      return NULL;
-    }
+  if (igraph_adjacency(&g, &m, mode)) {
+    igraphmodule_handle_igraph_error();
+    igraph_matrix_destroy(&m);
+    return NULL;
   }
 
-  igraph_matrix_destroy(&m);
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject *) self;
 }
@@ -1329,21 +1323,17 @@ PyObject *igraphmodule_Graph_Atlas(PyTypeObject * type, PyObject * args)
 {
   long n;
   igraphmodule_GraphObject *self;
+  igraph_t g;
 
   if (!PyArg_ParseTuple(args, "l", &n))
     return NULL;
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_atlas(&self->g, (igraph_integer_t) n)) {
-      igraphmodule_handle_igraph_error();
-			Py_DECREF(self);
-      return NULL;
-    }
+  if (igraph_atlas(&g, (igraph_integer_t) n)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
   }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject *) self;
 }
@@ -1361,12 +1351,13 @@ PyObject *igraphmodule_Graph_Barabasi(PyTypeObject * type,
                                       PyObject * args, PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
+  igraph_t g;
   long n, m = 1;
   float power = 1.0, zero_appeal = 1.0;
   igraph_vector_t outseq;
   PyObject *m_obj = 0, *outpref = Py_False, *directed = Py_False;
 
-  char *kwlist[] =
+  static char *kwlist[] =
     { "n", "m", "outpref", "directed", "power", "zero_appeal", NULL };
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|OOOff", kwlist,
@@ -1395,40 +1386,33 @@ PyObject *igraphmodule_Graph_Barabasi(PyTypeObject * type,
     }
   }
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (power == 1.0 && zero_appeal == 1.0) {
-      /* linear model */
-      if (igraph_barabasi_game(&self->g, (igraph_integer_t) n,
-                               (igraph_integer_t) m,
-                               &outseq, PyObject_IsTrue(outpref),
-                               PyObject_IsTrue(directed))) {
-        igraphmodule_handle_igraph_error();
-				Py_DECREF(self);
-        igraph_vector_destroy(&outseq);
-        return NULL;
-      }
+  if (power == 1.0 && zero_appeal == 1.0) {
+    /* linear model */
+    if (igraph_barabasi_game(&g, (igraph_integer_t) n,
+                             (igraph_integer_t) m,
+                             &outseq, PyObject_IsTrue(outpref),
+                             PyObject_IsTrue(directed))) {
+      igraphmodule_handle_igraph_error();
+      igraph_vector_destroy(&outseq);
+      return NULL;
     }
-    else {
-      /* nonlinear model */
-      if (igraph_nonlinear_barabasi_game(&self->g, (igraph_integer_t) n,
-                                         (igraph_real_t) power,
-                                         (igraph_integer_t) m,
-                                         &outseq, PyObject_IsTrue(outpref),
-                                         (igraph_real_t) zero_appeal,
-                                         PyObject_IsTrue(directed))) {
-				Py_DECREF(self);
-        igraphmodule_handle_igraph_error();
-        igraph_vector_destroy(&outseq);
-        return NULL;
-      }
+  } else {
+    /* nonlinear model */
+    if (igraph_nonlinear_barabasi_game(&g, (igraph_integer_t) n,
+                                       (igraph_real_t) power,
+                                       (igraph_integer_t) m,
+                                       &outseq, PyObject_IsTrue(outpref),
+                                       (igraph_real_t) zero_appeal,
+                                       PyObject_IsTrue(directed))) {
+      igraphmodule_handle_igraph_error();
+      igraph_vector_destroy(&outseq);
+      return NULL;
     }
   }
 
   igraph_vector_destroy(&outseq);
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject *) self;
 }
@@ -1484,21 +1468,18 @@ PyObject *igraphmodule_Graph_De_Bruijn(PyTypeObject *type, PyObject *args,
   PyObject *kwds) {
   long m, n;
   igraphmodule_GraphObject *self;
+  igraph_t g;
 
   static char *kwlist[] = {"m", "n", NULL};
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll", kwlist, &m, &n))
     return NULL;
 
-  self = (igraphmodule_GraphObject*) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_de_bruijn(&self->g, m, n)) {
-      igraphmodule_handle_igraph_error();
-			Py_DECREF(self);
-      return NULL;
-    }
+  if (igraph_de_bruijn(&g, m, n)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
   }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject*)self;
 }
@@ -1516,6 +1497,7 @@ PyObject *igraphmodule_Graph_Degree_Sequence(PyTypeObject * type,
                                              PyObject * args, PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
+  igraph_t g;
   igraph_vector_t outseq, inseq;
   igraph_degseq_t meth = IGRAPH_DEGSEQ_SIMPLE;
   PyObject *outdeg = NULL, *indeg = NULL, *method = NULL;
@@ -1539,22 +1521,17 @@ PyObject *igraphmodule_Graph_Degree_Sequence(PyTypeObject * type,
     igraph_vector_init(&inseq, 0);
   }
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_degree_sequence_game(&self->g, &outseq, &inseq, meth)) {
-      igraphmodule_handle_igraph_error();
-      igraph_vector_destroy(&outseq);
-      igraph_vector_destroy(&inseq);
-      Py_DECREF(self);
-      return NULL;
-    }
+  if (igraph_degree_sequence_game(&g, &outseq, &inseq, meth)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&outseq);
+    igraph_vector_destroy(&inseq);
+    return NULL;
   }
 
   igraph_vector_destroy(&outseq);
   igraph_vector_destroy(&inseq);
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject *) self;
 }
@@ -1568,12 +1545,13 @@ PyObject *igraphmodule_Graph_Erdos_Renyi(PyTypeObject * type,
                                          PyObject * args, PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
+  igraph_t g;
   long n, m = -1;
   double p = -1.0;
   igraph_erdos_renyi_t t;
   PyObject *loops = NULL, *directed = NULL;
 
-  char *kwlist[] = { "n", "p", "m", "directed", "loops", NULL };
+  static char *kwlist[] = { "n", "p", "m", "directed", "loops", NULL };
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|dlO!O!", kwlist,
                                    &n, &p, &m,
@@ -1613,21 +1591,14 @@ PyObject *igraphmodule_Graph_Erdos_Renyi(PyTypeObject * type,
     }
   }
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_erdos_renyi_game(&self->g, t, (igraph_integer_t) n,
-                                (igraph_real_t) ((t ==
-                                                  IGRAPH_ERDOS_RENYI_GNM) ? m
-                                                 : p), (directed == Py_True),
-                                (loops == Py_True))) {
-      igraphmodule_handle_igraph_error();
-			Py_DECREF(self);
-      return NULL;
-    }
+  if (igraph_erdos_renyi_game(&g, t, (igraph_integer_t) n,
+                              (igraph_real_t) ((t == IGRAPH_ERDOS_RENYI_GNM) ? m : p),
+							  (directed == Py_True), (loops == Py_True))) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
   }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject *) self;
 }
@@ -1641,6 +1612,7 @@ PyObject *igraphmodule_Graph_Establishment(PyTypeObject * type,
                                            PyObject * args, PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
+  igraph_t g;
   long n, types, k;
   PyObject *type_dist, *pref_matrix;
   PyObject *directed = Py_False;
@@ -1680,25 +1652,21 @@ PyObject *igraphmodule_Graph_Establishment(PyTypeObject * type,
     return NULL;
   }
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_establishment_game(&self->g, (igraph_integer_t) n,
-                                  (igraph_integer_t) types,
-                                  (igraph_integer_t) k, &td, &pm,
-                                  PyObject_IsTrue(directed))) {
-      igraphmodule_handle_igraph_error();
-			Py_DECREF(self);
-      igraph_matrix_destroy(&pm);
-      igraph_vector_destroy(&td);
-      return NULL;
-    }
+  if (igraph_establishment_game(&g, (igraph_integer_t) n,
+                                (igraph_integer_t) types,
+                                (igraph_integer_t) k, &td, &pm,
+                                PyObject_IsTrue(directed))) {
+    igraphmodule_handle_igraph_error();
+    igraph_matrix_destroy(&pm);
+    igraph_vector_destroy(&td);
+    return NULL;
   }
 
   igraph_matrix_destroy(&pm);
   igraph_vector_destroy(&td);
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+
   return (PyObject *) self;
 }
 
@@ -1710,24 +1678,20 @@ PyObject *igraphmodule_Graph_Establishment(PyTypeObject * type,
 PyObject *igraphmodule_Graph_Famous(PyTypeObject * type,
                                     PyObject * args, PyObject * kwds) {
   igraphmodule_GraphObject *self;
+  igraph_t g;
   const char* name;
 
-  char *kwlist[] = { "name", NULL };
+  static char *kwlist[] = { "name", NULL };
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &name))
     return NULL;
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_famous(&self->g, name)) {
-			igraphmodule_handle_igraph_error();
-      Py_DECREF(self);
-      return NULL;
-    }
+  if (igraph_famous(&g, name)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
   }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject *) self;
 }
@@ -1742,6 +1706,7 @@ PyObject *igraphmodule_Graph_Forest_Fire(PyTypeObject * type,
   PyObject * args, PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
+  igraph_t g;
   long n, ambs=1;
   double fw_prob, bw_factor=0.0;
   PyObject *directed = Py_False;
@@ -1752,19 +1717,15 @@ PyObject *igraphmodule_Graph_Forest_Fire(PyTypeObject * type,
                                    &n, &fw_prob, &bw_factor, &ambs, &directed))
     return NULL;
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_forest_fire_game(&self->g, (igraph_integer_t)n,
-		(igraph_real_t)fw_prob, (igraph_real_t)bw_factor,
-		(igraph_integer_t)ambs, (igraph_bool_t)(PyObject_IsTrue(directed)))) {
-      igraphmodule_handle_igraph_error();
-      Py_DECREF(self);
-      return NULL;
-    }
+  if (igraph_forest_fire_game(&g, (igraph_integer_t)n,
+                              (igraph_real_t)fw_prob, (igraph_real_t)bw_factor,
+                              (igraph_integer_t)ambs,
+							  (igraph_bool_t)(PyObject_IsTrue(directed)))) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
   }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject *) self;
 }
@@ -1779,6 +1740,7 @@ PyObject *igraphmodule_Graph_Full(PyTypeObject * type,
                                   PyObject * args, PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
+  igraph_t g;
   long n;
   PyObject *loops = Py_False, *directed = Py_False;
 
@@ -1793,18 +1755,13 @@ PyObject *igraphmodule_Graph_Full(PyTypeObject * type,
     return NULL;
   }
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_full(&self->g, (igraph_integer_t) n,
-                    (directed == Py_True), (loops == Py_True))) {
-      igraphmodule_handle_igraph_error();
-      Py_DECREF(self);
-      return NULL;
-    }
+  if (igraph_full(&g, (igraph_integer_t) n, PyObject_IsTrue(directed),
+			      PyObject_IsTrue(loops))) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
   }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject *) self;
 }
@@ -1866,6 +1823,7 @@ PyObject *igraphmodule_Graph_Full_Citation(PyTypeObject *type,
     PyObject *args, PyObject *kwds)
 {
   igraphmodule_GraphObject *self;
+  igraph_t g;
   long n;
   PyObject *directed = Py_False;
 
@@ -1874,18 +1832,13 @@ PyObject *igraphmodule_Graph_Full_Citation(PyTypeObject *type,
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|O", kwlist, &n, &directed))
     return NULL;
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_full_citation(&self->g, (igraph_integer_t) n,
-		(igraph_bool_t) PyObject_IsTrue(directed))) {
-      igraphmodule_handle_igraph_error();
-      Py_DECREF(self);
-      return NULL;
-    }
+  if (igraph_full_citation(&g, (igraph_integer_t) n,
+                           (igraph_bool_t) PyObject_IsTrue(directed))) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
   }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject *) self;
 }
@@ -1899,6 +1852,7 @@ PyObject *igraphmodule_Graph_GRG(PyTypeObject * type,
                                  PyObject * args, PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
+  igraph_t g;
   long n;
   double r;
   PyObject *torus = Py_False, *coords = Py_False;
@@ -1923,22 +1877,15 @@ PyObject *igraphmodule_Graph_GRG(PyTypeObject * type,
     }
   }
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_grg_game(&self->g, (igraph_integer_t) n, (igraph_real_t) r,
-                        PyObject_IsTrue(torus),
-                        need_coords ? &xs : 0,
-                        need_coords ? &ys : 0)) {
-      igraphmodule_handle_igraph_error();
-      Py_DECREF(self);
-      if (need_coords) {
-        igraph_vector_destroy(&xs); igraph_vector_destroy(&ys);
-      }
-      return NULL;
+  if (igraph_grg_game(&g, (igraph_integer_t) n, (igraph_real_t) r,
+                      PyObject_IsTrue(torus),
+                      need_coords ? &xs : 0,
+                      need_coords ? &ys : 0)) {
+    igraphmodule_handle_igraph_error();
+    if (need_coords) {
+      igraph_vector_destroy(&xs); igraph_vector_destroy(&ys);
     }
+    return NULL;
   }
 
   if (need_coords) {
@@ -1946,18 +1893,24 @@ PyObject *igraphmodule_Graph_GRG(PyTypeObject * type,
     o_xs = igraphmodule_vector_t_to_PyList(&xs, IGRAPHMODULE_TYPE_FLOAT);
     igraph_vector_destroy(&xs);
     if (!o_xs) {
-      Py_DECREF(self);
+	  igraph_destroy(&g);
       igraph_vector_destroy(&ys);
       return NULL;
     }
     o_ys = igraphmodule_vector_t_to_PyList(&ys, IGRAPHMODULE_TYPE_FLOAT);
     igraph_vector_destroy(&ys);
     if (!o_ys) {
-      Py_DECREF(self);
+	  igraph_destroy(&g);
       return NULL;
     }
+
+    CREATE_GRAPH_FROM_TYPE(self, g, type);
+
     return Py_BuildValue("NNN", (PyObject*)self, o_xs, o_ys);
   }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+
   return (PyObject *) self;
 }
 
@@ -1972,8 +1925,9 @@ PyObject *igraphmodule_Graph_Growing_Random(PyTypeObject * type,
   long n, m;
   PyObject *directed = NULL, *citation = NULL;
   igraphmodule_GraphObject *self;
+  igraph_t g;
 
-  char *kwlist[] = { "n", "m", "directed", "citation", NULL };
+  static char *kwlist[] = { "n", "m", "directed", "citation", NULL };
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|O!O!", kwlist, &n, &m,
                                    &PyBool_Type, &directed,
@@ -1991,20 +1945,15 @@ PyObject *igraphmodule_Graph_Growing_Random(PyTypeObject * type,
     return NULL;
   }
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_growing_random_game(&self->g, (igraph_integer_t) n,
-                                   (igraph_integer_t) m,
-                                   (directed == Py_True),
-                                   (citation == Py_True))) {
-      igraphmodule_handle_igraph_error();
-      Py_DECREF(self);
-      return NULL;
-    }
+  if (igraph_growing_random_game(&g, (igraph_integer_t) n,
+                                 (igraph_integer_t) m,
+                                 (directed == Py_True),
+                                 (citation == Py_True))) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
   }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject *) self;
 }
@@ -2076,8 +2025,9 @@ PyObject *igraphmodule_Graph_Isoclass(PyTypeObject * type,
   long n, isoclass;
   PyObject *directed = NULL;
   igraphmodule_GraphObject *self;
+  igraph_t g;
 
-  char *kwlist[] = { "n", "class", "directed", NULL };
+  static char *kwlist[] = { "n", "class", "directed", NULL };
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|O", kwlist,
                                    &n, &isoclass, &directed))
@@ -2089,18 +2039,12 @@ PyObject *igraphmodule_Graph_Isoclass(PyTypeObject * type,
     return NULL;
   }
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_isoclass_create
-        (&self->g, n, isoclass, PyObject_IsTrue(directed))) {
-      igraphmodule_handle_igraph_error();
-      Py_DECREF(self);
-      return NULL;
-    }
+  if (igraph_isoclass_create(&g, n, isoclass, PyObject_IsTrue(directed))) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
   }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject *) self;
 }
@@ -2113,21 +2057,18 @@ PyObject *igraphmodule_Graph_Kautz(PyTypeObject *type, PyObject *args,
   PyObject *kwds) {
   long m, n;
   igraphmodule_GraphObject *self;
+  igraph_t g;
 
   static char *kwlist[] = {"m", "n", NULL};
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll", kwlist, &m, &n))
     return NULL;
 
-  self = (igraphmodule_GraphObject*) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_kautz(&self->g, m, n)) {
-      igraphmodule_handle_igraph_error();
-      Py_DECREF(self);
-      return NULL;
-    }
+  if (igraph_kautz(&g, m, n)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
   }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject*)self;
 }
@@ -2148,8 +2089,9 @@ PyObject *igraphmodule_Graph_Lattice(PyTypeObject * type,
   PyObject *o_directed = Py_False, *o_mutual = Py_True, *o_circular = Py_True;
   PyObject *o_dimvector = Py_None;
   igraphmodule_GraphObject *self;
+  igraph_t g;
 
-  char *kwlist[] = { "dim", "nei", "directed", "mutual", "circular", NULL };
+  static char *kwlist[] = { "dim", "nei", "directed", "mutual", "circular", NULL };
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|lOOO", kwlist,
                                    &PyList_Type, &o_dimvector,
@@ -2163,20 +2105,15 @@ PyObject *igraphmodule_Graph_Lattice(PyTypeObject * type,
   if (igraphmodule_PyObject_to_vector_t(o_dimvector, &dimvector, 1, 0))
     return NULL;
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_lattice(&self->g, &dimvector, nei, directed, mutual, circular)) {
-      igraph_vector_destroy(&dimvector);
-      igraphmodule_handle_igraph_error();
-      Py_DECREF(self);
-      return NULL;
-    }
+  if (igraph_lattice(&g, &dimvector, nei, directed, mutual, circular)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&dimvector);
+    return NULL;
   }
 
   igraph_vector_destroy(&dimvector);
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject *) self;
 }
@@ -2193,6 +2130,7 @@ PyObject *igraphmodule_Graph_LCF(PyTypeObject *type,
 	long int n;
   PyObject *o_shifts;
   igraphmodule_GraphObject *self;
+  igraph_t g;
 
   static char *kwlist[] = { "n", "shifts", "repeats", NULL };
 
@@ -2203,20 +2141,15 @@ PyObject *igraphmodule_Graph_LCF(PyTypeObject *type,
   if (igraphmodule_PyObject_to_vector_t(o_shifts, &shifts, 0, 0))
     return NULL;
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_lcf_vector(&self->g, n, &shifts, repeats)) {
-      igraph_vector_destroy(&shifts);
-      igraphmodule_handle_igraph_error();
-      Py_DECREF(self);
-      return NULL;
-    }
+  if (igraph_lcf_vector(&g, n, &shifts, repeats)) {
+    igraph_vector_destroy(&shifts);
+    igraphmodule_handle_igraph_error();
+    return NULL;
   }
 
   igraph_vector_destroy(&shifts);
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject *) self;
 }
@@ -2230,6 +2163,7 @@ PyObject *igraphmodule_Graph_Preference(PyTypeObject * type,
                                         PyObject * args, PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
+  igraph_t g;
   long n, types;
   PyObject *type_dist, *pref_matrix;
   PyObject *directed = Py_False;
@@ -2259,57 +2193,52 @@ NULL };
     return NULL;
   }
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
+  store_attribs = (attribute_key && attribute_key != Py_None);
+  if (store_attribs && igraph_vector_init(&type_vec, (igraph_integer_t) n)) {
+    igraph_matrix_destroy(&pm);
+    igraph_vector_destroy(&td);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
 
-  if (self != NULL) {
-    store_attribs = (attribute_key && attribute_key != Py_None);
-    if (store_attribs && igraph_vector_init(&type_vec, (igraph_integer_t) n)) {
+  if (igraph_preference_game(&g, (igraph_integer_t) n,
+                             (igraph_integer_t) types, &td, &pm,
+                             store_attribs ? &type_vec : 0,
+                             PyObject_IsTrue(directed),
+                             PyObject_IsTrue(loops))) {
+    igraphmodule_handle_igraph_error();
+    igraph_matrix_destroy(&pm);
+    igraph_vector_destroy(&td);
+    if (store_attribs)
+      igraph_vector_destroy(&type_vec);
+    return NULL;
+  }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+
+  if (store_attribs) {
+    type_vec_o = igraphmodule_vector_t_to_PyList(&type_vec, IGRAPHMODULE_TYPE_INT);
+    if (type_vec_o == 0) {
       igraph_matrix_destroy(&pm);
       igraph_vector_destroy(&td);
-      igraphmodule_handle_igraph_error();
+      igraph_vector_destroy(&type_vec);
       Py_DECREF(self);
       return NULL;
     }
-
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_preference_game(&self->g, (igraph_integer_t) n,
-                               (igraph_integer_t) types, &td, &pm,
-                               store_attribs ? &type_vec : 0,
-                               PyObject_IsTrue(directed),
-                               PyObject_IsTrue(loops))) {
-      igraphmodule_handle_igraph_error();
-      igraph_matrix_destroy(&pm);
-      igraph_vector_destroy(&td);
-      if (store_attribs)
-        igraph_vector_destroy(&type_vec);
-      return NULL;
-    }
-
-    if (store_attribs) {
-      type_vec_o = igraphmodule_vector_t_to_PyList(&type_vec, IGRAPHMODULE_TYPE_INT);
-      if (type_vec_o == 0) {
+    if (attribute_key != Py_None && attribute_key != 0) {
+      if (PyDict_SetItem(((PyObject **) self->g.attr)[ATTRHASH_IDX_VERTEX],
+                         attribute_key, type_vec_o) == -1) {
+        Py_DECREF(type_vec_o);
         igraph_matrix_destroy(&pm);
         igraph_vector_destroy(&td);
         igraph_vector_destroy(&type_vec);
         Py_DECREF(self);
         return NULL;
       }
-      if (attribute_key != Py_None && attribute_key != 0) {
-        if (PyDict_SetItem(((PyObject **) self->g.attr)[ATTRHASH_IDX_VERTEX],
-                           attribute_key, type_vec_o) == -1) {
-          Py_DECREF(type_vec_o);
-          igraph_matrix_destroy(&pm);
-          igraph_vector_destroy(&td);
-          igraph_vector_destroy(&type_vec);
-          Py_DECREF(self);
-          return NULL;
-        }
-      }
-
-      Py_DECREF(type_vec_o);
-      igraph_vector_destroy(&type_vec);
     }
+
+    Py_DECREF(type_vec_o);
+    igraph_vector_destroy(&type_vec);
   }
 
   igraph_matrix_destroy(&pm);
@@ -2327,6 +2256,7 @@ PyObject *igraphmodule_Graph_Asymmetric_Preference(PyTypeObject * type,
                                                    PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
+  igraph_t g;
   long n, types;
   PyObject *type_dist_matrix, *pref_matrix;
   PyObject *loops = Py_False;
@@ -2353,46 +2283,53 @@ PyObject *igraphmodule_Graph_Asymmetric_Preference(PyTypeObject * type,
     return NULL;
   }
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    store_attribs = (attribute_key && attribute_key != Py_None);
-    if (store_attribs) {
-      if (igraph_vector_init(&in_type_vec, (igraph_integer_t) n)) {
-        igraph_matrix_destroy(&pm);
-        igraph_matrix_destroy(&td);
-        igraphmodule_handle_igraph_error();
-				Py_DECREF(self);
-        return NULL;
-      }
-      if (igraph_vector_init(&out_type_vec, (igraph_integer_t) n)) {
-        igraph_matrix_destroy(&pm);
-        igraph_matrix_destroy(&td);
-        igraph_vector_destroy(&in_type_vec);
-        igraphmodule_handle_igraph_error();
-        return NULL;
-      }
-    }
-
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_asymmetric_preference_game(&self->g, (igraph_integer_t) n,
-                                          (igraph_integer_t) types, &td, &pm,
-                                          store_attribs ? &in_type_vec : 0,
-                                          store_attribs ? &out_type_vec : 0,
-                                          PyObject_IsTrue(loops))) {
-      igraphmodule_handle_igraph_error();
-      igraph_vector_destroy(&in_type_vec);
-      igraph_vector_destroy(&out_type_vec);
+  store_attribs = (attribute_key && attribute_key != Py_None);
+  if (store_attribs) {
+    if (igraph_vector_init(&in_type_vec, (igraph_integer_t) n)) {
       igraph_matrix_destroy(&pm);
       igraph_matrix_destroy(&td);
+      igraphmodule_handle_igraph_error();
       return NULL;
     }
+    if (igraph_vector_init(&out_type_vec, (igraph_integer_t) n)) {
+      igraph_matrix_destroy(&pm);
+      igraph_matrix_destroy(&td);
+      igraph_vector_destroy(&in_type_vec);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  }
 
-    if (store_attribs) {
-      type_vec_o = igraphmodule_vector_t_pair_to_PyList(&in_type_vec,
-                                                        &out_type_vec);
-      if (type_vec_o == NULL) {
+  if (igraph_asymmetric_preference_game(&g, (igraph_integer_t) n,
+                                        (igraph_integer_t) types, &td, &pm,
+                                        store_attribs ? &in_type_vec : 0,
+                                        store_attribs ? &out_type_vec : 0,
+                                        PyObject_IsTrue(loops))) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&in_type_vec);
+    igraph_vector_destroy(&out_type_vec);
+    igraph_matrix_destroy(&pm);
+    igraph_matrix_destroy(&td);
+    return NULL;
+  }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+
+  if (store_attribs) {
+    type_vec_o = igraphmodule_vector_t_pair_to_PyList(&in_type_vec,
+                                                      &out_type_vec);
+    if (type_vec_o == NULL) {
+      igraph_matrix_destroy(&pm);
+      igraph_matrix_destroy(&td);
+      igraph_vector_destroy(&in_type_vec);
+      igraph_vector_destroy(&out_type_vec);
+      Py_DECREF(self);
+      return NULL;
+    }
+    if (attribute_key != Py_None && attribute_key != 0) {
+      if (PyDict_SetItem(((PyObject **) self->g.attr)[ATTRHASH_IDX_VERTEX],
+                         attribute_key, type_vec_o) == -1) {
+        Py_DECREF(type_vec_o);
         igraph_matrix_destroy(&pm);
         igraph_matrix_destroy(&td);
         igraph_vector_destroy(&in_type_vec);
@@ -2400,23 +2337,11 @@ PyObject *igraphmodule_Graph_Asymmetric_Preference(PyTypeObject * type,
         Py_DECREF(self);
         return NULL;
       }
-      if (attribute_key != Py_None && attribute_key != 0) {
-        if (PyDict_SetItem(((PyObject **) self->g.attr)[ATTRHASH_IDX_VERTEX],
-                           attribute_key, type_vec_o) == -1) {
-          Py_DECREF(type_vec_o);
-          igraph_matrix_destroy(&pm);
-          igraph_matrix_destroy(&td);
-          igraph_vector_destroy(&in_type_vec);
-          igraph_vector_destroy(&out_type_vec);
-          Py_DECREF(self);
-          return NULL;
-        }
-      }
-
-      Py_DECREF(type_vec_o);
-      igraph_vector_destroy(&in_type_vec);
-      igraph_vector_destroy(&out_type_vec);
     }
+
+    Py_DECREF(type_vec_o);
+    igraph_vector_destroy(&in_type_vec);
+    igraph_vector_destroy(&out_type_vec);
   }
 
   igraph_matrix_destroy(&pm);
@@ -2433,6 +2358,7 @@ PyObject *igraphmodule_Graph_Recent_Degree(PyTypeObject * type,
                                            PyObject * args, PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
+  igraph_t g;
   long n, m = 0, window = 0;
   float power = 0.0, zero_appeal = 0.0;
   igraph_vector_t outseq;
@@ -2464,26 +2390,21 @@ NULL };
     }
   }
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_recent_degree_game(&self->g, (igraph_integer_t) n,
-                                  (igraph_real_t) power,
-                                  (igraph_integer_t) window,
-                                  (igraph_integer_t) m, &outseq,
-                                  PyObject_IsTrue(outpref),
-                                  (igraph_real_t) zero_appeal,
-                                  PyObject_IsTrue(directed))) {
-      igraphmodule_handle_igraph_error();
-      igraph_vector_destroy(&outseq);
-      Py_DECREF(self);
-      return NULL;
-    }
+  if (igraph_recent_degree_game(&g, (igraph_integer_t) n,
+                                (igraph_real_t) power,
+                                (igraph_integer_t) window,
+                                (igraph_integer_t) m, &outseq,
+                                PyObject_IsTrue(outpref),
+                                (igraph_real_t) zero_appeal,
+                                PyObject_IsTrue(directed))) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&outseq);
+    return NULL;
   }
 
   igraph_vector_destroy(&outseq);
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject *) self;
 }
@@ -2499,8 +2420,9 @@ PyObject *igraphmodule_Graph_Ring(PyTypeObject * type,
   long n;
   PyObject *directed = Py_False, *mutual = Py_False, *circular = Py_True;
   igraphmodule_GraphObject *self;
+  igraph_t g;
 
-  char *kwlist[] = { "n", "directed", "mutual", "circular", NULL };
+  static char *kwlist[] = { "n", "directed", "mutual", "circular", NULL };
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|O!O!O!", kwlist, &n,
                                    &PyBool_Type, &directed,
@@ -2513,18 +2435,13 @@ PyObject *igraphmodule_Graph_Ring(PyTypeObject * type,
     return NULL;
   }
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_ring(&self->g, (igraph_integer_t) n, (directed == Py_True),
-                    (mutual == Py_True), (circular == Py_True))) {
-      igraphmodule_handle_igraph_error();
-      Py_DECREF(self);
-      return NULL;
-    }
+  if (igraph_ring(&g, (igraph_integer_t) n, (directed == Py_True),
+                  (mutual == Py_True), (circular == Py_True))) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
   }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject *) self;
 }
@@ -2540,8 +2457,9 @@ PyObject *igraphmodule_Graph_Star(PyTypeObject * type,
   long n, center = 0;
   igraph_star_mode_t mode = IGRAPH_STAR_UNDIRECTED;
   igraphmodule_GraphObject *self;
+  igraph_t g;
 
-  char *kwlist[] = { "n", "mode", "center", NULL };
+  static char *kwlist[] = { "n", "mode", "center", NULL };
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|ll", kwlist,
                                    &n, &mode, &center))
@@ -2565,18 +2483,12 @@ PyObject *igraphmodule_Graph_Star(PyTypeObject * type,
     return NULL;
   }
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_star
-        (&self->g, (igraph_integer_t) n, mode, (igraph_integer_t) center)) {
-      igraphmodule_handle_igraph_error();
-      Py_DECREF(self);
-      return NULL;
-    }
+  if (igraph_star(&g, (igraph_integer_t) n, mode, (igraph_integer_t) center)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
   }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject *) self;
 }
@@ -2592,8 +2504,9 @@ PyObject *igraphmodule_Graph_Tree(PyTypeObject * type,
   long n, children;
   igraph_tree_mode_t mode = IGRAPH_TREE_UNDIRECTED;
   igraphmodule_GraphObject *self;
+  igraph_t g;
 
-  char *kwlist[] = { "n", "children", "type", NULL };
+  static char *kwlist[] = { "n", "children", "type", NULL };
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|l", kwlist,
                                    &n, &children, &mode))
@@ -2611,18 +2524,12 @@ PyObject *igraphmodule_Graph_Tree(PyTypeObject * type,
     return NULL;
   }
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_tree
-        (&self->g, (igraph_integer_t) n, (igraph_integer_t) children, mode)) {
+  if (igraph_tree(&g, (igraph_integer_t) n, (igraph_integer_t) children, mode)) {
       igraphmodule_handle_igraph_error();
-      Py_DECREF(self);
       return NULL;
-    }
   }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject *) self;
 }
@@ -2638,24 +2545,20 @@ PyObject *igraphmodule_Graph_Watts_Strogatz(PyTypeObject * type,
   long nei = 1, dim, size;
   double p;
   igraphmodule_GraphObject *self;
+  igraph_t g;
 
-  char *kwlist[] = { "dim", "size", "nei", "p", NULL };
+  static char *kwlist[] = { "dim", "size", "nei", "p", NULL };
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "llld", kwlist,
                                    &dim, &size, &nei, &p))
     return NULL;
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_watts_strogatz_game(&self->g, dim, size, nei, p)) {
-      igraphmodule_handle_igraph_error();
-      Py_DECREF(self);
-      return NULL;
-    }
+  if (igraph_watts_strogatz_game(&g, dim, size, nei, p)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
   }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject *) self;
 }
@@ -2668,12 +2571,13 @@ PyObject *igraphmodule_Graph_Watts_Strogatz(PyTypeObject * type,
 PyObject *igraphmodule_Graph_Weighted_Adjacency(PyTypeObject * type,
                                        PyObject * args, PyObject * kwds) {
   igraphmodule_GraphObject *self;
+  igraph_t g;
   igraph_matrix_t m;
   PyObject *matrix, *mode_o = Py_None, *attr_o = Py_None, *s = 0;
   char* attr = "weight";
   igraph_adjacency_t mode = IGRAPH_ADJ_DIRECTED;
 
-  char *kwlist[] = { "matrix", "mode", "attr", NULL };
+  static char *kwlist[] = { "matrix", "mode", "attr", NULL };
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|OO", kwlist,
                                    &PyList_Type, &matrix, &mode_o, &attr_o))
@@ -2692,21 +2596,15 @@ PyObject *igraphmodule_Graph_Weighted_Adjacency(PyTypeObject * type,
     return NULL;
   }
 
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_weighted_adjacency(&self->g, &m, mode, attr)) {
-      igraphmodule_handle_igraph_error();
-      Py_DECREF(self);
-      igraph_matrix_destroy(&m);
-      return NULL;
-    }
+  if (igraph_weighted_adjacency(&g, &m, mode, attr)) {
+    igraphmodule_handle_igraph_error();
+    igraph_matrix_destroy(&m);
+    return NULL;
   }
 
   igraph_matrix_destroy(&m);
-  if (s) { Py_DECREF(s); }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return (PyObject *) self;
 }
@@ -4466,9 +4364,9 @@ PyObject *igraphmodule_Graph_vertex_connectivity(igraphmodule_GraphObject *self,
 	return NULL;
   }
 
-  if (res == IGRAPH_INFINITY) return Py_BuildValue("d", (double)res);
+  if (!IGRAPH_FINITE(res)) return Py_BuildValue("d", (double)res);
   
-  result = res;
+  result = (long)res;
   return Py_BuildValue("l", result);
 }
 

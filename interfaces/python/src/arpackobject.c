@@ -86,7 +86,8 @@ PyObject* igraphmodule_ARPACKOptions_getattr(
     result=PyInt_FromLong(self->params.ldv);
   } else if (strcmp(attrname, "ishift") == 0) {
     result=PyInt_FromLong(self->params.ishift);
-  } else if (strcmp(attrname, "maxiter") == 0) {
+  } else if (strcmp(attrname, "maxiter") == 0 ||
+		     strcmp(attrname, "mxiter") == 0) {
     result=PyInt_FromLong(self->params.mxiter);
   } else if (strcmp(attrname, "nb") == 0) {
     result=PyInt_FromLong(self->params.nb);
@@ -124,7 +125,8 @@ int igraphmodule_ARPACKOptions_setattr(
     PyErr_SetString(PyExc_TypeError, "attribute can not be deleted");
     return -1;
   }
-  if (strcmp(attrname, "maxiter") == 0) {
+  if (strcmp(attrname, "maxiter") == 0 ||
+      strcmp(attrname, "mxiter") == 0) {
     if (PyInt_Check(value)) {
       long int n=PyInt_AsLong(value);
       if (n>0) self->params.mxiter=n;
@@ -250,8 +252,8 @@ PyTypeObject igraphmodule_ARPACKOptionsType = {
   " - C{tol}: precision. If less than or equal to zero, the standard\n"
   "   machine precision is used as computed by the LAPACK utility\n"
   "   called C{dlamch}. This can be modified.\n\n"
-  " - C{maxiter}: maximum number of update iterations to take. This\n"
-  "   can be modified.\n\n"
+  " - C{mxiter}: maximum number of update iterations to take. This\n"
+  "   can be modified. You can also use C{maxiter}.\n\n"
   " - C{iter}: actual number of update iterations taken\n\n"
   " - C{numop}: total number of OP*x operations\n\n"
   " - C{numopb}: total number of B*x operations if C{bmat} is C{'G'}\n\n"
