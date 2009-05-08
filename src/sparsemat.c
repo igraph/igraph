@@ -485,16 +485,21 @@ int igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *res) {
   
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
-  long int i;
+  igraph_bool_t directed=igraph_is_directed(graph);
+  long int nzmax= directed ? no_of_edges : no_of_edges*2;
+  long int i;  
   
   IGRAPH_CHECK(igraph_sparsemat_init(res, no_of_nodes, no_of_nodes, 
-				     no_of_edges));
+				     nzmax));
+  
   for (i=0; i<no_of_edges; i++) {
-    IGRAPH_CHECK(igraph_sparsemat_entry(res, 
-					IGRAPH_FROM(graph, i), 
-					IGRAPH_TO(graph, i),
-					1.0));
-  }
+    long int from=IGRAPH_FROM(graph, i);
+    long int to=IGRAPH_TO(graph, i);
+    IGRAPH_CHECK(igraph_sparsemat_entry(res, from, to, 1.0));
+    if (!directed && from != to) {
+      IGRAPH_CHECK(igraph_sparsemat_entry(res, to, from, 1.0));
+    }
+  }    
   
   return 0;
 }
