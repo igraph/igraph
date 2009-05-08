@@ -66,11 +66,14 @@ SRCFILES_ORIGPLACE4 = 	$(wildcard $(top_srcdir)/src/blas/*.c)
 
 SRCFILES_ORIGPLACE5 = 	$(wildcard $(top_srcdir)/src/f2c/*.c)
 
+SRCFILES_ORIGPLACE6 =   $(wildcard $(top_srcdir)/include/*.h)
+
 SRCFILES = $(patsubst $(top_srcdir)/src/%,igraph/src/%,$(SRCFILES_ORIGPLACE)) \
 	$(patsubst $(top_srcdir)/src/arpack/%,igraph/src/%,$(SRCFILES_ORIGPLACE2)) \
 	$(patsubst $(top_srcdir)/src/lapack/%,igraph/src/%,$(SRCFILES_ORIGPLACE3)) \
 	$(patsubst $(top_srcdir)/src/blas/%,igraph/src/%,$(SRCFILES_ORIGPLACE4)) \
-	$(patsubst $(top_srcdir)/src/f2c/%,igraph/src/%,$(SRCFILES_ORIGPLACE5))
+	$(patsubst $(top_srcdir)/src/f2c/%,igraph/src/%,$(SRCFILES_ORIGPLACE5)) \
+	$(patsubst $(top_srcdir)/include/%,igraph/src/%,$(SRCFILES_ORIGPLACE6))
 
 igraph/src/%.c: $(top_srcdir)/src/%.c
 	cp $(top_srcdir)/src/$(@F) $@
@@ -93,6 +96,9 @@ igraph/src/%.c: $(top_srcdir)/src/blas/%.c
 	cp $(top_srcdir)/src/blas/$(@F) igraph/src/$(@F)
 igraph/src/%.c: $(top_srcdir)/src/f2c/%.c
 	cp $(top_srcdir)/src/f2c/$(@F) igraph/src/$(@F)
+
+igraph/src/%.h: $(top_srcdir)/include/%.h
+	cp $(top_srcdir)/include/$(@F) $@
 
 igraph_$(VERSION).tar.gz: $(RFILES) $(SRCFILES)
 	rm -f igraph/R/config.R
