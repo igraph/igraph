@@ -21,7 +21,7 @@
 
 */
 
-#include "igraph.h"
+#include "igraph_interrupt.h"
 #include "config.h"
 
 #include <stdio.h>

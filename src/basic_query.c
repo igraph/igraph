@@ -21,8 +21,9 @@
 
 */
 
-#include "igraph.h"
-#include "types.h"
+#include "igraph_datatype.h"
+#include "igraph_types.h"
+#include "igraph_interface.h"
 #include "config.h"
 
 /**

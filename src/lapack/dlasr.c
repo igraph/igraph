@@ -11,8 +11,8 @@
 */
 
 #include "config.h"
-#include "arpack_internal.h"
-#include "f2c.h"
+#include "igraph_arpack_internal.h"
+#include "igraph_f2c.h"
 
 /* Subroutine */ int igraphdlasr_(char *side, char *pivot, char *direct, integer *m,
 	 integer *n, doublereal *c__, doublereal *s, doublereal *a, integer *

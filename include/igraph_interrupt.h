@@ -24,7 +24,7 @@
 #ifndef IGRAPH_INTERRUPT_H
 #define IGRAPH_INTERRUPT_H
 
-#include "error.h"
+#include "igraph_error.h"
 
 #undef __BEGIN_DECLS
 #undef __END_DECLS

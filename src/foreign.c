@@ -21,11 +21,16 @@
 
 */
 
-#include "igraph.h"
+#include "igraph_foreign.h"
 #include "config.h"
 #include "igraph_math.h"
-#include "gml_tree.h"
-#include "memory.h"
+#include "igraph_gml_tree.h"
+#include "igraph_memory.h"
+#include "igraph_attributes.h"
+#include "igraph_interface.h"
+#include "igraph_interrupt.h"
+#include "igraph_constructors.h"
+#include "igraph_types_internal.h"
 
 #include <ctype.h>		/* isspace */
 #include <string.h>
@@ -2733,7 +2738,7 @@ extern FILE *igraph_dl_yyin;
 int igraph_dl_eof;
 long int igraph_dl_mylineno;
 char *igraph_i_dl_errmsg;
-extern igraph_i_dl_mode;
+extern int igraph_i_dl_mode;
 igraph_i_dl_parsedata_t igraph_i_dl_data;
 
 /** 

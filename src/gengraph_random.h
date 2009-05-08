@@ -1,7 +1,7 @@
 #ifndef RNG_H
 #define RNG_H
 
-#include "random.h"
+#include "igraph_random.h"
 #include <iostream>
 using namespace std;
 

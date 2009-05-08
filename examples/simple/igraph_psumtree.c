@@ -23,6 +23,7 @@
 */
 
 #include <igraph.h>
+#include <igraph_psumtree.h>
 #include <stdlib.h>
 
 int print_vector(igraph_vector_t *v) {

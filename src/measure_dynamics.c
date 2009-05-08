@@ -21,8 +21,12 @@
 
 */
 
-#include "igraph.h"
-#include "memory.h"
+#include "igraph_revolver.h"
+#include "igraph_memory.h"
+#include "igraph_interrupt.h"
+#include "igraph_interface.h"
+#include "igraph_iterators.h"
+#include "igraph_dqueue.h"
 #include "config.h"
 
 #include <math.h>

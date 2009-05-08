@@ -1,0 +1,84 @@
+/* -*- mode: C -*-  */
+/* 
+   IGraph library.
+   Copyright (C) 2009  Gabor Csardi <csardi@rmki.kfki.hu>
+   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   02110-1301 USA
+
+*/
+
+#ifndef IGRAPH_VECTOR_PTR_H
+#define IGRAPH_VECTOR_PTR_H
+
+#undef __BEGIN_DECLS
+#undef __END_DECLS
+#ifdef __cplusplus
+# define __BEGIN_DECLS extern "C" {
+# define __END_DECLS }
+#else
+# define __BEGIN_DECLS /* empty */
+# define __END_DECLS /* empty */
+#endif
+
+__BEGIN_DECLS
+
+/* -------------------------------------------------- */
+/* Flexible vector, storing pointers                  */
+/* -------------------------------------------------- */
+
+/** 
+ * Vector, storing pointers efficiently
+ * \ingroup internal
+ * 
+ */
+typedef struct s_vector_ptr {
+  void** stor_begin;
+  void** stor_end;
+  void** end;
+} igraph_vector_ptr_t;
+
+#define IGRAPH_VECTOR_PTR_NULL { 0,0,0 }
+#define IGRAPH_VECTOR_PTR_INIT_FINALLY(v, size) \
+  do { IGRAPH_CHECK(igraph_vector_ptr_init(v, size)); \
+  IGRAPH_FINALLY(igraph_vector_ptr_destroy, v); } while (0)
+
+int igraph_vector_ptr_init      (igraph_vector_ptr_t* v, long int size);
+int igraph_vector_ptr_init_copy (igraph_vector_ptr_t* v, void** data, long int length);
+const igraph_vector_ptr_t *igraph_vector_ptr_view (const igraph_vector_ptr_t *v, 
+				     void *const *data, long int length);
+void igraph_vector_ptr_destroy   (igraph_vector_ptr_t* v);
+void igraph_vector_ptr_free_all   (igraph_vector_ptr_t* v);
+void igraph_vector_ptr_destroy_all   (igraph_vector_ptr_t* v);
+int igraph_vector_ptr_reserve   (igraph_vector_ptr_t* v, long int size);
+igraph_bool_t igraph_vector_ptr_empty     (const igraph_vector_ptr_t* v);
+long int igraph_vector_ptr_size      (const igraph_vector_ptr_t* v);
+void igraph_vector_ptr_clear     (igraph_vector_ptr_t* v);
+void igraph_vector_ptr_null      (igraph_vector_ptr_t* v);
+int igraph_vector_ptr_push_back (igraph_vector_ptr_t* v, void* e);
+void *igraph_vector_ptr_pop_back (igraph_vector_ptr_t *v);
+int igraph_vector_ptr_insert(igraph_vector_ptr_t *v, long int pos, void* e);
+void* igraph_vector_ptr_e         (const igraph_vector_ptr_t* v, long int pos);
+void igraph_vector_ptr_set       (igraph_vector_ptr_t* v, long int pos, void* value);
+int igraph_vector_ptr_resize(igraph_vector_ptr_t* v, long int newsize);
+void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to);
+int igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from);
+void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos);
+void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int(*compar)(const void*, const void*));
+
+__END_DECLS
+
+#endif

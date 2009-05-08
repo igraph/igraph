@@ -28,7 +28,7 @@
    include this header.
 */
 
-#include "igraph.h"
+#include "igraph_types.h"
 #include "config.h"
 
 #ifndef INTERNAL_ARPACK

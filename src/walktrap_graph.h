@@ -56,7 +56,7 @@
 #define GRAPH_H
 #include <iostream>
 
-#include "igraph.h"
+#include "igraph_community.h"
 
 using namespace std;
 

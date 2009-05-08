@@ -45,7 +45,6 @@
 */
 
 #include "config.h"
-#include "igraph.h"
 #include <stdlib.h>
 #include <stdarg.h>
 #include "foreign-dl-header.h"

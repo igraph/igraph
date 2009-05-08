@@ -11,8 +11,8 @@
 */
 
 #include "config.h"
-#include "arpack_internal.h"
-#include "f2c.h"
+#include "igraph_arpack_internal.h"
+#include "igraph_f2c.h"
 
 /* Subroutine */ int igraphdlascl_(char *type__, integer *kl, integer *ku, 
 	doublereal *cfrom, doublereal *cto, integer *m, integer *n, 

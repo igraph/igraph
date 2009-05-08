@@ -21,10 +21,9 @@
 
 */
 
-#include "arpack.h"
-#include "arpack_internal.h"
-#include "memory.h"
-#include "igraph.h"
+#include "igraph_arpack.h"
+#include "igraph_arpack_internal.h"
+#include "igraph_memory.h"
 
 #include <math.h>
 #include <stdio.h>

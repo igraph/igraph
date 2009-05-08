@@ -34,8 +34,9 @@ using namespace std;
 #endif
 
 using namespace drl3d;
-#include "igraph.h"
-#include "random.h"
+#include "igraph_layout.h"
+#include "igraph_random.h"
+#include "igraph_interface.h"
 
 /**
  * \function igraph_layout_drl_3d

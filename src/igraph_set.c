@@ -21,9 +21,10 @@
 
 */
 
-#include "types.h"
-#include "memory.h"
-#include "error.h"
+#include "igraph_types.h"
+#include "igraph_memory.h"
+#include "igraph_error.h"
+#include "igraph_types_internal.h"
 #include "config.h"
 
 #include <assert.h>

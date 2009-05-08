@@ -21,9 +21,21 @@
 
 */
 
-#include "igraph.h"
-#include "random.h"
-#include "memory.h"
+#include "igraph_layout.h"
+#include "igraph_random.h"
+#include "igraph_memory.h"
+#include "igraph_iterators.h"
+#include "igraph_interface.h"
+#include "igraph_adjlist.h"
+#include "igraph_progress.h"
+#include "igraph_interrupt.h"
+#include "igraph_paths.h"
+#include "igraph_structural.h"
+#include "igraph_visitor.h"
+#include "igraph_topology.h"
+#include "igraph_components.h"
+#include "igraph_types_internal.h"
+#include "igraph_dqueue.h"
 #include "config.h"
 #include <math.h>
 #include "igraph_math.h"

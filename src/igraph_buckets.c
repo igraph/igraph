@@ -21,7 +21,8 @@
 
 */
 
-#include "types.h"
+#include "igraph_types.h"
+#include "igraph_types_internal.h"
 #include "config.h"
 
 #include <stdio.h>

@@ -21,12 +21,14 @@
 
 */
 
-#include "random.h"
-#include "error.h"
+#include "igraph_random.h"
+#include "igraph_error.h"
 #include "config.h"
 
 #include <math.h>
 #include "igraph_math.h"
+#include "igraph_types.h"
+#include "igraph_vector.h"
 
 int igraph_rng_inited = 0;
 

@@ -21,9 +21,11 @@
 
 */
 
-#include "igraph.h"
-#include "memory.h"
-#include "string.h"		/* memset & co. */
+#include "igraph_datatype.h"
+#include "igraph_interface.h"
+#include "igraph_attributes.h"
+#include "igraph_memory.h"
+#include <string.h>		/* memset & co. */
 #include "config.h"
 
 /* Internal functions */

@@ -4,7 +4,9 @@
 #include "gengraph_degree_sequence.h"
 #include "gengraph_random.h"
 
-#include "igraph.h"
+#include "igraph_datatype.h"
+#include "igraph_types.h"
+#include "igraph_error.h"
 
 namespace gengraph {
 

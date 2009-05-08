@@ -21,14 +21,17 @@
 
 */
 
-#include "igraph.h"
+#include "igraph_foreign.h"
 #include "config.h"
 #include <math.h>               /* isnan */
 #include "igraph_math.h"
+#include "igraph_attributes.h"
+#include "igraph_interface.h"
+#include "igraph_types_internal.h"
 
 #include <ctype.h>		/* isspace */
 #include <string.h>
-#include "memory.h"
+#include "igraph_memory.h"
 #include <stdarg.h> 		/* va_start & co */
 
 #if HAVE_LIBXML == 1

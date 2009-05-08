@@ -46,10 +46,11 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "types.h"
-#include "memory.h"
-#include "error.h"
-#include "attributes.h"
+#include "igraph_types.h"
+#include "igraph_types_internal.h"
+#include "igraph_memory.h"
+#include "igraph_error.h"
+#include "igraph_attributes.h"
 #include "config.h"
 #include "igraph_math.h"
 #include <math.h>

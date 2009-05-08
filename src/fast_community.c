@@ -21,8 +21,14 @@
 
 */
 
-#include "igraph.h"
-#include "memory.h"
+#include "igraph_community.h"
+#include "igraph_memory.h"
+#include "igraph_iterators.h"
+#include "igraph_interface.h"
+#include "igraph_progress.h"
+#include "igraph_interrupt.h"
+#include "igraph_structural.h"
+#include "igraph_vector_ptr.h"
 #include "config.h"
 
 /* #define IGRAPH_FASTCOMM_DEBUG */

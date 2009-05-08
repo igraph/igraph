@@ -20,7 +20,8 @@
 #include "bliss_kqueue.hh"
 #include "bliss_utils.hh"
 
-#include "types.h"
+#include "igraph_types.h"
+#include "igraph_topology.h"
 
 #include <cstring>
 

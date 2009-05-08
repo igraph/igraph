@@ -32,7 +32,7 @@ namespace igraph {
 #include "bliss_bignum.hh"
 #include "bliss_eqrefhash.hh"
 
-#include "igraph.h"
+#include "igraph_datatype.h"
 
 namespace igraph {
 

@@ -46,7 +46,9 @@
 #include "NetRoutines.h"
 #include "NetDataTypes.h"
 
-#include "igraph.h"
+#include "igraph_types.h"
+#include "igraph_interface.h"
+#include "igraph_conversion.h"
 
 int igraph_i_read_network(const igraph_t *graph, 
 			  const igraph_vector_t *weights,

@@ -20,8 +20,9 @@
 
 */
 
-#include "gml_tree.h"
-#include "memory.h"
+#include "igraph_gml_tree.h"
+#include "igraph_memory.h"
+#include "igraph_error.h"
 #include "config.h"
 
 #include <string.h>

@@ -21,8 +21,9 @@
 
 */
 
-#include "types.h"
-#include "error.h"
+#include "igraph_types.h"
+#include "igraph_psumtree.h"
+#include "igraph_error.h"
 #include "config.h"
 
 #include <math.h>

@@ -21,12 +21,12 @@
 
 */
 
-#include "igraph.h"
 #include <math.h>
 #include <float.h>
 #include <stdarg.h>
 #include "config.h"
 #include "igraph_math.h"
+#include "igraph_types.h"
 
 int igraph_finite(double x)
 {

@@ -21,7 +21,8 @@
 
 */
 
-#include "types.h"
+#include "igraph_types.h"
+#include "igraph_heap.h"
 
 #define BASE_IGRAPH_REAL
 #define HEAP_TYPE_MAX

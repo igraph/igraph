@@ -59,7 +59,9 @@
 #include <iostream>
 #include <fstream>
 
-#include "igraph.h"
+#include "igraph_community.h"
+#include "igraph_interface.h"
+#include "igraph_interrupt.h"
 
 using namespace std;
 

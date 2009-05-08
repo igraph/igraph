@@ -21,9 +21,16 @@
 
 */
 
-#include "igraph.h"
-#include "memory.h"
-#include "random.h"
+#include "igraph_centrality.h"
+#include "igraph_memory.h"
+#include "igraph_random.h"
+#include "igraph_adjlist.h"
+#include "igraph_interface.h"
+#include "igraph_progress.h"
+#include "igraph_interrupt.h"
+#include "igraph_types_internal.h"
+#include "igraph_stack.h"
+#include "igraph_dqueue.h"
 #include "config.h"
 #include <math.h>
 #include <string.h>    /* memset */

@@ -36,7 +36,7 @@
 
 __BEGIN_DECLS
 
-#include "types.h"
+#include "igraph_types.h"
 
 #include <stdlib.h>
 #include <time.h>

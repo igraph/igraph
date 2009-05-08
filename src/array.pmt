@@ -21,7 +21,7 @@
 
 */
 
-#include "types.h"
+#include "igraph_types.h"
 
 int FUNCTION(igraph_array3,init)(TYPE(igraph_array3) *a, long int n1, long int n2, 
 				 long int n3) {

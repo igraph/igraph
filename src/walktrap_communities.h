@@ -58,7 +58,7 @@
 #include "walktrap_graph.h"
 #include "walktrap_heap.h"
 
-#include "igraph.h"
+#include "igraph_community.h"
 
 class Communities;
 class Probabilities {

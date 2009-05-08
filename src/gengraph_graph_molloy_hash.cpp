@@ -11,6 +11,7 @@
 
 #include "config.h"
 #include "igraph_math.h"
+#include "igraph_constructors.h"
 
 namespace gengraph {
 

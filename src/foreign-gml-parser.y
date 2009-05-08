@@ -48,11 +48,11 @@
 #include <math.h>
 #include <string.h>
 
-#include "error.h"
-#include "memory.h"
+#include "igraph_error.h"
+#include "igraph_memory.h"
 #include "config.h"
 #include "igraph_math.h"
-#include "gml_tree.h"
+#include "igraph_gml_tree.h"
 
 extern int igraph_gml_yylex(void);
 extern long int igraph_gml_mylineno;

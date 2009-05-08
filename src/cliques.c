@@ -21,9 +21,14 @@
 
 */
 
-#include "igraph.h"
-#include "memory.h"
-#include "random.h"
+#include "igraph_cliques.h"
+#include "igraph_memory.h"
+#include "igraph_random.h"
+#include "igraph_constants.h"
+#include "igraph_adjlist.h"
+#include "igraph_interrupt.h"
+#include "igraph_interface.h"
+#include "igraph_types_internal.h"
 #include "config.h"
 
 

@@ -47,7 +47,9 @@
 
 #include "NetDataTypes.h"
 
-#include "igraph.h"
+#include "igraph_types.h"
+#include "igraph_vector.h"
+#include "igraph_matrix.h"
 
 #define qmax 500
 

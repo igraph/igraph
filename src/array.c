@@ -21,7 +21,9 @@
 
 */
 
-#include "types.h"
+#include "igraph_types.h"
+#include "igraph_vector.h"
+#include "igraph_array.h"
 
 #define BASE_IGRAPH_REAL
 #include "igraph_pmt.h"
