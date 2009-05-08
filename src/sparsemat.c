@@ -70,6 +70,39 @@ igraph_bool_t igraph_sparsemat_is_cc(const igraph_sparsemat_t *A) {
   return A->cs->nz < 0;
 }
 
+/* Limitations:
+   - p and q must be of length nrow and ncol, respectively
+   - no duplicated indices
+*/
+
+int igraph_sparsemat_index(const igraph_sparsemat_t *A,
+			   const igraph_vector_int_t *p, 
+			   const igraph_vector_int_t *q,
+			   igraph_sparsemat_t *res) {
+
+  long int nrow=A->cs->m, ncol=A->cs->n;
+  long int plen=igraph_vector_int_size(p);
+  igraph_vector_int_t pinv;
+  long int i;
+  
+  /* We invert the permutation by hand */
+  IGRAPH_CHECK(igraph_vector_int_init(&pinv, nrow));
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &pinv);
+  for (i=0; i<nrow; i++) {
+    VECTOR(pinv)[ VECTOR(*p)[i] ] = i;
+  }
+  
+  /* And call the permutation routine */
+  if (! (res->cs = cs_permute(A->cs, VECTOR(pinv), VECTOR(*q), /*values=*/ 1))) {
+    IGRAPH_ERROR("Cannot index sparse matrix", IGRAPH_FAILURE);
+  }
+  
+  igraph_vector_int_destroy(&pinv);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
+
 int igraph_sparsemat_entry(igraph_sparsemat_t *A, int row, int col, 
 			   igraph_real_t elem) {
   
