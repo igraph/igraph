@@ -498,3 +498,32 @@ int igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *res) {
   
   return 0;
 }
+
+#define CHECK(x) if ((x)<0) { IGRAPH_ERROR("Cannot write to file", IGRAPH_EFILE); }
+
+int igraph_sparsemat_print(const igraph_sparsemat_t *A,
+			   FILE *outstream) {
+  
+  if (A->cs->nz < 0) {
+    /* CC */
+    int j, p;
+    for (j=0; j<A->cs->n; j++) {
+      CHECK(fprintf(outstream, "col %i: locations %i to %i\n", 
+		    j, A->cs->p[j], A->cs->p[j+1]-1));
+      for (p=A->cs->p[j]; p < A->cs->p[j+1]; p++) {
+	CHECK(fprintf(outstream, "%i : %g\n", A->cs->i[p], A->cs->x[p]));
+      }
+    }
+  } else {
+    /* Triplet */
+    int p;
+    for (p=0; p<A->cs->nz; p++) {
+      CHECK(fprintf(outstream, "%i %i : %g\n", 
+		    A->cs->i[p], A->cs->p[p], A->cs->x[p]));
+    }
+  }
+  
+  return 0;
+}
+
+#undef CHECK

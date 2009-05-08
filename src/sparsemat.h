@@ -28,6 +28,8 @@
 #include "types.h"
 #include "igraph.h"
 
+#include <stdio.h>
+
 typedef struct igraph_sparsemat_t {
   cs *cs;
 } igraph_sparsemat_t;
@@ -102,6 +104,9 @@ int igraph_sparsemat_lusol(const igraph_sparsemat_t *A,
 			   igraph_vector_t *res,
 			   int order,
 			   igraph_real_t tol);
+
+int igraph_sparsemat_print(const igraph_sparsemat_t *A,
+			   FILE *outstream);
 
 int igraph_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
 		     igraph_bool_t directed);
