@@ -527,3 +527,90 @@ int igraph_sparsemat_print(const igraph_sparsemat_t *A,
 }
 
 #undef CHECK
+
+int igraph_i_sparsemat_eye_triplet(igraph_sparsemat_t *A, int n, int nzmax, 
+				   igraph_real_t value) {
+  long int i;
+
+  IGRAPH_CHECK(igraph_sparsemat_init(A, n, n, nzmax));
+  
+  for (i=0; i<n; i++) {
+    igraph_sparsemat_entry(A, i, i, value);
+  }
+  
+  return 0;
+}
+
+int igraph_i_sparsemat_eye_cc(igraph_sparsemat_t *A, int n,
+			      igraph_real_t value) {
+  long int i;
+
+  if (! (A->cs = cs_spalloc(n, n, n, /*values=*/ 1, /*triplet=*/ 0)) ) {
+    IGRAPH_ERROR("Cannot create eye sparse matrix", IGRAPH_FAILURE);
+  }
+  
+  for (i=0; i<n; i++) {
+    A->cs->p [i] = i;
+    A->cs->i [i] = i;
+    A->cs->x [i] = value;
+  }
+  A->cs->p [n] = n;
+  
+  return 0;
+}
+
+int igraph_sparsemat_eye(igraph_sparsemat_t *A, int n, int nzmax,
+			 igraph_real_t value,
+			 igraph_bool_t compress) {
+  if (compress) {
+    return(igraph_i_sparsemat_eye_cc(A, n, value));
+  } else {
+    return(igraph_i_sparsemat_eye_triplet(A, n, nzmax, value));
+  }
+}
+
+int igraph_i_sparsemat_diag_triplet(igraph_sparsemat_t *A, int nzmax,
+				    const igraph_vector_t *values) {
+
+  long int i, n=igraph_vector_size(values);
+
+  IGRAPH_CHECK(igraph_sparsemat_init(A, n, n, nzmax));
+  
+  for (i=0; i<n; i++) {
+    igraph_sparsemat_entry(A, i, i, VECTOR(*values)[i]);
+  }
+  
+  return 0;
+  
+}
+
+int igraph_i_sparsemat_diag_cc(igraph_sparsemat_t *A,
+			       const igraph_vector_t *values) {
+
+  long int i, n=igraph_vector_size(values);
+
+  if (! (A->cs = cs_spalloc(n, n, n, /*values=*/ 1, /*triplet=*/ 0)) ) {
+    IGRAPH_ERROR("Cannot create eye sparse matrix", IGRAPH_FAILURE);
+  }
+  
+  for (i=0; i<n; i++) {
+    A->cs->p [i] = i;
+    A->cs->i [i] = i;
+    A->cs->x [i] = VECTOR(*values)[i];
+  }
+  A->cs->p [n] = n;
+  
+  return 0;
+
+}
+
+int igraph_sparsemat_diag(igraph_sparsemat_t *A, int nzmax,
+			  const igraph_vector_t *values,
+			  igraph_bool_t compress) {
+
+  if (compress) {
+    return(igraph_i_sparsemat_diag_cc(A, values));
+  } else {
+    return(igraph_i_sparsemat_diag_triplet(A, nzmax, values));
+  }
+}

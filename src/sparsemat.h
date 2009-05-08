@@ -108,6 +108,14 @@ int igraph_sparsemat_lusol(const igraph_sparsemat_t *A,
 int igraph_sparsemat_print(const igraph_sparsemat_t *A,
 			   FILE *outstream);
 
+int igraph_sparsemat_eye(igraph_sparsemat_t *A, int n, int nzmax,
+			 igraph_real_t value,
+			 igraph_bool_t compress);
+
+int igraph_sparsemat_diag(igraph_sparsemat_t *A, int nzmax,
+			  const igraph_vector_t *values,
+			  igraph_bool_t compress);
+
 int igraph_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
 		     igraph_bool_t directed);
 
