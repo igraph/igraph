@@ -3,6 +3,7 @@
 DOXROX=$(top_srcdir)/doc/doxrox.py
 REGEX=$(top_srcdir)/doc/c-docbook.re
 SRCDIR=$(top_srcdir)/src
+INCLUDEDIR=$(top_srcdir)/include
 
 DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      structural.xml iterators.xml attributes.xml layout.xml \
@@ -33,18 +34,18 @@ doctemplate: $(DOCINCLUDES)
 igraph-docs.xml: $(DOCINCLUDES)
 	touch igraph-docs.xml
 
-vector.xml: vector.xxml $(SRCDIR)/types.h $(SRCDIR)/vector.pmt $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.h $(SRCDIR)/vector.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/types.h \
-	$(SRCDIR)/vector.pmt $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.h $(SRCDIR)/vector.c
+vector.xml: vector.xxml $(INCLUDEDIR)/igraph_vector_pmt.h $(SRCDIR)/vector.pmt $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_vector_pmt.h \
+	$(SRCDIR)/vector.pmt $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.c
 
-error.xml: error.xxml $(SRCDIR)/error.h
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/error.h
+error.xml: error.xxml $(INCLUDEDIR)/igraph_error.h
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_error.h
 
-matrix.xml: matrix.xxml $(SRCDIR)/types.h $(SRCDIR)/matrix.pmt
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/types.h $(SRCDIR)/matrix.pmt
+matrix.xml: matrix.xxml $(INCLUDEDIR)/igraph_matrix.h $(SRCDIR)/matrix.pmt
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_matrix.h $(SRCDIR)/matrix.pmt
 
-sparsematrix.xml: sparsematrix.xxml $(SRCDIR)/types.h $(SRCDIR)/spmatrix.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/types.h $(SRCDIR)/spmatrix.c
+sparsematrix.xml: sparsematrix.xxml $(INCLUDEDIR)/igraph_spmatrix.h $(SRCDIR)/spmatrix.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_spmatrix.h $(SRCDIR)/spmatrix.c
 
 basicigraph.xml: basicigraph.xxml $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c
@@ -66,16 +67,16 @@ structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 	$(SRCDIR)/spectral_properties.c $(SRCDIR)/cores.c \
 	$(SRCDIR)/centrality.c $(SRCDIR)/decomposition.c
 
-iterators.xml: iterators.xxml $(SRCDIR)/iterators.c $(SRCDIR)/igraph.h
+iterators.xml: iterators.xxml $(SRCDIR)/iterators.c $(INCLUDEDIR)/igraph_iterators.h
 	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/iterators.c \
-	$(SRCDIR)/igraph.h
+	$(INCLUDEDIR)/igraph_iterators.h
 
-attributes.xml: attributes.xxml $(SRCDIR)/attributes.c $(SRCDIR)/attributes.h $(SRCDIR)/cattributes.c
+attributes.xml: attributes.xxml $(SRCDIR)/attributes.c $(INCLUDEDIR)/igraph_attributes.h $(SRCDIR)/cattributes.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/attributes.c \
-	$(SRCDIR)/attributes.h $(SRCDIR)/cattributes.c
+	$(INCLUDEDIR)/igraph_attributes.h $(SRCDIR)/cattributes.c
 
-layout.xml: layout.xxml $(SRCDIR)/layout.c $(SRCDIR)/igraph.h $(SRCDIR)/drl_layout.cpp $(SRCDIR)/drl_layout_3d.cpp
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/layout.c $(SRCDIR)/igraph.h $(SRCDIR)/drl_layout.cpp $(SRCDIR)/drl_layout_3d.cpp
+layout.xml: layout.xxml $(SRCDIR)/layout.c $(INCLUDEDIR)/igraph_layout.h $(SRCDIR)/drl_layout.cpp $(SRCDIR)/drl_layout_3d.cpp
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/layout.c $(INCLUDEDIR)/igraph_layout.h $(SRCDIR)/drl_layout.cpp $(SRCDIR)/drl_layout_3d.cpp
 
 foreign.xml: foreign.xxml $(SRCDIR)/foreign.c $(SRCDIR)/foreign-graphml.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/foreign.c \
@@ -84,8 +85,8 @@ foreign.xml: foreign.xxml $(SRCDIR)/foreign.c $(SRCDIR)/foreign-graphml.c
 nongraph.xml: nongraph.xxml $(SRCDIR)/other.c $(SRCDIR)/random.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/other.c $(SRCDIR)/random.c
 
-isomorphism.xml: isomorphism.xxml $(SRCDIR)/topology.c $(SRCDIR)/igraph.h $(SRCDIR)/bliss.cc
-	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/topology.c $(SRCDIR)/igraph.h $(SRCDIR)/bliss.cc
+isomorphism.xml: isomorphism.xxml $(SRCDIR)/topology.c $(INCLUDEDIR)/igraph_topology.h $(SRCDIR)/bliss.cc
+	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/topology.c $(INCLUDEDIR)/igraph_topology.h $(SRCDIR)/bliss.cc
 
 motifs.xml: motifs.xxml $(SRCDIR)/motifs.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/motifs.c
@@ -111,20 +112,20 @@ dqueue.xml: dqueue.xxml $(SRCDIR)/dqueue.pmt
 heap.xml: heap.xxml $(SRCDIR)/heap.pmt
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/heap.pmt
 
-strvector.xml: strvector.xxml $(SRCDIR)/igraph_strvector.c $(SRCDIR)/types.h
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/igraph_strvector.c $(SRCDIR)/types.h
+strvector.xml: strvector.xxml $(SRCDIR)/igraph_strvector.c $(INCLUDEDIR)/igraph_strvector.h
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/igraph_strvector.c $(INCLUDEDIR)/igraph_strvector.h
 
-adjlist.xml: adjlist.xxml $(SRCDIR)/adjlist.c $(SRCDIR)/igraph.h
-	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/adjlist.c $(SRCDIR)/igraph.h
+adjlist.xml: adjlist.xxml $(SRCDIR)/adjlist.c $(INCLUDEDIR)/igraph_adjlist.h
+	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/adjlist.c $(INCLUDEDIR)/igraph_adjlist.h
 
-arpack.xml: arpack.xxml $(SRCDIR)/arpack.h $(SRCDIR)/arpack.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/arpack.h $(SRCDIR)/arpack.c
+arpack.xml: arpack.xxml $(INCLUDEDIR)/igraph_arpack.h $(SRCDIR)/arpack.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_arpack.h $(SRCDIR)/arpack.c
 
 bipartite.xml: bipartite.xxml $(SRCDIR)/bipartite.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/bipartite.c
 
-visitors.xml: visitors.xxml $(SRCDIR)/visitors.c  $(SRCDIR)/igraph.h
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/visitors.c  $(SRCDIR)/igraph.h
+visitors.xml: visitors.xxml $(SRCDIR)/visitors.c  $(INCLUDEDIR)/igraph_visitor.h
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/visitors.c  $(INCLUDEDIR)/igraph_visitor.h
 
 html/stamp: igraph-docs.xml $(DOCFIX2) gtk-doc.xsl
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
