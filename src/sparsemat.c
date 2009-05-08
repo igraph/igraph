@@ -79,7 +79,14 @@ int igraph_sparsemat_permute(const igraph_sparsemat_t *A,
   long int plen=igraph_vector_int_size(p);
   igraph_vector_int_t pinv;
   long int i;
-  
+
+  if (nrow != igraph_vector_int_size(p)) {
+    IGRAPH_ERROR("Invalid row permutation length", IGRAPH_FAILURE);
+  }
+  if (ncol != igraph_vector_int_size(q)) {
+    IGRAPH_ERROR("Invalud column permutation length", IGRAPH_FAILURE);
+  }
+
   /* We invert the permutation by hand */
   IGRAPH_CHECK(igraph_vector_int_init(&pinv, nrow));
   IGRAPH_FINALLY(igraph_vector_int_destroy, &pinv);
