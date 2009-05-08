@@ -70,15 +70,10 @@ igraph_bool_t igraph_sparsemat_is_cc(const igraph_sparsemat_t *A) {
   return A->cs->nz < 0;
 }
 
-/* Limitations:
-   - p and q must be of length nrow and ncol, respectively
-   - no duplicated indices
-*/
-
-int igraph_sparsemat_index(const igraph_sparsemat_t *A,
-			   const igraph_vector_int_t *p, 
-			   const igraph_vector_int_t *q,
-			   igraph_sparsemat_t *res) {
+int igraph_sparsemat_permute(const igraph_sparsemat_t *A,
+			     const igraph_vector_int_t *p, 
+			     const igraph_vector_int_t *q,
+			     igraph_sparsemat_t *res) {
 
   long int nrow=A->cs->m, ncol=A->cs->n;
   long int plen=igraph_vector_int_size(p);
