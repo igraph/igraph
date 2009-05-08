@@ -50,6 +50,12 @@ int igraph_sparsemat_permute(const igraph_sparsemat_t *A,
 			     const igraph_vector_int_t *q,
 			     igraph_sparsemat_t *res);
 
+int igraph_sparsemat_index(const igraph_sparsemat_t *A,
+			   const igraph_vector_int_t *p,
+			   const igraph_vector_int_t *q,
+			   igraph_sparsemat_t *res,
+			   igraph_real_t *constres);
+
 int igraph_sparsemat_entry(igraph_sparsemat_t *A, int row, int col, 
 			   igraph_real_t elem);
 int igraph_sparsemat_compress(const igraph_sparsemat_t *A, 

@@ -105,6 +105,77 @@ int igraph_sparsemat_permute(const igraph_sparsemat_t *A,
   return 0;
 }
 
+int igraph_sparsemat_index(const igraph_sparsemat_t *A,
+			   const igraph_vector_int_t *p,
+			   const igraph_vector_int_t *q,
+			   igraph_sparsemat_t *res,
+			   igraph_real_t *constres) {
+
+  igraph_sparsemat_t II, JJ, II2, JJ2, tmp;
+  long int nrow=A->cs->m;
+  long int ncol=A->cs->n;
+  long int idx_rows=igraph_vector_int_size(p);
+  long int idx_cols=igraph_vector_int_size(q);
+  long int k;
+
+  igraph_sparsemat_t *myres=res, mres;
+
+  if (!res && (idx_rows != 1 || idx_cols != 1)) {
+    IGRAPH_ERROR("Sparse matrix indexing: must give `res' if not a "
+		 "single element is selected", IGRAPH_EINVAL);
+  }
+
+  if (!res) {
+    myres=&mres;
+  }
+
+  /* Create first index matrix */
+  IGRAPH_CHECK(igraph_sparsemat_init(&II2, idx_rows, ncol, idx_rows));
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &II2);
+  for (k=0; k<idx_rows; k++) {
+    igraph_sparsemat_entry(&II2, k, VECTOR(*p)[k], 1.0);
+  }
+  IGRAPH_CHECK(igraph_sparsemat_compress(&II2, &II));
+  igraph_sparsemat_destroy(&II2);
+  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &II);
+
+  /* Create second index matrix */
+  IGRAPH_CHECK(igraph_sparsemat_init(&JJ2, nrow, idx_cols, idx_cols));
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &JJ2);
+  for (k=0; k<idx_cols; k++) {
+    igraph_sparsemat_entry(&JJ2, VECTOR(*q)[k], k, 1.0);
+  }
+  IGRAPH_CHECK(igraph_sparsemat_compress(&JJ2, &JJ));
+  igraph_sparsemat_destroy(&JJ2);
+  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &JJ);
+  
+  /* Multiply */
+  IGRAPH_CHECK(igraph_sparsemat_multiply(&II, A, &tmp));
+  igraph_sparsemat_destroy(&II);
+  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmp);
+  IGRAPH_CHECK(igraph_sparsemat_multiply(&tmp, &JJ, myres));
+  igraph_sparsemat_destroy(&tmp);
+  igraph_sparsemat_destroy(&JJ);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  if (constres) {
+    if (myres->cs->p [0] <= ncol) {
+      *constres = myres->cs->x [0];
+    } else {
+      *constres = 0.0;
+    }
+  }
+
+  if (!res) {
+    igraph_sparsemat_destroy(myres);
+  }
+
+  return 0;
+}
+
 int igraph_sparsemat_entry(igraph_sparsemat_t *A, int row, int col, 
 			   igraph_real_t elem) {
   
