@@ -28,6 +28,24 @@
 # define _GNU_SOURCE
 #endif
 
+#include "igraph_memory.h"
+#include "igraph_error.h"
+#include "igraph_random.h"
+#include "igraph_interrupt.h"
+#include "igraph_progress.h"
+
+#include "igraph_types.h"
+#include "igraph_vector.h"
+#include "igraph_matrix.h"
+#include "igraph_array.h"
+#include "igraph_dqueue.h"
+#include "igraph_stack.h"
+#include "igraph_heap.h"
+#include "igraph_psumtree.h"
+#include "igraph_strvector.h"
+#include "igraph_vector_ptr.h"
+#include "igraph_spmatrix.h"
+
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
 #include "igraph_iterators.h"
@@ -55,7 +73,7 @@
 #include "igraph_nongraph.h"
 #include "igraph_cocitation.h"
 #include "igraph_adjlist.h"
-#include "igraph_progress.h"
 #include "igraph_attributes.h"
+#include "igraph_arpack.h"
 
 #endif
