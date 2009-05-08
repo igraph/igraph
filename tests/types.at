@@ -110,3 +110,8 @@ AT_SETUP([2-way heap (igraph_2wheap_t): ])
 AT_KEYWORDS([heap two-way 2-way igraph_2wheap_t])
 AT_COMPILE_CHECK([simple/2wheap.c])
 AT_CLEANUP
+
+AT_SETUP([Sparse matrix (igraph_sparsemat_t): ])
+AT_KEYWORDS([sparse matrix igraph_sparsemat_t])
+AT_COMPILE_CHECK([simple/igraph_sparsemat.c], [simple/igraph_sparsemat.out])
+AT_CLEANUP
