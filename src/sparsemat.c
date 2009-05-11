@@ -130,7 +130,7 @@ int igraph_sparsemat_index(const igraph_sparsemat_t *A,
   }
 
   /* Create first index matrix */
-  IGRAPH_CHECK(igraph_sparsemat_init(&II2, idx_rows, ncol, idx_rows));
+  IGRAPH_CHECK(igraph_sparsemat_init(&II2, idx_rows, nrow, idx_rows));
   IGRAPH_FINALLY(igraph_sparsemat_destroy, &II2);
   for (k=0; k<idx_rows; k++) {
     igraph_sparsemat_entry(&II2, k, VECTOR(*p)[k], 1.0);
@@ -141,7 +141,7 @@ int igraph_sparsemat_index(const igraph_sparsemat_t *A,
   IGRAPH_FINALLY(igraph_sparsemat_destroy, &II);
 
   /* Create second index matrix */
-  IGRAPH_CHECK(igraph_sparsemat_init(&JJ2, nrow, idx_cols, idx_cols));
+  IGRAPH_CHECK(igraph_sparsemat_init(&JJ2, ncol, idx_cols, idx_cols));
   IGRAPH_FINALLY(igraph_sparsemat_destroy, &JJ2);
   for (k=0; k<idx_cols; k++) {
     igraph_sparsemat_entry(&JJ2, VECTOR(*q)[k], k, 1.0);
