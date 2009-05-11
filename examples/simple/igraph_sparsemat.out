@@ -1,0 +1,295 @@
+1 0 : 1
+0 1 : 1
+2 1 : 1
+1 2 : 1
+3 2 : 1
+2 3 : 1
+4 3 : 1
+3 4 : 1
+5 4 : 1
+4 5 : 1
+6 5 : 1
+5 6 : 1
+7 6 : 1
+6 7 : 1
+8 7 : 1
+7 8 : 1
+9 8 : 1
+8 9 : 1
+9 0 : 1
+0 9 : 1
+col 0: locations 0 to 1
+1 : 1
+9 : 1
+col 1: locations 2 to 3
+0 : 1
+2 : 1
+col 2: locations 4 to 5
+1 : 1
+3 : 1
+col 3: locations 6 to 7
+2 : 1
+4 : 1
+col 4: locations 8 to 9
+3 : 1
+5 : 1
+col 5: locations 10 to 11
+4 : 1
+6 : 1
+col 6: locations 12 to 13
+5 : 1
+7 : 1
+col 7: locations 14 to 15
+6 : 1
+8 : 1
+col 8: locations 16 to 17
+7 : 1
+9 : 1
+col 9: locations 18 to 19
+8 : 1
+0 : 1
+------------------------
+0 0 : 1
+1 1 : 1
+2 2 : 1
+3 3 : 1
+4 4 : 1
+col 0: locations 0 to 0
+0 : 1
+col 1: locations 1 to 1
+1 : 1
+col 2: locations 2 to 2
+2 : 1
+col 3: locations 3 to 3
+3 : 1
+col 4: locations 4 to 4
+4 : 1
+------------------------
+0 0 : 0
+1 1 : 1
+2 2 : 2
+3 3 : 3
+4 4 : 4
+col 0: locations 0 to 0
+0 : 0
+col 1: locations 1 to 1
+1 : 1
+col 2: locations 2 to 2
+2 : 2
+col 3: locations 3 to 3
+3 : 3
+col 4: locations 4 to 4
+4 : 4
+------------------------
+col 0: locations 0 to -1
+col 1: locations 0 to 0
+0 : 1
+col 2: locations 1 to 1
+0 : 1
+col 3: locations 2 to 2
+1 : 1
+col 4: locations 3 to 3
+1 : 1
+col 5: locations 4 to 4
+2 : 1
+col 6: locations 5 to 5
+2 : 1
+col 7: locations 6 to 6
+3 : 1
+col 8: locations 7 to 7
+3 : 1
+col 9: locations 8 to 8
+4 : 1
+col 0: locations 0 to 1
+1 : 1
+2 : 1
+col 1: locations 2 to 3
+3 : 1
+4 : 1
+col 2: locations 4 to 5
+5 : 1
+6 : 1
+col 3: locations 6 to 7
+7 : 1
+8 : 1
+col 4: locations 8 to 8
+9 : 1
+col 5: locations 9 to 8
+col 6: locations 9 to 8
+col 7: locations 9 to 8
+col 8: locations 9 to 8
+col 9: locations 9 to 8
+------------------------
+0 1 : 1
+0 2 : 1
+0 3 : 1
+0 4 : 1
+0 5 : 1
+0 6 : 1
+0 7 : 1
+0 8 : 1
+0 9 : 1
+0 1 : 1
+0 2 : 1
+0 3 : 1
+0 4 : 1
+0 5 : 1
+0 6 : 1
+0 7 : 1
+0 8 : 1
+0 9 : 1
+col 0: locations 0 to -1
+col 1: locations 0 to 1
+0 : 1
+0 : 1
+col 2: locations 2 to 3
+0 : 1
+0 : 1
+col 3: locations 4 to 5
+0 : 1
+0 : 1
+col 4: locations 6 to 7
+0 : 1
+0 : 1
+col 5: locations 8 to 9
+0 : 1
+0 : 1
+col 6: locations 10 to 11
+0 : 1
+0 : 1
+col 7: locations 12 to 13
+0 : 1
+0 : 1
+col 8: locations 14 to 15
+0 : 1
+0 : 1
+col 9: locations 16 to 17
+0 : 1
+0 : 1
+col 0: locations 0 to -1
+col 1: locations 0 to 0
+0 : 2
+col 2: locations 1 to 1
+0 : 2
+col 3: locations 2 to 2
+0 : 2
+col 4: locations 3 to 3
+0 : 2
+col 5: locations 4 to 4
+0 : 2
+col 6: locations 5 to 5
+0 : 2
+col 7: locations 6 to 6
+0 : 2
+col 8: locations 7 to 7
+0 : 2
+col 9: locations 8 to 8
+0 : 2
+------------------------
+7 3 : 0
+0 1 : 1
+0 1 : 0
+0 2 : 1
+0 2 : 0
+0 3 : 1
+0 3 : 0
+0 4 : 1
+0 4 : 0
+0 5 : 1
+0 5 : 0
+0 6 : 1
+0 6 : 0
+0 7 : 1
+0 7 : 0
+0 8 : 1
+0 8 : 0
+0 9 : 1
+0 9 : 0
+0 0 : 0
+col 0: locations 0 to 0
+0 : 0
+col 1: locations 1 to 2
+0 : 1
+0 : 0
+col 2: locations 3 to 4
+0 : 1
+0 : 0
+col 3: locations 5 to 7
+7 : 0
+0 : 1
+0 : 0
+col 4: locations 8 to 9
+0 : 1
+0 : 0
+col 5: locations 10 to 11
+0 : 1
+0 : 0
+col 6: locations 12 to 13
+0 : 1
+0 : 0
+col 7: locations 14 to 15
+0 : 1
+0 : 0
+col 8: locations 16 to 17
+0 : 1
+0 : 0
+col 9: locations 18 to 19
+0 : 1
+0 : 0
+col 0: locations 0 to -1
+col 1: locations 0 to 0
+0 : 1
+col 2: locations 1 to 1
+0 : 1
+col 3: locations 2 to 2
+0 : 1
+col 4: locations 3 to 3
+0 : 1
+col 5: locations 4 to 4
+0 : 1
+col 6: locations 5 to 5
+0 : 1
+col 7: locations 6 to 6
+0 : 1
+col 8: locations 7 to 7
+0 : 1
+col 9: locations 8 to 8
+0 : 1
+------------------------
+col 0: locations 0 to 1
+1 : 2
+9 : 2
+col 1: locations 2 to 3
+0 : 3
+2 : 2
+col 2: locations 4 to 6
+0 : 1
+1 : 2
+3 : 2
+col 3: locations 7 to 9
+0 : 1
+2 : 2
+4 : 2
+col 4: locations 10 to 12
+0 : 1
+3 : 2
+5 : 2
+col 5: locations 13 to 15
+0 : 1
+4 : 2
+6 : 2
+col 6: locations 16 to 18
+0 : 1
+5 : 2
+7 : 2
+col 7: locations 19 to 21
+0 : 1
+6 : 2
+8 : 2
+col 8: locations 22 to 24
+0 : 1
+7 : 2
+9 : 2
+col 9: locations 25 to 26
+0 : 3
+8 : 2

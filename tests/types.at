@@ -114,3 +114,24 @@ AT_SETUP([2-way heap (igraph_2wheap_t): ])
 AT_KEYWORDS([heap two-way 2-way igraph_2wheap_t])
 AT_COMPILE_CHECK([simple/2wheap.c], [], [], [INTERNAL])
 AT_CLEANUP
+
+AT_SETUP([Sparse matrix (igraph_sparsemat_t): ])
+AT_KEYWORDS([sparse matrix igraph_sparsemat_t])
+AT_COMPILE_CHECK([simple/igraph_sparsemat.c], [simple/igraph_sparsemat.out])
+AT_CLEANUP
+
+AT_SETUP([Sparse matrix, multiplications (igraph_sparsemat_t): ])
+AT_KEYWORDS([sparse matrix igraph_sparsemat_t])
+AT_COMPILE_CHECK([simple/igraph_sparsemat2.c], [simple/igraph_sparsemat2.out])
+AT_CLEANUP
+
+AT_SETUP([Sparse matrix, indexing (igraph_sparsemat_t): ])
+AT_KEYWORDS([sparse matrix igraph_sparsemat_t])
+AT_COMPILE_CHECK([simple/igraph_sparsemat3.c], [simple/igraph_sparsemat3.out])
+AT_CLEANUP
+
+AT_SETUP([Sparse matrix, solvers (igraph_sparsemat_t): ])
+AT_KEYWORDS([sparse matrix igraph_sparsemat_t])
+AT_COMPILE_CHECK([simple/igraph_sparsemat4.c], [simple/igraph_sparsemat4.out])
+AT_CLEANUP
+
