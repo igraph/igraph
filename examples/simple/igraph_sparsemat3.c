@@ -48,6 +48,46 @@ int permute(const igraph_matrix_t *M,
   return 0;
 }
 
+int permute_rows(const igraph_matrix_t *M,
+		 const igraph_vector_int_t *p,
+		 igraph_matrix_t *res) {
+
+  long int nrow=igraph_vector_int_size(p);
+  long int ncol=igraph_matrix_ncol(M);
+  long int i, j;
+  
+  igraph_matrix_resize(res, nrow, ncol);
+  
+  for (i=0; i<nrow; i++) {
+    for (j=0; j<ncol; j++) {
+      int ii=VECTOR(*p)[i];
+      MATRIX(*res, i, j) = MATRIX(*M, ii, j);
+    }
+  }
+  
+  return 0;
+}
+
+int permute_cols(const igraph_matrix_t *M,
+		 const igraph_vector_int_t *q,
+		 igraph_matrix_t *res) {
+
+  long int nrow=igraph_matrix_nrow(M);
+  long int ncol=igraph_vector_int_size(q);
+  long int i, j;
+  
+  igraph_matrix_resize(res, nrow, ncol);
+  
+  for (i=0; i<nrow; i++) {
+    for (j=0; j<ncol; j++) {
+      int jj=VECTOR(*q)[j];
+      MATRIX(*res, i, j) = MATRIX(*M, i, jj);
+    }
+  }
+  
+  return 0;
+}
+
 int random_permutation(igraph_vector_int_t *vec) {
   /* We just do size(vec) * 2 swaps */
   long int one, two, i, n=igraph_vector_int_size(vec);
@@ -185,7 +225,6 @@ int main() {
   permute(&M, &p, &q, &N);
   
   igraph_sparsemat_index(&B, &p, &q, &A, 0);
-  igraph_sparsemat_dupl(&A);
   
   if (! check_same(&A, &N)) { return 3; }
   
@@ -223,6 +262,49 @@ int main() {
   igraph_matrix_destroy(&M);
   igraph_matrix_destroy(&N);
 
+  /* Indexing only the rows or the columns */
+  
+  igraph_matrix_init(&M, NROW, NCOL);
+  igraph_sparsemat_init(&A, NROW, NCOL, EDGES);
+  for (i=0; i<EDGES; i++) {
+    long int r=RNG_INTEGER(0, NROW-1);
+    long int c=RNG_INTEGER(0, NCOL-1);
+    igraph_real_t value=RNG_INTEGER(1,5);
+    MATRIX(M, r, c) = MATRIX(M, r, c) + value;
+    igraph_sparsemat_entry(&A, r, c, value);
+  }
+  igraph_sparsemat_compress(&A, &B);
+  igraph_sparsemat_destroy(&A);
+  
+  igraph_vector_int_init(&p, I_NROW);
+  igraph_vector_int_init(&q, I_NCOL);
+  
+  for (i=0; i<I_NROW; i++) {
+    VECTOR(p)[i] = RNG_INTEGER(0, I_NROW-1);
+  }
+  for (i=0; i<I_NCOL; i++) {
+    VECTOR(p)[i] = RNG_INTEGER(0, I_NCOL-1);
+  }
+  
+  igraph_matrix_init(&N, 0, 0);
+  permute_rows(&M, &p, &N);
+  
+  igraph_sparsemat_index(&B, &p, 0, &A, 0);
+
+  if (! check_same(&A, &N)) { return 5; }
+  
+  permute_cols(&M, &q, &N);
+  igraph_sparsemat_destroy(&A);
+  igraph_sparsemat_index(&B, 0, &q, &A, 0);
+  
+  if (! check_same(&A, &N)) { return 6; }
+  
+  igraph_sparsemat_destroy(&A);
+  igraph_sparsemat_destroy(&B);
+  igraph_vector_int_destroy(&p);
+  igraph_vector_int_destroy(&q);
+  igraph_matrix_destroy(&M);
+  igraph_matrix_destroy(&N);
 
   return 0;
 }
