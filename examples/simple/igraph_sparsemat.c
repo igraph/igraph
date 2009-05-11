@@ -22,7 +22,7 @@
 */
 
 #include <igraph.h>
-#include <../src/sparsemat.h>	/* TODO: hack, correct it */
+#include <igraph_sparsemat.h>
 
 int main() {
   

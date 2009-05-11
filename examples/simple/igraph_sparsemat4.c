@@ -21,8 +21,9 @@
 
 */
 
+#include <cs/cs.h>
 #include <igraph.h>
-#include <../src/sparsemat.h>	/* TODO: hack, correct it */
+#include <igraph_sparsemat.h>
 
 #define RNG_INTEGER(l, h) ((long int)((rand())/((double)RAND_MAX+1)*((h)-(l)+1)+(l)))
 

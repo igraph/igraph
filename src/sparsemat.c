@@ -21,6 +21,8 @@
 
 */
 
+#include "cs/cs.h"
+
 #include "igraph_sparsemat.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"

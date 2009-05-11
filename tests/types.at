@@ -122,16 +122,19 @@ AT_CLEANUP
 
 AT_SETUP([Sparse matrix, multiplications (igraph_sparsemat_t): ])
 AT_KEYWORDS([sparse matrix igraph_sparsemat_t])
-AT_COMPILE_CHECK([simple/igraph_sparsemat2.c], [simple/igraph_sparsemat2.out])
+AT_COMPILE_CHECK([simple/igraph_sparsemat2.c], [simple/igraph_sparsemat2.out],
+                 [], [INTERNAL])
 AT_CLEANUP
 
 AT_SETUP([Sparse matrix, indexing (igraph_sparsemat_t): ])
 AT_KEYWORDS([sparse matrix igraph_sparsemat_t])
-AT_COMPILE_CHECK([simple/igraph_sparsemat3.c], [simple/igraph_sparsemat3.out])
+AT_COMPILE_CHECK([simple/igraph_sparsemat3.c], [simple/igraph_sparsemat3.out],
+                 [], [INTERNAL])
 AT_CLEANUP
 
 AT_SETUP([Sparse matrix, solvers (igraph_sparsemat_t): ])
 AT_KEYWORDS([sparse matrix igraph_sparsemat_t])
-AT_COMPILE_CHECK([simple/igraph_sparsemat4.c], [simple/igraph_sparsemat4.out])
+AT_COMPILE_CHECK([simple/igraph_sparsemat4.c], [simple/igraph_sparsemat4.out],
+                 [], [INTERNAL])
 AT_CLEANUP
 

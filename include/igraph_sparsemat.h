@@ -24,15 +24,16 @@
 #ifndef IGRAPH_SPARSEMAT_H
 #define IGRAPH_SPARSEMAT_H
 
-#include "cs/cs.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_datatype.h"
 
 #include <stdio.h>
 
-typedef struct igraph_sparsemat_t {
-  cs *cs;
+struct cs_di_sparse;
+
+typedef struct {
+  struct cs_di_sparse *cs;
 } igraph_sparsemat_t;
 
 typedef enum { IGRAPH_SPARSEMAT_TRIPLET, 
