@@ -21,8 +21,10 @@
 
 */
 
-#include "sparsemat.h"
-#include "error.h"
+#include "igraph_sparsemat.h"
+#include "igraph_error.h"
+#include "igraph_interface.h"
+#include "igraph_constructors.h"
 
 int igraph_sparsemat_init(igraph_sparsemat_t *A, int rows, int cols, int nzmax) {
 
