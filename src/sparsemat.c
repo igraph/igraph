@@ -162,7 +162,7 @@ int igraph_sparsemat_index(const igraph_sparsemat_t *A,
   IGRAPH_FINALLY_CLEAN(2);
 
   if (constres) {
-    if (myres->cs->p [0] <= ncol) {
+    if (myres->cs->p [1] != 0) {
       *constres = myres->cs->x [0];
     } else {
       *constres = 0.0;
