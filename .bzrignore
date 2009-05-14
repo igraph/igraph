@@ -89,3 +89,5 @@ interfaces/java/Makefile
 interfaces/java/src/Graph.java
 interfaces/java/src/hu_kfki_rmki_cneuro_igraph_Graph.c
 interfaces/java/src/hu_kfki_rmki_cneuro_igraph_Graph.h
+interfaces/R/igraph/src/cs/UFconfig.h
+interfaces/R/igraph/src/cs/cs.h

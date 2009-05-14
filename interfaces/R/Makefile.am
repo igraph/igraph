@@ -68,12 +68,21 @@ SRCFILES_ORIGPLACE5 = 	$(wildcard $(top_srcdir)/src/f2c/*.c)
 
 SRCFILES_ORIGPLACE6 =   $(wildcard $(top_srcdir)/include/*.h)
 
+SRCFILES_ORIGPLACE7 = 	$(wildcard $(top_srcdir)/src/cs/*.c)
+
+SRCFILES_ORIGPLACE8 = 	$(wildcard $(top_srcdir)/src/cs/*.h)
+
 SRCFILES = $(patsubst $(top_srcdir)/src/%,igraph/src/%,$(SRCFILES_ORIGPLACE)) \
 	$(patsubst $(top_srcdir)/src/arpack/%,igraph/src/%,$(SRCFILES_ORIGPLACE2)) \
 	$(patsubst $(top_srcdir)/src/lapack/%,igraph/src/%,$(SRCFILES_ORIGPLACE3)) \
 	$(patsubst $(top_srcdir)/src/blas/%,igraph/src/%,$(SRCFILES_ORIGPLACE4)) \
 	$(patsubst $(top_srcdir)/src/f2c/%,igraph/src/%,$(SRCFILES_ORIGPLACE5)) \
-	$(patsubst $(top_srcdir)/include/%,igraph/src/%,$(SRCFILES_ORIGPLACE6))
+	$(patsubst $(top_srcdir)/include/%,igraph/src/%,$(SRCFILES_ORIGPLACE6)) \
+	$(patsubst $(top_srcdir)/src/cs/%,igraph/src/%,$(SRCFILES_ORIGPLACE7)) \
+	$(patsubst $(top_srcdir)/src/cs/%,igraph/src/cs/%,$(SRCFILES_ORIGPLACE8))
+
+igraph/src/cs/%.h: $(top_srcdir)/src/cs/%.h
+	cp $(top_srcdir)/src/cs/$(@F) igraph/src/cs/$(@F)
 
 igraph/src/%.c: $(top_srcdir)/src/%.c
 	cp $(top_srcdir)/src/$(@F) $@
@@ -96,6 +105,8 @@ igraph/src/%.c: $(top_srcdir)/src/blas/%.c
 	cp $(top_srcdir)/src/blas/$(@F) igraph/src/$(@F)
 igraph/src/%.c: $(top_srcdir)/src/f2c/%.c
 	cp $(top_srcdir)/src/f2c/$(@F) igraph/src/$(@F)
+igraph/src/%.c: $(top_srcdir)/src/cs/%.c
+	cp $(top_srcdir)/src/cs/$(@F) igraph/src/$(@F)
 
 igraph/src/%.h: $(top_srcdir)/include/%.h
 	cp $(top_srcdir)/include/$(@F) $@
