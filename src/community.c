@@ -582,7 +582,12 @@ int igraph_modularity(const igraph_t *graph,
   long int i;
   igraph_integer_t from, to, m;
   long int c1, c2;
-  
+
+  if (igraph_vector_size(membership) < igraph_vcount(graph)) {
+    IGRAPH_ERROR("cannot calculate modularity, membership vector too short",
+      IGRAPH_EINVAL);
+  }
+
   IGRAPH_VECTOR_INIT_FINALLY(&e, types);
   IGRAPH_VECTOR_INIT_FINALLY(&a, types);
   
