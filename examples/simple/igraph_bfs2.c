@@ -54,12 +54,12 @@ int main() {
 	     &order, &rank, &father, &pred, &succ, &dist, 
 	     /*callback=*/ 0, /*extra=*/ 0);
   
-  igraph_vector_print(&order, stdout);
-  igraph_vector_print(&rank, stdout);
-  igraph_vector_print(&father, stdout);
-  igraph_vector_print(&pred, stdout);
-  igraph_vector_print(&succ, stdout);
-  igraph_vector_print(&dist, stdout);
+  igraph_vector_print(&order);
+  igraph_vector_print(&rank);
+  igraph_vector_print(&father);
+  igraph_vector_print(&pred);
+  igraph_vector_print(&succ);
+  igraph_vector_print(&dist);
 
   igraph_vector_destroy(&order);
   igraph_vector_destroy(&rank);

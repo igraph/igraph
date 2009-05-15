@@ -109,8 +109,8 @@ int main() {
     igraph_matrix_scale(&vectors, -1.0);
   }
   
-  igraph_vector_print(&values, stdout);
-  igraph_matrix_print(&vectors, stdout);
+  igraph_vector_print(&values);
+  igraph_matrix_print(&vectors);
   
   igraph_vector_destroy(&values);
   igraph_matrix_destroy(&vectors);
@@ -142,8 +142,8 @@ int main() {
     igraph_matrix_scale(&vectors, -1.0);
   }
   
-  igraph_matrix_print(&values2, stdout);
-  igraph_matrix_print(&vectors, stdout);
+  igraph_matrix_print(&values2);
+  igraph_matrix_print(&vectors);
   
   igraph_matrix_destroy(&values2);
   igraph_matrix_destroy(&vectors);

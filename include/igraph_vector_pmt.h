@@ -202,7 +202,8 @@ void FUNCTION(igraph_vector,sort)(TYPE(igraph_vector) *v);
 /* Printing  */
 /*-----------*/
 
-int FUNCTION(igraph_vector,print)(TYPE(igraph_vector) *v, FILE *file);
+int FUNCTION(igraph_vector,print)(const TYPE(igraph_vector) *v);
+int FUNCTION(igraph_vector,fprint)(const TYPE(igraph_vector) *v, FILE *file);
 
 /* ----------------------------------------------------------------------------*/
 /* For internal use only, may be removed, rewritten ... */

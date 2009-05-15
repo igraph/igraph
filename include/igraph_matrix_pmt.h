@@ -177,8 +177,9 @@ int FUNCTION(igraph_matrix,remove_row)(TYPE(igraph_matrix) *m, long int row);
 /* Print as text          */
 /*------------------------*/
 
-int FUNCTION(igraph_matrix,print)(TYPE(igraph_matrix) *m,
-				  FILE *file);
+int FUNCTION(igraph_matrix,print)(const TYPE(igraph_matrix) *m);
+int FUNCTION(igraph_matrix,fprint)(const TYPE(igraph_matrix) *m,
+				   FILE *file);
 
 /* ----------------------------------------------------------------------------*/
 /* For internal use only, may be removed, rewritten ... */

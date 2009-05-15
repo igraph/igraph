@@ -312,7 +312,7 @@ int igraph_adjlist_print(const igraph_adjlist_t *al, FILE *outfile) {
   long int n=al->length;
   for (i=0; i<n; i++) {
     igraph_vector_t *v=&al->adjs[i];
-    igraph_vector_print(v, outfile);
+    igraph_vector_print(v);
   }
   return 0;
 }
@@ -344,7 +344,7 @@ int igraph_adjedgelist_print(const igraph_adjedgelist_t *al, FILE *outfile) {
   long int n=al->length;
   for (i=0; i<n; i++) {
     igraph_vector_t *v=&al->adjs[i];
-    igraph_vector_print(v, outfile);
+    igraph_vector_print(v);
   }
   return 0;
 }

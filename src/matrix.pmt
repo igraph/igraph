@@ -1337,8 +1337,24 @@ int FUNCTION(igraph_matrix,select_cols)(const TYPE(igraph_matrix) *m,
   return 0;
 }
 
-int FUNCTION(igraph_matrix,print)(TYPE(igraph_matrix) *m,
-				  FILE *file) {
+int FUNCTION(igraph_matrix,print)(const TYPE(igraph_matrix) *m) {
+
+  long int nr=FUNCTION(igraph_matrix,nrow)(m);
+  long int nc=FUNCTION(igraph_matrix,ncol)(m);
+  long int i, j;
+  for (i=0; i<nr; i++) {
+    for (j=0; j<nc; j++) {
+      if (j!=0) { putchar(' '); }
+      printf(OUT_FORMAT, MATRIX(*m, i, j));
+    }
+    printf("\n");
+  }
+  
+  return 0;
+}
+
+int FUNCTION(igraph_matrix,fprint)(const TYPE(igraph_matrix) *m,
+				   FILE *file) {
 
   long int nr=FUNCTION(igraph_matrix,nrow)(m);
   long int nc=FUNCTION(igraph_matrix,ncol)(m);
