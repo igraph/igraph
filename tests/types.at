@@ -138,3 +138,7 @@ AT_COMPILE_CHECK([simple/igraph_sparsemat4.c], [simple/igraph_sparsemat4.out],
                  [], [INTERNAL])
 AT_CLEANUP
 
+AT_SETUP([Sparse matrix, ARPACK eigensolver (igraph_sparsemat_t): ])
+AT_KEYWORDS([sparse matrix igraph_sparsemat_t ARPACK])
+AT_COMPILE_CHECK([simple/igraph_sparsemat5.c], [simple/igraph_sparsemat5.out])
+AT_CLEANUP

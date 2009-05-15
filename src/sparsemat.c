@@ -708,3 +708,55 @@ int igraph_sparsemat_diag(igraph_sparsemat_t *A, int nzmax,
     return(igraph_i_sparsemat_diag_triplet(A, nzmax, values));
   }
 }
+
+int igraph_i_sparsemat_arpack_multiply(igraph_real_t *to, 
+				       const igraph_real_t *from,
+				       long int n,
+				       void *extra) {
+  igraph_sparsemat_t *A=extra;
+  igraph_vector_t vto, vfrom;
+  igraph_vector_view(&vto, to, n);
+  igraph_vector_view(&vfrom, from, n);
+  igraph_vector_null(&vto);
+  IGRAPH_CHECK(igraph_sparsemat_gaxpy(A, &vfrom, &vto));
+  return 0;
+}
+
+int igraph_sparsemat_arpack_rssolve(const igraph_sparsemat_t *A,
+				    igraph_arpack_options_t *options,
+				    igraph_arpack_storage_t *storage,
+				    igraph_vector_t *values,
+				    igraph_matrix_t *vectors) {
+
+  long int n=igraph_sparsemat_nrow(A);
+
+  if (n != igraph_sparsemat_ncol(A)) {
+    IGRAPH_ERROR("Non-square matrix for ARPACK", IGRAPH_NONSQUARE);
+  }
+
+  options->n=n;
+
+  return igraph_arpack_rssolve(igraph_i_sparsemat_arpack_multiply,
+			       (void*) A, options, storage, 
+			       values, vectors);
+}
+
+int igraph_sparsemat_arpack_rnsolve(const igraph_sparsemat_t *A,
+				    igraph_arpack_options_t *options,
+				    igraph_arpack_storage_t *storage,
+				    igraph_matrix_t *values, 
+				    igraph_matrix_t *vectors) {
+
+  long int n=igraph_sparsemat_nrow(A);
+
+  if (n != igraph_sparsemat_ncol(A)) {
+    IGRAPH_ERROR("Non-square matrix for ARPACK", IGRAPH_NONSQUARE);
+  }
+
+  options->n=n;
+
+  return igraph_arpack_rnsolve(igraph_i_sparsemat_arpack_multiply,
+			       (void*) A, options, storage, 
+			       values, vectors);
+}
+

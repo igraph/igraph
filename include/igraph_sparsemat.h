@@ -27,6 +27,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_datatype.h"
+#include "igraph_arpack.h"
 
 #include <stdio.h>
 
@@ -122,5 +123,17 @@ int igraph_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
 		     igraph_bool_t directed);
 
 int igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *res);
+
+int igraph_sparsemat_arpack_rssolve(const igraph_sparsemat_t *A,
+				    igraph_arpack_options_t *options,
+				    igraph_arpack_storage_t *storage,
+				    igraph_vector_t *values,
+				    igraph_matrix_t *vectors);
+
+int igraph_sparsemat_arpack_rnsolve(const igraph_sparsemat_t *A,
+				    igraph_arpack_options_t *options,
+				    igraph_arpack_storage_t *storage,
+				    igraph_matrix_t *values, 
+				    igraph_matrix_t *vectors);
 
 #endif
