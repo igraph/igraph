@@ -2,15 +2,16 @@ Source: python-igraph
 Section: python
 Priority: optional
 Maintainer: Tamas Nepusz <ntamas@rmki.kfki.hu>
-Build-Depends: debhelper (>= 5.0.38), python-all-dev (>= 2.3.5-11), python-central (>= 0.5.6), libxml2-dev, libigraph-dev (= @VERSION@), python-epydoc
-Standards-Version: 3.7.2
+Build-Depends: cdbs (>= 0.4.42); debhelper (>= 6), python-all-dev (>= 2.3.5-11), libxml2-dev, libigraph-dev (= @VERSION@), python-epydoc
+Standards-Version: 3.7.3
 XS-Python-Version: >= 2.4
+Homepage: http://igraph.sourceforge.net
 
 Package: python-igraph
 Architecture: any
 Section: python
 Priority: optional
-Depends: ${python:Depends}, libigraph (= @VERSION@), ${shlibs:Depends}
+Depends: ${python:Depends}, libigraph (= @VERSION@)
 Suggests: python-igraph-doc, python-cairo
 Provides: ${python:Provides}
 XB-Python-Version: ${python:Versions}
