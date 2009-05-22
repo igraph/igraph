@@ -3,9 +3,6 @@
 # Uncomment this to turn on verbose mode.
 export DH_VERBOSE=1
 
-# This is the debhelper compatability version to use.
-export DH_COMPAT=4
-
 # This is to mark that the public modules installed differ between
 # Python version and they can't be shared
 export DH_PYCENTRAL=nomove
@@ -39,7 +36,7 @@ build-stamp:
 	set -e; \
 	for python in $(PYVERS); do \
 	  python=$$(echo $$python | sed "s/$(PYDEF)/python/"); \
-	  $$python setup.py build --build-platlib=build/lib; \
+	  $$python setup.py build --build-platlib=$(CURDIR)/build/lib; \
 	done
 	scripts/mkdoc.sh build/lib
 	touch build-stamp
@@ -64,7 +61,7 @@ install: build
 	set -e; \
 	for python in $(PYVERS); do \
 	  python=$$(echo $$python | sed "s/$(PYDEF)/python/"); \
-	  $$python setup.py install --prefix=/usr --root=debian/python-igraph; \
+	  $$python setup.py install --root=$(CURDIR)/debian/python-igraph --install-layout=deb; \
 	done
 	dh_installdocs -ppython-igraph-doc build/lib/html/*
 
