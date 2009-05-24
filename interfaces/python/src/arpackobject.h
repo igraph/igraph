@@ -25,7 +25,7 @@
 #define PYTHON_ARPACKOBJECT_H
 
 #include <Python.h>
-#include <igraph/arpack.h>
+#include <igraph/igraph_arpack.h>
 #include "graphobject.h"
 
 /**
