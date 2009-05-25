@@ -1746,10 +1746,10 @@ int igraph_closeness_estimate_weighted(const igraph_t *graph,
       igraph_vector_t *neis=igraph_lazy_adjedgelist_get(&adjlist, minnei);
       long int nlen=igraph_vector_size(neis);
 
-      if (cutoff>0 && mindist>=cutoff) break;      
-      
       VECTOR(*res)[i] += mindist;
       nodes_reached++;
+      
+      if (cutoff>0 && mindist>=cutoff) continue;    /* NOT break!!! */
       
       for (j=0; j<nlen; j++) {
 	long int edge=VECTOR(*neis)[j];
@@ -1904,9 +1904,9 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
       long int act=igraph_dqueue_pop(&q);
       long int actdist=igraph_dqueue_pop(&q);
       
-      if (cutoff>0 && actdist>=cutoff) break;
-
       VECTOR(*res)[i] += actdist;
+
+      if (cutoff>0 && actdist>=cutoff) continue;   /* NOT break!!! */
 
       neis=igraph_adjlist_get(&allneis, act);
       for (j=0; j<igraph_vector_size(neis); j++) {

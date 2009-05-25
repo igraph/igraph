@@ -197,6 +197,20 @@ class CentralityTests(unittest.TestCase):
         for idx in xrange(g.vcount()):
             self.assertAlmostEqual(cl[idx], cl2[idx], places=3)
 
+        weights = [1] * 4
+
+        g = Graph.Star(5)
+        cl = g.closeness(weights=weights)
+        cl2 = [1., 0.57142, 0.57142, 0.57142, 0.57142]
+        for idx in xrange(g.vcount()):
+            self.assertAlmostEqual(cl[idx], cl2[idx], places=3)
+
+        g = Graph.Star(5)
+        cl = g.closeness(cutoff=1, weights=weights)
+        cl2 = [1., 0.25, 0.25, 0.25, 0.25]
+        for idx in xrange(g.vcount()):
+            self.assertAlmostEqual(cl[idx], cl2[idx], places=3)
+
     def testPageRank(self):
         g = Graph.Star(11)
         cent = g.pagerank()
