@@ -2876,7 +2876,7 @@ PyObject *igraphmodule_Graph_biconnected_components(igraphmodule_GraphObject *se
 	}
   }
 
-  if (igraph_biconnected_components(&self->g, &no, 0, 0, &components, return_articulation_points ? &points : 0)) {
+  if (igraph_biconnected_components(&self->g, &no, &components, 0, 0, return_articulation_points ? &points : 0)) {
     igraphmodule_handle_igraph_error();
 	igraph_vector_ptr_destroy(&components);
     if (return_articulation_points) igraph_vector_destroy(&points);
