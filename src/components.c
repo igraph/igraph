@@ -711,9 +711,9 @@ int igraph_biconnected_components(const igraph_t *graph,
 		    VECTOR(vertex_added)[to] = comps;
 		    IGRAPH_CHECK(igraph_vector_push_back(v2, to));
 		  }
-		  if (from==prev || to==prev) {
-		    break;
-		  }
+		}
+		if (from==prev || to==prev) {
+		  break;
 		}
 	      }
 	      

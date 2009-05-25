@@ -52,10 +52,25 @@ int main() {
   
   igraph_biconnected_components(&g, &no, 0, 0, &result, 0);
   if (no != 2 || no != igraph_vector_ptr_size(&result)) return 1;
-  sort_and_print_vector((igraph_vector_t*)VECTOR(result)[0]);
-  sort_and_print_vector((igraph_vector_t*)VECTOR(result)[1]);
-  igraph_vector_destroy((igraph_vector_t*)VECTOR(result)[0]);
-  igraph_vector_destroy((igraph_vector_t*)VECTOR(result)[1]);
+  for (i = 0; i < no; i++) {
+    sort_and_print_vector((igraph_vector_t*)VECTOR(result)[i]);
+    igraph_vector_destroy((igraph_vector_t*)VECTOR(result)[i]);
+  }
+
+  igraph_biconnected_components(&g, &no, 0, &result, 0, 0);
+  if (no != 2 || no != igraph_vector_ptr_size(&result)) return 2;
+  for (i = 0; i < no; i++) {
+    sort_and_print_vector((igraph_vector_t*)VECTOR(result)[i]);
+    igraph_vector_destroy((igraph_vector_t*)VECTOR(result)[i]);
+  }
+
+  igraph_biconnected_components(&g, &no, &result, 0, 0, 0);
+  if (no != 2 || no != igraph_vector_ptr_size(&result)) return 3;
+  for (i = 0; i < no; i++) {
+    sort_and_print_vector((igraph_vector_t*)VECTOR(result)[i]);
+    igraph_vector_destroy((igraph_vector_t*)VECTOR(result)[i]);
+  }
+
   igraph_vector_ptr_destroy(&result);
   igraph_destroy(&g);
 
