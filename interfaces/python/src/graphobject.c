@@ -1125,23 +1125,40 @@ PyObject *igraphmodule_Graph_diameter(igraphmodule_GraphObject * self,
                                       PyObject * args, PyObject * kwds)
 {
   PyObject *dir = Py_True, *vcount_if_unconnected = Py_True;
-  igraph_integer_t i;
+  PyObject *weights_o = Py_None;
+  igraph_vector_t *weights = 0;
 
   static char *kwlist[] = {
-    "directed", "unconn", NULL
+    "directed", "unconn", "weights", NULL
   };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist,
-                                   &dir, &vcount_if_unconnected))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist,
+                                   &dir, &vcount_if_unconnected,
+                                   &weights_o))
     return NULL;
 
-  if (igraph_diameter(&self->g, &i, 0, 0, 0, PyObject_IsTrue(dir),
-                      PyObject_IsTrue(vcount_if_unconnected))) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE)) return NULL;
+
+  if (weights) {
+    igraph_real_t i;
+    if (igraph_diameter_dijkstra(&self->g, weights, &i, 0, 0, 0,
+          PyObject_IsTrue(dir), PyObject_IsTrue(vcount_if_unconnected))) {
+      igraphmodule_handle_igraph_error();
+      igraph_vector_destroy(weights); free(weights);
+      return NULL;
+    }
+    igraph_vector_destroy(weights); free(weights);
+    return PyFloat_FromDouble((double)i);
+  } else {
+    igraph_integer_t i;
+    if (igraph_diameter(&self->g, &i, 0, 0, 0, PyObject_IsTrue(dir),
+                        PyObject_IsTrue(vcount_if_unconnected))) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+    return PyInt_FromLong((long)i);
   }
-
-  return PyInt_FromLong((long)i);
 }
 
 /** \ingroup python_interface_graph
@@ -1152,19 +1169,36 @@ PyObject *igraphmodule_Graph_get_diameter(igraphmodule_GraphObject * self,
                                       PyObject * args, PyObject * kwds)
 {
   PyObject *dir = Py_True, *vcount_if_unconnected = Py_True, *result;
+  PyObject *weights_o = Py_None;
+  igraph_vector_t *weights = 0;
   igraph_vector_t res;
 
-  static char *kwlist[] = { "directed", "unconn", NULL };
+  static char *kwlist[] = { "directed", "unconn", "weights", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist,
-                                   &dir, &vcount_if_unconnected))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist,
+                                   &dir, &vcount_if_unconnected,
+                                   &weights_o))
     return NULL;
+
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE)) return NULL;
 
   igraph_vector_init(&res, 0);
-  if (igraph_diameter(&self->g, 0, 0, 0, &res, PyObject_IsTrue(dir),
-                      PyObject_IsTrue(vcount_if_unconnected))) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
+  if (weights) {
+    if (igraph_diameter_dijkstra(&self->g, weights, 0, 0, 0, &res,
+          PyObject_IsTrue(dir), PyObject_IsTrue(vcount_if_unconnected))) {
+      igraphmodule_handle_igraph_error();
+      igraph_vector_destroy(weights); free(weights);
+      igraph_vector_destroy(&res);
+      return NULL;
+    }
+    igraph_vector_destroy(weights); free(weights);
+  } else {
+    if (igraph_diameter(&self->g, 0, 0, 0, &res, PyObject_IsTrue(dir),
+                        PyObject_IsTrue(vcount_if_unconnected))) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
   }
 
   result = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
@@ -1180,22 +1214,43 @@ PyObject *igraphmodule_Graph_farthest_points(igraphmodule_GraphObject * self,
                                       PyObject * args, PyObject * kwds)
 {
   PyObject *dir = Py_True, *vcount_if_unconnected = Py_True;
+  PyObject *weights_o = Py_None;
+  igraph_vector_t *weights = 0;
   igraph_integer_t from, to, len;
+  igraph_real_t len_real;
 
-  static char *kwlist[] = { "directed", "unconn", NULL };
+  static char *kwlist[] = { "directed", "unconn", "weights", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist,
-                                   &dir, &vcount_if_unconnected))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist,
+                                   &dir, &vcount_if_unconnected,
+                                   &weights_o))
     return NULL;
 
-  if (igraph_diameter(&self->g, &len, &from, &to, 0, PyObject_IsTrue(dir),
-                      PyObject_IsTrue(vcount_if_unconnected))) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE)) return NULL;
+
+  if (weights) {
+    if (igraph_diameter_dijkstra(&self->g, weights, &len_real, &from, &to, 0,
+          PyObject_IsTrue(dir), PyObject_IsTrue(vcount_if_unconnected))) {
+      igraphmodule_handle_igraph_error();
+      igraph_vector_destroy(weights); free(weights);
+      return NULL;
+    }
+    igraph_vector_destroy(weights); free(weights);
+    if (from >= 0)
+      return Py_BuildValue("lld", (long)from, (long)to, (double)len_real);
+    return Py_BuildValue("OOd", Py_None, Py_None, (double)len_real);
+  } else {
+    if (igraph_diameter(&self->g, &len, &from, &to, 0, PyObject_IsTrue(dir),
+                        PyObject_IsTrue(vcount_if_unconnected))) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+
+    if (from >= 0)
+      return Py_BuildValue("lll", (long)from, (long)to, (long)len);
+    return Py_BuildValue("OOl", Py_None, Py_None, (long)len);
   }
-
-  if (from >= 0) return Py_BuildValue("lll", (long)from, (long)to, (long)len);
-  return Py_BuildValue("OOl", Py_None, Py_None, (long)len);
 }
 
 /**
@@ -9113,17 +9168,20 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interfaces to igraph_diameter */
   {"diameter", (PyCFunction) igraphmodule_Graph_diameter,
    METH_VARARGS | METH_KEYWORDS,
-   "diameter(directed=True, unconn=True)\n\n"
+   "diameter(directed=True, unconn=True, weights=None)\n\n"
    "Calculates the diameter of the graph.\n\n"
    "@param directed: whether to consider directed paths.\n"
    "@param unconn: if C{True} and the graph is unconnected, the\n"
    "  longest geodesic within a component will be returned. If\n"
    "  C{False} and the graph is unconnected, the result is the\n"
-   "  number of vertices.\n"
+   "  number of vertices if there are no weights or infinity\n"
+   "  if there are weights.\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name.\n"
    "@return: the diameter"},
   {"get_diameter", (PyCFunction) igraphmodule_Graph_get_diameter,
    METH_VARARGS | METH_KEYWORDS,
-   "get_diameter(directed=True, unconn=True)\n\n"
+   "get_diameter(directed=True, unconn=True, weights=None)\n\n"
    "Returns a path with the actual diameter of the graph.\n\n"
    "If there are many shortest paths with the length of the diameter,\n"
    "it returns the first one it founds.\n\n"
@@ -9131,19 +9189,26 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param unconn: if C{True} and the graph is unconnected, the\n"
    "  longest geodesic within a component will be returned. If\n"
    "  C{False} and the graph is unconnected, the result is the\n"
-   "  number of vertices.\n"
+   "  number of vertices if there are no weights or infinity\n"
+   "  if there are weights.\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name.\n"
    "@return: the vertices in the path in order."},
   {"farthest_points", (PyCFunction) igraphmodule_Graph_farthest_points,
    METH_VARARGS | METH_KEYWORDS,
-   "get_diameter(directed=True, unconn=True)\n\n"
-   "Returns two vertex IDs whose distance equals the actual diameter of the graph.\n\n"
+   "farthest_points(directed=True, unconn=True, weights=None)\n\n"
+   "Returns two vertex IDs whose distance equals the actual diameter\n"
+   "of the graph.\n\n"
    "If there are many shortest paths with the length of the diameter,\n"
-   "it returns the first one it founds.\n\n"
+   "it returns the first one it found.\n\n"
    "@param directed: whether to consider directed paths.\n"
    "@param unconn: if C{True} and the graph is unconnected, the\n"
    "  longest geodesic within a component will be returned. If\n"
    "  C{False} and the graph is unconnected, the result contains the\n"
-   "  number of vertices.\n"
+   "  number of vertices if there are no weights or infinity\n"
+   "  if there are weights.\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name.\n"
    "@return: a triplet containing the two vertex IDs and their distance.\n"
    "  The IDs are C{None} if the graph is unconnected and C{unconn}\n"
    "  is C{False}."},

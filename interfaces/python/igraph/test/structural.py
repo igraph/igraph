@@ -21,6 +21,8 @@ class SimplePropertiesTests(unittest.TestCase):
     def testDiameter(self):
         self.failUnless(self.gfull.diameter() == 1)
         self.failUnless(self.gempty.diameter(unconn=False) == 10)
+        self.failUnless(self.gempty.diameter(unconn=False, weights=[]) \
+                == float('inf'))
         self.failUnless(self.g.diameter() == 2)
         self.failUnless(self.gdir.diameter(False) == 2)
         self.failUnless(self.gdir.diameter() == 3)
@@ -32,7 +34,13 @@ class SimplePropertiesTests(unittest.TestCase):
         
         d = self.tree.get_diameter()
         self.failUnless(d[0] == 13 or d[-1] == 13)
-        
+
+        weights = [1, 1, 1, 5, 1, 5, 1, 1, 1, 1, 1, 1, 5]
+        self.failUnless(self.tree.diameter(weights=weights) == 15)
+
+        d = self.tree.farthest_points(weights=weights)
+        self.failUnless(d == (13, 6, 15) or d == (6, 13, 15))
+
     def testTransitivity(self):
         self.failUnless(self.gfull.transitivity_undirected() == 1.0)
         self.failUnless(self.tree.transitivity_undirected() == 0.0)
