@@ -25,6 +25,7 @@
 #include <igraph_sparsemat.h>
 
 #define RNG_INTEGER(l, h) ((long int)((rand())/((double)RAND_MAX+1)*((h)-(l)+1)+(l)))
+#define EPS 1e-13
 
 int main() {
 
@@ -73,13 +74,17 @@ int main() {
   igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0,
 				  &values, /*vectors=*/ &vectors);
 
-  if ( fabs(VECTOR(values)[0] - DIM) > 1e-14 ) { return 2; }
+  if ( fabs(VECTOR(values)[0] - DIM) > EPS ) {
+    printf("VECTOR(values)[0] numerical precision is only %g, should be %g",
+			fabs((double)VECTOR(values)[0]-DIM), EPS);
+	return 2;
+  }
 
-  if ( fabs(fabs(MATRIX(vectors, DIM-1, 0)) - 1.0) > 1e-14) { return 3; }
+  if ( fabs(fabs(MATRIX(vectors, DIM-1, 0)) - 1.0) > EPS) { return 3; }
   MATRIX(vectors, DIM-1, 0) = 0.0;
   igraph_matrix_minmax(&vectors, &min, &max);
-  if (fabs(min) > 1e-14) { return 3; }
-  if (fabs(max) > 1e-14) { return 3; }
+  if (fabs(min) > EPS) { return 3; }
+  if (fabs(max) > EPS) { return 3; }
   
   igraph_vector_destroy(&values);
   igraph_matrix_destroy(&vectors);
