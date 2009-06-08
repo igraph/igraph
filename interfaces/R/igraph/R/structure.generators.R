@@ -791,7 +791,7 @@ graph.incidence.dense <- function(incidence, directed, mode, multiple,
     mode(incidence) <- "double"
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     ## Function call
-    res <- .Call("R_igraph_incidence", incidence, mode, directed, multiple,
+    res <- .Call("R_igraph_incidence", incidence, directed, mode, multiple,
                  PACKAGE="igraph")
     res <- set.vertex.attribute(res$graph, "type", value=res$types)
 
