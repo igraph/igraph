@@ -730,6 +730,14 @@ graph.incidence.sparse <- function(incidence, directed, mode, multiple,
       el[,3] <- el[,3] != 0
     }
 
+    if (!directed || mode==1) {
+      ## nothing do to
+    } else if (mode==2) {
+      el[,1:2] <- el[,c(2,1)]
+    } else if (mode==3) {
+      el <- rbind(el, el[,c(2,1,3)])
+    }
+    
     edges <- unlist(apply(el, 1, function(x) rep(unname(x[1:2]), x[3])))
     res <- graph(n=n1+n2, edges, directed=directed)
   } 
