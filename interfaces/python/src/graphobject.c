@@ -8542,10 +8542,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_get_eid */
   {"get_eid", (PyCFunction) igraphmodule_Graph_get_eid,
    METH_VARARGS | METH_KEYWORDS,
-   "get_eid(v1, v2)\n\n"
+   "get_eid(v1, v2, directed=True)\n\n"
    "Returns the edge ID of an arbitrary edge between vertices v1 and v2\n\n"
    "@param v1: the first vertex ID\n"
    "@param v2: the second vertex ID\n"
+   "@param directed: whether edge directions should be considered in\n"
+   "  directed graphs. The default is C{True}. Ignored for undirected\n"
+   "  graphs.\n"
    "@return: the edge ID of an arbitrary edge between vertices v1 and v2\n"},
 
   /* interface to igraph_adjacent */
