@@ -806,7 +806,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   long int no_of_nodes=igraph_vcount(graph);
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
   long int *distance;
-  long int *nrgeo;
+  unsigned long long int *nrgeo;  /* must be long long; consider grid graphs for example */
   double *tmpscore;
   igraph_stack_t stack=IGRAPH_STACK_NULL;
   long int source;
@@ -843,7 +843,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, distance);
-  nrgeo=igraph_Calloc(no_of_nodes, long int);
+  nrgeo=igraph_Calloc(no_of_nodes, unsigned long long int);
   if (nrgeo==0) {
     IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
   }
@@ -868,7 +868,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_ALLOW_INTERRUPTION();
 
     memset(distance, 0, no_of_nodes*sizeof(long int));
-    memset(nrgeo, 0, no_of_nodes*sizeof(long int));
+    memset(nrgeo, 0, no_of_nodes*sizeof(unsigned long long int));
     memset(tmpscore, 0, no_of_nodes*sizeof(double));
     igraph_stack_clear(&stack); /* it should be empty anyway... */
     
@@ -1030,7 +1030,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
   long int no_of_edges=igraph_ecount(graph);
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
   long int *distance;
-  long int *nrgeo;
+  unsigned long long int *nrgeo;
   double *tmpscore;
   igraph_stack_t stack=IGRAPH_STACK_NULL;
   long int source;
@@ -1065,7 +1065,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
     IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, distance);
-  nrgeo=igraph_Calloc(no_of_nodes, long int);
+  nrgeo=igraph_Calloc(no_of_nodes, unsigned long long int);
   if (nrgeo==0) {
     IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
   }
@@ -1091,7 +1091,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
     IGRAPH_ALLOW_INTERRUPTION();
 
     memset(distance, 0, no_of_nodes*sizeof(long int));
-    memset(nrgeo, 0, no_of_nodes*sizeof(long int));
+    memset(nrgeo, 0, no_of_nodes*sizeof(unsigned long long int));
     memset(tmpscore, 0, no_of_nodes*sizeof(double));
     igraph_stack_clear(&stack); /* it should be empty anyway... */
     
