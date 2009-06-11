@@ -970,7 +970,7 @@ int igraphmodule_i_get_numeric_vertex_attr(const igraph_t *graph,
   if (igraph_vs_is_all(&vs)) {
     if (igraphmodule_PyObject_float_to_vector_t(list, &newvalue))
       IGRAPH_ERROR("Internal error", IGRAPH_EINVAL);
-    igraph_vector_copy(value, &newvalue);
+    igraph_vector_update(value, &newvalue);
     igraph_vector_destroy(&newvalue);
   } else {
     igraph_vit_t it;
@@ -1049,7 +1049,7 @@ int igraphmodule_i_get_numeric_edge_attr(const igraph_t *graph,
   if (igraph_es_is_all(&es)) {
     if (igraphmodule_PyObject_float_to_vector_t(list, &newvalue))
       IGRAPH_ERROR("Internal error", IGRAPH_EINVAL);
-    igraph_vector_copy(value, &newvalue);
+    igraph_vector_update(value, &newvalue);
     igraph_vector_destroy(&newvalue);
   } else {
     igraph_eit_t it;
