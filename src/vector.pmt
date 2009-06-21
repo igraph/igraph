@@ -686,7 +686,7 @@ BASE FUNCTION(igraph_vector,tail)(const TYPE(igraph_vector) *v) {
  */
 
 BASE FUNCTION(igraph_vector,pop_back)(TYPE(igraph_vector)* v) {
-  igraph_real_t tmp;
+  BASE tmp;
   assert(v!=NULL);
   assert(v->stor_begin != NULL);
   assert(v->end != v->stor_begin);
@@ -1528,7 +1528,7 @@ int FUNCTION(igraph_vector,append)(TYPE(igraph_vector) *to,
   fromsize=FUNCTION(igraph_vector,size)(from);
   IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(to, tosize+fromsize));
   memcpy(to->stor_begin+tosize, from->stor_begin, 
-	 sizeof(igraph_real_t)*fromsize);
+	 sizeof(BASE)*fromsize);
   to->end=to->stor_begin+tosize+fromsize;
   
   return 0;
@@ -1542,7 +1542,7 @@ int FUNCTION(igraph_vector,get_interval)(const TYPE(igraph_vector) *v,
 					 TYPE(igraph_vector) *res,
 					 long int from, long int to) {
   IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(res, to-from));
-  memcpy(res->stor_begin, v->stor_begin+from, (to-from)*sizeof(igraph_real_t));
+  memcpy(res->stor_begin, v->stor_begin+from, (to-from)*sizeof(BASE));
   return 0;
 }
 
