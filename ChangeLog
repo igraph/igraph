@@ -1,3 +1,8 @@
+2009-07-02  Tamas Nepusz  <tamas@cs.rhul.ac.uk>
+
+	* src/centrality.c (igraph_personalized_pagerank)
+	(igraph_personalized_pagerank_vs) : added
+	
 2009-02-21  Gabor Csardi  <csardi@szaffi>
 
 	* src/centrality.c (igraph_edge_betweenness_estimate)
