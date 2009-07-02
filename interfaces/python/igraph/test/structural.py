@@ -225,6 +225,15 @@ class CentralityTests(unittest.TestCase):
         self.failUnless(cent.index(max(cent)) == 0)
         self.assertAlmostEquals(max(cent), 0.4668, places=3)
 
+    def testPersonalizedPageRank(self):
+        g = Graph.Star(11)
+        self.assertRaises(InternalError, g.personalized_pagerank, reset=[0]*11)
+        cent = g.personalized_pagerank(reset=[0,10]+[0]*9, damping=0.5)
+        self.failUnless(cent.index(max(cent)) == 1)
+        self.assertAlmostEquals(cent[0], 0.3333, places=3)
+        self.assertAlmostEquals(cent[1], 0.5166, places=3)
+        self.assertAlmostEquals(cent[2], 0.0166, places=3)
+
     def testEigenvectorCentrality(self):
         g = Graph.Star(11)
         cent = g.evcent()

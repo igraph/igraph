@@ -3732,28 +3732,29 @@ PyObject *igraphmodule_Graph_pagerank_old(igraphmodule_GraphObject *self,
 
 
 /** \ingroup python_interface_graph
- * \brief Calculates the Google PageRank value of some nodes in the graph.
- * \return the PageRank values
- * \sa igraph_pagerank
+ * \brief Calculates the Google personalized PageRank value of some nodes in the graph.
+ * \return the personalized PageRank values
+ * \sa igraph_personalized_pagerank
  */
-PyObject *igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self,
+PyObject *igraphmodule_Graph_personalized_pagerank(igraphmodule_GraphObject *self,
                                       PyObject *args, PyObject *kwds)
 {
   static char *kwlist[] =
-    { "vertices", "directed", "damping", "weights", "arpack_options", NULL };
+    { "vertices", "directed", "damping", "reset", "weights", "arpack_options", NULL };
   PyObject *directed = Py_True;
-  PyObject *vobj = Py_None, *wobj = Py_None;
+  PyObject *vobj = Py_None, *wobj = Py_None, *robj = Py_None;
   PyObject *list;
   PyObject *arpack_options_o = igraphmodule_arpack_options_default;
   igraphmodule_ARPACKOptionsObject *arpack_options;
   double damping = 0.85;
   igraph_vector_t res;
+  igraph_vector_t *reset = 0;
   igraph_vector_t weights;
   igraph_bool_t return_single = 0;
   igraph_vs_t vs;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOdOO!", kwlist, &vobj,
-                                   &directed, &damping, &wobj,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOdOOO!", kwlist, &vobj,
+                                   &directed, &damping, &robj, &wobj,
                                    &igraphmodule_ARPACKOptionsType,
                                    &arpack_options_o))
     return NULL;
@@ -3763,8 +3764,16 @@ PyObject *igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self,
     return NULL;
   }
 
+  if (igraphmodule_attrib_to_vector_t(robj, self, &reset, ATTRIBUTE_TYPE_VERTEX)) {
+    igraph_vs_destroy(&vs);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
   if (igraph_vector_init(&weights, 0)) {
     igraph_vs_destroy(&vs);
+    if (reset) { igraph_vector_destroy(reset); free(reset); }
+    igraphmodule_handle_igraph_error();
     return NULL;
   }
 
@@ -3772,21 +3781,24 @@ PyObject *igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self,
                                                 self, ATTRHASH_IDX_EDGE,
                                                 1.0)) {
     igraph_vs_destroy(&vs);
+    if (reset) { igraph_vector_destroy(reset); free(reset); }
     igraph_vector_destroy(&weights);
     return NULL;
   }
 
   if (igraph_vector_init(&res, 0)) {
     igraph_vs_destroy(&vs);
+    if (reset) { igraph_vector_destroy(reset); free(reset); }
     igraph_vector_destroy(&weights);
     return igraphmodule_handle_igraph_error();
   }
 
   arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
-  if (igraph_pagerank(&self->g, &res, 0, vs, PyObject_IsTrue(directed),
-      damping, &weights, igraphmodule_ARPACKOptions_get(arpack_options))) {
+  if (igraph_personalized_pagerank(&self->g, &res, 0, vs, PyObject_IsTrue(directed),
+      damping, reset, &weights, igraphmodule_ARPACKOptions_get(arpack_options))) {
     igraphmodule_handle_igraph_error();
     igraph_vs_destroy(&vs);
+    if (reset) { igraph_vector_destroy(reset); free(reset); }
     igraph_vector_destroy(&weights);
     igraph_vector_destroy(&res);
     return NULL;
@@ -3800,6 +3812,7 @@ PyObject *igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self,
   igraph_vector_destroy(&res);
   igraph_vs_destroy(&vs);
   igraph_vector_destroy(&weights);
+  if (reset) { igraph_vector_destroy(reset); free(reset); }
 
   return list;
 }
@@ -9408,29 +9421,34 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  out-degrees, L{IN} IN for in-degrees or L{ALL} for the sum of\n"
    "  them).\n" "@param loops: whether self-loops should be counted.\n"},
 
-  /* interface to igraph_pagerank */
-  {"pagerank", (PyCFunction) igraphmodule_Graph_pagerank,
+  /* interface to igraph_personalized_pagerank */
+  {"personalized_pagerank", (PyCFunction) igraphmodule_Graph_personalized_pagerank,
    METH_VARARGS | METH_KEYWORDS,
-   "pagerank(vertices=None, directed=True, damping=0.85, weights=None, "
-   "arpack_options=None)\n\n"
-   "Calculates the Google PageRank values of a graph.\n"
+   "personalized_pagerank(vertices=None, directed=True, damping=0.85, "
+   "reset=None, weights=None, arpack_options=None)\n\n"
+   "Calculates the personalized PageRank values of a graph.\n\n"
+   "The personalized PageRank calculation is similar to the PageRank\n"
+   "calculation, but the random walk is reset to a non-uniform distribution\n"
+   "over the vertices in every step with probability M{1-damping} instead of a\n"
+   "uniform distribution.\n\n"
    "@param vertices: the indices of the vertices being queried.\n"
    "  C{None} means all of the vertices.\n"
    "@param directed: whether to consider directed paths.\n"
    "@param damping: the damping factor.\n"
    "  M{1-damping} is the PageRank value for nodes with no\n"
    "  incoming links.\n"
+   "@param reset: the distribution over the vertices to be used when resetting\n"
+   "  the random walk. Can be a sequence, an iterable or a vertex attribute\n"
+   "  name as long as they return a list of floats whose length is equal to\n"
+   "  the number of vertices. If C{None}, a uniform distribution is assumed,\n"
+   "  which makes the method equivalent to the original PageRank algorithm.\n"
    "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
    "  even an edge attribute name.\n"
    "@param arpack_options: an L{ARPACKOptions} object used to fine-tune\n"
    "  the ARPACK eigenvector calculation. If omitted, the module-level\n"
    "  variable called C{arpack_options} is used.\n"
-   "@return: a list with the Google PageRank values of the specified\n"
-   "  vertices.\n\n"
-   "@newfield ref: Reference\n"
-   "@ref: Sergey Brin and Larry Page: I{The Anatomy of a Large-Scale\n"
-   "  Hypertextual Web Search Engine}. Proceedings of the 7th\n"
-   "  World-Wide Web Conference, Brisbane, Australia, April 1998.\n"},
+   "@return: a list with the personalized PageRank values of the specified\n"
+   "  vertices.\n"},
 
   /* interface to igraph_pagerank_old */
   {"pagerank_old", (PyCFunction) igraphmodule_Graph_pagerank_old,

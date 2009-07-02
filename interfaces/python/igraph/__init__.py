@@ -414,6 +414,27 @@ class Graph(core.GraphBase):
         hist.unconnected = long(unconn)
         return hist
 
+    def pagerank(self, vertices=None, directed=True, damping=0.85, weights=None,arpack_options=None):
+        """Calculates the Google PageRank values of a graph.
+        
+        @param vertices: the indices of the vertices being queried.
+          C{None} means all of the vertices.
+        @param directed: whether to consider directed paths.
+        @param damping: the damping factor. M{1-damping} is the PageRank value
+          for nodes with no incoming links. It is also the probability of resetting
+          the random walk to a uniform distribution in each step.
+        @param weights: edge weights to be used. Can be a sequence or iterable or
+          even an edge attribute name.
+        @param arpack_options: an L{ARPACKOptions} object used to fine-tune
+          the ARPACK eigenvector calculation. If omitted, the module-level
+          variable called C{arpack_options} is used.
+        @return: a list with the Google PageRank values of the specified
+          vertices."""
+        if arpack_options is None:
+            arpack_options = core.arpack_options
+        return self.personalized_pagerank(vertices, directed, damping, None, weights, arpack_options)
+
+
     def triad_census(self, *args, **kwds):
         """triad_census()
 
@@ -2390,8 +2411,8 @@ def _add_proxy_methods():
     decorated_methods[VertexSeq] = \
         ["degree", "betweenness", "bibcoupling", "closeness", "cocitation",
         "constraint", "eccentricity", "get_shortest_paths", "maxdegree",
-        "pagerank", "shortest_paths", "similarity_dice", "similarity_jaccard",
-        "subgraph", "indegree", "outdegree", "isoclass"]
+        "pagerank", "personalized_pagerank", "shortest_paths", "similarity_dice",
+        "similarity_jaccard", "subgraph", "indegree", "outdegree", "isoclass"]
     decorated_methods[EdgeSeq] = \
         ["count_multiple", "is_loop", "is_multiple"]
 
