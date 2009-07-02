@@ -432,7 +432,7 @@ class Graph(core.GraphBase):
           vertices."""
         if arpack_options is None:
             arpack_options = core.arpack_options
-        return self.personalized_pagerank(vertices, directed, damping, None, weights, arpack_options)
+        return self.personalized_pagerank(vertices, directed, damping, None, None, weights, arpack_options)
 
 
     def triad_census(self, *args, **kwds):

@@ -233,6 +233,8 @@ class CentralityTests(unittest.TestCase):
         self.assertAlmostEquals(cent[0], 0.3333, places=3)
         self.assertAlmostEquals(cent[1], 0.5166, places=3)
         self.assertAlmostEquals(cent[2], 0.0166, places=3)
+        cent2 = g.personalized_pagerank(reset_vertices=g.vs[1], damping=0.5)
+        self.failUnless(max(abs(x-y) for x, y in zip(cent, cent2)) < 0.001)
 
     def testEigenvectorCentrality(self):
         g = Graph.Star(11)

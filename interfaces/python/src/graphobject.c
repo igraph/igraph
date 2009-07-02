@@ -3740,9 +3740,10 @@ PyObject *igraphmodule_Graph_personalized_pagerank(igraphmodule_GraphObject *sel
                                       PyObject *args, PyObject *kwds)
 {
   static char *kwlist[] =
-    { "vertices", "directed", "damping", "reset", "weights", "arpack_options", NULL };
+    { "vertices", "directed", "damping", "reset", "reset_vertices", "weights",
+      "arpack_options", NULL };
   PyObject *directed = Py_True;
-  PyObject *vobj = Py_None, *wobj = Py_None, *robj = Py_None;
+  PyObject *vobj = Py_None, *wobj = Py_None, *robj = Py_None, *rvsobj = Py_None;
   PyObject *list;
   PyObject *arpack_options_o = igraphmodule_arpack_options_default;
   igraphmodule_ARPACKOptionsObject *arpack_options;
@@ -3751,27 +3752,42 @@ PyObject *igraphmodule_Graph_personalized_pagerank(igraphmodule_GraphObject *sel
   igraph_vector_t *reset = 0;
   igraph_vector_t weights;
   igraph_bool_t return_single = 0;
-  igraph_vs_t vs;
+  igraph_vs_t vs, reset_vs;
+  int retval;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOdOOO!", kwlist, &vobj,
-                                   &directed, &damping, &robj, &wobj,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOdOOOO!", kwlist, &vobj,
+                                   &directed, &damping, &robj, &rvsobj, &wobj,
                                    &igraphmodule_ARPACKOptionsType,
                                    &arpack_options_o))
     return NULL;
+
+  if (robj != Py_None && rvsobj != Py_None) {
+    PyErr_SetString(PyExc_ValueError, "only reset or reset_vs can be defined, not both");
+    return NULL;
+  }
 
   if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
-  if (igraphmodule_attrib_to_vector_t(robj, self, &reset, ATTRIBUTE_TYPE_VERTEX)) {
-    igraph_vs_destroy(&vs);
-    igraphmodule_handle_igraph_error();
-    return NULL;
+  if (robj != Py_None) {
+    if (igraphmodule_attrib_to_vector_t(robj, self, &reset, ATTRIBUTE_TYPE_VERTEX)) {
+      igraph_vs_destroy(&vs);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  } else if (rvsobj != Py_None) {
+    if (igraphmodule_PyObject_to_vs_t(rvsobj, &reset_vs, 0)) {
+      igraph_vs_destroy(&vs);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
   }
 
   if (igraph_vector_init(&weights, 0)) {
     igraph_vs_destroy(&vs);
+    if (rvsobj != Py_None) igraph_vs_destroy(&reset_vs);
     if (reset) { igraph_vector_destroy(reset); free(reset); }
     igraphmodule_handle_igraph_error();
     return NULL;
@@ -3781,6 +3797,7 @@ PyObject *igraphmodule_Graph_personalized_pagerank(igraphmodule_GraphObject *sel
                                                 self, ATTRHASH_IDX_EDGE,
                                                 1.0)) {
     igraph_vs_destroy(&vs);
+    if (rvsobj != Py_None) igraph_vs_destroy(&reset_vs);
     if (reset) { igraph_vector_destroy(reset); free(reset); }
     igraph_vector_destroy(&weights);
     return NULL;
@@ -3788,16 +3805,24 @@ PyObject *igraphmodule_Graph_personalized_pagerank(igraphmodule_GraphObject *sel
 
   if (igraph_vector_init(&res, 0)) {
     igraph_vs_destroy(&vs);
+    if (rvsobj != Py_None) igraph_vs_destroy(&reset_vs);
     if (reset) { igraph_vector_destroy(reset); free(reset); }
     igraph_vector_destroy(&weights);
     return igraphmodule_handle_igraph_error();
   }
 
   arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
-  if (igraph_personalized_pagerank(&self->g, &res, 0, vs, PyObject_IsTrue(directed),
-      damping, reset, &weights, igraphmodule_ARPACKOptions_get(arpack_options))) {
+  if (rvsobj != Py_None)
+    retval = igraph_personalized_pagerank_vs(&self->g, &res, 0, vs, PyObject_IsTrue(directed),
+        damping, reset_vs, &weights, igraphmodule_ARPACKOptions_get(arpack_options));
+  else
+    retval = igraph_personalized_pagerank(&self->g, &res, 0, vs, PyObject_IsTrue(directed),
+        damping, reset, &weights, igraphmodule_ARPACKOptions_get(arpack_options));
+
+  if (retval) {
     igraphmodule_handle_igraph_error();
     igraph_vs_destroy(&vs);
+    if (rvsobj != Py_None) igraph_vs_destroy(&reset_vs);
     if (reset) { igraph_vector_destroy(reset); free(reset); }
     igraph_vector_destroy(&weights);
     igraph_vector_destroy(&res);
@@ -3811,6 +3836,7 @@ PyObject *igraphmodule_Graph_personalized_pagerank(igraphmodule_GraphObject *sel
 
   igraph_vector_destroy(&res);
   igraph_vs_destroy(&vs);
+  if (rvsobj != Py_None) igraph_vs_destroy(&reset_vs);
   igraph_vector_destroy(&weights);
   if (reset) { igraph_vector_destroy(reset); free(reset); }
 
@@ -9425,7 +9451,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"personalized_pagerank", (PyCFunction) igraphmodule_Graph_personalized_pagerank,
    METH_VARARGS | METH_KEYWORDS,
    "personalized_pagerank(vertices=None, directed=True, damping=0.85, "
-   "reset=None, weights=None, arpack_options=None)\n\n"
+   "reset=None, reset_vertices=None, weights=None, arpack_options=None)\n\n"
    "Calculates the personalized PageRank values of a graph.\n\n"
    "The personalized PageRank calculation is similar to the PageRank\n"
    "calculation, but the random walk is reset to a non-uniform distribution\n"
@@ -9442,6 +9468,11 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  name as long as they return a list of floats whose length is equal to\n"
    "  the number of vertices. If C{None}, a uniform distribution is assumed,\n"
    "  which makes the method equivalent to the original PageRank algorithm.\n"
+   "@param reset_vertices: an alternative way to specify the distribution\n"
+   "  over the vertices to be used when resetting the random walk. Simply\n"
+   "  supply a list of vertex IDs here, or a L{VertexSeq} or a L{Vertex}.\n"
+   "  Resetting will take place using a uniform distribution over the specified\n"
+   "  vertices.\n"
    "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
    "  even an edge attribute name.\n"
    "@param arpack_options: an L{ARPACKOptions} object used to fine-tune\n"
