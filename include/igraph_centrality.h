@@ -76,6 +76,18 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
 		    igraph_bool_t directed, igraph_real_t damping, 
 		    const igraph_vector_t *weights,
 		    igraph_arpack_options_t *options);
+int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
+		    igraph_real_t *value, const igraph_vs_t vids,
+		    igraph_bool_t directed, igraph_real_t damping, 
+		    igraph_vector_t *reset,
+		    const igraph_vector_t *weights,
+		    igraph_arpack_options_t *options);
+int igraph_personalized_pagerank_vs(const igraph_t *graph, igraph_vector_t *vector,
+		    igraph_real_t *value, const igraph_vs_t vids,
+		    igraph_bool_t directed, igraph_real_t damping,
+			igraph_vs_t reset_vids,
+		    const igraph_vector_t *weights,
+		    igraph_arpack_options_t *options);
 
 int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector,
 				  igraph_real_t *value, igraph_bool_t scale,

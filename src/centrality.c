@@ -525,6 +525,7 @@ typedef struct igraph_i_pagerank_data_t {
   igraph_real_t damping;
   igraph_vector_t *outdegree;
   igraph_vector_t *tmp;
+  igraph_vector_t *reset;
 } igraph_i_pagerank_data_t;
 
 typedef struct igraph_i_pagerank_data2_t {
@@ -534,6 +535,7 @@ typedef struct igraph_i_pagerank_data2_t {
   igraph_real_t damping;
   igraph_vector_t *outdegree;
   igraph_vector_t *tmp;
+  igraph_vector_t *reset;
 } igraph_i_pagerank_data2_t;
 
 int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
@@ -543,6 +545,7 @@ int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
   igraph_adjlist_t *adjlist=data->adjlist;
   igraph_vector_t *outdegree=data->outdegree;
   igraph_vector_t *tmp=data->tmp;
+  igraph_vector_t *reset=data->reset;
   igraph_vector_t *neis;
   long int i, j, nlen;
   igraph_real_t sumfrom=0.0;
@@ -561,7 +564,17 @@ int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
       to[i] += VECTOR(*tmp)[nei];
     }
     to[i] *= data->damping;
-    to[i] += (1-data->damping)/n * sumfrom;
+  }
+  if (reset) {
+    /* Running personalized PageRank */
+    for (i=0; i<n; i++) {
+	  to[i] += (1-data->damping) * VECTOR(*reset)[i] * sumfrom;
+	}
+  } else {
+    /* Traditional PageRank with uniform reset vector */
+    for (i=0; i<n; i++) {
+	  to[i] += (1-data->damping) / n * sumfrom;
+	}
   }
 
   return 0;
@@ -576,6 +589,7 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
   const igraph_vector_t *weights=data->weights;
   igraph_vector_t *outdegree=data->outdegree;
   igraph_vector_t *tmp=data->tmp;
+  igraph_vector_t *reset=data->reset;
   long int i, j, nlen;
   igraph_real_t sumfrom=0.0;
   igraph_vector_t *neis;
@@ -595,7 +609,17 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
       to[i] += VECTOR(*weights)[edge] * VECTOR(*tmp)[nei];
     }
     to[i] *= data->damping;
-    to[i] += (1-data->damping)/n * sumfrom;
+  }
+  if (reset) {
+    /* Running personalized PageRank */
+    for (i=0; i<n; i++) {
+      to[i] += (1-data->damping) * VECTOR(*reset)[i] * sumfrom;
+    }
+  } else {
+    /* Traditional PageRank with uniform reset vector */
+    for (i=0; i<n; i++) {
+      to[i] += (1-data->damping) / n * sumfrom;
+    }
   }
   
   return 0;
@@ -615,12 +639,6 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * only some of the vertices, all of them must be calculated. Requesting
  * the PageRank for only some of the vertices does not result in any
  * performance increase at all.
- * </para>
- * <para>
- * Since the calculation is an iterative
- * process, the algorithm is stopped after a given count of iterations
- * or if the PageRank value differences between iterations are less than
- * a predefined value.
  * </para>
  * 
  * <para>
@@ -673,12 +691,52 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
 		    igraph_bool_t directed, igraph_real_t damping, 
 		    const igraph_vector_t *weights,
 		    igraph_arpack_options_t *options) {
+	return igraph_personalized_pagerank(graph, vector, value, vids, directed,
+			damping, 0, weights, options);
+}
+
+int igraph_personalized_pagerank_vs(const igraph_t *graph, igraph_vector_t *vector,
+		    igraph_real_t *value, const igraph_vs_t vids,
+		    igraph_bool_t directed, igraph_real_t damping, 
+		    igraph_vs_t reset_vids,
+		    const igraph_vector_t *weights,
+		    igraph_arpack_options_t *options) {
+	igraph_vector_t reset;
+	igraph_vit_t vit;
+
+	IGRAPH_VECTOR_INIT_FINALLY(&reset, igraph_vcount(graph));
+	IGRAPH_CHECK(igraph_vit_create(graph, reset_vids, &vit));
+	IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+
+	while (!IGRAPH_VIT_END(vit)) {
+		VECTOR(reset)[(long int)IGRAPH_VIT_GET(vit)]++;
+		IGRAPH_VIT_NEXT(vit);
+	}
+	igraph_vit_destroy(&vit);
+	IGRAPH_FINALLY_CLEAN(1);
+	
+	IGRAPH_CHECK(igraph_personalized_pagerank(graph, vector, value, vids, directed, damping,
+				&reset, weights, options));
+
+	igraph_vector_destroy(&reset);
+	IGRAPH_FINALLY_CLEAN(1);
+
+	return 0;
+}
+
+int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
+		    igraph_real_t *value, const igraph_vs_t vids,
+		    igraph_bool_t directed, igraph_real_t damping, 
+		    igraph_vector_t *reset,
+		    const igraph_vector_t *weights,
+		    igraph_arpack_options_t *options) {
 
   igraph_matrix_t values;
   igraph_matrix_t vectors;
   igraph_integer_t dirmode;
   igraph_vector_t outdegree;
   igraph_vector_t tmp;
+
   long int i;
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
@@ -696,7 +754,13 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
     IGRAPH_ERROR("Invalid length of weights vector when calculating "
 		 "PageRank scores", IGRAPH_EINVAL);
   }
-  
+
+  if (reset && igraph_vector_size(reset) != no_of_nodes)
+  {
+    IGRAPH_ERROR("Invalid length of reset vector when calculating "
+		 "personalized PageRank scores", IGRAPH_EINVAL);
+  }
+
   IGRAPH_MATRIX_INIT_FINALLY(&values, 0, 0);
   IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 1);
 
@@ -707,18 +771,29 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
 
   RNG_BEGIN();
 
+  if (reset) {
+	/* Normalize reset vector so the sum is 1 */
+	double reset_sum;
+	if (igraph_vector_min(reset) < 0)
+	  IGRAPH_ERROR("the reset vector must not contain negative elements", IGRAPH_EINVAL);
+	reset_sum = igraph_vector_sum(reset);
+	if (reset_sum == 0)
+	  IGRAPH_ERROR("the sum of the elements in the reset vector must not be zero", IGRAPH_EINVAL);
+	igraph_vector_scale(reset, 1.0/reset_sum);
+  }
+
   if (!weights) {
     
     igraph_adjlist_t adjlist;
     igraph_i_pagerank_data_t data = { graph, &adjlist, damping,
-				      &outdegree, &tmp };
+				      &outdegree, &tmp, reset };
 
     IGRAPH_CHECK(igraph_degree(graph, &outdegree, igraph_vss_all(),
 			       directed ? IGRAPH_OUT : IGRAPH_ALL, /*loops=*/ 0));
     /* Avoid division by zero */
     for (i=0; i<options->n; i++) {
       if (VECTOR(outdegree)[i]==0) {
-	VECTOR(outdegree)[i]=1;
+        VECTOR(outdegree)[i]=1;
       }
       MATRIX(vectors, i, 0) = VECTOR(outdegree)[i];
     } 
@@ -736,7 +811,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
     
     igraph_adjedgelist_t adjedgelist;
     igraph_i_pagerank_data2_t data = { graph, &adjedgelist, weights,
-				       damping, &outdegree, &tmp };    
+				       damping, &outdegree, &tmp, reset };    
 
     IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjedgelist, dirmode));
     IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjedgelist);
@@ -748,13 +823,13 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
       igraph_real_t weight=VECTOR(*weights)[i];
       VECTOR(outdegree)[from] += weight;
       if (!directed) { 
-	VECTOR(outdegree)[to]   += weight;
+        VECTOR(outdegree)[to]   += weight;
       }
     }
     /* Avoid division by zero */
     for (i=0; i<options->n; i++) {
       if (VECTOR(outdegree)[i]==0) {
-	VECTOR(outdegree)[i]=1;
+        VECTOR(outdegree)[i]=1;
       }
       MATRIX(vectors, i, 0) = VECTOR(outdegree)[i];
     }     
