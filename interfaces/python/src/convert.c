@@ -681,7 +681,10 @@ PyObject* igraphmodule_vector_t_to_PyList(igraph_vector_t *v,
   list=PyList_New(n);
   for (i=0; i<n; i++) {
     if (type == IGRAPHMODULE_TYPE_INT) {
-      item=PyInt_FromLong((long)VECTOR(*v)[i]);
+	  if (!igraph_finite(VECTOR(*v)[i]))
+		item=PyFloat_FromDouble((double)VECTOR(*v)[i]);
+	  else
+        item=PyInt_FromLong((long)VECTOR(*v)[i]);
     } else if (type == IGRAPHMODULE_TYPE_FLOAT) {
       item=PyFloat_FromDouble((double)VECTOR(*v)[i]);
     } else {
@@ -1012,10 +1015,13 @@ PyObject* igraphmodule_matrix_t_to_PyList(igraph_matrix_t *m,
     row=PyList_New(nc);
     for (j=0; j<nc; j++) 
       {
-         if (type==IGRAPHMODULE_TYPE_INT)
-           item=PyInt_FromLong(MATRIX(*m,i,j));
-         else
-           item=PyFloat_FromDouble(MATRIX(*m,i,j));
+         if (type==IGRAPHMODULE_TYPE_INT) {
+	       if (!igraph_finite(MATRIX(*m, i, j)))
+		     item=PyFloat_FromDouble((double)MATRIX(*m, i, j));
+	       else
+             item=PyInt_FromLong((long)MATRIX(*m, i, j));
+		 } else
+           item=PyFloat_FromDouble(MATRIX(*m, i, j));
            
          if (PyList_SetItem(row, j, item))
            {
