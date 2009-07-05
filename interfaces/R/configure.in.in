@@ -3,7 +3,19 @@ AC_CONFIG_SRCDIR(src/rinterface.c)
 AC_CONFIG_HEADERS(src/config.h)
 
 AC_PROG_CC
+
+# Tricky check for C++ compiler, because Autoconf has a weird bug:
+# http://lists.gnu.org/archive/html/autoconf/2006-03/msg00067.html
 AC_PROG_CXX
+AC_LANG_PUSH([C++])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+#include <iostream>
+const char hw[] = "Hello, World\n";]],
+                [[std::cout << hw;]])],
+        [AC_PROG_CXXCPP
+        cxx_error=no],
+        [AC_MSG_ERROR([no C++ compiler found or it cannot create executables])])
+AC_LANG_POP([C++])
 
 AC_CHECK_FUNCS(fmemopen, [HAVE_FMEMOPEN=1], [HAVE_FMEMOPEN=0])
 AC_SUBST(HAVE_FMEMOPEN)
