@@ -8,7 +8,20 @@ AC_CONFIG_TESTDIR(tests)
 AC_CONFIG_FILES([tests/Makefile tests/atlocal])
 
 AC_PROG_CC
+
+# Tricky check for C++ compiler, because Autoconf has a weird bug:
+# http://lists.gnu.org/archive/html/autoconf/2006-03/msg00067.html
 AC_PROG_CXX
+AC_LANG_PUSH([C++])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+#include <iostream>
+const char hw[] = "Hello, World\n";]],
+                [[std::cout << hw;]])],
+        [AC_PROG_CXXCPP
+        cxx_error=no],
+        [AC_MSG_ERROR([no C++ compiler found or it cannot create executables])])
+AC_LANG_POP([C++])
+
 AM_PROG_LEX
 AC_PROG_YACC
 
