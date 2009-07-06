@@ -72,6 +72,9 @@ __BEGIN_DECLS
 #include "igraph_pmt_off.h"
 #undef BASE_INT
 
+int igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to);
+int igraph_vector_round(const igraph_vector_t *from, igraph_vector_long_t *to);
+
 /* These are for internal use only */
 int igraph_vector_order(const igraph_vector_t* v, const igraph_vector_t *v2,
 			igraph_vector_t* res, igraph_real_t maxval);

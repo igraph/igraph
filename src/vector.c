@@ -55,6 +55,26 @@
 #include "igraph_pmt_off.h"
 #undef BASE_INT
 
+int igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to) {
+  long int i, n=igraph_vector_size(from);
+  
+  IGRAPH_CHECK(igraph_vector_long_resize(to, n));
+  for (i=0; i<n; i++) {
+    VECTOR(*to)[i] = floor(VECTOR(*from)[i]);
+  }
+  return 0;
+}
+
+int igraph_vector_round(const igraph_vector_t *from, igraph_vector_long_t *to) {
+  long int i, n=igraph_vector_size(from);
+  
+  IGRAPH_CHECK(igraph_vector_long_resize(to, n));
+  for (i=0; i<n; i++) {
+    VECTOR(*to)[i] = round(VECTOR(*from)[i]);
+  }
+  return 0;
+}
+
 int igraph_vector_order2(igraph_vector_t *v) {
 
   igraph_indheap_t heap;
