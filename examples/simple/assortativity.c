@@ -112,7 +112,7 @@ int main() {
 
   /*---------------------*/
   
-  igraph_assortativity_degree(&g, &res);
+  igraph_assortativity_degree(&g, &res, /*directed=*/ 1);
   printf("%.5f\n", res);
 
   igraph_destroy(&g);  
@@ -123,7 +123,7 @@ int main() {
   igraph_read_graph_gml(&g, karate);
   fclose(karate);
   
-  igraph_assortativity_degree(&g, &res);
+  igraph_assortativity_degree(&g, &res, /*directed=*/ 1);
   printf("%.5f\n", res);
   
   igraph_destroy(&g);

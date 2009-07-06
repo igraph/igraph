@@ -52,7 +52,8 @@ int igraph_assortativity(const igraph_t *graph,
 			 igraph_bool_t directed);
 
 int igraph_assortativity_degree(const igraph_t *graph,
-				igraph_real_t *res);
+				igraph_real_t *res, 
+				igraph_bool_t directed);
 
 __END_DECLS
 

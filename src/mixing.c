@@ -163,9 +163,12 @@ int igraph_assortativity(const igraph_t *graph,
 }
 
 int igraph_assortativity_degree(const igraph_t *graph,
-				igraph_real_t *res) {
-  
-  if (igraph_is_directed(graph)) {
+				igraph_real_t *res, 
+				igraph_bool_t directed) {
+
+  directed = directed && igraph_is_directed(graph);
+
+  if (directed) {
     igraph_vector_t indegree, outdegree;
     igraph_vector_init(&indegree, 0);
     igraph_vector_init(&outdegree, 0);

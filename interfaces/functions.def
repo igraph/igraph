@@ -606,7 +606,7 @@ igraph_assortativity:
         NAME-R: assortativity
 
 igraph_assortativity_degree:
-        PARAMS: GRAPH graph, OUT REALPTR res
+        PARAMS: GRAPH graph, OUT REALPTR res, BOOLEAN directed=True
         NAME-R: assortativity.degree
 
 #######################################
