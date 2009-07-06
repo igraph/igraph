@@ -2694,6 +2694,45 @@ PyObject *igraphmodule_Graph_articulation_points(igraphmodule_GraphObject *self)
 }
 
 /** \ingroup python_interface_graph
+ * \brief Calculates the assortativity coefficient
+ * \sa igraph_assortativity
+ */
+PyObject *igraphmodule_Graph_assortativity(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds)
+{
+  static char *kwlist[] = { "types1", "types2", "directed", NULL };
+  PyObject *types1_o = Py_None, *types2_o = Py_None, *directed = Py_True;
+  igraph_real_t res;
+  int ret;
+  igraph_vector_t *types1 = 0, *types2 = 0;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist, &types1_o, &types2_o, &directed))
+    return NULL;
+
+  if (igraphmodule_attrib_to_vector_t(types1_o, self, &types1, ATTRIBUTE_TYPE_VERTEX))
+    return NULL;
+  if (igraphmodule_attrib_to_vector_t(types2_o, self, &types2, ATTRIBUTE_TYPE_VERTEX)) {
+    if (types1) { igraph_vector_destroy(types1); free(types1); }
+    return NULL;
+  }
+
+  if (types1) {
+    ret = igraph_assortativity(&self->g, types1, types2, &res, PyObject_IsTrue(directed));
+  } else {
+    ret = igraph_assortativity_degree(&self->g, &res);
+  }
+
+  if (types1) { igraph_vector_destroy(types1); free(types1); }
+  if (types2) { igraph_vector_destroy(types2); free(types2); }
+
+  if (ret) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  return Py_BuildValue("d", (double)(res));
+}
+
+/** \ingroup python_interface_graph
  * \brief Calculates Kleinberg's authority scores of the nodes in the graph
  * \sa igraph_authority_score
  */
@@ -9042,6 +9081,24 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Returns the list of articulation points in the graph.\n\n"
    "A vertex is an articulation point if its removal increases the number of\n"
    "connected components in the graph.\n"
+  },
+
+  /* interface to igraph_assortativity{_degree} */
+  {"assortativity", (PyCFunction)igraphmodule_Graph_assortativity,
+   METH_VARARGS | METH_KEYWORDS,
+   "assortativity(types1=None, types2=None, directed=True)\n\n"
+   "Returns the assortativity degree of the graph.\n\n"
+   "@param types1: vertex types in a list or the name of a vertex attribute\n"
+   "  holding vertex types. Types are ideally denoted by numeric values.\n"
+   "  If C{None}, the vertex out-degrees are used.\n\n"
+   "@param types2: in directed assortativity calculations, each vertex can\n"
+   "  have an out-type and an in-type. In this case, I{types1} contains the\n"
+   "  out-types and this parameter contains the in-types in a list or the\n"
+   "  name of a vertex attribute. If C{None} and I{types1} is given, it is\n"
+   "  assumed to be equal to I{types1}, otherwise it is assumed to contain\n"
+   "  the in-degrees of the vertices.\n\n"
+   "@param directed: whether to consider edge directions or not.\n"
+   "@return: the assortativity coefficient\n"
   },
 
   /* interface to igraph_average_path_length */
