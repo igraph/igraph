@@ -20,6 +20,9 @@ BOOLEAN:
 VECTOR:
     INCONV: %I% <- as.numeric(%I%)
 
+VECTOR_LONG:
+    INCONV: %I% <- as.integer(%I%)
+
 VECTOR_OR_0:
     INCONV: if (!is.null(%I%)) %I% <- as.numeric(%I%)
 

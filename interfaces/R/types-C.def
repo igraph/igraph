@@ -173,6 +173,12 @@ VECTOR_BOOL:
          igraph_vector_bool_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
 
+VECTOR_LONG:
+  CTYPE: igraph_vector_long_t
+  CALL: &%C%
+  INCONV:
+    IN: R_SEXP_to_vector_long(%I%, &%C%);
+
 VECTORLIST:
   CTYPE: igraph_vector_ptr_t
   CALL: &%C%

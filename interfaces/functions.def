@@ -595,6 +595,20 @@ igraph_centralization_eigenvector_centrality:
                 BOOLEAN normalized=True
         NAME-R: centralization.evcent
 
+igraph_assortativity_nominal:
+        PARAMS: GRAPH graph, VECTOR_LONG types, OUT REALPTR res, \
+                BOOLEAN directed=True
+        NAME-R: assortativity.nominal
+
+igraph_assortativity:
+        PARAMS: GRAPH graph, VECTOR types1, VECTOR_OR_0 types2=NULL, \
+                OUT REALPTR res, BOOLEAN directed=True
+        NAME-R: assortativity
+
+igraph_assortativity_degree:
+        PARAMS: GRAPH graph, OUT REALPTR res
+        NAME-R: assortativity.degree
+
 #######################################
 # Visitors
 #######################################

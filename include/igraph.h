@@ -75,5 +75,6 @@
 #include "igraph_adjlist.h"
 #include "igraph_attributes.h"
 #include "igraph_arpack.h"
+#include "igraph_mixing.h"
 
 #endif

@@ -130,3 +130,8 @@ AT_KEYWORDS([edge convergence degree igraph_convergence_degree])
 AT_COMPILE_CHECK([simple/igraph_convergence_degree.c], [simple/igraph_convergence_degree.out])
 AT_CLEANUP
 
+AT_SETUP([Assortativity coefficient (igraph_assortativity): ])
+AT_KEYWORDS([assortativity mixing igraph_assortativity])
+AT_COMPILE_CHECK([simple/assortativity.c], [simple/assortativity.out], 
+                 [simple/{karate,celegansneural}.gml])
+AT_CLEANUP
