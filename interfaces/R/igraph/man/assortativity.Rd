@@ -100,6 +100,6 @@ assortativity.degree (graph, directed = TRUE)
 assortativity.degree(erdos.renyi.game(10000,3/10000))
 
 # BA model, tends to be dissortative
-assortativity.degree(ba.game(10000, 4)), dir=FALSE)
+assortativity.degree(simplify(ba.game(10000, m=4)))
 }
 \keyword{graphs}
