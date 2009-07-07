@@ -143,7 +143,7 @@ int igraph_assortativity_nominal(const igraph_t *graph,
  * \param types2 A second value vector to be using for the incoming
  *     edges when calculating assortativity for a directed graph. 
  *     Supply a null pointer here if you want to use the same values
- *     for outgoing and incoming edges. This arguments is ignored
+ *     for outgoing and incoming edges. This argument is ignored
  *     (with a warning) if it is not a null pointer and undirected
  *     assortativity coefficient is being calculated.
  * \param res Pointer to a real variable, the result is stored here.
@@ -244,7 +244,7 @@ int igraph_assortativity(const igraph_t *graph,
  * 
  * \param graph The input graph, it can be directed or undirected.
  * \param res Pointer to a real variable, the result is stored here.
- * \param directed Boolean, whether to consider edge directecions for
+ * \param directed Boolean, whether to consider edge directions for
  *     directed graphs. This argument is ignored for undirected
  *     graphs. Supply 1 (=TRUE) here to do the natural thing, i.e. use
  *     directed version of the measure for directed graphs and the
