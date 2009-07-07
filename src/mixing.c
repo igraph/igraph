@@ -24,6 +24,38 @@
 #include "igraph_mixing.h"
 #include "igraph_interface.h"
 
+/**
+ * \function igraph_assortativity_nominal
+ * Assortativity of a graph based on vertex categories
+ * 
+ * Assuming the vertices of the input graph belong to different
+ * categories, this function calculates the assortativity coeffient of
+ * the graph. The assortativity coeffient is between minus one and one
+ * and it is one if all connections stay within categories, it is
+ * minus one, if the network is perfectly disassortative. For a
+ * randomly connected network it is (asymptotically) zero.
+ * 
+ * </para><para>See equation (2) in M. E. J. Newman: Mixing patterns
+ * in networks, Phys. Rev. E 67, 026126 (2003)
+ * (http://arxiv.org/abs/cond-mat/0209450) for the proper
+ * definition. 
+ * 
+ * \param graph The input graph, it can be directed or undirected.
+ * \param types Vector giving the vertex types. They are assumed to be
+ *    integer numbers, starting with zero.
+ * \param res Pointer to a real variable, the result is stored here.
+ * \param directed Boolean, it gives whether to consider edge
+ *    directions in a directed graph. It is ignored for undirected
+ *    graphs.
+ * \return Error code.
+ * 
+ * Time complecity: O(|E|+t), |E| is the number of edges, t is the
+ * number of vertex types.
+ * 
+ * \sa \ref igraph_assortativity if the vertex types are defines by
+ * numeric values (e.g. vertex degree), instead of categories. 
+ */
+
 int igraph_assortativity_nominal(const igraph_t *graph, 
 				 const igraph_vector_long_t *types,
 				 igraph_real_t *res,
@@ -87,6 +119,47 @@ int igraph_assortativity_nominal(const igraph_t *graph,
   return 0;
 }
     
+/** 
+ * \function igraph_assortativity
+ * Assortativity based on numeric properties of vertices
+ * 
+ * This function calculates the assortativity coefficient of the input
+ * graph. This coefficient is basically the correlation between the
+ * actual connectivity patterns of the vertices and the pattern
+ * expected from the distribution of the vertex types. 
+ * 
+ * </para><para>See equation (21) in M. E. J. Newman: Mixing patterns
+ * in networks, Phys. Rev. E 67, 026126 (2003)
+ * (http://arxiv.org/abs/cond-mat/0209450) for the proper
+ * definition. The actual calculation is performed using equation (26)
+ * in the same paper for directed graphs, and equation (4) in
+ * M. E. J. Newman: Assortative mixing in networks,
+ * Phys. Rev. Lett. 89, 208701 (2002)
+ * (http://arxiv.org/abs/cond-mat/0205405/) for undirected graphs.
+ * 
+ * \param graph The input graph, it can be directed or undirected.
+ * \param types1 The vertex values, these can be arbitrary numeric
+ *     values.
+ * \param types2 A second value vector to be using for the incoming
+ *     edges when calculating assortativity for a directed graph. 
+ *     Supply a null pointer here if you want to use the same values
+ *     for outgoing and incoming edges. This arguments is ignored
+ *     (with a warning) if it is not a null pointer and undirected
+ *     assortativity coefficient is being calculated.
+ * \param res Pointer to a real variable, the result is stored here.
+ * \param directed Boolean, whether to consider edge directions for
+ *     directed graphs. It is ignored for undirected graphs.
+ * \return Error code.
+ * 
+ * Time complexity: O(|E|), linear in the number of edges of the
+ * graph.
+ * 
+ * \sa \ref igraph_assortativity_nominal() if you have discrete vertex
+ * categories instead of numeric labels, and \ref
+ * igraph_assortativity_degree() for the special case of assortativity
+ * based on vertex degree.
+ */
+
 int igraph_assortativity(const igraph_t *graph,
 			 const igraph_vector_t *types1,
 			 const igraph_vector_t *types2,
@@ -161,6 +234,29 @@ int igraph_assortativity(const igraph_t *graph,
       
   return 0;
 }
+
+/**
+ * \function igraph_assortativity_degree
+ * Assortativity of a graph based on vertex degree
+ * 
+ * Assortativity based on vertex degree, please see the discussion at
+ * the documentation of \ref igraph_assortativity() for details. 
+ * 
+ * \param graph The input graph, it can be directed or undirected.
+ * \param res Pointer to a real variable, the result is stored here.
+ * \param directed Boolean, whether to consider edge directecions for
+ *     directed graphs. This argument is ignored for undirected
+ *     graphs. Supply 1 (=TRUE) here to do the natural thing, i.e. use
+ *     directed version of the measure for directed graphs and the
+ *     undirected version for undirected graphs.
+ * \return Error code.
+ * 
+ * Time complexity: O(|E|+|V|), |E| is the number of edges, |V| is
+ * the number of vertices.
+ * 
+ * \sa \ref igraph_assortativity() for the general function
+ * calculating assortativity for any kind of numeric vertex values.
+ */
 
 int igraph_assortativity_degree(const igraph_t *graph,
 				igraph_real_t *res, 

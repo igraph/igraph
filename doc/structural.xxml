@@ -111,6 +111,12 @@
 <!-- doxrox-include igraph_simplify -->
 </section>
 
+<section><title>Mixing patterns</title>
+<!-- doxrox-include igraph_assortativity_nominal -->
+<!-- doxrox-include igraph_assortativity -->
+<!-- doxrox-include igraph_assortativity_degree -->
+</section>
+
 <section><title>K-Cores</title>
 <!-- doxrox-include igraph_coreness -->
 </section>
