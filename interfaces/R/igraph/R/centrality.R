@@ -68,6 +68,6 @@ subgraph.centrality <- function(graph, diag=FALSE) {
   A <- get.adjacency(graph)
   if (!diag) { diag(A) <- 0 }
   eig <- eigen(A)
-  eig$values * exp(diag(eig$vectors))
+  eig$vectors^2 %*% exp(eig$values)
 }
 
