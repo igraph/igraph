@@ -63,3 +63,11 @@ arpack <- function(func, extra=NULL, sym=FALSE, options=igraph.arpack.default,
   
   res
 }
+
+subgraph.centrality <- function(graph, diag=FALSE) {
+  A <- get.adjacency(graph)
+  if (!diag) { diag(A) <- 0 }
+  eig <- eigen(A)
+  eig$values * exp(diag(eig$vectors))
+}
+
