@@ -1688,7 +1688,7 @@ class Graph(core.GraphBase):
             attribute is C{color}, the default is red.  Colors can be
             specified either by common X11 color names (see the source
             code of L{igraph.colors} for a list of known colors), by
-            3-tuples of floats (ranging between 0 and 1 for the R, G and
+            3-tuples of floats (ranging between 0 and 255 for the R, G and
             B components), by CSS-style string specifications (C{#rrggbb})
             or by integer color indices of the specified palette.
 
