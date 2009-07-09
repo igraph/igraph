@@ -1,5 +1,7 @@
 \name{assortativity}
 \alias{assortativity}
+\alias{assortativity.degree}
+\alias{assortativity.nominal}
 \concept{Assortativity coefficient}
 \title{Assortativity coefficient}
 \description{
