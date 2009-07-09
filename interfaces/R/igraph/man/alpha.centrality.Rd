@@ -7,7 +7,7 @@
 }
 \usage{
 alpha.centrality(graph, nodes=V(graph), alpha=1, loops=FALSE,
-                 exo=1, attr=NULL, tol=1e-7, sparse=TRUE)
+                 exo=1, weights=NULL, tol=1e-7, sparse=TRUE)
 }
 \arguments{
   \item{graph}{The input graph, can be directed or undirected}
@@ -23,10 +23,11 @@ alpha.centrality(graph, nodes=V(graph), alpha=1, loops=FALSE,
     constant -- the same factor for every node, or a vector giving the
     factor for every vertex. Note that long vectors will be truncated and
     short vectors will be replicated.}
-  \item{attr}{A character scalar to give the name of the edge attribute
-    to use in the adjacency matrix. If it is \code{NULL}, then no edge
-    attribute is used and the calculation uses the standard adjacency
-    matrix. Supply \dQuote{weight} here if you have a weighted graph.}
+  \item{weights}{A character scalar to give the name of the edge attribute
+    to use in the adjacency matrix. If it is \code{NULL}, then the
+    \sQuote{weight} edge attribute of the graph is used, if there is
+    one. Otherwise, or if it is \code{NA}, then the calculation uses the
+    standard adjacency matrix.}
   \item{tol}{Tolerance for near-singularities during matrix inversion,
     see \code{\link{solve}}.}
   \item{sparse}{Logical scalar, whether to use sparse matrices for the
