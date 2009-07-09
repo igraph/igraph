@@ -13,10 +13,11 @@
 \usage{
 betweenness(graph, v=V(graph), directed = TRUE, weights = NULL,
      verbose = igraph.par("verbose"))
-edge.betweenness(graph, e=E(graph), directed = TRUE)
+edge.betweenness(graph, e=E(graph), directed = TRUE, weights = NULL)
 betweenness.estimate(graph, vids = V(graph), directed = TRUE, cutoff,
      weights = NULL, verbose = igraph.par("verbose"))
-edge.betweenness.estimate(graph, directed = TRUE, cutoff)
+edge.betweenness.estimate(graph, e=E(graph),
+     directed = TRUE, cutoff, weights = NULL)
 }
 \arguments{
   \item{graph}{The graph to analyze.}

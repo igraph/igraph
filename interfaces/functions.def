@@ -364,12 +364,14 @@ igraph_edge_betweenness:
                 EDGEWEIGHTS weights=NULL
         DEPS: weights ON graph
         NAME-R: edge.betweenness
+        IGNORE: RR
 
 igraph_edge_betweenness_estimate:
         PARAMS: GRAPH graph, OUT VECTOR res, BOOLEAN directed=True, \
                 REAL cutoff, EDGEWEIGHTS weights=NULL
         DEPS: weights ON graph
         NAME-R: edge.betweenness.estimate
+        IGNORE: RR
 
 igraph_pagerank_old:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, BOOLEAN directed=True, \

@@ -831,3 +831,48 @@ graph.dfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
         PACKAGE="igraph")
   
 }
+
+edge.betweenness <- function(graph, e=E(graph),
+                             directed=TRUE, weights=NULL) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  e <- as.igraph.es(e)
+  directed <- as.logical(directed)
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
+  weights <- E(graph)$weight 
+  } 
+  if (!is.null(weights) && any(!is.na(weights))) { 
+  weights <- as.numeric(weights) 
+  } else { 
+  weights <- NULL 
+  }
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_edge_betweenness", graph, directed, weights,
+        PACKAGE="igraph")
+  res[as.numeric(e)+1]
+}
+
+edge.betweenness.estimate <- function(graph, e=E(graph),
+                                      directed=TRUE, cutoff, weights=NULL) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  e <- as.igraph.es(e)
+  directed <- as.logical(directed)
+  cutoff <- as.numeric(cutoff)
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
+  weights <- E(graph)$weight 
+  } 
+  if (!is.null(weights) && any(!is.na(weights))) { 
+  weights <- as.numeric(weights) 
+  } else { 
+  weights <- NULL 
+  }
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_edge_betweenness_estimate", graph, directed, cutoff, weights,
+        PACKAGE="igraph")
+  res[as.numeric(e)+1]
+}
