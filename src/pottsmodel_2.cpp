@@ -1186,8 +1186,7 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
   if (modularity)  { *modularity=calculate_Q(); }
   if (temperature) { *temperature=kT; }
 
-  if (csize) {
-    igraph_vector_resize(csize, 0);
+  if (csize || membership) {
     // TODO: count the number of clusters
     for (unsigned int spin=1; spin<=q; spin++)
       {
@@ -1210,6 +1209,12 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 	      }
 	    n_cur=iter.Next();
 	  }
+      }
+  }
+  if (csize) {
+    igraph_vector_resize(csize, 0);
+    for (unsigned int spin=1; spin<=q; spin++)
+      {
 	if (nodes[spin]>0)
 	  {
 	    inner_links[spin]/=2;
