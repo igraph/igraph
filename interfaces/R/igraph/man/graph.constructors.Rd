@@ -28,7 +28,7 @@ graph.lattice(dimvector = NULL, length = NULL, dim = NULL, nei = 1,
 \usage{
 graph.empty(n=0, directed=TRUE)
 graph(edges, n=max(edges)+1, directed=TRUE)
-graph.star(n, mode = "in", center = 0)
+graph.star(n, mode = c("in", "out", "mutual", "undirected"), center = 0)
 graph.lattice(dimvector, nei = 1, directed = FALSE, mutual = FALSE, 
               circular = FALSE)
 graph.lattice(length, dim, nei = 1, directed = FALSE, mutual = FALSE,
@@ -63,7 +63,8 @@ graph.extended.chordal.ring(n, w)
   \item{mode}{
     For \code{graph.star} it defines the direction of the
     edges, \code{in}: the edges point \emph{to} the center, \code{out}:
-    the edges point \emph{from} the center, \code{undirected}: the edges
+    the edges point \emph{from} the center, \code{mutual}: a directed
+    star is created with mutual edges, \code{undirected}: the edges
     are undirected.
 
     For \code{igraph.tree} this parameter defines the direction of the

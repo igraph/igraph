@@ -58,7 +58,8 @@ typedef enum { IGRAPH_ADJ_DIRECTED=0,
 	       IGRAPH_ADJ_PLUS } igraph_adjacency_t;
 
 typedef enum { IGRAPH_STAR_OUT=0, IGRAPH_STAR_IN,
-	       IGRAPH_STAR_UNDIRECTED } igraph_star_mode_t;
+	       IGRAPH_STAR_UNDIRECTED, 
+	       IGRAPH_STAR_MUTUAL } igraph_star_mode_t;
 
 typedef enum { IGRAPH_TREE_OUT=0, IGRAPH_TREE_IN,
 	       IGRAPH_TREE_UNDIRECTED } igraph_tree_mode_t;

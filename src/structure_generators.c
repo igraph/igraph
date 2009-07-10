@@ -550,6 +550,8 @@ int igraph_weighted_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
  *        \cli IGRAPH_STAR_IN
  *          directed star graph, edges point
  *          \em to the center from the other vertices.
+ *        \cli IGRAPH_STAR_MUTUAL
+ *          directed star graph with mutual edges.
  *        \cli IGRAPH_STAR_UNDIRECTED 
  *          an undirected star graph is
  *          created. 
@@ -586,11 +588,15 @@ int igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
     IGRAPH_ERROR("Invalid center vertex", IGRAPH_EINVAL);
   }
   if (mode != IGRAPH_STAR_OUT && mode != IGRAPH_STAR_IN && 
-      mode != IGRAPH_STAR_UNDIRECTED) {
+      mode != IGRAPH_STAR_MUTUAL && mode != IGRAPH_STAR_UNDIRECTED) {
     IGRAPH_ERROR("invalid mode", IGRAPH_EINVMODE);
   }
-
-  IGRAPH_VECTOR_INIT_FINALLY(&edges, (n-1)*2);
+  
+  if (mode != IGRAPH_STAR_MUTUAL) {
+    IGRAPH_VECTOR_INIT_FINALLY(&edges, (n-1)*2);
+  } else {
+    IGRAPH_VECTOR_INIT_FINALLY(&edges, (n-1)*2*2);
+  }
   
   if (mode == IGRAPH_STAR_OUT) {
     for (i=0; i<center; i++) {
@@ -600,6 +606,13 @@ int igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
     for (i=center+1; i<n; i++) {
       VECTOR(edges)[2*(i-1)]=center;
       VECTOR(edges)[2*(i-1)+1]=i;
+    }
+  } else if (mode == IGRAPH_STAR_MUTUAL) {
+    for (i=0; i<center; i++) {
+      VECTOR(edges)[2*i]=center;
+      VECTOR(edges)[2*i+1]=i;
+      VECTOR(edges)[3*i]=i;
+      VECTOR(edges)[3*i+1]=center;
     }
   } else {
     for (i=0; i<center; i++) {

@@ -403,10 +403,11 @@ graph.adjacency <- function(adjmatrix, mode=c("directed", "undirected", "max",
 }
   
 
-graph.star <- function(n, mode=c("in", "out", "undirected"), center=0 ) {
+graph.star <- function(n, mode=c("in", "out", "mutual", "undirected"),
+                       center=0 ) {
 
   mode <- igraph.match.arg(mode)
-  mode <- switch(mode, "out"=0, "in"=1, "undirected"=2)
+  mode <- switch(mode, "out"=0, "in"=1, "undirected"=2, "mutual"=3)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_star", as.numeric(n), as.numeric(mode),
