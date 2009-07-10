@@ -11,24 +11,28 @@ int main() {
   /* in-star */
   igraph_star(&g, 10, IGRAPH_STAR_IN, /*center=*/ 0);
   
-  igraph_centralization_degree(&g, /*res=*/ 0, igraph_vss_all(), 
+  igraph_centralization_degree(&g, /*res=*/ 0,
 			       /*mode=*/ IGRAPH_IN, IGRAPH_NO_LOOPS,
-			       &cent, /*normalized=*/ 1);
+			       &cent, /*theoretical_max=*/ 0, 
+			       /*normalized=*/ 1);
   if (cent != 1.0) { 
     fprintf(stderr, "in-star, degree: %g\n", cent); 
     return 1; 
   }
 
-  igraph_centralization_betweenness(&g, /*res=*/ 0, igraph_vss_all(),
+  igraph_centralization_betweenness(&g, /*res=*/ 0,
 				    IGRAPH_UNDIRECTED, &cent, 
+				    /*theoretical_max=*/ 0,
 				    /*normalized=*/ 1);
   if (cent != 1.0) { 
     fprintf(stderr, "in-star, betweenness: %g\n", cent); 
     return 2; 
   }
 
-  igraph_centralization_closeness(&g, /*res=*/ 0, igraph_vss_all(),
-				  IGRAPH_IN, &cent, /*normalization=*/ 1);
+  igraph_centralization_closeness(&g, /*res=*/ 0,
+				  IGRAPH_IN, &cent, 
+				  /*theoretical_max=*/ 0,
+				  /*normalization=*/ 1);
   
   if (cent != 1.0) {
     fprintf(stderr, "in-star, closeness: %g\n", cent);
@@ -41,24 +45,28 @@ int main() {
   /* out-star */
   igraph_star(&g, 10, IGRAPH_STAR_OUT, /*center=*/ 0);
   
-  igraph_centralization_degree(&g, /*res=*/ 0, igraph_vss_all(), 
+  igraph_centralization_degree(&g, /*res=*/ 0,
 			       /*mode=*/ IGRAPH_OUT, IGRAPH_NO_LOOPS,
-			       &cent, /*normalized=*/ 1);
+			       &cent, /*theoretical_max=*/ 0,
+			       /*normalized=*/ 1);
   if (cent != 1.0) { 
     fprintf(stderr, "out-star, degree: %g\n", cent); 
     return 11; 
   }
 
-  igraph_centralization_betweenness(&g, /*res=*/ 0, igraph_vss_all(),
-				    IGRAPH_UNDIRECTED, &cent, 
+  igraph_centralization_betweenness(&g, /*res=*/ 0,
+				    IGRAPH_UNDIRECTED, &cent,
+				    /*theoretical_max=*/ 0,
 				    /*normalized=*/ 1);
   if (cent != 1.0) { 
     fprintf(stderr, "out-star, betweenness: %g\n", cent); 
     return 12; 
   }
 
-  igraph_centralization_closeness(&g, /*res=*/ 0, igraph_vss_all(),
-				  IGRAPH_OUT, &cent, /*normalization=*/ 1);
+  igraph_centralization_closeness(&g, /*res=*/ 0,
+				  IGRAPH_OUT, &cent, 
+				  /*theoretical_max=*/ 0,
+				  /*normalization=*/ 1);
   
   if (cent != 1.0) {
     fprintf(stderr, "out-star, closeness: %g\n", cent);
@@ -71,6 +79,7 @@ int main() {
   igraph_centralization_eigenvector_centrality(&g, /*vector=*/ 0, 
 					       /*value=*/ 0, /*scale=*/ 1,
 					       &arpack_options, &cent,
+					       /*theoretical_max=*/ 0,
 					       /*normalization=*/ 1);
   
 /*   if (cent != 1.0) { */
@@ -84,24 +93,28 @@ int main() {
   /* undricted star */
   igraph_star(&g, 10, IGRAPH_STAR_UNDIRECTED, /*center=*/ 0);
   
-  igraph_centralization_degree(&g, /*res=*/ 0, igraph_vss_all(), 
+  igraph_centralization_degree(&g, /*res=*/ 0,
 			       /*mode=*/ IGRAPH_ALL, IGRAPH_NO_LOOPS,
-			       &cent, /*normalized=*/ 1);
+			       &cent, /*theoretical_max=*/ 0,
+			       /*normalized=*/ 1);
   if (cent != 1.0) { 
     fprintf(stderr, "undirected star, degree: %g\n", cent); 
     return 21; 
   }
 
-  igraph_centralization_betweenness(&g, /*res=*/ 0, igraph_vss_all(),
-				    IGRAPH_UNDIRECTED, &cent, 
+  igraph_centralization_betweenness(&g, /*res=*/ 0,
+				    IGRAPH_UNDIRECTED, &cent,
+				    /*theoretical_max=*/ 0,
 				    /*normalized=*/ 1);
   if (cent != 1.0) { 
     fprintf(stderr, "undirected star, betweenness: %g\n", cent); 
     return 22; 
   }
 
-  igraph_centralization_closeness(&g, /*res=*/ 0, igraph_vss_all(),
-				  IGRAPH_ALL, &cent, /*normalization=*/ 1);
+  igraph_centralization_closeness(&g, /*res=*/ 0,
+				  IGRAPH_ALL, &cent, 
+				  /*theoretical_max=*/ 0,
+				  /*normalization=*/ 1);
   
   if (cent != 1.0) {
     fprintf(stderr, "undirected star, closeness: %g\n", cent);
@@ -119,6 +132,7 @@ int main() {
   igraph_centralization_eigenvector_centrality(&g, /*vector=*/ 0,
 					       /*value=*/ 0, /*scale=*/ 1,
 					       &arpack_options, &cent,
+					       /*theoretical_max=*/ 0,
 					       /*normalization=*/ 1);
   
   if (cent != 1.0) {
@@ -129,6 +143,7 @@ int main() {
   igraph_centralization_eigenvector_centrality(&g, /*vector=*/ 0,
 					       /*value=*/ 0, /*scale=*/ 0,
 					       &arpack_options, &cent,
+					       /*theoretical_max=*/ 0,
 					       /*normalization=*/ 1);
   
 /*   if (cent != 1.0) { */

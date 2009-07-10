@@ -563,37 +563,36 @@ igraph_strength:
         DEPS: vids ON graph, weights ON graph
 
 igraph_centralization:
-        PARAMS: VECTOR scores, REAL theoretical_max, BOOLEAN normalized=True
+        PARAMS: VECTOR scores, REAL theoretical_max=0, BOOLEAN normalized=True
         RETURN: REAL
         NAME-R: centralize.scores
 
 igraph_centralization_degree:
-        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
+        PARAMS: GRAPH graph, OUT VECTOR res, \
                 NEIMODE mode=ALL, BOOLEAN loops=True, \
-                OUT REALPTR centralization, \
+                OUT REALPTR centralization, OUT REALPTR theoretical_max, \
                 BOOLEAN normalized=True
-        DEPS: vids ON graph
         NAME-R: centralization.degree
 
 igraph_centralization_betweenness:
-        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
+        PARAMS: GRAPH graph, OUT VECTOR res, \
                 BOOLEAN directed=True, OUT REALPTR centralization, \
+                OUT REALPTR theoretical_max, \
                 BOOLEAN normalized=True
-        DEPS: vids ON graph
         NAME-R: centralization.betweenness
 
 igraph_centralization_closeness:
-        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
+        PARAMS: GRAPH graph, OUT VECTOR res, \
                 NEIMODE mode=OUT, OUT REALPTR centralization, \
+                OUT REALPTR theoretical_max, \
                 BOOLEAN normalized=True
-        DEPS: vids ON graph
         NAME-R: centralization.closeness
 
 igraph_centralization_eigenvector_centrality:
         PARAMS: GRAPH graph, OUT VECTOR vector, OUT REALPTR value, \
                 BOOLEAN scale=True, \
                 INOUT ARPACKOPT options=igraph.arpack.default, \
-                OUT REALPTR centralization, \
+                OUT REALPTR centralization, OUT REALPTR theoretical_max,\
                 BOOLEAN normalized=True
         NAME-R: centralization.evcent
 

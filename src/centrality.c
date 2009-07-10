@@ -2175,7 +2175,6 @@ igraph_real_t igraph_centralization(const igraph_vector_t *scores,
   long int no_of_nodes=igraph_vector_size(scores);
   igraph_real_t maxscore=0.0;
   igraph_real_t cent=0.0;
-  long int i;
   
   if (no_of_nodes != 0) {
     maxscore = igraph_vector_max(scores);
@@ -2199,9 +2198,6 @@ igraph_real_t igraph_centralization(const igraph_vector_t *scores,
  * \param graph The input graph.
  * \param res A vector if you need the node-level degree scores, or a
  *     null pointer otherwise.
- * \param vids The vertices for which the degree is calculated and the
- *     centralization is also performed based of these. Normally this
- *     is \ref igraph_vss_all() to include each vertex exactly once.
  * \param mode Constant the specifies the type of degree for directed
  *     graphs. Possible values: \c IGRAPH_IN, \c IGRAPH_OUT and \c
  *     IGRAPH_ALL. This argument is ignored for undirected graphs.
@@ -2209,6 +2205,10 @@ igraph_real_t igraph_centralization(const igraph_vector_t *scores,
  *     calculating the degree (and the centralization).
  * \param centralization Pointer to a real number, the centralization
  *     score is placed here.
+ * \param theoretical_max Pointer to real number or a null pointer. If
+ *     not a null pointer, then the theoretical maximum graph
+ *     centrality score for a graph with the same number vertices is
+ *     stored here.
  * \param normalized Boolean, whether to calculate a normalized
  *     centralization score. See \ref igraph_centralization() for how
  *     the normalization is done.
@@ -2222,56 +2222,120 @@ igraph_real_t igraph_centralization(const igraph_vector_t *scores,
  */
 
 int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res, 
-				 const igraph_vs_t vids, 
 				 igraph_neimode_t mode, igraph_bool_t loops,
-				 igraph_real_t *centralization, 
+				 igraph_real_t *centralization,
+				 igraph_real_t *theoretical_max,
 				 igraph_bool_t normalized) {
   
-  igraph_integer_t no_of_nodes=igraph_vcount(graph);
   igraph_vector_t myscores;
   igraph_vector_t *scores=res;
-  igraph_real_t theoretical_max;
+  igraph_real_t *tmax=theoretical_max, mytmax;
+
+  if (!tmax) { tmax=&mytmax; }
 
   if (!res) {
     scores=&myscores;
     IGRAPH_VECTOR_INIT_FINALLY(scores, 0);
   }
   
-  IGRAPH_CHECK(igraph_degree(graph, scores, vids, mode, loops));
+  IGRAPH_CHECK(igraph_degree(graph, scores, igraph_vss_all(), mode, loops));
+  
+  IGRAPH_CHECK(igraph_centralization_degree_tmax(graph, 0, mode, loops, 
+						 tmax));
 
-  if (igraph_is_directed(graph)) {
-    switch (mode) {
-    case IGRAPH_IN:
-    case IGRAPH_OUT:
-      if (!loops) {
-	theoretical_max = (no_of_nodes-1) * (no_of_nodes-1);
-      } else {
-	theoretical_max = (no_of_nodes-1) * no_of_nodes;
-      }
-      break;
-    case IGRAPH_ALL:
-      if (!loops) {
-	theoretical_max = 2 * (no_of_nodes-1) * (no_of_nodes-2);
-      } else {
-	theoretical_max = 2 * (no_of_nodes-1) * (no_of_nodes-1);
-      }
-      break;
-    }
-  } else {
-    if (!loops) {
-      theoretical_max = (no_of_nodes-1) * (no_of_nodes-2);
-    } else {
-      theoretical_max = (no_of_nodes-1) * no_of_nodes;
-    }
-  }
-
-  *centralization = igraph_centralization(scores, theoretical_max, normalized);
+  *centralization = igraph_centralization(scores, *tmax, normalized);
   
   if (!res) {
     igraph_vector_destroy(scores);
     IGRAPH_FINALLY_CLEAN(1);
   }
   
+  return 0;
+}
+
+/** 
+ * \function igraph_centralization_degree_max
+ * Theoretical maximum for graph centrality based on degree
+ * 
+ * This function returns the theoretical maximum graph centrality
+ * based on vertex degree. 
+ * 
+ * </para><para>
+ * There are two ways to call this function, the first is to supply a
+ * graph as the <code>graph</code> argument, and then the number of
+ * vertices is taken from this object, and its directedness is
+ * considered as well. The <code>nodes</code> argument is ignored in
+ * this case. The <code>mode</code> argument is also ignored if the
+ * supplied graph is undirected.
+ * 
+ * </para><para>
+ * The other way is to supply a null pointer as the <code>graph</code>
+ * argument. In this case the <code>nodes</code> and <code>mode</code>
+ * arguments are considered.
+ * 
+ * </para><para>
+ * The most centralized structure is the star. More specifically, for
+ * undirected graphs it is the star, for directed graphs it is the
+ * in-star or the out-star.
+ * \param graph A graph object or a null pointer, see the description
+ *     above.
+ * \param nodes The number of nodes. This is ignored if the
+ *     <code>graph</code> argument is not a null pointer.
+ * \param mode Constant, whether the calculation is based on in-degree
+ *     (<code>IGRAPH_IN</code>), out-degree (<code>IGRAPH_OUT</code>)
+ *     or total degree (<code>IGRAPH_ALL</code>). This is ignored if
+ *     the <code>graph</code> argument is not a null pointer and the
+ *     given graph is undirected. 
+ * \param loops Boolean scalar, whether to consider loop edges in the
+ *     calculation. 
+ * \param res Pointer to a real variable, the result is stored here.
+ * \return Error code.
+ * 
+ * Time complexity: O(1).
+ * 
+ * \sa \ref igraph_centralization_degree() and \ref
+ * igraph_centralization().
+ */
+
+int igraph_centralization_degree_tmax(const igraph_t *graph, 
+				      igraph_integer_t nodes,
+				      igraph_neimode_t mode,
+				      igraph_bool_t loops,
+				      igraph_real_t *res) {
+
+  igraph_bool_t directed=mode != IGRAPH_ALL;
+
+  if (graph) {
+    directed=igraph_is_directed(graph);
+    nodes=igraph_vcount(graph);
+  }
+
+  if (directed) {
+    switch (mode) {
+    case IGRAPH_IN:
+    case IGRAPH_OUT:
+      if (!loops) {
+	*res = (nodes-1) * (nodes-1);
+      } else {
+	*res = (nodes-1) * nodes;
+      }
+      break;
+    case IGRAPH_ALL:
+      if (!loops) {
+	*res = 2 * (nodes-1) * (nodes-2);
+      } else {
+	*res = 2 * (nodes-1) * (nodes-1);
+      }
+      break;
+    }
+  } else {
+    if (!loops) {
+      *res = (nodes-1) * (nodes-2);
+    } else {
+      *res = (nodes-1) * nodes;
+    }
+  }
+
   return 0;
 }
 
@@ -2286,13 +2350,14 @@ int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res,
  * \param graph The input graph.
  * \param res A vector if you need the node-level betweenness scores, or a
  *     null pointer otherwise.
- * \param vids The vertices for which the betweenness is calculated and the
- *     centralization is also performed based of these. Normally this
- *     is \ref igraph_vss_all() to include each vertex exactly once.
  * \param directed Boolean, whether to consider directed paths when
  *     calculating betweenness.
  * \param centralization Pointer to a real number, the centralization
  *     score is placed here.
+ * \param theoretical_max Pointer to real number or a null pointer. If
+ *     not a null pointer, then the theoretical maximum graph
+ *     centrality score for a graph with the same number vertices is
+ *     stored here.
  * \param normalized Boolean, whether to calculate a normalized
  *     centralization score. See \ref igraph_centralization() for how
  *     the normalization is done.
@@ -2307,35 +2372,95 @@ int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res,
 
 int igraph_centralization_betweenness(const igraph_t *graph, 
 				      igraph_vector_t *res,
-				      const igraph_vs_t vids,
 				      igraph_bool_t directed,
 				      igraph_real_t *centralization,
+				      igraph_real_t *theoretical_max,
 				      igraph_bool_t normalized) {
   
-  igraph_integer_t no_of_nodes=igraph_vcount(graph);
   igraph_vector_t myscores;
   igraph_vector_t *scores=res;
-  igraph_real_t theoretical_max;
-  
+  igraph_real_t *tmax=theoretical_max, mytmax;
+
+  if (!tmax) { tmax=&mytmax; }
+
   if (!res) {
     scores=&myscores;
     IGRAPH_VECTOR_INIT_FINALLY(scores, 0);
   }
   
-  IGRAPH_CHECK(igraph_betweenness(graph, scores, vids, directed, 
+  IGRAPH_CHECK(igraph_betweenness(graph, scores, igraph_vss_all(), directed, 
 				  /*weights=*/ 0));
   
-  if (directed && igraph_is_directed(graph)) {
-    theoretical_max = (no_of_nodes-1) * (no_of_nodes-1) * (no_of_nodes-2);
-  } else {
-    theoretical_max = (no_of_nodes-1) * (no_of_nodes-1) * (no_of_nodes-2) / 2.0;
-  }
+  IGRAPH_CHECK(igraph_centralization_betweenness_tmax(graph, 0, directed, 
+						      tmax));
   
-  *centralization = igraph_centralization(scores, theoretical_max, normalized);
+  *centralization = igraph_centralization(scores, *tmax, normalized);
   
   if (!res) {
     igraph_vector_destroy(scores);
     IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  return 0;
+}
+
+/** 
+ * \function igraph_centralization_betweenness_max
+ * Theoretical maximum for graph centrality based on betweenness
+ * 
+ * This function returns the theoretical maximum graph centrality
+ * based on vertex betweenness. 
+ * 
+ * </para><para>
+ * There are two ways to call this function, the first is to supply a
+ * graph as the <code>graph</code> argument, and then the number of
+ * vertices is taken from this object, and its directedness is
+ * considered as well. The <code>nodes</code> argument is ignored in
+ * this case. The <code>directed</code> argument is also ignored if the
+ * supplied graph is undirected.
+ * 
+ * </para><para>
+ * The other way is to supply a null pointer as the <code>graph</code>
+ * argument. In this case the <code>nodes</code> and <code>directed</code>
+ * arguments are considered.
+ * 
+ * </para><para>
+ * The most centralized structure is the star. More specifically, for
+ * undirected graphs it is the star, for directed graphs it is the
+ * star with mutual edges only.
+ * \param graph A graph object or a null pointer, see the description
+ *     above.
+ * \param nodes The number of nodes. This is ignored if the
+ *     <code>graph</code> argument is not a null pointer.
+ * \param mode Constant, whether the calculation is based on in-degree
+ *     (<code>IGRAPH_IN</code>), out-degree (<code>IGRAPH_OUT</code>)
+ *     or total degree (<code>IGRAPH_ALL</code>). This is ignored if
+ *     the <code>graph</code> argument is not a null pointer and the
+ *     given graph is undirected. 
+ * \param loops Boolean scalar, whether to consider loop edges in the
+ *     calculation. 
+ * \param res Pointer to a real variable, the result is stored here.
+ * \return Error code.
+ * 
+ * Time complexity: O(1).
+ * 
+ * \sa \ref igraph_centralization_degree() and \ref
+ * igraph_centralization().
+ */
+
+int igraph_centralization_betweenness_tmax(const igraph_t *graph, 
+					   igraph_integer_t nodes,
+					   igraph_bool_t directed,
+					   igraph_real_t *res) {
+  if (graph) { 
+    directed=directed && igraph_is_directed(graph); 
+    nodes=igraph_vcount(graph);
+  }
+  
+  if (directed) {
+    *res = (nodes-1) * (nodes-1) * (nodes-2);
+  } else {
+    *res = (nodes-1) * (nodes-1) * (nodes-2) / 2.0;
   }
   
   return 0;
@@ -2352,15 +2477,16 @@ int igraph_centralization_betweenness(const igraph_t *graph,
  * \param graph The input graph.
  * \param res A vector if you need the node-level closeness scores, or a
  *     null pointer otherwise.
- * \param vids The vertices for which the betweenness is calculated and the
- *     centralization is also performed based of these. Normally this
- *     is \ref igraph_vss_all() to include each vertex exactly once.
  * \param mode Constant the specifies the type of closeness for directed
  *     graphs. Possible values: \c IGRAPH_IN, \c IGRAPH_OUT and \c
  *     IGRAPH_ALL. This argument is ignored for undirected graphs. See
  *     \ref igraph_closeness() argument with the same name for more.
  * \param centralization Pointer to a real number, the centralization
  *     score is placed here.
+ * \param theoretical_max Pointer to real number or a null pointer. If
+ *     not a null pointer, then the theoretical maximum graph
+ *     centrality score for a graph with the same number vertices is
+ *     stored here.
  * \param normalized Boolean, whether to calculate a normalized
  *     centralization score. See \ref igraph_centralization() for how
  *     the normalization is done.
@@ -2375,35 +2501,51 @@ int igraph_centralization_betweenness(const igraph_t *graph,
 
 int igraph_centralization_closeness(const igraph_t *graph, 
 				    igraph_vector_t *res, 
-				    const igraph_vs_t vids,
 				    igraph_neimode_t mode, 
 				    igraph_real_t *centralization,
+				    igraph_real_t *theoretical_max,
 				    igraph_bool_t normalized) {
 
-  igraph_integer_t no_of_nodes=igraph_vcount(graph);
   igraph_vector_t myscores;
   igraph_vector_t *scores=res;
-  igraph_real_t theoretical_max;
-  
+  igraph_real_t *tmax=theoretical_max, mytmax;
+
+  if (!tmax) { tmax=&mytmax; }    
+
   if (!res) {
     scores=&myscores;
     IGRAPH_VECTOR_INIT_FINALLY(scores, 0);
   }
   
-  IGRAPH_CHECK(igraph_closeness(graph, scores, vids, mode, 
+  IGRAPH_CHECK(igraph_closeness(graph, scores, igraph_vss_all(), mode, 
 				/*weights=*/ 0));
-  
-  if (mode != IGRAPH_ALL && igraph_is_directed(graph)) {
-    theoretical_max = (no_of_nodes-1) * (1.0-1.0/no_of_nodes);
-  } else {
-    theoretical_max = (no_of_nodes-1) * (no_of_nodes-2) / (2.0*no_of_nodes-3);
-  }
-  
-  *centralization = igraph_centralization(scores, theoretical_max, normalized);
+
+  IGRAPH_CHECK(igraph_centralization_closeness_tmax(graph, 0, mode, 
+						    tmax));
+
+  *centralization = igraph_centralization(scores, *tmax, normalized);
   
   if (!res) {
     igraph_vector_destroy(scores);
     IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  return 0;
+}
+
+int igraph_centralization_closeness_tmax(const igraph_t *graph,
+					 igraph_integer_t nodes,
+					 igraph_neimode_t mode,
+					 igraph_real_t *res) {
+  if (graph) {
+    nodes=igraph_vcount(graph); 
+    if (!igraph_is_directed(graph)) { mode=IGRAPH_ALL; }
+  }
+  
+  if (mode != IGRAPH_ALL) {
+    *res = (nodes-1) * (1.0-1.0/nodes);
+  } else {
+    *res = (nodes-1) * (nodes-2) / (2.0*nodes-3);
   }
   
   return 0;
@@ -2431,6 +2573,10 @@ int igraph_centralization_closeness(const igraph_t *graph,
  *    calculated based on the degree of the vertices.
  * \param centralization Pointer to a real number, the centralization
  *     score is placed here.
+ * \param theoretical_max Pointer to real number or a null pointer. If
+ *     not a null pointer, then the theoretical maximum graph
+ *     centrality score for a graph with the same number vertices is
+ *     stored here.
  * \param normalized Boolean, whether to calculate a normalized
  *     centralization score. See \ref igraph_centralization() for how
  *     the normalization is done.
@@ -2450,14 +2596,16 @@ int igraph_centralization_eigenvector_centrality(
 					 igraph_bool_t scale,
 					 igraph_arpack_options_t *options,
 					 igraph_real_t *centralization,
+					 igraph_real_t *theoretical_max,
 					 igraph_bool_t normalized) {
   
-  igraph_integer_t no_of_nodes=igraph_vcount(graph);
   igraph_vector_t myscores;
   igraph_vector_t *scores=vector;
   igraph_real_t realvalue, *myvalue=value;
-  igraph_real_t theoretical_max;
-  
+  igraph_real_t *tmax=theoretical_max, mytmax;
+
+  if (!tmax) { tmax=&mytmax; }
+
   if (!vector) {
     scores=&myscores;
     IGRAPH_VECTOR_INIT_FINALLY(scores, 0);
@@ -2469,17 +2617,12 @@ int igraph_centralization_eigenvector_centrality(
   IGRAPH_CHECK(igraph_eigenvector_centrality(graph, scores, myvalue, scale,
 					     /*weights=*/ 0, options));
 
-  if (igraph_is_directed(graph)) {
-    theoretical_max = no_of_nodes - 1; 
-  } else {
-    if (scale) { 
-      theoretical_max = no_of_nodes - 2;
-    } else {
-      theoretical_max = (no_of_nodes-2.0) / M_SQRT2;
-    }
-  }
+  IGRAPH_CHECK(igraph_centralization_eigenvector_centrality_tmax(
+						 graph, 0, 0, 
+						 scale, 
+						 tmax));
 
-  *centralization = igraph_centralization(scores, theoretical_max, normalized);
+  *centralization = igraph_centralization(scores, *tmax, normalized);
   
   if (!vector) {
     igraph_vector_destroy(scores);
@@ -2489,3 +2632,27 @@ int igraph_centralization_eigenvector_centrality(
   return 0;
 }
   
+int igraph_centralization_eigenvector_centrality_tmax(
+					 const igraph_t *graph,
+					 igraph_integer_t nodes,
+					 igraph_bool_t directed,
+					 igraph_bool_t scale, 
+					 igraph_real_t *res) {
+
+  if (graph) {
+    nodes=igraph_vcount(graph);
+    directed=igraph_is_directed(graph);
+  }
+  
+  if (directed) {
+    *res = nodes - 1; 
+  } else {
+    if (scale) { 
+      *res = nodes - 2;
+    } else {
+      *res = (nodes-2.0) / M_SQRT2;
+    }
+  }
+
+  return 0;
+}
