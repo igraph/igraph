@@ -569,10 +569,15 @@ igraph_centralization:
 
 igraph_centralization_degree:
         PARAMS: GRAPH graph, OUT VECTOR res, \
-                NEIMODE mode=ALL, BOOLEAN loops=True, \
+                NEIMODE mode=ALL, BOOLEAN loops=False, \
                 OUT REALPTR centralization, OUT REALPTR theoretical_max, \
                 BOOLEAN normalized=True
         NAME-R: centralization.degree
+
+igraph_centralization_degree_tmax:
+        PARAMS: GRAPH_OR_0 graph=NULL, INTEGER nodes=0, NEIMODE mode=ALL, \
+                BOOLEAN loops=False, OUT REALPTR res
+        NAME-R: centralization.degree.tmax
 
 igraph_centralization_betweenness:
         PARAMS: GRAPH graph, OUT VECTOR res, \
@@ -581,12 +586,22 @@ igraph_centralization_betweenness:
                 BOOLEAN normalized=True
         NAME-R: centralization.betweenness
 
+igraph_centralization_betweenness_tmax:
+        PARAMS: GRAPH_OR_0 graph=NULL, INTEGER nodes=0, \
+                BOOLEAN directed=True, OUT REALPTR res
+        NAME-R: centralization.betweenness.tmax
+
 igraph_centralization_closeness:
         PARAMS: GRAPH graph, OUT VECTOR res, \
                 NEIMODE mode=OUT, OUT REALPTR centralization, \
                 OUT REALPTR theoretical_max, \
                 BOOLEAN normalized=True
         NAME-R: centralization.closeness
+
+igraph_centralization_closeness_tmax:
+        PARAMS: GRAPH_OR_0 graph=NULL, INTEGER nodes=0, \
+                BOOLEAN directed=True, OUT REALPTR res
+        NAME-R: centralization.closeness.tmax
 
 igraph_centralization_eigenvector_centrality:
         PARAMS: GRAPH graph, OUT VECTOR vector, OUT REALPTR value, \
@@ -595,6 +610,12 @@ igraph_centralization_eigenvector_centrality:
                 OUT REALPTR centralization, OUT REALPTR theoretical_max,\
                 BOOLEAN normalized=True
         NAME-R: centralization.evcent
+
+igraph_centralization_eigenvector_centrality_tmax:
+        PARAMS: GRAPH_OR_0 graph=NULL, INTEGER nodes=0, \
+                BOOLEAN directed=False, BOOLEAN scale=True, \
+                OUT REALPTR res
+        NAME-R: centralization.evcent.tmax
 
 igraph_assortativity_nominal:
         PARAMS: GRAPH graph, VECTOR_LONG types, OUT REALPTR res, \

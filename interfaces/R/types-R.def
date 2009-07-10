@@ -3,7 +3,7 @@ GRAPH:
     INCONV: if (!is.igraph(%I%)) { stop("Not a graph object") }
 
 GRAPH_OR_0:    
-    INCONV: if (!is.igraph(%I%)) { stop("Not a graph object") }
+    INCONV: if (!is.null(graph) && !is.igraph(%I%)) { stop("Not a graph object") }
 
 INTEGER:
     INCONV: %I% <- as.numeric(%I%)

@@ -20,19 +20,19 @@ GRAPH:
 
 GRAPH_OR_0:
   CTYPE: igraph_t
-  CALL:  &%C%
+  CALL:  (isNull(%I%) ? 0 : &%C%)
   INCONV: 
-    IN: R_SEXP_to_igraph(%I%, &%C%);
-    INOUT: R_SEXP_to_igraph_copy(%I%, &%C%); \
-           IGRAPH_FINALLY(igraph_destroy, &%C%);
+    IN: if (!isNull(%I%)) { R_SEXP_to_igraph(%I%, &%C%); }
+    INOUT: if (!isNull(%I%)) { R_SEXP_to_igraph_copy(%I%, &%C%); \
+             IGRAPH_FINALLY(igraph_destroy, &%C%); }
   OUTCONV:
     OUT: IGRAPH_FINALLY(igraph_destroy, &%C%); \
          PROTECT(%I%=R_igraph_to_SEXP(&%C%));  \
          igraph_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
-    INOUT: PROTECT(%I%=R_igraph_to_SEXP(&%C%));  \
+    INOUT: if (!isNull(%I%)) { PROTECT(%I%=R_igraph_to_SEXP(&%C%));  \
            igraph_destroy(&%C%); \
-           IGRAPH_FINALLY_CLEAN(1);
+           IGRAPH_FINALLY_CLEAN(1); }
 
 ##################################
 # INTEGER
