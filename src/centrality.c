@@ -2793,7 +2793,7 @@ int igraph_centralization_eigenvector_centrality_tmax(
 
   if (graph) {
     nodes=igraph_vcount(graph);
-    directed=igraph_is_directed(graph);
+    directed=directed && igraph_is_directed(graph);
   }
   
   if (directed) {
