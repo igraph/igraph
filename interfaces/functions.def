@@ -490,7 +490,7 @@ igraph_add_edge:
 
 igraph_eigenvector_centrality:
         PARAMS: GRAPH graph, OUT VECTOR vector, OUT REALPTR value, \
-                BOOLEAN scale=True, EDGEWEIGHTS weights=NULL, \
+                BOOLEAN directed=False, BOOLEAN scale=True, EDGEWEIGHTS weights=NULL, \
                 INOUT ARPACKOPT options=igraph.arpack.default
         DEPS: weights ON graph
         DEFAULT-R: options=igraph.arpack.default
@@ -590,7 +590,7 @@ igraph_centralization_closeness:
 
 igraph_centralization_eigenvector_centrality:
         PARAMS: GRAPH graph, OUT VECTOR vector, OUT REALPTR value, \
-                BOOLEAN scale=True, \
+                BOOLEAN directed=False, BOOLEAN scale=True, \
                 INOUT ARPACKOPT options=igraph.arpack.default, \
                 OUT REALPTR centralization, OUT REALPTR theoretical_max,\
                 BOOLEAN normalized=True

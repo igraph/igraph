@@ -90,7 +90,8 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph, igraph_vector_t *vect
 		    igraph_arpack_options_t *options);
 
 int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector,
-				  igraph_real_t *value, igraph_bool_t scale,
+				  igraph_real_t *value,
+				  igraph_bool_t directed, igraph_bool_t scale,
 				  const igraph_vector_t *weights,
 				  igraph_arpack_options_t *options);
 
@@ -154,6 +155,7 @@ int igraph_centralization_eigenvector_centrality(
 					 const igraph_t *graph,
 					 igraph_vector_t *vector,
 					 igraph_real_t *value,
+					 igraph_bool_t directed,
 					 igraph_bool_t scale,
 					 igraph_arpack_options_t *options,
 					 igraph_real_t *centralization,

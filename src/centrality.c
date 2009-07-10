@@ -87,44 +87,10 @@ int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *fro
   return 0;
 }
 
-/**
- * \function igraph_eigenvector_centrality
- * Eigenvector centrality of the verices
- * 
- * Eigenvector centrality is a measure of the importance of a node in a
- * network. It assigns relative scores to all nodes in the network based
- * on the principle that connections to high-scoring nodes contribute
- * more to the score of the node in question than equal connections to
- * low-scoring nodes.
- * \param graph The input graph. It might be directed, but it will be
- *     treated as undirected anyway. 
- * \param vector Pointer to an initialized vector, it will be resized
- *     as needed. The result of the computation is stored here. It can
- *     be a null pointer, then it is ignored.
- * \param value If not a null pointer, then the eigenvalue
- *     corresponding to the found eigenvector is stored here.
- * \param scale If not zero then the result will be scaled, such that
- *     the absolute value of the maximum centrality is one.
- * \param weights A null pointer (=no edge weights), or a vector
- *     giving the weights of the edges.
- * \param options Options to ARPACK. See \ref igraph_arpack_options_t
- *    for details. Note that the function overwrites the
- *    <code>n</code> (number of vertices) parameter and 
- *    it always starts the calculation from a non-random vector
- *    calculated based on the degree of the vertices.
- * \return Error code.
- * 
- * Time complexity: depends on the input graph, usually it is O(|V|),
- * the number of vertices.
- * 
- * \sa \ref igraph_pagerank and \ref igraph_personalized_pagerank for 
- *   modifications of eigenvector centrality.
- */
-
-int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector,
-				  igraph_real_t *value, igraph_bool_t scale,
-				  const igraph_vector_t *weights,
-				  igraph_arpack_options_t *options) {
+int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vector_t *vector,
+					     igraph_real_t *value, igraph_bool_t scale,
+					     const igraph_vector_t *weights,
+					     igraph_arpack_options_t *options) {
   
   igraph_vector_t values;
   igraph_matrix_t vectors;
@@ -137,10 +103,6 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
   if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
     IGRAPH_ERROR("Invalid length of weights vector when calculating "
 		 "eigenvector centrality", IGRAPH_EINVAL);
-  }
-
-  if (weights && igraph_is_directed(graph)) {
-    IGRAPH_WARNING("Weighted directed graph in eigenvector centrality");
   }
 
   IGRAPH_VECTOR_INIT_FINALLY(&values, 0);
@@ -208,7 +170,11 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
       tmp=fabs(VECTOR(*vector)[i]);
       if (tmp>amax) { amax=tmp; which=i; }
     }
-    if (scale && amax!=0) { igraph_vector_scale(vector, 1/VECTOR(*vector)[which]); }
+    if (scale && amax!=0) { 
+      igraph_vector_scale(vector, 1/VECTOR(*vector)[which]); 
+    } else if (VECTOR(*vector)[0] < 0) {
+      igraph_vector_scale(vector, -1.0);
+    }
   }
 
   if (options->info) {
@@ -219,6 +185,190 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
   igraph_vector_destroy(&values);
   IGRAPH_FINALLY_CLEAN(2);
   return 0;
+}
+
+/* int igraph_i_evcent_dir(igraph_real_t *to, const igraph_real_t *from, */
+/* 			long int n, void *extra) { */
+/*   /\* TODO *\/ */
+/*   return 0; */
+/* } */
+
+/* int igraph_i_evcent_dir2(igraph_real_t *to, const igraph_real_t *from, */
+/* 			 long int n, void *extra) { */
+/*   /\* TODO *\/ */
+/*   return 0; */
+/* } */
+
+int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_t *vector,
+					   igraph_real_t *value, igraph_bool_t scale,
+					   const igraph_vector_t *weights,
+					   igraph_arpack_options_t *options) {
+  
+  igraph_matrix_t values;
+  igraph_matrix_t vectors;
+  igraph_vector_t indegree;
+  long int i;
+    
+  if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
+    IGRAPH_ERROR("Invalid length of weights vector when calculating "
+		 "eigenvector centrality", IGRAPH_EINVAL);
+  }
+
+  if (weights && igraph_is_directed(graph)) {
+    IGRAPH_WARNING("Weighted directed graph in eigenvector centrality");
+  }
+
+  if (weights && igraph_vector_min(weights) < 0.0) {
+    IGRAPH_WARNING("Negative weights, eigenpair might be complex");
+  }
+
+  options->n=igraph_vcount(graph);
+  options->start=1;
+  options->nev=1;
+  options->ncv=3;
+  options->which[0]='L' ; options->which[1]='M';
+
+  IGRAPH_MATRIX_INIT_FINALLY(&values, 0, 0);
+  IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 2);
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&indegree, options->n);
+    
+  if (!weights) {
+
+    igraph_adjlist_t adjlist;
+
+    IGRAPH_CHECK(igraph_degree(graph, &indegree, igraph_vss_all(), 
+			       IGRAPH_IN, /*loops=*/ 1));
+    for (i=0; i<options->n; i++) {
+      if (VECTOR(indegree)[i]) {
+	MATRIX(vectors, i, 0) = VECTOR(indegree)[i];
+      } else {
+	MATRIX(vectors, i, 0) = 1.0;
+      }
+    }
+    igraph_vector_destroy(&indegree);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+    
+    IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_eigenvector_centrality,
+				       &adjlist, options, 0, &values, 
+				       &vectors));
+    
+    igraph_adjlist_destroy(&adjlist);
+    IGRAPH_FINALLY_CLEAN(1);
+
+  } else {
+    igraph_adjedgelist_t adjedgelist;
+    igraph_i_eigenvector_centrality_t data={ graph, &adjedgelist, weights };
+
+    IGRAPH_CHECK(igraph_strength(graph, &indegree, igraph_vss_all(),
+				 IGRAPH_IN, /*loops=*/ 1, weights));
+    for (i=0; i<options->n; i++) {
+      if (VECTOR(indegree)[i]) {
+	MATRIX(vectors, i, 0) = VECTOR(indegree)[i];
+      } else {
+	MATRIX(vectors, i, 0) = 1.0;
+      }
+    }
+    igraph_vector_destroy(&indegree);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjedgelist, IGRAPH_IN));
+    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjedgelist); 
+    
+    IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_eigenvector_centrality2,
+				       &data, options, 0, &values, &vectors));
+    
+    igraph_adjedgelist_destroy(&adjedgelist);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  if (value) {
+    *value=MATRIX(values, 0, 0);
+  }
+
+  if (vector) {
+    igraph_real_t amax=0;
+    long int which=0;
+    long int i;
+    IGRAPH_CHECK(igraph_vector_resize(vector, options->n));
+    for (i=0; i<options->n; i++) {
+      igraph_real_t tmp;
+      VECTOR(*vector)[i] = MATRIX(vectors, i, 0);
+      tmp=fabs(VECTOR(*vector)[i]);
+      if (tmp>amax) { amax=tmp; which=i; }
+    }
+    if (scale && amax!=0) { 
+      igraph_vector_scale(vector, 1/VECTOR(*vector)[which]); 
+    } else if (VECTOR(*vector)[0] < 0) {
+      igraph_vector_scale(vector, -1.0);
+    }
+  }
+
+  if (options->info) {
+    IGRAPH_WARNING("Non-zero return code from ARPACK routine!");
+  }
+  
+  igraph_matrix_destroy(&vectors);
+  igraph_matrix_destroy(&values);
+  IGRAPH_FINALLY_CLEAN(2);  
+
+  return 0;
+}
+
+/**
+ * \function igraph_eigenvector_centrality
+ * Eigenvector centrality of the verices
+ * 
+ * Eigenvector centrality is a measure of the importance of a node in a
+ * network. It assigns relative scores to all nodes in the network based
+ * on the principle that connections to high-scoring nodes contribute
+ * more to the score of the node in question than equal connections to
+ * low-scoring nodes.
+ * \param graph The input graph. It might be directed.
+ * \param vector Pointer to an initialized vector, it will be resized
+ *     as needed. The result of the computation is stored here. It can
+ *     be a null pointer, then it is ignored.
+ * \param value If not a null pointer, then the eigenvalue
+ *     corresponding to the found eigenvector is stored here.
+ * \param directed Boolean scalar, whether to consider edge directions
+ *     in a directed graph. It is ignored for undirected graphs.
+ * \param scale If not zero then the result will be scaled, such that
+ *     the absolute value of the maximum centrality is one.
+ * \param weights A null pointer (=no edge weights), or a vector
+ *     giving the weights of the edges. The algorithm might result
+ *     complex numbers is some weights are negative. In this case only
+ *     the real part is reported.
+ * \param options Options to ARPACK. See \ref igraph_arpack_options_t
+ *    for details. Note that the function overwrites the
+ *    <code>n</code> (number of vertices) parameter and 
+ *    it always starts the calculation from a non-random vector
+ *    calculated based on the degree of the vertices.
+ * \return Error code.
+ * 
+ * Time complexity: depends on the input graph, usually it is O(|V|),
+ * the number of vertices.
+ * 
+ * \sa \ref igraph_pagerank and \ref igraph_personalized_pagerank for 
+ *   modifications of eigenvector centrality.
+ */
+
+int igraph_eigenvector_centrality(const igraph_t *graph, 
+				  igraph_vector_t *vector,
+				  igraph_real_t *value, 
+				  igraph_bool_t directed, igraph_bool_t scale,
+				  const igraph_vector_t *weights,
+				  igraph_arpack_options_t *options) {
+
+  if (directed && igraph_is_directed(graph)) {
+    return igraph_eigenvector_centrality_directed(graph, vector, value,
+						  scale, weights, options);
+  } else {
+    return igraph_eigenvector_centrality_undirected(graph, vector, value, 
+						    scale, weights, options);
+  }
 }
 
 /* struct for the unweighted variant of the HITS algorithm */
@@ -2593,6 +2743,7 @@ int igraph_centralization_eigenvector_centrality(
 					 const igraph_t *graph,
 					 igraph_vector_t *vector,
 					 igraph_real_t *value,
+					 igraph_bool_t directed,
 					 igraph_bool_t scale,
 					 igraph_arpack_options_t *options,
 					 igraph_real_t *centralization,
@@ -2614,11 +2765,12 @@ int igraph_centralization_eigenvector_centrality(
     myvalue=&realvalue;
   }
   
-  IGRAPH_CHECK(igraph_eigenvector_centrality(graph, scores, myvalue, scale,
-					     /*weights=*/ 0, options));
+  IGRAPH_CHECK(igraph_eigenvector_centrality(graph, scores, myvalue, directed,
+					     scale, /*weights=*/ 0, 
+					     options));
 
   IGRAPH_CHECK(igraph_centralization_eigenvector_centrality_tmax(
-						 graph, 0, 0, 
+						 graph, 0, directed, 
 						 scale, 
 						 tmax));
 

@@ -7,10 +7,13 @@
   eigenvector centralities of positions \code{v} within it
 }
 \usage{
-evcent (graph, scale = TRUE, weights = NULL, options = igraph.arpack.default) 
+evcent (graph, directed = FALSE, scale = TRUE, weights = NULL,
+     options = igraph.arpack.default) 
 }
 \arguments{
   \item{graph}{Graph to be analyzed.}
+  \item{directed}{Logical scalar, whether to consider direction of the
+    edges in directed graphs. It is ignored for undirected graphs.}
   \item{scale}{Logical scalar, whether to scale the result to have a
     maximum score of one. If no scaling is used then the result vector
     has unit length in the Euclidean norm.}
@@ -21,7 +24,9 @@ evcent (graph, scale = TRUE, weights = NULL, options = igraph.arpack.default)
     a numerical vector then it used, even if the graph has a
     \code{weights} edge attribute. If this is \code{NA}, then no edge
     weights are used (even if the graph has a \code{weight} edge
-    attribute.}
+    attribute. Note that if there are negative edge weights and the
+    direction of the edges is considered, then the eigenvector might be
+    complex. In this case only the real part is reported.}
   \item{options}{A named list, to override some ARPACK options. See
     \code{\link{arpack}} for details.}
 }

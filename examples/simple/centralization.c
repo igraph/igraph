@@ -1,5 +1,6 @@
 
 #include <igraph.h>
+#include <math.h>
 
 int main() {
 
@@ -39,6 +40,20 @@ int main() {
     return 3;
   }
 
+  igraph_arpack_options_init(&arpack_options);
+  igraph_centralization_eigenvector_centrality(&g, /*vector=*/ 0, 
+					       /*value=*/ 0, 
+					       /*directed=*/ 1,
+					       /*scale=*/ 1,
+					       &arpack_options, &cent,
+					       /*theoretical_max=*/ 0,
+					       /*normalization=*/ 1);
+  
+  if (cent != 1.0) {
+    fprintf(stderr, "out-star, eigenvector centrality: %g\n", cent);
+    return 14;
+  }
+
   igraph_destroy(&g);
   
   /****************************/
@@ -72,20 +87,6 @@ int main() {
     fprintf(stderr, "out-star, closeness: %g\n", cent);
     return 13;
   }
-
-  igraph_star(&g, 10, IGRAPH_STAR_OUT, /*center=*/ 0);
-  
-  igraph_arpack_options_init(&arpack_options);
-  igraph_centralization_eigenvector_centrality(&g, /*vector=*/ 0, 
-					       /*value=*/ 0, /*scale=*/ 1,
-					       &arpack_options, &cent,
-					       /*theoretical_max=*/ 0,
-					       /*normalization=*/ 1);
-  
-/*   if (cent != 1.0) { */
-/*     fprintf(stderr, "out-star, eigenvector centrality: %g\n", cent); */
-/*     return 14; */
-/*   } */
 
   igraph_destroy(&g);
   
@@ -130,7 +131,9 @@ int main() {
 	       0,1, -1);
   
   igraph_centralization_eigenvector_centrality(&g, /*vector=*/ 0,
-					       /*value=*/ 0, /*scale=*/ 1,
+					       /*value=*/ 0, 
+					       /*directed=*/ 1,
+					       /*scale=*/ 1,
 					       &arpack_options, &cent,
 					       /*theoretical_max=*/ 0,
 					       /*normalization=*/ 1);
@@ -141,15 +144,17 @@ int main() {
   }
 
   igraph_centralization_eigenvector_centrality(&g, /*vector=*/ 0,
-					       /*value=*/ 0, /*scale=*/ 0,
+					       /*value=*/ 0, 
+					       /*directed=*/ 1,
+					       /*scale=*/ 0,
 					       &arpack_options, &cent,
 					       /*theoretical_max=*/ 0,
 					       /*normalization=*/ 1);
   
-/*   if (cent != 1.0) { */
-/*     fprintf(stderr, "dyad, eigenvector centrality, not scaled: %g\n", cent); */
-/*     return 25; */
-/*   } */
+  if (fabs(cent - 1.0) > 1e-15) {
+    fprintf(stderr, "dyad, eigenvector centrality, not scaled: %g\n", cent);
+    return 25;
+  }
     
   igraph_destroy(&g);
   
