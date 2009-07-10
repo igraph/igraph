@@ -72,6 +72,10 @@
 <!-- doxrox-include igraph_centralization_betweenness -->
 <!-- doxrox-include igraph_centralization_closeness -->
 <!-- doxrox-include igraph_centralization_eigenvector_centrality -->
+<!-- doxrox-include igraph_centralization_degree_tmax -->
+<!-- doxrox-include igraph_centralization_betweenness_tmax -->
+<!-- doxrox-include igraph_centralization_closeness_tmax -->
+<!-- doxrox-include igraph_centralization_eigenvector_centrality_tmax -->
 </section>
 
 <section><title>Similarity Measures</title>
