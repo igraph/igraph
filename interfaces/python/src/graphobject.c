@@ -2518,7 +2518,7 @@ PyObject *igraphmodule_Graph_Star(PyTypeObject * type,
   static char *kwlist[] = { "n", "mode", "center", NULL };
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|Ol", kwlist,
-                                   &n, &mode, &center))
+                                   &n, &mode_o, &center))
     return NULL;
 
   if (n < 0) {
