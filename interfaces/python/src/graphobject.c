@@ -3429,24 +3429,24 @@ PyObject *igraphmodule_Graph_edge_connectivity(igraphmodule_GraphObject *self,
 PyObject *igraphmodule_Graph_eigenvector_centrality(
   igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
   static char *kwlist[] =
-    { "scale", "weights", "arpack_options", "return_eigenvalue", NULL };
+    { "directed", "scale", "weights", "arpack_options", "return_eigenvalue",
+      NULL };
+  PyObject *directed_o = Py_True;
   PyObject *scale_o = Py_True;
   PyObject *weights_o = Py_None;
   PyObject *arpack_options_o = igraphmodule_arpack_options_default;
   igraphmodule_ARPACKOptionsObject *arpack_options;
   PyObject *return_eigenvalue = Py_False;
   PyObject *res_o;
-  igraph_bool_t scale;
   igraph_real_t value;
   igraph_vector_t *weights=0, res;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO!O", kwlist,
-                                   &scale_o, &weights_o,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOO!O", kwlist,
+                                   &directed_o, &scale_o, &weights_o,
                                    &igraphmodule_ARPACKOptionsType,
                                    &arpack_options, &return_eigenvalue))
     return NULL;
 
-  scale = PyObject_IsTrue(scale_o);
   if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
 	  ATTRIBUTE_TYPE_EDGE)) return NULL;
 
@@ -3456,7 +3456,8 @@ PyObject *igraphmodule_Graph_eigenvector_centrality(
   }
 
   arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
-  if (igraph_eigenvector_centrality(&self->g, &res, &value, scale,
+  if (igraph_eigenvector_centrality(&self->g, &res, &value,
+      PyObject_IsTrue(directed_o), PyObject_IsTrue(scale_o),
       weights, igraphmodule_ARPACKOptions_get(arpack_options))) {
     igraphmodule_handle_igraph_error();
     if (weights) { igraph_vector_destroy(weights); free(weights); }
@@ -9356,10 +9357,12 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"eigenvector_centrality",
    (PyCFunction) igraphmodule_Graph_eigenvector_centrality,
    METH_VARARGS | METH_KEYWORDS,
-   "eigenvector_centrality(scale=True, weights=None, return_eigenvalue=False, arpack_options=None)\n\n"
+   "eigenvector_centrality(directed=True, scale=True, weights=None, return_eigenvalue=False, arpack_options=None)\n\n"
    "Calculates the eigenvector centralities of the vertices in a graph.\n\n"
+   "@param directed: whether to consider edge directions in a directed\n"
+   "  graph. Ignored for undirected graphs.\n"
    "@param scale: whether to normalize the centralities so the largest\n"
-   "  one will always be 1.\n\n"
+   "  one will always be 1.\n"
    "@param weights: edge weights given as a list or an edge attribute. If\n"
    "  C{None}, all edges have equal weight.\n"
    "@param return_eigenvalue: whether to return the actual largest\n"
