@@ -609,10 +609,16 @@ int igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
     }
   } else if (mode == IGRAPH_STAR_MUTUAL) {
     for (i=0; i<center; i++) {
-      VECTOR(edges)[2*i]=center;
-      VECTOR(edges)[2*i+1]=i;
-      VECTOR(edges)[3*i]=i;
-      VECTOR(edges)[3*i+1]=center;
+      VECTOR(edges)[4*i]=center;
+      VECTOR(edges)[4*i+1]=i;
+      VECTOR(edges)[4*i+2]=i;
+      VECTOR(edges)[4*i+3]=center;
+    }
+    for (i=center+1; i<n; i++) {
+      VECTOR(edges)[4*i-4]=center;
+      VECTOR(edges)[4*i-3]=i;
+      VECTOR(edges)[4*i-2]=i;
+      VECTOR(edges)[4*i-1]=center;
     }
   } else {
     for (i=0; i<center; i++) {
