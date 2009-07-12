@@ -49,6 +49,7 @@ int igraphmodule_PyObject_to_neimode_t(PyObject *o, igraph_neimode_t *result);
 int igraphmodule_PyObject_to_adjacency_t(PyObject *o, igraph_adjacency_t *result);
 int igraphmodule_PyObject_to_connectedness_t(PyObject *o, igraph_connectedness_t *result);
 int igraphmodule_PyObject_to_degseq_t(PyObject *o, igraph_degseq_t *result);
+int igraphmodule_PyObject_to_star_mode_t(PyObject *o, igraph_star_mode_t *result);
 int igraphmodule_PyObject_to_transitivity_mode_t(PyObject *o, igraph_transitivity_mode_t *result);
 
 int igraphmodule_PyObject_to_integer_t(PyObject *object, igraph_real_t *v);

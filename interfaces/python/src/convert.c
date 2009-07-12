@@ -186,6 +186,23 @@ int igraphmodule_PyObject_to_degseq_t(PyObject *o,
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts a Python object to an igraph \c igraph_star_mode_t
+ */
+int igraphmodule_PyObject_to_star_mode_t(PyObject *o,
+  igraph_star_mode_t *result) {
+  static igraphmodule_enum_translation_table_entry_t star_mode_tt[] = {
+        {"in", IGRAPH_STAR_IN},
+        {"out", IGRAPH_STAR_OUT},
+        {"mutual", IGRAPH_STAR_MUTUAL},
+        {"undirected", IGRAPH_STAR_UNDIRECTED},
+        {0,0}
+    };
+
+  return igraphmodule_PyObject_to_enum(o, star_mode_tt, (int*)result);
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts a Python object to an \c igraph_transitivity_mode_t
  */
 int igraphmodule_PyObject_to_transitivity_mode_t(PyObject *o,

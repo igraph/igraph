@@ -1215,6 +1215,7 @@ PyMODINIT_FUNC initcore(void) {
 
   PyModule_AddIntConstant(m, "STAR_OUT", IGRAPH_STAR_OUT);
   PyModule_AddIntConstant(m, "STAR_IN", IGRAPH_STAR_IN);
+  PyModule_AddIntConstant(m, "STAR_MUTUAL", IGRAPH_STAR_MUTUAL);
   PyModule_AddIntConstant(m, "STAR_UNDIRECTED", IGRAPH_STAR_UNDIRECTED);
 
   PyModule_AddIntConstant(m, "TREE_OUT", IGRAPH_TREE_OUT);

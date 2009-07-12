@@ -2511,12 +2511,13 @@ PyObject *igraphmodule_Graph_Star(PyTypeObject * type,
 {
   long n, center = 0;
   igraph_star_mode_t mode = IGRAPH_STAR_UNDIRECTED;
+  PyObject* mode_o = Py_None;
   igraphmodule_GraphObject *self;
   igraph_t g;
 
   static char *kwlist[] = { "n", "mode", "center", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|ll", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|Ol", kwlist,
                                    &n, &mode, &center))
     return NULL;
 
@@ -2531,10 +2532,9 @@ PyObject *igraphmodule_Graph_Star(PyTypeObject * type,
     return NULL;
   }
 
-  if (mode != IGRAPH_STAR_UNDIRECTED && mode != IGRAPH_STAR_IN &&
-      mode != IGRAPH_STAR_OUT) {
+  if (igraphmodule_PyObject_to_star_mode_t(mode_o, &mode)) {
     PyErr_SetString(PyExc_ValueError,
-                    "Mode should be either STAR_IN, STAR_OUT or STAR_UNDIRECTED.");
+                    "Mode should be either \"in\", \"out\", \"mutual\" or \"undirected\"");
     return NULL;
   }
 
@@ -2718,7 +2718,7 @@ PyObject *igraphmodule_Graph_assortativity(igraphmodule_GraphObject *self, PyObj
   if (types1) {
     ret = igraph_assortativity(&self->g, types1, types2, &res, PyObject_IsTrue(directed));
   } else {
-    ret = igraph_assortativity_degree(&self->g, &res);
+    ret = igraph_assortativity_degree(&self->g, &res, PyObject_IsTrue(directed));
   }
 
   if (types1) { igraph_vector_destroy(types1); free(types1); }
@@ -8931,11 +8931,11 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   // interface to igraph_star
   {"Star", (PyCFunction) igraphmodule_Graph_Star,
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-   "Star(n, mode=STAR_UNDIRECTED, center=0)\n\n"
+   "Star(n, mode=\"undirected\", center=0)\n\n"
    "Generates a star graph.\n\n"
    "@param n: the number of vertices in the graph\n"
    "@param mode: Gives the type of the star graph to create. Should be\n"
-   "  one of the constants C{STAR_OUT}, C{STAR_IN} and C{STAR_UNDIRECTED}.\n"
+   "  either \"in\", \"out\", \"mutual\" or \"undirected\"\n"
    "@param center: Vertex ID for the central vertex in the star.\n"},
 
   // interface to igraph_lattice
