@@ -2,6 +2,24 @@ import unittest
 from igraph import *
 
 class GeneratorTests(unittest.TestCase):
+    def testStar(self):
+        g=Graph.Star(5, "in")
+        el=[(1,0),(2,0),(3,0),(4,0)]
+        self.failUnless(g.is_directed())
+        self.failUnless(g.get_edgelist() == el)
+        g=Graph.Star(5, "out", center=2)
+        el=[(2,0),(2,1),(2,3),(2,4)]
+        self.failUnless(g.is_directed())
+        self.failUnless(g.get_edgelist() == el)
+        g=Graph.Star(5, "mutual", center=2)
+        el=[(0,2),(1,2),(2,0),(2,1),(2,3),(2,4),(3,2),(4,2)]
+        self.failUnless(g.is_directed())
+        self.failUnless(sorted(g.get_edgelist()) == el)
+        g=Graph.Star(5, center=3)
+        el=[(0,3),(1,3),(2,3),(3,4)]
+        self.failUnless(not g.is_directed())
+        self.failUnless(sorted(g.get_edgelist()) == el)
+
     def testFamous(self):
         g=Graph.Famous("tutte")
         self.failUnless(g.vcount() == 46 and g.ecount() == 69)
