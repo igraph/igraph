@@ -9805,7 +9805,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_read_graph_ncol */
   {"Read_Ncol", (PyCFunction) igraphmodule_Graph_Read_Ncol,
    METH_VARARGS | METH_KEYWORDS | METH_CLASS,
-   "Read_Ncol(f, names=True, weights=True)\n\n"
+   "Read_Ncol(f, names=True, weights=True, directed=True)\n\n"
    "Reads an .ncol file used by LGL.\n\n"
    "It is also useful for creating graphs from \"named\" (and\n"
    "optionally weighted) edge lists.\n\n"
@@ -9819,7 +9819,10 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param names: If C{True}, the vertex names are added as a\n"
    "  vertex attribute called 'name'.\n"
    "@param weights: If True, the edge weights are added as an\n"
-   "  edge attribute called 'weight'.\n"},
+   "  edge attribute called 'weight'.\n"
+   "@param directed: whether the graph being created should be\n"
+   "  directed\n"
+  },
   // interface to igraph_read_graph_lgl
   {"Read_Lgl", (PyCFunction) igraphmodule_Graph_Read_Lgl,
    METH_VARARGS | METH_KEYWORDS | METH_CLASS,
