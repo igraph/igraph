@@ -596,9 +596,9 @@ PyObject *igraphmodule_Graph_strength(igraphmodule_GraphObject * self,
   if (weights) { igraph_vector_destroy(weights); free(weights); }
 
   if (!return_single)
-    list = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
+    list = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_FLOAT);
   else
-    list = PyInt_FromLong(VECTOR(result)[0]);
+    list = PyFloat_FromDouble(VECTOR(result)[0]);
 
   igraph_vector_destroy(&result);
   igraph_vs_destroy(&vs);
