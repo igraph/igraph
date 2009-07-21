@@ -130,7 +130,7 @@ options = dict(
     ]
 )
 
-if "macosx" in plat:
+if "macosx" in plat and "bdist_mpkg" in sys.argv:
     # OS X specific stuff to build the .mpkg installer
     options["data_files"] = [ \
             ('/usr/local/lib', [os.path.expanduser('~/lib/libigraph.0.dylib')])
