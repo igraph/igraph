@@ -118,13 +118,9 @@ get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
                       j=pmin(el[,1],el[,2])+1, x=value)
     } else if (type=="both") {
       ## both
-      i <- pn <- pmin(el[,1],el[,2])+1
-      j <- px <- pmax(el[,1],el[,2])+1
-      non.loop <- pn != px
-      i <- c(pn, px[non.loop])
-      j <- c(px, pn[non.loop])
-      x <- c(value, value[non.loop])
-      res <- spMatrix(vc, vc, i=i, j=j, x=x)
+      res <- spMatrix(vc, vc, i=pmin(el[,1],el[,2])+1,
+                      j=pmax(el[,1],el[,2])+1, x=value)
+      res <- forceSymmetric(res)
     }
   }
 
