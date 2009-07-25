@@ -33,6 +33,10 @@ igraph.to.graphNEL(graph)
   will be used as igraph vertex attribute \sQuote{\code{name}} and the
   graphNEL vertex names will be ignored.
 
+  Because graphNEL graphs poorly support multiple edges, the edge
+  attributes of the multiple edges are lost: they are all replaced by
+  the attributes of the first of the multiple edges.
+  
   \code{igraph.to.graphNEL} converts and igraph graph to a graphNEL
   graph. It converts all graph/vertex/edge attributes. If the igraph
   graph has a vertex attribute \sQuote{\code{name}}, then it will be
