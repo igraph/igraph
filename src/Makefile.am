@@ -92,7 +92,7 @@ HEADERS_PRIVATE = atlas-edges.h \
 		drl_Node_3d.h 		DensityGrid_3d.h \
 		vector.pmt matrix.pmt stack.pmt dqueue.pmt heap.pmt array.pmt \
 		igraph_types_internal.h \
-		foreign_dl_header.h
+		foreign-dl-header.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
