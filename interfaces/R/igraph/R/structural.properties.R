@@ -539,17 +539,16 @@ bonpow.sparse <- function(graph, nodes=V(graph), loops=FALSE,
     graph <- simplify(graph, remove.multiple=FALSE, remove.loops=TRUE)
   }
 
+  vg <- vcount(graph)
+  
   ## sparse adjacency matrix
   d <- get.adjacency(graph, sparse=TRUE)
 
   ## sparse identity matrix
-  id <- spMatrix(vcount(graph), vcount(graph),
-                 i=1:vcount(graph), j=1:vcount(graph),
-                 x=rep(1, vcount(graph)))
-  id <- as(id, "dgCMatrix")
+  id <- Diagonal(vg)
 
   ## solve it
-  ev <- solve(id - exponent * d, tol=tol) %*% degree(graph, mode="out")
+  ev <- solve(id - exponent * d, degree(graph, mode="out"), tol=tol)
 
   if (rescale) {
     ev <- ev/sum(ev)
