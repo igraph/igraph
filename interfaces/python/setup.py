@@ -6,7 +6,7 @@ except ImportError:
 from distutils.core import Extension
 from distutils.file_util import copy_file
 from distutils.util import get_platform
-from sys import version_info, exit
+from sys import version_info, exit, argv
 import os.path
 import glob
 from os import mkdir
@@ -130,7 +130,7 @@ options = dict(
     ]
 )
 
-if "macosx" in plat and "bdist_mpkg" in sys.argv:
+if "macosx" in plat and "bdist_mpkg" in argv:
     # OS X specific stuff to build the .mpkg installer
     options["data_files"] = [ \
             ('/usr/local/lib', [os.path.expanduser('~/lib/libigraph.0.dylib')])
