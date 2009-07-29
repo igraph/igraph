@@ -414,7 +414,7 @@ V(g)$color <- colbar[comps+1]
 plot(g, layout=layout.fruchterman.reingold, vertex.size=5, vertex.label=NA)
 
 # plot communities in a graph
-g <- graph.full(5) %du% graph.full(5) %du% graph.full(5)
+g <- graph.full(5) \%du\% graph.full(5) \%du\% graph.full(5)
 g <- add.edges(g, c(0,5, 0,10, 5,10))
 com <- spinglass.community(g, spins=5)
 V(g)$color <- com$membership+1
@@ -425,7 +425,7 @@ plot(g, vertex.label.dist=1.5)
 igraph.par("plot.layout", layout.reingold.tilford)
 plot(graph.tree(20, 2))
 plot(graph.tree(50, 3), vertex.size=3, vertex.label=NA)
-tkplot(graph.tree(50, 2), mode="undirected", vertex.size=10, vertex.color="green")
+tkplot(graph.tree(50, 2, mode="undirected"), vertex.size=10, vertex.color="green")
 }
 }
 \keyword{graphs}
