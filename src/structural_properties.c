@@ -168,7 +168,7 @@ int igraph_diameter(const igraph_t *graph, igraph_integer_t *pres,
       igraph_vector_ptr_init(&tmpptr, 1);
       IGRAPH_FINALLY(igraph_vector_ptr_destroy, &tmpptr);
       VECTOR(tmpptr)[0]=path;
-      IGRAPH_CHECK(igraph_get_shortest_paths(graph, &tmpptr, from, 
+      IGRAPH_CHECK(igraph_get_shortest_paths(graph, &tmpptr, 0, from, 
 					     igraph_vss_1(to), dirmode));
       igraph_vector_ptr_destroy(&tmpptr);
       IGRAPH_FINALLY_CLEAN(1);
@@ -839,12 +839,24 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
  * If there is more than one geodesic between two vertices, this
  * function gives only one of them. 
  * \param graph The graph object.
- * \param res The result, this is a pointer vector, each element points 
- *        to a vector
+ * \param vertices The result, the ids of the vertices along the paths. 
+ *        This is a pointer vector, each element points to a vector
  *        object. These should be initialized before passing them to
  *        the function, which will properly clear and/or resize them
  *        and fill the ids of the vertices along the geodesics from/to
- *        the vertices.
+ *        the vertices. Supply a null pointer here if you don't need
+ *        these vectors. Normally, either this argument, or the \c
+ *        edges should be non-null, but no error or warning is given
+ *        if they are both null pointers.
+ * \param edges The result, the ids of the edges along the paths.
+ *        This is a pointer vector, each element points to a vector
+ *        object. These should be initialized before passing them to
+ *        the function, which will properly clear and/or resize them
+ *        and fill the ids of the vertices along the geodesics from/to
+ *        the vertices. Supply a null pointer here if you don't need
+ *        these vectors. Normally, either this argument, or the \c
+ *        vertices should be non-null, but no error or warning is given
+ *        if they are both null pointers.
  * \param from The id of the vertex from/to which the geodesics are
  *        calculated. 
  * \param to Vertex sequence with the ids of the vertices to/from which the 
@@ -882,7 +894,9 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
  */
  
 
-int igraph_get_shortest_paths(const igraph_t *graph, igraph_vector_ptr_t *res,
+int igraph_get_shortest_paths(const igraph_t *graph, 
+			      igraph_vector_ptr_t *vertices,
+			      igraph_vector_ptr_t *edges,
 			      igraph_integer_t from, const igraph_vs_t to, 
 			      igraph_neimode_t mode) {
 
@@ -912,15 +926,18 @@ int igraph_get_shortest_paths(const igraph_t *graph, igraph_vector_ptr_t *res,
   IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
   IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
-  if (IGRAPH_VIT_SIZE(vit) != igraph_vector_ptr_size(res)) {
-    IGRAPH_ERROR("Size of the `res' and the `to' should match", IGRAPH_EINVAL);
+  if (vertices && IGRAPH_VIT_SIZE(vit) != igraph_vector_ptr_size(vertices)) {
+    IGRAPH_ERROR("Size of the `vertices' and the `to' should match", IGRAPH_EINVAL);
+  }
+  if (edges && IGRAPH_VIT_SIZE(vit) != igraph_vector_ptr_size(edges)) {
+    IGRAPH_ERROR("Size of the `edges' and the `to' should match", IGRAPH_EINVAL);
   }
 
   father=igraph_Calloc(no_of_nodes, long int);
   if (father==0) {
     IGRAPH_ERROR("cannot get shortest paths", IGRAPH_ENOMEM);
   }
-  IGRAPH_FINALLY(free, father);	/* TODO: hack */
+  IGRAPH_FINALLY(igraph_free, father);
   IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
   IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
@@ -936,21 +953,22 @@ int igraph_get_shortest_paths(const igraph_t *graph, igraph_vector_ptr_t *res,
 
   IGRAPH_CHECK(igraph_dqueue_push(&q, from+1));
   if (father[ (long int) from ] < 0) { reached++; }
-  father[ (long int)from ] = from+1;
+  father[ (long int)from ] = 1;
   
   while (!igraph_dqueue_empty(&q) && reached < to_reach) {
-    long int act=igraph_dqueue_pop(&q);
+    long int act=igraph_dqueue_pop(&q)-1;
     
-    IGRAPH_CHECK(igraph_neighbors(graph, &tmp, act-1, mode));
+    IGRAPH_CHECK(igraph_adjacent(graph, &tmp, act, mode));
     for (j=0; j<igraph_vector_size(&tmp); j++) {
-      long int neighbor=VECTOR(tmp)[j]+1;
-      if (father[neighbor-1] > 0) { 
+      long int edge=VECTOR(tmp)[j];
+      long int neighbor=IGRAPH_OTHER(graph, edge, act);
+      if (father[neighbor] > 0) { 
 	continue; 
-      } else if (father[neighbor-1] < 0) { 
+      } else if (father[neighbor] < 0) { 
 	reached++; 
       }
-      father[neighbor-1] = act;
-      IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+      father[neighbor] = edge+2;
+      IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor+1));
     }
   }
 
@@ -958,29 +976,47 @@ int igraph_get_shortest_paths(const igraph_t *graph, igraph_vector_ptr_t *res,
     IGRAPH_WARNING("Couldn't reach some vertices");
   }
   
-  for (IGRAPH_VIT_RESET(vit), j=0; 
-       !IGRAPH_VIT_END(vit);
-       IGRAPH_VIT_NEXT(vit), j++) {
-    long int node=IGRAPH_VIT_GET(vit);
-    igraph_vector_t *vec=VECTOR(*res)[j];
-    igraph_vector_clear(vec);
-
-    IGRAPH_ALLOW_INTERRUPTION();
-
-    if (father[node]>0) {
-      long int act=node+1;
-      long int size=0;
-      while (father[act-1] != act) {
-	size++;
-	act=father[act-1];
+  if (vertices || edges) {
+    for (IGRAPH_VIT_RESET(vit), j=0; 
+	 !IGRAPH_VIT_END(vit);
+	 IGRAPH_VIT_NEXT(vit), j++) {
+      long int node=IGRAPH_VIT_GET(vit);
+      igraph_vector_t *vvec=0, *evec=0;
+      if (vertices) {
+	vvec=VECTOR(*vertices)[j];
+	igraph_vector_clear(vvec);
       }
-      size++;
-      IGRAPH_CHECK(igraph_vector_resize(vec, size));
-      VECTOR(*vec)[--size]=node;
-      act=node+1;
-      while (father[act-1] != act) {
-	VECTOR(*vec)[--size]=father[act-1]-1;
-	act=father[act-1];
+      if (edges) {
+	evec=VECTOR(*edges)[j];
+	igraph_vector_clear(evec);
+      }
+      
+      IGRAPH_ALLOW_INTERRUPTION();
+      
+      if (father[node]>0) {
+	long int act=node;
+	long int size=0;
+	long int edge;
+	while (father[act]>1) {
+	  size++;
+	  edge=father[act]-2;
+	  act=IGRAPH_OTHER(graph, edge, act);
+	}
+	if (vvec) {
+	  IGRAPH_CHECK(igraph_vector_resize(vvec, size+1));
+	  VECTOR(*vvec)[size]=node;
+	}
+	if (evec) {
+	  IGRAPH_CHECK(igraph_vector_resize(evec, size));
+	}
+	act=node;
+	while (father[act]>1) {
+	  size--;
+	  edge=father[act]-2;
+	  act=IGRAPH_OTHER(graph, edge, act);
+	  if (vvec) { VECTOR(*vvec)[size]=act; }
+	  if (evec) { VECTOR(*evec)[size]=edge; }
+	}
       }
     }
   }
@@ -4478,12 +4514,24 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
  * If there is more than one path with the smallest weight between two vertices, this
  * function gives only one of them. 
  * \param graph The graph object.
- * \param res The result, this is a pointer vector, each element points 
- *        to a vector
+ * \param vertices The result, the ids of the vertices along the paths. 
+ *        This is a pointer vector, each element points to a vector
  *        object. These should be initialized before passing them to
  *        the function, which will properly clear and/or resize them
  *        and fill the ids of the vertices along the geodesics from/to
- *        the vertices.
+ *        the vertices. Supply a null pointer here if you don't need
+ *        these vectors. Normally, either this argument, or the \c
+ *        edges should be non-null, but no error or warning is given
+ *        if they are both null pointers.
+ * \param edges The result, the ids of the edges along the paths.
+ *        This is a pointer vector, each element points to a vector
+ *        object. These should be initialized before passing them to
+ *        the function, which will properly clear and/or resize them
+ *        and fill the ids of the vertices along the geodesics from/to
+ *        the vertices. Supply a null pointer here if you don't need
+ *        these vectors. Normally, either this argument, or the \c
+ *        vertices should be non-null, but no error or warning is given
+ *        if they are both null pointers.
  * \param from The id of the vertex from/to which the geodesics are
  *        calculated. 
  * \param to Vertex sequence with the ids of the vertices to/from which the 
@@ -4521,7 +4569,8 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
  * weights are equal. 
  */
 int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
-                                       igraph_vector_ptr_t *res,
+                                       igraph_vector_ptr_t *vertices,
+				       igraph_vector_ptr_t *edges,
 				       igraph_integer_t from,
 				       igraph_vs_t to,
 				       const igraph_vector_t *weights,
@@ -4554,9 +4603,9 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
   long int *parents;
   igraph_bool_t *is_target;
   long int i,to_reach;
-    
+
   if (!weights) {
-    return igraph_get_shortest_paths(graph, res, from, to, mode);
+    return igraph_get_shortest_paths(graph, vertices, edges, from, to, mode);
   }
   
   if (igraph_vector_size(weights) != no_of_edges) {
@@ -4569,8 +4618,11 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
   IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
   IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
-  if (IGRAPH_VIT_SIZE(vit) != igraph_vector_ptr_size(res)) {
-    IGRAPH_ERROR("Size of `res' and `to' should match", IGRAPH_EINVAL);
+  if (vertices && IGRAPH_VIT_SIZE(vit) != igraph_vector_ptr_size(vertices)) {
+    IGRAPH_ERROR("Size of `vertices' and `to' should match", IGRAPH_EINVAL);
+  }
+  if (edges && IGRAPH_VIT_SIZE(vit) != igraph_vector_ptr_size(edges)) {
+    IGRAPH_ERROR("Size of `edges' and `to' should match", IGRAPH_EINVAL);
   }
 
   IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
@@ -4599,7 +4651,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 
   VECTOR(dists)[(long int)from] = 1.0;	/* zero distance */
   if (is_target[(long int)from]) to_reach--;
-  parents[(long int)from] = from+1;
+  parents[(long int)from] = 0;
   igraph_2wheap_push_with_index(&Q, from, 0);
     
   while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
@@ -4625,12 +4677,12 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
       if (curdist==0) {
         /* This is the first non-infinite distance */
         VECTOR(dists)[to] = altdist+1.0;
-        parents[to] = minnei+1;
+        parents[to] = edge+1;
         IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
       } else if (altdist < curdist-1) {
 	    /* This is a shorter path */
         VECTOR(dists)[to] = altdist+1.0;
-        parents[to] = minnei+1;
+        parents[to] = edge+1;
         IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
       }
     }
@@ -4638,28 +4690,46 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 
   if (to_reach > 0) IGRAPH_WARNING("Couldn't reach some vertices");
 
-  /* Reconstruct the shortest paths based on vertex IDs */
-  for (IGRAPH_VIT_RESET(vit), i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-    long int node=IGRAPH_VIT_GET(vit);
-    igraph_vector_t *vec=VECTOR(*res)[i];
-    igraph_vector_clear(vec);
-
-    IGRAPH_ALLOW_INTERRUPTION();
-
-    if (parents[node]>0) {
-      long int size=0;
-	  long int act=node;
-      while (parents[act] != act+1) {
-        size++;
-        act=parents[act]-1;
+  /* Reconstruct the shortest paths based on vertex and/or edge IDs */
+  if (vertices || edges) {
+    for (IGRAPH_VIT_RESET(vit), i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+      long int node=IGRAPH_VIT_GET(vit);
+      igraph_vector_t *vvec=0, *evec=0;
+      if (vertices) {
+	vvec=VECTOR(*vertices)[i];
+	igraph_vector_clear(vvec);
       }
-      size++;
-      IGRAPH_CHECK(igraph_vector_resize(vec, size));
-      VECTOR(*vec)[--size]=node;
-      act=node;
-      while (parents[act] != act+1) {
-        VECTOR(*vec)[--size]=parents[act]-1;
-        act=parents[act]-1;
+      if (edges) {
+	evec=VECTOR(*edges)[i];
+	igraph_vector_clear(evec);
+      }
+      
+      IGRAPH_ALLOW_INTERRUPTION();
+      
+      if (parents[node]>0) {
+	long int size=0;
+	long int act=node;
+	long int edge;
+	while (parents[act]) {
+	  size++;
+	  edge=parents[act]-1;
+	  act=IGRAPH_OTHER(graph, edge, act);
+	}
+	if (vvec) { 
+	  IGRAPH_CHECK(igraph_vector_resize(vvec, size+1)); 
+	  VECTOR(*vvec)[size]=node;
+	}
+	if (evec) {
+	  IGRAPH_CHECK(igraph_vector_resize(evec, size));
+	}
+	act=node;
+	while (parents[act]) {
+	  edge=parents[act]-1;
+	  act=IGRAPH_OTHER(graph, edge, act);
+	  size--;
+	  if (vvec) { VECTOR(*vvec)[size]=act; }
+	  if (evec) { VECTOR(*evec)[size]=edge; }
+	}
       }
     }
   }
@@ -5648,7 +5718,10 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
       igraph_vector_ptr_init(&tmpptr, 1);
       IGRAPH_FINALLY(igraph_vector_ptr_destroy, &tmpptr);
       VECTOR(tmpptr)[0]=path;
-      IGRAPH_CHECK(igraph_get_shortest_paths_dijkstra(graph, &tmpptr, from,
+      IGRAPH_CHECK(igraph_get_shortest_paths_dijkstra(graph, 
+						      /*vertices=*/ &tmpptr, 
+						      /*edges=*/ 0, 
+						      from,
 						      igraph_vss_1(to), 
 						      weights, dirmode));
       igraph_vector_ptr_destroy(&tmpptr);

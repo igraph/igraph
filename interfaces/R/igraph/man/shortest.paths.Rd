@@ -18,7 +18,7 @@ shortest.paths(graph, v=V(graph), to=V(graph),
                                     "dijkstra", "bellman-ford",
                                     "johnson"))
 get.shortest.paths(graph, from, to=V(graph), mode = c("all", "out",
-      "in"), weights = NULL)
+      "in"), weights = NULL, output=c("vpath", "epath", "both"))
 get.all.shortest.paths(graph, from, to = V(graph), mode = c("all", "out", "in")) 
 average.path.length(graph, directed=TRUE, unconnected=TRUE)
 path.length.hist (graph, directed = TRUE, verbose = igraph.par("verbose")) 
@@ -57,6 +57,12 @@ path.length.hist (graph, directed = TRUE, verbose = igraph.par("verbose"))
   \item{from}{Numeric constant, the vertex from or to the shortest paths
     will be calculated. Note that right now this is not a vector of
     vertex ids, but only a single vertex.}
+  \item{output}{Character scalar, defines how to report the shortest
+    paths. \dQuote{vpath} means that the vertices along the paths are
+    reported, this form was used prior to igraph version
+    0.6. \dQuote{epath} means that the edges along the paths are
+    reported. \dQuote{both} means that both forms are returned, in a
+    named list with components \dQuote{vpath} and \dQuote{epath}.}
   \item{directed}{Whether to consider directed paths in directed graphs,
     this argument is ignored for undirected graphs.}
   \item{unconnected}{What to do if the graph is unconnected (not
@@ -100,8 +106,10 @@ path.length.hist (graph, directed = TRUE, verbose = igraph.par("verbose"))
   columns and \code{length(v)} rows. The shortest path length from a vertex to
   itself is always zero. For unreachable vertices \code{Inf} is included.
 
-  For \code{get.shortest.paths} a list of length
-  \code{vcount(graph)}. List element \code{i} contains the vertex ids on
+  For \code{get.shortest.paths} the return value depends on the
+  \code{output} parameter. If this is \dQuote{vpath}, then a list of length
+  \code{vcount(graph)} is returned.
+  List element \code{i} contains the vertex ids on
   the path from vertex \code{from} to vertex \code{i} (or the other way
   for directed graphs depending on the \code{mode} argument). The vector
   also contains \code{from} and \code{i} as the first and last
@@ -109,6 +117,13 @@ path.length.hist (graph, directed = TRUE, verbose = igraph.par("verbose"))
   included once. If there is no path between two vertices then a
   numeric vector of length zero is returned as the list element.
 
+  If \code{output} is \dQuote{epath}, then a similar list is returned,
+  but the vectors in the list contain the edge ids along the shortest
+  paths, instead of the vertex ids.
+
+  If \code{output} is \dQuote{both}, then both lists are returned, in a
+  named list with entries named as \dQuote{vpath} and \dQuote{epath}.
+  
   For \code{get.all.shortest.paths} a list is returned, each list
   element contains a shortest path from \code{from} to a vertex in
   \code{to}. The shortest paths to the same vertex are collected into

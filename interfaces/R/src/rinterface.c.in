@@ -3155,17 +3155,21 @@ SEXP R_igraph_measure_dynamics_citingcat_citedcat_st(SEXP graph,
 }
 
 SEXP R_igraph_get_shortest_paths(SEXP graph, SEXP pfrom, SEXP pto, 
-				 SEXP pmode, SEXP pno, SEXP weights) {
+				 SEXP pmode, SEXP pno, SEXP weights, 
+				 SEXP output) {
 
   igraph_t g;
   igraph_integer_t from=REAL(pfrom)[0];
   igraph_vs_t to;
   igraph_integer_t mode=REAL(pmode)[0];
-  igraph_vector_t *vects;
+  igraph_vector_t *vects, *evects;
   long int i;
-  igraph_vector_ptr_t ptrvec;
+  igraph_vector_ptr_t ptrvec, ptrevec;
   igraph_vector_t w, *pw=&w;
-  SEXP result;
+  SEXP result, result1, result2, names;
+  igraph_bool_t verts=REAL(output)[0]==0 || REAL(output)[0]==2;
+  igraph_bool_t edges=REAL(output)[0]==1 || REAL(output)[0]==2;
+  int tofree=1;
   
   long int no=REAL(pno)[0];
   
@@ -3174,29 +3178,73 @@ SEXP R_igraph_get_shortest_paths(SEXP graph, SEXP pfrom, SEXP pto,
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs(pto, &g, &to);
 
-  igraph_vector_ptr_init(&ptrvec, no);
-  vects=(igraph_vector_t*) R_alloc(GET_LENGTH(pto), sizeof(igraph_vector_t));
-  for (i=0; i<no; i++) {
-    igraph_vector_init(&vects[i], 0);
-    VECTOR(ptrvec)[i]=&vects[i];
+  if (verts) { 
+    igraph_vector_ptr_init(&ptrvec, no);
+    vects=(igraph_vector_t*) R_alloc(GET_LENGTH(pto), sizeof(igraph_vector_t));
+    for (i=0; i<no; i++) {
+      igraph_vector_init(&vects[i], 0);
+      VECTOR(ptrvec)[i]=&vects[i];
+    }
   }
+  if (edges) { 
+    igraph_vector_ptr_init(&ptrevec, no);
+    evects=(igraph_vector_t*) R_alloc(GET_LENGTH(pto), sizeof(igraph_vector_t));
+    for (i=0; i<no; i++) {
+      igraph_vector_init(&evects[i], 0);
+      VECTOR(ptrevec)[i]=&evects[i];
+    }
+  }
+  
   if (isNull(weights)) {
     pw=0;
   } else {
     R_SEXP_to_vector(weights, &w);
   }
-  igraph_get_shortest_paths_dijkstra(&g, &ptrvec, from, to, pw, mode);
-  PROTECT(result=NEW_LIST(no));
-  for (i=0; i<no; i++) {
-    SET_VECTOR_ELT(result, i, NEW_NUMERIC(igraph_vector_size(&vects[i])));
-    igraph_vector_copy_to(&vects[i], REAL(VECTOR_ELT(result, i)));
-    igraph_vector_destroy(&vects[i]);
+  igraph_get_shortest_paths_dijkstra(&g, 
+				     vects ? &ptrvec : 0, 
+				     edges ? &ptrevec : 0,
+				     from, to, pw, mode);
+  if (!verts && !edges) { 
+    /* nothing requested */
+    PROTECT(result=R_NilValue);
+  } 
+  if (verts) {
+    PROTECT(result1=NEW_LIST(no));
+    for (i=0; i<no; i++) {
+      SET_VECTOR_ELT(result1, i, NEW_NUMERIC(igraph_vector_size(&vects[i])));
+      igraph_vector_copy_to(&vects[i], REAL(VECTOR_ELT(result1, i)));
+      igraph_vector_destroy(&vects[i]);
+    }
+    igraph_vector_ptr_destroy(&ptrvec);
   }
-  igraph_vector_ptr_destroy(&ptrvec);
+  if (edges) {
+    PROTECT(result2=NEW_LIST(no));
+    for (i=0; i<no; i++) {
+      SET_VECTOR_ELT(result2, i, NEW_NUMERIC(igraph_vector_size(&evects[i])));
+      igraph_vector_copy_to(&evects[i], REAL(VECTOR_ELT(result2, i)));
+      igraph_vector_destroy(&evects[i]);
+    }
+    igraph_vector_ptr_destroy(&ptrevec);
+  }
+
+  if (verts && !edges) {
+    result=result1;
+  } else if (!verts && edges) {
+    result=result2;
+  } else {
+    PROTECT(result=NEW_LIST(2));
+    PROTECT(names=NEW_CHARACTER(2));
+    SET_VECTOR_ELT(result, 0, result1);
+    SET_VECTOR_ELT(result, 1, result2);
+    SET_STRING_ELT(names, 0, mkChar("vpath"));
+    SET_STRING_ELT(names, 1, mkChar("epath"));
+    SET_NAMES(result, names);
+    tofree=4;
+  }
   
   R_igraph_after();
   
-  UNPROTECT(1);
+  UNPROTECT(tofree);
   return result;
 }
 

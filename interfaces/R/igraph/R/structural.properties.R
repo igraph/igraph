@@ -170,13 +170,16 @@ shortest.paths <- function(graph, v=V(graph), to=V(graph),
 
 get.shortest.paths <- function(graph, from, to=V(graph),
                                mode=c("all", "out", "in"),
-                               weights=NULL) {
+                               weights=NULL,
+                               output=c("vpath", "epath", "both")) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
   mode <- igraph.match.arg(mode)
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
+  output <- igraph.match.arg(output)
+  output <- switch(output, "vpath"=0, "epath"=1, "both"=2)
 
   if (is.null(weights)) {
     if ("weight" %in% list.edge.attributes(graph)) {
@@ -194,7 +197,7 @@ get.shortest.paths <- function(graph, from, to=V(graph),
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_get_shortest_paths", graph,
         as.numeric(from), to, as.numeric(mode), as.numeric(length(to)),
-        weights, PACKAGE="igraph")
+        weights, as.numeric(output), PACKAGE="igraph")
 }
 
 get.all.shortest.paths <- function(graph, from,

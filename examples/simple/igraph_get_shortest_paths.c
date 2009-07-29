@@ -11,32 +11,79 @@ int print_vector(igraph_vector_t *v) {
   printf("\n");
 }
 
+int check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
+		const igraph_vector_ptr_t *evecs, int error_code) {
+
+  igraph_bool_t directed=igraph_is_directed(graph);
+  long int i, n=igraph_vector_ptr_size(vecs);
+  if (igraph_vector_ptr_size(evecs) != n) { exit(error_code+1); }
+  
+  for (i=0; i<n; i++) {
+    igraph_vector_t *vvec=VECTOR(*vecs)[i];
+    igraph_vector_t *evec=VECTOR(*evecs)[i];
+    long int j, n2=igraph_vector_size(evec);
+    if (igraph_vector_size(vvec) == 0 && n2==0) { continue; }
+    if (igraph_vector_size(vvec) != n2+1) { exit(error_code+2); }
+    for (j=0; j<n2; j++) {
+      long int edge=VECTOR(*evec)[j];
+      long int from=VECTOR(*vvec)[j];
+      long int to=VECTOR(*vvec)[j+1];
+      if (directed) {
+	if (from != IGRAPH_FROM(graph, edge) ||
+	    to   != IGRAPH_TO  (graph, edge)) {
+	  exit(error_code);
+	}
+      } else {
+	long int from2=IGRAPH_FROM(graph, edge);
+	long int to2=IGRAPH_TO(graph, edge);
+	long int min1= from < to ? from : to;
+	long int max1= from < to ? to : from;
+	long int min2= from2 < to2 ? from2 : to2;
+	long int max2= from2 < to2 ? to2 : from2;
+	if (min1 != min2 || max2 != max2) { exit(error_code+3); }
+      }
+    }
+  }
+
+  return 0;
+}
+
 int main() {
 
   igraph_t g;
-  igraph_vector_ptr_t vecs;
+  igraph_vector_ptr_t vecs, evecs;
   long int i;
   igraph_vs_t vs;
 
   igraph_ring(&g, 10, IGRAPH_DIRECTED, 0, 1);
   
   igraph_vector_ptr_init(&vecs, 5);
+  igraph_vector_ptr_init(&evecs, 5);
   for (i=0; i<igraph_vector_ptr_size(&vecs); i++) {
     VECTOR(vecs)[i] = calloc(1, sizeof(igraph_vector_t));
     igraph_vector_init(VECTOR(vecs)[i], 0);
+    VECTOR(evecs)[i] = calloc(1, sizeof(igraph_vector_t));
+    igraph_vector_init(VECTOR(evecs)[i], 0);
   }
   igraph_vs_vector_small(&vs, 1, 3, 5, 2, 1,  -1);
   
-  igraph_get_shortest_paths(&g, &vecs, 0, vs, IGRAPH_OUT);
+  igraph_get_shortest_paths(&g, &vecs, &evecs, 0, vs, IGRAPH_OUT);
+
+  check_evecs(&g, &vecs, &evecs, 10);
   
   for (i=0; i<igraph_vector_ptr_size(&vecs); i++) {
     print_vector(VECTOR(vecs)[i]);
     igraph_vector_destroy(VECTOR(vecs)[i]);
     free(VECTOR(vecs)[i]);
+    igraph_vector_destroy(VECTOR(evecs)[i]);
+    free(VECTOR(evecs)[i]);
   }
   igraph_vector_ptr_destroy(&vecs);
+  igraph_vector_ptr_destroy(&evecs);
   igraph_vs_destroy(&vs);
   igraph_destroy(&g);
+
+  if (!IGRAPH_FINALLY_STACK_EMPTY) return 1;
   
   return 0;
 }
