@@ -723,9 +723,10 @@ int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
   igraph_vector_t *neis;
   long int i, j, nlen;
   igraph_real_t sumfrom=0.0;
+  igraph_real_t fact=1-data->damping;
 
   for (i=0; i<n; i++) {
-    sumfrom += from[i];
+    sumfrom += VECTOR(*outdegree)[i]!=0 ? from[i] * fact : from[i];
     VECTOR(*tmp)[i] = from[i] / VECTOR(*outdegree)[i];
   }
   
@@ -742,13 +743,13 @@ int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
   if (reset) {
     /* Running personalized PageRank */
     for (i=0; i<n; i++) {
-	  to[i] += (1-data->damping) * VECTOR(*reset)[i] * sumfrom;
+	  to[i] += sumfrom * VECTOR(*reset)[i];
 	}
   } else {
     /* Traditional PageRank with uniform reset vector */
     for (i=0; i<n; i++) {
-	  to[i] += (1-data->damping) / n * sumfrom;
-	}
+	to[i] += sumfrom / n;
+    }
   }
 
   return 0;
@@ -767,9 +768,10 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
   long int i, j, nlen;
   igraph_real_t sumfrom=0.0;
   igraph_vector_t *neis;
+  igraph_real_t fact=1-data->damping;
   
   for (i=0; i<n; i++) {
-    sumfrom += from[i];
+    sumfrom += VECTOR(*outdegree)[i]!=0 ? from[i] * fact : from[i];
     VECTOR(*tmp)[i] = from[i] / VECTOR(*outdegree)[i];
   }
   
@@ -787,12 +789,12 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
   if (reset) {
     /* Running personalized PageRank */
     for (i=0; i<n; i++) {
-      to[i] += (1-data->damping) * VECTOR(*reset)[i] * sumfrom;
+      to[i] += sumfrom * VECTOR(*reset)[i];
     }
   } else {
     /* Traditional PageRank with uniform reset vector */
     for (i=0; i<n; i++) {
-      to[i] += (1-data->damping) / n * sumfrom;
+      to[i] += sumfrom / n;
     }
   }
   
@@ -1081,9 +1083,6 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
 			       directed ? IGRAPH_OUT : IGRAPH_ALL, /*loops=*/ 0));
     /* Avoid division by zero */
     for (i=0; i<options->n; i++) {
-      if (VECTOR(outdegree)[i]==0) {
-        VECTOR(outdegree)[i]=1;
-      }
       MATRIX(vectors, i, 0) = VECTOR(outdegree)[i];
     } 
 
@@ -1117,9 +1116,6 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
     }
     /* Avoid division by zero */
     for (i=0; i<options->n; i++) {
-      if (VECTOR(outdegree)[i]==0) {
-        VECTOR(outdegree)[i]=1;
-      }
       MATRIX(vectors, i, 0) = VECTOR(outdegree)[i];
     }     
     
