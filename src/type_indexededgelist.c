@@ -1093,6 +1093,185 @@ int igraph_get_eid2(const igraph_t *graph, igraph_integer_t *eid,
   return IGRAPH_SUCCESS;  
 }
 
+int igraph_get_eids_pairs(const igraph_t *graph, igraph_vector_t *eids,
+			  const igraph_vector_t *pairs, 
+			  igraph_bool_t directed) {
+  long int n=igraph_vector_size(pairs);
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i;
+  igraph_integer_t eid=-1;
+    
+  if (n % 2 != 0) {
+    IGRAPH_ERROR("Cannot get edge ids, invalid length of edge ids",
+		 IGRAPH_EINVAL);
+  }
+  if (!igraph_vector_isininterval(pairs, 0, no_of_nodes-1)) {
+    IGRAPH_ERROR("Cannot get edge ids, invalid vertex id", IGRAPH_EINVVID);
+  }
+
+  IGRAPH_CHECK(igraph_vector_resize(eids, n/2));
+  
+  if (igraph_is_directed(graph)) {
+    for (i=0; i<n/2; i++) {
+      long int from=VECTOR(*pairs)[2*i];
+      long int to=VECTOR(*pairs)[2*i+1];
+
+      eid=-1;
+      FIND_DIRECTED_EDGE(graph,from,to,&eid);
+      if (!directed && eid < 0) {
+	FIND_DIRECTED_EDGE(graph,to,from,&eid);
+      }
+      
+      if (eid >= 0) {
+	VECTOR(*eids)[i]=eid;
+      } else {
+	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
+      }
+    }
+  } else {
+    for (i=0; i<n/2; i++) {
+      long int from=VECTOR(*pairs)[2*i];
+      long int to=VECTOR(*pairs)[2*i+1];
+
+      eid=-1;
+      FIND_UNDIRECTED_EDGE(graph,from,to,&eid);
+      if (eid >= 0) {
+	VECTOR(*eids)[i]=eid;
+      } else {
+	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
+      }
+    }
+  }
+  
+  return 0;
+}
+
+int igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids,
+			 const igraph_vector_t *path, 
+			 igraph_bool_t directed) {
+
+  long int n=igraph_vector_size(path);
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i;
+  igraph_integer_t eid=-1;
+
+  if (!igraph_vector_isininterval(path, 0, no_of_nodes-1)) {
+    IGRAPH_ERROR("Cannot get edge ids, invalid vertex id", IGRAPH_EINVVID);
+  }
+  
+  IGRAPH_CHECK(igraph_vector_resize(eids, n==0 ? 0 : n-1));
+  
+  if (igraph_is_directed(graph)) {
+    for (i=0; i<n-1; i++) {
+      long int from=VECTOR(*path)[i];
+      long int to=VECTOR(*path)[i+1];
+      
+      eid=-1;
+      FIND_DIRECTED_EDGE(graph, from, to, &eid);
+      if (!directed && eid < 0) {
+	FIND_DIRECTED_EDGE(graph, to, from, &eid);
+      }
+      
+      if (eid >= 0) {
+	VECTOR(*eids)[i]=eid;
+      } else {
+	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
+      }
+    }
+  } else {
+    for (i=0; i<n-1; i++) {
+      long int from=VECTOR(*path)[i];
+      long int to=VECTOR(*path)[i+1];
+      
+      eid=-1;
+      FIND_UNDIRECTED_EDGE(graph, from, to, &eid);
+      if (eid >= 0) {
+	VECTOR(*eids)[i]=eid;
+      } else {
+	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
+      }
+    }
+  }
+  
+  return 0;
+}
+
+/** 
+ * \function igraph_get_eids
+ * Return edge ids based on the adjacenct vertices
+ * 
+ * This function operates in two modes. If the \c pairs argument is
+ * not a null pointer, but the \c path argument is, then it searches
+ * for the edge ids of all pairs of vertices given in \c pairs. The
+ * pairs of vertex ids are taken consecutively from the vector,
+ * i.e. <code>VECTOR(pairs)[0]</code> and
+ * <code>VECTOR(pairs)[1]</code> give the first 
+ * pair, <code>VECTOR(pairs)[2]</code> and
+ * <code>VECTOR(pairs)[3]</code> the second pair, etc.
+ * 
+ * </para><para>
+ * If the \c pairs argument is a null pointer, and \c path is not a
+ * null pointer, then the \c path is interpreted as a path given by
+ * vertex ids and the edges along the path are returned.
+ * 
+ * </para><para>
+ * If neither \c pairs, nor \c path are null pointers, then both are
+ * considered (first \c pairs and then \c path), and the results are
+ * concatenated.
+ * 
+ * </para><para>
+ * It is an error to give pairs of vertices that are not connected.
+ * 
+ * </para><para>
+ * If there are multiple edges in the graph, then these are ignored;
+ * i.e. for a given pair of vertex ids, always the same edge id is
+ * returned, even if the pair is given multiple time in \c pairs or in
+ * \c path. See \ref igraph_get_eids_multi() for a similar function
+ * that works differently in case of multiple edges.
+ * 
+ * \param graph The input graph.
+ * \param eids Pointer to an initialized vector, the result is stored
+ *        here. It will be resized as needed.
+ * \param pairs Vector giving pairs of vertices, or a null pointer.
+ * \param path Vector giving vertex ids along a path, or a null
+ *        pointer.
+ * \param directed Logical scalar, whether to consider edge directions
+ *        in directed graphs. This is ignored for undirected graphs.
+ * \return Error code.
+ * 
+ * Time complexity: O(n log(d)), where n is the number of queried
+ * edges and d is the average degree of the vertices.
+ * 
+ * \sa \ref igraph_get_eid() for a single edge, \ref
+ * igraph_get_eids_multi() for a version that handles multiple edges
+ * better (at a cost).
+ */
+
+int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
+		    const igraph_vector_t *pairs, 
+		    const igraph_vector_t *path, 
+		    igraph_bool_t directed) {
+
+  if (!pairs && !path) {
+    igraph_vector_clear(eids);
+    return 0;
+  } else if (pairs && !path) {
+    return igraph_get_eids_pairs(graph, eids, pairs, directed);
+  } else if (!pairs && path) { 
+    return igraph_get_eids_path(graph, eids, path, directed);
+  } else {
+    /* both */
+    igraph_vector_t tmp;
+    IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
+    IGRAPH_CHECK(igraph_get_eids_pairs(graph, eids, pairs, directed));
+    IGRAPH_CHECK(igraph_get_eids_path(graph, &tmp, path, directed));
+    IGRAPH_CHECK(igraph_vector_append(eids, &tmp));
+    igraph_vector_destroy(&tmp);
+    IGRAPH_FINALLY_CLEAN(1);
+    return 0;
+  }
+}
+
 #undef BINSEARCH
 #undef FIND_DIRECTED_EDGE
 #undef FIND_UNDIRECTED_EDGE
@@ -1141,8 +1320,10 @@ int igraph_get_eid2(const igraph_t *graph, igraph_integer_t *eid,
     FIND_DIRECTED_EDGE(graph,xfrom1,xto1,eid,seen);		    \
   } while (0)
 
-int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
-		    const igraph_vector_t *pairs, igraph_bool_t directed) {
+
+int igraph_get_eids_multipairs(const igraph_t *graph, igraph_vector_t *eids,
+			       const igraph_vector_t *pairs, 
+			       igraph_bool_t directed) {
 
   long int n=igraph_vector_size(pairs);
   long int no_of_nodes=igraph_vcount(graph);
@@ -1205,9 +1386,136 @@ int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
   return 0;
 }
 
+int igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t *eids,
+			      const igraph_vector_t *path, 
+			      igraph_bool_t directed) {
+  
+  long int n=igraph_vector_size(path);
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_bool_t *seen;
+  long int i;
+  igraph_integer_t eid=-1;
+
+  if (!igraph_vector_isininterval(path, 0, no_of_nodes-1)) {
+    IGRAPH_ERROR("Cannot get edge ids, invalid vertex id", IGRAPH_EINVVID);
+  }
+  
+  seen=igraph_Calloc(no_of_edges, igraph_bool_t);
+  if (!seen) {
+    IGRAPH_ERROR("Cannot get edge ids", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, seen);
+  IGRAPH_CHECK(igraph_vector_resize(eids, n==0 ? 0 : n-1));
+  
+  if (igraph_is_directed(graph)) {
+    for (i=0; i<n-1; i++) {
+      long int from=VECTOR(*path)[i];
+      long int to=VECTOR(*path)[i+1];
+      
+      eid=-1;
+      FIND_DIRECTED_EDGE(graph, from, to, &eid, seen);
+      if (!directed && eid < 0) {
+	FIND_DIRECTED_EDGE(graph, to, from, &eid, seen);
+      }
+      
+      if (eid >= 0) {
+	VECTOR(*eids)[i]=eid;
+	seen[(long int)(eid)]=1;
+      } else {
+	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
+      }
+    }
+  } else {
+    for (i=0; i<n-1; i++) {
+      long int from=VECTOR(*path)[i];
+      long int to=VECTOR(*path)[i+1];
+      
+      eid=-1;
+      FIND_UNDIRECTED_EDGE(graph, from, to, &eid, seen);
+      if (eid >= 0) {
+	VECTOR(*eids)[i]=eid;
+	seen[(long int)(eid)]=1;
+      } else {
+	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
+      }
+    }
+  }
+  
+  igraph_Free(seen);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
 #undef BINSEARCH
 #undef FIND_DIRECTED_EDGE
 #undef FIND_UNDIRECTED_EDGE
+
+/** 
+ * \function igraph_get_eids_multi
+ * \brief Query edge ids based on their adjacenct vertices, handle multiple edges
+ * 
+ * This function operates in two modes. If the \c pairs argument is
+ * not a null pointer, but the \c path argument is, then it searches
+ * for the edge ids of all pairs of vertices given in \c pairs. The
+ * pairs of vertex ids are taken consecutively from the vector,
+ * i.e. <code>VECTOR(pairs)[0]</code> and
+ * <code>VECTOR(pairs)[1]</code> give the first pair,
+ * <code>VECTOR(pairs)[2]</code> and <code>VECTOR(pairs)[3]</code> the
+ * second pair, etc.
+ * 
+ * </para><para>
+ * If the \c pairs argument is a null pointer, and \c path is not a
+ * null pointer, then the \c path is interpreted as a path given by
+ * vertex ids and the edges along the path are returned.
+ * 
+ * </para><para>
+ * It is an error to give pairs of vertices that are not connected.
+ *
+ * </para><para>
+ * An error is triggered if both \c pairs and \c path are non-null
+ * pointers. 
+ * 
+ * </para><para>
+ * This function handles multiple edges properly, i.e. if the same
+ * pair is given multiple times and they are indeed connected by
+ * multiple edges, then each time a different edge id is reported.
+ * 
+ * \param graph The input graph.
+ * \param eids Pointer to an initialized vector, the result is stored
+ *        here. It will be resized as needed.
+ * \param pairs Vector giving pairs of vertices, or a null pointer.
+ * \param path Vector giving vertex ids along a path, or a null
+ *        pointer.
+ * \param directed Logical scalar, whether to consider edge directions
+ *        in directed graphs. This is ignored for undirected graphs.
+ * \return Error code.
+ * 
+ * Time complexity: O(|E|+n log(d)), where |E| is the number of edges
+ * in the graph, n is the number of queried edges and d is the average
+ * degree of the vertices. 
+ * 
+ * \sa \ref igraph_get_eid() for a single edge, \ref
+ * igraph_get_eids() for a faster version that does not handle
+ * multiple edges.
+ */
+
+int igraph_get_eids_multi(const igraph_t *graph, igraph_vector_t *eids,
+			  const igraph_vector_t *pairs, 
+			  const igraph_vector_t *path,
+			  igraph_bool_t directed) {
+  
+  if (!pairs && !path) {
+    igraph_vector_clear(eids);
+    return 0;
+  } else if (pairs && !path) {
+    return igraph_get_eids_multipairs(graph, eids, pairs, directed);
+  } else if (!pairs && path) {
+    return igraph_get_eids_multipath(graph, eids, path, directed);
+  } else { /* both */
+    IGRAPH_ERROR("Give `pairs' or `path' but not both", IGRAPH_EINVAL);
+  }
+}
 
 /**
  * \function igraph_adjacent

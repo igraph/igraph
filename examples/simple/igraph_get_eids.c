@@ -22,6 +22,9 @@
 */
 
 #include <igraph.h>
+#include <stdlib.h>
+
+#define RNG_INTEGER(l, h) ((long int)((rand())/((double)RAND_MAX+1)*((h)-(l)+1)+(l)))
 
 void print_vector(igraph_vector_t *v, FILE *f) {
   long int i;
@@ -31,7 +34,70 @@ void print_vector(igraph_vector_t *v, FILE *f) {
   fprintf(f, "\n");
 }
 
-int main() {
+int check_simple() {
+
+  igraph_t g;
+  long int nodes=100;
+  long int edges=1000;
+  igraph_real_t p=3.0/nodes;
+  long int runs=10;
+  long int r, e, ecount;
+  igraph_vector_t eids, pairs, path;
+
+  srand(time(0));
+
+  igraph_vector_init(&pairs, edges*2);
+  igraph_vector_init(&path, 0);
+  igraph_vector_init(&eids, 0);
+
+  for (r=0; r<runs; r++) {
+    igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, nodes, p, 
+			    /*directed=*/ 0, /*loops=*/ 0);
+    ecount=igraph_ecount(&g);
+    for (e=0; e<edges; e++) {
+      long int edge=RNG_INTEGER(0, ecount-1);
+      VECTOR(pairs)[2*e] = IGRAPH_FROM(&g, edge);
+      VECTOR(pairs)[2*e+1] = IGRAPH_TO(&g, edge);
+    }
+    igraph_get_eids(&g, &eids, &pairs, /*path=*/ 0, 0);
+    for (e=0; e<edges; e++) {
+      long int edge=VECTOR(eids)[e];
+      long int from1=VECTOR(pairs)[2*e];
+      long int to1=VECTOR(pairs)[2*e+1];
+      long int from2=IGRAPH_FROM(&g, edge);
+      long int to2=IGRAPH_TO(&g, edge);
+      long int min1= from1 < to1 ? from1 : to1;
+      long int max1= from1 < to1 ? to1 : from1;
+      long int min2= from2 < to2 ? from2 : to2;
+      long int max2= from2 < to2 ? to2 : from2;
+      if (min1 != min2 || max1 != max2) {
+	return 11;
+      }
+    }
+    
+    igraph_diameter(&g, /*res=*/ 0, /*from=*/ 0, /*to=*/ 0, &path,
+		    IGRAPH_UNDIRECTED, /*unconn=*/ 1);
+    igraph_get_eids(&g, &eids, /*pairs=*/ 0, &path, 0);
+    for (e=0; e<igraph_vector_size(&path)-1; e++) {
+      long int edge=VECTOR(eids)[e];
+      long int from1=VECTOR(path)[e];
+      long int to1=VECTOR(path)[e+1];
+      long int from2=IGRAPH_FROM(&g, edge);
+      long int to2=IGRAPH_TO(&g, edge);
+      long int min1= from1 < to1 ? from1 : to1;
+      long int max1= from1 < to1 ? to1 : from1;
+      long int min2= from2 < to2 ? from2 : to2;
+      long int max2= from2 < to2 ? to2 : from2;
+      if (min1 != min2 || max1 != max2) {
+	return 12;
+      }
+    }
+  }
+
+  return 0;
+}
+
+int check_multi() {
 
   igraph_t g;
   igraph_vector_t vec;
@@ -52,18 +118,18 @@ int main() {
 	       -1);
 
   igraph_vector_view(&vec, q1, sizeof(q1) / sizeof(igraph_real_t));
-  igraph_get_eids(&g, &eids, &vec, /*directed=*/ 1);
+  igraph_get_eids_multi(&g, &eids, &vec, 0, /*directed=*/ 1);
   igraph_vector_sort(&eids);
   print_vector(&eids, stdout);
 
   igraph_vector_view(&vec, q2, sizeof(q2) / sizeof(igraph_real_t));
-  igraph_get_eids(&g, &eids, &vec, /*directed=*/ 0);
+  igraph_get_eids_multi(&g, &eids, &vec, 0, /*directed=*/ 0);
   igraph_vector_sort(&eids);
   print_vector(&eids, stdout);
 
   igraph_vector_view(&vec, q2, sizeof(q2) / sizeof(igraph_real_t));
   igraph_set_error_handler(igraph_error_handler_ignore);
-  ret=igraph_get_eids(&g, &eids, &vec, /*directed=*/ 1);
+  ret=igraph_get_eids_multi(&g, &eids, &vec, 0, /*directed=*/ 1);
   if (ret != IGRAPH_EINVAL) { return 1; } 
   igraph_set_error_handler(igraph_error_handler_abort);
 
@@ -76,13 +142,13 @@ int main() {
 	       -1);
   
   igraph_vector_view(&vec, q1, sizeof(q1) / sizeof(igraph_real_t));
-  igraph_get_eids(&g, &eids, &vec, /*directed=*/1);
+  igraph_get_eids_multi(&g, &eids, &vec, 0, /*directed=*/1);
   igraph_vector_sort(&eids);
   print_vector(&eids, stdout);
 
   igraph_vector_view(&vec, q3, sizeof(q3) / sizeof(igraph_real_t));
   igraph_set_error_handler(igraph_error_handler_ignore);
-  ret=igraph_get_eids(&g, &eids, &vec, /*directed=*/0);
+  ret=igraph_get_eids_multi(&g, &eids, &vec, 0, /*directed=*/0);
   if (ret != IGRAPH_EINVAL) { return 2; }
   igraph_set_error_handler(igraph_error_handler_abort);
   
@@ -109,7 +175,7 @@ int main() {
     VECTOR(vec)[2*i+1] = IGRAPH_TO(&g, VECTOR(eids)[i]);
   }
   igraph_vector_init(&eids2, 0);
-  igraph_get_eids(&g, &eids2, &vec, /*directed=*/ 1);
+  igraph_get_eids_multi(&g, &eids2, &vec, 0, /*directed=*/ 1);
   if (!igraph_vector_is_equal(&eids, &eids2)) {
     return 3;
   }
@@ -120,7 +186,7 @@ int main() {
     VECTOR(vec)[2*i]   = IGRAPH_TO(&g, VECTOR(eids)[i]);
     VECTOR(vec)[2*i+1] = IGRAPH_FROM(&g, VECTOR(eids)[i]);
   }
-  igraph_get_eids(&g, &eids2, &vec, /*directed=*/ 0);
+  igraph_get_eids_multi(&g, &eids2, &vec, 0, /*directed=*/ 0);
   if (!igraph_vector_is_equal(&eids, &eids2)) {
     return 4;
   }
@@ -131,6 +197,15 @@ int main() {
   igraph_destroy(&g);
 		  
   /*********************************/
+
+  return 0;
+}
+
+int main() {
+  int ret;
+
+  if ( (ret=check_simple()) != 0) { return ret; }
+  if ( (ret=check_multi()) != 0)  { return ret; }
 
   return 0;
 }

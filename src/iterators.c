@@ -1608,8 +1608,9 @@ int igraph_i_eit_multipairs(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_free, (igraph_vector_t*)eit->vec);
   IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t*)eit->vec, n/2);
   
-  IGRAPH_CHECK(igraph_get_eids(graph, (igraph_vector_t *) eit->vec,
-			       es.data.path.ptr, es.data.path.mode));
+  IGRAPH_CHECK(igraph_get_eids_multi(graph, (igraph_vector_t *) eit->vec,
+				     /*pairs=*/ es.data.path.ptr, /*path=*/ 0, 
+				     es.data.path.mode));
   
   IGRAPH_FINALLY_CLEAN(2);
   return 0;
