@@ -99,7 +99,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
         v <- which(v)
       }
       on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_vs_nei", graph, x, as.igraph.vs(v),
+      tmp <- .Call("R_igraph_vs_nei", graph, x, as.igraph.vs(graph, v),
                    as.numeric(mode),
                    PACKAGE="igraph")
       tmp[as.numeric(x)+1]
@@ -175,21 +175,21 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
     adj <- function(v) {
       ## TRUE iff the edge is adjacent to at least one vertex in v
       on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(v), as.numeric(3),
+      tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v), as.numeric(3),
                    PACKAGE="igraph")
       tmp[ as.numeric(x)+1 ]
     }
     from <- function(v) {
       ## TRUE iff the edge originates from at least one vertex in v
       on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(v), as.numeric(1),
+      tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v), as.numeric(1),
                    PACKAGE="igraph")
       tmp[ as.numeric(x)+1 ]      
     }
     to <- function(v) {
       ## TRUE iff the edge points to at least one vertex in v
       on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(v), as.numeric(2),
+      tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v), as.numeric(2),
                    PACKAGE="igraph")
       tmp[ as.numeric(x)+1 ]
     }
@@ -338,7 +338,16 @@ print.igraph.es <- function(x, ...) {
 
 # these are internal
 
-as.igraph.vs <- as.numeric
+as.igraph.vs <- function(graph, v) {
+  if (is.character(v) && "name" %in% list.vertex.attributes(graph)) {
+    v <- as.numeric(match(v, V(g)$name)-1)
+    if (any(is.na(v))) {
+      stop("Invalid vertex names")
+    }
+    v
+  } else {
+    as.numeric(v)
+  }
+}
+
 as.igraph.es <- as.numeric
-
-
