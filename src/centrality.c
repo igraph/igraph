@@ -21,7 +21,11 @@
 
 */
 
+#include <math.h>
+#include <string.h>    /* memset */
+#include <assert.h>
 #include "igraph_centrality.h"
+#include "igraph_math.h"
 #include "igraph_memory.h"
 #include "igraph_random.h"
 #include "igraph_adjlist.h"
@@ -32,9 +36,6 @@
 #include "igraph_stack.h"
 #include "igraph_dqueue.h"
 #include "config.h"
-#include <math.h>
-#include <string.h>    /* memset */
-#include <assert.h>
 
 int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
 				    long int n, void *extra) {

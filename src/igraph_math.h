@@ -68,8 +68,11 @@ double igraph_fmin(double a, double b);
 #ifndef M_PI
 #  define M_PI 3.14159265358979323846
 #endif
-#if !defined(M_LN2)
+#ifndef M_LN2
 #  define M_LN2 0.69314718055994530942
+#endif
+#ifndef M_SQRT2
+#  define M_SQRT2 1.4142135623730950488016887
 #endif
 
 __END_DECLS
