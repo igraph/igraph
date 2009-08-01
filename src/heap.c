@@ -37,6 +37,10 @@
 #define LEFTCHILD(x)  (((x)+1)*2-1)
 #define RIGHTCHILD(x) (((x)+1)*2)
 
+#if defined(_MSC_VER)
+#  define inline __inline
+#endif
+
 /**
  * \ingroup indheap
  * \brief Initializes an indexed heap (constructor).
