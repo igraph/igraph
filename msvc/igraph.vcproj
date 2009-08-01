@@ -555,6 +555,9 @@
 				RelativePath=".\src\memory.c">
 			</File>
 			<File
+				RelativePath=".\src\mixing.c">
+			</File>
+			<File
 				RelativePath=".\src\motifs.c">
 			</File>
 			<File

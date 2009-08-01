@@ -55,6 +55,8 @@
 #include "igraph_pmt_off.h"
 #undef BASE_INT
 
+#include "igraph_math.h"
+
 int igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to) {
   long int i, n=igraph_vector_size(from);
   
