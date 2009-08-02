@@ -37,10 +37,6 @@
 #define LEFTCHILD(x)  (((x)+1)*2-1)
 #define RIGHTCHILD(x) (((x)+1)*2)
 
-#if defined(_MSC_VER)
-#  define inline __inline
-#endif
-
 /**
  * \ingroup indheap
  * \brief Initializes an indexed heap (constructor).
@@ -855,8 +851,8 @@ int igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, long int vertex) {
    In other words, for this heap the indexing operation is O(1), the 
    normal heap does this in O(n) time.... */
 
-static inline void igraph_i_2wheap_switch(igraph_2wheap_t *h,
-					  long int e1, long int e2) {
+void igraph_i_2wheap_switch(igraph_2wheap_t *h,
+			    long int e1, long int e2) {
   if (e1 != e2) {
     long int tmp1, tmp2;
     igraph_real_t tmp3=VECTOR(h->data)[e1];
@@ -874,8 +870,8 @@ static inline void igraph_i_2wheap_switch(igraph_2wheap_t *h,
   }
 }
 
-static inline void igraph_i_2wheap_shift_up(igraph_2wheap_t *h, 
-					    long int elem) {
+void igraph_i_2wheap_shift_up(igraph_2wheap_t *h, 
+			      long int elem) {
   if (elem==0 || VECTOR(h->data)[elem] < VECTOR(h->data)[PARENT(elem)]) {
     /* at the top */
   } else {
@@ -884,8 +880,8 @@ static inline void igraph_i_2wheap_shift_up(igraph_2wheap_t *h,
   }
 }
 
-static inline void igraph_i_2wheap_sink(igraph_2wheap_t *h,
-					long int head) {
+void igraph_i_2wheap_sink(igraph_2wheap_t *h,
+			  long int head) {
   long int size=igraph_2wheap_size(h);
   if (LEFTCHILD(head) >= size) {
     /* no subtrees */
