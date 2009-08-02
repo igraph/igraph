@@ -55,8 +55,8 @@ int igraph_biguint_size(igraph_biguint_t *b) {
 
 int igraph_biguint_resize(igraph_biguint_t *b, int newlength) {
   long int origlen=igraph_biguint_size(b);
+  IGRAPH_CHECK(igraph_vector_limb_resize(&b->v, newlength));
   if (newlength > origlen) {
-    IGRAPH_CHECK(igraph_vector_limb_resize(&b->v, newlength));
     memset(VECTOR(b->v) + origlen, 0, (newlength-origlen) * sizeof(limb_t));
   }
   return 0;
@@ -71,10 +71,27 @@ int igraph_biguint_zero(igraph_biguint_t *b) {
   return 0;
 }
 
-int igraph_biguint_set(igraph_biguint_t *b, int value) {
+int igraph_biguint_set_limb(igraph_biguint_t *b, int value) {
   IGRAPH_CHECK(igraph_vector_limb_resize(&b->v, 1));
   VECTOR(b->v)[0]=value;
   return 0;
+}
+
+igraph_real_t igraph_biguint_get(igraph_biguint_t *b) {
+  long int size=igraph_biguint_size(b);
+  long int i;
+  double val=VECTOR(b->v)[size-1];
+  if (size==0) { return 0.0; }
+  for (i=size-2; i>=0; i--) {
+    val = val * LIMBMASK + VECTOR(b->v)[i];
+    if (!IGRAPH_FINITE(val)) break;
+  }
+  return val;
+}
+
+int igraph_biguint_compare_limb(igraph_biguint_t *b, limb_t l) {
+  long int n=igraph_biguint_size(b);
+  return bn_cmp_limb(VECTOR(b->v), l, n);
 }
 
 int igraph_biguint_compare(igraph_biguint_t *left, igraph_biguint_t *right) {
@@ -140,6 +157,20 @@ int igraph_biguint_sub_limb(igraph_biguint_t *res, igraph_biguint_t *b,
   /* We don't check the return value here */
   bn_sub_limb( VECTOR(res->v), VECTOR(b->v), l, nlimb);
 
+  return 0;
+}
+
+int igraph_biguint_mul_limb(igraph_biguint_t *res, igraph_biguint_t *b,
+			    limb_t l) {
+  long int nlimb=igraph_biguint_size(b);
+  limb_t carry;
+  
+  if (res!= b) { IGRAPH_CHECK(igraph_biguint_resize(res, nlimb)); }
+  
+  carry=bn_mul_limb( VECTOR(res->v), VECTOR(b->v), l, nlimb);
+  if (carry) { 
+    IGRAPH_CHECK(igraph_biguint_extend(res, carry));
+  }
   return 0;
 }
 
@@ -245,6 +276,12 @@ int igraph_biguint_fprint(igraph_biguint_t *b, FILE *file) {
   igraph_biguint_t tmp;
   char *dst;
   limb_t r;
+
+  /* Zero? */
+  if (!bn_cmp_limb(VECTOR(b->v), 0, n)) {
+    fputs("0", file);
+    return 0;
+  }
   
   IGRAPH_CHECK(igraph_biguint_copy(&tmp, b));
   IGRAPH_FINALLY(igraph_biguint_destroy, &tmp);

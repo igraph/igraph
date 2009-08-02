@@ -65,8 +65,11 @@ int igraph_biguint_resize(igraph_biguint_t *b, int newlength);
 int igraph_biguint_reserve(igraph_biguint_t *b, int length);
 
 int igraph_biguint_zero(igraph_biguint_t *b);
-int igraph_biguint_set(igraph_biguint_t *b, int value);
+int igraph_biguint_set_limb(igraph_biguint_t *b, int value);
 
+igraph_real_t igraph_biguint_get(igraph_biguint_t *b);
+
+int igraph_biguint_compare_limb(igraph_biguint_t *b, limb_t l);
 int igraph_biguint_compare(igraph_biguint_t *left, igraph_biguint_t *right);
 igraph_bool_t igraph_biguint_equal(igraph_biguint_t *left, igraph_biguint_t *right);
 igraph_bool_t igraph_biguint_bigger(igraph_biguint_t *left, 
@@ -80,6 +83,8 @@ int igraph_biguint_dec(igraph_biguint_t *res, igraph_biguint_t *b);
 int igraph_biguint_add_limb(igraph_biguint_t *res, igraph_biguint_t *b, 
 			    limb_t l);
 int igraph_biguint_sub_limb(igraph_biguint_t *res, igraph_biguint_t *b, 
+			    limb_t l);
+int igraph_biguint_mul_limb(igraph_biguint_t *res, igraph_biguint_t *b,
 			    limb_t l);
 
 int igraph_biguint_add(igraph_biguint_t *res, igraph_biguint_t *left, 

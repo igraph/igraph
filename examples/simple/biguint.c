@@ -40,9 +40,9 @@ int main() {
   igraph_biguint_init(&one);
 
   /* set & add & sub */
-  igraph_biguint_set(&one, 1);
-  igraph_biguint_set(&A, UINT_MAX);
-  igraph_biguint_set(&B, UINT_MAX);
+  igraph_biguint_set_limb(&one, 1);
+  igraph_biguint_set_limb(&A, UINT_MAX);
+  igraph_biguint_set_limb(&B, UINT_MAX);
   igraph_biguint_add(&A, &A, &B);                      /* A <- A + B */
 
   igraph_biguint_print(&B);
