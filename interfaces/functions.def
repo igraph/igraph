@@ -354,14 +354,16 @@ igraph_subcomponent:
 
 igraph_betweenness:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
-                BOOLEAN directed=True, EDGEWEIGHTS weights=NULL
+                BOOLEAN directed=True, EDGEWEIGHTS weights=NULL, \
+                BOOLEAN nobigint=True
         IGNORE: RR, RC, RNamespace
         DEPS: weights ON graph
         FLAGS: PROGRESS
 
 igraph_betweenness_estimate:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
-                BOOLEAN directed=True, REAL cutoff, EDGEWEIGHTS weights=NULL
+                BOOLEAN directed=True, REAL cutoff, EDGEWEIGHTS weights=NULL, \
+                BOOLEAN nobigint=True
         DEPS: vids ON graph, weights ON graph
         NAME-R: betweenness.estimate
         FLAGS: PROGRESS
@@ -588,7 +590,8 @@ igraph_centralization_degree_tmax:
 
 igraph_centralization_betweenness:
         PARAMS: GRAPH graph, OUT VECTOR res, \
-                BOOLEAN directed=True, OUT REALPTR centralization, \
+                BOOLEAN directed=True, BOOLEAN nobigint=True, \
+                OUT REALPTR centralization, \
                 OUT REALPTR theoretical_max, \
                 BOOLEAN normalized=True
         NAME-R: centralization.betweenness

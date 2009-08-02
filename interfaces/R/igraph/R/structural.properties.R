@@ -278,7 +278,7 @@ simplify <- function(graph, remove.multiple=TRUE,
 }
 
 betweenness <- function(graph, v=V(graph), directed=TRUE, weights=NULL,
-                        verbose=igraph.par("verbose")) {
+                        nobigint=TRUE, verbose=igraph.par("verbose")) {
   
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -293,7 +293,8 @@ betweenness <- function(graph, v=V(graph), directed=TRUE, weights=NULL,
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_betweenness", graph, as.igraph.vs(graph, v),
-        as.logical(directed), weights, as.logical(verbose),
+        as.logical(directed), weights, as.logical(nobigint),
+        as.logical(verbose),
         PACKAGE="igraph")
 }
 

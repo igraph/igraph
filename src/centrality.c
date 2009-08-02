@@ -37,6 +37,8 @@
 #include "igraph_dqueue.h"
 #include "config.h"
 
+#include "bigint.h"
+
 int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
 				    long int n, void *extra) {
   igraph_adjlist_t *adjlist=extra;
@@ -1192,6 +1194,10 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
  * \param weights An optional vector containing edge weights for 
  *        calculating weighted betweenness. Supply a null pointer here
  *        for unweighted betweenness.
+ * \param nobigint Logical, if true, then we don't use big integers
+ *        for the calculation, setting this to 1 (=true) should
+ *        work for most graphs. It is currently ignored for weighted
+ *        graphs.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for
  *        temporary data. 
@@ -1212,8 +1218,9 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
  */
 int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
 		       const igraph_vs_t vids, igraph_bool_t directed, 
-		       const igraph_vector_t* weights) {
-    return igraph_betweenness_estimate(graph, res, vids, directed, -1, weights);
+		       const igraph_vector_t* weights, igraph_bool_t nobigint) {
+  return igraph_betweenness_estimate(graph, res, vids, directed, -1, weights,
+				     nobigint);
 }
 
 int igraph_betweenness_estimate_weighted(const igraph_t *graph, 
@@ -1221,7 +1228,8 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
 					 const igraph_vs_t vids, 
 					 igraph_bool_t directed,
 					 igraph_real_t cutoff, 
-					 const igraph_vector_t *weights) {
+					 const igraph_vector_t *weights, 
+					 igraph_bool_t nobigint) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
@@ -1371,6 +1379,13 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
   return 0;
 }
 
+void igraph_i_destroy_biguints(igraph_biguint_t *p) {
+  while ( ! *((int*)(p)) ) {
+    igraph_biguint_destroy(p);
+  }
+  igraph_Free(p);
+}
+
 /**
  * \ingroup structural
  * \function igraph_betweenness_estimate
@@ -1398,6 +1413,10 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
  * \param weights An optional vector containing edge weights for 
  *        calculating weighted betweenness. Supply a null pointer here
  *        for unweighted betweenness.
+ * \param nobigint Logical, if true, then we don't use big integers
+ *        for the calculation, setting this to 1 (=true) should
+ *        work for most graphs. It is currently ignored for weighted
+ *        graphs.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for
  *        temporary data. 
@@ -1416,13 +1435,17 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
  *     of the edges in a graph.
  */
 int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res, 
-			const igraph_vs_t vids, igraph_bool_t directed,
-                        igraph_real_t cutoff, const igraph_vector_t *weights) {
+				const igraph_vs_t vids, igraph_bool_t directed,
+				igraph_real_t cutoff, 
+				const igraph_vector_t *weights, 
+				igraph_bool_t nobigint) {
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
   long int *distance;
-  unsigned long long int *nrgeo;  /* must be long long; consider grid graphs for example */
+  unsigned long long int *nrgeo=0;  /* must be long long; consider grid
+				       graphs for example */
+  igraph_biguint_t *big_nrgeo=0;
   double *tmpscore;
   igraph_stack_t stack=IGRAPH_STACK_NULL;
   long int source;
@@ -1435,9 +1458,11 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   igraph_adjlist_t adjlist_out, adjlist_in;
   igraph_adjlist_t *adjlist_out_p, *adjlist_in_p;
 
+  igraph_biguint_t D, R, T;
+
   if (weights) { 
     return igraph_betweenness_estimate_weighted(graph, res, vids, directed,
-						cutoff, weights);
+						cutoff, weights, nobigint);
   }
 
   if (!igraph_vs_is_all(&vids)) {
@@ -1478,11 +1503,31 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, distance);
-  nrgeo=igraph_Calloc(no_of_nodes, unsigned long long int);
-  if (nrgeo==0) {
-    IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
+  if (nobigint) {
+    nrgeo=igraph_Calloc(no_of_nodes, unsigned long long int);
+    if (nrgeo==0) {
+      IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, nrgeo);
+  } else {
+    /* +1 is to have one containing zeros, when we free it, we stop
+       at the zero */
+    big_nrgeo=igraph_Calloc(no_of_nodes+1, igraph_biguint_t);
+    if (!big_nrgeo) {
+      IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_i_destroy_biguints, big_nrgeo);
+    for (j=0; j<no_of_nodes; j++) {
+      IGRAPH_CHECK(igraph_biguint_init(&big_nrgeo[j]));
+    }
+    IGRAPH_FINALLY(igraph_i_destroy_biguints, big_nrgeo);
+    IGRAPH_CHECK(igraph_biguint_init(&D));
+    IGRAPH_FINALLY(igraph_biguint_destroy, &D);
+    IGRAPH_CHECK(igraph_biguint_init(&R));
+    IGRAPH_FINALLY(igraph_biguint_destroy, &R);
+    IGRAPH_CHECK(igraph_biguint_init(&T));
+    IGRAPH_FINALLY(igraph_biguint_destroy, &T);
   }
-  IGRAPH_FINALLY(igraph_free, nrgeo);
   tmpscore=igraph_Calloc(no_of_nodes, double);
   if (tmpscore==0) {
     IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
@@ -1500,7 +1545,11 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_ALLOW_INTERRUPTION();
 
     IGRAPH_CHECK(igraph_dqueue_push(&q, source));
-    nrgeo[source]=1;
+    if (nobigint) { 
+      nrgeo[source]=1;
+    } else {
+      igraph_biguint_set_limb(&big_nrgeo[source], 1);
+    }
     distance[source]=1;
     
     while (!igraph_dqueue_empty(&q)) {
@@ -1520,7 +1569,13 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
 	if (distance[neighbor]==distance[actnode]+1) {
 	  igraph_vector_t *v=igraph_adjlist_get(adjlist_in_p, neighbor);
 	  igraph_vector_push_back(v, actnode);
-	  nrgeo[neighbor]+=nrgeo[actnode];
+	  if (nobigint) { 
+	    nrgeo[neighbor]+=nrgeo[actnode];
+	  } else {
+	    IGRAPH_CHECK(igraph_biguint_add(&big_nrgeo[neighbor],
+					    &big_nrgeo[neighbor], 
+					    &big_nrgeo[actnode]));
+	  }
 	}
       }
     } /* while !igraph_dqueue_empty */
@@ -1534,14 +1589,32 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
       nneis = igraph_vector_size(neis);
       for (j=0; j<nneis; j++) {
         long int neighbor=VECTOR(*neis)[j];
-	tmpscore[neighbor] +=  (tmpscore[actnode]+1)*
-	  ((double)(nrgeo[neighbor]))/nrgeo[actnode];
+	if (nobigint) {
+	  tmpscore[neighbor] +=  (tmpscore[actnode]+1)*
+	    ((double)(nrgeo[neighbor]))/nrgeo[actnode];
+	} else {
+	  if (!igraph_biguint_compare_limb(&big_nrgeo[actnode], 0)) {
+	    tmpscore[neighbor] = IGRAPH_INFINITY;
+	  } else {
+	    double div;
+	    int shift=100000;
+	    IGRAPH_CHECK(igraph_biguint_mul_limb(&T, &big_nrgeo[neighbor], 
+						 shift));	  
+	    igraph_biguint_div(&D, &R, &T, &big_nrgeo[actnode]);
+	    div=igraph_biguint_get(&D) / shift;
+	    tmpscore[neighbor] += (tmpscore[actnode]+1) * div;
+	  }
+	}
       }
       
       if (actnode != source) { VECTOR(*tmpres)[actnode] += tmpscore[actnode]; }
 
       distance[actnode]=0;
-      nrgeo[actnode]=0;
+      if (nobigint) { 
+	nrgeo[actnode]=0;
+      } else {
+	igraph_biguint_set_limb(&big_nrgeo[actnode], 0);
+      }
       tmpscore[actnode]=0;
       igraph_vector_clear(igraph_adjlist_get(adjlist_in_p, actnode));      
     }
@@ -1550,7 +1623,15 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
 
   /* clean  */
   igraph_Free(distance);
-  igraph_Free(nrgeo);
+  if (nobigint) {
+    igraph_Free(nrgeo); 
+  } else {
+    igraph_biguint_destroy(&T);
+    igraph_biguint_destroy(&R);
+    igraph_biguint_destroy(&D);
+    IGRAPH_FINALLY_CLEAN(3);
+    igraph_i_destroy_biguints(big_nrgeo);
+  }
   igraph_Free(tmpscore);
   
   igraph_dqueue_destroy(&q);
@@ -2522,6 +2603,10 @@ int igraph_centralization_degree_tmax(const igraph_t *graph,
  *     null pointer otherwise.
  * \param directed Boolean, whether to consider directed paths when
  *     calculating betweenness.
+ * \param nobigint Logical, if true, then we don't use big integers
+ *        for the calculation, setting this to zero (=false) should
+ *        work for most graphs. It is currently ignored for weighted
+ *        graphs.
  * \param centralization Pointer to a real number, the centralization
  *     score is placed here.
  * \param theoretical_max Pointer to real number or a null pointer. If
@@ -2543,6 +2628,7 @@ int igraph_centralization_degree_tmax(const igraph_t *graph,
 int igraph_centralization_betweenness(const igraph_t *graph, 
 				      igraph_vector_t *res,
 				      igraph_bool_t directed,
+				      igraph_bool_t nobigint,
 				      igraph_real_t *centralization,
 				      igraph_real_t *theoretical_max,
 				      igraph_bool_t normalized) {
@@ -2559,7 +2645,7 @@ int igraph_centralization_betweenness(const igraph_t *graph,
   }
   
   IGRAPH_CHECK(igraph_betweenness(graph, scores, igraph_vss_all(), directed, 
-				  /*weights=*/ 0));
+				  /*weights=*/ 0, nobigint));
   
   IGRAPH_CHECK(igraph_centralization_betweenness_tmax(graph, 0, directed, 
 						      tmax));

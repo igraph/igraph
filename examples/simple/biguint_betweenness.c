@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2008  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2009  Gabor Csardi <Gabor.Csardi@unil.ch>
+   UNIL DGM, Rue de Bugnon 27, CH-1005 Lausanne, Switzerland
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,25 +16,39 @@
    
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
    02110-1301 USA
 
 */
 
 #include <igraph.h>
+#include <stdlib.h>
 
-void print_vector(igraph_vector_t *v, FILE *f) {
-  long int i;
-  for (i=0; i<igraph_vector_size(v); i++) {
-    fprintf(f, " %li", (long int) VECTOR(*v)[i]);
+int check(const igraph_vector_t *v1, const igraph_vector_t *v2, int code) {
+  igraph_vector_t v;
+  long int i, n=igraph_vector_size(v1);
+  igraph_real_t m;
+
+  igraph_vector_copy(&v, v1);
+  igraph_vector_sub(&v, v2);
+  
+  for (i=0; i<n; i++) {
+    VECTOR(v)[i] = fabs(VECTOR(v)[i]);
   }
-  fprintf(f, "\n");
+  
+  if ( (m=igraph_vector_max(&v)) > 0.01) { 
+    printf("Difference: %g\n", m);
+    exit(code); 
+  }
+
+  return 0;
 }
 
 int main() {
   
   igraph_t g;
   igraph_vector_t bet, bet2, weights, edges;
+  igraph_vector_t bbet, bbet2;
   
   igraph_real_t nontriv[] = { 0, 19, 0, 16, 0, 20, 1, 19, 2, 5, 3, 7, 3, 8, 
 			      4, 15, 4, 11, 5, 8, 5, 19, 6, 7, 6, 10, 6, 8, 
@@ -64,6 +78,7 @@ int main() {
   igraph_simplify(&g, /* multiple= */ 1, /* loops= */ 1);
   
   igraph_vector_init(&bet, 0);
+  igraph_vector_init(&bbet, 0);
   
   igraph_betweenness_estimate(/* graph=     */ &g,
 			      /* res=       */ &bet,
@@ -72,8 +87,19 @@ int main() {
 			      /* cutoff=    */ 2,
 			      /* weights=   */ 0, 
 			      /* nobigint=  */ 1);
-  
+
+  igraph_betweenness_estimate(/* graph=     */ &g,
+			      /* res=       */ &bbet,
+			      /* vids=      */ igraph_vss_all(),
+			      /* directed = */ 0,
+			      /* cutoff=    */ 2,
+			      /* weights=   */ 0, 
+			      /* nobigint=  */ 0);  
+
+  check(&bet, &bbet, 10);
+
   igraph_vector_destroy(&bet);
+  igraph_vector_destroy(&bbet);
   igraph_destroy(&g);
 
   /*******************************************************/
@@ -81,6 +107,7 @@ int main() {
   igraph_tree(&g, 20000, 10, IGRAPH_TREE_UNDIRECTED);
   
   igraph_vector_init(&bet, 0);
+  igraph_vector_init(&bbet, 0);
   
   igraph_betweenness_estimate(/* graph=     */ &g,
 			      /* res=       */ &bet,
@@ -90,7 +117,18 @@ int main() {
 			      /* weights=   */ 0, 
 			      /* nobigint=  */ 1);
 
+  igraph_betweenness_estimate(/* graph=     */ &g,
+			      /* res=       */ &bbet,
+			      /* vids=      */ igraph_vss_all(),
+			      /* directed = */ 0,
+			      /* cutoff=    */ 3,
+			      /* weights=   */ 0, 
+			      /* nobigint=  */ 0);
+
+  check(&bet, &bbet, 20);
+
   igraph_vector_init(&bet2, 0);
+  igraph_vector_init(&bbet2, 0);
   igraph_vector_init(&weights, igraph_ecount(&g));
   igraph_vector_fill(&weights, 1.0);
   
@@ -102,12 +140,29 @@ int main() {
 			      /* weights=   */ &weights, 
 			      /* nobigint=  */ 1);
 
+  igraph_betweenness_estimate(/* graph=     */ &g,
+			      /* res=       */ &bbet2,
+			      /* vids=      */ igraph_vss_all(),
+			      /* directed = */ 0,
+			      /* cutoff=    */ 3,
+			      /* weights=   */ &weights, 
+			      /* nobigint=  */ 0);
+
   if (!igraph_vector_is_equal(&bet, &bet2)) {
     return 1;
   }
 
+/*   if (!igraph_vector_is_equal(&bbet, &bbet2)) { */
+/*     return 2; */
+/*   } */
+
+  check(&bet, &bbet, 30);
+  check(&bet2, &bbet2, 40);
+
   igraph_vector_destroy(&bet);
   igraph_vector_destroy(&bet2);
+  igraph_vector_destroy(&bbet);
+  igraph_vector_destroy(&bbet2);
   igraph_vector_destroy(&weights);
   igraph_destroy(&g);
 
@@ -117,9 +172,13 @@ int main() {
   igraph_vector_view(&weights, nontriv_weights, 
 		     sizeof(nontriv_weights)/sizeof(igraph_real_t));
   igraph_vector_init(&bet, 0);
+  igraph_vector_init(&bbet, 0);
 
   igraph_betweenness(/*graph=*/ &g, /*res=*/ &bet, /*vids=*/ igraph_vss_all(), 
 		     /*directed=*/0, /*weights=*/ &weights, /*nobigint=*/ 1);
+
+  igraph_betweenness(/*graph=*/ &g, /*res=*/ &bbet, /*vids=*/ igraph_vss_all(), 
+		     /*directed=*/0, /*weights=*/ &weights, /*nobigint=*/ 0);
 
   igraph_vector_view(&bet2, nontriv_res, 
 		     sizeof(nontriv_res)/sizeof(igraph_real_t));
@@ -127,10 +186,12 @@ int main() {
   if (!igraph_vector_is_equal(&bet, &bet2)) {
     return 2;
   }
+
+  check(&bet, &bbet, 50);
   
   igraph_vector_destroy(&bet);
+  igraph_vector_destroy(&bbet);
   igraph_destroy(&g);
 
   return 0;
 }
-

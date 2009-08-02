@@ -68,6 +68,11 @@ AT_KEYWORDS([igraph_betweenness betweenness])
 AT_COMPILE_CHECK([simple/igraph_betweenness.c])
 AT_CLEANUP
 
+AT_SETUP([Betweenness, big integers (igraph_betweenness): ])
+AT_KEYWORDS([igraph_betweenness betweenness arbitrarily large integers biguint bigint])
+AT_COMPILE_CHECK([simple/biguint_betweenness.c])
+AT_CLEANUP
+
 AT_SETUP([Edge betweenness (igraph_edge_betweenness): ])
 AT_KEYWORDS([igraph_edge_betweenness betwenness])
 AT_COMPILE_CHECK([simple/igraph_edge_betweenness.c], 
