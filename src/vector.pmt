@@ -1978,6 +1978,8 @@ int FUNCTION(igraph_vector,intersect_sorted)(const TYPE(igraph_vector) *v1,
   return 0;
 }
 
+#if defined(OUT_FORMAT)
+
 int FUNCTION(igraph_vector,print)(const TYPE(igraph_vector) *v) {
   long int i, n=FUNCTION(igraph_vector,size)(v);
   if (n!=0) {
@@ -2001,3 +2003,5 @@ int FUNCTION(igraph_vector,fprint)(const TYPE(igraph_vector) *v, FILE *file) {
   fprintf(file, "\n");
   return 0;
 }
+
+#endif

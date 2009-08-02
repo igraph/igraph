@@ -142,3 +142,8 @@ AT_SETUP([Sparse matrix, ARPACK eigensolver (igraph_sparsemat_t): ])
 AT_KEYWORDS([sparse matrix igraph_sparsemat_t ARPACK])
 AT_COMPILE_CHECK([simple/igraph_sparsemat5.c], [simple/igraph_sparsemat5.out])
 AT_CLEANUP
+
+AT_SETUP([Arbitrarily big integers (igraph_biguint_t): ])
+AT_KEYWORDS([bignum bigint big integer arbitrarily])
+AT_COMPILE_CHECK([simple/biguint.c],[simple/biguint.out],[],[INTERNAL])
+AT_CLEANUP

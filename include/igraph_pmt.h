@@ -85,6 +85,14 @@
 #define ZERO 0
 #define ONE 1
 
+#elif defined(BASE_LIMB)
+#define BASE limb_t
+#define SHORT limb
+#define ATOMIC limb_t
+#define MULTIPLICITY 1
+#define ZERO 0
+#define ONE 1
+
 #else
 #error unknown BASE_ directive
 #endif

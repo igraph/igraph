@@ -92,7 +92,7 @@ HEADERS_PRIVATE = atlas-edges.h \
 		drl_Node_3d.h 		DensityGrid_3d.h \
 		vector.pmt matrix.pmt stack.pmt dqueue.pmt heap.pmt array.pmt \
 		igraph_types_internal.h \
-		foreign-dl-header.h
+		foreign-dl-header.h bignum.h bigint.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
@@ -165,7 +165,7 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     drl_layout_3d.cpp drl_graph_3d.cpp \
 			     DensityGrid_3d.cpp \
 			     foreign-dl-parser.y foreign-dl-lexer.l \
-			     $(CS) sparsemat.c mixing.c
+			     $(CS) sparsemat.c mixing.c bigint.c bignum.c
 
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -Wall
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -Wall
