@@ -1621,6 +1621,8 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
 
   } /* for source < no_of_nodes */
 
+  IGRAPH_PROGRESS("Betweenness centrality: ", 100.0, 0);
+
   /* clean  */
   igraph_Free(distance);
   if (nobigint) {
@@ -1804,6 +1806,8 @@ int igraph_edge_betweenness_estimate_weighted(const igraph_t *graph,
       VECTOR(*result)[j] /= 2.0;
     }
   }
+
+  IGRAPH_PROGRESS("Edge betweenness centrality: ", 100.0, 0);
 
   igraph_stack_destroy(&S);
   igraph_2wheap_destroy(&Q);
