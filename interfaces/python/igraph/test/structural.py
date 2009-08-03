@@ -316,6 +316,19 @@ class PathTests(unittest.TestCase):
         self.failUnless(g.shortest_paths(weights="weight", target=[2,3]) ==
                 [row[2:4] for row in expected])
 
+    def testGetShortestPaths(self):
+        g = Graph(4, [(0,1), (0,2), (1,3), (3,2), (2,1)], directed=True)
+        sps = g.get_shortest_paths(0)
+        expected = [[0], [0, 1], [0, 2], [0, 1, 3]]
+        self.failUnless(sps == expected)
+        sps = g.get_shortest_paths(0, output="vpath")
+        expected = [[0], [0, 1], [0, 2], [0, 1, 3]]
+        self.failUnless(sps == expected)
+        sps = g.get_shortest_paths(0, output="epath")
+        expected = [[], [0], [1], [0, 2]]
+        self.failUnless(sps == expected)
+        self.assertRaises(ValueError, g.get_shortest_paths, 0, output="x")
+
     def testPathLengthHist(self):
         g = Graph.Tree(15, 2)
         h = g.path_length_hist()

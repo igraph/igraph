@@ -3498,82 +3498,100 @@ PyObject *igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *
                                                 self, PyObject * args,
                                                 PyObject * kwds)
 {
-  static char *kwlist[] = { "v", "weights", "mode", NULL };
+  static char *kwlist[] = { "v", "weights", "mode", "output", NULL };
   igraph_vector_t *res, *weights=0;
   igraph_neimode_t mode = IGRAPH_OUT;
   long from0, i, j;
   igraph_integer_t from;
-  PyObject *list, *item, *mode_o=Py_None, *weights_o=Py_None;
+  PyObject *list, *item, *mode_o=Py_None, *weights_o=Py_None,
+           *output_o=Py_None;
   long int no_of_nodes = igraph_vcount(&self->g);
-  igraph_vector_ptr_t ptrvec;
-
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|OO", kwlist, &from0, &weights_o,
-	                               &mode_o))
+  igraph_vector_ptr_t *ptrvec=0;
+  igraph_bool_t use_edges = 0;
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|OOO!", kwlist, &from0,
+        &weights_o, &mode_o, &PyString_Type, &output_o))
     return NULL;
+
+  if (output_o == 0 || output_o == Py_None ||
+      !strcmp(PyString_AsString(output_o), "vpath")) {
+    use_edges = 0;
+  } else if (!strcmp(PyString_AsString(output_o), "epath")) {
+    use_edges = 1;
+  } else {
+    PyErr_SetString(PyExc_ValueError, "output argument must be \"vpath\" or \"epath\"");
+    return NULL;
+  }
 
   if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
   
   if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
-      ATTRIBUTE_TYPE_EDGE)) return NULL; 
-  
-  from = (igraph_integer_t) from0;
-  res = (igraph_vector_t *) calloc(no_of_nodes, sizeof(igraph_vector_t));
-  if (!res) {
+      ATTRIBUTE_TYPE_EDGE)) return NULL;
+
+  ptrvec = (igraph_vector_ptr_t *) calloc(1, sizeof(igraph_vector_ptr_t));
+  if (!ptrvec) {
     PyErr_SetString(PyExc_MemoryError, "");
 	if (weights) { igraph_vector_destroy(weights); free(weights); }
     return NULL;
   }
 
-  if (igraph_vector_ptr_init(&ptrvec, no_of_nodes)) {
+  if (igraph_vector_ptr_init(ptrvec, no_of_nodes)) {
     PyErr_SetString(PyExc_MemoryError, "");
+    free(ptrvec);
+	if (weights) { igraph_vector_destroy(weights); free(weights); }
+    return NULL;
+  }
+
+  from = (igraph_integer_t) from0;
+  res = (igraph_vector_t *) calloc(no_of_nodes, sizeof(igraph_vector_t));
+  if (!res) {
+    PyErr_SetString(PyExc_MemoryError, "");
+    igraph_vector_ptr_destroy(ptrvec); free(ptrvec);
 	if (weights) { igraph_vector_destroy(weights); free(weights); }
     return NULL;
   }
 
   for (i = 0; i < no_of_nodes; i++) {
-    VECTOR(ptrvec)[i] = &res[i];
+    VECTOR(*ptrvec)[i] = &res[i];
     igraph_vector_init(&res[i], 0);
   }
 
-  if (igraph_get_shortest_paths_dijkstra(&self->g, &ptrvec, 0, from, igraph_vss_all(),
-	                                     weights, mode)) {
+  if (igraph_get_shortest_paths_dijkstra(&self->g, use_edges ? 0 : ptrvec,
+        use_edges ? ptrvec : 0, from, igraph_vss_all(), weights, mode)) {
     igraphmodule_handle_igraph_error();
     for (j = 0; j < no_of_nodes; j++) igraph_vector_destroy(&res[j]);
     free(res);
 	if (weights) { igraph_vector_destroy(weights); free(weights); }
+    igraph_vector_ptr_destroy(ptrvec);
+    free(ptrvec);
     return NULL;
   }
+
+  igraph_vector_ptr_destroy(ptrvec);
+  free(ptrvec);
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
 
   list = PyList_New(no_of_nodes);
   if (!list) {
     for (j = 0; j < no_of_nodes; j++) igraph_vector_destroy(&res[j]);
     free(res);
-	if (weights) { igraph_vector_destroy(weights); free(weights); }
     return NULL;
   }
 
   for (i = 0; i < no_of_nodes; i++) {
     item = igraphmodule_vector_t_to_PyList(&res[i], IGRAPHMODULE_TYPE_INT);
-    if (!item) {
+    if (!item || PyList_SetItem(list, i, item)) {
+      if (item) {
+        Py_DECREF(item);
+      }
       Py_DECREF(list);
       for (j = 0; j < no_of_nodes; j++) igraph_vector_destroy(&res[j]);
       free(res);
-	  if (weights) { igraph_vector_destroy(weights); free(weights); }
-      return NULL;
-    }
-    if (PyList_SetItem(list, i, item)) {
-      Py_DECREF(list);
-      for (j = 0; j < no_of_nodes; j++) igraph_vector_destroy(&res[j]);
-      free(res);
-	  if (weights) { igraph_vector_destroy(weights); free(weights); }
       return NULL;
     }
   }
 
   for (j = 0; j < no_of_nodes; j++) igraph_vector_destroy(&res[j]);
   free(res);
-  if (weights) { igraph_vector_destroy(weights); free(weights); }
-  igraph_vector_ptr_destroy(&ptrvec);
   return list;
 }
 
@@ -9388,7 +9406,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   // interface to igraph_get_shortest_paths
   {"get_shortest_paths", (PyCFunction) igraphmodule_Graph_get_shortest_paths,
    METH_VARARGS | METH_KEYWORDS,
-   "get_shortest_paths(v, weights=None, mode=OUT)\n\n"
+   "get_shortest_paths(v, weights=None, mode=OUT, output=\"vpath\")\n\n"
    "Calculates the shortest paths from/to a given node in a graph.\n\n"
    "@param v: the source/destination for the calculated paths\n"
    "@param weights: edge weights in a list or the name of an edge attribute\n"
@@ -9397,10 +9415,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param mode: the directionality of the paths. L{IN} means to\n"
    "  calculate incoming paths, L{OUT} means to calculate outgoing\n"
    "  paths, L{ALL} means to calculate both ones.\n"
-   "@return: at most one shortest path for every node in the graph in a\n"
-   "list. For unconnected graphs, some of the list elements will be\n"
-   "empty lists. Note that in case of mode=L{IN}, the nodes in a path\n"
-   "are returned in reversed order!"},
+   "@param output: determines what should be returned. If this is\n"
+   "  C{\"vpath\"}, a list of vertex IDs will be returned, one path\n"
+   "  for each target vertex. For unconnected graphs, some of the list\n"
+   "  elements may be empty. Note that in case of mode=L{IN}, the nodes\n"
+   "  in a path are returned in reversed order. If C{output=\"epath\"},\n"
+   "  edge IDs are returned instead of vertex IDs.\n"
+   "@return: see the documentation of the C{output} parameter.\n"},
 
   // interface to igraph_get_all_shortest_paths
   {"get_all_shortest_paths",
