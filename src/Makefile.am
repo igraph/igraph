@@ -88,6 +88,7 @@ HEADERS_PRIVATE = atlas-edges.h \
 		walktrap_heap.h \
 		igraph_arpack_internal.h	igraph_f2c.h \
 		igraph_math.h \
+		drl_layout.h drl_parse.h drl_graph.h \
 		drl_graph_3d.h		drl_layout_3d.h \
 		drl_Node_3d.h 		DensityGrid_3d.h \
 		vector.pmt matrix.pmt stack.pmt dqueue.pmt heap.pmt array.pmt \
