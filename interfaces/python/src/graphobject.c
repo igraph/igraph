@@ -2821,17 +2821,20 @@ PyObject *igraphmodule_Graph_average_path_length(igraphmodule_GraphObject *
 PyObject *igraphmodule_Graph_betweenness(igraphmodule_GraphObject * self,
                                          PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] = { "vertices", "directed", "cutoff", "weights", NULL };
+  static char *kwlist[] = { "vertices", "directed", "cutoff", "weights",
+    "nobigint", NULL };
   PyObject *directed = Py_True;
   PyObject *vobj = Py_None, *list;
   PyObject *cutoff = Py_None;
   PyObject *weights_o = Py_None;
+  PyObject *nobigint = Py_True;
   igraph_vector_t res, *weights = 0;
   igraph_bool_t return_single = 0;
   igraph_vs_t vs;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOO", kwlist,
-                                   &vobj, &directed, &cutoff, &weights_o)) {
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOOO", kwlist,
+                                   &vobj, &directed, &cutoff, &weights_o,
+                                   &nobigint)) {
     return NULL;
   }
 
@@ -2851,7 +2854,8 @@ PyObject *igraphmodule_Graph_betweenness(igraphmodule_GraphObject * self,
   }
 
   if (cutoff == Py_None) {
-    if (igraph_betweenness(&self->g, &res, vs, PyObject_IsTrue(directed), weights)) {
+    if (igraph_betweenness(&self->g, &res, vs, PyObject_IsTrue(directed),
+          weights, PyObject_IsTrue(nobigint))) {
       igraph_vs_destroy(&vs);
       igraph_vector_destroy(&res);
       if (weights) { igraph_vector_destroy(weights); free(weights); }
@@ -2867,7 +2871,8 @@ PyObject *igraphmodule_Graph_betweenness(igraphmodule_GraphObject * self,
       return NULL;
     }
     if (igraph_betweenness_estimate(&self->g, &res, vs, PyObject_IsTrue(directed),
-        (igraph_integer_t)PyInt_AsLong(cutoff_num), weights)) {
+        (igraph_integer_t)PyInt_AsLong(cutoff_num), weights,
+        PyObject_IsTrue(nobigint))) {
       igraph_vs_destroy(&vs);
       igraph_vector_destroy(&res);
       if (weights) { igraph_vector_destroy(weights); free(weights); }
@@ -9137,7 +9142,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_betweenness[_estimate] */
   {"betweenness", (PyCFunction) igraphmodule_Graph_betweenness,
    METH_VARARGS | METH_KEYWORDS,
-   "betweenness(vertices=None, directed=True, cutoff=None, weights=None)\n\n"
+   "betweenness(vertices=None, directed=True, cutoff=None, weights=None, nobigint=True)\n\n"
    "Calculates or estimates the betweenness of nodes in a graph.\n\n"
    "Keyword arguments:\n"
    "@param vertices: the vertices for which the betweennesses must be returned.\n"
@@ -9149,6 +9154,12 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  returned.\n"
    "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
    "  even an edge attribute name.\n"
+   "@param nobigint: if C{True}, igraph uses the longest available integer\n"
+   "  type on the current platform to count shortest paths. For some large\n"
+   "  networks that have a specific structure, the counters may overflow.\n"
+   "  To prevent this, use C{nobigint=False}, which forces igraph to use\n"
+   "  arbitrary precision integers at the expense of increased computation\n"
+   "  time.\n"
    "@return: the (possibly estimated) betweenness of the given nodes in a list\n"},
 
   /* interface to biconnected_components */
