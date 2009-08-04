@@ -53,6 +53,7 @@ char *igraph_i_lgl_errmsg=0;
 int igraph_lgl_yyerror(char *s);
 #include "igraph_types.h" 
 #include "igraph_types_internal.h"
+#include "igraph_math.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "config.h"

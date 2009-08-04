@@ -45,6 +45,11 @@ __BEGIN_DECLS
 double igraph_i_fdiv(const double a, const double b);
 double igraph_i_round(double X);
 
+#ifdef _MSC_VER
+int igraph_i_snprintf(char *buffer, size_t count, const char *format, ...);
+#define snprintf igraph_i_snprintf
+#endif
+
 double igraph_log2(const double a);
 long double igraph_logbl(long double a);
 double igraph_log1p(double a);
