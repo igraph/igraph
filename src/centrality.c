@@ -1597,7 +1597,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
 	    tmpscore[neighbor] = IGRAPH_INFINITY;
 	  } else {
 	    double div;
-	    int shift=100000;
+	    int shift=1000000000L;
 	    IGRAPH_CHECK(igraph_biguint_mul_limb(&T, &big_nrgeo[neighbor], 
 						 shift));	  
 	    igraph_biguint_div(&D, &R, &T, &big_nrgeo[actnode]);
