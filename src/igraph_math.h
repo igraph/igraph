@@ -26,6 +26,7 @@
 
 #include "config.h"
 #include <math.h>
+#include <stddef.h>
 
 #undef __BEGIN_DECLS
 #undef __END_DECLS
