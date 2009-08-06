@@ -844,17 +844,33 @@ static int igraphmodule_i_attribute_get_info(const igraph_t *graph,
       k=PyList_Size(keys);
       igraph_vector_init(t, k);
       for (j=0; j<k; j++) {
-	int is_numeric = 1; 
-	values=PyDict_GetItem(dict, PyList_GetItem(keys, j));
-	if (PyList_Check(values)) {
-	  m=PyList_Size(values);
-	  for (l=0; l<m && is_numeric; l++) {
-	    o=PyList_GetItem(values, l);
-	    if (o != Py_None && !PyNumber_Check(o)) is_numeric=0;
-	  }
-	} else if (o != Py_None && !PyNumber_Check(values)) is_numeric=0;
-      
-	VECTOR(*t)[j]=is_numeric ? IGRAPH_ATTRIBUTE_NUMERIC : IGRAPH_ATTRIBUTE_STRING;
+        int is_numeric = 1;
+        int is_string = 1;
+        values=PyDict_GetItem(dict, PyList_GetItem(keys, j));
+        if (PyList_Check(values)) {
+          m=PyList_Size(values);
+          for (l=0; l<m && is_numeric; l++) {
+            o=PyList_GetItem(values, l);
+            if (o != Py_None && !PyNumber_Check(o))
+              is_numeric=0;
+          }
+          for (l=0; l<m && is_string; l++) {
+            o=PyList_GetItem(values, l);
+            if (o != Py_None && !PyString_Check(o) && !PyUnicode_Check(o))
+              is_string=0;
+          }
+        } else {
+          if (values != Py_None && !PyNumber_Check(values))
+            is_numeric=0;
+          if (values != Py_None && !PyString_Check(values) && !PyUnicode_Check(values))
+            is_string=0;
+        }
+        if (is_numeric)
+          VECTOR(*t)[j] = IGRAPH_ATTRIBUTE_NUMERIC;
+        else if (is_string)
+          VECTOR(*t)[j] = IGRAPH_ATTRIBUTE_STRING;
+        else
+          VECTOR(*t)[j] = IGRAPH_ATTRIBUTE_PY_OBJECT;
       }
     }
     
@@ -887,7 +903,7 @@ int igraphmodule_i_attribute_get_type(const igraph_t *graph,
 				      igraph_attribute_elemtype_t elemtype,
 				      const char *name) {
   long int attrnum, i, j;
-  int is_numeric;
+  int is_numeric, is_string;
   PyObject *o, *dict;
   switch (elemtype) {
   case IGRAPH_ATTRIBUTE_GRAPH: attrnum=0; break;
@@ -898,7 +914,7 @@ int igraphmodule_i_attribute_get_type(const igraph_t *graph,
   dict = ((PyObject**)graph->attr)[attrnum];
   o = PyDict_GetItemString(dict, name);
   if (o == 0) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
-  is_numeric = 1;
+  is_numeric = is_string = 1;
   if (attrnum>0) {
     if (!PyList_Check(o)) IGRAPH_ERROR("attribute hash type mismatch", IGRAPH_EINVAL);
     if (!PyList_Size(o))  IGRAPH_ERROR("attribute hash type mismatch", IGRAPH_EINVAL);
@@ -907,11 +923,22 @@ int igraphmodule_i_attribute_get_type(const igraph_t *graph,
       PyObject *item = PyList_GET_ITEM(o, i);
       if (item != Py_None && !PyNumber_Check(item)) is_numeric=0;
     }
-  } else if (o != Py_None && !PyNumber_Check(o)) is_numeric=0;
+    for (i=0; i<j && is_string; i++) {
+      PyObject *item = PyList_GET_ITEM(o, i);
+      if (item != Py_None && !PyString_Check(item) && !PyUnicode_Check(item))
+        is_string=0;
+    }
+  } else {
+    if (o != Py_None && !PyNumber_Check(o)) is_numeric=0;
+    if (o != Py_None && !PyString_Check(o) && !PyUnicode_Check(o))
+      is_string=0;
+  }
   if (is_numeric)
     *type = IGRAPH_ATTRIBUTE_NUMERIC;
-  else
+  else if (is_string)
     *type = IGRAPH_ATTRIBUTE_STRING;
+  else
+    *type = IGRAPH_ATTRIBUTE_PY_OBJECT;
   return 0;
 }
 
@@ -946,7 +973,11 @@ int igraphmodule_i_get_string_graph_attr(const igraph_t *graph,
   o = PyDict_GetItemString(dict, name);
   if (!o) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   IGRAPH_CHECK(igraph_strvector_resize(value, 1));
-  result = PyObject_Str(o);
+  if (PyUnicode_Check(o)) {
+    result = PyUnicode_AsUTF8String(o);
+  } else {
+    result = PyObject_Str(o);
+  }
   if (result) {
     IGRAPH_CHECK(igraph_strvector_set(value, 0, PyString_AsString(result)));
     Py_DECREF(result);
@@ -1021,7 +1052,12 @@ int igraphmodule_i_get_string_vertex_attr(const igraph_t *graph,
     IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_VIT_SIZE(it)));
     while (!IGRAPH_VIT_END(it)) {
       long int v=IGRAPH_VIT_GET(it);
-      result = PyObject_Str(PyList_GetItem(list, v));
+      PyObject* item = PyList_GetItem(list, v);
+      if (PyUnicode_Check(item)) {
+        result = PyUnicode_AsUTF8String(item);
+      } else {
+        result = PyObject_Str(item);
+      }
       igraph_strvector_set(value, i, PyString_AsString(result));
       Py_XDECREF(result);
       IGRAPH_VIT_NEXT(it);
@@ -1100,7 +1136,12 @@ int igraphmodule_i_get_string_edge_attr(const igraph_t *graph,
     IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_EIT_SIZE(it)));
     while (!IGRAPH_EIT_END(it)) {
       long int v=IGRAPH_EIT_GET(it);
-      result = PyObject_Str(PyList_GetItem(list, v));
+      PyObject *item = PyList_GetItem(list, v);
+      if (PyUnicode_Check(item)) {
+        result = PyUnicode_AsUTF8String(item);
+      } else {
+        result = PyObject_Str(item);
+      }
       igraph_strvector_set(value, i, PyString_AsString(result));
       Py_XDECREF(result);
       IGRAPH_EIT_NEXT(it);
