@@ -33,6 +33,8 @@
 
 int igraph_i_arpack_err_dsaupd(long int error) {
   switch (error) {
+  case  1:      return IGRAPH_ARPACK_MAXIT;
+  case  3:      return IGRAPH_ARPACK_NOSHIFT;
   case -1:      return IGRAPH_ARPACK_NPOS;
   case -2:      return IGRAPH_ARPACK_NEVNPOS;
   case -3:      return IGRAPH_ARPACK_NCVSMALL;
