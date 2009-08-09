@@ -794,8 +794,8 @@ class JavaCodeGenerator(CodeGenerator):
                 continue
             tdesc = self.types.get(type_name, {})
             if not tdesc.has_key(type_param):
-                raise StimulusError, "%s: unknown input type %s, skipping" % \
-                  (data["name"], type_name)
+                raise StimulusError, "%s: unknown input type %s (needs %s), skipping" % \
+                  (data["name"], type_name, type_param)
             method_arguments.append(" ".join([tdesc[type_param], p]))
         data["argument_types"] = method_arguments
 

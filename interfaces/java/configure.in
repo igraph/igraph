@@ -1,7 +1,11 @@
 m4_include(config/java.m4)
 
 AC_INIT([igraph-java-wrapper], 0.6, ntamas@rmki.kfki.hu)
-AC_CONFIG_SRCDIR(src/hu_kfki_rmki_cneuro_igraph_Graph.c.in)
+AC_CONFIG_SRCDIR(src/c/net_sourceforge_igraph_Graph.c.in)
+
+if test -f configure; then
+  AC_MSG_ERROR([Only out-of-tree builds are supported.])
+fi
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -17,7 +21,7 @@ AC_SUBST(HAVE_FMEMOPEN)
 AC_CHECK_FUNCS(open_memstream, [HAVE_OPEN_MEMSTREAM=1], [HAVE_OPEN_MEMSTREAM=0])
 AC_SUBST(HAVE_OPEN_MEMSTREAM)
 
-JAVA_PACKAGE=hu.kfki.rmki.cneuro.igraph
+JAVA_PACKAGE=net.sourceforge.igraph
 AC_SUBST(JAVA_PACKAGE)
 JAVA_PACKAGE_DOT=$JAVA_PACKAGE
 AC_SUBST(JAVA_PACKAGE_DOT)
@@ -75,7 +79,7 @@ LDFLAGS="$OLDLDFLAGS"
 AC_SUBST(IGRAPH_CFLAGS)
 AC_SUBST(IGRAPH_LIBS)
 
-AC_CONFIG_FILES([Makefile manifest])
+AC_CONFIG_FILES([Makefile manifest src/c/config.h])
 
 AC_OUTPUT
 

@@ -32,24 +32,19 @@ or finish it completely.
 
 */
 
-package hu.kfki.rmki.cneuro.igraph;
+#ifndef CONCAT2
+#  define CONCAT2x(a,b)     a ## _ ## b
+#  define CONCAT2(a,b)      CONCAT2x(a,b)
+#endif
 
-public class Graph {
-    private long handle=0; // handle to the underlying igraph_t object
-  
-    private Graph(long handle) { this.handle = handle; }
-    private native void destroy();
-  
-    @Override protected void finalize() throws Throwable {
-        if (handle != 0) destroy();
-        super.finalize();
-    }
-  
-    /* stimulus.py generated part starts here */
-    %STIMULUS%
-    /* stimulus.py generated part ends here */
-  
-    static {
-        System.loadLibrary("igraph-java-wrapper");
-    }
-}
+#ifndef CONCAT3
+#  define CONCAT3x(a,b,c)   a ## _ ## b ## _ ## c
+#  define CONCAT3(a,b,c)    CONCAT3x(a,b,c)
+#endif
+
+#ifndef CONCAT4
+#  define CONCAT4x(a,b,c,d) a ## _ ## b ## _ ## c ## _ ## d
+#  define CONCAT4(a,b,c,d)  CONCAT4x(a,b,c)
+#endif
+
+#define FUNCTION(a) CONCAT3(Java, JAVA_TYPE, a)

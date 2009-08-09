@@ -82,23 +82,32 @@ ERROR:
   CTYPE: int
 
 ##################################
-# CONNECTEDNESS
+# ENUMS
 
 CONNECTEDNESS:
   CTYPE: igraph_connectedness_t
+  JAVATYPE: jobject
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C% = Java_Connectedness_to_igraph(env, %I%);
 
 NEIMODE:
-  CTYPE: igraph_integer_t
+  CTYPE: igraph_neimode_t
+  JAVATYPE: jobject
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C% = Java_NeighborMode_to_igraph(env, %I%);
+
+STARMODE:
+  CTYPE: igraph_star_mode_t
+  JAVATYPE: jobject
+  INCONV:
+    IN: %C% = Java_StarMode_to_igraph(env, %I%);
 
 ##################################
 # VECTOR of real values
 
 VECTOR:
   CTYPE: igraph_vector_t
+  # JAVATYPE: jdoubleArray
   CALL: &%C%
   INCONV:
     IN: R_SEXP_to_vector(%I%, &%C%);
