@@ -32,14 +32,29 @@ or finish it completely.
 
 */
 
+#include "net_sf_igraph_enums.h"
+
+#define JAVA_TYPE Connectedness
+#define JAVA_TYPE_STRING "Connectedness"
+#define C_TYPE igraph_connectedness_t
+#include "net_sf_igraph_enum_impl.pmt"
+#undef JAVA_TYPE_STRING
+#undef JAVA_TYPE
+#undef C_TYPE
+
 #define JAVA_TYPE NeighborMode
+#define JAVA_TYPE_STRING "NeighborMode"
 #define C_TYPE igraph_neimode_t
-#include "net_sourceforge_igraph_enum.pmt"
+#include "net_sf_igraph_enum_impl.pmt"
+#undef JAVA_TYPE_STRING
 #undef JAVA_TYPE
 #undef C_TYPE
 
 #define JAVA_TYPE StarMode
+#define JAVA_TYPE_STRING "StarMode"
 #define C_TYPE igraph_star_mode_t
-#include "net_sourceforge_igraph_enum.pmt"
+#include "net_sf_igraph_enum_impl.pmt"
+#undef JAVA_TYPE_STRING
 #undef JAVA_TYPE
 #undef C_TYPE
+

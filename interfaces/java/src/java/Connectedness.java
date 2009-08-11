@@ -32,7 +32,7 @@ or finish it completely.
 
 */
 
-package net.sourceforge.igraph;
+package net.sf.igraph;
 
 /// Proxy class for igraph_connectedness_t
 public enum Connectedness {

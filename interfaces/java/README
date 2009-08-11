@@ -34,10 +34,10 @@ Compilation steps
 
 First, compile and install the C core of igraph (see the corresponding
 [documentation](http://cneurocvs.rmki.kfki.hu/igraph). After that,
-do the usual `./configure && make` cycle in order to compile the Java
-interface. This should generate two files in the `build/` subdirectory:
+change to `interfaces/java` and type `ant build`.
+This should generate two files in the `dist/` subdirectory:
 
-* `igraph-0.5.jar` (substitute the appropriate version number of course).
+* `igraph-0.6.jar` (substitute the appropriate version number of course).
   This contains the platform-independent compiled class files. Put it
   wherever you want in your classpath.
     
@@ -50,23 +50,13 @@ interface. This should generate two files in the `build/` subdirectory:
   path by passing `-Djava.library.path=whatever` to the Java
   interpreter when executing an igraph-based program.
   
-`./configure` might fail stating that igraph is not installed on your
+`ant` might fail stating that igraph is not installed on your
 system. In that case, you must specify explicitly where igraph is
-to be found by using `./configure --with-igraph=whatever`. E.g., if
-you installed the igraph libraries in `/opt/igraph/lib` and the
-igraph include files in `/opt/igraph/include`, you must use
-`./configure --with-igraph=/opt/igraph`. On Linux and OS X, the
-configure script will try to determine the igraph path by using
-`pkg-config` (if you installed that).
-
-In case `./configure` does not find your Java interpreter, you should
-put or symlink it to somewhere in your shell path (igraph needs
-access to `java`, `javac`, `javah` and `jar`), or set the `JAVA_HOME`
-environment variable to the appropriate directory.
+to be found by tweaking the appropriate properties in `build.xml`.
 
 Bugs, suggestions
 -----------------
 
-Drop me a mail at <ntamas@rmki.kfki.hu> if something sucks. Contact
+Drop me a mail at <tamas@cs.rhul.ac.uk> if something sucks. Contact
 me also if you find this a great idea and want to complete it for
 the benefit of the whole open source community :)

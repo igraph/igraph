@@ -32,7 +32,7 @@ or finish it completely.
 
 */
 
-package net.sourceforge.igraph;
+package net.sf.igraph;
 
 public class CoreException extends Exception {
     public CoreException() { super(); }

@@ -35,7 +35,7 @@ or finish it completely.
 #include <igraph/igraph.h>
 #include <stdlib.h>    /* calloc */
 #include "config.h"
-#include "net_sourceforge_igraph_Graph.h"
+#include "net_sf_igraph_Graph.h"
 
 /************************** STATIC VARIABLES ***************************/
 

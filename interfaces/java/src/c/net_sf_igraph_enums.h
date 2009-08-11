@@ -1,7 +1,6 @@
-/* -*- mode: C -*-  */
 /* 
    IGraph library Java interface.
-   Copyright (C) 2007-2009  Tamas Nepusz <ntamas@rmki.kfki.hu>
+   Copyright (C) 2007  Tamas Nepusz <ntamas@rmki.kfki.hu>
    MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
    
    This program is free software; you can redistribute it and/or modify
@@ -33,12 +32,14 @@ or finish it completely.
 
 */
 
-#include <jni.h>
-#include "config.h"
-#include <igraph/igraph_constants.h>
-#include "net_sourceforge_igraph_pmt.h"
+#define JAVA_TYPE NeighborMode
+#define C_TYPE igraph_neimode_t
+#include "net_sf_igraph_enum.pmt"
+#undef JAVA_TYPE
+#undef C_TYPE
 
-jint FUNCTION(OnLoad)(JNIEnv *env);
-void FUNCTION(OnUnload)(JNIEnv *env);
-C_TYPE FUNCTION(to_igraph)(JNIEnv *env, jobject jobj);
-
+#define JAVA_TYPE StarMode
+#define C_TYPE igraph_star_mode_t
+#include "net_sf_igraph_enum.pmt"
+#undef JAVA_TYPE
+#undef C_TYPE

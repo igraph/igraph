@@ -32,7 +32,7 @@ or finish it completely.
 
 */
 
-package net.sourceforge.igraph;
+package net.sf.igraph;
 
 public class Graph {
     private long handle=0; // handle to the underlying igraph_t object

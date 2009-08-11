@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Extension-Name: @JAVA_PACKAGE@
-Implementation-Version: @VERSION@
-Main-Class: net.sourceforge.igraph.Test

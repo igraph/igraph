@@ -32,7 +32,7 @@ or finish it completely.
 
 */
 
-package net.sourceforge.igraph;
+package net.sf.igraph;
 
 /// Proxy class for igraph_star_mode_t
 public enum StarMode {

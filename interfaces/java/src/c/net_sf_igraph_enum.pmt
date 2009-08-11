@@ -1,6 +1,7 @@
+/* -*- mode: C -*-  */
 /* 
    IGraph library Java interface.
-   Copyright (C) 2007  Tamas Nepusz <ntamas@rmki.kfki.hu>
+   Copyright (C) 2007-2009  Tamas Nepusz <ntamas@rmki.kfki.hu>
    MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
    
    This program is free software; you can redistribute it and/or modify
@@ -32,45 +33,12 @@ or finish it completely.
 
 */
 
-#include "net_sourceforge_igraph_pmt.h"
+#include <jni.h>
+#include "config.h"
+#include <igraph/igraph_constants.h>
+#include "net_sf_igraph_pmt.h"
 
-/************************** STATIC VARIABLES ***************************/
-
-#define CLASSVAR CONCAT3(igraph, JAVA_TYPE, class)
-#define FIELDVAR CONCAT3(igraph, JAVA_TYPE, numericValue_fid)
-
-static jclass CLASSVAR;
-static jfieldID FIELDVAR;
-
-/************************ CONVERSION ROUTINES **************************/
-
-/*
- * Initializes the locally cached field IDs
- */
-jint FUNCTION(OnLoad)(JNIEnv *env) {
-  jclass cls;
-
-  cls = (*env)->FindClass(env, JAVA_PACKAGE_PREFIX "/" JAVA_TYPE_STRING);
-  if (cls == 0) return JNI_ERR;
-  CLASSVAR = (*env)->NewWeakGlobalRef(env, cls);
-  if (CLASSVAR == 0) return JNI_ERR;
-  FIELDVAR = (*env)->GetFieldID(env, cls, "numericValue", "I");
-  if (FIELDVAR == 0) return JNI_ERR;
-}
-
-/*
- * Releases the weak references held
- */
-void FUNCTION(OnUnload)(JNIEnv *env) {
-  (*env)->DeleteWeakGlobalRef(env, CLASSVAR);
-  CLASSVAR = 0;
-}
-
-/*
- * Converts a Java enum type to an igraph enum type
- */
-C_TYPE FUNCTION(to_igraph)(JNIEnv *env, jobject jobj) {
-  return (*env)->GetIntField(env, jobj, FIELDVAR);
-}
-
+jint FUNCTION(OnLoad)(JNIEnv *env);
+void FUNCTION(OnUnload)(JNIEnv *env);
+C_TYPE FUNCTION(to_igraph)(JNIEnv *env, jobject jobj);
 

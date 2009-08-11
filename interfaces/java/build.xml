@@ -1,0 +1,167 @@
+<?xml version="1.0"?>
+<project name="igraph Java interface" default="usage" basedir="."
+	xmlns:cpptasks="antlib:net.sf.antcontrib.cpptasks">
+
+	<!-- Package name and version number -->
+	<property name="package.name" value="net.sf.igraph" />
+	<property name="package.slashed.name" value="net/sf/igraph" />
+	<property name="package.underscored.name" value="net_sf_igraph" />
+	<property name="package.version" value="0.6" />
+
+	<!-- Directories -->
+	<property name="src" location="src" />
+	<property name="build" location="build" />
+	<property name="dist" location="dist" />
+
+	<!-- Access to environment -->
+	<property environment="os" />
+
+	<!-- Include and library paths -->
+	<property name="igraph.include.path" location="../../include" />
+	<property name="igraph.library.path" location="${os.HOME}/lib" />
+
+	<!-- External tools -->
+	<property name="python.executable" value="python" />
+	<property name="stimulus.script" location="../../tools/stimulus.py" />
+	
+	<!-- Other configuration stuff -->
+	<property name="libtype" value="shared" />
+
+	<!-- DON'T CHANGE ANYTHING BELOW THIS LINE -->
+	<property name="java.home" value="${os.JAVA_HOME}" />
+	<condition property="jni.library.name" value="igraph-java-wrapper.jnilib">
+		<and><os family="mac" /><os family="unix" /></and>
+	</condition>
+	<condition property="jni.library.name" value="igraph-java-wrapper.dll">
+		<os family="windows" />
+	</condition>
+	<condition property="jni.library.name" value="igraph-java-wrapper.dll">
+		<os family="unix" />
+	</condition>
+
+	<!-- Initializes the build tree, creates the necessary directories -->
+	<target name="-init" description="Initializes the build process">
+		<mkdir dir="${build}" />
+		<mkdir dir="${build}/java" />
+		<mkdir dir="${build}/c" />
+		<mkdir dir="${dist}" />
+	</target>
+
+	<!-- Deletes the existing build -->
+	<target name="clean" description="Cleans up the build directories">
+		<!-- Delete build directories -->
+		<delete dir="${build}/java" />
+		<delete dir="${build}/c" />
+		<delete dir="${build}" />
+		<delete dir="${dist}" />
+		<!-- Delete generated source files -->
+		<delete file="${src}/java/Graph.java" />
+		<delete file="${src}/c/config.h" />
+		<delete file="${src}/c/net_sf_igraph_Graph.h" />
+	</target>
+
+	<!-- Generates some Java source files -->
+	<target name="generate_java_source">
+		<exec executable="${python.executable}" failonerror="true">
+			<arg value="${stimulus.script}" />
+			<arg value="-f" />
+			<arg value="../functions.def" />
+			<arg value="-i" />
+			<arg value="${src}/java/Graph.java.in" />
+			<arg value="-o" />
+			<arg value="${src}/java/Graph.java" />
+			<arg value="-t" />
+			<arg value="types-Java.def" />
+			<arg value="-l" />
+			<arg value="JavaJava" />
+		</exec>
+	</target>
+
+	<!-- Generates some C source files -->
+	<target name="generate_c_source">
+		<copy file="${src}/c/config.h.in" tofile="${src}/c/config.h" />
+		<replace file="${src}/c/config.h" token="@JAVA_PACKAGE_PREFIX"
+			value="${package.slashed.name}" />
+
+		<javah class="${package.name}.Graph" destdir="${src}/c" verbose="yes" force="yes">
+			<classpath location="${build}/java" />
+		</javah>
+
+		<exec executable="${python.executable}" failonerror="true">
+			<arg value="${stimulus.script}" />
+			<arg value="-f" />
+			<arg value="../functions.def" />
+			<arg value="-i" />
+			<arg value="${src}/c/${package.underscored.name}_Graph.c.in" />
+			<arg value="-o" />
+			<arg value="${src}/c/${package.underscored.name}_Graph.c" />
+			<arg value="-t" />
+			<arg value="types-C.def" />
+			<arg value="-l" />
+			<arg value="JavaC" />
+		</exec>
+	</target>
+
+	<!-- Compiles the Java source code -->
+	<target name="compile_java" depends="-init, generate_java_source"
+		description="--> compile Java code">
+		<javac srcdir="${src}/java" destdir="${build}/java" />
+	</target>
+
+	<!-- Compiles the C source code -->
+	<target name="compile_c" depends="-init, generate_c_source, compile_java"
+		description="--> compile C code">
+		<cpptasks:cc outtype="${libtype}" subsystem="console"
+			multithreaded="true" optimize="speed"
+			objdir="${build}/c"
+			outfile="${build}/igraph-java-wrapper"
+			outputfileproperty="jni.library.outfile">
+			<fileset dir="${src}/c" includes="*.c" />
+			<cpptasks:includepath>
+				<path path="${igraph.include.path}" />
+				<path path="${java.home}/include" />
+			</cpptasks:includepath>
+			<cpptasks:linker libtool="true">
+				<libset libs="igraph" type="shared" dir="${igraph.library.path}" />
+			</cpptasks:linker>
+		</cpptasks:cc>
+		<move file="${jni.library.outfile}" tofile="${build}/${jni.library.name}" />
+	</target>
+
+	<!-- Compiles the whole thing -->
+	<target name="compile" depends="compile_java, compile_c" description="Compiles all the source files">
+	</target>
+
+	<!-- Creates the JAR file -->
+	<target name="jar" depends="compile" description="Creates the JAR file">
+		<jar destfile="${dist}/igraph-${package.version}.jar" basedir="${build}/java">
+			<manifest>
+				<attribute name="Manifest-Version" value="1.0" />
+				<attribute name="Extension-Name" value="${package.name}" />
+				<attribute name="Implementation-Version" value="${package.version}" />
+				<attribute name="Main-Class" value="${package.name}.TestSuite" />
+			</manifest>
+		</jar>
+		<copy file="${build}/${jni.library.name}" todir="${dist}" />
+	</target>
+
+	<!-- Tests the whole thing -->
+	<target name="test" depends="compile" description="Runs JUnit tests in the distribution">
+		<junit printsummary="yes" fork="yes" haltonfailure="yes">
+			<classpath refid="lib/junit.jar" />
+			<formatter type="plain" />
+			<test name="${package.name}.TestSuite" />
+		</junit>
+	</target>
+
+	<!-- Main targets -->
+	<target name="build" depends="compile, jar" description="Builds the whole project" />
+	<target name="rebuild" depends="clean, build" description="Rebuilds the project from scratch" />
+
+	<!-- Usage information target -->
+	<target name="usage" description="Display usage information">
+		<echo message="  Execute 'ant -projecthelp' for build file help." />
+		<echo message="  Execute 'ant -help' for Ant hellp." />
+	</target>
+	<target name="help" depends="usage" />
+</project>
