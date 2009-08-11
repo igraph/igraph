@@ -1,0 +1,194 @@
+#!/bin/bash
+#
+# Nightly build script for igraph branches.
+# 
+# Requirements:
+# - a valid Google Code account with password and upload access to the
+#   igraph project
+# - googlecode_upload.py
+# - passwordless access to igraph's Bazaar repository at Launchpad
+#
+# TODO:
+# - collect output and put it online as well
+
+## Some functions
+usage() {
+    echo >&2 "Usage: `basename $0` [-f] [-t] [-i interfaces] working-directory"
+	echo >&2 ""
+	echo >&2 "Options:"
+	echo >&2 "  -f: force upload (even if nothing has changed)"
+	echo >&2 "  -t: test only, don't upload"
+	echo >&2 "  -i: compile and upload only the specified interfaces."
+	echo >&2 "      Must be a comma-separated list of the following:"
+	echo >&2 "      c, r, python."
+}
+
+## default options
+force=no
+upload=yes
+interfaces="c,r"
+
+## handle options
+while getopts fi:t o
+do
+    case "$o" in
+	f)    force=yes;;
+	i)    interfaces=$OPTARG;;
+	t)    upload=no;;
+	[?])  usage
+	      exit 1;;
+    esac
+done
+shift $(($OPTIND-1))
+	    
+
+## do we have the argument?
+if [ $# -eq 0 ]; then
+    usage
+    exit 1
+fi
+
+## check required environment variables
+if [ x$GC_USERNAME == x ]; then
+    echo "Please set the GC_USERNAME environment variable to your Google Code username"
+	exit 1
+fi
+if [ x$GC_PASSWORD == x ]; then
+	echo -n "Password: "
+	stty -echo
+	read GC_PASSWORD
+	stty echo
+	echo ""
+	if [ x$GC_PASSWORD == x ]; then exit 1; fi
+fi
+
+## check what to build
+build_c=0
+build_python=0
+build_r=0
+for interface in `echo $interfaces | tr ',' ' '`; do
+	case "$interface" in
+	c) build_c=1;;
+	python) build_python=1;;
+	r) build_r=1;;
+	esac
+done
+
+## working directory
+dir="$1"
+cd $dir
+
+## Bazaar tree
+tree=`basename $dir`
+
+## update from Launchpad
+revisionbefore=`bzr revno`
+bzr pull || exit 2
+revision=`bzr revno`
+
+if [ x"$force" != "xyes" ]; then
+    if [ x"$revisionbefore" = x"$revision" ]; then
+	exit 0
+    fi
+fi
+
+## current version
+version=`head -1 configure.in | cut -f2 -d, | tr -d ' '`
+
+## mount savannah download area
+#mount | grep -q "^dl.sv.gnu.org:/releases/igraph" ||
+#sshfs dl.sv.gnu.org:/releases/igraph /home/csardi/savannah || exit 2
+#mkdir -p ~/savannah/nightly-builds/$version/R-package
+#mkdir -p ~/savannah/nightly-builds/$version/C-library
+
+## autotools
+./bootstrap.sh || exit 3
+if [ ! -d build ]; then
+	mkdir build || exit 4
+fi
+cd build || exit 5
+../configure || exit 6
+
+## compile
+make || exit 7
+
+## check
+make check
+
+if [ $build_c == 1 ]; then
+	## create documentation
+	cd doc
+	make
+	make html
+	make info
+	make pdf
+	cd ..
+
+	## create tar.gz file
+	make dist || exit 20
+	CPACKAGE="igraph-nightly-$version-$revision-`date +'%Y%m%d'`.tar.gz"
+	rm -f $CPACKAGE
+	mv igraph-$version.tar.gz $CPACKAGE || exit 21
+
+	## sign and upload C package
+	#rm -rf $CPACKAGE.sig
+	#gpg -b --use-agent $CPACKAGE
+	#cp $CPACKAGE $CPACKAGE.sig ~/savannah/nightly-builds/$version/C-library/
+
+	## upload to google code
+	if [ x$upload == xyes ]; then
+		googlecode_upload.py -s \
+		   "Nightly build, C library, $tree tree, revision $revision" \
+		   -p igraph -u $GC_USERNAME -l Type-Source,OpSys-All,Nightly \
+		   -w $GC_PASSWORD $CPACKAGE
+	fi
+fi
+
+## climb out of build directory
+cd ..
+
+if [ $build_r == 1 ]; then
+	## R package
+	cd interfaces/R
+	make
+	R_LIBS=~/.R/library R CMD check igraph_$version.tar.gz
+	RPACKAGE="igraph_nightly_$version-$revision-`date +'%Y%m%d'`.tar.gz"
+	rm -f $RPACKAGE
+	mv igraph_$version.tar.gz $RPACKAGE
+
+	## sign and upload R package
+	#rm -rf $RPACKAGE.sig
+	#gpg -b --use-agent $RPACKAGE
+	#cp $RPACKAGE $RPACKAGE.sig ~/savannah/nightly-builds/$version/R-package/
+
+
+	## upload to google code
+	if [ x$upload == xyes ]; then
+		googlecode_upload.py -s \
+		   "Nightly build, GNU R source package, $tree tree, revision $revision" \
+		   -p igraph -u $GC_USERNAME -l Type-Rsource,OpSys-All,Nightly \
+		   -w $GC_PASSWORD $RPACKAGE
+	fi
+fi
+
+if [ $build_python == 1 ]; then
+	## Python package
+	cd interfaces/python
+	LD_LIBRARY_PATH=../../build/src/.libs python setup.py build test
+	python setup.py sdist
+	PYPACKAGE=python-igraph_nightly_$version-$revision-`date +'%Y%m%d'`.tar.gz
+	mv dist/python-igraph-$version.tar.gz $PYPACKAGE
+	## upload to google code
+	if [ x$upload == xyes ]; then
+		googlecode_upload.py -s \
+		   "Nightly build, Python source package, $tree tree, revision $revision" \
+		   -p igraph -u $GC_USERNAME -l Type-Pysource,OpSys-All,Nightly \
+		   -w $GC_PASSWORD $PYPACKAGE
+	fi
+	## remove nightly build
+	rm -f $PYPACKAGE
+fi
+
+## remove build directory
+rm -rf build/
+
