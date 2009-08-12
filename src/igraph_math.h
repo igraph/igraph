@@ -60,6 +60,9 @@ double igraph_fmin(double a, double b);
 #ifndef HAVE_LOG1P
 #define log1p(a) igraph_log1p(a)
 #endif
+#ifndef HAVE_FABSL
+#define fabsl(a,b) ((a)<0?-(a):(a))
+#endif
 #ifndef HAVE_FMIN
 #define fmin(a,b) igraph_fmin((a),(b))
 #endif
