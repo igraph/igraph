@@ -103,7 +103,7 @@ void JNU_ThrowByName(JNIEnv *env, const char *name, const char *msg) {
  * @return: 0 if everything was OK, 1 otherwise
  */
 int Java_jobject_to_igraph(JNIEnv *env, jobject jobj, igraph_t** gptr) {
-  *gptr = (igraph_t*)(*env)->GetIntField(env, jobj, igraph_Graph_handle_fid);
+  *gptr = (igraph_t*)(*env)->GetLongField(env, jobj, igraph_Graph_handle_fid);
   return (*gptr == 0 ? 1 : 0);
 }
 

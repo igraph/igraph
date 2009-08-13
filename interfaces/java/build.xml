@@ -28,7 +28,6 @@
 	<property name="libtype" value="shared" />
 
 	<!-- DON'T CHANGE ANYTHING BELOW THIS LINE -->
-	<property name="java.home" value="${os.JAVA_HOME}" />
 	<condition property="jni.library.name" value="igraph-java-wrapper.jnilib">
 		<and><os family="mac" /><os family="unix" /></and>
 	</condition>
@@ -38,6 +37,12 @@
 	<condition property="jni.library.name" value="igraph-java-wrapper.dll">
 		<os family="unix" />
 	</condition>
+	<path id="jni.include.path">
+		<pathelement path="${java.home}/include" />
+		<pathelement path="${java.home}/include/linux" />
+		<pathelement path="${java.home}/../include" />
+		<pathelement path="${java.home}/../include/linux" />
+	</path>
 
 	<!-- Initializes the build tree, creates the necessary directories -->
 	<target name="-init" description="Initializes the build process">
@@ -119,7 +124,7 @@
 			<fileset dir="${src}/c" includes="*.c" />
 			<cpptasks:includepath>
 				<path path="${igraph.include.path}" />
-				<path path="${java.home}/include" />
+				<path refid="jni.include.path" />
 			</cpptasks:includepath>
 			<cpptasks:linker libtool="true">
 				<libset libs="igraph" type="shared" dir="${igraph.library.path}" />
