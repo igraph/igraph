@@ -36,7 +36,7 @@ master_doc = 'index'
 
 # General substitutions.
 project   = 'python-igraph'
-copyright = u'2008, Tam\xe1s Nepusz, G\xe1bor Cs\xe1rdi'
+copyright = u'2006-2009, Tam\xe1s Nepusz, G\xe1bor Cs\xe1rdi'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.

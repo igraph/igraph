@@ -16,7 +16,7 @@ Which |igraph| is right for you?
 
 |igraph| is primarily a library written in C. It is *not* a standalone program, nor it is
 a Python package that you can just drop on your Python path to start using it. Therefore,
-if you would like to exploit |igraph|'s functionality in Python, you must compile and install
+if you would like to exploit |igraph|'s functionality in Python, you must install
 a few packages. Do not worry, though, there are precompiled packages for the major operating
 systems, so you will not have to compile |igraph| from source unless you use an esoteric
 operating system or you have specific requirements (i.e., adding a custom patch to |igraph|'s
@@ -94,6 +94,38 @@ Having done that, you can launch Python again and check if it worked:
 
 |igraph| on Mac OS X
 --------------------
+
+There is a Mac OS X installer for |igraph|'s Python interface on the
+`Python Package Index <http://pypi.python.org/pypi/python-igraph>`_
+which works for Intel-based Macs running OS X Leopard. The default
+Python version in Leopard is Python 2.5, so the package is compiled
+for this specific version. PowerPC users should compile the package
+themselves (see `Compiling igraph from source`_). To test the
+installed package, launch your favourite Python IDE or the default
+command line interpreter and type the following:
+
+  >>> import igraph.test
+  >>> igraph.test.test()
+
+The above commands run the bundled test cases to ensure that everything
+is fine with your |igraph| installation.
+
+Graph plotting in |igraph| on Mac OS X
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Graph plotting in |igraph| is implemented using a third-party package
+called `Cairo <http://www.cairographics.org>`_. If you want to create
+publication-quality plots in |igraph| on Mac OS X, you must also install
+Cairo and its Python bindings. The Cairo project does not provide
+pre-compiled binaries for Mac OS X, but `MacPorts <http://www.macports.org>`_
+and `Fink <http://www.finkproject.org>`_ does, so you can use them to
+install Cairo. The `Cairo homepage <http://www.cairographics.org>` gives
+you some installation instructions. However, this is only one half of the
+job, you will also need the Python bindings of Cairo from the
+`PyCairo homepage <http://www.cairographics.org/pycairo>`. At the moment
+there are no precompiled PyCairo packages for Mac OS X either.
+
+TODO: detailed compilation instructions for PyCairo
 
 |igraph| on other operating systems
 -----------------------------------

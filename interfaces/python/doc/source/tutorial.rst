@@ -206,7 +206,8 @@ produce a different graph every time. Deterministic generators include methods f
 creating trees, regular lattices, rings, extended chordal rings, several famous graphs
 and so on, while stochastic generators are used to create Erdős-Rényi random networks,
 Barabási-Albert networks, geometric random graphs and such. |igraph| has too many
-generators to cover them all in this tutorial, so we will only show an example for both:
+generators to cover them all in this tutorial, so we will only try a
+deterministic and a stochastic generator instead:
 
 >>> g = Graph.Tree(127, 2)
 >>> summary(g)
@@ -217,7 +218,7 @@ Density: 0.0157
 Average path length: 8.3510
 
 :meth:`Graph.Tree` generates a regular tree graph. The one that we generated has 127
-vertices and each vertex (apart from the root) has two children (and of course one
+vertices and each vertex (apart from the leaves) has two children (and of course one
 parent). No matter how many times you call :meth:`Graph.Tree`, the generated graph will
 always be the same if you use the same parameters:
 
@@ -261,7 +262,7 @@ False
 
 :meth:`~Graph.isomorphic()` tells you whether two graphs are isomorphic or not. In general,
 it might take quite a lot of time, especially for large graphs, but in our case, the
-answer can quickly be given by checking the degree sequences of the two graphs.
+answer can quickly be given by checking the degree distributions of the two graphs.
 
 
 Setting and retrieving attributes
@@ -307,7 +308,7 @@ a Python dictionary, you will manipulate the attribute storage area of the graph
 >>> g.vs["name"] = ["Alice", "Bob", "Claire", "Dennis", "Esther", "Frank", "George"]
 >>> g.vs["age"] = [25, 31, 18, 47, 22, 23, 50]
 >>> g.vs["gender"] = ["f", "m", "f", "m", "f", "m", "m"]
->>> g.es["formal"] = [False, False, True, True, True, False, True, False, False]
+>>> g.es["is_formal"] = [False, False, True, True, True, False, True, False, False]
 
 Whenever you use :attr:`~Graph.vs` or :attr:`~Graph.es` as a dictionary, you are assigning
 attributes to *all* vertices/edges of the graph. However, you can simply alter the attributes
@@ -322,7 +323,7 @@ as dictionaries to alter the attributes of that single vertex or edge:
 igraph.Edge(<igraph.Graph object at 0x4c87a0>,0,{'formal': False})
 >>> g.es[0].attributes()
 {'formal': False}
->>> g.es[0]["formal"] = True
+>>> g.es[0]["is_formal"] = True
 igraph.Edge(<igraph.Graph object at 0x4c87a0>,0,{'formal': True})
 
 The above snippet illustrates that indexing an :class:`EdgeSeq` object returns
@@ -440,7 +441,7 @@ The syntax may seem a little bit awkward for the first sight, so let's try to in
 it step by step. :meth:`~VertexSeq.select` is a method of :class:`VertexSeq` and its
 sole purpose is to filter a :class:`VertexSeq` based on the properties of individual
 vertices. The way it filters the vertices depends on its positional and keyword
-arguments and positional arguments (the ones without an explicit name like
+arguments. Positional arguments (the ones without an explicit name like
 ``_degree`` above) are always processed before keyword arguments as follows:
 
 - If the first positional argument is :keyword:`None`, an empty sequence (containing no
@@ -456,7 +457,7 @@ arguments and positional arguments (the ones without an explicit name like
   the vertex will be included, otherwise it will be excluded:
 
   >>> graph = Graph.Full(10)
-  >>> only_odd_vertices = graph.select(lambda x: x % 2 == 1)
+  >>> only_odd_vertices = graph.vs.select(lambda vertex: vertex.index % 2 == 1)
   >>> len(only_odd_vertices)
   5
 
@@ -481,7 +482,7 @@ arguments and positional arguments (the ones without an explicit name like
 
 - If the first positional argument is an integer, all remaining arguments are also
   expected to be integers and they are interpreted as indices into the current vertex
-  set. This is just syntactical sugar, you could achieve an equivalent effect by
+  set. This is just syntactic sugar, you could achieve an equivalent effect by
   passing a list as the first positional argument, but this way you can omit the
   square brackets:
 
@@ -496,38 +497,41 @@ filtering operator. The operator can be omitted; in that case, we automatically
 assume the equality operator. The possibilities are as follows (where
 *name* denotes the name of the attribute or property):
 
-# TODO: table here
-
-- ``name_eq``: the attribute/property value must be equal to the value of the
-  keyword argument
-
-- ``name_ne``: the attribute/property value must not be equal to the value of the
-  keyword argument
-
-- ``name_lt``: the attribute/property value must be less than the value of the
-  keyword argument
-
-- ``name_le``: the attribute/property value must be less than or equal to the
-  value of the keyword argument
-
-- ``name_gt``: the attribute/property value must be greater than the value of the
-  keyword argument
-
-- ``name_ge``: the attribute/property value must be greater than or equal to the
-  value of the keyword argument
-
-- ``name_in``: the attribute/property value must be included in the
-  value of the keyword argument, which must be a sequence in this case
-  
-- ``name_notin``: the attribute/property value must not be included in the value
-  of the the keyword argument, which must be a sequence in this case
+================ ================================================================
+Keyword argument Meaning
+================ ================================================================
+``name_eq``      The attribute/property value must be *equal to* the value of the
+                 keyword argument
+---------------- ----------------------------------------------------------------
+``name_ne``      The attribute/property value must *not be equal to* the value of
+                 the keyword argument
+---------------- ----------------------------------------------------------------
+``name_lt``      The attribute/property value must be *less than* the value of
+                 the keyword argument
+---------------- ----------------------------------------------------------------
+``name_le``      The attribute/property value must be *less than or equal to* the
+                 value of the keyword argument
+---------------- ----------------------------------------------------------------
+``name_gt``      The attribute/property value must be *greater than* the value of
+                 the keyword argument
+---------------- ----------------------------------------------------------------
+``name_ge``      The attribute/property value must be *greater than or equal to*
+                 the value of the keyword argument
+---------------- ----------------------------------------------------------------
+``name_in``      The attribute/property value must be *included in* the value of
+                 the keyword argument, which must be a sequence in this case
+---------------- ----------------------------------------------------------------
+``name_notin``   The attribute/property value must *not be included in* the value
+                 of the the keyword argument, which must be a sequence in this
+                 case
+================ ================================================================
 
 For instance, the following command gives you people younger than 30 years in
 our imaginary social network:
 
 >>> g.vs.select(age_lt=30)
 
-.. note:
+.. note::
    Due to the syntactical constraints of Python, you cannot use the admittedly
    simpler syntax of ``g.vs.select(age < 30)`` as only the equality operator is
    allowed to appear in an argument list in Python.
@@ -546,30 +550,367 @@ find vertices with degree larger than 2:
 
 >>> g.vs(_degree_gt=2)
 
+There are two special structural properties for selecting edges: using ``_source``
+or ``_from`` in the keyword argument list of :meth:`EdgeSeq.select` filters based on
+the source vertices of the edges, while ``_target_`` or ``_to`` filters based on
+the target vertices.
 
 
 Layouts and plotting
 ====================
 
-TODO
+A graph is an abstract mathematical object without a specific representation in 2D or
+3D space. This means that whenever we want to visualise a graph, we have to find a
+mapping from vertices to coordinates in two- or three-dimensional space first,
+preferably in a way that is pleasing for the eye. A separate branch of graph theory,
+namely graph drawing, tries to solve this problem via several graph layout algorithms.
+|igraph| implements quite a few layout algorithms and is also able to draw them onto
+the screen or to a PDF, PNG or SVG file using the `Cairo library <http://www.cairographics.org>`_.
 
+.. important::
+   To follow the examples of this subsection, you need the Python bindings of the
+   Cairo library. The previous chapter (:ref:`installing-igraph`) tells you more
+   about how to install Cairo's Python bindings.
+
+Layout algorithms
+^^^^^^^^^^^^^^^^^
+
+The layout methods in |igraph| are to be found in the :class:`Graph` object, and their
+always start with ``layout_``. The following table summarises them:
+
+==================================== =============== =============================================
+Method name                          Short name      Algorithm description
+==================================== =============== =============================================
+``layout_circle``                    ``circle``,     Deterministic layout that places the
+                                     ``circular``    vertices on a circle
+------------------------------------ --------------- ---------------------------------------------
+``layout_drl``                       ``drl``         The `Distributed Recursive Layout`_ algorithm
+                                                     for large graphs
+------------------------------------ --------------- ---------------------------------------------
+``layout_fruchterman_reingold``      ``fr``          Fruchterman-Reingold force-directed algorithm
+------------------------------------ --------------- ---------------------------------------------
+``layout_fruchterman_reingold_3d``   ``fr3d``,       Fruchterman-Reingold force-directed algorithm
+                                     ``fr_3d``       in three dimensions
+------------------------------------ --------------- ---------------------------------------------
+``layout_grid_fruchterman_reingold`` ``grid_fr``     Fruchterman-Reingold force-directed algorithm
+                                                     with grid heuristics for large graphs
+------------------------------------ --------------- ---------------------------------------------
+``layout_kamada_kawai``              ``kk``          Kamada-Kawai force-directed algorithm
+------------------------------------ --------------- ---------------------------------------------
+``layout_kamada_kawai_3d``           ``kk3d``,       Kamada-Kawai force-directed algorithm
+                                     ``kk_3d``       in three dimensions
+------------------------------------ --------------- ---------------------------------------------
+``layout_lgl``                       ``large``,      The `Large Graph Layout`_ algorithm for
+                                     ``lgl``,        large graphs
+                                     ``large_graph``
+------------------------------------ --------------- ---------------------------------------------
+``layout_random``                    ``random``      Places the vertices completely randomly
+------------------------------------ --------------- ---------------------------------------------
+``layout_random_3d``                 ``random_3d``   Places the vertices completely randomly in 3D
+------------------------------------ --------------- ---------------------------------------------
+``layout_reingold_tilford``          ``rt``,         Reingold-Tilford tree layout, useful for
+                                     ``tree``        (almost) tree-like graphs
+------------------------------------ --------------- ---------------------------------------------
+``layout_reingold_tilford_circular`` ``rt_circular`` Reingold-Tilford tree layout with a polar
+                                                     coordinate post-transformation, useful for
+                                     ``tree``        (almost) tree-like graphs
+------------------------------------ --------------- ---------------------------------------------
+``layout_sphere``                    ``sphere``,     Deterministic layout that places the vertices
+                                     ``spherical``,  evenly on the surface of a sphere
+                                     ``circular``,
+                                     ``circular_3d``
+==================================== =============== =============================================
+
+.. _Distributed Recursive Layout: http://www.cs.sandia.gov/~smartin/software.html
+.. _Large Graph Layout: http://sourceforge.net/projects/lgl/
+
+Layout algorithms can either be called directly or using the common layout method called
+:meth:`~Graph.layout`:
+
+>>> layout = g.layout_kamada_kawai()
 >>> layout = g.layout("kamada_kawai")
->>> plot(g)
->>> plot(g, "graph.png")
->>> plot(g, "graph.png", vertex_color = g.vs["colors"])
+
+The first argument of the :meth:`~Graph.layout` method must be the short name of the
+layout algorithm (see the table above). All the remaining positional and keyword arguments
+are passed intact to the chosen layout method. For instance, the following two calls are
+completely equivalent:
+
+>>> layout = g.layout_reingold_tilford(root=2)
+>>> layout = g.layout("rt", 2)
+
+Layout methods return a :class:`Layout` object which behaves mostly like a list of lists.
+Each list entry in a :class:`Layout` object corresponds to a vertex in the original graph
+and contains the vertex coordinates in the 2D or 3D space. :class:`Layout` objects also
+contain some useful methods to translate, scale or rotate the coordinates in a batch.
+However, the primary utility of :class:`Layout` objects is that you can pass them to the
+:func:`plot` function along with the graph to obtain a 2D drawing.
+
+Drawing a graph using a layout
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For instance, we can plot our imaginary social network with the Kamada-Kawai
+layout algorithm as follows:
+
+>>> layout = g.layout("kk")
+>>> plot(g, layout = layout)
+
+This should open an external image viewer showing a visual representation of the network,
+something like the one on the following figure:
+
+.. figure:: figures/tutorial_social_network_1.png
+   :alt: The visual representation of our social network
+   :align: center
+
+   Our social network with the Kamada-Kawai layout algorithm
+
+Hmm, this is not too pretty so far. A trivial addition would be to use the names as the
+vertex labels and to color the vertices according to the gender. Vertex labels are taken
+from the ``label`` attribute by default and vertex colors are determined by the
+``color`` attribute, so we can simply create these attributes and re-plot the graph:
+
+>>> g.vs["label"] = g.vs["name"]
+>>> color_dict = {"m": "blue", "f": "pink"}
+>>> g.vs["color"] = [color_dict[gender] for gender in g.vs["gender"]]
+>>> plot(g, layout = layout, bbox = (300, 300), margin = 20)
+
+Note that we are simply re-using the previous layout object here, but we also specified
+that we need a smaller plot (300 x 300 pixels) and a larger margin around the graph
+to fit the labels (20 pixels). The result is:
+
+.. figure:: figures/tutorial_social_network_2.png
+   :alt: The visual representation of our social network - with names and genders
+   :align: center
+
+   Our social network - with names as labels and genders as colors
+
+Instead of specifying the visual properties as vertex and edge attributes, you can
+also give them as keyword arguments to :func:`plot`:
+
+>>> color_dict = {"m": "black", "f": "white"}
+>>> plot(g, layout = layout, vertex_color = [color_dict[gender] for gender in g.vs["gender"]])
+
+This latter approach is preferred if you want to keep the properties of the visual
+representation of your graph separate from the graph itself. You can simply set up
+a Python dictionary containing the keyword arguments you would pass to :func:`plot`
+and then use the double asterisk (``**``) operator to pass your specific styling
+attributes to :func:`plot`::
+
+>>> visual_style = {}
+>>> visual_style["vertex_size"] = [20] * g.vcount()
+>>> visual_style["vertex_color"] = [color_dict[gender] for gender in g.vs["gender"]]
+>>> visual_style["vertex_label"] = g.vs["name"]
+>>> visual_style["edge_width"] = [1 + 2 * int(is_formal) for is_formal in g.es["is_formal"]]
+>>> visual_style["layout"] = layout
+>>> visual_style["bbox"] = (300, 300)
+>>> visual_style["margin"] = 20
+>>> plot(g, **visual_style)
+
+The final plot shows the formal ties with thick lines while informal ones with thin lines:
+
+.. figure:: figures/tutorial_social_network_3.png
+   :alt: The visual representation of our social network - with names, genders and formal ties
+   :align: center
+
+   Our social network - also showing which ties are formal
+
+To sum it all up: there are special vertex and edge properties that correspond to
+the visual representation of the graph. These attributes override the default settings
+of |igraph| (see :ref:`configuring-igraph` for overriding the system-wide defaults).
+Furthermore, appropriate keyword arguments supplied to :func:`plot` override the
+visual properties provided by the vertex and edge attributes. The following two
+tables summarise the most frequently used visual attributes for vertices and edges,
+respectively:
+
+Vertex attributes controlling graph plots
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+=============== ====================== ==========================================
+Attribute name  Keyword argument       Purpose
+=============== ====================== ==========================================
+``color``       ``vertex_color``       Color of the vertex
+--------------- ---------------------- ------------------------------------------
+``label``       ``vertex_label``       Label of the vertex
+--------------- ---------------------- ------------------------------------------
+``label_angle`` ``vertex_label_angle`` The placement of the vertex label on the
+                                       circle around the vertex. This is an angle
+                                       in radians, with zero belonging to the
+                                       right side of the vertex.
+--------------- ---------------------- ------------------------------------------
+``label_color`` ``vertex_label_color`` Color of the vertex label
+--------------- ---------------------- ------------------------------------------
+``label_dist``  ``vertex_label_dist``  Distance of the vertex label from the
+                                       vertex itself, relative to the vertex size
+--------------- ---------------------- ------------------------------------------
+``label_size``  ``vertex_label_size``  Font size of the vertex label
+--------------- ---------------------- ------------------------------------------
+``shape``       ``vertex_shape``       Shape of the vertex. Known shapes are:
+                                       ``rectangle``, ``circle``, ``hidden``,
+                                       ``triangle-up``, ``triangle-down``.
+                                       Several aliases are also accepted, see
+                                       :data:`drawing.known_shapes`.
+--------------- ---------------------- ------------------------------------------
+``size``        ``vertex_size``        Size of the vertex in pixels
+=============== ====================== ==========================================
+
+
+Edge attributes controlling graph plots
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+=============== ====================== ==========================================
+Attribute name  Keyword argument       Purpose
+=============== ====================== ==========================================
+``color``       ``edge_color``         Color of the edge
+--------------- ---------------------- ------------------------------------------
+``arrow_size``  ``edge_arrow_size``    Size (length) of the arrowhead on the edge
+                                       if the graph is directed, relative to 15
+                                       pixels.
+--------------- ---------------------- ------------------------------------------
+``arrow_width`` ``edge_arrow_width``   Width of the arrowhead on the edge if the
+                                       graph is directed, relative to 10 pixels.
+--------------- ---------------------- ------------------------------------------
+``width``       ``edge_width``         Width of the edge in pixels
+=============== ====================== ==========================================
+
+
+Specifying colors in plots
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+|igraph| understands the following color specifications wherever it expects a
+color (e.g., edge, vertex or label colors in the respective attributes):
+
+X11 color names
+    See the `list of X11 color names <http://en.wikipedia.org/wiki/X11_color_names>`_
+    in Wikipedia for the complete list.
+
+Color specification in CSS syntax
+    This is a string according to one of the following formats (where *R*, *G* and
+    *B* denote the red, green and blue components, respectively):
+
+      - ``#RRGGBB``, components range from 0 to 255 in hexadecimal format.
+        Example: ``"#0088ff"``.
+      - ``#RGB``, components range from 0 to 15 in hexadecimal format. Example:
+        ``"#08f"``.
+      - ``rgb(R, G, B)``, components range from 0 to 255 or from 0% to
+        100%. Example: ``"rgb(0, 127, 255)"`` or ``"rgb(0%, 50%, 100%)"``.
+
+List, tuple or whitespace-separated string of RGB values
+    Example: ``(255, 128, 0)``, ``[255, 128, 0]`` or ``"255, 128, 0"``.
+
+
+Saving plots
+^^^^^^^^^^^^
+
+|igraph| can be used to create publication-quality plots by asking the :func:`plot`
+function to save the plot into a file instead of showing it on a screen. This can
+be done simply by passing the target filename as an additional argument after the
+graph itself. The preferred format is inferred from the extension. |igraph| can
+save to anything that is supported by Cairo, including SVG, PDF and PNG files.
+SVG or PDF files can then later be converted to PostScript (``.ps``) or Encapsulated
+PostScript (``.eps``) format if you prefer that, while PNG files can be converted to
+TIF (``.tif``)::
+
+>>> plot(g, "social_network.pdf", **visual_style)
 
 
 |igraph| and the outside world
 ==============================
 
-TODO
+No graph module would be complete without some kind of import/export functionality
+that enables the package to communicate with external programs and toolkits. |igraph|
+is no exception: it provides functions to read the most common graph formats and
+to save :class:`Graph` objects into files obeying these format specifications.
+The following table summarises the formats |igraph| can read or write:
 
->>> g = load("karate.net")
->>> g.write_graphml("karate.graphml")
->>> g.save("karate.graphml")
+================ ============= ============================ =============================
+Format           Short name    Reader method                Writer method
+================ ============= ============================ =============================
+Adjacency list   ``lgl``       :meth:`Graph.Read_Lgl`       :meth:`Graph.write_lgl`
+(a.k.a. `LGL`_)
+---------------- ------------- ---------------------------- -----------------------------
+Adjacency matrix ``adjacency`` :meth:`Graph.Read_Adjacency` :meth:`Graph.write_adjacency`
+---------------- ------------- ---------------------------- -----------------------------
+DIMACS           ``dimacs``    :meth:`Graph.Read_DIMACS`    :meth:`Graph.write_dimacs`
+---------------- ------------- ---------------------------- -----------------------------
+Edge list        ``edgelist``, :meth:`Graph.Read_Edgelist`  :meth:`Graph.write_edgelist`
+                 ``edges``,
+                 ``edge``
+---------------- ------------- ---------------------------- -----------------------------
+`GraphViz`_      ``graphviz``, not supported yet            :meth:`Graph.write_dot`
+                 ``dot``
+---------------- ------------- ---------------------------- -----------------------------
+GML              ``gml``       :meth:`Graph.Read_GML`       :meth:`Graph.write_gml`
+---------------- ------------- ---------------------------- -----------------------------
+GraphML          ``graphml``   :meth:`Graph.Read_GraphML`   :meth:`Graph.write_graphml`
+---------------- ------------- ---------------------------- -----------------------------
+Gzipped GraphML  ``graphmlz``  :meth:`Graph.Read_GraphMLz`  :meth:`Graph.write_graphmlz`
+---------------- ------------- ---------------------------- -----------------------------
+Labeled edgelist ``ncol``      :meth:`Graph.Read_Ncol`      :meth:`Graph.write_ncol`
+(a.k.a. `NCOL`_)
+---------------- ------------- ---------------------------- -----------------------------
+`Pajek`_ format  ``pajek``,    :meth:`Graph.Read_Pajek`     :meth:`Graph.write_pajek`
+                 ``net``
+---------------- ------------- ---------------------------- -----------------------------
+Pickled graph    ``pickle``    :meth:`Graph.Read_Pickle`    :meth:`Graph.write_pickle`
+================ ============= ============================ =============================
+
+.. _GraphViz: http://www.graphviz.org
+.. _LGL: http://lgl.sourceforge.net/#FileFormat
+.. _NCOL: http://lgl.sourceforge.net/#FileFormat
+.. _Pajek: http://pajek.imfm.si/doku.php
+
+As an exercise, download the graph representation of the well-known
+`Zachary karate club study <http://igraph.sourceforge.net/karate.net>`_, save it to
+a folder and try to load it into |igraph|. Since it is a Pajek network file, you
+must use the Pajek reader method from the table above (make sure you use the
+appropriate path to the downloaded file):
+
+>>> karate = Graph.Read_Pajek("karate.net")
+>>> summary(karate)
+34 nodes, 78 edges, undirected
+Number of components: 1
+Diameter: 5
+Density: 0.1390
+Average path length: 2.4100
+
+If you want to convert the very same graph into GraphML, you can do it with the
+GraphML writer method from the table above:
+
+>>> karate.write_graphml("karate.graphml")
+
+.. note:: Most of the formats have their own limitations; for instance, not all of
+   them can store attributes. Your best bet is probably GraphML or GML if you
+   want to save |igraph| graphs in a format that can be read from an external
+   package and you want to preserve numeric and string attributes. Edge list and
+   NCOL is also fine if you don't have attributes (NCOL supports vertex names and
+   edge weights, though). If you don't want to use your graphs outside |igraph|
+   but you want to store them for a later session, the pickled graph format
+   ensures that you get exactly the same graph back. The pickled graph format
+   uses Python's ``pickle`` module to store and read graphs.
+
+There are two helper methods as well: :func:`load` is a generic entry point for
+reader methods which tries to infer the appropriate format from the file extension.
+:meth:`Graph.save` is the opposite of :func:`load`: it lets you save a graph where
+the preferred format is again inferred from the extension. The format detection of
+:func:`load` and :meth:`Graph.save` can be overridden by the ``format`` keyword
+argument which accepts the short names of the formats from the above table:
+
+>>> karate = load("karate.net")
+>>> karate.save("karate.graphml")
+>>> karate.save("karate.my_extension", format="gml")
 
 
 Where to go next
 ================
 
+This tutorial was only scratching the surface of what |igraph| can do.  My
+long-term plans are to extend this tutorial into a proper manual-style
+documentation to |igraph| in the next chapters. In the meanwhile, check out the
+full `API documentation`_ which should provide information about almost every
+|igraph| class, function or method. A good starting point is the documentation
+of the `Graph class`_. Should you get stuck, drop a mail to the `igraph mailing
+list`_ - maybe there is someone out there who can help you out immediately.
+
+.. _API documentation: http://igraph.sourceforge.net/doc/python/
+.. _Graph class: http://igraph.sourceforge.net/doc/python/igraph.Graph-class.html
+.. _igraph mailing list: http://lists.nongnu.org/mailman/listinfo/igraph-help
 
