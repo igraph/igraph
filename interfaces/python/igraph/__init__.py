@@ -2302,14 +2302,25 @@ class EdgeSeq(core.EdgeSeq):
         Attribute names inferred from keyword arguments are treated specially
         if they start with an underscore (C{_}). These are not real attributes
         but refer to specific properties of the edges, e.g., their centrality.
-        The rule is as follows: if an attribute name starts with an underscore,
-        the rest of the name is interpreted as a method of the L{Graph} object.
-        This method is called with the edge sequence as its first argument
-        (all others left at default values) and edges are filtered
-        according to the value returned by the method. For instance, if you
-        want to exclude edges with a betweenness centrality less than 2:
+        The rules are as follows:
+
+          1. C{_source} or {_from} means the source vertex of an edge.
+
+          2. C{_target} or {_to} means the target vertex of an edge.
+
+          3. Otherwise, the rest of the name is interpreted as a method of the
+             L{Graph} object. This method is called with the edge sequence as
+             its first argument (all others left at default values) and edges
+             are filtered according to the value returned by the method.
+             
+        For instance, if you want to exclude edges with a betweenness
+        centrality less than 2:
 
           >>> excl = g.es.select(_edge_betweenness_ge = 2)
+
+        To select edges originating from vertices 2 and 4:
+
+          >>> edges = g.es.select(_source_in = [2, 4])
 
         For properties that take a long time to be computed (e.g., betweenness
         centrality for large graphs), it is advised to calculate the values
@@ -2350,8 +2361,13 @@ class EdgeSeq(core.EdgeSeq):
                 func = operators["eq"]
 
             if attr[0] == '_':
-                # Method call, not an attribute
-                values = getattr(es.graph, attr[1:])(es) 
+                if attr == "_source" or attr == "_from":
+                    values = [e.source for e in es]
+                elif attr == "_target" or attr == "_to":
+                    values = [e.target for e in es]
+                else:
+                    # Method call, not an attribute
+                    values = getattr(es.graph, attr[1:])(es) 
             else:
                 values = es[attr]
             filtered_idxs=[i for i, v in enumerate(values) if func(v, value)]

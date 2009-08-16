@@ -91,6 +91,12 @@ class EdgeSeqTests(unittest.TestCase):
         self.failUnless(len(g.es(betweenness_gt=10)) < 2000)
         self.failUnless(len(g.es(betweenness_gt=10, parity=0)) < 2000)
 
+    def testSourceTargetFiltering(self):
+        g = Graph.Barabasi(1000, 2)
+        es1 = set(e.source for e in g.es.select(_target_in = [2,4]))
+        es2 = set(v1 for v1, v2 in g.get_edgelist() if v2 in [2, 4])
+        self.failUnless(es1 == es2)
+
     def testGraphMethodProxying(self):
         g = Graph.Barabasi(100)
         es = g.es(1,3,5,7,9)
