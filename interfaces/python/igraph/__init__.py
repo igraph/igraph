@@ -1719,7 +1719,7 @@ class Graph(core.GraphBase):
             This can be used to position the labels relative to the
             vertices themselves in conjunction with C{vertex_label_dist}.
             Corresponding vertex attribute: C{label_angle}. The
-            default is C{-math.pi/4}.
+            default is C{-math.pi/2}.
 
           - C{edge_color}: color of the edges. The corresponding edge
             attribute is C{color}, the default is red. See C{vertex_color}
@@ -1853,10 +1853,10 @@ class Graph(core.GraphBase):
             vertex_labels = drawing.collect_attributes(self.vcount(), "vertex_label", \
                 "label", kwds, self.vs, config, None)
         vertex_dists = drawing.collect_attributes(self.vcount(), "vertex_label_dist", \
-            "label_dist", kwds, self.vs, config, 1, float)
+            "label_dist", kwds, self.vs, config, 1.2, float)
         vertex_degrees = drawing.collect_attributes(self.vcount(), \
             "vertex_label_angle", "label_angle", kwds, self.vs, config, \
-            -math.pi/4, float)
+            -math.pi/2, float)
         vertex_label_colors = drawing.collect_attributes(self.vcount(), \
             "vertex_label_color", "label_color", kwds, self.vs, config, \
             "black", palette.get)
