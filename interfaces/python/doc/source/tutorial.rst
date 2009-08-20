@@ -180,7 +180,7 @@ you must call them on the appropriate :class:`Graph` instance!
 >>> g.delete_edges(3)
 <igraph.Graph object at 0x4c87a0>
 >>> summary(g)
-6 nodes, 6 edges, undirected
+6 vertices, 6 edges, undirected
 Number of components: 2
 Diameter: 1
 Density: 0.4000
@@ -188,7 +188,7 @@ Average path length: 1.0000
 
 :meth:`summary` is a new command that you haven't seen before; it is a member of |igraph|'s
 own namespace and it can be used to get an overview of a given graph object. It lists the
-number of nodes and edges, checks whether the graph is directed, counts the connected components,
+number of vertices and edges, checks whether the graph is directed, counts the connected components,
 calculates the graph diameter, the edge density and the average path lengths. All of these
 informations can be calculated separately by the appropriate methods of :class:`Graph` of course;
 we will talk about these later in the reference manual. In general, :meth:`summary` is primarily
@@ -211,7 +211,7 @@ deterministic and a stochastic generator instead:
 
 >>> g = Graph.Tree(127, 2)
 >>> summary(g)
-127 nodes, 126 edges, undirected
+127 vertices, 126 edges, undirected
 Number of components: 1
 Diameter: 12
 Density: 0.0157
@@ -239,7 +239,7 @@ Let's do the same with a stochastic generator!
 
 >>> g = Graph.GRG(100, 0.2)
 >>> summary(g)
-100 nodes, 524 edges, undirected
+100 vertices, 524 edges, undirected
 Number of components: 1
 Diameter: 9
 Density: 0.1059
@@ -409,7 +409,7 @@ restrict them to exactly the vertices or edges you want.
   example is eigenvector centrality (:meth:`Graph.evcent()`).
 
 Besides degree, |igraph| includes built-in routines to calculate many other centrality
-properties, including node and edge betweenness (:meth:`Graph.betweenness`,
+properties, including vertex and edge betweenness (:meth:`Graph.betweenness`,
 :meth:`Graph.edge_betweenness`) or Google's PageRank (:meth:`Graph.pagerank`)
 just to name a few. Here we just illustrate edge betweenness:
 
@@ -866,7 +866,7 @@ appropriate path to the downloaded file):
 
 >>> karate = Graph.Read_Pajek("karate.net")
 >>> summary(karate)
-34 nodes, 78 edges, undirected
+34 vertices, 78 edges, undirected
 Number of components: 1
 Diameter: 5
 Density: 0.1390

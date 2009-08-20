@@ -1090,7 +1090,7 @@ PyObject *igraphmodule_Graph_are_connected(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
- * \brief Returns the ID of an arbitrary edge between the given two nodes
+ * \brief Returns the ID of an arbitrary edge between the given two vertices
  * \sa igraph_get_eid
  */
 PyObject *igraphmodule_Graph_get_eid(igraphmodule_GraphObject * self,
@@ -2733,7 +2733,7 @@ PyObject *igraphmodule_Graph_assortativity(igraphmodule_GraphObject *self, PyObj
 }
 
 /** \ingroup python_interface_graph
- * \brief Calculates Kleinberg's authority scores of the nodes in the graph
+ * \brief Calculates Kleinberg's authority scores of the vertices in the graph
  * \sa igraph_authority_score
  */
 PyObject *igraphmodule_Graph_authority_score(
@@ -2814,7 +2814,7 @@ PyObject *igraphmodule_Graph_average_path_length(igraphmodule_GraphObject *
 }
 
 /** \ingroup python_interface_graph
- * \brief Calculates the betweennesses of some nodes in a graph.
+ * \brief Calculates the betweennesses of some vertices in a graph.
  * \return the betweennesses as a list (or a single float)
  * \sa igraph_betweenness
  */
@@ -2902,7 +2902,7 @@ PyObject *igraphmodule_Graph_betweenness(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
- * \brief Calculates the bibliographic coupling of some nodes in a graph.
+ * \brief Calculates the bibliographic coupling of some vertices in a graph.
  * \return the bibliographic coupling values in a matrix
  * \sa igraph_bibcoupling
  */
@@ -3064,7 +3064,7 @@ PyObject *igraphmodule_Graph_bipartite_projection_size(igraphmodule_GraphObject 
 }
 
 /** \ingroup python_interface_graph
- * \brief Calculates the closeness centrality of some nodes in a graph.
+ * \brief Calculates the closeness centrality of some vertices in a graph.
  * \return the closeness centralities as a list (or a single float)
  * \sa igraph_betweenness
  */
@@ -3240,7 +3240,7 @@ PyObject *igraphmodule_Graph_constraint(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
- * \brief Calculates the cocitation scores of some nodes in a graph.
+ * \brief Calculates the cocitation scores of some vertices in a graph.
  * \return the cocitation scores in a matrix
  * \sa igraph_cocitation
  */
@@ -3428,7 +3428,7 @@ PyObject *igraphmodule_Graph_edge_connectivity(igraphmodule_GraphObject *self,
 }
 
 /** \ingroup python_interface_graph
- * \brief Calculates the eigenvector centralities of the nodes in the graph
+ * \brief Calculates the eigenvector centralities of the vertices in the graph
  * \sa igraph_eigenvector_centrality
  */
 PyObject *igraphmodule_Graph_eigenvector_centrality(
@@ -3668,7 +3668,7 @@ PyObject *igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *
 }
 
 /** \ingroup python_interface_graph
- * \brief Calculates Kleinberg's hub scores of the nodes in the graph
+ * \brief Calculates Kleinberg's hub scores of the vertices in the graph
  * \sa igraph_hub_score
  */
 PyObject *igraphmodule_Graph_hub_score(
@@ -3741,7 +3741,7 @@ PyObject *igraphmodule_Graph_linegraph(igraphmodule_GraphObject * self) {
 }
 
 /** \ingroup python_interface_graph
- * \brief Calculates the Google PageRank value of some nodes in the graph
+ * \brief Calculates the Google PageRank value of some vertices in the graph
  *   (old algorithm, for compatibility)
  * \return the PageRank values
  * \sa igraph_pagerank_old
@@ -3795,7 +3795,7 @@ PyObject *igraphmodule_Graph_pagerank_old(igraphmodule_GraphObject *self,
 
 
 /** \ingroup python_interface_graph
- * \brief Calculates the Google personalized PageRank value of some nodes in the graph.
+ * \brief Calculates the Google personalized PageRank value of some vertices in the graph.
  * \return the personalized PageRank values
  * \sa igraph_personalized_pagerank
  */
@@ -4088,7 +4088,7 @@ PyObject *igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
- * \brief Calculates the Jaccard similarities of some nodes in a graph.
+ * \brief Calculates the Jaccard similarities of some vertices in a graph.
  * \return the similarity scores in a matrix
  * \sa igraph_similarity_jaccard
  */
@@ -4130,7 +4130,7 @@ PyObject *igraphmodule_Graph_similarity_jaccard(igraphmodule_GraphObject * self,
 
 
 /** \ingroup python_interface_graph
- * \brief Calculates the Dice similarities of some nodes in a graph.
+ * \brief Calculates the Dice similarities of some vertices in a graph.
  * \return the similarity scores in a matrix
  * \sa igraph_similarity_dice
  */
@@ -4171,7 +4171,7 @@ PyObject *igraphmodule_Graph_similarity_dice(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
- * \brief Calculates the inverse log-weighted similarities of some nodes in
+ * \brief Calculates the inverse log-weighted similarities of some vertices in
  * a graph.
  * \return the similarity scores in a matrix
  * \sa igraph_similarity_inverse_log_weighted
@@ -8719,10 +8719,10 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Generates a graph from the Graph Atlas.\n\n"
    "@param idx: The index of the graph to be generated.\n"
    "  Indices start from zero, graphs are listed:\n\n"
-   "    1. in increasing order of number of nodes;\n"
-   "    2. for a fixed number of nodes, in increasing order of the\n"
+   "    1. in increasing order of number of vertices;\n"
+   "    2. for a fixed number of vertices, in increasing order of the\n"
    "       number of edges;\n"
-   "    3. for fixed numbers of nodes and edges, in increasing order\n"
+   "    3. for fixed numbers of vertices and edges, in increasing order\n"
    "       of the degree sequence, for example 111223 < 112222;\n"
    "    4. for fixed degree sequence, in increasing number of automorphisms.\n\n"
    "@newfield ref: Reference\n"
@@ -9161,14 +9161,14 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"betweenness", (PyCFunction) igraphmodule_Graph_betweenness,
    METH_VARARGS | METH_KEYWORDS,
    "betweenness(vertices=None, directed=True, cutoff=None, weights=None, nobigint=True)\n\n"
-   "Calculates or estimates the betweenness of nodes in a graph.\n\n"
+   "Calculates or estimates the betweenness of vertices in a graph.\n\n"
    "Keyword arguments:\n"
    "@param vertices: the vertices for which the betweennesses must be returned.\n"
    "  If C{None}, assumes all of the vertices in the graph.\n"
    "@param directed: whether to consider directed paths.\n"
    "@param cutoff: if it is an integer, only paths less than or equal to this\n"
    "  length are considered, effectively resulting in an estimation of the\n"
-   "  betweenness for the given nodes. If C{None}, the exact betweenness is\n"
+   "  betweenness for the given vertices. If C{None}, the exact betweenness is\n"
    "  returned.\n"
    "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
    "  even an edge attribute name.\n"
@@ -9178,7 +9178,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  To prevent this, use C{nobigint=False}, which forces igraph to use\n"
    "  arbitrary precision integers at the expense of increased computation\n"
    "  time.\n"
-   "@return: the (possibly estimated) betweenness of the given nodes in a list\n"},
+   "@return: the (possibly estimated) betweenness of the given vertices in a list\n"},
 
   /* interface to biconnected_components */
   {"biconnected_components", (PyCFunction) igraphmodule_Graph_biconnected_components,
@@ -9210,7 +9210,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"closeness", (PyCFunction) igraphmodule_Graph_closeness,
    METH_VARARGS | METH_KEYWORDS,
    "closeness(vertices=None, mode=ALL, cutoff=None, weights=None)\n\n"
-   "Calculates the closeness centralities of given nodes in a graph.\n\n"
+   "Calculates the closeness centralities of given vertices in a graph.\n\n"
    "The closeness centerality of a vertex measures how easily other\n"
    "vertices can be reached from it (or the other way: how easily it\n"
    "can be reached from the other vertices). It is defined as the\n"
@@ -9228,7 +9228,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  that both of them must be calculated.\n"
    "@param cutoff: if it is an integer, only paths less than or equal to this\n"
    "  length are considered, effectively resulting in an estimation of the\n"
-   "  closeness for the given nodes (which is always an underestimation of the\n"
+   "  closeness for the given vertices (which is always an underestimation of the\n"
    "  real closeness, since some vertex pairs will appear as disconnected even\n"
    "  though they are connected).. If C{None}, the exact closeness is\n"
    "  returned.\n"
@@ -9418,7 +9418,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param output: determines what should be returned. If this is\n"
    "  C{\"vpath\"}, a list of vertex IDs will be returned, one path\n"
    "  for each target vertex. For unconnected graphs, some of the list\n"
-   "  elements may be empty. Note that in case of mode=L{IN}, the nodes\n"
+   "  elements may be empty. Note that in case of mode=L{IN}, the vertices\n"
    "  in a path are returned in reversed order. If C{output=\"epath\"},\n"
    "  edge IDs are returned instead of vertex IDs.\n"
    "@return: see the documentation of the C{output} parameter.\n"},
@@ -9435,7 +9435,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  L{ALL} means to calculate both ones.\n"
    "@return: all of the shortest path from the given node to every other\n"
    "reachable node in the graph in a list. Note that in case of mode=L{IN},\n"
-   "the nodes in a path are returned in reversed order!"},
+   "the vertices in a path are returned in reversed order!"},
 
   /* interface to igraph_girth */
   {"girth", (PyCFunction)igraphmodule_Graph_girth,
@@ -9553,7 +9553,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  C{None} means all of the vertices.\n"
    "@param directed: whether to consider directed paths.\n"
    "@param damping: the damping factor.\n"
-   "  M{1-damping} is the PageRank value for nodes with no\n"
+   "  M{1-damping} is the PageRank value for vertices with no\n"
    "  incoming links.\n"
    "@param reset: the distribution over the vertices to be used when resetting\n"
    "  the random walk. Can be a sequence, an iterable or a vertex attribute\n"
@@ -9589,7 +9589,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param eps: the iteration stops if all of the PageRank values change\n"
    "  less than M{eps} between two iterations.\n"
    "@param damping: the damping factor.\n"
-   "  M{1-damping} is the PageRank value for nodes with no\n"
+   "  M{1-damping} is the PageRank value for vertices with no\n"
    "  incoming links.\n"
    "@return: a list with the Google PageRank values of the specified\n"
    "  vertices.\n\n"
@@ -9645,7 +9645,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"shortest_paths", (PyCFunction) igraphmodule_Graph_shortest_paths,
    METH_VARARGS | METH_KEYWORDS,
    "shortest_paths(source=None, target=None, weights=None, mode=OUT)\n\n"
-   "Calculates shortest path lengths for given nodes in a graph.\n\n"
+   "Calculates shortest path lengths for given vertices in a graph.\n\n"
    "The algorithm used for the calculations is selected automatically:\n"
    "a simple BFS is used for unweighted graphs, Dijkstra's algorithm is\n"
    "used when all the weights are positive. Otherwise, the Bellman-Ford\n"
@@ -9662,7 +9662,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  calculation in directed graphs. L{OUT} means only outgoing,\n"
    "  L{IN} means only incoming paths. L{ALL} means to consider\n"
    "  the directed graph as an undirected one.\n"
-   "@return: the shortest path lengths for given nodes in a matrix\n"},
+   "@return: the shortest path lengths for given vertices in a matrix\n"},
 
   /* interface to igraph_simplify */
   {"simplify", (PyCFunction) igraphmodule_Graph_simplify,
@@ -10368,7 +10368,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Returns the Laplacian matrix of a graph.\n\n"
    "The Laplacian matrix is similar to the adjacency matrix, but the edges\n"
    "are denoted with -1 and the diagonal contains the node degrees.\n\n"
-   "Normalized Laplacian matrices have 1 or 0 in their diagonals (0 for nodes\n"
+   "Normalized Laplacian matrices have 1 or 0 in their diagonals (0 for vertices\n"
    "with no edges), edges are denoted by 1 / sqrt(d_i * d_j) where d_i is the\n"
    "degree of node i.\n\n"
    "Multiple edges and self-loops are silently ignored. Although it is\n"
@@ -10394,7 +10394,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Restrictions compared to the official description of the format:\n\n"
    "  - igraph's DIMACS reader requires only three fields in an arc definition,\n"
    "    describing the edge's source and target node and its capacity.\n"
-   "  - Source nodes are identified by 's' in the FLOW field, target nodes are\n"
+   "  - Source vertices are identified by 's' in the FLOW field, target vertices are\n"
    "    identified by 't'.\n"
    "  - Node indices start from 1. Only a single source and target node is allowed.\n\n"
    "@param f: the name of the file\n"
@@ -10574,7 +10574,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "isoclass(vertices)\n\n"
    "Returns the isomorphy class of the graph or its subgraph.\n\n"
    "Isomorphy class calculations are implemented only for graphs with\n"
-   "3 or 4 nodes.\n\n"
+   "3 or 4 vertices.\n\n"
    "@param vertices: a list of vertices if we want to calculate the\n"
    "  isomorphy class for only a subset of vertices. C{None} means to\n"
    "  use the full graph.\n"
