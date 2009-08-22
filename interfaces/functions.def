@@ -1477,5 +1477,5 @@ igraph_revolver_probs_ADE_dpareto:
 # Other, (yet) undocumented functions
 #######################################
 igraph_convergence_degree:
-        PARAMS: GRAPH graph, OUT VECTOR result
+        PARAMS: GRAPH graph, OUT VECTOR result, OUT VECTOR in, OUT VECTOR out
         IGNORE: RR, RC, RNamespace

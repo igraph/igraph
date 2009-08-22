@@ -988,7 +988,7 @@ class JavaCCodeGenerator(JavaCodeGenerator):
         if 'CDECL' in rt:
             retdecl="  " + rt['CDECL']
         elif 'CTYPE' in rt:
-            retdecl="  " + rt['CTYPE'] + " c_result;"
+            retdecl="  " + rt['CTYPE'] + " c__result;"
         else:
             retdecl=""
 
@@ -1055,7 +1055,7 @@ class JavaCCodeGenerator(JavaCodeGenerator):
         call=map( lambda t, n: t.get('CALL', "c_"+n), types, params.keys() )
         call=map( lambda c, n: c.replace("%C%", "c_"+n).replace("%I%", n),
                   call, params.keys() )
-        return "  c_result = " + function + "(" + ", ".join(call) + ");\n"
+        return "  c__result = " + function + "(" + ", ".join(call) + ");\n"
 
     def chunk_outconv(self, function, params):
         """The output conversions, this is quite difficult. A function
@@ -1101,7 +1101,7 @@ class JavaCCodeGenerator(JavaCodeGenerator):
                 retconv="  " + rt['OUTCONV']['OUT']
             else:
                 retconv=""
-            retconv=retconv.replace("%C%", "c_result").replace("%I%", "result")
+            retconv=retconv.replace("%C%", "c__result").replace("%I%", "result")
             if len(retconv)>0: outconv.append(retconv)
             ret="\n".join(outconv)
         elif len(retpars)==1:

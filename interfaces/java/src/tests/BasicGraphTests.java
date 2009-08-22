@@ -41,11 +41,49 @@ public class BasicGraphTests {
 	@Test
 	public void testEmptyGraph() {
 		Graph graph = Graph.Empty(10, false);
-		assertEquals("graph should have ten vertices", 10, graph.vcount());
+		assertEquals("empty graph should have ten vertices", 10, graph.vcount());
+		assertEquals("empty graph should have no edges", 0, graph.ecount());
 		assertFalse(graph.isDirected());
 
 		graph = Graph.Empty(5, true);
-		assertEquals("graph should have five vertices", 5, graph.vcount());
+		assertEquals("empty graph should have five vertices", 5, graph.vcount());
+		assertEquals("empty graph should have no edges", 0, graph.ecount());
 		assertTrue(graph.isDirected());
+	}
+
+	@Test(expected=CoreException.class)
+	public void testEmptyGraphException() {
+		Graph graph = Graph.Empty(-1, true);
+	}
+
+	@Test
+	public void testFullGraph() {
+		Graph graph = Graph.Full(10, false, false);
+		assertEquals("full graph should have 10 vertices", 10, graph.vcount());
+		assertEquals("full graph should have 45 edges", 45, graph.ecount());
+
+		graph = Graph.Full(10, true, false);
+		assertEquals("full directed graph should have 10 vertices", 10, graph.vcount());
+		assertEquals("full directed graph should have 90 edges", 90, graph.ecount());
+
+		graph = Graph.Full(10, false, true);
+		assertEquals("full graph with loops should have 10 vertices", 10, graph.vcount());
+		assertEquals("full graph with loops should have 45 edges", 55, graph.ecount());
+	}
+
+	@Test(expected=CoreException.class)
+	public void testFullGraphException() {
+		Graph graph = Graph.Full(-1, true, true);
+	}
+
+	@Test
+	public void testNeighbors() {
+		Graph graph = Graph.Full(10, false, false);
+		double[] neighbors = graph.neighbors(3, NeighborMode.OUT);
+		double[] expectedNeighbors = { 0, 1, 2, 4, 5, 6, 7, 8, 9 };
+
+		for (int i = 0; i < expectedNeighbors.length; i++)
+			assertEquals("neighbor list element "+i+" invalid for undirected full graph",
+					expectedNeighbors[i], neighbors[i], 0.0);
 	}
 };
