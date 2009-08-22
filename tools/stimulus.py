@@ -723,7 +723,7 @@ class RCCodeGenerator(CodeGenerator):
 class JavaCodeGenerator(CodeGenerator):
     """Class containing the common parts of JavaJavaCodeGenerator and
     JavaCCodeGenerator"""
-    package = "hu.kfki.rmki.cneuro.igraph"
+    package = "net.sf.igraph"
 
     def __init__(self, func, types):
         CodeGenerator.__init__(self, func, types)
@@ -925,7 +925,7 @@ class JavaCCodeGenerator(JavaCodeGenerator):
         
         The name of the function is the igraph function name minus the
         igraph_ prefix, camelcased and prefixed with the underscored
-        Java classname: hu_kfki_rmki_cneuro_igraph_Graph_. The arguments
+        Java classname: net_sf_igraph_Graph_. The arguments
         are mapped from the JAVATYPE key of the type dict. Static
         methods also need a 'jclass cls' argument, ordinary methods
         need 'jobject jobj'. Besides that, the Java environment pointer

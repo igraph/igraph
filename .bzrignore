@@ -90,3 +90,4 @@
 ./interfaces/java/src/c/net_sf_igraph_Graph.c
 ./interfaces/java/src/c/net_sf_igraph_Graph.h
 ./interfaces/java/src/java/Graph.java
+./interfaces/java/reports
