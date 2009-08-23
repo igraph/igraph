@@ -42,5 +42,6 @@ int Java_jobject_to_igraph(JNIEnv *env, jobject jobj, igraph_t** gptr);
 jobject Java_igraph_to_new_jobject(JNIEnv *env, igraph_t* gptr, jclass cls);
 
 /* Conversion between jdoubleArray and igraph_vector_t */
+int Java_jdoubleArray_to_igraph_vector(JNIEnv *env, jdoubleArray array, igraph_vector_t* vector);
 jdoubleArray Java_igraph_vector_to_new_jdoubleArray(JNIEnv *env, igraph_vector_t* vector);
 

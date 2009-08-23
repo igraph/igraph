@@ -34,6 +34,7 @@ or finish it completely.
 #include <jni.h>
 #include <igraph/igraph.h>
 #include <stdlib.h>    /* calloc */
+#include <string.h>    /* strcmp */
 #include "config.h"
 #include "conversion.h"
 #include "net_sf_igraph_Graph.h"
@@ -93,7 +94,8 @@ JNIEnv *JNU_GetEnv() {
  */
 void JNU_ThrowByName(JNIEnv *env, const char *name, const char *msg) {
   jclass cls = (*env)->FindClass(env, name);
-  if (cls != 0) (*env)->ThrowNew(env, cls, msg);
+  if (cls != 0)
+	(*env)->ThrowNew(env, cls, msg);
   (*env)->DeleteLocalRef(env, cls);
 }
 
@@ -118,11 +120,17 @@ igraph_warning_handler_t *Java_igraph_old_warning_handler;
 void Java_igraph_error_handler(const char *reason, const char *file,
   int line, int igraph_errno) {
   JNIEnv *env = JNU_GetEnv();
-  char msg[8192];
+  char msg[8192], *p;
   IGRAPH_FINALLY_FREE();
-  snprintf(msg, 8192, "%s, %s at %s:%i", reason, igraph_strerror(igraph_errno),
-    file, line);
-  JNU_ThrowByName(env, JAVA_PACKAGE_PREFIX "/CoreException", msg);
+
+  if (strlen(reason) > 2 && reason[0] == '_' && reason[1] == '_') {
+	/* Special case: throwing a Java exception by name */
+	JNU_ThrowByName(env, reason+2, "");
+  } else {
+    snprintf(msg, 8192, "%s, %s at %s:%i", reason, igraph_strerror(igraph_errno),
+      file, line);
+    JNU_ThrowByName(env, JAVA_PACKAGE_PREFIX "/CoreException", msg);
+  }
 }
 
 void Java_igraph_before() {

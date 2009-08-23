@@ -764,7 +764,7 @@ class JavaCodeGenerator(CodeGenerator):
         for p in params.keys():
             types[params[p]["mode"]].append(params[p])
 
-        if len(types["OUT"])+len(types["INOUT"]):
+        if len(types["OUT"])+len(types["INOUT"]) == 1:
             # If a single one is OUT or INOUT and all others are
             # INs, then this is our lucky day - the method fits the Java
             # semantics
@@ -1113,6 +1113,10 @@ class JavaCCodeGenerator(JavaCodeGenerator):
                 # INOUT parameter
                 retconv="  result = " + retpars[0][0] + ";"
             outconv.append(retconv)
+
+            outconv.insert(0, "if (c__result == 0) {")
+            outconv.append("}")
+            outconv = ["  %s" % line for line in outconv]
             ret="\n".join(outconv)
         else:
             raise StimulusError, "%s: the case of multiple outputs not supported yet" % function

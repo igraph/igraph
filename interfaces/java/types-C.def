@@ -88,19 +88,25 @@ CONNECTEDNESS:
   CTYPE: igraph_connectedness_t
   JAVATYPE: jobject
   INCONV:
-    IN: %C% = Java_Connectedness_to_igraph(env, %I%);
+    IN: if (Java_Connectedness_to_igraph(env, %I%, &%C%)) { \
+	        igraph_error("__java/lang/NullPointerException", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+		}
 
 NEIMODE:
   CTYPE: igraph_neimode_t
   JAVATYPE: jobject
   INCONV:
-    IN: %C% = Java_NeighborMode_to_igraph(env, %I%);
+    IN: if (Java_NeighborMode_to_igraph(env, %I%, &%C%)) { \
+	        igraph_error("__java/lang/NullPointerException", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+		}
 
 STARMODE:
   CTYPE: igraph_star_mode_t
   JAVATYPE: jobject
   INCONV:
-    IN: %C% = Java_StarMode_to_igraph(env, %I%);
+    IN: if (Java_StarMode_to_igraph(env, %I%, &%C%)) { \
+	        igraph_error("__java/lang/NullPointerException", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+		}
 
 ##################################
 # VECTOR of real values
@@ -110,11 +116,15 @@ VECTOR:
   JAVATYPE: jdoubleArray
   CALL: &%C%
   INCONV:
+    IN:  Java_jdoubleArray_to_igraph_vector(env, %I%, &%C%); \
+	     IGRAPH_FINALLY(igraph_vector_destroy, &%C%);
     OUT: if (0 != igraph_vector_init(&%C%, 0)) { \
 	       igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
 		 } \
 		 IGRAPH_FINALLY(igraph_vector_destroy, &%C%);
   OUTCONV:
+    IN:  igraph_vector_destroy(&%C%); \
+	     IGRAPH_FINALLY_CLEAN(1);
     OUT: %I% = Java_igraph_vector_to_new_jdoubleArray(env, &%C%); \
          igraph_vector_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);

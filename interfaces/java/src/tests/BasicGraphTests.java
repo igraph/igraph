@@ -86,4 +86,28 @@ public class BasicGraphTests {
 			assertEquals("neighbor list element "+i+" invalid for undirected full graph",
 					expectedNeighbors[i], neighbors[i], 0.0);
 	}
+
+	@Test(expected=CoreException.class)
+	public void testNeighborsInvalidVertexID() {
+		 Graph graph = Graph.Full(10, false, false);
+		double[] neighbors = graph.neighbors(-1, NeighborMode.OUT);
+	}
+
+	@Test(expected=NullPointerException.class)
+	public void testNeighborsInvalidNeighborMode() {
+		 Graph graph = Graph.Empty(3, false);
+		double[] neighbors = graph.neighbors(-1, null);
+	}
+
+	@Test
+	public void testGetEids() {
+		Graph graph = Graph.Full(10, false, false);
+		double[] pairs = {2, 7, 5, 1, 3, 4};
+		double[] eids = graph.getEids(pairs, false);
+		double[] expectedEids = { 21, 12, 24 };
+
+		for (int i = 0; i < expectedEids.length; i++)
+			assertEquals("edge ID list element "+i+" invalid for undirected full graph",
+					expectedEids[i], eids[i], 0.0);
+	}
 };

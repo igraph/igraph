@@ -56,19 +56,43 @@ int Java_jobject_to_igraph(JNIEnv *env, jobject jobj, igraph_t** gptr) {
  */
 jobject Java_igraph_to_new_jobject(JNIEnv *env, igraph_t* gptr, jclass cls) {
   /* Construct the object */
-  return (*env)->NewObject(env, cls, net_sf_igraph_Graph_constructor_mid, gptr);
+  jobject result;
+  result = (*env)->NewObject(env, cls, net_sf_igraph_Graph_constructor_mid, gptr);
+  return result;
 }
 
 /***** Conversion between jdoubleArray and igraph_vector_t */
+
+/**
+ * Converts a Java double[] to an igraph_vector_t* object.
+ * The igraph_vector_t* that's passed in must be uninitialized.
+ * @return: zero if everything was OK, an igraph error code otherwise
+ */
+int Java_jdoubleArray_to_igraph_vector(JNIEnv *env, jdoubleArray array, igraph_vector_t* vector) {
+	jsize i, n = (*env)->GetArrayLength(env, array);
+	jdouble* elements = (*env)->GetDoubleArrayElements(env, array, 0);
+
+	IGRAPH_CHECK(igraph_vector_init(vector, n));
+	for (i=0; i < n; i++)
+		VECTOR(*vector)[i] = elements[i];
+
+	(*env)->ReleaseDoubleArrayElements(env, array, elements, JNI_ABORT);
+
+	return 0;
+}
 
 /**
  * Converts an igraph_vector_t* to a new Java double[] object
  * @return: the new Java double array or NULL if there was an error
  */
 jdoubleArray Java_igraph_vector_to_new_jdoubleArray(JNIEnv *env, igraph_vector_t* vector) {
-	long i, n = igraph_vector_size(vector);
-	jdoubleArray result = (*env)->NewDoubleArray(env, n);
-	jdouble* elements = (*env)->GetDoubleArrayElements(env, result, 0);
+	long i, n;
+	jdoubleArray result;
+	jdouble* elements;
+
+	n = igraph_vector_size(vector);
+	result = (*env)->NewDoubleArray(env, n);
+	elements = (*env)->GetDoubleArrayElements(env, result, 0);
 
 	for (i=0; i < n; i++) {
 		elements[i] = VECTOR(*vector)[i];
