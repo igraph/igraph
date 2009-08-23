@@ -48,21 +48,33 @@ jmethodID net_sf_igraph_Graph_constructor_mid;
 
 /*********************** INITIALIZER FUNCTION **************************/
 
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *this_jvm, void* reserved) {
-  JNIEnv *env;
+jint Java_Graph_OnLoad(JNIEnv *env) {
   jclass cls;
-  jvm = this_jvm;
-  if ((*jvm)->GetEnv(jvm, (void**)&env, JNI_VERSION_1_2)) return JNI_ERR;
+
   cls = (*env)->FindClass(env, JAVA_PACKAGE_PREFIX "/Graph");
   if (cls == 0) return JNI_ERR;
+
   net_sf_igraph_Graph_class = (*env)->NewWeakGlobalRef(env, cls);
   if (net_sf_igraph_Graph_class == 0) return JNI_ERR;
+
   net_sf_igraph_Graph_handle_fid = (*env)->GetFieldID(env, cls, "handle", "J");
   if (net_sf_igraph_Graph_handle_fid == 0) return JNI_ERR;
+
   net_sf_igraph_Graph_constructor_mid = (*env)->GetMethodID(env, cls, "<init>", "(J)V");
   if (net_sf_igraph_Graph_constructor_mid == 0) return JNI_ERR;
+}
 
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *this_jvm, void* reserved) {
+  JNIEnv *env;
+
+  jvm = this_jvm;
+  if ((*jvm)->GetEnv(jvm, (void**)&env, JNI_VERSION_1_2)) return JNI_ERR;
+
+  if (Java_Graph_OnLoad(env) == JNI_ERR) return JNI_ERR;
+
+  if (Java_Connectedness_OnLoad(env) == JNI_ERR) return JNI_ERR;
   if (Java_NeighborMode_OnLoad(env) == JNI_ERR) return JNI_ERR;
+  if (Java_StarMode_OnLoad(env) == JNI_ERR) return JNI_ERR;
 
   return JNI_VERSION_1_2;
 }

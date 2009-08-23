@@ -34,12 +34,12 @@ or finish it completely.
 
 package net.sf.igraph;
 
-/// Proxy class for igraph_connectedness_t
-public enum Connectedness {
-	WEAK(1), STRONG(2);
+/// Proxy class for @ctype@
+public enum @javatype@ {
+	@values@;
 
 	private final int numericValue;
 
-	Connectedness(int numericValue) { this.numericValue = numericValue; }
+	@javatype@(int numericValue) { this.numericValue = numericValue; }
 	public int intValue() { return this.numericValue; }
 }
