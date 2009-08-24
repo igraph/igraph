@@ -20,6 +20,7 @@
 <!-- doxrox-include igraph_vs_1 -->
 <!-- doxrox-include igraph_vs_vector -->
 <!-- doxrox-include igraph_vs_vector_small -->
+<!-- doxrox-include igraph_vs_vector_copy -->
 <!-- doxrox-include igraph_vs_seq -->
 </section>
 
