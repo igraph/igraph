@@ -32,6 +32,13 @@ or finish it completely.
 
 */
 
+#ifndef _Included_net_sf_igraph_conversion
+#define _Included_net_sf_igraph_conversion
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <jni.h>
 #include <igraph/igraph.h>
 
@@ -44,4 +51,9 @@ jobject Java_igraph_to_new_jobject(JNIEnv *env, igraph_t* gptr, jclass cls);
 /* Conversion between jdoubleArray and igraph_vector_t */
 int Java_jdoubleArray_to_igraph_vector(JNIEnv *env, jdoubleArray array, igraph_vector_t* vector);
 jdoubleArray Java_igraph_vector_to_new_jdoubleArray(JNIEnv *env, igraph_vector_t* vector);
+
+#ifdef __cplusplus
+}
+#endif
+#endif
 

@@ -4,7 +4,7 @@ igraph library Java interface
 Preface
 -------
 
-__ATTENTION__: This is a highly experimental, proof-of-concept Java interface.
+**ATTENTION**: This is a highly experimental, proof-of-concept Java interface.
 Its main purpose was to convince me that it can be done in finite time :)
 The interface is highly incomplete, at the time of writing even some
 essential functions (e.g. `addEdges`) are missing. Since I don't use Java
@@ -20,14 +20,24 @@ following:
 
 * A recent C compiler
 
-* A recent Java SDK (>= 1.3 should be enough, but I only tried 1.5)
+* A recent Java SDK (>= 1.5)
 
 * Python 2.4 or later if you want to use the interface generator called
   Stimulus (found in tools/stimulus.py in the igraph distribution) to
-  generate `src/Graph.java` and `src/hu_kfki_rmki_cneuro_igraph_Graph.c`
+  generate `src/Graph.java` and `src/net_sf_igraph_Graph.c`
 
 * A GNU-compatible environment (e.g. Cygwin or MinGW on Windows,
   practically anything on Linux, XCode Developer Tools on Mac OS X)
+
+* The `Apache Ant build tool <http://ant.apache.org>`_ for Java
+
+* `ant-contrib.jar` and `cpptasks.jar` somewhere in your Ant path.
+  You can get these from http://ant-contrib.sourceforge.net.
+
+* JUnit 4 if you want to run the unit tests. You can get it from
+  http://junit.org. Put the downloaded JAR file in the `lib`
+  subdirectory and rename it to `junit.jar`.
+
 
 Compilation steps
 -----------------
@@ -42,7 +52,7 @@ This should generate two files in the `dist/` subdirectory:
   wherever you want in your classpath.
     
 * `igraph-java-wrapper.dll` on Windows, `libigraph-java-wrapper.so` on
-  Linux or `igraph-java-wrapper.jnilib` on Mac OS X. This contains the
+  Linux or `libigraph-java-wrapper.jnilib` on Mac OS X. This contains the
   platform-dependent parts. Put it somewhere in the Java library path
   so Java can find it. (The library path can be determined by
   `System.out.println(System.getProperty("java.library.path"))` from

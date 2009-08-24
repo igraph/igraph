@@ -32,19 +32,37 @@ or finish it completely.
 
 */
 
-#ifndef CONCAT2
-#  define CONCAT2x(a,b)     a ## _ ## b
-#  define CONCAT2(a,b)      CONCAT2x(a,b)
+#ifndef _Included_net_sf_igraph_jni_utils
+#define _Included_net_sf_igraph_jni_utils
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-#ifndef CONCAT3
-#  define CONCAT3x(a,b,c)   a ## _ ## b ## _ ## c
-#  define CONCAT3(a,b,c)    CONCAT3x(a,b,c)
+#include <jni.h>
+#include "config.h"
+
+/*********************** INITIALIZER FUNCTION **************************/
+
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *this_jvm, void* reserved);
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *this_jvm, void* reserved);
+
+/************************ AUXILIARY FUNCTIONS **************************/
+
+/// Returns the environment of the current thread using the cached JVM
+JNIEnv *JNU_GetEnv();
+
+/// Throws an exception by exception class name
+void JNU_ThrowByName(JNIEnv *env, const char *name, const char *msg);
+
+/********** THINGS TO DO BEFORE ENTERING & AFTER LEAVING C LAYER ***********/
+
+void Java_igraph_error_handler(const char *reason, const char *file, int line, int igraph_errno);
+void Java_igraph_before();
+void Java_igraph_after();
+
+#ifdef __cplusplus
+}
+#endif
 #endif
 
-#ifndef CONCAT4
-#  define CONCAT4x(a,b,c,d) a ## _ ## b ## _ ## c ## _ ## d
-#  define CONCAT4(a,b,c,d)  CONCAT4x(a,b,c)
-#endif
-
-#define FUNCTION(a) CONCAT3(Java_net_sf_igraph, JAVA_TYPE, a)

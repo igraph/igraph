@@ -88,7 +88,7 @@ CONNECTEDNESS:
   CTYPE: igraph_connectedness_t
   JAVATYPE: jobject
   INCONV:
-    IN: if (Java_Connectedness_to_igraph(env, %I%, &%C%)) { \
+    IN: if (Java_net_sf_igraph_Connectedness_to_igraph(env, %I%, &%C%)) { \
 	        igraph_error("__java/lang/NullPointerException", __FILE__, __LINE__, IGRAPH_ENOMEM); \
 		}
 
@@ -96,7 +96,7 @@ NEIMODE:
   CTYPE: igraph_neimode_t
   JAVATYPE: jobject
   INCONV:
-    IN: if (Java_NeighborMode_to_igraph(env, %I%, &%C%)) { \
+    IN: if (Java_net_sf_igraph_NeighborMode_to_igraph(env, %I%, &%C%)) { \
 	        igraph_error("__java/lang/NullPointerException", __FILE__, __LINE__, IGRAPH_ENOMEM); \
 		}
 
@@ -104,7 +104,7 @@ STARMODE:
   CTYPE: igraph_star_mode_t
   JAVATYPE: jobject
   INCONV:
-    IN: if (Java_StarMode_to_igraph(env, %I%, &%C%)) { \
+    IN: if (Java_net_sf_igraph_StarMode_to_igraph(env, %I%, &%C%)) { \
 	        igraph_error("__java/lang/NullPointerException", __FILE__, __LINE__, IGRAPH_ENOMEM); \
 		}
 
