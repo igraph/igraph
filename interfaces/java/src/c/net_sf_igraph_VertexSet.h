@@ -32,51 +32,22 @@ or finish it completely.
 
 */
 
-#include "net_sf_igraph_pmt.h"
+#ifndef _Included_net_sf_igraph_VertexSet
+#define _Included_net_sf_igraph_VertexSet
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-/************************** STATIC VARIABLES ***************************/
+#include <jni.h>
+#include <igraph/igraph.h>
+#include "config.h"
 
-#define CLASSVAR CONCAT3(igraph, JAVA_TYPE, class)
-#define FIELDVAR CONCAT3(igraph, JAVA_TYPE, numericValue_fid)
+jint Java_net_sf_igraph_VertexSet_OnLoad(JNIEnv *env);
+void Java_net_sf_igraph_VertexSet_OnUnload(JNIEnv *env);
+int Java_net_sf_igraph_VertexSet_to_igraph_vs(JNIEnv *env, jobject jobj, igraph_vs_t *result);
 
-static jclass CLASSVAR;
-static jfieldID FIELDVAR;
-
-/************************ CONVERSION ROUTINES **************************/
-
-/*
- * Initializes the locally cached field IDs
- */
-jint FUNCTION(OnLoad)(JNIEnv *env) {
-  jclass cls;
-
-  cls = (*env)->FindClass(env, JAVA_PACKAGE_PREFIX "/" JAVA_TYPE_STRING);
-  if (cls == 0) return JNI_ERR;
-  CLASSVAR = (*env)->NewWeakGlobalRef(env, cls);
-  if (CLASSVAR == 0) return JNI_ERR;
-  FIELDVAR = (*env)->GetFieldID(env, cls, "numericValue", "I");
-  if (FIELDVAR == 0) return JNI_ERR;
-
-  return JNI_OK;
+#ifdef __cplusplus
 }
-
-/*
- * Releases the weak references held
- */
-void FUNCTION(OnUnload)(JNIEnv *env) {
-  (*env)->DeleteWeakGlobalRef(env, CLASSVAR);
-  CLASSVAR = 0;
-}
-
-/*
- * Converts a Java enum type to an igraph enum type
- * @return:  zero if everything went fine, 1 if a null pointer was passed
- */
-int FUNCTION(to_igraph)(JNIEnv *env, jobject jobj, C_TYPE *result) {
-  if (jobj == 0)
-    return 1;
-  *result = (*env)->GetIntField(env, jobj, FIELDVAR);
-  return 0;
-}
-
+#endif
+#endif
 

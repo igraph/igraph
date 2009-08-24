@@ -203,10 +203,15 @@ MATRIX:
 
 VERTEXSET:
   CTYPE: igraph_vs_t
+  JAVATYPE: jobject
   INCONV:
-    IN: R_SEXP_to_igraph_vs(%I%, &%C1%, &%C%);
+    IN: if (0 != Java_net_sf_igraph_VertexSet_to_igraph_vs(env, %I%, &%C%)) { \
+	      igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+		} \
+	    IGRAPH_FINALLY(igraph_vs_destroy, &%C%);
   OUTCONV:
-    IN: igraph_vs_destroy(&%C%);
+    IN: igraph_vs_destroy(&%C%); \
+	    IGRAPH_FINALLY_CLEAN(1);
 
 ##################################
 # NULL, this is supplied as an argument

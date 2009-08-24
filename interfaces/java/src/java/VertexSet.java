@@ -62,12 +62,32 @@ public class VertexSet implements Iterable<Long> {
     /// Constructor that creates a VertexSet referring to a single vertex attached to a given graph
     public VertexSet(Long vertexID, Graph graph) {
         this(graph);
-        this.ids = new Vector<Long>();
+        this.ids = new Vector<Long>(1);
         this.ids.add(vertexID);
     }
 
     /// Constructor that creates a VertexSet referring to a single vertex with no attached graph
     public VertexSet(Long vertexID) {
+        this(vertexID, null);
+    }
+
+    /// Constructor that creates a VertexSet referring to a single vertex attached to a given graph
+    public VertexSet(Integer vertexID, Graph graph) {
+		this(Long.valueOf(vertexID), graph);
+    }
+
+    /// Constructor that creates a VertexSet referring to a single vertex with no attached graph
+    public VertexSet(Integer vertexID) {
+        this(vertexID, null);
+    }
+
+    /// Constructor that creates a VertexSet referring to a single vertex attached to a given graph
+    public VertexSet(long vertexID, Graph graph) {
+		this(Long.valueOf(vertexID), graph);
+    }
+
+    /// Constructor that creates a VertexSet referring to a single vertex with no attached graph
+    public VertexSet(long vertexID) {
         this(vertexID, null);
     }
 
@@ -86,9 +106,8 @@ public class VertexSet implements Iterable<Long> {
     public VertexSet(long[] vertexIDs, Graph graph) {
         this(graph);
         this.ids = new Vector<Long>(vertexIDs.length);
-
         for (int i = 0; i < vertexIDs.length; i++)
-            this.ids.set(i, Long.valueOf(vertexIDs[i]));
+            this.ids.add(Long.valueOf(vertexIDs[i]));
     }
 
     /// Constructor that creates a VertexSet referring to a predefined set of vertices with no attached graph
@@ -99,17 +118,37 @@ public class VertexSet implements Iterable<Long> {
     /// Returns an iterator for the vertex IDs (may change in the future!)
     public Iterator<Long> iterator() {
         if (ids == null) {
-            /* No IDs specified. If we are assigned to a graph, get the vertex count
-             * and iterate over all the vertices */
+            /* No IDs specified. If we are assigned to a graph, get the vertex
+             * count and iterate over all the vertices */
             if (graph == null)
                 throw new UnsupportedOperationException("VertexSet is not assigned to a graph");
 
-            Long vcount = graph.vcount();
-            return new LongRangeIterator(0L, vcount);
+            return new LongRangeIterator(0L, graph.vcount());
         }
 
         return this.ids.iterator();
     }
+
+	/// Returns an array for the vertex IDs
+	public long[] getIdArray() {
+		if (this.ids == null) {
+            /* No IDs specified. If we are assigned to a graph, get the vertex
+             * count and return all the IDs */
+            if (graph == null)
+                throw new UnsupportedOperationException("VertexSet is not assigned to a graph");
+
+			long[] result = new long[(int)graph.vcount()];
+			for (int i = 0; i < result.length; i++)
+				result[i] = i;
+
+            return result;
+		}
+
+		long[] result = new long[this.ids.size()];
+		for (int i = 0; i < result.length; i++)
+			result[i] = this.ids.get(i);
+		return result;
+	}
 
     /**
      * Returns the type hint of this vertex set.

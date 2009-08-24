@@ -55,6 +55,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *this_jvm, void* reserved) {
   if (Java_net_sf_igraph_NeighborMode_OnLoad(env) == JNI_ERR) return JNI_ERR;
   if (Java_net_sf_igraph_StarMode_OnLoad(env) == JNI_ERR) return JNI_ERR;
 
+  if (Java_net_sf_igraph_VertexSet_OnLoad(env) == JNI_ERR) return JNI_ERR;
+
   return JNI_VERSION_1_2;
 }
 
@@ -68,6 +70,8 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *this_jvm, void* reserved) {
   Java_net_sf_igraph_Connectedness_OnUnload(env);
   Java_net_sf_igraph_NeighborMode_OnUnload(env);
   Java_net_sf_igraph_StarMode_OnUnload(env);
+
+  Java_net_sf_igraph_VertexSet_OnUnload(env);
 }
 
 /************************ AUXILIARY FUNCTIONS **************************/
@@ -102,6 +106,11 @@ void Java_igraph_error_handler(const char *reason, const char *file,
   JNIEnv *env = JNU_GetEnv();
   char msg[8192], *p;
   IGRAPH_FINALLY_FREE();
+
+  if ((*env)->ExceptionCheck(env)) {
+	/* We already have an exception, keep that and return */
+	return;
+  }
 
   if (strlen(reason) > 2 && reason[0] == '_' && reason[1] == '_') {
 	/* Special case: throwing a Java exception by name */

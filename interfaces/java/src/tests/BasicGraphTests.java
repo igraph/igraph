@@ -110,4 +110,49 @@ public class BasicGraphTests {
             assertEquals("edge ID list element "+i+" invalid for undirected full graph",
                     expectedEids[i], eids[i], 0.0);
     }
+
+    @Test
+    public void testDegreeAll1() {
+        Graph graph = Graph.Full(10, false, true);
+        double[] expectedDegrees = { 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 };
+        double[] degrees = graph.degree(null, NeighborMode.OUT, false);
+
+        for (int i = 0; i < expectedDegrees.length; i++) {
+            assertEquals("degree list element "+i+" invalid for undirected full graph (no loops)",
+                    expectedDegrees[i], degrees[i], 0.0);
+		}
+	}
+
+    @Test
+    public void testDegreeAll2() {
+        Graph graph = Graph.Full(10, false, true);
+        double[] expectedDegrees = { 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 };
+        double[] degrees = graph.degree(VertexSet.ALL, NeighborMode.OUT, false);
+
+        for (int i = 0; i < expectedDegrees.length; i++) {
+            assertEquals("degree list element "+i+" invalid for undirected full graph (no loops)",
+                    expectedDegrees[i], degrees[i], 0.0);
+		}
+	}
+
+	@Test
+	public void testDegreeSingle() {
+        Graph graph = Graph.Full(10, false, true);
+        double[] expectedDegrees = { 9 };
+        double[] degrees = graph.degree(new VertexSet(2), NeighborMode.OUT, false);
+        for (int i = 0; i < expectedDegrees.length; i++)
+            assertEquals("degree list element "+i+" invalid for undirected full graph (no loops)",
+                    expectedDegrees[i], degrees[i], 0.0);
+    }
+
+	@Test
+	public void testDegreeMultiple() {
+        Graph graph = Graph.Full(10, false, true);
+		long[] ids = { 2, 3, 7 };
+        double[] expectedDegrees = { 9, 9, 9 };
+        double[] degrees = graph.degree(new VertexSet(ids), NeighborMode.OUT, false);
+        for (int i = 0; i < expectedDegrees.length; i++)
+            assertEquals("degree list element "+i+" invalid for undirected full graph (no loops)",
+                    expectedDegrees[i], degrees[i], 0.0);
+    }
 };
