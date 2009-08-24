@@ -1853,7 +1853,7 @@ class Graph(core.GraphBase):
             vertex_labels = drawing.collect_attributes(self.vcount(), "vertex_label", \
                 "label", kwds, self.vs, config, None)
         vertex_dists = drawing.collect_attributes(self.vcount(), "vertex_label_dist", \
-            "label_dist", kwds, self.vs, config, 1.2, float)
+            "label_dist", kwds, self.vs, config, 1.6, float)
         vertex_degrees = drawing.collect_attributes(self.vcount(), \
             "vertex_label_angle", "label_angle", kwds, self.vs, config, \
             -math.pi/2, float)
@@ -1870,10 +1870,11 @@ class Graph(core.GraphBase):
         for idx, v in enumerate(self.vs):
             xb, yb, w, h = context.text_extents(vertex_labels[idx])[:4]
             cx, cy = layout[idx]
-            cx += math.cos(vertex_degrees[idx]) * vertex_dists[idx] * vertex_sizes[idx]
-            cy += math.sin(vertex_degrees[idx]) * vertex_dists[idx] * vertex_sizes[idx]
-            cx -= w/2. + xb
-            cy -= h/2. + yb
+            si, co = math.sin(vertex_degrees[idx]), math.cos(vertex_degrees[idx])
+            cx += co * vertex_dists[idx] * vertex_sizes[idx] / 2.
+            cy += si * vertex_dists[idx] * vertex_sizes[idx] / 2.
+            cx += (co - 1) * w/2. + xb
+            cy += (si + 1) * h/2.
             context.move_to(cx, cy)
             context.set_font_size(vertex_label_sizes[idx])
             context.set_source_rgb(*vertex_label_colors[idx])
