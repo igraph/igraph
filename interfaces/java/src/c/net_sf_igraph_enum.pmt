@@ -40,5 +40,5 @@ or finish it completely.
 
 jint FUNCTION(OnLoad)(JNIEnv *env);
 void FUNCTION(OnUnload)(JNIEnv *env);
-C_TYPE FUNCTION(to_igraph)(JNIEnv *env, jobject jobj);
+int FUNCTION(to_igraph)(JNIEnv *env, jobject jobj, C_TYPE *result);
 

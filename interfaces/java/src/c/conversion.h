@@ -1,6 +1,6 @@
 /* 
    IGraph library Java interface.
-   Copyright (C) 2007  Tamas Nepusz <ntamas@rmki.kfki.hu>
+   Copyright (C) 2007-2009  Tamas Nepusz <tamas@cs.rhul.ac.uk>
    MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
    
    This program is free software; you can redistribute it and/or modify
@@ -32,14 +32,16 @@ or finish it completely.
 
 */
 
-package net.sf.igraph;
+#include <jni.h>
+#include <igraph/igraph.h>
 
-/// Proxy class for igraph_connectedness_t
-public enum Connectedness {
-	WEAK(1), STRONG(2);
+/************************ CONVERSION ROUTINES **************************/
 
-	private final int numericValue;
+/* Conversion between jobject and igraph_t */
+int Java_jobject_to_igraph(JNIEnv *env, jobject jobj, igraph_t** gptr);
+jobject Java_igraph_to_new_jobject(JNIEnv *env, igraph_t* gptr, jclass cls);
 
-	Connectedness(int numericValue) { this.numericValue = numericValue; }
-	public int intValue() { return this.numericValue; }
-}
+/* Conversion between jdoubleArray and igraph_vector_t */
+int Java_jdoubleArray_to_igraph_vector(JNIEnv *env, jdoubleArray array, igraph_vector_t* vector);
+jdoubleArray Java_igraph_vector_to_new_jdoubleArray(JNIEnv *env, igraph_vector_t* vector);
+

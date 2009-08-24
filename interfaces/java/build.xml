@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <project name="igraph Java interface" default="usage" basedir="."
-	xmlns:cpptasks="antlib:net.sf.antcontrib.cpptasks">
+	xmlns:cpptasks="antlib:net.sf.antcontrib.cpptasks"
+	xmlns:antcontrib="antlib:net.sf.antcontrib">
 
 	<!-- Package name and version number -->
 	<property name="package.name" value="net.sf.igraph" />
@@ -9,9 +10,12 @@
 	<property name="package.version" value="0.6" />
 
 	<!-- Directories -->
-	<property name="src" location="src" />
 	<property name="build" location="build" />
 	<property name="dist" location="dist" />
+	<property name="etc" location="etc" />
+	<property name="lib" location="lib" />
+	<property name="src" location="src" />
+	<property name="reports" location="reports" />
 
 	<!-- Access to environment -->
 	<property environment="os" />
@@ -27,14 +31,15 @@
 	<!-- Other configuration stuff -->
 	<property name="libtype" value="shared" />
 
-	<!-- DON'T CHANGE ANYTHING BELOW THIS LINE -->
-	<condition property="jni.library.name" value="igraph-java-wrapper.jnilib">
+	<!-- DON'T CHANGE ANYTHING BELOW THIS LINE
+	     UNLESS YOU KNOW WHAT YOU'RE DOING -->
+	<condition property="jni.library.name" value="libigraph-java-wrapper.jnilib">
 		<and><os family="mac" /><os family="unix" /></and>
 	</condition>
-	<condition property="jni.library.name" value="igraph-java-wrapper.dll">
+	<condition property="jni.library.name" value="libigraph-java-wrapper.dll">
 		<os family="windows" />
 	</condition>
-	<condition property="jni.library.name" value="igraph-java-wrapper.dll">
+	<condition property="jni.library.name" value="libigraph-java-wrapper.so">
 		<os family="unix" />
 	</condition>
 	<path id="jni.include.path">
@@ -44,12 +49,16 @@
 		<pathelement path="${java.home}/../include/linux" />
 	</path>
 
+	<property name="generated.enum.classes" value="Connectedness NeighborMode StarMode" />
+
 	<!-- Initializes the build tree, creates the necessary directories -->
 	<target name="-init" description="Initializes the build process">
 		<mkdir dir="${build}" />
-		<mkdir dir="${build}/java" />
 		<mkdir dir="${build}/c" />
+		<mkdir dir="${build}/java" />
+		<mkdir dir="${build}/tests" />
 		<mkdir dir="${dist}" />
+		<mkdir dir="${reports}" />
 	</target>
 
 	<!-- Deletes the existing build -->
@@ -59,14 +68,23 @@
 		<delete dir="${build}/c" />
 		<delete dir="${build}" />
 		<delete dir="${dist}" />
-		<!-- Delete generated source files -->
+		<delete dir="${reports}" />
+		<!-- Delete generated Java source files -->
 		<delete file="${src}/java/Graph.java" />
+		<antcontrib:for param="classname" list="${generated.enum.classes}"
+			delimiter=" ">
+			<sequential>
+				<delete file="${src}/java/@{classname}.java" />
+			</sequential>
+		</antcontrib:for>
+		<!-- Delete generated C source files -->
 		<delete file="${src}/c/config.h" />
 		<delete file="${src}/c/net_sf_igraph_Graph.h" />
 	</target>
 
 	<!-- Generates some Java source files -->
 	<target name="generate_java_source">
+		<!-- Generate Graph.java -->
 		<exec executable="${python.executable}" failonerror="true">
 			<arg value="${stimulus.script}" />
 			<arg value="-f" />
@@ -80,12 +98,26 @@
 			<arg value="-l" />
 			<arg value="JavaJava" />
 		</exec>
+
+		<!-- Generate enum classes -->
+		<antcontrib:for param="classname" delimiter=" "
+			list="${generated.enum.classes}">
+			<sequential>
+				<copy file="${src}/java/GenericEnum.java.in"
+					  tofile="${src}/java/@{classname}.java" />
+				<replace file="${src}/java/@{classname}.java"
+				 replacefilterfile="${etc}/enums/@{classname}.properties" />
+			</sequential>
+		</antcontrib:for>
+	</target>
+
+	<target name="-generate_java_enum_class">
 	</target>
 
 	<!-- Generates some C source files -->
 	<target name="generate_c_source">
 		<copy file="${src}/c/config.h.in" tofile="${src}/c/config.h" />
-		<replace file="${src}/c/config.h" token="@JAVA_PACKAGE_PREFIX"
+		<replace file="${src}/c/config.h" token="@JAVA_PACKAGE_SLASH@"
 			value="${package.slashed.name}" />
 
 		<javah class="${package.name}.Graph" destdir="${src}/c" verbose="yes" force="yes">
@@ -111,6 +143,17 @@
 	<target name="compile_java" depends="-init, generate_java_source"
 		description="--> compile Java code">
 		<javac srcdir="${src}/java" destdir="${build}/java" />
+	</target>
+
+	<!-- Compiles the Java tests -->
+	<target name="compile_tests" depends="-init"
+		description="--> compile Java tests">
+		<javac srcdir="${src}/tests" destdir="${build}/tests">
+			<classpath>
+				<pathelement location="${build}/java" />
+				<pathelement location="${lib}/junit.jar" />
+			</classpath>
+		</javac>
 	</target>
 
 	<!-- Compiles the C source code -->
@@ -151,11 +194,24 @@
 	</target>
 
 	<!-- Tests the whole thing -->
-	<target name="test" depends="compile" description="Runs JUnit tests in the distribution">
+	<target name="test" depends="compile, compile_tests" description="Runs JUnit tests in the distribution">
 		<junit printsummary="yes" fork="yes" haltonfailure="yes">
-			<classpath refid="lib/junit.jar" />
+			<classpath>
+				<pathelement location="${build}/tests" />
+				<pathelement location="${build}/java" />
+				<pathelement location="${lib}/junit.jar" />
+			</classpath>
+
+			<jvmarg value="-Djava.library.path=${build}" />
+
 			<formatter type="plain" />
-			<test name="${package.name}.TestSuite" />
+
+			<batchtest todir="${reports}">
+				<fileset dir="${build}/tests">
+					<include name="**/*Test*.class" />
+					<exclude name="**/AllTests.class" />
+				</fileset>
+			</batchtest>
 		</junit>
 	</target>
 

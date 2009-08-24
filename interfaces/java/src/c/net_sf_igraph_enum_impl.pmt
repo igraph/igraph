@@ -68,9 +68,13 @@ void FUNCTION(OnUnload)(JNIEnv *env) {
 
 /*
  * Converts a Java enum type to an igraph enum type
+ * @return:  zero if everything went fine, 1 if a null pointer was passed
  */
-C_TYPE FUNCTION(to_igraph)(JNIEnv *env, jobject jobj) {
-  return (*env)->GetIntField(env, jobj, FIELDVAR);
+int FUNCTION(to_igraph)(JNIEnv *env, jobject jobj, C_TYPE *result) {
+  if (jobj == 0)
+    return 1;
+  *result = (*env)->GetIntField(env, jobj, FIELDVAR);
+  return 0;
 }
 
 

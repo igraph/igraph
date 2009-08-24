@@ -137,12 +137,12 @@ VECTOR:
   INCONV:
     IN: R_SEXP_to_vector(%I%, &%C%);
     OUT: if (0 != igraph_vector_init(&%C%, 0)) { \
-           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+             igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
          } \
          IGRAPH_FINALLY(igraph_vector_destroy, &%C%);
     INOUT: if (0 != R_SEXP_to_vector_copy(%I%, &%C%)) { \
-           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
-         } \
+             igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+           } \
          IGRAPH_FINALLY(igraph_vector_destroy, &%C%);
   OUTCONV:
     OUT: PROTECT(%I%=R_igraph_vector_to_SEXP(&%C%)); \

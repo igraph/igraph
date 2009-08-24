@@ -90,3 +90,7 @@
 ./interfaces/java/src/c/net_sf_igraph_Graph.c
 ./interfaces/java/src/c/net_sf_igraph_Graph.h
 ./interfaces/java/src/java/Graph.java
+./interfaces/java/src/java/Connectedness.java
+./interfaces/java/src/java/NeighborMode.java
+./interfaces/java/src/java/StarMode.java
+./interfaces/java/reports

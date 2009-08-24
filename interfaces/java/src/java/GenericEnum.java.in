@@ -34,12 +34,12 @@ or finish it completely.
 
 package net.sf.igraph;
 
-/// Proxy class for igraph_star_mode_t
-public enum StarMode {
-	OUT(0), IN(1), UNDIRECTED(2), MUTUAL(3);
+/// Proxy class for @ctype@
+public enum @javatype@ {
+	@values@;
 
 	private final int numericValue;
 
-	StarMode(int numericValue) { this.numericValue = numericValue; }
+	@javatype@(int numericValue) { this.numericValue = numericValue; }
 	public int intValue() { return this.numericValue; }
 }

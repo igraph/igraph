@@ -34,32 +34,48 @@ or finish it completely.
 #include <jni.h>
 #include <igraph/igraph.h>
 #include <stdlib.h>    /* calloc */
+#include <string.h>    /* strcmp */
 #include "config.h"
+#include "conversion.h"
 #include "net_sf_igraph_Graph.h"
 
 /************************** STATIC VARIABLES ***************************/
 
 static JavaVM *jvm;
-static jclass igraph_Graph_class;
-static jfieldID igraph_Graph_handle_fid;
-static jmethodID igraph_Graph_constructor_mid;
+jclass net_sf_igraph_Graph_class;
+jfieldID net_sf_igraph_Graph_handle_fid;
+jmethodID net_sf_igraph_Graph_constructor_mid;
 
 /*********************** INITIALIZER FUNCTION **************************/
 
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *this_jvm, void* reserved) {
-  JNIEnv *env;
+jint Java_Graph_OnLoad(JNIEnv *env) {
   jclass cls;
-  jvm = this_jvm;
-  if ((*jvm)->GetEnv(jvm, (void**)&env, JNI_VERSION_1_2)) return JNI_ERR;
+
   cls = (*env)->FindClass(env, JAVA_PACKAGE_PREFIX "/Graph");
   if (cls == 0) return JNI_ERR;
-  igraph_Graph_class = (*env)->NewWeakGlobalRef(env, cls);
-  if (igraph_Graph_class == 0) return JNI_ERR;
-  igraph_Graph_handle_fid = (*env)->GetFieldID(env, cls, "handle", "J");
-  if (igraph_Graph_handle_fid == 0) return JNI_ERR;
-  igraph_Graph_constructor_mid = (*env)->GetMethodID(env, cls, "<init>", "(J)V");
-  if (igraph_Graph_constructor_mid == 0) return JNI_ERR;
+
+  net_sf_igraph_Graph_class = (*env)->NewWeakGlobalRef(env, cls);
+  if (net_sf_igraph_Graph_class == 0) return JNI_ERR;
+
+  net_sf_igraph_Graph_handle_fid = (*env)->GetFieldID(env, cls, "handle", "J");
+  if (net_sf_igraph_Graph_handle_fid == 0) return JNI_ERR;
+
+  net_sf_igraph_Graph_constructor_mid = (*env)->GetMethodID(env, cls, "<init>", "(J)V");
+  if (net_sf_igraph_Graph_constructor_mid == 0) return JNI_ERR;
+}
+
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *this_jvm, void* reserved) {
+  JNIEnv *env;
+
+  jvm = this_jvm;
+  if ((*jvm)->GetEnv(jvm, (void**)&env, JNI_VERSION_1_2)) return JNI_ERR;
+
+  if (Java_Graph_OnLoad(env) == JNI_ERR) return JNI_ERR;
+
+  if (Java_Connectedness_OnLoad(env) == JNI_ERR) return JNI_ERR;
   if (Java_NeighborMode_OnLoad(env) == JNI_ERR) return JNI_ERR;
+  if (Java_StarMode_OnLoad(env) == JNI_ERR) return JNI_ERR;
+
   return JNI_VERSION_1_2;
 }
 
@@ -67,8 +83,8 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *this_jvm, void* reserved) {
   JNIEnv *env;
 
   if ((*jvm)->GetEnv(jvm, (void**)&env, JNI_VERSION_1_2)) return;
-  (*env)->DeleteWeakGlobalRef(env, igraph_Graph_class);
-  igraph_Graph_class = 0;
+  (*env)->DeleteWeakGlobalRef(env, net_sf_igraph_Graph_class);
+  net_sf_igraph_Graph_class = 0;
 
   Java_NeighborMode_OnUnload(env);
 }
@@ -90,36 +106,17 @@ JNIEnv *JNU_GetEnv() {
  */
 void JNU_ThrowByName(JNIEnv *env, const char *name, const char *msg) {
   jclass cls = (*env)->FindClass(env, name);
-  if (cls != 0) (*env)->ThrowNew(env, cls, msg);
+  if (cls != 0)
+	(*env)->ThrowNew(env, cls, msg);
   (*env)->DeleteLocalRef(env, cls);
 }
 
-/************************ CONVERSION ROUTINES **************************/
-
-/*
- * Converts a Java jobject to an igraph_t* if appropriate by casting
- * its private handle field to an igraph_t*
- *
- * @return: 0 if everything was OK, 1 otherwise
- */
-int Java_jobject_to_igraph(JNIEnv *env, jobject jobj, igraph_t** gptr) {
-  *gptr = (igraph_t*)(*env)->GetLongField(env, jobj, igraph_Graph_handle_fid);
-  return (*gptr == 0 ? 1 : 0);
-}
-
-/*
- * Converts an igraph_t* to a new Java Graph object
- * @return: the new Java Graph object or NULL if there was an error
- */
-jobject Java_igraph_to_new_jobject(JNIEnv *env, igraph_t* gptr, jclass cls) {
-  /* Construct the object */
-  return (*env)->NewObject(env, cls, igraph_Graph_constructor_mid, gptr);
-}
+/************************ DESTRUCTOR ROUTINES **************************/
 
 /*
  * Frees the underlying igraph_t object
  */
-void Java_hu_kfki_rmki_cneuro_igraph_Graph_destroy(JNIEnv *env, jobject jobj) {
+void Java_net_sf_igraph_Graph_destroy(JNIEnv *env, jobject jobj) {
   igraph_t *g;
   if (Java_jobject_to_igraph(env, jobj, &g)) return;
   if (g == 0) return;
@@ -135,11 +132,17 @@ igraph_warning_handler_t *Java_igraph_old_warning_handler;
 void Java_igraph_error_handler(const char *reason, const char *file,
   int line, int igraph_errno) {
   JNIEnv *env = JNU_GetEnv();
-  char msg[8192];
+  char msg[8192], *p;
   IGRAPH_FINALLY_FREE();
-  snprintf(msg, 8192, "%s, %s at %s:%i", reason, igraph_strerror(igraph_errno),
-    file, line);
-  JNU_ThrowByName(env, JAVA_PACKAGE_PREFIX "/CoreException", msg);
+
+  if (strlen(reason) > 2 && reason[0] == '_' && reason[1] == '_') {
+	/* Special case: throwing a Java exception by name */
+	JNU_ThrowByName(env, reason+2, "");
+  } else {
+    snprintf(msg, 8192, "%s, %s at %s:%i", reason, igraph_strerror(igraph_errno),
+      file, line);
+    JNU_ThrowByName(env, JAVA_PACKAGE_PREFIX "/CoreException", msg);
+  }
 }
 
 void Java_igraph_before() {
