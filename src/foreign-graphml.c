@@ -996,7 +996,9 @@ int igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
 
   if (index<0)
     IGRAPH_ERROR("Graph index must be non-negative", IGRAPH_EINVAL);
-  
+
+  xmlInitParser();
+
   /* Create a progressive parser context */
   state.g=graph;
   state.index=index<0?0:index;
