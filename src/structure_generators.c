@@ -649,8 +649,7 @@ int igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
  *        its dimensions. Ie. the dimension of the lattice will be the
  *        same as the length of this vector.
  * \param nei Integer value giving the distance (number of steps)
- *        within which two vertices will be connected. Not implemented
- *        yet. 
+ *        within which two vertices will be connected.
  * \param directed Boolean, whether to create a directed graph. The
  *        direction of the edges is determined by the generation
  *        algorithm and is unlikely to suit you, so this isn't a very
