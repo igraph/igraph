@@ -5612,15 +5612,16 @@ PyObject *igraphmodule_Graph_laplacian(igraphmodule_GraphObject * self,
     return NULL;
   }
 
-  if (weights) { igraph_vector_destroy(weights); free(weights); }
-
-  if (PyObject_IsTrue(normalized)) {
+  if (PyObject_IsTrue(normalized) || weights) {
     result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
   }
   else {
     result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_INT);
   }
+
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
   igraph_matrix_destroy(&m);
+
   return result;
 }
 
