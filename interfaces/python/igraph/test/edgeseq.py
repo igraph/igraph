@@ -26,8 +26,25 @@ class EdgeSeqTests(unittest.TestCase):
         only_even["test2"] = range(23)
         expected = [[i/2, None][i % 2] for i in xrange(self.g.ecount())]
         self.failUnless(self.g.es["test2"] == expected)
-        
-        self.assertRaises(ValueError, only_even.__setitem__, "test2", range(6))
+
+    def testSequenceReusing(self):
+        if "test" in self.g.edge_attributes(): del self.g.es["test"]
+
+        self.g.es["test"] = ["A", "B", "C"]
+        self.failUnless(self.g.es["test"] == ["A", "B", "C"]*15)
+        self.g.es["test"] = "ABC"
+        self.failUnless(self.g.es["test"] == ["ABC"] * 45)
+
+        only_even = self.g.es.select(lambda e: (e.index % 2 == 0))
+        only_even["test"] = ["D", "E"]
+        expected = ["D", "ABC", "E", "ABC"] * 12
+        expected = expected[0:45]
+        self.failUnless(self.g.es["test"] == expected)
+        del self.g.es["test"]
+        only_even["test"] = ["D", "E"]
+        expected = ["D", None, "E", None] * 12
+        expected = expected[0:45]
+        self.failUnless(self.g.es["test"] == expected)
 
     def testAllSequence(self):
         self.failUnless(len(self.g.es) == 45)

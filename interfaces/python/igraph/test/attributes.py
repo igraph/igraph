@@ -47,7 +47,8 @@ class AttributeTests(unittest.TestCase):
         self.failUnless(g.vs["name"] == range(5,10))
         g.vs["name2"] = (1,2,3,4,6) 
         self.failUnless(g.vs["name2"] == [1,2,3,4,6])
-        self.assertRaises(ValueError, g.vs.set_attribute_values, "name", [2])
+        g.vs.set_attribute_values("name", [2])
+        self.failUnless(g.vs["name"] == [2]*5)
 
     def testMassEdgeAttributeAssignment(self):
         g = Graph.Full(5)
@@ -57,7 +58,8 @@ class AttributeTests(unittest.TestCase):
         self.failUnless(g.es["name"] == range(10,20))
         g.es["name2"] = (1,2,3,4,6,1,2,3,4,6) 
         self.failUnless(g.es["name2"] == [1,2,3,4,6,1,2,3,4,6])
-        self.assertRaises(ValueError, g.es.set_attribute_values, "name", [2])
+        g.es.set_attribute_values("name", [2])
+        self.failUnless(g.es["name"] == [2]*10)
     
 def suite():
     attribute_suite = unittest.makeSuite(AttributeTests)

@@ -22,7 +22,23 @@ class VertexSeqTests(unittest.TestCase):
         self.failUnless(self.g.vs["test"] == [0,1,0,3,0,5,0,7,0,9])
         only_even["test2"] = range(5)
         self.failUnless(self.g.vs["test2"] == [0,None,1,None,2,None,3,None,4,None])
-        self.assertRaises(ValueError, only_even.__setitem__, "test2", range(6))
+
+    def testSequenceReusing(self):
+        if "test "in self.g.vertex_attributes(): del self.g.vs["test"]
+
+        self.g.vs["test"] = ["A", "B", "C"]
+        self.failUnless(self.g.vs["test"] == ["A", "B", "C", "A", "B", "C", "A", "B", "C", "A"])
+        self.g.vs["test"] = "ABC"
+        self.failUnless(self.g.vs["test"] == ["ABC"] * 10)
+
+        only_even = self.g.vs.select(lambda v: (v.index % 2 == 0))
+        only_even["test"] = ["D", "E"]
+        self.failUnless(self.g.vs["test"] == ["D", "ABC", "E", "ABC", "D", "ABC", "E", "ABC", "D", "ABC"])
+        del self.g.vs["test"]
+        only_even["test"] = ["D", "E"]
+        self.failUnless(self.g.vs["test"] == ["D", None, "E", None, "D", None, "E", None, "D", None])
+
+
 
     def testAllSequence(self):
         self.failUnless(len(self.g.vs) == 10)

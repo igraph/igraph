@@ -348,7 +348,7 @@ int igraphmodule_EdgeSeq_set_attribute_values_mapping(igraphmodule_EdgeSeqObject
   PyObject *dict, *list, *item;
   igraphmodule_GraphObject *gr=self->gref;
   igraph_vector_t es;
-  long i, n;
+  long i, j, n, no_of_edges;
   
   dict = ((PyObject**)gr->g.attr)[ATTRHASH_IDX_EDGE];
 
@@ -359,12 +359,26 @@ int igraphmodule_EdgeSeq_set_attribute_values_mapping(igraphmodule_EdgeSeqObject
     return -1;
   }
 
+ if (PyString_Check(values) || !PySequence_Check(values)) {
+    /* If values is a string or not a sequence, we construct a list with a
+     * single element (the value itself) and then call ourselves again */
+    int result;
+    PyObject *newList = PyList_New(1);
+    if (newList == 0) return -1;
+    Py_INCREF(values);
+    PyList_SET_ITEM(newList, 0, values);    /* reference stolen here */
+    result = igraphmodule_EdgeSeq_set_attribute_values_mapping(self, attrname, newList);
+    Py_DECREF(newList);
+    return result;
+  }
+
   n=PySequence_Size(values);
   if (n<0) return -1;
 
   if (igraph_es_type(&self->es) == IGRAPH_ES_ALL) {
-    if (n != (long)igraph_ecount(&gr->g)) {
-      PyErr_SetString(PyExc_ValueError, "value list length must be equal to the number of edges in the edge sequence");
+    no_of_edges = (long)igraph_ecount(&gr->g);
+    if (n == 0 && no_of_edges > 0) {
+      PyErr_SetString(PyExc_ValueError, "sequence must not be empty");
       return -1;
     }
 
@@ -372,8 +386,9 @@ int igraphmodule_EdgeSeq_set_attribute_values_mapping(igraphmodule_EdgeSeqObject
     list = PyDict_GetItem(dict, attrname);
     if (list != 0) {
       /* Yes, we have. Modify its items to the items found in values */
-      for (i=0; i<n; i++) {
-        item = PySequence_GetItem(values, i);
+      for (i=0, j=0; i<no_of_edges; i++, j++) {
+        if (j == n) j = 0;
+        item = PySequence_GetItem(values, j);
         if (item == 0) return -1;
         /* No need to Py_INCREF(item), PySequence_GetItem returns a new reference */
         if (PyList_SetItem(list, i, item)) {
@@ -384,10 +399,11 @@ int igraphmodule_EdgeSeq_set_attribute_values_mapping(igraphmodule_EdgeSeqObject
     } else if (values != 0) {
       /* We don't have attributes with the given name yet. Create an entry
        * in the dict, create a new list and copy everything */
-      list = PyList_New(n);
+      list = PyList_New(no_of_edges);
       if (list == 0) return -1;
-      for (i=0; i<n; i++) {
-        item = PySequence_GetItem(values, i);
+      for (i=0, j=0; i<no_of_edges; i++, j++) {
+        if (j == n) j = 0;
+        item = PySequence_GetItem(values, j);
         if (item == 0) { Py_DECREF(list); return -1; }
         /* No need to Py_INCREF(item), PySequence_GetItem returns a new reference */
         PyList_SET_ITEM(list, i, item);
@@ -411,8 +427,9 @@ int igraphmodule_EdgeSeq_set_attribute_values_mapping(igraphmodule_EdgeSeqObject
       igraph_vector_destroy(&es);
       return -1;
     }
-    if (n != (long)igraph_vector_size(&es)) {
-      PyErr_SetString(PyExc_ValueError, "value list length must be equal to the number of edges in the edge sequence");
+    no_of_edges = (long)igraph_vector_size(&es);
+    if (n == 0 && no_of_edges > 0) {
+      PyErr_SetString(PyExc_ValueError, "sequence must not be empty");
       igraph_vector_destroy(&es);
       return -1;
     }
@@ -420,8 +437,9 @@ int igraphmodule_EdgeSeq_set_attribute_values_mapping(igraphmodule_EdgeSeqObject
     list = PyDict_GetItem(dict, attrname);
     if (list != 0) {
       /* Yes, we have. Modify its items to the items found in values */
-      for (i=0; i<n; i++) {
-        item = PySequence_GetItem(values, i);
+      for (i=0, j=0; i<no_of_edges; i++, j++) {
+        if (j == n) j = 0;
+        item = PySequence_GetItem(values, j);
         if (item == 0) { igraph_vector_destroy(&es); return -1; }
         /* No need to Py_INCREF(item), PySequence_GetItem returns a new reference */
         if (PyList_SetItem(list, (long)VECTOR(es)[i], item)) {
@@ -442,8 +460,9 @@ int igraphmodule_EdgeSeq_set_attribute_values_mapping(igraphmodule_EdgeSeqObject
         Py_INCREF(Py_None);
         PyList_SET_ITEM(list, i, Py_None);
       }
-      for (i=0; i<n; i++) {
-        item = PySequence_GetItem(values, i);
+      for (i=0, j=0; i<no_of_edges; i++, j++) {
+        if (j == n) j = 0;
+        item = PySequence_GetItem(values, j);
         if (item == 0) {
           igraph_vector_destroy(&es);
           Py_DECREF(list); return -1;
