@@ -696,7 +696,7 @@ and then use the double asterisk (``**``) operator to pass your specific styling
 attributes to :func:`plot`::
 
 >>> visual_style = {}
->>> visual_style["vertex_size"] = [20] * g.vcount()
+>>> visual_style["vertex_size"] = 20
 >>> visual_style["vertex_color"] = [color_dict[gender] for gender in g.vs["gender"]]
 >>> visual_style["vertex_label"] = g.vs["name"]
 >>> visual_style["edge_width"] = [1 + 2 * int(is_formal) for is_formal in g.es["is_formal"]]

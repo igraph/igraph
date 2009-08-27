@@ -2017,6 +2017,21 @@ class VertexSeq(core.VertexSeq):
       >>> g.vs["weight"]
       [0, 10, 20]
 
+    If you specify a sequence that is shorter than the number of vertices in
+    the VertexSeq, the sequence is reused:
+
+      >>> g = Graph.Tree(7, 2)
+      >>> g.vs["color"] = ["red", "green"]
+      >>> g.vs["color"]
+      ["red", "green", "red", "green", "red", "green", "red"]
+
+    You can even pass a single string or integer, it will be considered as a
+    sequence of length 1:
+
+      >>> g.vs["color"] = "red"
+      >>> g.vs["color"]
+      ["red", "red", "red", "red", "red", "red", "red"]
+
     Some methods of the vertex sequences are simply proxy methods to the
     corresponding methods in the L{Graph} object. One such example is
     L{VertexSeq.degree()}:
@@ -2214,6 +2229,21 @@ class EdgeSeq(core.EdgeSeq):
       >>> g.es["weight"] = range(3)
       >>> g.es["weight"]
       [0, 1, 2]
+
+    If you specify a sequence that is shorter than the number of edges in
+    the EdgeSeq, the sequence is reused:
+
+      >>> g = Graph.Tree(7, 2)
+      >>> g.es["color"] = ["red", "green"]
+      >>> g.es["color"]
+      ["red", "green", "red", "green", "red", "green"]
+
+    You can even pass a single string or integer, it will be considered as a
+    sequence of length 1:
+
+      >>> g.es["color"] = "red"
+      >>> g.es["color"]
+      ["red", "red", "red", "red", "red", "red"]
 
     Some methods of the edge sequences are simply proxy methods to the
     corresponding methods in the L{Graph} object. One such example is
