@@ -76,7 +76,7 @@ int igraph_adjlist_print(const igraph_adjlist_t *al, FILE *outfile);
 #define igraph_adjlist_get(al,no) (&(al)->adjs[(long int)(no)])
 
 int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
-		   igraph_bool_t directed, igraph_bool_t duplicate);
+		   igraph_neimode_t mode, igraph_bool_t duplicate);
 
 typedef struct igraph_adjedgelist_t {
   igraph_integer_t length;

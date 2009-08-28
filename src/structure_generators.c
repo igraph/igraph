@@ -2061,7 +2061,12 @@ int igraph_famous(igraph_t *graph, const char *name) {
  * 
  * \param graph Pointer to an uninitialized graph object.
  * \param adjlist The adjacency list.
- * \param directed Logical, whether or not to create a directed graph.
+ * \param mode Whether or not to create a directed graph. \c IGRAPH_ALL
+ *             means an undirected graph, \c IGRAPH_OUT means a
+ *             directed graph from an out-adjacency list (i.e. each
+ *             list contains the successors of the corresponding
+ *             vertices), \c IGRAPH_IN means a directed graph from an
+ *             in-adjacency list
  * \param duplicate Logical, for undirected graphs this specified
  *        whether each edge is included twice, in the vectors of 
  *        both adjacenct vertices. If this is false (0), then it is
@@ -2076,7 +2081,7 @@ int igraph_famous(igraph_t *graph, const char *name) {
  */
 
 int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
-		   igraph_bool_t directed, igraph_bool_t duplicate) {
+		   igraph_neimode_t mode, igraph_bool_t duplicate) {
   
   long int no_of_nodes=igraph_adjlist_size(adjlist);
   long int no_of_edges=0;
@@ -2085,7 +2090,7 @@ int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
   igraph_vector_t edges;
   long int edgeptr=0;
 
-  duplicate = duplicate && !directed; /* only duplicate if undirected */
+  duplicate = duplicate && (mode == IGRAPH_ALL); /* only duplicate if undirected */
   
   for (i=0; i<no_of_nodes; i++) {
     no_of_edges += igraph_vector_size(igraph_adjlist_get(adjlist, i));
@@ -2094,26 +2099,32 @@ int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
   if (duplicate) {
     no_of_edges /= 2;
   }
-  
+
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 2*no_of_edges);
   
   for (i=0; i<no_of_nodes; i++) {
     igraph_vector_t *neis=igraph_adjlist_get(adjlist, i);
     long int j, n=igraph_vector_size(neis);
     long int loops=0;
+
     for (j=0; j<n; j++) {
       long int nei=VECTOR(*neis)[j];
       if (nei==i) {
-	loops++; 
+        loops++; 
       } else {
-	if (! duplicate || nei > i) {
-	  if (edgeptr+2 > 2*no_of_edges) {
-	    IGRAPH_ERROR("Invalid adjacency list, most probably not correctly"
-			 " duplicated edges for an undirected graph", IGRAPH_EINVAL);
-	  }
-	  VECTOR(edges)[edgeptr++] = i;
-	  VECTOR(edges)[edgeptr++] = nei;
-	}
+        if (! duplicate || nei > i) {
+          if (edgeptr+2 > 2*no_of_edges) {
+            IGRAPH_ERROR("Invalid adjacency list, most probably not correctly"
+              " duplicated edges for an undirected graph", IGRAPH_EINVAL);
+          }
+          if (mode == IGRAPH_IN) {
+            VECTOR(edges)[edgeptr++] = nei;
+            VECTOR(edges)[edgeptr++] = i;
+          } else {
+            VECTOR(edges)[edgeptr++] = i;
+            VECTOR(edges)[edgeptr++] = nei;
+          }
+	    }
       }
     }
     /* loops */
@@ -2127,8 +2138,12 @@ int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
       VECTOR(edges)[edgeptr++] = i;
     }
   }
-  
-  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
+
+  if (mode == IGRAPH_ALL)
+    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, 0));
+  else
+    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, 1));
+
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   
