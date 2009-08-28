@@ -24,6 +24,8 @@
 #include <igraph.h>
 #include <math.h>
 
+#define ALMOST_EQUALS(a, b) (fabs((a)-(b)) < 1e-8)
+
 int main() {
 
   igraph_t g;
@@ -57,7 +59,7 @@ int main() {
 				  /*theoretical_max=*/ 0,
 				  /*normalization=*/ 1);
   
-  if (cent != 1.0) {
+  if (!ALMOST_EQUALS(cent, 1.0)) {
     fprintf(stderr, "in-star, closeness: %g\n", cent);
     return 3;
   }
@@ -71,8 +73,8 @@ int main() {
 					       /*theoretical_max=*/ 0,
 					       /*normalization=*/ 1);
   
-  if (cent != 1.0) {
-    fprintf(stderr, "out-star, eigenvector centrality: %g\n", cent);
+  if (!ALMOST_EQUALS(cent, 1.0)) {
+    fprintf(stderr, "in-star, eigenvector centrality: %g\n", cent);
     return 14;
   }
 
@@ -105,7 +107,7 @@ int main() {
 				  /*theoretical_max=*/ 0,
 				  /*normalization=*/ 1);
   
-  if (cent != 1.0) {
+  if (!ALMOST_EQUALS(cent, 1.0)) {
     fprintf(stderr, "out-star, closeness: %g\n", cent);
     return 13;
   }
@@ -139,7 +141,7 @@ int main() {
 				  /*theoretical_max=*/ 0,
 				  /*normalization=*/ 1);
   
-  if (cent != 1.0) {
+  if (!ALMOST_EQUALS(cent, 1.0)) {
     fprintf(stderr, "undirected star, closeness: %g\n", cent);
     return 23;
   }
@@ -160,7 +162,7 @@ int main() {
 					       /*theoretical_max=*/ 0,
 					       /*normalization=*/ 1);
   
-  if (cent != 1.0) {
+  if (!ALMOST_EQUALS(cent, 1.0)) {
     fprintf(stderr, "dyad, eigenvector centrality: %g\n", cent);
     return 24;
   }
@@ -173,7 +175,7 @@ int main() {
 					       /*theoretical_max=*/ 0,
 					       /*normalization=*/ 1);
   
-  if (fabs(cent - 1.0) > 1e-15) {
+  if (!ALMOST_EQUALS(cent, 1.0)) {
     fprintf(stderr, "dyad, eigenvector centrality, not scaled: %g\n", cent);
     return 25;
   }
