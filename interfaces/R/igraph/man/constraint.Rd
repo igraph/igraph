@@ -22,8 +22,8 @@ constraint(graph, nodes=V(graph), weights=NULL)
   \eqn{V_i}{V[i]}, is defined for directed and valued graphs,
   \deqn{C_i=\sum_{j \in V_i \setminus \{i\}} (p_{ij}+\sum_{q \in V_i
       \setminus \{i,j\}} p_{iq} p_{qj})^2}{%
-    C[i] = sum( sum( p[i,j] + p[i,q] p[q,j])^2, q in V[i], q != i,j ), j in
-    V[], j != i).
+    C[i] = sum( [sum( p[i,j] + p[i,q] p[q,j], q in V[i], q != i,j )]^2, j in
+    V[i], j != i).
   }
   for a graph of order (ie. number of vertices) \eqn{N}, where
   proportional tie strengths are defined as 
