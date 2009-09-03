@@ -36,7 +36,9 @@
 
 #include "igraph_types.h"
 #include "igraph_matrix.h"
+#include "igraph_stack.h"
 #include "igraph_strvector.h"
+#include "igraph_vector.h"
 #include "igraph_vector_ptr.h"
 
 __BEGIN_DECLS

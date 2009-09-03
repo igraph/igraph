@@ -64,7 +64,16 @@ __BEGIN_DECLS
 #include "igraph_pmt_off.h"
 #undef BASE_BOOL
 
+#define BASE_PTR
+#include "igraph_pmt.h"
+#include "igraph_stack_pmt.h"
+#include "igraph_pmt_off.h"
+#undef BASE_PTR
+
 #define IGRAPH_STACK_NULL { 0,0,0 }
+
+void igraph_stack_ptr_free_all(igraph_stack_ptr_t* s);
+void igraph_stack_ptr_destroy_all(igraph_stack_ptr_t* s);
 
 __END_DECLS
 

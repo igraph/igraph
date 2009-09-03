@@ -1309,7 +1309,7 @@ igraph_bool_t FUNCTION(igraph_vector,binsearch)(const TYPE(igraph_vector) *v,
 
   if (right < 0) {
     if (pos != 0) *pos=0;
-	return 0;
+	  return 0;
   }
 
   while (left < right-1) {
@@ -1964,6 +1964,7 @@ int FUNCTION(igraph_vector,intersect_sorted)(const TYPE(igraph_vector) *v1,
     BASE element;
     if (VECTOR(*v1)[i] == VECTOR(*v2)[j]) {
       element = VECTOR(*v1)[i]; k=0;
+      i++; j++; k += 2;
       while (i < i0 && VECTOR(*v1)[i] == element) { i++; k++; }
       while (j < j0 && VECTOR(*v2)[j] == element) { j++; k++; }
       if (!keep_multiplicity) k=1;
@@ -1973,6 +1974,67 @@ int FUNCTION(igraph_vector,intersect_sorted)(const TYPE(igraph_vector) *v1,
       }
     } else if (VECTOR(*v1)[i] < VECTOR(*v2)[j]) i++;
     else j++;
+  }
+
+  return 0;
+}
+
+/**
+ * \function igraph_vector_difference_sorted
+ * \brief Calculates the difference between two sorted vectors (considered as sets)
+ *
+ * The elements that are contained in only the first vector but not the second are
+ * stored in the result vector. All three vectors must be initialized.
+ *
+ * \param v1 the first vector
+ * \param v2 the second vector
+ * \param result the result vector
+ */
+int FUNCTION(igraph_vector,difference_sorted)(const TYPE(igraph_vector) *v1,
+    const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result) {
+  long int i, j, i0, j0;
+  i0 = FUNCTION(igraph_vector,size)(v1);
+  j0 = FUNCTION(igraph_vector,size)(v2);
+  i = j = 0;
+
+  if (i0 == 0) {
+    /* v1 is empty, this is easy */
+    FUNCTION(igraph_vector,clear)(result);
+    return IGRAPH_SUCCESS;
+  }
+
+  if (j0 == 0) {
+    /* v2 is empty, this is easy */
+    IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(result, i0));
+    memcpy(result->stor_begin, v1->stor_begin, sizeof(BASE) * i0);
+    return IGRAPH_SUCCESS;
+  }
+
+  FUNCTION(igraph_vector,clear)(result);
+
+  /* Copy the part of v1 that is less than the first element of v2 */
+  while (i < i0 && VECTOR(*v1)[i] < VECTOR(*v2)[j]) { i++; }
+  if (i > 0) {
+    IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(result, i));
+    memcpy(result->stor_begin, v1->stor_begin, sizeof(BASE) * i);
+  }
+
+  while (i < i0 && j < j0) {
+    BASE element = VECTOR(*v1)[i];
+    if (element == VECTOR(*v2)[j]) {
+      i++; j++;
+      while (i < i0 && VECTOR(*v1)[i] == element) { i++; }
+      while (j < j0 && VECTOR(*v2)[j] == element) { j++; }
+    } else if (element < VECTOR(*v2)[j]) {
+      IGRAPH_CHECK(FUNCTION(igraph_vector,push_back)(result, element));
+      i++;
+    }
+    else j++;
+  }
+  if (i < i0) {
+    int oldsize = FUNCTION(igraph_vector,size)(result);
+    IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(result, oldsize+i0-i));
+    memcpy(result->stor_begin+oldsize, v1->stor_begin+i, sizeof(BASE)*(i0-i));
   }
 
   return 0;

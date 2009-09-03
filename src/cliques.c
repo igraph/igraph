@@ -28,9 +28,12 @@
 #include "igraph_adjlist.h"
 #include "igraph_interrupt.h"
 #include "igraph_interface.h"
+#include "igraph_stack.h"
 #include "igraph_types_internal.h"
 #include "config.h"
 
+#include <assert.h>
+#include <string.h>    /* memset */
 
 void igraph_i_cliques_free_res(igraph_vector_ptr_t *res) {
   long i, n;
@@ -321,47 +324,15 @@ int igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
   return igraph_i_cliques(graph, res, min_size, max_size, 0);
 }
 
+typedef int(*igraph_i_maximal_clique_func_t)(const igraph_vector_t*, void*, igraph_bool_t*);
+
+int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func_t func, void* data);
+
 int igraph_i_maximal_or_largest_cliques_or_indsets(const igraph_t *graph,
                                         igraph_vector_ptr_t *res,
                                         igraph_integer_t *clique_number,
                                         igraph_bool_t keep_only_largest,
 					igraph_bool_t complementer);
-
-/**
- * \function igraph_largest_cliques
- * \brief Finds the largest clique(s) in a graph.
- * 
- * </para><para>
- * A clique is largest (quite intuitively) if there is no other clique
- * in the graph which contains more vertices. 
- * 
- * </para><para>
- * Note that this is not neccessarily the same as a maximal clique,
- * ie. the largest cliques are always maximal but a maximal clique is
- * not always largest.
- *
- * </para><para>The current implementation of this function searches
- * for maximal independent vertex sets (see \ref
- * igraph_maximal_independent_vertex_sets()) in the complementer graph
- * using the algorithm published in: 
- * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirawaka. A new algorithm
- * for generating all the maximal independent sets. SIAM J Computing,
- * 6:505--517, 1977.
- *
- * \param graph The input graph.
- * \param res Pointer to an initialized pointer vector, the result
- *        will be stored here. It will be resized as needed.
- * \return Error code.
- * 
- * \sa \ref igraph_cliques(), \ref igraph_maximal_cliques()
- * 
- * Time complexity: TODO.
- */
-
-int igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
-  return igraph_i_maximal_or_largest_cliques_or_indsets(graph, res, 0, 1, 1);
-}
-
 
 /**
  * \function igraph_independent_vertex_sets
@@ -736,42 +707,139 @@ int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no) {
   return 0;
 }
 
+/*************************************************************************/
+/* MAXIMAL CLIQUES, LARGEST CLIQUES                                      */
+/*************************************************************************/
+
+int igraph_i_maximal_cliques_store_max_size(const igraph_vector_t* clique, void* data,
+    igraph_bool_t* cont) {
+  igraph_integer_t* result = (igraph_integer_t*)data;
+  if (*result < igraph_vector_size(clique))
+    *result = igraph_vector_size(clique);
+  return IGRAPH_SUCCESS;
+}
+
+int igraph_i_maximal_cliques_store(const igraph_vector_t* clique, void* data, igraph_bool_t* cont) {
+  igraph_vector_ptr_t* result = (igraph_vector_ptr_t*)data;
+  igraph_vector_t* vec = igraph_Calloc(1, igraph_vector_t);
+  if (vec == 0)
+    IGRAPH_ERROR("cannot allocate memory for storing next clique", IGRAPH_ENOMEM);
+
+  IGRAPH_CHECK(igraph_vector_copy(vec, clique));
+  IGRAPH_CHECK(igraph_vector_ptr_push_back(result, vec));
+
+  return IGRAPH_SUCCESS;
+}
+
+int igraph_i_largest_cliques_store(const igraph_vector_t* clique, void* data, igraph_bool_t* cont) {
+  igraph_vector_ptr_t* result = (igraph_vector_ptr_t*)data;
+  long int i, n;
+
+  /* Is the current clique at least as large as the others that we have found? */
+  if (!igraph_vector_ptr_empty(result)) {
+    n = igraph_vector_size(clique);
+    if (n < igraph_vector_size(VECTOR(*result)[0]))
+      return IGRAPH_SUCCESS;
+
+    if (n > igraph_vector_size(VECTOR(*result)[0])) {
+      for (i = 0; i < igraph_vector_ptr_size(result); i++)
+        igraph_vector_destroy(VECTOR(*result)[i]);
+      igraph_vector_ptr_free_all(VECTOR(*result)[i]);
+      igraph_vector_ptr_resize(result, 0);
+    }
+  }
+
+  igraph_vector_t* vec = igraph_Calloc(1, igraph_vector_t);
+  if (vec == 0)
+    IGRAPH_ERROR("cannot allocate memory for storing next clique", IGRAPH_ENOMEM);
+
+  IGRAPH_CHECK(igraph_vector_copy(vec, clique));
+  IGRAPH_CHECK(igraph_vector_ptr_push_back(result, vec));
+
+  return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_largest_cliques
+ * \brief Finds the largest clique(s) in a graph.
+ * 
+ * </para><para>
+ * A clique is largest (quite intuitively) if there is no other clique
+ * in the graph which contains more vertices. 
+ * 
+ * </para><para>
+ * Note that this is not neccessarily the same as a maximal clique,
+ * ie. the largest cliques are always maximal but a maximal clique is
+ * not always largest.
+ *
+ * </para><para>The current implementation of this function searches
+ * for maximal cliques using \ref igraph_maximal_cliques() and drops
+ * those that are not the largest.
+ *
+ * </para><para>The implementation of this function changed between
+ * igraph 0.5 and 0.6, so the order of the cliques and the order of
+ * vertices within the cliques will almost surely be different between
+ * these two versions.
+ *
+ * \param graph The input graph.
+ * \param res Pointer to an initialized pointer vector, the result
+ *        will be stored here. It will be resized as needed. Note that
+ *        vertices of a clique may be returned in arbitrary order.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_cliques(), \ref igraph_maximal_cliques()
+ * 
+ * Time complexity: O(3^(|V|/3)).
+ */
+
+int igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
+  igraph_vector_ptr_clear(res);
+  /* TODO: destroy and free all the vectors in res in case of error */
+  return igraph_i_maximal_cliques(graph, &igraph_i_largest_cliques_store, (void*)res);
+}
+
+
 /**
  * \function igraph_maximal_cliques
  * \brief Find all maximal cliques of a graph
  *
  * </para><para>
- * A maximal clique is a clique which
- * can't be extended any more by adding a new vertex to it. This is actually
- * implemented by looking for a maximal independent vertex set in the
- * complementer of the graph.
- * 
+ * A maximal clique is a clique which can't be extended any more by adding a
+ * new vertex to it.
+ *
  * </para><para>
  * If you are only interested in the size of the largest clique in the graph,
  * use \ref igraph_clique_number() instead.
  *
  * </para><para>
- * The current implementation was ported to igraph from the Very Nauty Graph
- * Library by Keith Briggs and uses the algorithm from the paper
- * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirawaka. A new algorithm
- * for generating all the maximal independent sets. SIAM J Computing,
- * 6:505--517, 1977.
+ * The current implementation uses the Bron-Kerbosch algorithm to find
+ * the maximal cliques, see: C. Bron and J. Kerbosch. Algorithm 457:
+ * finding all cliques of an undirected graph. Communications of the ACM
+ * 16(9):575-577, 1973.
+ *
+ * </para><para>The implementation of this function changed between
+ * igraph 0.5 and 0.6, so the order of the cliques and the order of
+ * vertices within the cliques will almost surely be different between
+ * these two versions.
  *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
  *   here, ie. \c res will contain pointers to \c igraph_vector_t
  *   objects which contain the indices of vertices involved in a clique.
  *   The pointer vector will be resized if needed but note that the
- *   objects in the pointer vector will not be freed.
+ *   objects in the pointer vector will not be freed. Note that vertices
+ *   of a clique may be returned in arbitrary order.
  * \return Error code.
  *
  * \sa \ref igraph_maximal_independent_vertex_sets(), \ref
  * igraph_clique_number() 
  * 
- * Time complexity: TODO.
+ * Time complexity: O(3^(|V|/3)).
  */
 int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
-  return igraph_i_maximal_or_largest_cliques_or_indsets(graph, res, 0, 0, 1);
+  igraph_vector_ptr_clear(res);
+  /* TODO: destroy and free all the vectors in res in case of error */
+  return igraph_i_maximal_cliques(graph, &igraph_i_maximal_cliques_store, (void*)res);
 }
 
 /**
@@ -788,10 +856,232 @@ int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
  * 
  * \sa \ref igraph_cliques(), \ref igraph_largest_cliques().
  * 
- * Time complexity: TODO.
+ * Time complexity: O(3^(|V|/3)).
  */
 int igraph_clique_number(const igraph_t *graph, igraph_integer_t *no) {
-  return igraph_i_maximal_or_largest_cliques_or_indsets(graph, 0, no, 0, 1);
+  *no = 0;
+  return igraph_i_maximal_cliques(graph, &igraph_i_maximal_cliques_store_max_size, (void*)no);
+}
+
+typedef struct {
+  igraph_vector_t cand;
+  igraph_vector_t done;
+  igraph_vector_t smallcand;
+} igraph_i_maximal_cliques_stack_frame;
+
+void igraph_i_maximal_cliques_stack_frame_destroy(igraph_i_maximal_cliques_stack_frame *frame) {
+  igraph_vector_destroy(&frame->cand);
+  igraph_vector_destroy(&frame->done);
+  igraph_vector_destroy(&frame->smallcand);
+}
+
+void igraph_i_maximal_cliques_stack_destroy(igraph_stack_ptr_t *stack) {
+  igraph_i_maximal_cliques_stack_frame *frame;
+
+  while (!igraph_stack_ptr_empty(stack)) {
+    frame = (igraph_i_maximal_cliques_stack_frame*)igraph_stack_ptr_pop(stack);
+    igraph_i_maximal_cliques_stack_frame_destroy(frame);
+    free(frame);
+  }
+
+  igraph_stack_ptr_destroy(stack);
+}
+
+int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func_t func, void* data) {
+  long int i, j, k, l;
+  igraph_integer_t no_of_nodes;
+  igraph_integer_t current_pivot = 0, current_pivot_degree = 0, pivot_degree_done;
+  igraph_adjlist_t adj_list;
+  igraph_stack_ptr_t stack;
+  igraph_i_maximal_cliques_stack_frame frame, *new_frame_ptr;
+  igraph_vector_t clique_so_far, new_cand, new_done, cn, pivot_nbrs, pivot_done_nbrs;
+  igraph_bool_t cont = 1;
+
+  if (igraph_is_directed(graph))
+    IGRAPH_WARNING("directionality of edges is ignored for directed graphs");
+
+  no_of_nodes = igraph_vcount(graph);
+  if (no_of_nodes == 0)
+    return IGRAPH_SUCCESS;
+
+  /* Construct an adjacency list representation */
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &adj_list, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &adj_list);
+
+  /* Initialize stack */
+  IGRAPH_CHECK(igraph_stack_ptr_init(&stack, 0));
+  IGRAPH_FINALLY(igraph_i_maximal_cliques_stack_destroy, &stack);
+
+  /* Create the initial (empty) clique */
+  IGRAPH_VECTOR_INIT_FINALLY(&clique_so_far, 0);
+
+  /* Initialize new_cand, new_done, cn, pivot_nbrs and pivot_done_nbrs (will be used later) */
+  IGRAPH_VECTOR_INIT_FINALLY(&new_cand, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&new_done, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&cn, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&pivot_nbrs, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&pivot_done_nbrs, 0);
+
+  /* Find the vertex with the highest degree */
+  current_pivot = 0; current_pivot_degree = igraph_vector_size(igraph_adjlist_get(&adj_list, 0));
+  for (i = 1; i < no_of_nodes; i++) {
+    j = igraph_vector_size(igraph_adjlist_get(&adj_list, i));
+    if (j > current_pivot_degree) {
+      current_pivot = i;
+      current_pivot_degree = j;
+    }
+  }
+
+  /* Create the initial stack frame */
+  IGRAPH_CHECK(igraph_vector_init_seq(&frame.cand, 0, no_of_nodes-1));
+  IGRAPH_FINALLY(igraph_vector_destroy, &frame.cand);
+  IGRAPH_CHECK(igraph_vector_init(&frame.done, 0));
+  IGRAPH_FINALLY(igraph_vector_destroy, &frame.done);
+  IGRAPH_CHECK(igraph_vector_init(&frame.smallcand, 0));
+  IGRAPH_FINALLY(igraph_vector_destroy, &frame.smallcand);
+  IGRAPH_CHECK(igraph_vector_difference_sorted(&frame.cand,
+        igraph_adjlist_get(&adj_list, current_pivot), &frame.smallcand));
+  IGRAPH_FINALLY_CLEAN(3);
+  IGRAPH_FINALLY(igraph_i_maximal_cliques_stack_frame_destroy, &frame);
+
+  /* TODO: frame.cand and frame.done should be a set instead of a vector */
+
+  /* Main loop starts here */
+  while (!igraph_vector_empty(&frame.smallcand) || !igraph_stack_ptr_empty(&stack)) {
+    if (igraph_vector_empty(&frame.smallcand)) {
+      /* No candidates left to check in this stack frame, pop out the previous stack frame */
+      igraph_i_maximal_cliques_stack_frame *newframe = igraph_stack_ptr_pop(&stack);
+      igraph_i_maximal_cliques_stack_frame_destroy(&frame);
+      frame = *newframe;
+      free(newframe);
+
+      igraph_vector_pop_back(&clique_so_far);
+      continue;
+    }
+
+    /* Try the next node in the clique */
+    i = igraph_vector_pop_back(&frame.smallcand);
+    IGRAPH_CHECK(igraph_vector_push_back(&clique_so_far, i));
+
+    /* Remove the node from the candidate list */
+    assert(igraph_vector_binsearch(&frame.cand, i, &j));
+    igraph_vector_remove(&frame.cand, j);
+
+    /* Add the node to the done list */
+    assert(!igraph_vector_binsearch(&frame.done, i, &j));
+    IGRAPH_CHECK(igraph_vector_insert(&frame.done, j, i));
+
+    /* Create new_cand and new_done */
+    IGRAPH_CHECK(igraph_vector_intersect_sorted(&frame.cand, igraph_adjlist_get(&adj_list, i), &new_cand, 0));
+    IGRAPH_CHECK(igraph_vector_intersect_sorted(&frame.done, igraph_adjlist_get(&adj_list, i), &new_done, 0));
+
+    /* Do we have anything more to search? */
+    if (igraph_vector_empty(&new_cand)) {
+      if (igraph_vector_empty(&new_done)) {
+        /* We have a maximal clique here */
+        IGRAPH_CHECK(func(&clique_so_far, data, &cont));
+        if (!cont) {
+          /* The callback function requested to stop the search */
+          /* TODO: check this here, is everything freed? */
+          break;
+        }
+      }
+      igraph_vector_pop_back(&clique_so_far);
+      continue;
+    }
+    if (igraph_vector_empty(&new_done) && igraph_vector_size(&new_cand) == 1) {
+      /* Shortcut: only one node left */
+      IGRAPH_CHECK(igraph_vector_push_back(&clique_so_far, VECTOR(new_cand)[0]));
+      IGRAPH_CHECK(func(&clique_so_far, data, &cont));
+      if (!cont) {
+        /* The callback function requested to stop the search */
+        /* TODO: check this here, is everything freed? */
+        break;
+      }
+      igraph_vector_pop_back(&clique_so_far);
+      igraph_vector_pop_back(&clique_so_far);
+      continue;
+    }
+
+    /* Find the next pivot node in new_done */
+    l = igraph_vector_size(&new_cand);
+    current_pivot_degree = -1;
+    j = igraph_vector_size(&new_done);
+    for (i = 0; i < j; i++) {
+      k = (long int)VECTOR(new_done)[i];
+      IGRAPH_CHECK(igraph_vector_intersect_sorted(&new_cand, igraph_adjlist_get(&adj_list, k), &cn, 0));
+      if (igraph_vector_size(&cn) > current_pivot_degree) {
+        current_pivot_degree = igraph_vector_size(&cn);
+        IGRAPH_CHECK(igraph_vector_update(&pivot_done_nbrs, &cn));
+        if (current_pivot_degree == l) {
+          /* Cool, we surely have the pivot node here as current_pivot_degree can't get any better */
+          break;
+        }
+      }
+    }
+    /* Shortcut here: we don't have to examine new_cand */
+    if (current_pivot_degree == l) {
+      igraph_vector_pop_back(&clique_so_far);
+      continue;
+    }
+    /* Still finding pivot node */
+    pivot_degree_done = current_pivot_degree;
+    current_pivot_degree = -1;
+    j = igraph_vector_size(&new_cand);
+    l = l - 1;
+    for (i = 0; i < j; i++) {
+      k = (long int)VECTOR(new_cand)[i];
+      IGRAPH_CHECK(igraph_vector_intersect_sorted(&new_cand, igraph_adjlist_get(&adj_list, k), &cn, 0));
+      if (igraph_vector_size(&cn) > current_pivot_degree) {
+        current_pivot_degree = igraph_vector_size(&cn);
+        IGRAPH_CHECK(igraph_vector_update(&pivot_nbrs, &cn));
+        if (current_pivot_degree == l) {
+          /* Cool, we surely have the pivot node here as current_pivot_degree can't get any better */
+          break;
+        }
+      }
+    }
+
+    /* Create a new stack frame in case we back out later */
+    new_frame_ptr = igraph_Calloc(1, igraph_i_maximal_cliques_stack_frame);
+    if (new_frame_ptr == 0) {
+      IGRAPH_ERROR("cannot allocate new stack frame", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, new_frame_ptr);
+    *new_frame_ptr = frame;
+    memset(&frame, 0, sizeof(frame));
+    IGRAPH_CHECK(igraph_stack_ptr_push(&stack, new_frame_ptr));
+    IGRAPH_FINALLY_CLEAN(1);  /* ownership of new_frame_ptr taken by the stack */
+    /* Ownership of the current frame and its vectors (frame.cand, frame.done, frame.smallcand)
+     * is taken by the stack from now on. Vectors in frame must be re-initialized with new_cand,
+     * new_done and stuff. The old frame.cand and frame.done won't be leaked because they are
+     * managed by the stack now. */
+    frame.cand = new_cand;
+    frame.done = new_done;
+    IGRAPH_CHECK(igraph_vector_init(&new_cand, 0));
+    IGRAPH_CHECK(igraph_vector_init(&new_done, 0));
+    IGRAPH_CHECK(igraph_vector_init(&frame.smallcand, 0));
+
+    /* Adjust frame.smallcand */
+    if (current_pivot_degree < pivot_degree_done) {
+      IGRAPH_CHECK(igraph_vector_difference_sorted(&frame.cand, &pivot_done_nbrs, &frame.smallcand));
+    } else {
+      IGRAPH_CHECK(igraph_vector_difference_sorted(&frame.cand, &pivot_nbrs, &frame.smallcand));
+    }
+  }
+
+  igraph_adjlist_destroy(&adj_list);
+  igraph_vector_destroy(&clique_so_far);
+  igraph_vector_destroy(&new_cand);
+  igraph_vector_destroy(&new_done);
+  igraph_vector_destroy(&cn);
+  igraph_vector_destroy(&pivot_nbrs);
+  igraph_vector_destroy(&pivot_done_nbrs);
+  igraph_i_maximal_cliques_stack_frame_destroy(&frame);
+  igraph_i_maximal_cliques_stack_destroy(&stack);
+  IGRAPH_FINALLY_CLEAN(8);
+
+  return IGRAPH_SUCCESS;
 }
 
 int igraph_i_maximal_or_largest_cliques_or_indsets(const igraph_t *graph,
