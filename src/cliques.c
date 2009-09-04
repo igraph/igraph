@@ -28,6 +28,7 @@
 #include "igraph_adjlist.h"
 #include "igraph_interrupt.h"
 #include "igraph_interface.h"
+#include "igraph_progress.h"
 #include "igraph_stack.h"
 #include "igraph_types_internal.h"
 #include "config.h"
@@ -789,7 +790,7 @@ int igraph_i_largest_cliques_store(const igraph_vector_t* clique, void* data, ig
  * 
  * \sa \ref igraph_cliques(), \ref igraph_maximal_cliques()
  * 
- * Time complexity: O(3^(|V|/3)).
+ * Time complexity: O(3^(|V|/3)) worst case.
  */
 
 int igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
@@ -834,7 +835,7 @@ int igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
  * \sa \ref igraph_maximal_independent_vertex_sets(), \ref
  * igraph_clique_number() 
  * 
- * Time complexity: O(3^(|V|/3)).
+ * Time complexity: O(3^(|V|/3)) worst case.
  */
 int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
   igraph_vector_ptr_clear(res);
@@ -856,7 +857,7 @@ int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
  * 
  * \sa \ref igraph_cliques(), \ref igraph_largest_cliques().
  * 
- * Time complexity: O(3^(|V|/3)).
+ * Time complexity: O(3^(|V|/3)) worst case.
  */
 int igraph_clique_number(const igraph_t *graph, igraph_integer_t *no) {
   *no = 0;
@@ -865,14 +866,14 @@ int igraph_clique_number(const igraph_t *graph, igraph_integer_t *no) {
 
 typedef struct {
   igraph_vector_t cand;
-  igraph_vector_t done;
-  igraph_vector_t smallcand;
+  igraph_vector_t fini;
+  igraph_vector_t cand_filtered;
 } igraph_i_maximal_cliques_stack_frame;
 
 void igraph_i_maximal_cliques_stack_frame_destroy(igraph_i_maximal_cliques_stack_frame *frame) {
   igraph_vector_destroy(&frame->cand);
-  igraph_vector_destroy(&frame->done);
-  igraph_vector_destroy(&frame->smallcand);
+  igraph_vector_destroy(&frame->fini);
+  igraph_vector_destroy(&frame->cand_filtered);
 }
 
 void igraph_i_maximal_cliques_stack_destroy(igraph_stack_ptr_t *stack) {
@@ -889,12 +890,12 @@ void igraph_i_maximal_cliques_stack_destroy(igraph_stack_ptr_t *stack) {
 
 int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func_t func, void* data) {
   long int i, j, k, l;
-  igraph_integer_t no_of_nodes;
-  igraph_integer_t current_pivot = 0, current_pivot_degree = 0, pivot_degree_done;
+  igraph_integer_t no_of_nodes, nodes_to_check, nodes_done;
+  igraph_integer_t best_cand = 0, best_cand_degree = 0, best_fini_cand_degree;
   igraph_adjlist_t adj_list;
   igraph_stack_ptr_t stack;
   igraph_i_maximal_cliques_stack_frame frame, *new_frame_ptr;
-  igraph_vector_t clique_so_far, new_cand, new_done, cn, pivot_nbrs, pivot_done_nbrs;
+  igraph_vector_t clique, new_cand, new_fini, cn, best_cand_nbrs, best_fini_cand_nbrs;
   igraph_bool_t cont = 1;
 
   if (igraph_is_directed(graph))
@@ -913,130 +914,139 @@ int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func
   IGRAPH_FINALLY(igraph_i_maximal_cliques_stack_destroy, &stack);
 
   /* Create the initial (empty) clique */
-  IGRAPH_VECTOR_INIT_FINALLY(&clique_so_far, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&clique, 0);
 
-  /* Initialize new_cand, new_done, cn, pivot_nbrs and pivot_done_nbrs (will be used later) */
+  /* Initialize new_cand, new_fini, cn, best_cand_nbrs and best_fini_cand_nbrs (will be used later) */
   IGRAPH_VECTOR_INIT_FINALLY(&new_cand, 0);
-  IGRAPH_VECTOR_INIT_FINALLY(&new_done, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&new_fini, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&cn, 0);
-  IGRAPH_VECTOR_INIT_FINALLY(&pivot_nbrs, 0);
-  IGRAPH_VECTOR_INIT_FINALLY(&pivot_done_nbrs, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&best_cand_nbrs, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&best_fini_cand_nbrs, 0);
 
   /* Find the vertex with the highest degree */
-  current_pivot = 0; current_pivot_degree = igraph_vector_size(igraph_adjlist_get(&adj_list, 0));
+  best_cand = 0; best_cand_degree = igraph_vector_size(igraph_adjlist_get(&adj_list, 0));
   for (i = 1; i < no_of_nodes; i++) {
     j = igraph_vector_size(igraph_adjlist_get(&adj_list, i));
-    if (j > current_pivot_degree) {
-      current_pivot = i;
-      current_pivot_degree = j;
+    if (j > best_cand_degree) {
+      best_cand = i;
+      best_cand_degree = j;
     }
   }
 
   /* Create the initial stack frame */
   IGRAPH_CHECK(igraph_vector_init_seq(&frame.cand, 0, no_of_nodes-1));
   IGRAPH_FINALLY(igraph_vector_destroy, &frame.cand);
-  IGRAPH_CHECK(igraph_vector_init(&frame.done, 0));
-  IGRAPH_FINALLY(igraph_vector_destroy, &frame.done);
-  IGRAPH_CHECK(igraph_vector_init(&frame.smallcand, 0));
-  IGRAPH_FINALLY(igraph_vector_destroy, &frame.smallcand);
+  IGRAPH_CHECK(igraph_vector_init(&frame.fini, 0));
+  IGRAPH_FINALLY(igraph_vector_destroy, &frame.fini);
+  IGRAPH_CHECK(igraph_vector_init(&frame.cand_filtered, 0));
+  IGRAPH_FINALLY(igraph_vector_destroy, &frame.cand_filtered);
   IGRAPH_CHECK(igraph_vector_difference_sorted(&frame.cand,
-        igraph_adjlist_get(&adj_list, current_pivot), &frame.smallcand));
+        igraph_adjlist_get(&adj_list, best_cand), &frame.cand_filtered));
   IGRAPH_FINALLY_CLEAN(3);
   IGRAPH_FINALLY(igraph_i_maximal_cliques_stack_frame_destroy, &frame);
 
-  /* TODO: frame.cand and frame.done should be a set instead of a vector */
+  /* TODO: frame.cand and frame.fini should be a set instead of a vector */
 
   /* Main loop starts here */
-  while (!igraph_vector_empty(&frame.smallcand) || !igraph_stack_ptr_empty(&stack)) {
-    if (igraph_vector_empty(&frame.smallcand)) {
+  nodes_to_check = igraph_vector_size(&frame.cand_filtered); nodes_done = 0;
+  while (!igraph_vector_empty(&frame.cand_filtered) || !igraph_stack_ptr_empty(&stack)) {
+    if (igraph_vector_empty(&frame.cand_filtered)) {
       /* No candidates left to check in this stack frame, pop out the previous stack frame */
       igraph_i_maximal_cliques_stack_frame *newframe = igraph_stack_ptr_pop(&stack);
       igraph_i_maximal_cliques_stack_frame_destroy(&frame);
       frame = *newframe;
       free(newframe);
 
-      igraph_vector_pop_back(&clique_so_far);
+      if (igraph_stack_ptr_size(&stack) == 1) {
+        /* We will be using the next candidate node in the next iteration, so we can increase
+         * nodes_done by 1 */
+        nodes_done++;
+      }
+
+      /* For efficiency reasons, we only check for interruption and show progress here */
+      IGRAPH_PROGRESS("Maximal cliques: ", 100.0 * nodes_done / nodes_to_check, NULL);
+      IGRAPH_ALLOW_INTERRUPTION();
+
+      igraph_vector_pop_back(&clique);
       continue;
     }
 
     /* Try the next node in the clique */
-    i = igraph_vector_pop_back(&frame.smallcand);
-    IGRAPH_CHECK(igraph_vector_push_back(&clique_so_far, i));
+    i = igraph_vector_pop_back(&frame.cand_filtered);
+    IGRAPH_CHECK(igraph_vector_push_back(&clique, i));
 
     /* Remove the node from the candidate list */
     assert(igraph_vector_binsearch(&frame.cand, i, &j));
     igraph_vector_remove(&frame.cand, j);
 
-    /* Add the node to the done list */
-    assert(!igraph_vector_binsearch(&frame.done, i, &j));
-    IGRAPH_CHECK(igraph_vector_insert(&frame.done, j, i));
+    /* Add the node to the finished list */
+    assert(!igraph_vector_binsearch(&frame.fini, i, &j));
+    IGRAPH_CHECK(igraph_vector_insert(&frame.fini, j, i));
 
-    /* Create new_cand and new_done */
+    /* Create new_cand and new_fini */
     IGRAPH_CHECK(igraph_vector_intersect_sorted(&frame.cand, igraph_adjlist_get(&adj_list, i), &new_cand, 0));
-    IGRAPH_CHECK(igraph_vector_intersect_sorted(&frame.done, igraph_adjlist_get(&adj_list, i), &new_done, 0));
+    IGRAPH_CHECK(igraph_vector_intersect_sorted(&frame.fini, igraph_adjlist_get(&adj_list, i), &new_fini, 0));
 
     /* Do we have anything more to search? */
     if (igraph_vector_empty(&new_cand)) {
-      if (igraph_vector_empty(&new_done)) {
+      if (igraph_vector_empty(&new_fini)) {
         /* We have a maximal clique here */
-        IGRAPH_CHECK(func(&clique_so_far, data, &cont));
+        IGRAPH_CHECK(func(&clique, data, &cont));
         if (!cont) {
           /* The callback function requested to stop the search */
-          /* TODO: check this here, is everything freed? */
           break;
         }
       }
-      igraph_vector_pop_back(&clique_so_far);
+      igraph_vector_pop_back(&clique);
       continue;
     }
-    if (igraph_vector_empty(&new_done) && igraph_vector_size(&new_cand) == 1) {
+    if (igraph_vector_empty(&new_fini) && igraph_vector_size(&new_cand) == 1) {
       /* Shortcut: only one node left */
-      IGRAPH_CHECK(igraph_vector_push_back(&clique_so_far, VECTOR(new_cand)[0]));
-      IGRAPH_CHECK(func(&clique_so_far, data, &cont));
+      IGRAPH_CHECK(igraph_vector_push_back(&clique, VECTOR(new_cand)[0]));
+      IGRAPH_CHECK(func(&clique, data, &cont));
       if (!cont) {
         /* The callback function requested to stop the search */
-        /* TODO: check this here, is everything freed? */
         break;
       }
-      igraph_vector_pop_back(&clique_so_far);
-      igraph_vector_pop_back(&clique_so_far);
+      igraph_vector_pop_back(&clique);
+      igraph_vector_pop_back(&clique);
       continue;
     }
 
-    /* Find the next pivot node in new_done */
+    /* Find the next best candidate node in new_fini */
     l = igraph_vector_size(&new_cand);
-    current_pivot_degree = -1;
-    j = igraph_vector_size(&new_done);
+    best_cand_degree = -1;
+    j = igraph_vector_size(&new_fini);
     for (i = 0; i < j; i++) {
-      k = (long int)VECTOR(new_done)[i];
+      k = (long int)VECTOR(new_fini)[i];
       IGRAPH_CHECK(igraph_vector_intersect_sorted(&new_cand, igraph_adjlist_get(&adj_list, k), &cn, 0));
-      if (igraph_vector_size(&cn) > current_pivot_degree) {
-        current_pivot_degree = igraph_vector_size(&cn);
-        IGRAPH_CHECK(igraph_vector_update(&pivot_done_nbrs, &cn));
-        if (current_pivot_degree == l) {
-          /* Cool, we surely have the pivot node here as current_pivot_degree can't get any better */
+      if (igraph_vector_size(&cn) > best_cand_degree) {
+        best_cand_degree = igraph_vector_size(&cn);
+        IGRAPH_CHECK(igraph_vector_update(&best_fini_cand_nbrs, &cn));
+        if (best_cand_degree == l) {
+          /* Cool, we surely have the best candidate node here as best_cand_degree can't get any better */
           break;
         }
       }
     }
     /* Shortcut here: we don't have to examine new_cand */
-    if (current_pivot_degree == l) {
-      igraph_vector_pop_back(&clique_so_far);
+    if (best_cand_degree == l) {
+      igraph_vector_pop_back(&clique);
       continue;
     }
-    /* Still finding pivot node */
-    pivot_degree_done = current_pivot_degree;
-    current_pivot_degree = -1;
+    /* Still finding best candidate node */
+    best_fini_cand_degree = best_cand_degree;
+    best_cand_degree = -1;
     j = igraph_vector_size(&new_cand);
     l = l - 1;
     for (i = 0; i < j; i++) {
       k = (long int)VECTOR(new_cand)[i];
       IGRAPH_CHECK(igraph_vector_intersect_sorted(&new_cand, igraph_adjlist_get(&adj_list, k), &cn, 0));
-      if (igraph_vector_size(&cn) > current_pivot_degree) {
-        current_pivot_degree = igraph_vector_size(&cn);
-        IGRAPH_CHECK(igraph_vector_update(&pivot_nbrs, &cn));
-        if (current_pivot_degree == l) {
-          /* Cool, we surely have the pivot node here as current_pivot_degree can't get any better */
+      if (igraph_vector_size(&cn) > best_cand_degree) {
+        best_cand_degree = igraph_vector_size(&cn);
+        IGRAPH_CHECK(igraph_vector_update(&best_cand_nbrs, &cn));
+        if (best_cand_degree == l) {
+          /* Cool, we surely have the best candidate node here as best_cand_degree can't get any better */
           break;
         }
       }
@@ -1052,31 +1062,33 @@ int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func
     memset(&frame, 0, sizeof(frame));
     IGRAPH_CHECK(igraph_stack_ptr_push(&stack, new_frame_ptr));
     IGRAPH_FINALLY_CLEAN(1);  /* ownership of new_frame_ptr taken by the stack */
-    /* Ownership of the current frame and its vectors (frame.cand, frame.done, frame.smallcand)
+    /* Ownership of the current frame and its vectors (frame.cand, frame.done, frame.cand_filtered)
      * is taken by the stack from now on. Vectors in frame must be re-initialized with new_cand,
-     * new_done and stuff. The old frame.cand and frame.done won't be leaked because they are
+     * new_fini and stuff. The old frame.cand and frame.fini won't be leaked because they are
      * managed by the stack now. */
     frame.cand = new_cand;
-    frame.done = new_done;
+    frame.fini = new_fini;
     IGRAPH_CHECK(igraph_vector_init(&new_cand, 0));
-    IGRAPH_CHECK(igraph_vector_init(&new_done, 0));
-    IGRAPH_CHECK(igraph_vector_init(&frame.smallcand, 0));
+    IGRAPH_CHECK(igraph_vector_init(&new_fini, 0));
+    IGRAPH_CHECK(igraph_vector_init(&frame.cand_filtered, 0));
 
-    /* Adjust frame.smallcand */
-    if (current_pivot_degree < pivot_degree_done) {
-      IGRAPH_CHECK(igraph_vector_difference_sorted(&frame.cand, &pivot_done_nbrs, &frame.smallcand));
+    /* Adjust frame.cand_filtered */
+    if (best_cand_degree < best_fini_cand_degree) {
+      IGRAPH_CHECK(igraph_vector_difference_sorted(&frame.cand, &best_fini_cand_nbrs, &frame.cand_filtered));
     } else {
-      IGRAPH_CHECK(igraph_vector_difference_sorted(&frame.cand, &pivot_nbrs, &frame.smallcand));
+      IGRAPH_CHECK(igraph_vector_difference_sorted(&frame.cand, &best_cand_nbrs, &frame.cand_filtered));
     }
   }
 
+  IGRAPH_PROGRESS("Maximal cliques: ", 100.0, NULL);
+
   igraph_adjlist_destroy(&adj_list);
-  igraph_vector_destroy(&clique_so_far);
+  igraph_vector_destroy(&clique);
   igraph_vector_destroy(&new_cand);
-  igraph_vector_destroy(&new_done);
+  igraph_vector_destroy(&new_fini);
   igraph_vector_destroy(&cn);
-  igraph_vector_destroy(&pivot_nbrs);
-  igraph_vector_destroy(&pivot_done_nbrs);
+  igraph_vector_destroy(&best_cand_nbrs);
+  igraph_vector_destroy(&best_fini_cand_nbrs);
   igraph_i_maximal_cliques_stack_frame_destroy(&frame);
   igraph_i_maximal_cliques_stack_destroy(&stack);
   IGRAPH_FINALLY_CLEAN(8);
