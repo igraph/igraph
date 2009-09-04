@@ -99,6 +99,56 @@ class MotifTests(unittest.TestCase):
         self.failUnless(len(list(tc)) == 16)
         self.failUnless(len(tuple(tc)) == 16)
 
+class CliqueBenchmark(object):
+    """This is a benchmark, not a real test case. You can run it
+    using:
+
+    >>> from igraph.test.clique import CliqueBenchmark
+    >>> CliqueBenchmark().run()
+    """
+
+    def __init__(self):
+        from time import time
+        self.time = time
+
+    def run(self):
+        self.printIntro()
+        self.testRandom()
+
+    def printIntro(self):
+        print "n = number of vertices"
+        print "#cliques = number of maximal cliques found"
+        print "t1 = time required to determine the clique number"
+        print "t2 = time required to determine and save all maximal cliques"
+        print "freq1 = time required to process 10^6 maximal cliques"
+        print "freq2 = time required to process and store 10^6 maximal cliques"
+        print
+
+    def testRandom(self):
+        np = {100: [0.6, 0.7, 0.8],
+              300: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+              500: [0.1, 0.2, 0.3, 0.4],
+              700: [0.1, 0.2, 0.3],
+              1000:[0.1, 0.2, 0.3],
+              2000:[0.1],
+              3000:[0.1],
+              10000: [0.001, 0.003, 0.005, 0.01, 0.03]}
+
+        print "Erdos-Renyi random graphs"
+        print "       n        p #cliques        t1        t2    freq1    freq2"
+        for n in sorted(np.keys()):
+            for p in np[n]:
+                g = Graph.Erdos_Renyi(n, p)
+                start = self.time()
+                omega = g.clique_number()
+                mid = self.time()
+                cl = g.maximal_cliques()
+                end = self.time()
+                print "%8d %8.3f %8d %8.4fs %8.4fs %6.4f/s %6.4f/s" % \
+                    (n, p, len(cl), mid-start, end-mid, \
+                    len(cl)/(mid-start)/1e6, len(cl)/(end-mid)/1e6)
+
+
 def suite():
     clique_suite = unittest.makeSuite(CliqueTests)
     indvset_suite = unittest.makeSuite(IndependentVertexSetTests)
