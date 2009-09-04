@@ -91,7 +91,7 @@ for i in *.c; do
   if [ $OK -eq 0 ]; then
     echo "skipped."
   else
-    gcc -g -o a.out $i -I${FULLDIR}/include -L../../src/.libs -ligraph
+    gcc -g -o a.out $i -I${ORIGDIR}/include -I${ORIGDIR}/src -L../../src/.libs -ligraph
     if [ -x a.out ]; then
       echo -n "compiled... "
       LOG=../../valgrind-logs/`basename ${current} .c`.log
