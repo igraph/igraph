@@ -24,12 +24,8 @@ dist-hook:
 
 MAINTAINERCLEANFILES = Makefile.in
 
-## to make sure make doc will always call doxygen rule
-## and deb will generate Debian packages
-.PHONY: dox deb debcvs framework msvc
-
-dox:
-	doxygen Doxyfile
+## to make sure make deb will generate Debian packages
+.PHONY: deb debcvs framework msvc
 
 deb: clean
 	debian/prepare

@@ -140,7 +140,7 @@ igraph-docs.info: igraph-docs.xml $(DOCFIX2) igraph-docs.info.diff
 	&& mv igraph_reference_manual.texi igraph-docs.texi \
 	&& makeinfo --no-split --number-sections igraph-docs.texi \
 	&& mv igraph_reference_manual.info igraph-docs.info \
-	&& patch <igraph-docs.info.diff
+	&& patch <$(top_srcdir)/doc/igraph-docs.info.diff
 
 igraph-docs.dvi: igraph-docs.xml $(DOCFIX2)
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \

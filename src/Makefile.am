@@ -90,10 +90,17 @@ HEADERS_PRIVATE = atlas-edges.h \
 		igraph_math.h \
 		drl_layout.h drl_parse.h drl_graph.h \
 		drl_graph_3d.h		drl_layout_3d.h \
-		drl_Node_3d.h 		DensityGrid_3d.h \
+		drl_Node.h	drl_Node_3d.h \
+		DensityGrid.h	DensityGrid_3d.h \
 		vector.pmt matrix.pmt stack.pmt dqueue.pmt heap.pmt array.pmt \
 		igraph_types_internal.h \
-		foreign-dl-header.h bignum.h bigint.h
+		foreign-dl-header.h bignum.h bigint.h \
+		gengraph_box_list.h gengraph_definitions.h \
+		gengraph_degree_sequence.h gengraph_graph_molloy_hash.h \
+		gengraph_graph_molloy_optimized.h \
+		gengraph_hash.h gengraph_header.h gengraph_powerlaw.h \
+		gengraph_qsort.h gengraph_random.h gengraph_vertex_cover.h \
+		f2c.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \

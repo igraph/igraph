@@ -2,12 +2,13 @@ bin_PROGRAMS = igraph
 
 STIMULUS = $(top_srcdir)/tools/stimulus.py
 FUNCTIONS_DEF = $(top_srcdir)/interfaces/functions.def
+TYPES_DEF = $(top_srcdir)/interfaces/shell/types.def
 
-interface.c: interface.c.in types.def $(STIMULUS) $(FUNCTIONS_DEF)
+interface.c: interface.c.in $(TYPES_DEF) $(STIMULUS) $(FUNCTIONS_DEF)
 	$(STIMULUS) -f $(FUNCTIONS_DEF) \
-	  -i interface.c.in \
+	  -i $(top_srcdir)/interfaces/shell/interface.c.in \
 	  -o interface.c \
-	  -t types.def \
+	  -t $(TYPES_DEF) \
           -l Shell
 
 funcs.txt: interface.c.in $(STIMULUS) $(FUNCTIONS_DEF)
