@@ -93,6 +93,14 @@
 #define ZERO 0
 #define ONE 1
 
+#elif defined(BASE_PTR)
+#define BASE void*
+#define SHORT ptr
+#define ATOMIC ptr_t
+#define MULTIPLICITY 1
+#define ZERO 0
+/* #define ONE 1  */  /* makes no sense */
+
 #else
 #error unknown BASE_ directive
 #endif

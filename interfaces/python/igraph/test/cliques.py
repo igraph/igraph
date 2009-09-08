@@ -20,16 +20,16 @@ class CliqueTests(unittest.TestCase):
                             [1, 3, 4], [1, 4, 5], [2, 3, 4], [2, 4, 5],
                             [1, 2, 3, 4], [1, 2, 4, 5]]}
         for (lo, hi), exp in tests.iteritems():
-            self.assertEqual(map(tuple, exp), self.g.cliques(lo, hi))
+            self.assertEqual(sorted(exp), sorted(map(sorted, self.g.cliques(lo, hi))))
 
     def testLargestCliques(self):
-        self.assertEqual(self.g.largest_cliques(),
-                         [(1, 2, 3, 4), (1, 2, 4, 5)])
+        self.assertEqual(sorted(map(sorted, self.g.largest_cliques())),
+                         [[1, 2, 3, 4], [1, 2, 4, 5]])
 
     def testMaximalCliques(self):
-        self.assertEqual(self.g.maximal_cliques(),
-                         [(0, 3, 4), (0, 4, 5),
-                          (1, 2, 3, 4), (1, 2, 4, 5)])
+        self.assertEqual(sorted(map(sorted, self.g.maximal_cliques())),
+                         [[0, 3, 4], [0, 4, 5],
+                          [1, 2, 3, 4], [1, 2, 4, 5]])
 
     def testCliqueNumber(self):
         self.assertEqual(self.g.clique_number(), 4)

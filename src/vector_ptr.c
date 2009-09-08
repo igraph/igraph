@@ -110,7 +110,7 @@ const igraph_vector_ptr_t *igraph_vector_ptr_view (const igraph_vector_ptr_t *v,
  * The destructor for pointer vectors.
  * \param v Pointer to the pointer vector to destroy.
  * 
- * Time complexity: operating system dependend, the \quote time
+ * Time complexity: operating system dependent, the \quote time
  * \endquote required to deallocate O(n) bytes, n is the number of
  * elements allocated for the pointer vector (not neccessarily the
  * number of elements in the vector).
