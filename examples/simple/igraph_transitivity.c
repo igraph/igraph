@@ -59,6 +59,7 @@ int main() {
   if (res) {
 	return 5;
   }
+  igraph_destroy(&g);
 
   /* Zachary Karate club */
 

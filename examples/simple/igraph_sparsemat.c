@@ -93,6 +93,7 @@ int main() {
   /* Transpose matrices */
   igraph_tree(&G, 10, /*children=*/ 2, IGRAPH_TREE_OUT);
   igraph_get_sparsemat(&G, &A);
+  igraph_destroy(&G);
   igraph_sparsemat_compress(&A, &B);
   igraph_sparsemat_print(&B, stdout);
   igraph_sparsemat_transpose(&B, &C, /*values=*/ 1);

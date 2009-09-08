@@ -92,7 +92,13 @@ int check_simple() {
 	return 12;
       }
     }
+
+    igraph_destroy(&g);
   }
+
+  igraph_vector_destroy(&path);
+  igraph_vector_destroy(&pairs);
+  igraph_vector_destroy(&eids);
 
   return 0;
 }

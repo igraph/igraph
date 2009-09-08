@@ -207,7 +207,9 @@ int main() {
   igraph_sparsemat_gaxpy(&B, &w, &y);
   
   if (!igraph_vector_is_equal(&x, &y)) { return 1; }
-  
+
+  igraph_vector_destroy(&x);
+  igraph_vector_destroy(&y);
   igraph_vector_destroy(&v);
   igraph_vector_destroy(&w);
   igraph_sparsemat_destroy(&B);

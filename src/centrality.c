@@ -1380,10 +1380,12 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
 }
 
 void igraph_i_destroy_biguints(igraph_biguint_t *p) {
-  while ( ! *((int*)(p)) ) {
+  igraph_biguint_t *p2 = p;
+  while ( *((long int*)(p)) ) {
     igraph_biguint_destroy(p);
+    p++;
   }
-  igraph_Free(p);
+  igraph_Free(p2);
 }
 
 /**
@@ -1520,7 +1522,6 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
     for (j=0; j<no_of_nodes; j++) {
       IGRAPH_CHECK(igraph_biguint_init(&big_nrgeo[j]));
     }
-    IGRAPH_FINALLY(igraph_i_destroy_biguints, big_nrgeo);
     IGRAPH_CHECK(igraph_biguint_init(&D));
     IGRAPH_FINALLY(igraph_biguint_destroy, &D);
     IGRAPH_CHECK(igraph_biguint_init(&R));

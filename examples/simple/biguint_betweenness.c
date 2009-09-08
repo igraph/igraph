@@ -41,6 +41,8 @@ int check(const igraph_vector_t *v1, const igraph_vector_t *v2, int code) {
     exit(code); 
   }
 
+  igraph_vector_destroy(&v);
+
   return 0;
 }
 
@@ -192,6 +194,8 @@ int main() {
   igraph_vector_destroy(&bet);
   igraph_vector_destroy(&bbet);
   igraph_destroy(&g);
+
+  if (IGRAPH_FINALLY_STACK_SIZE() != 0) return 3;
 
   return 0;
 }
