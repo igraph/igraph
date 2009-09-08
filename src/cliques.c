@@ -280,7 +280,7 @@ int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
   igraph_free(member_storage);
   igraph_free(new_member_storage);
   igraph_vector_destroy(&neis);
-  IGRAPH_FINALLY_CLEAN(4); /* 2 here, +1 is igraph_i_cliques_free_res */
+  IGRAPH_FINALLY_CLEAN(4); /* 3 here, +1 is igraph_i_cliques_free_res */
   
   return 0;
 }
@@ -745,7 +745,7 @@ int igraph_i_largest_cliques_store(const igraph_vector_t* clique, void* data, ig
     if (n > igraph_vector_size(VECTOR(*result)[0])) {
       for (i = 0; i < igraph_vector_ptr_size(result); i++)
         igraph_vector_destroy(VECTOR(*result)[i]);
-      igraph_vector_ptr_free_all(VECTOR(*result)[i]);
+      igraph_vector_ptr_free_all(result);
       igraph_vector_ptr_resize(result, 0);
     }
   }
@@ -795,8 +795,10 @@ int igraph_i_largest_cliques_store(const igraph_vector_t* clique, void* data, ig
 
 int igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
   igraph_vector_ptr_clear(res);
-  /* TODO: destroy and free all the vectors in res in case of error */
-  return igraph_i_maximal_cliques(graph, &igraph_i_largest_cliques_store, (void*)res);
+  IGRAPH_FINALLY(igraph_i_cliques_free_res, res);
+  IGRAPH_CHECK(igraph_i_maximal_cliques(graph, &igraph_i_largest_cliques_store, (void*)res));
+  IGRAPH_FINALLY_CLEAN(1);
+  return IGRAPH_SUCCESS;
 }
 
 
@@ -839,8 +841,10 @@ int igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
  */
 int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
   igraph_vector_ptr_clear(res);
-  /* TODO: destroy and free all the vectors in res in case of error */
-  return igraph_i_maximal_cliques(graph, &igraph_i_maximal_cliques_store, (void*)res);
+  IGRAPH_FINALLY(igraph_i_cliques_free_res, res);
+  IGRAPH_CHECK(igraph_i_maximal_cliques(graph, &igraph_i_maximal_cliques_store, (void*)res));
+  IGRAPH_FINALLY_CLEAN(1);
+  return IGRAPH_SUCCESS;
 }
 
 /**

@@ -109,44 +109,77 @@ class CliqueBenchmark(object):
 
     def __init__(self):
         from time import time
+        import gc
         self.time = time
+        self.gc_collect = gc.collect
 
     def run(self):
         self.printIntro()
         self.testRandom()
+        self.testMoonMoser()
+        self.testGRG()
 
     def printIntro(self):
         print "n = number of vertices"
         print "#cliques = number of maximal cliques found"
         print "t1 = time required to determine the clique number"
         print "t2 = time required to determine and save all maximal cliques"
-        print "freq1 = time required to process 10^6 maximal cliques"
-        print "freq2 = time required to process and store 10^6 maximal cliques"
         print
 
-    def testRandom(self):
-        np = {100: [0.6, 0.7, 0.8],
-              300: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
-              500: [0.1, 0.2, 0.3, 0.4],
-              700: [0.1, 0.2, 0.3],
-              1000:[0.1, 0.2, 0.3],
-              2000:[0.1],
-              3000:[0.1],
-              10000: [0.001, 0.003, 0.005, 0.01, 0.03]}
+    def timeit(self, g):
+        start = self.time()
+        omega = g.clique_number()
+        mid = self.time()
+        cl = g.maximal_cliques()
+        end = self.time()
+        self.gc_collect()
+        return len(cl), mid-start, end-mid
 
+    def testRandom(self):
+        np = {100: [0.6, 0.7],
+              300: [0.1, 0.2, 0.3, 0.4],
+              500: [0.1, 0.2, 0.3],
+              700: [0.1, 0.2],
+              1000:[0.1, 0.2],
+              10000: [0.001, 0.003, 0.005, 0.01, 0.02]}
+
+        print
         print "Erdos-Renyi random graphs"
-        print "       n        p #cliques        t1        t2    freq1    freq2"
+        print "       n        p #cliques        t1        t2"
         for n in sorted(np.keys()):
             for p in np[n]:
                 g = Graph.Erdos_Renyi(n, p)
-                start = self.time()
-                omega = g.clique_number()
-                mid = self.time()
-                cl = g.maximal_cliques()
-                end = self.time()
-                print "%8d %8.3f %8d %8.4fs %8.4fs %6.4f/s %6.4f/s" % \
-                    (n, p, len(cl), mid-start, end-mid, \
-                    len(cl)/(mid-start)/1e6, len(cl)/(end-mid)/1e6)
+                result = self.timeit(g)
+                print "%8d %8.3f %8d %8.4fs %8.4fs" % \
+                    tuple([n, p] + list(result))
+
+    def testMoonMoser(self):
+        ns = [15, 27, 33]
+
+        print
+        print "Moon-Moser graphs"
+        print "       n exp_clqs #cliques        t1        t2"
+        for n in ns:
+            n3 = n/3
+            types = range(n3) * 3
+            el = [(i, j) for i in range(n) for j in range(i+1,n) if types[i] != types[j]]
+            g = Graph(n, el)
+            result = self.timeit(g)
+            print "%8d %8d %8d %8.4fs %8.4fs" % \
+                tuple([n, (3**(n/3))] + list(result))
+
+    def testGRG(self):
+        ns = [100, 1000, 5000, 10000, 25000, 50000]
+
+        print
+        print "Geometric random graphs"
+        print "       n        d #cliques        t1        t2"
+        for n in ns:
+            d = 2. / (n ** 0.5)
+            g = Graph.GRG(n, d)
+            result = self.timeit(g)
+            print "%8d %8.3f %8d %8.4fs %8.4fs" % \
+                tuple([n, d] + list(result))
 
 
 def suite():
