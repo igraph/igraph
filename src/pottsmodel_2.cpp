@@ -2107,7 +2107,7 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
 		num_links_neg = new double *[q+1] ;
 
 		//memory allocated for  elements of each column.
-		for( int i = 0 ; i < q+1 ; i++)
+		for( unsigned int i = 0 ; i < q+1 ; i++)
 		{
 			num_links_pos[i] = new double[q+1];
 			num_links_neg[i] = new double[q+1];
@@ -2235,7 +2235,7 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
 		} //for i
 		
 		//free the allocated memory
-		for( int i = 0 ; i < q+1 ; i++ )
+		for( unsigned int i = 0 ; i < q+1 ; i++ )
 		{
 			delete [] num_links_pos[i] ;
 			delete [] num_links_neg[i];

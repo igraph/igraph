@@ -680,7 +680,7 @@ int igraph_biconnected_components(const igraph_t *graph,
 	    /*------------------------------------*/
 	    /* Record the biconnected component just found */
 	    if (tree_edges || mycomponents) {
-	      igraph_vector_t *v, *v2;
+	      igraph_vector_t *v = 0, *v2 = 0;
 	      comps++;
 	      if (tree_edges) { 
 		v=igraph_Calloc(1, igraph_vector_t);

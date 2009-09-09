@@ -80,7 +80,6 @@ int igraph_sparsemat_permute(const igraph_sparsemat_t *A,
 			     igraph_sparsemat_t *res) {
 
   long int nrow=A->cs->m, ncol=A->cs->n;
-  long int plen=igraph_vector_int_size(p);
   igraph_vector_int_t pinv;
   long int i;
 

@@ -534,7 +534,7 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
   unsigned long changes, runs;
   igraph_bool_t use_weights=0;
   bool zeroT;
-  double Q, kT, acc, prob;
+  double kT, acc, prob;
   ClusterList<NNode*> *cl_cur;
   network *net;
   PottsModelN *pm;
@@ -598,6 +598,8 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
   /* initialize the random number generator */
   RNG_BEGIN();
   
+  if ((stoptemp==0.0) && (starttemp==0.0)) zeroT=true; else zeroT=false;
+
   //Begin at a high enough temperature
   kT=pm->FindStartTemp(gamma, lambda, starttemp);
 
@@ -607,7 +609,7 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
   runs=0;
   changes=1;
   acc = 0;
-	while (changes>0 && (kT/stoptemp>1.0 || zeroT && runs<150)) 
+	while (changes>0 && (kT/stoptemp>1.0 || (zeroT && runs<150))) 
 	{
 		
 		IGRAPH_ALLOW_INTERRUPTION(); /* This is not clean.... */

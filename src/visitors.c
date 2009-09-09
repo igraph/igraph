@@ -85,7 +85,7 @@ int igraph_bfs(const igraph_t *graph,
   
   igraph_dqueue_t Q;
   long int no_of_nodes=igraph_vcount(graph);
-  long int i, actroot;
+  long int actroot;
   igraph_vector_char_t added;
   igraph_lazy_adjlist_t adjlist;
   
@@ -404,7 +404,7 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
     while (!igraph_stack_empty(&stack)) {
       long int actvect=igraph_stack_top(&stack);
       igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, actvect);
-      long int i, n=igraph_vector_size(neis);
+      long int n=igraph_vector_size(neis);
       long int *ptr=igraph_vector_long_e_ptr(&nptr, actvect);
 
       /* Search for a neighbor that was not yet visited */
