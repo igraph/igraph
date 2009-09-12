@@ -173,19 +173,22 @@ summary.igraph <- function(object, ...) {
   if (length(l)==0) {
     cat("No graph attributes.\n")
   } else {
-    cat(sep="", "Graph attributes: ", paste(l, collapse=", "), ".\n")
+    txt <- paste(sep="", "Graph attributes: ", paste(l, collapse=", "), ".")
+    cat(sep="\n", strwrap(txt, exdent=2))
   }
   l <- list.vertex.attributes(object)
   if (length(l)==0) {
     cat("No vertex attributes.\n")
   } else {
-    cat(sep="", "Vertex attributes: ", paste(l, collapse=", "), ".\n")
+    txt <- paste(sep="", "Vertex attributes: ", paste(l, collapse=", "), ".")
+    cat(sep="\n", strwrap(txt, exdent=2))
   }
   l <- list.edge.attributes(object)
   if (length(l)==0) {
     cat("No edge attributes.\n")
   } else {
-    cat(sep="", "Edge attributes: ", paste(l, collapse=", "), ".\n")
+    txt <- paste(sep="", "Edge attributes: ", paste(l, collapse=", "), ".")
+    cat(sep="\n", strwrap(txt, exdent=2))
   }
   
   invisible(object)
