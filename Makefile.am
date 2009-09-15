@@ -1,6 +1,6 @@
 
 
-SUBDIRS=src debian tests interfaces
+SUBDIRS=src tests interfaces
 DOC_FILES = 	$(top_builddir)/doc/book/Makefile.in \
 	$(top_builddir)/doc/igraph-docs.info \
 	$(top_srcdir)/doc/Makefile.in \
@@ -25,11 +25,7 @@ dist-hook:
 MAINTAINERCLEANFILES = Makefile.in
 
 ## to make sure make deb will generate Debian packages
-.PHONY: deb debcvs framework msvc
-
-deb: clean
-	debian/prepare
-	dpkg-buildpackage -rfakeroot
+.PHONY: framework msvc
 
 framework: all
 	rm -rf $(top_builddir)/igraph.framework
