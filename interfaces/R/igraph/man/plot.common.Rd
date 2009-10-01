@@ -160,9 +160,9 @@
       symbol font is available, otherwise the first font which has
       \sQuote{symbol} in its name. If the parameter is not a name of the
       base families and it is also not a named Tk font then we pass it
-      to \code{\link[tcltk]{tkfont.create}} and hope the user knows what
+      to \code{tkfont.create} and hope the user knows what
       she is doing. The \code{label.font} and \code{label.cex}
-      parameters are also passed to \code{\link[tcltk]{tkfont.create}}
+      parameters are also passed to \code{tkfont.create}
       in this case.
 
       The default value is \sQuote{serif}.
@@ -193,7 +193,7 @@
       \code{\link[graphics]{text}} as argument \code{cex}.
 
       For \code{\link{tkplot}} it is multiplied by 12 and then used as
-      the \code{size} argument for \code{\link[tcltk]{tkfont.create}}.
+      the \code{size} argument for \code{tkfont.create}.
       The base font is thus 12 for tkplot.
 
       For \code{\link{rglplot}} it is ignored.

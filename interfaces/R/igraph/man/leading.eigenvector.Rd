@@ -145,7 +145,7 @@ community.le.to.membership(merges, steps, membership)
 \seealso{\code{\link{modularity}}, \code{\link{walktrap.community}},
   \code{\link{edge.betweenness.community}},
   \code{\link{fastgreedy.community}},
-  \code{\link[stats]{as.dendrogram}}
+  \code{as.dendrogram} in package \code{stats}.
 }
 \examples{
 g <- graph.full(5) \%du\% graph.full(5) \%du\% graph.full(5)

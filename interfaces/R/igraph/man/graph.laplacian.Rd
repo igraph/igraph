@@ -22,7 +22,8 @@ graph.laplacian(graph, normalized=FALSE)
   is 1 if i==j, -1/sqrt(d[i] d[j]) if i!=j and there is an edge between
   vertices i and j and 0 otherwise.
 }
-\value{}
+\value{A square matrix with as many rows as the number of vertices in
+  the input graph.}
 % \references{}
 \author{ Gabor Csardi \email{csardi@rmki.kfki.hu}}
 % \seealso{}

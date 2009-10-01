@@ -72,7 +72,7 @@
 }
 \section{Visualization}{
   igraph provides three different ways for visualization. The first is
-  the \code{\layout{plot.igraph}} function. (Actually you don't need to
+  the \sQuote{\code{plot.igraph}} function. (Actually you don't need to
   write \sQuote{\code{plot.igraph}}, \sQuote{\code{plot}} is
   enough. This function uses base R graphic and can be used with any R
   device.

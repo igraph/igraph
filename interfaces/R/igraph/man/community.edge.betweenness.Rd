@@ -97,7 +97,7 @@ edge.betweenness.community.merges (graph, edges)
   calculation of the edge betweenness,
   \code{\link{walktrap.community}}, \code{\link{fastgreedy.community}},
   \code{\link{leading.eigenvector.community}} for other community
-  detection methods. \code{\link[stats]{as.dendrogram}} for creating an
+  detection methods. \code{as.dendrogram} in package \code{stats} for creating an
   R dendrogram object from the result of the clustering. See
   \code{\link{community.to.membership}} to create the actual communities
   after a number of edges removed from the network.

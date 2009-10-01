@@ -39,7 +39,7 @@ asymmetric.preference.game(nodes, types,
   argument, which can be asymmetric. The joint distribution for the in-
   and out-types is given in the \sQuote{type.dist.matrix} argument.
 }
-\value{}
+\value{An igraph graph.}
 %\references{}
 \author{Tamas Nepusz \email{ntamas@rmki.kfki.hu} and Gabor Csardi
   \email{csardi@rmki.kfki.hu} for the R interface} 
