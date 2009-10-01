@@ -12,11 +12,13 @@ Copyright (C) 2003-2006 Tommi Junttila
 
  You should have received a copy of the GNU General Public License
  along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#ifndef KQUEUE_HH
-#define KQUEUE_HH
+/* FSF address fixed in the above notice on 1 Oct 2009 by Tamas Nepusz */
+
+#ifndef BLISS_KQUEUE_HH
+#define BLISS_KQUEUE_HH
 
 #include "bliss_defs.hh"
 #include <cstdlib>		// malloc
