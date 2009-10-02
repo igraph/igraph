@@ -1,3 +1,30 @@
+/* -*- mode: C -*-  */
+/* 
+   IGraph library.
+   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
+   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+   02110-1301 USA
+
+*/
+
+/* The original version of this file was written by Pascal Pons
+   The original copyright notice follows here. The FSF address was
+   fixed by Tamas Nepusz */
+
 // File: graph.cpp
 //-----------------------------------------------------------------------------
 // Walktrap v0.2 -- Finds community structure of networks using random walks
@@ -15,7 +42,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+// 02110-1301 USA
 //-----------------------------------------------------------------------------
 // Author   : Pascal Pons 
 // Email    : pons@liafa.jussieu.fr
