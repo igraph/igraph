@@ -225,7 +225,8 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
       visualization software
       (\url{http://bioinformatics.icmb.utexas.edu/lgl}), it can describe
       undirected optionally weighted graphs. From the LGL manual:
-      \dQuote{The second format is the LGL file format (.lgl file
+      
+      The second format is the LGL file format (.lgl file
       suffix). This is yet another graph file format that tries to be
       as stingy as possible with space, yet keeping the edge file in a
       human readable (not binary) format. The format itself is like
@@ -236,8 +237,8 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 	vertex3name [optionalWeight]
       }
       Here, the first vertex of an edge is preceded with a pound sign
-      '#'.  Then each vertex that shares an edge with that vertex is
-      listed one per line on subsequent lines.}
+      \sQuote{#}.  Then each vertex that shares an edge with that vertex is
+      listed one per line on subsequent lines.
       
       LGL cannot handle loop and multiple edges or directed graphs, but
       in igraph it is not an error to have multiple and loop edges.
