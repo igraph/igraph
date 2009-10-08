@@ -1110,6 +1110,59 @@ PyObject *igraphmodule_Graph_get_eid(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Returns the IDs of some edges between some vertices
+ * \sa igraph_get_eids
+ */
+PyObject *igraphmodule_Graph_get_eids(igraphmodule_GraphObject * self,
+                                      PyObject * args, PyObject * kwds)
+{
+  static char *kwlist[] = { "pairs", "path", "directed", NULL };
+  PyObject *pairs_o = Py_None, *path_o = Py_None;
+  PyObject *directed = Py_True;
+  PyObject *result = NULL;
+  igraph_vector_t pairs, path, res;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist,
+                                   &pairs_o, &path_o, &directed))
+    return NULL;
+
+  if (igraph_vector_init(&res, 0))
+    return igraphmodule_handle_igraph_error();
+
+  if (pairs_o != Py_None) {
+    if (igraphmodule_PyObject_to_vector_t(pairs_o, &pairs, 1, 1)) {
+      igraph_vector_destroy(&res);
+      return NULL;
+    }
+  }
+
+  if (path_o != Py_None) {
+    if (igraphmodule_PyObject_to_vector_t(path_o, &path, 1, 0)) {
+      igraph_vector_destroy(&res);
+      if (pairs_o != Py_None) igraph_vector_destroy(&pairs);
+      return NULL;
+    }
+  }
+
+  if (igraph_get_eids(&self->g, &res,
+        pairs_o == Py_None ? 0 : &pairs,
+        path_o  == Py_None ? 0 : &path,
+        PyObject_IsTrue(directed))) {
+    if (pairs_o != Py_None) igraph_vector_destroy(&pairs);
+    if (path_o != Py_None)  igraph_vector_destroy(&path);
+    igraph_vector_destroy(&res);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (pairs_o != Py_None) igraph_vector_destroy(&pairs);
+  if (path_o != Py_None)  igraph_vector_destroy(&path);
+
+  result = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&res);
+  return result;
+}
+
+/** \ingroup python_interface_graph
  * \brief Calculates the diameter of an \c igraph.Graph
  * This method accepts two optional parameters: the first one is
  * a boolean meaning whether to consider directed paths (and is
@@ -8653,6 +8706,31 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  directed graphs. The default is C{True}. Ignored for undirected\n"
    "  graphs.\n"
    "@return: the edge ID of an arbitrary edge between vertices v1 and v2\n"},
+
+  /* interface to igraph_get_eids */
+  {"get_eids", (PyCFunction) igraphmodule_Graph_get_eids,
+   METH_VARARGS | METH_KEYWORDS,
+   "get_eids(pairs=None, path=None, directed=True)\n\n"
+   "Returns the edge IDs of some edges between some vertices.\n\n"
+   "This method can operate in two different modes, depending on which\n"
+   "of the keyword arguments C{pairs} and C{path} are given.\n\n"
+   "The method does not consider multiple edges; if there are multiple\n"
+   "edges between a pair of vertices, only the ID of one of the edges\n"
+   "is returned.\n\n"
+   "@param pairs: a list of integer pairs. Each integer pair is considered\n"
+   "  as a source-target vertex pair; the corresponding edge is looked up\n"
+   "  in the graph and the edge ID is returned for each pair.\n"
+   "@param path: a list of vertex IDs. The list is considered as a\n"
+   "  continuous path from the first vertex to the last, passing\n"
+   "  through the intermediate vertices. The corresponding edge IDs\n"
+   "  between the first and the second, the second and the third and\n"
+   "  so on are looked up in the graph and the edge IDs are returned.\n"
+   "  If both C{path} and C{pairs} are given, the two lists are\n"
+   "  concatenated.\n"
+   "@param directed: whether edge directions should be considered in\n"
+   "  directed graphs. The default is C{True}. Ignored for undirected\n"
+   "  graphs.\n"
+   "@return: the edge IDs in a list\n"},
 
   /* interface to igraph_adjacent */
   {"adjacent", (PyCFunction) igraphmodule_Graph_adjacent,

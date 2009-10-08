@@ -13,6 +13,15 @@ class BasicTests(unittest.TestCase):
         g=Graph([(0,1), (0,0), (1,2)])
         self.failUnless(g.vcount() == 3 and g.ecount() == 3 and g.is_directed() == False and g.is_simple() == False)
 
+    def testGraphGetEids(self):
+        g = Graph.Famous("petersen")
+        eids = g.get_eids(pairs=[(0,1), (0,5), (1, 6), (4, 9), (8, 6)])
+        self.failUnless(eids == [0, 2, 4, 9, 12])
+        eids = g.get_eids(path=[0, 1, 2, 3, 4])
+        self.failUnless(eids == [0, 3, 5, 7])
+        eids = g.get_eids(pairs=[(7,9), (9,6)], path = [7, 9, 6])
+        self.failUnless(eids == [14, 13, 14, 13])
+        self.assertRaises(InternalError, g.get_eids, pairs=[(0,1), (0,2)])
 
     def testAdjacency(self):
         g=Graph(4, [(0,1), (1,2), (2,0), (2,3)], directed=True)
