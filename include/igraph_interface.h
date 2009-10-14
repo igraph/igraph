@@ -72,6 +72,10 @@ int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
 int igraph_get_eid2(const igraph_t *graph, igraph_integer_t *eid,
 		   igraph_integer_t pfrom, igraph_integer_t pto,
 		    igraph_bool_t directed);
+int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
+                    const igraph_vector_t *pairs,
+					const igraph_vector_t *path,
+					igraph_bool_t directed);
 int igraph_get_eids_multi(const igraph_t *graph, igraph_vector_t *eids,
 			  const igraph_vector_t *pairs, 
 			  const igraph_vector_t *path,
