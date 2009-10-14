@@ -768,7 +768,7 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
  * A simple min-cut algorithm, Journal of the ACM, 44 585-591, 1997. 
  * 
  * </para><para>
- * The minimum cut is the mimimum set of edges which needs to be
+ * The minimum cut is the minimum set of edges which needs to be
  * removed to disconnect the graph. The minimum is calculated using
  * the weigths (\p capacity) of the edges, so the cut with the minimum
  * total capacity is calculated. 
