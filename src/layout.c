@@ -536,16 +536,22 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
  * This function was ported from the SNA R package.
  * \param graph A graph object.
  * \param res Pointer to an initialized matrix object. This will
- *        contain the result and will be resized if needed.
- * \param niter The number of iterations to perform.
+ *        contain the result (x-positions in column zero and
+ *        y-positions in column one) and will be resized if needed.
+ * \param niter The number of iterations to perform.  
+ *        Typical value: 1000.  
  * \param sigma Sets the base standard deviation of position
- *        change proposals. 
+ *        change proposals.  
+ *        Typical value: (number of vertices)/4.
  * \param initemp Sets the initial temperature for the annealing.
- * \param coolexp The cooling exponent of the annealing.
+ *        Typical value: 10.
+ * \param coolexp The cooling exponent of the annealing.  
+ *        Typical value: 0.99.
  * \param kkconst The Kamada-Kawai vertex attraction constant.
- * \param use_seed Boolean, whether to use the values cupplied in the \p res 
- *     argument as the initial configuration. If zero then a random initial 
- *     configuration is used.
+ *        Typical value: (number of vertices)^2
+ * \param use_seed Boolean, whether to use the values supplied in the
+ *        \p res argument as the initial configuration. If zero then a
+ *        random initial configuration is used.
  * \return Error code.
  * 
  * Time complexity: O(|V|^2) for each
