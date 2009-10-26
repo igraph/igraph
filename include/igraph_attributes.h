@@ -460,7 +460,7 @@ void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
  * \return Error code.
  */
 #define EANV(graph,n,vec) (igraph_cattribute_EANV((graph),(n), \
-						  igraph_ess_all(), (vec)))
+						  igraph_ess_all(IGRAPH_EDGEORDER_ID), (vec)))
 
 /**
  * \define EASV
@@ -474,7 +474,7 @@ void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
  * \return Error code.
  */
 #define EASV(graph,n,vec) (igraph_cattribute_EASV((graph),(n), \
-						  igraph_ess_all(), (vec)))
+						  igraph_ess_all(IGRAPH_EDGEORDER_ID), (vec)))
 /**
  * \define SETGAN
  * Set a numeric graph attribute
