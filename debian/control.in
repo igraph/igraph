@@ -3,12 +3,10 @@ Section: libs
 Priority: optional
 Maintainer: Tamas Nepusz <ntamas@gmail.com>
 Build-Depends: debhelper (>= 4.0.0)
-Standards-Version: 3.6.1
+Standards-Version: 3.8.0
 
 Package: libigraph
 Architecture: any
-Section: libs
-Priority: optional
 Depends: ${shlibs:Depends}
 Description: A library for creating and manipulating graphs
  igraph is a library for creating and manipulating graphs.
@@ -20,8 +18,7 @@ Description: A library for creating and manipulating graphs
 Package: libigraph-dev
 Architecture: any
 Section: libdevel
-Priority: optional
-Depends: libc6-dev, libxml2-dev, libigraph (= ${Source-Version})
+Depends: libc6-dev, libxml2-dev, libigraph (= ${binary:Version})
 Description: A library for creating and manipulating graphs - development files
  igraph is a library for creating and manipulating graphs.
  It is intended to be as powerful (ie. fast) as possible to enable the
