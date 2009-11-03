@@ -24,7 +24,7 @@ Description: Python interface for the igraph library
 
 Package: python-igraph-doc
 Architecture: any
-Section: docs
+Section: doc
 Suggests: python-igraph, python-doc
 Depends: ${misc:Depends}
 Description: Documentation of the Python interface of the igraph library
