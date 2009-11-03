@@ -1,17 +1,15 @@
 Source: python-igraph
 Section: python
 Priority: optional
-Maintainer: Tamas Nepusz <ntamas@rmki.kfki.hu>
-Build-Depends: cdbs (>= 0.4.42); debhelper (>= 6), python-all-dev (>= 2.3.5-11), libxml2-dev, libigraph-dev (= @VERSION@), python-epydoc
-Standards-Version: 3.7.3
+Maintainer: Tamas Nepusz <ntamas@gmail.com>
+Build-Depends: cdbs (>= 0.4.42), debhelper (>= 6), python-all-dev (>= 2.3.5-11), libxml2-dev, libigraph-dev (= @VERSION@), python-epydoc
+Standards-Version: 3.8.3
 XS-Python-Version: >= 2.4
 Homepage: http://igraph.sourceforge.net
 
 Package: python-igraph
 Architecture: any
-Section: python
-Priority: optional
-Depends: ${python:Depends}, libigraph (= @VERSION@)
+Depends: ${python:Depends}, ${misc:Depends}, libigraph (= @VERSION@)
 Suggests: python-igraph-doc, python-cairo
 Provides: ${python:Provides}
 XB-Python-Version: ${python:Versions}
@@ -22,13 +20,13 @@ Description: Python interface for the igraph library
  .
  This package contains the Python interface of igraph.
  .
- Homepage: http://cneurocvs.rmki.kfki.hu/igraph
+ Homepage: http://igraph.sourceforge.net
 
 Package: python-igraph-doc
 Architecture: any
 Section: docs
-Priority: optional
 Suggests: python-igraph, python-doc
+Depends: ${misc:Depends}
 Description: Documentation of the Python interface of the igraph library
  igraph is a library for creating and manipulating graphs.
  It is intended to be as powerful (ie. fast) as possible to enable the
@@ -37,4 +35,4 @@ Description: Documentation of the Python interface of the igraph library
  This package contains the API documentation of the Python interface of
  the igraph library.
  .
- Homepage: http://cneurocvs.rmki.kfki.hu/igraph
+ Homepage: http://igraph.sourceforge.net
