@@ -59,18 +59,18 @@ pre-compiled binaries for Windows, but other projects depending on
 Cairo do, so the preferred way to install Cairo on Windows along with
 its Python bindings is as follows:
 
-1. Get the Cairo DLLs from http://www.gtk.org/download-windows.
-   You will need ``cairo_1.8.6-1_win32.zip`` and the binary version
-   of ``libpng`` and ``zlib``. From ``cairo_1.8.6-1_win32.zip``,
-   you need ``libcairo-2.dll``; from ``libpng``, you need
-   ``libpng13.dll``; from ``zlib``, you need ``zlib1.dll``.
-   Version numbers may vary, so be adaptive! Put these DLLs to
-   somewhere where Windows can find them, e.g., into
-   ``C:\Windows\System32``.
+1. Get the Cairo DLLs from http://www.gtk.org/download-windows.  You will need
+   ``cairo_1.8.6-1_win32.zip`` and the binary version of ``expat``,
+   ``fontconfig``, ``freetype``, ``libpng`` and ``zlib``. From
+   ``cairo_1.8.6-1_win32.zip``, you need ``libcairo-2.dll``; from ``libpng``,
+   you need ``libpng13.dll``; from ``zlib``, you need ``zlib1.dll``; from the
+   rest of the archives, grab all the DLLs in the ``bin`` subdirectory of the
+   archive.  Version numbers may vary, so be adaptive! Put these DLLs to
+   somewhere where Windows can find them, e.g., into ``C:\Windows\System32``.
 
 2. Get the latest PyCairo for Windows installer from
-   http://ftp.gnome.org/pub/GNOME/binaries/win32/pycairo/1.4. Make
-   sure you grab the one that matches your Python version.
+   http://ftp.gnome.org/pub/GNOME/binaries/win32/pycairo/1.4. Make sure you
+   grab the one that matches your Python version.
 
 3. Run the PyCairo installer.
 
