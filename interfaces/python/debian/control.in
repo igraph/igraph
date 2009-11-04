@@ -23,7 +23,7 @@ Description: Python interface for the igraph library
  Homepage: http://igraph.sourceforge.net
 
 Package: python-igraph-doc
-Architecture: any
+Architecture: all
 Section: doc
 Suggests: python-igraph, python-doc
 Depends: ${misc:Depends}
