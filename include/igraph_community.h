@@ -125,6 +125,9 @@ int igraph_modularity(const igraph_t *graph,
 		      igraph_real_t *modularity,
               const igraph_vector_t *weights);
 
+int igraph_reindex_membership(igraph_vector_t *membership,
+                              igraph_vector_t *new_to_old);
+
 int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
 					       igraph_matrix_t *merges,
 					       igraph_vector_t *membership,
@@ -148,6 +151,11 @@ int igraph_community_label_propagation(const igraph_t *graph,
                                        const igraph_vector_t *weights,
                                        const igraph_vector_t *initial,
                                        igraph_vector_bool_t *fixed);
+int igraph_community_multilevel(const igraph_t *graph,
+                                const igraph_vector_t *weights,
+                                igraph_vector_t *membership,
+                                igraph_matrix_t *memberships,
+                                igraph_vector_t *modularity);
 
 __END_DECLS
 

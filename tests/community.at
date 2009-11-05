@@ -55,3 +55,9 @@ AT_COMPILE_CHECK([simple/igraph_community_label_propagation.c],
                  [simple/igraph_community_label_propagation.out])
 AT_CLEANUP
 
+AT_SETUP([Multilevel community detection (igraph_community_multilevel) :])
+AT_KEYWORDS([community structure multilevel Blondel Guillaume Lambiotte Lefebvre])
+AT_COMPILE_CHECK([simple/igraph_community_multilevel.c],
+                 [simple/igraph_community_multilevel.out])
+AT_CLEANUP
+

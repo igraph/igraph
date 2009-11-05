@@ -949,6 +949,9 @@ igraph_modularity:
                 IN VECTOR_OR_0 weights=NULL
         NAME-R: modularity
 
+igraph_reindex_membership:
+        PARAMS: INOUT VECTOR membership, OUT VECTOR new_to_old
+
 igraph_community_leading_eigenvector:
         PARAMS: GRAPH graph, OUT MATRIX merges, OUT VECTOR membership, \
                 INTEGER steps=-1, \
@@ -980,6 +983,12 @@ igraph_community_label_propagation:
                 VECTOR_OR_0 initial=NULL, VECTOR_BOOL_OR_0 fixed=NULL
         DEPS: weights ON graph
         NAME-R: label.propagation.community
+
+igraph_community_multilevel:
+        PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VECTOR membership, \
+		        OUT MATRIX memberships, OUT VECTOR modularity
+        DEPS: weights ON graph
+        NAME-R: multilevel.community
 
 #######################################
 # Conversion
