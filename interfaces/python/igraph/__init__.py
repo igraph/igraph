@@ -611,7 +611,7 @@ class Graph(core.GraphBase):
         @ref: A Clauset, MEJ Newman and C Moore: Finding community structure
           in very large networks. Phys Rev E 70, 066111 (2004).
         """
-        if not self.is_directed():
+        if self.is_directed():
             raise ValueError, "input graph must be undirected"
 
         if return_levels:
