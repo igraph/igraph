@@ -8385,6 +8385,66 @@ PyObject *igraphmodule_Graph_community_label_propagation(
   return result;
 }
 
+/**
+ * Multilevel algorithm of Blondel et al
+ */
+PyObject *igraphmodule_Graph_community_multilevel(igraphmodule_GraphObject *self,
+  PyObject *args, PyObject *kwds)
+{
+  static char *kwlist[] = { "weights", "return_levels", NULL };
+  PyObject *return_levels = Py_False;
+  PyObject *mss, *qs, *res, *weights = Py_None;
+  igraph_matrix_t memberships;
+  igraph_vector_t membership, modularity;
+  igraph_vector_t *ws;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist, &weights, &return_levels)) {
+    return NULL;
+  }
+
+  if (igraphmodule_attrib_to_vector_t(weights, self, &ws, ATTRIBUTE_TYPE_EDGE))
+    return NULL;
+
+  igraph_matrix_init(&memberships, 0, 0);
+  igraph_vector_init(&membership, 0);
+  igraph_vector_init(&modularity, 0);
+
+  if (igraph_community_multilevel(&self->g, ws, &membership, &memberships,
+        &modularity)) {
+    if (ws) { igraph_vector_destroy(ws); free(ws); }
+    igraph_vector_destroy(&membership);
+    igraph_vector_destroy(&modularity);
+    igraph_matrix_destroy(&memberships);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (ws) { igraph_vector_destroy(ws); free(ws); }
+
+  qs=igraphmodule_vector_t_to_PyList(&modularity, IGRAPHMODULE_TYPE_FLOAT);
+  igraph_vector_destroy(&modularity);
+  if (!qs) {
+    igraph_vector_destroy(&membership);
+    igraph_matrix_destroy(&memberships);
+    return NULL;
+  }
+
+  if (PyObject_IsTrue(return_levels)) {
+    mss=igraphmodule_matrix_t_to_PyList(&memberships, IGRAPHMODULE_TYPE_INT);
+    if (!mss) {
+      res = mss;
+    } else {
+      res=Py_BuildValue("NN", mss, qs); /* steals references */
+    }
+  } else {
+    res=igraphmodule_vector_t_to_PyList(&membership, IGRAPHMODULE_TYPE_INT);
+  }
+
+  igraph_vector_destroy(&membership);
+  igraph_matrix_destroy(&memberships);
+
+  return res;
+}
+
 
 /**
  * Walktrap community detection of Latapy & Pons
@@ -11070,7 +11130,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"community_fastgreedy",
    (PyCFunction) igraphmodule_Graph_community_fastgreedy,
    METH_VARARGS | METH_KEYWORDS,
-   "community_fastgreedy(weights=None, return_q=True)\n\n"
+   "community_fastgreedy(weights=None, return_q=False)\n\n"
    "Finds the community structure of the graph according to the algorithm of\n"
    "Clauset et al based on the greedy optimization of modularity.\n\n"
    "This is a bottom-up algorithm: initially every vertex belongs to a separate\n"
@@ -11172,6 +11232,37 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@newfield ref: Reference\n"
   "@ref: MEJ Newman: Finding community structure in networks using the\n"
   "  eigenvectors of matrices, arXiv:physics/0605087\n"
+  },
+  {"community_multilevel",
+   (PyCFunction) igraphmodule_Graph_community_multilevel,
+   METH_VARARGS | METH_KEYWORDS,
+   "community_multilevel(weights=None, return_levels=True)\n\n"
+   "Finds the community structure of the graph according to the multilevel\n"
+   "algorithm of Blondel et al. This is a bottom-up algorithm: initially\n"
+   "every vertex belongs to a separate community, and vertices are moved\n"
+   "between communities iteratively in a way that maximizes the vertices'\n"
+   "local contribution to the overall modularity score. When a consensus is\n"
+   "reached (i.e. no single move would increase the modularity score), every\n"
+   "community in the original graph is shrank to a single vertex (while\n"
+   "keeping the total weight of the adjacent edges) and the process continues\n"
+   "on the next level. The algorithm stops when it is not possible to increase\n"
+   "the modularity any more after shrinking the communities to vertices.\n\n"
+   "@attention: this function is wrapped in a more convenient syntax in the\n"
+   "  derived class L{Graph}. It is advised to use that instead of this version.\n\n"
+   "@param weights: name of an edge attribute or a list containing\n"
+   "  edge weights\n"
+   "@param return_levels: if C{True}, returns the multilevel result. If\n"
+   "  C{False}, only the best level (corresponding to the best modularity)\n"
+   "  is returned.\n"
+   "@return: either a single list describing the community membership of each\n"
+   "  vertex (if C{return_levels} is C{False}), or a list of community membership\n"
+   "  vectors, one corresponding to each level and a list of corresponding\n"
+   "  modularities (if C{return_levels} is C{True}).\n"
+   "\n"
+   "@newfield ref: Reference\n"
+   "@ref: A. Clauset, M. E. J. Newman and C. Moore: I{Finding community\n"
+   "  structure in very large networks.} Phys Rev E 70, 066111 (2004).\n"
+   "@see: modularity()\n"
   },
   {"community_edge_betweenness",
   (PyCFunction)igraphmodule_Graph_community_edge_betweenness,

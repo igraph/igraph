@@ -583,6 +583,46 @@ class Graph(core.GraphBase):
         return VertexClustering(self, cl)
 
 
+    def community_multilevel(self, weights=None, return_levels=False):
+        """Community structure based on the multilevel algorithm of Blondel et al.
+        
+        This is a bottom-up algorithm: initially every vertex belongs to a
+        separate community, and vertices are moved between communities iteratively
+        in a way that maximizes the vertices' local contribution to the overall
+        modularity score. When a consensus is reached (i.e. no single move would
+        increase the modularity score), every community in the original graph is
+        shrank to a single vertex (while keeping the total weight of the adjacent
+        edges) and the process continues on the next level. The algorithm stops
+        when it is not possible to increase the modularity any more after
+        shrinking the communities to vertices.
+
+        This algorithm is said to run almost in linear time on sparse graphs.
+
+        @param weights: edge attribute name or a list containing edge
+          weights
+        @param return_levels: if C{True}, the communities at each level are
+          returned in a list. If C{False}, only the community structure with
+          the best modularity is returned.
+        @return: a list of L{VertexClustering} objects, one corresponding to
+          each level (if C{return_levels} is C{True}), or a L{VertexClustering}
+          corresponding to the best modularity.
+
+        @newfield ref: Reference
+        @ref: A Clauset, MEJ Newman and C Moore: Finding community structure
+          in very large networks. Phys Rev E 70, 066111 (2004).
+        """
+        if return_levels:
+            levels, qs = GraphBase.community_multilevel(self, weights, True)
+            result = []
+            for level, q in zip(levels, qs):
+                result.append(VertexClustering(self, level, q))
+        else:
+            membership = GraphBase.community_multilevel(self, weights, False)
+            q = self.modularity(membership, weights)
+            result = VertexClustering(self, membership, q)
+        return result
+
+
     def community_edge_betweenness(self, clusters = None, directed = True):
         """Community structure based on the betweenness of the edges in the network.
 
