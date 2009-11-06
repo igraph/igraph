@@ -34,8 +34,9 @@
 <!-- doxrox-include igraph_community_eb_get_merges -->
 </section>
 
-<section><title>Community structure based on fast greedy optimization of modularity</title>
+<section><title>Community structure based on the optimization of modularity</title>
 <!-- doxrox-include igraph_community_fastgreedy -->
+<!-- doxrox-include igraph_community_multilevel -->
 </section>
 
 <section><title>Label propagation</title>
