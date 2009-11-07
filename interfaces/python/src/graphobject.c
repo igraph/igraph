@@ -10107,7 +10107,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    METH_O,
    "union(graphs)\n\n"
    "Creates the union of two (or more) graphs.\n\n"
-   "@param graphs: the list of graphs to be intersected with\n"
+   "@param graphs: the list of graphs to be united with\n"
    "  the current one.\n"},
 
   /**************************/
