@@ -121,31 +121,34 @@ HAVE_LIBXML=0
 if test $graphml_support = yes; then
   AC_PATH_PROG([XML2CONFIG], [xml2-config], [none])
   if test "$XML2CONFIG" = "none"; then
-    graphml_support=no
+	# Hmmm, no xml2-config. OS X does not have it while still
+	# having libxml2, so let's try an educated guess
+	XML2_LIBS="-lxml2 -lz -lm"
+	XML2_CFLAGS="-I/usr/include/libxml2"
   else
     XML2_LIBS=`$XML2CONFIG --libs`
     XML2_CFLAGS=`$XML2CONFIG --cflags`
-    AC_CHECK_LIB([xml2], [xmlSAXUserParseFile], [
-      OLDCFLAGS=${CFLAGS}
-      OLDCPPFLAGS=${CPPFLAGS}
-      CFLAGS=${XML2_CFLAGS}
-      CPPFLAGS=${XML2_CFLAGS}
-      AC_CHECK_HEADER([libxml/parser.h], [
-        HAVE_LIBXML=1
-	AC_DEFINE([HAVE_LIBXML], [1], [Define to 1 if you have the libxml2 libraries installed])
-        CFLAGS="${OLDCFLAGS} ${XML2_CFLAGS}"
-	CPPFLAGS="${OLDCFLAGS} ${XML2_CFLAGS}"
-	AC_SUBST(XML2_LIBS)
-	AC_SUBST(XML2_CFLAGS)
-      ], [
-        graphml_support=no
-        CFLAGS=${OLDCFLAGS}
-	CPPFLAGS=${OLDCPPFLAGS}
-      ])
+  fi
+  AC_CHECK_LIB([xml2], [xmlSAXUserParseFile], [
+    OLDCFLAGS=${CFLAGS}
+    OLDCPPFLAGS=${CPPFLAGS}
+    CFLAGS=${XML2_CFLAGS}
+    CPPFLAGS=${XML2_CFLAGS}
+    AC_CHECK_HEADER([libxml/parser.h], [
+      HAVE_LIBXML=1
+      AC_DEFINE([HAVE_LIBXML], [1], [Define to 1 if you have the libxml2 libraries installed])
+	  CFLAGS="${OLDCFLAGS} ${XML2_CFLAGS}"
+      CPPFLAGS="${OLDCFLAGS} ${XML2_CFLAGS}"
+      AC_SUBST(XML2_LIBS)
+      AC_SUBST(XML2_CFLAGS)
     ], [
       graphml_support=no
+      CFLAGS=${OLDCFLAGS}
+	  CPPFLAGS=${OLDCPPFLAGS}
     ])
-  fi
+  ], [
+    graphml_support=no
+  ])
 fi
 
 gmp_support=no
