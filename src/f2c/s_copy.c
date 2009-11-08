@@ -5,7 +5,7 @@
  */
 
 #include "config.h"
-#include "f2c.h"
+#include "igraph_f2c.h"
 
 /* assign strings:  a = b */
 

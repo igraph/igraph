@@ -1,4 +1,4 @@
-#include "f2c.h"
+#include "igraph_f2c.h"
 
 #ifdef KR_headers
 double floor();

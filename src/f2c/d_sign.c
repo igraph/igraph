@@ -1,5 +1,5 @@
 #include "config.h"
-#include "f2c.h"
+#include "igraph_f2c.h"
 
 #ifdef KR_headers
 double igraphd_sign(a,b) doublereal *a, *b;

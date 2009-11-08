@@ -170,8 +170,6 @@ doublereal igraphdlamch_(char *cmach)
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "f2c.h"
-
 /* *********************************************************************** */
 
 /* Subroutine */ int igraphdlamc1_(integer *beta, integer *t, logical *rnd, logical 
@@ -390,8 +388,6 @@ L30:
 
 		http://www.netlib.org/f2c/libf2c.zip
 */
-
-#include "f2c.h"
 
 /* Table of constant values */
 
@@ -713,8 +709,6 @@ L10:
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "f2c.h"
-
 /* *********************************************************************** */
 
 doublereal igraphdlamc3_(doublereal *a, doublereal *b)
@@ -767,8 +761,6 @@ doublereal igraphdlamc3_(doublereal *a, doublereal *b)
 
 		http://www.netlib.org/f2c/libf2c.zip
 */
-
-#include "f2c.h"
 
 /* *********************************************************************** */
 
@@ -878,8 +870,6 @@ L10:
 
 		http://www.netlib.org/f2c/libf2c.zip
 */
-
-#include "f2c.h"
 
 /* Table of constant values */
 
