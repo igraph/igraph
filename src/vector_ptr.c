@@ -127,6 +127,13 @@ void igraph_vector_ptr_destroy   (igraph_vector_ptr_t* v) {
 /**
  * \ingroup vectorptr
  * \brief Calls free() on all elements of a pointer vector.
+ *
+ * \param v Pointer to the pointer vector whose elements will be freed.
+ * 
+ * Time complexity: operating system dependent, the \quote time
+ * \endquote required to deallocate O(n) pointers, each pointing to
+ * a memory area of arbitrary size. n is the number of
+ * elements in the pointer vector.
  */
 
 void igraph_vector_ptr_free_all   (igraph_vector_ptr_t* v) {
@@ -141,6 +148,15 @@ void igraph_vector_ptr_free_all   (igraph_vector_ptr_t* v) {
 /**
  * \ingroup vectorptr
  * \brief Calls free() on all elements and destroys the pointer vector.
+ *
+ * \param v Pointer to the pointer vector to destroy.
+ *
+ * Time complexity: operating system dependent, the \quote time
+ * \endquote required to deallocate O(n) pointers, each pointing to
+ * a memory area of arbitrary size, plus the \quote time \endquote
+ * required to deallocate O(n) bytes, n being the number of elements
+ * allocated for the pointer vector (not necessarily the number of
+ * elements in the vector).
  */
 
 void igraph_vector_ptr_destroy_all   (igraph_vector_ptr_t* v) { 
