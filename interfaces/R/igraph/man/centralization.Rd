@@ -133,7 +133,7 @@ centralization.evcent.tmax (graph = NULL, nodes = 0,
   Methods and Applications.}  Cambridge University Press.
 }
 \author{Gabor Csardi \email{Gabor.Csardi@unil.ch}}
-\seealso{}
+%\seealso{}
 \examples{
 # A BA graph is quite centralized
 g <- simplify(ba.game(1000, m=4))

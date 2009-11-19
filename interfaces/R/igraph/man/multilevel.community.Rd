@@ -51,7 +51,7 @@ multilevel.community (graph, weights = NULL)
   Lefebvre: Fast unfolding of communities in large
   networks. J. Stat. Mech. (2008) P10008   
 }
-\author{Tom Gregorovic, Tamas Nepusz \email{ntamas}
+\author{Tom Gregorovic, Tamas Nepusz \email{tamas@cs.rhul.ac.uk}}
 \seealso{Other community detection algorithms:
   \code{\link{walktrap.community}},
   \code{\link{spinglass.community}},

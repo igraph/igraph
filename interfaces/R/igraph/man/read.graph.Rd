@@ -226,7 +226,7 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 
       The resulting graph is always undirected. LGL cannot deal with
       files which contain multiple or loop edges, this is however not
-      checked here, as \a igraph is happy with these.
+      checked here, as igraph is happy with these.
 
       Additional arguments:
       \itemize{
@@ -259,7 +259,7 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
       listed one per line on subsequent lines.}
       
       LGL cannot handle loop and multiple edges or directed graphs, but
-      in \a igraph it is not an error to have multiple and loop edges.
+      in igraph it is not an error to have multiple and loop edges.
       
       Additional arguments:
       \itemize{
