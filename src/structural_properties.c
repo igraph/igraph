@@ -1591,7 +1591,7 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
  * </para><para>
  * This function collects the specified vertices and all edges between
  * them to a new graph.
- * As the vertex ids in a graph always start with one, this function
+ * As the vertex ids in a graph always start with zero, this function
  * very likely needs to reassign ids to the vertices.
  * \param graph The graph object.
  * \param res The subgraph, another graph object will be stored here,
