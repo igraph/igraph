@@ -633,7 +633,7 @@ int igraph_modularity(const igraph_t *graph,
 }
 
 /**
- * \function igraoh_reindex_membership
+ * \function igraph_reindex_membership
  * \brief Makes the IDs in a membership vector continuous
  *
  * This function reindexes component IDs in a membership vector
