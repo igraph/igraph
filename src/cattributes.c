@@ -1254,6 +1254,25 @@ int igraph_cattribute_list(const igraph_t *graph,
 }
 
 /**
+ * \function igraph_cattribute_has_attr
+ * Checks whether a (graph, vertex or edge) attribute exists
+ * 
+ * \param graph The graph.
+ * \param type The type of the attribute, \c IGRAPH_ATTRIBUTE_GRAPH, 
+ *        \c IGRAPH_ATTRIBUTE_VERTEX or \c IGRAPH_ATTRIBUTE_EDGE.
+ * \param name Character constant, the name of the attribute.
+ * \return Logical value, TRUE if the attribute exists, FALSE otherwise.
+ * 
+ * Time complexity: O(A), the number of (graph, vertex or edge) 
+ * attributes, assuming attribute names are not too long.
+ */
+igraph_bool_t igraph_cattribute_has_attr(const igraph_t *graph,
+					 igraph_attribute_elemtype_t type,
+					 const char *name) {
+  return igraph_i_cattribute_has_attr(graph, type, name);
+}
+
+/**
  * \function igraph_cattribute_GAN_set
  * Set a numeric graph attribute
  * 

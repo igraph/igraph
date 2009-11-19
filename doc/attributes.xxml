@@ -24,6 +24,7 @@
 
 <section><title>Query attributes</title>
 <!-- doxrox-include igraph_cattribute_list -->
+<!-- doxrox-include igraph_cattribute_has_attr -->
 <!-- doxrox-include igraph_cattribute_GAN -->
 <!-- doxrox-include GAN -->
 <!-- doxrox-include igraph_cattribute_GAS -->

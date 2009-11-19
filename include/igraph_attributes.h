@@ -329,6 +329,9 @@ int igraph_cattribute_list(const igraph_t *graph,
 			   igraph_strvector_t *gnames, igraph_vector_t *gtypes,
 			   igraph_strvector_t *vnames, igraph_vector_t *vtypes,
 			   igraph_strvector_t *enames, igraph_vector_t *etypes);
+igraph_bool_t igraph_cattribute_has_attr(const igraph_t *graph,
+					 igraph_attribute_elemtype_t type,
+					 const char *name);
 
 int igraph_cattribute_GAN_set(igraph_t *graph, const char *name, 
 			      igraph_real_t value);
