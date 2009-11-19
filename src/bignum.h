@@ -22,7 +22,7 @@
 #ifndef _bignum_h_
 #define _bignum_h_
 
-#include <config.h>
+#include "config.h"
 #ifdef HAVE_STDINT_H
 #  include <stdint.h>
 #else 
