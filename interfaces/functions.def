@@ -951,6 +951,7 @@ igraph_modularity:
 
 igraph_reindex_membership:
         PARAMS: INOUT VECTOR membership, OUT VECTOR_OR_0 new_to_old
+        NAME-R: reindex.membership
 
 igraph_community_leading_eigenvector:
         PARAMS: GRAPH graph, OUT MATRIX merges, OUT VECTOR membership, \
@@ -1319,6 +1320,7 @@ igraph_random_sample:
 
 igraph_convex_hull:
         PARAMS: MATRIX data, OUT VECTOR resverts, OUT MATRIX rescoords
+        NAME-R: convex.hull
 
 #######################################
 # (R)evolver
