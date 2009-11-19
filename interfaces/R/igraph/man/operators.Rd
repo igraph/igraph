@@ -10,6 +10,7 @@
 \alias{\%m\%}
 \alias{\%s\%}
 \alias{\%u\%}
+\concept{Graph operators}
 \title{Graph operators}
 \description{Graph operators handle graphs in terms of set theory.}
 \usage{

@@ -162,6 +162,9 @@ export(graph.disjoint.union, "%du%", graph.intersection, "%s%",
        graph.union, "%u%", graph.difference, "%m%",
        graph.complementer, graph.compose, "%c%")
 
+export(graph.intersection.by.name, graph.union.by.name,
+       graph.difference.by.name)
+
 # parameters, config
 
 export(igraph.par)
