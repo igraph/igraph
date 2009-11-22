@@ -1,7 +1,7 @@
 Package: igraph
 Version: @VERSION@
-Date: Apr 10, 2009
-Title:  Routines for simple graphs, network analysis.
+Date: Nov 22, 2009
+Title:  Network analysis and visualization
 Author: Gabor Csardi <Gabor.Csardi@unil.ch>
 Maintainer: Gabor Csardi <Gabor.Csardi@unil.ch>
 Description: Routines for simple graphs and network analysis. igraph can
@@ -10,4 +10,4 @@ Description: Routines for simple graphs and network analysis. igraph can
 Depends: stats
 Suggests: stats4, rgl, tcltk, RSQLite, digest, graph, Matrix
 License: GPL (>= 2)
-URL: http://cneurocvs.rmki.kfki.hu/igraph
+URL: http://igraph.sourceforge.net
