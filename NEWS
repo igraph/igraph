@@ -14,6 +14,8 @@ Bugs corrected in the R interface
 - When compiling the package, the configure script fails if there is
   no C compiler available
 - igraph.from.graphNEL creates the right number of loop edges now
+- Fixed a bug in bipartite.projection() that caused occasional crashes 
+  on some systems
 
 New in the Python interface
 ---------------------------
@@ -29,6 +31,8 @@ Bugs corrected in the C layer
 - The configure script fails if there is no C compiler available
 - Fixed a bug in igraph_community_spinglass, when csize was a NULL
   pointer, but membership was not
+- Fixed a bug in igraph_bipartite_projection that caused occasional
+  crashes on some systems
 
 ============
 igraph 0.5.2
