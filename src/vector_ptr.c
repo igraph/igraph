@@ -126,6 +126,7 @@ void igraph_vector_ptr_destroy   (igraph_vector_ptr_t* v) {
 
 /**
  * \ingroup vectorptr
+ * \function igraph_vector_ptr_free_all
  * \brief Calls free() on all elements of a pointer vector.
  *
  * \param v Pointer to the pointer vector whose elements will be freed.
@@ -147,6 +148,7 @@ void igraph_vector_ptr_free_all   (igraph_vector_ptr_t* v) {
 
 /**
  * \ingroup vectorptr
+ * \function igraph_vector_ptr_destroy_all
  * \brief Calls free() on all elements and destroys the pointer vector.
  *
  * \param v Pointer to the pointer vector to destroy.
