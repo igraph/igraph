@@ -1,4 +1,36 @@
 ============
+igraph 0.5.3
+============
+
+Released November 22, 2009
+
+Bugs corrected in the R interface
+---------------------------------
+- Some small changes to make 'R CMD check' clean
+- Fixed a bug in graph.incidence, the 'directed' and 'mode' arguments 
+  were not handled correctly
+- Betweenness and edge betweenness functions work for graphs with
+  many shortest paths now (up to the limit of long long int)
+- When compiling the package, the configure script fails if there is
+  no C compiler available
+- igraph.from.graphNEL creates the right number of loop edges now
+
+New in the Python interface
+---------------------------
+- Added support for weighted diameter
+- get_eid() considers edge directions by default from now on
+- Fixed a memory leak in the attribute handler
+- 'NaN' and 'inf' are treated correctly now
+
+Bugs corrected in the C layer
+-----------------------------
+- Betweenness and edge betweenness functions work for graphs with
+  many shortest paths now (up to the limit of long long int)
+- The configure script fails if there is no C compiler available
+- Fixed a bug in igraph_community_spinglass, when csize was a NULL
+  pointer, but membership was not
+
+============
 igraph 0.5.2
 ============
 
