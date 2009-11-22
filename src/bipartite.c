@@ -191,7 +191,7 @@ int igraph_i_bipartite_projection(const igraph_t *graph,
   igraph_adjlist_destroy(&adjlist);
   igraph_vector_long_destroy(&added);
   igraph_vector_destroy(&vertex_index);
-  IGRAPH_FINALLY_CLEAN(2);
+  IGRAPH_FINALLY_CLEAN(3);
   
   IGRAPH_CHECK(igraph_create(proj, &edges, remaining_nodes, 
 			     /*directed=*/ 0));
