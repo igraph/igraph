@@ -1246,7 +1246,7 @@ PyMODINIT_FUNC initcore(void) {
   PyModule_AddIntConstant(m, "BLISS_FSM", IGRAPH_BLISS_FSM);
 
   /* More useful constants */
-  PyModule_AddStringConstant(m, "__version__", "0.5.2");
+  PyModule_AddStringConstant(m, "__version__", "0.5.3");
   PyModule_AddStringConstant(m, "__build_date__", __DATE__);
 
   /* initialize error, progress, warning and interruption handler */
