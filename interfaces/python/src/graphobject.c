@@ -2078,7 +2078,7 @@ PyObject *igraphmodule_Graph_Isoclass(PyTypeObject * type,
                                       PyObject * args, PyObject * kwds)
 {
   long n, isoclass;
-  PyObject *directed = NULL;
+  PyObject *directed = Py_False;
   igraphmodule_GraphObject *self;
   igraph_t g;
 
