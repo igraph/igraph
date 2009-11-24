@@ -8,8 +8,16 @@ Standards-Version: 3.8.3
 Homepage: http://igraph.sourceforge.net
 
 Package: libigraph
+Architecture: all
+Depends: libigraph0
+Description: Transitional dummy package for libigraph0
+
+Package: libigraph0
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Replaces: libigraph (<< 0.5.3-1)
+Conflicts: libigraph (<< 0.5.3-1)
+Provides: libigraph
 Description: A library for creating and manipulating graphs
  igraph is a library for creating and manipulating graphs.
  It is intended to be as powerful (ie. fast) as possible to enable the
@@ -20,7 +28,7 @@ Description: A library for creating and manipulating graphs
 Package: libigraph-dev
 Architecture: any
 Section: libdevel
-Depends: libigraph (= ${binary:Version}), ${misc:Depends}
+Depends: libigraph0 (= ${binary:Version}), ${misc:Depends}
 Description: A library for creating and manipulating graphs - development files
  igraph is a library for creating and manipulating graphs.
  It is intended to be as powerful (ie. fast) as possible to enable the
