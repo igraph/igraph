@@ -2,14 +2,14 @@ Source: python-igraph
 Section: python
 Priority: optional
 Maintainer: Tamas Nepusz <ntamas@gmail.com>
-Build-Depends: cdbs (>= 0.4.42), debhelper (>= 6), python-all-dev (>= 2.3.5-11), libxml2-dev, libigraph-dev (= @VERSION@), python-epydoc
+Build-Depends: cdbs (>= 0.4.42), debhelper (>= 7), python-all-dev (>= 2.3.5-11), libxml2-dev, libigraph-dev (= @VERSION@), python-epydoc
 Standards-Version: 3.8.3
 XS-Python-Version: >= 2.4
 Homepage: http://igraph.sourceforge.net
 
 Package: python-igraph
 Architecture: any
-Depends: ${python:Depends}, ${misc:Depends}, libigraph (= @VERSION@)
+Depends: ${python:Depends}, ${misc:Depends}, libigraph0 (= @VERSION@)
 Suggests: python-igraph-doc, python-cairo
 Provides: ${python:Provides}
 XB-Python-Version: ${python:Versions}
@@ -19,8 +19,6 @@ Description: Python interface for the igraph library
  analysis of large graphs.
  .
  This package contains the Python interface of igraph.
- .
- Homepage: http://igraph.sourceforge.net
 
 Package: python-igraph-doc
 Architecture: all
@@ -34,5 +32,3 @@ Description: Documentation of the Python interface of the igraph library
  .
  This package contains the API documentation of the Python interface of
  the igraph library.
- .
- Homepage: http://igraph.sourceforge.net
