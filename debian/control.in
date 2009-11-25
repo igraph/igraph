@@ -9,8 +9,10 @@ Homepage: http://igraph.sourceforge.net
 
 Package: libigraph
 Architecture: all
-Depends: libigraph0
+Depends: libigraph0, ${misc:Depends}
 Description: Transitional dummy package for libigraph0
+ This is a dummy package to ease the transition from libigraph to
+ libigraph0.
 
 Package: libigraph0
 Architecture: any
