@@ -2610,14 +2610,15 @@ PyObject *igraphmodule_Graph_Tree(PyTypeObject * type,
                                   PyObject * args, PyObject * kwds)
 {
   long n, children;
+  PyObject* tree_mode_o = Py_None;
   igraph_tree_mode_t mode = IGRAPH_TREE_UNDIRECTED;
   igraphmodule_GraphObject *self;
   igraph_t g;
 
   static char *kwlist[] = { "n", "children", "type", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|l", kwlist,
-                                   &n, &children, &mode))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|O", kwlist,
+                                   &n, &children, &tree_mode_o))
     return NULL;
 
   if (n < 0) {
@@ -2625,10 +2626,7 @@ PyObject *igraphmodule_Graph_Tree(PyTypeObject * type,
     return NULL;
   }
 
-  if (mode != IGRAPH_TREE_UNDIRECTED && mode != IGRAPH_TREE_IN &&
-      mode != IGRAPH_TREE_OUT) {
-    PyErr_SetString(PyExc_ValueError,
-                    "Mode should be either TREE_IN, TREE_OUT or TREE_UNDIRECTED.");
+  if (igraphmodule_PyObject_to_tree_mode_t(tree_mode_o, &mode)) {
     return NULL;
   }
 
@@ -6095,16 +6093,16 @@ PyObject *igraphmodule_Graph_write_dimacs(igraphmodule_GraphObject * self,
 {
   char *fname = NULL;
   FILE *f;
-  long source, target;
+  long source = 0, target = 0;
   PyObject *capacity_obj = Py_None;
   igraph_vector_t capacity;
   igraph_bool_t capacity_obj_created = 0;
 
-  char *kwlist[] = {
+  static char *kwlist[] = {
     "f", "source", "target", "capacity", NULL
   };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "sii|O", kwlist, &fname,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "sll|O", kwlist, &fname,
                                    &source, &target, &capacity_obj))
     return NULL;
 

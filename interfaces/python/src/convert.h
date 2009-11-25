@@ -43,14 +43,15 @@ typedef struct {
 
 int igraphmodule_PyObject_to_enum(PyObject *o,
   igraphmodule_enum_translation_table_entry_t *table, int *result);
-int igraphmodule_PyObject_to_bliss_sh_t(PyObject *o, igraph_bliss_sh_t *result);
-int igraphmodule_PyObject_to_vconn_nei_t(PyObject *o, igraph_vconn_nei_t *result);
-int igraphmodule_PyObject_to_neimode_t(PyObject *o, igraph_neimode_t *result);
 int igraphmodule_PyObject_to_adjacency_t(PyObject *o, igraph_adjacency_t *result);
+int igraphmodule_PyObject_to_bliss_sh_t(PyObject *o, igraph_bliss_sh_t *result);
 int igraphmodule_PyObject_to_connectedness_t(PyObject *o, igraph_connectedness_t *result);
 int igraphmodule_PyObject_to_degseq_t(PyObject *o, igraph_degseq_t *result);
+int igraphmodule_PyObject_to_neimode_t(PyObject *o, igraph_neimode_t *result);
 int igraphmodule_PyObject_to_star_mode_t(PyObject *o, igraph_star_mode_t *result);
 int igraphmodule_PyObject_to_transitivity_mode_t(PyObject *o, igraph_transitivity_mode_t *result);
+int igraphmodule_PyObject_to_tree_mode_t(PyObject *o, igraph_tree_mode_t *result);
+int igraphmodule_PyObject_to_vconn_nei_t(PyObject *o, igraph_vconn_nei_t *result);
 
 int igraphmodule_PyObject_to_integer_t(PyObject *object, igraph_real_t *v);
 int igraphmodule_PyObject_to_real_t(PyObject *object, igraph_real_t *v);
