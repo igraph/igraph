@@ -52,7 +52,7 @@ binary-arch: build install
 	dh_testdir
 	dh_testroot
 	
-	dh_movefiles -plibigraph        \
+	dh_movefiles -plibigraph0       \
 	    usr/lib/libigraph.so.0      \
 	    usr/lib/libigraph.so.0.0.0
 			
@@ -94,7 +94,7 @@ binary-arch: build install
 	dh_compress
 	dh_fixperms
 	dh_makeshlibs
-	dh_shlibdeps -L libigraph -l debian/libigraph/usr/lib
+	dh_shlibdeps
 	dh_gencontrol
 #	dh_python
 	dh_installdeb
