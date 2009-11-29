@@ -51,7 +51,8 @@ int main() {
   igraph_t g, p1, p2, full, ring;
   igraph_vector_bool_t types;
   igraph_bool_t iso;
-  long int i;
+  long int i, m2=0, w, f, t;
+  igraph_vector_t mult1, mult2;
   
   /*******************************************************/
   /* Full bipartite graph -> full graphs                 */
@@ -62,7 +63,7 @@ int main() {
 			/*mode=*/ IGRAPH_ALL);
 
   /* Get both projections */
-  igraph_bipartite_projection(&g, &types, &p1, &p2, /*probe1=*/ -1);
+  igraph_bipartite_projection(&g, &types, &p1, &p2, 0, 0, /*probe1=*/ -1);
   check_projection(&g, &types, &p1, &p2);
 
   /* Check first projection */
@@ -96,7 +97,7 @@ int main() {
   }
   
   /* Get both projections */
-  igraph_bipartite_projection(&g, &types, &p1, &p2, /*probe1=*/ -1);
+  igraph_bipartite_projection(&g, &types, &p1, &p2, 0, 0, /*probe1=*/ -1);
   check_projection(&g, &types, &p1, &p2);
   
   /* Check first projection */
@@ -112,6 +113,57 @@ int main() {
   if (!iso) { return 2; }
   igraph_destroy(&ring);
   
+  igraph_destroy(&p1);
+  igraph_destroy(&p2);
+  igraph_destroy(&g);
+  igraph_vector_bool_destroy(&types);
+
+  /*******************************************************/
+  /* Multiplicity test                                   */
+  /*******************************************************/
+  
+  igraph_small(&g, 10, IGRAPH_UNDIRECTED, 
+	       0,8, 1,8, 2,8, 3,8, 4,8, 4,9, 5,9, 6,9, 7,9, 0,9, 
+	       -1);
+  igraph_vector_bool_init(&types, igraph_vcount(&g));
+  igraph_vector_bool_fill(&types, 1);
+  VECTOR(types)[8] = VECTOR(types)[9] = 0;
+  
+  igraph_vector_init(&mult1, 0);
+  igraph_vector_init(&mult2, 0);
+  igraph_bipartite_projection(&g, &types, &p1, &p2, &mult1, &mult2, 
+			      /*probe=*/ -1);
+  check_projection(&g, &types, &p1, &p2);
+  
+  if (igraph_vector_size(&mult1) != igraph_ecount(&p1)) {
+    return 21;
+  }
+  if (igraph_vector_size(&mult2) != igraph_ecount(&p2)) {
+    return 22;
+  }
+  if (VECTOR(mult1)[0] != 2) { 
+    return 23;
+  }
+  for (i=0; i<igraph_vector_size(&mult2); i++) {
+    if (VECTOR(mult2)[i] != 1 && VECTOR(mult2)[i] != 2) {
+      return 24;
+    }
+    if (VECTOR(mult2)[i] == 2) {
+      m2++;
+      w=i;
+    }
+  }
+  if (m2 != 1) { 
+    return 25;
+  }
+  f=IGRAPH_FROM(&p2, w);
+  t=IGRAPH_TO(&p2, w);
+  if (fmin(f, t) != 0 || fmax(f, t) != 4) { 
+    return 26;
+  }
+   
+  igraph_vector_destroy(&mult1);
+  igraph_vector_destroy(&mult2);
   igraph_destroy(&p1);
   igraph_destroy(&p2);
   igraph_destroy(&g);

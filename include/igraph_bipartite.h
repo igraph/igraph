@@ -67,6 +67,8 @@ int igraph_bipartite_projection(const igraph_t *graph,
 				const igraph_vector_bool_t *types,
 				igraph_t *proj1,
 				igraph_t *proj2,
+				igraph_vector_t *multiplicity1,
+				igraph_vector_t *multiplicity2,
 				igraph_integer_t probe1);
 
 int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,

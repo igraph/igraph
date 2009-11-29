@@ -673,9 +673,12 @@ igraph_bipartite_projection_size:
 
 igraph_bipartite_projection:
         PARAMS: GRAPH graph, BIPARTITE_TYPES types=NULL, \
-                OUT GRAPH proj1, OUT GRAPH proj2, INTEGER probe1=-1
+                OUT GRAPH proj1, OUT GRAPH proj2, \
+                OUT VECTOR_OR_0 multiplicity1, \
+                OUT VECTOR_OR_0 multiplicity2, INTEGER probe1=-1
         DEPS: types ON graph
         NAME-R: bipartite.projection
+        IGNORE: RR
 
 igraph_create_bipartite:
         PARAMS: OUT GRAPH graph, IN VECTOR_BOOL types, \
