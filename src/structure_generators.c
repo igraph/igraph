@@ -999,7 +999,7 @@ int igraph_full_citation(igraph_t *graph, igraph_integer_t n,
 
 /**
  * \function igraph_small
- * \brief Shortand to create a short graph, giving the edges as agruments
+ * \brief Shortand to create a short graph, giving the edges as arguments
  * 
  * </para><para>
  * This function is handy when a relatively small graph needs to be created. 
