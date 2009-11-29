@@ -7,7 +7,7 @@
 \description{A bipartite graph is projected into two one-mode networks}
 \usage{
 bipartite.projection.size(graph, types=NULL)
-bipartite.projection (graph, types=NULL, probe1=-1)
+bipartite.projection (graph, types=NULL, multiplicity = TRUE, probe1=-1)
 }
 \arguments{
   \item{graph}{The input graph. It can be directed, but edge directions
@@ -15,6 +15,11 @@ bipartite.projection (graph, types=NULL, probe1=-1)
   \item{types}{An optional vertex type vector to use instead of the
     \sQuote{\code{type}} vertex attribute. You must supply this argument
     if the graph has no \sQuote{\code{type}} vertex attribute.}
+  \item{multiplicity}{If \code{TRUE}, then igraph keeps the multiplicity
+    of the edges as an edge attribute. E.g. if there is an A-C-B and
+    also an A-D-B triple in the bipartite graph (but no more X, such
+    that A-X-B is also in the graph), then the multiplicity of the A-B
+    edge in the projection will be 2.}
   \item{probe1}{This argument can be used to specify the order of the
     projections in the resulting list. If given and non-negative, then
     it is considered as a vertex id; the projection containing the
