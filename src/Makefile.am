@@ -99,8 +99,7 @@ HEADERS_PRIVATE = atlas-edges.h \
 		gengraph_degree_sequence.h gengraph_graph_molloy_hash.h \
 		gengraph_graph_molloy_optimized.h \
 		gengraph_hash.h gengraph_header.h gengraph_powerlaw.h \
-		gengraph_qsort.h gengraph_random.h gengraph_vertex_cover.h \
-		f2c.h
+		gengraph_qsort.h gengraph_random.h gengraph_vertex_cover.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
