@@ -30,7 +30,7 @@ void show_results(igraph_t *g, igraph_vector_t *membership, igraph_matrix_t *mem
   j=igraph_vector_which_max(modularity);
   for (i=0; i<igraph_vector_size(membership); i++) {
     if (VECTOR(*membership)[i] != MATRIX(*memberships, j, i)) {
-      fprintf(f, "WARNING: best membership vector element %d does not match the best one in the membership matrix\n", i);
+      fprintf(f, "WARNING: best membership vector element %li does not match the best one in the membership matrix\n", i);
     }
   }
 
