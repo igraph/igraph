@@ -5435,49 +5435,46 @@ PyObject *igraphmodule_Graph_Read_DIMACS(PyTypeObject * type,
                                          PyObject * args, PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
-  char *fname = NULL;
-  FILE *f;
   igraph_integer_t source = 0, target = 0;
   igraph_vector_t capacity;
   igraph_t g;
-  PyObject *directed = Py_False, *capacity_obj;
+  PyObject *fname = NULL, *fobj = NULL, *directed = Py_False, *capacity_obj;
 
-  char *kwlist[] = { "f", "directed", NULL };
+  static char *kwlist[] = { "f", "directed", NULL };
 
   if (!PyArg_ParseTupleAndKeywords
-      (args, kwds, "s|O", kwlist, &fname, &directed))
+      (args, kwds, "O|O", kwlist, &fname, &directed))
     return NULL;
 
-  f = fopen(fname, "r");
-  if (!f) {
-    PyErr_SetString(PyExc_IOError, strerror(errno));
+  fobj = igraphmodule_PyObject_to_PyFile(fname, "r");
+  if (!fobj)
     return NULL;
-  }
+
   if (igraph_vector_init(&capacity, 0)) {
     igraphmodule_handle_igraph_error();
-    fclose(f);
+    Py_DECREF(fobj);
     return NULL;
   }
 
-  if (igraph_read_graph_dimacs(&g, f, 0, 0, &source, &target, &capacity,
-                               PyObject_IsTrue(directed))) {
+  if (igraph_read_graph_dimacs(&g, PyFile_AsFile(fobj), 0, 0, &source, &target,
+                               &capacity, PyObject_IsTrue(directed))) {
     igraphmodule_handle_igraph_error();
     igraph_vector_destroy(&capacity);
-    fclose(f);
+    Py_DECREF(fobj);
     return NULL;
   }
 
   capacity_obj = igraphmodule_vector_t_to_PyList(&capacity, IGRAPHMODULE_TYPE_FLOAT);
   if (!capacity_obj) {
     igraph_vector_destroy(&capacity);
-    fclose(f);
+    Py_DECREF(fobj);
     return NULL;
   }
 
-  CREATE_GRAPH_FROM_TYPE(self, g, type);
-
-  fclose(f);
+  Py_DECREF(fobj);
   igraph_vector_destroy(&capacity);
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
 
   return Py_BuildValue("NiiN", (PyObject *) self, (long)source,
                        (long)target, capacity_obj);
@@ -5492,33 +5489,27 @@ PyObject *igraphmodule_Graph_Read_Edgelist(PyTypeObject * type,
                                            PyObject * args, PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
-  char *fname = NULL;
-  FILE *f;
-  PyObject *directed = Py_True;
+  PyObject *directed = Py_True, *fname = NULL, *fobj = NULL;
   igraph_t g;
 
-  char *kwlist[] = {
-    "f", "directed", NULL
-  };
+  static char *kwlist[] = { "f", "directed", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|O", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist,
                                    &fname, &directed))
     return NULL;
 
-  f = fopen(fname, "r");
-  if (!f) {
-    PyErr_SetString(PyExc_IOError, strerror(errno));
+  fobj = igraphmodule_PyObject_to_PyFile(fname, "r");
+  if (!fobj)
     return NULL;
-  }
-  if (igraph_read_graph_edgelist(&g, f, 0, PyObject_IsTrue(directed))) {
+
+  if (igraph_read_graph_edgelist(&g, PyFile_AsFile(fobj), 0, PyObject_IsTrue(directed))) {
     igraphmodule_handle_igraph_error();
-    fclose(f);
+    Py_DECREF(fobj);
     return NULL;
   }
 
+  Py_DECREF(fobj);
   CREATE_GRAPH_FROM_TYPE(self, g, type);
-
-  fclose(f);
 
   return (PyObject *) self;
 }
@@ -5532,35 +5523,30 @@ PyObject *igraphmodule_Graph_Read_Ncol(PyTypeObject * type, PyObject * args,
                                        PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
-  char *fname = NULL;
-  FILE *f;
   PyObject *names = Py_True, *weights = Py_True, *directed = Py_True;
+  PyObject *fname = NULL, *fobj = NULL;
   igraph_t g;
 
-  char *kwlist[] = {
-    "f", "names", "weights", "directed", NULL
-  };
+  static char *kwlist[] = { "f", "names", "weights", "directed", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|OOO", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|OOO", kwlist,
                                    &fname, &names, &weights, &directed))
     return NULL;
 
-  f = fopen(fname, "r");
-  if (!f) {
-    PyErr_SetString(PyExc_IOError, strerror(errno));
+  fobj = igraphmodule_PyObject_to_PyFile(fname, "r");
+  if (!fobj)
     return NULL;
-  }
+
   if (igraph_read_graph_ncol
-      (&g, f, 0, PyObject_IsTrue(names), PyObject_IsTrue(weights),
+      (&g, PyFile_AsFile(fobj), 0, PyObject_IsTrue(names), PyObject_IsTrue(weights),
        PyObject_IsTrue(directed))) {
     igraphmodule_handle_igraph_error();
-    fclose(f);
+    Py_DECREF(fobj);
     return NULL;
   }
 
+  Py_DECREF(fobj);
   CREATE_GRAPH_FROM_TYPE(self, g, type);
-
-  fclose(f);
 
   return (PyObject *) self;
 }
@@ -5574,34 +5560,28 @@ PyObject *igraphmodule_Graph_Read_Lgl(PyTypeObject * type, PyObject * args,
                                       PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
-  char *fname = NULL;
-  FILE *f;
-  PyObject *names = Py_True, *weights = Py_True;
+  PyObject *names = Py_True, *weights = Py_True, *fname = NULL, *fobj = NULL;
   igraph_t g;
 
-  char *kwlist[] = {
-    "f", "names", "weights", NULL
-  };
+  static char *kwlist[] = { "f", "names", "weights", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|OO", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|OO", kwlist,
                                    &fname, &names, &weights))
     return NULL;
 
-  f = fopen(fname, "r");
-  if (!f) {
-    PyErr_SetString(PyExc_IOError, strerror(errno));
+  fobj = igraphmodule_PyObject_to_PyFile(fname, "r");
+  if (!fobj)
     return NULL;
-  }
+
   if (igraph_read_graph_lgl
-      (&g, f, PyObject_IsTrue(names), PyObject_IsTrue(weights))) {
+      (&g, PyFile_AsFile(fobj), PyObject_IsTrue(names), PyObject_IsTrue(weights))) {
     igraphmodule_handle_igraph_error();
-    fclose(f);
+    Py_DECREF(fobj);
     return NULL;
   }
 
+  Py_DECREF(fobj);
   CREATE_GRAPH_FROM_TYPE(self, g, type);
-
-  fclose(f);
 
   return (PyObject *) self;
 }
@@ -5615,31 +5595,26 @@ PyObject *igraphmodule_Graph_Read_Pajek(PyTypeObject * type, PyObject * args,
                                         PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
-  char *fname = NULL;
-  FILE *f;
+  PyObject *fname = NULL, *fobj = NULL;
   igraph_t g;
 
-  char *kwlist[] = {
-    "f", NULL
-  };
+  static char *kwlist[] = { "f", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &fname))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &fname))
     return NULL;
 
-  f = fopen(fname, "r");
-  if (!f) {
-    PyErr_SetString(PyExc_IOError, strerror(errno));
+  fobj = igraphmodule_PyObject_to_PyFile(fname, "r");
+  if (!fobj)
     return NULL;
-  }
-  if (igraph_read_graph_pajek(&g, f)) {
+
+  if (igraph_read_graph_pajek(&g, PyFile_AsFile(fobj))) {
     igraphmodule_handle_igraph_error();
-    fclose(f);
+    Py_DECREF(fobj);
     return NULL;
   }
   
+  Py_DECREF(fobj);
   CREATE_GRAPH_FROM_TYPE(self, g, type);
-  
-  fclose(f);
 
   return (PyObject *) self;
 }
@@ -5653,29 +5628,26 @@ PyObject *igraphmodule_Graph_Read_GML(PyTypeObject * type,
                                       PyObject * args, PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
-  char *fname = NULL;
-  FILE *f;
+  PyObject *fname = NULL, *fobj = NULL;
   igraph_t g;
 
   static char *kwlist[] = { "f", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &fname))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &fname))
     return NULL;
 
-  f = fopen(fname, "r");
-  if (!f) {
-    PyErr_SetString(PyExc_IOError, strerror(errno));
+  fobj = igraphmodule_PyObject_to_PyFile(fname, "r");
+  if (!fobj)
     return NULL;
-  }
-  if (igraph_read_graph_gml(&g, f)) {
+
+  if (igraph_read_graph_gml(&g, PyFile_AsFile(fobj))) {
     igraphmodule_handle_igraph_error();
-    fclose(f);
+    Py_DECREF(fobj);
     return NULL;
   }
 
+  Py_DECREF(fobj);
   CREATE_GRAPH_FROM_TYPE(self, g, type);
-
-  fclose(f);
 
   return (PyObject *) self;
 }
@@ -5689,31 +5661,28 @@ PyObject *igraphmodule_Graph_Read_GraphML(PyTypeObject * type,
                                           PyObject * args, PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
-  char *fname = NULL;
-  FILE *f;
+  PyObject *fname = NULL, *fobj = NULL;
   long int index = 0;
   igraph_t g;
 
-  char *kwlist[] = { "f", "index", NULL };
+  static char *kwlist[] = { "f", "index", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|l", kwlist, &fname, &index))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|l", kwlist, &fname, &index))
     return NULL;
 
-  f = fopen(fname, "r");
-  if (!f) {
-    PyErr_SetString(PyExc_IOError, strerror(errno));
+  fobj = igraphmodule_PyObject_to_PyFile(fname, "r");
+  if (!fobj)
     return NULL;
-  }
-  if (igraph_read_graph_graphml(&g, f, index)) {
+
+  if (igraph_read_graph_graphml(&g, PyFile_AsFile(fobj), index)) {
     igraphmodule_handle_igraph_error();
-    fclose(f);
+    Py_DECREF(fobj);
     return NULL;
   }
   
+  Py_DECREF(fobj);
   CREATE_GRAPH_FROM_TYPE(self, g, type);
   
-  fclose(f);
-
   return (PyObject *) self;
 }
 
@@ -5725,10 +5694,8 @@ PyObject *igraphmodule_Graph_Read_GraphML(PyTypeObject * type,
 PyObject *igraphmodule_Graph_write_dimacs(igraphmodule_GraphObject * self,
                                           PyObject * args, PyObject * kwds)
 {
-  char *fname = NULL;
-  FILE *f;
   long source = 0, target = 0;
-  PyObject *capacity_obj = Py_None;
+  PyObject *capacity_obj = Py_None, *fname = NULL, *fobj = NULL;
   igraph_vector_t capacity;
   igraph_bool_t capacity_obj_created = 0;
 
@@ -5736,21 +5703,19 @@ PyObject *igraphmodule_Graph_write_dimacs(igraphmodule_GraphObject * self,
     "f", "source", "target", "capacity", NULL
   };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "sll|O", kwlist, &fname,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "Oll|O", kwlist, &fname,
                                    &source, &target, &capacity_obj))
     return NULL;
 
-  f = fopen(fname, "w");
-  if (!f) {
-    PyErr_SetString(PyExc_IOError, strerror(errno));
+  fobj = igraphmodule_PyObject_to_PyFile(fname, "w");
+  if (!fobj)
     return NULL;
-  }
 
   if (igraphmodule_PyObject_to_attribute_values(capacity_obj,
                                                 &capacity,
                                                 self, ATTRHASH_IDX_EDGE,
                                                 1.0)) {
-    fclose(f);
+    Py_DECREF(fobj);
     return igraphmodule_handle_igraph_error();
   }
 
@@ -5759,17 +5724,17 @@ PyObject *igraphmodule_Graph_write_dimacs(igraphmodule_GraphObject * self,
     capacity_obj = PyString_FromString("capacity");
   }
 
-  if (igraph_write_graph_dimacs(&self->g, f, source, target, &capacity)) {
+  if (igraph_write_graph_dimacs(&self->g, PyFile_AsFile(fobj), source, target, &capacity)) {
     igraphmodule_handle_igraph_error();
     igraph_vector_destroy(&capacity);
-    fclose(f);
+    Py_DECREF(fobj);
     if (capacity_obj_created) {
       Py_DECREF(capacity_obj);
     }
     return NULL;
   }
   igraph_vector_destroy(&capacity);
-  fclose(f);
+  Py_DECREF(fobj);
   if (capacity_obj_created) {
     Py_DECREF(capacity_obj);
   }
@@ -5785,25 +5750,22 @@ PyObject *igraphmodule_Graph_write_dimacs(igraphmodule_GraphObject * self,
  */
 PyObject *igraphmodule_Graph_write_dot(igraphmodule_GraphObject * self,
   PyObject * args, PyObject * kwds) {
-  char *fname = NULL;
-  FILE *f;
+  PyObject *fname = NULL, *fobj;
   static char *kwlist[] = { "f", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &fname))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &fname))
     return NULL;
 
-  f = fopen(fname, "w");
-  if (!f) {
-    PyErr_SetString(PyExc_IOError, strerror(errno));
+  fobj = igraphmodule_PyObject_to_PyFile(fname, "w");
+  if (!fobj)
     return NULL;
-  }
 
-  if (igraph_write_graph_dot(&self->g, f)) {
+  if (igraph_write_graph_dot(&self->g, PyFile_AsFile(fobj))) {
     igraphmodule_handle_igraph_error();
-    fclose(f);
+    Py_DECREF(fobj);
     return NULL;
   }
-  fclose(f);
+  Py_DECREF(fobj);
 
   Py_RETURN_NONE;
 }
@@ -5816,28 +5778,22 @@ PyObject *igraphmodule_Graph_write_dot(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_write_edgelist(igraphmodule_GraphObject * self,
                                             PyObject * args, PyObject * kwds)
 {
-  char *fname = NULL;
-  FILE *f;
+  PyObject *fname = NULL, *fobj = NULL;
+  static char *kwlist[] = { "f", NULL };
 
-  char *kwlist[] = {
-    "f", NULL
-  };
-
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &fname))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &fname))
     return NULL;
 
-  f = fopen(fname, "w");
-  if (!f) {
-    PyErr_SetString(PyExc_IOError, strerror(errno));
+  fobj = igraphmodule_PyObject_to_PyFile(fname, "w");
+  if (!fobj)
     return NULL;
-  }
 
-  if (igraph_write_graph_edgelist(&self->g, f)) {
+  if (igraph_write_graph_edgelist(&self->g, PyFile_AsFile(fobj))) {
     igraphmodule_handle_igraph_error();
-    fclose(f);
+    Py_DECREF(fobj);
     return NULL;
   }
-  fclose(f);
+  Py_DECREF(fobj);
 
   Py_RETURN_NONE;
 }
@@ -5851,9 +5807,7 @@ PyObject *igraphmodule_Graph_write_edgelist(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_write_gml(igraphmodule_GraphObject * self,
                                        PyObject * args, PyObject * kwds)
 {
-  char *fname = NULL;
-  FILE *f;
-  PyObject *ids = Py_None;
+  PyObject *ids = Py_None, *fname = NULL, *fobj = NULL;
   PyObject *creator = Py_None, *o=0;
   igraph_vector_t idvec, *idvecptr=0;
   char *creator_str=0;
@@ -5862,36 +5816,36 @@ PyObject *igraphmodule_Graph_write_gml(igraphmodule_GraphObject * self,
     "f", "creator", "ids", NULL
   };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|OO", kwlist, &fname, &creator, &ids))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|OO", kwlist, &fname, &creator, &ids))
     return NULL;
 
-  f = fopen(fname, "w");
-  if (!f) {
-    PyErr_SetString(PyExc_IOError, strerror(errno));
+  fobj = igraphmodule_PyObject_to_PyFile(fname, "w");
+  if (!fobj)
     return NULL;
-  }
 
   if (PyList_Check(ids)) {
-  idvecptr = &idvec;
-    if (igraphmodule_PyObject_to_vector_t(ids, idvecptr, 0, 0)) return NULL;
+    idvecptr = &idvec;
+    if (igraphmodule_PyObject_to_vector_t(ids, idvecptr, 0, 0)) {
+      Py_DECREF(fobj);
+      return NULL;
+    }
   }
 
   if (creator != Py_None) {
-  o = PyObject_Str(creator);
+    o = PyObject_Str(creator);
     creator_str = PyString_AS_STRING(o);
   }
 
-  if (igraph_write_graph_gml(&self->g, f, idvecptr, creator_str)) {
+  if (igraph_write_graph_gml(&self->g, PyFile_AsFile(fobj), idvecptr, creator_str)) {
     if (idvecptr) { igraph_vector_destroy(idvecptr); }
     if (o) { Py_DECREF(o); }
+    Py_DECREF(fobj);
     igraphmodule_handle_igraph_error();
-    fclose(f);
     return NULL;
   }
   if (idvecptr) { igraph_vector_destroy(idvecptr); }
   if (o) { Py_DECREF(o); }
-
-  fclose(f);
+  Py_DECREF(fobj);
 
   Py_RETURN_NONE;
 }
@@ -5904,30 +5858,26 @@ PyObject *igraphmodule_Graph_write_gml(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_write_ncol(igraphmodule_GraphObject * self,
                                         PyObject * args, PyObject * kwds)
 {
-  char *fname = NULL;
+  PyObject *fname = NULL, *fobj = NULL;
   char *names = "name";
   char *weights = "weight";
-  FILE *f;
 
-  char *kwlist[] = {
-    "f", "names", "weights", NULL
-  };
+  static char *kwlist[] = { "f", "names", "weights", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|zz", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|zz", kwlist,
                                    &fname, &names, &weights))
     return NULL;
 
-  f = fopen(fname, "w");
-  if (!f) {
-    PyErr_SetString(PyExc_IOError, strerror(errno));
+  fobj = igraphmodule_PyObject_to_PyFile(fname, "w");
+  if (!fobj)
     return NULL;
-  }
-  if (igraph_write_graph_ncol(&self->g, f, names, weights)) {
+
+  if (igraph_write_graph_ncol(&self->g, PyFile_AsFile(fobj), names, weights)) {
     igraphmodule_handle_igraph_error();
-    fclose(f);
+    Py_DECREF(fobj);
     return NULL;
   }
-  fclose(f);
+  Py_DECREF(fobj);
 
   Py_RETURN_NONE;
 }
@@ -5940,32 +5890,28 @@ PyObject *igraphmodule_Graph_write_ncol(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_write_lgl(igraphmodule_GraphObject * self,
                                        PyObject * args, PyObject * kwds)
 {
-  char *fname = NULL;
+  PyObject *fname = NULL, *fobj = NULL;
   char *names = "name";
   char *weights = "weight";
   PyObject *isolates = Py_True;
-  FILE *f;
 
-  char *kwlist[] = {
-    "f", "names", "weights", "isolates", NULL
-  };
+  static char *kwlist[] = { "f", "names", "weights", "isolates", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|zzO", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|zzO", kwlist,
                                    &fname, &names, &weights, &isolates))
     return NULL;
 
-  f = fopen(fname, "w");
-  if (!f) {
-    PyErr_SetString(PyExc_IOError, strerror(errno));
+  fobj = igraphmodule_PyObject_to_PyFile(fname, "w");
+  if (!fobj)
     return NULL;
-  }
-  if (igraph_write_graph_lgl(&self->g, f, names, weights,
+
+  if (igraph_write_graph_lgl(&self->g, PyFile_AsFile(fobj), names, weights,
                              PyObject_IsTrue(isolates))) {
     igraphmodule_handle_igraph_error();
-    fclose(f);
+    Py_DECREF(fobj);
     return NULL;
   }
-  fclose(f);
+  Py_DECREF(fobj);
 
   Py_RETURN_NONE;
 }
@@ -5977,25 +5923,22 @@ PyObject *igraphmodule_Graph_write_lgl(igraphmodule_GraphObject * self,
  */
 PyObject *igraphmodule_Graph_write_pajek(igraphmodule_GraphObject * self,
   PyObject * args, PyObject * kwds) {
-  char *fname = NULL;
-  FILE *f;
+  PyObject *fname = NULL, *fobj = NULL;
   static char *kwlist[] = { "f", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &fname))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &fname))
     return NULL;
 
-  f = fopen(fname, "w");
-  if (!f) {
-    PyErr_SetString(PyExc_IOError, strerror(errno));
+  fobj = igraphmodule_PyObject_to_PyFile(fname, "w");
+  if (!fobj)
     return NULL;
-  }
 
-  if (igraph_write_graph_pajek(&self->g, f)) {
+  if (igraph_write_graph_pajek(&self->g, PyFile_AsFile(fobj))) {
     igraphmodule_handle_igraph_error();
-    fclose(f);
+    Py_DECREF(fobj);
     return NULL;
   }
-  fclose(f);
+  Py_DECREF(fobj);
 
   Py_RETURN_NONE;
 }
@@ -6008,25 +5951,22 @@ PyObject *igraphmodule_Graph_write_pajek(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_write_graphml(igraphmodule_GraphObject * self,
                                            PyObject * args, PyObject * kwds)
 {
-  char *fname = NULL;
-  FILE *f;
-
+  PyObject *fname = NULL, *fobj = NULL;
   static char *kwlist[] = { "f", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &fname))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &fname))
     return NULL;
 
-  f = fopen(fname, "w");
-  if (!f) {
-    PyErr_SetString(PyExc_IOError, strerror(errno));
+  fobj = igraphmodule_PyObject_to_PyFile(fname, "w");
+  if (!fobj)
     return NULL;
-  }
-  if (igraph_write_graph_graphml(&self->g, f)) {
+
+  if (igraph_write_graph_graphml(&self->g, PyFile_AsFile(fobj))) {
     igraphmodule_handle_igraph_error();
-    fclose(f);
+    Py_DECREF(fobj);
     return NULL;
   }
-  fclose(f);
+  Py_DECREF(fobj);
 
   Py_RETURN_NONE;
 }
@@ -9770,7 +9710,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  - Source nodes are identified by 's' in the FLOW field, target nodes are\n"
    "    identified by 't'.\n"
    "  - Node indices start from 1. Only a single source and target node is allowed.\n\n"
-   "@param f: the name of the file\n"
+   "@param f: the name of the file or a Python file handle\n"
    "@param directed: whether the generated graph should be directed.\n"
    "@return: the generated graph, the source and the target of the flow and the edge\n"
    "  capacities in a tuple\n"},
@@ -9781,14 +9721,14 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Read_Edgelist(f, directed=True)\n\n"
    "Reads an edge list from a file and creates a graph based on it.\n\n"
    "Please note that the vertex indices are zero-based.\n\n"
-   "@param f: the name of the file\n"
+   "@param f: the name of the file or a Python file handle\n"
    "@param directed: whether the generated graph should be directed.\n"},
   /* interface to igraph_read_graph_graphml */
   {"Read_GraphML", (PyCFunction) igraphmodule_Graph_Read_GraphML,
    METH_VARARGS | METH_KEYWORDS | METH_CLASS,
    "Read_GraphML(f, directed=True, index=0)\n\n"
    "Reads a GraphML format file and creates a graph based on it.\n\n"
-   "@param f: the name of the file\n"
+   "@param f: the name of the file or a Python file handle\n"
    "@param index: if the GraphML file contains multiple graphs,\n"
    "  specifies the one that should be loaded. Graph indices\n"
    "  start from zero, so if you want to load the first graph,\n"
@@ -9798,7 +9738,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    METH_VARARGS | METH_KEYWORDS | METH_CLASS,
    "Read_GML(f)\n\n"
    "Reads a GML file and creates a graph based on it.\n\n"
-   "@param f: the name of the file\n"
+   "@param f: the name of the file or a Python file handle\n"
   },
   /* interface to igraph_read_graph_ncol */
   {"Read_Ncol", (PyCFunction) igraphmodule_Graph_Read_Ncol,
@@ -9813,7 +9753,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "LGL originally cannot deal with graphs containing multiple or loop\n"
    "edges, but this condition is not checked here, as igraph is happy\n"
    "with these.\n\n"
-   "@param f: the name of the file\n"
+   "@param f: the name of the file or a Python file handle\n"
    "@param names: If C{True}, the vertex names are added as a\n"
    "  vertex attribute called 'name'.\n"
    "@param weights: If True, the edge weights are added as an\n"
@@ -9821,7 +9761,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param directed: whether the graph being created should be\n"
    "  directed\n"
   },
-  // interface to igraph_read_graph_lgl
+  /* interface to igraph_read_graph_lgl */
   {"Read_Lgl", (PyCFunction) igraphmodule_Graph_Read_Lgl,
    METH_VARARGS | METH_KEYWORDS | METH_CLASS,
    "Read_Lgl(f, names=True, weights=True)\n\n"
@@ -9834,23 +9774,23 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "LGL originally cannot deal with graphs containing multiple or loop\n"
    "edges, but this condition is not checked here, as igraph is happy\n"
    "with these.\n\n"
-   "@param f: the name of the file\n"
+   "@param f: the name of the file or a Python file handle\n"
    "@param names: If C{True}, the vertex names are added as a\n"
    "  vertex attribute called 'name'.\n"
    "@param weights: If True, the edge weights are added as an\n"
    "  edge attribute called 'weight'.\n"},
-  // interface to igraph_read_graph_pajek
+  /* interface to igraph_read_graph_pajek */
   {"Read_Pajek", (PyCFunction) igraphmodule_Graph_Read_Pajek,
    METH_VARARGS | METH_KEYWORDS | METH_CLASS,
    "Read_Pajek(f)\n\n"
    "Reads a Pajek format file and creates a graph based on it.\n\n"
-   "@param f: the name of the file\n"},
+   "@param f: the name of the file or a Python file handle\n"},
   /* interface to igraph_write_graph_dimacs */
   {"write_dimacs", (PyCFunction) igraphmodule_Graph_write_dimacs,
    METH_VARARGS | METH_KEYWORDS,
    "write_dimacs(f, source, target, capacity=None)\n\n"
    "Writes the graph in DIMACS format to the given file.\n\n"
-   "@param f: the name of the file to be written\n"
+   "@param f: the name of the file to be written or a Python file handle\n"
    "@param source: the source vertex ID\n"
    "@param target: the target vertex ID\n"
    "@param capacity: the capacities of the edges in a list. If it is not a\n"
@@ -9863,7 +9803,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Writes the graph in DOT format to the given file.\n\n"
    "DOT is the format used by the U{GraphViz <http://www.graphviz.org>}\n"
    "software package.\n\n"
-   "@param f: the name of the file to be written\n"
+   "@param f: the name of the file to be written or a Python file handle\n"
    },
   /* interface to igraph_write_graph_edgelist */
   {"write_edgelist", (PyCFunction) igraphmodule_Graph_write_edgelist,
@@ -9871,20 +9811,20 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "write_edgelist(f)\n\n"
    "Writes the edge list of a graph to a file.\n\n"
    "Directed edges are written in (from, to) order.\n\n"
-   "@param f: the name of the file to be written\n"},
+   "@param f: the name of the file to be written or a Python file handle\n"},
   /* interface to igraph_write_graph_gml */
   {"write_gml", (PyCFunction) igraphmodule_Graph_write_gml,
    METH_VARARGS | METH_KEYWORDS,
    "write_gml(f, creator=None, ids=None)\n\n"
    "Writes the graph in GML format to the given file.\n\n"
-   "@param f: the name of the file to be written\n"
+   "@param f: the name of the file to be written or a Python file handle\n"
    "@param creator: optional creator information to be written to the file.\n"
    "  If C{None}, the current date and time is added.\n"
    "@param ids: optional numeric vertex IDs to use in the file. This must\n"
    "  be a list of integers or C{None}. If C{None}, the C{id} attribute of\n"
    "  the vertices are used, or if they don't exist, numeric vertex IDs\n"
    "  will be generated automatically."},
-  // interface to igraph_write_graph_ncol
+  /* interface to igraph_write_graph_ncol */
   {"write_ncol", (PyCFunction) igraphmodule_Graph_write_ncol,
    METH_VARARGS | METH_KEYWORDS,
    "write_ncol(f, names=\"name\", weights=\"weights\")\n\n"
@@ -9893,14 +9833,14 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "but igraph does not check for this condition. Unless you know\n"
    "that the graph does not have multiple edges and/or loops, it\n"
    "is wise to call L{simplify()} before saving.\n\n"
-   "@param f: the name of the file to be written\n"
+   "@param f: the name of the file to be written or a Python file handle\n"
    "@param names: the name of the vertex attribute containing the name\n"
    "  of the vertices. If you don't want to store vertex names,\n"
    "  supply C{None} here.\n"
    "@param weights: the name of the edge attribute containing the weight\n"
    "  of the vertices. If you don't want to store weights,\n"
    "  supply C{None} here.\n"},
-  // interface to igraph_write_graph_lgl
+  /* interface to igraph_write_graph_lgl */
   {"write_lgl", (PyCFunction) igraphmodule_Graph_write_lgl,
    METH_VARARGS | METH_KEYWORDS,
    "write_lgl(f, names=\"name\", weights=\"weights\", isolates=True)\n\n"
@@ -9909,7 +9849,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "but igraph does not check for this condition. Unless you know\n"
    "that the graph does not have multiple edges and/or loops, it\n"
    "is wise to call L{simplify()} before saving.\n\n"
-   "@param f: the name of the file to be written\n"
+   "@param f: the name of the file to be written or a Python file handle\n"
    "@param names: the name of the vertex attribute containing the name\n"
    "  of the vertices. If you don't want to store vertex names,\n"
    "  supply C{None} here.\n"
@@ -9922,14 +9862,15 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    METH_VARARGS | METH_KEYWORDS,
    "write_pajek(f)\n\n"
    "Writes the graph in Pajek format to the given file.\n\n"
-   "@param f: the name of the file to be written\n"
+   "@param f: the name of the file to be written or a Python file handle\n"
    },
-  // interface to igraph_write_graph_edgelist
+  /* interface to igraph_write_graph_edgelist */
   {"write_graphml", (PyCFunction) igraphmodule_Graph_write_graphml,
    METH_VARARGS | METH_KEYWORDS,
    "write_graphml(f)\n\n"
    "Writes the graph to a GraphML file.\n\n"
-   "@param f: the name of the file to be written\n"},
+   "@param f: the name of the file to be written or a Python file handle\n"
+  },
 
   /////////////////
   // ISOMORPHISM //
