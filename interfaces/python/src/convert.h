@@ -55,6 +55,7 @@ int igraphmodule_PyObject_to_vconn_nei_t(PyObject *o, igraph_vconn_nei_t *result
 
 int igraphmodule_PyObject_to_integer_t(PyObject *object, igraph_real_t *v);
 int igraphmodule_PyObject_to_real_t(PyObject *object, igraph_real_t *v);
+PyObject* igraphmodule_PyObject_to_PyFile(PyObject *object, char* mode);
 
 int igraphmodule_PyObject_to_vector_t(PyObject *list, igraph_vector_t *v, igraph_bool_t need_non_negative, igraph_bool_t pairs);
 int igraphmodule_PyObject_float_to_vector_t(PyObject *list, igraph_vector_t *v);

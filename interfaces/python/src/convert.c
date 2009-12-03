@@ -307,6 +307,38 @@ int igraphmodule_PyObject_to_real_t(PyObject *object, igraph_real_t *v) {
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts a Python object to a Python file object.
+ *
+ * If the Python object is a string, it will be interpreted as a filename
+ * and will be opened in the given mode. If the Python object is a file
+ * handle, it will be used intact.
+ *
+ * \param object a Python object to be converted
+ * \param mode   file opening mode if the Python object is a string.
+ * \return the file object if everything is OK, NULL otherwise.
+ *   An appropriate exception is raised in this case.
+ */
+PyObject* igraphmodule_PyObject_to_PyFile(PyObject *object, char* mode) {
+    PyObject* result;
+
+    if (object == NULL) {
+    } else if (PyString_Check(object)) {
+        result = PyFile_FromString(PyString_AsString(object), mode);
+        return result;
+    } else if (PyFile_Check(object)) {
+        /* Check if the file object has a corresponding FILE* handle */
+        if (PyFile_AsFile(object) == NULL)
+            return NULL;
+
+        Py_INCREF(object);
+        return object;
+    }
+    PyErr_SetString(PyExc_TypeError, "string or file handle expected");
+    return NULL;
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts a Python object to an igraph \c igraph_vector_t
  * The incoming \c igraph_vector_t should be uninitialized. Raises suitable
  * Python exceptions when needed.
