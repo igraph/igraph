@@ -1453,8 +1453,8 @@ class Graph(core.GraphBase):
         result.vs["type"] = types
         return result
 
-    def bipartite_projection(self, types="type", *args, **kwds):
-        """bipartite_projection(types="type", probe1=-1)
+    def bipartite_projection(self, types="type", multiplicity=True, *args, **kwds):
+        """bipartite_projection(types="type", multiplicity=True, probe1=-1)
 
         Projects a bipartite graph into two one-mode graphs. Edge directions
         are ignored while projecting.
@@ -1471,13 +1471,25 @@ class Graph(core.GraphBase):
         @param types: an igraph vector containing the vertex types, or an attribute
           name. Anything that evalulates to C{False} corresponds to vertices of the
           first kind, everything else to the second kind.
+        @param multiplicity: if C{True}, then igraph keeps the multiplicity of the
+          edges in the projection in an edge attribute called C{"weight"}. E.g., if
+          there is an A-C-B and an A-D-B triplet in the bipartite graph and there is
+          no other X (apart from X=B and X=D) for which an A-X-B triplet would exist
+          in the bipartite graph, the multiplicity of the A-B edge in the projection
+          will be 2.
         @param probe1: this argument can be used to specify the order of the
           projections in the resulting list. If given and non-negative, then it is
           considered as a vertex ID; the projection containing the vertex will be
           the first one in the result.
         @return: a tuple containing the two projected one-mode graphs.
         """
-        return super(Graph, self).bipartite_projection(types, *args, **kwds)
+        if multiplicity:
+            g1, g2, w1, w2 = super(Graph, self).bipartite_projection(types, True, *args, **kwds)
+            g1.es["weight"] = w1
+            g2.es["weight"] = w2
+            return g1, g2
+        else:
+            return super(Graph, self).bipartite_projection(types, False, *args, **kwds)
 
     def bipartite_projection_size(self, types="type", *args, **kwds):
         """bipartite_projection(types="type")
