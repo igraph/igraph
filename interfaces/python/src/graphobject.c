@@ -1345,7 +1345,7 @@ PyObject *igraphmodule_Graph_Adjacency(PyTypeObject * type,
   PyObject *matrix, *mode_o = Py_None;
   igraph_adjacency_t mode = IGRAPH_ADJ_DIRECTED;
 
-  char *kwlist[] = { "matrix", "mode", NULL };
+  static char *kwlist[] = { "matrix", "mode", NULL };
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|O", kwlist,
                                    &PyList_Type, &matrix, &mode_o))
@@ -1363,6 +1363,8 @@ PyObject *igraphmodule_Graph_Adjacency(PyTypeObject * type,
     igraph_matrix_destroy(&m);
     return NULL;
   }
+
+  igraph_matrix_destroy(&m);
 
   CREATE_GRAPH_FROM_TYPE(self, g, type);
 
