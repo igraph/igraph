@@ -5090,17 +5090,19 @@ PyObject* igraphmodule_Graph_layout_drl(igraphmodule_GraphObject *self,
           PyObject *args, PyObject *kwds)
 {
   static char *kwlist[] =
-    { "weights", "seed", "fixed", "options", NULL };
+    { "weights", "seed", "fixed", "options", "_3d", NULL };
   igraph_matrix_t m;
   igraph_bool_t use_seed=0;
   igraph_vector_t *weights=0;
   igraph_vector_bool_t *fixed=0;
   igraph_layout_drl_options_t options;
   PyObject *result;
-  PyObject *wobj=Py_None, *fixed_o=Py_None, *seed_o=Py_None, *options_o=Py_None;
+  PyObject *wobj=Py_None, *fixed_o=Py_None, *seed_o=Py_None, *options_o=Py_None,
+		   *three_dim_o=Py_False;
+  int retval;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOO", kwlist,
-                                   &wobj, &seed_o, &fixed_o, &options_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOOO", kwlist,
+                                   &wobj, &seed_o, &fixed_o, &options_o, &three_dim_o))
 	  return NULL;
 
   if (igraphmodule_PyObject_to_drl_options_t(options_o, &options))
@@ -5144,8 +5146,14 @@ PyObject* igraphmodule_Graph_layout_drl(igraphmodule_GraphObject *self,
     igraphmodule_handle_igraph_error();
     return NULL;
   }
-  
-  if (igraph_layout_drl(&self->g, &m, use_seed, &options, weights, fixed)) {
+
+  if (PyObject_IsTrue(three_dim_o)) {
+	retval = igraph_layout_drl(&self->g, &m, use_seed, &options, weights, fixed);
+  } else {
+	retval = igraph_layout_drl_3d(&self->g, &m, use_seed, &options, weights, fixed);
+  }
+
+  if (retval) {
     igraph_matrix_destroy(&m);
     if (weights) { igraph_vector_destroy(weights); free(weights); }
 	if (fixed) { igraph_vector_bool_destroy(fixed); free(fixed); }
@@ -5158,6 +5166,25 @@ PyObject* igraphmodule_Graph_layout_drl(igraphmodule_GraphObject *self,
   result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
   igraph_matrix_destroy(&m);
   return (PyObject *) result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Places the vertices in the 3D space according to the DrL algorithm.
+ * \return the calculated coordinates as a Python list of lists
+ * \sa igraph_layout_drl_3d
+ */
+PyObject* igraphmodule_Graph_layout_drl_3d(igraphmodule_GraphObject *self,
+          PyObject *args, PyObject *kwds)
+{
+  PyObject *kwds_copy = PyDict_Copy(kwds), *result;
+
+  if (kwds_copy == NULL)
+	return NULL;
+
+  PyDict_SetItemString(kwds_copy, "_3d", Py_True);
+  result = igraphmodule_Graph_layout_drl(self, args, kwds_copy);
+  Py_DECREF(kwds_copy);
+  return result;
 }
 
 /** \ingroup python_interface_graph
@@ -10213,6 +10240,20 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  a parameter cannot be found either as a key or an attribute, the\n"
    "  default from the C{default} preset will be used.\n\n"
    "@return: the calculated coordinate pairs in a list."
+  },
+
+  /* interface to igraph_layout_drl_3d */
+  {"layout_drl_3d",
+   (PyCFunction) igraphmodule_Graph_layout_drl,
+   METH_VARARGS | METH_KEYWORDS,
+   "layout_drl(weights=None, fixed=None, seed=None, options=None)\n\n"
+   "Places the vertices in the 3D space according to the DrL layout algorithm.\n\n"
+   "This is an algorithm suitable for quite large graphs, but it can be\n"
+   "surprisingly slow for small ones (where the simpler force-based layouts\n"
+   "like C{layout_kamada_kawai()} or C{layout_fruchterman_reingold()} are\n"
+   "more useful.\n\n"
+   "See C{layout_drl()} for more information on the parameters.\n"
+   "@return: the calculated coordinate triplets in a list."
   },
 
   /* interface to igraph_layout_fruchterman_reingold */

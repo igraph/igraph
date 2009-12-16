@@ -723,6 +723,8 @@ class Graph(core.GraphBase):
 
           - C{drl}: DrL layout for large graphs (see L{Graph.layout_drl})
 
+          - C{drl_3d}: 3D DrL layout for large graphs (see L{Graph.layout_drl_3d})
+
           - C{fr}, C{fruchterman_reingold}: Fruchterman-Reingold layout
             (see L{Graph.layout_fruchterman_reingold}).
 
@@ -1996,6 +1998,7 @@ class Graph(core.GraphBase):
         "circle": "layout_circle",
         "circular": "layout_circle",
         "drl": "layout_drl",
+        "drl_3d": "layout_drl_3d",
         "fr": "layout_fruchterman_reingold",
         "fruchterman_reingold": "layout_fruchterman_reingold",
         "fr3d": "layout_fruchterman_reingold_3d",
