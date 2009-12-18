@@ -323,6 +323,11 @@ vertex3name [optionalWeight] \endverbatim
  * \param weights Logical value, if TRUE the weights of the
  *        edges is added to the graph as an edge attribute called
  *        \quote weight\endquote.
+ * \param directed Whether to create a directed graph. As this format
+ *        was originally used only for undirected graphs there is no
+ *        information in the file about the directedness of the graph.
+ *        Set this parameter to \c IGRAPH_DIRECTED or \c
+ *        IGRAPH_UNDIRECTED to create a directed or undirected graph.
  * \return Error code:
  *         \c IGRAPH_PARSEERROR: if there is a
  *         problem reading the file, or the file is syntactically
@@ -338,7 +343,7 @@ vertex3name [optionalWeight] \endverbatim
  */
 
 int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
-			  igraph_bool_t names, igraph_bool_t weights) {
+			  igraph_bool_t names, igraph_bool_t weights, igraph_bool_t directed) {
 
   igraph_vector_t edges=IGRAPH_VECTOR_NULL, ws=IGRAPH_VECTOR_NULL;
   igraph_trie_t trie=IGRAPH_TRIE_NULL;
@@ -367,7 +372,7 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
     }
   }
 
-  IGRAPH_CHECK(igraph_empty(graph, 0, IGRAPH_UNDIRECTED));
+  IGRAPH_CHECK(igraph_empty(graph, 0, directed));
   IGRAPH_FINALLY(igraph_destroy, graph);
 
   if (names) {

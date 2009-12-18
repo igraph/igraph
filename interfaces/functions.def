@@ -1029,7 +1029,8 @@ igraph_read_graph_ncol:
         IGNORE: RR, RC, RNamespace
 
 igraph_read_graph_lgl:
-        PARAMS: OUT GRAPH graph, INFILE instream, BOOLEAN names=True, BOOLEAN weights=True
+        PARAMS: OUT GRAPH graph, INFILE instream, BOOLEAN names=True, \
+                BOOLEAN weights=True, BOOLEAN directed=True
         IGNORE: RR, RC, RNamespace
 
 igraph_read_graph_pajek:

@@ -5989,21 +5989,29 @@ PyObject *igraphmodule_Graph_Read_Lgl(PyTypeObject * type, PyObject * args,
                                       PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
-  PyObject *names = Py_True, *weights = Py_True, *fname = NULL, *fobj = NULL;
+  PyObject *names = Py_True, *weights = Py_True, *directed = Py_True;
+  PyObject *fname = NULL, *fobj = NULL;
   igraph_t g;
 
-  static char *kwlist[] = { "f", "names", "weights", NULL };
+  static char *kwlist[] = { "f", "names", "weights", "directed", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|OO", kwlist,
-                                   &fname, &names, &weights))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|OOO", kwlist,
+                                   &fname, &names, &weights, &directed))
     return NULL;
+
+  if (PyDict_Check(kwds) && PyDict_GetItemString(kwds, "directed") == NULL) {
+    if (PyErr_Occurred())
+      return NULL;
+    PyErr_Warn(PyExc_Warning, "Graph.Read_Lgl creates directed networks by default from igraph 0.6. To get rid of this warning, specify directed=... explicitly. This warning will be removed from igraph 0.7.");
+  }
 
   fobj = igraphmodule_PyObject_to_PyFile(fname, "r");
   if (!fobj)
     return NULL;
 
-  if (igraph_read_graph_lgl
-      (&g, PyFile_AsFile(fobj), PyObject_IsTrue(names), PyObject_IsTrue(weights))) {
+  if (igraph_read_graph_lgl(&g, PyFile_AsFile(fobj),
+        PyObject_IsTrue(names), PyObject_IsTrue(weights),
+        PyObject_IsTrue(directed))) {
     igraphmodule_handle_igraph_error();
     Py_DECREF(fobj);
     return NULL;
@@ -10613,7 +10621,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_read_graph_lgl */
   {"Read_Lgl", (PyCFunction) igraphmodule_Graph_Read_Lgl,
    METH_VARARGS | METH_KEYWORDS | METH_CLASS,
-   "Read_Lgl(f, names=True, weights=True)\n\n"
+   "Read_Lgl(f, names=True, weights=True, directed=True)\n\n"
    "Reads an .lgl file used by LGL.\n\n"
    "It is also useful for creating graphs from \"named\" (and\n"
    "optionally weighted) edge lists.\n\n"
@@ -10627,7 +10635,10 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param names: If C{True}, the vertex names are added as a\n"
    "  vertex attribute called 'name'.\n"
    "@param weights: If True, the edge weights are added as an\n"
-   "  edge attribute called 'weight'.\n"},
+   "  edge attribute called 'weight'.\n"
+   "@param directed: whether the graph being created should be\n"
+   "  directed\n"
+  },
   /* interface to igraph_read_graph_pajek */
   {"Read_Pajek", (PyCFunction) igraphmodule_Graph_Read_Pajek,
    METH_VARARGS | METH_KEYWORDS | METH_CLASS,
