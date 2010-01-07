@@ -1672,6 +1672,8 @@ class Graph(core.GraphBase):
         This method is needed to allow the graph to react to additions
         with lists, tuples, integers, vertices, edges and so on.
         """
+        if other is None:
+            return self, other
         if type(other) in [int, tuple, list]:
             return self, other
         if isinstance(other, core.Vertex):
