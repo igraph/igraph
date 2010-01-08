@@ -1,0 +1,28 @@
+
+Social network analysis with R and the igraph package
+
+Social network analysis is a discipline that emphasizes the
+relationship of the actors in social systems, over their individual
+properties.
+
+GNU R is a cross-platform, open source statistical software
+package. It is a de facto standard for statistical software
+development and data analysis. Igraph is an extension package to GNU
+R, and implements several (social) network analysis methods. 
+
+This three hours workshop has four main parts. The first part is
+a crash-course to GNU R and igraph. The second part addresses the
+problem of small world networks; the third deals with network
+centrality, finding the key influential actors in social networks. 
+Finally, the fourth part discusses methods for finding
+communities, building blocks in networks. 
+
+All three problems are presented interactively, using various data
+sets. You are encouraged to take your laptop with you or use the
+desktop computers in the room. Please install R and the igraph package
+on your laptop before the workshop; the desktop computers have
+all the necessary software pre-installed. Please contact the
+organizers if you have problems installing R or igraph.
+
+Basic statistics and graph theory background is expected from the
+participants. 
