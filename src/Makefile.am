@@ -129,7 +129,8 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_stack_pmt.h	../include/igraph_heap_pmt.h  \
 		../include/igraph_vector_ptr.h	../include/igraph_spmatrix.h  \
 		../include/igraph_strvector.h	../include/igraph_psumtree.h  \
-		../include/igraph_sparsemat.h   ../include/igraph_mixing.h
+		../include/igraph_sparsemat.h   ../include/igraph_mixing.h    \
+		../include/igraph_version.h
 
 
 libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
@@ -172,7 +173,8 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     drl_layout_3d.cpp drl_graph_3d.cpp \
 			     DensityGrid_3d.cpp \
 			     foreign-dl-parser.y foreign-dl-lexer.l \
-			     $(CS) sparsemat.c mixing.c bigint.c bignum.c
+			     $(CS) sparsemat.c mixing.c bigint.c bignum.c \
+			     version.c
 
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -Wall
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -Wall

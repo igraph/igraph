@@ -28,6 +28,7 @@
 # define _GNU_SOURCE
 #endif
 
+#include "igraph_version.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "igraph_random.h"
