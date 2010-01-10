@@ -7,7 +7,8 @@
   vertices.}
 \usage{
 page.rank (graph, vids = V(graph), directed = TRUE, damping = 0.85, 
-    weights = NULL, options = igraph.arpack.default) 
+    personalized = NULL, weights = NULL,
+    options = igraph.arpack.default) 
 page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000, 
     eps = 0.001, damping = 0.85, old = FALSE) 
 }
@@ -17,6 +18,12 @@ page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000,
   \item{directed}{Logical, if true directed paths will be considered for
     directed graphs. It is ignored for undirected graphs.}
   \item{damping}{The damping factor (\sQuote{d} in the original paper).}
+  \item{personalized}{Optional vector giving a probability distribution
+    to calculate personalized PageRank. For personalized PageRank, the
+    probability of jumping to a node when abandoning the random walk is
+    not uniform, but it is given by this vector. The vector should
+    contains an entry for each vertex and it will be rescaled to sum up
+    to one.}
   \item{weights}{A numerical vector or \code{NULL}. This argument can be
     used to give edge weights for calculating the weighted PageRank of
     vertices. If this is \code{NULL} and the graph has a \code{weight}
@@ -98,5 +105,11 @@ page.rank(g)$vector
 
 g2 <- graph.star(10)
 page.rank(g2)$vector
+
+# Personalized PageRank
+g3 <- graph.ring(10)
+page.rank(g3)$vector
+reset <- seq(vcount(g3))
+page.rank(g3, personalized=reset)$vector
 }
 \keyword{graphs}

@@ -396,6 +396,17 @@ igraph_pagerank:
         DEPS: vids ON graph, weights ON graph
         DEFAULT-R: options=igraph.arpack.default
         NAME-R: page.rank
+        IGNORE: RR, RC, RNamespace
+
+igraph_personalized_pagerank:
+        PARAMS: GRAPH graph, OUT VECTOR vector, OUT REALPTR value, \
+                VERTEXSET vids=ALL, BOOLEAN directed=True, REAL damping=0.85, \
+                VECTOR_OR_0 personalized=NULL, \
+                EDGEWEIGHTS weights=NULL, \
+                INOUT ARPACKOPT options=igraph.arpack.default
+        DEPS: vids ON graph, weights ON graph
+        DEFAULT-R: options=igraph.arpack.default
+        NAME-R: page.rank
 
 igraph_rewire:
         PARAMS: INOUT GRAPH rewire, INTEGER n, REWIRINGMODE mode=SIMPLE
