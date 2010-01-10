@@ -133,20 +133,17 @@ html/stamp: igraph-docs.xml $(DOCFIX2) gtk-doc.xsl
 	xmlto -x $(top_srcdir)/doc/gtk-doc.xsl -o html xhtml igraph-docs.xml \
 	&& touch html/stamp
 
-igraph.info: igraph-docs.info
-	cp igraph-docs.info igraph.info
-
-igraph-docs.info: igraph-docs.xml $(DOCFIX2) igraph-docs.info.diff
+igraph.info: igraph-docs.xml $(DOCFIX2) igraph.info.diff
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
 	cat tutorial.xml | sed '/<link/{N;s/<link\n*[^>]*>//g}' | \
 	  sed 's/<\/link>//g' >tutorial-info.xml \
 	&& sed 's/tutorial\.xml/tutorial-info.xml/' igraph-docs.xml > igraph-docs-info.xml \
-	&& db2x_xsltproc --xinclude -s texi igraph-docs-info.xml -o igraph-docs.txml \
-	&& db2x_texixml igraph-docs.txml \
-	&& mv igraph_reference_manual.texi igraph-docs.texi \
-	&& makeinfo --no-split --number-sections igraph-docs.texi \
-	&& mv igraph_reference_manual.info igraph-docs.info \
-	&& patch <$(top_srcdir)/doc/igraph-docs.info.diff
+	&& db2x_xsltproc --xinclude -s texi igraph-docs-info.xml -o igraph.txml \
+	&& db2x_texixml igraph.txml \
+	&& mv igraph_reference_manual.texi igraph.texi \
+	&& makeinfo --no-split --number-sections igraph.texi \
+	&& mv igraph_reference_manual.info igraph.info \
+	&& patch <$(top_srcdir)/doc/igraph.info.diff
 
 igraph-docs.dvi: igraph-docs.xml $(DOCFIX2)
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
