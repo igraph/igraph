@@ -1,0 +1,8 @@
+<h2>igraph 0.5.3 Release Notes</h2>
+
+<p class="news">
+  A minor release that was created mainly to be compatible with 
+  the new R 2.10 version. It contains a couple of bug fixes and 
+  no major features. See the <a href="news.html">news page</a> for
+  the complete list of changes.
+</p>
