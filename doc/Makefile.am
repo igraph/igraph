@@ -20,7 +20,7 @@ all: doctemplate
 
 html: html/stamp
 
-info: igraph-docs.info
+info: igraph.info
 
 dvi: igraph-docs.dvi
 
@@ -128,9 +128,15 @@ html/stamp: igraph-docs.xml $(DOCFIX2) gtk-doc.xsl
 	xmlto -x $(top_srcdir)/doc/gtk-doc.xsl -o html xhtml igraph-docs.xml \
 	&& touch html/stamp
 
+igraph.info: igraph-docs.info
+	cp igraph-docs.info igraph.info
+
 igraph-docs.info: igraph-docs.xml $(DOCFIX2) igraph-docs.info.diff
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
-	db2x_xsltproc --xinclude -s texi igraph-docs.xml -o igraph-docs.txml \
+	cat tutorial.xml | sed '/<link/{N;s/<link\n*[^>]*>//g}' | \
+	  sed 's/<\/link>//g' >tutorial-info.xml \
+	&& sed 's/tutorial\.xml/tutorial-info.xml/' igraph-docs.xml > igraph-docs-info.xml \
+	&& db2x_xsltproc --xinclude -s texi igraph-docs-info.xml -o igraph-docs.txml \
 	&& db2x_texixml igraph-docs.txml \
 	&& mv igraph_reference_manual.texi igraph-docs.texi \
 	&& makeinfo --no-split --number-sections igraph-docs.texi \
