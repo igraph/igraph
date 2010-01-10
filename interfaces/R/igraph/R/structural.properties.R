@@ -169,7 +169,7 @@ shortest.paths <- function(graph, v=V(graph), to=V(graph),
 }
 
 get.shortest.paths <- function(graph, from, to=V(graph),
-                               mode=c("all", "out", "in"),
+                               mode=c("out", "all", "in"),
                                weights=NULL,
                                output=c("vpath", "epath", "both")) {
 
@@ -202,7 +202,7 @@ get.shortest.paths <- function(graph, from, to=V(graph),
 
 get.all.shortest.paths <- function(graph, from,
                                    to=V(graph),
-                                   mode=c("all", "out", "in")) {
+                                   mode=c("out", "all", "in")) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")

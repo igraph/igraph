@@ -17,9 +17,9 @@ shortest.paths(graph, v=V(graph), to=V(graph),
       weights = NULL, algorithm = c("automatic", "unweighted",
                                     "dijkstra", "bellman-ford",
                                     "johnson"))
-get.shortest.paths(graph, from, to=V(graph), mode = c("all", "out",
+get.shortest.paths(graph, from, to=V(graph), mode = c("out", "all",
       "in"), weights = NULL, output=c("vpath", "epath", "both"))
-get.all.shortest.paths(graph, from, to = V(graph), mode = c("all", "out", "in")) 
+get.all.shortest.paths(graph, from, to = V(graph), mode = c("out", "all", "in")) 
 average.path.length(graph, directed=TRUE, unconnected=TRUE)
 path.length.hist (graph, directed = TRUE, verbose = igraph.par("verbose")) 
 }
