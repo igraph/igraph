@@ -2,7 +2,7 @@
 
 SUBDIRS=src tests interfaces
 DOC_FILES = 	$(top_builddir)/doc/book/Makefile.in \
-	$(top_builddir)/doc/igraph-docs.info \
+	$(top_builddir)/doc/igraph.info \
 	$(top_srcdir)/doc/Makefile.in \
 	$(top_srcdir)/doc/igraph.3
 
@@ -18,6 +18,15 @@ install-exec-hook:
 	if test -f $(top_builddir)/src/.libs/cygigraph-0.dll ; \
 		then cp $(top_builddir)/src/.libs/cygigraph-0.dll \
 		$(DESTDIR)$(libdir) ; fi
+
+install-info:
+	if test -f doc/igraph.info; then d="doc"; \
+         else d=$(srcdir); fi; \
+        $(INSTALL_DATA) $$d/igraph.info $(infodir); \
+        if $(SHELL) -c 'install-info --version' \
+           >/dev/null 2>&1; then \
+          install-info --infodir=$(infodir) $$d/igraph.info; \
+        else true; fi
 
 dist-hook:
 	rm -rf `find $(distdir)/examples -type d -name .arch-ids`
