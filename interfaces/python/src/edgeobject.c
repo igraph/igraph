@@ -317,7 +317,7 @@ PyObject* igraphmodule_Edge_get_tuple(igraphmodule_EdgeObject* self, void* closu
 PyMethodDef igraphmodule_Edge_methods[] = {
   {"attributes", (PyCFunction)igraphmodule_Edge_attributes,
     METH_NOARGS,
-    "attributes() -> list\n\n"
+    "attributes() -> dict\n\n"
     "Returns a dict of attribute names and values for the edge\n"
   },
   {"attribute_names", (PyCFunction)igraphmodule_Edge_attribute_names,
