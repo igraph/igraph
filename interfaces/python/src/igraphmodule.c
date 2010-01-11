@@ -1291,7 +1291,11 @@ PyMODINIT_FUNC initcore(void) {
   PyModule_AddIntConstant(m, "TRANSITIVITY_ZERO", IGRAPH_TRANSITIVITY_ZERO);
 
   /* More useful constants */
-  PyModule_AddStringConstant(m, "__version__", "0.6");
+  {
+    const char* version;
+    igraph_version(&version, 0, 0, 0);
+    PyModule_AddStringConstant(m, "__version__", version);
+  }
   PyModule_AddStringConstant(m, "__build_date__", __DATE__);
 
   /* initialize error, progress, warning and interruption handler */
