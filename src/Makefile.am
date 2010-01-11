@@ -176,8 +176,8 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     $(CS) sparsemat.c mixing.c bigint.c bignum.c \
 			     version.c
 
-libigraph_la_CFLAGS        = -I$(top_srcdir)/include -Wall
-libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -Wall
+libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall
+libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall
 libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(FLIBS) $(LAPACK_DLAMCH)
 
