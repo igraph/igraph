@@ -274,7 +274,7 @@ long igraphmodule_Vertex_get_index_long(igraphmodule_VertexObject* self) {
 PyMethodDef igraphmodule_Vertex_methods[] = {
   {"attributes", (PyCFunction)igraphmodule_Vertex_attributes,
     METH_NOARGS,
-    "attributes() -> list\n\n"
+    "attributes() -> dict\n\n"
     "Returns a dict of attribute names and values for the vertex\n"
   },
   {"attribute_names", (PyCFunction)igraphmodule_Vertex_attribute_names,
