@@ -27,9 +27,16 @@
 
 #define RNG_INTEGER(l, h) ((long int)((rand())/((double)RAND_MAX+1)*((h)-(l)+1)+(l)))
 
+#ifdef INTERNAL_BLAS
 void igraphdgemv_(char *trans, long int *m, long int *n, igraph_real_t *alpha, 
             igraph_real_t *a, long int *lda, igraph_real_t *x, long int *incx, 
             igraph_real_t *beta, igraph_real_t *y, long int *incy);
+#else
+void dgemv_(char *trans, long int *m, long int *n, igraph_real_t *alpha, 
+            igraph_real_t *a, long int *lda, igraph_real_t *x, long int *incx, 
+            igraph_real_t *beta, igraph_real_t *y, long int *incy);
+#define igraphdgemv_ dgemv_
+#endif
 
 int igraph_matrix_dgemv(const igraph_matrix_t *m,
                         const igraph_vector_t *v,
@@ -68,10 +75,6 @@ int igraph_matrix_vector_prod(const igraph_matrix_t *m,
                               igraph_vector_t *res) {
   return igraph_matrix_dgemv(m, v, res, 1.0, 0.0, /*transpose=*/ 0);
 }
-
-void igraphdgemv_(char *trans, long int *m, long int *n, igraph_real_t *alpha, 
-           igraph_real_t *a, long int *lda, igraph_real_t *x, long int *incx, 
-           igraph_real_t *beta, igraph_real_t *y, long int *incy);
 
 int my_dgemv(const igraph_matrix_t *m,
                        const igraph_vector_t *v,

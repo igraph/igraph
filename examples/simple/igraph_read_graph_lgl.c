@@ -33,29 +33,45 @@ int main() {
   if (!input) { 
     return 1;
   }
-  igraph_read_graph_lgl(&g, input, 0, 0);
+  igraph_read_graph_lgl(&g, input, 0, 0, 1);
   fclose(input);
+  if (!igraph_is_directed(&g)) {
+    return 2;
+  }
   igraph_write_graph_edgelist(&g, stdout);
   igraph_destroy(&g);
 
   /* With names and weights */
   input=fopen("igraph_read_graph_lgl-2.lgl", "r");
   if (!input) {
-    return 2;
+    return 3;
   }
-  igraph_read_graph_lgl(&g, input, 0, 0);
+  igraph_read_graph_lgl(&g, input, 0, 0, 1);
   fclose(input);
+  if (!igraph_is_directed(&g)) {
+    return 4;
+  }
+  igraph_write_graph_ncol(&g, stdout, 0, 0);
+  igraph_destroy(&g);
+
+  /* Same graph, but forcing undirected mode */
+  input=fopen("igraph_read_graph_lgl-2.lgl", "r");
+  igraph_read_graph_lgl(&g, input, 0, 0, 0);
+  fclose(input);
+  if (igraph_is_directed(&g)) {
+    return 5;
+  }
   igraph_write_graph_ncol(&g, stdout, 0, 0);
   igraph_destroy(&g);
 
   /* Erroneous LGL file (empty vertex name) */
   input=fopen("igraph_read_graph_lgl-3.lgl", "r");
   if (!input) {
-    return 3;
+    return 6;
   }
   igraph_set_error_handler(igraph_error_handler_ignore);
-  if (igraph_read_graph_lgl(&g, input, 0, 0) != IGRAPH_PARSEERROR) {
-    return 4;
+  if (igraph_read_graph_lgl(&g, input, 0, 0, 1) != IGRAPH_PARSEERROR) {
+    return 7;
   }
   fclose(input);
 
