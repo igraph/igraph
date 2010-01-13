@@ -2053,6 +2053,8 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
 						  igraph_vss_1(i), &strv);
 	igraph_strvector_get(&strv, 0, &s);
 	fprintf(outstream, " \"%s\"", s);
+      } else {
+	fprintf(outstream, " \"%li\"", i+1);
       }
       
       /* coordinates */
