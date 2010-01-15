@@ -6,6 +6,7 @@ include COPYING
 include debian/changelog.in
 include debian/control.in
 include debian/copyright.in
+include debian/compat
 include debian/rules
 include debian/prepare
 include scripts/mkdoc.sh
