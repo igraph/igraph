@@ -2,7 +2,7 @@ Source: python-igraph
 Section: python
 Priority: optional
 Maintainer: Tamas Nepusz <ntamas@gmail.com>
-Build-Depends: cdbs (>= 0.4.42), debhelper (>= 7), python-all-dev (>= 2.3.5-11), libxml2-dev, libigraph-dev (= @VERSION@), python-epydoc
+Build-Depends: cdbs (>= 0.4.42), debhelper (>= 7), python-all-dev (>= 2.3.5-11), libxml2-dev, libigraph-dev (= @VERSION@), python-epydoc, python-central
 Standards-Version: 3.8.3
 XS-Python-Version: >= 2.4
 Homepage: http://igraph.sourceforge.net
