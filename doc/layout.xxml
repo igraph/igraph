@@ -11,6 +11,7 @@
 <!-- doxrox-include about_layouts -->
 <!-- doxrox-include igraph_layout_random -->
 <!-- doxrox-include igraph_layout_circle -->
+<!-- doxrox-include igraph_layout_star -->
 <!-- doxrox-include igraph_layout_graphopt -->
 <section><title>The DrL layout generator</title>
 <!-- doxrox-include about_drl -->

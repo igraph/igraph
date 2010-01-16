@@ -145,6 +145,57 @@ int igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res) {
 }
 
 /**
+ * \function igraph_layout_star
+ * Generate a star-like layout
+ * 
+ * \param graph The input graph.
+ * \param res Pointer to an initialized matrix, the layout is stored here.
+ * \param center The id of the vertex to put in the center.
+ * \param order A numeric vector giving the order of the vertices 
+ *      (including the center vertex!). If a null pointer, then the
+ *      vertices are placed in increasing vertex id order.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|), linear in the number of vertices.
+ * 
+ * \sa \ref igraph_layout_circle() and other layout generators.
+ */
+
+int igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
+		       igraph_integer_t center, const igraph_vector_t *order) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int c=center;
+  long int i;
+  igraph_real_t step;
+  igraph_real_t phi;
+
+  if (order && igraph_vector_size(order) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid order vector length", IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
+
+  if (no_of_nodes==1) {
+    MATRIX(*res, 0, 0) = MATRIX(*res, 0, 1) = 0.0; 
+  } else {
+    for (i=0, step=2*M_PI/(no_of_nodes-1), phi=0; 
+	 i<no_of_nodes; i++) {
+      long int node = order ? VECTOR(*order)[i] : i;
+      if (node != c) { 
+	MATRIX(*res, node, 0) = cos(phi);
+	MATRIX(*res, node, 1) = sin(phi);
+	phi += step;
+      } else {
+	MATRIX(*res, node, 0) = MATRIX(*res, node, 1) = 0.0;
+      }
+    }
+  }
+  
+  return 0;
+}
+
+/**
  * \function igraph_layout_sphere
  * \brief Places vertices (more or less) uniformly on a sphere.
  *

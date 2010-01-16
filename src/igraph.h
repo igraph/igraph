@@ -966,6 +966,8 @@ int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no);
 
 int igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res);
 int igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res);
+int igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
+		       igraph_integer_t center, const igraph_vector_t *order);
 int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *res,
 				       igraph_integer_t niter, igraph_real_t maxdelta,
 				       igraph_real_t area, igraph_real_t coolexp, 

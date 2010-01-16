@@ -649,6 +649,12 @@ igraph_layout_circle:
         PARAMS: GRAPH graph, OUT MATRIX res
         IGNORE: RR, RC, RNamespace
 
+igraph_layout_star:
+        PARAMS: GRAPH graph, OUT MATRIX res, VERTEX center=V(graph)[0], \
+                VECTOR_OR_0 order=NULL
+        DEPS: center ON graph
+        NAME-R: layout.star
+
 igraph_layout_fruchterman_reingold:
         PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=500, REAL maxdelta=VCOUNT(graph), \
                 REAL area=VCOUNT(graph)^2, REAL coolexp=1.5, REAL repulserad=VCOUNT(graph)^3, NULL use_seed, \

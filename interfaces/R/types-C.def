@@ -297,6 +297,13 @@ ARRAY3_OR_0:
 # 3d array
 
 
+##################################
+# A single vertex
+
+VERTEX:
+  CTYPE: igraph_integer_t
+  INCONV: 
+    IN: %C%=REAL(%I%)[0];
 
 ##################################
 # Some vertices/edges of a graph

@@ -71,6 +71,9 @@ VERTEXSET:
     DEFAULT:
        ALL: V(%I1%)
 
+VERTEX:
+    INCONV: %I% <- as.igraph.vs(%I%)
+
 EDGESET:
     INCONV: %I% <- as.igraph.es(%I%)
     DEFAULT:
