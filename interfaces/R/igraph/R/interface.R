@@ -98,7 +98,7 @@ delete.vertices <- function(graph, v) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_delete_vertices", graph, as.igraph.vs(v),
+  .Call("R_igraph_delete_vertices", graph, as.igraph.vs(graph, v),
         PACKAGE="igraph")
 }
 
@@ -123,7 +123,7 @@ neighbors <- function(graph, v, mode=1) {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_neighbors", graph, as.numeric(v),
+  .Call("R_igraph_neighbors", graph, as.igraph.vs(graph, v),
         as.numeric(mode),
         PACKAGE="igraph")
 }

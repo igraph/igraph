@@ -60,9 +60,14 @@
 
   Some vertex/edge/graph attributes are treated specially. One of them
   is the \sQuote{name} attribute. This is used for printing the graph
-  instead of the numerical ids, if it exists. Other attributes define
-  visualization parameters, see \code{\link{igraph.plotting}} for
-  details.
+  instead of the numerical ids, if it exists. Vertex names can also be
+  used to specify a vector or set of vertices, in all igraph
+  functions. E.g. \code{\link{degree}} has a \sQuote{\code{v}} argument
+  that gives the vertices for which the degree is calculated. This
+  argument can be given as character vector of vertex names as well.
+
+  Other attributes define visualization parameters, see
+  \code{\link{igraph.plotting}} for details.
 
   Attribute values can be set to any R object, but note that storing the
   graph in some file formats might result the loss of complex attribute

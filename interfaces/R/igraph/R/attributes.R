@@ -53,6 +53,7 @@ get.vertex.attribute <- function(graph, name, index=V(graph)) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  index <- as.igraph.vs(graph, index)
   name <- as.character(name)
   if (is.list(graph[[9]][[3]][[name]]) && length(index)==1) {
     graph[[9]][[3]][[as.character(name)]][[index+1]]
@@ -65,6 +66,7 @@ set.vertex.attribute <- function(graph, name, index=V(graph), value) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  index <- as.igraph.vs(graph, index)
   name <- as.character(name)
   vc <- vcount(graph)
 ##   if (length(index) %% length(value)) {

@@ -25,7 +25,7 @@ are.connected <- function(graph, v1, v2) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_are_connected", graph, as.numeric(v1),
-        as.numeric(v2),
+  .Call("R_igraph_are_connected", graph, as.igraph.vs(graph, v1),
+        as.igraph.vs(graph, v2),
         PACKAGE="igraph")
 }

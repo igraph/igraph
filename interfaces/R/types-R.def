@@ -67,12 +67,12 @@ INT:
     INCONV: %I% <- as.integer(%I%)
 
 VERTEXSET:
-    INCONV: %I% <- as.igraph.vs(%I%)
+    INCONV: %I% <- as.igraph.vs(%I1%, %I%)
     DEFAULT:
        ALL: V(%I1%)
 
 VERTEX:
-    INCONV: %I% <- as.igraph.vs(%I%)
+    INCONV: %I% <- as.igraph.vs(%I1%, %I%)
 
 EDGESET:
     INCONV: %I% <- as.igraph.es(%I%)

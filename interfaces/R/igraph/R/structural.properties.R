@@ -110,7 +110,7 @@ degree <- function(graph, v=V(graph),
   mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_degree", graph, as.igraph.vs(v), as.numeric(mode),
+  .Call("R_igraph_degree", graph, as.igraph.vs(graph, v), as.numeric(mode),
         as.logical(loops), PACKAGE="igraph")
 }
   
@@ -139,7 +139,7 @@ closeness <- function(graph, v=V(graph), mode=c("all", "out", "in")) {
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_closeness", graph, as.igraph.vs(v), as.numeric(mode),
+  .Call("R_igraph_closeness", graph, as.igraph.vs(graph, v), as.numeric(mode),
         PACKAGE="igraph")
 }
 
@@ -175,7 +175,7 @@ shortest.paths <- function(graph, v=V(graph), mode=c("all", "out", "in"),
   }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_shortest_paths", graph, as.igraph.vs(v),
+  .Call("R_igraph_shortest_paths", graph, as.igraph.vs(graph, v),
         as.numeric(mode), weights, as.numeric(algorithm),
         PACKAGE="igraph")
 }
@@ -202,10 +202,10 @@ get.shortest.paths <- function(graph, from, to=V(graph),
     }
   }
   
-  to <- as.igraph.vs(to)
+  to <- as.igraph.vs(graph, to)
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_get_shortest_paths", graph,
-        as.numeric(from), to, as.numeric(mode), as.numeric(length(to)),
+        as.igraph.vs(graph, from), to, as.numeric(mode), as.numeric(length(to)),
         weights, PACKAGE="igraph")
 }
 
@@ -221,7 +221,7 @@ get.all.shortest.paths <- function(graph, from,
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_get_all_shortest_paths", graph,
-        as.numeric(from), as.igraph.vs(to), as.numeric(mode),
+        as.numeric(from), as.igraph.vs(graph, to), as.numeric(mode),
         PACKAGE="igraph")
 }
 
@@ -234,7 +234,7 @@ subcomponent <- function(graph, v, mode=c("all", "out", "in")) {
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_subcomponent", graph, as.igraph.vs(v), as.numeric(mode),
+  .Call("R_igraph_subcomponent", graph, as.igraph.vs(graph, v), as.numeric(mode),
         PACKAGE="igraph")
 }
 
@@ -244,7 +244,7 @@ subgraph <- function(graph, v) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_subgraph", graph, as.igraph.vs(v),
+  .Call("R_igraph_subgraph", graph, as.igraph.vs(graph, v),
         PACKAGE="igraph")
 }
 
@@ -292,7 +292,7 @@ betweenness <- function(graph, v=V(graph), directed=TRUE, verbose=igraph.par("ve
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_betweenness", graph, as.igraph.vs(v),
+  .Call("R_igraph_betweenness", graph, as.igraph.vs(graph, v),
         as.logical(directed), as.logical(verbose),
         PACKAGE="igraph")
 }
@@ -333,8 +333,8 @@ transitivity <- function(graph, type=c("undirected", "global", "globalundirected
       .Call("R_igraph_transitivity_local_undirected_all", graph,
             PACKAGE="igraph")
     } else {
-      vids <- as.igraph.vs(vids)
-      .Call("R_igraph_transitivity_local_undirected", graph, as.numeric(vids),
+      vids <- as.igraph.vs(graph, vids)
+      .Call("R_igraph_transitivity_local_undirected", graph, vids,
             PACKAGE="igraph")
     }
   } else if (type==2) {
@@ -468,7 +468,7 @@ constraint <- function(graph, nodes=V(graph), weights=NULL) {
   }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_constraint", graph, as.igraph.vs(nodes),
+  .Call("R_igraph_constraint", graph, as.igraph.vs(graph, nodes),
         as.numeric(weights),        
         PACKAGE="igraph")
 }
@@ -527,6 +527,8 @@ bonpow <- function(graph, nodes=V(graph),
 alpha.centrality <- function(graph, nodes=V(graph), alpha=1,
                              loops=FALSE, exo=1, weights=NULL,
                              tol=1e-7) {
+
+  nodes <- as.igraph.vs(graph, nodes)
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
@@ -583,7 +585,7 @@ neighborhood.size <- function(graph, order, nodes=V(graph),
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_neighborhood_size", graph, 
-        as.igraph.vs(nodes), as.numeric(order), as.numeric(mode),
+        as.igraph.vs(graph, nodes), as.numeric(order), as.numeric(mode),
         PACKAGE="igraph")
 }
 
@@ -597,7 +599,7 @@ neighborhood <- function(graph, order, nodes=V(graph), mode=c("all", "out", "in"
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_neighborhood", graph, 
-        as.igraph.vs(nodes), as.numeric(order), as.numeric(mode),
+        as.igraph.vs(graph, nodes), as.numeric(order), as.numeric(mode),
         PACKAGE="igraph")
 }
 
@@ -612,7 +614,7 @@ graph.neighborhood <- function(graph, order, nodes=V(graph),
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_neighborhood_graphs", graph, 
-        as.igraph.vs(nodes), as.numeric(order), as.numeric(mode),
+        as.igraph.vs(graph, nodes), as.numeric(order), as.numeric(mode),
         PACKAGE="igraph")
 }
 
