@@ -94,3 +94,4 @@
 ./interfaces/java/src/java/NeighborMode.java
 ./interfaces/java/src/java/StarMode.java
 ./interfaces/java/reports
+./fatbuild
