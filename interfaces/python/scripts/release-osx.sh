@@ -6,6 +6,9 @@ while [ ! -f setup.py ]; do cd ..; done
 VERSION=`cat setup.py | grep "version =" | cut -d '=' -f 2 | tr -d "', "`
 python setup.py bdist_mpkg || exit 2
 MPKG="dist/python_igraph-${VERSION}-py2.5-macosx10.5.mpkg"
+if [ ! -f $MPKG ]; then
+  MPKG="dist/python_igraph-${VERSION}-py2.6-macosx10.6.mpkg"
+fi
 DMG=dist/`basename $MPKG .mpkg`.dmg
 rm -f ${DMG}
 hdiutil create -volname "python-igraph ${VERSION}" -layout NONE -srcfolder $MPKG $DMG
