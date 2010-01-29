@@ -2344,12 +2344,12 @@ class EdgeSeq(core.EdgeSeq):
             indices of the current edge set again.
 
         Keyword arguments can be used to filter the edges based on their
-        attributes. The name of the keyword specifies the name of the attribute
-        and the filtering operator, they should be concatenated by an
-        underscore (C{_}) character. Attribute names can also contain
-        underscores, but operator names don't, so the operator is always the
-        largest trailing substring of the keyword name that does not contain
-        an underscore. Possible operators are:
+        attributes and properties. The name of the keyword specifies the name
+        of the attribute and the filtering operator, they should be
+        concatenated by an underscore (C{_}) character. Attribute names can
+        also contain underscores, but operator names don't, so the operator is
+        always the largest trailing substring of the keyword name that does not
+        contain an underscore. Possible operators are:
 
           - C{eq}: equal to
 
@@ -2389,16 +2389,24 @@ class EdgeSeq(core.EdgeSeq):
         recognized operator is part of the attribute name and the actual
         operator is C{eq}.
 
-        Attribute names inferred from keyword arguments are treated specially
-        if they start with an underscore (C{_}). These are not real attributes
-        but refer to specific properties of the edges, e.g., their centrality.
-        The rules are as follows:
+        Keyword arguments are treated specially if they start with an
+        underscore (C{_}). These are not real attributes but refer to specific
+        properties of the edges, e.g., their centrality.  The rules are as
+        follows:
 
           1. C{_source} or {_from} means the source vertex of an edge.
 
           2. C{_target} or {_to} means the target vertex of an edge.
 
-          3. Otherwise, the rest of the name is interpreted as a method of the
+          3. C{_within} ignores the operator and checks whether both endpoints
+             of the edge lie within a specified set.
+
+          4. C{_between} ignores the operator and checks whether I{one}
+             endpoint of the edge lies within a specified set and the I{other}
+             endpoint lies within another specified set. The two sets must be
+             given as a tuple.
+
+          5. Otherwise, the rest of the name is interpreted as a method of the
              L{Graph} object. This method is called with the edge sequence as
              its first argument (all others left at default values) and edges
              are filtered according to the value returned by the method.
@@ -2411,6 +2419,17 @@ class EdgeSeq(core.EdgeSeq):
         To select edges originating from vertices 2 and 4:
 
           >>> edges = g.es.select(_source_in = [2, 4])
+
+        To select edges lying entirely within the subgraph spanned by vertices
+        2, 3, 4 and 7:
+
+          >>> edges = g.es.select(_within = [2, 3, 4, 7])
+
+        To select edges with one endpoint in the vertex set containing vertices
+        2, 3, 4 and 7 and the other endpoint in the vertex set containing
+        vertices 8 and 9:
+
+          >>> edges = g.es.select(_between = ([2, 3, 4, 7], [8, 9]))
 
         For properties that take a long time to be computed (e.g., betweenness
         centrality for large graphs), it is advised to calculate the values
@@ -2429,6 +2448,13 @@ class EdgeSeq(core.EdgeSeq):
 
         @return: the new, filtered edge sequence"""
         es = core.EdgeSeq.select(self, *args)
+
+        def _ensure_set(value):
+            if isinstance(value, VertexSeq):
+                value = set(v.index for v in value)
+            else:
+                value = set(value)
+            return value
 
         operators = {
             "lt": operator.lt, \
@@ -2453,14 +2479,35 @@ class EdgeSeq(core.EdgeSeq):
             if attr[0] == '_':
                 if attr == "_source" or attr == "_from":
                     values = [e.source for e in es]
+                    if op == "in" or op == "notin":
+                        value = _ensure_set(value)
                 elif attr == "_target" or attr == "_to":
                     values = [e.target for e in es]
+                    if op == "in" or op == "notin":
+                        value = _ensure_set(value)
+                elif attr == "_within":
+                    values = None
+                    value = _ensure_set(value)
+                    filtered_idxs = [i for i, e in enumerate(es) if \
+                            e.source in value and e.target in value]
+                elif attr == "_between":
+                    values = None
+                    if len(value) != 2:
+                        raise ValueError, "_between selector requires two vertex ID lists"
+                    set1 = _ensure_set(value[0])
+                    set2 = _ensure_set(value[1])
+                    filtered_idxs = [i for i, e in enumerate(es) if \
+                            (e.source in set1 and e.target in set2) or \
+                            (e.source in set2 and e.target in set1)]
                 else:
                     # Method call, not an attribute
                     values = getattr(es.graph, attr[1:])(es) 
             else:
                 values = es[attr]
-            filtered_idxs=[i for i, v in enumerate(values) if func(v, value)]
+
+            if values is not None:
+                filtered_idxs=[i for i, v in enumerate(values) if func(v, value)]
+
             es = es.select(filtered_idxs)
 
         return es

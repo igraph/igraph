@@ -114,6 +114,29 @@ class EdgeSeqTests(unittest.TestCase):
         es2 = set(v1 for v1, v2 in g.get_edgelist() if v2 in [2, 4])
         self.failUnless(es1 == es2)
 
+    def testWithinFiltering(self):
+        g = Graph.Lattice([10, 10])
+        vs = [0, 1, 2, 10, 11, 12, 20, 21, 22] 
+
+        es1 = g.es.select(_within = vs)
+        es2 = g.es.select(_within = VertexSeq(g, vs))
+
+        for es in [es1, es2]:
+            self.failUnless(len(es) == 12)
+            self.failUnless(all(e.source in vs and e.target in vs for e in es))
+
+    def testBetweenFiltering(self):
+        g = Graph.Lattice([10, 10])
+        vs1, vs2 = [10, 11, 12], [20, 21, 22] 
+
+        es1 = g.es.select(_between = (vs1, vs2))
+        es2 = g.es.select(_between = (VertexSeq(g, vs1), VertexSeq(g, vs2)))
+
+        for es in [es1, es2]:
+            self.failUnless(len(es) == 3)
+            self.failUnless(all((e.source in vs1 and e.target in vs2) or \
+                                (e.target in vs1 and e.source in vs2) for e in es))
+
     def testGraphMethodProxying(self):
         g = Graph.Barabasi(100)
         es = g.es(1,3,5,7,9)
