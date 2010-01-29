@@ -416,6 +416,10 @@ igraph_subgraph:
         PARAMS: GRAPH graph, OUT GRAPH res, VERTEXSET vids
         IGNORE: RR, RC, RNamespace
 
+igraph_subgraph_edges:
+        PARAMS: GRAPH graph, OUT GRAPH res, EDGESET eids, BOOLEAN delete_vertices=True
+        IGNORE: RR, RC, RNamespace
+
 igraph_average_path_length:
         PARAMS: GRAPH graph, OUT REALPTR res, BOOLEAN directed=True, BOOLEAN unconn=True
         IGNORE: RR, RC, RNamespace

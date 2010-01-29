@@ -1677,7 +1677,7 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
  *        do \em not initialize this object before calling this
  *        function, and call \ref igraph_destroy() on it if you don't need
  *        it any more.
- * \param vids Vector with the vertex ids to put in the subgraph.
+ * \param vids A vertex selector describing which vertices to keep.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data. 
@@ -1737,6 +1737,118 @@ int igraph_subgraph(const igraph_t *graph, igraph_t *res,
   
   igraph_vector_destroy(&delete);
   igraph_vit_destroy(&vit);
+  IGRAPH_FINALLY_CLEAN(3);
+  return 0;
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_subgraph_edges
+ * \brief Creates a subgraph with the specified edges and their endpoints.
+ * 
+ * </para><para>
+ * This function collects the specified edges and their endpoints to a new
+ * graph.
+ * As the vertex ids in a graph always start with zero, this function
+ * very likely needs to reassign ids to the vertices.
+ * \param graph The graph object.
+ * \param res The subgraph, another graph object will be stored here,
+ *        do \em not initialize this object before calling this
+ *        function, and call \ref igraph_destroy() on it if you don't need
+ *        it any more.
+ * \param eids An edge selector describing which edges to keep.
+ * \param delete_vertices Whether to delete the vertices not adjacent to any
+ *        of the specified edges as well. If \c FALSE, the number of vertices
+ *        in the result graph will always be equal to the number of vertices
+ *        in the input graph.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM, not enough memory for
+ *         temporary data. 
+ *         \c IGRAPH_EINVEID, invalid edge id in
+ *         \p eids. 
+ * 
+ * Time complexity: O(|V|+|E|),
+ * |V| and
+ * |E| are the number of vertices and
+ * edges in the original graph.
+ *
+ * \sa \ref igraph_delete_edges() to delete the specified set of
+ * edges from a graph, the opposite of this function.
+ */
+
+int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res, 
+		    const igraph_es_t eids, igraph_bool_t delete_vertices) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_vector_t delete=IGRAPH_VECTOR_NULL;
+  char *vremain, *eremain;
+  long int i;
+  igraph_eit_t eit;
+  
+  IGRAPH_CHECK(igraph_eit_create(graph, eids, &eit));
+  IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&delete, 0);
+  vremain=igraph_Calloc(no_of_nodes, char);
+  if (vremain==0) {
+    IGRAPH_ERROR("subgraph_edges failed", IGRAPH_ENOMEM);
+  }
+  eremain=igraph_Calloc(no_of_edges, char);
+  if (eremain==0) {
+    IGRAPH_ERROR("subgraph_edges failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(free, vremain);	/* TODO: hack */
+  IGRAPH_FINALLY(free, eremain);	/* TODO: hack */
+  IGRAPH_CHECK(igraph_vector_reserve(&delete, no_of_edges-IGRAPH_EIT_SIZE(eit)));
+
+  /* Collect the vertex and edge IDs that will remain */
+  for (IGRAPH_EIT_RESET(eit); !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
+    igraph_integer_t from, to;
+    long int eid = (long int) IGRAPH_EIT_GET(eit);
+    IGRAPH_CHECK(igraph_edge(graph, eid, &from, &to));
+    eremain[eid] = vremain[(long int)from] = vremain[(long int)to] = 1;
+  }
+
+  /* Collect the edge IDs to be deleted */
+  for (i=0; i<no_of_edges; i++) {
+    IGRAPH_ALLOW_INTERRUPTION();
+    if (eremain[i] == 0) {
+      IGRAPH_CHECK(igraph_vector_push_back(&delete, i));
+    }
+  }
+
+  igraph_Free(eremain);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  /* Delete the unnecessary edges */
+  /* must set res->attr to 0 before calling igraph_copy */
+  res->attr=0;           /* Why is this needed? TODO */
+  IGRAPH_CHECK(igraph_copy(res, graph));
+  IGRAPH_FINALLY(igraph_destroy, res);
+  IGRAPH_CHECK(igraph_delete_edges(res, igraph_ess_vector(&delete)));
+
+  if (delete_vertices) {
+    /* Collect the vertex IDs to be deleted */
+    igraph_vector_clear(&delete);
+    for (i=0; i<no_of_nodes; i++) {
+      IGRAPH_ALLOW_INTERRUPTION();
+      if (vremain[i] == 0) {
+        IGRAPH_CHECK(igraph_vector_push_back(&delete, i));
+      }
+    }
+  }
+
+  igraph_Free(vremain);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  /* Delete the unnecessary vertices */
+  if (delete_vertices) {
+    IGRAPH_CHECK(igraph_delete_vertices(res, igraph_vss_vector(&delete)));
+  }
+
+  igraph_vector_destroy(&delete);
+  igraph_eit_destroy(&eit);
   IGRAPH_FINALLY_CLEAN(3);
   return 0;
 }

@@ -62,6 +62,8 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
 int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode);
 int igraph_subgraph(const igraph_t *graph, igraph_t *res, 
 		    const igraph_vs_t vids);
+int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res, 
+		    const igraph_es_t eids, igraph_bool_t delete_vertices);
 int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops);
 int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 		       igraph_bool_t ignore_loops);
