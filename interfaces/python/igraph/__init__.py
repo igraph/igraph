@@ -2565,13 +2565,25 @@ def _add_proxy_methods():
         ["degree", "betweenness", "bibcoupling", "closeness", "cocitation",
         "constraint", "eccentricity", "get_shortest_paths", "maxdegree",
         "pagerank", "personalized_pagerank", "shortest_paths", "similarity_dice",
-        "similarity_jaccard", "subgraph", "indegree", "outdegree", "isoclass"]
+        "similarity_jaccard", "subgraph", "indegree", "outdegree", "isoclass",
+        "delete_vertices"]
     decorated_methods[EdgeSeq] = \
-        ["count_multiple", "is_loop", "is_multiple"]
+        ["count_multiple", "delete_edges", "is_loop", "is_multiple",
+        "is_mutual", "subgraph_edges"]
+
+    rename_methods = {}
+    rename_methods[VertexSeq] = {
+        "delete_vertices": "delete"
+    }
+    rename_methods[EdgeSeq] = {
+        "delete_edges": "delete",
+        "subgraph_edges": "subgraph"
+    }
 
     for klass, methods in decorated_methods.iteritems():
         for method in methods:
-            setattr(klass, method, _graphmethod(None, method))
+            new_method_name = rename_methods[klass].get(method, method)
+            setattr(klass, new_method_name, _graphmethod(None, method))
 
     setattr(EdgeSeq, "edge_betweenness", _graphmethod( \
       lambda self, result: [result[i] for i in self.indices], "edge_betweenness"))
