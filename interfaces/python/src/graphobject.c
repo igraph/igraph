@@ -4413,7 +4413,7 @@ PyObject *igraphmodule_Graph_subcomponent(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_subgraph(igraphmodule_GraphObject * self,
                                       PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] = { "vertices", NULL };
+  static char *kwlist[] = { "vertices", NULL };
   igraph_vs_t vs;
   igraph_t sg;
   igraphmodule_GraphObject *result;
@@ -4434,6 +4434,39 @@ PyObject *igraphmodule_Graph_subgraph(igraphmodule_GraphObject * self,
   CREATE_GRAPH(result, sg);
 
   igraph_vs_destroy(&vs);
+
+  return (PyObject *) result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Returns a subgraph of the graph based on the given edges
+ * \return the subgraph as a new igraph object
+ * \sa igraph_subgraph_edges
+ */
+PyObject *igraphmodule_Graph_subgraph_edges(igraphmodule_GraphObject * self,
+                                            PyObject * args, PyObject * kwds)
+{
+  static char *kwlist[] = { "edges", "delete_vertices", NULL };
+  igraph_es_t es;
+  igraph_t sg;
+  igraphmodule_GraphObject *result;
+  PyObject *list, *delete_vertices = Py_True;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &list, &delete_vertices))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_es_t(list, &es, 0))
+    return NULL;
+
+  if (igraph_subgraph_edges(&self->g, &sg, es, PyObject_IsTrue(delete_vertices))) {
+    igraphmodule_handle_igraph_error();
+    igraph_es_destroy(&es);
+    return NULL;
+  }
+
+  CREATE_GRAPH(result, sg);
+
+  igraph_vs_destroy(&es);
 
   return (PyObject *) result;
 }
@@ -9849,14 +9882,26 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  results of L{IN} and L{OUT}.\n"
    "@return: the indices of vertices which are in the same component as a given vertex.\n"},
 
-  // interface to igraph_subgraph
+  /* interface to igraph_subgraph */
   {"subgraph", (PyCFunction) igraphmodule_Graph_subgraph,
    METH_VARARGS | METH_KEYWORDS,
    "subgraph(vertices)\n\n"
-   "Returns a subgraph based on the given vertices.\n\n"
+   "Returns a subgraph spanned by the given vertices.\n\n"
    "@param vertices: a list containing the vertex IDs which\n"
    "  should be included in the result.\n"
-   "@return: a copy of the subgraph\n"},
+   "@return: the subgraph\n"},
+
+  /* interface to igraph_subgraph_edges */
+  {"subgraph_edges", (PyCFunction) igraphmodule_Graph_subgraph_edges,
+   METH_VARARGS | METH_KEYWORDS,
+   "subgraph_edges(edges, delete_vertices=True)\n\n"
+   "Returns a subgraph spanned by the given edges.\n\n"
+   "@param edges: a list containing the edge IDs which should\n"
+   "  be included in the result.\n"
+   "@param delete_vertices: if C{True}, vertices not adjacent to\n"
+   "  any of the specified edges will be deleted from the result.\n"
+   "  If C{False}, all vertices will be kept.\n"
+   "@return: the subgraph\n"},
 
   /* interface to igraph_topological_sorting */
   {"topological_sorting",

@@ -6,6 +6,31 @@ except NameError:
     import sets
     set, frozenset = sets.Set, sets.ImmutableSet
 
+
+class SubgraphTests(unittest.TestCase):
+    def testSubgraph(self):
+        g = Graph.Lattice([10, 10], circular=False, mutual=False)
+        g.vs["id"] = range(g.vcount())
+
+        vs = [0, 1, 2, 10, 11, 12, 20, 21, 22]
+        sg = g.subgraph(vs)
+
+        self.failUnless(sg.isomorphic(Graph.Lattice([3, 3], circular=False, mutual=False)))
+        self.failUnless(sg.vs["id"] == vs)
+
+    def testSubgraphEdges(self):
+        g = Graph.Lattice([10, 10], circular=False, mutual=False)
+        g.es["id"] = range(g.ecount())
+
+        es = [0, 1, 2, 5, 20, 21, 22, 24, 38, 40]
+        sg = g.subgraph_edges(es)
+        exp = Graph.Lattice([3, 3], circular=False, mutual=False)
+        exp.delete_edges([7, 8])
+
+        self.failUnless(sg.isomorphic(exp))
+        self.failUnless(sg.es["id"] == es)
+
+
 class DecompositionTests(unittest.TestCase):
     def testKCores(self):
         g = Graph(11, [(0,1), (0,2), (0,3), (1,2), (1,3), (2,3),
