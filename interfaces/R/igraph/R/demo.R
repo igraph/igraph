@@ -14,7 +14,8 @@ igraphdemo <- function(which) {
   if (!grepl("\\.R$", which)) {
     which <- paste(which, sep=".", "R")
   }
-  if (! grepl("^/", which)) {
+
+  if (!file.exists(which) && ! grepl("^/", which)) {
     which <- system.file( paste("demo", sep="/", which), package="igraph" )
   }
 
@@ -28,16 +29,25 @@ igraphdemo <- function(which) {
       return()
     }
 
+    options(keep.source=TRUE)
+    
     text <- tclvalue(tkget(txt, act[1], act[2]))
     cat("=======================================================\n");
-    cat(paste(">", strsplit(text, "\n")[[1]][-1]), sep="\n")
-    cat("> -------------------------------------------------------\n");
+
     expr <- parse(text=text)
-    res <- withVisible(eval(expr, envir=.GlobalEnv))
-    if (res$visible) {
-      print(res$value)
-      cat("> -------------------------------------------------------\n");
+    for (i in seq_along(expr)) {
+      co <- as.character(attributes(expr)$srcref[[i]])
+      co[1] <- paste("> ", sep="", co[1])
+      if (length(co)>1) {
+        co[-1] <- paste(" +", sep="", co[-1])
+      }
+      cat(co, sep="\n")
+      res <- withVisible(eval(expr[[i]], envir=.GlobalEnv))
+      if (res$visible) {
+        print(res$value)
+      }
     }
+    cat("> -------------------------------------------------------\n");
     cat(options()$prompt)
     
     tktag.remove(txt, "activechunk", act[1], act[2])
@@ -57,29 +67,35 @@ igraphdemo <- function(which) {
   
   .igraphdemo.reset <- function(top, txt, which) {
     demolines <- readLines(which)
+    demolines <- demolines[!grepl("^pause\\(\\)$", demolines)]
+    demolines <- paste(" ", sep="", demolines)
+
+    ch <- grep("^[ ]*###", demolines)
+    ch <- c(ch, length(demolines)+1)
+    if (length(ch)==1) {
+      warning("Demo source file does not contain chunks")
+    } else {
+      demolines <- demolines[ch[1]:length(demolines)]
+      ch <- grep("^[ ]*###", demolines)
+      ch <- c(ch, length(demolines)+1)
+    }
+    
     tkconfigure(txt, state="normal")
     tkdelete(txt, "0.0", "end")
     tkinsert(txt, "insert", paste(demolines, collapse="\n"))
     tkconfigure(txt, state="disabled")
 
-    ch <- grep("^### @Chunk", demolines)
-    ch <- c(ch, length(demolines)+1)
-    if (length(ch)==1) {
-      warning("Demo source file does not contain chunks")
-    }
     for (i in seq_along(ch[-1])) {
       from <- paste(sep="", ch[i], ".0")
-      to <- paste(sep="", ch[i+1]-1, ".end")
+      to <- paste(sep="", ch[i+1]-1, ".0")
       tktag.add(txt, "chunk", from, to)
       tktag.add(txt, "activechunk", from, to)
-      tktag.add(txt, "chunkhead", from, paste(sep="", ch[i]+1, ".0"))
     }
-    tktag.configure(txt, "chunkhead", "-elide", TRUE)
     tktag.configure(txt, "chunk", "-borderwidth", "1")
     tktag.configure(txt, "chunk", "-relief", "sunken")
     if (length(ch) >= 2) {
       tktag.add(txt, "active", paste(sep="", ch[1], ".0"),
-                paste(sep="", ch[2]-1, ".end"))
+                paste(sep="", ch[2]-1, ".0"))
       tktag.configure(txt, "active", "-foreground", "red")
       tktag.configure(txt, "active", "-background", "lightgrey")
     }
