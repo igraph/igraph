@@ -4466,7 +4466,7 @@ PyObject *igraphmodule_Graph_subgraph_edges(igraphmodule_GraphObject * self,
 
   CREATE_GRAPH(result, sg);
 
-  igraph_vs_destroy(&es);
+  igraph_es_destroy(&es);
 
   return (PyObject *) result;
 }
