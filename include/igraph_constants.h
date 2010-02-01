@@ -108,6 +108,8 @@ typedef enum { IGRAPH_TRANSITIVITY_NAN=0,
 typedef enum { IGRAPH_SPINCOMM_IMP_ORIG=0, 
 	       IGRAPH_SPINCOMM_IMP_NEG } igraph_spinglass_implementation_t;
 
+typedef enum { IGRAPH_COMMCMP_VI = 0 } igraph_community_comparison_t;
+
 typedef igraph_real_t  igraph_scalar_function_t(const igraph_vector_t *var, 
 						const igraph_vector_t *par,
 						void* extra);

@@ -157,6 +157,15 @@ int igraph_community_multilevel(const igraph_t *graph,
                                 igraph_matrix_t *memberships,
                                 igraph_vector_t *modularity);
 
+/* -------------------------------------------------- */
+/* Community Structure Comparison                     */
+/* -------------------------------------------------- */
+
+int igraph_compare_communities(const igraph_vector_t *comm1,
+		                       const igraph_vector_t *comm2,
+							   igraph_real_t* result,
+							   igraph_community_comparison_t method);
+
 __END_DECLS
 
 #endif

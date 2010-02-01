@@ -34,6 +34,7 @@
 #include "igraph_components.h"
 #include "igraph_dqueue.h"
 #include "igraph_stack.h"
+#include "igraph_spmatrix.h"
 #include "config.h"
 
 #include <string.h>
@@ -2574,3 +2575,154 @@ int igraph_community_multilevel(const igraph_t *graph,
 
   return 0;
 }
+
+
+int igraph_i_compare_communities_vi(igraph_vector_t *v1, igraph_vector_t *v2,
+    igraph_real_t* result);
+
+/**
+ * \ingroup communities
+ * \function igraph_compare_communities
+ * \brief Compares community structures using various metrics
+ *
+ * This function assesses the distance between two community structures using
+ * the variation of information (VI) metric of Meila (2003).
+ * </para><para>
+ * Reference: Meila M: Comparing clusterings by the variation of information.
+ * In: Schölkopf B, Warmuth MK (eds.). Learning Theory and Kernel Machines:
+ * 16th Annual Conference on Computational Learning Theory and 7th Kernel
+ * Workshop, COLT/Kernel 2003, Washington, DC, USA. Lecture Notes in Computer
+ * Science, vol. 2777, Springer, 2003. ISBN: 978-3-540-40720-1.
+ *
+ * \param  comm1   the membership vector of the first community structure
+ * \param  comm2   the membership vector of the first community structure
+ * \param  method  the comparison method to use. Currently only the
+ *                 variation of information (VI) metric of Meila (2003)
+ *                 is implemented. If you want to use this metric, pass
+ *                 \c IGRAPH_COMMCMP_VI here.
+ *
+ * \return  Error code.
+ *
+ * Time complexity: O(n log(n)) for the variation of information metric.
+ */
+int igraph_compare_communities(const igraph_vector_t *comm1,
+    const igraph_vector_t *comm2, igraph_real_t* result,
+    igraph_community_comparison_t method) {
+  igraph_vector_t c1, c2;
+
+  if (igraph_vector_size(comm1) != igraph_vector_size(comm2)) {
+    IGRAPH_ERROR("community membership vectors have different lengths", IGRAPH_EINVAL);
+  }
+
+  /* Copy and reindex membership vectors to make sure they are continuous */
+  IGRAPH_CHECK(igraph_vector_copy(&c1, comm1));
+  IGRAPH_FINALLY(igraph_vector_destroy, &c1);
+
+  IGRAPH_CHECK(igraph_vector_copy(&c2, comm2));
+  IGRAPH_FINALLY(igraph_vector_destroy, &c2);
+
+  IGRAPH_CHECK(igraph_reindex_membership(&c1, 0));
+  IGRAPH_CHECK(igraph_reindex_membership(&c2, 0));
+
+  switch (method) {
+    case IGRAPH_COMMCMP_VI:
+      IGRAPH_CHECK(igraph_i_compare_communities_vi(&c1, &c2, result));
+      break;
+    default:
+      IGRAPH_ERROR("unknown community comparison method", IGRAPH_EINVAL);
+  }
+
+  /* Clean up everything */
+  igraph_vector_destroy(&c1);
+  igraph_vector_destroy(&c2);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return 0;
+}
+
+/**
+ * Implementation of the variation of information metric (VI) of
+ * Meila et al. This function assumes that the community membership
+ * vectors have already been normalized using igraph_reindex_communities().
+ *
+ * Reference: Meila M: Comparing clusterings by the variation of information.
+ * In: Schölkopf B, Warmuth MK (eds.). Learning Theory and Kernel Machines:
+ * 16th Annual Conference on Computational Learning Theory and 7th Kernel
+ * Workshop, COLT/Kernel 2003, Washington, DC, USA. Lecture Notes in Computer
+ * Science, vol. 2777, Springer, 2003. ISBN: 978-3-540-40720-1.
+ *
+ * Time complexity: O(n log(n))
+ */
+int igraph_i_compare_communities_vi(igraph_vector_t *v1, igraph_vector_t *v2,
+    igraph_real_t* result) {
+  long int i, n = igraph_vector_size(v1);
+  long int k1 = (long int)igraph_vector_max(v1)+1;
+  long int k2 = (long int)igraph_vector_max(v2)+1;
+  double *p1, *p2;
+  igraph_spmatrix_t m;
+  igraph_spmatrix_iter_t mit;
+  double mut_inf, h1, h2;
+
+  p1 = igraph_Calloc(k1, double);
+  if (p1 == 0) {
+    IGRAPH_ERROR("igraph_i_compare_communities_vi failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(free, p1);
+  p2 = igraph_Calloc(k2, double);
+  if (p2 == 0) {
+    IGRAPH_ERROR("igraph_i_compare_communities_vi failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(free, p2);
+
+  /* Calculate the entropy of v1 */
+  h1 = 0.0;
+  for (i = 0; i < n; i++)
+    p1[(long int)VECTOR(*v1)[i]]++;
+  for (i = 0; i < k1; i++) {
+    p1[i] /= n;
+    h1 -= p1[i] * log(p1[i]);
+  }
+
+  /* Calculate the entropy of v2 */
+  h2 = 0.0;
+  for (i = 0; i < n; i++)
+    p2[(long int)VECTOR(*v2)[i]]++;
+  for (i = 0; i < k2; i++) {
+    p2[i] /= n;
+    h2 -= p2[i] * log(p2[i]);
+  }
+
+  /* We will only need the logs of p1 and p2 from now on */
+  for (i = 0; i < k1; i++) {
+    p1[i] = log(p1[i]);
+  }
+  for (i = 0; i < k2; i++) {
+    p2[i] = log(p2[i]);
+  }
+
+  /* Calculate the mutual information of v1 and v2 */
+  mut_inf = 0.0;
+  IGRAPH_CHECK(igraph_spmatrix_init(&m, k1, k2));
+  IGRAPH_FINALLY(igraph_spmatrix_destroy, &m);
+  for (i = 0; i < n; i++) {
+    IGRAPH_CHECK(igraph_spmatrix_add_e(&m,
+          (int)VECTOR(*v1)[i], (int)VECTOR(*v2)[i], 1));
+  }
+  IGRAPH_CHECK(igraph_spmatrix_iter_create(&mit, &m));
+  while (!igraph_spmatrix_iter_end(&mit)) {
+    double p = mit.value / n;
+    mut_inf += p * (log(p) - p1[mit.ri] - p2[mit.ci]);
+    igraph_spmatrix_iter_next(&mit);
+  }
+  IGRAPH_FINALLY(igraph_spmatrix_iter_destroy, &mit);
+
+  *result = h1 + h2 - 2*mut_inf;
+
+  igraph_spmatrix_iter_destroy(&mit);
+  igraph_spmatrix_destroy(&m);
+  free(p1); free(p2);
+  IGRAPH_FINALLY_CLEAN(4);
+
+  return 0;
+}
+
