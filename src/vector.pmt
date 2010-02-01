@@ -1346,10 +1346,7 @@ igraph_bool_t FUNCTION(igraph_vector,binsearch)(const TYPE(igraph_vector) *v,
  * \brief Binary search, without returning the index.
  * 
  * </para><para>
- * It is assumed that the vector is sorted. If the specified element
- * (\p what) is not in the vector, then the
- * position of where it should be inserted (to keep the vector sorted)
- * is returned.
+ * It is assumed that the vector is sorted.
  * \param v The \type igraph_vector_t object.
  * \param what The element to search for.
  * \return Positive integer (true) if \p what is
