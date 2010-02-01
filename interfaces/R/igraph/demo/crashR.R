@@ -1,0 +1,341 @@
+
+pause <- function() {
+  cat("Press ENTER/RETURN/NEWLINE to continue.")
+  readLines(n=1)
+  invisible()
+}
+
+### R objects, (real) numbers
+a <- 3
+a
+b <- 4
+b
+a+b
+
+pause()
+
+### Case sensitive
+A <- 16
+a
+A
+
+pause()
+
+### Vector objects
+a <- c(1,2,3,4,5,6,7,8,9,10)
+a
+b <- 1:100
+b
+a[1]
+b[1:5]
+a[1] <- 10
+a
+a[1:4] <- 2
+a
+
+pause()
+
+### Vector arithmetic
+a * 2 + 1
+
+pause()
+
+### Functions
+ls()
+length(a)
+mean(a)
+sd(a)
+sd
+c
+
+pause()
+
+### Getting help
+# ?sd
+# ??"standard deviation"
+# RSiteSearch("network betweenness")
+
+pause()
+
+### Classes
+class(2)
+class(1:10)
+class(sd)
+
+pause()
+
+### Character vectors
+char.vec <- c("this", "is", "a", "vector", "of", "characters")
+char_vec <- char.vec
+char.vec[1]
+
+pause()
+
+### Index vectors
+age <- c(45, 36, 65, 21, 52, 19)
+age[1]
+age[1:5]
+age[c(2,5,6)]
+
+b[ seq(1,100,by=2) ]
+
+pause()
+
+### Named vectors
+names(age) <- c("Alice", "Bob", "Cecil", "David", "Eve", "Fiona")
+age
+age["Bob"]
+age[c("Eve", "David", "David")]
+
+pause()
+
+### Indexing with logical vectors
+age[c(FALSE, TRUE, FALSE, TRUE, FALSE, TRUE)]
+names(age)[ age>40 ]
+age > 40
+
+pause()
+
+### Matrices
+M <- matrix(1:20, 10, 2)
+M
+M2 <- matrix(1:20, 10, 2, byrow=TRUE)   ## Named argument!
+M2
+M[1,1]
+M[1,]
+M[,1]
+M[1:5,2]
+
+pause()
+
+### Generic functions
+sd(a)
+sd(M)
+class(a)
+class(M)
+
+pause()
+
+### Lists
+l <- list(1:10, "Hello!", diag(5))
+l
+l[[1]]
+l[2:3]
+l
+l2 <- list(A=1:10, H="Hello!", M=diag(5))
+l2
+l2$A
+l2$M
+
+pause()
+
+### Factors
+countries <- c("SUI", "USA", "GBR", "GER", "SUI",
+               "SUI", "GBR", "GER", "FRA", "GER")
+countries
+fcountries <- factor(countries)
+fcountries
+levels(fcountries)
+
+pause()
+
+### Data frames
+survey <- data.frame(row.names=c("Alice", "Bob", "Cecil", "David", "Eve"),
+                     Sex=c("F","M","F","F","F"),
+                     Age=c(45,36,65,21,52),
+                     Country=c("SUI", "USA", "SUI", "GBR", "USA"),
+                     Married=c(TRUE, FALSE, FALSE, TRUE, TRUE),
+                     Salary=c(70, 65, 200, 45, 100))
+survey
+survey$Sex
+plot(survey$Age, survey$Salary)
+AS.model <- lm(Salary ~ Age, data=survey)
+AS.model
+summary(AS.model)
+abline(AS.model)
+
+tapply(survey$Salary, survey$Country, mean)
+
+pause()
+
+### Packages
+# install.packages("igraph")
+# library(help="igraph")
+library(igraph)
+sessionInfo()
+
+pause()
+
+### Graphs
+## Create a small graph, A->B, A->C, B->C, C->E, D
+## A=0, B=1, C=2, D=3, E=4
+g <- graph( c(0,1, 0,2, 1,2, 2,4), n=5 )
+
+pause()
+
+### Print a graph to the screen
+g
+
+pause()
+
+### Create an undirected graph as well
+## A--B, A--C, B--C, C--E, D
+g2 <- graph( c(0,1, 0,2, 1,2, 2,4), n=5, dir=FALSE )
+g2
+
+pause()
+
+### Is this object an igraph graph?
+is.igraph(g)
+is.igraph(1:10)
+
+pause()
+
+### Summary, number of vertices, edges
+summary(g)
+vcount(g)
+ecount(g)
+
+pause()
+
+### Is the graph directed?
+is.directed(g)
+is.directed(g2)
+
+pause()
+
+### Convert from directed to undirected
+as.undirected(g)
+
+pause()
+
+### And back
+as.directed(as.undirected(g))
+
+pause()
+
+### Multiple edges
+g <- graph( c(0,1,0,1, 0,2, 1,2, 3,4), n=5 )
+g
+
+is.simple(g)
+is.multiple(g)
+
+pause()
+
+### Remove multiple edges
+g <- simplify(g)
+is.simple(g)
+
+pause()
+
+### Loop edges
+g <- graph( c(0,0,0,1, 0,2, 1,2, 3,4), n=5 )
+g
+
+is.simple(g)
+is.loop(g)
+
+pause()
+
+### Remove loop edges
+g <- simplify(g)
+is.simple(g)
+
+pause()
+
+### Naming vertices
+g <- graph.ring(10)
+V(g)$name <- letters[1:10]
+V(g)$name
+g
+print(g, v=T)
+
+pause()
+
+### Create undirected example graph
+g2 <- graph.formula(Alice-Bob:Cecil:Daniel, 
+                    Cecil:Daniel-Eugene:Gordon )
+print(g2, v=T)
+
+pause()
+
+### Remove Alice
+g3 <- delete.vertices(g2, match("Alice", V(g2)$name)-1)
+
+pause()
+
+### Add three new vertices
+g4 <- add.vertices(g3, 3)
+print(g4, v=T)
+igraph.par("print.vertex.attributes", TRUE)
+igraph.par("plot.layout", layout.fruchterman.reingold)
+g4
+plot(g4)                      
+
+pause()
+
+### Add three new vertices, with names this time
+g4 <- add.vertices(g3, 3, attr=list(name=c("Helen", "Ike", "Jane")))
+g4
+
+pause()
+
+### Add some edges as well
+g4 <- add.edges(g4, match(c("Helen", "Jane", "Ike", "Jane"), V(g4)$name )-1)
+g4
+
+pause()
+
+### Edge sequences, first create a directed example graph
+g2 <- graph.formula(Alice -+ Bob:Cecil:Daniel, 
+                    Cecil:Daniel +-+ Eugene:Gordon )
+print(g2, v=T)
+plot(g2, layout=layout.kamada.kawai, vertex.label=V(g2)$name)
+
+pause()
+
+### Sequence of all edges
+E(g2)
+
+pause()
+
+### Edge from a vertex to another
+E(g2, P=c(0,1))
+
+pause()
+
+### Delete this edge
+g3 <- delete.edges(g2, E(g2, P=c(0,1)))
+g3
+
+pause()
+
+### Get the id of the edge
+as.vector(E(g2, P=c(0,1)))
+
+pause()
+
+### All adjacent edges of a vertex
+E(g2)[ adj(2) ]
+
+pause()
+
+### Or multiple vertices
+E(g2)[ adj(c(2,0)) ]
+
+pause()
+
+### Outgoing edges
+E(g2)[ from(2) ]
+
+pause()
+
+### Incoming edges
+E(g2)[ to(2) ]
+
+pause()
+
+### Edges along a path
+E(g2, path=c(0,3,4))
+
