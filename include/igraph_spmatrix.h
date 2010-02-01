@@ -99,6 +99,21 @@ int igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
 int igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, long int row);
 int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m);
 
+
+typedef struct s_spmatrix_iter {
+  const igraph_spmatrix_t *m; /* pointer to the matrix we are iterating over */
+  long int pos;               /* internal index into the data vector */
+  long int ri;                /* row index */
+  long int ci;                /* column index */
+  igraph_real_t value;        /* value at the given cell */
+} igraph_spmatrix_iter_t;
+
+int igraph_spmatrix_iter_create(igraph_spmatrix_iter_t *mit, const igraph_spmatrix_t *m);
+int igraph_spmatrix_iter_reset(igraph_spmatrix_iter_t *mit);
+int igraph_spmatrix_iter_next(igraph_spmatrix_iter_t *mit);
+igraph_bool_t igraph_spmatrix_iter_end(igraph_spmatrix_iter_t *mit);
+void igraph_spmatrix_iter_destroy(igraph_spmatrix_iter_t *mit);
+
 __END_DECLS
 
 #endif

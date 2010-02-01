@@ -44,6 +44,7 @@ void print_vector(igraph_vector_t *v, FILE *f) {
 
 int main() {
   igraph_spmatrix_t m, m1;
+  igraph_spmatrix_iter_t mit;
   igraph_real_t arr[12];
   igraph_vector_t v;
   long int i, j;
@@ -186,6 +187,23 @@ int main() {
   print_vector(&v, stdout);
   igraph_vector_destroy(&v);
   igraph_spmatrix_destroy(&m);
+
+  /* igraph_spmatrix_iter_t */
+  igraph_spmatrix_init(&m, 5, 5);
+  for (i=0; i<igraph_spmatrix_nrow(&m); i++) {
+    for (j=0; j<igraph_spmatrix_ncol(&m); j++) {
+      if (abs(i-j) == 1)
+        igraph_spmatrix_set(&m, i, j, (i+1)*(j+1));
+    }
+  }
+  igraph_spmatrix_iter_create(&mit, &m);
+  while (!igraph_spmatrix_iter_end(&mit)) {
+    printf("%ld %ld %ld\n", mit.ri, mit.ci, (long int)mit.value);
+    igraph_spmatrix_iter_next(&mit);
+  }
+  igraph_spmatrix_iter_destroy(&mit);
+  igraph_spmatrix_destroy(&m);
+  printf("=========================\n");
 
   /* TODO: igraph_spmatrix_add_col_values */
 

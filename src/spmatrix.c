@@ -1,4 +1,5 @@
 /* -*- mode: C -*-  */
+/* vim:set ts=2 sw=2 sts=2 et */
 /* 
    IGraph library.
    Copyright (C) 2003, 2004, 2005  Gabor Csardi <csardi@rmki.kfki.hu>
@@ -761,6 +762,7 @@ igraph_real_t igraph_spmatrix_max(const igraph_spmatrix_t *m,
     if (ridx != 0) *ridx = VECTOR(m->ridx)[maxidx];
     if (cidx != 0) {
       igraph_vector_binsearch(&m->cidx, maxidx, &i);
+      i--;
       while (i < m->ncol-1 && VECTOR(m->cidx)[i+1] == VECTOR(m->cidx)[i]) i++;
       *cidx = (igraph_real_t)i;
     }
@@ -799,5 +801,128 @@ int igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
   for (i=VECTOR(m->cidx)[col], n=0; i<VECTOR(m->cidx)[col+1]; i++, n++)
     if (VECTOR(m->data)[i] != 0.0) VECTOR(*res)[n] = VECTOR(m->ridx)[i];
   return 0;
+}
+
+
+/**
+ * \section igraph_spmatrix_iterating Iterating over the non-zero elements of a sparse matrix
+ *
+ * <para>The \type igraph_spmatrix_iter_t type represents an iterator that can
+ * be used to step over the non-zero elements of a sparse matrix in columnwise
+ * order efficiently. In general, you shouldn't modify the elements of the matrix
+ * while iterating over it; doing so will probably invalidate the iterator, but
+ * there are no checks to prevent you from doing this.</para>
+ *
+ * <para>To access the row index of the current element of the iterator, use its
+ * \c ri field. Similarly, the \c ci field stores the column index of the current
+ * element and the \c value field stores the value of the element.</para>
+ */
+
+/**
+ * \function igraph_spmatrix_iter_create
+ * \brief Creates a sparse matrix iterator corresponding to the given matrix.
+ *
+ * \param  mit  pointer to the matrix iterator being initialized
+ * \param  m    pointer to the matrix we will be iterating over
+ * \return  Error code. The current implementation is always successful.
+ *
+ * Time complexity: O(1).
+ */
+int igraph_spmatrix_iter_create(igraph_spmatrix_iter_t *mit, const igraph_spmatrix_t *m) {
+  mit->m = m;
+  IGRAPH_CHECK(igraph_spmatrix_iter_reset(mit));
+  return 0;
+}
+
+/**
+ * \function igraph_spmatrix_iter_reset
+ * \brief Resets a sparse matrix iterator.
+ *
+ * </para><para>
+ * After resetting, the iterator will point to the first nonzero element (if any).
+ *
+ * \param  mit  pointer to the matrix iterator being reset
+ * \return  Error code. The current implementation is always successful.
+ *
+ * Time complexity: O(1).
+ */
+int igraph_spmatrix_iter_reset(igraph_spmatrix_iter_t *mit) {
+  assert(mit->m);
+
+  if (igraph_spmatrix_count_nonzero(mit->m) == 0) {
+    mit->pos = mit->ri = mit->ci = mit->value = -1;
+    return 0;
+  }
+
+  mit->ci = 0;
+  mit->pos = -1;
+
+  IGRAPH_CHECK(igraph_spmatrix_iter_next(mit));
+
+  return 0;
+}
+
+/**
+ * \function igraph_spmatrix_iter_next
+ * \brief Moves a sparse matrix iterator to the next nonzero element.
+ *
+ * </para><para>
+ * You should call this function only if \ref igraph_spmatrix_iter_end()
+ * returns FALSE (0).
+ *
+ * \param  mit  pointer to the matrix iterator being moved
+ * \return  Error code. The current implementation is always successful.
+ *
+ * Time complexity: O(1).
+ */
+int igraph_spmatrix_iter_next(igraph_spmatrix_iter_t *mit) {
+  mit->pos++;
+
+  mit->ri = (long int)VECTOR(mit->m->ridx)[mit->pos];
+  mit->value = VECTOR(mit->m->data)[mit->pos];
+
+  while (VECTOR(mit->m->cidx)[mit->ci+1] <= mit->pos) {
+    mit->ci++;
+  }
+
+  return 0;
+}
+
+/**
+ * \function igraph_spmatrix_iter_end
+ * \brief Checks whether there are more elements in the iterator.
+ *
+ * </para><para>
+ * You should call this function before calling \ref igraph_spmatrix_iter_next()
+ * to make sure you have more elements in the iterator.
+ *
+ * \param  mit  pointer to the matrix iterator being checked
+ * \return   TRUE (1) if there are more elements in the iterator,
+ *           FALSE (0) otherwise.
+ *
+ * Time complexity: O(1).
+ */
+igraph_bool_t igraph_spmatrix_iter_end(igraph_spmatrix_iter_t *mit) {
+  return mit->pos >= igraph_spmatrix_count_nonzero(mit->m);
+}
+
+/**
+ * \function igraph_spmatrix_iter_destroy
+ * \brief Frees the memory used by the iterator.
+ *
+ * </para><para>
+ * The current implementation does not allocate any memory upon
+ * creation, so this function does nothing. However, since there is
+ * no guarantee that future implementations will not allocate any
+ * memory in \ref igraph_spmatrix_iter_create(), you are still
+ * required to call this function whenever you are done with the
+ * iterator.
+ *
+ * \param  mit  pointer to the matrix iterator being destroyed
+ *
+ * Time complexity: O(1).
+ */
+void igraph_spmatrix_iter_destroy(igraph_spmatrix_iter_t *mit) {
+  /* Nothing to do at the moment */
 }
 
