@@ -298,6 +298,41 @@ PyObject* igraphmodule_community_to_membership(PyObject *self,
   return result_o;
 }
 
+
+PyObject* igraphmodule_compare_communities(PyObject *self,
+  PyObject *args, PyObject *kwds) {
+  static char* kwlist[] = { "comm1", "comm2", "method", NULL };
+  PyObject *comm1_o, *comm2_o, *method_o = Py_None;
+  igraph_vector_t comm1, comm2;
+  igraph_community_comparison_t method = IGRAPH_COMMCMP_VI;
+  igraph_real_t result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "OO|O", kwlist,
+      &comm1_o, &comm2_o, &method_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_community_comparison_t(method_o, &method))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vector_t(comm1_o, &comm1, 0, 0))
+    return NULL;
+  if (igraphmodule_PyObject_to_vector_t(comm2_o, &comm2, 0, 0)) {
+    igraph_vector_destroy(&comm1);
+    return NULL;
+  }
+
+  if (igraph_compare_communities(&comm1, &comm2, &result, method)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&comm1);
+    igraph_vector_destroy(&comm2);
+    return NULL;
+  }
+  igraph_vector_destroy(&comm1);
+  igraph_vector_destroy(&comm2);
+
+  return PyFloat_FromDouble((double)result);
+}
+
 /* Attribute handlers for the Python interface */
 
 /* Initialization */ 
@@ -1182,6 +1217,10 @@ static PyMethodDef igraphmodule_methods[] =
   {"community_to_membership", (PyCFunction)igraphmodule_community_to_membership,
     METH_VARARGS | METH_KEYWORDS,
     "community_to_membership(merges, nodes, steps, return_csize=False)\n\n"
+  },
+  {"_compare_communities", (PyCFunction)igraphmodule_compare_communities,
+    METH_VARARGS | METH_KEYWORDS,
+    "_compare_communities(comm1, comm2, method=\"vi\")\n\n"
   },
   {"convex_hull", (PyCFunction)igraphmodule_convex_hull, METH_VARARGS,
       "convex_hull(vs, coords=False)\n\n"

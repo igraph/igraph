@@ -2592,6 +2592,26 @@ _add_proxy_methods()
 
 ##############################################################
 
+def compare_communities(comm1, comm2, method="vi"):
+    """Compares two community structures using various distance measures.
+
+    @param comm1: the first community structure as a membership list or
+      as a L{Clustering} object.
+    @param comm2: the second community structure as a membership list or
+      as a L{Clustering} object.
+    @param method: the measure to use. Currently the only available measure
+      is the variation of information metric of Meila et al, this can be
+      selected by passing C{"vi"} here.
+    @return: the calculated measure.
+    """
+    def _ensure_list(obj):
+        if isinstance(obj, Clustering):
+            return obj.membership
+        return list(obj)
+    return core._compare_communities(_ensure_list(comm1), _ensure_list(comm2), method)
+
+##############################################################
+
 def read(filename, *args, **kwds):
     """Loads a graph from the given filename.
 

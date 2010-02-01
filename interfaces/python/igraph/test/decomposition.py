@@ -1,4 +1,6 @@
 import unittest
+import math
+
 from igraph import *
 try:
     set, frozenset
@@ -58,7 +60,7 @@ class ClusteringTests(unittest.TestCase):
         self.failUnless(len(self.cl) == 5)
 
     def testClusteringMembership(self):
-        self.failUnless(membership == [0,0,0,1,1,2,1,1,4,4])
+        self.failUnless(self.cl.membership == [0,0,0,1,1,2,1,1,4,4])
 
     def testClusteringSizes(self):
         self.failUnless(self.cl.sizes() == [3, 4, 1, 0, 2])
@@ -166,12 +168,25 @@ class CommunityTests(unittest.TestCase):
         cl = g.community_walktrap(steps=3)
         self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1,2,2,2,2,2])
         
+class ComparisonTests(unittest.TestCase):
+    def testCompareVI(self):
+        l1 = Clustering([1, 1, 1, 2, 2, 2])
+        l2 = Clustering([1, 1, 2, 2, 3, 3])
+        self.assertAlmostEqual(compare_communities(l1, l2), 0.8675, places=3)
+        l1 = [1, 1, 1, 1, 1, 1]
+        l2 = [1, 2, 3, 5, 6, 7]
+        self.assertAlmostEqual(compare_communities(l1, l2), math.log(6), places=3)
+        self.failUnless(compare_communities(l1, l1) == 0.)
+
 def suite():
     decomposition_suite = unittest.makeSuite(DecompositionTests)
     clustering_suite = unittest.makeSuite(ClusteringTests)
     overlapping_clustering_suite = unittest.makeSuite(OverlappingClusteringTests)
     community_suite = unittest.makeSuite(CommunityTests)
-    return unittest.TestSuite([decomposition_suite, community_suite])
+    comparison_suite = unittest.makeSuite(ComparisonTests)
+    return unittest.TestSuite([decomposition_suite, clustering_suite, \
+            overlapping_clustering_suite, community_suite, \
+            comparison_suite])
 
 def test():
     runner = unittest.TextTestRunner()
