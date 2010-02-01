@@ -925,6 +925,11 @@ igraph_similarity_inverse_log_weighted:
 # Community structure
 #######################################
 
+igraph_compare_communities:
+        PARAMS: VECTOR comm1, VECTOR comm2, OUT REALPTR result, \
+		        COMMCMP method=VI)
+		NAME-R: compare.communities
+
 igraph_community_spinglass:
         PARAMS: GRAPH graph, VECTOR_OR_0 weights, OUT REALPTR modularity,  \
                 OUT REALPTR temperature, OUT VECTOR membership, OUT VECTOR csize, \
