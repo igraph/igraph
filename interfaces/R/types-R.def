@@ -159,3 +159,8 @@ BLISSINFO:
 
 ADJLIST:
     INCONV: %I% <- lapply(%I%, as.numeric)
+
+COMMCMP:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "vi"=0)
+    DEFAULT:
+       VI: c("vi")
