@@ -56,7 +56,7 @@
 #define	DIGMSB 0x80000000ul
 #define	DIGLSB 0x00000001ul
 
-typedef uint32_t cnt_t;
+typedef uint32_t count_t;
 typedef uint16_t half_t;
 typedef uint32_t limb_t;
 #if HAVE_U64
@@ -79,42 +79,42 @@ int sl_modmul(limb_t *a, limb_t x, limb_t y, limb_t m);
 int sl_mul(limb_t p[2], limb_t x, limb_t y);
 
 /* big number functions (max. MAXSIZE limbs) */
-void bn_zero(limb_t a[], cnt_t nlimb);
-void bn_limb(limb_t a[], limb_t d, cnt_t nlimb);
-void bn_copy(limb_t a[], limb_t b[], cnt_t nlimb);
-cnt_t bn_sizeof(limb_t a[], cnt_t nlimb);
-int bn_cmp_limb(limb_t a[], limb_t b, cnt_t nlimb);
-int bn_cmp(limb_t a[], limb_t b[], cnt_t nlimb);
+void bn_zero(limb_t a[], count_t nlimb);
+void bn_limb(limb_t a[], limb_t d, count_t nlimb);
+void bn_copy(limb_t a[], limb_t b[], count_t nlimb);
+count_t bn_sizeof(limb_t a[], count_t nlimb);
+int bn_cmp_limb(limb_t a[], limb_t b, count_t nlimb);
+int bn_cmp(limb_t a[], limb_t b[], count_t nlimb);
 
 /* big number to hex, decimal, binary */
-const char *bn2x(limb_t a[], cnt_t nlimb);
-const char *bn2d(limb_t a[], cnt_t nlimb);
-const char *bn2f(limb_t a[], cnt_t alimb, limb_t b[], cnt_t blimb);
-const char *bn2b(limb_t a[], cnt_t nlimb);
+const char *bn2x(limb_t a[], count_t nlimb);
+const char *bn2d(limb_t a[], count_t nlimb);
+const char *bn2f(limb_t a[], count_t alimb, limb_t b[], count_t blimb);
+const char *bn2b(limb_t a[], count_t nlimb);
 
 /* big number with single limb operations */
-limb_t bn_add_limb(limb_t w[], limb_t u[], limb_t v, cnt_t nlimb);
-limb_t bn_sub_limb(limb_t w[], limb_t u[], limb_t v, cnt_t nlimb);
-limb_t bn_div_limb(limb_t q[], limb_t u[], limb_t v, cnt_t nlimb);
-limb_t bn_mod_limb(limb_t u[], limb_t d, cnt_t nlimb);
-limb_t bn_mul_limb(limb_t w[], limb_t u[], limb_t v, cnt_t nlimb);
+limb_t bn_add_limb(limb_t w[], limb_t u[], limb_t v, count_t nlimb);
+limb_t bn_sub_limb(limb_t w[], limb_t u[], limb_t v, count_t nlimb);
+limb_t bn_div_limb(limb_t q[], limb_t u[], limb_t v, count_t nlimb);
+limb_t bn_mod_limb(limb_t u[], limb_t d, count_t nlimb);
+limb_t bn_mul_limb(limb_t w[], limb_t u[], limb_t v, count_t nlimb);
 
 /* big number with single limb <= HALFMASK operations */
-limb_t bn_div_half(limb_t q[], limb_t u[], limb_t v, cnt_t nlimb);
-limb_t bn_mod_half(limb_t a[], limb_t d, cnt_t nlimb);
+limb_t bn_div_half(limb_t q[], limb_t u[], limb_t v, count_t nlimb);
+limb_t bn_mod_half(limb_t a[], limb_t d, count_t nlimb);
 
 /* big number operations */
-limb_t bn_add(limb_t w[], limb_t u[], limb_t v[], cnt_t nlimb);
-limb_t bn_sub(limb_t w[], limb_t u[], limb_t v[], cnt_t nlimb);
-limb_t bn_shl(limb_t a[], limb_t b[], cnt_t x, cnt_t nlimb);
-limb_t bn_shr(limb_t a[], limb_t b[], cnt_t x, cnt_t nlimb);
-int bn_mul(limb_t w[], limb_t u[], limb_t v[], cnt_t nlimb);
-int bn_div(limb_t q[], limb_t r[], limb_t u[], limb_t v[], cnt_t ulimb, cnt_t vlimb);
-limb_t bn_mod(limb_t r[], limb_t u[], cnt_t ulimb, limb_t v[], cnt_t vlimb);
-int bn_gcd(limb_t g[], limb_t x[], limb_t y[], cnt_t nlimb);
-int bn_sqrt(limb_t g[], limb_t x[], limb_t y[], cnt_t rlimb, cnt_t nlimb);
-int bn_modexp(limb_t y[], limb_t x[], limb_t e[], limb_t m[], cnt_t nlimb);
-int bn_modinv(limb_t inv[], limb_t u[], limb_t v[], cnt_t nlimb);
-limb_t bn_modmul(limb_t a[], limb_t x[], limb_t y[], limb_t m[], cnt_t nlimb);
+limb_t bn_add(limb_t w[], limb_t u[], limb_t v[], count_t nlimb);
+limb_t bn_sub(limb_t w[], limb_t u[], limb_t v[], count_t nlimb);
+limb_t bn_shl(limb_t a[], limb_t b[], count_t x, count_t nlimb);
+limb_t bn_shr(limb_t a[], limb_t b[], count_t x, count_t nlimb);
+int bn_mul(limb_t w[], limb_t u[], limb_t v[], count_t nlimb);
+int bn_div(limb_t q[], limb_t r[], limb_t u[], limb_t v[], count_t ulimb, count_t vlimb);
+limb_t bn_mod(limb_t r[], limb_t u[], count_t ulimb, limb_t v[], count_t vlimb);
+int bn_gcd(limb_t g[], limb_t x[], limb_t y[], count_t nlimb);
+int bn_sqrt(limb_t g[], limb_t x[], limb_t y[], count_t rlimb, count_t nlimb);
+int bn_modexp(limb_t y[], limb_t x[], limb_t e[], limb_t m[], count_t nlimb);
+int bn_modinv(limb_t inv[], limb_t u[], limb_t v[], count_t nlimb);
+limb_t bn_modmul(limb_t a[], limb_t x[], limb_t y[], limb_t m[], count_t nlimb);
 
 #endif	/* !defined(_bignum_h_) */

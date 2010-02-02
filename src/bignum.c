@@ -39,16 +39,16 @@
  *
  * @result string containing the hex representation of a
  */
-const char *bn2x(limb_t *a, cnt_t nlimb)
+const char *bn2x(limb_t *a, count_t nlimb)
 {
-	static cnt_t which = 0;
+	static count_t which = 0;
 	static char *xbuff[8] = {
 		NULL, NULL, NULL, NULL,
 		NULL, NULL, NULL, NULL
 	};
 	char *dst;
-	cnt_t size;
-	cnt_t n = nlimb;
+	count_t size;
+	count_t n = nlimb;
 
 	if (0 == n)
 		return "0";
@@ -78,9 +78,9 @@ const char *bn2x(limb_t *a, cnt_t nlimb)
  *
  * @result string containing the decimal representation of a
  */
-const char *bn2d(limb_t *a, cnt_t nlimb)
+const char *bn2d(limb_t *a, count_t nlimb)
 {
-	static cnt_t which = 0;
+	static count_t which = 0;
 	static char *dbuff[8] = {
 		NULL, NULL, NULL, NULL,
 		NULL, NULL, NULL, NULL
@@ -88,8 +88,8 @@ const char *bn2d(limb_t *a, cnt_t nlimb)
 	static limb_t v[BN_MAXSIZE];
 	limb_t r;
 	char *dst;
-	cnt_t size;
-	cnt_t n = bn_sizeof(a, nlimb);
+	count_t size;
+	count_t n = bn_sizeof(a, nlimb);
 
 	if (0 == n)
 		return "0";
@@ -124,9 +124,9 @@ const char *bn2d(limb_t *a, cnt_t nlimb)
  *
  * @result string containing the decimal representation of a.b
  */
-const char *bn2f(limb_t *a, cnt_t alimb, limb_t *b, cnt_t blimb)
+const char *bn2f(limb_t *a, count_t alimb, limb_t *b, count_t blimb)
 {
-	static cnt_t which = 0;
+	static count_t which = 0;
 	static char *dbuff[8] = {
 		NULL, NULL, NULL, NULL,
 		NULL, NULL, NULL, NULL
@@ -135,7 +135,7 @@ const char *bn2f(limb_t *a, cnt_t alimb, limb_t *b, cnt_t blimb)
 	static limb_t w[BN_MAXSIZE];
 	limb_t r;
 	char *dst;
-	cnt_t size;
+	count_t size;
 
 	bn_copy(v, a, alimb);
 	bn_copy(w, b, blimb);
@@ -174,17 +174,17 @@ const char *bn2f(limb_t *a, cnt_t alimb, limb_t *b, cnt_t blimb)
  *
  * @result string containing the binary representation of a
  */
-const char *bn2b(limb_t *a, cnt_t nlimb)
+const char *bn2b(limb_t *a, count_t nlimb)
 {
-	static cnt_t which = 0;
+	static count_t which = 0;
 	static char *bbuff[8] = {
 		NULL, NULL, NULL, NULL,
 		NULL, NULL, NULL, NULL
 	};
 	limb_t r;
 	char *dst;
-	cnt_t size;
-	cnt_t n = bn_sizeof(a, nlimb);
+	count_t size;
+	count_t n = bn_sizeof(a, nlimb);
 
 	if (0 == n)
 		return "0";
@@ -216,7 +216,7 @@ const char *bn2b(limb_t *a, cnt_t nlimb)
  * @param nlimb number of limbs in the array
  *
  */
-void bn_zero(limb_t a[], cnt_t nlimb)
+void bn_zero(limb_t a[], count_t nlimb)
 {
 	memset(a, 0, nlimb * sizeof(limb_t));
 }
@@ -233,7 +233,7 @@ void bn_zero(limb_t a[], cnt_t nlimb)
  * @param nlimb number of limbs in the array
  *
  */
-void bn_limb(limb_t a[], limb_t d, cnt_t nlimb)
+void bn_limb(limb_t a[], limb_t d, count_t nlimb)
 {
 	memset(a, 0, nlimb * sizeof(limb_t));
 	a[0] = d;
@@ -249,7 +249,7 @@ void bn_limb(limb_t a[], limb_t d, cnt_t nlimb)
  * @param b pointer to an array of limbs (source)
  * @param nlimb number of limbs in the arrays
  */
-void bn_copy(limb_t a[], limb_t b[], cnt_t nlimb)
+void bn_copy(limb_t a[], limb_t b[], count_t nlimb)
 {
 	memcpy(a, b, nlimb * sizeof(limb_t));
 }
@@ -266,7 +266,7 @@ void bn_copy(limb_t a[], limb_t b[], cnt_t nlimb)
  *
  * @result number of significant limbs in a
  */
-cnt_t bn_sizeof(limb_t a[], cnt_t nlimb)
+count_t bn_sizeof(limb_t a[], count_t nlimb)
 {
 	while (nlimb-- > 0)
 		if (0 != a[nlimb])
@@ -288,7 +288,7 @@ cnt_t bn_sizeof(limb_t a[], cnt_t nlimb)
  *
  * @result sign of the comparison: -1 a<b, 0 a=b, +1 a>b
  */
-int bn_cmp_limb(limb_t a[], limb_t b, cnt_t nlimb)
+int bn_cmp_limb(limb_t a[], limb_t b, count_t nlimb)
 {
 	if (0 == nlimb)
 		return 0;
@@ -315,7 +315,7 @@ int bn_cmp_limb(limb_t a[], limb_t b, cnt_t nlimb)
  *
  * @result sign of the comparison: -1 a<b, 0 a=b, +1 a>b
  */
-int bn_cmp(limb_t a[], limb_t b[], cnt_t nlimb)
+int bn_cmp(limb_t a[], limb_t b[], count_t nlimb)
 {
 	if (0 == nlimb)
 		return 0;
@@ -357,7 +357,7 @@ int sl_iseven(limb_t a)
  *
  * @result zero if a is odd, 1 if a is even
  */
-int bn_iseven(limb_t *a, cnt_t nlimb)
+int bn_iseven(limb_t *a, count_t nlimb)
 {
 	if (0 == nlimb)
 		return 1;
@@ -381,10 +381,10 @@ int bn_iseven(limb_t *a, cnt_t nlimb)
  *
  * @result The carry status of the addition
  */
-limb_t bn_add_limb(limb_t w[], limb_t u[], limb_t v, cnt_t nlimb)
+limb_t bn_add_limb(limb_t w[], limb_t u[], limb_t v, count_t nlimb)
 {
 	limb_t carry;
-	cnt_t j;
+	count_t j;
 
 	/* Copy u to w, so we can bail out if no borrow is left */
 	if (w != u)
@@ -420,10 +420,10 @@ limb_t bn_add_limb(limb_t w[], limb_t u[], limb_t v, cnt_t nlimb)
  *
  * @result borrow of the subtraction (0 if u >= v, 1 if u < v)
  */
-limb_t bn_sub_limb(limb_t w[], limb_t u[], limb_t v, cnt_t nlimb)
+limb_t bn_sub_limb(limb_t w[], limb_t u[], limb_t v, count_t nlimb)
 {
 	limb_t borrow;
-	cnt_t j;
+	count_t j;
 
 	/* Copy u to w, so we can bail out if no borrow is left */
 	if (w != u)
@@ -461,11 +461,11 @@ limb_t bn_sub_limb(limb_t w[], limb_t u[], limb_t v, cnt_t nlimb)
  *
  * @result single limb remainder of the division (modulo)
  */
-limb_t bn_div_limb(limb_t q[], limb_t u[], limb_t v, cnt_t nlimb)
+limb_t bn_div_limb(limb_t q[], limb_t u[], limb_t v, count_t nlimb)
 {
-	cnt_t j;
+	count_t j;
 	limb_t t[2], r;
-	cnt_t shift;
+	count_t shift;
 
 	if (0 == nlimb)
 		return 0;
@@ -510,7 +510,7 @@ limb_t bn_div_limb(limb_t q[], limb_t u[], limb_t v, cnt_t nlimb)
  *
  * @result single limb remainder of the division (modulo)
  */
-limb_t bn_mod_limb(limb_t u[], limb_t v, cnt_t nlimb)
+limb_t bn_mod_limb(limb_t u[], limb_t v, count_t nlimb)
 {
 	static limb_t q[2*BN_MAXSIZE];
 	limb_t r;
@@ -536,11 +536,11 @@ limb_t bn_mod_limb(limb_t u[], limb_t v, cnt_t nlimb)
  *
  * @result zero if no overflow, else overflow (value of w[nlimb])
  */
-limb_t bn_mul_limb(limb_t w[], limb_t u[], limb_t v, cnt_t nlimb)
+limb_t bn_mul_limb(limb_t w[], limb_t u[], limb_t v, count_t nlimb)
 {
 	limb_t t[2];
 	limb_t carry;
-	cnt_t j;
+	count_t j;
 
 	if (0 == v) {
 		bn_zero(w, nlimb);
@@ -1040,7 +1040,7 @@ int sl_mul(limb_t p[2], limb_t x, limb_t y)
  *
  * @result returns remainder of the division
  */
-limb_t bn_div_hdig(limb_t q[], limb_t u[], limb_t v, cnt_t nlimb)
+limb_t bn_div_hdig(limb_t q[], limb_t u[], limb_t v, count_t nlimb)
 {
 	limb_t mask = DIGMSB;
 	limb_t r = 0;
@@ -1105,7 +1105,7 @@ limb_t bn_div_hdig(limb_t q[], limb_t u[], limb_t v, cnt_t nlimb)
  *
  * @result returns remainder of the division
  */
-limb_t bn_mod_hdig(limb_t u[], limb_t v, cnt_t nlimb)
+limb_t bn_mod_hdig(limb_t u[], limb_t v, count_t nlimb)
 {
 	limb_t mask;
 	limb_t r;
@@ -1163,10 +1163,10 @@ limb_t bn_mod_hdig(limb_t u[], limb_t v, cnt_t nlimb)
  *
  * @result returns the carry, i.e. w[nlimb], as 0 or 1
  */
-limb_t bn_add(limb_t w[], limb_t u[], limb_t v[], cnt_t nlimb)
+limb_t bn_add(limb_t w[], limb_t u[], limb_t v[], count_t nlimb)
 {
 	limb_t carry;
-	cnt_t j;
+	count_t j;
 
 	for (j = 0, carry = 0; j < nlimb; j++) {
 		/*
@@ -1201,10 +1201,10 @@ limb_t bn_add(limb_t w[], limb_t u[], limb_t v[], cnt_t nlimb)
  *
  * @result zero on success, 1 if v was greater than u
  */
-limb_t bn_sub(limb_t w[], limb_t u[], limb_t v[], cnt_t nlimb)
+limb_t bn_sub(limb_t w[], limb_t u[], limb_t v[], count_t nlimb)
 {
 	limb_t borrow;
-	cnt_t j;
+	count_t j;
 
 	for (j = 0, borrow = 0; j < nlimb; j++) {
 		/*
@@ -1239,11 +1239,11 @@ limb_t bn_sub(limb_t w[], limb_t u[], limb_t v[], cnt_t nlimb)
  *
  * @result zero on success (always!?)
  */
-int bn_mul(limb_t w[], limb_t u[], limb_t v[], cnt_t nlimb)
+int bn_mul(limb_t w[], limb_t u[], limb_t v[], count_t nlimb)
 {
 	limb_t t[2];
 	limb_t carry;
-	cnt_t i, j, m, n;
+	count_t i, j, m, n;
 
 	m = n = nlimb;
 
@@ -1295,9 +1295,9 @@ int bn_mul(limb_t w[], limb_t u[], limb_t v[], cnt_t nlimb)
  *
  * @result returns a single limb "carry", i.e. bits that came out left
  */
-limb_t bn_shl(limb_t a[], limb_t b[], cnt_t x, cnt_t nlimb)
+limb_t bn_shl(limb_t a[], limb_t b[], count_t x, count_t nlimb)
 {
-	cnt_t i, y;
+	count_t i, y;
 	limb_t carry, temp;
 
 	if (0 == nlimb)
@@ -1342,9 +1342,9 @@ limb_t bn_shl(limb_t a[], limb_t b[], cnt_t x, cnt_t nlimb)
  *
  * @result returns a single limb "carry", i.e. bits that came out right
  */
-limb_t bn_shr(limb_t a[], limb_t b[], cnt_t x, cnt_t nlimb)
+limb_t bn_shr(limb_t a[], limb_t b[], count_t x, count_t nlimb)
 {
-	cnt_t i, y;
+	count_t i, y;
 	limb_t carry, temp;
 
 	if (0 == nlimb)
@@ -1423,7 +1423,7 @@ static int quot_overflow(limb_t quot, limb_t rem, limb_t v, limb_t u)
  * @result zero on success, LIMBASK on division by zero
  */
 int bn_div(limb_t q[], limb_t r[], limb_t u[], limb_t v[],
-	cnt_t ulimb, cnt_t vlimb)
+	count_t ulimb, count_t vlimb)
 {
 	static limb_t qq[BN_MAXSIZE];
 	static limb_t uu[BN_MAXSIZE];
@@ -1434,7 +1434,7 @@ int bn_div(limb_t q[], limb_t r[], limb_t u[], limb_t v[],
 	limb_t rem;
 	limb_t t[2];
 	limb_t *ww;
-	cnt_t n, m, i, j, shift;
+	count_t n, m, i, j, shift;
 	int ok, cmp;
 
 	/* find size of v */
@@ -1609,7 +1609,7 @@ int bn_div(limb_t q[], limb_t r[], limb_t u[], limb_t v[],
  *
  * @result zero on success, LIMBASK on division by zero
  */
-limb_t bn_mod(limb_t r[], limb_t u[], cnt_t ulimb, limb_t v[], cnt_t vlimb)
+limb_t bn_mod(limb_t r[], limb_t u[], count_t ulimb, limb_t v[], count_t vlimb)
 {
 	static limb_t qq[2*BN_MAXSIZE];
 	static limb_t rr[2*BN_MAXSIZE];
@@ -1641,7 +1641,7 @@ limb_t bn_mod(limb_t r[], limb_t u[], cnt_t ulimb, limb_t v[], cnt_t vlimb)
  *
  * @result zero on succes (always)
  */
-int bn_gcd(limb_t g[], limb_t x[], limb_t y[], cnt_t nlimb)
+int bn_gcd(limb_t g[], limb_t x[], limb_t y[], count_t nlimb)
 {	
 	static limb_t yy[BN_MAXSIZE];
 	static limb_t xx[BN_MAXSIZE];
@@ -1683,10 +1683,10 @@ int bn_gcd(limb_t g[], limb_t x[], limb_t y[], cnt_t nlimb)
  *
  * @result zero on success, -1 on error (nlimb is zero)
  */
-int bn_modexp(limb_t y[], limb_t x[], limb_t e[], limb_t m[], cnt_t nlimb)
+int bn_modexp(limb_t y[], limb_t x[], limb_t e[], limb_t m[], count_t nlimb)
 {
 	limb_t mask;
-	cnt_t n;
+	count_t n;
 	
 	if (nlimb == 0)
 		return -1;
@@ -1740,7 +1740,7 @@ int bn_modexp(limb_t y[], limb_t x[], limb_t e[], limb_t m[], cnt_t nlimb)
  *
  * @result zero on success, LIMBMASK if m was zero (division by zero)
  */
-limb_t bn_modmul(limb_t a[], limb_t x[], limb_t y[], limb_t m[], cnt_t nlimb)
+limb_t bn_modmul(limb_t a[], limb_t x[], limb_t y[], limb_t m[], count_t nlimb)
 {
 	static limb_t pp[2*BN_MAXSIZE];
 	limb_t d0;
@@ -1771,7 +1771,7 @@ limb_t bn_modmul(limb_t a[], limb_t x[], limb_t y[], limb_t m[], cnt_t nlimb)
  *
  * @result zero on success
  */
-int bn_modinv(limb_t inv[], limb_t u[], limb_t v[], cnt_t nlimb)
+int bn_modinv(limb_t inv[], limb_t u[], limb_t v[], count_t nlimb)
 {
 	/* Allocate temp variables */
 	static limb_t u1[BN_MAXSIZE];
@@ -1854,14 +1854,14 @@ int bn_modinv(limb_t inv[], limb_t u[], limb_t v[], cnt_t nlimb)
  *
  * @result zero on success
  */
-int bn_sqrt(limb_t q[], limb_t r[], limb_t u[], cnt_t rlimb, cnt_t ulimb)
+int bn_sqrt(limb_t q[], limb_t r[], limb_t u[], count_t rlimb, count_t ulimb)
 {
 	static limb_t step[BN_MAXSIZE];
 	static limb_t accu[BN_MAXSIZE];
 	static limb_t w[2*BN_MAXSIZE];
 	limb_t d;
-	cnt_t m, n;
-	cnt_t shift;
+	count_t m, n;
+	count_t shift;
 
 	bn_zero(q, ulimb);
 	bn_limb(step, 1, BN_MAXSIZE);
