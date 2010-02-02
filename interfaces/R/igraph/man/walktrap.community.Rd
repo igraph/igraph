@@ -9,7 +9,7 @@
 }
 \usage{
 walktrap.community(graph, weights = E(graph)$weight, steps = 4, merges =
-          TRUE, modularity = FALSE, labels = TRUE)
+          TRUE, modularity = TRUE, labels = TRUE, membership = TRUE)
 }
 \arguments{
   \item{graph}{The input graph.}
@@ -18,10 +18,13 @@ walktrap.community(graph, weights = E(graph)$weight, steps = 4, merges =
   \item{merges}{Logical scalar, whether to include the merge matrix in
     the result.}
   \item{modularity}{Logical scalar, whether to include the vector of the
-    modularity scores in the result.}
+    modularity scores in the result. If the \code{membership} argument
+    is true, then it will be always calculated.}
   \item{labels}{Logical scalar, if \code{TRUE} and the graph has a
     vertex attribute called \code{name} then it will be included in the
     result, in the list member called \code{labels}.}
+  \item{membership}{Logical scalar, whether to calculate the membership
+    vector for the split corresponding to the highest modularity value.}
 }
 \details{
   This function is the implementation of the Walktrap community
@@ -48,6 +51,9 @@ walktrap.community(graph, weights = E(graph)$weight, steps = 4, merges =
   }
   \item{labels}{The labels of the vertices in the graph. The
     \code{name} vertex attribute will be copied here, if exists.
+  }
+  \item{membership}{ If requested, then the membership vector that
+    belongs to the best split, in terms of highest modularity score.
   }
 }
 \references{Pascal Pons, Matthieu Latapy: Computing
