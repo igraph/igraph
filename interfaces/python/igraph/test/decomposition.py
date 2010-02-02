@@ -70,6 +70,26 @@ class ClusteringTests(unittest.TestCase):
     def testClusteringHistogram(self):
         self.failUnless(isinstance(self.cl.size_histogram(), Histogram))
 
+
+class VertexClusteringTests(unittest.TestCase):
+    def setUp(self):
+        self.graph = Graph.Full(10)
+        self.graph.vs["string"] = list("aaabbcccab")
+        self.graph.vs["int"] = [17, 41, 23, 25, 64, 33, 3, 24, 47, 15]
+
+    def testFromStringAttribute(self):
+        cl = VertexClustering.FromAttribute(self.graph, "string")
+        self.failUnless(cl.membership == [0,0,0,1,1,2,2,2,0,1])
+
+    def testFromIntAttribute(self):
+        cl = VertexClustering.FromAttribute(self.graph, "int")
+        self.failUnless(cl.membership == list(range(10)))
+        cl = VertexClustering.FromAttribute(self.graph, "int", 15)
+        self.failUnless(cl.membership == [0, 1, 0, 0, 2, 1, 3, 0, 4, 0])
+        cl = VertexClustering.FromAttribute(self.graph, "int", [10, 20, 30])
+        self.failUnless(cl.membership == [0, 1, 2, 2, 1, 1, 3, 2, 1, 0])
+
+
 class OverlappingClusteringTests(unittest.TestCase):
     def setUp(self):
         self.cl = OverlappingClustering([set([0]), set([0]), set([0]), set([0,1]), set([1]), set([1]), set([1]), set([]), set([3]), set([3,1])])
@@ -181,12 +201,13 @@ class ComparisonTests(unittest.TestCase):
 def suite():
     decomposition_suite = unittest.makeSuite(DecompositionTests)
     clustering_suite = unittest.makeSuite(ClusteringTests)
+    vertex_clustering_suite = unittest.makeSuite(VertexClusteringTests)
     overlapping_clustering_suite = unittest.makeSuite(OverlappingClusteringTests)
     community_suite = unittest.makeSuite(CommunityTests)
     comparison_suite = unittest.makeSuite(ComparisonTests)
     return unittest.TestSuite([decomposition_suite, clustering_suite, \
-            overlapping_clustering_suite, community_suite, \
-            comparison_suite])
+            vertex_clustering_suite, overlapping_clustering_suite, \
+            community_suite, comparison_suite])
 
 def test():
     runner = unittest.TextTestRunner()

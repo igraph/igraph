@@ -22,10 +22,13 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 
-from statistics import Histogram
 from copy import copy, deepcopy
 from StringIO import StringIO
+
 from igraph import community_to_membership
+from igraph.datatypes import UniqueIdGenerator
+from igraph.statistics import Histogram
+
 try:
     set, frozenset
 except NameError:
@@ -224,6 +227,55 @@ class VertexClustering(Clustering):
             self._q = graph.modularity(membership)
         else:
             self._q = modularity
+
+    def FromAttribute(klass, graph, attribute, intervals=None, params={}):
+        """Creates a vertex clustering based on the value of a vertex attribute.
+
+        Vertices having the same attribute will correspond to the same cluster.
+
+        @param graph: the graph on which we are working
+        @param attribute: name of the attribute on which the clustering
+            is based.
+        @param intervals: for numeric attributes, you can either pass a single
+            number or a list of numbers here. A single number means that the
+            vertices will be put in bins of that width and vertices ending up
+            in the same bin will be in the same cluster. A list of numbers
+            specify the bin positions explicitly; e.g., C{[10, 20, 30]} means
+            that there will be four categories: vertices with the attribute
+            value less than 10, between 10 and 20, between 20 and 30 and over 30.
+            Intervals are closed from the left and open from the right.
+        @param params: additional parameters to be stored in this object.
+
+        @return: a new VertexClustering object
+        """
+        from bisect import bisect
+
+        def safeint(x):
+            if x is None: return None
+            return int(x)
+
+        def safebisect(intervals, x):
+            if x is None: return None
+            return bisect(intervals, x)
+
+        try:
+            it = iter(intervals)
+            iterable = True
+        except TypeError:
+            iterable = False
+        if intervals is None:
+            vec = graph.vs[attribute]
+        elif iterable:
+            intervals = list(intervals)
+            vec = [safebisect(intervals, x) for x in graph.vs[attribute]]
+        else:
+            intervals = float(intervals)
+            vec = [safeint(x / intervals) for x in graph.vs[attribute]]
+
+        idgen = UniqueIdGenerator()
+        vec = [idgen[i] for i in vec]
+        return klass(graph, vec, None, params)
+    FromAttribute = classmethod(FromAttribute)
 
     def _get_modularity(self): return self._q
     modularity = property(_get_modularity, doc = "The modularity score")
