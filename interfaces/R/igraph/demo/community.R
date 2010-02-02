@@ -1,0 +1,237 @@
+
+pause <- function() {
+  cat("Press ENTER/RETURN/NEWLINE to continue.")
+  readLines(n=1)
+  invisible()
+}
+
+### A modular graph has dense subgraphs
+mod <- graph.full(10) %du% graph.full(10) %du% graph.full(10)
+perfect <- c(rep(0,10), rep(1,10), rep(2,10))
+perfect
+
+pause()
+
+### Plot it with community (=component) colors
+plot(mod, vertex.color=perfect+1, layout=layout.fruchterman.reingold)
+
+pause()
+
+### Modularity of the perfect division
+modularity(mod, perfect)
+
+pause()
+
+### Modularity of the trivial partition, quite bad
+modularity(mod, rep(0, 30))
+
+pause()
+
+### Modularity of a good partition with two communities
+modularity(mod, c(rep(0, 10), rep(1,20)))
+
+pause()
+
+### A real little network, Zachary's karate club data
+karate <- graph.famous("Zachary")
+karate$layout <- layout.kamada.kawai(karate, niter=1000)
+
+pause()
+
+### Greedy algorithm
+fc <- fastgreedy.community(karate)
+memb <- community.to.membership(karate, fc$merges,
+                                steps=which.max(fc$modularity)-1)
+plot(karate, vertex.color=memb$membership+1)
+  
+pause()
+
+### Spinglass algorithm, create a hierarchical network
+pref.mat <- matrix(0, 16, 16)
+pref.mat[1:4,1:4] <- pref.mat[5:8,5:8] <-
+  pref.mat[9:12,9:12] <- pref.mat[13:16,13:16] <- 7.5/127
+pref.mat[ pref.mat==0 ] <- 5/(3*128)
+diag(pref.mat) <- diag(pref.mat) + 10/31
+
+pause()
+
+### Create the network with the given vertex preferences
+G <- preference.game(128*4, types=16, pref.matrix=pref.mat)
+
+pause()
+
+### Run spinglass community detection with two gamma parameters
+sc1 <- spinglass.community(G, spins=4, gamma=1.0)
+sc2.2 <- spinglass.community(G, spins=16, gamma=2.2)
+
+pause()
+
+### Plot the adjacency matrix, use the Matrix package if available
+if (require(Matrix)) {
+  myimage <- function(...) image(Matrix(...))
+} else {
+  myimage <- image
+}
+A <- get.adjacency(G)
+myimage(A)
+
+pause()
+
+### Ordering according to (big) communities
+ord1 <- order(sc1$membership)
+myimage(A[ord1,ord1])
+
+pause()
+
+### Ordering according to (small) communities
+ord2.2 <- order(sc2.2$membership)
+myimage(A[ord2.2,ord2.2])
+
+pause()
+
+### Consensus ordering
+ord <- order(sc1$membership, sc2.2$membership)
+myimage(A[ord,ord])
+
+pause()
+
+### Comparision of algorithms
+memberships <- list()
+
+pause()
+
+### edge.betweenness.community
+ebc <- edge.betweenness.community(karate)
+mods <- sapply(0:ecount(karate), function(i) {
+  g2 <- delete.edges(karate, ebc$removed.edges[seq(length=i)])
+  cl <- clusters(g2)$membership
+  modularity(karate, cl)
+})
+
+g2 <- delete.edges(karate, ebc$removed.edges[1:(which.max(mods)-1)])
+memberships$`Edge betweenness` <- clusters(g2)$membership
+
+pause()
+
+### fastgreedy.community
+fc <- fastgreedy.community(karate)
+memb <- community.to.membership(karate, fc$merges,
+                                steps=which.max(fc$modularity)-1)
+memberships$`Fast greedy` <- memb$membership
+
+pause()
+
+### leading.eigenvector.community
+lec <- leading.eigenvector.community(karate)
+memberships$`Leading eigenvector` <- lec$membership
+
+pause()
+
+### spinglass.community
+sc <- spinglass.community(karate, spins=10)
+memberships$`Spinglass` <- sc$membership
+
+pause()
+
+### walktrap.community
+wt <- walktrap.community(karate, modularity=TRUE)
+wmemb <- community.to.membership(karate, wt$merges,
+                                 steps=which.max(wt$modularity)-1)
+memberships$`Walktrap` <- wmemb$membership
+
+pause()
+
+### label.propagation.community
+memberships$`Label propagation` <- label.propagation.community(karate)
+
+pause()
+
+### Plot everything
+layout(rbind(1:3, 4:6))
+for (i in 1:6) {
+  m <- modularity(karate, memberships[[i]])
+  plot(karate, vertex.color=memberships[[i]]+2,
+       main=paste(names(memberships)[i], "\n",
+         "Modularity:", round(m, 3)))
+}
+
+pause()
+
+### Function to calculate clique communities
+clique.community <- function(graph, k) {
+  clq <- cliques(graph, min=k, max=k)
+  edges <- c()
+  for (i in seq(along=clq)) {
+    for (j in seq(along=clq)) {
+      if ( length(unique(c(clq[[i]], 
+             clq[[j]]))) == k+1 ) {
+        edges <- c(edges, c(i,j)-1)
+      }
+    }
+  }
+  clq.graph <- simplify(graph(edges))
+  V(clq.graph)$name <- 
+    seq(length=vcount(clq.graph))
+  comps <- decompose.graph(clq.graph)
+  
+  lapply(comps, function(x) {
+    unique(unlist(clq[ V(x)$name ]))
+  })
+}
+
+pause()
+
+### Apply it to a graph, this is the example graph from
+##  the original publication
+g <- graph.formula(A-B:F:C:E:D, B-A:D:C:E:F:G, C-A:B:F:E:D, D-A:B:C:F:E,
+                   E-D:A:C:B:F:V:W:U, F-H:B:A:C:D:E, G-B:J:K:L:H,
+                   H-F:G:I:J:K:L, I-J:L:H, J-I:G:H:L, K-G:H:L:M,
+                   L-H:G:I:J:K:M, M-K:L:Q:R:S:P:O:N, N-M:Q:R:P:S:O,
+                   O-N:M:P, P-Q:M:N:O:S, Q-M:N:P:V:U:W:R, R-M:N:V:W:Q,
+                   S-N:P:M:U:W:T, T-S:V:W:U, U-E:V:Q:S:W:T,
+                   V-E:U:W:T:R:Q, W-U:E:V:Q:R:S:T)
+g <- simplify(g)
+
+pause()
+
+### Hand-made layout to make it look like the original in the paper
+lay <- c(387.0763, 306.6947, 354.0305, 421.0153, 483.5344, 512.1145, 
+         148.6107, 392.4351, 524.6183, 541.5878, 240.6031, 20, 
+         65.54962, 228.0992, 61.9771, 152.1832, 334.3817, 371.8931, 
+         421.9084, 265.6107, 106.6336, 57.51145, 605, 20, 124.8780, 
+         273.6585, 160.2439, 241.9512, 132.1951, 123.6585, 343.1707, 
+         465.1220, 317.561, 216.3415, 226.0976, 343.1707, 306.5854, 
+         123.6585, 360.2439, 444.3902, 532.1951, 720, 571.2195, 
+         639.5122, 505.3659, 644.3902)
+lay <- matrix(lay, nc=2)
+lay[,2] <- max(lay[,2])-lay[,2]
+
+pause()
+
+### Take a look at it
+layout(1)
+plot(g, layout=lay, vertex.label=V(g)$name)
+
+pause()
+
+### Calculate communities
+res <- clique.community(g, k=4)
+
+pause()
+
+### Paint them to different colors
+colbar <- rainbow( length(res)+1 )
+for (i in seq(along=res)) {
+  V(g)[ res[[i]] ]$color <- colbar[i+1]
+}
+
+pause()
+
+### Paint the vertices in multiple communities to red
+V(g)[ unlist(res)[ duplicated(unlist(res)) ] ]$color <- "red"
+
+pause()
+
+### Plot with the new colors
+plot(g, layout=lay, vertex.label=V(g)$name)
+
