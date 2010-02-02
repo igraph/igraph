@@ -35,7 +35,14 @@
 #endif
 
 #include "igraph_types.h"
-#include <stdint.h>
+
+#ifdef HAVE_STDINT_H
+#  include <stdint.h>
+#else
+#  if HAVE_SYS_INT_TYPES_H
+#    include <sys/int_types.h>    /* for Solaris */
+#  endif
+#endif
 
 __BEGIN_DECLS
 

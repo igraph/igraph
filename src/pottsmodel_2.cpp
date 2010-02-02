@@ -1660,7 +1660,7 @@ void PottsModelN::assign_initial_conf(bool init_spins)
 		degree_community_pos_out[i]	= 0.0;
 		degree_community_neg_out[i]	= 0.0;
 		
-		csize[i]					= 0.0;
+		csize[i]					= 0;
 	}
 	
 	//Initialize vectors
@@ -1915,7 +1915,7 @@ double PottsModelN::HeatBathLookup(double gamma, double lambda, double t, unsign
 			for (spin_opt=1; spin_opt<=q; spin_opt++)  // all possible new spins
 			{
 				weights[spin_opt] -= maxweight;  //subtract maxweight for numerical stability (otherwise overflow).
-				weights[spin_opt]  = exp(beta*weights[spin_opt]);
+				weights[spin_opt]  = exp((double)(beta*weights[spin_opt]));
 				sum_weights   += weights[spin_opt];
 			}   // for spin
 			/*******************************************/

@@ -808,7 +808,7 @@ void graph::Solve_Analytic( int node_ind, float &pos_x, float &pos_y,
    // Don't cut at end of scale
    if ( CUT_END >= 39500 ) return;
 
-   float num_connections = sqrtf(neighbors[node_ind].size());
+   float num_connections = (float)sqrt(neighbors[node_ind].size());
    float maxLength = 0;
 
    map<int, float>::iterator maxIndex;

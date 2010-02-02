@@ -25,8 +25,12 @@
 #include "config.h"
 #ifdef HAVE_STDINT_H
 #  include <stdint.h>
-#else 
-#  include "pstdint.h"
+#else
+#  ifdef HAVE_SYS_INT_TYPES_H
+#    include <sys/int_types.h>
+#  else
+#    include "pstdint.h"
+#  endif
 #endif
 #include <stdlib.h>
 #include <string.h>
