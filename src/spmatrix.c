@@ -878,6 +878,9 @@ int igraph_spmatrix_iter_reset(igraph_spmatrix_iter_t *mit) {
 int igraph_spmatrix_iter_next(igraph_spmatrix_iter_t *mit) {
   mit->pos++;
 
+  if (igraph_spmatrix_iter_end(mit))
+      return 0;
+
   mit->ri = (long int)VECTOR(mit->m->ridx)[mit->pos];
   mit->value = VECTOR(mit->m->data)[mit->pos];
 
