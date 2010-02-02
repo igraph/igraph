@@ -110,6 +110,12 @@ graph.famous(name)
     \item{Walther}{An identity graph with 25 vertices and 31
       edges. An identity graph has a single graph automorphism,
       the trivial one.}
+    \item{Zachary}{Social network of friendships between 34 members of a
+      karate club at a US university in the 1970s. See
+      W. W. Zachary, An information flow model for conflict and
+      fission in small groups, Journal of Anthropological
+      Research 33, 452-473 (1977).
+    }
   }
 }
 \value{A graph object.}
