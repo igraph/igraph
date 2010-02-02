@@ -107,24 +107,18 @@
 
 </ul>
 
-<h3>Debian Linux packages</h3>
+<h3>Debian/Ubuntu Linux packages</h3>
 
-<p><a href="http://debian.org">Debian Linux</a> users may also benefit from
-our Debian package repository. The <i>igraph C library</i> and its Python
-interface can be installed and automatically updated using the standard
-Debian package manager. Just add the following two lines to
-<code>/etc/apt/sources.list</code> and install
-the <code>libigraph</code>, <code>libigraph-dev</code> and
-<code>python-igraph</code> packages:</p>
-
-<pre class="programlisting">
-deb http://cneurocvs.rmki.kfki.hu /packages/binary/
-deb-src http://cneurocvs.rmki.kfki.hu /packages/source/
-</pre>
-
-<p>The binary packages are built for the <code>i386</code> architecture.
-Source packages should compile on <code>x86_64</code> and <code>amd64</code>
-architectures as well.</p>
+<p>
+Debian/Ubuntu packages for igraph and its Python interface are
+available for both i386, amd64 and lpia archtectures from Launchpad.
+See the page of the package archive at
+<a href="https://launchpad.net/~igraph/+archive/ppa">
+https://launchpad.net/~igraph/+archive/ppa</a> for more
+instructions. The old package archive at
+<a href="http://cneurocvs.rmki.kfki.hu/packages">
+http://cneurocvs.rmki.kfki.hu/packages</a> is not updated any
+more.
 
 <h3>Fedora Project packages</h3>
 
