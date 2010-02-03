@@ -211,7 +211,7 @@ class VertexClustering(Clustering):
           be equal to the number of vertices in the graph. If C{None}, every
           vertex is assumed to belong to the same cluster.
         @param modularity: the modularity score of the clustering. If C{None},
-          it will be calculated.
+          it will be calculated when needed.
         @param params: additional parameters to be stored in this object.
         """
         self._graph = graph
@@ -223,10 +223,7 @@ class VertexClustering(Clustering):
                 raise ValueError, "membership list has invalid length"
             Clustering.__init__(self, membership, params)
 
-        if modularity is None:
-            self._q = graph.modularity(membership)
-        else:
-            self._q = modularity
+        self._q = modularity
 
     def FromAttribute(klass, graph, attribute, intervals=None, params={}):
         """Creates a vertex clustering based on the value of a vertex attribute.
@@ -273,11 +270,15 @@ class VertexClustering(Clustering):
             vec = [safeintdiv(x, intervals) for x in graph.vs[attribute]]
 
         idgen = UniqueIdGenerator()
+        idgen[None] = None
         vec = [idgen[i] for i in vec]
         return klass(graph, vec, None, params)
     FromAttribute = classmethod(FromAttribute)
 
-    def _get_modularity(self): return self._q
+    def _get_modularity(self):
+        if self._q is None:
+            self._q = self._graph.modularity(self.membership)
+        return self._q
     modularity = property(_get_modularity, doc = "The modularity score")
     q = modularity
 

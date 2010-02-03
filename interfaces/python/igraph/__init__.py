@@ -2631,10 +2631,16 @@ def compare_communities(comm1, comm2, method="vi", remove_none=False):
         raise ValueError, "the two membership vectors must be equal in length"
 
     if remove_none and (None in vec1 or None in vec2):
-        valid_idxs = [i for i in xrange(len(vec1)) \
-                if vec1[i] is not None and vec2[i] is not None]
-        vec1 = [vec1[i] for i in valid_idxs]
-        vec2 = [vec2[i] for i in valid_idxs]
+        idxs_to_remove = [i for i in xrange(len(vec1)) \
+                if vec1[i] is None or vec2[i] is None]
+        idxs_to_remove.reverse()
+        n = len(vec1)
+        for i in idxs_to_remove:
+            n -= 1
+            vec1[i], vec1[n] = vec1[n], vec1[i]
+            vec2[i], vec2[n] = vec2[n], vec2[i]
+        del vec1[n:]
+        del vec2[n:]
 
     return core._compare_communities(vec1, vec2, method)
 

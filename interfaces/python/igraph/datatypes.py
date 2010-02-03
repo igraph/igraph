@@ -629,6 +629,10 @@ class UniqueIdGenerator(object):
             self._ids[item] = self._generator.next()
             return self._ids[item]
 
+    def __setitem__(self, item, value):
+        """Overrides the ID for `item`."""
+        self._ids[item] = value
+
     def __len__(self):
         """"Returns the number of items"""
         return len(self._ids)
