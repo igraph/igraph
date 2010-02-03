@@ -2592,23 +2592,51 @@ _add_proxy_methods()
 
 ##############################################################
 
-def compare_communities(comm1, comm2, method="vi"):
+def compare_communities(comm1, comm2, method="vi", remove_none=False):
     """Compares two community structures using various distance measures.
 
     @param comm1: the first community structure as a membership list or
       as a L{Clustering} object.
     @param comm2: the second community structure as a membership list or
       as a L{Clustering} object.
-    @param method: the measure to use. Currently the only available measure
-      is the variation of information metric of Meila et al, this can be
-      selected by passing C{"vi"} here.
+    @param method: the measure to use. C{"vi"} or C{"meila"} means the
+      variation of information metric of Meila (2003), C{"nmi"} or C{"danon"}
+      means the normalized mutual information as defined by Danon et al (2005).
+    @param remove_none: whether to remove C{None} entries from the membership
+      lists. This is handy if your L{Clustering} object was constructed using
+      L{VertexClustering.FromAttribute} using an attribute which was not defined
+      for all the vertices. If C{remove_none} is C{False}, a C{None} entry in
+      either C{comm1} or C{comm2} will result in an exception. If C{remove_none}
+      is C{True}, C{None} values are filtered away and only the remaining lists
+      are compared.
+
     @return: the calculated measure.
+    @newfield ref: Reference
+    @ref: Meila M: Comparing clusterings by the variation of information.
+          In: Scholkopf B, Warmuth MK (eds). Learning Theory and Kernel
+          Machines: 16th Annual Conference on Computational Learning Theory
+          and 7th Kernel Workship, COLT/Kernel 2003, Washington, DC, USA.
+          Lecture Notes in Computer Science, vol. 2777, Springer, 2003.
+          ISBN: 978-3-540-40720-1.
+    @ref: Danon L, Diaz-Guilera A, Duch J, Arenas A: Comparing community
+          structure identification. J Stat Mech P09008, 2005.
     """
     def _ensure_list(obj):
         if isinstance(obj, Clustering):
             return obj.membership
         return list(obj)
-    return core._compare_communities(_ensure_list(comm1), _ensure_list(comm2), method)
+
+    vec1, vec2 = _ensure_list(comm1), _ensure_list(comm2)
+    if len(vec1) != len(vec2):
+        raise ValueError, "the two membership vectors must be equal in length"
+
+    if remove_none and (None in vec1 or None in vec2):
+        valid_idxs = [i for i in xrange(len(vec1)) \
+                if vec1[i] is not None and vec2[i] is not None]
+        vec1 = [vec1[i] for i in valid_idxs]
+        vec2 = [vec2[i] for i in valid_idxs]
+
+    return core._compare_communities(vec1, vec2, method)
 
 ##############################################################
 

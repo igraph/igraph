@@ -177,6 +177,8 @@ int igraphmodule_PyObject_to_community_comparison_t(PyObject *o,
   static igraphmodule_enum_translation_table_entry_t commcmp_tt[] = {
         {"vi", IGRAPH_COMMCMP_VI},
         {"meila", IGRAPH_COMMCMP_VI},
+        {"nmi", IGRAPH_COMMCMP_NMI},
+        {"danon", IGRAPH_COMMCMP_NMI},
         {0,0}
     };
 

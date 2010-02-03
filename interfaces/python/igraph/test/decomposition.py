@@ -198,6 +198,21 @@ class ComparisonTests(unittest.TestCase):
         self.assertAlmostEqual(compare_communities(l1, l2), math.log(6), places=3)
         self.failUnless(compare_communities(l1, l1) == 0.)
 
+    def testCompareNMI(self):
+        l1 = Clustering([1, 1, 1, 2, 2, 2])
+        l2 = Clustering([1, 1, 2, 2, 3, 3])
+        self.assertAlmostEqual(compare_communities(l1, l2, "nmi"), 0.5158, places=3)
+        l1 = [1, 1, 1, 1, 1, 1]
+        l2 = [1, 2, 3, 5, 6, 7]
+        self.failUnless(compare_communities(l1, l2, "nmi") == 0)
+        self.failUnless(compare_communities(l1, l1, "nmi") == 1.)
+
+    def testRemoveNone(self):
+        l1 = Clustering([1, 1, 1, None, None, 2, 2, 2, 2])
+        l2 = Clustering([1, 1, 2,    2, None, 2, 3, 3, None])
+        self.assertAlmostEqual(compare_communities(l1, l2, "nmi", remove_none=True), \
+                0.5158, places=3)
+
 def suite():
     decomposition_suite = unittest.makeSuite(DecompositionTests)
     clustering_suite = unittest.makeSuite(ClusteringTests)

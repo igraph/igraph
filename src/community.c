@@ -2579,6 +2579,8 @@ int igraph_community_multilevel(const igraph_t *graph,
 
 int igraph_i_compare_communities_vi(igraph_vector_t *v1, igraph_vector_t *v2,
     igraph_real_t* result);
+int igraph_i_compare_communities_nmi(igraph_vector_t *v1, igraph_vector_t *v2,
+    igraph_real_t* result);
 
 /**
  * \ingroup communities
@@ -2586,20 +2588,30 @@ int igraph_i_compare_communities_vi(igraph_vector_t *v1, igraph_vector_t *v2,
  * \brief Compares community structures using various metrics
  *
  * This function assesses the distance between two community structures using
- * the variation of information (VI) metric of Meila (2003).
+ * either the variation of information (VI) metric of Meila (2003) or the
+ * normalized mutual information (NMI) proposed by Danon et al (2005).
+ *
  * </para><para>
- * Reference: Meila M: Comparing clusterings by the variation of information.
+ * References:
+ *
+ * </para><para>
+ * Meila M: Comparing clusterings by the variation of information.
  * In: Schölkopf B, Warmuth MK (eds.). Learning Theory and Kernel Machines:
  * 16th Annual Conference on Computational Learning Theory and 7th Kernel
  * Workshop, COLT/Kernel 2003, Washington, DC, USA. Lecture Notes in Computer
  * Science, vol. 2777, Springer, 2003. ISBN: 978-3-540-40720-1.
  *
+ * </para><para>
+ * Danon L, Diaz-Guilera A, Duch J, Arenas A: Comparing community structure
+ * identification. J Stat Mech P09008, 2005.
+ *
  * \param  comm1   the membership vector of the first community structure
  * \param  comm2   the membership vector of the first community structure
- * \param  method  the comparison method to use. Currently only the
- *                 variation of information (VI) metric of Meila (2003)
- *                 is implemented. If you want to use this metric, pass
- *                 \c IGRAPH_COMMCMP_VI here.
+ * \param  method  the comparison method to use. \c IGRAPH_COMMCMP_VI
+ *                 selects the variation of information (VI) metric of
+ *                 Meila (2003), while \c IGRAPH_COMMCMP_NMI selects the
+ *                 normalized mutual information measure proposed by
+ *                 Danon et al (2005).
  *
  * \return  Error code.
  *
@@ -2628,6 +2640,11 @@ int igraph_compare_communities(const igraph_vector_t *comm1,
     case IGRAPH_COMMCMP_VI:
       IGRAPH_CHECK(igraph_i_compare_communities_vi(&c1, &c2, result));
       break;
+
+    case IGRAPH_COMMCMP_NMI:
+      IGRAPH_CHECK(igraph_i_compare_communities_nmi(&c1, &c2, result));
+      break;
+
     default:
       IGRAPH_ERROR("unknown community comparison method", IGRAPH_EINVAL);
   }
@@ -2641,8 +2658,108 @@ int igraph_compare_communities(const igraph_vector_t *comm1,
 }
 
 /**
+ * Calculates the entropy and the mutual information for two reindexed community
+ * membership vectors v1 and v2. This is needed by both Meila's and Danon's
+ * community comparison measure.
+ */
+int igraph_i_entropy_and_mutual_information(igraph_vector_t* v1, igraph_vector_t* v2,
+    double* h1, double* h2, double* mut_inf) {
+  long int i, n = igraph_vector_size(v1);
+  long int k1 = (long int)igraph_vector_max(v1)+1;
+  long int k2 = (long int)igraph_vector_max(v2)+1;
+  double *p1, *p2;
+  igraph_spmatrix_t m;
+  igraph_spmatrix_iter_t mit;
+
+  p1 = igraph_Calloc(k1, double);
+  if (p1 == 0) {
+    IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(free, p1);
+  p2 = igraph_Calloc(k2, double);
+  if (p2 == 0) {
+    IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(free, p2);
+
+  /* Calculate the entropy of v1 */
+  *h1 = 0.0;
+  for (i = 0; i < n; i++)
+    p1[(long int)VECTOR(*v1)[i]]++;
+  for (i = 0; i < k1; i++) {
+    p1[i] /= n;
+    *h1 -= p1[i] * log(p1[i]);
+  }
+
+  /* Calculate the entropy of v2 */
+  *h2 = 0.0;
+  for (i = 0; i < n; i++)
+    p2[(long int)VECTOR(*v2)[i]]++;
+  for (i = 0; i < k2; i++) {
+    p2[i] /= n;
+    *h2 -= p2[i] * log(p2[i]);
+  }
+
+  /* We will only need the logs of p1 and p2 from now on */
+  for (i = 0; i < k1; i++) {
+    p1[i] = log(p1[i]);
+  }
+  for (i = 0; i < k2; i++) {
+    p2[i] = log(p2[i]);
+  }
+
+  /* Calculate the mutual information of v1 and v2 */
+  *mut_inf = 0.0;
+  IGRAPH_CHECK(igraph_spmatrix_init(&m, k1, k2));
+  IGRAPH_FINALLY(igraph_spmatrix_destroy, &m);
+  for (i = 0; i < n; i++) {
+    IGRAPH_CHECK(igraph_spmatrix_add_e(&m,
+          (int)VECTOR(*v1)[i], (int)VECTOR(*v2)[i], 1));
+  }
+  IGRAPH_CHECK(igraph_spmatrix_iter_create(&mit, &m));
+  while (!igraph_spmatrix_iter_end(&mit)) {
+    double p = mit.value / n;
+    *mut_inf += p * (log(p) - p1[mit.ri] - p2[mit.ci]);
+    igraph_spmatrix_iter_next(&mit);
+  }
+  IGRAPH_FINALLY(igraph_spmatrix_iter_destroy, &mit);
+
+  igraph_spmatrix_iter_destroy(&mit);
+  igraph_spmatrix_destroy(&m);
+  free(p1); free(p2);
+
+  IGRAPH_FINALLY_CLEAN(4);
+
+  return 0;
+}
+
+/**
  * Implementation of the variation of information metric (VI) of
  * Meila et al. This function assumes that the community membership
+ * vectors have already been normalized using igraph_reindex_communities().
+ *
+ * Reference: Danon L, Diaz-Guilera A, Duch J, Arenas A: Comparing community
+ * structure identification. J Stat Mech P09008, 2005.
+ *
+ * Time complexity: O(n log(n))
+ */
+int igraph_i_compare_communities_nmi(igraph_vector_t *v1, igraph_vector_t *v2,
+    igraph_real_t* result) {
+  double h1, h2, mut_inf;
+
+  IGRAPH_CHECK(igraph_i_entropy_and_mutual_information(v1, v2, &h1, &h2, &mut_inf));
+
+  if (h1 == 0 && h2 == 0)
+    *result = 1;
+  else
+    *result = 2 * mut_inf / (h1 + h2);
+
+  return 0;
+}
+
+/**
+ * Implementation of the normalized mutual information (NMI) measure of
+ * Danon et al. This function assumes that the community membership
  * vectors have already been normalized using igraph_reindex_communities().
  *
  * Reference: Meila M: Comparing clusterings by the variation of information.
@@ -2655,73 +2772,10 @@ int igraph_compare_communities(const igraph_vector_t *comm1,
  */
 int igraph_i_compare_communities_vi(igraph_vector_t *v1, igraph_vector_t *v2,
     igraph_real_t* result) {
-  long int i, n = igraph_vector_size(v1);
-  long int k1 = (long int)igraph_vector_max(v1)+1;
-  long int k2 = (long int)igraph_vector_max(v2)+1;
-  double *p1, *p2;
-  igraph_spmatrix_t m;
-  igraph_spmatrix_iter_t mit;
-  double mut_inf, h1, h2;
+  double h1, h2, mut_inf;
 
-  p1 = igraph_Calloc(k1, double);
-  if (p1 == 0) {
-    IGRAPH_ERROR("igraph_i_compare_communities_vi failed", IGRAPH_ENOMEM);
-  }
-  IGRAPH_FINALLY(free, p1);
-  p2 = igraph_Calloc(k2, double);
-  if (p2 == 0) {
-    IGRAPH_ERROR("igraph_i_compare_communities_vi failed", IGRAPH_ENOMEM);
-  }
-  IGRAPH_FINALLY(free, p2);
-
-  /* Calculate the entropy of v1 */
-  h1 = 0.0;
-  for (i = 0; i < n; i++)
-    p1[(long int)VECTOR(*v1)[i]]++;
-  for (i = 0; i < k1; i++) {
-    p1[i] /= n;
-    h1 -= p1[i] * log(p1[i]);
-  }
-
-  /* Calculate the entropy of v2 */
-  h2 = 0.0;
-  for (i = 0; i < n; i++)
-    p2[(long int)VECTOR(*v2)[i]]++;
-  for (i = 0; i < k2; i++) {
-    p2[i] /= n;
-    h2 -= p2[i] * log(p2[i]);
-  }
-
-  /* We will only need the logs of p1 and p2 from now on */
-  for (i = 0; i < k1; i++) {
-    p1[i] = log(p1[i]);
-  }
-  for (i = 0; i < k2; i++) {
-    p2[i] = log(p2[i]);
-  }
-
-  /* Calculate the mutual information of v1 and v2 */
-  mut_inf = 0.0;
-  IGRAPH_CHECK(igraph_spmatrix_init(&m, k1, k2));
-  IGRAPH_FINALLY(igraph_spmatrix_destroy, &m);
-  for (i = 0; i < n; i++) {
-    IGRAPH_CHECK(igraph_spmatrix_add_e(&m,
-          (int)VECTOR(*v1)[i], (int)VECTOR(*v2)[i], 1));
-  }
-  IGRAPH_CHECK(igraph_spmatrix_iter_create(&mit, &m));
-  while (!igraph_spmatrix_iter_end(&mit)) {
-    double p = mit.value / n;
-    mut_inf += p * (log(p) - p1[mit.ri] - p2[mit.ci]);
-    igraph_spmatrix_iter_next(&mit);
-  }
-  IGRAPH_FINALLY(igraph_spmatrix_iter_destroy, &mit);
-
+  IGRAPH_CHECK(igraph_i_entropy_and_mutual_information(v1, v2, &h1, &h2, &mut_inf));
   *result = h1 + h2 - 2*mut_inf;
-
-  igraph_spmatrix_iter_destroy(&mit);
-  igraph_spmatrix_destroy(&m);
-  free(p1); free(p2);
-  IGRAPH_FINALLY_CLEAN(4);
 
   return 0;
 }

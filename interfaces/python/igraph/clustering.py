@@ -250,9 +250,9 @@ class VertexClustering(Clustering):
         """
         from bisect import bisect
 
-        def safeint(x):
+        def safeintdiv(x, y):
             if x is None: return None
-            return int(x)
+            return int(x / y)
 
         def safebisect(intervals, x):
             if x is None: return None
@@ -270,7 +270,7 @@ class VertexClustering(Clustering):
             vec = [safebisect(intervals, x) for x in graph.vs[attribute]]
         else:
             intervals = float(intervals)
-            vec = [safeint(x / intervals) for x in graph.vs[attribute]]
+            vec = [safeintdiv(x, intervals) for x in graph.vs[attribute]]
 
         idgen = UniqueIdGenerator()
         vec = [idgen[i] for i in vec]
