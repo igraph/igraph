@@ -163,4 +163,4 @@ ADJLIST:
 COMMCMP:
     INCONV: %I% <- switch(igraph.match.arg(%I%), "vi"=0, "nmi"=1)
     DEFAULT:
-       VI: c("vi")
+       VI: c("vi", "nmi")
