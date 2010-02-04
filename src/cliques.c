@@ -1095,7 +1095,7 @@ int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func
   igraph_vector_destroy(&best_fini_cand_nbrs);
   igraph_i_maximal_cliques_stack_frame_destroy(&frame);
   igraph_i_maximal_cliques_stack_destroy(&stack);
-  IGRAPH_FINALLY_CLEAN(8);
+  IGRAPH_FINALLY_CLEAN(9);
 
   return IGRAPH_SUCCESS;
 }
