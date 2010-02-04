@@ -220,12 +220,13 @@ igraph.from.graphNEL <- function(graphNEL, name=TRUE, weight=TRUE,
   
   al <- lapply(edgeL(graphNEL), "[[", "edges")
   if (edgemode(graphNEL)=="undirected") {
-    al <- mapply(seq_along(al), al, FUN=function(n, l) {
+    al <- mapply(SIMPLIFY=FALSE, seq_along(al), al, FUN=function(n, l) {
       c(l, rep(n, sum(l==n)))
     })
   }
   al <- lapply(al, function(x) x-1)
-  g <- graph.adjlist(al, directed= edgemode(graphNEL)=="directed")
+  mode <- if (edgemode(graphNEL)=="directed") "out" else "all"
+  g <- graph.adjlist(al, mode=mode, duplicate=TRUE)
   if (name) {
     V(g)$name <- nodes(graphNEL)
   }
