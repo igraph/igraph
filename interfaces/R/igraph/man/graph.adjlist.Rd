@@ -6,22 +6,25 @@
   graph object from such a list.
 }
 \usage{
-graph.adjlist(adjlist, directed = TRUE, duplicate = TRUE)
+graph.adjlist(adjlist, mode = c("out", "in", "all", "total"),
+              duplicate = TRUE)
 }
 \arguments{
   \item{adjlist}{The adjacency list. It should be consistent, i.e. the
     maximum throughout all vectors in the list must be less than the
     number of vectors (=the number of vertices in the graph). Note that
     the list is expected to be 0-indexed.}
-  \item{directed}{Logical scalar, whether or not to create a directed
-    graph.}
+  \item{mode}{Character scalar, it specifies whether the graph to create
+    is undirected (\sQuote{all} or \sQuote{total}) or directed; and in
+    the latter case, whether it contains the outgoing (\sQuote{out}) or
+    the incoming (\sQuote{in}) neighbors of the vertices.}
   \item{duplicate}{Logical scalar. For undirected graphs it gives
     whether edges are included in the list twice. E.g. if it is
     \code{TRUE} then for an undirected \code{{A,B}} edge
     \code{graph.adjlist} expects \code{A} included in the neighbors of
     \code{B} and \code{B} to be included in the neighbors of \code{A}.
 
-    This argument is ignored if \code{directed} is \code{TRUE}.
+    This argument is ignored if \code{mode} is \code{out} or \code{in}.
   }
 }
 \details{
@@ -49,10 +52,10 @@ graph.isomorphic(g, g2)
 ## Undirected
 g <- graph.ring(10)
 al <- get.adjlist(g)
-g2 <- graph.adjlist(al, dir=FALSE)
+g2 <- graph.adjlist(al, mode="all")
 graph.isomorphic(g, g2)
 ecount(g2)
-g3 <- graph.adjlist(al, dir=FALSE, duplicate=FALSE)
+g3 <- graph.adjlist(al, mode="all", duplicate=FALSE)
 ecount(g3)
 is.multiple(g3)
 }

@@ -147,7 +147,7 @@ igraph_lcf_vector:
         NAME-R: graph.lcf
 
 igraph_adjlist:
-        PARAMS: OUT GRAPH graph, ADJLIST adjlist, NEIMODE mode=ALL, \
+        PARAMS: OUT GRAPH graph, ADJLIST adjlist, NEIMODE mode=OUT, \
                 BOOLEAN duplicate=True
         NAME-R: graph.adjlist
 
