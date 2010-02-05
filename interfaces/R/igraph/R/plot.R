@@ -160,7 +160,7 @@ plot.igraph <- function(x,
     loop <- function(x0, y0, cx=x0, cy=y0, color, angle=0, label=NA,
                      width=1, arr=2, lty=1, arrow.size=arrow.size, arr.w=arr.w) {
 
-      rad <- angle/180*pi
+      rad <- angle
       center <- c(cx,cy)
       cp <- matrix( c(x0,y0, x0+.4,y0+.2, x0+.4,y0-.2, x0,y0),
                    nc=2, byrow=TRUE)
@@ -204,10 +204,10 @@ plot.igraph <- function(x,
     if (length(arrow.mode)>1) { arr <- arrow.mode[loops.e] }
     asize <- arrow.size
     if (length(arrow.size)>1) { asize <- arrow.size[loops.e] }
-    xx0 <- layout[loops.v,1] + cos(la/180*pi) * vs
-    yy0 <- layout[loops.v,2] + sin(la/180*pi) * vs
+    xx0 <- layout[loops.v,1] + cos(la) * vs
+    yy0 <- layout[loops.v,2] - sin(la) * vs
     mapply(loop, xx0, yy0,
-           color=ec, angle=la, label=loop.labels, lty=lty,
+           color=ec, angle=-la, label=loop.labels, lty=lty,
            width=ew, arr=arr, arrow.size=asize, arr.w=arrow.width)
   }
 
