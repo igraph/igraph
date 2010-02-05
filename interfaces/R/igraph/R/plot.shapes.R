@@ -114,9 +114,9 @@
 
     square.shift <- function(x0, y0, x1, y1, vsize) {
       m <- (y0-y1)/(x0-x1)
-      l <- cbind((-vsize+m*x1)/m , y1-vsize,
+      l <- cbind(x1-vsize/m , y1-vsize,
                  x1-vsize , y1-vsize*m,
-                 (vsize+m*x1)/m , y1+vsize,
+                 x1+vsize/m, y1+vsize,
                  x1+vsize , y1+vsize*m )
       
       v <- cbind(x1-vsize <= l[,1] & l[,1] <= x1+vsize &
