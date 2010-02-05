@@ -219,6 +219,7 @@ plot.igraph <- function(x,
     if (length(edge.lty)>1) { edge.lty <- edge.lty[nonloops.e] }
     if (length(arrow.mode)>1) { arrow.mode <- arrow.mode[nonloops.e] }
     if (length(arrow.size)>1) { arrow.size <- arrow.size[nonloops.e] }
+    if (length(curved)>1) { curved <- curved[nonloops.e] }
     if (length(unique(arrow.mode))==1) {
       igraph.Arrows(x0, y0, x1, y1, h.col=edge.color, sh.col=edge.color,
                     sh.lwd=edge.width, h.lwd=1, open=FALSE, code=arrow.mode,
