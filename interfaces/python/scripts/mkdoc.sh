@@ -25,6 +25,7 @@ epydoc --html -o html -v \
        --name="IGraph library" \
 	   --url="http://igraph.sourceforge.net" \
 	   --no-private \
+	   --exclude=igraph.test \
 	   $PACKAGES
 
 PDF=0
@@ -32,7 +33,7 @@ which latex >/dev/null && PDF=1
 
 if [ $PDF -eq 1 ]; then
   echo "Generating PDF documentation..."
-  epydoc --pdf -o pdf --inheritance=listed -v --name="IGraph library" --url="http://cneurocvs.rmki.kfki.hu/igraph" $PACKAGES
+  epydoc --pdf -o pdf --exclude=igraph.test --inheritance=listed -v --name="IGraph library" --url="http://cneurocvs.rmki.kfki.hu/igraph" $PACKAGES
 
   echo "Zipping HTML documentation..."
   cd html && zip ../python-igraph-docs.zip -r . && cd ..
@@ -44,7 +45,7 @@ fi
 
 if [ $SYNC -eq 1 ]; then
   echo "Syncing documentation to web"
-  rsync --delete -avz html/ ntamas@cneurocvs.rmki.kfki.hu:/var/www/igraph-new/doc/python/
+  rsync --delete -avz html/ ntamas,igraph@web.sourceforge.net:/home/groups/i/ig/igraph/htdocs/doc/python/
 fi
 
 cd "$PWD"
