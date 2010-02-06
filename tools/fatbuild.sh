@@ -224,7 +224,7 @@ if test x$configure_ppc = xyes; then
      sh ../../configure $CONFIG_PPC CC="$CC_PPC" CXX="$CXX_PPC" CFLAGS="$CFLAGS $CFLAGS_PPC" CPPFLAGS="$CPPFLAGS_PPC" LDFLAGS="$LFLAGS_PPC") || exit 2
 fi
 if test x$make_ppc = xyes; then
-    (cd fatbuild/ppc && ls include && make -j$NJOB) || exit 3
+    (cd fatbuild/ppc && ls src && make -j$NJOB) || exit 3
 fi
 
 #
@@ -235,7 +235,7 @@ if test x$configure_ppc64 = xyes; then
      sh ../../configure $CONFIG_PPC64 CC="$CC_PPC64" CXX="$CXX_PPC64" CFLAGS="$CFLAGS $CFLAGS_PPC64" CPPFLAGS="$CPPFLAGS_PPC64" LDFLAGS="$LFLAGS_PPC64") || exit 2
 fi
 if test x$make_ppc64 = xyes; then
-    (cd fatbuild/ppc64 && ls include && make -j$NJOB) || exit 3
+    (cd fatbuild/ppc64 && ls src && make -j$NJOB) || exit 3
 fi
 
 #
