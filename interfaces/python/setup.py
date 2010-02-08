@@ -6,7 +6,7 @@ except ImportError:
 from distutils.core import Extension
 from distutils.file_util import copy_file
 from distutils.util import get_platform
-from sys import version_info, exit, argv
+from sys import argv, version_info, exit
 import os.path
 import glob
 from os import mkdir
