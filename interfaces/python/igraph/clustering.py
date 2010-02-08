@@ -22,10 +22,11 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 
-from copy import copy, deepcopy
+from copy import deepcopy
 from StringIO import StringIO
 
 from igraph import community_to_membership
+from igraph.colors import ClusterColoringPalette
 from igraph.datatypes import UniqueIdGenerator
 from igraph.statistics import Histogram
 
@@ -89,7 +90,7 @@ class Clustering(object):
         """
         return self._len
 
-    def _get_membership(self): return deepcopy(self._membership)
+    def _get_membership(self): return self._membership[:]
     membership = property(_get_membership, doc = "The membership vector (read only)")
 
     def size(self, idx):
@@ -324,7 +325,22 @@ class VertexClustering(Clustering):
         ss = self.sizes()
         max_size = max(ss)
         return self.subgraph(ss.index(max_size))
-    
+
+    def __plot__(self, context, bbox, palette, *args, **kwds):
+        """Plots the clustering to the given Cairo context in the given bounding box.
+
+        This is done by calling L{Graph.__plot__()} with the same arguments, but
+        coloring the graph vertices according to the current clustering.
+
+        @see: L{Graph.__plot__()} for possible keyword arguments.
+        """
+        if "vertex_color" in kwds:
+            raise ValueError, "you are not allowed to define vertex colors when plotting a clustering"
+
+        palette = ClusterColoringPalette(len(self))
+        kwds["vertex_color"] = self.membership
+        return self._graph.__plot__(context, bbox, palette, *args, **kwds)
+
 
 class OverlappingVertexClustering(OverlappingClustering, VertexClustering):
     """Overlapping clustering of the vertex set of a graph.
@@ -680,7 +696,7 @@ class Dendrogram(Clustering):
                 context.line_to(x1, y1)
                 context.stroke()
 
-    def _get_merges(self): return copy(self._merges)
+    def _get_merges(self): return deepcopy(self._merges)
     merges = property(_get_merges, doc = "The performed merges in matrix format")
 
 class VertexDendrogram(VertexClustering, Dendrogram):
@@ -730,6 +746,26 @@ class VertexDendrogram(VertexClustering, Dendrogram):
         Dendrogram.__init__(self, merges)
         VertexClustering.__init__(self, graph, membership, maxmod, params)
 
+    def as_clustering(self, n=None):
+        """Cuts the dendrogram at the given level and returns a corresponding
+        L{VertexClustering} object.
+
+        @param n: the desired number of clusters. Merges are replayed from the
+          beginning until the membership vector has exactly M{n} distinct elements
+          or until there are no more recorded merges, whichever happens first.
+          If C{None}, the current membership vector will be used.
+        @return: a new L{VertexClustering} object.
+        """
+        if n is not None:
+            num_elts = self._graph.vcount()
+            membership = community_to_membership(self._merges, num_elts, num_elts-n)
+            idgen = UniqueIdGenerator()
+            membership = [idgen[m] for m in membership]
+        else:
+            membership = self.membership
+        return VertexClustering(self._graph, membership)
+
+
     def cut(self, n):
         """Cuts the dendrogram at a given level.
 
@@ -740,20 +776,10 @@ class VertexDendrogram(VertexClustering, Dendrogram):
         """
         num_elts = self._graph.vcount()
         membership = community_to_membership(self._merges, num_elts, num_elts-n)
-        
-        recoding = {}
-        n=0
-        for idx, m in enumerate(membership):
-            try:
-                v = recoding[m]
-            except KeyError:
-                recoding[m], v = n, n
-                n += 1
-            membership[idx] = v
- 
-        self._membership = membership
-        self._len = max(membership) + 1
-        return copy(membership)
+        idgen = UniqueIdGenerator()
+        self._membership = [idgen[m] for m in membership]
+        self._len = max(self._membership) + 1
+        return self._membership[:]
 
     def __plot__(self, context, bbox, palette, *args, **kwds):
         """Draws the vertex dendrogram on the given Cairo context
