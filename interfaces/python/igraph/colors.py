@@ -24,6 +24,8 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 
+from math import ceil
+
 __all__ = ["Palette", "GradientPalette", "AdvancedGradientPalette", \
     "color_name_to_rgb", "palettes", "known_colors"]
 
@@ -79,7 +81,10 @@ class Palette(object):
 
         @return: the color as an RGB triplet"""
         if isinstance(v, list): v=tuple(v)
-        if v in self._cache: return self._cache[v] 
+        try:
+            return self._cache[v]
+        except KeyError:
+            pass
         if isinstance(v, int) or isinstance(v, long):
             if v<0: raise ValueError, "color index must be non-negative"
             if v>=self._length: raise ValueError, "color index too large"
@@ -173,6 +178,66 @@ class AdvancedGradientPalette(GradientPalette):
         return (0., 0., 0.)
 
 
+class PrecalculatedPalette(Palette):
+    """A palette that returns colors from a pre-calculated list of colors"""
+
+    def __init__(self, l):
+        """Creates the palette backed by the given list. The list must contain
+        RGB triplets or color names, which will be resolved first by
+        L{color_name_to_rgb()}."""
+        Palette.__init__(self, len(l))
+        for idx, color in enumerate(l):
+            if isinstance(color, (str, unicode)):
+                color = color_name_to_rgb(color)
+            self._cache[idx] = color
+
+    def _get(self, v):
+        """This method will only be called if the requested color index is
+        outside the size of the palette. In that case, we throw an exception"""
+        raise ValueError, "palette index outside bounds: %s" % v
+
+
+class ClusterColoringPalette(PrecalculatedPalette):
+    """A palette suitable for coloring vertices when plotting a clustering.
+
+    This palette tries to make sure that the colors are easily distinguishable.
+    This is achieved by using a set of base colors and their lighter and darker
+    variants, depending on the number of elements in the palette.
+
+    When the desired size of the palette is less than or equal to the number of
+    base colors (denoted by M{n}), only the bsae colors will be used. When the
+    size of the palette is larger than M{n} but less than M{2*n}, the base colors
+    and their lighter variants will be used. Between M{2*n} and M{3*n}, the
+    base colors and their lighter and darker variants will be used. Above M{3*n},
+    more darker and lighter variants will be generated, but this makes the individual
+    colors less and less distinguishable.
+    """
+
+    def __init__(self, n):
+        base_colors = ["red", "green", "blue", "yellow", "magenta", "cyan", "#808080"]
+        base_colors = map(color_name_to_rgb, base_colors)
+
+        num_base_colors = len(base_colors)
+        colors = base_colors[:]
+
+        blocks_to_add = ceil(float(n - num_base_colors) / num_base_colors)
+        ratio = 1.0 / (ceil(blocks_to_add / 2.0) + 1)
+
+        adding_darker = True
+        r = ratio
+        while len(colors) < n:
+            if adding_darker:
+                new_block = [darken(color, r) for color in base_colors]
+            else:
+                new_block = [lighten(color, r) for color in base_colors]
+                r += ratio
+            colors.extend(new_block)
+            adding_darker = not adding_darker
+
+        colors = colors[0:n]
+        PrecalculatedPalette.__init__(self, colors)
+
+
 def _clamp(value, min, max):
     """Clamps the given value between min and max"""
     if value>max: return max
@@ -252,6 +317,33 @@ def color_name_to_rgb(color, palette=None):
     # At this point, the components are floats
     return tuple([_clamp(val, 0., 1.) for val in components])
 
+
+def darken(color, ratio=0.5):
+    """Creates a darker version of a color given by an RGB triplet.
+    
+    This is done by mixing the original color with black using the given
+    ratio. A ratio of 1.0 will yield a completely black color, a ratio
+    of 0.0 will yield the original color.
+    """
+    r, g, b = color
+    ratio = 1.0 - ratio
+    r *= ratio
+    g *= ratio
+    b *= ratio
+    return r, g, b
+
+def lighten(color, ratio=0.5):
+    """Creates a lighter version of a color given by an RGB triplet.
+    
+    This is done by mixing the original color with white using the given
+    ratio. A ratio of 1.0 will yield a completely white color, a ratio
+    of 0.0 will yield the original color.
+    """
+    r, g, b = color
+    r += (1.0 - r) * ratio
+    g += (1.0 - g) * ratio
+    b += (1.0 - b) * ratio
+    return r, g, b
 
 known_colors = \
 {   'alice blue': (0.94117647058823528, 0.97254901960784312, 1.0),

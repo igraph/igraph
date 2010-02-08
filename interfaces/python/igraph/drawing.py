@@ -182,7 +182,7 @@ class Plot(object):
     be available, depending on your C{pycairo} installation.
 
     A C{Plot} has an assigned default palette (see L{colors.Palette}) which
-    is used for plottingo bjects.
+    is used for plotting objects.
 
     A C{Plot} object also has a list of objects to be plotted with their
     respective bounding boxes, palettes and opacities. Palettes assigned
