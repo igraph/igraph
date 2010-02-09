@@ -1276,6 +1276,10 @@ igraph_bool_t FUNCTION(igraph_vector,is_equal)(const TYPE(igraph_vector) *lhs,
   }
 }
 
+igraph_bool_t FUNCTION(igraph_i_vector,binsearch_slice)(const TYPE(igraph_vector) *v,
+                                                        BASE what, long int *pos,
+                                                        long int start, long int end);
+
 /**
  * \ingroup vector
  * \function igraph_vector_binsearch
@@ -1304,40 +1308,37 @@ igraph_bool_t FUNCTION(igraph_vector,is_equal)(const TYPE(igraph_vector) *lhs,
 
 igraph_bool_t FUNCTION(igraph_vector,binsearch)(const TYPE(igraph_vector) *v, 
 						BASE what, long int *pos) {
-  long int left=0;
-  long int right=FUNCTION(igraph_vector,size)(v)-1;
+  return FUNCTION(igraph_i_vector,binsearch_slice)(v, what, pos,
+      0, FUNCTION(igraph_vector,size)(v));
+}
 
-  if (right < 0) {
-    if (pos != 0) *pos=0;
-	  return 0;
-  }
+igraph_bool_t FUNCTION(igraph_i_vector,binsearch_slice)(const TYPE(igraph_vector) *v,
+                                                        BASE what, long int *pos,
+                                                        long int start, long int end) {
+  long int left  = start;
+  long int right = end-1;
 
-  while (left < right-1) {
-    long int middle=(left+right)/2;
+  while (left <= right) {
+    /* (right + left) / 2 could theoretically overflow for long vectors */
+    long int middle = left + ((right - left) >> 1);
     if (VECTOR(*v)[middle] > what) {
-      right=middle;
+      right = middle - 1;
     } else if (VECTOR(*v)[middle] < what) {
-      left=middle;
+      left = middle + 1;
     } else {
-      left=middle;
-      break;
+      if (pos != 0) {
+        *pos = middle;
+      }
+      return 1;
     }
   }
 
-  if (VECTOR(*v)[left] < what) {
-    if (VECTOR(*v)[right] < what) left=right+1;
-    else left=right;
-  }
-  
+  /* if we are here, the element was not found */
   if (pos != 0) {
-    *pos=left;
+    *pos = left;
   }
-  
-  if (left < FUNCTION(igraph_vector,size)(v)) {
-    return VECTOR(*v)[left]==what;
-  } else { 
-    return 0;
-  }
+
+  return 0;
 }
 
 /**
@@ -1360,25 +1361,21 @@ igraph_bool_t FUNCTION(igraph_vector,binsearch)(const TYPE(igraph_vector) *v,
 igraph_bool_t FUNCTION(igraph_vector,binsearch2)(const TYPE(igraph_vector) *v, 
 						 BASE what) {
   long int left=0;
-  long int right=v->end - v->stor_begin-1;
+  long int right=FUNCTION(igraph_vector,size)(v)-1;
 
-  if (right<0) {
-    return 0;
-  }
-
-  while (left < right-1) {
-    long int middle=(left+right)/2;
-    if (VECTOR(*v)[middle] > what) {
-      right=middle;
-    } else if (VECTOR(*v)[middle] < what) {
-      left=middle;
+  while (left <= right) {
+    /* (right + left) / 2 could theoretically overflow for long vectors */
+    long int middle = left + ((right - left) >> 1);
+    if (what < VECTOR(*v)[middle]) {
+      right = middle - 1;
+    } else if (what > VECTOR(*v)[middle]) {
+      left = middle + 1;
     } else {
-      left=middle;
-      break;
+      return 1;
     }
   }
 
-  return VECTOR(*v)[left]==what || VECTOR(*v)[right]==what;
+  return 0;
 }
 
 /**
