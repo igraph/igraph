@@ -184,6 +184,13 @@ TOUNDIRECTED:
   INCONV:
     IN: shell_read_enum(&%C%, optarg, "each", 0, "collapse", 0);
 
+COMMCMP:
+  CTYPE: igraph_community_comparison_t
+  DEFAULT:
+    VI: IGRAPH_COMMCMP_VI
+  INCONV:
+    IN: shell_read_enum(&%C%, optarg, "vi", IGRAPH_COMMCMP_VI, "nmi", IGRAPH_COMMCMP_NMI);
+
 VCONNNEI:
   CTYPE: igraph_vconn_nei_t
   DEFAULT:
@@ -351,4 +358,10 @@ VECTORLIST_OR_0:
 VERTEX_COLOR:
 
 EDGE_COLOR:
+
+VERTEX:
+  CTYPE: igraph_integer_t
+  INCONV:
+    IN: shell_read_integer(&%C%, optarg);
+
 
