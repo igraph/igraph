@@ -109,6 +109,9 @@ int main() {
   print_vector(&v3, stdout);
   igraph_vector_intersect_sorted(&v1, &v2, &v3, 1);
   print_vector(&v3, stdout);
+  igraph_vector_intersect_sorted_2(&v1, &v2, &v3);
+  print_vector(&v3, stdout);
+
   igraph_vector_difference_sorted(&v1, &v2, &v3);
   print_vector(&v3, stdout);
   igraph_vector_difference_sorted(&v2, &v1, &v3);

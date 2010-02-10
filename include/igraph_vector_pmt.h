@@ -233,4 +233,6 @@ int FUNCTION(igraph_vector,difference_sorted)(const TYPE(igraph_vector) *v1,
 int FUNCTION(igraph_vector,intersect_sorted)(const TYPE(igraph_vector) *v1,
   const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result,
   igraph_bool_t keep_multiplicity);
+int FUNCTION(igraph_vector,intersect_sorted_2)(const TYPE(igraph_vector) *v1,
+  const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result);
 

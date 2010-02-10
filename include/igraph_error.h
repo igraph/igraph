@@ -535,8 +535,10 @@ int IGRAPH_FINALLY_STACK_SIZE(void);
 
 #if (defined(__GNUC__) && GCC_VERSION_MAJOR >= 3)
 #  define IGRAPH_UNLIKELY(a) __builtin_expect((a), 0)
+#  define IGRAPH_LIKELY(a)   __builtin_expect((a), 1)
 #else
 #  define IGRAPH_UNLIKELY(a) a
+#  define IGRAPH_LIKELY(a)   a
 #endif
 
 #define IGRAPH_CHECK(a) do { \
