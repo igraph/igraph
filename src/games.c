@@ -1942,7 +1942,7 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
 
       maxedges = v1_size * v2_size;
       if (!loops) {
-        IGRAPH_CHECK(igraph_vector_intersect_sorted_2(v1, v2, &intersect));
+        IGRAPH_CHECK(igraph_vector_intersect_sorted(v1, v2, &intersect));
         c = igraph_vector_size(&intersect);
         maxedges -= c; 
       }

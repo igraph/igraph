@@ -105,11 +105,7 @@ int main() {
   igraph_vector_init_int(&v2, 10, 1, 3, 3, 6, 6, 9, 12, 15, 17, 20);
   igraph_vector_init(&v3, 0);
 
-  igraph_vector_intersect_sorted(&v1, &v2, &v3, 0);
-  print_vector(&v3, stdout);
-  igraph_vector_intersect_sorted(&v1, &v2, &v3, 1);
-  print_vector(&v3, stdout);
-  igraph_vector_intersect_sorted_2(&v1, &v2, &v3);
+  igraph_vector_intersect_sorted(&v1, &v2, &v3);
   print_vector(&v3, stdout);
 
   igraph_vector_difference_sorted(&v1, &v2, &v3);

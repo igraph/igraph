@@ -988,8 +988,8 @@ int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func
     IGRAPH_CHECK(igraph_vector_insert(&frame.fini, j, i));
 
     /* Create new_cand and new_fini */
-    IGRAPH_CHECK(igraph_vector_intersect_sorted_2(&frame.cand, igraph_adjlist_get(&adj_list, i), &new_cand));
-    IGRAPH_CHECK(igraph_vector_intersect_sorted_2(&frame.fini, igraph_adjlist_get(&adj_list, i), &new_fini));
+    IGRAPH_CHECK(igraph_vector_intersect_sorted(&frame.cand, igraph_adjlist_get(&adj_list, i), &new_cand));
+    IGRAPH_CHECK(igraph_vector_intersect_sorted(&frame.fini, igraph_adjlist_get(&adj_list, i), &new_fini));
 
     /* Do we have anything more to search? */
     if (igraph_vector_empty(&new_cand)) {
@@ -1023,7 +1023,7 @@ int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func
     j = igraph_vector_size(&new_fini);
     for (i = 0; i < j; i++) {
       k = (long int)VECTOR(new_fini)[i];
-      IGRAPH_CHECK(igraph_vector_intersect_sorted_2(&new_cand, igraph_adjlist_get(&adj_list, k), &cn));
+      IGRAPH_CHECK(igraph_vector_intersect_sorted(&new_cand, igraph_adjlist_get(&adj_list, k), &cn));
       if (igraph_vector_size(&cn) > best_cand_degree) {
         best_cand_degree = igraph_vector_size(&cn);
         IGRAPH_CHECK(igraph_vector_update(&best_fini_cand_nbrs, &cn));
@@ -1045,7 +1045,7 @@ int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func
     l = l - 1;
     for (i = 0; i < j; i++) {
       k = (long int)VECTOR(new_cand)[i];
-      IGRAPH_CHECK(igraph_vector_intersect_sorted_2(&new_cand, igraph_adjlist_get(&adj_list, k), &cn));
+      IGRAPH_CHECK(igraph_vector_intersect_sorted(&new_cand, igraph_adjlist_get(&adj_list, k), &cn));
       if (igraph_vector_size(&cn) > best_cand_degree) {
         best_cand_degree = igraph_vector_size(&cn);
         IGRAPH_CHECK(igraph_vector_update(&best_cand_nbrs, &cn));

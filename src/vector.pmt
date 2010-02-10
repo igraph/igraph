@@ -1932,77 +1932,13 @@ igraph_bool_t FUNCTION(igraph_vector,isnull)(const TYPE(igraph_vector) *v) {
   return i==n;
 }
 
-/**
- * \function igraph_vector_intersect_sorted
- * \brief Calculates the intersection of two sorted vectors
- *
- * The elements that are contained in both vectors are stored in the result
- * vector. All three vectors must be initialized.
- *
- * \param v1 the first vector
- * \param v2 the second vector
- * \param result the result vector, which will also be sorted.
- * \param keep_multiplicity whether to preserve the multiplicity of the
- *   elements. If \c FALSE, all elements in the resulting vector will be
- *   unique. If \c TRUE and an element occurs \em k1 times in the first
- *   vector and \em k2 times in the second vector, the element will
- *   appear \em min(k1,k2) times in the result.
- *
- * Time complexity: O(n), where n is the number of elements in the longer vector
- */
-int FUNCTION(igraph_vector,intersect_sorted)(const TYPE(igraph_vector) *v1,
-    const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result,
-    igraph_bool_t keep_multiplicity) {
-  long int i, j, k, i0, j0;
-  i0 = FUNCTION(igraph_vector,size)(v1);
-  j0 = FUNCTION(igraph_vector,size)(v2);
-  i = j = 0;
-  FUNCTION(igraph_vector,clear)(result);
-
-  if (keep_multiplicity) {
-	/* keep multiplicity */
-    while (i < i0 && j < j0) {
-      BASE element;
-      if (VECTOR(*v1)[i] == VECTOR(*v2)[j]) {
-        element = VECTOR(*v1)[i];
-        i++; j++; k = 1;
-        while (i < i0 && j < j0 && VECTOR(*v1)[i] == element && VECTOR(*v2)[j] == element) {
-          i++; j++; k++;
-        }
-        while (i < i0 && VECTOR(*v1)[i] == element) { i++; }
-        while (j < j0 && VECTOR(*v2)[j] == element) { j++; }
-        while (k>0) {
-          FUNCTION(igraph_vector,push_back)(result, element);
-          k--;
-        }
-      } else if (VECTOR(*v1)[i] < VECTOR(*v2)[j]) i++;
-      else j++;
-	}
-  } else {
-    /* don't keep multiplicity */
-    while (i < i0 && j < j0) {
-      BASE element;
-      if (VECTOR(*v1)[i] == VECTOR(*v2)[j]) {
-        element = VECTOR(*v1)[i];
-        i++; j++;
-        while (i < i0 && VECTOR(*v1)[i] == element) { i++; }
-        while (j < j0 && VECTOR(*v2)[j] == element) { j++; }
-        FUNCTION(igraph_vector,push_back)(result, element);
-      } else if (VECTOR(*v1)[i] < VECTOR(*v2)[j]) i++;
-      else j++;
-	}
-  }
-
-  return 0;
-}
-
-int FUNCTION(igraph_i_vector,intersect_sorted_2)(
+int FUNCTION(igraph_i_vector,intersect_sorted)(
     const TYPE(igraph_vector) *v1, long int begin1, long int end1,
     const TYPE(igraph_vector) *v2, long int begin2, long int end2,
     TYPE(igraph_vector) *result);
 
 /**
- * \function igraph_vector_intersect_sorted_2
+ * \function igraph_vector_intersect_sorted
  * \brief Calculates the intersection of two sorted vectors
  *
  * The elements that are contained in both vectors are stored in the result
@@ -2011,8 +1947,14 @@ int FUNCTION(igraph_i_vector,intersect_sorted_2)(
  * </para><para>
  * Instead of the naive intersection which takes O(n), this function uses
  * the set intersection method of Ricardo Baeza-Yates, which is more efficient
- * when one of the vectors is significantly smaller than the other.
- * 
+ * when one of the vectors is significantly smaller than the other, and
+ * gives similar performance on average when the two vectors are equal.
+ *
+ * </para><para>
+ * The algorithm keeps the multiplicities of the elements: if an element appears
+ * k1 times in the first vector and k2 times in the second, the result
+ * will include that element min(k1, k2) times.
+ *
  * </para><para>
  * Reference: Baeza-Yates R: A fast set intersection algorithm for sorted
  * sequences. In: Lecture Notes in Computer Science, vol. 3109/2004, pp.
@@ -2025,7 +1967,7 @@ int FUNCTION(igraph_i_vector,intersect_sorted_2)(
  * Time complexity: O(m log(n)) where m is the size of the smaller vector
  * and n is the size of the larger one.
  */
-int FUNCTION(igraph_vector,intersect_sorted_2)(const TYPE(igraph_vector) *v1,
+int FUNCTION(igraph_vector,intersect_sorted)(const TYPE(igraph_vector) *v1,
     const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result) {
   long int size1, size2;
 
@@ -2037,12 +1979,12 @@ int FUNCTION(igraph_vector,intersect_sorted_2)(const TYPE(igraph_vector) *v1,
   if (size1 == 0 || size2 == 0)
     return 0;
 
-  IGRAPH_CHECK(FUNCTION(igraph_i_vector,intersect_sorted_2)(
+  IGRAPH_CHECK(FUNCTION(igraph_i_vector,intersect_sorted)(
     v1, 0, size1, v2, 0, size2, result));
   return 0;
 }
 
-int FUNCTION(igraph_i_vector,intersect_sorted_2)(
+int FUNCTION(igraph_i_vector,intersect_sorted)(
     const TYPE(igraph_vector) *v1, long int begin1, long int end1,
     const TYPE(igraph_vector) *v2, long int begin2, long int end2,
     TYPE(igraph_vector) *result) {
@@ -2057,36 +1999,28 @@ int FUNCTION(igraph_i_vector,intersect_sorted_2)(
   if (size1 < size2) {
     probe1 = begin1 + (size1 >> 1);      /* pick the median element */
     FUNCTION(igraph_i_vector,binsearch_slice)(v2, VECTOR(*v1)[probe1], &probe2, begin2, end2);
-    IGRAPH_CHECK(FUNCTION(igraph_i_vector,intersect_sorted_2)(
-        v1, begin1, probe1,
-        v2, begin2, probe2,
-        result
+    IGRAPH_CHECK(FUNCTION(igraph_i_vector,intersect_sorted)(
+        v1, begin1, probe1, v2, begin2, probe2, result
     ));
     if (!(probe2 == end2 || VECTOR(*v1)[probe1] < VECTOR(*v2)[probe2])) {
       IGRAPH_CHECK(FUNCTION(igraph_vector,push_back)(result, VECTOR(*v2)[probe2]));
       probe2++;
     }
-    IGRAPH_CHECK(FUNCTION(igraph_i_vector,intersect_sorted_2)(
-        v1, probe1+1, end1,
-        v2, probe2, end2,
-        result
+    IGRAPH_CHECK(FUNCTION(igraph_i_vector,intersect_sorted)(
+        v1, probe1+1, end1, v2, probe2, end2, result
     ));
   } else {
     probe2 = begin2 + (size2 >> 1);      /* pick the median element */
     FUNCTION(igraph_i_vector,binsearch_slice)(v1, VECTOR(*v2)[probe2], &probe1, begin1, end1);
-    IGRAPH_CHECK(FUNCTION(igraph_i_vector,intersect_sorted_2)(
-        v1, begin1, probe1,
-        v2, begin2, probe2,
-        result
+    IGRAPH_CHECK(FUNCTION(igraph_i_vector,intersect_sorted)(
+        v1, begin1, probe1, v2, begin2, probe2, result
     ));
     if (!(probe1 == end1 || VECTOR(*v2)[probe2] < VECTOR(*v1)[probe1])) {
       IGRAPH_CHECK(FUNCTION(igraph_vector,push_back)(result, VECTOR(*v2)[probe2]));
       probe1++;
     }
-    IGRAPH_CHECK(FUNCTION(igraph_i_vector,intersect_sorted_2)(
-        v1, probe1, end1,
-        v2, probe2+1, end2,
-        result
+    IGRAPH_CHECK(FUNCTION(igraph_i_vector,intersect_sorted)(
+        v1, probe1, end1, v2, probe2+1, end2, result
     ));
   }
 
