@@ -26,7 +26,7 @@ AT_KEYWORDS([igraph_layout_lgl LGL])
 AT_COMPILE_CHECK([simple/igraph_layout_lgl.c])
 AT_CLEANUP
 
-AT_SETUP([Reingold-Tilford tree layout (igraph_layout_reingold_tilford])
+AT_SETUP([Reingold-Tilford tree layout (igraph_layout_reingold_tilford):])
 AT_KEYWORDS([reingold tilford tree layout igraph_layout_reingold_tilford])
 AT_COMPILE_CHECK([simple/igraph_layout_reingold_tilford.c], [],
   [simple/igraph_layout_reingold_tilford.in])
