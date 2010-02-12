@@ -124,9 +124,6 @@ class CommunityTests(unittest.TestCase):
         g += [(0,5), (5,10), (10, 0)]
         cl = g.community_spinglass()
         self.failUnless(self.reindexMembership(cl) == [0,0,0,0,0,1,1,1,1,1,2,2,2,2,2])
-        cl = g.community_spinglass(spins=2)
-        self.failUnless(self.reindexMembership(cl) == [0,0,0,0,0,0,0,0,0,0,1,1,1,1,1] or
-                        self.reindexMembership(cl) == [0,0,0,0,0,1,1,1,1,1,1,1,1,1,1])
         
     def testWalktrap(self):
         g = Graph.Full(5) + Graph.Full(5) + Graph.Full(5)

@@ -548,7 +548,7 @@ class Graph(core.GraphBase):
           to vertices whose labeling should not change during the algorithm.
           It only makes sense if initial labels are also given. Unlabeled
           vertices cannot be fixed.
-        @return: the resulting membership vector
+        @return: an appropriate L{VertexClustering} object
 
         @newfield ref: Reference
         @ref: Raghavan, U.N. and Albert, R. and Kumara, S. Near linear
@@ -615,7 +615,7 @@ class Graph(core.GraphBase):
           balance between the importance of present and missing edges
           within a community. The default value of 1.0 assigns equal
           importance to both of them.
-        @return: the community membership vector.
+        @return: an appropriate L{VertexClustering} object
 
         @newfield ref: Reference
         @ref: Reichardt J and Bornholdt S: Statistical mechanics of
