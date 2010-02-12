@@ -946,7 +946,11 @@ int igraphmodule_i_get_string_graph_attr(const igraph_t *graph,
   o = PyDict_GetItemString(dict, name);
   if (!o) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   IGRAPH_CHECK(igraph_strvector_resize(value, 1));
-  result = PyObject_Str(o);
+  if (PyUnicode_Check(o)) {
+    result = PyUnicode_AsEncodedString(o, "utf-8", "xmlcharrefreplace");
+  } else {
+    result = PyObject_Str(o);
+  }
   if (result) {
     IGRAPH_CHECK(igraph_strvector_set(value, 0, PyString_AsString(result)));
     Py_DECREF(result);
@@ -1021,7 +1025,15 @@ int igraphmodule_i_get_string_vertex_attr(const igraph_t *graph,
     IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_VIT_SIZE(it)));
     while (!IGRAPH_VIT_END(it)) {
       long int v=IGRAPH_VIT_GET(it);
-      result = PyObject_Str(PyList_GetItem(list, v));
+      result = PyList_GetItem(list, v);
+      if (PyUnicode_Check(result)) {
+        result = PyUnicode_AsEncodedString(result, "utf-8", "xmlcharrefreplace");
+      } else {
+        result = PyObject_Str(result);
+      }
+      if (result == 0) {
+        IGRAPH_ERROR("Internal error in PyObject_Str", IGRAPH_EINVAL);
+      }
       igraph_strvector_set(value, i, PyString_AsString(result));
       Py_XDECREF(result);
       IGRAPH_VIT_NEXT(it);
@@ -1100,7 +1112,15 @@ int igraphmodule_i_get_string_edge_attr(const igraph_t *graph,
     IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_EIT_SIZE(it)));
     while (!IGRAPH_EIT_END(it)) {
       long int v=IGRAPH_EIT_GET(it);
-      result = PyObject_Str(PyList_GetItem(list, v));
+      result = PyList_GetItem(list, v);
+      if (PyUnicode_Check(result)) {
+        result = PyUnicode_AsEncodedString(result, "utf-8", "xmlcharrefreplace");
+      } else {
+        result = PyObject_Str(result);
+      }
+      if (result == 0) {
+        IGRAPH_ERROR("Internal error in PyObject_Str", IGRAPH_EINVAL);
+      }
       igraph_strvector_set(value, i, PyString_AsString(result));
       Py_XDECREF(result);
       IGRAPH_EIT_NEXT(it);
