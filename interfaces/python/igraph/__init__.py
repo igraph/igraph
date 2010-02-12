@@ -586,6 +586,45 @@ class Graph(core.GraphBase):
         if clusters is not None: d.cut(clusters)
         return d
 
+    def community_spinglass(self, *args, **kwds):
+        """community_spinglass(weights=None, spins=25, parupdate=False,
+        start_temp=1, stop_temp=0.01, cool_fact=0.99, update_rule="config",
+        gamma=1)
+
+        Finds the community structure of the graph according to the
+        spinglass community detection method of Reichardt & Bornholdt.
+
+        @param graph: the input graph. It can be directed, but the
+          direction of edges will be ignored.
+        @param weights: edge weights to be used. Can be a sequence or
+          iterable or even an edge attribute name.
+        @param spins: integer, the number of spins to use. This is the
+          upper limit for the number of communities. It is not a problem
+          to supply a (reasonably) big number here, in which case some
+          spin states will be unpopulated.
+        @param parupdate: whether to update the spins of the vertices in
+          parallel (synchronously) or not
+        @param start_temp: the starting temperature
+        @param stop_temp: the stop temperature
+        @param cool_fact: cooling factor for the simulated annealing
+        @param update_rule: specifies the null model of the simulation.
+          Possible values are C{"config"} (a random graph with the same
+          vertex degrees as the input graph) or C{"simple"} (a random
+          graph with the same number of edges)
+        @param gamma: the gamma argument of the algorithm, specifying the
+          balance between the importance of present and missing edges
+          within a community. The default value of 1.0 assigns equal
+          importance to both of them.
+        @return: the community membership vector.
+
+        @newfield ref: Reference
+        @ref: Reichardt J and Bornholdt S: Statistical mechanics of
+          community detection. Phys Rev E 74:016110 (2006).
+          U{http://arxiv.org/abs/cond-mat/0603718}.
+        """
+        membership = GraphBase.community_spinglass(self, *args, **kwds)
+        return VertexClustering(self, membership)
+
     def community_walktrap(self, weights=None, steps=4):
         """Community detection algorithm of Latapy & Pons, based on random walks.
         

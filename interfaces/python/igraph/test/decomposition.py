@@ -67,6 +67,10 @@ class OverlappingClusteringTests(unittest.TestCase):
 
 
 class CommunityTests(unittest.TestCase):
+    def reindexMembership(self, cl):
+        idgen = UniqueIdGenerator()
+        return [idgen[i] for i in cl.membership]
+
     def testClauset(self):
         g = Graph.Full(5) + Graph.Full(5)
         g.add_edges([(0, 5)])
@@ -115,6 +119,15 @@ class CommunityTests(unittest.TestCase):
                         cl.membership == [0, 1, 1, 1] or \
                         cl.membership == [0, 0, 0, 1])
 
+    def testSpinglass(self):
+        g = Graph.Full(5) + Graph.Full(5) + Graph.Full(5)
+        g += [(0,5), (5,10), (10, 0)]
+        cl = g.community_spinglass()
+        self.failUnless(self.reindexMembership(cl) == [0,0,0,0,0,1,1,1,1,1,2,2,2,2,2])
+        cl = g.community_spinglass(spins=2)
+        self.failUnless(self.reindexMembership(cl) == [0,0,0,0,0,0,0,0,0,0,1,1,1,1,1] or
+                        self.reindexMembership(cl) == [0,0,0,0,0,1,1,1,1,1,1,1,1,1,1])
+        
     def testWalktrap(self):
         g = Graph.Full(5) + Graph.Full(5) + Graph.Full(5)
         g += [(0,5), (5,10), (10, 0)]

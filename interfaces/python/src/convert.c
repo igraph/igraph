@@ -186,6 +186,19 @@ int igraphmodule_PyObject_to_degseq_t(PyObject *o,
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts a Python object to an igraph \c igraph_spincomm_update_t
+ */
+int igraphmodule_PyObject_to_spincomm_update_t(PyObject *o, igraph_spincomm_update_t *result) {
+  static igraphmodule_enum_translation_table_entry_t spincomm_update_tt[] = {
+        {"simple", IGRAPH_SPINCOMM_UPDATE_SIMPLE},
+        {"config", IGRAPH_SPINCOMM_UPDATE_CONFIG}
+  };
+
+  return igraphmodule_PyObject_to_enum(o, spincomm_update_tt, (int*)result);
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts a Python object to an igraph \c igraph_tree_mode_t
  */
 int igraphmodule_PyObject_to_tree_mode_t(PyObject *o,
