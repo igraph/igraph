@@ -202,6 +202,30 @@ int igraphmodule_PyObject_to_degseq_t(PyObject *o,
 }
 
 /**
+ * \brief Converts a Python object to an igraph \c igraph_spinglass_implementation_t
+ */
+int igraphmodule_PyObject_to_spinglass_implementation_t(PyObject *o, igraph_spinglass_implementation_t *result) {
+  static igraphmodule_enum_translation_table_entry_t spinglass_implementation_tt[] = {
+        {"original", IGRAPH_SPINCOMM_IMP_ORIG},
+        {"negative", IGRAPH_SPINCOMM_IMP_NEG}
+  };
+
+  return igraphmodule_PyObject_to_enum(o, spinglass_implementation_tt, (int*)result);
+}
+
+/**
+ * \brief Converts a Python object to an igraph \c igraph_spincomm_update_t
+ */
+int igraphmodule_PyObject_to_spincomm_update_t(PyObject *o, igraph_spincomm_update_t *result) {
+  static igraphmodule_enum_translation_table_entry_t spincomm_update_tt[] = {
+        {"simple", IGRAPH_SPINCOMM_UPDATE_SIMPLE},
+        {"config", IGRAPH_SPINCOMM_UPDATE_CONFIG}
+  };
+
+  return igraphmodule_PyObject_to_enum(o, spincomm_update_tt, (int*)result);
+}
+
+/**
  * \ingroup python_interface_conversion
  * \brief Converts a Python object to an igraph \c igraph_star_mode_t
  */

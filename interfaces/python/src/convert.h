@@ -50,6 +50,8 @@ int igraphmodule_PyObject_to_community_comparison_t(PyObject *obj,
 int igraphmodule_PyObject_to_connectedness_t(PyObject *o, igraph_connectedness_t *result);
 int igraphmodule_PyObject_to_degseq_t(PyObject *o, igraph_degseq_t *result);
 int igraphmodule_PyObject_to_neimode_t(PyObject *o, igraph_neimode_t *result);
+int igraphmodule_PyObject_to_spinglass_implementation_t(PyObject *o, igraph_spinglass_implementation_t *result);
+int igraphmodule_PyObject_to_spincomm_update_t(PyObject *o, igraph_spincomm_update_t *result);
 int igraphmodule_PyObject_to_star_mode_t(PyObject *o, igraph_star_mode_t *result);
 int igraphmodule_PyObject_to_transitivity_mode_t(PyObject *o, igraph_transitivity_mode_t *result);
 int igraphmodule_PyObject_to_tree_mode_t(PyObject *o, igraph_tree_mode_t *result);

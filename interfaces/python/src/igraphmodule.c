@@ -1009,7 +1009,7 @@ int igraphmodule_i_get_string_graph_attr(const igraph_t *graph,
   if (!o) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   IGRAPH_CHECK(igraph_strvector_resize(value, 1));
   if (PyUnicode_Check(o)) {
-    result = PyUnicode_AsUTF8String(o);
+    result = PyUnicode_AsEncodedString(o, "utf-8", "xmlcharrefreplace");
   } else {
     result = PyObject_Str(o);
   }
@@ -1087,11 +1087,14 @@ int igraphmodule_i_get_string_vertex_attr(const igraph_t *graph,
     IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_VIT_SIZE(it)));
     while (!IGRAPH_VIT_END(it)) {
       long int v=IGRAPH_VIT_GET(it);
-      PyObject* item = PyList_GetItem(list, v);
-      if (PyUnicode_Check(item)) {
-        result = PyUnicode_AsUTF8String(item);
+      result = PyList_GetItem(list, v);
+      if (PyUnicode_Check(result)) {
+        result = PyUnicode_AsEncodedString(result, "utf-8", "xmlcharrefreplace");
       } else {
-        result = PyObject_Str(item);
+        result = PyObject_Str(result);
+      }
+      if (result == 0) {
+        IGRAPH_ERROR("Internal error in PyObject_Str", IGRAPH_EINVAL);
       }
       igraph_strvector_set(value, i, PyString_AsString(result));
       Py_XDECREF(result);
@@ -1171,11 +1174,14 @@ int igraphmodule_i_get_string_edge_attr(const igraph_t *graph,
     IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_EIT_SIZE(it)));
     while (!IGRAPH_EIT_END(it)) {
       long int v=IGRAPH_EIT_GET(it);
-      PyObject *item = PyList_GetItem(list, v);
-      if (PyUnicode_Check(item)) {
-        result = PyUnicode_AsUTF8String(item);
+      result = PyList_GetItem(list, v);
+      if (PyUnicode_Check(result)) {
+        result = PyUnicode_AsEncodedString(result, "utf-8", "xmlcharrefreplace");
       } else {
-        result = PyObject_Str(item);
+        result = PyObject_Str(result);
+      }
+      if (result == 0) {
+        IGRAPH_ERROR("Internal error in PyObject_Str", IGRAPH_EINVAL);
       }
       igraph_strvector_set(value, i, PyString_AsString(result));
       Py_XDECREF(result);
