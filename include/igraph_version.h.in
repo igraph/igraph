@@ -25,7 +25,6 @@
 #define IGRAPH_VERSION_H
 
 #define IGRAPH_VERSION "@VERSION@"
-static const char *igraph_version_string=IGRAPH_VERSION;
 
 int igraph_version(const char **version_string,
 		   int *major,

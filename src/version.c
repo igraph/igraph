@@ -25,6 +25,8 @@
 
 #include <stdio.h>
 
+static const char *igraph_version_string=IGRAPH_VERSION;
+
 /** 
  * \function igraph_version
  * Return the version of the igraph C library
