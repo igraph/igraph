@@ -23,6 +23,7 @@
 
 /************************ Miscellaneous functions *************************/
 
+#include "attributes.h"
 #include "graphobject.h"
 #include "vertexseqobject.h"
 #include "vertexobject.h"
