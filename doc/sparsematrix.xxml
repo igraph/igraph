@@ -32,6 +32,7 @@
 <!-- doxrox-include igraph_spmatrix_iter_next -->
 <!-- doxrox-include igraph_spmatrix_iter_end -->
 <!-- doxrox-include igraph_spmatrix_iter_destroy -->
+</section>
 
 <section>
 <title>Matrix query operations</title>
