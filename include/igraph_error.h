@@ -510,6 +510,14 @@ int IGRAPH_FINALLY_STACK_SIZE(void);
 #define IGRAPH_FINALLY(func,ptr) \
   IGRAPH_FINALLY_REAL((igraph_finally_func_t*)(func), (ptr))
 
+#if (defined(__GNUC__) && GCC_VERSION_MAJOR >= 3)
+#  define IGRAPH_UNLIKELY(a) __builtin_expect((a), 0)
+#  define IGRAPH_LIKELY(a)   __builtin_expect((a), 1)
+#else
+#  define IGRAPH_UNLIKELY(a) a
+#  define IGRAPH_LIKELY(a)   a
+#endif
+
 /**
  * \define IGRAPH_CHECK
  * \brief Check the return value of a function call.
@@ -532,14 +540,6 @@ int IGRAPH_FINALLY_STACK_SIZE(void);
  * by using <function>IGRAPH_CHECK</function> on every \a igraph
  * call which can return an error code.
  */
-
-#if (defined(__GNUC__) && GCC_VERSION_MAJOR >= 3)
-#  define IGRAPH_UNLIKELY(a) __builtin_expect((a), 0)
-#  define IGRAPH_LIKELY(a)   __builtin_expect((a), 1)
-#else
-#  define IGRAPH_UNLIKELY(a) a
-#  define IGRAPH_LIKELY(a)   a
-#endif
 
 #define IGRAPH_CHECK(a) do { \
                  int igraph_i_ret=(a); \
