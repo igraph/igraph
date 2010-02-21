@@ -685,7 +685,7 @@ connecting people working in the same room colored red.
 <informalexample>
 <programlisting>
 <prompt>> </prompt>E(g)$color &lt;- "black"
-<prompt>> </prompt>E(g)[ room=="y" ]$color &lt;- "red"
+<prompt>> </prompt>E(g)[ room=="Y" ]$color &lt;- "red"
 <prompt>> </prompt>tkplot(g, layout=layout.kamada.kawai, edge.color=E(g)$color)
 </programlisting>
 <mediaobject>
