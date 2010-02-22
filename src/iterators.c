@@ -496,7 +496,8 @@ int igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs,
   IGRAPH_CHECK(igraph_vit_create(graph, vs, &vit));
   IGRAPH_FINALLY(igraph_vit_destroy, &vit);
   IGRAPH_CHECK(igraph_vit_as_vector(&vit, v));
-  
+
+  igraph_vit_destroy(&vit);
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 } 
