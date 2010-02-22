@@ -35,11 +35,13 @@ int main() {
   igraph_vector_init(&result, 0);
   
   for (i=0; i<1; i++) {
-    igraph_transitivity_local_undirected2(&g, &result, igraph_vss_all());
+    igraph_transitivity_local_undirected2(&g, &result, igraph_vss_all(),
+			IGRAPH_TRANSITIVITY_NAN);
   }
 
   for (i=0; i<1; i++) {
-    igraph_transitivity_local_undirected4(&g, &result, igraph_vss_all());
+    igraph_transitivity_local_undirected4(&g, &result, igraph_vss_all(),
+			IGRAPH_TRANSITIVITY_NAN);
   }
   
 /*   for (i=0; i<igraph_vector_size(&result); i++) { */

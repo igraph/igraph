@@ -80,7 +80,8 @@ int main() {
   igraph_biguint_destroy(&C);
   igraph_biguint_destroy(&D);
   igraph_biguint_destroy(&E);
-  igraph_biguint_destroy(&zero);			    
+  igraph_biguint_destroy(&zero);
+  igraph_biguint_destroy(&one);
   
   return 0;
 }

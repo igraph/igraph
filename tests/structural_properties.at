@@ -84,6 +84,11 @@ AT_KEYWORDS([igraph_transitivity transitivity igraph_transitivity_undirected])
 AT_COMPILE_CHECK([simple/igraph_transitivity.c])
 AT_CLEANUP
 
+AT_SETUP([Local transitivity (igraph_local_transitivity): ])
+AT_KEYWORDS([transitivity igraph_transitivity_local_undirected])
+AT_COMPILE_CHECK([simple/igraph_local_transitivity.c])
+AT_CLEANUP
+
 AT_SETUP([Reciprocity (igraph_reciprocity): ])
 AT_KEYWORDS([igraph_reciprocity reciprocity])
 AT_COMPILE_CHECK([simple/igraph_reciprocity.c])
