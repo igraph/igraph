@@ -24,6 +24,38 @@
 #include <igraph.h>
 
 int main() {
+  igraph_t g;
+  igraph_vector_t outdeg, indeg, vec;
+  igraph_bool_t is_simple;
+
+  igraph_vector_init_real(&outdeg, 10, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0);
+  igraph_vector_init(&indeg, 0);
+  igraph_vector_init(&vec, 0);
+
+  /* checking the simple method, undirected graphs */
+  igraph_degree_sequence_game(&g, &outdeg, 0, IGRAPH_DEGSEQ_SIMPLE);
+  if (igraph_is_directed(&g) || igraph_vcount(&g) != 10)
+	return 1;
+  if (igraph_degree(&g, &vec, igraph_vss_all(), IGRAPH_OUT, 1))
+	return 2;
+  igraph_vector_print(&vec);
+  igraph_destroy(&g);
+
+  /* checking the Viger-Latapy method, undirected graphs */
+  igraph_degree_sequence_game(&g, &outdeg, 0, IGRAPH_DEGSEQ_VL);
+  if (igraph_is_directed(&g) || igraph_vcount(&g) != 10)
+	return 3;
+  if (igraph_is_simple(&g, &is_simple) || !is_simple)
+	return 4;
+  if (igraph_degree(&g, &vec, igraph_vss_all(), IGRAPH_OUT, 0))
+	return 5;
+  igraph_vector_print(&vec);
+  igraph_destroy(&g);
+
+  igraph_vector_destroy(&vec);
+  igraph_vector_destroy(&outdeg);
+  igraph_vector_destroy(&indeg);
 
   return 0;
 }
+

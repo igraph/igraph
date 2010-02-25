@@ -421,7 +421,8 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
   }
   
   outsum=igraph_vector_sum(out_seq);
-  insum=igraph_vector_sum(in_seq);
+  if (directed)
+    insum=igraph_vector_sum(in_seq);
   
   if (!directed && outsum % 2 != 0) {
     IGRAPH_ERROR("Total degree not even for undirected graph", IGRAPH_EINVAL);
