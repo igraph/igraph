@@ -929,6 +929,7 @@ int igraph_clusters(const igraph_t *graph, igraph_vector_t *membership,
 		    igraph_connectedness_t mode);
 int igraph_is_connected(const igraph_t *graph, igraph_bool_t *res, 
 			igraph_connectedness_t mode);
+void igraph_decompose_destroy(igraph_vector_ptr_t *complist);
 int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components, 
 		     igraph_connectedness_t mode, 
 		     long int maxcompno, long int minelements);
