@@ -354,7 +354,17 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
   return 0;
 }
 
-void igraph_i_decompose_free(igraph_vector_ptr_t *complist) {
+/** 
+ * \function igraph_decompose_destroy
+ * \brief Free the memory allocated by \ref igraph_decompose()
+ * 
+ * \param complist The list of graph components, as returned by 
+ *        \ref igraph_decompose().
+ * 
+ * Time complexity: O(c), c is the number of components.
+ */ 
+
+void igraph_decompose_destroy(igraph_vector_ptr_t *complist) {
   long int i;
   for (i=0; i<igraph_vector_ptr_size(complist); i++) {
     if (VECTOR(*complist)[i] != 0) {
@@ -376,8 +386,9 @@ void igraph_i_decompose_free(igraph_vector_ptr_t *complist) {
  * \param components This pointer vector will contain pointers to the
  *   subcomponent graphs. It should be initialized before calling this
  *   function and will be resized to hold the graphs. Don't forget to 
- *   call \ref igraph_destroy() and igraph_free() on the elements of
- *   this pointer vector to free unneeded memory.
+ *   call \ref igraph_destroy() and free() on the elements of
+ *   this pointer vector to free unneeded memory. Alternatively, you can 
+ *   simply call \ref igraph_decompose_destroy() that does this for you.
  * \param mode Either \c IGRAPH_WEAK or \c IGRAPH_STRONG for weakly
  *    and strongly connected components respectively. Right now only
  *    the former is implemented.
@@ -434,7 +445,7 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
   IGRAPH_VECTOR_INIT_FINALLY(&verts, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
   igraph_vector_ptr_clear(components);
-  IGRAPH_FINALLY(igraph_i_decompose_free, components);
+  IGRAPH_FINALLY(igraph_decompose_destroy, components);
   
   for(actstart=0; resco<maxcompno && actstart < no_of_nodes; actstart++) {
     
