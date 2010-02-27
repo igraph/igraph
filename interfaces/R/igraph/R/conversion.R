@@ -224,7 +224,7 @@ igraph.from.graphNEL <- function(graphNEL, name=TRUE, weight=TRUE,
   
   al <- lapply(edgeL(graphNEL), "[[", "edges")
   if (edgemode(graphNEL)=="undirected") {
-    al <- mapply(seq_along(al), al, FUN=function(n, l) {
+    al <- mapply(seq_along(al), al, SIMPLIFY=FALSE, FUN=function(n, l) {
       c(l, rep(n, sum(l==n)))
     })
   }
