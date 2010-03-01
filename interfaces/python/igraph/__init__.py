@@ -143,7 +143,7 @@ class Graph(core.GraphBase):
         """
         if len(args) == 0 and len(kwds) == 0:
             raise ValueError, "expected at least one argument"
-        if len(kwds)>0 or (callable(args[0]) and not isinstance(args[0], core.EdgeSeq)):
+        if len(kwds)>0 or (hasattr(args[0], "__call__") and not isinstance(args[0], core.EdgeSeq)):
             es = self.es(*args, **kwds)
         else:
             es = args[0]
@@ -821,11 +821,12 @@ class Graph(core.GraphBase):
         @return: a L{Layout} object.
         """
         if layout is None: layout = config["plotting.layout"]
-        if callable(layout):
+        if hasattr(layout, "__call__"):
             method = layout
         else:
             method = getattr(self.__class__, self._layout_mapping[layout.lower()])
-        if not callable(method): raise ValueError, "layout method must be callable"
+        if not hasattr(method, "__call__"):
+            raise ValueError, "layout method must be callable"
         l=method(self, *args, **kwds)
         if not isinstance(l, Layout): l=Layout(l)
         return l
@@ -2593,7 +2594,7 @@ def _graphmethod(func=None, name=None):
     if name is None: name = func.__name__
     method = getattr(Graph, name)
 
-    if callable(func):
+    if hasattr(func, "__call__"):
         def decorated(*args, **kwds):
             self = args[0].graph
             return func(args[0], method(self, *args, **kwds))

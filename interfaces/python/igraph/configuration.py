@@ -175,7 +175,7 @@ class Configuration(object):
         for sec in self._sections: self._config.add_section(sec)
         # Create default values
         for name, definition in self._definitions.iteritems():
-            if definition.has_key("default"):
+            if "default" in definition:
                 self[name]=definition["default"]
 
         if filename is not None: self.load(filename)
@@ -215,7 +215,7 @@ class Configuration(object):
         section, key = self._item_to_section_key(item)
         definition = self._definitions.get("%s.%s" % (section,key), {})
         getter = None
-        if definition.has_key("type"):
+        if "type" in definition:
             getter = self._types[definition["type"]].get("getter", None)
         if getter is None: getter = self._config.__class__.get
         return getter(self._config, section, key)
@@ -229,7 +229,7 @@ class Configuration(object):
         section, key = self._item_to_section_key(item)
         definition = self._definitions.get("%s.%s" % (section,key), {})
         setter = None
-        if definition.has_key("type"):
+        if "type" in definition:
             setter = self._types[definition["type"]].get("setter", None)
         if setter is None: setter = self._config.__class__.set
         return setter(self._config, section, key, value)
@@ -242,7 +242,7 @@ class Configuration(object):
         """
         section, key = self._item_to_section_key(item)
         definition = self._definitions.get("%s.%s" % (section, key), {})
-        if definition.has_key("default"):
+        if "default" in definition:
             self[item]=definition["default"]
         else:
             self._config.remove_option(section, key)

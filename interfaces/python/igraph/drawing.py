@@ -145,7 +145,7 @@ class BoundingBox(object):
 
     def __eq__(self, other): return self.coords == other.coords
     def __ne__(self, other): return self.coords != other.coords
-
+    def __hash__(self): return hash(self.coords)
 
 
 

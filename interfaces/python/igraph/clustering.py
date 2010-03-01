@@ -68,7 +68,7 @@ class Clustering(object):
           object's dictionary."""
         self._membership = list(membership)
         if len(self._membership)>0:
-            self._len = max(self._membership)+1
+            self._len = max(m for m in self._membership if m is not None)+1
         else:
             self._len = 0
         self.__dict__.update(params)
