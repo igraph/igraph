@@ -145,7 +145,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
       tmp[as.numeric(x)+1]
     }
     i <- eval(i, c(graph[[9]][[3]], adj=adj, nei=nei, from=from, to=to,
-                   as.list(parent.frame())))
+                   envir=parent.frame()))
     if (is.numeric(i) || is.integer(i)) {
       i <- as.numeric(i)
       res <- i[ i %in% x ]
@@ -201,7 +201,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
     }
     i <- eval(i, c(graph[[9]][[4]], from=list(graph[[3]][ as.numeric(x)+1 ]),
                    to=list(graph[[4]][as.numeric(x)+1]), graph=list(graph),
-                   adj=adj, as.list(parent.frame())))
+                   adj=adj, envir=parent.frame()))
     if (is.numeric(i) || is.integer(i)) {
       i <- as.numeric(i)
       res <- i[ i %in% x ]
