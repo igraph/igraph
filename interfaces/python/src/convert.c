@@ -1572,6 +1572,43 @@ int igraphmodule_append_PyIter_to_vector_ptr_t(PyObject *it, igraph_vector_ptr_t
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Tries to interpret a Python object as a single vertex ID
+ * 
+ * \param o the Python object
+ * \param vid the vertex ID will be stored here
+ * \return 0 if everything was OK, 1 otherwise
+ */
+int igraphmodule_PyObject_to_vid(PyObject *o, long int *vid) {
+  if (o == Py_None || o == 0) {
+    *vid = 0;
+  } else if (PyInt_Check(o)) {
+    /* Single vertex ID */
+    *vid = PyInt_AsLong(o);
+  } else if (PyLong_Check(o)) {
+    /* Single vertex ID */
+    *vid = PyLong_AsLong(o);
+  } else if (PyString_Check(o) || PyUnicode_Check(o)) {
+    /* Single vertex ID from vertex name */
+    PyErr_SetString(PyExc_TypeError, "vertex name lookups not implemented yet");
+  } else if (PyObject_IsInstance(o, (PyObject*)&igraphmodule_VertexType)) {
+    /* Single vertex ID from Vertex object */
+    igraphmodule_VertexObject *vo = (igraphmodule_VertexObject*)o;
+    *vid = igraphmodule_Vertex_get_index_long(vo);
+  } else {
+    PyErr_SetString(PyExc_TypeError, "only integers, long integers or igraph.Vertex objects can be converted to vertex IDs");
+    return 1;
+  }
+
+  if (*vid < 0) {
+    PyErr_SetString(PyExc_ValueError, "vertex IDs must be positive");
+    return 1;
+  }
+
+  return 0;
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Tries to interpret a Python object as a vertex selector
  * 
  * \param o the Python object
@@ -1582,33 +1619,35 @@ int igraphmodule_append_PyIter_to_vector_ptr_t(PyObject *it, igraph_vector_ptr_t
  */
 int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
                   igraph_bool_t *return_single) {
-  if (return_single) *return_single=0;
-  if (o==NULL || o == Py_None) {
+  long int vid;
+
+  if (o == 0 || o == Py_None) {
     /* Returns a vertex sequence for all vertices */
+    if (return_single) *return_single = 0;
     igraph_vs_all(vs);
-  } else if (PyInt_Check(o)) {
-    /* Returns a vertex sequence for a single vertex ID */
-    igraph_vs_1(vs, PyInt_AsLong(o));
-    if (return_single) *return_single=1;
-  } else if (PyLong_Check(o)) {
-    /* Returns a vertex sequence for a single vertex ID */
-    igraph_vs_1(vs, PyLong_AsLong(o));
-    if (return_single) *return_single=1;
-  } else if (PyObject_IsInstance(o, (PyObject*)&igraphmodule_VertexSeqType)) {
+    return 0;
+  }
+
+  if (PyObject_IsInstance(o, (PyObject*)&igraphmodule_VertexSeqType)) {
+    /* Returns a vertex sequence from a VertexSeq object */
     igraphmodule_VertexSeqObject *vso = (igraphmodule_VertexSeqObject*)o;
     if (igraph_vs_copy(vs, &vso->vs)) {
       igraphmodule_handle_igraph_error();
       return 1;
     }
-  } else if (PyObject_IsInstance(o, (PyObject*)&igraphmodule_VertexType)) {
-    igraphmodule_VertexObject *vo = (igraphmodule_VertexObject*)o;
-    igraph_vs_1(vs, igraphmodule_Vertex_get_index_long(vo));
-    if (return_single) *return_single=1;
-  } else {
-    /* Returns a vertex sequence with the IDs returned by the iterator */
+    if (return_single) *return_single = 0;
+    return 0;
+  }
+
+  if (igraphmodule_PyObject_to_vid(o, &vid)) {
+    /* Object cannot be converted to a single vertex ID,
+     * assume it is a sequence or iterable */
     PyObject *iterator = PyObject_GetIter(o);
     PyObject *item;
     igraph_vector_t vector;
+
+    /* Clear the exception set by igraphmodule_PyObject_to_vid */
+    PyErr_Clear();
 
     if (iterator == NULL) {
       PyErr_SetString(PyExc_TypeError, "integer, long, iterable, Vertex, VertexSeq or None expected");
@@ -1620,17 +1659,13 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
     IGRAPH_CHECK(igraph_vector_reserve(&vector, 20));
 
     while ((item = PyIter_Next(iterator))) {
-      long val=-1;
-      if (PyInt_Check(item)) val=PyInt_AsLong(item);
-      else if (PyLong_Check(item)) val=PyLong_AsLong(item);
+      long int vid=-1;
+
+      if (igraphmodule_PyObject_to_vid(item, &vid))
+        break;
+
       Py_DECREF(item);
-
-      if (val >= 0) igraph_vector_push_back(&vector, val);
-      else {
-        PyErr_SetString(PyExc_TypeError, "integer or long expected");
-      }
-
-      if (PyErr_Occurred()) break;
+      igraph_vector_push_back(&vector, vid);
     }
     Py_DECREF(iterator);
 
@@ -1638,12 +1673,21 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
       igraph_vector_destroy(&vector);
       IGRAPH_FINALLY_CLEAN(1);
       return 1;
-    } else {
-      igraph_vs_vector_copy(vs, &vector);
-      igraph_vector_destroy(&vector);
-      IGRAPH_FINALLY_CLEAN(1);
     }
+
+    igraph_vs_vector_copy(vs, &vector);
+    igraph_vector_destroy(&vector);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    if (return_single) *return_single = 0;
+    
+    return 0;
   }
+
+  /* The object can be converted into a single vertex ID */
+  if (return_single) *return_single = 1;
+  igraph_vs_1(vs, vid);
+
   return 0;
 }
 
