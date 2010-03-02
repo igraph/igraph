@@ -732,6 +732,64 @@ void FUNCTION(igraph_vector,sort)(TYPE(igraph_vector) *v) {
 }
 
 /**
+ * comparison function passed to qsort from  igraph_vector_qsort_ind
+ */
+
+int FUNCTION(igraph_vector,qsort_ind_cmp)(const void *p1 , const void *p2) {
+  BASE **pa = (BASE **) p1;
+  BASE **pb = (BASE **) p2;
+  if( **pa < **pb ) return -1;
+  if( **pa > **pb) return 1;
+  return 0;
+}
+
+/**
+ * \function vector_qsort_ind
+ * \brief Return a permutation of indices that sorts a vector 
+ *
+ * Takes an unsorted array \c v as input and computes an array of
+ * indices inds such that v[ inds[i] ], with i increasing from 0, is
+ * an ordered (and decreasing) array. The order of indices for
+ * identical elements is not defined. 
+ * \param v the array to be sorted
+ * \param inds the output array of indices. this must be initialized,
+ *         but will be resized 
+ * \return Error code.
+ *
+ * This routine uses the C library qsort routine.
+ * Algorithm: 1) create an array of pointers to the elements of v. 2)
+ * Pass this array to qsort. 3) after sorting the difference between
+ * the pointer value and the first pointer value gives its original
+ * position in the array. Use this to set the values of inds. 
+ *
+ * Some tests show that this routine is faster than
+ * igraph_vector_heapsort_ind by about 10 percent 
+ * for small vectors to a factor of two for large vectors.
+ */
+
+long int FUNCTION(igraph_vector,qsort_ind)(TYPE(igraph_vector) *v, 
+					   igraph_vector_t *inds ) {
+  long int i;
+  BASE **vind, *first;
+  long int n = FUNCTION(igraph_vector,size)(v);
+  IGRAPH_CHECK(igraph_vector_resize(inds, n));
+  vind = igraph_Calloc(n, BASE*);
+  if (vind == 0) {
+    IGRAPH_ERROR("igraph_vector_qsort_ind failed", IGRAPH_ENOMEM);
+  }
+  for(i=0; i<n; i++) {
+    vind[i] = &VECTOR(*v)[i];
+  }
+  first = vind[0];
+  qsort(vind, n, sizeof(BASE**), FUNCTION(igraph_vector,qsort_ind_cmp));
+  for(i=0; i<n; i++) {
+    VECTOR(*inds)[n-i-1] = vind[i]-first;
+  }
+  igraph_Free(vind);
+  return 0;
+}
+
+/**
  * \ingroup vector
  * \function igraph_vector_resize
  * \brief Resize the vector.
