@@ -26,26 +26,106 @@
 #include "common.h"
 #include "convert.h"
 
+#define ATTR_STRUCT(graph) ((igraphmodule_i_attribute_struct*)((graph)->attr))
+#define ATTR_STRUCT_DICT(graph) ((igraphmodule_i_attribute_struct*)((graph)->attr))->attrs
+
+typedef struct {
+  PyObject* attrs[3];
+  PyObject* vertex_name_index;
+} igraphmodule_i_attribute_struct;
+
+int igraphmodule_i_attribute_struct_init(igraphmodule_i_attribute_struct *attrs) {
+  int i;
+  for (i=0; i<3; i++) {
+    attrs->attrs[i] = PyDict_New();
+    if (PyErr_Occurred())
+      return 1;
+    RC_ALLOC("dict", attrs->attrs[i]);
+  }
+  attrs->vertex_name_index = 0;
+  return 0;
+}
+
+void igraphmodule_i_attribute_struct_destroy(igraphmodule_i_attribute_struct *attrs) {
+  int i;
+  for (i=0; i<3; i++) {
+    if (attrs->attrs[i]) {
+      RC_DEALLOC("dict", attrs->attrs[i]);
+      Py_DECREF(attrs->attrs[i]);
+    }
+  }
+  if (attrs->vertex_name_index) {
+    RC_DEALLOC("dict", attrs->vertex_name_index);
+    Py_DECREF(attrs->vertex_name_index);
+  }
+}
+
+int igraphmodule_i_attribute_struct_index_vertex_names(
+    igraphmodule_i_attribute_struct *attrs, igraph_bool_t force) {
+  Py_ssize_t n = 0;
+  PyObject *name_list, *key, *value;
+
+  if (attrs->vertex_name_index && !force)
+    return 0;
+
+  if (attrs->vertex_name_index == 0) {
+    attrs->vertex_name_index = PyDict_New();
+    if (attrs->vertex_name_index == 0) {
+      return 1;
+    }
+  } else
+    PyDict_Clear(attrs->vertex_name_index);
+
+  name_list = PyDict_GetItemString(attrs->attrs[1], "name");
+  if (name_list == 0)
+    return 0;    /* no name attribute */
+
+  n = PyList_Size(name_list) - 1;
+  while (n >= 0) {
+    key = PyList_GET_ITEM(name_list, n);    /* we don't own a reference to key */
+    value = PyInt_FromLong(n);              /* we do own a reference to value */
+    if (value == 0)
+      return 1;
+    PyDict_SetItem(attrs->vertex_name_index, key, value);
+    /* PyDict_SetItem did an INCREF for both the key and a value, therefore we
+     * have to drop our reference on value */
+    Py_DECREF(value);
+
+    n--;
+  }
+
+  return 0;
+}
+
+void igraphmodule_i_attribute_struct_invalidate_vertex_name_index(
+    igraphmodule_i_attribute_struct *attrs) {
+  if (attrs->vertex_name_index == 0)
+    return;
+  
+  Py_DECREF(attrs->vertex_name_index);
+  attrs->vertex_name_index = 0;
+}
+
 /* Attribute handlers for the Python interface */
 
 /* Initialization */ 
 static int igraphmodule_i_attribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
-  PyObject** attrs;
+  igraphmodule_i_attribute_struct* attrs;
   long int i, n;
   
-  attrs=(PyObject**)calloc(3, sizeof(PyObject*));
+  attrs=(igraphmodule_i_attribute_struct*)calloc(1, sizeof(igraphmodule_i_attribute_struct));
   if (!attrs)
     IGRAPH_ERROR("not enough memory to allocate attribute hashes", IGRAPH_ENOMEM);
-  
-  for (i=0; i<3; i++) {
-    attrs[i] = PyDict_New();
-    RC_ALLOC("dict", attrs[i]);
+  if (igraphmodule_i_attribute_struct_init(attrs)) {
+    PyErr_Clear();
+    free(attrs);
+    IGRAPH_ERROR("not enough memory to allocate attribute hashes", IGRAPH_ENOMEM);
   }
   graph->attr=(void*)attrs;
 
   /* See if we have graph attributes */
   if (attr) {
-    PyObject *dict=attrs[ATTRHASH_IDX_GRAPH], *value;
+    PyObject *dict=attrs->attrs[ATTRHASH_IDX_GRAPH], *value;
     char *s;
     n = igraph_vector_ptr_size(attr);
     for (i=0; i<n; i++) {
@@ -68,9 +148,7 @@ static int igraphmodule_i_attribute_init(igraph_t *graph, igraph_vector_ptr_t *a
       if (value) {
         if (PyDict_SetItemString(dict, attr_rec->name, value)) {
           Py_DECREF(value);
-          Py_DECREF(attrs[0]);
-          Py_DECREF(attrs[1]);
-          Py_DECREF(attrs[2]);
+          igraphmodule_i_attribute_struct_destroy(attrs);
           free(graph->attr); graph->attr = 0;
           IGRAPH_ERROR("failed to add attributes to graph attribute hash",
                        IGRAPH_FAILURE);
@@ -86,15 +164,12 @@ static int igraphmodule_i_attribute_init(igraph_t *graph, igraph_vector_ptr_t *a
 
 /* Destruction */
 static void igraphmodule_i_attribute_destroy(igraph_t *graph) {
-  PyObject** attrs;
-  int i;
+  igraphmodule_i_attribute_struct* attrs;
  
   /* printf("Destroying attribute table\n"); */
   if (graph->attr) {
-    attrs=(PyObject**)graph->attr;
-    for (i=0; i<3; i++) {
-      Py_DECREF(attrs[i]);
-    }
+    attrs=(igraphmodule_i_attribute_struct*)graph->attr;
+    igraphmodule_i_attribute_struct_destroy(attrs);
     free(attrs);
   }
 }
@@ -102,33 +177,37 @@ static void igraphmodule_i_attribute_destroy(igraph_t *graph) {
 /* Copying */
 static int igraphmodule_i_attribute_copy(igraph_t *to, const igraph_t *from,
   igraph_bool_t ga, igraph_bool_t va, igraph_bool_t ea) {
-  PyObject **fromattrs, **toattrs, *key, *value, *newval, *o=NULL;
+  igraphmodule_i_attribute_struct *fromattrs, *toattrs;
+  PyObject *key, *value, *newval, *o=NULL;
   igraph_bool_t copy_attrs[3] = { ga, va, ea };
   int i, j;
   Py_ssize_t pos = 0;
  
   if (from->attr) {
-    fromattrs=(PyObject**)from->attr;
+    fromattrs=ATTR_STRUCT(from);
     /* what to do with the original value of toattrs? */
-    toattrs=to->attr=(PyObject**)calloc(3, sizeof(PyObject*));
-    for (i=0; i<3; i++) {
-      if (!copy_attrs[i]) {
-        toattrs[i] = PyDict_New();
-        RC_ALLOC("dict (copying, empty)", toattrs[i]);
-        continue;
-      }
+    toattrs=(igraphmodule_i_attribute_struct*)calloc(1, sizeof(igraphmodule_i_attribute_struct));
+    if (!toattrs)
+      IGRAPH_ERROR("not enough memory to allocate attribute hashes", IGRAPH_ENOMEM);
+    if (igraphmodule_i_attribute_struct_init(toattrs)) {
+      PyErr_Clear();
+      free(toattrs);
+      IGRAPH_ERROR("not enough memory to allocate attribute hashes", IGRAPH_ENOMEM);
+    }
+    to->attr=toattrs;
 
-      if (!PyDict_Check(fromattrs[i])) {
-        toattrs[i]=fromattrs[i];
-        Py_XINCREF(o);
+    for (i=0; i<3; i++) {
+      if (!copy_attrs[i])
+        continue;
+
+      if (!PyDict_Check(fromattrs->attrs[i])) {
+        toattrs->attrs[i]=fromattrs->attrs[i];
+        Py_XINCREF(fromattrs->attrs[i]);
         continue;
       }
       
-      toattrs[i]=PyDict_New();
-      RC_ALLOC("dict (copying)", toattrs[i]);
-      
-      pos=0;
-      while (PyDict_Next(fromattrs[i], &pos, &key, &value)) {
+      pos = 0;
+      while (PyDict_Next(fromattrs->attrs[i], &pos, &key, &value)) {
         /* value is only borrowed, so copy it */
         if (i>0) {
           newval=PyList_New(PyList_GET_SIZE(value));
@@ -141,7 +220,7 @@ static int igraphmodule_i_attribute_copy(igraph_t *to, const igraph_t *from,
           newval=value;
           Py_INCREF(newval);
         }
-        PyDict_SetItem(toattrs[i], key, newval);
+        PyDict_SetItem(toattrs->attrs[i], key, newval);
         Py_DECREF(newval); /* compensate for PyDict_SetItem */
       }
     }
@@ -169,7 +248,7 @@ static int igraphmodule_i_attribute_add_vertices(igraph_t *graph, long int nv, i
     IGRAPH_FINALLY(free, added_attrs);
   }
 
-  dict=((PyObject**)graph->attr)[1];
+  dict=ATTR_STRUCT_DICT(graph)[1];
   if (!PyDict_Check(dict)) 
     IGRAPH_ERROR("vertex attribute hash type mismatch", IGRAPH_EINVAL);
 
@@ -216,6 +295,10 @@ static int igraphmodule_i_attribute_add_vertices(igraph_t *graph, long int nv, i
           else Py_DECREF(o);
         }
       }
+
+      /* Invalidate the vertex name index if needed */
+      if (!strcmp(attr_rec->name, "name"))
+        igraphmodule_i_attribute_struct_invalidate_vertex_name_index(ATTR_STRUCT(graph));
     } else {
       for (i=0; i<nv; i++) {
         if (PyList_Append(value, Py_None) == -1) {
@@ -264,6 +347,10 @@ static int igraphmodule_i_attribute_add_vertices(igraph_t *graph, long int nv, i
         if (o) PyList_SET_ITEM(value, i+j, o);
       }
 
+      /* Invalidate the vertex name index if needed */
+      if (!strcmp(attr_rec->name, "name"))
+        igraphmodule_i_attribute_struct_invalidate_vertex_name_index(ATTR_STRUCT(graph));
+
       PyDict_SetItemString(dict, attr_rec->name, value);
       Py_DECREF(value);   /* compensate for PyDict_SetItemString */
     }
@@ -285,7 +372,7 @@ static void igraphmodule_i_attribute_delete_vertices(igraph_t *graph,
   Py_ssize_t pos=0;
   
   /* Reindexing vertices */
-  dict=((PyObject**)graph->attr)[1];
+  dict=ATTR_STRUCT_DICT(graph)[1];
   if (!PyDict_Check(dict)) return;
 
   n=igraph_vector_size(vidx);
@@ -322,6 +409,10 @@ static void igraphmodule_i_attribute_delete_vertices(igraph_t *graph,
     printf("value: "); PyObject_Print(value, stdout, Py_PRINT_RAW); printf("\n");*/
   }
   
+  /* Invalidate the vertex name index */
+  igraphmodule_i_attribute_struct_invalidate_vertex_name_index(ATTR_STRUCT(graph));
+
+  /* Delete the attributes of the edges adjacent to the deleted vertices */
   igraphmodule_i_attribute_delete_edges(graph, eidx);
 
   return;
@@ -348,7 +439,7 @@ static int igraphmodule_i_attribute_add_edges(igraph_t *graph, const igraph_vect
     IGRAPH_FINALLY(free, added_attrs);
   }
 
-  dict=((PyObject**)graph->attr)[2];
+  dict=ATTR_STRUCT_DICT(graph)[2];
   if (!PyDict_Check(dict)) 
     IGRAPH_ERROR("edge attribute hash type mismatch", IGRAPH_EINVAL);
   while (PyDict_Next(dict, &pos, &key, &value)) {
@@ -465,7 +556,7 @@ static void igraphmodule_i_attribute_delete_edges(igraph_t *graph, const igraph_
   PyObject *key, *value, *dict, *o;
   Py_ssize_t pos=0;
   
-  dict=((PyObject**)graph->attr)[2];
+  dict=ATTR_STRUCT_DICT(graph)[2];
   if (!PyDict_Check(dict)) return;
 
   n=igraph_vector_size(idx);
@@ -512,7 +603,7 @@ static int igraphmodule_i_attribute_permute_edges(igraph_t *graph,
   PyObject *key, *value, *dict, *newdict, *newlist, *o;
   Py_ssize_t pos=0;
 
-  dict=((PyObject**)graph->attr)[2];
+  dict=ATTR_STRUCT_DICT(graph)[2];
   if (!PyDict_Check(dict)) return 1;
 
   newdict=PyDict_New();
@@ -526,8 +617,8 @@ static int igraphmodule_i_attribute_permute_edges(igraph_t *graph,
     for (i=0; i<n; i++) {
       o=PyList_GetItem(value, VECTOR(*idx)[i]-1);
       if (!o) {
-	PyErr_Clear();
-	return 1;
+        PyErr_Clear();
+        return 1;
       }
       Py_INCREF(o);
       PyList_SET_ITEM(newlist, i, o);
@@ -557,7 +648,7 @@ static int igraphmodule_i_attribute_get_info(const igraph_t *graph,
   for (i=0; i<3; i++) {
     igraph_strvector_t *n = names[i];
     igraph_vector_t *t = types[i];
-    PyObject *dict = ((PyObject**)graph->attr)[i];
+    PyObject *dict = ATTR_STRUCT_DICT(graph)[i];
     PyObject *keys;
     PyObject *values;
     PyObject *o=0;
@@ -620,7 +711,7 @@ igraph_bool_t igraphmodule_i_attribute_has_attr(const igraph_t *graph,
   case IGRAPH_ATTRIBUTE_EDGE: attrnum=2; break;
   default: return 0; break;
   }
-  dict = ((PyObject**)graph->attr)[attrnum];
+  dict = ATTR_STRUCT_DICT(graph)[attrnum];
   o = PyDict_GetItemString(dict, name);
   return o != 0;
 }
@@ -639,7 +730,7 @@ int igraphmodule_i_attribute_get_type(const igraph_t *graph,
   case IGRAPH_ATTRIBUTE_EDGE: attrnum=2; break;
   default: IGRAPH_ERROR("No such attribute type", IGRAPH_EINVAL); break;
   }
-  dict = ((PyObject**)graph->attr)[attrnum];
+  dict = ATTR_STRUCT_DICT(graph)[attrnum];
   o = PyDict_GetItemString(dict, name);
   if (o == 0) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   is_numeric = is_string = 1;
@@ -674,7 +765,7 @@ int igraphmodule_i_attribute_get_type(const igraph_t *graph,
 int igraphmodule_i_get_numeric_graph_attr(const igraph_t *graph,
 					  const char *name, igraph_vector_t *value) {
   PyObject *dict, *o, *result;
-  dict = ((PyObject**)graph->attr)[0];
+  dict = ATTR_STRUCT_DICT(graph)[0];
   /* No error checking, if we get here, the type has already been checked by previous
      attribute handler calls... hopefully :) Same applies for the other handlers. */
   o = PyDict_GetItemString(dict, name);
@@ -697,7 +788,7 @@ int igraphmodule_i_get_numeric_graph_attr(const igraph_t *graph,
 int igraphmodule_i_get_string_graph_attr(const igraph_t *graph,
 					 const char *name, igraph_strvector_t *value) {
   PyObject *dict, *o, *result;
-  dict = ((PyObject**)graph->attr)[0];
+  dict = ATTR_STRUCT_DICT(graph)[0];
   o = PyDict_GetItemString(dict, name);
   if (!o) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   IGRAPH_CHECK(igraph_strvector_resize(value, 1));
@@ -722,7 +813,7 @@ int igraphmodule_i_get_numeric_vertex_attr(const igraph_t *graph,
   PyObject *dict, *list, *result, *o;
   igraph_vector_t newvalue;
 
-  dict = ((PyObject**)graph->attr)[1];
+  dict = ATTR_STRUCT_DICT(graph)[1];
   list = PyDict_GetItemString(dict, name);
   if (!list) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
 
@@ -741,9 +832,9 @@ int igraphmodule_i_get_numeric_vertex_attr(const igraph_t *graph,
       long int v=IGRAPH_VIT_GET(it);
       o = PyList_GetItem(list, v);
       if (o != Py_None) {
-	result = PyNumber_Float(o);
-	VECTOR(*value)[i] = PyFloat_AsDouble(result);
-	Py_XDECREF(result);
+        result = PyNumber_Float(o);
+        VECTOR(*value)[i] = PyFloat_AsDouble(result);
+        Py_XDECREF(result);
       } else VECTOR(*value)[i] = IGRAPH_NAN;
       IGRAPH_VIT_NEXT(it);
       i++;
@@ -763,7 +854,7 @@ int igraphmodule_i_get_string_vertex_attr(const igraph_t *graph,
   PyObject *dict, *list, *result;
   igraph_strvector_t newvalue;
 
-  dict = ((PyObject**)graph->attr)[1];
+  dict = ATTR_STRUCT_DICT(graph)[1];
   list = PyDict_GetItemString(dict, name);
   if (!list) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
 
@@ -809,7 +900,7 @@ int igraphmodule_i_get_numeric_edge_attr(const igraph_t *graph,
   PyObject *dict, *list, *result, *o;
   igraph_vector_t newvalue;
 
-  dict = ((PyObject**)graph->attr)[2];
+  dict = ATTR_STRUCT_DICT(graph)[2];
   list = PyDict_GetItemString(dict, name);
   if (!list) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
 
@@ -850,7 +941,7 @@ int igraphmodule_i_get_string_edge_attr(const igraph_t *graph,
   PyObject *dict, *list, *result;
   igraph_strvector_t newvalue;
 
-  dict = ((PyObject**)graph->attr)[2];
+  dict = ATTR_STRUCT_DICT(graph)[2];
   list = PyDict_GetItemString(dict, name);
   if (!list) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
 
