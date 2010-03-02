@@ -174,7 +174,7 @@ plot.igraph <- function(x,
 
       plot.bezier(cp, 50, color, width, arr=arr, lty=lty, arrow.size=arrow.size, arr.w=arr.w)
 
-      if (!is.na(label)) {
+      if (is.language(label) || !is.na(label)) {
         lx <- x0+.3
         ly <- y0
         phi <- atan2(ly-center[2], lx-center[1])
