@@ -197,6 +197,8 @@ void FUNCTION(igraph_vector,remove_section)(TYPE(igraph_vector) *v,
 /*-----------*/
 
 void FUNCTION(igraph_vector,sort)(TYPE(igraph_vector) *v);
+long int FUNCTION(igraph_vector,qsort_ind)(TYPE(igraph_vector) *v, 
+					   igraph_vector_t *inds );
 
 /*-----------*/
 /* Printing  */
