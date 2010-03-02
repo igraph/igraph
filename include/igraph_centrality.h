@@ -115,6 +115,13 @@ int igraph_strength(const igraph_t *graph, igraph_vector_t *res,
 int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
          igraph_vector_t *ins, igraph_vector_t *outs);
 
+int igraph_sort_vertex_ids_by_degree(const igraph_t *graph, 
+				     igraph_vector_t *outvids, 
+				     igraph_vs_t vids,
+				     igraph_neimode_t mode, 
+				     igraph_bool_t loops,
+				     igraph_bool_t only_indices);
+
 igraph_real_t igraph_centralization(const igraph_vector_t *scores,
 				    igraph_real_t theoretical_max,
 				    igraph_bool_t normalized);

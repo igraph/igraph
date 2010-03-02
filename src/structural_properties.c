@@ -5843,3 +5843,61 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
         
   return 0;
 }
+
+/**
+ * \function igraph_sort_vertex_ids_by_degree
+ * \brief Calculate a list of vertex ids sorted by degree of the corresponding vertex.
+ * 
+ * The list of vertex ids is returned in a vector that is sorted
+ * in decreasing order of vertex degree.
+ * \param graph The input graph.
+ * \param outvids Pointer to an initialized vector that will be
+ *        resized and will contain the ordered vertex ids.
+ * \param vids Input vertex selector of vertex ids to include in
+ *        calculation.
+ * \param mode Defines the type of the degree.
+ *        \c IGRAPH_OUT, out-degree,
+ *        \c IGRAPH_IN, in-degree,
+ *        \c IGRAPH_ALL, total degree (sum of the
+ *        in- and out-degree). 
+ *        This parameter is ignored for undirected graphs. 
+ * \param loops Boolean, gives whether the self-loops should be
+ *        counted.
+ * \param only_indices If true, then return a sorted list of indices
+ *        into a vector corresponding to \c vids, rather than a list
+ *        of vertex ids. This parameter is ignored if \c vids is set
+ *        to all vertices via igraph_vs_all() or igraph_vss_all(),
+ *        because in this case the indices and vertex ids are the
+ *        same.
+ * \return Error code:
+ *         \c IGRAPH_EINVVID: invalid vertex id.
+ *         \c IGRAPH_EINVMODE: invalid mode argument.
+ *
+ */
+
+int igraph_sort_vertex_ids_by_degree(const igraph_t *graph, 
+				     igraph_vector_t *outvids, 
+				     igraph_vs_t vids,
+				     igraph_neimode_t mode, 
+				     igraph_bool_t loops,
+				     igraph_bool_t only_indices) {
+  long int i;
+  igraph_vector_t degrees, vs_vec;
+  IGRAPH_VECTOR_INIT_FINALLY(&degrees, 0);
+  IGRAPH_CHECK(igraph_degree(graph, &degrees, vids, mode, loops));
+  IGRAPH_CHECK(igraph_vector_qsort_ind(&degrees, outvids));
+  if (only_indices || igraph_vs_is_all(&vids) ) {
+    igraph_vector_destroy(&degrees);
+    IGRAPH_FINALLY_CLEAN(1);
+  } else {
+    IGRAPH_VECTOR_INIT_FINALLY(&vs_vec, 0);
+    IGRAPH_CHECK(igraph_vs_as_vector(graph, vids, &vs_vec));
+    for(i=0; i<igraph_vector_size(outvids); i++) {
+      VECTOR(*outvids)[i] = VECTOR(vs_vec)[(long int)VECTOR(*outvids)[i]];
+    }
+    igraph_vector_destroy(&vs_vec);
+    igraph_vector_destroy(&degrees);
+    IGRAPH_FINALLY_CLEAN(2);    
+  }
+  return 0;
+}
