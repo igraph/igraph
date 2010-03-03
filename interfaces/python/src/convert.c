@@ -1,4 +1,4 @@
-/* -*- mode: C -*-  */
+/* vim:set ts=2 sw=2 sts=2 et: */
 /* 
    IGraph library.
    Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
@@ -1574,11 +1574,13 @@ int igraphmodule_append_PyIter_to_vector_ptr_t(PyObject *it, igraph_vector_ptr_t
  * \ingroup python_interface_conversion
  * \brief Tries to interpret a Python object as a single vertex ID
  * 
- * \param o the Python object
- * \param vid the vertex ID will be stored here
+ * \param o      the Python object
+ * \param vid    the vertex ID will be stored here
+ * \param graph  the graph that will be used to interpret vertex names
+ *               if a string was given in o
  * \return 0 if everything was OK, 1 otherwise
  */
-int igraphmodule_PyObject_to_vid(PyObject *o, long int *vid) {
+int igraphmodule_PyObject_to_vid(PyObject *o, long int *vid, igraph_t *graph) {
   if (o == Py_None || o == 0) {
     *vid = 0;
   } else if (PyInt_Check(o)) {
@@ -1589,7 +1591,8 @@ int igraphmodule_PyObject_to_vid(PyObject *o, long int *vid) {
     *vid = PyLong_AsLong(o);
   } else if (PyString_Check(o) || PyUnicode_Check(o)) {
     /* Single vertex ID from vertex name */
-    PyErr_SetString(PyExc_TypeError, "vertex name lookups not implemented yet");
+    if (igraphmodule_get_vertex_id_by_name(graph, o, vid))
+      return 1;
   } else if (PyObject_IsInstance(o, (PyObject*)&igraphmodule_VertexType)) {
     /* Single vertex ID from Vertex object */
     igraphmodule_VertexObject *vo = (igraphmodule_VertexObject*)o;
@@ -1611,14 +1614,17 @@ int igraphmodule_PyObject_to_vid(PyObject *o, long int *vid) {
  * \ingroup python_interface_conversion
  * \brief Tries to interpret a Python object as a vertex selector
  * 
- * \param o the Python object
- * \param vs the \c igraph_vs_t which will contain the result
+ * \param o      the Python object
+ * \param vs     the \c igraph_vs_t which will contain the result
+ * \param graph  an \c igraph_t object which will be used to interpret vertex
+ *               names (if the supplied Python object contains strings)
  * \param return_single will be 1 if the selector selected only a single vertex,
- * 0 otherwise
+ *                      0 otherwise
+ *
  * \return 0 if everything was OK, 1 otherwise
  */
 int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
-                  igraph_bool_t *return_single) {
+    igraph_t *graph, igraph_bool_t *return_single) {
   long int vid;
 
   if (o == 0 || o == Py_None) {
@@ -1639,15 +1645,24 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
     return 0;
   }
 
-  if (igraphmodule_PyObject_to_vid(o, &vid)) {
+  if (igraphmodule_PyObject_to_vid(o, &vid, graph)) {
     /* Object cannot be converted to a single vertex ID,
      * assume it is a sequence or iterable */
-    PyObject *iterator = PyObject_GetIter(o);
+
+    PyObject *iterator;
     PyObject *item;
     igraph_vector_t vector;
 
+    if (PyString_Check(o) || PyUnicode_Check(o)) {
+      /* Special case: strings and unicode objects are sequences, but they
+       * will not yield valid vertex IDs */
+      return 1;
+    }
+
     /* Clear the exception set by igraphmodule_PyObject_to_vid */
     PyErr_Clear();
+
+    iterator = PyObject_GetIter(o);
 
     if (iterator == NULL) {
       PyErr_SetString(PyExc_TypeError, "integer, long, iterable, Vertex, VertexSeq or None expected");
@@ -1661,7 +1676,7 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
     while ((item = PyIter_Next(iterator))) {
       long int vid=-1;
 
-      if (igraphmodule_PyObject_to_vid(item, &vid))
+      if (igraphmodule_PyObject_to_vid(item, &vid, graph))
         break;
 
       Py_DECREF(item);

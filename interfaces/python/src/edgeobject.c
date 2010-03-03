@@ -23,6 +23,7 @@
 
 */
 
+#include "attributes.h"
 #include "edgeobject.h"
 #include "graphobject.h"
 #include "error.h"

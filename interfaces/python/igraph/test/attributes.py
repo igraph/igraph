@@ -1,3 +1,4 @@
+# vim:ts=4 sw=4 sts=4:
 import unittest
 from igraph import *
 
@@ -60,6 +61,20 @@ class AttributeTests(unittest.TestCase):
         self.failUnless(g.es["name2"] == [1,2,3,4,6,1,2,3,4,6])
         g.es.set_attribute_values("name", [2])
         self.failUnless(g.es["name"] == [2]*10)
+
+    def testVertexNameIndexing(self):
+        g = Graph.Famous("bull")
+        g.vs["name"] = ["foo", "bar", "baz", "fred", "thud"]
+        self.failUnless(g.degree("bar") == 3)
+        self.failUnless(g.degree(["bar", "fred", 0]) == [3, 1, 2])
+        g.vs[2]["name"] = "quack"
+        self.assertRaises(ValueError, g.degree, "baz")
+        self.failUnless(g.degree("quack") == 3)
+        self.failUnless(g.degree(u"quack") == 3)
+        self.failUnless(g.degree([u"bar", u"thud", 0]) == [3, 1, 2])
+        del g.vs["name"]
+        self.assertRaises(ValueError, g.degree, [u"bar", u"thud", 0])
+
     
 def suite():
     attribute_suite = unittest.makeSuite(AttributeTests)

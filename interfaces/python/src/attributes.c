@@ -26,14 +26,6 @@
 #include "common.h"
 #include "convert.h"
 
-#define ATTR_STRUCT(graph) ((igraphmodule_i_attribute_struct*)((graph)->attr))
-#define ATTR_STRUCT_DICT(graph) ((igraphmodule_i_attribute_struct*)((graph)->attr))->attrs
-
-typedef struct {
-  PyObject* attrs[3];
-  PyObject* vertex_name_index;
-} igraphmodule_i_attribute_struct;
-
 int igraphmodule_i_attribute_struct_init(igraphmodule_i_attribute_struct *attrs) {
   int i;
   for (i=0; i<3; i++) {
@@ -101,9 +93,43 @@ void igraphmodule_i_attribute_struct_invalidate_vertex_name_index(
     igraphmodule_i_attribute_struct *attrs) {
   if (attrs->vertex_name_index == 0)
     return;
-  
+
   Py_DECREF(attrs->vertex_name_index);
   attrs->vertex_name_index = 0;
+}
+
+void igraphmodule_invalidate_vertex_name_index(igraph_t *graph) {
+  igraphmodule_i_attribute_struct_invalidate_vertex_name_index(ATTR_STRUCT(graph));
+}
+
+int igraphmodule_get_vertex_id_by_name(igraph_t *graph, PyObject* o, long int* vid) {
+  igraphmodule_i_attribute_struct* attrs = ATTR_STRUCT(graph);
+  PyObject* o_vid;
+
+  if (igraphmodule_i_attribute_struct_index_vertex_names(attrs, 0))
+    return 1;
+
+  o_vid = PyDict_GetItem(attrs->vertex_name_index, o);
+  if (o_vid == NULL) {
+    PyObject* s = PyObject_Repr(o);
+    
+    if (s) {
+      PyErr_Format(PyExc_ValueError, "no such vertex: %s", PyString_AS_STRING(s));
+      Py_DECREF(s);
+    } else {
+      PyErr_Format(PyExc_ValueError, "no such vertex: %p", o);
+    }
+    return 1;
+  }
+
+  if (!PyInt_Check(o_vid)) {
+    PyErr_SetString(PyExc_ValueError, "non-numeric vertex ID assigned to vertex name. This is most likely a bug.");
+    return 1;
+  }
+
+  *vid = PyInt_AsLong(o_vid);
+
+  return 0;
 }
 
 /* Attribute handlers for the Python interface */
@@ -125,7 +151,7 @@ static int igraphmodule_i_attribute_init(igraph_t *graph, igraph_vector_ptr_t *a
 
   /* See if we have graph attributes */
   if (attr) {
-    PyObject *dict=attrs->attrs[ATTRHASH_IDX_GRAPH], *value;
+    PyObject *dict=attrs->attrs[0], *value;
     char *s;
     n = igraph_vector_ptr_size(attr);
     for (i=0; i<n; i++) {
@@ -248,7 +274,7 @@ static int igraphmodule_i_attribute_add_vertices(igraph_t *graph, long int nv, i
     IGRAPH_FINALLY(free, added_attrs);
   }
 
-  dict=ATTR_STRUCT_DICT(graph)[1];
+  dict=ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_VERTEX];
   if (!PyDict_Check(dict)) 
     IGRAPH_ERROR("vertex attribute hash type mismatch", IGRAPH_EINVAL);
 
@@ -372,7 +398,7 @@ static void igraphmodule_i_attribute_delete_vertices(igraph_t *graph,
   Py_ssize_t pos=0;
   
   /* Reindexing vertices */
-  dict=ATTR_STRUCT_DICT(graph)[1];
+  dict=ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_VERTEX];
   if (!PyDict_Check(dict)) return;
 
   n=igraph_vector_size(vidx);
@@ -439,7 +465,7 @@ static int igraphmodule_i_attribute_add_edges(igraph_t *graph, const igraph_vect
     IGRAPH_FINALLY(free, added_attrs);
   }
 
-  dict=ATTR_STRUCT_DICT(graph)[2];
+  dict=ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_EDGE];
   if (!PyDict_Check(dict)) 
     IGRAPH_ERROR("edge attribute hash type mismatch", IGRAPH_EINVAL);
   while (PyDict_Next(dict, &pos, &key, &value)) {
@@ -556,7 +582,7 @@ static void igraphmodule_i_attribute_delete_edges(igraph_t *graph, const igraph_
   PyObject *key, *value, *dict, *o;
   Py_ssize_t pos=0;
   
-  dict=ATTR_STRUCT_DICT(graph)[2];
+  dict=ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_EDGE];
   if (!PyDict_Check(dict)) return;
 
   n=igraph_vector_size(idx);
@@ -603,7 +629,7 @@ static int igraphmodule_i_attribute_permute_edges(igraph_t *graph,
   PyObject *key, *value, *dict, *newdict, *newlist, *o;
   Py_ssize_t pos=0;
 
-  dict=ATTR_STRUCT_DICT(graph)[2];
+  dict=ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_EDGE];
   if (!PyDict_Check(dict)) return 1;
 
   newdict=PyDict_New();
@@ -706,9 +732,9 @@ igraph_bool_t igraphmodule_i_attribute_has_attr(const igraph_t *graph,
   long int attrnum;
   PyObject *o, *dict;
   switch (type) {
-  case IGRAPH_ATTRIBUTE_GRAPH: attrnum=0; break;
-  case IGRAPH_ATTRIBUTE_VERTEX: attrnum=1; break;
-  case IGRAPH_ATTRIBUTE_EDGE: attrnum=2; break;
+  case IGRAPH_ATTRIBUTE_GRAPH:  attrnum=ATTRHASH_IDX_GRAPH;  break;
+  case IGRAPH_ATTRIBUTE_VERTEX: attrnum=ATTRHASH_IDX_VERTEX; break;
+  case IGRAPH_ATTRIBUTE_EDGE:   attrnum=ATTRHASH_IDX_EDGE;   break;
   default: return 0; break;
   }
   dict = ATTR_STRUCT_DICT(graph)[attrnum];
@@ -725,9 +751,9 @@ int igraphmodule_i_attribute_get_type(const igraph_t *graph,
   int is_numeric, is_string;
   PyObject *o, *dict;
   switch (elemtype) {
-  case IGRAPH_ATTRIBUTE_GRAPH: attrnum=0; break;
-  case IGRAPH_ATTRIBUTE_VERTEX: attrnum=1; break;
-  case IGRAPH_ATTRIBUTE_EDGE: attrnum=2; break;
+  case IGRAPH_ATTRIBUTE_GRAPH:  attrnum=ATTRHASH_IDX_GRAPH;  break;
+  case IGRAPH_ATTRIBUTE_VERTEX: attrnum=ATTRHASH_IDX_VERTEX; break;
+  case IGRAPH_ATTRIBUTE_EDGE:   attrnum=ATTRHASH_IDX_EDGE;   break;
   default: IGRAPH_ERROR("No such attribute type", IGRAPH_EINVAL); break;
   }
   dict = ATTR_STRUCT_DICT(graph)[attrnum];
@@ -765,7 +791,7 @@ int igraphmodule_i_attribute_get_type(const igraph_t *graph,
 int igraphmodule_i_get_numeric_graph_attr(const igraph_t *graph,
 					  const char *name, igraph_vector_t *value) {
   PyObject *dict, *o, *result;
-  dict = ATTR_STRUCT_DICT(graph)[0];
+  dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_GRAPH];
   /* No error checking, if we get here, the type has already been checked by previous
      attribute handler calls... hopefully :) Same applies for the other handlers. */
   o = PyDict_GetItemString(dict, name);
@@ -788,7 +814,7 @@ int igraphmodule_i_get_numeric_graph_attr(const igraph_t *graph,
 int igraphmodule_i_get_string_graph_attr(const igraph_t *graph,
 					 const char *name, igraph_strvector_t *value) {
   PyObject *dict, *o, *result;
-  dict = ATTR_STRUCT_DICT(graph)[0];
+  dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_GRAPH];
   o = PyDict_GetItemString(dict, name);
   if (!o) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   IGRAPH_CHECK(igraph_strvector_resize(value, 1));
@@ -813,7 +839,7 @@ int igraphmodule_i_get_numeric_vertex_attr(const igraph_t *graph,
   PyObject *dict, *list, *result, *o;
   igraph_vector_t newvalue;
 
-  dict = ATTR_STRUCT_DICT(graph)[1];
+  dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_VERTEX];
   list = PyDict_GetItemString(dict, name);
   if (!list) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
 
@@ -854,7 +880,7 @@ int igraphmodule_i_get_string_vertex_attr(const igraph_t *graph,
   PyObject *dict, *list, *result;
   igraph_strvector_t newvalue;
 
-  dict = ATTR_STRUCT_DICT(graph)[1];
+  dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_VERTEX];
   list = PyDict_GetItemString(dict, name);
   if (!list) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
 
@@ -900,7 +926,7 @@ int igraphmodule_i_get_numeric_edge_attr(const igraph_t *graph,
   PyObject *dict, *list, *result, *o;
   igraph_vector_t newvalue;
 
-  dict = ATTR_STRUCT_DICT(graph)[2];
+  dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_EDGE];
   list = PyDict_GetItemString(dict, name);
   if (!list) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
 
@@ -941,7 +967,7 @@ int igraphmodule_i_get_string_edge_attr(const igraph_t *graph,
   PyObject *dict, *list, *result;
   igraph_strvector_t newvalue;
 
-  dict = ATTR_STRUCT_DICT(graph)[2];
+  dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_EDGE];
   list = PyDict_GetItemString(dict, name);
   if (!list) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
 

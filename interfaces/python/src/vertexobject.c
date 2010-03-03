@@ -23,6 +23,7 @@
 
 */
 
+#include "attributes.h"
 #include "vertexobject.h"
 #include "graphobject.h"
 #include "error.h"
@@ -196,6 +197,9 @@ int igraphmodule_Vertex_set_attribute(igraphmodule_VertexObject* self, PyObject*
   int r;
   
   if (o==0) return -1;
+
+  if (PyString_Check(k) && !strcmp(PyString_AS_STRING(k), "name"))
+    igraphmodule_invalidate_vertex_name_index(&o->g);
 
   if (v==NULL)
     // we are deleting attribute

@@ -23,11 +23,12 @@
 
 */
 
-#include "vertexseqobject.h"
-#include "vertexobject.h"
+#include "attributes.h"
 #include "common.h"
 #include "convert.h"
 #include "error.h"
+#include "vertexseqobject.h"
+#include "vertexobject.h"
 
 #define GET_GRAPH(obj) (((igraphmodule_GraphObject*)obj->gref)->g)
 
@@ -246,7 +247,7 @@ PyObject* igraphmodule_VertexSeq_get_attribute_values(igraphmodule_VertexSeqObje
   long int i, n;
 
   PyErr_Clear();
-  values=PyDict_GetItem(((PyObject**)gr->g.attr)[ATTRHASH_IDX_VERTEX], o);
+  values=PyDict_GetItem(ATTR_STRUCT_DICT(&gr->g)[ATTRHASH_IDX_VERTEX], o);
   if (!values) {
     PyErr_SetString(PyExc_KeyError, "Attribute does not exist");
     return NULL;
@@ -343,8 +344,11 @@ int igraphmodule_VertexSeq_set_attribute_values_mapping(igraphmodule_VertexSeqOb
   long i, j, n, no_of_nodes;
 
   gr = self->gref;
-  dict = ((PyObject**)gr->g.attr)[ATTRHASH_IDX_VERTEX];
-  
+  dict = ATTR_STRUCT_DICT(&gr->g)[ATTRHASH_IDX_VERTEX];
+
+  if (PyString_Check(attrname) && !strcmp(PyString_AS_STRING(attrname), "name"))
+    igraphmodule_invalidate_vertex_name_index(&gr->g);
+
   if (values == 0) {
     if (igraph_vs_type(&self->vs) == IGRAPH_VS_ALL)
       return PyDict_DelItem(dict, attrname);

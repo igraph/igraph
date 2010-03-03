@@ -23,10 +23,11 @@
 
 */
 
-#include "edgeseqobject.h"
-#include "edgeobject.h"
+#include "attributes.h"
 #include "common.h"
 #include "convert.h"
+#include "edgeseqobject.h"
+#include "edgeobject.h"
 #include "error.h"
 
 #define GET_GRAPH(obj) (((igraphmodule_GraphObject*)obj->gref)->g)
@@ -254,7 +255,7 @@ PyObject* igraphmodule_EdgeSeq_get_attribute_values(igraphmodule_EdgeSeqObject* 
   long int i, n;
 
   PyErr_Clear();
-  values=PyDict_GetItem(((PyObject**)gr->g.attr)[ATTRHASH_IDX_EDGE], o);
+  values=PyDict_GetItem(ATTR_STRUCT_DICT(&gr->g)[ATTRHASH_IDX_EDGE], o);
   if (!values) {
     PyErr_SetString(PyExc_KeyError, "Attribute does not exist");
     return NULL;
@@ -350,7 +351,7 @@ int igraphmodule_EdgeSeq_set_attribute_values_mapping(igraphmodule_EdgeSeqObject
   igraph_vector_t es;
   long i, j, n, no_of_edges;
   
-  dict = ((PyObject**)gr->g.attr)[ATTRHASH_IDX_EDGE];
+  dict = ATTR_STRUCT_DICT(&gr->g)[ATTRHASH_IDX_EDGE];
 
   if (values == 0) {
     if (igraph_es_type(&self->es) == IGRAPH_ES_ALL)
