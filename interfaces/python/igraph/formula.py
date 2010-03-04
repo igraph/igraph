@@ -63,7 +63,7 @@ def generate_edges(formula):
                 # End markers are fine
                 pass
             else:
-                raise SyntaxError, "invalid token found in edge specification: %s" % formula
+                raise SyntaxError("invalid token found in edge specification: %s" % formula)
         else:
             # We are parsing an edge operator
             if   tok == "<":  arrowheads[0] = True

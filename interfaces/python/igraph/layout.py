@@ -76,23 +76,23 @@ class Layout(object):
         @raise ValueError: if the coordinate list is empty and the
           number of dimensions is not given.
         """
-        self._coords = map(list, coords)
+        self._coords = [list(coord) for coord in coords]
         if dim is None:
             if len(self._coords) == 0:
-                raise ValueError, "the number of dimensions must be given if the coordinate list is empty"
+                raise ValueError("the number of dimensions must be given if the coordinate list is empty")
             else:
                 self._dim = len(self._coords[0])
         else:
             self._dim = int(dim)
             for row in self._coords:
                 if len(row) != self._dim:
-                    raise ValueError, "all items in the coordinate list must have a length of %d" % self._dim
+                    raise ValueError("all items in the coordinate list must have a length of %d" % self._dim)
 
     def __len__(self): return len(self._coords)
     def __getitem__(self, idx): return copy(self._coords[idx])
     def __setitem__(self, idx, value):
         if len(value) != self._dim:
-            raise ValueError, "assigned item must have %d elements" % self._dim
+            raise ValueError("assigned item must have %d elements" % self._dim)
         self._coords[idx] = list(value)
     def __delitem__(self, idx): del self._coords[idx]
     def __copy__(self):
@@ -106,8 +106,8 @@ class Layout(object):
     def append(self, value):
         """Appends a new point to the layout"""
         if len(value) < self._dim:
-            raise ValueError, "appended item must have %d elements" % self._dim
-        self._coords.append(map(float, value[0:self._dim]))
+            raise ValueError("appended item must have %d elements" % self._dim)
+        self._coords.append([float(coord) for coord in value[0:self._dim]])
 
     def mirror(self, dim):
         """Mirrors the layout along the given dimension(s)
@@ -115,7 +115,7 @@ class Layout(object):
         @param dim: the list of dimensions or a single dimension
         """
         if isinstance(dim, int): dim = [dim]
-        else: dim = map(int, dim)
+        else: dim = [int(x) for x in dim]
 
         _n = self._dim
         vec = [1]*_n
@@ -153,19 +153,19 @@ class Layout(object):
         """
         origin = list(kwds.get("origin", [0.]*self._dim))
         if len(origin) != self._dim:
-            raise ValueError, "origin must have %d dimensions" % self._dim
+            raise ValueError("origin must have %d dimensions" % self._dim)
 
         scaling = kwds.get("scale") or args
         if type(scaling) == int or type(scaling) == float: scaling = [scaling]
         if len(scaling) == 0:
-            raise ValueError, "scaling factor must be given"
+            raise ValueError("scaling factor must be given")
         elif len(scaling) == 1:
             if type(scaling[0]) == int or type(scaling[0]) == float:
                 scaling = scaling*self._dim
             else:
                 scaling = scaling[0]
         if len(scaling) != self._dim:
-            raise ValueError, "scaling factor list must have %d elements" % self._dim
+            raise ValueError("scaling factor list must have %d elements" % self._dim)
 
         for idx, row in enumerate(self._coords):
             self._coords[idx] = [(row[d]-origin[d])*scaling[d]+origin[d] \
@@ -184,11 +184,11 @@ class Layout(object):
         """
         v = kwds.get("v") or args
         if len(v) == 0:
-            raise ValueError, "translation vector must be given"
+            raise ValueError("translation vector must be given")
         elif len(v) == 1 and type(v[0]) != int and type(v[0]) != float:
             v = v[0]
         if len(v) != self._dim:
-            raise ValueError, "translation vector must have %d dimensions" % self._dim
+            raise ValueError("translation vector must have %d dimensions" % self._dim)
 
         for idx, row in enumerate(self._coords):
             self._coords[idx] = [row[d]+v[d] for d in xrange(self._dim)]
@@ -220,7 +220,8 @@ class Layout(object):
         @param max_radius: the radius corresponding to the maximum Y value
         """
         bbox = self.bounding_box()
-        if len(bbox) != 4: raise TypeError, "implemented only for 2D layouts"
+        if len(bbox) != 4:
+            raise TypeError("implemented only for 2D layouts")
 
         while min_angle > max_angle: max_angle += 360
         while min_angle > 360:
@@ -303,7 +304,7 @@ class Layout(object):
             and type(center[0]) != float:
             center = center[0]
         if len(center) != self._dim:
-            raise ValueError, "the given point must have %d dimensions"%self._dim
+            raise ValueError("the given point must have %d dimensions" % self._dim)
         centroid = self.centroid()
         vec = [center[d]-centroid[d] for d in xrange(self._dim)]
         self.translate(vec)

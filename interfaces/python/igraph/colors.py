@@ -86,8 +86,8 @@ class Palette(object):
         except KeyError:
             pass
         if isinstance(v, int) or isinstance(v, long):
-            if v<0: raise ValueError, "color index must be non-negative"
-            if v>=self._length: raise ValueError, "color index too large"
+            if v<0: raise ValueError("color index must be non-negative")
+            if v>=self._length: raise ValueError("color index too large")
             result=self._get(v)
         else:
             result=color_name_to_rgb(v)
@@ -102,7 +102,7 @@ class Palette(object):
 
         @param v: numerical index of the color to be retrieved
         @return: a 3-tuple containing the RGB values"""
-        raise ValueError, "abstract class"
+        raise ValueError("abstract class")
 
     __getitem__ = get
 
@@ -161,7 +161,7 @@ class AdvancedGradientPalette(GradientPalette):
             d = float(n-1) / (len(indices)-1)
             for i in xrange(len(colors)): indices[i] *= d
         elif not hasattr(indices, "__iter__"):
-            indices = map(float, indices)
+            indices = [float(x) for x in indices]
         d = zip(*sorted(zip(indices, colors)))
         self._colors = [color_name_to_rgb(c) for c in d[1]]
         self._indices = d[0]
@@ -187,14 +187,14 @@ class PrecalculatedPalette(Palette):
         L{color_name_to_rgb()}."""
         Palette.__init__(self, len(l))
         for idx, color in enumerate(l):
-            if isinstance(color, (str, unicode)):
+            if isinstance(color, basestring):
                 color = color_name_to_rgb(color)
             self._cache[idx] = color
 
     def _get(self, v):
         """This method will only be called if the requested color index is
         outside the size of the palette. In that case, we throw an exception"""
-        raise ValueError, "palette index outside bounds: %s" % v
+        raise ValueError("palette index outside bounds: %s" % v)
 
 
 class ClusterColoringPalette(PrecalculatedPalette):
@@ -215,7 +215,7 @@ class ClusterColoringPalette(PrecalculatedPalette):
 
     def __init__(self, n):
         base_colors = ["red", "green", "blue", "yellow", "magenta", "cyan", "#808080"]
-        base_colors = map(color_name_to_rgb, base_colors)
+        base_colors = [color_name_to_rgb[name] for name in base_colors]
 
         num_base_colors = len(base_colors)
         colors = base_colors[:]
@@ -287,7 +287,7 @@ def color_name_to_rgb(color, palette=None):
             try:
                 components = palette.get(color)
             except AttributeError:
-                raise ValueError, "palette index used when no palette was given"
+                raise ValueError("palette index used when no palette was given")
     else:
         if color[0] == '#':
             color = color[1:]

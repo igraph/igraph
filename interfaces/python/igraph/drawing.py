@@ -36,9 +36,10 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 from warnings import warn
 import os
 import platform
-import colors
 import time
 import math
+
+import igraph.colors as colors
 
 __all__ = ["BoundingBox", "Plot", "plot"]
 
@@ -48,11 +49,11 @@ except ImportError:
     # No cairo support is installed. Create a fake module
     class FakeModule(object):
         def __getattr__(self, a):
-            raise TypeError, "plotting not available"
+            raise TypeError("plotting not available")
         def __call__(self, a):
-            raise TypeError, "plotting not available"
+            raise TypeError("plotting not available")
         def __setattr__(self, k, v):
-            raise TypeError, "plotting not available"
+            raise TypeError("plotting not available")
     cairo=FakeModule()
 
 class BoundingBox(object):
@@ -78,11 +79,11 @@ class BoundingBox(object):
         elif len(args) == 2:
             coords = (0, 0, args[0], args[1])
         if coords is None:
-            raise ValueError, "invalid coordinate format"
+            raise ValueError("invalid coordinate format")
         try:
             coords = tuple(map(float, coords))
         except ValueError:
-            raise ValueError, "invalid coordinate format, numbers expected"
+            raise ValueError("invalid coordinate format, numbers expected")
         self.coords = coords
 
     def _set_coords(self, coords):
@@ -127,7 +128,7 @@ class BoundingBox(object):
         if isinstance(margins, int) or isinstance(margins, float):
             margins = [float(margins)] * 4
         if len(margins) != 4:
-            raise ValueError, "margins must be a 4-tuple or a single number"
+            raise ValueError("margins must be a 4-tuple or a single number")
         nx1, ny1 = self._coords[0]+margins[0], self._coords[1]+margins[1]
         nx2, ny2 = self._coords[2]-margins[2], self._coords[3]-margins[3]
         if nx1 > nx2:
@@ -291,7 +292,7 @@ class Plot(object):
         @see: Graph.__plot__
         """
         if opacity<0.0 or opacity>1.0:
-            raise ValueError, "opacity must be between 0.0 and 1.0"
+            raise ValueError("opacity must be between 0.0 and 1.0")
         bbox = bbox or (0,0,self._width,self._height)
         if not isinstance(bbox, BoundingBox): bbox = BoundingBox(bbox)
         self._objects.append((object, bbox, palette, opacity, args, kwds))
@@ -374,7 +375,7 @@ class Plot(object):
             if self._tmpfile: self._create_tmpfile()
             fname = fname or self._filename or self._tmpfile_name
             if fname is None:
-                raise ValueError, "no file name is known for the surface and none given"
+                raise ValueError("no file name is known for the surface and none given")
             result = self._surface.write_to_png(fname)
             if self._tmpfile: self._close_tmpfile()
             if not self._tmpfile: return result
@@ -404,7 +405,7 @@ class Plot(object):
         if not imgviewer:
             # No image viewer was given and none was detected. This
             # should only happen on unknown platforms.
-            raise NotImplementedError, "showing plots is not implemented on this platform: %s" % platform.system()
+            raise NotImplementedError("showing plots is not implemented on this platform: %s" % platform.system())
         else:
             os.system("%s %s" % (imgviewer, self._tmpfile_name))
             if platform.system() == "Darwin" or self._windows_hacks:
@@ -438,7 +439,7 @@ class ShapeDrawer(object):
         @param w: the width of the object
         @param h: the height of the object. If C{None}, equals to the width.
         """
-        raise TypeError, "abstract class"
+        raise TypeError("abstract class")
     draw_path=staticmethod(draw_path)
 
 
@@ -572,7 +573,7 @@ def draw_shape_path(shape, ctx, cx, cy, w, h=None):
     try:
         drawer = known_shapes[shape]
     except:
-        raise ValueError, "unknown shape: %s" % shape
+        raise ValueError("unknown shape: %s" % shape)
     drawer.draw_path(ctx, cx, cy, w, h)
 
 known_shapes = {
@@ -630,14 +631,14 @@ class CoordinateSystem(object):
         be I{initialized} with respect to a Cairo drawing context and a bounding
         box before being plotted -- hence the different method name.
         """
-        raise NotImplementedError, "abstract class"
+        raise NotImplementedError("abstract class")
 
     def local_to_context(self, *args):
         """Converts local coordinates to the context coordinate system (given
         by the bounding box).
         
         This method must be overridden in derived classes."""
-        raise NotImplementedError, "abstract class"
+        raise NotImplementedError("abstract class")
 
 
 class DescartesCoordinateSystem(object):

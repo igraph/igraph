@@ -214,9 +214,9 @@ class Shell(object):
     """Superclass of the embeddable shells supported by igraph"""
 
     def __init__(self):
-        raise ValueError, "abstract class"
+        raise ValueError("abstract class")
     def __call__(self, namespace=None):
-        raise ValueError, "abstract class"
+        raise ValueError("abstract class")
     def supports_progress_bar(self):
         return hasattr(self, "_progress_handler")
     def get_progress_handler(self):

@@ -142,7 +142,7 @@ class Graph(core.GraphBase):
             between a given source-target vertex pair, only one is removed.
         """
         if len(args) == 0 and len(kwds) == 0:
-            raise ValueError, "expected at least one argument"
+            raise ValueError("expected at least one argument")
         if len(kwds)>0 or (hasattr(args[0], "__call__") and not isinstance(args[0], core.EdgeSeq)):
             es = self.es(*args, **kwds)
         else:
@@ -259,7 +259,7 @@ class Graph(core.GraphBase):
         if self.vcount() == 0: return []
         if self.vcount() == 1: return [1.0]
         distance_matrix = self.shortest_paths(mode=OUT)
-        distance_maxs = map(max, distance_matrix)
+        distance_maxs = [max(row) for row in distance_matrix]
         
         if vertices is None:
             result = [1.0/x for x in distance_maxs]
@@ -294,7 +294,7 @@ class Graph(core.GraphBase):
 
         if attribute is None: return Matrix(GraphBase.get_adjacency(self, type))
         if attribute not in self.es.attribute_names():
-            raise ValueError, "Attribute does not exist"
+            raise ValueError("Attribute does not exist")
         data = [[default] * self.vcount() for _ in xrange(self.vcount())]
 
         if not self.is_directed():
@@ -390,7 +390,7 @@ class Graph(core.GraphBase):
         """
         if isinstance(membership, VertexClustering):
             if membership.graph != self:
-                raise ValueError, "clustering object belongs to a different graph"
+                raise ValueError("clustering object belongs to a different graph")
             return GraphBase.modularity(self, membership.membership, weights)
         else:
             return GraphBase.modularity(self, membership, weights)
@@ -577,7 +577,7 @@ class Graph(core.GraphBase):
           networks. Phys Rev E 76:036106, 2007.
           U{http://arxiv.org/abs/0709.2938}.
         """
-        if isinstance(fixed, (str, unicode)):
+        if isinstance(fixed, basestring):
             fixed = [bool(o) for o in g.vs[fixed]]
         cl = GraphBase.community_label_propagation(self, weights, initial, fixed)
         return VertexClustering(self, cl)
@@ -612,7 +612,7 @@ class Graph(core.GraphBase):
           in very large networks. Phys Rev E 70, 066111 (2004).
         """
         if self.is_directed():
-            raise ValueError, "input graph must be undirected"
+            raise ValueError("input graph must be undirected")
 
         if return_levels:
             levels, qs = GraphBase.community_multilevel(self, weights, True)
@@ -826,7 +826,7 @@ class Graph(core.GraphBase):
         else:
             method = getattr(self.__class__, self._layout_mapping[layout.lower()])
         if not hasattr(method, "__call__"):
-            raise ValueError, "layout method must be callable"
+            raise ValueError("layout method must be callable")
         l=method(self, *args, **kwds)
         if not isinstance(l, Layout): l=Layout(l)
         return l
@@ -876,7 +876,7 @@ class Graph(core.GraphBase):
             line = line.strip()
             if len(line) == 0: continue
             if line.startswith(comment_char): continue
-            row = map(float, line.split(sep))
+            row = [float(x) for x in line.split(sep)]
             matrix.append(row)
             ri += 1
 
@@ -956,12 +956,12 @@ class Graph(core.GraphBase):
         @return: C{None} if the graph was saved successfully to the
           file given, or a string if C{fname} was C{None}.
         """
-        import cPickle
-        if fname is None: return cPickle.dumps(self, version)
+        import cPickle as pickle
+        if fname is None: return pickle.dumps(self, version)
         if not isinstance(fname, file):
             file_was_opened=True
             fname=open(fname, 'wb')
-        result=cPickle.dump(self, fname, version)
+        result=pickle.dump(self, fname, version)
         if file_was_opened: fname.close()
         return result
 
@@ -976,16 +976,16 @@ class Graph(core.GraphBase):
           of an C{igraph} Graph object.
         @return: the created graph object.
         """
-        import cPickle
+        import cPickle as pickle
         if len(fname)>40 and "cigraph\nGraph\n" in fname:
-            return cPickle.loads(fname)
+            return pickle.loads(fname)
         if not isinstance(fname, file):
             file_was_opened=True
             fname=open(fname, 'rb')
-        result=cPickle.load(fname)
+        result=pickle.load(fname)
         if file_was_opened: fname.close()
         if not isinstance(result, klass):
-            raise TypeError, "unpickled object is not a %s" % klass.__name__
+            raise TypeError("unpickled object is not a %s" % klass.__name__)
         return result
 
     def write_svg(self, fname, layout, width = None, height = None, \
@@ -1033,7 +1033,7 @@ class Graph(core.GraphBase):
             height = width
                 
         if width<=0 or height<=0:
-            raise ValueError, "width and height must be positive"
+            raise ValueError("width and height must be positive")
 
         if isinstance(layout, str):
             f=getattr(Graph, "layout_"+layout);
@@ -1068,7 +1068,7 @@ class Graph(core.GraphBase):
             font_size = "%spx" % str(font_size)
         else:
             if ";" in font_size:
-                raise ValueError, "font size can't contain a semicolon"
+                raise ValueError("font size can't contain a semicolon")
 
         vc = self.vcount()
         while len(labels)<vc: labels.append(len(labels)+1)
@@ -1252,9 +1252,9 @@ class Graph(core.GraphBase):
         try:
             reader = klass._format_mapping[format][0]
         except KeyError, IndexError:
-            raise IOError, "unknown file format: %s" % str(format)
+            raise IOError("unknown file format: %s" % str(format))
         if reader is None:
-            raise IOError, "no reader method for file format: %s" % str(format)
+            raise IOError("no reader method for file format: %s" % str(format))
         reader = getattr(klass, reader)
         return reader(f, *args, **kwds)
     Load = Read
@@ -1288,9 +1288,9 @@ class Graph(core.GraphBase):
         try:
             writer = self._format_mapping[format][1]
         except KeyError, IndexError:
-            raise IOError, "unknown file format: %s" % str(format)
+            raise IOError("unknown file format: %s" % str(format))
         if writer is None:
-            raise IOError, "no writer method for file format: %s" % str(format)
+            raise IOError("no writer method for file format: %s" % str(format))
         writer = getattr(self, writer)
         return writer(f, *args, **kwds)
     save = write
@@ -1356,7 +1356,7 @@ class Graph(core.GraphBase):
         vertex_names = vertex_attrs[vertex_name_attr]
         # Check for duplicates in vertex_names
         if len(vertex_names) != len(set(vertex_names)):
-            raise ValueError, "vertex names are not unique"
+            raise ValueError("vertex names are not unique")
         # Create a reverse mapping from vertex names to indices
         vertex_name_map = UniqueIdGenerator(initial = vertex_names)
 
@@ -1850,7 +1850,6 @@ class Graph(core.GraphBase):
             corresponding edge attribute is C{arrow_width}, the default
             is 1.
         """
-        import colors
         import cairo
 
         directed = self.is_directed()
@@ -1958,9 +1957,9 @@ class Graph(core.GraphBase):
         del vertex_shapes
 
         # Draw the vertex labels
-        if not kwds.has_key("vertex_label") and "label" not in self.vs.attribute_names():
+        if "vertex_label" not in kwds and "label" not in self.vs.attribute_names():
             vertex_labels = map(str, xrange(self.vcount()))
-        elif kwds.has_key("vertex_label") and kwds["vertex_label"] is None:
+        elif "vertex_label" in kwds and kwds["vertex_label"] is None:
             vertex_labels = [""] * self.vcount()
         else:
             vertex_labels = drawing.collect_attributes(self.vcount(), "vertex_label", \
@@ -2548,7 +2547,7 @@ class EdgeSeq(core.EdgeSeq):
                 elif attr == "_between":
                     values = None
                     if len(value) != 2:
-                        raise ValueError, "_between selector requires two vertex ID lists"
+                        raise ValueError("_between selector requires two vertex ID lists")
                     set1 = _ensure_set(value[0])
                     set2 = _ensure_set(value[1])
                     filtered_idxs = [i for i, e in enumerate(es) if \
@@ -2683,7 +2682,7 @@ def compare_communities(comm1, comm2, method="vi", remove_none=False):
 
     vec1, vec2 = _ensure_list(comm1), _ensure_list(comm2)
     if len(vec1) != len(vec2):
-        raise ValueError, "the two membership vectors must be equal in length"
+        raise ValueError("the two membership vectors must be equal in length")
 
     if remove_none and (None in vec1 or None in vec2):
         idxs_to_remove = [i for i in xrange(len(vec1)) \
@@ -2731,8 +2730,8 @@ def summary(o, f=sys.stdout):
     @param f: the stream to be used
     """
     if hasattr(o, "summary"):
-        print >>f, o.summary()
+        f.write(o.summary() + "\n")
     else:
-        print >>f, str(o)
+        f.write(str(o) + "\n")
 
 config = configuration.init()

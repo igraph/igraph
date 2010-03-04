@@ -28,13 +28,14 @@ class Matrix(object):
           two integers or a tuple. If a single integer is
           given here, the matrix is assumed to be square-shaped.
         """
-        if len(args) < 1: raise TypeError, "expected an integer or a tuple"
+        if len(args) < 1: raise TypeError("expected an integer or a tuple")
         if len(args) == 1:
             if hasattr(args[0], "__len__"):
-                h, w = map(int, args[0][0:2])
+                h, w = int(args[0][0]), int(args[0][1])
             else:
                 h, w = int(args[0]), int(args[0])
-        else: h, w = map(int, args[0:2])
+        else:
+            h, w = int(args[0]), int(args[1])
         mtrx = [[value]*w for _ in xrange(h)]
         return klass(mtrx)
     Fill=classmethod(Fill)
@@ -65,11 +66,12 @@ class Matrix(object):
     def _set_data(self, data=None):
         """Sets the data stored in the matrix"""
         if data is not None:
-            self._data = map(list, data)
+            self._data = [list(row) for row in data]
             self._nrow = len(data)
-            self._ncol = max(map(len, data))
+            self._ncol = max(len(row) for row in data)
             for row in self._data:
-                if len(row) < self._ncol: row.extend([0]*(self._ncol-len(row)))
+                if len(row) < self._ncol:
+                    row.extend([0]*(self._ncol-len(row)))
 
     def _get_data(self):
         """Returns the data stored in the matrix as a list of lists"""
@@ -109,7 +111,7 @@ class Matrix(object):
             else:
                 return self._data[first][second]
         else:
-            raise IndexError, "invalid matrix index"
+            raise IndexError("invalid matrix index")
 
 
     def __setitem__(self, i, value):
@@ -124,15 +126,15 @@ class Matrix(object):
         if isinstance(i, int):
             # Setting a row
             if len(value) != len(self._data[i]):
-                raise ValueError, "new value must have %d items" % len(self._data[i])
+                raise ValueError("new value must have %d items" % len(self._data[i]))
             self._data[i] = list(value)
         elif isinstance(i, slice):
             # Setting multiple rows
             if len(value) != len(self._data[i]):
-                raise ValueError, "new value must have %d items" % len(self._data[i])
+                raise ValueError("new value must have %d items" % len(self._data[i]))
             for j in xrange(len(value)):
                 if len(value[j]) != len(self._data[0]):
-                    raise ValueError, "rows of new value must have %d items" % len(self._data[0])
+                    raise ValueError("rows of new value must have %d items" % len(self._data[0]))
             self._data[i] = list(map(list, value))
         elif isinstance(i, tuple):
             try:
@@ -154,7 +156,7 @@ class Matrix(object):
                 # Setting a single element
                 self._data[first][second] = value
         else:
-            raise IndexError, "invalid matrix index"
+            raise IndexError("invalid matrix index")
 
 
     def __repr__(self):
@@ -223,7 +225,6 @@ class Matrix(object):
         is square-shaped, the same names are used for both column and row
         names.
         """
-        import colors
         gw = float(kwds.get("grid_width", 1.))
         border_width = float(kwds.get("border_width", 1.))
         style = kwds.get("style", "boolean")
@@ -233,7 +234,8 @@ class Matrix(object):
         value_format = kwds.get("value_format", None)
 
         # Validations
-        if style not in ("boolean", "palette"): raise ValueError, "invalid style"
+        if style not in ("boolean", "palette"):
+            raise ValueError("invalid style")
         if row_names is None and col_names is not None: row_names=col_names
         if row_names is not None:
             row_names=list(row_names)[0:self._nrow]
@@ -247,9 +249,9 @@ class Matrix(object):
         if values == True: values=self
         if isinstance(values, list): values=Matrix(list)
         if values is not None and not isinstance(values, Matrix):
-            raise TypeError, "values must be None, False, True or a matrix"
+            raise TypeError("values must be None, False, True or a matrix")
         if values is not None and values.shape != self.shape:
-            raise ValueError, "values must be a matrix of size %s" % str(self.shape)
+            raise ValueError("values must be a matrix of size %s" % str(self.shape))
 
         _, _, font_height, _, _ = context.font_extents()
 
@@ -362,9 +364,9 @@ class Matrix(object):
           determining the row minimums. If C{None}, the global minimum is
           returned.
         """
-        if dim == 1: return map(min, self._data)
-        if dim == 0: return map(min, [[row[idx] for row in self._data] for idx in xrange(self._ncol)])
-        return min(map(min, self._data))
+        if dim == 1: return [min(row) for row in self._data]
+        if dim == 0: return [min(row[idx] for row in self._data) for idx in xrange(self._ncol)]
+        return min(min(row) for row in self._data)
 
     def max(self, dim=None):
         """Returns the maximum of the matrix along the given dimension
@@ -373,9 +375,9 @@ class Matrix(object):
           determining the row maximums. If C{None}, the global maximum is
           returned.
         """
-        if dim == 1: return map(max, self._data)
-        if dim == 0: return map(max, [[row[idx] for row in self._data] for idx in xrange(self._ncol)])
-        return max(map(max, self._data))
+        if dim == 1: return [max(row) for row in self._data]
+        if dim == 0: return [max(row[idx] for row in self._data) for idx in xrange(self._ncol)]
+        return max(max(row) for row in self._data)
 
 
 class DyadCensus(tuple):
@@ -405,9 +407,9 @@ class DyadCensus(tuple):
         return tuple.__getitem__(self, self._remap.get(idx, idx))
 
     def __getattr__(self, attr):
-        if attr in self._remap.keys():
+        if attr in self._remap:
             return tuple.__getitem__(self, self._remap[attr])
-        raise AttributeError, "no such attribute: %s" % attr
+        raise AttributeError("no such attribute: %s" % attr)
 
     def __repr__(self):
         return "DyadCensus((%d, %d, %d))" % self
@@ -467,9 +469,9 @@ class TriadCensus(tuple):
 
     def __getattr__(self, attr):
         if isinstance(attr, basestring) and attr[0] == 't' \
-            and attr[1:].upper() in self._remap.keys():
+            and attr[1:].upper() in self._remap:
                 return tuple.__getitem__(self, self._remap[attr[1:].upper()])
-        raise AttributeError, "no such attribute: %s" % attr
+        raise AttributeError("no such attribute: %s" % attr)
 
     def __repr__(self):
         return "TriadCensus((%s))" % ", ".join(map(str, self))
@@ -478,7 +480,7 @@ class TriadCensus(tuple):
         maxidx = len(self)
         maxcount = max(self)
         numwidth = len(str(maxcount))
-        captionwidth = max(map(len, self._remap.keys()))
+        captionwidth = max(len(key) for key in self._remap)
         colcount = 4
 
         rowcount = maxidx / colcount
@@ -564,7 +566,8 @@ class Cut(object):
     def __len__(self): return 2
 
     def __getitem__(self, idx):
-        if idx >= 2: raise IndexError, "a cut has only two partitions"
+        if idx >= 2:
+            raise IndexError("a cut has only two partitions")
         return self.graph.vs.select(self._partition[idx])
 
     def _get_es(self): return self._graph.es.select(self.cut)

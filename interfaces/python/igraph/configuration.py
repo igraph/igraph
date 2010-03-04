@@ -141,7 +141,7 @@ class Configuration(object):
             elif str(value).lower() in ["1", "true", "yes", "on"]:
                 value="true"
             else:
-                raise ValueError, "value cannot be coerced to boolean type"
+                raise ValueError("value cannot be coerced to boolean type")
             object.set(section, key, value)
         setboolean=staticmethod(setboolean)
 

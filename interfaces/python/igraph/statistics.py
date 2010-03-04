@@ -308,13 +308,13 @@ def power_law_fit(x, xmin=None, method="discrete_approx"):
 
     if method == "continuous" or method == "hill":
         for x1 in x: s += math.log(x1/x0)
-        if s == 0: raise ValueError, "lower bound too high"
+        if s == 0: raise ValueError("lower bound too high")
         return 1.0+len(x)/s
     elif method == "discrete_approx":
         x0 -= 0.5
         for x1 in x: s += math.log(x1/x0)
-        if s == 0: raise ValueError, "lower bound too high"
+        if s == 0: raise ValueError("lower bound too high")
         return 1.0+len(x)/s
 
-    raise ValueError, "unknown method: %s" % method
+    raise ValueError("unknown method: %s" % method)
 

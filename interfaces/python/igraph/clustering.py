@@ -80,7 +80,7 @@ class Clustering(object):
         @return: the members of the specified cluster as a list
         @raise IndexError: if the index is out of bounds"""
         if idx<0 or idx>=self._len:
-            raise IndexError, "cluster index out of range"
+            raise IndexError("cluster index out of range")
         return [i for i,e in enumerate(self._membership) if e==idx]
 
     def __len__(self):
@@ -173,7 +173,7 @@ class OverlappingClustering(Clustering):
         @return: the members of the specified cluster as a list
         @raise IndexError: if the index is out of bounds"""
         if idx<0 or idx>=self._len:
-            raise IndexError, "cluster index out of range"
+            raise IndexError("cluster index out of range")
         return [i for i,cl in enumerate(self._membership) if idx in cl]
    
     def sizes(self, *args):
@@ -221,7 +221,7 @@ class VertexClustering(Clustering):
             Clustering.__init__(self, [0]*graph.vcount(), params)
         else:
             if len(membership) != graph.vcount():
-                raise ValueError, "membership list has invalid length"
+                raise ValueError("membership list has invalid length")
             Clustering.__init__(self, membership, params)
 
         self._q = modularity
@@ -335,7 +335,7 @@ class VertexClustering(Clustering):
         @see: L{Graph.__plot__()} for possible keyword arguments.
         """
         if "vertex_color" in kwds:
-            raise ValueError, "you are not allowed to define vertex colors when plotting a clustering"
+            raise ValueError("you are not allowed to define vertex colors when plotting a clustering")
 
         palette = ClusterColoringPalette(len(self))
         kwds["vertex_color"] = self.membership
@@ -378,7 +378,7 @@ class OverlappingVertexClustering(OverlappingClustering, VertexClustering):
             OverlappingClustering.__init__(self, [set(0)]*graph.vcount(), params)
         else:
             if len(membership) != graph.vcount():
-                raise ValueError, "membership list is too short"
+                raise ValueError("membership list is too short")
             OverlappingClustering.__init__(self, membership, params)
 
         if modularity is None:
@@ -467,7 +467,7 @@ class Dendrogram(Clustering):
                 t[idxi] = (t[idxi], t[idxj])
                 t[idxj] = None
             except IndexError:
-                raise ValueError, "malformed matrix, subgroup referenced before being created in step %d" % rowidx
+                raise ValueError("malformed matrix, subgroup referenced before being created in step %d" % rowidx)
             idxs.append(j)
         return [x for x in t if x is not None]
 
@@ -590,7 +590,8 @@ class Dendrogram(Clustering):
         """
         from igraph.layout import Layout
 
-        if not hasattr(self, "_names"): self._names = map(str, xrange(self._n))
+        if not hasattr(self, "_names"):
+            self._names = [str(x) for x in xrange(self._n)]
 
         orientation = kwds.get("orientation", "lr")
         
@@ -602,7 +603,7 @@ class Dendrogram(Clustering):
         }
         orientation = orientation_aliases.get(orientation, orientation)
         if orientation not in ("left-right", "right-left", "top-bottom", "bottom-top"):
-            raise ValueError, "unknown orientation: %s" % orientation
+            raise ValueError("unknown orientation: %s" % orientation)
         horiz = orientation in ("left-right", "right-left")
 
         # Calculate space needed for individual items at the bottom of the dendrogram
@@ -788,11 +789,11 @@ class VertexDendrogram(VertexClustering, Dendrogram):
         from igraph.drawing import collect_attributes
         from igraph import config
 
-        if not kwds.has_key("vertex_label") and \
+        if "vertex_label" not in kwds and \
             "label" not in self._graph.vs.attribute_names():
-            self._names = map(str, xrange(self._graph.vcount()))
+            self._names = [str(i) for i in xrange(self._graph.vcount())]
         elif kwds.get("vertex_label", []) is None:
-            self._names = map(str, xrange(self._graph.vcount()))
+            self._names = [str(i) for i in xrange(self._graph.vcount())]
         else:
             self._names = collect_attributes(self._graph.vcount(), \
                 "vertex_label", "label", kwds, self._graph.vs, config, None)
