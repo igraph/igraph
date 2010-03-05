@@ -33,6 +33,7 @@ or finish it completely.
 */
 
 #include "conversion.h"
+#include <stdint.h>
 
 extern jfieldID net_sf_igraph_Graph_handle_fid;
 extern jmethodID net_sf_igraph_Graph_constructor_mid;
@@ -84,6 +85,43 @@ int Java_jdoubleArray_to_igraph_vector(JNIEnv *env, jdoubleArray array, igraph_v
 		VECTOR(*vector)[i] = elements[i];
 
 	(*env)->ReleaseDoubleArrayElements(env, array, elements, JNI_ABORT);
+
+	return 0;
+}
+
+/**
+ * Converts a Java double[] to an igraph_vector_t* object, allocating the
+ * object itself as well.
+ *
+ * This function is useful when we want to accept null in place of a Java
+ * double[] and use a null pointer in the C layer in that case.
+ * 
+ * @return: zero if everything was OK, an igraph error code otherwise
+ */
+int Java_jdoubleArray_to_ptr_of_igraph_vector(JNIEnv *env, jdoubleArray array, igraph_vector_t** vector_ptr) {
+	jsize i, n;
+	jdouble* elements;
+    igraph_vector_t *vector;
+
+	if (array == 0) {
+        *vector_ptr = 0;
+        return 0;
+	}
+
+	n = (*env)->GetArrayLength(env, array);
+	elements = (*env)->GetDoubleArrayElements(env, array, 0);
+
+    vector = (igraph_vector_t*)calloc(1, sizeof(igraph_vector_t*));
+    if (vector == 0) {
+        IGRAPH_ERROR("cannot convert Java array to C array", IGRAPH_ENOMEM);
+    }
+	IGRAPH_CHECK(igraph_vector_init(vector, n));
+	for (i=0; i < n; i++)
+		VECTOR(*vector)[i] = elements[i];
+
+	(*env)->ReleaseDoubleArrayElements(env, array, elements, JNI_ABORT);
+
+    *vector_ptr = vector;
 
 	return 0;
 }

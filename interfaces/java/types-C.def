@@ -10,7 +10,7 @@ GRAPH:
     OUT: %C% = (igraph_t*)calloc(1, sizeof(igraph_t));
     INOUT: if (Java_jobject_to_igraph(env, %I%, &%C%)) return 0;
   OUTCONV:
-    OUT: %I% = Java_igraph_to_new_jobject(env, %C%, cls);
+    OUT: %J% = Java_igraph_to_new_jobject(env, %C%, cls);
     INOUT: /* No conversion needed for INOUT GRAPH */
 
 ##################################
@@ -22,14 +22,14 @@ INTEGER:
   INCONV: 
     IN: %C% = (igraph_integer_t)%I%;
   OUTCONV:
-    OUT: %I% = (jlong)%C%;
+    OUT: %J% = (jlong)%C%;
 
 INTEGERPTR:
   CTYPE: igraph_integer_t
   JAVATYPE: jlong
   CALL: &%C%
   OUTCONV:
-    OUT: %I% = (jlong)%C%;
+    OUT: %J% = (jlong)%C%;
 
 INT:
   CTYPE: int
@@ -46,7 +46,7 @@ REAL:
   INCONV:
     IN: %C% = (igraph_real_t)%I%;
   OUTCONV:
-    OUT: %I% = (jdouble)%C%;
+    OUT: %J% = (jdouble)%C%;
 
 REALPTR:
   CTYPE: igraph_real_t
@@ -55,7 +55,7 @@ REALPTR:
   INCONV:
     INOUT: %C% = (igraph_real_t)%I%;
   OUTCONV:
-    OUT: %I% = (jdouble)%C%;
+    OUT: %J% = (jdouble)%C%;
 
 ##################################
 # BOOLEAN
@@ -66,14 +66,14 @@ BOOLEAN:
   INCONV:
     IN: %C% = (igraph_bool_t)%I%;
   OUTCONV:
-    OUT: %I% = (%C% ? JNI_TRUE : JNI_FALSE);
+    OUT: %J% = (%C% ? JNI_TRUE : JNI_FALSE);
 
 BOOLEANPTR:
   CTYPE: igraph_bool_t
   JAVATYPE: jboolean
   CALL: &%C%
   OUTCONV:
-    OUT: %I% = (%C% ? JNI_TRUE : JNI_FALSE);
+    OUT: %J% = (%C% ? JNI_TRUE : JNI_FALSE);
 
 ##################################
 # ERROR, used as the return type usually
@@ -134,7 +134,7 @@ VECTOR:
   OUTCONV:
     IN:  igraph_vector_destroy(&%C%); \
 	     IGRAPH_FINALLY_CLEAN(1);
-    OUT: %I% = Java_igraph_vector_to_new_jdoubleArray(env, &%C%); \
+    OUT: %J% = Java_igraph_vector_to_new_jdoubleArray(env, &%C%); \
          igraph_vector_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
 
@@ -153,42 +153,38 @@ VECTORLIST:
 
 ##################################
 # VECTOR that can be NULL
-# 'OUT' arguments are always returned now, in the 
-# future we should have a boolean R argument for them which
-# defines whether or not we want to return them, but this 
-# requires some stimulus development.
 
 VECTOR_OR_0:
   CTYPE: igraph_vector_t
-  CALL: (isNull(%I%) ? 0 : &%C%)
+  JAVATYPE: jdoubleArray
+  CALL: (%I% == 0 ? 0 : &%C%)
   INCONV:
-    IN: if (!isNull(%I%)) { R_SEXP_to_vector(%I%, &%C%); }
-    OUT: if (0 != igraph_vector_init(&%C%, 0)) { \
-           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
-         } \
-         IGRAPH_FINALLY(igraph_vector_destroy, &%C%); \
-         %I%=NEW_NUMERIC(0); /* hack to have a non-NULL value */
+    IN:  if (%I% != 0) { \
+           Java_jdoubleArray_to_igraph_vector(env, %I%, &%C%); \
+           IGRAPH_FINALLY(igraph_vector_destroy, &%C%); \
+         }
   OUTCONV:
-    OUT: PROTECT(%I%=R_igraph_0orvector_to_SEXP(&%C%)); \
-         igraph_vector_destroy(&%C%); \
-         IGRAPH_FINALLY_CLEAN(1);
+    IN:  if (%I% != 0) { \
+           igraph_vector_destroy(&%C%); \
+           IGRAPH_FINALLY_CLEAN(1); \
+         }
 
 # This is the same, some syntax would be needed to express it
 
 EDGEWEIGHTS:
   CTYPE: igraph_vector_t
-  CALL: (isNull(%I%) ? 0 : &%C%)
+  JAVATYPE: jdoubleArray
+  CALL: (%I% == 0 ? 0 : &%C%)
   INCONV:
-    IN: if (!isNull(%I%)) { R_SEXP_to_vector(%I%, &%C%); }
-    OUT: if (0 != igraph_vector_init(&%C%, 0)) { \
-           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
-         } \
-         IGRAPH_FINALLY(igraph_vector_destroy, &%C%); \
-         %I%=NEW_NUMERIC(0); /* hack to have a non-NULL value */
+    IN:  if (%I% != 0) { \
+           Java_jdoubleArray_to_igraph_vector(env, %I%, &%C%); \
+           IGRAPH_FINALLY(igraph_vector_destroy, &%C%); \
+         }
   OUTCONV:
-    OUT: PROTECT(%I%=R_igraph_0orvector_to_SEXP(&%C%)); \
-         igraph_vector_destroy(&%C%); \
-         IGRAPH_FINALLY_CLEAN(1);
+    IN:  if (%I% != 0) { \
+           igraph_vector_destroy(&%C%); \
+           IGRAPH_FINALLY_CLEAN(1); \
+         }
 
 ##################################
 # MATRIX of real values

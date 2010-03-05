@@ -109,6 +109,7 @@
 		<antcontrib:for param="infile">
 			<path refid="enum.definitions" />
 			<sequential>
+				<antcontrib:var name="classname" unset="true" />
 				<basename property="classname" suffix=".properties"
 					file="@{infile}" />
 				<copy file="${src}/java/GenericEnum.java.in"
@@ -216,7 +217,7 @@
 
 			<batchtest todir="${reports}">
 				<fileset dir="${build}/tests">
-					<include name="**/*Test*.class" />
+					<include name="**/*Test.class" />
 					<exclude name="**/AllTests.class" />
 				</fileset>
 			</batchtest>

@@ -1093,7 +1093,7 @@ class JavaCCodeGenerator(JavaCodeGenerator):
                 outconv="  " + t['OUTCONV'][mode]
             else:
                 outconv=""
-            return outconv.replace("%C%", cname).replace("%I%", jname)
+            return outconv.replace("%C%", cname).replace("%I%", pname).replace("%J%", jname)
 
         outconv=[ do_par(n) for n in params.keys() ]
         outconv=[ o for o in outconv if o != "" ]
@@ -1106,7 +1106,7 @@ class JavaCCodeGenerator(JavaCodeGenerator):
                 retconv="  " + rt['OUTCONV']['OUT']
             else:
                 retconv=""
-            retconv=retconv.replace("%C%", "c__result").replace("%I%", "result")
+            retconv=retconv.replace("%C%", "c__result").replace("%J%", "result")
             if len(retconv)>0: outconv.append(retconv)
             ret="\n".join(outconv)
         elif len(retpars)==1:

@@ -1,6 +1,7 @@
+/* vim:set ts=4 sw=4 sts=4 et */
 /* 
    IGraph library Java interface.
-   Copyright (C) 2007-2009  Tamas Nepusz <tamas@cs.rhul.ac.uk>
+   Copyright (C) 2007  Tamas Nepusz <ntamas@rmki.kfki.hu>
    MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
    
    This program is free software; you can redistribute it and/or modify
@@ -32,29 +33,19 @@ or finish it completely.
 
 */
 
-#ifndef _Included_net_sf_igraph_conversion
-#define _Included_net_sf_igraph_conversion
+package net.sf.igraph;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+import static org.junit.Assert.assertEquals;
 
-#include <jni.h>
-#include <igraph/igraph.h>
+public class TestUtils {
+    /// Protect constructor since it is a static only class
+    protected TestUtils() {}
 
-/************************ CONVERSION ROUTINES **************************/
-
-/* Conversion between jobject and igraph_t */
-int Java_jobject_to_igraph(JNIEnv *env, jobject jobj, igraph_t** gptr);
-jobject Java_igraph_to_new_jobject(JNIEnv *env, igraph_t* gptr, jclass cls);
-
-/* Conversion between jdoubleArray and igraph_vector_t */
-int Java_jdoubleArray_to_igraph_vector(JNIEnv *env, jdoubleArray array, igraph_vector_t* vector);
-int Java_jdoubleArray_to_ptr_of_igraph_vector(JNIEnv *env, jdoubleArray array, igraph_vector_t** vector_ptr);
-jdoubleArray Java_igraph_vector_to_new_jdoubleArray(JNIEnv *env, igraph_vector_t* vector);
-
-#ifdef __cplusplus
+    /// Asserts that two double arrays are equal
+    public static void assertArrayEquals(double[] expecteds, double[] actuals, double delta) {
+        assertEquals("array sizes are different", expecteds.length, actuals.length);
+        for (int i = 0; i < expecteds.length; i++)
+            assertEquals("array element "+i+" is different", expecteds[i], actuals[i], delta);
+    }
 }
-#endif
-#endif
 

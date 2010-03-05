@@ -100,11 +100,24 @@ public class BasicGraphTests {
     }
 
     @Test
-    public void testGetEids() {
+    public void testGetEidsWithPairs() {
         Graph graph = Graph.Full(10, false, false);
         double[] pairs = {2, 7, 5, 1, 3, 4};
         double[] eids = graph.getEids(pairs, null, false);
         double[] expectedEids = { 21, 12, 24 };
+
+        TestUtils.assertArrayEquals(expectedEids, eids, 0.0);
+        for (int i = 0; i < expectedEids.length; i++)
+            assertEquals("edge ID list element "+i+" invalid for undirected full graph",
+                    expectedEids[i], eids[i], 0.0);
+    }
+
+    @Test
+    public void testGetEidsWithPath() {
+        Graph graph = Graph.Full(10, false, false);
+        double[] path = {2, 7, 5, 1, 3, 4};
+        double[] eids = graph.getEids(null, path, false);
+        double[] expectedEids = { 21, 36, 12, 10, 24 };
 
         for (int i = 0; i < expectedEids.length; i++)
             assertEquals("edge ID list element "+i+" invalid for undirected full graph",
