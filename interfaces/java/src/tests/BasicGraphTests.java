@@ -103,7 +103,7 @@ public class BasicGraphTests {
     public void testGetEids() {
         Graph graph = Graph.Full(10, false, false);
         double[] pairs = {2, 7, 5, 1, 3, 4};
-        double[] eids = graph.getEids(pairs, false);
+        double[] eids = graph.getEids(pairs, null, false);
         double[] expectedEids = { 21, 12, 24 };
 
         for (int i = 0; i < expectedEids.length; i++)

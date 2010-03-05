@@ -32,40 +32,39 @@ or finish it completely.
 
 */
 
-#ifndef _Included_net_sf_igraph_jni_utils
-#define _Included_net_sf_igraph_jni_utils
+package net.sf.igraph;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+import org.junit.*;
+import static org.junit.Assert.*;
 
-#include <jni.h>
-#include "config.h"
+public class GraphConstructorTests {
+    @Test
+    public void testStarGraph() {
+		Graph graph = Graph.Star(10, StarMode.OUT, 2);
+        assertEquals("star graph must have ten vertices", 10, graph.vcount());
+        assertEquals("star graph must have nine edges", 9, graph.ecount());
+        assertTrue("star graph must be directed", graph.isDirected());
 
-/*********************** INITIALIZER FUNCTION **************************/
+        double[] expectedEdgelist = { 2, 0, 2, 1, 2, 3, 2, 4, 2, 5, 2, 6, 2, 7, 2, 8, 2, 9 };
+        double[] edgelist = graph.getEdgelist(false);
 
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *this_jvm, void* reserved);
-JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *this_jvm, void* reserved);
+        for (int i = 0; i < expectedEdgelist.length; i++) {
+            assertEquals("edge list element "+i+" mismatch", expectedEdgelist[i], edgelist[i], 0);
+        }
+	}
 
-/************************ AUXILIARY FUNCTIONS **************************/
+	@Test(expected=CoreException.class)
+	public void testInvalidStarGraphException1() {
+		Graph graph = Graph.Star(-1, StarMode.OUT, 0);
+	}
 
-/// Returns the environment of the current thread using the cached JVM
-JNIEnv *JNU_GetEnv();
+	@Test(expected=NullPointerException.class)
+	public void testInvalidStarGraphException2() {
+		Graph graph = Graph.Star(10, null, 0);
+	}
 
-/// Throws an exception by exception class name
-void JNU_ThrowByName(JNIEnv *env, const char *name, const char *msg);
-
-/// Throws a NullPointerException
-void JNU_ThrowNPE(JNIEnv *env);
-
-/********** THINGS TO DO BEFORE ENTERING & AFTER LEAVING C LAYER ***********/
-
-void Java_igraph_error_handler(const char *reason, const char *file, int line, int igraph_errno);
-void Java_igraph_before();
-void Java_igraph_after();
-
-#ifdef __cplusplus
-}
-#endif
-#endif
-
+	@Test(expected=CoreException.class)
+	public void testInvalidStarGraphException3() {
+		Graph graph = Graph.Star(10, StarMode.IN, 15);
+	}
+};

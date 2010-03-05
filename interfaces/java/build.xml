@@ -21,7 +21,10 @@
 	<property environment="os" />
 
 	<!-- Include and library paths -->
-	<property name="igraph.include.path" location="../../include" />
+	<path id="igraph.include.path">
+		<pathelement path="../../include" />
+		<pathelement path="../../build/include" />
+	</path>
 	<property name="igraph.library.path" location="${os.HOME}/lib" />
 
 	<!-- External tools -->
@@ -48,8 +51,9 @@
 		<pathelement path="${java.home}/../include" />
 		<pathelement path="${java.home}/../include/linux" />
 	</path>
-
-	<property name="generated.enum.classes" value="Connectedness NeighborMode StarMode" />
+	<path id="enum.definitions">
+		<fileset dir="${etc}/enums" includes="*.properties" />
+	</path>
 
 	<!-- Initializes the build tree, creates the necessary directories -->
 	<target name="-init" description="Initializes the build process">
@@ -71,10 +75,12 @@
 		<delete dir="${reports}" />
 		<!-- Delete generated Java source files -->
 		<delete file="${src}/java/Graph.java" />
-		<antcontrib:for param="classname" list="${generated.enum.classes}"
-			delimiter=" ">
+		<antcontrib:for param="infile">
+			<path refid="enum.definitions" />
 			<sequential>
-				<delete file="${src}/java/@{classname}.java" />
+				<basename property="classname" suffix=".properties"
+					file="@{infile}" />
+				<delete file="${src}/java/${classname}.java" />
 			</sequential>
 		</antcontrib:for>
 		<!-- Delete generated C source files -->
@@ -100,13 +106,15 @@
 		</exec>
 
 		<!-- Generate enum classes -->
-		<antcontrib:for param="classname" delimiter=" "
-			list="${generated.enum.classes}">
+		<antcontrib:for param="infile">
+			<path refid="enum.definitions" />
 			<sequential>
+				<basename property="classname" suffix=".properties"
+					file="@{infile}" />
 				<copy file="${src}/java/GenericEnum.java.in"
-					  tofile="${src}/java/@{classname}.java" />
-				<replace file="${src}/java/@{classname}.java"
-				 replacefilterfile="${etc}/enums/@{classname}.properties" />
+					  tofile="${src}/java/${classname}.java" />
+				<replace file="${src}/java/${classname}.java"
+				         replacefilterfile="@{infile}" />
 			</sequential>
 		</antcontrib:for>
 	</target>
@@ -166,7 +174,7 @@
 			outputfileproperty="jni.library.outfile">
 			<fileset dir="${src}/c" includes="*.c" />
 			<cpptasks:includepath>
-				<path path="${igraph.include.path}" />
+				<path refid="igraph.include.path" />
 				<path refid="jni.include.path" />
 			</cpptasks:includepath>
 			<cpptasks:linker libtool="true">

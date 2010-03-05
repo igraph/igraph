@@ -82,6 +82,15 @@ ERROR:
   CTYPE: int
 
 ##################################
+# ATTRIBUTES (not implemented yet)
+
+ATTRIBUTES:
+  JAVATYPE: jobject
+  CTYPE: void*
+  INCONV:
+    IN: %C% = 0;
+
+##################################
 # ENUMS
 
 CONNECTEDNESS:

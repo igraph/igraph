@@ -96,6 +96,13 @@ void JNU_ThrowByName(JNIEnv *env, const char *name, const char *msg) {
   (*env)->DeleteLocalRef(env, cls);
 }
 
+/*
+ * Throws a NullPointerException
+ */
+void JNU_ThrowNPE(JNIEnv *env) {
+    JNU_ThrowByName(env, "java/lang/NullPointerException", 0);
+}
+
 /********** THINGS TO DO BEFORE ENTERING & AFTER LEAVING C LAYER ***********/
 
 static igraph_error_handler_t *Java_igraph_old_error_handler;

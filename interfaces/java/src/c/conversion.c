@@ -69,8 +69,15 @@ jobject Java_igraph_to_new_jobject(JNIEnv *env, igraph_t* gptr, jclass cls) {
  * @return: zero if everything was OK, an igraph error code otherwise
  */
 int Java_jdoubleArray_to_igraph_vector(JNIEnv *env, jdoubleArray array, igraph_vector_t* vector) {
-	jsize i, n = (*env)->GetArrayLength(env, array);
-	jdouble* elements = (*env)->GetDoubleArrayElements(env, array, 0);
+	jsize i, n;
+	jdouble* elements;
+
+	if (array == 0) {
+		IGRAPH_ERROR("__java/lang/NullPointerException", IGRAPH_ENOMEM);
+	}
+
+	n = (*env)->GetArrayLength(env, array);
+	elements = (*env)->GetDoubleArrayElements(env, array, 0);
 
 	IGRAPH_CHECK(igraph_vector_init(vector, n));
 	for (i=0; i < n; i++)

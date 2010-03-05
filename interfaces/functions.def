@@ -70,7 +70,8 @@ igraph_get_eid:
         IGNORE: RR, RC, RNamespace
 
 igraph_get_eids:
-        PARAMS: GRAPH graph, OUT VECTOR eids, VECTOR pairs, BOOLEAN directed=True
+        PARAMS: GRAPH graph, OUT VECTOR eids, VECTOR_OR_0 pairs, \
+                VECTOR_OR_0 path, BOOLEAN directed=True
         IGNORE: RR, RC, RNamespace
 
 igraph_adjacent:
