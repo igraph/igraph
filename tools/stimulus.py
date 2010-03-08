@@ -892,6 +892,7 @@ class JavaCCodeGenerator(JavaCodeGenerator):
             res['call']=self.chunk_call(function, params)
             res['outconv']=self.chunk_outconv(function, params)
             res['after']=self.chunk_after(function, params)
+            res['return']=self.chunk_result(function, params)
         except StimulusError, e:
             out.write("/* %s */\n" % str(e))
             return
@@ -915,7 +916,7 @@ class JavaCCodeGenerator(JavaCodeGenerator):
 
 %(after)s
 
-  return result;
+%(return)s
 }\n""" % res
 
         out.write(text)
@@ -1131,6 +1132,13 @@ class JavaCCodeGenerator(JavaCodeGenerator):
     def chunk_after(self, function, params):
         """We simply call Java_igraph_after"""
         return '  Java_igraph_after();'        
+
+    def chunk_result(self, function, params):
+        """We simply call Java_igraph_after"""
+        data = self.get_function_metadata(function, "JAVATYPE")
+        if data['return_type'] == 'void':
+            return ''
+        return '  return result;'        
 
 
 

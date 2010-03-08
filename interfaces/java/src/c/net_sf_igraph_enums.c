@@ -34,6 +34,14 @@ or finish it completely.
 
 #include "net_sf_igraph_enums.h"
 
+#define JAVA_TYPE Adjacency
+#define JAVA_TYPE_STRING "Adjacency"
+#define C_TYPE igraph_adjacency_t
+#include "net_sf_igraph_enum_impl.pmt"
+#undef JAVA_TYPE_STRING
+#undef JAVA_TYPE
+#undef C_TYPE
+
 #define JAVA_TYPE Connectedness
 #define JAVA_TYPE_STRING "Connectedness"
 #define C_TYPE igraph_connectedness_t
@@ -53,6 +61,14 @@ or finish it completely.
 #define JAVA_TYPE StarMode
 #define JAVA_TYPE_STRING "StarMode"
 #define C_TYPE igraph_star_mode_t
+#include "net_sf_igraph_enum_impl.pmt"
+#undef JAVA_TYPE_STRING
+#undef JAVA_TYPE
+#undef C_TYPE
+
+#define JAVA_TYPE TransitivityMode
+#define JAVA_TYPE_STRING "TransitivityMode"
+#define C_TYPE igraph_transitivity_mode_t
 #include "net_sf_igraph_enum_impl.pmt"
 #undef JAVA_TYPE_STRING
 #undef JAVA_TYPE

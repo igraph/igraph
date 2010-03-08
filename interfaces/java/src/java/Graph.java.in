@@ -34,6 +34,9 @@ or finish it completely.
 
 package net.sf.igraph;
 
+import java.io.File;
+import java.io.IOException;
+
 public class Graph {
     private long handle=0; // handle to the underlying igraph_t object
   

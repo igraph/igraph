@@ -95,3 +95,5 @@
 ./interfaces/java/src/java/StarMode.java
 ./interfaces/java/reports
 ./fatbuild
+./interfaces/java/src/java/Adjacency.java
+./interfaces/java/src/java/TransitivityMode.java

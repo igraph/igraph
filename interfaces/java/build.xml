@@ -218,6 +218,7 @@
 			<batchtest todir="${reports}">
 				<fileset dir="${build}/tests">
 					<include name="**/*Test.class" />
+					<include name="**/*Tests.class" />
 					<exclude name="**/AllTests.class" />
 				</fileset>
 			</batchtest>

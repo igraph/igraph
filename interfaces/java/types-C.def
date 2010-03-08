@@ -38,6 +38,17 @@ INT:
     IN: %C% = (int)%I%;
 
 ##################################
+# LONGINT
+
+LONGINT:  
+  CTYPE: long int
+  JAVATYPE: jlong
+  INCONV: 
+    IN: %C% = (long int)%I%;
+  OUTCONV:
+    OUT: %J% = (jlong)%C%;
+
+##################################
 # REAL
 
 REAL:
@@ -80,6 +91,10 @@ BOOLEANPTR:
 
 ERROR:
   CTYPE: int
+  JAVATYPE: void
+  JAVADECL: /* no Java return value declaration */
+  OUTCONV:
+    OUT:    /* not returning anything */
 
 ##################################
 # ATTRIBUTES (not implemented yet)
@@ -93,12 +108,20 @@ ATTRIBUTES:
 ##################################
 # ENUMS
 
+ADJACENCYMODE:
+  CTYPE: igraph_adjacency_t
+  JAVATYPE: jobject
+  INCONV:
+    IN: if (Java_net_sf_igraph_Adjacency_to_igraph(env, %I%, &%C%)) { \
+	        IGRAPH_ERROR_NPE(); \
+		}
+
 CONNECTEDNESS:
   CTYPE: igraph_connectedness_t
   JAVATYPE: jobject
   INCONV:
     IN: if (Java_net_sf_igraph_Connectedness_to_igraph(env, %I%, &%C%)) { \
-	        igraph_error("__java/lang/NullPointerException", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+	        IGRAPH_ERROR_NPE(); \
 		}
 
 NEIMODE:
@@ -106,7 +129,7 @@ NEIMODE:
   JAVATYPE: jobject
   INCONV:
     IN: if (Java_net_sf_igraph_NeighborMode_to_igraph(env, %I%, &%C%)) { \
-	        igraph_error("__java/lang/NullPointerException", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+	        IGRAPH_ERROR_NPE(); \
 		}
 
 STARMODE:
@@ -114,7 +137,15 @@ STARMODE:
   JAVATYPE: jobject
   INCONV:
     IN: if (Java_net_sf_igraph_StarMode_to_igraph(env, %I%, &%C%)) { \
-	        igraph_error("__java/lang/NullPointerException", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+	        IGRAPH_ERROR_NPE(); \
+		}
+
+TRANSITIVITYMODE:
+  CTYPE: igraph_transitivity_mode_t
+  JAVATYPE: jobject
+  INCONV:
+    IN: if (Java_net_sf_igraph_TransitivityMode_to_igraph(env, %I%, &%C%)) { \
+	        IGRAPH_ERROR_NPE(); \
 		}
 
 ##################################
@@ -219,6 +250,29 @@ VERTEXSET:
 	    IGRAPH_FINALLY_CLEAN(1);
 
 ##################################
+# Files
+
+INFILE:
+  CTYPE: FILE*
+  JAVATYPE: jobject
+  INCONV:
+    IN: if (0 != Java_jobject_to_file_ptr(env, %I%, &%C%, "r")) { \
+	      igraph_error("__java/io/IOException", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+		} \
+  OUTCONV:
+    IN: fclose(%C%);
+
+OUTFILE:
+  CTYPE: FILE*
+  JAVATYPE: jobject
+  INCONV:
+    IN: if (0 != Java_jobject_to_file_ptr(env, %I%, &%C%, "w")) { \
+	      igraph_error("__java/io/IOException", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+		} \
+  OUTCONV:
+    IN: fclose(%C%);
+
+##################################
 # NULL, this is supplied as an argument
 
 NULL:
@@ -235,3 +289,4 @@ ARPACKOPT:
     INOUT: R_SEXP_to_igraph_arpack_options(%I%, &%C%);
   OUTCONV:
     INOUT: PROTECT(%I%=R_igraph_arpack_options_to_SEXP(&%C%));
+

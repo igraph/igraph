@@ -32,33 +32,28 @@ or finish it completely.
 
 */
 
-#define JAVA_TYPE Adjacency
-#define C_TYPE igraph_adjacency_t
-#include "net_sf_igraph_enum.pmt"
-#undef JAVA_TYPE
-#undef C_TYPE
+package net.sf.igraph;
 
-#define JAVA_TYPE Connectedness
-#define C_TYPE igraph_connectedness_t
-#include "net_sf_igraph_enum.pmt"
-#undef JAVA_TYPE
-#undef C_TYPE
+import java.io.File;
+import java.io.IOException;
 
-#define JAVA_TYPE NeighborMode
-#define C_TYPE igraph_neimode_t
-#include "net_sf_igraph_enum.pmt"
-#undef JAVA_TYPE
-#undef C_TYPE
+import org.junit.*;
+import static org.junit.Assert.*;
 
-#define JAVA_TYPE StarMode
-#define C_TYPE igraph_star_mode_t
-#include "net_sf_igraph_enum.pmt"
-#undef JAVA_TYPE
-#undef C_TYPE
+public class GraphIOTests {
+    @Test
+    public void testReadWritePajek() throws IOException {
+		Graph graph = Graph.Star(10, StarMode.OUT, 2);
+        Graph graph2;
 
-#define JAVA_TYPE TransitivityMode
-#define C_TYPE igraph_transitivity_mode_t
-#include "net_sf_igraph_enum.pmt"
-#undef JAVA_TYPE
-#undef C_TYPE
+        File f = File.createTempFile("igraph", null);
 
+        graph.writePajek(f);
+        graph2 = Graph.ReadPajek(f);
+        assertEquals("star graph from Pajek file must have ten vertices", 10, graph2.vcount());
+        assertEquals("star graph from Pajek file must have nine edges", 9, graph2.ecount());
+        assertTrue("star graph from Pajek file must be directed", graph2.isDirected());
+        assertTrue("graph loaded from Pajek file should be isomorphic to original",
+                graph2.isIsomorphic(graph));
+	}
+};

@@ -49,11 +49,15 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *this_jvm, void* reserved) {
   jvm = this_jvm;
   if ((*jvm)->GetEnv(jvm, (void**)&env, JNI_VERSION_1_2)) return JNI_ERR;
 
+  if (Java_jobject_to_file_ptr_OnLoad(env) == JNI_ERR) return JNI_ERR;
+
   if (Java_net_sf_igraph_Graph_OnLoad(env) == JNI_ERR) return JNI_ERR;
 
+  if (Java_net_sf_igraph_Adjacency_OnLoad(env) == JNI_ERR) return JNI_ERR;
   if (Java_net_sf_igraph_Connectedness_OnLoad(env) == JNI_ERR) return JNI_ERR;
   if (Java_net_sf_igraph_NeighborMode_OnLoad(env) == JNI_ERR) return JNI_ERR;
   if (Java_net_sf_igraph_StarMode_OnLoad(env) == JNI_ERR) return JNI_ERR;
+  if (Java_net_sf_igraph_TransitivityMode_OnLoad(env) == JNI_ERR) return JNI_ERR;
 
   if (Java_net_sf_igraph_VertexSet_OnLoad(env) == JNI_ERR) return JNI_ERR;
 
@@ -65,11 +69,15 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *this_jvm, void* reserved) {
 
   if ((*jvm)->GetEnv(jvm, (void**)&env, JNI_VERSION_1_2)) return;
 
+  Java_jobject_to_file_ptr_OnUnload(env);
+
   Java_net_sf_igraph_Graph_OnUnload(env);
 
+  Java_net_sf_igraph_Adjacency_OnUnload(env);
   Java_net_sf_igraph_Connectedness_OnUnload(env);
   Java_net_sf_igraph_NeighborMode_OnUnload(env);
   Java_net_sf_igraph_StarMode_OnUnload(env);
+  Java_net_sf_igraph_TransitivityMode_OnUnload(env);
 
   Java_net_sf_igraph_VertexSet_OnUnload(env);
 }

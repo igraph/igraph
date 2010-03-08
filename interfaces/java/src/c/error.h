@@ -1,6 +1,6 @@
 /* 
    IGraph library Java interface.
-   Copyright (C) 2007  Tamas Nepusz <ntamas@rmki.kfki.hu>
+   Copyright (C) 2007-2009  Tamas Nepusz <tamas@cs.rhul.ac.uk>
    MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
    
    This program is free software; you can redistribute it and/or modify
@@ -32,33 +32,23 @@ or finish it completely.
 
 */
 
-#define JAVA_TYPE Adjacency
-#define C_TYPE igraph_adjacency_t
-#include "net_sf_igraph_enum.pmt"
-#undef JAVA_TYPE
-#undef C_TYPE
+#ifndef _Included_net_sf_igraph_error
+#define _Included_net_sf_igraph_error
 
-#define JAVA_TYPE Connectedness
-#define C_TYPE igraph_connectedness_t
-#include "net_sf_igraph_enum.pmt"
-#undef JAVA_TYPE
-#undef C_TYPE
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#define JAVA_TYPE NeighborMode
-#define C_TYPE igraph_neimode_t
-#include "net_sf_igraph_enum.pmt"
-#undef JAVA_TYPE
-#undef C_TYPE
+/// Throws a NullPointerException using igraph's conventions to signal an error
+#define IGRAPH_ERROR_NPE() igraph_error("__java/lang/NullPointerException", __FILE__, __LINE__, IGRAPH_ENOMEM);
 
-#define JAVA_TYPE StarMode
-#define C_TYPE igraph_star_mode_t
-#include "net_sf_igraph_enum.pmt"
-#undef JAVA_TYPE
-#undef C_TYPE
+#define IGRAPH_EXCEPTION_PROPAGATE() IGRAPH_ERROR("__", IGRAPH_ENOMEM)
+#define IGRAPH_EXCEPTION_CHECK() \
+    if ((*env)->ExceptionCheck(env)) IGRAPH_ERROR("__", IGRAPH_ENOMEM)
 
-#define JAVA_TYPE TransitivityMode
-#define C_TYPE igraph_transitivity_mode_t
-#include "net_sf_igraph_enum.pmt"
-#undef JAVA_TYPE
-#undef C_TYPE
+#ifdef __cplusplus
+}
+#endif
+#endif
+
 

@@ -1049,75 +1049,92 @@ igraph_to_undirected:
 igraph_read_graph_edgelist:
         PARAMS: OUT GRAPH graph, INFILE instream, INTEGER n=0, BOOLEAN directed=True
         IGNORE: RR, RC, RNamespace
+        NAME-JAVA: ReadEdgelist
 
 igraph_read_graph_ncol:
         PARAMS: OUT GRAPH graph, INFILE instream, STRVECTOR_OR_0 predefnames, \
                 BOOLEAN names=True, BOOLEAN weights=True, BOOLEAN directed=True
         IGNORE: RR, RC, RNamespace
+        NAME-JAVA: ReadNCOL
 
 igraph_read_graph_lgl:
         PARAMS: OUT GRAPH graph, INFILE instream, BOOLEAN names=True, \
                 BOOLEAN weights=True, BOOLEAN directed=True
         IGNORE: RR, RC, RNamespace
+        NAME-JAVA: ReadLGL
 
 igraph_read_graph_pajek:
         PARAMS: OUT GRAPH graph, INFILE instream
         IGNORE: RR, RC, RNamespace
+        NAME-JAVA: ReadPajek
 
 igraph_read_graph_graphml:
         PARAMS: OUT GRAPH graph, INFILE instream, INT index=0
         IGNORE: RR, RC, RNamespace
+        NAME-JAVA: ReadGraphML
 
 igraph_read_graph_dimacs:
         PARAMS: OUT GRAPH graph, INFILE instream, OUT INTEGERPTR source, \
                 OUT INTEGERPTR target, OUT VECTOR capacity, BOOLEAN directed=True
         IGNORE: RR, RC, RNamespace
+        NAME-JAVA: ReadDIMACS
 
 igraph_read_graph_graphdb:
         PARAMS: OUT GRAPH graph, INFILE instream, BOOLEAN directed=False
         IGNORE: RR, RC, RNamespace
+        NAME-JAVA: ReadGraphDB
 
 igraph_read_graph_gml:
         PARAMS: OUT GRAPH graph, INFILE instream
         IGNORE: RR, RC, RNamespace
+        NAME-JAVA: ReadGML
 
 igraph_read_graph_dl:
         PARAMS: OUT GRAPH graph, INFILE instream, BOOLEAN directed=True
         IGNORE: RR, RC, RNamespace
+        NAME-JAVA: ReadDL
 
 igraph_write_graph_edgelist:
         PARAMS: GRAPH graph, OUTFILE outstream
         IGNORE: RR, RC, RNamespace
+        NAME-JAVA: writeEdgelist
 
 igraph_write_graph_ncol:
         PARAMS: GRAPH graph, OUTFILE outstream, CSTRING names="name", CSTRING weights="weight"
         IGNORE: RR, RC, RNamespace
+        NAME-JAVA: writeNCOL
 
 igraph_write_graph_lgl:
         PARAMS: GRAPH graph, OUTFILE outstream, CSTRING names="name", CSTRING weights="weight", \
                 BOOLEAN isolates=True
         IGNORE: RR, RC, RNamespace
+        NAME-JAVA: writeLGL
 
 igraph_write_graph_graphml:
         PARAMS: GRAPH graph, OUTFILE outstream
         IGNORE: RR, RC, RNamespace
+        NAME-JAVA: writeGraphML
 
 igraph_write_graph_pajek:
         PARAMS: GRAPH graph, OUTFILE outstream
         IGNORE: RR, RC, RNamespace
+        NAME-JAVA: writePajek
 
 igraph_write_graph_dimacs:
         PARAMS: GRAPH graph, OUTFILE outstream, LONGINT source=0, LONGINT target=0, \
                 VECTOR capacity
         IGNORE: RR, RC, RNamespace
+        NAME-JAVA: writeDIMACS
 
 igraph_write_graph_gml:
         PARAMS: GRAPH graph, OUTFILE outstream, VECTOR id, CSTRING creator="igraph"
         IGNORE: RR, RC, RNamespace
+        NAME-JAVA: writeGML
 
 igraph_write_graph_dot:
         PARAMS: GRAPH graph, OUTFILE outstream
         IGNORE: RR, RC, RNamespace
+        NAME-JAVA: writeDOT
 
 #######################################
 # Motifs
@@ -1259,6 +1276,7 @@ igraph_isoclass:
 
 igraph_isomorphic:
         PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso
+        NAME-JAVA: isIsomorphic
 
 igraph_isoclass_subgraph:
         PARAMS: GRAPH graph, VECTOR vids, OUT INTEGERPTR isoclass
@@ -1319,6 +1337,7 @@ igraph_get_subisomorphisms_vf2:
 
 igraph_isomorphic_34:
         PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso
+        IGNORE: JavaC, JavaJava
 
 igraph_canonical_permutation:
         PARAMS: GRAPH graph, OUT VECTOR labeling, BLISSSH sh="fm", OUT BLISSINFO info

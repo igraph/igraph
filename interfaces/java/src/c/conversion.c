@@ -33,10 +33,13 @@ or finish it completely.
 */
 
 #include "conversion.h"
+#include "error.h"
 #include <stdint.h>
 
 extern jfieldID net_sf_igraph_Graph_handle_fid;
 extern jmethodID net_sf_igraph_Graph_constructor_mid;
+
+static jmethodID java_io_File_getCanonicalPath_mid;
 
 /***** Conversion between jobject and igraph_t */
 
@@ -148,3 +151,43 @@ jdoubleArray Java_igraph_vector_to_new_jdoubleArray(JNIEnv *env, igraph_vector_t
 	return result;
 }
 
+/* Conversion between jobject and FILE* */
+
+/**
+ * Prepares method IDs for Java_jobject_to_file_ptr
+ */
+int Java_jobject_to_file_ptr_OnLoad(JNIEnv *env) {
+  jclass cls;
+
+  cls = (*env)->FindClass(env, "java/io/File");
+  if (cls == 0) return JNI_ERR;
+
+  java_io_File_getCanonicalPath_mid = (*env)->GetMethodID(env, cls, "getCanonicalPath", "()Ljava/lang/String;");
+  if (java_io_File_getCanonicalPath_mid == 0) return JNI_ERR;
+
+  return JNI_OK;
+}
+
+void Java_jobject_to_file_ptr_OnUnload(JNIEnv *env) {
+}
+
+/**
+ * Converts a Java File or String object to FILE*
+ *
+ * @return: zero if everything was OK, an igraph error code otherwise
+ */
+int Java_jobject_to_file_ptr(JNIEnv *env, jobject jobj, FILE** file, const char* mode) {
+	const char *fname_buf;
+
+	jobject fname = (*env)->CallObjectMethod(env, jobj, java_io_File_getCanonicalPath_mid);
+	IGRAPH_EXCEPTION_CHECK();
+
+	fname_buf = (*env)->GetStringUTFChars(env, fname, 0);
+	*file = fopen(fname_buf, mode);
+	(*env)->ReleaseStringUTFChars(env, fname, fname_buf);
+
+	if (!*file)
+		IGRAPH_ERROR("__java/io/IOException", IGRAPH_ENOMEM);
+
+	return 0;
+}

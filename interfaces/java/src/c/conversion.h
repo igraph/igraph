@@ -53,6 +53,11 @@ int Java_jdoubleArray_to_igraph_vector(JNIEnv *env, jdoubleArray array, igraph_v
 int Java_jdoubleArray_to_ptr_of_igraph_vector(JNIEnv *env, jdoubleArray array, igraph_vector_t** vector_ptr);
 jdoubleArray Java_igraph_vector_to_new_jdoubleArray(JNIEnv *env, igraph_vector_t* vector);
 
+/* Conversion between jobject and FILE* */
+int Java_jobject_to_file_ptr_OnLoad(JNIEnv *env);
+void Java_jobject_to_file_ptr_OnUnload(JNIEnv *env);
+int Java_jobject_to_file_ptr(JNIEnv *env, jobject jobj, FILE** file, const char* mode);
+
 #ifdef __cplusplus
 }
 #endif

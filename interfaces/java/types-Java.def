@@ -2,6 +2,9 @@
 GRAPH:
     JAVATYPE: Graph
 
+ERROR:
+    JAVATYPE: void
+    
 INTEGER:
     JAVATYPE: long
 
@@ -10,6 +13,9 @@ INTEGERPTR:
 
 INT:
     JAVATYPE: int
+
+LONGINT:
+    JAVATYPE: long
 
 REAL:
     JAVATYPE: double
@@ -50,10 +56,22 @@ ATTRIBUTES:
 VERTEXSET:
     JAVATYPE: VertexSet
 
+ADJACENCYMODE:
+    JAVATYPE: Adjacency
+
 TRANSITIVITYMODE:
+    JAVATYPE: TransitivityMode
 
 EDGEWEIGHTS:
     JAVATYPE: double[]
+
+INFILE:
+    JAVATYPE: File
+    THROWS: java.io.IOException
+
+OUTFILE:
+    JAVATYPE: File
+    THROWS: java.io.IOException
 
 NULL:
 
