@@ -6,9 +6,9 @@ GRAPH:
   CTYPE: igraph_t*
   JAVATYPE: jobject
   INCONV: 
-    IN: if (Java_jobject_to_igraph(env, %I%, &%C%)) return 0;
+    IN: if (Java_jobject_to_igraph(env, %I%, &%C%)) %RETURN%;
     OUT: %C% = (igraph_t*)calloc(1, sizeof(igraph_t));
-    INOUT: if (Java_jobject_to_igraph(env, %I%, &%C%)) return 0;
+    INOUT: if (Java_jobject_to_igraph(env, %I%, &%C%)) %RETURN%;
   OUTCONV:
     OUT: %J% = Java_igraph_to_new_jobject(env, %C%, cls);
     INOUT: /* No conversion needed for INOUT GRAPH */

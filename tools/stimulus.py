@@ -1025,6 +1025,9 @@ class JavaCCodeGenerator(JavaCodeGenerator):
         without INCONV fields are ignored. The usual %C%, %I% is
         performed at the end.
         """
+        data = self.get_function_metadata(function, "JAVATYPE")
+        ret = ["return 0", "return"][data['return_type'] == "void"]
+
         def do_par(pname):
             cname="c_"+pname
             t=self.types[params[pname]['type']]
@@ -1039,7 +1042,7 @@ class JavaCCodeGenerator(JavaCodeGenerator):
                 for i in range(len(deps)):
                     inconv=inconv.replace("%C"+str(i+1)+"%", "c_"+deps[i])
                 
-            return inconv.replace("%C%", cname).replace("%I%", pname)
+            return inconv.replace("%C%", cname).replace("%I%", pname).replace("%RETURN%", ret)
 
         inconv=[ do_par(n) for n in params.keys() ]
         inconv=[ i for i in inconv if i != "" ]
