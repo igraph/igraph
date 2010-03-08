@@ -258,7 +258,7 @@ INFILE:
   INCONV:
     IN: if (0 != Java_jobject_to_file_ptr(env, %I%, &%C%, "r")) { \
 	      igraph_error("__java/io/IOException", __FILE__, __LINE__, IGRAPH_ENOMEM); \
-		} \
+		}
   OUTCONV:
     IN: fclose(%C%);
 
@@ -268,7 +268,7 @@ OUTFILE:
   INCONV:
     IN: if (0 != Java_jobject_to_file_ptr(env, %I%, &%C%, "w")) { \
 	      igraph_error("__java/io/IOException", __FILE__, __LINE__, IGRAPH_ENOMEM); \
-		} \
+		}
   OUTCONV:
     IN: fclose(%C%);
 
