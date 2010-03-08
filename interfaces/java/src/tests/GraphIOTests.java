@@ -56,4 +56,18 @@ public class GraphIOTests {
         assertTrue("graph loaded from Pajek file should be isomorphic to original",
                 graph2.isIsomorphic(graph));
 	}
+    
+    @Test(expected=IOException.class)
+    public void testWriteIOError() throws IOException {
+		Graph graph = Graph.Star(10, StarMode.OUT, 2);
+
+        File f = new File("////this/is/almost surely an invalid filename");
+        graph.writePajek(f);
+	}
+    
+    @Test(expected=IOException.class)
+    public void testReadIOError() throws IOException {
+        File f = new File("////this/is/almost surely a nonexistent filename");
+		Graph graph = Graph.ReadPajek(f);
+	}
 };

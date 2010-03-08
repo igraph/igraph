@@ -260,7 +260,7 @@ INFILE:
 	      igraph_error("__java/io/IOException", __FILE__, __LINE__, IGRAPH_ENOMEM); \
 		}
   OUTCONV:
-    IN: fclose(%C%);
+    IN: if (%C%) fclose(%C%);
 
 OUTFILE:
   CTYPE: FILE*
@@ -270,7 +270,7 @@ OUTFILE:
 	      igraph_error("__java/io/IOException", __FILE__, __LINE__, IGRAPH_ENOMEM); \
 		}
   OUTCONV:
-    IN: fclose(%C%);
+    IN: if (%C%) fclose(%C%);
 
 ##################################
 # NULL, this is supplied as an argument
