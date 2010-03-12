@@ -144,8 +144,8 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
                    PACKAGE="igraph")
       tmp[as.numeric(x)+1]
     }
-    i <- eval(i, c(graph[[9]][[3]], adj=adj, nei=nei, from=from, to=to,
-                   envir=parent.frame()))
+    i <- eval(i, envir=c(graph[[9]][[3]],
+                   adj=adj, nei=nei, from=from, to=to))
     if (is.numeric(i) || is.integer(i)) {
       i <- as.numeric(i)
       res <- i[ i %in% x ]
@@ -199,9 +199,11 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
                    PACKAGE="igraph")
       tmp[ as.numeric(x)+1 ]
     }
-    i <- eval(i, c(graph[[9]][[4]], from=list(graph[[3]][ as.numeric(x)+1 ]),
-                   to=list(graph[[4]][as.numeric(x)+1]), graph=list(graph),
-                   adj=adj, envir=parent.frame()))
+    i <- eval(i, envir=c(graph[[9]][[4]],
+                   from=list(graph[[3]][ as.numeric(x)+1 ]),
+                   to=list(graph[[4]][as.numeric(x)+1]),
+                   graph=list(graph),
+                   adj=adj))
     if (is.numeric(i) || is.integer(i)) {
       i <- as.numeric(i)
       res <- i[ i %in% x ]
