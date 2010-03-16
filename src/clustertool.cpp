@@ -73,9 +73,10 @@
  *     in which case all edges are weighted equally. Edge weights
  *     should be positive, altough this is not tested.
  * \param modularity Pointer to a real number, if not \c NULL then the
- *     modularity score of the solution will be stored here, see
- *     M. E. J. Newman and M. Girvan, Phys. Rev. E 69, 026113 (2004)
- *     for details. 
+ *     modularity score of the solution will be stored here. This is the 
+ *     gereralized modularity that simplifies to the one defined in
+ *     M. E. J. Newman and M. Girvan, Phys. Rev. E 69, 026113 (2004), 
+ *     if the gamma parameter is one.
  * \param temperature Pointer to a real number, if not \c NULL then
  *     the temperature at the end of the algorithm will be stored
  *     here.
