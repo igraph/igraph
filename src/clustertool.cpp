@@ -238,7 +238,7 @@ int igraph_community_spinglass(const igraph_t *graph,
     }
   } /* while loop */
 
-  pm->WriteClusters(modularity, temperature, csize, membership, kT);
+  pm->WriteClusters(modularity, temperature, csize, membership, kT, gamma);
 
   while (net->link_list->Size()) delete net->link_list->Pop();
   while (net->node_list->Size()) delete net->node_list->Pop();

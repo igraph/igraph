@@ -253,6 +253,21 @@ double PottsModel::calculate_Q()
   Q/=double(2.0*net->sum_weights);
   return Q;
 }
+double PottsModel::calculate_genQ(double gamma)
+{
+  double Q=0.0;
+  for (unsigned int i=0; i<=q; i++)
+  {
+    Q+=Qmatrix[i][i]-gamma*Qa[i]*Qa[i]/double(2.0*net->sum_weights);
+    if ((Qa[i]<0.0) || Qmatrix[i][i]<0.0) {
+//         printf("Negatives Qa oder Qii\n\n\n");
+        //printf("Press any key to continue\n\n");
+        //cin >> Q;
+    }
+  }
+  Q/=double(2.0*net->sum_weights);
+  return Q;
+}
 //#######################################################################
 // This function calculates the Energy for the standard Hamiltonian
 // given a particular value of gamma and the current spin states
@@ -1162,7 +1177,7 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 			       igraph_real_t *temperature,
 			       igraph_vector_t *csize,
 			       igraph_vector_t *membership,
-			       double kT)
+			       double kT, double gamma)
 {
   NNode *n_cur, *n_cur2;
   bool found;
@@ -1183,7 +1198,7 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 //   fprintf(file,"Temperature=\t%f\n", kT);
 //   fprintf(file,"Cluster\tNodes\tInnerLinks\tOuterLinks\tp_in\tp_out\t<Ln(#comm.)>\n");
   
-  if (modularity)  { *modularity=calculate_Q(); }
+  if (modularity)  { *modularity=calculate_genQ(gamma); }
   if (temperature) { *temperature=kT; }
 
   if (csize || membership) {
