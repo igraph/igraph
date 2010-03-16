@@ -27,6 +27,7 @@
 <section><title>Generic vertex selector operations</title>
 <!-- doxrox-include igraph_vs_destroy -->
 <!-- doxrox-include igraph_vs_is_all -->
+<!-- doxrox-include igraph_vs_size -->
 </section>
 
 <section><title>Immediate vertex selectors</title>
