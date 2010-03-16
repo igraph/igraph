@@ -245,14 +245,14 @@ double PottsModel::calculate_Q()
   double Q=0.0;
   for (unsigned int i=0; i<=q; i++)
   {
-    Q+=Qmatrix[i][i]-Qa[i]*Qa[i]/double(2.0*num_of_links);
+    Q+=Qmatrix[i][i]-Qa[i]*Qa[i]/double(2.0*net->sum_weights);
     if ((Qa[i]<0.0) || Qmatrix[i][i]<0.0) {
 //         printf("Negatives Qa oder Qii\n\n\n");
         //printf("Press any key to continue\n\n");
         //cin >> Q;
     }
   }
-  Q/=double(2.0*num_of_links);
+  Q/=double(2.0*net->sum_weights);
   return Q;
 }
 //#######################################################################
