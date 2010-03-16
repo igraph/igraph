@@ -35,12 +35,13 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
     stop("Not a graph object")
   }
 
-  if (is.null(weights)) {
-    if ("weight" %in% list.edge.attributes(graph)) {
-      weights <- as.numeric(E(graph)$weight)
-    } else {
-      weights <- as.numeric(rep(1, ecount(graph)))
-    }
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
+    weights <- E(graph)$weight
+  }
+  if (!is.null(weights) && any(!is.na(weights))) {
+    weights <- as.numeric(weights)
+  } else {
+    weights <- NULL
   }
 
   update.rule <- igraph.match.arg(update.rule)

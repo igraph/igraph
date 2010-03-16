@@ -5563,14 +5563,14 @@ SEXP R_igraph_cohesion(SEXP graph, SEXP pchecks) {
   return result;
 }
 
-SEXP R_igraph_spinglass_community(SEXP graph, SEXP pweights,
+SEXP R_igraph_spinglass_community(SEXP graph, SEXP weights,
 				  SEXP pspins, SEXP pparupdate,
 				  SEXP pstarttemp, SEXP pstoptemp,
 				  SEXP pcoolfact, SEXP pupdate_rule,
 				  SEXP pgamma, SEXP pimplementation, 
 				  SEXP plambda) {
   igraph_t g;
-  igraph_vector_t weights;
+  igraph_vector_t v_weights, *pweights=0;
   igraph_integer_t spins=REAL(pspins)[0];
   igraph_bool_t parupdate=LOGICAL(pparupdate)[0];
   igraph_real_t starttemp=REAL(pstarttemp)[0];
@@ -5589,10 +5589,12 @@ SEXP R_igraph_spinglass_community(SEXP graph, SEXP pweights,
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  R_SEXP_to_vector(pweights, &weights);
+  if (!isNull(weights)) { 
+    pweights=&v_weights; R_SEXP_to_vector(weights, &v_weights);
+  }
   igraph_vector_init(&membership, 0);
   igraph_vector_init(&csize, 0);
-  igraph_community_spinglass(&g, &weights, 
+  igraph_community_spinglass(&g, pweights, 
 			     &modularity, &temperature, 
 			     &membership, &csize,
 			     spins, parupdate, starttemp, stoptemp,
