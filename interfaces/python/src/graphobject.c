@@ -3590,18 +3590,18 @@ PyObject *igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *
                                                 self, PyObject * args,
                                                 PyObject * kwds)
 {
-  static char *kwlist[] = { "v", "weights", "mode", "output", NULL };
+  static char *kwlist[] = { "v", "to", "weights", "mode", "output", NULL };
   igraph_vector_t *res, *weights=0;
   igraph_neimode_t mode = IGRAPH_OUT;
   long from0, i, j;
-  igraph_integer_t from;
+  igraph_integer_t from, no_of_target_nodes;
+  igraph_vs_t to;
   PyObject *list, *item, *mode_o=Py_None, *weights_o=Py_None,
-           *output_o=Py_None;
-  long int no_of_nodes = igraph_vcount(&self->g);
+           *output_o=Py_None, *to_o=Py_None;
   igraph_vector_ptr_t *ptrvec=0;
   igraph_bool_t use_edges = 0;
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|OOO!", kwlist, &from0,
-        &weights_o, &mode_o, &PyString_Type, &output_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|OOOO!", kwlist, &from0,
+        &to_o, &weights_o, &mode_o, &PyString_Type, &output_o))
     return NULL;
 
   if (output_o == 0 || output_o == Py_None ||
@@ -3619,6 +3619,13 @@ PyObject *igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *
   if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
       ATTRIBUTE_TYPE_EDGE)) return NULL;
 
+  if (igraphmodule_PyObject_to_vs_t(to_o, &to, &self->g, 0)) return NULL;
+
+  if (igraph_vs_size(&self->g, &to, &no_of_target_nodes)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
   ptrvec = (igraph_vector_ptr_t *) calloc(1, sizeof(igraph_vector_ptr_t));
   if (!ptrvec) {
     PyErr_SetString(PyExc_MemoryError, "");
@@ -3626,7 +3633,7 @@ PyObject *igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *
     return NULL;
   }
 
-  if (igraph_vector_ptr_init(ptrvec, no_of_nodes)) {
+  if (igraph_vector_ptr_init(ptrvec, no_of_target_nodes)) {
     PyErr_SetString(PyExc_MemoryError, "");
     free(ptrvec);
 	if (weights) { igraph_vector_destroy(weights); free(weights); }
@@ -3634,7 +3641,7 @@ PyObject *igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *
   }
 
   from = (igraph_integer_t) from0;
-  res = (igraph_vector_t *) calloc(no_of_nodes, sizeof(igraph_vector_t));
+  res = (igraph_vector_t *) calloc(no_of_target_nodes, sizeof(igraph_vector_t));
   if (!res) {
     PyErr_SetString(PyExc_MemoryError, "");
     igraph_vector_ptr_destroy(ptrvec); free(ptrvec);
@@ -3642,15 +3649,15 @@ PyObject *igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *
     return NULL;
   }
 
-  for (i = 0; i < no_of_nodes; i++) {
+  for (i = 0; i < no_of_target_nodes; i++) {
     VECTOR(*ptrvec)[i] = &res[i];
     igraph_vector_init(&res[i], 0);
   }
 
   if (igraph_get_shortest_paths_dijkstra(&self->g, use_edges ? 0 : ptrvec,
-        use_edges ? ptrvec : 0, from, igraph_vss_all(), weights, mode)) {
+        use_edges ? ptrvec : 0, from, to, weights, mode)) {
     igraphmodule_handle_igraph_error();
-    for (j = 0; j < no_of_nodes; j++) igraph_vector_destroy(&res[j]);
+    for (j = 0; j < no_of_target_nodes; j++) igraph_vector_destroy(&res[j]);
     free(res);
 	if (weights) { igraph_vector_destroy(weights); free(weights); }
     igraph_vector_ptr_destroy(ptrvec);
@@ -3662,27 +3669,27 @@ PyObject *igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *
   free(ptrvec);
   if (weights) { igraph_vector_destroy(weights); free(weights); }
 
-  list = PyList_New(no_of_nodes);
+  list = PyList_New(no_of_target_nodes);
   if (!list) {
-    for (j = 0; j < no_of_nodes; j++) igraph_vector_destroy(&res[j]);
+    for (j = 0; j < no_of_target_nodes; j++) igraph_vector_destroy(&res[j]);
     free(res);
     return NULL;
   }
 
-  for (i = 0; i < no_of_nodes; i++) {
+  for (i = 0; i < no_of_target_nodes; i++) {
     item = igraphmodule_vector_t_to_PyList(&res[i], IGRAPHMODULE_TYPE_INT);
     if (!item || PyList_SetItem(list, i, item)) {
       if (item) {
         Py_DECREF(item);
       }
       Py_DECREF(list);
-      for (j = 0; j < no_of_nodes; j++) igraph_vector_destroy(&res[j]);
+      for (j = 0; j < no_of_target_nodes; j++) igraph_vector_destroy(&res[j]);
       free(res);
       return NULL;
     }
   }
 
-  for (j = 0; j < no_of_nodes; j++) igraph_vector_destroy(&res[j]);
+  for (j = 0; j < no_of_target_nodes; j++) igraph_vector_destroy(&res[j]);
   free(res);
   return list;
 }
@@ -3696,18 +3703,21 @@ PyObject *igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *
                                                     self, PyObject * args,
                                                     PyObject * kwds)
 {
-  char *kwlist[] = { "v", "mode", NULL };
+  static char *kwlist[] = { "v", "to", "mode", NULL };
   igraph_vector_ptr_t res;
   igraph_neimode_t mode = IGRAPH_OUT;
   long from0, i, j, k;
   igraph_integer_t from;
-  PyObject *list, *item, *mode_o=Py_None;
+  igraph_vs_t to;
+  PyObject *list, *item, *mode_o=Py_None, *to_o=Py_None;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|O", kwlist, &from0, &mode_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|OO", kwlist, &from0, &to_o, &mode_o))
     return NULL;
 
   if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
-  
+
+  if (igraphmodule_PyObject_to_vs_t(to_o, &to, &self->g, 0)) return NULL;
+
   from = (igraph_integer_t) from0;
 
   if (igraph_vector_ptr_init(&res, 1)) {
@@ -3716,7 +3726,7 @@ PyObject *igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *
   }
 
   if (igraph_get_all_shortest_paths(&self->g, &res, NULL, from,
-                                    igraph_vss_all(), mode)) {
+                                    to, mode)) {
     igraphmodule_handle_igraph_error();
     igraph_vector_ptr_destroy(&res);
     return NULL;
@@ -9657,9 +9667,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   // interface to igraph_get_shortest_paths
   {"get_shortest_paths", (PyCFunction) igraphmodule_Graph_get_shortest_paths,
    METH_VARARGS | METH_KEYWORDS,
-   "get_shortest_paths(v, weights=None, mode=OUT, output=\"vpath\")\n\n"
+   "get_shortest_paths(v, to=None, weights=None, mode=OUT, output=\"vpath\")\n\n"
    "Calculates the shortest paths from/to a given node in a graph.\n\n"
    "@param v: the source/destination for the calculated paths\n"
+   "@param to: a vertex selector describing the destination/source for\n"
+   "  the calculated paths. This can be a single vertex ID, a list of\n"
+   "  vertex IDs, a single vertex name, a list of vertex names or a\n"
+   "  L{VertexSeq} object. C{None} means all the vertices.\n"
    "@param weights: edge weights in a list or the name of an edge attribute\n"
    "  holding edge weights. If C{None}, all edges are assumed to have\n"
    "  equal weight.\n"
@@ -9678,9 +9692,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"get_all_shortest_paths",
    (PyCFunction) igraphmodule_Graph_get_all_shortest_paths,
    METH_VARARGS | METH_KEYWORDS,
-   "get_all_shortest_paths(v, mode=OUT)\n\n"
+   "get_all_shortest_paths(v, to=None, mode=OUT)\n\n"
    "Calculates all of the shortest paths from/to a given node in a graph.\n\n"
    "@param v: the source/destination for the calculated paths\n"
+   "@param to: a vertex selector describing the destination/source for\n"
+   "  the calculated paths. This can be a single vertex ID, a list of\n"
+   "  vertex IDs, a single vertex name, a list of vertex names or a\n"
+   "  L{VertexSeq} object. C{None} means all the vertices.\n"
    "@param mode: the directionality of the paths. L{IN} means to calculate\n"
    "  incoming paths, L{OUT} means to calculate outgoing paths,\n"
    "  L{ALL} means to calculate both ones.\n"
