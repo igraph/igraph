@@ -82,6 +82,7 @@ class PottsModel {
     unsigned long initialize_lookup(double kT, double gamma);
     double initialize_Qmatrix(void);
     double calculate_Q(void);
+    double calculate_genQ(double gamma);
     double FindStartTemp(double gamma, double prob,  double ts);
     long   HeatBathParallelLookupZeroTemp(double gamma, double prob, unsigned int max_sweeps);
     double HeatBathLookupZeroTemp(double gamma, double prob, unsigned int max_sweeps);
@@ -94,7 +95,7 @@ class PottsModel {
     long   WriteClusters(igraph_real_t *modularity,
 			 igraph_real_t *temperature, 
 			 igraph_vector_t *csize, igraph_vector_t *membership,
-			 double kT);
+			 double kT, double gamma);
     long   WriteSoftClusters(char *filename, double threshold);
     double Get_Energy(void) { return energy;}
     double FindCommunityFromStart(double gamma, double prob, char *nodename,
