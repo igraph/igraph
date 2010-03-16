@@ -27,7 +27,9 @@ spinglass.community(graph, weights=NULL, vertex, spins=25,
   \item{weights}{The weights of the edges. Either a numeric vector or
     \code{NULL}. If it is null and the input graph has a \sQuote{weight}
     edge attribute then that will be used. If \code{NULL} and no such
-    attribute is present then the edges will have equal weights.}
+    attribute is present then the edges will have equal weights. Set
+    this to \code{NA} if the graph was a \sQuote{weight} edge attribute,
+    but you don't want to use it for community detection.}
   \item{spins}{Integer constant, the number of spins to use. This is the
     upper limit for the number of communities. It is not a problem to
     supply a (reasonably) big number here, in which case some
