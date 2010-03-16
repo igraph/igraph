@@ -98,8 +98,9 @@ spinglass.community(graph, weights=NULL, vertex, spins=25,
     communities have ids starting from zero and for each graph vertex
     ids community id is given in this vector.}
   \item{csize}{The sizes of the communities in the order of their ids.}
-  \item{modularity}{The modularity score of the result, as defined by
-    Newman and Girvan, see references.}
+  \item{modularity}{The (generalized) modularity score of the result, as
+    defined in the Reichardt-Bornholdt paper, see references. If gamma
+    is one, then it simplifies to the Newman-Girvan modularity score.}
   \item{temperature}{The temperature of the system when the algorithm
     terminated.}
 
