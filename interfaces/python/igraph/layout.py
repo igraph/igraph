@@ -4,9 +4,11 @@ Layout-related code in the IGraph library.
 This package contains the implementation of the L{Layout} object.
 """
 
-from copy import copy
-from igraph.statistics import RunningMean
 import math
+from copy import copy
+
+from igraph.drawing import BoundingBox
+from igraph.statistics import RunningMean
 
 __license__ = """
 Copyright (C) 2006-2007  Gabor Csardi <csardi@rmki.kfki.hu>,
@@ -313,4 +315,41 @@ class Layout(object):
     def copy(self):
         """Creates an exact copy of the layout."""
         return copy(self)
+
+    def fit_into(self, bbox, keep_aspect_ratio=True):
+        """Fits the layout into the given bounding box.
+
+        The layout will be modified in-place.
+
+        @param bbox: the bounding box in which to fit the layout. It can either
+          be a 2-tuple (defining the width and height of the box), a 4-tuple
+          (defining the coordinates of the top left point and the width and
+          height of the box), or a L{BoundingBox} object.
+        @param keep_aspect_ratio: whether to keep the aspect ratio of the current
+          layout. If C{False}, the layout will be rescaled to fit exactly into
+          the bounding box. If C{True}, the original aspect ratio of the layout
+          will be kept and it will be centered within the bounding box.
+        """
+        if not isinstance(bbox, BoundingBox): bbox=BoundingBox(bbox)
+
+        sl, st, sr, sb = self.bounding_box()
+        sw, sh = sr-sl, sb-st
+        if sw == 0 and sh == 0: sw, sh = 1, 1
+        if sw == 0: sw = sh
+        if sh == 0: sh = sw
+
+        rx, ry = float(bbox.width)/sw, float(bbox.height)/sh
+        tx, ty = 0, 0
+        if keep_aspect_ratio:
+            if rx > ry:
+                rx = ry
+                tx += (float(bbox.width) - rx * sw) / 2.
+            else:
+                ry = rx
+                ty += (float(bbox.height) - ry * sh) / 2.
+
+        tx, ty = tx - sl*rx + bbox.coords[0], ty - st*ry + bbox.coords[1]
+
+        self.scale(rx, ry)
+        self.translate(tx, ty)
 

@@ -1879,16 +1879,10 @@ class Graph(core.GraphBase):
         else:
             layout = Layout(layout)
 
-        sl, st, sr, sb = layout.bounding_box()
-        sw, sh = sr-sl, sb-st
-        if sw == 0 and sh == 0: sw, sh = 1, 1
-        if sw == 0: sw = sh
-        if sh == 0: sh = sw
-        rx, ry = float(bbox.width-max_vertex_size-margin[1]-margin[3])/sw, \
-          float(bbox.height-max_vertex_size-margin[0]-margin[2])/sh
-        layout.scale(rx, ry)
-        layout.translate(-sl*rx+max_vertex_size/2.+margin[1]+bbox.coords[0], \
-          -st*ry+max_vertex_size/2.+margin[0]+bbox.coords[1])
+        margin = [x + max_vertex_size/2. for x in margin]
+        bbox = bbox.contract(margin)
+        layout.fit_into(bbox, keep_aspect_ratio=False)
+
         context.set_line_width(1)
 
         edge_colors = drawing.collect_attributes(self.ecount(), "edge_color", \
