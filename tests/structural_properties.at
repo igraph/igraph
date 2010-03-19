@@ -125,3 +125,7 @@ AT_KEYWORDS([edge convergence degree igraph_convergence_degree])
 AT_COMPILE_CHECK([simple/igraph_convergence_degree.c], [simple/igraph_convergence_degree.out])
 AT_CLEANUP
 
+AT_SETUP([Average nearest neighbor degree (igraph_avg_nearest_neighbor_degree): ])
+AT_KEYWORDS([nearest neighbor degree degree correlations])
+AT_COMPILE_CHECK([simple/igraph_knn.c])
+AT_CLEANUP
