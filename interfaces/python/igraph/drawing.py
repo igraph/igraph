@@ -34,14 +34,18 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 from warnings import warn
+from operator import itemgetter
+
+import math
 import os
 import platform
 import time
-import math
 
 import igraph.colors as colors
 
-__all__ = ["BoundingBox", "Plot", "plot"]
+from igraph.configuration import Configuration
+
+__all__ = ["BoundingBox", "DefaultGraphDrawer", "Plot", "Point", "plot"]
 
 try:
     import cairo
@@ -55,6 +59,84 @@ except ImportError:
         def __setattr__(self, k, v):
             raise TypeError("plotting not available")
     cairo=FakeModule()
+
+
+class Point(tuple):
+    """Class representing a point on the 2D plane."""
+    __slots__ = ()
+    _fields = ('x', 'y')
+
+    def __new__(_cls, x, y):
+        """Creates a new point with the given coordinates"""
+        return tuple.__new__(_cls, (x, y))
+
+    @classmethod
+    def _make(cls, iterable, new = tuple.__new__, len = len):
+        """Creates a new point from a sequence or iterable"""
+        result = new(cls, iterable)
+        if len(result) != 2:
+            raise TypeError('Expected 2 arguments, got %d' % len(result))
+        return result
+
+    def __repr__(self):
+        """Returns a nicely formatted representation of the point"""
+        return 'Point(x=%r, y=%r)' % self
+
+    def _asdict(self):
+        """Returns a new dict which maps field names to their values"""
+        return dict(zip(self._fields, self))
+
+    def _replace(self, **kwds):
+        """Returns a new point object replacing specified fields with new
+        values"""
+        result = self._make(map(kwds.pop, ('x', 'y'), self))
+        if kwds:
+            raise ValueError('Got unexpected field names: %r' % kwds.keys())
+        return result
+
+    def __getnewargs__(self):
+        """Return self as a plain tuple. Used by copy and pickle."""
+        return tuple(self)
+
+    x = property(itemgetter(0), doc="Alias for field number 0")
+    y = property(itemgetter(1), doc="Alias for field number 1")
+
+    def __add__(self, other):
+        """Adds the coordinates of a point to another one"""
+        return self.__class__(x = self.x + other.x, y = self.y + other.y)
+
+    def __sub__(self, other):
+        """Subtracts the coordinates of a point to another one"""
+        return self.__class__(x = self.x - other.x, y = self.y - other.y)
+
+    def __mul__(self, scalar):
+        """Multiplies the coordinates by a scalar"""
+        return self.__class__(x = self.x * scalar, y = self.y * scalar)
+
+    def __div__(self, scalar):
+        """Divides the coordinates by a scalar"""
+        return self.__class__(x = self.x / scalar, y = self.y / scalar)
+
+    def interpolate(self, other, ratio = 0.5):
+        """Linearly interpolates between the coordinates of this point and
+        another one.
+
+        @param  other:  the other point
+        @param  ratio:  the interpolation ratio between 0 and 1. Zero will
+          return this point, 1 will return the other point.
+        """
+        r = float(ratio)
+        return Point(x = self.x * (1.0 - r) + other.x * r, \
+                     y = self.y * (1.0 - r) + other.y * r)
+
+    def length(self):
+        """Returns the length of the vector pointing from the origin to this point."""
+        return (self.x ** 2 + self.y ** 2) ** 0.5
+
+    def sq_length(self):
+        """Returns the squared length of the vector pointing from the origin to this point."""
+        return (self.x ** 2 + self.y ** 2)
+
 
 class BoundingBox(object):
     """Class representing a bounding box (a rectangular area)."""
@@ -236,7 +318,7 @@ class Plot(object):
             bbox = BoundingBox(bbox)
 
         if palette is None:
-            from igraph import config
+            config = Configuration.instance()
             palette = config["plotting.palette"]
         if not isinstance(palette, colors.Palette):
             palette = colors.palettes[palette]
@@ -400,7 +482,8 @@ class Plot(object):
 
         self._create_tmpfile()
         sur.write_to_png(self._tmpfile_name)
-        from igraph import config # Can only be imported here
+
+        config = Configuration.instance()
         imgviewer = config["apps.image_viewer"]
         if not imgviewer:
             # No image viewer was given and none was detected. This
@@ -602,7 +685,201 @@ known_shapes = {
 
 #####################################################################
 
-class CoordinateSystem(object):
+class AbstractDrawer(object):
+    """Abstract class that serves as a base class for anything that
+    draws on a Cairo context within a given bounding box."""
+
+    def __init__(self, context, bbox):
+        """Constructs the drawer and associates it to the given
+        Cairo context and the given L{BoundingBox}.
+
+        @param context  the context on which we will draw
+        @param bbox     the bounding box within which we will draw.
+                        Can be anything accepted by the constructor
+                        of L{BoundingBox} (i.e., a 2-tuple, a 4-tuple
+                        or a L{BoundingBox} object).
+        """
+        self.context = context
+        if not isinstance(bbox, BoundingBox):
+            bbox = BoundingBox(bbox)
+        self.bbox = bbox
+
+    def draw(self):
+        """Abstract method, must be implemented in derived classes."""
+        raise NotImplementedError("abstract class")
+
+
+#####################################################################
+
+class DefaultGraphDrawer(AbstractDrawer):
+    """Class implementing the default visualisation of a graph.
+
+    The default visualisation of a graph draws the nodes on a 2D plane
+    according to a given L{Layout}, then draws a straight or curved
+    edge between nodes connected by edges. This is the visualisation
+    used when one invokes the L{plot()} function on a L{Graph} object.
+
+    See L{Graph.__plot__()} for the keyword arguments understood by
+    this drawer."""
+
+    def __init__(self, context, bbox):
+        """Constructs the graph drawer and associates it to the given
+        Cairo context and the given L{BoundingBox}.
+
+        @param context  the context on which we will draw
+        @param bbox     the bounding box within which we will draw.
+                        Can be anything accepted by the constructor
+                        of L{BoundingBox} (i.e., a 2-tuple, a 4-tuple
+                        or a L{BoundingBox} object).
+        """
+        AbstractDrawer.__init__(self, context, bbox)
+
+    def draw(self, graph, palette, *args, **kwds):
+        from igraph.layout import Layout
+
+        vcount, ecount, directed = graph.vcount(), graph.ecount(), graph.is_directed()
+        context = self.context
+
+        margin = kwds.get("margin", [0., 0., 0., 0.])
+        try:
+            margin = list(margin)
+        except TypeError:
+            margin = [margin]
+        while len(margin)<4: margin.extend(margin)
+        margin = tuple(map(float, margin[:4]))
+
+        config = Configuration.instance()
+
+        vertex_colors = collect_attributes(vcount, "vertex_color", \
+            "color", kwds, graph.vs, config, "red", palette.get)
+        vertex_sizes = collect_attributes(vcount, "vertex_size", \
+            "size", kwds, graph.vs, config, 10, float)
+        vertex_shapes = [known_shapes.get(x, NullDrawer) \
+            for x in collect_attributes(vcount, "vertex_shape", \
+            "shape", kwds, graph.vs, config, "circle")]
+
+        max_vertex_size = max(vertex_sizes)
+
+        layout = kwds.get("layout", None)
+        if isinstance(layout, Layout):
+            layout = Layout(layout.coords)
+        elif isinstance(layout, str) or layout is None:
+            layout = graph.layout(layout)
+        else:
+            layout = Layout(layout)
+
+        margin = [x + max_vertex_size/2. for x in margin]
+        bbox = self.bbox.contract(margin)
+        layout.fit_into(bbox, keep_aspect_ratio=False)
+
+        context.set_line_width(1)
+
+        edge_colors = collect_attributes(ecount, "edge_color", \
+            "color", kwds, graph.es, config, "black", palette.get)
+        edge_widths = collect_attributes(ecount, "edge_width", \
+            "width", kwds, graph.es, config, 1, float)
+        edge_arrow_sizes = collect_attributes(ecount, \
+            "edge_arrow_size", "arrow_size", kwds, graph.es, config, 1, float)
+        edge_arrow_widths = collect_attributes(ecount, \
+            "edge_arrow_width", "arrow_width", kwds, graph.es, config, 1, float)
+
+        # Draw the edges
+        for idx, e in enumerate(graph.es):
+            context.set_source_rgb(*edge_colors[idx])
+            context.set_line_width(edge_widths[idx])
+
+            src, tgt = e.tuple
+            if src == tgt:
+                # Loop edge
+                r = vertex_sizes[src]*2
+                cx, cy = layout[src][0]+math.cos(math.pi/4)*r/2, \
+                  layout[src][1]-math.sin(math.pi/4)*r/2
+                context.arc(cx, cy, r/2., 0, math.pi*2)
+            else:
+                # Determine where the edge intersects the circumference of the
+                # vertex shape. TODO: theoretically this need not to be done
+                # if there are no arrowheads on the edge, but maybe it's not worth
+                # testing for
+                p1 = vertex_shapes[src].intersection_point( \
+                    layout[src][0], layout[src][1], layout[tgt][0], layout[tgt][1],
+                    vertex_sizes[src])
+                p2 = vertex_shapes[tgt].intersection_point( \
+                    layout[tgt][0], layout[tgt][1], layout[src][0], layout[src][1],
+                    vertex_sizes[tgt])
+                context.move_to(*p1)
+                context.line_to(*p2)
+            context.stroke()
+
+            if directed and src != tgt:
+                # Draw an arrowhead
+                angle = math.atan2(p2[1]-p1[1], p2[0]-p1[0])
+                arrow_size = 15.*edge_arrow_sizes[idx]
+                arrow_width = 10./edge_arrow_widths[idx]
+                a1 = (p2[0]-arrow_size*math.cos(angle-math.pi/arrow_width),
+                  p2[1]-arrow_size*math.sin(angle-math.pi/arrow_width))
+                a2 = (p2[0]-arrow_size*math.cos(angle+math.pi/arrow_width),
+                  p2[1]-arrow_size*math.sin(angle+math.pi/arrow_width))
+                context.move_to(*p2)
+                context.line_to(*a1)
+                context.line_to(*a2)
+                context.line_to(*p2)
+                context.fill()
+
+        del edge_colors
+        del edge_widths
+
+        # Draw the vertices
+        context.set_line_width(1)
+        for idx, v in enumerate(graph.vs):
+            vertex_shapes[idx].draw_path(context, layout[idx][0], layout[idx][1], vertex_sizes[idx])
+            context.set_source_rgb(*vertex_colors[idx])
+            context.fill_preserve()
+            context.set_source_rgb(0., 0., 0.)
+            context.stroke()
+        del vertex_colors
+        del vertex_shapes
+
+        # Draw the vertex labels
+        if "vertex_label" not in kwds and "label" not in graph.vs.attribute_names():
+            vertex_labels = [str(i) for i in xrange(vcount)]
+        elif "vertex_label" in kwds and kwds["vertex_label"] is None:
+            vertex_labels = [""] * vcount
+        else:
+            vertex_labels = collect_attributes(vcount, "vertex_label", \
+                "label", kwds, graph.vs, config, None)
+        vertex_dists = collect_attributes(vcount, "vertex_label_dist", \
+            "label_dist", kwds, graph.vs, config, 1.6, float)
+        vertex_degrees = collect_attributes(vcount, \
+            "vertex_label_angle", "label_angle", kwds, graph.vs, config, \
+            -math.pi/2, float)
+        vertex_label_colors = collect_attributes(vcount, \
+            "vertex_label_color", "label_color", kwds, graph.vs, config, \
+            "black", palette.get)
+        vertex_label_sizes = collect_attributes(vcount, \
+            "vertex_label_size", "label_size", kwds, graph.vs, \
+            config, 14, float)
+
+        context.select_font_face("sans-serif", cairo.FONT_SLANT_NORMAL, \
+            cairo.FONT_WEIGHT_BOLD)
+        
+        for idx, v in enumerate(graph.vs):
+            xb, yb, w, h = context.text_extents(vertex_labels[idx])[:4]
+            cx, cy = layout[idx]
+            si, co = math.sin(vertex_degrees[idx]), math.cos(vertex_degrees[idx])
+            cx += co * vertex_dists[idx] * vertex_sizes[idx] / 2.
+            cy += si * vertex_dists[idx] * vertex_sizes[idx] / 2.
+            cx += (co - 1) * w/2. + xb
+            cy += (si + 1) * h/2.
+            context.move_to(cx, cy)
+            context.set_font_size(vertex_label_sizes[idx])
+            context.set_source_rgb(*vertex_label_colors[idx])
+            context.text_path(vertex_labels[idx])
+            context.fill()
+
+
+#####################################################################
+
+class CoordinateSystem(AbstractDrawer):
     """Class implementing a coordinate system object.
 
     Coordinate system objects are used when drawing plots which
@@ -620,16 +897,12 @@ class CoordinateSystem(object):
         @param bbox: the bounding box that will contain the coordinate
           system.
         """
-        self.context = context
-        self.bbox = bbox
+        AbstractDrawer.__init__(self, context, bbox)
 
-    def plot(self):
+    def draw(self):
         """Draws the coordinate system.
 
-        This method must be overridden in derived classes. Note that a coordinate
-        system itself is not plottable (there is no C{__plot__} method), it must
-        be I{initialized} with respect to a Cairo drawing context and a bounding
-        box before being plotted -- hence the different method name.
+        This method must be overridden in derived classes.
         """
         raise NotImplementedError("abstract class")
 
@@ -680,7 +953,7 @@ class DescartesCoordinateSystem(object):
         self._ox2 = self._bbox.left
         self._oy2 = self._bbox.bottom
 
-    def plot(self):
+    def draw(self):
         """Draws the coordinate system."""
         # Draw the frame
         coords = self.bbox.coords

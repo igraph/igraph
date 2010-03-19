@@ -163,6 +163,9 @@ class Configuration(object):
         "plotting.palette": { "default": "gray" }
     }
 
+    # The singleton instance we are using throughout other modules
+    _instance = None
+
     def __init__(self, filename=None):
         """Creates a new configuration instance.
 
@@ -286,6 +289,19 @@ class Configuration(object):
         self._config.write(fp)
         if file_was_open: fp.close()
 
+    @classmethod
+    def instance(klass):
+        if klass._instance is None:
+            cfile = get_user_config_file()
+            try:
+                config = klass(cfile)
+            except IOError:
+                # No config file yet, whatever
+                config = klass()
+            klass._instance = config
+        return klass._instance
+
+
 def get_user_config_file():
     """Returns the path where the user-level configuration file is stored"""
     import os.path
@@ -297,16 +313,10 @@ def init():
 
     This method loads the user-specific configuration file from the
     user's home directory, or if it does not exist, creates a default
-    configuration
-    
-    @return: the L{Configuration} object loaded or created"""
-    cfile = get_user_config_file()
-    try:
-        config = Configuration(cfile)
-        return config
-    except IOError:
-        # No config file yet, whatever
-        config = Configuration()
-        return config
+    configuration.
 
+    The method is safe to be called multiple times, it will not parse
+    the configuration file twice.
 
+    @return: the L{Configuration} object loaded or created."""
+    return Configuration.instance()

@@ -154,7 +154,7 @@ class Histogram(object):
             context.fill()
 
         # Draw the axes
-        c.plot()
+        c.draw()
 
     def __str__(self):
         """Returns the string representation of the histogram"""
