@@ -5585,6 +5585,11 @@ int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
   }
   
+  igraph_vector_destroy(&neis);
+  igraph_vector_destroy(&deg);
+  igraph_vit_destroy(&vit);
+  IGRAPH_FINALLY_CLEAN(3);
+  
   if (!knn) {
     igraph_vector_destroy(&my_knn_v);
     IGRAPH_FINALLY_CLEAN(1);

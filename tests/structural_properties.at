@@ -145,3 +145,8 @@ AT_KEYWORDS([assortativity mixing igraph_assortativity])
 AT_COMPILE_CHECK([simple/assortativity.c], [simple/assortativity.out], 
                  [simple/{karate,celegansneural}.gml])
 AT_CLEANUP
+
+AT_SETUP([Average nearest neighbor degree (igraph_avg_nearest_neighbor_degree): ])
+AT_KEYWORDS([nearest neighbor degree degree correlations])
+AT_COMPILE_CHECK([simple/igraph_knn.c])
+AT_CLEANUP
