@@ -33,6 +33,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
 02110-1301 USA
 """
+
 from warnings import warn
 from operator import itemgetter
 
@@ -711,7 +712,108 @@ class AbstractDrawer(object):
 
 #####################################################################
 
-class DefaultGraphDrawer(AbstractDrawer):
+class AbstractGraphDrawer(AbstractDrawer):
+    """Abstract class that serves as a base class for anything that
+    draws a graph on a Cairo context within a given bounding box.
+    
+    This class is primarily used to collect routines that can be
+    potentially useful in different kinds of graph drawers."""
+
+    def collect_attributes(self, name, alt_name, kwds, vs, default, transform=None, config=None):
+        """Collects graph visualization attributes from various sources.
+
+        This method can be used to collect the attributes required for graph
+        visualization from various sources. Attribute value sources are:
+
+          - A specific value of a Python dict belonging to a given key. This dict
+            is given by the argument M{kwds}, and the name of the key is determined
+            by the argument M{name}.
+
+          - A vertex or edge sequence of a graph, given in M{vs}
+
+          - The global configuration, given in M{config}
+
+          - A default value when all other sources fail to provide the value.
+            given in M{default}
+
+        Attribute sources are considered exactly in the order mentioned above.
+        Optionally, the retrieved value is passed through an arbitrary
+        transformation.
+
+        @param  name:      the name of the attribute when it is coming from a
+                           list of Python keyword arguments
+        @param  alt_name:  the name of the attribute when it is coming from the
+                           graph attributes directly
+        @param  kwds:      a Python dict of keyword arguments that will be
+                           indexed by C{name}
+        @param  vs:        a L{VertexSeq} or L{EdgeSeq} that will be indexed
+                           by C{alt_name}
+        @param  default:   the default value of the attribute
+        @param  transform: optional callable transformation to call on the values.
+                           This can be used to ensure that the attributes are of
+                           a given type.
+        @param  config:    a L{Configuration} object to be used for determining the
+                           defaults if all else fails. If C{None}, the global
+                           igraph configuration will be used
+        @return: the collected attributes
+        """
+        n = len(vs)
+
+        if config is None:
+            config = Configuration.instance()
+
+        try:
+            attrs = vs[alt_name]
+        except:
+            attrs = None
+
+        result = kwds.get(name, None)
+        if attrs:
+            if not result:
+                result = attrs
+            else:
+                if isinstance(result, str): result = [result] * n
+                try:
+                    len(result)
+                except TypeError:
+                    result = [result] * n
+                result = [result[idx] or attrs[idx] for idx in xrange(len(result))]
+
+        if isinstance(result, str): result = [result] * n
+        try:
+            m = len(result)
+        except TypeError:
+            result = [result] * n
+
+        if not hasattr(result, "extend"): result = list(result)
+        m = len(result)
+        while len(result) < n:
+            if len(result) <= n/2:
+                result.extend(result)
+            else:
+                result.extend(result[0:(n-len(result))])
+
+        # By now, the length of the result vector should be n as requested
+        try:
+            conf_def = config["plotting.%s" % name]
+        except:
+            conf_def = None
+
+        if conf_def and None in result:
+            result = [result[idx] or conf_def for idx in xrange(len(result))]
+
+        if None in result:
+            result = [result[idx] or default for idx in xrange(len(result))]
+
+        if transform is not None:
+            result = [transform(x) for x in result]
+
+        return result
+
+
+#####################################################################
+
+class DefaultGraphDrawer(AbstractGraphDrawer):
     """Class implementing the default visualisation of a graph.
 
     The default visualisation of a graph draws the nodes on a 2D plane
@@ -732,7 +834,7 @@ class DefaultGraphDrawer(AbstractDrawer):
                         of L{BoundingBox} (i.e., a 2-tuple, a 4-tuple
                         or a L{BoundingBox} object).
         """
-        AbstractDrawer.__init__(self, context, bbox)
+        AbstractGraphDrawer.__init__(self, context, bbox)
 
     def draw(self, graph, palette, *args, **kwds):
         from igraph.layout import Layout
@@ -750,13 +852,13 @@ class DefaultGraphDrawer(AbstractDrawer):
 
         config = Configuration.instance()
 
-        vertex_colors = collect_attributes(vcount, "vertex_color", \
-            "color", kwds, graph.vs, config, "red", palette.get)
-        vertex_sizes = collect_attributes(vcount, "vertex_size", \
-            "size", kwds, graph.vs, config, 10, float)
+        vertex_colors = self.collect_attributes("vertex_color", \
+            "color", kwds, graph.vs, "red", palette.get)
+        vertex_sizes = self.collect_attributes("vertex_size", \
+            "size", kwds, graph.vs, 10, float)
         vertex_shapes = [known_shapes.get(x, NullDrawer) \
-            for x in collect_attributes(vcount, "vertex_shape", \
-            "shape", kwds, graph.vs, config, "circle")]
+            for x in self.collect_attributes("vertex_shape", \
+            "shape", kwds, graph.vs, "circle")]
 
         max_vertex_size = max(vertex_sizes)
 
@@ -774,14 +876,14 @@ class DefaultGraphDrawer(AbstractDrawer):
 
         context.set_line_width(1)
 
-        edge_colors = collect_attributes(ecount, "edge_color", \
-            "color", kwds, graph.es, config, "black", palette.get)
-        edge_widths = collect_attributes(ecount, "edge_width", \
-            "width", kwds, graph.es, config, 1, float)
-        edge_arrow_sizes = collect_attributes(ecount, \
-            "edge_arrow_size", "arrow_size", kwds, graph.es, config, 1, float)
-        edge_arrow_widths = collect_attributes(ecount, \
-            "edge_arrow_width", "arrow_width", kwds, graph.es, config, 1, float)
+        edge_colors = self.collect_attributes("edge_color", \
+            "color", kwds, graph.es, "black", palette.get)
+        edge_widths = self.collect_attributes("edge_width", \
+            "width", kwds, graph.es, 1, float)
+        edge_arrow_sizes = self.collect_attributes( \
+            "edge_arrow_size", "arrow_size", kwds, graph.es, 1, float)
+        edge_arrow_widths = self.collect_attributes( \
+            "edge_arrow_width", "arrow_width", kwds, graph.es, 1, float)
 
         # Draw the edges
         for idx, e in enumerate(graph.es):
@@ -845,19 +947,19 @@ class DefaultGraphDrawer(AbstractDrawer):
         elif "vertex_label" in kwds and kwds["vertex_label"] is None:
             vertex_labels = [""] * vcount
         else:
-            vertex_labels = collect_attributes(vcount, "vertex_label", \
-                "label", kwds, graph.vs, config, None)
-        vertex_dists = collect_attributes(vcount, "vertex_label_dist", \
-            "label_dist", kwds, graph.vs, config, 1.6, float)
-        vertex_degrees = collect_attributes(vcount, \
-            "vertex_label_angle", "label_angle", kwds, graph.vs, config, \
+            vertex_labels = self.collect_attributes("vertex_label", \
+                "label", kwds, graph.vs, None)
+        vertex_dists = self.collect_attributes("vertex_label_dist", \
+            "label_dist", kwds, graph.vs, 1.6, float)
+        vertex_degrees = self.collect_attributes(\
+            "vertex_label_angle", "label_angle", kwds, graph.vs, \
             -math.pi/2, float)
-        vertex_label_colors = collect_attributes(vcount, \
-            "vertex_label_color", "label_color", kwds, graph.vs, config, \
+        vertex_label_colors = self.collect_attributes(\
+            "vertex_label_color", "label_color", kwds, graph.vs, \
             "black", palette.get)
-        vertex_label_sizes = collect_attributes(vcount, \
+        vertex_label_sizes = self.collect_attributes(\
             "vertex_label_size", "label_size", kwds, graph.vs, \
-            config, 14, float)
+            14, float)
 
         context.select_font_face("sans-serif", cairo.FONT_SLANT_NORMAL, \
             cairo.FONT_WEIGHT_BOLD)
@@ -1017,75 +1119,4 @@ def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
     return result
 
 #####################################################################
-
-def collect_attributes(n, name, alt_name, kwds, vs, config, default, transform=None):
-    """Collects graph visualization attributes from various sources.
-
-    This method is used by L{Graph.__plot__} to collect the attributes required
-    for graph visualization from various sources. Attribute value sources are:
-
-      - A specific value of a Python dict belonging to a given key. This dict
-        is given by the argument M{kwds}, and the name of the key is determined
-        by the argument M{name}.
-
-      - A vertex or edge sequence of a graph, given in M{vs}
-
-      - The global configuration, given in M{config}
-
-      - A default value when all other sources fail to provide the value.
-        given in M{default}
-
-    Attribute sources are considered exactly in the order mentioned above.
-    Optionally, the retrieved value is passed through an arbitrary
-    transformation.
-
-    @return: the collected attributes
-    """
-    try:
-        attrs = vs[alt_name]
-    except:
-        attrs = None
-
-    result = kwds.get(name, None)
-    if attrs:
-        if not result:
-            result = attrs
-        else:
-            if isinstance(result, str): result = [result] * n
-            try:
-                len(result)
-            except TypeError:
-                result = [result] * n
-            result = [result[idx] or attrs[idx] for idx in xrange(len(result))]
-
-    if isinstance(result, str): result = [result] * n
-    try:
-        m = len(result)
-    except TypeError:
-        result = [result] * n
-
-    if not hasattr(result, "extend"): result = list(result)
-    m = len(result)
-    while len(result) < n:
-        if len(result) <= n/2:
-            result.extend(result)
-        else:
-            result.extend(result[0:(n-len(result))])
-
-    # By now, the length of the result vector should be n as requested
-    try:
-        conf_def = config["plotting.%s" % name]
-    except:
-        conf_def = None
-
-    if conf_def and None in result:
-        result = [result[idx] or conf_def for idx in xrange(len(result))]
-
-    if None in result:
-        result = [result[idx] or default for idx in xrange(len(result))]
-
-    if transform is not None:
-        result = [transform(x) for x in result]
-
-    return result
 
