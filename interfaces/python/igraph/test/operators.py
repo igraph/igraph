@@ -113,6 +113,14 @@ class OperatorTests(unittest.TestCase):
         self.failUnless(g.vcount() == 4 and g.ecount() == 1
                         and g.clusters().membership == [0,1,2,2])
 
+    def testNonzero(self):
+        self.failUnless(Graph(1))
+        self.failIf(Graph(0))
+
+    def testLength(self):
+        self.assertRaises(TypeError, len, Graph(15))
+        self.failUnless(len(Graph(15).vs) == 15)
+        self.failUnless(len(Graph.Full(5).es) == 10)
 
 def suite():
     operator_suite = unittest.makeSuite(OperatorTests)

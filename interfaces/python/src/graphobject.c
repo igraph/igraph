@@ -11550,11 +11550,11 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
  * igraph attributes in Python as if it were of a Python mapping type)
  */
 PyMappingMethods igraphmodule_Graph_as_mapping = {
-  // returns the number of graph attributes
-  (lenfunc) igraphmodule_Graph_attribute_count,
-  // returns an attribute by name
+  /* __len__ function intentionally left unimplemented */
+  0,
+  /* returns an attribute by name */
   (binaryfunc) igraphmodule_Graph_get_attribute,
-  // sets an attribute by name
+  /* sets an attribute by name */
   (objobjargproc) igraphmodule_Graph_set_attribute
 };
 

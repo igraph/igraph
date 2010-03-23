@@ -1720,7 +1720,11 @@ class Graph(core.GraphBase):
                 return NotImplemented
 
         return NotImplemented
-    
+
+    def __nonzero__(self):
+        """Returns True if the graph has at least one vertex, False otherwise."""
+        return self.vcount() > 0
+
     def __coerce__(self, other):
         """Coercion rules.
 
