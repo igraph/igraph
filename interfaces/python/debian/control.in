@@ -9,7 +9,7 @@ Homepage: http://igraph.sourceforge.net
 
 Package: python-igraph
 Architecture: any
-Depends: ${python:Depends}, ${misc:Depends}, libigraph0 (= @VERSION@)
+Depends: ${python:Depends}, ${misc:Depends}, libigraph0 (>= @VERSION@)
 Suggests: python-igraph-doc, python-cairo
 Provides: ${python:Provides}
 XB-Python-Version: ${python:Versions}

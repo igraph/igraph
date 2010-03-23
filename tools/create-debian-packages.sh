@@ -1,7 +1,28 @@
 #!/bin/bash
 
-IGRAPH_VERSION=0.5.2
-DEST_DIR=$HOME/packages
+if [ `id -u` != 0 ]; then
+	echo "This script must be run as root."
+	exit 2
+fi
+
+if [ $# -ne 3]; then
+    echo "Usage: $0 igraph_version debian_revision series"
+	echo "where igraph_version is the version number of igraph,"
+	echo "debian_revision is the Debian package revision number"
+	echo "and series is the distribution series (e.g., unstable,"
+	echo "karmic, jaunty etc)."
+	echo ""
+	echo "For the Launchpad PPA, you have to prepare a package"
+	echo "for the two most recent Ubuntu series"
+	exit 1
+fi
+
+IGRAPH_VERSION=$1
+DEBIAN_REVISION=$2
+SERIES=$3
+
+DEST_DIR=$HOME/packages/$SERIES
+CURR_DIR=`pwd`
 
 function install_build_dependencies {
   apt-get -y --no-install-recommends install \
@@ -14,38 +35,48 @@ function make_destdir {
   mkdir -p ${DEST_DIR}
 }
 
+function bazaar_update {
+  pushd ${CURR_DIR}/bzr/0.6-main
+  bzr update
+  popd
+}
+
 function create_igraph_debian_pkg {
-  wget http://switch.dl.sourceforge.net/sourceforge/igraph/igraph-$1.tar.gz
-  tar -xvvzf igraph-$1.tar.gz
+  wget -O igraph_$1.orig.tar.gz http://switch.dl.sourceforge.net/sourceforge/igraph/igraph-$1.tar.gz
+  tar -xvvzf igraph_$1.orig.tar.gz
   cd igraph-$1
-  # Patching igraph.pc.in if needed
-  patch -p1 << EOF
---- old/igraph.pc.in    2009-04-29 11:36:21.000000000 +0100
-+++ new/igraph.pc.in    2009-04-29 11:36:21.000000000 +0100
-@@ -9,2 +9,2 @@
- Libs: -L\${libdir} -ligraph
--Cflags: -I\${includedir}/igraph
-+Cflags: -I\${includedir}
-EOF
+  # cp -r ${CURR_DIR}/bzr/0.6-main/debian .
+  cat debian/changelog.in | sed -e "s/@VERSION@/@VERSION@-${DEBIAN_REVISION}/g" >debian/changelog.in.new
+  mv debian/changelog.in.new debian/changelog.in
   debian/prepare
-  dpkg-buildpackage -tc -rfakeroot
+  cat debian/changelog | sed -e "s/unstable/${SERIES}/g" >debian/changelog.new
+  mv debian/changelog.new debian/changelog
+  # dpkg-buildpackage -tc -rfakeroot
+  debuild -b -us -uc
+  debuild -S -sa
   cd ..
 }
 
 function install_igraph_debian_pkg {
-  dpkg -i libigraph_$1_*.deb libigraph-dev_$1_*.deb
+  dpkg -i libigraph0_$1-$2_*.deb libigraph-dev_$1-$2_*.deb || exit 3
 }
 
 function remove_igraph_debian_pkg {
-  dpkg -r libigraph libigraph-dev
+  dpkg -r libigraph0 libigraph-dev
 }
 
 function compile_python_interface {
-  wget http://pypi.python.org/packages/source/p/python-igraph/python-igraph-$1.tar.gz
-  tar -xvvzf python-igraph-$1.tar.gz
+  wget -O python-igraph_$1.orig.tar.gz http://pypi.python.org/packages/source/p/python-igraph/python-igraph-$1.tar.gz
+  tar -xvvzf python-igraph_$1.orig.tar.gz
   cd python-igraph-$1
+  cat debian/changelog.in | sed -e "s/@VERSION@/@VERSION@-${DEBIAN_REVISION}/g" >debian/changelog.in.new
+  mv debian/changelog.in.new debian/changelog.in
   debian/prepare
-  dpkg-buildpackage -tc -rfakeroot
+  cat debian/changelog | sed -e "s/unstable/${SERIES}/g" >debian/changelog.new
+  mv debian/changelog.new debian/changelog
+  # dpkg-buildpackage -tc -rfakeroot
+  debuild -b -us -uc
+  debuild -S -sa
   cd ..
 }
 
@@ -58,19 +89,19 @@ function remove_build_dir {
   rm -rf ${BUILD_DIR}
 }
 
-if [ `id -u` != 0 ]; then
-  echo This script must be run as root.
-  exit 1
-fi
-
 BUILD_DIR=`mktemp -d`
 cd ${BUILD_DIR}
 
 install_build_dependencies
 make_destdir
+bazaar_update
 create_igraph_debian_pkg ${IGRAPH_VERSION}
-install_igraph_debian_pkg ${IGRAPH_VERSION}
+install_igraph_debian_pkg ${IGRAPH_VERSION} ${DEBIAN_REVISION}
 compile_python_interface ${IGRAPH_VERSION}
 remove_igraph_debian_pkg
 move_packages
-# remove_build_dir
+remove_build_dir
+
+echo ""
+echo "Commands to upload packages to the Launchpad PPA:"
+echo "dput ppa:igraph/ppa <source.changes>"
