@@ -850,8 +850,6 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
         while len(margin)<4: margin.extend(margin)
         margin = tuple(map(float, margin[:4]))
 
-        config = Configuration.instance()
-
         vertex_colors = self.collect_attributes("vertex_color", \
             "color", kwds, graph.vs, "red", palette.get)
         vertex_sizes = self.collect_attributes("vertex_size", \
@@ -932,7 +930,7 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
 
         # Draw the vertices
         context.set_line_width(1)
-        for idx, v in enumerate(graph.vs):
+        for idx in xrange(vcount):
             vertex_shapes[idx].draw_path(context, layout[idx][0], layout[idx][1], vertex_sizes[idx])
             context.set_source_rgb(*vertex_colors[idx])
             context.fill_preserve()
@@ -964,7 +962,7 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
         context.select_font_face("sans-serif", cairo.FONT_SLANT_NORMAL, \
             cairo.FONT_WEIGHT_BOLD)
         
-        for idx, v in enumerate(graph.vs):
+        for idx in xrange(vcount):
             xb, yb, w, h = context.text_extents(vertex_labels[idx])[:4]
             cx, cy = layout[idx]
             si, co = math.sin(vertex_degrees[idx]), math.cos(vertex_degrees[idx])
