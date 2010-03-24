@@ -1748,6 +1748,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
 
       /* Count the weights corresponding to different labels */
       igraph_vector_null(&label_counters);
+      igraph_vector_clear(&dominant_labels);
       max_count = 0.0;
       if (weights) {
         neis = igraph_adjedgelist_get(&ael, v1);
