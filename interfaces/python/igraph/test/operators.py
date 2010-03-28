@@ -114,6 +114,57 @@ class OperatorTests(unittest.TestCase):
                         and g.clusters().membership == [0,1,2,2])
 
 
+    def testSimplify(self):
+        el = [(0,1), (1,0), (1,2), (2,3), (2,3), (2,3), (3,3)] 
+        g = Graph(el)
+        g.es["weight"] = [1, 2, 3, 4, 5, 6, 7]
+
+        g2 = g.copy()
+        g2.simplify()
+        self.failUnless(g2.vcount() == g.vcount())
+        self.failUnless(g2.ecount() == 3)
+
+        g2 = g.copy()
+        g2.simplify(loops=False)
+        self.failUnless(g2.vcount() == g.vcount())
+        self.failUnless(g2.ecount() == 4)
+
+        g2 = g.copy()
+        g2.simplify(multiple=False)
+        self.failUnless(g2.vcount() == g.vcount())
+        self.failUnless(g2.ecount() == g.ecount() - 1)
+
+    def testSimplifyAttributes(self):
+        el = [(0,1), (1,0), (1,2), (2,3), (2,3), (2,3), (3,3)] 
+        g = Graph(el)
+        g.es["weight"] = [1, 2, 3, 4, 5, 6, 7]
+        g.es["weight2"] = [1, 2, 3, 4, 5, 6, 7]
+
+        g2 = g.copy()
+        g2.simplify(reduce_attributes=max)
+        self.failUnless(g2.es["weight"] == [2, 3, 6])
+        self.failUnless(g2.es["weight2"] == [2, 3, 6])
+
+        g2 = g.copy()
+        g2.simplify(reduce_attributes={"weight": max})
+        self.failUnless(g2.es["weight"] == [2, 3, 6])
+
+        g2 = g.copy()
+        g2.simplify(reduce_attributes={"weight": max, "weight2": sum})
+        self.failUnless(g2.es["weight"] == [2, 3, 6])
+        self.failUnless(g2.es["weight2"] == [3, 3, 15])
+
+        g = Graph(el, directed=True)
+        g.es["weight"] = [1, 2, 3, 4, 5, 6, 7]
+        g.es["weight2"] = [1, 2, 3, 4, 5, 6, 7]
+
+        g2 = g.copy()
+        g2.simplify(reduce_attributes={"weight": max, "weight2": sum})
+        self.failUnless(g2.es["weight"] == [1, 2, 3, 6])
+        self.failUnless(g2.es["weight2"] == [1, 2, 3, 15])
+
+
+
 def suite():
     operator_suite = unittest.makeSuite(OperatorTests)
     return unittest.TestSuite([operator_suite])

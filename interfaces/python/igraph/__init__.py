@@ -42,6 +42,7 @@ import math
 import gzip
 import sys
 import operator
+from collections import defaultdict
 from tempfile import mkstemp
 from warnings import warn
 
@@ -413,6 +414,73 @@ class Graph(core.GraphBase):
         for i, n in enumerate(data): hist.add(i+1, n)
         hist.unconnected = long(unconn)
         return hist
+
+    def simplify(self, multiple=True, loops=True, reduce_attributes=None):
+        """Simplifies the graph by removing self-loops and/or multiple edges.
+
+        @param multiple: whether to remove multiple edges
+        @param loops: whether to remove loops
+        @param reduce_attributes: specifies how to reduce the attributes of
+          multiple edges between the same pair of vertices into a single
+          attribute. If it is C{None}, only one of the edges will be kept
+          and the rest will be removed (and it is unpredictable which one
+          will be kept). If it is a function, the attributes of multiple
+          edges will be collected and passed on to a function which will
+          return the new attribute value that has to be assigned to the single
+          collapsed edge. You can also pass a dictionary assigning edge
+          attribute names to functions if you want to make the function
+          depend on the name of the attribute.
+
+        For example, suppose you have a graph with an edge attribute named
+        C{weight}. C{graph.simplify(reduce_attributes=max)} will take the
+        maximum of the weights of multiple edges and assign that weight to
+        the collapsed edge. C{graph.simplify(reduce_attributes=sum)} will
+        take the sum of the weights.
+        """
+        if not reduce_attributes:
+            # Fallback to default behaviour
+            return GraphBase.simplify(self, multiple, loops)
+
+        # Check the type of reduce_attributes
+        if hasattr(reduce_attributes, "__call__"):
+            reduce_attributes = dict((attr_name, reduce_attributes) \
+                    for attr_name in self.edge_attributes())
+        if not hasattr(reduce_attributes, "__getitem__"):
+            raise TypeError, "reduce_attributes must be None, callable or a dictionary"
+
+        # Loops can be removed in advance
+        if loops:
+            self.simplify(multiple=False, loops=True)
+
+        # Find the edges with multiplicity > 1
+        extra_edges = [eidx for eidx, mul in enumerate(self.count_multiple()) if mul > 1]
+
+        # Group them by source and target vertices
+        edge_groups = defaultdict(list)
+        if self.is_directed():
+            for eidx in extra_edges:
+                edge_groups[self.es[eidx].tuple].append(eidx)
+        else:
+            for eidx in extra_edges:
+                v1, v2 = self.es[eidx].tuple
+                if v1 > v2:
+                    edge_groups[v2, v1].append(eidx)
+                else:
+                    edge_groups[v1, v2].append(eidx)
+
+        # Apply the reductor function to the attributes of edges in the same group
+        edge_attributes = self.edge_attributes()
+        edges_to_remove = []
+        es = self.es
+        for attr_name, reductor in reduce_attributes.iteritems():
+            for eidxs in edge_groups.itervalues():
+                first = eidxs[0]
+                es[first][attr_name] = reductor(es[eidxs][attr_name])
+                edges_to_remove.extend(eidxs[1:])
+
+        # Remove the extra edges
+        self.delete_edges(edges_to_remove)
+
 
     def triad_census(self, *args, **kwds):
         """triad_census()
