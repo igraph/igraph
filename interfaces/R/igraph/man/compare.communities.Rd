@@ -24,7 +24,7 @@ compare.communities (comm1, comm2, method = c("vi"))
 \value{A real number.}
 \references{
   Meila M: Comparing clusterings by the variation of information.
-  In: Schölkopf B, Warmuth MK (eds.). Learning Theory and Kernel Machines:
+  In: Scholkopf B, Warmuth MK (eds.). Learning Theory and Kernel Machines:
   16th Annual Conference on Computational Learning Theory and 7th Kernel
   Workshop, COLT/Kernel 2003, Washington, DC, USA. Lecture Notes in Computer
   Science, vol. 2777, Springer, 2003. ISBN: 978-3-540-40720-1.
