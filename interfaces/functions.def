@@ -981,6 +981,7 @@ igraph_modularity:
 igraph_reindex_membership:
         PARAMS: INOUT VECTOR membership, OUT VECTOR_OR_0 new_to_old
         NAME-R: reindex.membership
+        IGNORE: RNamespace
 
 igraph_community_leading_eigenvector:
         PARAMS: GRAPH graph, OUT MATRIX merges, OUT VECTOR membership, \
