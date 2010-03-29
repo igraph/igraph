@@ -6,7 +6,7 @@
   This function assesses the distance between two community structures.
 }
 \usage{
-compare.communities (comm1, comm2, method = c("vi"))
+compare.communities (comm1, comm2, method = c("vi", "nmi"))
 }
 \arguments{
   \item{comm1}{Numeric vector. The membership vector of the first
