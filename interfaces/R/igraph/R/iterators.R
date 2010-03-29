@@ -144,8 +144,8 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
                    PACKAGE="igraph")
       tmp[as.numeric(x)+1]
     }
-    i <- eval(i, envir=c(graph[[9]][[3]],
-                   adj=adj, nei=nei, from=from, to=to),
+    i <- eval(i, envir=c(graph[[9]][[3]], nei=nei, innei=innei,
+                   outnei=outnei, adj=adj, from=from, to=to),
               enclos=parent.frame())
     if (is.numeric(i) || is.integer(i)) {
       i <- as.numeric(i)
@@ -201,10 +201,11 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
       tmp[ as.numeric(x)+1 ]
     }
     i <- eval(i, envir=c(graph[[9]][[4]],
-                   from=list(graph[[3]][ as.numeric(x)+1 ]),
-                   to=list(graph[[4]][as.numeric(x)+1]),
-                   graph=list(graph),
-                   adj=adj),
+                   adj=adj, from=from, to=to,
+                   .igraph.from=list(graph[[3]][ as.numeric(x)+1 ]),
+                   .igraph.to=list(graph[[4]][as.numeric(x)+1]),
+                   .igraph.graph=list(graph),
+                   `%--%`=`%--%`, `%->%`=`%->%`, `%<-%`=`%<-%`),
               enclos=parent.frame())
     if (is.numeric(i) || is.integer(i)) {
       i <- as.numeric(i)
@@ -222,15 +223,15 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
 } 
 
 "%--%" <- function(f, t) {
-  from <- get("from", parent.frame())
-  to <- get("to", parent.frame())
+  from <- get(".igraph.from", parent.frame())
+  to <- get(".igraph.to", parent.frame())
   (from %in% f & to %in% t) | (to %in% f & from %in% t)
 }
 
 "%->%" <- function(f, t) {
-  from <- get("from", parent.frame())
-  to <- get("to", parent.frame())
-  graph <- get("graph", parent.frame())
+  from <- get(".igraph.from", parent.frame())
+  to <- get(".igraph.to", parent.frame())
+  graph <- get(".igraph.graph", parent.frame())
   if (is.directed(graph)) {
     from %in% f & to %in% t
   } else {
@@ -239,9 +240,9 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
 }
 
 "%<-%" <- function(t, value) {
-  from <- get("from", parent.frame())
-  to <- get("to", parent.frame())
-  graph <- get("graph", parent.frame())
+  from <- get(".igraph.from", parent.frame())
+  to <- get(".igraph.to", parent.frame())
+  graph <- get(".igraph.graph", parent.frame())
   if (is.directed(graph)) {
     from %in% value & to %in% t
   } else {
