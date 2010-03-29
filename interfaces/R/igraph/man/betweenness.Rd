@@ -12,7 +12,7 @@
 }
 \usage{
 betweenness(graph, v=V(graph), directed = TRUE, weights = NULL,
-     verbose = igraph.par("verbose"))
+     nobigint = TRUE, verbose = igraph.par("verbose"))
 edge.betweenness(graph, e=E(graph), directed = TRUE, weights = NULL)
 betweenness.estimate(graph, vids = V(graph), directed = TRUE, cutoff,
      weights = NULL, verbose = igraph.par("verbose"))
@@ -30,6 +30,10 @@ edge.betweenness.estimate(graph, e=E(graph),
   \item{weights}{Optional positive weight vector for calculating
     weighted betweenness. If the graph has a \code{weight} edge
     attribute, then this is used by default.}
+  \item{nobigint}{Logical scalar, whether to use big integers during the
+    calculation. This is only required for lattice-like graphs that have
+    very many shortest paths between a pair of vertices. If \code{TRUE}
+    (the default), then big integers are not used.}
   \item{verbose}{Logical, whether to show a progress bar.}
   \item{vids}{The vertices for which the vertex betweenness estimation
     will be calculated.}
