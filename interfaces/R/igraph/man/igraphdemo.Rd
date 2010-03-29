@@ -26,7 +26,7 @@ igraphdemo(which)
 \seealso{\code{\link{demo}}}
 \examples{
 igraphdemo()
-if (interacive()) {
+if (interactive()) {
   igraphdemo("centrality")
 }
 }
