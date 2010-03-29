@@ -329,6 +329,35 @@ class PathTests(unittest.TestCase):
         self.failUnless(sps == expected)
         self.assertRaises(ValueError, g.get_shortest_paths, 0, output="x")
 
+    def testGetAllShortestPaths(self):
+        g = Graph(4, [(0,1), (1, 2), (1, 3), (2, 4), (3, 4), (4, 5)], directed=True)
+
+        sps = sorted(g.get_all_shortest_paths(0, 5))
+        expected = [[0, 1, 2, 4, 5], [0, 1, 3, 4, 5]]
+        self.failUnless(sps == expected)
+
+        sps = sorted(g.get_all_shortest_paths(1, 4))
+        expected = [[1, 2, 4], [1, 3, 4]]
+        self.failUnless(sps == expected)
+
+        g = Graph.Lattice([5, 5], circular=False)
+        
+        sps = sorted(g.get_all_shortest_paths(0, 12))
+        expected = [[0, 1, 2, 7, 12], [0, 1, 6, 7, 12], [0, 1, 6, 11, 12], \
+                    [0, 5, 6, 7, 12], [0, 5, 6, 11, 12], [0, 5, 10, 11, 12]]
+        self.failUnless(sps == expected)
+
+        g = Graph.Lattice([100, 100], circular=False)
+        sps = sorted(g.get_all_shortest_paths(0, 202))
+        expected = [[0, 1, 2, 102, 202], [0, 1, 101, 102, 202], [0, 1, 101, 201, 202], \
+                    [0, 100, 101, 102, 202], [0, 100, 101, 201, 202], [0, 100, 200, 201, 202]]
+        self.failUnless(sps == expected)
+
+        g = Graph.Lattice([100, 100], circular=False)
+        sps = sorted(g.get_all_shortest_paths(0, [0, 202]))
+        self.failUnless(sps == [[0]] + expected)
+
+
     def testPathLengthHist(self):
         g = Graph.Tree(15, 2)
         h = g.path_length_hist()
