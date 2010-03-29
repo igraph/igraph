@@ -4,6 +4,8 @@
 \alias{graph.difference.by.name}
 \concept{Graph operators}
 \title{Graph operators based on symbolic vertex names}
+\description{Normally igraph operators are based on internal igraph
+  vertex ids. This function works with vertex names instead.}
 \usage{
 graph.intersection.by.name(g1, g2, keep.x.vertices = FALSE,
       keep.x.vertex.attributes = FALSE,
