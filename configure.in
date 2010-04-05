@@ -163,6 +163,18 @@ if test "x$enable_gmp" != "xno"; then
   ])
 fi
 
+glpk_support=no
+AC_ARG_ENABLE(glpk, AC_HELP_STRING([--disable-glpk], [Compile without the GLPK library]))
+if test "x$enable_glpk" != "xno"; then
+  AC_CHECK_LIB([glpk], [glp_read_mps], [
+    AC_CHECK_HEADER([glpk.h], [
+      AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
+      glpk_support=yes
+      LDFLAGS="${LDFLAGS} -lglpk"
+    ])
+  ])
+fi
+
 AC_ARG_WITH([external-blas], [AS_HELP_STRING([--with-external-blas],
 		                      [Use external BLAS library [default=no]])],
             [internal_blas=no],
@@ -235,6 +247,7 @@ AC_OUTPUT
 AC_MSG_RESULT([igraph successfully configured.])
 AC_MSG_RESULT([  GraphML format support -- $graphml_support])
 AC_MSG_RESULT([  GMP library support    -- $gmp_support])
+AC_MSG_RESULT([  GLPK library support   -- $glpk_support])
 AC_MSG_RESULT([  Use internal ARPACK    -- $internal_arpack])
 AC_MSG_RESULT([  Use internal LAPACK    -- $internal_lapack])
 AC_MSG_RESULT([  Use internal BLAS      -- $internal_blas])

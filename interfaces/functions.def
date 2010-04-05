@@ -1022,6 +1022,11 @@ igraph_community_multilevel:
         DEPS: weights ON graph
         NAME-R: multilevel.community
 
+igraph_community_optimal_modularity:
+        PARAMS: GRAPH graph, OUT REALPTR modularity, \
+                OUT VECTOR_OR_0 membership
+        NAME-R: optimal.community
+
 #######################################
 # Conversion
 #######################################

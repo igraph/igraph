@@ -56,6 +56,10 @@ int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
 /* TODO: edge.type.matrix */
 /* TODO:  */
 
+int igraph_community_optimal_modularity(const igraph_t *graph,
+					igraph_real_t *modularity,
+					igraph_vector_t *membership);
+
 int igraph_community_spinglass(const igraph_t *graph,
 			       const igraph_vector_t *weights,
 			       igraph_real_t *modularity,

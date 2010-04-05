@@ -61,3 +61,7 @@ AT_COMPILE_CHECK([simple/igraph_community_multilevel.c],
                  [simple/igraph_community_multilevel.out])
 AT_CLEANUP
 
+AT_SETUP([Modularity optimization, integer programming (igraph_community_optimal_modularity) :])
+AT_KEYWORDS([community structure optimal modularity integer programming])
+AT_COMPILE_CHECK([simple/igraph_community_optimal_modularity.c])
+AT_CLEANUP

@@ -12,6 +12,9 @@
 /* Define to 1 if you have the `fmin' function. */
 #undef HAVE_FMIN
 
+/* Define to 1 if you have the GLPK library */
+#undef HAVE_GLPK
+
 /* Define to 1 if you have the GMP library */
 #undef HAVE_GMP
 
