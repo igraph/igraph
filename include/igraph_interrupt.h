@@ -135,6 +135,11 @@ extern igraph_interruption_handler_t *igraph_i_interruption_handler;
        if (igraph_i_interruption_handler) { if (igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) return IGRAPH_INTERRUPTED; \
        } } while (0)
 
+#define IGRAPH_ALLOW_INTERRUPTION_NORETURN() \
+       do { \
+       if (igraph_i_interruption_handler) { igraph_allow_interruption(NULL); } \
+       } while (0)
+
 /**
  * \function igraph_allow_interruption
  *
