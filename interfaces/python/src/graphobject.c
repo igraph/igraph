@@ -8562,6 +8562,7 @@ PyObject *igraphmodule_Graph_community_spinglass(igraphmodule_GraphObject *self,
   }
 
   if (igraph_vector_init(&membership, igraph_vcount(&self->g))) {
+	igraphmodule_handle_igraph_error();
     return NULL;
   }
 
