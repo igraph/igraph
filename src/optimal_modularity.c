@@ -41,7 +41,7 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
 					igraph_vector_t *membership) {
 #ifndef HAVE_GLPK
   IGRAPH_ERROR("GLPK is not available", 
-	       IGARPH_UNIMPLEMENTED);    
+	       IGRAPH_UNIMPLEMENTED);    
 #else
 
   long int no_of_nodes=igraph_vcount(graph);
