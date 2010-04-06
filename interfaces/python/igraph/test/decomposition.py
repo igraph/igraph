@@ -183,6 +183,21 @@ class CommunityTests(unittest.TestCase):
         self.assertAlmostEquals(cls[0].q, 0.346301, 5)
         self.assertAlmostEquals(cls[1].q, 0.392219, 5)
 
+    def testOptimalModularity(self):
+        g = Graph.Famous("bull")
+        cl = g.community_optimal_modularity()
+        self.failUnless(len(cl) == 2)
+        self.failUnless(cl.membership == [0, 0, 1, 0, 1])
+        self.assertAlmostEquals(cl.q, 0.08, 7)
+
+        g = Graph.Famous("zachary")
+        cl = g.community_optimal_modularity()
+        self.failUnless(len(cl) == 4)
+        self.failUnless(cl.membership == [0, 0, 0, 0, 1, 1, 1, 0, 2, 2, 1, \
+                0, 0, 0, 2, 2, 1, 0, 2, 0, 2, 0, 2, 3, 3, 3, 2, 3, 3, \
+                2, 2, 3, 2, 2])
+        self.assertAlmostEquals(cl.q, 0.4197896, 7)
+
     def testSpinglass(self):
         g = Graph.Full(5) + Graph.Full(5) + Graph.Full(5)
         g += [(0,5), (5,10), (10, 0)]

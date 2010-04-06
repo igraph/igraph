@@ -8495,6 +8495,34 @@ PyObject *igraphmodule_Graph_community_multilevel(igraphmodule_GraphObject *self
   return res;
 }
 
+/**
+ * Optimal modularity by integer programming
+ */
+PyObject *igraphmodule_Graph_community_optimal_modularity(
+	igraphmodule_GraphObject *self) {
+  igraph_real_t modularity;
+  igraph_vector_t membership;
+  PyObject *res;
+
+  if (igraph_vector_init(&membership, igraph_vcount(&self->g))) {
+	igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_community_optimal_modularity(&self->g, &modularity, &membership)) {
+	igraphmodule_handle_igraph_error();
+	igraph_vector_destroy(&membership);
+    return NULL;
+  }
+
+  res = igraphmodule_vector_t_to_PyList(&membership, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&membership);
+
+  if (!res)
+	return NULL;
+
+  return Py_BuildValue("Nd", res, (double)modularity);
+}
 
 /**
  * Spinglass community detection method of Reichardt & Bornholdt
@@ -11454,6 +11482,21 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   "  betweennesses of the removed edges and the IDs of the bridges. Any\n"
   "  of these elements can be equal to C{None} based on the C{return_*}\n"
   "  arguments."
+  },
+  {"community_optimal_modularity",
+   (PyCFunction) igraphmodule_Graph_community_optimal_modularity,
+   METH_VARARGS | METH_KEYWORDS,
+   "community_optimal_modularity()\n\n"
+   "Calculates the optimal modularity score of the graph and the\n"
+   "corresponding community structure.\n\n"
+   "This function uses the GNU Linear Programming Kit to solve a large\n"
+   "integer optimization problem in order to find the optimal modularity\n"
+   "score and the corresponding community structure, therefore it is\n"
+   "unlikely to work for graphs larger than a few (less than a hundred)\n"
+   "vertices. Consider using one of the heuristic approaches instead if\n"
+   "you have such a large graph.\n\n"
+   "@return: the calculated membership vector and the corresponding\n"
+   "  modularity in a tuple\n."
   },
   {"community_spinglass",
    (PyCFunction) igraphmodule_Graph_community_spinglass,

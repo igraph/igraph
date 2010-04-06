@@ -692,6 +692,22 @@ class Graph(core.GraphBase):
             result = VertexClustering(self, membership, q)
         return result
 
+    def community_optimal_modularity(self, *args, **kwds):
+        """Calculates the optimal modularity score of the graph and the
+        corresponding community structure.
+
+        This function uses the GNU Linear Programming Kit to solve a large
+        integer optimization problem in order to find the optimal modularity
+        score and the corresponding community structure, therefore it is
+        unlikely to work for graphs larger than a few (less than a hundred)
+        vertices. Consider using one of the heuristic approaches instead if
+        you have such a large graph.
+
+        @return: the calculated membership vector and the corresponding
+          modularity in a tuple."""
+        membership, modularity = \
+                GraphBase.community_optimal_modularity(self, *args, **kwds)
+        return VertexClustering(self, membership, modularity)
 
     def community_edge_betweenness(self, clusters = None, directed = True):
         """Community structure based on the betweenness of the edges in the network.

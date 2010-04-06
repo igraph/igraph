@@ -202,10 +202,15 @@ PyObject* igraphmodule_Graph_maximal_independent_sets(igraphmodule_GraphObject* 
 PyObject* igraphmodule_Graph_largest_independent_sets(igraphmodule_GraphObject* self);
 PyObject* igraphmodule_Graph_independence_number(igraphmodule_GraphObject* self);
 
+PyObject* igraphmodule_Graph_community_edge_betweenness(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_community_fastgreedy(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_community_label_propagation(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_community_leading_eigenvector(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_community_leading_eigenvector_naive(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
-PyObject* igraphmodule_Graph_community_clauset(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
-PyObject* igraphmodule_Graph_community_edge_betweenness(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
+PyObject *igraphmodule_Graph_community_multilevel(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject *igraphmodule_Graph_community_optimal_modularity(igraphmodule_GraphObject *self);
+PyObject* igraphmodule_Graph_community_spinglass(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_community_walktrap(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_modularity(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
 
 PyObject *igraphmodule_Graph_is_bipartite(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
