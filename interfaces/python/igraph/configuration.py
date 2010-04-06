@@ -27,6 +27,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
 02110-1301 USA
 """
+
 from ConfigParser import SafeConfigParser
 import platform
 import os.path
@@ -132,18 +133,36 @@ class Configuration(object):
           numbers to colors. See L{colors.Palette} for more information.
           Valid palette names are stored in C{colors.palettes}.
     """
-    class Types:
+
+    # pylint: disable-msg=R0903
+    # R0903: too few public methods
+    class Types(object):
         """Static class for the implementation of custom getter/setter functions
         for configuration keys"""
-        def setboolean(object, section, key, value):
-            if str(value).lower() in ["0", "false", "no", "off"]:
-                value="false"
-            elif str(value).lower() in ["1", "true", "yes", "on"]:
-                value="true"
+
+        def __init__(self):
+            pass
+
+        @staticmethod
+        def setboolean(obj, section, key, value):
+            """Sets a boolean value in the given configuration object.
+            
+            @param obj: a configuration object
+            @param section: the section of the value to be set
+            @param key: the key of the value to be set
+            @param value: the value itself. C{0}, C{false}, C{no} and C{off}
+              means false, C{1}, C{true}, C{yes} and C{on} means true,
+              everything else results in a C{ValueError} being thrown.
+              Values are case insensitive
+            """
+            value = str(value).lower()
+            if value in ("0", "false", "no", "off"):
+                value = "false"
+            elif value in ("1", "true", "yes", "on"):
+                value = "true"
             else:
                 raise ValueError("value cannot be coerced to boolean type")
-            object.set(section, key, value)
-        setboolean=staticmethod(setboolean)
+            obj.set(section, key, value)
 
     _types = {
         "boolean": {
@@ -175,15 +194,18 @@ class Configuration(object):
         self._filename = None
 
         # Create default sections
-        for sec in self._sections: self._config.add_section(sec)
+        for sec in self._sections:
+            self._config.add_section(sec)
         # Create default values
         for name, definition in self._definitions.iteritems():
             if "default" in definition:
-                self[name]=definition["default"]
+                self[name] = definition["default"]
 
-        if filename is not None: self.load(filename)
+        if filename is not None:
+            self.load(filename)
 
-    def _get_filename(self):
+    @property
+    def filename(self):
         """Returns the filename associated to the object.
 
         It is usually the name of the configuration file that was used when
@@ -192,8 +214,8 @@ class Configuration(object):
         created from scratch or it was updated from a stream without name
         information."""
         return self._filename
-    filename=property(_get_filename, doc=_get_filename.__doc__)
 
+    @staticmethod
     def _item_to_section_key(item):
         """Converts an item description to a section-key pair.
         
@@ -208,7 +230,6 @@ class Configuration(object):
         else:
             section, key = "general", item
         return section, key
-    _item_to_section_key=staticmethod(_item_to_section_key)
 
     def __getitem__(self, item):
         """Returns the given configuration item.
@@ -216,11 +237,12 @@ class Configuration(object):
         @param item: the configuration key to retrieve.
         @return: the configuration value"""
         section, key = self._item_to_section_key(item)
-        definition = self._definitions.get("%s.%s" % (section,key), {})
+        definition = self._definitions.get("%s.%s" % (section, key), {})
         getter = None
         if "type" in definition:
             getter = self._types[definition["type"]].get("getter", None)
-        if getter is None: getter = self._config.__class__.get
+        if getter is None:
+            getter = self._config.__class__.get
         return getter(self._config, section, key)
 
     def __setitem__(self, item, value):
@@ -230,11 +252,12 @@ class Configuration(object):
         @param value: the new value of the configuration key
         """
         section, key = self._item_to_section_key(item)
-        definition = self._definitions.get("%s.%s" % (section,key), {})
+        definition = self._definitions.get("%s.%s" % (section, key), {})
         setter = None
         if "type" in definition:
             setter = self._types[definition["type"]].get("setter", None)
-        if setter is None: setter = self._config.__class__.set
+        if setter is None:
+            setter = self._config.__class__.set
         return setter(self._config, section, key, value)
 
     def __delitem__(self, item):
@@ -246,7 +269,7 @@ class Configuration(object):
         section, key = self._item_to_section_key(item)
         definition = self._definitions.get("%s.%s" % (section, key), {})
         if "default" in definition:
-            self[item]=definition["default"]
+            self[item] = definition["default"]
         else:
             self._config.remove_option(section, key)
 
@@ -260,51 +283,53 @@ class Configuration(object):
             section, key = "general", item
         return self._config.has_option(section, key)
             
-    def load(self, fp=None):
+    def load(self, stream=None):
         """Loads the configuration from the given file.
 
-        @param fp: name of a file or a file object. The configuration will be loaded
+        @param stream: name of a file or a file object. The configuration will be loaded
           from here. Can be omitted, in this case, the user-level configuration is
           loaded.
         """
-        fp = fp or get_user_config_file()
-        if not isinstance(fp, file):
-            fp=open(fp, "r")
-            file_was_open=True
-        self._config.readfp(fp)
-        self._filename = getattr(fp, "name", None)
-        if file_was_open: fp.close()
+        stream = stream or get_user_config_file()
+        if not isinstance(stream, file):
+            stream = open(stream, "r")
+            file_was_open = True
+        self._config.readfp(stream)
+        self._filename = getattr(stream, "name", None)
+        if file_was_open:
+            stream.close()
 
-    def save(self, fp=None):
+    def save(self, stream=None):
         """Saves the configuration.
 
-        @param fp: name of a file or a file object. The configuration will be saved
+        @param stream: name of a file or a file object. The configuration will be saved
           there. Can be omitted, in this case, the user-level configuration file will
           be overwritten.
         """
-        fp = fp or get_user_config_file()
-        if not isinstance(fp, file):
-            fp=open(fp, "w")
-            file_was_open=True
-        self._config.write(fp)
-        if file_was_open: fp.close()
+        stream = stream or get_user_config_file()
+        if not isinstance(stream, file):
+            stream = open(stream, "w")
+            file_was_open = True
+        self._config.write(stream)
+        if file_was_open:
+            stream.close()
 
     @classmethod
-    def instance(klass):
-        if klass._instance is None:
+    def instance(cls):
+        """Returns the single instance of the configuration object."""
+        if cls._instance is None:
             cfile = get_user_config_file()
             try:
-                config = klass(cfile)
+                config = cls(cfile)
             except IOError:
                 # No config file yet, whatever
-                config = klass()
-            klass._instance = config
-        return klass._instance
+                config = cls()
+            cls._instance = config
+        return cls._instance
 
 
 def get_user_config_file():
     """Returns the path where the user-level configuration file is stored"""
-    import os.path
     return os.path.expanduser("~/.igraphrc")
 
 

@@ -13,7 +13,7 @@ from igraph.datatypes import UniqueIdGenerator
 import tokenize
 import token
 
-__all__ = ["Formula"]
+__all__ = ["construct_graph_from_formula"]
 
 def generate_edges(formula):
     """Parses an edge specification from the head of the given
@@ -34,7 +34,7 @@ def generate_edges(formula):
 
     # Tokenize the formula
     token_gen = tokenize.generate_tokens(StringIO(formula).next)
-    for token_type, tok, (_, start_char), (_, end_char), _ in token_gen:
+    for token_type, tok, _, _, _ in token_gen:
         # Do the state transitions
         if parsing_vertices:
             if tok in edge_chars and token_type == token.OP:
@@ -43,7 +43,8 @@ def generate_edges(formula):
                 if start_names and end_names:
                     # We have a whole edge
                     yield start_names, end_names, arrowheads
-                start_names, end_names, arrowheads = end_names, [], [False, False]
+                start_names, end_names = end_names, []
+                arrowheads = [False, False]
         else:
             if tok not in edge_chars:
                 parsing_vertices = True
@@ -63,12 +64,16 @@ def generate_edges(formula):
                 # End markers are fine
                 pass
             else:
-                raise SyntaxError("invalid token found in edge specification: %s" % formula)
+                msg = "invalid token found in edge specification: %s" % formula
+                raise SyntaxError(msg)
         else:
             # We are parsing an edge operator
-            if   tok == "<":  arrowheads[0] = True
-            elif tok == ">":  arrowheads[1] = True
-            elif tok == "<>": arrowheads = [True, True]
+            if tok == "<":
+                arrowheads[0] = True
+            elif tok == ">":
+                arrowheads[1] = True
+            elif tok == "<>":
+                arrowheads = [True, True]
             elif tok == "+":
                 pass   # TODO!
 
@@ -76,7 +81,7 @@ def generate_edges(formula):
     yield start_names, end_names, arrowheads
 
 
-def Formula(klass, formula = None, attr = "name"):
+def construct_graph_from_formula(cls, formula = None, attr = "name"):
     """Graph.Formula(formula = None, attr = "name")
     
     Generates a graph from a graph formula
@@ -155,7 +160,8 @@ def Formula(klass, formula = None, attr = "name"):
     """
     
     # If we have no formula, return an empty graph
-    if formula is None: return klass(0, vertex_attrs = {attr: []})
+    if formula is None:
+        return cls(0, vertex_attrs = {attr: []})
 
     vertex_ids, edges, directed = UniqueIdGenerator(), [], False
     # Loop over each part in the formula
@@ -170,17 +176,20 @@ def Formula(klass, formula = None, attr = "name"):
                 # This is an undirected edge. Do we have a directed graph?
                 if not directed:
                     # Nope, add the edge
-                    edges.extend([(id1, id2) for id1 in start_ids for id2 in end_ids])
+                    edges.extend((id1, id2) for id1 in start_ids \
+                                 for id2 in end_ids)
             else:
                 # This is a directed edge
                 directed = True
                 if arrowheads[1]:
-                    edges.extend([(id1, id2) for id1 in start_ids for id2 in end_ids])
+                    edges.extend((id1, id2) for id1 in start_ids \
+                                 for id2 in end_ids)
                 if arrowheads[0]:
-                    edges.extend([(id2, id1) for id1 in start_ids for id2 in end_ids])
+                    edges.extend((id2, id1) for id1 in start_ids \
+                                 for id2 in end_ids)
 
     # Grab the vertex names into a list
-    names = sorted(((v, k) for k, v in vertex_ids._ids.iteritems()))
-    names = [k for _, k in names]
+    vertex_attrs = {}
+    vertex_attrs[attr] = vertex_ids.values()
     # Construct and return the graph
-    return klass(len(names), edges, directed, vertex_attrs={attr: names})
+    return cls(len(vertex_ids), edges, directed, vertex_attrs=vertex_attrs)

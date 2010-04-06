@@ -17,10 +17,12 @@ class Matrix(object):
         @param data: the elements of the matrix as a list of lists, or C{None} to
           create a 0x0 matrix.
         """
-        self._data = []
+        self._nrow, self._ncol, self._data = 0, 0, []
         self.data = data
 
-    def Fill(klass, value, *args):
+    # pylint: disable-msg=C0103
+    @classmethod
+    def Fill(cls, value, *args):
         """Creates a matrix filled with the given value
 
         @param value: the value to be used
@@ -28,47 +30,51 @@ class Matrix(object):
           two integers or a tuple. If a single integer is
           given here, the matrix is assumed to be square-shaped.
         """
-        if len(args) < 1: raise TypeError("expected an integer or a tuple")
+        if len(args) < 1:
+            raise TypeError("expected an integer or a tuple")
         if len(args) == 1:
             if hasattr(args[0], "__len__"):
-                h, w = int(args[0][0]), int(args[0][1])
+                height, width = int(args[0][0]), int(args[0][1])
             else:
-                h, w = int(args[0]), int(args[0])
+                height, width = int(args[0]), int(args[0])
         else:
-            h, w = int(args[0]), int(args[1])
-        mtrx = [[value]*w for _ in xrange(h)]
-        return klass(mtrx)
-    Fill=classmethod(Fill)
+            height, width = int(args[0]), int(args[1])
+        mtrx = [[value]*width for _ in xrange(height)]
+        return cls(mtrx)
 
-    def Zero(klass, *args):
+    # pylint: disable-msg=C0103
+    @classmethod
+    def Zero(cls, *args):
         """Creates a matrix filled with zeros.
 
         @keyword shape: the shape of the matrix. Can be a single integer,
           two integers or a tuple. If a single integer is
           given here, the matrix is assumed to be square-shaped.
         """
-        result = klass.Fill(0, *args)
+        result = cls.Fill(0, *args)
         return result
-    Zero=classmethod(Zero)
 
-    def Identity(klass, *args):
+    # pylint: disable-msg=C0103
+    @classmethod
+    def Identity(cls, *args):
         """Creates an identity matrix.
 
         @keyword shape: the shape of the matrix. Can be a single integer,
           two integers or a tuple. If a single integer is
           given here, the matrix is assumed to be square-shaped.
         """
-        result=klass.Fill(0, *args)
-        for i in xrange(min(*result.shape)): result._data[i][i] = 1
+        # pylint: disable-msg=W0212
+        result = cls.Fill(0, *args)
+        for i in xrange(min(result.shape)):
+            result._data[i][i] = 1
         return result
-    Identity=classmethod(Identity)
 
     def _set_data(self, data=None):
         """Sets the data stored in the matrix"""
         if data is not None:
             self._data = [list(row) for row in data]
-            self._nrow = len(data)
-            self._ncol = max(len(row) for row in data)
+            self._nrow = len(self._data)
+            self._ncol = max(len(row) for row in self._data)
             for row in self._data:
                 if len(row) < self._ncol:
                     row.extend([0]*(self._ncol-len(row)))
@@ -76,12 +82,12 @@ class Matrix(object):
     def _get_data(self):
         """Returns the data stored in the matrix as a list of lists"""
         return [list(row) for row in self._data]
-    data = property(_get_data, _set_data, doc="Elements of the matrix as a list of lists")
+    data = property(_get_data, _set_data)
 
-    def _get_shape(self):
-        """Returns the shape of the matrix"""
+    @property
+    def shape(self):
+        """Returns the shape of the matrix as a tuple"""
         return self._nrow, self._ncol
-    shape = property(_get_shape, doc="Shape of the matrix as a tuple")
 
     def __getitem__(self, i):
         """Returns a single item, a row or a column of the matrix
@@ -98,14 +104,14 @@ class Matrix(object):
         elif isinstance(i, tuple):
             try:
                 first = i[0]
-            except:
+            except IndexError:
                 first = slice(None)
             try:
                 second = i[1]
-            except:
+            except IndexError:
                 second = slice(None)
             if type(first) == slice and type(second) == slice:
-                return self.__class__([row[second] for row in self._data[first]])
+                return self.__class__(row[second] for row in self._data[first])
             elif type(first) == slice:
                 return [row[second] for row in self._data[first]]
             else:
@@ -126,24 +132,24 @@ class Matrix(object):
         if isinstance(i, int):
             # Setting a row
             if len(value) != len(self._data[i]):
-                raise ValueError("new value must have %d items" % len(self._data[i]))
+                raise ValueError("new value must have %d items" % self._ncol)
             self._data[i] = list(value)
         elif isinstance(i, slice):
             # Setting multiple rows
             if len(value) != len(self._data[i]):
-                raise ValueError("new value must have %d items" % len(self._data[i]))
-            for j in xrange(len(value)):
-                if len(value[j]) != len(self._data[0]):
-                    raise ValueError("rows of new value must have %d items" % len(self._data[0]))
-            self._data[i] = list(map(list, value))
+                raise ValueError("new value must have %d items" % self._ncol)
+            if any(len(row) != self._ncol for row in value):
+                raise ValueError("rows of new value must have %d items" % \
+                        self._ncol)
+            self._data[i] = [list(row) for row in value]
         elif isinstance(i, tuple):
             try:
                 first = i[0]
-            except:
+            except IndexError:
                 first = slice(None)
             try:
                 second = i[1]
-            except:
+            except IndexError:
                 second = slice(None)
             if type(first) == slice and type(second) == slice:
                 # Setting a submatrix
@@ -160,10 +166,13 @@ class Matrix(object):
 
 
     def __repr__(self):
-        return "Matrix([\n %s])" % ",\n ".join(["[%s]" % (", ".join(map(repr, row))) for row in self])
+        class_name = self.__class__.__name__
+        rows = ("[%s]" % ", ".join(repr(item) for item in row) for row in self)
+        return "%s([%s])" % (class_name, ", ".join(rows))
 
     def __str__(self):
-        return "[%s]" % "\n ".join(["[%s]" % (", ".join(map(str, row))) for row in self])
+        rows = ("[%s]" % ", ".join(repr(item) for item in row) for row in self)
+        return "[%s]" % "\n ".join(rows)
 
     def __iter__(self):
         """Support for iteration.
@@ -173,9 +182,9 @@ class Matrix(object):
         the matrix as lists to avoid messing around with the internals. Feel
         free to do anything with the copies, the changes won't be reflected in
         the original matrix."""
-        for row in self._data: yield list(row)
+        return (list(row) for row in self._data)
 
-    def __plot__(self, context, bbox, palette, *args, **kwds):
+    def __plot__(self, context, bbox, palette, **kwds):
         """Plots the matrix to the given Cairo context in the given box
 
         Besides the usual self-explanatory plotting parameters (C{context},
@@ -225,7 +234,9 @@ class Matrix(object):
         is square-shaped, the same names are used for both column and row
         names.
         """
-        gw = float(kwds.get("grid_width", 1.))
+        # pylint: disable-msg=W0142
+        # pylint: disable-msg=C0103
+        grid_width = float(kwds.get("grid_width", 1.))
         border_width = float(kwds.get("border_width", 1.))
         style = kwds.get("style", "boolean")
         row_names = kwds.get("row_names", None)
@@ -236,24 +247,26 @@ class Matrix(object):
         # Validations
         if style not in ("boolean", "palette"):
             raise ValueError("invalid style")
-        if row_names is None and col_names is not None: row_names=col_names
+        if row_names is None and col_names is not None:
+            row_names = col_names
         if row_names is not None:
-            row_names=list(row_names)[0:self._nrow]
+            row_names = list(row_names)[0:self._nrow]
             if len(row_names) < self._nrow:
                 row_names.extend([""]*(self._nrow-len(row_names)))
         if col_names is not None:
-            col_names=list(col_names)[0:self._ncol]
+            col_names = list(col_names)[0:self._ncol]
             if len(col_names) < self._ncol:
                 col_names.extend([""]*(self._ncol-len(col_names)))
-        if values == False: values=None
-        if values == True: values=self
-        if isinstance(values, list): values=Matrix(list)
+        if values == False:
+            values = None
+        if values == True:
+            values = self
+        if isinstance(values, list):
+            values = Matrix(list)
         if values is not None and not isinstance(values, Matrix):
             raise TypeError("values must be None, False, True or a matrix")
         if values is not None and values.shape != self.shape:
-            raise ValueError("values must be a matrix of size %s" % str(self.shape))
-
-        _, _, font_height, _, _ = context.font_extents()
+            raise ValueError("values must be a matrix of size %s" % self.shape)
 
         # Calculate text extents if needed
         if row_names is not None or col_names is not None:
@@ -269,7 +282,8 @@ class Matrix(object):
         grid_height = float(bbox.height)-max_col_name_width
         dx = grid_width / self.shape[1]
         dy = grid_height / self.shape[0]
-        if kwds.get("square", True): dx, dy = min(dx, dy), min(dx, dy)
+        if kwds.get("square", True):
+            dx, dy = min(dx, dy), min(dx, dy)
         grid_width, grid_height = dx*self.shape[1], dy*self.shape[0]
         ox = bbox.left + (bbox.width - grid_width - max_row_name_width) / 2.0
         oy = bbox.top + (bbox.height - grid_height - max_col_name_width) / 2.0
@@ -283,8 +297,10 @@ class Matrix(object):
             color_ratio = (len(palette)-1) / float(ma-mi)
 
         # Validate grid width
-        if dx < 3*gw or dy < 3*gw: gw = 0.
-        if gw>0: context.set_line_width(gw)
+        if dx < 3*grid_width or dy < 3*grid_width:
+            grid_width = 0.
+        if grid_width > 0:
+            context.set_line_width(grid_width)
 
         # Draw row names (if any)
         context.set_source_rgb(0., 0., 0.)
@@ -323,10 +339,11 @@ class Matrix(object):
                         context.set_source_rgb(1., 1., 1.)
                 elif style == "palette":
                     cidx = int((item-color_offset)*color_ratio)
-                    if cidx < 0: cidx = 0
+                    if cidx < 0:
+                        cidx = 0
                     context.set_source_rgb(*palette.get(cidx))
                 context.rectangle(x, y, dx, dy)
-                if gw>0:
+                if grid_width > 0:
                     context.fill_preserve()
                     context.set_source_rgb(0.5, 0.5, 0.5)
                     context.stroke()
@@ -341,8 +358,10 @@ class Matrix(object):
             context.set_source_rgb(0., 0., 0.)
             for row in values.data:
                 for item in row:
-                    if value_format is not None: s = value_format % item
-                    else: s = str(item)
+                    if value_format is not None:
+                        s = value_format % item
+                    else:
+                        s = str(item)
                     th, tw = context.text_extents(s)[3:5]
                     context.move_to(x+(dx-tw)/2., y+(dy+th)/2.)
                     context.show_text(s)
@@ -364,8 +383,11 @@ class Matrix(object):
           determining the row minimums. If C{None}, the global minimum is
           returned.
         """
-        if dim == 1: return [min(row) for row in self._data]
-        if dim == 0: return [min(row[idx] for row in self._data) for idx in xrange(self._ncol)]
+        if dim == 1:
+            return [min(row) for row in self._data]
+        if dim == 0:
+            return [min(row[idx] for row in self._data) \
+                        for idx in xrange(self._ncol)]
         return min(min(row) for row in self._data)
 
     def max(self, dim=None):
@@ -375,8 +397,11 @@ class Matrix(object):
           determining the row maximums. If C{None}, the global maximum is
           returned.
         """
-        if dim == 1: return [max(row) for row in self._data]
-        if dim == 0: return [max(row[idx] for row in self._data) for idx in xrange(self._ncol)]
+        if dim == 1:
+            return [max(row) for row in self._data]
+        if dim == 0:
+            return [max(row[idx] for row in self._data) \
+                        for idx in xrange(self._ncol)]
         return max(max(row) for row in self._data)
 
 
@@ -464,17 +489,18 @@ class TriadCensus(tuple):
         "120U": 12, "120C": 13, "210": 14, "300": 15}
 
     def __getitem__(self, idx):
-        if isinstance(idx, basestring): idx=idx.upper()
+        if isinstance(idx, basestring):
+            idx = idx.upper()
         return tuple.__getitem__(self, self._remap.get(idx, idx))
 
     def __getattr__(self, attr):
         if isinstance(attr, basestring) and attr[0] == 't' \
-            and attr[1:].upper() in self._remap:
-                return tuple.__getitem__(self, self._remap[attr[1:].upper()])
+                and attr[1:].upper() in self._remap:
+            return tuple.__getitem__(self, self._remap[attr[1:].upper()])
         raise AttributeError("no such attribute: %s" % attr)
 
     def __repr__(self):
-        return "TriadCensus((%s))" % ", ".join(map(str, self))
+        return "TriadCensus((%s))" % ", ".join(str(item) for item in self)
 
     def __str__(self):
         maxidx = len(self)
@@ -484,13 +510,15 @@ class TriadCensus(tuple):
         colcount = 4
 
         rowcount = maxidx / colcount
-        if rowcount * colcount < maxidx: rowcount += 1
+        if rowcount * colcount < maxidx:
+            rowcount += 1
 
-        invmap = dict((v,k) for k,v in self._remap.iteritems())
+        invmap = dict((v, k) for k, v in self._remap.iteritems())
         result, row, idx = [], [], 0
-        for rowidx in xrange(rowcount):
-            for colidx in xrange(colcount):
-                if idx >= maxidx: break 
+        for _ in xrange(rowcount):
+            for _ in xrange(colcount):
+                if idx >= maxidx:
+                    break 
                 row.append("%-*s: %*d" % (captionwidth, invmap.get(idx, ""),
                   numwidth, self[idx]))
                 idx += 1
@@ -541,6 +569,7 @@ class Cut(object):
 
     __slots__ = ["_graph", "_value", "_partition", "_cut"]
 
+    # pylint: disable-msg=R0913
     def __init__(self, graph, value, cut, partition, partition2):
         """Initializes the cut.
 
@@ -563,25 +592,39 @@ class Cut(object):
           (len(self._cut), len(self._partition[0]), len(self._partition[1]), \
           self._value)
 
-    def __len__(self): return 2
+    def __len__(self):
+        return 2
 
     def __getitem__(self, idx):
         if idx >= 2:
             raise IndexError("a cut has only two partitions")
         return self.graph.vs.select(self._partition[idx])
 
-    def _get_es(self): return self._graph.es.select(self.cut)
-    def _get_graph(self): return self._graph
-    def _get_partition(self): return self._partition
-    def _get_cut(self): return self._cut
-    def _get_value(self): return self._value
+    # pylint: disable-msg=C0103
+    @property
+    def es(self):
+        """Returns an edge selector restricted to the cut"""
+        return self._graph.es.select(self.cut)
 
-    es = property(_get_es, doc="Returns an edge selector restricted to the cut")
-    graph = property(_get_graph, doc="The graph over which this cut is defined")
-    partition = property(_get_partition,
-      doc="Vertex IDs partitioned according to the cut")
-    cut = property(_get_cut, doc="Edge IDs in the cut")
-    value = property(_get_value, doc="Sum of edge capacities in the cut")
+    @property
+    def graph(self):
+        """Returns the graph over which this cut is defined"""
+        return self._graph
+
+    @property
+    def partition(self):
+        """Returns the vertex IDs partitioned according to the cut"""
+        return self._partition
+
+    @property
+    def cut(self):
+        """Returns the edge IDs in the cut"""
+        return self._cut
+
+    @property
+    def value(self):
+        """Returns the sum of edge capacities in the cut"""
+        return self._value
 
 
 class UniqueIdGenerator(object):
@@ -612,7 +655,8 @@ class UniqueIdGenerator(object):
         an integer, elements will be assigned identifiers starting from the given
         integer. If it is an iterator or generator, its `next` method will be
         called every time a new ID is needed."""
-        if id_generator is None: id_generator = 0
+        if id_generator is None:
+            id_generator = 0
         if isinstance(id_generator, int):
             import itertools
             self._generator = itertools.count(id_generator)
@@ -624,8 +668,8 @@ class UniqueIdGenerator(object):
                 self.add(value)
 
     def __getitem__(self, item):
-        """Retrieves the ID corresponding to `item`. Generates a new ID for `item`
-        if it is the first time we request an ID for it."""
+        """Retrieves the ID corresponding to `item`. Generates a new ID for
+        `item` if it is the first time we request an ID for it."""
         try:
             return self._ids[item]
         except KeyError:

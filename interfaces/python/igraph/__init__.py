@@ -1494,7 +1494,7 @@ class Graph(core.GraphBase):
 
     #################################
     # Constructor for graph formulae
-    Formula=classmethod(Formula)
+    Formula=classmethod(construct_graph_from_formula)
 
     ###########################
     # Vertex and edge sequence
@@ -2685,3 +2685,4 @@ def summary(o, f=sys.stdout):
         f.write(str(o) + "\n")
 
 config = configuration.init()
+del construct_graph_from_formula

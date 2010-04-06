@@ -125,6 +125,11 @@ class DatatypeTests(unittest.TestCase):
         m=Matrix.Identity(3, 2)
         self.failUnless(m.data == [[1,0], [0,1], [0,0]])
 
+        # Conversion to string
+        m=Matrix.Identity(3)
+        self.failUnless(str(m) == "[[1, 0, 0]\n [0, 1, 0]\n [0, 0, 1]]")
+        self.failUnless(repr(m) == "Matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])")
+
 
 class GraphDictListTests(unittest.TestCase):
     def setUp(self):

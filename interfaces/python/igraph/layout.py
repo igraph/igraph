@@ -4,8 +4,7 @@ Layout-related code in the IGraph library.
 This package contains the implementation of the L{Layout} object.
 """
 
-import math
-from copy import copy
+from math import sin, cos, pi
 
 from igraph.drawing import BoundingBox
 from igraph.statistics import RunningMean
@@ -65,7 +64,7 @@ class Layout(object):
         [0, 3]
     """
     
-    def __init__(self, coords=[], dim=None):
+    def __init__(self, coords=None, dim=None):
         """Constructor.
 
         @param coords: the coordinates to be stored in the layout.
@@ -78,32 +77,50 @@ class Layout(object):
         @raise ValueError: if the coordinate list is empty and the
           number of dimensions is not given.
         """
-        self._coords = [list(coord) for coord in coords]
+        if coords:
+            self._coords = [list(coord) for coord in coords]
+        else:
+            self._coords = []
+
         if dim is None:
             if len(self._coords) == 0:
-                raise ValueError("the number of dimensions must be given if the coordinate list is empty")
+                raise ValueError("the number of dimensions must be given "+
+                                 "if the coordinate list is empty")
             else:
                 self._dim = len(self._coords[0])
         else:
             self._dim = int(dim)
             for row in self._coords:
                 if len(row) != self._dim:
-                    raise ValueError("all items in the coordinate list must have a length of %d" % self._dim)
+                    raise ValueError("all items in the coordinate list "+
+                                     "must have a length of %d" % self._dim)
 
-    def __len__(self): return len(self._coords)
-    def __getitem__(self, idx): return copy(self._coords[idx])
+    def __len__(self):
+        return len(self._coords)
+
+    def __getitem__(self, idx):
+        return self._coords[idx][:]
+
     def __setitem__(self, idx, value):
         if len(value) != self._dim:
             raise ValueError("assigned item must have %d elements" % self._dim)
         self._coords[idx] = list(value)
-    def __delitem__(self, idx): del self._coords[idx]
-    def __copy__(self):
-        return self.__class__(copy(self._coords), self._dim)
 
-    def _get_dim(self): return self._dim
-    dim = property(_get_dim, "the number of dimensions")
-    def _get_coords(self): return [copy(row) for row in self._coords]
-    coords = property(_get_coords, "the coordinates as a list of lists")
+    def __delitem__(self, idx):
+        del self._coords[idx]
+
+    def __copy__(self):
+        return self.__class__(self.coords, self.dim)
+
+    @property
+    def dim(self):
+        """Returns the number of dimensions"""
+        return self._dim
+
+    @property
+    def coords(self):
+        """The coordinates as a list of lists"""
+        return [row[:] for row in self._coords]
 
     def append(self, value):
         """Appends a new point to the layout"""
@@ -116,25 +133,26 @@ class Layout(object):
 
         @param dim: the list of dimensions or a single dimension
         """
-        if isinstance(dim, int): dim = [dim]
-        else: dim = [int(x) for x in dim]
+        if isinstance(dim, int):
+            dim = [dim]
+        else:
+            dim = [int(x) for x in dim]
 
-        _n = self._dim
-        vec = [1]*_n
-        for d in dim: vec[d] *= -1
-
-        self._coords = [[row[i]*vec[i] for i in xrange(_n)] for row in self._coords]
+        for current_dim in dim:
+            for row in self._coords:
+                row[current_dim] *= -1
 
 
     def rotate(self, degree, dim1=0, dim2=1):
         """Rotates the layout by the given degrees along the plane defined by
         the given two dimensions"""
-        ca, sa = math.cos(degree * math.pi / 180.), math.sin(degree * math.pi / 180.)
+        radian = degree * pi / 180.
+        cos_alpha, sin_alpha = cos(radian), sin(radian)
         
         for idx, row in enumerate(self._coords): 
             new_row = list(row)
-            new_row[dim1] = ca*row[dim1] - sa*row[dim2]
-            new_row[dim2] = sa*row[dim1] + ca*row[dim2]
+            new_row[dim1] = cos_alpha*row[dim1] - sin_alpha*row[dim2]
+            new_row[dim2] = sin_alpha*row[dim1] + cos_alpha*row[dim2]
             self._coords[idx] = new_row
 
 
@@ -158,7 +176,8 @@ class Layout(object):
             raise ValueError("origin must have %d dimensions" % self._dim)
 
         scaling = kwds.get("scale") or args
-        if type(scaling) == int or type(scaling) == float: scaling = [scaling]
+        if isinstance(scaling, (int, float)):
+            scaling = [scaling]
         if len(scaling) == 0:
             raise ValueError("scaling factor must be given")
         elif len(scaling) == 1:
@@ -167,7 +186,8 @@ class Layout(object):
             else:
                 scaling = scaling[0]
         if len(scaling) != self._dim:
-            raise ValueError("scaling factor list must have %d elements" % self._dim)
+            raise ValueError("scaling factor list must have %d elements" \
+                    % self._dim)
 
         for idx, row in enumerate(self._coords):
             self._coords[idx] = [(row[d]-origin[d])*scaling[d]+origin[d] \
@@ -190,7 +210,8 @@ class Layout(object):
         elif len(v) == 1 and type(v[0]) != int and type(v[0]) != float:
             v = v[0]
         if len(v) != self._dim:
-            raise ValueError("translation vector must have %d dimensions" % self._dim)
+            raise ValueError("translation vector must have %d dimensions" \
+                    % self._dim)
 
         for idx, row in enumerate(self._coords):
             self._coords[idx] = [row[d]+v[d] for d in xrange(self._dim)]
@@ -224,8 +245,10 @@ class Layout(object):
         bbox = self.bounding_box()
         if len(bbox) != 4:
             raise TypeError("implemented only for 2D layouts")
+        bbox = BoundingBox(bbox)
 
-        while min_angle > max_angle: max_angle += 360
+        while min_angle > max_angle:
+            max_angle += 360
         while min_angle > 360:
             min_angle -= 360
             max_angle -= 360
@@ -233,14 +256,14 @@ class Layout(object):
             min_angle += 360
             max_angle += 360
 
-        minx, miny, maxx, maxy = bbox
-        rx = (max_angle - min_angle) / (maxx-minx)
-        rx *= math.pi / 180.
-        min_angle *= math.pi / 180.
-        ry = (max_radius - min_radius) / (maxy-miny)
+        ratio_x = (max_angle - min_angle) / bbox.width
+        ratio_x *= pi / 180.
+        min_angle *= pi / 180.
+        ratio_y = (max_radius - min_radius) / bbox.height
         for idx, (x, y) in enumerate(self._coords):
-            alpha, r = (x-minx) * rx + min_angle, (y-miny) * ry + min_radius
-            self._coords[idx] = math.cos(alpha)*r, -math.sin(alpha)*r
+            alpha  = (x-bbox.left) * ratio_x + min_angle
+            radius = (y-bbox.top) * ratio_y + min_radius
+            self._coords[idx] = [cos(alpha)*radius, -sin(alpha)*radius]
 
 
     def transform(self, function, *args, **kwds):
@@ -263,10 +286,10 @@ class Layout(object):
         the layout.
         
         @return: the centroid as a list of floats"""
-        centroid = [RunningMean() for d in xrange(self._dim)]
+        centroid = [RunningMean() for _ in xrange(self._dim)]
         for row in self._coords:
-            for d in xrange(self._dim):
-                centroid[d] << row[d]
+            for dim in xrange(self._dim):
+                centroid[dim].add(row[dim])
         return [rm.mean for rm in centroid]
 
     def bounding_box(self, border=0):
@@ -280,10 +303,11 @@ class Layout(object):
           of the box. Defaults to zero.
         @return: the coordinates of the lower left and the upper right corner
           of the box. "Lower left" means the minimum coordinates and "upper right"
-          means the maximum."""
+          means the maximum. These are encapsulated in a L{BoundingBox} object.
+        """
         mins, maxs = [], []
-        for d in xrange(self._dim):
-            col = [row[d] for row in self._coords]
+        for dim in xrange(self._dim):
+            col = [row[dim] for row in self._coords]
             mins.append(min(col)-border)
             maxs.append(max(col)+border)
         mins.extend(maxs)
@@ -306,7 +330,8 @@ class Layout(object):
             and type(center[0]) != float:
             center = center[0]
         if len(center) != self._dim:
-            raise ValueError("the given point must have %d dimensions" % self._dim)
+            raise ValueError("the given point must have %d dimensions" \
+                    % self._dim)
         centroid = self.centroid()
         vec = [center[d]-centroid[d] for d in xrange(self._dim)]
         self.translate(vec)
@@ -314,7 +339,7 @@ class Layout(object):
 
     def copy(self):
         """Creates an exact copy of the layout."""
-        return copy(self)
+        return self.__copy__()
 
     def fit_into(self, bbox, keep_aspect_ratio=True):
         """Fits the layout into the given bounding box.
@@ -330,13 +355,17 @@ class Layout(object):
           the bounding box. If C{True}, the original aspect ratio of the layout
           will be kept and it will be centered within the bounding box.
         """
-        if not isinstance(bbox, BoundingBox): bbox=BoundingBox(bbox)
+        if not isinstance(bbox, BoundingBox):
+            bbox = BoundingBox(bbox)
 
-        sl, st, sr, sb = self.bounding_box()
-        sw, sh = sr-sl, sb-st
-        if sw == 0 and sh == 0: sw, sh = 1, 1
-        if sw == 0: sw = sh
-        if sh == 0: sh = sw
+        self_bbox = BoundingBox(self.bounding_box())
+        sw, sh = self_bbox.width, self_bbox.height
+        if sw == 0 and sh == 0:
+            sw, sh = 1, 1
+        if sw == 0:
+            sw = sh
+        if sh == 0:
+            sh = sw
 
         rx, ry = float(bbox.width)/sw, float(bbox.height)/sh
         tx, ty = 0, 0
@@ -348,7 +377,8 @@ class Layout(object):
                 ry = rx
                 ty += (float(bbox.height) - ry * sh) / 2.
 
-        tx, ty = tx - sl*rx + bbox.coords[0], ty - st*ry + bbox.coords[1]
+        tx = tx - self_bbox.left*rx + bbox.coords[0]
+        ty = ty - self_bbox.top*ry + bbox.coords[1]
 
         self.scale(rx, ry)
         self.translate(tx, ty)

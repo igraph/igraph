@@ -25,6 +25,8 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 """
 import math
 
+__all__ = ["Histogram", "RunningMean", "power_law_fit"]
+
 class Histogram(object):
     """Generic histogram class for real numbers
     
@@ -38,15 +40,20 @@ class Histogram(object):
         [ 5.000, 10.000): ******
     """
 
-    def __init__(self, bin_width = 1, data = []):
+    def __init__(self, bin_width = 1, data = None):
         """Initializes the histogram with the given data set.
 
         @param bin_width: the bin width of the histogram.
         @param data: the data set to be used. Must contain real numbers.
         """
         self._bin_width = float(bin_width)
+        self._bins = None
+        self._min, self._max = None, None
+        self._running_mean = RunningMean()
         self.clear()
-        self.add_many(data)
+
+        if data:
+            self.add_many(data)
 
     def _get_bin(self, num, create = False):
         """Returns the bin index corresponding to the given number.
@@ -56,22 +63,28 @@ class Histogram(object):
         @return: the index of the bin or C{None} if no bin exists yet and
           {create} is C{False}."""
         if len(self._bins) == 0:
-            if not create: return None
-            self._min = int(num/self._bin_width)*self._bin_width
-            self._max = self._min+self._bin_width
-            self._bins = [0]
-            return 0
+            if not create:
+                result = None
+            else: 
+                self._min = int(num/self._bin_width)*self._bin_width
+                self._max = self._min+self._bin_width
+                self._bins = [0]
+                result = 0
+            return result
 
         if num >= self._min:
             binidx = int((num-self._min)/self._bin_width)
-            if binidx < len(self._bins): return binidx
-            if not create: return None
+            if binidx < len(self._bins):
+                return binidx
+            if not create:
+                return None
             extra_bins = binidx-len(self._bins)+1
             self._bins.extend([0]*extra_bins)
             self._max = self._min + len(self._bins)*self._bin_width
             return binidx
 
-        if not create: return None
+        if not create:
+            return None
 
         extra_bins = int(math.ceil((self._min-num)/self._bin_width))
         self._bins[0:0] = [0]*extra_bins
@@ -79,14 +92,27 @@ class Histogram(object):
         self._max = self._min + len(self._bins)*self._bin_width
         return 0
 
-    def _get_n(self): return self._n
-    def _get_mean(self): return self._mean
-    def _get_sd(self): return self._sd
-    def _get_var(self): return self._sd ** 2
-    n = property(_get_n, doc="Number of elements in the histogram")
-    mean = property(_get_mean, doc="Mean of the elements")
-    sd = property(_get_sd, doc="Standard deviation of the elements")
-    var = property(_get_var, doc="Variance of the elements")
+    @property
+    def n(self):
+        """Returns the number of elements in the histogram"""
+        return len(self._running_mean)
+
+    @property
+    def mean(self):
+        """Returns the mean of the elements in the histogram"""
+        return self._running_mean.mean
+
+    # pylint: disable-msg=C0103
+    @property
+    def sd(self):
+        """Returns the standard deviation of the elements in
+        the histogram"""
+        return self._running_mean.sd
+
+    @property
+    def var(self):
+        """Returns the variance of the elements in the histogram"""
+        return self._running_mean.var
 
     def add(self, num, repeat=1):
         """Adds a single number to the histogram.
@@ -95,32 +121,27 @@ class Histogram(object):
         @param repeat: number of repeated additions
         """
         num = float(num)
-        bin = self._get_bin(num, True)
-        self._bins[bin] += repeat 
-        self._n += repeat
-        delta = num - self._mean
-        self._mean += (repeat*delta / self._n)
-        self._s += (repeat*delta) * (num - self._mean)
-        if self._n > 1:
-            self._sd = (self._s / (self._n-1)) ** 0.5
+        binidx = self._get_bin(num, True)
+        self._bins[binidx] += repeat 
+        self._running_mean.add(num, repeat)
 
     def add_many(self, data):
-        """Adds a single number or elements of an iterable to the histogram.
+        """Adds a single number or the elements of an iterable to the histogram.
 
         @param data: the data to be added"""
         try:
-            it = iter(data)
-        except:
-            it = iter([data])
-        for x in it: self.add(x)
+            iterator = iter(data)
+        except TypeError:
+            iterator = iter([data])
+        for x in iterator:
+            self.add(x)
     __lshift__ = add_many
 
     def clear(self):
         """Clears the collected data"""
         self._bins = []
         self._min, self._max = None, None
-        self._n = 0
-        self._mean, self._s, self._sd = 0.0, 0.0, 0.0
+        self._running_mean = RunningMean()
 
     def bins(self):
         """Generator returning the bins of the histogram in increasing order
@@ -132,44 +153,47 @@ class Histogram(object):
             yield (x, x+self._bin_width, elem)
             x += self._bin_width
 
-    def __plot__(self, context, bbox, palette, *args, **kwds):
+    def __plot__(self, context, bbox, _, **kwds):
         """Plotting support"""
-        max_value = kwds.get("max_value", max(self._bins))
-        mi = kwds.get("min", self._min)
-        ma = kwds.get("max", self._max)
-
-        import drawing
-        c = drawing.DescartesCoordinateSystem(context, bbox, \
-            (mi, 0, ma, max_value))
+        import igraph.drawing
+        coord_system = igraph.drawing.DescartesCoordinateSystem(context, bbox, \
+            (kwds.get("min", self._min), 0, \
+             kwds.get("max", self._max), kwds.get("max_value", max(self._bins))
+            ))
 
         # Draw the boxes
         context.set_line_width(1)
         context.set_source_rgb(1., 0., 0.)
         x = self._min
         for value in self._bins:
-            x1, y1 = c.local_to_context(x, value)
+            top_left_x, top_left_y = coord_system.local_to_context(x, value)
             x += self._bin_width
-            x2, y2 = c.local_to_context(x, 0)
-            context.rectangle(x1, y1, x2-x1, y2-y1)
+            bottom_right_x, bottom_right_y = coord_system.local_to_context(x, 0)
+            context.rectangle(top_left_x, top_left_y, \
+                              bottom_right_x - top_left_x, \
+                              bottom_right_y - top_left_y)
             context.fill()
 
         # Draw the axes
-        c.draw()
+        coord_system.draw()
 
     def __str__(self):
         """Returns the string representation of the histogram"""
-        if self._min is None or self._max is None: return "N = 0"
+        if self._min is None or self._max is None:
+            return "N = 0"
         num_length = max(len("%.3f" % self._min), \
                          len("%.3f" % self._max))
         format_string = "[%%%d.3f, %%%d.3f): %%s" % (num_length, num_length)
         maxval = max(self._bins)
         scale = maxval // (70-2*num_length)
-        if scale<1: scale = 1
+        if scale < 1:
+            scale = 1
 
-        result=["N = %d, mean +- sd: %.4f +- %.4f " % \
+        result = ["N = %d, mean +- sd: %.4f +- %.4f " % \
             (self.n, self.mean, self.sd)]
 
-        if scale>1: result.append("Each * represents %d items" % scale)
+        if scale > 1:
+            result.append("Each * represents %d items" % scale)
 
         for left, right, cnt in self.bins():
             cnt //= scale
@@ -189,7 +213,8 @@ class RunningMean(object):
     capable of returning the standard deviation (also calculated on
     the fly)
     """
-    
+
+    # pylint: disable-msg=C0103
     def __init__(self, n = 0.0, mean = 0.0, sd = 0.0):
         """RunningMean(n=0.0, mean=0.0, sd=0.0)
         
@@ -201,17 +226,17 @@ class RunningMean(object):
         @param n: the initial number of elements already processed
         @param mean: the initial mean
         @param sd: the initial standard deviation"""
-        self._n = float(n)
+        self._nitems = float(n)
         self._mean = float(mean)
-        if n>1:
-            self._s = float(sd) ** 2 * float(n-1)
+        if n > 1:
+            self._sqdiff = float(sd) ** 2 * float(n-1)
             self._sd = float(sd)
         else:
-            self._s = 0.0
+            self._sqdiff = 0.0
             self._sd = 0.0
         
     def add(self, value, repeat=1):
-        """RunningMean.add(value,repeat=1)
+        """RunningMean.add(value, repeat=1)
         
         Adds the given value to the elements from which we calculate
         the mean and the standard deviation.
@@ -219,12 +244,12 @@ class RunningMean(object):
         @param value: the element to be added
         @param repeat: number of repeated additions
         @return: the new mean and standard deviation as a tuple"""
-        self._n += 1
+        self._nitems += repeat
         delta = value - self._mean
-        self._mean += (repeat*delta / self._n)
-        self._s += (repeat*delta) * (value - self._mean)
-        if self._n > 1:
-            self._sd = (self._s / (self._n-1)) ** 0.5
+        self._mean += (repeat*delta / self._nitems)
+        self._sqdiff += (repeat*delta) * (value - self._mean)
+        if self._nitems > 1:
+            self._sd = (self._sqdiff / (self._nitems-1)) ** 0.5
         return self._mean, self._sd
 
     def add_many(self, values):
@@ -243,29 +268,50 @@ class RunningMean(object):
         @type values: iterable
         @return: the new mean"""
         try:
-            iterator=iter(values)
+            iterator = iter(values)
         except TypeError:
-            iterator=iter([values])
-        for value in iterator: self.add(value)
+            iterator = iter([values])
+        for value in iterator:
+            self.add(value)
         return self._mean, self._sd
-        
-    def _get_result(self): return self._mean, self._sd
-    def _get_mean(self): return self._mean
-    def _get_sd(self): return self._sd
-    mean = property(_get_mean, doc="the current mean")
-    sd = property(_get_sd, doc="the current standard deviation")
-    result = property(_get_result, doc="the current mean and standard deviation as a tuple")
+
+    @property
+    def result(self):
+        """Returns the current mean and standard deviation as a tuple"""
+        return self._mean, self._sd
+
+    @property
+    def mean(self):
+        """Returns the current mean"""
+        return self._mean
+
+    @property
+    def sd(self):
+        """Returns the current standard deviation"""
+        return self._sd
+
+    @property
+    def var(self):
+        """Returns the current variation"""
+        return self._sd ** 2
 
     def __str__(self):
         return "Running mean (N=%d, %f +- %f)" % \
-            (int(self._n), self._mean, self._sd)
+            (self._nitems, self._mean, self._sd)
     
     __lshift__ = add_many
     
-    def __float__(self): return float(self._mean)
-    def __int__(self): return int(self._mean)
-    def __long__(self): return long(self._mean)
-    def __complex__(self): return complex(self._mean)
+    def __float__(self):
+        return float(self._mean)
+
+    def __int__(self):
+        return int(self._mean)
+
+    def __long__(self):
+        return long(self._mean)
+
+    def __complex__(self):
+        return complex(self._mean)
 
 
 def power_law_fit(x, xmin=None, method="discrete_approx"):
@@ -299,22 +345,20 @@ def power_law_fit(x, xmin=None, method="discrete_approx"):
       Contemporary Physics 46, 323-351 (2005)
     @ref: A Clauset, CR Shalizi, MEJ Newman: Power-law distributions
       in empirical data. E-print (2007). arXiv:0706.1062"""
-    x0 = float(min(x))
-    if xmin is not None: x0 = float(max(xmin, x0))
-    s = 0.0
-    x = [x1 for x1 in x if x1>=xmin]
+    real_xmin = float(min(x))
+    if xmin is not None:
+        real_xmin = float(max(xmin, real_xmin))
+    filtered_xs = [x1 for x1 in x if x1 >= xmin]
 
     method = method.lower()
 
-    if method == "continuous" or method == "hill":
-        for x1 in x: s += math.log(x1/x0)
-        if s == 0: raise ValueError("lower bound too high")
-        return 1.0+len(x)/s
-    elif method == "discrete_approx":
-        x0 -= 0.5
-        for x1 in x: s += math.log(x1/x0)
-        if s == 0: raise ValueError("lower bound too high")
-        return 1.0+len(x)/s
+    if method in ("continuous", "hill", "discrete_approx"):
+        if method == "discrete_approx":
+            real_xmin -= 0.5
+        log_sum = sum(math.log(x/real_xmin) for x in filtered_xs)
+        if log_sum == 0:
+            raise ValueError("lower bound too high")
+        return 1.0+len(filtered_xs)/log_sum
 
     raise ValueError("unknown method: %s" % method)
 

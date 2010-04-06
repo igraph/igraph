@@ -46,9 +46,13 @@ class Palette(object):
         self._length = n
         self._cache = {}
 
-    def _get_length(self): return self._length
-    length = property(_get_length, "the length of the palette")
-    def __len__(self): return self._length
+    @property
+    def length(self):
+        """Returns the number of colors in this palette"""
+        return self._length
+
+    def __len__(self):
+        return self._length
 
     def clear_cache(self):
         """Clears the result cache.
@@ -80,18 +84,21 @@ class Palette(object):
           RGB values.
 
         @return: the color as an RGB triplet"""
-        if isinstance(v, list): v=tuple(v)
+        if isinstance(v, list):
+            v = tuple(v)
         try:
             return self._cache[v]
         except KeyError:
             pass
         if isinstance(v, int) or isinstance(v, long):
-            if v<0: raise ValueError("color index must be non-negative")
-            if v>=self._length: raise ValueError("color index too large")
-            result=self._get(v)
+            if v < 0:
+                raise ValueError("color index must be non-negative")
+            if v >= self._length:
+                raise ValueError("color index too large")
+            result = self._get(v)
         else:
-            result=color_name_to_rgb(v)
-        self._cache[v]=result
+            result = color_name_to_rgb(v)
+        self._cache[v] = result
         return result
 
     def _get(self, v):
@@ -102,7 +109,7 @@ class Palette(object):
 
         @param v: numerical index of the color to be retrieved
         @return: a 3-tuple containing the RGB values"""
-        raise ValueError("abstract class")
+        raise NotImplementedError("abstract class")
 
     __getitem__ = get
 
@@ -118,6 +125,7 @@ class GradientPalette(Palette):
       >>> pal.get(2)
       (0.5, 0., 0.5)
     """
+
     def __init__(self, color1, color2, n=256):
         """Creates a gradient palette.
 
@@ -130,11 +138,16 @@ class GradientPalette(Palette):
         self._color2 = color_name_to_rgb(color2)
 
     def _get(self, v):
+        """Returns the color corresponding to the given color index.
+
+        @param v: numerical index of the color to be retrieved
+        @return: a 3-tuple containing the RGB values"""
         ratio = float(v)/(len(self)-1)
-        return tuple([self._color1[x]*(1-ratio)+self._color2[x]*ratio for x in range(3)])
+        return tuple(self._color1[x]*(1-ratio) + \
+                     self._color2[x]*ratio for x in range(3))
 
 
-class AdvancedGradientPalette(GradientPalette):
+class AdvancedGradientPalette(Palette):
     """Advanced gradient that consists of more than two base colors.
     
     Example:
@@ -151,30 +164,33 @@ class AdvancedGradientPalette(GradientPalette):
 
         @param colors: the colors in the gradient.
         @param indices: the color indices belonging to the given colors. If
-          C{None}, the colors are distributed equally
+          C{None}, the colors are distributed equidistantly
         @param n: the total number of colors in the palette
         """
         Palette.__init__(self, n)
 
         if indices is None:
-            indices = list(range(len(colors)))
-            d = float(n-1) / (len(indices)-1)
-            for i in xrange(len(colors)): indices[i] *= d
+            diff = float(n-1) / (len(colors)-1)
+            indices = [i * diff for i in xrange(len(colors))]
         elif not hasattr(indices, "__iter__"):
             indices = [float(x) for x in indices]
-        d = zip(*sorted(zip(indices, colors)))
-        self._colors = [color_name_to_rgb(c) for c in d[1]]
-        self._indices = d[0]
-        self._k = len(self._indices)-1
-        self._dists = [self._indices[i+1]-self._indices[i] for i in xrange(self._k)]
+        self._indices, self._colors = zip(*sorted(zip(indices, colors)))
+        self._colors = [color_name_to_rgb(color) for color in self._colors]
+        self._dists = [curr-prev for curr, prev in \
+                zip(self._indices[1:], self._indices)]
 
     def _get(self, v):
-        # Find where does v belong
-        for i in xrange(self._k):
+        """Returns the color corresponding to the given color index.
+
+        @param v: numerical index of the color to be retrieved
+        @return: a 3-tuple containing the RGB values"""
+        colors = self._colors
+        for i in xrange(len(self._indices)-1):
             if self._indices[i] <= v and self._indices[i+1] >= v:
                 dist = self._dists[i]
                 ratio = float(v-self._indices[i])/dist
-                return tuple([self._colors[i][x]*(1-ratio)+self._colors[i+1][x]*ratio for x in range(3)])
+                return tuple([colors[i][x]*(1-ratio)+colors[i+1][x]*ratio \
+                        for x in range(3)])
         return (0., 0., 0.)
 
 
@@ -214,23 +230,24 @@ class ClusterColoringPalette(PrecalculatedPalette):
     """
 
     def __init__(self, n):
-        base_colors = ["red", "green", "blue", "yellow", "magenta", "cyan", "#808080"]
+        base_colors = ["red", "green", "blue", "yellow", \
+                       "magenta", "cyan", "#808080"]
         base_colors = [color_name_to_rgb(name) for name in base_colors]
 
         num_base_colors = len(base_colors)
         colors = base_colors[:]
 
         blocks_to_add = ceil(float(n - num_base_colors) / num_base_colors)
-        ratio = 1.0 / (ceil(blocks_to_add / 2.0) + 1)
+        ratio_increment = 1.0 / (ceil(blocks_to_add / 2.0) + 1)
 
         adding_darker = True
-        r = ratio
+        ratio = ratio_increment
         while len(colors) < n:
             if adding_darker:
-                new_block = [darken(color, r) for color in base_colors]
+                new_block = [darken(color, ratio) for color in base_colors]
             else:
-                new_block = [lighten(color, r) for color in base_colors]
-                r += ratio
+                new_block = [lighten(color, ratio) for color in base_colors]
+                ratio += ratio_increment
             colors.extend(new_block)
             adding_darker = not adding_darker
 
@@ -238,14 +255,17 @@ class ClusterColoringPalette(PrecalculatedPalette):
         PrecalculatedPalette.__init__(self, colors)
 
 
-def _clamp(value, min, max):
+def _clamp(value, min_value, max_value):
     """Clamps the given value between min and max"""
-    if value>max: return max
-    if value<min: return min
+    if value > max_value:
+        return max_value
+    if value < min_value:
+        return min_value
     return value
 
 def color_name_to_rgb(color, palette=None):
-    """Converts a color given in one of the supported color formats to R-G-B values.
+    """Converts a color given in one of the supported color formats to
+    R-G-B values.
 
     Examples:
 
@@ -277,8 +297,6 @@ def color_name_to_rgb(color, palette=None):
       Since these colors are primarily used by Cairo routines, the tuples
       contain floats in the range 0.0-1.0
     """
-    global known_colors
-
     if not isinstance(color, basestring):
         try:
             components = [c/255. for c in color]
@@ -294,28 +312,26 @@ def color_name_to_rgb(color, palette=None):
             if len(color) == 3:
                 components = [int(i, 16) * 17. / 255. for i in color]
             elif len(color) == 6:
-                components = [int(color[(2*i):(2*i+2)], 16) / 255. for i in range(3)]
+                components = [int(color[i:i+2], 16) / 255. for i in (0, 2, 4)]
         else:
-            if color.startswith("rgb(") and color[-1] == ")": color = color[4:-1]
+            if color.startswith("rgb(") and color[-1] == ")":
+                color = color[4:-1]
             if " " in color or "/" in color or "," in color:
-                color = color.replace(",", " ")
-                color = color.replace("/", " ")
+                color = color.replace(",", " ").replace("/", " ")
                 components = color.split()
-                for idx, c in enumerate(components):
-                    if c[-1] == "%":
-                        components[idx] = float(c[:-1])/100.
+                for idx, comp in enumerate(components):
+                    if comp[-1] == "%":
+                        components[idx] = float(comp[:-1])/100.
                     else:
-                        components[idx] = float(c)/255.
+                        components[idx] = float(comp)/255.
             else:
                 try:
                     components = palette.get(int(color))
-                except ValueError:
-                    components = known_colors[color.lower()]
-                except AttributeError:
+                except (ValueError, AttributeError):
                     components = known_colors[color.lower()]
 
     # At this point, the components are floats
-    return tuple([_clamp(val, 0., 1.) for val in components])
+    return tuple(_clamp(val, 0., 1.) for val in components)
 
 
 def darken(color, ratio=0.5):
@@ -325,12 +341,8 @@ def darken(color, ratio=0.5):
     ratio. A ratio of 1.0 will yield a completely black color, a ratio
     of 0.0 will yield the original color.
     """
-    r, g, b = color
     ratio = 1.0 - ratio
-    r *= ratio
-    g *= ratio
-    b *= ratio
-    return r, g, b
+    return tuple(component * ratio for component in color)
 
 def lighten(color, ratio=0.5):
     """Creates a lighter version of a color given by an RGB triplet.
@@ -339,11 +351,7 @@ def lighten(color, ratio=0.5):
     ratio. A ratio of 1.0 will yield a completely white color, a ratio
     of 0.0 will yield the original color.
     """
-    r, g, b = color
-    r += (1.0 - r) * ratio
-    g += (1.0 - g) * ratio
-    b += (1.0 - b) * ratio
-    return r, g, b
+    return tuple(component + (1.0 - component) * ratio for component in color)
 
 known_colors = \
 {   'alice blue': (0.94117647058823528, 0.97254901960784312, 1.0),
