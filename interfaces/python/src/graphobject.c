@@ -8499,17 +8499,23 @@ PyObject *igraphmodule_Graph_community_multilevel(igraphmodule_GraphObject *self
  * Optimal modularity by integer programming
  */
 PyObject *igraphmodule_Graph_community_optimal_modularity(
-	igraphmodule_GraphObject *self) {
+	igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = { "verbose", NULL };
   igraph_real_t modularity;
   igraph_vector_t membership;
-  PyObject *res;
+  PyObject *res, *verbose_o = Py_False;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &verbose_o)) {
+    return NULL;
+  }
 
   if (igraph_vector_init(&membership, igraph_vcount(&self->g))) {
 	igraphmodule_handle_igraph_error();
     return NULL;
   }
 
-  if (igraph_community_optimal_modularity(&self->g, &modularity, &membership)) {
+  if (igraph_community_optimal_modularity(&self->g, &modularity, &membership,
+        PyObject_IsTrue(verbose_o))) {
 	igraphmodule_handle_igraph_error();
 	igraph_vector_destroy(&membership);
     return NULL;
@@ -11487,7 +11493,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"community_optimal_modularity",
    (PyCFunction) igraphmodule_Graph_community_optimal_modularity,
    METH_VARARGS | METH_KEYWORDS,
-   "community_optimal_modularity()\n\n"
+   "community_optimal_modularity(verbose=False)\n\n"
    "Calculates the optimal modularity score of the graph and the\n"
    "corresponding community structure.\n\n"
    "This function uses the GNU Linear Programming Kit to solve a large\n"
