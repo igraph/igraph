@@ -11463,8 +11463,6 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "gamma=1, implementation=\"orig\", lambda=1)\n\n"
    "Finds the community structure of the graph according to the spinglass\n"
    "community detection method of Reichardt & Bornholdt.\n\n"
-   "@param graph: the input graph. It can be directed, but the direction\n"
-   "  of edges will be ignored.\n"
    "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
    "  even an edge attribute name.\n"
    "@param spins: integer, the number of spins to use. This is the upper limit\n"
@@ -11531,7 +11529,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "__graph_as_cobject()\n\n"
    "Returns the igraph graph encapsulated by the Python object as\n"
    "a PyCObject\n\n."
-   "A PyObject is barely a regular C pointer. This function\n"
+   "A PyCObject is practically a regular C pointer. This function\n"
    "should not be used directly by igraph users, it is useful only\n"
    "in the case when the underlying igraph object must be passed to\n"
    "another C code through Python.\n\n"},
@@ -11623,7 +11621,9 @@ PyTypeObject igraphmodule_GraphType = {
   0,                            /* tp_setattro */
   0,                            /* tp_as_buffer */
   Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_GC,  /* tp_flags */
-  "Low-level representation of a graph.\n\n" "Don't use it directly, use L{igraph.Graph} instead.\n\n" "@deffield ref: Reference",  /* tp_doc */
+  "Low-level representation of a graph.\n\n"
+  "Don't use it directly, use L{igraph.Graph} instead.\n\n"
+  "@deffield ref: Reference",  /* tp_doc */
   (traverseproc) igraphmodule_Graph_traverse, /* tp_traverse */
   (inquiry) igraphmodule_Graph_clear, /* tp_clear */
   0,                            /* tp_richcompare */

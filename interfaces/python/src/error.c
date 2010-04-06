@@ -21,8 +21,8 @@
 
 */
 
-#include <igraph/igraph.h>
 #include "error.h"
+#include <igraph/igraph.h>
 
 /** \ingroup python_interface_errors
  * \brief Exception type to be returned when an internal \c igraph error occurs.

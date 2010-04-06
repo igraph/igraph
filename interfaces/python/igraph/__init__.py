@@ -1028,8 +1028,11 @@ class Graph(core.GraphBase):
         if not isinstance(fname, file):
             file_was_opened=True
             fname=open(fname, 'wb')
+        else:
+            file_was_opened=False
         result=pickle.dump(self, fname, version)
-        if file_was_opened: fname.close()
+        if file_was_opened:
+            fname.close()
         return result
 
     @classmethod

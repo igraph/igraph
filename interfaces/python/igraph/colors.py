@@ -215,7 +215,7 @@ class ClusterColoringPalette(PrecalculatedPalette):
 
     def __init__(self, n):
         base_colors = ["red", "green", "blue", "yellow", "magenta", "cyan", "#808080"]
-        base_colors = [color_name_to_rgb[name] for name in base_colors]
+        base_colors = [color_name_to_rgb(name) for name in base_colors]
 
         num_base_colors = len(base_colors)
         colors = base_colors[:]
