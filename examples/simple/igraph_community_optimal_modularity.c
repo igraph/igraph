@@ -51,7 +51,8 @@ int main() {
   igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
   
   igraph_vector_init(&membership, 0);
-  igraph_community_optimal_modularity(&graph, &modularity, &membership);
+  igraph_community_optimal_modularity(&graph, &modularity, &membership, 
+				      /*verbose=*/ 0);
 
   if (fabs(modularity - 0.4197896) > 0.0000001) { return 2; }
   

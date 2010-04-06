@@ -26,19 +26,58 @@
 #include "igraph_structural.h"
 #include "igraph_community.h"
 #include "igraph_error.h"
+#include "igraph_interrupt.h"
 #include "config.h"
 
 #ifdef HAVE_GLPK
 #include <glpk.h>
+
+void igraph_i_optmod_hook(glp_tree *tree, void *info) {
+  IGRAPH_ALLOW_INTERRUPTION_NORETURN();
+}
+
 #endif
 
 /**
  * \function igraph_community_optimal_modularity
+ * Calculate the community structure with the highest modularity value
+ * 
+ * This function calculates the optimal community structure for a
+ * graph, in terms of maximal modularity score. 
+ * 
+ * </para><para>
+ * The calculation is done by transforming the modularity maximization
+ * into an integer programming problem, and then calling the GLPK
+ * library to solve that. Please see Ulrik Brandes et al.: On
+ * Modularity Clustering, IEEE Transactions on Knowledge and Data
+ * Engineering 20(2):172-188, 2008.
+ * 
+ * </para><para>
+ * Note that modularity optimization is an NP-complete problem, and
+ * all known algorithms for it have exponential time complexity. This
+ * means that you probably don't want to run this function on larger
+ * graphs. Graphs with up to fifty vertices should be fine, graphs
+ * with a couple of hundred vertices might be possible.
+ * 
+ * \param graph The input graph. It is always treated as undirected.
+ * \param modularity Pointer to a real number, or a null pointer.
+ *        If it is not a null pointer, then a optimal modularity value 
+ *        is returned here.
+ * \param membership Pointer to a vector, or a null pointer. If not a
+ *        null pointer, then the membership vector of the optimal
+ *        community structure is stored here.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_modularity(), \ref igraph_community_fastgreedy()
+ * for an algorithm that finds a local optimum in a greedy way. 
+ * 
+ * Time complexity: exponential in the number of vertices.
  */
 
 int igraph_community_optimal_modularity(const igraph_t *graph,
 					igraph_real_t *modularity,
-					igraph_vector_t *membership) {
+					igraph_vector_t *membership,
+					igraph_bool_t verbose) {
 #ifndef HAVE_GLPK
   IGRAPH_ERROR("GLPK is not available", 
 	       IGRAPH_UNIMPLEMENTED);    
@@ -47,25 +86,35 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   igraph_bool_t directed=igraph_is_directed(graph);
-  long int no_of_variables=no_of_edges * (no_of_edges+1)/2;
+  long int no_of_variables=no_of_nodes * (no_of_nodes+1)/2;
   long int i, j, k, st;
   int idx[] = { 0, 0, 0, 0 };
   double coef[] = { 0.0, 1.0, 1.0, -2.0 };
+  int ret;
 
   igraph_vector_t degree;
 
   glp_prob *ip;
   glp_iocp parm;
 
-  /* TODO: special cases, empty graph, etc. */
-
+  /* Special case */
+  if (no_of_edges == 0) {
+    if (modularity) {
+      *modularity=IGRAPH_NAN;
+    }
+    if (membership) {
+      IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+      igraph_vector_null(membership);
+    }
+  }
+  
   IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
   IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), 
 			     IGRAPH_ALL, IGRAPH_LOOPS));
 
   glp_term_out(GLP_OFF);
   ip = glp_create_prob();
-  IGRAPH_FINALLY(ip, glp_delete_prob);
+  IGRAPH_FINALLY(glp_delete_prob, ip);
 
   glp_set_obj_dir(ip, GLP_MAX);
   st=glp_add_cols(ip, no_of_variables);
@@ -85,6 +134,9 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
   /* transitivity */
   for (i=0; i<no_of_nodes; i++) {
     for (j=i+1; j<no_of_nodes; j++) {
+
+      IGRAPH_ALLOW_INTERRUPTION();
+
       for (k=j+1; k<no_of_nodes; k++) {
 	long int newrow=glp_add_rows(ip, 3);
 
@@ -127,7 +179,46 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
   parm.bt_tech = GLP_BT_BLB;
   parm.presolve = GLP_ON;
   parm.binarize = GLP_ON;
-  glp_intopt(ip, &parm);
+  parm.cb_func = igraph_i_optmod_hook;
+  ret=glp_intopt(ip, &parm);
+
+  /* handle errors */
+  switch (ret) {
+  case 0: 
+    break;
+  case GLP_EBOUND:
+    IGRAPH_ERROR("Modularity optimization failed (GLP_EBOUND)", 
+		 IGRAPH_GLP_EBOUND);
+    break;
+  case GLP_EROOT:
+    IGRAPH_ERROR("Modularity optimization failed (GLP_EROOT)", 
+		 IGRAPH_GLP_EROOT);
+    break;
+  case GLP_ENOPFS:
+    IGRAPH_ERROR("Modularity optimization failed (GLP_ENOPFS)", 
+		 IGRAPH_GLP_ENOPFS);
+    break;
+  case GLP_ENODFS:
+    IGRAPH_ERROR("Modularity optimization failed (GLP_ENODFS)", 
+		 IGRAPH_GLP_ENODFS);
+    break;
+  case GLP_EFAIL:
+    IGRAPH_ERROR("Modularity optimization failed (GLP_EFAIL)", 
+		 IGRAPH_GLP_EFAIL);
+    break;
+  case GLP_EMIPGAP:
+    IGRAPH_ERROR("Modularity optimization failed (GLP_EMIPGAP)", 
+		 IGRAPH_GLP_EMIPGAP);
+    break;
+  case GLP_ETMLIM:
+    IGRAPH_ERROR("Modularity optimization failed (GLP_ETMLIM)", 
+		 IGRAPH_GLP_ETMLIM);
+    break;
+  case GLP_ESTOP:
+    IGRAPH_ERROR("Modularity optimization failed (GLP_ESTOP)", 
+		 IGRAPH_GLP_ESTOP);
+    break;        
+  }
   
   /* store the results */
   if (modularity) {
@@ -138,6 +229,9 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
     long int comm=0;	 /* id of the last community that was found */
     IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
     for (i=0; i<no_of_nodes; i++) {
+      
+      IGRAPH_ALLOW_INTERRUPTION();
+      
       for (j=0; j<i; j++) {
 	int val=glp_mip_col_val(ip, st+IDX(j,i));
 	if (val==1) {

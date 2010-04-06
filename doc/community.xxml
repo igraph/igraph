@@ -9,6 +9,7 @@
 
 <section><title>Common functions related to community structure</title>
 <!-- doxrox-include igraph_modularity -->
+<!-- doxrox-include igraph_community_optimal_modularity -->
 <!-- doxrox-include igraph_community_to_membership -->
 <!-- doxrox-include igraph_reindex_membership -->
 <!-- doxrox-include igraph_compare_communities -->

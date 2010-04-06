@@ -315,6 +315,14 @@ igraph_set_error_handler(igraph_error_handler_t* new_handler);
  * \enumval IGRAPH_ENEGLOOP Negative loop detected while calculating shortest paths.
  * \enumval IGRAPH_EINTERNAL Internal error, likely a bug in igraph.
  * \enumval IGRAPH_EDIVZERO Big integer division by zero.
+ * \enumval IGARPH_GLP_EBOUND GLPK error (GLP_EBOUND).
+ * \enumval IGARPH_GLP_EROOT GLPK error (GLP_EROOT).
+ * \enumval IGARPH_GLP_ENOPFS GLPK error (GLP_ENOPFS).
+ * \enumval IGARPH_GLP_ENODFS GLPK error (GLP_ENODFS).
+ * \enumval IGARPH_GLP_EFAIL GLPK error (GLP_EFAIL).
+ * \enumval IGARPH_GLP_EMIPGAP GLPK error (GLP_EMIPGAP).
+ * \enumval IGARPH_GLP_ETMLIM GLPK error (GLP_ETMLIM).
+ * \enumval IGARPH_GLP_ESTOP GLPK error (GLP_ESTOP).
  */
 
 typedef enum {
@@ -359,7 +367,15 @@ typedef enum {
   IGRAPH_ARPACK_MAXIT     = 39,
   IGRAPH_ARPACK_NOSHIFT   = 40,
   IGRAPH_ARPACK_REORDER   = 41,
-  IGRAPH_EDIVZERO         = 42
+  IGRAPH_EDIVZERO         = 42,
+  IGRAPH_GLP_EBOUND       = 43,
+  IGRAPH_GLP_EROOT        = 44,
+  IGRAPH_GLP_ENOPFS       = 45,
+  IGRAPH_GLP_ENODFS       = 46,
+  IGRAPH_GLP_EFAIL        = 47, 
+  IGRAPH_GLP_EMIPGAP      = 48,
+  IGRAPH_GLP_ETMLIM       = 49,
+  IGRAPH_GLP_ESTOP        = 50
 } igraph_error_type_t;
 
 /**
