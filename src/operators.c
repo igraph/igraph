@@ -698,13 +698,20 @@ int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs) {
 
 int igraph_difference(igraph_t *res, 
 		      const igraph_t *orig, const igraph_t *sub) {
+
+  /* Quite nasty, but we will use that an edge adjacency list
+     contains the vertices according to the order of the 
+     vertex ids at the "other" end of the edge. */
+
   long int no_of_nodes_orig=igraph_vcount(orig);
   long int no_of_nodes_sub =igraph_vcount(sub);
   long int no_of_nodes=no_of_nodes_orig;
   long int smaller_nodes;
   igraph_bool_t directed=igraph_is_directed(orig);
   igraph_vector_t edges;
-  igraph_vector_t nei1, nei2;
+  igraph_vector_t edge_ids;
+  igraph_vector_t *nei1, *nei2;
+  igraph_adjedgelist_t adj_orig, adj_sub;
   long int i;
   igraph_integer_t v1, v2;
 
@@ -713,63 +720,93 @@ int igraph_difference(igraph_t *res,
 		 IGRAPH_EINVAL);
   }
   
+  IGRAPH_VECTOR_INIT_FINALLY(&edge_ids, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-  IGRAPH_VECTOR_INIT_FINALLY(&nei1, 0);
-  IGRAPH_VECTOR_INIT_FINALLY(&nei2, 0);
+  IGRAPH_CHECK(igraph_adjedgelist_init(orig, &adj_orig, IGRAPH_OUT));
+  IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adj_orig);
+  IGRAPH_CHECK(igraph_adjedgelist_init(sub, &adj_sub, IGRAPH_OUT));
+  IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adj_sub);
   
   smaller_nodes=no_of_nodes_orig > no_of_nodes_sub ?
     no_of_nodes_sub : no_of_nodes_orig;
   
   for (i=0; i<smaller_nodes; i++) {
+    long int n1, n2, e1, e2;
     IGRAPH_ALLOW_INTERRUPTION();
-    IGRAPH_CHECK(igraph_neighbors(orig, &nei1, i, IGRAPH_OUT));
-    IGRAPH_CHECK(igraph_neighbors(sub, &nei2, i, IGRAPH_OUT));
-    if (!directed) {
-      igraph_vector_filter_smaller(&nei1, i);
-      igraph_vector_filter_smaller(&nei2, i);
-    }
-    while (!igraph_vector_empty(&nei1) && !igraph_vector_empty(&nei2)) {
-      v1=igraph_vector_tail(&nei1);
-      v2=igraph_vector_tail(&nei2);
+    nei1=igraph_adjedgelist_get(&adj_orig, i);
+    nei2=igraph_adjedgelist_get(&adj_sub, i);
+    n1=igraph_vector_size(nei1)-1;
+    n2=igraph_vector_size(nei2)-1;
+    while (n1>=0 && n2>=0) {
+      e1=VECTOR(*nei1)[n1];
+      e2=VECTOR(*nei2)[n2];
+      v1=IGRAPH_OTHER(orig, e1, i);
+      v2=IGRAPH_OTHER(sub, e2, i);
       
-      if (v1>v2) {
+      if (!directed && v1<i) { 
+	n1--;
+      } else if (!directed && v2<i) {
+	n2--;
+      } else if (v1>v2) {
+	IGRAPH_CHECK(igraph_vector_push_back(&edge_ids, e1));
 	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
 	IGRAPH_CHECK(igraph_vector_push_back(&edges, v1));
-	igraph_vector_pop_back(&nei1);
+	n1--;	
       } else if (v2>v1) {
-	igraph_vector_pop_back(&nei2);
+	n2--;
       } else {
-	igraph_vector_pop_back(&nei1);
-	igraph_vector_pop_back(&nei2);
+	n1--;
+	n2--;
       }
     }
-
+    
     /* Copy remaining edges */
-    while (!igraph_vector_empty(&nei1)) {
-      IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-      IGRAPH_CHECK(igraph_vector_push_back(&edges, 
-					   igraph_vector_pop_back(&nei1)));
+    while (n1>=0) {
+      e1=VECTOR(*nei1)[n1];
+      v1=IGRAPH_OTHER(orig, e1, i);
+      if (directed || v1 >= i) { 
+	IGRAPH_CHECK(igraph_vector_push_back(&edge_ids, e1));
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, v1));
+      }
+      n1--;
     }
   }
 
   /* copy remaining edges, use the previous value of 'i' */
   for (; i<no_of_nodes_orig; i++) {
-    IGRAPH_CHECK(igraph_neighbors(orig, &nei1, i, IGRAPH_OUT));
-    if (!directed) {
-      igraph_vector_filter_smaller(&nei1, i);
-    }
-    while (!igraph_vector_empty(&nei1)) {
-      IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-      IGRAPH_CHECK(igraph_vector_push_back(&edges, 
-					   igraph_vector_pop_back(&nei1)));
+    long int n1, e1;
+    nei1=igraph_adjedgelist_get(&adj_orig, i);
+    n1=igraph_vector_size(nei1)-1;
+    while (n1>=0) {
+      e1=VECTOR(*nei1)[n1];
+      v1=IGRAPH_OTHER(orig, e1, i);
+      if (directed || v1 >= i) { 
+	IGRAPH_CHECK(igraph_vector_push_back(&edge_ids, e1));
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, v1));
+      }
+      n1--;
     }
   }
 
+  igraph_adjedgelist_destroy(&adj_sub);
+  igraph_adjedgelist_destroy(&adj_orig);
+  IGRAPH_FINALLY_CLEAN(2);
   IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
-  igraph_vector_destroy(&edges);
-  igraph_vector_destroy(&nei1);
-  igraph_vector_destroy(&nei2);
-  IGRAPH_FINALLY_CLEAN(3);
+  igraph_vector_destroy(&edges);  
+  IGRAPH_FINALLY_CLEAN(1);
+
+  /* Attributes */
+  if (orig->attr) {
+    IGRAPH_I_ATTRIBUTE_DESTROY(res);
+    IGRAPH_I_ATTRIBUTE_COPY(res, orig, /*graph=*/1, /*vertex=*/1, /*edge=*/0);
+    IGRAPH_CHECK(igraph_i_attribute_permute_edges(orig, res, &edge_ids));
+  }
+  
+  igraph_vector_destroy(&edge_ids);
+  IGRAPH_FINALLY_CLEAN(1);
+  
   return 0;
 }
 
