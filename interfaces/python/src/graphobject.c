@@ -4372,7 +4372,7 @@ PyObject *igraphmodule_Graph_simplify(igraphmodule_GraphObject * self,
     return NULL;
 
   if (igraph_simplify(&self->g, PyObject_IsTrue(multiple),
-                      PyObject_IsTrue(loops))) {
+                      PyObject_IsTrue(loops), 0)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
