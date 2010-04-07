@@ -71,6 +71,18 @@ class DegreeTests(unittest.TestCase):
     gdir = Graph(4, [(0, 1), (0, 2), (1, 2), (2, 1), (0, 3), (1, 3), (3, 0)], directed=True)
     tree = Graph.Tree(10, 3)
 
+    def testKnn(self):
+        knn, knnk = self.gfull.knn()
+        self.failUnless(knn == [9.] * 10)
+        self.assertAlmostEquals(knnk[8], 9.0, places=6)
+
+        knn, knnk = self.g.knn()
+        diff = max(abs(a-b) for a, b in zip(knn, [17/5., 3, 4, 4]))
+        self.assertAlmostEquals(diff, 0., places=6)
+        self.assertAlmostEquals(knnk[1], 4, places=6)
+        self.assertAlmostEquals(knnk[2], 3, places=6)
+        self.assertAlmostEquals(knnk[4], 17/5., places=6)
+
     def testDegree(self):
         self.failUnless(self.gfull.degree() == [9] * 10)
         self.failUnless(self.gempty.degree() == [0] * 10)

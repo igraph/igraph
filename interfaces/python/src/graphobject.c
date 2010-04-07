@@ -1381,6 +1381,81 @@ PyObject *igraphmodule_Graph_convergence_field_size(igraphmodule_GraphObject *se
   return Py_BuildValue("NN", o1, o2);
 }
 
+/**
+ * \ingroup python_interface_graph
+ * \brief Calculates the average nearest neighbor degree of the vertices
+ *   of a \c igraph.Graph
+ */
+PyObject *igraphmodule_Graph_knn(igraphmodule_GraphObject *self,
+                                 PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = { "vids", "weights", NULL };
+  PyObject *vids_obj = Py_None, *weights_obj = Py_None;
+  PyObject *knn_obj, *knnk_obj;
+  igraph_vector_t *weights = 0;
+  igraph_vector_t knn, knnk;
+  igraph_vs_t vids;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist, &vids_obj, &weights_obj)) {
+    return NULL;
+  }
+
+  if (igraph_vector_init(&knn, 0)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_vector_init(&knnk, 0)) {
+    igraph_vector_destroy(&knn);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraphmodule_PyObject_to_vs_t(vids_obj, &vids, &self->g, 0)) {
+    igraph_vector_destroy(&knn);
+    igraph_vector_destroy(&knnk);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraphmodule_attrib_to_vector_t(weights_obj, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    igraph_vs_destroy(&vids);
+    igraph_vector_destroy(&knn);
+    igraph_vector_destroy(&knnk);
+    return NULL;
+  }
+
+  if (igraph_avg_nearest_neighbor_degree(&self->g, vids, &knn, &knnk, weights)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vs_destroy(&vids);
+    igraph_vector_destroy(&knn);
+    igraph_vector_destroy(&knnk);
+    if (weights) {
+      igraph_vector_destroy(weights);
+      free(weights);
+    }
+    return NULL;
+  }
+
+  igraph_vs_destroy(&vids);
+  if (weights) {
+    igraph_vector_destroy(weights);
+    free(weights);
+  }
+
+  knn_obj = igraphmodule_vector_t_to_PyList(&knn, IGRAPHMODULE_TYPE_FLOAT);
+  if (!knn_obj)
+    return NULL;
+
+  knnk_obj = igraphmodule_vector_t_to_PyList(&knnk, IGRAPHMODULE_TYPE_FLOAT);
+  if (!knnk_obj) {
+    Py_DECREF(knn_obj);
+    return NULL;
+  }
+
+  return Py_BuildValue("NN", knn_obj, knnk_obj);
+}
+
 /**********************************************************************
  * Deterministic and non-deterministic graph generators               *
  **********************************************************************/
@@ -8818,7 +8893,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  out-degrees, L{IN} IN for in-degrees or L{ALL} for the sum of\n"
    "  them).\n" "@param loops: whether self-loops should be counted.\n"},
 
-  /* interface to igraph_degree */
+  /* interface to igraph_strength */
   {"strength", (PyCFunction) igraphmodule_Graph_strength,
    METH_VARARGS | METH_KEYWORDS,
    "strength(vertices, type=ALL, loops=True, weights=None)\n\n"
@@ -9802,6 +9877,25 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@return: C{True} if the graph is bipartite, C{False} if not.\n"
    "  If C{return_types} is C{True}, the group assignment is also\n"
    "  returned.\n"
+  },
+
+  /* interface to igraph_avg_nearest_neighbor_degree */
+  {"knn", (PyCFunction) igraphmodule_Graph_knn,
+   METH_VARARGS | METH_KEYWORDS,
+   "knn(vids=None, weights=None)\n\n"
+   "Calculates the average degree of the neighbors for each vertex, and\n"
+   "the same quantity as the function of vertex degree.\n\n"
+   "@param vids: the vertices for which the calculation is performed.\n"
+   "  C{None} means all vertices.\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name. If this is given, the vertex strength\n"
+   "  will be used instead of the vertex degree in the calculations, but\n"
+   "  the \"ordinary\" vertex degree will be used for the second (degree-\n"
+   "  dependent) list in the result.\n"
+   "@return: two lists in a tuple. The first list contains the average\n"
+   "  degree of neighbors for each vertex, the second contains the average\n"
+   "  degree of neighbors as a function of vertex degree. The zeroth element\n"
+   "  of this list corresponds to vertices of degree 1.\n"
   },
 
   /* interface to igraph_is_connected */
