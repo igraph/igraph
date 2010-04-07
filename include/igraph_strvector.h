@@ -95,6 +95,11 @@ void igraph_strvector_remove_negidx(igraph_strvector_t *v, const igraph_vector_t
 				    long int nremove);
 int igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
 			   const char *sep);
+
+int igraph_strvector_index(const igraph_strvector_t *v, 
+                           igraph_strvector_t *newv,
+                           const igraph_vector_t *idx);
+
   
 __END_DECLS
 

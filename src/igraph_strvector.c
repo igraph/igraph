@@ -565,3 +565,20 @@ int igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
   return 0;
 
 }
+
+int igraph_strvector_index(const igraph_strvector_t *v, 
+                           igraph_strvector_t *newv,
+                           const igraph_vector_t *idx) {
+  
+  long int i, newlen=igraph_vector_size(idx);
+  IGRAPH_CHECK(igraph_strvector_resize(newv, newlen));
+
+  for (i=0; i<newlen; i++) {
+    long int j=VECTOR(*idx)[i];
+    char *str;
+    igraph_strvector_get(v, j, &str);
+    igraph_strvector_set(newv, i, str);
+  }
+  
+  return 0;
+}
