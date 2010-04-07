@@ -57,11 +57,11 @@ int igraph_i_attribute_add_vertices(igraph_t *graph, long int nv, void *attr) {
   }
 }
 
-void igraph_i_attribute_delete_vertices(igraph_t *graph, 
-					const igraph_vector_t *eidx,
-					const igraph_vector_t *vidx) {
+int igraph_i_attribute_permute_vertices(igraph_t *graph, 
+					 const igraph_vector_t *idx) {
+  
   if (igraph_i_attribute_table) {
-    igraph_i_attribute_table->delete_vertices(graph, eidx, vidx);
+    igraph_i_attribute_table->permute_vertices(graph, idx);
   }
 }
   
@@ -75,13 +75,6 @@ int igraph_i_attribute_add_edges(igraph_t *graph,
   }
 }
   
-void igraph_i_attribute_delete_edges(igraph_t *graph, 
-				     const igraph_vector_t *idx) {
-  if (igraph_i_attribute_table) {
-    igraph_i_attribute_table->delete_edges(graph, idx);
-  }
-}
-
 int igraph_i_attribute_permute_edges(igraph_t *graph, 
 				      const igraph_vector_t *idx) {
   if (igraph_i_attribute_table) {
