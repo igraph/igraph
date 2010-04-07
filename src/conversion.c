@@ -349,7 +349,7 @@ int igraph_to_directed(igraph_t *graph,
     for (i=0; i<no_of_edges; i++) {
       VECTOR(edges)[no_of_edges*2+i*2]  =VECTOR(edges)[i*2+1];
       VECTOR(edges)[no_of_edges*2+i*2+1]=VECTOR(edges)[i*2];
-      VECTOR(index)[i] = VECTOR(index)[no_of_edges+i] = i+1;
+      VECTOR(index)[i] = VECTOR(index)[no_of_edges+i] = i;
     }
 
     IGRAPH_CHECK(igraph_create(&newgraph, &edges, no_of_nodes,
