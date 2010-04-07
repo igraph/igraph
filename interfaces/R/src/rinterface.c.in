@@ -294,12 +294,82 @@ int R_igraph_attribute_add_vertices(igraph_t *graph, long int nv,
   return 0;
 }
 
-void R_igraph_attribute_delete_vertices(igraph_t *graph, 
-					const igraph_vector_t *eidx,
-					const igraph_vector_t *vidx) {
+/* void R_igraph_attribute_delete_vertices(igraph_t *graph,  */
+/* 					const igraph_vector_t *eidx, */
+/* 					const igraph_vector_t *vidx) { */
+/*   SEXP attr=graph->attr; */
+/*   SEXP eal, val; */
+/*   long int valno, ealno, i; */
+/*   if (REAL(VECTOR_ELT(attr, 0))[0]+REAL(VECTOR_ELT(attr, 0))[1] > 1) { */
+/*     SEXP newattr; */
+/*     PROTECT(newattr=duplicate(attr)); */
+/*     REAL(VECTOR_ELT(attr, 0))[1] -= 1; */
+/*     if (REAL(VECTOR_ELT(attr, 0))[1] == 0) { */
+/*       UNPROTECT_PTR(attr); */
+/*     } */
+/*     REAL(VECTOR_ELT(newattr, 0))[0] = 0; */
+/*     REAL(VECTOR_ELT(newattr, 0))[1] = 1; */
+/*     attr=graph->attr=newattr; */
+/*   } */
+
+/*   /\* Vertices *\/ */
+/*   val=VECTOR_ELT(attr, 2); */
+/*   valno=GET_LENGTH(val); */
+/*   for (i=0; i<valno; i++) { */
+/*     SEXP oldva=VECTOR_ELT(val, i), newva, ss; */
+/*     long int origlen=GET_LENGTH(oldva); */
+/*     long int newlen=0, j; */
+/*     for (j=0; j<igraph_vector_size(vidx); j++) { */
+/*       if (VECTOR(*vidx)[j] > 0) { */
+/* 	newlen++; */
+/*       } */
+/*     } */
+/*     PROTECT(ss=NEW_NUMERIC(newlen)); */
+/*     for (j=0; j<origlen; j++) { */
+/*       if (VECTOR(*vidx)[j]>0) { */
+/* 	REAL(ss)[(long int)VECTOR(*vidx)[j]-1]=j+1; */
+/*       } */
+/*     } */
+/*     PROTECT(newva=EVAL(lang3(install("["), oldva, ss))); */
+/*     SET_VECTOR_ELT(val, i, newva); */
+/*     UNPROTECT(2); */
+/*   }     */
+
+/*   /\* Edges *\/ */
+/*   eal=VECTOR_ELT(attr, 3); */
+/*   ealno=GET_LENGTH(eal); */
+/*   for (i=0; i<ealno; i++) { */
+/*     SEXP oldea=VECTOR_ELT(eal, i), newea, ss; */
+/*     long int origlen=GET_LENGTH(oldea); */
+/*     long int newlen=0, j; */
+/*     /\* calculate new length *\/ */
+/*     for (j=0; j<origlen; j++) { */
+/*       if (VECTOR(*eidx)[j] > 0) { */
+/* 	newlen++; */
+/*       } */
+/*     }     */
+/*     PROTECT(ss=NEW_NUMERIC(newlen)); */
+/*     for (j=0; j<origlen; j++) { */
+/*       if (VECTOR(*eidx)[j]>0) { */
+/* 	REAL(ss)[(long int)VECTOR(*eidx)[j]-1]=j+1; */
+/*       } */
+/*     } */
+/*     PROTECT(newea=EVAL(lang3(install("["), oldea, ss))); */
+/*     SET_VECTOR_ELT(eal, i, newea); */
+/*     UNPROTECT(2); */
+/*   } */
+/* } */
+
+int R_igraph_attribute_permute_vertices(igraph_t *graph,
+					const igraph_vector_t *idx) {
+  
   SEXP attr=graph->attr;
-  SEXP eal, val;
-  long int valno, ealno, i;
+  SEXP val;
+  long int i, valno;
+  long int idxlen=igraph_vector_size(idx);
+  SEXP ss;
+
+  /* We copy if we need to */
   if (REAL(VECTOR_ELT(attr, 0))[0]+REAL(VECTOR_ELT(attr, 0))[1] > 1) {
     SEXP newattr;
     PROTECT(newattr=duplicate(attr));
@@ -312,54 +382,30 @@ void R_igraph_attribute_delete_vertices(igraph_t *graph,
     attr=graph->attr=newattr;
   }
 
-  /* Vertices */
-  val=VECTOR_ELT(attr, 2);
+  val=VECTOR_ELT(attr,2);
   valno=GET_LENGTH(val);
+
+  /* If we have no vertex attributes, then we don't need to do anything */
+  if (valno==0) { return 0; }
+
+  /* Convert idx to an R object, we will use this for indexing */
+  PROTECT(ss=NEW_INTEGER(idxlen));
+  for (i=0; i<idxlen; i++) {
+    INTEGER(ss)[i] = VECTOR(*idx)[i]+1;
+  }
+  
   for (i=0; i<valno; i++) {
-    SEXP oldva=VECTOR_ELT(val, i), newva, ss;
-    long int origlen=GET_LENGTH(oldva);
-    long int newlen=0, j;
-    for (j=0; j<igraph_vector_size(vidx); j++) {
-      if (VECTOR(*vidx)[j] > 0) {
-	newlen++;
-      }
-    }
-    PROTECT(ss=NEW_NUMERIC(newlen));
-    for (j=0; j<origlen; j++) {
-      if (VECTOR(*vidx)[j]>0) {
-	REAL(ss)[(long int)VECTOR(*vidx)[j]-1]=j+1;
-      }
-    }
+    SEXP oldva=VECTOR_ELT(val, i);
+    SEXP newva;
+  
     PROTECT(newva=EVAL(lang3(install("["), oldva, ss)));
     SET_VECTOR_ELT(val, i, newva);
-    UNPROTECT(2);
-  }    
-
-  /* Edges */
-  eal=VECTOR_ELT(attr, 3);
-  ealno=GET_LENGTH(eal);
-  for (i=0; i<ealno; i++) {
-    SEXP oldea=VECTOR_ELT(eal, i), newea, ss;
-    long int origlen=GET_LENGTH(oldea);
-    long int newlen=0, j;
-    /* calculate new length */
-    for (j=0; j<origlen; j++) {
-      if (VECTOR(*eidx)[j] > 0) {
-	newlen++;
-      }
-    }    
-    PROTECT(ss=NEW_NUMERIC(newlen));
-    for (j=0; j<origlen; j++) {
-      if (VECTOR(*eidx)[j]>0) {
-	REAL(ss)[(long int)VECTOR(*eidx)[j]-1]=j+1;
-      }
-    }
-    PROTECT(newea=EVAL(lang3(install("["), oldea, ss)));
-    SET_VECTOR_ELT(eal, i, newea);
-    UNPROTECT(2);
+    UNPROTECT(1);
   }
+  
+  UNPROTECT(1);
+  return 0;
 }
-
 
 int R_igraph_attribute_add_edges(igraph_t *graph, 
 				 const igraph_vector_t *edges,
@@ -492,52 +538,57 @@ int R_igraph_attribute_add_edges(igraph_t *graph,
   return 0;
 }
 
-void R_igraph_attribute_delete_edges(igraph_t *graph, 
-				     const igraph_vector_t *idx) {
-  SEXP attr=graph->attr;
-  SEXP eal;
-  long int ealno, i;
-  if (REAL(VECTOR_ELT(attr, 0))[0]+REAL(VECTOR_ELT(attr, 0))[1] > 1) {
-    SEXP newattr;
-    PROTECT(newattr=duplicate(attr));
-    REAL(VECTOR_ELT(attr, 0))[1] -= 1;
-    if (REAL(VECTOR_ELT(attr, 0))[1] == 0) {
-      UNPROTECT_PTR(attr);
-    }
-    REAL(VECTOR_ELT(newattr, 0))[0] = 0;
-    REAL(VECTOR_ELT(newattr, 0))[1] = 1;
-    attr=graph->attr=newattr;
-  }
+/* void R_igraph_attribute_delete_edges(igraph_t *graph,  */
+/* 				     const igraph_vector_t *idx) { */
+/*   SEXP attr=graph->attr; */
+/*   SEXP eal; */
+/*   long int ealno, i; */
+/*   if (REAL(VECTOR_ELT(attr, 0))[0]+REAL(VECTOR_ELT(attr, 0))[1] > 1) { */
+/*     SEXP newattr; */
+/*     PROTECT(newattr=duplicate(attr)); */
+/*     REAL(VECTOR_ELT(attr, 0))[1] -= 1; */
+/*     if (REAL(VECTOR_ELT(attr, 0))[1] == 0) { */
+/*       UNPROTECT_PTR(attr); */
+/*     } */
+/*     REAL(VECTOR_ELT(newattr, 0))[0] = 0; */
+/*     REAL(VECTOR_ELT(newattr, 0))[1] = 1; */
+/*     attr=graph->attr=newattr; */
+/*   } */
 
-  eal=VECTOR_ELT(attr, 3);
-  ealno=GET_LENGTH(eal);
-  for (i=0; i<ealno; i++) {
-    SEXP oldea=VECTOR_ELT(eal, i), newea, ss;
-    long int origlen=GET_LENGTH(oldea);
-    long int newlen=0, j;
-    /* create subscript vector */
-    for (j=0; j<origlen; j++) {
-      if (VECTOR(*idx)[j] > 0) {
-	newlen++;
-      }
-    }
-    PROTECT(ss=NEW_NUMERIC(newlen));
-    for (j=0; j<origlen; j++) {
-      if (VECTOR(*idx)[j] > 0) {
-	REAL(ss)[(long int)VECTOR(*idx)[j]-1] = j+1;
-      }
-    }
-    PROTECT(newea=EVAL(lang3(install("["), oldea, ss)));
-    SET_VECTOR_ELT(eal, i, newea);
-    UNPROTECT(2);
-  }
-}
+/*   eal=VECTOR_ELT(attr, 3); */
+/*   ealno=GET_LENGTH(eal); */
+/*   for (i=0; i<ealno; i++) { */
+/*     SEXP oldea=VECTOR_ELT(eal, i), newea, ss; */
+/*     long int origlen=GET_LENGTH(oldea); */
+/*     long int newlen=0, j; */
+/*     /\* create subscript vector *\/ */
+/*     for (j=0; j<origlen; j++) { */
+/*       if (VECTOR(*idx)[j] > 0) { */
+/* 	newlen++; */
+/*       } */
+/*     } */
+/*     PROTECT(ss=NEW_NUMERIC(newlen)); */
+/*     for (j=0; j<origlen; j++) { */
+/*       if (VECTOR(*idx)[j] > 0) { */
+/* 	REAL(ss)[(long int)VECTOR(*idx)[j]-1] = j+1; */
+/*       } */
+/*     } */
+/*     PROTECT(newea=EVAL(lang3(install("["), oldea, ss))); */
+/*     SET_VECTOR_ELT(eal, i, newea); */
+/*     UNPROTECT(2); */
+/*   } */
+/* } */
 
 int R_igraph_attribute_permute_edges(igraph_t *graph,
 				     const igraph_vector_t *idx) {
+  
   SEXP attr=graph->attr;
   SEXP eal;
-  long int ealno, i;
+  long int i, ealno;
+  long int idxlen=igraph_vector_size(idx);
+  SEXP ss;
+  
+  /* We copy if we need to */
   if (REAL(VECTOR_ELT(attr, 0))[0]+REAL(VECTOR_ELT(attr, 0))[1] > 1) {
     SEXP newattr;
     PROTECT(newattr=duplicate(attr));
@@ -550,21 +601,31 @@ int R_igraph_attribute_permute_edges(igraph_t *graph,
     attr=graph->attr=newattr;
   }
 
-  eal=VECTOR_ELT(attr, 3);
+  eal=VECTOR_ELT(attr,3);
   ealno=GET_LENGTH(eal);
+  
+  /* If we have no edge attributes, then we don't need to do anything */
+  if (ealno==0) { return 0; }
+
+  /* Convert idx to an R object, we will use this for indexing */
+  PROTECT(ss=NEW_INTEGER(idxlen));
+  for (i=0; i<idxlen; i++) {
+    INTEGER(ss)[i] = VECTOR(*idx)[i]+1;
+  }
+  
   for (i=0; i<ealno; i++) {
-    SEXP oldea=VECTOR_ELT(eal, i), newea, ss;
-    long int j;
-    long int newlen=igraph_vector_size(idx);
-    /* create subscript vector */
-    PROTECT(ss=NEW_NUMERIC(newlen));
-    for (j=0; j<newlen; j++) {
-      REAL(ss)[j] = VECTOR(*idx)[j];
-    }
+    SEXP oldea=VECTOR_ELT(eal, i);
+    SEXP newea;
+  
+    /* We do NOT do any copying, the attributes were already copied, 
+       we're doing this in place. */
     PROTECT(newea=EVAL(lang3(install("["), oldea, ss)));
     SET_VECTOR_ELT(eal, i, newea);
-    UNPROTECT(2);
+    UNPROTECT(1);
   }
+  
+  UNPROTECT(1);
+  
   return 0;
 }
 
@@ -848,8 +909,8 @@ int R_igraph_attribute_get_string_edge_attr(const igraph_t *graph,
 igraph_attribute_table_t R_igraph_attribute_table={
   &R_igraph_attribute_init, &R_igraph_attribute_destroy,
   &R_igraph_attribute_copy, &R_igraph_attribute_add_vertices,
-  &R_igraph_attribute_delete_vertices, &R_igraph_attribute_add_edges,
-  &R_igraph_attribute_delete_edges, &R_igraph_attribute_permute_edges,
+  &R_igraph_attribute_permute_vertices, &R_igraph_attribute_add_edges,
+  &R_igraph_attribute_permute_edges,
   &R_igraph_attribute_get_info,
   &R_igraph_attribute_has_attr, &R_igraph_attribute_gettype,
   &R_igraph_attribute_get_numeric_graph_attr,
