@@ -370,47 +370,94 @@ int R_igraph_attribute_permute_vertices(const igraph_t *graph,
 					igraph_t *newgraph,
 					const igraph_vector_t *idx) {
 
-  /* All we do here, is just indexing the 'graph' vertex attributes
-     and put the results into newgraph. Reference counting and such 
-     was already done earlier....  */
-  
-  SEXP attr=graph->attr;
-  SEXP toattr=newgraph->attr;
-  SEXP val, toval;
-  SEXP names;
-  long int i, valno;
-  long int idxlen=igraph_vector_size(idx);
-  SEXP ss;
+  if (graph == newgraph) {
 
-  val=VECTOR_ELT(attr,2);
-  valno=GET_LENGTH(val);
+    SEXP attr=newgraph->attr;
+    SEXP val, toval;
+    SEXP names;
+    long int i, valno;
+    long int idxlen=igraph_vector_size(idx);
+    SEXP ss;
 
-  /* If we have no vertex attributes, then we don't need to do anything */
-  if (valno==0) { return 0; }
+    /* We copy if we need to */
+    if (REAL(VECTOR_ELT(attr, 0))[0]+REAL(VECTOR_ELT(attr, 0))[1] > 1) {
+      SEXP newattr;
+      PROTECT(newattr=duplicate(attr));
+      REAL(VECTOR_ELT(attr, 0))[1] -= 1;
+      if (REAL(VECTOR_ELT(attr, 0))[1] == 0) {
+	UNPROTECT_PTR(attr);
+      }
+      REAL(VECTOR_ELT(newattr, 0))[0] = 0;
+      REAL(VECTOR_ELT(newattr, 0))[1] = 1;
+      attr=newgraph->attr=newattr;
+    }
 
-  /* Convert idx to an R object, we will use this for indexing */
-  PROTECT(ss=NEW_INTEGER(idxlen));
-  for (i=0; i<idxlen; i++) {
-    INTEGER(ss)[i] = VECTOR(*idx)[i]+1;
-  }
+    val=VECTOR_ELT(attr,2);
+    valno=GET_LENGTH(val);
+    
+    /* If we have no vertex attributes, then we don't need to do anything */
+    if (valno==0) { return 0; }
+    
+    /* Convert idx to an R object, we will use this for indexing */
+    PROTECT(ss=NEW_INTEGER(idxlen));
+    for (i=0; i<idxlen; i++) {
+      INTEGER(ss)[i] = VECTOR(*idx)[i]+1;
+    }
+    
+    for (i=0; i<valno; i++) {
+      SEXP oldva=VECTOR_ELT(val, i);
+      SEXP newva;
+      
+      /* We do NOT do any copying, the attributes were already copied, 
+	 we're doing this in place. */
+      PROTECT(newva=EVAL(lang3(install("["), oldva, ss)));
+      SET_VECTOR_ELT(val, i, newva);
+      UNPROTECT(1);
+    }
+    
+    UNPROTECT(1);    
 
-  /* Resize the vertex attribute list in 'newgraph' */
-  PROTECT(toval=NEW_LIST(valno));
-  PROTECT(names=GET_NAMES(val));
-  SET_NAMES(toval, names);
-  UNPROTECT(1);
+  } else {
 
-  for (i=0; i<valno; i++) {
-    SEXP oldva=VECTOR_ELT(val, i);
-    SEXP newva;
-  
-    PROTECT(newva=EVAL(lang3(install("["), oldva, ss)));
-    SET_VECTOR_ELT(toval, i, newva);
+    SEXP attr=graph->attr;
+    SEXP toattr=newgraph->attr;
+    SEXP val, toval;
+    SEXP names;
+    long int i, valno;
+    long int idxlen=igraph_vector_size(idx);
+    SEXP ss;
+
+    val=VECTOR_ELT(attr,2);
+    valno=GET_LENGTH(val);
+    
+    /* If we have no vertex attributes, then we don't need to do anything */
+    if (valno==0) { return 0; }
+    
+    /* Convert idx to an R object, we will use this for indexing */
+    PROTECT(ss=NEW_INTEGER(idxlen));
+    for (i=0; i<idxlen; i++) {
+      INTEGER(ss)[i] = VECTOR(*idx)[i]+1;
+    }
+    
+    /* Resize the vertex attribute list in 'newgraph' */
+    PROTECT(toval=NEW_LIST(valno));
+    PROTECT(names=GET_NAMES(val));
+    SET_NAMES(toval, names);
     UNPROTECT(1);
+    
+    for (i=0; i<valno; i++) {
+      SEXP oldva=VECTOR_ELT(val, i);
+      SEXP newva;
+      
+      PROTECT(newva=EVAL(lang3(install("["), oldva, ss)));
+      SET_VECTOR_ELT(toval, i, newva);
+      UNPROTECT(1);
+    }
+    
+    SET_VECTOR_ELT(toattr, 2, toval);
+    UNPROTECT(2);
   }
   
-  SET_VECTOR_ELT(toattr, 2, toval);
-  UNPROTECT(2);
   return 0;
 }
 
@@ -586,52 +633,96 @@ int R_igraph_attribute_add_edges(igraph_t *graph,
 /*   } */
 /* } */
 
-int R_igraph_attribute_permute_edges(igraph_t *graph,
+int R_igraph_attribute_permute_edges(const igraph_t *graph,
+				     igraph_t *newgraph,
 				     const igraph_vector_t *idx) {
-  
-  SEXP attr=graph->attr;
-  SEXP eal;
-  long int i, ealno;
-  long int idxlen=igraph_vector_size(idx);
-  SEXP ss;
-  
-  /* We copy if we need to */
-  if (REAL(VECTOR_ELT(attr, 0))[0]+REAL(VECTOR_ELT(attr, 0))[1] > 1) {
-    SEXP newattr;
-    PROTECT(newattr=duplicate(attr));
-    REAL(VECTOR_ELT(attr, 0))[1] -= 1;
-    if (REAL(VECTOR_ELT(attr, 0))[1] == 0) {
+
+  if (graph==newgraph) {
+    
+    SEXP attr=newgraph->attr;
+    SEXP eal;
+    long int i, ealno;
+    long int idxlen=igraph_vector_size(idx);
+    SEXP ss;
+    
+    /* We copy if we need to */
+    if (REAL(VECTOR_ELT(attr, 0))[0]+REAL(VECTOR_ELT(attr, 0))[1] > 1) {
+      SEXP newattr;
+      PROTECT(newattr=duplicate(attr));
+      REAL(VECTOR_ELT(attr, 0))[1] -= 1;
+      if (REAL(VECTOR_ELT(attr, 0))[1] == 0) {
       UNPROTECT_PTR(attr);
+      }
+      REAL(VECTOR_ELT(newattr, 0))[0] = 0;
+      REAL(VECTOR_ELT(newattr, 0))[1] = 1;
+      attr=newgraph->attr=newattr;
     }
-    REAL(VECTOR_ELT(newattr, 0))[0] = 0;
-    REAL(VECTOR_ELT(newattr, 0))[1] = 1;
-    attr=graph->attr=newattr;
-  }
-
-  eal=VECTOR_ELT(attr,3);
-  ealno=GET_LENGTH(eal);
-  
-  /* If we have no edge attributes, then we don't need to do anything */
-  if (ealno==0) { return 0; }
-
-  /* Convert idx to an R object, we will use this for indexing */
-  PROTECT(ss=NEW_INTEGER(idxlen));
-  for (i=0; i<idxlen; i++) {
-    INTEGER(ss)[i] = VECTOR(*idx)[i]+1;
-  }
-  
-  for (i=0; i<ealno; i++) {
-    SEXP oldea=VECTOR_ELT(eal, i);
-    SEXP newea;
-  
-    /* We do NOT do any copying, the attributes were already copied, 
-       we're doing this in place. */
-    PROTECT(newea=EVAL(lang3(install("["), oldea, ss)));
-    SET_VECTOR_ELT(eal, i, newea);
+    
+    eal=VECTOR_ELT(attr,3);
+    ealno=GET_LENGTH(eal);
+    
+    /* If we have no edge attributes, then we don't need to do anything */
+    if (ealno==0) { return 0; }
+    
+    /* Convert idx to an R object, we will use this for indexing */
+    PROTECT(ss=NEW_INTEGER(idxlen));
+    for (i=0; i<idxlen; i++) {
+      INTEGER(ss)[i] = VECTOR(*idx)[i]+1;
+    }
+    
+    for (i=0; i<ealno; i++) {
+      SEXP oldea=VECTOR_ELT(eal, i);
+      SEXP newea;
+      
+      /* We do NOT do any copying, the attributes were already copied, 
+	 we're doing this in place. */
+      PROTECT(newea=EVAL(lang3(install("["), oldea, ss)));
+      SET_VECTOR_ELT(eal, i, newea);
+      UNPROTECT(1);
+    }
+    
     UNPROTECT(1);
+
+  } else { 
+
+    SEXP attr=graph->attr;
+    SEXP toattr=newgraph->attr;
+    SEXP eal, toeal;
+    SEXP names;
+    long int i, ealno;
+    long int idxlen=igraph_vector_size(idx);
+    SEXP ss;
+
+    eal=VECTOR_ELT(attr,3);
+    ealno=GET_LENGTH(eal);
+    
+    /* If we have no vertex attributes, then we don't need to do anything */
+    if (ealno==0) { return 0; }
+    
+    /* Convert idx to an R object, we will use this for indexing */
+    PROTECT(ss=NEW_INTEGER(idxlen));
+    for (i=0; i<idxlen; i++) {
+      INTEGER(ss)[i] = VECTOR(*idx)[i]+1;
+    }
+    
+    /* Resize the vertex attribute list in 'newgraph' */
+    PROTECT(toeal=NEW_LIST(ealno));
+    PROTECT(names=GET_NAMES(eal));
+    SET_NAMES(toeal, names);
+    UNPROTECT(1);
+    
+    for (i=0; i<ealno; i++) {
+      SEXP oldea=VECTOR_ELT(eal, i);
+      SEXP newea;
+      
+      PROTECT(newea=EVAL(lang3(install("["), oldea, ss)));
+      SET_VECTOR_ELT(toeal, i, newea);
+      UNPROTECT(1);
+    }
+    
+    SET_VECTOR_ELT(toattr, 3, toeal);
+    UNPROTECT(2);
   }
-  
-  UNPROTECT(1);
   
   return 0;
 }
