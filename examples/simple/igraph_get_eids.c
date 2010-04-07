@@ -171,7 +171,7 @@ int check_multi() {
   igraph_barabasi_game(&g, /*n=*/ NODES, /*m=*/ 3, 
 		       /*outseq=*/ 0, /*outpref=*/ 0,
 		       /*directed=*/ 1);
-  igraph_simplify(&g, /*multiple=*/ 1, /*loops=*/ 0);
+  igraph_simplify(&g, /*multiple=*/ 1, /*loops=*/ 0, /*edge_comb=*/ 0);
 
   igraph_vector_init(&eids, NODES/2);
   igraph_random_sample(&eids, 0, igraph_ecount(&g)-1, NODES/2);

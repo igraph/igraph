@@ -40,6 +40,7 @@
 #include "igraph_matrix.h"
 #include "igraph_datatype.h"
 #include "igraph_iterators.h"
+#include "igraph_attributes.h"
 
 __BEGIN_DECLS
 
@@ -64,7 +65,9 @@ int igraph_subgraph(const igraph_t *graph, igraph_t *res,
 		    const igraph_vs_t vids);
 int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res, 
 		    const igraph_es_t eids, igraph_bool_t delete_vertices);
-int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops);
+int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, 
+		    igraph_bool_t loops,
+		    const igraph_attribute_combination_t *edge_comb);
 int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 		       igraph_bool_t ignore_loops);
 

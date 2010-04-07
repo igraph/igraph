@@ -77,7 +77,7 @@ int main() {
 		       /* outpref= */  0,
 		       /* directed= */ 0);
   
-  igraph_simplify(&g, /* multiple= */ 1, /* loops= */ 1);
+  igraph_simplify(&g, /* multiple= */ 1, /* loops= */ 1, /*edge_comb=*/ 0);
   
   igraph_vector_init(&bet, 0);
   igraph_vector_init(&bbet, 0);

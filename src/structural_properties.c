@@ -1932,13 +1932,17 @@ int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
  * \param graph The graph object.
  * \param multiple Logical, if true, multiple edges will be removed. 
  * \param loops Logical, if true, loops (self edges) will be removed.
+ * \param edge_comb What to do with the edge attributes. See the igraph 
+ *        manual section about attributes for details.
  * \return Error code:
  *    \c IGRAPH_ENOMEM if we are out of memory.
  *
  * Time complexity: O(|V|+|E|).
  */
 
-int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops) {
+int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, 
+		    igraph_bool_t loops, 
+		    const igraph_attribute_combination_t *edge_comb) {
 
   igraph_vector_t edges=IGRAPH_VECTOR_NULL;
   igraph_vector_t neis=IGRAPH_VECTOR_NULL;

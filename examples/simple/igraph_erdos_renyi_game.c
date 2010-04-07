@@ -57,7 +57,7 @@ int main() {
 			    IGRAPH_DIRECTED, IGRAPH_LOOPS);
     if (igraph_vcount(&g) != 10) { return 5; }
     if (igraph_ecount(&g) != 10*10) { return 77; }
-    igraph_simplify(&g, /*multiple=*/0, /*loops=*/1);
+    igraph_simplify(&g, /*multiple=*/0, /*loops=*/1, /*edge_comb=*/ 0);
     if (igraph_ecount(&g) != 10*9) { return 77; }
     igraph_destroy(&g);
   }
@@ -68,7 +68,7 @@ int main() {
 			    IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
     if (igraph_vcount(&g) != 10) { return 7; }
     if (igraph_ecount(&g) != 10*(10-1)) { return 77; }
-    igraph_simplify(&g, /*multiple=*/0, /*loops=*/1);
+    igraph_simplify(&g, /*multiple=*/0, /*loops=*/1, /*edge_comb=*/ 0);
     if (igraph_ecount(&g) != 10*9) { return 77; }
     igraph_destroy(&g);
   }
@@ -79,7 +79,7 @@ int main() {
 			    IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
     if (igraph_vcount(&g) != 10) { return 9; }
     if (igraph_ecount(&g) != 10*(10+1)/2) { return 77; }
-    igraph_simplify(&g, /*multiple=*/0, /*loops=*/1);
+    igraph_simplify(&g, /*multiple=*/0, /*loops=*/1, /*edge_comb=*/ 0);
     if (igraph_ecount(&g) != 10*(10-1)/2) { return 77; }
     igraph_destroy(&g);
   }
@@ -90,7 +90,7 @@ int main() {
 			    IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     if (igraph_vcount(&g) != 10) { return 11; }
     if (igraph_ecount(&g) != 10*(10-1)/2) { return 77; }
-    igraph_simplify(&g, /*multiple=*/0, /*loops=*/1);
+    igraph_simplify(&g, /*multiple=*/0, /*loops=*/1, /*edge_comb=*/ 0);
     if (igraph_ecount(&g) != 10*(10-1)/2) { return 77; }
     igraph_destroy(&g);
   }    
@@ -129,7 +129,7 @@ int main() {
 			    IGRAPH_DIRECTED, IGRAPH_LOOPS);
     if (igraph_vcount(&g) != 10) { return 13; }
     if (igraph_ecount(&g) != 10*10-1) { return 14; }
-    igraph_simplify(&g, /*multiple=*/0, /*loops=*/1);
+    igraph_simplify(&g, /*multiple=*/0, /*loops=*/1, /*edge_comb=*/ 0);
     igraph_is_simple(&g, &simple);
     if (!simple) { return 27; }
     ec=igraph_ecount(&g);
@@ -145,7 +145,7 @@ int main() {
     if (!simple) { return 28; }
     if (igraph_vcount(&g) != 10) { return 16; }
     if (igraph_ecount(&g) != 10*(10-1)-1) { return 17; }
-    igraph_simplify(&g, /*multiple=*/0, /*loops=*/1);
+    igraph_simplify(&g, /*multiple=*/0, /*loops=*/1, /*edge_comb=*/ 0);
     if (igraph_ecount(&g) != 10*9-1) { return 18; }
     igraph_destroy(&g);
   }
@@ -157,7 +157,7 @@ int main() {
 			    IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
     if (igraph_vcount(&g) != 10) { return 19; }
     if (igraph_ecount(&g) != 10*(10+1)/2-1) { return 20; }
-    igraph_simplify(&g, /*multiple=*/0, /*loops=*/1);
+    igraph_simplify(&g, /*multiple=*/0, /*loops=*/1, /*edge_comb=*/ 0);
     igraph_is_simple(&g, &simple);
     if (!simple) { return 29; }
     ec=igraph_ecount(&g);
@@ -173,7 +173,7 @@ int main() {
     if (!simple) { return 30; }
     if (igraph_vcount(&g) != 10) { return 22; }
     if (igraph_ecount(&g) != 10*(10-1)/2-1) { return 23; }
-    igraph_simplify(&g, /*multiple=*/0, /*loops=*/1);
+    igraph_simplify(&g, /*multiple=*/0, /*loops=*/1, /*edge_comb=*/ 0);
     if (igraph_ecount(&g) != 10*(10-1)/2-1) { return 24; }
     igraph_destroy(&g);
   }  
@@ -197,7 +197,7 @@ int main() {
 			  IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
   if (igraph_vcount(&g) != 100000) { return 26; }
   if (igraph_ecount(&g) != 200000) { return 26; }
-  igraph_simplify(&g, 0, 1);	/* only remove loops */
+  igraph_simplify(&g, 0, 1, /*edge_comb=*/ 0);	/* only remove loops */
   igraph_is_simple(&g, &simple);
   if (!simple) { return 33; }
   igraph_destroy(&g);
@@ -205,7 +205,7 @@ int main() {
 			  IGRAPH_DIRECTED, IGRAPH_LOOPS);
   if (igraph_vcount(&g) != 100000) { return 26; }
   if (igraph_ecount(&g) != 200000) { return 26; }
-  igraph_simplify(&g, 0, 1);	/* only remove loops */
+  igraph_simplify(&g, 0, 1, /*edge_comb=*/ 0);	/* only remove loops */
   igraph_is_simple(&g, &simple);
   if (!simple) { return 34; }
   igraph_destroy(&g);
