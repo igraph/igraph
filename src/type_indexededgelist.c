@@ -572,7 +572,8 @@ int igraph_delete_vertices(igraph_t *graph, const igraph_vs_t vertices) {
 				     &newgraph.ii, remaining_vertices));
   
   /* attributes */
-  IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, 1,1,1);
+  IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, 
+			  /*graph=*/ 1, /*vertex=*/0, /*edge=*/1);
   IGRAPH_FINALLY_CLEAN(6);
   IGRAPH_FINALLY(igraph_destroy, &newgraph);
 
@@ -585,7 +586,8 @@ int igraph_delete_vertices(igraph_t *graph, const igraph_vs_t vertices) {
 	VECTOR(idx)[ j-1 ] = i;
       }
     }
-    IGRAPH_CHECK(igraph_i_attribute_permute_vertices(&newgraph, 
+    IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph,
+						     &newgraph,
 						     &idx));
     IGRAPH_CHECK(igraph_vector_resize(&idx, remaining_edges));
     for (i=0; i<no_of_edges; i++) {

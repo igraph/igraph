@@ -323,6 +323,9 @@ igraph_set_error_handler(igraph_error_handler_t* new_handler);
  * \enumval IGARPH_GLP_EMIPGAP GLPK error (GLP_EMIPGAP).
  * \enumval IGARPH_GLP_ETMLIM GLPK error (GLP_ETMLIM).
  * \enumval IGARPH_GLP_ESTOP GLPK error (GLP_ESTOP).
+ * \enumval IGRAPH_EATTRIBUTES Attribute handler error. The user is not 
+ *   expected to find this; it is signalled if some igraph function is
+ *   not using the attribute handler interface properly.
  */
 
 typedef enum {
@@ -375,7 +378,8 @@ typedef enum {
   IGRAPH_GLP_EFAIL        = 47, 
   IGRAPH_GLP_EMIPGAP      = 48,
   IGRAPH_GLP_ETMLIM       = 49,
-  IGRAPH_GLP_ESTOP        = 50
+  IGRAPH_GLP_ESTOP        = 50,
+  IGRAPH_EATTRIBUTES      = 51
 } igraph_error_type_t;
 
 /**

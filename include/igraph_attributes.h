@@ -189,7 +189,9 @@ typedef struct igraph_attribute_table_t {
   int (*copy)(igraph_t *to, const igraph_t *from, igraph_bool_t ga,
 	      igraph_bool_t va, igraph_bool_t ea);
   int (*add_vertices)(igraph_t *graph, long int nv, igraph_vector_ptr_t *attr);
-  int (*permute_vertices)(igraph_t *graph, const igraph_vector_t *idx);
+  int (*permute_vertices)(const igraph_t *graph, 
+			  igraph_t *newgraph,
+			  const igraph_vector_t *idx);
   int (*add_edges)(igraph_t *graph, const igraph_vector_t *edges, 
 		   igraph_vector_ptr_t *attr);
   int (*permute_edges)(igraph_t *graph, const igraph_vector_t *idx);
@@ -243,7 +245,8 @@ void igraph_i_attribute_destroy(igraph_t *graph);
 int igraph_i_attribute_copy(igraph_t *to, const igraph_t *from, 
 			    igraph_bool_t ga, igraph_bool_t va, igraph_bool_t ea);
 int igraph_i_attribute_add_vertices(igraph_t *graph, long int nv, void *attr);
-int igraph_i_attribute_permute_vertices(igraph_t *graph, 
+int igraph_i_attribute_permute_vertices(const igraph_t *graph,
+					igraph_t *newgraph,
 					const igraph_vector_t *idx);
 int igraph_i_attribute_add_edges(igraph_t *graph, 
 				 const igraph_vector_t *edges, void *attr);

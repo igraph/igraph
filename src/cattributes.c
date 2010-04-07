@@ -345,19 +345,47 @@ int igraph_i_cattribute_add_vertices(igraph_t *graph, long int nv,
   return 0;
 }
 
-int igraph_i_cattribute_permute_vertices(igraph_t *graph,
+void igraph_i_cattribute_permute_vertices_free(igraph_vector_ptr_t *v) {
+  /* TODO */
+}
+
+int igraph_i_cattribute_permute_vertices(const igraph_t *graph,
+					 igraph_t *newgraph,
 					 const igraph_vector_t *idx) {
   
   igraph_i_cattributes_t *attr=graph->attr;
   igraph_vector_ptr_t *val=&attr->val;
   long int valno=igraph_vector_ptr_size(val);
   long int i;
+
+  /* New vertex attributes */
+  igraph_i_cattributes_t *new_attr=newgraph->attr;
+  igraph_vector_ptr_t *new_val=&new_attr->val;
+  if (igraph_vector_ptr_size(new_val) != 0) { 
+    IGRAPH_ERROR("Vertex attributes were already copied", 
+		 IGRAPH_EATTRIBUTES);
+  }
+  IGRAPH_CHECK(igraph_vector_ptr_resize(new_val, valno));
+
+  IGRAPH_FINALLY(igraph_i_cattribute_permute_vertices_free, new_val);
   
   for (i=0; i<valno; i++) {
     igraph_i_attribute_record_t *oldrec=VECTOR(*val)[i];
     igraph_attribute_type_t type=oldrec->type;
     igraph_vector_t *num, *newnum;
     igraph_strvector_t *str, *newstr;
+
+    /* The record itself */
+    igraph_i_attribute_record_t *new_rec=
+      igraph_Calloc(1, igraph_i_attribute_record_t);
+    if (!new_rec) { 
+      IGRAPH_ERROR("Cannot create vertex attributes", IGRAPH_ENOMEM);
+    }
+    new_rec->name = strdup(oldrec->name);
+    new_rec->type = oldrec->type;
+    VECTOR(*new_val)[i]=new_rec;
+
+    /* The data */
     switch (type) {
     case IGRAPH_ATTRIBUTE_NUMERIC:
       num=(igraph_vector_t*)oldrec->value;
@@ -367,9 +395,7 @@ int igraph_i_cattribute_permute_vertices(igraph_t *graph,
       }
       IGRAPH_VECTOR_INIT_FINALLY(newnum, 0);
       igraph_vector_index(num, newnum, idx);
-      oldrec->value=newnum;
-      igraph_vector_destroy(num);
-      igraph_Free(num);
+      new_rec->value=newnum;
       IGRAPH_FINALLY_CLEAN(1);
       break;
     case IGRAPH_ATTRIBUTE_STRING:
@@ -381,16 +407,15 @@ int igraph_i_cattribute_permute_vertices(igraph_t *graph,
       IGRAPH_CHECK(igraph_strvector_init(newstr, 0));
       IGRAPH_FINALLY(igraph_strvector_destroy, newstr);
       igraph_strvector_index(str, newstr, idx);
-      oldrec->value=newstr;
-      igraph_strvector_destroy(str);
-      igraph_Free(str);
+      new_rec->value=newstr;
       IGRAPH_FINALLY_CLEAN(1);
       break;
     default:
       IGRAPH_WARNING("Unknown vertex attribute ignored");
     }
   }
-  
+
+  IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
 
