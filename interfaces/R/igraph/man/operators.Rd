@@ -64,9 +64,10 @@ x \%u\% y
   in the second graph.
 
   \code{graph.complementer} keeps graph and vertex attriubutes, edge
-  attributes are lost. The other functions do not handle vertex and edge
-  attributes, the new graph will have no attributes at all. Yes, this is
-  considered to be a bug, so will likely change in the near future.
+  attributes are lost. \code{graph.difference} keeps all attributes
+  (graph, vertex and edge) of the first graph.
+  The other functions do not handle vertex and edge
+  attributes, the new graph will have no attributes at all.
 }
 \value{
 A new graph object.
@@ -83,5 +84,19 @@ graph.intersection(g1, g2)
 graph.difference(g1, g2)
 graph.complementer(g2)
 graph.compose(g1, g2)
+
+## graph complementer keeps graph and vertex attributes
+g2$layout <- layout.circle
+V(g2)$name <- letters[1:vcount(g2)]
+cg2 <- graph.complementer(g2)
+cg2$layout
+V(cg2)$name
+
+## graph difference keeps the attributes of the first graph
+g1$name <- "Ring"
+V(g1)$name <- LETTERS[1:vcount(g1)]
+E(g1)$weight <- round(runif(ecount(g1))*10)
+dg <- graph.difference(g1, g2)
+print(dg, g=TRUE, v=TRUE, e=TRUE)
 }
 \keyword{graphs}
