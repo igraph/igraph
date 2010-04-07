@@ -70,7 +70,7 @@ typedef struct igraph_i_graphml_attribute_record_t {
   enum { I_GRAPHML_BOOLEAN, I_GRAPHML_INTEGER, I_GRAPHML_LONG,
 	 I_GRAPHML_FLOAT, I_GRAPHML_DOUBLE, I_GRAPHML_STRING,
 	 I_GRAPHML_UNKNOWN_TYPE } type;	/* GraphML type */
-  igraph_i_attribute_record_t record;
+  igraph_attribute_record_t record;
 } igraph_i_graphml_attribute_record_t;
 
 struct igraph_i_graphml_parser_state {
@@ -294,7 +294,7 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
     (struct igraph_i_graphml_parser_state*)state0;
   long i, l;
   int r;
-  igraph_i_attribute_record_t idrec, eidrec;
+  igraph_attribute_record_t idrec, eidrec;
   const char *idstr="id";
   igraph_bool_t already_has_vertex_id=0, already_has_edge_id=0;
 
@@ -334,7 +334,7 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
     for (i=0; i<igraph_vector_ptr_size(&state->v_attrs); i++) {
       igraph_i_graphml_attribute_record_t *graphmlrec=
 	VECTOR(state->v_attrs)[i];
-      igraph_i_attribute_record_t *rec=&graphmlrec->record;
+      igraph_attribute_record_t *rec=&graphmlrec->record;
 
       /* Check that the name of the vertex attribute is not 'id'.
 	 If it is then we cannot the complimentary 'id' attribute. */
@@ -376,7 +376,7 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
     for (i=0; i<igraph_vector_ptr_size(&state->e_attrs); i++) {
       igraph_i_graphml_attribute_record_t *graphmlrec=
 	VECTOR(state->e_attrs)[i];
-      igraph_i_attribute_record_t *rec=&graphmlrec->record;
+      igraph_attribute_record_t *rec=&graphmlrec->record;
 
       if (! strcmp(rec->name, idstr)) {
 	already_has_edge_id=1;
@@ -423,7 +423,7 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
     for (i=0; i<igraph_vector_ptr_size(&state->g_attrs); i++) {
       igraph_i_graphml_attribute_record_t *graphmlrec=
 	VECTOR(state->g_attrs)[i];
-      igraph_i_attribute_record_t *rec=&graphmlrec->record;
+      igraph_attribute_record_t *rec=&graphmlrec->record;
       if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
 	igraph_vector_t *vec=(igraph_vector_t*)rec->value;
 	long int origsize=igraph_vector_size(vec);
@@ -632,7 +632,7 @@ void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parser_state
   igraph_trie_t *trie=0;
   igraph_vector_ptr_t *ptrvector=0;
   igraph_i_graphml_attribute_record_t *graphmlrec;
-  igraph_i_attribute_record_t *rec;
+  igraph_attribute_record_t *rec;
   long int recid, id=0;
   int ret;
   

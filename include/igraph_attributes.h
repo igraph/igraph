@@ -112,11 +112,11 @@ typedef enum { IGRAPH_ATTRIBUTE_DEFAULT=0,
 	       IGRAPH_ATTRIBUTE_R_OBJECT=3, 
 	       IGRAPH_ATTRIBUTE_PY_OBJECT=4 } igraph_attribute_type_t;
 
-typedef struct igraph_i_attribute_record_t {
+typedef struct igraph_attribute_record_t {
   const char *name;
   igraph_attribute_type_t type;
   const void *value;
-} igraph_i_attribute_record_t;
+} igraph_attribute_record_t;
 
 typedef enum { IGRAPH_ATTRIBUTE_GRAPH=0,
 	       IGRAPH_ATTRIBUTE_VERTEX,

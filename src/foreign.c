@@ -195,7 +195,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
   long int no_predefined=0;
   igraph_vector_ptr_t name, weight;
   igraph_vector_ptr_t *pname=0, *pweight=0;
-  igraph_i_attribute_record_t namerec, weightrec;
+  igraph_attribute_record_t namerec, weightrec;
   const char *namestr="name", *weightstr="weight";
 
   IGRAPH_CHECK(igraph_empty(graph, 0, directed));
@@ -349,7 +349,7 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
   igraph_trie_t trie=IGRAPH_TRIE_NULL;
   igraph_vector_ptr_t name, weight;
   igraph_vector_ptr_t *pname=0, *pweight=0;
-  igraph_i_attribute_record_t namerec, weightrec;
+  igraph_attribute_record_t namerec, weightrec;
   const char *namestr="name", *weightstr="weight";
   
   IGRAPH_VECTOR_INIT_FINALLY(&ws, 0);
@@ -591,7 +591,7 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     IGRAPH_ERROR("invalid vertex count in Pajek file", IGRAPH_EINVAL);
 
   for (i=0; i<igraph_vector_ptr_size(&eattrs); i++) {
-    igraph_i_attribute_record_t *rec=VECTOR(eattrs)[i];
+    igraph_attribute_record_t *rec=VECTOR(eattrs)[i];
     if (rec->type==IGRAPH_ATTRIBUTE_NUMERIC) {
       igraph_vector_t *vec=(igraph_vector_t*)rec->value;
       long int origsize=igraph_vector_size(vec);
@@ -615,7 +615,7 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
   IGRAPH_CHECK(igraph_add_edges(graph, &edges, &eattrs));
 
   for (i=0; i<igraph_vector_ptr_size(&vattrs); i++) {
-    igraph_i_attribute_record_t *rec=VECTOR(vattrs)[i];
+    igraph_attribute_record_t *rec=VECTOR(vattrs)[i];
     if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
       igraph_vector_t *vec=(igraph_vector_t*) rec->value;
       igraph_vector_destroy(vec);
@@ -630,7 +630,7 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
   }
 
   for (i=0; i<igraph_vector_ptr_size(&eattrs); i++) {
-    igraph_i_attribute_record_t *rec=VECTOR(eattrs)[i];
+    igraph_attribute_record_t *rec=VECTOR(eattrs)[i];
     if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
       igraph_vector_t *vec=(igraph_vector_t*) rec->value;
       igraph_vector_destroy(vec);
@@ -973,7 +973,7 @@ void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {
     long int j;
     vec=ptr[i];
     for (j=0; j<igraph_vector_ptr_size(vec); j++) {
-      igraph_i_attribute_record_t *atrec=VECTOR(*vec)[j];
+      igraph_attribute_record_t *atrec=VECTOR(*vec)[j];
       if (atrec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
 	igraph_vector_t *value=(igraph_vector_t*)atrec->value;
 	igraph_vector_destroy(value);
@@ -1173,7 +1173,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 	IGRAPH_CHECK(igraph_trie_get(&vattrnames, name, &trieid));
 	if (trieid==triesize) {
 	  /* new attribute */
-	  igraph_i_attribute_record_t *atrec=igraph_Calloc(1, igraph_i_attribute_record_t);
+	  igraph_attribute_record_t *atrec=igraph_Calloc(1, igraph_attribute_record_t);
 	  int type=igraph_gml_tree_type(node, j);
 	  if (!atrec) {
 	    IGRAPH_ERROR("Cannot read GML file", IGRAPH_ENOMEM);
@@ -1187,7 +1187,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 	  }
 	} else {
 	  /* already seen, should we update type? */
-	  igraph_i_attribute_record_t *atrec=VECTOR(vattrs)[trieid];
+	  igraph_attribute_record_t *atrec=VECTOR(vattrs)[trieid];
 	  int type1=atrec->type;
 	  int type2=igraph_gml_tree_type(node, j);
 	  if (type1==IGRAPH_ATTRIBUTE_NUMERIC && type2==IGRAPH_I_GML_TREE_STRING) {
@@ -1237,7 +1237,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 	  IGRAPH_CHECK(igraph_trie_get(&eattrnames, name, &trieid));
 	  if (trieid==triesize) {
 	    /* new attribute */
-	    igraph_i_attribute_record_t *atrec=igraph_Calloc(1, igraph_i_attribute_record_t);
+	    igraph_attribute_record_t *atrec=igraph_Calloc(1, igraph_attribute_record_t);
 	    int type=igraph_gml_tree_type(edge, j);
 	    if (!atrec) {
 	      IGRAPH_ERROR("Cannot read GML file", IGRAPH_ENOMEM);
@@ -1251,7 +1251,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 	    }
 	  } else {
 	    /* already seen, should we update type? */
-	    igraph_i_attribute_record_t *atrec=VECTOR(eattrs)[trieid];
+	    igraph_attribute_record_t *atrec=VECTOR(eattrs)[trieid];
 	    int type1=atrec->type;
 	    int type2=igraph_gml_tree_type(edge, j);
 	    if (type1==IGRAPH_ATTRIBUTE_NUMERIC && type2==IGRAPH_I_GML_TREE_STRING) {
@@ -1278,7 +1278,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
   
   /* now we allocate the vectors and strvectors for the attributes */
   for (i=0; i<igraph_vector_ptr_size(&vattrs); i++) {
-    igraph_i_attribute_record_t *atrec=VECTOR(vattrs)[i];
+    igraph_attribute_record_t *atrec=VECTOR(vattrs)[i];
     int type=atrec->type;
     if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
       igraph_vector_t *p=igraph_Calloc(1, igraph_vector_t);
@@ -1294,7 +1294,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
   }
 
   for (i=0; i<igraph_vector_ptr_size(&eattrs); i++) {
-    igraph_i_attribute_record_t *atrec=VECTOR(eattrs)[i];
+    igraph_attribute_record_t *atrec=VECTOR(eattrs)[i];
     int type=atrec->type;
     if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
       igraph_vector_t *p=igraph_Calloc(1, igraph_vector_t);
@@ -1327,7 +1327,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
       } else {
 	long int edgeid=edgeptr/2;
 	long int trieidx;
-	igraph_i_attribute_record_t *atrec;
+	igraph_attribute_record_t *atrec;
 	int type;
 	igraph_trie_get(&eattrnames, n, &trieidx);
 	atrec=VECTOR(eattrs)[trieidx];
@@ -1369,7 +1369,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
       igraph_trie_get(&trie, name, &id);
       for (j=0; j<igraph_gml_tree_length(node); j++) {
 	const char *aname=igraph_gml_tree_name(node, j);
-	igraph_i_attribute_record_t *atrec;
+	igraph_attribute_record_t *atrec;
 	int type;
 	igraph_trie_get(&vattrnames, aname, &k);
 	atrec=VECTOR(vattrs)[k];
@@ -2779,7 +2779,7 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
   const igraph_strvector_t *namevec=0;
   igraph_vector_ptr_t name, weight;
   igraph_vector_ptr_t *pname=0, *pweight=0;
-  igraph_i_attribute_record_t namerec, weightrec;
+  igraph_attribute_record_t namerec, weightrec;
   const char *namestr="name", *weightstr="weight";
 
   igraph_dl_yyin=instream;

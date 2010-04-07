@@ -475,7 +475,7 @@ int igraph_weighted_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
   igraph_vector_t weights=IGRAPH_VECTOR_NULL;
   const char* default_attr = "weight";
   igraph_vector_ptr_t attr_vec;
-  igraph_i_attribute_record_t attr_rec;
+  igraph_attribute_record_t attr_rec;
   long int no_of_nodes;
 
   /* Some checks */

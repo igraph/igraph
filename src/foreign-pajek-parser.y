@@ -509,12 +509,12 @@ int igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
   long int attrsize=igraph_trie_size(names);
   long int id;
   igraph_vector_t *na;
-  igraph_i_attribute_record_t *rec;
+  igraph_attribute_record_t *rec;
 
   igraph_trie_get(names, attrname, &id);
   if (id == attrsize) {
     /* add a new attribute */
-    rec=igraph_Calloc(1, igraph_i_attribute_record_t);
+    rec=igraph_Calloc(1, igraph_attribute_record_t);
     na=igraph_Calloc(1, igraph_vector_t);
     igraph_vector_init(na, count);
     rec->name=strdup(attrname);
@@ -551,13 +551,13 @@ int igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
   long int attrsize=igraph_trie_size(names);
   long int id;
   igraph_strvector_t *na;
-  igraph_i_attribute_record_t *rec;
+  igraph_attribute_record_t *rec;
   long int i;
 
   igraph_trie_get(names, attrname, &id);
   if (id == attrsize) {
     /* add a new attribute */
-    rec=igraph_Calloc(1, igraph_i_attribute_record_t);
+    rec=igraph_Calloc(1, igraph_attribute_record_t);
     na=igraph_Calloc(1, igraph_strvector_t);
     igraph_strvector_init(na, count);
     for (i=0; i<count; i++) {
