@@ -69,8 +69,14 @@ void igraphmodule_igraph_warning_hook(const char *reason, const char *file,
 void igraphmodule_igraph_error_hook(const char *reason, const char *file,
 				    int line, int igraph_errno) {
   char buf[4096];
+  PyObject *exc = igraphmodule_InternalError;
+
+  if (igraph_errno == IGRAPH_UNIMPLEMENTED)
+      exc = PyExc_NotImplementedError;
+
   sprintf(buf, "Error at %s:%i: %s, %s", file, line, reason,
 	  igraph_strerror(igraph_errno));
   IGRAPH_FINALLY_FREE();
-  PyErr_SetString(igraphmodule_InternalError, buf);
+
+  PyErr_SetString(exc, buf);
 }
