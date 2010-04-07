@@ -27,6 +27,7 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 from math import ceil
 
 __all__ = ["Palette", "GradientPalette", "AdvancedGradientPalette", \
+    "PrecalculatedPalette", "ClusterColoringPalette", \
     "color_name_to_rgb", "palettes", "known_colors"]
 
 class Palette(object):
