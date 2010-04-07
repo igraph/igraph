@@ -122,6 +122,31 @@ typedef enum { IGRAPH_ATTRIBUTE_GRAPH=0,
 	       IGRAPH_ATTRIBUTE_VERTEX,
 	       IGRAPH_ATTRIBUTE_EDGE } igraph_attribute_elemtype_t;
 
+typedef enum {
+  IGRAPH_ATTRIBUTE_COMBINE_IGNORE=0,
+  IGRAPH_ATTRIBUTE_COMBINE_DEFAULT,
+  IGRAPH_ATTRIBUTE_COMBINE_FUNCTION,
+  IGRAPH_ATTRIBUTE_COMBINE_SUM,
+  IGRAPH_ATTRIBUTE_COMBINE_PROD,
+  IGRAPH_ATTRIBUTE_COMBINE_MIN,
+  IGRAPH_ATTRIBUTE_COMBINE_MAX,
+  IGRAPH_ATTRIBUTE_COMBINE_RANDOM,
+  IGRAPH_ATTRIBUTE_COMBINE_FIRST,
+  IGRAPH_ATTRIBUTE_COMBINE_LAST,
+  IGRAPH_ATTRIBUTE_COMBINE_MEAN,
+  IGRAPH_ATTRIBUTE_COMBINE_MEDIAN,
+  IGRAPG_ATTRIBUTE_COMBINE_CONCAT } igraph_attribute_combination_type_t;
+
+typedef struct igraph_attribute_combination_record_t {
+  const char *name;		/* can be NULL, meaning: the rest */
+  igraph_attribute_combination_type_t type;
+  void *func;
+} igraph_attribute_combination_record_t;
+
+typedef struct igraph_attribute_combination_t {
+  igraph_vector_ptr_t list;
+} igraph_attribute_combination_t;
+
 /**
  * \struct igraph_attribute_table_t
  * \brief Table of functions to perform operations on attributes
@@ -146,6 +171,9 @@ typedef enum { IGRAPH_ATTRIBUTE_GRAPH=0,
  *    from a graph. The supplied index vector defines which old vertex
  *    a new vertex corresponds to. Its length must be the same as the
  *    number of vertices in the new graph.
+ * \member combine_vertices This function is called when the creation
+ *    of a new graph involves a merge (contraction, etc.) of vertices
+ *    from another graph. 
  * \member add_edges Called when new edges have been added. The number
  *    of new edges are supplied as well. It is expected to return an
  *    error code.
