@@ -67,7 +67,20 @@ int igraph_i_attribute_permute_vertices(const igraph_t *graph,
     return 0;
   }
 }
-  
+
+int igraph_i_attribute_combine_vertices(const igraph_t *graph,
+			igraph_t *newgraph,
+			igraph_integer_t newvid,
+			const igraph_vector_t *oldvids,
+			const igraph_attribute_combination_t *comb) {
+  if (igraph_i_attribute_table) {
+    return igraph_i_attribute_table->combine_vertices(graph, newgraph, 
+						      newvid, oldvids,
+						      comb);
+  } else {
+    return 0;
+  }
+} 
   
 int igraph_i_attribute_add_edges(igraph_t *graph, 
 				 const igraph_vector_t *edges, void *attr) {
@@ -87,6 +100,20 @@ int igraph_i_attribute_permute_edges(const igraph_t *graph,
     return 0;
   }
 }
+
+int igraph_i_attribute_combine_edges(const igraph_t *graph,
+			igraph_t *newgraph,
+			igraph_integer_t neweid,
+			const igraph_vector_t *oldeids,
+			const igraph_attribute_combination_t *comb) {
+  if (igraph_i_attribute_table) {
+    return igraph_i_attribute_table->combine_edges(graph, newgraph, 
+						   neweid, oldeids,
+						   comb);
+  } else {
+    return 0;
+  }
+} 
 
 int igraph_i_attribute_get_info(const igraph_t *graph,
 				igraph_strvector_t *gnames, 

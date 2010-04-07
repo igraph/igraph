@@ -100,7 +100,7 @@ int R_igraph_attribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
   gal=VECTOR_ELT(result, 1);
   PROTECT(names=NEW_CHARACTER(attrno));
   for (i=0; i<attrno; i++) {
-    igraph_i_attribute_record_t *rec=VECTOR(*attr)[i];
+    igraph_attribute_record_t *rec=VECTOR(*attr)[i];
     igraph_vector_t *vec;
     igraph_strvector_t *strvec;
     SET_STRING_ELT(names, i, mkChar(rec->name));
@@ -203,7 +203,7 @@ int R_igraph_attribute_add_vertices(igraph_t *graph, long int nv,
   newattrs=0;
   IGRAPH_VECTOR_INIT_FINALLY(&news, 0);
   for (i=0; i<nattrno; i++) {
-    igraph_i_attribute_record_t *nattr_entry=VECTOR(*nattr)[i];
+    igraph_attribute_record_t *nattr_entry=VECTOR(*nattr)[i];
     const char *nname=nattr_entry->name;
     long int j; 
     igraph_bool_t l=0;
@@ -222,7 +222,7 @@ int R_igraph_attribute_add_vertices(igraph_t *graph, long int nv,
     PROTECT(rep=EVAL(lang3(install("rep"), ScalarLogical(NA_LOGICAL), 
 			   ScalarInteger(origlen))));
     for (i=0; i<newattrs; i++) {
-      igraph_i_attribute_record_t *tmp=
+      igraph_attribute_record_t *tmp=
 	VECTOR(*nattr)[(long int)VECTOR(news)[i]];
       SET_VECTOR_ELT(app, i, rep);
       SET_STRING_ELT(newnames, i, CREATE_STRING_VECTOR(tmp->name));
@@ -248,13 +248,13 @@ int R_igraph_attribute_add_vertices(igraph_t *graph, long int nv,
     igraph_bool_t l=0;
     long int j;
     for (j=0; !l && j<nattrno; j++) {
-      igraph_i_attribute_record_t *tmp=VECTOR(*nattr)[j];
+      igraph_attribute_record_t *tmp=VECTOR(*nattr)[j];
       l=!strcmp(sexpname, tmp->name);
     }
     if (l) {
       /* This attribute is present in nattr */
       SEXP app=0;
-      igraph_i_attribute_record_t *tmprec=VECTOR(*nattr)[j-1];
+      igraph_attribute_record_t *tmprec=VECTOR(*nattr)[j-1];
       switch (tmprec->type) {
       case IGRAPH_ATTRIBUTE_NUMERIC:
 	if (nv != igraph_vector_size(tmprec->value)) {
@@ -461,6 +461,15 @@ int R_igraph_attribute_permute_vertices(const igraph_t *graph,
   return 0;
 }
 
+int R_igraph_attribute_combine_vertices(const igraph_t *graph,
+			 igraph_t *newgraph,
+			 igraph_integer_t newvid,
+			 const igraph_vector_t *oldvids,
+			 const igraph_attribute_combination_t *comb) {
+  /* TODO */
+  return 0;
+}
+
 int R_igraph_attribute_add_edges(igraph_t *graph, 
 				 const igraph_vector_t *edges,
 				 igraph_vector_ptr_t *nattr) {
@@ -495,7 +504,7 @@ int R_igraph_attribute_add_edges(igraph_t *graph,
   newattrs=0;
   IGRAPH_VECTOR_INIT_FINALLY(&news, 0);
   for (i=0; i<nattrno; i++) {
-    igraph_i_attribute_record_t *nattr_entry=VECTOR(*nattr)[i];
+    igraph_attribute_record_t *nattr_entry=VECTOR(*nattr)[i];
     const char *nname=nattr_entry->name;
     long int j;
     igraph_bool_t l=0;
@@ -514,7 +523,7 @@ int R_igraph_attribute_add_edges(igraph_t *graph,
     PROTECT(rep=EVAL(lang3(install("rep"), ScalarLogical(NA_LOGICAL),
 			   ScalarInteger(origlen))));
     for (i=0; i<newattrs; i++) {
-      igraph_i_attribute_record_t *tmp=
+      igraph_attribute_record_t *tmp=
 	VECTOR(*nattr)[ (long int) VECTOR(news)[i]];
       SET_VECTOR_ELT(app, i, rep);
       SET_STRING_ELT(newnames, i, CREATE_STRING_VECTOR(tmp->name));
@@ -540,13 +549,13 @@ int R_igraph_attribute_add_edges(igraph_t *graph,
     igraph_bool_t l=0;
     long int j;
     for (j=0; !l && j<nattrno; j++) {
-      igraph_i_attribute_record_t *tmp=VECTOR(*nattr)[j];
+      igraph_attribute_record_t *tmp=VECTOR(*nattr)[j];
       l=!strcmp(sexpname, tmp->name);
     }
     if (l) {
       /* This attribute is present in nattr */
       SEXP app=0;
-      igraph_i_attribute_record_t *tmprec=VECTOR(*nattr)[j-1];
+      igraph_attribute_record_t *tmprec=VECTOR(*nattr)[j-1];
       switch (tmprec->type) {
       case IGRAPH_ATTRIBUTE_NUMERIC:
 	if (ne != igraph_vector_size(tmprec->value)) {
@@ -724,6 +733,15 @@ int R_igraph_attribute_permute_edges(const igraph_t *graph,
     UNPROTECT(2);
   }
   
+  return 0;
+}
+
+int R_igraph_attribute_combine_edges(const igraph_t *graph,
+			 igraph_t *newgraph,
+			 igraph_integer_t neweid,
+			 const igraph_vector_t *oldeids,
+			 const igraph_attribute_combination_t *comb) {
+  /* TODO */
   return 0;
 }
 
@@ -1007,8 +1025,11 @@ int R_igraph_attribute_get_string_edge_attr(const igraph_t *graph,
 igraph_attribute_table_t R_igraph_attribute_table={
   &R_igraph_attribute_init, &R_igraph_attribute_destroy,
   &R_igraph_attribute_copy, &R_igraph_attribute_add_vertices,
-  &R_igraph_attribute_permute_vertices, &R_igraph_attribute_add_edges,
+  &R_igraph_attribute_permute_vertices, 
+  &R_igraph_attribute_combine_vertices,
+  &R_igraph_attribute_add_edges,
   &R_igraph_attribute_permute_edges,
+  &R_igraph_attribute_combine_edges,
   &R_igraph_attribute_get_info,
   &R_igraph_attribute_has_attr, &R_igraph_attribute_gettype,
   &R_igraph_attribute_get_numeric_graph_attr,
@@ -3713,7 +3734,7 @@ SEXP R_igraph_simplify(SEXP graph, SEXP pmultiple, SEXP ploops) {
   R_igraph_before();
   
   R_SEXP_to_igraph_copy(graph, &g);
-  igraph_simplify(&g, multiple, loops);
+  igraph_simplify(&g, multiple, loops, /*edge_comb=*/0); /* TODO */
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   

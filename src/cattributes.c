@@ -466,6 +466,15 @@ int igraph_i_cattribute_permute_vertices(const igraph_t *graph,
   return 0;
 }
 
+int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
+			 igraph_t *newgraph,
+			 igraph_integer_t newvid,
+			 const igraph_vector_t *oldvids,
+			 const igraph_attribute_combination_t *comb) {
+  /* TODO */
+  return 0;
+}
+
 /* void igraph_i_cattribute_delete_vertices(igraph_t *graph, */
 /* 				       const igraph_vector_t *eidx, */
 /* 				       const igraph_vector_t *vidx) { */
@@ -815,7 +824,14 @@ int igraph_i_cattribute_permute_edges(const igraph_t *graph,
   return 0;
 }
 
-
+int igraph_i_cattribute_combine_edges(const igraph_t *graph,
+			 igraph_t *newgraph,
+			 igraph_integer_t neweid,
+			 const igraph_vector_t *oldeids,
+			 const igraph_attribute_combination_t *comb) {
+  /* TODO */
+  return 0;
+}
 
 int igraph_i_cattribute_get_info(const igraph_t *graph,
 				 igraph_strvector_t *gnames,
@@ -1124,8 +1140,10 @@ int igraph_i_cattribute_get_string_edge_attr(const igraph_t *graph,
 igraph_attribute_table_t igraph_cattribute_table={
   &igraph_i_cattribute_init, &igraph_i_cattribute_destroy,
   &igraph_i_cattribute_copy, &igraph_i_cattribute_add_vertices,
-  &igraph_i_cattribute_permute_vertices, &igraph_i_cattribute_add_edges,
+  &igraph_i_cattribute_permute_vertices, 
+  &igraph_i_cattribute_combine_vertices, &igraph_i_cattribute_add_edges,
   &igraph_i_cattribute_permute_edges,
+  &igraph_i_cattribute_combine_edges,
   &igraph_i_cattribute_get_info,
   &igraph_i_cattribute_has_attr, &igraph_i_cattribute_gettype,
   &igraph_i_cattribute_get_numeric_graph_attr,
