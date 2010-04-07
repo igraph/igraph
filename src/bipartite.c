@@ -241,8 +241,7 @@ int igraph_i_bipartite_projection(const igraph_t *graph,
   
   IGRAPH_I_ATTRIBUTE_DESTROY(proj);
   IGRAPH_I_ATTRIBUTE_COPY(proj, graph, 1, 0, 0);
-  /*  For this we need the new attribute handling interface first... */
-  /*   IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph, proj, &vertex_perm)); */
+  IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph, proj, &vertex_perm));
   igraph_vector_destroy(&vertex_perm);
   IGRAPH_FINALLY_CLEAN(2);
   
