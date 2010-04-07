@@ -292,7 +292,7 @@ class Plot(object):
         """
         if opacity<0.0 or opacity>1.0:
             raise ValueError, "opacity must be between 0.0 and 1.0"
-        bbox = bbox or (0,0,self._width,self._height)
+        bbox = bbox or self.bounding_box
         if not isinstance(bbox, BoundingBox): bbox = BoundingBox(bbox)
         self._objects.append((object, bbox, palette, opacity, args, kwds))
         self.mark_dirty()
@@ -415,6 +415,29 @@ class Plot(object):
                 # we wait here a little bit. Yes, this is quite hackish :(
                 time.sleep(5)
         self._close_tmpfile()
+
+    @property
+    def bounding_box(self):
+        """Returns the bounding box of the Cairo surface as a
+        L{BoundingBox} object"""
+        return BoundingBox(self._width, self._height)
+
+    @property
+    def height(self):
+        """Returns the height of the Cairo surface on which the plot
+        is drawn"""
+        return self._height
+
+    @property
+    def surface(self):
+        """Returns the Cairo surface on which the plot is drawn"""
+        return self._surface
+
+    @property
+    def width(self):
+        """Returns the width of the Cairo surface on which the plot
+        is drawn"""
+        return self._width
 
 #####################################################################
 
