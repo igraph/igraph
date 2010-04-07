@@ -387,61 +387,45 @@ static int igraphmodule_i_attribute_add_vertices(igraph_t *graph, long int nv, i
   return IGRAPH_SUCCESS;
 }
 
-static void igraphmodule_i_attribute_delete_edges(igraph_t *graph, const igraph_vector_t *idx);
-
-/* Deleting vertices */
-static void igraphmodule_i_attribute_delete_vertices(igraph_t *graph,
-                                         const igraph_vector_t *eidx,
-                                         const igraph_vector_t *vidx) {
-  long int n, i, ndeleted=0;
-  PyObject *key, *value, *dict, *o;
+/* Permuting vertices */
+static int igraphmodule_i_attribute_permute_vertices(const igraph_t *graph,
+    igraph_t *newgraph, const igraph_vector_t *idx) {
+  long int n, i;
+  PyObject *key, *value, *dict, *newdict, *newlist, *o;
   Py_ssize_t pos=0;
   
-  /* Reindexing vertices */
   dict=ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_VERTEX];
-  if (!PyDict_Check(dict)) return;
+  if (!PyDict_Check(dict)) return 1;
 
-  n=igraph_vector_size(vidx);
-  for (i=0; i<n; i++) {
-    /*printf("%ld:%f ", i, VECTOR(*idx)[i]);*/
-    if (!VECTOR(*vidx)[i]) {
-      ndeleted++;
-      continue;
-    }
+  newdict=PyDict_New();
+  if (!newdict) return 1;
 
-    pos=0;
-    /* TODO: maybe it would be more efficient to get the values from the
-     * hash in advance? */
-    while (PyDict_Next(dict, &pos, &key, &value)) {
-      /* Move the element from index i to VECTOR(*idx)[i]-1 */
-      o=PyList_GetItem(value, i);
-      if (!o) {
-        /* IndexError is already set, clear it and return */
-        PyErr_Clear();
-        return;
-      }
-      Py_INCREF(o);   /* take ownership, since PyList_SetItem will steal it */
-      PyList_SetItem(value, VECTOR(*vidx)[i]-1, o);
-    }
-  }
-  /*printf("\n");*/
-  
-  /* Clear the remaining parts of the lists that aren't needed anymore */
+  n=igraph_vector_size(idx);
   pos=0;
+
   while (PyDict_Next(dict, &pos, &key, &value)) {
-    n=PySequence_Size(value);
-    if (PySequence_DelSlice(value, n-ndeleted, n) == -1) return;
-    /*printf("key: "); PyObject_Print(key, stdout, Py_PRINT_RAW); printf("\n");
-    printf("value: "); PyObject_Print(value, stdout, Py_PRINT_RAW); printf("\n");*/
+    newlist=PyList_New(n);
+    for (i=0; i<n; i++) {
+      o=PyList_GetItem(value, VECTOR(*idx)[i]);
+      if (!o) {
+        PyErr_Clear();
+        return 1;
+      }
+      Py_INCREF(o);
+      PyList_SET_ITEM(newlist, i, o);
+    }
+    PyDict_SetItem(newdict, key, newlist);
+    Py_DECREF(newlist);
   }
-  
+
+  dict = ATTR_STRUCT_DICT(newgraph)[ATTRHASH_IDX_VERTEX];
+  ATTR_STRUCT_DICT(newgraph)[ATTRHASH_IDX_VERTEX]=newdict;
+  Py_DECREF(dict);
+
   /* Invalidate the vertex name index */
-  igraphmodule_i_attribute_struct_invalidate_vertex_name_index(ATTR_STRUCT(graph));
+  igraphmodule_i_attribute_struct_invalidate_vertex_name_index(ATTR_STRUCT(newgraph));
 
-  /* Delete the attributes of the edges adjacent to the deleted vertices */
-  igraphmodule_i_attribute_delete_edges(graph, eidx);
-
-  return;
+  return 0;
 }
 
 /* Adding edges */
@@ -576,7 +560,8 @@ static int igraphmodule_i_attribute_add_edges(igraph_t *graph, const igraph_vect
   return IGRAPH_SUCCESS;
 }
 
-/* Deleting edges */
+/* Deleting edges, currently unused */
+/*
 static void igraphmodule_i_attribute_delete_edges(igraph_t *graph, const igraph_vector_t *idx) {
   long int n, i, ndeleted=0;
   PyObject *key, *value, *dict, *o;
@@ -587,44 +572,36 @@ static void igraphmodule_i_attribute_delete_edges(igraph_t *graph, const igraph_
 
   n=igraph_vector_size(idx);
   for (i=0; i<n; i++) {
-    /* printf("%ld:%f ", i, VECTOR(*idx)[i]); */
     if (!VECTOR(*idx)[i]) {
       ndeleted++;
       continue;
     }
 
     pos=0;
-    /* TODO: maybe it would be more efficient to get the values from the
-     * hash in advance? */
     while (PyDict_Next(dict, &pos, &key, &value)) {
-      /* Move the element from index i to VECTOR(*idx)[i]-1 */
       o=PyList_GetItem(value, i);
       if (!o) {
-	/* IndexError is already set, clear it and return */
-	PyErr_Clear();
-	return;
+        PyErr_Clear();
+        return;
       }
       Py_INCREF(o);
       PyList_SetItem(value, VECTOR(*idx)[i]-1, o);
     }
   }
-  /*printf("\n");*/
   
-  /* Clear the remaining parts of the lists that aren't needed anymore */
   pos=0;
   while (PyDict_Next(dict, &pos, &key, &value)) {
     n=PySequence_Size(value);
     if (PySequence_DelSlice(value, n-ndeleted, n) == -1) return;
-    /*printf("key: "); PyObject_Print(key, stdout, Py_PRINT_RAW); printf("\n");
-    printf("value: "); PyObject_Print(value, stdout, Py_PRINT_RAW); printf("\n");*/
   }
   
   return;
 }
+*/
 
 /* Permuting edges */
-static int igraphmodule_i_attribute_permute_edges(igraph_t *graph,
-						  const igraph_vector_t *idx) { 
+static int igraphmodule_i_attribute_permute_edges(const igraph_t *graph,
+    igraph_t *newgraph, const igraph_vector_t *idx) { 
   long int n, i;
   PyObject *key, *value, *dict, *newdict, *newlist, *o;
   Py_ssize_t pos=0;
@@ -641,7 +618,7 @@ static int igraphmodule_i_attribute_permute_edges(igraph_t *graph,
   while (PyDict_Next(dict, &pos, &key, &value)) {
     newlist=PyList_New(n);
     for (i=0; i<n; i++) {
-      o=PyList_GetItem(value, VECTOR(*idx)[i]-1);
+      o=PyList_GetItem(value, VECTOR(*idx)[i]);
       if (!o) {
         PyErr_Clear();
         return 1;
@@ -653,7 +630,8 @@ static int igraphmodule_i_attribute_permute_edges(igraph_t *graph,
     Py_DECREF(newlist);
   }
 
-  ((PyObject**)graph->attr)[2]=newdict;
+  dict = ATTR_STRUCT_DICT(newgraph)[ATTRHASH_IDX_EDGE];
+  ATTR_STRUCT_DICT(newgraph)[ATTRHASH_IDX_EDGE]=newdict;
   Py_DECREF(dict);
 
   return 0;
@@ -1010,9 +988,8 @@ static igraph_attribute_table_t igraphmodule_attribute_table = {
   igraphmodule_i_attribute_destroy,
   igraphmodule_i_attribute_copy,
   igraphmodule_i_attribute_add_vertices,
-  igraphmodule_i_attribute_delete_vertices,
+  igraphmodule_i_attribute_permute_vertices,
   igraphmodule_i_attribute_add_edges,
-  igraphmodule_i_attribute_delete_edges,
   igraphmodule_i_attribute_permute_edges,
   igraphmodule_i_attribute_get_info,
   igraphmodule_i_attribute_has_attr,
