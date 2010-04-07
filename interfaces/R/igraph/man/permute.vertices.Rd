@@ -17,7 +17,10 @@ permute.vertices(graph, permutation)
   This function creates a new graph from the input graph by permuting
   its vertices according to the specified mapping. Call this function
   with the output of \code{\link{canonical.permutation}} to create
-  the canonical form of a graph.  
+  the canonical form of a graph.
+
+  \code{permute.vertices} keeps all graph, vertex and edge attributes of
+  the graph.
 }
 \value{A new graph object.}
 %\references{}
@@ -28,5 +31,16 @@ permute.vertices(graph, permutation)
 g <- random.graph.game(20, 50, type="gnm")
 g2 <- permute.vertices(g, sample(vcount(g))-1)
 graph.isomorphic(g, g2)
+
+# Permutation keeps all attributes
+g$name <- "Random graph, Gnm, 20, 50"
+V(g)$name <- letters[1:vcount(g)]
+E(g)$weight <- sample(1:5, ecount(g), replace=TRUE)
+g2 <- permute.vertices(g, sample(vcount(g))-1)
+graph.isomorphic(g, g2)
+g2$name
+V(g2)$name
+E(g2)$weight
+all(sort(E(g2)$weight) == sort(E(g)$weight))
 }
 \keyword{graphs}
