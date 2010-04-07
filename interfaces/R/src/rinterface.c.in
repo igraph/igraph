@@ -140,6 +140,12 @@ void R_igraph_attribute_destroy(igraph_t *graph) {
   graph->attr=0;
 }
 
+/* If not copying all three attribute kinds are requested, then 
+   we don't refcount, but really copy the requested ones, because 
+   1) we can only refcount all three at the same time, and 
+   2) the not-copied attributes will be set up by subsequent calls 
+      to permute_vertices and/or permute/edges anyway. */
+
 int R_igraph_attribute_copy(igraph_t *to, const igraph_t *from,
 			    igraph_bool_t ga, igraph_bool_t va, igraph_bool_t ea) {
   SEXP fromattr=from->attr;
@@ -360,27 +366,21 @@ int R_igraph_attribute_add_vertices(igraph_t *graph, long int nv,
 /*   } */
 /* } */
 
-int R_igraph_attribute_permute_vertices(igraph_t *graph,
+int R_igraph_attribute_permute_vertices(const igraph_t *graph,
+					igraph_t *newgraph,
 					const igraph_vector_t *idx) {
+
+  /* All we do here, is just indexing the 'graph' vertex attributes
+     and put the results into newgraph. Reference counting and such 
+     was already done earlier....  */
   
   SEXP attr=graph->attr;
-  SEXP val;
+  SEXP toattr=newgraph->attr;
+  SEXP val, toval;
+  SEXP names;
   long int i, valno;
   long int idxlen=igraph_vector_size(idx);
   SEXP ss;
-
-  /* We copy if we need to */
-  if (REAL(VECTOR_ELT(attr, 0))[0]+REAL(VECTOR_ELT(attr, 0))[1] > 1) {
-    SEXP newattr;
-    PROTECT(newattr=duplicate(attr));
-    REAL(VECTOR_ELT(attr, 0))[1] -= 1;
-    if (REAL(VECTOR_ELT(attr, 0))[1] == 0) {
-      UNPROTECT_PTR(attr);
-    }
-    REAL(VECTOR_ELT(newattr, 0))[0] = 0;
-    REAL(VECTOR_ELT(newattr, 0))[1] = 1;
-    attr=graph->attr=newattr;
-  }
 
   val=VECTOR_ELT(attr,2);
   valno=GET_LENGTH(val);
@@ -393,17 +393,24 @@ int R_igraph_attribute_permute_vertices(igraph_t *graph,
   for (i=0; i<idxlen; i++) {
     INTEGER(ss)[i] = VECTOR(*idx)[i]+1;
   }
-  
+
+  /* Resize the vertex attribute list in 'newgraph' */
+  PROTECT(toval=NEW_LIST(valno));
+  PROTECT(names=GET_NAMES(val));
+  SET_NAMES(toval, names);
+  UNPROTECT(1);
+
   for (i=0; i<valno; i++) {
     SEXP oldva=VECTOR_ELT(val, i);
     SEXP newva;
   
     PROTECT(newva=EVAL(lang3(install("["), oldva, ss)));
-    SET_VECTOR_ELT(val, i, newva);
+    SET_VECTOR_ELT(toval, i, newva);
     UNPROTECT(1);
   }
   
-  UNPROTECT(1);
+  SET_VECTOR_ELT(toattr, 2, toval);
+  UNPROTECT(2);
   return 0;
 }
 
