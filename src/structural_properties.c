@@ -37,6 +37,7 @@
 #include "igraph_conversion.h"
 #include "igraph_types_internal.h"
 #include "igraph_dqueue.h"
+#include "igraph_attributes.h"
 #include "config.h"
 
 #include <string.h>
@@ -1945,86 +1946,91 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
 		    const igraph_attribute_combination_t *edge_comb) {
 
   igraph_vector_t edges=IGRAPH_VECTOR_NULL;
-  igraph_vector_t neis=IGRAPH_VECTOR_NULL;
   long int no_of_nodes=igraph_vcount(graph);
-  long int i, j;
+  long int no_of_edges=igraph_ecount(graph);
+  long int edge;
+  igraph_bool_t attr=edge_comb && igraph_has_attribute_table();
+  long int from, to, pfrom=-1, pto=-2;
+  igraph_t res;
+  igraph_vector_t contraction, count;
+  long int keptm1=-1;
   igraph_es_t es;
-  igraph_bool_t directed=igraph_is_directed(graph);
+  igraph_eit_t eit;
+
+  if (attr) {
+    IGRAPH_VECTOR_INIT_FINALLY(&contraction, 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&count, 0);
+    IGRAPH_CHECK(igraph_vector_reserve(&contraction, no_of_edges));
+    IGRAPH_CHECK(igraph_vector_reserve(&count, no_of_edges));
+  }
 
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges*2));
 
-  if (directed) { 
-    for (i=0; i<no_of_nodes; i++) {
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
-      
-      IGRAPH_ALLOW_INTERRUPTION();
-      
-      if (loops) {
-	for (j=0; j<igraph_vector_size(&neis); j++) {
-	  if (VECTOR(neis)[j]==i) {
-	    IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	    IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	  }
-	}
-      } /* if loops */
-      
-      if (multiple) {
-	for (j=1; j<igraph_vector_size(&neis); j++) {
-	  if (VECTOR(neis)[j]==VECTOR(neis)[j-1] && 
-	      (!loops || VECTOR(neis)[j] != i) ) {
-	    IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	    IGRAPH_CHECK(igraph_vector_push_back(&edges, VECTOR(neis)[j]));
-	  }
-	}
-      }
-    }
-  } else { 			/* not directed */
-    for (i=0; i<no_of_nodes; i++) {
-      int flip=0;
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
-      
-      IGRAPH_ALLOW_INTERRUPTION();
-      
-      if (loops) {
-	for (j=0; j<igraph_vector_size(&neis); j++) {
-	  if (VECTOR(neis)[j]==i) {
-	    flip=1-flip;
-	    if (flip==0) {
-	      IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	      IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	    }
-	  }
-	}
-      } /* if loops */
-      
-      if (multiple) {
-	for (j=1; j<igraph_vector_size(&neis); j++) {
-	  if (VECTOR(neis)[j] > i && VECTOR(neis)[j]==VECTOR(neis)[j-1]) {
-	    IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	    IGRAPH_CHECK(igraph_vector_push_back(&edges, VECTOR(neis)[j]));
-	  }
-	  if (VECTOR(neis)[j]==i && VECTOR(neis)[j-1]==i && !loops) {
-	    flip=1-flip;
-	    if (flip==0) {
-	      IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	      IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	    }
-	  }
-	}
-      }
-    }
-  }
-    
-  igraph_vector_destroy(&neis);
-  IGRAPH_FINALLY_CLEAN(1);
-  IGRAPH_CHECK(igraph_es_multipairs(&es, &edges, IGRAPH_DIRECTED));
+  IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_FROM));
   IGRAPH_FINALLY(igraph_es_destroy, &es);
-  IGRAPH_CHECK(igraph_delete_edges(graph, es));
+  IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
+  IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+
+  for (; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
+    edge=IGRAPH_EIT_GET(eit);
+    from=IGRAPH_FROM(graph, edge);
+    to=IGRAPH_TO(graph, edge);
+    
+    if (loops && from==to) {
+      /* Loop edge to be removed */
+    } else if (multiple && from==pfrom && to==pto) {
+      /* Multiple edge to be contracted */
+      if (attr) { 
+	igraph_vector_push_back(&contraction, edge);
+	VECTOR(count)[keptm1] += 1; 
+      }
+    } else {
+      /* Edge to be kept */
+      igraph_vector_push_back(&edges, from);
+      igraph_vector_push_back(&edges, to);
+      if (attr) { 
+	igraph_vector_push_back(&contraction, edge);
+	igraph_vector_push_back(&count, 1);
+	keptm1++;
+      }
+    }
+    pfrom=from; pto=to;
+  }
+  
+  IGRAPH_CHECK(igraph_create(&res, &edges, no_of_nodes, 
+			     igraph_is_directed(graph)));
+  
+  IGRAPH_I_ATTRIBUTE_DESTROY(&res);
+  IGRAPH_I_ATTRIBUTE_COPY(&res, graph, /*graph=*/ 1, 
+			  /*vertex=*/ 1, /*edge=*/ 0);
+
+  if (attr) {
+    long int i, no_new_edges=keptm1+1;
+    igraph_vector_t v;
+    long int s=0;
+    for (i=0; i<no_new_edges; i++) {
+      long int c=VECTOR(count)[i];
+      igraph_vector_view(&v, VECTOR(contraction)+s, c);
+      IGRAPH_CHECK(igraph_i_attribute_combine_edges(graph, &res, i, 
+						    &v, edge_comb));
+      s+=c;
+    }				       
+  }
+  
+  igraph_destroy(graph);
+  *graph=res;
+
+  igraph_eit_destroy(&eit);
   igraph_es_destroy(&es);
-  IGRAPH_FINALLY_CLEAN(1);
   igraph_vector_destroy(&edges);
-  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  if (attr) {
+    igraph_vector_destroy(&contraction);
+    igraph_vector_destroy(&count);
+    IGRAPH_FINALLY_CLEAN(2);
+  }
 
   return 0;
 }
