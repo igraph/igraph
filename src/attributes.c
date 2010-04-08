@@ -240,6 +240,10 @@ igraph_i_set_attribute_table(igraph_attribute_table_t * table) {
   igraph_i_attribute_table=table;
   return old;
 }
+
+igraph_bool_t *igraph_has_attribute_table() {
+  return igraph_i_attribute_table != 0;
+}
   
 int igraph_attribute_combination_init(igraph_attribute_combination_t *comb) {
   IGRAPH_CHECK(igraph_vector_ptr_init(&comb->list, 0));
