@@ -81,6 +81,39 @@ SEXP R_igraph_getListElement(SEXP list, const char *str)
  * Attributes                                         *
  *****************************************************/
 
+int R_SEXP_to_attr_comb(SEXP input, igraph_attribute_combination_t *comb) {
+  long int i, n=GET_LENGTH(input);
+  SEXP names=GET_NAMES(input);
+  
+  igraph_attribute_combination_init(comb);
+  
+  for (i=0; i<n; i++) {
+    const char *n;
+    igraph_attribute_combination_type_t type;
+    void *func;
+    
+    /* Name */
+    if (!isNull(names)) {
+      n=CHAR(STRING_ELT(names, i));
+    }
+    if (isNull(names) || strlen(n)==0) {
+      n=0;
+    }
+
+    /* Type and function, if any */
+    if (isFunction(VECTOR_ELT(input, i))) {
+      type=IGRAPH_ATTRIBUTE_COMBINE_FUNCTION;
+      func=VECTOR_ELT(input, i);      
+    } else {
+      type=INTEGER(VECTOR_ELT(input, i))[0];
+      func=0;
+    }
+    igraph_attribute_combination_add(comb, n, type, func);
+  }
+  
+  return 0;
+}
+
 int R_igraph_attribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
   SEXP result, names, gal;
   long int i;
@@ -3724,26 +3757,6 @@ SEXP R_igraph_get_adjacency(SEXP graph, SEXP ptype) {
   return result;
 }
   
-SEXP R_igraph_simplify(SEXP graph, SEXP pmultiple, SEXP ploops) {
-  
-  igraph_t g;
-  igraph_bool_t multiple=LOGICAL(pmultiple)[0];
-  igraph_bool_t loops=LOGICAL(ploops)[0];
-  SEXP result;
-  
-  R_igraph_before();
-  
-  R_SEXP_to_igraph_copy(graph, &g);
-  igraph_simplify(&g, multiple, loops, /*edge_comb=*/0); /* TODO */
-  PROTECT(result=R_igraph_to_SEXP(&g));
-  igraph_destroy(&g);
-  
-  R_igraph_after();
-  
-  UNPROTECT(1);
-  return result;
-}
-
 SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP pniter, 
 					  SEXP pmaxdelta, SEXP parea,
 					  SEXP pcoolexp, SEXP prepulserad,
