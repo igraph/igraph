@@ -25,6 +25,8 @@
 #include "igraph_memory.h"
 #include "config.h"
 
+#include <string.h>
+
 int igraph_i_attribute_init(igraph_t *graph, void *attr) {
   graph->attr=0;
   if (igraph_i_attribute_table) {
@@ -239,3 +241,120 @@ igraph_i_set_attribute_table(igraph_attribute_table_t * table) {
   return old;
 }
   
+int igraph_attribute_combination_init(igraph_attribute_combination_t *comb) {
+  IGRAPH_CHECK(igraph_vector_ptr_init(&comb->list, 0));
+  return 0;
+}
+
+void igraph_attribute_combination_destroy(igraph_attribute_combination_t *comb) {
+  long int i, n=igraph_vector_ptr_size(&comb->list);
+  for (i=0; i<n; i++) {
+    igraph_attribute_combination_record_t *rec=VECTOR(comb->list)[i];
+    if (rec->name) { igraph_Free(rec->name); }
+    igraph_Free(rec);    
+  }
+  igraph_vector_ptr_destroy(&comb->list);
+}
+
+int igraph_attribute_combination_add(igraph_attribute_combination_t *comb, 
+				     const char *name,
+				     igraph_attribute_combination_type_t type,
+				     void *func) {
+  long int i, n=igraph_vector_ptr_size(&comb->list);
+
+  /* Search, in case it is already there */
+  for (i=0; i<n; i++) {
+    igraph_attribute_combination_record_t *r=VECTOR(comb->list)[i];
+    const char *n=r->name;
+    if ( (!name && !n) ||
+	 (name && n && !strcmp(n, name)) ) {
+      r->type=type;
+      r->func=func;
+      break;
+    }
+  }
+
+  if (i==n) {
+    /* This is a new attribute name */
+    igraph_attribute_combination_record_t *rec=
+      igraph_Calloc(1, igraph_attribute_combination_record_t);
+
+    if (!rec) {
+      IGRAPH_ERROR("Cannot create attribute combination data",
+		   IGRAPH_ENOMEM);
+    }
+    if (!name) { 
+      rec->name=0;
+    } else {
+      rec->name=strdup(name);
+    }
+    rec->type=type;
+    rec->func=func;
+    
+    IGRAPH_CHECK(igraph_vector_ptr_push_back(&comb->list, rec));
+    
+  }
+  
+  return 0;
+}
+
+int igraph_attribute_combination_remove(igraph_attribute_combination_t *comb, 
+					const char *name) {
+  long int i, n=igraph_vector_ptr_size(&comb->list);
+
+  /* Search, in case it is already there */
+  for (i=0; i<n; i++) {
+    igraph_attribute_combination_record_t *r=VECTOR(comb->list)[i];
+    const char *n=r->name;
+    if ( (!name && !n) ||
+	 (name && n && !strcmp(n, name)) ) {
+      break;
+    }
+  }
+  
+  if (i!=n) {
+    igraph_attribute_combination_record_t *r=VECTOR(comb->list)[i];
+    if (r->name) { igraph_Free(r->name); }
+    igraph_Free(r);
+    igraph_vector_ptr_remove(&comb->list, i);
+  } else {
+    /* It is not there, we don't do anything */
+  }
+  
+  return 0;
+}
+
+int igraph_attribute_combination_query(const igraph_attribute_combination_t *comb,
+				       const char *name,
+				       igraph_attribute_combination_type_t *type,
+				       void **func) {
+  long int i, def=-1, n=igraph_vector_ptr_size(&comb->list);
+
+  for (i=0; i<n; i++) {
+    igraph_attribute_combination_record_t *rec=VECTOR(comb->list)[i];
+    const char *n=rec->name;
+    if ( (!name && !n) ||
+	 (name && n && !strcmp(n, name)) ) {
+      *type=rec->type;
+      *func=rec->func;
+      return 0;
+    }
+    if (!n) {
+      def=i;
+    }
+  }
+  
+  if (def==-1) {
+    /* Did not find anything */
+    *type=IGRAPH_ATTRIBUTE_COMBINE_DEFAULT;
+    *func=0;
+  } else {
+    igraph_attribute_combination_record_t *rec=VECTOR(comb->list)[def];
+    *type=rec->type;
+    *func=rec->func;
+  }
+
+  return 0;
+}
+
+

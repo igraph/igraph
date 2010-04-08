@@ -147,6 +147,19 @@ typedef struct igraph_attribute_combination_t {
   igraph_vector_ptr_t list;
 } igraph_attribute_combination_t;
 
+int igraph_attribute_combination_init(igraph_attribute_combination_t *comb);
+void igraph_attribute_combination_destroy(igraph_attribute_combination_t *comb);
+int igraph_attribute_combination_add(igraph_attribute_combination_t *comb,
+				     const char *name, 
+				     igraph_attribute_combination_type_t type,
+				     void *func);
+int igraph_attribute_combination_remove(igraph_attribute_combination_t *comb, 
+					const char *name);
+int igraph_attribute_combination_query(const igraph_attribute_combination_t *comb,
+				       const char *name,
+				       igraph_attribute_combination_type_t *type,
+				       void **func);
+
 /**
  * \struct igraph_attribute_table_t
  * \brief Table of functions to perform operations on attributes
