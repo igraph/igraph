@@ -76,7 +76,16 @@ static char *igraph_i_error_strings[]=
              "is to increase the size of NCV relative to NEV",
     /* 41 */ "The Schur form computed by LAPACK routine dlahqr "
              "could not be reordered by LAPACK routine dtrsen.",
-    /* 42 */ "Big integer division by zero"
+    /* 42 */ "Big integer division by zero",
+    /* 43 */ "GLPK Error, GLP_EBOUND",
+    /* 44 */ "GLPK Error, GLP_EROOT",
+    /* 45 */ "GLPK Error, GLP_ENOPFS",
+    /* 46 */ "GLPK Error, GLP_ENODFS",
+    /* 47 */ "GLPK Error, GLP_EFAIL",
+    /* 48 */ "GLPK Error, GLP_EMIPGAP",
+    /* 49 */ "GLPK Error, GLP_ETMLIM",
+    /* 50 */ "GLPK Error, GLP_STOP",
+    /* 51 */ "Internal attribute handler error",
 };
 
 const char* igraph_strerror(const int igraph_errno) {
