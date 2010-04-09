@@ -3,7 +3,7 @@ Section: libs
 Priority: optional
 Maintainer: Tamas Nepusz <ntamas@gmail.com>
 Build-Depends: debhelper (>= 7), libtool, libxml2-dev, libgmp3-dev, libarpack2-dev,
- libblas-dev, liblapack-dev, automake
+ libblas-dev, liblapack-dev, libglpk-dev, automake
 Standards-Version: 3.8.3
 Homepage: http://igraph.sourceforge.net
 
