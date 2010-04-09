@@ -1925,6 +1925,15 @@ int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
   return 0;
 }
 
+void igraph_i_simplify_free(igraph_vector_ptr_t *p) {
+  long int i, n=igraph_vector_ptr_size(p);
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v=VECTOR(*p)[i];
+    if (v) { igraph_vector_destroy(v); }
+  }
+  igraph_vector_ptr_destroy(p);
+}
+
 /**
  * \ingroup structural
  * \function igraph_simplify
@@ -1952,18 +1961,14 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
   igraph_bool_t attr=edge_comb && igraph_has_attribute_table();
   long int from, to, pfrom=-1, pto=-2;
   igraph_t res;
-  igraph_vector_t contraction, count;
-  long int keptm1=-1;
   igraph_es_t es;
   igraph_eit_t eit;
+  igraph_vector_t mergeinto;
+  long int actedge;
 
-  if (attr) {
-    IGRAPH_VECTOR_INIT_FINALLY(&contraction, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&count, 0);
-    IGRAPH_CHECK(igraph_vector_reserve(&contraction, no_of_edges));
-    IGRAPH_CHECK(igraph_vector_reserve(&count, no_of_edges));
+  if (attr) {    
+    IGRAPH_VECTOR_INIT_FINALLY(&mergeinto, no_of_edges);
   }
-
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges*2));
 
@@ -1972,27 +1977,26 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
   IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
   IGRAPH_FINALLY(igraph_eit_destroy, &eit);
 
-  for (; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
+  for (actedge=-1; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
     edge=IGRAPH_EIT_GET(eit);
     from=IGRAPH_FROM(graph, edge);
     to=IGRAPH_TO(graph, edge);
     
     if (loops && from==to) {
       /* Loop edge to be removed */
+      if (attr) { VECTOR(mergeinto)[edge] = -1; }
     } else if (multiple && from==pfrom && to==pto) {
       /* Multiple edge to be contracted */
-      if (attr) { 
-	igraph_vector_push_back(&contraction, edge);
-	VECTOR(count)[keptm1] += 1; 
+      if (attr) {
+	VECTOR(mergeinto)[edge]=actedge;
       }
     } else {
       /* Edge to be kept */
       igraph_vector_push_back(&edges, from);
       igraph_vector_push_back(&edges, to);
       if (attr) { 
-	igraph_vector_push_back(&contraction, edge);
-	igraph_vector_push_back(&count, 1);
-	keptm1++;
+	actedge++;
+	VECTOR(mergeinto)[edge]=actedge;
       }
     }
     pfrom=from; pto=to;
@@ -2005,32 +2009,59 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
   IGRAPH_I_ATTRIBUTE_COPY(&res, graph, /*graph=*/ 1, 
 			  /*vertex=*/ 1, /*edge=*/ 0);
 
-  if (attr) {
-    long int i, no_new_edges=keptm1+1;
-    igraph_vector_t v;
-    long int s=0;
-    for (i=0; i<no_new_edges; i++) {
-      long int c=VECTOR(count)[i];
-      igraph_vector_view(&v, VECTOR(contraction)+s, c);
-      IGRAPH_CHECK(igraph_i_attribute_combine_edges(graph, &res, i, 
-						    &v, edge_comb));
-      s+=c;
-    }				       
-  }
-  
-  igraph_destroy(graph);
-  *graph=res;
-
   igraph_eit_destroy(&eit);
   igraph_es_destroy(&es);
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(3);
 
   if (attr) {
-    igraph_vector_destroy(&contraction);
-    igraph_vector_destroy(&count);
-    IGRAPH_FINALLY_CLEAN(2);
+    long int i;
+    igraph_vector_ptr_t merges;
+    long int no_new_edges=actedge+1;
+    igraph_vector_t sizes;
+    igraph_vector_t *vecs;
+    IGRAPH_CHECK(igraph_vector_ptr_init(&merges, no_new_edges));
+    IGRAPH_FINALLY(igraph_i_simplify_free, &merges);
+    IGRAPH_VECTOR_INIT_FINALLY(&sizes, no_new_edges);
+    vecs=igraph_Calloc(no_new_edges, igraph_vector_t);
+    if (!vecs) {
+      IGRAPH_ERROR("Cannot merge attributes for simplify", 
+		   IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, vecs);
+
+    for (i=0; i<no_of_edges; i++) {
+      long int to=VECTOR(mergeinto)[i];
+      if (to >= 0) { VECTOR(sizes)[to] += 1; }
+    }
+    for (i=0; i<no_new_edges; i++) {
+      igraph_vector_t *v=&vecs[i];
+      IGRAPH_CHECK(igraph_vector_init(v, VECTOR(sizes)[i]));
+      igraph_vector_clear(v);
+      VECTOR(merges)[i]=v;
+    }
+    for (i=0; i<no_of_edges; i++) {
+      long int to=VECTOR(mergeinto)[i];
+      if (to >= 0) { 
+	igraph_vector_t *v=&vecs[to];
+	igraph_vector_push_back(v, i);
+      }
+    }
+    
+    IGRAPH_CHECK(igraph_i_attribute_combine_edges(graph, &res, &merges, 
+						  edge_comb));
+    
+    igraph_free(vecs);
+    igraph_vector_destroy(&sizes);
+    igraph_vector_ptr_destroy(&merges);
+    IGRAPH_FINALLY_CLEAN(3);
+    
+    igraph_vector_destroy(&mergeinto);
+    IGRAPH_FINALLY_CLEAN(1);
   }
+  
+  igraph_destroy(graph);
+  *graph=res;
 
   return 0;
 }

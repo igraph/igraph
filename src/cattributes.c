@@ -468,8 +468,7 @@ int igraph_i_cattribute_permute_vertices(const igraph_t *graph,
 
 int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
 			 igraph_t *newgraph,
-			 igraph_integer_t newvid,
-			 const igraph_vector_t *oldvids,
+			 const igraph_vector_ptr_t *merges,
 			 const igraph_attribute_combination_t *comb) {
   /* TODO */
   return 0;
@@ -826,8 +825,7 @@ int igraph_i_cattribute_permute_edges(const igraph_t *graph,
 
 int igraph_i_cattribute_combine_edges(const igraph_t *graph,
 			 igraph_t *newgraph,
-			 igraph_integer_t neweid,
-			 const igraph_vector_t *oldeids,
+			 const igraph_vector_ptr_t *merges,
 			 const igraph_attribute_combination_t *comb) {
   /* TODO */
   return 0;
