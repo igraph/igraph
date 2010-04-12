@@ -11,3 +11,4 @@ Depends: stats
 Suggests: stats4, rgl, tcltk, RSQLite, digest, graph, Matrix
 License: GPL (>= 2)
 URL: http://igraph.sourceforge.net
+SystemRequirements: gmp, libxml2
