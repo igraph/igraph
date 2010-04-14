@@ -43,16 +43,21 @@ int main() {
   igraph_vector_t membership;
   igraph_real_t modularity;
   igraph_bool_t simple;
-
-  igraph_is_simple(&graph, &simple);
-  if (!simple) { return 1; }
+  int retval;
 
   igraph_vector_view(&v, edges, sizeof(edges)/sizeof(double));
   igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
   
+  igraph_is_simple(&graph, &simple);
+  if (!simple) { return 1; }
+
   igraph_vector_init(&membership, 0);
-  igraph_community_optimal_modularity(&graph, &modularity, &membership, 
-				      /*verbose=*/ 0);
+
+  igraph_set_error_handler(&igraph_error_handler_printignore);
+
+  retval = igraph_community_optimal_modularity(&graph, &modularity,
+    &membership, /*verbose=*/ 0);
+  if (retval == IGRAPH_UNIMPLEMENTED) { return 77; }
 
   if (fabs(modularity - 0.4197896) > 0.0000001) { return 2; }
   
