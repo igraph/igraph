@@ -316,6 +316,7 @@ int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
   igraph_vector_t *neis;
   igraph_integer_t dirmode;
   igraph_adjlist_t allneis;
+  igraph_real_t unconn = 0;
   long int ressize;
   
   if (directed) { dirmode=IGRAPH_OUT; } else { dirmode=IGRAPH_ALL; }
@@ -329,8 +330,6 @@ int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
   IGRAPH_CHECK(igraph_vector_resize(res, 0));
   ressize=0;
   
-  *unconnected=0;
-
   for (i=0; i<no_of_nodes; i++) {
     nodes_reached=1;		/* itself */
     IGRAPH_CHECK(igraph_dqueue_push(&q, i));
@@ -365,7 +364,7 @@ int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
       }
     } /* while !igraph_dqueue_empty */
 
-    *unconnected += (no_of_nodes-nodes_reached);
+    unconn += (no_of_nodes-nodes_reached);
 
   } /* for i<no_of_nodes */
 
@@ -376,14 +375,17 @@ int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
     for (i=0; i<ressize; i++) {
       VECTOR(*res)[i] /= 2;
     }
-    *unconnected /= 2;
+    unconn /= 2;
   }
 
   igraph_vector_long_destroy(&already_added);
   igraph_dqueue_destroy(&q);
   igraph_adjlist_destroy(&allneis);
   IGRAPH_FINALLY_CLEAN(3);
-  
+
+  if (unconnected)
+	*unconnected = unconn;
+
   return 0;
 }
 
