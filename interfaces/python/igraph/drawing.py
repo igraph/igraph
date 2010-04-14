@@ -42,6 +42,8 @@ import os
 import platform
 import time
 
+from ConfigParser import NoOptionError
+
 import igraph.colors as colors
 
 from igraph.configuration import Configuration
@@ -52,14 +54,21 @@ try:
     import cairo
 except ImportError:
     # No cairo support is installed. Create a fake module
+    # pylint: disable-msg=R0903
+    # R0903: too few public methods
     class FakeModule(object):
-        def __getattr__(self, a):
+        """Fake module that raises an exception for everything"""
+
+        def __getattr__(self, _):
             raise TypeError("plotting not available")
-        def __call__(self, a):
+        def __call__(self, _):
             raise TypeError("plotting not available")
-        def __setattr__(self, k, v):
+        def __setattr__(self, _, _):
             raise TypeError("plotting not available")
-    cairo=FakeModule()
+
+    # pylint: disable-msg=C0103
+    # C0103: invalid name
+    cairo = FakeModule()
 
 
 class Point(tuple):
@@ -67,10 +76,12 @@ class Point(tuple):
     __slots__ = ()
     _fields = ('x', 'y')
 
-    def __new__(_cls, x, y):
+    def __new__(cls, x, y):
         """Creates a new point with the given coordinates"""
-        return tuple.__new__(_cls, (x, y))
+        return tuple.__new__(cls, (x, y))
 
+    # pylint: disable-msg=W0622
+    # W0622: redefining built-in 'len'
     @classmethod
     def _make(cls, iterable, new = tuple.__new__, len = len):
         """Creates a new point from a sequence or iterable"""
@@ -87,6 +98,8 @@ class Point(tuple):
         """Returns a new dict which maps field names to their values"""
         return dict(zip(self._fields, self))
 
+    # pylint: disable-msg=W0141
+    # W0141: used builtin function 'map'
     def _replace(self, **kwds):
         """Returns a new point object replacing specified fields with new
         values"""
@@ -126,16 +139,18 @@ class Point(tuple):
         @param  ratio:  the interpolation ratio between 0 and 1. Zero will
           return this point, 1 will return the other point.
         """
-        r = float(ratio)
-        return Point(x = self.x * (1.0 - r) + other.x * r, \
-                     y = self.y * (1.0 - r) + other.y * r)
+        ratio = float(ratio)
+        return Point(x = self.x * (1.0 - ratio) + other.x * ratio, \
+                     y = self.y * (1.0 - ratio) + other.y * ratio)
 
     def length(self):
-        """Returns the length of the vector pointing from the origin to this point."""
+        """Returns the length of the vector pointing from the origin to this
+        point."""
         return (self.x ** 2 + self.y ** 2) ** 0.5
 
     def sq_length(self):
-        """Returns the squared length of the vector pointing from the origin to this point."""
+        """Returns the squared length of the vector pointing from the origin
+        to this point."""
         return (self.x ** 2 + self.y ** 2)
 
 
@@ -163,10 +178,13 @@ class BoundingBox(object):
             coords = (0, 0, args[0], args[1])
         if coords is None:
             raise ValueError("invalid coordinate format")
+
         try:
-            coords = tuple(map(float, coords))
+            coords = tuple(float(coord) for coord in coords)
         except ValueError:
             raise ValueError("invalid coordinate format, numbers expected")
+
+        self._coords = None    # to make pylint happy
         self.coords = coords
 
     def _set_coords(self, coords):
@@ -187,21 +205,40 @@ class BoundingBox(object):
     coords = property(_get_coords, _set_coords,
         doc="Sets or returns the coordinates of the corners")
 
-    def _get_width(self): return self._coords[2]-self._coords[0]
-    def _get_height(self): return self._coords[3]-self._coords[1]
-    def _get_left(self): return self._coords[0]
-    def _get_right(self): return self._coords[2]
-    def _get_top(self): return self._coords[1]
-    def _get_bottom(self): return self._coords[3]
-    def _get_shape(self):
+    @property
+    def width(self):
+        """Returns the width of the bounding box"""
+        return self._coords[2]-self._coords[0]
+
+    @property
+    def height(self):
+        """Returns the height of the bounding box"""
+        return self._coords[3]-self._coords[1]
+
+    @property
+    def left(self):
+        """Returns the X coordinate of the left side of the box"""
+        return self._coords[0]
+
+    @property
+    def right(self):
+        """Returns the X coordinate of the right side of the box"""
+        return self._coords[2]
+
+    @property
+    def top(self):
+        """Returns the Y coordinate of the top edge of the box"""
+        return self._coords[1]
+
+    @property
+    def bottom(self):
+        """Returns the Y coordinate of the bottom edge of the box"""
+        return self._coords[3]
+
+    @property
+    def shape(self):
+        """Returns the shape of the bounding box (width, height)"""
         return self._coords[2]-self._coords[0], self._coords[3]-self._coords[1]
-    width = property(_get_width, doc="Gets the width of the bounding box")
-    height = property(_get_height, doc="Gets the height of the bounding box")
-    left = property(_get_left, doc="X coordinate of the left side of the box")
-    right = property(_get_right, doc="X coordinate of the right side of the box")
-    top = property(_get_top, doc="Y coordinate of the top of the box")
-    bottom = property(_get_bottom, doc="Y coordinate of the bottom of the box")
-    shape = property(_get_shape, doc="Gets the shape of the bounding box (width, height)")
 
     def contract(self, margins):
         """Contracts the bounding box by the given margins.
@@ -227,9 +264,12 @@ class BoundingBox(object):
             self._coords[0], self._coords[1], self._coords[2], \
             self._coords[3])
 
-    def __eq__(self, other): return self.coords == other.coords
-    def __ne__(self, other): return self.coords != other.coords
-    def __hash__(self): return hash(self.coords)
+    def __eq__(self, other):
+        return self.coords == other.coords
+    def __ne__(self, other):
+        return self.coords != other.coords
+    def __hash__(self):
+        return hash(self.coords)
 
 
 
@@ -273,7 +313,9 @@ class Plot(object):
     to an object override the default palette of the plot. Objects can be
     added by the L{Plot.add} method and removed by the L{Plot.remove} method.
     """
-    
+
+    # pylint: disable-msg=E1101
+    # E1101: Module 'cairo' has no 'foo' member - of course it has! :)
     def __init__(self, target=None, bbox=None, palette=None):
         """Creates a new plot.
 
@@ -302,16 +344,16 @@ class Plot(object):
           In the latter case, the default palette given by the configuration
           key C{plotting.palette} is used.
         """
-        self._filename=None
-        self._surface_was_created=not isinstance(target, cairo.Surface)
-        self._tmpfile=False
-        self._tmpfile_name=None
-        self._filename=None
-        self._bgcolor=None
+        self._filename = None
+        self._surface_was_created = not isinstance(target, cairo.Surface)
+        self._tmpfile = False
+        self._tmpfile_name = None
+        self._filename = None
+        self._bgcolor = None
 
         # Several Windows-specific hacks will be used from now on, thanks
         # to Dale Hunscher for debugging and fixing all that stuff
-        self._windows_hacks=("Windows" in platform.platform())
+        self._windows_hacks = "Windows" in platform.platform()
 
         if bbox is None:
             bbox = BoundingBox(600, 600)
@@ -326,27 +368,29 @@ class Plot(object):
         self._palette = palette
 
         if target is None:
-            self._tmpfile=True
-            self._surface=cairo.ImageSurface(cairo.FORMAT_ARGB32, \
+            self._tmpfile = True
+            self._surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, \
                 int(bbox.width), int(bbox.height))
-            self._bgcolor=(1., 1., 1.)
+            self._bgcolor = (1., 1., 1.)
         elif isinstance(target, cairo.Surface):
             self._surface = target
         else:
-            import os.path
             self._filename = target
-            fname, ext = os.path.splitext(target)
-            ext=ext.lower()
+            _, ext = os.path.splitext(target)
+            ext = ext.lower()
             if ext == ".pdf":
-                self._surface = cairo.PDFSurface(target, bbox.width, bbox.height)
+                self._surface = cairo.PDFSurface(target, \
+                                                 bbox.width, bbox.height)
             elif ext == ".ps":
-                self._surface = cairo.PSSurface(target, bbox.width, bbox.height)
+                self._surface = cairo.PSSurface(target, \
+                                                bbox.width, bbox.height)
             elif ext == ".png":
                 self._surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, \
                     int(bbox.width), int(bbox.height))
                 self._bgcolor = (1., 1., 1.)
             elif ext == ".svg":
-                self._surface = cairo.SVGSurface(target, bbox.width, bbox.height)
+                self._surface = cairo.SVGSurface(target, \
+                                                 bbox.width, bbox.height)
 
         self._width = bbox.width
         self._height = bbox.height
@@ -354,7 +398,7 @@ class Plot(object):
         self._objects = []
         self._is_dirty = False
 
-    def add(self, object, bbox=None, palette=None, opacity=1.0, *args, **kwds):
+    def add(self, obj, bbox=None, palette=None, opacity=1.0, *args, **kwds):
         """Adds an object to the plot.
 
         Arguments not specified here are stored and passed to the object's
@@ -362,7 +406,7 @@ class Plot(object):
         in the arguments acceptable by graphs, see L{Graph.__plot__} for more
         details.
 
-        @param object: the object to be added
+        @param obj: the object to be added
         @param bbox: the bounding box of the object. If C{None}, the object
           will fill the entire area of the plot.
         @param palette: the color palette used for drawing the object. If the
@@ -374,32 +418,34 @@ class Plot(object):
 
         @see: Graph.__plot__
         """
-        if opacity<0.0 or opacity>1.0:
+        if opacity < 0.0 or opacity > 1.0:
             raise ValueError("opacity must be between 0.0 and 1.0")
         bbox = bbox or self.bounding_box
-        if not isinstance(bbox, BoundingBox): bbox = BoundingBox(bbox)
-        self._objects.append((object, bbox, palette, opacity, args, kwds))
+        if not isinstance(bbox, BoundingBox):
+            bbox = BoundingBox(bbox)
+        self._objects.append((obj, bbox, palette, opacity, args, kwds))
         self.mark_dirty()
 
-    def remove(self, object, bbox=None, idx=1):
+    def remove(self, obj, bbox=None, idx=1):
         """Removes an object from the plot.
 
         If the object has been added multiple times and no bounding box
         was specified, it removes the instance which occurs M{idx}th
         in the list of identical instances of the object.
 
-        @param object: the object to be removed
+        @param obj: the object to be removed
         @param bbox: optional bounding box specification for the object.
           If given, only objects with exactly this bounding box will be
           considered.
         @param idx: if multiple objects match the specification given by
-          M{object} and M{bbox}, only the M{idx}th occurrence will be removed.
+          M{obj} and M{bbox}, only the M{idx}th occurrence will be removed.
         @return: C{True} if the object has been removed successfully,
           C{False} if the object was not on the plot at all or M{idx}
           was larger than the count of occurrences
         """
-        for i, (o, b, _, _, _, _) in enumerate(self._objects):
-            if o is object and (bbox is None or b == bbox):
+        for i in xrange(len(self._objects)):
+            current_obj, current_bbox = self._objects[i][0:2]
+            if current_obj is obj and (bbox is None or current_bbox == bbox):
                 idx -= 1
                 if idx == 0:
                     self._objects[i:(i+1)] = []
@@ -411,6 +457,8 @@ class Plot(object):
         """Marks the plot as dirty (should be redrawn)"""
         self._is_dirty = True
 
+    # pylint: disable-msg=W0142
+    # W0142: used * or ** magic
     def redraw(self, context=None):
         """Redraws the plot"""
         ctx = context or self._ctx
@@ -425,8 +473,10 @@ class Plot(object):
             if plotter is None:
                 warn("%s does not support plotting" % obj)
             else:
-                if opacity < 1.0: ctx.push_group()
-                else: ctx.save()
+                if opacity < 1.0:
+                    ctx.push_group()
+                else:
+                    ctx.save()
                 plotter(ctx, bbox, palette, *args, **kwds)
                 if opacity < 1.0:
                     ctx.pop_group_to_source()
@@ -437,12 +487,14 @@ class Plot(object):
         self._is_dirty = False
 
     def _create_tmpfile(self):
+        """Creates a temporary file to plot to"""
         from tempfile import mkstemp
         handle, self._tmpfile_name = mkstemp(prefix="igraph", suffix=".png")
         os.close(handle)
         return self._tmpfile_name
 
     def _close_tmpfile(self):
+        """Closes the temporary file used for plotting"""
         if self._tmpfile_name:
             os.unlink(self._tmpfile_name)
             self._tmpfile_name = None
@@ -453,15 +505,20 @@ class Plot(object):
         @param fname: the filename to save to. It is ignored if the surface
           of the plot is not an C{ImageSurface}.
         """
-        if self._is_dirty: self.redraw()
+        if self._is_dirty:
+            self.redraw()
         if isinstance(self._surface, cairo.ImageSurface):
-            if self._tmpfile: self._create_tmpfile()
+            if self._tmpfile:
+                self._create_tmpfile()
             fname = fname or self._filename or self._tmpfile_name
             if fname is None:
-                raise ValueError("no file name is known for the surface and none given")
+                raise ValueError("no file name is known for the surface " + \
+                                 "and none given")
             result = self._surface.write_to_png(fname)
-            if self._tmpfile: self._close_tmpfile()
-            if not self._tmpfile: return result
+            if self._tmpfile:
+                self._close_tmpfile()
+            if not self._tmpfile:
+                return result
         else:
             if fname is not None:
                 warn("filename is ignored for surfaces other than ImageSurface")
@@ -472,14 +529,15 @@ class Plot(object):
     def show(self):
         """Saves the plot to a temporary file and shows it."""
         if not isinstance(self._surface, cairo.ImageSurface):
-            sur=cairo.ImageSurface(cairo.FORMAT_ARGB32,int(self._width),
-                int(self._height))
-            ctx=cairo.Context(sur)
+            sur = cairo.ImageSurface(cairo.FORMAT_ARGB32,
+                    int(self._width), int(self._height))
+            ctx = cairo.Context(sur)
             self.redraw(ctx)
         else:
-            sur=self._surface
-            ctx=self._ctx
-            if self._is_dirty: self.redraw(ctx)
+            sur = self._surface
+            ctx = self._ctx
+            if self._is_dirty:
+                self.redraw(ctx)
 
         self._create_tmpfile()
         sur.write_to_png(self._tmpfile_name)
@@ -489,7 +547,9 @@ class Plot(object):
         if not imgviewer:
             # No image viewer was given and none was detected. This
             # should only happen on unknown platforms.
-            raise NotImplementedError("showing plots is not implemented on this platform: %s" % platform.system())
+            plat = platform.system()
+            raise NotImplementedError("showing plots is not implemented " + \
+                                      "on this platform: %s" % plat)
         else:
             os.system("%s %s" % (imgviewer, self._tmpfile_name))
             if platform.system() == "Darwin" or self._windows_hacks:
@@ -532,141 +592,199 @@ class ShapeDrawer(object):
     Custom shapes must implement at least the C{draw_path} method of the class.
     The method I{must not} stroke or fill, it should just set up the current
     Cairo path appropriately."""
-    
-    def draw_path(ctx, cx, cy, w, h=None):
-        """Draws the path of the shape on the given Cairo context, without stroking
-        or filling it.
+
+    @staticmethod
+    def draw_path(ctx, center_x, center_y, width, height=None):
+        """Draws the path of the shape on the given Cairo context, without
+        stroking or filling it.
 
         This method must be overridden in derived classes implementing custom shapes
         and declared as a static method using C{staticmethod(...)}.
 
         @param ctx: the context to draw on
-        @param cx: the X coordinate of the center of the object
-        @param cy: the Y coordinate of the center of the object
-        @param w: the width of the object
-        @param h: the height of the object. If C{None}, equals to the width.
+        @param center_x: the X coordinate of the center of the object
+        @param center_y: the Y coordinate of the center of the object
+        @param width: the width of the object
+        @param height: the height of the object. If C{None}, equals to the width.
         """
-        raise TypeError("abstract class")
-    draw_path=staticmethod(draw_path)
+        raise NotImplementedError("abstract class")
 
-
-    def intersection_point(cx, cy, sx, sy, w, h=None):
-        """Determines where the shape centered at (cx, cy) intersects with a
-        line drawn from (sx, sy) to (cx, cy).
+    # pylint: disable-msg=W0613
+    @staticmethod
+    def intersection_point(center_x, center_y, source_x, source_y, \
+            width, height=None):
+        """Determines where the shape centered at (center_x, center_y)
+        intersects with a line drawn from (source_x, source_y) to
+        (center_x, center_y).
 
         Can be overridden in derived classes. Must always be defined as a static
         method using C{staticmethod(...)}
 
-        @param w: the width of the shape
-        @param h: the height of the shape. If C{None}, defaults to the width
-        @return: the intersection point (the closest to (sx, sy) if there are
-            more than one) or (cx, cy) if there is no intersection
+        @param width: the width of the shape
+        @param height: the height of the shape. If C{None}, defaults to the width
+        @return: the intersection point (the closest to (source_x, source_y) if
+            there are more than one) or (center_x, center_y) if there is no
+            intersection
         """
-        return cx, cy
-    intersection_point=staticmethod(intersection_point)
+        return center_x, center_y
+
 
 class NullDrawer(ShapeDrawer):
     """Static drawer class which draws nothing.
 
     This class is used for graph vertices with unknown shapes"""
-    def draw_path(ctx, cx, cy, w, h=None): pass
-    draw_path=staticmethod(draw_path)
+
+    @staticmethod
+    def draw_path(ctx, center_x, center_y, width, height=None):
+        """Draws nothing."""
+        pass
 
 
 class RectangleDrawer(ShapeDrawer):
     """Static class which draws rectangular vertices"""
 
-    def draw_path(ctx, cx, cy, w, h=None):
-        """Draws a rectangle-shaped path on the Cairo context without stroking or
-        filling it.
+    @staticmethod
+    def draw_path(ctx, center_x, center_y, width, height=None):
+        """Draws a rectangle-shaped path on the Cairo context without stroking
+        or filling it.
         @see: ShapeDrawer.draw_path"""
-        h = h or w
-        ctx.rectangle(cx-w/2., cy-h/2., w, h)
-    draw_path=staticmethod(draw_path)
+        height = height or width
+        ctx.rectangle(center_x - width/2., center_y - height/2.,
+                width, height)
 
-    def intersection_point(cx, cy, sx, sy, w, h=None):
-        h = h or w
-        dx, dy = cx-sx, cy-sy
-        if dx == 0 and dy == 0: return cx, cy
-        if dy>0 and dx<=dy and dx>=-dy: # top edge
-            ry = cy - h/2.
-            ratio = (h/2.) / dy
-            return cx-ratio*dx, ry
-        if dy<0 and dx<=-dy and dx>=dy: # bottom edge
-            ry = cy + h/2.
-            ratio = (h/2.) / -dy
-            return cx-ratio*dx, ry
-        if dx>0 and dy<=dx and dy>=-dx: # left edge
-            rx = cx - w/2.
-            ratio = (w/2.) / dx
-            return rx, cy-ratio*dy
-        if dx<0 and dy<=-dx and dy>=dx: # right edge
-            rx = cx + w/2.
-            ratio = (w/2.) / -dx
-            return rx, cy-ratio*dy
-        if dx == 0:
-            if dy>0: return cx, cy - h/2.
-            return cx, cy + h/2.
-        if dy == 0:
-            if dx>0: return cx - w/2., cy
-            return cx + w/2., cy
-    intersection_point=staticmethod(intersection_point)
+    # pylint: disable-msg=C0103, R0911
+    # R0911: too many return statements
+    @staticmethod
+    def intersection_point(center_x, center_y, source_x, source_y, \
+            width, height=None):
+        """Determines where the rectangle centered at (center_x, center_y)
+        having the given width and height intersects with a line drawn from
+        (source_x, source_y) to (center_x, center_y).
+
+        @see: ShapeDrawer.intersection_point"""
+        height = height or width
+        delta_x, delta_y = center_x-source_x, center_y-source_y
+
+        if delta_x == 0 and delta_y == 0:
+            return center_x, center_y
+
+        if delta_y > 0 and delta_x <= delta_y and delta_x >= -delta_y:
+            # this is the top edge
+            ry = center_y - height/2.
+            ratio = (height/2.) / delta_y
+            return center_x-ratio*delta_x, ry
+
+        if delta_y < 0 and delta_x <= -delta_y and delta_x >= delta_y:
+            # this is the bottom edge
+            ry = center_y + height/2.
+            ratio = (height/2.) / -delta_y
+            return center_x-ratio*delta_x, ry
+
+        if delta_x > 0 and delta_y <= delta_x and delta_y >= -delta_x:
+            # this is the left edge
+            rx = center_x - width/2.
+            ratio = (width/2.) / delta_x
+            return rx, center_y-ratio*delta_y
+
+        if delta_x < 0 and delta_y <= -delta_x and delta_y >= delta_x:
+            # this is the right edge
+            rx = center_x + width/2.
+            ratio = (width/2.) / -delta_x
+            return rx, center_y-ratio*delta_y
+
+        if delta_x == 0:
+            if delta_y > 0:
+                return center_x, center_y - height/2.
+            return center_x, center_y + height/2.
+
+        if delta_y == 0:
+            if delta_x > 0:
+                return center_x - width/2., center_y
+            return center_x + width/2., center_y
 
 
 class CircleDrawer(ShapeDrawer):
     """Static class which draws circular vertices"""
-    
-    def draw_path(ctx, cx, cy, w, h=None):
-        """Draws a circular path on the Cairo context without stroking or filling.
+
+    @staticmethod
+    def draw_path(ctx, center_x, center_y, width, height=None):
+        """Draws a circular path on the Cairo context without stroking or
+        filling it.
 
         Height is ignored, it is the width that determines the diameter of the circle.
 
         @see: ShapeDrawer.draw_path"""
-        ctx.arc(cx, cy, w/2., 0, 2*math.pi)
-    draw_path=staticmethod(draw_path)
+        ctx.arc(center_x, center_y, width/2., 0, 2*math.pi)
 
-    def intersection_point(cx, cy, sx, sy, w, h=None):
-        h = h or w
-        angle = math.atan2(cy-sy, cx-sx)
-        return cx-w/2.*math.cos(angle), cy-h/2.*math.sin(angle)
-    intersection_point=staticmethod(intersection_point)
+    @staticmethod
+    def intersection_point(center_x, center_y, source_x, source_y, \
+            width, height=None):
+        """Determines where the circle centered at (center_x, center_y)
+        intersects with a line drawn from (source_x, source_y) to
+        (center_x, center_y).
+
+        @see: ShapeDrawer.intersection_point"""
+        height = height or width
+        angle = math.atan2(center_y-source_y, center_x-source_x)
+        return center_x-width/2. * math.cos(angle), \
+               center_y-height/2.* math.sin(angle)
 
 
 class UpTriangleDrawer(ShapeDrawer):
     """Static class which draws upright triangles"""
-    def draw_path(ctx, cx, cy, w, h=None):
-        """Draws an upright triangle on the Cairo context without stroking or filling."""
-        h = h or w
-        ctx.move_to(cx-w/2., cy+h/2.)
-        ctx.line_to(cx, cy-h/2.)
-        ctx.line_to(cx+w/2., cy+h/2.)
-        ctx.line_to(cx-w/2., cy+h/2.)
-    draw_path=staticmethod(draw_path)
 
-    def intersection_point(cx, cy, sx, sy, w, h=None):
+    @staticmethod
+    def draw_path(ctx, center_x, center_y, width, height=None):
+        """Draws an upright triangle on the Cairo context without stroking or
+        filling it.
+        
+        @see: ShapeDrawer.draw_path"""
+        height = height or width
+        ctx.move_to(center_x-width/2., center_y+height/2.)
+        ctx.line_to(center_x, center_y-height/2.)
+        ctx.line_to(center_x+width/2., center_y+height/2.)
+        ctx.line_to(center_x-width/2., center_y+height/2.)
+
+    @staticmethod
+    def intersection_point(center_x, center_y, source_x, source_y, \
+            width, height=None):
+        """Determines where the triangle centered at (center_x, center_y)
+        intersects with a line drawn from (source_x, source_y) to
+        (center_x, center_y).
+
+        @see: ShapeDrawer.intersection_point"""
         # TODO: finish it properly
-        h = h or w
-        return cx, cy
-    intersection_point=staticmethod(intersection_point)
+        height = height or width
+        return center_x, center_y
 
 class DownTriangleDrawer(ShapeDrawer):
     """Static class which draws triangles pointing down"""
-    def draw_path(ctx, cx, cy, w, h=None):
-        """Draws a triangle on the Cairo context without stroking or filling."""
-        h = h or w
-        ctx.move_to(cx-w/2., cy-h/2.)
-        ctx.line_to(cx, cy+h/2.)
-        ctx.line_to(cx+w/2., cy-h/2.)
-        ctx.line_to(cx-w/2., cy-h/2.)
-    draw_path=staticmethod(draw_path)
 
-    def intersection_point(cx, cy, sx, sy, w, h=None):
+    @staticmethod
+    def draw_path(ctx, center_x, center_y, width, height=None):
+        """Draws a triangle on the Cairo context without stroking or
+        filling it.
+        
+        @see: ShapeDrawer.draw_path"""
+        height = height or width
+        ctx.move_to(center_x-width/2., center_y-height/2.)
+        ctx.line_to(center_x, center_y+height/2.)
+        ctx.line_to(center_x+width/2., center_y-height/2.)
+        ctx.line_to(center_x-width/2., center_y-height/2.)
+
+    @staticmethod
+    def intersection_point(center_x, center_y, source_x, source_y, \
+            width, height=None):
+        """Determines where the triangle centered at (center_x, center_y)
+        intersects with a line drawn from (source_x, source_y) to
+        (center_x, center_y).
+
+        @see: ShapeDrawer.intersection_point"""
         # TODO: finish it properly
-        h = h or w
-        return cx, cy
-    intersection_point=staticmethod(intersection_point)
+        height = height or width
+        return center_x, center_y
 
-def draw_shape_path(shape, ctx, cx, cy, w, h=None):
+def draw_shape_path(shape, ctx, center_x, center_y, width, height=None):
     """Draws a path of a shape on the given Cairo context.
 
     @param shape: the shape to be drawn
@@ -676,13 +794,13 @@ def draw_shape_path(shape, ctx, cx, cy, w, h=None):
     @param w: desired width of the shape
     @param h: desired height of the shape. If omitted, defaults to the width.
     """
-    global known_shapes
     try:
         drawer = known_shapes[shape]
-    except:
+    except KeyError:
         raise ValueError("unknown shape: %s" % shape)
-    drawer.draw_path(ctx, cx, cy, w, h)
+    drawer.draw_path(ctx, center_x, center_y, width, height)
 
+# pylint: disable-msg=C0103
 known_shapes = {
     "rectangle": RectangleDrawer,
     "rect": RectangleDrawer,
@@ -709,6 +827,8 @@ known_shapes = {
 
 #####################################################################
 
+# pylint: disable-msg=R0903
+# R0903: too few public methods
 class AbstractDrawer(object):
     """Abstract class that serves as a base class for anything that
     draws on a Cairo context within a given bounding box."""
@@ -728,13 +848,15 @@ class AbstractDrawer(object):
             bbox = BoundingBox(bbox)
         self.bbox = bbox
 
-    def draw(self):
+    def draw(self, *args, **kwds):
         """Abstract method, must be implemented in derived classes."""
         raise NotImplementedError("abstract class")
 
 
 #####################################################################
 
+# pylint: disable-msg=R0922
+# R0922: Abstract class is only referenced 1 times
 class AbstractGraphDrawer(AbstractDrawer):
     """Abstract class that serves as a base class for anything that
     draws a graph on a Cairo context within a given bounding box.
@@ -742,7 +864,8 @@ class AbstractGraphDrawer(AbstractDrawer):
     This class is primarily used to collect routines that can be
     potentially useful in different kinds of graph drawers."""
 
-    def collect_attributes(self, name, alt_name, kwds, vs, default, transform=None, config=None):
+    def collect_attributes(self, name, alt_name, kwds, vs, default, \
+                           transform=None, config=None):
         """Collects graph visualization attributes from various sources.
 
         This method can be used to collect the attributes required for graph
@@ -787,7 +910,7 @@ class AbstractGraphDrawer(AbstractDrawer):
 
         try:
             attrs = vs[alt_name]
-        except:
+        except KeyError:
             attrs = None
 
         result = kwds.get(name, None)
@@ -795,21 +918,24 @@ class AbstractGraphDrawer(AbstractDrawer):
             if not result:
                 result = attrs
             else:
-                if isinstance(result, str): result = [result] * n
+                if isinstance(result, str):
+                    result = [result] * n
                 try:
                     len(result)
                 except TypeError:
                     result = [result] * n
-                result = [result[idx] or attrs[idx] for idx in xrange(len(result))]
+                result = [result[idx] or attrs[idx] \
+                          for idx in xrange(len(result))]
 
-        if isinstance(result, str): result = [result] * n
+        if isinstance(result, str):
+            result = [result] * n
         try:
-            m = len(result)
+            len(result)
         except TypeError:
             result = [result] * n
 
-        if not hasattr(result, "extend"): result = list(result)
-        m = len(result)
+        if not hasattr(result, "extend"):
+            result = list(result)
         while len(result) < n:
             if len(result) <= n/2:
                 result.extend(result)
@@ -819,7 +945,7 @@ class AbstractGraphDrawer(AbstractDrawer):
         # By now, the length of the result vector should be n as requested
         try:
             conf_def = config["plotting.%s" % name]
-        except:
+        except NoOptionError:
             conf_def = None
 
         if conf_def and None in result:
@@ -832,6 +958,10 @@ class AbstractGraphDrawer(AbstractDrawer):
             result = [transform(x) for x in result]
 
         return result
+
+    def draw(self, *args, **kwds):
+        """Abstract method, must be implemented in derived classes."""
+        raise NotImplementedError("abstract class")
 
 
 #####################################################################
@@ -859,10 +989,15 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
         """
         AbstractGraphDrawer.__init__(self, context, bbox)
 
+    # pylint: disable-msg=W0142,W0221,E1101
+    # W0142: Used * or ** magic
+    # W0221: argument number differs from overridden method
+    # E1101: Module 'cairo' has no 'foo' member - of course it does :)
     def draw(self, graph, palette, *args, **kwds):
         from igraph.layout import Layout
 
-        vcount, ecount, directed = graph.vcount(), graph.ecount(), graph.is_directed()
+        vcount = graph.vcount()
+        directed = graph.is_directed()
         context = self.context
 
         margin = kwds.get("margin", [0., 0., 0., 0.])
@@ -870,8 +1005,9 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
             margin = list(margin)
         except TypeError:
             margin = [margin]
-        while len(margin)<4: margin.extend(margin)
-        margin = tuple(map(float, margin[:4]))
+        while len(margin)<4:
+            margin.extend(margin)
+        margin = tuple(float(length) for length in margin[:4])
 
         vertex_colors = self.collect_attributes("vertex_color", \
             "color", kwds, graph.vs, "red", palette.get)
@@ -921,13 +1057,15 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
             else:
                 # Determine where the edge intersects the circumference of the
                 # vertex shape. TODO: theoretically this need not to be done
-                # if there are no arrowheads on the edge, but maybe it's not worth
-                # testing for
+                # if there are no arrowheads on the edge, but maybe it's not
+                # worth testing for
                 p1 = vertex_shapes[src].intersection_point( \
-                    layout[src][0], layout[src][1], layout[tgt][0], layout[tgt][1],
+                    layout[src][0], layout[src][1], \
+                    layout[tgt][0], layout[tgt][1], \
                     vertex_sizes[src])
                 p2 = vertex_shapes[tgt].intersection_point( \
-                    layout[tgt][0], layout[tgt][1], layout[src][0], layout[src][1],
+                    layout[tgt][0], layout[tgt][1], \
+                    layout[src][0], layout[src][1],
                     vertex_sizes[tgt])
                 context.move_to(*p1)
                 context.line_to(*p2)
@@ -954,7 +1092,8 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
         # Draw the vertices
         context.set_line_width(1)
         for idx in xrange(vcount):
-            vertex_shapes[idx].draw_path(context, layout[idx][0], layout[idx][1], vertex_sizes[idx])
+            vertex_shapes[idx].draw_path(context, \
+                    layout[idx][0], layout[idx][1], vertex_sizes[idx])
             context.set_source_rgb(*vertex_colors[idx])
             context.fill_preserve()
             context.set_source_rgb(0., 0., 0.)
@@ -963,7 +1102,8 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
         del vertex_shapes
 
         # Draw the vertex labels
-        if "vertex_label" not in kwds and "label" not in graph.vs.attribute_names():
+        if "vertex_label" not in kwds and \
+            "label" not in graph.vs.attribute_names():
             vertex_labels = [str(i) for i in xrange(vcount)]
         elif "vertex_label" in kwds and kwds["vertex_label"] is None:
             vertex_labels = [""] * vcount
@@ -986,9 +1126,10 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
             cairo.FONT_WEIGHT_BOLD)
         
         for idx in xrange(vcount):
-            xb, yb, w, h = context.text_extents(vertex_labels[idx])[:4]
+            xb, _, w, h = context.text_extents(vertex_labels[idx])[:4]
             cx, cy = layout[idx]
-            si, co = math.sin(vertex_degrees[idx]), math.cos(vertex_degrees[idx])
+            si = math.sin(vertex_degrees[idx])
+            co = math.cos(vertex_degrees[idx])
             cx += co * vertex_dists[idx] * vertex_sizes[idx] / 2.
             cy += si * vertex_dists[idx] * vertex_sizes[idx] / 2.
             cx += (co - 1) * w/2. + xb
@@ -1002,6 +1143,8 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
 
 #####################################################################
 
+# pylint: disable-msg=R0922
+# R0922: Abstract class is only referenced 1 times
 class CoordinateSystem(AbstractDrawer):
     """Class implementing a coordinate system object.
 
@@ -1029,7 +1172,7 @@ class CoordinateSystem(AbstractDrawer):
         """
         raise NotImplementedError("abstract class")
 
-    def local_to_context(self, *args):
+    def local_to_context(self, x, y):
         """Converts local coordinates to the context coordinate system (given
         by the bounding box).
         
@@ -1037,7 +1180,7 @@ class CoordinateSystem(AbstractDrawer):
         raise NotImplementedError("abstract class")
 
 
-class DescartesCoordinateSystem(object):
+class DescartesCoordinateSystem(CoordinateSystem):
     """Class implementing a 2D Descartes coordinate system object."""
 
     def __init__(self, context, bbox, bounds):
@@ -1049,26 +1192,36 @@ class DescartesCoordinateSystem(object):
           system.
         @param bounds: minimum and maximum X and Y values in a 4-tuple.
         """
-        self.context = context
-        self._bounds = None
+        self._bounds, self._bbox = None, None
+        self._sx, self._sy = None, None
+        self._ox, self._oy, self._ox2, self._oy2 = None, None, None, None
+
+        CoordinateSystem.__init__(self, context, bbox)
         self.bbox = bbox
         self.bounds = bounds
-        self._recalc_scale_factors()
 
-    def _get_bbox(self): return BoundingBox(self._bbox.coords)
+    def _get_bbox(self):
+        """Returns the bounding box of the coordinate system"""
+        return BoundingBox(self._bbox.coords)
     def _set_bbox(self, bbox):
+        """Sets the bounding box of the coordinate system"""
         self._bbox = bbox
         self._recalc_scale_factors()
-    bbox = property(_get_bbox, _set_bbox, doc="The bounding box of the coordinate system")
+    bbox = property(_get_bbox, _set_bbox)
 
-    def _get_bounds(self): return self._bounds.coords
+    def _get_bounds(self):
+        """Returns the lower and upper bounds of the X and Y values"""
+        return self._bounds.coords
     def _set_bounds(self, bounds):
+        """Sets the lower and upper bounds of the X and Y values"""
         self._bounds = BoundingBox(bounds)
         self._recalc_scale_factors()
-    bounds = property(_get_bounds, _set_bounds, doc="The lower and upper bounds of the X and Y values")
+    bounds = property(_get_bounds, _set_bounds)
 
     def _recalc_scale_factors(self):
-        if self._bounds is None: return
+        """Recalculates some cached scale factors used within the class"""
+        if self._bounds is None:
+            return
         self._sx = self._bbox.width / self._bounds.width
         self._sy = self._bbox.height / self._bounds.height
         self._ox = self._bounds.left
@@ -1131,12 +1284,20 @@ def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
 
     @see: Graph.__plot__
     """
-    if not isinstance(bbox, BoundingBox): bbox=BoundingBox(bbox)
+    if not isinstance(bbox, BoundingBox):
+        bbox = BoundingBox(bbox)
+
     result = Plot(target, bbox)
-    cw, ch = bbox.width/60., bbox.height/60.
-    result.add(obj, bbox.contract((cw, ch, cw, ch)), *args, **kwds)
-    if target is None: result.show()
-    if isinstance(target, basestring): result.save()
+    contract_w, contract_h = bbox.width/60., bbox.height/60.
+    bbox = bbox.contract((contract_w, contract_h, contract_w, contract_h))
+
+    result.add(obj, bbox, *args, **kwds)
+    if target is None:
+        result.show()
+
+    if isinstance(target, basestring):
+        result.save()
+
     return result
 
 #####################################################################
