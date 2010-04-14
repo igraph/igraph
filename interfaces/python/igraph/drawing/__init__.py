@@ -12,27 +12,7 @@ U{Inkscape<http://www.inkscape.org>} (free), U{Skencil<http://www.skencil.org>}
 I'm not linking to it :)).
 """
 
-__license__ = """
-Copyright (C) 2006-2007  Gabor Csardi <csardi@rmki.kfki.hu>,
-Tamas Nepusz <ntamas@rmki.kfki.hu>
-
-MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
-02110-1301 USA
-"""
+from __future__ import with_statement
 
 from warnings import warn
 from operator import itemgetter
@@ -47,8 +27,12 @@ from ConfigParser import NoOptionError
 import igraph.colors as colors
 
 from igraph.configuration import Configuration
+from igraph.drawing.shapes import ShapeDrawerDirectory
+from igraph.utils import named_temporary_file
 
 __all__ = ["BoundingBox", "DefaultGraphDrawer", "Plot", "Point", "plot"]
+
+__license__ = "GPL"
 
 try:
     import cairo
@@ -63,7 +47,7 @@ except ImportError:
             raise TypeError("plotting not available")
         def __call__(self, _):
             raise TypeError("plotting not available")
-        def __setattr__(self, _, _):
+        def __setattr__(self, key, value):
             raise TypeError("plotting not available")
 
     # pylint: disable-msg=C0103
@@ -346,9 +330,7 @@ class Plot(object):
         """
         self._filename = None
         self._surface_was_created = not isinstance(target, cairo.Surface)
-        self._tmpfile = False
-        self._tmpfile_name = None
-        self._filename = None
+        self._need_tmpfile = False
         self._bgcolor = None
 
         # Several Windows-specific hacks will be used from now on, thanks
@@ -356,9 +338,9 @@ class Plot(object):
         self._windows_hacks = "Windows" in platform.platform()
 
         if bbox is None:
-            bbox = BoundingBox(600, 600)
+            self.bbox = BoundingBox(600, 600)
         elif isinstance(bbox, tuple) or isinstance(bbox, list):
-            bbox = BoundingBox(bbox)
+            self.bbox = BoundingBox(bbox)
 
         if palette is None:
             config = Configuration.instance()
@@ -368,9 +350,9 @@ class Plot(object):
         self._palette = palette
 
         if target is None:
-            self._tmpfile = True
+            self._need_tmpfile = True
             self._surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, \
-                int(bbox.width), int(bbox.height))
+                int(self.bbox.width), int(self.bbox.height))
             self._bgcolor = (1., 1., 1.)
         elif isinstance(target, cairo.Surface):
             self._surface = target
@@ -379,21 +361,19 @@ class Plot(object):
             _, ext = os.path.splitext(target)
             ext = ext.lower()
             if ext == ".pdf":
-                self._surface = cairo.PDFSurface(target, \
-                                                 bbox.width, bbox.height)
+                self._surface = cairo.PDFSurface(target, self.bbox.width, \
+                                                 self.bbox.height)
             elif ext == ".ps":
-                self._surface = cairo.PSSurface(target, \
-                                                bbox.width, bbox.height)
+                self._surface = cairo.PSSurface(target, self.bbox.width, \
+                                                self.bbox.height)
             elif ext == ".png":
                 self._surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, \
-                    int(bbox.width), int(bbox.height))
+                    int(self.bbox.width), int(self.bbox.height))
                 self._bgcolor = (1., 1., 1.)
             elif ext == ".svg":
-                self._surface = cairo.SVGSurface(target, \
-                                                 bbox.width, bbox.height)
+                self._surface = cairo.SVGSurface(target, self.bbox.width, \
+                                                 self.bbox.height)
 
-        self._width = bbox.width
-        self._height = bbox.height
         self._ctx = cairo.Context(self._surface)
         self._objects = []
         self._is_dirty = False
@@ -420,7 +400,7 @@ class Plot(object):
         """
         if opacity < 0.0 or opacity > 1.0:
             raise ValueError("opacity must be between 0.0 and 1.0")
-        bbox = bbox or self.bounding_box
+        bbox = bbox or self.bbox
         if not isinstance(bbox, BoundingBox):
             bbox = BoundingBox(bbox)
         self._objects.append((obj, bbox, palette, opacity, args, kwds))
@@ -464,7 +444,7 @@ class Plot(object):
         ctx = context or self._ctx
         if self._bgcolor is not None:
             ctx.set_source_rgb(*self._bgcolor)
-            ctx.rectangle(0, 0, self._width, self._height)
+            ctx.rectangle(0, 0, self.bbox.width, self.bbox.height)
             ctx.fill()
 
         for obj, bbox, palette, opacity, args, kwds in self._objects:
@@ -486,19 +466,6 @@ class Plot(object):
 
         self._is_dirty = False
 
-    def _create_tmpfile(self):
-        """Creates a temporary file to plot to"""
-        from tempfile import mkstemp
-        handle, self._tmpfile_name = mkstemp(prefix="igraph", suffix=".png")
-        os.close(handle)
-        return self._tmpfile_name
-
-    def _close_tmpfile(self):
-        """Closes the temporary file used for plotting"""
-        if self._tmpfile_name:
-            os.unlink(self._tmpfile_name)
-            self._tmpfile_name = None
-
     def save(self, fname=None):
         """Saves the plot.
 
@@ -508,29 +475,29 @@ class Plot(object):
         if self._is_dirty:
             self.redraw()
         if isinstance(self._surface, cairo.ImageSurface):
-            if self._tmpfile:
-                self._create_tmpfile()
-            fname = fname or self._filename or self._tmpfile_name
+            if self._need_tmpfile:
+                with named_temporary_file(prefix="igraph", suffix=".png") as fname:
+                    self._surface.write_to_png(fname)
+                    return None
+
+            fname  = fname or self._filename
             if fname is None:
                 raise ValueError("no file name is known for the surface " + \
                                  "and none given")
-            result = self._surface.write_to_png(fname)
-            if self._tmpfile:
-                self._close_tmpfile()
-            if not self._tmpfile:
-                return result
-        else:
-            if fname is not None:
-                warn("filename is ignored for surfaces other than ImageSurface")
+            return self._surface.write_to_png(fname)
 
-            self._ctx.show_page()
-            self._surface.finish()
+        if fname is not None:
+            warn("filename is ignored for surfaces other than ImageSurface")
+
+        self._ctx.show_page()
+        self._surface.finish()
+
 
     def show(self):
         """Saves the plot to a temporary file and shows it."""
         if not isinstance(self._surface, cairo.ImageSurface):
             sur = cairo.ImageSurface(cairo.FORMAT_ARGB32,
-                    int(self._width), int(self._height))
+                    int(self.bbox.width), int(self.bbox.height))
             ctx = cairo.Context(sur)
             self.redraw(ctx)
         else:
@@ -539,39 +506,38 @@ class Plot(object):
             if self._is_dirty:
                 self.redraw(ctx)
 
-        self._create_tmpfile()
-        sur.write_to_png(self._tmpfile_name)
+        with named_temporary_file(prefix="igraph", suffix=".png") as tmpfile:
+            sur.write_to_png(tmpfile)
+            config = Configuration.instance()
+            imgviewer = config["apps.image_viewer"]
+            if not imgviewer:
+                # No image viewer was given and none was detected. This
+                # should only happen on unknown platforms.
+                plat = platform.system()
+                raise NotImplementedError("showing plots is not implemented " + \
+                                          "on this platform: %s" % plat)
+            else:
+                os.system("%s %s" % (imgviewer, tmpfile))
+                if platform.system() == "Darwin" or self._windows_hacks:
+                    # On Mac OS X and Windows, launched applications are likely to
+                    # fork and give control back to Python immediately.
+                    # Chances are that the temporary image file gets removed
+                    # before the image viewer has a chance to open it, so
+                    # we wait here a little bit. Yes, this is quite hackish :(
+                    time.sleep(5)
 
-        config = Configuration.instance()
-        imgviewer = config["apps.image_viewer"]
-        if not imgviewer:
-            # No image viewer was given and none was detected. This
-            # should only happen on unknown platforms.
-            plat = platform.system()
-            raise NotImplementedError("showing plots is not implemented " + \
-                                      "on this platform: %s" % plat)
-        else:
-            os.system("%s %s" % (imgviewer, self._tmpfile_name))
-            if platform.system() == "Darwin" or self._windows_hacks:
-                # On Mac OS X and Windows, launched applications are likely to
-                # fork and give control back to Python immediately.
-                # Chances are that the temporary image file gets removed
-                # before the image viewer has a chance to open it, so
-                # we wait here a little bit. Yes, this is quite hackish :(
-                time.sleep(5)
-        self._close_tmpfile()
 
     @property
     def bounding_box(self):
         """Returns the bounding box of the Cairo surface as a
         L{BoundingBox} object"""
-        return BoundingBox(self._width, self._height)
+        return BoundingBox(self.bbox)
 
     @property
     def height(self):
         """Returns the height of the Cairo surface on which the plot
         is drawn"""
-        return self._height
+        return self.bbox.height
 
     @property
     def surface(self):
@@ -582,248 +548,7 @@ class Plot(object):
     def width(self):
         """Returns the width of the Cairo surface on which the plot
         is drawn"""
-        return self._width
-
-#####################################################################
-
-class ShapeDrawer(object):
-    """Static class, the ancestor of all vertex shape drawer classes.
-    
-    Custom shapes must implement at least the C{draw_path} method of the class.
-    The method I{must not} stroke or fill, it should just set up the current
-    Cairo path appropriately."""
-
-    @staticmethod
-    def draw_path(ctx, center_x, center_y, width, height=None):
-        """Draws the path of the shape on the given Cairo context, without
-        stroking or filling it.
-
-        This method must be overridden in derived classes implementing custom shapes
-        and declared as a static method using C{staticmethod(...)}.
-
-        @param ctx: the context to draw on
-        @param center_x: the X coordinate of the center of the object
-        @param center_y: the Y coordinate of the center of the object
-        @param width: the width of the object
-        @param height: the height of the object. If C{None}, equals to the width.
-        """
-        raise NotImplementedError("abstract class")
-
-    # pylint: disable-msg=W0613
-    @staticmethod
-    def intersection_point(center_x, center_y, source_x, source_y, \
-            width, height=None):
-        """Determines where the shape centered at (center_x, center_y)
-        intersects with a line drawn from (source_x, source_y) to
-        (center_x, center_y).
-
-        Can be overridden in derived classes. Must always be defined as a static
-        method using C{staticmethod(...)}
-
-        @param width: the width of the shape
-        @param height: the height of the shape. If C{None}, defaults to the width
-        @return: the intersection point (the closest to (source_x, source_y) if
-            there are more than one) or (center_x, center_y) if there is no
-            intersection
-        """
-        return center_x, center_y
-
-
-class NullDrawer(ShapeDrawer):
-    """Static drawer class which draws nothing.
-
-    This class is used for graph vertices with unknown shapes"""
-
-    @staticmethod
-    def draw_path(ctx, center_x, center_y, width, height=None):
-        """Draws nothing."""
-        pass
-
-
-class RectangleDrawer(ShapeDrawer):
-    """Static class which draws rectangular vertices"""
-
-    @staticmethod
-    def draw_path(ctx, center_x, center_y, width, height=None):
-        """Draws a rectangle-shaped path on the Cairo context without stroking
-        or filling it.
-        @see: ShapeDrawer.draw_path"""
-        height = height or width
-        ctx.rectangle(center_x - width/2., center_y - height/2.,
-                width, height)
-
-    # pylint: disable-msg=C0103, R0911
-    # R0911: too many return statements
-    @staticmethod
-    def intersection_point(center_x, center_y, source_x, source_y, \
-            width, height=None):
-        """Determines where the rectangle centered at (center_x, center_y)
-        having the given width and height intersects with a line drawn from
-        (source_x, source_y) to (center_x, center_y).
-
-        @see: ShapeDrawer.intersection_point"""
-        height = height or width
-        delta_x, delta_y = center_x-source_x, center_y-source_y
-
-        if delta_x == 0 and delta_y == 0:
-            return center_x, center_y
-
-        if delta_y > 0 and delta_x <= delta_y and delta_x >= -delta_y:
-            # this is the top edge
-            ry = center_y - height/2.
-            ratio = (height/2.) / delta_y
-            return center_x-ratio*delta_x, ry
-
-        if delta_y < 0 and delta_x <= -delta_y and delta_x >= delta_y:
-            # this is the bottom edge
-            ry = center_y + height/2.
-            ratio = (height/2.) / -delta_y
-            return center_x-ratio*delta_x, ry
-
-        if delta_x > 0 and delta_y <= delta_x and delta_y >= -delta_x:
-            # this is the left edge
-            rx = center_x - width/2.
-            ratio = (width/2.) / delta_x
-            return rx, center_y-ratio*delta_y
-
-        if delta_x < 0 and delta_y <= -delta_x and delta_y >= delta_x:
-            # this is the right edge
-            rx = center_x + width/2.
-            ratio = (width/2.) / -delta_x
-            return rx, center_y-ratio*delta_y
-
-        if delta_x == 0:
-            if delta_y > 0:
-                return center_x, center_y - height/2.
-            return center_x, center_y + height/2.
-
-        if delta_y == 0:
-            if delta_x > 0:
-                return center_x - width/2., center_y
-            return center_x + width/2., center_y
-
-
-class CircleDrawer(ShapeDrawer):
-    """Static class which draws circular vertices"""
-
-    @staticmethod
-    def draw_path(ctx, center_x, center_y, width, height=None):
-        """Draws a circular path on the Cairo context without stroking or
-        filling it.
-
-        Height is ignored, it is the width that determines the diameter of the circle.
-
-        @see: ShapeDrawer.draw_path"""
-        ctx.arc(center_x, center_y, width/2., 0, 2*math.pi)
-
-    @staticmethod
-    def intersection_point(center_x, center_y, source_x, source_y, \
-            width, height=None):
-        """Determines where the circle centered at (center_x, center_y)
-        intersects with a line drawn from (source_x, source_y) to
-        (center_x, center_y).
-
-        @see: ShapeDrawer.intersection_point"""
-        height = height or width
-        angle = math.atan2(center_y-source_y, center_x-source_x)
-        return center_x-width/2. * math.cos(angle), \
-               center_y-height/2.* math.sin(angle)
-
-
-class UpTriangleDrawer(ShapeDrawer):
-    """Static class which draws upright triangles"""
-
-    @staticmethod
-    def draw_path(ctx, center_x, center_y, width, height=None):
-        """Draws an upright triangle on the Cairo context without stroking or
-        filling it.
-        
-        @see: ShapeDrawer.draw_path"""
-        height = height or width
-        ctx.move_to(center_x-width/2., center_y+height/2.)
-        ctx.line_to(center_x, center_y-height/2.)
-        ctx.line_to(center_x+width/2., center_y+height/2.)
-        ctx.line_to(center_x-width/2., center_y+height/2.)
-
-    @staticmethod
-    def intersection_point(center_x, center_y, source_x, source_y, \
-            width, height=None):
-        """Determines where the triangle centered at (center_x, center_y)
-        intersects with a line drawn from (source_x, source_y) to
-        (center_x, center_y).
-
-        @see: ShapeDrawer.intersection_point"""
-        # TODO: finish it properly
-        height = height or width
-        return center_x, center_y
-
-class DownTriangleDrawer(ShapeDrawer):
-    """Static class which draws triangles pointing down"""
-
-    @staticmethod
-    def draw_path(ctx, center_x, center_y, width, height=None):
-        """Draws a triangle on the Cairo context without stroking or
-        filling it.
-        
-        @see: ShapeDrawer.draw_path"""
-        height = height or width
-        ctx.move_to(center_x-width/2., center_y-height/2.)
-        ctx.line_to(center_x, center_y+height/2.)
-        ctx.line_to(center_x+width/2., center_y-height/2.)
-        ctx.line_to(center_x-width/2., center_y-height/2.)
-
-    @staticmethod
-    def intersection_point(center_x, center_y, source_x, source_y, \
-            width, height=None):
-        """Determines where the triangle centered at (center_x, center_y)
-        intersects with a line drawn from (source_x, source_y) to
-        (center_x, center_y).
-
-        @see: ShapeDrawer.intersection_point"""
-        # TODO: finish it properly
-        height = height or width
-        return center_x, center_y
-
-def draw_shape_path(shape, ctx, center_x, center_y, width, height=None):
-    """Draws a path of a shape on the given Cairo context.
-
-    @param shape: the shape to be drawn
-    @param ctx: the context to draw on
-    @param cx: X coordinate of the center of the shape
-    @param cy: Y coordinate of the center of the shape
-    @param w: desired width of the shape
-    @param h: desired height of the shape. If omitted, defaults to the width.
-    """
-    try:
-        drawer = known_shapes[shape]
-    except KeyError:
-        raise ValueError("unknown shape: %s" % shape)
-    drawer.draw_path(ctx, center_x, center_y, width, height)
-
-# pylint: disable-msg=C0103
-known_shapes = {
-    "rectangle": RectangleDrawer,
-    "rect": RectangleDrawer,
-    "rectangular": RectangleDrawer,
-    "square": RectangleDrawer,
-    "box": RectangleDrawer,
-
-    "circle": CircleDrawer,
-    "circular": CircleDrawer,
-
-    "null": NullDrawer,
-    "": NullDrawer,
-    "empty": NullDrawer,
-    "hidden": NullDrawer,
-
-    "triangle": UpTriangleDrawer,
-    "triangle-up": UpTriangleDrawer,
-    "arrow-up": UpTriangleDrawer,
-    "up-arrow": UpTriangleDrawer,
-    "triangle-down": DownTriangleDrawer,
-    "arrow-down": DownTriangleDrawer,
-    "down-arrow": DownTriangleDrawer,
-}
+        return self.bbox.width
 
 #####################################################################
 
@@ -864,8 +589,8 @@ class AbstractGraphDrawer(AbstractDrawer):
     This class is primarily used to collect routines that can be
     potentially useful in different kinds of graph drawers."""
 
-    def collect_attributes(self, name, alt_name, kwds, vs, default, \
-                           transform=None, config=None):
+    @staticmethod
+    def collect_attributes(name, alt_name, kwds, vs, default, transform=None, config=None):
         """Collects graph visualization attributes from various sources.
 
         This method can be used to collect the attributes required for graph
@@ -1013,7 +738,7 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
             "color", kwds, graph.vs, "red", palette.get)
         vertex_sizes = self.collect_attributes("vertex_size", \
             "size", kwds, graph.vs, 10, float)
-        vertex_shapes = [known_shapes.get(x, NullDrawer) \
+        vertex_shapes = [ShapeDrawerDirectory.resolve_default(x) \
             for x in self.collect_attributes("vertex_shape", \
             "shape", kwds, graph.vs, "circle")]
 
