@@ -155,7 +155,7 @@ static int igraphmodule_i_attribute_init(igraph_t *graph, igraph_vector_ptr_t *a
     char *s;
     n = igraph_vector_ptr_size(attr);
     for (i=0; i<n; i++) {
-      igraph_i_attribute_record_t *attr_rec;
+      igraph_attribute_record_t *attr_rec;
       attr_rec = VECTOR(*attr)[i];
       switch (attr_rec->type) {
       case IGRAPH_ATTRIBUTE_NUMERIC:
@@ -259,7 +259,7 @@ static int igraphmodule_i_attribute_add_vertices(igraph_t *graph, long int nv, i
   /* Extend the end of every value in the vertex hash with nv pieces of None */
   PyObject *key, *value, *dict;
   long int i, j, k, l;
-  igraph_i_attribute_record_t *attr_rec;
+  igraph_attribute_record_t *attr_rec;
   igraph_bool_t *added_attrs=0;
   Py_ssize_t pos = 0;
 
@@ -342,7 +342,7 @@ static int igraphmodule_i_attribute_add_vertices(igraph_t *graph, long int nv, i
     /* j contains the number of vertices EXCLUDING the new ones! */
     for (k=0; k<l; k++) {
       if (added_attrs[k]) continue;
-      attr_rec=(igraph_i_attribute_record_t*)VECTOR(*attr)[k];
+      attr_rec=(igraph_attribute_record_t*)VECTOR(*attr)[k];
 
       value=PyList_New(j + nv);
       if (!value) {
@@ -435,7 +435,7 @@ static int igraphmodule_i_attribute_add_edges(igraph_t *graph, const igraph_vect
   Py_ssize_t pos=0;
   long int i, j, k, l, ne;
   igraph_bool_t *added_attrs=0;
-  igraph_i_attribute_record_t *attr_rec;
+  igraph_attribute_record_t *attr_rec;
 
   ne=igraph_vector_size(edges)/2;
   if (!graph->attr) return IGRAPH_SUCCESS;
@@ -519,7 +519,7 @@ static int igraphmodule_i_attribute_add_edges(igraph_t *graph, const igraph_vect
     /* j contains the number of edges EXCLUDING the new ones! */
     for (k=0; k<l; k++) {
       if (added_attrs[k]) continue;
-      attr_rec=(igraph_i_attribute_record_t*)VECTOR(*attr)[k];
+      attr_rec=(igraph_attribute_record_t*)VECTOR(*attr)[k];
 
       value=PyList_New(j+ne);
       if (!value) {
@@ -989,8 +989,10 @@ static igraph_attribute_table_t igraphmodule_attribute_table = {
   igraphmodule_i_attribute_copy,
   igraphmodule_i_attribute_add_vertices,
   igraphmodule_i_attribute_permute_vertices,
+  0,  /* TODO */
   igraphmodule_i_attribute_add_edges,
   igraphmodule_i_attribute_permute_edges,
+  0,  /* TODO */
   igraphmodule_i_attribute_get_info,
   igraphmodule_i_attribute_has_attr,
   igraphmodule_i_attribute_get_type,
