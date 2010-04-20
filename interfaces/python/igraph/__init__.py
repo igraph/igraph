@@ -27,6 +27,8 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 
+from __future__ import with_statement
+
 from igraph.core import *
 from igraph.core import __version__, __build_date__
 from igraph.clustering import *
@@ -989,18 +991,13 @@ class Graph(core.GraphBase):
         @param compresslevel: the level of compression. 1 is fastest and
           produces the least compression, and 9 is slowest and produces
           the most compression."""
-        tmpfilename=None
-        try:
-            tmpfileno, tmpfilename = mkstemp(text=True)
-            os.close(tmpfileno)
-            self.write_graphml(tmpfilename)
+        from igraph.utils import named_temporary_file
+        with named_temporary_file(text=True) as tmpfile:
+            self.write_graphml(tmpfile)
             outf = gzip.GzipFile(f, "wb", compresslevel)
-            inf = open(tmpfilename)
-            for line in inf: outf.write(line)
-            inf.close()
+            for line in open(tmpfile):
+                outf.write(line)
             outf.close()
-        finally:
-            if tmpfilename is not None: os.unlink(tmpfilename)
 
     @classmethod
     def Read_GraphMLz(cls, f, *params, **kwds):
@@ -1014,19 +1011,13 @@ class Graph(core.GraphBase):
           start from zero, so if you want to load the first graph,
           specify 0 here.
         @return: the loaded graph object"""
-        tmpfilename=None
-        try:
-            tmpfileno, tmpfilename = mkstemp(text=True)
-            os.close(tmpfileno)
-            inf = gzip.GzipFile(f, "rb")
-            outf = open(tmpfilename, "wt")
-            for line in inf: outf.write(line)
-            inf.close()
+        from igraph.utils import named_temporary_file
+        with named_temporary_file(text=True) as tmpfile:
+            outf = open(tmpfile, "wt")
+            for line in gzip.GzipFile(f, "rb"):
+                outf.write(line)
             outf.close()
-            result=cls.Read_GraphML(tmpfilename)
-        finally:
-            if tmpfilename is not None: os.unlink(tmpfilename)
-        return result
+            return cls.Read_GraphML(tmpfile)
 
 
     def write_pickle(self, fname=None, version=-1):
@@ -1838,9 +1829,12 @@ class Graph(core.GraphBase):
         vertex_attr_names = self.vs.attribute_names()
         edge_attr_names = self.es.attribute_names()
         gattrs, vattrs, eattrs = {}, {}, {}
-        for a in graph_attr_names: gattrs[a] = self[a]
-        for a in vertex_attr_names: vattrs[a] = self.vs[a]
-        for a in edge_attr_names: eattrs[a] = self.es[a]
+        for a in graph_attr_names:
+            gattrs[a] = self[a]
+        for a in vertex_attr_names:
+            vattrs[a] = self.vs[a]
+        for a in edge_attr_names:
+            eattrs[a] = self.es[a]
         parameters = (self.vcount(), self.get_edgelist(), self.is_directed(), \
             gattrs, vattrs, eattrs)
         return (constructor, parameters, {})
