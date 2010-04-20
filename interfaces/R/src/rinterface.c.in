@@ -1243,9 +1243,34 @@ SEXP R_igraph_ac_mean_numeric(SEXP attr,
 SEXP R_igraph_ac_median_numeric(SEXP attr, 
 				const igraph_vector_ptr_t *merges) {
   SEXP res;
+  SEXP attr2;
+  long int i, len=igraph_vector_ptr_size(merges);
   
-  /* TODO */
+  PROTECT(attr2=AS_NUMERIC(attr));
+  PROTECT(res=NEW_NUMERIC(len));
 
+  for (i=0; i<len; i++) {
+    igraph_vector_t *v=VECTOR(*merges)[i];
+    long int j, n=igraph_vector_size(v);
+    SEXP tmp, call, tmp2;
+    if (n==0) {
+      REAL(res)[i] = NA_REAL;
+    } else if (n==1) {
+      REAL(res)[i] = REAL(attr2)[ (long) VECTOR(*v)[0] ];
+    } else {
+      PROTECT(tmp=NEW_NUMERIC(n));
+      for (j=0; j<n; j++) {
+	long int src=VECTOR(*v)[j];
+	REAL(tmp)[j] = REAL(attr2)[src];
+      }
+      PROTECT(call=lang2(install("median"), tmp));
+      PROTECT(tmp2=EVAL(call));
+      REAL(res)[i] = REAL(tmp2)[0];
+      UNPROTECT(3);
+    }
+  }
+  
+  UNPROTECT(2);
   return res;
 }
 
@@ -1360,10 +1385,18 @@ int R_igraph_attribute_combine_edges(const igraph_t *graph,
       }
       break;
     case IGRAPH_ATTRIBUTE_COMBINE_MEDIAN:
-      /* TODO */
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, i, R_igraph_ac_median_numeric(ea, merges));
+      } else {
+	/* TODO */
+      }
       break;
     case IGRAPH_ATTRIBUTE_COMBINE_CONCAT:
-      /* TODO */
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, i, R_igraph_ac_concat_numeric(ea, merges));
+      } else {
+	/* TODO */
+      }
       break;
     default:
       /* TODO */ 
