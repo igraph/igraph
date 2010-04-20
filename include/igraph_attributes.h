@@ -135,7 +135,7 @@ typedef enum {
   IGRAPH_ATTRIBUTE_COMBINE_LAST=9,
   IGRAPH_ATTRIBUTE_COMBINE_MEAN=10,
   IGRAPH_ATTRIBUTE_COMBINE_MEDIAN=11,
-  IGRAPG_ATTRIBUTE_COMBINE_CONCAT=12 } igraph_attribute_combination_type_t;
+  IGRAPH_ATTRIBUTE_COMBINE_CONCAT=12 } igraph_attribute_combination_type_t;
 
 typedef struct igraph_attribute_combination_record_t {
   const char *name;		/* can be NULL, meaning: the rest */
@@ -283,7 +283,7 @@ extern igraph_attribute_table_t *igraph_i_attribute_table;
 igraph_attribute_table_t *
 igraph_i_set_attribute_table(igraph_attribute_table_t * table);
 
-igraph_bool_t *igraph_has_attribute_table();
+igraph_bool_t igraph_has_attribute_table();
 
 #define IGRAPH_I_ATTRIBUTE_DESTROY(graph) \
         do {if ((graph)->attr) igraph_i_attribute_destroy(graph);} while(0)
