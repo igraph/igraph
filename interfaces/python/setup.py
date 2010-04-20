@@ -108,7 +108,7 @@ options = dict(
 
     ext_modules = [igraph_extension],
     package_dir = {'igraph': 'igraph'},
-    packages = ['igraph', 'igraph.test', 'igraph.app'],
+    packages = ['igraph', 'igraph.test', 'igraph.app', 'igraph.drawing'],
     scripts = ['scripts/igraph'],
     test_suite = "igraph.test.suite",
 
