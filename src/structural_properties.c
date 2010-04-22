@@ -2001,18 +2001,22 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
     }
     pfrom=from; pto=to;
   }
-  
-  IGRAPH_CHECK(igraph_create(&res, &edges, no_of_nodes, 
-			     igraph_is_directed(graph)));
-  
-  IGRAPH_I_ATTRIBUTE_DESTROY(&res);
-  IGRAPH_I_ATTRIBUTE_COPY(&res, graph, /*graph=*/ 1, 
-			  /*vertex=*/ 1, /*edge=*/ 0);
 
   igraph_eit_destroy(&eit);
   igraph_es_destroy(&es);
+  IGRAPH_FINALLY_CLEAN(2);
+  
+  IGRAPH_CHECK(igraph_create(&res, &edges, no_of_nodes, 
+			     igraph_is_directed(graph)));
+
   igraph_vector_destroy(&edges);
-  IGRAPH_FINALLY_CLEAN(3);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  IGRAPH_FINALLY(igraph_destroy, &res);
+
+  IGRAPH_I_ATTRIBUTE_DESTROY(&res);
+  IGRAPH_I_ATTRIBUTE_COPY(&res, graph, /*graph=*/ 1, 
+			  /*vertex=*/ 1, /*edge=*/ 0);
 
   if (attr) {
     long int i;
@@ -2053,13 +2057,14 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
     
     igraph_free(vecs);
     igraph_vector_destroy(&sizes);
-    igraph_vector_ptr_destroy(&merges);
+    igraph_i_simplify_free(&merges);
     IGRAPH_FINALLY_CLEAN(3);
     
     igraph_vector_destroy(&mergeinto);
     IGRAPH_FINALLY_CLEAN(1);
   }
   
+  IGRAPH_FINALLY_CLEAN(1);
   igraph_destroy(graph);
   *graph=res;
 
