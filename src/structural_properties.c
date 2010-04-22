@@ -2024,15 +2024,16 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
     long int no_new_edges=actedge+1;
     igraph_vector_t sizes;
     igraph_vector_t *vecs;
-    IGRAPH_CHECK(igraph_vector_ptr_init(&merges, no_new_edges));
-    IGRAPH_FINALLY(igraph_i_simplify_free, &merges);
-    IGRAPH_VECTOR_INIT_FINALLY(&sizes, no_new_edges);
+
     vecs=igraph_Calloc(no_new_edges, igraph_vector_t);
     if (!vecs) {
       IGRAPH_ERROR("Cannot merge attributes for simplify", 
 		   IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, vecs);
+    IGRAPH_CHECK(igraph_vector_ptr_init(&merges, no_new_edges));
+    IGRAPH_FINALLY(igraph_i_simplify_free, &merges);
+    IGRAPH_VECTOR_INIT_FINALLY(&sizes, no_new_edges);
 
     for (i=0; i<no_of_edges; i++) {
       long int to=VECTOR(mergeinto)[i];
@@ -2051,13 +2052,13 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
 	igraph_vector_push_back(v, i);
       }
     }
-    
+
     IGRAPH_CHECK(igraph_i_attribute_combine_edges(graph, &res, &merges, 
 						  edge_comb));
     
-    igraph_free(vecs);
     igraph_vector_destroy(&sizes);
     igraph_i_simplify_free(&merges);
+    igraph_free(vecs);
     IGRAPH_FINALLY_CLEAN(3);
     
     igraph_vector_destroy(&mergeinto);
