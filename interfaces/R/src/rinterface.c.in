@@ -1328,6 +1328,50 @@ SEXP R_igraph_ac_all_other(SEXP attr,
   return res;
 }
 
+SEXP R_igraph_ac_func(SEXP attr, 
+		      const igraph_vector_ptr_t *merges,
+		      SEXP func) {
+  SEXP res, res2;
+  long int i, len=igraph_vector_ptr_size(merges);
+  
+  PROTECT(res=NEW_LIST(len));
+  
+  for (i=0; i<len; i++) {
+    igraph_vector_t *v=VECTOR(*merges)[i];
+    long int j, n=igraph_vector_size(v);
+    SEXP tmp;
+    PROTECT(tmp=NEW_NUMERIC(n));
+    for (j=0; j<n; j++) {
+      long int src=VECTOR(*v)[j];
+      REAL(tmp)[j] = src+1;
+    }
+    SET_VECTOR_ELT(res, i, 
+		   EVAL(lang2(func, 
+			      EVAL(lang3(install("["), attr, tmp)))));
+    UNPROTECT(1);
+  }
+  
+  if (IS_VECTOR(attr)) {
+    /* try to simplify it */
+    igraph_bool_t good=1;
+    for (i=0; i<len; i++) {
+      if (GET_LENGTH(VECTOR_ELT(res, i)) != 1) {
+	good=0;
+	break;
+      }
+    }
+    if (good) {
+      res2=EVAL(lang3(install("unlist"), res, 
+		      ScalarLogical(0)));
+      UNPROTECT(1);
+      return res2;
+    }
+  }
+  
+  UNPROTECT(1);
+  return res;
+}
+
 int R_igraph_attribute_combine_vertices(const igraph_t *graph,
 			 igraph_t *newgraph,
 			 const igraph_vector_ptr_t *merges,
@@ -1379,7 +1423,7 @@ int R_igraph_attribute_combine_edges(const igraph_t *graph,
       break;
     case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
       func=(SEXP)voidfunc;
-      /* TODO */
+      SET_VECTOR_ELT(res, i, R_igraph_ac_func(ea, merges, func));
       break;
     case IGRAPH_ATTRIBUTE_COMBINE_SUM:
       if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
