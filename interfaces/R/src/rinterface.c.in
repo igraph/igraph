@@ -1280,7 +1280,7 @@ SEXP R_igraph_ac_all_other(SEXP attr,
 			   const igraph_vector_ptr_t *merges,
 			   const char *function_name,
 			   SEXP arg) {
-  SEXP res;
+  SEXP res, res2;
   long int i, len=igraph_vector_ptr_size(merges);
 
   PROTECT(res=NEW_LIST(len));
@@ -1305,6 +1305,23 @@ SEXP R_igraph_ac_all_other(SEXP attr,
 				arg)));
     }
     UNPROTECT(1);
+  }
+    
+  if (IS_VECTOR(attr)) {
+    /* try to simplify it */
+    igraph_bool_t good=1;
+    for (i=0; i<len; i++) {
+      if (GET_LENGTH(VECTOR_ELT(res, i)) != 1) {
+	good=0;
+	break;
+      }
+    }
+    if (good) {
+      res2=EVAL(lang3(install("unlist"), res, 
+		      ScalarLogical(0)));
+      UNPROTECT(1);
+      return res2;
+    }
   }
   
   UNPROTECT(1);
