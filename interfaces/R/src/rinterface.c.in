@@ -119,9 +119,10 @@ int R_igraph_attribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
   long int i;
   long int attrno;
   PROTECT(result=NEW_LIST(4));
-  SET_VECTOR_ELT(result, 0, NEW_NUMERIC(2));
+  SET_VECTOR_ELT(result, 0, NEW_NUMERIC(3));
   REAL(VECTOR_ELT(result, 0))[0]=0; /* R objects */
   REAL(VECTOR_ELT(result, 0))[1]=1; /* igraph_t objects */
+  REAL(VECTOR_ELT(result, 0))[2]=1; /* whether the graph is safe */
   for (i=1; i<3; i++) {
     SET_VECTOR_ELT(result, i+1, NEW_LIST(0)); /* gal, val, eal */
   }
@@ -167,7 +168,8 @@ int R_igraph_attribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
 void R_igraph_attribute_destroy(igraph_t *graph) {
   SEXP attr=graph->attr;
   REAL(VECTOR_ELT(attr, 0))[1] -= 1; /* refcount for igraph_t */
-  if (REAL(VECTOR_ELT(attr, 0))[1]==0) {
+  if (REAL(VECTOR_ELT(attr, 0))[1]==0 && 
+      REAL(VECTOR_ELT(attr, 0))[2]==1) {
     UNPROTECT_PTR(attr);
   }
   graph->attr=0;
