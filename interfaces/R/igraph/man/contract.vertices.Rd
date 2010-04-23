@@ -38,7 +38,7 @@ V(g)$name <- letters[1:vcount(g)]
 E(g)$weight <- runif(ecount(g))
 
 g2 <- contract.vertices(g, rep(0:4, each=2),
-                        vertex.attr.comb=list(toString))
+                        vertex.attr.comb=toString)
 
 ## graph and edge attributes are kept, vertex attributes are
 ## combined using the 'toString' function.

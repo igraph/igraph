@@ -159,6 +159,9 @@ remove.edge.attribute <- function(graph, name) {
 #############
 
 igraph.i.attribute.combination <- function(comb) {
+  if (is.function(comb)) {
+    comb <- list(comb)
+  }
   comb <- as.list(comb)
   if (any(!sapply(comb, function(x)
                   is.function(x) || (is.character(x) && length(x)==1)))) {
