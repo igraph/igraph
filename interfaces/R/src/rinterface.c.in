@@ -1376,7 +1376,129 @@ int R_igraph_attribute_combine_vertices(const igraph_t *graph,
 			 igraph_t *newgraph,
 			 const igraph_vector_ptr_t *merges,
 			 const igraph_attribute_combination_t *comb) {
-  /* TODO */
+  
+  SEXP attr=graph->attr;
+  SEXP toattr=newgraph->attr;
+  SEXP val=VECTOR_ELT(attr, 2);
+  SEXP toval;
+  long int i, valno=GET_LENGTH(val);
+  SEXP names=GET_NAMES(val);
+  SEXP res;
+  
+  /* Not safe to UNPROTECT attributes */
+  REAL(VECTOR_ELT(attr, 0))[2]=0;
+  REAL(VECTOR_ELT(toattr, 0))[2]=0;
+  
+  PROTECT(res=NEW_LIST(valno));
+  SET_NAMES(res, names);
+  for (i=0; i<valno; i++) {
+    SEXP va=VECTOR_ELT(val, i);
+    const char *name=CHAR(STRING_ELT(names, i));
+    igraph_attribute_combination_type_t todo;
+    igraph_attribute_type_t type;
+    void *voidfunc;
+    SEXP func;
+    
+    /* What kinf of attribute */
+    R_igraph_attribute_gettype(graph, &type, 
+			       IGRAPH_ATTRIBUTE_VERTEX, name);
+    
+    /* What to do with it */
+    igraph_attribute_combination_query(comb, name, &todo, &voidfunc);
+    
+    switch (todo) {
+    case IGRAPH_ATTRIBUTE_COMBINE_IGNORE:
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_DEFAULT:
+      /* Never happens from R */
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
+      func=(SEXP)voidfunc;
+      SET_VECTOR_ELT(res, i, R_igraph_ac_func(va, merges, func));
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_SUM:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, i, R_igraph_ac_sum_numeric(va, merges));
+      } else {
+	SET_VECTOR_ELT(res, i, R_igraph_ac_all_other(va, merges, "sum", NULL));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_PROD:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, i, R_igraph_ac_prod_numeric(va, merges));
+      } else {
+	SET_VECTOR_ELT(res, i, R_igraph_ac_all_other(va, merges, "prod", NULL));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_MIN:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, i, R_igraph_ac_min_numeric(va, merges));
+      } else {
+	SET_VECTOR_ELT(res, i, R_igraph_ac_all_other(va, merges, "min", NULL));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_MAX:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, i, R_igraph_ac_max_numeric(va, merges));
+      } else {
+	SET_VECTOR_ELT(res, i, R_igraph_ac_all_other(va, merges, "max", NULL));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_RANDOM:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, i, R_igraph_ac_random_numeric(va, merges));
+      } else {
+	SET_VECTOR_ELT(res, i, R_igraph_ac_all_other(va, merges, "sample", 
+						     ScalarInteger(1)));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_FIRST:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, i, R_igraph_ac_first_numeric(va, merges));
+      } else {
+	SET_VECTOR_ELT(res, i, R_igraph_ac_all_other(va, merges, "head", 
+						     ScalarInteger(1)));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_LAST:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, i, R_igraph_ac_last_numeric(va, merges));
+      } else {
+	SET_VECTOR_ELT(res, i, R_igraph_ac_all_other(va, merges, "tail", 
+						     ScalarInteger(1)));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_MEAN:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, i, R_igraph_ac_mean_numeric(va, merges));
+      } else {
+	SET_VECTOR_ELT(res, i, R_igraph_ac_all_other(va, merges, "mean", NULL));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_MEDIAN:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, i, R_igraph_ac_median_numeric(va, merges));
+      } else {
+	SET_VECTOR_ELT(res, i, R_igraph_ac_all_other(va, merges, "median", NULL));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_CONCAT:
+      SET_VECTOR_ELT(res, i, R_igraph_ac_all_other(va, merges, "c", NULL));
+      break;
+    default:
+      IGRAPH_ERROR("Unknown attribute combination", 
+		   IGRAPH_UNIMPLEMENTED);
+      break;
+    }
+  } 
+
+  /* It is now safe to UNPROTECT attributes */
+  REAL(VECTOR_ELT(attr, 0))[2]=1;
+  REAL(VECTOR_ELT(toattr, 0))[2]=1;
+
+  SET_VECTOR_ELT(toattr, 2, res);
+  UNPROTECT(1);
+  
   return 0;
 }
 
