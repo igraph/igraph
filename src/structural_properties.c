@@ -6027,6 +6027,23 @@ int igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
 
 /**
  * \function igraph_contract_vertices
+ * Replace multiple vertices with a single one
+ * 
+ * This function creates a new graph, by merging several 
+ * vertices into one. The vertices in the new graph correspond
+ * to sets of vertices in the input graph.
+ * \param graph The input graph, it can be directed or 
+ *        undirected.
+ * \param mapping A vector giving the mapping. For each 
+ *        vertex in the original graph, it should contain 
+ *        its id in the new graph.
+ * \param vertex_comb What to do with the vertex attributes. 
+ *        See the igraph manual section about attributes for 
+ *        details.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), linear in the number 
+ * or vertices plus edges.
  */
 
 int igraph_contract_vertices(igraph_t *graph,
