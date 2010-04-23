@@ -6047,12 +6047,15 @@ int igraph_contract_vertices(igraph_t *graph,
   for (e=0; e<no_of_edges; e++) {
     long int from = IGRAPH_FROM(graph, e);
     long int to = IGRAPH_TO(graph, e);
+
+    long int nfrom = VECTOR(*mapping)[from];
+    long int nto = VECTOR(*mapping)[to];
     
-    igraph_vector_push_back(&edges, VECTOR(*mapping)[from]);
-    igraph_vector_push_back(&edges, VECTOR(*mapping)[to]);
+    igraph_vector_push_back(&edges, nfrom);
+    igraph_vector_push_back(&edges, nto);
     
-    if (from > last) { last = from; }
-    if (to   > last) { last = to;   }
+    if (nfrom > last) { last = nfrom; }
+    if (nto   > last) { last = nto;   }
   }
 			   
   no_new_vertices = last+1;
