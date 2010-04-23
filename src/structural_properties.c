@@ -6057,6 +6057,11 @@ int igraph_contract_vertices(igraph_t *graph,
   igraph_t res;
   long int e, last=0;
   long int no_new_vertices;
+
+  if (igraph_vector_size(mapping) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid mapping vector length", 
+		 IGRAPH_EINVAL);
+  }
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges*2));
