@@ -345,8 +345,23 @@ int igraph_i_cattribute_add_vertices(igraph_t *graph, long int nv,
   return 0;
 }
 
-void igraph_i_cattribute_permute_vertices_free(igraph_vector_ptr_t *v) {
-  /* TODO */
+void igraph_i_cattribute_permute_free(igraph_vector_ptr_t *v) {
+  long int i, n=igraph_vector_ptr_size(v);
+  for (i=0; i<n; i++) {
+    igraph_attribute_record_t *rec=VECTOR(*v)[i];
+    igraph_Free(rec->name);
+    if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
+      igraph_vector_t *numv= (igraph_vector_t*) rec->value;
+      igraph_vector_destroy(numv);
+      igraph_Free(numv);
+    } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
+      igraph_strvector_t *strv= (igraph_strvector_t*) rec->value;
+      igraph_strvector_destroy(strv);
+      igraph_Free(strv);
+    }
+    igraph_Free(rec);
+  }
+  igraph_vector_ptr_clear(v);
 }
 
 int igraph_i_cattribute_permute_vertices(const igraph_t *graph,
@@ -413,7 +428,7 @@ int igraph_i_cattribute_permute_vertices(const igraph_t *graph,
     }
     IGRAPH_CHECK(igraph_vector_ptr_resize(new_val, valno));
     
-    IGRAPH_FINALLY(igraph_i_cattribute_permute_vertices_free, new_val);
+    IGRAPH_FINALLY(igraph_i_cattribute_permute_free, new_val);
     
     for (i=0; i<valno; i++) {
       igraph_attribute_record_t *oldrec=VECTOR(*val)[i];
@@ -706,10 +721,6 @@ int igraph_i_cattribute_add_edges(igraph_t *graph, const igraph_vector_t *edges,
   
 /* } */
 
-void igraph_i_cattribute_permute_edges_free(igraph_vector_ptr_t *v) {
-  /* TODO */
-}
-
 int igraph_i_cattribute_permute_edges(const igraph_t *graph,
 				      igraph_t *newgraph,
 				      const igraph_vector_t *idx) {
@@ -771,7 +782,7 @@ int igraph_i_cattribute_permute_edges(const igraph_t *graph,
     igraph_vector_ptr_t *new_eal=&new_attr->eal;
     IGRAPH_CHECK(igraph_vector_ptr_resize(new_eal, ealno));
     
-    IGRAPH_FINALLY(igraph_i_cattribute_permute_edges_free, new_eal);
+    IGRAPH_FINALLY(igraph_i_cattribute_permute_free, new_eal);
     
     for (i=0; i<ealno; i++) {
       igraph_attribute_record_t *oldrec=VECTOR(*eal)[i];
