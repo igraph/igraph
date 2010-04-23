@@ -6024,3 +6024,98 @@ int igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
   }
   return 0;
 }
+
+/**
+ * \function igraph_contract_vertices
+ */
+
+int igraph_contract_vertices(igraph_t *graph,
+			     const igraph_vector_t *mapping,
+			     const igraph_attribute_combination_t 
+			     *vertex_comb) {
+  igraph_vector_t edges;
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_bool_t vattr=vertex_comb && igraph_has_attribute_table();
+  igraph_t res;
+  long int e, last=0;
+  long int no_new_vertices;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges*2));
+  
+  for (e=0; e<no_of_edges; e++) {
+    long int from = IGRAPH_FROM(graph, e);
+    long int to = IGRAPH_TO(graph, e);
+    
+    igraph_vector_push_back(&edges, VECTOR(*mapping)[from]);
+    igraph_vector_push_back(&edges, VECTOR(*mapping)[to]);
+    
+    if (from > last) { last = from; }
+    if (to   > last) { last = to;   }
+  }
+			   
+  no_new_vertices = last+1;
+  
+  IGRAPH_CHECK(igraph_create(&res, &edges, no_new_vertices,
+			     igraph_is_directed(graph)));
+  
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  IGRAPH_FINALLY(igraph_destroy, &res);
+  
+  IGRAPH_I_ATTRIBUTE_DESTROY(&res);
+  IGRAPH_I_ATTRIBUTE_COPY(&res, graph, /*graph=*/ 1,
+			  /*vertex=*/ 0, /*edge=*/ 1);
+  
+  if (vattr) {
+    long int i;
+    igraph_vector_ptr_t merges;
+    igraph_vector_t sizes;
+    igraph_vector_t *vecs;
+    
+    vecs=igraph_Calloc(no_new_vertices, igraph_vector_t);
+    if (!vecs) {
+      IGRAPH_ERROR("Cannot combine attributes while contracting"
+		   " vertices", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, vecs);
+    IGRAPH_CHECK(igraph_vector_ptr_init(&merges, no_new_vertices));
+    IGRAPH_FINALLY(igraph_i_simplify_free, &merges);
+    IGRAPH_VECTOR_INIT_FINALLY(&sizes, no_new_vertices);
+    
+    for (i=0; i<no_of_nodes; i++) {
+      long int to=VECTOR(*mapping)[i];
+      VECTOR(sizes)[to] += 1;
+    }
+    for (i=0; i<no_new_vertices; i++) {
+      igraph_vector_t *v=&vecs[i];
+      IGRAPH_CHECK(igraph_vector_init(v, VECTOR(sizes)[i]));
+      igraph_vector_clear(v);
+      VECTOR(merges)[i]=v;
+    }
+    for (i=0; i<no_of_nodes; i++) {
+      long int to=VECTOR(*mapping)[i];
+      igraph_vector_t *v=&vecs[to];
+      igraph_vector_push_back(v, i);
+    }
+    
+    IGRAPH_CHECK(igraph_i_attribute_combine_vertices(graph, &res, 
+						     &merges,
+						     vertex_comb));
+    
+    igraph_vector_destroy(&sizes);
+    igraph_i_simplify_free(&merges);
+    igraph_free(vecs);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  IGRAPH_FINALLY_CLEAN(1);
+  igraph_destroy(graph);
+  *graph=res;
+  
+  return 0;
+}
+
+      
