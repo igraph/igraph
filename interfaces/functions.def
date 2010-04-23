@@ -658,6 +658,11 @@ igraph_assortativity_degree:
         PARAMS: GRAPH graph, OUT REALPTR res, BOOLEAN directed=True
         NAME-R: assortativity.degree
 
+igraph_contract_vertices:
+        PARAMS: INOUT GRAPH graph, VECTOR mapping, \
+                VERTEX_ATTRIBUTE_COMBINATION vertex_attr_comb=Default
+        NAME-R: contract.vertices
+
 #######################################
 # Visitors
 #######################################
