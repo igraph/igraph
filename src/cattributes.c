@@ -26,6 +26,7 @@
 #include "config.h"
 #include "igraph_math.h"
 #include "igraph_interface.h"
+#include "igraph_random.h"
 
 #include <string.h>
 
@@ -512,6 +513,284 @@ int igraph_i_cattributes_cn_sum(const igraph_attribute_record_t *oldrec,
   return 0;
 }
 
+int igraph_i_cattributes_cn_prod(const igraph_attribute_record_t *oldrec, 
+				 igraph_attribute_record_t * newrec, 
+				 const igraph_vector_ptr_t *merges) {
+  const igraph_vector_t *oldv=oldrec->value;
+  igraph_vector_t *newv=igraph_Calloc(1, igraph_vector_t);
+  long int newlen=igraph_vector_ptr_size(merges);
+  long int i;
+ 
+  if (!newv) {
+    IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, newv);
+  IGRAPH_VECTOR_INIT_FINALLY(newv, newlen);
+  
+  for (i=0; i<newlen; i++) {
+    igraph_real_t s=1.0;
+    igraph_vector_t *idx=VECTOR(*merges)[i];
+    long int j, n=igraph_vector_size(idx);
+    for (j=0; j<n; j++) {
+      long int x=VECTOR(*idx)[j];      
+      s *= VECTOR(*oldv)[x];
+    }
+    VECTOR(*newv)[i]=s;
+  }
+  
+  IGRAPH_FINALLY_CLEAN(2);
+  newrec->value = newv;
+  
+  return 0;
+}
+
+int igraph_i_cattributes_cn_min(const igraph_attribute_record_t *oldrec, 
+				igraph_attribute_record_t * newrec, 
+				const igraph_vector_ptr_t *merges) {
+  const igraph_vector_t *oldv=oldrec->value;
+  igraph_vector_t *newv=igraph_Calloc(1, igraph_vector_t);
+  long int newlen=igraph_vector_ptr_size(merges);
+  long int i;
+  igraph_real_t nan=IGRAPH_NAN;
+
+  if (!newv) {
+    IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, newv);
+  IGRAPH_VECTOR_INIT_FINALLY(newv, newlen);
+
+  for (i=0; i<newlen; i++) {
+    igraph_vector_t *idx=VECTOR(*merges)[i];
+    long int j, n=igraph_vector_size(idx);
+    igraph_real_t m= n > 0 ? VECTOR(*oldv)[ (long int) VECTOR(*idx)[0] ] : nan;
+    for (j=1; j<n; j++) {
+      long int x=VECTOR(*idx)[j];      
+      igraph_real_t val=VECTOR(*oldv)[x];
+      if (val < m) { m=val; }
+    }
+    VECTOR(*newv)[i]=m;
+  }
+  
+  IGRAPH_FINALLY_CLEAN(2);
+  newrec->value = newv;  
+
+  return 0;
+}
+
+int igraph_i_cattributes_cn_max(const igraph_attribute_record_t *oldrec, 
+				igraph_attribute_record_t * newrec, 
+				const igraph_vector_ptr_t *merges) {
+  const igraph_vector_t *oldv=oldrec->value;
+  igraph_vector_t *newv=igraph_Calloc(1, igraph_vector_t);
+  long int newlen=igraph_vector_ptr_size(merges);
+  long int i;
+  igraph_real_t nan=IGRAPH_NAN;
+
+  if (!newv) {
+    IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, newv);
+  IGRAPH_VECTOR_INIT_FINALLY(newv, newlen);
+
+  for (i=0; i<newlen; i++) {
+    igraph_vector_t *idx=VECTOR(*merges)[i];
+    long int j, n=igraph_vector_size(idx);
+    igraph_real_t m= n > 0 ? VECTOR(*oldv)[ (long int) VECTOR(*idx)[0] ] : nan;
+    for (j=1; j<n; j++) {
+      long int x=VECTOR(*idx)[j];      
+      igraph_real_t val=VECTOR(*oldv)[x];
+      if (val > m) { m=val; }
+    }
+    VECTOR(*newv)[i]=m;
+  }
+  
+  IGRAPH_FINALLY_CLEAN(2);
+  newrec->value = newv;  
+
+  return 0;
+}
+
+int igraph_i_cattributes_cn_random(const igraph_attribute_record_t *oldrec, 
+				   igraph_attribute_record_t * newrec, 
+				   const igraph_vector_ptr_t *merges) {
+
+  const igraph_vector_t *oldv=oldrec->value;
+  igraph_vector_t *newv=igraph_Calloc(1, igraph_vector_t);
+  long int newlen=igraph_vector_ptr_size(merges);
+  long int i;
+  igraph_real_t nan=IGRAPH_NAN;
+
+  if (!newv) {
+    IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, newv);
+  IGRAPH_VECTOR_INIT_FINALLY(newv, newlen);
+
+  RNG_BEGIN();
+
+  for (i=0; i<newlen; i++) {
+    igraph_vector_t *idx=VECTOR(*merges)[i];
+    long int n=igraph_vector_size(idx);
+    if (n==0) {
+      VECTOR(*newv)[i]=nan;
+    } else if (n==1) {
+      VECTOR(*newv)[i]=VECTOR(*oldv)[ (long int) VECTOR(*idx)[0] ];
+    } else {
+      long int r=RNG_INTEGER(0, n-1);
+      VECTOR(*newv)[i]=VECTOR(*oldv)[ (long int) VECTOR(*idx)[r] ];
+    }
+  }
+
+  RNG_END();
+
+  IGRAPH_FINALLY_CLEAN(2);
+  newrec->value = newv;  
+
+  return 0;
+}
+
+int igraph_i_cattributes_cn_first(const igraph_attribute_record_t *oldrec, 
+				  igraph_attribute_record_t * newrec, 
+				  const igraph_vector_ptr_t *merges) {
+
+  const igraph_vector_t *oldv=oldrec->value;
+  igraph_vector_t *newv=igraph_Calloc(1, igraph_vector_t);
+  long int newlen=igraph_vector_ptr_size(merges);
+  long int i;
+  igraph_real_t nan=IGRAPH_NAN;
+
+  if (!newv) {
+    IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, newv);
+  IGRAPH_VECTOR_INIT_FINALLY(newv, newlen);
+
+  for (i=0; i<newlen; i++) {
+    igraph_vector_t *idx=VECTOR(*merges)[i];
+    long int n=igraph_vector_size(idx);
+    if (n==0) {
+      VECTOR(*newv)[i]=nan;
+    } else {
+      VECTOR(*newv)[i]=VECTOR(*oldv)[ (long int) VECTOR(*idx)[0] ];
+    }
+  }
+
+  IGRAPH_FINALLY_CLEAN(2);
+  newrec->value = newv;  
+
+  return 0;
+}
+
+int igraph_i_cattributes_cn_last(const igraph_attribute_record_t *oldrec, 
+				 igraph_attribute_record_t * newrec, 
+				 const igraph_vector_ptr_t *merges) {
+
+  const igraph_vector_t *oldv=oldrec->value;
+  igraph_vector_t *newv=igraph_Calloc(1, igraph_vector_t);
+  long int newlen=igraph_vector_ptr_size(merges);
+  long int i;
+  igraph_real_t nan=IGRAPH_NAN;
+
+  if (!newv) {
+    IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, newv);
+  IGRAPH_VECTOR_INIT_FINALLY(newv, newlen);
+
+  for (i=0; i<newlen; i++) {
+    igraph_vector_t *idx=VECTOR(*merges)[i];
+    long int n=igraph_vector_size(idx);
+    if (n==0) {
+      VECTOR(*newv)[i]=nan;
+    } else {
+      VECTOR(*newv)[i]=VECTOR(*oldv)[ (long int) VECTOR(*idx)[n-1] ];
+    }
+  }
+
+  IGRAPH_FINALLY_CLEAN(2);
+  newrec->value = newv;  
+
+  return 0;
+}
+
+int igraph_i_cattributes_cn_mean(const igraph_attribute_record_t *oldrec, 
+				 igraph_attribute_record_t * newrec, 
+				 const igraph_vector_ptr_t *merges) {
+  const igraph_vector_t *oldv=oldrec->value;
+  igraph_vector_t *newv=igraph_Calloc(1, igraph_vector_t);
+  long int newlen=igraph_vector_ptr_size(merges);
+  long int i;
+  igraph_real_t nan=IGRAPH_NAN;
+ 
+  if (!newv) {
+    IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, newv);
+  IGRAPH_VECTOR_INIT_FINALLY(newv, newlen);
+  
+  for (i=0; i<newlen; i++) {
+    igraph_vector_t *idx=VECTOR(*merges)[i];
+    long int j, n=igraph_vector_size(idx);
+    igraph_real_t s= n > 0 ? 0.0 : nan;
+    for (j=0; j<n; j++) {
+      long int x=VECTOR(*idx)[j];      
+      s += VECTOR(*oldv)[x];
+    }
+    if (n>0) { s=s/n; }
+    VECTOR(*newv)[i]=s;
+  }
+  
+  IGRAPH_FINALLY_CLEAN(2);
+  newrec->value = newv;
+  
+  return 0;
+}
+
+typedef int igraph_cattributes_combine_num_t(const igraph_vector_t *input, 
+					      igraph_real_t *output);
+
+typedef int igraph_cattributes_combine_str_t(const igraph_strvector_t *input,
+					      const char *output);
+
+int igraph_i_cattributes_cn_func(const igraph_attribute_record_t *oldrec,
+				 igraph_attribute_record_t *newrec,
+				 const igraph_vector_ptr_t *merges, 
+				 igraph_cattributes_combine_num_t *func) {
+  
+  const igraph_vector_t *oldv=oldrec->value;
+  long int newlen=igraph_vector_ptr_size(merges);
+  long int i;
+  igraph_vector_t *newv=igraph_Calloc(1, igraph_vector_t);
+  igraph_vector_t values;
+
+  if (!newv) {
+    IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, newv);
+  IGRAPH_VECTOR_INIT_FINALLY(newv, newlen);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&values, 0);
+
+  for (i=0; i<newlen; i++) {
+    igraph_vector_t *idx=VECTOR(*merges)[i];
+    long int j, n=igraph_vector_size(idx);
+    igraph_real_t res;
+    IGRAPH_CHECK(igraph_vector_resize(&values, n));
+    for (j=0; j<n; j++) {
+      long int x=VECTOR(*idx)[j];
+      VECTOR(values)[j] = VECTOR(*oldv)[x];
+    }
+    IGRAPH_CHECK(func(&values, &res));
+    VECTOR(*newv)[i] = res;
+  }
+  
+  igraph_vector_destroy(&values);
+  IGRAPH_FINALLY_CLEAN(3);
+  newrec->value = newv;
+  
+  return 0;
+}
+
 int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
 			 igraph_t *newgraph,
 			 const igraph_vector_ptr_t *merges,
@@ -579,37 +858,41 @@ int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
     if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
       switch (todo) {
       case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
-	/* TODO */
+	IGRAPH_CHECK(igraph_i_cattributes_cn_func(oldrec, newrec, merges,
+						  voidfunc));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_SUM:
 	IGRAPH_CHECK(igraph_i_cattributes_cn_sum(oldrec, newrec, merges));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_PROD:
-	/* TODO */
+	IGRAPH_CHECK(igraph_i_cattributes_cn_prod(oldrec, newrec, merges));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_MIN:
-	/* TODO */
+	IGRAPH_CHECK(igraph_i_cattributes_cn_min(oldrec, newrec, merges));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_MAX:
-	/* TODO */
+	IGRAPH_CHECK(igraph_i_cattributes_cn_max(oldrec, newrec, merges));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_RANDOM:
+	IGRAPH_CHECK(igraph_i_cattributes_cn_random(oldrec, newrec, merges));
 	/* TODO */
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_FIRST:
-	/* TODO */
+	IGRAPH_CHECK(igraph_i_cattributes_cn_first(oldrec, newrec, merges));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_LAST:
-	/* TODO */
+	IGRAPH_CHECK(igraph_i_cattributes_cn_last(oldrec, newrec, merges));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_MEAN:
-	/* TODO */
+	IGRAPH_CHECK(igraph_i_cattributes_cn_mean(oldrec, newrec, merges));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_MEDIAN:
-	/* TODO */
+	IGRAPH_ERROR("Median calculation not implemented", 
+		     IGRAPH_UNIMPLEMENTED);
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_CONCAT:
-	/* TODO */
+	IGRAPH_ERROR("Cannot concatenate numeric attributes", 
+		     IGRAPH_EATTRCOMBINE);
 	break;
       default:
 	IGRAPH_ERROR("Unknown attribute_combination",
@@ -1087,37 +1370,41 @@ int igraph_i_cattribute_combine_edges(const igraph_t *graph,
     if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
       switch (todo) {
       case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
-	/* TODO */
+	IGRAPH_CHECK(igraph_i_cattributes_cn_func(oldrec, newrec, merges,
+						  voidfunc));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_SUM:
 	IGRAPH_CHECK(igraph_i_cattributes_cn_sum(oldrec, newrec, merges));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_PROD:
-	/* TODO */
+	IGRAPH_CHECK(igraph_i_cattributes_cn_prod(oldrec, newrec, merges));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_MIN:
-	/* TODO */
+	IGRAPH_CHECK(igraph_i_cattributes_cn_min(oldrec, newrec, merges));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_MAX:
-	/* TODO */
+	IGRAPH_CHECK(igraph_i_cattributes_cn_max(oldrec, newrec, merges));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_RANDOM:
+	IGRAPH_CHECK(igraph_i_cattributes_cn_random(oldrec, newrec, merges));
 	/* TODO */
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_FIRST:
-	/* TODO */
+	IGRAPH_CHECK(igraph_i_cattributes_cn_first(oldrec, newrec, merges));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_LAST:
-	/* TODO */
+	IGRAPH_CHECK(igraph_i_cattributes_cn_last(oldrec, newrec, merges));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_MEAN:
-	/* TODO */
+	IGRAPH_CHECK(igraph_i_cattributes_cn_mean(oldrec, newrec, merges));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_MEDIAN:
-	/* TODO */
+	IGRAPH_ERROR("Median calculation not implemented", 
+		     IGRAPH_UNIMPLEMENTED);
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_CONCAT:
-	/* TODO */
+	IGRAPH_ERROR("Cannot concatenate numeric attributes", 
+		     IGRAPH_EATTRCOMBINE);
 	break;
       default:
 	IGRAPH_ERROR("Unknown attribute_combination",
