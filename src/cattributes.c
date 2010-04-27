@@ -488,7 +488,7 @@ int igraph_i_cattributes_cn_sum(const igraph_attribute_record_t *oldrec,
   igraph_vector_t *newv=igraph_Calloc(1, igraph_vector_t);
   long int newlen=igraph_vector_ptr_size(merges);
   long int i;
-  
+ 
   if (!newv) {
     IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
   }
@@ -1024,7 +1024,162 @@ int igraph_i_cattribute_combine_edges(const igraph_t *graph,
 			 igraph_t *newgraph,
 			 const igraph_vector_ptr_t *merges,
 			 const igraph_attribute_combination_t *comb) {
-  /* TODO */
+  
+  igraph_i_cattributes_t *attr=graph->attr;
+  igraph_i_cattributes_t *toattr=newgraph->attr;
+  igraph_vector_ptr_t *eal=&attr->eal;
+  igraph_vector_ptr_t *new_eal=&toattr->eal;
+  long int ealno=igraph_vector_ptr_size(eal);
+  long int i, j, keepno=0;
+  int *TODO;
+  void **funcs;
+
+  TODO=igraph_Calloc(ealno, int);
+  if (!TODO) {
+    IGRAPH_ERROR("Cannot combine edge attributes", 
+		 IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, TODO);
+  funcs=igraph_Calloc(ealno, void*);
+  if (!funcs) {
+    IGRAPH_ERROR("Cannot combine edge attributes",
+		 IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, funcs);
+  
+  for (i=0; i<ealno; i++) {
+    igraph_attribute_record_t *oldrec=VECTOR(*eal)[i];    
+    const char *name=oldrec->name;
+    igraph_attribute_combination_type_t todo;
+    void *voidfunc;
+    igraph_attribute_combination_query(comb, name, &todo, &voidfunc);
+    TODO[i]=todo;
+    funcs[i]=voidfunc;
+    if (todo != IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
+      keepno++;
+    }
+  }
+  
+  IGRAPH_CHECK(igraph_vector_ptr_resize(new_eal, keepno));
+  IGRAPH_FINALLY(igraph_i_cattribute_permute_free, new_eal);
+  
+  for (i=0, j=0; i<ealno; i++) {
+    igraph_attribute_record_t *newrec, *oldrec=VECTOR(*eal)[i];
+    const char *name=oldrec->name;
+    igraph_attribute_combination_type_t todo=TODO[i];
+    igraph_attribute_type_t type=oldrec->type;
+    void *voidfunc=funcs[i];
+    
+    if (todo==IGRAPH_ATTRIBUTE_COMBINE_DEFAULT || 
+	todo==IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
+      continue;
+    }
+  
+    newrec=igraph_Calloc(1, igraph_attribute_record_t);
+    if (!newrec) {
+      IGRAPH_ERROR("Cannot combine edge attributes", 
+		   IGRAPH_ENOMEM);
+    }
+    newrec->name = strdup(name);
+    newrec->type = type;
+    VECTOR(*new_eal)[j] = newrec;
+
+    if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+      switch (todo) {
+      case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
+	/* TODO */
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_SUM:
+	IGRAPH_CHECK(igraph_i_cattributes_cn_sum(oldrec, newrec, merges));
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_PROD:
+	/* TODO */
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_MIN:
+	/* TODO */
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_MAX:
+	/* TODO */
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_RANDOM:
+	/* TODO */
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_FIRST:
+	/* TODO */
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_LAST:
+	/* TODO */
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_MEAN:
+	/* TODO */
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_MEDIAN:
+	/* TODO */
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_CONCAT:
+	/* TODO */
+	break;
+      default:
+	IGRAPH_ERROR("Unknown attribute_combination",
+		     IGRAPH_UNIMPLEMENTED);
+	break;
+      }
+    } else if (type==IGRAPH_ATTRIBUTE_STRING) {
+      switch (todo) {
+      case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
+	/* TODO */
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_SUM:
+	IGRAPH_ERROR("Cannot sum strings", IGRAPH_EATTRCOMBINE);
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_PROD:
+	IGRAPH_ERROR("Cannot multiply strings", IGRAPH_EATTRCOMBINE);
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_MIN:
+	IGRAPH_ERROR("Cannot find minimum of strings", 
+		     IGRAPH_EATTRCOMBINE);
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_MAX:
+	IGRAPH_ERROR("Cannot find maximum of strings", 
+		     IGRAPH_EATTRCOMBINE);
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_MEAN:
+	IGRAPH_ERROR("Cannot calculate mean of strings", 
+		     IGRAPH_EATTRCOMBINE);
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_MEDIAN:
+	IGRAPH_ERROR("Cannot calculate median of strings", 
+		     IGRAPH_EATTRCOMBINE);
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_RANDOM:
+	/* TODO */
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_FIRST:
+	/* TODO */
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_LAST:
+	/* TODO */
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_CONCAT:
+	/* TODO */
+	break;
+      default:
+	IGRAPH_ERROR("Unknown attribute_combination",
+		     IGRAPH_UNIMPLEMENTED);
+	break;
+      }
+    } else {
+      IGRAPH_ERROR("Unknown attribute type, this should not happen", 
+		   IGRAPH_UNIMPLEMENTED);
+    }
+    
+    j++;    
+  }
+
+  igraph_free(funcs);
+  igraph_free(TODO);
+  IGRAPH_FINALLY_CLEAN(2);    
+  
   return 0;
 }
 
