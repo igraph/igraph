@@ -525,16 +525,16 @@ int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
   long int i, j, keepno=0;
   int *TODO;
   void **funcs;
-  
+
   TODO=igraph_Calloc(valno, int);
   if (!TODO) {
-    IGRAPH_ERROR("Cannot combine edge attributes", 
+    IGRAPH_ERROR("Cannot combine vertex attributes", 
 		 IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, TODO);
   funcs=igraph_Calloc(valno, void*);
   if (!funcs) {
-    IGRAPH_ERROR("Cannot combine edge attributes",
+    IGRAPH_ERROR("Cannot combine vertex attributes",
 		 IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, funcs);
