@@ -26,6 +26,7 @@
 #include "config.h"
 
 #include <string.h>
+#include <stdarg.h>
 
 int igraph_i_attribute_init(igraph_t *graph, void *attr) {
   graph->attr=0;
@@ -359,4 +360,31 @@ int igraph_attribute_combination_query(const igraph_attribute_combination_t *com
   return 0;
 }
 
+int igraph_attribute_combination(igraph_attribute_combination_t *comb, ...) {
 
+  va_list ap;
+
+  IGRAPH_CHECK(igraph_attribute_combination_init(comb));
+  
+  va_start(ap, comb);
+  while (1) { 
+    void *func=0;
+    int type;
+    const char *name;
+    
+    name=va_arg(ap, const char *);
+    
+    if (!name) { break; }
+    
+    type=va_arg(ap, igraph_attribute_combination_type_t);
+    if (type == IGRAPH_ATTRIBUTE_COMBINE_FUNCTION) {
+      func=va_arg(ap, void*);      
+    }
+    
+    IGRAPH_CHECK(igraph_attribute_combination_add(comb, name, type, func));
+  }
+  
+  va_end(ap);
+  
+  return 0;
+}

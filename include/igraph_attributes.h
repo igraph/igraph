@@ -148,6 +148,7 @@ typedef struct igraph_attribute_combination_t {
 } igraph_attribute_combination_t;
 
 int igraph_attribute_combination_init(igraph_attribute_combination_t *comb);
+int igraph_attribute_combination(igraph_attribute_combination_t *comb, ...);
 void igraph_attribute_combination_destroy(igraph_attribute_combination_t *comb);
 int igraph_attribute_combination_add(igraph_attribute_combination_t *comb,
 				     const char *name, 
