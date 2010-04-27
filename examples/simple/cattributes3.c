@@ -140,6 +140,17 @@ int main() {
   igraph_destroy(&g2);
   /* ****************************************************** */  
 
+  /* ****************************************************** */
+  igraph_copy(&g2, &g);
+  igraph_attribute_combination(&comb, 
+			       "",       IGRAPH_ATTRIBUTE_COMBINE_MEAN,
+			       0);
+  igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
+  igraph_attribute_combination_destroy(&comb);
+  igraph_write_graph_graphml(&g2, stdout);
+  igraph_destroy(&g2);
+  /* ****************************************************** */  
+
   igraph_destroy(&g);
 
   return 0;

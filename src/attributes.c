@@ -380,6 +380,8 @@ int igraph_attribute_combination(igraph_attribute_combination_t *comb, ...) {
     if (type == IGRAPH_ATTRIBUTE_COMBINE_FUNCTION) {
       func=va_arg(ap, void*);      
     }
+
+    if (strlen(name)==0) { name=0; }
     
     IGRAPH_CHECK(igraph_attribute_combination_add(comb, name, type, func));
   }
