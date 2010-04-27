@@ -507,6 +507,7 @@ int igraph_i_cattributes_cn_sum(const igraph_attribute_record_t *oldrec,
   }
   
   IGRAPH_FINALLY_CLEAN(2);
+  newrec->value = newv;
   
   return 0;
 }
