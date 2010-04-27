@@ -53,7 +53,7 @@ int main() {
                -1);  
   
   igraph_vector_init(&membership, 0);
-
+  igraph_community_label_propagation(&g, &membership, 0, 0, 0);
   if (igraph_vector_max(&membership) > 3) {
     printf("Resulting graph had more than four clusters:\n");
     for (i=0; i<igraph_vcount(&g); i++)
@@ -82,6 +82,12 @@ int main() {
                   &initial, &fixed);
   for (i=0; i<igraph_vcount(&g); i++)
     if (VECTOR(membership)[i] != 0) return 4;
+
+  /* Check whether it works with no fixed vertices at all
+   * while an initial configuration is given -- see bug
+   * #570902 in Launchpad. This is a simple smoke test only. */
+  igraph_community_label_propagation(&g, &membership, &weights,
+                  &initial, 0);
 
   igraph_vector_bool_destroy(&fixed);
   igraph_vector_destroy(&weights);
