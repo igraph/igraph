@@ -23,6 +23,18 @@
 
 #include <igraph.h>
 
+int vector_print(const igraph_vector_t *v) {
+  long int i, n=igraph_vector_size(v);
+  for (i=0; i<n-1; i++) {
+    printf("%g ", VECTOR(*v)[i]);
+  }
+  if (n>0) {
+    printf("%g", VECTOR(*v)[i]);
+  }
+  printf("\n");
+  return 0;
+}
+
 int main() {
   igraph_t g;
   igraph_vector_t outdeg, indeg, vec;
@@ -38,7 +50,7 @@ int main() {
 	return 1;
   if (igraph_degree(&g, &vec, igraph_vss_all(), IGRAPH_OUT, 1))
 	return 2;
-  igraph_vector_print(&vec);
+  vector_print(&vec);
   igraph_destroy(&g);
 
   /* checking the Viger-Latapy method, undirected graphs */
@@ -49,7 +61,7 @@ int main() {
 	return 4;
   if (igraph_degree(&g, &vec, igraph_vss_all(), IGRAPH_OUT, 0))
 	return 5;
-  igraph_vector_print(&vec);
+  vector_print(&vec);
   igraph_destroy(&g);
 
   igraph_vector_destroy(&vec);
