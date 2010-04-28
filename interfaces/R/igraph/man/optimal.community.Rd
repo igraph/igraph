@@ -65,15 +65,20 @@ e <- c( 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8,
        32,33)
 g <- graph(e, dir=FALSE)
 
-## The calculation only takes a couple of seconds
-oc <- optimal.community(g)
+## We put everything into a big 'try' block, in case 
+## igraph was compiled without GLPK support
 
-## Double check the result
-oc$modularity
-modularity(g, oc$membership)
+try({
+  ## The calculation only takes a couple of seconds
+  oc <- optimal.community(g)
 
-## Compare to the greedy optimizer
-fc <- fastgreedy.community(g)
-max(fc$modularity)
+  ## Double check the result
+  oc$modularity
+  modularity(g, oc$membership)
+
+  ## Compare to the greedy optimizer
+  fc <- fastgreedy.community(g)
+  max(fc$modularity)
+}, silent=TRUE)
 }
 \keyword{graphs}
