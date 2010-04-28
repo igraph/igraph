@@ -84,17 +84,19 @@ void igraph_i_cattribute_destroy(igraph_t *graph) {
     n=igraph_vector_ptr_size(als[a]);
     for (i=0; i<n; i++) {
       rec=VECTOR(*als[a])[i];
-      if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
-	num=(igraph_vector_t*)rec->value;
-	igraph_vector_destroy(num);
-	igraph_free(num);
-      } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
-	str=(igraph_strvector_t*)rec->value;
-	igraph_strvector_destroy(str);
-	igraph_free(str);
+      if (rec) { 
+	if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
+	  num=(igraph_vector_t*)rec->value;
+	  igraph_vector_destroy(num);
+	  igraph_free(num);
+	} else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
+	  str=(igraph_strvector_t*)rec->value;
+	  igraph_strvector_destroy(str);
+	  igraph_free(str);
+	}
+	igraph_free((char*)rec->name);
+	igraph_free(rec);
       }
-      igraph_free((char*)rec->name);
-      igraph_free(rec);
     }
   }
   igraph_vector_ptr_destroy(&attr->gal);
