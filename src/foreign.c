@@ -1656,7 +1656,7 @@ int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
  * file operations are expected to have time complexity 
  * O(1). 
  *
- * \sa \ref igraph_read_graph_ncol(), \ref igraph_write_graph_lgl()
+ * \sa \ref igraph_read_graph_lgl(), \ref igraph_write_graph_ncol()
  */
 
 int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
@@ -1696,7 +1696,8 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
     IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &weighttype,
 					    IGRAPH_ATTRIBUTE_EDGE, weights));
   }
-  if (weights && weighttype != IGRAPH_ATTRIBUTE_NUMERIC) {
+  if (weights && weighttype != IGRAPH_ATTRIBUTE_NUMERIC && 
+      weighttype != IGRAPH_ATTRIBUTE_STRING) {
     IGRAPH_WARNING("ignoring weights attribute, unknown attribute type");
     weights=0;
   }
