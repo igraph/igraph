@@ -1,6 +1,6 @@
-AC_INIT(igraph, 0.5.3, csardi@rmki.kfki.hu)
+AC_INIT(igraph, 0.5.4, csardi@rmki.kfki.hu)
 AC_CONFIG_SRCDIR(src/games.c)
-AM_INIT_AUTOMAKE(igraph, 0.5.3)
+AM_INIT_AUTOMAKE(igraph, 0.5.4)
 AM_CONFIG_HEADER(config.h)
 
 # Test suite
