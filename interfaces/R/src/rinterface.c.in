@@ -672,9 +672,13 @@ int R_igraph_attribute_get_numeric_graph_attr(const igraph_t *graph,
   if (ga == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
+
+  PROTECT(ga=AS_NUMERIC(ga));
   
   IGRAPH_CHECK(igraph_vector_resize(value, 1));
   VECTOR(*value)[0]=REAL(ga)[0];
+
+  UNPROTECT(1);
 
   return 0;
 }
@@ -689,10 +693,14 @@ int R_igraph_attribute_get_string_graph_attr(const igraph_t *graph,
   if (ga == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
-  
+
+  PROTECT(ga=AS_CHARACTER(ga));
+
   IGRAPH_CHECK(igraph_strvector_resize(value, 1));
   IGRAPH_CHECK(igraph_strvector_set(value, 0, CHAR(STRING_ELT(ga, 0))));
-  
+
+  UNPROTECT(1);
+
   return 0;
 }
 
@@ -746,9 +754,11 @@ int R_igraph_attribute_get_string_vertex_attr(const igraph_t *graph,
   if (va == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
+
+  PROTECT(va=AS_CHARACTER(va));
   
   if (igraph_vs_is_all(&vs)) {
-    R_igraph_SEXP_to_strvector_copy(AS_CHARACTER(va), value);
+    R_igraph_SEXP_to_strvector_copy(va, value);
   } else {
     igraph_vit_t it;
     long int i=0;
@@ -757,7 +767,7 @@ int R_igraph_attribute_get_string_vertex_attr(const igraph_t *graph,
     IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_VIT_SIZE(it)));
     while (!IGRAPH_VIT_END(it)) {
       long int v=IGRAPH_VIT_GET(it);
-      const char *str=CHAR(STRING_ELT(AS_CHARACTER(va), v));
+      const char *str=CHAR(STRING_ELT(va, v));
       IGRAPH_CHECK(igraph_strvector_set(value, i, str));
       IGRAPH_VIT_NEXT(it);
       i++;
@@ -765,7 +775,9 @@ int R_igraph_attribute_get_string_vertex_attr(const igraph_t *graph,
     igraph_vit_destroy(&it);
     IGRAPH_FINALLY_CLEAN(1);
   }
-  
+
+  UNPROTECT(1);
+
   return 0;
 }
 
@@ -818,9 +830,11 @@ int R_igraph_attribute_get_string_edge_attr(const igraph_t *graph,
   if (ea == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
+
+  PROTECT(ea=AS_CHARACTER(ea));
   
   if (igraph_es_is_all(&es)) {
-    R_igraph_SEXP_to_strvector_copy(AS_CHARACTER(ea), value);
+    R_igraph_SEXP_to_strvector_copy(ea, value);
   } else {
     igraph_eit_t it;
     long int i=0;
@@ -829,7 +843,7 @@ int R_igraph_attribute_get_string_edge_attr(const igraph_t *graph,
     IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_EIT_SIZE(it)));
     while (!IGRAPH_EIT_END(it)) {
       long int e=IGRAPH_EIT_GET(it);
-      const char *str=CHAR(STRING_ELT(AS_CHARACTER(ea), e));
+      const char *str=CHAR(STRING_ELT(ea, e));
       IGRAPH_CHECK(igraph_strvector_set(value, i, str));
       IGRAPH_EIT_NEXT(it);
       i++;
@@ -837,6 +851,8 @@ int R_igraph_attribute_get_string_edge_attr(const igraph_t *graph,
     igraph_eit_destroy(&it);
     IGRAPH_FINALLY_CLEAN(1);
   }
+  
+  UNPROTECT(1);
   
   return 0;
 }
