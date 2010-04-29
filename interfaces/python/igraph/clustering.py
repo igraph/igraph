@@ -26,8 +26,8 @@ from copy import deepcopy
 from StringIO import StringIO
 
 from igraph import community_to_membership
-from igraph.colors import ClusterColoringPalette
 from igraph.datatypes import UniqueIdGenerator
+from igraph.drawing.colors import ClusterColoringPalette
 from igraph.statistics import Histogram
 
 class Clustering(object):

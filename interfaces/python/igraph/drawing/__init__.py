@@ -14,8 +14,9 @@ I'm not linking to it :)).
 
 from __future__ import with_statement
 
-from warnings import warn
+from itertools import izip
 from operator import itemgetter
+from warnings import warn
 
 import math
 import os
@@ -24,10 +25,10 @@ import time
 
 from ConfigParser import NoOptionError
 
-import igraph.colors as colors
-
 from igraph.configuration import Configuration
+from igraph.drawing.colors import Palette, palettes
 from igraph.drawing.shapes import ShapeDrawerDirectory
+from igraph.drawing.metamagic import AttributeCollectorBase
 from igraph.utils import named_temporary_file
 
 __all__ = ["BoundingBox", "DefaultGraphDrawer", "Plot", "Point", "plot"]
@@ -289,7 +290,7 @@ class Plot(object):
     which surface class will be used. Please note that not all surfaces might
     be available, depending on your C{pycairo} installation.
 
-    A C{Plot} has an assigned default palette (see L{colors.Palette}) which
+    A C{Plot} has an assigned default palette (see L{igraph.colors.Palette}) which
     is used for plotting objects.
 
     A C{Plot} object also has a list of objects to be plotted with their
@@ -323,8 +324,8 @@ class Plot(object):
 
         @param palette: the palette primarily used on the plot if the
           added objects do not specify a private palette. Must be either
-          a L{colors.Palette} object or a string referring to a valid
-          key of C{colors.palettes} (see module L{colors}) or C{None}.
+          an L{igraph.colors.Palette} object or a string referring to a valid
+          key of C{igraph.colors.palettes} (see module L{igraph.colors}) or C{None}.
           In the latter case, the default palette given by the configuration
           key C{plotting.palette} is used.
         """
@@ -341,12 +342,14 @@ class Plot(object):
             self.bbox = BoundingBox(600, 600)
         elif isinstance(bbox, tuple) or isinstance(bbox, list):
             self.bbox = BoundingBox(bbox)
+        else:
+            self.bbox = bbox
 
         if palette is None:
             config = Configuration.instance()
             palette = config["plotting.palette"]
-        if not isinstance(palette, colors.Palette):
-            palette = colors.palettes[palette]
+        if not isinstance(palette, Palette):
+            palette = palettes[palette]
         self._palette = palette
 
         if target is None:
@@ -589,101 +592,6 @@ class AbstractGraphDrawer(AbstractDrawer):
     This class is primarily used to collect routines that can be
     potentially useful in different kinds of graph drawers."""
 
-    @staticmethod
-    def collect_attributes(name, alt_name, kwds, vs, default, transform=None, config=None):
-        """Collects graph visualization attributes from various sources.
-
-        This method can be used to collect the attributes required for graph
-        visualization from various sources. Attribute value sources are:
-
-          - A specific value of a Python dict belonging to a given key. This dict
-            is given by the argument M{kwds}, and the name of the key is determined
-            by the argument M{name}.
-
-          - A vertex or edge sequence of a graph, given in M{vs}
-
-          - The global configuration, given in M{config}
-
-          - A default value when all other sources fail to provide the value.
-            given in M{default}
-
-        Attribute sources are considered exactly in the order mentioned above.
-        Optionally, the retrieved value is passed through an arbitrary
-        transformation.
-
-        @param  name:      the name of the attribute when it is coming from a
-                           list of Python keyword arguments
-        @param  alt_name:  the name of the attribute when it is coming from the
-                           graph attributes directly
-        @param  kwds:      a Python dict of keyword arguments that will be
-                           indexed by C{name}
-        @param  vs:        a L{VertexSeq} or L{EdgeSeq} that will be indexed
-                           by C{alt_name}
-        @param  default:   the default value of the attribute
-        @param  transform: optional callable transformation to call on the values.
-                           This can be used to ensure that the attributes are of
-                           a given type.
-        @param  config:    a L{Configuration} object to be used for determining the
-                           defaults if all else fails. If C{None}, the global
-                           igraph configuration will be used
-        @return: the collected attributes
-        """
-        n = len(vs)
-
-        if config is None:
-            config = Configuration.instance()
-
-        try:
-            attrs = vs[alt_name]
-        except KeyError:
-            attrs = None
-
-        result = kwds.get(name, None)
-        if attrs:
-            if not result:
-                result = attrs
-            else:
-                if isinstance(result, str):
-                    result = [result] * n
-                try:
-                    len(result)
-                except TypeError:
-                    result = [result] * n
-                result = [result[idx] or attrs[idx] \
-                          for idx in xrange(len(result))]
-
-        if isinstance(result, str):
-            result = [result] * n
-        try:
-            len(result)
-        except TypeError:
-            result = [result] * n
-
-        if not hasattr(result, "extend"):
-            result = list(result)
-        while len(result) < n:
-            if len(result) <= n/2:
-                result.extend(result)
-            else:
-                result.extend(result[0:(n-len(result))])
-
-        # By now, the length of the result vector should be n as requested
-        try:
-            conf_def = config["plotting.%s" % name]
-        except NoOptionError:
-            conf_def = None
-
-        if conf_def and None in result:
-            result = [result[idx] or conf_def for idx in xrange(len(result))]
-
-        if None in result:
-            result = [result[idx] or default for idx in xrange(len(result))]
-
-        if transform is not None:
-            result = [transform(x) for x in result]
-
-        return result
-
     def draw(self, *args, **kwds):
         """Abstract method, must be implemented in derived classes."""
         raise NotImplementedError("abstract class")
@@ -721,29 +629,34 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
     def draw(self, graph, palette, *args, **kwds):
         from igraph.layout import Layout
 
-        vcount = graph.vcount()
+        class VisualVertexBuilder(AttributeCollectorBase):
+            """Collects some visual properties of a vertex for drawing"""
+            _kwds_prefix = "vertex_"
+            color = ("red", palette.get)
+            label = None
+            label_angle = -math.pi/2
+            label_dist  = 1.6
+            label_color = ("black", palette.get)
+            label_size  = 14.0
+            shape = ("circle", ShapeDrawerDirectory.resolve_default)
+            size  = 10.0
+
+        class VisualEdgeBuilder(AttributeCollectorBase):
+            """Collects some visual properties of an edge for drawing"""
+            _kwds_prefix = "edge_"
+            arrow_size = 1.0
+            arrow_width = 1.0
+            color = ("red", palette.get)
+            width = 1.0
+
         directed = graph.is_directed()
         context = self.context
 
-        margin = kwds.get("margin", [0., 0., 0., 0.])
-        try:
-            margin = list(margin)
-        except TypeError:
-            margin = [margin]
-        while len(margin)<4:
-            margin.extend(margin)
-        margin = tuple(float(length) for length in margin[:4])
+        # Construct the visual vertex/edge builders
+        vertex_builder = VisualVertexBuilder(graph.vs, kwds)
+        edge_builder = VisualEdgeBuilder(graph.es, kwds)
 
-        vertex_colors = self.collect_attributes("vertex_color", \
-            "color", kwds, graph.vs, "red", palette.get)
-        vertex_sizes = self.collect_attributes("vertex_size", \
-            "size", kwds, graph.vs, 10, float)
-        vertex_shapes = [ShapeDrawerDirectory.resolve_default(x) \
-            for x in self.collect_attributes("vertex_shape", \
-            "shape", kwds, graph.vs, "circle")]
-
-        max_vertex_size = max(vertex_sizes)
-
+        # Calculate/get the layout of the graph
         layout = kwds.get("layout", None)
         if isinstance(layout, Layout):
             layout = Layout(layout.coords)
@@ -752,46 +665,51 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
         else:
             layout = Layout(layout)
 
-        margin = [x + max_vertex_size/2. for x in margin]
+        # Determine the size of the margin on each side
+        margin = kwds.get("margin", [0., 0., 0., 0.])
+        try:
+            margin = list(margin)
+        except TypeError:
+            margin = [margin]
+        while len(margin)<4:
+            margin.extend(margin)
+        max_vertex_size = max(vertex.size for vertex in vertex_builder)
+        margin = [float(x) + max_vertex_size/2. for x in margin[:4]]
+
+        # Contract the drawing area by the margin and fit the layout
         bbox = self.bbox.contract(margin)
         layout.fit_into(bbox, keep_aspect_ratio=False)
 
         context.set_line_width(1)
 
-        edge_colors = self.collect_attributes("edge_color", \
-            "color", kwds, graph.es, "black", palette.get)
-        edge_widths = self.collect_attributes("edge_width", \
-            "width", kwds, graph.es, 1, float)
-        edge_arrow_sizes = self.collect_attributes( \
-            "edge_arrow_size", "arrow_size", kwds, graph.es, 1, float)
-        edge_arrow_widths = self.collect_attributes( \
-            "edge_arrow_width", "arrow_width", kwds, graph.es, 1, float)
-
         # Draw the edges
-        for idx, e in enumerate(graph.es):
-            context.set_source_rgb(*edge_colors[idx])
-            context.set_line_width(edge_widths[idx])
+        for edge, visual_edge in izip(graph.es, edge_builder):
+            context.set_source_rgb(*visual_edge.color)
+            context.set_line_width(visual_edge.width)
 
-            src, tgt = e.tuple
+            src, tgt = edge.tuple
+            src_vertex = vertex_builder[src]
+
             if src == tgt:
                 # Loop edge
-                r = vertex_sizes[src]*2
-                cx, cy = layout[src][0]+math.cos(math.pi/4)*r/2, \
-                  layout[src][1]-math.sin(math.pi/4)*r/2
-                context.arc(cx, cy, r/2., 0, math.pi*2)
+                radius = src_vertex.size*2
+                c_x, c_y = layout[src][0]+math.cos(math.pi/4)*r/2, \
+                           layout[src][1]-math.sin(math.pi/4)*r/2
+                context.arc(c_x, c_y, radius/2., 0, math.pi*2)
             else:
                 # Determine where the edge intersects the circumference of the
                 # vertex shape. TODO: theoretically this need not to be done
                 # if there are no arrowheads on the edge, but maybe it's not
                 # worth testing for
-                p1 = vertex_shapes[src].intersection_point( \
+                tgt_vertex = vertex_builder[tgt]
+                p1 = src_vertex.shape.intersection_point( \
                     layout[src][0], layout[src][1], \
                     layout[tgt][0], layout[tgt][1], \
-                    vertex_sizes[src])
-                p2 = vertex_shapes[tgt].intersection_point( \
+                    src_vertex.size)
+                p2 = tgt_vertex.shape.intersection_point( \
                     layout[tgt][0], layout[tgt][1], \
                     layout[src][0], layout[src][1],
-                    vertex_sizes[tgt])
+                    tgt_vertex.size)
                 context.move_to(*p1)
                 context.line_to(*p2)
             context.stroke()
@@ -799,8 +717,8 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
             if directed and src != tgt:
                 # Draw an arrowhead
                 angle = math.atan2(p2[1]-p1[1], p2[0]-p1[0])
-                arrow_size = 15.*edge_arrow_sizes[idx]
-                arrow_width = 10./edge_arrow_widths[idx]
+                arrow_size = 15.*visual_edge.arrow_size
+                arrow_width = 10./visual_edge.arrow_width
                 a1 = (p2[0]-arrow_size*math.cos(angle-math.pi/arrow_width),
                   p2[1]-arrow_size*math.sin(angle-math.pi/arrow_width))
                 a2 = (p2[0]-arrow_size*math.cos(angle+math.pi/arrow_width),
@@ -811,58 +729,35 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
                 context.line_to(*p2)
                 context.fill()
 
-        del edge_colors
-        del edge_widths
-
         # Draw the vertices
         context.set_line_width(1)
-        for idx in xrange(vcount):
-            vertex_shapes[idx].draw_path(context, \
-                    layout[idx][0], layout[idx][1], vertex_sizes[idx])
-            context.set_source_rgb(*vertex_colors[idx])
+        for vertex, coords in izip(vertex_builder, layout):
+            vertex.shape.draw_path(context, \
+                    coords[0], coords[1], vertex.size)
+            context.set_source_rgb(*vertex.color)
             context.fill_preserve()
             context.set_source_rgb(0., 0., 0.)
             context.stroke()
-        del vertex_colors
-        del vertex_shapes
 
         # Draw the vertex labels
-        if "vertex_label" not in kwds and \
-            "label" not in graph.vs.attribute_names():
-            vertex_labels = [str(i) for i in xrange(vcount)]
-        elif "vertex_label" in kwds and kwds["vertex_label"] is None:
-            vertex_labels = [""] * vcount
-        else:
-            vertex_labels = self.collect_attributes("vertex_label", \
-                "label", kwds, graph.vs, None)
-        vertex_dists = self.collect_attributes("vertex_label_dist", \
-            "label_dist", kwds, graph.vs, 1.6, float)
-        vertex_degrees = self.collect_attributes(\
-            "vertex_label_angle", "label_angle", kwds, graph.vs, \
-            -math.pi/2, float)
-        vertex_label_colors = self.collect_attributes(\
-            "vertex_label_color", "label_color", kwds, graph.vs, \
-            "black", palette.get)
-        vertex_label_sizes = self.collect_attributes(\
-            "vertex_label_size", "label_size", kwds, graph.vs, \
-            14, float)
-
         context.select_font_face("sans-serif", cairo.FONT_SLANT_NORMAL, \
             cairo.FONT_WEIGHT_BOLD)
         
-        for idx in xrange(vcount):
-            xb, _, w, h = context.text_extents(vertex_labels[idx])[:4]
-            cx, cy = layout[idx]
-            si = math.sin(vertex_degrees[idx])
-            co = math.cos(vertex_degrees[idx])
-            cx += co * vertex_dists[idx] * vertex_sizes[idx] / 2.
-            cy += si * vertex_dists[idx] * vertex_sizes[idx] / 2.
+        for vertex, coords in izip(vertex_builder, layout):
+            if vertex.label is None:
+                continue
+            xb, _, w, h = context.text_extents(vertex.label)[:4]
+            cx, cy = coords
+            si = math.sin(vertex.label_angle)
+            co = math.cos(vertex.label_angle)
+            cx += co * vertex.label_dist * vertex.size / 2.
+            cy += si * vertex.label_dist * vertex.size / 2.
             cx += (co - 1) * w/2. + xb
             cy += (si + 1) * h/2.
             context.move_to(cx, cy)
-            context.set_font_size(vertex_label_sizes[idx])
-            context.set_source_rgb(*vertex_label_colors[idx])
-            context.text_path(vertex_labels[idx])
+            context.set_font_size(vertex.label_size[idx])
+            context.set_source_rgb(*vertex.label_color[idx])
+            context.text_path(vertex.label[idx])
             context.fill()
 
 

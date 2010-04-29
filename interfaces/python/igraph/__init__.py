@@ -5,6 +5,8 @@ IGraph library.
 @undocumented: igraph.formula, igraph.test
 """
 
+from __future__ import with_statement
+
 __license__ = """
 Copyright (C) 2006-2009  Gabor Csardi <csardi@rmki.kfki.hu>,
 Tamas Nepusz <ntamas@rmki.kfki.hu>
@@ -27,14 +29,12 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 
-from __future__ import with_statement
-
 from igraph.core import *
 from igraph.core import __version__, __build_date__
 from igraph.clustering import *
 from igraph.configuration import Configuration
-from igraph.colors import *
 from igraph.drawing import *
+from igraph.drawing.colors import *
 from igraph.datatypes import *
 from igraph.formula import *
 from igraph.layout import *
