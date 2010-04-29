@@ -44,6 +44,11 @@ __BEGIN_DECLS
 /* MAximum flows, minimum cuts & such                 */
 /* -------------------------------------------------- */
 
+int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
+		   igraph_vector_t *flow, igraph_vector_t *cut,
+		   igraph_vector_t *partition, igraph_vector_t *partition2,
+		   igraph_integer_t source, igraph_integer_t target,
+		   const igraph_vector_t *capacity);
 int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
 			 igraph_integer_t source, igraph_integer_t target,
 			 const igraph_vector_t *capacity);
