@@ -374,9 +374,9 @@ int igraph_attribute_combination(igraph_attribute_combination_t *comb, ...) {
     
     name=va_arg(ap, const char *);
     
-    if (!name) { break; }
+    if (name == IGRAPH_NO_MORE_ATTRIBUTES) { break; }
     
-    type=va_arg(ap, igraph_attribute_combination_type_t);
+    type=(igraph_attribute_combination_type_t)va_arg(ap, int);
     if (type == IGRAPH_ATTRIBUTE_COMBINE_FUNCTION) {
       func=va_arg(ap, void*);      
     }
