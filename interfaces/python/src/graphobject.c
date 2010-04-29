@@ -230,6 +230,7 @@ int igraphmodule_Graph_init(igraphmodule_GraphObject * self,
     if (igraph_create
         (&self->g, &edges_vector, (igraph_integer_t) n, (dir == Py_True))) {
       igraphmodule_handle_igraph_error();
+      igraph_vector_destroy(&edges_vector);
       return -1;
     }
 
