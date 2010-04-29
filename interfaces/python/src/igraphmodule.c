@@ -431,7 +431,7 @@ static int igraphmodule_i_attribute_add_vertices(igraph_t *graph, long int nv, i
   Py_ssize_t pos = 0;
 
   if (!graph->attr) return IGRAPH_SUCCESS;
-  if (nv<=0) return IGRAPH_SUCCESS;
+  if (nv<0) return IGRAPH_SUCCESS;
 
   if (attr) {
     added_attrs = (igraph_bool_t*)calloc((size_t)igraph_vector_ptr_size(attr),
@@ -610,7 +610,7 @@ static int igraphmodule_i_attribute_add_edges(igraph_t *graph, const igraph_vect
 
   ne=igraph_vector_size(edges)/2;
   if (!graph->attr) return IGRAPH_SUCCESS;
-  if (ne<=0) return IGRAPH_SUCCESS;
+  if (ne<0) return IGRAPH_SUCCESS;
   
   if (attr) {
     added_attrs = (igraph_bool_t*)calloc((size_t)igraph_vector_ptr_size(attr),
