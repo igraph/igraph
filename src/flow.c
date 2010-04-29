@@ -278,7 +278,7 @@ int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
   IGRAPH_VECTOR_INIT_FINALLY(&first,    no_of_nodes+1);
 
   IGRAPH_VECTOR_INIT_FINALLY(&from,     no_of_edges);
-  IGRAPH_VECTOR_INIT_FINALLY(&edges,    no_of_edges*2);
+  IGRAPH_VECTOR_INIT_FINALLY(&edges,    no_of_edges);
   IGRAPH_VECTOR_INIT_FINALLY(&rank,     no_of_edges);
   
   /* Create the basic data structure */
