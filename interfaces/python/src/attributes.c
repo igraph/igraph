@@ -728,20 +728,33 @@ int igraphmodule_i_attribute_get_type(const igraph_t *graph,
   long int attrnum, i, j;
   int is_numeric, is_string;
   PyObject *o, *dict;
+
   switch (elemtype) {
   case IGRAPH_ATTRIBUTE_GRAPH:  attrnum=ATTRHASH_IDX_GRAPH;  break;
   case IGRAPH_ATTRIBUTE_VERTEX: attrnum=ATTRHASH_IDX_VERTEX; break;
   case IGRAPH_ATTRIBUTE_EDGE:   attrnum=ATTRHASH_IDX_EDGE;   break;
   default: IGRAPH_ERROR("No such attribute type", IGRAPH_EINVAL); break;
   }
+
+  /* Get the attribute dict */
   dict = ATTR_STRUCT_DICT(graph)[attrnum];
+
+  /* Check whether the attribute exists */
   o = PyDict_GetItemString(dict, name);
   if (o == 0) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+
+  /* Basic type check */
+  if (!PyList_Check(o)) IGRAPH_ERROR("attribute hash type mismatch", IGRAPH_EINVAL);
+  j = PyList_Size(o);
+  if (j == 0) {
+    *type = IGRAPH_ATTRIBUTE_NUMERIC;
+    return 0;
+  }
+
+  /* Go on with the checks */
   is_numeric = is_string = 1;
   if (attrnum>0) {
-    if (!PyList_Check(o)) IGRAPH_ERROR("attribute hash type mismatch", IGRAPH_EINVAL);
-    if (!PyList_Size(o))  IGRAPH_ERROR("attribute hash type mismatch", IGRAPH_EINVAL);
-    j = PyList_Size(o);
+
     for (i=0; i<j && is_numeric; i++) {
       PyObject *item = PyList_GET_ITEM(o, i);
       if (item != Py_None && !PyNumber_Check(item)) is_numeric=0;
