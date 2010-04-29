@@ -93,7 +93,7 @@ export(igraph.drl.default, igraph.drl.coarsen, igraph.drl.coarsest,
 
 # structural properties
 
-export(subgraph, simplify, degree, degree.distribution, diameter,
+export(subgraph, degree, degree.distribution, diameter,
        subcomponent, betweenness, bibcoupling, cocitation,
        shortest.paths, minimum.spanning.tree,
        get.shortest.paths, average.path.length, transitivity,

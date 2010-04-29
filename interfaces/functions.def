@@ -431,9 +431,10 @@ igraph_path_length_hist:
         FLAGS: PROGRESS
 
 igraph_simplify:
-        PARAMS: INOUT GRAPH graph, BOOLEAN multiple=True, \
-                BOOLEAN loops=True, ATTRIBUTE_COMBINATION edge_comb
-        IGNORE: RR, RC, RNamespace
+        PARAMS: INOUT GRAPH graph, BOOLEAN remove_multiple=True, \
+                BOOLEAN remove_loops=True, \
+		EDGE_ATTRIBUTE_COMBINATION edge_attr_comb=Default
+        NAME-R: simplify
 
 igraph_transitivity_undirected:
         PARAMS: GRAPH graph, OUT REALPTR res, TRANSITIVITYMODE mode=NAN
@@ -656,6 +657,11 @@ igraph_assortativity:
 igraph_assortativity_degree:
         PARAMS: GRAPH graph, OUT REALPTR res, BOOLEAN directed=True
         NAME-R: assortativity.degree
+
+igraph_contract_vertices:
+        PARAMS: INOUT GRAPH graph, VECTOR mapping, \
+                VERTEX_ATTRIBUTE_COMBINATION vertex_attr_comb=Default
+        NAME-R: contract.vertices
 
 #######################################
 # Visitors

@@ -164,3 +164,13 @@ COMMCMP:
     INCONV: %I% <- switch(igraph.match.arg(%I%), "vi"=0, "nmi"=1)
     DEFAULT:
        VI: c("vi", "nmi")
+
+EDGE_ATTRIBUTE_COMBINATION:
+    INCONV: %I% <- igraph.i.attribute.combination(%I%)
+    DEFAULT: 
+       Default: igraph.par("edge.attr.comb")
+
+VERTEX_ATTRIBUTE_COMBINATION:
+    INCONV: %I% <- igraph.i.attribute.combination(%I%)
+    DEFAULT: 
+       Default: igraph.par("vertex.attr.comb")

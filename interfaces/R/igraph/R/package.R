@@ -34,7 +34,10 @@
 
   # verbosity, progress bars mainly
   igraph.par("verbose", FALSE)
-  
+
+  # what to do with attributes
+  igraph.par("vertex.attr.comb", list(name="concat", "ignore"))
+  igraph.par("edge.attr.comb", list(weight="sum", name="concat", "ignore"))
 }
 
 .onUnload <- function(libpath) {

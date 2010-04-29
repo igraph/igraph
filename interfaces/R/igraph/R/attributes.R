@@ -155,3 +155,38 @@ remove.edge.attribute <- function(graph, name) {
   graph[[9]][[4]][[as.character(name)]] <- NULL
   graph
 }
+
+#############
+
+igraph.i.attribute.combination <- function(comb) {
+  if (is.function(comb)) {
+    comb <- list(comb)
+  }
+  comb <- as.list(comb)
+  if (any(!sapply(comb, function(x)
+                  is.function(x) || (is.character(x) && length(x)==1)))) {
+    stop("Attribute combination element must be a function or character scalar")
+  }
+  if (is.null(names(comb))) {
+    names(comb) <- rep("", length(comb))
+  }
+  if (any(duplicated(names(comb)))) {
+    warning("Some attributes are duplicated")
+  }
+  comb <- lapply(comb, function(x) {
+    if (!is.character(x)) {
+      x
+    } else {
+      known <- data.frame(n=c("ignore", "sum", "prod", "min", "max", "random",
+                            "first", "last", "mean", "median", "concat"),
+                          i=c(0,3,4,5,6,7,8,9,10,11,12), stringsAsFactors=FALSE)
+      x <- pmatch(tolower(x), known[,1])
+      if (is.na(x)) {
+        stop("Unknown/unambigous attribute combination specification")
+      }
+      known[,2][x]
+    }
+  })
+
+  comb
+}

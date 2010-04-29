@@ -81,14 +81,48 @@ SEXP R_igraph_getListElement(SEXP list, const char *str)
  * Attributes                                         *
  *****************************************************/
 
+int R_SEXP_to_attr_comb(SEXP input, igraph_attribute_combination_t *comb) {
+  long int i, n=GET_LENGTH(input);
+  SEXP names=GET_NAMES(input);
+  
+  igraph_attribute_combination_init(comb);
+  
+  for (i=0; i<n; i++) {
+    const char *n;
+    igraph_attribute_combination_type_t type;
+    void *func;
+    
+    /* Name */
+    if (!isNull(names)) {
+      n=CHAR(STRING_ELT(names, i));
+    }
+    if (isNull(names) || strlen(n)==0) {
+      n=0;
+    }
+
+    /* Type and function, if any */
+    if (isFunction(VECTOR_ELT(input, i))) {
+      type=IGRAPH_ATTRIBUTE_COMBINE_FUNCTION;
+      func=VECTOR_ELT(input, i);      
+    } else {
+      type=REAL(AS_NUMERIC(VECTOR_ELT(input, i)))[0];
+      func=0;
+    }
+    igraph_attribute_combination_add(comb, n, type, func);
+  }
+  
+  return 0;
+}
+
 int R_igraph_attribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
   SEXP result, names, gal;
   long int i;
   long int attrno;
   PROTECT(result=NEW_LIST(4));
-  SET_VECTOR_ELT(result, 0, NEW_NUMERIC(2));
+  SET_VECTOR_ELT(result, 0, NEW_NUMERIC(3));
   REAL(VECTOR_ELT(result, 0))[0]=0; /* R objects */
   REAL(VECTOR_ELT(result, 0))[1]=1; /* igraph_t objects */
+  REAL(VECTOR_ELT(result, 0))[2]=1; /* whether the graph is safe */
   for (i=1; i<3; i++) {
     SET_VECTOR_ELT(result, i+1, NEW_LIST(0)); /* gal, val, eal */
   }
@@ -134,7 +168,8 @@ int R_igraph_attribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
 void R_igraph_attribute_destroy(igraph_t *graph) {
   SEXP attr=graph->attr;
   REAL(VECTOR_ELT(attr, 0))[1] -= 1; /* refcount for igraph_t */
-  if (REAL(VECTOR_ELT(attr, 0))[1]==0) {
+  if (REAL(VECTOR_ELT(attr, 0))[1]==0 && 
+      REAL(VECTOR_ELT(attr, 0))[2]==1) {
     UNPROTECT_PTR(attr);
   }
   graph->attr=0;
@@ -461,15 +496,6 @@ int R_igraph_attribute_permute_vertices(const igraph_t *graph,
   return 0;
 }
 
-int R_igraph_attribute_combine_vertices(const igraph_t *graph,
-			 igraph_t *newgraph,
-			 igraph_integer_t newvid,
-			 const igraph_vector_t *oldvids,
-			 const igraph_attribute_combination_t *comb) {
-  /* TODO */
-  return 0;
-}
-
 int R_igraph_attribute_add_edges(igraph_t *graph, 
 				 const igraph_vector_t *edges,
 				 igraph_vector_ptr_t *nattr) {
@@ -733,15 +759,6 @@ int R_igraph_attribute_permute_edges(const igraph_t *graph,
     UNPROTECT(2);
   }
   
-  return 0;
-}
-
-int R_igraph_attribute_combine_edges(const igraph_t *graph,
-			 igraph_t *newgraph,
-			 igraph_integer_t neweid,
-			 const igraph_vector_t *oldeids,
-			 const igraph_attribute_combination_t *comb) {
-  /* TODO */
   return 0;
 }
 
@@ -1035,6 +1052,668 @@ int R_igraph_attribute_get_string_edge_attr(const igraph_t *graph,
   
   UNPROTECT(1);
   
+  return 0;
+}
+
+SEXP R_igraph_ac_sum_numeric(SEXP attr, 
+			     const igraph_vector_ptr_t *merges) {
+  SEXP res;
+  SEXP attr2;
+  long int i, len=igraph_vector_ptr_size(merges);
+  
+  PROTECT(attr2=AS_NUMERIC(attr));
+  PROTECT(res=NEW_NUMERIC(len));
+  
+  for (i=0; i<len; i++) {
+    igraph_vector_t *v=VECTOR(*merges)[i];
+    long int j, n=igraph_vector_size(v);
+    igraph_real_t s=0.0;
+    for (j=0; j<n; j++) {
+      long int src=VECTOR(*v)[j];
+      s += REAL(attr2)[src];
+    }
+    REAL(res)[i] = s;
+  }
+  
+  UNPROTECT(2);
+  return res;
+}
+
+SEXP R_igraph_ac_prod_numeric(SEXP attr, 
+			      const igraph_vector_ptr_t *merges) {
+  SEXP res;
+  SEXP attr2;
+  long int i, len=igraph_vector_ptr_size(merges);
+  
+  PROTECT(attr2=AS_NUMERIC(attr));
+  PROTECT(res=NEW_NUMERIC(len));
+  
+  for (i=0; i<len; i++) {
+    igraph_vector_t *v=VECTOR(*merges)[i];
+    long int j, n=igraph_vector_size(v);
+    igraph_real_t s=1.0;
+    for (j=0; j<n; j++) {
+      long int src=VECTOR(*v)[j];
+      s *= REAL(attr2)[src];
+    }
+    REAL(res)[i] = s;
+  }
+  
+  UNPROTECT(2);
+  return res;
+}
+
+SEXP R_igraph_ac_min_numeric(SEXP attr, 
+			     const igraph_vector_ptr_t *merges) {
+  SEXP res;
+  SEXP attr2;
+  long int i, len=igraph_vector_ptr_size(merges);
+  
+  PROTECT(attr2=AS_NUMERIC(attr));
+  PROTECT(res=NEW_NUMERIC(len));
+  
+  for (i=0; i<len; i++) {
+    igraph_vector_t *v=VECTOR(*merges)[i];
+    long int j, n=igraph_vector_size(v);
+    igraph_real_t m= n > 0 ? REAL(attr2)[(long) VECTOR(*v)[0] ] : NA_REAL;
+    for (j=1; j<n; j++) {
+      long int src=VECTOR(*v)[j];
+      igraph_real_t val= REAL(attr2)[src];
+      if (val < m) {
+	m=val;
+      }
+    }
+    REAL(res)[i] = m;
+  }
+  
+  UNPROTECT(2);
+  return res;
+}
+
+SEXP R_igraph_ac_max_numeric(SEXP attr, 
+			     const igraph_vector_ptr_t *merges) {
+  SEXP res;
+  SEXP attr2;
+  long int i, len=igraph_vector_ptr_size(merges);
+  
+  PROTECT(attr2=AS_NUMERIC(attr));
+  PROTECT(res=NEW_NUMERIC(len));
+  
+  for (i=0; i<len; i++) {
+    igraph_vector_t *v=VECTOR(*merges)[i];
+    long int j, n=igraph_vector_size(v);
+    igraph_real_t m= n > 0 ? REAL(attr2)[(long) VECTOR(*v)[0] ] : NA_REAL;
+    for (j=1; j<n; j++) {
+      long int src=VECTOR(*v)[j];
+      igraph_real_t val= REAL(attr2)[src];
+      if (val > m) {
+	m=val;
+      }
+    }
+    REAL(res)[i] = m;
+  }
+  
+  UNPROTECT(2);
+  return res;
+}
+
+SEXP R_igraph_ac_random_numeric(SEXP attr, 
+				const igraph_vector_ptr_t *merges) {
+  SEXP res;
+  SEXP attr2;
+  long int i, len=igraph_vector_ptr_size(merges);
+  
+  PROTECT(attr2=AS_NUMERIC(attr));
+  PROTECT(res=NEW_NUMERIC(len));
+
+  RNG_BEGIN();
+
+  for (i=0; i<len; i++) {
+    igraph_vector_t *v=VECTOR(*merges)[i];
+    long int j, n=igraph_vector_size(v);
+    if (n==0) {
+      REAL(res)[i]=NA_REAL;
+    } else if (n==1) {
+      REAL(res)[i]=REAL(attr2)[(long) VECTOR(*v)[0] ];
+    } else {
+      long int r=RNG_INTEGER(0,n-1);
+      REAL(res)[i]=REAL(attr2)[(long) VECTOR(*v)[r] ];
+    }
+  }
+
+  RNG_END();
+
+  UNPROTECT(2);
+  return res;
+}
+
+SEXP R_igraph_ac_first_numeric(SEXP attr, 
+			       const igraph_vector_ptr_t *merges) {
+  SEXP res;
+  SEXP attr2;
+  long int i, len=igraph_vector_ptr_size(merges);
+  
+  PROTECT(attr2=AS_NUMERIC(attr));
+  PROTECT(res=NEW_NUMERIC(len));
+  
+  for (i=0; i<len; i++) {
+    igraph_vector_t *v=VECTOR(*merges)[i];
+    long int j, n=igraph_vector_size(v);
+    if (n==0) {
+      REAL(res)[i]=NA_REAL;
+    } else {
+      REAL(res)[i]=REAL(attr2)[(long) VECTOR(*v)[0] ];
+    }
+  }
+  
+  UNPROTECT(2);
+  return res;
+}
+
+SEXP R_igraph_ac_last_numeric(SEXP attr, 
+			      const igraph_vector_ptr_t *merges) {
+  SEXP res;
+  SEXP attr2;
+  long int i, len=igraph_vector_ptr_size(merges);
+  
+  PROTECT(attr2=AS_NUMERIC(attr));
+  PROTECT(res=NEW_NUMERIC(len));
+  
+  for (i=0; i<len; i++) {
+    igraph_vector_t *v=VECTOR(*merges)[i];
+    long int j, n=igraph_vector_size(v);
+    if (n==0) {
+      REAL(res)[i]=NA_REAL;
+    } else {
+      REAL(res)[i]=REAL(attr2)[(long) VECTOR(*v)[n-1] ];
+    }
+  }
+  
+  UNPROTECT(2);
+  return res;
+}
+
+SEXP R_igraph_ac_mean_numeric(SEXP attr, 
+			      const igraph_vector_ptr_t *merges) {
+  SEXP res;
+  SEXP attr2;
+  long int i, len=igraph_vector_ptr_size(merges);
+  
+  PROTECT(attr2=AS_NUMERIC(attr));
+  PROTECT(res=NEW_NUMERIC(len));
+  
+  for (i=0; i<len; i++) {
+    igraph_vector_t *v=VECTOR(*merges)[i];
+    long int j, n=igraph_vector_size(v);
+    igraph_real_t s= n>0 ? 0.0 : NA_REAL;
+    for (j=0; j<n; j++) {
+      long int src=VECTOR(*v)[j];
+      s += REAL(attr2)[src];
+    }
+    if (n>0) { s=s/n; }
+    REAL(res)[i] = s;
+  }
+  
+  UNPROTECT(2);
+  return res;
+}
+
+SEXP R_igraph_ac_median_numeric(SEXP attr, 
+				const igraph_vector_ptr_t *merges) {
+  SEXP res;
+  SEXP attr2;
+  long int i, len=igraph_vector_ptr_size(merges);
+  
+  PROTECT(attr2=AS_NUMERIC(attr));
+  PROTECT(res=NEW_NUMERIC(len));
+
+  for (i=0; i<len; i++) {
+    igraph_vector_t *v=VECTOR(*merges)[i];
+    long int j, n=igraph_vector_size(v);
+    SEXP tmp, call, tmp2;
+    if (n==0) {
+      REAL(res)[i] = NA_REAL;
+    } else if (n==1) {
+      REAL(res)[i] = REAL(attr2)[ (long) VECTOR(*v)[0] ];
+    } else {
+      PROTECT(tmp=NEW_NUMERIC(n));
+      for (j=0; j<n; j++) {
+	long int src=VECTOR(*v)[j];
+	REAL(tmp)[j] = REAL(attr2)[src];
+      }
+      PROTECT(call=lang2(install("median"), tmp));
+      PROTECT(tmp2=EVAL(call));
+      REAL(res)[i] = REAL(tmp2)[0];
+      UNPROTECT(3);
+    }
+  }
+  
+  UNPROTECT(2);
+  return res;
+}
+
+SEXP R_igraph_ac_all_other(SEXP attr,
+			   const igraph_vector_ptr_t *merges,
+			   const char *function_name,
+			   SEXP arg) {
+  SEXP res, res2;
+  long int i, len=igraph_vector_ptr_size(merges);
+
+  PROTECT(res=NEW_LIST(len));
+  
+  for (i=0; i<len; i++) {
+    igraph_vector_t *v=VECTOR(*merges)[i];
+    long int j, n=igraph_vector_size(v);
+    SEXP tmp;
+    PROTECT(tmp=NEW_NUMERIC(n));
+    for (j=0; j<n; j++) {
+      long int src=VECTOR(*v)[j];
+      REAL(tmp)[j] = src+1;
+    }
+    if (! arg) {
+      SET_VECTOR_ELT(res, i, 
+		     EVAL(lang2(install(function_name), 
+				EVAL(lang3(install("["), attr, tmp)))));
+    } else {
+      SET_VECTOR_ELT(res, i, 
+		     EVAL(lang3(install(function_name), 
+				EVAL(lang3(install("["), attr, tmp)),
+				arg)));
+    }
+    UNPROTECT(1);
+  }
+    
+  if (IS_VECTOR(attr)) {
+    /* try to simplify it */
+    igraph_bool_t good=1;
+    for (i=0; i<len; i++) {
+      if (GET_LENGTH(VECTOR_ELT(res, i)) != 1) {
+	good=0;
+	break;
+      }
+    }
+    if (good) {
+      res2=EVAL(lang3(install("unlist"), res, 
+		      ScalarLogical(0)));
+      UNPROTECT(1);
+      return res2;
+    }
+  }
+  
+  UNPROTECT(1);
+  return res;
+}
+
+SEXP R_igraph_ac_func(SEXP attr, 
+		      const igraph_vector_ptr_t *merges,
+		      SEXP func) {
+  SEXP res, res2;
+  long int i, len=igraph_vector_ptr_size(merges);
+  
+  PROTECT(res=NEW_LIST(len));
+  
+  for (i=0; i<len; i++) {
+    igraph_vector_t *v=VECTOR(*merges)[i];
+    long int j, n=igraph_vector_size(v);
+    SEXP tmp;
+    PROTECT(tmp=NEW_NUMERIC(n));
+    for (j=0; j<n; j++) {
+      long int src=VECTOR(*v)[j];
+      REAL(tmp)[j] = src+1;
+    }
+    SET_VECTOR_ELT(res, i, 
+		   EVAL(lang2(func, 
+			      EVAL(lang3(install("["), attr, tmp)))));
+    UNPROTECT(1);
+  }
+  
+  if (IS_VECTOR(attr)) {
+    /* try to simplify it */
+    igraph_bool_t good=1;
+    for (i=0; i<len; i++) {
+      if (GET_LENGTH(VECTOR_ELT(res, i)) != 1) {
+	good=0;
+	break;
+      }
+    }
+    if (good) {
+      res2=EVAL(lang3(install("unlist"), res, 
+		      ScalarLogical(0)));
+      UNPROTECT(1);
+      return res2;
+    }
+  }
+  
+  UNPROTECT(1);
+  return res;
+}
+
+int R_igraph_attribute_combine_vertices(const igraph_t *graph,
+			 igraph_t *newgraph,
+			 const igraph_vector_ptr_t *merges,
+			 const igraph_attribute_combination_t *comb) {
+  
+  SEXP attr=graph->attr;
+  SEXP toattr=newgraph->attr;
+  SEXP val=VECTOR_ELT(attr, 2);
+  SEXP toval;
+  long int i, j, valno=GET_LENGTH(val);
+  SEXP names, newnames;
+  SEXP res;
+  int keepno=0;
+  int *TODO;
+  void **funcs;
+  
+  /* Create the TODO list first */
+  PROTECT(names=GET_NAMES(val));
+  TODO=igraph_Calloc(valno, int);
+  if (!TODO) {
+    IGRAPH_ERROR("Cannot combine edge attributes", 
+		 IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, TODO);
+  funcs=igraph_Calloc(valno, void*);
+  if (!funcs) {
+    IGRAPH_ERROR("Cannot combine edge attributes",
+		 IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, funcs);
+  for (i=0; i<valno; i++) {
+    const char *name=CHAR(STRING_ELT(names, i));
+    igraph_attribute_combination_type_t todo;
+    void *voidfunc;
+    igraph_attribute_combination_query(comb, name, &todo, &voidfunc);
+    TODO[i]=todo;
+    funcs[i]=voidfunc;
+    if (todo != IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
+      keepno++;
+    }
+  }
+
+  /* Not safe to UNPROTECT attributes */
+  REAL(VECTOR_ELT(attr, 0))[2]=0;
+  REAL(VECTOR_ELT(toattr, 0))[2]=0;
+  
+  PROTECT(res=NEW_LIST(keepno));
+  PROTECT(newnames=NEW_CHARACTER(keepno));
+  for (i=0, j=0; i<valno; i++) {
+    SEXP va=VECTOR_ELT(val, i);
+    const char *name=CHAR(STRING_ELT(names, i));
+    igraph_attribute_combination_type_t todo=TODO[i];
+    igraph_attribute_type_t type;
+    void *voidfunc=funcs[i];
+    SEXP func;
+
+    /* What kind of attribute */
+    R_igraph_attribute_gettype(graph, &type, 
+			       IGRAPH_ATTRIBUTE_VERTEX, name);
+    
+    switch (todo) {
+    case IGRAPH_ATTRIBUTE_COMBINE_DEFAULT:
+      /* Never happens from R */
+    case IGRAPH_ATTRIBUTE_COMBINE_IGNORE:
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
+      func=(SEXP)voidfunc;
+      SET_VECTOR_ELT(res, j, R_igraph_ac_func(va, merges, func));
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_SUM:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_sum_numeric(va, merges));
+      } else {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_all_other(va, merges, "sum", NULL));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_PROD:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_prod_numeric(va, merges));
+      } else {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_all_other(va, merges, "prod", NULL));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_MIN:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_min_numeric(va, merges));
+      } else {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_all_other(va, merges, "min", NULL));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_MAX:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_max_numeric(va, merges));
+      } else {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_all_other(va, merges, "max", NULL));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_RANDOM:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_random_numeric(va, merges));
+      } else {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_all_other(va, merges, "sample", 
+						     ScalarInteger(1)));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_FIRST:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_first_numeric(va, merges));
+      } else {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_all_other(va, merges, "head", 
+						     ScalarInteger(1)));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_LAST:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_last_numeric(va, merges));
+      } else {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_all_other(va, merges, "tail", 
+						     ScalarInteger(1)));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_MEAN:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_mean_numeric(va, merges));
+      } else {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_all_other(va, merges, "mean", NULL));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_MEDIAN:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_median_numeric(va, merges));
+      } else {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_all_other(va, merges, "median", NULL));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_CONCAT:
+      SET_VECTOR_ELT(res, j, R_igraph_ac_all_other(va, merges, "c", NULL));
+      break;
+    default:
+      IGRAPH_ERROR("Unknown attribute combination", 
+		   IGRAPH_UNIMPLEMENTED);
+      break;
+    }
+
+    if (todo != IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
+      SET_STRING_ELT(newnames, j, STRING_ELT(names, i));
+      j++;
+    }
+  } 
+
+  /* It is now safe to UNPROTECT attributes */
+  REAL(VECTOR_ELT(attr, 0))[2]=1;
+  REAL(VECTOR_ELT(toattr, 0))[2]=1;
+
+  igraph_free(funcs);
+  igraph_free(TODO);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  SET_NAMES(res, newnames);
+  SET_VECTOR_ELT(toattr, 2, res);
+  UNPROTECT(3);
+  
+  return 0;
+}
+
+int R_igraph_attribute_combine_edges(const igraph_t *graph,
+			 igraph_t *newgraph,
+			 const igraph_vector_ptr_t *merges,
+			 const igraph_attribute_combination_t *comb) {
+
+  SEXP attr=graph->attr;
+  SEXP toattr=newgraph->attr;
+  SEXP eal=VECTOR_ELT(attr, 3);
+  SEXP toeal;
+  long int i, j, ealno=GET_LENGTH(eal);
+  SEXP names, newnames;
+  SEXP res;
+  int keepno=0;
+  int *TODO;
+  void **funcs;
+
+  /* Create the TODO list first */
+  PROTECT(names=GET_NAMES(eal));
+  TODO=igraph_Calloc(ealno, int);
+  if (!TODO) {
+    IGRAPH_ERROR("Cannot combine edge attributes", 
+		 IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, TODO);
+  funcs=igraph_Calloc(ealno, void*);
+  if (!funcs) {
+    IGRAPH_ERROR("Cannot combine edge attributes",
+		 IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, funcs);
+  for (i=0; i<ealno; i++) {
+    const char *name=CHAR(STRING_ELT(names, i));
+    igraph_attribute_combination_type_t todo;
+    void *voidfunc;
+    igraph_attribute_combination_query(comb, name, &todo, &voidfunc);
+    TODO[i]=todo;
+    funcs[i]=voidfunc;
+    if (todo != IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
+      keepno++;
+    }
+  }
+
+  /* Not safe to UNPROTECT attributes */
+  REAL(VECTOR_ELT(attr, 0))[2]=0;
+  REAL(VECTOR_ELT(toattr, 0))[2]=0;
+
+  PROTECT(res=NEW_LIST(keepno));
+  PROTECT(newnames=NEW_CHARACTER(keepno));
+  for (i=0, j=0; i<ealno; i++) {
+    SEXP ea=VECTOR_ELT(eal, i);
+    const char *name=CHAR(STRING_ELT(names, i));
+    igraph_attribute_combination_type_t todo=TODO[i];
+    igraph_attribute_type_t type;
+    void *voidfunc=funcs[i];
+    SEXP func;
+
+    /* What kind of attribute */
+    R_igraph_attribute_gettype(graph, &type, IGRAPH_ATTRIBUTE_EDGE, name);
+    
+    switch (todo) {
+    case IGRAPH_ATTRIBUTE_COMBINE_DEFAULT:
+      /* Never happens from R */
+    case IGRAPH_ATTRIBUTE_COMBINE_IGNORE:
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
+      func=(SEXP)voidfunc;
+      SET_VECTOR_ELT(res, j, R_igraph_ac_func(ea, merges, func));
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_SUM:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_sum_numeric(ea, merges));
+      } else {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_all_other(ea, merges, "sum", NULL));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_PROD:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_prod_numeric(ea, merges));
+      } else {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_all_other(ea, merges, "prod", NULL));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_MIN:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_min_numeric(ea, merges));
+      } else {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_all_other(ea, merges, "min", NULL));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_MAX:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_max_numeric(ea, merges));
+      } else {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_all_other(ea, merges, "max", NULL));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_RANDOM:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_random_numeric(ea, merges));
+      } else {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_all_other(ea, merges, "sample", 
+						     ScalarInteger(1)));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_FIRST:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_first_numeric(ea, merges));
+      } else {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_all_other(ea, merges, "head", 
+						     ScalarInteger(1)));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_LAST:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_last_numeric(ea, merges));
+      } else {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_all_other(ea, merges, "tail", 
+						     ScalarInteger(1)));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_MEAN:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_mean_numeric(ea, merges));
+      } else {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_all_other(ea, merges, "mean", NULL));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_MEDIAN:
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_median_numeric(ea, merges));
+      } else {
+	SET_VECTOR_ELT(res, j, R_igraph_ac_all_other(ea, merges, "median", NULL));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_COMBINE_CONCAT:
+      SET_VECTOR_ELT(res, j, R_igraph_ac_all_other(ea, merges, "c", NULL));
+      break;
+    default:
+      IGRAPH_ERROR("Unknown attribute combination", 
+		   IGRAPH_UNIMPLEMENTED);
+      break;
+    }
+
+    if (todo != IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
+      SET_STRING_ELT(newnames, j, STRING_ELT(names, i));
+      j++;
+    }
+  }   
+
+  /* It is now safe to UNPROTECT attributes */
+  REAL(VECTOR_ELT(attr, 0))[2]=1;
+  REAL(VECTOR_ELT(toattr, 0))[2]=1;
+
+  igraph_free(funcs);
+  igraph_free(TODO);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  SET_NAMES(res, newnames);
+  SET_VECTOR_ELT(toattr, 3, res);
+  UNPROTECT(3);
+
   return 0;
 }
 
@@ -3738,26 +4417,6 @@ SEXP R_igraph_get_adjacency(SEXP graph, SEXP ptype) {
   return result;
 }
   
-SEXP R_igraph_simplify(SEXP graph, SEXP pmultiple, SEXP ploops) {
-  
-  igraph_t g;
-  igraph_bool_t multiple=LOGICAL(pmultiple)[0];
-  igraph_bool_t loops=LOGICAL(ploops)[0];
-  SEXP result;
-  
-  R_igraph_before();
-  
-  R_SEXP_to_igraph_copy(graph, &g);
-  igraph_simplify(&g, multiple, loops, /*edge_comb=*/0); /* TODO */
-  PROTECT(result=R_igraph_to_SEXP(&g));
-  igraph_destroy(&g);
-  
-  R_igraph_after();
-  
-  UNPROTECT(1);
-  return result;
-}
-
 SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP pniter, 
 					  SEXP pmaxdelta, SEXP parea,
 					  SEXP pcoolexp, SEXP prepulserad,

@@ -31,3 +31,14 @@ AT_SETUP([Writing an attributed graph in GML and GraphML:])
 AT_KEYWORDS([gml GML graphml GraphML attributes])
 AT_COMPILE_CHECK([simple/cattributes2.c], [simple/cattributes2.out])
 AT_CLEANUP
+
+AT_SETUP([Combining numeric attributes:])
+AT_KEYWORDS([attributes combination combining])
+AT_COMPILE_CHECK([simple/cattributes3.c], [simple/cattributes3.out])
+AT_CLEANUP
+
+AT_SETUP([Combining string attributes:])
+AT_KEYWORDS([attributes combination combining])
+AT_COMPILE_CHECK([simple/cattributes4.c], [simple/cattributes4.out])
+AT_CLEANUP
+

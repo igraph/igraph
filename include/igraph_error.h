@@ -326,6 +326,8 @@ igraph_set_error_handler(igraph_error_handler_t* new_handler);
  * \enumval IGRAPH_EATTRIBUTES Attribute handler error. The user is not 
  *   expected to find this; it is signalled if some igraph function is
  *   not using the attribute handler interface properly.
+ * \enumval IGRAPH_EATTRCOMBINE Unimplemented attribute combination 
+ *   method for the given attribute type.
  */
 
 typedef enum {
@@ -379,7 +381,8 @@ typedef enum {
   IGRAPH_GLP_EMIPGAP      = 48,
   IGRAPH_GLP_ETMLIM       = 49,
   IGRAPH_GLP_ESTOP        = 50,
-  IGRAPH_EATTRIBUTES      = 51
+  IGRAPH_EATTRIBUTES      = 51,
+  IGRAPH_EATTRCOMBINE     = 52
 } igraph_error_type_t;
 
 /**

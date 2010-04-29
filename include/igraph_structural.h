@@ -107,6 +107,10 @@ int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
 				       igraph_vector_t *knn,
 				       igraph_vector_t *knnk, 
 				       const igraph_vector_t *weights);
+int igraph_contract_vertices(igraph_t *graph,
+			     const igraph_vector_t *mapping,
+			     const igraph_attribute_combination_t 
+			     *vertex_comb);
 
 /* -------------------------------------------------- */
 /* Spectral Properties                                */

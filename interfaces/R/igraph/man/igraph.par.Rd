@@ -17,6 +17,10 @@ igraph.par(parid, parvalue = NULL)
 \details{
   The currently used parameters in alphabetical order:
   \itemize{
+    \item{edge.attr.comb}{Specifies what to do with the edge
+      attributes if the graph is modified. The default value is
+      \code{list(weight="sum", name="concat", "ignore")}. See
+      \code{\link{attribute.combination}} for details on this.}
     \item{print.edge.attributes}{Logical constant, whether to print edge
       attributes when printing graphs. Defaults to \code{FALSE}.}
     \item{print.graph.attributes}{Logical constant, whether to print
@@ -26,6 +30,10 @@ igraph.par(parid, parvalue = NULL)
     \item{verbose}{Logical constant, whether igraph functions should
       talk more than minimal. Eg. if \code{TRUE} thne some functions
       will use progress bars while computing. Defaults to \code{FALSE}.}
+    \item{vertex.attr.comb}{Specifies what to do with the vertex
+      attributes if the graph is modified. The default value is
+      \code{list(name="concat", "ignore")} See
+      \code{\link{attribute.combination}} for details on this.}
   }
 }
 \value{

@@ -151,6 +151,7 @@
 <!-- doxrox-include igraph_avg_nearest_neighbor_degree -->
 <!-- doxrox-include igraph_get_adjacency -->	
 <!-- doxrox-include igraph_get_edgelist -->	
+<!-- doxrox-include igraph_contract_vertices -->
 </section>
 
 </chapter>

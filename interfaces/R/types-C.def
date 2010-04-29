@@ -464,3 +464,19 @@ COMMCMP:
   CTYPE: igraph_integer_t
   INCONV:
     IN: %C%=REAL(%I%)[0];
+
+##################################
+# Specification on what to do with the attributes
+
+VERTEX_ATTRIBUTE_COMBINATION:
+  CTYPE: igraph_attribute_combination_t
+  CALL: &%C%
+  INCONV:
+    IN: R_SEXP_to_attr_comb(%I%, &%C%);
+
+EDGE_ATTRIBUTE_COMBINATION:
+  CTYPE: igraph_attribute_combination_t
+  CALL: &%C%
+  INCONV:
+    IN: R_SEXP_to_attr_comb(%I%, &%C%);
+

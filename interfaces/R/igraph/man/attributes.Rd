@@ -121,7 +121,9 @@ graph <- remove.edge.attribute(graph, attrname)
 }
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
-\seealso{\code{\link{print.igraph}} can also print attributes}
+\seealso{\code{\link{print.igraph}} can print attributes. See
+  \code{\link{attribute.combination}} for details on how igraph combines
+  attributes if several vertices or edges are mapped into one.}
 \examples{
 g <- graph.ring(10)
 g <- set.graph.attribute(g, "name", "RING")

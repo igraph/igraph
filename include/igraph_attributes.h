@@ -124,18 +124,18 @@ typedef enum { IGRAPH_ATTRIBUTE_GRAPH=0,
 
 typedef enum {
   IGRAPH_ATTRIBUTE_COMBINE_IGNORE=0,
-  IGRAPH_ATTRIBUTE_COMBINE_DEFAULT,
-  IGRAPH_ATTRIBUTE_COMBINE_FUNCTION,
-  IGRAPH_ATTRIBUTE_COMBINE_SUM,
-  IGRAPH_ATTRIBUTE_COMBINE_PROD,
-  IGRAPH_ATTRIBUTE_COMBINE_MIN,
-  IGRAPH_ATTRIBUTE_COMBINE_MAX,
-  IGRAPH_ATTRIBUTE_COMBINE_RANDOM,
-  IGRAPH_ATTRIBUTE_COMBINE_FIRST,
-  IGRAPH_ATTRIBUTE_COMBINE_LAST,
-  IGRAPH_ATTRIBUTE_COMBINE_MEAN,
-  IGRAPH_ATTRIBUTE_COMBINE_MEDIAN,
-  IGRAPG_ATTRIBUTE_COMBINE_CONCAT } igraph_attribute_combination_type_t;
+  IGRAPH_ATTRIBUTE_COMBINE_DEFAULT=1,
+  IGRAPH_ATTRIBUTE_COMBINE_FUNCTION=2,
+  IGRAPH_ATTRIBUTE_COMBINE_SUM=3,
+  IGRAPH_ATTRIBUTE_COMBINE_PROD=4,
+  IGRAPH_ATTRIBUTE_COMBINE_MIN=5,
+  IGRAPH_ATTRIBUTE_COMBINE_MAX=6,
+  IGRAPH_ATTRIBUTE_COMBINE_RANDOM=7,
+  IGRAPH_ATTRIBUTE_COMBINE_FIRST=8,
+  IGRAPH_ATTRIBUTE_COMBINE_LAST=9,
+  IGRAPH_ATTRIBUTE_COMBINE_MEAN=10,
+  IGRAPH_ATTRIBUTE_COMBINE_MEDIAN=11,
+  IGRAPH_ATTRIBUTE_COMBINE_CONCAT=12 } igraph_attribute_combination_type_t;
 
 typedef struct igraph_attribute_combination_record_t {
   const char *name;		/* can be NULL, meaning: the rest */
@@ -146,6 +146,20 @@ typedef struct igraph_attribute_combination_record_t {
 typedef struct igraph_attribute_combination_t {
   igraph_vector_ptr_t list;
 } igraph_attribute_combination_t;
+
+int igraph_attribute_combination_init(igraph_attribute_combination_t *comb);
+int igraph_attribute_combination(igraph_attribute_combination_t *comb, ...);
+void igraph_attribute_combination_destroy(igraph_attribute_combination_t *comb);
+int igraph_attribute_combination_add(igraph_attribute_combination_t *comb,
+				     const char *name, 
+				     igraph_attribute_combination_type_t type,
+				     void *func);
+int igraph_attribute_combination_remove(igraph_attribute_combination_t *comb, 
+					const char *name);
+int igraph_attribute_combination_query(const igraph_attribute_combination_t *comb,
+				       const char *name,
+				       igraph_attribute_combination_type_t *type,
+				       void **func);
 
 /**
  * \struct igraph_attribute_table_t
@@ -173,10 +187,9 @@ typedef struct igraph_attribute_combination_t {
  *    number of vertices in the new graph.
  * \member combine_vertices This function is called when the creation
  *    of a new graph involves a merge (contraction, etc.) of vertices
- *    from another graph. The function is called once for each new vertex, 
- *    and the id of the new vertex in the new graph is given, and also 
- *    a vector with the ids of the old vertices that are contracted.
- *    The last argument specifies how the combination should be performed.
+ *    from another graph. The function is after the new graph was created.
+ *    An argument specifies how several vertices from the old graph map to a 
+ *    single vertex in the new graph.
  * \member add_edges Called when new edges have been added. The number
  *    of new edges are supplied as well. It is expected to return an
  *    error code.
@@ -188,10 +201,9 @@ typedef struct igraph_attribute_combination_t {
  *    the old graph).
  * \member combine_edges This function is called when the creation
  *    of a new graph involves a merge (contraction, etc.) of edges
- *    from another graph. The function is called once for each new edge, 
- *    and the id of the new edge in the new graph is given, and also 
- *    a vector with the ids of the old edges that are contracted.
- *    The last argument specifies how the combination should be performed.
+ *    from another graph. The function is after the new graph was created.
+ *    An argument specifies how several edges from the old graph map to a 
+ *    single edge in the new graph.
  * \member get_info Query the attributes of a graph, the names and
  *    types should be returned.
  * \member has_attr Check whether a graph has the named
@@ -231,8 +243,7 @@ typedef struct igraph_attribute_table_t {
 			  const igraph_vector_t *idx);
   int (*combine_vertices)(const igraph_t *graph,
 			  igraph_t *newgraph,
-			  igraph_integer_t newvid,
-			  const igraph_vector_t *oldvids,
+			  const igraph_vector_ptr_t *merges,
 			  const igraph_attribute_combination_t *comb);
   int (*add_edges)(igraph_t *graph, const igraph_vector_t *edges, 
 		   igraph_vector_ptr_t *attr);
@@ -240,8 +251,7 @@ typedef struct igraph_attribute_table_t {
 		       igraph_t *newgraph, const igraph_vector_t *idx);
   int (*combine_edges)(const igraph_t *graph, 
 		       igraph_t *newgraph,
-		       igraph_integer_t neweid,
-		       const igraph_vector_t *oldeids,
+		       const igraph_vector_ptr_t *merges,
 		       const igraph_attribute_combination_t *comb);
   int (*get_info)(const igraph_t *graph,
 		  igraph_strvector_t *gnames, igraph_vector_t *gtypes,
@@ -274,6 +284,8 @@ extern igraph_attribute_table_t *igraph_i_attribute_table;
 igraph_attribute_table_t *
 igraph_i_set_attribute_table(igraph_attribute_table_t * table);
 
+igraph_bool_t igraph_has_attribute_table();
+
 #define IGRAPH_I_ATTRIBUTE_DESTROY(graph) \
         do {if ((graph)->attr) igraph_i_attribute_destroy(graph);} while(0)
 #define IGRAPH_I_ATTRIBUTE_COPY(to,from,ga,va,ea) do { \
@@ -298,8 +310,7 @@ int igraph_i_attribute_permute_vertices(const igraph_t *graph,
 					const igraph_vector_t *idx);
 int igraph_i_attribute_combine_vertices(const igraph_t *graph,
 			igraph_t *newgraph,
-			igraph_integer_t newvid,
-			const igraph_vector_t *oldvids,
+			const igraph_vector_ptr_t *merges,
 			const igraph_attribute_combination_t *comb);
 int igraph_i_attribute_add_edges(igraph_t *graph, 
 				 const igraph_vector_t *edges, void *attr);
@@ -308,8 +319,7 @@ int igraph_i_attribute_permute_edges(const igraph_t *graph,
 				     const igraph_vector_t *idx);
 int igraph_i_attribute_combine_edges(const igraph_t *graph,
 			igraph_t *newgraph,
-			igraph_integer_t neweid,
-			const igraph_vector_t *oldeids,
+		        const igraph_vector_ptr_t *merges,
 			const igraph_attribute_combination_t *comb);
 
 int igraph_i_attribute_get_info(const igraph_t *graph,
