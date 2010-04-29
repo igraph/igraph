@@ -286,7 +286,7 @@ extern igraph_attribute_table_t *igraph_i_attribute_table;
 igraph_attribute_table_t *
 igraph_i_set_attribute_table(igraph_attribute_table_t * table);
 
-igraph_bool_t igraph_has_attribute_table();
+igraph_bool_t igraph_has_attribute_table(void);
 
 #define IGRAPH_I_ATTRIBUTE_DESTROY(graph) \
         do {if ((graph)->attr) igraph_i_attribute_destroy(graph);} while(0)
