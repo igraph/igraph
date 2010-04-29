@@ -27,8 +27,8 @@
 
 #include <stdio.h>
 
-int igraph_buckets_init(igraph_buckets_t *b, long int bsize, long int size) {
-  IGRAPH_VECTOR_INIT_FINALLY(&b->bptr, bsize);
+int igraph_buckets_init(igraph_buckets_t *b, long int size) {
+  IGRAPH_VECTOR_INIT_FINALLY(&b->bptr, size+1);
   IGRAPH_VECTOR_INIT_FINALLY(&b->buckets, size);
   b->max=-1; b->no=0;
   IGRAPH_FINALLY_CLEAN(2);
