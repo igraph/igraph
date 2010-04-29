@@ -365,3 +365,5 @@ VERTEX:
     IN: shell_read_integer(&%C%, optarg);
 
 
+VERTEX_ATTRIBUTE_COMBINATION:
+EDGE_ATTRIBUTE_COMBINATION:
