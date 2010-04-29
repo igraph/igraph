@@ -34,6 +34,7 @@
 #include "igraph_types_internal.h"
 #include "config.h"
 #include "igraph_math.h"
+#include "igraph_dqueue.h"
 
 #include <limits.h>
 #include <stdio.h>
@@ -144,11 +145,15 @@
  * undirected edge.
  */
 
-int igraph_i_maxflow_value_undirected(const igraph_t *graph, 
-				      igraph_real_t *value,
-				      igraph_integer_t source, 
-				      igraph_integer_t target,
-				      const igraph_vector_t *capacity) {
+int igraph_i_maxflow_undirected(const igraph_t *graph, 
+				igraph_real_t *value,
+				igraph_vector_t *flow,
+				igraph_vector_t *cut,
+				igraph_vector_t *partition,
+				igraph_vector_t *partition2,
+				igraph_integer_t source, 
+				igraph_integer_t target,
+				const igraph_vector_t *capacity) {
   long int no_of_edges=igraph_ecount(graph);
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t edges;
@@ -175,8 +180,9 @@ int igraph_i_maxflow_value_undirected(const igraph_t *graph,
   IGRAPH_CHECK(igraph_create(&newgraph, &edges, no_of_nodes, IGRAPH_DIRECTED));
   IGRAPH_FINALLY(igraph_destroy, &newgraph);
   
-  IGRAPH_CHECK(igraph_maxflow_value(&newgraph, value, source,
-				    target, &newcapacity));
+  /* TODO: flow, cut, partition, partition2 is bad, conversion needed */
+  IGRAPH_CHECK(igraph_maxflow(&newgraph, value, flow, cut, partition,
+			      partition2, source, target, &newcapacity));
   
   igraph_destroy(&newgraph);
   igraph_vector_destroy(&edges);
@@ -186,65 +192,11 @@ int igraph_i_maxflow_value_undirected(const igraph_t *graph,
   return 0;
 }
 
-/**
- * \function igraph_maxflow_value
- * \brief Maximum flow in a network with the push/relabel algorithm
- * 
- * </para><para>This function implements the Goldberg-Tarjan algorithm for
- * calculating value of the maximum flow in a directed or undirected
- * graph. The algorithm was given in Andrew V. Goldberg, Robert
- * E. Tarjan: A New Approach to the Maximum-Flow Problem, Journal of
- * the ACM, 35(4), 921-940, 1988. </para>
- * 
- * <para> The input of the function is a graph, a vector
- * of real numbers giving the capacity of the edges and two vertices
- * of the graph, the source and the target. A flow is a function 
- * assigning positive real numbers to the edges and satisfying two
- * requirements: (1) the flow value is less than the capacity of the
- * edge and (2) at each vertex except the source and the target, the
- * incoming flow (ie. the sum of the flow on the incoming edges) is
- * the same as the outgoing flow (ie. the sum of the flow on the
- * outgoing edges). The value of the flow is the incoming flow at the
- * target vertex. The maximum flow is the flow with the maximum
- * value. </para>
- * 
- * <para> This function can only calculate the value of the maximum
- * flow, but not the flow itself (may be added later). </para>
- * 
- * <para> According to a theorem by Ford and Furkelson 
- * (L. R. Ford Jr. and D. R. Fulkerson. Maximal flow through a
- * network. Canadian J. Math., 8:399-404, 1956.) the maximum flow
- * between two vertices is the same as the 
- * minimum cut between them (also called the minimum s-t cut). So \ref
- * igraph_st_mincut_value() gives the same result in all cases as \c
- * igraph_maxflow_value().</para>
- * 
- * <para> Note that the value of the maximum flow is the same as the
- * minimum cut in the graph.
- * \param graph The input graph, either directed or undirected.
- * \param value Pointer to a real number, the result will be placed here.
- * \param source The id of the source vertex.
- * \param target The id of the target vertex.
- * \param capacity Vector containing the capacity of the edges. If NULL, then
- *        every edge is considered to have capacity 1.0.
- * \return Error code.
- * 
- * Time complexity: O(|V|^3). In practice it is much faster, but i
- * cannot prove a better lower bound for the data structure i've
- * used. In fact, this implementation runs much faster than the
- * \c hi_pr implementation discussed in
- * B. V. Cherkassky and A. V. Goldberg: On implementing the 
- * push-relabel method for the maximum flow problem, (Algorithmica, 
- * 19:390--410, 1997) on all the graph classes i've tried.
- * 
- * \sa \ref igraph_mincut_value(), \ref igraph_edge_connectivity(),
- * \ref igraph_vertex_connectivity() for 
- * properties based on the maximum flow.
- */
-
-int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
-			 igraph_integer_t source, igraph_integer_t target,
-			 const igraph_vector_t *capacity) {
+int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
+		   igraph_vector_t *flow, igraph_vector_t *cut,
+		   igraph_vector_t *partition, igraph_vector_t *partition2,
+		   igraph_integer_t source, igraph_integer_t target,
+		   const igraph_vector_t *capacity) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_orig_edges=igraph_ecount(graph);
@@ -258,8 +210,9 @@ int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
   long int i, j, k, l, idx;
 
   if (!igraph_is_directed(graph)) {
-    IGRAPH_CHECK(igraph_i_maxflow_value_undirected(graph, value, source, 
-						   target, capacity));
+    IGRAPH_CHECK(igraph_i_maxflow_undirected(graph, value, flow, cut,
+					partition, partition2, source, 
+					target, capacity));
     return 0;
   }
 
@@ -269,6 +222,35 @@ int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
   if (source<0 || source>=no_of_nodes || target<0 || target>=no_of_nodes) {
     IGRAPH_ERROR("Invalid source or target vertex", IGRAPH_EINVAL);
   }
+
+  /* 
+   * The data structure:
+   * - First of all, we consider every edge twice, first the edge
+   *   itself, but also its opposite.
+   * - (from, to) contain all edges (original + opposite), ordered by 
+   *   the id of the source vertex. During the algorithm we just need
+   *   'to', so from is destroyed soon. We only need it in the
+   *   beginning, to create the 'first' pointers.
+   * - 'first' is a pointer vector for 'to', first[i] points to the
+   *   first neighbor of vertex i and first[i+1]-1 is the last
+   *   neighbor of vertex i. (Unless vertex i is isolate, in which
+   *   case first[i]==first[i+1]).
+   * - 'rev' contains a mapping from an edge to its opposite pair
+   * - 'rescap' contains the residual capacities of the edges, this is
+   *   initially equal to the capasity of the edges for the original
+   *   edges and it is zero for the opposite edges.
+   * - 'excess' contains the excess flow for the vertices. I.e. the flow
+   *   that is coming in, but it is not going out.
+   * - 'current' stores the next neighboring vertex to check, for every
+   *   vertex, when excess flow is being pushed to neighbors.
+   * - 'distance' stores the distance of the vertices from the source.
+   * - 'rank' and 'edges' are only needed temporarily, for ordering and
+   *   storing the edges.
+   * - we use an igraph_buckets_t data structure ('buckets') to find
+   *   the vertices with the highest 'distance' values quickly.
+   *   This always contains the vertices that have a positive excess
+   *   flow.
+   */
   
   IGRAPH_VECTOR_INIT_FINALLY(&to,       no_of_edges);
   IGRAPH_VECTOR_INIT_FINALLY(&rev,      no_of_edges);
@@ -302,7 +284,8 @@ int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(2);
 
-  /* The first pointers */
+  /* The first pointers. This is a but trickier, than one would
+     think, because of the possible isolate vertices. */
   
   idx=-1;
   for (i=0; i<=VECTOR(from)[0]; i++) {
@@ -344,6 +327,7 @@ int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
   IGRAPH_CHECK(igraph_buckets_init(&buckets, no_of_nodes+1, no_of_nodes));
   IGRAPH_FINALLY(igraph_buckets_destroy, &buckets);
 
+  /* Send as much flow as possible from the source to its neighbors */
   for (i=FIRST(source), j=LAST(source); i<j; i++) {
     if (HEAD(i) != source) {
       igraph_real_t delta=RESCAP(i);
@@ -358,7 +342,9 @@ int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
   }
   DIST(source)=no_of_nodes;
   DIST(target)=0;
-    
+
+  /* It would be enough to do this for the neighbors of the source,
+     the rest have EXCESS(i) == 0.0 by definition. */
   for (i=0; i<no_of_nodes; i++) {
     if (EXCESS(i) > 0.0 && i != target) {
       igraph_buckets_add(&buckets, DIST(i), i);
@@ -433,7 +419,54 @@ int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
   if (value) {
     *value=EXCESS(target);
   }
+  
+  /* If we also need the minimum cut */
+  if (cut) {
+    /* We need to find all vertices from which the target is reachable 
+       in the residual graph. We do a breadth-first search, going
+       backwards. */
+    igraph_dqueue_t Q;
+    igraph_vector_bool_t added;
 
+    IGRAPH_CHECK(igraph_vector_bool_init(&added, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_bool_destroy, &added);
+
+    IGRAPH_CHECK(igraph_dqueue_init(&Q, 100));
+    IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);
+
+    igraph_dqueue_push(&Q, target);
+    VECTOR(added)[(long int)target]=1;
+    while (!igraph_dqueue_empty(&Q)) {
+      long int actnode=igraph_dqueue_pop(&Q);
+      for (i=FIRST(actnode), j=LAST(actnode); i<j; i++) {
+	long int nei=HEAD(i);
+	if (!VECTOR(added)[nei] && RESCAP(REV(i)) > 0.0) {
+	  VECTOR(added)[nei]=1;
+	  IGRAPH_CHECK(igraph_dqueue_push(&Q, nei));
+	}
+      }
+    }    
+    igraph_dqueue_destroy(&Q);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    /* Now we marked each vertex that is on one side of the cut,
+       check the crossing edges */
+    
+    igraph_vector_clear(cut);
+    for (i=0; i<no_of_edges/2; i++) {
+      long int v1=IGRAPH_FROM(graph, i);
+      long int v2=IGRAPH_TO(graph, i);
+      char p1=VECTOR(added)[v1];
+      char p2=VECTOR(added)[v2];
+      if (p1 ^ p2) {
+	IGRAPH_CHECK(igraph_vector_push_back(cut, i));
+      }
+    }
+
+    igraph_vector_bool_destroy(&added);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
   igraph_buckets_destroy(&buckets);
   igraph_vector_destroy(&current);
   igraph_vector_destroy(&first);
@@ -445,6 +478,71 @@ int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
   IGRAPH_FINALLY_CLEAN(8);
 
   return 0;
+}
+
+/**
+ * \function igraph_maxflow_value
+ * \brief Maximum flow in a network with the push/relabel algorithm
+ * 
+ * </para><para>This function implements the Goldberg-Tarjan algorithm for
+ * calculating value of the maximum flow in a directed or undirected
+ * graph. The algorithm was given in Andrew V. Goldberg, Robert
+ * E. Tarjan: A New Approach to the Maximum-Flow Problem, Journal of
+ * the ACM, 35(4), 921-940, 1988. </para>
+ * 
+ * <para> The input of the function is a graph, a vector
+ * of real numbers giving the capacity of the edges and two vertices
+ * of the graph, the source and the target. A flow is a function 
+ * assigning positive real numbers to the edges and satisfying two
+ * requirements: (1) the flow value is less than the capacity of the
+ * edge and (2) at each vertex except the source and the target, the
+ * incoming flow (ie. the sum of the flow on the incoming edges) is
+ * the same as the outgoing flow (ie. the sum of the flow on the
+ * outgoing edges). The value of the flow is the incoming flow at the
+ * target vertex. The maximum flow is the flow with the maximum
+ * value. </para>
+ * 
+ * <para> This function can only calculate the value of the maximum
+ * flow, but not the flow itself (may be added later). </para>
+ * 
+ * <para> According to a theorem by Ford and Furkelson 
+ * (L. R. Ford Jr. and D. R. Fulkerson. Maximal flow through a
+ * network. Canadian J. Math., 8:399-404, 1956.) the maximum flow
+ * between two vertices is the same as the 
+ * minimum cut between them (also called the minimum s-t cut). So \ref
+ * igraph_st_mincut_value() gives the same result in all cases as \c
+ * igraph_maxflow_value().</para>
+ * 
+ * <para> Note that the value of the maximum flow is the same as the
+ * minimum cut in the graph.
+ * \param graph The input graph, either directed or undirected.
+ * \param value Pointer to a real number, the result will be placed here.
+ * \param source The id of the source vertex.
+ * \param target The id of the target vertex.
+ * \param capacity Vector containing the capacity of the edges. If NULL, then
+ *        every edge is considered to have capacity 1.0.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|^3). In practice it is much faster, but i
+ * cannot prove a better lower bound for the data structure i've
+ * used. In fact, this implementation runs much faster than the
+ * \c hi_pr implementation discussed in
+ * B. V. Cherkassky and A. V. Goldberg: On implementing the 
+ * push-relabel method for the maximum flow problem, (Algorithmica, 
+ * 19:390--410, 1997) on all the graph classes i've tried.
+ * 
+ * \sa \ref igraph_mincut_value(), \ref igraph_edge_connectivity(),
+ * \ref igraph_vertex_connectivity() for 
+ * properties based on the maximum flow.
+ */
+
+int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
+			 igraph_integer_t source, igraph_integer_t target,
+			 const igraph_vector_t *capacity) {
+
+  return igraph_maxflow(graph, value, /*flow=*/ 0, /*cut=*/ 0, 
+			/*partition=*/ 0, /*partition1=*/ 0,
+			source, target, capacity);
 }
 
 /**
