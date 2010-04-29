@@ -341,7 +341,7 @@ int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
 
   /* OK, the graph is set up, initialization */
 
-  IGRAPH_CHECK(igraph_buckets_init(&buckets, no_of_nodes));
+  IGRAPH_CHECK(igraph_buckets_init(&buckets, no_of_nodes+1, no_of_nodes));
   IGRAPH_FINALLY(igraph_buckets_destroy, &buckets);
 
   for (i=FIRST(source), j=LAST(source); i<j; i++) {
