@@ -52,7 +52,7 @@ int main() {
 			       "weight", IGRAPH_ATTRIBUTE_COMBINE_SUM,
 			       "color",  IGRAPH_ATTRIBUTE_COMBINE_FIRST,
 			       "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE, 
-			       0);
+			       IGRAPH_NO_MORE_ATTRIBUTES);
   igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
   igraph_attribute_combination_destroy(&comb);
   igraph_write_graph_graphml(&g2, stdout);
@@ -63,7 +63,7 @@ int main() {
   igraph_copy(&g2, &g);
   igraph_attribute_combination(&comb, 
 			       "",       IGRAPH_ATTRIBUTE_COMBINE_LAST,
-			       0);
+			       IGRAPH_NO_MORE_ATTRIBUTES);
   igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
   igraph_attribute_combination_destroy(&comb);
   igraph_write_graph_graphml(&g2, stdout);
@@ -75,7 +75,7 @@ int main() {
   igraph_attribute_combination(&comb, 
 			       "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE, 
 			       "color",  IGRAPH_ATTRIBUTE_COMBINE_CONCAT,
-			       0);
+			       IGRAPH_NO_MORE_ATTRIBUTES);
   igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
   igraph_attribute_combination_destroy(&comb);
   igraph_write_graph_graphml(&g2, stdout);

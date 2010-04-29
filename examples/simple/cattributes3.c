@@ -49,7 +49,7 @@ int main() {
   igraph_attribute_combination(&comb, 
 			       "weight", IGRAPH_ATTRIBUTE_COMBINE_SUM,
 			       "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE, 
-			       0);
+			       IGRAPH_NO_MORE_ATTRIBUTES);
   igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
   igraph_attribute_combination_destroy(&comb);
   igraph_write_graph_graphml(&g2, stdout);
@@ -61,7 +61,7 @@ int main() {
   igraph_attribute_combination(&comb, 
 			       "weight", IGRAPH_ATTRIBUTE_COMBINE_PROD,
 			       "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE, 
-			       0);
+			       IGRAPH_NO_MORE_ATTRIBUTES);
   igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
   igraph_attribute_combination_destroy(&comb);
   igraph_write_graph_graphml(&g2, stdout);
@@ -73,7 +73,7 @@ int main() {
   igraph_attribute_combination(&comb, 
 			       "weight", IGRAPH_ATTRIBUTE_COMBINE_MIN,
 			       "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE, 
-			       0);
+			       IGRAPH_NO_MORE_ATTRIBUTES);
   igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
   igraph_attribute_combination_destroy(&comb);
   igraph_write_graph_graphml(&g2, stdout);
@@ -85,7 +85,7 @@ int main() {
   igraph_attribute_combination(&comb, 
 			       "weight", IGRAPH_ATTRIBUTE_COMBINE_MAX,
 			       "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE, 
-			       0);
+			       IGRAPH_NO_MORE_ATTRIBUTES);
   igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
   igraph_attribute_combination_destroy(&comb);
   igraph_write_graph_graphml(&g2, stdout);
@@ -97,7 +97,7 @@ int main() {
   igraph_attribute_combination(&comb, 
 			       "weight", IGRAPH_ATTRIBUTE_COMBINE_FIRST,
 			       "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE, 
-			       0);
+			       IGRAPH_NO_MORE_ATTRIBUTES);
   igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
   igraph_attribute_combination_destroy(&comb);
   igraph_write_graph_graphml(&g2, stdout);
@@ -109,7 +109,7 @@ int main() {
   igraph_attribute_combination(&comb, 
 			       "weight", IGRAPH_ATTRIBUTE_COMBINE_LAST,
 			       "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE, 
-			       0);
+			       IGRAPH_NO_MORE_ATTRIBUTES);
   igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
   igraph_attribute_combination_destroy(&comb);
   igraph_write_graph_graphml(&g2, stdout);
@@ -121,7 +121,7 @@ int main() {
   igraph_attribute_combination(&comb, 
 			       "weight", IGRAPH_ATTRIBUTE_COMBINE_MEAN,
 			       "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE, 
-			       0);
+			       IGRAPH_NO_MORE_ATTRIBUTES);
   igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
   igraph_attribute_combination_destroy(&comb);
   igraph_write_graph_graphml(&g2, stdout);
@@ -133,7 +133,7 @@ int main() {
   igraph_attribute_combination(&comb, 
 			       "weight", IGRAPH_ATTRIBUTE_COMBINE_FUNCTION, mf,
 			       "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE, 
-			       0);
+			       IGRAPH_NO_MORE_ATTRIBUTES);
   igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
   igraph_attribute_combination_destroy(&comb);
   igraph_write_graph_graphml(&g2, stdout);
@@ -144,7 +144,7 @@ int main() {
   igraph_copy(&g2, &g);
   igraph_attribute_combination(&comb, 
 			       "",       IGRAPH_ATTRIBUTE_COMBINE_MEAN,
-			       0);
+			       IGRAPH_NO_MORE_ATTRIBUTES);
   igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
   igraph_attribute_combination_destroy(&comb);
   igraph_write_graph_graphml(&g2, stdout);
