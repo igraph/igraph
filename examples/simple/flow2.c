@@ -29,6 +29,7 @@ int main() {
   igraph_real_t flow_value;
   igraph_vector_t cut;
   igraph_vector_t capacity;
+  igraph_vector_t partition, partition2;
   long int i, n;
   igraph_integer_t source, target;
   FILE *infile;
@@ -43,8 +44,11 @@ int main() {
   fclose(infile);
 
   igraph_vector_init(&cut, 0);
-  igraph_maxflow(&g, &flow_value, /*flow=*/ 0, &cut, /*partition=*/ 0,
-		 /*partition2=*/ 0, source, target, &capacity);
+  igraph_vector_init(&partition, 0);
+  igraph_vector_init(&partition2, 0);
+
+  igraph_maxflow(&g, &flow_value, /*flow=*/ 0, &cut, &partition,
+		 &partition2, source, target, &capacity);
 
   if (flow_value != 8207) {
     return 1;
@@ -62,6 +66,8 @@ int main() {
   igraph_destroy(&g);  
   igraph_vector_destroy(&capacity);
   igraph_vector_destroy(&cut);
+  igraph_vector_destroy(&partition);
+  igraph_vector_destroy(&partition2);
 
   return 0;
 }

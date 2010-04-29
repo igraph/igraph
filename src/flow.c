@@ -421,12 +421,13 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
   }
   
   /* If we also need the minimum cut */
-  if (cut) {
+  if (cut || partition || partition2) {
     /* We need to find all vertices from which the target is reachable 
        in the residual graph. We do a breadth-first search, going
        backwards. */
     igraph_dqueue_t Q;
     igraph_vector_bool_t added;
+    long int marked=0;
 
     IGRAPH_CHECK(igraph_vector_bool_init(&added, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &added);
@@ -436,12 +437,14 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
     igraph_dqueue_push(&Q, target);
     VECTOR(added)[(long int)target]=1;
+    marked++;
     while (!igraph_dqueue_empty(&Q)) {
       long int actnode=igraph_dqueue_pop(&Q);
       for (i=FIRST(actnode), j=LAST(actnode); i<j; i++) {
 	long int nei=HEAD(i);
 	if (!VECTOR(added)[nei] && RESCAP(REV(i)) > 0.0) {
 	  VECTOR(added)[nei]=1;
+	  marked++;
 	  IGRAPH_CHECK(igraph_dqueue_push(&Q, nei));
 	}
       }
@@ -451,18 +454,41 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
     /* Now we marked each vertex that is on one side of the cut,
        check the crossing edges */
-    
-    igraph_vector_clear(cut);
-    for (i=0; i<no_of_edges/2; i++) {
-      long int v1=IGRAPH_FROM(graph, i);
-      long int v2=IGRAPH_TO(graph, i);
-      char p1=VECTOR(added)[v1];
-      char p2=VECTOR(added)[v2];
-      if (p1 ^ p2) {
-	IGRAPH_CHECK(igraph_vector_push_back(cut, i));
+
+    if (cut) {
+      igraph_vector_clear(cut);
+      for (i=0; i<no_of_edges/2; i++) {
+	long int v1=IGRAPH_FROM(graph, i);
+	long int v2=IGRAPH_TO(graph, i);
+	char p1=VECTOR(added)[v1];
+	char p2=VECTOR(added)[v2];
+	if (p1 ^ p2) {
+	  IGRAPH_CHECK(igraph_vector_push_back(cut, i));
+	}
       }
     }
 
+    if (partition) {
+      long int x=0;
+      IGRAPH_CHECK(igraph_vector_resize(partition, marked));
+      for (i=0; i<no_of_nodes; i++) {
+	if (VECTOR(added)[i]) {
+	  VECTOR(*partition)[x++]=i;
+	}
+      }
+    }
+
+    if (partition2) {
+      long int x=0;
+      IGRAPH_CHECK(igraph_vector_resize(partition2,
+					no_of_nodes-marked));
+      for (i=0; i<no_of_nodes; i++) {
+	if (!VECTOR(added)[i]) {
+	  VECTOR(*partition2)[x++]=i;
+	}
+      }
+    }
+    
     igraph_vector_bool_destroy(&added);
     IGRAPH_FINALLY_CLEAN(1);
   }
