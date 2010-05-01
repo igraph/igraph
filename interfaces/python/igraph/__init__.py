@@ -1317,15 +1317,17 @@ class Graph(core.GraphBase):
         @param f: the file containing the graph to be loaded
         @param format: the format of the file (if known in advance).
           C{None} means auto-detection. Possible values are: C{"ncol"}
-          (NCOL format), C{"lgl"} (LGL format), C{"graphml"}, C{"graphmlz"}
-          (GraphML and gzipped GraphML format), C{"gml"} (GML format),
-          C{"net"}, C{"pajek"} (Pajek format), C{"dimacs"} (DIMACS format),
-          C{"edgelist"}, C{"edges"} or C{"edge"} (edge list), C{"adjacency"}
+          (NCOL format), C{"lgl"} (LGL format), C{"graphdb"} (GraphDB
+          format), C{"graphml"}, C{"graphmlz"} (GraphML and gzipped
+          GraphML format), C{"gml"} (GML format), C{"net"}, C{"pajek"}
+          (Pajek format), C{"dimacs"} (DIMACS format), C{"edgelist"},
+          C{"edges"} or C{"edge"} (edge list), C{"adjacency"}
           (adjacency matrix), C{"pickle"} (Python pickled format).
         @raises IOError: if the file format can't be identified and
           none was given.
         """
-        if format is None: format = klass._identify_format(f)
+        if format is None:
+            format = klass._identify_format(f)
         try:
             reader = klass._format_mapping[format][0]
         except KeyError, IndexError:
@@ -1976,6 +1978,7 @@ class Graph(core.GraphBase):
     _format_mapping = {
           "ncol":       ("Read_Ncol", "write_ncol"),
           "lgl":        ("Read_Lgl", "write_lgl"),
+          "graphdb":    ("Read_GraphDB", None),
           "graphmlz":   ("Read_GraphMLz", "write_graphmlz"),
           "graphml":    ("Read_GraphML", "write_graphml"),
           "gml":        ("Read_GML", "write_gml"),
