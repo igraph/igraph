@@ -5655,6 +5655,39 @@ PyObject *igraphmodule_Graph_Read_GML(PyTypeObject * type,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Reads a GraphDB file and creates a graph from it.
+ * \return the graph
+ * \sa igraph_read_graph_graphdb
+ */
+PyObject *igraphmodule_Graph_Read_GraphDB(PyTypeObject * type,
+                                          PyObject * args, PyObject * kwds)
+{
+  igraphmodule_GraphObject *self;
+  PyObject *fname = NULL, *fobj = NULL, *directed_o = Py_False;
+  igraph_t g;
+
+  static char *kwlist[] = { "f", "directed", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &fname, &directed_o))
+    return NULL;
+
+  fobj = igraphmodule_PyObject_to_PyFile(fname, "r");
+  if (!fobj)
+    return NULL;
+
+  if (igraph_read_graph_graphdb(&g, PyFile_AsFile(fobj), PyObject_IsTrue(directed_o))) {
+    igraphmodule_handle_igraph_error();
+    Py_DECREF(fobj);
+    return NULL;
+  }
+  
+  Py_DECREF(fobj);
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+  
+  return (PyObject *) self;
+}
+
+/** \ingroup python_interface_graph
  * \brief Reads a GraphML file and creates a graph from it.
  * \return the graph
  * \sa igraph_read_graph_graphml
@@ -9788,6 +9821,15 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Read_Edgelist(f, directed=True)\n\n"
    "Reads an edge list from a file and creates a graph based on it.\n\n"
    "Please note that the vertex indices are zero-based.\n\n"
+   "@param f: the name of the file or a Python file handle\n"
+   "@param directed: whether the generated graph should be directed.\n"},
+  /* interface to igraph_read_graph_graphdb */
+  {"Read_GraphDB", (PyCFunction) igraphmodule_Graph_Read_GraphDB,
+   METH_VARARGS | METH_KEYWORDS | METH_CLASS,
+   "Read_GraphDB(f, directed=False)\n\n"
+   "Reads a GraphDB format file and creates a graph based on it.\n\n"
+   "GraphDB is a binary format, used in the graph database for\n"
+   "isomorphism testing (see U{http://amalfi.dis.unina.it/graph/}).\n\n"
    "@param f: the name of the file or a Python file handle\n"
    "@param directed: whether the generated graph should be directed.\n"},
   /* interface to igraph_read_graph_graphml */
