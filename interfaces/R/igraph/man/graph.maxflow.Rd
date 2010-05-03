@@ -66,7 +66,14 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL,
 \value{
   For \code{graph.maxflow} a named list with components:
   \item{value}{A numeric scalar, the value of the maximum flow.}
-  \item{flow}{A numeric vector, the flow itself, one entry for each edge.}
+  \item{flow}{A numeric vector, the flow itself, one entry for each
+    edge. For undirected graphs this entry is bit trickier,
+    since for these the flow direction is not predetermined by
+    the edge direction. For these graphs the elements of the
+    this vector can be negative, this means that the flow
+    goes from the bigger vertex id to the smaller one. Positive
+    values mean that the flow goes from the smaller vertex id to
+    the bigger one.}
   \item{cut}{A numeric vector of edge ids, the minimum cut corresponding
     to the maximum flow.}
   \item{partition1}{A numeric vector of vertex ids, the vertices in the

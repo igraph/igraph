@@ -180,9 +180,30 @@ int igraph_i_maxflow_undirected(const igraph_t *graph,
   IGRAPH_CHECK(igraph_create(&newgraph, &edges, no_of_nodes, IGRAPH_DIRECTED));
   IGRAPH_FINALLY(igraph_destroy, &newgraph);
   
-  /* TODO: flow, cut, partition, partition2 is bad, conversion needed */
   IGRAPH_CHECK(igraph_maxflow(&newgraph, value, flow, cut, partition,
 			      partition2, source, target, &newcapacity));
+
+  /* Edges are ordered by ids in the cut, we just remove the
+     additional ones */
+  if (cut) {
+    IGRAPH_CHECK(igraph_vector_resize(cut,
+				      igraph_vector_size(cut)/2));
+  }
+  
+  /* The flow has one non-zero value for each real-nonreal edge pair,
+     by definition, we convert it to a positive-negative vector. If
+     for an edge the flow is negative that means that it is going
+     from the bigger vertex id to the smaller one. For positive
+     values the direction is the opposite. */
+  if (flow) {
+    long int i;
+    for (i=0; i<no_of_edges; i++) {
+      if (VECTOR(*flow)[i] == 0) {
+	VECTOR(*flow)[i] = - VECTOR(*flow)[i+no_of_edges];
+      }
+    }
+    IGRAPH_CHECK(igraph_vector_resize(flow, no_of_edges));
+  }
   
   igraph_destroy(&newgraph);
   igraph_vector_destroy(&edges);
@@ -220,7 +241,13 @@ int igraph_i_maxflow_undirected(const igraph_t *graph,
  * \param flow If not a null pointer, then it must be a pointer to an
  *        initialized vector. The vector will be resized, and the flow
  *        on each edge will be placed in it, in the order of the edge
- *        ids.
+ *        ids. For undirected graphs this argument is bit trickier,
+ *        since for these the flow direction is not predetermined by
+ *        the edge direction. For these graphs the elements of the
+ *        \p flow vector can be negative, this means that the flow
+ *        goes from the bigger vertex id to the smaller one. Positive
+ *        values mean that the flow goes from the smaller vertex id to
+ *        the bigger one.
  * \param cut A null pointer or a pointer to an initialized vector. 
  *        If not a null pointer, then the minimum cut corresponding to
  *        the maximum flow is stored here, i.e. all edge ids that are
