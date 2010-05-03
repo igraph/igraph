@@ -662,7 +662,7 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
       } while (1);
     }
     
-    IGRAPH_CHECK(igraph_vector_resize(flow, no_of_edges));
+    IGRAPH_CHECK(igraph_vector_resize(flow, no_of_orig_edges));
     for (i=0, j=0; i<no_of_edges; i+=2, j++) {
       long int pos=VECTOR(rank)[i];
       VECTOR(*flow)[j] = VECTOR(*capacity)[j] - RESCAP(pos);
