@@ -221,6 +221,10 @@ int igraph_i_maxflow_undirected(const igraph_t *graph,
  *        initialized vector. The vector will be resized, and the flow
  *        on each edge will be placed in it, in the order of the edge
  *        ids.
+ * \param cut A null pointer or a pointer to an initialized vector. 
+ *        If not a null pointer, then the minimum cut corresponding to
+ *        the maximum flow is stored here, i.e. all edge ids that are
+ *        part of the minimum cut are stored in the vector.
  * \param partition A null pointer or a pointer to an initialized
  *        vector. If not a null pointer, then the first partition of
  *        the minimum cut that corresponds to the maximum flow will be
