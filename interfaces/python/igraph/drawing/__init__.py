@@ -376,6 +376,8 @@ class Plot(object):
             elif ext == ".svg":
                 self._surface = cairo.SVGSurface(target, self.bbox.width, \
                                                  self.bbox.height)
+            else:
+                raise ValueError("image format not handled by Cairo: %s" % ext)
 
         self._ctx = cairo.Context(self._surface)
         self._objects = []
