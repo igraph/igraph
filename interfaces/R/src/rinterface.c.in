@@ -6028,33 +6028,6 @@ SEXP R_igraph_density(SEXP graph, SEXP ploops) {
   return result;
 }
 
-SEXP R_igraph_maxflow(SEXP graph, SEXP psource, SEXP ptarget, 
-		      SEXP pcapacity) {
-
-  igraph_t g;
-  igraph_integer_t source=REAL(psource)[0], target=REAL(ptarget)[0];
-  igraph_vector_t capacity, *ppcapacity=0;
-  igraph_real_t value;
-  SEXP result;
-  
-  R_igraph_before();
-  
-  R_SEXP_to_igraph(graph, &g);
-  if (!isNull(pcapacity)) {
-    R_SEXP_to_vector(pcapacity, &capacity);
-    ppcapacity=&capacity;
-  }
-  igraph_maxflow_value(&g, &value, source, target, ppcapacity);
-  
-  PROTECT(result=NEW_NUMERIC(1));
-  REAL(result)[0]=value;
-  
-  R_igraph_after();
-  
-  UNPROTECT(1);
-  return result;
-}
-
 SEXP R_igraph_read_graph_dimacs(SEXP pvfile, SEXP pdirected) {
   
   igraph_t g;

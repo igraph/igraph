@@ -1203,6 +1203,13 @@ igraph_compose:
 # Maximum flows, minimum cuts
 #######################################
 
+igraph_maxflow:
+        PARAMS: GRAPH graph, OUT REALPTR value, OUT VECTOR_OR_0 flow, \
+                OUT VECTOR_OR_0 cut, OUT VECTOR_OR_0 partition1, \
+                OUT VECTOR_OR_0 partition2, INTEGER source, INTEGER target, \
+                EDGECAPACITY capacity=NULL
+        DEPS: capacity ON graph
+
 igraph_maxflow_value:
         PARAMS: GRAPH graph, OUT REALPTR value, INTEGER source, INTEGER target, \
                 VECTOR_OR_0 capacity

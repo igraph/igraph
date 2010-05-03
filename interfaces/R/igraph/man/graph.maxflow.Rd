@@ -59,11 +59,26 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL,
 
   Starting from version 0.5 igraph can return the edges in the minimum
   cut for undirected graphs.
+
+  Starting from version 0.6 igraph can calculate the actual flow, not
+  just the flow value.
 }
 \value{
-  A numeric constant, the maximum flow, or the minimum cut, except if
-  \code{value.only=FALSE} for \code{graph.mincut}. In this case a named
-  list with components:
+  For \code{graph.maxflow} a named list with components:
+  \item{value}{A numeric scalar, the value of the maximum flow.}
+  \item{flow}{A numeric vector, the flow itself, one entry for each edge.}
+  \item{cut}{A numeric vector of edge ids, the minimum cut corresponding
+    to the maximum flow.}
+  \item{partition1}{A numeric vector of vertex ids, the vertices in the
+    first partition of the minimum cut corresponding to the maximum
+    flow.}
+  \item{partition2}{A numeric vector of vertex ids, the vertices in the
+    second partition of the minimum cut corresponding to the maximum
+    flow.}
+  
+  For \code{graph.mincut} a numeric constant, the value of the minimum
+  cut, except if \code{value.only=FALSE}. In this case a named list with
+  components:
   \item{value}{Numeric scalar, the cut value.}
   \item{cut}{Numeric vector, the edges in the cut.}
   \item{partition1}{The vertices in the first partition after the cut
@@ -83,6 +98,11 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL,
 \seealso{\code{\link{shortest.paths}}, \code{\link{edge.connectivity}},
   \code{\link{vertex.connectivity}}}
 \examples{
+E <- rbind( c(1,3,3), c(3,4,1), c(4,2,2), c(1,5,1), c(5,6,2), c(6,2,10))
+colnames(E) <- c("from", "to", "capacity")
+g1 <- graph.data.frame(as.data.frame(E))
+graph.maxflow(g1, source=V(g1)["1"], target=V(g1)["2"])
+
 g <- graph.ring(100)
 graph.mincut(g, capacity=rep(1,vcount(g)))
 graph.mincut(g, value.only=FALSE, capacity=rep(1,vcount(g)))

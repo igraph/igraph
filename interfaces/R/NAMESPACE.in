@@ -171,7 +171,7 @@ export(igraph.par)
 
 # flows, cuts, etc.
 
-export(graph.maxflow, graph.mincut, vertex.connectivity, edge.connectivity,
+export(graph.mincut, vertex.connectivity, edge.connectivity,
        edge.disjoint.paths, vertex.disjoint.paths, graph.adhesion,
        graph.cohesion)
 
