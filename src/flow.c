@@ -73,15 +73,15 @@
  * (28) graph cohesion, undirected graph
  * 
  * This is how they are calculated:
- * ( 1) igraph_maxflow_value, it does a push-relabel algorithm
- * ( 2) igraph_maxflow_value,
- *      it transforms the graph into a directed graph, including two
- *      mutual edges instead of every undirected edge 
- *      (igraph_i_maxflow_value_undirected), then
- *      igraph_maxflow_value is called again with the directed
- *      graph.
- * ( 3) NOT IMPLEMENTED
- * ( 4) NOT IMPLEMENTED
+ * ( 1) igraph_maxflow_value, calls igraph_maxflow.
+ * ( 2) igraph_maxflow_value, calls igraph_maxflow, this calls
+ *      igraph_i_maxflow_undirected. This transforms the graph into a
+ *      directed graph, including two mutual edges instead of every
+ *      undirected edge, then igraph_maxflow is called again with the
+ *      directed graph.
+ * ( 3) igraph_maxflow, does the push-relabel algorithm, optionally
+ *      calculates the cut, the partitions and the flow itself.
+ * ( 4) NOT IMPLEMENTED, igraph_maxflow gives wrong results.
  * ( 5) igraph_st_mincut_value, we just call igraph_maxflow_value
  * ( 6) igraph_st_mincut_value, we just call igraph_maxflow_value
  * ( 7) igraph_mincut_value, we call igraph_maxflow_value (|V|-1)*2
@@ -90,8 +90,8 @@
  * ( 8) We call igraph_i_mincut_value_undirected, that calls 
  *      igraph_i_mincut_undirected with partition=partition2=cut=NULL
  *      The Stoer-Wagner algorithm is used.
- * ( 9) NOT IMPLEMENTED
- * (10) NOT IMPLEMENTED
+ * ( 9) igraph_st_mincut, just calls igraph_maxflow.
+ * (10) NOT IMPLEMENTED, igraph_st_mincut gives an error message
  * (11) NOT IMPLEMENTED, igraph_mincut gives an error message
  * (12) igraph_mincut, igraph_i_mincut_undirected is called, 
  *      this is the Stoer-Wagner algorithm
@@ -212,7 +212,7 @@ int igraph_i_maxflow_undirected(const igraph_t *graph,
  * the same as the outgoing flow (ie. the sum of the flow on the
  * outgoing edges). The value of the flow is the incoming flow at the
  * target vertex. The maximum flow is the flow with the maximum
- * value. </para>
+ * value.
  * 
  * \param graph The input graph, either directed or undirected.
  * \param value Pointer to a real number, the value of the maximum
@@ -789,6 +789,56 @@ int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *value,
   IGRAPH_CHECK(igraph_maxflow_value(graph, value, source, target, capacity));
   return 0;
 }			    
+
+/** 
+ * \function igraph_st_mincut
+ * Minimum cut between a source and a target vertex
+ * 
+ * Finds the edge set that has the smallest total capacity among all
+ * edge sets that disconnect the source and target vertices.
+ * 
+ * </para><para>The calculation is performed using maximum flow
+ * techniques, by calling \ref igraph_maxflow().
+ * \param graph The input graph, currently the function is only
+ *        implemented for directed graphs.
+ * \param value Pointer to a real variable, the value of the cut is
+ *        stored here.
+ * \param cut Pointer to a real vector, the edge ids that are included
+ *        in the cut are stored here. This argument is ignored if it
+ *        is a null pointer.
+ * \param partition Pointer to a real vector, the vertex ids of the
+ *        vertices in the first partition of the cut are stored
+ *        here. This argument is ignored if it is a null pointer.
+ * \param partition2 Pointer to a real vector, the vertex ids of the
+ *        vertices in the second partinio of the cut are stored here.
+ *        This argument is ignored if it is a null pointer.
+ * \param source Integer, the id of the source vertex.
+ * \param target Integer, the id of the target vertex.
+ * \param capacity Vector containing the capacity of the edges. If a
+ *        null pointer, then every edge is considered to have capacity
+ *        1.0.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_maxflow().
+ * 
+ * Time complecity: see \ref igraph_maxflow().
+ */
+
+int igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
+		     igraph_vector_t *cut, igraph_vector_t *partition,
+		     igraph_vector_t *partition2,
+		     igraph_integer_t source, igraph_integer_t target,
+		     const igraph_vector_t *capacity) {
+  
+  if (igraph_is_directed(graph)) {
+    return igraph_maxflow(graph, value, /*flow=*/ 0, 
+			  cut, partition, partition2, 
+			  source, target, capacity);
+  } else {
+    IGRAPH_ERROR("S-t minimum cut is not yet implemented for uncirected graphs",
+		 IGRAPH_UNIMPLEMENTED);
+  }
+}
 
 /* This is a flow-based version, but there is a better one
    for undirected graphs */

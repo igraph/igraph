@@ -13,6 +13,7 @@
 </section>
 
 <section><title>Minimum cuts</title>
+<!-- doxrox-include igraph_st_mincut -->
 <!-- doxrox-include igraph_st_mincut_value -->
 <!-- doxrox-include igraph_mincut_value -->
 <!-- doxrox-include igraph_mincut -->
