@@ -30,10 +30,13 @@ int main() {
   igraph_vector_t cut;
   igraph_vector_t capacity;
   igraph_vector_t partition, partition2;
+  igraph_vector_t flow;
   long int i, n;
   igraph_integer_t source, target;
   FILE *infile;
   igraph_real_t flow_value2=0.0;
+  
+  igraph_vector_t inedges, outedges;
 
   igraph_vector_init(&capacity, 0);
 
@@ -46,8 +49,9 @@ int main() {
   igraph_vector_init(&cut, 0);
   igraph_vector_init(&partition, 0);
   igraph_vector_init(&partition2, 0);
+  igraph_vector_init(&flow, 0);
 
-  igraph_maxflow(&g, &flow_value, /*flow=*/ 0, &cut, &partition,
+  igraph_maxflow(&g, &flow_value, &flow, &cut, &partition,
 		 &partition2, source, target, &capacity);
 
   if (flow_value != 8207) {
@@ -63,11 +67,57 @@ int main() {
     return 2;
   }
 
+  /* Check the flow */
+  
+  /* Always less than the capacity */
+  n=igraph_ecount(&g);
+  for (i=0; i<n; i++) {
+    if (VECTOR(flow)[i] > VECTOR(capacity)[i]) {
+      return 3;
+    }
+  }
+
+  /* What comes in goes out */
+  igraph_vector_init(&inedges, 0);
+  igraph_vector_init(&outedges, 0);
+
+  n=igraph_vcount(&g);
+  for (i=0; i<n; i++) {
+    long int n1, n2, j;
+    igraph_real_t in_flow=0.0, out_flow=0.0;    
+    igraph_adjacent(&g, &inedges,  i, IGRAPH_IN);
+    igraph_adjacent(&g, &outedges, i, IGRAPH_OUT);
+    n1=igraph_vector_size(&inedges);
+    n2=igraph_vector_size(&outedges);
+    for (j=0; j<n1; j++) {
+      long int e=VECTOR(inedges)[j];
+      in_flow += VECTOR(flow)[e];
+    }
+    for (j=0; j<n2; j++) {
+      long int e=VECTOR(outedges)[j];
+      out_flow += VECTOR(flow)[e];
+    }
+    if (i == source) {
+      if (in_flow > 0) { return 4; }
+      if (out_flow != flow_value) { return 5; }
+    } else if (i == target) {
+      if (out_flow > 0) { return 6; }
+      if (in_flow != flow_value) { return 7; }
+
+    } else {
+      if (in_flow != out_flow) { return 8; }
+    }
+  }
+  
+  igraph_vector_destroy(&inedges);
+  igraph_vector_destroy(&outedges);
+
   igraph_destroy(&g);  
   igraph_vector_destroy(&capacity);
   igraph_vector_destroy(&cut);
   igraph_vector_destroy(&partition);
   igraph_vector_destroy(&partition2);
+  igraph_vector_destroy(&flow);
 
   return 0;
 }

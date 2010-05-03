@@ -87,3 +87,10 @@ void igraph_buckets_add(igraph_buckets_t *b, long int bucket,
   }
   b->no++;
 }
+
+void igraph_buckets_clear(igraph_buckets_t *b) {
+  igraph_vector_null(&b->bptr);
+  igraph_vector_null(&b->buckets);
+  b->max -1; 
+  b->no = 0;
+}
