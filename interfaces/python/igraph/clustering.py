@@ -848,20 +848,16 @@ class VertexDendrogram(VertexClustering, Dendrogram):
 
         See L{Dendrogram.__plot__} for the list of supported keyword
         arguments."""
-        from igraph.drawing import collect_attributes
-        from igraph import config
+        from igraph.drawing import AttributeCollectorBase
 
-        if "vertex_label" not in kwds and \
-            "label" not in self._graph.vs.attribute_names():
-            self._names = [str(i) for i in xrange(self._graph.vcount())]
-        elif kwds.get("vertex_label", []) is None:
-            self._names = [str(i) for i in xrange(self._graph.vcount())]
-        else:
-            self._names = collect_attributes(self._graph.vcount(), \
-                "vertex_label", "label", kwds, self._graph.vs, config, None)
+        class VisualVertexBuilder(AttributeCollectorBase):
+            label = None
 
+        builder = VisualVertexBuilder(self._graph.vs, kwds)
+        self._names = [vertex.label for vertex in builder]
         result = Dendrogram.__plot__(self, context, bbox, palette, \
                 *args, **kwds)
         del self._names
+
         return result
 

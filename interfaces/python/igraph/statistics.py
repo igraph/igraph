@@ -244,6 +244,7 @@ class RunningMean(object):
         @param value: the element to be added
         @param repeat: number of repeated additions
         @return: the new mean and standard deviation as a tuple"""
+        repeat = int(repeat)
         self._nitems += repeat
         delta = value - self._mean
         self._mean += (repeat*delta / self._nitems)
@@ -313,6 +314,8 @@ class RunningMean(object):
     def __complex__(self):
         return complex(self._mean)
 
+    def __len__(self):
+        return self._nitems
 
 def power_law_fit(x, xmin=None, method="discrete_approx"):
     """Fitting a power-law distribution to empirical data

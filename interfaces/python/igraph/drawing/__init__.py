@@ -646,7 +646,7 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
             _kwds_prefix = "edge_"
             arrow_size = 1.0
             arrow_width = 1.0
-            color = ("red", palette.get)
+            color = ("#444", palette.get)
             width = 1.0
 
         directed = graph.is_directed()
@@ -755,9 +755,9 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
             cx += (co - 1) * w/2. + xb
             cy += (si + 1) * h/2.
             context.move_to(cx, cy)
-            context.set_font_size(vertex.label_size[idx])
-            context.set_source_rgb(*vertex.label_color[idx])
-            context.text_path(vertex.label[idx])
+            context.set_font_size(vertex.label_size)
+            context.set_source_rgb(*vertex.label_color)
+            context.text_path(vertex.label)
             context.fill()
 
 

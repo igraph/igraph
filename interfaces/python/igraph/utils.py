@@ -23,7 +23,7 @@ def named_temporary_file(*args, **kwds):
     handle, tmpfile = mkstemp(*args, **kwds)
     os.close(handle)
     try:
-        yield
+        yield tmpfile
     finally:
         os.unlink(tmpfile)
 

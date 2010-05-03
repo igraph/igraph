@@ -228,7 +228,7 @@ class AttributeCollectorBase(object):
         # pylint: disable-msg=E1101
         # E1101: instance has no '_cache' member
         for attr_spec in self._attributes:
-            self._collect_attributes(attr_spec) 
+            self._cache[attr_spec.name] = self._collect_attributes(attr_spec) 
 
     def _collect_attributes(self, attr_spec, config=None):
         """Collects graph visualization attributes from various sources.
@@ -265,6 +265,10 @@ class AttributeCollectorBase(object):
         seq = self.seq
 
         n = len(seq)
+
+        if attr_spec.name == "label":
+            if attr_spec.alt_name in kwds and kwds[attr_spec.alt_name] is None:
+                return [None] * n
 
         if config is None:
             config = Configuration.instance()
@@ -320,9 +324,7 @@ class AttributeCollectorBase(object):
             transform = attr_spec.transform
             result = [transform(x) for x in result]
 
-        # pylint: disable-msg=E1101
-        # E1101: instance has no '_cache' member
-        self._cache[attr_spec.name] = result
+        return result
 
 
     def __getitem__(self, index):
