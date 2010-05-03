@@ -192,6 +192,62 @@ int igraph_i_maxflow_undirected(const igraph_t *graph,
   return 0;
 }
 
+/**
+ * \function igraph_maxflow
+ * Maximum network flow between a pair of vertices
+ * 
+ * </para><para>This function implements the Goldberg-Tarjan algorithm for
+ * calculating value of the maximum flow in a directed or undirected
+ * graph. The algorithm was given in Andrew V. Goldberg, Robert
+ * E. Tarjan: A New Approach to the Maximum-Flow Problem, Journal of
+ * the ACM, 35(4), 921-940, 1988. </para>
+ * 
+ * <para> The input of the function is a graph, a vector
+ * of real numbers giving the capacity of the edges and two vertices
+ * of the graph, the source and the target. A flow is a function 
+ * assigning positive real numbers to the edges and satisfying two
+ * requirements: (1) the flow value is less than the capacity of the
+ * edge and (2) at each vertex except the source and the target, the
+ * incoming flow (ie. the sum of the flow on the incoming edges) is
+ * the same as the outgoing flow (ie. the sum of the flow on the
+ * outgoing edges). The value of the flow is the incoming flow at the
+ * target vertex. The maximum flow is the flow with the maximum
+ * value. </para>
+ * 
+ * \param graph The input graph, either directed or undirected.
+ * \param value Pointer to a real number, the value of the maximum
+ *        will be placed here, unless it is a null pointer.
+ * \param flow If not a null pointer, then it must be a pointer to an
+ *        initialized vector. The vector will be resized, and the flow
+ *        on each edge will be placed in it, in the order of the edge
+ *        ids.
+ * \param partition A null pointer or a pointer to an initialized
+ *        vector. If not a null pointer, then the first partition of
+ *        the minimum cut that corresponds to the maximum flow will be
+ *        placed here.
+ * \param partition2 A null pointer or a pointer to an initialized
+ *        vector. If not a null pointer, then the second partition of
+ *        the minimum cut that corresponds to the maximum flow will be
+ *        placed here.
+ * \param source The id of the source vertex.
+ * \param target The id of the target vertex.
+ * \param capacity Vector containing the capacity of the edges. If NULL, then
+ *        every edge is considered to have capacity 1.0.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|^3). In practice it is much faster, but i
+ * cannot prove a better lower bound for the data structure i've
+ * used. In fact, this implementation runs much faster than the
+ * \c hi_pr implementation discussed in
+ * B. V. Cherkassky and A. V. Goldberg: On implementing the 
+ * push-relabel method for the maximum flow problem, (Algorithmica, 
+ * 19:390--410, 1997) on all the graph classes i've tried.
+ * 
+ * \sa \ref igraph_mincut_value(), \ref igraph_edge_connectivity(),
+ * \ref igraph_vertex_connectivity() for 
+ * properties based on the maximum flow.
+ */
+
 int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 		   igraph_vector_t *flow, igraph_vector_t *cut,
 		   igraph_vector_t *partition, igraph_vector_t *partition2,

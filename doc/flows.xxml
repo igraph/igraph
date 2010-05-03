@@ -8,6 +8,7 @@
 <title>Maximum Flows, Minimum Cuts and related measures</title>
 
 <section><title>Maximum Flows</title>
+<!-- doxrox-include igraph_maxflow -->
 <!-- doxrox-include igraph_maxflow_value -->
 </section>
 
