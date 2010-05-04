@@ -28,7 +28,7 @@
 int main() {
   
   igraph_t g;
-  igraph_vector_t v;
+  igraph_vector_t v, weights;
   long int i;
   igraph_integer_t value, retcode;
   igraph_arpack_options_t options;
@@ -49,8 +49,36 @@ int main() {
   }
   printf("\n");
   
-  igraph_vector_destroy(&v);
   igraph_destroy(&g);
-  
+
+  /* Special cases: check for empty graph */
+  igraph_empty(&g, 10, 0);
+  igraph_eigenvector_centrality(&g, &v, &value, 0, 0, &options);
+  if (igraph_finite(value)) {
+    return 1;
+  }
+  for (i=0; i<igraph_vector_size(&v); i++) {
+    printf(" %.2f", fabs(VECTOR(v)[i]));
+  }
+  printf("\n");
+  igraph_destroy(&g);
+
+  /* Special cases: check for full graph, zero weights */
+  igraph_full(&g, 10, 0, 0);
+  igraph_vector_init(&weights, 45);
+  igraph_vector_fill(&weights, 0);
+  igraph_eigenvector_centrality(&g, &v, &value, 0, &weights, &options);
+  igraph_vector_destroy(&weights);
+  if (igraph_finite(value)) {
+    return 2;
+  }
+  for (i=0; i<igraph_vector_size(&v); i++) {
+    printf(" %.2f", fabs(VECTOR(v)[i]));
+  }
+  printf("\n");
+  igraph_destroy(&g);
+
+  igraph_vector_destroy(&v);
+
   return 0;
 }

@@ -37,6 +37,7 @@ int main() {
   igraph_t g;
   igraph_vector_t v, res;
   igraph_arpack_options_t arpack_options;
+  igraph_real_t value;
   int ret;
 
   /* Test graphs taken from http://www.iprcom.com/papers/pagerank/ */
@@ -109,7 +110,29 @@ int main() {
     return 3;
   }
   
-  igraph_vector_destroy(&res);
   igraph_destroy(&g);
+
+  /* Special cases: check for empty graph */
+  igraph_empty(&g, 10, 0);
+  igraph_pagerank(&g, &res, &value, igraph_vss_all(), 1, 0.85, 0, &arpack_options);
+  if (igraph_finite(value)) {
+    return 6;
+  }
+  print_vector(&res, stdout);
+  igraph_destroy(&g);
+
+  /* Special cases: check for full graph, zero weights */
+  igraph_full(&g, 10, 0, 0);
+  igraph_vector_init(&v, 45);
+  igraph_vector_fill(&v, 0);
+  igraph_pagerank(&g, &res, &value, igraph_vss_all(), 1, 0.85, &v, &arpack_options);
+  igraph_vector_destroy(&v);
+  if (igraph_finite(value)) {
+    return 7;
+  }
+  print_vector(&res, stdout);
+  igraph_destroy(&g);
+
+  igraph_vector_destroy(&res);
   return 0;
 }
