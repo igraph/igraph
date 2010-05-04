@@ -122,9 +122,35 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
   options->n=igraph_vcount(graph);
   options->start=1;		/* no random start vector */
 
-  if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
-    IGRAPH_ERROR("Invalid length of weights vector when calculating "
-		 "eigenvector centrality", IGRAPH_EINVAL);
+  if (igraph_ecount(graph) == 0) {
+    /* special case: empty graph */
+    if (value)
+      *value = IGRAPH_NAN;
+    if (vector) {
+      igraph_vector_resize(vector, igraph_vcount(graph));
+      igraph_vector_fill(vector, 1);
+    }
+	return IGRAPH_SUCCESS;
+  }
+
+  if (weights) {
+	igraph_real_t min, max;
+
+    if (igraph_vector_size(weights) != igraph_ecount(graph)) {
+      IGRAPH_ERROR("Invalid length of weights vector when calculating "
+                   "eigenvector centrality", IGRAPH_EINVAL);
+	}
+    IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
+    if (min == 0 && max == 0) {
+      /* special case: all weights are zeros */
+      if (value)
+        *value = IGRAPH_NAN;
+      if (vector) {
+        igraph_vector_resize(vector, igraph_vcount(graph));
+        igraph_vector_fill(vector, 1);
+      }
+      return IGRAPH_SUCCESS;
+    }
   }
 
   IGRAPH_VECTOR_INIT_FINALLY(&values, 0);
@@ -234,18 +260,44 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
   igraph_matrix_t vectors;
   igraph_vector_t indegree;
   long int i;
-    
-  if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
-    IGRAPH_ERROR("Invalid length of weights vector when calculating "
-		 "eigenvector centrality", IGRAPH_EINVAL);
+
+  if (igraph_ecount(graph) == 0) {
+    /* special case: empty graph */
+    if (value)
+      *value = IGRAPH_NAN;
+    if (vector) {
+      igraph_vector_resize(vector, igraph_vcount(graph));
+      igraph_vector_fill(vector, 1);
+    }
+	return IGRAPH_SUCCESS;
   }
 
-  if (weights && igraph_is_directed(graph)) {
-    IGRAPH_WARNING("Weighted directed graph in eigenvector centrality");
-  }
+  if (weights) {
+    igraph_real_t min, max;
 
-  if (weights && igraph_vector_min(weights) < 0.0) {
-    IGRAPH_WARNING("Negative weights, eigenpair might be complex");
+    if (igraph_vector_size(weights) != igraph_ecount(graph)) {
+      IGRAPH_ERROR("Invalid length of weights vector when calculating "
+                   "eigenvector centrality", IGRAPH_EINVAL);
+    }
+    if (igraph_is_directed(graph)) {
+      IGRAPH_WARNING("Weighted directed graph in eigenvector centrality");
+    }
+
+	IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
+
+	if (min < 0.0) {
+      IGRAPH_WARNING("Negative weights, eigenpair might be complex");
+    }
+    if (min == 0.0 && max == 0.0) {
+      /* special case: all weights are zeros */
+      if (value)
+        *value = IGRAPH_NAN;
+      if (vector) {
+        igraph_vector_resize(vector, igraph_vcount(graph));
+        igraph_vector_fill(vector, 1);
+      }
+      return IGRAPH_SUCCESS;
+    }
   }
 
   options->n=igraph_vcount(graph);
@@ -501,7 +553,38 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
   igraph_i_kleinberg_data_t extra;
   igraph_i_kleinberg_data2_t extra2;
   long int i;
-  
+
+  if (igraph_ecount(graph) == 0) {
+    /* special case: empty graph */
+    if (value)
+      *value = IGRAPH_NAN;
+    if (vector) {
+      igraph_vector_resize(vector, igraph_vcount(graph));
+      igraph_vector_fill(vector, 1);
+    }
+	return IGRAPH_SUCCESS;
+  }
+
+  if (weights) {
+	igraph_real_t min, max;
+
+    if (igraph_vector_size(weights) != igraph_ecount(graph)) {
+      IGRAPH_ERROR("Invalid length of weights vector when calculating "
+                   "hub or authority scores", IGRAPH_EINVAL);
+	}
+    IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
+    if (min == 0 && max == 0) {
+      /* special case: all weights are zeros */
+      if (value)
+        *value = IGRAPH_NAN;
+      if (vector) {
+        igraph_vector_resize(vector, igraph_vcount(graph));
+        igraph_vector_fill(vector, 1);
+      }
+      return IGRAPH_SUCCESS;
+    }
+  }
+
   options->n=igraph_vcount(graph);
   options->start=1;     /* no random start vector */
   
@@ -521,8 +604,8 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
     outadjedgelist=&myinadjedgelist;
   } else {
     /* This should not happen */
-    IGRAPH_ERROR("Invalid 'inout' argument, plese do not call "
-		 "this funtion directly", IGRAPH_FAILURE);
+    IGRAPH_ERROR("Invalid 'inout' argument, please do not call "
+                 "this function directly", IGRAPH_FAILURE);
   }
 
   if (weights == 0) {
@@ -1035,7 +1118,18 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
 
-  options->n = igraph_vcount(graph);
+  if (no_of_edges == 0) {
+    /* special case: empty graph */
+    if (value)
+      *value = IGRAPH_NAN;
+    if (vector) {
+      igraph_vector_resize(vector, no_of_nodes);
+      igraph_vector_fill(vector, 1);
+    }
+	return IGRAPH_SUCCESS;
+  }
+
+  options->n = no_of_nodes;
   options->nev = 1;
   options->ncv = 3;
   options->which[0]='L'; options->which[1]='M';
@@ -1043,10 +1137,25 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
 
   directed = directed && igraph_is_directed(graph);
 
-  if (weights && igraph_vector_size(weights) != igraph_ecount(graph))
-  {
-    IGRAPH_ERROR("Invalid length of weights vector when calculating "
-		 "PageRank scores", IGRAPH_EINVAL);
+  if (weights) {
+    igraph_real_t min, max;
+
+	if (igraph_vector_size(weights) != no_of_edges) {
+      IGRAPH_ERROR("Invalid length of weights vector when calculating "
+                   "PageRank scores", IGRAPH_EINVAL);
+    }
+
+    IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
+    if (min == 0 && max == 0) {
+      /* special case: all weights are zeros */
+      if (value)
+        *value = IGRAPH_NAN;
+      if (vector) {
+        igraph_vector_resize(vector, igraph_vcount(graph));
+        igraph_vector_fill(vector, 1);
+      }
+      return IGRAPH_SUCCESS;
+    }
   }
 
   if (reset && igraph_vector_size(reset) != no_of_nodes)
