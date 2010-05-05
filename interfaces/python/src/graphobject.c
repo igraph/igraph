@@ -4440,20 +4440,27 @@ PyObject *igraphmodule_Graph_spanning_tree(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_simplify(igraphmodule_GraphObject * self,
                                       PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] = { "multiple", "loops", NULL };
-  PyObject *multiple = Py_True, *loops = Py_True;
+  char *kwlist[] = { "multiple", "loops", "edge_comb", NULL };
+  PyObject *multiple = Py_True, *loops = Py_True, *comb_o = Py_None;
+  igraph_attribute_combination_t comb;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist,
-                                   &multiple, &loops))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist,
+                                   &multiple, &loops, &comb_o))
     return NULL;
 
+  if (igraphmodule_PyObject_to_attribute_combination_t(comb_o, &comb))
+	return NULL;
+
   if (igraph_simplify(&self->g, PyObject_IsTrue(multiple),
-                      PyObject_IsTrue(loops), 0)) {
+                      PyObject_IsTrue(loops), &comb)) {
+	igraph_attribute_combination_destroy(&comb);
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
+  igraph_attribute_combination_destroy(&comb);
   Py_INCREF(self);
+
   return (PyObject *) self;
 }
 
@@ -10108,10 +10115,34 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_simplify */
   {"simplify", (PyCFunction) igraphmodule_Graph_simplify,
    METH_VARARGS | METH_KEYWORDS,
-   "simplify(multiple=True, loops=True)\n\n"
+   "simplify(multiple=True, loops=True, edge_comb=None)\n\n"
    "Simplifies a graph by removing self-loops and/or multiple edges.\n\n"
    "@param multiple: whether to remove multiple edges.\n"
-   "@param loops: whether to remove loops.\n"},
+   "@param loops: whether to remove loops.\n"
+   "@param edge_comb: specifies how to combine the attributes of\n"
+   "  multiple edges between the same pair of vertices into a single\n"
+   "  attribute. If it is C{None}, only one of the edges will be kept\n"
+   "  and the rest will be removed (and it is unpredictable which one\n"
+   "  will be kept). If it is a function, the attributes of multiple\n"
+   "  edges will be collected and passed on to a function which will\n"
+   "  return the new attribute value that has to be assigned to the single\n"
+   "  collapsed edge. You can also pass a dictionary assigning edge\n"
+   "  attribute names to functions or the above string constants if you\n"
+   "  want to make the function depend on the name of the attribute.\n"
+   "  If the dictionary assigns C{None} to some function or string constant,\n"
+   "  that function will be used for all the attributes not specified\n"
+   "  explicitly in the dictionary.\n"
+   "\n"
+   "For example, suppose you have a graph with an edge attribute named\n"
+   "C{weight}. C{graph.simplify(edge_comb=max)} will take the\n"
+   "maximum of the weights of multiple edges and assign that weight to\n"
+   "the collapsed edge. C{graph.simplify(edge_comb=sum)} will\n"
+   "take the sum of the weights. An equivalent call would be\n"
+   "C{graph.simplify(edge_comb=dict(weight=\"sum\"))} or\n"
+   "C{graph.simplify(edge_comb=dict(weight=sum))}, since\n"
+   "C{sum} is recognised both as a Python built-in function and as\n"
+   "a string constant.\n"
+  },
 
   // interface to igraph_minimum_spanning_tree_unweighted and
   // igraph_minimum_spanning_tree_prim

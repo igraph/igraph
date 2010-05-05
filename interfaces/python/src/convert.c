@@ -148,6 +148,32 @@ int igraphmodule_PyObject_to_adjacency_t(PyObject *o,
   return igraphmodule_PyObject_to_enum(o, adjacency_tt, (int*)result);
 }
 
+int igraphmodule_PyObject_to_attribute_combination_type_t(PyObject* o,
+    igraph_attribute_combination_type_t *result) {
+  static igraphmodule_enum_translation_table_entry_t attribute_combination_type_tt[] = {
+        {"ignore", IGRAPH_ATTRIBUTE_COMBINE_IGNORE},
+        {"default", IGRAPH_ATTRIBUTE_COMBINE_DEFAULT},
+        {"sum", IGRAPH_ATTRIBUTE_COMBINE_SUM},
+        {"product", IGRAPH_ATTRIBUTE_COMBINE_PROD},
+        {"min", IGRAPH_ATTRIBUTE_COMBINE_MIN},
+        {"max", IGRAPH_ATTRIBUTE_COMBINE_MAX},
+        {"random", IGRAPH_ATTRIBUTE_COMBINE_RANDOM},
+        {"first", IGRAPH_ATTRIBUTE_COMBINE_FIRST},
+        {"last", IGRAPH_ATTRIBUTE_COMBINE_LAST},
+        {"mean", IGRAPH_ATTRIBUTE_COMBINE_MEAN},
+        {"median", IGRAPH_ATTRIBUTE_COMBINE_MEDIAN},
+        {"concatenate", IGRAPH_ATTRIBUTE_COMBINE_CONCAT},
+        {0, 0}
+  };
+
+  if (PyCallable_Check(o)) {
+    *result = IGRAPH_ATTRIBUTE_COMBINE_FUNCTION;
+    return 0;
+  }
+
+  return igraphmodule_PyObject_to_enum(o, attribute_combination_type_tt, (int*)result);
+}
+
 /**
  * \ingroup python_interface_conversion
  * \brief Converts a Python object to an igraph \c igraph_connectedness_t
@@ -1969,6 +1995,112 @@ int igraphmodule_PyObject_to_drl_options_t(PyObject *obj,
     PyErr_Clear();
 	return 0;
   }
+  return 0;
+}
+
+
+int igraphmodule_i_PyObject_pair_to_attribute_combination_record_t(
+    PyObject* name, PyObject* value,
+    igraph_attribute_combination_record_t *result) {
+  if (name == Py_None)
+    result->name = "";
+  else if (!PyString_Check(name)) {
+    PyErr_SetString(PyExc_TypeError, "keys must be strings or None in attribute combination specification dicts");
+    return 1;
+  } else
+    result->name = PyString_AS_STRING(name);
+
+  if (igraphmodule_PyObject_to_attribute_combination_type_t(value, &result->type))
+    return 1;
+
+  if (result->type == IGRAPH_ATTRIBUTE_COMBINE_FUNCTION) {
+    result->func = value;
+  } else {
+    result->func = 0;
+  }
+
+  return 0;
+}
+
+/**
+ * \brief Converts a Python object to an \c igraph_attribute_combination_t
+ *
+ * Raises suitable Python exceptions when needed.
+ *
+ * An \c igraph_attribute_combination_t specifies how the attributes of multiple
+ * vertices/edges should be combined when they are collapsed into a single vertex
+ * or edge (e.g., when simplifying a graph). For each attribute, one can specify
+ * a Python callable object to call or one of a list of recognised strings which
+ * map to simple functions. The recognised strings are as follows:
+ *
+ *   - \c "ignore"  - the attribute will be ignored
+ *   - \c "default" - default behaviour
+ *   - \c "sum"     - the attribute values will be added
+ *   - \c "prod"    - the product of the attribute values will be taken
+ *   - \c "min"     - the minimum attribute value will be used
+ *   - \c "max"     - the maximum attribute value will be used
+ *   - \c "random"  - a random value will be selected
+ *   - \c "first"   - the first value encountered will be selected
+ *   - \c "last"    - the last value encountered will be selected
+ *   - \c "mean"    - the mean of the attributes will be selected
+ *   - \c "median"  - the median of the attributes will be selected
+ *   - \c "concat"  - the attribute values will be concatenated
+ *
+ * The Python object being converted must either be a string, a callable or a dict.
+ * If a string is given, it is considered as an \c igraph_attribute_combination_t
+ * object that combines all attributes according to the function given by that
+ * string. If a callable is given, it is considered as an
+ * \c igraph_attribute_combination_t that combines all attributes by calling the
+ * callable and taking its return value. If a dict is given, its key-value pairs
+ * are iterated, the keys specify the attribute names (a key of None means all
+ * explicitly not specified attributes), the values specify the functions to
+ * call for those attributes.
+ *
+ * \param object the Python object to be converted
+ * \param result the result is returned here. It must be an uninitialized
+ *   \c igraph_attribute_combination_t object, it will be initialized accordingly.
+ *   It is the responsibility of the caller to 
+ * \return 0 if everything was OK, 1 otherwise
+ */
+int igraphmodule_PyObject_to_attribute_combination_t(PyObject* object,
+    igraph_attribute_combination_t *result) {
+  igraph_attribute_combination_record_t rec;
+
+  if (igraph_attribute_combination_init(result)) {
+    igraphmodule_handle_igraph_error();
+    return 1;
+  }
+
+  if (object == Py_None) {
+    return 0;
+  }
+
+  if (PyDict_Check(object)) {
+    /* a full-fledged dict was passed */
+    PyObject *key, *value;
+    Py_ssize_t pos = 0;
+
+    while (PyDict_Next(object, &pos, &key, &value)) {
+      if (igraphmodule_i_PyObject_pair_to_attribute_combination_record_t(key, value, &rec)) {
+        igraph_attribute_combination_destroy(result);
+        return 1;
+      }
+      igraph_attribute_combination_add(result, rec.name, rec.type, rec.func);
+    }
+  } else {
+    /* assume it is a string or callable */
+    PyObject *empty_str = PyString_FromString("");
+
+    if (igraphmodule_i_PyObject_pair_to_attribute_combination_record_t(empty_str, object, &rec)) {
+      igraph_attribute_combination_destroy(result);
+      Py_DECREF(empty_str);
+      return 1;
+    }
+    Py_DECREF(empty_str);
+
+    igraph_attribute_combination_add(result, rec.name, rec.type, rec.func);
+  }
+
   return 0;
 }
 

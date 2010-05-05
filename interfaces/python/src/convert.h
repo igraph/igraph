@@ -30,6 +30,7 @@
 #define PYTHON_CONVERT_H
 
 #include <Python.h>
+#include <igraph/igraph_constants.h>
 #include <igraph/igraph_types.h>
 #include "graphobject.h"
 
@@ -45,6 +46,8 @@ int igraphmodule_PyObject_to_enum(PyObject *o,
   igraphmodule_enum_translation_table_entry_t *table, int *result);
 int igraphmodule_PyObject_to_add_weights_t(PyObject *o, igraph_add_weights_t *result);
 int igraphmodule_PyObject_to_adjacency_t(PyObject *o, igraph_adjacency_t *result);
+int igraphmodule_PyObject_to_attribute_combination_type_t(PyObject* o,
+    igraph_attribute_combination_type_t *type);
 int igraphmodule_PyObject_to_bliss_sh_t(PyObject *o, igraph_bliss_sh_t *result);
 int igraphmodule_PyObject_to_community_comparison_t(PyObject *obj,
                   igraph_community_comparison_t *result); 
@@ -97,4 +100,6 @@ int igraphmodule_PyObject_to_attribute_values(PyObject *o,
 					      igraph_real_t def);
 int igraphmodule_PyObject_to_drl_options_t(PyObject *obj,
                   igraph_layout_drl_options_t *options); 
+int igraphmodule_PyObject_to_attribute_combination_t(PyObject* object,
+    igraph_attribute_combination_t *type);
 #endif

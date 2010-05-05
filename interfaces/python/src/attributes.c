@@ -428,6 +428,13 @@ static int igraphmodule_i_attribute_permute_vertices(const igraph_t *graph,
   return 0;
 }
 
+/* Combining vertices */
+static int igraphmodule_i_attribute_combine_vertices(const igraph_t *graph,
+    igraph_t *newgraph, const igraph_vector_ptr_t *merges,
+    const igraph_attribute_combination_t *comb) {
+  return 0;
+}
+
 /* Adding edges */
 static int igraphmodule_i_attribute_add_edges(igraph_t *graph, const igraph_vector_t *edges, igraph_vector_ptr_t *attr) {
   /* Extend the end of every value in the edge hash with ne pieces of None */
@@ -634,6 +641,13 @@ static int igraphmodule_i_attribute_permute_edges(const igraph_t *graph,
   ATTR_STRUCT_DICT(newgraph)[ATTRHASH_IDX_EDGE]=newdict;
   Py_DECREF(dict);
 
+  return 0;
+}
+
+/* Combining edges */
+static int igraphmodule_i_attribute_combine_edges(const igraph_t *graph,
+    igraph_t *newgraph, const igraph_vector_ptr_t *merges,
+    const igraph_attribute_combination_t *comb) {
   return 0;
 }
 
@@ -1002,10 +1016,10 @@ static igraph_attribute_table_t igraphmodule_attribute_table = {
   igraphmodule_i_attribute_copy,
   igraphmodule_i_attribute_add_vertices,
   igraphmodule_i_attribute_permute_vertices,
-  0,  /* TODO */
+  igraphmodule_i_attribute_combine_vertices,
   igraphmodule_i_attribute_add_edges,
   igraphmodule_i_attribute_permute_edges,
-  0,  /* TODO */
+  igraphmodule_i_attribute_combine_edges,
   igraphmodule_i_attribute_get_info,
   igraphmodule_i_attribute_has_attr,
   igraphmodule_i_attribute_get_type,
