@@ -64,19 +64,24 @@ int igraphmodule_PyObject_to_enum(PyObject *o,
         PyErr_SetString(PyExc_TypeError, "int, long or string expected");
         return -1;
     }
-    s=PyString_AsString(o);
+    s=strdup(PyString_AS_STRING(o));
     /* Convert string to lowercase */
     for (s2=s; *s2; s2++) *s2 = tolower(*s2);
     best = 0; best_unique = 0; best_result = -1;
     /* Search for matches */
     while (table->name != 0) {
-        if (strcmp(s, table->name) == 0) { *result = table->value; return 0; }
+        if (strcmp(s, table->name) == 0) {
+          *result = table->value;
+          free(s);
+          return 0;
+        }
         for (i=0; s[i] == table->name[i]; i++);
         if (i > best) {
             best = i; best_unique = 1; best_result = table->value;
         } else if (i == best) best_unique = 0;
         table++;
     }
+    free(s);
     if (best_unique) { *result = best_result; return 0; }
     PyErr_SetObject(PyExc_ValueError, o);
     return -1;
