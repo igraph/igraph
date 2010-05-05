@@ -6071,8 +6071,9 @@ PyObject *igraphmodule_Graph_Read_Ncol(PyTypeObject * type, PyObject * args,
                                        PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
-  PyObject *names = Py_True, *weights = Py_True, *directed = Py_True;
+  PyObject *names = Py_True, *weights = Py_None, *directed = Py_True;
   PyObject *fname = NULL, *fobj = NULL;
+  igraph_add_weights_t add_weights = IGRAPH_ADD_WEIGHTS_IF_PRESENT;
   igraph_t g;
 
   static char *kwlist[] = { "f", "names", "weights", "directed", NULL };
@@ -6081,13 +6082,16 @@ PyObject *igraphmodule_Graph_Read_Ncol(PyTypeObject * type, PyObject * args,
                                    &fname, &names, &weights, &directed))
     return NULL;
 
+  if (igraphmodule_PyObject_to_add_weights_t(weights, &add_weights))
+    return NULL;
+
   fobj = igraphmodule_PyObject_to_PyFile(fname, "r");
   if (!fobj)
     return NULL;
 
-  if (igraph_read_graph_ncol
-      (&g, PyFile_AsFile(fobj), 0, PyObject_IsTrue(names), PyObject_IsTrue(weights),
-       PyObject_IsTrue(directed))) {
+  if (igraph_read_graph_ncol(&g, PyFile_AsFile(fobj), 0,
+      PyObject_IsTrue(names), add_weights,
+      PyObject_IsTrue(directed))) {
     igraphmodule_handle_igraph_error();
     Py_DECREF(fobj);
     return NULL;
@@ -6108,8 +6112,9 @@ PyObject *igraphmodule_Graph_Read_Lgl(PyTypeObject * type, PyObject * args,
                                       PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
-  PyObject *names = Py_True, *weights = Py_True, *directed = Py_True;
+  PyObject *names = Py_True, *weights = Py_None, *directed = Py_True;
   PyObject *fname = NULL, *fobj = NULL;
+  igraph_add_weights_t add_weights = IGRAPH_ADD_WEIGHTS_IF_PRESENT;
   igraph_t g;
 
   static char *kwlist[] = { "f", "names", "weights", "directed", NULL };
@@ -6118,7 +6123,11 @@ PyObject *igraphmodule_Graph_Read_Lgl(PyTypeObject * type, PyObject * args,
                                    &fname, &names, &weights, &directed))
     return NULL;
 
-  if (PyDict_Check(kwds) && PyDict_GetItemString(kwds, "directed") == NULL) {
+  if (igraphmodule_PyObject_to_add_weights_t(weights, &add_weights))
+    return NULL;
+
+  if (kwds && PyDict_Check(kwds) && \
+      PyDict_GetItemString(kwds, "directed") == NULL) {
     if (PyErr_Occurred())
       return NULL;
     PyErr_Warn(PyExc_Warning, "Graph.Read_Lgl creates directed networks by default from igraph 0.6. To get rid of this warning, specify directed=... explicitly. This warning will be removed from igraph 0.7.");
@@ -6129,7 +6138,7 @@ PyObject *igraphmodule_Graph_Read_Lgl(PyTypeObject * type, PyObject * args,
     return NULL;
 
   if (igraph_read_graph_lgl(&g, PyFile_AsFile(fobj),
-        PyObject_IsTrue(names), PyObject_IsTrue(weights),
+        PyObject_IsTrue(names), add_weights,
         PyObject_IsTrue(directed))) {
     igraphmodule_handle_igraph_error();
     Py_DECREF(fobj);
@@ -10905,7 +10914,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_read_graph_ncol */
   {"Read_Ncol", (PyCFunction) igraphmodule_Graph_Read_Ncol,
    METH_VARARGS | METH_KEYWORDS | METH_CLASS,
-   "Read_Ncol(f, names=True, weights=True, directed=True)\n\n"
+   "Read_Ncol(f, names=True, weights=\"if_present\", directed=True)\n\n"
    "Reads an .ncol file used by LGL.\n\n"
    "It is also useful for creating graphs from \"named\" (and\n"
    "optionally weighted) edge lists.\n\n"
@@ -10919,14 +10928,18 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param names: If C{True}, the vertex names are added as a\n"
    "  vertex attribute called 'name'.\n"
    "@param weights: If True, the edge weights are added as an\n"
-   "  edge attribute called 'weight'.\n"
+   "  edge attribute called 'weight', even if there are no\n"
+   "  weights in the file. If False, the edge weights are never\n"
+   "  added, even if they are present. C{\"auto\"} or C{\"if_present\"}\n"
+   "  means that weights are added if there is at least one weighted\n"
+   "  edge in the input file, but they are not added otherwise.\n"
    "@param directed: whether the graph being created should be\n"
    "  directed\n"
   },
   /* interface to igraph_read_graph_lgl */
   {"Read_Lgl", (PyCFunction) igraphmodule_Graph_Read_Lgl,
    METH_VARARGS | METH_KEYWORDS | METH_CLASS,
-   "Read_Lgl(f, names=True, weights=True, directed=True)\n\n"
+   "Read_Lgl(f, names=True, weights=\"if_present\", directed=True)\n\n"
    "Reads an .lgl file used by LGL.\n\n"
    "It is also useful for creating graphs from \"named\" (and\n"
    "optionally weighted) edge lists.\n\n"
@@ -10940,7 +10953,11 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param names: If C{True}, the vertex names are added as a\n"
    "  vertex attribute called 'name'.\n"
    "@param weights: If True, the edge weights are added as an\n"
-   "  edge attribute called 'weight'.\n"
+   "  edge attribute called 'weight', even if there are no\n"
+   "  weights in the file. If False, the edge weights are never\n"
+   "  added, even if they are present. C{\"auto\"} or C{\"if_present\"}\n"
+   "  means that weights are added if there is at least one weighted\n"
+   "  edge in the input file, but they are not added otherwise.\n"
    "@param directed: whether the graph being created should be\n"
    "  directed\n"
   },

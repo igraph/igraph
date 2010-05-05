@@ -108,6 +108,76 @@ class ForeignTests(unittest.TestCase):
             self.failUnless(sorted(g.get_edgelist()) == \
                     [(0,1),(0,2),(0,3),(1,2),(2,4)])
 
+    def _testNCOLOrLGL(self, func, fname):
+        g = func(fname, names=False, weights=False, \
+                directed=False)
+        self.failUnless(isinstance(g, Graph))
+        self.failUnless(g.vcount() == 4 and g.ecount() == 5)
+        self.failUnless(not g.is_directed())
+        self.failUnless(sorted(g.get_edgelist()) == \
+                [(0,1),(0,2),(1,1),(1,3),(2,3)])
+        self.failUnless("name" not in g.vertex_attributes() and \
+                "weight" not in g.edge_attributes())
+
+        g = func(fname, names=False, \
+                directed=False)
+        self.failUnless("name" not in g.vertex_attributes() and \
+                "weight" in g.edge_attributes())
+        self.failUnless(g.es["weight"] == [1, 2, 0, 3, 0])
+
+        g = func(fname, directed=False)
+        self.failUnless("name" in g.vertex_attributes() and \
+                "weight" in g.edge_attributes())
+        self.failUnless(g.vs["name"] == ["eggs", "spam", "ham", "bacon"])
+        self.failUnless(g.es["weight"] == [1, 2, 0, 3, 0])
+
+    def testNCOL(self):
+        with temporary_file("""\
+        eggs spam 1
+        ham eggs 2
+        ham bacon
+        bacon spam 3
+        spam spam""") as tmpfname:
+            self._testNCOLOrLGL(func=Graph.Read_Ncol, fname=tmpfname)
+
+        with temporary_file("""\
+        eggs spam
+        ham eggs
+        ham bacon
+        bacon spam
+        spam spam""") as tmpfname:
+            g = Graph.Read_Ncol(tmpfname)
+            self.failUnless("name" in g.vertex_attributes() and \
+                "weight" not in g.edge_attributes())
+
+    def testLGL(self):
+        with temporary_file("""\
+        # eggs
+        spam 1
+        # ham
+        eggs 2
+        bacon
+        # bacon
+        spam 3
+        # spam
+        spam""") as tmpfname:
+            self._testNCOLOrLGL(func=Graph.Read_Lgl, fname=tmpfname)
+
+        with temporary_file("""\
+        # eggs
+        spam
+        # ham
+        eggs
+        bacon
+        # bacon
+        spam
+        # spam
+        spam""") as tmpfname:
+            g = Graph.Read_Lgl(tmpfname)
+            self.failUnless("name" in g.vertex_attributes() and \
+                "weight" not in g.edge_attributes())
+
+
     def testAdjacency(self):
         with temporary_file("""\
         # Test comment line

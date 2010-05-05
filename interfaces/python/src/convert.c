@@ -101,6 +101,35 @@ int igraphmodule_PyObject_to_neimode_t(PyObject *o,
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts a Python object to an igraph \c igraph_add_weights_t
+ */
+int igraphmodule_PyObject_to_add_weights_t(PyObject *o,
+  igraph_add_weights_t *result) {
+  static igraphmodule_enum_translation_table_entry_t add_weights_tt[] = {
+        {"true", IGRAPH_ADD_WEIGHTS_YES},
+        {"yes", IGRAPH_ADD_WEIGHTS_YES},
+        {"false", IGRAPH_ADD_WEIGHTS_NO},
+        {"no", IGRAPH_ADD_WEIGHTS_NO},
+        {"auto", IGRAPH_ADD_WEIGHTS_IF_PRESENT},
+        {"if_present", IGRAPH_ADD_WEIGHTS_IF_PRESENT},
+        {0,0}
+    };
+
+  if (o == Py_True) {
+    *result = IGRAPH_ADD_WEIGHTS_YES;
+    return 0;
+  }
+
+  if (o == Py_False) {
+    *result = IGRAPH_ADD_WEIGHTS_NO;
+    return 0;
+  }
+
+  return igraphmodule_PyObject_to_enum(o, add_weights_tt, (int*)result);
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts a Python object to an igraph \c igraph_adjacency_t
  */
 int igraphmodule_PyObject_to_adjacency_t(PyObject *o,
