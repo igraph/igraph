@@ -81,7 +81,12 @@
  *      directed graph.
  * ( 3) igraph_maxflow, does the push-relabel algorithm, optionally
  *      calculates the cut, the partitions and the flow itself.
- * ( 4) NOT IMPLEMENTED, igraph_maxflow gives wrong results.
+ * ( 4) igraph_maxflow calls igraph_i_maxflow_undirected, this converts 
+ *      the undirected graph into a directed one, adding two mutual edges
+ *      for each undirected edge, then igraph_maxflow is called again, 
+ *      with the directed graph. After igraph_maxflow returns, we need 
+ *      to edit the flow (and the cut) to make it sense for the
+ *      original graph.
  * ( 5) igraph_st_mincut_value, we just call igraph_maxflow_value
  * ( 6) igraph_st_mincut_value, we just call igraph_maxflow_value
  * ( 7) igraph_mincut_value, we call igraph_maxflow_value (|V|-1)*2
@@ -91,8 +96,10 @@
  *      igraph_i_mincut_undirected with partition=partition2=cut=NULL
  *      The Stoer-Wagner algorithm is used.
  * ( 9) igraph_st_mincut, just calls igraph_maxflow.
- * (10) NOT IMPLEMENTED, igraph_st_mincut gives an error message
- * (11) NOT IMPLEMENTED, igraph_mincut gives an error message
+ * (10) igraph_st_mincut, just calls igraph_maxflow.
+ * (11) igraph_mincut, calls igraph_i_mincut_directed, which runs 
+ *      the maximum flow algorithm 2(|V|-1) times, from vertex zero to
+ *      and from all other vertices and stores the smallest cut.
  * (12) igraph_mincut, igraph_i_mincut_undirected is called, 
  *      this is the Stoer-Wagner algorithm
  * (13) We just call igraph_maxflow_value, back to (1)
@@ -826,8 +833,7 @@ int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *value,
  * 
  * </para><para>The calculation is performed using maximum flow
  * techniques, by calling \ref igraph_maxflow().
- * \param graph The input graph, currently the function is only
- *        implemented for directed graphs.
+ * \param graph The input graph.
  * \param value Pointer to a real variable, the value of the cut is
  *        stored here.
  * \param cut Pointer to a real vector, the edge ids that are included
@@ -857,14 +863,9 @@ int igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
 		     igraph_integer_t source, igraph_integer_t target,
 		     const igraph_vector_t *capacity) {
   
-  if (igraph_is_directed(graph)) {
-    return igraph_maxflow(graph, value, /*flow=*/ 0, 
-			  cut, partition, partition2, 
-			  source, target, capacity);
-  } else {
-    IGRAPH_ERROR("S-t minimum cut is not yet implemented for uncirected graphs",
-		 IGRAPH_UNIMPLEMENTED);
-  }
+  return igraph_maxflow(graph, value, /*flow=*/ 0, 
+			cut, partition, partition2, 
+			source, target, capacity);
 }
 
 /* This is a flow-based version, but there is a better one
@@ -1138,6 +1139,119 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
   return 0;
 }
 
+int igraph_i_mincut_directed(const igraph_t *graph,
+			     igraph_real_t *value,
+			     igraph_vector_t *partition,
+			     igraph_vector_t *partition2,
+			     igraph_vector_t *cut,
+			     const igraph_vector_t *capacity) {
+  long int i;
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_real_t flow;
+  igraph_real_t minmaxflow=IGRAPH_INFINITY;
+  igraph_vector_t mypartition, mypartition2, mycut;
+  igraph_vector_t *ppartition=0, *ppartition2=0, *pcut=0;
+  igraph_vector_t bestpartition, bestpartition2, bestcut;
+  igraph_vector_t *pbestpartition=0, *pbestpartition2=0, *pbestcut=0;
+
+  if (partition) {
+    IGRAPH_VECTOR_INIT_FINALLY(&bestpartition, 0);
+    pbestpartition=&bestpartition;
+  }
+  if (partition2) {
+    IGRAPH_VECTOR_INIT_FINALLY(&bestpartition2, 0);
+    pbestpartition2=&bestpartition2;
+  }
+  if (cut) {
+    IGRAPH_VECTOR_INIT_FINALLY(&bestcut, 0);
+    pbestcut=&bestcut;
+  }
+  
+  if (partition) {
+    IGRAPH_VECTOR_INIT_FINALLY(&mypartition, 0);
+    ppartition=&mypartition;
+  }
+  if (partition2) {
+    IGRAPH_VECTOR_INIT_FINALLY(&mypartition2, 0);
+    ppartition2=&mypartition2;
+  }
+  if (cut) {
+    IGRAPH_VECTOR_INIT_FINALLY(&mycut, 0);
+    pcut=&mycut;
+  }
+
+  for (i=1; i<no_of_nodes; i++) {
+    IGRAPH_CHECK(igraph_maxflow(graph, /*value=*/ &flow, /*flow=*/ 0, 
+				pcut, ppartition, ppartition2, /*source=*/ 0,
+				/*target=*/ i, capacity));
+    if (flow < minmaxflow) {
+      minmaxflow = flow;
+      if (cut) { 
+	IGRAPH_CHECK(igraph_vector_update(&bestcut, &mycut)); 
+      }
+      if (partition) { 
+	IGRAPH_CHECK(igraph_vector_update(&bestpartition, &mypartition)); 
+      }
+      if (partition2) { 
+	IGRAPH_CHECK(igraph_vector_update(&bestpartition2, &mypartition2)); 
+      }
+
+      if (minmaxflow == 0) { break; }
+    }
+    IGRAPH_CHECK(igraph_maxflow(graph, /*value=*/ &flow, /*flow=*/ 0,
+				pcut, ppartition, ppartition2, /*source=*/ i,
+				/*target=*/ i, capacity));
+    if (flow < minmaxflow) {
+      minmaxflow = flow;
+      if (cut) { 
+	IGRAPH_CHECK(igraph_vector_update(&bestcut, &mycut)); 
+      }
+      if (partition) { 
+	IGRAPH_CHECK(igraph_vector_update(&bestpartition, &mypartition)); 
+      }
+      if (partition2) { 
+	IGRAPH_CHECK(igraph_vector_update(&bestpartition2, &mypartition2)); 
+      }
+
+      if (minmaxflow == 0) { break; }
+    }
+  }
+  
+  if (value) {
+    *value = minmaxflow;
+  }
+
+  if (cut) {
+    igraph_vector_destroy(&mycut);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  if (partition) {
+    igraph_vector_destroy(&mypartition);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  if (partition2) {
+    igraph_vector_destroy(&mypartition2);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  if (cut) {
+    IGRAPH_CHECK(igraph_vector_update(cut, &bestcut));
+    igraph_vector_destroy(&bestcut);
+    IGRAPH_FINALLY_CLEAN(1);
+  }  
+  if (partition2) {
+    IGRAPH_CHECK(igraph_vector_update(partition2, &bestpartition2));
+    igraph_vector_destroy(&bestpartition2);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  if (partition) {
+    IGRAPH_CHECK(igraph_vector_update(partition, &bestpartition));
+    igraph_vector_destroy(&bestpartition);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  return 0;
+}
+
 /** 
  * \function igraph_mincut
  * \brief Calculates the minimum cut in a graph.
@@ -1188,12 +1302,13 @@ int igraph_mincut(const igraph_t *graph,
 		  igraph_vector_t *cut,
 		  const igraph_vector_t *capacity) {
   
-  if (igraph_is_directed(graph) && 
-      (partition || partition2 || cut)) {
-    IGRAPH_ERROR("Minimum cut for directed graph not yet implemented", 
-		 IGRAPH_UNIMPLEMENTED);
-  } else if (!partition && !partition2 && !cut) {
-    return igraph_mincut_value(graph, value, capacity);
+  if (igraph_is_directed(graph)) {
+    if (partition || partition2 || cut) {
+      igraph_i_mincut_directed(graph, value, partition, partition2, cut, 
+			       capacity);
+    } else {
+      return igraph_mincut_value(graph, value, capacity);      
+    }
   } else {
     return igraph_i_mincut_undirected(graph, value, partition, 
 				      partition2, cut, capacity);
