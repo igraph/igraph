@@ -233,8 +233,13 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 	\item{names}{Logical constant, whether to add the symbolic names
 	  as vertex attributes to the graph. If TRUE the name of the
 	  vertex attribute will be \sQuote{name}.}
-	\item{weights}{Logical constant, whether to add the weights of
-	  the edges as edge attribute \sQuote{weight}.
+	\item{weights}{Character scalar, specifies whether edge weights
+	  should be added to the graph. Possible values are and their
+	  meaning are: \sQuote{no}, edge weights will not be added;
+	  \sQuote{yes}, edge weights will be added, if they are not
+	  present in the file, then all edges get zero weight;
+	  \sQuote{auto}, edge weights will added if they are present in
+	  the file, otherwise not. The default is \sQuote{auto}.
 	}
 	\item{directed}{Logical constant, whether to create a directed
 	  graph. The default is undirected.} 
@@ -266,8 +271,13 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 	\item{names}{Logical constant, whether to add the symbolic names
 	  as vertex attributes to the graph. If TRUE the name of the
 	  vertex attribute will be \sQuote{name}.}
-	\item{weights}{Logical constant, whether to add the weights of
-	  the edges as edge attribute \sQuote{weight}.
+	\item{weights}{Character scalar, specifies whether edge weights
+	  should be added to the graph. Possible values are and their
+	  meaning are: \sQuote{no}, edge weights will not be added;
+	  \sQuote{yes}, edge weights will be added, if they are not
+	  present in the file, then all edges get zero weight;
+	  \sQuote{auto}, edge weights will added if they are present in
+	  the file, otherwise not. The default is \sQuote{auto}.
 	}
       }      
     }

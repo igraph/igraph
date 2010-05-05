@@ -174,3 +174,6 @@ VERTEX_ATTRIBUTE_COMBINATION:
     INCONV: %I% <- igraph.i.attribute.combination(%I%)
     DEFAULT: 
        Default: igraph.par("vertex.attr.comb")
+
+ADD_WEIGHTS:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "no"=0, "yes"=1, "auto"=2)

@@ -168,14 +168,16 @@ write.graph.edgelist <- function(graph, file, ...) {
 ################################################################
 
 read.graph.ncol <- function(file, predef=character(0), names=TRUE,
-                           weights=TRUE, directed=FALSE, ...) {
+                            weights=c("auto", "yes", "no"),
+                            directed=FALSE, ...) {
 
   if (length(list(...))>0) {
     stop("Unknown arguments to read.graph (NCOL format)")
   }
+  weights <- switch(igraph.match.arg(weights), "no"=0, "yes"=1, "auto"=2)
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_read_graph_ncol", file, as.character(predef),
-        as.logical(names), as.logical(weights), as.logical(directed),
+        as.logical(names), as.numeric(weights), as.logical(directed),
         PACKAGE="igraph")
 }
 
@@ -196,14 +198,17 @@ write.graph.ncol <- function(graph, file,
 }  
 
 read.graph.lgl <- function(file, names=TRUE,
-                           weights=TRUE, directed=FALSE, ...) {
+                           weights=c("auto", "yes", "no"),
+                           directed=FALSE,
+                            ...) {
 
   if (length(list(...))>0) {
     stop("Unknown arguments to read.graph (LGL format)")
   }
+  weights <- switch(igraph.match.arg(weights), "no"=0, "yes"=1, "auto"=2)
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_read_graph_lgl", file,
-        as.logical(names), as.logical(weights), as.logical(directed),
+        as.logical(names), as.numeric(weights), as.logical(directed),
         PACKAGE="igraph")
 }
 
