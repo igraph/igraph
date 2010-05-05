@@ -428,13 +428,6 @@ static int igraphmodule_i_attribute_permute_vertices(const igraph_t *graph,
   return 0;
 }
 
-/* Combining vertices */
-static int igraphmodule_i_attribute_combine_vertices(const igraph_t *graph,
-    igraph_t *newgraph, const igraph_vector_ptr_t *merges,
-    const igraph_attribute_combination_t *comb) {
-  return 0;
-}
-
 /* Adding edges */
 static int igraphmodule_i_attribute_add_edges(igraph_t *graph, const igraph_vector_t *edges, igraph_vector_ptr_t *attr) {
   /* Extend the end of every value in the edge hash with ne pieces of None */
@@ -644,11 +637,399 @@ static int igraphmodule_i_attribute_permute_edges(const igraph_t *graph,
   return 0;
 }
 
+/* Auxiliary function for combining vertices/edges. Given a merge list
+ * (which specifies the vertex/edge IDs that were merged, the source
+ * attribute values and a Python callable to be called for every merge,
+ * returns a new list with the new attribute values. Each new attribute
+ * is derived by calling func with the old attributes of the set of
+ * merged vertices/edges as the first argument.
+ */
+static PyObject* igraphmodule_i_ac_func(PyObject* values,
+    const igraph_vector_ptr_t *merges, PyObject* func) {
+  long int i, len = igraph_vector_ptr_size(merges);
+  PyObject *res, *list, *item;
+
+  res = PyList_New(len);
+  for (i = 0; i < len; i++) {
+    igraph_vector_t *v = (igraph_vector_t*)VECTOR(*merges)[i];
+    long int j, n = igraph_vector_size(v);
+    list = PyList_New(n);
+    for (j = 0; j < n; j++) {
+      item = PyList_GET_ITEM(values, (Py_ssize_t)VECTOR(*v)[j]);
+      Py_INCREF(item);
+      PyList_SET_ITEM(list, j, item);   /* reference to item stolen */
+    }
+    item = PyObject_CallFunctionObjArgs(func, list, 0);
+    Py_DECREF(list);
+    if (item == 0) {
+      Py_DECREF(res);
+      return 0;
+    }
+    PyList_SET_ITEM(res, i, item);   /* reference to item stolen */
+  }
+
+  return res;
+}
+
+/* Auxiliary function for combining vertices/edges. Given a merge list
+ * (which specifies the vertex/edge IDs that were merged, the source
+ * attribute values and a name of a Python builtin function,
+ * returns a new list with the new attribute values. Each new attribute
+ * is derived by calling the given builtin function with the old
+ * attributes of the set of merged vertices/edges as the first argument.
+ */
+static PyObject* igraphmodule_i_ac_builtin_func(PyObject* values,
+    const igraph_vector_ptr_t *merges, const char* func_name) {
+  static PyObject* builtin_module_dict = 0;
+  PyObject* func = 0;
+
+  if (builtin_module_dict == 0) {
+    PyObject* builtin_module = PyImport_ImportModule("__builtin__");
+    if (builtin_module == 0)
+      return 0;
+    builtin_module_dict = PyModule_GetDict(builtin_module);
+    Py_DECREF(builtin_module);
+    if (builtin_module_dict == 0)
+      return 0;
+  }
+
+  func = PyDict_GetItemString(builtin_module_dict, func_name);
+  if (func == 0) {
+    PyErr_Format(PyExc_NameError, "no such builtin function; %s", func_name);
+    return 0;
+  }
+
+  return igraphmodule_i_ac_func(values, merges, func);
+}
+
+/* Auxiliary function for combining vertices/edges. Given a merge list
+ * (which specifies the vertex/edge IDs that were merged and the source
+ * attribute values, returns a new list with the new attribute values.
+ * Each new attribute is derived from the product of the attributes of
+ * the merged vertices/edges.
+ */
+static PyObject* igraphmodule_i_ac_prod(PyObject* values,
+    const igraph_vector_ptr_t *merges) {
+  long int i, len = igraph_vector_ptr_size(merges);
+  PyObject *res, *item;
+
+  res = PyList_New(len);
+  for (i = 0; i < len; i++) {
+    igraph_vector_t *v = (igraph_vector_t*)VECTOR(*merges)[i];
+    igraph_real_t num = 1.0, prod = 1.0;
+    long int j, n = igraph_vector_size(v);
+
+    for (j = 0; j < n; j++) {
+      item = PyList_GET_ITEM(values, (Py_ssize_t)VECTOR(*v)[j]);
+      if (igraphmodule_PyObject_to_real_t(item, &num)) {
+        PyErr_SetString(PyExc_TypeError, "product can only be invoked on numeric attributes");
+        Py_DECREF(res);
+        return 0;
+      }
+      prod *= num;
+    }
+
+    /* reference to new float stolen */
+    PyList_SET_ITEM(res, i, PyFloat_FromDouble((double)prod));
+  }
+
+  return res;
+}
+
+/* Auxiliary function for combining vertices/edges. Given a merge list
+ * (which specifies the vertex/edge IDs that were merged and the source
+ * attribute values, returns a new list with the new attribute values.
+ * Each new attribute is derived from the first entry of the set of merged
+ * vertices/edges.
+ */
+static PyObject* igraphmodule_i_ac_first(PyObject* values,
+    const igraph_vector_ptr_t *merges) {
+  long int i, len = igraph_vector_ptr_size(merges);
+  PyObject *res, *item;
+
+  res = PyList_New(len);
+  for (i = 0; i < len; i++) {
+    igraph_vector_t *v = (igraph_vector_t*)VECTOR(*merges)[i];
+    long int n = igraph_vector_size(v);
+
+    if (n == 0)
+      continue;
+
+    item = PyList_GET_ITEM(values, (Py_ssize_t)VECTOR(*v)[0]);
+    Py_INCREF(item);
+    PyList_SET_ITEM(res, i, item);   /* reference to item stolen */
+  }
+
+  return res;
+}
+
+/* Auxiliary function for combining vertices/edges. Given a merge list
+ * (which specifies the vertex/edge IDs that were merged and the source
+ * attribute values, returns a new list with the new attribute values.
+ * Each new attribute is derived from the last entry of the set of merged
+ * vertices/edges.
+ */
+static PyObject* igraphmodule_i_ac_last(PyObject* values,
+    const igraph_vector_ptr_t *merges) {
+  long int i, len = igraph_vector_ptr_size(merges);
+  PyObject *res, *item;
+
+  res = PyList_New(len);
+  for (i = 0; i < len; i++) {
+    igraph_vector_t *v = (igraph_vector_t*)VECTOR(*merges)[i];
+    long int n = igraph_vector_size(v);
+
+    if (n == 0)
+      continue;
+
+    item = PyList_GET_ITEM(values, (Py_ssize_t)VECTOR(*v)[n-1]);
+    Py_INCREF(item);
+    PyList_SET_ITEM(res, i, item);   /* reference to item stolen */
+  }
+
+  return res;
+}
+
+/* Auxiliary function for combining vertices/edges. Given a merge list
+ * (which specifies the vertex/edge IDs that were merged and the source
+ * attribute values, returns a new list with the new attribute values.
+ * Each new attribute is derived from the mean of the attributes of
+ * the merged vertices/edges.
+ */
+static PyObject* igraphmodule_i_ac_mean(PyObject* values,
+    const igraph_vector_ptr_t *merges) {
+  long int i, len = igraph_vector_ptr_size(merges);
+  PyObject *res, *item;
+
+  res = PyList_New(len);
+  for (i = 0; i < len; i++) {
+    igraph_vector_t *v = (igraph_vector_t*)VECTOR(*merges)[i];
+    igraph_real_t num = 0.0, mean = 0.0;
+    long int j, n = igraph_vector_size(v);
+
+    for (j = 0; j < n; ) {
+      item = PyList_GET_ITEM(values, (Py_ssize_t)VECTOR(*v)[j]);
+      if (igraphmodule_PyObject_to_real_t(item, &num)) {
+        PyErr_SetString(PyExc_TypeError, "mean can only be invoked on numeric attributes");
+        Py_DECREF(res);
+        return 0;
+      }
+      j++;
+      num -= mean;
+      mean += num / j;
+    }
+
+    /* reference to new float stolen */
+    PyList_SET_ITEM(res, i, PyFloat_FromDouble((double)mean));
+  }
+
+  return res;
+}
+
+/* Auxiliary function for combining vertices/edges. Given a merge list
+ * (which specifies the vertex/edge IDs that were merged and the source
+ * attribute values, returns a new list with the new attribute values.
+ * Each new attribute is derived from the median of the attributes of
+ * the merged vertices/edges.
+ */
+static PyObject* igraphmodule_i_ac_median(PyObject* values,
+    const igraph_vector_ptr_t *merges) {
+  long int i, len = igraph_vector_ptr_size(merges);
+  PyObject *res, *list, *item;
+
+  res = PyList_New(len);
+  for (i = 0; i < len; i++) {
+    igraph_vector_t *v = (igraph_vector_t*)VECTOR(*merges)[i];
+    long int j, n = igraph_vector_size(v);
+    list = PyList_New(n);
+    for (j = 0; j < n; j++) {
+      item = PyList_GET_ITEM(values, (Py_ssize_t)VECTOR(*v)[j]);
+      Py_INCREF(item);
+      PyList_SET_ITEM(list, j, item);   /* reference to item stolen */
+    }
+    /* sort the list */
+    if (PyList_Sort(list)) {
+      Py_DECREF(list);
+      Py_DECREF(res);
+      return 0;
+    }
+    if (n % 2 == 1) {
+      item = PyList_GET_ITEM(list, n / 2);
+    } else {
+      igraph_real_t num1, num2;
+      item = PyList_GET_ITEM(list, n / 2 - 1);
+      if (igraphmodule_PyObject_to_real_t(item, &num1)) {
+        Py_DECREF(list);
+        Py_DECREF(res);
+        return 0;
+      }
+      item = PyList_GET_ITEM(list, n / 2);
+      if (igraphmodule_PyObject_to_real_t(item, &num2)) {
+        Py_DECREF(list);
+        Py_DECREF(res);
+        return 0;
+      }
+      item = PyFloat_FromDouble((num1 + num2) / 2);
+    }
+    /* reference to item stolen */
+    PyList_SET_ITEM(res, i, item);
+  }
+
+  return res;
+}
+
+/* Auxiliary function for the common parts of
+ * igraphmodule_i_attribute_combine_vertices and
+ * igraphmodule_i_attribute_combine_edges
+ */
+static int igraphmodule_i_attribute_combine_dicts(PyObject *dict,
+    PyObject *newdict, const igraph_vector_ptr_t *merges,
+    const igraph_attribute_combination_t *comb) {
+  PyObject *key, *value;
+  Py_ssize_t pos;
+  igraph_attribute_combination_record_t* todo;
+  int i;
+  if (!PyDict_Check(dict) || !PyDict_Check(newdict)) return 1;
+
+  /* Allocate memory for the attribute_combination_records */
+  todo = (igraph_attribute_combination_record_t*)calloc(
+    PyDict_Size(dict), sizeof(igraph_attribute_combination_record_t)
+  );
+  if (todo == 0) {
+    IGRAPH_ERROR("cannot allocate memory for attribute combination", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(free, todo);
+
+  /* Collect what to do for each attribute in the source dict */
+  pos = 0; i = 0;
+  while (PyDict_Next(dict, &pos, &key, &value)) {
+    todo[i].name = PyString_AS_STRING(key);
+    igraph_attribute_combination_query(comb, todo[i].name,
+        &todo[i].type, &todo[i].func);
+    i++;
+  }
+
+  /* Combine the attributes. Here we make use of the fact that PyDict_Next
+   * will iterate over the dict in the same order */
+  pos = 0; i = 0;
+  while (PyDict_Next(dict, &pos, &key, &value)) {
+    PyObject *empty_str;
+    PyObject *func;
+    PyObject *newvalue;
+
+    /* Safety check */
+    if (strcmp(todo[i].name, PyString_AS_STRING(key))) {
+      IGRAPH_ERROR("PyDict_Next iteration order not consistent. "
+          "This should never happen. Please report the bug to the igraph "
+          "developers!", IGRAPH_FAILURE);
+    }
+
+    newvalue = 0;
+    switch (todo[i].type) {
+      case IGRAPH_ATTRIBUTE_COMBINE_DEFAULT:
+      case IGRAPH_ATTRIBUTE_COMBINE_IGNORE:
+        break;
+
+      case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
+        func = (PyObject*)todo[i].func;
+        newvalue = igraphmodule_i_ac_func(value, merges, func);
+        break;
+
+      case IGRAPH_ATTRIBUTE_COMBINE_SUM:
+        newvalue = igraphmodule_i_ac_builtin_func(value, merges, "sum");
+        break;
+
+      case IGRAPH_ATTRIBUTE_COMBINE_PROD:
+        newvalue = igraphmodule_i_ac_prod(value, merges);
+        break;
+
+      case IGRAPH_ATTRIBUTE_COMBINE_MIN:
+        newvalue = igraphmodule_i_ac_builtin_func(value, merges, "min");
+        break;
+
+      case IGRAPH_ATTRIBUTE_COMBINE_MAX:
+        newvalue = igraphmodule_i_ac_builtin_func(value, merges, "max");
+        break;
+
+      case IGRAPH_ATTRIBUTE_COMBINE_FIRST:
+        newvalue = igraphmodule_i_ac_first(value, merges);
+        break;
+
+      case IGRAPH_ATTRIBUTE_COMBINE_LAST:
+        newvalue = igraphmodule_i_ac_last(value, merges);
+        break;
+
+      case IGRAPH_ATTRIBUTE_COMBINE_MEAN:
+        newvalue = igraphmodule_i_ac_mean(value, merges);
+        break;
+
+      case IGRAPH_ATTRIBUTE_COMBINE_MEDIAN:
+        newvalue = igraphmodule_i_ac_median(value, merges);
+        break;
+
+      case IGRAPH_ATTRIBUTE_COMBINE_CONCAT:
+        empty_str = PyString_FromString("");
+        func = PyObject_GetAttrString(empty_str, "join");
+        newvalue = igraphmodule_i_ac_func(value, merges, func);
+        Py_DECREF(func);
+        Py_DECREF(empty_str);
+        break;
+
+      default:
+        IGRAPH_ERROR("Unsupported combination type. "
+            "This should never happen. Please report the bug to the igraph "
+            "developers!", IGRAPH_FAILURE);
+    }
+
+    if (newvalue) {
+      if (PyDict_SetItem(newdict, key, newvalue)) {
+        Py_DECREF(newvalue);  /* PyDict_SetItem does not steal reference */
+        IGRAPH_ERROR("PyDict_SetItem failed when combining attributes.", IGRAPH_FAILURE);
+      }
+      Py_DECREF(newvalue);    /* PyDict_SetItem does not steal reference */
+    } else {
+      /* We can arrive here for two reasons: first, if the attribute is to
+       * be ignored explicitly; second, if there was an error. */
+      if (PyErr_Occurred()) {
+        IGRAPH_ERROR("Unexpected failure when combining attributes", IGRAPH_FAILURE);
+      }
+    }
+
+    i++;
+  }
+
+  free(todo);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
+/* Combining vertices */
+static int igraphmodule_i_attribute_combine_vertices(const igraph_t *graph,
+    igraph_t *newgraph, const igraph_vector_ptr_t *merges,
+    const igraph_attribute_combination_t *comb) {
+  PyObject *dict, *newdict;
+
+  /* Get the attribute dicts */
+  dict=ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_VERTEX];
+  newdict=ATTR_STRUCT_DICT(newgraph)[ATTRHASH_IDX_VERTEX];
+
+  return igraphmodule_i_attribute_combine_dicts(dict, newdict,
+      merges, comb);
+}
+
 /* Combining edges */
 static int igraphmodule_i_attribute_combine_edges(const igraph_t *graph,
     igraph_t *newgraph, const igraph_vector_ptr_t *merges,
     const igraph_attribute_combination_t *comb) {
-  return 0;
+  PyObject *dict, *newdict;
+
+  /* Get the attribute dicts */
+  dict=ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_EDGE];
+  newdict=ATTR_STRUCT_DICT(newgraph)[ATTRHASH_IDX_EDGE];
+
+  return igraphmodule_i_attribute_combine_dicts(dict, newdict,
+      merges, comb);
 }
 
 /* Getting attribute names and types */

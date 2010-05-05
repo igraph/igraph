@@ -152,7 +152,6 @@ int igraphmodule_PyObject_to_attribute_combination_type_t(PyObject* o,
     igraph_attribute_combination_type_t *result) {
   static igraphmodule_enum_translation_table_entry_t attribute_combination_type_tt[] = {
         {"ignore", IGRAPH_ATTRIBUTE_COMBINE_IGNORE},
-        {"default", IGRAPH_ATTRIBUTE_COMBINE_DEFAULT},
         {"sum", IGRAPH_ATTRIBUTE_COMBINE_SUM},
         {"product", IGRAPH_ATTRIBUTE_COMBINE_PROD},
         {"min", IGRAPH_ATTRIBUTE_COMBINE_MIN},
@@ -165,6 +164,11 @@ int igraphmodule_PyObject_to_attribute_combination_type_t(PyObject* o,
         {"concatenate", IGRAPH_ATTRIBUTE_COMBINE_CONCAT},
         {0, 0}
   };
+
+  if (o == Py_None) {
+    *result = IGRAPH_ATTRIBUTE_COMBINE_IGNORE;
+    return 0;
+  }
 
   if (PyCallable_Check(o)) {
     *result = IGRAPH_ATTRIBUTE_COMBINE_FUNCTION;
@@ -2003,7 +2007,7 @@ int igraphmodule_i_PyObject_pair_to_attribute_combination_record_t(
     PyObject* name, PyObject* value,
     igraph_attribute_combination_record_t *result) {
   if (name == Py_None)
-    result->name = "";
+    result->name = 0;
   else if (!PyString_Check(name)) {
     PyErr_SetString(PyExc_TypeError, "keys must be strings or None in attribute combination specification dicts");
     return 1;
@@ -2034,7 +2038,6 @@ int igraphmodule_i_PyObject_pair_to_attribute_combination_record_t(
  * map to simple functions. The recognised strings are as follows:
  *
  *   - \c "ignore"  - the attribute will be ignored
- *   - \c "default" - default behaviour
  *   - \c "sum"     - the attribute values will be added
  *   - \c "prod"    - the product of the attribute values will be taken
  *   - \c "min"     - the minimum attribute value will be used
@@ -2089,16 +2092,12 @@ int igraphmodule_PyObject_to_attribute_combination_t(PyObject* object,
     }
   } else {
     /* assume it is a string or callable */
-    PyObject *empty_str = PyString_FromString("");
-
-    if (igraphmodule_i_PyObject_pair_to_attribute_combination_record_t(empty_str, object, &rec)) {
+    if (igraphmodule_i_PyObject_pair_to_attribute_combination_record_t(Py_None, object, &rec)) {
       igraph_attribute_combination_destroy(result);
-      Py_DECREF(empty_str);
       return 1;
     }
-    Py_DECREF(empty_str);
 
-    igraph_attribute_combination_add(result, rec.name, rec.type, rec.func);
+    igraph_attribute_combination_add(result, 0, rec.type, rec.func);
   }
 
   return 0;

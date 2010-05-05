@@ -142,46 +142,6 @@ class OperatorTests(unittest.TestCase):
         self.failUnless(g2.vcount() == g.vcount())
         self.failUnless(g2.ecount() == g.ecount() - 1)
 
-    def testSimplifyAttributes(self):
-        el = [(0,1), (1,0), (1,2), (2,3), (2,3), (2,3), (3,3)] 
-        g = Graph(el)
-        g.es["weight"] = [1, 2, 3, 4, 5, 6, 7]
-        g.es["weight2"] = [1, 2, 3, 4, 5, 6, 7]
-
-        g2 = g.copy()
-        g2.simplify(edge_comb=max)
-        self.failUnless(g2.es["weight"] == [2, 3, 6])
-        self.failUnless(g2.es["weight2"] == [2, 3, 6])
-
-        g2 = g.copy()
-        g2.simplify(edge_comb={"weight": max})
-        self.failUnless(g2.es["weight"] == [2, 3, 6])
-
-        g2 = g.copy()
-        g2.simplify(edge_comb={"weight": max, "weight2": sum})
-        self.failUnless(g2.es["weight"] == [2, 3, 6])
-        self.failUnless(g2.es["weight2"] == [3, 3, 15])
-
-        g2 = g.copy()
-        g2.simplify(edge_comb={"weight": max, None: sum})
-        self.failUnless(g2.es["weight"] == [2, 3, 6])
-        self.failUnless(g2.es["weight2"] == [3, 3, 15])
-
-        g2 = g.copy()
-        g2.simplify(edge_comb={"weight": max, None: "mean"})
-        self.failUnless(g2.es["weight"] == [2, 3, 6])
-        self.failUnless(g2.es["weight2"] == [1.5, 3, 5])
-
-        g = Graph(el, directed=True)
-        g.es["weight"] = [1, 2, 3, 4, 5, 6, 7]
-        g.es["weight2"] = [1, 2, 3, 4, 5, 6, 7]
-
-        g2 = g.copy()
-        g2.simplify(edge_comb={"weight": max, "weight2": sum})
-        self.failUnless(g2.es["weight"] == [1, 2, 3, 6])
-        self.failUnless(g2.es["weight2"] == [1, 2, 3, 15])
-
-
 
 def suite():
     operator_suite = unittest.makeSuite(OperatorTests)
