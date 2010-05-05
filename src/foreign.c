@@ -1742,7 +1742,7 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
     IGRAPH_CHECK(igraph_strvector_init(&wvec, igraph_ecount(graph)));
     IGRAPH_FINALLY(igraph_strvector_destroy, &wvec);
     IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph, weights,
-							 igraph_ess_all(IGRAPH_EDGEORDER_FROM),
+							 igraph_ess_all(IGRAPH_EDGEORDER_ID),
 							 &wvec));
     /* No names but weights */
     while (!IGRAPH_EIT_END(it)) {
@@ -1773,7 +1773,7 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
     IGRAPH_CHECK(igraph_strvector_init(&nvec, igraph_vcount(graph)));
     IGRAPH_FINALLY(igraph_strvector_destroy, &nvec);
     IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph, weights,
-							 igraph_ess_all(IGRAPH_EDGEORDER_FROM),
+							 igraph_ess_all(IGRAPH_EDGEORDER_ID),
 							 &wvec));
     IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, names, 
 							   igraph_vss_all(),
