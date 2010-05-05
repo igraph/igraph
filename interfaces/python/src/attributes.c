@@ -766,6 +766,54 @@ static PyObject* igraphmodule_i_ac_first(PyObject* values,
 /* Auxiliary function for combining vertices/edges. Given a merge list
  * (which specifies the vertex/edge IDs that were merged and the source
  * attribute values, returns a new list with the new attribute values.
+ * Each new attribute is derived from a randomly selected entry of the set of
+ * merged vertices/edges.
+ */
+static PyObject* igraphmodule_i_ac_random(PyObject* values,
+    const igraph_vector_ptr_t *merges) {
+  long int i, len = igraph_vector_ptr_size(merges);
+  PyObject *res, *item, *num;
+  PyObject *random_module = PyImport_ImportModule("random");
+  PyObject *random_func;
+
+  if (random_module == 0)
+    return 0;
+
+  random_func = PyObject_GetAttrString(random_module, "random");
+  Py_DECREF(random_module);
+
+  if (random_func == 0)
+    return 0;
+
+  res = PyList_New(len);
+  for (i = 0; i < len; i++) {
+    igraph_vector_t *v = (igraph_vector_t*)VECTOR(*merges)[i];
+    long int n = igraph_vector_size(v);
+
+    if (n == 0)
+      continue;
+
+    num = PyObject_CallObject(random_func, 0);
+    if (num == 0) {
+      Py_DECREF(random_func);
+      Py_DECREF(res);
+      return 0;
+    }
+
+    item = PyList_GET_ITEM(values, (Py_ssize_t)VECTOR(*v)[(long int)(n*PyFloat_AsDouble(num))]);
+    Py_INCREF(item);
+    Py_DECREF(num);
+    PyList_SET_ITEM(res, i, item);   /* reference to item stolen */
+  }
+
+  Py_DECREF(random_func);
+
+  return res;
+}
+
+/* Auxiliary function for combining vertices/edges. Given a merge list
+ * (which specifies the vertex/edge IDs that were merged and the source
+ * attribute values, returns a new list with the new attribute values.
  * Each new attribute is derived from the last entry of the set of merged
  * vertices/edges.
  */
@@ -949,6 +997,10 @@ static int igraphmodule_i_attribute_combine_dicts(PyObject *dict,
 
       case IGRAPH_ATTRIBUTE_COMBINE_MAX:
         newvalue = igraphmodule_i_ac_builtin_func(value, merges, "max");
+        break;
+
+      case IGRAPH_ATTRIBUTE_COMBINE_RANDOM:
+        newvalue = igraphmodule_i_ac_random(value, merges);
         break;
 
       case IGRAPH_ATTRIBUTE_COMBINE_FIRST:

@@ -85,66 +85,75 @@ class AttributeCombinationTests(unittest.TestCase):
 
     def testCombinationMax(self):
         g = self.g
-        g.simplify(edge_comb="max")
+        g.simplify(combine_attributes="max")
         self.failUnless(g.es["weight"] == [2, 3, 6])
         self.failUnless(g.es["weight2"] == [2, 3, 6])
 
     def testCombinationMin(self):
         g = self.g
-        g.simplify(edge_comb="min")
+        g.simplify(combine_attributes="min")
         self.failUnless(g.es["weight"] == [1, 3, 4])
         self.failUnless(g.es["weight2"] == [1, 3, 4])
 
+    def testCombinationRandom(self):
+        g = self.g
+        g.simplify(combine_attributes="random")
+        del g.es["weight2"]
+        for i in xrange(100):
+            self.failUnless(g.es[0]["weight"] in (1, 2))
+            self.failUnless(g.es[1]["weight"] == 3)
+            self.failUnless(g.es[2]["weight"] in (4, 5, 6))
+
     def testCombinationMean(self):
         g = self.g
-        g.simplify(edge_comb="mean")
+        g.simplify(combine_attributes="mean")
         self.failUnless(g.es["weight"] == [1.5, 3, 5])
         self.failUnless(g.es["weight2"] == [1.5, 3, 5])
 
     def testCombinationMedian(self):
         g = self.g
         g.es["weight2"] = [1, 0, 2, 4, 8, 6, 7]
-        g.simplify(edge_comb="median")
+        g.simplify(combine_attributes="median")
         self.failUnless(g.es["weight"] == [1.5, 3, 5])
         self.failUnless(g.es["weight2"] == [0.5, 2, 6])
 
     def testCombinationSum(self):
         g = self.g
-        g.simplify(edge_comb="sum")
+        g.simplify(combine_attributes="sum")
         self.failUnless(g.es["weight"] == [3, 3, 15])
         self.failUnless(g.es["weight2"] == [3, 3, 15])
 
     def testCombinationProd(self):
         g = self.g
-        g.simplify(edge_comb="prod")
+        g.simplify(combine_attributes="prod")
         self.failUnless(g.es["weight"] == [2, 3, 120])
         self.failUnless(g.es["weight2"] == [2, 3, 120])
 
     def testCombinationMedian(self):
         g = self.g
         g.es["weight2"] = [1, 0, 2, 4, 8, 6, 7]
-        g.simplify(edge_comb="median")
+        g.simplify(combine_attributes="median")
         self.failUnless(g.es["weight"] == [1.5, 3, 5])
         self.failUnless(g.es["weight2"] == [0.5, 2, 6])
 
     def testCombinationFirst(self):
         g = self.g
         g.es["weight2"] = [1, 0, 2, 6, 8, 4, 7]
-        g.simplify(edge_comb="first")
+        g.simplify(combine_attributes="first")
         self.failUnless(g.es["weight"] == [1, 3, 4])
         self.failUnless(g.es["weight2"] == [1, 2, 6])
 
     def testCombinationLast(self):
         g = self.g
         g.es["weight2"] = [1, 0, 2, 6, 8, 4, 7]
-        g.simplify(edge_comb="last")
+        g.simplify(combine_attributes="last")
         self.failUnless(g.es["weight"] == [2, 3, 6])
         self.failUnless(g.es["weight2"] == [0, 2, 4])
 
     def testCombinationConcat(self):
         g = self.g
         g.es["name"] = list("ABCDEFG")
-        g.simplify(edge_comb=dict(name="concat"))
+        g.simplify(combine_attributes=dict(name="concat"))
         self.failIf("weight" in g.edge_attributes())
         self.failIf("weight2" in g.edge_attributes())
         self.failUnless(g.es["name"] == ["AB", "C", "DEF"])
@@ -152,7 +161,7 @@ class AttributeCombinationTests(unittest.TestCase):
     def testCombinationMaxMinIgnore(self):
         g = self.g
         g.es["name"] = list("ABCDEFG")
-        g.simplify(edge_comb={"weight": "min", "weight2": "max", "name": "ignore"})
+        g.simplify(combine_attributes={"weight": "min", "weight2": "max", "name": "ignore"})
         self.failUnless(g.es["weight"] == [1, 3, 4])
         self.failUnless(g.es["weight2"] == [2, 3, 6])
         self.failIf("name" in g.edge_attributes())
@@ -160,7 +169,7 @@ class AttributeCombinationTests(unittest.TestCase):
     def testCombinationIgnoreAsNone(self):
         g = self.g
         g.es["name"] = list("ABCDEFG")
-        g.simplify(edge_comb={"weight": "min", "name": None})
+        g.simplify(combine_attributes={"weight": "min", "name": None})
         self.failUnless(g.es["weight"] == [1, 3, 4])
         self.failIf("weight2" in g.edge_attributes())
         self.failIf("name" in g.edge_attributes())
@@ -172,31 +181,31 @@ class AttributeCombinationTests(unittest.TestCase):
             return "-".join(l)
 
         g.es["name"] = list("ABCDEFG")
-        g.simplify(edge_comb={"weight": max, "name": join_dash})
+        g.simplify(combine_attributes={"weight": max, "name": join_dash})
         self.failUnless(g.es["weight"] == [2, 3, 6])
         self.failIf("weight2" in g.edge_attributes())
         self.failUnless(g.es["name"] == ["A-B", "C", "D-E-F"])
 
     def testCombinationDefault(self):
         g = self.g
-        g.simplify(edge_comb={None: "max"})
+        g.simplify(combine_attributes={None: "max"})
         self.failUnless(g.es["weight"] == [2, 3, 6])
         self.failUnless(g.es["weight2"] == [2, 3, 6])
 
     def testCombinationDefaultOverride(self):
         g = self.g
-        g.simplify(edge_comb={None: "max", "weight": "sum"})
+        g.simplify(combine_attributes={None: "max", "weight": "sum"})
         self.failUnless(g.es["weight"] == [3, 3, 15])
         self.failUnless(g.es["weight2"] == [2, 3, 6])
 
     def testCombinationTypeMismatch(self):
         g = self.g
         g.es["weight"] = list("ABCDEFG")
-        self.assertRaises(TypeError, g.simplify, edge_comb={"weight": "mean"})
+        self.assertRaises(TypeError, g.simplify, combine_attributes={"weight": "mean"})
 
     def testCombinationNonexistentAttribute(self):
         g = self.g
-        g.simplify(edge_comb={"nonexistent": max})
+        g.simplify(combine_attributes={"nonexistent": max})
         self.failUnless(g.edge_attributes() == [])
 
     def testCombinationNone(self):
