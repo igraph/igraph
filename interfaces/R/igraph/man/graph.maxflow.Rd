@@ -20,8 +20,7 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL,
     used.}
   \item{value.only}{Logical scalar, if \code{TRUE} only the minumum cut
     value is returned, if \code{FALSE} the edges in the cut and a the
-    two (or more) partitions are also returned. This currently only
-    works for undirected graphs.
+    two (or more) partitions are also returned.
   }
 }
 \details{
@@ -57,11 +56,8 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL,
   and \code{target} arguments and then minimum of all possible minimum
   cuts is calculated.
 
-  Starting from version 0.5 igraph can return the edges in the minimum
-  cut for undirected graphs.
-
-  Starting from version 0.6 igraph can calculate the actual flow, not
-  just the flow value.
+  For undirected graphs the Stoer-Wagner algorithm (see reference below)
+  is used to calculate the minimum cut.
 }
 \value{
   For \code{graph.maxflow} a named list with components:
@@ -98,8 +94,11 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL,
     graph may fall apart into more than two components.}
 }
 \references{
-  A. V. Goldberg and R. E. Tarjan: ``A New Approach to the Maximum Flow
-  Problem'' Journal of the ACM 35:921-940, 1988.  
+  A. V. Goldberg and R. E. Tarjan: A New Approach to the Maximum Flow
+  Problem \emph{Journal of the ACM} 35:921-940, 1988.
+  
+  M. Stoer and F. Wagner: A simple min-cut algorithm, \emph{Journal of
+  the ACM}, 44 585-591, 1997.
 }
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{\code{\link{shortest.paths}}, \code{\link{edge.connectivity}},

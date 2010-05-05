@@ -741,9 +741,6 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
  * target vertex. The maximum flow is the flow with the maximum
  * value. </para>
  * 
- * <para> This function can only calculate the value of the maximum
- * flow, but not the flow itself (may be added later). </para>
- * 
  * <para> According to a theorem by Ford and Furkelson 
  * (L. R. Ford Jr. and D. R. Fulkerson. Maximal flow through a
  * network. Canadian J. Math., 8:399-404, 1956.) the maximum flow
@@ -770,7 +767,8 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
  * push-relabel method for the maximum flow problem, (Algorithmica, 
  * 19:390--410, 1997) on all the graph classes i've tried.
  * 
- * \sa \ref igraph_mincut_value(), \ref igraph_edge_connectivity(),
+ * \sa \ref igraph_maxflow() to calculate the actual flow. 
+ * \ref igraph_mincut_value(), \ref igraph_edge_connectivity(),
  * \ref igraph_vertex_connectivity() for 
  * properties based on the maximum flow.
  */
@@ -1256,20 +1254,21 @@ int igraph_i_mincut_directed(const igraph_t *graph,
  * \function igraph_mincut
  * \brief Calculates the minimum cut in a graph.
  * 
- * This function calculates the minimum cut in a graph. Right now it
- * is implemented only for undirected graphs, in which case it uses
- * the Stoer-Wagner algorithm, as described in M. Stoer and F. Wagner: 
- * A simple min-cut algorithm, Journal of the ACM, 44 585-591, 1997. 
- * 
- * </para><para>
+ * This function calculates the minimum cut in a graph. 
  * The minimum cut is the minimum set of edges which needs to be
  * removed to disconnect the graph. The minimum is calculated using
  * the weigths (\p capacity) of the edges, so the cut with the minimum
  * total capacity is calculated. 
  * 
+ * </para><para> For directed graphs an implementation based on
+ * calculating 2|V|-2 maximum flows is used. 
+ * For undirected graphs we use the Stoer-Wagner
+ * algorithm, as described in M. Stoer and F. Wagner: A simple min-cut
+ * algorithm, Journal of the ACM, 44 585-591, 1997.
+ * 
  * </para><para>
- * The first implementation of the actual cut calculation was made by 
- * Gregory Benison, thanks Greg.
+ * The first implementation of the actual cut calculation for
+ * undirected graphs was made by Gregory Benison, thanks Greg.
  * \param graph The input graph.
  * \param value Pointer to an integer, the value of the cut will be
  *    stored here.
@@ -1291,8 +1290,10 @@ int igraph_i_mincut_directed(const igraph_t *graph,
  * \sa \ref igraph_mincut_value(), a simpler interface for calculating
  * the value of the cut only.
  *
- * Time complexity: for undirected graphs it is O(|V|E|+|V|^2 log|V|),
- * |V| and |E| are the number of vertices and edges respectively.
+ * Time complexity: for directed graphs it is O(|V|^4), but see the
+ * remarks at \ref igraph_maxflow(). For undirected graphs it is
+ * O(|V||E|+|V|^2 log|V|). |V| and |E| are the number of vertices and
+ * edges respectively.
  */
 
 int igraph_mincut(const igraph_t *graph,
