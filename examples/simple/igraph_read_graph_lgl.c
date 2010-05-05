@@ -33,7 +33,7 @@ int main() {
   if (!input) { 
     return 1;
   }
-  igraph_read_graph_lgl(&g, input, 0, 0, 1);
+  igraph_read_graph_lgl(&g, input, 0, IGRAPH_ADD_WEIGHTS_NO, 1);
   fclose(input);
   if (!igraph_is_directed(&g)) {
     return 2;
@@ -46,7 +46,7 @@ int main() {
   if (!input) {
     return 3;
   }
-  igraph_read_graph_lgl(&g, input, 0, 0, 1);
+  igraph_read_graph_lgl(&g, input, 0, IGRAPH_ADD_WEIGHTS_NO, 1);
   fclose(input);
   if (!igraph_is_directed(&g)) {
     return 4;
@@ -56,7 +56,7 @@ int main() {
 
   /* Same graph, but forcing undirected mode */
   input=fopen("igraph_read_graph_lgl-2.lgl", "r");
-  igraph_read_graph_lgl(&g, input, 0, 0, 0);
+  igraph_read_graph_lgl(&g, input, 0, IGRAPH_ADD_WEIGHTS_NO, 0);
   fclose(input);
   if (igraph_is_directed(&g)) {
     return 5;
@@ -70,7 +70,8 @@ int main() {
     return 6;
   }
   igraph_set_error_handler(igraph_error_handler_ignore);
-  if (igraph_read_graph_lgl(&g, input, 0, 0, 1) != IGRAPH_PARSEERROR) {
+  if (igraph_read_graph_lgl(&g, input, 0, IGRAPH_ADD_WEIGHTS_NO, 1) !=
+		  IGRAPH_PARSEERROR) {
     return 7;
   }
   fclose(input);

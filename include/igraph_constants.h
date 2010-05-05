@@ -111,6 +111,10 @@ typedef enum { IGRAPH_SPINCOMM_IMP_ORIG=0,
 typedef enum { IGRAPH_COMMCMP_VI = 0,
                IGRAPH_COMMCMP_NMI } igraph_community_comparison_t;
 
+typedef enum { IGRAPH_ADD_WEIGHTS_NO = 0,
+               IGRAPH_ADD_WEIGHTS_YES,
+               IGRAPH_ADD_WEIGHTS_IF_PRESENT } igraph_add_weights_t;
+
 typedef igraph_real_t  igraph_scalar_function_t(const igraph_vector_t *var, 
 						const igraph_vector_t *par,
 						void* extra);

@@ -34,6 +34,7 @@
 # define __END_DECLS /* empty */
 #endif
 
+#include "igraph_constants.h"
 #include "igraph_datatype.h"
 #include "igraph_types.h"
 #include "igraph_strvector.h"
@@ -50,9 +51,9 @@ int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
 			       igraph_integer_t n, igraph_bool_t directed);
 int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 			   igraph_strvector_t *predefnames, igraph_bool_t names, 
-			  igraph_bool_t weights, igraph_bool_t directed);
+			  igraph_add_weights_t weights, igraph_bool_t directed);
 int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
-			  igraph_bool_t names, igraph_bool_t weights,
+			  igraph_bool_t names, igraph_add_weights_t weights,
 			  igraph_bool_t directed);
 int igraph_read_graph_pajek(igraph_t *graph, FILE *instream);
 int igraph_read_graph_graphml(igraph_t *graph, FILE *instream,

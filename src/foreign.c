@@ -124,6 +124,7 @@ extern int igraph_ncol_yyparse(void);
 extern FILE *igraph_ncol_yyin;
 extern int igraph_i_ncol_eof;
 long int igraph_ncol_mylineno;
+igraph_bool_t igraph_ncol_has_weights=0;
 igraph_vector_t *igraph_ncol_vector=0;
 igraph_vector_t *igraph_ncol_weights=0;
 igraph_trie_t *igraph_ncol_trie=0;
@@ -164,9 +165,14 @@ extern char *igraph_i_ncol_errmsg;
  * \param names Logical value, if TRUE the symbolic names of the
  *        vertices will be added to the graph as a vertex attribute
  *        called \quote name\endquote.
- * \param weights Logical value, if TRUE the weights of the
- *        edges is added to the graph as an edge attribute called
- *        \quote weight\endquote.
+ * \param weights Whether to add the weights of the edges to the
+ *        graph as an edge attribute called \quote weight\endquote.
+ *        \c IGRAPH_ADD_WEIGHTS_YES adds the weights (even if they
+ *        are not present in the file, in this case they are assumed
+ *        to be zero). \c IGRAPH_ADD_WEIGHTS_NO does not add any
+ *        edge attribute. \c IGRAPH_ADD_WEIGHTS_IF_PRESENT adds the
+ *        attribute if and only if there is at least one explicit
+ *        edge weight in the input file.
  * \param directed Whether to create a directed graph. As this format
  *        was originally used only for undirected graphs there is no
  *        information in the file about the directedness of the graph.
@@ -188,7 +194,8 @@ extern char *igraph_i_ncol_errmsg;
 
 int igraph_read_graph_ncol(igraph_t *graph, FILE *instream, 
 			   igraph_strvector_t *predefnames,
-			   igraph_bool_t names, igraph_bool_t weights, igraph_bool_t directed) {
+			   igraph_bool_t names, igraph_add_weights_t weights,
+			   igraph_bool_t directed) {
   
   igraph_vector_t edges, ws;
   igraph_trie_t trie=IGRAPH_TRIE_NULL;
@@ -214,12 +221,13 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
       igraph_strvector_get(predefnames, i, &key);
       igraph_trie_get(&trie, key, &id);
       if (id != i) {
-	IGRAPH_WARNING("reading NCOL file, duplicate entry in predefnames");
-	no_predefined--;
+        IGRAPH_WARNING("reading NCOL file, duplicate entry in predefnames");
+        no_predefined--;
       }
     }
   }
   
+  igraph_ncol_has_weights=0;
   igraph_ncol_vector=&edges;
   igraph_ncol_weights=&ws;
   igraph_ncol_trie=&trie;
@@ -252,7 +260,8 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     VECTOR(name)[0]=&namerec;
   }
 
-  if (weights) {
+  if (weights == IGRAPH_ADD_WEIGHTS_YES ||
+      (weights == IGRAPH_ADD_WEIGHTS_IF_PRESENT && igraph_ncol_has_weights)) {
     IGRAPH_CHECK(igraph_vector_ptr_init(&weight, 1)); 
     pweight=&weight;
     weightrec.name=weightstr;
@@ -282,6 +291,7 @@ extern int igraph_lgl_yyparse(void);
 extern FILE *igraph_lgl_yyin;
 extern int igraph_i_lgl_eof;
 long int igraph_lgl_mylineno;
+igraph_bool_t igraph_lgl_has_weights=0;
 igraph_vector_t *igraph_lgl_vector=0;
 igraph_vector_t *igraph_lgl_weights=0;
 igraph_trie_t *igraph_lgl_trie=0;
@@ -320,9 +330,14 @@ vertex3name [optionalWeight] \endverbatim
  * \param names Logical value, if TRUE the symbolic names of the
  *        vertices will be added to the graph as a vertex attribute
  *        called \quote name\endquote.
- * \param weights Logical value, if TRUE the weights of the
- *        edges is added to the graph as an edge attribute called
- *        \quote weight\endquote.
+ * \param weights Whether to add the weights of the edges to the
+ *        graph as an edge attribute called \quote weight\endquote.
+ *        \c IGRAPH_ADD_WEIGHTS_YES adds the weights (even if they
+ *        are not present in the file, in this case they are assumed
+ *        to be zero). \c IGRAPH_ADD_WEIGHTS_NO does not add any
+ *        edge attribute. \c IGRAPH_ADD_WEIGHTS_IF_PRESENT adds the
+ *        attribute if and only if there is at least one explicit
+ *        edge weight in the input file.
  * \param directed Whether to create a directed graph. As this format
  *        was originally used only for undirected graphs there is no
  *        information in the file about the directedness of the graph.
@@ -343,7 +358,8 @@ vertex3name [optionalWeight] \endverbatim
  */
 
 int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
-			  igraph_bool_t names, igraph_bool_t weights, igraph_bool_t directed) {
+			   igraph_bool_t names, igraph_add_weights_t weights,
+			   igraph_bool_t directed) {
 
   igraph_vector_t edges=IGRAPH_VECTOR_NULL, ws=IGRAPH_VECTOR_NULL;
   igraph_trie_t trie=IGRAPH_TRIE_NULL;
@@ -356,6 +372,7 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   IGRAPH_TRIE_INIT_FINALLY(&trie, names);
   
+  igraph_lgl_has_weights=0;
   igraph_lgl_vector=&edges;
   igraph_lgl_weights=&ws;
   igraph_lgl_trie=&trie;
@@ -387,7 +404,8 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
     VECTOR(name)[0]=&namerec;
   }
 
-  if (weights) {
+  if (weights == IGRAPH_ADD_WEIGHTS_YES ||
+      (weights == IGRAPH_ADD_WEIGHTS_IF_PRESENT && igraph_lgl_has_weights)) {
     IGRAPH_CHECK(igraph_vector_ptr_init(&weight, 1)); 
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, &weight);
     pweight=&weight;
@@ -2742,6 +2760,7 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
 
 #include "foreign-dl-header.h"
 
+extern int igraph_dl_yyparse(void);
 extern FILE *igraph_dl_yyin;
 int igraph_dl_eof;
 long int igraph_dl_mylineno;

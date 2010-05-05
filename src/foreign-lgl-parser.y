@@ -57,6 +57,7 @@ int igraph_lgl_yyerror(char *s);
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "config.h"
+extern igraph_bool_t igraph_lgl_has_weights;
 extern igraph_vector_t *igraph_lgl_vector;
 extern igraph_vector_t *igraph_lgl_weights;
 extern igraph_trie_t *igraph_lgl_trie;
@@ -96,13 +97,14 @@ edges :   /* empty */ | edge edges ;
 
 edge :   edgeid NEWLINE             { 
              igraph_vector_push_back(igraph_lgl_vector, igraph_lgl_actvertex);
-	     igraph_vector_push_back(igraph_lgl_vector, $1);
-	     igraph_vector_push_back(igraph_lgl_weights, 0);
+             igraph_vector_push_back(igraph_lgl_vector, $1);
+             igraph_vector_push_back(igraph_lgl_weights, 0);
            }
        | edgeid weight NEWLINE      { 
              igraph_vector_push_back(igraph_lgl_vector, igraph_lgl_actvertex);
-	     igraph_vector_push_back(igraph_lgl_vector, $1);
-	     igraph_vector_push_back(igraph_lgl_weights, $2);
+             igraph_vector_push_back(igraph_lgl_vector, $1);
+             igraph_vector_push_back(igraph_lgl_weights, $2);
+			 igraph_lgl_has_weights = 1;
            } 
 ;
 
