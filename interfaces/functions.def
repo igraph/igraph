@@ -1065,12 +1065,12 @@ igraph_read_graph_edgelist:
 
 igraph_read_graph_ncol:
         PARAMS: OUT GRAPH graph, INFILE instream, STRVECTOR_OR_0 predefnames, \
-                BOOLEAN names=True, BOOLEAN weights=True, BOOLEAN directed=True
+                BOOLEAN names=True, ADD_WEIGHTS weights=True, BOOLEAN directed=True
         IGNORE: RR, RC, RNamespace
 
 igraph_read_graph_lgl:
         PARAMS: OUT GRAPH graph, INFILE instream, BOOLEAN names=True, \
-                BOOLEAN weights=True, BOOLEAN directed=True
+                ADD_WEIGHTS weights=True, BOOLEAN directed=True
         IGNORE: RR, RC, RNamespace
 
 igraph_read_graph_pajek:
