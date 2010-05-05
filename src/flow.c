@@ -1198,7 +1198,7 @@ int igraph_i_mincut_directed(const igraph_t *graph,
     }
     IGRAPH_CHECK(igraph_maxflow(graph, /*value=*/ &flow, /*flow=*/ 0,
 				pcut, ppartition, ppartition2, /*source=*/ i,
-				/*target=*/ i, capacity));
+				/*target=*/ 0, capacity));
     if (flow < minmaxflow) {
       minmaxflow = flow;
       if (cut) { 
