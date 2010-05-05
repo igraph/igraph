@@ -331,9 +331,9 @@ int igraph_attribute_combination_query(const igraph_attribute_combination_t *com
 				       const char *name,
 				       igraph_attribute_combination_type_t *type,
 				       void **func) {
-  long int i, def=-1, n=igraph_vector_ptr_size(&comb->list);
+  long int i, def=-1, len=igraph_vector_ptr_size(&comb->list);
 
-  for (i=0; i<n; i++) {
+  for (i=0; i<len; i++) {
     igraph_attribute_combination_record_t *rec=VECTOR(comb->list)[i];
     const char *n=rec->name;
     if ( (!name && !n) ||
