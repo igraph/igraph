@@ -196,14 +196,14 @@ write.graph.ncol <- function(graph, file,
 }  
 
 read.graph.lgl <- function(file, names=TRUE,
-                           weights=TRUE, ...) {
+                           weights=TRUE, directed=FALSE, ...) {
 
   if (length(list(...))>0) {
     stop("Unknown arguments to read.graph (LGL format)")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_read_graph_lgl", file,
-        as.logical(names), as.logical(weights),
+        as.logical(names), as.logical(weights), as.logical(directed),
         PACKAGE="igraph")
 }
 
