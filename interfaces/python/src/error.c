@@ -48,6 +48,7 @@ PyObject* igraphmodule_handle_igraph_error()
     PyErr_SetString(igraphmodule_InternalError,
 		    "Internal igraph error. Please contact the author!");
   }
+
   return NULL;
 }
 
@@ -74,9 +75,14 @@ void igraphmodule_igraph_error_hook(const char *reason, const char *file,
   if (igraph_errno == IGRAPH_UNIMPLEMENTED)
       exc = PyExc_NotImplementedError;
 
+  if (igraph_errno == IGRAPH_ENOMEM)
+      exc = PyExc_MemoryError;
+
   sprintf(buf, "Error at %s:%i: %s, %s", file, line, reason,
 	  igraph_strerror(igraph_errno));
   IGRAPH_FINALLY_FREE();
 
-  PyErr_SetString(exc, buf);
+  /* make sure we are not masking already thrown exceptions */
+  if (!PyErr_Occurred())
+    PyErr_SetString(exc, buf);
 }
