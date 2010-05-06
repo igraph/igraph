@@ -165,6 +165,11 @@ COMMCMP:
     DEFAULT:
        VI: c("vi", "nmi")
 
+SUBGRAPH_IMPL:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "auto"=0, "copy_and_delete"=1, "create_from_scratch"=2)
+    DEFAULT:
+       AUTO: c("auto", "copy_and_delete", "create_from_scratch")
+
 EDGE_ATTRIBUTE_COMBINATION:
     INCONV: %I% <- igraph.i.attribute.combination(%I%)
     DEFAULT: 

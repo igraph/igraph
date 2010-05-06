@@ -471,6 +471,14 @@ COMMCMP:
     IN: %C%=REAL(%I%)[0];
 
 ##################################
+# Subgraph implementations
+
+SUBGRAPH_IMPL:
+  CTYPE: igraph_integer_t
+  INCONV:
+    IN: %C%=REAL(%I%)[0];
+
+##################################
 # Specification on what to do with the attributes
 
 VERTEX_ATTRIBUTE_COMBINATION:

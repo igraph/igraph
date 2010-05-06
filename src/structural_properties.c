@@ -1,4 +1,5 @@
 /* -*- mode: C -*-  */
+/* vim:set ts=2 sts=2 sw=2 et: */
 /* 
    IGraph library.
    Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
@@ -1736,40 +1737,13 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
   return 0;
 }
 
-/**
- * \ingroup structural
- * \function igraph_subgraph
- * \brief Creates a subgraph with the specified vertices.
- * 
- * </para><para>
- * This function collects the specified vertices and all edges between
- * them to a new graph.
- * As the vertex ids in a graph always start with zero, this function
- * very likely needs to reassign ids to the vertices.
- * \param graph The graph object.
- * \param res The subgraph, another graph object will be stored here,
- *        do \em not initialize this object before calling this
- *        function, and call \ref igraph_destroy() on it if you don't need
- *        it any more.
- * \param vids A vertex selector describing which vertices to keep.
- * \return Error code:
- *         \c IGRAPH_ENOMEM, not enough memory for
- *         temporary data. 
- *         \c IGRAPH_EINVVID, invalid vertex id in
- *         \p vids. 
- * 
- * Time complexity: O(|V|+|E|),
- * |V| and
- * |E| are the number of vertices and
- * edges in the original graph.
- *
- * \sa \ref igraph_delete_vertices() to delete the specified set of
- * vertices from a graph, the opposite of this function.
- */
 
-int igraph_subgraph(const igraph_t *graph, igraph_t *res, 
-		    const igraph_vs_t vids) {
-  
+/**
+ * Subgraph creation, old version: it copies the graph and then deletes
+ * unneeded vertices.
+ */
+int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
+		const igraph_vs_t vids) {
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t delete=IGRAPH_VECTOR_NULL;
   char *remain;
@@ -1813,6 +1787,263 @@ int igraph_subgraph(const igraph_t *graph, igraph_t *res,
   igraph_vit_destroy(&vit);
   IGRAPH_FINALLY_CLEAN(3);
   return 0;
+}
+
+/**
+ * Subgraph creation, new version: creates the new graph instead of
+ * copying the old one.
+ */
+int igraph_i_subgraph_create_from_scratch(const igraph_t *graph, igraph_t *res,
+		const igraph_vs_t vids) {
+  igraph_bool_t directed = igraph_is_directed(graph);
+  long int no_of_nodes = igraph_vcount(graph);
+  long int no_of_new_nodes = 0;
+  char* seen_edges = 0;
+  long int i, j, n;
+  igraph_vector_t vids_old2new, vids_new2old;
+  igraph_vector_t eids_new2old;
+  igraph_vector_t nei_edges;
+  igraph_vector_t new_edges;
+  igraph_vit_t vit;
+
+  /* The order of initialization is important here, they will be destroyed in the
+   * opposite order */
+  IGRAPH_VECTOR_INIT_FINALLY(&eids_new2old, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&vids_new2old, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&new_edges, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&nei_edges, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&vids_old2new, no_of_nodes);
+
+  IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+  IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+
+  /* Calculate the mapping from the old node IDs to the new ones. The other
+   * igraph_simplify implementation in igraph_i_simplify_copy_and_delete
+   * ensures that the order of vertex IDs is kept during remapping (i.e.
+   * if the old ID of vertex A is less than the old ID of vertex B, then
+   * the same will also be true for the new IDs). To ensure compatibility
+   * with the other implementation, we have to fetch the vertex IDs into
+   * a vector first and then sort it. We temporarily use new_edges for that.
+   */
+  IGRAPH_CHECK(igraph_vit_as_vector(&vit, &nei_edges));
+  igraph_vit_destroy(&vit);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  igraph_vector_sort(&nei_edges);
+  n = igraph_vector_size(&nei_edges);
+  for (i = 0; i < n; i++) {
+    long int vid = (long int) VECTOR(nei_edges)[i];
+    if (VECTOR(vids_old2new)[vid] == 0) {
+      VECTOR(vids_old2new)[vid] = ++no_of_new_nodes;
+    }
+  }
+
+  /* Allocate some memory for the seen_edges array that avoids processing edges
+   * twice for undirected graphs */
+  if (!directed) {
+    seen_edges = igraph_Calloc(igraph_ecount(graph), char);
+    if (seen_edges == 0)
+      IGRAPH_ERROR("cannot calculate subgraph", IGRAPH_ENOMEM);
+    IGRAPH_FINALLY(igraph_free, seen_edges);
+  }
+
+  /* Calculate the mapping from the new node IDs to the new ones
+   * and also create the new edge list */
+  IGRAPH_CHECK(igraph_vector_resize(&vids_new2old, no_of_new_nodes));
+  for (i = 0; i < no_of_nodes; i++) {
+    long int new_vid = VECTOR(vids_old2new)[i] - 1;
+    if (new_vid < 0)
+      continue;
+
+    VECTOR(vids_new2old)[new_vid] = i;
+
+    IGRAPH_CHECK(igraph_adjacent(graph, &nei_edges, i, IGRAPH_OUT));
+    n = igraph_vector_size(&nei_edges);
+
+    if (directed) {
+      for (j = 0; j < n; j++) {
+        igraph_integer_t eid  = VECTOR(nei_edges)[j];
+        long int from, to;
+
+        from = VECTOR(vids_old2new)[(long int)IGRAPH_FROM(graph, eid)];
+        if (!from) continue;
+        to = VECTOR(vids_old2new)[(long int)IGRAPH_TO(graph, eid)];
+        if (!to) continue;
+
+        IGRAPH_CHECK(igraph_vector_push_back(&new_edges, from-1));
+        IGRAPH_CHECK(igraph_vector_push_back(&new_edges, to-1));
+        IGRAPH_CHECK(igraph_vector_push_back(&eids_new2old, eid));
+      }
+    } else {
+      for (j = 0; j < n; j++) {
+        igraph_integer_t eid  = VECTOR(nei_edges)[j];
+        long int from, to;
+
+        from = VECTOR(vids_old2new)[(long int)IGRAPH_FROM(graph, eid)];
+        if (!from) continue;
+        to = VECTOR(vids_old2new)[(long int)IGRAPH_TO(graph, eid)];
+        if (!to) continue;
+        if (seen_edges[(long int)eid])
+          continue;
+
+        seen_edges[(long int)eid] = 1;
+        IGRAPH_CHECK(igraph_vector_push_back(&new_edges, from-1));
+        IGRAPH_CHECK(igraph_vector_push_back(&new_edges, to-1));
+        IGRAPH_CHECK(igraph_vector_push_back(&eids_new2old, eid));
+      }
+    }
+  }
+
+  /* Get rid of some vectors that are not needed anymore */
+  if (!directed) {
+    igraph_free(seen_edges);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  igraph_vector_destroy(&vids_old2new);
+  igraph_vector_destroy(&nei_edges);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  /* Create the new graph */
+  res->attr=0;           /* Why is this needed? TODO */
+  IGRAPH_CHECK(igraph_create(res, &new_edges, no_of_new_nodes, directed));
+
+  /* Now we can also get rid of the new_edges vector */
+  igraph_vector_destroy(&new_edges);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  /* Make sure that the newly created graph is destroyed if something happens from
+   * now on */
+  IGRAPH_FINALLY(igraph_destroy, res);
+
+  /* Copy the graph attributes */
+  IGRAPH_CHECK(igraph_i_attribute_copy(res, graph,
+        /* ga = */ 1, /* va = */ 0, /* ea = */ 0));
+
+  /* Copy the vertex attributes */
+  IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph, res, &vids_new2old));
+
+  /* Copy the edge attributes */
+  IGRAPH_CHECK(igraph_i_attribute_permute_edges(graph, res, &eids_new2old));
+
+  igraph_vector_destroy(&vids_new2old);
+  igraph_vector_destroy(&eids_new2old);
+  IGRAPH_FINALLY_CLEAN(3);   /* 2 + 1 since we don't need to destroy res */
+
+  return 0;
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_subgraph
+ * \brief Creates a subgraph induced by the specified vertices.
+ * 
+ * </para><para>
+ * This function is an alias to \ref igraph_induced_subgraph(), it is
+ * left here to ensure API compatibility with igraph < 0.6.
+ *
+ * </para><para>
+ * This function collects the specified vertices and all edges between
+ * them to a new graph.
+ * As the vertex ids in a graph always start with zero, this function
+ * very likely needs to reassign ids to the vertices.
+ * \param graph The graph object.
+ * \param res The subgraph, another graph object will be stored here,
+ *        do \em not initialize this object before calling this
+ *        function, and call \ref igraph_destroy() on it if you don't need
+ *        it any more.
+ * \param vids A vertex selector describing which vertices to keep.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM, not enough memory for
+ *         temporary data. 
+ *         \c IGRAPH_EINVVID, invalid vertex id in
+ *         \p vids. 
+ * 
+ * Time complexity: O(|V|+|E|),
+ * |V| and
+ * |E| are the number of vertices and
+ * edges in the original graph.
+ *
+ * \sa \ref igraph_delete_vertices() to delete the specified set of
+ * vertices from a graph, the opposite of this function.
+ */
+
+int igraph_subgraph(const igraph_t *graph, igraph_t *res, 
+		    const igraph_vs_t vids) {
+  return igraph_induced_subgraph(graph, res, vids, IGRAPH_SUBGRAPH_AUTO);
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_induced_subgraph
+ * \brief Creates a subgraph induced by the specified vertices.
+ * 
+ * </para><para>
+ * This function collects the specified vertices and all edges between
+ * them to a new graph.
+ * As the vertex ids in a graph always start with zero, this function
+ * very likely needs to reassign ids to the vertices.
+ * \param graph The graph object.
+ * \param res The subgraph, another graph object will be stored here,
+ *        do \em not initialize this object before calling this
+ *        function, and call \ref igraph_destroy() on it if you don't need
+ *        it any more.
+ * \param vids A vertex selector describing which vertices to keep.
+ * \param impl This parameter selects which implementation should we
+ *        use when constructing the new graph. Basically there are two
+ *        possibilities: \c IGRAPH_SUBGRAPH_COPY_AND_DELETE copies the
+ *        existing graph and deletes the vertices that are not needed
+ *        in the new graph, while \c IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH
+ *        constructs the new graph from scratch without copying the old
+ *        one. The latter is more efficient if you are extracting a
+ *        relatively small subpart of a very large graph, while the
+ *        former is better if you want to extract a subgraph whose size
+ *        is comparable to the size of the whole graph. There is a third
+ *        possibility: \c IGRAPH_SUBGRAPH_AUTO will select one of the
+ *        two methods automatically based on the ratio of the number
+ *        of vertices in the new and the old graph.
+ *
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM, not enough memory for
+ *         temporary data. 
+ *         \c IGRAPH_EINVVID, invalid vertex id in
+ *         \p vids. 
+ * 
+ * Time complexity: O(|V|+|E|),
+ * |V| and
+ * |E| are the number of vertices and
+ * edges in the original graph.
+ *
+ * \sa \ref igraph_delete_vertices() to delete the specified set of
+ * vertices from a graph, the opposite of this function.
+ */
+int igraph_induced_subgraph(const igraph_t *graph, igraph_t *res, 
+		    const igraph_vs_t vids, igraph_subgraph_implementation_t impl) {
+  if (impl == IGRAPH_SUBGRAPH_AUTO) {
+    double ratio;
+
+    if (igraph_vs_is_all(&vids))
+      ratio = 1.0;
+    else {
+      IGRAPH_CHECK(igraph_vs_size(graph, &vids, &ratio));
+      ratio /= igraph_vcount(graph);
+    }
+
+    if (ratio > 0.5)
+      impl = IGRAPH_SUBGRAPH_COPY_AND_DELETE;
+    else
+      impl = IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH;
+  }
+
+  switch (impl) {
+    case IGRAPH_SUBGRAPH_COPY_AND_DELETE:
+	    return igraph_i_subgraph_copy_and_delete(graph, res, vids);
+
+    case IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH:
+      return igraph_i_subgraph_create_from_scratch(graph, res, vids);
+
+    default:
+      IGRAPH_ERROR("unknown subgraph implementation type", IGRAPH_EINVAL);
+  }
 }
 
 /**

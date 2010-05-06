@@ -412,6 +412,10 @@ igraph_rewire:
         PARAMS: INOUT GRAPH rewire, INTEGER n, REWIRINGMODE mode=SIMPLE
         IGNORE: RR, RC, RNamespace
 
+igraph_induced_subgraph:
+        PARAMS: GRAPH graph, OUT GRAPH res, VERTEXSET vids, SUBGRAPH_IMPL impl=AUTO
+        IGNORE: RR, RC, RNamespace
+
 igraph_subgraph:
         PARAMS: GRAPH graph, OUT GRAPH res, VERTEXSET vids
         IGNORE: RR, RC, RNamespace

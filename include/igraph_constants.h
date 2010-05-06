@@ -115,6 +115,11 @@ typedef enum { IGRAPH_ADD_WEIGHTS_NO = 0,
                IGRAPH_ADD_WEIGHTS_YES,
                IGRAPH_ADD_WEIGHTS_IF_PRESENT } igraph_add_weights_t;
 
+typedef enum { IGRAPH_SUBGRAPH_AUTO = 0,
+	           IGRAPH_SUBGRAPH_COPY_AND_DELETE,
+			   IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH
+			 } igraph_subgraph_implementation_t;
+
 typedef igraph_real_t  igraph_scalar_function_t(const igraph_vector_t *var, 
 						const igraph_vector_t *par,
 						void* extra);
