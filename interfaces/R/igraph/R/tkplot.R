@@ -683,18 +683,23 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
     label.degree <- ifelse(length(tkp$params$label.degree)>1,
                            tkp$params$label.degree[id+1],
                            tkp$params$label.degree)
+    label.color <- if (length(tkp$params$label.color)>1) {
+      tkp$params$label.color[id+1]
+    } else {
+      tkp$params$label.color
+    }
     label.dist <- tkp$params$label.dist
     label.x <- x+label.dist*cos(label.degree)*
       (vertex.size+6+4*(ceiling(log10(id+1))))
     label.y <- y+label.dist*sin(label.degree)*
       (vertex.size+6+4*(ceiling(log10(id+1))))
     if (label.dist==0)
-      { afill <- tkp$params$label.color }
+      { afill <- label.color }
     else
       { afill <- "red" }
     litem <- tkcreate(tkp$canvas, "text", label.x, label.y,
                       text=as.character(label), state="normal",
-                      fill=tkp$params$label.color, activefill=afill,
+                      fill=label.color, activefill=afill,
                       font=tkp$params$label.font)
     tkaddtag(tkp$canvas, "label", "withtag", litem)
     tkaddtag(tkp$canvas, paste("v-", id, sep=""), "withtag", litem)
@@ -826,12 +831,15 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
                        tkp$params$edge.labels[id],
                        tkp$params$edge.labels)
   if (!is.na(edge.label)) {
+    label.color <- ifelse(length(tkp$params$edge.label.color)>1,
+                          tkp$params$edge.label.color[id],
+                          tkp$params$edge.label.color)
     ## not correct for loop edges but we will update anyway...
     label.x <- (to.c[1]+from.c[1])/2
     label.y <- (to.c[2]+from.c[2])/2
     litem <- tkcreate(tkp$canvas, "text", label.x, label.y,
                       text=as.character(edge.label), state="normal",
-                      fill=tkp$params$edge.label.color,
+                      fill=label.color,
                       font=tkp$params$edge.label.font)
     tkaddtag(tkp$canvas, "label", "withtag", litem)
     tkaddtag(tkp$canvas, paste(sep="", "edge-", id), "withtag", litem)
