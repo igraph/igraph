@@ -1969,6 +1969,8 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph, igraph_t *res,
 
 int igraph_subgraph(const igraph_t *graph, igraph_t *res, 
 		    const igraph_vs_t vids) {
+	IGRAPH_WARNING("igraph_subgraph is deprecated from igraph 0.6, "
+			           "use igraph_induced_subgraph instead");
   return igraph_induced_subgraph(graph, res, vids, IGRAPH_SUBGRAPH_AUTO);
 }
 
