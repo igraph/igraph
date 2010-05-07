@@ -406,23 +406,23 @@ int igraphmodule_PyObject_to_real_t(PyObject *object, igraph_real_t *v) {
   if (object == NULL) {
   } else if (PyInt_Check(object)) {
     long l = PyInt_AS_LONG((PyIntObject*)object);
-    *v=l;
+    *v=(igraph_real_t)l;
     return 0;
   } else if (PyLong_Check(object)) {
     double d = PyLong_AsDouble(object);
-    *v=d;
+    *v=(igraph_real_t)d;
     return 0;
   } else if (PyFloat_Check(object)) {
     double d = PyFloat_AS_DOUBLE((PyFloatObject*)object);
-    *v=d;
+    *v=(igraph_real_t)d;
     return 0;
   } else if (PyNumber_Check(object)) {
-    PyObject *i = PyNumber_Int(object);
-    long l;
+    PyObject *i = PyNumber_Float(object);
+    double d;
     if (i == NULL) return 1;
-    l = PyInt_AS_LONG((PyIntObject*)i);
+    d = PyFloat_AS_DOUBLE((PyFloatObject*)i);
     Py_DECREF(i);
-    *v = l;
+    *v = (igraph_real_t)d;
     return 0;
   }
   PyErr_BadArgument();

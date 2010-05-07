@@ -705,6 +705,40 @@ static PyObject* igraphmodule_i_ac_builtin_func(PyObject* values,
 /* Auxiliary function for combining vertices/edges. Given a merge list
  * (which specifies the vertex/edge IDs that were merged and the source
  * attribute values, returns a new list with the new attribute values.
+ * Each new attribute is derived from the sum of the attributes of
+ * the merged vertices/edges.
+ */
+static PyObject* igraphmodule_i_ac_sum(PyObject* values,
+    const igraph_vector_ptr_t *merges) {
+  long int i, len = igraph_vector_ptr_size(merges);
+  PyObject *res, *item;
+
+  res = PyList_New(len);
+  for (i = 0; i < len; i++) {
+    igraph_vector_t *v = (igraph_vector_t*)VECTOR(*merges)[i];
+    igraph_real_t num = 0.0, sum = 0.0;
+    long int j, n = igraph_vector_size(v);
+
+    for (j = 0; j < n; j++) {
+      item = PyList_GET_ITEM(values, (Py_ssize_t)VECTOR(*v)[j]);
+      if (igraphmodule_PyObject_to_real_t(item, &num)) {
+        PyErr_SetString(PyExc_TypeError, "product can only be invoked on numeric attributes");
+        Py_DECREF(res);
+        return 0;
+      }
+      sum += num;
+    }
+
+    /* reference to new float stolen */
+    PyList_SET_ITEM(res, i, PyFloat_FromDouble((double)sum));
+  }
+
+  return res;
+}
+
+/* Auxiliary function for combining vertices/edges. Given a merge list
+ * (which specifies the vertex/edge IDs that were merged and the source
+ * attribute values, returns a new list with the new attribute values.
  * Each new attribute is derived from the product of the attributes of
  * the merged vertices/edges.
  */
@@ -984,7 +1018,7 @@ static int igraphmodule_i_attribute_combine_dicts(PyObject *dict,
         break;
 
       case IGRAPH_ATTRIBUTE_COMBINE_SUM:
-        newvalue = igraphmodule_i_ac_builtin_func(value, merges, "sum");
+        newvalue = igraphmodule_i_ac_sum(value, merges);
         break;
 
       case IGRAPH_ATTRIBUTE_COMBINE_PROD:
