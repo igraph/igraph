@@ -4499,34 +4499,38 @@ PyObject *igraphmodule_Graph_subcomponent(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
- * \brief Returns a subgraph of the graph based on the given vertices
+ * \brief Returns an induced subgraph of the graph based on the given vertices
  * \return the subgraph as a new igraph object
- * \sa igraph_subgraph
+ * \sa igraph_induced_subgraph
  */
-PyObject *igraphmodule_Graph_subgraph(igraphmodule_GraphObject * self,
+PyObject *igraphmodule_Graph_induced_subgraph(igraphmodule_GraphObject * self,
                                       PyObject * args, PyObject * kwds)
 {
-  static char *kwlist[] = { "vertices", NULL };
+  static char *kwlist[] = { "vertices", "implementation", NULL };
   igraph_vs_t vs;
   igraph_t sg;
   igraphmodule_GraphObject *result;
-  PyObject *list;
+  PyObject *list, *impl_o = Py_None;
+  igraph_subgraph_implementation_t impl = IGRAPH_SUBGRAPH_AUTO;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &list))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &list, &impl_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_subgraph_implementation_t(impl_o, &impl))
     return NULL;
 
   if (igraphmodule_PyObject_to_vs_t(list, &vs, &self->g, 0))
     return NULL;
 
-  if (igraph_subgraph(&self->g, &sg, vs)) {
+  if (igraph_induced_subgraph(&self->g, &sg, vs, impl)) {
     igraphmodule_handle_igraph_error();
     igraph_vs_destroy(&vs);
     return NULL;
   }
 
-  CREATE_GRAPH(result, sg);
-
   igraph_vs_destroy(&vs);
+
+  CREATE_GRAPH(result, sg);
 
   return (PyObject *) result;
 }
@@ -9910,6 +9914,27 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@see: authority_score()\n"
   },
 
+  /* interface to igraph_induced_subgraph */
+  {"induced_subgraph", (PyCFunction) igraphmodule_Graph_induced_subgraph,
+   METH_VARARGS | METH_KEYWORDS,
+   "induced_subgraph(vertices, implementation=\"auto\")\n\n"
+   "Returns a subgraph spanned by the given vertices.\n\n"
+   "@param vertices: a list containing the vertex IDs which\n"
+   "  should be included in the result.\n"
+   "@param implementation: the implementation to use when constructing\n"
+   "  the new subgraph. igraph includes two implementations at the\n"
+   "  moment. C{\"copy_and_delete\"} copies the original graph and\n"
+   "  removes those vertices that are not in the given set. This is more\n"
+   "  efficient if the size of the subgraph is comparable to the original\n"
+   "  graph. The other implementation (C{\"create_from_scratch\"})\n"
+   "  constructs the result graph from scratch and then copies the\n"
+   "  attributes accordingly. This is a better solution if the subgraph\n"
+   "  is relatively small, compared to the original graph. C{\"auto\"}\n"
+   "  selects between the two implementations automatically, based on\n"
+   "  the ratio of the size of the subgraph and the size of the original\n"
+   "  graph.\n"
+   "@return: the subgraph\n"},
+
   /* interface to igraph_is_bipartite */
   {"is_bipartite", (PyCFunction) igraphmodule_Graph_is_bipartite,
    METH_VARARGS | METH_KEYWORDS,
@@ -10192,15 +10217,6 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  Note that this is not equal to calculating the union of the \n"
    "  results of L{IN} and L{OUT}.\n"
    "@return: the indices of vertices which are in the same component as a given vertex.\n"},
-
-  /* interface to igraph_subgraph */
-  {"subgraph", (PyCFunction) igraphmodule_Graph_subgraph,
-   METH_VARARGS | METH_KEYWORDS,
-   "subgraph(vertices)\n\n"
-   "Returns a subgraph spanned by the given vertices.\n\n"
-   "@param vertices: a list containing the vertex IDs which\n"
-   "  should be included in the result.\n"
-   "@return: the subgraph\n"},
 
   /* interface to igraph_subgraph_edges */
   {"subgraph_edges", (PyCFunction) igraphmodule_Graph_subgraph_edges,

@@ -58,7 +58,7 @@ int igraphmodule_PyObject_to_enum(PyObject *o,
     char *s, *s2;
     int i, best, best_result, best_unique;
     
-    if (o == 0 || o==Py_None) return 0;
+    if (o == 0 || o == Py_None) return 0;
     if (PyInt_Check(o)) { *result = (int)PyInt_AsLong(o); return 0; }
     if (PyLong_Check(o)) { *result = (int)PyLong_AsLong(o); return 0; }
     if (!PyString_Check(o)) {
@@ -305,6 +305,24 @@ int igraphmodule_PyObject_to_star_mode_t(PyObject *o,
     };
 
   return igraphmodule_PyObject_to_enum(o, star_mode_tt, (int*)result);
+}
+
+/**
+ * \ingroup python_interface_conversion
+ * \brief Converts a Python object to an igraph \c igraph_subgraph_implementation_t
+ */
+int igraphmodule_PyObject_to_subgraph_implementation_t(PyObject *o,
+  igraph_subgraph_implementation_t *result) {
+  static igraphmodule_enum_translation_table_entry_t subgraph_impl_tt[] = {
+        {"auto", IGRAPH_SUBGRAPH_AUTO},
+        {"copy_and_delete", IGRAPH_SUBGRAPH_COPY_AND_DELETE},
+        {"old", IGRAPH_SUBGRAPH_COPY_AND_DELETE},
+        {"create_from_scratch", IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH},
+        {"new", IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH},
+        {0,0}
+    };
+
+  return igraphmodule_PyObject_to_enum(o, subgraph_impl_tt, (int*)result);
 }
 
 /**

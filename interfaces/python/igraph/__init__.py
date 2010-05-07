@@ -77,6 +77,7 @@ class Graph(core.GraphBase):
 
     # Compatibility aliases
     shortest_paths_dijkstra = core.GraphBase.shortest_paths
+    subgraph = core.GraphBase.induced_subgraph
 
     def __init__(self, *args, **kwds):
         """__init__(n=None, edges=None, directed=None, graph_attrs=None, vertex_attrs=None, edge_attrs=None)
