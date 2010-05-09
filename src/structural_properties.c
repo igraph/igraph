@@ -6368,7 +6368,7 @@ int igraph_contract_vertices(igraph_t *graph,
     igraph_vector_destroy(&sizes);
     igraph_i_simplify_free(&merges);
     igraph_free(vecs);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(3);
   }
   
   IGRAPH_FINALLY_CLEAN(1);
