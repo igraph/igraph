@@ -3451,6 +3451,41 @@ PyObject *igraphmodule_Graph_cocitation(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Replaces multiple vertices with a single one.
+ * \return None.
+ * \sa igraph_contract_vertices
+ */
+PyObject *igraphmodule_Graph_contract_vertices(igraphmodule_GraphObject * self,
+	                                           PyObject * args, PyObject * kwds) {
+  static char* kwlist[] = {"mapping", "combine_attrs", NULL };
+  PyObject *mapping_o, *combination_o = Py_None;
+  igraph_vector_t mapping;
+  igraph_attribute_combination_t combination;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &mapping_o,
+		&combination_o))
+	return NULL;
+
+  if (igraphmodule_PyObject_to_attribute_combination_t(
+		combination_o, &combination))
+	return NULL;
+
+  if (igraphmodule_PyObject_to_vector_t(mapping_o, &mapping, 1, 0)) {
+    igraph_attribute_combination_destroy(&combination);
+    return NULL;
+  }
+
+  if (igraph_contract_vertices(&self->g, &mapping, &combination)) {
+    igraph_attribute_combination_destroy(&combination);
+    return NULL;
+  }
+
+  igraph_attribute_combination_destroy(&combination);
+
+  Py_RETURN_NONE;
+}
+
+/** \ingroup python_interface_graph
  * \brief Decomposes a graph into components.
  * \return a list of graph objects, each containing a copy of a component in the original graph.
  * \sa igraph_components
@@ -4440,7 +4475,7 @@ PyObject *igraphmodule_Graph_spanning_tree(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_simplify(igraphmodule_GraphObject * self,
                                       PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] = { "multiple", "loops", "combine_attributes", NULL };
+  char *kwlist[] = { "multiple", "loops", "combine_edges", NULL };
   PyObject *multiple = Py_True, *loops = Py_True, *comb_o = Py_None;
   igraph_attribute_combination_t comb;
 
@@ -9688,6 +9723,31 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  as separate components.\n"
    "@return: a list of the subgraphs. Every returned subgraph is a\n"
    "  copy of the original.\n"},
+  /* interface to igraph_contract_vertices */
+  {"contract_vertices", (PyCFunction) igraphmodule_Graph_contract_vertices,
+   METH_VARARGS | METH_KEYWORDS,
+   "contract_vertices(mapping, combine_attrs=None)\n\n"
+   "Contracts some vertices in the graph, i.e. replaces groups of vertices\n"
+   "with single vertices. Edges are not affected.\n\n"
+   "@param mapping: numeric vector which gives the mapping between old and\n"
+   "  new vertex IDs. Vertices having the same new vertex ID in this vector\n"
+   "  will be remapped into a single new vertex. It is safe to pass the\n"
+   "  membership vector of a L{VertexClustering} object here.\n"
+   "@param combine_attrs: specifies how to combine the attributes of\n"
+   "  the vertices being collapsed into a single one. If it is C{None},\n"
+   "  all the attributes will be lost. If it is a function, the\n"
+   "  attributes of the vertices will be collected and passed on to\n"
+   "  that function which will return the new attribute value that has to\n"
+   "  be assigned to the single collapsed vertex. It can also be one of\n"
+   "  the following string constants which define built-in collapsing\n"
+   "  functions: C{sum}, C{prod}, C{mean}, C{median}, C{max}, C{min},\n"
+   "  C{first}, C{last}, C{random}. You can also specify different\n"
+   "  combination functions for different attributes by passing a dict\n"
+   "  here which maps attribute names to functions. See\n"
+   "  L{Graph.simplify()} for more details.\n"
+   "@return: C{None}.\n"
+   "@see: L{Graph.simplify()}\n"
+  },
   /* interface to igraph_constraint */
   {"constraint", (PyCFunction) igraphmodule_Graph_constraint,
    METH_VARARGS | METH_KEYWORDS,
@@ -10140,11 +10200,11 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_simplify */
   {"simplify", (PyCFunction) igraphmodule_Graph_simplify,
    METH_VARARGS | METH_KEYWORDS,
-   "simplify(multiple=True, loops=True, combine_attributes=None)\n\n"
+   "simplify(multiple=True, loops=True, combine_vertices=None)\n\n"
    "Simplifies a graph by removing self-loops and/or multiple edges.\n\n"
    "@param multiple: whether to remove multiple edges.\n"
    "@param loops: whether to remove loops.\n"
-   "@param combine_attributes: specifies how to combine the attributes of\n"
+   "@param combine_vertices: specifies how to combine the attributes of\n"
    "  multiple edges between the same pair of vertices into a single\n"
    "  attribute. If it is C{None}, only one of the edges will be kept\n"
    "  and all the attributes will be lost. If it is a function, the\n"
@@ -10179,12 +10239,12 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  the attributes not specified explicitly in the dictionary.\n"
    "\n"
    "For example, suppose you have a graph with an edge attribute named\n"
-   "C{weight}. C{graph.simplify(combine_attributes=max)} will take the\n"
+   "C{weight}. C{graph.simplify(combine_vertices=max)} will take the\n"
    "maximum of the weights of multiple edges and assign that weight to\n"
-   "the collapsed edge. C{graph.simplify(combine_attributes=sum)} will\n"
+   "the collapsed edge. C{graph.simplify(combine_vertices=sum)} will\n"
    "take the sum of the weights. You can also write\n"
-   "C{graph.simplify(combine_attributes=dict(weight=\"sum\"))} or\n"
-   "C{graph.simplify(combine_attributes=dict(weight=sum))}, since\n"
+   "C{graph.simplify(combine_vertices=dict(weight=\"sum\"))} or\n"
+   "C{graph.simplify(combine_vertices=dict(weight=sum))}, since\n"
    "C{sum} is recognised both as a Python built-in function and as\n"
    "a string constant.\n"
   },

@@ -1095,13 +1095,20 @@ static int igraphmodule_i_attribute_combine_vertices(const igraph_t *graph,
     igraph_t *newgraph, const igraph_vector_ptr_t *merges,
     const igraph_attribute_combination_t *comb) {
   PyObject *dict, *newdict;
+  int result;
 
   /* Get the attribute dicts */
   dict=ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_VERTEX];
   newdict=ATTR_STRUCT_DICT(newgraph)[ATTRHASH_IDX_VERTEX];
 
-  return igraphmodule_i_attribute_combine_dicts(dict, newdict,
+  /* Combine the attribute dicts */
+  result = igraphmodule_i_attribute_combine_dicts(dict, newdict,
       merges, comb);
+
+  /* Invalidate vertex name index */
+  igraphmodule_i_attribute_struct_invalidate_vertex_name_index(ATTR_STRUCT(graph));
+
+  return result;
 }
 
 /* Combining edges */

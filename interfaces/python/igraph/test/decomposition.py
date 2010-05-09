@@ -89,6 +89,22 @@ class VertexClusteringTests(unittest.TestCase):
         cl = VertexClustering.FromAttribute(self.graph, "int", [10, 20, 30])
         self.failUnless(cl.membership == [0, 1, 2, 2, 1, 1, 3, 2, 1, 0])
 
+    def testClusterGraph(self):
+        cl = VertexClustering(self.graph, [0, 0, 0, 1, 1, 1, 2, 2, 2, 2])
+        self.graph.delete_edges(self.graph.es.select(_between=([0,1,2], [3,4,5])))
+        clg = cl.cluster_graph(dict(string="concat", int=max))
+
+        self.failUnless(sorted(clg.get_edgelist()) == [(0, 2), (1, 2)])
+        self.failUnless(not clg.is_directed())
+        self.failUnless(clg.vs["string"] == ["aaa", "bbc", "ccab"])
+        self.failUnless(clg.vs["int"] == [41, 34, 47])
+
+        clg = cl.cluster_graph(dict(string="concat", int=max), False)
+        self.failUnless(sorted(clg.get_edgelist()) == [(0, 2)]*6 + [(1, 2)]*6)
+        self.failUnless(not clg.is_directed())
+        self.failUnless(clg.vs["string"] == ["aaa", "bbc", "ccab"])
+        self.failUnless(clg.vs["int"] == [41, 34, 47])
+
 
 class OverlappingClusteringTests(unittest.TestCase):
     def setUp(self):
