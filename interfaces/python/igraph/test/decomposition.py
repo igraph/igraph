@@ -97,13 +97,14 @@ class VertexClusteringTests(unittest.TestCase):
         self.failUnless(sorted(clg.get_edgelist()) == [(0, 2), (1, 2)])
         self.failUnless(not clg.is_directed())
         self.failUnless(clg.vs["string"] == ["aaa", "bbc", "ccab"])
-        self.failUnless(clg.vs["int"] == [41, 34, 47])
+        self.failUnless(clg.vs["int"] == [41, 64, 47])
 
         clg = cl.cluster_graph(dict(string="concat", int=max), False)
-        self.failUnless(sorted(clg.get_edgelist()) == [(0, 2)]*6 + [(1, 2)]*6)
+        self.failUnless(sorted(clg.get_edgelist()) == \
+            [(0, 0)]*3 + [(0, 2)]*12 + [(1, 1)]*3 + [(1, 2)]*12 + [(2, 2)]*6)
         self.failUnless(not clg.is_directed())
         self.failUnless(clg.vs["string"] == ["aaa", "bbc", "ccab"])
-        self.failUnless(clg.vs["int"] == [41, 34, 47])
+        self.failUnless(clg.vs["int"] == [41, 64, 47])
 
 
 class OverlappingClusteringTests(unittest.TestCase):

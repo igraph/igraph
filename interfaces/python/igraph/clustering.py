@@ -310,8 +310,8 @@ class VertexClustering(Clustering):
 
         @return: the new graph.
         """
-        result = self.graph.contract_vertices(self.membership, \
-                 combine_vertices)
+        result = self.graph.copy()
+        result.contract_vertices(self.membership, combine_vertices)
         if combine_edges != False:
             result.simplify(combine_edges=combine_edges)
         return result
