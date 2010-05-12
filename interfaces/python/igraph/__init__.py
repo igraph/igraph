@@ -988,13 +988,13 @@ class Graph(core.GraphBase):
         @return: the created graph object.
         """
         import cPickle as pickle
-        if len(fname)>40 and "cigraph\nGraph\n" in fname:
-            return pickle.loads(fname)
+        if isinstance(fname, (str, unicode)) and\
+           len(fname)>40 and "cigraph\nGraph\n" in fname:
+            result = pickle.loads(fname)
         if not isinstance(fname, file):
-            file_was_opened=True
-            fname=open(fname, 'rb')
-        result=pickle.load(fname)
-        if file_was_opened: fname.close()
+            fname = open(fname, 'rb')
+            result = pickle.load(fname)
+            fname.close()
         if not isinstance(result, klass):
             raise TypeError("unpickled object is not a %s" % klass.__name__)
         return result
