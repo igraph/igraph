@@ -62,6 +62,22 @@ a 3 4 5
         g.write_adjacency(tmpfname)
         os.unlink(tmpfname)
 
+    def testPickle(self):
+        pickle = '\x80\x02cigraph\nGraph\nq\x01(K\x03]q\x02K\x01K\x02\x86q\x03a\x89}}}tRq\x04}b.'
+        tmpf, tmpfname = tempfile.mkstemp()
+        os.close(tmpf)
+        tmpf = open(tmpfname, "w")
+        tmpf.write(pickle)
+        tmpf.close()
+
+        g = Graph.Read_Pickle(tmpfname)
+        self.failUnless(isinstance(g, Graph))
+        self.failUnless(g.vcount() == 3 and g.ecount() == 1 and
+            not g.is_directed())
+        g.write_pickle(tmpfname)
+
+        os.unlink(tmpfname)
+
 
 def suite():
     foreign_suite = unittest.makeSuite(ForeignTests)
