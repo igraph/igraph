@@ -966,7 +966,7 @@ class Graph(core.GraphBase):
         """
         import cPickle as pickle
         if fname is None: return pickle.dumps(self, version)
-        if not isinstance(fname, file):
+        if not hasattr(fname, "write"):
             file_was_opened=True
             fname=open(fname, 'wb')
         else:
@@ -991,7 +991,7 @@ class Graph(core.GraphBase):
         if isinstance(fname, (str, unicode)) and\
            len(fname)>40 and "cigraph\nGraph\n" in fname:
             result = pickle.loads(fname)
-        if not isinstance(fname, file):
+        if not hasattr(fname, "write"):
             fname = open(fname, 'rb')
             result = pickle.load(fname)
             fname.close()
