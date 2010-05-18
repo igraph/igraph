@@ -74,6 +74,12 @@ int main() {
 	     0, 0, 0, 0, 0, 0, &bfs_callback, 0);
   printf("\n");
   
+  /* Test different roots */
+
+  igraph_bfs(&graph, /*root=*/ 2, /*neimode=*/ IGRAPH_OUT, 
+	     0, 0, 0, 0, 0, 0, &bfs_callback, 0);
+  printf("\n");
+  
   igraph_destroy(&graph);
   
   return 0;
