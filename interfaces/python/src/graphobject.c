@@ -4947,22 +4947,22 @@ PyObject
                                                      PyObject * kwds)
 {
   static char *kwlist[] =
-    { "weights", "maxiter", "maxdelta", "area", "coolexp", "repulserad",
+    { "weights", "maxiter", "maxdelta", "volume", "coolexp", "repulserad",
 	  "seed", NULL };
   igraph_matrix_t m;
   long niter = 500;
-  double maxdelta, area, coolexp, repulserad;
+  double maxdelta, volume, coolexp, repulserad;
   igraph_bool_t use_seed = 0;
   PyObject *result, *seed_o=Py_None, *wobj=Py_None;
   igraph_vector_t *weights;
 
   maxdelta = igraph_vcount(&self->g);
-  area = maxdelta * maxdelta;
+  volume = maxdelta * maxdelta * maxdelta;
   coolexp = 1.5;
-  repulserad = area * maxdelta;
+  repulserad = volume * maxdelta;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OlddddO", kwlist, &wobj,
-                                   &niter, &maxdelta, &area, &coolexp,
+                                   &niter, &maxdelta, &volume, &coolexp,
                                    &repulserad, &seed_o))
     return NULL;
 
@@ -4983,7 +4983,7 @@ PyObject
     return NULL;
   }
   if (igraph_layout_fruchterman_reingold_3d
-      (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, use_seed, weights)) {
+      (&self->g, &m, niter, maxdelta, volume, coolexp, repulserad, use_seed, weights)) {
     igraph_matrix_destroy(&m);
     if (weights) {
       igraph_vector_destroy(weights); free(weights);
@@ -9450,7 +9450,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Information Processing Letters, 31/1, 7--15, 1989.\n\n"
    "@param maxiter: the number of iterations to perform.\n"
    "@param sigma: the standard base deviation of the position\n"
-   "  change proposals. C{None} means the number of vertices * 0.25\n"
+   "  change proposals. C{None} means the number of vertices / 4\n"
    "@param initemp: initial temperature of the simulated annealing.\n"
    "@param coolexp: cooling exponent of the simulated annealing.\n"
    "@param kkconst: the Kamada-Kawai vertex attraction constant.\n"
@@ -9471,7 +9471,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Information Processing Letters, 31/1, 7--15, 1989.\n\n"
    "@param maxiter: the number of iterations to perform.\n"
    "@param sigma: the standard base deviation of the position\n"
-   "  change proposals. C{None} means the number of vertices * 0.25\n"
+   "  change proposals. C{None} means the number of vertices / 4\n"
    "@param initemp: initial temperature of the simulated annealing.\n"
    "@param coolexp: cooling exponent of the simulated annealing.\n"
    "@param kkconst: the Kamada-Kawai vertex attraction constant.\n"
@@ -9542,22 +9542,25 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"layout_fruchterman_reingold",
    (PyCFunction) igraphmodule_Graph_layout_fruchterman_reingold,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_fruchterman_reingold(weights=None, maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta, seed=None)\n\n"
+   "layout_fruchterman_reingold(weights=None, maxiter=500, maxdelta=None, area=None, coolexp=1.5, repulserad=None, miny=None, maxy=None, seed=None)\n\n"
    "Places the vertices on a 2D plane according to the Fruchterman-Reingold algorithm.\n\n"
    "This is a force directed layout, see Fruchterman, T. M. J. and Reingold, E. M.:\n"
    "Graph Drawing by Force-directed Placement.\n"
    "Software -- Practice and Experience, 21/11, 1129--1164, 1991\n\n"
    "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
    "  even an edge attribute name.\n"
-   "@param maxiter: the number of iterations to perform.\n"
+   "@param maxiter: the number of iterations to perform. The default\n"
+   "  is 500.\n"
    "@param maxdelta: the maximum distance to move a vertex in\n"
-   "  an iteration. C{None} means the number of vertices.\n"
+   "  an iteration. The default is the number of vertices.\n"
    "@param area: the area of the square on which the vertices\n"
-   "  will be placed. C{None} means the square of M{maxdelta}.\n"
+   "  will be placed. The default is the square of the number of\n"
+   "  vertices.\n"
    "@param coolexp: the cooling exponent of the simulated annealing.\n"
+   "  The default is 1.5.\n"
    "@param repulserad: determines the radius at which vertex-vertex\n"
    "  repulsion cancels out attraction of adjacent vertices.\n"
-   "  C{None} means M{maxiter*maxdelta}.\n"
+   "  The default is the number of vertices^3.\n"
    "@param seed: if C{None}, uses a random starting layout for the\n"
    "  algorithm. If a matrix (list of lists), uses the given matrix\n"
    "  as the starting position.\n"
@@ -9567,22 +9570,25 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"layout_fruchterman_reingold_3d",
    (PyCFunction) igraphmodule_Graph_layout_fruchterman_reingold_3d,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_fruchterman_reingold_3d(weights=None, maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta, seed=None)\n\n"
+   "layout_fruchterman_reingold_3d(weights=None, maxiter=500, maxdelta=None, volume=None, coolexp=1.5, repulserad=None, seed=None)\n\n"
    "Places the vertices in the 3D space according to the Fruchterman-Reingold grid algorithm.\n\n"
    "This is a force directed layout, see Fruchterman, T. M. J. and Reingold, E. M.:\n"
    "Graph Drawing by Force-directed Placement.\n"
    "Software -- Practice and Experience, 21/11, 1129--1164, 1991\n\n"
    "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
    "  even an edge attribute name.\n"
-   "@param maxiter: the number of iterations to perform.\n"
+   "@param maxiter: the number of iterations to perform. The default\n"
+   "  is 500.\n"
    "@param maxdelta: the maximum distance to move a vertex in\n"
-   "  an iteration. C{None} means the number of vertices.\n"
-   "@param area: the area of the square on which the vertices\n"
-   "  will be placed. C{None} means the square of M{maxdelta}.\n"
+   "  an iteration. The default is the number of vertices.\n"
+   "@param volume: the volume of the cube in which the vertices\n"
+   "  will be placed. The default is the third power of the number\n"
+   "  of vertices.\n"
    "@param coolexp: the cooling exponent of the simulated annealing.\n"
+   "  The default is 1.5.\n"
    "@param repulserad: determines the radius at which vertex-vertex\n"
    "  repulsion cancels out attraction of adjacent vertices.\n"
-   "  C{None} means M{maxiter*maxdelta}.\n"
+   "  The default is the number of vertices^4.\n"
    "@param seed: if C{None}, uses a random starting layout for the\n"
    "  algorithm. If a matrix (list of lists), uses the given matrix\n"
    "  as the starting position.\n"
