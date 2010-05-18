@@ -73,8 +73,10 @@ class BasicTests(unittest.TestCase):
         g["data"]="abcdef"
         g.vs["data"]=[3,4,5]
         g.es["data"]=["A", "B"]
+        g.custom_data = None
         pickled=pickle.dumps(g)
         self.failUnless(isinstance(pickled, str))
+
         g2=pickle.loads(pickled)
         self.failUnless(g["data"] == g2["data"])
         self.failUnless(g.vs["data"] == g2.vs["data"])
@@ -82,6 +84,7 @@ class BasicTests(unittest.TestCase):
         self.failUnless(g.vcount() == g2.vcount())
         self.failUnless(g.ecount() == g2.ecount())
         self.failUnless(g.is_directed() == g2.is_directed())
+        self.failUnless(g2.custom_data == g.custom_data)
 
 
 class DatatypeTests(unittest.TestCase):

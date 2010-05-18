@@ -18,10 +18,15 @@ overrides the default order. IDLE shell is only tried in Windows
 unless explicitly stated by C{global.shells}, since Linux and
 Mac OS X users are likely to invoke igraph from the command line.
 """
-from igraph import *
-from igraph import __version__
+
+# pylint: disable-msg=W0401
+# W0401: wildcard import. That's exactly what we need for the shell.
+from igraph import __version__, set_progress_handler, config
 import sys, re
 
+# pylint: disable-msg=C0103,R0903
+# C0103: invalid name. Disabled because this is a third-party class.
+# R0903: too few public methods.
 class TerminalController:
     """
     A class that can be used to portably generate formatted output to
@@ -110,16 +115,21 @@ class TerminalController:
         assumed to be a dumb terminal (i.e., have no capabilities).
         """
         # Curses isn't available on all platforms
-        try: import curses
-        except: return
+        try:
+            import curses
+        except ImportError:
+            return
 
         # If the stream isn't a tty, then assume it has no capabilities.
-        if not term_stream.isatty(): return
+        if not term_stream.isatty():
+            return
 
         # Check the terminal type.  If we fail, then assume that the
         # terminal has no capabilities.
-        try: curses.setupterm()
-        except: return
+        try:
+            curses.setupterm()
+        except StandardError:
+            return
 
         # Look up numeric capabilities.
         self.COLS = curses.tigetnum('cols')
@@ -133,22 +143,25 @@ class TerminalController:
         # Colors
         set_fg = self._tigetstr('setf')
         if set_fg:
-            for i,color in zip(range(len(self._COLORS)), self._COLORS):
+            for i, color in zip(range(len(self._COLORS)), self._COLORS):
                 setattr(self, color, curses.tparm(set_fg, i) or '')
         set_fg_ansi = self._tigetstr('setaf')
         if set_fg_ansi:
-            for i,color in zip(range(len(self._ANSICOLORS)), self._ANSICOLORS):
+            for i, color in zip(range(len(self._ANSICOLORS)), self._ANSICOLORS):
                 setattr(self, color, curses.tparm(set_fg_ansi, i) or '')
         set_bg = self._tigetstr('setb')
         if set_bg:
-            for i,color in zip(range(len(self._COLORS)), self._COLORS):
+            for i, color in zip(range(len(self._COLORS)), self._COLORS):
                 setattr(self, 'BG_'+color, curses.tparm(set_bg, i) or '')
         set_bg_ansi = self._tigetstr('setab')
         if set_bg_ansi:
-            for i,color in zip(range(len(self._ANSICOLORS)), self._ANSICOLORS):
+            for i, color in zip(range(len(self._ANSICOLORS)), self._ANSICOLORS):
                 setattr(self, 'BG_'+color, curses.tparm(set_bg_ansi, i) or '')
 
-    def _tigetstr(self, cap_name):
+    @staticmethod
+    def _tigetstr(cap_name):
+        """Rewrites string capabilities to remove "delays" which are not
+        required for modern terminals"""
         # String capabilities can include "delays" of the form "$<2>".
         # For any modern terminal, we should be able to just ignore
         # these, so strip them out.
@@ -165,9 +178,12 @@ class TerminalController:
         return re.sub(r'\$\$|\${\w+}', self._render_sub, template)
 
     def _render_sub(self, match):
+        """Helper function for L{render}"""
         s = match.group()
-        if s == '$$': return s
-        else: return getattr(self, s[2:-1])
+        if s == '$$':
+            return s
+        else:
+            return getattr(self, s[2:-1])
 
 
 class ProgressBar:
@@ -189,38 +205,54 @@ class ProgressBar:
             raise ValueError("Terminal isn't capable enough -- you "
                              "should use a simpler progress display.")
         self.width = self.term.COLS or 75
-        self.bar = term.render(self.BAR)
+        self.progress_bar = term.render(self.BAR)
         self.header = self.term.render(self.HEADER % "".center(self.width))
-        self.cleared = 1 #: true if we haven't drawn the bar yet.
+        self.cleared = True #: true if we haven't drawn the bar yet.
 
     def update(self, percent, message):
+        """Updates the progress bar.
+
+        @param percent: the percentage to be shown
+        @param message: the message to be shown above the progress bar
+        """
         if self.cleared:
             sys.stdout.write(self.header)
-            self.cleared = 0
+            self.cleared = False
         n = int((self.width-10)*(percent/100.0))
         sys.stdout.write(
             self.term.BOL + self.term.UP + self.term.CLEAR_EOL +
             self.term.render(self.HEADER % message.center(self.width)) +
-            (self.bar % (percent, '='*n, '-'*(self.width-10-n)))
+            (self.progress_bar % (percent, '='*n, '-'*(self.width-10-n)))
             )
 
     def clear(self):
+        """Clears the progress bar (i.e. removes it from the screen)"""
         if not self.cleared:
             sys.stdout.write(self.term.BOL + self.term.CLEAR_EOL +
                              self.term.UP + self.term.CLEAR_EOL)
-            self.cleared = 1
+            self.cleared = True
 
 class Shell(object):
     """Superclass of the embeddable shells supported by igraph"""
 
     def __init__(self):
-        raise ValueError("abstract class")
-    def __call__(self, namespace=None):
-        raise ValueError("abstract class")
+        pass
+
+    def __call__(self):
+        raise NotImplementedError("abstract class")
+
     def supports_progress_bar(self):
+        """Checks whether the shell supports progress bars.
+
+        This is done by checking for the existence of an attribute
+        called C{_progress_handler}."""
         return hasattr(self, "_progress_handler")
+
+    # pylint: disable-msg=E1101
     def get_progress_handler(self):
-        if self.supports_progress_bar(): return self._progress_handler
+        """Returns the progress handler (if exists) or None (if not)."""
+        if self.supports_progress_bar():
+            return self._progress_handler
         return None
 
 class IDLEShell(Shell):
@@ -237,8 +269,9 @@ class IDLEShell(Shell):
         Imports IDLE's embedded shell. The implementation of this method is
         ripped from idlelib.PyShell.main() after removing the unnecessary
         parts."""
+        Shell.__init__(self)
+
         import idlelib.PyShell
-        import sys
         
         idlelib.PyShell.use_subprocess = True
         
@@ -251,11 +284,12 @@ class IDLEShell(Shell):
         idlelib.PyShell.fixwordbreaks(root)
         root.withdraw()
         flist = idlelib.PyShell.PyShellFileList(root)
-        if not flist.open_shell(): raise NotImplementedError
+        if not flist.open_shell():
+            raise NotImplementedError
         self._shell = flist.pyshell
         self._root = root
 
-    def __call__(self, namespace=None):
+    def __call__(self):
         """Starts the shell"""
         self._shell.interp.execsource("from igraph import *")
         self._root.mainloop()
@@ -271,21 +305,22 @@ class IPythonShell(Shell):
         """Constructor.
 
         Imports IPython's embedded shell with separator lines removed."""
+        Shell.__init__(self)
+
         from IPython.Shell import IPShellEmbed
         self._shell = IPShellEmbed(['-nosep'])
+        self._shell.IP.runsource("from igraph import *")
         try:
             self.__class__.progress_bar = ProgressBar(TerminalController())
         except ValueError:
             # Terminal is not capable enough, disable progress handler
             del self.__class__._progress_handler
 
-    def __call__(self, namespace=None):
-        """Starts the embedded shell.
-        
-        @param namespace: global namespace to use"""
+    def __call__(self):
+        """Starts the embedded shell."""
         print "igraph %s running inside" % __version__,
         print self._shell.IP.BANNER,
-        self._shell(local_ns=namespace)
+        self._shell()
 
     def _progress_handler(message, percentage):
         """Progress bar handler, called when C{igraph} reports the progress
@@ -309,21 +344,23 @@ class ClassicPythonShell(Shell):
         """Constructor.
 
         Imports Python's classic shell"""
-        from code import InteractiveConsole
+        Shell.__init__(self)
+        self._shell = None
+
         try:
             self.__class__.progress_bar = ProgressBar(TerminalController())
         except ValueError:
             # Terminal is not capable enough, disable progress handler
             del self.__class__._progress_handler
 
-    def __call__(self, namespace=None):
-        """Starts the embedded shell.
-        
-        @param namespace: global namespace to use"""
-        from code import InteractiveConsole
-        self._shell = InteractiveConsole(locals=namespace)
-        print >>sys.stderr, "igraph %s running inside " % __version__,
-        self._shell.runsource("from igraph import *")
+    def __call__(self):
+        """Starts the embedded shell."""
+        if self._shell is None:
+            from code import InteractiveConsole
+            self._shell = InteractiveConsole()
+            print >> sys.stderr, "igraph %s running inside " % __version__,
+            self._shell.runsource("from igraph import *")
+
         self._shell.interact()
 
     def _progress_handler(message, percentage):
@@ -340,10 +377,12 @@ class ClassicPythonShell(Shell):
     _progress_handler = staticmethod(_progress_handler)
 
 def main():
+    """The main entry point for igraph when invoked from the command
+    line shell"""
     if config.filename:
-        print >>sys.stderr, "Using configuration from %s" % config.filename
+        print >> sys.stderr, "Using configuration from %s" % config.filename
     else:
-        print >>sys.stderr, "No configuration file, using defaults"
+        print >> sys.stderr, "No configuration file, using defaults"
 
     if config.has_key("shells"):
         parts = [part.strip() for part in config["shells"].split(",")]
@@ -353,9 +392,9 @@ def main():
         for part in parts:
             klass = available_classes.get(part, None)
             if klass is None:
-                print >>sys.stderr, "Warning: unknown shell class `%s'" % part
-            else:
-                shell_classes.append(klass)
+                print >> sys.stderr, "Warning: unknown shell class `%s'" % part
+                continue
+            shell_classes.append(klass)
     else:
         shell_classes = [IPythonShell, ClassicPythonShell]
         import platform
@@ -364,10 +403,12 @@ def main():
 
     shell = None
     for shell_class in shell_classes:
+        # pylint: disable-msg=W0703
+        # W0703: catch "Exception"
         try:
             shell = shell_class()
             break
-        except:
+        except StandardError:
             # Try the next one
             pass
 
@@ -376,8 +417,9 @@ def main():
             set_progress_handler(shell.get_progress_handler())
         shell()
     else:
-        print >>sys.stderr, "No suitable Python shell was found."
-        print >>sys.stderr, "Check configuration variable `general.shells'."
+        print >> sys.stderr, "No suitable Python shell was found."
+        print >> sys.stderr, "Check configuration variable `general.shells'."
 
-if __name__ == '__main__': main()
+if __name__ == '__main__':
+    sys.exit(main())
 

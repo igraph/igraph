@@ -74,7 +74,10 @@ class Matrix(object):
         if data is not None:
             self._data = [list(row) for row in data]
             self._nrow = len(self._data)
-            self._ncol = max(len(row) for row in self._data)
+            if self._nrow > 0:
+                self._ncol = max(len(row) for row in self._data)
+            else:
+                self._ncol = 0
             for row in self._data:
                 if len(row) < self._ncol:
                     row.extend([0]*(self._ncol-len(row)))

@@ -29,6 +29,8 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 
+# pylint: disable-msg=W0401
+# W0401: wildcard import
 from igraph.core import *
 from igraph.core import __version__, __build_date__
 from igraph.clustering import *
@@ -48,7 +50,8 @@ from collections import defaultdict
 from tempfile import mkstemp
 from warnings import warn
 
-class Graph(core.GraphBase):
+# pylint: disable-msg=E1101
+class Graph(GraphBase):
     """Generic graph.
     
     This class is built on top of L{GraphBase}, so the order of the
@@ -64,30 +67,31 @@ class Graph(core.GraphBase):
     """
 
     # Some useful aliases
-    omega = core.GraphBase.clique_number
-    alpha = core.GraphBase.independence_number
-    shell_index = core.GraphBase.coreness
-    cut_vertices = core.GraphBase.articulation_points
-    blocks = core.GraphBase.biconnected_components
-    evcent = core.GraphBase.eigenvector_centrality
-    vertex_disjoint_paths = core.GraphBase.vertex_connectivity
-    edge_disjoint_paths = core.GraphBase.edge_connectivity
-    cohesion = core.GraphBase.vertex_connectivity
-    adhesion = core.GraphBase.edge_connectivity
+    omega = GraphBase.clique_number
+    alpha = GraphBase.independence_number
+    shell_index = GraphBase.coreness
+    cut_vertices = GraphBase.articulation_points
+    blocks = GraphBase.biconnected_components
+    evcent = GraphBase.eigenvector_centrality
+    vertex_disjoint_paths = GraphBase.vertex_connectivity
+    edge_disjoint_paths = GraphBase.edge_connectivity
+    cohesion = GraphBase.vertex_connectivity
+    adhesion = GraphBase.edge_connectivity
 
     # Compatibility aliases
-    shortest_paths_dijkstra = core.GraphBase.shortest_paths
-    subgraph = core.GraphBase.induced_subgraph
+    shortest_paths_dijkstra = GraphBase.shortest_paths
+    subgraph = GraphBase.induced_subgraph
 
     def __init__(self, *args, **kwds):
-        """__init__(n=None, edges=None, directed=None, graph_attrs=None, vertex_attrs=None, edge_attrs=None)
+        """__init__(n=None, edges=None, directed=None, graph_attrs=None,
+        vertex_attrs=None, edge_attrs=None)
         
         Constructs a graph from scratch.
 
         @keyword n: the number of vertices. Can be omitted.
-        @keyword edges: the edge list where every list item is a pair of integers.
-          If any of the integers is larger than M{n-1}, the number of vertices
-          is adjusted accordingly.
+        @keyword edges: the edge list where every list item is a pair of
+          integers. If any of the integers is larger than M{n-1}, the number
+          of vertices is adjusted accordingly.
         @keyword directed: whether the graph should be directed
         @keyword graph_attrs: the attributes of the graph as a dictionary.
         @keyword vertex_attrs: the attributes of the vertices as a dictionary.
@@ -96,10 +100,13 @@ class Graph(core.GraphBase):
           dictionary value must be an iterable with exactly M{m} items where
           M{m} is the number of edges.
         """
-        # Set up default values for the parameters. This should match the order in *args
-        kwd_order = ["n", "edges", "directed", "graph_attrs", "vertex_attrs", "edge_attrs"]
+        # Set up default values for the parameters. This should match the order
+        # in *args
+        kwd_order = ["n", "edges", "directed", "graph_attrs", "vertex_attrs", \
+                "edge_attrs"]
         params = [1, [], False, {}, {}, {}]
-        # If the first argument is a list, assume that the number of vertices were omitted
+        # If the first argument is a list, assume that the number of vertices
+        # were omitted
         args = list(args)
         if len(args) > 0:
             if isinstance(args[0], list) or isinstance(args[0], tuple):
@@ -108,24 +115,28 @@ class Graph(core.GraphBase):
         params[:len(args)] = args
         # Override default parameters from keywords
         for idx, k in enumerate(kwd_order):
-            if k in kwds: params[idx] = kwds[k]
+            if k in kwds:
+                params[idx] = kwds[k]
         # Now, translate the params list to argument names
-        n, edges, directed, graph_attrs, vertex_attrs, edge_attrs = params
+        nverts, edges, directed, graph_attrs, vertex_attrs, edge_attrs = params
 
         # Initialize the graph
-        core.GraphBase.__init__(self, n, edges, directed)
+        GraphBase.__init__(self, nverts, edges, directed)
         # Set the graph attributes
-        for k, v in graph_attrs.iteritems():
-            if isinstance(k, int) or isinstance(k, long): k=str(k)
-            self[k]=v
+        for key, value in graph_attrs.iteritems():
+            if isinstance(key, (int, long)):
+                key = str(key)
+            self[key] = value
         # Set the vertex attributes
-        for k, v in vertex_attrs.iteritems():
-            if isinstance(k, int) or isinstance(k, long): k=str(k)
-            self.vs[k]=v
+        for key, value in vertex_attrs.iteritems():
+            if isinstance(key, (int, long)):
+                key = str(key)
+            self.vs[key] = value
         # Set the edge attributes
-        for k, v in edge_attrs.iteritems():
-            if isinstance(k, int) or isinstance(k, long): k=str(k)
-            self.es[k]=v
+        for key, value in edge_attrs.iteritems():
+            if isinstance(key, (int, long)):
+                key = str(key)
+            self.es[key] = value
 
     def delete_edges(self, *args, **kwds):
         """Deletes some edges from the graph.
@@ -147,11 +158,12 @@ class Graph(core.GraphBase):
         """
         if len(args) == 0 and len(kwds) == 0:
             raise ValueError("expected at least one argument")
-        if len(kwds)>0 or (hasattr(args[0], "__call__") and not isinstance(args[0], core.EdgeSeq)):
-            es = self.es(*args, **kwds)
+        if len(kwds)>0 or (hasattr(args[0], "__call__") and \
+                not isinstance(args[0], EdgeSeq)):
+            edge_seq = self.es(*args, **kwds)
         else:
-            es = args[0]
-        return core.GraphBase.delete_edges(self, es)
+            edge_seq = args[0]
+        return GraphBase.delete_edges(self, edge_seq)
 
 
     def indegree(self, *args, **kwds):
@@ -159,7 +171,7 @@ class Graph(core.GraphBase):
         
         See L{degree} for possible arguments.
         """
-        kwds['type']=IN
+        kwds['type'] = IN
         return self.degree(*args, **kwds)
 
     def outdegree(self, *args, **kwds):
@@ -167,7 +179,7 @@ class Graph(core.GraphBase):
         
         See L{degree} for possible arguments.
         """
-        kwds['type']=OUT
+        kwds['type'] = OUT
         return self.degree(*args, **kwds)
 
     def biconnected_components(self, return_articulation_points=False):
@@ -187,15 +199,15 @@ class Graph(core.GraphBase):
 
         membership = [set() for _ in xrange(self.vcount())]
         for idx, tree in enumerate(trees):
-            for e in tree:
-                membership[self.es[e].source].add(idx)
-                membership[self.es[e].target].add(idx)
-        cl = OverlappingVertexClustering(self, membership)
+            for eidx in tree:
+                membership[self.es[eidx].source].add(idx)
+                membership[self.es[eidx].target].add(idx)
+        clustering = OverlappingVertexClustering(self, membership)
 
         if return_articulation_points:
-            return cl, aps
+            return clustering, aps
         else:
-            return cl
+            return clustering
     blocks = biconnected_components
 
     def clusters(self, mode=STRONG):
@@ -260,8 +272,10 @@ class Graph(core.GraphBase):
           vertices are considered.
         @return: the eccentricities in a list
         """
-        if self.vcount() == 0: return []
-        if self.vcount() == 1: return [1.0]
+        if self.vcount() == 0:
+            return []
+        if self.vcount() == 1:
+            return [1.0]
         distance_matrix = self.shortest_paths(mode=OUT)
         distance_maxs = [max(row) for row in distance_matrix]
         
@@ -272,7 +286,8 @@ class Graph(core.GraphBase):
 
         return result
 
-    def get_adjacency(self, type=GET_ADJACENCY_BOTH, attribute=None, default=None):
+    def get_adjacency(self, type=GET_ADJACENCY_BOTH, attribute=None, \
+            default=None):
         """Returns the adjacency matrix of a graph.
 
         @param type: either C{GET_ADJACENCY_LOWER} (uses the lower
@@ -294,24 +309,33 @@ class Graph(core.GraphBase):
           type != GET_ADJACENCY_BOTH:
             # Maybe it was called with the first argument as the attribute name
             type, attribute = attribute, type
-            if type is None: type = GET_ADJACENCY_BOTH
+            if type is None:
+                type = GET_ADJACENCY_BOTH
 
-        if attribute is None: return Matrix(GraphBase.get_adjacency(self, type))
+        if attribute is None: 
+            return Matrix(GraphBase.get_adjacency(self, type))
+
         if attribute not in self.es.attribute_names():
             raise ValueError("Attribute does not exist")
+
         data = [[default] * self.vcount() for _ in xrange(self.vcount())]
 
-        if not self.is_directed():
-            if type == GET_ADJACENCY_BOTH:
-                for e in self.es:
-                    data[e.tuple[0]][e.tuple[1]] = e[attribute]
-                    data[e.tuple[1]][e.tuple[0]] = e[attribute]
-            elif type == GET_ADJACENCY_UPPER:
-                for e in self.es: data[min(e.tuple)][max(e.tuple)] = e[attribute]
-            else:
-                for e in self.es: data[max(e.tuple)][min(e.tuple)] = e[attribute]
+        if self.is_directed():
+            for edge in self.es:
+                data[edge.source][edge.target] = edge[attribute]
+            return Matrix(data)
+
+        if type == GET_ADJACENCY_BOTH:
+            for edge in self.es:
+                source, target = edge.tuple
+                data[source][target] = edge[attribute]
+                data[target][source] = edge[attribute]
+        elif type == GET_ADJACENCY_UPPER:
+            for edge in self.es:
+                data[min(edge.tuple)][max(edge.tuple)] = edge[attribute]
         else:
-            for e in self.es: data[e.tuple[0]][e.tuple[1]] = e[attribute]
+            for edge in self.es:
+                data[max(edge.tuple)][min(edge.tuple)] = edge[attribute]
 
         return Matrix(data)
 
@@ -370,12 +394,12 @@ class Graph(core.GraphBase):
         
         The modularity of a graph w.r.t. some division measures how good the
         division is, or how separated are the different vertex types from each
-        other. It is defined as M{Q=1/(2m)*sum(Aij-ki*kj/(2m)delta(ci,cj),i,j)}.
-        M{m} is the number of edges, M{Aij} is the element of the M{A} adjacency
-        matrix in row M{i} and column M{j}, M{ki} is the degree of node M{i},
-        M{kj} is the degree of node M{j}, and M{Ci} and C{cj} are the types of
-        the two vertices (M{i} and M{j}). M{delta(x,y)} is one iff M{x=y}, 0
-        otherwise.
+        other. It's defined as M{Q=1/(2m)*sum(Aij-ki*kj/(2m)delta(ci,cj),i,j)}.
+        M{m} is the number of edges, M{Aij} is the element of the M{A}
+        adjacency matrix in row M{i} and column M{j}, M{ki} is the degree of
+        node M{i}, M{kj} is the degree of node M{j}, and M{Ci} and C{cj} are
+        the types of the two vertices (M{i} and M{j}). M{delta(x,y)} is one iff
+        M{x=y}, 0 otherwise.
         
         If edge weights are given, the definition of modularity is modified as
         follows: M{Aij} becomes the weight of the corresponding edge, M{ki}
@@ -384,8 +408,8 @@ class Graph(core.GraphBase):
         edge weight in the graph.
         
         @param membership: a membership list or a L{VertexClustering} object
-        @param weights: optional edge weights or C{None} if all edges are weighed
-          equally. Attribute names are also allowed.
+        @param weights: optional edge weights or C{None} if all edges are
+          weighed equally. Attribute names are also allowed.
         @return: the modularity score
         
         @newfield ref: Reference
@@ -394,7 +418,7 @@ class Graph(core.GraphBase):
         """
         if isinstance(membership, VertexClustering):
             if membership.graph != self:
-                raise ValueError("clustering object belongs to a different graph")
+                raise ValueError("clustering object belongs to another graph")
             return GraphBase.modularity(self, membership.membership, weights)
         else:
             return GraphBase.modularity(self, membership, weights)
@@ -414,21 +438,23 @@ class Graph(core.GraphBase):
         """
         data, unconn = GraphBase.path_length_hist(self, directed)
         hist = Histogram(bin_width=1)
-        for i, n in enumerate(data): hist.add(i+1, n)
+        for i, length in enumerate(data):
+            hist.add(i+1, length)
         hist.unconnected = long(unconn)
         return hist
 
-    def pagerank(self, vertices=None, directed=True, damping=0.85, weights=None,arpack_options=None):
+    def pagerank(self, vertices=None, directed=True, damping=0.85,
+            weights=None, arpack_options=None):
         """Calculates the Google PageRank values of a graph.
         
         @param vertices: the indices of the vertices being queried.
           C{None} means all of the vertices.
         @param directed: whether to consider directed paths.
         @param damping: the damping factor. M{1-damping} is the PageRank value
-          for nodes with no incoming links. It is also the probability of resetting
-          the random walk to a uniform distribution in each step.
-        @param weights: edge weights to be used. Can be a sequence or iterable or
-          even an edge attribute name.
+          for nodes with no incoming links. It is also the probability of
+          resetting the random walk to a uniform distribution in each step.
+        @param weights: edge weights to be used. Can be a sequence or iterable
+          or even an edge attribute name.
         @param arpack_options: an L{ARPACKOptions} object used to fine-tune
           the ARPACK eigenvector calculation. If omitted, the module-level
           variable called C{arpack_options} is used.
@@ -436,7 +462,8 @@ class Graph(core.GraphBase):
           vertices."""
         if arpack_options is None:
             arpack_options = core.arpack_options
-        return self.personalized_pagerank(vertices, directed, damping, None, None, weights, arpack_options)
+        return self.personalized_pagerank(vertices, directed, damping, None, \
+                None, weights, arpack_options)
 
     def triad_census(self, *args, **kwds):
         """triad_census()
@@ -470,8 +497,8 @@ class Graph(core.GraphBase):
 
         This algorithm merges individual nodes into communities in a way that
         greedily maximizes the modularity score of the graph. It can be proven
-        that if no merge can increase the current modularity score, the algorithm
-        can be stopped since no further increase can be achieved.
+        that if no merge can increase the current modularity score, the
+        algorithm can be stopped since no further increase can be achieved.
 
         This algorithm is said to run almost in linear time on sparse graphs.
 
@@ -487,8 +514,11 @@ class Graph(core.GraphBase):
         return VertexDendrogram(self, merges, None, qs)
 
 
-    def community_leading_eigenvector_naive(self, clusters=None, return_merges = False):
-        """community_leading_eigenvector_naive(clusters=None, return_merges=False)
+    def community_leading_eigenvector_naive(self, clusters = None, \
+            return_merges = False):
+        """community_leading_eigenvector_naive(clusters=None,
+        return_merges=False)
+
         A naive implementation of Newman's eigenvector community structure
         detection. This function splits the network into two components
         according to the leading eigenvector of the modularity matrix and
@@ -497,11 +527,11 @@ class Graph(core.GraphBase):
         however, see the reference for explanation. Consider using the
         correct L{community_leading_eigenvector} method instead.
 
-        @param clusters: the desired number of communities. If C{None}, the algorithm
-          tries to do as many splits as possible. Note that the algorithm
-          won't split a community further if the signs of the leading eigenvector
-          are all the same, so the actual number of discovered communities can be
-          less than the desired one.
+        @param clusters: the desired number of communities. If C{None}, the
+          algorithm tries to do as many splits as possible. Note that the
+          algorithm won't split a community further if the signs of the leading
+          eigenvector are all the same, so the actual number of discovered
+          communities can be less than the desired one.
         @param return_merges: whether the returned object should be a
           dendrogram instead of a single clustering.
         @return: an appropriate L{VertexClustering} or L{VertexDendrogram}
@@ -510,15 +540,18 @@ class Graph(core.GraphBase):
         @newfield ref: Reference
         @ref: MEJ Newman: Finding community structure in networks using the
         eigenvectors of matrices, arXiv:physics/0605087"""
-        if clusters is None: clusters=-1
-        cl, merges = GraphBase.community_leading_eigenvector_naive(self, clusters, return_merges)
+        if clusters is None:
+            clusters = -1
+        cl, merges = GraphBase.community_leading_eigenvector_naive(self, \
+                clusters, return_merges)
         if merges is None:
             return VertexClustering(self, cl)
         else:
             return VertexDendrogram(self, merges, cl)
 
 
-    def community_leading_eigenvector(self, clusters=None, return_merges = False):
+    def community_leading_eigenvector(self, clusters=None, \
+            return_merges=False):
         """community_leading_eigenvector(clusters=None, return_merges=False)
         
         Newman's leading eigenvector method for detecting community structure.
@@ -526,11 +559,11 @@ class Graph(core.GraphBase):
         each split is done by maximizing the modularity regarding the
         original network.
         
-        @param clusters: the desired number of communities. If C{None}, the algorithm
-          tries to do as many splits as possible. Note that the algorithm
-          won't split a community further if the signs of the leading eigenvector
-          are all the same, so the actual number of discovered communities can be
-          less than the desired one.
+        @param clusters: the desired number of communities. If C{None}, the
+          algorithm tries to do as many splits as possible. Note that the
+          algorithm won't split a community further if the signs of the leading
+          eigenvector are all the same, so the actual number of discovered
+          communities can be less than the desired one.
         @param return_merges: whether the returned object should be a
           dendrogram instead of a single clustering.
         @return: an appropriate L{VertexClustering} or L{VertexDendrogram}
@@ -539,15 +572,18 @@ class Graph(core.GraphBase):
         @newfield ref: Reference
         @ref: MEJ Newman: Finding community structure in networks using the
         eigenvectors of matrices, arXiv:physics/0605087"""
-        if clusters is None: clusters=-1
-        cl, merges = GraphBase.community_leading_eigenvector(self, clusters, return_merges)
+        if clusters is None:
+            clusters = -1
+        cl, merges = GraphBase.community_leading_eigenvector(self, \
+                clusters, return_merges)
         if merges is None:
             return VertexClustering(self, cl)
         else:
             return VertexDendrogram(self, merges, cl)
 
 
-    def community_label_propagation(self, weights = None, initial = None, fixed = None):
+    def community_label_propagation(self, weights = None, initial = None, \
+            fixed = None):
         """community_label_propagation(weights=None, initial=None, fixed=None)
 
         Finds the community structure of the graph according to the label
@@ -582,22 +618,24 @@ class Graph(core.GraphBase):
         """
         if isinstance(fixed, basestring):
             fixed = [bool(o) for o in g.vs[fixed]]
-        cl = GraphBase.community_label_propagation(self, weights, initial, fixed)
+        cl = GraphBase.community_label_propagation(self, \
+                weights, initial, fixed)
         return VertexClustering(self, cl)
 
 
     def community_multilevel(self, weights=None, return_levels=False):
-        """Community structure based on the multilevel algorithm of Blondel et al.
+        """Community structure based on the multilevel algorithm of
+        Blondel et al.
         
         This is a bottom-up algorithm: initially every vertex belongs to a
-        separate community, and vertices are moved between communities iteratively
-        in a way that maximizes the vertices' local contribution to the overall
-        modularity score. When a consensus is reached (i.e. no single move would
-        increase the modularity score), every community in the original graph is
-        shrank to a single vertex (while keeping the total weight of the adjacent
-        edges) and the process continues on the next level. The algorithm stops
-        when it is not possible to increase the modularity any more after
-        shrinking the communities to vertices.
+        separate community, and vertices are moved between communities
+        iteratively in a way that maximizes the vertices' local contribution
+        to the overall modularity score. When a consensus is reached (i.e. no
+        single move would increase the modularity score), every community in
+        the original graph is shrank to a single vertex (while keeping the
+        total weight of the adjacent edges) and the process continues on the
+        next level. The algorithm stops when it is not possible to increase
+        the modularity any more after shrinking the communities to vertices.
 
         This algorithm is said to run almost in linear time on sparse graphs.
 
@@ -646,28 +684,31 @@ class Graph(core.GraphBase):
         return VertexClustering(self, membership, modularity)
 
     def community_edge_betweenness(self, clusters = None, directed = True):
-        """Community structure based on the betweenness of the edges in the network.
+        """Community structure based on the betweenness of the edges in the
+        network.
 
-        The idea is that the betweenness of the edges connecting two communities
-        is typically high, as many of the shortest paths between nodes in separate
-        communities go through them. So we gradually remove the edge with the
-        highest betweenness and recalculate the betweennesses after every
-        removal. This way sooner or later the network falls of to separate
-        components. The result of the clustering will be represented by a
-        dendrogram.
+        The idea is that the betweenness of the edges connecting two
+        communities is typically high, as many of the shortest paths between
+        nodes in separate communities go through them. So we gradually remove
+        the edge with the highest betweenness and recalculate the betweennesses
+        after every removal. This way sooner or later the network falls of to
+        separate components. The result of the clustering will be represented
+        by a dendrogram.
 
         @param clusters: the number of clusters we would like to see. This
           practically defines the "level" where we "cut" the dendrogram to
           get the membership vector of the vertices. If C{None}, the dendrogram
           is cut at the level which maximizes the modularity.
-        @param directed: whether the directionality of the edges should be taken
-          into account or not.
+        @param directed: whether the directionality of the edges should be
+          taken into account or not.
         @return: a L{VertexDendrogram} object, initally cut at the maximum
           modularity.
         """
-        d = VertexDendrogram(self, GraphBase.community_edge_betweenness(self, directed));
-        if clusters is not None: d.cut(clusters)
-        return d
+        merges = GraphBase.community_edge_betweenness(self, directed)
+        dendrogram = VertexDendrogram(merges)
+        if clusters is not None:
+            dendrogram.cut(clusters)
+        return dendrogram
 
     def community_spinglass(self, *args, **kwds):
         """community_spinglass(weights=None, spins=25, parupdate=False,
@@ -724,7 +765,8 @@ class Graph(core.GraphBase):
         return VertexClustering(self, membership)
 
     def community_walktrap(self, weights=None, steps=4):
-        """Community detection algorithm of Latapy & Pons, based on random walks.
+        """Community detection algorithm of Latapy & Pons, based on random
+        walks.
         
         The basic idea of the algorithm is that short random walks tend to stay
         in the same community. The result of the clustering will be represented
@@ -738,8 +780,8 @@ class Graph(core.GraphBase):
           modularity.
           
         @newfield ref: Reference
-        @ref: Pascal Pons, Matthieu Latapy: Computing communities in large networks
-          using random walks, U{http://arxiv.org/abs/physics/0512106}.
+        @ref: Pascal Pons, Matthieu Latapy: Computing communities in large
+          networks using random walks, U{http://arxiv.org/abs/physics/0512106}.
         """
         merges, qs = GraphBase.community_walktrap(self, weights, steps, True)
         d = VertexDendrogram(self, merges, modularity=qs)
@@ -792,17 +834,19 @@ class Graph(core.GraphBase):
 
         Registered layout names understood by this method are:
 
-          - C{circle}, C{circular}: circular layout (see L{Graph.layout_circle})
+          - C{circle}, C{circular}: circular layout
+            (see L{Graph.layout_circle})
 
           - C{drl}: DrL layout for large graphs (see L{Graph.layout_drl})
 
-          - C{drl_3d}: 3D DrL layout for large graphs (see L{Graph.layout_drl_3d})
+          - C{drl_3d}: 3D DrL layout for large graphs
+            (see L{Graph.layout_drl_3d})
 
           - C{fr}, C{fruchterman_reingold}: Fruchterman-Reingold layout
             (see L{Graph.layout_fruchterman_reingold}).
 
-          - C{fr_3d}, C{fr3d}, C{fruchterman_reingold_3d}: 3D Fruchterman-Reingold
-            layout (see L{Graph.layout_fruchterman_reingold_3d}).
+          - C{fr_3d}, C{fr3d}, C{fruchterman_reingold_3d}: 3D Fruchterman-
+            Reingold layout (see L{Graph.layout_fruchterman_reingold_3d}).
 
           - C{graphopt}: the graphopt algorithm (see L{Graph.layout_graphopt})
 
@@ -843,7 +887,8 @@ class Graph(core.GraphBase):
         if hasattr(layout, "__call__"):
             method = layout
         else:
-            method = getattr(self.__class__, self._layout_mapping[layout.lower()])
+            layout = layout.lower()
+            method = getattr(self.__class__, self._layout_mapping[layout])
         if not hasattr(method, "__call__"):
             raise ValueError("layout method must be callable")
         l=method(self, *args, **kwds)
@@ -999,6 +1044,9 @@ class Graph(core.GraphBase):
             raise TypeError("unpickled object is not a %s" % klass.__name__)
         return result
 
+    # pylint: disable-msg=C0301,C0323
+    # C0301: line too long.
+    # C0323: operator not followed by a space - well, print >>f looks OK
     def write_svg(self, fname, layout, width = None, height = None, \
                   labels = "label", colors = "color", shapes = "shape", \
                   vertex_size = 10, edge_colors = "color", \
@@ -1043,12 +1091,11 @@ class Graph(core.GraphBase):
         elif height is None:
             height = width
                 
-        if width<=0 or height<=0:
+        if width <= 0 or height <= 0:
             raise ValueError("width and height must be positive")
 
         if isinstance(layout, str):
-            f=getattr(Graph, "layout_"+layout);
-            layout=f(self, *args)
+            layout = self.layout(layout, *args, **kwds)
 
         if isinstance(labels, str):
             try:
@@ -1069,6 +1116,7 @@ class Graph(core.GraphBase):
                 shapes = self.vs.get_attribute_values(shapes)
             except KeyError:
                 shapes = [1]*self.vcount()
+
         if isinstance(edge_colors, str):
             try:
                 edge_colors = self.es.get_attribute_values(edge_colors)
@@ -1081,35 +1129,32 @@ class Graph(core.GraphBase):
             if ";" in font_size:
                 raise ValueError("font size can't contain a semicolon")
 
-        vc = self.vcount()
-        while len(labels)<vc: labels.append(len(labels)+1)
-        while len(colors)<vc: colors.append("red")
+        vcount = self.vcount()
+        labels.extend(str(i+1) for i in xrange(len(labels), vcount))
+        colors.extend(["red"] * (vcount - len(colors)))
 
-        f=open(fname, "w")
+        f = open(fname, "w")
+
+        bbox = BoundingBox(layout.bounding_box())
+
+        sizes = [width-2*vertex_size, height-2*vertex_size]
+        halfsizes = [(bbox.left + bbox.right) / 2., \
+                   (bbox.top + bbox.bottom) / 2.]
+        ratios = [sizes[0] / bbox.width, sizes[1] / bbox.height]
+        layout = [[(row[0] - halfsizes[0]) * ratios[0], \
+                  (row[1] - halfsizes[1]) * ratios[1]] \
+                  for row in layout]
                 
-        maxs=[layout[0][dim] for dim in range(2)]
-        mins=[layout[0][dim] for dim in range(2)]
-                
-        for rowidx in range(1, len(layout)):
-            row = layout[rowidx]
-            for dim in range(0, 2):
-                if maxs[dim]<row[dim]: maxs[dim]=row[dim]
-                if mins[dim]>row[dim]: mins[dim]=row[dim]
-                
-        sizes=[width-2*vertex_size, height-2*vertex_size]
-        halfsizes=[(maxs[dim]+mins[dim])/2.0 for dim in range(2)]
-        ratios=[sizes[dim]/(maxs[dim]-mins[dim]) for dim in range(2)]
-        layout=[[(row[0]-halfsizes[0])*ratios[0], \
-                 (row[1]-halfsizes[1])*ratios[1]] \
-                for row in layout]
-                
-        directed=self.is_directed()
+        directed = self.is_directed()
 
         print >>f, "<?xml version=\"1.0\" standalone=\"no\"?>"
         print >>f, "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\""
         print >>f, "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">"
         
-        print >>f, "<svg width=\"%d\" height=\"%d\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">" % (width, height)
+        print >>f, "<svg width=\"%d\" height=\"%d\"" % (width, height),
+        print >>f, "version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\"",
+        print >>f, "xmlns:xlink=\"http://www.w3.org/1999/xlink\">"
+
         print >>f, "<!-- Created by igraph -->"
         print >>f
         print >>f, "<defs>"
@@ -1120,17 +1165,19 @@ class Graph(core.GraphBase):
         print >>f, "    <![CDATA["
         print >>f, "#vertices circle { stroke: black; stroke-width: 1 }"
         print >>f, "#vertices rect { stroke: black; stroke-width: 1 }"
-        print >>f, "#vertices text { text-anchor: middle; font-size: %s; font-family: sans-serif; font-weight: normal }" % font_size
+        print >>f, ("#vertices text { text-anchor: middle; "+
+                   ("font-size: %s; " % font_size)+
+                   "font-family: sans-serif; font-weight: normal }")
         print >>f, "#edges line { stroke-width: 1 }"
         print >>f, "    ]]>"
         print >>f, "  </style>"
         print >>f, "</defs>"
         print >>f
-        print >>f, "<g transform=\"translate(%.4f,%.4f)\">" % (width/2.0, height/2.0)
+        print >>f, "<g transform=\"translate(%.4f,%.4f)\">" % \
+                   (width/2.0, height/2.0)
         print >>f, "  <g id=\"edges\">"
         print >>f, "  <!-- Edges -->"
 
-        has_edge_opacities = "opacity" in self.edge_attributes()
         for eidx, edge in enumerate(self.es):
             vidxs = edge.tuple
             x1 = layout[vidxs[0]][0]
@@ -1156,7 +1203,8 @@ class Graph(core.GraphBase):
         print >>f, "  <g id=\"vertices\">"
         print >>f, "  <!-- Vertices -->"
         for vidx in range(self.vcount()):
-            print >>f, "    <g transform=\"translate(%.4f %.4f)\">" % (layout[vidx][0], layout[vidx][1])
+            print >>f, "    <g transform=\"translate(%.4f %.4f)\">" % \
+                    layout[vidx]
             if shapes[vidx] == 1:
                 # Undocumented feature: can handle two colors
                 c = str(colors[vidx])
@@ -1169,7 +1217,7 @@ class Graph(core.GraphBase):
                 else:
                     print >>f, "      <circle cx=\"0\" cy=\"0\" r=\"%s\" fill=\"%s\"/>" % (str(vertex_size), str(colors[vidx]))
             elif shapes[vidx] == 2:
-                print >>f, "      <rect x=\"-%s\" y=\"-%s\" width=\"%s\" height=\"%s\" fill=\"%s\"/>" % (str(vertex_size), str(vertex_size), str(2*vertex_size), str(2*vertex_size), str(colors[vidx]))
+                print >>f, "      <rect x=\"-%s\" y=\"-%s\" width=\"%s\" height=\"%s\" fill=\"%s\"/>" % (vertex_size, vertex_size, 2*vertex_size, 2*vertex_size, colors[vidx])
             print >>f, "      <text x=\"0\" y=\"5\">%s</text>" % str(labels[vidx])
             print >>f, "    </g>"
 
@@ -1225,7 +1273,8 @@ class Graph(core.GraphBase):
                 if len(parts) == 2:
                     line = f.readline()
                     if line is None:
-                        # This is a 2x2 matrix, it can be a matrix or an edge list
+                        # This is a 2x2 matrix, it can be a matrix or an edge
+                        # list as well and we cannot decide
                         return None
                     else:
                         parts = line.strip().split()
@@ -1286,11 +1335,11 @@ class Graph(core.GraphBase):
         @param f: the file containing the graph to be saved
         @param format: the format of the file (if one wants to override the
           format determined from the filename extension, or the filename itself
-          is a stream). C{None} means auto-detection. Possible values are: C{"ncol"}
-          (NCOL format), C{"lgl"} (LGL format), C{"graphml"}, C{"graphmlz"}
-          (GraphML and gzipped GraphML format), C{"gml"} (GML format),
-          C{"dot"}, C{"graphviz"} (DOT format, used by GraphViz), C{"net"},
-          C{"pajek"} (Pajek format), C{"dimacs"} (DIMACS format),
+          is a stream). C{None} means auto-detection. Possible values are:
+          C{"ncol"} (NCOL format), C{"lgl"} (LGL format), C{"graphml"},
+          C{"graphmlz"} (GraphML and gzipped GraphML format), C{"gml"} (GML
+          format), C{"dot"}, C{"graphviz"} (DOT format, used by GraphViz),
+          C{"net"}, C{"pajek"} (Pajek format), C{"dimacs"} (DIMACS format),
           C{"edgelist"}, C{"edges"} or C{"edge"} (edge list), C{"adjacency"}
           (adjacency matrix), C{"pickle"} (Python pickled format),
           C{"svg"} (Scalable Vector Graphics).
@@ -1312,8 +1361,9 @@ class Graph(core.GraphBase):
     # Constructor for dict-like representation of graphs
 
     @classmethod
-    def DictList(klass, vertices, edges, directed=False, vertex_name_attr="name", \
-            edge_foreign_keys=("source", "target"), iterative=False):
+    def DictList(klass, vertices, edges, directed=False, \
+            vertex_name_attr="name", edge_foreign_keys=("source", "target"), \
+            iterative=False):
         """Constructs a graph from a list-of-dictionaries representation.
 
         This representation assumes that vertices and edges are encoded in
@@ -1397,7 +1447,9 @@ class Graph(core.GraphBase):
         else:
             edge_list, edge_attrs, m = [], {}, 0
             for idx, edge_data in enumerate(edges):
-                v1, v2 = vertex_name_map[edge_data[efk_src]], vertex_name_map[edge_data[efk_dest]]
+                v1 = vertex_name_map[edge_data[efk_src]]
+                v2 = vertex_name_map[edge_data[efk_dest]]
+
                 edge_list.append((v1, v2))
                 for k, v in edge_data.iteritems():
                     try:
@@ -1408,7 +1460,8 @@ class Graph(core.GraphBase):
             for k, v in edge_attrs.iteritems():
                 edge_attrs[k] = create_list_from_indices(v, m)
 
-            # It may have happened that some vertices were added during the process
+            # It may have happened that some vertices were added during
+            # the process
             if len(vertex_name_map) > n:
                 diff = len(vertex_name_map) - n
                 more = [None] * diff
@@ -1425,10 +1478,16 @@ class Graph(core.GraphBase):
 
     ###########################
     # Vertex and edge sequence
-    def _get_vs(self): return VertexSeq(self)
-    def _get_es(self): return EdgeSeq(self)
-    vs=property(_get_vs, doc="The vertex sequence of the graph")
-    es=property(_get_es, doc="The edge sequence of the graph")
+
+    @property
+    def vs(self):
+        """The vertex sequence of the graph"""
+        return VertexSeq(self)
+
+    @property
+    def es(self):
+        """The edge sequence of the graph"""
+        return EdgeSeq(self)
 
     #############################################
     # Friendlier interface for bipartite methods
@@ -1523,7 +1582,8 @@ class Graph(core.GraphBase):
         result.vs["type"] = types
         return result
 
-    def bipartite_projection(self, types="type", multiplicity=True, *args, **kwds):
+    def bipartite_projection(self, types="type", multiplicity=True, \
+            *args, **kwds):
         """bipartite_projection(types="type", multiplicity=True, probe1=-1)
 
         Projects a bipartite graph into two one-mode graphs. Edge directions
@@ -1538,59 +1598,63 @@ class Graph(core.GraphBase):
         >>> g2.isomorphic(Graph.Full(5))
         True
         
-        @param types: an igraph vector containing the vertex types, or an attribute
-          name. Anything that evalulates to C{False} corresponds to vertices of the
-          first kind, everything else to the second kind.
-        @param multiplicity: if C{True}, then igraph keeps the multiplicity of the
-          edges in the projection in an edge attribute called C{"weight"}. E.g., if
-          there is an A-C-B and an A-D-B triplet in the bipartite graph and there is
-          no other X (apart from X=B and X=D) for which an A-X-B triplet would exist
-          in the bipartite graph, the multiplicity of the A-B edge in the projection
-          will be 2.
+        @param types: an igraph vector containing the vertex types, or an
+          attribute name. Anything that evalulates to C{False} corresponds to
+          vertices of the first kind, everything else to the second kind.
+        @param multiplicity: if C{True}, then igraph keeps the multiplicity of
+          the edges in the projection in an edge attribute called C{"weight"}.
+          E.g., if there is an A-C-B and an A-D-B triplet in the bipartite
+          graph and there is no other X (apart from X=B and X=D) for which an
+          A-X-B triplet would exist in the bipartite graph, the multiplicity
+          of the A-B edge in the projection will be 2.
         @param probe1: this argument can be used to specify the order of the
-          projections in the resulting list. If given and non-negative, then it is
-          considered as a vertex ID; the projection containing the vertex will be
-          the first one in the result.
+          projections in the resulting list. If given and non-negative, then
+          it is considered as a vertex ID; the projection containing the
+          vertex will be the first one in the result.
         @return: a tuple containing the two projected one-mode graphs.
         """
+        superclass_meth = super(Graph, self).bipartite_projection
         if multiplicity:
-            g1, g2, w1, w2 = super(Graph, self).bipartite_projection(types, True, *args, **kwds)
+            g1, g2, w1, w2 = superclass_meth(types, True, *args, **kwds)
             g1.es["weight"] = w1
             g2.es["weight"] = w2
             return g1, g2
         else:
-            return super(Graph, self).bipartite_projection(types, False, *args, **kwds)
+            return superclass_meth(types, False, *args, **kwds)
 
     def bipartite_projection_size(self, types="type", *args, **kwds):
         """bipartite_projection(types="type")
 
-        Calculates the number of vertices and edges in the bipartite projections
-        of this graph according to the specified vertex types. This is useful if
-        you have a bipartite graph and you want to estimate the amount of memory
-        you would need to calculate the projections themselves.
+        Calculates the number of vertices and edges in the bipartite
+        projections of this graph according to the specified vertex types.
+        This is useful if you have a bipartite graph and you want to estimate
+        the amount of memory you would need to calculate the projections
+        themselves.
         
-        @param types: an igraph vector containing the vertex types, or an attribute
-          name. Anything that evalulates to C{False} corresponds to vertices of the
-          first kind, everything else to the second kind.
+        @param types: an igraph vector containing the vertex types, or an
+          attribute name. Anything that evalulates to C{False} corresponds to
+          vertices of the first kind, everything else to the second kind.
         @return: a 4-tuple containing the number of vertices and edges in the
           first projection, followed by the number of vertices and edges in the
           second projection.
         """
-        return super(Graph, self).bipartite_projection_size(types, *args, **kwds)
+        return super(Graph, self).bipartite_projection_size(types, \
+                *args, **kwds)
 
     def get_incidence(self, types="type", *args, **kwds):
         """get_incidence(self, types="type")
 
         Returns the incidence matrix of a bipartite graph. The incidence matrix
-        is an M{n} times M{m} matrix, where M{n} and M{m} are the number of vertices
-        in the two vertex classes.
+        is an M{n} times M{m} matrix, where M{n} and M{m} are the number of
+        vertices in the two vertex classes.
 
-        @param types: an igraph vector containing the vertex types, or an attribute
-          name. Anything that evalulates to C{False} corresponds to vertices of the
-          first kind, everything else to the second kind.
-        @return: the incidence matrix and two lists in a triplet. The first list
-          define the mapping between row indices of the matrix and the
-          original vertex IDs. The second list is the same for the column indices.
+        @param types: an igraph vector containing the vertex types, or an
+          attribute name. Anything that evalulates to C{False} corresponds to
+          vertices of the first kind, everything else to the second kind.
+        @return: the incidence matrix and two lists in a triplet. The first
+          list defines the mapping between row indices of the matrix and the
+          original vertex IDs. The second list is the same for the column
+          indices.
         """
         return super(Graph, self).get_incidence(types, *args, **kwds)
 
@@ -1715,7 +1779,8 @@ class Graph(core.GraphBase):
         return NotImplemented
 
     def __mul__(self, other):
-        """Copies exact replicas of the original graph an arbitrary number of times.
+        """Copies exact replicas of the original graph an arbitrary number of
+        times.
 
         @param other: if it is an integer, multiplies the graph by creating the
           given number of identical copies and taking the disjoint union of
@@ -1727,7 +1792,6 @@ class Graph(core.GraphBase):
             elif other == 1:
                 return self
             elif other > 1:
-                # TODO: should make it more efficient - powers of 2?
                 return self.disjoint_union([self]*(other-1))
             else:
                 return NotImplemented
@@ -1735,7 +1799,8 @@ class Graph(core.GraphBase):
         return NotImplemented
 
     def __nonzero__(self):
-        """Returns True if the graph has at least one vertex, False otherwise."""
+        """Returns True if the graph has at least one vertex, False otherwise.
+        """
         return self.vcount() > 0
 
     def __coerce__(self, other):
@@ -1756,24 +1821,29 @@ class Graph(core.GraphBase):
             return self, other
         return NotImplemented
 
+    @classmethod
+    def _reconstruct(cls, attrs, *args, **kwds):
+        """Reconstructs a Graph object from Python's pickled format.
+
+        This method is for internal use only, it should not be called
+        directly."""
+        result = cls(*args, **kwds)
+        result.__dict__.update(attrs)
+        return result
 
     def __reduce__(self):
         """Support for pickling."""
-        import warnings
         constructor = self.__class__
-        graph_attr_names = self.attributes()
-        vertex_attr_names = self.vs.attribute_names()
-        edge_attr_names = self.es.attribute_names()
         gattrs, vattrs, eattrs = {}, {}, {}
-        for a in graph_attr_names:
-            gattrs[a] = self[a]
-        for a in vertex_attr_names:
-            vattrs[a] = self.vs[a]
-        for a in edge_attr_names:
-            eattrs[a] = self.es[a]
-        parameters = (self.vcount(), self.get_edgelist(), self.is_directed(), \
-            gattrs, vattrs, eattrs)
-        return (constructor, parameters, {})
+        for attr in self.attributes():
+            gattrs[attr] = self[attr]
+        for attr in self.vs.attribute_names():
+            vattrs[attr] = self.vs[attr]
+        for attr in self.es.attribute_names():
+            eattrs[attr] = self.es[attr]
+        parameters = (self.vcount(), self.get_edgelist(), \
+            self.is_directed(), gattrs, vattrs, eattrs)
+        return (constructor, parameters, self.__dict__)
 
 
     def __plot__(self, context, bbox, palette, *args, **kwds):
@@ -1804,9 +1874,9 @@ class Graph(core.GraphBase):
           - C{layout}: the layout to be used. If not an instance of
             L{Layout}, it will be passed to L{Graph.layout} to calculate
             the layout. Note that if you want a deterministic layout that
-            does not change with every plot, you must either use a deterministic
-            layout function (like L{Graph.layout_circle}) or calculate the
-            layout in advance and pass a L{Layout} object here.
+            does not change with every plot, you must either use a
+            deterministic layout function (like L{Graph.layout_circle}) or
+            calculate the layout in advance and pass a L{Layout} object here.
             
           - C{margin}: the top, right, bottom, left margins as a 4-tuple.
             If it has less than 4 elements or is a single float, the elements
@@ -1902,10 +1972,12 @@ class Graph(core.GraphBase):
             if self.is_directed():
                 output.append("")
                 output.append("Degree distribution (only in-degrees):")
-                output.append(str(self.degree_distribution(binwidth, type=IN)))
+                dd = self.degree_distribution(binwidth, type=IN)
+                output.append(str(dd))
                 output.append("")
                 output.append("Degree distribution (only out-degrees):")
-                output.append(str(self.degree_distribution(binwidth, type=OUT)))
+                dd = self.degree_distribution(binwidth, type=OUT)
+                output.append(str(dd))
 
         return "\n".join(output)
 
@@ -2253,9 +2325,9 @@ class EdgeSeq(core.EdgeSeq):
     def select(self, *args, **kwds):
         """Selects a subset of the edge sequence based on some criteria
         
-        The selection criteria can be specified by the positional and the keyword
-        arguments. Positional arguments are always processed before keyword
-        arguments.
+        The selection criteria can be specified by the positional and the
+        keyword arguments. Positional arguments are always processed before
+        keyword arguments.
         
           - If the first positional argument is C{None}, an empty sequence is
             returned.
@@ -2401,7 +2473,8 @@ class EdgeSeq(core.EdgeSeq):
             "in": lambda a, b: a in b, \
             "notin": lambda a, b: a not in b }
         for keyword, value in kwds.iteritems():
-            if "_" not in keyword or keyword.rindex("_") == 0: keyword = keyword+"_eq"
+            if "_" not in keyword or keyword.rindex("_") == 0:
+                keyword = keyword+"_eq"
             pos = keyword.rindex("_")
             attr, op = keyword[0:pos], keyword[pos+1:]
             try:
@@ -2441,7 +2514,8 @@ class EdgeSeq(core.EdgeSeq):
                 values = es[attr]
 
             if values is not None:
-                filtered_idxs=[i for i, v in enumerate(values) if func(v, value)]
+                filtered_idxs=[i for i, v in enumerate(values) \
+                               if func(v, value)]
 
             es = es.select(filtered_idxs)
 
