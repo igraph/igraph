@@ -19,7 +19,7 @@ if test -z "$R_PACKAGE_DIR" ; then
    R_PACKAGE_DIR=${DPKG}
 fi
 
-mkdir -p ${R_PACKAGE_DIR}/ libs${R_ARCH}
+mkdir -p ${R_PACKAGE_DIR}/libs${R_ARCH}
 cp $LIB_ZLIB/bin/zlib1.dll ${R_PACKAGE_DIR}/libs${R_ARCH}
 cp $LIB_XML/bin/libxml2.dll ${R_PACKAGE_DIR}/libs${R_ARCH}
 cp $LIB_ICONV/bin/iconv.dll ${R_PACKAGE_DIR}/libs${R_ARCH}
