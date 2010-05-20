@@ -1210,7 +1210,7 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
   long int i;
   igraph_vector_t tmp=IGRAPH_VECTOR_NULL;
 
-  if (vertex<0 || vertex>=no_of_nodes) {
+  if (!IGRAPH_FINITE(vertex) || vertex<0 || vertex>=no_of_nodes) {
     IGRAPH_ERROR("subcomponent failed", IGRAPH_EINVVID);
   }
   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
