@@ -195,7 +195,7 @@ AC_ARG_WITH([external-arpack], [AS_HELP_STRING([--with-external-arpack],
             [internal_arpack=no],
 	    [internal_arpack=yes])
 
-if test "$internal_blas" == "no"; then
+if test "$internal_blas" = "no"; then
   AC_CHECK_LIB([blas], [daxpy_], [],
      AC_CHECK_LIB([blas], [daxpy], [],
         AC_CHECK_LIB([blas], [DAXPY_], [],
@@ -206,7 +206,7 @@ else
   AC_DEFINE([INTERNAL_BLAS], [1], [Define to 1 if you use the internal BLAS library])
 fi
 
-if test "$internal_lapack" == "no"; then
+if test "$internal_lapack" = "no"; then
   AC_CHECK_LIB([lapack], [dlarnv_], [],
      AC_CHECK_LIB([lapack], [dlarnv], [],
         AC_CHECK_LIB([lapack], [DLARNV_], [],
@@ -217,7 +217,7 @@ else
   AC_DEFINE([INTERNAL_LAPACK], [1], [Define to 1 if you use the internal LAPACK library])
 fi
 
-if test "$internal_arpack" == "no"; then
+if test "$internal_arpack" = "no"; then
   AC_CHECK_LIB([arpack], [dsaupd_], [],
      AC_CHECK_LIB([arpack], [dsaupd], [],
         AC_CHECK_LIB([arpack], [DSAUPD_], [],
@@ -232,19 +232,19 @@ AM_CONDITIONAL(INTERNAL_ARPACK, test x$internal_arpack = xyes)
 AM_CONDITIONAL(INTERNAL_LAPACK, test x$internal_lapack = xyes)
 AM_CONDITIONAL(INTERNAL_BLAS, test x$internal_blas = xyes)
 
-if test "$debug" == "yes"; then
+if test "$debug" = "yes"; then
   CFLAGS="${CFLAGS} -ggdb -DRC_DEBUG"
   CPPFLAGS="${CFLAGS} -ggdb -DRC_DEBUG"
   CXXFLAGS="${CFLAGS} -ggdb -DRC_DEBUG"
 fi
 
-if test "$use_gprof" == "yes"; then
+if test "$use_gprof" = "yes"; then
   CFLAGS="${CFLAGS} -pg"
   CPPFLAGS="${CFLAGS} -pg"
   CXXFLAGS="${CFLAGS} -pg"
 fi
 
-if test "$use_shell" == "yes"; then
+if test "$use_shell" = "yes"; then
   AC_PROG_LN_S
 fi
 
