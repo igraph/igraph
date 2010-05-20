@@ -60,12 +60,14 @@ msvc: all
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc
 	cp -r $(top_srcdir)/src $(top_builddir)/igraph-$(VERSION)-msvc/
+	cp -r $(top_srcdir)/include $(top_builddir)/igraph-$(VERSION)-msvc
+	if [ $(top_srcdir) != $(top_builddir) ]; then cp -r $(top_builddir)/include $(top_builddir)/src $(top_builddir)/igraph-$(VERSION)-msvc; fi
+	cp -r $(top_srcdir)/msvc/include $(top_builddir)/igraph-$(VERSION)-msvc/winclude
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/{.deps,.libs}
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/config.h
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/*.{o,lo,la}
-	cp -r $(top_srcdir)/include $(top_builddir)/igraph-$(VERSION)-msvc
-	if [ $(top_srcdir) != $(top_builddir) ]; then cp -r $(top_builddir)/include $(top_builddir)/src $(top_builddir)/igraph_$(VERSION)-msvc; fi
-	cp -r $(top_srcdir)/msvc/include $(top_builddir)/igraph-$(VERSION)-msvc/winclude
+	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/*~
+	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/include/*~
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc/winlib
 	cp $(top_srcdir)/msvc/igraph.{sln,vcproj} $(top_builddir)/igraph-$(VERSION)-msvc/
 	cp -r $(top_srcdir)/msvc/igraphtest .
