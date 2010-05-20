@@ -2028,11 +2028,12 @@ int igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_t *eids
   igraph_bool_t directed = igraph_is_directed(graph);
   igraph_integer_t from, to;
   igraph_vector_t edges;
+  igraph_i_multilevel_link *links;
 
   /* Make sure there's enough space in eids to store the new edge IDs */
   IGRAPH_CHECK(igraph_vector_resize(eids, ecount));
 
-  igraph_i_multilevel_link *links = igraph_Calloc(ecount, igraph_i_multilevel_link);
+  links = igraph_Calloc(ecount, igraph_i_multilevel_link);
   if (links == 0) {
     IGRAPH_ERROR("multi-level community structure detection failed", IGRAPH_ENOMEM);
   }
@@ -2176,7 +2177,13 @@ int igraph_i_multilevel_community_links(const igraph_t *graph,
 }
 
 /* Returns gain of modularity if vertex is added into community */
-inline igraph_real_t igraph_i_multilevel_community_modularity_gain(
+#ifdef _MSC_VER
+#  define INLINE __forceinline
+#else
+#  define INLINE inline
+#endif
+
+INLINE igraph_real_t igraph_i_multilevel_community_modularity_gain(
   const igraph_i_multilevel_community_list *communities,
   igraph_integer_t community, igraph_integer_t vertex,
   igraph_real_t weight_all, igraph_real_t weight_inside) {
@@ -2342,11 +2349,15 @@ int igraph_i_community_multilevel_step(igraph_t *graph,
       igraph_real_t weight_all = 0;
       igraph_real_t weight_inside = 0;
       igraph_real_t weight_loop = 0;
+      igraph_real_t max_q_gain = 0;
+      igraph_integer_t max_weight;
+      long int old_id, new_id, n;
+
       igraph_i_multilevel_community_links(graph, &communities, i, &edges,
         &weight_all, &weight_inside, &weight_loop, &links_community, &links_weight);
 
-      long int old_id = (long int)VECTOR(*(communities.membership))[i];
-      long int new_id = old_id;
+      old_id = (long int)VECTOR(*(communities.membership))[i];
+      new_id = old_id;
 
       /* Update old community */
       igraph_vector_set(communities.membership, i, -1);
@@ -2358,9 +2369,9 @@ int igraph_i_community_multilevel_step(igraph_t *graph,
       /* debug("Remove %ld all: %lf Inside: %lf\n", i, -weight_all, -2*weight_inside + weight_loop); */
 
       /* Find new community to join with the best modification gain */
-      igraph_real_t max_q_gain = 0;
-      igraph_integer_t max_weight = weight_inside;
-      long int n = igraph_vector_size(&links_community);
+      max_q_gain = 0;
+      max_weight = weight_inside;
+      n = igraph_vector_size(&links_community);
 
       for (j = 0; j < n; j++) {
         long int c = (long int) VECTOR(links_community)[j];
