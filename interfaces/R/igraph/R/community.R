@@ -295,10 +295,14 @@ fastgreedy.community <- function(graph, merges=TRUE, modularity=TRUE,
   }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_community_fastgreedy", graph, as.logical(merges),
-        as.logical(modularity), weights,
-        PACKAGE="igraph")
-} 
+  res <- .Call("R_igraph_community_fastgreedy", graph, as.logical(merges),
+               as.logical(modularity), weights,
+               PACKAGE="igraph")
+  class(res) <- "igraph.fgc"
+  res
+}
+
+as.dendrogram.igraph.fgc <- as.dendrogram.igraph.walktrap
 
 community.to.membership <- function(graph, merges, steps, membership=TRUE,
                                     csize=TRUE) {
