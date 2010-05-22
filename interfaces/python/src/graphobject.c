@@ -4475,7 +4475,7 @@ PyObject *igraphmodule_Graph_spanning_tree(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_simplify(igraphmodule_GraphObject * self,
                                       PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] = { "multiple", "loops", "combine_edges", NULL };
+  static char *kwlist[] = { "multiple", "loops", "combine_edges", NULL };
   PyObject *multiple = Py_True, *loops = Py_True, *comb_o = Py_None;
   igraph_attribute_combination_t comb;
 
@@ -10200,11 +10200,11 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_simplify */
   {"simplify", (PyCFunction) igraphmodule_Graph_simplify,
    METH_VARARGS | METH_KEYWORDS,
-   "simplify(multiple=True, loops=True, combine_vertices=None)\n\n"
+   "simplify(multiple=True, loops=True, combine_edges=None)\n\n"
    "Simplifies a graph by removing self-loops and/or multiple edges.\n\n"
    "@param multiple: whether to remove multiple edges.\n"
    "@param loops: whether to remove loops.\n"
-   "@param combine_vertices: specifies how to combine the attributes of\n"
+   "@param combine_edges: specifies how to combine the attributes of\n"
    "  multiple edges between the same pair of vertices into a single\n"
    "  attribute. If it is C{None}, only one of the edges will be kept\n"
    "  and all the attributes will be lost. If it is a function, the\n"
@@ -10239,12 +10239,12 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  the attributes not specified explicitly in the dictionary.\n"
    "\n"
    "For example, suppose you have a graph with an edge attribute named\n"
-   "C{weight}. C{graph.simplify(combine_vertices=max)} will take the\n"
+   "C{weight}. C{graph.simplify(combine_edges=max)} will take the\n"
    "maximum of the weights of multiple edges and assign that weight to\n"
-   "the collapsed edge. C{graph.simplify(combine_vertices=sum)} will\n"
+   "the collapsed edge. C{graph.simplify(combine_edges=sum)} will\n"
    "take the sum of the weights. You can also write\n"
-   "C{graph.simplify(combine_vertices=dict(weight=\"sum\"))} or\n"
-   "C{graph.simplify(combine_vertices=dict(weight=sum))}, since\n"
+   "C{graph.simplify(combine_edges=dict(weight=\"sum\"))} or\n"
+   "C{graph.simplify(combine_edges=dict(weight=sum))}, since\n"
    "C{sum} is recognised both as a Python built-in function and as\n"
    "a string constant.\n"
   },
