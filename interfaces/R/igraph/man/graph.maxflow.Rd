@@ -20,8 +20,7 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL,
     used.}
   \item{value.only}{Logical scalar, if \code{TRUE} only the minumum cut
     value is returned, if \code{FALSE} the edges in the cut and a the
-    two (or more) partitions are also returned. This currently only
-    works for undirected graphs.
+    two (or more) partitions are also returned.
   }
 }
 \details{
@@ -57,13 +56,32 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL,
   and \code{target} arguments and then minimum of all possible minimum
   cuts is calculated.
 
-  Starting from version 0.5 igraph can return the edges in the minimum
-  cut for undirected graphs.
+  For undirected graphs the Stoer-Wagner algorithm (see reference below)
+  is used to calculate the minimum cut.
 }
 \value{
-  A numeric constant, the maximum flow, or the minimum cut, except if
-  \code{value.only=FALSE} for \code{graph.mincut}. In this case a named
-  list with components:
+  For \code{graph.maxflow} a named list with components:
+  \item{value}{A numeric scalar, the value of the maximum flow.}
+  \item{flow}{A numeric vector, the flow itself, one entry for each
+    edge. For undirected graphs this entry is bit trickier,
+    since for these the flow direction is not predetermined by
+    the edge direction. For these graphs the elements of the
+    this vector can be negative, this means that the flow
+    goes from the bigger vertex id to the smaller one. Positive
+    values mean that the flow goes from the smaller vertex id to
+    the bigger one.}
+  \item{cut}{A numeric vector of edge ids, the minimum cut corresponding
+    to the maximum flow.}
+  \item{partition1}{A numeric vector of vertex ids, the vertices in the
+    first partition of the minimum cut corresponding to the maximum
+    flow.}
+  \item{partition2}{A numeric vector of vertex ids, the vertices in the
+    second partition of the minimum cut corresponding to the maximum
+    flow.}
+  
+  For \code{graph.mincut} a numeric constant, the value of the minimum
+  cut, except if \code{value.only=FALSE}. In this case a named list with
+  components:
   \item{value}{Numeric scalar, the cut value.}
   \item{cut}{Numeric vector, the edges in the cut.}
   \item{partition1}{The vertices in the first partition after the cut
@@ -76,15 +94,27 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL,
     graph may fall apart into more than two components.}
 }
 \references{
-  A. V. Goldberg and R. E. Tarjan: ``A New Approach to the Maximum Flow
-  Problem'' Journal of the ACM 35:921-940, 1988.  
+  A. V. Goldberg and R. E. Tarjan: A New Approach to the Maximum Flow
+  Problem \emph{Journal of the ACM} 35:921-940, 1988.
+  
+  M. Stoer and F. Wagner: A simple min-cut algorithm, \emph{Journal of
+  the ACM}, 44 585-591, 1997.
 }
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{\code{\link{shortest.paths}}, \code{\link{edge.connectivity}},
   \code{\link{vertex.connectivity}}}
 \examples{
+E <- rbind( c(1,3,3), c(3,4,1), c(4,2,2), c(1,5,1), c(5,6,2), c(6,2,10))
+colnames(E) <- c("from", "to", "capacity")
+g1 <- graph.data.frame(as.data.frame(E))
+graph.maxflow(g1, source=V(g1)["1"], target=V(g1)["2"])
+
 g <- graph.ring(100)
 graph.mincut(g, capacity=rep(1,vcount(g)))
 graph.mincut(g, value.only=FALSE, capacity=rep(1,vcount(g)))
+
+g2 <- graph( c(0,1,1,2,2,3, 0,5,5,4,4,3, 3,0) )
+E(g2)$capacity <- c(3,1,2, 10,1,3, 2)
+graph.mincut(g2, value.only=FALSE)
 }
 \keyword{graphs}

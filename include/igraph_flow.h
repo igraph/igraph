@@ -44,15 +44,26 @@ __BEGIN_DECLS
 /* MAximum flows, minimum cuts & such                 */
 /* -------------------------------------------------- */
 
+int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
+		   igraph_vector_t *flow, igraph_vector_t *cut,
+		   igraph_vector_t *partition, igraph_vector_t *partition2,
+		   igraph_integer_t source, igraph_integer_t target,
+		   const igraph_vector_t *capacity);
 int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
 			 igraph_integer_t source, igraph_integer_t target,
 			 const igraph_vector_t *capacity);
-int igraph_mincut_value(const igraph_t *graph, igraph_real_t *res, 
-			const igraph_vector_t *capacity);
+
+int igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
+		     igraph_vector_t *cut, igraph_vector_t *partition,
+		     igraph_vector_t *partition2,
+		     igraph_integer_t source, igraph_integer_t target,
+		     const igraph_vector_t *capacity);
 int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *res,
                            igraph_integer_t source, igraph_integer_t target,
 			   const igraph_vector_t *capacity);
 
+int igraph_mincut_value(const igraph_t *graph, igraph_real_t *res, 
+			const igraph_vector_t *capacity);
 int igraph_mincut(const igraph_t *graph,
 		  igraph_real_t *value,
 		  igraph_vector_t *partition,
@@ -67,17 +78,20 @@ int igraph_st_vertex_connectivity(const igraph_t *graph,
 				  igraph_vconn_nei_t neighbors);
 int igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res,
 			       igraph_bool_t checks);
+
 int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
 				igraph_integer_t source, 
 				igraph_integer_t target);
 int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
 			     igraph_bool_t checks);
+
 int igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
 			       igraph_integer_t source, 
 			       igraph_integer_t target);
 int igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
 				 igraph_integer_t source,
 				 igraph_integer_t target);
+
 int igraph_adhesion(const igraph_t *graph, igraph_integer_t *res,
 		    igraph_bool_t checks);
 int igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,

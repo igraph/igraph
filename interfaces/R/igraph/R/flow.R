@@ -20,26 +20,6 @@
 #
 ###################################################################
 
-graph.maxflow <- function(graph, source, target, capacity=NULL) {
-
-  if (!is.igraph(graph)) {
-    stop("Not a graph object")
-  }
-  if (is.null(capacity)) {
-    if ("capacity" %in% list.edge.attributes(graph)) {
-      capacity <- E(graph)$capacity
-    }
-  }
-  if (!is.null(capacity)) {
-    capacity <- as.numeric(capacity)
-  }
-  
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_maxflow", graph, as.igraph.vs(graph, source),
-        as.igraph.vs(graph, target), capacity,
-        PACKAGE="igraph")
-}
-
 graph.mincut <- function(graph, source=NULL, target=NULL, capacity=NULL,
                          value.only=TRUE) {
 

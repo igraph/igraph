@@ -8,13 +8,15 @@
 <title>Maximum Flows, Minimum Cuts and related measures</title>
 
 <section><title>Maximum Flows</title>
+<!-- doxrox-include igraph_maxflow -->
 <!-- doxrox-include igraph_maxflow_value -->
 </section>
 
 <section><title>Minimum cuts</title>
+<!-- doxrox-include igraph_st_mincut -->
 <!-- doxrox-include igraph_st_mincut_value -->
-<!-- doxrox-include igraph_mincut_value -->
 <!-- doxrox-include igraph_mincut -->
+<!-- doxrox-include igraph_mincut_value -->
 </section>
 
 <section><title>Connectivity</title>

@@ -21,9 +21,14 @@
 
 AT_BANNER([[Maximum flows and such]])
 
-AT_SETUP([Maximum flow (igraph_maxflow): ])
+AT_SETUP([Maximum flow value (igraph_maxflow_value): ])
 AT_KEYWORDS([maximum flow maxflow minimum cut])
 AT_COMPILE_CHECK([simple/flow.c], [], [simple/ak-4102.max])
+AT_CLEANUP
+
+AT_SETUP([Maximum flow (igraph_maxflow): ])
+AT_KEYWORDS([maximum flow maxflow minimum cut])
+AT_COMPILE_CHECK([simple/flow2.c], [], [simple/ak-4102.max])
 AT_CLEANUP
 
 AT_SETUP([Minimum cut (igraph_mincut): ])
