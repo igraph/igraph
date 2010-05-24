@@ -5640,6 +5640,69 @@ PyObject *igraphmodule_Graph_layout_lgl(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Places the vertices of a graph using multidimensional scaling
+ * \return the calculated coordinates as a Python list of lists
+ * \sa igraph_layout_mds
+ */
+PyObject *igraphmodule_Graph_layout_mds(igraphmodule_GraphObject * self,
+                                        PyObject * args, PyObject * kwds)
+{
+  static char *kwlist[] =
+    { "dist", "dim", "arpack_options", NULL };
+  igraph_matrix_t m;
+  igraph_matrix_t *dist = 0;
+  long int dim = 2;
+  igraphmodule_ARPACKOptionsObject *arpack_options;
+  PyObject *dist_o = Py_None, *options_o = Py_None;
+  PyObject *arpack_options_o = igraphmodule_arpack_options_default;
+  PyObject *result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OlO!", kwlist, &dist_o,
+                                   &dim, &igraphmodule_ARPACKOptionsType,
+                                   &arpack_options_o))
+    return NULL;
+
+  if (dist_o != Py_None) {
+    dist = (igraph_matrix_t*)malloc(sizeof(igraph_matrix_t));
+    if (!dist) {
+      PyErr_NoMemory();
+      return NULL;
+    }
+	if (igraphmodule_PyList_to_matrix_t(dist_o, dist)) {
+      free(dist);
+      return NULL;
+    }
+  }
+
+  if (igraph_matrix_init(&m, 1, 1)) {
+    if (dist) {
+      igraph_matrix_destroy(dist); free(dist);
+    }
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
+  if (igraph_layout_mds(&self->g, &m, dist, dim,
+                        igraphmodule_ARPACKOptions_get(arpack_options))) {
+    if (dist) {
+      igraph_matrix_destroy(dist); free(dist);
+    }
+    igraph_matrix_destroy(&m);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (dist) {
+    igraph_matrix_destroy(dist); free(dist);
+  }
+
+  result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
+  igraph_matrix_destroy(&m);
+  return (PyObject *) result;
+}
+
+/** \ingroup python_interface_graph
  * \brief Places the vertices of a graph according to the Reingold-Tilford
  * tree layout algorithm
  * \return the calculated coordinates as a Python list of lists
@@ -10830,6 +10893,39 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  in the first iteration, second neighbors in the second,\n"
    "  etc. A negative number means a random vertex.\n"
    "@return: the calculated coordinate pairs in a list."},
+
+  /* interface to igraph_layout_mds */
+  {"layout_mds",
+   (PyCFunction) igraphmodule_Graph_layout_mds,
+   METH_VARARGS | METH_KEYWORDS,
+   "layout_mds(dist=None, dim=2, arpack_options=None)\n"
+   "Places the vertices in an Euclidean space with the given number of\n"
+   "dimensions using multidimensional scaling.\n\n"
+   "This layout requires a distance matrix, where the intersection of\n"
+   "row M{i} and column M{j} specifies the desired distance between\n"
+   "vertex M{i} and vertex M{j}. The algorithm will try to place the\n"
+   "vertices in a way that approximates the distance relations\n"
+   "prescribed in the distance matrix. igraph uses the classical\n"
+   "multidimensional scaling by Torgerson (see reference below).\n\n"
+   "For unconnected graphs, the method will decompose the graph into\n"
+   "weakly connected components and then lay out the components\n"
+   "individually using the appropriate parts of the distance matrix.\n\n"
+   "@param dist: the distance matrix. It must be symmetric and the\n"
+   "  symmetry is not checked -- results are unspecified when a\n"
+   "  non-symmetric distance matrix is used. If this parameter is\n"
+   "  C{None}, the shortest path lengths will be used as distances.\n"
+   "  Directed graphs are treated as undirected when calculating\n"
+   "  the shortest path lengths to ensure symmetry.\n"
+   "@param dim: the number of dimensions. For 2D layouts, supply\n"
+   "  2 here.\n"
+   "@param arpack_options: an L{ARPACKOptions} object used to fine-tune\n"
+   "  the ARPACK eigenvector calculation. If omitted, the module-level\n"
+   "  variable called C{arpack_options} is used.\n"
+   "@return: the calculated layout as a list of lists.\n\n"
+   "@newfield ref: Reference\n"
+   "@ref: Cox & Cox: Multidimensional Scaling (1994), Chapman and\n"
+   "  Hall, London.\n"
+  },
 
   /* interface to igraph_layout_reingold_tilford */
   {"layout_reingold_tilford",

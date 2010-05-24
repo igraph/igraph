@@ -863,6 +863,8 @@ class Graph(GraphBase):
           - C{lgl}, C{large}, C{large_graph}: Large Graph Layout
             (see L{Graph.layout_lgl})
 
+          - C{mds}: multidimensional scaling layout (see L{Graph.layout_mds})
+
           - C{random}: random layout (see L{Graph.layout_random})
 
           - C{random_3d}: random 3D layout (see L{Graph.layout_random_3d})
@@ -892,7 +894,8 @@ class Graph(GraphBase):
         if not hasattr(method, "__call__"):
             raise ValueError("layout method must be callable")
         l=method(self, *args, **kwds)
-        if not isinstance(l, Layout): l=Layout(l)
+        if not isinstance(l, Layout):
+            l=Layout(l)
         return l
 
     # Auxiliary I/O functions
@@ -2024,6 +2027,7 @@ class Graph(GraphBase):
         "lgl": "layout_lgl",
         "large": "layout_lgl",
         "large_graph": "layout_lgl",
+        "mds": "layout_mds",
         "random": "layout_random",
         "random_3d": "layout_random_3d",
         "rt": "layout_reingold_tilford",

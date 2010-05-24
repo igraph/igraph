@@ -117,6 +117,14 @@ class LayoutAlgorithmTests(unittest.TestCase):
         lo = g.layout("fr", miny=range(100), maxy=range(100))
         self.failUnless(isinstance(lo, Layout))
 
+    def testMDS(self):
+        g = Graph.Tree(10, 2)
+        lo = g.layout("mds")
+        self.failUnless(isinstance(lo, Layout))
+        g += Graph.Tree(10, 2)
+        lo = g.layout("mds")
+        self.failUnless(isinstance(lo, Layout))
+
     def testReingoldTilford(self):
         g = Graph.Barabasi(100)
         lo = g.layout("rt")
