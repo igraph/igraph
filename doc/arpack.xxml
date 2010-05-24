@@ -8,6 +8,10 @@
 <title>Using BLAS and ARPACK for igraph graphs</title>
 
 <section>
+<!-- doxrox-include about_blas -->
+</section>
+
+<section>
 <!-- doxrox-include about_arpack -->
 </section>
 

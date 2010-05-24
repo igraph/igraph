@@ -44,13 +44,19 @@ __BEGIN_DECLS
  * \section about_blas About the BLAS interface in igraph
  * 
  * <para>
- * TODO
- * </para>
- * 
- * <para>
- * igraph does not contain all BLAS routines, only the ones
- * dealing with symmetric and non-symmetric matrices and vectors
- * using double precision real numbers.
+ * BLAS is a highly optimized library for basic linear algebra operations
+ * such as vector-vector, matrix-vector and matrix-matrix product.
+ * Please see http://www.netlib.org/blas/ for details and a reference
+ * implementation in Fortran. igraph contains some wrapper functions
+ * that can be used to call BLAS routines in a somewhat more
+ * user-friendly way. Not all BLAS routines are included in igraph,
+ * and even those which are included might not have wrappers;
+ * the extension of the set of wrapped functions will probably be driven
+ * by igraph's internal requirements. The wrapper functions usually
+ * substitute double-precision floating point arrays used by BLAS with
+ * \ref igraph_vector_t and \ref igraph_matrix_t instances and also
+ * remove those parameters (such as the number of rows/columns) that
+ * can be inferred from the passed arguments directly.
  * </para>
  */
 
