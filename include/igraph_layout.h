@@ -40,6 +40,7 @@
 #include "igraph_vector_ptr.h"
 #include "igraph_matrix.h"
 #include "igraph_datatype.h"
+#include "igraph_arpack.h"
 
 __BEGIN_DECLS
 
@@ -107,6 +108,11 @@ int igraph_layout_graphopt(const igraph_t *graph,
 			   igraph_real_t spring_constant, 
 			   igraph_real_t max_sa_movement,
 			   igraph_bool_t use_seed);
+
+int igraph_layout_mds(const igraph_t *graph,
+                      igraph_matrix_t *res, long int dim,
+                      const igraph_matrix_t *dist,
+                      igraph_arpack_options_t *options);
 
 /** 
  * \struct igraph_layout_drl_options_t
