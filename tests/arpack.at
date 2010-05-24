@@ -19,7 +19,13 @@
 # Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
 # 02110-1301 USA
 
-AT_BANNER([[ARPACK based functions]])
+AT_BANNER([[BLAS and ARPACK based functions]])
+
+AT_SETUP([Basic BLAS functions (igraph_blas_*):])
+AT_KEYWORDS([blas BLAS matrix vector dgemv igraph_blas_dgemv])
+AT_COMPILE_CHECK([simple/blas.c],
+                 [simple/blas.out])
+AT_CLEANUP
 
 AT_SETUP([Eigenvector centrality (igraph_eigenvector_centrality):])
 AT_KEYWORDS([eigenvector centrality arpack ARPACK])

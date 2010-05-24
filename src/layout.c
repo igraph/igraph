@@ -1,4 +1,5 @@
 /* -*- mode: C -*-  */
+/* vim:set ts=2 sw=2 sts=2 et: */
 /* 
    IGraph R package.
    Copyright (C) 2003, 2004, 2005, 2006  Gabor Csardi <csardi@rmki.kfki.hu>
@@ -36,6 +37,8 @@
 #include "igraph_components.h"
 #include "igraph_types_internal.h"
 #include "igraph_dqueue.h"
+#include "igraph_arpack.h"
+#include "igraph_blas.h"
 #include "config.h"
 #include <math.h>
 #include "igraph_math.h"
@@ -2443,3 +2446,149 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
 /*   fprintf(stderr, "%li ", steps); */
   return 0;
 }
+
+
+int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
+    long int n, void *extra) {
+  igraph_matrix_t* matrix = (igraph_matrix_t*)extra;
+  igraph_blas_dgemv_array(0, 1, matrix, from, 0, to);
+  return 0;
+}
+
+/**
+ * \function igraph_layout_mds
+ * \brief Place the vertices on a plane using multidimensional scaling.
+ * 
+ * </para><para>
+ * This layout requires a distance matrix, where the intersection of
+ * row i and column j specifies the desired distance between vertex i
+ * and vertex j. The algorithm will try to place the vertices in a
+ * space having a given number of dimensions in a way that approximates
+ * the distance relations prescribed in the distance matrix. igraph
+ * uses the classical multidimensional scaling by Torgerson; for more
+ * details, see Cox & Cox: Multidimensional Scaling (1994), Chapman
+ * and Hall, London.
+ *
+ * </para><para>
+ * If the input graph is disconnected, igraph will decompose it
+ * first into its subgraphs, lay out the subgraphs one by one
+ * using the appropriate submatrices of the distance matrix, and
+ * then merge the layouts using \ref igraph_layout_merge_dla.
+ *
+ * \param graph A graph object.
+ * \param res Pointer to an initialized matrix object. This will
+ *        contain the result and will be resized if needed.
+ * \param dim The number of dimensions in the embedding space. For
+ *        2D layouts, supply 2 here.
+ * \param dist The distance matrix. It must be symmetric and this
+ *        function does not check whether the matrix is indeed
+ *        symmetric. Results are unspecified if you pass a non-symmetric
+ *        matrix here. You can set this parameter to null; in this
+ *        case, the shortest path lengths between vertices will be
+ *        used as distances.
+ * \param options Options to ARPACK for eigenvector calculations. See
+ *        \ref igraph_arpack_options_t.
+ * \return Error code.
+ * 
+ * Added in version 0.6.
+ * 
+ * </para><para>
+ * Time complexity: usually around O(|V|^2 dim).
+ */
+
+int igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
+                      long int dim, const igraph_matrix_t *dist,
+                      igraph_arpack_options_t *options) {
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i, j;
+  igraph_matrix_t m, vectors;
+  igraph_vector_t values, row_means;
+  igraph_real_t grand_mean;
+
+  /* Check the distance matrix */
+  if (dist && (igraph_matrix_nrow(dist) != no_of_nodes ||
+      igraph_matrix_ncol(dist) != no_of_nodes)) {
+    IGRAPH_ERROR("invalid distance matrix size", IGRAPH_EINVAL);
+  }
+
+  /* Check the number of dimensions */
+  if (dim <= 1) {
+    IGRAPH_ERROR("dim must be positive", IGRAPH_EINVAL);
+  }
+  if (dim > no_of_nodes) {
+    IGRAPH_ERROR("dim must be less than the number of nodes", IGRAPH_EINVAL);
+  }
+
+  /* Initialize some stuff */
+  IGRAPH_VECTOR_INIT_FINALLY(&values, no_of_nodes);
+  IGRAPH_CHECK(igraph_matrix_init(&vectors, no_of_nodes, dim));
+  IGRAPH_FINALLY(igraph_matrix_destroy, &vectors);
+
+  /* Copy or obtain the distance matrix */
+  if (dist == 0) {
+    IGRAPH_CHECK(igraph_matrix_init(&m, no_of_nodes, no_of_nodes));
+    IGRAPH_FINALLY(igraph_matrix_destroy, &m);
+    IGRAPH_CHECK(igraph_shortest_paths(graph, &m,
+          igraph_vss_all(), igraph_vss_all(), IGRAPH_ALL));
+  } else {
+    IGRAPH_CHECK(igraph_matrix_copy(&m, dist));
+    IGRAPH_FINALLY(igraph_matrix_destroy, &m);
+    /* Make sure that the diagonal contains zeroes only */
+    for (i = 0; i < no_of_nodes; i++)
+      MATRIX(m, i, i) = 0.0;
+  }
+
+  /* Take the square of the distance matrix */
+  for (i = 0; i < no_of_nodes; i++) {
+    for (j = 0; j < no_of_nodes; j++) {
+      MATRIX(m, i, j) *= MATRIX(m, i, j);
+    }
+  }
+
+  /* Double centering on the distance matrix */
+  IGRAPH_VECTOR_INIT_FINALLY(&row_means, no_of_nodes);
+  igraph_vector_fill(&values, 1.0 / no_of_nodes);
+  igraph_blas_dgemv(0, 1, &m, &values, 0, &row_means);
+  grand_mean = igraph_vector_sum(&row_means) / no_of_nodes;
+  igraph_matrix_add_constant(&m, grand_mean);
+  for (i = 0; i < no_of_nodes; i++) {
+    for (j = 0; j < no_of_nodes; j++) {
+      MATRIX(m, i, j) -= VECTOR(row_means)[i] + VECTOR(row_means)[j];
+      MATRIX(m, i, j) *= -0.5;
+    }
+  }
+  igraph_vector_destroy(&row_means);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  /* Calculate the top `dim` eigenvectors */
+  options->mode = 1;
+  options->ishift = 1;
+  options->n = no_of_nodes;
+  options->nev = dim;
+  options->ncv = 2 * dim + 1;
+  options->which[0] = 'L'; options->which[1] = 'A';
+  options->start = 0;
+
+  IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_layout_mds_step,
+        &m, options, 0, &values, &vectors));
+  igraph_matrix_destroy(&m);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  /* Calculate and normalize the final coordinates */
+  for (j = 0; j < dim; j++) {
+    VECTOR(values)[j] = sqrt(abs((double)VECTOR(values)[j]));
+  }
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, dim));
+  for (i = 0; i < no_of_nodes; i++) {
+    for (j = 0; j < dim; j++) {
+      MATRIX(*res, i, j) = VECTOR(values)[j] * MATRIX(vectors, i, j);
+    }
+  }
+
+  igraph_matrix_destroy(&vectors);
+  igraph_vector_destroy(&values);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return IGRAPH_SUCCESS;
+}
+

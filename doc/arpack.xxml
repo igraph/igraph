@@ -5,7 +5,7 @@
 ]>
 
 <chapter id="igraph-Arpack">
-<title>Using ARPACK for igraph graphs</title>
+<title>Using BLAS and ARPACK for igraph graphs</title>
 
 <section>
 <!-- doxrox-include about_arpack -->
@@ -19,6 +19,10 @@
 <!-- doxrox-include igraph_arpack_storage_init -->
 <!-- doxrox-include igraph_arpack_storage_destroy -->
 </section>
+
+<section><title>BLAS routines</title>
+<!-- doxrox-include igraph_blas_dgemv -->
+<!-- doxrox-include igraph_blas_dgemv_array -->
 
 <section><title>ARPACK solvers</title>
 <!-- doxrox-include igraph_arpack_rssolve -->

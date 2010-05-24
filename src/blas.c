@@ -1,0 +1,102 @@
+/* -*- mode: C -*-  */
+/* vim:set ts=2 sw=2 sts=2 et: */
+/* 
+   IGraph library.
+   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
+   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   02110-1301 USA
+
+*/
+
+#include "igraph_blas.h"
+#include "igraph_blas_internal.h"
+
+#include <assert.h>
+
+/**
+ * \function igraph_blas_dgemv
+ * \brief Matrix-vector multiplication using BLAS, vector version.
+ *
+ * This function is a somewhat more user-friendly interface to
+ * the \c dgemv function in BLAS. \c dgemv performs the operation
+ * y = alpha*A*x + beta*y, where x and y are vectors and A is an
+ * appropriately sized matrix (symmetric or unsymmetric).
+ *
+ * \param transpose whether to transpose the matrix \p A
+ * \param alpha     the constant \p alpha
+ * \param a         the matrix \p A
+ * \param x         the vector \p x
+ * \param beta      the constant \p beta
+ * \param y         the vector \p y (which will be modified in-place)
+ *
+ * Time complexity: O(nk) if the matrix is of size n x k
+ *
+ * \sa \ref igraph_blas_dgemv_array if you have arrays instead of
+ *     vectors.
+ */
+void igraph_blas_dgemv(igraph_bool_t transpose, igraph_real_t alpha,
+        const igraph_matrix_t* a, const igraph_vector_t* x,
+        igraph_real_t beta, igraph_vector_t* y) {
+  char trans = transpose ? 'T' : 'N';
+  long int m, n;
+  static const long int inc = 1;
+
+  m = igraph_matrix_nrow(a);
+  n = igraph_matrix_ncol(a);
+
+  assert(igraph_vector_size(x) == transpose ? m : n);
+  assert(igraph_vector_size(y) == transpose ? n : m);
+
+  igraphdgemv_(&trans, &m, &n, &alpha, VECTOR(a->data), &m,
+               VECTOR(*x), &inc, &beta, VECTOR(*y), &inc);
+}
+
+/**
+ * \function igraph_blas_dgemv_array
+ * \brief Matrix-vector multiplication using BLAS, array version.
+ *
+ * This function is a somewhat more user-friendly interface to
+ * the \c dgemv function in BLAS. \c dgemv performs the operation
+ * y = alpha*A*x + beta*y, where x and y are vectors and A is an
+ * appropriately sized matrix (symmetric or unsymmetric).
+ *
+ * \param transpose whether to transpose the matrix \p A
+ * \param alpha     the constant \p alpha
+ * \param a         the matrix \p A
+ * \param x         the vector \p x as a regular C array
+ * \param beta      the constant \p beta
+ * \param y         the vector \p y as a regular C array
+ *                  (which will be modified in-place)
+ *
+ * Time complexity: O(nk) if the matrix is of size n x k
+ *
+ * \sa \ref igraph_blas_dgemv_array if you have vectors instead of
+ *     arrays.
+ */
+void igraph_blas_dgemv_array(igraph_bool_t transpose, igraph_real_t alpha,
+        const igraph_matrix_t* a, const igraph_real_t* x,
+        igraph_real_t beta, igraph_real_t* y) {
+  char trans = transpose ? 'T' : 'N';
+  long int m, n;
+  static const long int inc = 1;
+
+  m = igraph_matrix_nrow(a);
+  n = igraph_matrix_ncol(a);
+
+  igraphdgemv_(&trans, &m, &n, &alpha, VECTOR(a->data), &m,
+               x, &inc, &beta, y, &inc);
+}

@@ -32,6 +32,11 @@ AT_COMPILE_CHECK([simple/igraph_layout_reingold_tilford.c], [],
   [simple/igraph_layout_reingold_tilford.in])
 AT_CLEANUP
 
+AT_SETUP([Multidimensional scaling (igraph_layout_mds):])
+AT_KEYWORDS([multidimensional scaling layout igraph_layout_mds])
+AT_COMPILE_CHECK([simple/igraph_layout_mds.c])
+AT_CLEANUP
+
 AT_SETUP([Covering circle and sphere (igraph_i_layout_sphere_{2,3}d):])
 AT_KEYWORDS([covering circle sphere layout])
 AT_COMPILE_CHECK([simple/igraph_i_layout_sphere.c])

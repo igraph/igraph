@@ -112,22 +112,6 @@
 #define igraphdlarfx_   dlarfx_
 #endif
 
-#ifndef INTERNAL_BLAS
-#define igraphdaxpy_	daxpy_
-#define igraphdger_	dger_
-#define igraphdcopy_	dcopy_
-#define igraphdscal_	dscal_
-#define igraphdswap_	dswap_
-#define igraphdgemv_	dgemv_
-#define igraphddot_	ddot_
-#define igraphdnrm2_	dnrm2_
-#define igraphlsame_	lsame_
-#define igraphdrot_     drot_
-#define igraphidamax_   idamax_
-#define igraphdtrmm_    dtrmm_
-#define igraphdasum_    dasum_
-#endif
-
 #if 0				/* internal f2c functions always used */
 #define igraphd_sign	d_sign
 #define igraphetime_	etime_

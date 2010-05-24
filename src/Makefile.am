@@ -86,6 +86,7 @@ HEADERS_PRIVATE = atlas-edges.h \
 		igraph_gml_tree.h \
 		walktrap_graph.h	walktrap_communities.h \
 		walktrap_heap.h \
+		igraph_blas_internal.h \
 		igraph_arpack_internal.h	igraph_f2c.h \
 		igraph_math.h \
 		drl_layout.h drl_parse.h drl_graph.h \
@@ -130,7 +131,7 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_vector_ptr.h	../include/igraph_spmatrix.h  \
 		../include/igraph_strvector.h	../include/igraph_psumtree.h  \
 		../include/igraph_sparsemat.h   ../include/igraph_mixing.h    \
-		../include/igraph_version.h
+		../include/igraph_version.h     ../include/igraph_blas.h
 
 
 libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
@@ -163,7 +164,7 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     bliss_heap.cc bliss_utils.cc bliss.cc \
 			     cattributes.c revolver_ml_cit.c zeroin.c bfgs.c math.c \
 			     forestfire.c $(ARPACK) $(BLAS) $(LAPACK) $(F2C) \
-			     arpack.c centrality.c drl_layout.cpp drl_parse.cpp \
+			     blas.c arpack.c centrality.c drl_layout.cpp drl_parse.cpp \
 			     drl_graph.cpp DensityGrid.cpp \
 			     gengraph_box_list.cpp gengraph_degree_sequence.cpp \
 			     gengraph_graph_molloy_hash.cpp \
