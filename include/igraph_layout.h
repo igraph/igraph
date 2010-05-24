@@ -109,9 +109,8 @@ int igraph_layout_graphopt(const igraph_t *graph,
 			   igraph_real_t max_sa_movement,
 			   igraph_bool_t use_seed);
 
-int igraph_layout_mds(const igraph_t *graph,
-                      igraph_matrix_t *res, long int dim,
-                      const igraph_matrix_t *dist,
+int igraph_layout_mds(const igraph_t *graph, igraph_matrix_t *res, 
+                      const igraph_matrix_t *dist, long int dim,
                       igraph_arpack_options_t *options);
 
 /** 

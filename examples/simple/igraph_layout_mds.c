@@ -35,7 +35,8 @@ int main() {
 
   igraph_tree(&g, 10, 2, IGRAPH_TREE_UNDIRECTED);
   igraph_matrix_init(&coords, 0, 0);
-  igraph_layout_mds(&g, &coords, 2, 0, &options);
+  igraph_layout_mds(&g, &coords, 0, 2, &options);
+  igraph_matrix_print(&coords);
 
   igraph_matrix_destroy(&coords);
   igraph_destroy(&g);

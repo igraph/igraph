@@ -2255,6 +2255,12 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
   for (i=0; i<igraph_vector_ptr_size(coords); i++) {
     igraph_matrix_t *mat=VECTOR(*coords)[i];
     long int size=igraph_matrix_nrow(mat);
+
+    if (igraph_matrix_ncol(mat) != 2) {
+      IGRAPH_ERROR("igraph_layout_merge_dla works for 2D layouts only",
+                   IGRAPH_EINVAL);
+    }
+
     IGRAPH_ALLOW_INTERRUPTION();
     allnodes += size;
     VECTOR(sizes)[i]=size;
@@ -2455,6 +2461,90 @@ int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
   return 0;
 }
 
+/* MDS layout for a connected graph, with no error checking on the
+ * input parameters. The distance matrix will be modified in-place. */
+int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
+                               igraph_matrix_t *dist, long int dim,
+                               igraph_arpack_options_t *options) {
+  long int no_of_nodes=igraph_vcount(graph);
+  long int nev = dim;
+  igraph_matrix_t vectors;
+  igraph_vector_t values, row_means;
+  igraph_real_t grand_mean;
+  long int i, j;
+
+  /* Handle the trivial cases */
+  if (no_of_nodes == 1) {
+    IGRAPH_CHECK(igraph_matrix_resize(res, 1, dim));
+    igraph_matrix_fill(res, 0);
+    return IGRAPH_SUCCESS;
+  }
+  if (no_of_nodes == 2) {
+    IGRAPH_CHECK(igraph_matrix_resize(res, 2, dim));
+    igraph_matrix_fill(res, 0);
+    for (j = 0; j < dim; j++)
+      MATRIX(*res, 1, dim) = 1;
+    return IGRAPH_SUCCESS;
+  }
+
+  /* Initialize some stuff */
+  IGRAPH_VECTOR_INIT_FINALLY(&values, no_of_nodes);
+  IGRAPH_CHECK(igraph_matrix_init(&vectors, no_of_nodes, dim));
+  IGRAPH_FINALLY(igraph_matrix_destroy, &vectors);
+
+  /* Take the square of the distance matrix */
+  for (i = 0; i < no_of_nodes; i++) {
+    for (j = 0; j < no_of_nodes; j++) {
+      MATRIX(*dist, i, j) *= MATRIX(*dist, i, j);
+    }
+  }
+
+  /* Double centering of the distance matrix */
+  IGRAPH_VECTOR_INIT_FINALLY(&row_means, no_of_nodes);
+  igraph_vector_fill(&values, 1.0 / no_of_nodes);
+  igraph_blas_dgemv(0, 1, dist, &values, 0, &row_means);
+  grand_mean = igraph_vector_sum(&row_means) / no_of_nodes;
+  igraph_matrix_add_constant(dist, grand_mean);
+  for (i = 0; i < no_of_nodes; i++) {
+    for (j = 0; j < no_of_nodes; j++) {
+      MATRIX(*dist, i, j) -= VECTOR(row_means)[i] + VECTOR(row_means)[j];
+      MATRIX(*dist, i, j) *= -0.5;
+    }
+  }
+  igraph_vector_destroy(&row_means);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  /* Calculate the top `dim` eigenvectors */
+  options->mode = 1;
+  options->ishift = 1;
+  options->n = no_of_nodes;
+  options->nev = nev;
+  options->ncv = 2 * nev + 1;
+  options->which[0] = 'L'; options->which[1] = 'A';
+  options->start = 0;
+
+  IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_layout_mds_step,
+        dist, options, 0, &values, &vectors));
+
+  /* Calculate and normalize the final coordinates */
+  for (j = 0; j < nev; j++) {
+    VECTOR(values)[j] = sqrt(abs((double)VECTOR(values)[j]));
+  }
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, dim));
+  igraph_matrix_fill(res, 0);
+  for (i = 0; i < no_of_nodes; i++) {
+    for (j = 0; j < nev; j++) {
+      MATRIX(*res, i, j) = VECTOR(values)[j] * MATRIX(vectors, i, j);
+    }
+  }
+
+  igraph_matrix_destroy(&vectors);
+  igraph_vector_destroy(&values);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return IGRAPH_SUCCESS;
+}
+
 /**
  * \function igraph_layout_mds
  * \brief Place the vertices on a plane using multidimensional scaling.
@@ -2474,18 +2564,21 @@ int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
  * first into its subgraphs, lay out the subgraphs one by one
  * using the appropriate submatrices of the distance matrix, and
  * then merge the layouts using \ref igraph_layout_merge_dla.
+ * Since \ref igraph_layout_merge_dla works for 2D layouts only,
+ * you cannot run the MDS layout on disconnected graphs for
+ * more than two dimensions.
  *
  * \param graph A graph object.
  * \param res Pointer to an initialized matrix object. This will
  *        contain the result and will be resized if needed.
- * \param dim The number of dimensions in the embedding space. For
- *        2D layouts, supply 2 here.
  * \param dist The distance matrix. It must be symmetric and this
  *        function does not check whether the matrix is indeed
  *        symmetric. Results are unspecified if you pass a non-symmetric
  *        matrix here. You can set this parameter to null; in this
  *        case, the shortest path lengths between vertices will be
  *        used as distances.
+ * \param dim The number of dimensions in the embedding space. For
+ *        2D layouts, supply 2 here.
  * \param options Options to ARPACK for eigenvector calculations. See
  *        \ref igraph_arpack_options_t.
  * \return Error code.
@@ -2497,13 +2590,11 @@ int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
  */
 
 int igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
-                      long int dim, const igraph_matrix_t *dist,
+                      const igraph_matrix_t *dist, long int dim,
                       igraph_arpack_options_t *options) {
-  long int no_of_nodes=igraph_vcount(graph);
-  long int i, j;
-  igraph_matrix_t m, vectors;
-  igraph_vector_t values, row_means;
-  igraph_real_t grand_mean;
+  long int i, no_of_nodes=igraph_vcount(graph);
+  igraph_matrix_t m;
+  igraph_bool_t conn;
 
   /* Check the distance matrix */
   if (dist && (igraph_matrix_nrow(dist) != no_of_nodes ||
@@ -2519,11 +2610,6 @@ int igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
     IGRAPH_ERROR("dim must be less than the number of nodes", IGRAPH_EINVAL);
   }
 
-  /* Initialize some stuff */
-  IGRAPH_VECTOR_INIT_FINALLY(&values, no_of_nodes);
-  IGRAPH_CHECK(igraph_matrix_init(&vectors, no_of_nodes, dim));
-  IGRAPH_FINALLY(igraph_matrix_destroy, &vectors);
-
   /* Copy or obtain the distance matrix */
   if (dist == 0) {
     IGRAPH_CHECK(igraph_matrix_init(&m, no_of_nodes, no_of_nodes));
@@ -2538,56 +2624,18 @@ int igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
       MATRIX(m, i, i) = 0.0;
   }
 
-  /* Take the square of the distance matrix */
-  for (i = 0; i < no_of_nodes; i++) {
-    for (j = 0; j < no_of_nodes; j++) {
-      MATRIX(m, i, j) *= MATRIX(m, i, j);
-    }
+  /* Check whether the graph is connected */
+  IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));
+  if (conn) {
+    /* Yes, it is, just do the MDS */
+    IGRAPH_CHECK(igraph_i_layout_mds_single(graph, res, &m, dim, options));
+  } else {
+    /* The graph is not connected, lay out the components one by one */
+    IGRAPH_ERROR("TODO", IGRAPH_UNIMPLEMENTED);
   }
 
-  /* Double centering on the distance matrix */
-  IGRAPH_VECTOR_INIT_FINALLY(&row_means, no_of_nodes);
-  igraph_vector_fill(&values, 1.0 / no_of_nodes);
-  igraph_blas_dgemv(0, 1, &m, &values, 0, &row_means);
-  grand_mean = igraph_vector_sum(&row_means) / no_of_nodes;
-  igraph_matrix_add_constant(&m, grand_mean);
-  for (i = 0; i < no_of_nodes; i++) {
-    for (j = 0; j < no_of_nodes; j++) {
-      MATRIX(m, i, j) -= VECTOR(row_means)[i] + VECTOR(row_means)[j];
-      MATRIX(m, i, j) *= -0.5;
-    }
-  }
-  igraph_vector_destroy(&row_means);
-  IGRAPH_FINALLY_CLEAN(1);
-
-  /* Calculate the top `dim` eigenvectors */
-  options->mode = 1;
-  options->ishift = 1;
-  options->n = no_of_nodes;
-  options->nev = dim;
-  options->ncv = 2 * dim + 1;
-  options->which[0] = 'L'; options->which[1] = 'A';
-  options->start = 0;
-
-  IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_layout_mds_step,
-        &m, options, 0, &values, &vectors));
   igraph_matrix_destroy(&m);
   IGRAPH_FINALLY_CLEAN(1);
-
-  /* Calculate and normalize the final coordinates */
-  for (j = 0; j < dim; j++) {
-    VECTOR(values)[j] = sqrt(abs((double)VECTOR(values)[j]));
-  }
-  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, dim));
-  for (i = 0; i < no_of_nodes; i++) {
-    for (j = 0; j < dim; j++) {
-      MATRIX(*res, i, j) = VECTOR(values)[j] * MATRIX(vectors, i, j);
-    }
-  }
-
-  igraph_matrix_destroy(&vectors);
-  igraph_vector_destroy(&values);
-  IGRAPH_FINALLY_CLEAN(2);
 
   return IGRAPH_SUCCESS;
 }
