@@ -4163,6 +4163,28 @@ SEXP R_igraph_graph_adjacency(SEXP adjmatrix, SEXP pmode) {
   return result;
 }
 
+SEXP R_igraph_weighted_adjacency(SEXP adjmatrix, SEXP pmode,
+				 SEXP pattr) {
+  
+  igraph_t g;
+  igraph_matrix_t adjm;
+  igraph_integer_t mode=REAL(pmode)[0];
+  SEXP result;
+  const char *attr=CHAR(STRING_ELT(pattr, 0));
+  
+  R_igraph_before();
+  
+  R_SEXP_to_matrix(adjmatrix, &adjm);
+  igraph_weighted_adjacency(&g, &adjm, mode, attr);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_average_path_length(SEXP graph, SEXP pdirected, 
 				  SEXP punconnected) {
   

@@ -120,6 +120,14 @@ graph.adjacency.dense <- function(adjmatrix, mode=c("directed", "undirected", "m
                                   weighted=NULL, diag=TRUE) {
 
   mode <- igraph.match.arg(mode)
+  mode <- switch(mode,
+                 "directed"=0,
+                 "undirected"=1,
+                 "max"=1,
+                 "upper"=2,
+                 "lower"=3,
+                 "min"=4,
+                 "plus"=5)
   
   if (!diag) { diag(adjmatrix) <- 0 }
   
@@ -135,62 +143,11 @@ graph.adjacency.dense <- function(adjmatrix, mode=c("directed", "undirected", "m
       stop("not a square matrix")
     }
 
-    if (mode == "undirected") {
-      if (!all(adjmatrix == t(adjmatrix))) {
-        stop("Please supply a symmetric matrix if you want to create a weighted graph with mode=UNDIRECTED.")
-      }
-      adjmatrix[lower.tri(adjmatrix, diag=FALSE)] <- 0
-    } else if (mode=="max") {
-      adjmatrix <- pmax(adjmatrix, t(adjmatrix))
-      adjmatrix[lower.tri(adjmatrix, diag=FALSE)] <- 0
-    } else if (mode=="upper") {
-      adjmatrix[lower.tri(adjmatrix, diag=FALSE)] <- 0
-    } else if (mode=="lower") {
-      adjmatrix[upper.tri(adjmatrix, diag=FALSE)] <- 0
-    } else if (mode=="min") {
-      adjmatrix <- pmin(adjmatrix, t(adjmatrix))
-      adjmatrix[lower.tri(adjmatrix, diag=FALSE)] <- 0
-    } else if (mode=="plus") {
-      adjmatrix <- adjmatrix + t(adjmatrix)
-      adjmatrix[lower.tri(adjmatrix, diag=FALSE)] <- 0
-      diag(adjmatrix) <- diag(adjmatrix) / 2
-    }
-    
-    no.edges <- sum(adjmatrix != 0)
-    edges <- numeric(2*no.edges)
-    weight <- numeric(no.edges)
-    ptr <- 1
-    if (no.edges == 0) {
-      res <- graph.empty(directed=(mode==0))
-      res <- set.edge.attribute(res, weighted, value=1)
-      res
-    } else {
-      for (i in 1:nrow(adjmatrix)) {
-        for (j in 1:ncol(adjmatrix)) {
-          if (adjmatrix[i,j] != 0) {
-            edges[2*ptr-1] <- i-1
-            edges[2*ptr] <- j-1
-            weight[ptr] <- adjmatrix[i,j]
-            ptr <- ptr + 1
-          }          
-        }
-      }
-      res <- graph.empty(n=nrow(adjmatrix), directed=(mode=="directed"))
-      weight <- list(weight)
-      names(weight) <- weighted
-      res <- add.edges(res, edges, attr=weight)
-      res
-    }
-    
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    res <- .Call("R_igraph_weighted_adjacency", adjmatrix,
+                 as.numeric(mode), "weight",
+                 PACKAGE="igraph")
   } else {
-    mode <- switch(mode,
-                   "directed"=0,
-                   "undirected"=1,
-                   "max"=1,
-                   "upper"=2,
-                   "lower"=3,
-                   "min"=4,
-                   "plus"=5)
     
     adjmatrix <- as.matrix(adjmatrix)
     attrs <- attributes(adjmatrix)

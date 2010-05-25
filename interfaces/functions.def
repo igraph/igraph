@@ -89,6 +89,11 @@ igraph_adjacency:
         PARAMS: OUT GRAPH graph, MATRIX adjmatrix, ADJACENCYMODE mode=DIRECTED
         IGNORE: RR, RC, RNamespace
 
+igraph_weighted_adjacency:
+        PARAMS: OUT GRAPH graph, MATRIX adjmatrix, \
+                ADJACENCYMODE mode=DIRECTED, CSTRING attr="weight"
+        IGNORE: RR, RC, RNamespace
+
 igraph_star:
         PARAMS: OUT GRAPH graph, INTEGER n, STARMODE mode=OUT, INTEGER center=0
         IGNORE: RR, RC, RNamespace
