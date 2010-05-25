@@ -353,6 +353,21 @@ igraph_bool_t igraph_set_contains (igraph_set_t* set, igraph_integer_t e);
 igraph_bool_t igraph_set_iterate (igraph_set_t* set, long int* state,
 				  igraph_integer_t* element);
 
+/* -------------------------------------------------- */
+/* Vectorlist, fixed length                           */
+/* -------------------------------------------------- */
+
+typedef struct igraph_fixed_vectorlist_t {
+  igraph_vector_t *vecs;
+  igraph_vector_ptr_t v;
+  long int length;
+} igraph_fixed_vectorlist_t;
+
+void igraph_fixed_vectorlist_destroy(igraph_fixed_vectorlist_t *l);
+int igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
+				    const igraph_vector_t *from,
+				    long int size);
+
 __END_DECLS
 
 #endif

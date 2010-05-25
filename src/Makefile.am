@@ -175,7 +175,8 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     DensityGrid_3d.cpp \
 			     foreign-dl-parser.y foreign-dl-lexer.l \
 			     $(CS) sparsemat.c mixing.c bigint.c bignum.c \
-			     version.c optimal_modularity.c
+			     version.c optimal_modularity.c \
+			     igraph_fixed_vectorlist.c
 
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall

@@ -2254,50 +2254,17 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
 			  /*vertex=*/ 1, /*edge=*/ 0);
 
   if (attr) {
-    long int i;
-    igraph_vector_ptr_t merges;
-    long int no_new_edges=actedge+1;
-    igraph_vector_t sizes;
-    igraph_vector_t *vecs;
+    igraph_fixed_vectorlist_t vl;
+    IGRAPH_CHECK(igraph_fixed_vectorlist_convert(&vl, &mergeinto, 
+						 actedge+1));
+    IGRAPH_FINALLY(igraph_fixed_vectorlist_destroy, &vl);
 
-    vecs=igraph_Calloc(no_new_edges, igraph_vector_t);
-    if (!vecs) {
-      IGRAPH_ERROR("Cannot merge attributes for simplify", 
-		   IGRAPH_ENOMEM);
-    }
-    IGRAPH_FINALLY(igraph_free, vecs);
-    IGRAPH_CHECK(igraph_vector_ptr_init(&merges, no_new_edges));
-    IGRAPH_FINALLY(igraph_i_simplify_free, &merges);
-    IGRAPH_VECTOR_INIT_FINALLY(&sizes, no_new_edges);
-
-    for (i=0; i<no_of_edges; i++) {
-      long int to=VECTOR(mergeinto)[i];
-      if (to >= 0) { VECTOR(sizes)[to] += 1; }
-    }
-    for (i=0; i<no_new_edges; i++) {
-      igraph_vector_t *v=&vecs[i];
-      IGRAPH_CHECK(igraph_vector_init(v, VECTOR(sizes)[i]));
-      igraph_vector_clear(v);
-      VECTOR(merges)[i]=v;
-    }
-    for (i=0; i<no_of_edges; i++) {
-      long int to=VECTOR(mergeinto)[i];
-      if (to >= 0) { 
-	igraph_vector_t *v=&vecs[to];
-	igraph_vector_push_back(v, i);
-      }
-    }
-
-    IGRAPH_CHECK(igraph_i_attribute_combine_edges(graph, &res, &merges, 
+    IGRAPH_CHECK(igraph_i_attribute_combine_edges(graph, &res, &vl.v, 
 						  edge_comb));
     
-    igraph_vector_destroy(&sizes);
-    igraph_i_simplify_free(&merges);
-    igraph_free(vecs);
-    IGRAPH_FINALLY_CLEAN(3);
-    
+    igraph_fixed_vectorlist_destroy(&vl);
     igraph_vector_destroy(&mergeinto);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2);
   }
   
   IGRAPH_FINALLY_CLEAN(1);
