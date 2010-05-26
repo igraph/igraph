@@ -34,7 +34,7 @@ AT_CLEANUP
 
 AT_SETUP([Multidimensional scaling (igraph_layout_mds):])
 AT_KEYWORDS([multidimensional scaling layout igraph_layout_mds])
-AT_COMPILE_CHECK([simple/igraph_layout_mds.c])
+AT_COMPILE_CHECK([simple/igraph_layout_mds.c], [simple/igraph_layout_mds.out])
 AT_CLEANUP
 
 AT_SETUP([Covering circle and sphere (igraph_i_layout_sphere_{2,3}d):])
