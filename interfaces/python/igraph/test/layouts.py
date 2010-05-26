@@ -1,5 +1,5 @@
 import unittest
-from igraph import Graph, Layout
+from igraph import Graph, Layout, BoundingBox
 
 class LayoutTests(unittest.TestCase):
     def testConstructor(self):
@@ -74,12 +74,15 @@ class LayoutTests(unittest.TestCase):
         self.assertAlmostEqual(centroid[1], 0.5)
         self.assertAlmostEqual(centroid[2], 1.)
 
+    def testBoundaries(self):
+        layout = Layout([(0,0,1), (0,1,0), (1,0,0), (2,1,3)])
+        self.assertEqual(layout.boundaries(), ([0,0,0],[2,1,3]))
+        self.assertEqual(layout.boundaries(1), ([-1,-1,-1],[3,2,4]))
 
     def testBoundingBox(self):
-        layout = Layout([(0,0,1), (0,1,0), (1,0,0), (2,1,3)])
-        self.assertEqual(layout.bounding_box(), (0,0,0,2,1,3))
-        self.assertEqual(layout.bounding_box(1), (-1,-1,-1,3,2,4))
-
+        layout = Layout([(0,1), (2,7)])
+        self.assertEqual(layout.bounding_box(), BoundingBox(0,1,2,7))
+        self.assertEqual(layout.bounding_box(1), BoundingBox(-1,0,3,8))
 
     def testCenter(self):
         layout = Layout([(-2,0), (-2,-2), (0,-2), (0,0)])
@@ -90,6 +93,19 @@ class LayoutTests(unittest.TestCase):
         self.assertRaises(ValueError, layout.center, 3)
         self.assertRaises(TypeError, layout.center, p=6)
 
+    def testFitInto(self):
+        layout = Layout([(-2,0), (-2,-2), (0,-2), (0,0)])
+        layout.fit_into(BoundingBox(5,5,8,10), keep_aspect_ratio=False)
+        self.assertEqual(layout.coords, [[5, 10], [5, 5], [8, 5], [8, 10]])
+        layout = Layout([(-2,0), (-2,-2), (0,-2), (0,0)])
+        layout.fit_into(BoundingBox(5,5,8,10))
+        self.assertEqual(layout.coords, [[5, 9], [5, 6], [8, 6], [8, 9]])
+
+        layout = Layout([(-1,-1,-1), (0,0,0), (1,1,1), (2,2,0), (3,3,-1)])
+        layout.fit_into((0,0,0,8,8,4))
+        self.assertEqual(layout.coords, \
+                [[0, 0, 0], [2, 2, 2], [4, 4, 4], [6, 6, 2], [8, 8, 0]]
+        )
 
     def testToPolar(self):
         import math
@@ -121,6 +137,11 @@ class LayoutAlgorithmTests(unittest.TestCase):
         g = Graph.Tree(10, 2)
         lo = g.layout("mds")
         self.failUnless(isinstance(lo, Layout))
+
+        dists = g.shortest_paths()
+        lo = g.layout("mds", dists)
+        self.failUnless(isinstance(lo, Layout))
+
         g += Graph.Tree(10, 2)
         lo = g.layout("mds")
         self.failUnless(isinstance(lo, Layout))

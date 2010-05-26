@@ -142,6 +142,8 @@ class Point(tuple):
 class BoundingBox(object):
     """Class representing a bounding box (a rectangular area)."""
 
+    __slots__ = ("_coords", )
+
     def __init__(self, *args):
         """Creates a bounding box.
 

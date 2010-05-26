@@ -4,6 +4,7 @@ Layout-related code in the IGraph library.
 This package contains the implementation of the L{Layout} object.
 """
 
+from itertools import izip
 from math import sin, cos, pi
 
 from igraph.drawing import BoundingBox
@@ -242,10 +243,9 @@ class Layout(object):
         @param min_radius: the radius corresponding to the minimum Y value
         @param max_radius: the radius corresponding to the maximum Y value
         """
-        bbox = self.bounding_box()
-        if len(bbox) != 4:
+        if self._dim != 2:
             raise TypeError("implemented only for 2D layouts")
-        bbox = BoundingBox(bbox)
+        bbox = self.bounding_box()
 
         while min_angle > max_angle:
             max_angle += 360
@@ -292,6 +292,26 @@ class Layout(object):
                 centroid[dim].add(row[dim])
         return [rm.mean for rm in centroid]
 
+    def boundaries(self, border=0):
+        """Returns the boundaries of the layout.
+
+        The boundaries are the minimum and maximum coordinates along all
+        dimensions.
+
+        @param border: this value gets subtracted from the minimum bounds
+          and gets added to the maximum bounds before returning the coordinates
+          of the box. Defaults to zero.
+        @return: the minimum and maximum coordinates along all dimensions,
+          in a tuple containing two lists, one for the minimum coordinates,
+          the other one for the maximum.
+        """
+        mins, maxs = [], []
+        for dim in xrange(self._dim):
+            col = [row[dim] for row in self._coords]
+            mins.append(min(col)-border)
+            maxs.append(max(col)+border)
+        return mins, maxs
+        
     def bounding_box(self, border=0):
         """Returns the bounding box of the layout.
 
@@ -305,13 +325,11 @@ class Layout(object):
           of the box. "Lower left" means the minimum coordinates and "upper right"
           means the maximum. These are encapsulated in a L{BoundingBox} object.
         """
-        mins, maxs = [], []
-        for dim in xrange(self._dim):
-            col = [row[dim] for row in self._coords]
-            mins.append(min(col)-border)
-            maxs.append(max(col)+border)
-        mins.extend(maxs)
-        return tuple(mins)
+        if self._dim != 2:
+            raise ValueError("Layout.boundary_box() supports 2D layouts only")
+        (x0, y0), (x1, y1) = self.boundaries(border)
+        return BoundingBox(x0, y0, x1, y1)
+
 
     def center(self, *args, **kwds):
         """Centers the layout around the given point.
@@ -346,40 +364,49 @@ class Layout(object):
 
         The layout will be modified in-place.
 
-        @param bbox: the bounding box in which to fit the layout. It can either
-          be a 2-tuple (defining the width and height of the box), a 4-tuple
-          (defining the coordinates of the top left point and the width and
-          height of the box), or a L{BoundingBox} object.
+        @param bbox: the bounding box in which to fit the layout. If the
+          dimension of the layout is d, it can either be a d-tuple (defining
+          the sizes of the box), a 2d-tuple (defining the coordinates of the
+          top left and the bottom right point of the box), or a L{BoundingBox}
+          object (for 2D layouts only).
         @param keep_aspect_ratio: whether to keep the aspect ratio of the current
           layout. If C{False}, the layout will be rescaled to fit exactly into
           the bounding box. If C{True}, the original aspect ratio of the layout
           will be kept and it will be centered within the bounding box.
         """
-        if not isinstance(bbox, BoundingBox):
-            bbox = BoundingBox(bbox)
+        if isinstance(bbox, BoundingBox):
+            if self._dim != 2:
+                raise TypeError("bounding boxes work for 2D layouts only")
+            corner, target_sizes = [bbox.left, bbox.top], [bbox.width, bbox.height]
+        elif len(bbox) == self._dim:
+            corner, target_sizes = [0.] * self._dim, list(bbox)
+        elif len(bbox) == 2 * self._dim:
+            corner, opposite_corner = bbox[0:self._dim], bbox[self._dim:]
+            for i in xrange(self._dim):
+                if corner[i] > opposite_corner[i]:
+                    corner[i], opposite_corner[i] = opposite_corner[i], corner[i]
+            target_sizes = [max_val-min_val \
+                    for min_val, max_val in izip(corner, opposite_corner)]
 
-        self_bbox = BoundingBox(self.bounding_box())
-        sw, sh = self_bbox.width, self_bbox.height
-        if sw == 0 and sh == 0:
-            sw, sh = 1, 1
-        if sw == 0:
-            sw = sh
-        if sh == 0:
-            sh = sw
+        mins, maxs = self.boundaries()
+        sizes = [max_val - min_val for min_val, max_val in izip(mins, maxs)]
 
-        rx, ry = float(bbox.width)/sw, float(bbox.height)/sh
-        tx, ty = 0, 0
+        for i, size in enumerate(sizes):
+            if size == 0:
+                sizes[i] = 1
+
+        ratios = [float(target_size) / current_size \
+                  for current_size, target_size in izip(sizes, target_sizes)]
         if keep_aspect_ratio:
-            if rx > ry:
-                rx = ry
-                tx += (float(bbox.width) - rx * sw) / 2.
-            else:
-                ry = rx
-                ty += (float(bbox.height) - ry * sh) / 2.
+            min_ratio = min(ratios)
+            ratios = [min_ratio] * self._dim
 
-        tx = tx - self_bbox.left*rx + bbox.coords[0]
-        ty = ty - self_bbox.top*ry + bbox.coords[1]
+        translations = []
+        for i in xrange(self._dim):
+            trans = (target_sizes[i] - ratios[i] * sizes[i]) / 2.
+            trans -= mins[i] * ratios[i] - corner[i]
+            translations.append(trans)
 
-        self.scale(rx, ry)
-        self.translate(tx, ty)
+        self.scale(*ratios)
+        self.translate(*translations)
 
