@@ -25,15 +25,14 @@ class DirectedUndirectedTests(unittest.TestCase):
         self.failUnless(sorted(graph2.get_edgelist()) == [(0,1), (0,2)])
         self.failUnless(graph2.es["weight"] == [4,2])
 
-        graph = Graph([(0,1),(1,0),(0,1),(1,0),(2,1),(1,2)])
+        graph = Graph([(0,1),(1,0),(0,1),(1,0),(2,1),(1,2)], directed=True)
         graph2 = graph.copy()
         graph2.es["weight"] = [1,2,3,4,5,6]
         graph2.to_undirected(mode="mutual", combine_edges="sum")
         self.failUnless(graph2.vcount() == graph.vcount())
         self.failUnless(graph2.is_directed() == False)
-        print graph2.get_edgelist()
         self.failUnless(sorted(graph2.get_edgelist()) == [(0,1), (0,1), (1,2)])
-        self.failUnless(graph2.es["weight"] == [3,7,11])
+        self.failUnless(graph2.es["weight"] == [7,3,11] or graph2.es["weight"] == [3,7,11])
 
     def testToDirected(self):
         graph = Graph([(0,1), (0,2), (2,3), (2,4)], directed=False)
