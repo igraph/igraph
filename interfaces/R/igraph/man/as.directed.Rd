@@ -9,7 +9,7 @@
   graph to undirected.}
 \usage{
 as.directed(graph, mode = c("mutual", "arbitrary")) 
-as.undirected(graph, mode = c("collapse", "each"),
+as.undirected(graph, mode = c("collapse", "each", "mutual"),
        edge.attr.comb = igraph.par("edge.attr.comb"))
 }
 \arguments{
@@ -19,7 +19,8 @@ as.undirected(graph, mode = c("collapse", "each"),
     \code{as.undirected} it can be \code{each} or \code{collapse}. See
     details below.}
   \item{edge.attr.comb}{Specifies what to do with edge attributes, if
-    \code{mode="collapse"}. In this case many edges might be mapped to a
+    \code{mode="collapse"} or \code{mode="mutual"}.
+    In these cases many edges might be mapped to a
     single one in the new graph, and their attributes are
     combined. Please see \code{\link{attribute.combination}} for details
     on this.}
@@ -42,6 +43,11 @@ as.undirected(graph, mode = c("collapse", "each"),
     \item{collapse}{One undirected edge will be created for each pair of
       vertices which are connected with at least one directed edge, no
       multiple edges will be created.}
+    \item{mutual}{One undirected edge will be created for each pair of
+      mutual edges. Non-mutual edges are ignored. This mode might create
+      multiple edges if there are more than one mutual edge pairs
+      between the same pair of vertices.
+    }
   }
 }
 \value{
@@ -68,5 +74,13 @@ print(ug3, e=TRUE)
   plot( g3, layout=layout.circle, edge.label=E(g3)$weight)
   plot(ug3, layout=layout.circle, edge.label=E(ug3)$weight)
 }
+
+g4 <- graph(c(0,1, 2,1,2,3,2,3, 4,3,4,3,
+              5,6, 6,5,6,7,6,7, 7,6,7,8,7,8,
+              8,7,8,7,8,8, 9,9,9,9))
+E(g4)$weight <- seq_len(ecount(g4))
+ug4 <- as.undirected(g4, mode="mutual",
+              edge.attr.comb=list(weight=length))
+print(ug4, e=TRUE)
 }
 \keyword{graphs}
