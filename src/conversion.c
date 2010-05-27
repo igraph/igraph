@@ -555,7 +555,7 @@ int igraph_to_undirected(igraph_t *graph,
     if (attr) {
       igraph_fixed_vectorlist_t vl;
       IGRAPH_CHECK(igraph_fixed_vectorlist_convert(&vl, &mergeinto, 
-						   actedge+1));
+						   actedge));
       IGRAPH_FINALLY(igraph_fixed_vectorlist_destroy, &vl);
       
       IGRAPH_CHECK(igraph_i_attribute_combine_edges(graph, &newgraph, &vl.v, 
@@ -645,7 +645,7 @@ int igraph_to_undirected(igraph_t *graph,
     if (attr) {
       igraph_fixed_vectorlist_t vl;
       IGRAPH_CHECK(igraph_fixed_vectorlist_convert(&vl, &mergeinto, 
-						   actedge+1));
+						   actedge));
       IGRAPH_FINALLY(igraph_fixed_vectorlist_destroy, &vl);
       
       IGRAPH_CHECK(igraph_i_attribute_combine_edges(graph, &newgraph, &vl.v, 
