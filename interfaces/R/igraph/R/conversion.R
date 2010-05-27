@@ -172,19 +172,6 @@ as.directed <- function(graph, mode=c("mutual", "arbitrary")) {
         PACKAGE="igraph")
 }
 
-as.undirected <- function(graph, mode=c("collapse", "each")) {
-  if (!is.igraph(graph)) {
-    stop("Not a graph object")
-  }
-
-  mode <- igraph.match.arg(mode)
-  mode <- switch(mode, "each"=0, "collapse"=1)
-  
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_to_undirected", graph, as.numeric(mode),
-        PACKAGE="igraph")  
-}
-
 get.adjlist <- function(graph, mode=c("all", "out", "in", "total")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")

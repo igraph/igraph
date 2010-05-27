@@ -1061,8 +1061,9 @@ igraph_to_directed:
         IGNORE: RR, RC, RNamespace
 
 igraph_to_undirected:
-        PARAMS: INOUT GRAPH graph, TOUNDIRECTED flags=COLLAPSE
-        IGNORE: RR, RC, RNamespace
+        PARAMS: INOUT GRAPH graph, TOUNDIRECTED mode=COLLAPSE, \
+                EDGE_ATTRIBUTE_COMBINATION edge_attr_comb=Default
+        NAME-R: as.undirected
 
 #######################################
 # Read and write foreign formats

@@ -26,6 +26,7 @@
 #include "igraph_interface.h"
 #include "igraph_attributes.h"
 #include "igraph_constructors.h"
+#include "igraph_types_internal.h"
 #include "config.h"
 
 /**
@@ -392,11 +393,14 @@ int igraph_to_directed(igraph_t *graph,
  */
 
 int igraph_to_undirected(igraph_t *graph,
-			 igraph_to_undirected_t mode) {
+			 igraph_to_undirected_t mode,
+			 const igraph_attribute_combination_t *edge_comb) {
+
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   igraph_vector_t edges;
   igraph_t newgraph;
+  igraph_bool_t attr=edge_comb && igraph_has_attribute_table();
   
   if (mode != IGRAPH_TO_UNDIRECTED_EACH &&
       mode != IGRAPH_TO_UNDIRECTED_COLLAPSE) {
@@ -442,26 +446,98 @@ int igraph_to_undirected(igraph_t *graph,
     *graph=newgraph;
     
   } else if (mode==IGRAPH_TO_UNDIRECTED_COLLAPSE) {
-    igraph_vector_t seen, nei;
-    long int i,j;
-    IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges*2));
-    IGRAPH_VECTOR_INIT_FINALLY(&seen, no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&nei, 0);
-    
-    for (i=0; i<no_of_nodes; i++) {
-      IGRAPH_CHECK(igraph_neighbors(graph, &nei, i, IGRAPH_ALL));
-      for (j=0; j<igraph_vector_size(&nei); j++) {
-	long int node=VECTOR(nei)[j];
-	if (VECTOR(seen)[node] != i+1 && node >= i) {
-	  IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	  IGRAPH_CHECK(igraph_vector_push_back(&edges, node));
-	  VECTOR(seen)[node]=i+1;
-	}
-      }
+    igraph_vector_t inadj, outadj;
+    long int i;
+    igraph_vector_t mergeinto;
+    long int actedge=0;
+
+    if (attr) {
+      IGRAPH_VECTOR_INIT_FINALLY(&mergeinto, no_of_edges);
     }
 
-    igraph_vector_destroy(&nei);
-    igraph_vector_destroy(&seen);
+    IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges*2));
+    IGRAPH_VECTOR_INIT_FINALLY(&inadj, 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&outadj, 0);
+    
+    for (i=0; i<no_of_nodes; i++) {
+      long int n_out, n_in;
+      long int p1=-1, p2=-1;
+      long int e1=0, e2=0, n1=0, n2=0;
+      IGRAPH_CHECK(igraph_adjacent(graph, &outadj, i, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_adjacent(graph, &inadj, i, IGRAPH_IN));
+      n_out=igraph_vector_size(&outadj);
+      n_in=igraph_vector_size(&inadj);
+
+#define STEPOUT() if ( (++p1) < n_out) {	\
+	e1 = VECTOR(outadj)[p1];		\
+	n1 = IGRAPH_TO(graph, e1);		\
+      }
+#define STEPIN()  if ( (++p2) < n_in) {	        \
+        e2 = VECTOR(inadj )[p2];		\
+	n2 = IGRAPH_FROM(graph, e2);		\
+      }
+
+      STEPOUT();
+      STEPIN();
+
+      while (p1 < n_out && n1 <= i && p2 < n_in && n2 <= i) {
+	long int last;
+	if (n1==n2) {
+	  last=n1;
+	  IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	  IGRAPH_CHECK(igraph_vector_push_back(&edges, n1));
+	  if (attr) {
+	    VECTOR(mergeinto)[e1]=actedge;
+	    VECTOR(mergeinto)[e2]=actedge;
+	    actedge++;
+	  }
+	  while (p1 < n_out && last==n1) { STEPOUT(); }
+	  while (p2 < n_in  && last==n2) { STEPIN (); }
+	} else if (n1<n2) {
+	  last=n1;
+	  IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	  IGRAPH_CHECK(igraph_vector_push_back(&edges, n1));
+	  if (attr) {
+	    VECTOR(mergeinto)[e1]=actedge;
+	    actedge++;
+	  }
+	  while (p1 < n_out && last==n1) { STEPOUT(); }
+	} else { /* n2<n1 */
+	  last=n2;
+	  IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	  IGRAPH_CHECK(igraph_vector_push_back(&edges, n2));
+	  if (attr) {
+	    VECTOR(mergeinto)[e2]=actedge;
+	    actedge++;
+	  }
+	  while (p2 < n_in && last==n2) { STEPIN(); }
+	}
+      }
+      while (p1 < n_out && n1 <= i) {
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, n1));
+	if (attr) {
+	  VECTOR(mergeinto)[e1]=actedge;
+	  actedge++;
+	}
+	STEPOUT();	
+      }
+      while (p2 < n_in && n2 <= i) {
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, n2));
+	if (attr) {
+	  VECTOR(mergeinto)[e2]=actedge;
+	  actedge++;
+	}
+	STEPIN();
+      }
+    }
+	
+#undef STEPOUT
+#undef STEPIN 
+
+    igraph_vector_destroy(&outadj);
+    igraph_vector_destroy(&inadj);
     IGRAPH_FINALLY_CLEAN(2);
 
     IGRAPH_CHECK(igraph_create(&newgraph, &edges, no_of_nodes, IGRAPH_UNDIRECTED));
@@ -469,10 +545,29 @@ int igraph_to_undirected(igraph_t *graph,
     igraph_vector_destroy(&edges);
     IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
     IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, 1,1,0); /* no edge attributes */
+
+    if (attr) {
+      igraph_fixed_vectorlist_t vl;
+      IGRAPH_CHECK(igraph_fixed_vectorlist_convert(&vl, &mergeinto, 
+						   actedge+1));
+      IGRAPH_FINALLY(igraph_fixed_vectorlist_destroy, &vl);
+      
+      IGRAPH_CHECK(igraph_i_attribute_combine_edges(graph, &newgraph, &vl.v, 
+						    edge_comb));
+      
+      igraph_fixed_vectorlist_destroy(&vl);
+      IGRAPH_FINALLY_CLEAN(1);
+    }
+
     IGRAPH_FINALLY_CLEAN(2);
     igraph_destroy(graph);
     *graph=newgraph;
+    
+    if (attr) {
+      igraph_vector_destroy(&mergeinto);
+      IGRAPH_FINALLY_CLEAN(1);
+    }
   }
 
   return 0;
-}
+  }

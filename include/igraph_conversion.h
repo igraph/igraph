@@ -39,6 +39,7 @@
 #include "igraph_datatype.h"
 #include "igraph_spmatrix.h"
 #include "igraph_matrix.h"
+#include "igraph_attributes.h"
 
 __BEGIN_DECLS
 
@@ -55,7 +56,8 @@ int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool
 int igraph_to_directed(igraph_t *graph, 
 		       igraph_to_directed_t flags);
 int igraph_to_undirected(igraph_t *graph,
-			 igraph_to_undirected_t flags);
+			 igraph_to_undirected_t flags,
+			 const igraph_attribute_combination_t *edge_comb);
 
 __END_DECLS
 

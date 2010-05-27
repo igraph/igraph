@@ -123,6 +123,11 @@ NEIMODE:
   INCONV:
     IN: %C%=REAL(%I%)[0];
 
+TOUNDIRECTED:
+  CTYPE: igraph_integer_t 
+  INCONV:
+    IN: %C%=REAL(%I%)[0];
+
 BLISSSH:
   CTYPE: igraph_bliss_sh_t
   INCONV:
