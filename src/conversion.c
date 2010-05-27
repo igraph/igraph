@@ -385,7 +385,9 @@ int igraph_to_directed(igraph_t *graph,
  *        \c IGRAPH_TO_UNDIRECTED_COLLAPSE: one undirected edge will
  *        be created for each pair of vertices which are connected
  *        with at least one directed edge, no multiple edges will be
- *        created. 
+ *        created.
+ * \param edge_comb What to do with the edge attributes. See the igraph 
+ *        manual section about attributes for details.
  * \return Error code.
  * 
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
