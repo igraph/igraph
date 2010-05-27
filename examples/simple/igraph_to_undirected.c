@@ -36,6 +36,17 @@ int main() {
 
   igraph_destroy(&g);
   igraph_vector_destroy(&v);
+
+  printf("---\n");
+
+  igraph_small(&g, 10, IGRAPH_DIRECTED, 
+	       0,1, 2,1, 2,3, 2,3, 4,3, 4,3,
+	       5,6, 6,5, 6,7, 6,7, 7,6, 7,8, 7,8, 8,7, 8,7, 8,8, 9,9, 9,9,
+	       -1);
+  igraph_to_undirected(&g, IGRAPH_TO_UNDIRECTED_MUTUAL,
+		       /*edge_comb=*/ 0);
+  igraph_write_graph_edgelist(&g, stdout);
+  igraph_destroy(&g);
   
   return 0;
 }

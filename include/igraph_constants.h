@@ -90,7 +90,8 @@ typedef enum { IGRAPH_TO_DIRECTED_ARBITRARY=0,
 	       IGRAPH_TO_DIRECTED_MUTUAL } igraph_to_directed_t;
 
 typedef enum { IGRAPH_TO_UNDIRECTED_EACH=0,
-	       IGRAPH_TO_UNDIRECTED_COLLAPSE } igraph_to_undirected_t;
+	       IGRAPH_TO_UNDIRECTED_COLLAPSE,
+               IGRAPH_TO_UNDIRECTED_MUTUAL} igraph_to_undirected_t;
 
 typedef enum { IGRAPH_VCONN_NEI_ERROR=0,
 	       IGRAPH_VCONN_NEI_INFINITY,

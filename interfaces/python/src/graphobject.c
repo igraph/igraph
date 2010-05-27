@@ -5653,7 +5653,7 @@ PyObject *igraphmodule_Graph_layout_mds(igraphmodule_GraphObject * self,
   igraph_matrix_t *dist = 0;
   long int dim = 2;
   igraphmodule_ARPACKOptionsObject *arpack_options;
-  PyObject *dist_o = Py_None, *options_o = Py_None;
+  PyObject *dist_o = Py_None;
   PyObject *arpack_options_o = igraphmodule_arpack_options_default;
   PyObject *result;
 
@@ -6005,16 +6005,25 @@ PyObject *igraphmodule_Graph_get_edgelist(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_to_undirected(igraphmodule_GraphObject * self,
                                            PyObject * args, PyObject * kwds)
 {
-  PyObject *collapse = Py_True, *comb_o = Py_None;
+  PyObject *mode_o = Py_None, *comb_o = Py_None;
   igraph_to_undirected_t mode = IGRAPH_TO_UNDIRECTED_COLLAPSE;
   igraph_attribute_combination_t comb;
-  static char *kwlist[] = { "collapse", "combine_edges", NULL };
+  static char *kwlist[] = { "mode", "combine_edges", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist, &collapse, &comb_o))
+  if (kwds && PyDict_GetItemString(kwds, "mode") && PyDict_GetItemString(kwds, "collapse"))
+    PyErr_SetString(PyExc_ValueError, "cannot specify mode=... and collapse=... at the same time");
+
+  if (kwds && PyDict_GetItemString(kwds, "collapse")) {
+    mode_o = PyDict_GetItemString(kwds, "collapse");
+    PyErr_Warn(PyExc_Warning, "The collapse=... keyword argument of Graph.to_undirected() is obsolete, please use mode=... instead. This warning will be removed from igraph 0.7.");
+    PyDict_DelItemString(kwds, "collapse");
+  }
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist, &mode_o, &comb_o))
     return NULL;
 
-  mode = (PyObject_IsTrue(collapse) ? IGRAPH_TO_UNDIRECTED_COLLAPSE :
-     IGRAPH_TO_UNDIRECTED_EACH);
+  if (igraphmodule_PyObject_to_to_undirected_t(mode_o, &mode))
+    return NULL;
 
   if (igraphmodule_PyObject_to_attribute_combination_t(comb_o, &comb))
 	return NULL;
@@ -11061,11 +11070,14 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   // interface to igraph_to_undirected
   {"to_undirected", (PyCFunction) igraphmodule_Graph_to_undirected,
    METH_VARARGS | METH_KEYWORDS,
-   "to_undirected(collapse=True, combine_edges=None)\n\n"
+   "to_undirected(mode=\"collapse\", combine_edges=None)\n\n"
    "Converts a directed graph to undirected.\n\n"
-   "@param collapse: C{True} if only a single edge should be\n"
-   "  created from multiple directed edges going between the\n"
-   "  same vertex pair. If C{False}, the edge count is kept constant.\n"
+   "@param mode: specifies what to do with multiple directed edges\n"
+   "  going between the same vertex pair. C{True} or C{\"collapse\"}\n"
+   "  means that only a single edge should be created from multiple\n"
+   "  directed edges. C{False} or C{\"each\"} means that every edge\n"
+   "  will be kept (with the arrowheads removed). C{\"mutual\"}\n"
+   "  creates one undirected edge for each mutual directed edge pair.\n"
    "@param combine_edges: specifies how to combine the attributes of\n"
    "  multiple edges between the same pair of vertices into a single\n"
    "  attribute. See L{Graph.simplify()} for more details.\n"

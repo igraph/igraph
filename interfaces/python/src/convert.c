@@ -327,6 +327,30 @@ int igraphmodule_PyObject_to_subgraph_implementation_t(PyObject *o,
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts a Python object to an igraph \c igraph_to_undirected_t
+ */
+int igraphmodule_PyObject_to_to_undirected_t(PyObject *o,
+  igraph_to_undirected_t *result) {
+  static igraphmodule_enum_translation_table_entry_t to_undirected_tt[] = {
+        {"each",     IGRAPH_TO_UNDIRECTED_EACH},
+        {"collapse", IGRAPH_TO_UNDIRECTED_COLLAPSE},
+        {"mutual",   IGRAPH_TO_UNDIRECTED_MUTUAL},
+        {0,0}
+  };
+
+  if (o == Py_True) {
+    *result = IGRAPH_TO_UNDIRECTED_COLLAPSE;
+    return 0;
+  } else if (o == Py_False) {
+    *result = IGRAPH_TO_UNDIRECTED_EACH;
+    return 0;
+  }
+
+  return igraphmodule_PyObject_to_enum(o, to_undirected_tt, (int*)result);
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts a Python object to an \c igraph_transitivity_mode_t
  */
 int igraphmodule_PyObject_to_transitivity_mode_t(PyObject *o,

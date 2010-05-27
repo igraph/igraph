@@ -63,9 +63,9 @@ NEIMODE:
        IN: c("in", "out", "all", "total")
 
 TOUNDIRECTED:
-    INCONV: %I% <- switch(igraph.match.arg(%I%), "collapse"=1, "each"=0)
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "collapse"=1, "each"=0, "mutual"=2)
     DEFAULT:
-       COLLAPSE: c("collapse", "each")
+       COLLAPSE: c("collapse", "each", "mutual")
 
 INTEGERPTR:
     INCONV:
