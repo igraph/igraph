@@ -6005,18 +6005,28 @@ PyObject *igraphmodule_Graph_get_edgelist(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_to_undirected(igraphmodule_GraphObject * self,
                                            PyObject * args, PyObject * kwds)
 {
-  PyObject *collapse = Py_True;
+  PyObject *collapse = Py_True, *comb_o = Py_None;
   igraph_to_undirected_t mode = IGRAPH_TO_UNDIRECTED_COLLAPSE;
-  static char *kwlist[] = { "collapse", NULL };
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &collapse))
+  igraph_attribute_combination_t comb;
+  static char *kwlist[] = { "collapse", "combine_edges", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist, &collapse, &comb_o))
     return NULL;
-  mode =
-    (PyObject_IsTrue(collapse) ? IGRAPH_TO_UNDIRECTED_COLLAPSE :
+
+  mode = (PyObject_IsTrue(collapse) ? IGRAPH_TO_UNDIRECTED_COLLAPSE :
      IGRAPH_TO_UNDIRECTED_EACH);
-  if (igraph_to_undirected(&self->g, mode)) {
+
+  if (igraphmodule_PyObject_to_attribute_combination_t(comb_o, &comb))
+	return NULL;
+
+  if (igraph_to_undirected(&self->g, mode, &comb)) {
+    igraph_attribute_combination_destroy(&comb);
     igraphmodule_handle_igraph_error();
     return NULL;
   }
+
+  igraph_attribute_combination_destroy(&comb);
+
   Py_RETURN_NONE;
 }
 
@@ -11051,11 +11061,15 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   // interface to igraph_to_undirected
   {"to_undirected", (PyCFunction) igraphmodule_Graph_to_undirected,
    METH_VARARGS | METH_KEYWORDS,
-   "to_undirected(collapse=True)\n\n"
+   "to_undirected(collapse=True, combine_edges=None)\n\n"
    "Converts a directed graph to undirected.\n\n"
    "@param collapse: C{True} if only a single edge should be\n"
    "  created from multiple directed edges going between the\n"
-   "  same vertex pair. If C{False}, the edge count is kept constant.\n"},
+   "  same vertex pair. If C{False}, the edge count is kept constant.\n"
+   "@param combine_edges: specifies how to combine the attributes of\n"
+   "  multiple edges between the same pair of vertices into a single\n"
+   "  attribute. See L{Graph.simplify()} for more details.\n"
+  },
 
   /* interface to igraph_laplacian */
   {"laplacian", (PyCFunction) igraphmodule_Graph_laplacian,
