@@ -1376,6 +1376,8 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
   }
   IGRAPH_FINALLY(free, already_added); /* TODO: hack */
 
+  igraph_vector_clear(res);
+
   IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
   IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
   
