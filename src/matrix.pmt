@@ -410,6 +410,45 @@ int FUNCTION(igraph_matrix,select_rows)(const TYPE(igraph_matrix) *m,
 }
 
 /**
+ * \function igraph_matrix_select_rows_cols
+ * \brief Select some rows and columns of a matrix
+ * 
+ * This function selects some rows and columns of a matrix and returns
+ * them in a new matrix. The result matrix should be initialized before
+ * calling the function.
+ * \param m The input matrix.
+ * \param res The result matrix. It should be initialized and will be
+ *    resized as needed.
+ * \param rows Vector, it contains the row indices (starting with
+ *    zero) to extract. Note that no range checking is performed.
+ * \param cols Vector, it contains the column indices (starting with
+ *    zero) to extract. Note that no range checking is performed.
+ * \return Error code.
+ * 
+ * Time complexity: O(nm), n is the number of rows, m the number of
+ * columns of the result matrix.
+ */
+
+int FUNCTION(igraph_matrix,select_rows_cols)(const TYPE(igraph_matrix) *m, 
+					TYPE(igraph_matrix) *res, 
+					const igraph_vector_t *rows,
+					const igraph_vector_t *cols) {
+  long int nrows=igraph_vector_size(rows);
+  long int ncols=igraph_vector_size(cols);
+  long int i, j;
+  
+  IGRAPH_CHECK(FUNCTION(igraph_matrix,resize)(res, nrows, ncols));
+  for (i=0; i<nrows; i++) {
+    for (j=0; j<ncols; j++) {
+      MATRIX(*res, i, j) = MATRIX(*m, (long int)VECTOR(*rows)[i],
+	                                  (long int)VECTOR(*cols)[j]);
+    }
+  }
+  
+  return 0;
+}
+
+/**
  * \function igraph_matrix_get_col
  * \brief Select a column
  * 

@@ -46,6 +46,7 @@
 <!--doxrox-include igraph_matrix_swap_cols -->
 <!--doxrox-include igraph_matrix_select_rows -->
 <!--doxrox-include igraph_matrix_select_cols -->
+<!--doxrox-include igraph_matrix_select_rows_cols -->
 </section>
 
 <section>
