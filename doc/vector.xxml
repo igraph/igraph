@@ -118,6 +118,8 @@
 <!-- doxrox-include igraph_vector_ptr_e -->
 <!-- doxrox-include igraph_vector_ptr_set -->
 <!-- doxrox-include igraph_vector_ptr_resize -->
+<!-- doxrox-include igraph_vector_ptr_get_item_destructor -->
+<!-- doxrox-include igraph_vector_ptr_set_item_destructor -->
 </section>
 
 </section>

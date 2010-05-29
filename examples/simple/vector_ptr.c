@@ -24,6 +24,12 @@
 #include <igraph.h>
 #include <stdlib.h>
 
+igraph_vector_ptr_t custom_destructor_stack;
+
+void custom_destructor(void* ptr) {
+  igraph_vector_ptr_push_back(&custom_destructor_stack, ptr);
+}
+
 int main() {
   
   igraph_vector_ptr_t v1, v2;
@@ -31,6 +37,7 @@ int main() {
   int i;
   void ** ptr;
   int d1=1, d2=2, d3=3, d4=4, d5=5;
+  char *block1=0, *block2=0;
 
   /* igraph_vector_ptr_init, igraph_vector_ptr_destroy */
   igraph_vector_ptr_init(&v1, 10);
@@ -234,8 +241,37 @@ int main() {
   }
 
   igraph_vector_ptr_destroy(&v2);
-   
-  if (IGRAPH_FINALLY_STACK_SIZE() != 0) return 24;
+
+  /* Testing destructor */
+  igraph_vector_ptr_init(&custom_destructor_stack, 0);
+  igraph_vector_ptr_init(&v1, 2);
+  block1 = igraph_Calloc(32, char);
+  block2 = igraph_Calloc(64, char);
+  VECTOR(v1)[0] = block1; VECTOR(v1)[1] = block2;
+  if (igraph_vector_ptr_get_item_destructor(&v1) != 0) {
+    return 24;
+  }
+  if (igraph_vector_ptr_set_item_destructor(&v1, &custom_destructor) != 0) {
+    return 25;
+  }
+  /* Okay, let's clear the vector. This should push the blocks in the
+   * custom destructor stack */
+  igraph_vector_ptr_clear(&v1);
+  /* Put the blocks back and destroy the vector */
+  igraph_vector_ptr_push_back(&v1, block1);
+  igraph_vector_ptr_push_back(&v1, block2);
+  igraph_vector_ptr_destroy_all(&v1);
+
+  if (VECTOR(custom_destructor_stack)[0] != block1 ||
+      VECTOR(custom_destructor_stack)[1] != block2 ||
+      VECTOR(custom_destructor_stack)[2] != block1 ||
+      VECTOR(custom_destructor_stack)[3] != block2
+     )
+    return 26;
+
+  igraph_vector_ptr_destroy(&custom_destructor_stack);
+
+  if (IGRAPH_FINALLY_STACK_SIZE() != 0) return 27;
 
   return 0;
 }

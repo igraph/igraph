@@ -49,9 +49,10 @@ typedef struct s_vector_ptr {
   void** stor_begin;
   void** stor_end;
   void** end;
+  igraph_finally_func_t* item_destructor;
 } igraph_vector_ptr_t;
 
-#define IGRAPH_VECTOR_PTR_NULL { 0,0,0 }
+#define IGRAPH_VECTOR_PTR_NULL { 0,0,0,0 }
 #define IGRAPH_VECTOR_PTR_INIT_FINALLY(v, size) \
   do { IGRAPH_CHECK(igraph_vector_ptr_init(v, size)); \
   IGRAPH_FINALLY(igraph_vector_ptr_destroy, v); } while (0)
@@ -78,6 +79,10 @@ void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to);
 int igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from);
 void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos);
 void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int(*compar)(const void*, const void*));
+
+igraph_finally_func_t* igraph_vector_ptr_get_item_destructor(const igraph_vector_ptr_t *v);
+igraph_finally_func_t* igraph_vector_ptr_set_item_destructor(igraph_vector_ptr_t *v,
+        igraph_finally_func_t *func);
 
 __END_DECLS
 
