@@ -697,8 +697,8 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
             if src == tgt:
                 # Loop edge
                 radius = src_vertex.size*2
-                c_x, c_y = layout[src][0]+math.cos(math.pi/4)*r/2, \
-                           layout[src][1]-math.sin(math.pi/4)*r/2
+                c_x, c_y = layout[src][0]+math.cos(math.pi/4)*radius/2, \
+                           layout[src][1]-math.sin(math.pi/4)*radius/2
                 context.arc(c_x, c_y, radius/2., 0, math.pi*2)
             else:
                 # Determine where the edge intersects the circumference of the
