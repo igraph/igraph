@@ -43,37 +43,11 @@
  * they generate a different graph every time you call them. </para>
  */
 
-/**
- * \ingroup generators
- * \function igraph_barabasi_game
- * \brief Generates a graph based on the Barab&aacute;si-Albert model.
- *
- * \param graph An uninitialized graph object.
- * \param n The number of vertices in the graph.
- * \param m The number of outgoing edges generated for each 
- *        vertex. (Only if \p outseq is \c NULL.) 
- * \param outseq Gives the (out-)degrees of the vertices. If this is
- *        constant, this can be a NULL pointer or an empty (but
- *        initialized!) vector, in this case \p m contains
- *        the constant out-degree. The very first vertex has by definition 
- *        no outgoing edges, so the first number in this vector is 
- *        ignored.
- * \param outpref Boolean, if true not only the in- but also the out-degree
- *        of a vertex increases its citation probability. Ie. the
- *        citation probability is determined by the total degree of
- *        the vertices.
- * \param directed Boolean, whether to generate a directed graph.
- * \return Error code:
- *         \c IGRAPH_EINVAL: invalid \p n,
- *         \p m or \p outseq parameter.
- * 
- * Time complexity: O(|V|+|E|), the
- * number of vertices plus the number of edges.
- */
-
-int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n, igraph_integer_t m, 
-			 const igraph_vector_t *outseq, igraph_bool_t outpref, 
-			 igraph_bool_t directed) {
+int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n, 
+			       igraph_integer_t m, 
+			       const igraph_vector_t *outseq, 
+			       igraph_bool_t outpref, 
+			       igraph_bool_t directed) {
 
   long int no_of_nodes=n;
   long int no_of_neighbors=m;
@@ -86,17 +60,11 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n, igraph_integer_t m
 
   long int i,j;
 
-  if (n<0) {
-    IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
-  }
-  if (outseq != 0 && igraph_vector_size(outseq) != 0 && igraph_vector_size(outseq) != n) {
-    IGRAPH_ERROR("Invalid out degree sequence length", IGRAPH_EINVAL);
-  }
-  if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m<0) {
-    IGRAPH_ERROR("Invalid out degree", IGRAPH_EINVAL);
+  if (outseq && igraph_vector_size(outseq)==0) {
+    outseq=0;
   }
 
-  if (outseq==0 || igraph_vector_size(outseq) == 0) {
+  if (!outseq) {
     no_of_neighbors=m;
     bag=igraph_Calloc(no_of_nodes * no_of_neighbors + no_of_nodes +
 	       outpref * no_of_nodes * no_of_neighbors,
@@ -128,7 +96,7 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n, igraph_integer_t m
   
   for (i=1; i<no_of_nodes; i++) {
     /* draw edges */
-    if (outseq != 0 && igraph_vector_size(outseq)!=0) { no_of_neighbors=VECTOR(*outseq)[i]; }
+    if (outseq) { no_of_neighbors=VECTOR(*outseq)[i]; }
     for (j=0; j<no_of_neighbors; j++) {
       long int to=bag[RNG_INTEGER(0, bagp-1)];
       VECTOR(edges)[resp++] = i;
@@ -151,6 +119,303 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n, igraph_integer_t m
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(2);
 
+  return 0;
+}
+
+int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph, 
+					     igraph_integer_t n,
+					     igraph_real_t power,
+					     igraph_integer_t m,
+					     const igraph_vector_t *outseq,
+					     igraph_bool_t outpref,
+					     igraph_real_t A,
+					     igraph_bool_t directed) {
+
+  long int no_of_nodes=n;
+  long int no_of_neighbors=m;
+  long int no_of_edges;
+  igraph_vector_t edges;
+  long int i, j;
+  igraph_psumtree_t sumtree;
+  long int edgeptr=0;
+  igraph_vector_t degree;
+
+  if (outseq && igraph_vector_size(outseq)==0) {
+    outseq=0;
+  }
+
+  if (!outseq) {
+    no_of_neighbors=m;
+    no_of_edges=(no_of_nodes-1)*no_of_neighbors;
+  } else {
+    no_of_edges=0;
+    for (i=1; i<igraph_vector_size(outseq); i++) {
+      no_of_edges+=VECTOR(*outseq)[i];
+    }
+  }
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges*2);
+  IGRAPH_CHECK(igraph_psumtree_init(&sumtree, no_of_nodes));
+  IGRAPH_FINALLY(igraph_psumtree_destroy, &sumtree);
+  IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+  
+  RNG_BEGIN();
+  
+  /* first node */
+  igraph_psumtree_update(&sumtree, 0, A);
+
+  /* and the rest */
+  for (i=1; i<no_of_nodes; i++) {
+    igraph_real_t sum=igraph_psumtree_sum(&sumtree);
+    long int to;
+    if (outseq) {
+      no_of_neighbors=VECTOR(*outseq)[i];
+    }
+    for (j=0; j<no_of_neighbors; j++) {
+      igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+      VECTOR(degree)[to]++;
+      VECTOR(edges)[edgeptr++] = i;
+      VECTOR(edges)[edgeptr++] = to;
+    }
+    /* update probabilities */
+    for (j=0; j<no_of_neighbors; j++) {
+      long int n=VECTOR(edges)[edgeptr-2*j-1];
+      igraph_psumtree_update(&sumtree, n, 
+			     pow(VECTOR(degree)[n], power)+A);
+    }
+    if (outpref) {
+      VECTOR(degree)[i] += no_of_neighbors;
+      igraph_psumtree_update(&sumtree, i, 
+			     pow(VECTOR(degree)[i], power)+A);
+    } else {
+      igraph_psumtree_update(&sumtree, i, A);
+    }
+  }
+  
+  RNG_END();
+
+  igraph_psumtree_destroy(&sumtree);
+  igraph_vector_destroy(&degree);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
+int igraph_i_barabasi_game_psumtree(igraph_t *graph, 
+				    igraph_integer_t n,
+				    igraph_real_t power,
+				    igraph_integer_t m,
+				    const igraph_vector_t *outseq,
+				    igraph_bool_t outpref,
+				    igraph_real_t A,
+				    igraph_bool_t directed) {
+
+  long int no_of_nodes=n;
+  long int no_of_neighbors=m;
+  long int no_of_edges;		/* upper limit only */
+  igraph_vector_t edges;
+  long int i, j;
+  igraph_psumtree_t sumtree;
+  long int edgeptr=0;
+  igraph_vector_t degree;
+
+  if (outseq && igraph_vector_size(outseq) == 0) {
+    outseq=0;
+  }
+
+  if (!outseq) {
+    no_of_neighbors=m;
+    no_of_edges=(no_of_nodes-1)*no_of_neighbors;
+  } else {
+    no_of_edges=0;
+    for (i=1; i<igraph_vector_size(outseq); i++) {
+      no_of_edges+=VECTOR(*outseq)[i];
+    }
+  }
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges*2));
+  IGRAPH_CHECK(igraph_psumtree_init(&sumtree, no_of_nodes));
+  IGRAPH_FINALLY(igraph_psumtree_destroy, &sumtree);
+  IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+  
+  RNG_BEGIN();
+  
+  /* first node */
+  igraph_psumtree_update(&sumtree, 0, A);
+
+  /* and the rest */
+  for (i=1; i<no_of_nodes; i++) {
+    igraph_real_t sum;
+    long int to;
+    if (outseq) {
+      no_of_neighbors=VECTOR(*outseq)[i];
+    }
+    if (no_of_neighbors >= i) {
+      /* All existing vertices are cited */
+      for (to=0; to<i; to++) {
+	VECTOR(degree)[to]++;
+	igraph_vector_push_back(&edges, i);
+	igraph_vector_push_back(&edges, to);
+	edgeptr+=2;
+	igraph_psumtree_update(&sumtree, to, pow(VECTOR(degree)[to], power)+A);
+      }
+    } else {
+      for (j=0; j<no_of_neighbors; j++) {
+	sum=igraph_psumtree_sum(&sumtree);
+	igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+	VECTOR(degree)[to]++;
+	igraph_vector_push_back(&edges, i);
+	igraph_vector_push_back(&edges, to);
+	edgeptr+=2;
+	igraph_psumtree_update(&sumtree, to, 0.0);
+      }
+      /* update probabilities */
+      for (j=0; j<no_of_neighbors; j++) {
+	long int n=VECTOR(edges)[edgeptr-2*j-1];
+	igraph_psumtree_update(&sumtree, n, 
+			       pow(VECTOR(degree)[n], power)+A);
+      }
+    }
+    if (outpref) {
+      VECTOR(degree)[i] += no_of_neighbors > i ? i : no_of_neighbors;
+      igraph_psumtree_update(&sumtree, i, 
+			     pow(VECTOR(degree)[i], power)+A);
+    } else {
+      igraph_psumtree_update(&sumtree, i, A);
+    }
+  }
+  
+  RNG_END();
+
+  igraph_psumtree_destroy(&sumtree);
+  igraph_vector_destroy(&degree);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
+/**
+ * \ingroup generators
+ * \function igraph_barabasi_game
+ * \brief Generates a graph based on the Barab&aacute;si-Albert model.
+ *
+ * \param graph An uninitialized graph object.
+ * \param n The number of vertices in the graph.
+ * \param power Power of the preferential attachment. The probability
+ *        that a vertex is cited is proportional to d^power+A, where 
+ *        d is its degree (see also the \p outpref argument), power
+ *        and A are given by arguments. In the classic preferential 
+ *        attachment model power=1.
+ * \param m The number of outgoing edges generated for each 
+ *        vertex. (Only if \p outseq is \c NULL.) 
+ * \param outseq Gives the (out-)degrees of the vertices. If this is
+ *        constant, this can be a NULL pointer or an empty (but
+ *        initialized!) vector, in this case \p m contains
+ *        the constant out-degree. The very first vertex has by definition 
+ *        no outgoing edges, so the first number in this vector is 
+ *        ignored.
+ * \param outpref Boolean, if true not only the in- but also the out-degree
+ *        of a vertex increases its citation probability. Ie. the
+ *        citation probability is determined by the total degree of
+ *        the vertices.
+ * \param A The probability that a vertex is cited is proportional to
+ *        d^power+A, where d is its degree (see also the \p outpref
+ *        argument), power and A are given by arguments. In the
+ *        previous versions of the function this parameter was
+ *        implicitly set to one.
+ * \param directed Boolean, whether to generate a directed graph.
+ * \param algo The algorithm to use to generate the network. Possible
+ *        values: 
+ *        \clist
+ *        \cli IGRAPH_BARABASI_BAG
+ *          This is the algorithm that was previously (before version
+ *          0.6) solely implemented in igraph. It works by putting the
+ *          ids of the vertices into a bag (mutliset, really), exactly
+ *          as many times as their (in-)degree, plus once more. Then
+ *          the required number of cited vertices are drawn from the
+ *          bag, with replacement. This method might generate multiple
+ *          edges. It only works if power=1 and A=1.
+ *        \cli IGRAPH_BARABASI_PSUMTREE
+ *          This algorithm uses a partial prefix-sum tree to generate
+ *          the graph. It does not generate multiple edges and 
+ *          works for any power and A values.
+ *        \cli IGRAPH_BARABASI_PSUMTREE_MULTIPLE
+ *          This algorithm also uses a partial prefix-sum tree to 
+ *          generate the graph. The difference is, that now multiple
+ *          edges are allowed. This method was implemented under the
+ *          name \c igraph_nonlinear_barabasi_game before version 0.6.
+ *        \endclist
+ * \return Error code:
+ *         \c IGRAPH_EINVAL: invalid \p n,
+ *         \p m or \p outseq parameter.
+ * 
+ * Time complexity: O(|V|+|E|), the
+ * number of vertices plus the number of edges.
+ */
+
+int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
+			 igraph_real_t power, 
+			 igraph_integer_t m,
+			 const igraph_vector_t *outseq,
+			 igraph_bool_t outpref,
+			 igraph_real_t A,
+			 igraph_bool_t directed,
+			 igraph_barabasi_algorithm_t algo) {
+
+  /* Check arguments */
+
+  if (algo != IGRAPH_BARABASI_BAG && 
+      algo != IGRAPH_BARABASI_PSUMTREE && 
+      algo != IGRAPH_BARABASI_PSUMTREE_MULTIPLE) {
+    IGRAPH_ERROR("Invalid algorithm", IGRAPH_EINVAL);
+  }
+  if (n < 0) {
+    IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+  }
+  if (outseq != 0 && igraph_vector_size(outseq) != 0 && 
+      igraph_vector_size(outseq) != n) {
+    IGRAPH_ERROR("Invalid out degree sequence length", IGRAPH_EINVAL);
+  }
+  if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m<0) {
+    IGRAPH_ERROR("Invalid out degree", IGRAPH_EINVAL);
+  }
+  if (outseq && igraph_vector_min(outseq) < 0) {
+    IGRAPH_ERROR("Negative out degree in sequence", IGRAPH_EINVAL);
+  }
+  if (A<=0) {
+    IGRAPH_ERROR("Constant attractiveness (A) must be positive",
+		 IGRAPH_EINVAL);
+  }
+  if (algo == IGRAPH_BARABASI_BAG) {
+    if (power != 1) {
+      IGRAPH_ERROR("Power must be one for 'bag' algorithm", IGRAPH_EINVAL);
+    }
+    if (A != 1) {
+      IGRAPH_ERROR("Constant attractiveness (A) must be one for bag algorithm",
+		   IGRAPH_EINVAL);
+    }
+  }
+  
+  if (algo == IGRAPH_BARABASI_BAG) {
+    return igraph_i_barabasi_game_bag(graph, n, m, outseq, outpref, directed);
+  } else if (algo == IGRAPH_BARABASI_PSUMTREE) {
+    return igraph_i_barabasi_game_psumtree(graph, n, power, m, outseq, 
+					   outpref, A, directed);
+  } else if (algo == IGRAPH_BARABASI_PSUMTREE_MULTIPLE) {
+    return igraph_i_barabasi_game_psumtree_multiple(graph, n, power, m, 
+						    outseq, outpref, A, 
+						    directed);
+  }
+					   
   return 0;
 }
 
@@ -825,140 +1090,6 @@ int igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes,
 }
 
 /**
- * \function igraph_nonlinear_barabasi_game
- * \brief Generates graph with non-linear preferential attachment
- * 
- * </para><para>
- * This function is very similar to \ref igraph_barabasi_game(), only
- * in this game the probability that a new vertex attaches to a given
- * old vertex is not proportional to the degree of the old node, but
- * some power of the degree of the old node.
- * 
- * </para><para>
- * More precisely the attachment probability is the degree to the
- * power of \p power plus \p zeroappeal.
- * 
- * </para><para>
- * This function might generate graphs with multiple edges if the
- * value of \p m is at least two. You can call \ref igraph_simplify()
- * to get rid of the multiple edges. 
- * \param graph Pointer to an uninitialized graph object, the
- *        generated graph will be stored here.
- * \param n The number of vertices in the generated graph.
- * \param power The power of the preferential attachment.
- * \param m The number of edges to generate in each time step, if the
- *        \p outseq parameter is a null vector or a vector with length
- *        zero. It is ignored otherwise.
- * \param outseq The number of edges to generate in each time
- *        step. For directed graphs this is exactly the out-degree of
- *        the vertices. The first element of the vector is ignored. If
- *        this is a null vector or a vector of length zero then it is
- *        ignored and the value of the \p m argument is used.
- * \param outpref Logical constant, if TRUE then the preferential
- *        attachment is based on the total degree of the nodes instead
- *        of the in-degree.
- * \param zeroappeal Positive number, the attachment probability for
- *        vertices with degree zero. 
- * \param directed Logical constant, whether to generate a directed
- *        graph.
- * \return Error code.
- * 
- * Time complexity: O(|V|*m*log(|V|)+|E|), |V| is the number of
- * vertices, |E| is the number of edges and m is the average number of
- * edges added in a time step.
- * 
- * \sa \ref igraph_barabasi_game() for the slightly more efficient
- * implementation of the special case \p power=1.
- */
-
-int igraph_nonlinear_barabasi_game(igraph_t *graph, igraph_integer_t n,
-				   igraph_real_t power,
-				   igraph_integer_t m,  
-				   const igraph_vector_t *outseq,
-				   igraph_bool_t outpref,
-				   igraph_real_t zeroappeal,
-				   igraph_bool_t directed) {
-  long int no_of_nodes=n;
-  long int no_of_neighbors=m;
-  long int no_of_edges;
-  igraph_vector_t edges;
-  long int i, j;
-  igraph_psumtree_t sumtree;
-  long int edgeptr=0;
-  igraph_vector_t degree;
-
-  if (n<0) {
-    IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
-  }
-  if (outseq != 0 && igraph_vector_size(outseq) != 0 && igraph_vector_size(outseq) != n) {
-    IGRAPH_ERROR("Invalid out degree sequence length", IGRAPH_EINVAL);
-  }
-  if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m<0) {
-    IGRAPH_ERROR("Invalid out degree", IGRAPH_EINVAL);
-  }
-
-  if (outseq==0 || igraph_vector_size(outseq) == 0) {
-    no_of_neighbors=m;
-    no_of_edges=(no_of_nodes-1)*no_of_neighbors;
-  } else {
-    no_of_edges=0;
-    for (i=1; i<igraph_vector_size(outseq); i++) {
-      no_of_edges+=VECTOR(*outseq)[i];
-    }
-  }
-  
-  IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges*2);
-  IGRAPH_CHECK(igraph_psumtree_init(&sumtree, no_of_nodes));
-  IGRAPH_FINALLY(igraph_psumtree_destroy, &sumtree);
-  IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
-  
-  RNG_BEGIN();
-  
-  /* first node */
-  igraph_psumtree_update(&sumtree, 0, zeroappeal);
-
-  /* and the rest */
-  for (i=1; i<no_of_nodes; i++) {
-    igraph_real_t sum=igraph_psumtree_sum(&sumtree);
-    long int to;
-    if (outseq != 0 && igraph_vector_size(outseq)!=0) {
-      no_of_neighbors=VECTOR(*outseq)[i];
-    }
-    for (j=0; j<no_of_neighbors; j++) {
-      igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
-      VECTOR(degree)[to]++;
-      VECTOR(edges)[edgeptr++] = i;
-      VECTOR(edges)[edgeptr++] = to;
-    }
-    /* update probabilities */
-    for (j=0; j<no_of_neighbors; j++) {
-      long int n=VECTOR(edges)[edgeptr-2*j-1];
-      igraph_psumtree_update(&sumtree, n, 
-			     pow(VECTOR(degree)[n], power)+zeroappeal);
-    }
-    if (outpref) {
-      VECTOR(degree)[i] += no_of_neighbors;
-      igraph_psumtree_update(&sumtree, i, 
-			     pow(VECTOR(degree)[i], power)+zeroappeal);
-    } else {
-      igraph_psumtree_update(&sumtree, i, zeroappeal);
-    }
-  }
-  
-  RNG_END();
-
-  igraph_psumtree_destroy(&sumtree);
-  igraph_vector_destroy(&degree);
-  IGRAPH_FINALLY_CLEAN(2);
-
-  IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
-  igraph_vector_destroy(&edges);
-  IGRAPH_FINALLY_CLEAN(1);
-
-  return 0;
-}
-
-/**
  * \function igraph_recent_degree_game
  * \brief Stochastic graph generator based on the number of adjacent edges a node has gained recently
  * 
@@ -999,6 +1130,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
 			      igraph_bool_t outpref,
 			      igraph_real_t zero_appeal,
 			      igraph_bool_t directed) {
+
   long int no_of_nodes=n;
   long int no_of_neighbors=m;
   long int no_of_edges;

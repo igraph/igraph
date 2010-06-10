@@ -31,6 +31,11 @@ AT_KEYWORDS([barabasi barabasi-albert igraph_barabasi_game])
 AT_COMPILE_CHECK([simple/igraph_barabasi_game.c])
 AT_CLEANUP
 
+AT_SETUP([More Barabasi-Albert model (igraph_barabasi_game):])
+AT_KEYWORDS([barabasi barabasi-albert igraph_barabasi_game])
+AT_COMPILE_CHECK([simple/igraph_barabasi_game2.c])
+AT_CLEANUP
+
 AT_SETUP([Erdos-Renyi model (igraph_erdos_renyi_game):])
 AT_KEYWORDS([erdos renyi erdos-renyi igraph_erdos_renyi_game])
 AT_COMPILE_CHECK([simple/igraph_erdos_renyi_game.c])

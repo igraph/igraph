@@ -1,5 +1,5 @@
 
-# sink("graph.adjacency.Rout")
+# sink("graph.adjacency.Rout.save")
 
 library(igraph)
 

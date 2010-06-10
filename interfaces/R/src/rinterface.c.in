@@ -2906,51 +2906,30 @@ SEXP R_igraph_lattice(SEXP pdimvector, SEXP pnei, SEXP pdirected,
   return result;  
 }
 
-SEXP R_igraph_barabasi_game(SEXP pn, SEXP pm, SEXP poutseq,
-			    SEXP poutpref, SEXP pdirected) {
+SEXP R_igraph_barabasi_game(SEXP pn, SEXP ppower, SEXP pm, SEXP poutseq,
+			    SEXP poutpref, SEXP pA, SEXP pdirected, 
+			    SEXP palgo) {
   
-  igraph_t g;
-  igraph_integer_t n=REAL(pn)[0];
-  igraph_integer_t m=REAL(pm)[0]; 
-  igraph_vector_t outseq;
-  igraph_bool_t outpref=LOGICAL(poutpref)[0];
-  igraph_bool_t directed=LOGICAL(pdirected)[0];
-  SEXP result;
-  
-  R_igraph_before();
-
-  R_SEXP_to_vector(poutseq, &outseq);
-  
-  igraph_barabasi_game(&g, n, m, &outseq, outpref, directed);
-  PROTECT(result=R_igraph_to_SEXP(&g));
-  igraph_destroy(&g);
-  
-  R_igraph_after();
-  
-  UNPROTECT(1);
-  return result;
-}
-
-SEXP R_igraph_nonlinear_barabasi_game(SEXP pn, SEXP ppower, SEXP pm,
-				      SEXP poutseq, SEXP poutpref, 
-				      SEXP pzeroappeal,
-				      SEXP pdirected) {
   igraph_t g;
   igraph_integer_t n=REAL(pn)[0];
   igraph_real_t power=REAL(ppower)[0];
-  igraph_integer_t m=REAL(pm)[0];
-  igraph_vector_t outseq;
+  igraph_integer_t m=REAL(pm)[0]; 
+  igraph_vector_t outseq, *myoutseq=0;
   igraph_bool_t outpref=LOGICAL(poutpref)[0];
+  igraph_real_t A=REAL(pA)[0];
   igraph_bool_t directed=LOGICAL(pdirected)[0];
-  igraph_real_t zeroappeal=REAL(pzeroappeal)[0];
+  igraph_integer_t algo=REAL(palgo)[0];
   SEXP result;
   
   R_igraph_before();
+
+  if (!isNull(poutseq)) {
+    R_SEXP_to_vector(poutseq, &outseq);
+    myoutseq=&outseq;
+  }
   
-  R_SEXP_to_vector(poutseq, &outseq);
-  
-  igraph_nonlinear_barabasi_game(&g, n, power, m, &outseq, outpref, 
-				 zeroappeal, directed);
+  igraph_barabasi_game(&g, n, power, m, &outseq, outpref, 
+		       A, directed, algo);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   

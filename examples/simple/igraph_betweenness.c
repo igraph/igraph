@@ -56,10 +56,13 @@ int main() {
 
   igraph_barabasi_game(/* graph= */    &g,
 		       /* n= */        1000,
+		       /* power= */    1,
 		       /* m= */        3,
 		       /* outseq= */   0,
 		       /* outpref= */  0,
-		       /* directed= */ 0);
+		       /* A= */        1,
+		       /* directed= */ 0,
+		       /* algo= */     IGRAPH_BARABASI_BAG);
   
   igraph_simplify(&g, /* multiple= */ 1, /* loops= */ 1, /*edge_comb=*/ 0);
   

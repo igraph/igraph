@@ -22,7 +22,8 @@
 
 ba.game <- function(n, power=1, m=NULL, out.dist=NULL, out.seq=NULL,
                     out.pref=FALSE, zero.appeal=1,
-                    directed=TRUE, time.window=NULL) {
+                    directed=TRUE, algorithm=c("psumtree",
+                                     "psumtree-multiple", "bag")) {
 
   # Checks
   if (! is.null(out.seq) && (!is.null(m) || !is.null(out.dist))) {
@@ -32,23 +33,6 @@ ba.game <- function(n, power=1, m=NULL, out.dist=NULL, out.seq=NULL,
   if (is.null(out.seq) && !is.null(out.dist) && !is.null(m)) {
     warning("if `out.dist' is given `m' will be ignored")
     m <- NULL
-  }
-  if (!is.null(out.seq) && length(out.seq) != n) {
-    stop("`out.seq' should be of length `n'")
-  }
-  if (!is.null(out.seq) && min(out.seq)<0) {
-    stop("negative elements in `out.seq'");
-  }
-  if (!is.null(m) && m<0) {
-    stop("`m' is negative")
-  }
-  if (!is.null(time.window) && time.window <= 0) {
-    stop("time window size should be positive")
-  }
-  if (zero.appeal != 1 && power == 1) {
-    warning("`zero.appeal' is set to 1 for traditional BA game")
-  } else if (zero.appeal <= 0) {
-    warning("`zero.appeal' is not positive")
   }
   if (!is.null(m) && m==0) {
     warning("`m' is zero, graph will be empty")
@@ -62,6 +46,7 @@ ba.game <- function(n, power=1, m=NULL, out.dist=NULL, out.seq=NULL,
   }
   
   n <- as.numeric(n)
+  power <- as.numeric(power)
   if (!is.null(m)) { m <- as.numeric(m) }
   if (!is.null(out.dist)) { out.dist <- as.numeric(out.dist) }
   if (!is.null(out.seq)) { out.seq <- as.numeric(out.seq) }
@@ -76,19 +61,14 @@ ba.game <- function(n, power=1, m=NULL, out.dist=NULL, out.seq=NULL,
     out.seq <- numeric()
   }
 
+  algorithm <- switch(igraph.match.arg(algorithm),
+                      "psumtree"=1, "psumtree-multiple"=2,
+                      "bag"=0)
+  
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  if (!is.null(time.window)) {
-    .Call("R_igraph_recent_degree_game", n, power, time.window, m, out.seq,
-          out.pref, as.numeric(zero.appeal), directed,
-          PACKAGE="igraph")
-  } else if (power==1 && zero.appeal==1) {    
-    .Call("R_igraph_barabasi_game", n, m, out.seq, out.pref, directed,
-          PACKAGE="igraph")
-  } else {
-    .Call("R_igraph_nonlinear_barabasi_game", n, power, m, out.seq,
-          out.pref, as.numeric(zero.appeal), directed,
-          PACKAGE="igraph")
-  }
+  .Call("R_igraph_barabasi_game", n, power, m, out.seq, out.pref,
+        zero.appeal, directed, algorithm,
+        PACKAGE="igraph")
 }
 
 barabasi.game <- ba.game

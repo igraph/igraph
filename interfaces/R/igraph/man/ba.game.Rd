@@ -9,7 +9,8 @@
   building a graph.}
 \usage{
 barabasi.game(n, power = 1, m = NULL, out.dist = NULL, out.seq = NULL, 
-    out.pref = FALSE, zero.appeal = 1, directed = TRUE, time.window = NULL) 
+    out.pref = FALSE, zero.appeal = 1, directed = TRUE,
+    algorithm = c("psumtree", "psumtree-multiple", "bag")) 
 }
 \arguments{
   \item{n}{Number of vertices.}
@@ -30,9 +31,23 @@ barabasi.game(n, power = 1, m = NULL, out.dist = NULL, out.seq = NULL,
   \item{zero.appeal}{The \sQuote{attractiveness} of the vertices with no
     adjacent edges. See details below.}
   \item{directed}{Whether to create a directed graph.}
-  \item{time.window}{Integer constant, if given only edges added in the
-    previous \code{time.window} time steps are counted as the basis of
-    preferential attachment.}
+  \item{algorithm}{The algorithm to use for the graph generation.
+    \sQuote{\code{psumtree}} uses a partial prefix-sum tree to generate
+    the graph, this algorithm can handle any \code{power} and
+    \code{zero.appeal} values and never generated multiple edges.
+    \sQuote{\code{psumtree-multiple}} also uses a partial prefix-sum
+    tree, but the generation of multiple edges is allowed. Before the
+    0.6 version igraph used this algorithm if \code{power} was not one,
+    or \code{zero.appeal} was not one.
+    \sQuote{\code{bag}} is the algorithm that was previously (before
+    version 0.6) used if \code{power} was one and \code{zero.appeal} was
+    one as well. It works by putting the ids of the vertices into a bag
+    (mutliset, really), exactly as many times as their (in-)degree, plus
+    once more. Then the required number of cited vertices are drawn from
+    the bag, with replacement. This method might generate multiple
+    edges. It only works if \code{power} and \code{zero.appeal} are
+    equal one.
+  }
 }
 \details{
   This is a simple stochastic algorithm to generate a graph. It is a
@@ -73,10 +88,6 @@ barabasi.game(n, power = 1, m = NULL, out.dist = NULL, out.seq = NULL,
   the number of adjacent edges not initiated by the vertex itself and
   not the total (in- + out-) degree of the vertex, unless the
   \code{out.pref} argument is set to \code{TRUE}.
-
-  If the \code{time.window} argument is not NULL then \eqn{k_i}{k[i]} is
-  the number of adjacent edges of \eqn{i} added in the previous
-  \code{time.window} time steps.
 
   Note that \code{barabasi.game} might generate graphs with multiple
   edges.

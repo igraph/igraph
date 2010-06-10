@@ -170,12 +170,6 @@ igraph_barabasi_game:
                 BOOLEAN outpref=False, BOOLEAN directed=True
         IGNORE: RR, RC, RNamespace
 
-igraph_nonlinear_barabasi_game:
-        PARAMS: OUT GRAPH graph, INTEGER n, REAL power=1.0, INTEGER m=1, \
-                VECTOR_OR_0 outseq, BOOLEAN outpref=False, REAL zeroappeal=1.0, \
-                BOOLEAN directed=True
-        IGNORE: RR, RC, RNamespace
-
 igraph_erdos_renyi_game_gnp:
         PARAMS: OUT GRAPH graph, INTEGER n, REAL p, BOOLEAN directed=False, BOOLEAN loops=False
         IGNORE: RR, RC, RNamespace

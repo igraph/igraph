@@ -116,6 +116,10 @@ typedef enum { IGRAPH_ADD_WEIGHTS_NO = 0,
                IGRAPH_ADD_WEIGHTS_YES,
                IGRAPH_ADD_WEIGHTS_IF_PRESENT } igraph_add_weights_t;
 
+typedef enum { IGRAPH_BARABASI_BAG = 0,
+	       IGRAPH_BARABASI_PSUMTREE, 
+	       IGRAPH_BARABASI_PSUMTREE_MULTIPLE} igraph_barabasi_algorithm_t;
+
 typedef enum { IGRAPH_SUBGRAPH_AUTO = 0,
 	           IGRAPH_SUBGRAPH_COPY_AND_DELETE,
 			   IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH

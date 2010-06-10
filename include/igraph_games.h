@@ -46,9 +46,14 @@ __BEGIN_DECLS
 /* Constructors, games (=stochastic)                  */
 /* -------------------------------------------------- */
 
-int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n, igraph_integer_t m, 
-			 const igraph_vector_t *outseq, igraph_bool_t outpref, 
-			 igraph_bool_t directed);
+int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
+			 igraph_real_t power, 
+			 igraph_integer_t m,
+			 const igraph_vector_t *outseq,
+			 igraph_bool_t outpref,
+			 igraph_real_t A,
+			 igraph_bool_t directed,
+			 igraph_barabasi_algorithm_t algo);
 int igraph_nonlinear_barabasi_game(igraph_t *graph, igraph_integer_t n,
 				   igraph_real_t power,
 				   igraph_integer_t m,  
