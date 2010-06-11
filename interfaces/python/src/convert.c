@@ -185,6 +185,22 @@ int igraphmodule_PyObject_to_attribute_combination_type_t(PyObject* o,
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts a Python object to an igraph \c igraph_barabasi_algorithm_t
+ */
+int igraphmodule_PyObject_to_barabasi_algorithm_t(PyObject *o,
+  igraph_barabasi_algorithm_t *result) {
+  static igraphmodule_enum_translation_table_entry_t barabasi_algorithm_tt[] = {
+        {"bag", IGRAPH_BARABASI_BAG},
+        {"psumtree", IGRAPH_BARABASI_PSUMTREE},
+        {"psumtree_multiple", IGRAPH_BARABASI_PSUMTREE_MULTIPLE},
+        {0,0}
+    };
+
+  return igraphmodule_PyObject_to_enum(o, barabasi_algorithm_tt, (int*)result);
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts a Python object to an igraph \c igraph_connectedness_t
  */
 int igraphmodule_PyObject_to_connectedness_t(PyObject *o,

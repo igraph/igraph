@@ -48,6 +48,8 @@ int igraphmodule_PyObject_to_add_weights_t(PyObject *o, igraph_add_weights_t *re
 int igraphmodule_PyObject_to_adjacency_t(PyObject *o, igraph_adjacency_t *result);
 int igraphmodule_PyObject_to_attribute_combination_type_t(PyObject* o,
     igraph_attribute_combination_type_t *type);
+int igraphmodule_PyObject_to_barabasi_algorithm_t(PyObject *o,
+  igraph_barabasi_algorithm_t *result);
 int igraphmodule_PyObject_to_bliss_sh_t(PyObject *o, igraph_bliss_sh_t *result);
 int igraphmodule_PyObject_to_community_comparison_t(PyObject *obj,
                   igraph_community_comparison_t *result); 

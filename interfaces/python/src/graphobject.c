@@ -1541,14 +1541,21 @@ PyObject *igraphmodule_Graph_Barabasi(PyTypeObject * type,
   long n, m = 1;
   float power = 1.0, zero_appeal = 1.0;
   igraph_vector_t outseq;
+  igraph_barabasi_algorithm_t algo = IGRAPH_BARABASI_PSUMTREE;
   PyObject *m_obj = 0, *outpref = Py_False, *directed = Py_False;
+  PyObject *implementation_o = Py_None;
 
   static char *kwlist[] =
-    { "n", "m", "outpref", "directed", "power", "zero_appeal", NULL };
+    { "n", "m", "outpref", "directed", "power", "zero_appeal",
+      "implementation", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|OOOff", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|OOOffO", kwlist,
                                    &n, &m_obj, &outpref, &directed, &power,
-                                   &zero_appeal))
+                                   &zero_appeal, &implementation_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_barabasi_algorithm_t(implementation_o,
+        &algo))
     return NULL;
 
   if (n < 0) {
@@ -1572,28 +1579,15 @@ PyObject *igraphmodule_Graph_Barabasi(PyTypeObject * type,
     }
   }
 
-  if (power == 1.0 && zero_appeal == 1.0) {
-    /* linear model */
-    if (igraph_barabasi_game(&g, (igraph_integer_t) n,
-                             (igraph_integer_t) m,
-                             &outseq, PyObject_IsTrue(outpref),
-                             PyObject_IsTrue(directed))) {
-      igraphmodule_handle_igraph_error();
-      igraph_vector_destroy(&outseq);
-      return NULL;
-    }
-  } else {
-    /* nonlinear model */
-    if (igraph_nonlinear_barabasi_game(&g, (igraph_integer_t) n,
-                                       (igraph_real_t) power,
-                                       (igraph_integer_t) m,
-                                       &outseq, PyObject_IsTrue(outpref),
-                                       (igraph_real_t) zero_appeal,
-                                       PyObject_IsTrue(directed))) {
-      igraphmodule_handle_igraph_error();
-      igraph_vector_destroy(&outseq);
-      return NULL;
-    }
+  if (igraph_barabasi_game(&g, (igraph_integer_t) n,
+                           (igraph_real_t) power,
+                           (igraph_integer_t) m,
+                           &outseq, PyObject_IsTrue(outpref),
+                           (igraph_real_t) zero_appeal,
+                           PyObject_IsTrue(directed), algo)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&outseq);
+    return NULL;
   }
 
   igraph_vector_destroy(&outseq);
@@ -9274,7 +9268,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   // interface to igraph_barabasi_game
   {"Barabasi", (PyCFunction) igraphmodule_Graph_Barabasi,
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-   "Barabasi(n, m, outpref=False, directed=False, power=1, zero_appeal=1)\n\n"
+   "Barabasi(n, m, outpref=False, directed=False, power=1,\n"
+   "         zero_appeal=1, implementation=\"psumtree\")\n\n"
    "Generates a graph based on the Barabasi-Albert model.\n\n"
    "@param n: the number of vertices\n"
    "@param m: either the number of outgoing edges generated for\n"
@@ -9290,6 +9285,22 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  will be used.\n"
    "@param zero_appeal: the attractivity of vertices with degree\n"
    "  zero.\n\n"
+   "@param implementation: the algorithm to use to generate the\n"
+   "  network. Possible values are:\n\n"
+   "    - C{\"bag\"}: the algorithm that was the default in\n"
+   "      igraph before 0.6. It works by putting the ids of the\n"
+   "      vertices into a bag (multiset) exactly as many times\n"
+   "      as their in-degree, plus once more. The required number\n"
+   "      of cited vertices are then drawn from the bag with\n"
+   "      replacement. It works only for I{power}=1 and\n"
+   "      I{zero_appeal}=1.\n\n"
+   "    - C{\"psumtree\"}: this algorithm uses a partial prefix-sum\n"
+   "      tree to generate the graph. It does not generate multiple\n"
+   "      edges and it works for any values of I{power} and\n"
+   "      I{zero_appeal}.\n\n"
+   "    - C{\"psumtree_multiple\"}: similar to C{\"psumtree\"}, but\n"
+   "      it will generate multiple edges as well. igraph before\n"
+   "      0.6 used this algorithm for I{power}s other than 1.\n\n"
    "@newfield ref: Reference\n"
    "@ref: Barabasi, A-L and Albert, R. 1999. Emergence of scaling\n"
    "  in random networks. Science, 286 509-512."},
