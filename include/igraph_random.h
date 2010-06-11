@@ -41,46 +41,79 @@ __BEGIN_DECLS
 #include <stdlib.h>
 #include <time.h>
 
+/* The new RNG interface is (somewhat) modelled based on the GSL */
+
+typedef struct igraph_rng_type_t {
+  const char *name;
+  unsigned long int min;
+  unsigned long int max;
+  int (*init)(void **state);
+  void (*destroy)(void *state);
+  int (*seed)(void *state, unsigned long int seed);  
+  unsigned long int (*get)(void *state);
+  igraph_real_t (*get_real)(void *state);
+  igraph_real_t (*get_norm)(void *state);
+  igraph_real_t (*get_geom)(void *state, igraph_real_t p);
+  igraph_real_t (*get_binom)(void *state, long int n, igraph_real_t p);
+} igraph_rng_type_t;
+
+typedef struct igraph_rng_t {
+  const igraph_rng_type_t *type;
+  void *state;
+} igraph_rng_t;
+
+/* --------------------------------- */
+
+int igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type);
+void igraph_rng_destroy(igraph_rng_t *rng);
+
+int igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed);
+unsigned long int igraph_rng_max(igraph_rng_t *rng);
+unsigned long int igraph_rng_min(igraph_rng_t *rng);
+const char *igraph_rng_name(igraph_rng_t *rng);
+
+long int igraph_rng_get_integer(igraph_rng_t *rng,
+				long int l, long int h);
+igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng, 
+				    igraph_real_t m, igraph_real_t s);
+igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng, 
+				  igraph_real_t l, igraph_real_t h);
+igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng);
+igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p);
+igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n, 
+				   igraph_real_t p);
+unsigned long int igraph_rng_get_int31(igraph_rng_t *rng);
+
+/* --------------------------------- */
+
+extern igraph_rng_type_t igraph_rngtype_glibc2;
+extern igraph_rng_type_t igraph_rngtype_bsd;
+extern igraph_rng_type_t mt19937;
+extern igraph_rng_t igraph_rng_default;
+
+/* --------------------------------- */
+
 #ifdef USING_R
 
 void GetRNGstate(void);
 void PutRNGstate(void);
-double  unif_rand(void);
-double  norm_rand(void);
-double  Rf_rgeom(double);
-double  Rf_rbinom(double, double);
-#define rgeom Rf_rgeom
-#define rbinom Rf_rbinom
+#define RNG_BEGIN()    GetRNGstate()
+#define RNG_END()      PutRNGstate()
 
-#define RNG_BEGIN()       GetRNGstate()
-#define RNG_END()         PutRNGstate()
-#define RNG_INTEGER(l, h) ((long int)(unif_rand()*((h)-(l)+1)+(l)))
-#define RNG_NORMAL(m, s)  (norm_rand()*(s)+(m))
-#define RNG_UNIF(l, h)    (unif_rand()*((h)-(l))+(l))
-#define RNG_UNIF01()      (unif_rand())
-#define RNG_GEOM(p)       (rgeom(p))
-#define RNG_BINOM(n,p)    (rbinom((n),(p)))
-#define RNG_INT31()       ((long)(unif_rand()*0x7FFFFFFFL))
+#else 
 
-#else
-
-double igraph_norm_rand(void);
-double igraph_rgeom(double);
-double igraph_rbinom(double, double);
-extern int igraph_rng_inited;
-
-#define RNG_BEGIN()       if (!igraph_rng_inited) { srand(time(0)); igraph_rng_inited=1; }
-#define RNG_END()  
-#define RNG_INTEGER(l, h) ((long int)((rand())/((double)RAND_MAX+1)*((h)-(l)+1)+(l)))
-#define RNG_NORMAL(m, s)  (igraph_norm_rand()*(s)+(m))
-#define RNG_UNIF(l, h)    (rand()/((double)RAND_MAX+1)*(double)((h)-(l))+(l))
-#define RNG_UNIF01()      (RNG_UNIF(0,1))
-#define RNG_GEOM(p)       (igraph_rgeom(p))
-#define RNG_BINOM(n,p)    (igraph_rbinom((n),(p)))
-/* #define RNG_INT31()       ((long)(RNG_UNIF01()*0x7FFFFFFF)) */
-#define RNG_INT31()       (rand())
+#define RNG_BEGIN()		/* do nothing */
+#define RNG_END()		/* do nothing */
 
 #endif
+
+#define RNG_INTEGER(l,h) (igraph_rng_get_integer(&igraph_rng_default,(l),(h)))
+#define RNG_NORMAL(m,s)  (igraph_rng_get_normal(&igraph_rng_default,(m),(s)))
+#define RNG_UNIF(l,h)    (igraph_rng_get_unif(&igraph_rng_default,(l),(h)))
+#define RNG_UNIF01()     (igraph_rng_get_unif01(&igraph_rng_default))
+#define RNG_GEOM(p)      (igraph_rng_get_geom(&igraph_rng_default,(p)))
+#define RNG_BINOM(n,p)   (igraph_rng_get_binom(&igraph_rng_default,(n),(p)))
+#define RNG_INT31()      (igraph_rng_get_int31(&igraph_rng_default))
 
 __END_DECLS
 

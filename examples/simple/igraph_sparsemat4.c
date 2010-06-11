@@ -25,8 +25,6 @@
 #include <igraph.h>
 #include <igraph_sparsemat.h>
 
-#define RNG_INTEGER(l, h) ((long int)((rand())/((double)RAND_MAX+1)*((h)-(l)+1)+(l)))
-
 igraph_bool_t check_solution(const igraph_sparsemat_t *A,
 			     const igraph_vector_t *x,
 			     const igraph_vector_t *b) {

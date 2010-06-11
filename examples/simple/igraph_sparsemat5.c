@@ -24,7 +24,6 @@
 #include <igraph.h>
 #include <igraph_sparsemat.h>
 
-#define RNG_INTEGER(l, h) ((long int)((rand())/((double)RAND_MAX+1)*((h)-(l)+1)+(l)))
 #define EPS 1e-13
 
 int main() {
