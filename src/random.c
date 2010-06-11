@@ -169,7 +169,8 @@ igraph_i_rng_glibc2_state_t igraph_i_rng_default_state = {
 
 igraph_rng_t igraph_rng_default = { 
   &igraph_rngtype_glibc2,
-  &igraph_i_rng_default_state
+  &igraph_i_rng_default_state,
+  /* def= */ 1
 };
 
 /* ------------------------------------ */
@@ -1389,6 +1390,8 @@ double igraph_rbinom(igraph_rng_t *rng, double nin, double pp)
 
 /*   int i; */
 
+/*   RNG_BEGIN(); */
+
 /*   for (i=0; i<1000; i++) { */
 /*     printf("%li ", RNG_INTEGER(0,10)); */
 /*   } */
@@ -1403,6 +1406,8 @@ double igraph_rbinom(igraph_rng_t *rng, double nin, double pp)
 /*     printf("%f ", RNG_NORMAL(0,5)); */
 /*   } */
 /*   printf("\n"); */
+
+/*   RNG_END(); */
 
 /*   return 0; */
 /* } */
