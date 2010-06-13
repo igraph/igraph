@@ -61,6 +61,7 @@ this is inferred from the type of the default value itself.
 """
 
 from ConfigParser import NoOptionError
+from itertools import izip
 
 from igraph.configuration import Configuration
 
@@ -89,11 +90,16 @@ class AttributeSpecification(object):
         - C{transform}: optional transformation to be performed on the
           attribute value. If C{None} or omitted, it defaults to the
           type of the default value.
+
+        - C{func}: when given, this function will be called with an
+          index in order to derive the value of the attribute.
     """
 
-    __slots__ = ("name", "alt_name", "default", "transform", "accessor")
+    __slots__ = ("name", "alt_name", "default", "transform", "accessor",
+                 "func")
 
-    def __init__(self, name, default=None, alt_name=None, transform=None):
+    def __init__(self, name, default=None, alt_name=None, transform=None,
+                 func=None):
         if isinstance(default, tuple):
             default, transform = default
 
@@ -101,6 +107,7 @@ class AttributeSpecification(object):
         self.default = default
         self.alt_name = alt_name or name
         self.transform = transform or None
+        self.func = func
         self.accessor = None
 
         if self.transform and not hasattr(self.transform, "__call__"):
@@ -152,6 +159,8 @@ class AttributeCollectorMeta(type):
                 continue
             if isinstance(value, AttributeSpecification):
                 attr_spec = value
+            elif isinstance(value, dict):
+                attr_spec = AttributeSpecification(attr, **value)
             else:
                 attr_spec = AttributeSpecification(attr, value)
             attr_specs.append(attr_spec)
@@ -162,13 +171,7 @@ class AttributeCollectorMeta(type):
                 if attr_spec.name == attr_spec.alt_name:
                     attr_spec.alt_name = "%s%s" % (prefix, attr_spec.name)
 
-        for attr_spec in attr_specs:
-            attr = attr_spec.name
-            attr_spec.accessor = mcs.attribute_accessor(attr)
-            attrs[attr] = attr_spec.accessor
-
         attrs["_attributes"] = attr_specs
-        attrs["_cache"] = {}
         attrs["Element"] = mcs.record_generator(
                 "%s.Element" % name,
                 (attr_spec.name for attr_spec in attr_specs)
@@ -178,26 +181,13 @@ class AttributeCollectorMeta(type):
                 name, bases, attrs)
 
     @classmethod
-    def attribute_accessor(mcs, attr):
-        """Generates an attribute accessor method for the given attribute
-        with the given default value"""
-
-        def method(self, index):
-            """The internal, generated method"""
-            # pylint: disable-msg=W0212
-            # W0212: access to a protected member _cache of a client class
-            return self._cache[attr][index]
-
-        return method
-
-    @classmethod
     def record_generator(mcs, name, slots):
         """Generates a simple class that has the given slots and nothing else"""
         class Element(object):
             """A simple class that holds the attributes collected by the
             attribute collector"""
             __slots__ = tuple(slots)
-            def __init__(self, attrs):
+            def __init__(self, attrs=()):
                 for attr, value in attrs:
                     setattr(self, attr, value)
         Element.__name__ = name
@@ -222,13 +212,17 @@ class AttributeCollectorBase(object):
         @param kwds: a Python dict that will be used to override the
           attributes collected from I{seq} if necessary.
         """
+        elt = self.__class__.Element
+        self._cache = [elt() for _ in xrange(len(seq))]
+
         self.seq = seq
         self.kwds = kwds or {}
 
-        # pylint: disable-msg=E1101
-        # E1101: instance has no '_cache' member
         for attr_spec in self._attributes:
-            self._cache[attr_spec.name] = self._collect_attributes(attr_spec) 
+            values = self._collect_attributes(attr_spec) 
+            attr_name = attr_spec.name
+            for cache_elt, val in izip(self._cache, values):
+                setattr(cache_elt, attr_name, val)
 
     def _collect_attributes(self, attr_spec, config=None):
         """Collects graph visualization attributes from various sources.
@@ -266,18 +260,29 @@ class AttributeCollectorBase(object):
 
         n = len(seq)
 
+        # Special case if the attribute name is "label" 
         if attr_spec.name == "label":
             if attr_spec.alt_name in kwds and kwds[attr_spec.alt_name] is None:
                 return [None] * n
 
+        # If the attribute uses an external callable to derive the attribute
+        # values, call it and store the results
+        if attr_spec.func is not None:
+            func = attr_spec.func
+            result = [func(i) for i in xrange(n)]
+            return result
+
+        # Get the configuration object
         if config is None:
             config = Configuration.instance()
 
+        # Fetch the defaults from the vertex/edge sequence
         try:
             attrs = seq[attr_spec.name]
         except KeyError:
             attrs = None
 
+        # Override them from the keyword arguments (if any)
         result = kwds.get(attr_spec.alt_name, None)
         if attrs:
             if not result:
@@ -292,15 +297,22 @@ class AttributeCollectorBase(object):
                 result = [result[idx] or attrs[idx] \
                           for idx in xrange(len(result))]
 
+        # Special case for string overrides, strings are not treated
+        # as sequences here
         if isinstance(result, str):
             result = [result] * n
+
+        # If the result is still not a sequence, make it one
         try:
             len(result)
         except TypeError:
             result = [result] * n
 
+        # If it is not a list, ensure that it is a list
         if not hasattr(result, "extend"):
             result = list(result)
+
+        # Ensure that the length is n
         while len(result) < n:
             if len(result) <= n/2:
                 result.extend(result)
@@ -308,18 +320,21 @@ class AttributeCollectorBase(object):
                 result.extend(result[0:(n-len(result))])
 
         # By now, the length of the result vector should be n as requested
+        # Get the configuration defaults
         try:
-            conf_def = config["plotting.%s" % attr_spec.alt_name]
+            default = config["plotting.%s" % attr_spec.alt_name]
         except NoOptionError:
-            conf_def = None
+            default = None
 
-        if conf_def and None in result:
-            result = [result[idx] or conf_def for idx in xrange(len(result))]
-
-        if None in result:
+        if default is None:
             default = attr_spec.default
-            result = [result[idx] or default for idx in xrange(len(result))]
 
+        # Fill the None values with the default values
+        for idx in xrange(len(result)):
+            if result[idx] is None:
+                result[idx] = default
+
+        # Finally, do the transformation
         if attr_spec.transform is not None:
             transform = attr_spec.transform
             result = [transform(x) for x in result]
@@ -332,8 +347,7 @@ class AttributeCollectorBase(object):
         given index."""
         # pylint: disable-msg=E1101
         # E1101: instance has no '_attributes' member
-        return self.Element((attr_spec.name, attr_spec.accessor(self, index)) \
-                            for attr_spec in self._attributes)
+        return self._cache[index]
 
     def __len__(self):
         return len(self.seq)

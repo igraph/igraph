@@ -27,8 +27,10 @@ from ConfigParser import NoOptionError
 
 from igraph.configuration import Configuration
 from igraph.drawing.colors import Palette, palettes
+from igraph.drawing.edge import ArrowEdgeDrawer
 from igraph.drawing.shapes import ShapeDrawerDirectory
-from igraph.drawing.metamagic import AttributeCollectorBase
+from igraph.drawing.metamagic import AttributeCollectorBase, \
+                                     AttributeSpecification
 from igraph.utils import named_temporary_file
 
 __all__ = ["BoundingBox", "DefaultGraphDrawer", "Plot", "Point", "plot"]
@@ -633,32 +635,9 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
     def draw(self, graph, palette, *args, **kwds):
         from igraph.layout import Layout
 
-        class VisualVertexBuilder(AttributeCollectorBase):
-            """Collects some visual properties of a vertex for drawing"""
-            _kwds_prefix = "vertex_"
-            color = ("red", palette.get)
-            label = None
-            label_angle = -math.pi/2
-            label_dist  = 1.6
-            label_color = ("black", palette.get)
-            label_size  = 14.0
-            shape = ("circle", ShapeDrawerDirectory.resolve_default)
-            size  = 10.0
-
-        class VisualEdgeBuilder(AttributeCollectorBase):
-            """Collects some visual properties of an edge for drawing"""
-            _kwds_prefix = "edge_"
-            arrow_size = 1.0
-            arrow_width = 1.0
-            color = ("#444", palette.get)
-            width = 1.0
-
+        # Some abbreviations for sake of simplicity
         directed = graph.is_directed()
         context = self.context
-
-        # Construct the visual vertex/edge builders
-        vertex_builder = VisualVertexBuilder(graph.vs, kwds)
-        edge_builder = VisualEdgeBuilder(graph.es, kwds)
 
         # Calculate/get the layout of the graph
         layout = kwds.get("layout", None)
@@ -677,61 +656,47 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
             margin = [margin]
         while len(margin)<4:
             margin.extend(margin)
-        max_vertex_size = max(vertex.size for vertex in vertex_builder)
-        margin = [float(x) + max_vertex_size/2. for x in margin[:4]]
+        margin = [x + 5. for x in margin[:4]]
 
         # Contract the drawing area by the margin and fit the layout
         bbox = self.bbox.contract(margin)
         layout.fit_into(bbox, keep_aspect_ratio=False)
 
-        context.set_line_width(1)
+        # Construct the visual vertex/edge builders
+        class VisualVertexBuilder(AttributeCollectorBase):
+            """Collects some visual properties of a vertex for drawing"""
+            _kwds_prefix = "vertex_"
+            color = ("red", palette.get)
+            label = None
+            label_angle = -math.pi/2
+            label_dist  = 1.6
+            label_color = ("black", palette.get)
+            label_size  = 14.0
+            position = dict(func=layout.__getitem__)
+            shape = ("circle", ShapeDrawerDirectory.resolve_default)
+            size  = 10.0
+
+        class VisualEdgeBuilder(AttributeCollectorBase):
+            """Collects some visual properties of an edge for drawing"""
+            _kwds_prefix = "edge_"
+            arrow_size = 1.0
+            arrow_width = 1.0
+            color = ("#444", palette.get)
+            width = 1.0
+
+        vertex_builder = VisualVertexBuilder(graph.vs, kwds)
+        edge_builder = VisualEdgeBuilder(graph.es, kwds)
 
         # Draw the edges
+        edge_drawer = ArrowEdgeDrawer(context)
+        if directed:
+            drawer_method = edge_drawer.draw_directed_edge
+        else:
+            drawer_method = edge_drawer.draw_undirected_edge
         for edge, visual_edge in izip(graph.es, edge_builder):
-            context.set_source_rgb(*visual_edge.color)
-            context.set_line_width(visual_edge.width)
-
-            src, tgt = edge.tuple
-            src_vertex = vertex_builder[src]
-
-            if src == tgt:
-                # Loop edge
-                radius = src_vertex.size*2
-                c_x, c_y = layout[src][0]+math.cos(math.pi/4)*radius/2, \
-                           layout[src][1]-math.sin(math.pi/4)*radius/2
-                context.arc(c_x, c_y, radius/2., 0, math.pi*2)
-            else:
-                # Determine where the edge intersects the circumference of the
-                # vertex shape. TODO: theoretically this need not to be done
-                # if there are no arrowheads on the edge, but maybe it's not
-                # worth testing for
-                tgt_vertex = vertex_builder[tgt]
-                p1 = src_vertex.shape.intersection_point( \
-                    layout[src][0], layout[src][1], \
-                    layout[tgt][0], layout[tgt][1], \
-                    src_vertex.size)
-                p2 = tgt_vertex.shape.intersection_point( \
-                    layout[tgt][0], layout[tgt][1], \
-                    layout[src][0], layout[src][1],
-                    tgt_vertex.size)
-                context.move_to(*p1)
-                context.line_to(*p2)
-            context.stroke()
-
-            if directed and src != tgt:
-                # Draw an arrowhead
-                angle = math.atan2(p2[1]-p1[1], p2[0]-p1[0])
-                arrow_size = 15.*visual_edge.arrow_size
-                arrow_width = 10./visual_edge.arrow_width
-                a1 = (p2[0]-arrow_size*math.cos(angle-math.pi/arrow_width),
-                  p2[1]-arrow_size*math.sin(angle-math.pi/arrow_width))
-                a2 = (p2[0]-arrow_size*math.cos(angle+math.pi/arrow_width),
-                  p2[1]-arrow_size*math.sin(angle+math.pi/arrow_width))
-                context.move_to(*p2)
-                context.line_to(*a1)
-                context.line_to(*a2)
-                context.line_to(*p2)
-                context.fill()
+            src, dest = edge.tuple
+            src_vertex, dest_vertex = vertex_builder[src], vertex_builder[dest]
+            drawer_method(visual_edge, src_vertex, dest_vertex)
 
         # Draw the vertices
         context.set_line_width(1)
