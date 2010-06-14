@@ -7876,6 +7876,86 @@ PyObject *igraphmodule_Graph_maxflow_value(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Calculates the maximum flow of the graph
+ */
+PyObject *igraphmodule_Graph_maxflow(igraphmodule_GraphObject * self,
+                                     PyObject * args, PyObject * kwds)
+{
+  static char *kwlist[] = { "source", "target", "capacity", NULL };
+  PyObject *capacity_object = Py_None, *flow_o, *cut_o, *partition_o;
+  igraph_vector_t capacity_vector;
+  igraph_real_t result;
+  long vid1 = -1, vid2 = -1;
+  igraph_integer_t v1, v2;
+  igraph_vector_t flow, cut, partition;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|O", kwlist,
+                                   &vid1, &vid2, &capacity_object))
+    return NULL;
+
+  v1 = vid1;
+  v2 = vid2;
+  if (igraphmodule_PyObject_to_attribute_values(capacity_object,
+                                                &capacity_vector,
+                                                self, ATTRHASH_IDX_EDGE, 1.0))
+    return igraphmodule_handle_igraph_error();
+
+  if (igraph_vector_init(&flow, 0)) {
+    igraph_vector_destroy(&capacity_vector);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (igraph_vector_init(&cut, 0)) {
+    igraph_vector_destroy(&capacity_vector);
+    igraph_vector_destroy(&flow);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (igraph_vector_init(&partition, 0)) {
+    igraph_vector_destroy(&capacity_vector);
+    igraph_vector_destroy(&flow);
+    igraph_vector_destroy(&cut);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (igraph_maxflow(&self->g, &result, &flow, &cut, &partition, 0,
+        v1, v2, &capacity_vector)) {
+    igraph_vector_destroy(&capacity_vector);
+    igraph_vector_destroy(&flow);
+    igraph_vector_destroy(&cut);
+    igraph_vector_destroy(&partition);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  igraph_vector_destroy(&capacity_vector);
+
+  flow_o = igraphmodule_vector_t_to_PyList(&flow, IGRAPHMODULE_TYPE_FLOAT);
+  igraph_vector_destroy(&flow);
+  
+  if (flow_o == NULL) {
+    igraph_vector_destroy(&cut);
+    igraph_vector_destroy(&partition);
+    return NULL;
+  }
+
+  cut_o = igraphmodule_vector_t_to_PyList(&cut, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&cut);
+  
+  if (cut_o == NULL) {
+    igraph_vector_destroy(&partition);
+    return NULL;
+  }
+
+  partition_o = igraphmodule_vector_t_to_PyList(&partition, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&partition);
+  
+  if (partition_o == NULL)
+    return NULL;
+
+  return Py_BuildValue("dOOO", (double)result, flow_o, cut_o, partition_o);
+}
+
+/** \ingroup python_interface_graph
  * \brief Calculates the value of the minimum cut in the graph
  */
 PyObject *igraphmodule_Graph_mincut_value(igraphmodule_GraphObject * self,
@@ -7950,7 +8030,7 @@ PyObject *igraphmodule_Graph_mincut_value(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
- * \brief Calculates a minimum cut in an undirected graph
+ * \brief Calculates a minimum cut in a graph
  */
 PyObject *igraphmodule_Graph_mincut(igraphmodule_GraphObject * self,
                                     PyObject * args, PyObject * kwds)
@@ -11570,13 +11650,34 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"maxflow_value", (PyCFunction) igraphmodule_Graph_maxflow_value,
    METH_VARARGS | METH_KEYWORDS,
    "maxflow_value(source, target, capacity=None)\n\n"
-   "Returns the maximum flow between the source and target vertices.\n\n"
+   "Returns the value of the maximum flow between the source and target vertices.\n\n"
    "@param source: the source vertex ID\n"
    "@param target: the target vertex ID\n"
    "@param capacity: the capacity of the edges. It must be a list or a valid\n"
    "  attribute name or C{None}. In the latter case, every edge will have the\n"
    "  same capacity.\n"
    "@return: the value of the maximum flow between the given vertices\n"},
+
+  {"maxflow", (PyCFunction) igraphmodule_Graph_maxflow,
+   METH_VARARGS | METH_KEYWORDS,
+   "maxflow(source, target, capacity=None)\n\n"
+   "Returns the maximum flow between the source and target vertices.\n\n"
+   "@attention: this function has a more convenient interface in class\n"
+   "  L{Graph} which wraps the result in a L{Flow} object. It is advised\n"
+   "  to use that.\n"
+   "@param source: the source vertex ID\n"
+   "@param target: the target vertex ID\n"
+   "@param capacity: the capacity of the edges. It must be a list or a valid\n"
+   "  attribute name or C{None}. In the latter case, every edge will have the\n"
+   "  same capacity.\n"
+   "@return: a tuple containing the following: the value of the maximum flow\n"
+   "  between the given vertices, the flow value on all the edges, the edge\n"
+   "  IDs that are part of the corresponding minimum cut, and the vertex IDs\n"
+   "  on one side of the cut. For directed graphs, the flow value vector gives\n"
+   "  the flow value on each edge. For undirected graphs, the flow value is\n"
+   "  positive if the flow goes from the smaller vertex ID to the bigger one\n"
+   "  and negative if the flow goes from the bigger vertex ID to the smaller."
+  },
 
   {"mincut_value", (PyCFunction) igraphmodule_Graph_mincut_value,
    METH_VARARGS | METH_KEYWORDS,
@@ -11595,13 +11696,15 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    METH_VARARGS | METH_KEYWORDS,
    "mincut(capacity=None)\n\n"
    "Calculates the minimum cut in a graph.\n\n"
-   "Right now it is implemented only for undirected graphs, in which\n"
-   "case it uses the Stoer-Wagner algorithm, as described in the\n"
-   "reference given below.\n\n"
    "The minimum cut is the minimum set of edges which needs to be removed\n"
    "to disconnect the graph. The minimum is calculated using the weights\n"
    "(capacities) of the edges, so the cut with the minimum total capacity\n"
    "is calculated.\n"
+   "For undirected graphs, it uses the Stoer-Wagner algorithm as described\n"
+   "in the reference given below.\n\n"
+   "@attention: this function has a more convenient interface in class\n"
+   "  L{Graph} which wraps the result in a L{Cut} object. It is advised\n"
+   "  to use that.\n"
    "@return: the value of the minimum cut, the IDs of vertices in the\n"
    "  first and second partition, and the IDs of edges in the cut,\n"
    "  packed in a 4-tuple\n\n"

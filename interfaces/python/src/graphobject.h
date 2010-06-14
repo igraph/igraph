@@ -190,7 +190,9 @@ PyObject* igraphmodule_Graph_union(igraphmodule_GraphObject* self, PyObject* oth
 PyObject* igraphmodule_Graph_bfs(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
 PyObject* igraphmodule_Graph_bfsiter(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
 
+PyObject* igraphmodule_Graph_maxflow(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
 PyObject* igraphmodule_Graph_maxflow_value(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
+PyObject* igraphmodule_Graph_mincut(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
 PyObject* igraphmodule_Graph_mincut_value(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
 
 PyObject* igraphmodule_Graph_cliques(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);

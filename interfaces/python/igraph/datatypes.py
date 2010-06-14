@@ -549,10 +549,6 @@ class Cut(object):
       - C{es} - an edge selector restricted to the edges
         in the cut.
 
-    Attributes are not read only, but you should consider them
-    as being read only. Unexpected behaviour may occur if you
-    mess with them.
-    
     You can use indexing on this object to obtain L{VertexSeq}
     objects of the partitions. 
 
@@ -567,28 +563,31 @@ class Cut(object):
       2
       >>> print min(map(len, mc))
       1
-      >>> mc.es["color"] = ["red"] * len(mc.es)
+      >>> mc.es["color"] = "red"
     """
 
     __slots__ = ["_graph", "_value", "_partition", "_cut"]
 
     # pylint: disable-msg=R0913
-    def __init__(self, graph, value, cut, partition, partition2):
+    def __init__(self, graph, value, cut, partition, partition2=None):
         """Initializes the cut.
 
         This should not be called directly, everything is
         taken care of by L{Graph.mincut}.
         """
+        if partition2 is None:
+            partition2 = sorted(set(range(graph.vcount())) - set(partition))
+
         self._graph = graph
         self._value = float(value)
         self._partition = (partition, partition2)
         self._cut = cut
 
     def __repr__(self):
-        return "%s(%s,%s,%s,%s,%s)" % \
-          (self.__class__.__name__, repr(self._graph), \
-           self._value, repr(self._cut), \
-           repr(self._partition[0]), repr(self._partition[1]))
+        return "%s(%r,%r,%r,%r,%r)" % \
+          (self.__class__.__name__, self._graph, \
+           self._value, self._cut, \
+           self._partition[0], self._partition[1])
 
     def __str__(self):
         return "Graph cut (%d edges, %d vs %d vertices, value=%.4f)" % \
@@ -628,6 +627,90 @@ class Cut(object):
     def value(self):
         """Returns the sum of edge capacities in the cut"""
         return self._value
+
+
+class Flow(Cut):
+    """A flow of a given graph.
+
+    This is a simple class used to represent flows returned by
+    L{Graph.maxflow}. It has the following attributes:
+
+      - C{graph} - the graph on which this flow is defined
+
+      - C{value} - the value (capacity) of the flow 
+
+      - C{flow} - the flow values on each edge. For directed graphs,
+        this is simply a list where element M{i} corresponds to the
+        flow on edge M{i}. For undirected graphs, the direction of
+        the flow is not constrained (since the edges are undirected),
+        hence positive flow always means a flow from the smaller vertex
+        ID to the larger, while negative flow means a flow from the
+        larger vertex ID to the smaller.
+
+      - C{cut} - edge IDs in the minimal cut corresponding to
+        the flow.
+
+      - C{partition} - vertex IDs in the parts created
+        after removing edges in the cut
+
+      - C{es} - an edge selector restricted to the edges
+        in the cut.
+
+    You can use indexing on this object to obtain L{VertexSeq}
+    objects of the partitions. 
+
+    This class is usually not instantiated directly, everything
+    is taken care of by L{Graph.maxflow}.
+
+    Examples:
+
+      >>> g = Graph.Ring(20)
+      >>> mf = g.maxflow(0, 10)
+      >>> print mf.value
+      2
+      >>> mf.es["color"] = "red"
+    """
+
+    __slots__ = Cut.__slots__ + ["_flow"]
+
+    # pylint: disable-msg=R0913
+    def __init__(self, graph, value, flow, cut, partition, partition2=None):
+        """Initializes the flow.
+
+        This should not be called directly, everything is
+        taken care of by L{Graph.maxflow}.
+        """
+        super(Flow, self).__init__(graph, value, cut, partition, partition2)
+        self._flow = flow
+
+    def __repr__(self):
+        return "%s(%r,%r,%r,%r,%r,%r)" % \
+          (self.__class__.__name__, self._graph, \
+           self._value, self._flow, self._cut, \
+           self._partition[0], self._partition[1])
+
+    def __str__(self):
+        return "Graph flow (%d edges, %d vs %d vertices, value=%.4f)" % \
+          (len(self._cut), len(self._partition[0]), len(self._partition[1]), \
+          self._value)
+
+    def __getitem__(self, idx):
+        if idx >= 2:
+            raise IndexError("a flow has only two partitions")
+        return self.graph.vs.select(self._partition[idx])
+
+    @property
+    def flow(self):
+        """Returns the flow values for each edge.
+        
+        For directed graphs, this is simply a list where element M{i}
+        corresponds to the flow on edge M{i}. For undirected graphs, the
+        direction of the flow is not constrained (since the edges are
+        undirected), hence positive flow always means a flow from the smaller
+        vertex ID to the larger, while negative flow means a flow from the
+        larger vertex ID to the smaller.
+        """
+        return self._flow
 
 
 class UniqueIdGenerator(object):

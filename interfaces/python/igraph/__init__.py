@@ -375,13 +375,40 @@ class Graph(GraphBase):
         return [self.adjacent(idx, type) for idx in xrange(self.vcount())]
 
 
+    def maxflow(self, source, target, capacity=None):
+        """maxflow(source, target, capacity=None)
+
+        Returns a maximum flow between the given source and target vertices
+        in a graph.
+
+        A maximum flow from I{source} to I{target} is an assignment of
+        non-negative real numbers to the edges of the graph, satisfying
+        two properties:
+
+            1. For each edge, the flow (i.e. the assigned number) is not
+               more than the capacity of the edge (see the I{capacity}
+               argument)
+
+            2. For every vertex except the source and the target, the
+               incoming flow is the same as the outgoing flow.
+               
+        The value of the flow is the incoming flow of the target or the
+        outgoing flow of the source (which are equal). The maximum flow
+        is the maximum possible such value.
+
+        @param capacity: the edge capacities (weights). If C{None}, all
+          edges have equal weight. May also be an attribute name.
+        @return: a L{Flow} object describing the maximum flow
+        """
+        return Flow(self, *GraphBase.maxflow(self, source, target, capacity))
+
     def mincut(self, capacity=None):
         """mincut(capacity=None)
 
-        Returns a minimum cut in an undirected graph.
+        Returns a minimum cut in a graph.
 
         @param capacity: the edge capacities (weights). If C{None}, all
-          edges have equal weight.
+          edges have equal weight. May also be an attribute name.
         @return: a L{Cut} object describing the minimum cut
         """
         return Cut(self, *GraphBase.mincut(self, capacity))

@@ -36,6 +36,20 @@ class MaxFlowTests(unittest.TestCase):
         self.failUnless(self.g.maxflow_value(0, 3, "capacity") == 4)
         self.assertRaises(KeyError, self.g.maxflow_value, 0, 3, "unknown")
 
+    def testMaxFlow(self):
+        flow = self.g.maxflow(0, 3)
+        self.failUnless(flow.value == 2)
+        self.failUnless(flow.flow == [1, 1, 0, 1, 1])
+
+        flow = self.g.maxflow(0, 3, "capacity")
+        self.failUnless(flow.value == 4)
+        self.failUnless(flow.cut == [3, 4])
+        self.failUnless([e.index for e in flow.es] == [3, 4])
+        self.failUnless(set(flow.partition[0]).union(flow.partition[1]) == \
+          set(range(self.g.vcount())))
+
+        self.assertRaises(KeyError, self.g.maxflow, 0, 3, "unknown")
+
     def testMinCutValue(self):
         self.failUnless(self.g.mincut_value(0, 3) == 2)
         self.failUnless(self.g.mincut_value(0, 3, self.capacities) == 4)
