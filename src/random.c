@@ -84,13 +84,27 @@
  * 
  * <section><title>Changing the default generator</title>
  * <para> 
- * TODO
+ * By default igraph uses the \ref igraph_rng_default random number
+ * generator. This can be changed any time by calling \ref
+ * igraph_rng_set_default(), with an already initialized random number
+ * generator. Note, that the old (replaced) generator is not
+ * destroyed, so no memory is deallocated.
  * </para>
  * </section>
  *
- * <section><title>Use multiple generators</title>
+ * <section><title>Using multiple generators</title>
  * <para> 
- * TODO
+ * igraph also provides functions to set up multiple random number
+ * generators, using the \ref igraph_rng_init() function, and then
+ * generating random numbers from them, e.g. with \ref igraph_rng_get_integer()
+ * and/or \ref igraph_rng_get_unif() calls. 
+ * </para>
+ * 
+ * <para>
+ * Note, that initializing a new random number generator is
+ * independent of the generator that the igraph functions themselves
+ * use. If you want to replace that, then please use \ref
+ * igraph_rng_set_default().
  * </para>
  * </section>
  *
@@ -195,9 +209,11 @@ void igraph_rng_glibc2_destroy(void *vstate) {
 
 /**
  * \var igraph_rngtype_glibc2
- * \brief The random number generator introduced in GNU libc 2
+ * \brief The random number generator type introduced in GNU libc 2
  * 
- * 
+ * It is a linear feedback shift register generator with a 128-byte
+ * buffer. This generator was the default prior to igraph version 0.6,
+ * at least on systems relying on GNU libc.
  */
 
 igraph_rng_type_t igraph_rngtype_glibc2 = {
@@ -259,6 +275,8 @@ void igraph_rng_rand_destroy(void *vstate) {
 /**
  * \var igraph_rngtype_rand
  * \brief The old BSD rand/stand random number generator
+ * 
+ * 
  */
 
 igraph_rng_type_t igraph_rngtype_rand = {
@@ -555,16 +573,20 @@ void igraph_rng_set_default(igraph_rng_t *rng) {
 
 #ifndef USING_R
 
+#define addr(a) (&a)
+
 /** 
  * \var igraph_rng_default
  * The default igraph random number generator
  */
 
 igraph_rng_t igraph_rng_default = { 
-  &igraph_rngtype_mt19937,
-  &igraph_i_rng_default_state,
+  addr(igraph_rngtype_mt19937),
+  addr(igraph_i_rng_default_state),
   /* def= */ 1
 };
+
+#undef addr
 
 #endif
 
