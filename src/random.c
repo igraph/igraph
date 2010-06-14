@@ -144,6 +144,62 @@ igraph_rng_type_t igraph_rngtype_glibc2 = {
 
 /* ------------------------------------ */
 
+typedef struct {
+  unsigned long int x;
+} igraph_i_rng_rand_state_t;
+
+unsigned long int igraph_rng_rand_get(void *vstate) {
+  igraph_i_rng_rand_state_t *state = vstate;
+  state->x = (1103515245 * state->x + 12345) & 0x7fffffffUL;
+  return state->x;
+}
+
+igraph_real_t igraph_rng_rand_get_real(void *vstate) {
+  return igraph_rng_rand_get (vstate) / 2147483648.0 ;
+}
+
+int igraph_rng_rand_seed(void *vstate, unsigned long int seed) {
+  igraph_i_rng_rand_state_t *state = vstate;
+  state->x = seed;
+  return 0;
+}
+
+int igraph_rng_rand_init(void **state) {
+  igraph_i_rng_rand_state_t *st;
+
+  st=igraph_Calloc(1, igraph_i_rng_rand_state_t);
+  if (!st) {
+    IGRAPH_ERROR("Cannot initialize RNG", IGRAPH_ENOMEM);
+  }
+  (*state)=st;
+  
+  igraph_rng_rand_seed(st, 0);
+  
+  return 0;
+}
+
+void igraph_rng_rand_destroy(void *vstate) {
+  igraph_i_rng_rand_state_t *state = 
+    (igraph_i_rng_rand_state_t*) vstate;
+  igraph_Free(state);  
+}  
+
+igraph_rng_type_t igraph_rngtype_rand = {
+  /* name= */      "RAND",
+  /* min=  */      0,
+  /* max=  */      0x7fffffffUL,
+  /* init= */      igraph_rng_rand_init,
+  /* destroy= */   igraph_rng_rand_destroy,
+  /* seed= */      igraph_rng_rand_seed,
+  /* get= */       igraph_rng_rand_get,
+  /* get_real= */  igraph_rng_rand_get_real,
+  /* get_norm= */  0,
+  /* get_geom= */  0,
+  /* get_binom= */ 0
+};
+
+/* ------------------------------------ */
+
 /* int main() { */
 /*   igraph_i_rng_glibc2_state_t *state; */
 /*   int i; */
