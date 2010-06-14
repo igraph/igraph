@@ -258,6 +258,7 @@ void igraph_rng_destroy(igraph_rng_t *rng) {
 
 int igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed) {
   const igraph_rng_type_t *type=rng->type;
+  rng->def=0;
   IGRAPH_CHECK(type->seed(rng->state, seed));
   return 0;
 }
