@@ -200,6 +200,128 @@ igraph_rng_type_t igraph_rngtype_rand = {
 
 /* ------------------------------------ */
 
+#define N 624   /* Period parameters */
+#define M 397
+
+/* most significant w-r bits */
+static const unsigned long UPPER_MASK = 0x80000000UL;   
+
+/* least significant r bits */
+static const unsigned long LOWER_MASK = 0x7fffffffUL;   
+
+typedef struct {
+  unsigned long mt[N];
+  int mti;
+} igraph_i_rng_mt19937_state_t;
+
+unsigned long int igraph_rng_mt19937_get(void *vstate) {
+  igraph_i_rng_mt19937_state_t *state = vstate;
+
+  unsigned long k ;
+  unsigned long int *const mt = state->mt;
+
+#define MAGIC(y) (((y)&0x1) ? 0x9908b0dfUL : 0)
+
+  if (state->mti >= N) {
+    /* generate N words at one time */
+    int kk;
+    
+    for (kk = 0; kk < N - M; kk++) {
+      unsigned long y = (mt[kk] & UPPER_MASK) | (mt[kk + 1] & LOWER_MASK);
+      mt[kk] = mt[kk + M] ^ (y >> 1) ^ MAGIC(y);
+    }
+    for (; kk < N - 1; kk++) {
+      unsigned long y = (mt[kk] & UPPER_MASK) | (mt[kk + 1] & LOWER_MASK);
+      mt[kk] = mt[kk + (M - N)] ^ (y >> 1) ^ MAGIC(y);
+    }
+    
+    {
+      unsigned long y = (mt[N - 1] & UPPER_MASK) | (mt[0] & LOWER_MASK);
+      mt[N - 1] = mt[M - 1] ^ (y >> 1) ^ MAGIC(y);
+    }
+    
+    state->mti = 0;
+  }
+
+#undef MAGIC
+
+  /* Tempering */
+  
+  k = mt[state->mti];
+  k ^= (k >> 11);
+  k ^= (k << 7) & 0x9d2c5680UL;
+  k ^= (k << 15) & 0xefc60000UL;
+  k ^= (k >> 18);
+
+  state->mti++;
+
+  return k;
+}
+
+igraph_real_t igraph_rng_mt19937_get_real(void *vstate) {
+  return igraph_rng_mt19937_get (vstate) / 4294967296.0 ;
+}
+
+int igraph_rng_mt19937_seed(void *vstate, unsigned long int seed) {
+  igraph_i_rng_mt19937_state_t *state = vstate;
+  int i;
+
+  if (seed == 0) {
+    seed = 4357;   /* the default seed is 4357 */
+  }
+  state->mt[0]= seed & 0xffffffffUL;
+
+  for (i = 1; i < N; i++) {
+    /* See Knuth's "Art of Computer Programming" Vol. 2, 3rd
+       Ed. p.106 for multiplier. */
+    state->mt[i] =
+      (1812433253UL * (state->mt[i-1] ^ (state->mt[i-1] >> 30)) + i);
+    state->mt[i] &= 0xffffffffUL;
+  }
+  
+  state->mti = i;
+  return 0;
+}
+
+int igraph_rng_mt19937_init(void **state) {
+  igraph_i_rng_mt19937_state_t *st;
+
+  st=igraph_Calloc(1, igraph_i_rng_mt19937_state_t);
+  if (!st) {
+    IGRAPH_ERROR("Cannot initialize RNG", IGRAPH_ENOMEM);
+  }
+  (*state)=st;
+  
+  igraph_rng_mt19937_seed(st, 0);
+  
+  return 0;
+}
+
+void igraph_rng_mt19937_destroy(void *vstate) {
+  igraph_i_rng_mt19937_state_t *state = 
+    (igraph_i_rng_mt19937_state_t*) vstate;
+  igraph_Free(state);  
+}  
+
+igraph_rng_type_t igraph_rngtype_mt19937 = {
+  /* name= */      "MT19937",
+  /* min=  */      0,
+  /* max=  */      0xffffffffUL,
+  /* init= */      igraph_rng_mt19937_init,
+  /* destroy= */   igraph_rng_mt19937_destroy,
+  /* seed= */      igraph_rng_mt19937_seed,
+  /* get= */       igraph_rng_mt19937_get,
+  /* get_real= */  igraph_rng_mt19937_get_real,
+  /* get_norm= */  0,
+  /* get_geom= */  0,
+  /* get_binom= */ 0
+};
+
+#undef N
+#undef M
+
+/* ------------------------------------ */
+
 /* int main() { */
 /*   igraph_i_rng_glibc2_state_t *state; */
 /*   int i; */
