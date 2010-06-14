@@ -32,6 +32,71 @@
 #include "igraph_vector.h"
 #include "igraph_memory.h"
 
+/** 
+ * \section about_rngs 
+ * 
+ * <section>
+ * <title>About random numbers in igraph, use cases</title>
+ * 
+ * <para> 
+ * Some algorithms in igraph, e.g. the generation of random graphs,
+ * require random number generators (RNGs). Prior to version 0.6
+ * igraph did not have a sophisticated way to deal with random number
+ * generators at the C level, but this has changed. From version 0.6
+ * different and multiple random number generators are supported.
+ * </para>
+ * </section>
+ * 
+ */
+
+/** 
+ * \section rng_use_cases
+ * 
+ * <section><title>Use cases</title>
+ * 
+ * <section><title>Normal (default) use</title>
+ * <para> 
+ * If the user does use any of the RNG functions explicitly, but calls
+ * some of the randomized igraph functions, then a default RNG is set
+ * up, the first time an igraph function needs random numbers. The
+ * seed of this RNG is the output of the <code>time(0)</code> function
+ * call, using the <code>time</code> function from the standard C
+ * library. This ensures that igraph creates a different random graph,
+ * easch time the C program is called.
+ * </para>
+ * 
+ * <para> 
+ * The created default generator is stored in the \ref
+ * igraph_rng_default variable.
+ * </para>
+ * </section>
+ * 
+ * <section><title>Reproducible simulations</title>
+ * <para> 
+ * If reproducible results are needed, then the user should set the
+ * seed of the default random number generator explixitly, using the 
+ * \ref igraph_rng_seed() function on the default generator, \ref
+ * igraph_rng_default. When setting the seed to the same number,
+ * igraph generates exactly the same random graph (or series of random
+ * graphs).
+ * </para>
+ * </section>
+ * 
+ * <section><title>Changing the default generator</title>
+ * <para> 
+ * TODO
+ * </para>
+ * </section>
+ *
+ * <section><title>Use multiple generators</title>
+ * <para> 
+ * TODO
+ * </para>
+ * </section>
+ *
+ * </section>
+ */
+
 /* ------------------------------------ */
 
 typedef struct {
@@ -128,6 +193,13 @@ void igraph_rng_glibc2_destroy(void *vstate) {
   igraph_Free(state);
 }
 
+/**
+ * \var igraph_rngtype_glibc2
+ * \brief The random number generator introduced in GNU libc 2
+ * 
+ * 
+ */
+
 igraph_rng_type_t igraph_rngtype_glibc2 = {
   /* name= */      "LIBC",
   /* min=  */      0,
@@ -183,6 +255,11 @@ void igraph_rng_rand_destroy(void *vstate) {
     (igraph_i_rng_rand_state_t*) vstate;
   igraph_Free(state);  
 }  
+
+/**
+ * \var igraph_rngtype_rand
+ * \brief The old BSD rand/stand random number generator
+ */
 
 igraph_rng_type_t igraph_rngtype_rand = {
   /* name= */      "RAND",
@@ -302,6 +379,11 @@ void igraph_rng_mt19937_destroy(void *vstate) {
     (igraph_i_rng_mt19937_state_t*) vstate;
   igraph_Free(state);  
 }  
+
+/** 
+ * \var igraph_rngtype_mt19937
+ * \brief The MT19937 random number generator
+ */
 
 igraph_rng_type_t igraph_rngtype_mt19937 = {
   /* name= */      "MT19937",
@@ -464,6 +546,11 @@ igraph_i_rng_mt19937_state_t igraph_i_rng_default_state = {
 
 #ifndef USING_R
 
+/** 
+ * \var igraph_rng_default
+ * The default igraph random number generator
+ */
+
 igraph_rng_t igraph_rng_default = { 
   &igraph_rngtype_mt19937,
   &igraph_i_rng_default_state,
@@ -541,16 +628,30 @@ double igraph_norm_rand(igraph_rng_t *rng);
 double igraph_rgeom(igraph_rng_t *rng, double p);
 double igraph_rbinom(igraph_rng_t *rng, double nin, double pp);
 
+/** 
+ * \function igraph_rng_init
+ * Initialize a random number generator
+ */
+
 int igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type) {
   rng->type=type;
   IGRAPH_CHECK(rng->type->init(&rng->state));
   return 0;
 }
 
+/** 
+ * \function igraph_rng_destroy
+ * Deallocate memory associated with a random number generator
+ */
+
 void igraph_rng_destroy(igraph_rng_t *rng) {
   rng->type->destroy(rng->state);
 }
 
+/**
+ * \function igraph_rng_seed
+ * Set the seed of a random number generator
+ */
 int igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed) {
   const igraph_rng_type_t *type=rng->type;
   rng->def=0;
@@ -558,20 +659,40 @@ int igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed) {
   return 0;
 }
 
+/** 
+ * \function igraph_rng_max 
+ * Query the maximum possible integer for a random number generator
+ */
+
 unsigned long int igraph_rng_max(igraph_rng_t *rng) {
   const igraph_rng_type_t *type=rng->type;
   return type->max;
 }
+
+/**
+ * \function igraph_rng_min
+ * Query the minimum possible integer for a random number generator
+ */
 
 unsigned long int igraph_rng_min(igraph_rng_t *rng) {
   const igraph_rng_type_t *type=rng->type;
   return type->min;
 }
 
+/** 
+ * \function igraph_rng_name
+ * Query the type of a random number generator
+ */
+
 const char *igraph_rng_name(igraph_rng_t *rng) {
   const igraph_rng_type_t *type=rng->type;
   return type->name;
 }
+
+/** 
+ * \function igraph_rng_get_integer
+ * Generate an integer random number from an interval
+ */
 
 long int igraph_rng_get_integer(igraph_rng_t *rng,
 				long int l, long int h) {
@@ -587,6 +708,11 @@ long int igraph_rng_get_integer(igraph_rng_t *rng,
   return 0;
 }
 
+/** 
+ * \function igraph_rng_get_normal
+ * Normally distributed random numbers
+ */
+
 igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng, 
 				    igraph_real_t m, igraph_real_t s) {
   const igraph_rng_type_t *type=rng->type;
@@ -596,6 +722,11 @@ igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng,
     return igraph_norm_rand(rng)*s+m;
   }
 }
+
+/** 
+ * \function igraph_rng_get_unif
+ * Generate real, uniform random numbers from an interval
+ */
 
 igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng, 
 				  igraph_real_t l, igraph_real_t h) {
@@ -610,6 +741,11 @@ igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng,
   return 0;  
 }
 
+/** 
+ * \function igraph_rng_get_unif01
+ * Generate real, uniform random number from the unit interval
+ */
+
 igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
   const igraph_rng_type_t *type=rng->type;
   if (type->get_real) {
@@ -622,6 +758,11 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
   return 0;  
 }
 
+/** 
+ * \function igraph_rng_get_geom
+ * Generate geometrically distributed random numbers
+ */
+
 igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p) {
   const igraph_rng_type_t *type=rng->type;
   if (type->get_geom) {
@@ -630,6 +771,11 @@ igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p) {
     return igraph_rgeom(rng, p);
   }
 }
+
+/** 
+ * \function igraph_rng_get_binom
+ * Generate binomially distributed random numbers
+ */
 
 igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n, 
 				   igraph_real_t p) {
