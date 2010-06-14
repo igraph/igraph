@@ -167,11 +167,78 @@ igraph_i_rng_glibc2_state_t igraph_i_rng_default_state = {
     -205601318 }
 };
 
+#ifndef USING_R
+
 igraph_rng_t igraph_rng_default = { 
   &igraph_rngtype_glibc2,
   &igraph_i_rng_default_state,
   /* def= */ 1
 };
+
+#endif
+
+/* ------------------------------------ */
+
+#ifdef USING_R
+
+double  unif_rand(void);
+double  norm_rand(void);
+double  Rf_rgeom(double);
+double  Rf_rbinom(double, double);
+
+int igraph_rng_R_init(void **state) {
+  IGRAPH_ERROR("R RNG error, unsupported function called",
+	       IGRAPH_EINTERNAL);
+  return 0;
+}
+
+void igraph_rng_R_destroy(void *state) {
+  igraph_error("R RNG error, unsupported function called",
+	       __FILE__, __LINE__, IGRAPH_EINTERNAL);
+}
+
+int igraph_rng_R_seed(void *state) {
+  IGRAPH_ERROR("R RNG error, unsupported function called",
+	       IGRAPH_EINTERNAL);
+  return 0;
+}
+
+unsigned long int igraph_rng_R_get(void *state) {
+  return unif_rand() * 0x7FFFFFFFUL;
+}
+
+igraph_real_t igraph_rng_R_get_real(void *state) {
+  return unif_rand();
+}
+
+igraph_real_t igraph_rng_R_get_norm(void *state) {
+  return norm_rand();
+}
+
+igraph_real_t igraph_rng_R_get_geom(void *state, igraph_real_t p) {
+  return Rf_rgeom(p);
+}
+ 
+igraph_real_t igraph_rng_R_get_binom(void *state, long int n,
+				     igraph_real_t p) {
+  return Rf_rbinom(n, p);
+}
+
+igraph_rng_type_t igraph_rngtype_R = {
+  /* name= */      "GNU R",
+  /* min=  */      0,
+  /* max=  */      0x7FFFFFFFUL,
+  /* init= */      igraph_rng_R_init,
+  /* destroy= */   igraph_rng_R_destroy,
+  /* seed= */      igraph_rng_R_seed,
+  /* get= */       igraph_rng_R_get,
+  /* get_real= */  igraph_rng_R_get_real,
+  /* get_norm= */  igraph_rng_R_get_norm,
+  /* get_geom= */  igraph_rng_R_get_geom,
+  /* get_binom= */ igraph_rng_R_get_binom
+};
+
+#endif
 
 /* ------------------------------------ */
 
