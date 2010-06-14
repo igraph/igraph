@@ -452,7 +452,7 @@ class Plot(object):
         """Redraws the plot"""
         ctx = context or self._ctx
         if self._bgcolor is not None:
-            ctx.set_source_rgb(*self._bgcolor)
+            ctx.set_source_rgba(*self._bgcolor)
             ctx.rectangle(0, 0, self.bbox.width, self.bbox.height)
             ctx.fill()
 
@@ -616,7 +616,8 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
     See L{Graph.__plot__()} for the keyword arguments understood by
     this drawer."""
 
-    def __init__(self, context, bbox):
+    def __init__(self, context, bbox, \
+                 edge_drawer_factory = ArrowEdgeDrawer):
         """Constructs the graph drawer and associates it to the given
         Cairo context and the given L{BoundingBox}.
 
@@ -625,8 +626,16 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
                         Can be anything accepted by the constructor
                         of L{BoundingBox} (i.e., a 2-tuple, a 4-tuple
                         or a L{BoundingBox} object).
+        @param edge_drawer_factory  a factory method that returns an
+                        L{AbstractEdgeDrawer} instance bound to a
+                        given Cairo context. You can use any of the
+                        actual L{AbstractEdgeDrawer} implementations
+                        here to control the style of edges drawn by
+                        igraph. The default edge drawer is
+                        L{ArrowEdgeDrawer}.
         """
         AbstractGraphDrawer.__init__(self, context, bbox)
+        self.edge_drawer_factory = edge_drawer_factory
 
     # pylint: disable-msg=W0142,W0221,E1101
     # W0142: Used * or ** magic
@@ -688,7 +697,7 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
         edge_builder = VisualEdgeBuilder(graph.es, kwds)
 
         # Draw the edges
-        edge_drawer = ArrowEdgeDrawer(context)
+        edge_drawer = self.edge_drawer_factory(context)
         if directed:
             drawer_method = edge_drawer.draw_directed_edge
         else:
@@ -703,7 +712,7 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
         for vertex, coords in izip(vertex_builder, layout):
             vertex.shape.draw_path(context, \
                     coords[0], coords[1], vertex.size)
-            context.set_source_rgb(*vertex.color)
+            context.set_source_rgba(*vertex.color)
             context.fill_preserve()
             context.set_source_rgb(0., 0., 0.)
             context.stroke()
@@ -725,7 +734,7 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
             cy += (si + 1) * h/2.
             context.move_to(cx, cy)
             context.set_font_size(vertex.label_size)
-            context.set_source_rgb(*vertex.label_color)
+            context.set_source_rgba(*vertex.label_color)
             context.text_path(vertex.label)
             context.fill()
 

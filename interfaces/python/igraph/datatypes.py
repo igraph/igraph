@@ -344,7 +344,7 @@ class Matrix(object):
                     cidx = int((item-color_offset)*color_ratio)
                     if cidx < 0:
                         cidx = 0
-                    context.set_source_rgb(*palette.get(cidx))
+                    context.set_source_rgba(*palette.get(cidx))
                 context.rectangle(x, y, dx, dy)
                 if grid_width > 0:
                     context.fill_preserve()

@@ -28,13 +28,14 @@ from math import ceil
 
 __all__ = ["Palette", "GradientPalette", "AdvancedGradientPalette", \
     "PrecalculatedPalette", "ClusterColoringPalette", \
-    "color_name_to_rgb", "palettes", "known_colors"]
+    "color_name_to_rgb", "color_name_to_rgba", \
+    "palettes", "known_colors"]
 
 class Palette(object):
     """Base class of color palettes.
 
     Color palettes are mappings that assign integers from the range
-    0..M{n-1} to colors (3-tuples). M{n} is called the size or length
+    0..M{n-1} to colors (4-tuples). M{n} is called the size or length
     of the palette. C{igraph} comes with a number of predefined palettes,
     so this class is useful for you only if you want to define your
     own palette. This can be done by subclassing this class and implementing
@@ -98,7 +99,7 @@ class Palette(object):
                 raise ValueError("color index too large")
             result = self._get(v)
         else:
-            result = color_name_to_rgb(v)
+            result = color_name_to_rgba(v)
         self._cache[v] = result
         return result
 
@@ -109,7 +110,7 @@ class Palette(object):
         where M{n} is the size of the palette.
 
         @param v: numerical index of the color to be retrieved
-        @return: a 3-tuple containing the RGB values"""
+        @return: a 4-tuple containing the RGBA values"""
         raise NotImplementedError("abstract class")
 
     __getitem__ = get
@@ -135,14 +136,14 @@ class GradientPalette(Palette):
         @param n: the number of colors in the palette.
         """
         Palette.__init__(self, n)
-        self._color1 = color_name_to_rgb(color1)
-        self._color2 = color_name_to_rgb(color2)
+        self._color1 = color_name_to_rgba(color1)
+        self._color2 = color_name_to_rgba(color2)
 
     def _get(self, v):
         """Returns the color corresponding to the given color index.
 
         @param v: numerical index of the color to be retrieved
-        @return: a 3-tuple containing the RGB values"""
+        @return: a 4-tuple containing the RGBA values"""
         ratio = float(v)/(len(self)-1)
         return tuple(self._color1[x]*(1-ratio) + \
                      self._color2[x]*ratio for x in range(3))
@@ -176,7 +177,7 @@ class AdvancedGradientPalette(Palette):
         elif not hasattr(indices, "__iter__"):
             indices = [float(x) for x in indices]
         self._indices, self._colors = zip(*sorted(zip(indices, colors)))
-        self._colors = [color_name_to_rgb(color) for color in self._colors]
+        self._colors = [color_name_to_rgba(color) for color in self._colors]
         self._dists = [curr-prev for curr, prev in \
                 zip(self._indices[1:], self._indices)]
 
@@ -184,7 +185,7 @@ class AdvancedGradientPalette(Palette):
         """Returns the color corresponding to the given color index.
 
         @param v: numerical index of the color to be retrieved
-        @return: a 3-tuple containing the RGB values"""
+        @return: a 4-tuple containing the RGBA values"""
         colors = self._colors
         for i in xrange(len(self._indices)-1):
             if self._indices[i] <= v and self._indices[i+1] >= v:
@@ -201,11 +202,11 @@ class PrecalculatedPalette(Palette):
     def __init__(self, l):
         """Creates the palette backed by the given list. The list must contain
         RGB triplets or color names, which will be resolved first by
-        L{color_name_to_rgb()}."""
+        L{color_name_to_rgba()}."""
         Palette.__init__(self, len(l))
         for idx, color in enumerate(l):
             if isinstance(color, basestring):
-                color = color_name_to_rgb(color)
+                color = color_name_to_rgba(color)
             self._cache[idx] = color
 
     def _get(self, v):
@@ -233,7 +234,7 @@ class ClusterColoringPalette(PrecalculatedPalette):
     def __init__(self, n):
         base_colors = ["red", "green", "blue", "yellow", \
                        "magenta", "cyan", "#808080"]
-        base_colors = [color_name_to_rgb(name) for name in base_colors]
+        base_colors = [color_name_to_rgba(name) for name in base_colors]
 
         num_base_colors = len(base_colors)
         colors = base_colors[:]
@@ -256,7 +257,7 @@ class ClusterColoringPalette(PrecalculatedPalette):
         PrecalculatedPalette.__init__(self, colors)
 
 
-def _clamp(value, min_value, max_value):
+def clamp(value, min_value, max_value):
     """Clamps the given value between min and max"""
     if value > max_value:
         return max_value
@@ -268,33 +269,53 @@ def color_name_to_rgb(color, palette=None):
     """Converts a color given in one of the supported color formats to
     R-G-B values.
 
+    This is done by calling L{color_name_to_rgba} and then throwing away
+    the alpha value.
+
+    @see: color_name_to_rgba for more details about what formats are
+      understood by this function.
+    """
+    return color_name_to_rgba(color, palette)[:3]
+
+def color_name_to_rgba(color, palette=None):
+    """Converts a color given in one of the supported color formats to
+    R-G-B-A values.
+
     Examples:
 
-      >>> color_name_to_rgb("red")
-      (1., 0., 0.)
-      >>> color_name_to_rgb("#ff8000")
-      (1., 0.50196078431372548, 0.)
-      >>> color_name_to_rgb("#08f")
-      (0., 0.53333333333333333, 1.)
-      >>> color_name_to_rgb("rgb(100%, 50%, 0%)")
-      (1., 0.5, 0.)
+      >>> color_name_to_rgba("red")
+      (1.0, 0.0, 0.0, 1.0)
+      >>> color_name_to_rgba("#ff8000")
+      (1.0, 0.50196078431372548, 0.0, 1.0)
+      >>> color_name_to_rgba("#ff800080")
+      (1.0, 0.50196078431372548, 0.0, 0.5)
+      >>> color_name_to_rgba("#08f")
+      (0.0, 0.53333333333333333, 1.0)
+      >>> color_name_to_rgba("rgb(100%, 50%, 0%)")
+      (1.0, 0.5, 0., 1.0)
+      >>> color_name_to_rgba("rgba(100%, 50%, 0%, 25%)")
+      (1., 0.5, 0., 0.25)
 
     @param color: the color to be converted in one of the following formats:
-      - B{CSS color specification}: C{#rrggbb} or C{#rgb} or C{rgb(red, green, blue)}
+      - B{CSS color specification}: C{#rrggbb}, C{#rgb}, C{#rrggbbaa}, C{#rgba},
+        C{rgb(red, green, blue)} or C{rgba(red, green, blue, alpha)}
         where the red-green-blue components are given as hexadecimal numbers in the
-        first two cases and as decimals (in the range of 0-255) or percentages
-        (0-100) in the third case. Of course these are given as strings.
+        first four cases and as decimals (in the range of 0-255) or percentages
+        (0-100) in the fifth and sixth case. Of course these are given as strings.
       - B{Valid HTML color names}, i.e. those that are present in the HTML 4.0
         specification
       - B{Valid X11 color names}, see U{http://en.wikipedia.org/wiki/X11_color_names}
       - B{Red-green-blue components} given separately in either a comma-, slash- or
-        whitespace-separated string or a list or a tuple, in the range of 0-255
+        whitespace-separated string or a list or a tuple, in the range of 0-255.
+        An alpha value of 255 (maximal opacity) will be assumed.
+      - B{Red-green-blue-alpha components} given separately in either a comma-, slash-
+        or whitespace-separated string or a list or a tuple, in the range of 0-255
       - B{A single palette index} given either as a string or a number. Uses
         the palette given in the C{palette} parameter of the method call.
     @param palette: the palette to be used if a single number is passed to
       the method. Must be an instance of L{colors.Palette}.
 
-    @return: the R-G-B values corresponding to the given color in a 3-tuple.
+    @return: the RGBA values corresponding to the given color in a 4-tuple.
       Since these colors are primarily used by Cairo routines, the tuples
       contain floats in the range 0.0-1.0
     """
@@ -307,16 +328,26 @@ def color_name_to_rgb(color, palette=None):
                 components = palette.get(color)
             except AttributeError:
                 raise ValueError("palette index used when no palette was given")
+        if len(components) < 4:
+            components += [1.] * (4 - len(components))
     else:
         if color[0] == '#':
             color = color[1:]
             if len(color) == 3:
                 components = [int(i, 16) * 17. / 255. for i in color]
+                components.append(1.0)
+            elif len(color) == 4:
+                components = [int(i, 16) * 17. / 255. for i in color]
             elif len(color) == 6:
                 components = [int(color[i:i+2], 16) / 255. for i in (0, 2, 4)]
+                components.append(1.0)
+            elif len(color) == 8:
+                components = [int(color[i:i+2], 16) / 255. for i in (0, 2, 4, 6)]
         else:
             if color.startswith("rgb(") and color[-1] == ")":
                 color = color[4:-1]
+            if color.startswith("rgba(") and color[-1] == ")":
+                color = color[5:-1]
             if " " in color or "/" in color or "," in color:
                 color = color.replace(",", " ").replace("/", " ")
                 components = color.split()
@@ -325,14 +356,16 @@ def color_name_to_rgb(color, palette=None):
                         components[idx] = float(comp[:-1])/100.
                     else:
                         components[idx] = float(comp)/255.
+                if len(components) < 4:
+                    components += [1.] * (4 - len(components))
             else:
                 try:
                     components = palette.get(int(color))
                 except (ValueError, AttributeError):
-                    components = known_colors[color.lower()]
+                    components = known_colors[color.lower()] + (1., )
 
     # At this point, the components are floats
-    return tuple(_clamp(val, 0., 1.) for val in components)
+    return tuple(clamp(val, 0., 1.) for val in components)
 
 
 def darken(color, ratio=0.5):
@@ -340,10 +373,11 @@ def darken(color, ratio=0.5):
     
     This is done by mixing the original color with black using the given
     ratio. A ratio of 1.0 will yield a completely black color, a ratio
-    of 0.0 will yield the original color.
+    of 0.0 will yield the original color. The alpha values are left intact.
     """
     ratio = 1.0 - ratio
-    return tuple(component * ratio for component in color)
+    red, green, blue, alpha = color
+    return (red * ratio, green * ratio, blue * ratio, alpha)
 
 def lighten(color, ratio=0.5):
     """Creates a lighter version of a color given by an RGB triplet.
@@ -352,7 +386,9 @@ def lighten(color, ratio=0.5):
     ratio. A ratio of 1.0 will yield a completely white color, a ratio
     of 0.0 will yield the original color.
     """
-    return tuple(component + (1.0 - component) * ratio for component in color)
+    red, green, blue, alpha = color
+    return (red + (1.0 - red) * ratio, green + (1.0 - green) * ratio,
+            blue + (1.0 - blue) * ratio, alpha)
 
 known_colors = \
 {   'alice blue': (0.94117647058823528, 0.97254901960784312, 1.0),
