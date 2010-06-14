@@ -92,6 +92,8 @@ extern igraph_rng_type_t igraph_rngtype_rand;
 extern igraph_rng_type_t mt19937;
 extern igraph_rng_t igraph_rng_default;
 
+void igraph_rng_set_default(igraph_rng_t *rng);
+
 /* --------------------------------- */
 
 #ifdef USING_R

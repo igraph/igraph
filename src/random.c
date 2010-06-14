@@ -544,6 +544,15 @@ igraph_i_rng_mt19937_state_t igraph_i_rng_default_state = {
 
 /* ------------------------------------ */
 
+/** 
+ * \function igraph_rng_set_default
+ * Set the default igraph random number generator
+ */
+
+void igraph_rng_set_default(igraph_rng_t *rng) {
+  igraph_rng_default = (*rng);
+}
+
 #ifndef USING_R
 
 /** 
