@@ -745,33 +745,31 @@ class Graph(GraphBase):
         Finds the community structure of the graph according to the
         spinglass community detection method of Reichardt & Bornholdt.
 
-        @param graph: the input graph. It can be directed, but the
-          direction of edges will be ignored.
-        @param weights: edge weights to be used. Can be a sequence or
+        @keyword weights: edge weights to be used. Can be a sequence or
           iterable or even an edge attribute name.
-        @param spins: integer, the number of spins to use. This is the
+        @keyword spins: integer, the number of spins to use. This is the
           upper limit for the number of communities. It is not a problem
           to supply a (reasonably) big number here, in which case some
           spin states will be unpopulated.
-        @param parupdate: whether to update the spins of the vertices in
+        @keyword parupdate: whether to update the spins of the vertices in
           parallel (synchronously) or not
-        @param start_temp: the starting temperature
-        @param stop_temp: the stop temperature
-        @param cool_fact: cooling factor for the simulated annealing
-        @param update_rule: specifies the null model of the simulation.
+        @keyword start_temp: the starting temperature
+        @keyword stop_temp: the stop temperature
+        @keyword cool_fact: cooling factor for the simulated annealing
+        @keyword update_rule: specifies the null model of the simulation.
           Possible values are C{"config"} (a random graph with the same
           vertex degrees as the input graph) or C{"simple"} (a random
           graph with the same number of edges)
-        @param gamma: the gamma argument of the algorithm, specifying the
+        @keyword gamma: the gamma argument of the algorithm, specifying the
           balance between the importance of present and missing edges
           within a community. The default value of 1.0 assigns equal
           importance to both of them.
-        @param implementation: currently igraph contains two implementations
+        @keyword implementation: currently igraph contains two implementations
           of the spinglass community detection algorithm. The faster
           original implementation is the default. The other implementation
           is able to take into account negative weights, this can be
           chosen by setting C{implementation} to C{"neg"}
-        @param lambda: the lambda argument of the algorithm, which
+        @keyword lambda: the lambda argument of the algorithm, which
           specifies the balance between the importance of present and missing
           negatively weighted edges within a community. Smaller values of
           lambda lead to communities with less negative intra-connectivity.

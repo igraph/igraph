@@ -10375,6 +10375,16 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    METH_VARARGS | METH_KEYWORDS,
    "simplify(multiple=True, loops=True, combine_edges=None)\n\n"
    "Simplifies a graph by removing self-loops and/or multiple edges.\n\n"
+   "\n"
+   "For example, suppose you have a graph with an edge attribute named\n"
+   "C{weight}. C{graph.simplify(combine_edges=max)} will take the\n"
+   "maximum of the weights of multiple edges and assign that weight to\n"
+   "the collapsed edge. C{graph.simplify(combine_edges=sum)} will\n"
+   "take the sum of the weights. You can also write\n"
+   "C{graph.simplify(combine_edges=dict(weight=\"sum\"))} or\n"
+   "C{graph.simplify(combine_edges=dict(weight=sum))}, since\n"
+   "C{sum} is recognised both as a Python built-in function and as\n"
+   "a string constant.\n\n"
    "@param multiple: whether to remove multiple edges.\n"
    "@param loops: whether to remove loops.\n"
    "@param combine_edges: specifies how to combine the attributes of\n"
@@ -10410,16 +10420,6 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  simplification process depend on the name of the attribute.\n"
    "  C{None} is a special key in this dict, its value will be used for all\n"
    "  the attributes not specified explicitly in the dictionary.\n"
-   "\n"
-   "For example, suppose you have a graph with an edge attribute named\n"
-   "C{weight}. C{graph.simplify(combine_edges=max)} will take the\n"
-   "maximum of the weights of multiple edges and assign that weight to\n"
-   "the collapsed edge. C{graph.simplify(combine_edges=sum)} will\n"
-   "take the sum of the weights. You can also write\n"
-   "C{graph.simplify(combine_edges=dict(weight=\"sum\"))} or\n"
-   "C{graph.simplify(combine_edges=dict(weight=sum))}, since\n"
-   "C{sum} is recognised both as a Python built-in function and as\n"
-   "a string constant.\n"
   },
 
   // interface to igraph_minimum_spanning_tree_unweighted and
@@ -12026,7 +12026,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "vertices. Consider using one of the heuristic approaches instead if\n"
    "you have such a large graph.\n\n"
    "@return: the calculated membership vector and the corresponding\n"
-   "  modularity in a tuple\n."
+   "  modularity in a tuple.\n"
   },
   {"community_spinglass",
    (PyCFunction) igraphmodule_Graph_community_spinglass,

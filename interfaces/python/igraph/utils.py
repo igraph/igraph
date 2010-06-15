@@ -1,9 +1,9 @@
 """Utility functions that cannot be categorised anywhere else"""
 
 from contextlib import contextmanager
-from tempfile import mkstemp
 
 import os
+import tempfile
 
 __license__ = "GPL"
 
@@ -20,7 +20,7 @@ def named_temporary_file(*args, **kwds):
 
     @see: tempfile.mkstemp
     """
-    handle, tmpfile = mkstemp(*args, **kwds)
+    handle, tmpfile = tempfile.mkstemp(*args, **kwds)
     os.close(handle)
     try:
         yield tmpfile

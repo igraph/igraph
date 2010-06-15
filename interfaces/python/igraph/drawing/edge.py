@@ -124,10 +124,6 @@ class TaperedEdgeDrawer(AbstractEdgeDrawer):
     """Edge drawer implementation that draws undirected edges as
     straight lines and directed edges as tapered lines that are
     wider at the source and narrow at the destination.
-
-    @newfield ref: Reference
-    @ref: Holten, D. and van Wijk, J. J. (2009). A user study on visualizing
-    directed edges in graphs. In: Proceedings of CHI 2009, pp. 2299--2308.
     """
 
     def draw_directed_edge(self, edge, src_vertex, dest_vertex):
@@ -166,10 +162,6 @@ class AlphaVaryingEdgeDrawer(AbstractEdgeDrawer):
     """Edge drawer implementation that draws undirected edges as
     straight lines and directed edges by varying the alpha value
     of the specified edge color between the source and the destination.
-
-    @newfield ref: Reference
-    @ref: Holten, D. and van Wijk, J. J. (2009). A user study on visualizing
-    directed edges in graphs. In: Proceedings of CHI 2009, pp. 2299--2308.
     """
 
     def __init__(self, context, alpha_at_src, alpha_at_dest):
@@ -205,10 +197,6 @@ class LightToDarkEdgeDrawer(AlphaVaryingEdgeDrawer):
     zero (total transparency) at the source and an alpha value of
     one (full opacity) at the destination. The alpha value is
     interpolated in-between.
-
-    @newfield ref: Reference
-    @ref: Holten, D. and van Wijk, J. J. (2009). A user study on visualizing
-    directed edges in graphs. In: Proceedings of CHI 2009, pp. 2299--2308.
     """
 
     def __init__(self, context):
@@ -221,10 +209,6 @@ class DarkToLightEdgeDrawer(AlphaVaryingEdgeDrawer):
     one (full opacity) at the source and an alpha value of zero
     (total transparency) at the destination. The alpha value is
     interpolated in-between.
-
-    @newfield ref: Reference
-    @ref: Holten, D. and van Wijk, J. J. (2009). A user study on visualizing
-    directed edges in graphs. In: Proceedings of CHI 2009, pp. 2299--2308.
     """
 
     def __init__(self, context):

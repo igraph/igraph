@@ -4,7 +4,7 @@
 #
 # Usage: ./mkdoc.sh [--sync] [directory]
 
-PACKAGES="igraph igraph.clustering igraph.colors igraph.configuration igraph.datatypes igraph.drawing igraph.layout igraph.statistics igraph.app igraph.app.shell"
+PACKAGES="igraph igraph.statistics igraph.app igraph.app.shell"
 
 PWD=`pwd`
 

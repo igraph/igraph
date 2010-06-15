@@ -571,8 +571,8 @@ class AbstractDrawer(object):
         """Constructs the drawer and associates it to the given
         Cairo context and the given L{BoundingBox}.
 
-        @param context  the context on which we will draw
-        @param bbox     the bounding box within which we will draw.
+        @param context: the context on which we will draw
+        @param bbox:    the bounding box within which we will draw.
                         Can be anything accepted by the constructor
                         of L{BoundingBox} (i.e., a 2-tuple, a 4-tuple
                         or a L{BoundingBox} object).
@@ -621,12 +621,12 @@ class DefaultGraphDrawer(AbstractGraphDrawer):
         """Constructs the graph drawer and associates it to the given
         Cairo context and the given L{BoundingBox}.
 
-        @param context  the context on which we will draw
-        @param bbox     the bounding box within which we will draw.
+        @param context: the context on which we will draw
+        @param bbox:    the bounding box within which we will draw.
                         Can be anything accepted by the constructor
                         of L{BoundingBox} (i.e., a 2-tuple, a 4-tuple
                         or a L{BoundingBox} object).
-        @param edge_drawer_factory  a factory method that returns an
+        @param edge_drawer_factory: a factory method that returns an
                         L{AbstractEdgeDrawer} instance bound to a
                         given Cairo context. You can use any of the
                         actual L{AbstractEdgeDrawer} implementations
