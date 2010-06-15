@@ -27,6 +27,7 @@
 <section><title>BLAS routines</title>
 <!-- doxrox-include igraph_blas_dgemv -->
 <!-- doxrox-include igraph_blas_dgemv_array -->
+</section>
 
 <section><title>ARPACK solvers</title>
 <!-- doxrox-include igraph_arpack_rssolve -->
