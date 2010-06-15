@@ -11,6 +11,7 @@
 
 <section><title>The default random number generator</title>
 <!-- doxrox-include igraph_rng_default -->
+<!-- doxrox-include igraph_rng_set_default -->
 </section>
 
 <section><title>Creating random number generators</title>
@@ -32,6 +33,12 @@
 </section>
 
 <section><title>Supported random number generators</title>
+<para>
+By default igraph uses the MT19937 generator. Prior to igraph version
+0.6, the generator supplied by the standard C library was used. This
+means the GLIBC2 generator on GNU libc 2 systems, and maybe the RAND
+generator on others.
+</para>
 <!-- doxrox-include igraph_rngtype_mt19937 -->
 <!-- doxrox-include igraph_rngtype_glibc2 -->
 <!-- doxrox-include igraph_rngtype_rand -->

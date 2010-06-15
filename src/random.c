@@ -214,6 +214,8 @@ void igraph_rng_glibc2_destroy(void *vstate) {
  * It is a linear feedback shift register generator with a 128-byte
  * buffer. This generator was the default prior to igraph version 0.6,
  * at least on systems relying on GNU libc.
+ * 
+ * This generator was ported from the GNU Scientific Library.
  */
 
 igraph_rng_type_t igraph_rngtype_glibc2 = {
@@ -276,7 +278,19 @@ void igraph_rng_rand_destroy(void *vstate) {
  * \var igraph_rngtype_rand
  * \brief The old BSD rand/stand random number generator
  * 
+ * The sequence is 
+ *     x_{n+1} = (a x_n + c) mod m 
+ * with a = 1103515245, c = 12345 and m = 2^31 = 2147483648. The seed
+ * specifies the initial value, x_1.
  * 
+ * The theoretical value of x_{10001} is 1910041713.
+ *
+ *  The period of this generator is 2^31.
+ * 
+ * This generator is not very good -- the low bits of successive
+ * numbers are correlated.
+ * 
+ * This generator was ported from the GNU Scientific Library.
  */
 
 igraph_rng_type_t igraph_rngtype_rand = {
@@ -401,6 +415,31 @@ void igraph_rng_mt19937_destroy(void *vstate) {
 /** 
  * \var igraph_rngtype_mt19937
  * \brief The MT19937 random number generator
+ * 
+ * The MT19937 generator of Makoto Matsumoto and Takuji Nishimura is a
+ * variant of the twisted generalized feedback shift-register
+ * algorithm, and is known as the “Mersenne Twister” generator. It has
+ * a Mersenne prime period of 2^19937 - 1 (about 10^6000) and is
+ * equi-distributed in 623 dimensions. It has passed the diehard
+ * statistical tests. It uses 624 words of state per generator and is
+ * comparable in speed to the other generators. The original generator
+ * used a default seed of 4357 and choosing s equal to zero in
+ * gsl_rng_set reproduces this. Later versions switched to 5489 as the
+ * default seed, you can choose this explicitly via igraph_rng_seed
+ * instead if you require it. 
+ * 
+ * For more information see,
+ * Makoto Matsumoto and Takuji Nishimura, “Mersenne Twister: A
+ * 623-dimensionally equidistributed uniform pseudorandom number
+ * generator”. ACM Transactions on Modeling and Computer Simulation,
+ * Vol. 8, No. 1 (Jan. 1998), Pages 3–30 
+ * 
+ * The generator igraph_rngtype_mt19937 uses the second revision of the
+ * seeding procedure published by the two authors above in 2002. The
+ * original seeding procedures could cause spurious artifacts for some
+ * seed values.
+ * 
+ * This generator was ported from the GNU Scientific Library.
  */
 
 igraph_rng_type_t igraph_rngtype_mt19937 = {
@@ -565,6 +604,13 @@ igraph_i_rng_mt19937_state_t igraph_i_rng_default_state = {
 /** 
  * \function igraph_rng_set_default
  * Set the default igraph random number generator
+ * 
+ * \param rng The random number generator to use as default from now
+ *    on. Calling \ref igraph_rng_destroy() on it, while it is still
+ *    being used as the default will result craches and/or
+ *    unpredictable results.
+ * 
+ * Time complexity: O(1).
  */
 
 void igraph_rng_set_default(igraph_rng_t *rng) {
@@ -578,6 +624,15 @@ void igraph_rng_set_default(igraph_rng_t *rng) {
 /** 
  * \var igraph_rng_default
  * The default igraph random number generator
+ * 
+ * This generator is used by all builtin igraph functions that need to
+ * generate random numbers; e.g. all random graph generators. 
+ * 
+ * You can use \ref igraph_rng_default with \ref igraph_rng_seed()
+ * to set its seed.
+ * 
+ * You can change the default generator using the \ref
+ * igraph_rng_set_default() function. 
  */
 
 igraph_rng_t igraph_rng_default = { 
@@ -662,6 +717,17 @@ double igraph_rbinom(igraph_rng_t *rng, double nin, double pp);
 /** 
  * \function igraph_rng_init
  * Initialize a random number generator
+ * 
+ * This function allocates memory for a random number generator, with
+ * the given type, and sets its seed to the default.
+ * 
+ * \param rng Pointer to an uninitialized RNG.
+ * \param type The type of the RNG, please see the documentation for
+ *    the supported types.
+ * \return Error code.
+ * 
+ * Time complexity: depends on the type of the generator, but usually
+ * it should be O(1).
  */
 
 int igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type) {
@@ -673,6 +739,11 @@ int igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type) {
 /** 
  * \function igraph_rng_destroy
  * Deallocate memory associated with a random number generator
+ * 
+ * \param rng The RNG to destroy. Do not destroy an RNG that is used
+ *    as the default igraph RNG. 
+ * 
+ * Time complexity: O(1).
  */
 
 void igraph_rng_destroy(igraph_rng_t *rng) {
@@ -682,6 +753,13 @@ void igraph_rng_destroy(igraph_rng_t *rng) {
 /**
  * \function igraph_rng_seed
  * Set the seed of a random number generator
+ * 
+ * \param rng The RNG. 
+ * \param seed The new seed.
+ * \return Error code.
+ * 
+ * Time complexity: usually O(1), but may depend on the type of the
+ * RNG.
  */
 int igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed) {
   const igraph_rng_type_t *type=rng->type;
@@ -693,6 +771,12 @@ int igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed) {
 /** 
  * \function igraph_rng_max 
  * Query the maximum possible integer for a random number generator
+ * 
+ * \param rng The RNG.
+ * \return The largest possible integer that can be generated by
+ *         calling \ref igraph_rng_get_integer() on the RNG.
+ * 
+ * Time complexity: O(1).
  */
 
 unsigned long int igraph_rng_max(igraph_rng_t *rng) {
@@ -703,6 +787,12 @@ unsigned long int igraph_rng_max(igraph_rng_t *rng) {
 /**
  * \function igraph_rng_min
  * Query the minimum possible integer for a random number generator
+ * 
+ * \param rng The RNG.
+ * \return The smallest possible integer that can be generated by
+ *         calling \ref igraph_rng_get_integer() on the RNG.
+ * 
+ * Time complexity: O(1).
  */
 
 unsigned long int igraph_rng_min(igraph_rng_t *rng) {
@@ -713,6 +803,12 @@ unsigned long int igraph_rng_min(igraph_rng_t *rng) {
 /** 
  * \function igraph_rng_name
  * Query the type of a random number generator
+ * 
+ * \param rng The RNG.
+ * \return The name of the type of the generator. Do not deallocate or
+ *         change the returned string pointer.
+ * 
+ * Time complexity: O(1).
  */
 
 const char *igraph_rng_name(igraph_rng_t *rng) {
@@ -723,6 +819,16 @@ const char *igraph_rng_name(igraph_rng_t *rng) {
 /** 
  * \function igraph_rng_get_integer
  * Generate an integer random number from an interval
+ * 
+ * \param rng Pointer to the RNG to use for the generation. Use \ref
+ *        igraph_rng_default here to use the default igraph RNG.
+ * \param l Lower limit, inclusive, it can be negative as well.
+ * \param h Upper limit, inclusive, it can be negative as well, but it
+ *        should be at least <code>l</code>.
+ * \return The generated random integer.
+ * 
+ * Time complexity: depends on the generator, but should be usually
+ * O(1).
  */
 
 long int igraph_rng_get_integer(igraph_rng_t *rng,
@@ -742,6 +848,14 @@ long int igraph_rng_get_integer(igraph_rng_t *rng,
 /** 
  * \function igraph_rng_get_normal
  * Normally distributed random numbers
+ * 
+ * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default
+ *        here to use the default igraph RNG.
+ * \param m The mean.
+ * \param s Standard deviation.
+ * \return The generated normally distributed random number.
+ * 
+ * Time complexity: depends on the type of the RNG.
  */
 
 igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng, 
@@ -757,6 +871,15 @@ igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng,
 /** 
  * \function igraph_rng_get_unif
  * Generate real, uniform random numbers from an interval
+ * 
+ * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default
+ *        here to use the default igraph RNG.
+ * \param l The lower bound, it can be negative.
+ * \param h The uppoer bound, it can be negative, but it has to be
+ *        larger than the lower bound.
+ * \return The generated uniformly distributed random number.
+ * 
+ * Time complexity: depends on the type of the RNG.
  */
 
 igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng, 
@@ -775,6 +898,12 @@ igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng,
 /** 
  * \function igraph_rng_get_unif01
  * Generate real, uniform random number from the unit interval
+ *
+ * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default
+ *        here to use the default igraph RNG.
+ * \return The generated uniformly distributed random number.
+ * 
+ * Time complexity: depends on the type of the RNG.
  */
 
 igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
@@ -792,6 +921,14 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
 /** 
  * \function igraph_rng_get_geom
  * Generate geometrically distributed random numbers
+ * 
+ * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default
+ *        here to use the default igraph RNG.
+ * \param p The probability of success in each trial. Must be larger
+ *        than zero and smaller or equal to 1.
+ * \return The generated geometrically distributed random number.
+ * 
+ * Time complexity: depends on the type of the RNG.
  */
 
 igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p) {
@@ -806,6 +943,14 @@ igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p) {
 /** 
  * \function igraph_rng_get_binom
  * Generate binomially distributed random numbers
+ * 
+ * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default
+ *        here to use the default igraph RNG.
+ * \param n Number of observations.
+ * \param p Probability of an event.
+ * \return The generated binomially distributed random number.
+ * 
+ * Time complexity: depends on the type of the RNG.
  */
 
 igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n, 
