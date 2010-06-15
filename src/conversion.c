@@ -154,7 +154,7 @@ int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
  *        \c IGRAPH_EINVAL invalid type argument.
  *
  * \sa igraph_get_adjacency if you would like to get a normal matrix
- *   ( \ref igraph_matrix_t )
+ *   ( \type igraph_matrix_t )
  *
  * Time complexity: O(|V||V|),
  * |V| is the 

@@ -119,8 +119,8 @@ strvector.xml: strvector.xxml $(SRCDIR)/igraph_strvector.c $(INCLUDEDIR)/igraph_
 adjlist.xml: adjlist.xxml $(SRCDIR)/adjlist.c $(INCLUDEDIR)/igraph_adjlist.h
 	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/adjlist.c $(INCLUDEDIR)/igraph_adjlist.h
 
-arpack.xml: arpack.xxml $(INCLUDEDIR)/igraph_arpack.h $(SRCDIR)/arpack.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_arpack.h $(SRCDIR)/arpack.c
+arpack.xml: arpack.xxml $(INCLUDEDIR)/igraph_arpack.h $(SRCDIR)/arpack.c $(INCLUDEDIR)/igraph_blas.h $(SRCDIR)/blas.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_arpack.h $(SRCDIR)/arpack.c $(INCLUDEDIR)/igraph_blas.h $(SRCDIR)/blas.c
 
 bipartite.xml: bipartite.xxml $(SRCDIR)/bipartite.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/bipartite.c

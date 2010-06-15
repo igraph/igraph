@@ -38,6 +38,7 @@
 <!-- doxrox-include igraph_subcomponent -->
 <!-- doxrox-include igraph_induced_subgraph -->
 <!-- doxrox-include igraph_subgraph_edges -->
+<!-- doxrox-include igraph_subgraph -->
 <!-- doxrox-include igraph_clusters -->
 <!-- doxrox-include igraph_is_connected -->
 <!-- doxrox-include igraph_decompose -->

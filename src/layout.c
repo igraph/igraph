@@ -2556,7 +2556,7 @@ int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
  * space having a given number of dimensions in a way that approximates
  * the distance relations prescribed in the distance matrix. igraph
  * uses the classical multidimensional scaling by Torgerson; for more
- * details, see Cox & Cox: Multidimensional Scaling (1994), Chapman
+ * details, see Cox &amp; Cox: Multidimensional Scaling (1994), Chapman
  * and Hall, London.
  *
  * </para><para>

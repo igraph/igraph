@@ -35,7 +35,6 @@
 <!-- doxrox-include about_games -->
 <!-- doxrox-include igraph_grg_game -->
 <!-- doxrox-include igraph_barabasi_game -->
-<!-- doxrox-include igraph_nonlinear_barabasi_game -->
 <!-- doxrox-include igraph_erdos_renyi_game -->
 <!-- doxrox-include igraph_watts_strogatz_game -->
 <!-- doxrox-include igraph_rewire_edges -->

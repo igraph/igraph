@@ -1941,7 +1941,7 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph, igraph_t *res,
  * 
  * </para><para>
  * This function is an alias to \ref igraph_induced_subgraph(), it is
- * left here to ensure API compatibility with igraph < 0.6.
+ * left here to ensure API compatibility with igraph versions prior 0.6.
  *
  * </para><para>
  * This function collects the specified vertices and all edges between
