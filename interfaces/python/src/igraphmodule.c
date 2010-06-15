@@ -28,6 +28,7 @@
 #include "common.h"
 #include "convert.h"
 #include "error.h"
+#include "random.h"
 #include "graphobject.h"
 #include "vertexseqobject.h"
 #include "vertexobject.h"
@@ -366,6 +367,20 @@ static PyMethodDef igraphmodule_methods[] =
       "  what igraph is doing right now, the second is the actual\n"
       "  progress information (a percentage).\n"
   },
+  {"set_random_number_generator", igraph_rng_Python_set_generator, METH_O,
+      "set_random_number_generator(generator)\n\n"
+      "Sets the random number generator used by igraph.\n"
+      "@param generator: the generator to be used. It must be a Python object\n"
+      "  with at least three attributes: C{random}, C{randint} and C{gauss}.\n"
+      "  Each of them must be callable and their signature and behaviour\n"
+      "  must be identical to L{random.random}, L{random.randint} and\n"
+      "  L{random.gauss}. By default, igraph uses the L{random} module for\n"
+      "  random number generation, but you can supply your alternative\n"
+      "  implementation here. If the given generator is C{None}, igraph\n"
+      "  reverts to the default Mersenne twister generator implemented in the\n"
+      "  C layer, which might be slightly faster than calling back to Python\n"
+      "  for random numbers, but you cannot set its seed or save its state.\n"
+  },
   {NULL, NULL, 0, NULL}
 };
 
@@ -378,24 +393,32 @@ extern PyObject* igraphmodule_arpack_options_default;
 
 PyMODINIT_FUNC initcore(void) {
   PyObject* m;
-  
+
+  /* Initialize random number generator */
+  igraphmodule_init_rng();
+
+  /* Initialize VertexSeq, EdgeSeq */
   if (PyType_Ready(&igraphmodule_VertexSeqType) < 0) return;
   if (PyType_Ready(&igraphmodule_EdgeSeqType) < 0) return;
   
+  /* Initialize Vertex, Edge */
   igraphmodule_VertexType.tp_clear = (inquiry)igraphmodule_Vertex_clear;
   if (PyType_Ready(&igraphmodule_VertexType) < 0) return;
   
   igraphmodule_EdgeType.tp_clear = (inquiry)igraphmodule_Edge_clear;
   if (PyType_Ready(&igraphmodule_EdgeType) < 0) return;
-  
+
+  /* Initialize Graph, BFSIter, ARPACKOptions etc */
   if (PyType_Ready(&igraphmodule_GraphType) < 0) return;
   if (PyType_Ready(&igraphmodule_BFSIterType) < 0) return;
   if (PyType_Ready(&igraphmodule_ARPACKOptionsType) < 0) return;
 
+  /* Initialize the core module */
   m = Py_InitModule3("igraph.core", igraphmodule_methods,
 		     "Low-level Python interface for the igraph library. "
 		     "Should not be used directly.");
-  
+
+  /* Add the types to the core module */
   PyModule_AddObject(m, "GraphBase", (PyObject*)&igraphmodule_GraphType);
   PyModule_AddObject(m, "BFSIter", (PyObject*)&igraphmodule_BFSIterType);
   PyModule_AddObject(m, "ARPACKOptions", (PyObject*)&igraphmodule_ARPACKOptionsType);
