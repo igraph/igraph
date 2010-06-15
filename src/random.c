@@ -706,6 +706,12 @@ igraph_rng_type_t igraph_rngtype_R = {
   /* get_binom= */ igraph_rng_R_get_binom
 };
 
+igraph_rng_t igraph_rng_default = { 
+  &igraph_rngtype_R,
+  0,
+  /* def= */ 1
+};
+
 #endif
 
 /* ------------------------------------ */
@@ -1175,6 +1181,20 @@ int igraph_random_sample(igraph_vector_t *res, igraph_integer_t l, igraph_intege
 }
   
 #ifdef USING_R
+
+/* These are never called. */
+
+double igraph_norm_rand(igraph_rng_t *rng) {
+  return norm_rand();
+}
+
+double igraph_rgeom(igraph_rng_t *rng, double p) {
+  return Rf_rgeom(p);
+}
+
+double igraph_rbinom(igraph_rng_t *rng, double nin, double pp) {
+  return Rf_rbinom(nin, pp);
+}
 
 #else
 
