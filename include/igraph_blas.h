@@ -54,7 +54,7 @@ __BEGIN_DECLS
  * the extension of the set of wrapped functions will probably be driven
  * by igraph's internal requirements. The wrapper functions usually
  * substitute double-precision floating point arrays used by BLAS with
- * \ref igraph_vector_t and \type igraph_matrix_t instances and also
+ * \type igraph_vector_t and \type igraph_matrix_t instances and also
  * remove those parameters (such as the number of rows/columns) that
  * can be inferred from the passed arguments directly.
  * </para>
