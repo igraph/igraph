@@ -1576,6 +1576,9 @@ PyObject *igraphmodule_Graph_Barabasi(PyTypeObject * type,
         /* something bad happened during conversion */
        return NULL;
       }
+    } else {
+      PyErr_SetString(PyExc_TypeError, "m must be an integer or a list of integers");
+      return NULL;
     }
   }
 
