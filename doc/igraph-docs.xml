@@ -63,6 +63,8 @@
     <xi:include href="adjlist.xml"/>
   </chapter>
 
+  <xi:include href="random.xml"/>
+
   <xi:include href="generators.xml"/>
 
   <xi:include href="iterators.xml"/>  

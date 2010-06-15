@@ -25,8 +25,6 @@
 #include <igraph.h>
 #include <igraph_sparsemat.h>
 
-#define RNG_INTEGER(l, h) ((long int)((rand())/((double)RAND_MAX+1)*((h)-(l)+1)+(l)))
-
 int permute(const igraph_matrix_t *M, 
 	    const igraph_vector_int_t *p,
 	    const igraph_vector_int_t *q,

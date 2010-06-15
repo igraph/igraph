@@ -24,8 +24,6 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-#define RNG_INTEGER(l, h) ((long int)((rand())/((double)RAND_MAX+1)*((h)-(l)+1)+(l)))
-
 void print_vector(igraph_vector_t *v, FILE *f) {
   long int i;
   for (i=0; i<igraph_vector_size(v); i++) {

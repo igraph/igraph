@@ -26,9 +26,954 @@
 #include "config.h"
 
 #include <math.h>
+#include <limits.h>
 #include "igraph_math.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
+#include "igraph_memory.h"
+
+/** 
+ * \section about_rngs 
+ * 
+ * <section>
+ * <title>About random numbers in igraph, use cases</title>
+ * 
+ * <para> 
+ * Some algorithms in igraph, e.g. the generation of random graphs,
+ * require random number generators (RNGs). Prior to version 0.6
+ * igraph did not have a sophisticated way to deal with random number
+ * generators at the C level, but this has changed. From version 0.6
+ * different and multiple random number generators are supported.
+ * </para>
+ * </section>
+ * 
+ */
+
+/** 
+ * \section rng_use_cases
+ * 
+ * <section><title>Use cases</title>
+ * 
+ * <section><title>Normal (default) use</title>
+ * <para> 
+ * If the user does use any of the RNG functions explicitly, but calls
+ * some of the randomized igraph functions, then a default RNG is set
+ * up, the first time an igraph function needs random numbers. The
+ * seed of this RNG is the output of the <code>time(0)</code> function
+ * call, using the <code>time</code> function from the standard C
+ * library. This ensures that igraph creates a different random graph,
+ * easch time the C program is called.
+ * </para>
+ * 
+ * <para> 
+ * The created default generator is stored in the \ref
+ * igraph_rng_default variable.
+ * </para>
+ * </section>
+ * 
+ * <section><title>Reproducible simulations</title>
+ * <para> 
+ * If reproducible results are needed, then the user should set the
+ * seed of the default random number generator explixitly, using the 
+ * \ref igraph_rng_seed() function on the default generator, \ref
+ * igraph_rng_default. When setting the seed to the same number,
+ * igraph generates exactly the same random graph (or series of random
+ * graphs).
+ * </para>
+ * </section>
+ * 
+ * <section><title>Changing the default generator</title>
+ * <para> 
+ * By default igraph uses the \ref igraph_rng_default random number
+ * generator. This can be changed any time by calling \ref
+ * igraph_rng_set_default(), with an already initialized random number
+ * generator. Note, that the old (replaced) generator is not
+ * destroyed, so no memory is deallocated.
+ * </para>
+ * </section>
+ *
+ * <section><title>Using multiple generators</title>
+ * <para> 
+ * igraph also provides functions to set up multiple random number
+ * generators, using the \ref igraph_rng_init() function, and then
+ * generating random numbers from them, e.g. with \ref igraph_rng_get_integer()
+ * and/or \ref igraph_rng_get_unif() calls. 
+ * </para>
+ * 
+ * <para>
+ * Note, that initializing a new random number generator is
+ * independent of the generator that the igraph functions themselves
+ * use. If you want to replace that, then please use \ref
+ * igraph_rng_set_default().
+ * </para>
+ * </section>
+ *
+ * </section>
+ */
+
+/* ------------------------------------ */
+
+typedef struct {
+  int i, j;
+  long int x[31];
+} igraph_i_rng_glibc2_state_t;
+
+unsigned long int igraph_i_rng_glibc2_get(int *i, int *j, int n, 
+					  long int *x) {
+  long int k;
+
+  x[*i] += x[*j];
+  k = (x[*i] >> 1) & 0x7FFFFFFF;
+  
+  (*i)++;
+  if (*i == n) {
+    *i = 0;
+  }
+  
+  (*j)++ ;
+  if (*j == n) {
+    *j = 0;
+  }
+
+  return k;
+}
+
+unsigned long int igraph_rng_glibc2_get(void *vstate) {
+  igraph_i_rng_glibc2_state_t *state = 
+    (igraph_i_rng_glibc2_state_t*) vstate;
+  return igraph_i_rng_glibc2_get(&state->i, &state->j, 31, state->x);
+}
+
+igraph_real_t igraph_rng_glibc2_get_real(void *state) {
+  return igraph_rng_glibc2_get(state) / 2147483648.0;
+}
+
+/* this function is independent of the bit size */
+
+void igraph_i_rng_glibc2_init(long int *x, int n, 
+			      unsigned long int s) {
+  int i;
+  
+  if (s==0) { s=1; }
+  
+  x[0] = s;
+  for (i=1 ; i<n ; i++) {
+    const long int h = s / 127773;
+    const long int t = 16807 * (s - h * 127773) - h * 2836;
+    if (t < 0) {
+      s = t + 2147483647 ;
+    } else { 
+      s = t ;
+    }
+    
+    x[i] = s ;
+  }
+}
+
+int igraph_rng_glibc2_seed(void *vstate, unsigned long int seed) {
+  igraph_i_rng_glibc2_state_t *state = 
+    (igraph_i_rng_glibc2_state_t*) vstate;
+  int i;
+  
+  igraph_i_rng_glibc2_init(state->x, 31, seed);
+  
+  state->i=3;
+  state->j=0;
+  
+  for (i=0;i<10*31; i++) {
+    igraph_rng_glibc2_get(state);
+  }
+  
+  return 0;
+}
+
+int igraph_rng_glibc2_init(void **state) {
+  igraph_i_rng_glibc2_state_t *st;
+
+  st=igraph_Calloc(1, igraph_i_rng_glibc2_state_t);
+  if (!st) {
+    IGRAPH_ERROR("Cannot initialize RNG", IGRAPH_ENOMEM);
+  }
+  (*state)=st;
+
+  igraph_rng_glibc2_seed(st, 0);
+  
+  return 0;
+}
+
+void igraph_rng_glibc2_destroy(void *vstate) {
+  igraph_i_rng_glibc2_state_t *state = 
+    (igraph_i_rng_glibc2_state_t*) vstate;
+  igraph_Free(state);
+}
+
+/**
+ * \var igraph_rngtype_glibc2
+ * \brief The random number generator type introduced in GNU libc 2
+ * 
+ * It is a linear feedback shift register generator with a 128-byte
+ * buffer. This generator was the default prior to igraph version 0.6,
+ * at least on systems relying on GNU libc.
+ * 
+ * This generator was ported from the GNU Scientific Library.
+ */
+
+igraph_rng_type_t igraph_rngtype_glibc2 = {
+  /* name= */      "LIBC",
+  /* min=  */      0,
+  /* max=  */      RAND_MAX,
+  /* init= */      igraph_rng_glibc2_init,
+  /* destroy= */   igraph_rng_glibc2_destroy,
+  /* seed= */      igraph_rng_glibc2_seed,
+  /* get= */       igraph_rng_glibc2_get,
+  /* get_real= */  igraph_rng_glibc2_get_real,
+  /* get_norm= */  0,
+  /* get_geom= */  0,
+  /* get_binom= */ 0
+};
+
+/* ------------------------------------ */
+
+typedef struct {
+  unsigned long int x;
+} igraph_i_rng_rand_state_t;
+
+unsigned long int igraph_rng_rand_get(void *vstate) {
+  igraph_i_rng_rand_state_t *state = vstate;
+  state->x = (1103515245 * state->x + 12345) & 0x7fffffffUL;
+  return state->x;
+}
+
+igraph_real_t igraph_rng_rand_get_real(void *vstate) {
+  return igraph_rng_rand_get (vstate) / 2147483648.0 ;
+}
+
+int igraph_rng_rand_seed(void *vstate, unsigned long int seed) {
+  igraph_i_rng_rand_state_t *state = vstate;
+  state->x = seed;
+  return 0;
+}
+
+int igraph_rng_rand_init(void **state) {
+  igraph_i_rng_rand_state_t *st;
+
+  st=igraph_Calloc(1, igraph_i_rng_rand_state_t);
+  if (!st) {
+    IGRAPH_ERROR("Cannot initialize RNG", IGRAPH_ENOMEM);
+  }
+  (*state)=st;
+  
+  igraph_rng_rand_seed(st, 0);
+  
+  return 0;
+}
+
+void igraph_rng_rand_destroy(void *vstate) {
+  igraph_i_rng_rand_state_t *state = 
+    (igraph_i_rng_rand_state_t*) vstate;
+  igraph_Free(state);  
+}  
+
+/**
+ * \var igraph_rngtype_rand
+ * \brief The old BSD rand/stand random number generator
+ * 
+ * The sequence is 
+ *     x_{n+1} = (a x_n + c) mod m 
+ * with a = 1103515245, c = 12345 and m = 2^31 = 2147483648. The seed
+ * specifies the initial value, x_1.
+ * 
+ * The theoretical value of x_{10001} is 1910041713.
+ *
+ *  The period of this generator is 2^31.
+ * 
+ * This generator is not very good -- the low bits of successive
+ * numbers are correlated.
+ * 
+ * This generator was ported from the GNU Scientific Library.
+ */
+
+igraph_rng_type_t igraph_rngtype_rand = {
+  /* name= */      "RAND",
+  /* min=  */      0,
+  /* max=  */      0x7fffffffUL,
+  /* init= */      igraph_rng_rand_init,
+  /* destroy= */   igraph_rng_rand_destroy,
+  /* seed= */      igraph_rng_rand_seed,
+  /* get= */       igraph_rng_rand_get,
+  /* get_real= */  igraph_rng_rand_get_real,
+  /* get_norm= */  0,
+  /* get_geom= */  0,
+  /* get_binom= */ 0
+};
+
+/* ------------------------------------ */
+
+#define N 624   /* Period parameters */
+#define M 397
+
+/* most significant w-r bits */
+static const unsigned long UPPER_MASK = 0x80000000UL;   
+
+/* least significant r bits */
+static const unsigned long LOWER_MASK = 0x7fffffffUL;   
+
+typedef struct {
+  unsigned long mt[N];
+  int mti;
+} igraph_i_rng_mt19937_state_t;
+
+unsigned long int igraph_rng_mt19937_get(void *vstate) {
+  igraph_i_rng_mt19937_state_t *state = vstate;
+
+  unsigned long k ;
+  unsigned long int *const mt = state->mt;
+
+#define MAGIC(y) (((y)&0x1) ? 0x9908b0dfUL : 0)
+
+  if (state->mti >= N) {
+    /* generate N words at one time */
+    int kk;
+    
+    for (kk = 0; kk < N - M; kk++) {
+      unsigned long y = (mt[kk] & UPPER_MASK) | (mt[kk + 1] & LOWER_MASK);
+      mt[kk] = mt[kk + M] ^ (y >> 1) ^ MAGIC(y);
+    }
+    for (; kk < N - 1; kk++) {
+      unsigned long y = (mt[kk] & UPPER_MASK) | (mt[kk + 1] & LOWER_MASK);
+      mt[kk] = mt[kk + (M - N)] ^ (y >> 1) ^ MAGIC(y);
+    }
+    
+    {
+      unsigned long y = (mt[N - 1] & UPPER_MASK) | (mt[0] & LOWER_MASK);
+      mt[N - 1] = mt[M - 1] ^ (y >> 1) ^ MAGIC(y);
+    }
+    
+    state->mti = 0;
+  }
+
+#undef MAGIC
+
+  /* Tempering */
+  
+  k = mt[state->mti];
+  k ^= (k >> 11);
+  k ^= (k << 7) & 0x9d2c5680UL;
+  k ^= (k << 15) & 0xefc60000UL;
+  k ^= (k >> 18);
+
+  state->mti++;
+
+  return k;
+}
+
+igraph_real_t igraph_rng_mt19937_get_real(void *vstate) {
+  return igraph_rng_mt19937_get (vstate) / 4294967296.0 ;
+}
+
+int igraph_rng_mt19937_seed(void *vstate, unsigned long int seed) {
+  igraph_i_rng_mt19937_state_t *state = vstate;
+  int i;
+
+  if (seed == 0) {
+    seed = 4357;   /* the default seed is 4357 */
+  }
+  state->mt[0]= seed & 0xffffffffUL;
+
+  for (i = 1; i < N; i++) {
+    /* See Knuth's "Art of Computer Programming" Vol. 2, 3rd
+       Ed. p.106 for multiplier. */
+    state->mt[i] =
+      (1812433253UL * (state->mt[i-1] ^ (state->mt[i-1] >> 30)) + i);
+    state->mt[i] &= 0xffffffffUL;
+  }
+  
+  state->mti = i;
+  return 0;
+}
+
+int igraph_rng_mt19937_init(void **state) {
+  igraph_i_rng_mt19937_state_t *st;
+
+  st=igraph_Calloc(1, igraph_i_rng_mt19937_state_t);
+  if (!st) {
+    IGRAPH_ERROR("Cannot initialize RNG", IGRAPH_ENOMEM);
+  }
+  (*state)=st;
+  
+  igraph_rng_mt19937_seed(st, 0);
+  
+  return 0;
+}
+
+void igraph_rng_mt19937_destroy(void *vstate) {
+  igraph_i_rng_mt19937_state_t *state = 
+    (igraph_i_rng_mt19937_state_t*) vstate;
+  igraph_Free(state);  
+}  
+
+/** 
+ * \var igraph_rngtype_mt19937
+ * \brief The MT19937 random number generator
+ * 
+ * The MT19937 generator of Makoto Matsumoto and Takuji Nishimura is a
+ * variant of the twisted generalized feedback shift-register
+ * algorithm, and is known as the “Mersenne Twister” generator. It has
+ * a Mersenne prime period of 2^19937 - 1 (about 10^6000) and is
+ * equi-distributed in 623 dimensions. It has passed the diehard
+ * statistical tests. It uses 624 words of state per generator and is
+ * comparable in speed to the other generators. The original generator
+ * used a default seed of 4357 and choosing s equal to zero in
+ * gsl_rng_set reproduces this. Later versions switched to 5489 as the
+ * default seed, you can choose this explicitly via igraph_rng_seed
+ * instead if you require it. 
+ * 
+ * For more information see,
+ * Makoto Matsumoto and Takuji Nishimura, “Mersenne Twister: A
+ * 623-dimensionally equidistributed uniform pseudorandom number
+ * generator”. ACM Transactions on Modeling and Computer Simulation,
+ * Vol. 8, No. 1 (Jan. 1998), Pages 3–30 
+ * 
+ * The generator igraph_rngtype_mt19937 uses the second revision of the
+ * seeding procedure published by the two authors above in 2002. The
+ * original seeding procedures could cause spurious artifacts for some
+ * seed values.
+ * 
+ * This generator was ported from the GNU Scientific Library.
+ */
+
+igraph_rng_type_t igraph_rngtype_mt19937 = {
+  /* name= */      "MT19937",
+  /* min=  */      0,
+  /* max=  */      0xffffffffUL,
+  /* init= */      igraph_rng_mt19937_init,
+  /* destroy= */   igraph_rng_mt19937_destroy,
+  /* seed= */      igraph_rng_mt19937_seed,
+  /* get= */       igraph_rng_mt19937_get,
+  /* get_real= */  igraph_rng_mt19937_get_real,
+  /* get_norm= */  0,
+  /* get_geom= */  0,
+  /* get_binom= */ 0
+};
+
+/* int main() { */
+/*   igraph_i_rng_mt19937_state_t *state; */
+/*   int i; */
+/*   igraph_rng_mt19937_init((void*) (&state)); */
+/*   printf("%i\n", state->mti); */
+/*   for (i=0;i<N;i++) { */
+/*     printf("%li ", state->mt[i]); */
+/*   } */
+/*   printf("\n"); */
+/*   return 0; */
+/* } */
+
+igraph_i_rng_mt19937_state_t igraph_i_rng_default_state = {
+  { 
+    4357, -1673174022, 631777498, -282408955, 1091969122, 734315028,
+    1326007786, 847272126, 827502846, -1253457345, 179783451,
+    -1525055310, -1916930692, 1925466307, 665749144, -603295225,
+    893329316, -682475579, 1040064304, -1908212221, 1482932089,
+    488227437, -1859057129, -1454295200, 526142402, -1371359837,
+    1458295199, -511098511, 1363858454, -1633223632, -231325224,
+    -912052602, 1122600857, 886757145, 1696742911, 329343833,
+    1615188801, 542742629, 2091527423, -1540772259, -346316125,
+    -678508215, 773063772, -759237513, -179010064, 866968588, 898917610,
+    133368449, -385274347, 1692595423, -1666750008, -2110794011,
+    1261594711, -955043805, -1607263018, -932981797, 1722362992,
+    -325189170, 1911057179, 934882173, 12520845, 1685835230,
+    -1692561351, -629769594, 233997241, -281347778, 2119236179,
+    -1675189091, -575600129, -887829327, -241302400, 1196876534,
+    226409147, 604684048, -236129894, 1727345320, -2055705095, 20690772,
+    -453556110, 1382747620, -873527127, 1435985251, -408260100,
+    1329164526, -375229025, 625795809, -51975141, -266601009,
+    -1234088492, 104152007, -2039540515, 571970390, 1619011402,
+    1587782644, -1056912121, -568064269, 1551707408, -503848682,
+    -774698325, -477160277, 107230892, 897556033, 651245835, 2069849278,
+    247854787, -931285416, -1062427311, -2049696827, 100496623,
+    119278008, -1286910458, -611193853, 735976560, 854141089,
+    -450744073, -111418185, -1080979592, -561257065, 1645856730,
+    1528630494, -328045709, -1263316055, -1338800655, 1151853658,
+    -1846621341, -642505022, -937978973, 414047903, -216732613,
+    791882393, -1221939233, 654288820, -1182237048, -329791753,
+    -1731849526, 699036015, -1795413933, -12172930, -701580325,
+    -975260477, 819466316, 1745558153, 390873142, -1997784099,
+    676787851, -703813528, -133384759, -623717563, 1999098162,
+    -1911630668, -1800842652, -1934616363, 547740779, -816694832,
+    1697102809, 1864086739, 863025526, 2029212203, -434248400,
+    -1848067906, -494829876, 1973210956, 2028535555, 896708205,
+    915547813, 1759153342, -1060847871, 1759866481, 1873707736,
+    -1815166650, -287595394, 52022012, -474877416, 310507604, 360181202,
+    -1085000055, -1355356025, -88348118, 798118879, 1924558510,
+    -1107406145, 248040006, 1499546708, 189035328, 980334840, -42749295,
+    1664325204, -1222587068, -222989478, -1883233318, -1528513290,
+    -1844895485, -750088411, 890228927, -1356033251, 288006910,
+    872299770, -1262102169, -1054289249, -1609264045, 1706352061,
+    1260984309, 1018431502, 1807264849, -901591972, 911374664,
+    1114202678, 2091134850, -1698112897, 1133910306, 1906353825,
+    -605200909, -1652850556, 1160473523, -1868447728, 2014865905,
+    -1746715512, 1741864267, 578242828, 2122006167, -650643446,
+    990948714, -1337449040, 1216422425, -992392104, 1846858696,
+    705503279, 1387256430, -2008050257, 1916445478, 1552105033,
+    -803988657, -1449233948, -608106841, 1580295070, 1696949670,
+    649624271, -1339409512, -1278939472, -280137943, -1674553726,
+    -623074959, -309349140, 1745832510, -662895921, 1936017265,
+    -297787354, -847020912, -560999945, 1942317629, -1973352794,
+    -481205329, -2027462696, -70616065, 1730201450, -762056394,
+    887523305, 1091457262, 1585370701, 348993791, 728822943, 1523751616,
+    825186347, 1258933502, 143349923, 568210520, -719994942, 1601827120,
+    830890593, 290568786, 1110599016, 671495292, -605220356,
+    -1256025684, 1515952312, -470990064, -1090149741, -13648566,
+    857784291, -1244581722, 856421836, 1389766293, -953258626,
+    676599916, 624127928, -501445451, 495643372, -67437509, 1082620728,
+    1626611614, -694840867, 1495555001, -1032476484, -520959104,
+    -2092407083, 242918138, 1148196810, 1199703872, 1794483919,
+    550571633, -464769855, -414221385, 494609202, -1782012439,
+    643906023, 900298836, -1752338858, -282887081, 752157272,
+    -558692883, 1011856924, 1051448899, -817208153, -2001634835,
+    298779525, 70357428, 443797824, 594333565, -1654472049, -1074841632,
+    -1653145750, -1434882743, -562937127, -1261368507, 2020832071,
+    -47779357, -722579802, 1285444960, 936352141, -856749334,
+    1602551863, -1508901735, 1589288307, -1543495353, -893514105,
+    -933470365, -1759772112, -1030250229, -1304964742, -1989747285,
+    -1647057407, 952523652, -1109933974, 2129564255, 1762004590,
+    -433710556, 1545089469, -196264825, 259491184, -157247859,
+    1137665380, 534318904, -1001391496, -34167064, -435118311,
+    -76959579, -1664775966, -833691195, 1348209284, 1536447712,
+    -1055332563, 1020056719, -1099340587, -1833117378, 895930904,
+    -156779291, 1183751724, 2015723056, -1767242811, 2072641012,
+    -468955109, -530550037, 669220604, 1150940897, -1241757738,
+    902089755, -2137261281, 1354209514, 1806833969, -1123114645,
+    554033385, -1626509718, -717604730, -270894344, -840967801,
+    -1487636843, 703240725, 680986828, 618636800, -971866235, 271910756,
+    698118139, 377651855, -1622865164, -573244776, -1117727822,
+    -1840466436, -409289533, 1481587022, 571860154, -484390670,
+    1376731558, -910669963, -265529055, 1159749118, -1106538960,
+    621141328, -1947196889, 1124484913, -1914999, -33057524,
+    -1356081274, 658353328, 1972327181, 1783705946, 586100102,
+    -1906070146, -1819357299, -1521193971, -1333024114, 523450080,
+    -1213036539, -1335071895, -1271945762, -275567244, -1163485028,
+    -603722240, -1375632422, 823107044, 937709729, 1554053683,
+    -1597671063, -1848628249, -1109270518, 1262071002, -1455462630,
+    -1512602068, -669478949, 1972591086, -2016648190, -1322814024,
+    -1297613285, -504257897, 1449286175, -707158638, 1327809778,
+    -846413667, 1475251733, -1380793436, -1815803841, -1278220589,
+    -1354568904, -606152282, -1863832354, 1973383314, -752150842,
+    445803137, 743051182, -245477520, 1658774826, -1295946045,
+    2111634674, 1513281709, 1219987883, 1689996258, -793350816,
+    -1170725663, 1243155042, -1356524061, 2004749466, 1438051837,
+    -2006203837, 960458365, 1234337322, 58575825, 1902855248, 823676625,
+    -1266945198, -246624146, -36466208, 515902319, 200010668,
+    -152631106, 100571508, -1078091608, 1030840055, -1236424615,
+    2050564302, 79805075, -1421063960, 511967292, -2607721, -1945806512,
+    606544199, 288367089, 599678724, 1141940868, 1328303466, 869650473,
+    -589294816, 1486506435, 1655041407, 1577132716, -1598274248,
+    -2014749734, 606066225, -779699121, -83822601, 1136617792,
+    1990152610, 251687501, -999076000, 649023247, -1847445012,
+    -1664927000, -1477215659, -1679239849, -832984690, -2080941145,
+    -1910147296, -1149815694, 1881645625, -2063926750, 499110059,
+    1007016067, -20870980, 1707224169, 641150743, -1717967581,
+    624759062, 517375424, -1602844973, -1734341751, -769723668,
+    -289357471, -80232511, 149650338, 1132428035, 254647268, -660109553,
+    -491670056, -412355452, -1222329759, -974027218, 5441249,
+    -1416158746, -1325439722, -1251567865, -1251064803, -2016511648,
+    -1122412592, 700254721, 1408662925, -2008844699, -1916020787,
+    1116925398, 438363903, -812475448, 1086594117, -161772285,
+    194224944, 1239684129, 1117852370, 73685618, 18658094, 444092763,
+    1920912925, 2065190723, -1781556926, 1688909945, -1084554862,
+    -38948853, 955432292, -1126482255, 301107677, -511530128, 443756959,
+    -2074497796, 401027192, 443439515, 1387941739, 1004998935,
+    1978666841, -1957419009, -712692199, -1108534133, 1720751447,
+    877654841, 524515529, -1967048038, -524322746, -2000002424,
+    811252930, -1541518117, -1660717841, -93652780, -1925169625,
+    1788695534, 1636173473, -506708105, 263593756, 1396982885,
+    1900315086, 975699974, -504022342, 154938970, 369260000,
+    -1188207681, -814513935, 1194419163, 937562468, -1321508137,
+    1143274861, 741001729, 1157840331, -555844327, 1651525546,
+    106154976, 1783255498, -1784354174, -1257306388, 304421971,
+    -820930003, -1128893291     
+  },
+  N
+};
+
+#undef N
+#undef M
+
+/* ------------------------------------ */
+
+/** 
+ * \function igraph_rng_set_default
+ * Set the default igraph random number generator
+ * 
+ * \param rng The random number generator to use as default from now
+ *    on. Calling \ref igraph_rng_destroy() on it, while it is still
+ *    being used as the default will result craches and/or
+ *    unpredictable results.
+ * 
+ * Time complexity: O(1).
+ */
+
+void igraph_rng_set_default(igraph_rng_t *rng) {
+  igraph_rng_default = (*rng);
+}
+
+#ifndef USING_R
+
+#define addr(a) (&a)
+
+/** 
+ * \var igraph_rng_default
+ * The default igraph random number generator
+ * 
+ * This generator is used by all builtin igraph functions that need to
+ * generate random numbers; e.g. all random graph generators. 
+ * 
+ * You can use \ref igraph_rng_default with \ref igraph_rng_seed()
+ * to set its seed.
+ * 
+ * You can change the default generator using the \ref
+ * igraph_rng_set_default() function. 
+ */
+
+igraph_rng_t igraph_rng_default = { 
+  addr(igraph_rngtype_mt19937),
+  addr(igraph_i_rng_default_state),
+  /* def= */ 1
+};
+
+#undef addr
+
+#endif
+
+/* ------------------------------------ */
+
+#ifdef USING_R
+
+double  unif_rand(void);
+double  norm_rand(void);
+double  Rf_rgeom(double);
+double  Rf_rbinom(double, double);
+
+int igraph_rng_R_init(void **state) {
+  IGRAPH_ERROR("R RNG error, unsupported function called",
+	       IGRAPH_EINTERNAL);
+  return 0;
+}
+
+void igraph_rng_R_destroy(void *state) {
+  igraph_error("R RNG error, unsupported function called",
+	       __FILE__, __LINE__, IGRAPH_EINTERNAL);
+}
+
+int igraph_rng_R_seed(void *state) {
+  IGRAPH_ERROR("R RNG error, unsupported function called",
+	       IGRAPH_EINTERNAL);
+  return 0;
+}
+
+unsigned long int igraph_rng_R_get(void *state) {
+  return unif_rand() * 0x7FFFFFFFUL;
+}
+
+igraph_real_t igraph_rng_R_get_real(void *state) {
+  return unif_rand();
+}
+
+igraph_real_t igraph_rng_R_get_norm(void *state) {
+  return norm_rand();
+}
+
+igraph_real_t igraph_rng_R_get_geom(void *state, igraph_real_t p) {
+  return Rf_rgeom(p);
+}
+ 
+igraph_real_t igraph_rng_R_get_binom(void *state, long int n,
+				     igraph_real_t p) {
+  return Rf_rbinom(n, p);
+}
+
+igraph_rng_type_t igraph_rngtype_R = {
+  /* name= */      "GNU R",
+  /* min=  */      0,
+  /* max=  */      0x7FFFFFFFUL,
+  /* init= */      igraph_rng_R_init,
+  /* destroy= */   igraph_rng_R_destroy,
+  /* seed= */      igraph_rng_R_seed,
+  /* get= */       igraph_rng_R_get,
+  /* get_real= */  igraph_rng_R_get_real,
+  /* get_norm= */  igraph_rng_R_get_norm,
+  /* get_geom= */  igraph_rng_R_get_geom,
+  /* get_binom= */ igraph_rng_R_get_binom
+};
+
+#endif
+
+/* ------------------------------------ */
+
+double igraph_norm_rand(igraph_rng_t *rng);
+double igraph_rgeom(igraph_rng_t *rng, double p);
+double igraph_rbinom(igraph_rng_t *rng, double nin, double pp);
+
+/** 
+ * \function igraph_rng_init
+ * Initialize a random number generator
+ * 
+ * This function allocates memory for a random number generator, with
+ * the given type, and sets its seed to the default.
+ * 
+ * \param rng Pointer to an uninitialized RNG.
+ * \param type The type of the RNG, please see the documentation for
+ *    the supported types.
+ * \return Error code.
+ * 
+ * Time complexity: depends on the type of the generator, but usually
+ * it should be O(1).
+ */
+
+int igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type) {
+  rng->type=type;
+  IGRAPH_CHECK(rng->type->init(&rng->state));
+  return 0;
+}
+
+/** 
+ * \function igraph_rng_destroy
+ * Deallocate memory associated with a random number generator
+ * 
+ * \param rng The RNG to destroy. Do not destroy an RNG that is used
+ *    as the default igraph RNG. 
+ * 
+ * Time complexity: O(1).
+ */
+
+void igraph_rng_destroy(igraph_rng_t *rng) {
+  rng->type->destroy(rng->state);
+}
+
+/**
+ * \function igraph_rng_seed
+ * Set the seed of a random number generator
+ * 
+ * \param rng The RNG. 
+ * \param seed The new seed.
+ * \return Error code.
+ * 
+ * Time complexity: usually O(1), but may depend on the type of the
+ * RNG.
+ */
+int igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed) {
+  const igraph_rng_type_t *type=rng->type;
+  rng->def=0;
+  IGRAPH_CHECK(type->seed(rng->state, seed));
+  return 0;
+}
+
+/** 
+ * \function igraph_rng_max 
+ * Query the maximum possible integer for a random number generator
+ * 
+ * \param rng The RNG.
+ * \return The largest possible integer that can be generated by
+ *         calling \ref igraph_rng_get_integer() on the RNG.
+ * 
+ * Time complexity: O(1).
+ */
+
+unsigned long int igraph_rng_max(igraph_rng_t *rng) {
+  const igraph_rng_type_t *type=rng->type;
+  return type->max;
+}
+
+/**
+ * \function igraph_rng_min
+ * Query the minimum possible integer for a random number generator
+ * 
+ * \param rng The RNG.
+ * \return The smallest possible integer that can be generated by
+ *         calling \ref igraph_rng_get_integer() on the RNG.
+ * 
+ * Time complexity: O(1).
+ */
+
+unsigned long int igraph_rng_min(igraph_rng_t *rng) {
+  const igraph_rng_type_t *type=rng->type;
+  return type->min;
+}
+
+/** 
+ * \function igraph_rng_name
+ * Query the type of a random number generator
+ * 
+ * \param rng The RNG.
+ * \return The name of the type of the generator. Do not deallocate or
+ *         change the returned string pointer.
+ * 
+ * Time complexity: O(1).
+ */
+
+const char *igraph_rng_name(igraph_rng_t *rng) {
+  const igraph_rng_type_t *type=rng->type;
+  return type->name;
+}
+
+/** 
+ * \function igraph_rng_get_integer
+ * Generate an integer random number from an interval
+ * 
+ * \param rng Pointer to the RNG to use for the generation. Use \ref
+ *        igraph_rng_default here to use the default igraph RNG.
+ * \param l Lower limit, inclusive, it can be negative as well.
+ * \param h Upper limit, inclusive, it can be negative as well, but it
+ *        should be at least <code>l</code>.
+ * \return The generated random integer.
+ * 
+ * Time complexity: depends on the generator, but should be usually
+ * O(1).
+ */
+
+long int igraph_rng_get_integer(igraph_rng_t *rng,
+				long int l, long int h) {
+  const igraph_rng_type_t *type=rng->type;
+  if (type->get_real) {
+    return (long int)(type->get_real(rng->state)*(h-l+1)+l);
+  } else if (type->get) {
+    unsigned long int max=type->max;
+    return (long int)(type->get(rng->state))/
+      ((double)max+1)*(h-l+1)+l;
+  }
+  IGRAPH_ERROR("Internal random generator error", IGRAPH_EINTERNAL);
+  return 0;
+}
+
+/** 
+ * \function igraph_rng_get_normal
+ * Normally distributed random numbers
+ * 
+ * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default
+ *        here to use the default igraph RNG.
+ * \param m The mean.
+ * \param s Standard deviation.
+ * \return The generated normally distributed random number.
+ * 
+ * Time complexity: depends on the type of the RNG.
+ */
+
+igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng, 
+				    igraph_real_t m, igraph_real_t s) {
+  const igraph_rng_type_t *type=rng->type;
+  if (type->get_norm) {
+    return type->get_norm(rng->state)*s+m;
+  } else {
+    return igraph_norm_rand(rng)*s+m;
+  }
+}
+
+/** 
+ * \function igraph_rng_get_unif
+ * Generate real, uniform random numbers from an interval
+ * 
+ * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default
+ *        here to use the default igraph RNG.
+ * \param l The lower bound, it can be negative.
+ * \param h The uppoer bound, it can be negative, but it has to be
+ *        larger than the lower bound.
+ * \return The generated uniformly distributed random number.
+ * 
+ * Time complexity: depends on the type of the RNG.
+ */
+
+igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng, 
+				  igraph_real_t l, igraph_real_t h) {
+  const igraph_rng_type_t *type=rng->type;
+  if (type->get_real) {
+    return type->get_real(rng->state)*(h-l)+l;
+  } else if (type->get) {
+    unsigned long int max=type->max;
+    return type->get(rng->state)/((double)max+1)*(double)(h-l)+l;
+  }
+  IGRAPH_ERROR("Internal random generator error", IGRAPH_EINTERNAL);
+  return 0;  
+}
+
+/** 
+ * \function igraph_rng_get_unif01
+ * Generate real, uniform random number from the unit interval
+ *
+ * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default
+ *        here to use the default igraph RNG.
+ * \return The generated uniformly distributed random number.
+ * 
+ * Time complexity: depends on the type of the RNG.
+ */
+
+igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
+  const igraph_rng_type_t *type=rng->type;
+  if (type->get_real) {
+    return type->get_real(rng->state);
+  } else if (type->get) {
+    unsigned long int max=type->max;
+    return type->get(rng->state)/((double)max+1);
+  }
+  IGRAPH_ERROR("Internal random generator error", IGRAPH_EINTERNAL);
+  return 0;  
+}
+
+/** 
+ * \function igraph_rng_get_geom
+ * Generate geometrically distributed random numbers
+ * 
+ * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default
+ *        here to use the default igraph RNG.
+ * \param p The probability of success in each trial. Must be larger
+ *        than zero and smaller or equal to 1.
+ * \return The generated geometrically distributed random number.
+ * 
+ * Time complexity: depends on the type of the RNG.
+ */
+
+igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p) {
+  const igraph_rng_type_t *type=rng->type;
+  if (type->get_geom) {
+    return type->get_geom(rng->state, p);
+  } else {
+    return igraph_rgeom(rng, p);
+  }
+}
+
+/** 
+ * \function igraph_rng_get_binom
+ * Generate binomially distributed random numbers
+ * 
+ * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default
+ *        here to use the default igraph RNG.
+ * \param n Number of observations.
+ * \param p Probability of an event.
+ * \return The generated binomially distributed random number.
+ * 
+ * Time complexity: depends on the type of the RNG.
+ */
+
+igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n, 
+				   igraph_real_t p) {
+  const igraph_rng_type_t *type=rng->type;
+  if (type->get_binom) {
+    return type->get_binom(rng->state, n, p);
+  } else {
+    return igraph_rbinom(rng, n, p);
+  }
+}
+
+unsigned long int igraph_rng_get_int31(igraph_rng_t *rng) {
+  const igraph_rng_type_t *type=rng->type;
+  unsigned long int max=type->max;
+  if (type->get && max==0x7FFFFFFFUL) {
+    return type->get(rng->state);
+  } else if (type->get_real) {
+    return type->get_real(rng->state)*0x7FFFFFFFUL;
+  } else { 
+    return igraph_rng_get_unif01(rng)*0x7FFFFFFFUL;
+  }
+}
 
 int igraph_rng_inited = 0;
 
@@ -606,14 +1551,14 @@ int R_isnancpp(double x)
 #  define ISNAN(x)     (isnan(x)!=0)
 #endif
 
-double igraph_norm_rand(void) {
+double igraph_norm_rand(igraph_rng_t *rng) {
   
   double u1;
 
 #define BIG 134217728 /* 2^27 */
   /* unif_rand() alone is not of high enough precision */
-  u1 = RNG_UNIF(0,1);
-  u1 = (int)(BIG*u1) + RNG_UNIF(0,1);
+  u1 = igraph_rng_get_unif01(rng);
+  u1 = (int)(BIG*u1) + igraph_rng_get_unif01(rng);
   return igraph_qnorm5(u1/BIG, 0.0, 1.0, 1, 0);
 }
 
@@ -653,7 +1598,7 @@ double igraph_norm_rand(void) {
  *    Comm. ACM, 15, 873-882.
  */
 
-double igraph_exp_rand(void)
+double igraph_exp_rand(igraph_rng_t *rng)
 {
     /* q[k-1] = sum(log(2)^k / k!)  k=1,..,n, */
     /* The highest n (here 8) is determined by q[n-1] = 1.0 */
@@ -682,8 +1627,8 @@ double igraph_exp_rand(void)
 
     a = 0.;
     /* precaution if u = 0 is ever returned */
-    u = RNG_UNIF01();
-    while(u <= 0.0 || u >= 1.0) u = RNG_UNIF01();
+    u = igraph_rng_get_unif01(rng);
+    while(u <= 0.0 || u >= 1.0) u = igraph_rng_get_unif01(rng);
     for (;;) {
 	u += u;
 	if (u > 1.0)
@@ -696,10 +1641,10 @@ double igraph_exp_rand(void)
 	return a + u;
 
     i = 0;
-    ustar = RNG_UNIF01();
+    ustar = igraph_rng_get_unif01(rng);
     umin = ustar;
     do {
-	ustar = RNG_UNIF01();
+        ustar = igraph_rng_get_unif01(rng);
 	if (ustar < umin)
 	    umin = ustar;
 	i++;
@@ -762,7 +1707,7 @@ double igraph_exp_rand(void)
 #define TRUE  1
 #define M_1_SQRT_2PI    0.398942280401432677939946059934     /* 1/sqrt(2pi) */
 
-double igraph_rpois(double mu)
+double igraph_rpois(igraph_rng_t *rng, double mu)
 {
     /* Factorial Table (0:9)! */
     const double fact[10] =
@@ -821,7 +1766,7 @@ double igraph_rpois(double mu)
 
 	    repeat {
 		/* Step U. uniform sample for inversion method */
-		u = RNG_UNIF01();
+	        u = igraph_rng_get_unif01(rng);
 		if (u <= p0)
 		    return 0.;
 
@@ -856,7 +1801,7 @@ double igraph_rpois(double mu)
 /* Only if mu >= 10 : ----------------------- */
 
     /* Step N. normal sample */
-    g = mu + s * igraph_norm_rand();/* norm_rand() ~ N(0,1), standard normal */
+    g = mu + s * igraph_norm_rand(rng);/* norm_rand() ~ N(0,1), standard normal */
 
     if (g >= 0.) {
 	pois = floor(g);
@@ -866,7 +1811,7 @@ double igraph_rpois(double mu)
 	/* Step S. squeeze acceptance */
 	fk = pois;
 	difmuk = mu - fk;
-	u = RNG_UNIF01(); /* ~ U(0,1) - sample */
+	u = igraph_rng_get_unif01(rng); /* ~ U(0,1) - sample */
 	if (d * u >= difmuk * difmuk * difmuk)
 	    return pois;
     }
@@ -902,11 +1847,11 @@ double igraph_rpois(double mu)
     repeat {
 	/* Step E. Exponential Sample */
 
-	E = igraph_exp_rand();	/* ~ Exp(1) (standard exponential) */
+	E = igraph_exp_rand(rng);/* ~ Exp(1) (standard exponential) */
 
 	/*  sample t from the laplace 'hat'
 	    (if t <= -0.6744 then pk < fk for all mu >= 10.) */
-	u = 2 * RNG_UNIF01() - 1.;
+	u = 2 * igraph_rng_get_unif01(rng) - 1.;
 	t = 1.8 + fsign(E, u);
 	if (t > -0.6744) {
 	    pois = floor(mu + s * t);
@@ -953,17 +1898,17 @@ double igraph_rpois(double mu)
     return pois;
 }
 
-double igraph_rgeom(double p) {
+double igraph_rgeom(igraph_rng_t *rng, double p) {
     if (ISNAN(p) || p <= 0 || p > 1) ML_ERR_return_NAN;
 
-    return igraph_rpois(igraph_exp_rand() * ((1 - p) / p));
+    return igraph_rpois(rng, igraph_exp_rand(rng) * ((1 - p) / p));
 }
 
 /* This is from nmath/rbinom.c */
 
 #define repeat for(;;)
 
-double igraph_rbinom(double nin, double pp)
+double igraph_rbinom(igraph_rng_t *rng, double nin, double pp)
 {
     /* FIXME: These should become THREAD_specific globals : */
 
@@ -1032,8 +1977,8 @@ double igraph_rbinom(double nin, double pp)
 
     /*-------------------------- np = n*p >= 30 : ------------------- */
     repeat {
-      u = RNG_UNIF01() * p4;
-      v = RNG_UNIF01();
+      u = igraph_rng_get_unif01(rng) * p4;
+      v = igraph_rng_get_unif01(rng);
       /* triangular region */
       if (u <= p1) {
 	  ix = xm - p1 * v + u;
@@ -1103,7 +2048,7 @@ double igraph_rbinom(double nin, double pp)
   repeat {
      ix = 0;
      f = qn;
-     u = RNG_UNIF01();
+     u = igraph_rng_get_unif01(rng);
      repeat {
 	 if (u < f)
 	     goto finis;
@@ -1130,21 +2075,24 @@ double igraph_rbinom(double nin, double pp)
 
 /*   int i; */
 
-/*   for (i=0; i<100; i++) { */
-/*     printf("%i ", RNG_INTEGER(0,10)); */
+/*   RNG_BEGIN(); */
+
+/*   for (i=0; i<1000; i++) { */
+/*     printf("%li ", RNG_INTEGER(1,10)); */
 /*   } */
 /*   printf("\n"); */
 
-/*   for (i=0; i<100; i++) { */
+/*   for (i=0; i<1000; i++) { */
 /*     printf("%f ", RNG_UNIF(0,1)); */
 /*   } */
 /*   printf("\n"); */
 
-/*   for (i=0; i<100; i++) { */
+/*   for (i=0; i<1000; i++) { */
 /*     printf("%f ", RNG_NORMAL(0,5)); */
 /*   } */
 /*   printf("\n"); */
 
-/* } */
+/*   RNG_END(); */
 
-  
+/*   return 0; */
+/* } */

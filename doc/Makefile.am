@@ -10,7 +10,7 @@ DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      foreign.xml nongraph.xml isomorphism.xml motifs.xml \
 	      operators.xml flows.xml community.xml cliques.xml \
 	      sparsematrix.xml stack.xml dqueue.xml heap.xml strvector.xml \
-	      adjlist.xml arpack.xml bipartite.xml visitors.xml
+	      adjlist.xml arpack.xml bipartite.xml visitors.xml random.xml
 
 DOCFIX = fdl.xml gpl.xml igraph-docs.xml installation.xml introduction.xml \
 	 tutorial.xml licenses.xml pmt.xml
@@ -127,6 +127,9 @@ bipartite.xml: bipartite.xxml $(SRCDIR)/bipartite.c
 
 visitors.xml: visitors.xxml $(SRCDIR)/visitors.c  $(INCLUDEDIR)/igraph_visitor.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/visitors.c  $(INCLUDEDIR)/igraph_visitor.h
+
+random.xml: random.xxml $(SRCDIR)/random.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/random.c
 
 html/stamp: igraph-docs.xml $(DOCFIX2) gtk-doc.xsl
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
