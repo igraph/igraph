@@ -53,7 +53,8 @@ int main() {
   igraph_vector_init(&edges, 0);
   igraph_vector_init(&eb, 0);
   igraph_community_edge_betweenness(&g, &edges, &eb, 0 /*merges */,
-				    0 /*bridges */,
+				    0 /*bridges */, /*modularity=*/ 0,
+				    /*membership=*/ 0,
 				    IGRAPH_UNDIRECTED);
   
   no_of_edges=igraph_ecount(&g);

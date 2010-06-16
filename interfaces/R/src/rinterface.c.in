@@ -7102,12 +7102,15 @@ SEXP R_igraph_topological_sorting(SEXP graph, SEXP pneimode) {
 }
 
 SEXP R_igraph_community_edge_betweenness(SEXP graph, SEXP pdirected, 
-					 SEXP peb, SEXP pmerges, SEXP pbridges) {
+					 SEXP peb, SEXP pmerges, SEXP pbridges,
+					 SEXP pmodularity, SEXP pmembership) {
   igraph_t g;
   igraph_vector_t res;
   igraph_vector_t eb, *ppeb=0;
   igraph_matrix_t merges, *ppmerges=0;
   igraph_vector_t bridges, *ppbridges=0;
+  igraph_vector_t modularity, *ppmodularity=0;
+  igraph_vector_t membership, *ppmembership=0;
   igraph_bool_t directed=LOGICAL(pdirected)[0];
   SEXP result, names;
   
@@ -7127,10 +7130,19 @@ SEXP R_igraph_community_edge_betweenness(SEXP graph, SEXP pdirected,
     ppbridges=&bridges;
     igraph_vector_init(&bridges, 0);
   }
+  if (LOGICAL(pmodularity)[0]) {
+    ppmodularity=&modularity;
+    igraph_vector_init(&modularity, 0);
+  }
+  if (LOGICAL(pmembership)[0]) {
+    ppmembership=&membership;
+    igraph_vector_init(&membership, 0);
+  }
   igraph_community_edge_betweenness(&g, &res, ppeb, ppmerges, ppbridges, 
+				    ppmodularity, ppmembership,
 				    directed);
   
-  PROTECT(result=NEW_LIST(4));
+  PROTECT(result=NEW_LIST(6));
   SET_VECTOR_ELT(result, 0, R_igraph_vector_to_SEXP(&res));
   igraph_vector_destroy(&res);
   SET_VECTOR_ELT(result, 1, R_igraph_0orvector_to_SEXP(ppeb));
@@ -7139,11 +7151,17 @@ SEXP R_igraph_community_edge_betweenness(SEXP graph, SEXP pdirected,
   if (ppmerges) { igraph_matrix_destroy(ppmerges); }
   SET_VECTOR_ELT(result, 3, R_igraph_0orvector_to_SEXP(ppbridges));
   if (ppbridges) { igraph_vector_destroy(ppbridges); }
-  PROTECT(names=NEW_CHARACTER(4));
+  SET_VECTOR_ELT(result, 4, R_igraph_0orvector_to_SEXP(ppmodularity));
+  if (ppmodularity) { igraph_vector_destroy(ppmodularity); }
+  SET_VECTOR_ELT(result, 5, R_igraph_0orvector_to_SEXP(ppmembership));
+  if (ppmembership) { igraph_vector_destroy(ppmembership); }
+  PROTECT(names=NEW_CHARACTER(6));
   SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("removed.edges"));
   SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("edge.betweenness"));
   SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("merges"));
   SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("bridges"));
+  SET_STRING_ELT(names, 4, CREATE_STRING_VECTOR("modularity"));
+  SET_STRING_ELT(names, 5, CREATE_STRING_VECTOR("membership"));
   SET_NAMES(result, names);
   
   R_igraph_after();
@@ -7167,7 +7185,8 @@ SEXP R_igraph_community_eb_get_merges(SEXP graph,
   R_SEXP_to_vector(pedges, &edges);
   igraph_matrix_init(&res, 0, 0);
   igraph_vector_init(&bridges, 0);
-  igraph_community_eb_get_merges(&g, &edges, &res, &bridges);
+  igraph_community_eb_get_merges(&g, &edges, &res, &bridges, 
+				 /*modularity=*/ 0, /*membership=*/ 0);
   PROTECT(result=NEW_LIST(2));
   SET_VECTOR_ELT(result, 0, R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);    

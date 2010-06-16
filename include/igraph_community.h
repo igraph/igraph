@@ -104,11 +104,15 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 				      igraph_vector_t *edge_betweenness,
 				      igraph_matrix_t *merges,
 				      igraph_vector_t *bridges,
+				      igraph_vector_t *modularity,
+				      igraph_vector_t *membership,
 				      igraph_bool_t directed);
 int igraph_community_eb_get_merges(const igraph_t *graph, 
 				   const igraph_vector_t *edges,
 				   igraph_matrix_t *merges,
-				   igraph_vector_t *bridges);
+				   igraph_vector_t *bridges,
+				   igraph_vector_t *modularity,
+				   igraph_vector_t *membership);
 
 int igraph_community_fastgreedy(const igraph_t *graph,
 				const igraph_vector_t *weights,

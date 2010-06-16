@@ -233,7 +233,8 @@ as.dendrogram.igraph.walktrap <- function (object, hang=-1,
 edge.betweenness.community <- function(graph, directed=TRUE,
                                        edge.betweenness=TRUE,
                                        merges=TRUE, bridges=TRUE,
-                                       labels=TRUE) {
+                                       labels=TRUE, modularity=TRUE,
+                                       membership=TRUE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -242,10 +243,11 @@ edge.betweenness.community <- function(graph, directed=TRUE,
   res <- .Call("R_igraph_community_edge_betweenness", graph, as.logical(directed),
                as.logical(edge.betweenness),
                as.logical(merges), as.logical(bridges),
+               as.logical(modularity), as.logical(membership),
                PACKAGE="igraph")
   if (labels && "name" %in% list.vertex.attributes(graph)) {
     res$labels <- V(graph)$name
-  }  
+  }
   class(res) <- "igraph.ebc"
   res
 }
