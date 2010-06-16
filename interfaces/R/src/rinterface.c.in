@@ -7266,6 +7266,30 @@ SEXP R_igraph_community_to_membership(SEXP graph, SEXP pmerges,
   return result;
 }
 
+SEXP R_igraph_community_to_membership2(SEXP pmerges, SEXP pvcount,
+				       SEXP psteps) {
+
+  igraph_t g;
+  igraph_matrix_t merges;
+  igraph_integer_t vcount=REAL(pvcount)[0];
+  igraph_integer_t steps=REAL(psteps)[0];
+  igraph_vector_t membership;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_matrix(pmerges, &merges);
+  igraph_vector_init(&membership, 0);
+
+  igraph_community_to_membership(&merges, vcount, steps, &membership, 0);
+  PROTECT(result=R_igraph_vector_to_SEXP(&membership));
+  
+  R_igraph_after();
+  
+  UNPROTECT(2);
+  return result;
+}
+
 SEXP R_igraph_girth(SEXP graph, SEXP pcircle) {
   
   igraph_t g;

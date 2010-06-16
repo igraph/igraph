@@ -24,6 +24,43 @@
 # Community structure
 ###################################################################
 
+membership <- function(commmunities, ...)
+  UseMethod("membership")
+
+membership.communities <- function(communities, ...) {
+  if (!is.null(communities$membership)) {
+    return(communities$membership)
+  } else if (!is.null(communities$merges) &&
+             !is.null(communities$modularity)) {
+    return(community.to.membership2(communities$merges, communities$vcount,
+                                    which.max(communities$modularity)-1))
+  } else {
+    stop("Cannot calculate community membership")
+  }
+}
+
+print.communities <- function(x, ...) {
+  cat("Graph community structure calculated with the",
+      x$algorithm, "algorithm\n")
+  if (x$algorithm=="spinglass") {
+    cat("Modularity:", x$modularity, "\n")
+    cat("Membership vector:\n")
+    print(x$membership)    
+  }
+}
+
+#####################################################################
+
+community.to.membership2 <- function(merges, vcount, steps) {
+  mode(merges) <- "numeric"
+  mode(vcount) <- "numeric"
+  mode(steps)  <- "numeric"
+  .Call("R_igraph_community_to_membership2", merges, vcount, steps,
+        PACKAGE="igraph")
+}
+
+#####################################################################
+
 spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
                                 parupdate=FALSE, start.temp=1,
                                 stop.temp=0.01, cool.fact=0.99,
@@ -51,22 +88,28 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   if (is.null(vertex)) {    
-    .Call("R_igraph_spinglass_community", graph, weights,
-          as.numeric(spins), as.logical(parupdate), as.numeric(start.temp),
-          as.numeric(stop.temp), as.numeric(cool.fact),
-          as.numeric(update.rule), as.numeric(gamma),
-          as.numeric(implementation), as.numeric(lambda),
-          PACKAGE="igraph")
+    res <- .Call("R_igraph_spinglass_community", graph, weights,
+                 as.numeric(spins), as.logical(parupdate),
+                 as.numeric(start.temp),
+                 as.numeric(stop.temp), as.numeric(cool.fact),
+                 as.numeric(update.rule), as.numeric(gamma),
+                 as.numeric(implementation), as.numeric(lambda),
+                 PACKAGE="igraph")
+    res$algorithm <- "spinglass"
+    res$vcount    <- vcount(graph)
+    class(res) <- "communities"
   } else {
-    .Call("R_igraph_spinglass_my_community", graph, weights,
-          as.igraph.vs(graph, vertex), as.numeric(spins), 
-          as.numeric(update.rule), as.numeric(gamma),
-          PACKAGE="igraph")
-  }    
+    res <- .Call("R_igraph_spinglass_my_community", graph, weights,
+                 as.igraph.vs(graph, vertex), as.numeric(spins), 
+                 as.numeric(update.rule), as.numeric(gamma),
+                 PACKAGE="igraph")
+  }
+  res
 }
 
-walktrap.community <- function(graph, weights=E(graph)$weight, steps=4, merges=TRUE,
-                               modularity=TRUE, labels=TRUE, membership=TRUE) {
+walktrap.community <- function(graph, weights=E(graph)$weight, steps=4,
+                               merges=TRUE, modularity=TRUE, labels=TRUE,
+                               membership=TRUE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -192,7 +235,7 @@ edge.betweenness.community <- function(graph, directed=TRUE,
                PACKAGE="igraph")
   if (labels && "name" %in% list.vertex.attributes(graph)) {
     res$labels <- V(graph)$name
-  }
+  }  
   class(res) <- "igraph.ebc"
   res
 }

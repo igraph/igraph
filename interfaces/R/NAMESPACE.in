@@ -64,6 +64,11 @@ export(edge.betweenness.community,
        edge.betweenness.community.merges, fastgreedy.community,
        community.to.membership)
 
+export(membership)
+
+S3method("membership", communities)
+S3method("print", communities)
+
 S3method("as.dendrogram", igraph.walktrap)
 S3method("as.dendrogram", igraph.ebc)
 S3method("as.dendrogram", igraph.eigenc)
