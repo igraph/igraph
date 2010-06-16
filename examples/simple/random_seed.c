@@ -24,8 +24,6 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-extern int igraph_rng_inited;
-
 int main() {
 
   igraph_t g1, g2;
