@@ -116,3 +116,9 @@ igraph_$(VERSION).tar.gz: $(RFILES) $(SRCFILES)
 	rm -f igraph/src/config.h
 	touch igraph/src/config.h
 	R CMD build igraph
+
+tests:
+	cd igraph/tests && echo "tools:::.runPackageTestsR()" | \
+	R_LIBS=~/.R/library/ R --no-save && echo
+
+.PHONY: tests
