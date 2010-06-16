@@ -62,6 +62,7 @@ community.to.membership2 <- function(merges, vcount, steps) {
   mode(merges) <- "numeric"
   mode(vcount) <- "numeric"
   mode(steps)  <- "numeric"
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_community_to_membership2", merges, vcount, steps,
         PACKAGE="igraph")
 }
