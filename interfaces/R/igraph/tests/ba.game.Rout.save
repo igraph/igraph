@@ -1,0 +1,48 @@
+
+R version 2.11.0 (2010-04-22)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> # sink("ba.game.Rout.save")
+> 
+> library(igraph)
+> 
+> g <- ba.game(100, m=2)
+> ecount(g)
+[1] 197
+> vcount(g)
+[1] 100
+> is.simple(g)
+[1] TRUE
+> 
+> g2 <- ba.game(100, m=2, algorithm="psumtree-multiple")
+> ecount(g2)
+[1] 198
+> vcount(g2)
+[1] 100
+> is.simple(g2)
+[1] FALSE
+> 
+> g3 <- ba.game(100, m=2, algorithm="bag")
+> ecount(g3)
+[1] 198
+> vcount(g3)
+[1] 100
+> is.simple(g3)
+[1] FALSE
+> 
+> # sink(NULL)
+> 
