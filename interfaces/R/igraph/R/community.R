@@ -46,6 +46,11 @@ print.communities <- function(x, ...) {
     cat("Modularity:", x$modularity, "\n")
     cat("Membership vector:\n")
     print(x$membership)    
+  } else if (x$algorithm=="walktrap") {
+    mm <- which.max(x$modularity)
+    cat("Modularity (best split):", x$modularity[mm], "\n")
+    cat("Membership vector:\n")
+    print(x$membership)
   }
 }
 
@@ -136,8 +141,10 @@ walktrap.community <- function(graph, weights=E(graph)$weight, steps=4,
       community.to.membership(graph, res$merges,
                               steps=which.max(res$modularity)-1)$membership
   }
-  
-  class(res) <- "igraph.walktrap"
+
+  res$vcount <- vcount(graph)
+  res$algorithm <- "walktrap"
+  class(res) <- "communities"
   res
 }
 
