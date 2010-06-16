@@ -2,7 +2,7 @@ import unittest
 from igraph.test import basic, layouts, games, foreign, structural, flow, \
     spectral, attributes, cliques, decomposition, operators, generators, \
     isomorphism, colortests, vertexseq, edgeseq, iterators, bipartite, \
-    conversion, random
+    conversion, rng
 
 def suite():
     return unittest.TestSuite( \
@@ -25,7 +25,7 @@ def suite():
          iterators.suite(),
          bipartite.suite(),
          colortests.suite(),
-         random.suite()] \
+         rng.suite()] \
     )
     
 def test():

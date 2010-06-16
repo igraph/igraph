@@ -1,3 +1,4 @@
+import random
 import unittest
 from igraph import *
 
@@ -20,6 +21,9 @@ class InvalidRNG(object):
 
 
 class RandomNumberGeneratorTests(unittest.TestCase):
+    def tearDown(self):
+        set_random_number_generator(random)
+
     def testSetRandomNumberGenerator(self):
         set_random_number_generator(FakeRNG)
         graph, xs, ys = Graph.GRG(10, 0.2, return_coordinates=True)
@@ -27,6 +31,14 @@ class RandomNumberGeneratorTests(unittest.TestCase):
 
         self.assertRaises(AttributeError, set_random_number_generator,
                 InvalidRNG)
+
+    def testSeeding(self):
+        state = random.getstate()
+        g1 = Graph.Erdos_Renyi(n=1000, m=5000)
+        random.setstate(state)
+        g2 = Graph.Erdos_Renyi(n=1000, m=5000)
+        self.failUnless(g1.get_edgelist() == g2.get_edgelist())
+
 
 def suite():
     random_suite = unittest.makeSuite(RandomNumberGeneratorTests)
