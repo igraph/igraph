@@ -43,11 +43,13 @@ print.communities <- function(x, ...) {
   cat("Graph community structure calculated with the",
       x$algorithm, "algorithm\n")
   if (x$algorithm=="spinglass") {
+    cat("Number of communities:", max(x$membership)+1, "\n")
     cat("Modularity:", x$modularity, "\n")
     cat("Membership vector:\n")
     print(x$membership)    
   } else if (x$algorithm=="walktrap") {
     mm <- which.max(x$modularity)
+    cat("Number of communities (best split):", max(x$membership)+1, "\n")
     cat("Modularity (best split):", x$modularity[mm], "\n")
     cat("Membership vector:\n")
     print(x$membership)
