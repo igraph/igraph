@@ -2424,6 +2424,8 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
   igraph_real_t angle, len;
   long int steps=0;
 
+  RNG_BEGIN();
+
   while (sp < 0) {
     /* start particle */
     do {
@@ -2448,6 +2450,8 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
       }
     }
   }
+
+  RNG_END();
 
 /*   fprintf(stderr, "%li ", steps); */
   return 0;
