@@ -31,3 +31,8 @@ AT_KEYWORDS([RNG seed random])
 AT_COMPILE_CHECK([simple/random_seed.c])
 AT_CLEANUP
 
+AT_SETUP([MT19937 RNG on 64 bit machines:])
+AT_KEYWORDS([RNG MT19937])
+AT_COMPILE_CHECK([simple/mt.c])
+AT_CLEANUP
+
