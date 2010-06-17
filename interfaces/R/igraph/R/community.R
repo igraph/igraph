@@ -65,7 +65,12 @@ print.communities <- function(x, ...) {
     cat("Modularity (best split):", x$modularity, "\n")
     cat("Membership vector:\n")
     print(x$membership)
-  }    
+  } else if (x$algorithm == "multi level") {
+    cat("Number of communities (best split):", max(x$membership)+1, "\n")
+    cat("Modularity (best split):", max(x$modularity), "\n")
+    cat("Membership vector:\n")
+    print(x$membership)
+  }
 }
 
 #####################################################################
@@ -542,6 +547,28 @@ label.propagation.community <- function(graph, weights=NULL, initial=NULL, fixed
         PACKAGE="igraph")
   res$vcount <- vcount(graph)
   res$algorithm <- "label propagation"
+  class(res) <- "communities"
+  res
+}
+
+multilevel.community <- function(graph, weights=NULL) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
+  weights <- E(graph)$weight 
+  } 
+  if (!is.null(weights) && any(!is.na(weights))) { 
+  weights <- as.numeric(weights) 
+  } else { 
+  weights <- NULL 
+  }
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_community_multilevel", graph, weights,
+        PACKAGE="igraph")
+  res$vcount <- vcount(graph)
+  res$algorithm <- "multi level"
   class(res) <- "communities"
   res
 }

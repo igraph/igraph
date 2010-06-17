@@ -1041,6 +1041,7 @@ igraph_community_multilevel:
 		OUT MATRIX_OR_0 memberships, OUT VECTOR_OR_0 modularity
         DEPS: weights ON graph
         NAME-R: multilevel.community
+        IGNORE: RR
 
 igraph_community_optimal_modularity:
         PARAMS: GRAPH graph, OUT REALPTR modularity, \
