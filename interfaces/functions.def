@@ -957,7 +957,7 @@ igraph_community_spinglass_single:
 
 igraph_community_walktrap:
         PARAMS: GRAPH graph, VECTOR weights, INT steps=4, OUT MATRIX merges, \
-                OUT VECTOR modularity
+                OUT VECTOR modularity, OUT VECTOR membership
         IGNORE: RR, RC, RNamespace
 
 igraph_community_edge_betweenness:

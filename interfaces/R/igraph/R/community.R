@@ -177,17 +177,10 @@ walktrap.community <- function(graph, weights=E(graph)$weight, steps=4,
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_walktrap_community", graph, weights, as.numeric(steps),
-        as.logical(merges), as.logical(modularity),
+        as.logical(merges), as.logical(modularity), as.logical(membership),
         PACKAGE="igraph")
   if (labels && "name" %in% list.vertex.attributes(graph)) {
     res$labels <- V(graph)$name
-  }
-
-  res <- append(res, list(membership=NULL))
-  if (membership) {
-    res$membership <-
-      community.to.membership(graph, res$merges,
-                              steps=which.max(res$modularity)-1)$membership
   }
 
   res$vcount <- vcount(graph)

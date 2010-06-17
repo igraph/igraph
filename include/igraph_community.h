@@ -97,7 +97,8 @@ int igraph_community_walktrap(const igraph_t *graph,
 			      const igraph_vector_t *weights,
 			      int steps,
 			      igraph_matrix_t *merges,
-			      igraph_vector_t *modularity);
+			      igraph_vector_t *modularity, 
+			      igraph_vector_t *membership);
 
 int igraph_community_edge_betweenness(const igraph_t *graph, 
 				      igraph_vector_t *result,
