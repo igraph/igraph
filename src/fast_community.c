@@ -497,6 +497,9 @@ int igraph_i_fastgreedy_commpair_cmp(const void* p1, const void* p2) {
  *    in the former case the modularity scores along the stages of the
  *    computation are recorded here. The vector will be resized as
  *    needed.
+ * \param membership Pointer to a vector. If not a null pointer, then
+ *    the membership vector corresponding to the best split (in terms
+ *    of modularity) is stored here. 
  * \return Error code.
  *
  * \sa \ref igraph_community_walktrap(), \ref
@@ -509,8 +512,10 @@ int igraph_i_fastgreedy_commpair_cmp(const void* p1, const void* p2) {
  * the number of edges.
  */
 int igraph_community_fastgreedy(const igraph_t *graph,
-  const igraph_vector_t *weights,
-  igraph_matrix_t *merges, igraph_vector_t *modularity) {
+				const igraph_vector_t *weights,
+				igraph_matrix_t *merges, 
+				igraph_vector_t *modularity, 
+				igraph_vector_t *membership) {
   long int no_of_edges, no_of_nodes, no_of_joins, total_joins;
   long int i, j, k, n, m, from, to, dummy;
   igraph_integer_t ffrom, fto;
@@ -891,6 +896,15 @@ int igraph_community_fastgreedy(const igraph_t *graph,
   igraph_i_fastgreedy_community_list_destroy(&communities);
   igraph_vector_destroy(&a);
   IGRAPH_FINALLY_CLEAN(4);
+
+  if (membership) {
+    long int m=igraph_vector_which_max(modularity);
+    IGRAPH_CHECK(igraph_community_to_membership(merges, no_of_nodes, 
+						/*steps=*/ m,
+						membership, 
+						/*csize=*/ 0));
+  }
+
   return 0;
 }
 

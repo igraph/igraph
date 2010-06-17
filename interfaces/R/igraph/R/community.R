@@ -348,6 +348,7 @@ as.dendrogram.igraph.ebc <- function (object, hang=-1,
 }
 
 fastgreedy.community <- function(graph, merges=TRUE, modularity=TRUE,
+                                 membership=TRUE,
                                  weights=E(graph)$weight) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -359,7 +360,7 @@ fastgreedy.community <- function(graph, merges=TRUE, modularity=TRUE,
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_community_fastgreedy", graph, as.logical(merges),
-               as.logical(modularity), weights,
+               as.logical(modularity), as.logical(membership), weights,
                PACKAGE="igraph")
   class(res) <- "igraph.fgc"
   res
