@@ -6,4 +6,4 @@ fc <- fastgreedy.community(g)
 fc
 modularity(g, fc$membership) == max(fc$modularity)
 membership(fc)
-
+length(fc)

@@ -69,6 +69,7 @@ export(membership, modularity)
 S3method("membership", communities)
 S3method("print", communities)
 S3method("modularity", communities)
+S3method("length", communities)
 
 S3method("modularity", igraph)
 

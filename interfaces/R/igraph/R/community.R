@@ -88,6 +88,11 @@ modularity.communities <- function(communities, ...) {
   }
 }
 
+length.communities <- function(x) {
+  m <- membership(x)
+  max(m)+1
+}
+
 #####################################################################
 
 community.to.membership2 <- function(merges, vcount, steps) {

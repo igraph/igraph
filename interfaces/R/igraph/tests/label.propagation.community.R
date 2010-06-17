@@ -7,4 +7,4 @@ lpc <- label.propagation.community(g)
 lpc
 lpc$modularity == modularity(g, lpc$membership)
 membership(lpc)
-
+length(lpc)

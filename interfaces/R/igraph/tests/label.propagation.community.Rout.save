@@ -31,5 +31,6 @@ Membership vector:
 [1] TRUE
 > membership(lpc)
  [1] 0 0 1 0 2 2 2 0 1 1 2 0 0 0 1 1 2 0 1 0 1 0 1 1 1 1 1 1 1 1 1 1 1 1
-> 
+> length(lpc)
+[1] 3
 > 
