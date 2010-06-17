@@ -1,0 +1,34 @@
+
+R version 2.11.0 (2010-04-22)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> g <- graph.famous("Zachary")
+> lc <- leading.eigenvector.community(g)
+> lc
+Graph community structure calculated with the leading eigenvector algorithm
+Number of communities (best split): 5 
+Modularity (best split): 0.3776298 
+Membership vector:
+ [1] 0 2 3 3 0 0 0 3 1 1 0 0 3 3 1 1 0 2 1 2 1 2 1 4 4 4 1 4 4 1 1 4 1 1
+> lc$modularity == modularity(g, lc$membership)
+[1] TRUE
+> membership(lc)
+ [1] 0 2 3 3 0 0 0 3 1 1 0 0 3 3 1 1 0 2 1 2 1 2 1 4 4 4 1 4 4 1 1 4 1 1
+> 
+> 

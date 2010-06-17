@@ -1005,6 +1005,7 @@ igraph_community_leading_eigenvector:
         DEFAULT-R: options=igraph.arpack.default
         CLASS-R: igraph.eigenc
         NAME-R: leading.eigenvector.community
+        IGNORE: RR
 
 igraph_community_leading_eigenvector_naive:
         PARAMS: GRAPH graph, OUT MATRIX merges, OUT VECTOR membership, \
@@ -1014,6 +1015,7 @@ igraph_community_leading_eigenvector_naive:
         DEFAULT-R: options=igraph.arpack.default
         CLASS-R: igraph.eigenc
         NAME-R: leading.eigenvector.community.naive
+        IGNORE: RR
 
 igraph_community_leading_eigenvector_step:
         PARAMS: GRAPH graph, INOUT VECTOR membership, INTEGER community, \

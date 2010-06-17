@@ -54,6 +54,12 @@ print.communities <- function(x, ...) {
     cat("Modularity (best split):", x$modularity[mm], "\n")
     cat("Membership vector:\n")
     print(x$membership)
+  } else if (x$algorithm %in% c("leading eigenvector",
+                                "leading eigenvector, naive")) {
+    cat("Number of communities (best split):", max(x$membership)+1, "\n")
+    cat("Modularity (best split):", x$modularity, "\n")
+    cat("Membership vector:\n")
+    print(x$membership)
   }
 }
 
@@ -378,6 +384,38 @@ community.to.membership <- function(graph, merges, steps, membership=TRUE,
   .Call("R_igraph_community_to_membership", graph, merges, as.numeric(steps),
         as.logical(membership), as.logical(csize),
         PACKAGE="igraph")
+}
+
+leading.eigenvector.community <- function(graph, steps=-1, options=igraph.arpack.default) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  steps <- as.numeric(steps)
+  options.tmp <- igraph.arpack.default; options.tmp[ names(options) ] <- options ; options <- options.tmp
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_community_leading_eigenvector", graph, steps, options,
+        PACKAGE="igraph")
+  res$algorithm <- "leading eigenvector"
+  res$vcount <- vcount(graph)
+  class(res) <- "communities"
+  res
+}
+
+leading.eigenvector.community.naive <- function(graph, steps=-1, options=igraph.arpack.default) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  steps <- as.numeric(steps)
+  options.tmp <- igraph.arpack.default; options.tmp[ names(options) ] <- options ; options <- options.tmp
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_community_leading_eigenvector_naive", graph, steps, options,
+        PACKAGE="igraph")
+  res$algorithm <- "leading eigenvector, naive"
+  res$vcount <- vcount(graph)
+  class(res) <- "communities"
+  res
 }
 
 leading.eigenvector.community.step <- function(graph, fromhere=NULL,
