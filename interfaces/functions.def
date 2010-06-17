@@ -1000,7 +1000,8 @@ igraph_reindex_membership:
 igraph_community_leading_eigenvector:
         PARAMS: GRAPH graph, OUT MATRIX merges, OUT VECTOR membership, \
                 INTEGER steps=-1, \
-                INOUT ARPACKOPT options=igraph.arpack.default
+                INOUT ARPACKOPT options=igraph.arpack.default, \
+                OUT REALPTR modularity
         DEFAULT-R: options=igraph.arpack.default
         CLASS-R: igraph.eigenc
         NAME-R: leading.eigenvector.community
@@ -1008,7 +1009,8 @@ igraph_community_leading_eigenvector:
 igraph_community_leading_eigenvector_naive:
         PARAMS: GRAPH graph, OUT MATRIX merges, OUT VECTOR membership, \
                 INTEGER steps=-1, \
-                INOUT ARPACKOPT options=igraph.arpack.default
+                INOUT ARPACKOPT options=igraph.arpack.default, \
+                OUT REALPTR modularity
         DEFAULT-R: options=igraph.arpack.default
         CLASS-R: igraph.eigenc
         NAME-R: leading.eigenvector.community.naive

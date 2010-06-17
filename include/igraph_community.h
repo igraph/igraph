@@ -142,12 +142,14 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
 					       igraph_matrix_t *merges,
 					       igraph_vector_t *membership,
 					       igraph_integer_t steps,
-					       igraph_arpack_options_t *options);
+					       igraph_arpack_options_t *options,
+					       igraph_real_t *modularity);
 int igraph_community_leading_eigenvector(const igraph_t *graph,
 					 igraph_matrix_t *merges,
 					 igraph_vector_t *membership,
 					 igraph_integer_t steps,
-					 igraph_arpack_options_t *options);
+					 igraph_arpack_options_t *options, 
+					 igraph_real_t *modularity);
 int igraph_community_leading_eigenvector_step(const igraph_t *graph,
 					      igraph_vector_t *membership,
 					      igraph_integer_t community,

@@ -1001,6 +1001,9 @@ int igraph_i_community_leading_eigenvector_naive(igraph_real_t *to,
  *    as possible.
  * \param options The options for ARPACK. \c n is always
  *    overwritten. \c ncv is set to at least 4.
+ * \param modularity If not a null pointer, then it must be a pointer
+ *    to a real number and the modularity score of the final division
+ *    is stored here.
  * \return Error code.
  * 
  * \sa \ref igraph_community_leading_eigenvector() for the proper way, 
@@ -1014,7 +1017,8 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
 					       igraph_matrix_t *merges,
 					       igraph_vector_t *membership,
 					       igraph_integer_t steps,
-					       igraph_arpack_options_t *options) {
+					       igraph_arpack_options_t *options,
+					       igraph_real_t *modularity) {
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_dqueue_t tosplit;
@@ -1220,6 +1224,11 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
   igraph_vector_destroy(&mymerges);
   IGRAPH_FINALLY_CLEAN(2);
 
+  if (modularity) {
+    IGRAPH_CHECK(igraph_modularity(graph, mymembership, modularity, 
+				   /*weights=*/ 0));
+  }
+
   if (!membership) {
     igraph_vector_destroy(mymembership);
     IGRAPH_FINALLY_CLEAN(1);
@@ -1334,6 +1343,9 @@ int igraph_i_community_leading_eigenvector(igraph_real_t *to,
  *    number of vertices in the network here.
  * \param options The options for ARPACK. \c n is always
  *    overwritten. \c ncv is set to at least 4.
+ * \param modularity If not a null pointer, then it must be a pointer
+ *    to a real number and the modularity score of the final division
+ *    is stored here.
  * \return Error code.
  * 
  * \sa \ref igraph_community_walktrap() and \ref
@@ -1349,7 +1361,8 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 					 igraph_matrix_t *merges,
 					 igraph_vector_t *membership,
 					 igraph_integer_t steps,
-					 igraph_arpack_options_t *options) {
+					 igraph_arpack_options_t *options, 
+					 igraph_real_t *modularity) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
@@ -1544,6 +1557,11 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   igraph_vector_destroy(&idx);
   igraph_vector_destroy(&mymerges);
   IGRAPH_FINALLY_CLEAN(2);
+
+  if (modularity) {
+    IGRAPH_CHECK(igraph_modularity(graph, mymembership, modularity, 
+				   /*weights=*/ 0));
+  }
   
   if (!membership) {
     igraph_vector_destroy(mymembership);
