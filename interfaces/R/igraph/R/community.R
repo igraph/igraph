@@ -44,38 +44,48 @@ print.communities <- function(x, ...) {
       x$algorithm, "algorithm\n")
   if (x$algorithm=="spinglass") {
     cat("Number of communities:", max(x$membership)+1, "\n")
-    cat("Modularity:", x$modularity, "\n")
+    cat("Modularity:", modularity(x), "\n")
     cat("Membership vector:\n")
     print(x$membership)    
   } else if (x$algorithm %in% c("walktrap", "edge betweenness",
                                 "fast greedy")) {
-    mm <- which.max(x$modularity)
     cat("Number of communities (best split):", max(x$membership)+1, "\n")
-    cat("Modularity (best split):", x$modularity[mm], "\n")
+    cat("Modularity (best split):", modularity(x), "\n")
     cat("Membership vector:\n")
     print(x$membership)
   } else if (x$algorithm %in% c("leading eigenvector",
                                 "leading eigenvector, naive")) {
     cat("Number of communities (best split):", max(x$membership)+1, "\n")
-    cat("Modularity (best split):", x$modularity, "\n")
+    cat("Modularity (best split):", modularity(x), "\n")
     cat("Membership vector:\n")
     print(x$membership)
   } else if (x$algorithm == "label propagation") {
     cat("Number of communities:", max(x$membership)+1, "\n")
-    cat("Modularity:", x$modularity, "\n")
+    cat("Modularity:", modularity(x), "\n")
     cat("Membership vector:\n")
     print(x$membership)
   } else if (x$algorithm == "multi level") {
     cat("Number of communities (best split):", max(x$membership)+1, "\n")
-    cat("Modularity (best split):", max(x$modularity), "\n")
+    cat("Modularity (best split):", modularity(x), "\n")
     cat("Membership vector:\n")
     print(x$membership)
   } else if (x$algorithm == "optimal") {
     cat("Number of communities:", max(x$membership)+1, "\n")
-    cat("Modularity:", x$modularity, "\n")
+    cat("Modularity:", modularity(x), "\n")
     cat("Membership vector:\n")
     print(x$membership)
   }    
+}
+
+modularity <- function(x, ...)
+  UseMethod("modularity")
+
+modularity.communities <- function(communities, ...) {
+  if (!is.null(communities$modularity)) {
+    max(communities$modularity)
+  } else {
+    stop("Modularity was not calculated")
+  }
 }
 
 #####################################################################
