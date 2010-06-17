@@ -33,7 +33,7 @@ Membership vector:
 > length(oc)
 [1] 4
 > sizes(oc)
-m
+Community sizes
  0  1  2  3 
 11  5 12  6 
 > 

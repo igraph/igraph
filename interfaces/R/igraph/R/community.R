@@ -98,7 +98,7 @@ sizes <- function(x, ...)
 
 sizes.communities <- function(x, ...) {
   m <- membership(x)
-  table(m)
+  table(`Community sizes`=m)
 }
 
 #####################################################################

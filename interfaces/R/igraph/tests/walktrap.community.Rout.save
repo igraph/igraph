@@ -36,7 +36,7 @@ Membership vector:
 > length(wc)
 [1] 5
 > sizes(wc)
-m
+Community sizes
 0 1 2 3 4 
 9 7 9 4 5 
 > 

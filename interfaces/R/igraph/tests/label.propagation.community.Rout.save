@@ -34,7 +34,7 @@ Membership vector:
 > length(lpc)
 [1] 3
 > sizes(lpc)
-m
+Community sizes
  0  1  2 
 10 19  5 
 > 
