@@ -70,7 +70,12 @@ print.communities <- function(x, ...) {
     cat("Modularity (best split):", max(x$modularity), "\n")
     cat("Membership vector:\n")
     print(x$membership)
-  }
+  } else if (x$algorithm == "optimal") {
+    cat("Number of communities:", max(x$membership)+1, "\n")
+    cat("Modularity:", x$modularity, "\n")
+    cat("Membership vector:\n")
+    print(x$membership)
+  }    
 }
 
 #####################################################################
@@ -569,6 +574,21 @@ multilevel.community <- function(graph, weights=NULL) {
         PACKAGE="igraph")
   res$vcount <- vcount(graph)
   res$algorithm <- "multi level"
+  class(res) <- "communities"
+  res
+}
+
+optimal.community <- function(graph, verbose=igraph.par("verbose")) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  verbose <- as.logical(verbose)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_community_optimal_modularity", graph, verbose,
+        PACKAGE="igraph")
+  res$vcount <- vcount(graph)
+  res$algorithm <- "optimal"
   class(res) <- "communities"
   res
 }

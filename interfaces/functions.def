@@ -1048,6 +1048,7 @@ igraph_community_optimal_modularity:
                 OUT VECTOR_OR_0 membership, \
                 BOOLEAN verbose=igraph.par("verbose")
         NAME-R: optimal.community
+        IGNORE: RR
 
 #######################################
 # Conversion
