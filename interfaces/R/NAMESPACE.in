@@ -64,12 +64,13 @@ export(edge.betweenness.community,
        edge.betweenness.community.merges, fastgreedy.community,
        community.to.membership)
 
-export(membership, modularity)
+export(membership, modularity, sizes)
 
 S3method("membership", communities)
 S3method("print", communities)
 S3method("modularity", communities)
 S3method("length", communities)
+S3method("sizes", communities)
 
 S3method("modularity", igraph)
 

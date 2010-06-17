@@ -7,3 +7,4 @@ fc
 modularity(g, fc$membership) == max(fc$modularity)
 membership(fc)
 length(fc)
+sizes(fc)

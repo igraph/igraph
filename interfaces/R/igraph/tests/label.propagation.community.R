@@ -8,3 +8,4 @@ lpc
 lpc$modularity == modularity(g, lpc$membership)
 membership(lpc)
 length(lpc)
+sizes(lpc)

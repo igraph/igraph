@@ -7,3 +7,4 @@ lc
 lc$modularity == modularity(g, lc$membership)
 membership(lc)
 length(lc)
+sizes(lc)

@@ -32,4 +32,8 @@ Membership vector:
 [1] TRUE
 > length(oc)
 [1] 4
+> sizes(oc)
+m
+ 0  1  2  3 
+11  5 12  6 
 > 

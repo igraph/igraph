@@ -93,6 +93,14 @@ length.communities <- function(x) {
   max(m)+1
 }
 
+sizes <- function(x, ...)
+  UseMethod("sizes")
+
+sizes.communities <- function(x, ...) {
+  m <- membership(x)
+  table(m)
+}
+
 #####################################################################
 
 community.to.membership2 <- function(merges, vcount, steps) {

@@ -7,3 +7,4 @@ oc
 membership(oc)
 modularity(g, oc$membership) == oc$modularity
 length(oc)
+sizes(oc)
