@@ -962,15 +962,19 @@ igraph_community_walktrap:
 
 igraph_community_edge_betweenness:
         PARAMS: GRAPH graph, OUT VECTOR result, OUT VECTOR edge_betweenness, \
-                OUT MATRIX merges, OUT VECTOR bridges, BOOLEAN directed=True
+                OUT MATRIX merges, OUT VECTOR bridges, \
+                OUT VECTOR_OR_0 modularity, OUT VECTOR_OR_0 membership, \
+                BOOLEAN directed=True
         IGNORE: RR, RC, RNamespace
 
 igraph_community_eb_get_merges:
-        PARAMS: GRAPH graph, VECTOR edges, OUT MATRIX merges, OUT VECTOR bridges
+        PARAMS: GRAPH graph, VECTOR edges, OUT MATRIX merges, \
+                OUT VECTOR bridges, OUT VECTOR_OR_0 modularity, \
+                OUT VECTOR_OR_0 membership
         IGNORE: RR, RC, RNamespace
 
 igraph_community_fastgreedy:
-        PARAMS: GRAPH graph, VECTOR_OR_0 weights, OUT MATRIX merges, OUT VECTOR modularity
+        PARAMS: GRAPH graph, VECTOR_OR_0 weights, OUT MATRIX merges, OUT VECTOR modularity, OUT VECTOR_OR_0 membership
         IGNORE: RR, RC, RNamespace
 
 igraph_community_to_membership:
