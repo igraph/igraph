@@ -43,37 +43,37 @@ print.communities <- function(x, ...) {
   cat("Graph community structure calculated with the",
       x$algorithm, "algorithm\n")
   if (x$algorithm=="spinglass") {
-    cat("Number of communities:", max(x$membership)+1, "\n")
+    cat("Number of communities:", max(membership(x))+1, "\n")
     cat("Modularity:", modularity(x), "\n")
     cat("Membership vector:\n")
-    print(x$membership)    
+    print(membership(x))
   } else if (x$algorithm %in% c("walktrap", "edge betweenness",
                                 "fast greedy")) {
-    cat("Number of communities (best split):", max(x$membership)+1, "\n")
+    cat("Number of communities (best split):", max(membership(x))+1, "\n")
     cat("Modularity (best split):", modularity(x), "\n")
     cat("Membership vector:\n")
-    print(x$membership)
+    print(membership(x))
   } else if (x$algorithm %in% c("leading eigenvector",
                                 "leading eigenvector, naive")) {
-    cat("Number of communities (best split):", max(x$membership)+1, "\n")
+    cat("Number of communities (best split):", max(membership(x))+1, "\n")
     cat("Modularity (best split):", modularity(x), "\n")
     cat("Membership vector:\n")
-    print(x$membership)
+    print(membership(x))
   } else if (x$algorithm == "label propagation") {
-    cat("Number of communities:", max(x$membership)+1, "\n")
+    cat("Number of communities:", max(membership(x))+1, "\n")
     cat("Modularity:", modularity(x), "\n")
     cat("Membership vector:\n")
-    print(x$membership)
+    print(membership(x))
   } else if (x$algorithm == "multi level") {
-    cat("Number of communities (best split):", max(x$membership)+1, "\n")
+    cat("Number of communities (best split):", max(membership(x))+1, "\n")
     cat("Modularity (best split):", modularity(x), "\n")
     cat("Membership vector:\n")
-    print(x$membership)
+    print(membership(x))
   } else if (x$algorithm == "optimal") {
-    cat("Number of communities:", max(x$membership)+1, "\n")
+    cat("Number of communities:", max(membership(x))+1, "\n")
     cat("Modularity:", modularity(x), "\n")
     cat("Membership vector:\n")
-    print(x$membership)
+    print(membership(x))
   }    
 }
 
