@@ -216,6 +216,39 @@ as.dendrogram.communities <- function(object, hang=-1,
   z
 }
 
+cutat <- function(communities, no, steps) {
+
+  if (!inherits(communities, "communities")) {
+    stop("Not a community structure")
+  }
+  if (!is.hierarchical(communities)) {
+    stop("Not a hierarchical communitity structure")
+  }
+
+  if ((!missing(no) && !missing(steps)) ||
+      ( missing(no) &&  missing(steps))) {
+    stop("Please give either `no' or `steps' (but not both)")
+  }
+
+  if (!missing(steps)) {
+    mm <- merges(communities)
+    if (steps > nrow(mm)) {
+      warning("Cannot make that many steps")
+      steps <- nrow(mm)
+    }
+    community.to.membership2(mm, communities$vcount, steps)
+  } else {
+    mm <- merges(communities)
+    noc <- communities$vcount - nrow(mm) # final number of communities
+    if (no<noc) {
+      warning("Cannot have that few communities")
+      no=noc
+    }
+    steps <- communities$vcount-no
+    community.to.membership2(mm, communities$vcount, steps)    
+  }
+}
+
 #####################################################################
 
 community.to.membership2 <- function(merges, vcount, steps) {

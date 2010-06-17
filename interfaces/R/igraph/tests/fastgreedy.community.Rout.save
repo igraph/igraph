@@ -43,4 +43,7 @@ Community sizes
 'dendrogram' with 2 branches and 17 members total, at height 32 
 > d[[2]]
 'dendrogram' with 2 branches and 17 members total, at height 30 
+> m2 <- cutat(fc, no=3)
+> modularity(g, m2) == fc$modularity[length(fc$modularity)-2]
+[1] TRUE
 > 

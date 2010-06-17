@@ -12,3 +12,5 @@ d <- as.dendrogram(fc)
 d
 d[[1]]
 d[[2]]
+m2 <- cutat(fc, no=3)
+modularity(g, m2) == fc$modularity[length(fc$modularity)-2]

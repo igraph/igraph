@@ -64,7 +64,8 @@ export(edge.betweenness.community,
        edge.betweenness.community.merges, fastgreedy.community,
        community.to.membership)
 
-export(membership, modularity, sizes, algorithm, is.hierarchical, merges)
+export(membership, modularity, sizes, algorithm, is.hierarchical, merges,
+       cutat)
 
 S3method("membership", communities)
 S3method("print", communities)
