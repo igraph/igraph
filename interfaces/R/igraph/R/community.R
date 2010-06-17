@@ -108,6 +108,17 @@ algorithm.communities <- function(x, ...) {
   x$algorithm
 }
 
+merges <- function(x, ...)
+  UseMethod("merges")
+
+merges.communities <- function(x, ...) {
+  if (!is.null(x$merges)) {
+    x$merges
+  } else {
+    stop("Not a hierarchical community structure")
+  }
+}
+
 is.hierarchical <- function(x, ...)
   UseMethod("is.hierarchical")
 
