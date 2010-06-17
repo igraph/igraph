@@ -135,7 +135,7 @@ int igraph_i_community_eb_get_merges2(const igraph_t *graph,
       for (j=0; j<no_of_nodes; j++) {
 	if (VECTOR(mymembership)[j]==c1 ||
 	    VECTOR(mymembership)[j]==c2) {
-	  VECTOR(mymembership)[j]=no_of_nodes+midx+1;
+	  VECTOR(mymembership)[j]=no_of_nodes+midx;
 	}
       }
       
