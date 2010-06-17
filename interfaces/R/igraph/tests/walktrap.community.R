@@ -10,3 +10,7 @@ membership(wc)
 modularity(wc)
 length(wc)
 sizes(wc)
+d <- as.dendrogram(wc)
+d
+d[[1]]
+d[[2]]

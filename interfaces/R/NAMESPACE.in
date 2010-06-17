@@ -64,19 +64,18 @@ export(edge.betweenness.community,
        edge.betweenness.community.merges, fastgreedy.community,
        community.to.membership)
 
-export(membership, modularity, sizes)
+export(membership, modularity, sizes, algorithm, is.hierarchical)
 
 S3method("membership", communities)
 S3method("print", communities)
 S3method("modularity", communities)
 S3method("length", communities)
 S3method("sizes", communities)
+S3method("algorithm", communities)
+S3method("is.hierarchical", communities)
+S3method("as.dendrogram", communities)
 
 S3method("modularity", igraph)
-
-S3method("as.dendrogram", igraph.walktrap)
-S3method("as.dendrogram", igraph.ebc)
-S3method("as.dendrogram", igraph.eigenc)
 
 # conversion
 

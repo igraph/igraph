@@ -39,4 +39,11 @@ Membership vector:
 Community sizes
 0 1 2 3 4 
 9 7 9 4 5 
+> d <- as.dendrogram(wc)
+> d
+'dendrogram' with 2 branches and 34 members total, at height 33 
+> d[[1]]
+'dendrogram' with 2 branches and 20 members total, at height 31 
+> d[[2]]
+'dendrogram' with 2 branches and 14 members total, at height 32 
 > 

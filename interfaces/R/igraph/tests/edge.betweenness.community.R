@@ -8,3 +8,7 @@ ebc
 membership(ebc)
 length(ebc)
 sizes(ebc)
+d <- as.dendrogram(ebc)
+d
+d[[1]]
+d[[2]]
