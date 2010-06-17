@@ -53,6 +53,12 @@ print.communities <- function(x, ...) {
     cat("Modularity (best split):", x$modularity[mm], "\n")
     cat("Membership vector:\n")
     print(x$membership)
+  } else if (x$algorithm=="edge betweenness") {
+    mm <- which.max(x$modularity)
+    cat("Number of communities (best split):", max(x$membership)+1, "\n")
+    cat("Modularity (best split):", x$modularity[mm], "\n")
+    cat("Membership vector:\n")
+    print(x$membership)
   }
 }
 
@@ -248,7 +254,9 @@ edge.betweenness.community <- function(graph, directed=TRUE,
   if (labels && "name" %in% list.vertex.attributes(graph)) {
     res$labels <- V(graph)$name
   }
-  class(res) <- "igraph.ebc"
+  res$vcount <- vcount(graph)
+  res$algorithm <- "edge betweenness"
+  class(res) <- "communities"
   res
 }
 
