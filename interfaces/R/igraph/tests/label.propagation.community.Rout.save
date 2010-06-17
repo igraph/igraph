@@ -23,8 +23,8 @@ Type 'q()' to quit R.
 > lpc <- label.propagation.community(g)
 > lpc
 Graph community structure calculated with the label propagation algorithm
-Number of communities (best split): 3 
-Modularity (best split): 0.3744247 
+Number of communities: 3 
+Modularity: 0.3744247 
 Membership vector:
  [1] 0 0 1 0 2 2 2 0 1 1 2 0 0 0 1 1 2 0 1 0 1 0 1 1 1 1 1 1 1 1 1 1 1 1
 > lpc$modularity == modularity(g, lpc$membership)
