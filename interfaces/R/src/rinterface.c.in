@@ -7323,7 +7323,7 @@ SEXP R_igraph_community_to_membership2(SEXP pmerges, SEXP pvcount,
   
   R_igraph_after();
   
-  UNPROTECT(2);
+  UNPROTECT(1);
   return result;
 }
 
