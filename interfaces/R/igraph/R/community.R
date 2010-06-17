@@ -61,8 +61,8 @@ print.communities <- function(x, ...) {
     cat("Membership vector:\n")
     print(x$membership)
   } else if (x$algorithm == "label propagation") {
-    cat("Number of communities (best split):", max(x$membership)+1, "\n")
-    cat("Modularity (best split):", x$modularity, "\n")
+    cat("Number of communities:", max(x$membership)+1, "\n")
+    cat("Modularity:", x$modularity, "\n")
     cat("Membership vector:\n")
     print(x$membership)
   } else if (x$algorithm == "multi level") {
