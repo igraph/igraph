@@ -1927,6 +1927,9 @@ int igraph_le_community_to_membership(const igraph_matrix_t *merges,
  *   this makes sense only if you provided an initial state, otherwise
  *   this element will be ignored. Also note that vertices without labels
  *   cannot be fixed.
+ * \param modularity If not a null pointer, then it must be a pointer
+ *   to a real number. The modularity score of the detected community
+ *   structure is stored here.
  * \return Error code.
  * 
  * Time complexity: O(m+n)
@@ -1935,7 +1938,8 @@ int igraph_community_label_propagation(const igraph_t *graph,
                                        igraph_vector_t *membership,
                                        const igraph_vector_t *weights,
                                        const igraph_vector_t *initial,
-                                       igraph_vector_bool_t *fixed) {
+                                       igraph_vector_bool_t *fixed, 
+				       igraph_real_t *modularity) {
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   long int no_of_not_fixed_nodes=no_of_nodes;
@@ -2130,6 +2134,11 @@ int igraph_community_label_propagation(const igraph_t *graph,
     igraph_adjedgelist_destroy(&ael);
   else
     igraph_adjlist_destroy(&al);
+
+  if (modularity) {
+    IGRAPH_CHECK(igraph_modularity(graph, membership, modularity,
+				   weights));
+  }
 
   igraph_vector_destroy(&node_order);
   igraph_vector_destroy(&label_counters);
