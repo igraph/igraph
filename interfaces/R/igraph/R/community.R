@@ -47,13 +47,8 @@ print.communities <- function(x, ...) {
     cat("Modularity:", x$modularity, "\n")
     cat("Membership vector:\n")
     print(x$membership)    
-  } else if (x$algorithm=="walktrap") {
-    mm <- which.max(x$modularity)
-    cat("Number of communities (best split):", max(x$membership)+1, "\n")
-    cat("Modularity (best split):", x$modularity[mm], "\n")
-    cat("Membership vector:\n")
-    print(x$membership)
-  } else if (x$algorithm=="edge betweenness") {
+  } else if (x$algorithm %in% c("walktrap", "edge betweenness",
+                                "fast greedy")) {
     mm <- which.max(x$modularity)
     cat("Number of communities (best split):", max(x$membership)+1, "\n")
     cat("Modularity (best split):", x$modularity[mm], "\n")
@@ -362,7 +357,9 @@ fastgreedy.community <- function(graph, merges=TRUE, modularity=TRUE,
   res <- .Call("R_igraph_community_fastgreedy", graph, as.logical(merges),
                as.logical(modularity), as.logical(membership), weights,
                PACKAGE="igraph")
-  class(res) <- "igraph.fgc"
+  res$algorithm <- "fast greedy"
+  res$vcount <- vcount(graph)
+  class(res) <- "communities"
   res
 }
 
