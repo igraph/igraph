@@ -528,3 +528,10 @@ optimal.community <- function(graph, verbose=igraph.par("verbose")) {
   class(res) <- "communities"
   res
 }
+
+plot.communities <- function(communities, graph,
+                             colbar=rainbow(length(communities), ...) {
+
+  col <- colbar[membership(communities)+1]
+  plot(graph, vertex.color=col, ...)  
+}

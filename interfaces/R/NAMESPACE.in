@@ -76,6 +76,7 @@ S3method("algorithm", communities)
 S3method("is.hierarchical", communities)
 S3method("as.dendrogram", communities)
 S3method("merges", communities)
+S3method("plot", communities)
 
 S3method("modularity", igraph)
 
