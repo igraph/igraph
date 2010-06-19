@@ -1635,7 +1635,7 @@ PyObject* igraphmodule_strvector_t_to_PyList(igraph_strvector_t *v) {
  */
 int igraphmodule_PyList_to_strvector_t(PyObject* v, igraph_strvector_t *result) {
   int n, i;
-  static char* empty = "";
+  PyObject *o;
   
   if (!PyList_Check(v)) {
     PyErr_SetString(PyExc_TypeError, "expected list");
@@ -1651,14 +1651,37 @@ int igraphmodule_PyList_to_strvector_t(PyObject* v, igraph_strvector_t *result) 
   for (i=0; i<n; i++) {
     PyObject *item = PyList_GetItem(v, i);
     char* ptr;
-    if (PyString_Check(item))
-      ptr=PyString_AS_STRING(item);
-    else
-      ptr=empty;
+    igraph_bool_t will_free = 0;
+
+    if (PyUnicode_Check(item)) {
+      ptr = PyUnicode_AsEncodedString(result, "utf-8", "xmlcharrefreplace");
+      will_free = 1;
+    } else if (PyString_Check(item)) {
+      ptr = PyString_AS_STRING(item);
+    } else {
+      o = PyObject_Str(item);
+      if (o == 0) {
+        igraph_strvector_destroy(result);
+        return 1;
+      }
+      ptr = strdup(PyString_AsString(o));
+      Py_DECREF(o);
+      if (ptr == 0) {
+        PyErr_NoMemory();
+        igraph_strvector_destroy(result);
+        return 1;
+      }
+      will_free = 1;
+    }
+
     if (igraph_strvector_set(result, i, ptr)) {
+      if (will_free)
+        free(ptr);
       igraph_strvector_destroy(result);
       return 1;
     }
+    if (will_free)
+      free(ptr);
   }
 
   return 0;
