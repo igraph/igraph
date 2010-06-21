@@ -24,10 +24,7 @@
 # Community structure
 ###################################################################
 
-membership <- function(commmunities, ...)
-  UseMethod("membership")
-
-membership.communities <- function(communities, ...) {
+membership <- function(communities) {
   if (!is.null(communities$membership)) {
     return(communities$membership)
   } else if (!is.null(communities$merges) &&
@@ -80,9 +77,9 @@ print.communities <- function(x, ...) {
 modularity <- function(x, ...)
   UseMethod("modularity")
 
-modularity.communities <- function(communities, ...) {
-  if (!is.null(communities$modularity)) {
-    max(communities$modularity)
+modularity.communities <- function(x, ...) {
+  if (!is.null(x$modularity)) {
+    max(x$modularity)
   } else {
     stop("Modularity was not calculated")
   }
@@ -93,58 +90,40 @@ length.communities <- function(x) {
   max(m)+1
 }
 
-sizes <- function(x, ...)
-  UseMethod("sizes")
-
-sizes.communities <- function(x, ...) {
-  m <- membership(x)
+sizes <- function(communities) {
+  m <- membership(communities)
   table(`Community sizes`=m)
 }
 
-communities <- function(x, ...)
-  UseMethod("communities")
-
-communities.communities <- function(x, ...) {
-  m <- membership(x)
+communities <- function(communities) {
+  m <- membership(communities)
   tapply(seq_along(m), m, simplify=FALSE,
          function(x) x-1)
 }
 
-algorithm <- function(x, ...)
-  UseMethod("algorithm")
-
-algorithm.communities <- function(x, ...) {
-  x$algorithm
+algorithm <- function(communities) {
+  communities$algorithm
 }
 
-merges <- function(x, ...)
-  UseMethod("merges")
-
-merges.communities <- function(x, ...) {
-  if (!is.null(x$merges)) {
-    x$merges
+merges <- function(communities) {
+  if (!is.null(communities$merges)) {
+    communities$merges
   } else {
     stop("Not a hierarchical community structure")
   }
 }
 
-crossing <- function(x, y, ...)
-  UseMethod("crossing")
-
-crossing.communities <- function(x, y, ...) {
-  m <- membership(x)
-  el <- get.edgelist(y, names=FALSE)
+crossing <- function(communities, graph) {
+  m <- membership(communities)
+  el <- get.edgelist(graph, names=FALSE)
   cr <- m[el[,1]+1] != m[el[,2]+1]
   as.integer(cr)
 }
 
-is.hierarchical <- function(x, ...)
-  UseMethod("is.hierarchical")
-
-is.hierarchical.communities <- function(x, ...) {
-  if (algorithm(x) %in% c("walktrap", "edge betweenness", "fast greedy")) {
+is.hierarchical <- function(communities, ...) {
+  if (algorithm(communities) %in% c("walktrap", "edge betweenness", "fast greedy")) {
     TRUE
-  } else if (algorithm(x) %in% c("spinglass", "leading eigenvector",
+  } else if (algorithm(communities) %in% c("spinglass", "leading eigenvector",
                                  "leading eigenvector, naive",
                                  "label propagation", "multi level",
                                  "optimal")) {
@@ -548,15 +527,15 @@ optimal.community <- function(graph, verbose=igraph.par("verbose")) {
   res
 }
 
-plot.communities <- function(communities, graph,
-                             colbar=rainbow(length(communities)),
-                             col=colbar[membership(communities)+1],
-                             mark.groups=communities(communities),
+plot.communities <- function(x, y,
+                             colbar=rainbow(length(x)),
+                             col=colbar[membership(x)+1],
+                             mark.groups=communities(x),
                              layout=layout.fruchterman.reingold,
-                             edge.color=c("green", "red")[crossing(communities, graph)+1],
+                             edge.color=c("green", "red")[crossing(x,y)+1],
                              ...) {
 
-  plot(graph, vertex.color=col, mark.groups=mark.groups,
+  plot(y, vertex.color=col, mark.groups=mark.groups,
        layout=layout, edge.color=edge.color,
        ...)  
 }
