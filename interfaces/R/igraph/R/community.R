@@ -101,6 +101,15 @@ sizes.communities <- function(x, ...) {
   table(`Community sizes`=m)
 }
 
+communities <- function(x, ...)
+  UseMethod("communities")
+
+communities.communities <- function(x, ...) {
+  m <- membership(x)
+  tapply(seq_along(m), m, simplify=FALSE,
+         function(x) x-1)
+}
+
 algorithm <- function(x, ...)
   UseMethod("algorithm")
 

@@ -65,7 +65,7 @@ export(edge.betweenness.community,
        community.to.membership)
 
 export(membership, modularity, sizes, algorithm, is.hierarchical, merges,
-       cutat)
+       cutat, communities)
 
 S3method("membership", communities)
 S3method("print", communities)
@@ -77,6 +77,7 @@ S3method("is.hierarchical", communities)
 S3method("as.dendrogram", communities)
 S3method("merges", communities)
 S3method("plot", communities)
+S3method("communities", communities)
 
 S3method("modularity", igraph)
 
