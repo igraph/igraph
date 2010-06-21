@@ -991,7 +991,7 @@ igraph_modularity:
         PARAMS: GRAPH graph, VECTOR membership, OUT REALPTR modularity, \
                 IN VECTOR_OR_0 weights=NULL
         NAME-R: modularity.igraph
-        IGNORE: RNamespace
+        IGNORE: RNamespace, RR
 
 igraph_reindex_membership:
         PARAMS: INOUT VECTOR membership, OUT VECTOR_OR_0 new_to_old

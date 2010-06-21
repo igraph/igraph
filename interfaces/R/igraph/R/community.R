@@ -77,6 +77,19 @@ print.communities <- function(x, ...) {
 modularity <- function(x, ...)
   UseMethod("modularity")
 
+modularity.igraph <- function(x, membership, weights=NULL, ...) {
+  # Argument checks
+  if (!is.igraph(x)) { stop("Not a graph object") }
+  membership <- as.numeric(membership)
+  if (!is.null(weights)) weights <- as.numeric(weights)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_modularity", x, membership, weights,
+        PACKAGE="igraph")
+  res
+}
+
 modularity.communities <- function(x, ...) {
   if (!is.null(x$modularity)) {
     max(x$modularity)
