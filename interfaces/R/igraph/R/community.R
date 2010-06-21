@@ -539,8 +539,13 @@ optimal.community <- function(graph, verbose=igraph.par("verbose")) {
 }
 
 plot.communities <- function(communities, graph,
-                             colbar=rainbow(length(communities)), ...) {
+                             colbar=rainbow(length(communities)),
+                             col=colbar[membership(communities)+1],
+                             mark.groups=communities(communities),
+                             layout=layout.fruchterman.reingold,
+                             ...) {
 
-  col <- colbar[membership(communities)+1]
-  plot(graph, vertex.color=col, ...)  
+  plot(graph, vertex.color=col, mark.groups=mark.groups,
+       layout=layout,
+       ...)  
 }
