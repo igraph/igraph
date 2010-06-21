@@ -128,6 +128,16 @@ merges.communities <- function(x, ...) {
   }
 }
 
+crossing <- function(x, y, ...)
+  UseMethod("crossing")
+
+crossing.communities <- function(x, y, ...) {
+  m <- membership(x)
+  el <- get.edgelist(y, names=FALSE)
+  cr <- m[el[,1]+1] != m[el[,2]+1]
+  as.integer(cr)
+}
+
 is.hierarchical <- function(x, ...)
   UseMethod("is.hierarchical")
 
@@ -543,9 +553,10 @@ plot.communities <- function(communities, graph,
                              col=colbar[membership(communities)+1],
                              mark.groups=communities(communities),
                              layout=layout.fruchterman.reingold,
+                             edge.color=c("green", "red")[crossing(communities, graph)+1],
                              ...) {
 
   plot(graph, vertex.color=col, mark.groups=mark.groups,
-       layout=layout,
+       layout=layout, edge.color=edge.color,
        ...)  
 }
