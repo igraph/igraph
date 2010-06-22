@@ -36,7 +36,7 @@ bipartite.projection <- function(graph, types=NULL,
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
-  res <- .Call("R_igraph_bipartite_projection", graph, types, probe1,
+  res <- .Call("R_igraph_bipartite_projection", graph, types, probe1-1,
         PACKAGE="igraph")
   if (multiplicity) {
     E(res[[1]])$weight <- res[[3]]

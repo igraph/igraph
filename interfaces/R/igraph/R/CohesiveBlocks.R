@@ -278,7 +278,7 @@ cohesive.blocks <- function(graph, db=NULL,
     for(v in V(tree)){
         p <- find.cohesive.parents(V(tree)[v]$branchId, cBlocks$branchId, subBranches)
         e <- rep(v, times=2*length(p))
-        e[(1:length(p))*2-1] <- V(tree)[match(p, V(tree)$branchId)-1]
+        e[(1:length(p))*2-1] <- V(tree)[match(p, V(tree)$branchId)]
         tree <- add.edges(tree, e)
     }
     
@@ -413,7 +413,7 @@ kComponents <- function(g, k=NULL, useHeuristic=TRUE, verbose=igraph.par("verbos
     if(length(cs)==0){## not connected
         cls <- clusters(g)
         for(cl in unique(cls$membership)){
-            theseBlocks <- c(theseBlocks, list(V(subgraph(g, which(cls$membership==cl)-1))$csid))
+            theseBlocks <- c(theseBlocks, list(V(subgraph(g, which(cls$membership==cl)))$csid))
         }
         return(theseBlocks)
     }
@@ -422,7 +422,7 @@ kComponents <- function(g, k=NULL, useHeuristic=TRUE, verbose=igraph.par("verbos
         gprime <- subgraph(g, V(g)[!(V(g) %in% thisCS)])
         gclusts <- clusters(gprime)
         for(i in ((1:length(gclusts$csize))-1)){
-            theseIDs <- V(gprime)[V(gprime) %in% (which(gclusts$membership==i)-1)]$csid
+            theseIDs <- V(gprime)[V(gprime) %in% (which(gclusts$membership==i))]$csid
             thisBlockBig <- list(sort(c(theseIDs, thisCS)))
             if(!(thisBlockBig %in% theseBlocks) && length(theseIDs)>0){
                 theseBlocks <- c(theseBlocks, thisBlockBig)
@@ -445,7 +445,7 @@ etReduction <- function(g){
     el2[, 2] <- el2[, 2] + vcount(g)
     el2 <- el2[, 2:1]
     el2 <- as.numeric(t(el2)) ## v' -> u'' edges (external)
-    el3 <- as.numeric(rbind(0:(vcount(g)-1), vcount(g):(2*vcount(g)-1))) ## v' -> v'' edges (internal)
+    el3 <- as.numeric(rbind(1:vcount(g), (vcount(g)+1):(2*vcount(g)))) ## v' -> v'' edges (internal)
     
     G <- add.edges(G, c(el1, el2), capacity=Inf) ## (external)
     G <- add.edges(G, el3, capacity=1) ## (internal)
@@ -634,11 +634,11 @@ plot.bgraph <- function(x, mc=NULL, vertex.size=3, colpal=NULL, emph=NULL, ...){
         }
     }
     
-    plot.igraph(g, vertex.size=vertex.size, vertex.color=mc+1,
+    plot.igraph(g, vertex.size=vertex.size, vertex.color=mc,
                 vertex.frame.color=bord, vertex.label.color="white", ...)
 
     tree <- get.graph.attribute(g, "tree")
-    r <- which.min(V(tree)$cohesion)-1
+    r <- which.min(V(tree)$cohesion)
     l <- layout.reingold.tilford(tree, root=r)
     l[, 2] <- -l[, 2]
     V(tree)$label <- V(tree)$cohesion
@@ -813,7 +813,7 @@ kCutsets <- function(g, k=NULL, cl=NULL){
                 cmp <- comp[[i]]
                 thisres <- list()
                 for(cn in l){
-                    thisres <- unique(c(thisres, list(unique(sort((which(cmp$membership %in% cn)-1) %% vcount(g))))))
+                    thisres <- unique(c(thisres, list(unique(sort((which(cmp$membership %in% cn)) %% vcount(g))))))
                 }
                 return(thisres)
             }
@@ -851,7 +851,7 @@ kCutsets <- function(g, k=NULL, cl=NULL){
                 cmp <- comp[[i]]
                 thisres <- list()
                 for(cn in l){
-                    thisres <- unique(c(thisres, list(unique(sort((which(cmp$membership %in% cn)-1) %% vcount(g))))))
+                    thisres <- unique(c(thisres, list(unique(sort((which(cmp$membership %in% cn)) %% vcount(g))))))
                 }
                 return(thisres)
             }
@@ -884,7 +884,7 @@ graph.shrink <- function(g, comp=clusters(g, mode="strong"), remove.multiple=TRU
     gc()
     res <- graph.empty(length(comp$csize), directed=TRUE)
     el <- get.edgelist(g)
-    el.comp <- rbind(comp$membership[el[, 1]+1], comp$membership[el[, 2]+1])
+    el.comp <- rbind(comp$membership[el[, 1]], comp$membership[el[, 2]])
     res <- add.edges(res, el.comp)
     res <- simplify(res, remove.multiple=remove.multiple, remove.loops=remove.loops)
     return(res)
@@ -914,7 +914,7 @@ graph.antichains <- function(g, cl=NULL){ ## g must be a directed acyclic graph 
             newchains <- combn(1:acount, 2, 
                 function(x){
                     thisChain <- unique(unlist(res[x]))
-                    if(all(adj[thisChain+1, thisChain+1]==0)) return(sort(thisChain))
+                    if(all(adj[thisChain, thisChain]==0)) return(sort(thisChain))
                     return(NA)
                 }, simplify=FALSE)
         } else {
@@ -922,7 +922,7 @@ graph.antichains <- function(g, cl=NULL){ ## g must be a directed acyclic graph 
             newchains <- parLapply(cl, cn, 
                 function(x){
                     thisChain <- unique(unlist(res[x]))
-                    if(all(adj[thisChain+1, thisChain+1]==0)) return(sort(thisChain))
+                    if(all(adj[thisChain, thisChain]==0)) return(sort(thisChain))
                     return(NA)
                 }, simplify=FALSE)
         }

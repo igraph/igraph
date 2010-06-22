@@ -110,7 +110,7 @@ degree <- function(graph, v=V(graph),
   mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_degree", graph, as.igraph.vs(graph, v), as.numeric(mode),
+  .Call("R_igraph_degree", graph, as.igraph.vs(graph, v)-1, as.numeric(mode),
         as.logical(loops), PACKAGE="igraph")
 }
   
@@ -163,8 +163,8 @@ shortest.paths <- function(graph, v=V(graph), to=V(graph),
   }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_shortest_paths", graph, as.igraph.vs(graph, v),
-        as.igraph.vs(graph, to), as.numeric(mode), weights, as.numeric(algorithm),
+  .Call("R_igraph_shortest_paths", graph, as.igraph.vs(graph, v)-1,
+        as.igraph.vs(graph, to)-1, as.numeric(mode), weights, as.numeric(algorithm),
         PACKAGE="igraph")
 }
 
@@ -193,10 +193,10 @@ get.shortest.paths <- function(graph, from, to=V(graph),
     }
   }
   
-  to <- as.igraph.vs(graph, to)
+  to <- as.igraph.vs(graph, to)-1
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_get_shortest_paths", graph,
-        as.igraph.vs(graph, from), to, as.numeric(mode), as.numeric(length(to)),
+        as.igraph.vs(graph, from)-1, to, as.numeric(mode), as.numeric(length(to)),
         weights, as.numeric(output), PACKAGE="igraph")
 }
 
@@ -212,7 +212,7 @@ get.all.shortest.paths <- function(graph, from,
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_get_all_shortest_paths", graph,
-        as.numeric(from), as.igraph.vs(graph, to), as.numeric(mode),
+        as.numeric(from)-1, as.igraph.vs(graph, to)-1, as.numeric(mode),
         PACKAGE="igraph")
 }
 
@@ -494,7 +494,7 @@ bonpow.dense <- function(graph, nodes=V(graph),
   } else {
     ev <- ev*sqrt(n/sum((ev)^2))
   } 
-  ev[as.numeric(nodes)+1]
+  ev[as.numeric(nodes)]
 }
 
 bonpow.sparse <- function(graph, nodes=V(graph), loops=FALSE,
@@ -522,7 +522,7 @@ bonpow.sparse <- function(graph, nodes=V(graph), loops=FALSE,
     ev <- ev * sqrt(vcount(graph)/sum((ev)^2))
   }
 
-  ev[as.numeric(nodes) + 1]
+  ev[as.numeric(nodes)]
 }
 
 bonpow <- function(graph, nodes=V(graph),
@@ -573,7 +573,7 @@ alpha.centrality.dense <- function(graph, nodes=V(graph), alpha=1,
   diag(id) <- 1
   
   ev <- solve(id-alpha*d, tol=tol) %*% exo
-  ev[as.numeric(nodes)+1]
+  ev[as.numeric(nodes)]
 }
 
 alpha.centrality.sparse <- function(graph, nodes=V(graph), alpha=1,
@@ -616,7 +616,7 @@ alpha.centrality.sparse <- function(graph, nodes=V(graph), alpha=1,
   M3 <- M2-alpha*M
   r <- solve(M3, tol=tol, exo)
   
-  r[ as.numeric(nodes)+1]
+  r[ as.numeric(nodes)]
 }
 
 alpha.centrality <- function(graph, nodes=V(graph), alpha=1,
@@ -656,7 +656,7 @@ neighborhood.size <- function(graph, order, nodes=V(graph),
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_neighborhood_size", graph, 
-        as.igraph.vs(graph, nodes), as.numeric(order), as.numeric(mode),
+        as.igraph.vs(graph, nodes)-1, as.numeric(order), as.numeric(mode),
         PACKAGE="igraph")
 }
 
@@ -670,7 +670,7 @@ neighborhood <- function(graph, order, nodes=V(graph), mode=c("all", "out", "in"
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_neighborhood", graph, 
-        as.igraph.vs(graph, nodes), as.numeric(order), as.numeric(mode),
+        as.igraph.vs(graph, nodes)-1, as.numeric(order), as.numeric(mode),
         PACKAGE="igraph")
 }
 
@@ -685,7 +685,7 @@ graph.neighborhood <- function(graph, order, nodes=V(graph),
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_neighborhood_graphs", graph, 
-        as.igraph.vs(graph, nodes), as.numeric(order), as.numeric(mode),
+        as.igraph.vs(graph, nodes)-1, as.numeric(order), as.numeric(mode),
         PACKAGE="igraph")
 }
 
@@ -731,7 +731,7 @@ is.loop <- function(graph, eids=E(graph)) {
     stop("Not a graph object");
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_is_loop", graph, as.igraph.es(eids),
+  .Call("R_igraph_is_loop", graph, as.igraph.es(eids)-1,
         PACKAGE="igraph")
 }
 
@@ -741,7 +741,7 @@ is.multiple <- function(graph, eids=E(graph)) {
     stop("Not a graph object");
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_is_multiple", graph, as.igraph.es(eids),
+  .Call("R_igraph_is_multiple", graph, as.igraph.es(eids)-1,
         PACKAGE="igraph")
 }
 
@@ -751,7 +751,7 @@ count.multiple <- function(graph, eids=E(graph)) {
     stop("Not a graph object");
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_count_multiple", graph, as.igraph.es(eids),
+  .Call("R_igraph_count_multiple", graph, as.igraph.es(eids)-1,
         PACKAGE="igraph")
 }
 
@@ -764,7 +764,7 @@ graph.bfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
     stop("Not a graph object");
   }
 
-  root <- as.igraph.vs(graph, root)
+  root <- as.igraph.vs(graph, root)-1
   neimode <- switch(igraph.match.arg(neimode),
                     "out"=1, "in"=2, "all"=3, "total"=3)
   if (!is.null(callback)) { callback <- as.function(callback) }
@@ -787,7 +787,7 @@ graph.dfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
     stop("Not a graph object");
   }
 
-  root <- as.igraph.vs(graph, root)
+  root <- as.igraph.vs(graph, root)-1
   neimode <- switch(igraph.match.arg(neimode),
                     "out"=1, "in"=2, "all"=3, "total"=3)
   if (!is.null(in.callback)) { in.callback <- as.function(in.callback) }
@@ -820,7 +820,7 @@ edge.betweenness <- function(graph, e=E(graph),
   # Function call
   res <- .Call("R_igraph_edge_betweenness", graph, directed, weights,
         PACKAGE="igraph")
-  res[as.numeric(e)+1]
+  res[as.numeric(e)]
 }
 
 edge.betweenness.estimate <- function(graph, e=E(graph),
@@ -843,5 +843,5 @@ edge.betweenness.estimate <- function(graph, e=E(graph),
   # Function call
   res <- .Call("R_igraph_edge_betweenness_estimate", graph, directed, cutoff, weights,
         PACKAGE="igraph")
-  res[as.numeric(e)+1]
+  res[as.numeric(e)]
 }

@@ -43,12 +43,12 @@ get.edge <- function(graph, id) {
   id <- as.numeric(id)
   ec <- ecount(graph)
   
-  if (id < 0 || id >= ec) {
+  if (id < 1 || id > ec) {
     stop("No such edge")
   }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_get_edge", graph, as.numeric(id),
+  .Call("R_igraph_get_edge", graph, as.numeric(id)-1,
         PACKAGE="igraph")
 }
 
