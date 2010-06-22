@@ -84,9 +84,9 @@ with four (new) graph attributes:
 \examples{
 ## Create a graph with an interesting structure:
 g <- graph.disjoint.union(graph.full(4), graph.empty(2,directed=FALSE))
-g <- add.edges(g,c(3,4,4,5,4,2))
+g <- add.edges(g,c(4,5,5,6,5,3))
 g <- graph.disjoint.union(g,g,g)
-g <- add.edges(g,c(0,6,1,7,0,12,4,0,4,1))
+g <- add.edges(g,c(1,7,2,8,1,13,5,1,5,2))
 
 ## Find cohesive blocks:
 gBlocks <- cohesive.blocks(g)

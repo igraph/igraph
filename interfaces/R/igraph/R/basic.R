@@ -48,8 +48,9 @@ get.edge <- function(graph, id) {
   }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_get_edge", graph, as.numeric(id)-1,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_get_edge", graph, as.numeric(id)-1,
+               PACKAGE="igraph")
+  res+1
 }
 
 

@@ -123,9 +123,10 @@ neighbors <- function(graph, v, mode=1) {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_neighbors", graph, as.igraph.vs(graph, v)-1,
-        as.numeric(mode),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_neighbors", graph, as.igraph.vs(graph, v)-1,
+               as.numeric(mode),
+               PACKAGE="igraph")
+  res+1
 }
 
 is.directed <- function(graph) {
@@ -144,5 +145,5 @@ get.edges <- function(graph, es) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_edges", graph, as.igraph.es(es)-1,
                PACKAGE="igraph")
-  matrix(res, nc=2, byrow=TRUE)
+  matrix(res, nc=2, byrow=TRUE)+1
 }

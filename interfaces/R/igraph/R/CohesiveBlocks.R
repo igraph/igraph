@@ -200,6 +200,7 @@ cohesive.blocks <- function(graph, db=NULL,
             
             ## assign appropriate branchIds
             branchIds <- as.numeric(rep(NA, length(kcomp)))
+            browser()
             isNew <- rep(TRUE, length(kcomp))
             if(nrow(searched)>0){
                 branchIds[ind <- match(searched$membershipHash, theseHashes)] <- searched$branchId
@@ -421,7 +422,7 @@ kComponents <- function(g, k=NULL, useHeuristic=TRUE, verbose=igraph.par("verbos
         if(is.list(thisCS)){thisCS <- unlist(thisCS)}
         gprime <- subgraph(g, V(g)[!(V(g) %in% thisCS)])
         gclusts <- clusters(gprime)
-        for(i in ((1:length(gclusts$csize))-1)){
+        for(i in ((1:length(gclusts$csize)))){
             theseIDs <- V(gprime)[V(gprime) %in% (which(gclusts$membership==i))]$csid
             thisBlockBig <- list(sort(c(theseIDs, thisCS)))
             if(!(thisBlockBig %in% theseBlocks) && length(theseIDs)>0){

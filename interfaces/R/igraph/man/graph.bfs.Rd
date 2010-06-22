@@ -65,9 +65,9 @@ graph.bfs (graph, root, neimode = c("out", "in", "all", "total"),
   \item{father}{Numeric vector. The father of each vertex, i.e. the
     vertex it was discovered from.}
   \item{pred}{Numeric vector. The previously visited vertex for each
-    vertex, or -1 if there was no such vertex.}
+    vertex, or 0 if there was no such vertex.}
   \item{succ}{Numeric vector. The next vertex that was visited after the
-    current one, or -1 if there was no such vertex.}
+    current one, or 0 if there was no such vertex.}
   \item{dist}{Numeric vector, for each vertex its distance from the root
     of the search tree.}
   
@@ -81,7 +81,7 @@ graph.bfs (graph, root, neimode = c("out", "in", "all", "total"),
 \seealso{ \code{\link{graph.dfs}} for depth-first search.}
 \examples{
 ## Two rings
-graph.bfs(graph.ring(10) \%du\% graph.ring(10), 0, "out",
+graph.bfs(graph.ring(10) \%du\% graph.ring(10), root=1, "out",
           TRUE, TRUE, TRUE, TRUE, TRUE, TRUE)
 
 ## How to use a callback
@@ -89,7 +89,7 @@ f <- function(graph, data, extra) {
   print(data)
   FALSE
 }
-tmp <- graph.bfs(graph.ring(10) \%du\% graph.ring(10), 0, "out",
+tmp <- graph.bfs(graph.ring(10) \%du\% graph.ring(10), root=1, "out",
                  callback=f)
 
 ## How to use a callback to stop the search
@@ -97,7 +97,7 @@ tmp <- graph.bfs(graph.ring(10) \%du\% graph.ring(10), 0, "out",
 f <- function(graph, data, extra) {
  data['succ'] == -1
 }
-graph.bfs(graph.ring(10) \%du\% graph.ring(10), 0, callback=f)
+graph.bfs(graph.ring(10) \%du\% graph.ring(10), root=1, callback=f)
 
 }
 \keyword{graphs}

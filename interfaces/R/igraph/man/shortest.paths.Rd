@@ -146,13 +146,13 @@ path.length.hist (graph, directed = TRUE, verbose = igraph.par("verbose"))
 g <- graph.ring(10)
 shortest.paths(g)
 get.shortest.paths(g, 5)
-get.all.shortest.paths(g, 0, 5:7)
+get.all.shortest.paths(g, 1, 6:8)
 average.path.length(g)
 ## Weighted shortest paths
 el <- matrix(nc=3, byrow=TRUE,
-             c(0,1,0, 0,2,2, 0,3,1, 1,2,0, 1,4,5, 1,5,2, 2,1,1, 2,3,1,
-               2,6,1, 3,2,0, 3,6,2, 4,5,2, 4,7,8, 5,2,2, 5,6,1, 5,8,1,
-               5,9,3, 7,5,1, 7,8,1, 8,9,4) )
+             c(1,2,0, 1,3,2, 1,4,1, 2,3,0, 2,5,5, 2,6,2, 3,2,1, 3,4,1,
+               3,7,1, 4,3,0, 4,7,2, 5,6,2, 5,8,8, 6,3,2, 6,7,1, 6,9,1,
+               6,10,3, 8,6,1, 8,9,1, 9,10,4) )
 g2 <- add.edges(graph.empty(10), t(el[,1:2]), weight=el[,3])
 shortest.paths(g2, mode="out")
 }
