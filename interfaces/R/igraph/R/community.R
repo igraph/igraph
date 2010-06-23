@@ -71,7 +71,8 @@ print.communities <- function(x, ...) {
     cat("Modularity:", modularity(x), "\n")
     cat("Membership vector:\n")
     print(membership(x))
-  }    
+  }
+  invisible(x)
 }
 
 modularity <- function(x, ...)
