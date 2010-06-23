@@ -6,15 +6,16 @@
   graph into subgraphs.
 }
 \usage{
-modularity(graph, membership, weights = NULL)
+\method{igraph}{modularity}(x, membership, weights = NULL)
 }
 \arguments{
-  \item{graph}{The input graph.}
+  \item{x}{The input graph.}
   \item{membership}{Numeric vector, for each vertex it gives its
     community. The communities are numbered from zero.
   }
   \item{weights}{If not \code{NULL} then a numeric vector giving edge
     weights.}
+  \item{\dots}{Additional arguments, none currently.}
 }
 \details{
   The modularity of a graph with respect to some division (or vertex

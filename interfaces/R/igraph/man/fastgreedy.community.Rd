@@ -9,13 +9,16 @@
 }
 \usage{
 fastgreedy.community(graph, merges=TRUE, modularity=TRUE,
-      weights=E(graph)$weight)
+      membership=TRUE, weights=E(graph)$weight)
 }
 \arguments{
   \item{graph}{The input graph}
   \item{merges}{Logical scalar, whether to return the merge matrix.}
-  \item{modularity}{Logcal scalar, whether to return a vector containing
+  \item{modularity}{Logical scalar, whether to return a vector containing
     the modularity after each merge.}
+  \item{membership}{Logical scalar, whether to calculate the membership
+    vector corresponding to the maximum modularity score, considering
+    all possible community structures along the merges.}
   \item{weights}{If not \code{NULL}, then a numeric vector of edge
     weights. The length must match the number of edges in the graph.
     By default the \sQuote{\code{weight}} edge attribute is used as

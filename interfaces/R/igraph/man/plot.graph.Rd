@@ -7,7 +7,11 @@
   function.}
 \usage{
 plot.igraph(x, axes=FALSE, xlab="", ylab="", add=FALSE,
-      xlim=c(-1,1), ylim=c(-1,1), main="", sub="", \dots)
+      xlim=c(-1,1), ylim=c(-1,1), main="", sub="",
+      mark.groups=list(), mark.shape=1/2, mark.border=NA,
+      mark.col=rainbow(length(mark.groups), alpha=0.3),
+      mark.expand=15, 
+      \dots)
 }
 \arguments{
   \item{x}{The graph to plot.}
@@ -23,6 +27,26 @@ plot.igraph(x, axes=FALSE, xlab="", ylab="", add=FALSE,
     want to modify this.}
   \item{main}{Main title.}
   \item{sub}{Subtitle.}
+  \item{mark.groups}{A list of vertex id vectors. It is interpreted as a
+    set of vertex groups. Each vertex group is highlighted, by plotting
+    a colored smoothed polygon around and \dQuote{under} it. See the
+    arguments below to control the look of the polygons.}
+  \item{mark.shape}{A numeric scalar or vector. Controls the smoothness
+    of the vertex group marking polygons. This is basically the \sQuote{shape}
+    parameter of the \code{\link[graphics]{xspline}} function, its
+    possible values are between -1 and 1. If it is a vector, then a
+    different value is used for the different vertex groups.}
+  \item{mark.border}{A scalar or vector giving the colors of the borders
+    of the vertex group marking polygons. If it is \code{NA}, then no
+    border is drawn.}
+  \item{mark.col}{A scalar or vector giving the colors of marking the
+    polygons, in any format accepted by
+    \code{\link[graphics]{xspline}}; e.g. numeric color ids, symbolic
+    color names, or colors in RGB.}
+  \item{mark.expand}{A numeric scalar or vector, the size of the border
+    around the marked vertex groups. It is in the same units as the vertex
+    sizes. If a vector is given, then different values are used for the
+    different vertex groups.} 
   \item{\dots}{Additional arguments, passed to \code{\link{plot}}.}
 }
 \details{

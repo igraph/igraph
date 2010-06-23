@@ -9,7 +9,7 @@
 \usage{
 edge.betweenness.community (graph, directed = TRUE,
     edge.betweenness = TRUE, merges = TRUE, bridges = TRUE,
-    labels = TRUE)
+    labels = TRUE, modularity = TRUE, membership = TRUE)
 }
 \arguments{
   \item{graph}{The graph to analyze.}
@@ -38,9 +38,12 @@ edge.betweenness.community (graph, directed = TRUE,
     vertices in the result. More precisely, if the graph has a vertex
     attribute valled \sQuote{name}, it will be part of the result
     object.}
-  \item{edges}{Numeric vector, the ids of the edges to be removed from a
-    graph, all edges should be present in the vector, their order
-    specifies the order of removal.}
+  \item{modularity}{Logical constant, whether to calculate the
+    maximum modularity score, considering all possibly community
+    structures along the edge-betweenness based edge removals.}
+  \item{membership}{Logical constant, whether to calculate the
+    membership vector corresponding to the highest possible modularity
+    score.}
 }
 \details{
   The edge betweenness score of an edge measures the number of shortest
