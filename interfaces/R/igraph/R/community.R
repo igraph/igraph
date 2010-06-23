@@ -133,7 +133,7 @@ crossing <- function(communities, graph) {
   as.integer(cr)
 }
 
-is.hierarchical <- function(communities, ...) {
+is.hierarchical <- function(communities) {
   if (algorithm(communities) %in% c("walktrap", "edge betweenness", "fast greedy")) {
     TRUE
   } else if (algorithm(communities) %in% c("spinglass", "leading eigenvector",
