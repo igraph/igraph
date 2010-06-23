@@ -1,5 +1,4 @@
-\name{communities}
-\alias{communities}
+\name{community.to.membership}
 \alias{community.to.membership}
 \concept{Community structure}
 \title{Common functions supporting community detection algorithms}
