@@ -337,6 +337,12 @@ igraph_get_shortest_paths_dijkstra:
                 EDGEWEIGHTS weights=NULL, NEIMODE mode=ALL
         IGNORE: RR, RC, RNamespace
 
+igraph_get_all_shortest_paths_dijkstra:
+        PARAMS: GRAPH graph, OUT VECTORLIST res, OUT VECTOR nrgeo, \
+                INTEGER from, VERTEXSET to=ALL, EDGEWEIGHTS weights, \
+				NEIMODE mode=OUT
+        IGNORE: RR, RC, RNamespace
+
 igraph_shortest_paths_bellman_ford:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, \
                 VERTEXSET to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT

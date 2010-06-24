@@ -21,6 +21,7 @@
 <!-- doxrox-include igraph_get_shortest_paths -->
 <!-- doxrox-include igraph_get_shortest_paths_dijkstra -->
 <!-- doxrox-include igraph_get_all_shortest_paths -->
+<!-- doxrox-include igraph_get_all_shortest_paths_dijkstra -->
 <!-- doxrox-include igraph_average_path_length -->
 <!-- doxrox-include igraph_path_length_hist -->
 <!-- doxrox-include igraph_diameter -->
