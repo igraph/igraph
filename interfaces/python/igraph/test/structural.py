@@ -372,7 +372,6 @@ class PathTests(unittest.TestCase):
         g = Graph([(0,1), (1,2), (0,2)])
         g.es["weight"] = [0.5, 0.5, 1]
         sps = sorted(g.get_all_shortest_paths(0, weights="weight"))
-        print sps
         self.failUnless(sps == [[0], [0,1], [0,1,2], [0,2]])
 
         g = Graph.Lattice([4, 4], circular=False)
