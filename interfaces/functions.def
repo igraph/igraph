@@ -419,7 +419,8 @@ igraph_rewire:
 
 igraph_induced_subgraph:
         PARAMS: GRAPH graph, OUT GRAPH res, VERTEXSET vids, SUBGRAPH_IMPL impl=AUTO
-        IGNORE: RR, RC, RNamespace
+        DEPS: vids ON graph
+        NAME-R: induced.subgraph
 
 igraph_subgraph:
         PARAMS: GRAPH graph, OUT GRAPH res, VERTEXSET vids
