@@ -369,6 +369,21 @@ class PathTests(unittest.TestCase):
         sps = sorted(g.get_all_shortest_paths(0, [0, 202]))
         self.failUnless(sps == [[0]] + expected)
 
+        g = Graph([(0,1), (1,2), (0,2)])
+        g.es["weight"] = [0.5, 0.5, 1]
+        sps = sorted(g.get_all_shortest_paths(0, weights="weight"))
+        print sps
+        self.failUnless(sps == [[0], [0,1], [0,1,2], [0,2]])
+
+        g = Graph.Lattice([4, 4], circular=False)
+        g.es["weight"] = 1
+        g.es[2,8]["weight"] = 100
+        sps = sorted(g.get_all_shortest_paths(0, [3, 12, 15], weights="weight"))
+        self.failUnless(len(sps) == 20)
+        self.failUnless(sum(1 for path in sps if path[-1] == 3) == 4)
+        self.failUnless(sum(1 for path in sps if path[-1] == 12) == 4)
+        self.failUnless(sum(1 for path in sps if path[-1] == 15) == 12)
+
 
     def testPathLengthHist(self):
         g = Graph.Tree(15, 2)

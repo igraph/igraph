@@ -3811,15 +3811,17 @@ PyObject *igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *
                                                     self, PyObject * args,
                                                     PyObject * kwds)
 {
-  static char *kwlist[] = { "v", "to", "mode", NULL };
+  static char *kwlist[] = { "v", "to", "weights", "mode", NULL };
   igraph_vector_ptr_t res;
+  igraph_vector_t *weights = 0;
   igraph_neimode_t mode = IGRAPH_OUT;
   long from0, i, j, k;
   igraph_integer_t from;
   igraph_vs_t to;
-  PyObject *list, *item, *mode_o=Py_None, *to_o=Py_None;
+  PyObject *list, *item, *mode_o=Py_None, *to_o=Py_None, *weights_o=Py_None;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|OO", kwlist, &from0, &to_o, &mode_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|OOO", kwlist, &from0,
+        &to_o, &weights_o, &mode_o))
     return NULL;
 
   if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
@@ -3828,17 +3830,24 @@ PyObject *igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *
 
   from = (igraph_integer_t) from0;
 
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+      ATTRIBUTE_TYPE_EDGE)) return NULL;
+
   if (igraph_vector_ptr_init(&res, 1)) {
     igraphmodule_handle_igraph_error();
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
     return NULL;
   }
 
-  if (igraph_get_all_shortest_paths(&self->g, &res, NULL, from,
-                                    to, mode)) {
+  if (igraph_get_all_shortest_paths_dijkstra(&self->g, &res,
+        NULL, from, to, weights, mode)) {
     igraphmodule_handle_igraph_error();
     igraph_vector_ptr_destroy(&res);
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
     return NULL;
   }
+
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
 
   j = igraph_vector_ptr_size(&res);
   list = PyList_New(j);
