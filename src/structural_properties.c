@@ -5088,7 +5088,6 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
   }
 
   VECTOR(dists)[(long int)from] = 1.0;	/* zero distance */
-  if (is_target[(long int)from]) to_reach--;
   parents[(long int)from] = 0;
   igraph_2wheap_push_with_index(&Q, from, 0);
     
@@ -5330,7 +5329,6 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(1);
 
   VECTOR(dists)[(long int)from] = 1.0;	/* zero distance */
-  if (is_target[(long int)from]) to_reach--;
   igraph_2wheap_push_with_index(&Q, from, 0);
     
   while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
@@ -5442,7 +5440,9 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
      * but it stands between a shortest path between the root and one
      * of the targets 
      */
-    if (!igraph_vs_is_all(&to)) {
+    if (igraph_vs_is_all(&to)) {
+      memset(is_target, 1, sizeof(unsigned char)*no_of_nodes);
+    } else {
       memset(is_target, 0, sizeof(unsigned char)*no_of_nodes);
 
       IGRAPH_CHECK(igraph_stack_init(&stack, 0));
