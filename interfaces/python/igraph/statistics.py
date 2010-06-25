@@ -155,8 +155,8 @@ class Histogram(object):
 
     def __plot__(self, context, bbox, _, **kwds):
         """Plotting support"""
-        import igraph.drawing
-        coord_system = igraph.drawing.DescartesCoordinateSystem(context, bbox, \
+        from igraph.drawing.coord import DescartesCoordinateSystem
+        coord_system = DescartesCoordinateSystem(context, bbox, \
             (kwds.get("min", self._min), 0, \
              kwds.get("max", self._max), kwds.get("max_value", max(self._bins))
             ))

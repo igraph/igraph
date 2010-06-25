@@ -7,7 +7,7 @@ This package contains the implementation of the L{Layout} object.
 from itertools import izip
 from math import sin, cos, pi
 
-from igraph.drawing import BoundingBox
+from igraph.drawing.utils import BoundingBox
 from igraph.statistics import RunningMean
 
 __license__ = """
