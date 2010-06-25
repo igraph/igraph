@@ -67,7 +67,7 @@ independence.number(g)
 independent.vertex.sets(g, min=independence.number(g))
 largest.independent.vertex.sets(g)
 # Empty graph
-subgraph(g, largest.independent.vertex.sets(g)[[1]])
+induced.subgraph(g, largest.independent.vertex.sets(g)[[1]])
 
 length(maximal.independent.vertex.sets(g))
 }

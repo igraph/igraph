@@ -474,7 +474,7 @@ layout.mds.igraph <- function(graph, d=shortest.paths(graph), ...){
         
         llen[i+1] <- length(which(ind))
         
-        glist[i+1] <- list(subgraph(graph, V(graph)[ind]))
+        glist[i+1] <- list(induced.subgraph(graph, V(graph)[ind]))
     }
     
     ## merge them all:
@@ -515,7 +515,7 @@ layout.svd.igraph <- function(graph, d=shortest.paths(graph), ...) {
         
         llen[i+1] <- length(which(ind))
         
-        glist[i+1] <- list(subgraph(graph, V(graph)[ind]))
+        glist[i+1] <- list(induced.subgraph(graph, V(graph)[ind]))
     }
     
     ## merge them all:

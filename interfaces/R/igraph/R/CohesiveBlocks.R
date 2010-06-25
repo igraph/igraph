@@ -117,7 +117,7 @@ cohesive.blocks <- function(graph, db=NULL,
             maxId <- max(branches$branchId)
         }
         
-        g <- subgraph(graph, V(graph)[cbid %in% v])
+        g <- induced.subgraph(graph, V(graph)[cbid %in% v])
 
         ## check if trivial or fully connected, else treat normally
         if(vcount(g) < 3){ #trivial
@@ -161,7 +161,7 @@ cohesive.blocks <- function(graph, db=NULL,
             }
             if (verbose) cat(length(v))
             while(any(degree(g)<=mac)){ ## trimming goes on here
-                g <- subgraph(g, V(g)[degree(g)>mac])
+                g <- induced.subgraph(g, V(g)[degree(g)>mac])
             }
             if (verbose) cat("(", vcount(g), ") vertices; ", sep="")
             
@@ -358,7 +358,7 @@ find.all.min.cutsets <- function(g, k=NULL){
         x <- v[order(degree(g), decreasing=TRUE)][1:k]
     
         #- check x for cutsetness
-        if(!is.connected(subgraph(g, setdiff(v, x)))){
+        if(!is.connected(induced.subgraph(g, setdiff(v, x)))){
             res <- c(res, list(x))
         }
     
@@ -385,7 +385,7 @@ find.all.min.cutsets <- function(g, k=NULL){
             if(length(phi)>0){
                 ksets <- combn(phi, k)
                 for(thisSet in 1:ncol(ksets)){
-                    if(!is.connected(subgraph(g, setdiff(v, ksets[, thisSet])))){
+                    if(!is.connected(induced.subgraph(g, setdiff(v, ksets[, thisSet])))){
                         if(!(list(ksets[, thisSet]) %in% res)){
                             res <- c(res, list(ksets[, thisSet]))
                         }
@@ -413,13 +413,13 @@ kComponents <- function(g, k=NULL, useHeuristic=TRUE, verbose=igraph.par("verbos
     if(length(cs)==0){## not connected
         cls <- clusters(g)
         for(cl in unique(cls$membership)){
-            theseBlocks <- c(theseBlocks, list(V(subgraph(g, which(cls$membership==cl)-1))$csid))
+            theseBlocks <- c(theseBlocks, list(V(induced.subgraph(g, which(cls$membership==cl)-1))$csid))
         }
         return(theseBlocks)
     }
     for(thisCS in cs){
         if(is.list(thisCS)){thisCS <- unlist(thisCS)}
-        gprime <- subgraph(g, V(g)[!(V(g) %in% thisCS)])
+        gprime <- induced.subgraph(g, V(g)[!(V(g) %in% thisCS)])
         gclusts <- clusters(gprime)
         for(i in ((1:length(gclusts$csize))-1)){
             theseIDs <- V(gprime)[V(gprime) %in% (which(gclusts$membership==i)-1)]$csid
@@ -433,7 +433,7 @@ kComponents <- function(g, k=NULL, useHeuristic=TRUE, verbose=igraph.par("verbos
 }
 
 is.cutset <- function(v, g){ ## does removal of `v` disconnect `g`?
-    return(!is.connected(subgraph(g, setdiff(V(g), v))))
+    return(!is.connected(induced.subgraph(g, setdiff(V(g), v))))
 }
 
 etReduction <- function(g){

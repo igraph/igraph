@@ -1474,7 +1474,7 @@ tkigraph <- function() {
   graph <- get("graphs", .tkigraph.env)[[gnos]]
   clu <- clusters(graph)
   v <- which(clu$membership+1 == which.max(clu$csize)) - 1
-  g <- subgraph(graph, v)
+  g <- induced.subgraph(graph, v)
   .tkigraph.add.graph(g)
 }
 
@@ -1493,7 +1493,7 @@ tkigraph <- function() {
     return()
   }
 
-  g <- subgraph(graph, subcomponent(graph, read$vertex-1))
+  g <- induced.subgraph(graph, subcomponent(graph, read$vertex-1))
   .tkigraph.add.graph(g)
 }
 
@@ -1514,7 +1514,7 @@ tkigraph <- function() {
   }
   
   v <- which(clu$membership==read$comp-1)-1
-  g <- subgraph(graph, v)
+  g <- induced.subgraph(graph, v)
   .tkigraph.add.graph(g)  
 }
 
@@ -1852,7 +1852,7 @@ tkigraph <- function() {
   
   create.graph <- function() {
     graph <- get("graphs", .tkigraph.env)[[gnos]]
-    g <- subgraph(graph, comm$community)
+    g <- induced.subgraph(graph, comm$community)
     .tkigraph.add.graph(g)
   }
   

@@ -74,7 +74,7 @@ edge.disjoint.paths(g2, 99, 0)
 
 g <- erdos.renyi.game(50, 5/50)
 g <- as.directed(g)
-g <- subgraph(g, subcomponent(g, 1))
+g <- induced.subgraph(g, subcomponent(g, 1))
 graph.adhesion(g)
 }
 \keyword{graphs}
