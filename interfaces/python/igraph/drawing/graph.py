@@ -196,7 +196,7 @@ class UbiGraphDrawer(AbstractGraphDrawer):
 
         url_parts = urlparse(url)
         hostname = url_parts.netloc
-        if not re.match("[0-9.:]+", hostname):
+        if not re.match("[0-9.:]+$", hostname):
             # hostname is not an IP address, look it up first
             from socket import gethostbyname
             if ":" in hostname:
