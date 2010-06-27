@@ -19,7 +19,8 @@ shortest.paths(graph, v=V(graph), to=V(graph),
                                     "johnson"))
 get.shortest.paths(graph, from, to=V(graph), mode = c("out", "all",
       "in"), weights = NULL, output=c("vpath", "epath", "both"))
-get.all.shortest.paths(graph, from, to = V(graph), mode = c("out", "all", "in")) 
+get.all.shortest.paths(graph, from, to = V(graph), mode = c("out", 
+      "all", "in"), weights=NULL) 
 average.path.length(graph, directed=TRUE, unconnected=TRUE)
 path.length.hist (graph, directed = TRUE, verbose = igraph.par("verbose")) 
 }
@@ -74,28 +75,48 @@ path.length.hist (graph, directed = TRUE, verbose = igraph.par("verbose"))
   \item{verbose}{Logical scalar, whether to draw a progress meter while
     the calculation is running.}
 }
-\details{The shortest paths (also called geodesics) are calculated by
-  using breath-first search in the graph. If no edge weights were
-  specified, then a breadth-first search is used to calculate the
-  shortest paths. If edge weigths are given and all of them are
-  non-zero, then Dijkstra's algorithm is used. Otherwise the
-  Bellman-Ford algorithm is used for \code{shortest.paths}.
+\details{
+  The shortest path, or geodesic between two pair of vertices is a path
+  with the minimal number of vertices. The functions documented in this
+  manual page all calculate shortest paths between vertex pairs.
+  
+  \code{shortest.paths} calculates the lengths of pairwise shortest
+  paths from a set of vertices (\code{from}) to another set of vertices
+  (\code{to}). It uses different algorithms, depending on the
+  \code{argorithm} argument and the \code{weight} edge attribute of the
+  graph. The implemented algorithms are breadth-first search
+  (\sQuote{\code{unweighted}}), this only works for unweighted graphs;
+  the Dijkstra algorithm (\sQuote{\code{dijkstra}}), this works for
+  graphs with non-negative edge weights; the Bellman-Ford algorithm
+  (\sQuote{\code{bellman-ford}}), and Johnson's algorithm
+  (\sQuote{\code{"johnson"}}). The latter two algorithms work with
+  arbitrary edge weights, but (naturally) only for graphs that don't
+  have a negative cycle.
 
-  Please do NOT call \code{get.shortest.paths} and
-  \code{get.all.shortest.paths} with negative edge weights, it will not
-  work, these functions do not use the Belmann-Ford algotithm.
+  igraph can choose automatically between algorithm, and chooses the
+  most efficient one that is appropriate for the supplied weights (if
+  any). For automatic algorithm selection, supply
+  \sQuote{\code{automatic}} as the \code{algorithm} argument. (This is
+  also the default.)
 
-  Note that \code{shortest.paths} is able to calculate the path length
-  from or to many vertices at the same time, but
-  \code{get.shortest.paths} works from one source only. This might
-  change in the future.
+  \code{get.shortest.paths} calculates a single shortest path (i.e. the
+  path itself, not just its length) between the source vertex
+  given in \code{from}, to the target vertices given in
+  \code{to}. \code{get.shortest.paths} uses breadth-first search for
+  unweighted graphs and Dijkstra's algorithm for weighted graphs. The
+  latter only works if the edge weights are non-negative.
 
-  Also note that \code{get.shortest.paths} gives only one shortest path,
-  however, more than one might exist between two vertices.
+  \code{get.all.shortest.paths} calculates \emph{all} shortest paths
+  between pairs of vertices. More precisely, between the \code{from}
+  vertex to the vertices given in \code{to}. It uses a breadth-first
+  search for unweighted graphs and Dijkstra's algorithm for weighted
+  ones. The latter only supports non-negative edge weights.
 
-  \code{get.all.shortest.paths} calculates all shortest paths from a
-  vertex to other vertices given in the \code{to} argument.
-
+  \code{average.path.length} calculates the average path length in a
+  graph, by calculating the shortest paths between all pairs of vertices
+  (both ways for directed graphs). This function does not consider edge
+  weights currently and uses a breadth-first search.
+  
   \code{path.length.hist} calculates a histogram, by calculating the
   shortest path length between each pair of vertices. For directed
   graphs both directions are considered, so every pair of vertices

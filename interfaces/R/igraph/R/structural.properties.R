@@ -202,7 +202,8 @@ get.shortest.paths <- function(graph, from, to=V(graph),
 
 get.all.shortest.paths <- function(graph, from,
                                    to=V(graph),
-                                   mode=c("out", "all", "in")) {
+                                   mode=c("out", "all", "in"),
+				   weights=NULL) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -210,10 +211,28 @@ get.all.shortest.paths <- function(graph, from,
   mode <- igraph.match.arg(mode)
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
 
+  if (is.null(weights)) {
+    if ("weight" %in% list.edge.attributes(graph)) {
+      weights <- as.numeric(E(graph)$weight)
+    }
+  } else {
+    if (length(weights)==1 && is.na(weights)) {
+      weights <- NULL
+    } else {
+      weights <- as.numeric(weights)
+    }
+  }
+
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_get_all_shortest_paths", graph,
-        as.numeric(from), as.igraph.vs(graph, to), as.numeric(mode),
-        PACKAGE="igraph")
+  if (is.null(weights)) {
+    .Call("R_igraph_get_all_shortest_paths", graph,
+          as.numeric(from), as.igraph.vs(graph, to), as.numeric(mode),
+          PACKAGE="igraph")
+  } else {
+    .Call("R_igraph_get_all_shortest_paths_dijkstra", graph, 
+          as.numeric(from), as.igraph.vs(graph, to), weights,
+          as.numeric(mode), PACKAGE="igraph")
+  }       
 }
 
 subcomponent <- function(graph, v, mode=c("all", "out", "in")) {
