@@ -428,7 +428,8 @@ igraph_subgraph:
 
 igraph_subgraph_edges:
         PARAMS: GRAPH graph, OUT GRAPH res, EDGESET eids, BOOLEAN delete_vertices=True
-        IGNORE: RR, RC, RNamespace
+        DEPS: eids ON graph
+        NAME-R: subgraph.edges
 
 igraph_average_path_length:
         PARAMS: GRAPH graph, OUT REALPTR res, BOOLEAN directed=True, BOOLEAN unconn=True

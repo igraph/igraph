@@ -139,7 +139,7 @@ spinglass.community(graph, weights=NULL, vertex, spins=25,
 \examples{
   g <- erdos.renyi.game(10, 5/10) \%du\% erdos.renyi.game(9, 5/9)
   g <- add.edges(g, c(0, 11))
-  g <- subgraph(g, subcomponent(g, 0))
+  g <- induced.subgraph(g, subcomponent(g, 0))
   spinglass.community(g, spins=2)
   spinglass.community(g, vertex=0)
 }

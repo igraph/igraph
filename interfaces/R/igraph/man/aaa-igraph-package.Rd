@@ -38,7 +38,7 @@
   always consecutive and they start with zero. I.e. for a graph with
   \sQuote{n} vertices the vertex ids are between \sQuote{0} and
   \sQuote{n-1}. If some operation changes the number of vertices in the
-  graphs, e.g. a subgraph is created via \code{\link{subgraph}}, then
+  graphs, e.g. a subgraph is created via \code{\link{induced.subgraph}}, then
   the vertices are renumbered to satisfty this criteria.
 
   The same is true for the edges as well, edge ids are always between
