@@ -435,6 +435,9 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
     maxcompno=LONG_MAX;
   }
 
+  igraph_vector_ptr_clear(components);
+  IGRAPH_FINALLY(igraph_decompose_destroy, components);
+
   already_added=igraph_Calloc(no_of_nodes, char);
   if (already_added==0) {
     IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
@@ -442,10 +445,9 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
   IGRAPH_FINALLY(igraph_free, already_added);
 
   IGRAPH_CHECK(igraph_dqueue_init(&q, 100));
+  IGRAPH_FINALLY(igraph_dqueue_destroy, &q);
   IGRAPH_VECTOR_INIT_FINALLY(&verts, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
-  igraph_vector_ptr_clear(components);
-  IGRAPH_FINALLY(igraph_decompose_destroy, components);
   
   for(actstart=0; resco<maxcompno && actstart < no_of_nodes; actstart++) {
     
@@ -477,20 +479,19 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
       IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
     }
     IGRAPH_CHECK(igraph_vector_ptr_push_back(components, newg));
-    IGRAPH_FINALLY(igraph_destroy, newg);
     IGRAPH_CHECK(igraph_induced_subgraph(graph, newg, 
-				 igraph_vss_vector(&verts), IGRAPH_SUBGRAPH_AUTO));
-    IGRAPH_FINALLY_CLEAN(1);
+					 igraph_vss_vector(&verts), 
+					 IGRAPH_SUBGRAPH_AUTO));
     resco++;
     
   } /* for actstart++ */
 
+  igraph_vector_destroy(&neis);
+  igraph_vector_destroy(&verts);
   igraph_dqueue_destroy(&q);
   igraph_free(already_added);
-  igraph_vector_destroy(&verts);
-  igraph_vector_destroy(&neis);
+  IGRAPH_FINALLY_CLEAN(5);	/* + components */
   
-  IGRAPH_FINALLY_CLEAN(4);
   return 0;
 }
 
