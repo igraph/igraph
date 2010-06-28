@@ -1910,8 +1910,8 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph, igraph_t *res,
   IGRAPH_FINALLY_CLEAN(2);
 
   /* Create the new graph */
-  res->attr=0;           /* Why is this needed? TODO */
   IGRAPH_CHECK(igraph_create(res, &new_edges, no_of_new_nodes, directed));
+  IGRAPH_I_ATTRIBUTE_DESTROY(res);
 
   /* Now we can also get rid of the new_edges vector */
   igraph_vector_destroy(&new_edges);
