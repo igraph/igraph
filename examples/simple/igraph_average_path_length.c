@@ -29,7 +29,8 @@ int main() {
   igraph_integer_t result;
   
   igraph_barabasi_game(&g, 30, /*power=*/ 1, 30, 0, 0, /*A=*/ 1, 
-		       IGRAPH_DIRECTED, IGRAPH_BARABASI_BAG);
+		       IGRAPH_DIRECTED, IGRAPH_BARABASI_BAG,
+		       /*start_from=*/ 0);
   igraph_average_path_length(&g, &result, IGRAPH_UNDIRECTED, 1);
   
 /*   printf("Length of the average shortest paths: %f\n", (float) result); */

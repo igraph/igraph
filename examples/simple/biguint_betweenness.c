@@ -78,7 +78,8 @@ int main() {
 		       /* outpref= */  0,
 		       /* A= */        1,
 		       /* directed= */ 0, 
-		       /* algo= */     IGRAPH_BARABASI_BAG);
+		       /* algo= */     IGRAPH_BARABASI_BAG,
+		       /* start_from= */ 0);
   
   igraph_simplify(&g, /* multiple= */ 1, /* loops= */ 1, /*edge_comb=*/ 0);
   

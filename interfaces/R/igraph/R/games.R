@@ -23,8 +23,13 @@
 ba.game <- function(n, power=1, m=NULL, out.dist=NULL, out.seq=NULL,
                     out.pref=FALSE, zero.appeal=1,
                     directed=TRUE, algorithm=c("psumtree",
-                                     "psumtree-multiple", "bag")) {
+                                     "psumtree-multiple", "bag"),
+                    start.graph=NULL) {
 
+  if (!is.null(start.graph) && !is.igraph(start.graph)) {
+    stop("`start.graph' not an `igraph' object")
+  }
+  
   # Checks
   if (! is.null(out.seq) && (!is.null(m) || !is.null(out.dist))) {
     warning("if `out.seq' is given `m' and `out.dist' should be NULL")
@@ -53,7 +58,8 @@ ba.game <- function(n, power=1, m=NULL, out.dist=NULL, out.seq=NULL,
   out.pref <- as.logical(out.pref)
 
   if (!is.null(out.dist)) {
-    out.seq <- as.numeric(sample(0:(length(out.dist)-1), n,
+    nn <- if (is.null(start.graph)) n else n-vcount(start.graph)
+    out.seq <- as.numeric(sample(0:(length(out.dist)-1), nn,
                                  replace=TRUE, prob=out.dist))
   }
 
@@ -67,7 +73,7 @@ ba.game <- function(n, power=1, m=NULL, out.dist=NULL, out.seq=NULL,
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_barabasi_game", n, power, m, out.seq, out.pref,
-        zero.appeal, directed, algorithm,
+        zero.appeal, directed, algorithm, start.graph,
         PACKAGE="igraph")
 }
 

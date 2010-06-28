@@ -2908,7 +2908,7 @@ SEXP R_igraph_lattice(SEXP pdimvector, SEXP pnei, SEXP pdirected,
 
 SEXP R_igraph_barabasi_game(SEXP pn, SEXP ppower, SEXP pm, SEXP poutseq,
 			    SEXP poutpref, SEXP pA, SEXP pdirected, 
-			    SEXP palgo) {
+			    SEXP palgo, SEXP pstart) {
   
   igraph_t g;
   igraph_integer_t n=REAL(pn)[0];
@@ -2919,6 +2919,7 @@ SEXP R_igraph_barabasi_game(SEXP pn, SEXP ppower, SEXP pm, SEXP poutseq,
   igraph_real_t A=REAL(pA)[0];
   igraph_bool_t directed=LOGICAL(pdirected)[0];
   igraph_integer_t algo=REAL(palgo)[0];
+  igraph_t start, *ppstart=0;
   SEXP result;
   
   R_igraph_before();
@@ -2928,8 +2929,13 @@ SEXP R_igraph_barabasi_game(SEXP pn, SEXP ppower, SEXP pm, SEXP poutseq,
     myoutseq=&outseq;
   }
   
+  if (!isNull(pstart)) {
+    R_SEXP_to_igraph(pstart, &start);
+    ppstart=&start;
+  }
+  
   igraph_barabasi_game(&g, n, power, m, &outseq, outpref, 
-		       A, directed, algo);
+		       A, directed, algo, ppstart);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   

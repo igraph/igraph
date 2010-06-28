@@ -168,7 +168,8 @@ int check_multi() {
 #define NODES 10000
   igraph_barabasi_game(&g, /*n=*/ NODES, /*power=*/ 1.0, /*m=*/ 3, 
 		       /*outseq=*/ 0, /*outpref=*/ 0, /*A=*/ 1,
-		       /*directed=*/ 1, IGRAPH_BARABASI_BAG);
+		       /*directed=*/ 1, IGRAPH_BARABASI_BAG,
+		       /*start_from=*/ 0);
   igraph_simplify(&g, /*multiple=*/ 1, /*loops=*/ 0, /*edge_comb=*/ 0);
 
   igraph_vector_init(&eids, NODES/2);

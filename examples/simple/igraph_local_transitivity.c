@@ -32,7 +32,8 @@ int main() {
   
   igraph_vs_seq(&vertices, 1, 101);
   igraph_barabasi_game(&g, 100000, /*power=*/ 1, 3, 0, 0, /*A=*/ 1,
-		       IGRAPH_DIRECTED, IGRAPH_BARABASI_BAG);
+		       IGRAPH_DIRECTED, IGRAPH_BARABASI_BAG, 
+		       /*start_from=*/ 0);
   igraph_vector_init(&result, 0);
   
   for (i=0; i<1; i++) {

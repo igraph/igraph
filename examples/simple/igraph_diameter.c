@@ -39,7 +39,8 @@ int main() {
   igraph_vector_t path;
   
   igraph_barabasi_game(&g, 30, /*power=*/ 1, 30, 0, 0, /*A=*/ 1, 
-		       IGRAPH_DIRECTED, IGRAPH_BARABASI_BAG);
+		       IGRAPH_DIRECTED, IGRAPH_BARABASI_BAG, 
+		       /*start_from=*/ 0);
   igraph_diameter(&g, &result, 0, 0, 0, IGRAPH_UNDIRECTED, 1);
   
 /*   printf("Diameter: %li\n", (long int) result); */

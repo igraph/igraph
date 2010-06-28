@@ -10,7 +10,8 @@
 \usage{
 barabasi.game(n, power = 1, m = NULL, out.dist = NULL, out.seq = NULL, 
     out.pref = FALSE, zero.appeal = 1, directed = TRUE,
-    algorithm = c("psumtree", "psumtree-multiple", "bag")) 
+    algorithm = c("psumtree", "psumtree-multiple", "bag"),
+    start.graph=NULL) 
 }
 \arguments{
   \item{n}{Number of vertices.}
@@ -48,6 +49,12 @@ barabasi.game(n, power = 1, m = NULL, out.dist = NULL, out.seq = NULL,
     edges. It only works if \code{power} and \code{zero.appeal} are
     equal one.
   }
+  \item{start.graph}{\code{NULL} or an igraph graph. If a graph, then
+    the supplied graph is used as a starting graph for the preferential
+    attachment algorithm. The graph should have at least one vertex. If
+    a graph is supplied here and the \code{out.seq} argument is not
+    \code{NULL}, then it should contain the out degrees of the new
+    vertices only, not the ones in the \code{start.graph}.} 
 }
 \details{
   This is a simple stochastic algorithm to generate a graph. It is a

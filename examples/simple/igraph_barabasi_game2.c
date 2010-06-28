@@ -37,7 +37,8 @@ int main() {
 		       /* outpref=  */ 0,
 		       /* A=        */ 1.0,
 		       /* directed= */ IGRAPH_DIRECTED,
-		       /* algo=     */ IGRAPH_BARABASI_PSUMTREE);
+		       /* algo=     */ IGRAPH_BARABASI_PSUMTREE,
+		       /* start_from= */ 0);
   
   if (igraph_ecount(&g) != 197) { return 1; }
   if (igraph_vcount(&g) != 100) { return 2; }
@@ -56,7 +57,8 @@ int main() {
 		       /* outpref=  */ 0,
 		       /* A=        */ 1.0,
 		       /* directed= */ IGRAPH_DIRECTED,
-		       /* algo=     */ IGRAPH_BARABASI_PSUMTREE_MULTIPLE);
+		       /* algo=     */ IGRAPH_BARABASI_PSUMTREE_MULTIPLE,
+		       /* start_from= */ 0);
 
   if (igraph_ecount(&g) != 198) { return 4; }
   if (igraph_vcount(&g) != 100) { return 5; }
@@ -75,7 +77,8 @@ int main() {
 		       /* outpref=  */ 0,
 		       /* A=        */ 1.0,
 		       /* directed= */ IGRAPH_DIRECTED,
-		       /* algo=     */ IGRAPH_BARABASI_BAG);
+		       /* algo=     */ IGRAPH_BARABASI_BAG,
+		       /* start_from= */ 0);
 
   if (igraph_ecount(&g) != 198) { return 7; }
   if (igraph_vcount(&g) != 100) { return 8; }

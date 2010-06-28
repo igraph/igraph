@@ -53,7 +53,8 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
 			 igraph_bool_t outpref,
 			 igraph_real_t A,
 			 igraph_bool_t directed,
-			 igraph_barabasi_algorithm_t algo);
+			 igraph_barabasi_algorithm_t algo,
+			 const igraph_t *start_from);
 int igraph_nonlinear_barabasi_game(igraph_t *graph, igraph_integer_t n,
 				   igraph_real_t power,
 				   igraph_integer_t m,  
