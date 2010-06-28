@@ -11,7 +11,7 @@
 \alias{plot.communities}
 \alias{length.communities}
 \alias{modularity.communities}
-\alias{as.dendrogram.communties}
+\alias{as.dendrogram.communities}
 \concept{Community structure}
 \title{Functions to deal with the result of network community detection}
 \description{igraph community detection functions return their results
@@ -44,7 +44,8 @@ cutat(communities, no, steps)
 \arguments{
   \item{communities,x,object}{A \code{communities} object, the result of
     an igraph community detection function.}
-  \item{y}{An igraph graph oebject, corresponding to the communities in
+  \item{graph}{An igraph graph object, corresponding to \code{communities}.}
+  \item{y}{An igraph graph object, corresponding to the communities in
     \code{x}.}
   \item{no}{Integer scalar, the desired number of communities. If too
     low or two high, then an error message is given. Exactly one of

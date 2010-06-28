@@ -1,12 +1,13 @@
 \name{modularity}
 \alias{modularity}
+\alias{modularity.igraph}
 \concept{Modularity}
 \title{Modularity of a community structure of a graph}
 \description{This function calculates how modular is a given division of a
   graph into subgraphs.
 }
 \usage{
-\method{igraph}{modularity}(x, membership, weights = NULL)
+\method{modularity}{igraph}(x, membership, weights = NULL, \dots)
 }
 \arguments{
   \item{x}{The input graph.}

@@ -78,7 +78,7 @@ edge.betweenness.community (graph, directed = TRUE,
   \code{\link{leading.eigenvector.community}} for other community
   detection methods.
 
-  See \link{\code{communities}} for extracting the results of the
+  See \code{\link{communities}} for extracting the results of the
   community detection.
 }
 \references{M Newman and M Girvan: Finding and evaluating community
