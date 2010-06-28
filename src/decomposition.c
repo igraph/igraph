@@ -414,7 +414,7 @@ int igraph_is_chordal(const igraph_t *graph,
   igraph_adjlist_destroy(&adjlist);
   igraph_vector_long_destroy(&index);
   igraph_vector_long_destroy(&f);
-  IGRAPH_FINALLY_CLEAN(3);
+  IGRAPH_FINALLY_CLEAN(4);
 
   if (newgraph) {
     IGRAPH_CHECK(igraph_copy(newgraph, graph));
