@@ -40,10 +40,14 @@ pause()
 
 ### Greedy algorithm
 fc <- fastgreedy.community(karate)
-memb <- community.to.membership(karate, fc$merges,
-                                steps=which.max(fc$modularity)-1)
-plot(karate, vertex.color=memb$membership+1)
+memb <- membership(fc)
+plot(karate, vertex.color=memb+1)
   
+pause()
+
+### Greedy algorithm, easier plotting
+plot(fc, karate)
+
 pause()
 
 ### Spinglass algorithm, create a hierarchical network
@@ -78,82 +82,74 @@ myimage(A)
 pause()
 
 ### Ordering according to (big) communities
-ord1 <- order(sc1$membership)
+ord1 <- order(membership(sc1))
 myimage(A[ord1,ord1])
 
 pause()
 
 ### Ordering according to (small) communities
-ord2.2 <- order(sc2.2$membership)
+ord2.2 <- order(membership(sc2.2))
 myimage(A[ord2.2,ord2.2])
 
 pause()
 
 ### Consensus ordering
-ord <- order(sc1$membership, sc2.2$membership)
+ord <- order(membership(sc1), membership(sc2.2))
 myimage(A[ord,ord])
 
 pause()
 
 ### Comparision of algorithms
-memberships <- list()
+communities <- list()
 
 pause()
 
 ### edge.betweenness.community
 ebc <- edge.betweenness.community(karate)
-mods <- sapply(0:ecount(karate), function(i) {
-  g2 <- delete.edges(karate, ebc$removed.edges[seq(length=i)])
-  cl <- clusters(g2)$membership
-  modularity(karate, cl)
-})
-
-g2 <- delete.edges(karate, ebc$removed.edges[1:(which.max(mods)-1)])
-memberships$`Edge betweenness` <- clusters(g2)$membership
+communities$`Edge betweenness` <- ebc
 
 pause()
 
 ### fastgreedy.community
 fc <- fastgreedy.community(karate)
-memb <- community.to.membership(karate, fc$merges,
-                                steps=which.max(fc$modularity)-1)
-memberships$`Fast greedy` <- memb$membership
+communities$`Fast greedy` <- fc
 
 pause()
 
 ### leading.eigenvector.community
 lec <- leading.eigenvector.community(karate)
-memberships$`Leading eigenvector` <- lec$membership
+communities$`Leading eigenvector` <- lec
 
 pause()
 
 ### spinglass.community
 sc <- spinglass.community(karate, spins=10)
-memberships$`Spinglass` <- sc$membership
+communities$`Spinglass` <- sc
 
 pause()
 
 ### walktrap.community
-wt <- walktrap.community(karate, modularity=TRUE)
-wmemb <- community.to.membership(karate, wt$merges,
-                                 steps=which.max(wt$modularity)-1)
-memberships$`Walktrap` <- wmemb$membership
+wt <- walktrap.community(karate)
+communities$`Walktrap` <- wt
 
 pause()
 
 ### label.propagation.community
-memberships$`Label propagation` <- label.propagation.community(karate)
+labprop <- label.propagation.community(karate)
+communities$`Label propagation` <- labprop
 
 pause()
 
 ### Plot everything
 layout(rbind(1:3, 4:6))
-for (i in 1:6) {
-  m <- modularity(karate, memberships[[i]])
-  plot(karate, vertex.color=memberships[[i]]+2,
-       main=paste(names(memberships)[i], "\n",
+coords <- layout.kamada.kawai(karate)
+lapply(seq_along(communities), function(x) {
+  m <- modularity(communities[[x]])
+  par(mar=c(1,1,3,1))
+  plot(communities[[x]], karate, layout=coords,
+       main=paste(names(communities)[x], "\n",
          "Modularity:", round(m, 3)))
-}
+})
 
 pause()
 
