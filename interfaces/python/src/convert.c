@@ -402,6 +402,31 @@ int igraphmodule_PyObject_to_tree_mode_t(PyObject *o,
 }
 
 /**
+ * \brief Extracts a pointer to the internal \c igraph_t from a graph object
+ *
+ * Raises suitable Python exceptions when needed.
+ *
+ * \param object the Python object to be converted. If it is Py_None, the
+ *               result pointer is untouched (so it should be null by default).
+ * \param result the pointer is stored here
+ *
+ * \return 0 if everything was OK, 1 otherwise
+ */
+int igraphmodule_PyObject_to_igraph_t(PyObject *o, igraph_t **result) {
+  if (o == Py_None)
+    return 0;
+
+  if (!PyObject_TypeCheck(o, &igraphmodule_GraphType)) {
+    PyErr_Format(PyExc_TypeError,
+        "expected graph object, got %s", o->ob_type->tp_name);
+    return 1;
+  }
+
+  *result = &((igraphmodule_GraphObject*)o)->g;
+  return 0;
+}
+
+/**
  * \brief Converts a Python object to an igraph \c igraph_integer_t
  *
  * Raises suitable Python exceptions when needed.
@@ -1654,7 +1679,18 @@ int igraphmodule_PyList_to_strvector_t(PyObject* v, igraph_strvector_t *result) 
     igraph_bool_t will_free = 0;
 
     if (PyUnicode_Check(item)) {
-      ptr = PyUnicode_AsEncodedString(result, "utf-8", "xmlcharrefreplace");
+      o = PyUnicode_AsEncodedString(item, "utf-8", "xmlcharrefreplace");
+      if (o == 0) {
+        igraph_strvector_destroy(result);
+        return 1;
+      }
+      ptr = strdup(PyString_AsString(o));
+      Py_DECREF(o);
+      if (ptr == 0) {
+        PyErr_NoMemory();
+        igraph_strvector_destroy(result);
+        return 1;
+      }
       will_free = 1;
     } else if (PyString_Check(item)) {
       ptr = PyString_AS_STRING(item);

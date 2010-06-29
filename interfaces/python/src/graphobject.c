@@ -1541,21 +1541,27 @@ PyObject *igraphmodule_Graph_Barabasi(PyTypeObject * type,
   long n, m = 1;
   float power = 1.0, zero_appeal = 1.0;
   igraph_vector_t outseq;
+  igraph_t *start_from = 0;
   igraph_barabasi_algorithm_t algo = IGRAPH_BARABASI_PSUMTREE;
   PyObject *m_obj = 0, *outpref = Py_False, *directed = Py_False;
   PyObject *implementation_o = Py_None;
+  PyObject *start_from_o = Py_None;
 
   static char *kwlist[] =
     { "n", "m", "outpref", "directed", "power", "zero_appeal",
-      "implementation", NULL };
+      "implementation", "start_from", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|OOOffO", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|OOOffOO", kwlist,
                                    &n, &m_obj, &outpref, &directed, &power,
-                                   &zero_appeal, &implementation_o))
+                                   &zero_appeal, &implementation_o,
+                                   &start_from_o))
     return NULL;
 
   if (igraphmodule_PyObject_to_barabasi_algorithm_t(implementation_o,
         &algo))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_igraph_t(start_from_o, &start_from))
     return NULL;
 
   if (n < 0) {
@@ -1587,7 +1593,8 @@ PyObject *igraphmodule_Graph_Barabasi(PyTypeObject * type,
                            (igraph_integer_t) m,
                            &outseq, PyObject_IsTrue(outpref),
                            (igraph_real_t) zero_appeal,
-                           PyObject_IsTrue(directed), algo)) {
+                           PyObject_IsTrue(directed), algo,
+                           start_from)) {
     igraphmodule_handle_igraph_error();
     igraph_vector_destroy(&outseq);
     return NULL;
@@ -9361,7 +9368,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"Barabasi", (PyCFunction) igraphmodule_Graph_Barabasi,
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
    "Barabasi(n, m, outpref=False, directed=False, power=1,\n"
-   "         zero_appeal=1, implementation=\"psumtree\")\n\n"
+   "         zero_appeal=1, implementation=\"psumtree\", start_from=None)\n\n"
    "Generates a graph based on the Barabasi-Albert model.\n\n"
    "@param n: the number of vertices\n"
    "@param m: either the number of outgoing edges generated for\n"
@@ -9393,6 +9400,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "    - C{\"psumtree_multiple\"}: similar to C{\"psumtree\"}, but\n"
    "      it will generate multiple edges as well. igraph before\n"
    "      0.6 used this algorithm for I{power}s other than 1.\n\n"
+   "@param start_from: if given and not C{None}, this must be another\n"
+   "      L{Graph} object. igraph will use this graph as a starting\n"
+   "      point for the preferential attachment model.\n\n"
    "@newfield ref: Reference\n"
    "@ref: Barabasi, A-L and Albert, R. 1999. Emergence of scaling\n"
    "  in random networks. Science, 286 509-512."},
