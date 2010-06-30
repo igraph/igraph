@@ -7,13 +7,15 @@ This module contains routines to draw graphs on:
 - UbiGraph displays (L{UbiGraphDrawer}, see L{http://ubietylab.net/ubigraph})
 
 It also contains routines to send an igraph graph directly to Cytoscape
-(L{http://www.cytoscape.org}) using the CytoTalk plugin.
+(L{http://www.cytoscape.org}) using the CytoscapeRPC plugin
+(L{http://gforge.nbic.nl/projects/cytoscaperpc/})
 """
 
 from itertools import izip
 from math import cos, pi, sin
 
-from igraph.drawing.baseclasses import AbstractDrawer, AbstractCairoDrawer
+from igraph.drawing.baseclasses import AbstractDrawer, AbstractCairoDrawer, \
+                                       AbstractXMLRPCDrawer
 from igraph.drawing.edge import ArrowEdgeDrawer
 from igraph.drawing.metamagic import AttributeCollectorBase, \
                                      AttributeSpecification
@@ -182,7 +184,7 @@ class DefaultGraphDrawer(AbstractGraphDrawer, AbstractCairoDrawer):
 
 #####################################################################
 
-class UbiGraphDrawer(AbstractGraphDrawer):
+class UbiGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
     """Graph drawer that draws a given graph on an UbiGraph display
     using the XML-RPC API of UbiGraph.
     """
@@ -190,47 +192,32 @@ class UbiGraphDrawer(AbstractGraphDrawer):
     def __init__(self, url="http://localhost:20738/RPC2"):
         """Constructs an UbiGraph drawer using the display at the given
         URL."""
-        from urlparse import urlparse, urlunparse
-        import xmlrpclib
-        import re
-
-        url_parts = urlparse(url)
-        hostname = url_parts.netloc
-        if not re.match("[0-9.:]+$", hostname):
-            # hostname is not an IP address, look it up first
-            from socket import gethostbyname
-            if ":" in hostname:
-                hostname = hostname[0:hostname.index(":")]
-            hostname = gethostbyname(hostname)
-            if url_parts.port is not None:
-                hostname = "%s:%d" % (hostname, url_parts.port)
-            url_parts = list(url_parts)
-            url_parts[1] = hostname
-            url = urlunparse(url_parts)
-
-        self.server = xmlrpclib.ServerProxy(url)
+        super(UbiGraphDrawer, self).__init__(url, "ubigraph")
         
     def draw(self, graph, *args, **kwds):
         """Draws the given graph on an UbiGraph display.
         
         @keyword clear: whether to clear the current UbiGraph display before
                         plotting. Default: C{True}."""
-        display = self.server.ubigraph
+        display = self.service
 
         # Clear the display
         if kwds.get("clear", True):
             display.clear()
+            display.set_vertex_style_attribute(0, "color", "#ff0000")
 
         # Add the vertices
         n = graph.vcount()
-        vertex_ids = [None] * n
-        for i in xrange(n):
-            vertex_ids[i] = display.new_vertex()
+        new_vertex = display.new_vertex
+        vertex_ids = [new_vertex() for _ in xrange(n)]
 
         # Add the edges
-        for edge in graph.es:
-            v1, v2 = vertex_ids[edge.source], vertex_ids[edge.target]
-            display.new_edge(v1, v2)
+        new_edge = display.new_edge
+        eids = [new_edge(vertex_ids[edge.source], vertex_ids[edge.target]) \
+                for edge in graph.es]
+
+        # Add arrowheads if needed
+        display.set_edge_style_attribute(0, "arrow", "true")
 
 #####################################################################
 
