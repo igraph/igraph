@@ -39,7 +39,7 @@
 //#include "config.h"
 
 #define IGRAPH_MODULE
-#include "api.h"
+#include "igraphmodule_api.h"
 
 extern double igraph_i_fdiv(double, double);
 
