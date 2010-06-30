@@ -248,6 +248,23 @@ int igraphmodule_Graph_init(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Creates an \c igraph.Graph object from an existing \c igraph_t
+ *
+ * The newly created \c igraph.Graph object will take ownership of the
+ * given \c igraph_t. This function is not accessible from Python the
+ * normal way, but it is exposed via the C API of the Python module.
+ * See \c api.h for more details.
+ */
+PyObject* igraphmodule_Graph_from_igraph_t(igraph_t *graph) {
+  igraphmodule_GraphObject* result;
+  PyTypeObject* type = &igraphmodule_GraphType;
+
+  CREATE_GRAPH_FROM_TYPE(result, *graph, type);
+
+  return (PyObject*)result;
+}
+
+/** \ingroup python_interface_graph
  * \brief Formats an \c igraph.Graph object in a human-readable format.
  * 
  * This function is rather simple now, it returns the number of vertices

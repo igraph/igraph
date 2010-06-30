@@ -27,7 +27,7 @@
 #include <Python.h>
 #include <igraph/igraph.h>
 
-void igraphmodule_init_rng();
+void igraphmodule_init_rng(PyObject*);
 PyObject* igraph_rng_Python_set_generator(PyObject* self, PyObject* object);
 
 #endif

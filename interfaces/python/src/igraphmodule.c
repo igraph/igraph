@@ -38,6 +38,9 @@
 #include "bfsiter.h"
 //#include "config.h"
 
+#define IGRAPH_MODULE
+#include "api.h"
+
 extern double igraph_i_fdiv(double, double);
 
 /**
@@ -384,6 +387,48 @@ static PyMethodDef igraphmodule_methods[] =
   {NULL, NULL, 0, NULL}
 };
 
+/****************** Exported API functions *******************/
+
+/**
+ * \brief Constructs a new Python Graph object from an existing igraph_t
+ *
+ * The newly created Graph object will take ownership of igraph_t and
+ * it will destroy it when the Python object is destructed.
+ *
+ * Returns a null pointer in case of an error and sets the appropriate
+ * Python exception.
+ */
+PyObject* PyIGraph_FromCGraph(igraph_t* g) {
+  return igraphmodule_Graph_from_igraph_t(g);
+}
+
+/**
+ * \brief Extracts the pointer to the \c igraph_t held by a Graph instance
+ *
+ * The ownership of the \c igraph_t object remains with the Graph instance,
+ * so make sure you don't call \c igraph_destroy() on the extracted pointer.
+ *
+ * Returns a null pointer in case of an error and sets the appropriate
+ * Python exception.
+ */
+igraph_t* PyIGraph_ToCGraph(PyObject* graph) {
+  igraph_t *result = 0;
+
+  if (graph == Py_None) {
+    PyErr_SetString(PyExc_TypeError, "expected Graph, got None");
+    return 0;
+  }
+
+  if (igraphmodule_PyObject_to_igraph_t(graph, &result))
+    return 0;
+
+  if (result == 0)
+    PyErr_SetString(PyExc_ValueError, "null pointer stored inside a Graph "
+                                      "object. Probably a bug.");
+
+  return result;
+}
+
 #ifndef PyMODINIT_FUNC
 #define PyMODINIT_FUNC void
 #endif
@@ -393,9 +438,8 @@ extern PyObject* igraphmodule_arpack_options_default;
 
 PyMODINIT_FUNC initcore(void) {
   PyObject* m;
-
-  /* Initialize random number generator */
-  igraphmodule_init_rng();
+  static void *PyIGraph_API[PyIGraph_API_pointers];
+  PyObject *c_api_object;
 
   /* Initialize VertexSeq, EdgeSeq */
   if (PyType_Ready(&igraphmodule_VertexSeqType) < 0) return;
@@ -417,6 +461,9 @@ PyMODINIT_FUNC initcore(void) {
   m = Py_InitModule3("igraph.core", igraphmodule_methods,
 		     "Low-level Python interface for the igraph library. "
 		     "Should not be used directly.");
+
+  /* Initialize random number generator */
+  igraphmodule_init_rng(m);
 
   /* Add the types to the core module */
   PyModule_AddObject(m, "GraphBase", (PyObject*)&igraphmodule_GraphType);
@@ -493,4 +540,14 @@ PyMODINIT_FUNC initcore(void) {
   
   /* initialize attribute handlers */
   igraphmodule_initialize_attribute_handler();
+
+  /* Initialize the C API pointer array */
+  PyIGraph_API[PyIGraph_FromCGraph_NUM] = (void *)PyIGraph_FromCGraph;
+  PyIGraph_API[PyIGraph_ToCGraph_NUM]   = (void *)PyIGraph_ToCGraph;
+
+  /* Create a CObject containing the API pointer array's address */
+  c_api_object = PyCObject_FromVoidPtr((void*)PyIGraph_API, NULL);
+  if (c_api_object != 0) {
+    PyModule_AddObject(m, "_C_API", c_api_object);
+  }
 }
