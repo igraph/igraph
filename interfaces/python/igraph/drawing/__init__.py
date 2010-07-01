@@ -83,7 +83,7 @@ class Plot(object):
 
     # pylint: disable-msg=E1101
     # E1101: Module 'cairo' has no 'foo' member - of course it has! :)
-    def __init__(self, target=None, bbox=None, palette=None):
+    def __init__(self, target=None, bbox=None, palette=None, background=None):
         """Creates a new plot.
 
         @param target: the target surface to write to. It can be one of the
@@ -110,11 +110,14 @@ class Plot(object):
           key of C{igraph.colors.palettes} (see module L{igraph.colors}) or C{None}.
           In the latter case, the default palette given by the configuration
           key C{plotting.palette} is used.
+
+        @param background: the background color. If C{None}, the background
+          will be transparent. You can use any color specification here that
+          is understood by L{igraph.colors.color_name_to_rgba}.
         """
         self._filename = None
         self._surface_was_created = not isinstance(target, cairo.Surface)
         self._need_tmpfile = False
-        self._bgcolor = None
 
         # Several Windows-specific hacks will be used from now on, thanks
         # to Dale Hunscher for debugging and fixing all that stuff
@@ -138,7 +141,6 @@ class Plot(object):
             self._need_tmpfile = True
             self._surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, \
                 int(self.bbox.width), int(self.bbox.height))
-            self._bgcolor = (1., 1., 1.)
         elif isinstance(target, cairo.Surface):
             self._surface = target
         else:
@@ -154,7 +156,6 @@ class Plot(object):
             elif ext == ".png":
                 self._surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, \
                     int(self.bbox.width), int(self.bbox.height))
-                self._bgcolor = (1., 1., 1.)
             elif ext == ".svg":
                 self._surface = cairo.SVGSurface(target, self.bbox.width, \
                                                  self.bbox.height)
@@ -164,6 +165,8 @@ class Plot(object):
         self._ctx = cairo.Context(self._surface)
         self._objects = []
         self._is_dirty = False
+
+        self.background = background
 
     def add(self, obj, bbox=None, palette=None, opacity=1.0, *args, **kwds):
         """Adds an object to the plot.
@@ -192,6 +195,25 @@ class Plot(object):
             bbox = BoundingBox(bbox)
         self._objects.append((obj, bbox, palette, opacity, args, kwds))
         self.mark_dirty()
+
+    @property
+    def background(self):
+        """Returns the background color of the plot. C{None} means a
+        transparent background.
+        """
+        return self._background
+
+    @background.setter
+    def background(self, color):
+        """Sets the background color of the plot. C{None} means a
+        transparent background. You can use any color specification here
+        that is understood by the C{get} method of the current palette
+        or by L{igraph.colors.color_name_to_rgb}.
+        """
+        if color is None:
+            self._background = None
+        else:
+            self._background = self._palette.get(color)
 
     def remove(self, obj, bbox=None, idx=1):
         """Removes an object from the plot.
@@ -229,8 +251,8 @@ class Plot(object):
     def redraw(self, context=None):
         """Redraws the plot"""
         ctx = context or self._ctx
-        if self._bgcolor is not None:
-            ctx.set_source_rgba(*self._bgcolor)
+        if self._background is not None:
+            ctx.set_source_rgba(*self._background)
             ctx.rectangle(0, 0, self.bbox.width, self.bbox.height)
             ctx.fill()
 
@@ -379,10 +401,7 @@ def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
     if not isinstance(bbox, BoundingBox):
         bbox = BoundingBox(bbox)
 
-    result = Plot(target, bbox)
-    contract_w, contract_h = bbox.width/60., bbox.height/60.
-    bbox = bbox.contract((contract_w, contract_h, contract_w, contract_h))
-
+    result = Plot(target, bbox, background="white")
     result.add(obj, bbox, *args, **kwds)
     if target is None:
         result.show()
