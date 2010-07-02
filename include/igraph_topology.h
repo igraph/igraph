@@ -43,6 +43,7 @@ __BEGIN_DECLS
 
 int igraph_topological_sorting(const igraph_t *graph, igraph_vector_t *res,
 			       igraph_neimode_t mode);
+int igraph_is_dag(const igraph_t *graph, igraph_bool_t *res);
 
 /* -------------------------------------------------- */
 /* Graph isomorphisms                                 */

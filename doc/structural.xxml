@@ -130,6 +130,7 @@
 </section>
 
 <section><title>Topological sorting</title>
+<!-- doxrox-include igraph_is_dag -->
 <!-- doxrox-include igraph_topological_sorting -->
 </section>
 

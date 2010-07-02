@@ -41,6 +41,7 @@ int main() {
 
   igraph_t g;
   igraph_vector_t v, res;
+  igraph_bool_t is_dag;
   int ret;
 
   igraph_set_warning_handler(igraph_warning_handler_print_stdout);
@@ -52,6 +53,10 @@ int main() {
 
   igraph_vector_init(&res, 0);
 
+  igraph_is_dag(&g, &is_dag);
+  if (!is_dag)
+    return 2;
+
   igraph_topological_sorting(&g, &res, IGRAPH_OUT);
   print_vector(&res, stdout);
   igraph_topological_sorting(&g, &res, IGRAPH_IN);
@@ -60,6 +65,9 @@ int main() {
   /* Add a circle: 5 -> 0 */
   igraph_vector_init_int(&v, 2, 5, 0);
   igraph_add_edges(&g, &v, 0);
+  igraph_is_dag(&g, &is_dag);
+  if (is_dag)
+    return 3;
   igraph_topological_sorting(&g, &res, IGRAPH_OUT);
   print_vector(&res, stdout);
   igraph_vector_destroy(&v);
@@ -71,6 +79,9 @@ int main() {
   /* This graph is the same but undirected */
   igraph_small(&g, 8, 0, 0, 3, 0, 4, 1, 3, 2, 4, 2, 7, \
 	       3, 5, 3, 6, 3, 7, 4, 6, -1);
+  igraph_is_dag(&g, &is_dag);
+  if (is_dag)
+    return 4;
   ret=igraph_topological_sorting(&g, &res, IGRAPH_ALL);
   if (ret != IGRAPH_EINVAL) {
     return 1;

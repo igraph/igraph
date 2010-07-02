@@ -4021,7 +4021,7 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
 
 /**
  * \function igraph_topological_sorting
- * Calculate a possible topological sorting of the graph
+ * \brief Calculate a possible topological sorting of the graph
  *
  * </para><para>
  * A topological sorting of a directed acyclic graph is a linear ordering
@@ -4044,6 +4044,9 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
  * 
  * Time complexity: O(|V|+|E|), where |V| and |E| are the number of
  * vertices and edges in the original input graph.
+ *
+ * \sa \ref igraph_is_dag() if you are only interested in whether a given
+ *     graph is a DAG or not.
  */
 int igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
 			       igraph_neimode_t mode) {
@@ -4103,6 +4106,79 @@ int igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
   IGRAPH_FINALLY_CLEAN(3);
 
   return 0;
+}
+
+/**
+ * \function igraph_is_dag
+ * Checks whether a graph is a directed acyclic graph (DAG) or not.
+ *
+ * </para><para>
+ * A directed acyclic graph (DAG) is a directed graph with no cycles.
+ *
+ * \param graph The input graph.
+ * \param res Pointer to a boolean constant, the result
+ *     is stored here.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), where |V| and |E| are the number of
+ * vertices and edges in the original input graph.
+ *
+ * \sa \ref igraph_topological_sorting() to get a possible topological
+ *     sorting of a DAG.
+ */
+int igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t degrees, neis;
+  igraph_dqueue_t sources;
+  long int node, i, j, nei, vertices_left;
+
+  if (!igraph_is_directed(graph)) {
+    *res = 0;
+    return IGRAPH_SUCCESS;
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&degrees, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_CHECK(igraph_dqueue_init(&sources, 0));
+  IGRAPH_FINALLY(igraph_dqueue_destroy, &sources);
+  IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_OUT, 0));
+
+  vertices_left = no_of_nodes;
+
+  /* Do we have nodes with no incoming edges? */
+  for (i=0; i<no_of_nodes; i++) {
+    if (VECTOR(degrees)[i] == 0)
+      IGRAPH_CHECK(igraph_dqueue_push(&sources, i));
+  }
+
+  /* Take all nodes with no incoming edges and remove them */
+  while (!igraph_dqueue_empty(&sources)) {
+    node=(long)igraph_dqueue_pop(&sources);
+    /* Exclude the node from further source searches */
+    VECTOR(degrees)[node]=-1;
+    vertices_left--;
+    /* Get the neighbors and decrease their degrees by one */
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_IN));
+    j=igraph_vector_size(&neis);
+    for (i=0; i<j; i++) {
+      nei = (long)VECTOR(neis)[i];
+      VECTOR(degrees)[nei]--;
+      if (VECTOR(degrees)[nei] == 0)
+        IGRAPH_CHECK(igraph_dqueue_push(&sources, nei));
+    }
+  }
+
+  *res = (vertices_left == 0);
+  if (vertices_left < 0) {
+    IGRAPH_WARNING("vertices_left < 0 in igraph_is_dag, possible bug");
+  }
+
+  igraph_vector_destroy(&degrees);
+  igraph_vector_destroy(&neis);
+  igraph_dqueue_destroy(&sources);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  return IGRAPH_SUCCESS;
 }
 
 /**

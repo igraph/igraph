@@ -506,6 +506,10 @@ igraph_is_loop:
         PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL
         IGNORE: RR, RC, RNamespace
 
+igraph_is_dag:
+        PARAMS: GRAPH graph, OUT BOOLEANPTR res
+        NAME-R: is.dag
+
 igraph_is_simple:
         PARAMS: GRAPH graph, OUT BOOLEANPTR res
         NAME-R: is.simple
