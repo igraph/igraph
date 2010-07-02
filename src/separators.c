@@ -331,7 +331,10 @@ int igraph_minimal_separators_berry(const igraph_t *graph,
       /* Remove N(x) U basis */
       igraph_vector_t *neis=igraph_adjlist_get(&adjlist, x);
       long int i, n=igraph_vector_size(neis);
-      VECTOR(leaveout)[x]=mark;
+      for (i=0; i<basislen; i++) {
+	long int sn=VECTOR(*basis)[i];
+	VECTOR(leaveout)[sn]=mark;
+      }
       for (i=0; i<n; i++) {
 	long int nei=VECTOR(*neis)[i];
 	VECTOR(leaveout)[nei]=mark;
