@@ -22,6 +22,12 @@
 AT_BANNER([[Minimal separators]])
 
 AT_SETUP([Decision problem (igraph_is_separator): ])
-AT_KEYWORDS([minimal separator])
+AT_KEYWORDS([vertex separator])
 AT_COMPILE_CHECK([simple/igraph_is_separator.c])
 AT_CLEANUP
+
+AT_SETUP([Minimal separators (igraph_minimal_separators): ])
+AT_KEYWORDS([minimal separator])
+AT_COMPILE_CHECK([simple/igraph_minimal_separators.c])
+AT_CLEANUP
+
