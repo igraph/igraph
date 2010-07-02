@@ -105,6 +105,84 @@ int igraph_is_separator(const igraph_t *graph,
   return 0;
 }
 
+int igraph_is_minimal_separator(const igraph_t *graph,
+				const igraph_vector_long_t *candidate, 
+				igraph_bool_t *res) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_bool_t removed;
+  igraph_dqueue_t Q;
+  igraph_vector_t neis;
+  igraph_vector_long_t candcopy;
+  long int candsize=igraph_vector_long_size(candidate);
+
+  IGRAPH_CHECK(igraph_vector_bool_init(&removed, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_bool_destroy, &removed);
+  IGRAPH_CHECK(igraph_dqueue_init(&Q, 100));
+  IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+
+  /* Is it a separator at all? */
+  IGRAPH_CHECK(igraph_i_is_separator(graph, candidate, res, &removed, 
+				     &Q, &neis, no_of_nodes));
+  if (!(*res)) {
+    /* Not a separator at all, nothing to do, *res is already set */
+  } else if (candsize == 0) {
+    /* Nothing to do, minimal, *res is already set */
+  } else if (candsize == 1) {
+    /* Check whether the graph was connected at all, by checking
+       whether the empty set is a separator. If yes, then 'candidate'
+       is not minimal, otherwise it is */
+    IGRAPH_CHECK(igraph_vector_long_init(&candcopy, 0));
+    IGRAPH_FINALLY(igraph_vector_long_destroy, &candcopy);
+    igraph_vector_bool_null(&removed);
+    IGRAPH_CHECK(igraph_i_is_separator(graph, &candcopy, res, &removed, 
+				       &Q, &neis, no_of_nodes));
+    (*res) = (*res) ? 0 : 1;	/* opposite */
+    igraph_vector_long_destroy(&candcopy);
+    IGRAPH_FINALLY_CLEAN(1);
+  } else {
+    /* General case, we need to remove each vertex from 'candidate'
+     * and check whether the remainder is a separator. If this is
+     * alse for all vertices, then 'candidate' is a minimal
+     * separator.
+     * 
+     * Trick: We copy 'candidate', and "mask out" vertices one by one,
+     * by putting candcopy[0] over it. The only drawback is that we
+     * need to handle the removal of candcopy[0] separately.
+     */
+    long int i;
+    IGRAPH_CHECK(igraph_vector_long_copy(&candcopy, candidate));
+    IGRAPH_FINALLY(igraph_vector_long_destroy, &candcopy);
+
+    /* "Remove" candcopy[0] */
+    VECTOR(candcopy)[0] = VECTOR(candcopy)[1];
+    igraph_vector_bool_null(&removed);
+    IGRAPH_CHECK(igraph_i_is_separator(graph, &candcopy, res, &removed, 
+				       &Q, &neis, no_of_nodes));
+    VECTOR(candcopy)[0] = VECTOR(*candidate)[0];
+
+    /* And the rest of them one by one */
+    for (i=1; i<candsize && (!*res); i++) {
+      VECTOR(candcopy)[i] = VECTOR(*candidate)[0];
+      igraph_vector_bool_null(&removed);
+      IGRAPH_CHECK(igraph_i_is_separator(graph, &candcopy, res, &removed, 
+					 &Q, &neis, no_of_nodes));    
+      VECTOR(candcopy)[i] = VECTOR(*candidate)[i];
+    }
+    (*res) = (*res) ? 0 : 1;	/* opposite */
+    igraph_vector_long_destroy(&candcopy);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  igraph_vector_destroy(&neis);
+  igraph_dqueue_destroy(&Q);
+  igraph_vector_bool_destroy(&removed);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  return 0;
+}
+
 /* --------------------------------------------------------------------*/
 
 #define UPDATEMARK() do {                              \
@@ -155,7 +233,7 @@ int igraph_i_clusters_leaveout(const igraph_adjlist_t *adjlist,
   }
   
   UPDATEMARK();
-
+  
   return 0;
 }
 
@@ -308,7 +386,7 @@ int igraph_minimal_separators_berry(const igraph_t *graph,
       long int nei=VECTOR(*neis)[i];
       VECTOR(leaveout)[nei]=mark;
     }
-    
+
     /* Find the components */
     IGRAPH_CHECK(igraph_i_clusters_leaveout(&adjlist, &components, &leaveout, 
 					    &mark, &Q));

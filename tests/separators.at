@@ -26,6 +26,11 @@ AT_KEYWORDS([vertex separator])
 AT_COMPILE_CHECK([simple/igraph_is_separator.c])
 AT_CLEANUP
 
+AT_SETUP([Decision problem, minimal separator (igraph_is_minimal separator): ])
+AT_KEYWORDS([minimal vertex separator])
+AT_COMPILE_CHECK([simple/igraph_is_minimal_separator.c])
+AT_CLEANUP
+
 AT_SETUP([Minimal separators (igraph_minimal_separators): ])
 AT_KEYWORDS([minimal separator])
 AT_COMPILE_CHECK([simple/igraph_minimal_separators.c])

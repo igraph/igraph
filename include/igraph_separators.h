@@ -49,6 +49,11 @@ int igraph_is_separator(const igraph_t *graph,
 int igraph_minimal_separators(const igraph_t *graph, 
 			      igraph_vector_ptr_t *separators, 
 			      igraph_separator_algorithm_t algo);
+
+int igraph_is_minimal_separator(const igraph_t *graph,
+				const igraph_vector_long_t *candidate, 
+				igraph_bool_t *res);
+
 __END_DECLS
 
 #endif
