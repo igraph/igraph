@@ -78,5 +78,6 @@
 #include "igraph_blas.h"
 #include "igraph_arpack.h"
 #include "igraph_mixing.h"
+#include "igraph_separators.h"
 
 #endif
