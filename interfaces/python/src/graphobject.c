@@ -332,6 +332,30 @@ PyObject *igraphmodule_Graph_ecount(igraphmodule_GraphObject * self)
 }
 
 /** \ingroup python_interface_graph
+ * \brief Checks whether an \c igraph.Graph object is a DAG.
+ * \return \c True if the graph is directed, \c False otherwise.
+ * \sa igraph_is_dag
+ */
+PyObject *igraphmodule_Graph_is_dag(igraphmodule_GraphObject * self)
+{
+  igraph_bool_t res;
+
+  if (igraph_is_dag(&self->g, &res)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (res) {
+    Py_INCREF(Py_True);
+    return Py_True;
+  }
+  else {
+    Py_INCREF(Py_False);
+    return Py_False;
+  }
+}
+
+/** \ingroup python_interface_graph
  * \brief Checks whether an \c igraph.Graph object is directed.
  * \return \c True if the graph is directed, \c False otherwise.
  * \sa igraph_is_directed
@@ -9104,6 +9128,15 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "ecount()\n\n"
    "Counts the number of edges.\n"
    "@return: the number of edges in the graph.\n" "@rtype: integer"},
+
+  // interface to igraph_is_dag
+  {"is_dag", (PyCFunction) igraphmodule_Graph_is_dag,
+   METH_NOARGS,
+   "is_dag()\n\n"
+   "Checks whether the graph is a DAG (directed acyclic graph).\n\n"
+   "A DAG is a directed graph with no directed cycles.\n\n"
+   "@return: C{True} if it is a DAG, C{False} otherwise.\n"
+   "@rtype: boolean"},
 
   // interface to igraph_is_directed
   {"is_directed", (PyCFunction) igraphmodule_Graph_is_directed,

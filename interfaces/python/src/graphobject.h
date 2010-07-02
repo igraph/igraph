@@ -61,7 +61,9 @@ PyObject* igraphmodule_Graph_str(igraphmodule_GraphObject *self);
 
 PyObject* igraphmodule_Graph_vcount(igraphmodule_GraphObject *self);
 PyObject* igraphmodule_Graph_ecount(igraphmodule_GraphObject *self);
+PyObject* igraphmodule_Graph_is_dag(igraphmodule_GraphObject *self);
 PyObject* igraphmodule_Graph_is_directed(igraphmodule_GraphObject *self);
+PyObject* igraphmodule_Graph_is_simple(igraphmodule_GraphObject *self);
 PyObject* igraphmodule_Graph_add_vertices(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_delete_vertices(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_add_edges(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);

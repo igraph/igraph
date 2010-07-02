@@ -291,6 +291,18 @@ class MiscTests(unittest.TestCase):
         g.to_undirected()
         self.assertRaises(InternalError, g.topological_sorting)
 
+    def testIsDAG(self):
+        g = Graph(5, [(0, 1), (0, 2), (1, 2), (1, 3), (2, 3)], directed=True)
+        self.failUnless(g.is_dag())
+        g.to_undirected()
+        self.failIf(g.is_dag())
+        g = Graph.Barabasi(1000, 2, directed=True)
+        self.failUnless(g.is_dag())
+        g = Graph.GRG(100, 0.2)
+        self.failIf(g.is_dag())
+        g = Graph.Ring(10, directed=True, mutual=False)
+        self.failIf(g.is_dag())
+
     def testLineGraph(self):
         g = Graph(4, [(0, 1), (0, 2), (1, 2), (0, 3), (1, 3)])
         el = g.linegraph().get_edgelist()
