@@ -28,16 +28,63 @@
 #include "igraph_vector.h"
 #include "igraph_interface.h"
 
+int igraph_i_is_separator(const igraph_t *graph,
+			  const igraph_vector_long_t *candidate,
+			  igraph_bool_t *res, 
+			  igraph_vector_bool_t *removed,
+			  igraph_dqueue_t *Q,
+			  igraph_vector_t *neis,
+			  long int no_of_nodes) {
+  
+  /* Remove the given vertices from the graph, do a breadth-first
+     search and check the number of components */  
+  long int i, clen=igraph_vector_long_size(candidate);
+  long int start=0;
+  
+  for (i=0; i<clen; i++) {
+    long int v=VECTOR(*candidate)[i];
+    VECTOR(*removed)[v] = 1;
+  }
+
+  /* Look for the first node that is not removed */
+  while (start < no_of_nodes && VECTOR(*removed)[start]) start++;
+  
+  if (start==no_of_nodes) { 
+    IGRAPH_ERROR("All vertices are included in the separator", 
+		 IGRAPH_EINVAL);
+  }
+  
+  igraph_dqueue_push(Q, start);
+  VECTOR(*removed)[start]=1;
+  while (!igraph_dqueue_empty(Q)) {
+    long int node=igraph_dqueue_pop(Q);
+    long int j, n;
+    igraph_neighbors(graph, neis, node, IGRAPH_ALL);
+    n=igraph_vector_size(neis);
+    for (j=0; j<n; j++) {
+      long int nei=VECTOR(*neis)[j];
+      if (!VECTOR(*removed)[nei]) {
+	IGRAPH_CHECK(igraph_dqueue_push(Q, nei));
+	VECTOR(*removed)[nei]=1;
+      }
+    }
+  }
+  
+  /* Look for the next node that was neighter removed, not visited */
+  while (start < no_of_nodes && VECTOR(*removed)[start]) start++;
+  
+  /* If there is another component, then we have a separator */
+  *res = (start < no_of_nodes);
+    
+  return 0;
+}
+
 int igraph_is_separator(const igraph_t *graph, 
 			const igraph_vector_long_t *candidate,
 			igraph_bool_t *res) {
-  
-  /* Remove the given vertices from the graph, do a breadth-first
-     search and check the number of components */
-  
+
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_bool_t removed;
-  long int start=0, i, clen=igraph_vector_long_size(candidate);
   igraph_dqueue_t Q;
   igraph_vector_t neis;
 
@@ -46,47 +93,15 @@ int igraph_is_separator(const igraph_t *graph,
   IGRAPH_CHECK(igraph_dqueue_init(&Q, 100));
   IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
-  
-  for (i=0; i<clen; i++) {
-    long int v=VECTOR(*candidate)[i];
-    VECTOR(removed)[v] = 1;
-  }
 
-  /* Look for the first node that is not removed */
-  while (start < no_of_nodes && VECTOR(removed)[start]) start++;
-  
-  if (start==no_of_nodes) { 
-    IGRAPH_ERROR("All vertices are included in the separator", 
-		 IGRAPH_EINVAL);
-  }
-  
-  igraph_dqueue_push(&Q, start);
-  VECTOR(removed)[start]=1;
-  while (!igraph_dqueue_empty(&Q)) {
-    long int node=igraph_dqueue_pop(&Q);
-    long int j, n;
-    igraph_neighbors(graph, &neis, node, IGRAPH_ALL);
-    n=igraph_vector_size(&neis);
-    for (j=0; j<n; j++) {
-      long int nei=VECTOR(neis)[j];
-      if (!VECTOR(removed)[nei]) {
-	IGRAPH_CHECK(igraph_dqueue_push(&Q, nei));
-	VECTOR(removed)[nei]=1;
-      }
-    }
-  }
-  
-  /* Look for the next node that was neighter removed, not visited */
-  while (start < no_of_nodes && VECTOR(removed)[start]) start++;
-  
-  /* If there is another component, then we have a separator */
-  *res = (start < no_of_nodes);
+  IGRAPH_CHECK(igraph_i_is_separator(graph, candidate, res, &removed, 
+				     &Q, &neis, no_of_nodes));
 
   igraph_vector_destroy(&neis);
   igraph_dqueue_destroy(&Q);
   igraph_vector_bool_destroy(&removed);
   IGRAPH_FINALLY_CLEAN(3);
-    
+
   return 0;
 }
 
