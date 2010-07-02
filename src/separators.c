@@ -81,6 +81,11 @@ int igraph_is_separator(const igraph_t *graph,
   
   /* If there is another component, then we have a separator */
   *res = (start < no_of_nodes);
+
+  igraph_vector_destroy(&neis);
+  igraph_dqueue_destroy(&Q);
+  igraph_vector_bool_destroy(&removed);
+  IGRAPH_FINALLY_CLEAN(3);
     
   return 0;
 }
