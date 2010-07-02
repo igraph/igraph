@@ -131,8 +131,8 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_vector_ptr.h	../include/igraph_spmatrix.h  \
 		../include/igraph_strvector.h	../include/igraph_psumtree.h  \
 		../include/igraph_sparsemat.h   ../include/igraph_mixing.h    \
-		../include/igraph_version.h     ../include/igraph_blas.h
-
+		../include/igraph_version.h     ../include/igraph_blas.h      \
+		../include/igraph_separators.h
 
 libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     basic_query.c games.c cocitation.c iterators.c \
@@ -176,7 +176,7 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     foreign-dl-parser.y foreign-dl-lexer.l \
 			     $(CS) sparsemat.c mixing.c bigint.c bignum.c \
 			     version.c optimal_modularity.c \
-			     igraph_fixed_vectorlist.c
+			     igraph_fixed_vectorlist.c separators.c
 
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall
