@@ -32,8 +32,7 @@ int main() {
   
   igraph_famous(&graph, "zachary");
   igraph_vector_ptr_init(&separators, 0);
-  igraph_minimal_separators(&graph, &separators, 
-			    IGRAPH_SEPARATOR_ALGORITHM_BERRY);
+  igraph_all_minimal_ab_separators(&graph, &separators);
 
   n=igraph_vector_ptr_size(&separators);
   for (i=0; i<n; i++) {

@@ -319,8 +319,8 @@ void igraph_i_separators_free(igraph_vector_ptr_t *separators) {
   }
 }
 
-int igraph_minimal_separators_berry(const igraph_t *graph, 
-				    igraph_vector_ptr_t *separators) {
+int igraph_all_minimal_ab_separators(const igraph_t *graph, 
+				     igraph_vector_ptr_t *separators) {
 
   /* 
    * Some notes about the tricks used here. For finding the components
@@ -446,22 +446,3 @@ int igraph_minimal_separators_berry(const igraph_t *graph,
 
 #undef UPDATEMARK
 
-/**
- * \function igraph_minimal_separators
- * Find all minimal separators in a graph
- * 
- * 
- */
-
-int igraph_minimal_separators(const igraph_t *graph, 
-			      igraph_vector_ptr_t *separators, 
-			      igraph_separator_algorithm_t algo) {
-
-  if (algo == IGRAPH_SEPARATOR_ALGORITHM_BERRY) {
-    return igraph_minimal_separators_berry(graph, separators);
-  } else {
-    IGRAPH_ERROR("Unknown minimal separator algorithm", IGRAPH_EINVAL);
-  }
-  
-  return IGRAPH_FAILURE;	/* never happens */
-}

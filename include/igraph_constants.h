@@ -125,9 +125,6 @@ typedef enum { IGRAPH_SUBGRAPH_AUTO = 0,
 			   IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH
 			 } igraph_subgraph_implementation_t;
 
-typedef enum { IGRAPH_SEPARATOR_ALGORITHM_BERRY = 0 }
-  igraph_separator_algorithm_t;
-
 typedef igraph_real_t  igraph_scalar_function_t(const igraph_vector_t *var, 
 						const igraph_vector_t *par,
 						void* extra);
