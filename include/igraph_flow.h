@@ -97,6 +97,8 @@ int igraph_adhesion(const igraph_t *graph, igraph_integer_t *res,
 int igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
 		    igraph_bool_t checks);
 
+int igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar);
+
 __END_DECLS
 
 #endif

@@ -35,3 +35,8 @@ AT_SETUP([Minimum cut (igraph_mincut): ])
 AT_KEYWORDS([minimum cut Stoer-Wagner])
 AT_COMPILE_CHECK([simple/igraph_mincut.c], [simple/igraph_mincut.out])
 AT_CLEANUP
+
+AT_SETUP([Even-Tarjan reduction (igraph_even_tarjan_reduction): ])
+AT_KEYWORDS([Even Tarjan reduction vertex cut separator])
+AT_COMPILE_CHECK([simple/even_tarjan.c])
+AT_CLEANUP

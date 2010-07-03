@@ -2008,3 +2008,51 @@ int igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
   IGRAPH_CHECK(igraph_vertex_connectivity(graph, res, checks));
   return 0;
 }
+
+/**
+ * \function igraph_even_tarjan_reduction
+ * Even-Tarjan reduction of a graph
+ */
+
+int igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  
+  long int new_no_of_nodes=no_of_nodes*2;
+  long int new_no_of_edges=no_of_nodes + no_of_edges * 2;
+  
+  igraph_vector_t edges;
+  long int edgeptr=0;
+  long int i;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, new_no_of_edges * 2);
+
+  /* Every vertex 'i' is replaced by two vertices, i' and i'' */
+  /* id[i'] := id[i] ; id[i''] := id[i] + no_of_nodes */
+
+  /* One edge for each original vertex, for i, we add (i',i'') */
+  for (i=0; i<no_of_nodes; i++) {
+    VECTOR(edges)[edgeptr++] = i;
+    VECTOR(edges)[edgeptr++] = i + no_of_nodes;
+  }
+  
+  /* Two news edges for each original edge 
+     (from,to) becomes (from'',to'), (to'',from') */
+  for (i=0; i<no_of_edges; i++) {
+    long int from=IGRAPH_FROM(graph, i);
+    long int to=IGRAPH_TO(graph, i);
+    VECTOR(edges)[edgeptr++] = from + no_of_nodes;
+    VECTOR(edges)[edgeptr++] = to;
+    VECTOR(edges)[edgeptr++] = to + no_of_nodes;
+    VECTOR(edges)[edgeptr++] = from;
+  }
+  
+  IGRAPH_CHECK(igraph_create(graphbar, &edges, new_no_of_nodes, 
+			     IGRAPH_DIRECTED));
+
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
