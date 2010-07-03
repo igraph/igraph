@@ -3674,9 +3674,11 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
   
   return 0;
 }
-    
-int igraph_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph) {
-  
+
+/* Note to self: tried using adjacency lists instead of igraph_adjacent queries,
+ * with minimal performance improvements on a graph with 70K vertices and 360K
+ * edges. (1.09s instead of 1.10s). I think it's not worth the fuss. */
+int igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph) {
   long int no_of_edges=igraph_ecount(graph);  
   long int i, j, n;
   igraph_vector_t adjedges, adjedges2;
@@ -3699,11 +3701,9 @@ int igraph_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph) {
     n=igraph_vector_size(&adjedges);
     for (j=0; j<n; j++) {
       long int e=VECTOR(adjedges)[j];
-      if (e!=i) {
-	if (e<=i) { 
-	  IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	  IGRAPH_CHECK(igraph_vector_push_back(&edges, e));
-	}
+      if (e<i) {
+        IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+        IGRAPH_CHECK(igraph_vector_push_back(&edges, e));
       }
     }
     
@@ -3711,11 +3711,9 @@ int igraph_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph) {
     n=igraph_vector_size(&adjedges2);
     for (j=0; j<n; j++) {
       long int e=VECTOR(adjedges2)[j];
-      if (e!=i) {
-	if (e<i) { 
-	  IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	  IGRAPH_CHECK(igraph_vector_push_back(&edges, e));
-	}
+      if (e<i) { 
+        IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+        IGRAPH_CHECK(igraph_vector_push_back(&edges, e));
       }
     }
     
@@ -3725,6 +3723,7 @@ int igraph_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph) {
   igraph_vector_destroy(&adjedges);
   igraph_vector_destroy(&adjedges2);
   IGRAPH_FINALLY_CLEAN(2);
+
   igraph_create(linegraph, &edges, no_of_edges, igraph_is_directed(graph));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
@@ -3732,8 +3731,7 @@ int igraph_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph) {
   return 0;
 }
 
-int igraph_linegraph_directed(const igraph_t *graph, igraph_t *linegraph) {
-  
+int igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegraph) {
   long int no_of_edges=igraph_ecount(graph);
   long int i, j, n;
   igraph_vector_t adjedges; 
@@ -3798,9 +3796,9 @@ int igraph_linegraph_directed(const igraph_t *graph, igraph_t *linegraph) {
 int igraph_linegraph(const igraph_t *graph, igraph_t *linegraph) {
 
   if (igraph_is_directed(graph)) {
-    return igraph_linegraph_directed(graph, linegraph);
+    return igraph_i_linegraph_directed(graph, linegraph);
   } else {
-    return igraph_linegraph_undirected(graph, linegraph);
+    return igraph_i_linegraph_undirected(graph, linegraph);
   }
 }
 
