@@ -2285,11 +2285,25 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
  * \brief Average local transitivity (clustering coefficient)
  * 
  * The transitivity measures the probability that two neighbors of a
- * vertex are connected. In case of the average local transitivity
- * this probability if calculated for each vertex and then the average
+ * vertex are connected. In case of the average local transitivity,
+ * this probability is calculated for each vertex and then the average
  * is taken. Vertices with less than two neighbors require special treatment,
  * they will either be left out from the calculation or they will be considered
  * as having zero transitivity, depending on the \c mode argument.
+ *
+ * </para><para>
+ * Note that this measure is different from the global transitivity measure
+ * (see \ref igraph_transitivity_undirected() ) as it simply takes the
+ * average local transitivity across the whole network. See the following
+ * reference for more details:
+ *
+ * </para><para>
+ * D. J. Watts and S. Strogatz: Collective dynamics of small-world networks.
+ * Nature 393(6684):440-442 (1998).
+ *
+ * </para><para>
+ * Clustering coefficient is an alternative name for transitivity.
+ *
  * \param graph The input graph, directed graphs are considered as 
  *    undirected ones.
  * \param res Pointer to a real variable, the result will be stored here.
@@ -2787,6 +2801,20 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
  * The transitivity measures the probability that two neighbors of a
  * vertex are connected. In case of the local transitivity, this
  * probability is calculated separately for each vertex.
+ *
+ * </para><para>
+ * Note that this measure is different from the global transitivity measure
+ * (see \ref igraph_transitivity_undirected() ) as it calculates a transitivity
+ * value for each vertex individually. See the following reference for more
+ * details:
+ *
+ * </para><para>
+ * D. J. Watts and S. Strogatz: Collective dynamics of small-world networks.
+ * Nature 393(6684):440-442 (1998).
+ *
+ * </para><para>
+ * Clustering coefficient is an alternative name for transitivity.
+ *
  * \param graph The input graph, it can be directed but direction of
  *   the edges will be ignored.
  * \param res Pointer to an initialized vector, the result will be
@@ -2836,9 +2864,22 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
  * 
  * </para><para>
  * The transitivity measures the probability that two neighbors of a
- * vertex are connected. More precisely this is the ratio of the
+ * vertex are connected. More precisely, this is the ratio of the
  * triangles and connected triples in the graph, the result is a
  * single real number. Directed graphs are considered as undirected ones.
+ *
+ * </para><para>
+ * Note that this measure is different from the local transitivity measure
+ * (see \ref igraph_transitivity_local_undirected() ) as it calculates a single
+ * value for the whole graph. See the following reference for more details:
+ *
+ * </para><para>
+ * S. Wasserman and K. Faust: Social Network Analysis: Methods and
+ * Applications. Cambridge: Cambridge University Press, 1994.
+ *
+ * </para><para>
+ * Clustering coefficient is an alternative name for transitivity.
+ *
  * \param graph The graph object.  
  * \param res Pointer to a real variable, the result will be stored here.
  * \param mode Defines how to treat graphs with no connected triples.
