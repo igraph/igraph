@@ -10553,12 +10553,24 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    (PyCFunction) igraphmodule_Graph_transitivity_undirected,
    METH_VARARGS | METH_KEYWORDS,
    "transitivity_undirected(mode=\"nan\")\n\n"
-   "Calculates the transitivity (clustering coefficient) of the graph.\n\n"
+   "Calculates the global transitivity (clustering coefficient) of the\n\n"
+   "graph.\n\n"
+   "The transitivity measures the probability that two neighbors of a\n"
+   "vertex are connected. More precisely, this is the ratio of the\n"
+   "triangles and connected triplets in the graph. The result is a\n"
+   "single read number. Directed graphs are considered as undirected\n"
+   "ones.\n\n"
+   "Note that this measure is different from the local transitivity\n"
+   "measure (see L{transitivity_local_undirected()}) as it calculates\n"
+   "a single value for the whole graph.\n\n"
    "@param mode: if C{TRANSITIVITY_ZERO} or C{\"zero\"}, the result will\n"
    "  be zero if the graph does not have any triplets. If C{\"nan\"} or\n"
    "  C{TRANSITIVITY_NAN}, the result will be C{NaN} (not a number).\n"
    "@return: the transitivity\n"
    "@see: L{transitivity_local_undirected()}, L{transitivity_avglocal_undirected()}\n"
+   "@newfield ref: Reference\n"
+   "@ref: S. Wasserman and K. Faust: I{Social Network Analysis: Methods and\n"
+   "  Applications}. Cambridge: Cambridge University Press, 1994."
   },
 
   // interface to igraph_transitivity_local_undirected
@@ -10566,7 +10578,14 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    (PyCFunction) igraphmodule_Graph_transitivity_local_undirected,
    METH_VARARGS | METH_KEYWORDS,
    "transitivity_local_undirected(vertices=None, mode=\"nan\")\n\n"
-   "Calculates the local transitivity of given vertices in the graph.\n\n"
+   "Calculates the local transitivity (clustering coefficient) of the\n"
+   "given vertices in the graph.\n\n"
+   "The transitivity measures the probability that two neighbors of a\n"
+   "vertex are connected. In case of the local transitivity, this\n"
+   "probability is calculated separately for each vertex.\n\n"
+   "Note that this measure is different from the global transitivity\n"
+   "measure (see L{transitivity_undirected()}) as it calculates\n"
+   "a transitivity value for each vertex individually.\n\n"
    "@param vertices: a list containing the vertex IDs which should be\n"
    "  included in the result. C{None} means all of the vertices.\n"
    "@param mode: defines how to treat vertices with degree less than two.\n"
@@ -10575,6 +10594,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  vertices will have C{NaN} (not a number) as their transitivity.\n"
    "@return: the transitivities for the given vertices in a list\n"
    "@see: L{transitivity_undirected()}, L{transitivity_avglocal_undirected()}\n"
+   "@newfield ref: Reference\n"
+   "@ref: D. J. Watts and S. Strogatz: I{Collective dynamics of small-world\n"
+   "  networks}. Nature 393(6884):440-442, 1998."
   },
 
   /* interface to igraph_transitivity_avglocal_undirected */
@@ -10583,11 +10605,24 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    METH_VARARGS | METH_KEYWORDS,
    "transitivity_avglocal_undirected(mode=\"nan\")\n\n"
    "Calculates the average of the vertex transitivities of the graph.\n\n"
+   "The transitivity measures the probability that two neighbors of a\n"
+   "vertex are connected. In case of the average local transitivity,\n"
+   "this probability is calculated for each vertex and then the average\n"
+   "is taken. Vertices with less than two neighbors require special\n"
+   "treatment, they will either be left out from the calculation or\n"
+   "they will be considered as having zero transitivity, depending on\n"
+   "the I{mode} parameter.\n\n"
+   "Note that this measure is different from the global transitivity measure\n"
+   "(see L{transitivity_undirected()}) as it simply takes the average local\n"
+   "transitivity across the whole network.\n\n"
    "@param mode: defines how to treat vertices with degree less than two.\n"
    "  If C{TRANSITIVITT_ZERO} or C{\"zero\"}, these vertices will have\n"
    "  zero transitivity. If C{TRANSITIVITY_NAN} or C{\"nan\"}, these\n"
    "  vertices will be excluded from the average.\n"
    "@see: L{transitivity_undirected()}, L{transitivity_local_undirected()}\n"
+   "@newfield ref: Reference\n"
+   "@ref: D. J. Watts and S. Strogatz: I{Collective dynamics of small-world\n"
+   "  networks}. Nature 393(6884):440-442, 1998."
   },
 
   /* interface to igraph_unfold_tree */
