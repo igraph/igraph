@@ -554,10 +554,10 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
   igraph_i_kleinberg_data2_t extra2;
   long int i;
 
-  if (igraph_ecount(graph) == 0) {
-    /* special case: empty graph */
+  if (igraph_ecount(graph) == 0 || igraph_vcount(graph) == 1) {
+    /* special case: empty graph or single vertex */
     if (value)
-      *value = IGRAPH_NAN;
+      *value = igraph_ecount(graph) ? 1.0 : IGRAPH_NAN;
     if (vector) {
       igraph_vector_resize(vector, igraph_vcount(graph));
       igraph_vector_fill(vector, 1);
@@ -635,6 +635,9 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
 
   options->nev = 1;
   options->ncv = 3;
+  if (options->n < options->ncv) {
+    options->ncv = options->n;
+  }
   options->which[0]='L'; options->which[1]='M';
 
   if (weights == 0) {
