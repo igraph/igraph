@@ -2707,16 +2707,20 @@ def write(graph, filename, *args, **kwds):
     return graph.write(filename, *args, **kwds)
 save=write
 
-def summary(o, f=sys.stdout):
+def summary(obj, stream=sys.stdout, *args, **kwds):
     """Prints a summary of object o to a given stream
 
-    @param o: the object about which a human-readable summary is requested.
-    @param f: the stream to be used
+    Positional and keyword arguments not explicitly mentioned here are passed
+    on to the underlying C{summary()} method of the object if it has any.
+
+    @param obj: the object about which a human-readable summary is requested.
+    @param stream: the stream to be used
     """
-    if hasattr(o, "summary"):
-        f.write(o.summary() + "\n")
+    if hasattr(obj, "summary"):
+        stream.write(obj.summary(*args, **kwds))
     else:
-        f.write(str(o) + "\n")
+        stream.write(str(obj))
+    stream.write("\n")
 
 config = configuration.init()
 del construct_graph_from_formula
