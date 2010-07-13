@@ -351,16 +351,17 @@ static PyMethodDef igraphmodule_methods[] =
     METH_VARARGS | METH_KEYWORDS,
     "_compare_communities(comm1, comm2, method=\"vi\")\n\n"
   },
-  {"convex_hull", (PyCFunction)igraphmodule_convex_hull, METH_VARARGS,
-      "convex_hull(vs, coords=False)\n\n"
-      "Calculates the convex hull of a given point set.\n\n"
-      "@param vs: the point set as a list of lists\n"
-      "@param coords: if C{True}, the function returns the\n"
-      "  coordinates of the corners of the convex hull polygon,\n"
-      "  otherwise returns the corner indices.\n"
-      "@return: either the hull's corner coordinates or the point\n"
-      "  indices corresponding to them, depending on the C{coords}\n"
-      "  parameter."
+  {"convex_hull", (PyCFunction)igraphmodule_convex_hull,
+    METH_VARARGS | METH_KEYWORDS,
+    "convex_hull(vs, coords=False)\n\n"
+    "Calculates the convex hull of a given point set.\n\n"
+    "@param vs: the point set as a list of lists\n"
+    "@param coords: if C{True}, the function returns the\n"
+    "  coordinates of the corners of the convex hull polygon,\n"
+    "  otherwise returns the corner indices.\n"
+    "@return: either the hull's corner coordinates or the point\n"
+    "  indices corresponding to them, depending on the C{coords}\n"
+    "  parameter."
   },
   {"set_progress_handler", igraphmodule_set_progress_handler, METH_VARARGS,
       "set_progress_handler(handler)\n\n"
