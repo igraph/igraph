@@ -129,6 +129,10 @@ class Configuration(object):
     They are all stored in section C{plotting}.
 
         - B{layout}: default graph layout algorithm to be used.
+
+        - B{mark_groups}: whether to mark the clusters by polygons when
+          plotting a clustering object.
+
         - B{palette}: default palette to be used for converting integer
           numbers to colors. See L{colors.Palette} for more information.
           Valid palette names are stored in C{colors.palettes}.
@@ -179,6 +183,7 @@ class Configuration(object):
         "apps.image_viewer": { "default": get_platform_image_viewer() },
 
         "plotting.layout": { "default": "random" },
+        "plotting.mark_groups": { "default": False, "type": "boolean" },
         "plotting.palette": { "default": "gray" }
     }
 

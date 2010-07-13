@@ -26,6 +26,7 @@ from copy import deepcopy
 from StringIO import StringIO
 
 from igraph import community_to_membership
+from igraph.configuration import Configuration
 from igraph.datatypes import UniqueIdGenerator
 from igraph.drawing.colors import ClusterColoringPalette
 from igraph.statistics import Histogram
@@ -376,13 +377,82 @@ class VertexClustering(Clustering):
         This is done by calling L{Graph.__plot__()} with the same arguments, but
         coloring the graph vertices according to the current clustering.
 
-        @see: L{Graph.__plot__()} for possible keyword arguments.
+        This method understands all the positional and keyword arguments that
+        are understood by L{Graph.__plot__()}, only the differences will be
+        highlighted here:
+
+          - C{mark_groups}: whether to highlight some of the vertex groups by
+            colored polygons. Besides the values accepted by L{Graph.__plot__}
+            (i.e., a dict mapping colors to vertex indices, a list containing
+            lists of vertex indices, or C{False}), the following are also
+            accepted:
+
+              - C{True}: all the groups will be highlighted, the colors matching
+                the corresponding color indices from the current palette
+                (see the C{palette} keyword argument of L{Graph.__plot__}.
+
+              - A dict mapping color names to cluster indices. The given clusters
+                will be highlighted by the given colors.
+
+              - A list of cluster indices. This is equivalent to passing a
+                dict mapping numeric color indices from the current palette
+                to cluster indices; therefore, the cluster referred to by element
+                I{i} of the list will be highlighted by color I{i} from the
+                palette.
+
+            The value of the C{plotting.mark_groups} configuration key is also
+            taken into account here; if that configuration key is C{True} and
+            C{mark_groups} is not given explicitly, it will automatically be set
+            to C{True}.
+
+          - C{palette}: the palette used to resolve numeric color indices to RGBA
+            values. By default, this is an instance of L{ClusterColoringPalette}.
+
+          - C{vertex_color}: this keyword argument is not allowed as it would override
+            the coloring.
+
+        @see: L{Graph.__plot__()} for more supported keyword arguments.
         """
         if "vertex_color" in kwds:
             raise ValueError("you are not allowed to define vertex colors "+
                              "when plotting a clustering")
 
-        palette = ClusterColoringPalette(len(self))
+        if "palette" in kwds:
+            palette = kwds["palette"]
+        else:
+            palette = ClusterColoringPalette(len(self))
+
+        if "mark_groups" not in kwds:
+            if Configuration.instance()["plotting.mark_groups"]:
+                kwds["mark_groups"] = enumerate(self) 
+        else:
+            mark_groups = kwds["mark_groups"]
+            del kwds["mark_groups"]
+
+            # Handle the case of mark_groups = True and mark_groups yielding
+            # cluster IDs
+            if mark_groups is True:
+                group_iter = enumerate(self)
+            elif isinstance(mark_groups, dict):
+                group_iter = mark_groups.iteritems()
+            elif hasattr(mark_groups, "__iter__"):
+                if hasattr(mark_groups, "next"):
+                    # Already an iterator, let's hope it works
+                    group_iter = mark_groups
+                else:
+                    # Lists, tuples etc
+                    group_iter = enumerate(mark_groups)
+            else:
+                group_iter = {}.iteritems()
+
+            def cluster_index_resolver():
+                for color_id, group in group_iter:
+                    if isinstance(group, (int, long)):
+                        group = self[group]
+                    yield color_id, group
+
+            kwds["mark_groups"] = cluster_index_resolver()
+
         kwds["vertex_color"] = self.membership
         return self._graph.__plot__(context, bbox, palette, *args, **kwds)
 
@@ -620,7 +690,10 @@ class Dendrogram(Clustering):
     def _item_box_size(self, context, horiz, idx):
         """Calculates the amount of space needed for drawing an
         individual vertex at the bottom of the dendrogram."""
-        _, _, _, height, x_ascent, _ = context.text_extents(self._names[idx])
+        if self._names[idx] is None:
+            _, _, _, height, x_ascent, _ = context.text_extents("")
+        else:
+            _, _, _, height, x_ascent, _ = context.text_extents(str(self._names[idx]))
         if horiz:
             return x_ascent, height
         return height, x_ascent
@@ -635,10 +708,13 @@ class Dendrogram(Clustering):
         @param x: the X position of the item
         @param y: the Y position of the item
         """
-        _, _, _, height, _, _ = context.text_extents(self._names[idx])
+        if not self._names[idx]:
+            return
+
+        height, _ = self._item_box_size(context, horiz, idx)
         if horiz:
             context.move_to(x, y+height)
-            context.show_text(self._names[idx])
+            context.show_text(str(self._names[idx]))
         else:
             context.save()
             context.translate(x, y)
@@ -734,10 +810,11 @@ class Dendrogram(Clustering):
             height -= maxh
             if orientation == "tb":
                 delta_y = maxh
-        sl, st, sr, sb = layout.bounding_box()
-        rx, ry = width / max(sr-sl, 1), height / max(sb-st, 1)
-        delta_x -= (sl * rx - bbox.left)
-        delta_y -= (st * ry - bbox.top)
+
+        bbox = layout.bounding_box()
+        rx, ry = width / max(bbox.width, 1), height / max(bbox.height, 1)
+        delta_x -= (bbox.left * rx - bbox.left)
+        delta_y -= (bbox.top * ry - bbox.top)
         layout.scale(rx, ry)
         layout.translate(delta_x, delta_y)
 
@@ -877,7 +954,7 @@ class VertexDendrogram(VertexClustering, Dendrogram):
 
         See L{Dendrogram.__plot__} for the list of supported keyword
         arguments."""
-        from igraph.drawing import AttributeCollectorBase
+        from igraph.drawing.metamagic import AttributeCollectorBase
 
         class VisualVertexBuilder(AttributeCollectorBase):
             label = None

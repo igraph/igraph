@@ -1910,6 +1910,20 @@ class Graph(GraphBase):
             If it has less than 4 elements or is a single float, the elements
             will be re-used until the length is at least 4.
 
+          - C{mark_groups}: whether to highlight some of the vertex groups by
+            colored polygons. This argument can be one of the following:
+            
+              - C{False}: no groups will be highlighted
+
+              - A dict mapping color names to lists of vertex indices. The given
+                vertex groups will be highlighted by the given colors.
+
+              - A list of lists of vertex indices. This is equivalent to passing
+                a dict mapping numeric color indices from the current palette
+                to lists of vertex indices; therefore, the vertices referred to
+                by element I{i} of the list will be highlighted by color I{i}
+                from the palette.
+
           - C{vertex_size}: size of the vertices. The corresponding vertex
             attribute is called C{size}. The default is 10. Vertex sizes
             are measured in the unit of the Cairo context on which igraph

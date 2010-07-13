@@ -14,6 +14,7 @@ It also contains routines to send an igraph graph directly to Cytoscape
 from itertools import izip
 from math import cos, pi, sin
 
+from igraph.core import convex_hull
 from igraph.drawing.baseclasses import AbstractDrawer, AbstractCairoDrawer, \
                                        AbstractXMLRPCDrawer
 from igraph.drawing.edge import ArrowEdgeDrawer
@@ -139,6 +140,42 @@ class DefaultGraphDrawer(AbstractGraphDrawer, AbstractCairoDrawer):
 
         vertex_builder = VisualVertexBuilder(graph.vs, kwds)
         edge_builder = VisualEdgeBuilder(graph.es, kwds)
+
+        # Draw the highlighted groups (if any)
+        if "mark_groups" in kwds:
+            mark_groups = kwds["mark_groups"]
+
+            # Figure out what to do with mark_groups in order to be able to
+            # iterate over it and get color-memberlist pairs
+            if isinstance(mark_groups, dict):
+                group_iter = mark_groups.iteritems()
+            elif hasattr(mark_groups, "__iter__"):
+                if hasattr(mark_groups, "next"):
+                    # Already an iterator, let's hope it works
+                    group_iter = mark_groups
+                else:
+                    # Lists, tuples etc
+                    group_iter = enumerate(mark_groups)
+            else:
+                # False
+                group_iter = {}.iteritems()
+
+            # Iterate over color-memberlist pairs
+            for color_id, group in group_iter:
+                color = palette.get(color_id)
+
+                if not hasattr(group, "__iter__"):
+                    raise TypeError("group membership list must be iterable")
+
+                polygon = convex_hull([layout[idx] for idx in group], True)
+
+                context.set_source_rgba(color[0], color[1], color[2], color[3]*0.25)
+                context.move_to(*polygon[-1])
+                for point in polygon:
+                    context.line_to(*point)
+                context.fill_preserve()
+                context.set_source_rgba(*color)
+                context.stroke()
 
         # Draw the edges
         edge_drawer = self.edge_drawer_factory(context)
