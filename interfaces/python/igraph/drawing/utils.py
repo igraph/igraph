@@ -225,4 +225,3 @@ class Point(tuple):
         """Returns the squared length of the vector pointing from the origin
         to this point."""
         return (self.x ** 2 + self.y ** 2)
-

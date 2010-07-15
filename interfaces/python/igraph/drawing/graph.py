@@ -18,6 +18,7 @@ from igraph.core import convex_hull
 from igraph.drawing.baseclasses import AbstractDrawer, AbstractCairoDrawer, \
                                        AbstractXMLRPCDrawer
 from igraph.drawing.edge import ArrowEdgeDrawer
+from igraph.drawing.text import TextDrawer
 from igraph.drawing.metamagic import AttributeCollectorBase, \
                                      AttributeSpecification
 from igraph.drawing.shapes import ShapeDrawerDirectory
@@ -201,23 +202,23 @@ class DefaultGraphDrawer(AbstractGraphDrawer, AbstractCairoDrawer):
         # Draw the vertex labels
         context.select_font_face("sans-serif", cairo.FONT_SLANT_NORMAL, \
             cairo.FONT_WEIGHT_BOLD)
-        
+
+        label_drawer = TextDrawer(context, halign="center")
         for vertex, coords in izip(vertex_builder, layout):
             if vertex.label is None:
                 continue
-            xb, _, w, h = context.text_extents(vertex.label)[:4]
+
             cx, cy = coords
-            si = sin(vertex.label_angle)
-            co = cos(vertex.label_angle)
-            cx += co * vertex.label_dist * vertex.size / 2.
-            cy += si * vertex.label_dist * vertex.size / 2.
-            cx += (co - 1) * w/2. + xb
-            cy += (si + 1) * h/2.
-            context.move_to(cx, cy)
+            radius = vertex.label_dist * vertex.size / 2.
+            cx = coords[0] + cos(vertex.label_angle) * radius
+            cy = coords[1] + sin(vertex.label_angle) * radius
+            # cx += (co - 1) * w/2. + xb
+            # cy += (si + 1) * h/2.
+
             context.set_font_size(vertex.label_size)
             context.set_source_rgba(*vertex.label_color)
-            context.text_path(vertex.label)
-            context.fill()
+            label_drawer.set_text(vertex.label)
+            label_drawer.draw(cx, cy)
 
 #####################################################################
 
