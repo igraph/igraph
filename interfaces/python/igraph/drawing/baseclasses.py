@@ -41,9 +41,23 @@ class AbstractCairoDrawer(AbstractDrawer):
                         or a L{BoundingBox} object).
         """
         self.context = context
-        if not isinstance(bbox, BoundingBox):
-            bbox = BoundingBox(bbox)
+        self._bbox = None
         self.bbox = bbox
+
+    @property
+    def bbox(self):
+        """The bounding box of the drawing area where this drawer will
+        draw."""
+        return self._bbox
+
+    @bbox.setter
+    def bbox(self, bbox):
+        """Sets the bounding box of the drawing area where this drawer
+        will draw."""
+        if not isinstance(bbox, BoundingBox):
+            self._bbox = BoundingBox(bbox)
+        else:
+            self._bbox = bbox
 
     def draw(self, *args, **kwds):
         """Abstract method, must be implemented in derived classes."""

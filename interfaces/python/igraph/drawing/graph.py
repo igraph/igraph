@@ -124,12 +124,12 @@ class DefaultGraphDrawer(AbstractGraphDrawer, AbstractCairoDrawer):
             color = ("red", palette.get)
             label = None
             label_angle = -pi/2
-            label_dist  = 1.6
+            label_dist  = 0.0
             label_color = ("black", palette.get)
             label_size  = 14.0
             position = dict(func=layout.__getitem__)
             shape = ("circle", ShapeDrawerDirectory.resolve_default)
-            size  = 10.0
+            size  = 20.0
 
         class VisualEdgeBuilder(AttributeCollectorBase):
             """Collects some visual properties of an edge for drawing"""
@@ -208,17 +208,24 @@ class DefaultGraphDrawer(AbstractGraphDrawer, AbstractCairoDrawer):
             if vertex.label is None:
                 continue
 
-            cx, cy = coords
-            radius = vertex.label_dist * vertex.size / 2.
-            cx = coords[0] + cos(vertex.label_angle) * radius
-            cy = coords[1] + sin(vertex.label_angle) * radius
-            # cx += (co - 1) * w/2. + xb
-            # cy += (si + 1) * h/2.
-
             context.set_font_size(vertex.label_size)
             context.set_source_rgba(*vertex.label_color)
-            label_drawer.set_text(vertex.label)
-            label_drawer.draw(cx, cy)
+            label_drawer.text = vertex.label
+
+            if vertex.label_dist:
+                # Label is displaced from the center of the vertex
+                cx, cy = coords
+                radius = vertex.label_dist * vertex.size / 2.
+                cx = coords[0] + cos(vertex.label_angle) * radius
+                cy = coords[1] + sin(vertex.label_angle) * radius
+                label_drawer.draw_at(cx, cy)
+            else:
+                # Label is exactly in the center of the vertex
+                cx, cy = coords
+                half_size = vertex.size / 2.
+                label_drawer.bbox = (cx - half_size, cy - half_size,
+                                     cx + half_size, cy + half_size)
+                label_drawer.draw()
 
 #####################################################################
 
