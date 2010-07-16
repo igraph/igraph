@@ -2,7 +2,10 @@
 Drawers for labels on plots.
 """
 
+import re
+
 from igraph.drawing.baseclasses import AbstractCairoDrawer
+from warnings import warn
 
 __all__ = ["TextDrawer"]
 __license__ = "GPL"
@@ -28,33 +31,115 @@ class TextDrawer(AbstractCairoDrawer):
         self.halign = halign
         self.valign = valign
 
-    def draw(self):
+    def draw(self, wrap=False):
         """Draws the text in the current bounding box of the drawer.
         
         Since the class itself is an instance of `AbstractCairoDrawer`, it
         has an attribute named ``bbox`` which will be used as a bounding
-        box."""
-        line_height = self.context.font_extents()[2]
-
+        box.
+        
+        :Parameters:
+          wrap: boolean
+            whether to allow re-wrapping of the text if it does not fit
+            within the bounding box horizontally.
+        """
+        ctx = self.context
         bbox = self.bbox
-        left, top, width = bbox.left, bbox.top, bbox.width
+
+        text_layout = self.get_text_layout(bbox.left, bbox.top, bbox.width, wrap)
+        if not text_layout:
+            return
+
+        line_height = ctx.font_extents()[2]
+        yb = ctx.text_extents(text_layout[0][2])[1]
+        total_height = len(text_layout) * line_height
 
         if self.valign == self.BOTTOM:
             # Bottom vertical alignment
-            _, yb, _, total_height = self.text_extents()[:4]
-            top += bbox.height - total_height - yb
+            dy = bbox.height - total_height - yb
         elif self.valign == self.CENTER:
             # Centered vertical alignment
-            _, yb, _, total_height = self.text_extents()[:4]
-            # total_height = self.text_extents()[3]
-            top += (bbox.height - total_height - yb / 2. + line_height) / 2.
+            dy = (bbox.height - total_height - yb + line_height) / 2.
         else:
             # Top vertical alignment
-            top += line_height
+            dy = line_height
 
-        return self.draw_at(left, top, width)
+        for ref_x, ref_y, line in text_layout:
+            ctx.move_to(ref_x, ref_y + dy)
+            ctx.show_text(line)
 
-    def draw_at(self, x = None, y = None, width = None):
+    def get_text_layout(self, x = None, y = None, width = None, wrap = False):
+        """Calculates the layout of the current text. `x` and `y` denote the
+        coordinates where the drawing should start. If they are both ``None``,
+        the current position of the context will be used.
+
+        Vertical alignment settings are not taken into account in this method
+        as the text is not drawn within a box.
+        
+        :Parameters:
+          x: float or ``None``
+            The X coordinate of the reference point where the layout should
+            start.
+          y: float or ``None``
+            The Y coordinate of the reference point where the layout should
+            start.
+          width: float or ``None``
+            The width of the box in which the text will be fitted. It matters
+            only when the text is right-aligned or centered. The text will
+            overflow the box if any of the lines is longer than the box width
+            and `wrap` is ``False``.
+          wrap: boolean
+            whether to allow re-wrapping of the text if it does not fit
+            within the given width.
+
+        :Returns:
+          a list consisting of ``(x, y, line)`` tuples where `x` and `y` refer
+          to reference points on the Cairo canvas and `line` refers to the
+          corresponding text that should be plotted there.
+        """
+        ctx = self.context
+
+        if x is None or y is None:
+            x, y = ctx.get_current_point()
+
+        line_height = ctx.font_extents()[2]
+
+        if wrap:
+            if width and width > 0:
+                iterlines = self._iterlines_wrapped(width)
+            else:
+                warn("ignoring wrap=True as no width was specified")
+        else:
+            iterlines = self._iterlines()
+
+        result = []
+
+        if self.halign == self.CENTER:
+            # Centered alignment
+            if width is None:
+                width = self.text_extents()[2]
+            for line, line_width, x_bearing in iterlines:
+                result.append((x + (width-line_width)/2. - x_bearing, y, line))
+                y += line_height
+
+        elif self.halign == self.RIGHT:
+            # Right alignment
+            if width is None:
+                width = self.text_extents()[2]
+            x += width
+            for line, line_width, x_bearing in iterlines:
+                result.append((x - line_width - x_bearing, y, line))
+                y += line_height
+
+        else:
+            # Left alignment
+            for line, _, x_bearing in iterlines:
+                result.append((x-x_bearing, y, line))
+                y += line_height
+
+        return result
+
+    def draw_at(self, x = None, y = None, width = None, wrap = False):
         """Draws the text by setting up an appropriate path on the Cairo
         context and filling it. `x` and `y` denote the coordinates where the
         drawing should start. If they are both C{None}, the current position
@@ -74,45 +159,67 @@ class TextDrawer(AbstractCairoDrawer):
             The width of the box in which the text will be fitted. It matters
             only when the text is right-aligned or centered. The text will
             overflow the box if any of the lines is longer than the box width.
+          wrap: boolean
+            whether to allow re-wrapping of the text if it does not fit
+            within the given width.
         """
         ctx = self.context
-
-        if x is None or y is None:
-            x, y = ctx.get_current_point()
-
-        line_height = ctx.font_extents()[2]
-        coords = []
-
-        if self.halign == self.CENTER:
-            # Centered alignment
-            if width is None:
-                width = self.text_extents()[2]
-            for idx, line in enumerate(self._iterlines()):
-                xb, _, line_width, _, _, _ = ctx.text_extents(line)
-                coords.append((x + (width - line_width) / 2. - xb,
-                               y + idx * line_height))
-        elif self.halign == self.RIGHT:
-            # Right alignment
-            if width is None:
-                width = self.text_extents()[2]
-            x += width
-            for idx, line in enumerate(self._iterlines()):
-                xb, _, width, _, _, _ = ctx.text_extents(line)
-                coords.append((x - width - xb, y + idx * line_height))
-        else:
-            # Left alignment
-            coords = [
-                (x - ctx.text_extents(line)[0], y + idx * line_height)
-                for idx, line in enumerate(self._iterlines())
-            ]
-
-        for (x, y), line in zip(coords, self._iterlines()):
-            ctx.move_to(x, y)
+        for ref_x, ref_y, line in self.get_text_layout(x, y, width, wrap):
+            ctx.move_to(ref_x, ref_y)
             ctx.show_text(line)
 
     def _iterlines(self):
-        """Iterates over the label line by line"""
-        return iter(self._text.split("\n"))
+        """Iterates over the label line by line and returns a tuple containing
+        the folloing for each line: the line itself, the width of the line and
+        the X-bearing of the line."""
+        ctx = self.context
+        for line in self._text.split("\n"):
+            xb, _, line_width, _, _, _ = ctx.text_extents(line)
+            yield (line, line_width, xb)
+
+    def _iterlines_wrapped(self, width):
+        """Iterates over the label line by line and returns a tuple containing
+        the folloing for each line: the line itself, the width of the line and
+        the X-bearing of the line.
+        
+        The difference between this method and `_iterlines()` is that this
+        method is allowed to re-wrap the line if necessary.
+
+        :Parameters:
+          width: float or ``None``
+            The width of the box in which the text will be fitted. Lines will
+            be wrapped if they are wider than this width.
+        """
+        ctx = self.context
+        for line in self._text.split("\n"):
+            xb, _, line_width, _, _, _ = ctx.text_extents(line)
+            if line_width <= width:
+                yield (line, line_width, xb)
+                continue
+
+            # We have to wrap the line
+            current_line, current_width, last_sep_width = [], 0, 0
+            for match in re.finditer(r"(\S+)(\s+)?", line):
+                word, sep = match.groups()
+                word_width = ctx.text_extents(word)[4]
+                if sep:
+                    sep_width = ctx.text_extents(sep)[4]
+                else:
+                    sep_width = 0
+                current_width += word_width
+                if current_width >= width and current_line:
+                    yield ("".join(current_line), current_width - word_width, 0)
+                    current_line, current_width = [word], word_width
+                    if sep is not None:
+                        current_line.append(sep)
+                else:
+                    current_width += last_sep_width
+                    current_line.append(word)
+                    if sep is not None:
+                        current_line.append(sep)
+                last_sep_width = sep_width
+            if current_line:
+                yield ("".join(current_line), current_width, 0) 
 
     @property
     def text(self):
@@ -159,8 +266,8 @@ def test():
     import cairo
     import math
 
-    text = "The quick brown fox\njumped over the\nlazy dog"
-    width, height = (300, 400)
+    text = "The quick brown fox\njumps over a\nlazy dog"
+    width, height = (300, 500)
 
     surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
     context = cairo.Context(surface)
@@ -171,11 +278,11 @@ def test():
     context.fill()
 
     context.set_source_rgb(0.5, 0.5, 0.5)
-    for i in range(100, width, 100):
+    for i in range(101, width, 100):
         context.move_to(i, 0)
         context.line_to(i, height)
         context.stroke()
-    for i in range(100, height, 100):
+    for i in range(101, height, 100):
         context.move_to(0, i)
         context.line_to(width, i)
         context.stroke()
@@ -197,6 +304,7 @@ def test():
         context.arc(x, y, 2, 0, 2 * math.pi)
         context.fill()
 
+    # Testing drawer.draw_at()
     for i, halign in enumerate(("left", "center", "right")):
         context.move_to(i * 100, 20)
 
@@ -211,6 +319,7 @@ def test():
         # Mark the new reference point
         mark_point(1, 0, 0)
 
+    # Testing TextDrawer.draw()
     for i, halign in enumerate(("left", "center", "right")):
         for j, valign in enumerate(("top", "center", "bottom")):
             # Draw the text
@@ -221,6 +330,27 @@ def test():
             drawer.draw()
             # Mark the new reference point
             mark_point(1, 0, 0)
+
+    # Testing TextDrawer.wrap()
+    drawer.text = "Jackdaws love my big sphinx of quartz. Yay, wrapping! " + \
+                  "Jackdaws love my big sphinx of quartz.\n\n" + \
+                  "Jackdaws  love  my  big  sphinx  of  quartz."
+    drawer.valign = TextDrawer.TOP
+    for i, halign in enumerate(("left", "center", "right")):
+        context.move_to(i * 100, 420)
+
+        # Mark the reference point
+        mark_point(0, 0, 1)
+
+        # Draw the text
+        context.set_source_rgb(0, 0, 0)
+        drawer.halign = halign
+        # Wrapping to 98 pixels only, 1 pixel is the separator line 
+        drawer.draw_at(i * 100, 420, width=99, wrap=True)
+
+        # Mark the new reference point
+        mark_point(1, 0, 0)
+
 
     surface.write_to_png("test.png")
 

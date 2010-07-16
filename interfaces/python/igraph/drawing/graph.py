@@ -15,6 +15,7 @@ from itertools import izip
 from math import cos, pi, sin
 
 from igraph.core import convex_hull
+from igraph.configuration import Configuration
 from igraph.drawing.baseclasses import AbstractDrawer, AbstractCairoDrawer, \
                                        AbstractXMLRPCDrawer
 from igraph.drawing.edge import ArrowEdgeDrawer
@@ -203,6 +204,12 @@ class DefaultGraphDrawer(AbstractGraphDrawer, AbstractCairoDrawer):
         context.select_font_face("sans-serif", cairo.FONT_SLANT_NORMAL, \
             cairo.FONT_WEIGHT_BOLD)
 
+        wrap = kwds.get("wrap_labels", None)
+        if wrap is None:
+            wrap = Configuration.instance()["plotting.wrap_labels"]
+        else:
+            wrap = bool(wrap)
+
         label_drawer = TextDrawer(context, halign="center")
         for vertex, coords in izip(vertex_builder, layout):
             if vertex.label is None:
@@ -218,14 +225,14 @@ class DefaultGraphDrawer(AbstractGraphDrawer, AbstractCairoDrawer):
                 radius = vertex.label_dist * vertex.size / 2.
                 cx = coords[0] + cos(vertex.label_angle) * radius
                 cy = coords[1] + sin(vertex.label_angle) * radius
-                label_drawer.draw_at(cx, cy)
+                label_drawer.draw_at(cx, cy, width=vertex.size, wrap=wrap)
             else:
                 # Label is exactly in the center of the vertex
                 cx, cy = coords
                 half_size = vertex.size / 2.
                 label_drawer.bbox = (cx - half_size, cy - half_size,
                                      cx + half_size, cy + half_size)
-                label_drawer.draw()
+                label_drawer.draw(wrap=wrap)
 
 #####################################################################
 

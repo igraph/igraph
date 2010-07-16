@@ -136,6 +136,10 @@ class Configuration(object):
         - B{palette}: default palette to be used for converting integer
           numbers to colors. See L{colors.Palette} for more information.
           Valid palette names are stored in C{colors.palettes}.
+
+        - B{wrap_labels}: whether to try to wrap the labels of the
+          vertices automatically if they don't fit within the vertex.
+          Default: C{False}.
     """
 
     # pylint: disable-msg=R0903
@@ -184,7 +188,8 @@ class Configuration(object):
 
         "plotting.layout": { "default": "random" },
         "plotting.mark_groups": { "default": False, "type": "boolean" },
-        "plotting.palette": { "default": "gray" }
+        "plotting.palette": { "default": "gray" },
+        "plotting.wrap_labels": { "default": False, "type": "boolean" }
     }
 
     # The singleton instance we are using throughout other modules
