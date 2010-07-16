@@ -87,7 +87,7 @@ void FUNCTION(igraph_dqueue,destroy) (TYPE(igraph_dqueue)* q) {
  * Time complexity: O(1).
  */
 
-igraph_bool_t FUNCTION(igraph_dqueue,empty) (TYPE(igraph_dqueue)* q) {
+igraph_bool_t FUNCTION(igraph_dqueue,empty) (const TYPE(igraph_dqueue)* q) {
   assert(q != 0);
   assert(q->stor_begin != 0);
   return q->end == NULL;
@@ -140,7 +140,7 @@ igraph_bool_t FUNCTION(igraph_dqueue,full) (TYPE(igraph_dqueue)* q) {
  * Time complexity: O(1).
  */
 
-long int FUNCTION(igraph_dqueue,size) (TYPE(igraph_dqueue)* q) {
+long int FUNCTION(igraph_dqueue,size) (const TYPE(igraph_dqueue)* q) {
         assert(q != 0);
         assert(q->stor_begin != 0);
 	if (q->end==NULL) {
@@ -164,7 +164,7 @@ long int FUNCTION(igraph_dqueue,size) (TYPE(igraph_dqueue)* q) {
  * Time complexity: O(1).
  */
 
-BASE FUNCTION(igraph_dqueue,head) (TYPE(igraph_dqueue)* q) {
+BASE FUNCTION(igraph_dqueue,head) (const TYPE(igraph_dqueue)* q) {
         assert(q != 0);
 	assert(q->stor_begin != 0);
 	return *(q->begin);
@@ -182,7 +182,7 @@ BASE FUNCTION(igraph_dqueue,head) (TYPE(igraph_dqueue)* q) {
  * Time complexity: O(1).
  */
 
-BASE FUNCTION(igraph_dqueue,back) (TYPE(igraph_dqueue)* q) {
+BASE FUNCTION(igraph_dqueue,back) (const TYPE(igraph_dqueue)* q) {
         assert(q != 0);
 	assert(q->stor_begin != 0);
 	if (q->end == q->stor_begin)
