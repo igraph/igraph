@@ -6776,4 +6776,94 @@ int igraph_contract_vertices(igraph_t *graph,
   return 0;
 }
 
-      
+/* Create the transitive closure of a tree graph. 
+   This is fairly simple, we just collect all ancestors of a vertex
+   using a depth-first search.     
+ */
+
+int igraph_transitive_closure_dag(const igraph_t *graph,
+				  igraph_t *closure) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t deg;
+  igraph_vector_t new_edges;
+  igraph_vector_t ancestors;
+  long int root;
+  igraph_vector_t neighbors;
+  igraph_stack_t path;
+  igraph_vector_bool_t done;
+
+  if (!igraph_is_directed(graph)) {
+    IGRAPH_ERROR("Tree transitive closure of a directed graph", 
+		 IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&new_edges, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&deg, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&ancestors, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&neighbors, 0);
+  IGRAPH_CHECK(igraph_stack_init(&path, 0));
+  IGRAPH_FINALLY(igraph_stack_destroy, &path);
+  IGRAPH_CHECK(igraph_vector_bool_init(&done, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_bool_destroy, &done);
+
+  IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), 
+			     IGRAPH_OUT, IGRAPH_LOOPS));
+
+#define STAR (-1)
+  
+  for (root=0; root<no_of_nodes; root++) {
+    if (VECTOR(deg)[root] != 0) { continue; }
+    IGRAPH_CHECK(igraph_stack_push(&path, root));
+
+    while (!igraph_stack_empty(&path)) {
+      long int node=igraph_stack_top(&path);
+      if (node == STAR) {
+	/* Leaving a node */
+	long int j, n;
+	igraph_stack_pop(&path);
+	node=igraph_stack_pop(&path);
+	if (!VECTOR(done)[node]) {
+	  igraph_vector_pop_back(&ancestors);
+	  VECTOR(done)[node]=1;
+	}
+	n=igraph_vector_size(&ancestors);
+	for (j=0; j<n; j++) {
+	  IGRAPH_CHECK(igraph_vector_push_back(&new_edges, node));
+	  IGRAPH_CHECK(igraph_vector_push_back(&new_edges, 
+					       VECTOR(ancestors)[j]));
+	}
+      } else {
+	/* Getting into a node */
+	long int n, j;
+	if (!VECTOR(done)[node]) {
+	  IGRAPH_CHECK(igraph_vector_push_back(&ancestors, node));
+	}
+	IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, node, IGRAPH_IN));
+	n=igraph_vector_size(&neighbors);
+	IGRAPH_CHECK(igraph_stack_push(&path, STAR));
+	for (j=0; j<n; j++) {
+	  long int nei=VECTOR(neighbors)[j];
+	  IGRAPH_CHECK(igraph_stack_push(&path, nei));
+	}
+      }
+    }
+  }
+
+#undef STAR
+
+  igraph_vector_bool_destroy(&done);
+  igraph_stack_destroy(&path);
+  igraph_vector_destroy(&neighbors);
+  igraph_vector_destroy(&ancestors);
+  igraph_vector_destroy(&deg);
+  IGRAPH_FINALLY_CLEAN(5);
+
+  IGRAPH_CHECK(igraph_create(closure, &new_edges, no_of_nodes, 
+			     IGRAPH_DIRECTED));
+
+  igraph_vector_destroy(&new_edges);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}

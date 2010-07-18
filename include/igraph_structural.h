@@ -114,6 +114,9 @@ int igraph_contract_vertices(igraph_t *graph,
 			     const igraph_attribute_combination_t 
 			     *vertex_comb);
 
+int igraph_transitive_closure_dag(const igraph_t *graph,
+				  igraph_t *closure);
+
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
 /* -------------------------------------------------- */

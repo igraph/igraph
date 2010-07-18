@@ -156,3 +156,9 @@ AT_SETUP([Average nearest neighbor degree (igraph_avg_nearest_neighbor_degree): 
 AT_KEYWORDS([nearest neighbor degree degree correlations])
 AT_COMPILE_CHECK([simple/igraph_knn.c])
 AT_CLEANUP
+
+AT_SETUP([Transitive closure of a DAG (igraph_transitive_closure_dag): ])
+AT_KEYWORDS([transitive closure DAG])
+AT_COMPILE_CHECK([simple/igraph_transitive_closure_dag.c],
+                 [simple/igraph_transitive_closure_dag.out])
+AT_CLEANUP
