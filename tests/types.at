@@ -152,3 +152,8 @@ AT_SETUP([Arbitrarily big integers (igraph_biguint_t): ])
 AT_KEYWORDS([bignum bigint big integer arbitrarily])
 AT_COMPILE_CHECK([simple/biguint.c],[simple/biguint.out],[],[INTERNAL])
 AT_CLEANUP
+
+AT_SETUP([Marked double ended queue (igraph_marked_queue_t): ])
+AT_KEYWORDS([dqueue queue igraph_marked_queue_t])
+AT_COMPILE_CHECK([simple/igraph_marked_queue.c], [], [], [INTERNAL])
+AT_CLEANUP
