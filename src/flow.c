@@ -2056,3 +2056,137 @@ int igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar) {
   
   return 0;
 }
+
+int igraph_i_residual_graph(const igraph_t *graph,
+			    const igraph_vector_t *capacity,
+			    igraph_t *residual,
+			    igraph_vector_t *residual_capacity,
+			    const igraph_vector_t *flow, 
+			    igraph_vector_t *tmp) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  long int i, no_new_edges=0;
+  long int edgeptr=0, capptr=0;
+  
+  for (i=0; i<no_of_edges; i++) {
+    if (VECTOR(*flow)[i] < VECTOR(*capacity)[i]) {
+      no_new_edges++;
+    }
+  }
+  
+  IGRAPH_CHECK(igraph_vector_resize(tmp, no_new_edges*2));
+  if (residual_capacity) {
+    IGRAPH_CHECK(igraph_vector_resize(residual_capacity, no_new_edges));
+  }
+  
+  for (i=0; i<no_of_edges; i++) {
+    if (VECTOR(*capacity)[i] - VECTOR(*flow)[i] > 0) {
+      long int from=IGRAPH_FROM(graph, i);
+      long int to=IGRAPH_TO(graph, i);
+      igraph_real_t c=VECTOR(*capacity)[i];
+      VECTOR(*tmp)[edgeptr++] = from;
+      VECTOR(*tmp)[edgeptr++] = to;
+      if (residual_capacity) {
+	VECTOR(*residual_capacity)[capptr++] = c;
+      }
+    }
+  }
+
+  IGRAPH_CHECK(igraph_create(residual, tmp, no_of_nodes, IGRAPH_DIRECTED));  
+
+  return 0;
+}
+
+int igraph_residual_graph(const igraph_t *graph,
+			  const igraph_vector_t *capacity,
+			  igraph_t *residual,
+			  igraph_vector_t *residual_capacity,
+			  const igraph_vector_t *flow) {
+  
+  igraph_vector_t tmp;
+  long int no_of_edges=igraph_ecount(graph);
+  
+  if (igraph_vector_size(capacity) != no_of_edges) {
+    IGRAPH_ERROR("Invalid `capacity' vector size", IGRAPH_EINVAL);
+  }
+  if (igraph_vector_size(flow) != no_of_edges) {
+    IGRAPH_ERROR("Invalid `flow' vector size", IGRAPH_EINVAL);
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
+
+  IGRAPH_CHECK(igraph_i_residual_graph(graph, capacity, residual, 
+				       residual_capacity, flow, &tmp));
+  
+  igraph_vector_destroy(&tmp);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
+
+int igraph_i_inverse_residual_graph(const igraph_t *graph,
+				    const igraph_vector_t *capacity,
+				    igraph_t *residual,
+				    const igraph_vector_t *flow,
+				    igraph_vector_t *tmp) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  long int i, no_new_edges=0;
+  long int edgeptr=0;
+
+  for (i=0; i<no_of_edges; i++) {
+    if (VECTOR(*flow)[i] > 0) {
+      no_new_edges++;
+    }
+    if (VECTOR(*flow)[i] < VECTOR(*capacity)[i]) {
+      no_new_edges++;
+    }
+  }
+  
+  IGRAPH_CHECK(igraph_vector_resize(tmp, no_new_edges*2));
+
+  for (i=0; i<no_of_edges; i++) {
+    if (VECTOR(*flow)[i] > 0) {
+      long int from=IGRAPH_FROM(graph, i);
+      long int to=IGRAPH_TO(graph, i);
+      VECTOR(*tmp)[edgeptr++] = from;
+      VECTOR(*tmp)[edgeptr++] = to;
+    }
+    if (VECTOR(*flow)[i] < VECTOR(*capacity)[i]) {
+      long int from=IGRAPH_TO(graph, i);
+      long int to=IGRAPH_FROM(graph, i);
+      VECTOR(*tmp)[edgeptr++] = from;
+      VECTOR(*tmp)[edgeptr++] = to;
+    }
+  }
+  
+  IGRAPH_CHECK(igraph_create(residual, tmp, no_of_nodes, IGRAPH_DIRECTED));
+  
+  return 0;
+}
+  
+int igraph_inverse_residual_graph(const igraph_t *graph,
+				  const igraph_vector_t *capacity,
+				  igraph_t *residual,
+				  const igraph_vector_t *flow) {
+  igraph_vector_t tmp;
+  long int no_of_edges=igraph_ecount(graph);
+  
+  if (igraph_vector_size(capacity) != no_of_edges) {
+    IGRAPH_ERROR("Invalid `capacity' vector size", IGRAPH_EINVAL);
+  }
+  if (igraph_vector_size(flow) != no_of_edges) {
+    IGRAPH_ERROR("Invalid `flow' vector size", IGRAPH_EINVAL);
+  }
+  IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
+  
+  IGRAPH_CHECK(igraph_i_inverse_residual_graph(graph, capacity, residual,
+					       flow, &tmp));
+  
+  igraph_vector_destroy(&tmp);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}

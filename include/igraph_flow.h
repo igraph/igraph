@@ -99,6 +99,28 @@ int igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
 
 int igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar);
 
+int igraph_residual_graph(const igraph_t *graph,
+			  const igraph_vector_t *capacity,
+			  igraph_t *residual,
+			  igraph_vector_t *residual_capacity,
+			  const igraph_vector_t *flow);
+int igraph_i_residual_graph(const igraph_t *graph,
+			    const igraph_vector_t *capacity,
+			    igraph_t *residual,
+			    igraph_vector_t *residual_capacity,
+			    const igraph_vector_t *flow, 
+			    igraph_vector_t *tmp);
+
+int igraph_i_inverse_residual_graph(const igraph_t *graph,
+				    const igraph_vector_t *capacity,
+				    igraph_t *residual,
+				    const igraph_vector_t *flow,
+				    igraph_vector_t *tmp);
+int igraph_inverse_residual_graph(const igraph_t *graph,
+				  const igraph_vector_t *capacity,
+				  igraph_t *residual,
+				  const igraph_vector_t *flow);
+
 __END_DECLS
 
 #endif
