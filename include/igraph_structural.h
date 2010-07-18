@@ -63,6 +63,11 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
 int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode);
 int igraph_subgraph(const igraph_t *graph, igraph_t *res, 
 		    const igraph_vs_t vids);
+int igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
+				const igraph_vs_t vids, 
+				igraph_subgraph_implementation_t impl,
+				igraph_vector_t *map, 
+				igraph_vector_t *invmap);
 int igraph_induced_subgraph(const igraph_t *graph, igraph_t *res, 
 		    const igraph_vs_t vids, igraph_subgraph_implementation_t impl);
 int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res, 
