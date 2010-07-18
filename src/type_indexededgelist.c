@@ -495,11 +495,13 @@ int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
  * edges in the original graph.
  */
 int igraph_delete_vertices(igraph_t *graph, const igraph_vs_t vertices) {
-  return igraph_delete_vertices_idx(graph, vertices, /* idx= */ 0);
+  return igraph_delete_vertices_idx(graph, vertices, /* idx= */ 0, 
+				    /* invidx= */ 0);
 }
 
 int igraph_delete_vertices_idx(igraph_t *graph, const igraph_vs_t vertices,
-			       igraph_vector_t *idx) {
+			       igraph_vector_t *idx, 
+			       igraph_vector_t *invidx) {
 
   long int no_of_edges=igraph_ecount(graph);
   long int no_of_nodes=igraph_vcount(graph);
@@ -517,6 +519,7 @@ int igraph_delete_vertices_idx(igraph_t *graph, const igraph_vs_t vertices,
   } else { 
     IGRAPH_VECTOR_INIT_FINALLY(&vertex_recoding, no_of_nodes);
   }
+
   IGRAPH_VECTOR_INIT_FINALLY(&edge_recoding, no_of_edges);
  
   IGRAPH_CHECK(igraph_vit_create(graph, vertices, &vit));
@@ -615,15 +618,27 @@ int igraph_delete_vertices_idx(igraph_t *graph, const igraph_vs_t vertices,
 	       
   igraph_vit_destroy(&vit);
   igraph_vector_destroy(&edge_recoding);
+  igraph_destroy(graph);
+  *graph=newgraph;
+
+  IGRAPH_FINALLY_CLEAN(3);  
+
+  if (invidx) {
+    long int i;
+    IGRAPH_CHECK(igraph_vector_resize(invidx, remaining_vertices));
+    for (i=0; i<no_of_nodes; i++) {
+      long int newid=VECTOR(*my_vertex_recoding)[i];
+      if (newid != 0) {
+	VECTOR(*invidx)[newid-1] = i;
+      }
+    }
+  }
+
   if (!idx) {
     igraph_vector_destroy(my_vertex_recoding);
     IGRAPH_FINALLY_CLEAN(1);
   }
 
-  igraph_destroy(graph);
-  *graph=newgraph;
-
-  IGRAPH_FINALLY_CLEAN(3);
   return 0;
 }
 
