@@ -279,9 +279,9 @@ int FUNCTION(igraph_matrix,remove_col)(TYPE(igraph_matrix) *m, long int col) {
 
 int FUNCTION(igraph_matrix,permdelete_rows)(TYPE(igraph_matrix) *m, long int *index, long int nremove) {
   long int i, j;
-  for (i=0; i<m->ncol; i++) {
-    for (j=0; j<m->nrow; j++) {
-      if (index[j] != 0) {
+  for (j=0; j<m->nrow; j++) {
+    if (index[j] != 0) {
+      for (i=0; i<m->ncol; i++) {
         MATRIX(*m, index[j]-1, i) = MATRIX(*m, j, i);
       }
     }
