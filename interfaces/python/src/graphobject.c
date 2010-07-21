@@ -8268,18 +8268,22 @@ PyObject *igraphmodule_Graph_largest_cliques(igraphmodule_GraphObject * self)
 /** \ingroup python_interface_graph
  * \brief Find all maximal cliques in a graph
  */
-PyObject *igraphmodule_Graph_maximal_cliques(igraphmodule_GraphObject * self)
-{
+PyObject *igraphmodule_Graph_maximal_cliques(igraphmodule_GraphObject * self,
+    PyObject* args, PyObject* kwds) {
+  static char* kwlist[] = { "min", "max", NULL };
   PyObject *list, *item;
-  long int i, j, n;
+  long int i = 0, j = 0, n;
   igraph_vector_ptr_t result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ll", kwlist, &i, &j))
+    return NULL;
 
   if (igraph_vector_ptr_init(&result, 0)) {
     PyErr_SetString(PyExc_MemoryError, "");
     return NULL;
   }
 
-  if (igraph_maximal_cliques(&self->g, &result)) {
+  if (igraph_maximal_cliques(&self->g, &result, i, j)) {
     igraph_vector_ptr_destroy(&result);
     return igraphmodule_handle_igraph_error();
   }
@@ -11843,12 +11847,18 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@see: L{clique_number()} for the size of the largest cliques or\n"
    "  L{maximal_cliques()} for the maximal cliques"},
   {"maximal_cliques", (PyCFunction) igraphmodule_Graph_maximal_cliques,
-   METH_NOARGS,
-   "maximal_cliques()\n\n"
+   METH_VARARGS | METH_KEYWORDS,
+   "maximal_cliques(min=0, max=0)\n\n"
    "Returns the maximal cliques of the graph as a list of tuples.\n\n"
    "A maximal clique is a clique which can't be extended by adding any other\n"
    "vertex to it. A maximal clique is not necessarily one of the largest\n"
    "cliques in the graph.\n\n"
+   "@param min: the minimum size of maximal cliques to be returned. If zero\n"
+   "  or negative, no lower bound will be used.\n\n"
+   "@param max: the maximum size of maximal cliques to be returned. If zero\n"
+   "  or negative, no upper bound will be used. If nonzero, the size of every\n"
+   "  maximal clique found will be compared to this value and a clique will\n"
+   "  be returned only if its size is smaller than this limit.\n\n"
    "@see: L{largest_cliques()} for the largest cliques."},
   {"clique_number", (PyCFunction) igraphmodule_Graph_clique_number,
    METH_NOARGS,

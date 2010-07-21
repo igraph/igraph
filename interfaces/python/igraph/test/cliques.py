@@ -30,6 +30,10 @@ class CliqueTests(unittest.TestCase):
         self.assertEqual(sorted(map(sorted, self.g.maximal_cliques())),
                          [[0, 3, 4], [0, 4, 5],
                           [1, 2, 3, 4], [1, 2, 4, 5]])
+        self.assertEqual(sorted(map(sorted, self.g.maximal_cliques(min=4))),
+                         [[1, 2, 3, 4], [1, 2, 4, 5]])
+        self.assertEqual(sorted(map(sorted, self.g.maximal_cliques(max=3))),
+                         [[0, 3, 4], [0, 4, 5]])
 
     def testCliqueNumber(self):
         self.assertEqual(self.g.clique_number(), 4)
