@@ -326,6 +326,11 @@ int igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
 }
 
 typedef int(*igraph_i_maximal_clique_func_t)(const igraph_vector_t*, void*, igraph_bool_t*);
+typedef struct {
+    igraph_vector_ptr_t* result;
+    igraph_integer_t min_size;
+    igraph_integer_t max_size;
+} igraph_i_maximal_clique_data_t;
 
 int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func_t func, void* data);
 
@@ -722,12 +727,32 @@ int igraph_i_maximal_cliques_store_max_size(const igraph_vector_t* clique, void*
 
 int igraph_i_maximal_cliques_store(const igraph_vector_t* clique, void* data, igraph_bool_t* cont) {
   igraph_vector_ptr_t* result = (igraph_vector_ptr_t*)data;
-  igraph_vector_t* vec = igraph_Calloc(1, igraph_vector_t);
+  igraph_vector_t* vec;
+
+  vec = igraph_Calloc(1, igraph_vector_t);
   if (vec == 0)
     IGRAPH_ERROR("cannot allocate memory for storing next clique", IGRAPH_ENOMEM);
 
   IGRAPH_CHECK(igraph_vector_copy(vec, clique));
   IGRAPH_CHECK(igraph_vector_ptr_push_back(result, vec));
+
+  return IGRAPH_SUCCESS;
+}
+
+int igraph_i_maximal_cliques_store_size_check(const igraph_vector_t* clique, void* data_, igraph_bool_t* cont) {
+  igraph_i_maximal_clique_data_t* data = (igraph_i_maximal_clique_data_t*)data_;
+  igraph_vector_t* vec;
+  igraph_integer_t size = igraph_vector_size(clique);
+
+  if (size < data->min_size || size > data->max_size)
+    return IGRAPH_SUCCESS;
+
+  vec = igraph_Calloc(1, igraph_vector_t);
+  if (vec == 0)
+    IGRAPH_ERROR("cannot allocate memory for storing next clique", IGRAPH_ENOMEM);
+
+  IGRAPH_CHECK(igraph_vector_copy(vec, clique));
+  IGRAPH_CHECK(igraph_vector_ptr_push_back(data->result, vec));
 
   return IGRAPH_SUCCESS;
 }
@@ -833,6 +858,10 @@ int igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
  *   The pointer vector will be resized if needed but note that the
  *   objects in the pointer vector will not be freed. Note that vertices
  *   of a clique may be returned in arbitrary order.
+ * \param min_size Integer giving the minimum size of the cliques to be
+ *   returned. If negative or zero, no lower bound will be used.
+ * \param max_size Integer giving the maximum size of the cliques to be
+ *   returned. If negative or zero, no upper bound will be used.
  * \return Error code.
  *
  * \sa \ref igraph_maximal_independent_vertex_sets(), \ref
@@ -840,11 +869,26 @@ int igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
  * 
  * Time complexity: O(3^(|V|/3)) worst case.
  */
-int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
+int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
+        igraph_integer_t min_size, igraph_integer_t max_size) {
+  igraph_i_maximal_clique_data_t data;
+
   igraph_vector_ptr_clear(res);
   IGRAPH_FINALLY(igraph_i_cliques_free_res, res);
-  IGRAPH_CHECK(igraph_i_maximal_cliques(graph, &igraph_i_maximal_cliques_store, (void*)res));
+
+  if (min_size <= 0 && (max_size <= 0 || max_size >= igraph_vcount(graph))) {
+    /* Search without size limits */
+    IGRAPH_CHECK(igraph_i_maximal_cliques(graph, &igraph_i_maximal_cliques_store, (void*)res));
+  } else {
+    /* Size-limited search */
+    data.result = res;
+    data.min_size = (min_size <= 0 ? 1 : min_size);
+    data.max_size = (max_size <= 0 ? igraph_vcount(graph) : max_size);
+    IGRAPH_CHECK(igraph_i_maximal_cliques(graph, &igraph_i_maximal_cliques_store_size_check, (void*)&data));
+  }
+
   IGRAPH_FINALLY_CLEAN(1);
+
   return IGRAPH_SUCCESS;
 }
 
