@@ -317,6 +317,13 @@ class VertexClustering(Clustering):
             result.simplify(combine_edges=combine_edges)
         return result
 
+    def crossing(self):
+        """Returns a boolean vector where element M{i} is C{True} iff edge
+        M{i} lies between clusters, C{False} otherwise."""
+        membership = self.membership
+        return [membership[v1] != membership[v2] \
+                for v1, v2 in self.graph.get_edgelist()]
+
     @property
     def modularity(self):
         """Returns the modularity score"""
@@ -416,6 +423,12 @@ class VertexClustering(Clustering):
         if "vertex_color" in kwds:
             raise ValueError("you are not allowed to define vertex colors "+
                              "when plotting a clustering")
+
+        if "edge_color" not in kwds and "color" not in self.graph.edge_attributes():
+            # Set up a default edge coloring based on internal vs external edges
+            colors = ["grey20", "grey80"]
+            kwds["edge_color"] = [colors[is_crossing]
+                                  for is_crossing in self.crossing()]
 
         if "palette" in kwds:
             palette = kwds["palette"]

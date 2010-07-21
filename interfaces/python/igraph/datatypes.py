@@ -225,13 +225,13 @@ class Matrix(object):
             the shape of the value matrix must match the shape of the
             matrix being plotted.
 
-          - C{value_format}: a format string that specifies how the values
-            should be plotted. Example: C{"%#.2f"} for floating-point numbers
-            with always exactly two digits after the decimal point. See
-            the Python documentation of the C{%} operator for details on
-            the format string. If the format string is not given, it defaults
-            to C{"%s"} and an implicit conversion to strings is performed
-            on the elements of the value matrix.
+          - C{value_format}: a format string or a callable that specifies how
+            the values should be plotted. If it is a callable, it must be a
+            function that expects a single value and returns a string.
+            Example: C{"%#.2f"} for floating-point numbers with always exactly
+            two digits after the decimal point. See the Python documentation of
+            the C{%} operator for details on the format string. If the format
+            string is not given, it defaults to the C{str} function.
 
         If only the row names or the column names are given and the matrix
         is square-shaped, the same names are used for both column and row
@@ -245,7 +245,7 @@ class Matrix(object):
         row_names = kwds.get("row_names", None)
         col_names = kwds.get("col_names", row_names)
         values = kwds.get("values", None)
-        value_format = kwds.get("value_format", None)
+        value_format = kwds.get("value_format", str)
 
         # Validations
         if style not in ("boolean", "palette"):
@@ -281,15 +281,15 @@ class Matrix(object):
             max_row_name_width, max_col_name_width = 0, 0
 
         # Calculate sizes
-        grid_width = float(bbox.width)-max_row_name_width
-        grid_height = float(bbox.height)-max_col_name_width
-        dx = grid_width / self.shape[1]
-        dy = grid_height / self.shape[0]
+        total_width = float(bbox.width)-max_row_name_width
+        total_height = float(bbox.height)-max_col_name_width
+        dx = total_width / self.shape[1]
+        dy = total_height / self.shape[0]
         if kwds.get("square", True):
             dx, dy = min(dx, dy), min(dx, dy)
-        grid_width, grid_height = dx*self.shape[1], dy*self.shape[0]
-        ox = bbox.left + (bbox.width - grid_width - max_row_name_width) / 2.0
-        oy = bbox.top + (bbox.height - grid_height - max_col_name_width) / 2.0
+        total_width, total_height = dx*self.shape[1], dy*self.shape[0]
+        ox = bbox.left + (bbox.width - total_width - max_row_name_width) / 2.0
+        oy = bbox.top + (bbox.height - total_height - max_col_name_width) / 2.0
         ox += max_row_name_width
         oy += max_col_name_width
 
@@ -360,14 +360,14 @@ class Matrix(object):
             x, y = ox, oy
             context.set_source_rgb(0., 0., 0.)
             for row in values.data:
-                for item in row:
-                    if value_format is not None:
-                        s = value_format % item
-                    else:
-                        s = str(item)
-                    th, tw = context.text_extents(s)[3:5]
+                if hasattr(value_format, "__call__"):
+                    values = [value_format(item) for item in row]
+                else:
+                    values = [value_format % item for item in row]
+                for item in values:
+                    th, tw = context.text_extents(item)[3:5]
                     context.move_to(x+(dx-tw)/2., y+(dy+th)/2.)
-                    context.show_text(s)
+                    context.show_text(item)
                     x += dx
                 x, y = ox, y+dy
 
