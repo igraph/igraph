@@ -15,7 +15,8 @@ degree.distribution(graph, cumulative = FALSE, \dots)
   \item{v}{The ids of vertices of which the degree will be calculated.}
   \item{mode}{Character string, \dQuote{out} for out-degree, \dQuote{in} for
     in-degree or \dQuote{total} for the sum of the two. For undirected
-    graphs this argument is ignored.}
+    graphs this argument is ignored. \dQuote{all} is a synonym of
+    \dQuote{total}.}
   \item{loops}{Logical; whether the loop edges are also counted.}
   \item{cumulative}{Logical; whether the cumulative degree distribution
     is to be calculated.}
