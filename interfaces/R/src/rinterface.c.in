@@ -6821,18 +6821,20 @@ SEXP R_igraph_largest_cliques(SEXP graph) {
   return result;
 }
 
-SEXP R_igraph_maximal_cliques(SEXP graph) {
+SEXP R_igraph_maximal_cliques(SEXP graph, SEXP pminsize, SEXP pmaxsize) {
   
   igraph_t g;
   igraph_vector_ptr_t ptrvec;
   long int i;
+  igraph_integer_t minsize=REAL(pminsize)[0];
+  igraph_integer_t maxsize=REAL(pmaxsize)[0];
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_ptr_init(&ptrvec,0);
-  igraph_maximal_cliques(&g, &ptrvec);
+  igraph_maximal_cliques(&g, &ptrvec, minsize, maxsize);
   PROTECT(result=NEW_LIST(igraph_vector_ptr_size(&ptrvec)));
   for (i=0; i<igraph_vector_ptr_size(&ptrvec); i++) {
     igraph_vector_t *vec=VECTOR(ptrvec)[i];

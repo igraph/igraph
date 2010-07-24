@@ -13,7 +13,7 @@
 \usage{
 cliques(graph, min=NULL, max=NULL)
 largest.cliques(graph)
-maximal.cliques(graph)
+maximal.cliques(graph, min=NULL, max=NULL)
 clique.number(graph)
 }
 \arguments{

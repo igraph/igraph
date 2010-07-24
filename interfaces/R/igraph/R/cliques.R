@@ -47,13 +47,17 @@ largest.cliques <- function(graph) {
         PACKAGE="igraph")
 }
 
-maximal.cliques <- function(graph) {
+maximal.cliques <- function(graph, min=NULL, max=NULL) {
   if (!is.igraph(graph)) {
     stop("Not a graph object");
   }
 
+  if (is.null(min)) { min <- 0 }
+  if (is.null(max)) { max <- 0 }
+
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_maximal_cliques", graph,
+  .Call("R_igraph_maximal_cliques", graph, as.numeric(min),
+        as.numeric(max),
         PACKAGE="igraph")
 }
 
