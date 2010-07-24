@@ -40,6 +40,132 @@
 #include <string.h>
 #include <math.h>
 
+int igraph_i_rewrite_membership_vector(igraph_vector_t *membership) {
+  long int no=igraph_vector_max(membership)+1;
+  igraph_vector_t idx;
+  long int realno=0;
+  long int i;
+  long int len=igraph_vector_size(membership);
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&idx, no);
+  for (i=0; i<len; i++) {
+    long int t=VECTOR(*membership)[i];
+    if (VECTOR(idx)[t]) {
+      VECTOR(*membership)[i]=VECTOR(idx)[t]-1;
+    } else {
+      VECTOR(idx)[t]=++realno;
+      VECTOR(*membership)[i]=VECTOR(idx)[t]-1;
+    }
+  }
+  igraph_vector_destroy(&idx);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
+int igraph_i_community_eb_get_merges2(const igraph_t *graph, 
+				      const igraph_vector_t *edges,
+				      igraph_matrix_t *res,
+				      igraph_vector_t *bridges, 
+				      igraph_vector_t *modularity, 
+				      igraph_vector_t *membership) {
+
+  igraph_vector_t mymembership;
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i;
+  igraph_real_t maxmod=-1;
+  long int midx=0;
+  igraph_integer_t no_comps;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&mymembership, no_of_nodes);
+  
+  if (membership) {
+    IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+  }
+
+  if (modularity || res || bridges) {
+    IGRAPH_CHECK(igraph_clusters(graph, 0, 0, &no_comps,
+				 IGRAPH_WEAK));
+
+    if (modularity) {
+      IGRAPH_CHECK(igraph_vector_resize(modularity,
+					no_of_nodes-no_comps+1));
+    }
+    if (res) {
+      IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes-no_comps,
+					2));
+    }
+    if (bridges) {
+      IGRAPH_CHECK(igraph_vector_resize(bridges,
+					no_of_nodes-no_comps));
+    }
+  }
+
+  for (i=0; i<no_of_nodes; i++) {
+    VECTOR(mymembership)[i]=i;
+  }
+  if (membership) {
+    igraph_vector_update(membership, &mymembership);
+  }
+  
+  IGRAPH_CHECK(igraph_modularity(graph, &mymembership, &maxmod, 
+				 /*weights=*/ 0));
+  if (modularity) {
+    VECTOR(*modularity)[0]=maxmod;
+  }
+
+  for (i=igraph_vector_size(edges)-1; i>=0; i--) {
+    long int edge=VECTOR(*edges)[i];
+    long int from=IGRAPH_FROM(graph, edge);
+    long int to=IGRAPH_TO(graph, edge);
+    long int c1=VECTOR(mymembership)[from];
+    long int c2=VECTOR(mymembership)[to];
+    igraph_real_t actmod;
+    long int j;
+    if (c1 != c2) {		/* this is a merge */
+      if (res) {
+	MATRIX(*res, midx, 0)=c1;
+	MATRIX(*res, midx, 1)=c2;
+      }
+      if (bridges) {
+	VECTOR(*bridges)[midx]=i+1;
+      }
+
+      /* The new cluster has id no_of_nodes+midx+1 */
+      for (j=0; j<no_of_nodes; j++) {
+	if (VECTOR(mymembership)[j]==c1 ||
+	    VECTOR(mymembership)[j]==c2) {
+	  VECTOR(mymembership)[j]=no_of_nodes+midx;
+	}
+      }
+      
+      IGRAPH_CHECK(igraph_modularity(graph, &mymembership, &actmod, 
+				     /*weights=*/ 0));
+      if (modularity) {
+	VECTOR(*modularity)[midx+1]=actmod;
+	if (actmod > maxmod) {
+	  maxmod=actmod;
+	  if (membership) {
+	    igraph_vector_update(membership, &mymembership);
+	  }
+	}
+      }
+            
+      midx++;
+    }
+  }
+
+  if (membership) {
+    IGRAPH_CHECK(igraph_i_rewrite_membership_vector(membership));
+  }
+
+  igraph_vector_destroy(&mymembership);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
+
+
 /**
  * \function igraph_community_eb_get_merges
  * \brief Calculating the merges, ie. the dendrogram for an edge betweenness community structure
@@ -72,6 +198,12 @@
  * \param bridges Pointer to an initialized vector or NULL. If not
  *    null then the index of the edge removals which split the network
  *    will be stored here. The vector will be resized as needed.
+ * \param modularity If not a null pointer, then the modularity values
+ *    for the different divisions, corresponding to the merges matrix,
+ *    will be stored here.
+ * \param membership If not a null pointer, then the membership vector
+ *    for the best division (in terms of modularity) will be stored
+ *    here.
  * \return Error code.
  * 
  * \sa \ref igraph_community_edge_betweenness().
@@ -83,13 +215,21 @@
 int igraph_community_eb_get_merges(const igraph_t *graph, 
 				   const igraph_vector_t *edges,
 				   igraph_matrix_t *res,
-				   igraph_vector_t *bridges) {
+				   igraph_vector_t *bridges, 
+				   igraph_vector_t *modularity, 
+				   igraph_vector_t *membership) {
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t ptr;
   long int i, midx=0;
   igraph_integer_t no_comps;
-  
+
+  if (membership || modularity) {
+    return igraph_i_community_eb_get_merges2(graph, edges, res,
+					     bridges, modularity, 
+					     membership);
+  }
+
   IGRAPH_CHECK(igraph_clusters(graph, 0, 0, &no_comps, IGRAPH_WEAK));
   
   IGRAPH_VECTOR_INIT_FINALLY(&ptr, no_of_nodes*2-1);
@@ -197,6 +337,11 @@ long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
  * \param bridges Pointer to an initialized vector of NULL. If not
  *     NULL then all edge removals which separated the network into
  *     more components are marked here.
+ * \param modularity If not a null pointer, then the modularity values
+ *     of the different divisions are stored here, in the order
+ *     corresponding to the merge matrix.
+ * \param membership If not a null pointer, then the membership vector,
+ *     corresponding to the highest modularity value, is stored here.
  * \param directed Logical constant, whether to calculate directed
  *    betweenness (ie. directed paths) for directed graphs. It is
  *    ignored for undirected graphs.
@@ -214,6 +359,8 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 				      igraph_vector_t *edge_betweenness,
 				      igraph_matrix_t *merges,
 				      igraph_vector_t *bridges,
+				      igraph_vector_t *modularity,
+				      igraph_vector_t *membership,
 				      igraph_bool_t directed) {
   
   long int no_of_nodes=igraph_vcount(graph);
@@ -402,8 +549,10 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
   }
 
-  if (merges || bridges) {
-    IGRAPH_CHECK(igraph_community_eb_get_merges(graph, result, merges, bridges));
+  if (merges || bridges || modularity || membership) {
+    IGRAPH_CHECK(igraph_community_eb_get_merges(graph, result, merges,
+						bridges, modularity, 
+						membership));
   }
   
   return 0;
@@ -564,6 +713,8 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
  * \param graph The input graph.
  * \param membership Numeric vector which gives the type of each
  *     vertex, ie. the component to which it belongs.
+ *     It does not have to be consecutive, i.e. empty communities are
+ *     allowed. 
  * \param modularity Pointer to a real number, the result will be
  *     stored here.
  * \param weights Weight vector or NULL if no weights are specified.
@@ -850,6 +1001,9 @@ int igraph_i_community_leading_eigenvector_naive(igraph_real_t *to,
  *    as possible.
  * \param options The options for ARPACK. \c n is always
  *    overwritten. \c ncv is set to at least 4.
+ * \param modularity If not a null pointer, then it must be a pointer
+ *    to a real number and the modularity score of the final division
+ *    is stored here.
  * \return Error code.
  * 
  * \sa \ref igraph_community_leading_eigenvector() for the proper way, 
@@ -863,7 +1017,8 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
 					       igraph_matrix_t *merges,
 					       igraph_vector_t *membership,
 					       igraph_integer_t steps,
-					       igraph_arpack_options_t *options) {
+					       igraph_arpack_options_t *options,
+					       igraph_real_t *modularity) {
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_dqueue_t tosplit;
@@ -1069,6 +1224,11 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
   igraph_vector_destroy(&mymerges);
   IGRAPH_FINALLY_CLEAN(2);
 
+  if (modularity) {
+    IGRAPH_CHECK(igraph_modularity(graph, mymembership, modularity, 
+				   /*weights=*/ 0));
+  }
+
   if (!membership) {
     igraph_vector_destroy(mymembership);
     IGRAPH_FINALLY_CLEAN(1);
@@ -1183,6 +1343,9 @@ int igraph_i_community_leading_eigenvector(igraph_real_t *to,
  *    number of vertices in the network here.
  * \param options The options for ARPACK. \c n is always
  *    overwritten. \c ncv is set to at least 4.
+ * \param modularity If not a null pointer, then it must be a pointer
+ *    to a real number and the modularity score of the final division
+ *    is stored here.
  * \return Error code.
  * 
  * \sa \ref igraph_community_walktrap() and \ref
@@ -1198,7 +1361,8 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 					 igraph_matrix_t *merges,
 					 igraph_vector_t *membership,
 					 igraph_integer_t steps,
-					 igraph_arpack_options_t *options) {
+					 igraph_arpack_options_t *options, 
+					 igraph_real_t *modularity) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
@@ -1393,6 +1557,11 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   igraph_vector_destroy(&idx);
   igraph_vector_destroy(&mymerges);
   IGRAPH_FINALLY_CLEAN(2);
+
+  if (modularity) {
+    IGRAPH_CHECK(igraph_modularity(graph, mymembership, modularity, 
+				   /*weights=*/ 0));
+  }
   
   if (!membership) {
     igraph_vector_destroy(mymembership);
@@ -1758,6 +1927,9 @@ int igraph_le_community_to_membership(const igraph_matrix_t *merges,
  *   this makes sense only if you provided an initial state, otherwise
  *   this element will be ignored. Also note that vertices without labels
  *   cannot be fixed.
+ * \param modularity If not a null pointer, then it must be a pointer
+ *   to a real number. The modularity score of the detected community
+ *   structure is stored here.
  * \return Error code.
  * 
  * Time complexity: O(m+n)
@@ -1766,7 +1938,8 @@ int igraph_community_label_propagation(const igraph_t *graph,
                                        igraph_vector_t *membership,
                                        const igraph_vector_t *weights,
                                        const igraph_vector_t *initial,
-                                       igraph_vector_bool_t *fixed) {
+                                       igraph_vector_bool_t *fixed, 
+				       igraph_real_t *modularity) {
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   long int no_of_not_fixed_nodes=no_of_nodes;
@@ -1961,6 +2134,11 @@ int igraph_community_label_propagation(const igraph_t *graph,
     igraph_adjedgelist_destroy(&ael);
   else
     igraph_adjlist_destroy(&al);
+
+  if (modularity) {
+    IGRAPH_CHECK(igraph_modularity(graph, membership, modularity,
+				   weights));
+  }
 
   igraph_vector_destroy(&node_order);
   igraph_vector_destroy(&label_counters);

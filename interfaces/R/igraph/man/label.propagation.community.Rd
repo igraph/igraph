@@ -43,7 +43,9 @@ label.propagation.community (graph, weights = NULL,
     communities.}
 }
 \value{
-  A numeric vector giving the final label (=community) of each vertex.
+  \code{label.propagation.community} returns a \code{\link{communities}}
+  object, please see the \code{\link{communities}} manual page for
+  details.
 }
 \references{
   Raghavan, U.N. and Albert, R. and Kumara, S.: Near linear time algorithm
@@ -54,7 +56,10 @@ label.propagation.community (graph, weights = NULL,
   Tamas Nepusz \email{ntamas@rmki.kfki.hu} for the C implementation,
   Gabor Csardi \email{Gabor.Csardi@unil.ch} for this manual page.
 }
-\seealso{\code{\link{fastgreedy.community}},
+\seealso{
+  \code{\link{communities}} for extracting the actual results.
+  
+  \code{\link{fastgreedy.community}},
   \code{\link{walktrap.community}} and \code{\link{spinglass.community}}
   for other community detection methods.}
 \examples{

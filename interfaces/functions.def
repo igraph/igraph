@@ -970,20 +970,24 @@ igraph_community_spinglass_single:
 
 igraph_community_walktrap:
         PARAMS: GRAPH graph, VECTOR weights, INT steps=4, OUT MATRIX merges, \
-                OUT VECTOR modularity
+                OUT VECTOR modularity, OUT VECTOR membership
         IGNORE: RR, RC, RNamespace
 
 igraph_community_edge_betweenness:
         PARAMS: GRAPH graph, OUT VECTOR result, OUT VECTOR edge_betweenness, \
-                OUT MATRIX merges, OUT VECTOR bridges, BOOLEAN directed=True
+                OUT MATRIX merges, OUT VECTOR bridges, \
+                OUT VECTOR_OR_0 modularity, OUT VECTOR_OR_0 membership, \
+                BOOLEAN directed=True
         IGNORE: RR, RC, RNamespace
 
 igraph_community_eb_get_merges:
-        PARAMS: GRAPH graph, VECTOR edges, OUT MATRIX merges, OUT VECTOR bridges
+        PARAMS: GRAPH graph, VECTOR edges, OUT MATRIX merges, \
+                OUT VECTOR bridges, OUT VECTOR_OR_0 modularity, \
+                OUT VECTOR_OR_0 membership
         IGNORE: RR, RC, RNamespace
 
 igraph_community_fastgreedy:
-        PARAMS: GRAPH graph, VECTOR_OR_0 weights, OUT MATRIX merges, OUT VECTOR modularity
+        PARAMS: GRAPH graph, VECTOR_OR_0 weights, OUT MATRIX merges, OUT VECTOR modularity, OUT VECTOR_OR_0 membership
         IGNORE: RR, RC, RNamespace
 
 igraph_community_to_membership:
@@ -999,7 +1003,8 @@ igraph_le_community_to_membership:
 igraph_modularity:
         PARAMS: GRAPH graph, VECTOR membership, OUT REALPTR modularity, \
                 IN VECTOR_OR_0 weights=NULL
-        NAME-R: modularity
+        NAME-R: modularity.igraph
+        IGNORE: RNamespace, RR
 
 igraph_reindex_membership:
         PARAMS: INOUT VECTOR membership, OUT VECTOR_OR_0 new_to_old
@@ -1009,18 +1014,22 @@ igraph_reindex_membership:
 igraph_community_leading_eigenvector:
         PARAMS: GRAPH graph, OUT MATRIX merges, OUT VECTOR membership, \
                 INTEGER steps=-1, \
-                INOUT ARPACKOPT options=igraph.arpack.default
+                INOUT ARPACKOPT options=igraph.arpack.default, \
+                OUT REALPTR modularity
         DEFAULT-R: options=igraph.arpack.default
         CLASS-R: igraph.eigenc
         NAME-R: leading.eigenvector.community
+        IGNORE: RR
 
 igraph_community_leading_eigenvector_naive:
         PARAMS: GRAPH graph, OUT MATRIX merges, OUT VECTOR membership, \
                 INTEGER steps=-1, \
-                INOUT ARPACKOPT options=igraph.arpack.default
+                INOUT ARPACKOPT options=igraph.arpack.default, \
+                OUT REALPTR modularity
         DEFAULT-R: options=igraph.arpack.default
         CLASS-R: igraph.eigenc
         NAME-R: leading.eigenvector.community.naive
+        IGNORE: RR
 
 igraph_community_leading_eigenvector_step:
         PARAMS: GRAPH graph, INOUT VECTOR membership, INTEGER community, \
@@ -1034,9 +1043,11 @@ igraph_community_leading_eigenvector_step:
 
 igraph_community_label_propagation:
         PARAMS: GRAPH graph, OUT VECTOR membership, EDGEWEIGHTS weights=NULL, \
-                VECTOR_OR_0 initial=NULL, VECTOR_BOOL_OR_0 fixed=NULL
+                VECTOR_OR_0 initial=NULL, VECTOR_BOOL_OR_0 fixed=NULL, \
+                OUT REALPTR modularity
         DEPS: weights ON graph
         NAME-R: label.propagation.community
+        IGNORE: RR
 
 igraph_community_multilevel:
         PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
@@ -1044,12 +1055,14 @@ igraph_community_multilevel:
 		OUT MATRIX_OR_0 memberships, OUT VECTOR_OR_0 modularity
         DEPS: weights ON graph
         NAME-R: multilevel.community
+        IGNORE: RR
 
 igraph_community_optimal_modularity:
         PARAMS: GRAPH graph, OUT REALPTR modularity, \
                 OUT VECTOR_OR_0 membership, \
                 BOOLEAN verbose=igraph.par("verbose")
         NAME-R: optimal.community
+        IGNORE: RR
 
 #######################################
 # Conversion

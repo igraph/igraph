@@ -9,8 +9,7 @@
 \usage{
 edge.betweenness.community (graph, directed = TRUE,
     edge.betweenness = TRUE, merges = TRUE, bridges = TRUE,
-    labels = TRUE)
-edge.betweenness.community.merges (graph, edges)
+    labels = TRUE, modularity = TRUE, membership = TRUE)
 }
 \arguments{
   \item{graph}{The graph to analyze.}
@@ -39,9 +38,12 @@ edge.betweenness.community.merges (graph, edges)
     vertices in the result. More precisely, if the graph has a vertex
     attribute valled \sQuote{name}, it will be part of the result
     object.}
-  \item{edges}{Numeric vector, the ids of the edges to be removed from a
-    graph, all edges should be present in the vector, their order
-    specifies the order of removal.}
+  \item{modularity}{Logical constant, whether to calculate the
+    maximum modularity score, considering all possibly community
+    structures along the edge-betweenness based edge removals.}
+  \item{membership}{Logical constant, whether to calculate the
+    membership vector corresponding to the highest possible modularity
+    score.}
 }
 \details{
   The edge betweenness score of an edge measures the number of shortest
@@ -63,44 +65,21 @@ edge.betweenness.community.merges (graph, edges)
 
   \code{edge.betweeness.community} returns various information collected
   throught the run of the algorithm. See the return value down here.
-
-  \code{edge.betweenness.community.merges} gets a list of edges and by
-  gradually removes them from the graph it creates a merge matrix
-  similar to the one returned by \code{edge.betweenness.community}.
 }
 \value{
-  A named list is returned by \code{edge.betweenness.community},
-  with the following components:
-  \item{removed.edges}{Numeric vector, the edges of the graph, in the
-    order of their removal.}
-  \item{edge.betweenness}{Numeric vector, the edge betweenness value
-    of the removed edges, the order is the same as in
-    \code{removed.edges}.}
-  \item{merges}{Matrix containing the merges (ie. divisions) the
-    algorithm performed, see the \code{merges} argument for the
-    format.}
-  \item{bridges}{Numeric vector, the steps (ie. edge removals) which
-    resulted a split of a component in the graph.} 
-  \item{labels}{The \code{name} argument of the vertices.}
-
-  Note that some components may be missing or \code{NULL} if you do not
-  request them, see the parameters.
-
-  A numeric matrix is returned by
-  \code{edge.betweenness.community.merges}.
-  The matrix has two column and its format is the same as the
-  \code{merges} slot of the result of
-  \code{edge.betweenness.community}.
+  \code{edge.betweenness.community} returns a \code{\link{communities}}
+  object, please see the \code{\link{communities}} manual page for
+  details.
 }
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{ \code{\link{edge.betweenness}} for the definition and
   calculation of the edge betweenness,
   \code{\link{walktrap.community}}, \code{\link{fastgreedy.community}},
   \code{\link{leading.eigenvector.community}} for other community
-  detection methods. \code{\link[stats]{as.dendrogram}} for creating an
-  R dendrogram object from the result of the clustering. See
-  \code{\link{community.to.membership}} to create the actual communities
-  after a number of edges removed from the network.
+  detection methods.
+
+  See \code{\link{communities}} for extracting the results of the
+  community detection.
 }
 \references{M Newman and M Girvan: Finding and evaluating community
   structure in networks, \emph{Physical Review E} 69, 026113 (2004)
@@ -112,6 +91,6 @@ eb <- edge.betweenness.community(g)
 g <- graph.full(10) \%du\% graph.full(10)
 g <- add.edges(g, c(0,10))
 eb <- edge.betweenness.community(g)
-E(g) [ eb$removed.edges[1] ] 		% should be the edge just added
+eb
 }
 \keyword{graphs}

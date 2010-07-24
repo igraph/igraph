@@ -97,23 +97,29 @@ int igraph_community_walktrap(const igraph_t *graph,
 			      const igraph_vector_t *weights,
 			      int steps,
 			      igraph_matrix_t *merges,
-			      igraph_vector_t *modularity);
+			      igraph_vector_t *modularity, 
+			      igraph_vector_t *membership);
 
 int igraph_community_edge_betweenness(const igraph_t *graph, 
 				      igraph_vector_t *result,
 				      igraph_vector_t *edge_betweenness,
 				      igraph_matrix_t *merges,
 				      igraph_vector_t *bridges,
+				      igraph_vector_t *modularity,
+				      igraph_vector_t *membership,
 				      igraph_bool_t directed);
 int igraph_community_eb_get_merges(const igraph_t *graph, 
 				   const igraph_vector_t *edges,
 				   igraph_matrix_t *merges,
-				   igraph_vector_t *bridges);
+				   igraph_vector_t *bridges,
+				   igraph_vector_t *modularity,
+				   igraph_vector_t *membership);
 
 int igraph_community_fastgreedy(const igraph_t *graph,
 				const igraph_vector_t *weights,
 				igraph_matrix_t *merges,
-				igraph_vector_t *modularity);
+				igraph_vector_t *modularity, 
+				igraph_vector_t *membership);
 
 int igraph_community_to_membership(const igraph_matrix_t *merges,
 				   igraph_integer_t nodes,
@@ -137,12 +143,14 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
 					       igraph_matrix_t *merges,
 					       igraph_vector_t *membership,
 					       igraph_integer_t steps,
-					       igraph_arpack_options_t *options);
+					       igraph_arpack_options_t *options,
+					       igraph_real_t *modularity);
 int igraph_community_leading_eigenvector(const igraph_t *graph,
 					 igraph_matrix_t *merges,
 					 igraph_vector_t *membership,
 					 igraph_integer_t steps,
-					 igraph_arpack_options_t *options);
+					 igraph_arpack_options_t *options, 
+					 igraph_real_t *modularity);
 int igraph_community_leading_eigenvector_step(const igraph_t *graph,
 					      igraph_vector_t *membership,
 					      igraph_integer_t community,
@@ -155,7 +163,8 @@ int igraph_community_label_propagation(const igraph_t *graph,
                                        igraph_vector_t *membership,
                                        const igraph_vector_t *weights,
                                        const igraph_vector_t *initial,
-                                       igraph_vector_bool_t *fixed);
+                                       igraph_vector_bool_t *fixed,
+				       igraph_real_t *modularity);
 int igraph_community_multilevel(const igraph_t *graph,
                                 const igraph_vector_t *weights,
                                 igraph_vector_t *membership,

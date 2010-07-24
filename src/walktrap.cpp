@@ -104,6 +104,10 @@ using namespace std;
  * \param modularity Pointer to a vector. If not NULL then the
  *     modularity score of the current clustering is stored here after
  *     each merge operation. 
+ * \param membership Pointer to a vector. If not a NULL pointer, then
+ *     the membership vector corresponding to the maximal modularity
+ *     score is stored here. If it is not a NULL pointer, then \p
+ *     modularity must not be a NULL pointer, either.
  * \return Error code.
  * 
  * \sa \ref igraph_community_spinglass(), \ref
@@ -117,12 +121,18 @@ int igraph_community_walktrap(const igraph_t *graph,
 			      const igraph_vector_t *weights,
 			      int steps,
 			      igraph_matrix_t *merges,
-			      igraph_vector_t *modularity) {
+			      igraph_vector_t *modularity, 
+			      igraph_vector_t *membership) {
 
   long int no_of_nodes=(long int)igraph_vcount(graph);
   int length=steps;
   long max_memory=-1;
-  
+
+  if (membership && !modularity) {
+    IGRAPH_ERROR("Cannot calculate membership without modularity",
+		 IGRAPH_EINVAL);
+  }
+
   Graph* G = new Graph;
   if (G->convert_from_igraph(graph, weights))
       IGRAPH_ERROR("isolated vertex found in graph", IGRAPH_EINVAL);
@@ -142,6 +152,14 @@ int igraph_community_walktrap(const igraph_t *graph,
   }
   
   delete G;
+
+  if (membership && modularity) {
+    long int m=igraph_vector_which_max(modularity);
+    IGRAPH_CHECK(igraph_community_to_membership(merges, no_of_nodes, 
+						/*steps=*/ m,
+						membership, 
+						/*csize=*/ 0));
+  }
   
   return 0;
 }

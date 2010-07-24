@@ -1,0 +1,40 @@
+
+R version 2.11.0 (2010-04-22)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> g <- graph.famous("Zachary")
+> set.seed(42)
+> lpc <- label.propagation.community(g)
+> lpc
+Graph community structure calculated with the label propagation algorithm
+Number of communities: 3 
+Modularity: 0.3744247 
+Membership vector:
+ [1] 0 0 1 0 2 2 2 0 1 1 2 0 0 0 1 1 2 0 1 0 1 0 1 1 1 1 1 1 1 1 1 1 1 1
+> lpc$modularity == modularity(g, lpc$membership)
+[1] TRUE
+> membership(lpc)
+ [1] 0 0 1 0 2 2 2 0 1 1 2 0 0 0 1 1 2 0 1 0 1 0 1 1 1 1 1 1 1 1 1 1 1 1
+> length(lpc)
+[1] 3
+> sizes(lpc)
+Community sizes
+ 0  1  2 
+10 19  5 
+> 

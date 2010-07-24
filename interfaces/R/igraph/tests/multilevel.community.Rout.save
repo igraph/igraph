@@ -1,0 +1,39 @@
+
+R version 2.11.0 (2010-04-22)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> g <- graph.famous("Zachary")
+> mc <- multilevel.community(g)
+> mc
+Graph community structure calculated with the multi level algorithm
+Number of communities (best split): 4 
+Modularity (best split): 0.4188034 
+Membership vector:
+ [1] 1 1 1 1 0 0 0 1 3 1 0 1 1 1 3 3 0 1 3 1 3 1 3 2 2 2 3 2 2 3 3 2 3 3
+> membership(mc)
+ [1] 1 1 1 1 0 0 0 1 3 1 0 1 1 1 3 3 0 1 3 1 3 1 3 2 2 2 3 2 2 3 3 2 3 3
+> modularity(g, mc$membership) == max(mc$modularity)
+[1] TRUE
+> length(mc)
+[1] 4
+> sizes(mc)
+Community sizes
+ 0  1  2  3 
+ 5 12  6 11 
+> 

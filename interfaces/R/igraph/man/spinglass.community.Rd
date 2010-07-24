@@ -93,16 +93,8 @@ spinglass.community(graph, weights=NULL, vertex, spins=25,
 }
 \value{
   If the \code{vertex} argument is not given, ie. the first form is used
-  then a named list is returned with the following slots:
-  \item{membership}{Integer vector giving the communities found. The
-    communities have ids starting from zero and for each graph vertex
-    ids community id is given in this vector.}
-  \item{csize}{The sizes of the communities in the order of their ids.}
-  \item{modularity}{The (generalized) modularity score of the result, as
-    defined in the Reichardt-Bornholdt paper, see references. If gamma
-    is one, then it simplifies to the Newman-Girvan modularity score.}
-  \item{temperature}{The temperature of the system when the algorithm
-    terminated.}
+  then a \code{\link{spinglass.community}} returns a
+  \code{\link{communities}} object. 
 
   If the \code{vertex} argument is present, ie. the second form is used
   then a named list is returned with the following components:
@@ -135,7 +127,7 @@ spinglass.community(graph, weights=NULL, vertex, spins=25,
   Changes to the original function for including the
   possibility of negative ties were implemented 
   by Vincent Traag \email{vtraag@f-m.fm}.}
-\seealso{\code{\link{clusters}}}
+\seealso{\code{\link{communities}}, \code{\link{clusters}}}
 \examples{
   g <- erdos.renyi.game(10, 5/10) \%du\% erdos.renyi.game(9, 5/9)
   g <- add.edges(g, c(0, 11))

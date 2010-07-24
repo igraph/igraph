@@ -1,20 +1,22 @@
 \name{modularity}
 \alias{modularity}
+\alias{modularity.igraph}
 \concept{Modularity}
 \title{Modularity of a community structure of a graph}
 \description{This function calculates how modular is a given division of a
   graph into subgraphs.
 }
 \usage{
-modularity(graph, membership, weights = NULL)
+\method{modularity}{igraph}(x, membership, weights = NULL, \dots)
 }
 \arguments{
-  \item{graph}{The input graph.}
+  \item{x}{The input graph.}
   \item{membership}{Numeric vector, for each vertex it gives its
     community. The communities are numbered from zero.
   }
   \item{weights}{If not \code{NULL} then a numeric vector giving edge
     weights.}
+  \item{\dots}{Additional arguments, none currently.}
 }
 \details{
   The modularity of a graph with respect to some division (or vertex

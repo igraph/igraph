@@ -38,13 +38,10 @@ multilevel.community (graph, weights = NULL)
   
   This function was contributed by Tom Gregorovic.
 }
-\value{A list with the following members:
-  \item{membership}{The membership vector.
-    For each vertex it gives the ID of its community.}
-  \item{memberships}{Numeric matrix that will contain the membership
-    vector after each level, each row is one membership vector.}
-  \item{modularity}{Numeric vector that will contain the modularity score
-    after each level.}
+\value{
+  \code{multilevel.community} returns a \code{\link{communities}}
+  object, please see the \code{\link{communities}} manual page for
+  details.
 }
 \references{
   Vincent D. Blondel, Jean-Loup Guillaume, Renaud Lambiotte, Etienne
@@ -52,7 +49,11 @@ multilevel.community (graph, weights = NULL)
   networks. J. Stat. Mech. (2008) P10008   
 }
 \author{Tom Gregorovic, Tamas Nepusz \email{tamas@cs.rhul.ac.uk}}
-\seealso{Other community detection algorithms:
+\seealso{
+  See \code{\link{communities}} for extracting the membership,
+  modularity scores, etc. from the results.
+  
+  Other community detection algorithms:
   \code{\link{walktrap.community}},
   \code{\link{spinglass.community}},
   \code{\link{leading.eigenvector.community}},

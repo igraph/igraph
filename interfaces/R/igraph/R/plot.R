@@ -24,6 +24,10 @@ plot.igraph <- function(x,
                        # SPECIFIC: #####################################
                        axes=FALSE, xlab="", ylab="", add=FALSE,
                        xlim=c(-1,1), ylim=c(-1,1), main="", sub="",
+                       mark.groups=list(), mark.shape=1/2,
+                       mark.border=NA,
+                       mark.col=rainbow(length(mark.groups), alpha=0.3),
+                       mark.expand=15,
                        ...) {
 
   graph <- x
@@ -81,7 +85,33 @@ plot.igraph <- function(x,
     plot(0, 0, type="n", xlab=xlab, ylab=ylab, xlim=xlim, ylim=ylim,
          axes=axes, frame=frame, asp=asp, main=main, sub=sub)
   }
+
+  ################################################################
+  ## Mark vertex groups
+  if (!is.list(mark.groups) && is.numeric(mark.groups)) {
+    mark.groups <- list(mark.groups)
+  }
+
+  mark.shape  <- rep(mark.shape,  length=length(mark.groups))
+  mark.border <- rep(mark.border, length=length(mark.groups))
+  mark.col    <- rep(mark.col,    length=length(mark.groups))
+  mark.expand <- rep(mark.expand, length=length(mark.groups))
   
+  for (g in seq_along(mark.groups)) {
+    v <- mark.groups[[g]]
+    if (length(vertex.size)==1) {
+      vs <- vertex.size
+    } else {
+      vs <- rep(vertex.size, length=vcount(graph))[v+1]
+    }
+    igraph.polygon(layout[v+1,,drop=FALSE],
+                   vertex.size=vs,
+                   expand.by=mark.expand[g]/200,
+                   shape=mark.shape[g],
+                   col=mark.col[g],
+                   border=mark.border[g])
+  }
+
   ################################################################
   ## calculate position of arrow-heads
   el <- get.edgelist(graph, names=FALSE)
@@ -653,4 +683,18 @@ function (x1, y1, x2, y2,
             border=h.col.bo, lty=h.lty)
   }
 } # Arrows
+
+igraph.polygon <- function(points, vertex.size=15/200, expand.by=15/200,
+                           shape=1/2, col="#ff000033", border=NA) {
+
+  by <- expand.by
+  pp <- rbind(points,
+              cbind(points[,1]-vertex.size-by, points[,2]),
+              cbind(points[,1]+vertex.size+by, points[,2]),
+              cbind(points[,1], points[,2]-vertex.size-by),
+              cbind(points[,1], points[,2]+vertex.size+by))
+
+  cl <- convex.hull(pp)
+  xspline(cl$rescoords, shape=shape, open=FALSE, col=col, border=border)
+}
 

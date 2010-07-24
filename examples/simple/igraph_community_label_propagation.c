@@ -53,7 +53,8 @@ int main() {
                -1);  
   
   igraph_vector_init(&membership, 0);
-  igraph_community_label_propagation(&g, &membership, 0, 0, 0);
+  igraph_community_label_propagation(&g, &membership, 0, 0, 0, 
+				     /*modularity=*/ 0);
   if (igraph_vector_max(&membership) > 3) {
     printf("Resulting graph had more than four clusters:\n");
     for (i=0; i<igraph_vcount(&g); i++)
@@ -75,11 +76,11 @@ int main() {
   VECTOR(fixed)[4] = 1;
   VECTOR(fixed)[5] = 1;
   igraph_community_label_propagation(&g, &membership, &weights,
-                  &initial, &fixed);
+				     &initial, &fixed, /*modularity=*/ 0);
   for (i=0; i<igraph_vcount(&g); i++)
     if (VECTOR(membership)[i] != (i < 2 ? 0 : 1)) return 3;
   igraph_community_label_propagation(&g, &membership, 0,
-                  &initial, &fixed);
+				     &initial, &fixed, /*modularity=*/ 0);
   for (i=0; i<igraph_vcount(&g); i++)
     if (VECTOR(membership)[i] != 0) return 4;
 
@@ -87,7 +88,7 @@ int main() {
    * while an initial configuration is given -- see bug
    * #570902 in Launchpad. This is a simple smoke test only. */
   igraph_community_label_propagation(&g, &membership, &weights,
-                  &initial, 0);
+				     &initial, 0, /*modularity=*/ 0);
 
   igraph_vector_bool_destroy(&fixed);
   igraph_vector_destroy(&weights);

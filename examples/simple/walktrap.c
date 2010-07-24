@@ -38,7 +38,8 @@ int main() {
   
   igraph_community_walktrap(&g, 0 /* no weights */,
 			    4 /* steps */,
-			    &merges, &modularity);
+			    &merges, &modularity, 
+			    /* membership=*/ 0);
   
   no_of_nodes=igraph_vcount(&g);
   printf("Merges:\n");
