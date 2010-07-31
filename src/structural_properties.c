@@ -1036,6 +1036,83 @@ int igraph_get_shortest_paths(const igraph_t *graph,
   return 0;
 }
 
+/** 
+ * \function igraph_get_shortest_path
+ * Shortest path from one vertex to another one
+ * 
+ * Calculates and returns a single unweighted shortest path from a
+ * given vertex to another one. If there are more than one shortest
+ * paths between the two vertices, then an arbitrary one is returned.
+ * 
+ * </para><para>This function is a wrapper to \ref
+ * igraph_get_shortest_paths(), for the special case when only one
+ * target vertex is considered.
+ * \param graph The input graph, it can be directed or
+ *        undirected. Directed paths are considered in directed
+ *        graphs.
+ * \param vertices Pointer to an initialized vector or a null
+ *        pointer. If not a null pointer, then the vertex ids along
+ *        the path are stored here, including the source and target
+ *        vertices. 
+ * \param edges Pointer to an uninitialized vector or a null
+ *        pointer. If not a null pointer, then the edge ids along the
+ *        path are stored here.
+ * \param from The id of the source vertex.
+ * \param to The id of the target vertex.
+ * \param mode A constant specifying how edge directions are
+ *        considered in directed graphs. \c IGRAPH_OUT follows edge
+ *        directions, \c IGRAPH_IN follows the opposite directions,
+ *        and \c IGRAPH_ALL ignores edge directions. This argument is
+ *        ignored for undirected graphs.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and
+ * edges in the graph.
+ * 
+ * \sa \ref igraph_get_shortest_paths() for the version with more target
+ * vertices.
+ */
+
+int igraph_get_shortest_path(const igraph_t *graph, 
+			     igraph_vector_t *vertices,
+			     igraph_vector_t *edges, 
+			     igraph_integer_t from,
+			     igraph_integer_t to,
+			     igraph_neimode_t mode) {
+
+  igraph_vector_ptr_t vertices2, *vp=&vertices2;
+  igraph_vector_ptr_t edges2, *ep=&edges2;
+  
+  if (vertices) { 
+    IGRAPH_CHECK(igraph_vector_ptr_init(&vertices2, 1));
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &vertices2);
+    VECTOR(vertices2)[0]=vertices;
+  } else {
+    vp=0;
+  }
+  if (edges) {
+    IGRAPH_CHECK(igraph_vector_ptr_init(&edges2, 1));
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &edges2);
+    VECTOR(edges2)[0]=edges;
+  } else {
+    ep=0;
+  }
+
+  IGRAPH_CHECK(igraph_get_shortest_paths(graph, vp, ep, from, 
+					 igraph_vss_1(to),mode));
+
+  if (edges) {
+    igraph_vector_ptr_destroy(&edges2);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  if (vertices) {
+    igraph_vector_ptr_destroy(&vertices2);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  return 0;  
+}
+
 void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v) {
   long int i;
   for (i=0; i<igraph_vector_ptr_size(v); i++) {
@@ -5293,6 +5370,85 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
   igraph_Free(parents);
   igraph_vit_destroy(&vit);
   IGRAPH_FINALLY_CLEAN(6);
+  
+  return 0;
+}
+
+/** 
+ * \function igraph_get_shortest_path_dijkstra
+ * Weighted shortest path from one vertex to another one
+ * 
+ * Calculates a single single (positively) weighted shortest path from
+ * a single vertex to another one, using Disjkstra's algorithm. 
+ * 
+ * </para><para>This function is a special case (and a wrapper) to
+ * \ref igraph_get_shortest_paths_dijkstra(). 
+ * 
+ * \param graph The input graph, it can be directed or undirected.
+ * \param vertices Pointer to an initialized vector or a null
+ *        pointer. If not a null pointer, then the vertex ids along
+ *        the path are stored here, including the source and target
+ *        vertices. 
+ * \param edges Pointer to an uninitialized vector or a null
+ *        pointer. If not a null pointer, then the edge ids along the
+ *        path are stored here.
+ * \param from The id of the source vertex.
+ * \param to The id of the target vertex.
+ * \param weights Vector of edge weights, in the order of edge
+ *        ids. They must be non-negative, otherwise the algorithm does
+ *        not work.
+ * \param mode A constant specifying how edge directions are
+ *        considered in directed graphs. \c IGRAPH_OUT follows edge
+ *        directions, \c IGRAPH_IN follows the opposite directions,
+ *        and \c IGRAPH_ALL ignores edge directions. This argument is
+ *        ignored for undirected graphs.
+ * \return Error code.
+ * 
+ * Time complexity: O(|E|log|E|+|V|), |V| is the number of vertices,
+ * |E| is the number of edges in the graph.
+ * 
+ * \sa \ref igraph_get_shortest_paths_dijkstra() for the version with
+ * more target vertices.
+ */
+
+int igraph_get_shortest_path_dijkstra(const igraph_t *graph,
+				      igraph_vector_t *vertices,
+				      igraph_vector_t *edges,
+				      igraph_integer_t from,
+				      igraph_integer_t to,
+				      const igraph_vector_t *weights,
+				      igraph_neimode_t mode) {
+
+  igraph_vector_ptr_t vertices2, *vp=&vertices2;
+  igraph_vector_ptr_t edges2, *ep=&edges2;
+
+  if (vertices) {
+    IGRAPH_CHECK(igraph_vector_ptr_init(&vertices2, 1));
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &vertices2);
+    VECTOR(vertices2)[0]=vertices;
+  } else {
+    vp=0;
+  }
+  if (edges) {
+    IGRAPH_CHECK(igraph_vector_ptr_init(&edges2, 1));
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &edges2);
+    VECTOR(edges2)[0]=edges;
+  } else {
+    ep=0;
+  }
+  
+  IGRAPH_CHECK(igraph_get_shortest_paths_dijkstra(graph, vp, ep, 
+						  from, igraph_vss_1(to),
+						  weights, mode));
+
+  if (edges) { 
+    igraph_vector_ptr_destroy(&edges2);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  if (vertices) {
+    igraph_vector_ptr_destroy(&vertices2);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
   
   return 0;
 }
