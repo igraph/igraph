@@ -239,7 +239,8 @@ class CommunityTests(unittest.TestCase):
         self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1,2,2,2,2,2])
         cl = g.community_walktrap(steps=3)
         self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1,2,2,2,2,2])
-        
+       
+
 class ComparisonTests(unittest.TestCase):
     def testCompareVI(self):
         l1 = Clustering([1, 1, 1, 2, 2, 2])
@@ -258,6 +259,19 @@ class ComparisonTests(unittest.TestCase):
         l2 = [1, 2, 3, 5, 6, 7]
         self.failUnless(compare_communities(l1, l2, "nmi") == 0)
         self.failUnless(compare_communities(l1, l1, "nmi") == 1.)
+
+    def testCompareSplitJoin(self):
+        l1 = Clustering([1, 1, 1, 2, 2, 2])
+        l2 = Clustering([1, 1, 2, 2, 3, 3])
+        self.assertEqual(compare_communities(l1, l2, "split"), 3)
+        l1 = [1, 1, 1, 1, 1, 1]
+        l2 = [1, 2, 3, 5, 6, 7]
+        self.assertEqual(compare_communities(l1, l2, "split"), 5)
+        self.failUnless(compare_communities(l1, l1, "split") == 0.)
+        l1 = [1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3]
+        l2 = [3, 1, 2, 1, 3, 1, 3, 1, 2, 1, 4, 2]
+        self.assertEqual(compare_communities(l1, l2, "split"), 11)
+        self.assertEqual(split_join_distance(l1, l2), (6, 5))
 
     def testRemoveNone(self):
         l1 = Clustering([1, 1, 1, None, None, 2, 2, 2, 2])

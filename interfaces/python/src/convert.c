@@ -260,6 +260,7 @@ int igraphmodule_PyObject_to_community_comparison_t(PyObject *o,
         {"meila", IGRAPH_COMMCMP_VI},
         {"nmi", IGRAPH_COMMCMP_NMI},
         {"danon", IGRAPH_COMMCMP_NMI},
+        {"split-join", IGRAPH_COMMCMP_SPLIT_JOIN},
         {0,0}
     };
 

@@ -338,6 +338,37 @@ PyObject* igraphmodule_compare_communities(PyObject *self,
   return PyFloat_FromDouble((double)result);
 }
 
+
+PyObject* igraphmodule_split_join_distance(PyObject *self,
+  PyObject *args, PyObject *kwds) {
+  static char* kwlist[] = { "comm1", "comm2", NULL };
+  PyObject *comm1_o, *comm2_o;
+  igraph_vector_t comm1, comm2;
+  igraph_integer_t distance12, distance21;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "OO", kwlist,
+      &comm1_o, &comm2_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vector_t(comm1_o, &comm1, 0, 0))
+    return NULL;
+  if (igraphmodule_PyObject_to_vector_t(comm2_o, &comm2, 0, 0)) {
+    igraph_vector_destroy(&comm1);
+    return NULL;
+  }
+
+  if (igraph_split_join_distance(&comm1, &comm2, &distance12, &distance21)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&comm1);
+    igraph_vector_destroy(&comm2);
+    return NULL;
+  }
+  igraph_vector_destroy(&comm1);
+  igraph_vector_destroy(&comm2);
+
+  return Py_BuildValue("ll", (long)distance12, (long)distance21);
+}
+
 /** \ingroup python_interface
  * \brief Method table for the igraph Python module
  */
@@ -384,6 +415,10 @@ static PyMethodDef igraphmodule_methods[] =
       "  reverts to the default Mersenne twister generator implemented in the\n"
       "  C layer, which might be slightly faster than calling back to Python\n"
       "  for random numbers, but you cannot set its seed or save its state.\n"
+  },
+  {"_split_join_distance", (PyCFunction)igraphmodule_split_join_distance,
+    METH_VARARGS | METH_KEYWORDS,
+    "_split_join_distance(comm1, comm2)\n\n"
   },
   {NULL, NULL, 0, NULL}
 };
