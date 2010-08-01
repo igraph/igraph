@@ -50,16 +50,16 @@ class TextDrawer(AbstractCairoDrawer):
         if not text_layout:
             return
 
-        line_height = ctx.font_extents()[2]
+        _, font_descent, line_height = ctx.font_extents()[:3]
         yb = ctx.text_extents(text_layout[0][2])[1]
         total_height = len(text_layout) * line_height
 
         if self.valign == self.BOTTOM:
             # Bottom vertical alignment
-            dy = bbox.height - total_height - yb
+            dy = bbox.height - total_height - yb + font_descent
         elif self.valign == self.CENTER:
             # Centered vertical alignment
-            dy = (bbox.height - total_height - yb + line_height) / 2.
+            dy = (bbox.height - total_height - yb + font_descent + line_height) / 2.
         else:
             # Top vertical alignment
             dy = line_height
@@ -209,6 +209,7 @@ class TextDrawer(AbstractCairoDrawer):
                 current_width += word_width
                 if current_width >= width and current_line:
                     yield ("".join(current_line), current_width - word_width, 0)
+                    # Starting a new line
                     current_line, current_width = [word], word_width
                     if sep is not None:
                         current_line.append(sep)
@@ -267,32 +268,33 @@ def test():
     import math
 
     text = "The quick brown fox\njumps over a\nlazy dog"
-    width, height = (300, 500)
+    width, height = (600, 1000)
 
     surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
     context = cairo.Context(surface)
     drawer = TextDrawer(context, text)
 
     context.set_source_rgb(1, 1, 1)
+    context.set_font_size(16.)
     context.rectangle(0, 0, width, height)
     context.fill()
 
     context.set_source_rgb(0.5, 0.5, 0.5)
-    for i in range(101, width, 100):
+    for i in range(200, width, 200):
         context.move_to(i, 0)
         context.line_to(i, height)
         context.stroke()
-    for i in range(101, height, 100):
+    for i in range(200, height, 200):
         context.move_to(0, i)
         context.line_to(width, i)
         context.stroke()
     context.set_source_rgb(0.75, 0.75, 0.75)
-    context.set_line_width(1)
-    for i in range(50, width, 100):
+    context.set_line_width(0.5)
+    for i in range(100, width, 200):
         context.move_to(i, 0)
         context.line_to(i, height)
         context.stroke()
-    for i in range(50, height, 100):
+    for i in range(100, height, 200):
         context.move_to(0, i)
         context.line_to(width, i)
         context.stroke()
@@ -301,12 +303,12 @@ def test():
         """Marks the current point on the canvas by the given color"""
         x, y = context.get_current_point()
         context.set_source_rgba(red, green, blue, 0.5)
-        context.arc(x, y, 2, 0, 2 * math.pi)
+        context.arc(x, y, 4, 0, 2 * math.pi)
         context.fill()
 
     # Testing drawer.draw_at()
     for i, halign in enumerate(("left", "center", "right")):
-        context.move_to(i * 100, 20)
+        context.move_to(i * 200, 40)
 
         # Mark the reference point
         mark_point(0, 0, 1)
@@ -314,7 +316,7 @@ def test():
         # Draw the text
         context.set_source_rgb(0, 0, 0)
         drawer.halign = halign
-        drawer.draw_at(i * 100, 20)
+        drawer.draw_at(i * 200, 40)
 
         # Mark the new reference point
         mark_point(1, 0, 0)
@@ -326,7 +328,7 @@ def test():
             context.set_source_rgb(0, 0, 0)
             drawer.halign = halign
             drawer.valign = valign
-            drawer.bbox = (i*100, j*100+100, i*100+100, j*100+200)
+            drawer.bbox = (i*200, j*200+200, i*200+200, j*200+400)
             drawer.draw()
             # Mark the new reference point
             mark_point(1, 0, 0)
@@ -337,7 +339,7 @@ def test():
                   "Jackdaws  love  my  big  sphinx  of  quartz."
     drawer.valign = TextDrawer.TOP
     for i, halign in enumerate(("left", "center", "right")):
-        context.move_to(i * 100, 420)
+        context.move_to(i * 200, 840)
 
         # Mark the reference point
         mark_point(0, 0, 1)
@@ -345,12 +347,10 @@ def test():
         # Draw the text
         context.set_source_rgb(0, 0, 0)
         drawer.halign = halign
-        # Wrapping to 98 pixels only, 1 pixel is the separator line 
-        drawer.draw_at(i * 100, 420, width=99, wrap=True)
+        drawer.draw_at(i * 200, 840, width=199, wrap=True)
 
         # Mark the new reference point
         mark_point(1, 0, 0)
-
 
     surface.write_to_png("test.png")
 

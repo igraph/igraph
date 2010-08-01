@@ -53,7 +53,26 @@ class AbstractGraphDrawer(AbstractDrawer):
 
 #####################################################################
 
-class DefaultGraphDrawer(AbstractGraphDrawer, AbstractCairoDrawer):
+class AbstractCairoGraphDrawer(AbstractGraphDrawer, AbstractCairoDrawer):
+    """Abstract base class for graph drawers that draw on a Cairo canvas.
+    """
+
+    def __init__(self, context, bbox):
+        """Constructs the graph drawer and associates it to the given
+        Cairo context and the given L{BoundingBox}.
+
+        @param context: the context on which we will draw
+        @param bbox:    the bounding box within which we will draw.
+                        Can be anything accepted by the constructor
+                        of L{BoundingBox} (i.e., a 2-tuple, a 4-tuple
+                        or a L{BoundingBox} object).
+        """
+        AbstractCairoDrawer.__init__(self, context, bbox)
+        AbstractGraphDrawer.__init__(self)
+
+#####################################################################
+
+class DefaultGraphDrawer(AbstractCairoGraphDrawer):
     """Class implementing the default visualisation of a graph.
 
     The default visualisation of a graph draws the nodes on a 2D plane
@@ -82,8 +101,7 @@ class DefaultGraphDrawer(AbstractGraphDrawer, AbstractCairoDrawer):
                         igraph. The default edge drawer is
                         L{ArrowEdgeDrawer}.
         """
-        AbstractCairoDrawer.__init__(self, context, bbox)
-        AbstractGraphDrawer.__init__(self)
+        AbstractCairoGraphDrawer.__init__(self, context, bbox)
         self.edge_drawer_factory = edge_drawer_factory
 
     # pylint: disable-msg=W0142,W0221,E1101
