@@ -110,7 +110,8 @@ typedef enum { IGRAPH_SPINCOMM_IMP_ORIG=0,
 	       IGRAPH_SPINCOMM_IMP_NEG } igraph_spinglass_implementation_t;
 
 typedef enum { IGRAPH_COMMCMP_VI = 0,
-               IGRAPH_COMMCMP_NMI } igraph_community_comparison_t;
+               IGRAPH_COMMCMP_NMI,
+               IGRAPH_COMMCMP_SPLIT_JOIN } igraph_community_comparison_t;
 
 typedef enum { IGRAPH_ADD_WEIGHTS_NO = 0,
                IGRAPH_ADD_WEIGHTS_YES,

@@ -13,6 +13,7 @@
 <!-- doxrox-include igraph_community_to_membership -->
 <!-- doxrox-include igraph_reindex_membership -->
 <!-- doxrox-include igraph_compare_communities -->
+<!-- doxrox-include igraph_split_join_distance -->
 </section>
 
 <section><title>Community structure based on statistical mechanics</title>

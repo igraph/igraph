@@ -2775,15 +2775,18 @@ int igraph_i_compare_communities_vi(igraph_vector_t *v1, igraph_vector_t *v2,
     igraph_real_t* result);
 int igraph_i_compare_communities_nmi(igraph_vector_t *v1, igraph_vector_t *v2,
     igraph_real_t* result);
+int igraph_i_split_join_distance(igraph_vector_t *v1, igraph_vector_t *v2,
+    igraph_real_t* distance12, igraph_real_t* distance21);
 
 /**
  * \ingroup communities
  * \function igraph_compare_communities
  * \brief Compares community structures using various metrics
  *
- * This function assesses the distance between two community structures using
- * either the variation of information (VI) metric of Meila (2003) or the
- * normalized mutual information (NMI) proposed by Danon et al (2005).
+ * This function assesses the distance between two community structures
+ * using the variation of information (VI) metric of Meila (2003), the
+ * normalized mutual information (NMI) of Danon et al (2005) or the
+ * split-join distance of van Dongen (2000).
  *
  * </para><para>
  * References:
@@ -2799,17 +2802,23 @@ int igraph_i_compare_communities_nmi(igraph_vector_t *v1, igraph_vector_t *v2,
  * Danon L, Diaz-Guilera A, Duch J, Arenas A: Comparing community structure
  * identification. J Stat Mech P09008, 2005.
  *
+ * </para><para>
+ * van Dongen S: Performance criteria for graph clustering and Markov cluster
+ * experiments. Technical Report INS-R0012, National Research Institute for
+ * Mathematics and Computer Science in the Netherlands, Amsterdam, May 2000.
+ * 
  * \param  comm1   the membership vector of the first community structure
- * \param  comm2   the membership vector of the first community structure
+ * \param  comm2   the membership vector of the second community structure
  * \param  method  the comparison method to use. \c IGRAPH_COMMCMP_VI
  *                 selects the variation of information (VI) metric of
- *                 Meila (2003), while \c IGRAPH_COMMCMP_NMI selects the
+ *                 Meila (2003), \c IGRAPH_COMMCMP_NMI selects the
  *                 normalized mutual information measure proposed by
- *                 Danon et al (2005).
+ *                 Danon et al (2005), \c IGRAPH_COMMCMP_SPLIT_JOIN
+ *                 selects the split-join distance of van Dongen (2000).
  *
  * \return  Error code.
  *
- * Time complexity: O(n log(n)) for the variation of information metric.
+ * Time complexity: O(n log(n)).
  */
 int igraph_compare_communities(const igraph_vector_t *comm1,
     const igraph_vector_t *comm2, igraph_real_t* result,
@@ -2839,9 +2848,96 @@ int igraph_compare_communities(const igraph_vector_t *comm1,
       IGRAPH_CHECK(igraph_i_compare_communities_nmi(&c1, &c2, result));
       break;
 
+    case IGRAPH_COMMCMP_SPLIT_JOIN:
+      {
+        igraph_integer_t d12, d21;
+        IGRAPH_CHECK(igraph_i_split_join_distance(&c1, &c2, &d12, &d21));
+        *result = d12 + d21;
+      }
+      break;
+
     default:
       IGRAPH_ERROR("unknown community comparison method", IGRAPH_EINVAL);
   }
+
+  /* Clean up everything */
+  igraph_vector_destroy(&c1);
+  igraph_vector_destroy(&c2);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return 0;
+}
+
+/**
+ * \ingroup communities
+ * \function igraph_split_join_distance
+ * \brief Calculates the split-join distance of two community structures
+ *
+ * The split-join distance between partitions A and B is the sum of the
+ * projection distance of A from B and the projection distance of B from
+ * A. The projection distance is an asymmetric measure and it is defined
+ * as follows:
+ *
+ * </para><para>
+ * First, each set in partition A is evaluated against all sets in partition
+ * B. For each set in partition A, the best matching set in partition B is
+ * found and the overlap size is calculated. (Matching is quantified by the
+ * size of the overlap between the two sets). Then, the maximal overlap sizes
+ * for each set in A are summed together and subtracted from the number of
+ * elements in A.
+ *
+ * </para><para>
+ * The split-join distance will be returned in two arguments, \c distance12
+ * will contain the projection distance of the first partition from the
+ * second, while \c distance21 will be the projection distance of the second
+ * partition from the first. This makes it easier to detect whether a
+ * partition is a subpartition of the other, since in this case, the
+ * corresponding distance will be zero.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * van Dongen S: Performance criteria for graph clustering and Markov cluster
+ * experiments. Technical Report INS-R0012, National Research Institute for
+ * Mathematics and Computer Science in the Netherlands, Amsterdam, May 2000.
+ * 
+ * \param  comm1       the membership vector of the first community structure
+ * \param  comm2       the membership vector of the second community structure
+ * \param  distance12  pointer to an \c igraph_integer_t, the projection distance
+ *                     of the first community structure from the second one will be
+ *                     returned here.
+ * \param  distance21  pointer to an \c igraph_integer_t, the projection distance
+ *                     of the second community structure from the first one will be
+ *                     returned here.
+ * \return  Error code.
+ *
+ * \see \ref igraph_compare_communities() with the \c IGRAPH_COMMCMP_SPLIT_JOIN
+ * method if you are not interested in the individual distances but only the sum
+ * of them.
+ *
+ * Time complexity: O(n log(n)).
+ */
+int igraph_split_join_distance(const igraph_vector_t *comm1,
+    const igraph_vector_t *comm2, igraph_integer_t *distance12,
+    igraph_integer_t *distance21) {
+  igraph_vector_t c1, c2;
+
+  if (igraph_vector_size(comm1) != igraph_vector_size(comm2)) {
+    IGRAPH_ERROR("community membership vectors have different lengths", IGRAPH_EINVAL);
+  }
+
+  /* Copy and reindex membership vectors to make sure they are continuous */
+  IGRAPH_CHECK(igraph_vector_copy(&c1, comm1));
+  IGRAPH_FINALLY(igraph_vector_destroy, &c1);
+
+  IGRAPH_CHECK(igraph_vector_copy(&c2, comm2));
+  IGRAPH_FINALLY(igraph_vector_destroy, &c2);
+
+  IGRAPH_CHECK(igraph_reindex_membership(&c1, 0));
+  IGRAPH_CHECK(igraph_reindex_membership(&c2, 0));
+
+  IGRAPH_CHECK(igraph_i_split_join_distance(&c1, &c2, distance12, distance21));
 
   /* Clean up everything */
   igraph_vector_destroy(&c1);
@@ -2911,12 +3007,12 @@ int igraph_i_entropy_and_mutual_information(igraph_vector_t* v1, igraph_vector_t
           (int)VECTOR(*v1)[i], (int)VECTOR(*v2)[i], 1));
   }
   IGRAPH_CHECK(igraph_spmatrix_iter_create(&mit, &m));
+  IGRAPH_FINALLY(igraph_spmatrix_iter_destroy, &mit);
   while (!igraph_spmatrix_iter_end(&mit)) {
     double p = mit.value / n;
     *mut_inf += p * (log(p) - p1[mit.ri] - p2[mit.ci]);
     igraph_spmatrix_iter_next(&mit);
   }
-  IGRAPH_FINALLY(igraph_spmatrix_iter_destroy, &mit);
 
   igraph_spmatrix_iter_destroy(&mit);
   igraph_spmatrix_destroy(&m);
@@ -2972,5 +3068,64 @@ int igraph_i_compare_communities_vi(igraph_vector_t *v1, igraph_vector_t *v2,
   *result = h1 + h2 - 2*mut_inf;
 
   return 0;
+}
+
+/**
+ * Implementation of the split-join distance of van Dongen.
+ * This function assumes that the community membership vectors have already
+ * been normalized using igraph_reindex_communities().
+ *
+ * Reference: van Dongen S: Performance criteria for graph clustering and Markov
+ * cluster experiments. Technical Report INS-R0012, National Research Institute
+ * for Mathematics and Computer Science in the Netherlands, Amsterdam, May 2000.
+ *
+ * Time complexity: O(n log(n))
+ */
+int igraph_i_split_join_distance(igraph_vector_t *v1, igraph_vector_t *v2,
+    igraph_integer_t* distance12, igraph_integer_t* distance21) {
+  long int k1 = (long int)igraph_vector_max(v1)+1;
+  long int k2 = (long int)igraph_vector_max(v2)+1;
+  long int i, n = igraph_vector_size(v1);
+  igraph_vector_t rowmax, colmax;
+  igraph_spmatrix_t m;
+  igraph_spmatrix_iter_t mit;
+
+  /* Initialize vectors that will store the row/columnwise maxima */
+  IGRAPH_VECTOR_INIT_FINALLY(&rowmax, k1);
+  IGRAPH_VECTOR_INIT_FINALLY(&colmax, k2);
+
+  /* Calculate the confusion matrix */
+  IGRAPH_CHECK(igraph_spmatrix_init(&m, k1, k2));
+  IGRAPH_FINALLY(igraph_spmatrix_destroy, &m);
+  for (i = 0; i < n; i++) {
+    IGRAPH_CHECK(igraph_spmatrix_add_e(&m,
+          (int)VECTOR(*v1)[i], (int)VECTOR(*v2)[i], 1));
+  }
+
+  /* Find the row/columnwise maxima */
+  IGRAPH_CHECK(igraph_spmatrix_iter_create(&mit, &m));
+  IGRAPH_FINALLY(igraph_spmatrix_iter_destroy, &mit);
+  while (!igraph_spmatrix_iter_end(&mit)) {
+    if (mit.value > VECTOR(rowmax)[mit.ri])
+      VECTOR(rowmax)[mit.ri] = mit.value;
+    if (mit.value > VECTOR(colmax)[mit.ci])
+      VECTOR(colmax)[mit.ci] = mit.value;
+    igraph_spmatrix_iter_next(&mit);
+  }
+
+  igraph_spmatrix_iter_destroy(&mit);
+  igraph_spmatrix_destroy(&m);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  /* Calculate the distances */
+  *distance12 = n - igraph_vector_sum(&rowmax);
+  *distance21 = n - igraph_vector_sum(&colmax);
+
+  igraph_vector_destroy(&rowmax);
+  igraph_vector_destroy(&colmax);
+
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return IGRAPH_SUCCESS;
 }
 

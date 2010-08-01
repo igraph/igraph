@@ -179,6 +179,10 @@ int igraph_compare_communities(const igraph_vector_t *comm1,
 	                       const igraph_vector_t *comm2,
 			       igraph_real_t* result,
 			       igraph_community_comparison_t method);
+int igraph_split_join_distance(const igraph_vector_t *comm1,
+        const igraph_vector_t *comm2,
+        igraph_integer_t* distance12,
+        igraph_integer_t* distance21);
 
 __END_DECLS
 
