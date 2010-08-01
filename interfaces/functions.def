@@ -1064,6 +1064,11 @@ igraph_community_optimal_modularity:
         NAME-R: optimal.community
         IGNORE: RR
 
+igraph_split_join_distance:
+        PARAMS: VECTOR comm1, VECTOR comm2, OUT REALPTR distance12, \
+		        OUT REALPTR distance21
+        NAME-R: split.join.distance
+
 #######################################
 # Conversion
 #######################################
