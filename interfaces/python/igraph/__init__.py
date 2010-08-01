@@ -537,7 +537,7 @@ class Graph(GraphBase):
         @ref: A Clauset, MEJ Newman and C Moore: Finding community structure
           in very large networks. Phys Rev E 70, 066111 (2004).
         """
-        merges, qs = GraphBase.community_fastgreedy(self, weights, True)
+        merges, qs = GraphBase.community_fastgreedy(self, weights)
         return VertexDendrogram(self, merges, None, qs)
 
 
@@ -569,12 +569,12 @@ class Graph(GraphBase):
         eigenvectors of matrices, arXiv:physics/0605087"""
         if clusters is None:
             clusters = -1
-        cl, merges = GraphBase.community_leading_eigenvector_naive(self, \
+        cl, merges, q = GraphBase.community_leading_eigenvector_naive(self, \
                 clusters, return_merges)
         if merges is None:
-            return VertexClustering(self, cl)
+            return VertexClustering(self, cl, modularity = q)
         else:
-            return VertexDendrogram(self, merges, cl)
+            return VertexDendrogram(self, merges, cl, modularity = q)
 
 
     def community_leading_eigenvector(self, clusters=None, \
@@ -591,22 +591,15 @@ class Graph(GraphBase):
           algorithm won't split a community further if the signs of the leading
           eigenvector are all the same, so the actual number of discovered
           communities can be less than the desired one.
-        @param return_merges: whether the returned object should be a
-          dendrogram instead of a single clustering.
-        @return: an appropriate L{VertexClustering} or L{VertexDendrogram}
-          object.
+        @return: an appropriate L{VertexDendrogram} object.
         
         @newfield ref: Reference
         @ref: MEJ Newman: Finding community structure in networks using the
         eigenvectors of matrices, arXiv:physics/0605087"""
         if clusters is None:
             clusters = -1
-        cl, merges = GraphBase.community_leading_eigenvector(self, \
-                clusters, return_merges)
-        if merges is None:
-            return VertexClustering(self, cl)
-        else:
-            return VertexDendrogram(self, merges, cl)
+        cl, merges, q = GraphBase.community_leading_eigenvector(self, clusters)
+        return VertexDendrogram(self, merges, cl)
 
 
     def community_label_propagation(self, weights = None, initial = None, \
@@ -731,8 +724,8 @@ class Graph(GraphBase):
         @return: a L{VertexDendrogram} object, initally cut at the maximum
           modularity.
         """
-        merges = GraphBase.community_edge_betweenness(self, directed)
-        dendrogram = VertexDendrogram(merges)
+        merges, qs = GraphBase.community_edge_betweenness(self, directed)
+        dendrogram = VertexDendrogram(merges, modularity=qs)
         if clusters is not None:
             dendrogram.cut(clusters)
         return dendrogram
@@ -808,7 +801,7 @@ class Graph(GraphBase):
         @ref: Pascal Pons, Matthieu Latapy: Computing communities in large
           networks using random walks, U{http://arxiv.org/abs/physics/0512106}.
         """
-        merges, qs = GraphBase.community_walktrap(self, weights, steps, True)
+        merges, qs = GraphBase.community_walktrap(self, weights, steps)
         d = VertexDendrogram(self, merges, modularity=qs)
         return d
 
