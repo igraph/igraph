@@ -8581,11 +8581,17 @@ PyObject *igraphmodule_Graph_community_edge_betweenness(igraphmodule_GraphObject
     igraph_matrix_destroy(&merges);
     return igraphmodule_handle_igraph_error();
   }
-  if (igraph_community_edge_betweenness(&self->g, &removed_edges, 0, &merges, 0, PyObject_IsTrue(directed))) {
-  igraphmodule_handle_igraph_error();
-  igraph_vector_destroy(&removed_edges);
-  igraph_matrix_destroy(&merges);
-  return NULL;
+  if (igraph_community_edge_betweenness(&self->g, &removed_edges,
+        /* edge_betweenness = */ 0,
+        /* merges = */ &merges,
+        /* bridges = */ 0,
+        /* modularity = */ 0,
+        /* membership = */ 0,
+        PyObject_IsTrue(directed))) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&removed_edges);
+    igraph_matrix_destroy(&merges);
+    return NULL;
   }
 
   res = igraphmodule_matrix_t_to_PyList(&merges, IGRAPHMODULE_TYPE_INT);
@@ -8623,7 +8629,7 @@ PyObject *igraphmodule_Graph_community_leading_eigenvector_naive(igraphmodule_Gr
 
   arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
   if (igraph_community_leading_eigenvector_naive(&self->g, mptr, &members, n,
-      igraphmodule_ARPACKOptions_get(arpack_options))){
+      igraphmodule_ARPACKOptions_get(arpack_options), 0)){
     if (mptr) igraph_matrix_destroy(mptr);
     igraph_vector_destroy(&members);
     return igraphmodule_handle_igraph_error();
@@ -8680,7 +8686,7 @@ PyObject *igraphmodule_Graph_community_leading_eigenvector(igraphmodule_GraphObj
 
   arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
   if (igraph_community_leading_eigenvector(&self->g, mptr, &members, n,
-      igraphmodule_ARPACKOptions_get(arpack_options))){
+      igraphmodule_ARPACKOptions_get(arpack_options), 0)){
     if (mptr) igraph_matrix_destroy(mptr);
   igraph_vector_destroy(&members);
     return igraphmodule_handle_igraph_error();
@@ -8729,7 +8735,7 @@ PyObject *igraphmodule_Graph_community_fastgreedy(igraphmodule_GraphObject * sel
   igraph_matrix_init(&merges, 0, 0);
   if (PyObject_IsTrue(return_modularities)) {
     igraph_vector_init(&q, 0);
-    if (igraph_community_fastgreedy(&self->g, ws, &merges, &q)) {
+    if (igraph_community_fastgreedy(&self->g, ws, &merges, &q, 0)) {
       if (ws) { igraph_vector_destroy(ws); free(ws); }
       igraph_vector_destroy(&q);
       igraph_matrix_destroy(&merges);
@@ -8743,7 +8749,7 @@ PyObject *igraphmodule_Graph_community_fastgreedy(igraphmodule_GraphObject * sel
       return NULL;
     }
   } else {
-    if (igraph_community_fastgreedy(&self->g, ws, &merges, 0)) {
+    if (igraph_community_fastgreedy(&self->g, ws, &merges, 0, 0)) {
       if (ws) { igraph_vector_destroy(ws); free(ws); }
       igraph_matrix_destroy(&merges);
       return igraphmodule_handle_igraph_error();
@@ -8801,7 +8807,7 @@ PyObject *igraphmodule_Graph_community_label_propagation(
 
   igraph_vector_init(&membership, igraph_vcount(&self->g));
   if (igraph_community_label_propagation(&self->g, &membership,
-        ws, initial, (fixed_o != Py_None ? &fixed : 0))) {
+        ws, initial, (fixed_o != Py_None ? &fixed : 0), 0)) {
     if (fixed_o != Py_None) igraph_vector_bool_destroy(&fixed);
     if (ws) { igraph_vector_destroy(ws); free(ws); }
     if (initial) { igraph_vector_destroy(initial); free(initial); }
@@ -9009,7 +9015,7 @@ PyObject *igraphmodule_Graph_community_walktrap(igraphmodule_GraphObject * self,
   igraph_matrix_init(&merges, 0, 0);
   if (PyObject_IsTrue(return_q)) {
     igraph_vector_init(&q, 0);
-    if (igraph_community_walktrap(&self->g, ws, steps, &merges, &q)) {
+    if (igraph_community_walktrap(&self->g, ws, steps, &merges, &q, 0)) {
       if (ws) { igraph_vector_destroy(ws); free(ws); }
       igraph_vector_destroy(&q);
       igraph_matrix_destroy(&merges);
@@ -9023,7 +9029,7 @@ PyObject *igraphmodule_Graph_community_walktrap(igraphmodule_GraphObject * self,
       return NULL;
     }
   } else {
-    if (igraph_community_walktrap(&self->g, ws, steps, &merges, 0)) {
+    if (igraph_community_walktrap(&self->g, ws, steps, &merges, 0, 0)) {
       if (ws) { igraph_vector_destroy(ws); free(ws); }
       igraph_matrix_destroy(&merges);
       return igraphmodule_handle_igraph_error();
