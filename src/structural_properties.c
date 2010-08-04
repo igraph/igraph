@@ -4750,11 +4750,18 @@ int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
     igraph_vector_destroy(&deghist);
     IGRAPH_FINALLY_CLEAN(1);
   }
-  
+
+  igraph_vector_destroy(&neis);
+  igraph_vector_destroy(&deg);
+  IGRAPH_FINALLY_CLEAN(2);
+
   if (!knn) {
     igraph_vector_destroy(&my_knn_v);
     IGRAPH_FINALLY_CLEAN(1);
   }
+  
+  igraph_vit_destroy(&vit);
+  IGRAPH_FINALLY_CLEAN(1);
   
   return 0;
 }
