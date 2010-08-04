@@ -1154,12 +1154,14 @@ igraph_revolver_ml_d:
                 OUT REALPTR logprob, OUT REALPTR logmax
         NAME-R: revolver.ml.d
         FLAGS: PROGRESS
+        IGNORE: RNamespace
 
 igraph_revolver_probs_d:
         PARAMS: GRAPH graph, VECTOR kernel, OUT VECTOR_OR_0 probs, \
                 OUT VECTOR_OR_0 citedprobs, OUT VECTOR_OR_0 citingprobs, \
                 BOOLEAN ntk=False
         NAME-R: revolver.probs.d
+        IGNORE: RNamespace
 
 igraph_revolver_ml_de:
         PARAMS: GRAPH graph, INTEGER niter, OUT MATRIX kernel, \
@@ -1168,11 +1170,13 @@ igraph_revolver_ml_de:
                 OUT REALPTR logprob, OUT REALPTR logmax
         NAME-R: revolver.ml.de
         FLAGS: PROGRESS
+        IGNORE: RNamespace
 
 igraph_revolver_probs_de:
         PARAMS: GRAPH graph, MATRIX kernel, VECTOR cats, OUT VECTOR_OR_0 logprobs, \
                 OUT VECTOR_OR_0 logcited, OUT VECTOR_OR_0 logciting
         NAME-R: revolver.probs.de
+        IGNORE: RNamespace
 
 igraph_revolver_ml_ade:
         PARAMS: GRAPH graph, INTEGER niter, OUT ARRAY3 kernel, \
@@ -1181,11 +1185,13 @@ igraph_revolver_ml_ade:
                 OUT REALPTR logprob, OUT REALPTR logmax
         NAME-R: revolver.ml.ade
         FLAGS: PROGRESS
+        IGNORE: RNamespace
 
 igraph_revolver_probs_ade:
         PARAMS: GRAPH graph, ARRAY3 kernel, VECTOR cats, OUT VECTOR_OR_0 logprobs, \
                 OUT VECTOR_OR_0 logcited, OUT VECTOR_OR_0 logciting
         NAME-R: revolver.probs.ade
+        IGNORE: RNamespace
 
 igraph_revolver_ml_f:
         PARAMS: GRAPH graph, INTEGER niter, OUT VECTOR kernel, \
@@ -1193,6 +1199,7 @@ igraph_revolver_ml_f:
                 OUT REALPTR logmax
         NAME-R: revolver.ml.f
         FLAGS: PROGRESS
+        IGNORE: RNamespace
 
 igraph_revolver_ml_df:
         PARAMS: GRAPH graph, INTEGER niter, OUT MATRIX kernel, \
@@ -1200,12 +1207,14 @@ igraph_revolver_ml_df:
                 OUT REALPTR logmax
         NAME-R: revolver.ml.df
         FLAGS: PROGRESS
+        IGNORE: RNamespace
 
 igraph_revolver_ml_l:
         PARAMS: GRAPH graph, INTEGER niter, OUT VECTOR kernel, \
                 OUT VECTOR_OR_0 cites, INTEGER agebins=300, REAL delta=1e-10, \
                 OUT REALPTR logprob, OUT REALPTR logmax
         NAME-R: revolver.ml.l
+        IGNORE: RNamespace
 
 igraph_revolver_ml_ad:
         PARAMS: GRAPH graph, INTEGER niter, OUT MATRIX kernel, \
@@ -1214,12 +1223,14 @@ igraph_revolver_ml_ad:
                 OUT REALPTR logprob, OUT REALPTR logmax
         NAME-R: revolver.ml.ad
         FLAGS: PROGRESS
+        IGNORE: RNamespace
 
 igraph_revolver_probs_ad:
         PARAMS: GRAPH graph, MATRIX kernel, OUT VECTOR_OR_0 probs, \
                 OUT VECTOR_OR_0 citedprobs, OUT VECTOR_OR_0 citingprobs, \
                 BOOLEAN ntk=False
         NAME-R: revolver.probs.ad
+        IGNORE: RNamespace
 
 igraph_revolver_ml_D_alpha:
         PARAMS: GRAPH graph, INOUT REALPTR alpha, OUT REALPTR Fmin, \
@@ -1228,6 +1239,7 @@ igraph_revolver_ml_D_alpha:
                 OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
         NAME-R: revolver.ml.D.alpha
         FLAGS: PROGRESS
+        IGNORE: RNamespace
 
 igraph_revolver_ml_D_alpha_a:
         PARAMS: GRAPH graph, INOUT REALPTR alpha, INOUT REALPTR a, \
@@ -1236,6 +1248,7 @@ igraph_revolver_ml_D_alpha_a:
                 OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
         NAME-R: revolver.ml.D.alpha.a
         FLAGS: PROGRESS
+        IGNORE: RNamespace
 
 igraph_revolver_ml_DE_alpha_a:
         PARAMS: GRAPH graph, VECTOR cats, INOUT REALPTR alpha, \
@@ -1244,6 +1257,7 @@ igraph_revolver_ml_DE_alpha_a:
                 VECTOR_OR_0 filter=NULL, \
                 OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
         NAME-R: revolver.ml.DE.alpha.a
+        IGNORE: RNamespace
 
 igraph_revolver_ml_AD_alpha_a_beta:
         PARAMS: GRAPH graph, INOUT REALPTR alpha, INOUT REALPTR a, \
@@ -1253,6 +1267,7 @@ igraph_revolver_ml_AD_alpha_a_beta:
                 OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
         NAME-R: revolver.ml.AD.alpha.a.beta
         FLAGS: PROGRESS
+        IGNORE: RNamespace
 
 igraph_revolver_ml_AD_dpareto:
         PARAMS: GRAPH graph, INOUT REALPTR alpha, INOUT REALPTR a, \
@@ -1263,12 +1278,14 @@ igraph_revolver_ml_AD_dpareto:
                 OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
         NAME-R: revolver.ml.AD.dpareto
         FLAGS: PROGRESS
+        IGNORE: RNamespace
 
 igraph_revolver_ml_AD_dpareto_eval:
         PARAMS: GRAPH graph, REAL alpha, REAL a, REAL paralpha, REAL parbeta, \
                 REAL parscale, OUT REALPTR value, OUT VECTOR deriv, \
                 INT agebins=300, VECTOR_OR_0 filter=NULL
         NAME-R: revolver.ml.AD.dpareto.eval
+        IGNORE: RNamespace
 
 igraph_revolver_ml_ADE_alpha_a_beta:
         PARAMS: GRAPH graph, VECTOR cats, INOUT REALPTR alpha, \
@@ -1278,6 +1295,7 @@ igraph_revolver_ml_ADE_alpha_a_beta:
                 VECTOR_OR_0 filter=NULL, \
                 OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
         NAME-R: revolver.ml.ADE.alpha.a.beta
+        IGNORE: RNamespace
 
 igraph_revolver_ml_ADE_dpareto:
         PARAMS: GRAPH graph, VECTOR cats, INOUT REALPTR alpha, \
@@ -1288,6 +1306,7 @@ igraph_revolver_ml_ADE_dpareto:
                 INT agebins=300, VECTOR_OR_0 filter=NULL, \
                 OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
         NAME-R: revolver.ml.ADE.dpareto
+        IGNORE: RNamespace
 
 igraph_revolver_ml_ADE_dpareto_eval:
         PARAMS: GRAPH graph, VECTOR cats, REAL alpha, REAL a, REAL paralpha, \
@@ -1295,17 +1314,20 @@ igraph_revolver_ml_ADE_dpareto_eval:
                 OUT REALPTR value, OUT VECTOR deriv, INT agebins=300, \
                 VECTOR_OR_0 filter=NULL
         NAME-R: revolver.ml.ADE.dpareto.eval
+        IGNORE: RNamespace
 
 igraph_revolver_ml_ADE_dpareto_evalf:
         PARAMS: GRAPH graph, VECTOR cats, MATRIX par, OUT VECTOR value, \
                 INT agebins, VECTOR_OR_0 filter=NULL
         NAME-R: revolver.ml.ADE.dpareto.evalf
+        IGNORE: RNamespace
 
 igraph_revolver_probs_ADE_dpareto:
         PARAMS: GRAPH graph, MATRIX par, VECTOR cats, VECTOR gcats, \
                 INT agebins, OUT VECTOR_OR_0 logprobs, \
                 OUT VECTOR_OR_0 logcited, OUT VECTOR_OR_0 logciting
         NAME-R: revolver.probs.ADE.dpareto
+        IGNORE: RNamespace
 
 #######################################
 # Other, (yet) undocumented functions

@@ -54,8 +54,7 @@ export(erdos.renyi.game, random.graph.game, degree.sequence.game,
        growing.random.game, barabasi.game, ba.game,
        callaway.traits.game, establishment.game, grg.game,
        preference.game, asymmetric.preference.game, connect.neighborhood,
-       rewire.edges, watts.strogatz.game, lastcit.game, cited.type.game,
-       citing.cited.type.game)
+       rewire.edges, watts.strogatz.game)
 
 # community structure
 
@@ -120,33 +119,6 @@ export(cluster.distribution, is.connected, decompose.graph,
 
 export(evcent, bonpow, alpha.centrality)
 export(igraph.arpack.default)
-
-# dynamics measurement
-
-export(measure.dynamics.id, measure.dynamics.idage, measure.dynamics.d.d,
-       measure.dynamics.citedcat.id.age, measure.dynamics.citingcat.id.age,
-       measure.dynamics.lastcit, measure.dynamics.age, measure.dynamics.citedcat,
-       measure.dynamics.citingcat.citedcat)
-
-export(revolver.d, revolver.error.d,
-       revolver.ad, revolver.error.ad,
-       revolver.ade, revolver.error.ade,
-       revolver.e, revolver.error.e,
-       revolver.de, revolver.error.de,
-       revolver.l, revolver.error.l,
-       revolver.dl, revolver.error.dl,
-       revolver.el, revolver.error.el,
-       revolver.r, revolver.error.r,
-       revolver.ar, revolver.error.ar,
-       revolver.di, revolver.error.di,
-       revolver.adi, revolver.error.adi,
-       revolver.il, revolver.error.il,
-       revolver.ir, revolver.error.ir,
-       revolver.air, revolver.error.air)
-
-export (revolver.d.d, revolver.p.p)
-
-export (evolver.d)
 
 # isomorphism, motifs
 
