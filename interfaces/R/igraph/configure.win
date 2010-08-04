@@ -1,25 +1,32 @@
 #! /bin/sh
 
-if test -z "$LIB_XML" ; then
-  echo "Please define LIB_XML (and LIB_ZLIB)"
-  exit 1
-fi
-
-if test -z "$LIB_ZLIB" ; then
-  echo "Please define LIB_ZLIB"
-  exit 1
-fi
-
-if test -z "$LIB_ICONV" ; then
-  echo "Please define LIB_ICONV"
-  exit 1
-fi
-
-if test -z "$R_PACKAGE_DIR" ; then
-   R_PACKAGE_DIR=${DPKG}
-fi
-
 mkdir -p ${R_PACKAGE_DIR}/libs${R_ARCH}
-cp $LIB_ZLIB/bin/zlib1.dll ${R_PACKAGE_DIR}/libs${R_ARCH}
-cp $LIB_XML/bin/libxml2.dll ${R_PACKAGE_DIR}/libs${R_ARCH}
-cp $LIB_ICONV/bin/iconv.dll ${R_PACKAGE_DIR}/libs${R_ARCH}
+if test "${R_ARCH}" = "/x64"; then
+  if test -z "$LIB_XML" ; then
+    echo "Please define LIB_XML"
+    exit 1
+  fi
+
+  cp $LIB_XML/bin/libxml2-2.dll $LIB_XML/bin/libiconv-2.dll $LIB_XML/bin/libz.dll ${R_PACKAGE_DIR}/libs${R_ARCH}
+else
+  if test -z "$LIB_XML" ; then
+    echo "Please define LIB_XML (and LIB_ZLIB)"
+    exit 1
+  fi
+
+  if test -z "$LIB_ZLIB" ; then
+    echo "Please define LIB_ZLIB"
+    exit 1
+  fi
+
+  if test -z "$LIB_ICONV" ; then
+    echo "Please define LIB_ICONV"
+    exit 1
+  fi
+
+  if test -z "$R_PACKAGE_DIR" ; then
+     R_PACKAGE_DIR=${DPKG}
+  fi
+
+  cp $LIB_ZLIB/bin/zlib1.dll $LIB_XML/bin/libxml2.dll ${R_PACKAGE_DIR}/libs${R_ARCH}
+fi
