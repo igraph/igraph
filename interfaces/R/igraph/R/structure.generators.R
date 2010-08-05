@@ -526,9 +526,9 @@ graph.data.frame <- function(d, directed=TRUE, vertices=NULL) {
   }
 
   ## Handle if some elements are 'NA'
-  if (any(is.na(d))) {
+  if (any(is.na(d[,1:2]))) {
     warning("In `d' `NA' elements were replaced with string \"NA\"")
-    d[ is.na(d) ] <- 'NA'
+    d[,1:2][ is.na(d[,1:2]) ] <- 'NA'
   }
   if (!is.null(vertices) && any(is.na(vertices[,1]))) {
     warning("In `vertices[,1]' `NA' elements were replaced with string \"NA\"")
