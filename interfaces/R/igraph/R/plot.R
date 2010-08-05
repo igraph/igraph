@@ -222,7 +222,7 @@ plot.igraph <- function(x,
     if (length(curved)>1) { curved <- curved[nonloops.e] }
     if (length(unique(arrow.mode))==1) {
       igraph.Arrows(x0, y0, x1, y1, h.col=edge.color, sh.col=edge.color,
-                    sh.lwd=edge.width, h.lwd=1, open=FALSE, code=arrow.mode,
+                    sh.lwd=edge.width, h.lwd=1, open=FALSE, code=arrow.mode[1],
                     sh.lty=edge.lty, h.lty=1, size=arrow.size,
                     width=arrow.width, curved=curved)
     } else {
