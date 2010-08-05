@@ -1,4 +1,93 @@
 ============
+igraph 0.5.4
+============
+
+Released August 5, 2010
+
+New in the R interface
+----------------------
+- A simple layout generator for star graphs (layout.star).
+- All functions that have vertex id input parameters, handle 
+  character vectors containing vertex names now.
+- Walktrap community detection calculates membership by default now.
+- The spinglass community detection now reports the generalized
+  modularity value.
+
+Bugs corrected in the R interface
+---------------------------------
+- Fixed a missing id problem when writing out Pajek files and using complex vertex 
+  id attributes.
+- Fixed bugs in writing NCOL and LGL files, when edge weights are
+  present. The edge weights were shuffled.
+- The loop.angle graphical parameter is interpreted in radian now (#517685).
+- Fixed a bug when the edge.curved graphical parameter was a vector and 
+  the graph had loop edges (#517697).
+- Plotting: fixed a bug with 'square' vertices and exactly vertical
+  edges (#517635).
+- Fixed a bug in the conversion from graphNEL format, when all nodes
+  have the same degree.
+- Speeded up smart indexing, when many object are in the workspace
+  (#528963).
+- Plotting: fixed loop edge labels when plotmath expressions are used
+  (#527895).
+- In spinglass community detection, corrected weighted modularity
+  calculation (#539413).
+- Fixed memory leaks and segmentation fault in average nearest
+  neighbor degree calculation (#541705).
+- Fixed a bug in the label propagation community finder.
+- Fixed another bug in the label propagation community finder (#570902).
+- Fixed a bug in the attribute handler, this speeds up the handing of
+  attributes.
+- PageRank and eigenvector centrality calculations work now for empty
+  graphs (#5750032).
+- tkplot() can handle different label colors now (partially fixes #572559).
+- Fixed a subcomponent() bug when vertex id is NA (#583239).
+- hub.score() and authority.score() work for graphs with less than
+  three vertices.
+- Updates to make igraph work in Windows64.
+- Fixed a bug for spinglass community detection of a single vertex.
+- graph.data.frame() replaces NA's with "NA" only in the first two
+  columns.
+- Eliminated a warning when arrow.mode is specified and the same
+  for all edges (#591835).
+- Fixed a bug in DLA layout merge.
+- Fixed motif estimation bug, when cutting the search tree (#362519).
+
+New in the C layer
+------------------
+- A simple layout generator for star graphs (igraph_layout_star)
+- Added the igraph_decompose_destroy function, to deallocate memory
+  allocated by igraph_decompose.
+- igraph_path_length_hist now allows NULL for the 'unconnected'
+  argument.
+
+Bugs corrected in the C layer
+-----------------------------
+- Fixed bugs when writing out NCOL and LGL files with edge weights,
+  the weights were shuffled.
+- Fixed a memory leak in igraph_vs_as_vector.
+- Fixed a bug in igraph_degree_sequence_game, simple method. Passing
+  NULL as the in-degree sequence did not work. (#527822).
+- In spinglass community detection, corrected weighted modularity
+  calculation (#539413).
+- The spinglass community detection now reports the generalized
+  modularity value.
+- Fixed memory leaks and segmentation fault in average nearest
+  neighbor degree calculation (#541705).
+- Fixed a bug in the label propagation community finder.
+- Fixed another bug in the label propagation community finder (#570902).
+- PageRank and eigenvector centrality calculations work now for empty
+  graphs (#5750032).
+- Fixed an igraph_subcomponent bug when vertex id is NA (#583239).
+- Fixed an igraph_subcomponent bug when the initial result vector was
+  not empty.
+- igraph_hub_score() and igraph_authority_score() work for graphs with
+  less than three vertices.
+- Updates to make igraph work in Windows64.
+- Fixed a bug in DLA layout merge, RNG_BEGIN() was not called.
+- Fixed motif estimation bug, when cutting the search tree (#362519).
+
+============
 igraph 0.5.3
 ============
 
