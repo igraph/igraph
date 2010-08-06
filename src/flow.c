@@ -2282,6 +2282,18 @@ long int igraph_i_dominator_EVAL(long int v,
   }
 }
 
+/* This callback is called if a subtree is finished in the DFS.
+   We terminate if the subtree of the root vertex is finished, 
+   before doing other components. */
+
+igraph_bool_t igraph_i_dominator_dfs_cb(const igraph_t *graph,
+					igraph_integer_t actroot, 
+					igraph_integer_t dist,
+					void *extra) {
+  igraph_integer_t *root=(igraph_integer_t *)extra;
+  return *root == actroot;	/* TRUE == terminate */
+} 					
+
 int igraph_dominator_tree(const igraph_t *graph,
 			  igraph_integer_t root,
 			  igraph_vector_t *dom,
@@ -2305,6 +2317,8 @@ int igraph_dominator_tree(const igraph_t *graph,
 
   igraph_vector_t vdom, *mydom=dom;
 
+  long int component_size=0;
+
   if (root < 0 || root >= no_of_nodes) {
     IGRAPH_ERROR("Invalid root vertex id for dominator tree", 
 		 IGRAPH_EINVAL);
@@ -2326,6 +2340,7 @@ int igraph_dominator_tree(const igraph_t *graph,
     mydom=&vdom;
     IGRAPH_VECTOR_INIT_FINALLY(mydom, no_of_nodes);
   }
+  igraph_vector_fill(mydom, IGRAPH_NAN);
 
   IGRAPH_CHECK(igraph_vector_init(&parent, no_of_nodes));
   IGRAPH_FINALLY(igraph_vector_destroy, &parent);
@@ -2349,16 +2364,30 @@ int igraph_dominator_tree(const igraph_t *graph,
   IGRAPH_CHECK(igraph_dfs(graph, root, mode, /*order=*/ &vertex,
 			  /*order_out=*/ 0, /*father=*/ &parent,
 			  /*dist=*/ 0, /*in_callback=*/ 0, 
-			  /*out_callback=*/ 0, /*extra=*/ 0));
+			  /*out_callback=*/ igraph_i_dominator_dfs_cb, 
+			  /*extra=*/ (void*) &root));
   for (i=0; i<no_of_nodes; i++) {
-    long int t=VECTOR(vertex)[i];
-    VECTOR(semi)[t]=i+1;
-    VECTOR(vertex)[i]=t+1;
+    if (IGRAPH_FINITE(VECTOR(vertex)[i])) {
+      long int t=VECTOR(vertex)[i];
+      VECTOR(semi)[t] = component_size+1;
+      VECTOR(vertex)[component_size] = t+1;
+      component_size++;
+    }
+  }
+  if (leftout) {
+    long int n=no_of_nodes-component_size;
+    long int p=0, j;
+    IGRAPH_CHECK(igraph_vector_resize(leftout, n));
+    for (j=0; j<no_of_nodes && p<n; j++) {
+      if (!IGRAPH_FINITE(VECTOR(parent)[j])) {
+	VECTOR(*leftout)[p++] = j;
+      }
+    }
   }
 
   /* Now comes the main algorithm, steps 2 & 3 */
 
-  for (i=no_of_nodes-1; i>0; i--) {
+  for (i=component_size-1; i>0; i--) {
     long int w=VECTOR(vertex)[i]-1;
     igraph_vector_t *predw=igraph_adjlist_get(&pred, w);
     long int j, n=igraph_vector_size(predw);
@@ -2382,7 +2411,7 @@ int igraph_dominator_tree(const igraph_t *graph,
 
   /* Finally, step 4 */
 
-  for (i=1; i<no_of_nodes; i++) {
+  for (i=1; i<component_size; i++) {
     long int w=VECTOR(vertex)[i]-1;
     if (VECTOR(*mydom)[w] != VECTOR(vertex)[VECTOR(semi)[w]-1]-1) {
       VECTOR(*mydom)[w] = VECTOR(*mydom)[(long int)VECTOR(*mydom)[w]];
@@ -2403,14 +2432,14 @@ int igraph_dominator_tree(const igraph_t *graph,
   if (domtree) {
     igraph_vector_t edges;
     long int ptr=0;
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_nodes*2-2);
+    IGRAPH_VECTOR_INIT_FINALLY(&edges, component_size*2-2);
     for (i=0; i<no_of_nodes; i++) {
-      if (i!=root) {
+      if (i!=root && IGRAPH_FINITE(VECTOR(*mydom)[i])) {
 	VECTOR(edges)[ptr++] = VECTOR(*mydom)[i];
 	VECTOR(edges)[ptr++] = i;
       }
     }
-    IGRAPH_CHECK(igraph_create(domtree, &edges, no_of_nodes, 
+    IGRAPH_CHECK(igraph_create(domtree, &edges, no_of_nodes,
 			       IGRAPH_DIRECTED));
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);

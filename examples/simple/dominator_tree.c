@@ -25,8 +25,9 @@
 #include <stdio.h>
 
 int main() {
+
   igraph_t g, domtree;
-  igraph_vector_t dom;
+  igraph_vector_t dom, leftout;
 
   igraph_vector_init(&dom, 0);
   igraph_small(&g, 13, IGRAPH_DIRECTED,
@@ -63,5 +64,38 @@ int main() {
   igraph_destroy(&domtree);
   igraph_destroy(&g);
 
+  /* -------------------------------------------------------------------*/
+
+  igraph_vector_init(&dom, 0);
+  igraph_vector_init(&leftout, 0);
+
+  /* Check a graph with more components */
+  igraph_small(&g, 20, IGRAPH_DIRECTED,
+	       0,1, 0,2, 0,3,
+	       1,4,
+	       2,1, 2,4, 2,8,
+	       3,9, 3,10,
+	       4,15,
+	       8,11, 
+	       9,12,
+	       10,12, 10,13,
+	       11,8, 11,14,
+	       12,14,
+	       13,12,
+	       14,12, 14,0,
+	       15,11,
+	       -1);
+
+  igraph_dominator_tree(&g, /*root=*/ 0, &dom, &domtree,
+			&leftout, /*mode=*/ IGRAPH_OUT);
+  igraph_vector_print(&dom);
+  igraph_vector_print(&leftout);
+  igraph_write_graph_edgelist(&domtree, stdout);
+
+  igraph_vector_destroy(&dom);
+  igraph_vector_destroy(&leftout);
+  igraph_destroy(&domtree);
+  igraph_destroy(&g);
+  
   return 0;
 }
