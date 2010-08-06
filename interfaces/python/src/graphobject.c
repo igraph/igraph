@@ -10558,8 +10558,6 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "gamma=1)\n\n"
    "Finds the community structure of the graph according to the spinglass\n"
    "community detection method of Reichardt & Bornholdt.\n\n"
-   "@param graph: the input graph. It can be directed, but the direction\n"
-   "  of edges will be ignored.\n"
    "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
    "  even an edge attribute name.\n"
    "@param spins: integer, the number of spins to use. This is the upper limit\n"

@@ -418,6 +418,15 @@ class Graph(core.GraphBase):
     def simplify(self, multiple=True, loops=True, reduce_attributes=None):
         """Simplifies the graph by removing self-loops and/or multiple edges.
 
+        The C{reduce_attributes} parameter lets you specify how edge
+        attributes will be handled when multiple edges are collapsed into
+        a single one.
+        For example, suppose you have a graph with an edge attribute named
+        C{weight}. C{graph.simplify(reduce_attributes=max)} will take the
+        maximum of the weights of multiple edges and assign that weight to
+        the collapsed edge. C{graph.simplify(reduce_attributes=sum)} will
+        take the sum of the weights.
+
         @param multiple: whether to remove multiple edges
         @param loops: whether to remove loops
         @param reduce_attributes: specifies how to reduce the attributes of
@@ -430,12 +439,6 @@ class Graph(core.GraphBase):
           collapsed edge. You can also pass a dictionary assigning edge
           attribute names to functions if you want to make the function
           depend on the name of the attribute.
-
-        For example, suppose you have a graph with an edge attribute named
-        C{weight}. C{graph.simplify(reduce_attributes=max)} will take the
-        maximum of the weights of multiple edges and assign that weight to
-        the collapsed edge. C{graph.simplify(reduce_attributes=sum)} will
-        take the sum of the weights.
         """
         if not reduce_attributes:
             # Fallback to default behaviour
@@ -662,8 +665,6 @@ class Graph(core.GraphBase):
         Finds the community structure of the graph according to the
         spinglass community detection method of Reichardt & Bornholdt.
 
-        @param graph: the input graph. It can be directed, but the
-          direction of edges will be ignored.
         @param weights: edge weights to be used. Can be a sequence or
           iterable or even an edge attribute name.
         @param spins: integer, the number of spins to use. This is the
