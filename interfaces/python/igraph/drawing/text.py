@@ -67,6 +67,7 @@ class TextDrawer(AbstractCairoDrawer):
         for ref_x, ref_y, line in text_layout:
             ctx.move_to(ref_x, ref_y + dy)
             ctx.show_text(line)
+        ctx.new_path()
 
     def get_text_layout(self, x = None, y = None, width = None, wrap = False):
         """Calculates the layout of the current text. `x` and `y` denote the
@@ -167,6 +168,7 @@ class TextDrawer(AbstractCairoDrawer):
         for ref_x, ref_y, line in self.get_text_layout(x, y, width, wrap):
             ctx.move_to(ref_x, ref_y)
             ctx.show_text(line)
+        ctx.new_path()
 
     def _iterlines(self):
         """Iterates over the label line by line and returns a tuple containing

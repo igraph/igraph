@@ -52,6 +52,24 @@ class Clustering(object):
 
       >>> len(cl)
       3
+
+    You can iterate over the clustering object as if it were a regular list
+    of clusters:
+
+      >>> for cluster in cl:
+      ...     print " ".join(str(idx) for idx in cluster)
+      ...
+      0 1 2 3
+      4 5 6
+      7 8 9 10
+
+    If you need all the clusters at once as lists, you can simply convert
+    the clustering object to a list:
+
+      >>> cluster_list = list(cl)
+      >>> print cluster_list
+      [[0, 1, 2, 3], [4, 5, 6], [7, 8, 9, 10]]
+
     """
 
     def __init__(self, membership, params = None):
@@ -78,7 +96,17 @@ class Clustering(object):
         @raise IndexError: if the index is out of bounds"""
         if idx < 0 or idx >= self._len:
             raise IndexError("cluster index out of range")
-        return [i for i, e in enumerate(self._membership) if e==idx]
+        return [i for i, e in enumerate(self._membership) if e == idx]
+
+    def __iter__(self):
+        """Iterates over the clusters in this clustering.
+
+        This method will return a generator that generates the clusters
+        one by one."""
+        clusters = [[] for _ in xrange(self._len)]
+        for idx, cluster in enumerate(self._membership):
+            clusters[cluster].append(idx)
+        return iter(clusters)
 
     def __len__(self):
         """Returns the number of clusters.
@@ -137,7 +165,7 @@ class OverlappingClustering(Clustering):
     
     Members of an individual cluster can be accessed by the C{[]} operator:
     
-      >>> cl = Clustering([(0,), (0,), (0,1), (1,), (1,), ()])
+      >>> cl = OverlappingClustering([(0,), (0,), (0,1), (1,), (1,), ()])
       >>> cl[0]
       [0, 1, 2]
       >>> cl[1]
@@ -146,7 +174,7 @@ class OverlappingClustering(Clustering):
     The membership vector can be accessed by the C{membership} property:
 
       >>> cl.membership
-      [frozenset([0]), frozenset([0]), frozenset([0,1]), frozenset([1]), frozenset([1]), frozenset([])]
+      [frozenset([0]), frozenset([0]), frozenset([0, 1]), frozenset([1]), frozenset([1]), frozenset([])]
 
     The number of clusters can be retrieved by the C{len} function:
 
