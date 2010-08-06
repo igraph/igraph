@@ -897,6 +897,8 @@ class Graph(GraphBase):
           - C{sphere}, C{spherical}, C{circle_3d}, C{circular_3d}: spherical
             layout (see L{Graph.layout_sphere})
 
+          - C{star}: star layout (see L{Graph.layout_star})
+
         @param layout: the layout to use. This can be one of the registered
           layout names or a callable which returns either a L{Layout} object or
           a list of lists containing the coordinates. If C{None}, uses the
@@ -2069,6 +2071,7 @@ class Graph(GraphBase):
         "reingold_tilford_circular": "layout_reingold_tilford_circular",
         "sphere": "layout_sphere",
         "spherical": "layout_sphere",
+        "star": "layout_star",
         "circle_3d": "layout_sphere",
         "circular_3d": "layout_sphere",
     }

@@ -5201,6 +5201,57 @@ PyObject *igraphmodule_Graph_layout_random_3d(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Places the vertices in a star-like layout
+ * \sa igraph_layout_star
+ */
+PyObject *igraphmodule_Graph_layout_star(igraphmodule_GraphObject* self,
+		PyObject *args, PyObject *kwds) {
+  static char *kwlist[] =
+    { "center", "order", NULL };
+
+  igraph_matrix_t m;
+  PyObject *result, *order_o = 0;
+  long int center = 0;
+  igraph_vector_t* order = 0;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lO", kwlist,
+        &center, &order_o))
+    return NULL;
+
+  if (igraph_matrix_init(&m, 1, 1)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (order_o != Py_None) {
+    order = (igraph_vector_t*)calloc(1, sizeof(igraph_vector_t));
+    if (!order) {
+      igraph_matrix_destroy(&m);
+      PyErr_NoMemory();
+      return NULL;
+    }
+    if (igraphmodule_PyObject_to_vector_t(order_o, order, 1, 0)) {
+      igraph_matrix_destroy(&m);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  }
+
+  if (igraph_layout_star(&self->g, &m, center, order)) {
+    if (order) {
+      igraph_vector_destroy(order); free(order);
+    }
+    igraph_matrix_destroy(&m);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
+  igraph_matrix_destroy(&m);
+  return (PyObject *) result;
+}
+
+/** \ingroup python_interface_graph
  * \brief Places the vertices on a plane according to the Kamada-Kawai algorithm.
  * \return the calculated coordinates as a Python list of lists
  * \sa igraph_layout_kamada_kawai
@@ -10870,6 +10921,17 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "layout_sphere()\n\n"
    "Places the vertices of the graph uniformly on a sphere.\n\n"
    "@return: the calculated coordinate triplets in a list."},
+
+  /* interface to igraph_layout_star */
+  {"layout_star", (PyCFunction) igraphmodule_Graph_layout_star,
+   METH_VARARGS | METH_KEYWORDS,
+   "layout_star(center=0, order=None)\n\n"
+   "Calculates a star-like layout for the graph.\n\n"
+   "@param center: the ID of the vertex to put in the center\n"
+   "@param order: a numeric vector giving the order of the vertices\n"
+   "  (including the center vertex!). If it is C{None}, the vertices\n"
+   "  will be placed in increasing vertex ID order.\n"
+  },
 
   // interface to igraph_layout_kamada_kawai
   {"layout_kamada_kawai",
