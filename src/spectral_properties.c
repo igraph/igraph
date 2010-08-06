@@ -28,8 +28,8 @@
 #include <math.h>
 
 int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
-				igraph_bool_t normalized, 
-				const igraph_vector_t *weights) {
+                                igraph_bool_t normalized, 
+                                const igraph_vector_t *weights) {
   
   igraph_eit_t edgeit;
   long int no_of_nodes=igraph_vcount(graph);
@@ -51,55 +51,53 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
   IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
   
   if (directed) {
-    IGRAPH_WARNING("Computing (weighted) Laplacian of a directed graph");
 
     if (!normalized) {
 
       while (!IGRAPH_EIT_END(edgeit)) {
-	long int edge=IGRAPH_EIT_GET(edgeit);
-	long int from=IGRAPH_FROM(graph, edge);
-	long int to  =IGRAPH_TO  (graph, edge);
-	igraph_real_t weight=VECTOR(*weights)[edge];
-	if (from != to) {
-	  MATRIX(*res, from, to) -= weight;
-	  VECTOR(degree)[from] += weight;
-	}
-	IGRAPH_EIT_NEXT(edgeit);
+        long int edge=IGRAPH_EIT_GET(edgeit);
+        long int from=IGRAPH_FROM(graph, edge);
+        long int to  =IGRAPH_TO  (graph, edge);
+        igraph_real_t weight=VECTOR(*weights)[edge];
+        if (from != to) {
+          MATRIX(*res, from, to) -= weight;
+          VECTOR(degree)[from] += weight;
+        }
+        IGRAPH_EIT_NEXT(edgeit);
       }
       
       /* And the diagonal */
       for (i=0; i<no_of_nodes; i++) {
-	MATRIX(*res, i, i) = VECTOR(degree)[i];
+        MATRIX(*res, i, i) = VECTOR(degree)[i];
       }
 
     } else /* normalized */ {
 
       while (!IGRAPH_EIT_END(edgeit)) {
-	long int edge=IGRAPH_EIT_GET(edgeit);
-	long int from=IGRAPH_FROM(graph, edge);
-	long int to  =IGRAPH_TO  (graph, edge);
-	igraph_real_t weight=VECTOR(*weights)[edge];
-	if (from != to) {
-	  VECTOR(degree)[from] += weight;
-	}
-	IGRAPH_EIT_NEXT(edgeit);
+        long int edge=IGRAPH_EIT_GET(edgeit);
+        long int from=IGRAPH_FROM(graph, edge);
+        long int to  =IGRAPH_TO  (graph, edge);
+        igraph_real_t weight=VECTOR(*weights)[edge];
+        if (from != to) {
+          VECTOR(degree)[from] += weight;
+        }
+        IGRAPH_EIT_NEXT(edgeit);
       }
 
       for (i=0; i<no_of_nodes; i++) {
-	MATRIX(*res, i, i) = VECTOR(degree)[i] > 0 ? 1 : 0;
+        MATRIX(*res, i, i) = VECTOR(degree)[i] > 0 ? 1 : 0;
       }
       
       IGRAPH_EIT_RESET(edgeit);
       while (!IGRAPH_EIT_END(edgeit)) {
-	long int edge=IGRAPH_EIT_GET(edgeit);
-	long int from=IGRAPH_FROM(graph, edge);
-	long int to  =IGRAPH_TO  (graph, edge);
-	igraph_real_t weight=VECTOR(*weights)[edge];
-	if (from != to) {
-	  MATRIX(*res, from, to) = 
-	    -weight / sqrt(VECTOR(degree)[from]);
-	}
-	IGRAPH_EIT_NEXT(edgeit);
+        long int edge=IGRAPH_EIT_GET(edgeit);
+        long int from=IGRAPH_FROM(graph, edge);
+        long int to  =IGRAPH_TO  (graph, edge);
+        igraph_real_t weight=VECTOR(*weights)[edge];
+        if (from != to) {
+          MATRIX(*res, from, to) -= weight / VECTOR(degree)[from]; 
+        }
+        IGRAPH_EIT_NEXT(edgeit);
       }
       
     }
@@ -109,53 +107,55 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
     if (!normalized) {
       
       while (!IGRAPH_EIT_END(edgeit)) {
-	long int edge=IGRAPH_EIT_GET(edgeit);
-	long int from=IGRAPH_FROM(graph, edge);
-	long int to  =IGRAPH_TO  (graph, edge);
-	igraph_real_t weight=VECTOR(*weights)[edge];
-	if (from != to) {
-	  MATRIX(*res, from, to) -= weight;
-	  MATRIX(*res, to, from) -= weight;
-	  VECTOR(degree)[from] += weight;
-	  VECTOR(degree)[to] += weight;
-	}
-	IGRAPH_EIT_NEXT(edgeit);
+        long int edge=IGRAPH_EIT_GET(edgeit);
+        long int from=IGRAPH_FROM(graph, edge);
+        long int to  =IGRAPH_TO  (graph, edge);
+        igraph_real_t weight=VECTOR(*weights)[edge];
+        if (from != to) {
+          MATRIX(*res, from, to) -= weight;
+          MATRIX(*res, to, from) -= weight;
+          VECTOR(degree)[from] += weight;
+          VECTOR(degree)[to] += weight;
+        }
+        IGRAPH_EIT_NEXT(edgeit);
       }
       
       /* And the diagonal */
       for (i=0; i<no_of_nodes; i++) {
-	MATRIX(*res, i, i) = VECTOR(degree)[i];
+        MATRIX(*res, i, i) = VECTOR(degree)[i];
       }
       
     } else /* normalized */ {
      
       while (!IGRAPH_EIT_END(edgeit)) {
-	long int edge=IGRAPH_EIT_GET(edgeit);
-	long int from=IGRAPH_FROM(graph, edge);
-	long int to  =IGRAPH_TO  (graph, edge);
-	igraph_real_t weight=VECTOR(*weights)[edge];
-	if (from != to) {
-	  VECTOR(degree)[from] += weight;
-	  VECTOR(degree)[to] += weight;
-	}
-	IGRAPH_EIT_NEXT(edgeit);
+        long int edge=IGRAPH_EIT_GET(edgeit);
+        long int from=IGRAPH_FROM(graph, edge);
+        long int to  =IGRAPH_TO  (graph, edge);
+        igraph_real_t weight=VECTOR(*weights)[edge];
+        if (from != to) {
+          VECTOR(degree)[from] += weight;
+          VECTOR(degree)[to] += weight;
+        }
+        IGRAPH_EIT_NEXT(edgeit);
       }
 
       for (i=0; i<no_of_nodes; i++) {
-	MATRIX(*res, i, i) = VECTOR(degree)[i] > 0 ? 1 : 0;
+        MATRIX(*res, i, i) = VECTOR(degree)[i] > 0 ? 1 : 0;
+        VECTOR(degree)[i] = sqrt(VECTOR(degree)[i]);
       }
       
       IGRAPH_EIT_RESET(edgeit);
       while (!IGRAPH_EIT_END(edgeit)) {
-	long int edge=IGRAPH_EIT_GET(edgeit);
-	long int from=IGRAPH_FROM(graph, edge);
-	long int to  =IGRAPH_TO  (graph, edge);
-	igraph_real_t weight=VECTOR(*weights)[edge];
-	if (from != to) {
-	  MATRIX(*res, from, to) = MATRIX(*res, to, from) = 
-	    -weight / sqrt(VECTOR(degree)[from] * VECTOR(degree)[to]);
-	}
-	IGRAPH_EIT_NEXT(edgeit);
+        long int edge=IGRAPH_EIT_GET(edgeit);
+        long int from=IGRAPH_FROM(graph, edge);
+        long int to  =IGRAPH_TO  (graph, edge);
+        igraph_real_t weight=VECTOR(*weights)[edge];
+        if (from != to) {
+          double diff = weight / (VECTOR(degree)[from] * VECTOR(degree)[to]);
+          MATRIX(*res, from, to) -= diff;
+          MATRIX(*res, to, from) -= diff;
+        }
+        IGRAPH_EIT_NEXT(edgeit);
       }
       
     }
@@ -178,8 +178,8 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
  * contains -1's instead of 1's and the vertex degrees are included in
  * the diagonal. So the result for edge i--j is -1 if i!=j and is equal
  * to the degree of vertex i if i==j. igraph_laplacian will work on a
- * directed graph (although this does not seem to make much sense) and
- * ignores loops.
+ * directed graph; in this case, the diagonal will contain the out-degrees.
+ * Loop edges will be ignored.
  * 
  * </para><para>
  * The normalized version of the Laplacian matrix has 1 in the diagonal and 
@@ -202,8 +202,8 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
  */
 
 int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
-		     igraph_bool_t normalized, 
-		     const igraph_vector_t *weights) {
+                     igraph_bool_t normalized, 
+                     const igraph_vector_t *weights) {
   
   igraph_eit_t edgeit;
   long int no_of_nodes=igraph_vcount(graph);
@@ -225,37 +225,36 @@ int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
   IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
   
   IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
-			     IGRAPH_OUT, IGRAPH_NO_LOOPS));
+                             IGRAPH_OUT, IGRAPH_NO_LOOPS));
   
   if(directed){
-    IGRAPH_WARNING("Computing Laplacian of a directed graph");
-  
     if (!normalized) {
       for(i=0;i<no_of_nodes;i++)
-	MATRIX(*res, i, i) = VECTOR(degree)[i];
+        MATRIX(*res, i, i) = VECTOR(degree)[i];
       
       while (!IGRAPH_EIT_END(edgeit)) {
-	igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
-	from=ffrom;
-	to=fto;
-	if (from != to) {
-	  MATRIX(*res, from, to) -= 1;
-	}
-	IGRAPH_EIT_NEXT(edgeit);
+        igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
+        from=ffrom;
+        to=fto;
+        if (from != to) {
+          MATRIX(*res, from, to) -= 1;
+        }
+        IGRAPH_EIT_NEXT(edgeit);
       }
     } else {
       for (i=0;i<no_of_nodes;i++) {
-	MATRIX(*res, i, i) = VECTOR(degree)[i]>0 ? 1 : 0;
+        MATRIX(*res, i, i) = VECTOR(degree)[i]>0 ? 1 : 0;
+        if (VECTOR(degree)[i] > 0)
+          VECTOR(degree)[i] = 1.0 / VECTOR(degree)[i];
       }
       
       while (!IGRAPH_EIT_END(edgeit)) {
-	igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
-	from=ffrom; to=fto;
-	if (from != to) {
-	  MATRIX(*res, from, to) = 
-	    -1.0 / sqrt(VECTOR(degree)[from]);
-	}
-	IGRAPH_EIT_NEXT(edgeit);
+        igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
+        from=ffrom; to=fto;
+        if (from != to) {
+          MATRIX(*res, from, to) -= VECTOR(degree)[from]; 
+        }
+        IGRAPH_EIT_NEXT(edgeit);
       }
     }
 
@@ -263,32 +262,36 @@ int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 
     if (!normalized) {
       for(i=0;i<no_of_nodes;i++) {
-	MATRIX(*res, i, i) = VECTOR(degree)[i];
+        MATRIX(*res, i, i) = VECTOR(degree)[i];
       }
       
       while (!IGRAPH_EIT_END(edgeit)) {
-	igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
-	from=ffrom;
-	to=fto;	
-	
-	MATRIX(*res, to, from) -= 1;
-	MATRIX(*res, from, to) -= 1;
-	
-	IGRAPH_EIT_NEXT(edgeit);
+        igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
+        from=ffrom;
+        to=fto; 
+
+        if (from != to) {
+          MATRIX(*res, to, from) -= 1;
+          MATRIX(*res, from, to) -= 1;
+        }
+
+        IGRAPH_EIT_NEXT(edgeit);
       }
     } else {
       for (i=0;i<no_of_nodes;i++) {
-	MATRIX(*res, i, i) = VECTOR(degree)[i]>0 ? 1: 0;
+        MATRIX(*res, i, i) = VECTOR(degree)[i]>0 ? 1: 0;
+        VECTOR(degree)[i] = sqrt(VECTOR(degree)[i]);
       }
       
       while (!IGRAPH_EIT_END(edgeit)) {
-	igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
-	from=ffrom; to=fto;
-	if (from != to) {
-	  MATRIX(*res, from, to) = MATRIX(*res, to, from) =
-	    -1.0 / sqrt(VECTOR(degree)[from] * VECTOR(degree)[to]);
-	}
-	IGRAPH_EIT_NEXT(edgeit);
+        igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
+        from=ffrom; to=fto;
+        if (from != to) {
+          double diff = 1.0 / (VECTOR(degree)[from] * VECTOR(degree)[to]);
+          MATRIX(*res, from, to) -= diff;
+          MATRIX(*res, to, from) -= diff;
+        }
+        IGRAPH_EIT_NEXT(edgeit);
       }
     }
 

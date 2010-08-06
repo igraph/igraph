@@ -31,3 +31,10 @@ AT_SETUP([Graphs from adjacency list (igraph_adjlist):])
 AT_KEYWORDS([igraph_adjlist adjacency list adjlist])
 AT_COMPILE_CHECK([simple/adjlist.c])
 AT_CLEANUP
+
+AT_SETUP([Graph to Laplacian matrix (igraph_laplacian):])
+AT_KEYWORDS([igraph_laplacian laplacian matrix])
+AT_COMPILE_CHECK([simple/igraph_laplacian.c],
+                 [simple/igraph_laplacian.out])
+AT_CLEANUP
+
