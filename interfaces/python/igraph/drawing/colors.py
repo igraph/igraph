@@ -368,6 +368,18 @@ def color_name_to_rgba(color, palette=None):
     # At this point, the components are floats
     return tuple(clamp(val, 0., 1.) for val in components)
 
+def color_to_html_format(color):
+    """Formats a color given as a 3-tuple or 4-tuple in HTML format.
+
+    The HTML format is simply given by C{#rrggbbaa}, where C{rr} gives
+    the red component in hexadecimal format, C{gg} gives the green
+    component C{bb} gives the blue component and C{gg} gives the
+    alpha level. The alpha level is optional.
+    """
+    color = [int(clamp(component * 256, 0, 255)) for component in color]
+    if len(color) == 4:
+        return "#{0:02X}{1:02X}{2:02X}{3:02X}".format(*color)
+    return "#{0:02X}{1:02X}{2:02X}".format(*color)
 
 def darken(color, ratio=0.5):
     """Creates a darker version of a color given by an RGB triplet.

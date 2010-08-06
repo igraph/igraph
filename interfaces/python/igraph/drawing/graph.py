@@ -18,6 +18,7 @@ from igraph.core import convex_hull
 from igraph.configuration import Configuration
 from igraph.drawing.baseclasses import AbstractDrawer, AbstractCairoDrawer, \
                                        AbstractXMLRPCDrawer
+from igraph.drawing.colors import color_to_html_format, color_name_to_rgb
 from igraph.drawing.edge import ArrowEdgeDrawer
 from igraph.drawing.text import TextDrawer
 from igraph.drawing.metamagic import AttributeCollectorBase, \
@@ -257,13 +258,38 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
 class UbiGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
     """Graph drawer that draws a given graph on an UbiGraph display
     using the XML-RPC API of UbiGraph.
+
+    The following vertex attributes are supported: C{color}, C{label},
+    C{shape}, C{size}. can be used. See the Ubigraph documentation for
+    supported shape names. Sizes are relative to the default Ubigraph
+    size.
+
+    The following edge attributes are supported: C{color}, C{label},
+    C{width}. Edge widths are relative to the default Ubigraph width.
+
+    All color specifications supported by igraph (e.g., color names,
+    palette indices, RGB triplets, RGBA quadruplets, HTML format)
+    are understood by the Ubigraph graph drawer.
+
+    The drawer also has two attributes, C{vertex_defaults} and
+    C{edge_defaults}. These are dictionaries that can be used to
+    set default values for the vertex/edge attributes in Ubigraph.
     """
 
     def __init__(self, url="http://localhost:20738/RPC2"):
         """Constructs an UbiGraph drawer using the display at the given
         URL."""
         super(UbiGraphDrawer, self).__init__(url, "ubigraph")
-        
+        self.vertex_defaults = dict(
+            color="#ff0000",
+            shape="cube",
+            size=1.0
+        )
+        self.edge_defaults = dict(
+            color="#ffffff",
+            width=1.0
+        )
+
     def draw(self, graph, *args, **kwds):
         """Draws the given graph on an UbiGraph display.
         
@@ -271,10 +297,37 @@ class UbiGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
                         plotting. Default: C{True}."""
         display = self.service
 
-        # Clear the display
+        # Clear the display and set the default visual attributes
         if kwds.get("clear", True):
             display.clear()
-            display.set_vertex_style_attribute(0, "color", "#ff0000")
+
+            for k, v in self.vertex_defaults.iteritems():
+                display.set_vertex_style_attribute(0, k, str(v))
+            for k, v in self.edge_defaults.iteritems():
+                display.set_edge_style_attribute(0, k, str(v))
+
+        # Custom color converter function
+        def color_conv(color):
+            return color_to_html_format(color_name_to_rgb(color))
+
+        # Construct the visual vertex/edge builders
+        class VisualVertexBuilder(AttributeCollectorBase):
+            """Collects some visual properties of a vertex for drawing"""
+            _kwds_prefix = "vertex_"
+            color = (str(self.vertex_defaults["color"]), color_conv)
+            label = None
+            shape = str(self.vertex_defaults["shape"])
+            size  = float(self.vertex_defaults["size"])
+
+        class VisualEdgeBuilder(AttributeCollectorBase):
+            """Collects some visual properties of an edge for drawing"""
+            _kwds_prefix = "edge_"
+            color = (str(self.edge_defaults["color"]), color_conv)
+            label = None
+            width = float(self.edge_defaults["width"])
+
+        vertex_builder = VisualVertexBuilder(graph.vs, kwds)
+        edge_builder = VisualEdgeBuilder(graph.es, kwds)
 
         # Add the vertices
         n = graph.vcount()
@@ -287,7 +340,33 @@ class UbiGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
                 for edge in graph.es]
 
         # Add arrowheads if needed
-        display.set_edge_style_attribute(0, "arrow", "true")
+        if graph.is_directed():
+            display.set_edge_style_attribute(0, "arrow", "true")
+
+        # Set the vertex attributes
+        set_attr = display.set_vertex_attribute
+        vertex_defaults = self.vertex_defaults
+        for vertex_id, vertex in izip(vertex_ids, vertex_builder):
+            if vertex.color != vertex_defaults["color"]:
+                set_attr(vertex_id, "color", vertex.color)
+            if vertex.label:
+                set_attr(vertex_id, "label", str(vertex.label))
+            if vertex.shape != vertex_defaults["shape"]:
+                set_attr(vertex_id, "shape", vertex.shape)
+            if vertex.size != vertex_defaults["size"]:
+                set_attr(vertex_id, "size", str(vertex.size))
+
+        # Set the edge attributes
+        set_attr = display.set_edge_attribute
+        edge_defaults = self.edge_defaults
+        for edge_id, edge in izip(eids, edge_builder):
+            if edge.color != edge_defaults["color"]:
+                set_attr(edge_id, "color", edge.color)
+            if edge.label:
+                set_attr(edge_id, "label", edge.label)
+            if edge.width != edge_defaults["width"]:
+                set_attr(edge_id, "width", str(edge.width))
+
 
 #####################################################################
 
