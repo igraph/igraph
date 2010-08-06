@@ -13,6 +13,43 @@ New in the R interface
 - The spinglass community detection now reports the generalized
   modularity value.
 
+New in the Python interface
+---------------------------
+- A simple layout generator for star graphs (Graph.layout_star)
+- VertexClustering objects can now be plotted directly using plot()
+- Added spinglass community detection (Graph.community_spinglass)
+- Added support for the GraphDB format (Graph.Read_GraphDB)
+- Graph.simplify() now lets you define how attributes are merged during
+  the process
+- You can now use save() to pickle graphs in StringIO objects
+
+Bugs corrected in the Python interface
+--------------------------------------
+- Unicode strings are now automatically converted to UTF-8 when saving
+  GraphML files
+- Fixed a bug where attributes were lost for imported empty graphs
+  (#571440)
+- Fixed an issue with Python's built-in table of interned strings
+- Fixed a bug when some exceptions were masked by InternalErrors
+- Fixed a bug when reading pickled graphs (#579295)
+- grid_width argument is now interpreted correctly in Matrix.__plot__
+- Fixed bugs when writing out NCOL and LGL files with edge weights,
+  the weights were shuffled.
+- In spinglass community detection, corrected weighted modularity
+  calculation (#539413).
+- The spinglass community detection now reports the generalized
+  modularity value.
+- Fixed memory leaks and segmentation fault in average nearest
+  neighbor degree calculation (#541705).
+- Fixed a bug in the label propagation community finder.
+- Fixed another bug in the label propagation community finder (#570902).
+- PageRank and eigenvector centrality calculations work now for empty
+  graphs (#575032).
+- Fixed bug in Graph.subcomponent() when vertex id is None (#583239).
+- Graph.hub_score() and Graph.authority_score() work for graphs with
+  less than three vertices.
+- Fixed motif estimation bug, when cutting the search tree (#362519).
+
 Bugs corrected in the R interface
 ---------------------------------
 - Fixed a missing id problem when writing out Pajek files and using complex vertex 
@@ -39,7 +76,7 @@ Bugs corrected in the R interface
 - Fixed a bug in the attribute handler, this speeds up the handing of
   attributes.
 - PageRank and eigenvector centrality calculations work now for empty
-  graphs (#5750032).
+  graphs (#575032).
 - tkplot() can handle different label colors now (partially fixes #572559).
 - Fixed a subcomponent() bug when vertex id is NA (#583239).
 - hub.score() and authority.score() work for graphs with less than
