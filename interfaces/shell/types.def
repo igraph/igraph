@@ -249,6 +249,11 @@ LONGINT:
   INCONV:
     IN: shell_read_longint(&%C%, optarg);
 
+VERTEX:
+  CTYPE: long int
+  INCONV:
+    IN: shell_read_longint(&%C%, optarg);
+
 MATRIXLIST:
   CTYPE: igraph_vector_ptr_t
   CALL: &%C%
