@@ -121,6 +121,13 @@ int igraph_inverse_residual_graph(const igraph_t *graph,
 				  igraph_t *residual,
 				  const igraph_vector_t *flow);
 
+int igraph_dominator_tree(const igraph_t *graph,
+			  igraph_integer_t root,
+			  igraph_vector_t *dom,
+			  igraph_t *domtree,
+			  igraph_vector_t *leftout,
+			  igraph_neimode_t mode);
+
 __END_DECLS
 
 #endif

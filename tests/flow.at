@@ -40,3 +40,9 @@ AT_SETUP([Even-Tarjan reduction (igraph_even_tarjan_reduction): ])
 AT_KEYWORDS([Even Tarjan reduction vertex cut separator])
 AT_COMPILE_CHECK([simple/even_tarjan.c])
 AT_CLEANUP
+
+AT_SETUP([Dominator tree of a flow graph (igraph_dominator_tree): ])
+AT_KEYWORDS([dominator tree])
+AT_COMPILE_CHECK([simple/dominator_tree.c],
+                 [simple/dominator_tree.out])
+AT_CLEANUP
