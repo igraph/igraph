@@ -2303,6 +2303,8 @@ int igraph_dominator_tree(const igraph_t *graph,
 
   long int i;
 
+  igraph_vector_t vdom, *mydom=dom;
+
   if (root < 0 || root >= no_of_nodes) {
     IGRAPH_ERROR("Invalid root vertex id for dominator tree", 
 		 IGRAPH_EINVAL);
@@ -2316,6 +2318,13 @@ int igraph_dominator_tree(const igraph_t *graph,
   if (mode == IGRAPH_ALL) {
     IGRAPH_ERROR("Invalid neighbor mode for dominator tree",
 		 IGRAPH_EINVAL);
+  }
+
+  if (dom) {
+    IGRAPH_CHECK(igraph_vector_resize(dom, no_of_nodes));
+  } else {
+    mydom=&vdom;
+    IGRAPH_VECTOR_INIT_FINALLY(mydom, no_of_nodes);
   }
 
   IGRAPH_CHECK(igraph_vector_init(&parent, no_of_nodes));
@@ -2349,8 +2358,6 @@ int igraph_dominator_tree(const igraph_t *graph,
 
   /* Now comes the main algorithm, steps 2 & 3 */
 
-  IGRAPH_CHECK(igraph_vector_resize(dom, no_of_nodes));
-
   for (i=no_of_nodes-1; i>0; i--) {
     long int w=VECTOR(vertex)[i]-1;
     igraph_vector_t *predw=igraph_adjlist_get(&pred, w);
@@ -2368,7 +2375,7 @@ int igraph_dominator_tree(const igraph_t *graph,
     while (!igraph_i_dbucket_empty(&bucket, VECTOR(parent)[w])) {
       long int v=igraph_i_dbucket_delete(&bucket, VECTOR(parent)[w]);
       long int u=igraph_i_dominator_EVAL(v, &ancestor, &label, &semi);
-      VECTOR(*dom)[v] = VECTOR(semi)[u] < VECTOR(semi)[v] ? u : 
+      VECTOR(*mydom)[v] = VECTOR(semi)[u] < VECTOR(semi)[v] ? u : 
 	VECTOR(parent)[w];
     }
   }
@@ -2377,11 +2384,11 @@ int igraph_dominator_tree(const igraph_t *graph,
 
   for (i=1; i<no_of_nodes; i++) {
     long int w=VECTOR(vertex)[i]-1;
-    if (VECTOR(*dom)[w] != VECTOR(vertex)[VECTOR(semi)[w]-1]-1) {
-      VECTOR(*dom)[w] = VECTOR(*dom)[(long int)VECTOR(*dom)[w]];
+    if (VECTOR(*mydom)[w] != VECTOR(vertex)[VECTOR(semi)[w]-1]-1) {
+      VECTOR(*mydom)[w] = VECTOR(*mydom)[(long int)VECTOR(*mydom)[w]];
     }
   }
-  VECTOR(*dom)[(long int)root]=-1;
+  VECTOR(*mydom)[(long int)root]=-1;
 
   igraph_i_dbucket_destroy(&bucket);
   igraph_adjlist_destroy(&pred);
@@ -2392,6 +2399,27 @@ int igraph_dominator_tree(const igraph_t *graph,
   igraph_vector_long_destroy(&semi);
   igraph_vector_destroy(&parent);
   IGRAPH_FINALLY_CLEAN(8);
+
+  if (domtree) {
+    igraph_vector_t edges;
+    long int ptr=0;
+    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_nodes*2-2);
+    for (i=0; i<no_of_nodes; i++) {
+      if (i!=root) {
+	VECTOR(edges)[ptr++] = VECTOR(*mydom)[i];
+	VECTOR(edges)[ptr++] = i;
+      }
+    }
+    IGRAPH_CHECK(igraph_create(domtree, &edges, no_of_nodes, 
+			       IGRAPH_DIRECTED));
+    igraph_vector_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  if (!dom) {
+    igraph_vector_destroy(&vdom);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
 
   return 0;
 }

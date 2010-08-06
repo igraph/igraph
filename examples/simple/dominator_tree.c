@@ -22,9 +22,10 @@
 */
 
 #include <igraph.h>
+#include <stdio.h>
 
 int main() {
-  igraph_t g;
+  igraph_t g, domtree;
   igraph_vector_t dom;
 
   igraph_vector_init(&dom, 0);
@@ -44,13 +45,23 @@ int main() {
 	       12,8,
 	       -1);
 
-  igraph_dominator_tree(&g, /*root=*/ 0, &dom, /*domtree=*/ 0,
+  /* Check NULL vector arguments */
+  igraph_dominator_tree(&g, /*root=*/ 0, /*dom=*/ 0, /*domtree=*/ 0,
 			/*leftout=*/ 0, /*mode=*/ IGRAPH_OUT);
 
+  /* Proper calculation */
+  igraph_dominator_tree(&g, /*root=*/ 0, &dom, /*domtree=*/ 0,
+			/*leftout=*/ 0, /*mode=*/ IGRAPH_OUT);
   igraph_vector_print(&dom);
+
+  /* Tree calculation */
+  igraph_dominator_tree(&g, /*root=*/ 0, /*dom=*/ 0, /*domtree=*/ &domtree,
+			/*leftout=*/ 0, /*mode=*/ IGRAPH_OUT);
+  igraph_write_graph_edgelist(&domtree, stdout);
   
   igraph_vector_destroy(&dom);
-  igraph_destroy(&g);			
+  igraph_destroy(&domtree);
+  igraph_destroy(&g);
 
   return 0;
 }
