@@ -5061,27 +5061,34 @@ PyObject *igraphmodule_Graph_layout_graphopt(igraphmodule_GraphObject *self,
   PyObject *args, PyObject *kwds) {
   static char *kwlist[] =
     { "niter", "node_charge", "node_mass", "spring_length", "spring_constant",
-      "max_sa_movement", NULL };
+      "max_sa_movement", "seed", NULL };
   igraph_matrix_t m;
   long niter = 500;
   double node_charge = 0.001, node_mass = 30;
   long spring_length = 0;
   double spring_constant = 1, max_sa_movement = 5;
-  PyObject *result;
+  PyObject *result, *seed_o = Py_None;
+  igraph_bool_t use_seed=0;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lddldd", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lddlddO", kwlist,
                                    &niter, &node_charge, &node_mass,
                                    &spring_length, &spring_constant,
-                                   &max_sa_movement))
+                                   &max_sa_movement, &seed_o))
     return NULL;
 
-  if (igraph_matrix_init(&m, 1, 1)) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
+  if (seed_o == 0 || seed_o == Py_None) {
+    if (igraph_matrix_init(&m, 1, 1)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  } else {
+    use_seed=1;
+    if (igraphmodule_PyList_to_matrix_t(seed_o, &m))
+			return NULL;
   }
 
   if (igraph_layout_graphopt(&self->g, &m, niter, node_charge, node_mass,
-      spring_length, spring_constant, max_sa_movement, 0)) {
+      spring_length, spring_constant, max_sa_movement, use_seed)) {
     igraph_matrix_destroy(&m);
     igraphmodule_handle_igraph_error();
     return NULL;
@@ -9656,11 +9663,11 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  as the starting position.\n"
    "@return: the calculated coordinate triplets in a list."},
 
-  // interface to igraph_layout_graphopt
+  /* interface to igraph_layout_graphopt */
   {"layout_graphopt",
    (PyCFunction) igraphmodule_Graph_layout_graphopt,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_graphopt(niter=500, node_charge=0.001, node_mass=30, spring_length=0, spring_constant=1, max_sa_movement=5)\n\n"
+   "layout_graphopt(niter=500, node_charge=0.001, node_mass=30, spring_length=0, spring_constant=1, max_sa_movement=5, seed=None)\n\n"
    "This is a port of the graphopt layout algorithm by Michael Schmuhl.\n"
    "graphopt version 0.4.1 was rewritten in C and the support for layers\n"
    "was removed.\n\n"
@@ -9678,6 +9685,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param spring_constant: the spring constant\n"
    "@param max_sa_movement: the maximum amount of movement allowed in a single\n"
    "  step along a single axis.\n"
+	 "@param seed: a matrix containing a seed layout from which the algorithm\n"
+	 "  will be started. If C{None}, a random layout will be used.\n"
   },
 
   // interface to igraph_layout_grid_fruchterman_reingold
