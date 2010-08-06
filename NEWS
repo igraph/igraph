@@ -15,8 +15,8 @@ New in the R interface
 
 Bugs corrected in the R interface
 ---------------------------------
-- Fixed a missing id problem when writing out Pajek files and using complex vertex 
-  id attributes.
+- Fixed a missing id problem when writing out Pajek files and using 
+  complex vertex id attributes.
 - Fixed bugs in writing NCOL and LGL files, when edge weights are
   present. The edge weights were shuffled.
 - The loop.angle graphical parameter is interpreted in radian now (#517685).
