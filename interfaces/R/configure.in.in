@@ -17,12 +17,6 @@ const char hw[] = "Hello, World\n";]],
         [AC_MSG_ERROR([no C++ compiler found or it cannot create executables])])
 AC_LANG_POP([C++])
 
-AC_CHECK_FUNCS(fmemopen, [HAVE_FMEMOPEN=1], [HAVE_FMEMOPEN=0])
-AC_SUBST(HAVE_FMEMOPEN)
-
-AC_CHECK_FUNCS(open_memstream, [HAVE_OPEN_MEMSTREAM=1], [HAVE_OPEN_MEMSTREAM=0])
-AC_SUBST(HAVE_OPEN_MEMSTREAM)
-
 LIBS_SAVE=$LIBS
 LIBS="$LIBS -lm"
 AC_CHECK_FUNCS([rintf finite expm1 rint log2 logbl snprintf log1p round fmin])
@@ -109,6 +103,6 @@ fi
 AC_SUBST(HAVE_GLPK)
 AC_SUBST(GLPK_LIBS)
 
-AC_CONFIG_FILES([R/config.R src/Makevars])
+AC_CONFIG_FILES([src/Makevars])
 
 AC_OUTPUT

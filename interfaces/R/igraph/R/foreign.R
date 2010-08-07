@@ -70,14 +70,10 @@ read.graph <- function(file, format=c("edgelist", "pajek", "ncol", "lgl",
                                "graphml", "dimacs", "graphdb", "gml", "dl"),
                        ...) {
 
-  if (igraph.i.have.fmemopen) {
-    file <- read.graph.toraw(file)
-  } else {
-    if (!is.character(file) || length(grep("://", file, fixed=TRUE))>0) {
-      buffer <- read.graph.toraw(file)
-      file <- tempfile()
-      write.graph.fromraw(buffer, file)
-    }
+  if (!is.character(file) || length(grep("://", file, fixed=TRUE))>0) {
+    buffer <- read.graph.toraw(file)
+    file <- tempfile()
+    write.graph.fromraw(buffer, file)
   }
 
   format <- igraph.match.arg(format)
@@ -102,14 +98,12 @@ write.graph <- function(graph, file, format=c("edgelist", "pajek", "ncol", "lgl"
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  if (!igraph.i.have.open.memstream) {
-    if (!is.character(file) || length(grep("://", file, fixed=TRUE))>0) {
-      tmpfile <- TRUE
-      origfile <- file
-      file <- tempfile()
-    } else {
-      tmpfile <- FALSE
-    }
+  if (!is.character(file) || length(grep("://", file, fixed=TRUE))>0) {
+    tmpfile <- TRUE
+    origfile <- file
+    file <- tempfile()
+  } else {
+    tmpfile <- FALSE
   }
   
   format <- igraph.match.arg(format)
@@ -125,13 +119,9 @@ write.graph <- function(graph, file, format=c("edgelist", "pajek", "ncol", "lgl"
                 stop(paste("Unknown file format:",format))
                 )
 
-  if (igraph.i.have.open.memstream) {
-    write.graph.fromraw(res, file)
-  } else {
-    if (tmpfile) {
-      buffer <- read.graph.toraw(file)
-      write.graph.fromraw(buffer, origfile)
-    }
+  if (tmpfile) {
+    buffer <- read.graph.toraw(file)
+    write.graph.fromraw(buffer, origfile)
   }
   
   invisible(res)
@@ -420,13 +410,9 @@ graph.graphdb <- function(url=NULL,
     stop(paste("Cannot open URL:", filename));
   }
 
-  if (igraph.i.have.fmemopen) {
-    f <- read.graph.toraw(f)
-  } else {
-    buffer <- read.graph.toraw(f)
-    f <- tempfile()
-    write.graph.fromraw(buffer, f)
-  }
+  buffer <- read.graph.toraw(f)
+  f <- tempfile()
+  write.graph.fromraw(buffer, f)
 
   .Call("R_igraph_read_graph_graphdb", f, as.logical(directed),
         PACKAGE="igraph")

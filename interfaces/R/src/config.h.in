@@ -6,9 +6,6 @@
 /* Define to 1 if you have the `finite' function. */
 #undef HAVE_FINITE
 
-/* Define to 1 if you have the `fmemopen' function. */
-#undef HAVE_FMEMOPEN
-
 /* Define to 1 if you have the `fmin' function. */
 #undef HAVE_FMIN
 
@@ -35,9 +32,6 @@
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
-
-/* Define to 1 if you have the `open_memstream' function. */
-#undef HAVE_OPEN_MEMSTREAM
 
 /* Define to 1 if you have the `rint' function. */
 #undef HAVE_RINT
