@@ -101,6 +101,8 @@ int test_unnormalized_laplacian(igraph_bool_t dir) {
   igraph_destroy(&g);
 
   igraph_matrix_destroy(&m);
+
+  return 0;
 }
 
 int test_normalized_laplacian(igraph_bool_t dir) {
