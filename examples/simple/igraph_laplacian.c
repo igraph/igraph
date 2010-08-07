@@ -105,6 +105,8 @@ int test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
   if (weights) {
     igraph_vector_destroy(weights); free(weights);
   }
+
+  return 0;
 }
 
 int test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
