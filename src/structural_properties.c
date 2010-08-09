@@ -681,13 +681,14 @@ int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
  * \brief The length of the shortest paths between vertices.
  *
  * \param graph The graph object.
- * \param res The result of the calculation, a matrix. It has the same
+ * \param res The result of the calculation, a matrix. A pointer to an
+ *        initialized matrix, to be more precise. The matrix will be
+ *        resized if needed. It will have the same
  *        number of rows as the length of the \c from
  *        argument, and its number of columns is the number of
- *        vertices in the graph. One row of the matrix shows the
- *        distances from/to a given vertex to all the others in the
- *        graph, the order is fixed by the vertex ids. For the
- *        unreachable vertices IGRAPH_INFINITY is returned.
+ *        vertices in the \c to argument. One row of the matrix shows the
+ *        distances from/to a given vertex to the ones in \c to.
+ *        For the unreachable vertices IGRAPH_INFINITY is returned.
  * \param from Vector of the vertex ids for which the path length
  *        calculations are done.
  * \param to Vector of the vertex ids to which the path length 
@@ -4970,9 +4971,12 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
  * efficient implementation.
  * 
  * \param graph The input graph, can be directed.
- * \param res The result, a matrix. Each row contains the distances
- *    from a single source, in the order of vertex ids.
- *    Unreachable vertices has distance \c IGRAPH_INFINITY.
+ * \param res The result, a matrix. A pointer to an initialized matrix
+ *    should be passed here. The matrix will be resized as needed. 
+ *    Each row contains the distances from a single source, to the
+ *    vertices given in the \c to argument. 
+ *    Unreachable vertices has distance
+ *    \c IGRAPH_INFINITY. 
  * \param from The source vertices.
  * \param to The target vertices. It is not allowed to include a
  *    vertex twice or more.
@@ -5882,9 +5886,11 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
  * weights, you are better off with \ref igraph_shortest_paths_dijkstra() .
  * 
  * \param graph The input graph, can be directed.
- * \param res The result, a matrix. Each row contains the distances
- *    from a single source, in the order of vertex ids.
- *    Unreachable vertices has distance \c IGRAPH_INFINITY.
+ * \param res The result, a matrix. A pointer to an initialized matrix
+ *    should be passed here, the matrix will be resized if needed. 
+ *    Each row contains the distances from a single source, to all
+ *    vertices in the graph, in the order of vertex ids. For unreachable
+ *    vertices the matrix contains \c IGRAPH_INFINITY. 
  * \param from The source vertices.
  * \param weights The edge weights. There mustn't be any closed loop in
  *    the graph that has a negative total weight (since this would allow
@@ -6046,7 +6052,8 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  * 
  * \param graph The input graph, typically it is directed.
  * \param res Pointer to an initialized matrix, the result will be
- *   stored here, one line for each source vertex.
+ *   stored here, one line for each source vertex, one column for each
+ *   target vertex.
  * \param from The source vertices.
  * \param to The target vertices. It is not allowed to include a
  *   vertex twice or more.
