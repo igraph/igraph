@@ -49,6 +49,9 @@
  *        \c IGRAPH_IN means the opposite, and 
  *        \c IGRAPH_ALL ignores the direction of the edges.
  *        This parameter is ignored for undirected graphs. 
+ * \param restricted If not a null pointer, then it must be a pointer 
+ *        to a vector containing vertex ids. The BFS is carried out
+ *        only on these vertices. It must contain the root vertex.
  * \param order If not null pointer, then the vertex ids of the graph are
  *        stored here, in the same order as they were visited.
  * \param rank If not a null pointer, then the rank of each vertex is
@@ -77,6 +80,7 @@
 
 int igraph_bfs(const igraph_t *graph, 
 	       igraph_integer_t root, igraph_neimode_t mode,
+	       const igraph_vector_t *restricted,
 	       igraph_vector_t *order, igraph_vector_t *rank,
 	       igraph_vector_t *father,
 	       igraph_vector_t *pred, igraph_vector_t *succ,
@@ -110,6 +114,18 @@ int igraph_bfs(const igraph_t *graph,
 
   IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, /*simplify=*/ 0));
   IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
+
+  if (restricted) {
+    long int i, n=igraph_vector_size(restricted);
+    igraph_vector_char_fill(&added, 1);
+    for (i=0; i<n; i++) {
+      long int v=VECTOR(*restricted)[i];
+      VECTOR(added)[v]=0;
+    }
+    if (VECTOR(added)[(long int)root]) {
+      IGRAPH_ERROR("`root' vertex is not allowed in BFS", IGRAPH_EINVAL);
+    }
+  }
 
   /* Resize result vectors, and fill them with IGRAPH_NAN */
 

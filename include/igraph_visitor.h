@@ -86,6 +86,7 @@ typedef igraph_bool_t igraph_bfshandler_t(const igraph_t *graph,
 
 int igraph_bfs(const igraph_t *graph, 
 	       igraph_integer_t root, igraph_neimode_t mode,
+	       const igraph_vector_t *restricted,
 	       igraph_vector_t *order, igraph_vector_t *rank,
 	       igraph_vector_t *father,
 	       igraph_vector_t *pred, igraph_vector_t *succ,
@@ -106,7 +107,7 @@ int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
  * igraph_dfshandler_t. They have the following arguments:
  * \param graph The graph that that algorithm is working on. Of course
  *   this must not be modified.
- * \param vid The id of the vertex just found by the breadth-first
+ * \param vid The id of the vertex just found by the depth-first
  *   search.
  * \param dist The distance (number of hops) of the current vertex
  *   from the root of the current search tree.

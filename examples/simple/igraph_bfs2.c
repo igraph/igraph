@@ -38,6 +38,8 @@ int main() {
   
   igraph_t graph, ring;
   igraph_vector_t order, rank, father, pred, succ, dist;
+  igraph_vector_t restricted;
+  long int i;
   
   igraph_ring(&ring, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
   igraph_disjoint_union(&graph, &ring, &ring);
@@ -50,7 +52,7 @@ int main() {
   igraph_vector_init(&succ, 0);
   igraph_vector_init(&dist, 0);
   
-  igraph_bfs(&graph, /*root=*/0, /*neimode=*/ IGRAPH_OUT, 
+  igraph_bfs(&graph, /*root=*/0, /*neimode=*/ IGRAPH_OUT, /*restricted=*/ 0,
 	     &order, &rank, &father, &pred, &succ, &dist, 
 	     /*callback=*/ 0, /*extra=*/ 0);
   
@@ -70,16 +72,26 @@ int main() {
 
   /* Test the callback */
 
-  igraph_bfs(&graph, /*root=*/ 0, /*neimode=*/ IGRAPH_OUT, 
+  igraph_bfs(&graph, /*root=*/ 0, /*neimode=*/ IGRAPH_OUT, /*restricted=*/ 0,
 	     0, 0, 0, 0, 0, 0, &bfs_callback, 0);
   printf("\n");
   
   /* Test different roots */
 
-  igraph_bfs(&graph, /*root=*/ 2, /*neimode=*/ IGRAPH_OUT, 
+  igraph_bfs(&graph, /*root=*/ 2, /*neimode=*/ IGRAPH_OUT, /*restricted=*/ 0,
 	     0, 0, 0, 0, 0, 0, &bfs_callback, 0);
   printf("\n");
+
+  /* Test restricted */
+  igraph_vector_init(&restricted, 0);
+  for (i=5; i<igraph_vcount(&graph); i++) {
+    igraph_vector_push_back(&restricted, i);
+  }
+  igraph_bfs(&graph, /*root=*/ 5, /*neimode=*/ IGRAPH_OUT, &restricted,
+	     0, 0, 0, 0, 0, 0, &bfs_callback, 0);
+  printf("\n");  
   
+  igraph_vector_destroy(&restricted);
   igraph_destroy(&graph);
   
   return 0;
