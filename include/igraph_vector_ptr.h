@@ -70,6 +70,8 @@ long int igraph_vector_ptr_size      (const igraph_vector_ptr_t* v);
 void igraph_vector_ptr_clear     (igraph_vector_ptr_t* v);
 void igraph_vector_ptr_null      (igraph_vector_ptr_t* v);
 int igraph_vector_ptr_push_back (igraph_vector_ptr_t* v, void* e);
+int igraph_vector_ptr_append    (igraph_vector_ptr_t *to, 
+				 const igraph_vector_ptr_t *from);
 void *igraph_vector_ptr_pop_back (igraph_vector_ptr_t *v);
 int igraph_vector_ptr_insert(igraph_vector_ptr_t *v, long int pos, void* e);
 void* igraph_vector_ptr_e         (const igraph_vector_ptr_t* v, long int pos);
