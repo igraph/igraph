@@ -378,6 +378,10 @@ int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
  *        \c IGRAPH_IN means the opposite, and 
  *        \c IGRAPH_ALL ignores the direction of the edges.
  *        This parameter is ignored for undirected graphs. 
+ * \param unreachable Logical scalar, whether the search should visit
+ *        the vertices that are unreachable from the given root
+ *        node(s). If true, then additional searches are performed
+ *        until all vertices are visited.
  * \param order If not null pointer, then the vertex ids of the graph are
  *        stored here, in the same order as they were discovered.
  * \param order_out If not a null pointer, then the vertex ids of the
@@ -401,7 +405,8 @@ int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
  */
 
 int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
-	       igraph_neimode_t mode, igraph_vector_t *order,
+	       igraph_neimode_t mode, igraph_bool_t unreachable, 
+	       igraph_vector_t *order,
 	       igraph_vector_t *order_out, igraph_vector_t *father,
 	       igraph_vector_t *dist, igraph_dfshandler_t *in_callback,
 	       igraph_dfshandler_t *out_callback,
@@ -471,6 +476,7 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 
     /* 'root' first, then all other vertices */
     if (igraph_stack_empty(&stack)) {
+      if (!unreachable) { break; }
       if (VECTOR(added)[actroot]) { continue; }
       IGRAPH_CHECK(igraph_stack_push(&stack, actroot));
       VECTOR(added)[actroot] = 1;

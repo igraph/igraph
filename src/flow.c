@@ -2282,17 +2282,7 @@ long int igraph_i_dominator_EVAL(long int v,
   }
 }
 
-/* This callback is called if a subtree is finished in the DFS.
-   We terminate if the subtree of the root vertex is finished, 
-   before doing other components. */
-
-igraph_bool_t igraph_i_dominator_dfs_cb(const igraph_t *graph,
-					igraph_integer_t actroot, 
-					igraph_integer_t dist,
-					void *extra) {
-  igraph_integer_t *root=(igraph_integer_t *)extra;
-  return *root == actroot;	/* TRUE == terminate */
-} 					
+/* TODO: implement the faster version. */
 
 int igraph_dominator_tree(const igraph_t *graph,
 			  igraph_integer_t root,
@@ -2359,13 +2349,13 @@ int igraph_dominator_tree(const igraph_t *graph,
   IGRAPH_CHECK(igraph_i_dbucket_init(&bucket, no_of_nodes));
   IGRAPH_FINALLY(igraph_i_dbucket_destroy, &bucket);
 
-  /* DSF first, to set semi, vertex and parent, step 1 */
+  /* DFS first, to set semi, vertex and parent, step 1 */
   
-  IGRAPH_CHECK(igraph_dfs(graph, root, mode, /*order=*/ &vertex,
+  IGRAPH_CHECK(igraph_dfs(graph, root, mode, /*unreachable=*/ 0,
+			  /*order=*/ &vertex,
 			  /*order_out=*/ 0, /*father=*/ &parent,
 			  /*dist=*/ 0, /*in_callback=*/ 0, 
-			  /*out_callback=*/ igraph_i_dominator_dfs_cb, 
-			  /*extra=*/ (void*) &root));
+			  /*out_callback=*/ 0, /*extra=*/ 0));
   for (i=0; i<no_of_nodes; i++) {
     if (IGRAPH_FINITE(VECTOR(vertex)[i])) {
       long int t=VECTOR(vertex)[i];
@@ -2457,3 +2447,4 @@ int igraph_dominator_tree(const igraph_t *graph,
 
   return 0;
 }
+
