@@ -52,7 +52,7 @@ void igraph_marked_queue_reset(igraph_marked_queue_t *q);
 igraph_bool_t igraph_marked_queue_empty(const igraph_marked_queue_t *q);
 long int igraph_marked_queue_size(const igraph_marked_queue_t *q);
 
-igraph_bool_t igraph_marked_queue_iselement(igraph_marked_queue_t *q, 
+igraph_bool_t igraph_marked_queue_iselement(const igraph_marked_queue_t *q, 
 					    long int elem);
 
 int igraph_marked_queue_push(igraph_marked_queue_t *q, long int elem);

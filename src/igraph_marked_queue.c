@@ -59,7 +59,7 @@ long int igraph_marked_queue_size(const igraph_marked_queue_t *q) {
   return q->size;
 }
 
-igraph_bool_t igraph_marked_queue_iselement(igraph_marked_queue_t *q, 
+igraph_bool_t igraph_marked_queue_iselement(const igraph_marked_queue_t *q, 
 					    long int elem) {
   return (VECTOR(q->set)[elem] == q->mark);
 }
