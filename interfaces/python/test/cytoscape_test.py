@@ -19,6 +19,13 @@ from igraph.drawing.graph import CytoscapeGraphDrawer
 def test():
     g = Graph.GRG(100, 0.2)
 
+    ### Adding network attributes
+    g["name"] = "Network name"
+    g["version"] = 5
+    g["obsolete"] = False
+    g["density"] = g.density()
+
+    ### Adding vertex attributes
     # String attribute
     g.vs["name"] = ["Node %d" % (i+1) for i in xrange(g.vcount())]
     # Integer attribute
@@ -32,6 +39,7 @@ def test():
     # Special attribute with Hungarian accents
     g.vs[0]["name"] = u"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP"
 
+    ### Adding edge attributes
     # String attribute
     g.es["name"] = ["Edge %d -- %d" % edge.tuple for edge in g.es]
     # Integer attribute

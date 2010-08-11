@@ -462,6 +462,28 @@ class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
         # being transferred
         cy.performDefaultLayout(network_id)
 
+        # Send the network attributes
+        try:
+            attr_names = set(cy.getNetworkAttributeNames())
+        except Exception:
+            # Method not supported yet by Cytoscape-RPC
+            attr_names = set()
+        for attr in graph.attributes():
+            cy_type, value = self.infer_cytoscape_type([graph[attr]])
+            value = value[0]
+            if value is None:
+                continue
+
+            # Resolve type conflicts (if any)
+            try:
+                while attr in attr_names and \
+                      cy.getNetworkAttributeType(attr) != cy_type:
+                    attr += "_"
+                cy.addNetworkAttributes(attr, cy_type, {network_id: value})
+            except Exception:
+                # Method not supported yet by Cytoscape-RPC
+                pass
+
         # Send the node attributes
         attr_names = set(cy.getNodeAttributeNames())
         for attr in graph.vertex_attributes():
