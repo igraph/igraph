@@ -2435,8 +2435,13 @@ int igraph_dominator_tree(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&edges, component_size*2-2);
     for (i=0; i<no_of_nodes; i++) {
       if (i!=root && IGRAPH_FINITE(VECTOR(*mydom)[i])) {
-	VECTOR(edges)[ptr++] = VECTOR(*mydom)[i];
-	VECTOR(edges)[ptr++] = i;
+	if (mode==IGRAPH_OUT) {
+	  VECTOR(edges)[ptr++] = VECTOR(*mydom)[i];
+	  VECTOR(edges)[ptr++] = i;
+	} else {
+	  VECTOR(edges)[ptr++] = i;
+	  VECTOR(edges)[ptr++] = VECTOR(*mydom)[i];
+	}
       }
     }
     IGRAPH_CHECK(igraph_create(domtree, &edges, no_of_nodes,
