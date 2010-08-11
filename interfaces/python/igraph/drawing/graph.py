@@ -8,7 +8,8 @@ This module contains routines to draw graphs on:
 
 It also contains routines to send an igraph graph directly to Cytoscape
 (L{http://www.cytoscape.org}) using the CytoscapeRPC plugin
-(L{http://gforge.nbic.nl/projects/cytoscaperpc/})
+(L{http://gforge.nbic.nl/projects/cytoscaperpc/}), see
+L{CytoscapeGraphDrawer}.
 """
 
 from itertools import izip
@@ -26,7 +27,7 @@ from igraph.drawing.metamagic import AttributeCollectorBase, \
 from igraph.drawing.shapes import ShapeDrawerDirectory
 from igraph.layout import Layout
 
-__all__ = ["DefaultGraphDrawer", "UbiGraphDrawer"]
+__all__ = ["DefaultGraphDrawer", "UbiGraphDrawer", "CytoscapeGraphDrawer"]
 __license__ = "GPL"
 
 try:
@@ -51,6 +52,37 @@ class AbstractGraphDrawer(AbstractDrawer):
     def draw(self, graph, *args, **kwds):
         """Abstract method, must be implemented in derived classes."""
         raise NotImplementedError("abstract class")
+
+    def ensure_layout(self, layout, graph = None):
+        """Helper method that ensures that I{layout} is an instance
+        of L{Layout}. If it is not, the method will try to convert
+        it to a L{Layout} according to the following rules:
+
+          - If I{layout} is a string, it is assumed to be a name
+            of an igraph layout, and it will be passed on to the
+            C{layout} method of the given I{graph} if I{graph} is
+            not C{None}.
+
+          - If I{layout} is C{None}, the C{layout} method of
+            I{graph} will be invoked with no parameters, which
+            will call the default layout algorithm.
+
+          - Otherwise, I{layout} will be passed on to the constructor
+            of L{Layout}. This handles lists of lists, lists of tuples
+            and such.
+
+        If I{layout} is already a L{Layout} instance, it will still
+        be copied and a copy will be returned. This is because graph
+        drawers are allowed to transform the layout for their purposes,
+        and we don't want the transformation to propagate back to the
+        caller.
+        """
+        if isinstance(layout, Layout):
+            layout = Layout(layout.coords)
+        elif isinstance(layout, str) or layout is None:
+            layout = graph.layout(layout)
+        else:
+            layout = Layout(layout)
 
 #####################################################################
 
@@ -115,13 +147,7 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
         context = self.context
 
         # Calculate/get the layout of the graph
-        layout = kwds.get("layout", None)
-        if isinstance(layout, Layout):
-            layout = Layout(layout.coords)
-        elif isinstance(layout, str) or layout is None:
-            layout = graph.layout(layout)
-        else:
-            layout = Layout(layout)
+        layout = self.ensure_layout(kwds.get("layout", None), graph)
 
         # Determine the size of the margin on each side
         margin = kwds.get("margin", [0., 0., 0., 0.])
@@ -260,9 +286,8 @@ class UbiGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
     using the XML-RPC API of UbiGraph.
 
     The following vertex attributes are supported: C{color}, C{label},
-    C{shape}, C{size}. can be used. See the Ubigraph documentation for
-    supported shape names. Sizes are relative to the default Ubigraph
-    size.
+    C{shape}, C{size}. See the Ubigraph documentation for supported shape
+    names. Sizes are relative to the default Ubigraph size.
 
     The following edge attributes are supported: C{color}, C{label},
     C{width}. Edge widths are relative to the default Ubigraph width.
@@ -367,6 +392,124 @@ class UbiGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
             if edge.width != edge_defaults["width"]:
                 set_attr(edge_id, "width", str(edge.width))
 
+#####################################################################
+
+class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
+    """Graph drawer that sends a given graph to Cytoscape as a new
+    network using CytoscapeRPC.
+    
+    This graph drawer cooperates with U{Cytoscape<http://www.cytoscape.org>}
+    using U{CytoscapeRPC<http://wiki.nbic.nl/index.php/CytoscapeRPC>}.
+    You need to install the CytoscapeRPC plugin first and start the
+    XML-RPC server on a given port (port 9000 by default) from the
+    appropriate Plugins submenu in Cytoscape.
+
+    Graph, vertex and edge attributes are transferred to Cytoscape whenever
+    possible (i.e. when a suitable mapping exists between a Python type
+    and a Cytoscape type). If there is no suitable Cytoscape type for a
+    Python type, the drawer will use a string attribute on the Cytoscape
+    side and invoke C{str()} on the Python attributes.
+
+    If an attribute to be created on the Cytoscape side already exists with
+    a different type, an underscore will be appended to the attribute name
+    to resolve the type conflict.
+
+    You can use the C{network_id} attribute of this class to figure out the
+    network ID of the last graph drawn with this drawer.
+    """
+
+    def __init__(self, url="http://localhost:9000/Cytoscape"):
+        """Constructs a Cytoscape graph drawer using the XML-RPC interface
+        of Cytoscape at the given URL."""
+        super(CytoscapeGraphDrawer, self).__init__(url, "Cytoscape")
+        self.network_id = None
+
+    def draw(self, graph, name = "Network from igraph", *args, **kwds):
+        """Sends the given graph to Cytoscape as a new network.
+        
+        @param name: the name of the network in Cytoscape."""
+        cy = self.service
+
+        # Create the network
+        network_id = cy.createNetwork(name)
+        self.network_id = network_id
+
+        # Create the nodes
+        node_ids = [str(idx) for idx in xrange(graph.vcount())]
+        cy.createNodes(network_id, node_ids)
+
+        # Create the edges
+        edgelists = [[], []]
+        for v1, v2 in graph.get_edgelist():
+            edgelists[0].append(node_ids[v1])
+            edgelists[1].append(node_ids[v2])
+        edge_ids = cy.createEdges(network_id,
+                edgelists[0], edgelists[1],
+                ["unknown"] * graph.ecount(),
+                [graph.is_directed()] * graph.ecount(),
+                False
+        )
+
+        # if "layout" in kwds:
+            # Calculate/get the layout of the graph
+            # TODO: this is postponed until CytoscapeRPC implements
+            # the necessary methods to control the position of the
+            # vertices
+            # layout = self.ensure_layout(kwds["layout"], graph)
+
+        # Ask Cytoscape to perform the default layout so the user can
+        # at least see something in Cytoscape while the attributes are
+        # being transferred
+        cy.performDefaultLayout(network_id)
+
+        # Send the node attributes
+        attr_names = set(cy.getNodeAttributeNames())
+        for attr in graph.vertex_attributes():
+            cy_type, values = self.infer_cytoscape_type(graph.vs[attr])
+            values = dict(pair for pair in izip(node_ids, values)
+                    if pair[1] is not None)
+            # Resolve type conflicts (if any)
+            while attr in attr_names and \
+                  cy.getNodeAttributeType(attr) != cy_type:
+                attr += "_"
+            # Send the attribute values
+            cy.addNodeAttributes(attr, cy_type, values, True)
+
+        # Send the edge attributes
+        attr_names = set(cy.getEdgeAttributeNames())
+        for attr in graph.edge_attributes():
+            cy_type, values = self.infer_cytoscape_type(graph.es[attr])
+            values = dict(pair for pair in izip(edge_ids, values)
+                    if pair[1] is not None)
+            # Resolve type conflicts (if any)
+            while attr in attr_names and \
+                  cy.getEdgeAttributeType(attr) != cy_type:
+                attr += "_"
+            # Send the attribute values
+            cy.addEdgeAttributes(attr, cy_type, values)
+
+    @staticmethod
+    def infer_cytoscape_type(values):
+        """Returns a Cytoscape type that can be used to represent all the
+        values in `values` and an appropriately converted copy of `values` that
+        is suitable for an XML-RPC call.  Note that the string type in
+        Cytoscape is used as a catch-all type; if no other type fits, attribute
+        values will be converted to string and then posted to Cytoscape.
+        
+        ``None`` entries are allowed in `values`, they will be ignored on the
+        Cytoscape side.
+        """
+        types = [type(value) for value in values if value is not None]
+        if all(t == bool for t in types):
+            return "BOOLEAN", values
+        if all(issubclass(t, (int, long)) for t in types):
+            return "INTEGER", values
+        if all(issubclass(t, float) for t in types):
+            return "FLOATING", values
+        return "STRING", [
+                str(value) if not isinstance(value, basestring) else value
+                for value in values
+        ]
 
 #####################################################################
 
