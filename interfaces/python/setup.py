@@ -91,8 +91,8 @@ separately. Windows installers already contain a compiled igraph DLL,
 so they should work out of the box. Linux users should refer to the
 `igraph homepage <http://igraph.sourceforge.net>`_ for
 compilation instructions (but check your distribution first, maybe
-there are pre-compiled packages available). OS X Leopard users may
-benefit from the meta-package in the Python Package Index.
+there are pre-compiled packages available). OS X Snow Leopard users may
+benefit from the disk images in the Python Package Index.
 """
 
 plat = get_platform()
