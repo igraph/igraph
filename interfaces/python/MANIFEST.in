@@ -1,6 +1,5 @@
 include setup.cfg
 include src/*.h
-include test.py
 include MANIFEST.in
 include COPYING
 include debian/changelog.in
@@ -10,4 +9,4 @@ include debian/compat
 include debian/rules
 include debian/prepare
 include scripts/mkdoc.sh
-
+include test/*.py
