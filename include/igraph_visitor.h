@@ -85,7 +85,8 @@ typedef igraph_bool_t igraph_bfshandler_t(const igraph_t *graph,
 					  void *extra);
 
 int igraph_bfs(const igraph_t *graph, 
-	       igraph_integer_t root, igraph_neimode_t mode,
+	       igraph_integer_t root, const igraph_vector_t *roots,
+	       igraph_neimode_t mode, igraph_bool_t unreachable,
 	       const igraph_vector_t *restricted,
 	       igraph_vector_t *order, igraph_vector_t *rank,
 	       igraph_vector_t *father,
