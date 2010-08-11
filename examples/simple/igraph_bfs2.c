@@ -39,6 +39,7 @@ int main() {
   igraph_t graph, ring;
   igraph_vector_t order, rank, father, pred, succ, dist;
   igraph_vector_t restricted;
+  igraph_vector_t roots;
   long int i;
   
   igraph_ring(&ring, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
@@ -86,6 +87,7 @@ int main() {
   printf("\n");
 
   /* Test restricted */
+
   igraph_vector_init(&restricted, 0);
   for (i=5; i<igraph_vcount(&graph); i++) {
     igraph_vector_push_back(&restricted, i);
@@ -94,7 +96,31 @@ int main() {
 	     /*unreachable=*/ 1, &restricted,
 	     0, 0, 0, 0, 0, 0, &bfs_callback, 0);
   printf("\n");  
-  
+
+  /* Root not in restricted set */
+
+  igraph_bfs(&graph, /*root=*/ 4, /*roots=*/ 0, /*neimode=*/ IGRAPH_OUT, 
+	     /*unreachable=*/ 1, &restricted,
+	     0, 0, 0, 0, 0, 0, &bfs_callback, 0);
+  printf("\n");  
+
+  igraph_bfs(&graph, /*root=*/ 3, /*roots=*/ 0, /*neimode=*/ IGRAPH_OUT, 
+	     /*unreachable=*/ 0, &restricted,
+	     0, 0, 0, 0, 0, 0, &bfs_callback, 0);
+  printf("\n");  
+
+  /* Multiple root vertices */
+
+  igraph_vector_init(&roots, 3);
+  VECTOR(roots)[0]=3; 
+  VECTOR(roots)[1]=4;
+  VECTOR(roots)[2]=6;
+  igraph_bfs(&graph, /*root=*/ -1, &roots, /*neimode=*/ IGRAPH_OUT, 
+	     /*unreachable=*/ 0, &restricted,
+	     0, 0, 0, 0, 0, 0, &bfs_callback, 0);
+  printf("\n");    
+
+  igraph_vector_destroy(&roots);
   igraph_vector_destroy(&restricted);
   igraph_destroy(&graph);
   
