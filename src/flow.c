@@ -2235,6 +2235,8 @@ int igraph_i_dominator_LINK(long int v, long int w,
   return 0;
 }
 
+/* TODO: don't always reallocate path */
+
 int igraph_i_dominator_COMPRESS(long int v,
 				igraph_vector_long_t *ancestor,
 				igraph_vector_long_t *label,
@@ -2371,6 +2373,23 @@ int igraph_dominator_tree(const igraph_t *graph,
     for (j=0; j<no_of_nodes && p<n; j++) {
       if (!IGRAPH_FINITE(VECTOR(parent)[j])) {
 	VECTOR(*leftout)[p++] = j;
+      }
+    }
+  }
+
+  /* We need to go over 'pred' because it should contain only the
+     edges towards the target vertex. */
+  for (i=0; i<no_of_nodes; i++) {
+    igraph_vector_t *v=igraph_adjlist_get(&pred, i);
+    long int j, n=igraph_vector_size(v);
+    for (j=0; j<n; ) {
+      long int v2=VECTOR(*v)[j];
+      if (IGRAPH_FINITE(VECTOR(parent)[v2])) {
+	j++; 
+      } else {
+	VECTOR(*v)[j]=VECTOR(*v)[n-1];
+	igraph_vector_pop_back(v);
+	n--;
       }
     }
   }

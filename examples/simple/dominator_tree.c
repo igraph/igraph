@@ -31,19 +31,19 @@ int main() {
 
   igraph_vector_init(&dom, 0);
   igraph_small(&g, 13, IGRAPH_DIRECTED,
-	       0,1, 0,2, 0,3,
-	       1,4,
-	       2,1, 2,4, 2,5,
-	       3,6, 3,7,
-	       4,12,
-	       5,8, 
-	       6,9,
-	       7,9, 7,10,
-	       8,5, 8,11,
-	       9,11,
-	       10,9,
-	       11,9, 11,0,
-	       12,8,
+	       0,1, 0,7, 0,10,
+	       1,2, 1,5,
+	       2,3,
+	       3,4,
+	       4,3, 4,0,
+	       5,3, 5,6,
+	       6,3,
+	       7,8, 7,10, 7,11,
+	       8,9,
+	       9,4, 9,8,
+	       10,11,
+	       11,12,
+	       12,9,
 	       -1);
 
   /* Check NULL vector arguments */
@@ -133,6 +133,33 @@ int main() {
   igraph_vector_destroy(&leftout);
   igraph_destroy(&domtree);
   igraph_destroy(&g);
+
+  /* -------------------------------------------------------------------*/
+
+  igraph_vector_init(&dom, 0);
+  igraph_vector_init(&leftout, 0);
   
+  igraph_small(&g, 10, IGRAPH_DIRECTED, 
+	       0,9,
+	       1,0, 1,2,
+	       2,3, 2,7,
+	       3,1,
+	       4,1, 4,3,
+	       5,2, 5,3, 5,4, 5,8,
+	       6,5, 6,9,
+	       8,7,
+	       -1);
+  
+  igraph_dominator_tree(&g, /*root=*/ 9, &dom, &domtree,
+			&leftout, /*mode=*/ IGRAPH_IN);
+  igraph_vector_print(&dom);
+  igraph_vector_print(&leftout);
+  igraph_write_graph_edgelist(&domtree, stdout);
+   
+  igraph_vector_destroy(&dom);
+  igraph_vector_destroy(&leftout);
+  igraph_destroy(&domtree);
+  igraph_destroy(&g);
+ 
   return 0;
 }
