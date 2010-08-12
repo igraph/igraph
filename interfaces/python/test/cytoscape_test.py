@@ -52,7 +52,7 @@ def test():
     g.es["mixed"] = [u"yay", 123, None, 0.7] * ((g.ecount()+3) / 4)
 
     drawer = CytoscapeGraphDrawer()
-    drawer.draw(g)
+    drawer.draw(g, layout="fr")
 
 if __name__ == "__main__":
     test()

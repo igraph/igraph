@@ -83,6 +83,7 @@ class AbstractGraphDrawer(AbstractDrawer):
             layout = graph.layout(layout)
         else:
             layout = Layout(layout)
+        return layout
 
 #####################################################################
 
@@ -450,24 +451,22 @@ class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
                 False
         )
 
-        # if "layout" in kwds:
+        if "layout" in kwds:
             # Calculate/get the layout of the graph
-            # TODO: this is postponed until CytoscapeRPC implements
-            # the necessary methods to control the position of the
-            # vertices
-            # layout = self.ensure_layout(kwds["layout"], graph)
-
-        # Ask Cytoscape to perform the default layout so the user can
-        # at least see something in Cytoscape while the attributes are
-        # being transferred
-        cy.performDefaultLayout(network_id)
+            layout = self.ensure_layout(kwds["layout"], graph)
+            size = 100 * graph.vcount() ** 0.5
+            layout.fit_into((size, size), keep_aspect_ratio=True)
+            layout.translate(-size/2., -size/2.)
+            cy.setNodesPositions(network_id,
+                    node_ids, *zip(*list(layout)))
+        else:
+            # Ask Cytoscape to perform the default layout so the user can
+            # at least see something in Cytoscape while the attributes are
+            # being transferred
+            cy.performDefaultLayout(network_id)
 
         # Send the network attributes
-        try:
-            attr_names = set(cy.getNetworkAttributeNames())
-        except Exception:
-            # Method not supported yet by Cytoscape-RPC
-            attr_names = set()
+        attr_names = set(cy.getNetworkAttributeNames())
         for attr in graph.attributes():
             cy_type, value = self.infer_cytoscape_type([graph[attr]])
             value = value[0]
@@ -475,14 +474,10 @@ class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
                 continue
 
             # Resolve type conflicts (if any)
-            try:
-                while attr in attr_names and \
-                      cy.getNetworkAttributeType(attr) != cy_type:
-                    attr += "_"
-                cy.addNetworkAttributes(attr, cy_type, {network_id: value})
-            except Exception:
-                # Method not supported yet by Cytoscape-RPC
-                pass
+            while attr in attr_names and \
+                  cy.getNetworkAttributeType(attr) != cy_type:
+                attr += "_"
+            cy.addNetworkAttributes(attr, cy_type, {network_id: value})
 
         # Send the node attributes
         attr_names = set(cy.getNodeAttributeNames())
