@@ -43,7 +43,7 @@ AT_CLEANUP
 
 AT_SETUP([Double ended queue (dqueue_t): ])
 AT_KEYWORDS([dqueue double queue dqueue_t])
-AT_COMPILE_CHECK([simple/dqueue.c])
+AT_COMPILE_CHECK([simple/dqueue.c], [simple/dqueue.out])
 AT_CLEANUP
 
 AT_SETUP([Vector of pointers (vector_ptr_t): ])

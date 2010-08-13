@@ -94,7 +94,24 @@ int main() {
   }
   igraph_dqueue_destroy(&q);
 
-  if (IGRAPH_FINALLY_STACK_SIZE() != 0) return 12;
+  /* print */
+  igraph_dqueue_init(&q, 4);
+  igraph_dqueue_push(&q, 1);
+  igraph_dqueue_push(&q, 2);
+  igraph_dqueue_push(&q, 3);
+  igraph_dqueue_push(&q, 4);
+  igraph_dqueue_pop(&q);
+  igraph_dqueue_pop(&q);
+  igraph_dqueue_push(&q, 5);
+  igraph_dqueue_push(&q, 6);
+  igraph_dqueue_print(&q);
+
+  igraph_dqueue_clear(&q);
+  igraph_dqueue_print(&q);
+  
+  igraph_dqueue_destroy(&q);  
+
+  if (IGRAPH_FINALLY_STACK_SIZE() != 0) return 12;  
 
   return 0;
 }
