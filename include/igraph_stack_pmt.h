@@ -21,6 +21,8 @@
 
 */
 
+#include <stdio.h>
+
 /**
  * Stack data type.
  * \ingroup internal
@@ -41,3 +43,5 @@ void FUNCTION(igraph_stack,clear)(TYPE(igraph_stack)* s);
 int FUNCTION(igraph_stack,push)(TYPE(igraph_stack)* s, BASE elem);
 BASE FUNCTION(igraph_stack,pop)(TYPE(igraph_stack)* s);
 BASE FUNCTION(igraph_stack,top)(const TYPE(igraph_stack)* s);
+int FUNCTION(igraph_stack,print)(const TYPE(igraph_stack)* s);
+int FUNCTION(igraph_stack,fprint)(const TYPE(igraph_stack)* s, FILE *file);
