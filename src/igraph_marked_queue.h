@@ -27,6 +27,8 @@
 #include "igraph_vector.h"
 #include "igraph_dqueue.h"
 
+#include <stdio.h>
+
 /* This is essentially a double ended queue, with some extra features:
    (1) The is-element? operation is fast, O(1). This requires that we
        know a limit for the number of elements in the queue.
@@ -51,6 +53,8 @@ void igraph_marked_queue_reset(igraph_marked_queue_t *q);
 
 igraph_bool_t igraph_marked_queue_empty(const igraph_marked_queue_t *q);
 long int igraph_marked_queue_size(const igraph_marked_queue_t *q);
+int igraph_marked_queue_print(const igraph_marked_queue_t *q);
+int igraph_marked_queue_fprint(const igraph_marked_queue_t *q, FILE *file);
 
 igraph_bool_t igraph_marked_queue_iselement(const igraph_marked_queue_t *q, 
 					    long int elem);
@@ -59,5 +63,8 @@ int igraph_marked_queue_push(igraph_marked_queue_t *q, long int elem);
 
 int igraph_marked_queue_start_batch(igraph_marked_queue_t *q);
 void igraph_marked_queue_pop_back_batch(igraph_marked_queue_t *q);
+
+int igraph_marked_queue_as_vector(const igraph_marked_queue_t *q, 
+				  igraph_vector_t *vec);
 
 #endif

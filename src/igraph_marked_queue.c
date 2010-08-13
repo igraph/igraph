@@ -87,3 +87,26 @@ void igraph_marked_queue_pop_back_batch(igraph_marked_queue_t *q) {
     q->size--;
   }
 }
+
+int igraph_marked_queue_print(const igraph_marked_queue_t *q) {
+  IGRAPH_CHECK(igraph_dqueue_print(&q->Q));
+  return 0;
+}
+
+int igraph_marked_queue_fprint(const igraph_marked_queue_t *q, FILE *file) {
+  IGRAPH_CHECK(igraph_dqueue_fprint(&q->Q, file));
+  return 0;
+}
+
+int igraph_marked_queue_as_vector(const igraph_marked_queue_t *q, 
+				  igraph_vector_t *vec) {
+  long int i, p, n=igraph_dqueue_size(&q->Q);
+  IGRAPH_CHECK(igraph_vector_resize(vec, q->size));
+  for (i=0, p=0; i<n; i++) {
+    igraph_real_t e=igraph_dqueue_e(&q->Q, i);
+    if (e != BATCH_MARKER) {
+      VECTOR(*vec)[p++]=e;
+    }
+  }
+  return 0;
+}
