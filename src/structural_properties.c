@@ -1927,8 +1927,6 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
   if (!map) {
     igraph_vector_destroy(&vids_old2new);
     IGRAPH_FINALLY_CLEAN(1);
-  } else {
-    igraph_vector_add_constant(&vids_old2new, -1.0);
   }
   igraph_vector_destroy(&nei_edges);
   IGRAPH_FINALLY_CLEAN(1);
