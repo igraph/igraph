@@ -102,14 +102,6 @@ int igraph_bfs(const igraph_t *graph,
   igraph_dqueue_t Q;
   long int no_of_nodes=igraph_vcount(graph);
   long int actroot=0;
-  
-  /* Three possible values: 
-     0: can be found, can be root vertex,
-     1: cannot be found, cannot be root vertex,
-     2: cannot be found, can be root vertex
-     The third value is for vertices that appear in the 'roots'
-     vector (or as 'root' if 'roots' is null), but not in the
-     restricted set. */
   igraph_vector_char_t added;
 
   igraph_lazy_adjlist_t adjlist;
@@ -165,18 +157,6 @@ int igraph_bfs(const igraph_t *graph,
       long int v=VECTOR(*restricted)[i];
       VECTOR(added)[v]=0;
     }
-    if (roots) { 
-      for (i=0; i<noroots; i++) {
-	long int v=VECTOR(*roots)[i];
-	if (VECTOR(added)[v]) {
-	  VECTOR(added)[v] = 2;
-	}
-      }
-    } else {
-      if (VECTOR(added)[(long int)root]) {
-	VECTOR(added)[(long int)root] = 2;
-      }
-    }
   }
 
   /* Resize result vectors, and fill them with IGRAPH_NAN */
@@ -218,7 +198,7 @@ int igraph_bfs(const igraph_t *graph,
     }
 
     /* OK, we have a new root, start BFS */
-    if (VECTOR(added)[actroot] == 1) { continue; }
+    if (VECTOR(added)[actroot]) { continue; }
     IGRAPH_CHECK(igraph_dqueue_push(&Q, actroot));
     IGRAPH_CHECK(igraph_dqueue_push(&Q, 0));
     VECTOR(added)[actroot] = 1;
