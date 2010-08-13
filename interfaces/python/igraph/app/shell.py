@@ -18,8 +18,8 @@ overrides the default order. IDLE shell is only tried in Windows
 unless explicitly stated by C{global.shells}, since Linux and
 Mac OS X users are likely to invoke igraph from the command line.
 """
-from igraph import *
-from igraph import __version__
+
+from igraph import __version__, set_progress_handler, config
 import sys, re
 
 class TerminalController:
@@ -238,7 +238,6 @@ class IDLEShell(Shell):
         ripped from idlelib.PyShell.main() after removing the unnecessary
         parts."""
         import idlelib.PyShell
-        import sys
         
         idlelib.PyShell.use_subprocess = True
         
@@ -251,7 +250,8 @@ class IDLEShell(Shell):
         idlelib.PyShell.fixwordbreaks(root)
         root.withdraw()
         flist = idlelib.PyShell.PyShellFileList(root)
-        if not flist.open_shell(): raise NotImplementedError
+        if not flist.open_shell():
+            raise NotImplementedError
         self._shell = flist.pyshell
         self._root = root
 
@@ -273,6 +273,7 @@ class IPythonShell(Shell):
         Imports IPython's embedded shell with separator lines removed."""
         from IPython.Shell import IPShellEmbed
         self._shell = IPShellEmbed(['-nosep'])
+        self._shell.IP.runsource("from igraph import *")
         try:
             self.__class__.progress_bar = ProgressBar(TerminalController())
         except ValueError:
