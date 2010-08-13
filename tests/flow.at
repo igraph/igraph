@@ -46,3 +46,9 @@ AT_KEYWORDS([dominator tree])
 AT_COMPILE_CHECK([simple/dominator_tree.c],
                  [simple/dominator_tree.out])
 AT_CLEANUP
+
+AT_SETUP([All s-t cuts of a graph (igraph_all_st_cuts): ])
+AT_KEYWORDS([s-t cut])
+AT_COMPILE_CHECK([simple/igraph_all_st_cuts.c], 
+                 [simple/igraph_all_st_cuts.out], [], [INTERNAL])
+AT_CLEANUP

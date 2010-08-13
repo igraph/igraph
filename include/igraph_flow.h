@@ -37,6 +37,7 @@
 #include "igraph_constants.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
+#include "igraph_vector_ptr.h"
 
 __BEGIN_DECLS
 
@@ -127,6 +128,19 @@ int igraph_dominator_tree(const igraph_t *graph,
 			  igraph_t *domtree,
 			  igraph_vector_t *leftout,
 			  igraph_neimode_t mode);
+
+int igraph_all_st_cuts(const igraph_t *graph,
+		       igraph_vector_ptr_t *cuts,
+		       igraph_vector_ptr_t *partition1s,
+		       igraph_integer_t source,
+		       igraph_integer_t target);
+
+int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
+			  igraph_vector_ptr_t *cuts,
+			  igraph_vector_ptr_t *partition1s,
+			  igraph_integer_t source,
+			  igraph_integer_t target,
+			  const igraph_vector_t *capacity);
 
 __END_DECLS
 
