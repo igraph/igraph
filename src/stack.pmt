@@ -144,7 +144,7 @@ igraph_bool_t FUNCTION(igraph_stack,empty)      (TYPE(igraph_stack)* s) {
  * Time complexity: O(1).
  */
 
-long int FUNCTION(igraph_stack,size)       (TYPE(igraph_stack)* s) {
+long int FUNCTION(igraph_stack,size)       (const TYPE(igraph_stack)* s) {
 	assert (s != NULL);
 	assert (s->stor_begin != NULL);
 	return s->end - s->stor_begin;
