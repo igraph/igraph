@@ -2935,6 +2935,107 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
 			  igraph_integer_t source,
 			  igraph_integer_t target,
 			  const igraph_vector_t *capacity) {
-  /* TODO */
+
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t flow;
+  igraph_t residual;
+  igraph_vector_t NtoL;
+  long int newsource, newtarget;
+  igraph_vector_ptr_t closedsets;
+  igraph_vector_t revmap_ptr;
+  igraph_vector_t revmap_next;
+  long int i, nocuts;
+  
+  if (source < 0 || source >= no_of_nodes) {
+    IGRAPH_ERROR("Invalid `source' vertex", IGRAPH_EINVAL);
+  }
+  if (target < 0 || target >= no_of_nodes) {
+    IGRAPH_ERROR("Invalid `target' vertex", IGRAPH_EINVAL);
+  }
+  if (source==target) {
+    IGRAPH_ERROR("`source' and 'target' are the same vertex", IGRAPH_EINVAL);
+  }
+  
+  if (capacity) {
+    IGRAPH_WARNING("Capacity vector ignored.");
+  }
+
+  if (cuts) {
+    IGRAPH_WARNING("Cuts are not (yet) calculated");
+  }
+
+  /* We need to calculate the maximum flow first */
+  IGRAPH_VECTOR_INIT_FINALLY(&flow, 0);
+  IGRAPH_CHECK(igraph_maxflow(graph, value, &flow, /*cut=*/ 0, 
+			      /*partition1=*/ 0, /*partition2=*/ 0, 
+			      /*source=*/ source, /*target=*/ target, 
+			      capacity));
+
+  /* Then we need the inverse residual graph */
+  IGRAPH_CHECK(igraph_inverse_residual_graph(graph, capacity, &residual,
+					     &flow));
+  IGRAPH_FINALLY(igraph_destroy, &residual);
+
+  /* We shrink its strongly connected components */
+  IGRAPH_VECTOR_INIT_FINALLY(&NtoL, 0);
+  IGRAPH_CHECK(igraph_clusters(&residual, /*membership=*/ &NtoL, 
+			       /*csize=*/ 0, /*no=*/ 0, IGRAPH_STRONG));
+  IGRAPH_CHECK(igraph_contract_vertices(&residual, /*mapping=*/ &NtoL, 
+					/*vertex_comb=*/ 0));
+  IGRAPH_CHECK(igraph_simplify(&residual, /*multiple=*/ 1, /*loops=*/ 1,
+			       /*edge_comb=*/ 0));
+
+  newsource=VECTOR(NtoL)[(long int)source];
+  newtarget=VECTOR(NtoL)[(long int)target];
+
+  /* TODO: handle the newsource == newtarget case */
+  
+  /* Find the cuts in the contracted graph */
+  IGRAPH_CHECK(igraph_vector_ptr_init(&closedsets, 0));
+  IGRAPH_FINALLY(igraph_vector_ptr_destroy, &closedsets); /* TODO */
+  IGRAPH_CHECK(igraph_all_st_cuts(&residual, /*cuts=*/ 0, 
+				  /*partitions1s=*/ &closedsets,
+				  /*source=*/ newsource, 
+				  /*target=*/ newtarget));
+
+  /* Convert the closed sets in the contracted graphs to cutsets in the
+     original graph */
+  IGRAPH_VECTOR_INIT_FINALLY(&revmap_ptr, igraph_vcount(&residual));
+  IGRAPH_VECTOR_INIT_FINALLY(&revmap_next, no_of_nodes);
+  for (i=0; i<no_of_nodes; i++) {
+    long int id=VECTOR(NtoL)[i];
+    VECTOR(revmap_next)[i]=VECTOR(revmap_ptr)[id];
+    VECTOR(revmap_ptr)[id]=i+1;
+  }
+  
+  nocuts=igraph_vector_ptr_size(&closedsets);
+  igraph_vector_ptr_clear(partition1s);
+  IGRAPH_CHECK(igraph_vector_ptr_reserve(partition1s, nocuts));
+  for (i=0; i<nocuts; i++) {
+    igraph_vector_t *supercut=VECTOR(closedsets)[i];
+    long int j, supercutsize=igraph_vector_size(supercut);
+    igraph_vector_t *cut=igraph_Calloc(1, igraph_vector_t);
+    IGRAPH_VECTOR_INIT_FINALLY(cut, 0); /* TODO: better allocation */
+    for (j=0; j<supercutsize; j++) {
+      long int vtx=VECTOR(*supercut)[j];
+      long int ovtx=VECTOR(revmap_ptr)[vtx];
+      while (ovtx != 0) {
+	ovtx--;
+	IGRAPH_CHECK(igraph_vector_push_back(cut, ovtx));
+	ovtx=VECTOR(revmap_next)[ovtx];
+      }
+    }
+    igraph_vector_ptr_push_back(partition1s, cut);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  igraph_vector_destroy(&revmap_next);
+  igraph_vector_destroy(&revmap_ptr);
+  igraph_vector_ptr_destroy(&closedsets);
+  igraph_vector_destroy(&NtoL);
+  igraph_destroy(&residual);
+  igraph_vector_destroy(&flow);
+  IGRAPH_FINALLY_CLEAN(6);
+
   return 0;
 }

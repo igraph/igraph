@@ -52,3 +52,9 @@ AT_KEYWORDS([s-t cut])
 AT_COMPILE_CHECK([simple/igraph_all_st_cuts.c], 
                  [simple/igraph_all_st_cuts.out], [], [INTERNAL])
 AT_CLEANUP
+
+AT_SETUP([All minimal s-t cuts of a graph (igraph_all_st_mincuts): ])
+AT_KEYWORDS([minimal s-t cut])
+AT_COMPILE_CHECK([simple/igraph_all_st_mincuts.c], 
+                 [simple/igraph_all_st_mincuts.out])
+AT_CLEANUP
