@@ -24,16 +24,22 @@
 #include <igraph.h>
 
 int print_and_destroy(igraph_real_t value, 
-		      igraph_vector_ptr_t *partitions) {
+		      igraph_vector_ptr_t *partitions, 
+		      igraph_vector_ptr_t *cuts) {
   long int i, n=igraph_vector_ptr_size(partitions);
   printf("Value: %g\n", value);
   for (i=0; i<n; i++) {
     igraph_vector_t *vec=VECTOR(*partitions)[i];
-    igraph_vector_print(vec);
+    igraph_vector_t *vec2=VECTOR(*cuts)[i];
+    printf("Partition: "); igraph_vector_print(vec);
+    printf("Cut: "); igraph_vector_print(vec2);
     igraph_vector_destroy(vec);
+    igraph_vector_destroy(vec2);
     igraph_free(vec);
+    igraph_free(vec2);
   }  
   igraph_vector_ptr_destroy(partitions);
+  igraph_vector_ptr_destroy(cuts);
   
   return 0;
 }
@@ -42,6 +48,7 @@ int main() {
 
   igraph_t g;
   igraph_vector_ptr_t partitions;
+  igraph_vector_ptr_t cuts;
   igraph_real_t value;
   
   igraph_small(&g, 5, IGRAPH_DIRECTED,
@@ -49,31 +56,34 @@ int main() {
 	       -1);
   
   igraph_vector_ptr_init(&partitions, 0);
-  igraph_all_st_mincuts(&g, &value, /*cuts=*/ 0, &partitions, 
+  igraph_vector_ptr_init(&cuts, 0);
+  igraph_all_st_mincuts(&g, &value, &cuts, &partitions, 
 			/*source=*/ 0, /*target=*/ 4,
 			/*capacity=*/ 0);
   
-  print_and_destroy(value, &partitions);
+  print_and_destroy(value, &partitions, &cuts);
   igraph_destroy(&g);  
 
   /* ---------------------------------------------------------------- */
   
   igraph_small(&g, 6, IGRAPH_DIRECTED, 0,1, 1,2, 1,3, 2,4, 3,4, 4,5, -1);
   igraph_vector_ptr_init(&partitions, 0);
-  igraph_all_st_mincuts(&g, &value, /*cuts=*/ 0, &partitions,
+  igraph_vector_ptr_init(&cuts, 0);
+  igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
 			/*source=*/ 0, /*target=*/ 5, /*capacity=*/ 0);
 
-  print_and_destroy(value, &partitions);
+  print_and_destroy(value, &partitions, &cuts);
   igraph_destroy(&g);  
 
   /* ---------------------------------------------------------------- */
   
   igraph_small(&g, 6, IGRAPH_DIRECTED, 0,1, 1,2, 1,3, 2,4, 3,4, 4,5, -1);
   igraph_vector_ptr_init(&partitions, 0);
-  igraph_all_st_mincuts(&g, &value, /*cuts=*/ 0, &partitions,
+  igraph_vector_ptr_init(&cuts, 0);
+  igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
 			/*source=*/ 0, /*target=*/ 4, /*capacity=*/ 0);
 
-  print_and_destroy(value, &partitions);
+  print_and_destroy(value, &partitions, &cuts);
   igraph_destroy(&g);  
  
   return 0;
