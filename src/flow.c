@@ -2866,7 +2866,6 @@ int igraph_all_st_cuts(const igraph_t *graph,
   if (partition1s) { igraph_vector_ptr_clear(partition1s); }    
   
   /* We call it with S={}, T={} */
-  igraph_marked_queue_push(&S, source);
   IGRAPH_CHECK(igraph_i_all_st_cuts_list(graph, &S, &T, &TV, 
 					 source, target, partition1s));
   
