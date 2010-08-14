@@ -2937,6 +2937,7 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
 			  const igraph_vector_t *capacity) {
 
   long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
   igraph_vector_t flow;
   igraph_t residual;
   igraph_vector_t NtoL;
@@ -2957,11 +2958,13 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
   }
   
   if (capacity) {
-    IGRAPH_WARNING("Capacity vector ignored.");
+    IGRAPH_WARNING("Capacity vector ignored, "
+		   "not implemented for weighted graphs");
   }
 
-  if (cuts) {
-    IGRAPH_WARNING("Cuts are not (yet) calculated");
+  if (!partition1s) {
+    IGRAPH_ERROR("`partition1s' cannot be a null pointer (yet).", 
+		 IGRAPH_EINVAL);
   }
 
   /* We need to calculate the maximum flow first */
@@ -3027,8 +3030,8 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
     }
     igraph_vector_ptr_push_back(partition1s, cut);
     IGRAPH_FINALLY_CLEAN(1);
-  }
-  
+  }    
+
   igraph_vector_destroy(&revmap_next);
   igraph_vector_destroy(&revmap_ptr);
   igraph_vector_ptr_destroy(&closedsets);
@@ -3036,6 +3039,38 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
   igraph_destroy(&residual);
   igraph_vector_destroy(&flow);
   IGRAPH_FINALLY_CLEAN(6);
+
+  if (cuts) {
+    igraph_vector_long_t memb;
+    IGRAPH_CHECK(igraph_vector_long_init(&memb, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_long_destroy, &memb);
+    IGRAPH_CHECK(igraph_vector_ptr_resize(cuts, nocuts));
+    for (i=0; i<nocuts; i++) {
+      igraph_vector_t *part=VECTOR(*partition1s)[i];
+      long int j, n=igraph_vector_size(part);
+      igraph_vector_t *v;
+      v=igraph_Calloc(1, igraph_vector_t);
+      if (!v) { 
+	IGRAPH_ERROR("Cannot list minimum s-t cuts", IGRAPH_ENOMEM);
+      }
+      IGRAPH_VECTOR_INIT_FINALLY(v, 0);
+      for (j=0; j<n; j++) {
+	long int vtx=VECTOR(*part)[j];
+	VECTOR(memb)[vtx]=i+1;
+      }
+      for (j=0; j<no_of_edges; j++) {
+	long int from=IGRAPH_FROM(graph, j);
+	long int to=IGRAPH_TO(graph, j);
+	if (VECTOR(memb)[from] == i+1 && VECTOR(memb)[to] != i+1) {
+	  IGRAPH_CHECK(igraph_vector_push_back(v, j)); /* TODO: allocation */
+	}
+      }
+      VECTOR(*cuts)[i] = v;
+      IGRAPH_FINALLY_CLEAN(1);
+    }
+    igraph_vector_long_destroy(&memb);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
 
   return 0;
 }
