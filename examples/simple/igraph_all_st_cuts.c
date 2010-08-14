@@ -285,5 +285,29 @@ int main() {
   
   igraph_destroy(&g);  
 
+  /* ----------------------------------------------------------- */
+  
+  igraph_small(&g, 3, IGRAPH_DIRECTED,
+  	       0,2, 1,2,
+  	       -1);
+
+  igraph_vector_ptr_init(&cuts, 0);
+  igraph_vector_ptr_init(&partition1s, 0);
+  igraph_all_st_cuts(&g, &cuts, &partition1s,
+		     /*source=*/ 1, /*target=*/ 2);
+
+  n=igraph_vector_ptr_size(&partition1s);
+  printf("Partitions and cuts:\n");
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v=VECTOR(partition1s)[i];
+    igraph_vector_t *v2=VECTOR(cuts)[i];
+    printf("P: ");
+    igraph_vector_print(v);
+    printf("C: ");
+    igraph_vector_print(v2);
+  }
+  
+  igraph_destroy(&g);  
+
   return 0;
 }
