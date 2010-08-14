@@ -2946,6 +2946,7 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
   igraph_vector_t revmap_ptr;
   igraph_vector_t revmap_next;
   long int i, nocuts;
+  igraph_vector_ptr_t *mypartition1s=partition1s, vpartition1s;
   
   if (source < 0 || source >= no_of_nodes) {
     IGRAPH_ERROR("Invalid `source' vertex", IGRAPH_EINVAL);
@@ -2963,10 +2964,11 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
   }
 
   if (!partition1s) {
-    IGRAPH_ERROR("`partition1s' cannot be a null pointer (yet).", 
-		 IGRAPH_EINVAL);
+    mypartition1s=&vpartition1s;
+    IGRAPH_CHECK(igraph_vector_ptr_init(mypartition1s, 0));
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy, mypartition1s);
   }
-
+  
   /* We need to calculate the maximum flow first */
   IGRAPH_VECTOR_INIT_FINALLY(&flow, 0);
   IGRAPH_CHECK(igraph_maxflow(graph, value, &flow, /*cut=*/ 0, 
@@ -3069,6 +3071,11 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
       IGRAPH_FINALLY_CLEAN(1);
     }
     igraph_vector_long_destroy(&memb);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  if (!partition1s) {
+    igraph_vector_ptr_destroy(mypartition1s);
     IGRAPH_FINALLY_CLEAN(1);
   }
 
