@@ -33,3 +33,12 @@ C: 3 4 6
 Partitions and cuts:
 P: 1
 C: 1
+Partitions and cuts:
+P: 0
+C: 0
+P: 0 1
+C: 1
+P: 0 1 2
+C: 2
+P: 0 1 2 3
+C: 3

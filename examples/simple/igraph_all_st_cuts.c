@@ -309,5 +309,29 @@ int main() {
   
   igraph_destroy(&g);  
 
+  /* ----------------------------------------------------------- */
+  
+  igraph_small(&g, 5, IGRAPH_DIRECTED,
+	       0,1, 1,2, 2,3, 3,4, 3,1,
+	       -1);
+
+  igraph_vector_ptr_init(&cuts, 0);
+  igraph_vector_ptr_init(&partition1s, 0);
+  igraph_all_st_cuts(&g, &cuts, &partition1s,
+		     /*source=*/ 0, /*target=*/ 4);
+
+  n=igraph_vector_ptr_size(&partition1s);
+  printf("Partitions and cuts:\n");
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v=VECTOR(partition1s)[i];
+    igraph_vector_t *v2=VECTOR(cuts)[i];
+    printf("P: ");
+    igraph_vector_print(v);
+    printf("C: ");
+    igraph_vector_print(v2);
+  }
+  
+  igraph_destroy(&g);  
+
   return 0;
 }

@@ -2891,8 +2891,7 @@ int igraph_all_st_cuts(const igraph_t *graph,
 	long int to=IGRAPH_TO(graph, j);
 	long int pfrom=VECTOR(inS)[from];
 	long int pto=VECTOR(inS)[to];
-	if ((pfrom == i+1 && pto != i+1) ||
-	    (pfrom != i+1 && pto == i+1)) {
+	if (pfrom == i+1 && pto != i+1) { 
 	  cutsize++;
 	}
       }
