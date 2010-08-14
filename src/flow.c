@@ -2144,7 +2144,7 @@ int igraph_i_inverse_residual_graph(const igraph_t *graph,
     if (VECTOR(*flow)[i] > 0) {
       no_new_edges++;
     }
-    if (VECTOR(*flow)[i] < VECTOR(*capacity)[i]) {
+    if (VECTOR(*flow)[i] < (capacity ? VECTOR(*capacity)[i] : 1.0)) {
       no_new_edges++;
     }
   }
@@ -2158,7 +2158,7 @@ int igraph_i_inverse_residual_graph(const igraph_t *graph,
       VECTOR(*tmp)[edgeptr++] = from;
       VECTOR(*tmp)[edgeptr++] = to;
     }
-    if (VECTOR(*flow)[i] < VECTOR(*capacity)[i]) {
+    if (VECTOR(*flow)[i] < (capacity ? VECTOR(*capacity)[i] : 1.0)) {
       long int from=IGRAPH_TO(graph, i);
       long int to=IGRAPH_FROM(graph, i);
       VECTOR(*tmp)[edgeptr++] = from;
@@ -2178,7 +2178,7 @@ int igraph_inverse_residual_graph(const igraph_t *graph,
   igraph_vector_t tmp;
   long int no_of_edges=igraph_ecount(graph);
   
-  if (igraph_vector_size(capacity) != no_of_edges) {
+  if (capacity && igraph_vector_size(capacity) != no_of_edges) {
     IGRAPH_ERROR("Invalid `capacity' vector size", IGRAPH_EINVAL);
   }
   if (igraph_vector_size(flow) != no_of_edges) {
