@@ -2725,7 +2725,7 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
        Isv; otherwise return Isv={}. */
     for (j=0; j<isvlen; j++) {
       long int v=VECTOR(Isv_min)[j];
-      if (VECTOR(*TV)[v]) { break; }
+      if (VECTOR(*TV)[v] || v==target) { break; }
     }
     /* We might have found one */
     if (j==isvlen) {
