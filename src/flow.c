@@ -2018,7 +2018,8 @@ int igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
  * Even-Tarjan reduction of a graph
  */
 
-int igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar) {
+int igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar,
+				 igraph_vector_t *capacity) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
@@ -2027,10 +2028,14 @@ int igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar) {
   long int new_no_of_edges=no_of_nodes + no_of_edges * 2;
   
   igraph_vector_t edges;
-  long int edgeptr=0;
+  long int edgeptr=0, capptr=0;
   long int i;
 
   IGRAPH_VECTOR_INIT_FINALLY(&edges, new_no_of_edges * 2);
+
+  if (capacity) { 
+    IGRAPH_CHECK(igraph_vector_resize(capacity, new_no_of_edges));
+  }
 
   /* Every vertex 'i' is replaced by two vertices, i' and i'' */
   /* id[i'] := id[i] ; id[i''] := id[i] + no_of_nodes */
@@ -2039,6 +2044,9 @@ int igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar) {
   for (i=0; i<no_of_nodes; i++) {
     VECTOR(edges)[edgeptr++] = i;
     VECTOR(edges)[edgeptr++] = i + no_of_nodes;
+    if (capacity) { 
+      VECTOR(*capacity)[capptr++] = 1.0;
+    }
   }
   
   /* Two news edges for each original edge 
@@ -2050,6 +2058,10 @@ int igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar) {
     VECTOR(edges)[edgeptr++] = to;
     VECTOR(edges)[edgeptr++] = to + no_of_nodes;
     VECTOR(edges)[edgeptr++] = from;
+    if (capacity) { 
+      VECTOR(*capacity)[capptr++] = no_of_nodes; /* TODO: should be Inf */
+      VECTOR(*capacity)[capptr++] = no_of_nodes; /* TODO: should be Inf */
+    }
   }
   
   IGRAPH_CHECK(igraph_create(graphbar, &edges, new_no_of_nodes, 

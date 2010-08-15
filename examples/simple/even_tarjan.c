@@ -33,7 +33,7 @@ int main() {
   /* --------------------------------------------------- */
   
   igraph_famous(&g, "meredith");
-  igraph_even_tarjan_reduction(&g, &gbar);
+  igraph_even_tarjan_reduction(&g, &gbar, /*capacity=*/ 0);
   
   igraph_vertex_connectivity(&g, &k1, /* checks= */ 0);
 
