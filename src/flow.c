@@ -38,6 +38,7 @@
 #include "igraph_visitor.h"
 #include "igraph_marked_queue.h"
 #include "igraph_stack.h"
+#include "igraph_estack.h"
 
 #include <limits.h>
 #include <stdio.h>
@@ -2592,8 +2593,7 @@ int igraph_i_all_st_cuts_minimal(const igraph_t *graph,
 
 int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
 			       const igraph_marked_queue_t *S,
-			       const igraph_stack_t *T,
-			       const igraph_vector_bool_t *TV,
+			       const igraph_estack_t *T,
 			       long int source,
 			       long int target,
 			       long int *v,
@@ -2737,7 +2737,7 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
        Isv; otherwise return Isv={}. */
     for (j=0; j<isvlen; j++) {
       long int v=VECTOR(Isv_min)[j];
-      if (VECTOR(*TV)[v] || v==target) { break; }
+      if (igraph_estack_iselement(T, v) || v==target) { break; }
     }
     /* We might have found one */
     if (j==isvlen) {
@@ -2782,8 +2782,7 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
 
 int igraph_i_all_st_cuts_list(const igraph_t *graph,
 			      igraph_marked_queue_t *S,
-			      igraph_stack_t *T,
-			      igraph_vector_bool_t *TV, 
+			      igraph_estack_t *T,
 			      long int source,
 			      long int target,
 			      igraph_vector_ptr_t *closed_sets) {
@@ -2794,7 +2793,7 @@ int igraph_i_all_st_cuts_list(const igraph_t *graph,
 
   igraph_vector_init(&Isv, 0);
   
-  igraph_i_all_st_cuts_pivot(graph, S, T, TV, source, target, &v, &Isv);
+  igraph_i_all_st_cuts_pivot(graph, S, T, source, target, &v, &Isv);
   if (igraph_vector_size(&Isv)==0) {
     if (igraph_marked_queue_size(S) != 0) {
       igraph_vector_t *vec=igraph_Calloc(1, igraph_vector_t);
@@ -2804,16 +2803,14 @@ int igraph_i_all_st_cuts_list(const igraph_t *graph,
     }
   } else {
     /* Put v into T */
-    igraph_stack_push(T, v);
-    VECTOR(*TV)[v] = 1;
+    igraph_estack_push(T, v);
 
     /* Go down left in the search tree */
-    igraph_i_all_st_cuts_list(graph, S, T, TV, source, target, 
+    igraph_i_all_st_cuts_list(graph, S, T, source, target, 
 			      closed_sets);
 
     /* Take out v from T */
-    igraph_stack_pop(T);
-    VECTOR(*TV)[v] = 0;
+    igraph_estack_pop(T);
     
     /* Add Isv to S */
     igraph_marked_queue_start_batch(S);
@@ -2826,7 +2823,7 @@ int igraph_i_all_st_cuts_list(const igraph_t *graph,
 
     /* Go down right in the search tree */
     
-    igraph_i_all_st_cuts_list(graph, S, T, TV, source, target, 
+    igraph_i_all_st_cuts_list(graph, S, T, source, target, 
 			      closed_sets);
 
     /* Take out Isv from S */
@@ -2847,15 +2844,14 @@ int igraph_all_st_cuts(const igraph_t *graph,
   /* S is a special stack, in which elements are pushed in batches. 
      It is then possible to remove the whole batch in one step.
 
-     T & TV together form a stack, that has a fast "is-element" 
-     operation. Every element has to be included at most once.
+     T is a stack with an is-element operation.
+     Every element is included at most once.
   */
 
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   igraph_marked_queue_t S;
-  igraph_stack_t T;
-  igraph_vector_bool_t TV;
+  igraph_estack_t T;
 
   if (!igraph_is_directed(graph)) {
     IGRAPH_ERROR("Listing all s-t cuts only implemented for "
@@ -2869,16 +2865,14 @@ int igraph_all_st_cuts(const igraph_t *graph,
 
   IGRAPH_CHECK(igraph_marked_queue_init(&S, no_of_nodes));
   IGRAPH_FINALLY(igraph_marked_queue_destroy, &S);
-  IGRAPH_CHECK(igraph_stack_init(&T, 0));
-  IGRAPH_FINALLY(igraph_stack_destroy, &T);
-  IGRAPH_CHECK(igraph_vector_bool_init(&TV, no_of_nodes));
-  IGRAPH_FINALLY(igraph_vector_bool_destroy, &TV);
+  IGRAPH_CHECK(igraph_estack_init(&T, no_of_nodes, 0));
+  IGRAPH_FINALLY(igraph_estack_destroy, &T);
 
   if (cuts)        { igraph_vector_ptr_clear(cuts);        }
   if (partition1s) { igraph_vector_ptr_clear(partition1s); }    
   
   /* We call it with S={}, T={} */
-  IGRAPH_CHECK(igraph_i_all_st_cuts_list(graph, &S, &T, &TV, 
+  IGRAPH_CHECK(igraph_i_all_st_cuts_list(graph, &S, &T,
 					 source, target, partition1s));
   
   if (cuts) {
@@ -2932,10 +2926,9 @@ int igraph_all_st_cuts(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
   }
 
-  igraph_vector_bool_destroy(&TV);
-  igraph_stack_destroy(&T);
+  igraph_estack_destroy(&T);
   igraph_marked_queue_destroy(&S);
-  IGRAPH_FINALLY_CLEAN(3);
+  IGRAPH_FINALLY_CLEAN(2);
 
   return 0;
 }

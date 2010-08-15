@@ -23,11 +23,11 @@
 
 #include <igraph.h>
 #include <igraph_marked_queue.h>
+#include <igraph_estack.h>
 
 int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
 			       const igraph_marked_queue_t *S,
-			       const igraph_stack_t *T,
-			       const igraph_vector_bool_t *TV,
+			       const igraph_estack_t *T,
 			       long int source,
 			       long int target,
 			       long int *v,
@@ -39,8 +39,7 @@ int main() {
   long int i, n;
 
   igraph_marked_queue_t S;
-  igraph_stack_t T;
-  igraph_vector_bool_t TV;
+  igraph_estack_t T;
   long int v;
   igraph_vector_t Isv;
 
@@ -71,13 +70,11 @@ int main() {
   igraph_marked_queue_push(&S, 0);
   
   /* T={t} */
-  igraph_stack_init(&T, 1);
-  igraph_stack_push(&T, 11);
-  igraph_vector_bool_init(&TV, igraph_vcount(&g));
-  VECTOR(TV)[11] = 1;
+  igraph_estack_init(&T, igraph_vcount(&g), 1);
+  igraph_estack_push(&T, 11);
 
   igraph_vector_init(&Isv, 0);
-  igraph_i_all_st_cuts_pivot(&g, &S, &T, &TV,
+  igraph_i_all_st_cuts_pivot(&g, &S, &T,
   				/*source=*/ 10, /*target=*/ 11,
   				&v, &Isv);
 
@@ -86,8 +83,7 @@ int main() {
   igraph_vector_print(&Isv);
   
   igraph_vector_destroy(&Isv);
-  igraph_vector_bool_destroy(&TV);
-  igraph_stack_destroy(&T);
+  igraph_estack_destroy(&T);
   igraph_marked_queue_destroy(&S);
   igraph_destroy(&g);
 
@@ -99,19 +95,17 @@ int main() {
   
   /* S={}, T={} */
   igraph_marked_queue_init(&S, igraph_vcount(&g));
-  igraph_stack_init(&T, 3);
-  igraph_vector_bool_init(&TV, igraph_vcount(&g));
+  igraph_estack_init(&T, igraph_vcount(&g), 3);
 
   igraph_vector_init(&Isv, 0);
-  igraph_i_all_st_cuts_pivot(&g, &S, &T, &TV,
+  igraph_i_all_st_cuts_pivot(&g, &S, &T,
   				/*source=*/ 0, /*target=*/ 2,
   				&v, &Isv);
   printf("%li; ", v);
   igraph_vector_print(&Isv);
 
   igraph_vector_destroy(&Isv);
-  igraph_vector_bool_destroy(&TV);
-  igraph_stack_destroy(&T);
+  igraph_estack_destroy(&T);
   igraph_marked_queue_destroy(&S);
   igraph_destroy(&g);
 
@@ -124,21 +118,18 @@ int main() {
   /* S={}, T={0} */
   igraph_marked_queue_init(&S, igraph_vcount(&g));
 
-  igraph_stack_init(&T, 3);
-  igraph_vector_bool_init(&TV, igraph_vcount(&g));
-  igraph_stack_push(&T, 0);
-  VECTOR(TV)[0]=1;
+  igraph_estack_init(&T, igraph_vcount(&g), 3);
+  igraph_estack_push(&T, 0);
 
   igraph_vector_init(&Isv, 0);
-  igraph_i_all_st_cuts_pivot(&g, &S, &T, &TV,
+  igraph_i_all_st_cuts_pivot(&g, &S, &T,
   				/*source=*/ 0, /*target=*/ 2,
   				&v, &Isv);
   printf("%li; ", v);
   igraph_vector_print(&Isv);
 
   igraph_vector_destroy(&Isv);
-  igraph_vector_bool_destroy(&TV);
-  igraph_stack_destroy(&T);
+  igraph_estack_destroy(&T);
   igraph_marked_queue_destroy(&S);
   igraph_destroy(&g);
 
@@ -152,19 +143,17 @@ int main() {
   igraph_marked_queue_init(&S, igraph_vcount(&g));
   igraph_marked_queue_push(&S, 0);
 
-  igraph_stack_init(&T, 3);
-  igraph_vector_bool_init(&TV, igraph_vcount(&g));
+  igraph_estack_init(&T, igraph_vcount(&g), 3);
 
   igraph_vector_init(&Isv, 0);
-  igraph_i_all_st_cuts_pivot(&g, &S, &T, &TV,
+  igraph_i_all_st_cuts_pivot(&g, &S, &T,
   				/*source=*/ 0, /*target=*/ 2,
   				&v, &Isv);
   printf("%li; ", v);
   igraph_vector_print(&Isv);
 
   igraph_vector_destroy(&Isv);
-  igraph_vector_bool_destroy(&TV);
-  igraph_stack_destroy(&T);
+  igraph_estack_destroy(&T);
   igraph_marked_queue_destroy(&S);
   igraph_destroy(&g);
 
@@ -178,21 +167,18 @@ int main() {
   igraph_marked_queue_init(&S, igraph_vcount(&g));
   igraph_marked_queue_push(&S, 0);
 
-  igraph_stack_init(&T, 3);
-  igraph_vector_bool_init(&TV, igraph_vcount(&g));
-  igraph_stack_push(&T, 1);
-  VECTOR(TV)[1] = 1;
+  igraph_estack_init(&T, igraph_vcount(&g), 3);
+  igraph_estack_push(&T, 1);
 
   igraph_vector_init(&Isv, 0);
-  igraph_i_all_st_cuts_pivot(&g, &S, &T, &TV,
+  igraph_i_all_st_cuts_pivot(&g, &S, &T,
   				/*source=*/ 0, /*target=*/ 2,
   				&v, &Isv);
   printf("%li; ", v);
   igraph_vector_print(&Isv);
 
   igraph_vector_destroy(&Isv);
-  igraph_vector_bool_destroy(&TV);
-  igraph_stack_destroy(&T);
+  igraph_estack_destroy(&T);
   igraph_marked_queue_destroy(&S);
   igraph_destroy(&g);
 
@@ -207,19 +193,17 @@ int main() {
   igraph_marked_queue_push(&S, 0);
   igraph_marked_queue_push(&S, 1);
 
-  igraph_stack_init(&T, 3);
-  igraph_vector_bool_init(&TV, igraph_vcount(&g));
+  igraph_estack_init(&T, igraph_vcount(&g), 3);
 
   igraph_vector_init(&Isv, 0);
-  igraph_i_all_st_cuts_pivot(&g, &S, &T, &TV,
+  igraph_i_all_st_cuts_pivot(&g, &S, &T,
   				/*source=*/ 0, /*target=*/ 2,
   				&v, &Isv);
   printf("%li; ", v);
   igraph_vector_print(&Isv);
 
   igraph_vector_destroy(&Isv);
-  igraph_vector_bool_destroy(&TV);
-  igraph_stack_destroy(&T);
+  igraph_estack_destroy(&T);
   igraph_marked_queue_destroy(&S);
   igraph_destroy(&g);
 

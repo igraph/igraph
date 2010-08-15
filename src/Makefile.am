@@ -101,7 +101,7 @@ HEADERS_PRIVATE = atlas-edges.h \
 		gengraph_graph_molloy_optimized.h \
 		gengraph_hash.h gengraph_header.h gengraph_powerlaw.h \
 		gengraph_qsort.h gengraph_random.h gengraph_vertex_cover.h \
-		igraph_marked_queue.h
+		igraph_marked_queue.h igraph_estack.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
@@ -178,7 +178,7 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     $(CS) sparsemat.c mixing.c bigint.c bignum.c \
 			     version.c optimal_modularity.c \
 			     igraph_fixed_vectorlist.c separators.c \
-			     igraph_marked_queue.c
+			     igraph_marked_queue.c igraph_estack.c
 
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall
