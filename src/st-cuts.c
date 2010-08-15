@@ -624,7 +624,8 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
 			       long int source,
 			       long int target,
 			       long int *v,
-			       igraph_vector_t *Isv) {
+			       igraph_vector_t *Isv,
+			       void *arg) {
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_t Sbar;
@@ -807,12 +808,14 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
 /* TODO: This is a temporary resursive version, without proper error
    handling */
 
-int igraph_i_all_st_cuts_list(const igraph_t *graph,
-			      igraph_marked_queue_t *S,
-			      igraph_estack_t *T,
-			      long int source,
-			      long int target,
-			      igraph_vector_ptr_t *closed_sets) {
+int igraph_provan_shier_list(const igraph_t *graph,
+			     igraph_marked_queue_t *S,
+			     igraph_estack_t *T,
+			     long int source,
+			     long int target,
+			     igraph_vector_ptr_t *result,
+			     igraph_provan_shier_pivot_t *pivot,
+			     void *pivot_arg) {
 
   igraph_vector_t Isv;
   long int v=0;
@@ -820,21 +823,21 @@ int igraph_i_all_st_cuts_list(const igraph_t *graph,
 
   igraph_vector_init(&Isv, 0);
   
-  igraph_i_all_st_cuts_pivot(graph, S, T, source, target, &v, &Isv);
+  pivot(graph, S, T, source, target, &v, &Isv, pivot_arg);
   if (igraph_vector_size(&Isv)==0) {
     if (igraph_marked_queue_size(S) != 0) {
       igraph_vector_t *vec=igraph_Calloc(1, igraph_vector_t);
       igraph_vector_init(vec, igraph_marked_queue_size(S));
       igraph_marked_queue_as_vector(S, vec);
-      igraph_vector_ptr_push_back(closed_sets, vec);
+      igraph_vector_ptr_push_back(result, vec);
     }
   } else {
     /* Put v into T */
     igraph_estack_push(T, v);
 
     /* Go down left in the search tree */
-    igraph_i_all_st_cuts_list(graph, S, T, source, target, 
-			      closed_sets);
+    igraph_provan_shier_list(graph, S, T, source, target, 
+			     result, pivot, pivot_arg);
 
     /* Take out v from T */
     igraph_estack_pop(T);
@@ -850,8 +853,8 @@ int igraph_i_all_st_cuts_list(const igraph_t *graph,
 
     /* Go down right in the search tree */
     
-    igraph_i_all_st_cuts_list(graph, S, T, source, target, 
-			      closed_sets);
+    igraph_provan_shier_list(graph, S, T, source, target, 
+			     result, pivot, pivot_arg);
 
     /* Take out Isv from S */
     igraph_marked_queue_pop_back_batch(S);
@@ -899,8 +902,10 @@ int igraph_all_st_cuts(const igraph_t *graph,
   if (partition1s) { igraph_vector_ptr_clear(partition1s); }    
   
   /* We call it with S={}, T={} */
-  IGRAPH_CHECK(igraph_i_all_st_cuts_list(graph, &S, &T,
-					 source, target, partition1s));
+  IGRAPH_CHECK(igraph_provan_shier_list(graph, &S, &T,
+					source, target, partition1s,
+					igraph_i_all_st_cuts_pivot, 
+					/*pivot_arg=*/ 0));
   
   if (cuts) {
     igraph_vector_long_t inS;
