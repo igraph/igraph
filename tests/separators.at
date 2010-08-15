@@ -31,8 +31,13 @@ AT_KEYWORDS([minimal vertex separator])
 AT_COMPILE_CHECK([simple/igraph_is_minimal_separator.c])
 AT_CLEANUP
 
-AT_SETUP([Minimal separators (igraph_minimal_separators): ])
+AT_SETUP([Minimal separators (igraph_all_minimal_ab_separators): ])
 AT_KEYWORDS([minimal separator])
 AT_COMPILE_CHECK([simple/igraph_minimal_separators.c])
 AT_CLEANUP
 
+AT_SETUP([Minimum size separators (igraph_minimum_size_separators): ])
+AT_KEYWORDS([minimum size separators])
+AT_COMPILE_CHECK([simple/igraph_minimum_size_separators.c],
+                 [simple/igraph_minimum_size_separators.out])
+AT_CLEANUP

@@ -27,6 +27,11 @@
 #include "igraph_dqueue.h"
 #include "igraph_vector.h"
 #include "igraph_interface.h"
+#include "igraph_flow.h"
+#include "igraph_components.h"
+#include "igraph_structural.h"
+#include "igraph_constructors.h"
+#include "igraph_stack.h"
 
 int igraph_i_is_separator(const igraph_t *graph,
 			  const igraph_vector_long_t *candidate,
@@ -446,3 +451,155 @@ int igraph_all_minimal_ab_separators(const igraph_t *graph,
 
 #undef UPDATEMARK
 
+
+/** 
+ * \function igraph_minimum_size_separators
+ * Find all minimum size separating vertex sets
+ */
+
+int igraph_minimum_size_separators(const igraph_t *graph,
+				   igraph_vector_ptr_t *separators) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_integer_t conn; long int k;  
+  igraph_vector_long_t X;
+  long int i, j;
+  igraph_bool_t issepX;
+  igraph_t Gbar;
+  igraph_vector_t phi;
+  igraph_t graph_copy;
+  igraph_vector_t capacity;
+
+  igraph_vector_ptr_clear(separators);
+  IGRAPH_FINALLY(igraph_i_separators_free, separators);
+
+  /* ---------------------------------------------------------------- */
+  /* 1 Find the vertex connectivity of 'graph' */
+  IGRAPH_CHECK(igraph_vertex_connectivity(graph, &conn, 
+					  /* checks= */ 1)); k=conn;
+
+  /* Special cases for low connectivity, two exits here! */
+  if (conn==0) {
+    /* Nothing to do */
+    IGRAPH_FINALLY_CLEAN(1);	/* separators */
+    return 0;
+  } else if (conn==1) {
+    igraph_vector_t ap;
+    long int i, n;
+    IGRAPH_VECTOR_INIT_FINALLY(&ap, 0);
+    IGRAPH_CHECK(igraph_articulation_points(graph, &ap));
+    n=igraph_vector_size(&ap);
+    IGRAPH_CHECK(igraph_vector_ptr_resize(separators, n));
+    igraph_vector_ptr_null(separators);
+    for (i=0; i<n; i++) {
+      igraph_vector_t *v=igraph_Calloc(1, igraph_vector_t);
+      if (!v) { 
+	IGRAPH_ERROR("Minimum size separators failed", IGRAPH_ENOMEM); 
+      }
+      IGRAPH_VECTOR_INIT_FINALLY(v, 1);
+      VECTOR(*v)[0] = VECTOR(ap)[i];
+      VECTOR(*separators)[i]=v;
+      IGRAPH_FINALLY_CLEAN(1);
+    }
+    igraph_vector_destroy(&ap);
+    IGRAPH_FINALLY_CLEAN(2);	/* +1 for separators */
+    return 0;
+  }
+
+  /* Work on a copy of 'graph' */
+  IGRAPH_CHECK(igraph_copy(&graph_copy, graph));
+  IGRAPH_FINALLY(igraph_destroy, &graph_copy);
+
+  /* ---------------------------------------------------------------- */
+  /* 2 Find k vertices with the largest degrees (x1;..,xk). Check
+     if these k vertices form a separating k-set of G */
+  /* TODO: right now we just take the k first vertices. */
+  IGRAPH_CHECK(igraph_vector_long_init(&X, conn));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &X);
+  for (i=0; i<conn; i++) {
+    VECTOR(X)[i]=i;
+  }
+  IGRAPH_CHECK(igraph_is_separator(&graph_copy, &X, &issepX));
+  if (issepX) {
+    igraph_vector_t *v=igraph_Calloc(1, igraph_vector_t);
+    if (!v) { 
+      IGRAPH_ERROR("Cannot find minimal size separators", IGRAPH_ENOMEM);
+    }
+    IGRAPH_VECTOR_INIT_FINALLY(v, k);
+    for (i=0; i<k; i++) {
+      VECTOR(*v)[i] = VECTOR(X)[i];
+    }
+    IGRAPH_CHECK(igraph_vector_ptr_push_back(separators, v));
+    IGRAPH_FINALLY_CLEAN(1);    
+  }
+
+  /* Create Gbar, the Even-Tarjan reduction of graph */
+  IGRAPH_VECTOR_INIT_FINALLY(&capacity, 0);
+  IGRAPH_CHECK(igraph_even_tarjan_reduction(&graph_copy, &Gbar, &capacity));
+  IGRAPH_FINALLY(igraph_destroy, &Gbar);
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&phi, no_of_edges);
+  
+  /* ---------------------------------------------------------------- */  
+  /* 3 If v[j] != x[i] and v[j] is not adjacent to x[i] then */
+  for (i=0; i<k; i++) {
+    for (j=0; j<no_of_nodes; j++) {
+      long int ii=VECTOR(X)[i];
+      igraph_real_t phivalue;
+      igraph_bool_t conn;
+      
+      if (ii == j) { continue; } /* the same vertex */
+      igraph_are_connected(&graph_copy, ii,  j, &conn);
+      if (conn) { continue; }	/* they are connected */
+
+      /* --------------------------------------------------------------- */  
+      /* 4 Compute a maximum flow phi in Gbar from x[i] to v[j].
+	 If |phi|=k, then */      
+      IGRAPH_CHECK(igraph_maxflow(&Gbar, &phivalue, &phi, /*cut=*/ 0, 
+				  /*partition=*/ 0, /*partition2=*/ 0, 
+				  /* source= */ ii+no_of_nodes, 
+				  /* target= */ j,
+				  &capacity));
+
+      if (phivalue == k) {
+
+	/* ------------------------------------------------------------- */  
+	/* 5-6-7. Find all k-sets separating x[i] and v[j]. */
+	igraph_vector_ptr_t stcuts;
+	IGRAPH_CHECK(igraph_vector_ptr_init(&stcuts, 0));
+	IGRAPH_FINALLY(igraph_vector_ptr_destroy, &stcuts);
+	/* TODO: proper destructor for stcuts */
+	IGRAPH_CHECK(igraph_all_st_mincuts(&Gbar, /*value=*/ 0, 
+					   /*cuts=*/ &stcuts,
+					   /*partitions1s=*/ 0, 
+					   /*source=*/ ii+no_of_nodes,
+					   /*target=*/ j,
+					   /*capacity=*/ &capacity));
+
+	IGRAPH_CHECK(igraph_vector_ptr_append(separators, &stcuts));
+	igraph_vector_ptr_destroy(&stcuts);
+	IGRAPH_FINALLY_CLEAN(1);
+
+      }	/* if phivalue == k */
+      
+      /* --------------------------------------------------------------- */
+      /* 8 Add edge (x[i],v[j]) to G. */
+      IGRAPH_CHECK(igraph_add_edge(&graph_copy, ii, j));
+      IGRAPH_CHECK(igraph_add_edge(&Gbar, ii+no_of_nodes, j));
+      IGRAPH_CHECK(igraph_add_edge(&Gbar, j+no_of_nodes, ii));
+      IGRAPH_CHECK(igraph_vector_push_back(&capacity, no_of_nodes));
+      IGRAPH_CHECK(igraph_vector_push_back(&capacity, no_of_nodes));
+      
+    } /* for j<no_of_nodes */
+  } /* for i<k */
+
+  igraph_vector_destroy(&phi);
+  igraph_destroy(&Gbar);
+  igraph_vector_destroy(&capacity);
+  igraph_vector_long_destroy(&X);
+  igraph_destroy(&graph_copy);
+  IGRAPH_FINALLY_CLEAN(6);	/* +1 for separators */
+  
+  return 0;
+}
