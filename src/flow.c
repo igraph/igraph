@@ -3020,8 +3020,8 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
   }
   
   nocuts=igraph_vector_ptr_size(&closedsets);
-  igraph_vector_ptr_clear(partition1s);
-  IGRAPH_CHECK(igraph_vector_ptr_reserve(partition1s, nocuts));
+  igraph_vector_ptr_clear(mypartition1s);
+  IGRAPH_CHECK(igraph_vector_ptr_reserve(mypartition1s, nocuts));
   for (i=0; i<nocuts; i++) {
     igraph_vector_t *supercut=VECTOR(closedsets)[i];
     long int j, supercutsize=igraph_vector_size(supercut);
@@ -3036,7 +3036,7 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
 	ovtx=VECTOR(revmap_next)[ovtx];
       }
     }
-    igraph_vector_ptr_push_back(partition1s, cut);
+    igraph_vector_ptr_push_back(mypartition1s, cut);
     IGRAPH_FINALLY_CLEAN(1);
   }    
 
@@ -3054,7 +3054,7 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
     IGRAPH_FINALLY(igraph_vector_long_destroy, &memb);
     IGRAPH_CHECK(igraph_vector_ptr_resize(cuts, nocuts));
     for (i=0; i<nocuts; i++) {
-      igraph_vector_t *part=VECTOR(*partition1s)[i];
+      igraph_vector_t *part=VECTOR(*mypartition1s)[i];
       long int j, n=igraph_vector_size(part);
       igraph_vector_t *v;
       v=igraph_Calloc(1, igraph_vector_t);
