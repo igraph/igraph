@@ -113,12 +113,12 @@ int igraph_i_residual_graph(const igraph_t *graph,
 			    const igraph_vector_t *flow, 
 			    igraph_vector_t *tmp);
 
-int igraph_i_inverse_residual_graph(const igraph_t *graph,
+int igraph_i_reverse_residual_graph(const igraph_t *graph,
 				    const igraph_vector_t *capacity,
 				    igraph_t *residual,
 				    const igraph_vector_t *flow,
 				    igraph_vector_t *tmp);
-int igraph_inverse_residual_graph(const igraph_t *graph,
+int igraph_reverse_residual_graph(const igraph_t *graph,
 				  const igraph_vector_t *capacity,
 				  igraph_t *residual,
 				  const igraph_vector_t *flow);

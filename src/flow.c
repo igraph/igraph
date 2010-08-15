@@ -2141,7 +2141,7 @@ int igraph_residual_graph(const igraph_t *graph,
   return 0;
 }
 
-int igraph_i_inverse_residual_graph(const igraph_t *graph,
+int igraph_i_reverse_residual_graph(const igraph_t *graph,
 				    const igraph_vector_t *capacity,
 				    igraph_t *residual,
 				    const igraph_vector_t *flow,
@@ -2153,10 +2153,11 @@ int igraph_i_inverse_residual_graph(const igraph_t *graph,
   long int edgeptr=0;
 
   for (i=0; i<no_of_edges; i++) {
+    igraph_real_t cap=capacity ? VECTOR(*capacity)[i] : 1.0;
     if (VECTOR(*flow)[i] > 0) {
       no_new_edges++;
     }
-    if (VECTOR(*flow)[i] < (capacity ? VECTOR(*capacity)[i] : 1.0)) {
+    if (VECTOR(*flow)[i] < cap) {
       no_new_edges++;
     }
   }
@@ -2164,17 +2165,16 @@ int igraph_i_inverse_residual_graph(const igraph_t *graph,
   IGRAPH_CHECK(igraph_vector_resize(tmp, no_new_edges*2));
 
   for (i=0; i<no_of_edges; i++) {
+    long int from=IGRAPH_FROM(graph, i);
+    long int to=IGRAPH_TO(graph, i);
+    igraph_real_t cap=capacity ? VECTOR(*capacity)[i] : 1.0;
     if (VECTOR(*flow)[i] > 0) {
-      long int from=IGRAPH_FROM(graph, i);
-      long int to=IGRAPH_TO(graph, i);
       VECTOR(*tmp)[edgeptr++] = from;
       VECTOR(*tmp)[edgeptr++] = to;
     }
-    if (VECTOR(*flow)[i] < (capacity ? VECTOR(*capacity)[i] : 1.0)) {
-      long int from=IGRAPH_TO(graph, i);
-      long int to=IGRAPH_FROM(graph, i);
-      VECTOR(*tmp)[edgeptr++] = from;
+    if (VECTOR(*flow)[i] < cap) {
       VECTOR(*tmp)[edgeptr++] = to;
+      VECTOR(*tmp)[edgeptr++] = from;
     }
   }
   
@@ -2183,7 +2183,7 @@ int igraph_i_inverse_residual_graph(const igraph_t *graph,
   return 0;
 }
   
-int igraph_inverse_residual_graph(const igraph_t *graph,
+int igraph_reverse_residual_graph(const igraph_t *graph,
 				  const igraph_vector_t *capacity,
 				  igraph_t *residual,
 				  const igraph_vector_t *flow) {
@@ -2198,7 +2198,7 @@ int igraph_inverse_residual_graph(const igraph_t *graph,
   }
   IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
   
-  IGRAPH_CHECK(igraph_i_inverse_residual_graph(graph, capacity, residual,
+  IGRAPH_CHECK(igraph_i_reverse_residual_graph(graph, capacity, residual,
 					       flow, &tmp));
   
   igraph_vector_destroy(&tmp);
@@ -2969,11 +2969,6 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
     IGRAPH_ERROR("`source' and 'target' are the same vertex", IGRAPH_EINVAL);
   }
   
-  if (capacity) {
-    IGRAPH_WARNING("Capacity vector ignored, "
-		   "not implemented for weighted graphs");
-  }
-
   if (!partition1s) {
     mypartition1s=&vpartition1s;
     IGRAPH_CHECK(igraph_vector_ptr_init(mypartition1s, 0));
@@ -2987,8 +2982,8 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
 			      /*source=*/ source, /*target=*/ target, 
 			      capacity));
 
-  /* Then we need the inverse residual graph */
-  IGRAPH_CHECK(igraph_inverse_residual_graph(graph, capacity, &residual,
+  /* Then we need the reverse residual graph */
+  IGRAPH_CHECK(igraph_reverse_residual_graph(graph, capacity, &residual,
 					     &flow));
   IGRAPH_FINALLY(igraph_destroy, &residual);
 
