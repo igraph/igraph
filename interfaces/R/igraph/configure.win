@@ -28,5 +28,5 @@ else
      R_PACKAGE_DIR=${DPKG}
   fi
 
-  cp $LIB_ZLIB/bin/zlib1.dll $LIB_XML/bin/libxml2.dll ${R_PACKAGE_DIR}/libs${R_ARCH}
+  cp $LIB_ZLIB/bin/zlib1.dll $LIB_XML/bin/libxml2.dll $LIB_ICONV/bin/iconv.dll ${R_PACKAGE_DIR}/libs${R_ARCH}
 fi
