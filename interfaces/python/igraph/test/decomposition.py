@@ -65,7 +65,7 @@ class ClusteringTests(unittest.TestCase):
     def testClusteringSizes(self):
         self.failUnless(self.cl.sizes() == [3, 4, 1, 0, 2])
         self.failUnless(self.cl.sizes(2, 4, 1) == [1, 2, 4])
-        self.failUnless(self.cl.sizes(2) == [1])
+        self.failUnless(self.cl.size(2) == 1)
 
     def testClusteringHistogram(self):
         self.failUnless(isinstance(self.cl.size_histogram(), Histogram))
