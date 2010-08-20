@@ -85,6 +85,20 @@ int igraph_i_is_separator(const igraph_t *graph,
   return 0;
 }
 
+/**
+ * \function igraph_is_separator
+ * Decides whether the removal of a set of vertices disconnects the graph
+ * 
+ * \param graph The input graph. It may be directed, but edge
+ *        directions are ignored.
+ * \param condidate Pointer to a vector of integers, the candidate
+ *        separator. It must not contain all vertices.
+ * \param res Pointer to a boolean variable, the result is stored here.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), linear in the number vertices and edges.
+ */
+
 int igraph_is_separator(const igraph_t *graph, 
 			const igraph_vector_long_t *candidate,
 			igraph_bool_t *res) {
@@ -110,6 +124,32 @@ int igraph_is_separator(const igraph_t *graph,
 
   return 0;
 }
+
+/**
+ * \function igraph_is_minimal_separator
+ * Decides whether a set of vertices is a minimal separator
+ * 
+ * A set of vertices is a minimal separator, if the removal of the
+ * vertices disconnects the graph, and this is not true for any subset
+ * of the set.
+ * 
+ * </para><para>This implementation first checks that the given
+ * candidate is a separator, by calling \ref
+ * igraph_is_separator(). If it is a separator, then it checks that
+ * each subset of size n-1, where n is the size of the candidate, is
+ * not a separator.
+ * \param graph The input graph. It may be directed, but edge
+ *        directions are ignored.
+ * \param candidate Pointer to a vector of long integers, the
+ *        candidate minimal separator.
+ * \param res Pointer to a boolean variable, the result is stored
+ *        here.
+ * \return Error code.
+ * 
+ * Time complexity: O(n(|V|+|E|)), |V| is the number of vertices, |E|
+ * is the number of edges, n is the number vertices in the candidate
+ * separator.
+ */
 
 int igraph_is_minimal_separator(const igraph_t *graph,
 				const igraph_vector_long_t *candidate, 
@@ -325,6 +365,34 @@ void igraph_i_separators_free(igraph_vector_ptr_t *separators) {
   }
 }
 
+/**
+ * \function igraph_all_minimal_ab_separators
+ * List all vertex sets that are minimal (a,b) separators for some a and b
+ * 
+ * This function lists all vertex sets that are minimal (a,b)
+ * separators for some (a,b) vertex pair.
+ * 
+ * </para><para>See more about the implemented algorithm in 
+ * Anne Berry, Jean-Paul Bordat and Olivier Cogis: Generating All the
+ * Minimal Separators of a Graph, In: Peter Widmayer, Gabriele Neyer
+ * and Stephan Eidenbenz (editors): Graph-theoretic concepts in
+ * computer science, 1665, 167--172, 1999. Springer.
+ * 
+ * \param graph The input graph. It may be directed, but edge
+ *        directions are ignored.
+ * \param separators An initialized pointer vector, the separators
+ *        are stored here. It is a list of pointers to igraph_vector_t
+ *        objects. Each vector will contain the ids of the vertices in
+ *        the separator. 
+ *        To free all memory allocated for \c separators, you need call 
+ *        \ref igraph_vector_destroy() and then \ref igraph_free() on
+ *        each element, before destroying the pointer vector itself.
+ * \return Error code.
+ * 
+ * Time complexity: O(n|V|^3), |V| is the number of vertices, n is the
+ * number of separators.
+ */
+
 int igraph_all_minimal_ab_separators(const igraph_t *graph, 
 				     igraph_vector_ptr_t *separators) {
 
@@ -487,6 +555,26 @@ int igraph_i_minimum_size_separators_topkdeg(const igraph_t *graph,
 /** 
  * \function igraph_minimum_size_separators
  * Find all minimum size separating vertex sets
+ * 
+ * This function lists all separator vertex sets of minimum size. 
+ * A vertex set is a separator if its removal disconnects the graph.
+ * 
+ * </para><para>The implementation is based on the following paper:
+ * Arkady Kanevsky: Finding all minimum-size separating vertex sets in
+ * a graph, Networks 23, 533--541, 1993.
+ * 
+ * \param graph The input graph, it may be directed, but edge
+ *        directions will be ignored.
+ * \param separators An initialized pointer vector, the separators
+ *        are stored here. It is a list of pointers to igraph_vector_t
+ *        objects. Each vector will contain the ids of the vertices in
+ *        the separator. 
+ *        To free all memory allocated for \c separators, you need call 
+ *        \ref igraph_vector_destroy() and then \ref igraph_free() on
+ *        each element, before destroying the pointer vector itself.
+ * \return Error code.
+ * 
+ * Time complexity: TODO.
  */
 
 int igraph_minimum_size_separators(const igraph_t *graph,

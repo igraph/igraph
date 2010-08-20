@@ -41,7 +41,7 @@
 #include "igraph_stack.h"
 #include "igraph_estack.h"
 
-/**
+/*
  * \function igraph_even_tarjan_reduction
  * Even-Tarjan reduction of a graph
  */
@@ -328,6 +328,56 @@ long int igraph_i_dominator_EVAL(long int v,
 }
 
 /* TODO: implement the faster version. */
+
+/** 
+ * \function igraph_dominator_tree
+ * Calculates the dominator tree of a flowgraph
+ * 
+ * A flowgraph is a directed graph with a distinguished start (or
+ * root) vertex r, such that for any vertex v, there is a path from r
+ * to v. A vertex v dominates another vertex w (not equal to v), if
+ * every path from r to w contains v. Vertex v is the immediate
+ * dominator or w, v=idom(w), if v dominates w and every other
+ * dominator of w dominates v. The edges {(idom(w), w)| w is not r}
+ * form a directed tree, rooted at r, called the dominator tree of the
+ * graph. Vertex v dominates vertex w if and only if v is an ancestor
+ * of w in the dominator tree.
+ * 
+ * </para><para>This function implements the Lengauer-Tarjan algorithm
+ * to construct the dominator tree of a directed graph. For details
+ * please see Thomas Lengauer, Robert Endre Tarjan: A fast algorithm
+ * for finding dominators in a flowgraph, ACM Transactions on
+ * Programming Languages and Systems (TOPLAS) I/1, 121--141, 1979.
+ * 
+ * \param graph A directed graph. If it is not a flowgraph, and it
+ *        contains some vertices not reachable from the root vertex,
+ *        then these vertices will be collected in the \c leftout
+ *        vector.
+ * \param root The id of the root (or source) vertex, this will be the
+ *        root of the tree.
+ * \param dom Pointer to an initialized vector or a null pointer. If
+ *        not a null pointer, then the immediate dominator of each
+ *        vertex will be stored here. For vertices that are not
+ *        reachable from the root, \c IGRAPH_NAN is stored here. For
+ *        the root vertex itself, -1 is added.
+ * \param domtree Pointer to an uninitialized igraph_t, or NULL. If
+ *        not a null pointer, then the dominator tree is returned
+ *        here. The graph contains the vertices that are unreachable
+ *        from the root (if any), these will be isolates.
+ * \param leftout Pointer to an initialized vector object, or NULL. If
+ *        not NULL, then the ids of the vertices that are unreachable
+ *        from the root vertex (and thus not part of the dominator
+ *        tree) are stored here.
+ * \param mode Constant, must be \c IGRAPH_IN or \c IGRAPH_OUT. If it
+ *        is \c IGRAPH_IN, then all directions are considered as
+ *        opposite to the original one in the input graph.
+ * \return Error code.
+ * 
+ * Time complexity: very close to O(|E|+|V|), linear in the number of
+ * edges and vertices. More precisely, it is O(|V|+|E|alpha(|E|,|V|)),
+ * where alpha(|E|,|V|) is a functional inverse of Ackermann's
+ * function.
+ */
 
 int igraph_dominator_tree(const igraph_t *graph,
 			  igraph_integer_t root,
@@ -867,6 +917,40 @@ int igraph_provan_shier_list(const igraph_t *graph,
   return 0;
 }
 
+/**
+ * \function igraph_all_st_cuts
+ * List all edge-cuts between two vertices in a directed graph
+ * 
+ * This function lists all edge-cuts between a source and a target
+ * vertex. Every cut is listed exactly once. The implemented algorithm
+ * is described in JS Provan and DR Shier: A Paradigm for listing
+ * (s,t)-cuts in graphs, Algorithmica 15, 351--372, 1996.
+ * 
+ * \param graph The input graph, is must be directed.
+ * \param cuts An initialized pointer vector, the cuts are stored
+ *        here. It is a list of pointers to igraph_vector_t
+ *        objects. Each vector will contain the ids of the edges in
+ *        the cut. This argument is ignored if it is a null pointer.
+ *        To free all memory allocated for \c cuts, you need call 
+ *        \ref igraph_vector_destroy() and then \ref igraph_free() on
+ *        each element, before destroying the pointer vector itself.
+ * \param partition1s An initialized pointer vector, the list of
+ *        vertex sets, generating the actual edge cuts, are stored
+ *        here. Each vector contains a set of vertex ids. If X is such
+ *        a set, then all edges going from X to the complement of X
+ *        form an (s,t) edge-cut in the graph. This argument is
+ *        ignored if it is a null pointer.
+ *        To free all memory allocated for \c partition1s, you need call 
+ *        \ref igraph_vector_destroy() and then \ref igraph_free() on
+ *        each element, before destroying the pointer vector itself.
+ * \param source The id of the source vertex.
+ * \param target The id of the target vertex.
+ * \return Error code.
+ * 
+ * Time complexity: O(n(|V|+|E|)), where |V| is the number of
+ * vertices, |E| is the number of edges, and n is the number of cuts.
+ */
+
 int igraph_all_st_cuts(const igraph_t *graph,
 		       igraph_vector_ptr_t *cuts,
 		       igraph_vector_ptr_t *partition1s,
@@ -1187,6 +1271,43 @@ int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
 
   return 0;
 }
+
+/** 
+ * \function igraph_all_st_mincuts
+ * All minimum s-t cuts of a directed graph
+ * 
+ * This function lists all minimum edge cuts between two vertices, in a
+ * directed graph. The implemented algorithm
+ * is described in JS Provan and DR Shier: A Paradigm for listing
+ * (s,t)-cuts in graphs, Algorithmica 15, 351--372, 1996.
+ * 
+ * \param graph The input graph, it must be directed.
+ * \param value Pointer to a real number, the value of the minimum cut
+ *        is stored here, unless it is a null pointer.
+ * \param cuts An initialized pointer vector, the cuts are stored
+ *        here. It is a list of pointers to igraph_vector_t
+ *        objects. Each vector will contain the ids of the edges in
+ *        the cut. This argument is ignored if it is a null pointer.
+ *        To free all memory allocated for \c cuts, you need call 
+ *        \ref igraph_vector_destroy() and then \ref igraph_free() on
+ *        each element, before destroying the pointer vector itself.
+ * \param partition1s An initialized pointer vector, the list of
+ *        vertex sets, generating the actual edge cuts, are stored
+ *        here. Each vector contains a set of vertex ids. If X is such
+ *        a set, then all edges going from X to the complement of X
+ *        form an (s,t) edge-cut in the graph. This argument is
+ *        ignored if it is a null pointer.
+ * \param source The id of the source vertex.
+ * \param target The id of the target vertex.
+ * \param capacity Vector of edge capacities. If this is a null
+ *        pointer, then all edges are assumed to have capacity one.
+ * \return Error code.
+ * 
+ * Time complexity: O(n(|V|+|E|))+O(F), where |V| is the number of
+ * vertices, |E| is the number of edges, and n is the number of cuts;
+ * O(F) is the time complexity of the maximum flow algorithm, see \ref
+ * igraph_maxflow().
+ */
 
 int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
 			  igraph_vector_ptr_t *cuts,
