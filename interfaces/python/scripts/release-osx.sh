@@ -30,6 +30,9 @@ fi
 # Clean up the previous build directory
 rm -rf build/
 
+# Set up ARCHFLAGS to ensure that we build a multi-arch Python extension
+export ARCHFLAGS="-arch ppc -arch i386 -arch x86_64"
+
 # For each Python version, build the .mpkg and the .dmg
 for PYVER in $PYTHON_VERSIONS; do
 	python$PYVER setup.py build_ext -I ../../include -L `dirname $FATLIB` || exit 3
