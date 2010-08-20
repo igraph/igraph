@@ -680,7 +680,9 @@ igraph_contract_vertices:
 #######################################
 
 igraph_bfs:
-        PARAMS: GRAPH graph, INTEGER root, NEIMODE mode=OUT, \
+        PARAMS: GRAPH graph, INTEGER root, VECTOR_OR_0 roots, \
+                NEIMODE mode=OUT, BOOLEAN unreachable, \
+                VECTOR_OR_0 restricted, \
                 OUT VECTOR_OR_0 order, OUT VECTOR_OR_0 rank, \
                 OUT VECTOR_OR_0 father, \
                 OUT VECTOR_OR_0 pred, OUT VECTOR_OR_0 succ, \
@@ -689,6 +691,7 @@ igraph_bfs:
 
 igraph_dfs:
         PARAMS: GRAPH graph, INTEGER root, NEIMODE mode=OUT, \
+                BOOLEAN unreachable, \
                 OUT VECTOR_OR_0 order, OUT VECTOR_OR_0 order_out, \
                 OUT VECTOR_OR_0 dist, DFS_FUNC in_callback, \
                 DFS_FUNC out_callback, EXTRA extra=NULL
