@@ -641,6 +641,23 @@ int igraph_minimum_size_separators(const igraph_t *graph,
     igraph_vector_destroy(&ap);
     IGRAPH_FINALLY_CLEAN(2);	/* +1 for separators */
     return 0;
+  } else if (conn==no_of_nodes-1) {
+    long int k;
+    IGRAPH_CHECK(igraph_vector_ptr_resize(separators, no_of_nodes));
+    igraph_vector_ptr_null(separators);
+    for (i=0; i<no_of_nodes; i++) {
+      igraph_vector_t *v=igraph_Calloc(1, igraph_vector_t);
+      if (!v) {
+	IGRAPH_ERROR("Cannot list minimum size separators", IGRAPH_ENOMEM);
+      }
+      IGRAPH_VECTOR_INIT_FINALLY(v, no_of_nodes-1);
+      for (j=0, k=0; j<no_of_nodes; j++) {
+	if (j!=i) { VECTOR(*v)[k++] = j; }
+      }
+      VECTOR(*separators)[i]=v;
+      IGRAPH_FINALLY_CLEAN(1);
+    }
+    return 0;
   }
 
   /* Work on a copy of 'graph' 
