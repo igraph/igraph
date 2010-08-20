@@ -8,7 +8,13 @@ __all__ = ["AbstractEdgeDrawer", "AlphaVaryingEdgeDrawer",
 
 __license__ = "GPL"
 
-from cairo import LinearGradient
+try:
+    from cairo import LinearGradient
+except ImportError:
+    # No cairo support is installed. Don't worry, there will
+    # be a fake Cairo module in igraph.drawing
+    pass
+
 from igraph.drawing.colors import clamp
 from math import atan2, cos, pi, sin
 
