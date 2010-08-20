@@ -7,8 +7,6 @@
 <chapter id="igraph-Memory">
 <title>Memory (de)allocation</title>
 
-<section><title>All functions</title>
 <!-- doxrox-include igraph_free -->
-</section>
 
 </chapter>

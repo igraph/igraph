@@ -7,11 +7,9 @@
 <chapter id="igraph-Separators">
 <title>Vertex separators</title>
 
-<section><title>All functions</title>
 <!-- doxrox-include igraph_is_separator -->
 <!-- doxrox-include igraph_is_minimal_separator -->
 <!-- doxrox-include igraph_all_minimal_ab_separators -->
 <!-- doxrox-include igraph_minimum_size_separators -->
-</section>
 
 </chapter>
