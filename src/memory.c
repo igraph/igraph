@@ -24,6 +24,51 @@
 #include "igraph_memory.h"
 #include "config.h"
 
+/**
+ * \function igraph_free
+ * Deallocate memory that was allocated by igraph functions
+ * 
+ * Some igraph functions return a pointer vector (igraph_vector_ptr_t)
+ * containing pointers to other igraph or other data types. These data
+ * types are dynamically allocated and have to be deallocated
+ * manually, if the user does not need them any more. This can be done
+ * by calling igraph_free on them.
+ * 
+ * </para><para>
+ * Here is a complete example on how to use \c igraph_free properly.
+ * <programlisting>
+ * <![CDATA[#include <igraph.h>
+ * 
+ * int main(void)
+ * {
+ *    igraph_t graph;
+ *    igraph_vector_ptr_t seps;
+ *    long int i;
+ * 
+ *    igraph_famous(&graph, "tutte");
+ *    igraph_vector_ptr_init(&seps, 0);
+ *    igraph_minimum_size_separators(&graph, &seps);
+ *    
+ *    for (i=0; i<igraph_vector_ptr_size(&seps); i++) {
+ *      igraph_vector_t *v=VECTOR(seps)[i];
+ *      igraph_vector_print(v);
+ *      igraph_vector_destroy(v);
+ *      igraph_free(v);
+ *    }
+ *
+ *    igraph_vector_ptr_destroy(&seps);
+ *    igraph_destroy(&graph);
+ *    return 0;
+ * }]]>
+ * </programlisting>
+ * 
+ * 
+ * \param p Pointer to the piece of memory to be deallocated.
+ * \return Error code, currently always zero, meaning success.
+ * 
+ * Time complexity: platform dependent, ideally it should be O(1).
+ */
+
 int igraph_free(void *p) {
   igraph_Free(p);
   return 0;
