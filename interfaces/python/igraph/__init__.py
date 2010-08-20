@@ -189,20 +189,21 @@ class Graph(GraphBase):
         
         @param return_articulation_points: whether to return the articulation
           points as well
-        @return: an L{OverlappingVertexClustering} object describing the
-          biconnected components and optionally the list of articulation points
+        @return: a L{VertexCover} object describing the biconnected components,
+          and optionally the list of articulation points as well
         """
         if return_articulation_points:
             trees, aps = GraphBase.biconnected_components(self, True)
         else:
             trees = GraphBase.biconnected_components(self, False)
 
-        membership = [set() for _ in xrange(self.vcount())]
-        for idx, tree in enumerate(trees):
-            for eidx in tree:
-                membership[self.es[eidx].source].add(idx)
-                membership[self.es[eidx].target].add(idx)
-        clustering = OverlappingVertexClustering(self, membership)
+        clusters = []
+        for tree in trees:
+            cluster = set()
+            for edge in self.es[tree]:
+                cluster.update(edge.tuple)
+            clusters.append(cluster)
+        clustering = VertexCover(self, clusters)
 
         if return_articulation_points:
             return clustering, aps

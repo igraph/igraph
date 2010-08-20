@@ -65,7 +65,7 @@ class ClusteringTests(unittest.TestCase):
     def testClusteringSizes(self):
         self.failUnless(self.cl.sizes() == [3, 4, 1, 0, 2])
         self.failUnless(self.cl.sizes(2, 4, 1) == [1, 2, 4])
-        self.failUnless(self.cl.size(2) == 1)
+        self.failUnless(self.cl.sizes(2) == [1])
 
     def testClusteringHistogram(self):
         self.failUnless(isinstance(self.cl.size_histogram(), Histogram))
@@ -107,27 +107,34 @@ class VertexClusteringTests(unittest.TestCase):
         self.failUnless(clg.vs["int"] == [41, 64, 47])
 
 
-class OverlappingClusteringTests(unittest.TestCase):
+class CoverTests(unittest.TestCase):
     def setUp(self):
-        self.cl = OverlappingClustering([set([0]), set([0]), set([0]), set([0,1]), set([1]), set([1]), set([1]), set([]), set([3]), set([3,1])])
+        self.cl = Cover([(0,1,2,3), (3,4,5,6,9), (), (8,9)])
 
-    def testClusteringIndex(self):
+    def testCoverIndex(self):
         self.failUnless(self.cl[0] == [0, 1, 2, 3])
         self.failUnless(self.cl[1] == [3, 4, 5, 6, 9])
         self.failUnless(self.cl[2] == [])
         self.failUnless(self.cl[3] == [8, 9])
 
-    def testClusteringLength(self):
+    def testCoverLength(self):
         self.failUnless(len(self.cl) == 4)
 
-    def testClusteringSizes(self):
+    def testCoverSizes(self):
         self.failUnless(self.cl.sizes() == [4, 5, 0, 2])
         self.failUnless(self.cl.sizes(1, 3, 0) == [5, 2, 4])
         self.failUnless(self.cl.size(1) == 5)
         self.failUnless(self.cl.size(2) == 0)
 
-    def testClusteringHistogram(self):
+    def testCoverHistogram(self):
         self.failUnless(isinstance(self.cl.size_histogram(), Histogram))
+
+    def testCoverConstructorWithN(self):
+        self.failUnless(self.cl.n == 10)
+        cl = Cover(self.cl, n = 15)
+        self.failUnless(cl.n == 15)
+        cl = Cover(self.cl, n = 1)
+        self.failUnless(cl.n == 10)
 
 
 class CommunityTests(unittest.TestCase):
@@ -141,9 +148,6 @@ class CommunityTests(unittest.TestCase):
         cl = g.community_fastgreedy()
         self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1])
         self.assertAlmostEqual(cl.q, 0.4523, places=3)
-
-        cl2 = OverlappingVertexClustering(g, [set([x]) for x in cl.membership])
-        self.assertAlmostEqual(cl.q, cl2.q, places=3)
 
         g = Graph.Full(4) + Graph.Full(2)
         g.add_edges([(3,4)])
@@ -283,11 +287,11 @@ def suite():
     decomposition_suite = unittest.makeSuite(DecompositionTests)
     clustering_suite = unittest.makeSuite(ClusteringTests)
     vertex_clustering_suite = unittest.makeSuite(VertexClusteringTests)
-    overlapping_clustering_suite = unittest.makeSuite(OverlappingClusteringTests)
+    cover_suite = unittest.makeSuite(CoverTests)
     community_suite = unittest.makeSuite(CommunityTests)
     comparison_suite = unittest.makeSuite(ComparisonTests)
     return unittest.TestSuite([decomposition_suite, clustering_suite, \
-            vertex_clustering_suite, overlapping_clustering_suite, \
+            vertex_clustering_suite, cover_suite, \
             community_suite, comparison_suite])
 
 def test():

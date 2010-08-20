@@ -120,6 +120,11 @@ class Clustering(object):
         """Returns the membership vector."""
         return self._membership[:]
 
+    @property
+    def n(self):
+        """Returns the number of elements covered by this clustering."""
+        return len(self._membership)
+
     def size(self, idx):
         """Returns the size of a given cluster.
 
@@ -129,22 +134,18 @@ class Clustering(object):
 
     def sizes(self, *args):
         """Returns the size of given clusters.
-
-        @keyword idxs: the cluster indices in which we are interested. If C{None},
-          defaults to all clusters
+        
+        The indices are given as positional arguments. If there are no
+        positional arguments, the function will return the sizes of all clusters.
         """
-        idxs = args
-        if len(idxs) == 0:
-            idxs = None
-
         counts = [0] * len(self)
         for x in self._membership:
             counts[x] += 1
 
-        if idxs is None:
-            return counts
+        if args:
+            return [counts[idx] for idx in args]
 
-        return [counts[idx] for idx in idxs]
+        return counts
     
     def size_histogram(self, bin_width = 1):
         """Returns the histogram of cluster sizes.
@@ -155,83 +156,13 @@ class Clustering(object):
         return Histogram(bin_width, self.sizes())
 
 
-class OverlappingClustering(Clustering):
-    """Extension of L{Clustering} that allows for overlapping clusters.
-
-    With overlapping clusters, a single vertex can be the member of multiple
-    clusters (or even none of them). Therefore, each item of the membership
-    vector is a list, set or tuple containing the cluster indices for all
-    vertices.
-    
-    Members of an individual cluster can be accessed by the C{[]} operator:
-    
-      >>> cl = OverlappingClustering([(0,), (0,), (0,1), (1,), (1,), ()])
-      >>> cl[0]
-      [0, 1, 2]
-      >>> cl[1]
-      [2, 3, 4]
-    
-    The membership vector can be accessed by the C{membership} property:
-
-      >>> cl.membership
-      [frozenset([0]), frozenset([0]), frozenset([0, 1]), frozenset([1]), frozenset([1]), frozenset([])]
-
-    The number of clusters can be retrieved by the C{len} function:
-
-      >>> len(cl)
-      2
-    """
-    def __init__(self, membership, params = None):
-        """Constructor.
-
-        @param membership: the membership list -- that is, the cluster
-          index in which each element of the set belongs to.
-        @param params: additional parameters to be stored in this
-          object's dictionary."""
-        Clustering.__init__(self, [], params)
-
-        self._membership = [frozenset(clusters) for clusters in membership]
-        try:
-            self._len = max(max(m) for m in self._membership if m) + 1
-        except ValueError:
-            self._len = 0
-    
-    def __getitem__(self, idx):
-        """Returns the members of the specified cluster.
-
-        @param idx: the index of the cluster
-        @return: the members of the specified cluster as a list
-        @raise IndexError: if the index is out of bounds"""
-        if idx < 0 or idx >= self._len:
-            raise IndexError("cluster index out of range")
-        return [i for i, cl in enumerate(self._membership) if idx in cl]
-   
-    def sizes(self, *args):
-        """Returns the size of given clusters.
-
-        @keyword idxs: the cluster indices in which we are interested. If C{None},
-          defaults to all clusters
-        """
-        idxs = args
-        if len(idxs) == 0:
-            idxs = None
-
-        counts = [0] * len(self)
-        for members in self._membership:
-            for member in members:
-                counts[member] += 1
-
-        if idxs is None:
-            return counts
-
-        return [counts[idx] for idx in idxs]
-    
-
 class VertexClustering(Clustering):
     """The clustering of the vertex set of a graph.
 
     This class extends L{Clustering} by linking it to a specific L{Graph} object
     and by optionally storing the modularity score of the clustering.
+    It also provides some handy methods like getting the subgraph corresponding
+    to a cluster and such.
 
     @note: since this class is linked to a L{Graph}, destroying the graph by the
       C{del} operator does not free the memory occupied by the graph if there
@@ -467,111 +398,14 @@ class VertexClustering(Clustering):
             if Configuration.instance()["plotting.mark_groups"]:
                 kwds["mark_groups"] = enumerate(self) 
         else:
-            mark_groups = kwds["mark_groups"]
-            del kwds["mark_groups"]
-
-            # Handle the case of mark_groups = True and mark_groups yielding
-            # cluster IDs
-            if mark_groups is True:
-                group_iter = enumerate(self)
-            elif isinstance(mark_groups, dict):
-                group_iter = mark_groups.iteritems()
-            elif hasattr(mark_groups, "__iter__"):
-                if hasattr(mark_groups, "next"):
-                    # Already an iterator, let's hope it works
-                    group_iter = mark_groups
-                else:
-                    # Lists, tuples etc
-                    group_iter = enumerate(mark_groups)
-            else:
-                group_iter = {}.iteritems()
-
-            def cluster_index_resolver():
-                for color_id, group in group_iter:
-                    if isinstance(group, (int, long)):
-                        group = self[group]
-                    yield color_id, group
-
-            kwds["mark_groups"] = cluster_index_resolver()
+            kwds["mark_groups"] = _handle_mark_groups_arg_for_clustering(
+                    kwds["mark_groups"], self)
 
         kwds["vertex_color"] = self.membership
         return self._graph.__plot__(context, bbox, palette, *args, **kwds)
 
 
-class OverlappingVertexClustering(OverlappingClustering, VertexClustering):
-    """Overlapping clustering of the vertex set of a graph.
-
-    This class extends L{OverlappingClustering} by linking it to a specific
-    L{Graph} object and by optionally storing the modularity score of the
-    clustering.
-
-    Modularity in the case of overlapping communities is defined similarly
-    to the nonoverlapping case, but the statement that ``vertex M{i} and
-    M{j} is in the same community'' (expressed by the Kronecker-delta at
-    the end of the formula in the original paper) is replaced by the
-    statement that ``vertex M{i} and M{j} are both contained by at least
-    one of the communities''.
-
-    @note: since this class is linked to a L{Graph}, destroying the graph by the
-      C{del} operator does not free the memory occupied by the graph if there
-      exists an L{OverlappingVertexClustering} that references the L{Graph}.
-    """
-
-    def __init__(self, graph, membership = None, modularity = None, \
-            params = None):
-        """Creates an overlapping clustering object for a given graph.
-
-        @param graph: the graph that will be associated to the clustering
-        @param membership: the membership list. The length of the list must
-          be equal to the number of vertices in the graph. If C{None}, every
-          vertex is assumed to belong to the same cluster.
-        @param modularity: the modularity score of the clustering. If C{None},
-          it will be calculated.
-        @param params: additional parameters to be stored in this object.
-        """
-        self._graph = graph
-
-        if membership is None:
-            membership = [set(0)] * graph.vcount()
-        if len(membership) != graph.vcount():
-            raise ValueError("membership list is too short")
-        OverlappingClustering.__init__(self, membership, params)
-
-        if modularity is None:
-            self._modularity = self.recalculate_modularity()
-        else:
-            self._modularity = modularity
-
-    def recalculate_modularity(self):
-        """Recalculates the stored modularity value.
-
-        This method must be called before querying the modularity score of the
-        clustering through the class member C{modularity} or C{q} if the
-        graph has been modified (edges have been added or removed) since the
-        creation of the L{OverlappingVertexClustering} object.
-        
-        @return: the new modularity score
-        @todo: this is pretty slow now, it should eventually be moved to
-          the C layer.
-        """
-        degrees = self._graph.degree()
-        edge_set = set(self._graph.get_edgelist())
-        if not self._graph.is_directed():
-            mirrored_edge_set = set((v2, v1) for v1, v2 in edge_set)
-            edge_set = edge_set.union(mirrored_edge_set)
-        ecount = float(len(edge_set))
-        result = 0.0
-        for source, cl1 in enumerate(self._membership):
-            source_degree = degrees[source]
-            for target, cl2 in enumerate(self._membership):
-                if len(cl1.intersection(cl2))>0:
-                    if (source, target) in edge_set:
-                        result += 1.0
-                    result -= source_degree*degrees[target] / ecount
-
-        self._modularity = result / ecount
-        return self._modularity
-
+###############################################################################
 
 class Dendrogram(Clustering):
     """The hierarchical clustering (dendrogram) of some dataset.
@@ -1007,4 +841,292 @@ class VertexDendrogram(VertexClustering, Dendrogram):
         del self._names
 
         return result
+
+###############################################################################
+
+class Cover(object):
+    """Class representing a cover of an arbitrary ordered set.
+
+    Covers are similar to clusterings, but each element of the set may
+    belong to more than one cluster in a cover, and elements not belonging
+    to any cluster are also allowed.
+
+    L{Cover} instances provide a similar API as L{Clustering} instances;
+    for instance, iterating over a L{Cover} will iterate over the clusters
+    just like with a regular L{Clustering} instance. However, they are not
+    derived from each other or from a common superclass, and there might
+    be functions that exist only in one of them or the other.
+
+    Clusters of an individual cover can be accessed by the C{[]} operator:
+    
+      >>> cl = Cover([[0,1,2,3], [2,3,4], [0,1,6]])
+      >>> cl[0]
+      [0, 1, 2, 3]
+    
+    The membership vector can be accessed by the C{membership} property.
+    Note that contrary to L{Clustering} instances, the membership vector
+    will contain lists that contain the cluster indices each item belongs
+    to:
+
+      >>> cl.membership
+      [[0, 2], [0, 2], [0, 1], [0, 1], [1], [], [2]]
+
+    The number of clusters can be retrieved by the C{len} function:
+
+      >>> len(cl)
+      3
+
+    You can iterate over the cover as if it were a regular list of
+    clusters:
+
+      >>> for cluster in cl:
+      ...     print " ".join(str(idx) for idx in cluster)
+      ...
+      0 1 2 3
+      2 3 4
+      0 1 6
+
+    If you need all the clusters at once as lists, you can simply convert
+    the cover to a list:
+
+      >>> cluster_list = list(cl)
+      >>> print cluster_list
+      [[0, 1, 2, 3], [2, 3, 4], [0, 1, 6]]
+
+    L{Clustering} objects can readily be converted to L{Cover} objects
+    using the constructor:
+
+      >>> clustering = Clustering([0, 1, 2, 3], [4, 5, 6], [7, 8, 9])
+      >>> cover = Cover(clustering)
+      >>> list(clustering) == list(cover)
+      True
+    """
+
+    def __init__(self, clusters, n=0):
+        """Constructs a cover with the given clusters.
+
+        @param clusters: the clusters in this cover, as a list or iterable.
+          Each cluster is specified by a list or tuple that contains the
+          IDs of the items in this cluster. IDs start from zero.
+
+        @param n: the total number of elements in the set that is covered
+          by this cover. If it is less than the number of unique elements
+          found in all the clusters, we will simply use the number of unique
+          elements, so it is safe to leave this at zero. You only have to
+          specify this parameter if there are some elements that are covered
+          by none of the clusters.
+        """
+
+        self._clusters = [list(cluster) for cluster in clusters]
+        try:
+            self._n = max(max(cluster)+1 for cluster in self._clusters if cluster)
+        except ValueError:
+            self._n = 0
+        self._n = max(n, self._n)
+
+    def __getitem__(self, index):
+        """Returns the cluster with the given index."""
+        return self._clusters[index]
+
+    def __iter__(self):
+        """Iterates over the clusters in this cover."""
+        return iter(self._clusters)
+
+    def __len__(self):
+        """Returns the number of clusters in this cover."""
+        return len(self._clusters)
+
+    @property
+    def membership(self):
+        """Returns the membership vector of this cover.
+
+        The membership vector of a cover covering I{n} elements is a list of
+        length I{n}, where element I{i} contains the cluster indices of the
+        I{i}th item.
+        """
+        result = [[] for _ in xrange(self._n)]
+        for idx, cluster in enumerate(self):
+            for item in cluster:
+                result[item].append(idx)
+        return result
+
+    @property
+    def n(self):
+        """Returns the number of elements in the set covered by this cover."""
+        return self._n
+
+    def size(self, idx):
+        """Returns the size of a given cluster.
+
+        @param idx: the cluster in which we are interested.
+        """
+        return len(self[idx])
+
+    def sizes(self, *args):
+        """Returns the size of given clusters.
+        
+        The indices are given as positional arguments. If there are no
+        positional arguments, the function will return the sizes of all clusters.
+        """
+        if args:
+            return [len(self._clusters[idx]) for idx in args]
+        return [len(cluster) for cluster in self]
+
+    def size_histogram(self, bin_width = 1):
+        """Returns the histogram of cluster sizes.
+
+        @param bin_width: the bin width of the histogram
+        @return: a L{Histogram} object
+        """
+        return Histogram(bin_width, self.sizes())
+
+
+class VertexCover(Cover):
+    """The cover of the vertex set of a graph.
+
+    This class extends L{Cover} by linking it to a specific L{Graph} object.
+    It also provides some handy methods like getting the subgraph corresponding
+    to a cluster and such.
+
+    @note: since this class is linked to a L{Graph}, destroying the graph by the
+      C{del} operator does not free the memory occupied by the graph if there
+      exists a L{VertexCover} that references the L{Graph}.
+    """
+
+    def __init__(self, graph, clusters = None):
+        """Creates a cover object for a given graph.
+
+        @param graph: the graph that will be associated to the cover
+        @param clusters: the list of clusters. If C{None}, it is assumed
+          that there is only a single cluster that covers the whole graph.
+        """
+        if clusters is None:
+            clusters = range(graph.vcount())
+
+        Cover.__init__(self, clusters, n = graph.vcount())
+        if self._n > graph.vcount():
+            raise ValueError("cluster list contains vertex ID larger than the "
+                             "number of vertices in the graph")
+
+        self._graph = graph
+
+    def crossing(self):
+        """Returns a boolean vector where element M{i} is C{True} iff edge
+        M{i} lies between clusters (i.e. there is no cluster where the two
+        endpoints appear together), C{False} otherwise."""
+        membership = [frozenset(cluster) for cluster in self.membership]
+        return [membership[v1].isdisjoint(membership[v2]) \
+                for v1, v2 in self.graph.get_edgelist()]
+
+    @property
+    def graph(self):
+        """Returns the graph belonging to this object"""
+        return self._graph
+
+    def subgraph(self, idx):
+        """Get the subgraph belonging to a given cluster.
+
+        @param idx: the cluster index
+        @return: a copy of the subgraph
+        @precondition: the vertex set of the graph hasn't been modified since
+          the moment the cover was constructed.
+        """
+        return self._graph.subgraph(self[idx])
+
+    def __plot__(self, context, bbox, palette, *args, **kwds):
+        """Plots the cover to the given Cairo context in the given
+        bounding box.
+
+        This is done by calling L{Graph.__plot__()} with the same arguments, but
+        drawing nice colored blobs around the vertex groups.
+
+        This method understands all the positional and keyword arguments that
+        are understood by L{Graph.__plot__()}, only the differences will be
+        highlighted here:
+
+          - C{mark_groups}: whether to highlight the vertex clusters by
+            colored polygons. Besides the values accepted by L{Graph.__plot__}
+            (i.e., a dict mapping colors to vertex indices, a list containing
+            lists of vertex indices, or C{False}), the following are also
+            accepted:
+
+              - C{True}: all the clusters will be highlighted, the colors matching
+                the corresponding color indices from the current palette
+                (see the C{palette} keyword argument of L{Graph.__plot__}.
+
+              - A dict mapping color names to cluster indices. The given clusters
+                will be highlighted by the given colors.
+
+              - A list of cluster indices. This is equivalent to passing a
+                dict mapping numeric color indices from the current palette
+                to cluster indices; therefore, the cluster referred to by element
+                I{i} of the list will be highlighted by color I{i} from the
+                palette.
+
+            The value of the C{plotting.mark_groups} configuration key is also
+            taken into account here; if that configuration key is C{True} and
+            C{mark_groups} is not given explicitly, it will automatically be set
+            to C{True}.
+
+          - C{palette}: the palette used to resolve numeric color indices to RGBA
+            values. By default, this is an instance of L{ClusterColoringPalette}.
+
+        @see: L{Graph.__plot__()} for more supported keyword arguments.
+        """
+        if "edge_color" not in kwds and "color" not in self.graph.edge_attributes():
+            # Set up a default edge coloring based on internal vs external edges
+            colors = ["grey20", "grey80"]
+            kwds["edge_color"] = [colors[is_crossing]
+                                  for is_crossing in self.crossing()]
+
+        if "palette" in kwds:
+            palette = kwds["palette"]
+        else:
+            palette = ClusterColoringPalette(len(self))
+
+        if "mark_groups" not in kwds:
+            if Configuration.instance()["plotting.mark_groups"]:
+                kwds["mark_groups"] = enumerate(self) 
+        else:
+            kwds["mark_groups"] = _handle_mark_groups_arg_for_clustering(
+                    kwds["mark_groups"], self)
+
+        return self._graph.__plot__(context, bbox, palette, *args, **kwds)
+
+
+def _handle_mark_groups_arg_for_clustering(mark_groups, clustering):
+    """Handles the mark_groups=... keyword argument in plotting methods of
+    clusterings.
+
+    This is an internal method, you shouldn't need to mess around with it.
+    Its purpose is to handle the extended semantics of the mark_groups=...
+    keyword argument in the C{__plot__} method of L{VertexClustering} and
+    L{VertexCover} instances, namely the feature that numeric IDs are resolved
+    to clusters automatically.
+    """
+    # Handle the case of mark_groups = True and mark_groups yielding
+    # cluster IDs
+    if mark_groups is True:
+        group_iter = enumerate(clustering)
+    elif isinstance(mark_groups, dict):
+        group_iter = mark_groups.iteritems()
+    elif hasattr(mark_groups, "__iter__"):
+        if hasattr(mark_groups, "next"):
+            # Already an iterator, let's hope it works
+            group_iter = mark_groups
+        else:
+            # Lists, tuples etc
+            group_iter = enumerate(mark_groups)
+    else:
+        group_iter = {}.iteritems()
+
+    def cluster_index_resolver():
+        for color_id, group in group_iter:
+            if isinstance(group, (int, long)):
+                group = clustering[group]
+            yield color_id, group
+
+    return cluster_index_resolver()
+
+
 
