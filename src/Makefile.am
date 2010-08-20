@@ -93,6 +93,7 @@ HEADERS_PRIVATE = atlas-edges.h \
 		drl_graph_3d.h		drl_layout_3d.h \
 		drl_Node.h	drl_Node_3d.h \
 		DensityGrid.h	DensityGrid_3d.h \
+		igraph_flow_internal.h \
 		vector.pmt matrix.pmt stack.pmt dqueue.pmt heap.pmt array.pmt \
 		igraph_types_internal.h \
 		foreign-dl-header.h bignum.h bigint.h \
