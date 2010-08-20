@@ -28,6 +28,7 @@
 #include "igraph_vector.h"
 #include "igraph_interface.h"
 #include "igraph_flow.h"
+#include "igraph_flow_internal.h"
 #include "igraph_components.h"
 #include "igraph_structural.h"
 #include "igraph_constructors.h"
@@ -451,6 +452,37 @@ int igraph_all_minimal_ab_separators(const igraph_t *graph,
 
 #undef UPDATEMARK
 
+int igraph_i_minimum_size_separators_append(igraph_vector_ptr_t *old,
+					    const igraph_vector_ptr_t *new) {
+ 
+  IGRAPH_CHECK(igraph_vector_ptr_append(old, new));  
+  return 0;
+}
+
+int igraph_i_minimum_size_separators_topkdeg(const igraph_t *graph, 
+					     igraph_vector_long_t *res,
+					     long int k) {
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t deg, order;
+  long int i;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&deg, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
+  IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_ALL, 
+			     /*loops=*/ 0));
+
+  IGRAPH_CHECK(igraph_vector_order1(&deg, &order, no_of_nodes));
+  IGRAPH_CHECK(igraph_vector_long_resize(res, k));
+  for (i=0; i<k; i++) {
+    VECTOR(*res)[i] = VECTOR(order)[no_of_nodes-1-i];
+  }
+  
+  igraph_vector_destroy(&order);
+  igraph_vector_destroy(&deg);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return 0;
+}
 
 /** 
  * \function igraph_minimum_size_separators
@@ -507,19 +539,17 @@ int igraph_minimum_size_separators(const igraph_t *graph,
     return 0;
   }
 
-  /* Work on a copy of 'graph' */
+  /* Work on a copy of 'graph' 
+     TODO: we don't actually need this copy... */
   IGRAPH_CHECK(igraph_copy(&graph_copy, graph));
   IGRAPH_FINALLY(igraph_destroy, &graph_copy);
 
   /* ---------------------------------------------------------------- */
   /* 2 Find k vertices with the largest degrees (x1;..,xk). Check
      if these k vertices form a separating k-set of G */
-  /* TODO: right now we just take the k first vertices. */
   IGRAPH_CHECK(igraph_vector_long_init(&X, conn));
   IGRAPH_FINALLY(igraph_vector_long_destroy, &X);
-  for (i=0; i<conn; i++) {
-    VECTOR(X)[i]=i;
-  }
+  IGRAPH_CHECK(igraph_i_minimum_size_separators_topkdeg(graph, &X, k));
   IGRAPH_CHECK(igraph_is_separator(&graph_copy, &X, &issepX));
   if (issepX) {
     igraph_vector_t *v=igraph_Calloc(1, igraph_vector_t);
@@ -548,7 +578,7 @@ int igraph_minimum_size_separators(const igraph_t *graph,
       long int ii=VECTOR(X)[i];
       igraph_real_t phivalue;
       igraph_bool_t conn;
-      
+
       if (ii == j) { continue; } /* the same vertex */
       igraph_are_connected(&graph_copy, ii,  j, &conn);
       if (conn) { continue; }	/* they are connected */
@@ -572,12 +602,13 @@ int igraph_minimum_size_separators(const igraph_t *graph,
 	/* TODO: proper destructor for stcuts */
 	IGRAPH_CHECK(igraph_all_st_mincuts(&Gbar, /*value=*/ 0, 
 					   /*cuts=*/ &stcuts,
-					   /*partitions1s=*/ 0, 
+					   /*partition1s=*/ 0, 
 					   /*source=*/ ii+no_of_nodes,
 					   /*target=*/ j,
 					   /*capacity=*/ &capacity));
 
-	IGRAPH_CHECK(igraph_vector_ptr_append(separators, &stcuts));
+	IGRAPH_CHECK(igraph_i_minimum_size_separators_append(separators,
+							     &stcuts));
 	igraph_vector_ptr_destroy(&stcuts);
 	IGRAPH_FINALLY_CLEAN(1);
 

@@ -38,8 +38,6 @@
 #include "igraph_types.h"
 #include "igraph_datatype.h"
 #include "igraph_vector_ptr.h"
-#include "igraph_marked_queue.h"
-#include "igraph_estack.h"
 
 __BEGIN_DECLS
 
@@ -147,14 +145,6 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
 			  igraph_integer_t target,
 			  const igraph_vector_t *capacity);
 
-typedef int igraph_provan_shier_pivot_t(const igraph_t *graph,
-					const igraph_marked_queue_t *S,
-					const igraph_estack_t *T,
-					long int source,
-					long int target,
-					long int *v,
-					igraph_vector_t *Isv,
-					void *arg);
 __END_DECLS
 
 #endif

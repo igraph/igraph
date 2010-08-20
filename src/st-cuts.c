@@ -22,6 +22,7 @@
 */
 
 #include "igraph_flow.h"
+#include "igraph_flow_internal.h"
 #include "igraph_error.h"
 #include "igraph_memory.h"
 #include "igraph_constants.h"
@@ -39,7 +40,6 @@
 #include "igraph_marked_queue.h"
 #include "igraph_stack.h"
 #include "igraph_estack.h"
-
 
 /**
  * \function igraph_even_tarjan_reduction
@@ -817,6 +817,7 @@ int igraph_provan_shier_list(const igraph_t *graph,
 			     igraph_provan_shier_pivot_t *pivot,
 			     void *pivot_arg) {
 
+  long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t Isv;
   long int v=0;
   long int i, n;
@@ -825,11 +826,12 @@ int igraph_provan_shier_list(const igraph_t *graph,
   
   pivot(graph, S, T, source, target, &v, &Isv, pivot_arg);
   if (igraph_vector_size(&Isv)==0) {
-    if (igraph_marked_queue_size(S) != 0) {
-      igraph_vector_t *vec=igraph_Calloc(1, igraph_vector_t);
+    if (igraph_marked_queue_size(S) != 0 && 
+	igraph_marked_queue_size(S) != no_of_nodes) {
+      igraph_vector_t *vec=igraph_Calloc(1, igraph_vector_t);      
       igraph_vector_init(vec, igraph_marked_queue_size(S));
       igraph_marked_queue_as_vector(S, vec);
-      igraph_vector_ptr_push_back(result, vec);
+      IGRAPH_CHECK(igraph_vector_ptr_push_back(result, vec));
     }
   } else {
     /* Put v into T */
@@ -965,6 +967,227 @@ int igraph_all_st_cuts(const igraph_t *graph,
   return 0;
 }
 
+typedef struct igraph_i_all_st_mincuts_minimal_dfs_data_t {
+  igraph_stack_t *stack;
+  igraph_vector_bool_t *nomark;
+  long int root;
+  const igraph_vector_bool_t *active;
+  const igraph_vector_t *map;
+  const igraph_marked_queue_t *X;
+} igraph_i_all_st_mincuts_minimal_dfs_data_t;
+
+igraph_bool_t igraph_i_all_st_mincuts_minimal_dfs_incb(const igraph_t *graph,
+						       igraph_integer_t vid,
+						       igraph_integer_t dist,
+						       void *extra) {
+
+  igraph_i_all_st_mincuts_minimal_dfs_data_t *data=extra;
+  igraph_stack_t *stack=data->stack;
+  igraph_vector_bool_t *nomark=data->nomark;
+  const igraph_vector_bool_t *active=data->active;
+  const igraph_vector_t *map=data->map;
+  long int realvid=VECTOR(*map)[(long int)vid];
+  const igraph_marked_queue_t *X=data->X;
+  
+  if (VECTOR(*active)[realvid] && 
+      !igraph_marked_queue_iselement(X, realvid)) {
+    if (!igraph_stack_empty(stack)) {
+      long int top=igraph_stack_top(stack);
+      VECTOR(*nomark)[top]=1; 	/* we just found a smaller one */
+    }
+    igraph_stack_push(stack, realvid); /* TODO: error check */
+  }
+
+  return 0;
+}
+
+igraph_bool_t igraph_i_all_st_mincuts_minimal_dfs_otcb(const igraph_t *graph,
+						       igraph_integer_t vid,
+						       igraph_integer_t dist,
+						       void *extra) {
+
+  igraph_i_all_st_mincuts_minimal_dfs_data_t *data=extra;
+  igraph_stack_t *stack=data->stack;
+  const igraph_vector_t *map=data->map;
+  long int realvid=VECTOR(*map)[(long int)vid];
+  
+  if (!igraph_stack_empty(stack) && 
+      igraph_stack_top(stack) == realvid) {
+    igraph_stack_pop(stack);
+  }
+
+  return 0;
+}
+
+int igraph_i_all_st_mincuts_minimal(const igraph_t *graph, 
+				    const igraph_t *domtree, 
+				    long int root, 
+				    const igraph_marked_queue_t *X,
+				    const igraph_vector_bool_t *active,
+				    const igraph_vector_t *invmap,
+				    igraph_vector_t *minimal) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_stack_t stack;
+  igraph_vector_bool_t nomark;
+  igraph_i_all_st_mincuts_minimal_dfs_data_t data;
+  long int i;
+  
+  IGRAPH_CHECK(igraph_stack_init(&stack, 10));
+  IGRAPH_FINALLY(igraph_stack_destroy, &stack);
+  IGRAPH_CHECK(igraph_vector_bool_init(&nomark, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_bool_destroy, &nomark);
+  
+  data.stack=&stack;
+  data.nomark=&nomark;
+  data.root=root;
+  data.active=active;
+  data.map=invmap;
+  data.X=X;
+  
+  /* We mark all active elements as minimal first  */
+  for (i=0; i<no_of_nodes; i++) {
+    if (!VECTOR(*active)[i] || igraph_marked_queue_iselement(X, i)) {
+      VECTOR(nomark)[i] = 1;
+    }
+  }
+
+  /* We do a reverse DFS from root. If, along a path we find an active
+     vertex after (=below) another active vertex, we mark the higher one
+     as non-minimal */
+  IGRAPH_CHECK(igraph_dfs(domtree, root, IGRAPH_IN, /*unreachable=*/ 0,
+			  /*order=*/ 0,
+			  /*order_out=*/ 0, /*father=*/ 0, 
+			  /*dist=*/ 0, /*in_callback=*/ 
+			  igraph_i_all_st_mincuts_minimal_dfs_incb,
+			  /*out_callback=*/ 
+			  igraph_i_all_st_mincuts_minimal_dfs_otcb,
+			  /*extra=*/ &data));
+
+  igraph_vector_clear(minimal);
+  for (i=0; i<no_of_nodes; i++) {
+    if (!VECTOR(nomark)[i]) { 
+      IGRAPH_CHECK(igraph_vector_push_back(minimal, i));
+    }
+  }
+
+  igraph_vector_bool_destroy(&nomark);
+  igraph_stack_destroy(&stack);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return 0;
+}
+
+typedef struct igraph_i_all_st_mincuts_data_t {
+  const igraph_vector_bool_t *active;
+} igraph_i_all_st_mincuts_data_t;
+
+int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
+				  const igraph_marked_queue_t *S,
+				  const igraph_estack_t *T,
+				  long int source,
+				  long int target,
+				  long int *v,
+				  igraph_vector_t *Isv,
+				  void *arg) {
+
+  igraph_i_all_st_mincuts_data_t *data=arg;
+  const igraph_vector_bool_t *active=data->active;
+
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i;
+  igraph_vector_t Sbar_map, Sbar_invmap;
+  igraph_vector_t keep;
+  igraph_t Sbar;
+  igraph_vector_t leftout;
+  long int root;
+  igraph_t domtree;
+  igraph_vector_t M;
+  long int nomin;
+
+  if (igraph_marked_queue_size(S) == no_of_nodes) {
+    igraph_vector_clear(Isv);
+    return 0;
+  }
+
+  /* Create the graph induced by Sbar */
+  IGRAPH_VECTOR_INIT_FINALLY(&Sbar_map, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&Sbar_invmap, 0);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&keep, 0);
+  for (i=0; i<no_of_nodes; i++) {
+    if (!igraph_marked_queue_iselement(S, i)) {
+      IGRAPH_CHECK(igraph_vector_push_back(&keep, i));
+    }
+  }
+  
+  IGRAPH_CHECK(igraph_induced_subgraph_map(graph, &Sbar,
+					   igraph_vss_vector(&keep),
+					   IGRAPH_SUBGRAPH_AUTO,
+					   /* map= */ &Sbar_map, 
+					   /* invmap= */ &Sbar_invmap));  
+  igraph_vector_destroy(&keep);
+  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY(igraph_destroy, &Sbar);
+
+  root=VECTOR(Sbar_map)[target]-1;
+
+  /* ------------------------------------------------------------- */
+  /* Construct the dominator tree of Sbar */ 
+  IGRAPH_VECTOR_INIT_FINALLY(&leftout, 0);
+  IGRAPH_CHECK(igraph_dominator_tree(&Sbar, root, /*dom=*/ 0, &domtree,
+				     &leftout, IGRAPH_IN));
+  IGRAPH_FINALLY(igraph_destroy, &domtree);
+  
+  /* ------------------------------------------------------------- */
+  /* Identify the set M of minimal elements that are active */
+  IGRAPH_VECTOR_INIT_FINALLY(&M, 0);
+  if (igraph_ecount(&domtree)>0) {
+    IGRAPH_CHECK(igraph_i_all_st_mincuts_minimal(graph, &domtree, root, S, 
+						 active, &Sbar_invmap, &M));
+  }
+
+  /* ------------------------------------------------------------- */
+  /* Now find a minimal element that is not in T */  
+  igraph_vector_clear(Isv);
+  nomin=igraph_vector_size(&M);
+  for (i=0; i<nomin; i++) {
+    long int min=VECTOR(M)[i];
+    if (!igraph_estack_iselement(T, min)) { break; }
+  }
+  if (i!=nomin) {
+    /* OK, we found a pivot element. I(S,v) contains all elements
+       that can reach the pivot element */
+    igraph_vector_t Isv_min;
+    long int isvlen;
+    IGRAPH_VECTOR_INIT_FINALLY(&Isv_min, 0);
+    *v=VECTOR(M)[i];
+    IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ *v, /*roots=*/ 0,
+			    /*mode=*/ IGRAPH_IN, /*unreachable=*/ 0,
+			    /*restricted=*/ 0, /*order=*/ &Isv_min,
+			    /*rank=*/ 0, /*father=*/ 0, /*pred=*/ 0,
+			    /*succ=*/ 0, /*dist=*/ 0, /*callback=*/ 0,
+			    /*extra=*/ 0));
+    for (isvlen=0; isvlen<no_of_nodes; isvlen++) {
+      if (!IGRAPH_FINITE(VECTOR(Isv_min)[isvlen])) { break; }
+    }
+    igraph_vector_resize(&Isv_min, isvlen);
+    igraph_vector_update(Isv, &Isv_min);
+    igraph_vector_destroy(&Isv_min);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  igraph_vector_destroy(&M);
+  igraph_destroy(&domtree);
+  igraph_vector_destroy(&leftout);
+  igraph_destroy(&Sbar);
+  igraph_vector_destroy(&Sbar_invmap);
+  igraph_vector_destroy(&Sbar_map);
+  IGRAPH_FINALLY_CLEAN(6);
+
+  return 0;
+}
+
 int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
 			  igraph_vector_ptr_t *cuts,
 			  igraph_vector_ptr_t *partition1s,
@@ -978,12 +1201,20 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
   igraph_t residual;
   igraph_vector_t NtoL;
   long int newsource, newtarget;
-  igraph_vector_ptr_t closedsets;
-  igraph_vector_t revmap_ptr;
-  igraph_vector_t revmap_next;
+  igraph_marked_queue_t S;
+  igraph_estack_t T;
+  igraph_i_all_st_mincuts_data_t pivot_data;
+  igraph_vector_bool_t VE1bool;
+  igraph_vector_t VE1;
+  long int VE1size=0;
   long int i, nocuts;
+  igraph_integer_t proj_nodes;
+  igraph_vector_t revmap_ptr, revmap_next;
+  igraph_vector_ptr_t closedsets;
   igraph_vector_ptr_t *mypartition1s=partition1s, vpartition1s;
-  
+
+  /* -------------------------------------------------------------------- */
+  /* Error checks */
   if (source < 0 || source >= no_of_nodes) {
     IGRAPH_ERROR("Invalid `source' vertex", IGRAPH_EINVAL);
   }
@@ -999,7 +1230,8 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
     IGRAPH_CHECK(igraph_vector_ptr_init(mypartition1s, 0));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, mypartition1s);
   }
-  
+
+  /* -------------------------------------------------------------------- */  
   /* We need to calculate the maximum flow first */
   IGRAPH_VECTOR_INIT_FINALLY(&flow, 0);
   IGRAPH_CHECK(igraph_maxflow(graph, value, &flow, /*cut=*/ 0, 
@@ -1007,15 +1239,18 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
 			      /*source=*/ source, /*target=*/ target, 
 			      capacity));
 
+  /* -------------------------------------------------------------------- */
   /* Then we need the reverse residual graph */
   IGRAPH_CHECK(igraph_reverse_residual_graph(graph, capacity, &residual,
 					     &flow));
   IGRAPH_FINALLY(igraph_destroy, &residual);
-
-  /* We shrink its strongly connected components */
+  
+  /* -------------------------------------------------------------------- */
+  /* We shrink it to its strongly connected components */
   IGRAPH_VECTOR_INIT_FINALLY(&NtoL, 0);
   IGRAPH_CHECK(igraph_clusters(&residual, /*membership=*/ &NtoL, 
-			       /*csize=*/ 0, /*no=*/ 0, IGRAPH_STRONG));
+			       /*csize=*/ 0, /*no=*/ &proj_nodes, 
+			       IGRAPH_STRONG));
   IGRAPH_CHECK(igraph_contract_vertices(&residual, /*mapping=*/ &NtoL, 
 					/*vertex_comb=*/ 0));
   IGRAPH_CHECK(igraph_simplify(&residual, /*multiple=*/ 1, /*loops=*/ 1,
@@ -1025,14 +1260,54 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
   newtarget=VECTOR(NtoL)[(long int)target];
 
   /* TODO: handle the newsource == newtarget case */
-  
-  /* Find the cuts in the contracted graph */
+
+  /* -------------------------------------------------------------------- */
+  /* Determine the active vertices in the projection */
+  IGRAPH_VECTOR_INIT_FINALLY(&VE1, 0);
+  IGRAPH_CHECK(igraph_vector_bool_init(&VE1bool, proj_nodes));
+  IGRAPH_FINALLY(igraph_vector_bool_destroy, &VE1bool);
+  for (i=0; i<no_of_edges; i++) {
+    if (VECTOR(flow)[i] > 0) {
+      long int from=IGRAPH_FROM(graph, i);
+      long int to=IGRAPH_TO(graph, i);
+      long int pfrom=VECTOR(NtoL)[from];
+      long int pto=VECTOR(NtoL)[to];
+      if (!VECTOR(VE1bool)[pfrom]) { 
+	VECTOR(VE1bool)[pfrom] = 1;
+	VE1size++;
+      }
+      if (!VECTOR(VE1bool)[pto]) {
+	VECTOR(VE1bool)[pto] = 1;
+	VE1size++;
+      }
+    }
+  }
+  IGRAPH_CHECK(igraph_vector_reserve(&VE1, VE1size));
+  for (i=0; i<proj_nodes; i++) {
+    if (VECTOR(VE1bool)[i]) {
+      igraph_vector_push_back(&VE1, i);
+    }
+  }
+
+  if (cuts)        { igraph_vector_ptr_clear(cuts);        }
+  if (partition1s) { igraph_vector_ptr_clear(partition1s); }    
+
+  /* -------------------------------------------------------------------- */
+  /* Everything is ready, list the cuts, using the right PIVOT
+     function  */
+  IGRAPH_CHECK(igraph_marked_queue_init(&S, no_of_nodes));
+  IGRAPH_FINALLY(igraph_marked_queue_destroy, &S);
+  IGRAPH_CHECK(igraph_estack_init(&T, no_of_nodes, 0));
+  IGRAPH_FINALLY(igraph_estack_destroy, &T);
+
+  pivot_data.active=&VE1bool;
+
   IGRAPH_CHECK(igraph_vector_ptr_init(&closedsets, 0));
   IGRAPH_FINALLY(igraph_vector_ptr_destroy, &closedsets); /* TODO */
-  IGRAPH_CHECK(igraph_all_st_cuts(&residual, /*cuts=*/ 0, 
-				  /*partitions1s=*/ &closedsets,
-				  /*source=*/ newsource, 
-				  /*target=*/ newtarget));
+  IGRAPH_CHECK(igraph_provan_shier_list(&residual, &S, &T, 
+					newsource, newtarget, &closedsets,
+					igraph_i_all_st_mincuts_pivot,
+					&pivot_data));
 
   /* Convert the closed sets in the contracted graphs to cutsets in the
      original graph */
@@ -1068,10 +1343,7 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
   igraph_vector_destroy(&revmap_next);
   igraph_vector_destroy(&revmap_ptr);
   igraph_vector_ptr_destroy(&closedsets);
-  igraph_vector_destroy(&NtoL);
-  igraph_destroy(&residual);
-  igraph_vector_destroy(&flow);
-  IGRAPH_FINALLY_CLEAN(6);
+  IGRAPH_FINALLY_CLEAN(3);
 
   if (cuts) {
     igraph_vector_long_t memb;
@@ -1104,6 +1376,14 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
     igraph_vector_long_destroy(&memb);
     IGRAPH_FINALLY_CLEAN(1);
   }
+  
+  igraph_estack_destroy(&T);
+  igraph_marked_queue_destroy(&S);
+  igraph_vector_bool_destroy(&VE1bool);
+  igraph_vector_destroy(&NtoL);
+  igraph_destroy(&residual);
+  igraph_vector_destroy(&flow);
+  IGRAPH_FINALLY_CLEAN(6);
 
   if (!partition1s) {
     igraph_vector_ptr_destroy(mypartition1s);
@@ -1112,3 +1392,4 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
 
   return 0;
 }
+

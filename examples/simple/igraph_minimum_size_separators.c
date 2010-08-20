@@ -71,8 +71,9 @@ int main() {
 
   /* ----------------------------------------------------------- */
 
-  igraph_small(&g, 5, IGRAPH_UNDIRECTED,
-	       0,2, 0,3, 2,1, 3,1,
+  igraph_small(&g, 10, IGRAPH_UNDIRECTED,
+	       0,2, 0,3, 1,2, 1,3, 5,2, 5,3, 6,2, 6,3, 
+	       7,2, 7,3, 8,2, 8,3, 9,2, 9,3,
 	       2,4, 4,3,
 	       -1);
   igraph_vector_ptr_init(&sep, 0);
