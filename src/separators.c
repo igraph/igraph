@@ -522,8 +522,24 @@ int igraph_all_minimal_ab_separators(const igraph_t *graph,
 
 int igraph_i_minimum_size_separators_append(igraph_vector_ptr_t *old,
 					    const igraph_vector_ptr_t *new) {
- 
-  IGRAPH_CHECK(igraph_vector_ptr_append(old, new));  
+
+  long int olen=igraph_vector_ptr_size(old);
+  long int nlen=igraph_vector_ptr_size(new);
+  long int i;
+  
+  for (i=0; i<nlen; i++) {
+    igraph_vector_t *newvec=VECTOR(*new)[i];
+    long int j;
+    for (j=0; j<olen; j++) {
+      igraph_vector_t *oldvec=VECTOR(*old)[j];
+      if (igraph_vector_is_equal(oldvec, newvec)) { break; }
+    }
+    if (j==olen) {
+      IGRAPH_CHECK(igraph_vector_ptr_push_back(old, newvec));
+      olen++;
+    }
+  }
+
   return 0;
 }
 
