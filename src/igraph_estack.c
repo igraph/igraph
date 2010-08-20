@@ -59,3 +59,7 @@ igraph_bool_t igraph_estack_iselement(const igraph_estack_t *s,
 long int igraph_estack_size(const igraph_estack_t *s) {
   return igraph_stack_long_size(&s->stack);
 }
+
+int igraph_estack_print(const igraph_estack_t *s) {
+  return igraph_stack_long_print(&s->stack);
+}
