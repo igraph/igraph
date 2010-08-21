@@ -366,11 +366,11 @@ void igraph_i_separators_free(igraph_vector_ptr_t *separators) {
 }
 
 /**
- * \function igraph_all_minimal_ab_separators
- * List all vertex sets that are minimal (a,b) separators for some a and b
+ * \function igraph_all_minimal_st_separators
+ * List all vertex sets that are minimal (s,t) separators for some a and b
  * 
- * This function lists all vertex sets that are minimal (a,b)
- * separators for some (a,b) vertex pair.
+ * This function lists all vertex sets that are minimal (s,t)
+ * separators for some (s,t) vertex pair.
  * 
  * </para><para>See more about the implemented algorithm in 
  * Anne Berry, Jean-Paul Bordat and Olivier Cogis: Generating All the
@@ -393,7 +393,7 @@ void igraph_i_separators_free(igraph_vector_ptr_t *separators) {
  * number of separators.
  */
 
-int igraph_all_minimal_ab_separators(const igraph_t *graph, 
+int igraph_all_minimal_st_separators(const igraph_t *graph, 
 				     igraph_vector_ptr_t *separators) {
 
   /* 

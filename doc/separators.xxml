@@ -9,7 +9,7 @@
 
 <!-- doxrox-include igraph_is_separator -->
 <!-- doxrox-include igraph_is_minimal_separator -->
-<!-- doxrox-include igraph_all_minimal_ab_separators -->
+<!-- doxrox-include igraph_all_minimal_st_separators -->
 <!-- doxrox-include igraph_minimum_size_separators -->
 
 </chapter>

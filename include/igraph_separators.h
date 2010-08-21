@@ -46,7 +46,7 @@ int igraph_is_separator(const igraph_t *graph,
 			const igraph_vector_long_t *candidate,
 			igraph_bool_t *res);
 
-int igraph_all_minimal_ab_separators(const igraph_t *graph, 
+int igraph_all_minimal_st_separators(const igraph_t *graph, 
 				     igraph_vector_ptr_t *separators);
 
 int igraph_is_minimal_separator(const igraph_t *graph,
