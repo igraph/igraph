@@ -879,6 +879,28 @@ class Graph(core.GraphBase):
 
         return graph
 
+    def write_dimacs(self, f, source=None, target=None, capacity="capacity"):
+        """Writes the graph in DIMACS format to the given file.
+
+        @param f: the name of the file to be written or a Python file handle.
+        @param source: the source vertex ID. If C{None}, igraph will try to
+          infer it from the C{source} graph attribute.
+        @param target: the target vertex ID. If C{None}, igraph will try to
+          infer it from the C{target} graph attribute.
+        @param capacity: the capacities of the edges in a list or the name of
+          an edge attribute that holds the capacities. If there is no such
+          edge attribute, every edge will have a capacity of 1.
+        """
+        if source is None:
+            source = self["source"]
+        if target is None:
+            target = self["target"]
+        if isinstance(capacity, basestring) and \
+                capacity not in self.edge_attributes():
+            warn("'%s' edge attribute does not exist" % capacity)
+            capacity = None
+        return GraphBase.write_dimacs(self, f, source, target, capacity)
+
     def write_graphmlz(self, f, compresslevel=9):
         """Writes the graph to a zipped GraphML file.
 
@@ -909,6 +931,39 @@ class Graph(core.GraphBase):
             if tmpfilename is not None: os.unlink(tmpfilename)
 
     @classmethod
+    def Read_DIMACS(cls, f, directed=False):
+        """Read_DIMACS(f, directed=False)
+
+        Reads a graph from a file conforming to the DIMACS minimum-cost flow
+        file format.
+
+        For the exact definition of the format, see
+        U{http://lpsolve.sourceforge.net/5.5/DIMACS.htm}.
+
+        Restrictions compared to the official description of the format are
+        as follows:
+
+          - igraph's DIMACS reader requires only three fields in an arc
+            definition, describing the edge's source and target node and
+            its capacity.
+          - Source vertices are identified by 's' in the FLOW field, target
+            vertices are identified by 't'.
+          - Node indices start from 1. Only a single source and target node
+            is allowed.
+
+        @param f: the name of the file or a Python file handle
+        @param directed: whether the generated graph should be directed.
+        @return: the generated graph. The indices of the source and target
+          vertices are attached as graph attributes C{source} and C{target},
+          the edge capacities are stored in the C{capacity} edge attribute.
+        """
+        graph, source, target, cap = super(Graph, cls).Read_DIMACS(f, directed)
+        graph.es["capacity"] = cap
+        graph["source"] = source
+        graph["target"] = target
+        return graph
+
+    @classmethod
     def Read_GraphMLz(cls, f, *params, **kwds):
         """Read_GraphMLz(f, directed=True, index=0)
 
@@ -933,7 +988,6 @@ class Graph(core.GraphBase):
         finally:
             if tmpfilename is not None: os.unlink(tmpfilename)
         return result
-
 
     def write_pickle(self, fname=None, version=-1):
         """Saves the graph in Python pickled format
