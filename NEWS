@@ -93,6 +93,7 @@ Bugs corrected in the Python interface
 - Fixed motif estimation bug, when cutting the search tree (#362519).
 - Fixed a bug in Laplacian calculation when the graph had multiple
   edges (#613161).
+- Fixed a problem with the DIMACS reader (#621716)
 
 New in the C layer
 ------------------
