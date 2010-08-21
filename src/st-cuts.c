@@ -551,6 +551,10 @@ int igraph_dominator_tree(const igraph_t *graph,
 			       IGRAPH_DIRECTED));
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
+    
+    IGRAPH_I_ATTRIBUTE_DESTROY(domtree);
+    IGRAPH_I_ATTRIBUTE_COPY(domtree, graph, /*graph=*/ 1, /*vertex=*/ 1, 
+			    /*edge=*/ 0);
   }
 
   if (!dom) {
