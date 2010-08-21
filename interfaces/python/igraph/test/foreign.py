@@ -40,12 +40,12 @@ class ForeignTests(unittest.TestCase):
         a 2 4 3
         a 3 4 5
         """) as tmpfname:
-            g, src, dst, cap=Graph.Read_DIMACS(tmpfname, False)
-            self.failUnless(isinstance(g, Graph))
-            self.failUnless(g.vcount() == 4 and g.ecount() == 5)
-            self.failUnless(src == 0 and dst == 3)
-            self.failUnless(cap == [4,2,2,3,5])
-            g.write_dimacs(tmpfname, src, dst, cap)
+            graph = Graph.Read_DIMACS(tmpfname, False)
+            self.failUnless(isinstance(graph, Graph))
+            self.failUnless(graph.vcount() == 4 and graph.ecount() == 5)
+            self.failUnless(graph["source"] == 0 and graph["target"] == 3)
+            self.failUnless(graph.es["capacity"] == [4,2,2,3,5])
+            graph.write_dimacs(tmpfname)
 
 
     def testDL(self):
