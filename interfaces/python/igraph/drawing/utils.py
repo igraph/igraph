@@ -2,6 +2,7 @@
 Utility classes for drawing routines.
 """
 
+from math import atan2, cos, sin
 from operator import itemgetter
 
 __all__ = ["BoundingBox", "FakeModule", "Point"]
@@ -225,3 +226,14 @@ class Point(tuple):
         """Returns the squared length of the vector pointing from the origin
         to this point."""
         return (self.x ** 2 + self.y ** 2)
+
+    def towards(self, other, distance = 0):
+        """Returns the point that is at a given distance from this point
+        towards another one."""
+        if not distance:
+            return self
+
+        angle = atan2(other.y - self.y, other.x - self.x)
+        return Point(self.x + distance * cos(angle),
+                     self.y + distance * sin(angle))
+

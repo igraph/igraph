@@ -13,7 +13,7 @@ L{CytoscapeGraphDrawer}.
 """
 
 from itertools import izip
-from math import atan2, cos, pi, sin
+from math import cos, pi, sin
 
 from igraph.core import convex_hull
 from igraph.configuration import Configuration
@@ -24,7 +24,8 @@ from igraph.drawing.edge import ArrowEdgeDrawer
 from igraph.drawing.text import TextDrawer
 from igraph.drawing.metamagic import AttributeCollectorBase, \
                                      AttributeSpecification
-from igraph.drawing.shapes import ShapeDrawerDirectory
+from igraph.drawing.shapes import ShapeDrawerDirectory, PolygonDrawer
+from igraph.drawing.utils import Point
 from igraph.layout import Layout
 
 __all__ = ["DefaultGraphDrawer", "UbiGraphDrawer", "CytoscapeGraphDrawer"]
@@ -208,12 +209,8 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
                 # False
                 group_iter = {}.iteritems()
 
-            def expand(point0, point1, r):
-                """Returns the point which lies on the line from point0 to point1
-                at distance r from point1 towards the opposite direction (i.e.
-                not towards point0)"""
-                angle = atan2(point1[1] - point0[1], point1[0] - point0[0])
-                return point1[0] + r * cos(angle), point1[1] + r * sin(angle)
+            # We will need a polygon drawer to draw the convex hulls
+            polygon_drawer = PolygonDrawer(context, bbox)
 
             # Iterate over color-memberlist pairs
             for color_id, group in group_iter:
@@ -223,16 +220,14 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
                     raise TypeError("group membership list must be iterable")
 
                 polygon = convex_hull([layout[idx] for idx in group], True)
-                center_of_mass = [sum(coords) / float(len(coords))
-                                  for coords in zip(*polygon)]
-                polygon = [expand(center_of_mass, point, 20)
+                center_of_mass = Point(*[sum(coords) / float(len(coords))
+                                  for coords in zip(*polygon)])
+                polygon = [Point(*point).towards(center_of_mass, -30)
                            for point in polygon]
-                
+
                 context.set_source_rgba(color[0], color[1], color[2],
                                         color[3]*0.25)
-                context.move_to(*polygon[-1])
-                for point in polygon:
-                    context.line_to(*point)
+                polygon_drawer.draw_path(polygon, corner_radius=30)
                 context.fill_preserve()
                 context.set_source_rgba(*color)
                 context.stroke()
