@@ -265,8 +265,10 @@ fi
 #
 if test x$merge = xyes; then
     cd fatbuild
-    output=.libs
-	mkdir -p $output
+    output=.
+	if [ ! -d $output ]; then
+		mkdir -p $output
+	fi
     target=`find . -mindepth 4 -maxdepth 4 -type f -name '*.dylib' | head -1 | sed 's|.*/||'`
     (lipo -create -o $output/$target `find . -mindepth 4 -maxdepth 4 -type f -name "*.dylib"` &&
      ln -sf $target $output/libigraph.dylib &&
