@@ -305,32 +305,25 @@ PyObject* igraphmodule_VertexSeq_get_attribute_values(igraphmodule_VertexSeqObje
 
 PyObject* igraphmodule_VertexSeq_get_attribute_values_mapping(igraphmodule_VertexSeqObject *self, PyObject *o) {
   /* Handle integer indices according to the sequence protocol */
-  if (PyInt_Check(o)) return igraphmodule_VertexSeq_sq_item(self, PyInt_AsLong(o));
-  if (PyTuple_Check(o)) {
-    /* Return a restricted VertexSeq */
-    if (PyTuple_Size(o) == 0) {
-      PyObject *args, *result;
-      args = Py_BuildValue("(O)", Py_None);
-      result = igraphmodule_VertexSeq_select(self, args, NULL);
-      Py_DECREF(args);
-      return result;
-    }
-    return igraphmodule_VertexSeq_select(self, o, NULL);
-  } else if (PySlice_Check(o) || PyList_Check(o)) {
-    /* Return a restricted VertexSeq */
+  if (PyInt_Check(o))
+    return igraphmodule_VertexSeq_sq_item(self, PyInt_AsLong(o));
+
+  /* Handle strings according to the mapping protocol */
+  if (PyString_Check(o) || PyUnicode_Check(o))
+    return igraphmodule_VertexSeq_get_attribute_values(self, o);
+
+  /* Handle iterables and slices by calling the select() method */
+  if (PySlice_Check(o) || PyObject_HasAttrString(o, "__iter__")) {
     PyObject *result, *args;
-    if (PySlice_Check(o)) {
-      args = Py_BuildValue("(O)", o);
-    } else if (PyList_Size(o) == 0) {
-      args = Py_BuildValue("(O)", Py_None);
-    } else {
-      args = PyList_AsTuple(o);
-    }
-    if (!args) return NULL;
+    args = Py_BuildValue("(O)", o);
+    if (!args)
+      return NULL;
     result = igraphmodule_VertexSeq_select(self, args, NULL);
     Py_DECREF(args);
     return result;
   }
+  
+  /* Handle everything else according to the mapping protocol */
   return igraphmodule_VertexSeq_get_attribute_values(self, o);
 }
 
@@ -648,7 +641,7 @@ PyObject* igraphmodule_VertexSeq_select(igraphmodule_VertexSeqObject *self,
 
       /* Create an appropriate iterator */
       if (PySlice_Check(item)) {
-        /* Create an iterator from the slice (which is not iterable by default )*/
+        /* Create an iterator from the slice (which is not iterable by default) */
         Py_ssize_t start, stop, step, sl;
         PyObject* range;
         igraph_bool_t ok;
