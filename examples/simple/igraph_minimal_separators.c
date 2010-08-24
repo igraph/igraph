@@ -38,7 +38,7 @@ int main() {
   for (i=0; i<n; i++) {
     igraph_bool_t res;
     igraph_vector_t *sep=VECTOR(separators)[i];
-    igraph_is_separator(&graph, sep, &res);
+    igraph_is_separator(&graph, igraph_vss_vector(sep), &res);
     if (!res) { 
       printf("Vertex set %li is not a separator!\n", i);
       igraph_vector_print(sep);

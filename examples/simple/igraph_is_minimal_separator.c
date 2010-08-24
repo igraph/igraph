@@ -32,27 +32,22 @@ int main() {
   igraph_vector_t sep;
   igraph_bool_t result;
 
-  igraph_vector_init(&sep, 0);
-
   /* Simple star graph, remove the center */
   igraph_star(&graph, 10, IGRAPH_STAR_UNDIRECTED, 0);
-  igraph_vector_resize(&sep, 1);
-  VECTOR(sep)[0] = 0;
-  igraph_is_minimal_separator(&graph, &sep, &result);
+  igraph_is_minimal_separator(&graph, igraph_vss_1(0), &result);
   if (!result) FAIL("Center of star graph failed.", 1);
 
   /* Same graph, but another vertex */
-  VECTOR(sep)[0] = 6;
-  igraph_is_minimal_separator(&graph, &sep, &result);
+  igraph_is_minimal_separator(&graph, igraph_vss_1(6), &result);
   if (result) FAIL("Non-center of star graph failed.", 2);
   igraph_destroy(&graph);
 
   /* Karate club */
   igraph_famous(&graph, "zachary");
-  igraph_vector_clear(&sep);
+  igraph_vector_init(&sep, 0);
   igraph_vector_push_back(&sep, 32);
   igraph_vector_push_back(&sep, 33);
-  igraph_is_minimal_separator(&graph, &sep, &result);
+  igraph_is_minimal_separator(&graph, igraph_vss_vector(&sep), &result);
   if (!result) FAIL("Karate network (32,33) failed", 3);
 
   igraph_vector_resize(&sep, 5);
@@ -61,7 +56,7 @@ int main() {
   VECTOR(sep)[2]=19;
   VECTOR(sep)[3]=30;
   VECTOR(sep)[4]=31;
-  igraph_is_minimal_separator(&graph, &sep, &result);
+  igraph_is_minimal_separator(&graph, igraph_vss_vector(&sep), &result);
   if (result) FAIL("Karate network (8,9,19,30,31) failed", 4);
 
   igraph_destroy(&graph);

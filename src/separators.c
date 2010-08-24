@@ -35,8 +35,9 @@
 #include "igraph_stack.h"
 
 int igraph_i_is_separator(const igraph_t *graph,
-			  const igraph_vector_t *candidate,
-			  igraph_bool_t *res, 
+			  igraph_vit_t *vit,
+			  long int except,
+			  igraph_bool_t *res,
 			  igraph_vector_bool_t *removed,
 			  igraph_dqueue_t *Q,
 			  igraph_vector_t *neis,
@@ -44,12 +45,27 @@ int igraph_i_is_separator(const igraph_t *graph,
   
   /* Remove the given vertices from the graph, do a breadth-first
      search and check the number of components */  
-  long int i, clen=igraph_vector_size(candidate);
   long int start=0;
-  
-  for (i=0; i<clen; i++) {
-    long int v=VECTOR(*candidate)[i];
-    VECTOR(*removed)[v] = 1;
+
+  if (except < 0) {
+    for (IGRAPH_VIT_RESET(*vit); 
+	 !IGRAPH_VIT_END(*vit);
+	 IGRAPH_VIT_NEXT(*vit)) {
+      VECTOR(*removed)[ (long int) IGRAPH_VIT_GET(*vit) ] = 1;
+    }
+  } else {
+    /* There is an exception */
+    long int i;
+    for (i=0, IGRAPH_VIT_RESET(*vit);
+	 i<except; 
+	 i++, IGRAPH_VIT_NEXT(*vit)) {
+      VECTOR(*removed)[ (long int) IGRAPH_VIT_GET(*vit) ] = 1;
+    }
+    for (IGRAPH_VIT_NEXT(*vit); 
+	 !IGRAPH_VIT_END(*vit); 
+	 IGRAPH_VIT_NEXT(*vit)) {
+      VECTOR(*removed)[ (long int) IGRAPH_VIT_GET(*vit) ] = 1;
+    }
   }
 
   /* Look for the first node that is not removed */
@@ -81,7 +97,7 @@ int igraph_i_is_separator(const igraph_t *graph,
   
   /* If there is another component, then we have a separator */
   *res = (start < no_of_nodes);
-    
+
   return 0;
 }
 
@@ -91,8 +107,8 @@ int igraph_i_is_separator(const igraph_t *graph,
  * 
  * \param graph The input graph. It may be directed, but edge
  *        directions are ignored.
- * \param condidate Pointer to a vector of integers, the candidate
- *        separator. It must not contain all vertices.
+ * \param condidate The candidate separator. It must not contain all
+ *        vertices.
  * \param res Pointer to a boolean variable, the result is stored here.
  * \return Error code.
  * 
@@ -100,27 +116,31 @@ int igraph_i_is_separator(const igraph_t *graph,
  */
 
 int igraph_is_separator(const igraph_t *graph, 
-			const igraph_vector_t *candidate,
+			const igraph_vs_t candidate,
 			igraph_bool_t *res) {
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_bool_t removed;
   igraph_dqueue_t Q;
   igraph_vector_t neis;
+  igraph_vit_t vit;
 
+  IGRAPH_CHECK(igraph_vit_create(graph, candidate, &vit));
+  IGRAPH_FINALLY(igraph_vit_destroy, &vit);
   IGRAPH_CHECK(igraph_vector_bool_init(&removed, no_of_nodes));
   IGRAPH_FINALLY(igraph_vector_bool_destroy, &removed);
   IGRAPH_CHECK(igraph_dqueue_init(&Q, 100));
   IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
 
-  IGRAPH_CHECK(igraph_i_is_separator(graph, candidate, res, &removed, 
+  IGRAPH_CHECK(igraph_i_is_separator(graph, &vit, -1, res, &removed, 
 				     &Q, &neis, no_of_nodes));
 
   igraph_vector_destroy(&neis);
   igraph_dqueue_destroy(&Q);
   igraph_vector_bool_destroy(&removed);
-  IGRAPH_FINALLY_CLEAN(3);
+  igraph_vit_destroy(&vit);
+  IGRAPH_FINALLY_CLEAN(4);
 
   return 0;
 }
@@ -152,15 +172,19 @@ int igraph_is_separator(const igraph_t *graph,
  */
 
 int igraph_is_minimal_separator(const igraph_t *graph,
-				const igraph_vector_t *candidate, 
+				const igraph_vs_t candidate, 
 				igraph_bool_t *res) {
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_bool_t removed;
   igraph_dqueue_t Q;
   igraph_vector_t neis;
-  igraph_vector_t candcopy;
-  long int candsize=igraph_vector_size(candidate);
+  long int candsize;
+  igraph_vit_t vit;
+  
+  IGRAPH_CHECK(igraph_vit_create(graph, candidate, &vit));
+  IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+  candsize=IGRAPH_VIT_SIZE(vit);
 
   IGRAPH_CHECK(igraph_vector_bool_init(&removed, no_of_nodes));
   IGRAPH_FINALLY(igraph_vector_bool_destroy, &removed);
@@ -169,62 +193,32 @@ int igraph_is_minimal_separator(const igraph_t *graph,
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
 
   /* Is it a separator at all? */
-  IGRAPH_CHECK(igraph_i_is_separator(graph, candidate, res, &removed, 
+  IGRAPH_CHECK(igraph_i_is_separator(graph, &vit, -1, res, &removed, 
 				     &Q, &neis, no_of_nodes));
   if (!(*res)) {
     /* Not a separator at all, nothing to do, *res is already set */
   } else if (candsize == 0) {
     /* Nothing to do, minimal, *res is already set */
-  } else if (candsize == 1) {
-    /* Check whether the graph was connected at all, by checking
-       whether the empty set is a separator. If yes, then 'candidate'
-       is not minimal, otherwise it is */
-    IGRAPH_CHECK(igraph_vector_init(&candcopy, 0));
-    IGRAPH_FINALLY(igraph_vector_destroy, &candcopy);
-    igraph_vector_bool_null(&removed);
-    IGRAPH_CHECK(igraph_i_is_separator(graph, &candcopy, res, &removed, 
-				       &Q, &neis, no_of_nodes));
-    (*res) = (*res) ? 0 : 1;	/* opposite */
-    igraph_vector_destroy(&candcopy);
-    IGRAPH_FINALLY_CLEAN(1);
   } else {
     /* General case, we need to remove each vertex from 'candidate'
      * and check whether the remainder is a separator. If this is
-     * alse for all vertices, then 'candidate' is a minimal
+     * false for all vertices, then 'candidate' is a minimal
      * separator.
-     * 
-     * Trick: We copy 'candidate', and "mask out" vertices one by one,
-     * by putting candcopy[0] over it. The only drawback is that we
-     * need to handle the removal of candcopy[0] separately.
      */
     long int i;
-    IGRAPH_CHECK(igraph_vector_copy(&candcopy, candidate));
-    IGRAPH_FINALLY(igraph_vector_destroy, &candcopy);
-
-    /* "Remove" candcopy[0] */
-    VECTOR(candcopy)[0] = VECTOR(candcopy)[1];
-    igraph_vector_bool_null(&removed);
-    IGRAPH_CHECK(igraph_i_is_separator(graph, &candcopy, res, &removed, 
-				       &Q, &neis, no_of_nodes));
-    VECTOR(candcopy)[0] = VECTOR(*candidate)[0];
-
-    /* And the rest of them one by one */
-    for (i=1; i<candsize && (!*res); i++) {
-      VECTOR(candcopy)[i] = VECTOR(*candidate)[0];
+    for (i=0, *res=0; i<candsize && (!*res); i++) {
       igraph_vector_bool_null(&removed);
-      IGRAPH_CHECK(igraph_i_is_separator(graph, &candcopy, res, &removed, 
+      IGRAPH_CHECK(igraph_i_is_separator(graph, &vit, i, res, &removed, 
 					 &Q, &neis, no_of_nodes));    
-      VECTOR(candcopy)[i] = VECTOR(*candidate)[i];
     }
     (*res) = (*res) ? 0 : 1;	/* opposite */
-    igraph_vector_destroy(&candcopy);
-    IGRAPH_FINALLY_CLEAN(1);
   }
   
   igraph_vector_destroy(&neis);
   igraph_dqueue_destroy(&Q);
   igraph_vector_bool_destroy(&removed);
-  IGRAPH_FINALLY_CLEAN(3);
+  igraph_vit_destroy(&vit);
+  IGRAPH_FINALLY_CLEAN(4);
 
   return 0;
 }
@@ -676,7 +670,8 @@ int igraph_minimum_size_separators(const igraph_t *graph,
   IGRAPH_CHECK(igraph_vector_init(&X, conn));
   IGRAPH_FINALLY(igraph_vector_destroy, &X);
   IGRAPH_CHECK(igraph_i_minimum_size_separators_topkdeg(graph, &X, k));
-  IGRAPH_CHECK(igraph_is_separator(&graph_copy, &X, &issepX));
+  IGRAPH_CHECK(igraph_is_separator(&graph_copy, igraph_vss_vector(&X), 
+				   &issepX));
   if (issepX) {
     igraph_vector_t *v=igraph_Calloc(1, igraph_vector_t);
     if (!v) { 
