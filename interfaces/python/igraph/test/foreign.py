@@ -33,12 +33,6 @@ a 3 4 5
         self.failUnless(graph["source"] == 0 and graph["target"] == 3)
         self.failUnless(graph.es["capacity"] == [4,2,2,3,5])
         graph.write_dimacs(tmpfname)
-        self.failUnless(isinstance(g, Graph))
-        self.failUnless(g.vcount() == 4 and g.ecount() == 5)
-        self.failUnless(src == 0 and dst == 3)
-        self.failUnless(cap == [4,2,2,3,5])
-
-        g.write_dimacs(tmpfname, src, dst, cap)
         os.unlink(tmpfname)
 
 
