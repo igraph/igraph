@@ -219,15 +219,25 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
                 if not hasattr(group, "__iter__"):
                     raise TypeError("group membership list must be iterable")
 
-                polygon = convex_hull([layout[idx] for idx in group], True)
+                # Get the vertex indices that constitute the convex hull
+                hull = [group[i] for i in convex_hull([layout[idx] for idx in group])]
+
+                # Calculate the preferred rounding radius for the corners
+                corner_radius = 1.25 * max(vertex_builder[idx].size for idx in hull)
+
+                # Construct the polygon
+                polygon = [layout[idx] for idx in hull]
+
+                # Expand the polygon around its center of mass
                 center_of_mass = Point(*[sum(coords) / float(len(coords))
                                   for coords in zip(*polygon)])
-                polygon = [Point(*point).towards(center_of_mass, -30)
+                polygon = [Point(*point).towards(center_of_mass, -corner_radius)
                            for point in polygon]
 
+                # Draw the hull
                 context.set_source_rgba(color[0], color[1], color[2],
                                         color[3]*0.25)
-                polygon_drawer.draw_path(polygon, corner_radius=30)
+                polygon_drawer.draw_path(polygon, corner_radius=corner_radius)
                 context.fill_preserve()
                 context.set_source_rgba(*color)
                 context.stroke()
