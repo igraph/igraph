@@ -521,7 +521,7 @@ int igraph_all_minimal_st_separators(const igraph_t *graph,
 #undef UPDATEMARK
 
 int igraph_i_minimum_size_separators_append(igraph_vector_ptr_t *old,
-					    const igraph_vector_ptr_t *new) {
+					    igraph_vector_ptr_t *new) {
 
   long int olen=igraph_vector_ptr_size(old);
   long int nlen=igraph_vector_ptr_size(new);
@@ -537,8 +537,12 @@ int igraph_i_minimum_size_separators_append(igraph_vector_ptr_t *old,
     if (j==olen) {
       IGRAPH_CHECK(igraph_vector_ptr_push_back(old, newvec));
       olen++;
+    } else {
+      igraph_vector_destroy(newvec);
+      igraph_free(newvec);
     }
   }
+  igraph_vector_ptr_clear(new);
 
   return 0;
 }
@@ -657,6 +661,7 @@ int igraph_minimum_size_separators(const igraph_t *graph,
       VECTOR(*separators)[i]=v;
       IGRAPH_FINALLY_CLEAN(1);
     }
+    IGRAPH_FINALLY_CLEAN(1);	/* separators */
     return 0;
   }
 
