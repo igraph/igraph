@@ -1463,6 +1463,10 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
     }
     igraph_vector_ptr_push_back(mypartition1s, cut);
     IGRAPH_FINALLY_CLEAN(1);
+    
+    igraph_vector_destroy(supercut);
+    igraph_free(supercut);
+    VECTOR(closedsets)[i] = 0;
   }    
 
   igraph_vector_destroy(&revmap_next);
@@ -1505,12 +1509,19 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
   igraph_estack_destroy(&T);
   igraph_marked_queue_destroy(&S);
   igraph_vector_bool_destroy(&VE1bool);
+  igraph_vector_destroy(&VE1);
   igraph_vector_destroy(&NtoL);
   igraph_destroy(&residual);
   igraph_vector_destroy(&flow);
-  IGRAPH_FINALLY_CLEAN(6);
+  IGRAPH_FINALLY_CLEAN(7);
 
   if (!partition1s) {
+    for (i=0; i<nocuts; i++) {
+      igraph_vector_t *cut=VECTOR(*mypartition1s)[i];
+      igraph_vector_destroy(cut);
+      igraph_free(cut);
+      VECTOR(*mypartition1s)[i]=0;
+    }
     igraph_vector_ptr_destroy(mypartition1s);
     IGRAPH_FINALLY_CLEAN(1);
   }
