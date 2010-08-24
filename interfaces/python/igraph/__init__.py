@@ -40,6 +40,7 @@ from igraph.drawing.colors import *
 from igraph.datatypes import *
 from igraph.formula import *
 from igraph.layout import *
+from igraph.utils import *
 
 import os
 import math

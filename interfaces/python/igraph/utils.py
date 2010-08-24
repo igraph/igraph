@@ -7,7 +7,7 @@ import tempfile
 
 __license__ = "GPL"
 
-__all__ = ["named_temporary_file"]
+__all__ = ["rescale"]
 __docformat__ = "restructuredtext en"
 
 @contextmanager
@@ -24,6 +24,56 @@ def named_temporary_file(*args, **kwds):
         yield tmpfile
     finally:
         os.unlink(tmpfile)
+
+def rescale(values, out_range = (0., 1.), in_range = None, clamp = False):
+    """Rescales a list of numbers into a given range.
+
+    `out_range` gives the range of the output values; by default, the minimum
+    of the original numbers in the list will be mapped to the first element
+    in the output range and the maximum will be mapped to the second element.
+    Elements between the minimum and maximum values in the input list will be
+    interpolated linearly between the first and second values of the output
+    range.
+
+    `in_range` may be used to override which numbers are mapped to the first
+    and second values of the output range. This must also be a tuple, where
+    the first element will be mapped to the first element of the output range
+    and the second element to the second.
+
+    If `clamp` is ``True``, elements which are outside the given `out_range`
+    after rescaling are clamped to the output range to ensure that no number
+    will be outside `out_range` in the result.
+    
+    Examples:
+        
+        >>> rescale(range(5), (0, 8))
+        [0.0, 2.0, 4.0, 6.0, 8.0]
+        >>> rescale(range(5), (2, 10))
+        [2.0, 4.0, 6.0, 8.0, 10.0]
+        >>> rescale(range(5), (0, 4), (1, 3))
+        [-2.0, 0.0, 2.0, 4.0, 6.0]
+        >>> rescale(range(5), (0, 4), (1, 3), clamp=True)
+        [0.0, 0.0, 2.0, 4.0, 4.0]
+        >>> rescale([0]*5, (1, 3))
+        [2.0, 2.0, 2.0, 2.0, 2.0]
+    """
+    if in_range is None:
+        mi, ma = min(values), max(values)
+    else:
+        mi, ma = in_range
+
+    ratio = float(ma - mi)
+    if not ratio:
+        return [(out_range[0] + out_range[1]) / 2.] * len(values)
+
+    min_out, max_out = map(float, out_range)
+    ratio = (max_out - min_out) / ratio
+    result = [(x - mi) * ratio + min_out for x in values]
+
+    if clamp:
+        return [max(min(x, max_out), min_out) for x in result]
+    else:
+        return result
 
 def consecutive_pairs(iterable, circular=False):
     """Returns consecutive pairs of items from the given iterable.
