@@ -123,9 +123,13 @@ class GradientPalette(Palette):
 
     Example:
     
-      >>> pal = GradientPalette("red", "blue",4)
+      >>> pal = GradientPalette("red", "blue", 5)
+      >>> pal.get(0)
+      (1.0, 0.0, 0.0, 1.0)
       >>> pal.get(2)
       (0.5, 0.0, 0.5, 1.0)
+      >>> pal.get(4)
+      (0.0, 0.0, 1.0, 1.0)
     """
 
     def __init__(self, color1, color2, n=256):
@@ -146,7 +150,7 @@ class GradientPalette(Palette):
         @return: a 4-tuple containing the RGBA values"""
         ratio = float(v)/(len(self)-1)
         return tuple(self._color1[x]*(1-ratio) + \
-                     self._color2[x]*ratio for x in range(3))
+                     self._color2[x]*ratio for x in range(4))
 
 
 class AdvancedGradientPalette(Palette):
@@ -154,7 +158,7 @@ class AdvancedGradientPalette(Palette):
     
     Example:
     
-      >>> pal = AdvancedGradientPalette(["red", "black", "blue"], n=8)
+      >>> pal = AdvancedGradientPalette(["red", "black", "blue"], n=9)
       >>> pal.get(2)
       (0.5, 0.0, 0.0, 1.0)
       >>> pal.get(7)
@@ -192,8 +196,8 @@ class AdvancedGradientPalette(Palette):
                 dist = self._dists[i]
                 ratio = float(v-self._indices[i])/dist
                 return tuple([colors[i][x]*(1-ratio)+colors[i+1][x]*ratio \
-                        for x in range(3)])
-        return (0., 0., 0.)
+                        for x in range(4)])
+        return (0., 0., 0., 1.)
 
 
 class PrecalculatedPalette(Palette):
@@ -286,16 +290,16 @@ def color_name_to_rgba(color, palette=None):
 
       >>> color_name_to_rgba("red")
       (1.0, 0.0, 0.0, 1.0)
-      >>> color_name_to_rgba("#ff8000")
-      (1.0, 0.50196078431372548, 0.0, 1.0)
-      >>> color_name_to_rgba("#ff800080")
-      (1.0, 0.50196078431372548, 0.0, 0.5)
-      >>> color_name_to_rgba("#08f")
-      (0.0, 0.53333333333333333, 1.0)
+      >>> color_name_to_rgba("#ff8000") == (1.0, 128/255.0, 0.0, 1.0)
+      True
+      >>> color_name_to_rgba("#ff800080") == (1.0, 128/255.0, 0.0, 128/255.0)
+      True
+      >>> color_name_to_rgba("#08f") == (0.0, 136/255.0, 1.0, 1.0)
+      True
       >>> color_name_to_rgba("rgb(100%, 50%, 0%)")
-      (1.0, 0.5, 0., 1.0)
+      (1.0, 0.5, 0.0, 1.0)
       >>> color_name_to_rgba("rgba(100%, 50%, 0%, 25%)")
-      (1., 0.5, 0., 0.25)
+      (1.0, 0.5, 0.0, 0.25)
 
     @param color: the color to be converted in one of the following formats:
       - B{CSS color specification}: C{#rrggbb}, C{#rgb}, C{#rrggbbaa}, C{#rgba},
