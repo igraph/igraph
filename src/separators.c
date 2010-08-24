@@ -35,7 +35,7 @@
 #include "igraph_stack.h"
 
 int igraph_i_is_separator(const igraph_t *graph,
-			  const igraph_vector_long_t *candidate,
+			  const igraph_vector_t *candidate,
 			  igraph_bool_t *res, 
 			  igraph_vector_bool_t *removed,
 			  igraph_dqueue_t *Q,
@@ -44,7 +44,7 @@ int igraph_i_is_separator(const igraph_t *graph,
   
   /* Remove the given vertices from the graph, do a breadth-first
      search and check the number of components */  
-  long int i, clen=igraph_vector_long_size(candidate);
+  long int i, clen=igraph_vector_size(candidate);
   long int start=0;
   
   for (i=0; i<clen; i++) {
@@ -100,7 +100,7 @@ int igraph_i_is_separator(const igraph_t *graph,
  */
 
 int igraph_is_separator(const igraph_t *graph, 
-			const igraph_vector_long_t *candidate,
+			const igraph_vector_t *candidate,
 			igraph_bool_t *res) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -152,15 +152,15 @@ int igraph_is_separator(const igraph_t *graph,
  */
 
 int igraph_is_minimal_separator(const igraph_t *graph,
-				const igraph_vector_long_t *candidate, 
+				const igraph_vector_t *candidate, 
 				igraph_bool_t *res) {
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_bool_t removed;
   igraph_dqueue_t Q;
   igraph_vector_t neis;
-  igraph_vector_long_t candcopy;
-  long int candsize=igraph_vector_long_size(candidate);
+  igraph_vector_t candcopy;
+  long int candsize=igraph_vector_size(candidate);
 
   IGRAPH_CHECK(igraph_vector_bool_init(&removed, no_of_nodes));
   IGRAPH_FINALLY(igraph_vector_bool_destroy, &removed);
@@ -179,13 +179,13 @@ int igraph_is_minimal_separator(const igraph_t *graph,
     /* Check whether the graph was connected at all, by checking
        whether the empty set is a separator. If yes, then 'candidate'
        is not minimal, otherwise it is */
-    IGRAPH_CHECK(igraph_vector_long_init(&candcopy, 0));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &candcopy);
+    IGRAPH_CHECK(igraph_vector_init(&candcopy, 0));
+    IGRAPH_FINALLY(igraph_vector_destroy, &candcopy);
     igraph_vector_bool_null(&removed);
     IGRAPH_CHECK(igraph_i_is_separator(graph, &candcopy, res, &removed, 
 				       &Q, &neis, no_of_nodes));
     (*res) = (*res) ? 0 : 1;	/* opposite */
-    igraph_vector_long_destroy(&candcopy);
+    igraph_vector_destroy(&candcopy);
     IGRAPH_FINALLY_CLEAN(1);
   } else {
     /* General case, we need to remove each vertex from 'candidate'
@@ -198,8 +198,8 @@ int igraph_is_minimal_separator(const igraph_t *graph,
      * need to handle the removal of candcopy[0] separately.
      */
     long int i;
-    IGRAPH_CHECK(igraph_vector_long_copy(&candcopy, candidate));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &candcopy);
+    IGRAPH_CHECK(igraph_vector_copy(&candcopy, candidate));
+    IGRAPH_FINALLY(igraph_vector_destroy, &candcopy);
 
     /* "Remove" candcopy[0] */
     VECTOR(candcopy)[0] = VECTOR(candcopy)[1];
@@ -217,7 +217,7 @@ int igraph_is_minimal_separator(const igraph_t *graph,
       VECTOR(candcopy)[i] = VECTOR(*candidate)[i];
     }
     (*res) = (*res) ? 0 : 1;	/* opposite */
-    igraph_vector_long_destroy(&candcopy);
+    igraph_vector_destroy(&candcopy);
     IGRAPH_FINALLY_CLEAN(1);
   }
   
@@ -548,7 +548,7 @@ int igraph_i_minimum_size_separators_append(igraph_vector_ptr_t *old,
 }
 
 int igraph_i_minimum_size_separators_topkdeg(const igraph_t *graph, 
-					     igraph_vector_long_t *res,
+					     igraph_vector_t *res,
 					     long int k) {
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t deg, order;
@@ -560,7 +560,7 @@ int igraph_i_minimum_size_separators_topkdeg(const igraph_t *graph,
 			     /*loops=*/ 0));
 
   IGRAPH_CHECK(igraph_vector_order1(&deg, &order, no_of_nodes));
-  IGRAPH_CHECK(igraph_vector_long_resize(res, k));
+  IGRAPH_CHECK(igraph_vector_resize(res, k));
   for (i=0; i<k; i++) {
     VECTOR(*res)[i] = VECTOR(order)[no_of_nodes-1-i];
   }
@@ -603,7 +603,7 @@ int igraph_minimum_size_separators(const igraph_t *graph,
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   igraph_integer_t conn; long int k;  
-  igraph_vector_long_t X;
+  igraph_vector_t X;
   long int i, j;
   igraph_bool_t issepX;
   igraph_t Gbar;
@@ -673,8 +673,8 @@ int igraph_minimum_size_separators(const igraph_t *graph,
   /* ---------------------------------------------------------------- */
   /* 2 Find k vertices with the largest degrees (x1;..,xk). Check
      if these k vertices form a separating k-set of G */
-  IGRAPH_CHECK(igraph_vector_long_init(&X, conn));
-  IGRAPH_FINALLY(igraph_vector_long_destroy, &X);
+  IGRAPH_CHECK(igraph_vector_init(&X, conn));
+  IGRAPH_FINALLY(igraph_vector_destroy, &X);
   IGRAPH_CHECK(igraph_i_minimum_size_separators_topkdeg(graph, &X, k));
   IGRAPH_CHECK(igraph_is_separator(&graph_copy, &X, &issepX));
   if (issepX) {
@@ -754,7 +754,7 @@ int igraph_minimum_size_separators(const igraph_t *graph,
   igraph_vector_destroy(&phi);
   igraph_destroy(&Gbar);
   igraph_vector_destroy(&capacity);
-  igraph_vector_long_destroy(&X);
+  igraph_vector_destroy(&X);
   igraph_destroy(&graph_copy);
   IGRAPH_FINALLY_CLEAN(6);	/* +1 for separators */
   

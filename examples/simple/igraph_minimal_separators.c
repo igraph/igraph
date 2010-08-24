@@ -37,19 +37,19 @@ int main() {
   n=igraph_vector_ptr_size(&separators);
   for (i=0; i<n; i++) {
     igraph_bool_t res;
-    igraph_vector_long_t *sep=VECTOR(separators)[i];
+    igraph_vector_t *sep=VECTOR(separators)[i];
     igraph_is_separator(&graph, sep, &res);
     if (!res) { 
       printf("Vertex set %li is not a separator!\n", i);
-      igraph_vector_long_print(sep);
+      igraph_vector_print(sep);
       return 1;
     }
   }
 
   igraph_destroy(&graph);
   for (i=0; i<n; i++) {
-    igraph_vector_long_t *v=VECTOR(separators)[i];
-    igraph_vector_long_destroy(v);
+    igraph_vector_t *v=VECTOR(separators)[i];
+    igraph_vector_destroy(v);
     igraph_Free(v);
   }
   igraph_vector_ptr_destroy(&separators);
