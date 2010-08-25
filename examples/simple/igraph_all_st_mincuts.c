@@ -85,6 +85,20 @@ int main() {
 
   print_and_destroy(value, &partitions, &cuts);
   igraph_destroy(&g);
+
+  /* ---------------------------------------------------------------- */
+  
+  igraph_small(&g, 9, IGRAPH_DIRECTED, 0,1, 0,2, 1,3, 2,3,
+	       1,4,4,2, 1,5,5,2, 1,6,6,2, 1,7,7,2, 1,8,8,2,
+	       -1);
+  igraph_vector_ptr_init(&partitions, 0);
+  igraph_vector_ptr_init(&cuts, 0);
+  igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
+  			/*source=*/ 0, /*target=*/ 3, /*capacity=*/ 0);
+
+  print_and_destroy(value, &partitions, &cuts);
+  igraph_destroy(&g);
+
  
   return 0;
 }
