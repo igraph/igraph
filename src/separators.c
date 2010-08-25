@@ -42,10 +42,34 @@ int igraph_i_is_separator(const igraph_t *graph,
 			  igraph_dqueue_t *Q,
 			  igraph_vector_t *neis,
 			  long int no_of_nodes) {
+
+  long int start=0;
+
+  if (IGRAPH_VIT_SIZE(*vit) >= no_of_nodes-1) {
+    /* Just need to check that we really have n-1 vertices in it */
+    igraph_vector_bool_t hit;
+    long int nohit=0;
+    IGRAPH_CHECK(igraph_vector_bool_init(&hit, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_bool_destroy, &hit);
+    for (IGRAPH_VIT_RESET(*vit); 
+	 !IGRAPH_VIT_END(*vit); 
+	 IGRAPH_VIT_NEXT(*vit)) {
+      long int v=IGRAPH_VIT_GET(*vit);
+      if (!VECTOR(hit)[v]) {
+	nohit++;
+	VECTOR(hit)[v] = 1;
+      }
+    }
+    igraph_vector_bool_destroy(&hit);
+    IGRAPH_FINALLY_CLEAN(1);
+    if (nohit == no_of_nodes-1) {
+      *res = 1;
+      return 0;
+    }
+  }
   
   /* Remove the given vertices from the graph, do a breadth-first
      search and check the number of components */  
-  long int start=0;
 
   if (except < 0) {
     for (IGRAPH_VIT_RESET(*vit); 
