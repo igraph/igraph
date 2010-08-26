@@ -623,6 +623,7 @@ int igraph_delete_vertices_idx(igraph_t *graph, const igraph_vs_t vertices,
 
   IGRAPH_FINALLY_CLEAN(3);  
 
+  /* TODO: this is duplicate */
   if (invidx) {
     long int i;
     IGRAPH_CHECK(igraph_vector_resize(invidx, remaining_vertices));
