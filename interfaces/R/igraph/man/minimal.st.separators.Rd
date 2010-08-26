@@ -13,6 +13,12 @@ minimal.st.separators(graph)
     are ignored.}
 }
 \details{
+  A \eqn{(s,t)} vertex separator is a set of vertices, such that after
+  their removal from the graph, there is no path between \eqn{s} and
+  \eqn{t} in the graph.
+
+  A \eqn{(s,t)} vertex separator is minimal if none of its subsets is an
+  \eqn{(s,t)} vertex separator.
 }
 \value{
   A list of numeric vectors. Each vector contains a vertex set (defined
