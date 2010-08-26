@@ -1948,13 +1948,14 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
         /* ga = */ 1, /* va = */ 0, /* ea = */ 0));
 
   /* Copy the vertex attributes */
-  IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph, res, &vids_new2old));
+  IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph, res, 
+						   my_vids_new2old));
 
   /* Copy the edge attributes */
   IGRAPH_CHECK(igraph_i_attribute_permute_edges(graph, res, &eids_new2old));
 
   if (!invmap) {
-    igraph_vector_destroy(&vids_new2old);
+    igraph_vector_destroy(my_vids_new2old);
     IGRAPH_FINALLY_CLEAN(1);
   }
   igraph_vector_destroy(&eids_new2old);
