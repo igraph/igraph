@@ -695,6 +695,7 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
   igraph_vector_t Nuv;
   igraph_vector_t Isv_min;
   igraph_vector_t GammaS_vec;
+  long int Sbar_size;
 
   /* We need to create the graph induced by Sbar */
   IGRAPH_VECTOR_INIT_FINALLY(&Sbar_map, 0);
@@ -706,6 +707,7 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
       IGRAPH_CHECK(igraph_vector_push_back(&keep, i));
     }
   }
+  Sbar_size=igraph_vector_size(&keep);
 
   IGRAPH_CHECK(igraph_induced_subgraph_map(graph, &Sbar,
 					   igraph_vss_vector(&keep),
@@ -788,7 +790,7 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
 			    /*in_callback=*/ 0, /*out_callback=*/ 0, 
 			    /*extra=*/ 0));
     /* Remove the NAN values from the end of the vector */
-    for (nuvsize=0; nuvsize<no_of_nodes; nuvsize++) {
+    for (nuvsize=0; nuvsize<Sbar_size; nuvsize++) {
       igraph_real_t t=VECTOR(Nuv)[nuvsize];
       if (IGRAPH_FINITE(t)) {
 	VECTOR(Nuv)[nuvsize]=VECTOR(Sbar_invmap)[(long int) t];
@@ -1035,8 +1037,7 @@ int igraph_all_st_cuts(const igraph_t *graph,
 	long int to=IGRAPH_TO(graph, j);
 	long int pfrom=VECTOR(inS)[from];
 	long int pto=VECTOR(inS)[to];
-	if ((pfrom == i+1 && pto != i+1) ||
-	    (pfrom != i+1 && pto == i+1)) {
+	if ((pfrom == i+1 && pto != i+1)) {
 	  VECTOR(*cut)[cutsize++]=j;
 	}
       }
