@@ -284,7 +284,7 @@ class Plot(object):
         if self._is_dirty:
             self.redraw()
         if isinstance(self._surface, cairo.ImageSurface):
-            if self._need_tmpfile:
+            if fname is None and self._need_tmpfile:
                 with named_temporary_file(prefix="igraph", suffix=".png") as fname:
                     self._surface.write_to_png(fname)
                     return None
