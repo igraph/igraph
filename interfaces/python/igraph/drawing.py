@@ -371,7 +371,8 @@ class Plot(object):
         """
         if self._is_dirty: self.redraw()
         if isinstance(self._surface, cairo.ImageSurface):
-            if self._tmpfile: self._create_tmpfile()
+            if self._tmpfile and fname is None:
+                self._create_tmpfile()
             fname = fname or self._filename or self._tmpfile_name
             if fname is None:
                 raise ValueError, "no file name is known for the surface and none given"
