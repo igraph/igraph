@@ -570,6 +570,7 @@ class Dendrogram(Clustering):
             x_bearing, _, _, height, x_advance, _ = context.text_extents("")
         else:
             x_bearing, _, _, height, x_advance, _ = context.text_extents(str(self._names[idx]))
+
         if horiz:
             return x_advance - x_bearing, height
         return height, x_advance - x_bearing
@@ -634,6 +635,9 @@ class Dendrogram(Clustering):
             raise ValueError("unknown orientation: %s" % orientation)
         horiz = orientation in ("lr", "rl")
 
+        # Get the font height
+        font_height = context.font_extents()[2]
+
         # Calculate space needed for individual items at the
         # bottom of the dendrogram
         item_boxes = [self._item_box_size(context, horiz, idx) \
@@ -652,7 +656,7 @@ class Dendrogram(Clustering):
             x, y = 0, 0
             for idx, element in enumerate(inorder):
                 layout[element] = (x, 0)
-                x += item_boxes[element][0]
+                x += max(font_height, item_boxes[element][0])
 
             for id1, id2 in self._merges:
                 y += 1
@@ -665,7 +669,7 @@ class Dendrogram(Clustering):
             x, y = 0, 0
             for idx, element in enumerate(inorder):
                 layout[element] = (0, y)
-                y += item_boxes[element][1]
+                y += max(font_height, item_boxes[element][1])
 
             for id1, id2 in self._merges:
                 x += 1
@@ -684,7 +688,6 @@ class Dendrogram(Clustering):
         # delta_x, delta_y: displacement of the dendrogram tree
         width, height = float(bbox.width), float(bbox.height)
         delta_x, delta_y = 0, 0
-        _, _, font_height, _, _ = context.font_extents()
         bbox = layout.bounding_box()
         if horiz:
             width -= maxw
@@ -838,11 +841,12 @@ class VertexDendrogram(VertexClustering, Dendrogram):
         from igraph.drawing.metamagic import AttributeCollectorBase
 
         class VisualVertexBuilder(AttributeCollectorBase):
+            _kwds_prefix = "vertex_"
             label = None
 
         builder = VisualVertexBuilder(self._graph.vs, kwds)
         self._names = [vertex.label for vertex in builder]
-        self._names = [name if name is not None else idx
+        self._names = [name if name is not None else str(idx)
                        for idx, name in enumerate(self._names)]
         result = Dendrogram.__plot__(self, context, bbox, palette, \
                 *args, **kwds)
