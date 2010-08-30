@@ -23,6 +23,7 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 """
 
 from copy import deepcopy
+from math import pi
 from StringIO import StringIO
 
 from igraph import community_to_membership
@@ -566,12 +567,12 @@ class Dendrogram(Clustering):
         """Calculates the amount of space needed for drawing an
         individual vertex at the bottom of the dendrogram."""
         if self._names[idx] is None:
-            _, _, _, height, x_ascent, _ = context.text_extents("")
+            x_bearing, _, _, height, x_advance, _ = context.text_extents("")
         else:
-            _, _, _, height, x_ascent, _ = context.text_extents(str(self._names[idx]))
+            x_bearing, _, _, height, x_advance, _ = context.text_extents(str(self._names[idx]))
         if horiz:
-            return x_ascent, height
-        return height, x_ascent
+            return x_advance - x_bearing, height
+        return height, x_advance - x_bearing
 
     # pylint: disable-msg=R0913
     def _plot_item(self, context, horiz, idx, x, y):
@@ -583,19 +584,19 @@ class Dendrogram(Clustering):
         @param x: the X position of the item
         @param y: the Y position of the item
         """
-        if not self._names[idx]:
+        if self._names[idx] is None:
             return
 
-        height, _ = self._item_box_size(context, horiz, idx)
+        height = self._item_box_size(context, True, idx)[1]
         if horiz:
             context.move_to(x, y+height)
             context.show_text(str(self._names[idx]))
         else:
             context.save()
             context.translate(x, y)
-            context.rotate(-1.5707963285)    # pi/2
+            context.rotate(-pi/2.)
             context.move_to(0, height)
-            context.show_text(self._names[idx])
+            context.show_text(str(self._names[idx]))
             context.restore()
 
     # pylint: disable-msg=C0103,W0613
@@ -638,13 +639,19 @@ class Dendrogram(Clustering):
         item_boxes = [self._item_box_size(context, horiz, idx) \
           for idx in xrange(self._nitems)]
 
+        # Small correction for cases when the right edge of the labels is
+        # aligned with the tips of the dendrogram branches
+        ygap = 2 if orientation == "bt" else 0
+        xgap = 2 if orientation == "lr" else 0
+        item_boxes = [(x+xgap, y+ygap) for x, y in item_boxes]
+
         # Calculate coordinates
         layout = Layout([(0, 0)] * self._nitems, dim=2)
         inorder = self._traverse_inorder()
         if not horiz:
             x, y = 0, 0
             for idx, element in enumerate(inorder):
-                layout[element] = (x + item_boxes[element][0]/2., 0)
+                layout[element] = (x, 0)
                 x += item_boxes[element][0]
 
             for id1, id2 in self._merges:
@@ -657,7 +664,7 @@ class Dendrogram(Clustering):
         else:
             x, y = 0, 0
             for idx, element in enumerate(inorder):
-                layout[element] = (0, y + item_boxes[element][1]/2.)
+                layout[element] = (0, y)
                 y += item_boxes[element][1]
 
             for id1, id2 in self._merges:
@@ -677,6 +684,8 @@ class Dendrogram(Clustering):
         # delta_x, delta_y: displacement of the dendrogram tree
         width, height = float(bbox.width), float(bbox.height)
         delta_x, delta_y = 0, 0
+        _, _, font_height, _, _ = context.font_extents()
+        bbox = layout.bounding_box()
         if horiz:
             width -= maxw
             if orientation == "lr":
@@ -686,29 +695,26 @@ class Dendrogram(Clustering):
             if orientation == "tb":
                 delta_y = maxh
 
-        bbox = layout.bounding_box()
-        rx, ry = width / max(bbox.width, 1), height / max(bbox.height, 1)
-        delta_x -= (bbox.left * rx - bbox.left)
-        delta_y -= (bbox.top * ry - bbox.top)
-        layout.scale(rx, ry)
-        layout.translate(delta_x, delta_y)
+        layout.translate(-bbox.left, -bbox.top)
+        if horiz:
+            delta_y += font_height / 2.
+        else:
+            delta_x += font_height / 2.
+        layout.fit_into((delta_x, delta_y, width - delta_x, height - delta_y),
+                        keep_aspect_ratio=False)
 
         context.set_source_rgb(0., 0., 0.)
         context.set_line_width(1)
         
         # Draw items
         if horiz:
-            sgn = -1
-            if orientation == "rl":
-                sgn = 0
+            sgn = 0 if orientation == "rl" else -1
             for idx in xrange(self._nitems):
                 x = layout[idx][0] + sgn * item_boxes[idx][0]
                 y = layout[idx][1] - item_boxes[idx][1]/2.
                 self._plot_item(context, horiz, idx, x, y)
         else:
-            sgn = 0
-            if orientation == "bt":
-                sgn = 1
+            sgn = 1 if orientation == "bt" else 0
             for idx in xrange(self._nitems):
                 x = layout[idx][0] - item_boxes[idx][0]/2.
                 y = layout[idx][1] + sgn * item_boxes[idx][1]
@@ -836,6 +842,8 @@ class VertexDendrogram(VertexClustering, Dendrogram):
 
         builder = VisualVertexBuilder(self._graph.vs, kwds)
         self._names = [vertex.label for vertex in builder]
+        self._names = [name if name is not None else idx
+                       for idx, name in enumerate(self._names)]
         result = Dendrogram.__plot__(self, context, bbox, palette, \
                 *args, **kwds)
         del self._names
