@@ -511,16 +511,15 @@ igraph_bool_t FUNCTION(igraph_matrix,is_equal)(const TYPE(igraph_matrix) *m1,
 
 /**
  * \function igraph_matrix_maxdifference
- * \brief Maximum difference
+ * \brief Maximum absolute difference between two matrices
  * 
- * Calculate the maximum difference of two matrices. Both matrices
- * must be non-empty. If their size differs then a warning is given
- * and the comparision is performed by vectors columnwise from both
- * matrices, columnwise, the remaining elements in the larger vector
- * are ignored.
+ * Calculate the maximum absolute difference of two matrices. Both matrices
+ * must be non-empty. If their size differs then a warning is given and the
+ * comparision is performed by vectors columnwise from both matrices,
+ * columnwise, the remaining elements in the larger vector are ignored.
  * \param m1 The first matrix.
  * \param m2 The second matrix.
- * \return The maximum of \c m1 - \c m2.
+ * \return The element with the largest absolute value in \c m1 - \c m2.
  * 
  * Time complexity: O(mn), the elements in the smaller matrix.
  */

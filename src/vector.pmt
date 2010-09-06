@@ -1600,14 +1600,14 @@ int FUNCTION(igraph_vector,get_interval)(const TYPE(igraph_vector) *v,
 
 /**
  * \function igraph_vector_maxdifference
- * \brief The largest element of \p m1 - \p m2
+ * \brief The maximum absolute difference of \p m1 and \p m2
  *
- * The maximum the elementwise performed difference is returned.
- * Both vectors must be non-empty, but they not need to have the same
- * length, the extra elements in the longer vector are ignored.
+ * The element with the largest absolute value in \p m1 - \p m2 is
+ * returned. Both vectors must be non-empty, but they not need to have
+ * the same length, the extra elements in the longer vector are ignored.
  * \param m1 The first vector.
  * \param m2 The second vector.
- * \return The maximum of the difference of \p m1 and \p m2.
+ * \return The maximum absolute difference of \p m1 and \p m2.
  *
  * Time complexity: O(n), the number of elements in the shorter
  * vector.
