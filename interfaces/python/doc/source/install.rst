@@ -59,20 +59,31 @@ pre-compiled binaries for Windows, but other projects depending on
 Cairo do, so the preferred way to install Cairo on Windows along with
 its Python bindings is as follows:
 
-1. Get the Cairo DLLs from http://www.gtk.org/download-windows.  You will need
-   ``cairo_1.8.6-1_win32.zip`` and the binary version of ``expat``,
-   ``fontconfig``, ``freetype``, ``libpng`` and ``zlib``. From
-   ``cairo_1.8.6-1_win32.zip``, you need ``libcairo-2.dll``; from ``libpng``,
-   you need ``libpng13.dll``; from ``zlib``, you need ``zlib1.dll``; from the
-   rest of the archives, grab all the DLLs in the ``bin`` subdirectory of the
-   archive.  Version numbers may vary, so be adaptive! Put these DLLs to
-   somewhere where Windows can find them, e.g., into ``C:\Windows\System32``.
+1. Get the latest PyCairo for Windows installer from
+   http://ftp.gnome.org/pub/GNOME/binaries/win32/pycairo/1.8. Make sure you
+   grab the one that matches your Python version. At the time of writing,
+   the above folder contained installers for Python 2.6 only. You may
+   also try and go one level up, then down then 1.4 subfolder -- these are
+   older versions, but they work with Python 2.5 and Python 2.6 as well.
 
-2. Get the latest PyCairo for Windows installer from
-   http://ftp.gnome.org/pub/GNOME/binaries/win32/pycairo/1.4. Make sure you
-   grab the one that matches your Python version.
+2. Install PyCairo using the installer. The installer extracts the necessary
+   files into ``Lib\site-packages\cairo`` within the folder where Python is
+   installed. Unfortunately there are some extra DLLs which are required to
+   make Cairo work, so we have to get these as well.
 
-3. Run the PyCairo installer.
+3. Head to http://www.gtk.org/download-windows and get the binary versions of
+   Cairo (``cairo_1.8.10-3_win32.zip`` at the time of writing), Fontconfig
+   (``fontconfig_2.8.0-2_win32.zip``), Expat (``expat_2.0.1-1_win32.zip``),
+   ``libpng`` (``libpng_1.4.0-1_win32.zip``) and ``zlib`` (``zlib_1.2.4-2_win32.zip``).
+   Version numbers may vary, so be adaptive! Each ZIP file will contain a
+   ``bin`` subfolder with a DLL file in it. Put the following DLLs in
+   ``Lib\site-packages\cairo`` within your Python installation:
+
+      - ``libcairo-2.dll`` (from ``cairo_1.8.10-3_win32.zip``)
+      - ``libexpat-1.dll`` (from ``expat_2.0.1-1_win32.zip``)
+      - ``libfontconfig-1.dll`` (from ``fontconfig_2.8.0-2_win32.zip``)
+      - ``libpng14-14.dll`` (from ``libpng_1.4.0-1_win32.zip``)
+      - ``zlib1.dll`` (from ``zlib_1.2.4-2_win32.zip``).
 
 Having done that, you can launch Python again and check if it worked:
 
