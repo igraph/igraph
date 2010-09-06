@@ -79,11 +79,11 @@ its Python bindings is as follows:
    ``bin`` subfolder with a DLL file in it. Put the following DLLs in
    ``Lib\site-packages\cairo`` within your Python installation:
 
-      - ``libcairo-2.dll`` (from ``cairo_1.8.10-3_win32.zip``)
-      - ``libexpat-1.dll`` (from ``expat_2.0.1-1_win32.zip``)
-      - ``libfontconfig-1.dll`` (from ``fontconfig_2.8.0-2_win32.zip``)
-      - ``libpng14-14.dll`` (from ``libpng_1.4.0-1_win32.zip``)
-      - ``zlib1.dll`` (from ``zlib_1.2.4-2_win32.zip``).
+   - ``libcairo-2.dll`` (from ``cairo_1.8.10-3_win32.zip``)
+   - ``libexpat-1.dll`` (from ``expat_2.0.1-1_win32.zip``)
+   - ``libfontconfig-1.dll`` (from ``fontconfig_2.8.0-2_win32.zip``)
+   - ``libpng14-14.dll`` (from ``libpng_1.4.0-1_win32.zip``)
+   - ``zlib1.dll`` (from ``zlib_1.2.4-2_win32.zip``).
 
 Having done that, you can launch Python again and check if it worked:
 
