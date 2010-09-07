@@ -18,8 +18,6 @@ class LayoutTests(unittest.TestCase):
         
         row = layout[2]
         row[2] = 1
-        self.assertEqual(layout[2], [1, 0, 0])
-        layout[2] = row
         self.assertEqual(layout[2], [1, 0, 1])
 
         del layout[1]

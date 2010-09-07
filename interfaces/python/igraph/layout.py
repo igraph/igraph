@@ -100,7 +100,7 @@ class Layout(object):
         return len(self._coords)
 
     def __getitem__(self, idx):
-        return self._coords[idx][:]
+        return self._coords[idx]
 
     def __setitem__(self, idx, value):
         if len(value) != self._dim:
