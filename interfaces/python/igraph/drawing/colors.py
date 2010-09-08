@@ -29,6 +29,7 @@ from math import ceil
 __all__ = ["Palette", "GradientPalette", "AdvancedGradientPalette", \
     "PrecalculatedPalette", "ClusterColoringPalette", \
     "color_name_to_rgb", "color_name_to_rgba", \
+    "hsv_to_rgb", "hsva_to_rgba", "hsl_to_rgb", "hsla_to_rgba", \
     "palettes", "known_colors"]
 
 class Palette(object):
@@ -300,13 +301,23 @@ def color_name_to_rgba(color, palette=None):
       (1.0, 0.5, 0.0, 1.0)
       >>> color_name_to_rgba("rgba(100%, 50%, 0%, 25%)")
       (1.0, 0.5, 0.0, 0.25)
+      >>> color_name_to_rgba("hsla(120, 100%, 50%, 0.5)")
+      (0.0, 1.0, 0.0, 0.5)
+      >>> color_name_to_rgba("hsl(60, 100%, 50%)")
+      (1.0, 1.0, 0.0, 1.0)
+      >>> color_name_to_rgba("hsv(60, 100%, 100%)")
+      (1.0, 1.0, 0.0, 1.0)
 
     @param color: the color to be converted in one of the following formats:
-      - B{CSS color specification}: C{#rrggbb}, C{#rgb}, C{#rrggbbaa}, C{#rgba},
-        C{rgb(red, green, blue)} or C{rgba(red, green, blue, alpha)}
-        where the red-green-blue components are given as hexadecimal numbers in the
-        first four cases and as decimals (in the range of 0-255) or percentages
-        (0-100) in the fifth and sixth case. Of course these are given as strings.
+      - B{CSS3 color specification}: C{#rrggbb}, C{#rgb}, C{#rrggbbaa}, C{#rgba},
+        C{rgb(red, green, blue)}, C{rgba(red, green, blue, alpha)},
+        C{hsl(hue, saturation, lightness)}, C{hsla(hue, saturation, lightness, alpha)},
+        C{hsv(hue, saturation, value)} and C{hsva(hue, saturation, value, alpha)}
+        where the components are given as hexadecimal numbers in the first four
+        cases and as decimals or percentages (0%-100%) in the remaining cases.
+        Red, green and blue components are between 0 and 255; hue is between 0
+        and 360; saturation, lightness and value is between 0 and 100; alpha is
+        between 0 and 1.
       - B{Valid HTML color names}, i.e. those that are present in the HTML 4.0
         specification
       - B{Valid X11 color names}, see U{http://en.wikipedia.org/wiki/X11_color_names}
@@ -349,10 +360,16 @@ def color_name_to_rgba(color, palette=None):
             elif len(color) == 8:
                 components = [int(color[i:i+2], 16) / 255. for i in (0, 2, 4, 6)]
         else:
-            if color.startswith("rgb(") and color[-1] == ")":
-                color = color[4:-1]
-            if color.startswith("rgba(") and color[-1] == ")":
-                color = color[5:-1]
+            color_mode = "rgba"
+            maximums = (255.0, 255.0, 255.0, 1.0)
+            for mode in ["rgb(", "rgba(", "hsv(", "hsva(", "hsl(", "hsla("]:
+                if color.startswith(mode) and color[-1] == ")":
+                    color = color[len(mode):-1]
+                    color_mode = mode[:-1]
+                    if mode[0] == "h":
+                        maximums = (360.0, 100.0, 100.0, 1.0)
+                    break
+
             if " " in color or "/" in color or "," in color:
                 color = color.replace(",", " ").replace("/", " ")
                 components = color.split()
@@ -360,9 +377,13 @@ def color_name_to_rgba(color, palette=None):
                     if comp[-1] == "%":
                         components[idx] = float(comp[:-1])/100.
                     else:
-                        components[idx] = float(comp)/255.
+                        components[idx] = float(comp)/maximums[idx]
                 if len(components) < 4:
                     components += [1.] * (4 - len(components))
+                if color_mode[:3] == "hsv":
+                    components = hsva_to_rgba(*components)
+                elif color_mode[:3] == "hsl":
+                    components = hsla_to_rgba(*components)
             else:
                 try:
                     components = palette.get(int(color))
@@ -395,6 +416,79 @@ def darken(color, ratio=0.5):
     ratio = 1.0 - ratio
     red, green, blue, alpha = color
     return (red * ratio, green * ratio, blue * ratio, alpha)
+
+def hsla_to_rgba(h, s, l, alpha = 1.0):
+    """Converts a color given by its HSLA coordinates (hue, saturation,
+    lightness, alpha) to RGBA coordinates.
+
+    Each of the HSLA coordinates must be in the range [0, 1].
+    """
+    # This is based on the formulae found at:
+    # http://en.wikipedia.org/wiki/HSL_and_HSV
+    c = s*(1 - 2*abs(l - 0.5))
+    h1 = (h*6) % 6
+    x = c*(1 - abs(h1 % 2 - 1))
+    m = l - c/2.
+    h1 = int(h1)
+    if h1 < 3:
+        if h1 < 1:
+            return (c+m, x+m, m, alpha)
+        elif h1 < 2:
+            return (x+m, c+m, m, alpha)
+        else:
+            return (m, c+m, x+m, alpha)
+    else:
+        if h1 < 4:
+            return (m, x+m, c+m, alpha)
+        elif h1 < 5:
+            return (x+m, m, c+m, alpha)
+        else:
+            return (c+m, m, x+m, alpha)
+
+def hsl_to_rgb(h, s, l):
+    """Converts a color given by its HSL coordinates (hue, saturation,
+    lightness) to RGB coordinates.
+
+    Each of the HSL coordinates must be in the range [0, 1].
+    """
+    return hsla_to_rgba(h, s, l)[:3]
+
+def hsva_to_rgba(h, s, v, alpha = 1.0):
+    """Converts a color given by its HSVA coordinates (hue, saturation,
+    value, alpha) to RGB coordinates.
+
+    Each of the HSVA coordinates must be in the range [0, 1].
+    """
+    # This is based on the formulae found at:
+    # http://en.wikipedia.org/wiki/HSL_and_HSV
+    c = v*s
+    h1 = (h*6) % 6
+    x = c*(1 - abs(h1 % 2 - 1))
+    m = v-c
+    h1 = int(h1)
+    if h1 < 3:
+        if h1 < 1:
+            return (c+m, x+m, m, alpha)
+        elif h1 < 2:
+            return (x+m, c+m, m, alpha)
+        else:
+            return (m, c+m, x+m, alpha)
+    else:
+        if h1 < 4:
+            return (m, x+m, c+m, alpha)
+        elif h1 < 5:
+            return (x+m, m, c+m, alpha)
+        else:
+            return (c+m, m, x+m, alpha)
+
+def hsv_to_rgb(h, s, v):
+    """Converts a color given by its HSV coordinates (hue, saturation,
+    value) to RGB coordinates.
+
+    Each of the HSV coordinates must be in the range [0, 1].
+    """
+    return hsva_to_rgba(h, s, v)[:3]
+
 
 def lighten(color, ratio=0.5):
     """Creates a lighter version of a color given by an RGB triplet.
