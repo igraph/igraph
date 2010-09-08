@@ -1,7 +1,57 @@
 import unittest
+
+from itertools import izip
 from igraph import *
 
 class ColorTests(unittest.TestCase):
+    def assertAlmostEqualsMany(self, items1, items2, eps):
+        for idx, (item1, item2) in enumerate(izip(items1, items2)):
+            self.assertAlmostEquals(item1, item2, eps,
+                    "mismatch at index %d, %r != %r with %d digits"
+                    % (idx, items1, items2, eps))
+
+    def setUp(self):
+        columns = ["r", "g", "b", "h", "v", "l", "s_hsv", "s_hsl", "alpha"]
+        # Examples taken from http://en.wikipedia.org/wiki/HSL_and_HSV
+        values = [
+                (1, 1, 1, 0, 1, 1, 0, 0, 1),
+                (0.5, 0.5, 0.5, 0, 0.5, 0.5, 0, 0, 0.5),
+                (0, 0, 0, 0, 0, 0, 0, 0, 1),
+                (1, 0, 0, 0, 1, 0.5, 1, 1, 0.5),
+                (0.75, 0.75, 0, 60, 0.75, 0.375, 1, 1, 0.25),
+                (0, 0.5, 0, 120, 0.5, 0.25, 1, 1, 0.75),
+                (0.5, 1, 1, 180, 1, 0.75, 0.5, 1, 1),
+                (0.5, 0.5, 1, 240, 1, 0.75, 0.5, 1, 1),
+                (0.75, 0.25, 0.75, 300, 0.75, 0.5, 0.667, 0.5, 0.25),
+                (0.211, 0.149, 0.597, 248.3, 0.597, 0.373, 0.750, 0.601, 1),
+                (0.495, 0.493, 0.721, 240.5, 0.721, 0.607, 0.316, 0.290, 0.75),
+        ]
+        self.data = [dict(zip(columns, value)) for value in values]
+        for row in self.data:
+            row["h"] /= 360.
+
+    def _testGeneric(self, method, args1, args2=("r", "g", "b")):
+        if len(args1) == len(args2)+1:
+            args2 += ("alpha", )
+        for data in self.data:
+            vals1 = [data.get(arg, 0.0) for arg in args1]
+            vals2 = [data.get(arg, 0.0) for arg in args2]
+            self.assertAlmostEqualsMany(method(*vals1), vals2, 2)
+
+    def testHSVtoRGB(self):
+        self._testGeneric(hsv_to_rgb, "h s_hsv v".split())
+
+    def testHSVAtoRGBA(self):
+        self._testGeneric(hsva_to_rgba, "h s_hsv v alpha".split())
+
+    def testHSLtoRGB(self):
+        self._testGeneric(hsl_to_rgb, "h s_hsl l".split())
+
+    def testHSLAtoRGBA(self):
+        self._testGeneric(hsla_to_rgba, "h s_hsl l alpha".split())
+
+
+class PaletteTests(unittest.TestCase):
     def testGradientPalette(self):
         gp = GradientPalette("red", "blue", 3)
         self.failUnless(gp.get(0) == (1., 0., 0., 1.))
@@ -24,7 +74,8 @@ class ColorTests(unittest.TestCase):
 
 def suite():
     color_suite = unittest.makeSuite(ColorTests)
-    return unittest.TestSuite([color_suite])
+    palette_suite = unittest.makeSuite(PaletteTests)
+    return unittest.TestSuite([color_suite, palette_suite])
 
 def test():
     runner = unittest.TextTestRunner()
