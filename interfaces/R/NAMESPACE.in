@@ -194,6 +194,15 @@ S3method(layout.svd, bgraph)
 S3method(layout.mds, bgraph)
 export(layout.mds, layout.svd)
 
+# cohesive blocking, new style 
+
+export(blocks, blockGraphs, cohesion, hierarchy, parent,
+       plotHierarchy, exportPajek)
+
+S3method(print, cohesiveBlocks)
+S3method(summary, cohesiveBlocks)
+S3method(plot, cohesiveBlocks)
+
 # arpack
 
 export(arpack)

@@ -1324,8 +1324,10 @@ igraph_minimum_size_separators:
 igraph_cohesive_blocks:
         PARAMS: GRAPH graph, OUT VECTORLIST blocks, \
                 OUT VECTOR cohesion, OUT VECTOR parent, \
-                OUT GRAPH block_tree
+                OUT GRAPH blockTree
         NAME-R: cohesive.blocks
+        CLASS-R: cohesiveBlocks
+        IGNORE: RR
 
 #######################################
 # K-Cores
