@@ -202,7 +202,7 @@ int igraph_cohesive_blocks(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_vector_bool_destroy, &marked);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
   IGRAPH_CHECK(igraph_dqueue_init(&bfsQ, 100));
-  IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);
+  IGRAPH_FINALLY(igraph_dqueue_destroy, &bfsQ);
   IGRAPH_CHECK(igraph_vector_long_init(&compid, 0));
   IGRAPH_FINALLY(igraph_vector_long_destroy, &compid);
   IGRAPH_CHECK(igraph_vector_long_init(&components, 0));
