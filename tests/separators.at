@@ -41,3 +41,8 @@ AT_KEYWORDS([minimum size separators])
 AT_COMPILE_CHECK([simple/igraph_minimum_size_separators.c],
                  [simple/igraph_minimum_size_separators.out])
 AT_CLEANUP
+
+AT_SETUP([Cohesive blocking (igraph_cohesive_blocks): ])
+AT_KEYWORDS([structurally cohesive blocks])
+AT_COMPILE_CHECK([simple/cohesive_blocks.c], [simple/cohesive_blocks.out])
+AT_CLEANUP

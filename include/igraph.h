@@ -79,5 +79,6 @@
 #include "igraph_arpack.h"
 #include "igraph_mixing.h"
 #include "igraph_separators.h"
+#include "igraph_cohesive_blocks.h"
 
 #endif
