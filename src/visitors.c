@@ -43,12 +43,26 @@
  * then additional root vertices will be used, in the order of their
  * vertex ids.
  * \param graph The input graph.
- * \param root The id of the root vertex.
+ * \param root The id of the root vertex. It is ignored if the \c
+ *        roots argument is not a null pointer.
+ * \param roots Pointer to an initialized vector, or a null
+ *        pointer. If not a null pointer, then it is a vector
+ *        containing root vertices to start the BFS from. The vertices
+ *        are considered in the order they appear. If a root vertex
+ *        was already found while searching from another one, then no
+ *        search is conducted from it.
  * \param mode For directed graphs is defines which edges to follow.
  *        \c IGRAPH_OUT means following the direction of the edges,
  *        \c IGRAPH_IN means the opposite, and 
  *        \c IGRAPH_ALL ignores the direction of the edges.
  *        This parameter is ignored for undirected graphs. 
+ * \param unreachable Logical scalar, whether the search should visit
+ *        the vertices that are unreachable from the given root
+ *        node(s). If true, then additional searches are performed
+ *        until all vertices are visited.
+ * \param restricted If not a null pointer, then it must be a pointer 
+ *        to a vector containing vertex ids. The BFS is carried out
+ *        only on these vertices.
  * \param order If not null pointer, then the vertex ids of the graph are
  *        stored here, in the same order as they were visited.
  * \param rank If not a null pointer, then the rank of each vertex is
@@ -76,7 +90,9 @@
  */
 
 int igraph_bfs(const igraph_t *graph, 
-	       igraph_integer_t root, igraph_neimode_t mode,
+	       igraph_integer_t root, const igraph_vector_t *roots,
+	       igraph_neimode_t mode, igraph_bool_t unreachable,
+	       const igraph_vector_t *restricted,
 	       igraph_vector_t *order, igraph_vector_t *rank,
 	       igraph_vector_t *father,
 	       igraph_vector_t *pred, igraph_vector_t *succ,
@@ -85,17 +101,37 @@ int igraph_bfs(const igraph_t *graph,
   
   igraph_dqueue_t Q;
   long int no_of_nodes=igraph_vcount(graph);
-  long int actroot;
+  long int actroot=0;
   igraph_vector_char_t added;
+
   igraph_lazy_adjlist_t adjlist;
   
   long int act_rank=0;
   long int pred_vec=-1;
+  
+  long int rootpos=0;
+  long int noroots= roots ? igraph_vector_size(roots) : root;
 
-  if (root < 0 || root >= no_of_nodes) {
+  if (!roots && (root < 0 || root >= no_of_nodes)) {
     IGRAPH_ERROR("Invalid root vertex in BFS", IGRAPH_EINVAL);
   }
   
+  if (roots) {
+    igraph_real_t min, max;
+    igraph_vector_minmax(roots, &min, &max);
+    if (min < 0 || max >= no_of_nodes) {
+      IGRAPH_ERROR("Invalid root vertex in BFS", IGRAPH_EINVAL);
+    }
+  }
+
+  if (restricted) {
+    igraph_real_t min, max;
+    igraph_vector_minmax(restricted, &min, &max);
+    if (min < 0 || max >= no_of_nodes) {
+      IGRAPH_ERROR("Invalid vertex id in restricted set", IGRAPH_EINVAL);
+    }
+  }
+
   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
       mode != IGRAPH_ALL) {
     IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
@@ -111,6 +147,18 @@ int igraph_bfs(const igraph_t *graph,
   IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, /*simplify=*/ 0));
   IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
 
+  /* Mark the vertices that are not in the restricted set, as already
+     found. Special care must be taken for vertices that are not in
+     the restricted set, but are to be used as 'root' vertices. */
+  if (restricted) {
+    long int i, n=igraph_vector_size(restricted);
+    igraph_vector_char_fill(&added, 1);
+    for (i=0; i<n; i++) {
+      long int v=VECTOR(*restricted)[i];
+      VECTOR(added)[v]=0;
+    }
+  }
+
   /* Resize result vectors, and fill them with IGRAPH_NAN */
 
 # define VINIT(v) if (v) {                      \
@@ -125,24 +173,39 @@ int igraph_bfs(const igraph_t *graph,
   VINIT(dist);
 # undef VINIT
 
-  IGRAPH_CHECK(igraph_dqueue_push(&Q, root));
-  IGRAPH_CHECK(igraph_dqueue_push(&Q, 0));
-  VECTOR(added)[(long int) root] = 1;
-  if (father) { VECTOR(*father)[(long int) root] = -1; }
+  while (1) { 
 
-  for (actroot=0; actroot<no_of_nodes; actroot++) {
+    /* Get the next root vertex, if any */
 
+    if (roots && rootpos < noroots) {
+      /* We are still going through the 'roots' vector */
+      actroot=VECTOR(*roots)[rootpos++];
+    } else if (!roots && rootpos==0) {
+      /* We have a single root vertex given, and start now */
+      actroot=root;
+      rootpos++;
+    } else if (rootpos==noroots && unreachable) {
+      /* We finished the given root(s), but other vertices are also
+	 tried as root */
+      actroot=0;
+      rootpos++;
+    } else if (unreachable && actroot+1 < no_of_nodes) {
+      /* We are already doing the other vertices, take the next one */
+      actroot++;
+    } else {
+      /* No more root nodes to do */
+      break;
+    }
+
+    /* OK, we have a new root, start BFS */
+    if (VECTOR(added)[actroot]) { continue; }
+    IGRAPH_CHECK(igraph_dqueue_push(&Q, actroot));
+    IGRAPH_CHECK(igraph_dqueue_push(&Q, 0));
+    VECTOR(added)[actroot] = 1;
+    if (father) { VECTOR(*father)[actroot] = -1; }
+      
     pred_vec=-1;
 
-    /* 'root' first, then all other vertices */
-    if (igraph_dqueue_empty(&Q)) {
-      if (VECTOR(added)[actroot]) { continue; }
-      IGRAPH_CHECK(igraph_dqueue_push(&Q, actroot));
-      IGRAPH_CHECK(igraph_dqueue_push(&Q, 0));
-      VECTOR(added)[actroot] = 1;
-      if (father) { VECTOR(*father)[actroot] = -1; }
-    }
-      
     while (!igraph_dqueue_empty(&Q)) {
       long int actvect=igraph_dqueue_pop(&Q);
       long int actdist=igraph_dqueue_pop(&Q);
@@ -295,6 +358,10 @@ int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
  *        \c IGRAPH_IN means the opposite, and 
  *        \c IGRAPH_ALL ignores the direction of the edges.
  *        This parameter is ignored for undirected graphs. 
+ * \param unreachable Logical scalar, whether the search should visit
+ *        the vertices that are unreachable from the given root
+ *        node(s). If true, then additional searches are performed
+ *        until all vertices are visited.
  * \param order If not null pointer, then the vertex ids of the graph are
  *        stored here, in the same order as they were discovered.
  * \param order_out If not a null pointer, then the vertex ids of the
@@ -318,7 +385,8 @@ int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
  */
 
 int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
-	       igraph_neimode_t mode, igraph_vector_t *order,
+	       igraph_neimode_t mode, igraph_bool_t unreachable, 
+	       igraph_vector_t *order,
 	       igraph_vector_t *order_out, igraph_vector_t *father,
 	       igraph_vector_t *dist, igraph_dfshandler_t *in_callback,
 	       igraph_dfshandler_t *out_callback,
@@ -388,6 +456,7 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 
     /* 'root' first, then all other vertices */
     if (igraph_stack_empty(&stack)) {
+      if (!unreachable) { break; }
       if (VECTOR(added)[actroot]) { continue; }
       IGRAPH_CHECK(igraph_stack_push(&stack, actroot));
       VECTOR(added)[actroot] = 1;

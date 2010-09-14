@@ -93,6 +93,7 @@ HEADERS_PRIVATE = atlas-edges.h \
 		drl_graph_3d.h		drl_layout_3d.h \
 		drl_Node.h	drl_Node_3d.h \
 		DensityGrid.h	DensityGrid_3d.h \
+		igraph_flow_internal.h \
 		vector.pmt matrix.pmt stack.pmt dqueue.pmt heap.pmt array.pmt \
 		igraph_types_internal.h \
 		foreign-dl-header.h bignum.h bigint.h \
@@ -100,7 +101,8 @@ HEADERS_PRIVATE = atlas-edges.h \
 		gengraph_degree_sequence.h gengraph_graph_molloy_hash.h \
 		gengraph_graph_molloy_optimized.h \
 		gengraph_hash.h gengraph_header.h gengraph_powerlaw.h \
-		gengraph_qsort.h gengraph_random.h gengraph_vertex_cover.h
+		gengraph_qsort.h gengraph_random.h gengraph_vertex_cover.h \
+		igraph_marked_queue.h igraph_estack.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
@@ -131,8 +133,8 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_vector_ptr.h	../include/igraph_spmatrix.h  \
 		../include/igraph_strvector.h	../include/igraph_psumtree.h  \
 		../include/igraph_sparsemat.h   ../include/igraph_mixing.h    \
-		../include/igraph_version.h     ../include/igraph_blas.h
-
+		../include/igraph_version.h     ../include/igraph_blas.h      \
+		../include/igraph_separators.h  ../include/igraph_cohesive_blocks.h
 
 libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     basic_query.c games.c cocitation.c iterators.c \
@@ -176,7 +178,9 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     foreign-dl-parser.y foreign-dl-lexer.l \
 			     $(CS) sparsemat.c mixing.c bigint.c bignum.c \
 			     version.c optimal_modularity.c \
-			     igraph_fixed_vectorlist.c
+			     igraph_fixed_vectorlist.c separators.c \
+			     igraph_marked_queue.c igraph_estack.c st-cuts.c \
+			     cohesive_blocks.c
 
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<chapter id="igraph-Separators">
+<title>Vertex separators</title>
+
+<!-- doxrox-include igraph_is_separator -->
+<!-- doxrox-include igraph_is_minimal_separator -->
+<!-- doxrox-include igraph_all_minimal_st_separators -->
+<!-- doxrox-include igraph_minimum_size_separators -->
+
+</chapter>

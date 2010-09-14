@@ -50,6 +50,8 @@
 
   <xi:include href="error.xml"/>
 
+  <xi:include href="memory.xml" />
+
   <chapter>
     <title>Data structure library: vector, matrix, other data types</title>
     <xi:include href="pmt.xml"/>
@@ -86,6 +88,8 @@
   <xi:include href="foreign.xml"/>
 
   <xi:include href="flows.xml"/>
+
+  <xi:include href="separators.xml"/>
 
   <xi:include href="community.xml"/>
 

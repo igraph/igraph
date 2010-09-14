@@ -87,7 +87,7 @@ void FUNCTION(igraph_dqueue,destroy) (TYPE(igraph_dqueue)* q) {
  * Time complexity: O(1).
  */
 
-igraph_bool_t FUNCTION(igraph_dqueue,empty) (TYPE(igraph_dqueue)* q) {
+igraph_bool_t FUNCTION(igraph_dqueue,empty) (const TYPE(igraph_dqueue)* q) {
   assert(q != 0);
   assert(q->stor_begin != 0);
   return q->end == NULL;
@@ -140,7 +140,7 @@ igraph_bool_t FUNCTION(igraph_dqueue,full) (TYPE(igraph_dqueue)* q) {
  * Time complexity: O(1).
  */
 
-long int FUNCTION(igraph_dqueue,size) (TYPE(igraph_dqueue)* q) {
+long int FUNCTION(igraph_dqueue,size) (const TYPE(igraph_dqueue)* q) {
         assert(q != 0);
         assert(q->stor_begin != 0);
 	if (q->end==NULL) {
@@ -164,7 +164,7 @@ long int FUNCTION(igraph_dqueue,size) (TYPE(igraph_dqueue)* q) {
  * Time complexity: O(1).
  */
 
-BASE FUNCTION(igraph_dqueue,head) (TYPE(igraph_dqueue)* q) {
+BASE FUNCTION(igraph_dqueue,head) (const TYPE(igraph_dqueue)* q) {
         assert(q != 0);
 	assert(q->stor_begin != 0);
 	return *(q->begin);
@@ -182,7 +182,7 @@ BASE FUNCTION(igraph_dqueue,head) (TYPE(igraph_dqueue)* q) {
  * Time complexity: O(1).
  */
 
-BASE FUNCTION(igraph_dqueue,back) (TYPE(igraph_dqueue)* q) {
+BASE FUNCTION(igraph_dqueue,back) (const TYPE(igraph_dqueue)* q) {
         assert(q != 0);
 	assert(q->stor_begin != 0);
 	if (q->end == q->stor_begin)
@@ -315,3 +315,53 @@ int FUNCTION(igraph_dqueue,push) (TYPE(igraph_dqueue)* q, BASE elem) {
 	return 0;
 }
 
+#if defined (OUT_FORMAT)
+
+int FUNCTION(igraph_dqueue,print)(const TYPE(igraph_dqueue)* q) {
+  return FUNCTION(igraph_dqueue,fprint)(q, stdout);
+}
+
+int FUNCTION(igraph_dqueue,fprint)(const TYPE(igraph_dqueue)* q, FILE *file) {
+  if (q->end != NULL) {
+    /* There is one element at least */
+    BASE *p=q->begin;
+    fprintf(file, OUT_FORMAT, *p);
+    p++;
+    if (q->end > q->begin) {
+      /* Q is in one piece */
+      while (p != q->end) {
+	fprintf(file, " " OUT_FORMAT, *p);
+	p++;
+      }
+    } else {
+      /* Q is in two pieces */
+      while (p != q->stor_end) {
+	fprintf(file, " " OUT_FORMAT, *p);
+	p++;
+      }
+      p=q->stor_begin;
+      while (p != q->end) {
+	fprintf(file, " " OUT_FORMAT, *p);
+	p++;
+      }
+    }
+  }
+
+  fprintf(file, "\n");
+
+  return 0;
+}
+
+#endif
+
+BASE FUNCTION(igraph_dqueue,e)(const TYPE(igraph_dqueue) *q, long int idx) {
+  if ((q->begin + idx < q->end) ||
+      (q->begin >= q->end && q->begin+idx < q->stor_end)) {
+    return q->begin[idx];
+  } else if (q->begin >= q->end && q->stor_begin+idx < q->end) {
+    idx = idx-(q->stor_end - q->begin);
+    return q->stor_begin[idx];
+  } else {
+    return 0;			/* Error */
+  }
+}

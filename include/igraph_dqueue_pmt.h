@@ -35,12 +35,15 @@ typedef struct TYPE(igraph_dqueue) {
 
 int FUNCTION(igraph_dqueue,init)    (TYPE(igraph_dqueue)* q, long int size);
 void FUNCTION(igraph_dqueue,destroy) (TYPE(igraph_dqueue)* q);
-igraph_bool_t FUNCTION(igraph_dqueue,empty)   (TYPE(igraph_dqueue)* q);
+igraph_bool_t FUNCTION(igraph_dqueue,empty)   (const TYPE(igraph_dqueue)* q);
 void FUNCTION(igraph_dqueue,clear)   (TYPE(igraph_dqueue)* q);
 igraph_bool_t FUNCTION(igraph_dqueue,full)    (TYPE(igraph_dqueue)* q);
-long int FUNCTION(igraph_dqueue,size)    (TYPE(igraph_dqueue)* q);
+long int FUNCTION(igraph_dqueue,size)    (const TYPE(igraph_dqueue)* q);
 BASE FUNCTION(igraph_dqueue,pop)     (TYPE(igraph_dqueue)* q);
 BASE FUNCTION(igraph_dqueue,pop_back)(TYPE(igraph_dqueue)* q);
-BASE FUNCTION(igraph_dqueue,head)    (TYPE(igraph_dqueue)* q);
-BASE FUNCTION(igraph_dqueue,back)    (TYPE(igraph_dqueue)* q);
+BASE FUNCTION(igraph_dqueue,head)    (const TYPE(igraph_dqueue)* q);
+BASE FUNCTION(igraph_dqueue,back)    (const TYPE(igraph_dqueue)* q);
 int FUNCTION(igraph_dqueue,push)    (TYPE(igraph_dqueue)* q, BASE elem);
+int FUNCTION(igraph_dqueue,print)(const TYPE(igraph_dqueue)* q);
+int FUNCTION(igraph_dqueue,fprint)(const TYPE(igraph_dqueue)* q, FILE *file);
+BASE FUNCTION(igraph_dqueue,e)(const TYPE(igraph_dqueue) *q, long int idx);

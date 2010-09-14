@@ -43,7 +43,7 @@ AT_CLEANUP
 
 AT_SETUP([Double ended queue (dqueue_t): ])
 AT_KEYWORDS([dqueue double queue dqueue_t])
-AT_COMPILE_CHECK([simple/dqueue.c])
+AT_COMPILE_CHECK([simple/dqueue.c], [simple/dqueue.out])
 AT_CLEANUP
 
 AT_SETUP([Vector of pointers (vector_ptr_t): ])
@@ -151,4 +151,9 @@ AT_CLEANUP
 AT_SETUP([Arbitrarily big integers (igraph_biguint_t): ])
 AT_KEYWORDS([bignum bigint big integer arbitrarily])
 AT_COMPILE_CHECK([simple/biguint.c],[simple/biguint.out],[],[INTERNAL])
+AT_CLEANUP
+
+AT_SETUP([Marked double ended queue (igraph_marked_queue_t): ])
+AT_KEYWORDS([dqueue queue igraph_marked_queue_t])
+AT_COMPILE_CHECK([simple/igraph_marked_queue.c], [], [], [INTERNAL])
 AT_CLEANUP

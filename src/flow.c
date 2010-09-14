@@ -35,6 +35,7 @@
 #include "config.h"
 #include "igraph_math.h"
 #include "igraph_dqueue.h"
+#include "igraph_visitor.h"
 
 #include <limits.h>
 #include <stdio.h>
@@ -699,7 +700,8 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
     IGRAPH_CHECK(igraph_vector_resize(flow, no_of_orig_edges));
     for (i=0, j=0; i<no_of_edges; i+=2, j++) {
       long int pos=VECTOR(rank)[i];
-      VECTOR(*flow)[j] = VECTOR(*capacity)[j] - RESCAP(pos);
+      VECTOR(*flow)[j] = (capacity ? VECTOR(*capacity)[j] : 1.0) - 
+	RESCAP(pos);
     }
     
     igraph_vector_destroy(&rank);
@@ -2008,3 +2010,4 @@ int igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
   IGRAPH_CHECK(igraph_vertex_connectivity(graph, res, checks));
   return 0;
 }
+

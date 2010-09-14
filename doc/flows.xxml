@@ -10,11 +10,14 @@
 <section><title>Maximum Flows</title>
 <!-- doxrox-include igraph_maxflow -->
 <!-- doxrox-include igraph_maxflow_value -->
+<!-- doxrox-include igraph_dominator_tree -->
 </section>
 
-<section><title>Minimum cuts</title>
+<section><title>Cuts and minimum cuts</title>
 <!-- doxrox-include igraph_st_mincut -->
 <!-- doxrox-include igraph_st_mincut_value -->
+<!-- doxrox-include igraph_all_st_cuts -->
+<!-- doxrox-include igraph_all_st_mincuts -->
 <!-- doxrox-include igraph_mincut -->
 <!-- doxrox-include igraph_mincut_value -->
 </section>

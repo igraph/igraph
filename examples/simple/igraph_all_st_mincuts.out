@@ -1,0 +1,24 @@
+Value: 1
+Partition: 0
+Cut: 0
+Partition: 0 1
+Cut: 1
+Partition: 0 1 2
+Cut: 2
+Partition: 0 1 2 3
+Cut: 3
+Value: 1
+Partition: 0
+Cut: 0
+Partition: 0 4 3 2 1
+Cut: 5
+Value: 1
+Partition: 0
+Cut: 0
+Value: 2
+Partition: 0
+Cut: 0 1
+Partition: 0 2
+Cut: 0 3
+Partition: 0 2 1 8 7 6 5 4
+Cut: 2 3

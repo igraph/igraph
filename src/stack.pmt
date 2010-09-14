@@ -144,7 +144,7 @@ igraph_bool_t FUNCTION(igraph_stack,empty)      (TYPE(igraph_stack)* s) {
  * Time complexity: O(1).
  */
 
-long int FUNCTION(igraph_stack,size)       (TYPE(igraph_stack)* s) {
+long int FUNCTION(igraph_stack,size)       (const TYPE(igraph_stack)* s) {
 	assert (s != NULL);
 	assert (s->stor_begin != NULL);
 	return s->end - s->stor_begin;
@@ -258,3 +258,32 @@ BASE FUNCTION(igraph_stack,top)        (const TYPE(igraph_stack)* s) {
 
 	return *(s->end-1);
 }
+
+#if defined (OUT_FORMAT)
+
+int FUNCTION(igraph_stack,print)(const TYPE(igraph_stack) *s) {
+  long int i, n=FUNCTION(igraph_stack,size)(s);
+  if (n!=0) {
+    printf(OUT_FORMAT, s->stor_begin[0]);
+  }
+  for (i=1; i<n; i++) {
+    printf(" " OUT_FORMAT, s->stor_begin[i]);
+  }
+  printf("\n");
+  return 0;
+}
+
+int FUNCTION(igraph_stack,fprint)(const TYPE(igraph_stack) *s, FILE *file) {
+  long int i, n=FUNCTION(igraph_stack,size)(s);
+  if (n!=0) {
+    fprintf(file, OUT_FORMAT, s->stor_begin[0]);
+  }
+  for (i=1; i<n; i++) {
+    fprintf(file, " " OUT_FORMAT, s->stor_begin[i]);
+  }
+  fprintf(file, "\n");
+  return 0;
+}
+
+#endif
+

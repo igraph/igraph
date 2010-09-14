@@ -37,6 +37,7 @@
 #include "igraph_constants.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
+#include "igraph_vector_ptr.h"
 
 __BEGIN_DECLS
 
@@ -96,6 +97,53 @@ int igraph_adhesion(const igraph_t *graph, igraph_integer_t *res,
 		    igraph_bool_t checks);
 int igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
 		    igraph_bool_t checks);
+
+/* s-t cut listing related stuff */
+
+int igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar,
+				 igraph_vector_t *capacity);
+
+int igraph_residual_graph(const igraph_t *graph,
+			  const igraph_vector_t *capacity,
+			  igraph_t *residual,
+			  igraph_vector_t *residual_capacity,
+			  const igraph_vector_t *flow);
+int igraph_i_residual_graph(const igraph_t *graph,
+			    const igraph_vector_t *capacity,
+			    igraph_t *residual,
+			    igraph_vector_t *residual_capacity,
+			    const igraph_vector_t *flow, 
+			    igraph_vector_t *tmp);
+
+int igraph_i_reverse_residual_graph(const igraph_t *graph,
+				    const igraph_vector_t *capacity,
+				    igraph_t *residual,
+				    const igraph_vector_t *flow,
+				    igraph_vector_t *tmp);
+int igraph_reverse_residual_graph(const igraph_t *graph,
+				  const igraph_vector_t *capacity,
+				  igraph_t *residual,
+				  const igraph_vector_t *flow);
+
+int igraph_dominator_tree(const igraph_t *graph,
+			  igraph_integer_t root,
+			  igraph_vector_t *dom,
+			  igraph_t *domtree,
+			  igraph_vector_t *leftout,
+			  igraph_neimode_t mode);
+
+int igraph_all_st_cuts(const igraph_t *graph,
+		       igraph_vector_ptr_t *cuts,
+		       igraph_vector_ptr_t *partition1s,
+		       igraph_integer_t source,
+		       igraph_integer_t target);
+
+int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
+			  igraph_vector_ptr_t *cuts,
+			  igraph_vector_ptr_t *partition1s,
+			  igraph_integer_t source,
+			  igraph_integer_t target,
+			  const igraph_vector_t *capacity);
 
 __END_DECLS
 

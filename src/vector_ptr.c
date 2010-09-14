@@ -541,6 +541,21 @@ void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int (*compar)(const void*, c
   qsort(v->stor_begin, igraph_vector_ptr_size(v), sizeof(void*), compar);
 }
 
+int igraph_vector_ptr_append    (igraph_vector_ptr_t *to, 
+				 const igraph_vector_ptr_t *from) {
+  long int origsize=igraph_vector_ptr_size(to);
+  long int othersize=igraph_vector_ptr_size(from);
+  long int i;
+  
+  IGRAPH_CHECK(igraph_vector_ptr_resize(to, origsize+othersize));
+  for (i=0; i<othersize; i++, origsize++) {
+    to->stor_begin[origsize]=from->stor_begin[i];
+  }
+
+  return 0;
+}
+
+
 /**
  * \ingroup vectorptr
  * \function igraph_vector_ptr_set_item_destructor

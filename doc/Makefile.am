@@ -10,7 +10,8 @@ DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      foreign.xml nongraph.xml isomorphism.xml motifs.xml \
 	      operators.xml flows.xml community.xml cliques.xml \
 	      sparsematrix.xml stack.xml dqueue.xml heap.xml strvector.xml \
-	      adjlist.xml arpack.xml bipartite.xml visitors.xml random.xml
+	      adjlist.xml arpack.xml bipartite.xml visitors.xml random.xml \
+	      separators.xml memory.xml
 
 DOCFIX = fdl.xml gpl.xml igraph-docs.xml installation.xml introduction.xml \
 	 tutorial.xml licenses.xml pmt.xml
@@ -95,8 +96,8 @@ motifs.xml: motifs.xxml $(SRCDIR)/motifs.c
 operators.xml: operators.xxml $(SRCDIR)/operators.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/operators.c
 
-flows.xml: flows.xxml $(SRCDIR)/flow.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/flow.c
+flows.xml: flows.xxml $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c
 
 community.xml: community.xxml $(SRCDIR)/community.c $(SRCDIR)/clustertool.cpp $(SRCDIR)/walktrap.cpp $(SRCDIR)/fast_community.c $(SRCDIR)/optimal_modularity.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/community.c $(SRCDIR)/clustertool.cpp $(SRCDIR)/walktrap.cpp $(SRCDIR)/fast_community.c $(SRCDIR)/optimal_modularity.c
@@ -130,6 +131,13 @@ visitors.xml: visitors.xxml $(SRCDIR)/visitors.c  $(INCLUDEDIR)/igraph_visitor.h
 
 random.xml: random.xxml $(SRCDIR)/random.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/random.c
+
+separators.xml: separators.xxml $(SRCDIR)/separators.c $(SRCDIR)/st-cuts.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/separators.c \
+		$(SRCDIR)/st-cuts.c
+
+memory.xml: memory.xxml $(SRCDIR)/memory.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/memory.c
 
 html/stamp: igraph-docs.xml $(DOCFIX2) gtk-doc.xsl
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \

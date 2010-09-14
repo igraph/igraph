@@ -34,7 +34,7 @@
 ## lable.                                           ##
 ######################################################
 
-cohesive.blocks <- function(graph, db=NULL,
+cohesive.blocks.old <- function(graph, db=NULL,
                             useDB=(vcount(graph)>400 && require(RSQLite)),
                             cutsetHeuristic=TRUE,
                             verbose=igraph.par("verbose")) {
@@ -298,7 +298,7 @@ cohesive.blocks <- function(graph, db=NULL,
     return(Gin)
 }
 
-structurally.cohesive.blocks <- cohesive.blocks
+structurally.cohesive.blocks <- cohesive.blocks.old
 
 ######################################################
 ## A small helper function to identify the cohesive ##

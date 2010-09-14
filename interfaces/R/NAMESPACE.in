@@ -188,7 +188,7 @@ export(cliques, largest.cliques, maximal.cliques, clique.number,
 
 # cohesive blocking
 
-export(cohesive.blocks, structurally.cohesive.blocks)
+export(cohesive.blocks.old, structurally.cohesive.blocks)
 export(is.bgraph, print.bgraph, plot.bgraph,
        write.pajek.bgraph)
 S3method(print, bgraph)
@@ -198,6 +198,15 @@ S3method(layout.mds, igraph)
 S3method(layout.svd, bgraph)
 S3method(layout.mds, bgraph)
 export(layout.mds, layout.svd)
+
+# cohesive blocking, new style 
+
+export(blocks, blockGraphs, cohesion, hierarchy, parent,
+       plotHierarchy, exportPajek)
+
+S3method(print, cohesiveBlocks)
+S3method(summary, cohesiveBlocks)
+S3method(plot, cohesiveBlocks)
 
 # arpack
 

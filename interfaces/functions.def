@@ -684,7 +684,9 @@ igraph_contract_vertices:
 #######################################
 
 igraph_bfs:
-        PARAMS: GRAPH graph, INTEGER root, NEIMODE mode=OUT, \
+        PARAMS: GRAPH graph, INTEGER root, VECTOR_OR_0 roots, \
+                NEIMODE mode=OUT, BOOLEAN unreachable, \
+                VECTOR_OR_0 restricted, \
                 OUT VECTOR_OR_0 order, OUT VECTOR_OR_0 rank, \
                 OUT VECTOR_OR_0 father, \
                 OUT VECTOR_OR_0 pred, OUT VECTOR_OR_0 succ, \
@@ -693,6 +695,7 @@ igraph_bfs:
 
 igraph_dfs:
         PARAMS: GRAPH graph, INTEGER root, NEIMODE mode=OUT, \
+                BOOLEAN unreachable, \
                 OUT VECTOR_OR_0 order, OUT VECTOR_OR_0 order_out, \
                 OUT VECTOR_OR_0 dist, DFS_FUNC in_callback, \
                 DFS_FUNC out_callback, EXTRA extra=NULL
@@ -1296,6 +1299,57 @@ igraph_adhesion:
 igraph_cohesion:
         PARAMS: GRAPH graph, OUT INTEGERPTR res, BOOLEAN checks=True
         IGNORE: RR, RC, RNamespace
+
+#######################################
+# Listing s-t cuts, separators
+#######################################
+
+igraph_dominator_tree: 
+        PARAMS: GRAPH graph, VERTEX root, OUT VECTOR_OR_0 dom, \
+                OUT GRAPH_OR_0 domtree, OUT VECTOR_OR_0 leftout, \
+                NEIMODE mode=OUT
+        DEPS: root ON graph
+        NAME-R: dominator.tree
+
+igraph_all_st_cuts:
+        PARAMS: GRAPH graph, OUT VECTORLIST_OR_0 cuts, \
+                OUT VECTORLIST_OR_0 partition1s, \
+                VERTEX source, VERTEX target
+        DEPS: source ON graph, target ON graph
+        NAME-R: all.st.cuts
+
+igraph_all_st_mincuts:
+        PARAMS: GRAPH graph, OUT REALPTR value, \
+                OUT VECTORLIST_OR_0 cuts, OUT VECTORLIST_OR_0 partition1s, \
+                VERTEX source, VERTEX target, EDGEWEIGHTS capacity=NULL
+        DEPS: capacity ON graph, source ON graph, target ON graph
+        NAME-R: all.st.mincuts
+
+igraph_is_separator:
+        PARAMS: GRAPH graph, VERTEXSET candidate, OUT BOOLEANPTR res
+        DEPS: candidate ON graph
+        NAME-R: is.separator
+
+igraph_is_minimal_separator:
+        PARAMS: GRAPH graph, VERTEXSET candidate, OUT BOOLEANPTR res
+        DEPS: candidate ON graph
+        NAME-R: is.minimal.separator
+
+igraph_all_minimal_st_separators:
+        PARAMS: GRAPH graph, OUT VECTORLIST separators
+        NAME-R: minimal.st.separators
+
+igraph_minimum_size_separators:
+        PARAMS: GRAPH graph, OUT VECTORLIST separators
+        NAME-R: minimum.size.separators
+
+igraph_cohesive_blocks:
+        PARAMS: GRAPH graph, OUT VECTORLIST blocks, \
+                OUT VECTOR cohesion, OUT VECTOR parent, \
+                OUT GRAPH blockTree
+        NAME-R: cohesive.blocks
+        CLASS-R: cohesiveBlocks
+        IGNORE: RR
 
 #######################################
 # K-Cores

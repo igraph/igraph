@@ -7754,7 +7754,8 @@ igraph_bool_t R_igraph_bfshandler(const igraph_t *graph,
   return cres;
 }
 
-SEXP R_igraph_bfs(SEXP graph, SEXP proot, SEXP pneimode,
+SEXP R_igraph_bfs(SEXP graph, SEXP proot, SEXP proots, SEXP pneimode,
+		  SEXP punreachable, SEXP prestricted,
 		  SEXP porder, SEXP prank, SEXP pfather,
 		  SEXP ppred, SEXP psucc, SEXP pdist, 
 		  SEXP pcallback, SEXP pextra, SEXP prho) {
@@ -7763,6 +7764,9 @@ SEXP R_igraph_bfs(SEXP graph, SEXP proot, SEXP pneimode,
   SEXP result, names;
 
   igraph_integer_t root=REAL(proot)[0];
+  igraph_vector_t roots;
+  igraph_bool_t unreachable=LOGICAL(punreachable)[0];
+  igraph_vector_t restricted;
   igraph_integer_t neimode=REAL(pneimode)[0];
   igraph_vector_t order, rank, father, pred, succ, dist;
   igraph_vector_t *p_order=0, *p_rank=0, *p_father=0, *p_pred=0, 
@@ -7773,6 +7777,12 @@ SEXP R_igraph_bfs(SEXP graph, SEXP proot, SEXP pneimode,
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
+  if (!isNull(proots)) {
+    R_SEXP_to_vector(proots, &roots);
+  }
+  if (!isNull(prestricted)) {
+    R_SEXP_to_vector(prestricted, &restricted);
+  }
 
   if (LOGICAL(porder)[0]) { 
     igraph_vector_init(&order, 0); p_order=&order;
@@ -7802,7 +7812,8 @@ SEXP R_igraph_bfs(SEXP graph, SEXP proot, SEXP pneimode,
     p_cb_data = &cb_data;
   }
 
-  igraph_bfs(&g, root, neimode, 
+  igraph_bfs(&g, root, isNull(proots) ? 0 : &roots, neimode, 
+	     unreachable, isNull(prestricted) ? 0 : &restricted,
 	     p_order, p_rank, p_father, p_pred, p_succ, p_dist, 
 	     (igraph_bfshandler_t*) callback, p_cb_data);
 
@@ -7894,7 +7905,7 @@ igraph_bool_t R_igraph_dfshandler_out(const igraph_t *graph,
   return R_igraph_dfshandler(graph, vid, dist, extra, 1);
 }
 
-SEXP R_igraph_dfs(SEXP graph, SEXP proot, SEXP pneimode,
+SEXP R_igraph_dfs(SEXP graph, SEXP proot, SEXP pneimode, SEXP punreachable,
 		  SEXP porder, SEXP porder_out, SEXP pfather, SEXP pdist, 
 		  SEXP pin_callback, SEXP pout_callback, 
 		  SEXP pextra, SEXP prho) {
@@ -7904,6 +7915,7 @@ SEXP R_igraph_dfs(SEXP graph, SEXP proot, SEXP pneimode,
 
   igraph_integer_t root=REAL(proot)[0];
   igraph_integer_t neimode=REAL(pneimode)[0];
+  igraph_bool_t unreachable=LOGICAL(punreachable)[0];
   igraph_vector_t order, order_out, father, dist;
   igraph_vector_t *p_order=0, *p_order_out=0, *p_father=0, *p_dist=0;
   void *in_callback=0, *out_callback=0;
@@ -7941,7 +7953,7 @@ SEXP R_igraph_dfs(SEXP graph, SEXP proot, SEXP pneimode,
     out_callback=R_igraph_dfshandler_out;
   }
 
-  igraph_dfs(&g, root, neimode, 
+  igraph_dfs(&g, root, neimode, unreachable,
 	     p_order, p_order_out, p_father, p_dist, 
 	     (igraph_dfshandler_t*) in_callback, 
 	     (igraph_dfshandler_t*) out_callback, p_cb_data);
