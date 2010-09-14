@@ -329,9 +329,9 @@ int igraph_cohesive_blocks(const igraph_t *graph,
   }
 
   igraph_vector_long_destroy(&components);
-  igraph_vector_destroy(&neis);
-  igraph_dqueue_destroy(&bfsQ);
   igraph_vector_long_destroy(&compid);
+  igraph_dqueue_destroy(&bfsQ);
+  igraph_vector_destroy(&neis);
   igraph_vector_bool_destroy(&marked);
   igraph_vector_destroy(&compvertices);
   igraph_vector_ptr_destroy(&separators);
@@ -393,6 +393,18 @@ int igraph_cohesive_blocks(const igraph_t *graph,
       resptr++;
     }
 
+    /* Plus the original graph */
+    if (blocks) {
+      igraph_vector_t *orig=igraph_Calloc(1, igraph_vector_t);
+      if (!orig) { 
+	IGRAPH_ERROR("Cannot do cohesive blocking", IGRAPH_ENOMEM); 
+      }
+      IGRAPH_FINALLY(igraph_free, orig);
+      IGRAPH_CHECK(igraph_vector_init_seq(orig, 0, igraph_vcount(graph)-1));
+      VECTOR(*blocks)[0]=orig;
+      IGRAPH_FINALLY_CLEAN(1);
+    }
+
     if (block_tree) {
       igraph_vector_t edges;
       long int eptr=0;
@@ -413,18 +425,6 @@ int igraph_cohesive_blocks(const igraph_t *graph,
     igraph_vector_bool_destroy(&removed);
     IGRAPH_FINALLY_CLEAN(2);
 
-    /* Plus the original graph */
-    if (blocks) {
-      igraph_vector_t *orig=igraph_Calloc(1, igraph_vector_t);
-      if (!orig) { 
-	IGRAPH_ERROR("Cannot do cohesive blocking", IGRAPH_ENOMEM); 
-      }
-      IGRAPH_FINALLY(igraph_free, orig);
-      IGRAPH_CHECK(igraph_vector_init_seq(orig, 0, igraph_vcount(graph)-1));
-      VECTOR(*blocks)[0]=orig;
-      IGRAPH_FINALLY_CLEAN(1);
-    }
-
   }
 
   igraph_vector_long_destroy(&Qcohesion);
@@ -434,7 +434,7 @@ int igraph_cohesive_blocks(const igraph_t *graph,
   
   igraph_vector_ptr_destroy(&Qmapping);
   igraph_vector_ptr_destroy(&Q);
-  IGRAPH_FINALLY_CLEAN(2);  
-    
+  IGRAPH_FINALLY_CLEAN(3);  	/* + the elements of Q, they were
+				   already destroyed */
   return 0;
 }
