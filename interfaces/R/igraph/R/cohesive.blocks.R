@@ -83,9 +83,10 @@ summary.cohesiveBlocks <- function(x, ...) {
 ## TODO: mark the groups
 
 plot.cohesiveBlocks <- function(x, y,
+                                mark.groups=blocks(x)[-1],
                                 layout=layout.fruchterman.reingold,
                                 ...) {
-  plot(y, layout=layout, ...)
+  plot(y, mark.groups=mark.groups, layout=layout, ...)
 }
 
 plotHierarchy <- function(blocks, ...) {
