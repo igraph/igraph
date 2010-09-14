@@ -59,5 +59,21 @@ minimum.size.separators(mw2)
 minimum.size.separators(mw3)
 minimum.size.separators(mw4)
 minimum.size.separators(mw5)
+
+# Another example, the science camp network
+camp <- graph.formula(Harry:Steve:Don:Bert - Harry:Steve:Don:Bert,
+                      Pam:Brazey:Carol:Pat - Pam:Brazey:Carol:Pat,
+                      Holly   - Carol:Pat:Pam:Jennie:Bill,
+                      Bill    - Pauline:Michael:Lee:Holly,
+                      Pauline - Bill:Jennie:Ann,
+                      Jennie  - Holly:Michael:Lee:Ann:Pauline,
+                      Michael - Bill:Jennie:Ann:Lee:John,
+                      Ann     - Michael:Jennie:Pauline,
+                      Lee     - Michael:Bill:Jennie,
+                      Gery    - Pat:Steve:Russ:John,
+                      Russ    - Steve:Bert:Gery:John,
+                      John    - Gery:Russ:Michael)
+camp <- simplify(camp)
+lapply(minimum.size.separators(camp), function(x) V(camp)[x])
 }
 \keyword{graphs}
