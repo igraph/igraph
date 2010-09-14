@@ -350,6 +350,7 @@ int igraph_cohesive_blocks(const igraph_t *graph,
 
     for (i=1; i<noblocks; i++) {
       long int p=VECTOR(Qparent)[i];
+      while (VECTOR(removed)[p]) { p=VECTOR(Qparent)[p]; }
       if (VECTOR(Qcohesion)[p] >= VECTOR(Qcohesion)[i]) {
 	VECTOR(removed)[i]=1;
 	badblocks++;
