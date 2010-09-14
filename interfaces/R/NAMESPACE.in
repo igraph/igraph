@@ -183,7 +183,7 @@ export(cliques, largest.cliques, maximal.cliques, clique.number,
 
 # cohesive blocking
 
-export(cohesive.blocks, structurally.cohesive.blocks)
+export(cohesive.blocks.old, structurally.cohesive.blocks)
 export(is.bgraph, print.bgraph, plot.bgraph,
        write.pajek.bgraph)
 S3method(print, bgraph)
