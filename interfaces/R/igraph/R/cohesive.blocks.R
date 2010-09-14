@@ -36,6 +36,10 @@ cohesive.blocks <- function(graph, labels=TRUE) {
   res
 }
 
+length.cohesiveBlocks <- function(x) {
+  length(x$blocks)
+}
+
 blocks <- function(blocks) {
   blocks$blocks
 }
@@ -80,13 +84,14 @@ summary.cohesiveBlocks <- function(x, ...) {
       length(blocks(x)), "blocks.\n")
 }
 
-## TODO: mark the groups
-
 plot.cohesiveBlocks <- function(x, y,
+                                colbar=rainbow(max(cohesion(x))+1),
+                                col=colbar[maxcohesion(x)+1],
                                 mark.groups=blocks(x)[-1],
                                 layout=layout.fruchterman.reingold,
                                 ...) {
-  plot(y, mark.groups=mark.groups, layout=layout, ...)
+  plot(y, mark.groups=mark.groups, layout=layout,
+       vertex.color=col, ...)
 }
 
 plotHierarchy <- function(blocks, ...) {
@@ -166,4 +171,14 @@ exportPajek <- function(blocks, graph, file,
   } else {
     return(exportPajek.cohesiveblocks.nopf(blocks, graph, file))
   }
+}
+
+maxcohesion <- function(blocks) {
+  res <- numeric(blocks$vcount)
+  myb <- blocks(blocks)
+  coh <- cohesion(blocks)
+  for (b in seq_along(myb)) {
+    res[ myb[[b]]+1 ] <- coh[b]
+  }
+  res
 }

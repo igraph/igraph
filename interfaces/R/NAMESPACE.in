@@ -202,11 +202,12 @@ export(layout.mds, layout.svd)
 # cohesive blocking, new style 
 
 export(blocks, blockGraphs, cohesion, hierarchy, parent,
-       plotHierarchy, exportPajek)
+       plotHierarchy, exportPajek, maxcohesion)
 
 S3method(print, cohesiveBlocks)
 S3method(summary, cohesiveBlocks)
 S3method(plot, cohesiveBlocks)
+S3method(length, cohesiveBlocks)
 
 # arpack
 
