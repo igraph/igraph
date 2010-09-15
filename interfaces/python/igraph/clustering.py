@@ -1229,13 +1229,20 @@ class CohesiveBlocks(VertexCover):
 
         See the documentation of L{VertexCover.__plot__()} for more details.
         """
+        prepare_groups = False
         if "mark_groups" not in kwds:
             if Configuration.instance()["plotting.mark_groups"]:
-                colors = self.cohesions()
-                for idx, color in enumerate(colors):
-                    if color < 2:
-                        colors[idx] = None
-                kwds["mark_groups"] = colors
+                prepare_groups = True
+        elif kwds["mark_groups"] == True:
+            prepare_groups = True
+
+        if prepare_groups:
+            colors = self.cohesions()
+            for idx, color in enumerate(colors):
+                if color < 2:
+                    colors[idx] = None
+            print colors
+            kwds["mark_groups"] = colors
 
         if "vertex_color" not in kwds:
             kwds["vertex_color"] = self.max_cohesions()

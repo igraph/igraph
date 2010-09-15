@@ -1993,7 +1993,8 @@ class Graph(GraphBase):
                 a dict mapping numeric color indices from the current palette
                 to lists of vertex indices; therefore, the vertices referred to
                 by element I{i} of the list will be highlighted by color I{i}
-                from the palette.
+                from the palette. If element I{i} is C{None}, the corresponding
+                group will not be highlighted.
 
           - C{vertex_size}: size of the vertices. The corresponding vertex
             attribute is called C{size}. The default is 10. Vertex sizes

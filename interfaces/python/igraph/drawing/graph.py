@@ -214,6 +214,9 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
 
             # Iterate over color-memberlist pairs
             for color_id, group in group_iter:
+                if group is None or color_id is None:
+                    continue
+
                 color = palette.get(color_id)
 
                 if not hasattr(group, "__iter__"):
