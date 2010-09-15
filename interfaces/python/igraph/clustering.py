@@ -369,8 +369,9 @@ class VertexClustering(Clustering):
                 the corresponding color indices from the current palette
                 (see the C{palette} keyword argument of L{Graph.__plot__}.
 
-              - A dict mapping color names to cluster indices. The given clusters
-                will be highlighted by the given colors.
+              - A dict mapping cluster indices or tuples of vertex indices to
+                color names.  The given clusters or vertex groups will be
+                highlighted by the given colors.
 
               - A list of cluster indices. This is equivalent to passing a
                 dict mapping numeric color indices from the current palette
@@ -382,6 +383,13 @@ class VertexClustering(Clustering):
             taken into account here; if that configuration key is C{True} and
             C{mark_groups} is not given explicitly, it will automatically be set
             to C{True}.
+
+            In place of lists of vertex indices, you may also use L{VertexSeq}
+            instances.
+
+            In place of color names, you may also use color indices into the
+            current palette. C{None} as a color name will mean that the
+            corresponding group is ignored.
 
           - C{palette}: the palette used to resolve numeric color indices to RGBA
             values. By default, this is an instance of L{ClusterColoringPalette}.
@@ -408,7 +416,9 @@ class VertexClustering(Clustering):
 
         if "mark_groups" not in kwds:
             if Configuration.instance()["plotting.mark_groups"]:
-                kwds["mark_groups"] = enumerate(self) 
+                kwds["mark_groups"] = (
+                    (group, color) for color, group in enumerate(self)
+                )
         else:
             kwds["mark_groups"] = _handle_mark_groups_arg_for_clustering(
                     kwds["mark_groups"], self)
@@ -1086,8 +1096,9 @@ class VertexCover(Cover):
                 the corresponding color indices from the current palette
                 (see the C{palette} keyword argument of L{Graph.__plot__}.
 
-              - A dict mapping color names to cluster indices. The given clusters
-                will be highlighted by the given colors.
+              - A dict mapping cluster indices or tuples of vertex indices to
+                color names.  The given clusters or vertex groups will be
+                highlighted by the given colors.
 
               - A list of cluster indices. This is equivalent to passing a
                 dict mapping numeric color indices from the current palette
@@ -1099,6 +1110,13 @@ class VertexCover(Cover):
             taken into account here; if that configuration key is C{True} and
             C{mark_groups} is not given explicitly, it will automatically be set
             to C{True}.
+
+            In place of lists of vertex indices, you may also use L{VertexSeq}
+            instances.
+
+            In place of color names, you may also use color indices into the
+            current palette. C{None} as a color name will mean that the
+            corresponding group is ignored.
 
           - C{palette}: the palette used to resolve numeric color indices to RGBA
             values. By default, this is an instance of L{ClusterColoringPalette}.
@@ -1237,11 +1255,8 @@ class CohesiveBlocks(VertexCover):
             prepare_groups = True
 
         if prepare_groups:
-            colors = self.cohesions()
-            for idx, color in enumerate(colors):
-                if color < 2:
-                    colors[idx] = None
-            print colors
+            colors = [pair for pair in enumerate(self.cohesions())
+                if pair[1] > 1]
             kwds["mark_groups"] = colors
 
         if "vertex_color" not in kwds:
@@ -1259,27 +1274,43 @@ def _handle_mark_groups_arg_for_clustering(mark_groups, clustering):
     L{VertexCover} instances, namely the feature that numeric IDs are resolved
     to clusters automatically.
     """
-    # Handle the case of mark_groups = True and mark_groups yielding
-    # cluster IDs
+    # Handle the case of mark_groups = True, mark_groups containing a list or
+    # tuple of cluster IDs, and and mark_groups yielding (cluster ID, color)
+    # pairs
     if mark_groups is True:
-        group_iter = enumerate(clustering)
+        group_iter = ((group, color) for color, group in enumerate(clustering))
     elif isinstance(mark_groups, dict):
         group_iter = mark_groups.iteritems()
-    elif hasattr(mark_groups, "__iter__"):
-        if hasattr(mark_groups, "next"):
-            # Already an iterator, let's hope it works
-            group_iter = mark_groups
+    elif hasattr(mark_groups, "__getitem__") and hasattr(mark_groups, "__len__"):
+        # Lists, tuples
+        try:
+            first = mark_groups[0]
+        except:
+            # Hmm. Maybe not a list or tuple?
+            first = None
+        if first is not None:
+            # Okay. Is the first element of the list a single number?
+            if isinstance(first, (int, long)):
+                # Yes. Seems like we have a list of cluster indices.
+                # Assign color indices automatically.
+                group_iter = ((group, color)
+                        for color, group in enumerate(mark_groups))
+            else:
+                # No. Seems like we have good ol' group-color pairs.
+                group_iter = mark_groups
         else:
-            # Lists, tuples etc
-            group_iter = enumerate(mark_groups)
+            group_iter = mark_groups
+    elif hasattr(mark_groups, "__iter__"):
+        # Iterators etc
+        group_iter = mark_groups
     else:
         group_iter = {}.iteritems()
 
     def cluster_index_resolver():
-        for color_id, group in group_iter:
+        for group, color in group_iter:
             if isinstance(group, (int, long)):
                 group = clustering[group]
-            yield color_id, group
+            yield group, color
 
     return cluster_index_resolver()
 

@@ -1986,15 +1986,20 @@ class Graph(GraphBase):
             
               - C{False}: no groups will be highlighted
 
-              - A dict mapping color names to lists of vertex indices. The given
-                vertex groups will be highlighted by the given colors.
+              - A dict mapping tuples of vertex indices to color names.
+                The given vertex groups will be highlighted by the given
+                colors.
 
-              - A list of lists of vertex indices. This is equivalent to passing
-                a dict mapping numeric color indices from the current palette
-                to lists of vertex indices; therefore, the vertices referred to
-                by element I{i} of the list will be highlighted by color I{i}
-                from the palette. If element I{i} is C{None}, the corresponding
-                group will not be highlighted.
+              - A list containing pairs or an iterable yielding pairs, where
+              the first element of each pair is a list of vertex indices and
+              the second element is a color.
+
+            In place of lists of vertex indices, you may also use L{VertexSeq}
+            instances.
+
+            In place of color names, you may also use color indices into the
+            current palette. C{None} as a color name will mean that the
+            corresponding group is ignored.
 
           - C{vertex_size}: size of the vertices. The corresponding vertex
             attribute is called C{size}. The default is 10. Vertex sizes

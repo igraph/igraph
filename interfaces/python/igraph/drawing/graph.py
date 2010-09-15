@@ -15,7 +15,7 @@ L{CytoscapeGraphDrawer}.
 from itertools import izip
 from math import cos, pi, sin
 
-from igraph.core import convex_hull
+from igraph.core import convex_hull, VertexSeq
 from igraph.configuration import Configuration
 from igraph.drawing.baseclasses import AbstractDrawer, AbstractCairoDrawer, \
                                        AbstractXMLRPCDrawer
@@ -195,16 +195,12 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
             mark_groups = kwds["mark_groups"]
 
             # Figure out what to do with mark_groups in order to be able to
-            # iterate over it and get color-memberlist pairs
+            # iterate over it and get memberlist-color pairs
             if isinstance(mark_groups, dict):
                 group_iter = mark_groups.iteritems()
             elif hasattr(mark_groups, "__iter__"):
-                if hasattr(mark_groups, "next"):
-                    # Already an iterator, let's hope it works
-                    group_iter = mark_groups
-                else:
-                    # Lists, tuples etc
-                    group_iter = enumerate(mark_groups)
+                # Lists, tuples, iterators etc
+                group_iter = iter(mark_groups)
             else:
                 # False
                 group_iter = {}.iteritems()
@@ -213,12 +209,14 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
             polygon_drawer = PolygonDrawer(context, bbox)
 
             # Iterate over color-memberlist pairs
-            for color_id, group in group_iter:
-                if group is None or color_id is None:
+            for group, color_id in group_iter:
+                if not group or color_id is None:
                     continue
 
                 color = palette.get(color_id)
 
+                if isinstance(group, VertexSeq):
+                    group = [vertex.index for vertex in group]
                 if not hasattr(group, "__iter__"):
                     raise TypeError("group membership list must be iterable")
 
