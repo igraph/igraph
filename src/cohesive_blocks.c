@@ -30,6 +30,7 @@
 #include "igraph_components.h"
 #include "igraph_dqueue.h"
 #include "igraph_constructors.h"
+#include "igraph_interrupt.h"
 
 void igraph_i_cohesive_blocks_free(igraph_vector_ptr_t *ptr) {
   long int i, n=igraph_vector_ptr_size(ptr);
@@ -228,6 +229,8 @@ int igraph_cohesive_blocks(const igraph_t *graph,
     long int no;
     long int cptr=0;
     long int nsepv=0;
+
+    IGRAPH_ALLOW_INTERRUPTION();
 
     /* Get the separators */
     IGRAPH_CHECK(igraph_minimum_size_separators(mygraph, &separators));

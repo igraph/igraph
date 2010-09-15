@@ -33,6 +33,7 @@
 #include "igraph_structural.h"
 #include "igraph_constructors.h"
 #include "igraph_stack.h"
+#include "igraph_interrupt.h"
 
 int igraph_i_is_separator(const igraph_t *graph,
 			  igraph_vit_t *vit,
@@ -719,6 +720,9 @@ int igraph_minimum_size_separators(const igraph_t *graph,
   /* ---------------------------------------------------------------- */  
   /* 3 If v[j] != x[i] and v[j] is not adjacent to x[i] then */
   for (i=0; i<k; i++) {
+
+    IGRAPH_ALLOW_INTERRUPTION();
+
     for (j=0; j<no_of_nodes; j++) {
       long int ii=VECTOR(X)[i];
       igraph_real_t phivalue;

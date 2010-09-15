@@ -36,6 +36,7 @@
 #include "igraph_math.h"
 #include "igraph_dqueue.h"
 #include "igraph_visitor.h"
+#include "igraph_interrupt.h"
 
 #include <limits.h>
 #include <stdio.h>
@@ -1599,6 +1600,9 @@ int igraph_i_vertex_connectivity_directed(const igraph_t *graph,
   for (i=0; i<no_of_nodes; i++) {
     for (j=0; j<no_of_nodes; j++) {
       if (i==j) { continue; }
+
+      IGRAPH_ALLOW_INTERRUPTION();
+
       IGRAPH_CHECK(igraph_st_vertex_connectivity(graph, &conn, i, j, 
 						 IGRAPH_VCONN_NEI_INFINITY));
       if (conn < minconn) {
