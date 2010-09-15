@@ -32,6 +32,7 @@
 #include "config.h"
 #include "igraph_math.h"
 #include "igraph_constructors.h"
+#include "igraph_error.h"
 
 namespace gengraph {
 
@@ -223,11 +224,13 @@ int graph_molloy_hash::random_edge_swap(int K, int *Kbuff, bool *visited) {
 }
 
 //_________________________________________________________________________
-unsigned long graph_molloy_hash::shuffle(unsigned long times, int type) {
+unsigned long graph_molloy_hash::shuffle(unsigned long times, 
+					 unsigned long maxtimes, int type) {
   if(VERBOSE()) fprintf(stderr,"Shuffle : 0%%");
   assert(verify());
   // counters
   unsigned long nb_swaps = 0;
+  unsigned long all_swaps = 0;
   unsigned long cost = 0;
   // window
   double T = double(min((unsigned long)(a),times)/10);
@@ -247,7 +250,7 @@ unsigned long graph_molloy_hash::shuffle(unsigned long times, int type) {
   if(VERBOSE()) next=0;
   
   // Shuffle: while #edge swap attempts validated by connectivity < times ...
-  while(times>nb_swaps) {
+  while(times>nb_swaps && maxtimes>all_swaps) {
     // Backup graph
     int *save = backup();
     // Prepare counters, K, T
@@ -263,6 +266,7 @@ unsigned long graph_molloy_hash::shuffle(unsigned long times, int type) {
     for(int i=T_int; i>0; i--) {
       // try one swap
       swaps += (unsigned long)(random_edge_swap(K_int, Kbuff, visited));
+      all_swaps++;
       // Verbose
       if(VERBOSE()>=VERBOSE_LOTS && nb_swaps+swaps>next) {
         next = (nb_swaps+swaps)+max((unsigned long)(100),(unsigned long)(times/1000));
@@ -311,6 +315,10 @@ unsigned long graph_molloy_hash::shuffle(unsigned long times, int type) {
         fprintf(stderr,"Error in graph_molloy_hash::shuffle() : Unknown heuristics type\n");
         return 0;
     }
+  }
+  
+  if (maxtimes <= all_swaps) { 
+    IGRAPH_WARNING("Cannot shuffle graph, maybe there is only a single one?");
   }
   
   // Status report
