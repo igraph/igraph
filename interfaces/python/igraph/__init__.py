@@ -212,6 +212,26 @@ class Graph(GraphBase):
             return clustering
     blocks = biconnected_components
 
+    def cohesive_blocks(self):
+        """cohesive_blocks()
+
+        Calculates the cohesive block structure of the graph.
+
+        Cohesive blocking is a method of determining hierarchical subsets of graph
+        vertices based on their structural cohesion (i.e. vertex connectivity).
+        For a given graph G, a subset of its vertices S is said to be maximally
+        k-cohesive if there is no superset of S with vertex connectivity greater
+        than or equal to k. Cohesive blocking is a process through which, given a
+        k-cohesive set of vertices, maximally l-cohesive subsets are recursively
+        identified with l > k. Thus a hierarchy of vertex subsets is obtained in
+        the end, with the entire graph G at its root.
+
+        @return: an instance of L{CohesiveBlocks}. See the documentation of
+          L{CohesiveBlocks} for more information.
+        @see: L{CohesiveBlocks}
+        """
+        return CohesiveBlocks(self, *GraphBase.cohesive_blocks(self))
+
     def clusters(self, mode=STRONG):
         """clusters(mode=STRONG)
 
@@ -2670,7 +2690,7 @@ def _add_proxy_methods():
         "constraint", "eccentricity", "get_shortest_paths", "maxdegree",
         "pagerank", "personalized_pagerank", "shortest_paths", "similarity_dice",
         "similarity_jaccard", "subgraph", "indegree", "outdegree", "isoclass",
-        "delete_vertices"]
+        "delete_vertices", "is_separator", "is_minimal_separator"]
     decorated_methods[EdgeSeq] = \
         ["count_multiple", "delete_edges", "is_loop", "is_multiple",
         "is_mutual", "subgraph_edges"]

@@ -23,6 +23,7 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 """
 
 from copy import deepcopy
+from itertools import izip
 from math import pi
 from StringIO import StringIO
 
@@ -320,6 +321,16 @@ class VertexClustering(Clustering):
           the moment the clustering was constructed.
         """
         return self._graph.subgraph(self[idx])
+
+
+    def subgraphs(self):
+        """Gets all the subgraphs belonging to each of the clusters.
+
+        @return: a list containing copies of the subgraphs
+        @precondition: the vertex set of the graph hasn't been modified since
+          the moment the clustering was constructed.
+        """
+        return [self._graph.subgraph(cl) for cl in self]
 
 
     def giant(self):
@@ -1045,6 +1056,15 @@ class VertexCover(Cover):
         """
         return self._graph.subgraph(self[idx])
 
+    def subgraphs(self):
+        """Gets all the subgraphs belonging to each of the clusters.
+
+        @return: a list containing copies of the subgraphs
+        @precondition: the vertex set of the graph hasn't been modified since
+          the moment the cover was constructed.
+        """
+        return [self._graph.subgraph(cl) for cl in self]
+
     def __plot__(self, context, bbox, palette, *args, **kwds):
         """Plots the cover to the given Cairo context in the given
         bounding box.
@@ -1105,6 +1125,122 @@ class VertexCover(Cover):
 
         return self._graph.__plot__(context, bbox, palette, *args, **kwds)
 
+
+class CohesiveBlocks(VertexCover):
+    """The cohesive block structure of a graph.
+
+    Instances of this type are created by L{Graph.cohesive_blocks()}. See
+    the documentation of L{Graph.cohesive_blocks()} for an explanation of
+    what cohesive blocks are.
+
+    This class provides a few more methods that make handling of cohesive
+    block structures easier.
+    """
+
+    def __init__(self, graph, blocks = None, cohesion = None, parent = None):
+        """Constructs a new cohesive block structure for the given graph.
+
+        If any of I{blocks}, I{cohesion} or I{parent} is C{None}, all the
+        arguments will be ignored and L{Graph.cohesive_blocks()} will be
+        called to calculate the cohesive blocks. Otherwise, these three
+        variables should describe the *result* of a cohesive block structure
+        calculation. Chances are that you never have to construct L{CohesiveBlocks}
+        instances directly, just use L{Graph.cohesive_blocks()}.
+
+        @param graph: the graph itself
+        @param blocks: a list containing the blocks; each block is described
+          as a list containing vertex IDs.
+        @param cohesion: the cohesion of each block. The length of this list
+          must be equal to the length of I{blocks}.
+        @param parent: the parent block of each block. Negative values or
+          C{None} mean that there is no parent block for that block. There
+          should be only one parent block, which covers the entire graph.
+        @see: Graph.cohesive_blocks()
+        """
+        if blocks is None or cohesion is None or parent is None:
+            blocks, cohesion, parent = graph.cohesive_blocks()
+
+        VertexCover.__init__(self, graph, blocks)
+
+        self._cohesion = cohesion
+        self._parent = parent
+        for idx, p in enumerate(self._parent):
+            if p < 0:
+                self._parent[idx] = None
+
+    def cohesion(self, idx):
+        """Returns the cohesion of the group with the given index."""
+        return self._cohesion[idx]
+
+    def cohesions(self):
+        """Returns the list of cohesion values for each group."""
+        return self._cohesion[:]
+
+    def hierarchy(self):
+        """Returns a new graph that describes the hierarchical relationships
+        between the groups.
+
+        The new graph will be a directed tree; an edge will point from
+        vertex M{i} to vertex M{j} if group M{i} is a superset of group M{j}.
+        In other words, the edges point downwards.
+        """
+        from igraph import Graph
+        edges = [pair for pair in izip(self._parent, xrange(len(self)))
+                 if pair[0] is not None]
+        return Graph(edges, directed=True)
+
+    def max_cohesion(self, idx):
+        """Finds the maximum cohesion score among all the groups that contain
+        the given vertex."""
+        result = 0
+        for cohesion, cluster in izip(self._cohesion, self._clusters):
+            if idx in cluster:
+                result = max(result, cohesion)
+        return result
+
+    def max_cohesions(self):
+        """For each vertex in the graph, returns the maximum cohesion score
+        among all the groups that contain the vertex."""
+        result = [0] * self._graph.vcount()
+        for cohesion, cluster in izip(self._cohesion, self._clusters):
+            for idx in cluster:
+                result[idx] = max(result[idx], cohesion)
+        return result
+
+    def parent(self, idx):
+        """Returns the parent group index of the group with the given index
+        or C{None} if the given group is the root."""
+        return self._parent[idx]
+
+    def parents(self):
+        """Returns the list of parent group indices for each group or C{None}
+        if the given group is the root."""
+        return self._parent[:]
+
+    def __plot__(self, context, bbox, palette, *args, **kwds):
+        """Plots the cohesive block structure to the given Cairo context in
+        the given bounding box.
+
+        Since a L{CohesiveBlocks} instance is also a L{VertexCover}, keyword
+        arguments accepted by L{VertexCover.__plot__()} are also accepted here.
+        The only difference is that the vertices are colored according to their
+        maximal cohesions by default, and groups are marked by colored blobs
+        except the last group which encapsulates the whole graph.
+
+        See the documentation of L{VertexCover.__plot__()} for more details.
+        """
+        if "mark_groups" not in kwds:
+            if Configuration.instance()["plotting.mark_groups"]:
+                colors = self.cohesions()
+                for idx, color in enumerate(colors):
+                    if color < 2:
+                        colors[idx] = None
+                kwds["mark_groups"] = colors
+
+        if "vertex_color" not in kwds:
+            kwds["vertex_color"] = self.max_cohesions()
+
+        return VertexCover.__plot__(self, context, bbox, palette, *args, **kwds)
 
 def _handle_mark_groups_arg_for_clustering(mark_groups, clustering):
     """Handles the mark_groups=... keyword argument in plotting methods of

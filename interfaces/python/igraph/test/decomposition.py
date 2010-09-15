@@ -45,6 +45,7 @@ class DecompositionTests(unittest.TestCase):
         l.sort()
         self.failUnless(l == [(0,1), (0,2), (0,3), (1,2), (1,3), (2,3)])
 
+
 class ClusteringTests(unittest.TestCase):
     def setUp(self):
         self.cl = Clustering([0,0,0,1,1,2,1,1,4,4])
@@ -245,6 +246,58 @@ class CommunityTests(unittest.TestCase):
         self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1,2,2,2,2,2])
        
 
+class CohesiveBlocksTests(unittest.TestCase):
+    def genericTests(self, cbs):
+        self.failUnless(isinstance(cbs, CohesiveBlocks))
+        self.failUnless(all(cbs.cohesion(i) == c
+                            for i, c in enumerate(cbs.cohesions())))
+        self.failUnless(all(cbs.parent(i) == c
+                            for i, c in enumerate(cbs.parents())))
+        self.failUnless(all(cbs.max_cohesion(i) == c
+                            for i, c in enumerate(cbs.max_cohesions())))
+
+    def testCohesiveBlocks1(self):
+        # Taken from the igraph R manual
+        g = Graph.Full(4) + Graph(2) + [(3, 4), (4, 5), (4, 2)]
+        g *= 3
+        g += [(0, 6), (1, 7), (0, 12), (4, 0), (4, 1)]
+
+        cbs = g.cohesive_blocks()
+        self.genericTests(cbs)
+        self.assertEquals(sorted(list(cbs)),
+                [range(0, 5), range(18), [0, 1, 2, 3, 4, 6, 7, 8, 9, 10],
+                 range(6, 10), range(12, 16), range(12, 17)])
+        self.assertEquals(cbs.cohesions(), [1, 2, 2, 4, 3, 3])
+        self.assertEquals(cbs.max_cohesions(), [4, 4, 4, 4, 4,
+            1, 3, 3, 3, 3, 2, 1, 3, 3, 3, 3, 2, 1])
+        self.assertEquals(cbs.parents(), [None, 0, 0, 1, 2, 1])
+
+    def testCohesiveBlocks2(self):
+        # Taken from the Moody-White paper
+        g = Graph.Formula("1-2:3:4:5:6, 2-3:4:5:7, 3-4:6:7, 4-5:6:7, "
+                          "5-6:7:21, 6-7, 7-8:11:14:19, 8-9:11:14, 9-10, "
+                          "10-12:13, 11-12:14, 12-16, 13-16, 14-15, 15-16, "
+                          "17-18:19:20, 18-20:21, 19-20:22:23, 20-21, "
+                          "21-22:23, 22-23")
+
+        cbs = g.cohesive_blocks()
+        self.genericTests(cbs)
+
+        expected_blocks = [range(7), range(23), range(7)+range(16, 23),
+                range(6, 16), [6, 7, 10, 13]]
+        observed_blocks = sorted(sorted(int(x)-1 for x in g.vs[bl]["name"]) for bl in cbs)
+        self.assertEquals(expected_blocks, observed_blocks)
+        self.failUnless(cbs.cohesions() == [1, 2, 2, 5, 3])
+        self.failUnless(cbs.parents() == [None, 0, 0, 1, 2])
+        self.failUnless(sorted(cbs.hierarchy().get_edgelist()) ==
+                [(0, 1), (0, 2), (1, 3), (2, 4)])
+
+    def testCohesiveBlockingErrors(self):
+        g = Graph.GRG(100, 0.2)
+        g.to_directed()
+        self.assertRaises(InternalError, g.cohesive_blocks)
+
+
 class ComparisonTests(unittest.TestCase):
     def testCompareVI(self):
         l1 = Clustering([1, 1, 1, 2, 2, 2])
@@ -289,10 +342,11 @@ def suite():
     vertex_clustering_suite = unittest.makeSuite(VertexClusteringTests)
     cover_suite = unittest.makeSuite(CoverTests)
     community_suite = unittest.makeSuite(CommunityTests)
+    cohesive_blocks_suite = unittest.makeSuite(CohesiveBlocksTests)
     comparison_suite = unittest.makeSuite(ComparisonTests)
     return unittest.TestSuite([decomposition_suite, clustering_suite, \
-            vertex_clustering_suite, cover_suite, \
-            community_suite, comparison_suite])
+            vertex_clustering_suite, cover_suite, community_suite, \
+            cohesive_blocks_suite, comparison_suite])
 
 def test():
     runner = unittest.TextTestRunner()

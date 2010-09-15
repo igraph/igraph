@@ -3130,7 +3130,6 @@ PyObject *igraphmodule_Graph_biconnected_components(igraphmodule_GraphObject *se
   igraph_bool_t return_articulation_points;
   igraph_integer_t no;
   PyObject *result, *aps=Py_False;
-  long int i;
 
   static char* kwlist[] = {"return_articulation_points", NULL};
 
@@ -3157,7 +3156,7 @@ PyObject *igraphmodule_Graph_biconnected_components(igraphmodule_GraphObject *se
   }
 
   result = igraphmodule_vector_ptr_t_to_PyList(&components, IGRAPHMODULE_TYPE_INT);
-  for (i=0; i<no; i++) igraph_vector_destroy(VECTOR(components)[i]);
+  igraph_vector_ptr_set_item_destructor(&components, (igraph_finally_func_t*)igraph_vector_destroy);
   igraph_vector_ptr_destroy_all(&components);
 
   if (return_articulation_points) {
@@ -3863,7 +3862,7 @@ PyObject *igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *
   igraph_vector_ptr_t res;
   igraph_vector_t *weights = 0;
   igraph_neimode_t mode = IGRAPH_OUT;
-  long from0, i, j, k;
+  long from0, i, j;
   igraph_integer_t from;
   igraph_vs_t to;
   PyObject *list, *item, *mode_o=Py_None, *to_o=Py_None, *weights_o=Py_None;
@@ -3897,11 +3896,11 @@ PyObject *igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *
 
   if (weights) { igraph_vector_destroy(weights); free(weights); }
 
+  igraph_vector_ptr_set_item_destructor(&res, (igraph_finally_func_t*)igraph_vector_destroy);
+
   j = igraph_vector_ptr_size(&res);
   list = PyList_New(j);
   if (!list) {
-    for (i = 0; i < j; i++)
-      igraph_vector_destroy(igraph_vector_ptr_e(&res, i));
     igraph_vector_ptr_destroy_all(&res);
     return NULL;
   }
@@ -3913,23 +3912,17 @@ PyObject *igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *
                     IGRAPHMODULE_TYPE_INT);
     if (!item) {
       Py_DECREF(list);
-      for (k = 0; k < j; k++)
-        igraph_vector_destroy(igraph_vector_ptr_e(&res, k));
       igraph_vector_ptr_destroy_all(&res);
       return NULL;
     }
     if (PyList_SetItem(list, i, item)) {
       Py_DECREF(list);
       Py_DECREF(item);
-      for (k = 0; k < j; k++)
-        igraph_vector_destroy(igraph_vector_ptr_e(&res, k));
       igraph_vector_ptr_destroy_all(&res);
       return NULL;
     }
   }
 
-  for (i = 0; i < j; i++)
-    igraph_vector_destroy(igraph_vector_ptr_e(&res, i));
   igraph_vector_ptr_destroy_all(&res);
   return list;
 }
@@ -7146,7 +7139,6 @@ PyObject *igraphmodule_Graph_get_isomorphisms_vf2(igraphmodule_GraphObject *self
   PyObject *color1_o = Py_None, *color2_o = Py_None;
   PyObject *edge_color1_o=Py_None, *edge_color2_o=Py_None;
   PyObject *res;
-  long int i,n;
   igraphmodule_GraphObject *other;
   igraph_vector_long_t *color1=0, *color2=0;
   igraph_vector_long_t *edge_color1=0, *edge_color2=0;
@@ -7205,8 +7197,7 @@ PyObject *igraphmodule_Graph_get_isomorphisms_vf2(igraphmodule_GraphObject *self
 
   res = igraphmodule_vector_ptr_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
 
-  n=igraph_vector_ptr_size(&result);
-  for (i=0; i<n; i++) igraph_vector_destroy((igraph_vector_t*)VECTOR(result)[i]);
+  igraph_vector_ptr_set_item_destructor(&result, (igraph_finally_func_t*)igraph_vector_destroy);
   igraph_vector_ptr_destroy_all(&result);
 
   return res;
@@ -7392,7 +7383,6 @@ PyObject *igraphmodule_Graph_get_subisomorphisms_vf2(igraphmodule_GraphObject *s
   PyObject *color1_o=Py_None, *color2_o=Py_None;
   PyObject *edge_color1_o=Py_None, *edge_color2_o=Py_None;
   PyObject *res;
-  long int i,n;
   igraphmodule_GraphObject *other;
   igraph_vector_long_t *color1=0, *color2=0;
   igraph_vector_long_t *edge_color1=0, *edge_color2=0;
@@ -7448,8 +7438,7 @@ PyObject *igraphmodule_Graph_get_subisomorphisms_vf2(igraphmodule_GraphObject *s
 
   res = igraphmodule_vector_ptr_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
 
-  n=igraph_vector_ptr_size(&result);
-  for (i=0; i<n; i++) igraph_vector_destroy((igraph_vector_t*)VECTOR(result)[i]);
+  igraph_vector_ptr_set_item_destructor(&result, (igraph_finally_func_t*)igraph_vector_destroy);
   igraph_vector_ptr_destroy_all(&result);
 
   return res;
@@ -7956,7 +7945,7 @@ PyObject *igraphmodule_Graph_unfold_tree(igraphmodule_GraphObject * self,
 }
 
 /**********************************************************************
- * Maximum flows and minimum cuts                                     *
+ * Maximum flows                                                      *
  **********************************************************************/
 
 /** \ingroup python_interface_graph
@@ -8072,6 +8061,10 @@ PyObject *igraphmodule_Graph_maxflow(igraphmodule_GraphObject * self,
 
   return Py_BuildValue("dOOO", (double)result, flow_o, cut_o, partition_o);
 }
+
+/**********************************************************************
+ * Minimum cuts (edge separators)                                     *
+ **********************************************************************/
 
 /** \ingroup python_interface_graph
  * \brief Calculates the value of the minimum cut in the graph
@@ -8223,6 +8216,202 @@ PyObject *igraphmodule_Graph_mincut(igraphmodule_GraphObject * self,
   return result;
 }
 
+/**********************************************************************
+ * Vertex separators                                                  *
+ **********************************************************************/
+
+/** \ingroup python_interface_graph
+ * \brief Returns all minimal s-t separators of a graph
+ */
+PyObject *igraphmodule_Graph_all_minimal_st_separators(
+    igraphmodule_GraphObject * self) {
+  PyObject* result_o;
+  igraph_vector_ptr_t result;
+
+  if (igraph_vector_ptr_init(&result, 0)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_all_minimal_st_separators(&self->g, &result)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_ptr_destroy(&result);
+    return NULL;
+  }
+
+  result_o = igraphmodule_vector_ptr_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_ptr_set_item_destructor(&result, (igraph_finally_func_t*)igraph_vector_destroy);
+  igraph_vector_ptr_destroy_all(&result);
+
+  return result_o;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Checks whether a given vertex set is a vertex separator
+ */
+PyObject *igraphmodule_Graph_is_separator(igraphmodule_GraphObject * self,
+                                          PyObject * args, PyObject * kwds)
+{
+  PyObject* list = Py_None;
+  igraph_bool_t result;
+  igraph_vs_t vs;
+
+  static char *kwlist[] = { "vertices", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &list))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vs_t(list, &vs, &self->g, 0)) {
+    return NULL;
+  }
+
+  if (igraph_is_separator(&self->g, vs, &result)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vs_destroy(&vs);
+    return NULL;
+  }
+
+  igraph_vs_destroy(&vs);
+
+  if (result)
+    Py_RETURN_TRUE;
+  else
+    Py_RETURN_FALSE;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Checks whether a given vertex set is a minimal vertex separator
+ */
+PyObject *igraphmodule_Graph_is_minimal_separator(igraphmodule_GraphObject * self,
+                                                  PyObject * args, PyObject * kwds)
+{
+  PyObject* list = Py_None;
+  igraph_bool_t result;
+  igraph_vs_t vs;
+
+  static char *kwlist[] = { "vertices", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &list))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vs_t(list, &vs, &self->g, 0)) {
+    return NULL;
+  }
+
+  if (igraph_is_minimal_separator(&self->g, vs, &result)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vs_destroy(&vs);
+    return NULL;
+  }
+
+  igraph_vs_destroy(&vs);
+
+  if (result)
+    Py_RETURN_TRUE;
+  else
+    Py_RETURN_FALSE;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Returns the minimum size separators of the graph
+ */
+PyObject *igraphmodule_Graph_minimum_size_separators(
+    igraphmodule_GraphObject * self) {
+  PyObject* result_o;
+  igraph_vector_ptr_t result;
+
+  if (igraph_vector_ptr_init(&result, 0)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_minimum_size_separators(&self->g, &result)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_ptr_destroy(&result);
+    return NULL;
+  }
+
+  result_o = igraphmodule_vector_ptr_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_ptr_set_item_destructor(&result, (igraph_finally_func_t*)igraph_vector_destroy);
+  igraph_vector_ptr_destroy_all(&result);
+
+  return result_o;
+}
+
+/**********************************************************************
+ * Cohesive blocks                                                    *
+ **********************************************************************/
+
+/** \ingroup python_interface_graph
+ * \brief Calculates the cohesive block structure of a graph
+ */
+PyObject *igraphmodule_Graph_cohesive_blocks(igraphmodule_GraphObject *self,
+    PyObject *args, PyObject *kwds) {
+  PyObject *blocks_o, *cohesion_o, *parents_o, *result_o;
+  igraph_vector_ptr_t blocks;
+  igraph_vector_t cohesion, parents;
+
+  if (igraph_vector_ptr_init(&blocks, 0)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_vector_init(&cohesion, 0)) {
+    igraph_vector_ptr_destroy(&blocks);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_vector_init(&parents, 0)) {
+    igraph_vector_ptr_destroy(&blocks);
+    igraph_vector_destroy(&cohesion);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_cohesive_blocks(&self->g, &blocks, &cohesion, &parents, 0)) {
+    igraph_vector_ptr_destroy(&blocks);
+    igraph_vector_destroy(&cohesion);
+    igraph_vector_destroy(&parents);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  blocks_o = igraphmodule_vector_ptr_t_to_PyList(&blocks, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_ptr_set_item_destructor(&blocks, (igraph_finally_func_t*)igraph_vector_destroy);
+  igraph_vector_ptr_destroy_all(&blocks);
+  if (blocks_o == NULL) {
+    igraph_vector_destroy(&parents);
+    igraph_vector_destroy(&cohesion);
+    return NULL;
+  }
+
+  cohesion_o = igraphmodule_vector_t_to_PyList(&cohesion, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&cohesion);
+  if (cohesion_o == NULL) {
+    Py_DECREF(blocks_o);
+    igraph_vector_destroy(&parents);
+    return NULL;
+  }
+
+  parents_o = igraphmodule_vector_t_to_PyList(&parents, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&parents); 
+
+  if (parents_o == NULL) {
+    Py_DECREF(blocks_o);
+    Py_DECREF(cohesion_o);
+    return NULL;
+  }
+
+  result_o = Py_BuildValue("NNN", blocks_o, cohesion_o, parents_o);
+  if (result_o == NULL) {
+    Py_DECREF(parents_o);
+    Py_DECREF(blocks_o);
+    Py_DECREF(cohesion_o);
+    return NULL;
+  }
+  return result_o;
+}
 
 /**********************************************************************
  * Cliques and independent sets                                       *
@@ -11830,9 +12019,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param graphs: the list of graphs to be united with\n"
    "  the current one.\n"},
 
-  /**************************/
-  /* FLOW RELATED FUNCTIONS */
-  /**************************/
+  /*****************/
+  /* MAXIMUM FLOWS */
+  /*****************/
   {"maxflow_value", (PyCFunction) igraphmodule_Graph_maxflow_value,
    METH_VARARGS | METH_KEYWORDS,
    "maxflow_value(source, target, capacity=None)\n\n"
@@ -11865,6 +12054,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  and negative if the flow goes from the bigger vertex ID to the smaller."
   },
 
+  /****************/
+  /* MINIMUM CUTS */
+  /****************/
   {"mincut_value", (PyCFunction) igraphmodule_Graph_mincut_value,
    METH_VARARGS | METH_KEYWORDS,
    "mincut_value(source=-1, target=-1, capacity=None)\n\n"
@@ -11898,6 +12090,65 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@ref: M. Stoer, F. Wagner: A simple min-cut algorithm. Journal of\n"
    "  the ACM 44(4):585-591, 1997.\n"
    },
+
+  /*********************/
+  /* VERTEX SEPARATORS */
+  /*********************/
+  {"all_minimal_st_separators",
+   (PyCFunction) igraphmodule_Graph_all_minimal_st_separators, METH_NOARGS,
+   "all_minimal_st_separators()\n\n"
+   "Returns a list containing all the minimal s-t separators of a graph.\n\n"
+   "A minimal separator is a set of vertices whose removal disconnects the graph,\n"
+   "while the removal of any subset of the set keeps the graph connected.\n\n"
+   "@return: a list where each item lists the vertex indices of a given\n"
+   "  minimal s-t separator.\n"
+   "@newfield ref: Reference\n"
+   "@ref: Anne Berry, Jean-Paul Bordat and Olivier Cogis: Generating all the\n"
+   "  minimal separators of a graph. In: Peter Widmayer, Gabriele Neyer and\n"
+   "  Stephan Eidenbenz (eds.): Graph-theoretic concepts in computer science,\n"
+   "  1665, 167--172, 1999. Springer.\n"},
+
+  {"is_minimal_separator", (PyCFunction) igraphmodule_Graph_is_minimal_separator,
+   METH_VARARGS | METH_KEYWORDS,
+   "is_minimal_separator(vertices)\n\n"
+   "Decides whether the given vertex set is a minimal separator.\n\n"
+   "A minimal separator is a set of vertices whose removal disconnects the graph,\n"
+   "while the removal of any subset of the set keeps the graph connected.\n\n"
+   "@param vertices: a single vertex ID or a list of vertex IDs\n"
+   "@return: C{True} is the given vertex set is a minimal separator, C{False}\n"
+   "  otherwise.\n"},
+
+  {"is_separator", (PyCFunction) igraphmodule_Graph_is_separator,
+   METH_VARARGS | METH_KEYWORDS,
+   "is_separator(vertices)\n\n"
+   "Decides whether the removal of the given vertices disconnects the graph.\n\n"
+   "@param vertices: a single vertex ID or a list of vertex IDs\n"
+   "@return: C{True} is the given vertex set is a separator, C{False} if not.\n"},
+
+  {"minimum_size_separators",
+   (PyCFunction) igraphmodule_Graph_minimum_size_separators, METH_NOARGS,
+   "minimum_size_separators()\n\n"
+   "Returns a list containing all separator vertex sets of minimum size.\n\n"
+   "A vertex set is a separator if its removal disconnects the graph. This method\n"
+   "lists all the separators for which no smaller separator set exists in the\n"
+   "given graph.\n\n"
+   "@return: a list where each item lists the vertex indices of a given\n"
+   "  separator of minimum size.\n"
+   "@newfield ref: Reference\n"
+   "@ref: Arkady Kanevsky: Finding all minimum-size separating vertex sets\n"
+   "  in a graph. Networks 23:533--541, 1993.\n"},
+
+  /*******************/
+  /* COHESIVE BLOCKS */
+  /*******************/
+  {"cohesive_blocks", (PyCFunction) igraphmodule_Graph_cohesive_blocks,
+   METH_NOARGS,
+   "cohesive_blocks()\n\n"
+   "Calculates the cohesive block structure of the graph.\n\n"
+   "@attention: this function has a more convenient interface in class\n"
+   "  L{Graph} which wraps the result in a L{CohesiveBlocks} object.\n"
+   "  It is advised to use that.\n"
+  },
 
   /********************************/
   /* CLIQUES AND INDEPENDENT SETS */
