@@ -151,7 +151,7 @@ int igraph_degree_sequence_game_vl(igraph_t *graph,
   graph_molloy_hash *gh = new graph_molloy_hash(hc);
   delete [] hc;
 
-  gh->shuffle(5*gh->nbarcs(), SHUFFLE_TYPE);
+  gh->shuffle(5*gh->nbarcs(), 100*gh->nbarcs(), SHUFFLE_TYPE);
   
   IGRAPH_CHECK(gh->print(graph));
   delete gh;

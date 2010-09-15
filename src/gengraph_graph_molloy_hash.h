@@ -127,7 +127,7 @@ public:
   // Random edge swap ATTEMPT. Return 1 if attempt was a succes, 0 otherwise
   int random_edge_swap(int K=0, int *Kbuff=NULL, bool *visited=NULL);
   // Connected Shuffle
-  unsigned long shuffle(unsigned long, int type);
+  unsigned long shuffle(unsigned long, unsigned long, int type);
   // Optimal window for the gkantsidis heuristics
   int optimal_window();
   // Average unitary cost per post-validated edge swap, for some window
