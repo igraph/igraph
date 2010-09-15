@@ -11,7 +11,7 @@
 
 #include "config.h"
 #include "igraph_math.h"
-#include "igraph_error.h"
+#include "error.h"
 
 namespace gengraph {
 
