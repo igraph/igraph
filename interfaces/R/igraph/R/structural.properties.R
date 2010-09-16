@@ -62,9 +62,10 @@ get.diameter <- function(graph, directed=TRUE, unconnected=TRUE,
   }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_get_diameter", graph, as.logical(directed),
-        as.logical(unconnected), weights,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_get_diameter", graph, as.logical(directed),
+               as.logical(unconnected), weights,
+               PACKAGE="igraph")
+  res + 1
 }
 
 farthest.nodes <- function(graph, directed=TRUE, unconnected=TRUE,
@@ -84,9 +85,10 @@ farthest.nodes <- function(graph, directed=TRUE, unconnected=TRUE,
   }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_farthest_points", graph, as.logical(directed),
-        as.logical(unconnected), weights,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_farthest_points", graph, as.logical(directed),
+               as.logical(unconnected), weights,
+               PACKAGE="igraph")
+  res + 1
 }       
 
 average.path.length <- function(graph, directed=TRUE, unconnected=TRUE) {
@@ -195,9 +197,17 @@ get.shortest.paths <- function(graph, from, to=V(graph),
   
   to <- as.igraph.vs(graph, to)-1
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_get_shortest_paths", graph,
-        as.igraph.vs(graph, from)-1, to, as.numeric(mode), as.numeric(length(to)),
-        weights, as.numeric(output), PACKAGE="igraph")
+  res <- .Call("R_igraph_get_shortest_paths", graph,
+               as.igraph.vs(graph, from)-1, to, as.numeric(mode), as.numeric(length(to)),
+               weights, as.numeric(output), PACKAGE="igraph")
+
+  if (output!="both") {
+    res <- lapply(res, function(x) x+1)
+  } else {
+    res <- list(vpath=lapply(res$vpath, function(x) x+1),
+                epath=lapply(res$epath, function(x) x+1))
+  }
+  res
 }
 
 get.all.shortest.paths <- function(graph, from,
@@ -225,14 +235,16 @@ get.all.shortest.paths <- function(graph, from,
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   if (is.null(weights)) {
-    .Call("R_igraph_get_all_shortest_paths", graph,
-          as.numeric(from)-1, as.igraph.vs(graph, to)-1, as.numeric(mode),
-          PACKAGE="igraph")
+    res <- .Call("R_igraph_get_all_shortest_paths", graph,
+                 as.numeric(from)-1, as.igraph.vs(graph, to)-1,
+                 as.numeric(mode), PACKAGE="igraph")
   } else {
-    .Call("R_igraph_get_all_shortest_paths_dijkstra", graph, 
-          as.numeric(from)-1, as.igraph.vs(graph, to)-1, weights,
-          as.numeric(mode), PACKAGE="igraph")
+    res <- .Call("R_igraph_get_all_shortest_paths_dijkstra", graph, 
+                 as.numeric(from)-1, as.igraph.vs(graph, to)-1, weights,
+                 as.numeric(mode), PACKAGE="igraph")
   }       
+  res <- lapply(res, function(x) x+1)
+  res
 }
 
 subcomponent <- function(graph, v, mode=c("all", "out", "in")) {
@@ -244,8 +256,9 @@ subcomponent <- function(graph, v, mode=c("all", "out", "in")) {
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_subcomponent", graph, as.igraph.vs(graph, v), as.numeric(mode),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_subcomponent", graph, as.igraph.vs(graph, v), as.numeric(mode),
+               PACKAGE="igraph")
+  res+1
 }
 
 subgraph <- function(graph, v) {
@@ -254,7 +267,7 @@ subgraph <- function(graph, v) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_subgraph", graph, as.igraph.vs(graph, v),
+  .Call("R_igraph_subgraph", graph, as.igraph.vs(graph, v)-1,
         PACKAGE="igraph")
 }
 
@@ -703,9 +716,11 @@ graph.neighborhood <- function(graph, order, nodes=V(graph),
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_neighborhood_graphs", graph, 
-        as.igraph.vs(graph, nodes)-1, as.numeric(order), as.numeric(mode),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_neighborhood_graphs", graph, 
+               as.igraph.vs(graph, nodes)-1, as.numeric(order), as.numeric(mode),
+               PACKAGE="igraph")
+  res <- lapply(res, function(x) x+1)
+  res
 }
 
 graph.coreness <- function(graph, mode=c("all", "out", "in")) {
@@ -730,8 +745,9 @@ topological.sort <- function(graph, mode=c("out", "all", "in")) {
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_topological_sorting", graph, as.numeric(mode),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_topological_sorting", graph, as.numeric(mode),
+               PACKAGE="igraph")
+  res+1
 }
 
 girth <- function(graph, circle=TRUE) {
@@ -798,12 +814,19 @@ graph.bfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
   if (!is.null(callback)) { callback <- as.function(callback) }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_bfs", graph, root, roots, neimode, unreachable, restricted,
-        as.logical(order), as.logical(rank), as.logical(father),
-        as.logical(pred), as.logical(succ), as.logical(dist),
-        callback, extra, rho,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_bfs", graph, root, roots, neimode, unreachable,
+               restricted,
+               as.logical(order), as.logical(rank), as.logical(father),
+               as.logical(pred), as.logical(succ), as.logical(dist),
+               callback, extra, rho,
+               PACKAGE="igraph")
   
+  if (order)  res$order  <- res$order+1
+  if (rank)   res$rank   <- res$rank+1
+  if (father) res$father <- res$father+1
+  if (pred)   res$pred   <- res$pred+1
+  if (succ)   res$succ   <- res$succ+1
+  res
 }
 
 graph.dfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
@@ -824,11 +847,15 @@ graph.dfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
   if (!is.null(out.callback)) { out.callback <- as.function(out.callback) }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_dfs", graph, root, neimode, unreachable,
-        as.logical(order), as.logical(order.out), as.logical(father),
-        as.logical(dist), in.callback, out.callback, extra, rho,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_dfs", graph, root, neimode, unreachable,
+               as.logical(order), as.logical(order.out), as.logical(father),
+               as.logical(dist), in.callback, out.callback, extra, rho,
+               PACKAGE="igraph")
   
+  if (order)     res$order     <- res$order+1
+  if (order.out) res$order.out <- res$order.out+1
+  if (father)    res$father    <- res$father+1
+  res
 }
 
 edge.betweenness <- function(graph, e=E(graph),
@@ -874,4 +901,17 @@ edge.betweenness.estimate <- function(graph, e=E(graph),
   res <- .Call("R_igraph_edge_betweenness_estimate", graph, directed, cutoff, weights,
         PACKAGE="igraph")
   res[as.numeric(e)]
+}
+
+clusters <- function(graph, mode=c("weak", "strong")) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  mode <- switch(igraph.match.arg(mode), "weak"=1, "strong"=2)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_clusters", graph, mode,
+        PACKAGE="igraph")
+  res$membership <- res$membership + 1
+  res
 }

@@ -152,6 +152,7 @@ get.edgelist <- function(graph, names=TRUE) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- matrix(.Call("R_igraph_get_edgelist", graph, TRUE,
                       PACKAGE="igraph"), nc=2)
+  res <- res+1
   if (names && "name" %in% list.vertex.attributes(graph)) {
     res <- matrix(V(graph)$name[ res ], nc=2)
   }
@@ -180,8 +181,9 @@ get.adjlist <- function(graph, mode=c("all", "out", "in", "total")) {
   mode <- igraph.match.arg(mode)
   mode <- as.numeric(switch(mode, "out"=1, "in"=2, "all"=3, "total"=3))
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_get_adjlist", graph, mode,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_get_adjlist", graph, mode,
+               PACKAGE="igraph")
+  lapply(res, function(x) x+1)
 }
 
 get.adjedgelist <- function(graph, mode=c("all", "out", "in", "total")) {
@@ -192,8 +194,9 @@ get.adjedgelist <- function(graph, mode=c("all", "out", "in", "total")) {
   mode <- igraph.match.arg(mode)
   mode <- as.numeric(switch(mode, "out"=1, "in"=2, "all"=3, "total"=3))
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_get_adjedgelist", graph, mode,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_get_adjedgelist", graph, mode,
+               PACKAGE="igraph")
+  lapply(res, function(x) x+1)
 }
 
 igraph.from.graphNEL <- function(graphNEL, name=TRUE, weight=TRUE,
