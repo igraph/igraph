@@ -89,7 +89,7 @@ export(read.graph, write.graph, graph.graphdb)
 
 # layouts
 
-export(layout.random, layout.circle,
+export(layout.auto, layout.random, layout.circle,
        layout.spring, layout.kamada.kawai, layout.lgl,
        layout.fruchterman.reingold.grid, layout.sphere, layout.merge,
        layout.reingold.tilford, layout.norm, piecewise.layout)

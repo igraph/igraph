@@ -1,5 +1,6 @@
 \name{layout}
 \alias{layout}
+\alias{layout.auto}
 \alias{layout.random}
 \alias{layout.circle}
 \alias{layout.sphere}
@@ -18,6 +19,7 @@
 \description{Some simple and not so simple functions determining the
   placement of the vertices for drawing a graph.}
 \usage{
+layout.auto(graph, dim=2, \dots)
 layout.random(graph, params, dim=2)
 layout.circle(graph, params)
 layout.sphere(graph, params)
@@ -43,7 +45,9 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
     to generate 2d and 3d layouts as well, supply this argument to
     change the default behavior.}
   \item{\dots}{Function dependent parameters, this is an alternative
-    notation to the \code{params} argument.}
+    notation to the \code{params} argument. For \code{layout.auto} these
+    extra parameters are simply passed to the real layout function, if
+    one is called.}
   \item{verbose}{Logial constant, whether to show a progress bar while
     calculating the layout.}
   \item{d}{The matrix used for multidimansional scaling. By default it
@@ -64,6 +68,26 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
   These functions calculate the coordinates of the vertices for a graph
   usually based on some optimality criterion.
 
+  \code{layout.auto} tries to choose an appropriate layout function for
+  the supplied graph, and uses that to generate the layout. The current
+  implementations works like this:
+  \enumerate{
+    \item If the graph has a graph attribute called \sQuote{layout},
+    then this is used. If this attribute is an R function, then it is
+    called, with the graph and any other extra arguments.
+    \item Otherwise, if the graph has vertex attributes called
+    \sQuote{x} and \sQuote{y}, then these are used as coordinates. If
+    the graph has an additional \sQuote{z} vertex attribute, that is
+    also used.
+    \item Otherwise, if the graph is connected and has less than 100
+    vertices, the Kamada-Kawai layout is used, by calling
+    \code{layout.kamada.kawai}.
+    \item Otherwise, if the graph has less than 1000 vertices, then the
+    Fruchterman-Reingold layout is used, by calling
+    \code{layout.fruchterman.reingold}.
+    \item Otherwise the DrL layout is used, \code{layout.drl} is called.
+  }
+  
   \code{layout.random} simply places the vertices randomly on a
   square. It has no parameters.
 
