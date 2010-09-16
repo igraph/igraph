@@ -1,0 +1,8 @@
+<h2>igraph 0.5.4 Release Notes</h2>
+
+<p class="news">
+  This is another igraph release that fixes a couple of bugs and 
+  ensures compatibility with the R 2.11.x series. Please see 
+  the <a href="news.html">news page</a> for the complete list of 
+  changes.
+</p>
