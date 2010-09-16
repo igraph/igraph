@@ -5089,43 +5089,30 @@ PyObject *igraphmodule_Graph_layout_circle(igraphmodule_GraphObject * self,
                                            PyObject * args, PyObject * kwds)
 {
   igraph_matrix_t m;
+  int ret;
+  long dim = 2;
   PyObject *result;
+  static char *kwlist[] = { "dim", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|l", kwlist, &dim))
+    return NULL;
+
+  if (dim != 2 && dim != 3) {
+    PyErr_SetString(PyExc_ValueError, "number of dimensions must be either 2 or 3");
+    return NULL;
+  }
 
   if (igraph_matrix_init(&m, 1, 1)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
-  if (igraph_layout_circle(&self->g, &m)) {
-    igraph_matrix_destroy(&m);
-    igraphmodule_handle_igraph_error();
-    return NULL;
-  }
+  if (dim == 2)
+    ret = igraph_layout_circle(&self->g, &m);
+  else
+    ret = igraph_layout_sphere(&self->g, &m);
 
-  result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
-
-  igraph_matrix_destroy(&m);
-
-  return (PyObject *) result;
-}
-
-/** \ingroup python_interface_graph
- * \brief Places the vertices of a graph uniformly on a sphere in 3D.
- * \return the calculated coordinates as a Python list of lists
- * \sa igraph_layout_sphere
- */
-PyObject *igraphmodule_Graph_layout_sphere(igraphmodule_GraphObject * self,
-                                           PyObject * args, PyObject * kwds)
-{
-  igraph_matrix_t m;
-  PyObject *result;
-
-  if (igraph_matrix_init(&m, 1, 1)) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
-  }
-
-  if (igraph_layout_sphere(&self->g, &m)) {
+  if (ret) {
     igraph_matrix_destroy(&m);
     igraphmodule_handle_igraph_error();
     return NULL;
@@ -5147,42 +5134,30 @@ PyObject *igraphmodule_Graph_layout_random(igraphmodule_GraphObject * self,
                                            PyObject * args, PyObject * kwds)
 {
   igraph_matrix_t m;
+  int ret;
+  long dim = 2;
   PyObject *result;
+  static char *kwlist[] = { "dim", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|l", kwlist, &dim))
+    return NULL;
+
+  if (dim != 2 && dim != 3) {
+    PyErr_SetString(PyExc_ValueError, "number of dimensions must be either 2 or 3");
+    return NULL;
+  }
 
   if (igraph_matrix_init(&m, 1, 1)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
-  if (igraph_layout_random(&self->g, &m)) {
-    igraph_matrix_destroy(&m);
-    igraphmodule_handle_igraph_error();
-    return NULL;
-  }
+  if (dim == 2)
+    ret = igraph_layout_random(&self->g, &m);
+  else
+    ret = igraph_layout_random_3d(&self->g, &m);
 
-  result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
-  igraph_matrix_destroy(&m);
-  return (PyObject *) result;
-}
-
-/** \ingroup python_interface_graph
- * \brief Places the vertices of a graph randomly in 3D.
- * \return the calculated coordinates as a Python list of lists
- * \sa igraph_layout_random_3d
- */
-PyObject *igraphmodule_Graph_layout_random_3d(igraphmodule_GraphObject * self,
-                                              PyObject * args,
-                                              PyObject * kwds)
-{
-  igraph_matrix_t m;
-  PyObject *result;
-
-  if (igraph_matrix_init(&m, 1, 1)) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
-  }
-
-  if (igraph_layout_random_3d(&self->g, &m)) {
+  if (ret) {
     igraph_matrix_destroy(&m);
     igraphmodule_handle_igraph_error();
     return NULL;
@@ -5254,10 +5229,11 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *
                                                  PyObject * kwds)
 {
   static char *kwlist[] =
-    { "maxiter", "sigma", "initemp", "coolexp", "kkconst", "seed", NULL };
+    { "maxiter", "sigma", "initemp", "coolexp", "kkconst", "seed", "dim", NULL };
   igraph_matrix_t m;
   igraph_bool_t use_seed=0;
-  long niter = 1000;
+  int ret;
+  long niter = 1000, dim = 2;
   double sigma, initemp, coolexp, kkconst;
   PyObject *result, *seed_o=Py_None;
 
@@ -5267,10 +5243,15 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *
   initemp = 10.0;
   coolexp = 0.99;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lddddO", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lddddOl", kwlist,
                                    &niter, &sigma, &initemp, &coolexp,
-                                   &kkconst, &seed_o))
+                                   &kkconst, &seed_o, &dim))
     return NULL;
+
+  if (dim != 2 && dim != 3) {
+    PyErr_SetString(PyExc_ValueError, "number of dimensions must be either 2 or 3");
+    return NULL;
+  }
 
   if (seed_o == 0 || seed_o == Py_None) {
     if (igraph_matrix_init(&m, 1, 1)) {
@@ -5282,8 +5263,14 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *
 	if (igraphmodule_PyList_to_matrix_t(seed_o, &m)) return NULL;
   }
 
-  if (igraph_layout_kamada_kawai
-      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, use_seed)) {
+  if (dim == 2)
+    ret = igraph_layout_kamada_kawai
+      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, use_seed);
+  else
+    ret = igraph_layout_kamada_kawai_3d
+      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, use_seed, 0);
+
+  if (ret) {
     igraph_matrix_destroy(&m);
     igraphmodule_handle_igraph_error();
     return NULL;
@@ -5353,20 +5340,25 @@ PyObject* igraphmodule_Graph_layout_drl(igraphmodule_GraphObject *self,
           PyObject *args, PyObject *kwds)
 {
   static char *kwlist[] =
-    { "weights", "seed", "fixed", "options", "_3d", NULL };
+    { "weights", "seed", "fixed", "options", "dim", NULL };
   igraph_matrix_t m;
   igraph_bool_t use_seed=0;
   igraph_vector_t *weights=0;
   igraph_vector_bool_t *fixed=0;
   igraph_layout_drl_options_t options;
   PyObject *result;
-  PyObject *wobj=Py_None, *fixed_o=Py_None, *seed_o=Py_None, *options_o=Py_None,
-		   *three_dim_o=Py_False;
+  PyObject *wobj=Py_None, *fixed_o=Py_None, *seed_o=Py_None, *options_o=Py_None;
+  long dim = 2;
   int retval;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOOO", kwlist,
-                                   &wobj, &seed_o, &fixed_o, &options_o, &three_dim_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOOl", kwlist,
+                                   &wobj, &seed_o, &fixed_o, &options_o, &dim))
 	  return NULL;
+
+  if (dim != 2 && dim != 3) {
+    PyErr_SetString(PyExc_ValueError, "number of dimensions must be either 2 or 3");
+    return NULL;
+  }
 
   if (igraphmodule_PyObject_to_drl_options_t(options_o, &options))
     return NULL;
@@ -5410,7 +5402,7 @@ PyObject* igraphmodule_Graph_layout_drl(igraphmodule_GraphObject *self,
     return NULL;
   }
 
-  if (PyObject_IsTrue(three_dim_o)) {
+  if (dim == 2) {
 	retval = igraph_layout_drl(&self->g, &m, use_seed, &options, weights, fixed);
   } else {
 	retval = igraph_layout_drl_3d(&self->g, &m, use_seed, &options, weights, fixed);
@@ -5432,25 +5424,6 @@ PyObject* igraphmodule_Graph_layout_drl(igraphmodule_GraphObject *self,
 }
 
 /** \ingroup python_interface_graph
- * \brief Places the vertices in the 3D space according to the DrL algorithm.
- * \return the calculated coordinates as a Python list of lists
- * \sa igraph_layout_drl_3d
- */
-PyObject* igraphmodule_Graph_layout_drl_3d(igraphmodule_GraphObject *self,
-          PyObject *args, PyObject *kwds)
-{
-  PyObject *kwds_copy = PyDict_Copy(kwds), *result;
-
-  if (kwds_copy == NULL)
-	return NULL;
-
-  PyDict_SetItemString(kwds_copy, "_3d", Py_True);
-  result = igraphmodule_Graph_layout_drl(self, args, kwds_copy);
-  Py_DECREF(kwds_copy);
-  return result;
-}
-
-/** \ingroup python_interface_graph
  * \brief Places the vertices on a plane according to the Fruchterman-Reingold algorithm.
  * \return the calculated coordinates as a Python list of lists
  * \sa igraph_layout_fruchterman_reingold
@@ -5462,24 +5435,38 @@ PyObject
 {
   static char *kwlist[] =
     { "weights", "maxiter", "maxdelta", "area", "coolexp", "repulserad",
-      "miny", "maxy", "seed", NULL };
+      "miny", "maxy", "seed", "dim", NULL };
   igraph_matrix_t m;
   igraph_bool_t use_seed=0;
   igraph_vector_t *weights=0, *miny=0, *maxy=0;
-  long niter = 500;
+  int ret;
+  long niter = 500, dim = 2;
   double maxdelta, area, coolexp, repulserad;
   PyObject *result;
   PyObject *wobj=Py_None, *miny_o=Py_None, *maxy_o=Py_None, *seed_o=Py_None;
 
   maxdelta = igraph_vcount(&self->g);
-  area = maxdelta * maxdelta;
   coolexp = 1.5;
-  repulserad = area * maxdelta;
+  repulserad = -1;
+  area = -1;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OlddddOOO", kwlist, &wobj,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OlddddOOOl", kwlist, &wobj,
                                    &niter, &maxdelta, &area, &coolexp,
-                                   &repulserad, &miny_o, &maxy_o, &seed_o))
+                                   &repulserad, &miny_o, &maxy_o, &seed_o, &dim))
     return NULL;
+
+  if (area <= 0) {
+    area = maxdelta * maxdelta;
+    if (dim == 3)
+      area *= maxdelta;
+  }
+  if (repulserad <= 0)
+    repulserad = area * maxdelta;
+
+  if (dim != 2 && dim != 3) {
+    PyErr_SetString(PyExc_ValueError, "number of dimensions must be either 2 or 3");
+    return NULL;
+  }
 
   if (seed_o == 0 || seed_o == Py_None) {
     if (igraph_matrix_init(&m, 1, 1)) {
@@ -5513,9 +5500,15 @@ PyObject
     return NULL;
   }
 
-  if (igraph_layout_fruchterman_reingold
-      (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, use_seed,
-	  weights, miny, maxy)) {
+  if (dim == 2)
+    ret = igraph_layout_fruchterman_reingold
+        (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, use_seed,
+        weights, miny, maxy);
+  else
+    ret = igraph_layout_fruchterman_reingold_3d
+      (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, use_seed, weights);
+
+  if (ret) {
     igraph_matrix_destroy(&m);
     if (weights) { igraph_vector_destroy(weights); free(weights); }
     if (miny) { igraph_vector_destroy(miny); free(miny); }
@@ -5529,70 +5522,7 @@ PyObject
   if (weights) { igraph_vector_destroy(weights); free(weights); }
   result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
   igraph_matrix_destroy(&m);
-  return (PyObject *) result;
-}
 
-/** \ingroup python_interface_graph
- * \brief Places the vertices on a plane according to the Fruchterman-Reingold algorithm in 3D.
- * \return the calculated coordinates as a Python list of lists
- * \sa igraph_layout_fruchterman_reingold_3d
- */
-PyObject
-  *igraphmodule_Graph_layout_fruchterman_reingold_3d(igraphmodule_GraphObject
-                                                     * self, PyObject * args,
-                                                     PyObject * kwds)
-{
-  static char *kwlist[] =
-    { "weights", "maxiter", "maxdelta", "volume", "coolexp", "repulserad",
-	  "seed", NULL };
-  igraph_matrix_t m;
-  long niter = 500;
-  double maxdelta, volume, coolexp, repulserad;
-  igraph_bool_t use_seed = 0;
-  PyObject *result, *seed_o=Py_None, *wobj=Py_None;
-  igraph_vector_t *weights;
-
-  maxdelta = igraph_vcount(&self->g);
-  volume = maxdelta * maxdelta * maxdelta;
-  coolexp = 1.5;
-  repulserad = volume * maxdelta;
-
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OlddddO", kwlist, &wobj,
-                                   &niter, &maxdelta, &volume, &coolexp,
-                                   &repulserad, &seed_o))
-    return NULL;
-
-  if (seed_o == 0 || seed_o == Py_None) {
-    if (igraph_matrix_init(&m, 1, 1)) {
-      igraphmodule_handle_igraph_error();
-      return NULL;
-    }
-  } else {
-    use_seed=1;
-	if (igraphmodule_PyList_to_matrix_t(seed_o, &m)) return NULL;
-  }
-
-  /* Convert the weight parameter to a vector */
-  if (igraphmodule_attrib_to_vector_t(wobj, self, &weights, ATTRIBUTE_TYPE_EDGE)) {
-    igraph_matrix_destroy(&m);
-    igraphmodule_handle_igraph_error();
-    return NULL;
-  }
-  if (igraph_layout_fruchterman_reingold_3d
-      (&self->g, &m, niter, maxdelta, volume, coolexp, repulserad, use_seed, weights)) {
-    igraph_matrix_destroy(&m);
-    if (weights) {
-      igraph_vector_destroy(weights); free(weights);
-    }
-    igraphmodule_handle_igraph_error();
-    return NULL;
-  }
-
-  result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
-  igraph_matrix_destroy(&m);
-  if (weights) {
-    igraph_vector_destroy(weights); free(weights);
-  }
   return (PyObject *) result;
 }
 
@@ -11104,19 +11034,14 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* LAYOUT FUNCTIONS */
   /********************/
 
-  // interface to igraph_layout_circle
+  /* interface to igraph_layout_circle */
   {"layout_circle", (PyCFunction) igraphmodule_Graph_layout_circle,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_circle()\n\n"
-   "Places the vertices of the graph uniformly on a circle.\n\n"
+   "layout_circle(dim=2)\n\n"
+   "Places the vertices of the graph uniformly on a circle or a sphere.\n\n"
+   "@param dim: the desired number of dimensions for the layout. dim=2\n"
+   "  means a 2D layout, dim=3 means a 3D layout.\n"
    "@return: the calculated coordinate pairs in a list."},
-
-  // interface to igraph_layout_sphere
-  {"layout_sphere", (PyCFunction) igraphmodule_Graph_layout_sphere,
-   METH_VARARGS | METH_KEYWORDS,
-   "layout_sphere()\n\n"
-   "Places the vertices of the graph uniformly on a sphere.\n\n"
-   "@return: the calculated coordinate triplets in a list."},
 
   /* interface to igraph_layout_star */
   {"layout_star", (PyCFunction) igraphmodule_Graph_layout_star,
@@ -11133,7 +11058,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"layout_kamada_kawai",
    (PyCFunction) igraphmodule_Graph_layout_kamada_kawai,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_kamada_kawai(maxiter=1000, sigma=None, initemp=10, coolexp=0.99, kkconst=None, seed=None)\n\n"
+   "layout_kamada_kawai(maxiter=1000, sigma=None, initemp=10, coolexp=0.99, kkconst=None, seed=None, dim=2)\n\n"
    "Places the vertices on a plane according to the Kamada-Kawai algorithm.\n\n"
    "This is a force directed layout, see Kamada, T. and Kawai, S.:\n"
    "An Algorithm for Drawing General Undirected Graphs.\n"
@@ -11148,35 +11073,17 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param seed: if C{None}, uses a random starting layout for the\n"
    "  algorithm. If a matrix (list of lists), uses the given matrix\n"
    "  as the starting position.\n"
+   "@param dim: the desired number of dimensions for the layout. dim=2\n"
+   "  means a 2D layout, dim=3 means a 3D layout.\n"
    "@return: the calculated coordinate pairs in a list."},
-
-  // interface to igraph_layout_kamada_kawai_3d
-  {"layout_kamada_kawai_3d",
-   (PyCFunction) igraphmodule_Graph_layout_kamada_kawai_3d,
-   METH_VARARGS | METH_KEYWORDS,
-   "layout_kamada_kawai_3d(maxiter=1000, sigma=None, initemp=10, coolexp=0.99, kkconst=None, seed=None)\n\n"
-   "Places the vertices in the 3D space according to the Kamada-Kawai algorithm.\n\n"
-   "This is a force directed layout, see Kamada, T. and Kawai, S.:\n"
-   "An Algorithm for Drawing General Undirected Graphs.\n"
-   "Information Processing Letters, 31/1, 7--15, 1989.\n\n"
-   "@param maxiter: the number of iterations to perform.\n"
-   "@param sigma: the standard base deviation of the position\n"
-   "  change proposals. C{None} means the number of vertices / 4\n"
-   "@param initemp: initial temperature of the simulated annealing.\n"
-   "@param coolexp: cooling exponent of the simulated annealing.\n"
-   "@param kkconst: the Kamada-Kawai vertex attraction constant.\n"
-   "  C{None} means the square of the number of vertices.\n"
-   "@param seed: if C{None}, uses a random starting layout for the\n"
-   "  algorithm. If a matrix (list of lists), uses the given matrix\n"
-   "  as the starting position.\n"
-   "@return: the calculated coordinate triplets in a list."},
 
   /* interface to igraph_layout_drl */
   {"layout_drl",
    (PyCFunction) igraphmodule_Graph_layout_drl,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_drl(weights=None, fixed=None, seed=None, options=None)\n\n"
-   "Places the vertices on a 2D plane according to the DrL layout algorithm.\n\n"
+   "layout_drl(weights=None, fixed=None, seed=None, options=None, dim=2)\n\n"
+   "Places the vertices on a 2D plane or in the 3D space ccording to the DrL\n"
+   "layout algorithm.\n\n"
    "This is an algorithm suitable for quite large graphs, but it can be\n"
    "surprisingly slow for small ones (where the simpler force-based layouts\n"
    "like C{layout_kamada_kawai()} or C{layout_fruchterman_reingold()} are\n"
@@ -11225,29 +11132,18 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  attribute of the object with the same name is looked up instead. If\n"
    "  a parameter cannot be found either as a key or an attribute, the\n"
    "  default from the C{default} preset will be used.\n\n"
+   "@param dim: the desired number of dimensions for the layout. dim=2\n"
+   "  means a 2D layout, dim=3 means a 3D layout.\n"
    "@return: the calculated coordinate pairs in a list."
-  },
-
-  /* interface to igraph_layout_drl_3d */
-  {"layout_drl_3d",
-   (PyCFunction) igraphmodule_Graph_layout_drl,
-   METH_VARARGS | METH_KEYWORDS,
-   "layout_drl(weights=None, fixed=None, seed=None, options=None)\n\n"
-   "Places the vertices in the 3D space according to the DrL layout algorithm.\n\n"
-   "This is an algorithm suitable for quite large graphs, but it can be\n"
-   "surprisingly slow for small ones (where the simpler force-based layouts\n"
-   "like C{layout_kamada_kawai()} or C{layout_fruchterman_reingold()} are\n"
-   "more useful.\n\n"
-   "See C{layout_drl()} for more information on the parameters.\n"
-   "@return: the calculated coordinate triplets in a list."
   },
 
   /* interface to igraph_layout_fruchterman_reingold */
   {"layout_fruchterman_reingold",
    (PyCFunction) igraphmodule_Graph_layout_fruchterman_reingold,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_fruchterman_reingold(weights=None, maxiter=500, maxdelta=None, area=None, coolexp=1.5, repulserad=None, miny=None, maxy=None, seed=None)\n\n"
-   "Places the vertices on a 2D plane according to the Fruchterman-Reingold algorithm.\n\n"
+   "layout_fruchterman_reingold(weights=None, maxiter=500, maxdelta=None, area=None, coolexp=1.5, repulserad=None, miny=None, maxy=None, seed=None, dim=2)\n\n"
+   "Places the vertices on a 2D plane or in the 3D space according to the\n"
+   "Fruchterman-Reingold algorithm.\n\n"
    "This is a force directed layout, see Fruchterman, T. M. J. and Reingold, E. M.:\n"
    "Graph Drawing by Force-directed Placement.\n"
    "Software -- Practice and Experience, 21/11, 1129--1164, 1991\n\n"
@@ -11268,39 +11164,15 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param miny: if not C{None}, it must be a vector with exactly as many\n"
    "  elements as there are vertices in the graph. Each element is a\n"
    "  minimum constraint on the Y value of the vertex in the layout.\n"
+   "  Used only in the 2D case.\n"
    "@param maxy: similar to I{miny}, but with maximum constraints\n"
+   "  Used only in the 2D case.\n"
    "@param seed: if C{None}, uses a random starting layout for the\n"
    "  algorithm. If a matrix (list of lists), uses the given matrix\n"
    "  as the starting position.\n"
+   "@param dim: the desired number of dimensions for the layout. dim=2\n"
+   "  means a 2D layout, dim=3 means a 3D layout.\n"
    "@return: the calculated coordinate pairs in a list."},
-
-  // interface to igraph_layout_fruchterman_reingold_3d
-  {"layout_fruchterman_reingold_3d",
-   (PyCFunction) igraphmodule_Graph_layout_fruchterman_reingold_3d,
-   METH_VARARGS | METH_KEYWORDS,
-   "layout_fruchterman_reingold_3d(weights=None, maxiter=500, maxdelta=None, volume=None, coolexp=1.5, repulserad=None, seed=None)\n\n"
-   "Places the vertices in the 3D space according to the Fruchterman-Reingold grid algorithm.\n\n"
-   "This is a force directed layout, see Fruchterman, T. M. J. and Reingold, E. M.:\n"
-   "Graph Drawing by Force-directed Placement.\n"
-   "Software -- Practice and Experience, 21/11, 1129--1164, 1991\n\n"
-   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
-   "  even an edge attribute name.\n"
-   "@param maxiter: the number of iterations to perform. The default\n"
-   "  is 500.\n"
-   "@param maxdelta: the maximum distance to move a vertex in\n"
-   "  an iteration. The default is the number of vertices.\n"
-   "@param volume: the volume of the cube in which the vertices\n"
-   "  will be placed. The default is the third power of the number\n"
-   "  of vertices.\n"
-   "@param coolexp: the cooling exponent of the simulated annealing.\n"
-   "  The default is 1.5.\n"
-   "@param repulserad: determines the radius at which vertex-vertex\n"
-   "  repulsion cancels out attraction of adjacent vertices.\n"
-   "  The default is the number of vertices^4.\n"
-   "@param seed: if C{None}, uses a random starting layout for the\n"
-   "  algorithm. If a matrix (list of lists), uses the given matrix\n"
-   "  as the starting position.\n"
-   "@return: the calculated coordinate triplets in a list."},
 
   /* interface to igraph_layout_graphopt */
   {"layout_graphopt",
@@ -11328,12 +11200,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
 	 "  will be started. If C{None}, a random layout will be used.\n"
   },
 
-  // interface to igraph_layout_grid_fruchterman_reingold
+  /* interface to igraph_layout_grid_fruchterman_reingold */
   {"layout_grid_fruchterman_reingold",
    (PyCFunction) igraphmodule_Graph_layout_grid_fruchterman_reingold,
    METH_VARARGS | METH_KEYWORDS,
    "layout_grid_fruchterman_reingold(maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta, cellsize=1.0, seed=None)\n\n"
-   "Places the vertices on a 2D plane according to the Fruchterman-Reingold grid algorithm.\n\n"
+   "Places the vertices on a 2D plane according to the Fruchterman-Reingold\n"
+   "grid algorithm.\n\n"
    "This is a modified version of a force directed layout, see\n"
    "Fruchterman, T. M. J. and Reingold, E. M.:\n"
    "Graph Drawing by Force-directed Placement.\n"
@@ -11355,7 +11228,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  as the starting position.\n"
    "@return: the calculated coordinate pairs in a list."},
 
-  // interface to igraph_layout_lgl
+  /* interface to igraph_layout_lgl */
   {"layout_lgl", (PyCFunction) igraphmodule_Graph_layout_lgl,
    METH_VARARGS | METH_KEYWORDS,
    "layout_lgl(maxiter=150, maxdelta=-1, area=-1, coolexp=1.5, repulserad=-1, cellsize=-1, root=-1)\n\n"
@@ -11402,7 +11275,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  Directed graphs are treated as undirected when calculating\n"
    "  the shortest path lengths to ensure symmetry.\n"
    "@param dim: the number of dimensions. For 2D layouts, supply\n"
-   "  2 here.\n"
+   "  2 here; for 3D layouts, supply 3.\n"
    "@param arpack_options: an L{ARPACKOptions} object used to fine-tune\n"
    "  the ARPACK eigenvector calculation. If omitted, the module-level\n"
    "  variable called C{arpack_options} is used.\n"
@@ -11457,19 +11330,14 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@ref: EM Reingold, JS Tilford: I{Tidier Drawings of Trees.}\n"
    "IEEE Transactions on Software Engineering 7:22, 223-228, 1981."},
 
-  // interface to igraph_layout_random
+  /* interface to igraph_layout_random */
   {"layout_random", (PyCFunction) igraphmodule_Graph_layout_random,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_random()\n"
-   "Places the vertices of the graph randomly in a 2D space.\n\n"
-   "@return: the \"calculated\" coordinate pairs in a list."},
-
-  // interface to igraph_layout_random_3d
-  {"layout_random_3d", (PyCFunction) igraphmodule_Graph_layout_random_3d,
-   METH_VARARGS | METH_KEYWORDS,
-   "layout_random_3d()\n"
-   "Places the vertices of the graph randomly in a 3D space.\n\n"
-   "@return: the \"calculated\" coordinate triplets in a list."},
+   "layout_random(dim=2)\n"
+   "Places the vertices of the graph randomly.\n\n"
+   "@param dim: the desired number of dimensions for the layout. dim=2\n"
+   "  means a 2D layout, dim=3 means a 3D layout.\n"
+   "@return: the coordinate pairs in a list."},
 
   ////////////////////////////
   // VISITOR-LIKE FUNCTIONS //

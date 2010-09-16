@@ -186,7 +186,7 @@ class Configuration(object):
 
         "apps.image_viewer": { "default": get_platform_image_viewer() },
 
-        "plotting.layout": { "default": "random" },
+        "plotting.layout": { "default": "auto" },
         "plotting.mark_groups": { "default": False, "type": "boolean" },
         "plotting.palette": { "default": "gray" },
         "plotting.wrap_labels": { "default": False, "type": "boolean" }

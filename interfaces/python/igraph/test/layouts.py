@@ -122,6 +122,43 @@ class LayoutTests(unittest.TestCase):
 
 
 class LayoutAlgorithmTests(unittest.TestCase):
+    def testAuto(self):
+        def layout_test(graph, test_with_dims=(2, 3)):
+            lo = graph.layout("auto")
+            self.failUnless(isinstance(lo, Layout))
+            self.assertEquals(len(lo[0]), 2)
+            for dim in test_with_dims:
+                lo = graph.layout("auto", dim=dim)
+                self.failUnless(isinstance(lo, Layout))
+                self.assertEquals(len(lo[0]), dim)
+            return lo
+
+        g = Graph.Barabasi(100)
+        layout_test(g)
+
+        g = Graph.GRG(101, 0.2)
+        layout_test(g)
+
+        g = Graph.Full(10) * 2
+        layout_test(g)
+
+        g["layout"] = "graphopt"
+        layout_test(g, test_with_dims=())
+
+        g.vs["x"] = range(20)
+        g.vs["y"] = range(20, 40)
+        layout_test(g, test_with_dims=())
+
+        del g["layout"]
+        lo = layout_test(g, test_with_dims=(2,))
+        self.assertEquals([tuple(item) for item in lo],
+                          zip(range(20), range(20, 40)))
+
+        g.vs["z"] = range(40, 60)
+        lo = layout_test(g)
+        self.assertEquals([tuple(item) for item in lo],
+                          zip(range(20), range(20, 40), range(40, 60)))
+
     def testFruchtermanReingold(self):
         g = Graph.Barabasi(100)
         lo = g.layout("fr")

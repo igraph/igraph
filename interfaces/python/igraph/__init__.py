@@ -874,19 +874,22 @@ class Graph(GraphBase):
 
         Registered layout names understood by this method are:
 
+          - C{auto}, C{automatic}: automatic layout
+            (see L{Graph.layout_auto})
+
           - C{circle}, C{circular}: circular layout
             (see L{Graph.layout_circle})
 
           - C{drl}: DrL layout for large graphs (see L{Graph.layout_drl})
 
           - C{drl_3d}: 3D DrL layout for large graphs
-            (see L{Graph.layout_drl_3d})
+            (see L{Graph.layout_drl})
 
           - C{fr}, C{fruchterman_reingold}: Fruchterman-Reingold layout
             (see L{Graph.layout_fruchterman_reingold}).
 
           - C{fr_3d}, C{fr3d}, C{fruchterman_reingold_3d}: 3D Fruchterman-
-            Reingold layout (see L{Graph.layout_fruchterman_reingold_3d}).
+            Reingold layout (see L{Graph.layout_fruchterman_reingold}).
 
           - C{graphopt}: the graphopt algorithm (see L{Graph.layout_graphopt})
 
@@ -898,7 +901,7 @@ class Graph(GraphBase):
             (see L{Graph.layout_kamada_kawai})
 
           - C{kk_3d}, C{kk3d}, C{kamada_kawai_3d}: 3D Kamada-Kawai layout
-            (see L{Graph.layout_kamada_kawai_3d})
+            (see L{Graph.layout_kamada_kawai})
 
           - C{lgl}, C{large}, C{large_graph}: Large Graph Layout
             (see L{Graph.layout_lgl})
@@ -907,7 +910,7 @@ class Graph(GraphBase):
 
           - C{random}: random layout (see L{Graph.layout_random})
 
-          - C{random_3d}: random 3D layout (see L{Graph.layout_random_3d})
+          - C{random_3d}: random 3D layout (see L{Graph.layout_random})
 
           - C{rt}, C{tree}, C{reingold_tilford}: Reingold-Tilford tree
             layout (see L{Graph.layout_reingold_tilford})
@@ -917,7 +920,7 @@ class Graph(GraphBase):
             (see L{Graph.layout_reingold_tilford_circular})
 
           - C{sphere}, C{spherical}, C{circle_3d}, C{circular_3d}: spherical
-            layout (see L{Graph.layout_sphere})
+            layout (see L{Graph.layout_circle})
 
           - C{star}: star layout (see L{Graph.layout_star})
 
@@ -927,18 +930,92 @@ class Graph(GraphBase):
           value of the C{plotting.layout} configuration key.
         @return: a L{Layout} object.
         """
-        if layout is None: layout = config["plotting.layout"]
+        if layout is None:
+            layout = config["plotting.layout"]
         if hasattr(layout, "__call__"):
             method = layout
         else:
             layout = layout.lower()
+            if layout[-3:] == "_3d":
+                kwds["dim"] = 3
+                layout = layout[:-3]
+            elif layout[-2:] == "3d":
+                kwds["dim"] = 3
+                layout = layout[:-2]
             method = getattr(self.__class__, self._layout_mapping[layout])
         if not hasattr(method, "__call__"):
             raise ValueError("layout method must be callable")
-        l=method(self, *args, **kwds)
+        l = method(self, *args, **kwds)
         if not isinstance(l, Layout):
-            l=Layout(l)
+            l = Layout(l)
         return l
+
+    def layout_auto(self, *args, **kwds):
+        """Chooses and runs a suitable layout function based on simple
+        topological properties of the graph.
+
+        This function tries to choose an appropriate layout function for
+        the graph using the following rules:
+
+          1. If the graph has an attribute called C{layout}, it will be
+             used. It may either be a L{Layout} instance, a list of
+             coordinate pairs, the name of a layout function, or a
+             callable function which generates the layout when called
+             with the graph as a parameter.
+
+          2. Otherwise, if the graph has vertex attributes called C{x}
+             and C{y}, these will be used as coordinates in the layout.
+             When a 3D layout is requested (by setting C{dim} to 3),
+             a vertex attribute named C{z} will also be needed.
+
+          3. Otherwise, if the graph is connected and has at most 100
+             vertices, the Kamada-Kawai layout will be used (see
+             L{Graph.layout_kamada_kawai()}).
+
+          4. Otherwise, if the graph has at most 1000 vertices, the
+             Fruchterman-Reingold layout will be used (see
+             L{Graph.layout_fruchterman_reingold()}).
+
+          5. If everything else above failed, the DrL layout algorithm
+             will be used (see L{Graph.layout_drl()}).
+
+        All the arguments of this function except C{dim} are passed on
+        to the chosen layout function (in case we have to call some layout
+        function).
+
+        @keyword dim: specifies whether we would like to obtain a 2D or a
+          3D layout.
+        @return: a L{Layout} object.
+        """
+        if "layout" in self.attributes():
+            layout = self["layout"]
+            if isinstance(layout, Layout):
+                # Layouts are used intact
+                return layout
+            if isinstance(layout, (list, tuple)):
+                # Lists/tuples are converted to layouts
+                return Layout(layout)
+            if hasattr(layout, "__call__"):
+                # Callables are called
+                return Layout(layout(*args, **kwds))
+            # Try Graph.layout()
+            return self.layout(layout, *args, **kwds)
+
+        dim = kwds.get("dim", 2)
+        vattrs = self.vertex_attributes()
+        if "x" in vattrs and "y" in vattrs:
+            if dim == 3 and "z" in vattrs:
+                return Layout(zip(self.vs["x"], self.vs["y"], self.vs["z"]))
+            else:
+                return Layout(zip(self.vs["x"], self.vs["y"]))
+
+        if self.vcount() <= 100 and self.is_connected():
+            algo = "kk"
+        elif self.vcount() <= 1000:
+            algo = "fr"
+        else:
+            algo = "drl"
+        return self.layout(algo, *args, **kwds)
 
     # Auxiliary I/O functions
 
@@ -2124,30 +2201,24 @@ class Graph(GraphBase):
     }
 
     _layout_mapping = {
+        "auto": "layout_auto",
+        "automatic": "layout_auto",
         "circle": "layout_circle",
         "circular": "layout_circle",
         "drl": "layout_drl",
-        "drl_3d": "layout_drl_3d",
         "fr": "layout_fruchterman_reingold",
         "fruchterman_reingold": "layout_fruchterman_reingold",
-        "fr3d": "layout_fruchterman_reingold_3d",
-        "fr_3d": "layout_fruchterman_reingold_3d",
-        "fruchterman_reingold_3d": "layout_fruchterman_reingold_3d",
         "gfr": "layout_grid_fruchterman_reingold",
         "graphopt": "layout_graphopt",
         "grid_fr": "layout_grid_fruchterman_reingold",
         "grid_fruchterman_reingold": "layout_grid_fruchterman_reingold",
         "kk": "layout_kamada_kawai",
         "kamada_kawai": "layout_kamada_kawai",
-        "kk3d": "layout_kamada_kawai_3d",
-        "kk_3d": "layout_kamada_kawai_3d",
-        "kamada_kawai_3d": "layout_kamada_kawai_3d",
         "lgl": "layout_lgl",
         "large": "layout_lgl",
         "large_graph": "layout_lgl",
         "mds": "layout_mds",
         "random": "layout_random",
-        "random_3d": "layout_random_3d",
         "rt": "layout_reingold_tilford",
         "tree": "layout_reingold_tilford",
         "reingold_tilford": "layout_reingold_tilford",
@@ -2156,8 +2227,6 @@ class Graph(GraphBase):
         "sphere": "layout_sphere",
         "spherical": "layout_sphere",
         "star": "layout_star",
-        "circle_3d": "layout_sphere",
-        "circular_3d": "layout_sphere",
     }
 
     # After adjusting something here, don't forget to update the docstring
@@ -2721,6 +2790,32 @@ def _add_proxy_methods():
       lambda self, result: [result[i] for i in self.indices], "edge_betweenness"))
 
 _add_proxy_methods()
+
+##############################################################
+# Adding aliases for the 3D versions of the layout methods
+
+def _3d_version_for(func):
+    """Creates an alias for the 3D version of the given layout algoritm.
+
+    This function is a decorator that creates a method which calls I{func} after
+    attaching C{dim=3} to the list of keyword arguments.
+
+    @param func: must be a method of the Graph object.
+    @return: a new method
+    """
+    def result(*args, **kwds):
+        kwds["dim"] = 3
+        return func(*args, **kwds)
+    result.__name__ = "%s_3d" % func.__name__
+    result.__doc__ = """Alias for L{%s()} with dim=3.\n\n@see: Graph.%s()""" \
+            % (func.__name__, func.__name__)
+    return result
+
+Graph.layout_fruchterman_reingold_3d=_3d_version_for(Graph.layout_fruchterman_reingold)
+Graph.layout_kamada_kawai_3d=_3d_version_for(Graph.layout_kamada_kawai)
+Graph.layout_random_3d=_3d_version_for(Graph.layout_random)
+Graph.layout_sphere=_3d_version_for(Graph.layout_circle)
+
 
 ##############################################################
 
