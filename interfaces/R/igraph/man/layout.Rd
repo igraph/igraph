@@ -152,6 +152,9 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
     \item{root}{The id of the root vertex, defaults to 0.}
     \item{circular}{Logical scalar, whether to plot the tree in a
       circular fashion, defaults to \code{FALSE}.}
+    \item{flip.y}{Logical scalar, whether to flip the \sQuote{y}
+      coordinates. The default is flipping because that puts the root
+      vertex on the top.}
   }
   
   \code{layout.fruchterman.reingold.grid} is similar to

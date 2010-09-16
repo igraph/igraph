@@ -256,15 +256,20 @@ layout.reingold.tilford <- function(graph, ..., params=list()) {
   if (is.null(params$circular))      { params$circular   <- FALSE      }
   if (is.null(params$rootlevel))     { params$rootlevel  <- numeric()  }
   if (is.null(params$mode))          { params$mode       <- "out"      }
+  if (is.null(params$flip.y))        { params$flip.y     <- TRUE       }
   params$mode <- tolower(params$mode)
   params$mode <- switch(params$mode, "out"=1, "in"=2, "all"=3, "total"=3)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_layout_reingold_tilford", graph,
-        as.igraph.vs(graph, params$root),
-        as.double(params$mode), as.double(params$rootlevel),
-        as.logical(params$circular),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_layout_reingold_tilford", graph,
+               as.igraph.vs(graph, params$root),
+               as.double(params$mode), as.double(params$rootlevel),
+               as.logical(params$circular),
+               PACKAGE="igraph")
+  if (params$flip.y) {
+    res[,2] <- max(res[,2])-res[,2]
+  }
+  res
 }
 
 layout.merge <- function(graphs, layouts, method="dla",
