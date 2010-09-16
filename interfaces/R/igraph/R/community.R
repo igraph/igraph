@@ -545,11 +545,10 @@ plot.communities <- function(x, y,
                              colbar=rainbow(length(x)),
                              col=colbar[membership(x)+1],
                              mark.groups=communities(x),
-                             layout=layout.fruchterman.reingold,
                              edge.color=c("green", "red")[crossing(x,y)+1],
                              ...) {
 
   plot(y, vertex.color=col, mark.groups=mark.groups,
-       layout=layout, edge.color=edge.color,
+       edge.color=edge.color,
        ...)  
 }

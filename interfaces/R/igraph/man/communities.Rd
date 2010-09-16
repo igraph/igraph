@@ -37,7 +37,6 @@ cutat(communities, no, steps)
    colbar=rainbow(length(x)),
    col=colbar[membership(x)+1],
    mark.groups=communities(x),
-   layout=layout.fruchterman.reingold,
    edge.color=c("green", "red")[crossing(x,y)+1],
    \dots)
 }
@@ -66,7 +65,6 @@ cutat(communities, no, steps)
     polygons are drawn are given here. The default is to use the groups
     given by the communities. Supply \code{NULL} here if you do not want
     to highlight any groups.}
-  \item{layout}{The layout for the graph, see \code{\link{layout}}.}
   \item{edge.color}{The colors of the edges. By default the edges within
     communities are colored green and other edges are red.}
   \item{hang}{Numeric scalar indicating how the height of leaves should
