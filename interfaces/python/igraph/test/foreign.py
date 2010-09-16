@@ -65,7 +65,7 @@ a 3 4 5
         pickle = '\x80\x02cigraph\nGraph\nq\x01(K\x03]q\x02K\x01K\x02\x86q\x03a\x89}}}tRq\x04}b.'
         tmpf, tmpfname = tempfile.mkstemp()
         os.close(tmpf)
-        tmpf = open(tmpfname, "w")
+        tmpf = open(tmpfname, "wb")
         tmpf.write(pickle)
         tmpf.close()
 
