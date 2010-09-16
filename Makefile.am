@@ -59,14 +59,15 @@ test: all
 msvc: all
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc
-	cp -r src $(top_builddir)/igraph-$(VERSION)-msvc/
+	cp -r $(top_srcdir)/src $(top_builddir)/igraph-$(VERSION)-msvc/
+	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp -r $(top_builddir)/src $(top_builddir)/igraph-$(VERSION)-msvc/; fi
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/{.deps,.libs}
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/config.h
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/*.{o,lo}
-	cp -r msvc/include $(top_builddir)/igraph-$(VERSION)-msvc/winclude
+	cp -r $(top_srcdir)/msvc/include $(top_builddir)/igraph-$(VERSION)-msvc/winclude
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc/winlib
-	cp msvc/igraph.{sln,vcproj} $(top_builddir)/igraph-$(VERSION)-msvc/
-	cp -r msvc/igraphtest .
+	cp $(top_srcdir)/msvc/igraph.{sln,vcproj} $(top_builddir)/igraph-$(VERSION)-msvc/
+	cp -r $(top_srcdir)/msvc/igraphtest .
 	rm -rf igraph-$(VERSION)-msvc.zip
 	zip -r igraph-$(VERSION)-msvc.zip igraph-$(VERSION)-msvc igraphtest
 
