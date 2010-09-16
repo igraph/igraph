@@ -61,7 +61,7 @@ msvc: all
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc
 	cp -r $(top_srcdir)/src $(top_builddir)/igraph-$(VERSION)-msvc/
 	cp -r $(top_srcdir)/include $(top_builddir)/igraph-$(VERSION)-msvc
-	if [ $(top_srcdir) != $(top_builddir) ]; then cp -r $(top_builddir)/include $(top_builddir)/src $(top_builddir)/igraph-$(VERSION)-msvc; fi
+	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp -r $(top_builddir)/include $(top_builddir)/src $(top_builddir)/igraph-$(VERSION)-msvc; fi
 	cp -r $(top_srcdir)/msvc/include $(top_builddir)/igraph-$(VERSION)-msvc/winclude
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/{.deps,.libs}
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/config.h
