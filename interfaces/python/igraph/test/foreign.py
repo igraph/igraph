@@ -9,10 +9,10 @@ from contextlib import contextmanager
 from textwrap import dedent
 
 @contextmanager
-def temporary_file(content):
+def temporary_file(content, mode="w"):
     tmpf, tmpfname = tempfile.mkstemp()
     os.close(tmpf)
-    tmpf = open(tmpfname, "w")
+    tmpf = open(tmpfname, mode)
     print >>tmpf, dedent(content)
     tmpf.close()
     yield tmpfname
@@ -201,8 +201,8 @@ class ForeignTests(unittest.TestCase):
 
     def testPickle(self):
         pickle = '\x80\x02cigraph\nGraph\nq\x01(K\x03]q\x02K\x01K\x02\x86q\x03a\x89}}}tRq\x04}b.'
-        with temporary_file(pickle) as tmpfname:
-            g = Graph.Read_Pickle(tmpfname)
+        with temporary_file(pickle, "wb") as tmpfname:
+            g = Graph.Read_Pickle(pickle)
             self.failUnless(isinstance(g, Graph))
             self.failUnless(g.vcount() == 3 and g.ecount() == 1 and
                 not g.is_directed())
