@@ -313,11 +313,10 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
     class(res) <- "communities"
   } else {
     res <- .Call("R_igraph_spinglass_my_community", graph, weights,
-                 as.igraph.vs(graph, vertex), as.numeric(spins), 
+                 as.igraph.vs(graph, vertex)-1, as.numeric(spins), 
                  as.numeric(update.rule), as.numeric(gamma),
                  PACKAGE="igraph")
   }
-  res
 }
 
 walktrap.community <- function(graph, weights=E(graph)$weight, steps=4,

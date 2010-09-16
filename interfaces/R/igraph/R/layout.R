@@ -467,7 +467,7 @@ layout.mds.igraph <- function(graph, d=shortest.paths(graph), ...){
     llist <- list()
     llen <- numeric()
     glist <- list()
-    for(i in 1:length(clust$csize)-1){
+    for(i in 1:length(clust$csize)){
         ind <- clust$membership==i
         
         if(length(which(ind))>=3){
@@ -505,7 +505,7 @@ layout.svd.igraph <- function(graph, d=shortest.paths(graph), ...) {
     llist <- list()
     llen <- numeric()
     glist <- list()
-    for(i in 1:length(clust$csize)-1){
+    for(i in 1:length(clust$csize)){
         ind <- clust$membership==i
         
         if(length(which(ind))>=3){

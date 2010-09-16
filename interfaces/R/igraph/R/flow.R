@@ -51,8 +51,8 @@ graph.mincut <- function(graph, source=NULL, target=NULL, capacity=NULL,
     }
   } else {
     if (value.only) {
-      .Call("R_igraph_st_mincut_value", graph, as.igraph.vs(graph, source),
-            as.igraph.vs(graph, target), capacity,
+      .Call("R_igraph_st_mincut_value", graph, as.igraph.vs(graph, source)-1,
+            as.igraph.vs(graph, target)-1, capacity,
             PACKAGE="igraph")
     } else {
       stop("Calculating minimum s-t cuts is not implemented yet")
@@ -72,8 +72,8 @@ vertex.connectivity <- function(graph, source=NULL, target=NULL, checks=TRUE) {
           PACKAGE="igraph")
   } else if (!is.null(source) && !is.null(target)) {
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-    .Call("R_igraph_st_vertex_connectivity", graph, as.igraph.vs(graph, source),
-          as.igraph.vs(graph, target),
+    .Call("R_igraph_st_vertex_connectivity", graph, as.igraph.vs(graph, source)-1,
+          as.igraph.vs(graph, target)-1,
           PACKAGE="igraph")
   } else {
     stop("either give both source and target or neither")
@@ -93,7 +93,7 @@ edge.connectivity <- function(graph, source=NULL, target=NULL, checks=TRUE) {
   } else if (!is.null(source) && !is.null(target)) {
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     .Call("R_igraph_st_edge_connectivity", graph,
-          as.igraph.vs(graph, source), as.igraph.vs(graph, target),
+          as.igraph.vs(graph, source)-1, as.igraph.vs(graph, target)-1,
           PACKAGE="igraph")
   } else {
     stop("either give both source and target or neither")
@@ -108,7 +108,7 @@ edge.disjoint.paths <- function(graph, source, target) {
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_edge_disjoint_paths", graph,
-        as.igraph.vs(graph, source), as.igraph.vs(graph, target),
+        as.igraph.vs(graph, source)-1, as.igraph.vs(graph, target)-1,
         PACKAGE="igraph")
 }
 
@@ -119,8 +119,8 @@ vertex.disjoint.paths <- function(graph, source=NULL, target=NULL) {
   }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_vertex_disjoint_paths", graph, as.igraph.vs(graph, source),
-        as.igraph.vs(graph, target),
+  .Call("R_igraph_vertex_disjoint_paths", graph, as.igraph.vs(graph, source)-1,
+        as.igraph.vs(graph, target)-1,
         PACKAGE="igraph")
 }
 

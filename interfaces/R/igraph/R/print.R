@@ -140,7 +140,7 @@ print.igraph <- function(x,
       }
       print(tab)
     } else {
-      i <- 0
+      i <- 1
       apply(el, 1, function(v) {
         cat(sep="", "[", i, "] ", v[1], " ", arrow, " ", v[2]);
         if (edge.attributes) {
