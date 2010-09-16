@@ -1023,10 +1023,12 @@ class Graph(core.GraphBase):
         if isinstance(fname, (str, unicode)) and\
            len(fname)>40 and "cigraph\nGraph\n" in fname:
             result = cPickle.loads(fname)
-        if not hasattr(fname, "write"):
+        elif not hasattr(fname, "write"):
             fname = open(fname, 'rb')
             result = cPickle.load(fname)
             fname.close()
+        else:
+            result = cPickle.load(fname)
         if not isinstance(result, klass):
             raise TypeError, "unpickled object is not a %s" % klass.__name__
         return result
