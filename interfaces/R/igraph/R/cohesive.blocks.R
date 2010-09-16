@@ -89,9 +89,8 @@ plot.cohesiveBlocks <- function(x, y,
                                 colbar=rainbow(max(cohesion(x))+1),
                                 col=colbar[maxcohesion(x)+1],
                                 mark.groups=blocks(x)[-1],
-                                layout=layout.fruchterman.reingold,
                                 ...) {
-  plot(y, mark.groups=mark.groups, layout=layout,
+  plot(y, mark.groups=mark.groups,
        vertex.color=col, ...)
 }
 

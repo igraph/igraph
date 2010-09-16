@@ -29,8 +29,7 @@ maxcohesion(blocks)
 \method{summary}{cohesiveBlocks}(object, \dots)
 \method{length}{cohesiveBlocks}(x)
 \method{plot}{cohesiveBlocks}(x, y, colbar = rainbow(max(cohesion(x))+1),
-     col = colbar[maxcohesion(x)+1], mark.groups = blocks(x)[-1],
-     layout = layout.fruchterman.reingold, \dots)
+     col = colbar[maxcohesion(x)+1], mark.groups = blocks(x)[-1], \dots)
 }
 \arguments{
     \item{graph}{For \code{cohesive.blocks} a graph object of class
