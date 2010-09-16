@@ -95,11 +95,10 @@ plot.cohesiveBlocks <- function(x, y,
        vertex.color=col, ...)
 }
 
-plotHierarchy <- function(blocks, ...) {
-  graph <- hierarchy(blocks)
-  coords <- layout.reingold.tilford(graph, root=0)
-  coords[,2] <- -coords[,2]
-  plot(graph, layout=coords, ...)
+plotHierarchy <- function(blocks,
+                          layout=layout.reingold.tilford(hierarchy(blocks),
+                            root=0), ...) {
+  plot(hierarchy(blocks), layout=layout, ...)
 }
 
 exportPajek.cohesiveblocks.pf <- function(blocks, graph, file) {

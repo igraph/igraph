@@ -20,7 +20,8 @@ blockGraphs(blocks, graph)
 cohesion(blocks)
 hierarchy(blocks)
 parent(blocks)
-plotHierarchy(blocks, \dots)
+plotHierarchy(blocks,
+   layout=layout.reingold.tilford(hierarchy(blocks), root=0), \dots)
 exportPajek(blocks, graph, file, project.file = TRUE)
 maxcohesion(blocks)
 
@@ -77,7 +78,7 @@ maxcohesion(blocks)
       the one corresponding to the all vertices.}
     \item{layout}{The layout of a plot, it is simply passed on to
       \code{plot.igraph}, see the possible formats there. By default the
-      Fruchterman-Reingold layout generator is used.}
+      Reingold-Tilford layout generator is used.}
     \item{\dots}{Additional arguments. \code{plotHierarchy} and
       \code{plot} pass them to \code{plot.igraph}.
       \code{print} and \code{summary} ignore them.
