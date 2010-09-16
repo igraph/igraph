@@ -178,6 +178,9 @@ maxcohesion <- function(blocks) {
   res <- numeric(blocks$vcount)
   myb <- blocks(blocks)
   coh <- cohesion(blocks)
+  oo <- order(coh)
+  myb <- myb[oo]
+  coh <- coh[oo]
   for (b in seq_along(myb)) {
     res[ myb[[b]]+1 ] <- coh[b]
   }
