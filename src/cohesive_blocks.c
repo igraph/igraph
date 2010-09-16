@@ -258,25 +258,13 @@ int igraph_cohesive_blocks(const igraph_t *graph,
 					&components, &no,
 					&compid, &bfsQ, &neis));
 
-    /* Add the separator vertices themselves, as another component, 
-       but only if there is at least one vertex not included in any
-       separator. */
-    if (nsepv != mynodes) {
-      for (i=0; i<mynodes; i++) {
-	if (VECTOR(marked)[i]) {
-	  IGRAPH_CHECK(igraph_vector_long_push_back(&components, i));
-	}
-      }
-      IGRAPH_CHECK(igraph_vector_long_push_back(&components, -1));
-      no++;
-    }
-    
     for (i=0; i<no; i++) {
       igraph_vector_t *newmapping;
       igraph_t *newgraph;
       igraph_integer_t maxdeg;
 
       igraph_vector_clear(&compvertices);
+      
       while (1) {
 	long int v=VECTOR(components)[cptr++];
 	if (v < 0) { break; }
