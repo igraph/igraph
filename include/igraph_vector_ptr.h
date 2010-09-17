@@ -86,6 +86,20 @@ igraph_finally_func_t* igraph_vector_ptr_get_item_destructor(const igraph_vector
 igraph_finally_func_t* igraph_vector_ptr_set_item_destructor(igraph_vector_ptr_t *v,
         igraph_finally_func_t *func);
 
+/**
+ * \define IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR
+ * \brief Sets the item destructor for this pointer vector (macro version).
+ *
+ * This macro is expanded to \ref igraph_vector_ptr_set_item_destructor(), the
+ * only difference is that the second argument is automatically cast to an
+ * \c igraph_finally_func_t*. The cast is necessary in most cases as the
+ * destructor functions we use (such as \ref igraph_vector_destroy()) take a
+ * pointer to some concrete igraph data type, while \c igraph_finally_func_t
+ * expects \c void*
+ */
+#define IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(v, func) \
+        igraph_vector_ptr_set_item_destructor((v), (igraph_finally_func_t*)(func))
+
 __END_DECLS
 
 #endif

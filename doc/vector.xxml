@@ -120,6 +120,7 @@
 <!-- doxrox-include igraph_vector_ptr_resize -->
 <!-- doxrox-include igraph_vector_ptr_get_item_destructor -->
 <!-- doxrox-include igraph_vector_ptr_set_item_destructor -->
+<!-- doxrox-include IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR -->
 </section>
 
 </section>
