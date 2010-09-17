@@ -3,10 +3,9 @@ from igraph import *
 
 class MaxFlowTests(unittest.TestCase):
     def setUp(self):
-        self.g=Graph(4, [(0, 1), (0, 2), (1, 2), (1, 3), (2, 3)])
+        self.g = Graph(4, [(0, 1), (0, 2), (1, 2), (1, 3), (2, 3)])
         self.capacities = [4, 2, 10, 2, 2]
-        for idx in range(self.g.ecount()):
-            self.g.es[idx]["capacity"]=self.capacities[idx]
+        self.g.es["capacity"] = self.capacities
 
     def testCapacities(self):
         self.failUnless(self.capacities == \
@@ -52,38 +51,46 @@ class MaxFlowTests(unittest.TestCase):
 
 
 class CutTests(unittest.TestCase):
-    def setUp(self):
-        self.g=Graph(4, [(0, 1), (0, 2), (1, 2), (1, 3), (2, 3)])
-        self.capacities = [4, 2, 10, 2, 2]
-        for idx in range(self.g.ecount()):
-            self.g.es[idx]["capacity"]=self.capacities[idx]
+    def constructSimpleGraph(self, directed=False):
+        g = Graph(4, [(0, 1), (0, 2), (1, 2), (1, 3), (2, 3)], directed)
+        g.es["capacity"] = [4, 2, 10, 2, 2]
+        return g
+
+    def constructLadderGraph(self, directed=False):
+        el  = zip(range(0, 5), range(1, 6))
+        el += zip(range(6, 11), range(7, 12))
+        el += zip(range(0, 6), range(6, 12))
+        g = Graph(el, directed=directed)
+        return g
 
     def testMinCutValue(self):
-        self.failUnless(self.g.mincut_value(0, 3) == 2)
-        self.failUnless(self.g.mincut_value(0, 3, self.capacities) == 4)
-        self.failUnless(self.g.mincut_value(0, 3, "capacity") == 4)
-        self.assertRaises(KeyError, self.g.mincut_value, 0, 3, "unknown")
-        self.failUnless(self.g.mincut_value() == 2)
-        self.failUnless(self.g.mincut_value(source=0) == 2)
-        self.failUnless(self.g.mincut_value(target=2) == 2)
+        g = self.constructSimpleGraph()
+        self.failUnless(g.mincut_value(0, 3) == 2)
+        self.failUnless(g.mincut_value(0, 3, g.es["capacity"]) == 4)
+        self.failUnless(g.mincut_value(0, 3, "capacity") == 4)
+        self.assertRaises(KeyError, g.mincut_value, 0, 3, "unknown")
+        self.failUnless(g.mincut_value() == 2)
+        self.failUnless(g.mincut_value(source=0) == 2)
+        self.failUnless(g.mincut_value(target=2) == 2)
 
     def testMinCut(self):
-        mc = self.g.mincut()
+        g = self.constructSimpleGraph()
+        mc = g.mincut()
         self.failUnless(isinstance(mc, Cut))
         self.failUnless(mc.value == 2)
         self.failUnless(set(mc.partition[0]).union(mc.partition[1]) == \
-          set(range(self.g.vcount())))
+          set(range(g.vcount())))
         self.failUnless(isinstance(str(mc), str))
         self.failUnless(isinstance(repr(mc), str))
         self.failUnless(isinstance(mc.es, EdgeSeq))
         self.failUnless(len(mc.es) == 2)
-        mc = self.g.mincut(self.capacities)
+        mc = g.mincut("capacity")
         self.failUnless(mc.value == 4)
-        self.assertRaises(KeyError, self.g.mincut, "unknown")
+        self.assertRaises(KeyError, g.mincut, "unknown")
 
     def testAllSTCuts1(self):
         # Simple graph with four vertices
-        g=Graph(4, [(0, 1), (0, 2), (1, 2), (1, 3), (2, 3)], directed=True)
+        g = self.constructSimpleGraph(directed=True)
         partitions = [((0, 1, 1, 1), 2), ((0, 0, 1, 1), 3),
                       ((0, 1, 0, 1), 2), ((0, 0, 0, 1), 2)]
         values = dict(partitions)
@@ -100,10 +107,7 @@ class CutTests(unittest.TestCase):
 
     def testAllSTCuts2(self):
         # "Ladder graph"
-        el  = zip(range(0, 5), range(1, 6))
-        el += zip(range(6, 11), range(7, 12))
-        el += zip(range(0, 6), range(6, 12))
-        g = Graph(el, directed=True)
+        g = self.constructLadderGraph(directed=True)
         cuts = g.all_st_cuts(0, 11)
         self.assertEquals(len(cuts), 36)
         self.assertEquals(len(set(tuple(cut.membership) for cut in cuts)), 36)
@@ -113,6 +117,29 @@ class CutTests(unittest.TestCase):
             self.failIf(g2.is_connected(),
                 "%r is not a real cut" % (cut.membership,))
             self.failIf(cut.value < 2 or cut.value > 6)
+
+
+    def testAllSTMinCuts2(self):
+        # "Ladder graph"
+        g = self.constructLadderGraph()
+        g.to_directed("mutual")
+        cuts = g.all_st_mincuts(0, 11)
+        self.assertEquals(len(cuts), 7)
+        self.assertEquals(len(set(tuple(cut.membership) for cut in cuts)), 7)
+        for cut in cuts:
+            self.assertEquals(cut.value, 2)
+            g2 = g.copy()
+            g2.delete_edges(cut.es)
+            self.failIf(g2.is_connected(),
+                "%r is not a real cut" % (cut.membership,))
+
+        g.es["capacity"] = [2, 1, 2, 1, 2, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1]
+        cuts = g.all_st_mincuts(0, 11, "capacity")
+        self.assertEquals(len(cuts), 2)
+        self.assertEquals(cuts[0].membership, [0,0,1,1,1,1,0,0,1,1,1,1])
+        self.assertEquals(cuts[1].membership, [0,0,0,0,1,1,0,0,0,0,1,1])
+        self.assertEquals(cuts[0].value, 2)
+        self.assertEquals(cuts[1].value, 2)
 
 
 def suite():

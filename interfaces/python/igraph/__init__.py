@@ -205,6 +205,29 @@ class Graph(GraphBase):
         return [Cut(self, cut=cut, partition=part)
                 for cut, part in izip(*GraphBase.all_st_cuts(self, source, target))]
 
+    def all_st_mincuts(self, source, target, capacity=None):
+        """all_st_mincuts(source, target)
+
+        Returns all the mincuts between the source and target vertices in a
+        directed graph.
+
+        This function lists all minimum edge-cuts between a source and a target
+        vertex.
+
+        @param source: the source vertex ID
+        @param target: the target vertex ID
+        @param capacity: the edge capacities (weights). If C{None}, all
+          edges have equal weight. May also be an attribute name.
+        @return: a list of L{Cut} objects.
+
+        @newfield ref: Reference
+        @ref: JS Provan and DR Shier: A paradigm for listing (s,t)-cuts in
+          graphs. Algorithmica 15, 351--372, 1996.
+        """
+        value, cuts, parts = GraphBase.all_st_mincuts(self, source, target, capacity)
+        return [Cut(self, value, cut=cut, partition=part)
+                for cut, part in izip(cuts, parts)]
+
     def biconnected_components(self, return_articulation_points=False):
         """biconnected_components(return_articulation_points=False)
 
