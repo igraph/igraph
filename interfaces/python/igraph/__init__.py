@@ -2326,14 +2326,14 @@ class VertexSeq(core.VertexSeq):
       >>> g = Graph.Tree(7, 2)
       >>> g.vs["color"] = ["red", "green"]
       >>> g.vs["color"]
-      ["red", "green", "red", "green", "red", "green", "red"]
+      ['red', 'green', 'red', 'green', 'red', 'green', 'red']
 
     You can even pass a single string or integer, it will be considered as a
     sequence of length 1:
 
       >>> g.vs["color"] = "red"
       >>> g.vs["color"]
-      ["red", "red", "red", "red", "red", "red", "red"]
+      ['red', 'red', 'red', 'red', 'red', 'red', 'red']
 
     Some methods of the vertex sequences are simply proxy methods to the
     corresponding methods in the L{Graph} object. One such example is
@@ -2402,19 +2402,19 @@ class VertexSeq(core.VertexSeq):
         For instance, if you want to filter vertices with a numeric C{age}
         property larger than 200, you have to write:
 
-          >>> g.vs.select(age_gt=200)
+          >>> g.vs.select(age_gt=200)                   #doctest: +SKIP
 
         Similarly, to filter vertices whose C{type} is in a list of predefined
         types:
 
           >>> list_of_types = ["HR", "Finance", "Management"]
-          >>> g.vs.select(type_in=list_of_types)
+          >>> g.vs.select(type_in=list_of_types)        #doctest: +SKIP
 
         If the operator is omitted, it defaults to C{eq}. For instance, the
         following selector selects vertices whose C{cluster} property equals
         to 2:
 
-          >>> g.vs.select(cluster=2)
+          >>> g.vs.select(cluster=2)                    #doctest: +SKIP
 
         In the case of an unknown operator, it is assumed that the
         recognized operator is part of the attribute name and the actual
@@ -2430,6 +2430,7 @@ class VertexSeq(core.VertexSeq):
         according to the value returned by the method. For instance, if you
         want to exclude isolated vertices:
 
+          >>> g = Graph.Famous("zachary")
           >>> non_isolated = g.vs.select(_degree_gt=0)
 
         For properties that take a long time to be computed (e.g., betweenness
@@ -2440,12 +2441,12 @@ class VertexSeq(core.VertexSeq):
         For instance, the following would calculate betweenness centralities
         twice:
 
-          >>> g.vs.select(_betweenness_gt=10, _betweenness_lt=30)
+          >>> edges = g.vs.select(_betweenness_gt=10, _betweenness_lt=30)
 
         It is advised to use this instead:
 
-          >>> g.vs["bs"] = g.betwenness()
-          >>> g.vs.select(bs_gt=10, bs_lt=30)
+          >>> g.vs["bs"] = g.betweenness()
+          >>> edges = g.vs.select(bs_gt=10, bs_lt=30)
 
         @return: the new, filtered vertex sequence"""
         vs = core.VertexSeq.select(self, *args)
@@ -2539,14 +2540,14 @@ class EdgeSeq(core.EdgeSeq):
       >>> g = Graph.Tree(7, 2)
       >>> g.es["color"] = ["red", "green"]
       >>> g.es["color"]
-      ["red", "green", "red", "green", "red", "green"]
+      ['red', 'green', 'red', 'green', 'red', 'green']
 
     You can even pass a single string or integer, it will be considered as a
     sequence of length 1:
 
       >>> g.es["color"] = "red"
       >>> g.es["color"]
-      ["red", "red", "red", "red", "red", "red"]
+      ['red', 'red', 'red', 'red', 'red', 'red']
 
     Some methods of the edge sequences are simply proxy methods to the
     corresponding methods in the L{Graph} object. One such example is
@@ -2615,19 +2616,19 @@ class EdgeSeq(core.EdgeSeq):
         For instance, if you want to filter edges with a numeric C{weight}
         property larger than 50, you have to write:
 
-          >>> g.es.select(weight_gt=50)
+          >>> g.es.select(weight_gt=50)            #doctest: +SKIP
 
         Similarly, to filter edges whose C{type} is in a list of predefined
         types:
 
           >>> list_of_types = ["inhibitory", "excitatory"]
-          >>> g.es.select(type_in=list_of_types)
+          >>> g.es.select(type_in=list_of_types)   #doctest: +SKIP
 
         If the operator is omitted, it defaults to C{eq}. For instance, the
         following selector selects edges whose C{type} property is
         C{intracluster}:
 
-          >>> g.es.select(type="intracluster")
+          >>> g.es.select(type="intracluster")     #doctest: +SKIP
 
         In the case of an unknown operator, it is assumed that the
         recognized operator is part of the attribute name and the actual
@@ -2658,11 +2659,12 @@ class EdgeSeq(core.EdgeSeq):
         For instance, if you want to exclude edges with a betweenness
         centrality less than 2:
 
+          >>> g = Graph.Famous("zachary")
           >>> excl = g.es.select(_edge_betweenness_ge = 2)
 
         To select edges originating from vertices 2 and 4:
 
-          >>> edges = g.es.select(_source_in = [2, 4])
+          >>> edges = g.es.select(_source_in = [2, 4]) 
 
         To select edges lying entirely within the subgraph spanned by vertices
         2, 3, 4 and 7:
@@ -2683,12 +2685,13 @@ class EdgeSeq(core.EdgeSeq):
         For instance, the following would calculate betweenness centralities
         twice:
 
-          >>> g.es.select(_edge_betweenness_gt=10, _edge_betweenness_lt=30)
+          >>> edges = g.es.select(_edge_betweenness_gt=10,
+          ...                     _edge_betweenness_lt=30)
 
         It is advised to use this instead:
 
-          >>> g.es["bs"] = g.edge_betwenness()
-          >>> g.es.select(bs_gt=10, bs_lt=30)
+          >>> g.es["bs"] = g.edge_betweenness()
+          >>> edges = g.es.select(bs_gt=10, bs_lt=30)
 
         @return: the new, filtered edge sequence"""
         es = core.EdgeSeq.select(self, *args)

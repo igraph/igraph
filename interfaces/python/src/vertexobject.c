@@ -347,8 +347,8 @@ PyTypeObject igraphmodule_VertexType =
   "(if the vertex indices are altered in the original graph).\n\n"
   "The attributes of the vertex can be accessed by using the vertex\n"
   "as a hash:\n\n"
-  "  >>> v[\"color\"] = \"red\"\n"
-  "  >>> print v[\"color\"]\n"
+  "  >>> v[\"color\"] = \"red\"                  #doctest: +SKIP\n"
+  "  >>> print v[\"color\"]                      #doctest: +SKIP\n"
   "  red\n", // tp_doc
   0,                                          // tp_traverse
   0,                                          // tp_clear

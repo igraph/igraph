@@ -396,8 +396,8 @@ PyTypeObject igraphmodule_EdgeType =
   "(if the edge indices are altered in the original graph).\n\n"
   "The attributes of the edge can be accessed by using the edge\n"
   "as a hash:\n\n"
-  "  >>> e[\"weight\"] = 2\n"
-  "  >>> print e[\"weight\"]\n"
+  "  >>> e[\"weight\"] = 2                  #doctest: +SKIP\n"
+  "  >>> print e[\"weight\"]                #doctest: +SKIP\n"
   "  2\n", // tp_doc
   0,                                          // tp_traverse
   0,                                          // tp_clear
