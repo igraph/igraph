@@ -202,7 +202,6 @@ class Graph(GraphBase):
         @ref: JS Provan and DR Shier: A paradigm for listing (s,t)-cuts in
           graphs. Algorithmica 15, 351--372, 1996.
         """
-        print GraphBase.all_st_cuts(self, source, target)
         return [Cut(self, cut=cut, partition=part)
                 for cut, part in izip(*GraphBase.all_st_cuts(self, source, target))]
 
