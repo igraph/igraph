@@ -34,6 +34,7 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 from igraph.core import *
 from igraph.core import __version__, __build_date__
 from igraph.clustering import *
+from igraph.cut import *
 from igraph.configuration import Configuration
 from igraph.drawing import *
 from igraph.drawing.colors import *

@@ -7997,6 +7997,60 @@ PyObject *igraphmodule_Graph_maxflow(igraphmodule_GraphObject * self,
  **********************************************************************/
 
 /** \ingroup python_interface_graph
+ * \brief Calculates all s-t cuts in a graph
+ */
+PyObject *igraphmodule_Graph_all_st_cuts(igraphmodule_GraphObject * self,
+                                         PyObject * args, PyObject * kwds)
+{
+  static char *kwlist[] = { "source", "target", NULL };
+  long int source, target;
+  igraph_vector_ptr_t cuts, partition1s;
+  PyObject *source_o, *target_o;
+  PyObject *cuts_o, *partition1s_o;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "OO", kwlist,
+                                   &source_o, &target_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vid(source_o, &source, &self->g))
+    return NULL;
+  if (igraphmodule_PyObject_to_vid(target_o, &target, &self->g))
+    return NULL;
+
+  if (igraph_vector_ptr_init(&partition1s, 0)) {
+	return igraphmodule_handle_igraph_error();
+  }
+  if (igraph_vector_ptr_init(&cuts, 0)) {
+    igraph_vector_ptr_destroy(&partition1s);
+	return igraphmodule_handle_igraph_error();
+  }
+
+  if (igraph_all_st_cuts(&self->g, &cuts, &partition1s,
+        source, target)) {
+    igraph_vector_ptr_destroy(&cuts);
+    igraph_vector_ptr_destroy(&partition1s);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&cuts, igraph_vector_destroy);
+  IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&partition1s, igraph_vector_destroy);
+
+  cuts_o = igraphmodule_vector_ptr_t_to_PyList(&cuts, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_ptr_destroy_all(&cuts);
+  if (cuts_o == NULL) {
+    igraph_vector_ptr_destroy_all(&partition1s);
+    return NULL;
+  }
+
+  partition1s_o = igraphmodule_vector_ptr_t_to_PyList(&partition1s, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_ptr_destroy_all(&partition1s);
+  if (partition1s_o == NULL)
+    return NULL;
+
+  return Py_BuildValue("NN", cuts_o, partition1s_o);
+}
+
+/** \ingroup python_interface_graph
  * \brief Calculates the value of the minimum cut in the graph
  */
 PyObject *igraphmodule_Graph_mincut_value(igraphmodule_GraphObject * self,
@@ -11922,9 +11976,24 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  and negative if the flow goes from the bigger vertex ID to the smaller."
   },
 
-  /****************/
-  /* MINIMUM CUTS */
-  /****************/
+  /**********************/
+  /* CUTS, MINIMUM CUTS */
+  /**********************/
+  {"all_st_cuts", (PyCFunction) igraphmodule_Graph_all_st_cuts,
+   METH_VARARGS | METH_KEYWORDS,
+   "all_st_cuts(source, target)\n\n"
+   "Returns all the cuts between the source and target vertices.\n\n"
+   "This function lists all edge-cuts between a source and a target vertex.\n"
+   "Every cut is listed exactly once.\n\n"
+   "@param source: the source vertex ID\n"
+   "@param target: the target vertex ID\n"
+   "@attention: this function has a more convenient interface in class\n"
+   "  L{Graph} which wraps the result in a list of L{Cut} objects. It is\n"
+   "  advised to use that.\n"
+   "@return: a tuple where the first element is a list of lists of edge IDs\n"
+   "  representing a cut and the second element is a list of lists of vertex\n"
+   "  IDs representing the sets of vertices that were separated by the cuts.\n"
+  },
   {"mincut_value", (PyCFunction) igraphmodule_Graph_mincut_value,
    METH_VARARGS | METH_KEYWORDS,
    "mincut_value(source=-1, target=-1, capacity=None)\n\n"
