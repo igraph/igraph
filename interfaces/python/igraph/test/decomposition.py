@@ -266,11 +266,11 @@ class CohesiveBlocksTests(unittest.TestCase):
         self.genericTests(cbs)
         self.assertEquals(sorted(list(cbs)),
                 [range(0, 5), range(18), [0, 1, 2, 3, 4, 6, 7, 8, 9, 10],
-                 range(6, 10), range(12, 16), range(12, 17)])
-        self.assertEquals(cbs.cohesions(), [1, 2, 2, 4, 3, 3])
+                 range(12, 16), range(12, 17)])
+        self.assertEquals(cbs.cohesions(), [1, 2, 2, 4, 3])
         self.assertEquals(cbs.max_cohesions(), [4, 4, 4, 4, 4,
-            1, 3, 3, 3, 3, 2, 1, 3, 3, 3, 3, 2, 1])
-        self.assertEquals(cbs.parents(), [None, 0, 0, 1, 2, 1])
+            1, 2, 2, 2, 2, 2, 1, 3, 3, 3, 3, 2, 1])
+        self.assertEquals(cbs.parents(), [None, 0, 0, 1, 2])
 
     def testCohesiveBlocks2(self):
         # Taken from the Moody-White paper
