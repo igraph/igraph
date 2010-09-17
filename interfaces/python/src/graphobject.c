@@ -3156,7 +3156,7 @@ PyObject *igraphmodule_Graph_biconnected_components(igraphmodule_GraphObject *se
   }
 
   result = igraphmodule_vector_ptr_t_to_PyList(&components, IGRAPHMODULE_TYPE_INT);
-  igraph_vector_ptr_set_item_destructor(&components, (igraph_finally_func_t*)igraph_vector_destroy);
+  IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&components, igraph_vector_destroy);
   igraph_vector_ptr_destroy_all(&components);
 
   if (return_articulation_points) {
@@ -3896,7 +3896,7 @@ PyObject *igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *
 
   if (weights) { igraph_vector_destroy(weights); free(weights); }
 
-  igraph_vector_ptr_set_item_destructor(&res, (igraph_finally_func_t*)igraph_vector_destroy);
+  IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&res, igraph_vector_destroy);
 
   j = igraph_vector_ptr_size(&res);
   list = PyList_New(j);
@@ -7127,7 +7127,7 @@ PyObject *igraphmodule_Graph_get_isomorphisms_vf2(igraphmodule_GraphObject *self
 
   res = igraphmodule_vector_ptr_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
 
-  igraph_vector_ptr_set_item_destructor(&result, (igraph_finally_func_t*)igraph_vector_destroy);
+  IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&result, igraph_vector_destroy);
   igraph_vector_ptr_destroy_all(&result);
 
   return res;
@@ -7368,7 +7368,7 @@ PyObject *igraphmodule_Graph_get_subisomorphisms_vf2(igraphmodule_GraphObject *s
 
   res = igraphmodule_vector_ptr_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
 
-  igraph_vector_ptr_set_item_destructor(&result, (igraph_finally_func_t*)igraph_vector_destroy);
+  IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&result, igraph_vector_destroy);
   igraph_vector_ptr_destroy_all(&result);
 
   return res;
@@ -8224,7 +8224,7 @@ PyObject *igraphmodule_Graph_all_minimal_st_separators(
   }
 
   result_o = igraphmodule_vector_ptr_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
-  igraph_vector_ptr_set_item_destructor(&result, (igraph_finally_func_t*)igraph_vector_destroy);
+  IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&result, igraph_vector_destroy);
   igraph_vector_ptr_destroy_all(&result);
 
   return result_o;
@@ -8316,7 +8316,7 @@ PyObject *igraphmodule_Graph_minimum_size_separators(
   }
 
   result_o = igraphmodule_vector_ptr_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
-  igraph_vector_ptr_set_item_destructor(&result, (igraph_finally_func_t*)igraph_vector_destroy);
+  IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&result, igraph_vector_destroy);
   igraph_vector_ptr_destroy_all(&result);
 
   return result_o;
@@ -8362,7 +8362,7 @@ PyObject *igraphmodule_Graph_cohesive_blocks(igraphmodule_GraphObject *self,
   }
 
   blocks_o = igraphmodule_vector_ptr_t_to_PyList(&blocks, IGRAPHMODULE_TYPE_INT);
-  igraph_vector_ptr_set_item_destructor(&blocks, (igraph_finally_func_t*)igraph_vector_destroy);
+  IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&blocks, igraph_vector_destroy);
   igraph_vector_ptr_destroy_all(&blocks);
   if (blocks_o == NULL) {
     igraph_vector_destroy(&parents);
