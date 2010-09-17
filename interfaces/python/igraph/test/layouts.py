@@ -133,7 +133,7 @@ class LayoutAlgorithmTests(unittest.TestCase):
                 self.assertEquals(len(lo[0]), dim)
             return lo
 
-        g = Graph.Barabasi(100)
+        g = Graph.Barabasi(10)
         layout_test(g)
 
         g = Graph.GRG(101, 0.2)
