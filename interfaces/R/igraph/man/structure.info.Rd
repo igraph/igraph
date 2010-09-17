@@ -77,6 +77,6 @@ ecount(g)
 neighbors(g, 5)
 are.connected(g, 1, 2)
 are.connected(g, 2, 4)
-get.edges(g, 0:5)
+get.edges(g, 1:6)
 }
 \keyword{graphs}

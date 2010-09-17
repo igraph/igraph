@@ -317,6 +317,7 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
                  as.numeric(update.rule), as.numeric(gamma),
                  PACKAGE="igraph")
   }
+  res
 }
 
 walktrap.community <- function(graph, weights=E(graph)$weight, steps=4,

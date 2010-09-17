@@ -71,12 +71,12 @@ graph.cohesion(graph, checks=TRUE)
   \code{\link{edge.disjoint.paths}}, \code{\link{graph.adhesion}}}
 \examples{
 g <- barabasi.game(100, m=1)
-g <- delete.edges(g, E(g)[ 99 \%--\% 0 ])
+g <- delete.edges(g, E(g)[ 100 \%--\% 1 ])
 g2 <- barabasi.game(100, m=5)
-g2 <- delete.edges(g2, E(g2)[ 99 \%--\% 0])
-vertex.connectivity(g, 99, 0)
-vertex.connectivity(g2, 99, 0)
-vertex.disjoint.paths(g2, 99, 0)
+g2 <- delete.edges(g2, E(g2)[ 100 \%--\% 1])
+vertex.connectivity(g, 100, 1)
+vertex.connectivity(g2, 100, 1)
+vertex.disjoint.paths(g2, 100, 1)
 
 g <- erdos.renyi.game(50, 5/50)
 g <- as.directed(g)

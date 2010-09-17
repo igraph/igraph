@@ -42,7 +42,7 @@ farthest.nodes (graph, directed = TRUE, unconnected = TRUE, weights = NULL)
 \seealso{\code{\link{shortest.paths}}}
 \examples{
 g <- graph.ring(10)
-g2 <- delete.edges(g, c(0,1,0,9))
+g2 <- delete.edges(g, c(1,2,1,10))
 diameter(g2, unconnected=TRUE)
 diameter(g2, unconnected=FALSE)
 

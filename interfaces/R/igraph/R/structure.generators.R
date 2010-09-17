@@ -20,7 +20,7 @@
 #
 ###################################################################
 
-graph <- function( edges, n=max(edges)+1, directed=TRUE ) {
+graph <- function( edges, n=max(edges), directed=TRUE ) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_create", as.numeric(edges)-1, as.numeric(n),
         as.logical(directed),
@@ -108,9 +108,9 @@ graph.formula <- function(...) {
     }
   }
 
-  ids <- seq(along=v)-1
+  ids <- seq(along=v)
   names(ids) <- v
-  res <- graph( unname(ids[edges])-1, n=length(v), directed=directed)
+  res <- graph( unname(ids[edges]), n=length(v), directed=directed)
   res <- set.vertex.attribute(res, "name", value=v)
   res  
 }
@@ -565,14 +565,14 @@ graph.edgelist <- function(el, directed=TRUE) {
     if (is.character(el)) {
       ## symbolic edge list
       names <- unique(as.character(t(el)))
-      ids <- seq(names)-1
+      ids <- seq(names)
       names(ids) <- names
       res <- graph( unname(ids[t(el)]), directed=directed)
       rm(ids)
       V(res)$name <- names
     } else {
       ## normal edge list
-      res <- graph( t(el)-1, directed=directed )
+      res <- graph( t(el), directed=directed )
     }
   }
 

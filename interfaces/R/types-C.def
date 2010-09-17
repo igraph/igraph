@@ -203,6 +203,32 @@ VECTORLIST:
          R_igraph_vectorlist_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
 
+VERTEXSETLIST:
+  CTYPE: igraph_vector_ptr_t
+  CALL: &%C%
+  INCONV:
+    OUT: if (0 != igraph_vector_ptr_init(&%C%, 0)) { \
+           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(R_igraph_vectorlist_destroy, &%C%);
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_vectorlist_to_SEXP_p1(&%C%)); \
+         R_igraph_vectorlist_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
+EDGESETLIST:
+  CTYPE: igraph_vector_ptr_t
+  CALL: &%C%
+  INCONV:
+    OUT: if (0 != igraph_vector_ptr_init(&%C%, 0)) { \
+           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(R_igraph_vectorlist_destroy, &%C%);
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_vectorlist_to_SEXP_p1(&%C%)); \
+         R_igraph_vectorlist_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
 VECTORLIST_OR_0:
   CTYPE: igraph_vector_ptr_t
   CALL: &%C%
@@ -213,6 +239,32 @@ VECTORLIST_OR_0:
          IGRAPH_FINALLY(R_igraph_vectorlist_destroy, &%C%);
   OUTCONV:
     OUT: PROTECT(%I%=R_igraph_vectorlist_to_SEXP(&%C%)); \
+         R_igraph_vectorlist_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
+VERTEXSETLIST_OR_0:
+  CTYPE: igraph_vector_ptr_t
+  CALL: &%C%
+  INCONV:
+    OUT: if (0 != igraph_vector_ptr_init(&%C%, 0)) { \
+           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(R_igraph_vectorlist_destroy, &%C%);
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_vectorlist_to_SEXP_p1(&%C%)); \
+         R_igraph_vectorlist_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
+EDGESETLIST_OR_0:
+  CTYPE: igraph_vector_ptr_t
+  CALL: &%C%
+  INCONV:
+    OUT: if (0 != igraph_vector_ptr_init(&%C%, 0)) { \
+           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(R_igraph_vectorlist_destroy, &%C%);
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_vectorlist_to_SEXP_p1(&%C%)); \
          R_igraph_vectorlist_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
 

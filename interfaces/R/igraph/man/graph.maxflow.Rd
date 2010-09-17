@@ -113,7 +113,7 @@ g <- graph.ring(100)
 graph.mincut(g, capacity=rep(1,vcount(g)))
 graph.mincut(g, value.only=FALSE, capacity=rep(1,vcount(g)))
 
-g2 <- graph( c(0,1,1,2,2,3, 0,5,5,4,4,3, 3,0) )
+g2 <- graph( c(1,2,2,3,3,4, 1,6,6,5,5,4, 4,1) )
 E(g2)$capacity <- c(3,1,2, 10,1,3, 2)
 graph.mincut(g2, value.only=FALSE)
 }

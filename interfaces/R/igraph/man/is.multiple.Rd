@@ -38,7 +38,7 @@ count.multiple(graph, eids=E(graph))
 \seealso{\code{\link{simplify}} to eliminate loop and multiple edges.}
 \examples{
 # Loops
-g <- graph( c(0,0,1,1,2,2,3,4) )
+g <- graph( c(1,1,2,2,3,3,4,5) )
 is.loop(g)
 
 # Multiple edges
@@ -49,8 +49,8 @@ is.multiple(simplify(g))
 all(count.multiple(simplify(g)) == 1)
 
 # Direction of the edge is important
-is.multiple(graph( c(0,1, 1,0) ))
-is.multiple(graph( c(0,1, 1,0), dir=FALSE ))
+is.multiple(graph( c(1,2, 2,1) ))
+is.multiple(graph( c(1,2, 2,1), dir=FALSE ))
 
 # Remove multiple edges but keep multiplicity
 g <- barabasi.game(10, m=3)

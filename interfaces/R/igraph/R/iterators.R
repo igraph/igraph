@@ -51,16 +51,16 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
     res <- seq_len(ec)
   } else if (!is.null(P)) {
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-    res <- .Call("R_igraph_es_pairs", graph, as.numeric(P)-1,
+    res <- .Call("R_igraph_es_pairs", graph, as.igraph.vs(graph, P)-1,
                  as.logical(directed),
-                 PACKAGE="igraph")
+                 PACKAGE="igraph")+1
   } else {
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-    res <- .Call("R_igraph_es_path", graph, as.numeric(path)-1,
+    res <- .Call("R_igraph_es_path", graph, as.igraph.vs(graph, path)-1,
                  as.logical(directed),
-                 PACKAGE="igraph")
+                 PACKAGE="igraph")+1
   }
-    
+  
   class(res) <- "igraph.es"
   ne <- new.env()
   assign("graph", graph, envir=ne)
@@ -94,7 +94,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
         v <- which(v)
       }
       on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_vs_nei", graph, x, as.igraph.vs(graph, v),
+      tmp <- .Call("R_igraph_vs_nei", graph, x, as.igraph.vs(graph, v)-1,
                    as.numeric(mode),
                    PACKAGE="igraph")
       tmp[as.numeric(x)]
@@ -112,7 +112,8 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
         e <- which(e)
       }
       on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(e), as.numeric(3),
+      tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(e)-1,
+                   as.numeric(3),
                    PACKAGE="igraph")
       tmp[as.numeric(x)]
     }
@@ -122,7 +123,8 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
         e <- which(e)
       }
       on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(e), as.numeric(1),
+      tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(e)-1,
+                   as.numeric(1),
                    PACKAGE="igraph")
       tmp[as.numeric(x)]
     }
@@ -132,7 +134,8 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
         e <- which(e)
       }
       on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(e), as.numeric(2),
+      tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(e)-1,
+                   as.numeric(2),
                    PACKAGE="igraph")
       tmp[as.numeric(x)]
     }

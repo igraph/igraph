@@ -37,7 +37,7 @@ community.to.membership(graph, merges, steps, membership=TRUE, csize=TRUE)
 }
 \examples{
 g <- graph.full(5) \%du\% graph.full(5) \%du\% graph.full(5)
-g <- add.edges(g, c(0,5, 0,10, 5, 10))
+g <- add.edges(g, c(1,6, 1,11, 6, 11))
 wtc <- walktrap.community(g)
 community.to.membership(g, wtc$merges, steps=12)
 }

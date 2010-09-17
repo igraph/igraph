@@ -75,9 +75,9 @@ print(ug3, e=TRUE)
   plot(ug3, layout=layout.circle, edge.label=E(ug3)$weight)
 }
 
-g4 <- graph(c(0,1, 2,1,2,3,2,3, 4,3,4,3,
-              5,6, 6,5,6,7,6,7, 7,6,7,8,7,8,
-              8,7,8,7,8,8, 9,9,9,9))
+g4 <- graph(c(1,2, 3,2,3,4,3,4, 5,4,5,4,
+              6,7, 7,6,7,8,7,8, 8,7,8,9,8,9,
+              9,8,9,8,9,9, 10,10,10,10))
 E(g4)$weight <- seq_len(ecount(g4))
 ug4 <- as.undirected(g4, mode="mutual",
               edge.attr.comb=list(weight=length))

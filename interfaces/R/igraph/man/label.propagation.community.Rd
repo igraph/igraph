@@ -64,7 +64,7 @@ label.propagation.community (graph, weights = NULL,
   for other community detection methods.}
 \examples{
   g <- erdos.renyi.game(10, 5/10) \%du\% erdos.renyi.game(9, 5/9)
-  g <- add.edges(g, c(0, 11))
+  g <- add.edges(g, c(1, 12))
   label.propagation.community(g)
 }
 \keyword{graphs}

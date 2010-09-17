@@ -89,7 +89,7 @@ g <- barabasi.game(100,m=2)
 eb <- edge.betweenness.community(g)
 
 g <- graph.full(10) \%du\% graph.full(10)
-g <- add.edges(g, c(0,10))
+g <- add.edges(g, c(1,11))
 eb <- edge.betweenness.community(g)
 eb
 }

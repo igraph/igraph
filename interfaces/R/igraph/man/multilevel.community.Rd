@@ -64,7 +64,7 @@ multilevel.community (graph, weights = NULL)
 \examples{
 # This is so simple that we will have only one level
 g <- graph.full(5) \%du\% graph.full(5) \%du\% graph.full(5)
-g <- add.edges(g, c(0,5, 0,10, 5, 10))
+g <- add.edges(g, c(1,6, 1,11, 6, 11))
 multilevel.community(g)
 }
 \keyword{graphs}

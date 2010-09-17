@@ -279,6 +279,7 @@ igraph.to.graphNEL <- function(graph) {
     }
   } else {
     al <- get.adjlist(graph, "out")
+    al <- lapply(al, function(x) list(edges=x))
   }  
   
   names(al) <- name

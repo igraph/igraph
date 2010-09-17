@@ -83,15 +83,15 @@ INT:
     INCONV: %I% <- as.integer(%I%)
 
 VERTEXSET:
-    INCONV: %I% <- as.igraph.vs(%I1%, %I%)
+    INCONV: %I% <- as.igraph.vs(%I1%, %I%)-1
     DEFAULT:
        ALL: V(%I1%)
 
 VERTEX:
-    INCONV: %I% <- as.igraph.vs(%I1%, %I%)
+    INCONV: %I% <- as.igraph.vs(%I1%, %I%)-1
 
 EDGESET:
-    INCONV: %I% <- as.igraph.es(%I%)
+    INCONV: %I% <- as.igraph.es(%I%)-1
     DEFAULT:
        ALL: E(%I1%)
 
@@ -158,6 +158,14 @@ VECTORLIST:
 
 VECTORLIST_OR_0:
 
+VERTEXSETLIST:
+
+VERTEXSETLIST_OR_0:
+
+EDGESETLIST:
+
+EDGESETLIST_OR_0:
+
 ARPACKOPT:
     INCONV:
       INOUT: %I%.tmp <- igraph.arpack.default; %I%.tmp[ names(%I%) ] <- %I% ; %I% <- %I%.tmp
@@ -174,7 +182,7 @@ BLISSSH:
 BLISSINFO:
 
 ADJLIST:
-    INCONV: %I% <- lapply(%I%, as.numeric)
+    INCONV: %I% <- lapply(%I%, function(x) as.numeric(x)-1)
 
 COMMCMP:
     INCONV: %I% <- switch(igraph.match.arg(%I%), "vi"=0, "nmi"=1)

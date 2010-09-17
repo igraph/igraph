@@ -56,7 +56,7 @@ walktrap.community(graph, weights = E(graph)$weight, steps = 4, merges =
 }
 \examples{
 g <- graph.full(5) \%du\% graph.full(5) \%du\% graph.full(5)
-g <- add.edges(g, c(0,5, 0,10, 5, 10))
+g <- add.edges(g, c(1,6, 1,11, 6, 11))
 walktrap.community(g)
 }
 \keyword{graphs}

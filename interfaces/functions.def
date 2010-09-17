@@ -316,14 +316,16 @@ igraph_shortest_paths:
         IGNORE: RR, RC, RNamespace
 
 igraph_get_shortest_paths:
-        PARAMS: GRAPH graph, OUT VECTORLIST_OR_0 vertices, 
-                OUT VECTORLIST_OR_0 edges, INTEGER from, VERTEXSET to=ALL, \
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST_OR_0 vertices, 
+                OUT EDGESETLIST_OR_0 edges, VERTEX from, VERTEXSET to=ALL, \
                 NEIMODE mode=OUT
+        DEPS: vertices ON graph, edges ON graph, from ON graph, to ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_get_all_shortest_paths:
-        PARAMS: GRAPH graph, OUT VECTORLIST res, OUT VECTOR nrgeo, \
-                INTEGER from, VERTEXSET to, NEIMODE mode=OUT
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST res, OUT VECTOR nrgeo, \
+                VERTEX from, VERTEXSET to, NEIMODE mode=OUT
+        DEPS: res ON graph, from ON graph, to ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_shortest_paths_dijkstra:
@@ -332,21 +334,24 @@ igraph_shortest_paths_dijkstra:
         IGNORE: RR, RC, RNamespace
 
 igraph_get_shortest_paths_dijkstra:
-        PARAMS: GRAPH graph, OUT VECTORLIST_OR_0 vertices, \
-                OUT VECTORLIST_OR_0 edges, INTEGER from, VERTEXSET to=ALL, \
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST_OR_0 vertices, \
+                OUT EDGESETLIST_OR_0 edges, VERTEX from, VERTEXSET to=ALL, \
                 EDGEWEIGHTS weights=NULL, NEIMODE mode=ALL
+        DEPS: vertices ON graph, edges ON graph, from ON graph, to ON graph,\
+              weights ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_get_all_shortest_paths_dijkstra:
-        PARAMS: GRAPH graph, OUT VECTORLIST res, OUT VECTOR nrgeo, \
-                INTEGER from, VERTEXSET to=ALL, EDGEWEIGHTS weights, \
-				NEIMODE mode=OUT
-        DEPS: weights ON graph, to ON graph
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST res, OUT VECTOR nrgeo, \
+                VERTEX from, VERTEXSET to=ALL, EDGEWEIGHTS weights, \
+                NEIMODE mode=OUT
+        DEPS: weights ON graph, to ON graph, res ON graph, from ON graph
         IGNORE: RR, RNamespace
 
 igraph_shortest_paths_bellman_ford:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, \
                 VERTEXSET to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
+        DEPS: from ON graph, to ON graph, weights ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_shortest_paths_johnson:
@@ -486,16 +491,21 @@ igraph_density:
 igraph_neighborhood_size:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids, INTEGER order, \
                 NEIMODE mode=ALL
+        DEPS: vids ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_neighborhood:
-        PARAMS: GRAPH graph, OUT VECTORLIST res, VERTEXSET vids, INTEGER order, \
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST res, \
+                VERTEXSET vids, INTEGER order, \
                 NEIMODE mode=ALL
+        DEPS res ON graph, vids ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_neighborhood_graphs:
-        PARAMS: GRAPH graph, OUT GRAPHLIST res, VERTEXSET vids, INTEGER order, \
+        PARAMS: GRAPH graph, OUT GRAPHLIST res, VERTEXSET vids, \
+                INTEGER order, \
                 NEIMODE mode=ALL
+        DEPS: vids ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_topological_sorting:
@@ -777,10 +787,13 @@ igraph_articulation_points:
         NAME-R: articulation.points
 
 igraph_biconnected_components:
-        PARAMS: GRAPH graph, OUT INTEGERPTR no, OUT VECTORLIST_OR_0 tree_edges, \
-                OUT VECTORLIST_OR_0 component_edges, \
-                OUT VECTORLIST_OR_0 components, \
+        PARAMS: GRAPH graph, OUT INTEGERPTR no, \
+                OUT EDGESETLIST_OR_0 tree_edges, \
+                OUT EDGESETLIST_OR_0 component_edges, \
+                OUT VERTEXSETLIST_OR_0 components, \
                 OUT VECTOR articulation_points
+        DEPS: tree_edges ON graph, component_edges ON graph, \
+              components ON graph
         NAME-R: biconnected.components
 
 #######################################
@@ -788,15 +801,19 @@ igraph_biconnected_components:
 #######################################
 
 igraph_cliques:
-        PARAMS: GRAPH graph, OUT VECTORLIST res, INTEGER min_size=0, INTEGER max_size=0
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST res, INTEGER min_size=0, \
+                INTEGER max_size=0
+        DEPS: res ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_largest_cliques:
-        PARAMS: GRAPH graph, OUT VECTORLIST res
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST res
+        DEPS: res ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_maximal_cliques:
-        PARAMS: GRAPH graph, OUT VECTORLIST res
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST res
+        DEPS: res ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_clique_number:
@@ -804,15 +821,19 @@ igraph_clique_number:
         IGNORE: RR, RC, RNamespace
 
 igraph_independent_vertex_sets:
-        PARAMS: GRAPH graph, OUT VECTORLIST res, INTEGER min_size=0, INTEGER max_size=0
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST res, INTEGER min_size=0, \
+                INTEGER max_size=0
+        DEPS: res ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_largest_independent_vertex_sets:
-        PARAMS: GRAPH graph, OUT VECTORLIST res
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST res
+        DEPS: res ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_maximal_independent_vertex_sets:
-        PARAMS: GRAPH graph, OUT VECTORLIST res
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST res
+        DEPS: res ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_independence_number:
@@ -1245,13 +1266,14 @@ igraph_compose:
 igraph_maxflow:
         PARAMS: GRAPH graph, OUT REALPTR value, OUT VECTOR_OR_0 flow, \
                 OUT VECTOR_OR_0 cut, OUT VECTOR_OR_0 partition1, \
-                OUT VECTOR_OR_0 partition2, INTEGER source, INTEGER target, \
+                OUT VECTOR_OR_0 partition2, VERTEX source, VERTEX target, \
                 EDGECAPACITY capacity=NULL
-        DEPS: capacity ON graph
+        DEPS: capacity ON graph, source ON graph, target ON graph
 
 igraph_maxflow_value:
-        PARAMS: GRAPH graph, OUT REALPTR value, INTEGER source, INTEGER target, \
+        PARAMS: GRAPH graph, OUT REALPTR value, VERTEX source, VERTEX target, \
                 VECTOR_OR_0 capacity
+        DEPS: source ON graph, target ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_mincut_value:
@@ -1259,8 +1281,9 @@ igraph_mincut_value:
         IGNORE: RR, RC, RNamespace
 
 igraph_st_mincut_value:
-        PARAMS: GRAPH graph, OUT REALPTR res, INTEGER source, INTEGER target, \
+        PARAMS: GRAPH graph, OUT REALPTR res, VERTEX source, VERTEX target, \
                 VECTOR_OR_0 capacity
+        DEPS: source ON graph, target ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_mincut:
@@ -1269,8 +1292,9 @@ igraph_mincut:
         IGNORE: RR, RC, RNamespace
 
 igraph_st_vertex_connectivity:
-        PARAMS: GRAPH graph, OUT INTEGERPTR res, INTEGER source, INTEGER target, \
+        PARAMS: GRAPH graph, OUT INTEGERPTR res, VERTEX source, VERTEX target, \
                 VCONNNEI neighbors=INFINITY
+        DEPS: source ON graph, target ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_vertex_connectivity:
@@ -1278,7 +1302,8 @@ igraph_vertex_connectivity:
         IGNORE: RR, RC, RNamespace
 
 igraph_st_edge_connectivity:
-        PARAMS: GRAPH graph, OUT INTEGERPTR res, INTEGER source, INTEGER target
+        PARAMS: GRAPH graph, OUT INTEGERPTR res, VERTEX source, VERTEX target
+        DEPS: source ON graph, target ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_edge_connectivity:
@@ -1286,11 +1311,13 @@ igraph_edge_connectivity:
         IGNORE: RR, RC, RNamespace
 
 igraph_edge_disjoint_paths:
-        PARAMS: GRAPH graph, OUT INTEGERPTR res, INTEGER source, INTEGER target
+        PARAMS: GRAPH graph, OUT INTEGERPTR res, VERTEX source, VERTEX target
+        DEPS: source ON graph, target ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_vertex_disjoint_paths:
-        PARAMS: GRAPH graph, OUT INTEGERPTR res, INTEGER source, INTEGER target
+        PARAMS: GRAPH graph, OUT INTEGERPTR res, VERTEX source, VERTEX target
+        DEPS: source ON graph, target ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_adhesion:
@@ -1313,17 +1340,20 @@ igraph_dominator_tree:
         NAME-R: dominator.tree
 
 igraph_all_st_cuts:
-        PARAMS: GRAPH graph, OUT VECTORLIST_OR_0 cuts, \
-                OUT VECTORLIST_OR_0 partition1s, \
+        PARAMS: GRAPH graph, OUT EDGESETLIST_OR_0 cuts, \
+                OUT VERTEXSETLIST_OR_0 partition1s, \
                 VERTEX source, VERTEX target
-        DEPS: source ON graph, target ON graph
+        DEPS: source ON graph, target ON graph, cuts ON graph, \
+              partition1s ON graph
         NAME-R: all.st.cuts
 
 igraph_all_st_mincuts:
         PARAMS: GRAPH graph, OUT REALPTR value, \
-                OUT VECTORLIST_OR_0 cuts, OUT VECTORLIST_OR_0 partition1s, \
+                OUT EDGESETLIST_OR_0 cuts, \
+                OUT VERTEXSETLIST_OR_0 partition1s, \
                 VERTEX source, VERTEX target, EDGEWEIGHTS capacity=NULL
-        DEPS: capacity ON graph, source ON graph, target ON graph
+        DEPS: capacity ON graph, source ON graph, target ON graph, \
+              cuts ON graph, partition1s ON graph
         NAME-R: all.st.mincuts
 
 igraph_is_separator:
@@ -1337,17 +1367,20 @@ igraph_is_minimal_separator:
         NAME-R: is.minimal.separator
 
 igraph_all_minimal_st_separators:
-        PARAMS: GRAPH graph, OUT VECTORLIST separators
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST separators
+        DEPS: separators ON graph
         NAME-R: minimal.st.separators
 
 igraph_minimum_size_separators:
-        PARAMS: GRAPH graph, OUT VECTORLIST separators
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST separators
+        DEPS: separators ON graph
         NAME-R: minimum.size.separators
 
 igraph_cohesive_blocks:
-        PARAMS: GRAPH graph, OUT VECTORLIST blocks, \
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST blocks, \
                 OUT VECTOR cohesion, OUT VECTOR parent, \
                 OUT GRAPH blockTree
+        DEPS: blocks ON graph
         NAME-R: cohesive.blocks
         CLASS-R: cohesiveBlocks
         IGNORE: RR

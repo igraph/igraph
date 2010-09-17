@@ -286,7 +286,7 @@ betweenness <- function(graph, v=V(graph), directed=TRUE, weights=NULL,
     weights <- NULL
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_betweenness", graph, as.igraph.vs(graph, v),
+  .Call("R_igraph_betweenness", graph, as.igraph.vs(graph, v)-1,
         as.logical(directed), weights, as.logical(nobigint),
         as.logical(verbose),
         PACKAGE="igraph")
@@ -473,7 +473,7 @@ constraint <- function(graph, nodes=V(graph), weights=NULL) {
   }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_constraint", graph, as.igraph.vs(graph, nodes),
+  .Call("R_igraph_constraint", graph, as.igraph.vs(graph, nodes)-1,
         as.numeric(weights),        
         PACKAGE="igraph")
 }
@@ -633,7 +633,7 @@ alpha.centrality.sparse <- function(graph, nodes=V(graph), alpha=1,
     weights <- rep(1, ecount(graph))
   }
   
-  el <- get.edgelist(graph, names=FALSE)+1
+  el <- get.edgelist(graph, names=FALSE)
   M <- spMatrix(vc, vc, i=el[,2], j=el[,1], x=weights)
   M <- as(M, "dgCMatrix")
   
@@ -701,9 +701,12 @@ neighborhood <- function(graph, order, nodes=V(graph), mode=c("all", "out", "in"
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_neighborhood", graph, 
-        as.igraph.vs(graph, nodes)-1, as.numeric(order), as.numeric(mode),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_neighborhood", graph, 
+               as.igraph.vs(graph, nodes)-1, as.numeric(order),
+               as.numeric(mode),
+               PACKAGE="igraph")
+  res <- lapply(res, function(x) x+1)
+  res
 }
 
 graph.neighborhood <- function(graph, order, nodes=V(graph),
@@ -717,9 +720,9 @@ graph.neighborhood <- function(graph, order, nodes=V(graph),
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_neighborhood_graphs", graph, 
-               as.igraph.vs(graph, nodes)-1, as.numeric(order), as.numeric(mode),
+               as.igraph.vs(graph, nodes)-1, as.numeric(order),
+               as.numeric(mode),
                PACKAGE="igraph")
-  res <- lapply(res, function(x) x+1)
   res
 }
 

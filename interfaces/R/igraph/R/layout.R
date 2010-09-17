@@ -262,7 +262,7 @@ layout.reingold.tilford <- function(graph, ..., params=list()) {
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_layout_reingold_tilford", graph,
-               as.igraph.vs(graph, params$root),
+               as.igraph.vs(graph, params$root)-1,
                as.double(params$mode), as.double(params$rootlevel),
                as.logical(params$circular),
                PACKAGE="igraph")

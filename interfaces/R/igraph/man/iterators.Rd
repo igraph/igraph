@@ -175,7 +175,7 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
 # mean degree of vertices in the largest cluster in a random graph
 g <- erdos.renyi.game(100, 2/100)
 c <- clusters(g)
-vsl <- which(which.max(c$csize)-1==c$membership)-1
+vsl <- which(which.max(c$csize)==c$membership)
 mean(degree(g, vsl))
 
 # set the color of these vertices to red, others greens
@@ -195,16 +195,16 @@ for (v in vsl) {
 }
 
 # the mode argument of the nei() function
-g <- graph( c(0,1, 1,2, 1,3, 3,1) )
-V(g)[ nei( c(1,3) ) ]
-V(g)[ nei( c(1,3), "in") ]
-V(g)[ nei( c(1,3), "out") ]
+g <- graph( c(1,2, 2,3, 2,4, 4,2) )
+V(g)[ nei( c(2,4) ) ]
+V(g)[ nei( c(2,4), "in") ]
+V(g)[ nei( c(2,4), "out") ]
 
 # operators for edge sequences
 g <- barabasi.game(100, power=0.3)
-E(g) [ 0:2 \%--\% 1:5 ]
-E(g) [ 0:2 \%->\% 1:5 ]
-E(g) [ 0:2 \%<-\% 1:5 ]
+E(g) [ 1:3 \%--\% 2:6 ]
+E(g) [ 1:5 \%->\% 1:6 ]
+E(g) [ 1:3 \%<-\% 2:6 ]
 
 # the edges along the diameter
 g <- barabasi.game(100, directed=FALSE)

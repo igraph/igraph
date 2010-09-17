@@ -36,7 +36,7 @@ graph.coreness(graph, mode=c("all", "out", "in"))
 \seealso{\code{\link{degree}}}
 \examples{
 g <- graph.ring(10)
-g <- add.edges(g, c(0,1, 1,2, 0,2))
+g <- add.edges(g, c(1,2, 2,3, 1,3))
 graph.coreness(g) 		% small core triangle in a ring
 }
 \keyword{graphs}

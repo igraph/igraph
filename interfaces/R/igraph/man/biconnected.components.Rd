@@ -45,7 +45,7 @@ biconnected.components(graph)
 \examples{
 g <- graph.disjoint.union( graph.full(5), graph.full(5) )
 clu <- clusters(g)$membership
-g <- add.edges(g, c(which(clu==0), which(clu==1))-1)
+g <- add.edges(g, c(which(clu==1), which(clu==2)))
 bc <- biconnected.components(g)
 }
 \keyword{graphs}

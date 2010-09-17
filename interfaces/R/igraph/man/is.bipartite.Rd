@@ -50,7 +50,7 @@ is.bipartite(g2)
 
 ## A graph containing a triangle is not fine
 g3 <- graph.ring(10)
-g3 <- add.edges(g3, c(0,2))
+g3 <- add.edges(g3, c(1,3))
 is.bipartite(g3)
 }
 \keyword{graphs}

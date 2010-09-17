@@ -2048,6 +2048,27 @@ SEXP R_igraph_vectorlist_to_SEXP(const igraph_vector_ptr_t *ptr) {
   return result;
 }
 
+SEXP R_igraph_vectorlist_to_SEXP_p1(const igraph_vector_ptr_t *ptr) {
+  SEXP result;
+  long int i, n=igraph_vector_ptr_size(ptr);
+  
+  PROTECT(result=NEW_LIST(n));
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v=VECTOR(*ptr)[i];
+    long int j, vn=igraph_vector_size(v);
+    SEXP vs;
+    PROTECT(vs=NEW_NUMERIC(vn));
+    for (j=0; j<vn; j++) {
+      REAL(vs)[j] = VECTOR(*v)[j] + 1;
+    }
+    SET_VECTOR_ELT(result, i, vs);
+    UNPROTECT(1);
+  }
+  
+  UNPROTECT(1);
+  return result;
+}
+
 void R_igraph_vectorlist_destroy(igraph_vector_ptr_t *ptr) {
   long int i, n=igraph_vector_ptr_size(ptr);
   

@@ -50,8 +50,8 @@ delete.vertices(graph, v)
 % \seealso{}
 \examples{
 g <- graph.ring(10)
-add.edges(g, c(1,5,2,6) )
-delete.edges(g, E(g, P=c(0,9, 1,2)) )
-delete.vertices(g, c(1,6,7) )
+add.edges(g, c(2,6,3,7) )
+delete.edges(g, E(g, P=c(1,10, 2,3)) )
+delete.vertices(g, c(2,7,8) )
 }
 \keyword{graphs}

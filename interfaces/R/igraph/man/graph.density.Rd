@@ -36,7 +36,7 @@ g2 <- graph.full(n=10)
 g3 <- erdos.renyi.game(n=10, 0.4)
 
 # loop edges
-g <- graph( c(0,1, 1,1, 1,2) )
+g <- graph( c(1,2, 2,2, 2,3) )
 graph.density(g, loops=FALSE)              # this is wrong!!!
 graph.density(g, loops=TRUE)               # this is right!!!
 graph.density(simplify(g), loops=FALSE)    # this is also right, but different

@@ -142,7 +142,7 @@ centralization.closeness(g, mode="all")$centralization
 centralization.evcent(g, directed=FALSE)$centralization
 
 # The most centralized graph according to eigenvector centrality
-g0 <- graph( c(1,0), n=10, dir=FALSE )
+g0 <- graph( c(2,1), n=10, dir=FALSE )
 g1 <- graph.star(10, mode="undirected")
 centralization.evcent(g0)$centralization
 centralization.evcent(g1)$centralization
