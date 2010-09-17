@@ -214,7 +214,7 @@ i.get.label.degree <- function(graph, label.degree) {
 i.get.labels <- function(graph, labels=NULL) {
 
   if (is.null(labels)) {
-    labels <- 0:(vcount(graph)-1)
+    labels <- seq_len(vcount(graph))
   }
   labels
 }
