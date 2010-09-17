@@ -81,7 +81,8 @@ class CutTests(unittest.TestCase):
         self.failUnless(mc.value == 4)
         self.assertRaises(KeyError, self.g.mincut, "unknown")
 
-    def testAllSTCuts(self):
+    def testAllSTCuts1(self):
+        # Simple graph with four vertices
         g=Graph(4, [(0, 1), (0, 2), (1, 2), (1, 3), (2, 3)], directed=True)
         partitions = [((0, 1, 1, 1), 2), ((0, 0, 1, 1), 3),
                       ((0, 1, 0, 1), 2), ((0, 0, 0, 1), 2)]
@@ -96,6 +97,22 @@ class CutTests(unittest.TestCase):
             partitions.remove(membership)
         self.failUnless(partitions == [],
                 "expected partitions not seen: %r" % (partitions, ))
+
+    def testAllSTCuts2(self):
+        # "Ladder graph"
+        el  = zip(range(0, 5), range(1, 6))
+        el += zip(range(6, 11), range(7, 12))
+        el += zip(range(0, 6), range(6, 12))
+        g = Graph(el, directed=True)
+        cuts = g.all_st_cuts(0, 11)
+        self.assertEquals(len(cuts), 36)
+        self.assertEquals(len(set(tuple(cut.membership) for cut in cuts)), 36)
+        for cut in cuts:
+            g2 = g.copy()
+            g2.delete_edges(cut.es)
+            self.failIf(g2.is_connected(),
+                "%r is not a real cut" % (cut.membership,))
+            self.failIf(cut.value < 2 or cut.value > 6)
 
 
 def suite():
