@@ -11982,7 +11982,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"all_st_cuts", (PyCFunction) igraphmodule_Graph_all_st_cuts,
    METH_VARARGS | METH_KEYWORDS,
    "all_st_cuts(source, target)\n\n"
-   "Returns all the cuts between the source and target vertices.\n\n"
+   "Returns all the cuts between the source and target vertices in a\n"
+   "directed graph.\n\n"
    "This function lists all edge-cuts between a source and a target vertex.\n"
    "Every cut is listed exactly once.\n\n"
    "@param source: the source vertex ID\n"

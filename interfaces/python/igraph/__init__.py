@@ -49,6 +49,7 @@ import gzip
 import sys
 import operator
 from collections import defaultdict
+from itertools import izip
 from tempfile import mkstemp
 from warnings import warn
 
@@ -183,6 +184,27 @@ class Graph(GraphBase):
         """
         kwds['type'] = OUT
         return self.degree(*args, **kwds)
+
+    def all_st_cuts(self, source, target):
+        """all_st_cuts(source, target)
+
+        Returns all the cuts between the source and target vertices in a
+        directed graph.
+
+        This function lists all edge-cuts between a source and a target vertex.
+        Every cut is listed exactly once.
+
+        @param source: the source vertex ID
+        @param target: the target vertex ID
+        @return: a list of L{Cut} objects.
+
+        @newfield ref: Reference
+        @ref: JS Provan and DR Shier: A paradigm for listing (s,t)-cuts in
+          graphs. Algorithmica 15, 351--372, 1996.
+        """
+        print GraphBase.all_st_cuts(self, source, target)
+        return [Cut(self, cut=cut, partition=part)
+                for cut, part in izip(*GraphBase.all_st_cuts(self, source, target))]
 
     def biconnected_components(self, return_articulation_points=False):
         """biconnected_components(return_articulation_points=False)

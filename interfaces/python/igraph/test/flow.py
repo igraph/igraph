@@ -50,6 +50,14 @@ class MaxFlowTests(unittest.TestCase):
 
         self.assertRaises(KeyError, self.g.maxflow, 0, 3, "unknown")
 
+
+class CutTests(unittest.TestCase):
+    def setUp(self):
+        self.g=Graph(4, [(0, 1), (0, 2), (1, 2), (1, 3), (2, 3)])
+        self.capacities = [4, 2, 10, 2, 2]
+        for idx in range(self.g.ecount()):
+            self.g.es[idx]["capacity"]=self.capacities[idx]
+
     def testMinCutValue(self):
         self.failUnless(self.g.mincut_value(0, 3) == 2)
         self.failUnless(self.g.mincut_value(0, 3, self.capacities) == 4)
@@ -73,10 +81,27 @@ class MaxFlowTests(unittest.TestCase):
         self.failUnless(mc.value == 4)
         self.assertRaises(KeyError, self.g.mincut, "unknown")
 
+    def testAllSTCuts(self):
+        g=Graph(4, [(0, 1), (0, 2), (1, 2), (1, 3), (2, 3)], directed=True)
+        partitions = [((0, 1, 1, 1), 2), ((0, 0, 1, 1), 3),
+                      ((0, 1, 0, 1), 2), ((0, 0, 0, 1), 2)]
+        values = dict(partitions)
+        partitions = [partition for partition, _ in partitions]
+        for cut in g.all_st_cuts(0,3):
+            membership = tuple(cut.membership)
+            self.failUnless(membership in partitions,
+                "%r not found among expected partitions" % (membership,))
+            self.assertEquals(cut.value, values[membership])
+            self.assertEquals(len(cut.es), values[membership])
+            partitions.remove(membership)
+        self.failUnless(partitions == [],
+                "expected partitions not seen: %r" % (partitions, ))
+
 
 def suite():
     flow_suite = unittest.makeSuite(MaxFlowTests)
-    return unittest.TestSuite([flow_suite])
+    cut_suite = unittest.makeSuite(CutTests)
+    return unittest.TestSuite([flow_suite, cut_suite])
 
 def test():
     runner = unittest.TextTestRunner()
