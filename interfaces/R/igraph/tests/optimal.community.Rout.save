@@ -1,5 +1,5 @@
 
-R version 2.11.0 (2010-04-22)
+R version 2.11.1 (2010-05-31)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -28,7 +28,7 @@ Membership vector:
  [1] 0 0 0 0 1 1 1 0 2 2 1 0 0 0 2 2 1 0 2 0 2 0 2 3 3 3 2 3 3 2 2 3 2 2
 > membership(oc)
  [1] 0 0 0 0 1 1 1 0 2 2 1 0 0 0 2 2 1 0 2 0 2 0 2 3 3 3 2 3 3 2 2 3 2 2
-> modularity(g, oc$membership) == oc$modularity
+> abs(modularity(g, oc$membership) - oc$modularity) < 1e-14
 [1] TRUE
 > length(oc)
 [1] 4

@@ -5,6 +5,6 @@ g <- graph.famous("Zachary")
 oc <- optimal.community(g)
 oc
 membership(oc)
-modularity(g, oc$membership) == oc$modularity
+abs(modularity(g, oc$membership) - oc$modularity) < 1e-14
 length(oc)
 sizes(oc)

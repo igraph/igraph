@@ -5,6 +5,6 @@ g <- graph.famous("Zachary")
 mc <- multilevel.community(g)
 mc
 membership(mc)
-modularity(g, mc$membership) == max(mc$modularity)
+abs(modularity(g, mc$membership) - max(mc$modularity)) < 1e-14
 length(mc)
 sizes(mc)

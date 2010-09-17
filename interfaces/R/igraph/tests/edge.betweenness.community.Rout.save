@@ -1,5 +1,5 @@
 
-R version 2.11.0 (2010-04-22)
+R version 2.11.1 (2010-05-31)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -20,7 +20,7 @@ Type 'q()' to quit R.
 > 
 > g <- graph.famous("Zachary")
 > ebc <- edge.betweenness.community(g)
-> max(ebc$modularity) == modularity(g, ebc$membership)
+> abs(max(ebc$modularity) - modularity(g, ebc$membership)) < 1e-14
 [1] TRUE
 > ebc
 Graph community structure calculated with the edge betweenness algorithm
@@ -44,6 +44,6 @@ Community sizes
 > d[[2]]
 'dendrogram' with 2 branches and 19 members total, at height 32 
 > m2 <- cutat(ebc, no=3)
-> modularity(g, m2) == ebc$modularity[length(ebc$modularity)-2]
+> abs(modularity(g, m2) - ebc$modularity[length(ebc$modularity)-2]) < 1e-14
 [1] TRUE
 > 
