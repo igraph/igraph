@@ -877,8 +877,7 @@ int igraph_reindex_membership(igraph_vector_t *membership,
  * The functions documented in these section implement the 
  * <quote>leading eigenvector</quote> method developed by Mark Newman and 
  * published in MEJ Newman: Finding community structure using the
- * eigenvectors of matrices, arXiv:physics/0605087. TODO: proper
- * citation.</para>
+ * eigenvectors of matrices, Phys Rev E 74:036104 (2006).</para>
  * 
  * <para>
  * The heart of the method is the definition of the modularity matrix,
