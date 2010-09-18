@@ -627,8 +627,7 @@ int igraph_modularity(const igraph_t *graph,
  * The functions documented in these section implement the 
  * <quote>leading eigenvector</quote> method developed by Mark Newman and 
  * published in MEJ Newman: Finding community structure using the
- * eigenvectors of matrices, arXiv:physics/0605087. TODO: proper
- * citation.</para>
+ * eigenvectors of matrices, Phys Rev E 74:036104 (2006).</para>
  * 
  * <para>
  * The heart of the method is the definition of the modularity matrix,
@@ -736,8 +735,9 @@ int igraph_i_community_leading_eigenvector_naive(igraph_real_t *to,
  * then recursively takes \p steps steps by splitting the components
  * as individual network. This is not the correct way however, see
  * MEJ Newman: Finding community structure in networks using the
- * eigenvectors of matrices, arXiv:physics/0605087. Consider using the 
- * correct \ref igraph_community_leading_eigenvector() function instead.
+ * eigenvectors of matrices, Phys Rev E 74:036104 (2006). Consider
+ * using the correct \ref igraph_community_leading_eigenvector()
+ * function instead.
  * \param graph The input graph, should be undirected to make sense.
  * \param merges The merge matrix. The splits done by the algorithm
  *    are stored here, its structure is the same ad for \ref
@@ -1042,7 +1042,7 @@ int igraph_i_community_leading_eigenvector(igraph_real_t *to,
  * divisive algorithm: each split is done by maximizing the modularity 
  * regarding the original network, see MEJ Newman: Finding community
  * structure in networks using the eigenvectors of matrices,
- * arXiv:physics/0605087.
+ * Phys Rev E 74:036104 (2006).
  * 
  * \param graph The undirected input graph.
  * \param merges The result of the algorithm, a matrix containing the
@@ -1349,7 +1349,7 @@ int igraph_i_community_leading_eigenvector_step(igraph_real_t *to,
  * Do one split according to Mark Newman's leading eigenvector
  * community detection method. See MEJ Newman: Finding community
  * structure in networks using the eigenvectors of matrices,
- * arXiv:phyisics/0605087 for the details.
+ * Phys Rev E 74:036104 (2006) for the details.
  * 
  * </para><para>Use this function instead of \ref
  * igraph_community_leading_eigenvector() if you want to have full
@@ -1835,4 +1835,3 @@ int igraph_community_label_propagation(const igraph_t *graph,
 
   return 0;
 }
-
