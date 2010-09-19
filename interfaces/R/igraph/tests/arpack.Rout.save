@@ -1,0 +1,50 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> ####
+> 
+> f <- function(x, extra=NULL) x
+> res <- arpack(f, options=list(n=10, nev=2, ncv=4), sym=TRUE)
+> res$values
+[1] 1 1
+> 
+> ####
+> 
+> f <- function(x, extra=NULL) {
++   y <- x
++   y[1] <- (length(x)-1)*x[1] - sum(x[-1])
++   for (i in 2:length(x)) {
++     y[i] <- x[i] - x[1]
++   }
++   y
++ }
+> r1 <- arpack(f, options=list(n=10, nev=1, ncv=3), sym=TRUE)
+> r2 <- eigen(graph.laplacian(graph.star(10, mode="undirected")))
+> 
+> correctSign <- function(x) { if (x[1]<0) { -x } else { x } }
+> r1$values == r2$values[1]
+[1] TRUE
+> max(abs(correctSign(r1$vectors) - correctSign(r2$vectors[,1]))) < 1e-14
+[1] TRUE
+> 
+> ####
+> 
+> # TODO: further tests for typically hard cases
+> 

@@ -24,7 +24,7 @@ articulation.points(graph)
 \examples{
 g <- graph.disjoint.union( graph.full(5), graph.full(5) )
 clu <- clusters(g)$membership
-g <- add.edges(g, c(which(clu==1), which(clu==2)))
+g <- add.edges(g, c(match(1, clu), match(2, clu)) )
 articulation.points(g)
 }
 \keyword{graphs}

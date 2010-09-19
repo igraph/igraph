@@ -1,0 +1,45 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> g <- graph.formula( A-B-C, B-D )
+> are.connected(g, "A", "B")
+[1] TRUE
+> are.connected(g, "B", "A")
+[1] TRUE
+> are.connected(g, "A", "D")
+[1] FALSE
+> 
+> g2 <- graph( c(1,2, 2,3, 3,4), dir=FALSE )
+> are.connected(g2, 1,2)
+[1] TRUE
+> are.connected(g2, 3,2)
+[1] TRUE
+> are.connected(g2, 4,1)
+[1] FALSE
+> 
+> g3 <- graph.formula( A-+B-+C, B-+D )
+> are.connected(g3, "A", "C")
+[1] FALSE
+> are.connected(g3, "A", "B")
+[1] TRUE
+> are.connected(g3, "B", "A")
+[1] FALSE
+> 
+> 

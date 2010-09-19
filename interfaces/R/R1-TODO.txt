@@ -9,46 +9,46 @@ $<-.igraph.vs
 %--%
 %->%
 %<-%
-%c%
-%du%
-%m%
-%s%
-%u%
-E
-E<-
-V
-V<-
+%c%					C
+%du%					C
+%m%					C
+%s%					C
+%u%					C
+E					C
+E<-					C
+V					C
+V<-					C
 [.igraph.es
 [.igraph.vs
 [<-.igraph.es
 [<-.igraph.vs
-add.edges
-add.vertices
+add.edges				C
+add.vertices				C
 aging.ba.game
 aging.barabasi.game
 aging.prefatt.game
 algorithm
-all.st.cuts
-all.st.mincuts
-alpha.centrality
-are.connected
-arpack
+all.st.cuts				C
+all.st.mincuts				C
+alpha.centrality			C
+are.connected				C
+arpack					C
 arpack.unpack.complex
-articulation.points
-as.directed
-as.undirected
-assortativity
-assortativity.degree
-assortativity.nominal
+articulation.points			C
+as.directed				C
+as.undirected				C
+assortativity				C
+assortativity.degree			C
+assortativity.nominal			C
 asymmetric.preference.game
-authority.score
-average.path.length
-ba.game
-barabasi.game
-betweenness
+authority.score				C
+average.path.length			C
+ba.game					C
+barabasi.game				C
+betweenness				C			
 betweenness.estimate
-bibcoupling
-biconnected.components
+bibcoupling				
+biconnected.components			
 bipartite.projection
 bipartite.projection.size
 blockGraphs
@@ -189,7 +189,7 @@ graph.union.by.name
 grg.game
 growing.random.game
 hierarchy
-hub.score
+hub.score				C
 igraph.arpack.default
 igraph.drl.coarsen
 igraph.drl.coarsest

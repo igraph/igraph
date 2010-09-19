@@ -1,0 +1,59 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> ashs <- function(graph, as=TRUE) {
++   mscale <- function(x) {
++     if (sd(x)!=0) { x <- scale(x) }
++     if (x[1] < 0) { x <- -x       }
++     x
++   }
++   A <- get.adjacency(graph)
++   if (as) { 
++     s1 <- eigen(t(A) %*% A)$vectors[,1]
++     s2 <- authority.score(graph)$vector
++   } else {
++     s1 <- eigen(A %*% t(A))$vectors[,1]
++     s2 <- hub.score(graph)$vector
++   }    
++   all(abs(mscale(s1) - mscale(s2)) < 1e-12)
++ }
+> 
+> g1 <- ba.game(100, m=10)
+> ashs(g1)
+[1] TRUE
+> ashs(g1, as=FALSE)
+[1] TRUE
+> 
+> g2 <- erdos.renyi.game(100, 2/100)
+> ashs(g2)
+[1] TRUE
+> ashs(g2, as=FALSE)
+[1] TRUE
+> 
+> g3 <- graph.ring(100)
+> all(authority.score(g3)$vector == 1)
+[1] TRUE
+> all(hub.score(g3)$vector == 1)
+[1] TRUE
+> 
+> 
+> 
+> 
+> 

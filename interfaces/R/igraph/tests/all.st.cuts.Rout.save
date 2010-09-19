@@ -1,0 +1,153 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> g <- graph.formula( a -+ b -+ c -+ d -+ e )
+> all.st.cuts(g, source="a", target="e")
+$cuts
+$cuts[[1]]
+[1] 1
+
+$cuts[[2]]
+[1] 2
+
+$cuts[[3]]
+[1] 3
+
+$cuts[[4]]
+[1] 4
+
+
+$partition1s
+$partition1s[[1]]
+[1] 1
+
+$partition1s[[2]]
+[1] 1 2
+
+$partition1s[[3]]
+[1] 1 2 3
+
+$partition1s[[4]]
+[1] 1 2 3 4
+
+
+> 
+> g2 <- graph.formula( s -+ a:b -+ t, a -+ 1:2:3 -+ b )
+> all.st.cuts(g2, source="s", target="t")
+$cuts
+$cuts[[1]]
+[1] 1 2
+
+$cuts[[2]]
+[1] 1 4
+
+$cuts[[3]]
+[1] 2 3 5 6 7
+
+$cuts[[4]]
+[1]  2  3  5  6 10
+
+$cuts[[5]]
+[1] 2 3 5 7 9
+
+$cuts[[6]]
+[1]  2  3  5  9 10
+
+$cuts[[7]]
+[1] 2 3 6 7 8
+
+$cuts[[8]]
+[1]  2  3  6  8 10
+
+$cuts[[9]]
+[1] 2 3 7 8 9
+
+$cuts[[10]]
+[1]  2  3  8  9 10
+
+$cuts[[11]]
+[1] 3 4
+
+
+$partition1s
+$partition1s[[1]]
+[1] 1
+
+$partition1s[[2]]
+[1] 1 3
+
+$partition1s[[3]]
+[1] 1 2
+
+$partition1s[[4]]
+[1] 1 2 7
+
+$partition1s[[5]]
+[1] 1 2 6
+
+$partition1s[[6]]
+[1] 1 2 6 7
+
+$partition1s[[7]]
+[1] 1 2 5
+
+$partition1s[[8]]
+[1] 1 2 5 7
+
+$partition1s[[9]]
+[1] 1 2 5 6
+
+$partition1s[[10]]
+[1] 1 2 5 6 7
+
+$partition1s[[11]]
+[1] 1 2 5 6 7 3
+
+
+> 
+> g3 <- graph.formula( s -+ a:b -+ t, a -+ 1:2:3:4:5 -+ b )
+> all.st.mincuts(g2, source="s", target="t")
+$value
+[1] 2
+
+$cuts
+$cuts[[1]]
+[1] 1 2
+
+$cuts[[2]]
+[1] 1 4
+
+$cuts[[3]]
+[1] 3 4
+
+
+$partition1s
+$partition1s[[1]]
+[1] 1
+
+$partition1s[[2]]
+[1] 1 3
+
+$partition1s[[3]]
+[1] 1 3 2 7 6 5
+
+
+> 
+> 

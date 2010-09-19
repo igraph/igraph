@@ -1,0 +1,40 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> g.1 <- graph( c(1,3,2,3,3,4,4,5) )
+> g.2 <- graph( c(2,1,3,1,4,1,5,1) )
+> g.3 <- graph( c(1,2,2,3,3,4,4,1,5,1) )
+> alpha.centrality(g.1)
+Loading required package: Matrix
+Loading required package: lattice
+
+Attaching package: 'Matrix'
+
+The following object(s) are masked from 'package:base':
+
+    det
+
+[1] 1 1 3 4 5
+> alpha.centrality(g.2)
+[1] 5 1 1 1 1
+> alpha.centrality(g.3,alpha=0.5)
+[1] 2.533333 2.266667 2.133333 2.066667 1.000000
+> 
+> 

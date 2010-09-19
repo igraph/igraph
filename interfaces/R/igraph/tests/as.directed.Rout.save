@@ -1,0 +1,123 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> g <- erdos.renyi.game(100, 2/100)
+> g2 <- as.directed(g, mode="mutual")
+> g3 <- as.directed(g, mode="arbitrary")
+> 
+> all(degree(g) == degree(g3))
+[1] TRUE
+> all(degree(g) == degree(g2) / 2)
+[1] TRUE
+> 
+> graph.isomorphic(g, as.undirected(g2))
+[1] TRUE
+> graph.isomorphic(g, as.undirected(g3))
+[1] TRUE
+> 
+> ge <- graph.empty(10)
+> summary(as.directed(ge))
+Vertices: 10 
+Edges: 0 
+Directed: TRUE 
+No graph attributes.
+No vertex attributes.
+No edge attributes.
+> summary(as.directed(ge, "arbitrary"))
+Vertices: 10 
+Edges: 0 
+Directed: TRUE 
+No graph attributes.
+No vertex attributes.
+No edge attributes.
+> 
+> ge2 <- graph.empty()
+> summary(as.directed(ge2))
+Vertices: 0 
+Edges: 0 
+Directed: TRUE 
+No graph attributes.
+No vertex attributes.
+No edge attributes.
+> summary(as.directed(ge2, "arbitrary"))
+Vertices: 0 
+Edges: 0 
+Directed: TRUE 
+No graph attributes.
+No vertex attributes.
+No edge attributes.
+> 
+> #### Keeping attributes
+> 
+> g <- graph.formula( A-B-C, D-A, E )
+> g$name <- "Small graph"
+> g2 <- as.directed(g, mode="mutual")
+> g3 <- as.directed(g, mode="arbitrary")
+> g2
+Vertices: 5 
+Edges: 6 
+Directed: TRUE 
+Edges:
+              
+[1] 'A' -> 'B'
+[2] 'B' -> 'C'
+[3] 'A' -> 'D'
+[4] 'B' -> 'A'
+[5] 'C' -> 'B'
+[6] 'D' -> 'A'
+> g3
+Vertices: 5 
+Edges: 3 
+Directed: TRUE 
+Edges:
+              
+[1] 'A' -> 'B'
+[2] 'B' -> 'C'
+[3] 'A' -> 'D'
+> g2$name
+[1] "Small graph"
+> g3$name
+[1] "Small graph"
+> 
+> set.seed(42)
+> E(g)$weight <- runif(ecount(g))
+> print(as.directed(g, "mutual"), e=TRUE)
+Vertices: 5 
+Edges: 6 
+Directed: TRUE 
+Edges and their attributes:
+                  weight
+[1] 'A' -> 'B' 0.9148060
+[2] 'B' -> 'C' 0.9370754
+[3] 'A' -> 'D' 0.2861395
+[4] 'B' -> 'A' 0.9148060
+[5] 'C' -> 'B' 0.9370754
+[6] 'D' -> 'A' 0.2861395
+> print(as.directed(g, "arbitrary"), e=TRUE)
+Vertices: 5 
+Edges: 3 
+Directed: TRUE 
+Edges and their attributes:
+                  weight
+[1] 'A' -> 'B' 0.9148060
+[2] 'B' -> 'C' 0.9370754
+[3] 'A' -> 'D' 0.2861395
+> 
+> 

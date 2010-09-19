@@ -792,7 +792,7 @@ igraph_biconnected_components:
                 OUT EDGESETLIST_OR_0 tree_edges, \
                 OUT EDGESETLIST_OR_0 component_edges, \
                 OUT VERTEXSETLIST_OR_0 components, \
-                OUT VECTOR articulation_points
+                OUT VERTEXSET articulation_points
         DEPS: tree_edges ON graph, component_edges ON graph, \
               components ON graph
         NAME-R: biconnected.components
