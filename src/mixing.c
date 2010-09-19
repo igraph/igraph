@@ -57,7 +57,7 @@
  */
 
 int igraph_assortativity_nominal(const igraph_t *graph, 
-				 const igraph_vector_long_t *types,
+				 const igraph_vector_t *types,
 				 igraph_real_t *res,
 				 igraph_bool_t directed) {
 
@@ -68,13 +68,13 @@ int igraph_assortativity_nominal(const igraph_t *graph,
   long int e, i;
   igraph_real_t sumaibi=0.0, sumeii=0.0;
 
-  if (igraph_vector_long_size(types) != no_of_nodes) {
+  if (igraph_vector_size(types) != no_of_nodes) {
     IGRAPH_ERROR("Invalid `types' vector length", IGRAPH_EINVAL);
   }
 
   directed = directed && igraph_is_directed(graph);
 
-  no_of_types=igraph_vector_long_max(types)+1;
+  no_of_types=igraph_vector_max(types)+1;
   IGRAPH_VECTOR_INIT_FINALLY(&ai, no_of_types);
   IGRAPH_VECTOR_INIT_FINALLY(&bi, no_of_types);
   IGRAPH_VECTOR_INIT_FINALLY(&eii, no_of_types);

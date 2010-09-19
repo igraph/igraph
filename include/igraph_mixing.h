@@ -41,7 +41,7 @@
 __BEGIN_DECLS
 
 int igraph_assortativity_nominal(const igraph_t *graph, 
-				 const igraph_vector_long_t *types,
+				 const igraph_vector_t *types,
 				 igraph_real_t *res,
 				 igraph_bool_t directed);
 
