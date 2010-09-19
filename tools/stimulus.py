@@ -573,7 +573,12 @@ class RCCodeGenerator(CodeGenerator):
             if 'DECL' in t:
                 decl="  " + t['DECL']
             elif 'CTYPE' in t:
-                decl="  " + t['CTYPE'] + " " + cname + ";"
+                ctype = t['CTYPE']
+                if type(ctype)==dict:
+                    mode=params[pname]['mode']
+                    decl="  " + ctype[mode] + " " + cname + ";"
+                else:
+                    decl="  " + ctype + " " + cname + ";"
             else:
                 decl=""            
             return decl.replace("%C%", cname).replace("%I%", pname)
@@ -586,7 +591,12 @@ class RCCodeGenerator(CodeGenerator):
         if 'DECL' in rt:
             retdecl="  " + rt['DECL']
         elif 'CTYPE' in rt:
-            retdecl="  " + rt['CTYPE'] + " c_result;"
+            ctype=rt['CTYPE']
+            if type(ctype)==dict:
+                mode=params[pname]['mode']
+                retdecl="  " + ctype[mode] + " " + "c_result;"
+            else:
+                retdecl="  " + rt['CTYPE'] + " c_result;"
         else:
             retdecl=""
 
@@ -636,8 +646,16 @@ class RCCodeGenerator(CodeGenerator):
         usual %C% and %I% substitutions, otherwise the standard 'c_'
         prefixed C argument name is used.
         """
+        def docall(t, n):
+            if type(t)==dict:
+                mode=params[n]['mode']
+                return t[mode]
+            else:
+                return t
+        
         types=[ self.types[params[n]['type']] for n in params.keys() ]
-        call=map( lambda t, n: t.get('CALL', "c_"+n), types, params.keys() )
+        call=map( lambda t, n: docall(t.get('CALL', "c_"+n), n), types, 
+                  params.keys() )
         call=map( lambda c, n: c.replace("%C%", "c_"+n).replace("%I%", n),
                   call, params.keys() )
         return "  c_result=" + function + "(" + ", ".join(call) + ");\n"

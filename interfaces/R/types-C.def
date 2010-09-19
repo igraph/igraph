@@ -163,6 +163,27 @@ VECTOR:
          igraph_vector_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
 
+VECTORM1:
+  CTYPE: igraph_vector_t
+  CALL: &%C%
+  INCONV:
+    IN: R_SEXP_to_vector(%I%, &%C%);
+    OUT: if (0 != igraph_vector_init(&%C%, 0)) { \
+             igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(igraph_vector_destroy, &%C%);
+    INOUT: if (0 != R_SEXP_to_vector_copy(%I%, &%C%)) { \
+             igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+           } \
+         IGRAPH_FINALLY(igraph_vector_destroy, &%C%);
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_vector_to_SEXP(&%C%)); \
+         igraph_vector_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+    INOUT: PROTECT(%I%=R_igraph_vector_to_SEXP(&%C%)); \
+         igraph_vector_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
 VECTOR_BOOL:
   CTYPE: igraph_vector_bool_t
   CALL: &%C%
@@ -447,11 +468,23 @@ VERTEX:
 # Some vertices/edges of a graph
 
 VERTEXSET:
-  CTYPE: igraph_vs_t
+  CTYPE: 
+    IN: igraph_vs_t
+    OUT: igraph_vector_t
+  CALL: 
+    IN: %C%
+    OUT: &%C%
   INCONV:
     IN: R_SEXP_to_igraph_vs(%I%, &%C1%, &%C%);
+    OUT: if (0 != igraph_vector_init(&%C%, 0)) { \
+             igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(igraph_vector_destroy, &%C%);
   OUTCONV:
     IN: igraph_vs_destroy(&%C%);
+    OUT: PROTECT(%I%=R_igraph_vector_to_SEXPp1(&%C%)); \
+         igraph_vector_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
 
 EDGESET:
   CTYPE: igraph_es_t

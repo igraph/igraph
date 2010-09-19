@@ -1854,6 +1854,18 @@ SEXP R_igraph_vector_to_SEXP(igraph_vector_t *v) {
   return result;
 }
 
+SEXP R_igraph_vector_to_SEXPp1(const igraph_vector_t *v) {
+  SEXP result;
+  long int i, n=igraph_vector_size(v);
+
+  PROTECT(result=NEW_NUMERIC(n));
+  for (i=0; i<n; i++) {
+    REAL(result)[i]=VECTOR(*v)[i]+1;
+  }
+  UNPROTECT(1);
+  return result;
+}  
+
 SEXP R_igraph_0orvector_to_SEXP(igraph_vector_t *v) {
   SEXP result;
   if (v) {

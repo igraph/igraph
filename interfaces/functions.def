@@ -671,7 +671,7 @@ igraph_centralization_eigenvector_centrality_tmax:
         NAME-R: centralization.evcent.tmax
 
 igraph_assortativity_nominal:
-        PARAMS: GRAPH graph, VECTOR_LONG types, OUT REALPTR res, \
+        PARAMS: GRAPH graph, VECTORM1 types, OUT REALPTR res, \
                 BOOLEAN directed=True
         NAME-R: assortativity.nominal
 
@@ -783,7 +783,8 @@ igraph_decompose:
         IGNORE: RR, RC, RNamespace
 
 igraph_articulation_points:
-        PARAMS: GRAPH graph, OUT VECTOR res
+        PARAMS: GRAPH graph, OUT VERTEXSET res
+        DEPS: res ON graph
         NAME-R: articulation.points
 
 igraph_biconnected_components:

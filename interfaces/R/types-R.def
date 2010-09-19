@@ -23,6 +23,9 @@ VECTOR:
 VECTOR_LONG:
     INCONV: %I% <- as.integer(%I%)
 
+VECTORM1:
+    INCONV: %I% <- as.numeric(%I%)-1
+
 VECTOR_OR_0:
     INCONV: if (!is.null(%I%)) %I% <- as.numeric(%I%)
 
