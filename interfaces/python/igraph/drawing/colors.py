@@ -27,6 +27,7 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 from math import ceil
 
 __all__ = ["Palette", "GradientPalette", "AdvancedGradientPalette", \
+    "RainbowPalette", \
     "PrecalculatedPalette", "ClusterColoringPalette", \
     "color_name_to_rgb", "color_name_to_rgba", \
     "hsv_to_rgb", "hsva_to_rgba", "hsl_to_rgb", "hsla_to_rgba", \
@@ -199,6 +200,67 @@ class AdvancedGradientPalette(Palette):
                 return tuple([colors[i][x]*(1-ratio)+colors[i+1][x]*ratio \
                         for x in range(4)])
         return (0., 0., 0., 1.)
+
+class RainbowPalette(Palette):
+    """A palette that varies the hue of the colors along a scale.
+
+    Colors in a rainbow palette all have the same saturation, value and
+    alpha components, while the hue is varied between two given extremes
+    linearly. This palette has the advantage that it wraps around nicely
+    if the hue is varied between zero and one (which is the default).
+
+    Example:
+
+        >>> pal = RainbowPalette(n=120)
+        >>> pal.get(0)
+        (1.0, 0.0, 0.0, 1.0)
+        >>> pal.get(20)
+        (1.0, 1.0, 0.0, 1.0)
+        >>> pal.get(40)
+        (0.0, 1.0, 0.0, 1.0)
+        >>> pal = RainbowPalette(n=120, s=1, v=0.5, alpha=0.75)
+        >>> pal.get(60)
+        (0.0, 0.5, 0.5, 0.75)
+        >>> pal.get(80)
+        (0.0, 0.0, 0.5, 0.75)
+        >>> pal.get(100)
+        (0.5, 0.0, 0.5, 0.75)
+        >>> pal = RainbowPalette(n=120)
+        >>> pal2 = RainbowPalette(n=120, start=0.5, end=0.5)
+        >>> pal.get(60) == pal2.get(0)
+        True
+        >>> pal.get(90) == pal2.get(30)
+        True
+
+    This palette was modeled after the C{rainbow} command of R.
+    """
+
+    def __init__(self, n=256, s=1, v=1, start=0, end=1, alpha=1):
+        """Creates a rainbow palette.
+
+        @param colors: the number of colors in the palette.
+        @param s: the saturation of the colors in the palette.
+        @param v: the value component of the colors in the palette.
+        @param start: the hue at which the rainbow begins (between 0 and 1).
+        @param end: the hue at which the rainbow ends (between 0 and 1).
+        @param alpha: the alpha component of the colors in the palette.
+        """
+        Palette.__init__(self, n)
+        self._s = float(clamp(s, 0, 1))
+        self._v = float(clamp(v, 0, 1))
+        self._alpha = float(clamp(alpha, 0, 1))
+        self._start = float(start)
+        if end == self._start:
+            end += 1
+        self._dh = (end - self._start) / n
+
+    def _get(self, v):
+        """Returns the color corresponding to the given color index.
+
+        @param v: numerical index of the color to be retrieved
+        @return: a 4-tuple containing the RGBA values"""
+        return hsva_to_rgba(self._start + v * self._dh,
+                self._s, self._v, self._alpha)
 
 
 class PrecalculatedPalette(Palette):
