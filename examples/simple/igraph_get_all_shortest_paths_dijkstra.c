@@ -64,6 +64,8 @@ void check_nrgeo(igraph_t *graph, igraph_vs_t vs,
     }
   }
   igraph_vit_destroy(&vit);
+
+  igraph_vector_destroy(&nrgeo2);
 }
 
 int main() {

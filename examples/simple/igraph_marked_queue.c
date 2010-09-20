@@ -55,6 +55,8 @@ int main() {
   if (!igraph_marked_queue_empty(&Q)) {
     return 2;
   }
-  
+
+  igraph_marked_queue_destroy(&Q);
+
   return 0;
 }

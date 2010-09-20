@@ -43,6 +43,7 @@ int main() {
   
   igraph_vector_init_seq(&weight, 1, igraph_ecount(&g));
   SETEANV(&g, "weight", &weight);
+  igraph_vector_destroy(&weight);
 
   /* ****************************************************** */
   igraph_copy(&g2, &g);

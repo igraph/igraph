@@ -82,6 +82,7 @@ int main() {
       }
     }
   igraph_matrix_destroy(&dist_mat);
+  igraph_matrix_destroy(&coords);
   igraph_destroy(&g);
 
   return 0;

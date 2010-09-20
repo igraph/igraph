@@ -39,7 +39,11 @@ int main() {
 
   igraph_blas_dgemv(0, 2, &m, &x, 3, &y);
   igraph_vector_print(&y);
-			  
+
+  igraph_vector_destroy(&x);
+  igraph_vector_destroy(&y);
+  igraph_matrix_destroy(&m);
+
   return 0;
 }
 

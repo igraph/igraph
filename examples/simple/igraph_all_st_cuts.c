@@ -213,7 +213,6 @@ int main() {
   	       0,1, 1,2,
   	       -1);
 
-  igraph_vector_ptr_init(&cuts, 0);
   igraph_vector_ptr_init(&partition1s, 0);
   igraph_all_st_cuts(&g, /*cuts=*/ 0, &partition1s,
 		     /*source=*/ 0, /*target=*/ 2);
@@ -235,7 +234,6 @@ int main() {
   	       0,1, 1,2, 1,3, 2,4, 3,4,
   	       -1);
 
-  igraph_vector_ptr_init(&cuts, 0);
   igraph_vector_ptr_init(&partition1s, 0);
   igraph_all_st_cuts(&g, /*cuts=*/ 0, &partition1s,
 		     /*source=*/ 0, /*target=*/ 4);
