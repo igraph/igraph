@@ -151,7 +151,12 @@ void graph_molloy_hash::restore(int* b) {
   int *dd = new int[n];
   memcpy(dd,deg,sizeof(int)*n);
   for(i=0; i<n; i++) deg[i] = 0;
-  for(i=0; i<n-1; i++) while(add_edge(i,*b,dd)) b++;
+  for(i=0; i<n-1; i++) {
+    while (deg[i] < dd[i]) {
+      add_edge(i, *b, dd);
+      b++;
+    }
+  }
   delete[] dd;
 }
 
@@ -316,7 +321,10 @@ unsigned long graph_molloy_hash::shuffle(unsigned long times,
         return 0;
     }
   }
-  
+
+  delete[] Kbuff;
+  delete[] visited;
+
   if (maxtimes <= all_swaps) { 
     IGRAPH_WARNING("Cannot shuffle graph, maybe there is only a single one?");
   }
