@@ -1775,6 +1775,35 @@ class Graph(GraphBase):
         return result
 
     @classmethod
+    def GRG(klass, n, radius, torus=False, return_coordinates=False):
+        """GRG(n, radius, torus=False, return_coordinates=False)
+
+        Generates a random geometric graph.
+
+        The algorithm drops the vertices randomly on the 2D unit square and
+        connects them if they are closer to each other than the given radius.
+        The coordinates of the vertices are stored in the vertex attributes C{x}
+        and C{y}.
+
+        @param n: The number of vertices in the graph
+        @param radius: The given radius
+        @param torus: This should be C{True} if we want to use a torus instead of a
+          square.
+        @param return_coordinates: whether the X and Y coordinates of the
+          vertices should be returned. If C{True}, a list for each dimension
+          will be returned along with the graph, packed in a tuple. This keyword
+          argument is deprecated and will be removed in igraph 0.7.
+        """
+        result, xs, ys = klass._GRG(n, radius, torus)
+        result.vs["x"] = xs
+        result.vs["y"] = ys
+        if return_coordinates:
+            warn("The return_coordinates=... keyword argument of Graph.GRG() is "
+                 "deprecated. It will be removed in igraph 0.7.")
+            return result, xs, ys
+        return result
+
+    @classmethod
     def Incidence(klass, *args, **kwds):
         """Incidence(matrix, directed=False, mode=ALL, multiple=False)
 
