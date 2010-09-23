@@ -48,14 +48,14 @@ barabasi.game				C
 betweenness				C			
 betweenness.estimate
 bibcoupling				
-biconnected.components			
-bipartite.projection
-bipartite.projection.size
+biconnected.components			C
+bipartite.projection			C
+bipartite.projection.size		C
 blockGraphs
 blocks
-bonpow
+bonpow					C
 callaway.traits.game
-canonical.permutation
+canonical.permutation			C
 centralization.betweenness
 centralization.betweenness.tmax
 centralization.closeness
@@ -67,70 +67,69 @@ centralization.evcent.tmax
 centralize.scores
 cited.type.game
 citing.cited.type.game
-clique.number
-cliques
-closeness
+clique.number				C
+cliques					C
+closeness				C
 closeness.estimate
 cluster.distribution
-clusters
+clusters				C
 cocitation
 cohesion
 cohesive.blocks
 cohesive.blocks.old
-communities
+communities				C
 community.le.to.membership
 community.to.membership
 compare.communities
 connect.neighborhood
-constraint
-contract.vertices
+constraint				C
+contract.vertices			C
 convex.hull
-count.multiple
-crossing
-cutat
-decompose.graph
-degree
+count.multiple				C
+crossing				C
+cutat					C
+decompose.graph				C
+degree					C
 degree.distribution
-degree.sequence.game
-delete.edges
-delete.vertices
-diameter
-dominator.tree
-dyad.census
+degree.sequence.game			C
+delete.edges				C
+delete.vertices				C
+diameter				C
+dominator.tree				C
+dyad.census				C
 ecount
-edge.betweenness
-edge.betweenness.community
+edge.betweenness			C
+edge.betweenness.community		C
 edge.betweenness.community.merges
 edge.betweenness.estimate
-edge.connectivity
+edge.connectivity			C
 edge.disjoint.paths
 erdos.renyi.game
 establishment.game
-evcent
+evcent					C
 evolver.d
 exportPajek
-farthest.nodes
-fastgreedy.community
+farthest.nodes				C
+fastgreedy.community			C
 forest.fire.game
-get.adjacency
-get.adjedgelist
-get.adjlist
-get.all.shortest.paths
-get.diameter
-get.edge
+get.adjacency				C
+get.adjedgelist				C
+get.adjlist				C
+get.all.shortest.paths			C
+get.diameter				C
+get.edge				C
 get.edge.attribute
-get.edgelist
-get.edges
+get.edgelist				C
 get.graph.attribute
-get.incidence
-get.shortest.paths
+get.incidence				C
+get.shortest.paths			C
 get.vertex.attribute
-girth
+girth					C
 graph
-graph.adhesion
-graph.adjacency
-graph.adjlist
-graph.atlas
+graph.adhesion				C
+graph.adjacency				C
+graph.adjlist				C
+graph.atlas				C
 graph.automorphisms
 graph.bfs
 graph.bipartite

@@ -102,9 +102,9 @@ plot.igraph <- function(x,
     if (length(vertex.size)==1) {
       vs <- vertex.size
     } else {
-      vs <- rep(vertex.size, length=vcount(graph))[v+1]
+      vs <- rep(vertex.size, length=vcount(graph))[v]
     }
-    igraph.polygon(layout[v+1,,drop=FALSE],
+    igraph.polygon(layout[v,,drop=FALSE],
                    vertex.size=vs,
                    expand.by=mark.expand[g]/200,
                    shape=mark.shape[g],

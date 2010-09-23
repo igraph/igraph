@@ -88,7 +88,8 @@ farthest.nodes <- function(graph, directed=TRUE, unconnected=TRUE,
   res <- .Call("R_igraph_farthest_points", graph, as.logical(directed),
                as.logical(unconnected), weights,
                PACKAGE="igraph")
-  res + 1
+  res[1:2] <- res[1:2] + 1
+  res
 }       
 
 average.path.length <- function(graph, directed=TRUE, unconnected=TRUE) {
@@ -236,14 +237,13 @@ get.all.shortest.paths <- function(graph, from,
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   if (is.null(weights)) {
     res <- .Call("R_igraph_get_all_shortest_paths", graph,
-                 as.numeric(from)-1, as.igraph.vs(graph, to)-1,
+                 as.igraph.vs(graph, from)-1, as.igraph.vs(graph, to)-1,
                  as.numeric(mode), PACKAGE="igraph")
   } else {
     res <- .Call("R_igraph_get_all_shortest_paths_dijkstra", graph, 
-                 as.numeric(from)-1, as.igraph.vs(graph, to)-1, weights,
-                 as.numeric(mode), PACKAGE="igraph")
+                 as.igraph.vs(graph, from)-1, as.igraph.vs(graph, to)-1,
+                 weights, as.numeric(mode), PACKAGE="igraph")
   }       
-  res <- lapply(res, function(x) x+1)
   res
 }
 

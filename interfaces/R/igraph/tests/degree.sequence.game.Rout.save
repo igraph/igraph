@@ -1,0 +1,58 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> gc <- function(graph) {
++   clu <- clusters(graph)
++   induced.subgraph(graph, which(clu$membership==which.max(clu$csize)))
++ }
+> 
+> g <- gc(erdos.renyi.game(1000, 2/1000))
+> 
+> nG <- degree.sequence.game(degree(g), method="simple")
+> all(degree(nG) == degree(g))
+[1] TRUE
+> 
+> nG <- degree.sequence.game(degree(g), method="vl")
+> all(degree(nG) == degree(g))
+[1] TRUE
+> is.connected(nG)
+[1] TRUE
+> is.simple(nG)
+[1] TRUE
+> 
+> #####
+> 
+> g <- erdos.renyi.game(1000, 1/1000)
+> 
+> nG <- degree.sequence.game(degree(g), method="simple")
+> all(degree(nG) == degree(g))
+[1] TRUE
+> 
+> g2 <- erdos.renyi.game(1000, 2/1000, dir=TRUE)
+> 
+> nG2 <- degree.sequence.game(degree(g, mode="out"),
++                             degree(g, mode="in"),
++                             method="simple")
+> all(degree(nG, mode="out") == degree(g, mode="out"))
+[1] TRUE
+> all(degree(nG, mode="in") == degree(g, mode="in"))
+[1] TRUE
+> 
+> 

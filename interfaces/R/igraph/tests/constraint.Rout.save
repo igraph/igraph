@@ -1,0 +1,62 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> constraint.orig <- function(graph, nodes=V(graph), attr=NULL) {
++   if (!is.igraph(graph)) {
++     stop("Not a graph object")
++   }
++   idx <- degree(graph) != 0
++   A <- get.adjacency(graph, attr=attr)
++   A <- A[idx, idx]
++   n <- sum(idx)
++   
++   one <- c(rep(1,n))
++   CZ <- A + t(A)
++   cs <- CZ %*% one                      # degree of vertices
++   ics <- 1/cs
++   CS <- ics %*% t(one)                  # 1/degree of vertices
++   P <- CZ * CS  #intermediate result: proportionate tie strengths
++   PSQ <- P%*%P #sum paths of length two
++   P.bi <- as.numeric(P>0)  #exclude paths to non-contacts (& reflexive):
++   PC <- (P + (PSQ*P.bi))^2  #dyadic constraint
++   ci <- PC %*% one      #overall constraint
++   dim(ci) <- NULL
++ 
++   ci2 <- numeric(vcount(graph))
++   ci2[idx] <- ci
++   ci2[!idx] <- NaN
++   ci2[nodes]
++ }
+> 
+> karate <- graph.famous("Zachary")
+> 
+> c1 <- constraint(karate)
+> c2 <- constraint.orig(karate)
+> max(abs(c1 - c2)) < 1e-14
+[1] TRUE
+> 
+> set.seed(42)
+> E(karate)$weight <- sample(1:10, replace=TRUE, ecount(karate))
+> wc1 <- constraint(karate)
+> wc2 <- constraint.orig(karate, attr="weight")
+> max(abs(wc1 - wc2)) < 1e-14
+[1] TRUE
+> 
+> 

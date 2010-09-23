@@ -74,7 +74,7 @@ cp1 <- canonical.permutation(g1)
 cf1 <- permute.vertices(g1, cp1$labeling)
 
 ## Do the same with a random permutation of it
-g2 <- permute.vertices(g1, sample(vcount(g1))-1)
+g2 <- permute.vertices(g1, sample(vcount(g1)))
 cp2 <- canonical.permutation(g2)
 cf2 <- permute.vertices(g2, cp2$labeling)
 

@@ -59,7 +59,7 @@ int R_SEXP_to_igraph_vs(SEXP rit, igraph_t *graph, igraph_vs_t *it);
 int R_SEXP_to_igraph_es(SEXP rit, igraph_t *graph, igraph_es_t *it);
 int R_SEXP_to_igraph_adjlist(SEXP vectorlist, igraph_adjlist_t *ptr);
 int R_SEXP_to_vector_bool(SEXP sv, igraph_vector_bool_t *v);
-int R_SEXP_to_vector_long(SEXP sv, igraph_vector_long_t *v);
+int R_SEXP_to_vector_int(SEXP sv, igraph_vector_int_t *v);
 
 /* get the list element named str, or return NULL */
 /* from the R Manual */
@@ -1877,6 +1877,17 @@ SEXP R_igraph_0orvector_to_SEXP(igraph_vector_t *v) {
   return result;
 }
 
+SEXP R_igraph_0orvector_to_SEXPp1(igraph_vector_t *v) {
+  SEXP result;
+  if (v) {
+    PROTECT(result=R_igraph_vector_to_SEXPp1(v));
+  } else {
+    PROTECT(result=R_NilValue);
+  }
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_vector_bool_to_SEXP(igraph_vector_bool_t *v) {
   SEXP result;
   long int n=igraph_vector_bool_size(v);
@@ -2144,8 +2155,8 @@ int R_SEXP_to_vector_bool(SEXP sv, igraph_vector_bool_t *v) {
   return 0;
 }
 
-int R_SEXP_to_vector_long(SEXP sv, igraph_vector_long_t *v) {
-  v->stor_begin=(long int*) INTEGER(sv);
+int R_SEXP_to_vector_int(SEXP sv, igraph_vector_int_t *v) {
+  v->stor_begin=(int*) INTEGER(sv);
   v->stor_end=v->stor_begin+GET_LENGTH(sv);
   v->end=v->stor_end;
   return 0;
@@ -5311,40 +5322,6 @@ SEXP R_igraph_motifs_randesu_estimate(SEXP graph, SEXP psize, SEXP pcutprob,
   return result;
 }
 
-SEXP R_igraph_get_all_shortest_paths(SEXP graph, SEXP pfrom, SEXP pto,
-				     SEXP pmode) {
-  
-  igraph_t g;
-  igraph_integer_t from=REAL(pfrom)[0];
-  igraph_vs_t to;
-  igraph_integer_t mode=REAL(pmode)[0];
-  igraph_vector_ptr_t res;
-  SEXP result;
-  long int i;
-
-  R_igraph_before();
-  
-  R_SEXP_to_igraph(graph, &g);
-  R_SEXP_to_igraph_vs(pto, &g, &to);
-  igraph_vector_ptr_init(&res, 0);
-  igraph_get_all_shortest_paths(&g, &res, 0, from, to, mode);
-  PROTECT(result=NEW_LIST(igraph_vector_ptr_size(&res)));
-  for (i=0; i<igraph_vector_ptr_size(&res); i++) {
-    long int len=igraph_vector_size(VECTOR(res)[i]);
-    SET_VECTOR_ELT(result, i, NEW_NUMERIC(len));
-    igraph_vector_copy_to(VECTOR(res)[i], REAL(VECTOR_ELT(result, i)));
-    igraph_vector_destroy(VECTOR(res)[i]);
-    igraph_free(VECTOR(res)[i]);
-  }
-  igraph_vector_ptr_destroy(&res);
-  igraph_vs_destroy(&to);
-  
-  R_igraph_after();
-  
-  UNPROTECT(1);
-  return result;
-}
-
 SEXP R_igraph_layout_merge_dla(SEXP graphs, SEXP layouts, SEXP verbose) {
 
   igraph_vector_ptr_t graphvec;
@@ -7385,7 +7362,7 @@ SEXP R_igraph_girth(SEXP graph, SEXP pcircle) {
   PROTECT(result=NEW_LIST(2));
   SET_VECTOR_ELT(result, 0, NEW_NUMERIC(1));
   REAL(VECTOR_ELT(result, 0))[0]=girth;
-  SET_VECTOR_ELT(result, 1, R_igraph_0orvector_to_SEXP(ppcircle));
+  SET_VECTOR_ELT(result, 1, R_igraph_0orvector_to_SEXPp1(ppcircle));
   if (ppcircle) { igraph_vector_destroy(ppcircle); }
   PROTECT(names=NEW_CHARACTER(2));
   SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("girth"));

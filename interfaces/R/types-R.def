@@ -29,6 +29,9 @@ VECTORM1:
 VECTOR_OR_0:
     INCONV: if (!is.null(%I%)) %I% <- as.numeric(%I%)
 
+VECTORM1_OR_0:
+    INCONV: if (!is.null(%I%)) %I% <- as.numeric(%I%)-1
+
 VECTOR_LONG_OR_0:
     INCONV: if (!is.null(%I%)) %I% <- as.integer(%I%)
 
@@ -138,7 +141,7 @@ VERTEX_COLOR:
                } \
             } \
             if (!is.null(%I%)) { \
-               %I% <- as.integer(%I%) \
+               %I% <- as.integer(%I%)-1 \
             }
 
 EDGE_COLOR:
@@ -150,7 +153,7 @@ EDGE_COLOR:
                } \
             } \
             if (!is.null(%I%)) { \
-               %I% <- as.integer(%I%) \
+               %I% <- as.integer(%I%)-1 \
             }
 
 NULL:

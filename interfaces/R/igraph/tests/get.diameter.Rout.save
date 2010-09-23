@@ -1,0 +1,43 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> g <- graph.ring(10)
+> E(g)$weight <- sample(seq_len(ecount(g)))
+> d <- diameter(g)
+> gd <- get.diameter(g)
+> sp <- shortest.paths(g)
+> 
+> d == max(sp)
+[1] TRUE
+> sp[ gd[1], gd[length(gd)] ] == d
+[1] TRUE
+> 
+> d <- diameter(g, weights=NA)
+> gd <- get.diameter(g, weights=NA)
+> sp <- shortest.paths(g, weights=NA)
+> 
+> d == max(sp)
+[1] TRUE
+> length(gd) == d + 1
+[1] TRUE
+> sp[ gd[1], gd[length(gd)] ] == d
+[1] TRUE
+> 
+> 

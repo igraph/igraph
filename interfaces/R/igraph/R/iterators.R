@@ -177,21 +177,24 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
     adj <- function(v) {
       ## TRUE iff the edge is adjacent to at least one vertex in v
       on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v), as.numeric(3),
+      tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v)-1,
+                   as.numeric(3),
                    PACKAGE="igraph")
       tmp[ as.numeric(x) ]
     }
     from <- function(v) {
       ## TRUE iff the edge originates from at least one vertex in v
       on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v), as.numeric(1),
+      tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v)-1,
+                   as.numeric(1),
                    PACKAGE="igraph")
       tmp[ as.numeric(x) ]      
     }
     to <- function(v) {
       ## TRUE iff the edge points to at least one vertex in v
       on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v), as.numeric(2),
+      tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v)-1,
+                   as.numeric(2),
                    PACKAGE="igraph")
       tmp[ as.numeric(x) ]
     }

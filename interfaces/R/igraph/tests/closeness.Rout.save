@@ -1,0 +1,40 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> kite <- graph.formula(Andre    - Beverly:Carol:Diane:Fernando,
++                       Beverly  - Andre:Diane:Ed:Garth,
++                       Carol    - Andre:Diane:Fernando,
++                       Diane    - Andre:Beverly:Carol:Ed:Fernando:Garth,
++                       Ed       - Beverly:Diane:Garth,
++                       Fernando - Andre:Carol:Diane:Garth:Heather,
++                       Garth    - Beverly:Diane:Ed:Fernando:Heather,
++                       Heather  - Fernando:Garth:Ike,
++                       Ike      - Heather:Jane,
++                       Jane     - Ike)
+> kite <- simplify(kite)
+> clo <- structure(closeness(kite), names=V(kite)$name)
+> round(sort(clo, decreasing=TRUE), 3)
+Fernando    Garth    Diane  Heather    Andre  Beverly    Carol       Ed 
+   0.643    0.643    0.600    0.600    0.529    0.529    0.500    0.500 
+     Ike     Jane 
+   0.429    0.310 
+> 
+> ## TODO: weighted closeness
+> 

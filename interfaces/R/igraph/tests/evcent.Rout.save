@@ -1,0 +1,35 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> kite <- graph.formula(Andre    - Beverly:Carol:Diane:Fernando,
++                       Beverly  - Andre:Diane:Ed:Garth,
++                       Carol    - Andre:Diane:Fernando,
++                       Diane    - Andre:Beverly:Carol:Ed:Fernando:Garth,
++                       Ed       - Beverly:Diane:Garth,
++                       Fernando - Andre:Carol:Diane:Garth:Heather,
++                       Garth    - Beverly:Diane:Ed:Fernando:Heather,
++                       Heather  - Fernando:Garth:Ike,
++                       Ike      - Heather:Jane,
++                       Jane     - Ike)
+> kite <- simplify(kite)
+> round(evcent(kite)$vector, 3)
+ [1] 0.732 0.732 0.594 1.000 0.827 0.594 0.827 0.407 0.100 0.023
+> 
+> 

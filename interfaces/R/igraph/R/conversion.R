@@ -336,11 +336,11 @@ get.incidence.dense <- function(graph, types, names, attr) {
                  PACKAGE="igraph")
 
     if (names && "name" %in% list.vertex.attributes(graph)) {
-      rownames(res$res) <- V(graph)$name[ res$row_ids ]
-      colnames(res$res) <- V(graph)$name[ res$col_ids ]
+      rownames(res$res) <- V(graph)$name[ res$row_ids+1 ]
+      colnames(res$res) <- V(graph)$name[ res$col_ids+1 ]
     } else {
-      rownames(res$res) <- res$row_ids
-      colnames(res$res) <- res$col_ids
+      rownames(res$res) <- res$row_ids+1
+      colnames(res$res) <- res$col_ids+1
     }
     res$res
     

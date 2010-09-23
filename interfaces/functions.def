@@ -326,7 +326,7 @@ igraph_get_all_shortest_paths:
         PARAMS: GRAPH graph, OUT VERTEXSETLIST res, OUT VECTOR nrgeo, \
                 VERTEX from, VERTEXSET to, NEIMODE mode=OUT
         DEPS: res ON graph, from ON graph, to ON graph
-        IGNORE: RR, RC, RNamespace
+        IGNORE: RR, RNamespace
 
 igraph_shortest_paths_dijkstra:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, \
@@ -533,7 +533,7 @@ igraph_count_multiple:
         IGNORE: RR, RC, RNamespace
 
 igraph_girth:
-        PARAMS: GRAPH graph, OUT INTEGERPTR girth, OUT VECTOR circle
+        PARAMS: GRAPH graph, OUT INTEGERPTR girth, OUT VERTEXSET circle
         IGNORE: RR, RC, RNamespace
 
 igraph_add_edge:
@@ -685,7 +685,7 @@ igraph_assortativity_degree:
         NAME-R: assortativity.degree
 
 igraph_contract_vertices:
-        PARAMS: INOUT GRAPH graph, VECTOR mapping, \
+        PARAMS: INOUT GRAPH graph, VECTORM1 mapping, \
                 VERTEX_ATTRIBUTE_COMBINATION vertex_attr_comb=Default
         NAME-R: contract.vertices
 
@@ -1334,8 +1334,8 @@ igraph_cohesion:
 #######################################
 
 igraph_dominator_tree: 
-        PARAMS: GRAPH graph, VERTEX root, OUT VECTOR_OR_0 dom, \
-                OUT GRAPH_OR_0 domtree, OUT VECTOR_OR_0 leftout, \
+        PARAMS: GRAPH graph, VERTEX root, OUT VERTEXSET dom, \
+                OUT GRAPH_OR_0 domtree, OUT VERTEXSET leftout, \
                 NEIMODE mode=OUT
         DEPS: root ON graph
         NAME-R: dominator.tree
@@ -1416,7 +1416,7 @@ igraph_isomorphic_vf2:
                 VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2, \
                 EDGE_COLOR edge_color1, EDGE_COLOR edge_color2, \
                 OUT BOOLEANPTR iso, \
-                OUT VECTOR_OR_0 map12, OUT VECTOR_OR_0 map21
+                OUT VECTORM1_OR_0 map12, OUT VECTORM1_OR_0 map21
         DEPS: vertex_color1 ON graph1, vertex_color2 ON graph2, \
               edge_color1 ON graph1, edge_color2 ON graph2
 
@@ -1441,7 +1441,7 @@ igraph_subisomorphic_vf2:
                 VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2, \
                 EDGE_COLOR edge_color1, EDGE_COLOR edge_color2, \
                 OUT BOOLEANPTR iso, \
-                OUT VECTOR_OR_0 map12, OUT VECTOR_OR_0 map21
+                OUT VECTORM1_OR_0 map12, OUT VECTORM1_OR_0 map21
         DEPS: vertex_color1 ON graph1, vertex_color2 ON graph2, \
               edge_color1 ON graph1, edge_color2 ON graph2
 
@@ -1465,16 +1465,16 @@ igraph_isomorphic_34:
         PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso
 
 igraph_canonical_permutation:
-        PARAMS: GRAPH graph, OUT VECTOR labeling, BLISSSH sh="fm", OUT BLISSINFO info
+        PARAMS: GRAPH graph, OUT VECTORM1 labeling, BLISSSH sh="fm", OUT BLISSINFO info
         NAME-R: canonical.permutation
 
 igraph_permute_vertices:
-        PARAMS: GRAPH graph, OUT GRAPH res, VECTOR permutation
+        PARAMS: GRAPH graph, OUT GRAPH res, VECTORM1 permutation
         NAME-R: permute.vertices
 
 igraph_isomorphic_bliss:
         PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso, \
-                OUT VECTOR_OR_0 map12, OUT VECTOR_OR_0 map21, \
+                OUT VECTORM1_OR_0 map12, OUT VECTORM1_OR_0 map21, \
                 BLISSSH sh1="fm", BLISSSH sh2="fm", OUT BLISSINFO info1, \
                 OUT BLISSINFO info2
 

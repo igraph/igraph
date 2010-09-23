@@ -1,0 +1,86 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> set.seed(42)
+> 
+> g <- graph.full.bipartite(10,5)
+> proj <- bipartite.projection(g)
+> graph.isomorphic(proj[[1]], graph.full(10))
+[1] TRUE
+> graph.isomorphic(proj[[2]], graph.full(5))
+[1] TRUE
+> 
+> M <- matrix(0, nr=5, nc=3)
+> rownames(M) <- c("Alice", "Bob", "Cecil", "Dan", "Ethel")
+> colnames(M) <- c("Party", "Skiing", "Badminton")
+> M[] <- sample(0:1, length(M), replace=TRUE)
+> M
+      Party Skiing Badminton
+Alice     1      1         0
+Bob       1      1         1
+Cecil     0      0         1
+Dan       1      1         0
+Ethel     1      1         0
+> g2 <- graph.incidence(M)
+> g2$name <- "Event network"
+> proj2 <- bipartite.projection(g2)
+> print(proj2[[1]], g=TRUE, e=TRUE)
+Vertices: 5 
+Edges: 7 
+Directed: FALSE 
+Graph attributes:
+[[name]]
+[1] "Event network"
+Edges and their attributes:
+                       weight
+[1] 'Alice' -- 'Bob'        2
+[2] 'Alice' -- 'Dan'        2
+[3] 'Alice' -- 'Ethel'      2
+[4] 'Bob'   -- 'Dan'        2
+[5] 'Bob'   -- 'Ethel'      2
+[6] 'Bob'   -- 'Cecil'      1
+[7] 'Dan'   -- 'Ethel'      2
+> print(proj2[[2]], g=TRUE, e=TRUE)
+Vertices: 3 
+Edges: 3 
+Directed: FALSE 
+Graph attributes:
+[[name]]
+[1] "Event network"
+Edges and their attributes:
+                               weight
+[1] 'Party'     -- 'Skiing'         4
+[2] 'Party'     -- 'Badminton'      1
+[3] 'Skiing'    -- 'Badminton'      1
+> 
+> bipartite.projection.size(g2)
+$vcount1
+[1] 5
+
+$ecount1
+[1] 7
+
+$vcount2
+[1] 3
+
+$ecount2
+[1] 3
+
+> 

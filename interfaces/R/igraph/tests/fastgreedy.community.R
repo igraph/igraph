@@ -1,6 +1,8 @@
 
 library(igraph)
 
+set.seed(42)
+
 g <- graph.famous("Zachary")
 fc <- fastgreedy.community(g)
 fc

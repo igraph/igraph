@@ -1,0 +1,55 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> gc <- function(graph) {
++   clu <- clusters(graph)
++   induced.subgraph(graph, which(clu$membership==which.max(clu$csize)))
++ }
+> 
+> #### Undirected
+> 
+> g <- gc(erdos.renyi.game(30, 3/30))
+> sp <- shortest.paths(g)
+> max(sp) == diameter(g)
+[1] TRUE
+> 
+> g <- gc(erdos.renyi.game(100, 1/100))
+> sp <- shortest.paths(g)
+> sp[sp==Inf] <- NA
+> max(sp, na.rm=TRUE) == diameter(g)
+[1] TRUE
+> 
+> #### Directed
+> 
+> g <- erdos.renyi.game(30, 3/30, dir=TRUE)
+> sp <- shortest.paths(g, mode="out")
+> sp[sp==Inf] <- NA
+> max(sp, na.rm=TRUE) == diameter(g, unconnected=TRUE)
+[1] TRUE
+> 
+> #### Weighted
+> 
+> E(g)$weight <- sample(1:10, ecount(g), replace=TRUE)
+> sp <- shortest.paths(g, mode="out")
+> sp[sp==Inf] <- NA
+> max(sp, na.rm=TRUE) == diameter(g, unconnected=TRUE)
+[1] TRUE
+> 
+> 

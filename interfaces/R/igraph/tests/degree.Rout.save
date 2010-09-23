@@ -1,0 +1,35 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> g <- erdos.renyi.game(100, 1/100)
+> d <- degree(g)
+> el <- get.edgelist(g)
+> all(table(el)==d[d!=0])
+[1] TRUE
+> 
+> g2 <- erdos.renyi.game(100, 2/100, dir=TRUE)
+> din <- degree(g2, mode="in")
+> dout <- degree(g2, mode="out")
+> el2 <- get.edgelist(g2)
+> all(table(el2[,1]) == dout[dout!=0])
+[1] TRUE
+> all(table(el2[,2]) == din[din!=0])
+[1] TRUE
+> 
