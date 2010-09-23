@@ -40,7 +40,7 @@ int random_permutation(igraph_vector_t *vec) {
 int main() {
   
   igraph_t ring1, ring2;
-  igraph_vector_long_t color1, color2;
+  igraph_vector_int_t color1, color2;
   igraph_vector_t perm;
   igraph_bool_t iso;
   igraph_integer_t count;
@@ -69,8 +69,8 @@ int main() {
   }
 
   /* Everything has the same colors */
-  igraph_vector_long_init(&color1, igraph_vcount(&ring1));
-  igraph_vector_long_init(&color2, igraph_vcount(&ring2));
+  igraph_vector_int_init(&color1, igraph_vcount(&ring1));
+  igraph_vector_int_init(&color2, igraph_vcount(&ring2));
   igraph_isomorphic_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &iso, 0, 0);
   if (!iso) {
     fprintf(stderr, "Single color failed.\n");
@@ -78,7 +78,7 @@ int main() {
   }
   
   /* Two colors, just counting */
-  for (i=0; i<igraph_vector_long_size(&color1); i+=2) {
+  for (i=0; i<igraph_vector_int_size(&color1); i+=2) {
     VECTOR(color1)[i]   = VECTOR(color2)[i] = 0;
     VECTOR(color1)[i+1] = VECTOR(color2)[i] = 1;
   }
@@ -90,7 +90,7 @@ int main() {
   }
 
   /* Separate colors for each vertex */
-  for (i=0; i<igraph_vector_long_size(&color1); i++) {
+  for (i=0; i<igraph_vector_int_size(&color1); i++) {
     VECTOR(color1)[i]   = VECTOR(color2)[i] = i;
   }
   igraph_count_isomorphisms_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &count);
@@ -101,8 +101,8 @@ int main() {
   }
 
   /* Try a negative result */
-  igraph_vector_long_fill(&color1, 0);
-  igraph_vector_long_fill(&color2, 0); 
+  igraph_vector_int_fill(&color1, 0);
+  igraph_vector_int_fill(&color2, 0); 
   VECTOR(color1)[0]=1;
   igraph_isomorphic_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &iso, 0, 0);
   if (iso) {
@@ -111,8 +111,8 @@ int main() {
   }
 
   /* Another negative, same color distribution, different topology */
-  igraph_vector_long_fill(&color1, 0);
-  igraph_vector_long_fill(&color2, 0); 
+  igraph_vector_int_fill(&color1, 0);
+  igraph_vector_int_fill(&color2, 0); 
   VECTOR(color1)[0]=1;  VECTOR(color1)[1]=1;
   VECTOR(color2)[0]=1;  VECTOR(color2)[2]=1;
   igraph_isomorphic_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &iso, 0, 0);
@@ -121,8 +121,8 @@ int main() {
     return 7;
   }  
   
-  igraph_vector_long_destroy(&color1);
-  igraph_vector_long_destroy(&color2);
+  igraph_vector_int_destroy(&color1);
+  igraph_vector_int_destroy(&color2);
 
   igraph_vector_destroy(&perm);
   igraph_destroy(&ring2);
@@ -136,8 +136,8 @@ int main() {
   igraph_ring(&ring2, 80 , /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/0);
 
   /* One color */
-  igraph_vector_long_init(&color1, igraph_vcount(&ring1));
-  igraph_vector_long_init(&color2, igraph_vcount(&ring2));
+  igraph_vector_int_init(&color1, igraph_vcount(&ring1));
+  igraph_vector_int_init(&color2, igraph_vcount(&ring2));
   igraph_count_subisomorphisms_vf2(&ring1, &ring2, &color1, &color2, 0, 0, 
 				   &count);
   if (count != 42) {
@@ -147,11 +147,11 @@ int main() {
   }
 
   /* Two colors */
-  for (i=0; i<igraph_vector_long_size(&color1); i+=2) {
+  for (i=0; i<igraph_vector_int_size(&color1); i+=2) {
     VECTOR(color1)[i]   = 0;
     VECTOR(color1)[i+1] = 1;
   }
-  for (i=0; i<igraph_vector_long_size(&color2); i+=2) {  
+  for (i=0; i<igraph_vector_int_size(&color2); i+=2) {  
     VECTOR(color2)[i]   = 0;
     VECTOR(color2)[i+1] = 1;
   }
@@ -163,8 +163,8 @@ int main() {
     return 32;
   }
 
-  igraph_vector_long_destroy(&color1);
-  igraph_vector_long_destroy(&color2);
+  igraph_vector_int_destroy(&color1);
+  igraph_vector_int_destroy(&color2);
 
   igraph_destroy(&ring1);
   igraph_destroy(&ring2);
@@ -180,8 +180,8 @@ int main() {
   igraph_vector_destroy(&perm);
 
   /* Everything has the same color */
-  igraph_vector_long_init(&color1, igraph_ecount(&ring1));
-  igraph_vector_long_init(&color2, igraph_ecount(&ring2));
+  igraph_vector_int_init(&color1, igraph_ecount(&ring1));
+  igraph_vector_int_init(&color2, igraph_ecount(&ring2));
   igraph_isomorphic_vf2(&ring1, &ring2, 0, 0, &color1, &color2, &iso, 0, 0);
   if (!iso) {
     fprintf(stderr, "Single edge-color failed.\n");
@@ -189,7 +189,7 @@ int main() {
   }
 
   /* Two colors, just counting */
-  for (i=0; i<igraph_vector_long_size(&color1); i+=2) {
+  for (i=0; i<igraph_vector_int_size(&color1); i+=2) {
     VECTOR(color1)[i]   = VECTOR(color2)[i] = 0;
     VECTOR(color1)[i+1] = VECTOR(color2)[i] = 1;
   }
@@ -201,7 +201,7 @@ int main() {
   }
 
   /* Separate colors for each edge */
-  for (i=0; i<igraph_vector_long_size(&color1); i++) {
+  for (i=0; i<igraph_vector_int_size(&color1); i++) {
     VECTOR(color1)[i]   = VECTOR(color2)[i] = i;
   }
   igraph_count_isomorphisms_vf2(&ring1, &ring2, 0, 0, &color1, &color2, &count);
@@ -212,8 +212,8 @@ int main() {
   }  
 
   /* Try a negative result */
-  igraph_vector_long_fill(&color1, 0);
-  igraph_vector_long_fill(&color2, 0); 
+  igraph_vector_int_fill(&color1, 0);
+  igraph_vector_int_fill(&color2, 0); 
   VECTOR(color1)[0]=1;
   igraph_isomorphic_vf2(&ring1, &ring2, 0, 0, &color1, &color2, &iso, 0, 0);
   if (iso) {
@@ -222,8 +222,8 @@ int main() {
   }
 
   /* Another negative, same color distribution, different topology */
-  igraph_vector_long_fill(&color1, 0);
-  igraph_vector_long_fill(&color2, 0); 
+  igraph_vector_int_fill(&color1, 0);
+  igraph_vector_int_fill(&color2, 0); 
   VECTOR(color1)[0]=1;  VECTOR(color1)[1]=1;
   VECTOR(color2)[0]=1;  VECTOR(color2)[2]=1;
   igraph_isomorphic_vf2(&ring1, &ring2, 0, 0, &color1, &color2, &iso, 0, 0);
@@ -232,8 +232,8 @@ int main() {
     return 45;
   }    
 
-  igraph_vector_long_destroy(&color1);
-  igraph_vector_long_destroy(&color2);
+  igraph_vector_int_destroy(&color1);
+  igraph_vector_int_destroy(&color2);
 
   igraph_destroy(&ring1);
   igraph_destroy(&ring2);
@@ -246,8 +246,8 @@ int main() {
   igraph_ring(&ring2, 80 , /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/0);
 
   /* One color */
-  igraph_vector_long_init(&color1, igraph_ecount(&ring1));
-  igraph_vector_long_init(&color2, igraph_ecount(&ring2));
+  igraph_vector_int_init(&color1, igraph_ecount(&ring1));
+  igraph_vector_int_init(&color2, igraph_ecount(&ring2));
   igraph_count_subisomorphisms_vf2(&ring1, &ring2, 0, 0, &color1, &color2,
 				   &count);
   if (count != 42) {
@@ -257,11 +257,11 @@ int main() {
   }
 
   /* Two colors */
-  for (i=0; i<igraph_vector_long_size(&color1)-1; i+=2) {
+  for (i=0; i<igraph_vector_int_size(&color1)-1; i+=2) {
     VECTOR(color1)[i]   = 0;
     VECTOR(color1)[i+1] = 1;
   }
-  for (i=0; i<igraph_vector_long_size(&color2)-1; i+=2) {  
+  for (i=0; i<igraph_vector_int_size(&color2)-1; i+=2) {  
     VECTOR(color2)[i]   = 0;
     VECTOR(color2)[i+1] = 1;
   }
@@ -273,8 +273,8 @@ int main() {
     return 32;
   }
 
-  igraph_vector_long_destroy(&color1);
-  igraph_vector_long_destroy(&color2);
+  igraph_vector_int_destroy(&color1);
+  igraph_vector_int_destroy(&color2);
 
   igraph_destroy(&ring1);
   igraph_destroy(&ring2);
