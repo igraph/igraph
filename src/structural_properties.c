@@ -4158,7 +4158,9 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
     }
     IGRAPH_FINALLY(igraph_free, newg);
     if (igraph_vector_size(&tmp) < no_of_nodes) {
-      IGRAPH_CHECK(igraph_subgraph(graph, newg, igraph_vss_vector(&tmp)));
+      IGRAPH_CHECK(igraph_induced_subgraph(graph, newg, 
+					   igraph_vss_vector(&tmp), 
+					   IGRAPH_SUBGRAPH_AUTO));
     } else {
       IGRAPH_CHECK(igraph_copy(newg, graph));
     }
