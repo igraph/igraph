@@ -1,4 +1,12 @@
 mincut value: 4
-first partition:  2 3 6 7 
-second partition: 0 1 4 5 
-edges in the cut: 1-2 5-6 
+first partition:  2 3 6 7
+second partition: 0 1 4 5
+edges in the cut: 1-2 (3), 5-6 (1), 
+mincut value: 1
+first partition:  0 2 3 4 5
+second partition: 1
+edges in the cut: 1-2 (1), 
+mincut value: 0
+first partition:  1 2 3 4
+second partition: 0
+edges in the cut: 
