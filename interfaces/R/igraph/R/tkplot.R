@@ -464,7 +464,7 @@ tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
                        params=list(
                          root=list(name="Root vertex",
                            type="numeric",
-                           default=0)
+                           default=1)
                          )
                        )
                   )

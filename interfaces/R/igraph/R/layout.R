@@ -233,13 +233,17 @@ layout.lgl <- function(graph, ..., params=list()) {
   if (is.null(params$repulserad)){ params$repulserad <- params$area * vc }
   if (is.null(params$cellsize))  { params$cellsize   <-
                                      (sqrt(sqrt(params$area))) }
-  if (is.null(params$root))      { params$root       <- -1   }
+  if (is.null(params$root))      {
+    params$root <- -1
+  } else {
+    params$root <- as.igraph.vs(graph, params$root)-1
+  }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_layout_lgl", graph, as.double(params$maxiter),
         as.double(params$maxdelta), as.double(params$area),
         as.double(params$coolexp), as.double(params$repulserad),
-        as.double(params$cellsize), as.double(params$root),
+        as.double(params$cellsize), params$root,
         PACKAGE="igraph")
 }
 

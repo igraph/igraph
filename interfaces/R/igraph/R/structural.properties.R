@@ -256,7 +256,8 @@ subcomponent <- function(graph, v, mode=c("all", "out", "in")) {
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  res <- .Call("R_igraph_subcomponent", graph, as.igraph.vs(graph, v), as.numeric(mode),
+  res <- .Call("R_igraph_subcomponent", graph, as.igraph.vs(graph, v)-1,
+               as.numeric(mode),
                PACKAGE="igraph")
   res+1
 }
@@ -328,7 +329,7 @@ transitivity <- function(graph, type=c("undirected", "global", "globalundirected
       .Call("R_igraph_transitivity_local_undirected_all", graph, isolates,
             PACKAGE="igraph")
     } else {
-      vids <- as.igraph.vs(graph, vids)
+      vids <- as.igraph.vs(graph, vids)-1
       .Call("R_igraph_transitivity_local_undirected", graph, vids,
             isolates, PACKAGE="igraph")
     }
@@ -336,7 +337,7 @@ transitivity <- function(graph, type=c("undirected", "global", "globalundirected
     .Call("R_igraph_transitivity_avglocal_undirected", graph, isolates,
           PACKAGE="igraph")
   } else if (type==3) {
-    vids <- as.igraph.vs(graph, vids)
+    vids <- as.igraph.vs(graph, vids)-1
     if (is.null(weights)) {
       .Call("R_igraph_transitivity_local_undirected", graph, vids,
             isolates, PACKAGE="igraph")
@@ -916,5 +917,18 @@ clusters <- function(graph, mode=c("weak", "strong")) {
   res <- .Call("R_igraph_clusters", graph, mode,
         PACKAGE="igraph")
   res$membership <- res$membership + 1
+  res
+}
+
+unfold.tree <- function(graph, mode=c("all", "out", "in", "total"), roots) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  mode <- switch(igraph.match.arg(mode), "out"=1, "in"=2, "all"=3, "total"=3)
+  roots <- as.igraph.vs(graph, roots)-1
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_unfold_tree", graph, mode, roots,
+        PACKAGE="igraph")
   res
 }

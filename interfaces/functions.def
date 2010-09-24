@@ -360,7 +360,7 @@ igraph_shortest_paths_johnson:
         IGNORE: RR, RC, RNamespace
 
 igraph_subcomponent: 
-        PARAMS: GRAPH graph, OUT VECTOR res, REAL vid, NEIMODE mode=ALL
+        PARAMS: GRAPH graph, OUT VERTEXSET res, VERTEX vid, NEIMODE mode=ALL
         IGNORE: RR, RC, RNamespace
 
 igraph_betweenness:
@@ -583,9 +583,10 @@ igraph_arpack_unpack_complex:
         NAME-R: arpack.unpack.complex
 
 igraph_unfold_tree:
-        PARAMS: GRAPH graph, OUT GRAPH tree, NEIMODE mode=ALL, VECTOR roots, \
-                OUT VECTOR_OR_0 vertex_index
+        PARAMS: GRAPH graph, OUT GRAPH tree, NEIMODE mode=ALL, VECTOR roots,\
+                OUT VECTORM1_OR_0 vertex_index
         NAME-R: unfold.tree
+        IGNORE: RR
 
 igraph_is_mutual:
         PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL
@@ -593,12 +594,12 @@ igraph_is_mutual:
         NAME-R: is.mutual
 
 igraph_maximum_cardinality_search:
-        PARAMS: GRAPH graph, OUT VECTOR alpha, OUT VECTOR_OR_0 alpham1
+        PARAMS: GRAPH graph, OUT VECTORM1 alpha, OUT VECTORM1_OR_0 alpham1
         NAME-R: maximum.cardinality.search
 
 igraph_is_chordal:
-        PARAMS: GRAPH graph, VECTOR_OR_0 alpha=NULL, VECTOR_OR_0 alpham1=NULL, \
-                OUT BOOLEANPTR_OR_0 chordal, OUT VECTOR_OR_0 fillin, \
+        PARAMS: GRAPH graph, VECTORM1_OR_0 alpha=NULL, VECTORM1_OR_0 alpham1=NULL, \
+                OUT BOOLEANPTR_OR_0 chordal, OUT VECTORM1_OR_0 fillin, \
                 OUT GRAPH_OR_0 newgraph
         NAME-R: is.chordal
         IGNORE: RR, RC
@@ -854,8 +855,8 @@ igraph_layout_circle:
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_star:
-        PARAMS: GRAPH graph, OUT MATRIX res, VERTEX center=V(graph)[0], \
-                VECTOR_OR_0 order=NULL
+        PARAMS: GRAPH graph, OUT MATRIX res, VERTEX center=V(graph)[1], \
+                VECTORM1_OR_0 order=NULL
         DEPS: center ON graph
         NAME-R: layout.star
 
@@ -1379,7 +1380,7 @@ igraph_minimum_size_separators:
 
 igraph_cohesive_blocks:
         PARAMS: GRAPH graph, OUT VERTEXSETLIST blocks, \
-                OUT VECTOR cohesion, OUT VECTOR parent, \
+                OUT VECTOR cohesion, OUT VECTORM1 parent, \
                 OUT GRAPH blockTree
         DEPS: blocks ON graph
         NAME-R: cohesive.blocks

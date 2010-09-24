@@ -1,6 +1,8 @@
 
 library(igraph)
 
+set.seed(42)                            # Shouldn't be here....
+
 ashs <- function(graph, as=TRUE) {
   mscale <- function(x) {
     if (sd(x)!=0) { x <- scale(x) }

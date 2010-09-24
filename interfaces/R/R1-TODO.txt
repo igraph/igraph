@@ -195,12 +195,12 @@ igraph.par
 igraph.sample
 igraph.to.graphNEL			C
 igraphdemo
-independence.number
-independent.vertex.sets
-induced.subgraph
+independence.number			C
+independent.vertex.sets			C
+induced.subgraph			C
 is.bgraph
-is.bipartite
-is.chordal
+is.bipartite				C
+is.chordal				C
 is.connected
 is.dag
 is.directed
@@ -212,9 +212,9 @@ is.multiple
 is.mutual
 is.separator
 is.simple
-label.propagation.community
-largest.cliques
-largest.independent.vertex.sets
+label.propagation.community		C
+largest.cliques				C
+largest.independent.vertex.sets		C
 lastcit.game
 layout.auto
 layout.circle
@@ -233,7 +233,7 @@ layout.sphere
 layout.spring
 layout.star
 layout.svd
-leading.eigenvector.community
+leading.eigenvector.community		C
 leading.eigenvector.community.naive
 leading.eigenvector.community.step
 line.graph
@@ -243,28 +243,19 @@ list.vertex.attributes
 maxcohesion
 maximal.cliques
 maximal.independent.vertex.sets
-maximum.cardinality.search
-measure.dynamics.age
-measure.dynamics.citedcat
-measure.dynamics.citedcat.id.age
-measure.dynamics.citingcat.citedcat
-measure.dynamics.citingcat.id.age
-measure.dynamics.d.d
-measure.dynamics.id
-measure.dynamics.idage
-measure.dynamics.lastcit
+maximum.cardinality.search		C
 membership
 merges
-minimal.st.separators
-minimum.size.separators
+minimal.st.separators			C
+minimum.size.separators			C
 minimum.spanning.tree
 modularity
-multilevel.community
-neighborhood
-neighborhood.size
-neighbors
+multilevel.community			C
+neighborhood				C
+neighborhood.size			C
+neighbors				C
 no.clusters
-optimal.community
+optimal.community			C
 page.rank
 page.rank.old
 parent
@@ -287,63 +278,8 @@ reciprocity
 remove.edge.attribute
 remove.graph.attribute
 remove.vertex.attribute
-revolver.ad
-revolver.ade
-revolver.adi
-revolver.air
-revolver.ar
-revolver.d
-revolver.d.d
-revolver.de
-revolver.di
-revolver.dl
-revolver.e
-revolver.el
-revolver.error.ad
-revolver.error.ade
-revolver.error.adi
-revolver.error.air
-revolver.error.ar
-revolver.error.d
-revolver.error.de
-revolver.error.di
-revolver.error.dl
-revolver.error.e
-revolver.error.el
-revolver.error.il
-revolver.error.ir
-revolver.error.l
-revolver.error.r
-revolver.il
-revolver.ir
-revolver.l
-revolver.ml.AD.alpha.a.beta
-revolver.ml.AD.dpareto
-revolver.ml.AD.dpareto.eval
-revolver.ml.ADE.alpha.a.beta
-revolver.ml.ADE.dpareto
-revolver.ml.ADE.dpareto.eval
-revolver.ml.ADE.dpareto.evalf
-revolver.ml.D.alpha
-revolver.ml.D.alpha.a
-revolver.ml.DE.alpha.a
-revolver.ml.ad
-revolver.ml.ade
-revolver.ml.d
-revolver.ml.de
-revolver.ml.df
-revolver.ml.f
-revolver.ml.l
-revolver.p.p
-revolver.probs.ADE.dpareto
-revolver.probs.ad
-revolver.probs.ade
-revolver.probs.d
-revolver.probs.de
-revolver.r
 rewire
 rewire.edges
-rglplot
 rglplot.igraph
 running.mean
 set.edge.attribute
@@ -357,30 +293,20 @@ simplify
 sizes
 spinglass.community
 split.join.distance
-structurally.cohesive.blocks
 subcomponent
 subgraph
 subgraph.centrality
 subgraph.edges
 summary.igraph
-tkigraph
 tkplot
-tkplot.center
-tkplot.close
-tkplot.export.postscript
-tkplot.fit.to.screen
-tkplot.getcoords
-tkplot.off
-tkplot.reshape
-tkplot.rotate
 topological.sort
 transitivity
 triad.census
-unfold.tree
+unfold.tree				C
 vcount
 vertex.connectivity
 vertex.disjoint.paths
-walktrap.community
+walktrap.community			C
 watts.strogatz.game
 write.graph
 write.pajek.bgraph

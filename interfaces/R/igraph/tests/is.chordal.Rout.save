@@ -1,0 +1,65 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> ## The examples from the Tarjan-Yannakakis paper
+> g1 <- graph.formula(A-B:C:I, B-A:C:D, C-A:B:E:H, D-B:E:F,
++                     E-C:D:F:H, F-D:E:G, G-F:H, H-C:E:G:I,
++                     I-A:H)
+> g1 <- simplify(g1)
+> maximum.cardinality.search(g1)
+$alpha
+[1] 9 4 6 8 3 5 7 2 1
+
+$alpham1
+[1] 9 8 5 2 6 3 7 4 1
+
+> is.chordal(g1, fillin=TRUE)
+$chordal
+[1] FALSE
+
+$fillin
+ [1] 2 6 8 7 5 7 2 7 6 1 7 1
+
+$newgraph
+NULL
+
+> 
+> g2 <- graph.formula(A-B:E, B-A:E:F:D, C-E:D:G, D-B:F:E:C:G,
++                     E-A:B:C:D:F, F-B:D:E, G-C:D:H:I, H-G:I:J,
++                     I-G:H:J, J-H:I)
+> g2 <- simplify(g2)
+> maximum.cardinality.search(g2)
+$alpha
+ [1] 10  8  9  6  7  5  4  2  3  1
+
+$alpham1
+ [1] 10  8  9  7  6  4  5  2  3  1
+
+> is.chordal(g2, fillin=TRUE)
+$chordal
+[1] TRUE
+
+$fillin
+numeric(0)
+
+$newgraph
+NULL
+
+> 
