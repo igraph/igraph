@@ -39,7 +39,7 @@ graph.bipartite(types, edges, directed=FALSE)
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{\code{\link{graph}} to create one-mode networks}
 \examples{
-g <- graph.bipartite( rep(0:1,length=10), c(0:9))
+g <- graph.bipartite( rep(0:1,length=10), c(1:10))
 print(g, v=TRUE)
 }
 \keyword{graphs}
