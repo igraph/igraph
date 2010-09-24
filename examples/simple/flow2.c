@@ -91,11 +91,8 @@ int check_flow(int errorinc,
 	out_flow += VECTOR(*flow)[e];
       }
       if (i == source) {
-	/* This would be the correct check, but only works 
-	   if we eliminate flow cycles first. */
-	/* if (in_flow > 0) { return errorinc+4; } */
-	/* if (out_flow != flow_value) { return errorinc+5; } */
-	if (out_flow - in_flow != flow_value) { return errorinc+4; }
+	if (in_flow > 0) { return errorinc+4; }
+	if (out_flow != flow_value) { return errorinc+5; }
       } else if (i == target) {
 	if (out_flow > 0) { return errorinc+6; }
 	if (in_flow != flow_value) { return errorinc+7; }
