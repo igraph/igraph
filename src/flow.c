@@ -37,6 +37,7 @@
 #include "igraph_dqueue.h"
 #include "igraph_visitor.h"
 #include "igraph_interrupt.h"
+#include "igraph_topology.h"
 
 #include <limits.h>
 #include <stdio.h>
@@ -593,11 +594,14 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
     /* Initialize the backward distances, with a breadth-first search 
        from the source */ 
     igraph_dqueue_t Q;
-    igraph_vector_bool_t added;
+    igraph_vector_int_t added;
     long int j;
+    igraph_t flow_graph;
+    igraph_vector_t flow_edges;
+    igraph_bool_t dag;
 
-    IGRAPH_CHECK(igraph_vector_bool_init(&added, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_bool_destroy, &added);
+    IGRAPH_CHECK(igraph_vector_int_init(&added, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &added);
     IGRAPH_CHECK(igraph_dqueue_init(&Q, 100));
     IGRAPH_FINALLY(igraph_dqueue_destroy, &added);
     
@@ -619,7 +623,7 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
       }
     } /* !igraph_dqueue_empty(&Q) */
 	  
-    igraph_vector_bool_destroy(&added);
+    igraph_vector_int_destroy(&added);
     igraph_dqueue_destroy(&Q);
     IGRAPH_FINALLY_CLEAN(2);
 
@@ -695,7 +699,143 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 	
       } while (1);
     }
+
+    /* We need to eliminate flow cycles now. Before that we check that
+       there is a cycle in the flow graph.
+
+       First we do a couple of DFSes from the source vertex to the
+       target and factor out the paths we find. If there is no more
+       path to the target, then all remaining flow must be in flow
+       cycles, so we don't need it at all.
+       
+       Some details. 'stack' contains the whole path of the DFS, both
+       the vertices and the edges, they are alternating in the stack.
+       'current' helps finding the next outgoing edge of a vertex
+       quickly, the next edge of 'v' is FIRST(v)+CURRENT(v). If this
+       is LAST(v), then there are no more edges to try.
+
+       The 'added' vector contains 0 if the vertex was not visited
+       before, 1 if it is currently in 'stack', and 2 if it is not in
+       'stack', but it was visited before. */
     
+    IGRAPH_VECTOR_INIT_FINALLY(&flow_edges, 0);
+    for (i=0, j=0; i<no_of_edges; i+=2, j++) {
+      long int pos=VECTOR(rank)[i];
+      if ((capacity ? VECTOR(*capacity)[j] : 1.0) > RESCAP(pos)) {
+	IGRAPH_CHECK(igraph_vector_push_back(&flow_edges, 
+					     IGRAPH_FROM(graph, j)));
+	IGRAPH_CHECK(igraph_vector_push_back(&flow_edges, 
+					     IGRAPH_TO(graph, j)));
+      }
+    }
+    IGRAPH_CHECK(igraph_create(&flow_graph, &flow_edges, no_of_nodes, 
+			       IGRAPH_DIRECTED));
+    igraph_vector_destroy(&flow_edges);
+    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY(igraph_destroy, &flow_graph);
+    IGRAPH_CHECK(igraph_is_dag(&flow_graph, &dag));
+    igraph_destroy(&flow_graph);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    if (!dag) {
+      igraph_vector_long_t stack;
+      igraph_vector_t mycap;
+
+      IGRAPH_CHECK(igraph_vector_long_init(&stack, 0));
+      IGRAPH_FINALLY(igraph_vector_long_destroy, &stack);
+      IGRAPH_CHECK(igraph_vector_int_init(&added, no_of_nodes));
+      IGRAPH_FINALLY(igraph_vector_int_destroy, &added);
+      IGRAPH_VECTOR_INIT_FINALLY(&mycap, no_of_edges);
+      
+#define MYCAP(i)      (VECTOR(mycap)[(i)])
+
+      for (i=0; i<no_of_edges; i+=2) {
+	long int pos=VECTOR(rank)[i];
+	long int pos2=VECTOR(rank)[i+1];
+	MYCAP(pos) = (capacity ? VECTOR(*capacity)[i/2] : 1.0) - RESCAP(pos);
+	MYCAP(pos2) = 0.0;
+      }
+      
+      do { 
+	igraph_vector_null(&current);
+	igraph_vector_long_clear(&stack);
+	igraph_vector_int_null(&added);
+	
+	IGRAPH_CHECK(igraph_vector_long_push_back(&stack, -1));
+	IGRAPH_CHECK(igraph_vector_long_push_back(&stack, source));
+	VECTOR(added)[(long int)source]=1;
+	while (!igraph_vector_long_empty(&stack) &&
+	       igraph_vector_long_tail(&stack) != target) {
+	  long int actnode=igraph_vector_long_tail(&stack);
+	  long int edge=FIRST(actnode)+CURRENT(actnode);
+	  long int nei;
+	  while (edge < LAST(actnode) && MYCAP(edge)==0.0) { edge++; }
+	  nei=edge < LAST(actnode) ? HEAD(edge) : -1;
+	  
+	  if (edge < LAST(actnode) && !VECTOR(added)[nei]) {
+	    /* Go forward along next edge, if the vertex was not
+	       visited before */
+	    IGRAPH_CHECK(igraph_vector_long_push_back(&stack, edge));
+	    IGRAPH_CHECK(igraph_vector_long_push_back(&stack, nei));
+	    VECTOR(added)[nei]=1;
+	    CURRENT(actnode) += 1;
+	  } else if (edge < LAST(actnode) && VECTOR(added)[nei]==1) {
+	    /* We found a flow cycle, factor it out. Go back in stack
+	       until we find 'nei' again, determine the flow along the
+	       cycle. */
+	    igraph_real_t thisflow=MYCAP(edge);
+	    long int idx;
+	    for (idx=igraph_vector_long_size(&stack)-2; 
+		 idx >= 0 && VECTOR(stack)[idx+1] != nei; idx-=2) {
+	      long int e=VECTOR(stack)[idx];
+	      igraph_real_t rcap= e >= 0 ? MYCAP(e) : MYCAP(edge);
+	      if (rcap < thisflow) { thisflow=rcap; }
+	    }
+	    MYCAP(edge) -= thisflow; RESCAP(edge) += thisflow;
+	    for (idx=igraph_vector_long_size(&stack)-2; 
+		 idx >= 0 && VECTOR(stack)[idx+1] != nei; idx-=2) {
+	      long int e=VECTOR(stack)[idx];
+	      if (e >= 0) { MYCAP(e) -= thisflow; RESCAP(e) += thisflow; }
+	    }
+	    CURRENT(actnode) += 1;
+	  } else if (edge < LAST(actnode)) { /* && VECTOR(added)[nei]==2 */
+	    /* The next edge leads to a vertex that was visited before,
+	       but it is currently not in 'stack' */
+	    CURRENT(actnode) += 1;
+	  } else {
+	    /* Go backward, take out the node and the edge that leads to it */
+	    igraph_vector_long_pop_back(&stack);
+	    igraph_vector_long_pop_back(&stack);
+	    VECTOR(added)[actnode]=2;
+	  }
+	}
+      
+	/* If non-empty, then it contains a path from source to target
+	   in the residual graph. We factor out this path from the flow. */
+	if (!igraph_vector_long_empty(&stack)) {
+	  long int pl=igraph_vector_long_size(&stack);
+	  igraph_real_t thisflow=EXCESS(target);
+	  for (i=2; i<pl; i+=2) {
+	    long int edge=VECTOR(stack)[i];
+	    igraph_real_t rcap=MYCAP(edge);
+	    if (rcap < thisflow) { thisflow=rcap; }
+	  }
+	  for (i=2; i<pl; i+=2) {
+	    long int edge=VECTOR(stack)[i];
+	    MYCAP(edge) -= thisflow;
+	  }
+	}
+	
+      } while (!igraph_vector_long_empty(&stack));
+      
+      igraph_vector_destroy(&mycap);
+      igraph_vector_int_destroy(&added);
+      igraph_vector_long_destroy(&stack);
+      IGRAPH_FINALLY_CLEAN(3);
+    }
+
+    /* ----------------------------------------------------------- */
+
     IGRAPH_CHECK(igraph_vector_resize(flow, no_of_orig_edges));
     for (i=0, j=0; i<no_of_edges; i+=2, j++) {
       long int pos=VECTOR(rank)[i];
