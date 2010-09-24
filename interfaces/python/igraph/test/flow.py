@@ -37,13 +37,13 @@ class MaxFlowTests(unittest.TestCase):
 
     def testMaxFlow(self):
         flow = self.g.maxflow(0, 3)
-        self.failUnless(flow.value == 2)
-        self.failUnless(flow.flow == [1, 1, 0, 1, 1])
+        self.assertEquals(flow.value, 2)
+        self.assertEquals(flow.flow, [1, 1, 0, 1, 1])
 
         flow = self.g.maxflow(0, 3, "capacity")
-        self.failUnless(flow.value == 4)
-        self.failUnless(flow.cut == [3, 4])
-        self.failUnless([e.index for e in flow.es] == [3, 4])
+        self.assertEquals(flow.value, 4)
+        self.assertEquals(flow.cut, [3, 4])
+        self.assertEquals([e.index for e in flow.es], [3, 4])
         self.failUnless(set(flow.partition[0]).union(flow.partition[1]) == \
           set(range(self.g.vcount())))
 

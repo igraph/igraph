@@ -137,6 +137,8 @@ class LayoutAlgorithmTests(unittest.TestCase):
         layout_test(g)
 
         g = Graph.GRG(101, 0.2)
+        del g.vs["x"]
+        del g.vs["y"]
         layout_test(g)
 
         g = Graph.Full(10) * 2
