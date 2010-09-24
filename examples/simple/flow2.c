@@ -23,7 +23,8 @@
 
 #include <igraph.h>
 
-int check_flow(const igraph_t *graph, igraph_real_t flow_value, 
+int check_flow(int errorinc,
+	       const igraph_t *graph, igraph_real_t flow_value, 
 	       const igraph_vector_t *flow, const igraph_vector_t *cut, 
 	       const igraph_vector_t *partition,
 	       const igraph_vector_t *partition2, 
@@ -58,54 +59,62 @@ int check_flow(const igraph_t *graph, igraph_real_t flow_value,
     }
     printf("\n");
   }
+  fflush(stdout);
         
   /* Always less than the capacity */
   for (i=0; i<m; i++) {
     if (VECTOR(*flow)[i] > VECTOR(*capacity)[i]) {
-      return 3;
+      return errorinc+3;
     }
   }
   
-  /* What comes in goes out */
-  igraph_vector_init(&inedges, 0);
-  igraph_vector_init(&outedges, 0);
+  /* What comes in goes out, but only in directed graphs, 
+     there is no in and out in undirected ones...
+   */
+  if (igraph_is_directed(graph)) {
+    igraph_vector_init(&inedges, 0);
+    igraph_vector_init(&outedges, 0);
 
-  for (i=0; i<n; i++) {
-    long int n1, n2, j;
-    igraph_real_t in_flow=0.0, out_flow=0.0;
-    igraph_adjacent(graph, &inedges,  i, IGRAPH_IN);
-    igraph_adjacent(graph, &outedges, i, IGRAPH_OUT);
-    n1=igraph_vector_size(&inedges);
-    n2=igraph_vector_size(&outedges);
-    for (j=0; j<n1; j++) {
-      long int e=VECTOR(inedges)[j];
-      in_flow += VECTOR(*flow)[e];
+    for (i=0; i<n; i++) {
+      long int n1, n2, j;
+      igraph_real_t in_flow=0.0, out_flow=0.0;
+      igraph_adjacent(graph, &inedges,  i, IGRAPH_IN);
+      igraph_adjacent(graph, &outedges, i, IGRAPH_OUT);
+      n1=igraph_vector_size(&inedges);
+      n2=igraph_vector_size(&outedges);
+      for (j=0; j<n1; j++) {
+	long int e=VECTOR(inedges)[j];
+	in_flow += VECTOR(*flow)[e];
+      }
+      for (j=0; j<n2; j++) {
+	long int e=VECTOR(outedges)[j];
+	out_flow += VECTOR(*flow)[e];
+      }
+      if (i == source) {
+	/* This would be the correct check, but only works 
+	   if we eliminate flow cycles first. */
+	/* if (in_flow > 0) { return errorinc+4; } */
+	/* if (out_flow != flow_value) { return errorinc+5; } */
+	if (out_flow - in_flow != flow_value) { return errorinc+4; }
+      } else if (i == target) {
+	if (out_flow > 0) { return errorinc+6; }
+	if (in_flow != flow_value) { return errorinc+7; }
+	
+      } else {
+	if (in_flow != out_flow) { return errorinc+8; }
+      }
     }
-    for (j=0; j<n2; j++) {
-      long int e=VECTOR(outedges)[j];
-      out_flow += VECTOR(*flow)[e];
-    }
-    if (i == source) {
-      if (in_flow > 0) { return 4; }
-      if (out_flow != flow_value) { return 5; }
-    } else if (i == target) {
-      if (out_flow > 0) { return 6; }
-      if (in_flow != flow_value) { return 7; }
-
-    } else {
-      if (in_flow != out_flow) { return 8; }
-    }
+    
+    igraph_vector_destroy(&inedges);
+    igraph_vector_destroy(&outedges);
   }
-  
-  igraph_vector_destroy(&inedges);
-  igraph_vector_destroy(&outedges);
 
   /* Check the minimum cut size*/
   for (i=0, cutsize=0.0; i<nc; i++) {
     long int edge=VECTOR(*cut)[i];
     cutsize += VECTOR(*capacity)[edge];
   }
-  if (fabs(cutsize-flow_value) > 1e-14) { return 9; }
+  if (fabs(cutsize-flow_value) > 1e-14) { return errorinc+9; }
 
   /* Check that the cut indeed cuts */
   igraph_copy(&graph_copy, graph);
@@ -113,8 +122,7 @@ int check_flow(const igraph_t *graph, igraph_real_t flow_value,
   igraph_matrix_init(&sp, 1, 1);
   igraph_shortest_paths(&graph_copy, &sp, /*from=*/ igraph_vss_1(source),
 			/*to=*/ igraph_vss_1(target), IGRAPH_OUT);
-  igraph_matrix_print(&sp);
-  if (MATRIX(sp, 0, 0) != IGRAPH_INFINITY) { return 10; }
+  if (MATRIX(sp, 0, 0) != IGRAPH_INFINITY) { return errorinc+10; }
   igraph_matrix_destroy(&sp);
   igraph_destroy(&graph_copy);
 
@@ -165,9 +173,9 @@ int main() {
   }
 
   /* Check the flow */
-  if (check=check_flow(&g, flow_value, &flow, &cut, &partition,
-		       &partition2, source, target, &capacity, 
-		       /*print=*/ 0)) {
+  if ( (check=check_flow(0, &g, flow_value, &flow, &cut, &partition,
+			 &partition2, source, target, &capacity, 
+			 /*print=*/ 0))) {
     return check;
   }
 
@@ -177,6 +185,32 @@ int main() {
   igraph_vector_destroy(&partition);
   igraph_vector_destroy(&partition2);
   igraph_vector_destroy(&flow);
+
+  /* ------------------------------------- */
+
+  igraph_small(&g, 4, IGRAPH_UNDIRECTED,
+	       0,1,0,2,1,2,1,3,2,3, -1);
+  igraph_vector_init_int_end(&capacity, -1, 4,2,10,2,2, -1);
+  igraph_vector_init(&cut, 0);
+  igraph_vector_init(&partition, 0);
+  igraph_vector_init(&partition2, 0);
+  igraph_vector_init(&flow, 0);
+
+  igraph_maxflow(&g, &flow_value, &flow, &cut, &partition, &partition2, 
+		 /*source=*/ 0, /*target=*/ 3, &capacity);
+
+  if ( (check=check_flow(20, &g, flow_value, &flow, &cut, &partition,
+			 &partition2, 0, 3, &capacity, 
+			 /*print=*/ 1))) {
+    return check;
+  }
+
+  igraph_vector_destroy(&cut);
+  igraph_vector_destroy(&partition2);
+  igraph_vector_destroy(&partition);
+  igraph_vector_destroy(&capacity);
+  igraph_vector_destroy(&flow);
+  igraph_destroy(&g);
 
   /* ------------------------------------- */
 
@@ -191,9 +225,9 @@ int main() {
   igraph_maxflow(&g, &flow_value, &flow, &cut, &partition, &partition2, 
 		 /*source=*/ 0, /*target=*/ 2, &capacity);
 
-  if (check=check_flow(&g, flow_value, &flow, &cut, &partition,
-		       &partition2, source, target, &capacity, 
-		       /*print=*/ 1)) {
+  if ( (check=check_flow(40, &g, flow_value, &flow, &cut, &partition,
+			 &partition2, 0, 2, &capacity, 
+			 /*print=*/ 1))) {
     return check;
   }
 

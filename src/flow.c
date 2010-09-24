@@ -192,11 +192,13 @@ int igraph_i_maxflow_undirected(const igraph_t *graph,
   IGRAPH_CHECK(igraph_maxflow(&newgraph, value, flow, cut, partition,
 			      partition2, source, target, &newcapacity));
 
-  /* Edges are ordered by ids in the cut, we just remove the
-     additional ones */
   if (cut) {
-    IGRAPH_CHECK(igraph_vector_resize(cut,
-				      igraph_vector_size(cut)/2));
+    long int i, cs=igraph_vector_size(cut);
+    for (i=0; i<cs; i++) {
+      if (VECTOR(*cut)[i] >= no_of_edges) {
+	VECTOR(*cut)[i] -= no_of_edges;
+      }
+    }
   }
   
   /* The flow has one non-zero value for each real-nonreal edge pair,
@@ -207,9 +209,7 @@ int igraph_i_maxflow_undirected(const igraph_t *graph,
   if (flow) {
     long int i;
     for (i=0; i<no_of_edges; i++) {
-      if (VECTOR(*flow)[i] == 0) {
-	VECTOR(*flow)[i] = - VECTOR(*flow)[i+no_of_edges];
-      }
+      VECTOR(*flow)[i] -= VECTOR(*flow)[i+no_of_edges];
     }
     IGRAPH_CHECK(igraph_vector_resize(flow, no_of_edges));
   }
