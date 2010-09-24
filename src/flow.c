@@ -556,11 +556,9 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
     if (cut) {
       igraph_vector_clear(cut);
       for (i=0; i<no_of_orig_edges; i++) {
-	long int v1=IGRAPH_FROM(graph, i);
-	long int v2=IGRAPH_TO(graph, i);
-	char p1=VECTOR(added)[v1];
-	char p2=VECTOR(added)[v2];
-	if (p1 ^ p2) {
+	long int f=IGRAPH_FROM(graph, i);
+	long int t=IGRAPH_TO(graph, i);
+	if (!VECTOR(added)[f] && VECTOR(added)[t]) {
 	  IGRAPH_CHECK(igraph_vector_push_back(cut, i));
 	}
       }
