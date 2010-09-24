@@ -637,7 +637,7 @@ graph.full.bipartite <- function(n1, n2, directed=FALSE,
 graph.bipartite <- function(types, edges, directed=FALSE) {
 
   types <- as.logical(types)
-  edges <- as.numeric(edges)
+  edges <- as.numeric(edges)-1
   directed <- as.logical(directed)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )

@@ -43,21 +43,27 @@ graph.mincut <- function(graph, source=NULL, target=NULL, capacity=NULL,
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   if (is.null(target) && is.null(source)) {
     if (value.only) {
-      .Call("R_igraph_mincut_value", graph, capacity,
-            PACKAGE="igraph")
+      res <- .Call("R_igraph_mincut_value", graph, capacity,
+                   PACKAGE="igraph")
     } else {
-      .Call("R_igraph_mincut", graph, capacity,
-            PACKAGE="igraph")
+      res <- .Call("R_igraph_mincut", graph, capacity,
+                   PACKAGE="igraph")
+      res$cut <- res$cut + 1
+      res$partition1 <- res$partition1 + 1
+      res$partition2 <- res$partition2 + 1
+      res
     }
   } else {
     if (value.only) {
-      .Call("R_igraph_st_mincut_value", graph, as.igraph.vs(graph, source)-1,
-            as.igraph.vs(graph, target)-1, capacity,
-            PACKAGE="igraph")
+      res <- .Call("R_igraph_st_mincut_value", graph,
+                   as.igraph.vs(graph, source)-1,
+                   as.igraph.vs(graph, target)-1, capacity,
+                   PACKAGE="igraph")
     } else {
       stop("Calculating minimum s-t cuts is not implemented yet")
     }
   }
+  res
 }
 
 vertex.connectivity <- function(graph, source=NULL, target=NULL, checks=TRUE) {

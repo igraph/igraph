@@ -131,22 +131,22 @@ graph.adjacency				C
 graph.adjlist				C
 graph.atlas				C
 graph.automorphisms
-graph.bfs
-graph.bipartite
-graph.cohesion
-graph.complementer
-graph.compose
-graph.coreness
+graph.bfs				
+graph.bipartite				C
+graph.cohesion				C
+graph.complementer			C
+graph.compose				C
+graph.coreness				C
 graph.count.isomorphisms.vf2
 graph.count.subisomorphisms.vf2
-graph.data.frame
-graph.de.bruijn
-graph.density
+graph.data.frame			C
+graph.de.bruijn				C
+graph.density				C
 graph.dfs
-graph.difference
+graph.difference			C
 graph.difference.by.name
-graph.disjoint.union
-graph.edgelist
+graph.disjoint.union			C
+graph.edgelist				C
 graph.empty
 graph.extended.chordal.ring
 graph.famous
@@ -157,48 +157,43 @@ graph.full.citation
 graph.get.isomorphisms.vf2
 graph.get.subisomorphisms.vf2
 graph.graphdb
-graph.incidence
-graph.intersection
+graph.incidence				C
+graph.intersection			C
 graph.intersection.by.name
-graph.isoclass
-graph.isoclass.subgraph
-graph.isocreate
-graph.isomorphic
-graph.isomorphic.34
-graph.isomorphic.bliss
-graph.isomorphic.vf2
-graph.kautz
-graph.knn
+graph.isoclass				C
+graph.isoclass.subgraph			C
+graph.isocreate				C
+graph.isomorphic			C
+graph.isomorphic.34			C
+graph.isomorphic.bliss			C
+graph.isomorphic.vf2			C
+graph.kautz				C
+graph.knn				C
 graph.laplacian
 graph.lattice
 graph.lcf
-graph.maxflow
-graph.mincut
-graph.motifs
-graph.motifs.est
-graph.motifs.no
-graph.neighborhood
+graph.maxflow				C
+graph.mincut				C
+graph.motifs				C
+graph.motifs.est			C
+graph.motifs.no				C
+graph.neighborhood			C
 graph.ring
 graph.star
 graph.strength
-graph.subisomorphic.vf2
+graph.subisomorphic.vf2			C
 graph.tree
-graph.union
+graph.union				C
 graph.union.by.name
 grg.game
 growing.random.game
 hierarchy
 hub.score				C
 igraph.arpack.default
-igraph.drl.coarsen
-igraph.drl.coarsest
-igraph.drl.default
-igraph.drl.final
-igraph.drl.refine
-igraph.from.graphNEL
+igraph.from.graphNEL			C
 igraph.par
 igraph.sample
-igraph.to.graphNEL
+igraph.to.graphNEL			C
 igraphdemo
 independence.number
 independent.vertex.sets

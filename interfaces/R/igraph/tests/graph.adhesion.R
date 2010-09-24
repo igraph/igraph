@@ -3,6 +3,7 @@ library(igraph)
 
 g <- graph.famous("Zachary")
 graph.adhesion(g)
+graph.cohesion(g)
 
 kite <- graph.formula(Andre    - Beverly:Carol:Diane:Fernando,
                       Beverly  - Andre:Diane:Ed:Garth,
@@ -16,6 +17,7 @@ kite <- graph.formula(Andre    - Beverly:Carol:Diane:Fernando,
                       Jane     - Ike)
 kite <- simplify(kite)
 graph.adhesion(kite)
+graph.cohesion(kite)
 
 camp <- graph.formula(Harry:Steve:Don:Bert - Harry:Steve:Don:Bert,
                       Pam:Brazey:Carol:Pat - Pam:Brazey:Carol:Pat,
@@ -31,3 +33,4 @@ camp <- graph.formula(Harry:Steve:Don:Bert - Harry:Steve:Don:Bert,
                       John    - Gery:Russ:Michael)
 camp <- simplify(camp)
 graph.adhesion(camp)
+graph.cohesion(camp)

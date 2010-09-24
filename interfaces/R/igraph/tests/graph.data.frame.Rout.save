@@ -1,0 +1,52 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> actors <- data.frame(name=c("Alice", "Bob", "Cecil", "David",
++                        "Esmeralda"),
++                      age=c(48,33,45,34,21),
++                      gender=c("F","M","F","M","F"))
+> relations <- data.frame(from=c("Bob", "Cecil", "Cecil", "David",
++                           "David", "Esmeralda"),
++                         to=c("Alice", "Bob", "Alice", "Alice",
++                           "Bob", "Alice"),
++                         same.dept=c(FALSE,FALSE,TRUE,FALSE,FALSE,TRUE),
++                         friendship=c(4,5,5,2,1,1), advice=c(4,5,5,4,2,3))
+> g <- graph.data.frame(relations, directed=TRUE, vertices=actors)
+> print(g, e=TRUE, v=TRUE)
+Vertices: 5 
+Edges: 6 
+Directed: TRUE 
+Vertex attributes:
+         name age gender
+[1]     Alice  48      F
+[2]       Bob  33      M
+[3]     Cecil  45      F
+[4]     David  34      M
+[5] Esmeralda  21      F
+Edges and their attributes:
+                               same.dept friendship advice
+[1] 'Bob'       -> 'Alice'         FALSE          4      4
+[2] 'Cecil'     -> 'Bob'           FALSE          5      5
+[3] 'Cecil'     -> 'Alice'          TRUE          5      5
+[4] 'David'     -> 'Alice'         FALSE          2      4
+[5] 'David'     -> 'Bob'           FALSE          1      2
+[6] 'Esmeralda' -> 'Alice'          TRUE          1      3
+> 
+> 

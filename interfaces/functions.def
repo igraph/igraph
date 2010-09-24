@@ -733,7 +733,7 @@ igraph_bipartite_projection:
 
 igraph_create_bipartite:
         PARAMS: OUT GRAPH graph, IN VECTOR_BOOL types, \
-                VECTOR edges, BOOLEAN directed=False
+                VECTORM1 edges, BOOLEAN directed=False
         NAME-R: graph.bipartite
         IGNORE: RR
 
@@ -1266,8 +1266,8 @@ igraph_compose:
 
 igraph_maxflow:
         PARAMS: GRAPH graph, OUT REALPTR value, OUT VECTOR_OR_0 flow, \
-                OUT VECTOR_OR_0 cut, OUT VECTOR_OR_0 partition1, \
-                OUT VECTOR_OR_0 partition2, VERTEX source, VERTEX target, \
+                OUT VECTORM1_OR_0 cut, OUT VECTORM1_OR_0 partition1, \
+                OUT VECTORM1_OR_0 partition2, VERTEX source, VERTEX target, \
                 EDGECAPACITY capacity=NULL
         DEPS: capacity ON graph, source ON graph, target ON graph
 
@@ -1288,8 +1288,8 @@ igraph_st_mincut_value:
         IGNORE: RR, RC, RNamespace
 
 igraph_mincut:
-        PARAMS: GRAPH graph, OUT REALPTR value, OUT VECTOR partition, \
-                OUT VECTOR partition2, OUT VECTOR cut, VECTOR_OR_0 capacity
+        PARAMS: GRAPH graph, OUT REALPTR value, OUT VECTORM1 partition1, \
+                OUT VECTORM1 partition2, OUT VECTORM1 cut, VECTOR_OR_0 capacity
         IGNORE: RR, RC, RNamespace
 
 igraph_st_vertex_connectivity:
@@ -1406,6 +1406,8 @@ igraph_isomorphic:
 
 igraph_isoclass_subgraph:
         PARAMS: GRAPH graph, VECTOR vids, OUT INTEGERPTR isoclass
+        DEPS: vids ON graph
+        IGNORE: RR
 
 igraph_isoclass_create:
         PARAMS: OUT GRAPH graph, INTEGER size, INTEGER number, BOOLEAN directed=True

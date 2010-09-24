@@ -21,6 +21,8 @@ Type 'q()' to quit R.
 > g <- graph.famous("Zachary")
 > graph.adhesion(g)
 [1] 1
+> graph.cohesion(g)
+[1] 1
 > 
 > kite <- graph.formula(Andre    - Beverly:Carol:Diane:Fernando,
 +                       Beverly  - Andre:Diane:Ed:Garth,
@@ -34,6 +36,8 @@ Type 'q()' to quit R.
 +                       Jane     - Ike)
 > kite <- simplify(kite)
 > graph.adhesion(kite)
+[1] 1
+> graph.cohesion(kite)
 [1] 1
 > 
 > camp <- graph.formula(Harry:Steve:Don:Bert - Harry:Steve:Don:Bert,
@@ -50,5 +54,7 @@ Type 'q()' to quit R.
 +                       John    - Gery:Russ:Michael)
 > camp <- simplify(camp)
 > graph.adhesion(camp)
+[1] 2
+> graph.cohesion(camp)
 [1] 2
 > 

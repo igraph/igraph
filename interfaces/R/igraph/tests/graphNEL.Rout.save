@@ -1,0 +1,73 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> g <- erdos.renyi.game(100, 5/100)
+> N <- igraph.to.graphNEL(g)
+Loading required package: graph
+
+Attaching package: 'graph'
+
+The following object(s) are masked from 'package:igraph':
+
+    degree
+
+> g2 <- igraph.from.graphNEL(N)
+> graph.isomorphic.vf2(g, g2)
+$iso
+[1] TRUE
+
+$map12
+  [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+ [19]  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36
+ [37]  37  38  39  40  41  42  43  44  45  46  47  48  49  50  51  52  53  54
+ [55]  55  56  57  58  59  60  61  62  63  64  65  66  67  68  69  70  71  72
+ [73]  73  74  75  76  77  78  79  80  81  82  83  84  85  86  87  88  89  90
+ [91]  91  92  93  94  95  96  97  98  99 100
+
+$map21
+  [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+ [19]  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36
+ [37]  37  38  39  40  41  42  43  44  45  46  47  48  49  50  51  52  53  54
+ [55]  55  56  57  58  59  60  61  62  63  64  65  66  67  68  69  70  71  72
+ [73]  73  74  75  76  77  78  79  80  81  82  83  84  85  86  87  88  89  90
+ [91]  91  92  93  94  95  96  97  98  99 100
+
+> 
+> ## Attributes
+> 
+> V(g)$name <- as.character(vcount(g):1)
+> E(g)$weight <- sample(1:10, ecount(g), replace=TRUE)
+> g$name <- "Foobar"
+> 
+> N <- igraph.to.graphNEL(g)
+> g2 <- igraph.from.graphNEL(N)
+> graph.isomorphic(g, g2)
+[1] TRUE
+> 
+> all(V(g)$name == V(g2)$name)
+[1] TRUE
+> A <- get.adjacency(g, attr="weight")
+> A2 <- get.adjacency(g2, attr="weight")
+> all(A == A2)
+[1] TRUE
+> g$name == g2$name
+[1] TRUE
+> 
+> 
