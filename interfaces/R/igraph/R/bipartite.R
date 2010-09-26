@@ -21,7 +21,7 @@
 ###################################################################
 
 bipartite.projection <- function(graph, types=NULL,
-                                 multiplicity=TRUE, probe1=-1) {
+                                 multiplicity=TRUE, probe1=NULL) {
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
   if (is.null(types) && "type" %in% list.vertex.attributes(graph)) { 
@@ -32,11 +32,15 @@ bipartite.projection <- function(graph, types=NULL,
   } else { 
   stop("Not a bipartite graph, supply `types' argument") 
   }
-  probe1 <- as.numeric(probe1)
+  if (!is.null(probe1)) {
+    probe1 <- as.igraph.vs(graph, probe1)-1
+  } else {
+    probe1 <- -1
+  }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
-  res <- .Call("R_igraph_bipartite_projection", graph, types, probe1-1,
+  res <- .Call("R_igraph_bipartite_projection", graph, types, probe1,
         PACKAGE="igraph")
   if (multiplicity) {
     E(res[[1]])$weight <- res[[3]]
