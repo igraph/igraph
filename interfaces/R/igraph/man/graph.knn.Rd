@@ -48,7 +48,7 @@ g2 <- graph.star(10)
 graph.knn(g2)
 
 # A scale-free one, try to plot 'knnk'
-g3 <- simplify(ba.game(1000, m=5))
+g3 <- ba.game(1000, m=5)
 graph.knn(g3)
 
 # A random graph

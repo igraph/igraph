@@ -136,7 +136,7 @@ centralization.evcent.tmax (graph = NULL, nodes = 0,
 %\seealso{}
 \examples{
 # A BA graph is quite centralized
-g <- simplify(ba.game(1000, m=4))
+g <- ba.game(1000, m=4)
 centralization.degree(g)$centralization
 centralization.closeness(g, mode="all")$centralization
 centralization.evcent(g, directed=FALSE)$centralization

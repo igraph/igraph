@@ -224,7 +224,7 @@ graph.isomorphic(g1, g2)
 
 # create two isomorphic graphs, by
 # permuting the vertices of the first 
-g1 <- simplify(barabasi.game(30, m=2, directed=FALSE))
+g1 <- barabasi.game(30, m=2, directed=FALSE)
 g2 <- permute.vertices(g1, sample(vcount(g1)))
 # should be TRUE
 graph.isomorphic(g1, g2)

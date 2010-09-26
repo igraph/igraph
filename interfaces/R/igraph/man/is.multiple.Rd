@@ -42,7 +42,7 @@ g <- graph( c(1,1,2,2,3,3,4,5) )
 is.loop(g)
 
 # Multiple edges
-g <- barabasi.game(10, m=3)
+g <- barabasi.game(10, m=3, algorithm="bag")
 is.multiple(g)
 count.multiple(g)
 is.multiple(simplify(g))
@@ -53,7 +53,7 @@ is.multiple(graph( c(1,2, 2,1) ))
 is.multiple(graph( c(1,2, 2,1), dir=FALSE ))
 
 # Remove multiple edges but keep multiplicity
-g <- barabasi.game(10, m=3)
+g <- barabasi.game(10, m=3, algorithm="bag")
 E(g)$weight <- count.multiple(g)
 g <- simplify(g)
 any(is.multiple(g))
