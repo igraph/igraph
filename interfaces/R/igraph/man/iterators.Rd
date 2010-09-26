@@ -99,7 +99,7 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
   \preformatted{
     g <- graph.tree(10)
     V(g)$color <- "grey"
-    V(g)[0:2]$color <- c("green", "blue")
+    V(g)[1:3]$color <- c("green", "blue")
   }
   
   If a new vertex/edge attribute is created with an assignment, but only
@@ -124,9 +124,9 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
   vector of the same length as the indexed vertex sequence and evaluates
   to \code{TRUE} for those vertices only which have a neighbor vertex in
   the vertex sequence supplied as a parameter. Thus for selecting all
-  neighbors of vertices 0 and 1 one can write:
+  neighbors of vertices 1 and 2 one can write:
   \preformatted{
-    V(g) [ nei( 0:1 ) ]
+    V(g) [ nei( 1:2 ) ]
   }
   The mode argument (just like for \code{\link{neighbors}}) gives the
   type of the neighbors to be included, it is interpreted only in
@@ -161,7 +161,7 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
 
   \code{E} has two optional arguments: \code{P} and \code{path}. If
   given \code{P} can be used to select edges based on their end points,
-  eg. \code{E(g, P=c(0,1))} selects edge \code{0->1}.
+  eg. \code{E(g, P=c(1,2))} selects edge \code{1->2}.
 
   \code{path} can be used to select all edges along a path. The path
   should be given with the visited vertex ids in the appropriate order.

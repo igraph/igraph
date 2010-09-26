@@ -13,7 +13,10 @@ articulation.points(graph)
 }
 \details{
   Articuation points or cut vertices are vertices whose
-  removal increases the number of connected components in a graph.  
+  removal increases the number of connected components in a graph. If
+  the original graph was connected, then the removal of a single
+  articulation point makes it undirected. If a graph contains no
+  articulation points, then its vertex connectivity is at least two.  
 }
 \value{A numeric vector giving the vertex ids of the articulation points
   of the input graph.}

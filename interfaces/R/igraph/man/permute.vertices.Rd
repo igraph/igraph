@@ -9,8 +9,8 @@ permute.vertices(graph, permutation)
 \arguments{
   \item{graph}{The input graph, it can directed or undirected.}
   \item{permutation}{A numeric vector giving the permutation to
-    apply. The first element is the new id of vertex 0, etc. Every
-    number between zero and \code{vcount(graph)-1} must appear exactly
+    apply. The first element is the new id of vertex 1, etc. Every
+    number between one and \code{vcount(graph)} must appear exactly
     once.}
 }
 \details{

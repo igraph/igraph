@@ -29,7 +29,7 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 \details{
   The \code{read.graph} function may have additional arguments depending
   on the file format (the \code{format} argument).
-  \itemize{
+  \describe{
     \item{edgelist}{
       
       This format is a simple text file with numeric vertex ids defining
@@ -37,7 +37,7 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
       edges, a simple space will also do.
       
       Additional arguments:
-      \itemize{
+      \describe{
 	\item{n}{The number of vertices in the graph. If it is smaller
 	  than or equal to the largest integer in the file, then it is
 	  ignored; so it is safe to set it to zero (the default).}
@@ -55,19 +55,19 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 
       \code{igraph} implements only a subset of the Pajek format:
       \itemize{
-	\item{}{Only .net files are supported, Pajek project files (which
+	\item Only .net files are supported, Pajek project files (which
 	  can contain many graph and also other type of data) are
 	  not. Poject files might be supported in a forthcoming igraph
-	  release if they turned out to be needed.}
-	\item{}{Time events networks are not supported.}
-	\item{}{Hypergraphs (graphs with non-binary edges) are not
-	  supported as igraph cannot handle them.}
-	\item{}{Graphs containing both directed and undirected edges are
-	  not supported as igraph cannot represent them.}
-	\item{}{Bipartite (also called affiliation) networks are not
+	  release if they turned out to be needed.
+	\item Time events networks are not supported.
+	\item Hypergraphs (graphs with non-binary edges) are not
+	  supported as igraph cannot handle them.
+	\item Graphs containing both directed and undirected edges are
+	  not supported as igraph cannot represent them.
+	\item Bipartite (also called affiliation) networks are not
 	  supported. The surrent igraph version imports the network
-	  structure correctly but vertex type information is omitted.}
-	\item{}{Graph with multiple edge sets are not supported.}
+	  structure correctly but vertex type information is omitted.
+	\item Graph with multiple edge sets are not supported.
       }
 
       Vertex and edge attributes defined in the Pajek file will be also
@@ -147,12 +147,12 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
       and generalized graphs which igraph cannot handle. Thus igraph
       supports only a subset of the GraphML language: 
       \itemize{
-	\item{}{Hypergraphs are not supported.}
-	\item{}{Nested graphs are not supported.}
-	\item{}{Mixed graphs, ie. graphs with both directed and
+	\item Hypergraphs are not supported.
+	\item Nested graphs are not supported.
+	\item Mixed graphs, ie. graphs with both directed and
 	  undirected edges are not supported. read.graph() sets the
 	  graph directed if this is the default in the GraphML file,
-	  even if all the edges are in fact undirected.}
+	  even if all the edges are in fact undirected.
       }
 
       See the GraphML homepage at
@@ -160,7 +160,7 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
       the GraphML format.       
       
       Additional arguments:
-      \itemize{
+      \describe{
 	\item{index}{If the GraphML file contains more than one graphs,
 	  this argument can be used to select the graph to read. By
 	  default the first graph is read (index 0).}
@@ -174,21 +174,21 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
       we implement only a subset of this format, some attributes might be
       ignored. Here is a list of all the differences:
       \itemize{
-	\item{}{Only \code{node} and \code{edge} attributes are 
+	\item Only \code{node} and \code{edge} attributes are 
 	  used, and only if they have a simple type: integer, real or
 	  string. So if an attribute is an array or a record, then it is 
 	  ignored. This is also true if only some values of the
-	  attribute are complex.}
-	\item{}{Top level attributes except for \code{Version} and the
-	  first \code{graph} attribute are completely ignored.}
-	\item{}{Graph attributes except for \code{node} and
-	  \code{edge} are completely ignored.}
-	\item{}{ There is no maximum line length.}
-	\item{}{ There is no maximum keyword length.}
-	\item{}{ Character entities in strings are not interpreted.}
-	\item{}{ We allow \code{inf} (infinity) and \code{nan}
+	  attribute are complex.
+	\item Top level attributes except for \code{Version} and the
+	  first \code{graph} attribute are completely ignored.
+	\item Graph attributes except for \code{node} and
+	  \code{edge} are completely ignored.
+	\item There is no maximum line length.
+	\item There is no maximum keyword length.
+	\item Character entities in strings are not interpreted.
+	\item We allow \code{inf} (infinity) and \code{nan}
 	  (not a number) as a real number. This is case insensitive, so
-	  \code{nan}, \code{NaN} and \code{NAN} are equal.}
+	  \code{nan}, \code{NaN} and \code{NAN} are equal.
       }
       
       Please contact us if you cannot live with these
@@ -208,7 +208,7 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
       same.
       
       Additional arguments:
-      \itemize{
+      \describe{
 	\item{directed}{Logical scalar, whether to create a directed
 	  graph. The default is to make the graph directed.}
       }
@@ -229,7 +229,7 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
       checked here, as igraph is happy with these.
 
       Additional arguments:
-      \itemize{
+      \describe{
 	\item{names}{Logical constant, whether to add the symbolic names
 	  as vertex attributes to the graph. If TRUE the name of the
 	  vertex attribute will be \sQuote{name}.}
@@ -267,7 +267,7 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
       in igraph it is not an error to have multiple and loop edges.
       
       Additional arguments:
-      \itemize{
+      \describe{
 	\item{names}{Logical constant, whether to add the symbolic names
 	  as vertex attributes to the graph. If TRUE the name of the
 	  vertex attribute will be \sQuote{name}.}
@@ -308,7 +308,7 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
       are assigned to the \code{capacity} edge attribute.
 
       Additional arguments:
-      \itemize{
+      \describe{
 	\item{directed}{Logical scalar, whether to create a directed
 	  graph. By default a directed graph is created.
 	}
@@ -335,7 +335,7 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
       Only unlabelled graphs are implemented.
 
       Additional attributes:
-      \itemize{
+      \describe{
 	\item{directed}{Logical scalar. Whether to create a directed
 	  graph.}
       }

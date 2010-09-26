@@ -22,7 +22,7 @@ graph.bipartite(types, edges, directed=FALSE)
     this is more common for bipartite graphs.}
 }
 \details{
-  Bipartite graphs have a \sQuote{\code{type}} vertex attribute in
+  Bipartite graphs have a \code{type} vertex attribute in
   igraph, this is boolean and \code{FALSE} for the vertices of the first
   kind and \code{TRUE} for vertices of the second kind.
 
@@ -33,7 +33,7 @@ graph.bipartite(types, edges, directed=FALSE)
 }
 \value{
   A bipartite igraph graph. In other words, an igraph graph that has a
-  vertex attribute \code{type}. 
+  vertex attribute named \code{type}. 
 }
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}

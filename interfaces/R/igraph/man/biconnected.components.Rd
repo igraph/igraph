@@ -34,9 +34,6 @@ biconnected.components(graph)
     components.}
   \item{articulation_points}{The articulation points of the graph. See
     \code{\link{articulation.points}}.}
-  
-  See examples below on how to extract the vertex ids of the biconnected
-  components from the result.
 }
 %\references
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}

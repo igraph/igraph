@@ -12,7 +12,7 @@
 \arguments{
   \item{x}{The input graph.}
   \item{membership}{Numeric vector, for each vertex it gives its
-    community. The communities are numbered from zero.
+    community. The communities are numbered from one.
   }
   \item{weights}{If not \code{NULL} then a numeric vector giving edge
     weights.}

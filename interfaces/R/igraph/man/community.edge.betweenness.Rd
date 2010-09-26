@@ -23,20 +23,21 @@ edge.betweenness.community (graph, directed = TRUE,
     This argument is called \code{merges}, even if the community
     structure algorithm itself is divisive and not agglomerative: it
     builds the tree from top to bottom. There is one line for each merge
-    (ie. split) in matrix, the first line is the first merge (last
+    (i.e. split) in matrix, the first line is the first merge (last
     split). The communities are identified by integer number starting from
-    zero. Community ids smaller than \sQuote{\code{N}}, the number of
-    vertices in the graph, belong to singleton communities, ie. individual
-    vertices. Before the first merge we have \sQuote{\code{N}} communities
-    numbered from zero to \sQuote{\code{N-1}}. The first merge, the
-    first line of the matrix creates community \sQuote{\code{N}}, the
-    second merge creates community \sQuote{\code{N+1}}, etc.
+    one. Community ids smaller than or equal to \eqn{N}, the
+    number of vertices in the graph, belong to singleton communities,
+    ie. individual vertices. Before the first merge we have
+    \eqn{N} communities numbered from one to \eqn{N}. The
+    first merge, the first line of the matrix creates community
+    \eqn{N+1}, the second merge creates community \eqn{N+2},
+    etc.
   }
   \item{bridges}{Logical constant, whether to return a list the edge
     removals which actually splitted a component of the graph.}
   \item{labels}{Logical constant, whether to contain the labels of the
     vertices in the result. More precisely, if the graph has a vertex
-    attribute valled \sQuote{name}, it will be part of the result
+    attribute valled \code{name}, it will be part of the result
     object.}
   \item{modularity}{Logical constant, whether to calculate the
     maximum modularity score, considering all possibly community

@@ -16,7 +16,7 @@ transitivity(graph, type=c("undirected", "global", "globalundirected",
   \item{graph}{The graph to analyze.}
   \item{type}{The type of the transitivity to calculate. Possible
     values:
-    \itemize{
+    \describe{
       \item{\code{global}}{The global transitivity of an
 	undirected graph (directed graphs are considered as undirected ones
 	as well). This is simply the ratio of the triangles and the

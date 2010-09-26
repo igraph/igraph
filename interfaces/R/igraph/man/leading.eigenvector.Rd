@@ -134,7 +134,7 @@ community.le.to.membership(merges, steps, membership)
   components:
   \item{membership}{A membership vector, a numerical vector
     indication which vertex belongs to which community. The
-    communities are always numbered from zero.}
+    communities are always numbered from one.}
   \item{csize}{A numeric vector giving the sizes of the communities.}
 }
 \references{

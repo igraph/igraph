@@ -11,7 +11,7 @@ compare.communities (comm1, comm2, method = c("vi", "nmi"))
 \arguments{
   \item{comm1}{Numeric vector. The membership vector of the first
     community structure. It should contain the community id of each
-    vertex, the numbering of the communities starts with zero.} 
+    vertex, the numbering of the communities starts with one.} 
   \item{comm2}{Numeric vector. The membership vector of the second
     community structure, in the same format as for the previous
     argument.} 
@@ -44,6 +44,6 @@ compare.communities (comm1, comm2, method = c("vi", "nmi"))
 g <- graph.famous("Zachary")
 sg <- spinglass.community(g)
 le <- leading.eigenvector.community(g)
-compare.communities(sg$membership, le$membership)
+compare.communities(membership(sg), membership(le))
 }
 \keyword{graphs}

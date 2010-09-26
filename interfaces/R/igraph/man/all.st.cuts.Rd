@@ -17,7 +17,7 @@ all.st.cuts(graph, source, target)
 \details{
   Given a \eqn{G} directed graph and two, different and non-ajacent
   vertices, \eqn{s} and \eqn{t}, an \eqn{(s,t)}-cut is a set of edges,
-  such that after removing this edges from \eqn{G} there is no directed
+  such that after removing these edges from \eqn{G} there is no directed
   path from \eqn{s} to \eqn{t}.  
 }
 \value{
@@ -26,7 +26,7 @@ all.st.cuts(graph, source, target)
     is an \eqn{(s,t)}-cut.}
   \item{partition1s}{A list of numeric vectors containing vertex
     ids, they correspond to the edge cuts. Each vertex set is a 
-    generator of the corresponding cut, i.e. the graph \eqn{G=(V,E)} the
+    generator of the corresponding cut, i.e. in the graph \eqn{G=(V,E)}, the
     vertex set \eqn{X} and its complementer \eqn{V-X}, generates the cut
     that contains exactly the edges that go from \eqn{X} to \eqn{V-X}.}
 }
@@ -41,7 +41,7 @@ all.st.cuts(graph, source, target)
 \examples{
 # A very simple graph
 g <- graph.formula(a -+ b -+ c -+ d -+ e)
-all.st.cuts(g, source=0, target=4)
+all.st.cuts(g, source="a", target="e")
 
 # A somewhat more difficult graph
 g2 <- graph.formula(s --+ a:b, a:b --+ t,

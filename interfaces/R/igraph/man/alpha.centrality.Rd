@@ -13,7 +13,7 @@ alpha.centrality(graph, nodes=V(graph), alpha=1, loops=FALSE,
   \item{graph}{The input graph, can be directed or undirected}
   \item{nodes}{Vertex sequence, the vertices for which the alpha
     centrality values are returned. (For technical reasons they
-    will be calculated for all vertices first, anyway.)}
+    will be calculated for all vertices, anyway.)}
   \item{alpha}{Parameter specifying the relative importance of
     endogenous versus exogenous factors in the determination of
     centrality. See details below.}
@@ -21,11 +21,12 @@ alpha.centrality(graph, nodes=V(graph), alpha=1, loops=FALSE,
     calculation.}
   \item{exo}{The exogenous factors, in most cases this is either a
     constant -- the same factor for every node, or a vector giving the
-    factor for every vertex. Note that long vectors will be truncated and
-    short vectors will be replicated.}
-  \item{weights}{A character scalar to give the name of the edge attribute
-    to use in the adjacency matrix. If it is \code{NULL}, then the
-    \sQuote{weight} edge attribute of the graph is used, if there is
+    factor for every vertex. Note that too long vectors will be
+    truncated and too short vectors will be replicated to match the
+    number of vertices.}
+  \item{weights}{A character scalar that gives the name of the edge
+    attribute to use in the adjacency matrix. If it is \code{NULL}, then
+    the \sQuote{weight} edge attribute of the graph is used, if there is
     one. Otherwise, or if it is \code{NA}, then the calculation uses the
     standard adjacency matrix.}
   \item{tol}{Tolerance for near-singularities during matrix inversion,

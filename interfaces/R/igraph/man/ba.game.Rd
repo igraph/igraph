@@ -33,14 +33,14 @@ barabasi.game(n, power = 1, m = NULL, out.dist = NULL, out.seq = NULL,
     adjacent edges. See details below.}
   \item{directed}{Whether to create a directed graph.}
   \item{algorithm}{The algorithm to use for the graph generation.
-    \sQuote{\code{psumtree}} uses a partial prefix-sum tree to generate
+    \code{psumtree} uses a partial prefix-sum tree to generate
     the graph, this algorithm can handle any \code{power} and
-    \code{zero.appeal} values and never generated multiple edges.
-    \sQuote{\code{psumtree-multiple}} also uses a partial prefix-sum
+    \code{zero.appeal} values and never generates multiple edges.
+    \code{psumtree-multiple} also uses a partial prefix-sum
     tree, but the generation of multiple edges is allowed. Before the
     0.6 version igraph used this algorithm if \code{power} was not one,
     or \code{zero.appeal} was not one.
-    \sQuote{\code{bag}} is the algorithm that was previously (before
+    \code{bag} is the algorithm that was previously (before
     version 0.6) used if \code{power} was one and \code{zero.appeal} was
     one as well. It works by putting the ids of the vertices into a bag
     (mutliset, really), exactly as many times as their (in-)degree, plus
@@ -95,9 +95,6 @@ barabasi.game(n, power = 1, m = NULL, out.dist = NULL, out.seq = NULL,
   the number of adjacent edges not initiated by the vertex itself and
   not the total (in- + out-) degree of the vertex, unless the
   \code{out.pref} argument is set to \code{TRUE}.
-
-  Note that \code{barabasi.game} might generate graphs with multiple
-  edges.
 }
 \value{A graph object.}
 \references{  Barabasi, A.-L. and Albert R. 1999. Emergence of scaling

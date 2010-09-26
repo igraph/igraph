@@ -87,7 +87,7 @@ maxcohesion(blocks)
   Cohesive blocking is a method of determining hierarchical subsets of
   graph vertices based on their structural cohesion (or vertex
   connectivity). For a given graph \eqn{G}, a subset of its vertices
-  \eqn{S\subset V(G)} is said to be maximally \eqn{k}-cohesive if there is
+  \eqn{S\subset V(G)}{S} is said to be maximally \eqn{k}-cohesive if there is
   no superset of \eqn{S} with vertex connectivity greater than or equal to
   \eqn{k}. Cohesive blocking is a process through which, given a
   \eqn{k}-cohesive set of vertices, maximally \eqn{l}-cohesive subsets are
@@ -121,7 +121,7 @@ maxcohesion(blocks)
   \code{blockGraphs}, \code{cohesion}, etc. functions.
 
   \code{parent} gives the parent vertex of each block, in the block
-  hierarchy, for the root vertex it gives -1.
+  hierarchy, for the root vertex it gives 0.
 
   \code{plotHierarchy} plots the hierarchy tree of the cohesive blocks
   on the active graphics device, by calling \code{igraph.plot}.
@@ -172,7 +172,7 @@ maxcohesion(blocks)
 
   \code{parent} returns a numeric vector giving the parent block of each
   cohesive block, in the block hierarchy. The block at the root of the
-  hierarchy has no parent and \code{-1} is returned for it.
+  hierarchy has no parent and \code{0} is returned for it.
 
   \code{plotHierarchy}, \code{plot} and \code{exportPajek} return
   \code{NULL}, invisibly.

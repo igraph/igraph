@@ -101,7 +101,7 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
   \code{layout.fruchterman.reingold} uses a force-based algorithm
   proposed by Fruchterman and Reingold, see references. Parameters and
   their default values:
-  \itemize{
+  \describe{
     \item{niter}{Numeric, the number of iterations to perform (500).}
     \item{coolexp}{Numeric, the cooling exponent for the simulated
       annealing (3).}
@@ -116,7 +116,7 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
 
   \code{layout.kamada.kawai} is another force based algorithm. 
   Parameters and default values:
-  \itemize{
+  \describe{
     \item{niter}{Number of iterations to perform (1000).}
     \item{sigma}{Sets the base standard deviation of position change
       proposals (vcount(graph)/4).}
@@ -131,7 +131,7 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
 
   \code{layout.spring} is a spring embedder algorithm.
   Parameters and default values:
-  \itemize{
+  \describe{
     \item{mass}{The vertex mass (in \sQuote{quasi-kilograms}). (Defaults to 0.1.)}
     \item{equil}{The equilibrium spring extension (in
       \sQuote{quasi-meters}). (Defaults to 1.)}
@@ -148,7 +148,7 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
 
   \code{layout.reingold.tilford} generates a tree-like layout, so it is
   mainly for trees. Parameters and default values:
-  \itemize{
+  \describe{
     \item{root}{The id of the root vertex, defaults to 0.}
     \item{circular}{Logical scalar, whether to plot the tree in a
       circular fashion, defaults to \code{FALSE}.}
@@ -161,7 +161,7 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
   \code{layout.fruchterman.reingold} but repelling force is calculated
   only between vertices that are closer to each other than a limit, so
   it is faster. Patameters and default values:
-  \itemize{
+  \describe{
     \item{niter}{Numeric, the number of iterations to perform (500).}
     \item{maxdelta}{Maximum change for one vertex in one iteration. (The
       number of vertices in the graph.)}
@@ -181,7 +181,7 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
   layout generator of the Large Graph Layout software
   (\url{http://bioinformatics.icmb.utexas.edu/lgl}). Parameters and
   default values:
-  \itemize{
+  \describe{
     \item{maxiter}{The maximum number of iterations to perform (150).}
     \item{maxdelta}{The maximum change for a vertex during an iteration
       (the number of vertices).}
@@ -214,7 +214,7 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
   graphopt.
 
   Parameters and default values:
-  \itemize{
+  \describe{
     \item{niter}{Integer scalar, the number of iterations to perform.
       Should be a couple of hundred in general. If you have a large graph 
       then you might want to only do a few iterations and then check the 
