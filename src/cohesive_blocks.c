@@ -132,6 +132,27 @@ int igraph_i_cb_components(igraph_t *graph,
   return 0;
 }
 
+igraph_bool_t igraph_i_cb_isin(const igraph_vector_t *needle, 
+			       const igraph_vector_t *haystack) {
+  long int nlen=igraph_vector_size(needle);
+  long int hlen=igraph_vector_size(haystack);
+  long int np=0, hp=0;
+  
+  if (hlen < nlen) { return 0; }
+  
+  while (np<nlen && hp<hlen) {
+    if (VECTOR(*needle)[np] == VECTOR(*haystack)[hp]) {
+      np++; hp++; 
+    } else if (VECTOR(*needle)[np] < VECTOR(*haystack)[hp]) {
+      return 0;
+    } else {
+      hp++;
+    }
+  }
+  
+  return np==nlen;
+}
+
 int igraph_cohesive_blocks(const igraph_t *graph,
 			   igraph_vector_ptr_t *blocks,
 			   igraph_vector_t *cohesion,
@@ -158,6 +179,7 @@ int igraph_cohesive_blocks(const igraph_t *graph,
   igraph_vector_ptr_t Qmapping;
   igraph_vector_long_t Qparent;
   igraph_vector_long_t Qcohesion;
+  igraph_vector_bool_t Qcheck;
   long int Qptr=0;
   igraph_integer_t conn;
 
@@ -194,6 +216,9 @@ int igraph_cohesive_blocks(const igraph_t *graph,
 
   IGRAPH_CHECK(igraph_vector_long_init(&Qcohesion, 1));
   IGRAPH_FINALLY(igraph_vector_long_destroy, &Qcohesion);
+
+  IGRAPH_CHECK(igraph_vector_bool_init(&Qcheck, 1));
+  IGRAPH_FINALLY(igraph_vector_bool_destroy, &Qcheck);
   
   IGRAPH_CHECK(igraph_vector_ptr_init(&separators, 0));
   IGRAPH_FINALLY(igraph_vector_ptr_destroy, &separators);
@@ -220,15 +245,18 @@ int igraph_cohesive_blocks(const igraph_t *graph,
   VECTOR(Qparent)[0] = -1;	/* Has no parent */
   IGRAPH_CHECK(igraph_vertex_connectivity(graph, &conn, /*checks=*/ 1));
   VECTOR(Qcohesion)[0] = conn;
+  VECTOR(Qcheck)[0] = 0;
   
   /* Then work until the queue is empty */
   while (Qptr < igraph_vector_ptr_size(&Q)) {
     igraph_t *mygraph=VECTOR(Q)[Qptr];
+    igraph_bool_t mycheck=VECTOR(Qcheck)[Qptr];
     long int mynodes=igraph_vcount(mygraph);
     long int i, nsep;
     long int no;
     long int cptr=0;
     long int nsepv=0;
+    igraph_bool_t addedsep=0;
 
     IGRAPH_ALLOW_INTERRUPTION();
 
@@ -257,6 +285,20 @@ int igraph_cohesive_blocks(const igraph_t *graph,
     IGRAPH_CHECK(igraph_i_cb_components(mygraph, &marked, 
 					&components, &no,
 					&compid, &bfsQ, &neis));
+
+    /* Add the separator vertices themselves, as another component,
+       but only if there is at least one vertex not included in any 
+       separator. */
+    if (nsepv != mynodes) {
+      addedsep=1;
+      for (i=0; i<mynodes; i++) {
+	if (VECTOR(marked)[i]) {
+	  IGRAPH_CHECK(igraph_vector_long_push_back(&components, i));
+	}
+      }
+      IGRAPH_CHECK(igraph_vector_long_push_back(&components, -1));
+      no++;
+    }
 
     for (i=0; i<no; i++) {
       igraph_vector_t *newmapping;
@@ -301,6 +343,8 @@ int igraph_cohesive_blocks(const igraph_t *graph,
 						/*checks=*/ 1));
 	IGRAPH_CHECK(igraph_vector_long_push_back(&Qcohesion, newconn));
 	IGRAPH_CHECK(igraph_vector_long_push_back(&Qparent, Qptr));
+	IGRAPH_CHECK(igraph_vector_bool_push_back(&Qcheck, 
+						  mycheck || addedsep));
       } else {
 	igraph_destroy(newgraph);
 	igraph_free(newgraph);
@@ -347,11 +391,6 @@ int igraph_cohesive_blocks(const igraph_t *graph,
 	badblocks++;
       }
     }
-    noblocks -= badblocks;
-
-    if (blocks) { IGRAPH_CHECK(igraph_vector_ptr_resize(blocks, noblocks)); }
-    if (cohesion) { IGRAPH_CHECK(igraph_vector_resize(cohesion, noblocks)); }
-    if (parent) { IGRAPH_CHECK(igraph_vector_resize(parent, noblocks)); }
 
     /* Rewrite the mappings */
     for (i=1; i<Qptr; i++) {
@@ -366,6 +405,35 @@ int igraph_cohesive_blocks(const igraph_t *graph,
 	VECTOR(*mapping)[j] = VECTOR(*pmapping)[v];
       }
     }
+
+    /* Because we also put the separator vertices in the queue, it is 
+       not ensured that the found blocks are not subsets of each other.
+       We check this now. */
+    for (i=1; i<noblocks; i++) {
+      long int j, ic;
+      igraph_vector_t *ivec;
+      if (!VECTOR(Qcheck)[i] || VECTOR(removed)[i]) { continue; }
+      ivec=VECTOR(Qmapping)[i];
+      ic=VECTOR(Qcohesion)[i];
+      for (j=1; j<noblocks; j++) {
+	igraph_vector_t *jvec;
+	long int jc;
+	if (j==i || !VECTOR(Qcheck)[j] || VECTOR(removed)[j]) { continue; }
+	jvec=VECTOR(Qmapping)[j];
+	jc=VECTOR(Qcohesion)[j];
+	if (igraph_i_cb_isin(ivec, jvec) && jc >= ic) { 
+	  badblocks++; 
+	  VECTOR(removed)[i]=1;
+	  break;
+	}
+      }
+    }
+	  
+    noblocks -= badblocks;
+
+    if (blocks) { IGRAPH_CHECK(igraph_vector_ptr_resize(blocks, noblocks)); }
+    if (cohesion) { IGRAPH_CHECK(igraph_vector_resize(cohesion, noblocks)); }
+    if (parent) { IGRAPH_CHECK(igraph_vector_resize(parent, noblocks)); }
 
     for (i=0; i<Qptr; i++) {
       if (VECTOR(removed)[i]) { continue; }
@@ -419,10 +487,11 @@ int igraph_cohesive_blocks(const igraph_t *graph,
 
   }
 
+  igraph_vector_bool_destroy(&Qcheck);
   igraph_vector_long_destroy(&Qcohesion);
   igraph_vector_long_destroy(&Qparent);
   igraph_i_cohesive_blocks_free2(&Qmapping);
-  IGRAPH_FINALLY_CLEAN(3);
+  IGRAPH_FINALLY_CLEAN(4);
   
   igraph_vector_ptr_destroy(&Qmapping);
   igraph_vector_ptr_destroy(&Q);
