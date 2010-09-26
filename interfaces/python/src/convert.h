@@ -72,6 +72,7 @@ PyObject* igraphmodule_PyObject_to_PyFile(PyObject *object, char* mode);
 
 int igraphmodule_PyObject_to_vector_t(PyObject *list, igraph_vector_t *v, igraph_bool_t need_non_negative, igraph_bool_t pairs);
 int igraphmodule_PyObject_float_to_vector_t(PyObject *list, igraph_vector_t *v);
+int igraphmodule_PyObject_to_vector_int_t(PyObject *list, igraph_vector_int_t *v);
 int igraphmodule_PyObject_to_vector_long_t(PyObject *list, igraph_vector_long_t *v);
 int igraphmodule_PyObject_to_vector_bool_t(PyObject *list, igraph_vector_bool_t *v);
 PyObject* igraphmodule_vector_bool_t_to_PyList(igraph_vector_bool_t *v);
@@ -79,6 +80,8 @@ PyObject* igraphmodule_vector_t_to_PyList(igraph_vector_t *v, igraphmodule_conv_
 PyObject* igraphmodule_vector_t_to_PyTuple(igraph_vector_t *v);
 int igraphmodule_attrib_to_vector_t(PyObject *o, igraphmodule_GraphObject *self,
   igraph_vector_t **vptr, int attr_type);
+int igraphmodule_attrib_to_vector_int_t(PyObject *o, igraphmodule_GraphObject *self,
+  igraph_vector_int_t **vptr, int attr_type);
 int igraphmodule_attrib_to_vector_long_t(PyObject *o, igraphmodule_GraphObject *self,
   igraph_vector_long_t **vptr, int attr_type);
 int igraphmodule_attrib_to_vector_bool_t(PyObject *o, igraphmodule_GraphObject *self,

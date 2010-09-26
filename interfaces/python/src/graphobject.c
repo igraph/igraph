@@ -6890,8 +6890,8 @@ PyObject *igraphmodule_Graph_isomorphic_vf2(igraphmodule_GraphObject * self,
   igraphmodule_GraphObject *other;
   igraph_vector_t mapping_12, mapping_21;
   igraph_vector_t *map12=0, *map21=0;
-  igraph_vector_long_t *color1=0, *color2=0;
-  igraph_vector_long_t *edge_color1=0, *edge_color2=0;
+  igraph_vector_int_t *color1=0, *color2=0;
+  igraph_vector_int_t *edge_color1=0, *edge_color2=0;
 
   static char *kwlist[] = {
     "other", "color1", "color2", "edge_color1", "edge_color2",
@@ -6904,24 +6904,24 @@ PyObject *igraphmodule_Graph_isomorphic_vf2(igraphmodule_GraphObject * self,
     return NULL;
   if (o == Py_None) other=self; else other=(igraphmodule_GraphObject*)o;
 
-  if (igraphmodule_attrib_to_vector_long_t(color1_o, self, &color1,
+  if (igraphmodule_attrib_to_vector_int_t(color1_o, self, &color1,
 	  ATTRIBUTE_TYPE_VERTEX)) return NULL;
-  if (igraphmodule_attrib_to_vector_long_t(color2_o, other, &color2,
+  if (igraphmodule_attrib_to_vector_int_t(color2_o, other, &color2,
 	  ATTRIBUTE_TYPE_VERTEX)) {
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
     return NULL;
   }
-  if (igraphmodule_attrib_to_vector_long_t(edge_color1_o, self, &edge_color1,
+  if (igraphmodule_attrib_to_vector_int_t(edge_color1_o, self, &edge_color1,
 	  ATTRIBUTE_TYPE_EDGE)) {
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_int_destroy(color2); free(color2); }
     return NULL;
   }
-  if (igraphmodule_attrib_to_vector_long_t(edge_color2_o, other, &edge_color2,
+  if (igraphmodule_attrib_to_vector_int_t(edge_color2_o, other, &edge_color2,
 	  ATTRIBUTE_TYPE_EDGE)) {
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
-    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_int_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_int_destroy(edge_color1); free(edge_color1); }
     return NULL;
   }
 
@@ -6937,17 +6937,17 @@ PyObject *igraphmodule_Graph_isomorphic_vf2(igraphmodule_GraphObject * self,
   if (igraph_isomorphic_vf2(&self->g, &other->g, color1, color2, edge_color1, edge_color2,
         &result, map12, map21)) {
     igraphmodule_handle_igraph_error();
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
-    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
-    if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_int_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_int_destroy(edge_color1); free(edge_color1); }
+    if (edge_color2) { igraph_vector_int_destroy(edge_color2); free(edge_color2); }
     return NULL;
   }
 
-  if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-  if (color2) { igraph_vector_long_destroy(color2); free(color2); }
-  if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
-  if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
+  if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+  if (color2) { igraph_vector_int_destroy(color2); free(color2); }
+  if (edge_color1) { igraph_vector_int_destroy(edge_color1); free(edge_color1); }
+  if (edge_color2) { igraph_vector_int_destroy(edge_color2); free(edge_color2); }
 
   if (!map12 && !map21) {
     if (result) Py_RETURN_TRUE;
@@ -6992,8 +6992,8 @@ PyObject *igraphmodule_Graph_count_isomorphisms_vf2(igraphmodule_GraphObject *se
   PyObject *color1_o=Py_None, *color2_o=Py_None;
   PyObject *edge_color1_o=Py_None, *edge_color2_o=Py_None;
   igraphmodule_GraphObject *other;
-  igraph_vector_long_t *color1=0, *color2=0;
-  igraph_vector_long_t *edge_color1=0, *edge_color2=0;
+  igraph_vector_int_t *color1=0, *color2=0;
+  igraph_vector_int_t *edge_color1=0, *edge_color2=0;
   static char *kwlist[] = { "other", "color1", "color2", "edge_color1", "edge_color2", NULL };
 
   if (!PyArg_ParseTupleAndKeywords
@@ -7002,41 +7002,41 @@ PyObject *igraphmodule_Graph_count_isomorphisms_vf2(igraphmodule_GraphObject *se
     return NULL;
   if (o == Py_None) other=self; else other=(igraphmodule_GraphObject*)o;
 
-  if (igraphmodule_attrib_to_vector_long_t(color1_o, self, &color1,
+  if (igraphmodule_attrib_to_vector_int_t(color1_o, self, &color1,
 	  ATTRIBUTE_TYPE_VERTEX)) return NULL;
-  if (igraphmodule_attrib_to_vector_long_t(color2_o, other, &color2,
+  if (igraphmodule_attrib_to_vector_int_t(color2_o, other, &color2,
 	  ATTRIBUTE_TYPE_VERTEX)) {
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
     return NULL;
   }
-  if (igraphmodule_attrib_to_vector_long_t(edge_color1_o, self, &edge_color1,
+  if (igraphmodule_attrib_to_vector_int_t(edge_color1_o, self, &edge_color1,
 	  ATTRIBUTE_TYPE_EDGE)) {
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_int_destroy(color2); free(color2); }
     return NULL;
   }
-  if (igraphmodule_attrib_to_vector_long_t(edge_color2_o, other, &edge_color2,
+  if (igraphmodule_attrib_to_vector_int_t(edge_color2_o, other, &edge_color2,
 	  ATTRIBUTE_TYPE_EDGE)) {
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
-    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_int_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_int_destroy(edge_color1); free(edge_color1); }
     return NULL;
   }
 
   if (igraph_count_isomorphisms_vf2(&self->g, &other->g,
         color1, color2, edge_color1, edge_color2, &result)) {
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
-    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
-    if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_int_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_int_destroy(edge_color1); free(edge_color1); }
+    if (edge_color2) { igraph_vector_int_destroy(edge_color2); free(edge_color2); }
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
-  if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-  if (color2) { igraph_vector_long_destroy(color2); free(color2); }
-  if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
-  if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
+  if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+  if (color2) { igraph_vector_int_destroy(color2); free(color2); }
+  if (edge_color1) { igraph_vector_int_destroy(edge_color1); free(edge_color1); }
+  if (edge_color2) { igraph_vector_int_destroy(edge_color2); free(edge_color2); }
 
   return Py_BuildValue("l", (long)result);
 }
@@ -7057,8 +7057,8 @@ PyObject *igraphmodule_Graph_get_isomorphisms_vf2(igraphmodule_GraphObject *self
   PyObject *edge_color1_o=Py_None, *edge_color2_o=Py_None;
   PyObject *res;
   igraphmodule_GraphObject *other;
-  igraph_vector_long_t *color1=0, *color2=0;
-  igraph_vector_long_t *edge_color1=0, *edge_color2=0;
+  igraph_vector_int_t *color1=0, *color2=0;
+  igraph_vector_int_t *edge_color1=0, *edge_color2=0;
   static char *kwlist[] = { "other", "color1", "color2", "edge_color1", "edge_color2", NULL };
 
   if (!PyArg_ParseTupleAndKeywords
@@ -7067,50 +7067,50 @@ PyObject *igraphmodule_Graph_get_isomorphisms_vf2(igraphmodule_GraphObject *self
     return NULL;
   if (o == Py_None) other=self; else other=(igraphmodule_GraphObject*)o;
 
-  if (igraphmodule_attrib_to_vector_long_t(color1_o, self, &color1,
+  if (igraphmodule_attrib_to_vector_int_t(color1_o, self, &color1,
 	  ATTRIBUTE_TYPE_VERTEX)) return NULL;
-  if (igraphmodule_attrib_to_vector_long_t(color2_o, other, &color2,
+  if (igraphmodule_attrib_to_vector_int_t(color2_o, other, &color2,
 	  ATTRIBUTE_TYPE_VERTEX)) {
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
     return NULL;
   }
-  if (igraphmodule_attrib_to_vector_long_t(edge_color1_o, self, &edge_color1,
+  if (igraphmodule_attrib_to_vector_int_t(edge_color1_o, self, &edge_color1,
 	  ATTRIBUTE_TYPE_EDGE)) {
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_int_destroy(color2); free(color2); }
     return NULL;
   }
-  if (igraphmodule_attrib_to_vector_long_t(edge_color2_o, other, &edge_color2,
+  if (igraphmodule_attrib_to_vector_int_t(edge_color2_o, other, &edge_color2,
 	  ATTRIBUTE_TYPE_EDGE)) {
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
-    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_int_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_int_destroy(edge_color1); free(edge_color1); }
     return NULL;
   }
 
   if (igraph_vector_ptr_init(&result, 0)) {
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
-    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
-    if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_int_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_int_destroy(edge_color1); free(edge_color1); }
+    if (edge_color2) { igraph_vector_int_destroy(edge_color2); free(edge_color2); }
     return igraphmodule_handle_igraph_error();
   }
 
   if (igraph_get_isomorphisms_vf2(&self->g, &other->g,
         color1, color2, edge_color1, edge_color2, &result)) {
     igraphmodule_handle_igraph_error();
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
-    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
-    if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_int_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_int_destroy(edge_color1); free(edge_color1); }
+    if (edge_color2) { igraph_vector_int_destroy(edge_color2); free(edge_color2); }
     igraph_vector_ptr_destroy(&result);
     return NULL;
   }
 
-  if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-  if (color2) { igraph_vector_long_destroy(color2); free(color2); }
-  if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
-  if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
+  if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+  if (color2) { igraph_vector_int_destroy(color2); free(color2); }
+  if (edge_color1) { igraph_vector_int_destroy(edge_color1); free(edge_color1); }
+  if (edge_color2) { igraph_vector_int_destroy(edge_color2); free(edge_color2); }
 
   res = igraphmodule_vector_ptr_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
 
@@ -7137,8 +7137,8 @@ PyObject *igraphmodule_Graph_subisomorphic_vf2(igraphmodule_GraphObject * self,
   PyObject *edge_color1_o=Py_None, *edge_color2_o=Py_None;
   igraphmodule_GraphObject *other;
   igraph_vector_t mapping_12, mapping_21, *map12=0, *map21=0;
-  igraph_vector_long_t *color1=0, *color2=0;
-  igraph_vector_long_t *edge_color1=0, *edge_color2=0;
+  igraph_vector_int_t *color1=0, *color2=0;
+  igraph_vector_int_t *edge_color1=0, *edge_color2=0;
   static char *kwlist[] = { "other", "color1", "color2", "edge_color1", "edge_color2",
     "return_mapping_12", "return_mapping_21", NULL };
 
@@ -7148,24 +7148,24 @@ PyObject *igraphmodule_Graph_subisomorphic_vf2(igraphmodule_GraphObject * self,
     return NULL;
   other=(igraphmodule_GraphObject*)o;
 
-  if (igraphmodule_attrib_to_vector_long_t(color1_o, self, &color1,
+  if (igraphmodule_attrib_to_vector_int_t(color1_o, self, &color1,
 	  ATTRIBUTE_TYPE_VERTEX)) return NULL;
-  if (igraphmodule_attrib_to_vector_long_t(color2_o, other, &color2,
+  if (igraphmodule_attrib_to_vector_int_t(color2_o, other, &color2,
 	  ATTRIBUTE_TYPE_VERTEX)) {
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
     return NULL;
   }
-  if (igraphmodule_attrib_to_vector_long_t(edge_color1_o, self, &edge_color1,
+  if (igraphmodule_attrib_to_vector_int_t(edge_color1_o, self, &edge_color1,
 	  ATTRIBUTE_TYPE_EDGE)) {
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_int_destroy(color2); free(color2); }
     return NULL;
   }
-  if (igraphmodule_attrib_to_vector_long_t(edge_color2_o, other, &edge_color2,
+  if (igraphmodule_attrib_to_vector_int_t(edge_color2_o, other, &edge_color2,
 	  ATTRIBUTE_TYPE_EDGE)) {
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
-    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_int_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_int_destroy(edge_color1); free(edge_color1); }
     return NULL;
   }
 
@@ -7181,17 +7181,17 @@ PyObject *igraphmodule_Graph_subisomorphic_vf2(igraphmodule_GraphObject * self,
   if (igraph_subisomorphic_vf2(&self->g, &other->g, color1, color2, edge_color1, edge_color2,
         &result, map12, map21)) {
     igraphmodule_handle_igraph_error();
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
-    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
-    if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_int_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_int_destroy(edge_color1); free(edge_color1); }
+    if (edge_color2) { igraph_vector_int_destroy(edge_color2); free(edge_color2); }
     return NULL;
   }
 
-  if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-  if (color2) { igraph_vector_long_destroy(color2); free(color2); }
-  if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
-  if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
+  if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+  if (color2) { igraph_vector_int_destroy(color2); free(color2); }
+  if (edge_color1) { igraph_vector_int_destroy(edge_color1); free(edge_color1); }
+  if (edge_color2) { igraph_vector_int_destroy(edge_color2); free(edge_color2); }
 
   if (!map12 && !map21) {
     if (result) Py_RETURN_TRUE;
@@ -7235,8 +7235,8 @@ PyObject *igraphmodule_Graph_count_subisomorphisms_vf2(igraphmodule_GraphObject 
   PyObject *o = Py_None;
   PyObject *color1_o = Py_None, *color2_o = Py_None;
   PyObject *edge_color1_o=Py_None, *edge_color2_o=Py_None;
-  igraph_vector_long_t *color1=0, *color2=0;
-  igraph_vector_long_t *edge_color1=0, *edge_color2=0;
+  igraph_vector_int_t *color1=0, *color2=0;
+  igraph_vector_int_t *edge_color1=0, *edge_color2=0;
   igraphmodule_GraphObject *other;
   static char *kwlist[] = { "other", "color1", "color2", "edge_color1", "edge_color2", NULL };
 
@@ -7246,41 +7246,41 @@ PyObject *igraphmodule_Graph_count_subisomorphisms_vf2(igraphmodule_GraphObject 
     return NULL;
   other=(igraphmodule_GraphObject*)o;
 
-  if (igraphmodule_attrib_to_vector_long_t(color1_o, self, &color1,
+  if (igraphmodule_attrib_to_vector_int_t(color1_o, self, &color1,
 	  ATTRIBUTE_TYPE_VERTEX)) return NULL;
-  if (igraphmodule_attrib_to_vector_long_t(color2_o, other, &color2,
+  if (igraphmodule_attrib_to_vector_int_t(color2_o, other, &color2,
 	  ATTRIBUTE_TYPE_VERTEX)) {
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
     return NULL;
   }
-  if (igraphmodule_attrib_to_vector_long_t(edge_color1_o, self, &edge_color1,
+  if (igraphmodule_attrib_to_vector_int_t(edge_color1_o, self, &edge_color1,
 	  ATTRIBUTE_TYPE_EDGE)) {
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_int_destroy(color2); free(color2); }
     return NULL;
   }
-  if (igraphmodule_attrib_to_vector_long_t(edge_color2_o, other, &edge_color2,
+  if (igraphmodule_attrib_to_vector_int_t(edge_color2_o, other, &edge_color2,
 	  ATTRIBUTE_TYPE_EDGE)) {
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
-    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_int_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_int_destroy(edge_color1); free(edge_color1); }
     return NULL;
   }
 
   if (igraph_count_subisomorphisms_vf2(&self->g, &other->g, color1, color2,
         edge_color1, edge_color2, &result)) {
     igraphmodule_handle_igraph_error();
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
-    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
-    if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_int_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_int_destroy(edge_color1); free(edge_color1); }
+    if (edge_color2) { igraph_vector_int_destroy(edge_color2); free(edge_color2); }
     return NULL;
   }
 
-  if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-  if (color2) { igraph_vector_long_destroy(color2); free(color2); }
-  if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
-  if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
+  if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+  if (color2) { igraph_vector_int_destroy(color2); free(color2); }
+  if (edge_color1) { igraph_vector_int_destroy(edge_color1); free(edge_color1); }
+  if (edge_color2) { igraph_vector_int_destroy(edge_color2); free(edge_color2); }
 
   return Py_BuildValue("l", (long)result);
 }
@@ -7301,8 +7301,8 @@ PyObject *igraphmodule_Graph_get_subisomorphisms_vf2(igraphmodule_GraphObject *s
   PyObject *edge_color1_o=Py_None, *edge_color2_o=Py_None;
   PyObject *res;
   igraphmodule_GraphObject *other;
-  igraph_vector_long_t *color1=0, *color2=0;
-  igraph_vector_long_t *edge_color1=0, *edge_color2=0;
+  igraph_vector_int_t *color1=0, *color2=0;
+  igraph_vector_int_t *edge_color1=0, *edge_color2=0;
   static char *kwlist[] = { "other", "color1", "color2", "edge_color1", "edge_color2", NULL };
 
   if (!PyArg_ParseTupleAndKeywords
@@ -7316,42 +7316,42 @@ PyObject *igraphmodule_Graph_get_subisomorphisms_vf2(igraphmodule_GraphObject *s
 
   other=(igraphmodule_GraphObject*)o;
 
-  if (igraphmodule_attrib_to_vector_long_t(color1_o, self, &color1,
+  if (igraphmodule_attrib_to_vector_int_t(color1_o, self, &color1,
 	  ATTRIBUTE_TYPE_VERTEX)) return NULL;
-  if (igraphmodule_attrib_to_vector_long_t(color2_o, other, &color2,
+  if (igraphmodule_attrib_to_vector_int_t(color2_o, other, &color2,
 	  ATTRIBUTE_TYPE_VERTEX)) {
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
     return NULL;
   }
-  if (igraphmodule_attrib_to_vector_long_t(edge_color1_o, self, &edge_color1,
+  if (igraphmodule_attrib_to_vector_int_t(edge_color1_o, self, &edge_color1,
 	  ATTRIBUTE_TYPE_EDGE)) {
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_int_destroy(color2); free(color2); }
     return NULL;
   }
-  if (igraphmodule_attrib_to_vector_long_t(edge_color2_o, other, &edge_color2,
+  if (igraphmodule_attrib_to_vector_int_t(edge_color2_o, other, &edge_color2,
 	  ATTRIBUTE_TYPE_EDGE)) {
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
-    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_int_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_int_destroy(edge_color1); free(edge_color1); }
     return NULL;
   }
 
   if (igraph_get_subisomorphisms_vf2(&self->g, &other->g, color1, color2,
         edge_color1, edge_color2, &result)) {
     igraphmodule_handle_igraph_error();
-    if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-    if (color2) { igraph_vector_long_destroy(color2); free(color2); }
-    if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
-    if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
+    if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+    if (color2) { igraph_vector_int_destroy(color2); free(color2); }
+    if (edge_color1) { igraph_vector_int_destroy(edge_color1); free(edge_color1); }
+    if (edge_color2) { igraph_vector_int_destroy(edge_color2); free(edge_color2); }
     igraph_vector_ptr_destroy(&result);
     return NULL;
   }
 
-  if (color1) { igraph_vector_long_destroy(color1); free(color1); }
-  if (color2) { igraph_vector_long_destroy(color2); free(color2); }
-  if (edge_color1) { igraph_vector_long_destroy(edge_color1); free(edge_color1); }
-  if (edge_color2) { igraph_vector_long_destroy(edge_color2); free(edge_color2); }
+  if (color1) { igraph_vector_int_destroy(color1); free(color1); }
+  if (color2) { igraph_vector_int_destroy(color2); free(color2); }
+  if (edge_color1) { igraph_vector_int_destroy(edge_color1); free(edge_color1); }
+  if (edge_color2) { igraph_vector_int_destroy(edge_color2); free(edge_color2); }
 
   res = igraphmodule_vector_ptr_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
 

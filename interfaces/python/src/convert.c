@@ -856,6 +856,117 @@ int igraphmodule_PyObject_float_to_vector_t(PyObject *list, igraph_vector_t *v) 
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts a Python list of ints to an igraph \c igraph_vector_int_t
+ * The incoming \c igraph_vector_int_t should be uninitialized.
+ * Raises suitable Python exceptions when needed.
+ *
+ * This function is almost identical to
+ * \ref igraphmodule_PyObject_to_vector_t . Make sure you fix bugs
+ * in both cases (if any).
+ *
+ * \param list the Python list to be converted
+ * \param v the \c igraph_vector_int_t containing the result
+ * \return 0 if everything was OK, 1 otherwise
+ */
+int igraphmodule_PyObject_to_vector_int_t(PyObject *list, igraph_vector_int_t *v) {
+  PyObject *item;
+  int value=0;
+  int i, j, k, ok;
+
+  if (PyString_Check(list) || PyUnicode_Check(list)) {
+    /* It is highly unlikely that a string (although it is a sequence) will
+     * provide us with integers or integer pairs */
+    PyErr_SetString(PyExc_TypeError, "expected a sequence or an iterable containing integers");
+    return 1;
+  }
+
+  if (!PySequence_Check(list)) {
+    /* try to use an iterator */
+    PyObject *it = PyObject_GetIter(list);
+    if (it) {
+      PyObject *item;
+      igraph_vector_int_init(v, 0);
+      while ((item = PyIter_Next(it)) != 0) {
+        ok = 1;
+        if (!PyNumber_Check(item)) {
+          PyErr_SetString(PyExc_TypeError, "iterable must return numbers");
+          ok=0;
+        } else {
+          PyObject *item2 = PyNumber_Int(item);
+          if (item2 == 0) {
+            PyErr_SetString(PyExc_TypeError, "can't convert a list item to integer");
+            ok = 0;
+          } else {
+            // TODO: proper overflow check
+            value=(int)PyInt_AsLong(item);
+            Py_DECREF(item2);
+          }
+        }
+       
+        if (ok == 0) {
+          igraph_vector_int_destroy(v);
+          Py_DECREF(item);
+          Py_DECREF(it);
+          return 1;
+        }
+        if (igraph_vector_int_push_back(v, value)) {
+          igraphmodule_handle_igraph_error();
+          igraph_vector_int_destroy(v);
+          Py_DECREF(item);
+          Py_DECREF(it);
+          return 1;
+        }
+        Py_DECREF(item);
+      }
+      Py_DECREF(it);
+      return 0;
+    } else {
+      PyErr_SetString(PyExc_TypeError, "sequence or iterable expected");
+      return 1;
+    }
+    return 0;
+  }
+
+  j=PySequence_Size(list);
+  igraph_vector_int_init(v, j);
+  for (i=0, k=0; i<j; i++) {
+    item=PySequence_GetItem(list, i);
+    if (item) {
+      ok=1;
+      if (!PyNumber_Check(item)) {
+        PyErr_SetString(PyExc_TypeError, "sequence elements must be integers");
+        ok=0;
+      } else {
+        PyObject *item2 = PyNumber_Int(item);
+        if (item2 == 0) {
+          PyErr_SetString(PyExc_TypeError, "can't convert sequence element to int");
+          ok=0;
+        } else {
+          // TODO: proper overflow check
+          value=(long)PyInt_AsLong(item2);
+          Py_DECREF(item2);
+        }
+      }
+      Py_XDECREF(item);
+      if (!ok) {
+        igraph_vector_int_destroy(v);
+        return 1;
+      }
+      VECTOR(*v)[k]=value;
+      k++;
+    } else {
+      /* this should not happen, but we return anyway.
+       * an IndexError exception was set by PyList_GetItem
+       * at this point */
+      igraph_vector_int_destroy(v);
+      return 1;
+    }
+  }
+  return 0;
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts a Python list of ints to an igraph \c igraph_vector_long_t
  * The incoming \c igraph_vector_long_t should be uninitialized.
  * Raises suitable Python exceptions when needed.
@@ -894,7 +1005,7 @@ int igraphmodule_PyObject_to_vector_long_t(PyObject *list, igraph_vector_long_t 
         } else {
           PyObject *item2 = PyNumber_Int(item);
           if (item2 == 0) {
-            PyErr_SetString(PyExc_TypeError, "can't convert a list item to float");
+            PyErr_SetString(PyExc_TypeError, "can't convert a list item to integer");
             ok = 0;
           } else {
             value=(long)PyInt_AsLong(item);
@@ -936,9 +1047,9 @@ int igraphmodule_PyObject_to_vector_long_t(PyObject *list, igraph_vector_long_t 
         PyErr_SetString(PyExc_TypeError, "sequence elements must be integers");
         ok=0;
       } else {
-        PyObject *item2 = PyNumber_Float(item);
+        PyObject *item2 = PyNumber_Int(item);
         if (item2 == 0) {
-          PyErr_SetString(PyExc_TypeError, "can't convert sequence element to float");
+          PyErr_SetString(PyExc_TypeError, "can't convert sequence element to integer");
           ok=0;
         } else {
           value=(long)PyInt_AsLong(item2);
@@ -1250,10 +1361,106 @@ int igraphmodule_attrib_to_vector_t(PyObject *o, igraphmodule_GraphObject *self,
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts an attribute name or a sequence to a vector_int_t
+ *
+ * Similar to igraphmodule_attrib_to_vector_t and
+ * igraphmodule_attrib_to_vector_long_t. Make sure you fix bugs
+ * in all three places (if any).
+ * 
+ * Note that if the function returned a pointer to an \c igraph_vector_int_t,
+ * it is the caller's responsibility to destroy the object and free its
+ * pointer after having finished using it.
+ *
+ * \param o the Python object being converted.
+ * \param self a Python Graph object being used when attributes are queried
+ * \param vptr the pointer to the allocated vector is returned here.
+ * \param attr_type the type of the attribute being handled
+ * \return 0 if everything was OK, nonzero otherwise.
+ */
+int igraphmodule_attrib_to_vector_int_t(PyObject *o, igraphmodule_GraphObject *self,
+    igraph_vector_int_t **vptr, int attr_type) {
+  igraph_vector_int_t *result;
+
+  *vptr = 0;
+  if (attr_type != ATTRIBUTE_TYPE_EDGE && attr_type != ATTRIBUTE_TYPE_VERTEX)
+    return 1;
+  if (o == Py_None) return 0;
+  if (PyString_Check(o)) {
+    /* Check whether the attribute exists and is numeric */
+    igraph_attribute_type_t at;
+    igraph_attribute_elemtype_t et;
+    igraph_vector_t dummy;
+    char *name = PyString_AsString(o);
+    long int i,n;
+
+    if (attr_type == ATTRIBUTE_TYPE_VERTEX) {
+      et = IGRAPH_ATTRIBUTE_VERTEX;
+      n = igraph_vcount(&self->g);
+    } else {
+      et = IGRAPH_ATTRIBUTE_EDGE;
+      n = igraph_ecount(&self->g);
+    }
+
+    if (igraphmodule_i_attribute_get_type(&self->g, &at, et, name)) {
+      /* exception was set by igraphmodule_i_attribute_get_type */
+      return 1;
+    }
+    if (at != IGRAPH_ATTRIBUTE_NUMERIC) {
+      PyErr_SetString(PyExc_ValueError, "attribute values must be numeric");
+      return 1;
+    }
+    /* Now that the attribute type has been checked, allocate the target
+     * vector */
+    igraph_vector_init(&dummy, n);
+    if (attr_type == ATTRIBUTE_TYPE_VERTEX) {
+      if (igraphmodule_i_get_numeric_vertex_attr(&self->g, name,
+          igraph_vss_all(), &dummy)) {
+        /* exception has already been set, so return */
+        igraph_vector_destroy(&dummy);
+        return 1;
+      }
+    } else {
+      if (igraphmodule_i_get_numeric_edge_attr(&self->g, name,
+          igraph_ess_all(IGRAPH_EDGEORDER_ID), &dummy)) {
+        /* exception has already been set, so return */
+        igraph_vector_destroy(&dummy);
+        return 1;
+      }
+    }
+    result = (igraph_vector_int_t*)calloc(1, sizeof(igraph_vector_int_t));
+    igraph_vector_int_init(result, n);
+    if (result==0) {
+      PyErr_NoMemory();
+      return 1;
+    }
+    for (i=0; i<n; i++) VECTOR(*result)[i] = VECTOR(dummy)[i];
+    *vptr = result;
+  } else if (PySequence_Check(o)) {
+    result = (igraph_vector_int_t*)calloc(1, sizeof(igraph_vector_int_t));
+    if (result==0) {
+      PyErr_NoMemory();
+      return 1;
+    }
+    if (igraphmodule_PyObject_to_vector_int_t(o, result)) {
+      igraph_vector_int_destroy(result);
+      free(result);
+      return 1;
+    }
+    *vptr = result;
+  } else {
+    PyErr_SetString(PyExc_TypeError, "unhandled type");
+    return 1;
+  }
+  return 0;
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts an attribute name or a sequence to a vector_long_t
  *
- * Similar to igraphmodule_attrib_to_vector_t. Make sure you fix bugs
- * in both places (if any).
+ * Similar to igraphmodule_attrib_to_vector_t and
+ * igraphmodule_attrib_to_vector_int_t. Make sure you fix bugs
+ * in all three places (if any).
  * 
  * Note that if the function returned a pointer to an \c igraph_vector_long_t,
  * it is the caller's responsibility to destroy the object and free its
