@@ -7,11 +7,9 @@ class GameTests(unittest.TestCase):
         self.failUnless(isinstance(g, Graph))
         g = Graph.GRG(50, 0.2, True)
         self.failUnless(isinstance(g, Graph))
-        g, xs, ys = Graph.GRG(50, 0.2, True, True)
-        self.failUnless(isinstance(g, Graph))
-        self.failUnless(isinstance(xs, list))
-        self.failUnless(isinstance(ys, list))
-        self.failUnless(isinstance(Layout(zip(xs,ys)), Layout))
+        self.failUnless("x" in g.vertex_attributes())
+        self.failUnless("y" in g.vertex_attributes())
+        self.failUnless(isinstance(Layout(zip(g.vs["x"], g.vs["y"])), Layout))
 
     def testForestFire(self):
         g=Graph.Forest_Fire(100, 0.1)

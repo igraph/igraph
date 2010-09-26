@@ -26,8 +26,9 @@ class RandomNumberGeneratorTests(unittest.TestCase):
 
     def testSetRandomNumberGenerator(self):
         set_random_number_generator(FakeRNG)
-        graph, xs, ys = Graph.GRG(10, 0.2, return_coordinates=True)
-        self.failUnless(xs == ys and xs == [0.1] * 10)
+        graph = Graph.GRG(10, 0.2)
+        self.assertEquals(graph.vs["x"], [0.1] * 10)
+        self.assertEquals(graph.vs["y"], [0.1] * 10)
 
         self.assertRaises(AttributeError, set_random_number_generator,
                 InvalidRNG)
