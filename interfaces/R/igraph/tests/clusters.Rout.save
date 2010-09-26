@@ -1,0 +1,44 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> set.seed(42)
+> 
+> gc <- function(graph) {
++   cl <- clusters(graph)
++   induced.subgraph(graph, which(cl$membership==which.max(cl$csize)))
++ }
+> 
+> rg <- function(n) {
++   gc(erdos.renyi.game(n, 1/n))
++ }
+>   
+> G <- lapply(1:30, function(x) rg(sample(100, 1)))
+> Gsize <- sapply(G, vcount)
+> 
+> allg <- graph.disjoint.union(G)
+> clu <- clusters(allg)
+> all(table(clu$membership) == clu$csize)
+[1] TRUE
+> all(sort(clu$csize)==sort(Gsize))
+[1] TRUE
+> clu$no == length(G)
+[1] TRUE
+> 
+> 

@@ -34,9 +34,6 @@ biconnected.components(graph)
     components.}
   \item{articulation_points}{The articulation points of the graph. See
     \code{\link{articulation.points}}.}
-  
-  See examples below on how to extract the vertex ids of the biconnected
-  components from the result.
 }
 %\references
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
@@ -45,7 +42,7 @@ biconnected.components(graph)
 \examples{
 g <- graph.disjoint.union( graph.full(5), graph.full(5) )
 clu <- clusters(g)$membership
-g <- add.edges(g, c(which(clu==0), which(clu==1))-1)
+g <- add.edges(g, c(which(clu==1), which(clu==2)))
 bc <- biconnected.components(g)
 }
 \keyword{graphs}

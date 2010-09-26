@@ -43,7 +43,7 @@ write.graph(graph, file, format=c("edgelist", "pajek", "ncol",
   format expected by the 'Large Graph Layout' layout generator software.
   See \link{read.graph} for details.
   Additional arguments:
-  \itemize{
+  \describe{
     \item{names}{If you want to write symbolic vertex names instead of
       vertex ids, supply the name of the vertex attribute containing the
       symbolic names here. By default the \sQuote{name} attribute is
@@ -60,7 +60,7 @@ write.graph(graph, file, format=c("edgelist", "pajek", "ncol",
   The \code{ncol} format is also used by LGL, it is a text file, see
   \link{read.graph} for details.
   Additional arguments:
-  \itemize{
+  \describe{
     \item{names}{If you want to write symbolic vertex names instead of
       vertex ids, supply the name of the vertex attribute containing the
       symbolic names here. By default the \sQuote{name} attribute is
@@ -94,7 +94,7 @@ write.graph(graph, file, format=c("edgelist", "pajek", "ncol",
   Vertex ids are numbered from 1.
   
   Additional arguments:
-  \itemize{
+  \describe{
     \item{source}{The id of the source vertex, if \code{NULL} (the
       default) then it is taken from the \code{source} graph attribute.}
     \item{target}{The id of the target vertex, if \code{NULL} (the
@@ -135,7 +135,7 @@ write.graph(graph, file, format=c("edgelist", "pajek", "ncol",
   before calling this function if you want to preserve them.
 
   Additional arguments:
-  \itemize{
+  \describe{
     \item{id}{\code{NULL} or a numeric vector giving the vertex ids. See
       details above.}
     \item{creator}{A character scalar to be added to the

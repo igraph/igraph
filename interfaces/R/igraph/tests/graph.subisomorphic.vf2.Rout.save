@@ -1,0 +1,49 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> set.seed(42)
+> g1 <- erdos.renyi.game(20,6/20)
+> g2 <- erdos.renyi.game(20,6/20)
+> g <- g1 %du% g2
+> 
+> graph.subisomorphic.vf2(g, g1)
+$iso
+[1] TRUE
+
+$map12
+ [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20  0  0  0  0  0
+[26]  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+
+$map21
+ [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20
+
+> graph.subisomorphic.vf2(g, g2)
+$iso
+[1] TRUE
+
+$map12
+ [1]  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  2  3  4  5
+[26]  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20
+
+$map21
+ [1] 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40
+
+> 
+> 

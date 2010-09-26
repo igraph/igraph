@@ -4,8 +4,10 @@
 \concept{(s,t)-cuts}
 \concept{Minimum cuts}
 \concept{Minimum (s,t)-cuts}
-\title{List all minimum (s,t)-cuts of a graph}
+\title{List all minimum \eqn{(s,t)}-cuts of a graph}
 \description{
+  Listing all minimum \eqn{(s,t)}-cuts of a directed graph, for given
+  \eqn{s} and \eqn{t}.
 }
 \usage{
 all.st.mincuts(graph, source, target, capacity = NULL)
@@ -15,20 +17,20 @@ all.st.mincuts(graph, source, target, capacity = NULL)
   \item{source}{The id of the source vertex.}
   \item{target}{The id of the target vertex.}
   \item{capacity}{Numeric vector giving the edge capacities. If this is
-    \code{NULL} and the graph has a \sQuote{\code{weight}} edge
+    \code{NULL} and the graph has a \code{weight} edge
     attribute, then this attribute defines the edge capacities. For
     forcing unit edge capacities, even for graphs that have a
-    \sQuote{\code{weight}} edge attribute, supply \code{NA} here.}
+    \code{weight} edge attribute, supply \code{NA} here.}
 }
 \details{
   Given a \eqn{G} directed graph and two, different and non-ajacent
   vertices, \eqn{s} and \eqn{t}, an \eqn{(s,t)}-cut is a set of edges,
-  such that after removing this edges from \eqn{G} there is no directed
+  such that after removing these edges from \eqn{G} there is no directed
   path from \eqn{s} to \eqn{t}.
 
-  The size of an \eqn{(s,t)}-cut is defined as the sum of their
-  capacities (or weights). For unweighed (=equally weighted) graphs,
-  this is simply the number of edges.
+  The size of an \eqn{(s,t)}-cut is defined as the sum of the
+  capacities (or weights) in the cut. For unweighed (=equally weighted)
+  graphs, this is simply the number of edges.
   
   An \eqn{(s,t)}-cut is minimum if it is of the smallest possible
   size.
@@ -40,7 +42,7 @@ all.st.mincuts(graph, source, target, capacity = NULL)
     is a minimum \eqn{(s,t)}-cut.}
   \item{partition1s}{A list of numeric vectors containing vertex
     ids, they correspond to the edge cuts. Each vertex set is a 
-    generator of the corresponding cut, i.e. the graph \eqn{G=(V,E)} the
+    generator of the corresponding cut, i.e. in the graph \eqn{G=(V,E)}, the
     vertex set \eqn{X} and its complementer \eqn{V-X}, generates the cut
     that contains exactly the edges that go from \eqn{X} to \eqn{V-X}.}
 }

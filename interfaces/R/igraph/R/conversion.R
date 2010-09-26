@@ -44,30 +44,30 @@ get.adjacency.dense <- function(graph, type=c("both", "upper", "lower"),
     }
     res <- matrix(0, nr=vcount(graph), nc=vcount(graph))
     if (is.directed(graph)) {
-      for (i in seq(length=ecount(graph))-1) {
+      for (i in seq(length=ecount(graph))) {
         e <- get.edge(graph, i)
-        res[ e[1]+1, e[2]+1 ] <- get.edge.attribute(graph, attr, i)
+        res[ e[1], e[2] ] <- get.edge.attribute(graph, attr, i)
       }
     } else {
       if (type==0) {
         ## upper
-        for (i in seq(length=ecount(graph))-1) {
+        for (i in seq(length=ecount(graph))) {
           e <- get.edge(graph, i)
-          res[ min(e)+1, max(e)+1 ] <- get.edge.attribute(graph, attr, i)
+          res[ min(e), max(e) ] <- get.edge.attribute(graph, attr, i)
         }        
       } else if (type==1) {
         ## lower
-        for (i in seq(length=ecount(graph))-1) {
+        for (i in seq(length=ecount(graph))) {
           e <- get.edge(graph, i)
-          res[ max(e)+1, min(e)+1 ] <- get.edge.attribute(graph, attr, i)
+          res[ max(e), min(e) ] <- get.edge.attribute(graph, attr, i)
         }        
       } else if (type==2) {
         ## both
-        for (i in seq(length=ecount(graph))-1) {
+        for (i in seq(length=ecount(graph))) {
           e <- get.edge(graph, i)
-          res[ e[1]+1, e[2]+1 ] <- get.edge.attribute(graph, attr, i)
+          res[ e[1], e[2] ] <- get.edge.attribute(graph, attr, i)
           if (e[1] != e[2]) {
-            res[ e[2]+1, e[1]+1 ] <- get.edge.attribute(graph, attr, i)
+            res[ e[2], e[1] ] <- get.edge.attribute(graph, attr, i)
           }
         }
       }
@@ -106,20 +106,20 @@ get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
   }
 
   if (is.directed(graph)) {
-    res <- spMatrix(vc, vc, i=el[,1]+1, j=el[,2]+1, x=value)
+    res <- spMatrix(vc, vc, i=el[,1], j=el[,2], x=value)
   } else {
     if (type=="upper") {
       ## upper
-      res <- spMatrix(vc, vc, i=pmin(el[,1],el[,2])+1,
-                      j=pmax(el[,1],el[,2])+1, x=value)
+      res <- spMatrix(vc, vc, i=pmin(el[,1],el[,2]),
+                      j=pmax(el[,1],el[,2]), x=value)
     } else if (type=="lower") {
       ## lower
-      res <- spMatrix(vc, vc, i=pmax(el[,1],el[,2])+1,
-                      j=pmin(el[,1],el[,2])+1, x=value)
+      res <- spMatrix(vc, vc, i=pmax(el[,1],el[,2]),
+                      j=pmin(el[,1],el[,2]), x=value)
     } else if (type=="both") {
       ## both
-      res <- spMatrix(vc, vc, i=pmin(el[,1],el[,2])+1,
-                      j=pmax(el[,1],el[,2])+1, x=value)
+      res <- spMatrix(vc, vc, i=pmin(el[,1],el[,2]),
+                      j=pmax(el[,1],el[,2]), x=value)
       res <- forceSymmetric(res)
     }
   }
@@ -152,8 +152,9 @@ get.edgelist <- function(graph, names=TRUE) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- matrix(.Call("R_igraph_get_edgelist", graph, TRUE,
                       PACKAGE="igraph"), nc=2)
+  res <- res+1
   if (names && "name" %in% list.vertex.attributes(graph)) {
-    res <- matrix(V(graph)$name[ res+1 ], nc=2)
+    res <- matrix(V(graph)$name[ res ], nc=2)
   }
 
   res
@@ -180,8 +181,9 @@ get.adjlist <- function(graph, mode=c("all", "out", "in", "total")) {
   mode <- igraph.match.arg(mode)
   mode <- as.numeric(switch(mode, "out"=1, "in"=2, "all"=3, "total"=3))
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_get_adjlist", graph, mode,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_get_adjlist", graph, mode,
+               PACKAGE="igraph")
+  lapply(res, function(x) x+1)
 }
 
 get.adjedgelist <- function(graph, mode=c("all", "out", "in", "total")) {
@@ -192,8 +194,9 @@ get.adjedgelist <- function(graph, mode=c("all", "out", "in", "total")) {
   mode <- igraph.match.arg(mode)
   mode <- as.numeric(switch(mode, "out"=1, "in"=2, "all"=3, "total"=3))
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_get_adjedgelist", graph, mode,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_get_adjedgelist", graph, mode,
+               PACKAGE="igraph")
+  lapply(res, function(x) x+1)
 }
 
 igraph.from.graphNEL <- function(graphNEL, name=TRUE, weight=TRUE,
@@ -211,7 +214,6 @@ igraph.from.graphNEL <- function(graphNEL, name=TRUE, weight=TRUE,
       c(l, rep(n, sum(l==n)))
     })
   }
-  al <- lapply(al, function(x) x-1)
   mode <- if (edgemode(graphNEL)=="directed") "out" else "all"
   g <- graph.adjlist(al, mode=mode, duplicate=TRUE)
   if (name) {
@@ -261,7 +263,7 @@ igraph.to.graphNEL <- function(graph) {
       is.character(V(graph)$name)) {
     name <- V(graph)$name
   } else {
-    name <- as.character(seq(vcount(graph))-1)    
+    name <- as.character(seq(vcount(graph)))    
   }
 
   edgemode <- if (is.directed(graph)) "directed" else "undirected"  
@@ -271,13 +273,13 @@ igraph.to.graphNEL <- function(graph) {
     al <- get.adjedgelist(graph, "out")
     for (i in seq(along=al)) {
       edges <- get.edges(graph, al[[i]])
-      edges <- ifelse( edges[,2]==i-1, edges[,1], edges[,2])
-      weights <- E(graph)$weight[al[[i]]+1]
-      al[[i]] <- list(edges=edges+1, weights=weights)
+      edges <- ifelse( edges[,2]==i, edges[,1], edges[,2])
+      weights <- E(graph)$weight[al[[i]]]
+      al[[i]] <- list(edges=edges, weights=weights)
     }
   } else {
     al <- get.adjlist(graph, "out")
-    al <- lapply(al, function(x) list(edges=x+1))
+    al <- lapply(al, function(x) list(edges=x))
   }  
   
   names(al) <- name
@@ -337,8 +339,8 @@ get.incidence.dense <- function(graph, types, names, attr) {
       rownames(res$res) <- V(graph)$name[ res$row_ids+1 ]
       colnames(res$res) <- V(graph)$name[ res$col_ids+1 ]
     } else {
-      rownames(res$res) <- res$row_ids
-      colnames(res$res) <- res$col_ids
+      rownames(res$res) <- res$row_ids+1
+      colnames(res$res) <- res$col_ids+1
     }
     res$res
     
@@ -358,10 +360,10 @@ get.incidence.dense <- function(graph, types, names, attr) {
     recode[!types] <- seq_len(n1)
     recode[types]  <- seq_len(n2)
     
-    for (i in seq(length=ecount(graph))-1) {
+    for (i in seq(length=ecount(graph))) {
       eo <- get.edge(graph, i)
-      e <- recode[eo+1]
-      if (!types[eo[1]+1]) {
+      e <- recode[eo]
+      if (!types[eo[1]]) {
         res[ e[1], e[2] ] <- get.edge.attribute(graph, attr, i)
       } else{
         res[ e[2], e[1] ] <- get.edge.attribute(graph, attr, i)
@@ -372,7 +374,7 @@ get.incidence.dense <- function(graph, types, names, attr) {
       rownames(res) <- V(graph)$name[ which(!types) ]
       colnames(res) <- V(graph)$name[ which( types) ]
     } else {
-      rownames(res) <- which(!types)-1
+      rownames(res) <- which(!types)
       colnames(res) <- which(types)
     }
 
@@ -389,7 +391,7 @@ get.incidence.sparse <- function(graph, types, names, attr) {
   
   require(Matrix)
   el <- get.edgelist(graph, names=FALSE)
-  if (any(types[el[,1]+1] == types[el[,2]+1])) {
+  if (any(types[el[,1]] == types[el[,2]])) {
     stop("Invalid types vector, not a bipartite graph")
   }
 
@@ -400,8 +402,8 @@ get.incidence.sparse <- function(graph, types, names, attr) {
   recode[!types] <- seq_len(n1)
   recode[types]  <- seq_len(n2) + n1
 
-  el[,1] <- recode[el[,1]+1]
-  el[,2] <- recode[el[,2]+1]
+  el[,1] <- recode[el[,1]]
+  el[,2] <- recode[el[,2]]
 
   change <- el[,1] > n1
   el[change,] <- el[change,2:1]
@@ -423,8 +425,8 @@ get.incidence.sparse <- function(graph, types, names, attr) {
     rownames(res) <- V(graph)$name[which(!types)]
     colnames(res) <- V(graph)$name[which(types)]
   } else {
-    rownames(res) <- which(!types)-1
-    colnames(res) <- which(types)-1
+    rownames(res) <- which(!types)
+    colnames(res) <- which(types)
   }
   res
 }

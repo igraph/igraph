@@ -99,7 +99,7 @@ cutat(communities, no, steps)
   
   \code{membership} gives the division of the vertices, into
   communities. It returns a numeric vector, one value for each vertex,
-  the id of its community. Community ids start with zero. Note that some
+  the id of its community. Community ids start from one. Note that some
   algorithms calculate the complete (or incomplete) hierarchical
   structure of the communities, and not just a single
   partitioning. For these algorithms typically the membership for the

@@ -89,7 +89,7 @@
   \code{\link{igraph.par}}. The value of the parameter may be scalar
   valid for every vertex or a vector with a separate value for each
   vertex. (Shorter vectors are recycled.)
-  \itemize{
+  \describe{
     \item{size}{The size of the vertex, a numeric scalar or vector, in
       the latter case each vertex sizes may differ. This vertex sizes
       are scaled in order have about the same size of vertices for a
@@ -225,7 +225,7 @@
   Edge parameters require to add the \sQuote{\code{edge.}} prefix when
   used as arguments or set by \code{\link{igraph.par}}. The edge
   parameters:
-  \itemize{
+  \describe{
     \item{color}{The color of the edges, see the \code{color} vertex
       parameter for the possible values.
 
@@ -335,7 +335,7 @@
   }
 
   Other parameters:
-  \itemize{
+  \describe{
     \item{layout}{
       Either a function or a numeric
       matrix. It specifies how the vertices will be placed on the plot.

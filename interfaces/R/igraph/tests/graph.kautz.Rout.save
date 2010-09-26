@@ -1,0 +1,76 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> graph.kautz(2,3)
+Vertices: 24 
+Edges: 48 
+Directed: TRUE 
+Edges:
+             
+[1]   1 ->  9
+[2]   1 -> 10
+[3]   2 -> 11
+[4]   2 -> 12
+[5]   3 -> 13
+[6]   3 -> 14
+[7]   4 -> 15
+[8]   4 -> 16
+[9]   5 -> 17
+[10]  5 -> 18
+[11]  6 -> 19
+[12]  6 -> 20
+[13]  7 -> 21
+[14]  7 -> 22
+[15]  8 -> 23
+[16]  8 -> 24
+[17]  9 ->  1
+[18]  9 ->  2
+[19] 10 ->  3
+[20] 10 ->  4
+[21] 11 ->  5
+[22] 11 ->  6
+[23] 12 ->  7
+[24] 12 ->  8
+[25] 13 -> 17
+[26] 13 -> 18
+[27] 14 -> 19
+[28] 14 -> 20
+[29] 15 -> 21
+[30] 15 -> 22
+[31] 16 -> 23
+[32] 16 -> 24
+[33] 17 ->  1
+[34] 17 ->  2
+[35] 18 ->  3
+[36] 18 ->  4
+[37] 19 ->  5
+[38] 19 ->  6
+[39] 20 ->  7
+[40] 20 ->  8
+[41] 21 ->  9
+[42] 21 -> 10
+[43] 22 -> 11
+[44] 22 -> 12
+[45] 23 -> 13
+[46] 23 -> 14
+[47] 24 -> 15
+[48] 24 -> 16
+> 
+> 

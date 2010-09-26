@@ -1,0 +1,58 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> neig <- function(graph, order, vertices) {
++   sp <- shortest.paths(graph)
++   v <- unique(unlist(lapply(vertices, function(x) {
++     w <- which(sp[x,] <= order)
++   })))
++   induced.subgraph(graph, c(v,vertices))
++ }
+> 
+> g <- erdos.renyi.game(50, 5/50)
+> 
+> v <- sample(vcount(g), 1)
+> g1 <- graph.neighborhood(g, 2, v)[[1]]
+> g2 <- neig(g, 2, v)
+> graph.isomorphic(g1, g2)
+[1] TRUE
+> 
+> #########
+> 
+> nei <- function(graph, order, vertices) {
++   sp <- shortest.paths(graph)
++   v <- unique(unlist(lapply(vertices, function(x) {
++     w <- which(sp[x,] <= order)
++   })))
++   v
++ }
+> 
+> v1 <- neighborhood(g, 2, v)[[1]]
+> v2 <- nei(g, 2, v)
+> length(v1)==length(v2) && all(sort(v1)==sort(v2))
+[1] TRUE
+> 
+> #########
+> 
+> s <- neighborhood.size(g, 2, v)[[1]]
+> s==length(v1)
+[1] TRUE
+> 
+> 

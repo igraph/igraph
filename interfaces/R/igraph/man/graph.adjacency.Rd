@@ -32,7 +32,7 @@ graph.adjacency(adjmatrix, mode=c("directed", "undirected", "max",
   }
   \item{diag}{Logical scalar, whether to include the diagonal of the
     matrix in the calculation. If this is \code{FALSE} then the diagonal
-    is zero-d out first.
+    is zerod out first.
   }
   \item{add.colnames}{Character scalar, whether to add the column names as
     vertex attributes. If it is \sQuote{\code{NULL}} (the default)
@@ -59,7 +59,7 @@ graph.adjacency(adjmatrix, mode=c("directed", "undirected", "max",
   created and an element of the adjacency matrix gives the number
   of edges to create between the two corresponding vertices.
   The details depend on the value of the \code{mode} argument:
-  \itemize{
+  \describe{
     \item{\code{directed}}{The graph will be directed and a matrix
       element gives the number of edges between two vertices.}
     \item{\code{undirected}}{This is exactly the same as \code{max},
@@ -84,7 +84,7 @@ graph.adjacency(adjmatrix, mode=c("directed", "undirected", "max",
   If the \code{weighted} argument is not \code{NULL} then the elements
   of the matrix give the weights of the edges (if they are not zero).
   The details depend on the value of the \code{mode} argument:
-  \itemize{
+  \describe{
     \item{\code{directed}}{The graph will be directed and a matrix
       element gives the edge weights.}
     \item{\code{undirected}}{First we check that the matrix is

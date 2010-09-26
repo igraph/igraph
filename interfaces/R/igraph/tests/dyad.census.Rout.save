@@ -1,0 +1,41 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> ce <- simplify(read.graph(gzfile("celegansneural.gml.gz"), format="gml"))
+> dc <- dyad.census(ce)
+> 
+> round(sum(is.mutual(ce))) == round(dc$mut * 2)
+[1] TRUE
+> round(ecount(as.undirected(ce, mode="collapse")) - dc$mut) == round(dc$asym)
+[1] TRUE
+> sum(unlist(dc)) == vcount(ce) * (vcount(ce)-1) / 2
+[1] TRUE
+> 
+> dc
+$mut
+[1] 197
+
+$asym
+[1] 1951
+
+$null
+[1] 41808
+
+> 

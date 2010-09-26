@@ -15,7 +15,7 @@ triad.census(graph)
   Triad census was defined by David and Leinhardt (see References
   below). Every triple of vertices (A, B, C) are classified into the 16
   possible states:
-  \itemize{
+  \describe{
     \item{003}{A,B,C, the empty graph.}
     \item{012}{A->B, C, the graph with a single directed edge.}
     \item{102}{A<->B, C, the graph with a mutual connection between two

@@ -134,7 +134,7 @@ community.le.to.membership(merges, steps, membership)
   components:
   \item{membership}{A membership vector, a numerical vector
     indication which vertex belongs to which community. The
-    communities are always numbered from zero.}
+    communities are always numbered from one.}
   \item{csize}{A numeric vector giving the sizes of the communities.}
 }
 \references{
@@ -149,7 +149,7 @@ community.le.to.membership(merges, steps, membership)
 }
 \examples{
 g <- graph.full(5) \%du\% graph.full(5) \%du\% graph.full(5)
-g <- add.edges(g, c(0,5, 0,10, 5, 10))
+g <- add.edges(g, c(1,6, 1,11, 6, 11))
 leading.eigenvector.community(g)
 
 lec <- leading.eigenvector.community.step(g)

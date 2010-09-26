@@ -1,0 +1,51 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> ## Dense
+> 
+> I <- matrix(sample(0:1, 35, replace=TRUE, prob=c(3,1)), nc=5)
+> g <- graph.incidence(I)
+> I2 <- get.incidence(g)
+> all(I==I2)
+[1] TRUE
+> all(rownames(I2) == 1:7)
+[1] TRUE
+> all(colnames(I2) == 8:12)
+[1] TRUE
+> 
+> ## Sparse
+> 
+> I3 <- get.incidence(g, sparse=TRUE)
+Loading required package: Matrix
+Loading required package: lattice
+
+Attaching package: 'Matrix'
+
+The following object(s) are masked from 'package:base':
+
+    det
+
+> all(I==I3)
+[1] TRUE
+> all(rownames(I3) == 1:7)
+[1] TRUE
+> all(colnames(I3) == 8:12)
+[1] TRUE
+> 

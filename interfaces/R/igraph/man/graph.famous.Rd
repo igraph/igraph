@@ -14,7 +14,7 @@ graph.famous(name)
 }
 \details{
   \code{graph.famous} knows the following graphs:
-  \itemize{
+  \describe{
     \item{Bull}{The bull graph, 5 vertices, 5 edges, resembles to the
       head of a bull if drawn properly.}
     \item{Chvatal}{This is the smallest triangle-free graph that is

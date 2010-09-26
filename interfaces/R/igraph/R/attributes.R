@@ -56,9 +56,9 @@ get.vertex.attribute <- function(graph, name, index=V(graph)) {
   index <- as.igraph.vs(graph, index)
   name <- as.character(name)
   if (is.list(graph[[9]][[3]][[name]]) && length(index)==1) {
-    graph[[9]][[3]][[as.character(name)]][[index+1]]
+    graph[[9]][[3]][[as.character(name)]][[index]]
   } else {
-    graph[[9]][[3]][[as.character(name)]][index+1]
+    graph[[9]][[3]][[as.character(name)]][index]
   }
 }
 
@@ -73,7 +73,7 @@ set.vertex.attribute <- function(graph, name, index=V(graph), value) {
 ##     warning("number of items to replace is not a multiple of replacement length")
 ##   }
 ##   value <- rep(value, length.out=length(index))
-  graph[[9]][[3]][[name]][index+1] <- value
+  graph[[9]][[3]][[name]][index] <- value
   length(graph[[9]][[3]][[name]]) <- vc
   graph
 }
@@ -84,9 +84,9 @@ get.edge.attribute <- function(graph, name, index=E(graph)) {
   }
   name <- as.character(name)
   if (is.list(graph[[9]][[4]][[name]]) && length(index)==1) {
-    graph[[9]][[4]][[name]][[index+1]]
+    graph[[9]][[4]][[name]][[index]]
   } else {
-    graph[[9]][[4]][[name]][index+1]
+    graph[[9]][[4]][[name]][index]
   }
 }
 
@@ -100,7 +100,7 @@ set.edge.attribute <- function(graph, name, index=E(graph), value) {
 ##     warning("number of items to replace is not a multiple of replacement length")
 ##   }
 ##   value <- rep(value, length.out=length(index))
-  graph[[9]][[4]][[name]][index+1] <- value
+  graph[[9]][[4]][[name]][index] <- value
   length(graph[[9]][[4]][[name]]) <- ec
   graph
 }

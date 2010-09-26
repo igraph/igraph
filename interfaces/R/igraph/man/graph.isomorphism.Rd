@@ -225,7 +225,7 @@ graph.isomorphic(g1, g2)
 # create two isomorphic graphs, by
 # permuting the vertices of the first 
 g1 <- simplify(barabasi.game(30, m=2, directed=FALSE))
-g2 <- permute.vertices(g1, sample(vcount(g1))-1)
+g2 <- permute.vertices(g1, sample(vcount(g1)))
 # should be TRUE
 graph.isomorphic(g1, g2)
 graph.isomorphic.bliss(g1, g2)
@@ -236,14 +236,14 @@ g1 <- graph.ring(10)
 g2 <- graph.ring(10)
 graph.isomorphic.vf2(g1, g2)
 
-V(g1)$color <- rep(0:1, length=vcount(g1))
-V(g2)$color <- rep(0:1, length=vcount(g2))
+V(g1)$color <- rep(1:2, length=vcount(g1))
+V(g2)$color <- rep(1:2, length=vcount(g2))
 graph.count.isomorphisms.vf2(g1, g2)
 graph.count.isomorphisms.vf2(g1, g2, vertex.color1=NULL,
     vertex.color2=NULL)
 
-V(g1)$color <- 0
-V(g2)$color <- 1
+V(g1)$color <- 1
+V(g2)$color <- 2
 graph.isomorphic.vf2(g1, g2)
 graph.isomorphic.vf2(g2, g2, vertex.color1=NULL,
     vertex.color2=NULL)

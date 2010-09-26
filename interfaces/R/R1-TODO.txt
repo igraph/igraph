@@ -1,0 +1,318 @@
+
+Public functions:
+-----------------
+
+$.igraph.es
+$.igraph.vs
+$<-.igraph.es
+$<-.igraph.vs
+%--%
+%->%
+%<-%
+%c%					C
+%du%					C
+%m%					C
+%s%					C
+%u%					C
+E					C
+E<-					C
+V					C
+V<-					C
+[.igraph.es
+[.igraph.vs
+[<-.igraph.es
+[<-.igraph.vs
+add.edges				C
+add.vertices				C
+aging.ba.game
+aging.barabasi.game
+aging.prefatt.game
+algorithm
+all.st.cuts				C
+all.st.mincuts				C
+alpha.centrality			C
+are.connected				C
+arpack					C
+arpack.unpack.complex
+articulation.points			C
+as.directed				C
+as.undirected				C
+assortativity				C
+assortativity.degree			C
+assortativity.nominal			C
+asymmetric.preference.game
+authority.score				C
+average.path.length			C
+ba.game					C
+barabasi.game				C
+betweenness				C			
+betweenness.estimate
+bibcoupling				
+biconnected.components			C
+bipartite.projection			C
+bipartite.projection.size		C
+blockGraphs
+blocks
+bonpow					C
+callaway.traits.game
+canonical.permutation			C
+centralization.betweenness
+centralization.betweenness.tmax
+centralization.closeness
+centralization.closeness.tmax
+centralization.degree
+centralization.degree.tmax
+centralization.evcent
+centralization.evcent.tmax
+centralize.scores
+cited.type.game
+citing.cited.type.game
+clique.number				C
+cliques					C
+closeness				C
+closeness.estimate
+cluster.distribution
+clusters				C
+cocitation
+cohesion
+cohesive.blocks
+cohesive.blocks.old
+communities				C
+community.le.to.membership
+community.to.membership
+compare.communities
+connect.neighborhood
+constraint				C
+contract.vertices			C
+convex.hull
+count.multiple				C
+crossing				C
+cutat					C
+decompose.graph				C
+degree					C
+degree.distribution
+degree.sequence.game			C
+delete.edges				C
+delete.vertices				C
+diameter				C
+dominator.tree				C
+dyad.census				C
+ecount
+edge.betweenness			C
+edge.betweenness.community		C
+edge.betweenness.community.merges
+edge.betweenness.estimate
+edge.connectivity			C
+edge.disjoint.paths
+erdos.renyi.game
+establishment.game
+evcent					C
+evolver.d
+exportPajek
+farthest.nodes				C
+fastgreedy.community			C
+forest.fire.game
+get.adjacency				C
+get.adjedgelist				C
+get.adjlist				C
+get.all.shortest.paths			C
+get.diameter				C
+get.edge				C
+get.edge.attribute
+get.edgelist				C
+get.graph.attribute
+get.incidence				C
+get.shortest.paths			C
+get.vertex.attribute
+girth					C
+graph
+graph.adhesion				C
+graph.adjacency				C
+graph.adjlist				C
+graph.atlas				C
+graph.automorphisms
+graph.bfs				
+graph.bipartite				C
+graph.cohesion				C
+graph.complementer			C
+graph.compose				C
+graph.coreness				C
+graph.count.isomorphisms.vf2
+graph.count.subisomorphisms.vf2
+graph.data.frame			C
+graph.de.bruijn				C
+graph.density				C
+graph.dfs
+graph.difference			C
+graph.difference.by.name
+graph.disjoint.union			C
+graph.edgelist				C
+graph.empty
+graph.extended.chordal.ring
+graph.famous
+graph.formula
+graph.full
+graph.full.bipartite
+graph.full.citation
+graph.get.isomorphisms.vf2
+graph.get.subisomorphisms.vf2
+graph.graphdb
+graph.incidence				C
+graph.intersection			C
+graph.intersection.by.name
+graph.isoclass				C
+graph.isoclass.subgraph			C
+graph.isocreate				C
+graph.isomorphic			C
+graph.isomorphic.34			C
+graph.isomorphic.bliss			C
+graph.isomorphic.vf2			C
+graph.kautz				C
+graph.knn				C
+graph.laplacian
+graph.lattice
+graph.lcf
+graph.maxflow				C
+graph.mincut				C
+graph.motifs				C
+graph.motifs.est			C
+graph.motifs.no				C
+graph.neighborhood			C
+graph.ring
+graph.star
+graph.strength
+graph.subisomorphic.vf2			C
+graph.tree
+graph.union				C
+graph.union.by.name
+grg.game
+growing.random.game
+hierarchy
+hub.score				C
+igraph.arpack.default
+igraph.from.graphNEL			C
+igraph.par
+igraph.sample
+igraph.to.graphNEL			C
+igraphdemo
+independence.number			C
+independent.vertex.sets			C
+induced.subgraph			C
+is.bgraph
+is.bipartite				C
+is.chordal				C
+is.connected
+is.dag
+is.directed
+is.hierarchical
+is.igraph
+is.loop
+is.minimal.separator
+is.multiple
+is.mutual
+is.separator
+is.simple
+label.propagation.community		C
+largest.cliques				C
+largest.independent.vertex.sets		C
+lastcit.game
+layout.auto
+layout.circle
+layout.drl
+layout.fruchterman.reingold
+layout.fruchterman.reingold.grid
+layout.graphopt
+layout.kamada.kawai
+layout.lgl
+layout.mds
+layout.merge
+layout.norm
+layout.random
+layout.reingold.tilford
+layout.sphere
+layout.spring
+layout.star
+layout.svd
+leading.eigenvector.community		C
+leading.eigenvector.community.naive
+leading.eigenvector.community.step
+line.graph
+list.edge.attributes
+list.graph.attributes
+list.vertex.attributes
+maxcohesion
+maximal.cliques
+maximal.independent.vertex.sets
+maximum.cardinality.search		C
+membership
+merges
+minimal.st.separators			C
+minimum.size.separators			C
+minimum.spanning.tree
+modularity
+multilevel.community			C
+neighborhood				C
+neighborhood.size			C
+neighbors				C
+no.clusters
+optimal.community			C
+page.rank
+page.rank.old
+parent
+path.length.hist
+permute.vertices
+piecewise.layout
+plot.bgraph
+plot.communities
+plot.igraph
+plotHierarchy
+power.law.fit
+preference.game
+print.bgraph
+print.igraph
+print.igraph.es
+print.igraph.vs
+random.graph.game
+read.graph
+reciprocity
+remove.edge.attribute
+remove.graph.attribute
+remove.vertex.attribute
+rewire
+rewire.edges
+rglplot.igraph
+running.mean
+set.edge.attribute
+set.graph.attribute
+set.vertex.attribute
+shortest.paths
+similarity.dice
+similarity.invlogweighted
+similarity.jaccard
+simplify
+sizes
+spinglass.community
+split.join.distance
+subcomponent
+subgraph
+subgraph.centrality
+subgraph.edges
+summary.igraph
+tkplot
+topological.sort
+transitivity
+triad.census
+unfold.tree				C
+vcount
+vertex.connectivity
+vertex.disjoint.paths
+walktrap.community			C
+watts.strogatz.game
+write.graph
+write.pajek.bgraph
+
+Private functions:
+------------------
+
+TODO
+

@@ -21,12 +21,12 @@ bipartite.projection (graph, types=NULL, multiplicity = TRUE, probe1=-1)
     that A-X-B is also in the graph), then the multiplicity of the A-B
     edge in the projection will be 2.}
   \item{probe1}{This argument can be used to specify the order of the
-    projections in the resulting list. If given and non-negative, then
-    it is considered as a vertex id; the projection containing the
-    first one in the result list.}
+    projections in the resulting list. If given, then it is considered
+    as a vertex id; the projection containing the first one in the
+    result list.}
 }
 \details{
-  Bipartite graphs have a \sQuote{\code{type}} vertex attribute in
+  Bipartite graphs have a \code{type} vertex attribute in
   igraph, this is boolean and \code{FALSE} for the vertices of the first
   kind and \code{TRUE} for vertices of the second kind.
 

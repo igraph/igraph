@@ -113,7 +113,7 @@
   graph/vertex/edges attributes in general. \code{\link{igraph.par}} on
   igraph parameters.}
 \examples{
-g <- graph( c(0,1, 0,1, 0,1, 1,2, 2,3) )
+g <- graph( c(1,2, 1,2, 1,2, 2,3, 3,4) )
 E(g)$weight <- 1:5
 
 ## print attribute values with the graph

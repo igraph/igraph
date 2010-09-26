@@ -4,7 +4,7 @@
 \concept{BLISS}
 \title{Canonical permutation of a graph}
 \description{The canonical permutation brings every isomorphic graphs
-  into the same (labeled) graphs.}
+  into the same (labeled) graph.}
 \usage{
 canonical.permutation(graph, sh="fm")
 }
@@ -23,16 +23,16 @@ canonical.permutation(graph, sh="fm")
   \url{http://www.tcs.hut.fi/Software/bliss/index.html}.
 
   The possible values for the \code{sh} argument are:
-  \itemize{
-    \item{f}{First non-singleton cell.}
-    \item{fl}{First largest non-singleton cell.}
-    \item{fs}{First smallest non-singleton cell.}
-    \item{fm}{First maximally non-trivially connectec non-singleton
-      cell.}
-    \item{flm}{Largest maximally non-trivially connected non-singleton
-      cell.}
-    \item{fsm}{Smallest maximally non-trivially connected non-singleton
-      cell.}
+  \describe{
+    \item{\code{f}}{First non-singleton cell.}
+    \item{\code{fl}}{First largest non-singleton cell.}
+    \item{\code{fs}}{First smallest non-singleton cell.}
+    \item{\code{fm}}{First maximally non-trivially connectec
+      non-singleton cell.}
+    \item{\code{flm}}{Largest maximally non-trivially connected
+      non-singleton cell.}
+    \item{\code{fsm}}{Smallest maximally non-trivially connected
+      non-singleton cell.}
   }
   See the paper in references for details about these.
 }
@@ -43,14 +43,14 @@ canonical.permutation(graph, sh="fm")
     the new label of vertex 0, the second element for vertex 1, etc. }
   \item{info}{Some information about the BLISS computation. A named
     list with the following members:
-    \itemize{
-      \item{nof\_nodes}{The number of nodes in the search tree.}
-      \item{nof\_leaf\_nodes}{The number of leaf nodes in the search
+    \describe{
+      \item{\code{nof_nodes}}{The number of nodes in the search tree.}
+      \item{\code{nof_leaf_nodes}}{The number of leaf nodes in the search
 	tree.}
-      \item{nof\_bad\_nodes}{Number of bad nodes.}
-      \item{nof\_canupdates}{Number of canrep updates.}
-      \item{max\_level}{Maximum level.}
-      \item{group\_size}{The size of the automorphism group of the
+      \item{\code{nof_bad_nodes}}{Number of bad nodes.}
+      \item{\code{nof_canupdates}}{Number of canrep updates.}
+      \item{\code{max_level}}{Maximum level.}
+      \item{\code{group_size}}{The size of the automorphism group of the
 	input graph, as a string. This number is exact if igraph was
 	compiled with the GMP library, and approximate otherwise.}
     }
@@ -74,7 +74,7 @@ cp1 <- canonical.permutation(g1)
 cf1 <- permute.vertices(g1, cp1$labeling)
 
 ## Do the same with a random permutation of it
-g2 <- permute.vertices(g1, sample(vcount(g1))-1)
+g2 <- permute.vertices(g1, sample(vcount(g1)))
 cp2 <- canonical.permutation(g2)
 cf2 <- permute.vertices(g2, cp2$labeling)
 

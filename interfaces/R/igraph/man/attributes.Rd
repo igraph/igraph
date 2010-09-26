@@ -97,7 +97,7 @@ graph <- remove.edge.attribute(graph, attrname)
   the regular R convention:
   \preformatted{V(g)$color <- "red"}
   It works for vertex subsets as well:
-  \preformatted{V(g)[0:5]$color <- "green"}
+  \preformatted{V(g)[1:5]$color <- "green"}
 
   The notation for edges is similar: \code{E(g)} means all edges
   \code{E(g)$weight} is the \code{weight} attribute for all edges, etc.

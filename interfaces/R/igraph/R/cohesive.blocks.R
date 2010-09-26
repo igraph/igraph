@@ -68,10 +68,10 @@ print.cohesiveBlocks <- function(x, ...) {
   cat("\nBlocks and their cohesion:\n")
   myb <- blocks(x)
   lapply(seq_along(myb), function(b) {
-    cat(sep="", "[[", b-1, "]], cohesion: ", cohesion(x)[b],
+    cat(sep="", "[[", b, "]], cohesion: ", cohesion(x)[b],
         ", parent: ", parent(x)[b], "\n")
     if (!is.null(x$labels)) {
-      print(x$labels[ myb[[b]]+1 ])
+      print(x$labels[ myb[[b]] ])
     } else {
       print(myb[[b]])
     }
@@ -96,7 +96,7 @@ plot.cohesiveBlocks <- function(x, y,
 
 plotHierarchy <- function(blocks,
                           layout=layout.reingold.tilford(hierarchy(blocks),
-                            root=0), ...) {
+                            root=1), ...) {
   plot(hierarchy(blocks), layout=layout, ...)
 }
 
@@ -124,7 +124,7 @@ exportPajek.cohesiveblocks.pf <- function(blocks, graph, file) {
   myb <- blocks(blocks)
   for (b in seq_along(myb)) {
     thisb <- rep(0, vcount(graph))
-    thisb[ myb[[b]]+1 ] <- 1
+    thisb[ myb[[b]] ] <- 1
     cat(file=file, sep="", "\r\n*Partition block_", b, ".clu\r\n",
         "*Vertices ", vcount(graph), "\r\n   ")    
     cat(thisb, sep="\r\n   ", file=file)
@@ -149,7 +149,7 @@ exportPajek.cohesiveblocks.nopf <- function(blocks, graph, file) {
   myb <- blocks(blocks)
   for (b in seq_along(myb)) {
     thisb <- rep(0, vcount(graph))
-    thisb[ myb[[b]]+1 ] <- 1
+    thisb[ myb[[b]] ] <- 1
     cat(file=paste(sep="", file, "_block_", b, ".clu"), sep="\r\n",
         paste("*Vertices", vcount(graph)), thisb)
   }
@@ -180,7 +180,7 @@ maxcohesion <- function(blocks) {
   myb <- myb[oo]
   coh <- coh[oo]
   for (b in seq_along(myb)) {
-    res[ myb[[b]]+1 ] <- coh[b]
+    res[ myb[[b]] ] <- coh[b]
   }
   res
 }

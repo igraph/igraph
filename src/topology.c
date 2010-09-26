@@ -1053,10 +1053,10 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
  */
   
 int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph2, 
-				   const igraph_vector_long_t *vertex_color1,
-				   const igraph_vector_long_t *vertex_color2,
-				   const igraph_vector_long_t *edge_color1,
-				   const igraph_vector_long_t *edge_color2,
+				   const igraph_vector_int_t *vertex_color1,
+				   const igraph_vector_int_t *vertex_color2,
+				   const igraph_vector_int_t *edge_color1,
+				   const igraph_vector_int_t *edge_color2,
 				   igraph_vector_t *map12,
 				   igraph_vector_t *map21,
 				   igraph_isohandler_t *function,
@@ -1092,15 +1092,15 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
   }
 
   if (vertex_color1) {
-    if (igraph_vector_long_size(vertex_color1) != no_of_nodes ||
-	igraph_vector_long_size(vertex_color2) != no_of_nodes) {
+    if (igraph_vector_int_size(vertex_color1) != no_of_nodes ||
+	igraph_vector_int_size(vertex_color2) != no_of_nodes) {
       IGRAPH_ERROR("Invalid vertex color vector length", IGRAPH_EINVAL);
     }
   }
 
   if (edge_color1) {
-    if (igraph_vector_long_size(edge_color1) != no_of_edges ||
-	igraph_vector_long_size(edge_color2) != no_of_edges) {
+    if (igraph_vector_int_size(edge_color1) != no_of_edges ||
+	igraph_vector_int_size(edge_color2) != no_of_edges) {
       IGRAPH_ERROR("Invalid edge color vector length", IGRAPH_EINVAL);
     }
   }
@@ -1113,16 +1113,16 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
   /* Check color distribution */
   if (vertex_color1) {
     int ret=0;
-    igraph_vector_long_t tmp1, tmp2;
-    IGRAPH_CHECK(igraph_vector_long_copy(&tmp1, vertex_color1));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &tmp1);
-    IGRAPH_CHECK(igraph_vector_long_copy(&tmp2, vertex_color2));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &tmp2);
-    igraph_vector_long_sort(&tmp1);
-    igraph_vector_long_sort(&tmp2);
-    ret= !igraph_vector_long_is_equal(&tmp1, &tmp2);
-    igraph_vector_long_destroy(&tmp1);
-    igraph_vector_long_destroy(&tmp2);
+    igraph_vector_int_t tmp1, tmp2;
+    IGRAPH_CHECK(igraph_vector_int_copy(&tmp1, vertex_color1));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp1);
+    IGRAPH_CHECK(igraph_vector_int_copy(&tmp2, vertex_color2));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp2);
+    igraph_vector_int_sort(&tmp1);
+    igraph_vector_int_sort(&tmp2);
+    ret= !igraph_vector_int_is_equal(&tmp1, &tmp2);
+    igraph_vector_int_destroy(&tmp1);
+    igraph_vector_int_destroy(&tmp2);
     IGRAPH_FINALLY_CLEAN(2);
     if (ret) { return 0; }
   }
@@ -1130,16 +1130,16 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
   /* Check edge color distribution */
   if (edge_color1) {
     int ret=0;
-    igraph_vector_long_t tmp1, tmp2;
-    IGRAPH_CHECK(igraph_vector_long_copy(&tmp1, edge_color1));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &tmp1);
-    IGRAPH_CHECK(igraph_vector_long_copy(&tmp2, edge_color2));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &tmp2);
-    igraph_vector_long_sort(&tmp1);
-    igraph_vector_long_sort(&tmp2);
-    ret= !igraph_vector_long_is_equal(&tmp1, &tmp2);
-    igraph_vector_long_destroy(&tmp1);
-    igraph_vector_long_destroy(&tmp2);
+    igraph_vector_int_t tmp1, tmp2;
+    IGRAPH_CHECK(igraph_vector_int_copy(&tmp1, edge_color1));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp1);
+    IGRAPH_CHECK(igraph_vector_int_copy(&tmp2, edge_color2));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp2);
+    igraph_vector_int_sort(&tmp1);
+    igraph_vector_int_sort(&tmp2);
+    ret= !igraph_vector_int_is_equal(&tmp1, &tmp2);
+    igraph_vector_int_destroy(&tmp1);
+    igraph_vector_int_destroy(&tmp2);
     IGRAPH_FINALLY_CLEAN(2);
     if (ret) { return 0; }
   }
@@ -1602,10 +1602,10 @@ igraph_bool_t igraph_i_isomorphic_vf2(igraph_vector_t *map12,
  */
 
 int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2, 
-			  const igraph_vector_long_t *vertex_color1,
-			  const igraph_vector_long_t *vertex_color2,
-			  const igraph_vector_long_t *edge_color1,
-			  const igraph_vector_long_t *edge_color2,
+			  const igraph_vector_int_t *vertex_color1,
+			  const igraph_vector_int_t *vertex_color2,
+			  const igraph_vector_int_t *edge_color1,
+			  const igraph_vector_int_t *edge_color2,
 			  igraph_bool_t *iso, igraph_vector_t *map12, 
 			  igraph_vector_t *map21) {
 
@@ -1660,10 +1660,10 @@ igraph_bool_t igraph_i_count_isomorphisms_vf2(const igraph_vector_t *map12,
  */
 
 int igraph_count_isomorphisms_vf2(const igraph_t *graph1, const igraph_t *graph2, 
-				  const igraph_vector_long_t *vertex_color1,
-				  const igraph_vector_long_t *vertex_color2,
-				  const igraph_vector_long_t *edge_color1,
-				  const igraph_vector_long_t *edge_color2,
+				  const igraph_vector_int_t *vertex_color1,
+				  const igraph_vector_int_t *vertex_color2,
+				  const igraph_vector_int_t *edge_color1,
+				  const igraph_vector_int_t *edge_color2,
 				  igraph_integer_t *count) {
   
   *count=0;
@@ -1744,10 +1744,10 @@ igraph_bool_t igraph_i_get_isomorphisms_vf2(const igraph_vector_t *map12,
  
 int igraph_get_isomorphisms_vf2(const igraph_t *graph1,
 				const igraph_t *graph2,
-				const igraph_vector_long_t *vertex_color1,
-				const igraph_vector_long_t *vertex_color2,
-				const igraph_vector_long_t *edge_color1,
-				const igraph_vector_long_t *edge_color2,
+				const igraph_vector_int_t *vertex_color1,
+				const igraph_vector_int_t *vertex_color2,
+				const igraph_vector_int_t *edge_color1,
+				const igraph_vector_int_t *edge_color2,
 				igraph_vector_ptr_t *maps) {
   
   igraph_vector_ptr_clear(maps);
@@ -1833,10 +1833,10 @@ int igraph_subisomorphic(const igraph_t *graph1, const igraph_t *graph2,
 
 int igraph_subisomorphic_function_vf2(const igraph_t *graph1, 
 				      const igraph_t *graph2,
-				      const igraph_vector_long_t *vertex_color1,
-				      const igraph_vector_long_t *vertex_color2,
-				      const igraph_vector_long_t *edge_color1,
-				      const igraph_vector_long_t *edge_color2,
+				      const igraph_vector_int_t *vertex_color1,
+				      const igraph_vector_int_t *vertex_color2,
+				      const igraph_vector_int_t *edge_color1,
+				      const igraph_vector_int_t *edge_color2,
 				      igraph_vector_t *map12,
 				      igraph_vector_t *map21,
 				      igraph_isohandler_t *function,
@@ -1879,15 +1879,15 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
   }
 
   if (vertex_color1) {
-    if (igraph_vector_long_size(vertex_color1) != no_of_nodes1 ||
-	igraph_vector_long_size(vertex_color2) != no_of_nodes2) {
+    if (igraph_vector_int_size(vertex_color1) != no_of_nodes1 ||
+	igraph_vector_int_size(vertex_color2) != no_of_nodes2) {
       IGRAPH_ERROR("Invalid vertex color vector length", IGRAPH_EINVAL);
     }
   }
 
   if (edge_color1) {
-    if (igraph_vector_long_size(edge_color1) != no_of_edges1 ||
-	igraph_vector_long_size(edge_color2) != no_of_edges2) {
+    if (igraph_vector_int_size(edge_color1) != no_of_edges1 ||
+	igraph_vector_int_size(edge_color2) != no_of_edges2) {
       IGRAPH_ERROR("Invalid edge color vector length", IGRAPH_EINVAL);
     }
   }
@@ -2322,10 +2322,10 @@ igraph_bool_t igraph_i_subisomorphic_vf2(const igraph_vector_t *map12,
  */
 
 int igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2, 
-			     const igraph_vector_long_t *vertex_color1,
-			     const igraph_vector_long_t *vertex_color2,
-			     const igraph_vector_long_t *edge_color1,
-			     const igraph_vector_long_t *edge_color2,
+			     const igraph_vector_int_t *vertex_color1,
+			     const igraph_vector_int_t *vertex_color2,
+			     const igraph_vector_int_t *edge_color1,
+			     const igraph_vector_int_t *edge_color2,
 			     igraph_bool_t *iso, igraph_vector_t *map12, 
 			     igraph_vector_t *map21) {
  
@@ -2383,10 +2383,10 @@ igraph_bool_t igraph_i_count_subisomorphisms_vf2(const igraph_vector_t *map12,
  */
 
 int igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const igraph_t *graph2, 
-				     const igraph_vector_long_t *vertex_color1,
-				     const igraph_vector_long_t *vertex_color2,
-				     const igraph_vector_long_t *edge_color1,
-				     const igraph_vector_long_t *edge_color2,
+				     const igraph_vector_int_t *vertex_color1,
+				     const igraph_vector_int_t *vertex_color2,
+				     const igraph_vector_int_t *edge_color1,
+				     const igraph_vector_int_t *edge_color2,
 				     igraph_integer_t *count) {
   
   *count=0;
@@ -2467,10 +2467,10 @@ igraph_bool_t igraph_i_get_subisomorphisms_vf2(const igraph_vector_t *map12,
  
 int igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
 				   const igraph_t *graph2,
-				   const igraph_vector_long_t *vertex_color1,
-				   const igraph_vector_long_t *vertex_color2,
-				   const igraph_vector_long_t *edge_color1,
-				   const igraph_vector_long_t *edge_color2,
+				   const igraph_vector_int_t *vertex_color1,
+				   const igraph_vector_int_t *vertex_color2,
+				   const igraph_vector_int_t *edge_color1,
+				   const igraph_vector_int_t *edge_color2,
 				   igraph_vector_ptr_t *maps) {
   
   igraph_vector_ptr_clear(maps);

@@ -48,7 +48,7 @@ edge.betweenness.estimate(graph, e=E(graph),
   
   The edge betweenness of edge \eqn{e}{\code{e}} is defined by
 
-  \deqn{\sum_{i\ne j} g{iej}/g_{ij}}{sum( g_iej / g_ij, i!=j)}.
+  \deqn{\sum_{i\ne j} g{iej}/g_{ij}.}{sum( g_iej / g_ij, i!=j).}
 
   \code{betweenness} calculates vertex betweenness,
   \code{edge.betweenness} calculates edge.betweenness.

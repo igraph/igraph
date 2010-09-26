@@ -30,7 +30,7 @@ membership <- function(communities) {
   } else if (!is.null(communities$merges) &&
              !is.null(communities$modularity)) {
     return(community.to.membership2(communities$merges, communities$vcount,
-                                    which.max(communities$modularity)-1))
+                                    which.max(communities$modularity)))
   } else {
     stop("Cannot calculate community membership")
   }
@@ -40,34 +40,34 @@ print.communities <- function(x, ...) {
   cat("Graph community structure calculated with the",
       algorithm(x), "algorithm\n")
   if (algorithm(x)=="spinglass") {
-    cat("Number of communities:", max(membership(x))+1, "\n")
+    cat("Number of communities:", max(membership(x)), "\n")
     cat("Modularity:", modularity(x), "\n")
     cat("Membership vector:\n")
     print(membership(x))
   } else if (algorithm(x) %in% c("walktrap", "edge betweenness",
                                 "fast greedy")) {
-    cat("Number of communities (best split):", max(membership(x))+1, "\n")
+    cat("Number of communities (best split):", max(membership(x)), "\n")
     cat("Modularity (best split):", modularity(x), "\n")
     cat("Membership vector:\n")
     print(membership(x))
   } else if (algorithm(x) %in% c("leading eigenvector",
                                 "leading eigenvector, naive")) {
-    cat("Number of communities (best split):", max(membership(x))+1, "\n")
+    cat("Number of communities (best split):", max(membership(x)), "\n")
     cat("Modularity (best split):", modularity(x), "\n")
     cat("Membership vector:\n")
     print(membership(x))
   } else if (algorithm(x) == "label propagation") {
-    cat("Number of communities:", max(membership(x))+1, "\n")
+    cat("Number of communities:", max(membership(x)), "\n")
     cat("Modularity:", modularity(x), "\n")
     cat("Membership vector:\n")
     print(membership(x))
   } else if (algorithm(x) == "multi level") {
-    cat("Number of communities (best split):", max(membership(x))+1, "\n")
+    cat("Number of communities (best split):", max(membership(x)), "\n")
     cat("Modularity (best split):", modularity(x), "\n")
     cat("Membership vector:\n")
     print(membership(x))
   } else if (algorithm(x) == "optimal") {
-    cat("Number of communities:", max(membership(x))+1, "\n")
+    cat("Number of communities:", max(membership(x)), "\n")
     cat("Modularity:", modularity(x), "\n")
     cat("Membership vector:\n")
     print(membership(x))
@@ -86,7 +86,7 @@ modularity.igraph <- function(x, membership, weights=NULL, ...) {
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
-  res <- .Call("R_igraph_modularity", x, membership, weights,
+  res <- .Call("R_igraph_modularity", x, membership-1, weights,
         PACKAGE="igraph")
   res
 }
@@ -101,7 +101,7 @@ modularity.communities <- function(x, ...) {
 
 length.communities <- function(x) {
   m <- membership(x)
-  max(m)+1
+  max(m)
 }
 
 sizes <- function(communities) {
@@ -112,7 +112,7 @@ sizes <- function(communities) {
 communities <- function(communities) {
   m <- membership(communities)
   tapply(seq_along(m), m, simplify=FALSE,
-         function(x) x-1)
+         function(x) x)
 }
 
 algorithm <- function(communities) {
@@ -130,8 +130,7 @@ merges <- function(communities) {
 crossing <- function(communities, graph) {
   m <- membership(communities)
   el <- get.edgelist(graph, names=FALSE)
-  cr <- m[el[,1]+1] != m[el[,2]+1]
-  as.integer(cr)
+  m[el[,1]] != m[el[,2]]
 }
 
 is.hierarchical <- function(communities) {
@@ -165,7 +164,7 @@ as.dendrogram.communities <- function(object, hang=-1,
   }
   
   if (is.null(object$labels))
-    object$labels <- 1:(nrow(object$merges)+1)-1
+    object$labels <- 1:(nrow(object$merges)+1)
   z <- list()
   if (!use.modularity || is.null(object$modularity)) {
     object$height <- 1:nrow(object$merges)
@@ -177,18 +176,18 @@ as.dendrogram.communities <- function(object, hang=-1,
   if (nMerge != nrow(object$merges))
     stop("'merge' and 'height' do not fit!")
   hMax <- oHgt[nMerge]
-  one <- 1:1;
-  two <- 2:2 # integer!
+  one <- 1L
+  two <- 2L
   leafs <- nrow(object$merges)+1
   for (k in 1:nMerge) {
     x <- object$merges[k, ]# no sort() anymore!
-    if (any(neg <- x < leafs))
+    if (any(neg <- x < leafs+1))
       h0 <- if (hang < 0) 0 else max(0, oHgt[k] - hang * hMax)
     if (all(neg)) {                  # two leaves
       zk <- as.list(x)
       attr(zk, "members") <- two
       attr(zk, "midpoint") <- 0.5 # mean( c(0,1) )
-      objlabels <- object$labels[x+1]
+      objlabels <- object$labels[x]
       attr(zk[[1]], "label") <- objlabels[1]
       attr(zk[[2]], "label") <- objlabels[2]
       attr(zk[[1]], "members") <- attr(zk[[2]], "members") <- one
@@ -199,7 +198,7 @@ as.dendrogram.communities <- function(object, hang=-1,
       X <- as.character(x)
       ## Originally had "x <- sort(..) above => leaf always left, x[1];
       ## don't want to assume this
-      isL <- x[1] < leafs ## is leaf left?
+      isL <- x[1] < leafs+1 ## is leaf left?
       zk <-
         if(isL) list(x[1], z[[X[2]]])
         else    list(z[[X[1]]], x[2])
@@ -208,7 +207,7 @@ as.dendrogram.communities <- function(object, hang=-1,
         (.memberDend(zk[[1]]) + attr(z[[X[1 + isL]]], "midpoint"))/2
       attr(zk[[2 - isL]], "members") <- one
       attr(zk[[2 - isL]], "height") <- h0
-      attr(zk[[2 - isL]], "label") <- object$labels[x[2 - isL]+1]
+      attr(zk[[2 - isL]], "label") <- object$labels[x[2 - isL]]
       attr(zk[[2 - isL]], "leaf") <- TRUE
       }
     else {                        # two nodes
@@ -221,7 +220,7 @@ as.dendrogram.communities <- function(object, hang=-1,
                                attr(z[[x[2]]], "midpoint"))/2
     }
     attr(zk, "height") <- oHgt[k]
-    z[[k <- as.character(k+leafs-1)]] <- zk
+    z[[k <- as.character(k+leafs)]] <- zk
   }
   z <- z[[k]]
   class(z) <- "dendrogram"
@@ -268,8 +267,9 @@ community.to.membership2 <- function(merges, vcount, steps) {
   mode(vcount) <- "numeric"
   mode(steps)  <- "numeric"
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_community_to_membership2", merges, vcount, steps,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_community_to_membership2", merges-1, vcount, steps,
+               PACKAGE="igraph")
+  res+1
 }
 
 #####################################################################
@@ -308,14 +308,16 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
                  as.numeric(update.rule), as.numeric(gamma),
                  as.numeric(implementation), as.numeric(lambda),
                  PACKAGE="igraph")
-    res$algorithm <- "spinglass"
-    res$vcount    <- vcount(graph)
+    res$algorithm  <- "spinglass"
+    res$vcount     <- vcount(graph)
+    res$membership <- res$membership + 1
     class(res) <- "communities"
   } else {
     res <- .Call("R_igraph_spinglass_my_community", graph, weights,
-                 as.igraph.vs(graph, vertex), as.numeric(spins), 
+                 as.igraph.vs(graph, vertex)-1, as.numeric(spins), 
                  as.numeric(update.rule), as.numeric(gamma),
                  PACKAGE="igraph")
+    res$community <- res$community + 1
   }
   res
 }
@@ -345,6 +347,8 @@ walktrap.community <- function(graph, weights=E(graph)$weight, steps=4,
 
   res$vcount <- vcount(graph)
   res$algorithm <- "walktrap"
+  res$membership <- res$membership + 1
+  res$merges <- res$merges + 1
   class(res) <- "communities"
   res
 }
@@ -369,6 +373,8 @@ edge.betweenness.community <- function(graph, directed=TRUE,
   }
   res$vcount <- vcount(graph)
   res$algorithm <- "edge betweenness"
+  res$membership <- res$membership + 1
+  res$merged <- res$merges + 1
   class(res) <- "communities"
   res
 }
@@ -401,6 +407,8 @@ fastgreedy.community <- function(graph, merges=TRUE, modularity=TRUE,
                PACKAGE="igraph")
   res$algorithm <- "fast greedy"
   res$vcount <- vcount(graph)
+  res$membership <- res$membership + 1
+  res$merges <- res$merges + 1
   class(res) <- "communities"
   res
 }
@@ -432,6 +440,8 @@ leading.eigenvector.community <- function(graph, steps=-1, options=igraph.arpack
         PACKAGE="igraph")
   res$algorithm <- "leading eigenvector"
   res$vcount <- vcount(graph)
+  res$membership <- res$membership + 1
+  res$merges <- res$merges + 1
   class(res) <- "communities"
   res
 }
@@ -448,6 +458,8 @@ leading.eigenvector.community.naive <- function(graph, steps=-1, options=igraph.
         PACKAGE="igraph")
   res$algorithm <- "leading eigenvector, naive"
   res$vcount <- vcount(graph)
+  res$membership <- res$membership + 1
+  res$merges <- res$merges + 1
   class(res) <- "communities"
   res
 }
@@ -500,6 +512,7 @@ label.propagation.community <- function(graph, weights=NULL, initial=NULL, fixed
         PACKAGE="igraph")
   res$vcount <- vcount(graph)
   res$algorithm <- "label propagation"
+  res$membership <- res$membership + 1
   class(res) <- "communities"
   res
 }
@@ -522,6 +535,8 @@ multilevel.community <- function(graph, weights=NULL) {
         PACKAGE="igraph")
   res$vcount <- vcount(graph)
   res$algorithm <- "multi level"
+  res$membership <- res$membership + 1
+  res$memberships <- res$memberships + 1
   class(res) <- "communities"
   res
 }
@@ -537,15 +552,16 @@ optimal.community <- function(graph, verbose=igraph.par("verbose")) {
         PACKAGE="igraph")
   res$vcount <- vcount(graph)
   res$algorithm <- "optimal"
+  res$membership <- res$membership + 1
   class(res) <- "communities"
   res
 }
 
 plot.communities <- function(x, y,
                              colbar=rainbow(length(x)),
-                             col=colbar[membership(x)+1],
+                             col=colbar[membership(x)],
                              mark.groups=communities(x),
-                             edge.color=c("green", "red")[crossing(x,y)+1],
+                             edge.color=c("black", "red")[crossing(x,y)+1],
                              ...) {
 
   plot(y, vertex.color=col, mark.groups=mark.groups,

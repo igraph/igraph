@@ -55,7 +55,7 @@ fastgreedy.community(graph, merges=TRUE, modularity=TRUE,
 }
 \examples{
 g <- graph.full(5) \%du\% graph.full(5) \%du\% graph.full(5)
-g <- add.edges(g, c(0,5, 0,10, 5, 10))
+g <- add.edges(g, c(1,6, 1,11, 6, 11))
 fc <- fastgreedy.community(g)
 membership(fc)
 sizes(fc)

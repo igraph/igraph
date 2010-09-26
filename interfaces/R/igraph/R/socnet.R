@@ -1321,7 +1321,7 @@ tkigraph <- function() {
     return()
   }
 
-  value <- shortest.paths(graph, read$v-1, mode="out")
+  value <- shortest.paths(graph, read$v, mode="out")
   dim(value) <- NULL
   value <- data.frame( V(graph)$name, value)
   colnames(value) <- c("Vertex", "Distance")
@@ -1375,9 +1375,9 @@ tkigraph <- function() {
   graph <- get("graphs", .tkigraph.env)[[gnos]]
   edges <- E(graph, path=get.diameter(graph, directed=FALSE), directed=FALSE)
   color <- rep("black", ecount(graph))
-  color[edges+1] <- "red"
+  color[edges] <- "red"
   width <- rep(1, ecount(graph))
-  width[edges+1] <- 2
+  width[edges] <- 2
   .tkigraph.plot(gnos=gnos, simple=simple, edge.color=color, edge.width=width)
 }
 
@@ -1389,7 +1389,7 @@ tkigraph <- function() {
   }
   graph <- get("graphs", .tkigraph.env)[[gnos]]
   comm <- clusters(graph)
-  members <- sapply(sapply(seq(along=comm$csize)-1,
+  members <- sapply(sapply(seq(along=comm$csize),
                            function(i) which(comm$membership==i)),
                     paste, collapse=", ")
   value <- data.frame("Component"=seq(along=comm$csize), "Members"=members)
@@ -1406,7 +1406,7 @@ tkigraph <- function() {
   graph <- get("graphs", .tkigraph.env)[[gnos]]
   comm <- clusters(graph)
   value <- data.frame("Vertex"=seq(along=comm$membership),
-                 "Component"=comm$membership+1)
+                 "Component"=comm$membership)
   .tkigraph.showData(value, title=paste("Components of graph #", gnos))
 }
 
@@ -1461,7 +1461,7 @@ tkigraph <- function() {
   graph <- get("graphs", .tkigraph.env)[[gnos]]
   clu <- clusters(graph)
   colbar <- rainbow(length(clu$csize)*2)
-  vertex.color <- colbar[ clu$membership+1 ]
+  vertex.color <- colbar[ clu$membership ]
   .tkigraph.plot(gnos=gnos, simple=simple, vertex.color=vertex.color)
 }
 
@@ -1473,7 +1473,7 @@ tkigraph <- function() {
   }
   graph <- get("graphs", .tkigraph.env)[[gnos]]
   clu <- clusters(graph)
-  v <- which(clu$membership+1 == which.max(clu$csize)) - 1
+  v <- which(clu$membership == which.max(clu$csize))
   g <- induced.subgraph(graph, v)
   .tkigraph.add.graph(g)
 }
@@ -1493,7 +1493,7 @@ tkigraph <- function() {
     return()
   }
 
-  g <- induced.subgraph(graph, subcomponent(graph, read$vertex-1))
+  g <- induced.subgraph(graph, subcomponent(graph, read$vertex))
   .tkigraph.add.graph(g)
 }
 
@@ -1513,7 +1513,7 @@ tkigraph <- function() {
     return()
   }
   
-  v <- which(clu$membership==read$comp-1)-1
+  v <- which(clu$membership==read$comp)
   g <- induced.subgraph(graph, v)
   .tkigraph.add.graph(g)  
 }
@@ -1550,17 +1550,17 @@ tkigraph <- function() {
     rows <- 4
     cols <- 3
   }
-  names <- as.character(seq(no)-1)
+  names <- as.character(seq(no))
   x11()
   layout( matrix(1:(rows*cols), nr=rows, byrow=TRUE) )
   layout.show(rows*cols)
-  for (i in seq(no)-1) {
+  for (i in seq(no)) {
     g <- graph.isocreate(read$size, i, dir=read$dir)
     par(mai=c(0,0,0,0), mar=c(0,0,0,0))
     par(cex=2)
     plot(g, layout=co, vertex.color="red", vertex.label=NA, frame=TRUE,
          edge.color="black", margin=0.1)
-    text(0,0, names[i+1], col="blue")
+    text(0,0, names[i], col="blue")
   }
   
 }
@@ -1607,17 +1607,17 @@ tkigraph <- function() {
     rows <- 4
     cols <- 3
   }
-  names <- as.character(seq(no)-1)
+  names <- as.character(seq(no))
   x11()
   layout( matrix(1:(rows*cols), nr=rows, byrow=TRUE) )
   layout.show(rows*cols)
-  for (i in seq(no)-1) {
+  for (i in seq(no)) {
     g <- graph.isocreate(read$size, i, dir=is.directed(graphs[[gnos]]))
     par(mai=c(0,0,0,0), mar=c(0,0,0,0))
     par(cex=2)
     plot(g, layout=co, vertex.color="red", vertex.label=NA, frame=TRUE,
          edge.color="black", margin=0.1)
-    text(0,0, motifs[i+1], col="green")
+    text(0,0, motifs[i], col="green")
   }  
   
 }
@@ -1707,7 +1707,7 @@ tkigraph <- function() {
   tkconfigure(txt, state="disabled")
 
   show.communities <- function() {
-    members <- sapply(sapply(seq(along=comm$csize)-1,
+    members <- sapply(sapply(seq(along=comm$csize),
                              function(i) which(comm$membership==i)),
                       paste, collapse=", ")
     value <- data.frame("Community"=seq(along=comm$csize), "Members"=members)
@@ -1717,7 +1717,7 @@ tkigraph <- function() {
   }
   show.membership <- function() {
     value <- data.frame("Vertex"=seq(along=comm$membership),
-                   "Community"=comm$membership+1)
+                   "Community"=comm$membership)
     .tkigraph.showData(value,
                        title=paste("Communities, spinglass algorithm on graph #",
                          gnos))
@@ -1731,7 +1731,7 @@ tkigraph <- function() {
   }
   plot.communities <- function(simple=FALSE) {
     colbar <- rainbow(length(comm$csize)*2)
-    vertex.color=colbar[ comm$membership+1 ]
+    vertex.color=colbar[ comm$membership ]
     .tkigraph.plot(gnos=gnos, simple=simple, vertex.color=vertex.color)
   }
   create.subgraph <- function() {
@@ -1846,7 +1846,7 @@ tkigraph <- function() {
   plot.communities <- function(simple=FALSE) {
     graph <- get("graphs", .tkigraph.env)[[gnos]]
     color <- rep("skyblue2", vcount(graph))
-    color[ comm$community+1 ] <- "red"
+    color[ comm$community ] <- "red"
     .tkigraph.plot(gnos=gnos, simple=simple, vertex.color=color)
   }
   

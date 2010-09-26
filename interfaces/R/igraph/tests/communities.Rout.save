@@ -1,0 +1,82 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> set.seed(42)
+> 
+> F <- list("edge.betweenness.community", "fastgreedy.community",
++           "label.propagation.community", "leading.eigenvector.community",
++           "multilevel.community", "optimal.community", "spinglass.community",
++           "walktrap.community")
+> 
+> karate <- graph.famous("Zachary")
+> 
+> for (f in F) {
++   print(f)
++   f <- get(f)
++   comm <- f(karate)
++   
++   c1 <- abs(modularity(comm) - modularity(karate, membership(comm))) < 1e-9
++   
++   cc <- communities(comm)
++   c2 <- all(!duplicated(unlist(cc)))
++   
++   c3 <- all(unlist(cc) <= vcount(karate) & unlist(cc) >= 1)
++ 
++   c4 <- length(comm) == max(membership(comm))
++   
++   print(c(c1, c2, c3, c4))
++ }
+[1] "edge.betweenness.community"
+[1] TRUE TRUE TRUE TRUE
+[1] "fastgreedy.community"
+[1] TRUE TRUE TRUE TRUE
+[1] "label.propagation.community"
+[1] TRUE TRUE TRUE TRUE
+[1] "leading.eigenvector.community"
+[1] TRUE TRUE TRUE TRUE
+[1] "multilevel.community"
+[1] TRUE TRUE TRUE TRUE
+[1] "optimal.community"
+[1] TRUE TRUE TRUE TRUE
+[1] "spinglass.community"
+[1] TRUE TRUE TRUE TRUE
+[1] "walktrap.community"
+[1] TRUE TRUE TRUE TRUE
+> 
+> fc <- fastgreedy.community(karate)
+> modularity(karate, cutat(fc, no=1))
+[1] 0
+> modularity(karate, cutat(fc, no=2))
+[1] 0.3717949
+> modularity(karate, cutat(fc, no=3))
+[1] 0.3806706
+> modularity(karate, cutat(fc, no=4))
+[1] 0.3759862
+> 
+> crossing(fc, karate)
+ [1]  TRUE  TRUE  TRUE FALSE FALSE FALSE  TRUE  TRUE FALSE FALSE  TRUE  TRUE
+[13]  TRUE FALSE  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE  TRUE
+[25] FALSE FALSE  TRUE  TRUE  TRUE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE
+[37] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE FALSE FALSE
+[49] FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+[61] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+[73] FALSE FALSE FALSE FALSE FALSE FALSE
+> 
+> 

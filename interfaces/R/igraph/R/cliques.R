@@ -33,8 +33,9 @@ cliques <- function(graph, min=NULL, max=NULL) {
   }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_cliques", graph, as.numeric(min), as.numeric(max),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_cliques", graph, as.numeric(min), as.numeric(max),
+               PACKAGE="igraph")
+  lapply(res, function(x) x+1)
 }
 
 largest.cliques <- function(graph) {
@@ -43,8 +44,9 @@ largest.cliques <- function(graph) {
   }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_largest_cliques", graph,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_largest_cliques", graph,
+               PACKAGE="igraph")
+  lapply(res, function(x) x+1)  
 }
 
 maximal.cliques <- function(graph, min=NULL, max=NULL) {
@@ -56,9 +58,10 @@ maximal.cliques <- function(graph, min=NULL, max=NULL) {
   if (is.null(max)) { max <- 0 }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_maximal_cliques", graph, as.numeric(min),
-        as.numeric(max),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_maximal_cliques", graph, as.numeric(min),
+               as.numeric(max),
+               PACKAGE="igraph")
+  lapply(res, function(x) x+1)
 }
 
 clique.number <- function(graph) {
@@ -85,9 +88,10 @@ independent.vertex.sets <- function(graph, min=NULL, max=NULL) {
   }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_independent_vertex_sets", graph, as.numeric(min),
-        as.numeric(max),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_independent_vertex_sets", graph, as.numeric(min),
+               as.numeric(max),
+               PACKAGE="igraph")
+  lapply(res, function(x) x+1)
 }
 
 largest.independent.vertex.sets <- function(graph) {
@@ -96,8 +100,9 @@ largest.independent.vertex.sets <- function(graph) {
   }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_largest_independent_vertex_sets", graph,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_largest_independent_vertex_sets", graph,
+               PACKAGE="igraph")
+  lapply(res, function(x) x+1)
 }
 
 maximal.independent.vertex.sets <- function(graph) {
@@ -106,8 +111,9 @@ maximal.independent.vertex.sets <- function(graph) {
   }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_maximal_independent_vertex_sets", graph,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_maximal_independent_vertex_sets", graph,
+               PACKAGE="igraph")
+  lapply(res, function(x) x+1)
 }
 
 independence.number <- function(graph) {

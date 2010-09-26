@@ -67,7 +67,7 @@ arpack.unpack.complex(vectors, values, nev)
   The \code{options} argument specifies what kind of calculation to
   perform. It is a list with the following members, they correspond
   directly to ARPACK parameters. On input it has the following fields:
-  \itemize{
+  \describe{
     \item{bmat}{Character constant, possible values: \sQuote{\code{I}},
       stadard eigenvalue problem, \eqn{Ax=\lambda x}{A*x=lambda*x}; and
       \sQuote{\code{G}}, generalized eigenvalue problem,
@@ -81,7 +81,7 @@ arpack.unpack.complex(vectors, values, nev)
       constant with exactly two characters.
 
       Possible values for symmetric input matrices:
-      \itemize{
+      \describe{
 	\item{\sQuote{\code{LA}}}{Compute \code{nev} largest (algebraic)
 	  eigenvalues.}
 	\item{\sQuote{\code{SA}}}{Compute \code{nev} smallest (algebraic)
@@ -96,7 +96,7 @@ arpack.unpack.complex(vectors, values, nev)
       }
 
       Possible values for non-symmetric input matrices:
-      \itemize{
+      \describe{
 	\item{\sQuote{\code{LM}}}{Compute \code{nev} eigenvalues of
 	  largest magnitude.}
 	\item{\sQuote{\code{SM}}}{Compute \code{nev} eigenvalues of
@@ -131,7 +131,7 @@ arpack.unpack.complex(vectors, values, nev)
       leave this on the default value, one.}
     \item{mode}{The type of the eigenproblem to be solved.
       Possible values if the input matrix is symmetric:
-      \itemize{
+      \describe{
 	\item{1}{\eqn{Ax=\lambda x}{A*x=lambda*x}, \eqn{A} is symmetric.}
 	\item{2}{\eqn{Ax=\lambda Mx}{A*x=lambda*M*x}, \eqn{A} is
 	  symmetric, \eqn{M} is symmetric positive definite.}
@@ -148,7 +148,7 @@ arpack.unpack.complex(vectors, values, nev)
       might not work properly.
 
       Possible values if the input matrix is not symmetric:
-      \itemize{
+      \describe{
 	\item{1}{\eqn{Ax=\lambda x}{A*x=lambda*x}.}
 	\item{2}{\eqn{Ax=\lambda Mx}{A*x=lambda*M*x}, \eqn{M} is
 	  symmetric positive definite.}
@@ -166,9 +166,9 @@ arpack.unpack.complex(vectors, values, nev)
     \item{sigmai}{Not use currently.}
 
     On output the following additional fields are added:
-    \itemize{
+    \describe{
       \item{info}{Error flag of ARPACK. Possible values:
-	\itemize{
+	\describe{
 	  \item{0}{Normal exit.}
 	  \item{1}{Maximum number of iterations taken.}
 	  \item{3}{No shifts could be applied during a cycle of the

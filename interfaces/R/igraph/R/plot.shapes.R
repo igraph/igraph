@@ -40,7 +40,7 @@
       vsize.from <- if (length(vertex.size)==1) {
         vertex.size
       } else {
-        vertex.size[ el[,1]+1 ]
+        vertex.size[ el[,1] ]
       }
       res <- cbind(coords[,1] + vsize.from*cos(phi),
                    coords[,2] + vsize.from*sin(phi) )
@@ -50,7 +50,7 @@
       vsize.to <- if (length(vertex.size)==1) {
         vertex.size
       } else {
-        vertex.size[ el[,2]+1 ]
+        vertex.size[ el[,2] ]
       }
       res <- cbind(coords[,1] + (r-vsize.to)*cos(phi),
                    coords[,2] + (r-vsize.to)*sin(phi) )
@@ -60,12 +60,12 @@
       vsize.from <- if (length(vertex.size)==1) {
         vertex.size
       } else {
-        vertex.size[ el[,1]+1 ]
+        vertex.size[ el[,1] ]
       }
       vsize.to <- if (length(vertex.size)==1) {
         vertex.size
       } else {
-        vertex.size[ el[,2]+1 ]
+        vertex.size[ el[,2] ]
       }
       res <- cbind(coords[,1] + vsize.from*cos(phi),
                    coords[,2] + vsize.from*sin(phi),
@@ -81,15 +81,15 @@
   } else if (mode=="plot") {
     vertex.color       <- params("vertex", "color")
     if (length(vertex.color) != 1 && !is.null(v)) {
-      vertex.color <- vertex.color[v+1]
+      vertex.color <- vertex.color[v]
     }
     vertex.frame.color <- params("vertex", "frame.color")
     if (length(vertex.frame.color) != 1 && !is.null(v)) {
-      vertex.frame.color <- vertex.frame.color[v+1]
+      vertex.frame.color <- vertex.frame.color[v]
     }
     vertex.size        <- 1/200 * params("vertex", "size")
     if (length(vertex.size) != 1 && !is.null(v)) {
-      vertex.size <- vertex.size[v+1]
+      vertex.size <- vertex.size[v]
     }
     vertex.size <- rep(vertex.size, length=nrow(coords))
     
@@ -144,7 +144,7 @@
       vsize <- if (length(vertex.size)==1) {
         vertex.size
       } else {
-        vertex.size[ el[,1]+1 ]
+        vertex.size[ el[,1] ]
       }
       res <- res1 <- square.shift(coords[,3], coords[,4], coords[,1], coords[,2],
                                   vsize)
@@ -153,7 +153,7 @@
       vsize <- if (length(vertex.size)==1) {
         vertex.size
       } else {
-        vertex.size[ el[,2]+1 ]
+        vertex.size[ el[,2] ]
       }
       res <- res2 <- square.shift(coords[,1], coords[,2], coords[,3], coords[,4],
                                   vsize)
@@ -170,15 +170,15 @@
   } else if (mode=="plot") {
     vertex.color       <- params("vertex", "color")
     if (length(vertex.color) != 1 && !is.null(v)) {
-      vertex.color <- vertex.color[v+1]
+      vertex.color <- vertex.color[v]
     }
     vertex.frame.color <- params("vertex", "frame.color")
     if (length(vertex.frame.color) != 1 && !is.null(v)) {
-      vertex.frame.color <- vertex.frame.color[v+1]
+      vertex.frame.color <- vertex.frame.color[v]
     }
     vertex.size        <- 1/200 * params("vertex", "size")
     if (length(vertex.size) != 1 && !is.null(v)) {
-      vertex.size <- vertex.size[v+1]
+      vertex.size <- vertex.size[v]
     }
     vertex.size <- rep(vertex.size, length=nrow(coords))
 
@@ -224,7 +224,7 @@
       vsize <- if (length(vertex.size)==1) {
         vertex.size
       } else {
-        vertex.size[ el[,1]+1 ]
+        vertex.size[ el[,1] ]
       }
       res <- res1 <- square.shift(coords[,3], coords[,4], coords[,1], coords[,2],
                                   vsize)
@@ -233,7 +233,7 @@
       vsize <- if (length(vertex.size)==1) {
         vertex.size
       } else {
-        vertex.size[ el[,2]+1 ]
+        vertex.size[ el[,2] ]
       }
       res <- res2 <- square.shift(coords[,1], coords[,2], coords[,3], coords[,4],
                                   vsize)
@@ -302,12 +302,12 @@
       vsize <- if (length(vertex.size)==1) {
         vertex.size
       } else {
-        vertex.size[ el[,1]+1 ]
+        vertex.size[ el[,1] ]
       }
       vsize2 <- if (length(vertex.size2)==1) {
         vertex.size2
       } else {
-        vertex.size2[ el[,1]+1 ]
+        vertex.size2[ el[,1] ]
       }
       res <- res1 <- rec.shift(coords[,3], coords[,4], coords[,1], coords[,2],
                                vsize, vsize2)
@@ -316,12 +316,12 @@
       vsize <- if (length(vertex.size)==1) {
         vertex.size
       } else {
-        vertex.size[ el[,2]+1 ]
+        vertex.size[ el[,2] ]
       }
       vsize2 <- if (length(vertex.size2)==1) {
         vertex.size2
       } else {
-        vertex.size2[ el[,1]+1 ]
+        vertex.size2[ el[,1] ]
       }
       res <- res2 <- rec.shift(coords[,1], coords[,2], coords[,3], coords[,4],
                                vsize, vsize2)
@@ -339,20 +339,20 @@
 
     vertex.color       <- params("vertex", "color")
     if (length(vertex.color) != 1 && !is.null(v)) {
-      vertex.color <- vertex.color[v+1]
+      vertex.color <- vertex.color[v]
     }
     vertex.frame.color <- params("vertex", "frame.color")
     if (length(vertex.frame.color) != 1 && !is.null(v)) {
-      vertex.frame.color <- vertex.frame.color[v+1]
+      vertex.frame.color <- vertex.frame.color[v]
     }
     vertex.size        <- 1/200 * params("vertex", "size")
     if (length(vertex.size) != 1 && !is.null(v)) {
-      vertex.size <- vertex.size[v+1]
+      vertex.size <- vertex.size[v]
     }
     vertex.size <- rep(vertex.size, length=nrow(coords))   
     vertex.size2       <- 1/200 * params("vertex", "size2")
     if (length(vertex.size2) != 1 && !is.null(v)) {
-      vertex.size2 <- vertex.size2[v+1]
+      vertex.size2 <- vertex.size2[v]
     }
     vertex.size <- cbind(vertex.size, vertex.size2)
 
@@ -399,12 +399,12 @@
       vsize <- if (length(vertex.size)==1) {
         vertex.size
       } else {
-        vertex.size[ el[,1]+1 ]
+        vertex.size[ el[,1] ]
       }
       vsize2 <- if (length(vertex.size2)==1) {
         vertex.size2
       } else {
-        vertex.size2[ el[,1]+1 ]
+        vertex.size2[ el[,1] ]
       }
       res <- res1 <- rec.shift(coords[,3], coords[,4], coords[,1], coords[,2],
                                vsize, vsize2)
@@ -413,12 +413,12 @@
       vsize <- if (length(vertex.size)==1) {
         vertex.size
       } else {
-        vertex.size[ el[,2]+1 ]
+        vertex.size[ el[,2] ]
       }
       vsize2 <- if (length(vertex.size2)==1) {
         vertex.size2
       } else {
-        vertex.size2[ el[,1]+1 ]
+        vertex.size2[ el[,1] ]
       }
       res <- res2 <- rec.shift(coords[,1], coords[,2], coords[,3], coords[,4],
                                vsize, vsize2)
@@ -471,12 +471,12 @@
       vsize <- if (length(vertex.size)==1) {
         vertex.size
       } else {
-        vertex.size[ el[,1]+1 ]
+        vertex.size[ el[,1] ]
       }
       vsize2 <- if (length(vertex.size2)==1) {
         vertex.size2
       } else {
-        vertex.size2[ el[,1]+1 ]
+        vertex.size2[ el[,1] ]
       }
       res <- res1 <- rec.shift(coords[,3], coords[,4], coords[,1], coords[,2],
                                vsize, vsize2)
@@ -485,12 +485,12 @@
       vsize <- if (length(vertex.size)==1) {
         vertex.size
       } else {
-        vertex.size[ el[,2]+1 ]
+        vertex.size[ el[,2] ]
       }
       vsize2 <- if (length(vertex.size2)==1) {
         vertex.size2
       } else {
-        vertex.size2[ el[,1]+1 ]
+        vertex.size2[ el[,1] ]
       }
       res <- res2 <- rec.shift(coords[,1], coords[,2], coords[,3], coords[,4],
                                vsize, vsize2)

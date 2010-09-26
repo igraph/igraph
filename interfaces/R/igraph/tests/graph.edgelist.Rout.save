@@ -1,0 +1,47 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> g <- erdos.renyi.game(50, 5/50)
+> el <- get.edgelist(g)
+> g2 <- graph.edgelist(el, dir=FALSE)
+> graph.isomorphic(g, g2)
+[1] TRUE
+> 
+> ####
+> 
+> g <- erdos.renyi.game(50, 5/50, dir=TRUE)
+> el <- get.edgelist(g)
+> g2 <- graph.edgelist(el, dir=TRUE)
+> graph.isomorphic(g, g2)
+[1] TRUE
+> 
+> ####
+> 
+> g <- erdos.renyi.game(26, 5/26, dir=TRUE)
+> el <- get.edgelist(g)
+> n <- letters[1:26]
+> names(n) <- 1:26
+> mode(el) <- "character"
+> el[] <- n[el]
+> g2 <- graph.edgelist(el, dir=TRUE)
+> graph.isomorphic(g, g2)
+[1] TRUE
+> 
+> 

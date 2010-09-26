@@ -30,13 +30,14 @@ is.chordal <- function(graph, alpha = NULL, alpham1 = NULL,
         stop("Not a graph object")
     }
     if (!is.null(alpha)) 
-        alpha <- as.numeric(alpha)
+        alpha <- as.numeric(alpha)-1
     if (!is.null(alpham1)) 
-        alpham1 <- as.numeric(alpham1)
+        alpham1 <- as.numeric(alpham1)-1
     fillin <- as.logical(fillin)
     newgraph <- as.logical(newgraph)
     on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
     res <- .Call("R_igraph_is_chordal", graph, alpha, alpham1, 
                  fillin, newgraph, PACKAGE = "igraph")
+    if (fillin) { res$fillin <- res$fillin + 1 }
     res
 }

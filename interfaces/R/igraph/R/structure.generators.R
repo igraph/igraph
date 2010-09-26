@@ -20,9 +20,9 @@
 #
 ###################################################################
 
-graph <- function( edges, n=max(edges)+1, directed=TRUE ) {
+graph <- function( edges, n=max(edges), directed=TRUE ) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_create", as.numeric(edges), as.numeric(n),
+  .Call("R_igraph_create", as.numeric(edges)-1, as.numeric(n),
         as.logical(directed),
         PACKAGE="igraph")
 }
@@ -108,9 +108,9 @@ graph.formula <- function(...) {
     }
   }
 
-  ids <- seq(along=v)-1
+  ids <- seq(along=v)
   names(ids) <- v
-  res <- graph( unname(ids[edges] ), n=length(v), directed=directed)
+  res <- graph( unname(ids[edges]), n=length(v), directed=directed)
   res <- set.vertex.attribute(res, "name", value=v)
   res  
 }
@@ -297,10 +297,10 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
     res <- graph.empty(n=vc, directed=(mode=="directed"))
     weight <- list(el[,3])
     names(weight) <- weighted
-    res <- add.edges(res, edges=t(as.matrix(el[,1:2]))-1, attr=weight)
+    res <- add.edges(res, edges=t(as.matrix(el[,1:2])), attr=weight)
   } else {
     edges <- unlist(apply(el, 1, function(x) rep(unname(x[1:2]), x[3])))
-    res <- graph(n=vc, edges-1, directed=(mode=="directed"))
+    res <- graph(n=vc, edges, directed=(mode=="directed"))
   }
   res
 }
@@ -361,14 +361,14 @@ graph.adjacency <- function(adjmatrix, mode=c("directed", "undirected", "max",
   
 
 graph.star <- function(n, mode=c("in", "out", "mutual", "undirected"),
-                       center=0 ) {
+                       center=1 ) {
 
   mode <- igraph.match.arg(mode)
   mode <- switch(mode, "out"=0, "in"=1, "undirected"=2, "mutual"=3)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_star", as.numeric(n), as.numeric(mode),
-        as.numeric(center),
+        as.numeric(center)-1,
         PACKAGE="igraph")
 }
 
@@ -508,7 +508,7 @@ graph.data.frame <- function(d, directed=TRUE, vertices=NULL) {
       stop("Some vertex names in edge list are not listed in vertex data frame")
     }
   }
-  ids <- seq(along=names)-1
+  ids <- seq(along=names)
   names(ids) <- names
     
   # create graph
@@ -565,7 +565,7 @@ graph.edgelist <- function(el, directed=TRUE) {
     if (is.character(el)) {
       ## symbolic edge list
       names <- unique(as.character(t(el)))
-      ids <- seq(names)-1
+      ids <- seq(names)
       names(ids) <- names
       res <- graph( unname(ids[t(el)]), directed=directed)
       rm(ids)
@@ -637,7 +637,7 @@ graph.full.bipartite <- function(n1, n2, directed=FALSE,
 graph.bipartite <- function(types, edges, directed=FALSE) {
 
   types <- as.logical(types)
-  edges <- as.numeric(edges)
+  edges <- as.numeric(edges)-1
   directed <- as.logical(directed)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
@@ -655,7 +655,6 @@ graph.incidence.sparse <- function(incidence, directed, mode, multiple,
   el <- selectMethod("summary", signature=c(object="sparseMatrix"))(incidence)
   ## el <- summary(incidence)
   el[,2] <- el[,2] + n1
-  el[,c(1,2)] <- el[,c(1,2)] - 1
 
   if (!is.null(weighted)) {
 
@@ -725,22 +724,22 @@ graph.incidence.dense <- function(incidence, directed, mode, multiple,
       for (j in seq_len(ncol(incidence))) {
         if (incidence[i,j] != 0) {
           if (!directed || mode==1) {
-            edges[2*ptr-1] <- i-1
-            edges[2*ptr] <- n1+j-1
+            edges[2*ptr-1] <- i
+            edges[2*ptr] <- n1+j
             weight[ptr] <- incidence[i,j]
             ptr <- ptr + 1
           } else if (mode==2) {
-            edges[2*ptr-1] <- n1+j-1
-            edges[2*ptr] <- i-1
+            edges[2*ptr-1] <- n1+j
+            edges[2*ptr] <- i
             weight[ptr] <- incidence[i,j]
             ptr <- ptr + 1
           } else if (mode==3) {
-            edges[2*ptr-1] <- i-1
-            edges[2*ptr] <- n1+j-1
+            edges[2*ptr-1] <- i
+            edges[2*ptr] <- n1+j
             weight[ptr] <- incidence[i,j]
             ptr <- ptr + 1
-            edges[2*ptr-1] <- n1+j-1
-            edges[2*ptr] <- i-1
+            edges[2*ptr-1] <- n1+j
+            edges[2*ptr] <- i
           }
         }
       }

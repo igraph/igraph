@@ -1,0 +1,39 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> g <- graph.formula(A:B:C - D:E:F, D-E-F)
+> g2 <- delete.edges(g, E(g, P=c("D", "E")))
+> g2
+Vertices: 6 
+Edges: 10 
+Directed: FALSE 
+Edges:
+               
+[1]  'A' -- 'D'
+[2]  'A' -- 'E'
+[3]  'A' -- 'F'
+[4]  'B' -- 'D'
+[5]  'B' -- 'E'
+[6]  'B' -- 'F'
+[7]  'C' -- 'D'
+[8]  'C' -- 'E'
+[9]  'C' -- 'F'
+[10] 'E' -- 'F'
+> 

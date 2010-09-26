@@ -316,15 +316,17 @@ igraph_shortest_paths:
         IGNORE: RR, RC, RNamespace
 
 igraph_get_shortest_paths:
-        PARAMS: GRAPH graph, OUT VECTORLIST_OR_0 vertices, 
-                OUT VECTORLIST_OR_0 edges, INTEGER from, VERTEXSET to=ALL, \
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST_OR_0 vertices, 
+                OUT EDGESETLIST_OR_0 edges, VERTEX from, VERTEXSET to=ALL, \
                 NEIMODE mode=OUT
+        DEPS: vertices ON graph, edges ON graph, from ON graph, to ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_get_all_shortest_paths:
-        PARAMS: GRAPH graph, OUT VECTORLIST res, OUT VECTOR nrgeo, \
-                INTEGER from, VERTEXSET to, NEIMODE mode=OUT
-        IGNORE: RR, RC, RNamespace
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST res, OUT VECTOR nrgeo, \
+                VERTEX from, VERTEXSET to, NEIMODE mode=OUT
+        DEPS: res ON graph, from ON graph, to ON graph
+        IGNORE: RR, RNamespace
 
 igraph_shortest_paths_dijkstra:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, \
@@ -332,21 +334,24 @@ igraph_shortest_paths_dijkstra:
         IGNORE: RR, RC, RNamespace
 
 igraph_get_shortest_paths_dijkstra:
-        PARAMS: GRAPH graph, OUT VECTORLIST_OR_0 vertices, \
-                OUT VECTORLIST_OR_0 edges, INTEGER from, VERTEXSET to=ALL, \
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST_OR_0 vertices, \
+                OUT EDGESETLIST_OR_0 edges, VERTEX from, VERTEXSET to=ALL, \
                 EDGEWEIGHTS weights=NULL, NEIMODE mode=ALL
+        DEPS: vertices ON graph, edges ON graph, from ON graph, to ON graph,\
+              weights ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_get_all_shortest_paths_dijkstra:
-        PARAMS: GRAPH graph, OUT VECTORLIST res, OUT VECTOR nrgeo, \
-                INTEGER from, VERTEXSET to=ALL, EDGEWEIGHTS weights, \
-				NEIMODE mode=OUT
-        DEPS: weights ON graph, to ON graph
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST res, OUT VECTOR nrgeo, \
+                VERTEX from, VERTEXSET to=ALL, EDGEWEIGHTS weights, \
+                NEIMODE mode=OUT
+        DEPS: weights ON graph, to ON graph, res ON graph, from ON graph
         IGNORE: RR, RNamespace
 
 igraph_shortest_paths_bellman_ford:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, \
                 VERTEXSET to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
+        DEPS: from ON graph, to ON graph, weights ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_shortest_paths_johnson:
@@ -355,7 +360,7 @@ igraph_shortest_paths_johnson:
         IGNORE: RR, RC, RNamespace
 
 igraph_subcomponent: 
-        PARAMS: GRAPH graph, OUT VECTOR res, REAL vid, NEIMODE mode=ALL
+        PARAMS: GRAPH graph, OUT VERTEXSET res, VERTEX vid, NEIMODE mode=ALL
         IGNORE: RR, RC, RNamespace
 
 igraph_betweenness:
@@ -486,16 +491,21 @@ igraph_density:
 igraph_neighborhood_size:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids, INTEGER order, \
                 NEIMODE mode=ALL
+        DEPS: vids ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_neighborhood:
-        PARAMS: GRAPH graph, OUT VECTORLIST res, VERTEXSET vids, INTEGER order, \
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST res, \
+                VERTEXSET vids, INTEGER order, \
                 NEIMODE mode=ALL
+        DEPS res ON graph, vids ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_neighborhood_graphs:
-        PARAMS: GRAPH graph, OUT GRAPHLIST res, VERTEXSET vids, INTEGER order, \
+        PARAMS: GRAPH graph, OUT GRAPHLIST res, VERTEXSET vids, \
+                INTEGER order, \
                 NEIMODE mode=ALL
+        DEPS: vids ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_topological_sorting:
@@ -523,7 +533,7 @@ igraph_count_multiple:
         IGNORE: RR, RC, RNamespace
 
 igraph_girth:
-        PARAMS: GRAPH graph, OUT INTEGERPTR girth, OUT VECTOR circle
+        PARAMS: GRAPH graph, OUT INTEGERPTR girth, OUT VERTEXSET circle
         IGNORE: RR, RC, RNamespace
 
 igraph_add_edge:
@@ -573,9 +583,10 @@ igraph_arpack_unpack_complex:
         NAME-R: arpack.unpack.complex
 
 igraph_unfold_tree:
-        PARAMS: GRAPH graph, OUT GRAPH tree, NEIMODE mode=ALL, VECTOR roots, \
-                OUT VECTOR_OR_0 vertex_index
+        PARAMS: GRAPH graph, OUT GRAPH tree, NEIMODE mode=ALL, VECTOR roots,\
+                OUT VECTORM1_OR_0 vertex_index
         NAME-R: unfold.tree
+        IGNORE: RR
 
 igraph_is_mutual:
         PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL
@@ -583,12 +594,12 @@ igraph_is_mutual:
         NAME-R: is.mutual
 
 igraph_maximum_cardinality_search:
-        PARAMS: GRAPH graph, OUT VECTOR alpha, OUT VECTOR_OR_0 alpham1
+        PARAMS: GRAPH graph, OUT VECTORM1 alpha, OUT VECTORM1_OR_0 alpham1
         NAME-R: maximum.cardinality.search
 
 igraph_is_chordal:
-        PARAMS: GRAPH graph, VECTOR_OR_0 alpha=NULL, VECTOR_OR_0 alpham1=NULL, \
-                OUT BOOLEANPTR_OR_0 chordal, OUT VECTOR_OR_0 fillin, \
+        PARAMS: GRAPH graph, VECTORM1_OR_0 alpha=NULL, VECTORM1_OR_0 alpham1=NULL, \
+                OUT BOOLEANPTR_OR_0 chordal, OUT VECTORM1_OR_0 fillin, \
                 OUT GRAPH_OR_0 newgraph
         NAME-R: is.chordal
         IGNORE: RR, RC
@@ -661,7 +672,7 @@ igraph_centralization_eigenvector_centrality_tmax:
         NAME-R: centralization.evcent.tmax
 
 igraph_assortativity_nominal:
-        PARAMS: GRAPH graph, VECTOR_LONG types, OUT REALPTR res, \
+        PARAMS: GRAPH graph, VECTORM1 types, OUT REALPTR res, \
                 BOOLEAN directed=True
         NAME-R: assortativity.nominal
 
@@ -675,7 +686,7 @@ igraph_assortativity_degree:
         NAME-R: assortativity.degree
 
 igraph_contract_vertices:
-        PARAMS: INOUT GRAPH graph, VECTOR mapping, \
+        PARAMS: INOUT GRAPH graph, VECTORM1 mapping, \
                 VERTEX_ATTRIBUTE_COMBINATION vertex_attr_comb=Default
         NAME-R: contract.vertices
 
@@ -723,7 +734,7 @@ igraph_bipartite_projection:
 
 igraph_create_bipartite:
         PARAMS: OUT GRAPH graph, IN VECTOR_BOOL types, \
-                VECTOR edges, BOOLEAN directed=False
+                VECTORM1 edges, BOOLEAN directed=False
         NAME-R: graph.bipartite
         IGNORE: RR
 
@@ -761,6 +772,7 @@ igraph_clusters:
         PARAMS: GRAPH graph, OUT VECTOR membership, OUT VECTOR csize, \
                 OUT INTEGERPTR no, CONNECTEDNESS mode=WEAK
         NAME-R: clusters
+        IGNORE: RR
 
 igraph_is_connected:
         PARAMS: GRAPH graph, OUT BOOLEANPTR res, CONNECTEDNESS mode=WEAK
@@ -772,14 +784,18 @@ igraph_decompose:
         IGNORE: RR, RC, RNamespace
 
 igraph_articulation_points:
-        PARAMS: GRAPH graph, OUT VECTOR res
+        PARAMS: GRAPH graph, OUT VERTEXSET res
+        DEPS: res ON graph
         NAME-R: articulation.points
 
 igraph_biconnected_components:
-        PARAMS: GRAPH graph, OUT INTEGERPTR no, OUT VECTORLIST_OR_0 tree_edges, \
-                OUT VECTORLIST_OR_0 component_edges, \
-                OUT VECTORLIST_OR_0 components, \
-                OUT VECTOR articulation_points
+        PARAMS: GRAPH graph, OUT INTEGERPTR no, \
+                OUT EDGESETLIST_OR_0 tree_edges, \
+                OUT EDGESETLIST_OR_0 component_edges, \
+                OUT VERTEXSETLIST_OR_0 components, \
+                OUT VERTEXSET articulation_points
+        DEPS: tree_edges ON graph, component_edges ON graph, \
+              components ON graph
         NAME-R: biconnected.components
 
 #######################################
@@ -787,15 +803,19 @@ igraph_biconnected_components:
 #######################################
 
 igraph_cliques:
-        PARAMS: GRAPH graph, OUT VECTORLIST res, INTEGER min_size=0, INTEGER max_size=0
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST res, INTEGER min_size=0, \
+                INTEGER max_size=0
+        DEPS: res ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_largest_cliques:
-        PARAMS: GRAPH graph, OUT VECTORLIST res
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST res
+        DEPS: res ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_maximal_cliques:
-        PARAMS: GRAPH graph, OUT VECTORLIST res
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST res
+        DEPS: res ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_clique_number:
@@ -803,15 +823,19 @@ igraph_clique_number:
         IGNORE: RR, RC, RNamespace
 
 igraph_independent_vertex_sets:
-        PARAMS: GRAPH graph, OUT VECTORLIST res, INTEGER min_size=0, INTEGER max_size=0
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST res, INTEGER min_size=0, \
+                INTEGER max_size=0
+        DEPS: res ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_largest_independent_vertex_sets:
-        PARAMS: GRAPH graph, OUT VECTORLIST res
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST res
+        DEPS: res ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_maximal_independent_vertex_sets:
-        PARAMS: GRAPH graph, OUT VECTORLIST res
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST res
+        DEPS: res ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_independence_number:
@@ -831,8 +855,8 @@ igraph_layout_circle:
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_star:
-        PARAMS: GRAPH graph, OUT MATRIX res, VERTEX center=V(graph)[0], \
-                VECTOR_OR_0 order=NULL
+        PARAMS: GRAPH graph, OUT MATRIX res, VERTEX center=V(graph)[1], \
+                VECTORM1_OR_0 order=NULL
         DEPS: center ON graph
         NAME-R: layout.star
 
@@ -1243,14 +1267,15 @@ igraph_compose:
 
 igraph_maxflow:
         PARAMS: GRAPH graph, OUT REALPTR value, OUT VECTOR_OR_0 flow, \
-                OUT VECTOR_OR_0 cut, OUT VECTOR_OR_0 partition1, \
-                OUT VECTOR_OR_0 partition2, INTEGER source, INTEGER target, \
+                OUT VECTORM1_OR_0 cut, OUT VECTORM1_OR_0 partition1, \
+                OUT VECTORM1_OR_0 partition2, VERTEX source, VERTEX target, \
                 EDGECAPACITY capacity=NULL
-        DEPS: capacity ON graph
+        DEPS: capacity ON graph, source ON graph, target ON graph
 
 igraph_maxflow_value:
-        PARAMS: GRAPH graph, OUT REALPTR value, INTEGER source, INTEGER target, \
+        PARAMS: GRAPH graph, OUT REALPTR value, VERTEX source, VERTEX target, \
                 VECTOR_OR_0 capacity
+        DEPS: source ON graph, target ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_mincut_value:
@@ -1258,18 +1283,20 @@ igraph_mincut_value:
         IGNORE: RR, RC, RNamespace
 
 igraph_st_mincut_value:
-        PARAMS: GRAPH graph, OUT REALPTR res, INTEGER source, INTEGER target, \
+        PARAMS: GRAPH graph, OUT REALPTR res, VERTEX source, VERTEX target, \
                 VECTOR_OR_0 capacity
+        DEPS: source ON graph, target ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_mincut:
-        PARAMS: GRAPH graph, OUT REALPTR value, OUT VECTOR partition, \
-                OUT VECTOR partition2, OUT VECTOR cut, VECTOR_OR_0 capacity
+        PARAMS: GRAPH graph, OUT REALPTR value, OUT VECTORM1 partition1, \
+                OUT VECTORM1 partition2, OUT VECTORM1 cut, VECTOR_OR_0 capacity
         IGNORE: RR, RC, RNamespace
 
 igraph_st_vertex_connectivity:
-        PARAMS: GRAPH graph, OUT INTEGERPTR res, INTEGER source, INTEGER target, \
+        PARAMS: GRAPH graph, OUT INTEGERPTR res, VERTEX source, VERTEX target, \
                 VCONNNEI neighbors=INFINITY
+        DEPS: source ON graph, target ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_vertex_connectivity:
@@ -1277,7 +1304,8 @@ igraph_vertex_connectivity:
         IGNORE: RR, RC, RNamespace
 
 igraph_st_edge_connectivity:
-        PARAMS: GRAPH graph, OUT INTEGERPTR res, INTEGER source, INTEGER target
+        PARAMS: GRAPH graph, OUT INTEGERPTR res, VERTEX source, VERTEX target
+        DEPS: source ON graph, target ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_edge_connectivity:
@@ -1285,11 +1313,13 @@ igraph_edge_connectivity:
         IGNORE: RR, RC, RNamespace
 
 igraph_edge_disjoint_paths:
-        PARAMS: GRAPH graph, OUT INTEGERPTR res, INTEGER source, INTEGER target
+        PARAMS: GRAPH graph, OUT INTEGERPTR res, VERTEX source, VERTEX target
+        DEPS: source ON graph, target ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_vertex_disjoint_paths:
-        PARAMS: GRAPH graph, OUT INTEGERPTR res, INTEGER source, INTEGER target
+        PARAMS: GRAPH graph, OUT INTEGERPTR res, VERTEX source, VERTEX target
+        DEPS: source ON graph, target ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_adhesion:
@@ -1305,24 +1335,27 @@ igraph_cohesion:
 #######################################
 
 igraph_dominator_tree: 
-        PARAMS: GRAPH graph, VERTEX root, OUT VECTOR_OR_0 dom, \
-                OUT GRAPH_OR_0 domtree, OUT VECTOR_OR_0 leftout, \
+        PARAMS: GRAPH graph, VERTEX root, OUT VERTEXSET dom, \
+                OUT GRAPH_OR_0 domtree, OUT VERTEXSET leftout, \
                 NEIMODE mode=OUT
         DEPS: root ON graph
         NAME-R: dominator.tree
 
 igraph_all_st_cuts:
-        PARAMS: GRAPH graph, OUT VECTORLIST_OR_0 cuts, \
-                OUT VECTORLIST_OR_0 partition1s, \
+        PARAMS: GRAPH graph, OUT EDGESETLIST_OR_0 cuts, \
+                OUT VERTEXSETLIST_OR_0 partition1s, \
                 VERTEX source, VERTEX target
-        DEPS: source ON graph, target ON graph
+        DEPS: source ON graph, target ON graph, cuts ON graph, \
+              partition1s ON graph
         NAME-R: all.st.cuts
 
 igraph_all_st_mincuts:
         PARAMS: GRAPH graph, OUT REALPTR value, \
-                OUT VECTORLIST_OR_0 cuts, OUT VECTORLIST_OR_0 partition1s, \
+                OUT EDGESETLIST_OR_0 cuts, \
+                OUT VERTEXSETLIST_OR_0 partition1s, \
                 VERTEX source, VERTEX target, EDGEWEIGHTS capacity=NULL
-        DEPS: capacity ON graph, source ON graph, target ON graph
+        DEPS: capacity ON graph, source ON graph, target ON graph, \
+              cuts ON graph, partition1s ON graph
         NAME-R: all.st.mincuts
 
 igraph_is_separator:
@@ -1336,17 +1369,20 @@ igraph_is_minimal_separator:
         NAME-R: is.minimal.separator
 
 igraph_all_minimal_st_separators:
-        PARAMS: GRAPH graph, OUT VECTORLIST separators
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST separators
+        DEPS: separators ON graph
         NAME-R: minimal.st.separators
 
 igraph_minimum_size_separators:
-        PARAMS: GRAPH graph, OUT VECTORLIST separators
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST separators
+        DEPS: separators ON graph
         NAME-R: minimum.size.separators
 
 igraph_cohesive_blocks:
-        PARAMS: GRAPH graph, OUT VECTORLIST blocks, \
-                OUT VECTOR cohesion, OUT VECTOR parent, \
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST blocks, \
+                OUT VECTOR cohesion, OUT VECTORM1 parent, \
                 OUT GRAPH blockTree
+        DEPS: blocks ON graph
         NAME-R: cohesive.blocks
         CLASS-R: cohesiveBlocks
         IGNORE: RR
@@ -1371,6 +1407,8 @@ igraph_isomorphic:
 
 igraph_isoclass_subgraph:
         PARAMS: GRAPH graph, VECTOR vids, OUT INTEGERPTR isoclass
+        DEPS: vids ON graph
+        IGNORE: RR
 
 igraph_isoclass_create:
         PARAMS: OUT GRAPH graph, INTEGER size, INTEGER number, BOOLEAN directed=True
@@ -1381,7 +1419,7 @@ igraph_isomorphic_vf2:
                 VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2, \
                 EDGE_COLOR edge_color1, EDGE_COLOR edge_color2, \
                 OUT BOOLEANPTR iso, \
-                OUT VECTOR_OR_0 map12, OUT VECTOR_OR_0 map21
+                OUT VECTORM1_OR_0 map12, OUT VECTORM1_OR_0 map21
         DEPS: vertex_color1 ON graph1, vertex_color2 ON graph2, \
               edge_color1 ON graph1, edge_color2 ON graph2
 
@@ -1406,7 +1444,7 @@ igraph_subisomorphic_vf2:
                 VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2, \
                 EDGE_COLOR edge_color1, EDGE_COLOR edge_color2, \
                 OUT BOOLEANPTR iso, \
-                OUT VECTOR_OR_0 map12, OUT VECTOR_OR_0 map21
+                OUT VECTORM1_OR_0 map12, OUT VECTORM1_OR_0 map21
         DEPS: vertex_color1 ON graph1, vertex_color2 ON graph2, \
               edge_color1 ON graph1, edge_color2 ON graph2
 
@@ -1430,16 +1468,16 @@ igraph_isomorphic_34:
         PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso
 
 igraph_canonical_permutation:
-        PARAMS: GRAPH graph, OUT VECTOR labeling, BLISSSH sh="fm", OUT BLISSINFO info
+        PARAMS: GRAPH graph, OUT VECTORM1 labeling, BLISSSH sh="fm", OUT BLISSINFO info
         NAME-R: canonical.permutation
 
 igraph_permute_vertices:
-        PARAMS: GRAPH graph, OUT GRAPH res, VECTOR permutation
+        PARAMS: GRAPH graph, OUT GRAPH res, VECTORM1 permutation
         NAME-R: permute.vertices
 
 igraph_isomorphic_bliss:
         PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso, \
-                OUT VECTOR_OR_0 map12, OUT VECTOR_OR_0 map21, \
+                OUT VECTORM1_OR_0 map12, OUT VECTORM1_OR_0 map21, \
                 BLISSSH sh1="fm", BLISSSH sh2="fm", OUT BLISSINFO info1, \
                 OUT BLISSINFO info2
 

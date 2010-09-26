@@ -23,8 +23,14 @@ VECTOR:
 VECTOR_LONG:
     INCONV: %I% <- as.integer(%I%)
 
+VECTORM1:
+    INCONV: %I% <- as.numeric(%I%)-1
+
 VECTOR_OR_0:
     INCONV: if (!is.null(%I%)) %I% <- as.numeric(%I%)
+
+VECTORM1_OR_0:
+    INCONV: if (!is.null(%I%)) %I% <- as.numeric(%I%)-1
 
 VECTOR_LONG_OR_0:
     INCONV: if (!is.null(%I%)) %I% <- as.integer(%I%)
@@ -83,15 +89,15 @@ INT:
     INCONV: %I% <- as.integer(%I%)
 
 VERTEXSET:
-    INCONV: %I% <- as.igraph.vs(%I1%, %I%)
+    INCONV: %I% <- as.igraph.vs(%I1%, %I%)-1
     DEFAULT:
        ALL: V(%I1%)
 
 VERTEX:
-    INCONV: %I% <- as.igraph.vs(%I1%, %I%)
+    INCONV: %I% <- as.igraph.vs(%I1%, %I%)-1
 
 EDGESET:
-    INCONV: %I% <- as.igraph.es(%I%)
+    INCONV: %I% <- as.igraph.es(%I%)-1
     DEFAULT:
        ALL: E(%I1%)
 
@@ -135,7 +141,7 @@ VERTEX_COLOR:
                } \
             } \
             if (!is.null(%I%)) { \
-               %I% <- as.integer(%I%) \
+               %I% <- as.integer(%I%)-1 \
             }
 
 EDGE_COLOR:
@@ -147,7 +153,7 @@ EDGE_COLOR:
                } \
             } \
             if (!is.null(%I%)) { \
-               %I% <- as.integer(%I%) \
+               %I% <- as.integer(%I%)-1 \
             }
 
 NULL:
@@ -157,6 +163,14 @@ NULL:
 VECTORLIST:
 
 VECTORLIST_OR_0:
+
+VERTEXSETLIST:
+
+VERTEXSETLIST_OR_0:
+
+EDGESETLIST:
+
+EDGESETLIST_OR_0:
 
 ARPACKOPT:
     INCONV:
@@ -174,7 +188,7 @@ BLISSSH:
 BLISSINFO:
 
 ADJLIST:
-    INCONV: %I% <- lapply(%I%, as.numeric)
+    INCONV: %I% <- lapply(%I%, function(x) as.numeric(x)-1)
 
 COMMCMP:
     INCONV: %I% <- switch(igraph.match.arg(%I%), "vi"=0, "nmi"=1)

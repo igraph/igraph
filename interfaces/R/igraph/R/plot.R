@@ -102,9 +102,9 @@ plot.igraph <- function(x,
     if (length(vertex.size)==1) {
       vs <- vertex.size
     } else {
-      vs <- rep(vertex.size, length=vcount(graph))[v+1]
+      vs <- rep(vertex.size, length=vcount(graph))[v]
     }
-    igraph.polygon(layout[v+1,,drop=FALSE],
+    igraph.polygon(layout[v,,drop=FALSE],
                    vertex.size=vs,
                    expand.by=mark.expand[g]/200,
                    shape=mark.shape[g],
@@ -115,7 +115,7 @@ plot.igraph <- function(x,
   ################################################################
   ## calculate position of arrow-heads
   el <- get.edgelist(graph, names=FALSE)
-  loops.v <- el[,1] [ el[,1] == el[,2] ] + 1
+  loops.v <- el[,1] [ el[,1] == el[,2] ]
   loops.e <- which(el[,1] == el[,2])
   nonloops.e <- which(el[,1] != el[,2])
   loop.labels <- edge.labels[el[,1] == el[,2]]
@@ -123,10 +123,10 @@ plot.igraph <- function(x,
   el <- el[el[,1] != el[,2],,drop=FALSE]
 
   edge.coords <- matrix(0, nrow=nrow(el), ncol=4)
-  edge.coords[,1] <- layout[,1][ el[,1]+1 ]
-  edge.coords[,2] <- layout[,2][ el[,1]+1 ]
-  edge.coords[,3] <- layout[,1][ el[,2]+1 ]
-  edge.coords[,4] <- layout[,2][ el[,2]+1 ]
+  edge.coords[,1] <- layout[,1][ el[,1] ]
+  edge.coords[,2] <- layout[,2][ el[,1] ]
+  edge.coords[,3] <- layout[,1][ el[,2] ]
+  edge.coords[,4] <- layout[,2][ el[,2] ]
   if ( length(unique(shape)) == 1) {
     ## same vertex shape for all vertices
     ec <- .igraph.shapes[[ shape[1] ]](edge.coords, el, mode="clip",
@@ -136,12 +136,12 @@ plot.igraph <- function(x,
     shape <- rep(shape, length=vcount(graph))
     ec <- edge.coords
     ec[,1:2] <- t(sapply(seq(length=nrow(el)), function(x) {
-      .igraph.shapes[[ shape[el[x,1]+1] ]](edge.coords[x,,drop=FALSE],
+      .igraph.shapes[[ shape[el[x,1]] ]](edge.coords[x,,drop=FALSE],
                                            el[x,,drop=FALSE],
                                            mode="clip", params=params, end="from")
     }))
     ec[,3:4] <- t(sapply(seq(length=nrow(el)), function(x) {
-      .igraph.shapes[[ shape[el[x,2]+1] ]](edge.coords[x,,drop=FALSE],
+      .igraph.shapes[[ shape[el[x,2]] ]](edge.coords[x,,drop=FALSE],
                                            el[x,,drop=FALSE],
                                            mode="clip", params=params, end="to")
     }))
@@ -287,7 +287,7 @@ plot.igraph <- function(x,
     .igraph.shapes[[ shape[1] ]](layout, mode="plot", params=params)
   } else {
     sapply(seq(length=vcount(graph)), function(x) {
-      .igraph.shapes[[ shape[x] ]](layout[x,,drop=FALSE], v=x-1,
+      .igraph.shapes[[ shape[x] ]](layout[x,,drop=FALSE], v=x,
                                    mode="plot", params=params)
     })
   }
@@ -514,13 +514,13 @@ rglplot.igraph <- function(x, ...) {
   for (i in seq(length=nrow(el))) {
     from <- el[i,1]
     to   <- el[i,2]
-    v1 <- layout[from+1,]
-    v2 <- layout[to+1,]
+    v1 <- layout[from,]
+    v2 <- layout[to,]
     am <- arrow.mode; if (length(am)>1) { am <- am[i] }
     ew <- edge.width; if (length(ew)>1) { ew <- ew[i] }
     ec <- edge.color; if (length(ec)>1) { ec <- ec[i] }
-    r1 <- vertex.size; if (length(r1)>1) { r1 <- r1[from+1] }
-    r2 <- vertex.size; if (length(r2)>1) { r2 <- r2[to+1] }
+    r1 <- vertex.size; if (length(r1)>1) { r1 <- r1[from] }
+    r2 <- vertex.size; if (length(r2)>1) { r2 <- r2[to] }
 
     if (from!=to) {
       create.edge(v1,v2,r1,r2,ec,ew,am,arrow.size)
@@ -552,12 +552,12 @@ rglplot.igraph <- function(x, ...) {
 
   edge.labels[is.na(edge.labels)] <- ""
   if (any(edge.labels != "")) {
-    x0 <- layout[,1][el[,1]+1]
-    x1 <- layout[,1][el[,2]+1]
-    y0 <- layout[,2][el[,1]+1]
-    y1 <- layout[,2][el[,2]+1]
-    z0 <- layout[,3][el[,1]+1]
-    z1 <- layout[,4][el[,2]+1]
+    x0 <- layout[,1][el[,1]]
+    x1 <- layout[,1][el[,2]]
+    y0 <- layout[,2][el[,1]]
+    y1 <- layout[,2][el[,2]]
+    z0 <- layout[,3][el[,1]]
+    z1 <- layout[,4][el[,2]]
     rgl.texts((x0+x1)/2, (y0+y1)/2, (z0+z1)/2, edge.labels,
               col=label.color)
   }

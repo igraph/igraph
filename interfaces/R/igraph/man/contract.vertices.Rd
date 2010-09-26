@@ -37,7 +37,7 @@ g$name <- "Ring"
 V(g)$name <- letters[1:vcount(g)]
 E(g)$weight <- runif(ecount(g))
 
-g2 <- contract.vertices(g, rep(0:4, each=2),
+g2 <- contract.vertices(g, rep(1:5, each=2),
                         vertex.attr.comb=toString)
 
 ## graph and edge attributes are kept, vertex attributes are

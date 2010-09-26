@@ -1,0 +1,38 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> camp <- graph.formula(Harry:Steve:Don:Bert - Harry:Steve:Don:Bert,
++                       Pam:Brazey:Carol:Pat - Pam:Brazey:Carol:Pat,
++                       Holly   - Carol:Pat:Pam:Jennie:Bill,
++                       Bill    - Pauline:Michael:Lee:Holly,
++                       Pauline - Bill:Jennie:Ann,
++                       Jennie  - Holly:Michael:Lee:Ann:Pauline,
++                       Michael - Bill:Jennie:Ann:Lee:John,
++                       Ann     - Michael:Jennie:Pauline,
++                       Lee     - Michael:Bill:Jennie,
++                       Gery    - Pat:Steve:Russ:John,
++                       Russ    - Steve:Bert:Gery:John,
++                       John    - Gery:Russ:Michael)
+> camp <- simplify(camp)
+> sep <- lapply(minimum.size.separators(camp), function(x) V(camp)[x])
+> all(sapply(sep, is.minimal.separator, graph=camp))
+[1] TRUE
+> 
+> 

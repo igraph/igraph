@@ -20,7 +20,7 @@
   mode and \sQuote{\code{plot}} selects plotting mode.
 
   In clipping mode a shape function has the following arguments:
-  \itemize{
+  \describe{
     \item{coords}{A matrix with four columns, it contains the
       coordinates of the vertices for the edge list supplied in the
       \code{el} argument.}
@@ -54,7 +54,7 @@
 
   In plotting mode the following arguments are supplied to the shape
   function:
-  \itemize{
+  \describe{
     \item{coords}{The coordinates of the vertices, a matrix with two
       columns.}
     \item{v}{The ids of the vertices to plot. It should match the number

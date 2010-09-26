@@ -13,7 +13,10 @@ articulation.points(graph)
 }
 \details{
   Articuation points or cut vertices are vertices whose
-  removal increases the number of connected components in a graph.  
+  removal increases the number of connected components in a graph. If
+  the original graph was connected, then the removal of a single
+  articulation point makes it undirected. If a graph contains no
+  articulation points, then its vertex connectivity is at least two.  
 }
 \value{A numeric vector giving the vertex ids of the articulation points
   of the input graph.}
@@ -24,7 +27,7 @@ articulation.points(graph)
 \examples{
 g <- graph.disjoint.union( graph.full(5), graph.full(5) )
 clu <- clusters(g)$membership
-g <- add.edges(g, c(which(clu==0), which(clu==1))-1)
+g <- add.edges(g, c(match(1, clu), match(2, clu)) )
 articulation.points(g)
 }
 \keyword{graphs}

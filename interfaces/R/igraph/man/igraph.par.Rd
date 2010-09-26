@@ -16,7 +16,7 @@ igraph.par(parid, parvalue = NULL)
 }
 \details{
   The currently used parameters in alphabetical order:
-  \itemize{
+  \describe{
     \item{edge.attr.comb}{Specifies what to do with the edge
       attributes if the graph is modified. The default value is
       \code{list(weight="sum", name="concat", "ignore")}. See

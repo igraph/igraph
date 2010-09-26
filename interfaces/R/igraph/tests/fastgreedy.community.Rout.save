@@ -1,5 +1,5 @@
 
-R version 2.11.0 (2010-04-22)
+R version 2.11.1 (2010-05-31)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -18,6 +18,8 @@ Type 'q()' to quit R.
 > 
 > library(igraph)
 > 
+> set.seed(42)
+> 
 > g <- graph.famous("Zachary")
 > fc <- fastgreedy.community(g)
 > fc
@@ -25,16 +27,16 @@ Graph community structure calculated with the fast greedy algorithm
 Number of communities (best split): 3 
 Modularity (best split): 0.3806706 
 Membership vector:
- [1] 0 2 2 2 0 0 0 2 1 2 0 0 2 2 1 1 0 2 1 0 1 2 1 1 1 1 1 1 1 1 1 1 1 1
-> modularity(g, fc$membership) == max(fc$modularity)
+ [1] 1 3 3 3 1 1 1 3 2 3 1 1 3 3 2 2 1 3 2 1 2 3 2 2 2 2 2 2 2 2 2 2 2 2
+> abs(modularity(g, fc$membership) - max(fc$modularity)) < 1e-14
 [1] TRUE
 > membership(fc)
- [1] 0 2 2 2 0 0 0 2 1 2 0 0 2 2 1 1 0 2 1 0 1 2 1 1 1 1 1 1 1 1 1 1 1 1
+ [1] 1 3 3 3 1 1 1 3 2 3 1 1 3 3 2 2 1 3 2 1 2 3 2 2 2 2 2 2 2 2 2 2 2 2
 > length(fc)
 [1] 3
 > sizes(fc)
 Community sizes
- 0  1  2 
+ 1  2  3 
  8 17  9 
 > d <- as.dendrogram(fc)
 > d
@@ -44,6 +46,6 @@ Community sizes
 > d[[2]]
 'dendrogram' with 2 branches and 17 members total, at height 30 
 > m2 <- cutat(fc, no=3)
-> modularity(g, m2) == fc$modularity[length(fc$modularity)-2]
+> abs(modularity(g, m2) - fc$modularity[length(fc$modularity)-2]) < 1e-14
 [1] TRUE
 > 

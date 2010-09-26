@@ -41,12 +41,14 @@ cluster.distribution(graph, cumulative = FALSE, mul.size = FALSE, \dots)
 
   \code{cluster.distribution} creates a histogram for the maximal
   connected component sizes.
-  
-  Breadth-first search is conducted from each not-yet visited
-  vertex. }
+
+  The weakly connected components are found by a simple breadth-first
+  search. The strongly connected components are implemented by two
+  consecutive depth-first searches.
+}
 \value{
   For \code{is.connected} a logical constant.
-  
+
   For \code{clusters} a named list with three components:
   \item{membership}{numeric vector giving the cluster id to which each
     vertex belongs.}

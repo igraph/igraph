@@ -1,0 +1,82 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> set.seed(42)
+> g <- graph.formula(A+-+B, A--+C, C+-+D)
+> g$name <- "Tiny graph"
+> E(g)$weight <- rnorm(ecount(g))
+> 
+> g2 <- as.undirected(g, mode="collapse")
+> g3 <- as.undirected(g, mode="each")
+> g4 <- as.undirected(g, mode="mutual")
+> 
+> print(g, e=TRUE, g=TRUE)
+Vertices: 4 
+Edges: 5 
+Directed: TRUE 
+Graph attributes:
+[[name]]
+[1] "Tiny graph"
+Edges and their attributes:
+                   weight
+[1] 'B' -> 'A'  1.3709584
+[2] 'A' -> 'B' -0.5646982
+[3] 'A' -> 'C'  0.3631284
+[4] 'D' -> 'C'  0.6328626
+[5] 'C' -> 'D'  0.4042683
+> print(g2, e=TRUE, g=TRUE)
+Vertices: 4 
+Edges: 3 
+Directed: FALSE 
+Graph attributes:
+[[name]]
+[1] "Tiny graph"
+Edges and their attributes:
+                  weight
+[1] 'A' -- 'B' 0.8062603
+[2] 'A' -- 'C' 0.3631284
+[3] 'C' -- 'D' 1.0371309
+> print(g3, e=TRUE, g=TRUE)
+Vertices: 4 
+Edges: 5 
+Directed: FALSE 
+Graph attributes:
+[[name]]
+[1] "Tiny graph"
+Edges and their attributes:
+                   weight
+[1] 'A' -- 'B'  1.3709584
+[2] 'A' -- 'B' -0.5646982
+[3] 'A' -- 'C'  0.3631284
+[4] 'C' -- 'D'  0.6328626
+[5] 'C' -- 'D'  0.4042683
+> print(g4, e=TRUE, g=TRUE)
+Vertices: 4 
+Edges: 2 
+Directed: FALSE 
+Graph attributes:
+[[name]]
+[1] "Tiny graph"
+Edges and their attributes:
+                  weight
+[1] 'A' -- 'B' 0.8062603
+[2] 'C' -- 'D' 1.0371309
+> 
+> 

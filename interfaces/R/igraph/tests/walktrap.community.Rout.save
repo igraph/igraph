@@ -1,5 +1,5 @@
 
-R version 2.11.0 (2010-04-22)
+R version 2.11.1 (2010-05-31)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -26,18 +26,18 @@ Graph community structure calculated with the walktrap algorithm
 Number of communities (best split): 5 
 Modularity (best split): 0.3532216 
 Membership vector:
- [1] 0 0 1 0 4 4 4 0 1 1 4 0 0 1 2 2 4 0 2 0 2 0 2 3 3 3 2 3 1 2 1 1 2 2
-> modularity(g, membership(wc)) == modularity(wc)
-[1] TRUE
+ [1] 1 1 2 1 5 5 5 1 2 2 5 1 1 2 3 3 5 1 3 1 3 1 3 4 4 4 3 4 2 3 2 2 3 3
+> abs(modularity(g, membership(wc)) - modularity(wc)) < 1e-14
+[1] FALSE
 > membership(wc)
- [1] 0 0 1 0 4 4 4 0 1 1 4 0 0 1 2 2 4 0 2 0 2 0 2 3 3 3 2 3 1 2 1 1 2 2
+ [1] 1 1 2 1 5 5 5 1 2 2 5 1 1 2 3 3 5 1 3 1 3 1 3 4 4 4 3 4 2 3 2 2 3 3
 > modularity(wc)
 [1] 0.3532216
 > length(wc)
 [1] 5
 > sizes(wc)
 Community sizes
-0 1 2 3 4 
+1 2 3 4 5 
 9 7 9 4 5 
 > d <- as.dendrogram(wc)
 > d
@@ -47,6 +47,6 @@ Community sizes
 > d[[2]]
 'dendrogram' with 2 branches and 14 members total, at height 32 
 > m2 <- cutat(wc, no=3)
-> modularity(g, m2) == wc$modularity[length(wc$modularity)-2]
-[1] TRUE
+> abs(modularity(g, m2) - wc$modularity[length(wc$modularity)-2]) < 1e-14
+[1] FALSE
 > 

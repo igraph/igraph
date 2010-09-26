@@ -38,7 +38,7 @@ add.edges <- function(graph, edges, ..., attr=list()) {
   
   edges.orig <- ecount(graph)  
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  graph <- .Call("R_igraph_add_edges", graph, as.numeric(edges),
+  graph <- .Call("R_igraph_add_edges", graph, as.numeric(edges)-1,
                  PACKAGE="igraph")
   edges.new <- ecount(graph)
   
@@ -89,7 +89,7 @@ delete.edges <- function(graph, edges) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_delete_edges", graph, as.igraph.es(edges),
+  .Call("R_igraph_delete_edges", graph, as.igraph.es(edges)-1,
         PACKAGE="igraph")
 }
 
@@ -98,7 +98,7 @@ delete.vertices <- function(graph, v) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_delete_vertices", graph, as.igraph.vs(graph, v),
+  .Call("R_igraph_delete_vertices", graph, as.igraph.vs(graph, v)-1,
         PACKAGE="igraph")
 }
 
@@ -123,9 +123,10 @@ neighbors <- function(graph, v, mode=1) {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_neighbors", graph, as.igraph.vs(graph, v),
-        as.numeric(mode),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_neighbors", graph, as.igraph.vs(graph, v)-1,
+               as.numeric(mode),
+               PACKAGE="igraph")
+  res+1
 }
 
 is.directed <- function(graph) {
@@ -142,7 +143,7 @@ get.edges <- function(graph, es) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  res <- .Call("R_igraph_edges", graph, as.igraph.es(es),
+  res <- .Call("R_igraph_edges", graph, as.igraph.es(es)-1,
                PACKAGE="igraph")
-  matrix(res, nc=2, byrow=TRUE)
+  matrix(res, nc=2, byrow=TRUE)+1
 }

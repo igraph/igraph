@@ -42,7 +42,7 @@ layout.drl (graph, use.seed = FALSE, seed = matrix(runif(vcount(graph) *
   This function implements the force-directed DrL layout generator.
 
   The generator has the following parameters:
-  \itemize{
+  \describe{
     \item{edge.cut}{Edge cutting is done in the late stages of the
       algorithm in order to achieve less dense layouts.  Edges are cut
       if there is a lot of stress on them (a large value in the

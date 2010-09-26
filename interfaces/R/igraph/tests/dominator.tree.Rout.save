@@ -1,0 +1,54 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> g <- graph.formula(R-+A:B:C, A-+D, B-+A:D:E, C-+F:G, D-+L,
++                    E-+H, F-+I, G-+I:J, H-+E:K, I-+K, J-+I,
++                    K-+I:R, L-+H)
+> dtree <- dominator.tree(g, root="R")
+> 
+> dtree$dom <- V(g)$name[ dtree$dom ]
+> dtree$leftout <- V(g)$name[ dtree$leftout ]
+> dtree
+$dom
+ [1] "R" "R" "R" "R" "R" "C" "C" "D" "R" "R" "G" "R"
+
+$domtree
+Vertices: 13 
+Edges: 12 
+Directed: TRUE 
+Edges:
+               
+[1]  'R' -> 'A'
+[2]  'R' -> 'B'
+[3]  'R' -> 'C'
+[4]  'R' -> 'D'
+[5]  'R' -> 'E'
+[6]  'C' -> 'F'
+[7]  'C' -> 'G'
+[8]  'D' -> 'L'
+[9]  'R' -> 'H'
+[10] 'R' -> 'I'
+[11] 'G' -> 'J'
+[12] 'R' -> 'K'
+
+$leftout
+character(0)
+
+> 
