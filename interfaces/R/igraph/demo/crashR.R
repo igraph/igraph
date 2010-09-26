@@ -168,8 +168,8 @@ pause()
 
 ### Graphs
 ## Create a small graph, A->B, A->C, B->C, C->E, D
-## A=0, B=1, C=2, D=3, E=4
-g <- graph( c(0,1, 0,2, 1,2, 2,4), n=5 )
+## A=1, B=2, C=3, D=4, E=5
+g <- graph( c(1,2, 1,3, 2,3, 3,5), n=5 )
 
 pause()
 
@@ -180,7 +180,7 @@ pause()
 
 ### Create an undirected graph as well
 ## A--B, A--C, B--C, C--E, D
-g2 <- graph( c(0,1, 0,2, 1,2, 2,4), n=5, dir=FALSE )
+g2 <- graph( c(1,2, 1,3, 2,3, 3,5), n=5, dir=FALSE )
 g2
 
 pause()
@@ -215,7 +215,7 @@ as.directed(as.undirected(g))
 pause()
 
 ### Multiple edges
-g <- graph( c(0,1,0,1, 0,2, 1,2, 3,4), n=5 )
+g <- graph( c(1,2,1,2, 1,3, 2,3, 4,5), n=5 )
 g
 
 is.simple(g)
@@ -230,7 +230,7 @@ is.simple(g)
 pause()
 
 ### Loop edges
-g <- graph( c(0,0,0,1, 0,2, 1,2, 3,4), n=5 )
+g <- graph( c(1,1,1,2, 1,3, 2,3, 4,5), n=5 )
 g
 
 is.simple(g)
@@ -261,7 +261,7 @@ print(g2, v=T)
 pause()
 
 ### Remove Alice
-g3 <- delete.vertices(g2, match("Alice", V(g2)$name)-1)
+g3 <- delete.vertices(g2, match("Alice", V(g2)$name))
 
 pause()
 
@@ -282,7 +282,7 @@ g4
 pause()
 
 ### Add some edges as well
-g4 <- add.edges(g4, match(c("Helen", "Jane", "Ike", "Jane"), V(g4)$name )-1)
+g4 <- add.edges(g4, match(c("Helen", "Jane", "Ike", "Jane"), V(g4)$name ))
 g4
 
 pause()
@@ -301,41 +301,41 @@ E(g2)
 pause()
 
 ### Edge from a vertex to another
-E(g2, P=c(0,1))
+E(g2, P=c(1,2))
 
 pause()
 
 ### Delete this edge
-g3 <- delete.edges(g2, E(g2, P=c(0,1)))
+g3 <- delete.edges(g2, E(g2, P=c(1,2)))
 g3
 
 pause()
 
 ### Get the id of the edge
-as.vector(E(g2, P=c(0,1)))
+as.vector(E(g2, P=c(1,2)))
 
 pause()
 
 ### All adjacent edges of a vertex
-E(g2)[ adj(2) ]
+E(g2)[ adj(3) ]
 
 pause()
 
 ### Or multiple vertices
-E(g2)[ adj(c(2,0)) ]
+E(g2)[ adj(c(3,1)) ]
 
 pause()
 
 ### Outgoing edges
-E(g2)[ from(2) ]
+E(g2)[ from(3) ]
 
 pause()
 
 ### Incoming edges
-E(g2)[ to(2) ]
+E(g2)[ to(3) ]
 
 pause()
 
 ### Edges along a path
-E(g2, path=c(0,3,4))
+E(g2, path=c(1,4,5))
 

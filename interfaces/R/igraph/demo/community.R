@@ -7,13 +7,13 @@ pause <- function() {
 
 ### A modular graph has dense subgraphs
 mod <- graph.full(10) %du% graph.full(10) %du% graph.full(10)
-perfect <- c(rep(0,10), rep(1,10), rep(2,10))
+perfect <- c(rep(1,10), rep(2,10), rep(3,10))
 perfect
 
 pause()
 
 ### Plot it with community (=component) colors
-plot(mod, vertex.color=perfect+1, layout=layout.fruchterman.reingold)
+plot(mod, vertex.color=perfect, layout=layout.fruchterman.reingold)
 
 pause()
 
@@ -23,12 +23,12 @@ modularity(mod, perfect)
 pause()
 
 ### Modularity of the trivial partition, quite bad
-modularity(mod, rep(0, 30))
+modularity(mod, rep(1, 30))
 
 pause()
 
 ### Modularity of a good partition with two communities
-modularity(mod, c(rep(0, 10), rep(1,20)))
+modularity(mod, c(rep(1, 10), rep(2,20)))
 
 pause()
 
@@ -41,7 +41,7 @@ pause()
 ### Greedy algorithm
 fc <- fastgreedy.community(karate)
 memb <- membership(fc)
-plot(karate, vertex.color=memb+1)
+plot(karate, vertex.color=memb)
   
 pause()
 
@@ -161,7 +161,7 @@ clique.community <- function(graph, k) {
     for (j in seq(along=clq)) {
       if ( length(unique(c(clq[[i]], 
              clq[[j]]))) == k+1 ) {
-        edges <- c(edges, c(i,j)-1)
+        edges <- c(edges, c(i,j))
       }
     }
   }

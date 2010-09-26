@@ -176,7 +176,7 @@ pause()
 
 ## ### Time evolution of authority scores
 ## AS <- authority.score(jg)$vector
-## center <- which.max(AS)-1
+## center <- which.max(AS)
 ## startyear <- V(jg)[center]$year
 
 ## pause()
@@ -184,7 +184,7 @@ pause()
 ## ### Function to go back in time
 ## auth.year <- function(y) {
 ##   print(y)
-##   keep <- which(V(jg)$year <= y)-1
+##   keep <- which(V(jg)$year <= y)
 ##   g2 <- subgraph(jg, keep)
 ##   as <- abs(authority.score(g2, scale=FALSE)$vector)
 ##   w <- match(V(jg)[center]$usid, V(g2)$usid)
@@ -200,7 +200,7 @@ pause()
 ## pause()
 
 ## ### Check another case
-## center <- match("22US1", V(jg)$usid)-1
+## center <- "22US1"
 ## startyear <- V(jg)[center]$year
 
 ## pause()
