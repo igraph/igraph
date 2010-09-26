@@ -77,11 +77,11 @@ Directed: TRUE
 Edges:
               
 [1] 'A' -> 'B'
-[2] 'B' -> 'C'
-[3] 'A' -> 'D'
+[2] 'A' -> 'D'
+[3] 'B' -> 'C'
 [4] 'B' -> 'A'
-[5] 'C' -> 'B'
-[6] 'D' -> 'A'
+[5] 'D' -> 'A'
+[6] 'C' -> 'B'
 > g3
 Vertices: 5 
 Edges: 3 
@@ -89,8 +89,8 @@ Directed: TRUE
 Edges:
               
 [1] 'A' -> 'B'
-[2] 'B' -> 'C'
-[3] 'A' -> 'D'
+[2] 'A' -> 'D'
+[3] 'B' -> 'C'
 > g2$name
 [1] "Small graph"
 > g3$name
@@ -105,11 +105,11 @@ Directed: TRUE
 Edges and their attributes:
                   weight
 [1] 'A' -> 'B' 0.9148060
-[2] 'B' -> 'C' 0.9370754
-[3] 'A' -> 'D' 0.2861395
+[2] 'A' -> 'D' 0.9370754
+[3] 'B' -> 'C' 0.2861395
 [4] 'B' -> 'A' 0.9148060
-[5] 'C' -> 'B' 0.9370754
-[6] 'D' -> 'A' 0.2861395
+[5] 'D' -> 'A' 0.9370754
+[6] 'C' -> 'B' 0.2861395
 > print(as.directed(g, "arbitrary"), e=TRUE)
 Vertices: 5 
 Edges: 3 
@@ -117,7 +117,7 @@ Directed: TRUE
 Edges and their attributes:
                   weight
 [1] 'A' -> 'B' 0.9148060
-[2] 'B' -> 'C' 0.9370754
-[3] 'A' -> 'D' 0.2861395
+[2] 'A' -> 'D' 0.9370754
+[3] 'B' -> 'C' 0.2861395
 > 
 > 

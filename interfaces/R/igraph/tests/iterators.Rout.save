@@ -27,8 +27,8 @@ Type 'q()' to quit R.
 Edge sequence:
           
 [1] B -- A
-[2] C -- B
-[3] D -- C
+[2] G -- A
+[3] C -- B
 > V(ring)[ c("A", "C") ]
 Vertex sequence:
 [1] "A" "C"

@@ -36,11 +36,11 @@ Graph attributes:
 [1] "Tiny graph"
 Edges and their attributes:
                    weight
-[1] 'B' -> 'A'  1.3709584
-[2] 'A' -> 'B' -0.5646982
-[3] 'A' -> 'C'  0.3631284
-[4] 'D' -> 'C'  0.6328626
-[5] 'C' -> 'D'  0.4042683
+[1] 'A' -> 'B'  1.3709584
+[2] 'A' -> 'C' -0.5646982
+[3] 'B' -> 'A'  0.3631284
+[4] 'C' -> 'D'  0.6328626
+[5] 'D' -> 'C'  0.4042683
 > print(g2, e=TRUE, g=TRUE)
 Vertices: 4 
 Edges: 3 
@@ -49,10 +49,10 @@ Graph attributes:
 [[name]]
 [1] "Tiny graph"
 Edges and their attributes:
-                  weight
-[1] 'A' -- 'B' 0.8062603
-[2] 'A' -- 'C' 0.3631284
-[3] 'C' -- 'D' 1.0371309
+                   weight
+[1] 'A' -- 'B'  1.7340869
+[2] 'A' -- 'C' -0.5646982
+[3] 'C' -- 'D'  1.0371309
 > print(g3, e=TRUE, g=TRUE)
 Vertices: 4 
 Edges: 5 
@@ -63,8 +63,8 @@ Graph attributes:
 Edges and their attributes:
                    weight
 [1] 'A' -- 'B'  1.3709584
-[2] 'A' -- 'B' -0.5646982
-[3] 'A' -- 'C'  0.3631284
+[2] 'A' -- 'C' -0.5646982
+[3] 'A' -- 'B'  0.3631284
 [4] 'C' -- 'D'  0.6328626
 [5] 'C' -- 'D'  0.4042683
 > print(g4, e=TRUE, g=TRUE)
@@ -75,8 +75,8 @@ Graph attributes:
 [[name]]
 [1] "Tiny graph"
 Edges and their attributes:
-                  weight
-[1] 'A' -- 'B' 0.8062603
-[2] 'C' -- 'D' 1.0371309
+                 weight
+[1] 'A' -- 'B' 1.734087
+[2] 'C' -- 'D' 1.037131
 > 
 > 
