@@ -16,7 +16,6 @@ g <- graph.formula(Andre----Beverly:Diane:Fernando:Carol,
                    Heather--Fernando:Garth:Ike,
                    Ike------Heather:Jane,
                    Jane-----Ike )
-g <- simplify(g)
 
 pause()
 

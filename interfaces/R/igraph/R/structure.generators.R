@@ -27,7 +27,7 @@ graph <- function( edges, n=max(edges), directed=TRUE ) {
         PACKAGE="igraph")
 }
 
-graph.formula <- function(...) {
+graph.formula <- function(..., simplify=TRUE) {
   mf <- as.list(match.call())[-1]
 
   ## Operators first
@@ -111,8 +111,9 @@ graph.formula <- function(...) {
   ids <- seq(along=v)
   names(ids) <- v
   res <- graph( unname(ids[edges]), n=length(v), directed=directed)
+  if (simplify) res <- simplify(res)
   res <- set.vertex.attribute(res, "name", value=v)
-  res  
+  res
 }
 
 graph.adjacency.dense <- function(adjmatrix, mode=c("directed", "undirected", "max",

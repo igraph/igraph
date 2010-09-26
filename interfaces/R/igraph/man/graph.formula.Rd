@@ -6,11 +6,14 @@
   quickly, it works for both directed and undirected graphs.
 }
 \usage{
-graph.formula(...)
+graph.formula(..., simplify = TRUE)
 }
 \arguments{
   \item{...}{The formulae giving the structure of the graph, see details
     below.}
+  \item{simplify}{Logical scalar, whether to call \code{\link{simplify}}
+    on the created graph. By default the graph is simplified, loop and
+    multiple edges are removed.}
 }
 \details{
   \code{graph.formula} is very handy for creating small graphs quickly.

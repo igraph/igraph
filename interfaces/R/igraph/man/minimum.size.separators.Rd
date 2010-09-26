@@ -73,7 +73,6 @@ camp <- graph.formula(Harry:Steve:Don:Bert - Harry:Steve:Don:Bert,
                       Gery    - Pat:Steve:Russ:John,
                       Russ    - Steve:Bert:Gery:John,
                       John    - Gery:Russ:Michael)
-camp <- simplify(camp)
 lapply(minimum.size.separators(camp), function(x) V(camp)[x])
 }
 \keyword{graphs}

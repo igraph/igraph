@@ -186,7 +186,6 @@ g <- graph.formula(A-B:F:C:E:D, B-A:D:C:E:F:G, C-A:B:F:E:D, D-A:B:C:F:E,
                    O-N:M:P, P-Q:M:N:O:S, Q-M:N:P:V:U:W:R, R-M:N:V:W:Q,
                    S-N:P:M:U:W:T, T-S:V:W:U, U-E:V:Q:S:W:T,
                    V-E:U:W:T:R:Q, W-U:E:V:Q:R:S:T)
-g <- simplify(g)
 
 pause()
 
