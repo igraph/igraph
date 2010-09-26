@@ -38,8 +38,7 @@ class GeneratorTests(unittest.TestCase):
             ),
             ("A:B:C:D -- A:B:C:D",
                 ["A", "B", "C", "D"],
-                [(0,0), (0,1), (0,2), (0,3), (0,1), (1,1), (1,2), (1,3),
-                 (0,2), (1,2), (2,2), (2,3), (0,3), (1,3), (2,3), (3,3)]
+                [(0,1), (0,2), (0,3), (1,2), (1,3), (2,3)]
             ),
             ("A -> B -> C", ["A", "B", "C"], [(0,1), (1,2)]),
             ("A <- B -> C", ["A", "B", "C"], [(1,0), (1,2)]),
@@ -72,7 +71,7 @@ class GeneratorTests(unittest.TestCase):
         for formula, names, edges in tests:
             g = Graph.Formula(formula)
             self.assertEquals(g.vs["name"], names)
-            self.assertEquals(g.get_edgelist(), edges)
+            self.assertEquals(g.get_edgelist(), sorted(edges))
 
     def testFull(self):
         g=Graph.Full(20, directed=True)

@@ -81,8 +81,9 @@ def generate_edges(formula):
     yield start_names, end_names, arrowheads
 
 
-def construct_graph_from_formula(cls, formula = None, attr = "name"):
-    """Graph.Formula(formula = None, attr = "name")
+def construct_graph_from_formula(cls, formula = None, attr = "name",
+        simplify = True):
+    """Graph.Formula(formula = None, attr = "name", simplify = True)
     
     Generates a graph from a graph formula
 
@@ -156,6 +157,7 @@ def construct_graph_from_formula(cls, formula = None, attr = "name"):
     @param formula: the formula itself
     @param attr: name of the vertex attribute where the vertex names
                  will be stored
+    @param simplify: whether the simplify the constructed graph
     @return: the constructed graph:
     """
     
@@ -192,4 +194,7 @@ def construct_graph_from_formula(cls, formula = None, attr = "name"):
     vertex_attrs = {}
     vertex_attrs[attr] = vertex_ids.values()
     # Construct and return the graph
-    return cls(len(vertex_ids), edges, directed, vertex_attrs=vertex_attrs)
+    result = cls(len(vertex_ids), edges, directed, vertex_attrs=vertex_attrs)
+    if simplify:
+        result.simplify()
+    return result
