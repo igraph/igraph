@@ -162,9 +162,11 @@ PyObject* igraphmodule_set_progress_handler(PyObject* self, PyObject* o) {
     return NULL;
   }
   Py_XDECREF(igraphmodule_progress_handler);
-  if (o == Py_None)
-     igraphmodule_progress_handler=NULL;
-  else {
+  if (o == Py_None) {
+    if (igraphmodule_progress_handler)
+      Py_DECREF(igraphmodule_progress_handler);
+    igraphmodule_progress_handler=NULL;
+  } else {
     Py_INCREF(o);
     igraphmodule_progress_handler=o;
   }
