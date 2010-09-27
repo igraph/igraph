@@ -400,7 +400,7 @@ class RRCodeGenerator(CodeGenerator):
                if p['mode'] in ['IN','INOUT'] ]
         head=[ h for h in head if h != "" ]
         if 'PROGRESS' in self.func[function]['FLAGS']:
-            head.append('verbose=igraph.par("verbose")')
+            head.append('verbose=getIgraphOpt("verbose")')
         out.write(", ".join(head))
         out.write(") {\n")
 

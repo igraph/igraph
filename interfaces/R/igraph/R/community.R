@@ -541,7 +541,7 @@ multilevel.community <- function(graph, weights=NULL) {
   res
 }
 
-optimal.community <- function(graph, verbose=igraph.par("verbose")) {
+optimal.community <- function(graph, verbose=getIgraphOpt("verbose")) {
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
   verbose <- as.logical(verbose)

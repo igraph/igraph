@@ -7,9 +7,9 @@
   a human readable form.}
 \usage{
 \method{print}{igraph}(x,
-  graph.attributes=igraph.par("print.graph.attributes"),
-  vertex.attributes=igraph.par("print.vertex.attributes"),
-  edge.attributes=igraph.par("print.edge.attributes"),
+  graph.attributes=getIgraphOpt("print.graph.attributes"),
+  vertex.attributes=getIgraphOpt("print.vertex.attributes"),
+  edge.attributes=getIgraphOpt("print.edge.attributes"),
   names=TRUE, quote.names=TRUE,
   \dots)
 \method{print}{bgraph}(x,

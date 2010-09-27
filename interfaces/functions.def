@@ -1088,7 +1088,7 @@ igraph_community_multilevel:
 igraph_community_optimal_modularity:
         PARAMS: GRAPH graph, OUT REALPTR modularity, \
                 OUT VECTOR_OR_0 membership, \
-                BOOLEAN verbose=igraph.par("verbose")
+                BOOLEAN verbose=getIgraphOpt("verbose")
         NAME-R: optimal.community
         IGNORE: RR
 

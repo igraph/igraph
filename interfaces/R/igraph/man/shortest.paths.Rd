@@ -22,7 +22,7 @@ get.shortest.paths(graph, from, to=V(graph), mode = c("out", "all",
 get.all.shortest.paths(graph, from, to = V(graph), mode = c("out", 
       "all", "in"), weights=NULL) 
 average.path.length(graph, directed=TRUE, unconnected=TRUE)
-path.length.hist (graph, directed = TRUE, verbose = igraph.par("verbose")) 
+path.length.hist (graph, directed = TRUE, verbose = getIgraphOpt("verbose")) 
 }
 \arguments{
   \item{graph}{The graph to work on.}

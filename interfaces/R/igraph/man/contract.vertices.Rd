@@ -8,7 +8,7 @@
 }
 \usage{
 contract.vertices(graph, mapping,
-                  vertex.attr.comb=igraph.par("vertex.attr.comb"))
+                  vertex.attr.comb=getIgraphOpt("vertex.attr.comb"))
 }
 \arguments{
   \item{graph}{The input graph, it can be directed or undirected.}

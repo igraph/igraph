@@ -37,7 +37,7 @@
 cohesive.blocks.old <- function(graph, db=NULL,
                             useDB=(vcount(graph)>400 && require(RSQLite)),
                             cutsetHeuristic=TRUE,
-                            verbose=igraph.par("verbose")) {
+                            verbose=getIgraphOpt("verbose")) {
 
     if(useDB && !require(RSQLite)) stop("package `RSQLite` required")
     if(!require(digest)) stop("package `digest` required")
@@ -406,7 +406,7 @@ find.all.min.cutsets <- function(g, k=NULL){
     }
 }
 
-kComponents <- function(g, k=NULL, useHeuristic=TRUE, verbose=igraph.par("verbose")){
+kComponents <- function(g, k=NULL, useHeuristic=TRUE, verbose=getIgraphOpt("verbose")){
     if(vcount(g)<1) return(list())
     V(g)$csid <- as.numeric(V(g))
     cs <- if(useHeuristic){find.all.min.cutsets(g, k)} else {kCutsets(g, k)}

@@ -24,15 +24,16 @@ layout.random(graph, params, dim=2)
 layout.circle(graph, params)
 layout.sphere(graph, params)
 layout.fruchterman.reingold(graph, \dots, dim=2,
-      verbose=igraph.par("verbose"), params)
+      verbose=getIgraphOpt("verbose"), params)
 layout.kamada.kawai(graph, \dots, dim=2,
-      verbose=igraph.par("verbose"), params)
+      verbose=getIgraphOpt("verbose"), params)
 layout.spring(graph, \dots, params)
 layout.reingold.tilford(graph, \dots, params)
 layout.fruchterman.reingold.grid(graph, \dots,
-      verbose=igraph.par("verbose"), params)
+      verbose=getIgraphOpt("verbose"), params)
 layout.lgl(graph, \dots, params)
-layout.graphopt(graph, ..., verbose = igraph.par("verbose"), params = list())
+layout.graphopt(graph, ..., verbose = getIgraphOpt("verbose"),
+      params = list())
 layout.mds(graph, d=shortest.paths(graph), ...)
 layout.svd(graph, d=shortest.paths(graph), ...)
 layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,

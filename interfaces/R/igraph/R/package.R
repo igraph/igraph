@@ -20,24 +20,14 @@
 #
 ###################################################################
 
+.onAttach <- function(library, pkg) {
+    ## we can't do this in .onLoad
+    unlockBinding("igraph.pars", asNamespace("igraph"))
+    invisible()
+}
+
 .onLoad <- function(dir, package) {
   library.dynam("igraph", package, dir, local=FALSE);
-
-  ########################
-  # Set default parameters
-  ########################
-
-  # printing attributes
-  igraph.par("print.graph.attributes", FALSE)
-  igraph.par("print.vertex.attributes", FALSE)
-  igraph.par("print.edge.attributes", FALSE)
-
-  # verbosity, progress bars mainly
-  igraph.par("verbose", FALSE)
-
-  # what to do with attributes
-  igraph.par("vertex.attr.comb", list(name="concat", "ignore"))
-  igraph.par("edge.attr.comb", list(weight="sum", name="concat", "ignore"))
 }
 
 .onUnload <- function(libpath) {

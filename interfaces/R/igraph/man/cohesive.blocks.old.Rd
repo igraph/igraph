@@ -9,7 +9,7 @@
 cohesive.blocks(graph, db=NULL,
                 useDB=(vcount(graph)>400 && require(RSQLite)),
                 cutsetHeuristic=TRUE,
-                verbose=igraph.par("verbose"))
+                verbose=getIgraphOpt("verbose"))
 is.bgraph(graph)
 }
 \arguments{

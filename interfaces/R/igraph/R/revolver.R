@@ -21,7 +21,7 @@
 ###################################################################
 
 evolver.d <- function(nodes, kernel, outseq=NULL, outdist=NULL,
-                      m=1, directed=TRUE, verbose=igraph.par("verbose")) {
+                      m=1, directed=TRUE, verbose=getIgraphOpt("verbose")) {
 
   if (!is.null(outseq)) { outseq <- as.numeric(outseq) }
   if (!is.null(outdist)) { outdist <- as.numeric(outdist) }
@@ -33,7 +33,7 @@ evolver.d <- function(nodes, kernel, outseq=NULL, outdist=NULL,
   
 revolver.d <- function(graph, niter=5, sd=FALSE, norm=FALSE,
                       cites=FALSE, expected=FALSE, error=TRUE, debug=numeric(),
-                      verbose=igraph.par("verbose")) {
+                      verbose=getIgraphOpt("verbose")) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
@@ -59,7 +59,7 @@ revolver.error.d <- function(graph, kernel) {
 
 revolver.ad <- function(graph, niter=5, agebins=max(vcount(graph)/7100, 10),
                        sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE, error=TRUE,
-                       debug=matrix(nc=2, nr=0), verbose=igraph.par("verbose")) {
+                       debug=matrix(nc=2, nr=0), verbose=getIgraphOpt("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -88,7 +88,7 @@ revolver.error.ad <- function(graph, kernel) {
 revolver.ade <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
                         sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
                         error=TRUE, debug=matrix(nc=2, nr=0),
-                        verbose=igraph.par("verbose")) {
+                        verbose=getIgraphOpt("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -115,7 +115,7 @@ revolver.error.ade <- function(graph, kernel, cats) {
 
 revolver.e <- function(graph, cats, niter=5, st=FALSE,
                       sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                      error=TRUE, debug=numeric(), verbose=igraph.par("verbose")) {
+                      error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -140,7 +140,7 @@ revolver.error.e <- function(graph, kernel, cats) {
 
 revolver.de <- function(graph, cats, niter=5,
                       sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                      error=TRUE, debug=numeric(), verbose=igraph.par("verbose")) {
+                      error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -166,7 +166,7 @@ revolver.error.de <- function(graph, kernel, cats) {
 
 revolver.l <- function(graph, niter=5, agebins=max(vcount(graph)/7100, 10),
                       sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                      error=TRUE, debug=numeric(), verbose=igraph.par("verbose")) {
+                      error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -191,7 +191,7 @@ revolver.error.l <- function(graph, kernel) {
 
 revolver.dl <- function(graph, niter=5, agebins=max(vcount(graph)/7100, 10),
                        sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                       error=TRUE, debug=numeric(), verbose=igraph.par("verbose")) {
+                       error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -217,7 +217,7 @@ revolver.error.dl <- function(graph, kernel) {
 
 revolver.el <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
                        sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                       error=TRUE, debug=numeric(), verbose=igraph.par("verbose")) {
+                       error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -244,7 +244,7 @@ revolver.error.el <- function(graph, kernel, cats) {
 
 revolver.r <- function(graph, window, niter=5, sd=FALSE, norm=FALSE,
                       cites=FALSE, expected=FALSE, error=TRUE, debug=numeric(),
-                      verbose=igraph.par("verbose")) {
+                      verbose=getIgraphOpt("verbose")) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
@@ -270,7 +270,7 @@ revolver.error.r <- function(graph, kernel, window) {
 
 revolver.ar <- function(graph, window, niter=5, agebins=max(vcount(graph)/7100, 10),
                        sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE, error=TRUE,
-                       debug=matrix(nc=2, nr=0), verbose=igraph.par("verbose")) {
+                       debug=matrix(nc=2, nr=0), verbose=getIgraphOpt("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -298,7 +298,7 @@ revolver.error.ar <- function(graph, kernel, window) {
 
 revolver.di <- function(graph, cats, niter=5,
                       sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                      error=TRUE, debug=numeric(), verbose=igraph.par("verbose")) {
+                      error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -325,7 +325,7 @@ revolver.error.di <- function(graph, kernel, cats) {
 revolver.adi <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
                         sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
                         error=TRUE, debug=matrix(nc=2, nr=0),
-                        verbose=igraph.par("verbose")) {
+                        verbose=getIgraphOpt("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -352,7 +352,7 @@ revolver.error.adi <- function(graph, kernel, cats) {
 
 revolver.il <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
                       sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                      error=TRUE, debug=numeric(), verbose=igraph.par("verbose")) {
+                      error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -379,7 +379,7 @@ revolver.error.il <- function(graph, kernel, cats) {
 
 revolver.ir <- function(graph, cats, window, niter=5,
                       sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                      error=TRUE, debug=numeric(), verbose=igraph.par("verbose")) {
+                      error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -409,7 +409,7 @@ revolver.air <- function(graph, cats, window,
                         niter=5, agebins=max(vcount(graph)/7100, 10),
                         sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
                         error=TRUE, debug=matrix(nc=2, nr=0),
-                        verbose=igraph.par("verbose")) {
+                        verbose=getIgraphOpt("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -439,7 +439,7 @@ revolver.error.air <- function(graph, kernel, cats, window) {
 revolver.d.d <- function(graph, vtime=V(graph)$time, etime=E(graph)$time, niter=5,
                          sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
                          error=TRUE, debug=matrix(nc=2, nr=0),
-                         verbose=igraph.par("verbose")) {
+                         verbose=getIgraphOpt("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -464,7 +464,7 @@ revolver.p.p <- function(graph, events=get.graph.attribute(graph, "events"),
                          vtime=V(graph)$time, etime=E(graph)$time,
                          niter=5, sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
                          error=TRUE, debug=matrix(nc=2, nr=0),
-                         verbose=igraph.par("verbose")) {
+                         verbose=getIgraphOpt("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }

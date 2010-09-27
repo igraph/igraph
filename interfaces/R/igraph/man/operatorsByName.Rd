@@ -40,8 +40,8 @@ graph.difference.by.name(g1, g2, keep.x.vertex.attributes = FALSE,
   vertex ids.}
 \examples{
 # Print attributes as well
-igraph.par("print.vertex.attributes", TRUE)
-igraph.par("print.edge.attributes", TRUE)
+igraph.options(print.vertex.attributes=TRUE,
+               print.edge.attributes=TRUE)
 
 # Creating a wheel graph
 g1 <- graph.ring(10)

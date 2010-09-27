@@ -60,7 +60,7 @@
 
   If a parameter is not given in the command line, and the corresponding
   vertex/edge/graph attribute is also missing then the general igraph
-  parameters handled by \code{\link{igraph.par}} are also
+  parameters handled by \code{\link{igraph.options}} are also
   checked. Vertex parameters have prefix \sQuote{\code{vertex.}}, edge
   parameters are prefixed with \sQuote{\code{edge.}}, general parameters
   like \code{layout} are prefixed with \sQuote{\code{plot}}.
@@ -86,7 +86,7 @@
 \section{The list of parameters}{
   Vertex parameters first, note that the \sQuote{\code{vertex.}} prefix
   needs to be added if they are used as an argument or when setting via
-  \code{\link{igraph.par}}. The value of the parameter may be scalar
+  \code{\link{igraph.options}}. The value of the parameter may be scalar
   valid for every vertex or a vector with a separate value for each
   vertex. (Shorter vectors are recycled.)
   \describe{
@@ -223,7 +223,7 @@
   }
 
   Edge parameters require to add the \sQuote{\code{edge.}} prefix when
-  used as arguments or set by \code{\link{igraph.par}}. The edge
+  used as arguments or set by \code{\link{igraph.options}}. The edge
   parameters:
   \describe{
     \item{color}{The color of the edges, see the \code{color} vertex
@@ -390,7 +390,7 @@
 }
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{ \code{\link{plot.igraph}}, \code{\link{tkplot}},
-  \code{\link{rglplot}}, \code{\link{igraph.par}}}
+  \code{\link{rglplot}}, \code{\link{igraph.options}}}
 \examples{
 \dontrun{
 
@@ -422,7 +422,7 @@ g <- set.graph.attribute(g, "layout", layout.kamada.kawai(g))
 plot(g, vertex.label.dist=1.5)
 
 # draw a bunch of trees, fix layout
-igraph.par("plot.layout", layout.reingold.tilford)
+igraph.options(plot.layout=layout.reingold.tilford)
 plot(graph.tree(20, 2))
 plot(graph.tree(50, 3), vertex.size=3, vertex.label=NA)
 tkplot(graph.tree(50, 2, mode="undirected"), vertex.size=10, vertex.color="green")

@@ -94,7 +94,7 @@ i.parse.plot.params <- function(graph, params) {
       } else {
         ## no attributes either, check igraph parameters
         n <- paste(sep="", type, ".", name)
-        v <- igraph.par(n)
+        v <- getIgraphOpt(n)
         if (!is.null(v)) {
           p[[type]][[name]] <- v
           return(ret())

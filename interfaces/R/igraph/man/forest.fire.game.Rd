@@ -7,7 +7,7 @@
   forest fire spreads by igniting trees close by.}
 \usage{
 forest.fire.game (nodes, fw.prob, bw.factor = 1, ambs = 1, directed = TRUE, 
-    verbose = igraph.par("verbose")) 
+    verbose = getIgraphOpt("verbose")) 
 }
 \arguments{
   \item{nodes}{The number of vertices in the graph.}

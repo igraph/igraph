@@ -217,8 +217,8 @@ if (FALSE)
 
 # Load library and set parameters for better printing
 library(igraph)
-igraph.par("print.vertex.attributes", TRUE)
-igraph.par("print.edge.attributes", TRUE)
+igraph.options(print.vertex.attributes=TRUE)
+igraph.options(print.edge.attributes=TRUE)
 
 # Define input graphs
 g1 <- graph.formula(a-b-c)

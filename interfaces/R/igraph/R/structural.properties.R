@@ -277,7 +277,7 @@ subgraph <- function(graph, v) {
 
 betweenness <- function(graph, v=V(graph), directed=TRUE, weights=NULL,
                         nobigint=TRUE, normalized=FALSE,
-                        verbose=igraph.par("verbose")) {
+                        verbose=getIgraphOpt("verbose")) {
   
   if (!is.igraph(graph)) {
     stop("Not a graph object")

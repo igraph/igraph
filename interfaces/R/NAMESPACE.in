@@ -172,7 +172,7 @@ export(graph.intersection.by.name, graph.union.by.name,
 
 # parameters, config
 
-export(igraph.par)
+export(igraph.par, igraph.options, getIgraphOpt)
 
 # flows, cuts, etc.
 

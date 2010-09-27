@@ -5,7 +5,7 @@
 \description{Place several graphs on the same layout}
 \usage{
 layout.merge(graphs, layouts, method = "dla",
-       verbose = igraph.par("verbose"))
+       verbose = getIgraphOpt("verbose"))
 piecewise.layout(graph, layout=layout.kamada.kawai, \dots)
 }
 \arguments{

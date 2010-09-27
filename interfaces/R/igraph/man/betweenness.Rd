@@ -13,11 +13,11 @@
 \usage{
 betweenness(graph, v=V(graph), directed = TRUE, weights = NULL,
      nobigint = TRUE, normalized = FALSE,
-     verbose = igraph.par("verbose"))
+     verbose = getIgraphOpt("verbose"))
 edge.betweenness(graph, e=E(graph), directed = TRUE, weights = NULL)
 betweenness.estimate(graph, vids = V(graph), directed = TRUE, cutoff,
      weights = NULL, nobigint = TRUE,
-     verbose = igraph.par("verbose"))
+     verbose = getIgraphOpt("verbose"))
 edge.betweenness.estimate(graph, e=E(graph),
      directed = TRUE, cutoff, weights = NULL)
 }

@@ -1,0 +1,88 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> g <- graph.ring(5)
+> V(g)$name <- letters[1:5]
+> E(g)$weight <- 5:1
+> g$name <- "A small ring"
+> 
+> g
+Vertices: 5 
+Edges: 5 
+Directed: FALSE 
+Edges:
+              
+[1] 'a' -- 'b'
+[2] 'b' -- 'c'
+[3] 'c' -- 'd'
+[4] 'd' -- 'e'
+[5] 'a' -- 'e'
+> 
+> igraph.options(print.vertex.attributes=TRUE)
+> getIgraphOpt("print.vertex.attributes")
+[1] TRUE
+> g
+Vertices: 5 
+Edges: 5 
+Directed: FALSE 
+Vertex attributes:
+    name
+[1]    a
+[2]    b
+[3]    c
+[4]    d
+[5]    e
+Edges:
+              
+[1] 'a' -- 'b'
+[2] 'b' -- 'c'
+[3] 'c' -- 'd'
+[4] 'd' -- 'e'
+[5] 'a' -- 'e'
+> 
+> igraph.options(print.edge.attributes=TRUE, print.vertex.attributes=FALSE)
+> g
+Vertices: 5 
+Edges: 5 
+Directed: FALSE 
+Edges and their attributes:
+               weight
+[1] 'a' -- 'b'      5
+[2] 'b' -- 'c'      4
+[3] 'c' -- 'd'      3
+[4] 'd' -- 'e'      2
+[5] 'a' -- 'e'      1
+> 
+> igraph.options(print.graph.attributes=TRUE)
+> g
+Vertices: 5 
+Edges: 5 
+Directed: FALSE 
+Graph attributes:
+[[name]]
+[1] "A small ring"
+Edges and their attributes:
+               weight
+[1] 'a' -- 'b'      5
+[2] 'b' -- 'c'      4
+[3] 'c' -- 'd'      3
+[4] 'd' -- 'e'      2
+[5] 'a' -- 'e'      1
+> 

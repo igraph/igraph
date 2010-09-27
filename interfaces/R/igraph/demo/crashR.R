@@ -268,8 +268,8 @@ pause()
 ### Add three new vertices
 g4 <- add.vertices(g3, 3)
 print(g4, v=T)
-igraph.par("print.vertex.attributes", TRUE)
-igraph.par("plot.layout", layout.fruchterman.reingold)
+igraph.options(print.vertex.attributes=TRUE, 
+               plot.layout=layout.fruchterman.reingold)
 g4
 plot(g4)                      
 
