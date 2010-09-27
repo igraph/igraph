@@ -116,6 +116,7 @@ help(igraph.Graph)
  */
 
 static PyObject* igraphmodule_progress_handler=NULL;
+static PyObject* igraphmodule_status_handler=NULL;
 
 static int igraphmodule_igraph_interrupt_hook(void* data) {
   if (PyErr_CheckSignals()) {
@@ -140,9 +141,22 @@ int igraphmodule_igraph_progress_hook(const char* message, igraph_real_t percent
   return IGRAPH_SUCCESS;
 }
 
-PyObject* igraphmodule_set_progress_handler(PyObject* self, PyObject* args) {
-  PyObject* o;
-  if (!PyArg_ParseTuple(args, "O", &o)) return NULL;
+int igraphmodule_igraph_status_hook(const char* message, void*data) {
+  if (igraphmodule_status_handler) {
+    PyObject *result;
+    if (PyCallable_Check(igraphmodule_status_handler)) {
+      result = PyObject_CallFunction(igraphmodule_status_handler, "sd", message);
+      if (result)
+        Py_DECREF(result);
+      else
+        return IGRAPH_INTERRUPTED;
+    }
+  }
+  
+  return IGRAPH_SUCCESS;
+}
+
+PyObject* igraphmodule_set_progress_handler(PyObject* self, PyObject* o) {
   if (!PyCallable_Check(o) && o != Py_None) {
     PyErr_SetString(PyExc_TypeError, "Progress handler must be callable.");
     return NULL;
@@ -157,6 +171,22 @@ PyObject* igraphmodule_set_progress_handler(PyObject* self, PyObject* args) {
   Py_RETURN_NONE;
 }
 
+PyObject* igraphmodule_set_status_handler(PyObject* self, PyObject* o) {
+  if (!PyCallable_Check(o) && o != Py_None) {
+    PyErr_SetString(PyExc_TypeError, "Status handler must be callable.");
+    return NULL;
+  }
+  Py_XDECREF(igraphmodule_status_handler);
+  if (o == Py_None) {
+    if (igraphmodule_status_handler)
+      Py_DECREF(igraphmodule_status_handler);
+    igraphmodule_status_handler=NULL;
+  } else {
+    Py_INCREF(o);
+    igraphmodule_status_handler=o;
+  }
+  Py_RETURN_NONE;
+}
 
 PyObject* igraphmodule_convex_hull(PyObject* self, PyObject* args, PyObject* kwds) {
   static char* kwlist[] = {"vs", "coords", NULL};
@@ -394,7 +424,7 @@ static PyMethodDef igraphmodule_methods[] =
     "  indices corresponding to them, depending on the C{coords}\n"
     "  parameter."
   },
-  {"set_progress_handler", igraphmodule_set_progress_handler, METH_VARARGS,
+  {"set_progress_handler", igraphmodule_set_progress_handler, METH_O,
       "set_progress_handler(handler)\n\n"
       "Sets the handler to be called when igraph is performing a long operation.\n"
       "@param handler: the progress handler function. It must accept two\n"
@@ -415,6 +445,17 @@ static PyMethodDef igraphmodule_methods[] =
       "  reverts to the default Mersenne twister generator implemented in the\n"
       "  C layer, which might be slightly faster than calling back to Python\n"
       "  for random numbers, but you cannot set its seed or save its state.\n"
+  },
+  {"set_status_handler", igraphmodule_set_status_handler, METH_O,
+      "set_status_handler(handler)\n\n"
+      "Sets the handler to be called when igraph tries to display a status\n"
+      "message.\n\n"
+      "This is used to communicate the progress of some calculations where\n"
+      "no reasonable progress percentage can be given (so it is not possible\n"
+      "to use the progress handler).\n\n"
+      "@param handler: the status handler function. It must accept a single\n"
+      "  argument, the message that informs the user about what igraph is\n"
+      "  doing right now.\n"
   },
   {"_split_join_distance", (PyCFunction)igraphmodule_split_join_distance,
     METH_VARARGS | METH_KEYWORDS,
@@ -571,6 +612,7 @@ PyMODINIT_FUNC initcore(void) {
   /* initialize error, progress, warning and interruption handler */
   igraph_set_error_handler(igraphmodule_igraph_error_hook);
   igraph_set_progress_handler(igraphmodule_igraph_progress_hook);
+  igraph_set_status_handler(igraphmodule_igraph_status_hook);
   igraph_set_warning_handler(igraphmodule_igraph_warning_hook);
   igraph_set_interruption_handler(igraphmodule_igraph_interrupt_hook);
   
