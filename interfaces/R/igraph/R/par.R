@@ -29,6 +29,13 @@
                       "ignore")
                     )
 
+igraph.pars.set.verbose <- function(verbose) {
+  verbose <- as.logical(verbose)
+##  .Call("R_igraph_set_verbose", verbose, PACKAGE="igraph")
+}
+
+igraph.pars.callbacks <- list("verbose"=igraph.pars.set.verbose)
+
 ## This is based on 'sm.options' in the 'sm' package
 
 igraph.options <- function(...) {
@@ -49,6 +56,10 @@ igraph.options <- function(...) {
   current[n] <- temp
   if (sys.parent() == 0) env <- asNamespace("igraph") else env <- parent.frame()
   assign(".igraph.pars", current, envir = env)
+  cb <- intersect(names(igraph.pars.callbacks), n)
+  for (cn in cb) {
+    igraph.pars.callbacks[[cn]](current[[cn]])
+  }
   invisible(current)
 }
 
