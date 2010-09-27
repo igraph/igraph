@@ -299,36 +299,43 @@ class CohesiveBlocksTests(unittest.TestCase):
 
 
 class ComparisonTests(unittest.TestCase):
+    def setUp(self):
+        self.clusterings = [
+            ([1, 1, 1, 2, 2, 2], [2, 2, 2, 1, 1, 1]),
+            ([1, 1, 1, 2, 2, 2], [1, 1, 2, 2, 3, 3]),
+            ([1, 1, 1, 1, 1, 1], [1, 2, 3, 5, 6, 7]),
+            ([1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3],
+             [3, 1, 2, 1, 3, 1, 3, 1, 2, 1, 4, 2])
+        ]
+
+    def _testMethod(self, method, expected): 
+        for clusters, result in zip(self.clusterings, expected):
+            self.assertAlmostEqual(compare_communities(*clusters, method=method),
+                    result, places=3)
+
     def testCompareVI(self):
-        l1 = Clustering([1, 1, 1, 2, 2, 2])
-        l2 = Clustering([1, 1, 2, 2, 3, 3])
-        self.assertAlmostEqual(compare_communities(l1, l2), 0.8675, places=3)
-        l1 = [1, 1, 1, 1, 1, 1]
-        l2 = [1, 2, 3, 5, 6, 7]
-        self.assertAlmostEqual(compare_communities(l1, l2), math.log(6), places=3)
-        self.failUnless(compare_communities(l1, l1) == 0.)
+        expected = [0, 0.8675, math.log(6)]
+        self._testMethod(None, expected)
+        self._testMethod("vi", expected)
 
     def testCompareNMI(self):
-        l1 = Clustering([1, 1, 1, 2, 2, 2])
-        l2 = Clustering([1, 1, 2, 2, 3, 3])
-        self.assertAlmostEqual(compare_communities(l1, l2, "nmi"), 0.5158, places=3)
-        l1 = [1, 1, 1, 1, 1, 1]
-        l2 = [1, 2, 3, 5, 6, 7]
-        self.failUnless(compare_communities(l1, l2, "nmi") == 0)
-        self.failUnless(compare_communities(l1, l1, "nmi") == 1.)
+        expected = [1, 0.5158, 0]
+        self._testMethod("nmi", expected)
 
     def testCompareSplitJoin(self):
-        l1 = Clustering([1, 1, 1, 2, 2, 2])
-        l2 = Clustering([1, 1, 2, 2, 3, 3])
-        self.assertEqual(compare_communities(l1, l2, "split"), 3)
-        l1 = [1, 1, 1, 1, 1, 1]
-        l2 = [1, 2, 3, 5, 6, 7]
-        self.assertEqual(compare_communities(l1, l2, "split"), 5)
-        self.failUnless(compare_communities(l1, l1, "split") == 0.)
+        expected = [0, 3, 5, 11]
+        self._testMethod("split", expected)
         l1 = [1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3]
         l2 = [3, 1, 2, 1, 3, 1, 3, 1, 2, 1, 4, 2]
-        self.assertEqual(compare_communities(l1, l2, "split"), 11)
         self.assertEqual(split_join_distance(l1, l2), (6, 5))
+
+    def testCompareRand(self):
+        expected = [1, 2/3., 0, 0.590909]
+        self._testMethod("rand", expected)
+
+    def testCompareAdjustedRand(self):
+        expected = [1, 0.242424, 0, -0.04700353]
+        self._testMethod("adjusted_rand", expected)
 
     def testRemoveNone(self):
         l1 = Clustering([1, 1, 1, None, None, 2, 2, 2, 2])

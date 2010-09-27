@@ -93,6 +93,10 @@ igraph_real_t igraph_spmatrix_max(const igraph_spmatrix_t *m,
     igraph_real_t *ridx, igraph_real_t *cidx);
 void igraph_spmatrix_scale(igraph_spmatrix_t *m, igraph_real_t by);
 int igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_t *res);
+int igraph_spmatrix_rowsums(const igraph_spmatrix_t *m, igraph_vector_t *res);
+
+int igraph_spmatrix_print(const igraph_spmatrix_t *matrix);
+int igraph_spmatrix_fprint(const igraph_spmatrix_t *matrix, FILE* file);
 
 int igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
     igraph_vector_t *res, long int col);

@@ -699,6 +699,29 @@ int igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
 }
 
 /**
+ * \function igraph_spmatrix_wolsums
+ * \brief Calculates the row sums of the matrix.
+ * \param m The matrix.
+ * \param res An initialized \c igraph_vector_t, the result will be stored here.
+ *   The vector will be resized as needed.
+ *
+ * Time complexity: O(n), the number of nonzero elements in the matrix.
+ */
+
+int igraph_spmatrix_rowsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
+  long int i, n;
+  assert(m != NULL);
+
+  IGRAPH_CHECK(igraph_vector_resize(res, m->nrow));
+	n = igraph_vector_size(&m->data);
+  igraph_vector_null(res);
+  for (i=0; i < n; i++) {
+    VECTOR(*res)[(long int)VECTOR(m->ridx)[i]] += VECTOR(m->data)[i];
+  }
+  return 0;
+}
+
+/**
  * \function igraph_spmatrix_max_nonzero
  * \brief Returns the maximum nonzero element of a matrix.
  * If the matrix is empty, zero is returned.
@@ -928,4 +951,47 @@ igraph_bool_t igraph_spmatrix_iter_end(igraph_spmatrix_iter_t *mit) {
 void igraph_spmatrix_iter_destroy(igraph_spmatrix_iter_t *mit) {
   /* Nothing to do at the moment */
 }
+
+/**
+ * \function igraph_spmatrix_print
+ * \brief Prints a sparse matrix.
+ *
+ * Prints a sparse matrix to the standard output. Only the non-zero entries
+ * are printed.
+ *
+ * \return Error code.
+ *
+ * Time complexity: O(n), the number of non-zero elements.
+ */
+int igraph_spmatrix_print(const igraph_spmatrix_t* matrix) {
+	igraph_spmatrix_fprint(matrix, stdout);
+}
+
+/**
+ * \function igraph_spmatrix_fprint
+ * \brief Prints a sparse matrix to the given file.
+ *
+ * Prints a sparse matrix to the given file. Only the non-zero entries
+ * are printed.
+ *
+ * \return Error code.
+ *
+ * Time complexity: O(n), the number of non-zero elements.
+ */
+int igraph_spmatrix_fprint(const igraph_spmatrix_t* matrix, FILE *file) {
+  igraph_spmatrix_iter_t mit;
+
+  IGRAPH_CHECK(igraph_spmatrix_iter_create(&mit, matrix));
+  IGRAPH_FINALLY(igraph_spmatrix_iter_destroy, &mit);
+  while (!igraph_spmatrix_iter_end(&mit)) {
+		fprintf(file, "[%ld, %ld] = %.4f\n", (long int)mit.ri,
+				(long int)mit.ci, mit.value);
+    igraph_spmatrix_iter_next(&mit);
+  }
+  igraph_spmatrix_iter_destroy(&mit);
+	IGRAPH_FINALLY_CLEAN(1);
+
+	return 0;
+}
+
 

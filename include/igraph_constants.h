@@ -111,7 +111,9 @@ typedef enum { IGRAPH_SPINCOMM_IMP_ORIG=0,
 
 typedef enum { IGRAPH_COMMCMP_VI = 0,
                IGRAPH_COMMCMP_NMI,
-               IGRAPH_COMMCMP_SPLIT_JOIN } igraph_community_comparison_t;
+               IGRAPH_COMMCMP_SPLIT_JOIN,
+               IGRAPH_COMMCMP_RAND,
+               IGRAPH_COMMCMP_ADJUSTED_RAND } igraph_community_comparison_t;
 
 typedef enum { IGRAPH_ADD_WEIGHTS_NO = 0,
                IGRAPH_ADD_WEIGHTS_YES,

@@ -42,6 +42,9 @@ typedef struct {
   int value;
 } igraphmodule_enum_translation_table_entry_t;
 
+int PyInt_AsInt(PyObject* obj, int* result);
+int PyLong_AsInt(PyObject* obj, int* result);
+
 int igraphmodule_PyObject_to_enum(PyObject *o,
   igraphmodule_enum_translation_table_entry_t *table, int *result);
 int igraphmodule_PyObject_to_add_weights_t(PyObject *o, igraph_add_weights_t *result);

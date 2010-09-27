@@ -41,6 +41,8 @@
 <!-- doxrox-include igraph_spmatrix_ncol -->
 <!-- doxrox-include igraph_spmatrix_count_nonzero -->
 <!-- doxrox-include igraph_spmatrix_max -->
+<!-- doxrox-include igraph_spmatrix_rowsums -->
+<!-- doxrox-include igraph_spmatrix_colsums -->
 </section>
 
 <section>
@@ -49,6 +51,12 @@
 <!-- doxrox-include igraph_spmatrix_add_rows -->
 <!-- doxrox-include igraph_spmatrix_add_cols -->
 <!-- doxrox-include igraph_spmatrix_resize -->
+</section>
+
+<section>
+<title>Printing sparse matrices</title>
+<!-- doxrox-include igraph_spmatrix_print -->
+<!-- doxrox-include igraph_spmatrix_fprint -->
 </section>
 
 </section>

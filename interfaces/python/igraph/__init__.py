@@ -2947,7 +2947,9 @@ def compare_communities(comm1, comm2, method="vi", remove_none=False):
     @param method: the measure to use. C{"vi"} or C{"meila"} means the
       variation of information metric of Meila (2003), C{"nmi"} or C{"danon"}
       means the normalized mutual information as defined by Danon et al (2005),
-      C{"split-join"} means the split-join distance of van Dongen (2000).
+      C{"split-join"} means the split-join distance of van Dongen (2000),
+      C{"rand"} means the Rand index of Rand (1971), C{"adjusted_rand"}
+      means the adjusted Rand index of Hubert and Arabie (1985).
     @param remove_none: whether to remove C{None} entries from the membership
       lists. This is handy if your L{Clustering} object was constructed using
       L{VertexClustering.FromAttribute} using an attribute which was not defined
@@ -2970,6 +2972,10 @@ def compare_communities(comm1, comm2, method="vi", remove_none=False):
           cluster experiments. Technical Report INS-R0012, National Research
           Institute for Mathematics and Computer Science in the Netherlands,
           Amsterdam, May 2000.
+    @ref: Rand WM: Objective criteria for the evaluation of clustering
+          methods. J Am Stat Assoc 66(336):846-850, 1971.
+    @ref: Hubert L and Arabie P: Comparing partitions. Journal of
+          Classification 2:193-218, 1985.
     """
     vec1, vec2 = _prepare_community_comparison(comm1, comm2, remove_none)
     return core._compare_communities(vec1, vec2, method)

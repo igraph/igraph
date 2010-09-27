@@ -2771,12 +2771,14 @@ int igraph_community_multilevel(const igraph_t *graph,
 }
 
 
-int igraph_i_compare_communities_vi(igraph_vector_t *v1, igraph_vector_t *v2,
-    igraph_real_t* result);
-int igraph_i_compare_communities_nmi(igraph_vector_t *v1, igraph_vector_t *v2,
-    igraph_real_t* result);
-int igraph_i_split_join_distance(igraph_vector_t *v1, igraph_vector_t *v2,
-    igraph_real_t* distance12, igraph_real_t* distance21);
+int igraph_i_compare_communities_vi(const igraph_vector_t *v1,
+    const igraph_vector_t *v2, igraph_real_t* result);
+int igraph_i_compare_communities_nmi(const igraph_vector_t *v1,
+    const igraph_vector_t *v2, igraph_real_t* result);
+int igraph_i_compare_communities_rand(const igraph_vector_t *v1,
+    const igraph_vector_t *v2, igraph_real_t* result, igraph_bool_t adjust);
+int igraph_i_split_join_distance(const igraph_vector_t *v1,
+    const igraph_vector_t *v2, igraph_real_t* distance12, igraph_real_t* distance21);
 
 /**
  * \ingroup communities
@@ -2785,8 +2787,9 @@ int igraph_i_split_join_distance(igraph_vector_t *v1, igraph_vector_t *v2,
  *
  * This function assesses the distance between two community structures
  * using the variation of information (VI) metric of Meila (2003), the
- * normalized mutual information (NMI) of Danon et al (2005) or the
- * split-join distance of van Dongen (2000).
+ * normalized mutual information (NMI) of Danon et al (2005), the
+ * split-join distance of van Dongen (2000), the Rand index of Rand (1971)
+ * or the adjusted Rand index of Hubert and Arabie (1985).
  *
  * </para><para>
  * References:
@@ -2807,6 +2810,14 @@ int igraph_i_split_join_distance(igraph_vector_t *v1, igraph_vector_t *v2,
  * experiments. Technical Report INS-R0012, National Research Institute for
  * Mathematics and Computer Science in the Netherlands, Amsterdam, May 2000.
  * 
+ * </para><para>
+ * Rand WM: Objective criteria for the evaluation of clustering methods.
+ * J Am Stat Assoc 66(336):846-850, 1971.
+ *
+ * </para><para>
+ * Hubert L and Arabie P: Comparing partitions. Journal of Classification
+ * 2:193-218, 1985.
+ *
  * \param  comm1   the membership vector of the first community structure
  * \param  comm2   the membership vector of the second community structure
  * \param  method  the comparison method to use. \c IGRAPH_COMMCMP_VI
@@ -2814,7 +2825,10 @@ int igraph_i_split_join_distance(igraph_vector_t *v1, igraph_vector_t *v2,
  *                 Meila (2003), \c IGRAPH_COMMCMP_NMI selects the
  *                 normalized mutual information measure proposed by
  *                 Danon et al (2005), \c IGRAPH_COMMCMP_SPLIT_JOIN
- *                 selects the split-join distance of van Dongen (2000).
+ *                 selects the split-join distance of van Dongen (2000),
+ *                 \c IGRAPH_COMMCMP_RAND selects the unadjusted Rand
+ *                 index (1971) and \c IGRAPH_COMMCMP_ADJUSTED_RAND
+ *                 selects the adjusted Rand index.
  *
  * \return  Error code.
  *
@@ -2854,6 +2868,12 @@ int igraph_compare_communities(const igraph_vector_t *comm1,
         IGRAPH_CHECK(igraph_i_split_join_distance(&c1, &c2, &d12, &d21));
         *result = d12 + d21;
       }
+      break;
+
+    case IGRAPH_COMMCMP_RAND:
+    case IGRAPH_COMMCMP_ADJUSTED_RAND:
+      IGRAPH_CHECK(igraph_i_compare_communities_rand(&c1, &c2, result,
+            method == IGRAPH_COMMCMP_ADJUSTED_RAND));
       break;
 
     default:
@@ -2952,8 +2972,8 @@ int igraph_split_join_distance(const igraph_vector_t *comm1,
  * membership vectors v1 and v2. This is needed by both Meila's and Danon's
  * community comparison measure.
  */
-int igraph_i_entropy_and_mutual_information(igraph_vector_t* v1, igraph_vector_t* v2,
-    double* h1, double* h2, double* mut_inf) {
+int igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
+    const igraph_vector_t* v2, double* h1, double* h2, double* mut_inf) {
   long int i, n = igraph_vector_size(v1);
   long int k1 = (long int)igraph_vector_max(v1)+1;
   long int k2 = (long int)igraph_vector_max(v2)+1;
@@ -3028,12 +3048,14 @@ int igraph_i_entropy_and_mutual_information(igraph_vector_t* v1, igraph_vector_t
  * Meila et al. This function assumes that the community membership
  * vectors have already been normalized using igraph_reindex_communities().
  *
+ * </para><para>
  * Reference: Danon L, Diaz-Guilera A, Duch J, Arenas A: Comparing community
  * structure identification. J Stat Mech P09008, 2005.
  *
+ * </para><para>
  * Time complexity: O(n log(n))
  */
-int igraph_i_compare_communities_nmi(igraph_vector_t *v1, igraph_vector_t *v2,
+int igraph_i_compare_communities_nmi(const igraph_vector_t *v1, const igraph_vector_t *v2,
     igraph_real_t* result) {
   double h1, h2, mut_inf;
 
@@ -3044,7 +3066,7 @@ int igraph_i_compare_communities_nmi(igraph_vector_t *v1, igraph_vector_t *v2,
   else
     *result = 2 * mut_inf / (h1 + h2);
 
-  return 0;
+  return IGRAPH_SUCCESS;
 }
 
 /**
@@ -3052,55 +3074,83 @@ int igraph_i_compare_communities_nmi(igraph_vector_t *v1, igraph_vector_t *v2,
  * Danon et al. This function assumes that the community membership
  * vectors have already been normalized using igraph_reindex_communities().
  *
+ * </para><para>
  * Reference: Meila M: Comparing clusterings by the variation of information.
  * In: Schölkopf B, Warmuth MK (eds.). Learning Theory and Kernel Machines:
  * 16th Annual Conference on Computational Learning Theory and 7th Kernel
  * Workshop, COLT/Kernel 2003, Washington, DC, USA. Lecture Notes in Computer
  * Science, vol. 2777, Springer, 2003. ISBN: 978-3-540-40720-1.
  *
+ * </para><para>
  * Time complexity: O(n log(n))
  */
-int igraph_i_compare_communities_vi(igraph_vector_t *v1, igraph_vector_t *v2,
+int igraph_i_compare_communities_vi(const igraph_vector_t *v1, const igraph_vector_t *v2,
     igraph_real_t* result) {
   double h1, h2, mut_inf;
 
   IGRAPH_CHECK(igraph_i_entropy_and_mutual_information(v1, v2, &h1, &h2, &mut_inf));
   *result = h1 + h2 - 2*mut_inf;
 
-  return 0;
+  return IGRAPH_SUCCESS;
+}
+
+/**
+ * \brief Calculates the confusion matrix for two clusterings.
+ *
+ * </para><para>
+ * This function assumes that the community membership vectors have already
+ * been normalized using igraph_reindex_communities().
+ *
+ * </para><para>
+ * Time complexity: O(n log(max(k1, k2))), where n is the number of vertices, k1
+ * and k2 are the number of clusters in each of the clusterings.
+ */
+int igraph_i_confusion_matrix(const igraph_vector_t *v1, const igraph_vector_t *v2,
+    igraph_spmatrix_t *m) {
+  long int k1 = (long int)igraph_vector_max(v1)+1;
+  long int k2 = (long int)igraph_vector_max(v2)+1;
+  long int i, n = igraph_vector_size(v1);
+
+  IGRAPH_CHECK(igraph_spmatrix_resize(m, k1, k2));
+  for (i = 0; i < n; i++) {
+    IGRAPH_CHECK(igraph_spmatrix_add_e(m,
+          (int)VECTOR(*v1)[i], (int)VECTOR(*v2)[i], 1));
+  }
+
+  return IGRAPH_SUCCESS;
 }
 
 /**
  * Implementation of the split-join distance of van Dongen.
+ *
+ * </para><para>
  * This function assumes that the community membership vectors have already
  * been normalized using igraph_reindex_communities().
  *
+ * </para><para>
  * Reference: van Dongen S: Performance criteria for graph clustering and Markov
  * cluster experiments. Technical Report INS-R0012, National Research Institute
  * for Mathematics and Computer Science in the Netherlands, Amsterdam, May 2000.
  *
- * Time complexity: O(n log(n))
+ * </para><para>
+ * Time complexity: O(n log(max(k1, k2))), where n is the number of vertices, k1
+ * and k2 are the number of clusters in each of the clusterings.
  */
-int igraph_i_split_join_distance(igraph_vector_t *v1, igraph_vector_t *v2,
+int igraph_i_split_join_distance(const igraph_vector_t *v1, const igraph_vector_t *v2,
     igraph_integer_t* distance12, igraph_integer_t* distance21) {
-  long int k1 = (long int)igraph_vector_max(v1)+1;
-  long int k2 = (long int)igraph_vector_max(v2)+1;
-  long int i, n = igraph_vector_size(v1);
+  long int n = igraph_vector_size(v1);
   igraph_vector_t rowmax, colmax;
   igraph_spmatrix_t m;
   igraph_spmatrix_iter_t mit;
 
-  /* Initialize vectors that will store the row/columnwise maxima */
-  IGRAPH_VECTOR_INIT_FINALLY(&rowmax, k1);
-  IGRAPH_VECTOR_INIT_FINALLY(&colmax, k2);
-
   /* Calculate the confusion matrix */
-  IGRAPH_CHECK(igraph_spmatrix_init(&m, k1, k2));
+  IGRAPH_CHECK(igraph_spmatrix_init(&m, 1, 1));
   IGRAPH_FINALLY(igraph_spmatrix_destroy, &m);
-  for (i = 0; i < n; i++) {
-    IGRAPH_CHECK(igraph_spmatrix_add_e(&m,
-          (int)VECTOR(*v1)[i], (int)VECTOR(*v2)[i], 1));
-  }
+  IGRAPH_CHECK(igraph_i_confusion_matrix(v1, v2, &m));
+
+  /* Initialize vectors that will store the row/columnwise maxima */
+  IGRAPH_VECTOR_INIT_FINALLY(&rowmax, igraph_spmatrix_nrow(&m));
+  IGRAPH_VECTOR_INIT_FINALLY(&colmax, igraph_spmatrix_ncol(&m));
 
   /* Find the row/columnwise maxima */
   IGRAPH_CHECK(igraph_spmatrix_iter_create(&mit, &m));
@@ -3112,10 +3162,8 @@ int igraph_i_split_join_distance(igraph_vector_t *v1, igraph_vector_t *v2,
       VECTOR(colmax)[mit.ci] = mit.value;
     igraph_spmatrix_iter_next(&mit);
   }
-
   igraph_spmatrix_iter_destroy(&mit);
-  igraph_spmatrix_destroy(&m);
-  IGRAPH_FINALLY_CLEAN(2);
+  IGRAPH_FINALLY_CLEAN(1);
 
   /* Calculate the distances */
   *distance12 = n - igraph_vector_sum(&rowmax);
@@ -3123,9 +3171,119 @@ int igraph_i_split_join_distance(igraph_vector_t *v1, igraph_vector_t *v2,
 
   igraph_vector_destroy(&rowmax);
   igraph_vector_destroy(&colmax);
-
-  IGRAPH_FINALLY_CLEAN(2);
+  igraph_spmatrix_destroy(&m);
+  IGRAPH_FINALLY_CLEAN(3);
 
   return IGRAPH_SUCCESS;
 }
 
+/**
+ * Implementation of the adjusted and unadjusted Rand indices.
+ *
+ * </para><para>
+ * This function assumes that the community membership vectors have already
+ * been normalized using igraph_reindex_communities().
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Rand WM: Objective criteria for the evaluation of clustering methods. J Am
+ * Stat Assoc 66(336):846-850, 1971.
+ *
+ * </para><para>
+ * Hubert L and Arabie P: Comparing partitions. Journal of Classification
+ * 2:193-218, 1985.
+ *
+ * </para><para>
+ * Time complexity: O(n log(max(k1, k2))), where n is the number of vertices, k1
+ * and k2 are the number of clusters in each of the clusterings.
+ */
+int igraph_i_compare_communities_rand(const igraph_vector_t *v1,
+    const igraph_vector_t *v2, igraph_real_t *result, igraph_bool_t adjust) {
+  igraph_spmatrix_t m;
+  igraph_spmatrix_iter_t mit;
+  igraph_vector_t rowsums, colsums;
+  long int i, nrow, ncol;
+  double rand, n;
+  double frac_pairs_in_1, frac_pairs_in_2;
+
+  /* Calculate the confusion matrix */
+  IGRAPH_CHECK(igraph_spmatrix_init(&m, 1, 1));
+  IGRAPH_FINALLY(igraph_spmatrix_destroy, &m);
+  IGRAPH_CHECK(igraph_i_confusion_matrix(v1, v2, &m));
+
+  /* The unadjusted Rand index is defined as (a+d) / (a+b+c+d), where:
+   *
+   * - a is the number of pairs in the same cluster both in v1 and v2. This
+   *   equals the sum of n(i,j) choose 2 for all i and j.
+   *
+   * - b is the number of pairs in the same cluster in v1 and in different
+   *   clusters in v2. This is sum n(i,*) choose 2 for all i minus a.
+   *   n(i,*) is the number of elements in cluster i in v1.
+   *
+   * - c is the number of pairs in the same cluster in v2 and in different
+   *   clusters in v1. This is sum n(*,j) choose 2 for all j minus a.
+   *   n(*,j) is the number of elements in cluster j in v2.
+   *
+   * - d is (n choose 2) - a - b - c.
+   *
+   * Therefore, a+d = (n choose 2) - b - c
+   *                = (n choose 2) - sum (n(i,*) choose 2)
+   *                               - sum (n(*,j) choose 2)
+   *                               + 2 * sum (n(i,j) choose 2).
+   *
+   * Since a+b+c+d = (n choose 2) and this goes in the denumerator, we can
+   * just as well start dividing each term in a+d by (n choose 2), which
+   * yields:
+   *
+   * 1 - sum( n(i,*)/n * (n(i,*)-1)/(n-1) )
+   *   - sum( n(*,i)/n * (n(*,i)-1)/(n-1) )
+   *   + sum( n(i,j)/n * (n(i,j)-1)/(n-1) ) * 2
+   */
+
+  /* Calculate row and column sums */
+  nrow = igraph_spmatrix_nrow(&m);
+  ncol = igraph_spmatrix_ncol(&m);
+  n = igraph_vector_size(v1) + 0.0;
+  IGRAPH_VECTOR_INIT_FINALLY(&rowsums, nrow);
+  IGRAPH_VECTOR_INIT_FINALLY(&colsums, ncol);
+  IGRAPH_CHECK(igraph_spmatrix_rowsums(&m, &rowsums));
+  IGRAPH_CHECK(igraph_spmatrix_colsums(&m, &colsums));
+
+  /* Start calculating the unadjusted Rand index */
+  rand = 0.0;
+  IGRAPH_CHECK(igraph_spmatrix_iter_create(&mit, &m));
+  IGRAPH_FINALLY(igraph_spmatrix_iter_destroy, &mit);
+  while (!igraph_spmatrix_iter_end(&mit)) {
+    rand += (mit.value / n) * (mit.value-1) / (n-1);
+    igraph_spmatrix_iter_next(&mit);
+  }
+  igraph_spmatrix_iter_destroy(&mit);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  frac_pairs_in_1 = frac_pairs_in_2 = 0.0;
+  for (i = 0; i < nrow; i++) {
+    frac_pairs_in_1 += (VECTOR(rowsums)[i] / n) * (VECTOR(rowsums)[i]-1) / (n-1);
+  }
+  for (i = 0; i < ncol; i++) {
+    frac_pairs_in_2 += (VECTOR(colsums)[i] / n) * (VECTOR(colsums)[i]-1) / (n-1);
+  }
+
+  rand = 1.0 + 2 * rand - frac_pairs_in_1 - frac_pairs_in_2;
+
+  if (adjust) {
+    double expected = frac_pairs_in_1 * frac_pairs_in_2 +
+                      (1-frac_pairs_in_1) * (1-frac_pairs_in_2);
+    rand = (rand - expected) / (1 - expected);
+  }
+
+  igraph_vector_destroy(&rowsums);
+  igraph_vector_destroy(&colsums);
+  igraph_spmatrix_destroy(&m);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  *result = rand;
+
+  return IGRAPH_SUCCESS;
+}

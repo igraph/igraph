@@ -23,6 +23,7 @@
 
 /************************ Miscellaneous functions *************************/
 
+#include <limits.h>
 #include "attributes.h"
 #include "graphobject.h"
 #include "vertexseqobject.h"
@@ -32,6 +33,54 @@
 #include "convert.h"
 #include "error.h"
 #include "memory.h"
+
+/**
+ * \brief Converts a Python integer to a C int
+ *
+ * This is similar to PyInt_AsLong, but it checks for overflow first and throws
+ * an exception if necessary.
+ *
+ * Returns -1 if there was an error, 0 otherwise.
+ */
+int PyInt_AsInt(PyObject* obj, int* result) {
+  long dummy = PyInt_AsLong(obj);
+  if (dummy < INT_MIN) {
+    PyErr_SetString(PyExc_OverflowError,
+        "integer too small for conversion to C int");
+    return -1;
+  }
+  if (dummy > INT_MAX) {
+    PyErr_SetString(PyExc_OverflowError,
+        "integer too large for conversion to C int");
+    return -1;
+  }
+  *result = (int)dummy;
+  return 0;
+}
+
+/**
+ * \brief Converts a Python long to a C int
+ *
+ * This is similar to PyLong_AsLong, but it checks for overflow first and
+ * throws an exception if necessary.
+ *
+ * Returns -1 if there was an error, 0 otherwise.
+ */
+int PyLong_AsInt(PyObject* obj, int* result) {
+  long dummy = PyLong_AsLong(obj);
+  if (dummy < INT_MIN) {
+    PyErr_SetString(PyExc_OverflowError,
+        "long integer too small for conversion to C int");
+    return -1;
+  }
+  if (dummy > INT_MAX) {
+    PyErr_SetString(PyExc_OverflowError,
+        "long integer too large for conversion to C int");
+    return -1;
+  }
+  *result = (int)dummy;
+  return 0;
+}
 
 /**
  * \ingroup python_interface_conversion
@@ -58,9 +107,12 @@ int igraphmodule_PyObject_to_enum(PyObject *o,
     char *s, *s2;
     int i, best, best_result, best_unique;
     
-    if (o == 0 || o == Py_None) return 0;
-    if (PyInt_Check(o)) { *result = (int)PyInt_AsLong(o); return 0; }
-    if (PyLong_Check(o)) { *result = (int)PyLong_AsLong(o); return 0; }
+    if (o == 0 || o == Py_None)
+      return 0;
+    if (PyInt_Check(o))
+      return PyInt_AsInt(o, result);
+    if (PyLong_Check(o))
+      return PyLong_AsInt(o, result);
     if (!PyString_Check(o)) {
         PyErr_SetString(PyExc_TypeError, "int, long or string expected");
         return -1;
@@ -261,6 +313,8 @@ int igraphmodule_PyObject_to_community_comparison_t(PyObject *o,
         {"nmi", IGRAPH_COMMCMP_NMI},
         {"danon", IGRAPH_COMMCMP_NMI},
         {"split-join", IGRAPH_COMMCMP_SPLIT_JOIN},
+        {"rand", IGRAPH_COMMCMP_RAND},
+        {"adjusted_rand", IGRAPH_COMMCMP_ADJUSTED_RAND},
         {0,0}
     };
 
@@ -897,8 +951,7 @@ int igraphmodule_PyObject_to_vector_int_t(PyObject *list, igraph_vector_int_t *v
             PyErr_SetString(PyExc_TypeError, "can't convert a list item to integer");
             ok = 0;
           } else {
-            // TODO: proper overflow check
-            value=(int)PyInt_AsLong(item);
+            ok = (PyInt_AsInt(item, &value) == 0);
             Py_DECREF(item2);
           }
         }
