@@ -7,14 +7,11 @@
   This function calculates the optimal community structure of a graph,
   by maximizing the modularity measure over all possible partitions.}
 \usage{
-optimal.community(graph, verbose = getIgraphOpt("verbose"))
+optimal.community(graph)
 }
 \arguments{
   \item{graph}{The input graph. Edge directions are ignored for directed
     graphs.}
-  \item{verbose}{Logical scalar, whether to print status messages about
-    the progress of the algorithm to the screen. Currently not
-    implemented.}
 }
 \details{
   This function calculates the optimal community structure for a

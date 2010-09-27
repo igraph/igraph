@@ -21,19 +21,19 @@
 ###################################################################
 
 evolver.d <- function(nodes, kernel, outseq=NULL, outdist=NULL,
-                      m=1, directed=TRUE, verbose=getIgraphOpt("verbose")) {
+                      m=1, directed=TRUE) {
 
   if (!is.null(outseq)) { outseq <- as.numeric(outseq) }
   if (!is.null(outdist)) { outdist <- as.numeric(outdist) }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_evolver_d", as.numeric(nodes), as.numeric(kernel),
-        outseq, outdist, m, as.logical(directed), as.logical(verbose),
+        outseq, outdist, m, as.logical(directed),
         PACKAGE="igraph")
 }
   
 revolver.d <- function(graph, niter=5, sd=FALSE, norm=FALSE,
-                      cites=FALSE, expected=FALSE, error=TRUE, debug=numeric(),
-                      verbose=getIgraphOpt("verbose")) {
+                      cites=FALSE, expected=FALSE, error=TRUE,
+                      debug=numeric()) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
@@ -42,7 +42,7 @@ revolver.d <- function(graph, niter=5, sd=FALSE, norm=FALSE,
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_revolver_d", graph, as.numeric(niter), as.logical(sd),
         as.logical(norm), as.logical(cites), as.logical(expected),
-        as.logical(error), as.numeric(debug), as.logical(verbose),
+        as.logical(error), as.numeric(debug),
         PACKAGE="igraph")
 }
 
@@ -59,7 +59,7 @@ revolver.error.d <- function(graph, kernel) {
 
 revolver.ad <- function(graph, niter=5, agebins=max(vcount(graph)/7100, 10),
                        sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE, error=TRUE,
-                       debug=matrix(nc=2, nr=0), verbose=getIgraphOpt("verbose")) {
+                       debug=matrix(nc=2, nr=0)) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -68,7 +68,7 @@ revolver.ad <- function(graph, niter=5, agebins=max(vcount(graph)/7100, 10),
   .Call("R_igraph_revolver_ad", graph, as.numeric(niter), as.numeric(agebins),
         as.logical(sd), as.logical(norm), as.logical(cites),
         as.logical(expected), as.logical(error),
-        structure(as.numeric(debug), dim=dim(debug)), as.logical(verbose),
+        structure(as.numeric(debug), dim=dim(debug)),
         PACKAGE="igraph")
 }
 
@@ -87,8 +87,8 @@ revolver.error.ad <- function(graph, kernel) {
 
 revolver.ade <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
                         sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                        error=TRUE, debug=matrix(nc=2, nr=0),
-                        verbose=getIgraphOpt("verbose")) {
+                        error=TRUE, debug=matrix(nc=2, nr=0)) {
+                        
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -97,7 +97,7 @@ revolver.ade <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 1
   .Call("R_igraph_revolver_ade", graph, as.numeric(cats), as.numeric(niter),
         as.numeric(agebins), as.logical(sd), as.logical(norm), as.logical(cites),
         as.logical(expected), as.logical(error),
-        structure(as.numeric(debug), dim=dim(debug)), as.logical(verbose),
+        structure(as.numeric(debug), dim=dim(debug)), 
         PACKAGE="igraph")
 }
 
@@ -115,7 +115,7 @@ revolver.error.ade <- function(graph, kernel, cats) {
 
 revolver.e <- function(graph, cats, niter=5, st=FALSE,
                       sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                      error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose")) {
+                      error=TRUE, debug=numeric()) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -123,7 +123,7 @@ revolver.e <- function(graph, cats, niter=5, st=FALSE,
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_revolver_e", graph, as.numeric(cats), as.numeric(niter), as.logical(st),
         as.logical(sd), as.logical(norm), as.logical(cites), as.logical(expected),
-        as.logical(error), as.numeric(debug), as.logical(verbose),
+        as.logical(error), as.numeric(debug), 
         PACKAGE="igraph")
 }
                                                      
@@ -140,7 +140,7 @@ revolver.error.e <- function(graph, kernel, cats) {
 
 revolver.de <- function(graph, cats, niter=5,
                       sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                      error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose")) {
+                      error=TRUE, debug=numeric()) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -148,7 +148,7 @@ revolver.de <- function(graph, cats, niter=5,
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_revolver_de", graph, as.numeric(cats), as.numeric(niter),
         as.logical(sd), as.logical(norm), as.logical(cites), as.logical(expected),
-        as.logical(error), as.numeric(debug), as.logical(verbose),
+        as.logical(error), as.numeric(debug), 
         PACKAGE="igraph")
 }
                        
@@ -166,7 +166,7 @@ revolver.error.de <- function(graph, kernel, cats) {
 
 revolver.l <- function(graph, niter=5, agebins=max(vcount(graph)/7100, 10),
                       sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                      error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose")) {
+                      error=TRUE, debug=numeric()) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -174,7 +174,7 @@ revolver.l <- function(graph, niter=5, agebins=max(vcount(graph)/7100, 10),
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_revolver_l", graph, as.numeric(niter), as.numeric(agebins),
         as.logical(sd), as.logical(norm), as.logical(cites), as.logical(expected),
-        as.logical(error), as.numeric(debug), as.logical(verbose),
+        as.logical(error), as.numeric(debug), 
         PACKAGE="igraph")
 }
 
@@ -191,7 +191,7 @@ revolver.error.l <- function(graph, kernel) {
 
 revolver.dl <- function(graph, niter=5, agebins=max(vcount(graph)/7100, 10),
                        sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                       error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose")) {
+                       error=TRUE, debug=numeric()) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -199,7 +199,7 @@ revolver.dl <- function(graph, niter=5, agebins=max(vcount(graph)/7100, 10),
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_revolver_dl", graph, as.numeric(niter), as.numeric(agebins),
         as.logical(sd), as.logical(norm), as.logical(cites), as.logical(expected),
-        as.logical(error), as.numeric(debug), as.logical(verbose),
+        as.logical(error), as.numeric(debug), 
         PACKAGE="igraph")
 }
 
@@ -217,7 +217,7 @@ revolver.error.dl <- function(graph, kernel) {
 
 revolver.el <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
                        sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                       error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose")) {
+                       error=TRUE, debug=numeric()) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -226,7 +226,7 @@ revolver.el <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10
   .Call("R_igraph_revolver_el", graph, as.numeric(cats), as.numeric(niter),
         as.numeric(agebins),
         as.logical(sd), as.logical(norm), as.logical(cites), as.logical(expected),
-        as.logical(error), as.numeric(debug), as.logical(verbose),
+        as.logical(error), as.numeric(debug), 
         PACKAGE="igraph")
 }
 
@@ -243,8 +243,8 @@ revolver.error.el <- function(graph, kernel, cats) {
 }
 
 revolver.r <- function(graph, window, niter=5, sd=FALSE, norm=FALSE,
-                      cites=FALSE, expected=FALSE, error=TRUE, debug=numeric(),
-                      verbose=getIgraphOpt("verbose")) {
+                       cites=FALSE, expected=FALSE, error=TRUE,
+                       debug=numeric()) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
@@ -253,7 +253,7 @@ revolver.r <- function(graph, window, niter=5, sd=FALSE, norm=FALSE,
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_revolver_r", graph, as.numeric(niter), as.numeric(window),
         as.logical(sd), as.logical(norm), as.logical(cites), as.logical(expected),
-        as.logical(error), as.numeric(debug), as.logical(verbose),
+        as.logical(error), as.numeric(debug), 
         PACKAGE="igraph")
 }
 
@@ -270,7 +270,7 @@ revolver.error.r <- function(graph, kernel, window) {
 
 revolver.ar <- function(graph, window, niter=5, agebins=max(vcount(graph)/7100, 10),
                        sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE, error=TRUE,
-                       debug=matrix(nc=2, nr=0), verbose=getIgraphOpt("verbose")) {
+                       debug=matrix(nc=2, nr=0)) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -280,7 +280,7 @@ revolver.ar <- function(graph, window, niter=5, agebins=max(vcount(graph)/7100, 
         as.numeric(window),
         as.logical(sd), as.logical(norm), as.logical(cites),
         as.logical(expected), as.logical(error),
-        structure(as.numeric(debug), dim=dim(debug)), as.logical(verbose),
+        structure(as.numeric(debug), dim=dim(debug)), 
         PACKAGE="igraph")
 }
 
@@ -298,7 +298,7 @@ revolver.error.ar <- function(graph, kernel, window) {
 
 revolver.di <- function(graph, cats, niter=5,
                       sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                      error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose")) {
+                      error=TRUE, debug=numeric()) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -306,7 +306,7 @@ revolver.di <- function(graph, cats, niter=5,
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_revolver_di", graph, as.numeric(cats), as.numeric(niter),
         as.logical(sd), as.logical(norm), as.logical(cites), as.logical(expected),
-        as.logical(error), as.numeric(debug), as.logical(verbose),
+        as.logical(error), as.numeric(debug), 
         PACKAGE="igraph")
 }
 
@@ -324,8 +324,8 @@ revolver.error.di <- function(graph, kernel, cats) {
 
 revolver.adi <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
                         sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                        error=TRUE, debug=matrix(nc=2, nr=0),
-                        verbose=getIgraphOpt("verbose")) {
+                        error=TRUE, debug=matrix(nc=2, nr=0)) {
+
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -334,7 +334,7 @@ revolver.adi <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 1
   .Call("R_igraph_revolver_adi", graph, as.numeric(cats), as.numeric(niter),
         as.numeric(agebins), as.logical(sd), as.logical(norm), as.logical(cites),
         as.logical(expected), as.logical(error),
-        structure(as.numeric(debug), dim=dim(debug)), as.logical(verbose),
+        structure(as.numeric(debug), dim=dim(debug)), 
         PACKAGE="igraph")
 }
 
@@ -352,7 +352,7 @@ revolver.error.adi <- function(graph, kernel, cats) {
 
 revolver.il <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
                       sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                      error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose")) {
+                      error=TRUE, debug=numeric()) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -361,7 +361,7 @@ revolver.il <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10
   .Call("R_igraph_revolver_il", graph, as.numeric(cats),
         as.numeric(niter), as.numeric(agebins),
         as.logical(sd), as.logical(norm), as.logical(cites), as.logical(expected),
-        as.logical(error), as.numeric(debug), as.logical(verbose),
+        as.logical(error), as.numeric(debug), 
         PACKAGE="igraph")
 }
 
@@ -379,7 +379,7 @@ revolver.error.il <- function(graph, kernel, cats) {
 
 revolver.ir <- function(graph, cats, window, niter=5,
                       sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                      error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose")) {
+                      error=TRUE, debug=numeric()) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -388,7 +388,7 @@ revolver.ir <- function(graph, cats, window, niter=5,
   .Call("R_igraph_revolver_ir", graph, as.numeric(cats), as.numeric(window),
         as.numeric(niter),
         as.logical(sd), as.logical(norm), as.logical(cites), as.logical(expected),
-        as.logical(error), as.numeric(debug), as.logical(verbose),
+        as.logical(error), as.numeric(debug), 
         PACKAGE="igraph")
 }
 
@@ -408,8 +408,8 @@ revolver.error.ir <- function(graph, kernel, cats, window) {
 revolver.air <- function(graph, cats, window,
                         niter=5, agebins=max(vcount(graph)/7100, 10),
                         sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                        error=TRUE, debug=matrix(nc=2, nr=0),
-                        verbose=getIgraphOpt("verbose")) {
+                        error=TRUE, debug=matrix(nc=2, nr=0)) {
+
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -419,7 +419,7 @@ revolver.air <- function(graph, cats, window,
         as.numeric(niter),
         as.numeric(agebins), as.logical(sd), as.logical(norm), as.logical(cites),
         as.logical(expected), as.logical(error),
-        structure(as.numeric(debug), dim=dim(debug)), as.logical(verbose),
+        structure(as.numeric(debug), dim=dim(debug)), 
         PACKAGE="igraph")
 }
 
@@ -438,8 +438,8 @@ revolver.error.air <- function(graph, kernel, cats, window) {
 
 revolver.d.d <- function(graph, vtime=V(graph)$time, etime=E(graph)$time, niter=5,
                          sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                         error=TRUE, debug=matrix(nc=2, nr=0),
-                         verbose=getIgraphOpt("verbose")) {
+                         error=TRUE, debug=matrix(nc=2, nr=0)) {
+
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -456,15 +456,15 @@ revolver.d.d <- function(graph, vtime=V(graph)$time, etime=E(graph)$time, niter=
         as.numeric(vtime), as.numeric(etime), 
         as.logical(sd), as.logical(norm), as.logical(cites),
         as.logical(expected), as.logical(error),
-        structure(as.numeric(debug), dim=dim(debug)), as.logical(verbose),
+        structure(as.numeric(debug), dim=dim(debug)), 
         PACKAGE="igraph")
 }
 
 revolver.p.p <- function(graph, events=get.graph.attribute(graph, "events"),
                          vtime=V(graph)$time, etime=E(graph)$time,
                          niter=5, sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                         error=TRUE, debug=matrix(nc=2, nr=0),
-                         verbose=getIgraphOpt("verbose")) {
+                         error=TRUE, debug=matrix(nc=2, nr=0)) {
+
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -488,6 +488,6 @@ revolver.p.p <- function(graph, events=get.graph.attribute(graph, "events"),
         as.numeric(vtime), as.numeric(etime), as.numeric(authors),
         as.numeric(eventsizes), as.logical(sd), as.logical(norm), as.logical(cites),
         as.logical(expected), as.logical(error),
-        structure(as.numeric(debug), dim=dim(debug)), as.logical(verbose),
+        structure(as.numeric(debug), dim=dim(debug)), 
         PACKAGE="igraph")
 }

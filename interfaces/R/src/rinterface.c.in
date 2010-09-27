@@ -1756,11 +1756,6 @@ void R_igraph_warning_handler(const char *reason, const char *file,
   warning("At %s:%i :%s", file, line, reason);
 }
 
-igraph_interruption_handler_t *R_igraph_oldinterrupt;
-igraph_progress_handler_t *R_igraph_oldprogress;
-igraph_warning_handler_t *R_igraph_oldwarning;
-igraph_status_handler_t *R_igraph_oldstatus;
-
 extern int R_interrupts_pending;
 
 int R_igraph_interrupt_handler(void *data) {
@@ -1803,46 +1798,26 @@ int R_igraph_status_handler(const char *message, void *data) {
   return 0;
 }
 
-static R_INLINE void R_igraph_before() {
-  R_igraph_oldhandler=igraph_set_error_handler(R_igraph_myhandler);
-  R_igraph_oldwarning=igraph_set_warning_handler(R_igraph_warning_handler);
-  R_igraph_oldinterrupt=
-    igraph_set_interruption_handler(R_igraph_interrupt_handler);
-  R_igraph_attribute_oldtable=
-    igraph_i_set_attribute_table(&R_igraph_attribute_table);
+SEXP R_igraph_init(SEXP progress, SEXP status) {
+  igraph_set_error_handler(R_igraph_myhandler);
+  igraph_set_warning_handler(R_igraph_warning_handler);
+  igraph_set_interruption_handler(R_igraph_interrupt_handler);
+  igraph_i_set_attribute_table(&R_igraph_attribute_table);
+  if (LOGICAL(status)[0]) { 
+    igraph_set_status_handler(R_igraph_status_handler);
+  }
+  if (LOGICAL(progress)[0]) {
+    igraph_set_progress_handler(R_igraph_progress_handler);
+  }
+  return R_NilValue;
 }
 
-static R_INLINE void R_igraph_before2(SEXP verbose, const char *str) {
-  R_igraph_oldhandler=igraph_set_error_handler(R_igraph_myhandler);
-  R_igraph_oldwarning=igraph_set_warning_handler(R_igraph_warning_handler);
-  R_igraph_oldinterrupt=
-    igraph_set_interruption_handler(R_igraph_interrupt_handler);
-  R_igraph_attribute_oldtable=
-    igraph_i_set_attribute_table(&R_igraph_attribute_table);
+SEXP R_igraph_set_verbose(SEXP verbose) {
   if (LOGICAL(verbose)[0]) {
-    R_igraph_oldstatus=igraph_set_status_handler(R_igraph_status_handler);
-    R_igraph_oldprogress=igraph_set_progress_handler(R_igraph_progress_handler);
+    igraph_set_status_handler(R_igraph_status_handler);    
+    igraph_set_progress_handler(R_igraph_progress_handler);
   }
-}  
-
-static R_INLINE void R_igraph_after() {
-  igraph_set_error_handler(R_igraph_oldhandler);
-  igraph_set_warning_handler(R_igraph_oldwarning);
-  igraph_set_interruption_handler(R_igraph_oldinterrupt);
-  igraph_i_set_attribute_table(R_igraph_attribute_oldtable);
-}
-
-static R_INLINE void R_igraph_after2(SEXP verbose) {
-  igraph_set_error_handler(R_igraph_oldhandler);
-  igraph_set_warning_handler(R_igraph_oldwarning);
-  igraph_set_status_handler(R_igraph_oldstatus);
-  igraph_set_interruption_handler(R_igraph_oldinterrupt);
-  igraph_i_set_attribute_table(R_igraph_attribute_oldtable);
-  if (LOGICAL(verbose)[0]) {
-    igraph_set_status_handler(R_igraph_oldstatus);
-    igraph_set_progress_handler(R_igraph_oldprogress);
-    fputc('\n', stderr);
-  }
+  return R_NilValue;
 }
 
 SEXP R_igraph_finalizer() {
@@ -2430,16 +2405,12 @@ SEXP R_igraph_add_edges(SEXP graph, SEXP edges) {
   igraph_t g;
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_vector(edges, &v);
   R_SEXP_to_igraph_copy(graph, &g);
   igraph_add_edges(&g, &v, 0);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -2450,16 +2421,12 @@ SEXP R_igraph_add_vertices(SEXP graph, SEXP pnv) {
   igraph_t g;
   SEXP result;
   
-  R_igraph_before();
-  
   nv=REAL(pnv)[0];
   R_SEXP_to_igraph_copy(graph, &g);
   igraph_add_vertices(&g, nv, 0);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -2469,14 +2436,10 @@ SEXP R_igraph_ecount(SEXP graph) {
   igraph_t g;
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=igraph_ecount(&g);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -2489,8 +2452,6 @@ SEXP R_igraph_neighbors(SEXP graph, SEXP pvid, SEXP pmode) {
   igraph_real_t vid;
   igraph_integer_t mode;
   
-  R_igraph_before();
-  
   igraph_vector_init(&neis, 0);
   vid=REAL(pvid)[0];
   mode=REAL(pmode)[0];
@@ -2501,8 +2462,6 @@ SEXP R_igraph_neighbors(SEXP graph, SEXP pvid, SEXP pmode) {
   igraph_vector_copy_to(&neis, REAL(result));
   igraph_vector_destroy(&neis);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -2513,16 +2472,12 @@ SEXP R_igraph_delete_edges(SEXP graph, SEXP edges) {
   igraph_t g;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph_copy(graph, &g);
   R_SEXP_to_igraph_es(edges, &g, &es);
   igraph_delete_edges(&g, es);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -2533,8 +2488,6 @@ SEXP R_igraph_delete_vertices(SEXP graph, SEXP vertices) {
   igraph_t g;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph_copy(graph, &g);
   R_SEXP_to_igraph_vs(vertices, &g, &vs);
   igraph_delete_vertices(&g, vs);
@@ -2542,8 +2495,6 @@ SEXP R_igraph_delete_vertices(SEXP graph, SEXP vertices) {
   igraph_destroy(&g);
   igraph_vs_destroy(&vs);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -2553,14 +2504,10 @@ SEXP R_igraph_is_directed(SEXP graph) {
   igraph_t g;
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   PROTECT(result=NEW_LOGICAL(1));
   LOGICAL(result)[0]=igraph_is_directed(&g);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -2573,15 +2520,11 @@ SEXP R_igraph_create(SEXP edges, SEXP pn, SEXP pdirected) {
   igraph_bool_t directed=LOGICAL(pdirected)[0];
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_vector(edges, &v);
   igraph_create(&g, &v, n, directed);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -2594,8 +2537,6 @@ SEXP R_igraph_degree(SEXP graph, SEXP vids, SEXP pmode, SEXP ploops) {
   igraph_integer_t mode=REAL(pmode)[0];
   igraph_bool_t loops=LOGICAL(ploops)[0];
   SEXP result;
-
-  R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs(vids, &g, &vs);
@@ -2607,8 +2548,6 @@ SEXP R_igraph_degree(SEXP graph, SEXP vids, SEXP pmode, SEXP ploops) {
   igraph_vector_destroy(&res);
   igraph_vs_destroy(&vs);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -2620,15 +2559,11 @@ SEXP R_igraph_is_connected(SEXP graph, SEXP pmode) {
   igraph_bool_t res;
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_is_connected(&g, &res, mode);
   
   PROTECT(result=NEW_LOGICAL(1));
   LOGICAL(result)[0]=res;
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -2644,8 +2579,6 @@ SEXP R_igraph_diameter(SEXP graph, SEXP pdirected, SEXP punconnected,
   igraph_integer_t res;  
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   if (!isNull(pweights)) {
     R_SEXP_to_vector(pweights, &weights);
@@ -2655,8 +2588,6 @@ SEXP R_igraph_diameter(SEXP graph, SEXP pdirected, SEXP punconnected,
   
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -2672,8 +2603,6 @@ SEXP R_igraph_get_diameter(SEXP graph, SEXP pdirected, SEXP punconnected,
   igraph_vector_t res;
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   if (!isNull(pweights)) {
     R_SEXP_to_vector(pweights, &weights);
@@ -2685,8 +2614,6 @@ SEXP R_igraph_get_diameter(SEXP graph, SEXP pdirected, SEXP punconnected,
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -2702,8 +2629,6 @@ SEXP R_igraph_farthest_points(SEXP graph, SEXP pdirected, SEXP punconnected,
   igraph_integer_t from, to, len;
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   if (!isNull(pweights)) {
     R_SEXP_to_vector(pweights, &weights);
@@ -2720,8 +2645,6 @@ SEXP R_igraph_farthest_points(SEXP graph, SEXP pdirected, SEXP punconnected,
     REAL(result)[2]=len;
   }
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -2734,8 +2657,6 @@ SEXP R_igraph_subcomponent(SEXP graph, SEXP pvertex, SEXP pmode) {
   igraph_vector_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_init(&res, 0);
   igraph_subcomponent(&g, &res, vertex, mode);
@@ -2744,14 +2665,12 @@ SEXP R_igraph_subcomponent(SEXP graph, SEXP pvertex, SEXP pmode) {
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
 
 SEXP R_igraph_betweenness(SEXP graph, SEXP pvids, SEXP pdirected, 
-			  SEXP weights, SEXP pnobigint, SEXP verbose) {
+			  SEXP weights, SEXP pnobigint) {
   
   igraph_t g;
   igraph_vs_t vs;
@@ -2761,8 +2680,6 @@ SEXP R_igraph_betweenness(SEXP graph, SEXP pvids, SEXP pdirected,
   igraph_vector_t v_weights, *pweights=0;
   SEXP result;
   
-  R_igraph_before2(verbose, "Betweenness");
-
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs(pvids, &g, &vs);
   igraph_vector_init(&res, 0);
@@ -2776,8 +2693,6 @@ SEXP R_igraph_betweenness(SEXP graph, SEXP pvids, SEXP pdirected,
   igraph_vector_destroy(&res);
   igraph_vs_destroy(&vs);
 
-  R_igraph_after2(verbose);
-  
   UNPROTECT(1);
   return result;
 }
@@ -2789,7 +2704,6 @@ SEXP R_igraph_running_mean(SEXP pdata, SEXP pbinwidth) {
   igraph_vector_t res;
   SEXP result;
   
-  R_igraph_before();
   R_SEXP_to_vector(pdata, &data);
   
   igraph_vector_init(&res, 0);
@@ -2798,8 +2712,6 @@ SEXP R_igraph_running_mean(SEXP pdata, SEXP pbinwidth) {
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -2812,8 +2724,6 @@ SEXP R_igraph_cocitation(SEXP graph, SEXP pvids) {
   igraph_matrix_t m;
   SEXP result;
   
-  R_igraph_before();
-
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs(pvids, &g, &vs);
   igraph_matrix_init(&m, 0, 0);
@@ -2823,8 +2733,6 @@ SEXP R_igraph_cocitation(SEXP graph, SEXP pvids) {
   igraph_matrix_destroy(&m);
   igraph_vs_destroy(&vs);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -2836,8 +2744,6 @@ SEXP R_igraph_bibcoupling(SEXP graph, SEXP pvids) {
   igraph_matrix_t m;
   SEXP result;
   
-  R_igraph_before();
-
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs(pvids, &g, &vs);
   igraph_matrix_init(&m, 0, 0);
@@ -2846,8 +2752,6 @@ SEXP R_igraph_bibcoupling(SEXP graph, SEXP pvids) {
   PROTECT(result=R_igraph_matrix_to_SEXP(&m));
   igraph_matrix_destroy(&m);
   igraph_vs_destroy(&vs);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -2863,13 +2767,9 @@ SEXP R_igraph_growing_random_game(SEXP pn, SEXP pm, SEXP pdirected,
   igraph_bool_t directed=LOGICAL(pdirected)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   igraph_growing_random_game(&g, n, m, directed, citation);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;  
@@ -2887,8 +2787,6 @@ SEXP R_igraph_shortest_paths(SEXP graph, SEXP pvids, SEXP pto,
   igraph_vector_t w, *pw=&w;
   igraph_bool_t negw=0;
   SEXP result;
-  
-  R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs(pvids, &g, &vs);
@@ -2928,8 +2826,6 @@ SEXP R_igraph_shortest_paths(SEXP graph, SEXP pvids, SEXP pto,
   igraph_matrix_destroy(&res);
   igraph_vs_destroy(&vs);
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -2945,15 +2841,11 @@ SEXP R_igraph_lattice(SEXP pdimvector, SEXP pnei, SEXP pdirected,
   igraph_bool_t circular=LOGICAL(pcircular)[0];  
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_vector(pdimvector, &dimvector);
   
   igraph_lattice(&g, &dimvector, nei, directed, mutual, circular);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;  
@@ -2975,8 +2867,6 @@ SEXP R_igraph_barabasi_game(SEXP pn, SEXP ppower, SEXP pm, SEXP poutseq,
   igraph_t start, *ppstart=0;
   SEXP result;
   
-  R_igraph_before();
-
   if (!isNull(poutseq)) {
     R_SEXP_to_vector(poutseq, &outseq);
     myoutseq=&outseq;
@@ -2991,8 +2881,6 @@ SEXP R_igraph_barabasi_game(SEXP pn, SEXP ppower, SEXP pm, SEXP poutseq,
 		       A, directed, algo, ppstart);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -3013,8 +2901,6 @@ SEXP R_igraph_recent_degree_game(SEXP pn, SEXP ppower, SEXP pwindow,
   igraph_real_t zero_appeal=REAL(pzero_appeal)[0];
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_vector(poutseq, &outseq);
   
   igraph_recent_degree_game(&g, n, power, window, m, &outseq, outpref, 
@@ -3022,16 +2908,13 @@ SEXP R_igraph_recent_degree_game(SEXP pn, SEXP ppower, SEXP pwindow,
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
   
 SEXP R_igraph_layout_kamada_kawai(SEXP graph, SEXP pniter, SEXP pinitemp, 
 				  SEXP pcoolexp, SEXP pkkconst, SEXP psigma, 
-				  SEXP start, SEXP pfixz,
-				  SEXP verbose) {
+				  SEXP start, SEXP pfixz) {
   
   igraph_t g;
   igraph_integer_t niter=REAL(pniter)[0];
@@ -3041,8 +2924,6 @@ SEXP R_igraph_layout_kamada_kawai(SEXP graph, SEXP pniter, SEXP pinitemp,
   igraph_real_t sigma=REAL(psigma)[0];
   igraph_matrix_t res;
   SEXP result;
-  
-  R_igraph_before2(verbose, "KK layout");
   
   R_SEXP_to_igraph(graph, &g);
   if (isNull(start)) {
@@ -3055,16 +2936,13 @@ SEXP R_igraph_layout_kamada_kawai(SEXP graph, SEXP pniter, SEXP pinitemp,
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   
-  R_igraph_after2(verbose);
-  
   UNPROTECT(1);
   return result;
 }
 
 SEXP R_igraph_layout_kamada_kawai_3d(SEXP graph, SEXP pniter, SEXP pinitemp,
 				     SEXP pcoolexp, SEXP pkkconst, 
-				     SEXP psigma, SEXP start, SEXP pfixz,
-				     SEXP verbose) {
+				     SEXP psigma, SEXP start, SEXP pfixz) {
   igraph_t g;
   igraph_integer_t niter=REAL(pniter)[0];
   igraph_real_t initemp=REAL(pinitemp)[0];
@@ -3074,8 +2952,6 @@ SEXP R_igraph_layout_kamada_kawai_3d(SEXP graph, SEXP pniter, SEXP pinitemp,
   igraph_bool_t fixz=LOGICAL(pfixz)[0];
   igraph_matrix_t res;
   SEXP result;
-  
-  R_igraph_before2(verbose, "3D KK layout");
   
   R_SEXP_to_igraph(graph, &g);
   if (isNull(start)) {
@@ -3088,8 +2964,6 @@ SEXP R_igraph_layout_kamada_kawai_3d(SEXP graph, SEXP pniter, SEXP pinitemp,
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   
-  R_igraph_after2(verbose);
-  
   UNPROTECT(1);
   return result;
 }
@@ -3097,7 +2971,7 @@ SEXP R_igraph_layout_kamada_kawai_3d(SEXP graph, SEXP pniter, SEXP pinitemp,
 SEXP R_igraph_layout_graphopt(SEXP graph, SEXP pniter, SEXP pcharge,
 			      SEXP pmass, SEXP pspring_length, 
 			      SEXP pspring_constant, SEXP pmax_sa_movement,
-			      SEXP start, SEXP verbose) {
+			      SEXP start) {
   igraph_t g;
   igraph_integer_t niter=REAL(pniter)[0];
   igraph_real_t charge=REAL(pcharge)[0];
@@ -3107,8 +2981,6 @@ SEXP R_igraph_layout_graphopt(SEXP graph, SEXP pniter, SEXP pcharge,
   igraph_real_t max_sa_movement=REAL(pmax_sa_movement)[0];
   igraph_matrix_t res;
   SEXP result;
-  
-  R_igraph_before2(verbose, "Graphopt layout");
   
   R_SEXP_to_igraph(graph, &g);
   if (isNull(start)) {
@@ -3120,8 +2992,6 @@ SEXP R_igraph_layout_graphopt(SEXP graph, SEXP pniter, SEXP pcharge,
 			 spring_constant, max_sa_movement, !isNull(start));
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
-  
-  R_igraph_after2(verbose);
   
   UNPROTECT(1);
   return result;
@@ -3142,8 +3012,6 @@ SEXP R_igraph_layout_lgl(SEXP graph, SEXP pmaxiter, SEXP pmaxdelta,
   igraph_integer_t root=REAL(proot)[0];
   SEXP result;
 
-  R_igraph_before();
-
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&res, 0, 0);
   igraph_layout_lgl(&g, &res, maxiter, maxdelta, area, coolexp, repulserad,
@@ -3151,8 +3019,6 @@ SEXP R_igraph_layout_lgl(SEXP graph, SEXP pmaxiter, SEXP pmaxdelta,
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }  
@@ -3161,8 +3027,7 @@ SEXP R_igraph_layout_fruchterman_reingold_grid(SEXP graph,
 					       SEXP pniter,
 					       SEXP pmaxdelta, SEXP parea,
 					       SEXP pcoolexp, SEXP prepulserad,
-					       SEXP pcellsize, SEXP start,
-					       SEXP verbose) {
+					       SEXP pcellsize, SEXP start) {
 
   igraph_t g;
   igraph_matrix_t res;
@@ -3175,8 +3040,6 @@ SEXP R_igraph_layout_fruchterman_reingold_grid(SEXP graph,
   igraph_bool_t use_seed=!isNull(start);
   SEXP result;
   
-  R_igraph_before2(verbose, "Grid-FR layout");
-
   R_SEXP_to_igraph(graph, &g);
   if (use_seed) {
     R_SEXP_to_igraph_matrix_copy(start, &res);
@@ -3189,8 +3052,6 @@ SEXP R_igraph_layout_fruchterman_reingold_grid(SEXP graph,
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   
-  R_igraph_after2(verbose);
-  
   UNPROTECT(1);
   return result;
 }
@@ -3201,14 +3062,10 @@ SEXP R_igraph_minimum_spanning_tree_unweighted(SEXP graph) {
   igraph_t mst;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_minimum_spanning_tree_unweighted(&g, &mst);
   PROTECT(result=R_igraph_to_SEXP(&mst));
   igraph_destroy(&mst);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -3221,16 +3078,12 @@ SEXP R_igraph_minimum_spanning_tree_prim(SEXP graph, SEXP pweights) {
   igraph_vector_t weights;
   SEXP result;
   
-  R_igraph_before();
-
   R_SEXP_to_vector(pweights, &weights);
   
   R_SEXP_to_igraph(graph, &g);
   igraph_minimum_spanning_tree_prim(&g, &mst, &weights);
   PROTECT(result=R_igraph_to_SEXP(&mst));
   igraph_destroy(&mst);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -3254,8 +3107,6 @@ SEXP R_igraph_measure_dynamics_id(SEXP graph,
   igraph_integer_t maxind=REAL(pmaxind)[0];
   igraph_integer_t debugdeg=REAL(pdebugdeg)[0];
   SEXP result;
-  
-  R_igraph_before();
   
   R_SEXP_to_vector(pst, &st);
   R_SEXP_to_igraph(graph, &g);
@@ -3304,8 +3155,6 @@ SEXP R_igraph_measure_dynamics_id(SEXP graph,
     SET_VECTOR_ELT(result, 4, R_NilValue);
   }
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -3317,8 +3166,6 @@ SEXP R_igraph_measure_dynamics_id_st(SEXP graph, SEXP pak) {
   igraph_vector_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_matrix(pak, &ak);
   igraph_vector_init(&res, 0);
@@ -3327,8 +3174,6 @@ SEXP R_igraph_measure_dynamics_id_st(SEXP graph, SEXP pak) {
   igraph_vector_copy_to(&res, REAL(result));
   
   igraph_vector_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -3343,8 +3188,6 @@ SEXP R_igraph_measure_dynamics_id_expected(SEXP graph, SEXP pak,
   igraph_integer_t which=REAL(pwhich)[0];
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pak, &ak);
   R_SEXP_to_vector(pst, &st);
@@ -3358,8 +3201,6 @@ SEXP R_igraph_measure_dynamics_id_expected(SEXP graph, SEXP pak,
   igraph_vector_copy_to(&err, REAL(result));
   igraph_vector_destroy(&err);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -3375,8 +3216,6 @@ SEXP R_igraph_measure_dynamics_idwindow(SEXP graph,
   igraph_integer_t maxind=REAL(pmaxind)[0];
   igraph_real_t window=REAL(pwindow)[0];
   SEXP result;
-  
-  R_igraph_before();
   
   R_SEXP_to_vector(pst, &st);
   R_SEXP_to_igraph(graph, &g);
@@ -3396,8 +3235,6 @@ SEXP R_igraph_measure_dynamics_idwindow(SEXP graph,
     igraph_matrix_destroy(&sd);
   }
 
-  R_igraph_after();
-
   UNPROTECT(1);
   return result;
 }
@@ -3410,8 +3247,6 @@ SEXP R_igraph_measure_dynamics_idwindow_st(SEXP graph, SEXP pak,
   igraph_integer_t window=REAL(pwindow)[0];
   SEXP result;
   
-  R_igraph_before();
-
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_matrix(pak, &ak);
   igraph_vector_init(&res, 0);
@@ -3420,8 +3255,6 @@ SEXP R_igraph_measure_dynamics_idwindow_st(SEXP graph, SEXP pak,
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -3442,8 +3275,6 @@ SEXP R_igraph_measure_dynamics_idage(SEXP graph,
   igraph_integer_t agebins=REAL(pagebins)[0];
   igraph_integer_t maxind=REAL(pmaxind)[0];
   SEXP result;
-  
-  R_igraph_before();
   
   R_SEXP_to_vector(pst, &st);
 
@@ -3491,8 +3322,6 @@ SEXP R_igraph_measure_dynamics_idage(SEXP graph,
     SET_VECTOR_ELT(result, 3, R_NilValue);
   }
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -3506,8 +3335,6 @@ SEXP R_igraph_measure_dynamics_idage_expected(SEXP graph, SEXP pakl,
   igraph_matrix_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_matrix(pakl, &akl);
   R_SEXP_to_vector(pst, &st);
@@ -3516,8 +3343,6 @@ SEXP R_igraph_measure_dynamics_idage_expected(SEXP graph, SEXP pakl,
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   
-  R_igraph_after();
-
   UNPROTECT(1);
   return result;
 }
@@ -3530,8 +3355,6 @@ SEXP R_igraph_measure_dynamics_idage_st(SEXP graph, SEXP pakl,
   igraph_vector_t res;
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_matrix(pakl, &akl);
   igraph_vector_init(&res, 0);
@@ -3547,8 +3370,6 @@ SEXP R_igraph_measure_dynamics_idage_st(SEXP graph, SEXP pakl,
   
   igraph_vector_destroy(&res);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -3568,8 +3389,6 @@ SEXP R_igraph_measure_dynamics_citedcat_id_age(SEXP graph,
   igraph_array3_t *ppsd=&sd;
   SEXP result;
   
-  R_igraph_before();
-
   R_SEXP_to_vector(pst, &st);
   R_SEXP_to_vector(pcats, &cats);
   R_SEXP_to_igraph(graph, &g);
@@ -3591,8 +3410,6 @@ SEXP R_igraph_measure_dynamics_citedcat_id_age(SEXP graph,
     igraph_array3_destroy(&sd);
   } 
   
-  R_igraph_after();
-
   UNPROTECT(1);
   return result;
 } 
@@ -3606,8 +3423,6 @@ SEXP R_igraph_measure_dynamics_citedcat_id_age_st(SEXP graph, SEXP padkl,
   igraph_vector_t res;
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_igraph_SEXP_to_array3(padkl, &adkl);
   R_SEXP_to_vector(pcats, &cats);
@@ -3617,8 +3432,6 @@ SEXP R_igraph_measure_dynamics_citedcat_id_age_st(SEXP graph, SEXP padkl,
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -3639,8 +3452,6 @@ SEXP R_igraph_measure_dynamics_citingcat_id_age(SEXP graph,
   igraph_array3_t *ppsd=&sd;
   SEXP result;
   
-  R_igraph_before();
-
   R_SEXP_to_vector(pst, &st);
   R_SEXP_to_vector(pcats, &cats);
   R_SEXP_to_igraph(graph, &g);
@@ -3662,8 +3473,6 @@ SEXP R_igraph_measure_dynamics_citingcat_id_age(SEXP graph,
     igraph_array3_destroy(&sd);
   }
   
-  R_igraph_after();
-
   UNPROTECT(1);
   return result;
 } 
@@ -3677,8 +3486,6 @@ SEXP R_igraph_measure_dynamics_citingcat_id_age_st(SEXP graph, SEXP padkl,
   igraph_vector_t res;
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_igraph_SEXP_to_array3(padkl, &adkl);
   R_SEXP_to_vector(pcats, &cats);
@@ -3688,8 +3495,6 @@ SEXP R_igraph_measure_dynamics_citingcat_id_age_st(SEXP graph, SEXP padkl,
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -3705,8 +3510,6 @@ SEXP R_igraph_measure_dynamics_d_d(SEXP graph, SEXP pntime, SEXP petime,
   igraph_vector_t st;
   igraph_integer_t maxdeg=REAL(pmaxdeg)[0];
   SEXP result;
-  
-  R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pntime, &ntime);
@@ -3729,8 +3532,6 @@ SEXP R_igraph_measure_dynamics_d_d(SEXP graph, SEXP pntime, SEXP petime,
     SET_VECTOR_ELT(result, 1, R_NilValue);
   }
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 } 
@@ -3746,8 +3547,6 @@ SEXP R_igraph_measure_dynamics_d_d_st(SEXP graph, SEXP pntime, SEXP petime,
   igraph_vector_t st;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pntime, &ntime);
   R_SEXP_to_vector(petime, &etime);
@@ -3758,8 +3557,6 @@ SEXP R_igraph_measure_dynamics_d_d_st(SEXP graph, SEXP pntime, SEXP petime,
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&st)));
   igraph_vector_copy_to(&st, REAL(result));
   igraph_vector_destroy(&st);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -3775,8 +3572,6 @@ SEXP R_igraph_measure_dynamics_lastcit(SEXP graph, SEXP pst,
   igraph_bool_t lno=LOGICAL(pno)[0];
   igraph_integer_t agebins=REAL(pagebins)[0];
   SEXP result;
-  
-  R_igraph_before();
   
   R_SEXP_to_vector(pst, &st);
   R_SEXP_to_igraph(graph, &g);
@@ -3811,8 +3606,6 @@ SEXP R_igraph_measure_dynamics_lastcit(SEXP graph, SEXP pst,
     SET_VECTOR_ELT(result, 2, R_NilValue);
   }
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -3824,8 +3617,6 @@ SEXP R_igraph_measure_dynamics_lastcit_st(SEXP graph, SEXP pal) {
   igraph_vector_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pal, &al);
   igraph_vector_init(&res, 0);
@@ -3833,8 +3624,6 @@ SEXP R_igraph_measure_dynamics_lastcit_st(SEXP graph, SEXP pal) {
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -3851,8 +3640,6 @@ SEXP R_igraph_measure_dynamics_age(SEXP graph, SEXP pst, SEXP pagebins,
   igraph_integer_t agebins=REAL(pagebins)[0];
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_vector(pst, &st);
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_init(&al, 0);
@@ -3886,8 +3673,6 @@ SEXP R_igraph_measure_dynamics_age(SEXP graph, SEXP pst, SEXP pagebins,
     SET_VECTOR_ELT(result, 2, R_NilValue);
   }
   
-  R_igraph_after();
-
   UNPROTECT(1);
   return result;
 }
@@ -3899,8 +3684,6 @@ SEXP R_igraph_measure_dynamics_age_st(SEXP graph, SEXP pal) {
   igraph_vector_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pal, &al);
   igraph_vector_init(&res, 0);
@@ -3908,8 +3691,6 @@ SEXP R_igraph_measure_dynamics_age_st(SEXP graph, SEXP pal) {
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -3926,8 +3707,6 @@ SEXP R_igraph_measure_dynamics_citedcat(SEXP graph, SEXP pcats,
   igraph_bool_t lno=LOGICAL(pno)[0];
   igraph_integer_t nocats=REAL(pnocats)[0];
   SEXP result;
-  
-  R_igraph_before();
   
   R_SEXP_to_vector(pst, &st);
   R_SEXP_to_vector(pcats, &cats);
@@ -3963,8 +3742,6 @@ SEXP R_igraph_measure_dynamics_citedcat(SEXP graph, SEXP pcats,
     SET_VECTOR_ELT(result, 2, R_NilValue);
   }
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -3977,8 +3754,6 @@ SEXP R_igraph_measure_dynamics_citedcat_st(SEXP graph, SEXP pal, SEXP pcats,
   igraph_vector_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pal, &al);
   R_SEXP_to_vector(pcats, &cats);
@@ -3987,8 +3762,6 @@ SEXP R_igraph_measure_dynamics_citedcat_st(SEXP graph, SEXP pal, SEXP pcats,
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4007,8 +3780,6 @@ SEXP R_igraph_measure_dynamics_citingcat_citedcat(SEXP graph, SEXP pcats,
   igraph_bool_t lno=LOGICAL(pno)[0];
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_vector(pcats, &cats);
   R_SEXP_to_vector(pst, &st);
   R_SEXP_to_igraph(graph, &g);
@@ -4033,8 +3804,6 @@ SEXP R_igraph_measure_dynamics_citingcat_citedcat(SEXP graph, SEXP pcats,
     SET_VECTOR_ELT(result, 2, R_NilValue);
   }
   
-  R_igraph_after();
-
   UNPROTECT(1);
   return result;
 }
@@ -4049,8 +3818,6 @@ SEXP R_igraph_measure_dynamics_citingcat_citedcat_st(SEXP graph,
   igraph_vector_t res;
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_matrix(pagd, &agd);
   R_SEXP_to_vector(pcats, &cats);
@@ -4059,8 +3826,6 @@ SEXP R_igraph_measure_dynamics_citingcat_citedcat_st(SEXP graph,
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4085,8 +3850,6 @@ SEXP R_igraph_get_shortest_paths(SEXP graph, SEXP pfrom, SEXP pto,
   
   long int no=REAL(pno)[0];
   
-  R_igraph_before();  
-
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs(pto, &g, &to);
 
@@ -4154,8 +3917,6 @@ SEXP R_igraph_get_shortest_paths(SEXP graph, SEXP pfrom, SEXP pto,
     tofree=4;
   }
   
-  R_igraph_after();
-  
   UNPROTECT(tofree);
   return result;
 }
@@ -4168,14 +3929,10 @@ SEXP R_igraph_are_connected(SEXP graph, SEXP pv1, SEXP pv2) {
   igraph_bool_t res;
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   PROTECT(result=NEW_LOGICAL(1));
   igraph_are_connected(&g, v1, v2, &res);
   LOGICAL(result)[0]=res;
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4188,14 +3945,10 @@ SEXP R_igraph_graph_adjacency(SEXP adjmatrix, SEXP pmode) {
   igraph_integer_t mode=REAL(pmode)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_matrix(adjmatrix, &adjm);
   igraph_adjacency(&g, &adjm, mode);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4210,14 +3963,10 @@ SEXP R_igraph_weighted_adjacency(SEXP adjmatrix, SEXP pmode,
   SEXP result;
   const char *attr=CHAR(STRING_ELT(pattr, 0));
   
-  R_igraph_before();
-  
   R_SEXP_to_matrix(adjmatrix, &adjm);
   igraph_weighted_adjacency(&g, &adjm, mode, attr);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4232,15 +3981,11 @@ SEXP R_igraph_average_path_length(SEXP graph, SEXP pdirected,
   igraph_real_t res;
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_average_path_length(&g, &res, directed, unconnected);
   
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4254,13 +3999,9 @@ SEXP R_igraph_star(SEXP pn, SEXP pmode, SEXP pcenter) {
   igraph_integer_t center=REAL(pcenter)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   igraph_star(&g, n, mode, center);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4275,13 +4016,9 @@ SEXP R_igraph_ring(SEXP pn, SEXP pdirected, SEXP pmutual, SEXP pcircular) {
   igraph_bool_t circular=LOGICAL(pcircular)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   igraph_ring(&g, n, directed, mutual, circular);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4295,13 +4032,9 @@ SEXP R_igraph_tree(SEXP pn, SEXP pchildren, SEXP pmode) {
   igraph_integer_t mode=REAL(pmode)[0];
   SEXP result;
 
-  R_igraph_before();
-  
   igraph_tree(&g, n, children, mode);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4314,8 +4047,6 @@ SEXP R_igraph_subgraph(SEXP graph, SEXP pvids) {
   igraph_vs_t vs;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs(pvids, &g, &vs);
   igraph_subgraph(&g, &sub, vs);
@@ -4323,8 +4054,6 @@ SEXP R_igraph_subgraph(SEXP graph, SEXP pvids) {
   igraph_destroy(&sub);
   igraph_vs_destroy(&vs);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -4335,15 +4064,11 @@ SEXP R_igraph_layout_random(SEXP graph) {
   igraph_matrix_t res;
   SEXP result=R_NilValue;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&res, 0, 0);
   igraph_layout_random(&g, &res);
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4355,15 +4080,11 @@ SEXP R_igraph_layout_circle(SEXP graph) {
   igraph_matrix_t res;
   SEXP result=R_NilValue;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&res, 0, 0);
   igraph_layout_circle(&g, &res);
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4380,13 +4101,9 @@ SEXP R_igraph_erdos_renyi_game(SEXP pn, SEXP ptype,
   igraph_bool_t loops=LOGICAL(ploops)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   igraph_erdos_renyi_game(&g, type, n, porm, directed, loops);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4400,13 +4117,9 @@ SEXP R_igraph_full(SEXP pn, SEXP pdirected, SEXP ploops) {
   igraph_bool_t loops=LOGICAL(ploops)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   igraph_full(&g, n, directed, loops);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4420,16 +4133,12 @@ SEXP R_igraph_random_sample(SEXP plow, SEXP phigh, SEXP plength) {
   igraph_integer_t length=REAL(plength)[0];
   SEXP result;
 
-  R_igraph_before();
-  
   igraph_vector_init(&res, 0);
   igraph_random_sample(&res, low, high, length);
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -4441,16 +4150,12 @@ SEXP R_igraph_get_edgelist(SEXP graph, SEXP pbycol) {
   igraph_bool_t bycol=LOGICAL(pbycol)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_init(&res, 0);
   igraph_get_edgelist(&g, &res, bycol);
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4463,15 +4168,11 @@ SEXP R_igraph_get_adjacency(SEXP graph, SEXP ptype) {
   igraph_integer_t type=REAL(ptype)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&res, 0, 0);
   igraph_get_adjacency(&g, &res, type);
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4481,8 +4182,7 @@ SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP pniter,
 					  SEXP pmaxdelta, SEXP parea,
 					  SEXP pcoolexp, SEXP prepulserad,
 					  SEXP pweights, SEXP start,
-					  SEXP pminy, SEXP pmaxy,
-					  SEXP verbose) {
+					  SEXP pminy, SEXP pmaxy) {
   igraph_t g;
   igraph_integer_t niter=REAL(pniter)[0];
   igraph_real_t maxdelta=REAL(pmaxdelta)[0];
@@ -4493,8 +4193,6 @@ SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP pniter,
   igraph_matrix_t res;
   igraph_vector_t miny, maxy, *ppminy=0, *ppmaxy=0;
   SEXP result;
-  
-  R_igraph_before2(verbose, "3D FR layout");
   
   R_SEXP_to_igraph(graph, &g);
   if (!isNull(pweights)) { R_SEXP_to_vector(pweights, &weights);ppweights=&weights; }
@@ -4511,8 +4209,6 @@ SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP pniter,
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   
-  R_igraph_after2(verbose);
-  
   UNPROTECT(1);
   return result;
 }
@@ -4520,8 +4216,7 @@ SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP pniter,
 SEXP R_igraph_layout_fruchterman_reingold_3d(SEXP graph, SEXP pniter, 
 					     SEXP pmaxdelta, SEXP parea,
 					     SEXP pcoolexp, SEXP prepulserad,
-					     SEXP pweights,
-					     SEXP verbose) {
+					     SEXP pweights) {
   igraph_t g;
   igraph_integer_t niter=REAL(pniter)[0];
   igraph_real_t maxdelta=REAL(pmaxdelta)[0];
@@ -4532,8 +4227,6 @@ SEXP R_igraph_layout_fruchterman_reingold_3d(SEXP graph, SEXP pniter,
   igraph_matrix_t res;
   SEXP result;
   
-  R_igraph_before2(verbose, "3D FR layout");
-  
   R_SEXP_to_igraph(graph, &g);
   if (!isNull(pweights)) { R_SEXP_to_vector(pweights, &weights);ppweights=&weights; }
   igraph_matrix_init(&res, 0, 0);
@@ -4541,8 +4234,6 @@ SEXP R_igraph_layout_fruchterman_reingold_3d(SEXP graph, SEXP pniter,
 					coolexp, repulserad, 0, ppweights);
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
-  
-  R_igraph_after2(verbose);
   
   UNPROTECT(1);
   return result;
@@ -4556,15 +4247,11 @@ SEXP R_igraph_degree_sequence_game(SEXP pout_seq, SEXP pin_seq,
   igraph_integer_t method=REAL(pmethod)[0];
   SEXP result;
 
-  R_igraph_before();
-
   R_SEXP_to_vector(pout_seq, &outseq);
   R_SEXP_to_vector(pin_seq, &inseq);
   igraph_degree_sequence_game(&g, &outseq, &inseq, method);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4577,14 +4264,10 @@ SEXP R_igraph_transitivity_undirected(SEXP graph, SEXP pisolates) {
   SEXP result;
   igraph_transitivity_mode_t isolates=REAL(pisolates)[0];
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_transitivity_undirected(&g, &res, isolates);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4597,14 +4280,10 @@ SEXP R_igraph_transitivity_avglocal_undirected(SEXP graph, SEXP pisolates) {
   SEXP result;
   igraph_transitivity_mode_t isolates=REAL(pisolates)[0];
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_transitivity_avglocal_undirected(&g, &res, isolates);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4619,8 +4298,6 @@ SEXP R_igraph_transitivity_local_undirected(SEXP graph, SEXP pvids,
   SEXP result;
   igraph_transitivity_mode_t isolates=REAL(pisolates)[0];
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs(pvids, &g, &vs);
   igraph_vector_init(&res, 0);
@@ -4630,8 +4307,6 @@ SEXP R_igraph_transitivity_local_undirected(SEXP graph, SEXP pvids,
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
   igraph_vs_destroy(&vs);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4647,8 +4322,6 @@ SEXP R_igraph_transitivity_barrat(SEXP graph, SEXP pvids,
   SEXP result;
   igraph_transitivity_mode_t isolates=REAL(pisolates)[0];
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs(pvids, &g, &vs);
   R_SEXP_to_vector(pweights, &weights);
@@ -4659,8 +4332,6 @@ SEXP R_igraph_transitivity_barrat(SEXP graph, SEXP pvids,
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
   igraph_vs_destroy(&vs);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4673,8 +4344,6 @@ SEXP R_igraph_transitivity_local_undirected_all(SEXP graph, SEXP pisolates) {
   SEXP result;
   igraph_transitivity_mode_t isolates=REAL(pisolates)[0];
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_init(&res, 0);
   igraph_transitivity_local_undirected(&g, &res, igraph_vss_all(), 
@@ -4683,8 +4352,6 @@ SEXP R_igraph_transitivity_local_undirected_all(SEXP graph, SEXP pisolates) {
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -4696,8 +4363,6 @@ SEXP R_igraph_read_graph_edgelist(SEXP pvfile, SEXP pn, SEXP pdirected) {
   igraph_bool_t directed=LOGICAL(pdirected)[0];
   FILE *file;
   SEXP result;
-  
-  R_igraph_before();
   
 #if HAVE_FMEMOPEN == 1
   file=fmemopen(RAW(pvfile), GET_LENGTH(pvfile), "r");
@@ -4711,8 +4376,6 @@ SEXP R_igraph_read_graph_edgelist(SEXP pvfile, SEXP pn, SEXP pdirected) {
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;  
 }
@@ -4722,8 +4385,6 @@ SEXP R_igraph_read_graph_gml(SEXP pvfile) {
   igraph_t g;
   FILE *file;
   SEXP result;
-  
-  R_igraph_before();
   
 #if HAVE_FMEMOPEN == 1
   file=fmemopen(RAW(pvfile), GET_LENGTH(pvfile), "r");
@@ -4737,8 +4398,6 @@ SEXP R_igraph_read_graph_gml(SEXP pvfile) {
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;  
 }
@@ -4749,8 +4408,6 @@ SEXP R_igraph_read_graph_dl(SEXP pvfile, SEXP pdirected) {
   FILE *file;
   SEXP result;
   igraph_bool_t directed=LOGICAL(pdirected)[0];
-  
-  R_igraph_before();
   
 #if HAVE_FMEMOPEN == 1
   file=fmemopen(RAW(pvfile), GET_LENGTH(pvfile), "r");
@@ -4764,8 +4421,6 @@ SEXP R_igraph_read_graph_dl(SEXP pvfile, SEXP pdirected) {
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;  
 }
@@ -4775,8 +4430,6 @@ SEXP R_igraph_read_graph_graphdb(SEXP pvfile, SEXP pdirected) {
   igraph_bool_t directed=LOGICAL(pdirected)[0];
   FILE *file;
   SEXP result;
-  
-  R_igraph_before();
   
 #if HAVE_FMEMOPEN == 1
   file=fmemopen(RAW(pvfile), GET_LENGTH(pvfile), "rb");
@@ -4790,8 +4443,6 @@ SEXP R_igraph_read_graph_graphdb(SEXP pvfile, SEXP pdirected) {
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -4802,8 +4453,6 @@ SEXP R_igraph_write_graph_edgelist(SEXP graph, SEXP file) {
   char *bp;
   size_t size;
   SEXP result;
-  
-  R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
 #if HAVE_OPEN_MEMSTREAM == 1
@@ -4823,8 +4472,6 @@ SEXP R_igraph_write_graph_edgelist(SEXP graph, SEXP file) {
   PROTECT(result=NEW_NUMERIC(0));
 #endif
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -4837,8 +4484,6 @@ SEXP R_igraph_write_graph_gml(SEXP graph, SEXP file, SEXP pid, SEXP pcreator) {
   igraph_vector_t id, *ppid=0;
   const char *creator=0;
   SEXP result;
-  
-  R_igraph_before();
   
   if (!isNull(pid)) { R_SEXP_to_vector(pid, &id); ppid=&id; }
   if (!isNull(pcreator)) { creator=CHAR(STRING_ELT(pcreator, 0)); } 
@@ -4860,8 +4505,6 @@ SEXP R_igraph_write_graph_gml(SEXP graph, SEXP file, SEXP pid, SEXP pcreator) {
   PROTECT(result=NEW_NUMERIC(0));
 #endif
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -4872,8 +4515,6 @@ SEXP R_igraph_write_graph_dot(SEXP graph, SEXP file) {
   char *bp;
   size_t size;
   SEXP result;
-  
-  R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
 #if HAVE_OPEN_MEMSTREAM == 1
@@ -4893,8 +4534,6 @@ SEXP R_igraph_write_graph_dot(SEXP graph, SEXP file) {
   PROTECT(result=NEW_NUMERIC(0));
 #endif
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -4906,8 +4545,6 @@ SEXP R_igraph_write_graph_pajek(SEXP graph, SEXP file) {
   char *bp;
   size_t size;
   SEXP result;
-  
-  R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
 #if HAVE_OPEN_MEMSTREAM == 1
@@ -4927,8 +4564,6 @@ SEXP R_igraph_write_graph_pajek(SEXP graph, SEXP file) {
   PROTECT(result=NEW_NUMERIC(0));
 #endif
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -4943,8 +4578,6 @@ SEXP R_igraph_read_graph_ncol(SEXP pvfile, SEXP ppredef,
   FILE *file;
   igraph_strvector_t predef, *predefptr=0;  
   SEXP result;
-  
-  R_igraph_before();
   
 #if HAVE_FMEMOPEN == 1
   file=fmemopen(RAW(pvfile), GET_LENGTH(pvfile), "r");
@@ -4962,8 +4595,6 @@ SEXP R_igraph_read_graph_ncol(SEXP pvfile, SEXP ppredef,
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;  
 }
@@ -4977,8 +4608,6 @@ SEXP R_igraph_write_graph_ncol(SEXP graph, SEXP file, SEXP pnames,
   const char *names, *weights;
   SEXP result;
 
-  R_igraph_before();
-  
   if (isNull(pnames)) {
     names=0; 
   } else {
@@ -5008,8 +4637,6 @@ SEXP R_igraph_write_graph_ncol(SEXP graph, SEXP file, SEXP pnames,
   PROTECT(result=NEW_NUMERIC(0));
 #endif
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -5022,8 +4649,6 @@ SEXP R_igraph_read_graph_lgl(SEXP pvfile, SEXP pnames, SEXP pweights, SEXP pdire
   FILE *file;
   SEXP result;
   
-  R_igraph_before();
-  
 #if HAVE_FMEMOPEN == 1
   file=fmemopen(RAW(pvfile), GET_LENGTH(pvfile), "r");
 #else 
@@ -5035,8 +4660,6 @@ SEXP R_igraph_read_graph_lgl(SEXP pvfile, SEXP pnames, SEXP pweights, SEXP pdire
   fclose(file);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;  
@@ -5052,8 +4675,6 @@ SEXP R_igraph_write_graph_lgl(SEXP graph, SEXP file, SEXP pnames,
   igraph_bool_t isolates=LOGICAL(pisolates)[0];
   SEXP result;
 
-  R_igraph_before();
-  
   if (isNull(pnames)) {
     names=0; 
   } else {
@@ -5081,8 +4702,6 @@ SEXP R_igraph_write_graph_lgl(SEXP graph, SEXP file, SEXP pnames,
   PROTECT(result=NEW_NUMERIC(0));
 #endif
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -5091,8 +4710,6 @@ SEXP R_igraph_read_graph_pajek(SEXP pvfile) {
   igraph_t g;
   FILE *file;  
   SEXP result;
-  
-  R_igraph_before();
   
 #if HAVE_FMEMOPEN == 1
   file=fmemopen(RAW(pvfile), GET_LENGTH(pvfile), "r");
@@ -5105,8 +4722,6 @@ SEXP R_igraph_read_graph_pajek(SEXP pvfile) {
   fclose(file);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -5123,8 +4738,6 @@ SEXP R_igraph_decompose(SEXP graph, SEXP pmode, SEXP pmaxcompno,
   SEXP result;
   long int i;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_ptr_init(&comps, 0);
   IGRAPH_FINALLY(igraph_vector_ptr_destroy, &comps);
@@ -5138,8 +4751,6 @@ SEXP R_igraph_decompose(SEXP graph, SEXP pmode, SEXP pmaxcompno,
   igraph_vector_ptr_destroy(&comps);
   IGRAPH_FINALLY_CLEAN(1);
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;  
 }
@@ -5150,14 +4761,10 @@ SEXP R_igraph_atlas(SEXP pno) {
   igraph_t g;
   SEXP result;
   
-  R_igraph_before();
-
   igraph_atlas(&g, no);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -5168,16 +4775,12 @@ SEXP R_igraph_layout_random_3d(SEXP graph) {
   igraph_matrix_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&res, 0, 0);
   igraph_layout_random_3d(&g, &res);
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);  
   
-  R_igraph_after();
-
   UNPROTECT(1);
   return result;
 }
@@ -5188,15 +4791,11 @@ SEXP R_igraph_layout_sphere(SEXP graph) {
   igraph_matrix_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&res, 0, 0);
   igraph_layout_sphere(&g, &res);
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -5215,16 +4814,12 @@ SEXP R_igraph_callaway_traits_game(SEXP pnodes, SEXP ptypes,
   igraph_bool_t directed=LOGICAL(pdirected)[0];
   SEXP result; 
 
-  R_igraph_before();
-  
   R_SEXP_to_vector(ptype_dist, &type_dist);
   R_SEXP_to_matrix(pmatrix, &matrix);
   igraph_callaway_traits_game(&g, nodes, types, epers, &type_dist,
 			      &matrix, directed);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -5242,16 +4837,12 @@ SEXP R_igraph_establishment_game(SEXP pnodes, SEXP ptypes, SEXP pk,
   igraph_bool_t directed=LOGICAL(pdirected)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_vector(ptype_dist, &type_dist);
   R_SEXP_to_matrix(pmatrix, &matrix);
   igraph_establishment_game(&g, nodes, types, k, &type_dist, &matrix,
 			    directed);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -5264,8 +4855,6 @@ SEXP R_igraph_motifs_randesu(SEXP graph, SEXP psize, SEXP pcutprob) {
   igraph_vector_t res;
   SEXP result;
 
-  R_igraph_before();
-
   R_SEXP_to_vector(pcutprob, &cutprob);
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_init(&res, 0);
@@ -5274,8 +4863,6 @@ SEXP R_igraph_motifs_randesu(SEXP graph, SEXP psize, SEXP pcutprob) {
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -5287,16 +4874,12 @@ SEXP R_igraph_motifs_randesu_no(SEXP graph, SEXP psize, SEXP pcutprob) {
   igraph_integer_t res;
   SEXP result;
 
-  R_igraph_before();
-
   R_SEXP_to_vector(pcutprob, &cutprob);
   R_SEXP_to_igraph(graph, &g);
   igraph_motifs_randesu_no(&g, &res, size, &cutprob);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -5312,8 +4895,6 @@ SEXP R_igraph_motifs_randesu_estimate(SEXP graph, SEXP psize, SEXP pcutprob,
   igraph_integer_t res;
   SEXP result;
   
-  R_igraph_before();
-
   R_SEXP_to_vector(pcutprob, &cutprob);
   if (GET_LENGTH(psample) != 0) {
     R_SEXP_to_vector(psample, &sample);
@@ -5325,13 +4906,11 @@ SEXP R_igraph_motifs_randesu_estimate(SEXP graph, SEXP psize, SEXP pcutprob,
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
 
-SEXP R_igraph_layout_merge_dla(SEXP graphs, SEXP layouts, SEXP verbose) {
+SEXP R_igraph_layout_merge_dla(SEXP graphs, SEXP layouts) {
 
   igraph_vector_ptr_t graphvec;
   igraph_vector_ptr_t ptrvec;
@@ -5340,8 +4919,6 @@ SEXP R_igraph_layout_merge_dla(SEXP graphs, SEXP layouts, SEXP verbose) {
   igraph_matrix_t res;
   long int i;
   SEXP result;
-  
-  R_igraph_before2(verbose, "Merge layouts");
   
   igraph_vector_ptr_init(&graphvec, GET_LENGTH(graphs));
   igraph_vector_ptr_init(&ptrvec, GET_LENGTH(layouts));
@@ -5363,8 +4940,6 @@ SEXP R_igraph_layout_merge_dla(SEXP graphs, SEXP layouts, SEXP verbose) {
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   
-  R_igraph_after2(verbose);
-  
   UNPROTECT(1);
   return result;
 }
@@ -5377,8 +4952,6 @@ SEXP R_igraph_disjoint_union(SEXP pgraphs) {
   long int i;
   SEXP result;
 
-  R_igraph_before();
-  
   igraph_vector_ptr_init(&ptrvec, GET_LENGTH(pgraphs));
   graphs=(igraph_t *)R_alloc(GET_LENGTH(pgraphs),
 			     sizeof(igraph_t));
@@ -5390,8 +4963,6 @@ SEXP R_igraph_disjoint_union(SEXP pgraphs) {
   igraph_vector_ptr_destroy(&ptrvec);
   PROTECT(result=R_igraph_to_SEXP(&res));
   igraph_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -5405,8 +4976,6 @@ SEXP R_igraph_union(SEXP pgraphs) {
   long int i;
   SEXP result;
 
-  R_igraph_before();
-  
   igraph_vector_ptr_init(&ptrvec, GET_LENGTH(pgraphs));
   graphs=(igraph_t *)R_alloc(GET_LENGTH(pgraphs),
 			     sizeof(igraph_t));
@@ -5418,8 +4987,6 @@ SEXP R_igraph_union(SEXP pgraphs) {
   igraph_vector_ptr_destroy(&ptrvec);
   PROTECT(result=R_igraph_to_SEXP(&res));
   igraph_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -5433,8 +5000,6 @@ SEXP R_igraph_intersection(SEXP pgraphs) {
   long int i;
   SEXP result;
   
-  R_igraph_before();
-  
   igraph_vector_ptr_init(&ptrvec, GET_LENGTH(pgraphs));
   graphs=(igraph_t *)R_alloc(GET_LENGTH(pgraphs),
 			     sizeof(igraph_t));
@@ -5447,8 +5012,6 @@ SEXP R_igraph_intersection(SEXP pgraphs) {
   PROTECT(result=R_igraph_to_SEXP(&res));
   igraph_destroy(&res);
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -5459,15 +5022,11 @@ SEXP R_igraph_difference(SEXP pleft, SEXP pright) {
   igraph_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(pleft, &left);
   R_SEXP_to_igraph(pright, &right);
   igraph_difference(&res, &left, &right);
   PROTECT(result=R_igraph_to_SEXP(&res));
   igraph_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -5480,14 +5039,10 @@ SEXP R_igraph_complementer(SEXP pgraph, SEXP ploops) {
   igraph_bool_t loops=LOGICAL(ploops)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(pgraph, &g);
   igraph_complementer(&res, &g, loops);
   PROTECT(result=R_igraph_to_SEXP(&res));
   igraph_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -5499,15 +5054,11 @@ SEXP R_igraph_compose(SEXP pleft, SEXP pright) {
   igraph_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(pleft, &left);
   R_SEXP_to_igraph(pright, &right);
   igraph_compose(&res, &left, &right);
   PROTECT(result=R_igraph_to_SEXP(&res));
   igraph_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -5534,8 +5085,6 @@ SEXP R_igraph_barabasi_aging_game(SEXP pn, SEXP ppa_exp, SEXP paging_exp,
   igraph_real_t age_coef=REAL(page_coef)[0];  
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_vector(pout_seq, &out_seq);  
   
   igraph_barabasi_aging_game(&g, n, m, &out_seq, out_pref, pa_exp, aging_exp,
@@ -5543,8 +5092,6 @@ SEXP R_igraph_barabasi_aging_game(SEXP pn, SEXP ppa_exp, SEXP paging_exp,
 			     deg_coef, age_coef, directed);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -5568,8 +5115,6 @@ SEXP R_igraph_recent_degree_aging_game(SEXP pn, SEXP ppa_exp, SEXP paging_exp,
   igraph_real_t zero_appeal=REAL(pzero_appeal)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_vector(pout_seq, &out_seq);  
   
   igraph_recent_degree_aging_game(&g, n, m, &out_seq, out_pref, pa_exp, 
@@ -5577,8 +5122,6 @@ SEXP R_igraph_recent_degree_aging_game(SEXP pn, SEXP ppa_exp, SEXP paging_exp,
 				  zero_appeal, directed);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -5591,16 +5134,12 @@ SEXP R_igraph_get_edge(SEXP graph, SEXP peid) {
   igraph_integer_t from, to;
   SEXP result;
   
-  R_igraph_before();
-
   R_SEXP_to_igraph(graph, &g);  
   igraph_edge(&g, eid, &from, &to);
   PROTECT(result=NEW_NUMERIC(2));
   REAL(result)[0]=from;
   REAL(result)[1]=to;
   
-  R_igraph_after();
-
   UNPROTECT(1);
   return result;
 }
@@ -5611,8 +5150,6 @@ SEXP R_igraph_edges(SEXP graph, SEXP eids) {
   igraph_vector_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_es(eids, &g, &es);
   igraph_vector_init(&res, 0);
@@ -5622,8 +5159,6 @@ SEXP R_igraph_edges(SEXP graph, SEXP eids) {
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
   igraph_es_destroy(&es);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -5637,8 +5172,6 @@ SEXP R_igraph_constraint(SEXP graph, SEXP vids, SEXP pweights) {
   igraph_vector_t res;
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs(vids, &g, &vs);
   if (GET_LENGTH(pweights) != 0) {
@@ -5653,8 +5186,6 @@ SEXP R_igraph_constraint(SEXP graph, SEXP vids, SEXP pweights) {
   igraph_vector_destroy(&res);
   igraph_vs_destroy(&vs);
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -5668,8 +5199,6 @@ SEXP R_igraph_es_path(SEXP graph, SEXP pp, SEXP pdir) {
   igraph_vector_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pp, &p);
   igraph_es_path(&es, &p, dir);
@@ -5679,8 +5208,6 @@ SEXP R_igraph_es_path(SEXP graph, SEXP pp, SEXP pdir) {
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
   igraph_es_destroy(&es);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -5695,8 +5222,6 @@ SEXP R_igraph_es_pairs(SEXP graph, SEXP pp, SEXP pdir) {
   igraph_vector_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pp, &p);
   igraph_es_pairs(&es, &p, dir);
@@ -5706,8 +5231,6 @@ SEXP R_igraph_es_pairs(SEXP graph, SEXP pp, SEXP pdir) {
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
   igraph_es_destroy(&es);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -5720,14 +5243,10 @@ SEXP R_igraph_reciprocity(SEXP graph, SEXP pignore_loops) {
   igraph_real_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_reciprocity(&g, &res, ignore_loops);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -5744,8 +5263,6 @@ SEXP R_igraph_layout_reingold_tilford(SEXP graph, SEXP proot,
   igraph_vector_t rootlevel;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(proot, &root);
   R_SEXP_to_vector(prootlevel, &rootlevel);
@@ -5758,8 +5275,6 @@ SEXP R_igraph_layout_reingold_tilford(SEXP graph, SEXP proot,
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -5771,14 +5286,10 @@ SEXP R_igraph_rewire(SEXP graph, SEXP pn, SEXP pmode) {
   igraph_rewiring_t mode=REAL(pmode)[0];
   SEXP result;
   
-  R_igraph_before();
-
   R_SEXP_to_igraph_copy(graph, &g);
   igraph_rewire(&g, n, mode);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -5790,14 +5301,10 @@ SEXP R_igraph_to_directed(SEXP graph, SEXP pmode) {
   igraph_integer_t mode=REAL(pmode)[0];
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_igraph_copy(graph, &g);
   igraph_to_directed(&g, mode);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -5809,8 +5316,6 @@ SEXP R_igraph_read_graph_graphml(SEXP pvfile, SEXP pindex) {
   FILE *file;
   SEXP result;
 
-  R_igraph_before();
-  
 #if HAVE_FMEMOPEN == 1
   file=fmemopen(RAW(pvfile), GET_LENGTH(pvfile), "r");
 #else
@@ -5822,8 +5327,6 @@ SEXP R_igraph_read_graph_graphml(SEXP pvfile, SEXP pindex) {
   fclose(file);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -5837,8 +5340,6 @@ SEXP R_igraph_write_graph_graphml(SEXP graph, SEXP file) {
   size_t size;
   SEXP result;
   
-  R_igraph_before();
-
   R_SEXP_to_igraph(graph, &g);
 #if HAVE_OPEN_MEMSTREAM == 1
   stream=open_memstream(&bp, &size);
@@ -5857,8 +5358,6 @@ SEXP R_igraph_write_graph_graphml(SEXP graph, SEXP file) {
   PROTECT(result=NEW_NUMERIC(0));
 #endif
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -5874,8 +5373,6 @@ SEXP R_igraph_vs_nei(SEXP graph, SEXP px, SEXP pv, SEXP pmode) {
   igraph_vector_t neis;
   long int i;
   
-  R_igraph_before();
-
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs(pv, &g, &v);
 
@@ -5897,8 +5394,6 @@ SEXP R_igraph_vs_nei(SEXP graph, SEXP px, SEXP pv, SEXP pmode) {
   igraph_vector_destroy(&neis);
   igraph_vs_destroy(&v);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -5912,8 +5407,6 @@ SEXP R_igraph_vs_adj(SEXP graph, SEXP px, SEXP pe, SEXP pmode) {
 
   igraph_integer_t from, to;
   igraph_eit_t ee;
-
-  R_igraph_before();
 
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_es(pe, &g, &e);
@@ -5936,8 +5429,6 @@ SEXP R_igraph_vs_adj(SEXP graph, SEXP px, SEXP pe, SEXP pmode) {
   igraph_eit_destroy(&ee);
   igraph_es_destroy(&e);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -5953,8 +5444,6 @@ SEXP R_igraph_es_adj(SEXP graph, SEXP x, SEXP pv, SEXP pmode) {
   igraph_vit_t vv;
   long int i;
 
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs(pv, &g, &v);
   
@@ -5976,8 +5465,6 @@ SEXP R_igraph_es_adj(SEXP graph, SEXP x, SEXP pv, SEXP pmode) {
   igraph_vit_destroy(&vv);
   igraph_vs_destroy(&v);
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -5993,8 +5480,6 @@ SEXP R_igraph_grg_game(SEXP pn, SEXP pradius, SEXP ptorus,
   igraph_vector_t x, y, *px=0, *py=0;
   SEXP result, names;
 
-  R_igraph_before();
-  
   if (coords) {
     igraph_vector_init(&x, 0);  px=&x;
     igraph_vector_init(&y, 0);  py=&y;
@@ -6008,8 +5493,6 @@ SEXP R_igraph_grg_game(SEXP pn, SEXP pradius, SEXP ptorus,
   SET_VECTOR_ELT(result, 2, R_igraph_0orvector_to_SEXP(py));
   if (coords) { igraph_vector_destroy(py); }
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -6021,15 +5504,11 @@ SEXP R_igraph_density(SEXP graph, SEXP ploops) {
   igraph_real_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_density(&g, &res, loops);
   
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -6045,8 +5524,6 @@ SEXP R_igraph_read_graph_dimacs(SEXP pvfile, SEXP pdirected) {
   igraph_integer_t source, target;
   igraph_vector_t cap;
   SEXP result;
-  
-  R_igraph_before();
   
 #if HAVE_FMEMOPEN == 1
   file=fmemopen(RAW(pvfile), GET_LENGTH(pvfile), "r");
@@ -6089,8 +5566,6 @@ SEXP R_igraph_read_graph_dimacs(SEXP pvfile, SEXP pdirected) {
 		 IGRAPH_PARSEERROR);
   }
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -6107,8 +5582,6 @@ SEXP R_igraph_write_graph_dimacs(SEXP graph, SEXP file,
   igraph_integer_t target=REAL(ptarget)[0];
   igraph_vector_t cap;
   SEXP result;
-  
-  R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcap, &cap);
@@ -6130,8 +5603,6 @@ SEXP R_igraph_write_graph_dimacs(SEXP graph, SEXP file,
   PROTECT(result=NEW_NUMERIC(0));
 #endif
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -6145,8 +5616,6 @@ SEXP R_igraph_mincut(SEXP graph, SEXP pcapacity) {
   igraph_vector_t partition2;
   igraph_vector_t cut;
   SEXP result, names;
-  
-  R_igraph_before();
   
   igraph_vector_init(&cut, 0);
   igraph_vector_init(&partition, 0);
@@ -6177,8 +5646,6 @@ SEXP R_igraph_mincut(SEXP graph, SEXP pcapacity) {
   SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("partition2"));
   SET_NAMES(result, names);
 
-  R_igraph_after();
-
   UNPROTECT(2);
   return result;
 }  
@@ -6189,8 +5656,6 @@ SEXP R_igraph_mincut_value(SEXP graph, SEXP pcapacity) {
   igraph_vector_t capacity, *ppcapacity=0;
   igraph_integer_t res;
   SEXP result;
-  
-  R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   if (!isNull(pcapacity)) {
@@ -6214,16 +5679,12 @@ SEXP R_igraph_st_vertex_connectivity(SEXP graph, SEXP psource,
   igraph_integer_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_st_vertex_connectivity(&g, &res, source, target, 
 				IGRAPH_VCONN_NEI_ERROR);
   
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -6235,8 +5696,6 @@ SEXP R_igraph_vertex_connectivity(SEXP graph, SEXP pchecks) {
   igraph_integer_t res;
   igraph_bool_t checks=LOGICAL(pchecks)[0];
   SEXP result;
-  
-  R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   igraph_vertex_connectivity(&g, &res, checks);
@@ -6255,15 +5714,11 @@ SEXP R_igraph_st_edge_connectivity(SEXP graph, SEXP psource, SEXP ptarget) {
   igraph_real_t value;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_st_edge_connectivity(&g, &value, source, target);
   
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=value;
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -6275,8 +5730,6 @@ SEXP R_igraph_edge_connectivity(SEXP graph, SEXP pchecks) {
   igraph_integer_t res;
   igraph_bool_t checks=LOGICAL(pchecks)[0];
   SEXP result;
-  
-  R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   igraph_edge_connectivity(&g, &res, checks);
@@ -6297,8 +5750,6 @@ SEXP R_igraph_st_mincut_value(SEXP graph, SEXP psource, SEXP ptarget,
   igraph_real_t res;
   SEXP result;
 
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   if (!isNull(pcapacity)) {
     R_SEXP_to_vector(pcapacity, &capacity);
@@ -6307,8 +5758,6 @@ SEXP R_igraph_st_mincut_value(SEXP graph, SEXP psource, SEXP ptarget,
   igraph_st_mincut_value(&g, &res, source, target, ppcapacity);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -6322,15 +5771,11 @@ SEXP R_igraph_edge_disjoint_paths(SEXP graph, SEXP psource, SEXP ptarget) {
   igraph_integer_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_edge_disjoint_paths(&g, &res, source, target);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -6343,15 +5788,11 @@ SEXP R_igraph_vertex_disjoint_paths(SEXP graph, SEXP psource, SEXP ptarget) {
   igraph_integer_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_vertex_disjoint_paths(&g, &res, source, target);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
 
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -6363,14 +5804,10 @@ SEXP R_igraph_adhesion(SEXP graph, SEXP pchecks) {
   igraph_bool_t checks=LOGICAL(pchecks)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_adhesion(&g, &res, checks);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -6383,14 +5820,10 @@ SEXP R_igraph_cohesion(SEXP graph, SEXP pchecks) {
   igraph_bool_t checks=LOGICAL(pchecks)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_cohesion(&g, &res, checks);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -6419,8 +5852,6 @@ SEXP R_igraph_spinglass_community(SEXP graph, SEXP weights,
   igraph_vector_t csize;
   SEXP result, names;
 
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   if (!isNull(weights)) { 
     pweights=&v_weights; R_SEXP_to_vector(weights, &v_weights);
@@ -6453,8 +5884,6 @@ SEXP R_igraph_spinglass_community(SEXP graph, SEXP weights,
   igraph_vector_destroy(&membership);
   igraph_vector_destroy(&csize);
   
-  R_igraph_after();
-  
   UNPROTECT(2);
   return result;
 }
@@ -6476,8 +5905,6 @@ SEXP R_igraph_spinglass_my_community(SEXP graph, SEXP weights,
 	
   SEXP result, names;
 
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   if (!isNull(weights)) { 
     pweights=&v_weights; R_SEXP_to_vector(weights, &v_weights);
@@ -6508,8 +5935,6 @@ SEXP R_igraph_spinglass_my_community(SEXP graph, SEXP weights,
   
   igraph_vector_destroy(&community);
   
-  R_igraph_after();
-  
   UNPROTECT(2);
   return result;
 }
@@ -6521,14 +5946,10 @@ SEXP R_igraph_extended_chordal_ring(SEXP pnodes, SEXP pw) {
   igraph_matrix_t w;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_matrix(pw, &w);
   igraph_extended_chordal_ring(&g, nodes, &w);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -6541,14 +5962,10 @@ SEXP R_igraph_no_clusters(SEXP graph, SEXP pmode) {
   igraph_integer_t res;
   SEXP result;
 
-  R_igraph_before();
-
   R_SEXP_to_igraph(graph, &g);
   igraph_clusters(&g, 0, 0, &res, mode);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -6563,8 +5980,6 @@ SEXP R_igraph_neighborhood_size(SEXP graph, SEXP pvids, SEXP porder,
   igraph_vector_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs(pvids, &g, &vids);
   igraph_vector_init(&res, 0);
@@ -6573,8 +5988,6 @@ SEXP R_igraph_neighborhood_size(SEXP graph, SEXP pvids, SEXP porder,
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
   igraph_vs_destroy(&vids);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -6589,8 +6002,6 @@ SEXP R_igraph_neighborhood(SEXP graph, SEXP pvids, SEXP porder,
   igraph_vector_ptr_t res;
   long int i;
   SEXP result;
-  
-  R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs(pvids, &g, &vids);
@@ -6607,8 +6018,6 @@ SEXP R_igraph_neighborhood(SEXP graph, SEXP pvids, SEXP porder,
   igraph_vector_ptr_destroy(&res);
   igraph_vs_destroy(&vids);
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -6623,8 +6032,6 @@ SEXP R_igraph_neighborhood_graphs(SEXP graph, SEXP pvids, SEXP porder,
   long int i;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs(pvids, &g, &vids);
   igraph_vector_ptr_init(&res, 0);
@@ -6638,8 +6045,6 @@ SEXP R_igraph_neighborhood_graphs(SEXP graph, SEXP pvids, SEXP porder,
   }
   igraph_vector_ptr_destroy(&res);
   igraph_vs_destroy(&vids);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -6657,16 +6062,12 @@ SEXP R_igraph_preference_game(SEXP pnodes, SEXP ptypes,
   igraph_bool_t loops=LOGICAL(ploops)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_vector(ptype_dist, &type_dist);
   R_SEXP_to_matrix(pmatrix, &matrix);
   igraph_preference_game(&g, nodes, types, &type_dist, &matrix, 0,
 			 directed, loops);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -6684,16 +6085,12 @@ SEXP R_igraph_asymmetric_preference_game(SEXP pnodes, SEXP ptypes,
   igraph_bool_t loops=LOGICAL(ploops)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_matrix(ptype_dist_matrix, &type_dist_matrix);
   R_SEXP_to_matrix(pmatrix, &matrix);
   igraph_asymmetric_preference_game(&g, nodes, types, &type_dist_matrix,
 				    &matrix, 0, 0, loops);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -6706,14 +6103,10 @@ SEXP R_igraph_connect_neighborhood(SEXP graph, SEXP porder, SEXP pmode) {
   igraph_integer_t mode=REAL(pmode)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph_copy(graph, &g);
   igraph_connect_neighborhood(&g, order, mode);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -6725,14 +6118,10 @@ SEXP R_igraph_rewire_edges(SEXP graph, SEXP pprob) {
   igraph_real_t prob=REAL(pprob)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph_copy(graph, &g);
   igraph_rewire_edges(&g, prob);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -6747,13 +6136,9 @@ SEXP R_igraph_watts_strogatz_game(SEXP pdim, SEXP psize, SEXP pnei, SEXP pp) {
   igraph_real_t p=REAL(pp)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   igraph_watts_strogatz_game(&g, dim, size, nei, p);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -6766,8 +6151,6 @@ SEXP R_igraph_coreness(SEXP graph, SEXP pmode) {
   igraph_vector_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_init(&res, 0);
   igraph_coreness(&g, &res, mode);
@@ -6775,8 +6158,6 @@ SEXP R_igraph_coreness(SEXP graph, SEXP pmode) {
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -6791,8 +6172,6 @@ SEXP R_igraph_cliques(SEXP graph, SEXP pminsize, SEXP pmaxsize) {
   long int i;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_ptr_init(&ptrvec, 0);
   igraph_cliques(&g, &ptrvec, minsize, maxsize);
@@ -6806,8 +6185,6 @@ SEXP R_igraph_cliques(SEXP graph, SEXP pminsize, SEXP pmaxsize) {
   }
   igraph_vector_ptr_destroy(&ptrvec);
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -6818,8 +6195,6 @@ SEXP R_igraph_largest_cliques(SEXP graph) {
   igraph_vector_ptr_t ptrvec;
   long int i;
   SEXP result;
-  
-  R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_ptr_init(&ptrvec,0);
@@ -6834,8 +6209,6 @@ SEXP R_igraph_largest_cliques(SEXP graph) {
   }
   igraph_vector_ptr_destroy(&ptrvec);
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -6848,8 +6221,6 @@ SEXP R_igraph_maximal_cliques(SEXP graph, SEXP pminsize, SEXP pmaxsize) {
   igraph_integer_t minsize=REAL(pminsize)[0];
   igraph_integer_t maxsize=REAL(pmaxsize)[0];
   SEXP result;
-  
-  R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_ptr_init(&ptrvec,0);
@@ -6864,8 +6235,6 @@ SEXP R_igraph_maximal_cliques(SEXP graph, SEXP pminsize, SEXP pmaxsize) {
   }
   igraph_vector_ptr_destroy(&ptrvec);
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -6876,14 +6245,10 @@ SEXP R_igraph_clique_number(SEXP graph) {
   igraph_integer_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_clique_number(&g, &res);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -6898,8 +6263,6 @@ SEXP R_igraph_independent_vertex_sets(SEXP graph,
   long int i;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_ptr_init(&ptrvec, 0);
   igraph_independent_vertex_sets(&g, &ptrvec, minsize, maxsize);
@@ -6913,8 +6276,6 @@ SEXP R_igraph_independent_vertex_sets(SEXP graph,
   }
   igraph_vector_ptr_destroy(&ptrvec);
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -6924,8 +6285,6 @@ SEXP R_igraph_largest_independent_vertex_sets(SEXP graph) {
   igraph_vector_ptr_t ptrvec;
   long int i;
   SEXP result;
-  
-  R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_ptr_init(&ptrvec,0);
@@ -6940,8 +6299,6 @@ SEXP R_igraph_largest_independent_vertex_sets(SEXP graph) {
   }
   igraph_vector_ptr_destroy(&ptrvec);
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -6951,8 +6308,6 @@ SEXP R_igraph_maximal_independent_vertex_sets(SEXP graph) {
   igraph_vector_ptr_t ptrvec;
   long int i;
   SEXP result;
-  
-  R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_ptr_init(&ptrvec,0);
@@ -6967,8 +6322,6 @@ SEXP R_igraph_maximal_independent_vertex_sets(SEXP graph) {
   }
   igraph_vector_ptr_destroy(&ptrvec);
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -6978,14 +6331,10 @@ SEXP R_igraph_independence_number(SEXP graph) {
   igraph_integer_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_independence_number(&g, &res);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -7002,14 +6351,10 @@ SEXP R_igraph_lastcit_game(SEXP pnodes, SEXP pedges, SEXP pagebins,
   igraph_bool_t directed=LOGICAL(pdirected)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_vector(ppreference, &preference);
   igraph_lastcit_game(&g, nodes, edges, agebins, &preference, directed);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -7024,15 +6369,11 @@ SEXP R_igraph_cited_type_game(SEXP pnodes, SEXP pedges, SEXP ptypes,
   igraph_bool_t directed=LOGICAL(pdirected)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_vector(ptypes, &types);
   R_SEXP_to_vector(ppref, &pref);
   igraph_cited_type_game(&g, nodes, &types, &pref, edges, directed);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -7049,15 +6390,11 @@ SEXP R_igraph_citing_cited_type_game(SEXP pnodes, SEXP ptypes, SEXP ppref,
   igraph_bool_t directed=LOGICAL(pdirected)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_vector(ptypes, &types);
   R_SEXP_to_matrix(ppref, &pref);
   igraph_citing_cited_type_game(&g, nodes, &types, &pref, edges, directed);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -7073,8 +6410,6 @@ SEXP R_igraph_walktrap_community(SEXP graph, SEXP pweights,
   igraph_vector_t modularity, *ppmodularity=0;
   igraph_vector_t membership, *ppmembership=0;
   SEXP result, names;
-  
-  R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   if (!isNull(pweights)) {
@@ -7110,8 +6445,6 @@ SEXP R_igraph_walktrap_community(SEXP graph, SEXP pweights,
   SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("membership"));
   SET_NAMES(result, names);
   
-  R_igraph_after();
-  
   UNPROTECT(2);
   return result;
 } 
@@ -7122,16 +6455,12 @@ SEXP R_igraph_topological_sorting(SEXP graph, SEXP pneimode) {
   igraph_integer_t mode=REAL(pneimode)[0];
   SEXP result;  
 
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_init(&res, 0);
   igraph_topological_sorting(&g, &res, mode);
   
   PROTECT(result=R_igraph_vector_to_SEXP(&res));
   igraph_vector_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -7149,8 +6478,6 @@ SEXP R_igraph_community_edge_betweenness(SEXP graph, SEXP pdirected,
   igraph_vector_t membership, *ppmembership=0;
   igraph_bool_t directed=LOGICAL(pdirected)[0];
   SEXP result, names;
-  
-  R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_init(&res, 0);
@@ -7200,8 +6527,6 @@ SEXP R_igraph_community_edge_betweenness(SEXP graph, SEXP pdirected,
   SET_STRING_ELT(names, 5, CREATE_STRING_VECTOR("membership"));
   SET_NAMES(result, names);
   
-  R_igraph_after();
-  
   UNPROTECT(2);
   return result;
 }
@@ -7215,8 +6540,6 @@ SEXP R_igraph_community_eb_get_merges(SEXP graph,
   igraph_matrix_t res;
   SEXP result, names;
   
-  R_igraph_before();
- 
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pedges, &edges);
   igraph_matrix_init(&res, 0, 0);
@@ -7233,8 +6556,6 @@ SEXP R_igraph_community_eb_get_merges(SEXP graph,
   SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("bridges"));  
   SET_NAMES(result, names);
 
-  R_igraph_after();
-  
   UNPROTECT(2);
   return result;
 }
@@ -7248,8 +6569,6 @@ SEXP R_igraph_community_fastgreedy(SEXP graph, SEXP pmerges, SEXP pmodularity,
   igraph_vector_t membership, *ppmembership=0;
   igraph_vector_t weights, *ppweights=0;
   SEXP result, names;
-  
-  R_igraph_before();
   
   if (!isNull(pweights)) {
     ppweights=&weights;
@@ -7283,8 +6602,6 @@ SEXP R_igraph_community_fastgreedy(SEXP graph, SEXP pmerges, SEXP pmodularity,
   SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("membership"));
   SET_NAMES(result, names);
   
-  R_igraph_after();
-  
   UNPROTECT(2);
   return result;
 } 
@@ -7299,8 +6616,6 @@ SEXP R_igraph_community_to_membership(SEXP graph, SEXP pmerges,
   igraph_vector_t membership, *ppmembership=0;
   igraph_vector_t csize, *ppcsize=0;
   SEXP result, names;
-  
-  R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   nodes=igraph_vcount(&g);
@@ -7324,8 +6639,6 @@ SEXP R_igraph_community_to_membership(SEXP graph, SEXP pmerges,
   SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("csize"));
   SET_NAMES(result, names);
   
-  R_igraph_after();
-  
   UNPROTECT(2);
   return result;
 }
@@ -7340,15 +6653,11 @@ SEXP R_igraph_community_to_membership2(SEXP pmerges, SEXP pvcount,
   igraph_vector_t membership;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_matrix(pmerges, &merges);
   igraph_vector_init(&membership, 0);
 
   igraph_community_to_membership(&merges, vcount, steps, &membership, 0);
   PROTECT(result=R_igraph_vector_to_SEXP(&membership));
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -7361,8 +6670,6 @@ SEXP R_igraph_girth(SEXP graph, SEXP pcircle) {
   igraph_integer_t girth;
   SEXP result, names;
   
-  R_igraph_before();
-
   R_SEXP_to_igraph(graph, &g);
   if (LOGICAL(pcircle)[0]) { igraph_vector_init(&circle, 0); ppcircle=&circle; }
 
@@ -7378,8 +6685,6 @@ SEXP R_igraph_girth(SEXP graph, SEXP pcircle) {
   SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("circle"));
   SET_NAMES(result, names);
 
-  R_igraph_after();
-  
   UNPROTECT(2);
   return result;
 }
@@ -7389,14 +6694,10 @@ SEXP R_igraph_line_graph(SEXP graph) {
   igraph_t g, lg;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   igraph_linegraph(&g, &lg);
   PROTECT(result=R_igraph_to_SEXP(&lg));
   igraph_destroy(&lg);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -7409,13 +6710,9 @@ SEXP R_igraph_de_bruijn(SEXP pm, SEXP pn) {
   igraph_integer_t n=REAL(pn)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   igraph_de_bruijn(&g, m, n);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -7428,13 +6725,9 @@ SEXP R_igraph_kautz(SEXP pm, SEXP pn) {
   igraph_integer_t n=REAL(pn)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   igraph_kautz(&g, m, n);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -7447,16 +6740,12 @@ SEXP R_igraph_is_loop(SEXP graph, SEXP edges) {
   igraph_vector_bool_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_es(edges, &g, &es);
   igraph_vector_bool_init(&res, 0);
   igraph_is_loop(&g, &res, es);
   PROTECT(result=R_igraph_vector_bool_to_SEXP(&res));
   igraph_vector_bool_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -7469,16 +6758,12 @@ SEXP R_igraph_is_multiple(SEXP graph, SEXP edges) {
   igraph_vector_bool_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_es(edges, &g, &es);
   igraph_vector_bool_init(&res, 0);
   igraph_is_multiple(&g, &res, es);
   PROTECT(result=R_igraph_vector_bool_to_SEXP(&res));
   igraph_vector_bool_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -7491,16 +6776,12 @@ SEXP R_igraph_count_multiple(SEXP graph, SEXP edges) {
   igraph_vector_t res;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_es(edges, &g, &es);
   igraph_vector_init(&res, 0);
   igraph_count_multiple(&g, &res, es);
   PROTECT(result=R_igraph_vector_to_SEXP(&res));
   igraph_vector_destroy(&res);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -7511,13 +6792,9 @@ SEXP R_igraph_famous(SEXP name) {
   igraph_t g;
   SEXP result;
   
-  R_igraph_before();
-  
   igraph_famous(&g, CHAR(STRING_ELT(name, 0)));
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
-  
-  R_igraph_after();
   
   UNPROTECT(1);
   return result;
@@ -7532,8 +6809,6 @@ SEXP R_igraph_get_adjlist(SEXP graph, SEXP pmode) {
   long int no_of_nodes;
   igraph_vector_t neis;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   no_of_nodes=igraph_vcount(&g);
   igraph_vector_init(&neis, 0);
@@ -7544,8 +6819,6 @@ SEXP R_igraph_get_adjlist(SEXP graph, SEXP pmode) {
   }
   igraph_vector_destroy(&neis);
   
-  R_igraph_after();
-
   UNPROTECT(1);
   return result;
 } 
@@ -7559,8 +6832,6 @@ SEXP R_igraph_get_adjedgelist(SEXP graph, SEXP pmode) {
   long int no_of_nodes;
   igraph_vector_t neis;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   no_of_nodes=igraph_vcount(&g);
   igraph_vector_init(&neis, 0);
@@ -7571,8 +6842,6 @@ SEXP R_igraph_get_adjedgelist(SEXP graph, SEXP pmode) {
   }
   igraph_vector_destroy(&neis);
   
-  R_igraph_after();
-
   UNPROTECT(1);
   return result;
 } 
@@ -7608,8 +6877,6 @@ SEXP R_igraph_arpack(SEXP function, SEXP extra, SEXP options, SEXP rho,
   R_igraph_i_arpack_data_t data;
   igraph_arpack_options_t c_options;
   SEXP result, names;
-
-  R_igraph_before();
 
   if (0 != igraph_matrix_init(&vectors, 0, 0)) {
     igraph_error("Cannot run ARPACK", __FILE__, __LINE__, IGRAPH_ENOMEM);
@@ -7661,8 +6928,6 @@ SEXP R_igraph_arpack(SEXP function, SEXP extra, SEXP options, SEXP rho,
   SET_STRING_ELT(names, 2, mkChar("options"));
   SET_NAMES(result, names);
 
-  R_igraph_after();
-  
   UNPROTECT(2);
   return result;
 }
@@ -7681,8 +6946,6 @@ SEXP R_igraph_is_chordal(SEXP graph, SEXP alpha, SEXP alpham1,
   SEXP newgraph;
   int c_result;
   SEXP result, names;
-
-  R_igraph_before();
                                         /* Convert input */
   R_SEXP_to_igraph(graph, &c_graph);
   if (!isNull(alpha)) { R_SEXP_to_vector(alpha, &c_alpha); }
@@ -7726,8 +6989,6 @@ SEXP R_igraph_is_chordal(SEXP graph, SEXP alpha, SEXP alpham1,
   SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("newgraph"));
   SET_NAMES(result, names);
   UNPROTECT(4);
-
-  R_igraph_after();
 
   UNPROTECT(1);
   return(result);
@@ -7792,8 +7053,6 @@ SEXP R_igraph_bfs(SEXP graph, SEXP proot, SEXP proots, SEXP pneimode,
     *p_succ=0, *p_dist=0;
   void *callback=0;
   R_igraph_i_bfs_data_t cb_data, *p_cb_data=0;
-  
-  R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   if (!isNull(proots)) {
@@ -7868,8 +7127,6 @@ SEXP R_igraph_bfs(SEXP graph, SEXP proot, SEXP proots, SEXP pneimode,
 
   SET_NAMES(result, names);
   
-  R_igraph_after();
-  
   UNPROTECT(2);
   return result;
 }
@@ -7940,8 +7197,6 @@ SEXP R_igraph_dfs(SEXP graph, SEXP proot, SEXP pneimode, SEXP punreachable,
   void *in_callback=0, *out_callback=0;
   R_igraph_i_dfs_data_t cb_data, *p_cb_data=0;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
 
   if (LOGICAL(porder)[0]) { 
@@ -8005,13 +7260,11 @@ SEXP R_igraph_dfs(SEXP graph, SEXP proot, SEXP pneimode, SEXP punreachable,
 
   SET_NAMES(result, names);
   
-  R_igraph_after();
-  
   UNPROTECT(2);
   return result;
 }
 
-SEXP R_igraph_cohesive_blocks(SEXP graph, SEXP verbose) {
+SEXP R_igraph_cohesive_blocks(SEXP graph) {
                                         /* Declarations */
   igraph_t c_graph;
   igraph_vector_ptr_t c_blocks;
@@ -8025,7 +7278,6 @@ SEXP R_igraph_cohesive_blocks(SEXP graph, SEXP verbose) {
   int c_result;
   SEXP result, names;
 
-  R_igraph_before2(verbose, "Cohesive blocks");
                                         /* Convert input */
   R_SEXP_to_igraph(graph, &c_graph);
   if (0 != igraph_vector_ptr_init(&c_blocks, 0)) { 
@@ -8070,15 +7322,14 @@ SEXP R_igraph_cohesive_blocks(SEXP graph, SEXP verbose) {
   SET_NAMES(result, names);
   UNPROTECT(5);
 
-  R_igraph_after2(verbose);
-
   UNPROTECT(1);
   return(result);
 }
 
 SEXP R_igraph_revolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
-			SEXP pcites, SEXP pexpected, SEXP perror, SEXP pdebug,
-			SEXP verbose) {
+			 SEXP pcites, SEXP pexpected, SEXP perror, 
+			 SEXP pdebug) {
+
   igraph_t g;
   igraph_vector_t kernel;
   igraph_integer_t niter=REAL(pniter)[0];
@@ -8093,8 +7344,6 @@ SEXP R_igraph_revolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0, rlogmax, *pplogmax=0;
   SEXP result, names;
   
-  R_igraph_before2(verbose, "Revolver d ");
-
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_init(&kernel, 0);
   if (sd) { igraph_vector_init(&vsd, 0); pvsd=&vsd; }
@@ -8144,8 +7393,6 @@ SEXP R_igraph_revolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after2(verbose);  
-
   UNPROTECT(2);
   return result;
 }
@@ -8157,8 +7404,6 @@ SEXP R_igraph_revolver_error2_d(SEXP graph, SEXP pkernel) {
   igraph_real_t logprob, lognull;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pkernel, &kernel);
   igraph_revolver_error2_d(&g, &kernel, &logprob, &lognull);
@@ -8166,15 +7411,13 @@ SEXP R_igraph_revolver_error2_d(SEXP graph, SEXP pkernel) {
   REAL(result)[0]=logprob;
   REAL(result)[1]=lognull;
    
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }   
 
 SEXP R_igraph_revolver_ad(SEXP graph, SEXP pniter, SEXP pagebins,
-			 SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			 SEXP perror, SEXP pdebug, SEXP verbose) {
+			  SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
+			  SEXP perror, SEXP pdebug) {
   igraph_t g;
   igraph_matrix_t kernel;
   igraph_integer_t niter=REAL(pniter)[0];
@@ -8189,8 +7432,6 @@ SEXP R_igraph_revolver_ad(SEXP graph, SEXP pniter, SEXP pagebins,
   igraph_matrix_t *pvsd=0, *pvnorm=0, *pvcites=0, *pvexpected=0;
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0, rlogmax, *pplogmax=0;
   SEXP result, names;
-  
-  R_igraph_before2(verbose, "Revolver ad ");
   
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&kernel, 0, 0);
@@ -8242,8 +7483,6 @@ SEXP R_igraph_revolver_ad(SEXP graph, SEXP pniter, SEXP pagebins,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after2(verbose);  
-
   UNPROTECT(2);
   return result;
   
@@ -8256,8 +7495,6 @@ SEXP R_igraph_revolver_error2_ad(SEXP graph, SEXP pkernel) {
   igraph_real_t logprob, lognull;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_matrix(pkernel, &kernel);
   igraph_revolver_error2_ad(&g, &kernel, &logprob, &lognull);
@@ -8265,15 +7502,13 @@ SEXP R_igraph_revolver_error2_ad(SEXP graph, SEXP pkernel) {
   REAL(result)[0]=logprob;
   REAL(result)[1]=lognull;
    
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }   
 
 SEXP R_igraph_revolver_ade(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
-			  SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			  SEXP perror, SEXP pdebug, SEXP verbose) {
+			   SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
+			   SEXP perror, SEXP pdebug) {
   igraph_t g;
   igraph_vector_t cats;
   igraph_array3_t kernel;
@@ -8285,8 +7520,6 @@ SEXP R_igraph_revolver_ade(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
   igraph_vector_ptr_t debugres, *ppdebugres=0;
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0, rlogmax, *pplogmax=0;
   SEXP result, names;
-  
-  R_igraph_before2(verbose, "Revolver ade ");
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
@@ -8342,8 +7575,6 @@ SEXP R_igraph_revolver_ade(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after2(verbose);  
-
   UNPROTECT(2);
   return result;
 }
@@ -8356,8 +7587,6 @@ SEXP R_igraph_revolver_error2_ade(SEXP graph, SEXP pkernel, SEXP pcats) {
   igraph_real_t logprob, lognull;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
   R_igraph_SEXP_to_array3(pkernel, &kernel);
@@ -8366,15 +7595,13 @@ SEXP R_igraph_revolver_error2_ade(SEXP graph, SEXP pkernel, SEXP pcats) {
   REAL(result)[0]=logprob;
   REAL(result)[1]=lognull;
    
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }   
   
 SEXP R_igraph_revolver_e(SEXP graph, SEXP pcats, SEXP pniter, SEXP pst,
-			SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			SEXP perror, SEXP pdebug, SEXP verbose) {
+			 SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
+			 SEXP perror, SEXP pdebug) {
   igraph_t g;
   igraph_vector_t cats;
   igraph_vector_t kernel;
@@ -8386,8 +7613,6 @@ SEXP R_igraph_revolver_e(SEXP graph, SEXP pcats, SEXP pniter, SEXP pst,
   igraph_vector_ptr_t debugres, *ppdebugres=0;
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0, rlogmax, *pplogmax=0;
   SEXP result, names;
-  
-  R_igraph_before2(verbose, "Revolver e ");
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
@@ -8446,8 +7671,6 @@ SEXP R_igraph_revolver_e(SEXP graph, SEXP pcats, SEXP pniter, SEXP pst,
   SET_STRING_ELT(names, 7, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after2(verbose);  
-
   UNPROTECT(2);
   return result;
 }
@@ -8460,8 +7683,6 @@ SEXP R_igraph_revolver_error2_e(SEXP graph, SEXP pkernel, SEXP pcats) {
   igraph_real_t logprob, lognull;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
   R_SEXP_to_vector(pkernel, &kernel);
@@ -8470,15 +7691,13 @@ SEXP R_igraph_revolver_error2_e(SEXP graph, SEXP pkernel, SEXP pcats) {
   REAL(result)[0]=logprob;
   REAL(result)[1]=lognull;
    
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }   
   
 SEXP R_igraph_revolver_de(SEXP graph, SEXP pcats, SEXP pniter,
-			 SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			 SEXP perror, SEXP pdebug, SEXP verbose) {
+			  SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
+			  SEXP perror, SEXP pdebug) {
   igraph_t g;
   igraph_vector_t cats;
   igraph_matrix_t kernel;
@@ -8489,8 +7708,6 @@ SEXP R_igraph_revolver_de(SEXP graph, SEXP pcats, SEXP pniter,
   igraph_vector_ptr_t debugres, *ppdebugres=0;
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0, rlogmax, *pplogmax=0;
   SEXP result, names;
-  
-  R_igraph_before2(verbose, "Revolver de ");
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
@@ -8545,8 +7762,6 @@ SEXP R_igraph_revolver_de(SEXP graph, SEXP pcats, SEXP pniter,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after2(verbose);  
-
   UNPROTECT(2);
   return result;
 }
@@ -8559,8 +7774,6 @@ SEXP R_igraph_revolver_error2_de(SEXP graph, SEXP pkernel, SEXP pcats) {
   igraph_real_t logprob, lognull;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
   R_SEXP_to_matrix(pkernel, &kernel);
@@ -8569,15 +7782,13 @@ SEXP R_igraph_revolver_error2_de(SEXP graph, SEXP pkernel, SEXP pcats) {
   REAL(result)[0]=logprob;
   REAL(result)[1]=lognull;
    
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
 
 SEXP R_igraph_revolver_l(SEXP graph, SEXP pniter, SEXP pagebins,
 			SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			SEXP perror, SEXP pdebug, SEXP verbose) {
+			SEXP perror, SEXP pdebug) {
   igraph_t g;
   igraph_vector_t kernel;
   igraph_integer_t niter=REAL(pniter)[0];
@@ -8588,8 +7799,6 @@ SEXP R_igraph_revolver_l(SEXP graph, SEXP pniter, SEXP pagebins,
   igraph_vector_ptr_t debugres, *ppdebugres=0;
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0, rlogmax, *pplogmax=0;
   SEXP result, names;
-  
-  R_igraph_before2(verbose, "Revolver l ");
   
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_init(&kernel, 0);
@@ -8644,8 +7853,6 @@ SEXP R_igraph_revolver_l(SEXP graph, SEXP pniter, SEXP pagebins,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after2(verbose);  
-
   UNPROTECT(2);
   return result;
 }
@@ -8657,8 +7864,6 @@ SEXP R_igraph_revolver_error2_l(SEXP graph, SEXP pkernel) {
   igraph_real_t logprob, lognull;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pkernel, &kernel);
   igraph_revolver_error2_l(&g, &kernel, &logprob, &lognull);
@@ -8666,15 +7871,13 @@ SEXP R_igraph_revolver_error2_l(SEXP graph, SEXP pkernel) {
   REAL(result)[0]=logprob;
   REAL(result)[1]=lognull;
    
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
 
 SEXP R_igraph_revolver_dl(SEXP graph, SEXP pniter, SEXP pagebins,
 			 SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			 SEXP perror, SEXP pdebug, SEXP verbose) {
+			 SEXP perror, SEXP pdebug) {
   igraph_t g;
   igraph_matrix_t kernel;
   igraph_integer_t niter=REAL(pniter)[0];
@@ -8685,8 +7888,6 @@ SEXP R_igraph_revolver_dl(SEXP graph, SEXP pniter, SEXP pagebins,
   igraph_vector_ptr_t debugres, *ppdebugres=0;
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0, rlogmax, *pplogmax=0;
   SEXP result, names;
-  
-  R_igraph_before2(verbose, "Revolver dl ");
   
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&kernel, 0, 0);
@@ -8741,8 +7942,6 @@ SEXP R_igraph_revolver_dl(SEXP graph, SEXP pniter, SEXP pagebins,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after2(verbose);  
-
   UNPROTECT(2);
   return result;
 }
@@ -8754,8 +7953,6 @@ SEXP R_igraph_revolver_error2_dl(SEXP graph, SEXP pkernel) {
   igraph_real_t logprob, lognull;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_matrix(pkernel, &kernel);
   igraph_revolver_error2_dl(&g, &kernel, &logprob, &lognull);
@@ -8763,15 +7960,13 @@ SEXP R_igraph_revolver_error2_dl(SEXP graph, SEXP pkernel) {
   REAL(result)[0]=logprob;
   REAL(result)[1]=lognull;
    
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
 
 SEXP R_igraph_revolver_el(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
 			 SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			 SEXP perror, SEXP pdebug, SEXP verbose) {
+			 SEXP perror, SEXP pdebug) {
   igraph_t g;
   igraph_vector_t cats;
   igraph_matrix_t kernel;
@@ -8784,7 +7979,6 @@ SEXP R_igraph_revolver_el(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0, rlogmax, *pplogmax=0;
   SEXP result, names;
   
-  R_igraph_before2(verbose, "Revolver el ");
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
@@ -8840,8 +8034,6 @@ SEXP R_igraph_revolver_el(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after2(verbose);  
-
   UNPROTECT(2);
   return result;
 }
@@ -8854,8 +8046,6 @@ SEXP R_igraph_revolver_error2_el(SEXP graph, SEXP pkernel, SEXP pcats) {
   igraph_real_t logprob, lognull;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
   R_SEXP_to_matrix(pkernel, &kernel);
@@ -8864,16 +8054,15 @@ SEXP R_igraph_revolver_error2_el(SEXP graph, SEXP pkernel, SEXP pcats) {
   REAL(result)[0]=logprob;
   REAL(result)[1]=lognull;
    
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
 
 SEXP R_igraph_revolver_r(SEXP graph, SEXP pniter, SEXP pwindow,
-			SEXP psd, SEXP pnorm,
-			SEXP pcites, SEXP pexpected, SEXP perror, SEXP pdebug,
-			SEXP verbose) {
+			 SEXP psd, SEXP pnorm,
+			 SEXP pcites, SEXP pexpected, SEXP perror, 
+			 SEXP pdebug) {
+
   igraph_t g;
   igraph_vector_t kernel;
   igraph_integer_t niter=REAL(pniter)[0];
@@ -8889,8 +8078,6 @@ SEXP R_igraph_revolver_r(SEXP graph, SEXP pniter, SEXP pwindow,
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0, rlogmax, *pplogmax=0;
   SEXP result, names;
   
-  R_igraph_before2(verbose, "Revolver r ");
-
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_init(&kernel, 0);
   if (sd) { igraph_vector_init(&vsd, 0); pvsd=&vsd; }
@@ -8940,8 +8127,6 @@ SEXP R_igraph_revolver_r(SEXP graph, SEXP pniter, SEXP pwindow,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after2(verbose);  
-
   UNPROTECT(2);
   return result;
 }
@@ -8954,8 +8139,6 @@ SEXP R_igraph_revolver_error2_r(SEXP graph, SEXP pkernel, SEXP pwindow) {
   igraph_real_t logprob, lognull;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pkernel, &kernel);
   igraph_revolver_error2_r(&g, &kernel, window, &logprob, &lognull);
@@ -8963,15 +8146,13 @@ SEXP R_igraph_revolver_error2_r(SEXP graph, SEXP pkernel, SEXP pwindow) {
   REAL(result)[0]=logprob;
   REAL(result)[1]=lognull;
    
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
 
 SEXP R_igraph_revolver_ar(SEXP graph, SEXP pniter, SEXP pagebins, SEXP pwindow,
 			 SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			 SEXP perror, SEXP pdebug, SEXP verbose) {
+			 SEXP perror, SEXP pdebug) {
   igraph_t g;
   igraph_matrix_t kernel;  
   igraph_integer_t niter=REAL(pniter)[0];  
@@ -8987,8 +8168,6 @@ SEXP R_igraph_revolver_ar(SEXP graph, SEXP pniter, SEXP pagebins, SEXP pwindow,
   igraph_matrix_t *pvsd=0, *pvnorm=0, *pvcites=0, *pvexpected=0;
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0, rlogmax, *pplogmax=0;
   SEXP result, names;
-  
-  R_igraph_before2(verbose, "Revolver ar ");
   
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&kernel, 0, 0);
@@ -9039,8 +8218,6 @@ SEXP R_igraph_revolver_ar(SEXP graph, SEXP pniter, SEXP pagebins, SEXP pwindow,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after2(verbose);  
-
   UNPROTECT(2);
   return result;
   
@@ -9054,8 +8231,6 @@ SEXP R_igraph_revolver_error2_ar(SEXP graph, SEXP pkernel, SEXP pwindow) {
   igraph_real_t logprob, lognull;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_matrix(pkernel, &kernel);
   igraph_revolver_error2_ar(&g, &kernel, window, &logprob, &lognull);
@@ -9063,15 +8238,13 @@ SEXP R_igraph_revolver_error2_ar(SEXP graph, SEXP pkernel, SEXP pwindow) {
   REAL(result)[0]=logprob;
   REAL(result)[1]=lognull;
    
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
 
 SEXP R_igraph_revolver_di(SEXP graph, SEXP pcats, SEXP pniter,
 			 SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			 SEXP perror, SEXP pdebug, SEXP verbose) {
+			 SEXP perror, SEXP pdebug) {
   igraph_t g;
   igraph_vector_t cats;
   igraph_matrix_t kernel;
@@ -9082,8 +8255,6 @@ SEXP R_igraph_revolver_di(SEXP graph, SEXP pcats, SEXP pniter,
   igraph_vector_ptr_t debugres, *ppdebugres=0;
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0, rlogmax, *pplogmax=0;
   SEXP result, names;
-  
-  R_igraph_before2(verbose, "Revolver di ");
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
@@ -9138,8 +8309,6 @@ SEXP R_igraph_revolver_di(SEXP graph, SEXP pcats, SEXP pniter,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after2(verbose);  
-
   UNPROTECT(2);
   return result;
 }
@@ -9152,8 +8321,6 @@ SEXP R_igraph_revolver_error2_di(SEXP graph, SEXP pkernel, SEXP pcats) {
   igraph_real_t logprob, lognull;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
   R_SEXP_to_matrix(pkernel, &kernel);
@@ -9162,15 +8329,13 @@ SEXP R_igraph_revolver_error2_di(SEXP graph, SEXP pkernel, SEXP pcats) {
   REAL(result)[0]=logprob;
   REAL(result)[1]=lognull;
    
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
 
 SEXP R_igraph_revolver_adi(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
 			  SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			  SEXP perror, SEXP pdebug, SEXP verbose) {
+			  SEXP perror, SEXP pdebug) {
   igraph_t g;
   igraph_vector_t cats;
   igraph_array3_t kernel;
@@ -9182,8 +8347,6 @@ SEXP R_igraph_revolver_adi(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
   igraph_vector_ptr_t debugres, *ppdebugres=0;
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0, rlogmax, *pplogmax=0;
   SEXP result, names;
-  
-  R_igraph_before2(verbose, "Revolver adi ");
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
@@ -9239,8 +8402,6 @@ SEXP R_igraph_revolver_adi(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after2(verbose);  
-
   UNPROTECT(2);
   return result;
 }
@@ -9253,8 +8414,6 @@ SEXP R_igraph_revolver_error2_adi(SEXP graph, SEXP pkernel, SEXP pcats) {
   igraph_real_t logprob, lognull;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
   R_igraph_SEXP_to_array3(pkernel, &kernel);
@@ -9263,15 +8422,13 @@ SEXP R_igraph_revolver_error2_adi(SEXP graph, SEXP pkernel, SEXP pcats) {
   REAL(result)[0]=logprob;
   REAL(result)[1]=lognull;
    
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
 
 SEXP R_igraph_revolver_il(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
 			 SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			 SEXP perror, SEXP pdebug, SEXP verbose) {
+			 SEXP perror, SEXP pdebug) {
   igraph_t g;
   igraph_vector_t cats;
   igraph_matrix_t kernel;
@@ -9283,8 +8440,6 @@ SEXP R_igraph_revolver_il(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
   igraph_vector_ptr_t debugres, *ppdebugres=0;
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0, rlogmax, *pplogmax=0;
   SEXP result, names;
-  
-  R_igraph_before2(verbose, "Revolver il ");
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
@@ -9340,8 +8495,6 @@ SEXP R_igraph_revolver_il(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after2(verbose);  
-
   UNPROTECT(2);
   return result;
 }
@@ -9354,8 +8507,6 @@ SEXP R_igraph_revolver_error2_il(SEXP graph, SEXP pkernel, SEXP pcats) {
   igraph_real_t logprob, lognull;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
   R_SEXP_to_matrix(pkernel, &kernel);
@@ -9364,15 +8515,13 @@ SEXP R_igraph_revolver_error2_il(SEXP graph, SEXP pkernel, SEXP pcats) {
   REAL(result)[0]=logprob;
   REAL(result)[1]=lognull;
    
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
 
 SEXP R_igraph_revolver_ir(SEXP graph, SEXP pcats, SEXP pwindow, SEXP pniter,
 			 SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			 SEXP perror, SEXP pdebug, SEXP verbose) {
+			 SEXP perror, SEXP pdebug) {
   igraph_t g;
   igraph_vector_t cats;
   igraph_integer_t window=REAL(pwindow)[0];
@@ -9384,8 +8533,6 @@ SEXP R_igraph_revolver_ir(SEXP graph, SEXP pcats, SEXP pwindow, SEXP pniter,
   igraph_vector_ptr_t debugres, *ppdebugres=0;
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0, rlogmax, *pplogmax=0;
   SEXP result, names;
-  
-  R_igraph_before2(verbose, "Revolver di ");
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
@@ -9440,8 +8587,6 @@ SEXP R_igraph_revolver_ir(SEXP graph, SEXP pcats, SEXP pwindow, SEXP pniter,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after2(verbose);  
-
   UNPROTECT(2);
   return result;
 }
@@ -9456,8 +8601,6 @@ SEXP R_igraph_revolver_error2_ir(SEXP graph, SEXP pkernel, SEXP pcats,
   igraph_real_t logprob, lognull;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
   R_SEXP_to_matrix(pkernel, &kernel);
@@ -9466,8 +8609,6 @@ SEXP R_igraph_revolver_error2_ir(SEXP graph, SEXP pkernel, SEXP pcats,
   REAL(result)[0]=logprob;
   REAL(result)[1]=lognull;
    
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -9475,7 +8616,7 @@ SEXP R_igraph_revolver_error2_ir(SEXP graph, SEXP pkernel, SEXP pcats,
 SEXP R_igraph_revolver_air(SEXP graph, SEXP pcats, SEXP pwindow, 
 			  SEXP pniter, SEXP pagebins,
 			  SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			  SEXP perror, SEXP pdebug, SEXP verbose) {
+			  SEXP perror, SEXP pdebug) {
   igraph_t g;
   igraph_vector_t cats;
   igraph_integer_t window=REAL(pwindow)[0];
@@ -9488,8 +8629,6 @@ SEXP R_igraph_revolver_air(SEXP graph, SEXP pcats, SEXP pwindow,
   igraph_vector_ptr_t debugres, *ppdebugres=0;
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0, rlogmax, *pplogmax=0;
   SEXP result, names;
-  
-  R_igraph_before2(verbose, "Revolver air ");
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
@@ -9545,8 +8684,6 @@ SEXP R_igraph_revolver_air(SEXP graph, SEXP pcats, SEXP pwindow,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after2(verbose);  
-
   UNPROTECT(2);
   return result;
 }
@@ -9561,8 +8698,6 @@ SEXP R_igraph_revolver_error2_air(SEXP graph, SEXP pkernel, SEXP pcats,
   igraph_real_t logprob, lognull;
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
   R_igraph_SEXP_to_array3(pkernel, &kernel);
@@ -9571,15 +8706,13 @@ SEXP R_igraph_revolver_error2_air(SEXP graph, SEXP pkernel, SEXP pcats,
   REAL(result)[0]=logprob;
   REAL(result)[1]=lognull;
    
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
 
 SEXP R_igraph_revolver_d_d(SEXP graph, SEXP pniter, SEXP pvtime, SEXP petime,
 			   SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			   SEXP perror, SEXP pdebug, SEXP verbose) {
+			   SEXP perror, SEXP pdebug) {
   igraph_t g;
   igraph_vector_t vtime, etime;
   igraph_integer_t niter=REAL(pniter)[0];
@@ -9590,8 +8723,6 @@ SEXP R_igraph_revolver_d_d(SEXP graph, SEXP pniter, SEXP pvtime, SEXP petime,
   igraph_vector_ptr_t debugres, *ppdebugres=0;
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0;
   SEXP result, names;
-  
-  R_igraph_before2(verbose, "Revover d-d ");
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pvtime, &vtime);
@@ -9647,8 +8778,6 @@ SEXP R_igraph_revolver_d_d(SEXP graph, SEXP pniter, SEXP pvtime, SEXP petime,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after2(verbose);  
-
   UNPROTECT(2);
   return result;
 }
@@ -9665,8 +8794,6 @@ SEXP R_igraph_evolver_d(SEXP pnodes, SEXP pkernel, SEXP poutseq,
   igraph_bool_t directed=LOGICAL(pdirected)[0];
   SEXP result;
   
-  R_igraph_before();
-  
   R_SEXP_to_vector(pkernel, &kernel);
   if (!isNull(poutseq)) {
     R_SEXP_to_vector(poutseq, &voutseq);
@@ -9681,8 +8808,6 @@ SEXP R_igraph_evolver_d(SEXP pnodes, SEXP pkernel, SEXP poutseq,
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   
-  R_igraph_after();
-  
   UNPROTECT(1);
   return result;
 }
@@ -9690,7 +8815,7 @@ SEXP R_igraph_evolver_d(SEXP pnodes, SEXP pkernel, SEXP poutseq,
 SEXP R_igraph_revolver_p_p(SEXP graph, SEXP pniter, SEXP pvtime, SEXP petime,
 			   SEXP pauthors, SEXP peventsizes,
 			   SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			   SEXP perror, SEXP pdebug, SEXP verbose) {
+			   SEXP perror, SEXP pdebug) {
   igraph_t g;
   igraph_vector_t vtime, etime;
   igraph_vector_t authors, eventsizes;
@@ -9702,8 +8827,6 @@ SEXP R_igraph_revolver_p_p(SEXP graph, SEXP pniter, SEXP pvtime, SEXP petime,
   igraph_vector_ptr_t debugres, *ppdebugres=0;
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0;
   SEXP result, names;
-  
-  R_igraph_before2(verbose, "Revover d-d ");
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pvtime, &vtime);
@@ -9762,8 +8885,6 @@ SEXP R_igraph_revolver_p_p(SEXP graph, SEXP pniter, SEXP pvtime, SEXP petime,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after2(verbose);  
-
   UNPROTECT(2);
   return result;
 }		   

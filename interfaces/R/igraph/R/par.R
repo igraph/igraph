@@ -31,7 +31,7 @@
 
 igraph.pars.set.verbose <- function(verbose) {
   verbose <- as.logical(verbose)
-##  .Call("R_igraph_set_verbose", verbose, PACKAGE="igraph")
+  .Call("R_igraph_set_verbose", verbose, PACKAGE="igraph")
 }
 
 igraph.pars.callbacks <- list("verbose"=igraph.pars.set.verbose)

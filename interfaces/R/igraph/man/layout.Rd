@@ -23,17 +23,13 @@ layout.auto(graph, dim=2, \dots)
 layout.random(graph, params, dim=2)
 layout.circle(graph, params)
 layout.sphere(graph, params)
-layout.fruchterman.reingold(graph, \dots, dim=2,
-      verbose=getIgraphOpt("verbose"), params)
-layout.kamada.kawai(graph, \dots, dim=2,
-      verbose=getIgraphOpt("verbose"), params)
+layout.fruchterman.reingold(graph, \dots, dim=2, params)
+layout.kamada.kawai(graph, \dots, dim=2, params)
 layout.spring(graph, \dots, params)
 layout.reingold.tilford(graph, \dots, params)
-layout.fruchterman.reingold.grid(graph, \dots,
-      verbose=getIgraphOpt("verbose"), params)
+layout.fruchterman.reingold.grid(graph, \dots, params)
 layout.lgl(graph, \dots, params)
-layout.graphopt(graph, ..., verbose = getIgraphOpt("verbose"),
-      params = list())
+layout.graphopt(graph, ..., params=list())
 layout.mds(graph, d=shortest.paths(graph), ...)
 layout.svd(graph, d=shortest.paths(graph), ...)
 layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
@@ -49,8 +45,6 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
     notation to the \code{params} argument. For \code{layout.auto} these
     extra parameters are simply passed to the real layout function, if
     one is called.}
-  \item{verbose}{Logial constant, whether to show a progress bar while
-    calculating the layout.}
   \item{d}{The matrix used for multidimansional scaling. By default it
     is the distance matrix of the graph.}
   \item{layout}{A matrix with two or three columns, the layout to

@@ -28,6 +28,7 @@
 
 .onLoad <- function(dir, package) {
   library.dynam("igraph", package, dir, local=FALSE);
+  .Call("R_igraph_init", FALSE, FALSE, PACKAGE="igraph")
 }
 
 .onUnload <- function(libpath) {

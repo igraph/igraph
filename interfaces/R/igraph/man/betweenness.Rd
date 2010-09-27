@@ -12,12 +12,10 @@
 }
 \usage{
 betweenness(graph, v=V(graph), directed = TRUE, weights = NULL,
-     nobigint = TRUE, normalized = FALSE,
-     verbose = getIgraphOpt("verbose"))
+     nobigint = TRUE, normalized = FALSE)
 edge.betweenness(graph, e=E(graph), directed = TRUE, weights = NULL)
 betweenness.estimate(graph, vids = V(graph), directed = TRUE, cutoff,
-     weights = NULL, nobigint = TRUE,
-     verbose = getIgraphOpt("verbose"))
+     weights = NULL, nobigint = TRUE)
 edge.betweenness.estimate(graph, e=E(graph),
      directed = TRUE, cutoff, weights = NULL)
 }
@@ -41,7 +39,6 @@ edge.betweenness.estimate(graph, e=E(graph),
     \deqn{B^n=\frac{2B}{n^2-3n+2}}{Bnorm=2*B/(n*n-3*n+2)}, where
     \eqn{B^n}{Bnorm} is the normalized, \eqn{B} the raw betweenness, and
     \eqn{n} is the number of vertices in the graph.}
-  \item{verbose}{Logical, whether to show a progress bar.}
   \item{vids}{The vertices for which the vertex betweenness estimation
     will be calculated.}
   \item{cutoff}{The maximum path length to consider when calculating the

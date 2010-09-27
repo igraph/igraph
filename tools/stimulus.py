@@ -365,10 +365,6 @@ class RRCodeGenerator(CodeGenerator):
         ## yes then we use the value given there, otherwise the
         ## default value is ignored silently. (Not very nice.)
         
-        ## We also check whether the function has a 'PROGRESS' flag.
-        ## If yes then there is an extra 'verbose'
-        ## argument. Alternatively we could just always add this
-        ## argument independently of the 'PROGRESS' flag.
         out.write(name)
         out.write(" <- function(")
         def do_par(pname):
@@ -399,8 +395,6 @@ class RRCodeGenerator(CodeGenerator):
         head=[ do_par(n) for n,p in params.items()
                if p['mode'] in ['IN','INOUT'] ]
         head=[ h for h in head if h != "" ]
-        if 'PROGRESS' in self.func[function]['FLAGS']:
-            head.append('verbose=getIgraphOpt("verbose")')
         out.write(", ".join(head))
         out.write(") {\n")
 
@@ -440,7 +434,7 @@ class RRCodeGenerator(CodeGenerator):
         ## This is a bit more difficult than INCONV. Here we supply
         ## each argument to the .Call function, if the argument has a
         ## 'CALL' field then it is used, otherwise we simply use its
-        ## name. We also need to take care about the PROGRESS bar
+        ## name. 
         ## argument. Note that arguments with empty CALL fields are
         ## completely ignored, so giving an empty CALL field is
         ## different than not giving it at all.
@@ -462,8 +456,6 @@ class RRCodeGenerator(CodeGenerator):
         out.write("  res <- .Call(\"R_" + function + "\", ")
         call=[ do_par(n) for n,p in params.items() if p['mode'] in ['IN', 'INOUT'] ]
         call=[ c for c in call if c != "" ]
-        if 'PROGRESS' in self.func[function]['FLAGS']:
-            call.append('as.logical(verbose)')
         out.write(", ".join(call))
         out.write(",\n        PACKAGE=\"igraph\")\n")
 
@@ -503,11 +495,9 @@ class RCCodeGenerator(CodeGenerator):
         res['func']=function
         res['header']=self.chunk_header(function, params)
         res['decl']=self.chunk_declaration(function, params)
-        res['before']=self.chunk_before(function, params)
         res['inconv']=self.chunk_inconv(function, params)
         res['call']=self.chunk_call(function, params)
         res['outconv']=self.chunk_outconv(function, params)
-        res['after']=self.chunk_after(function, params)
 
         # Replace into the template
         text="""
@@ -517,16 +507,12 @@ class RCCodeGenerator(CodeGenerator):
 %(header)s {
                                         /* Declarations */
 %(decl)s
-
-%(before)s
                                         /* Convert input */
 %(inconv)s
                                         /* Call igraph */
 %(call)s
                                         /* Convert output */
 %(outconv)s
-
-%(after)s
 
   UNPROTECT(1);
   return(result);
@@ -537,8 +523,7 @@ class RCCodeGenerator(CodeGenerator):
     def chunk_header(self, function, params):
         """The header. All functions return with a 'SEXP', so this is
         easy. We just take the 'IN' and 'INOUT' arguments, all will
-        have type SEXP, and concatenate them by commas. If the
-        function has a 'PROGRESS' flag that is used. The function name
+        have type SEXP, and concatenate them by commas. The function name
         is created by prefixing the original name with 'R_'."""
         def do_par(pname):
             t=self.types[params[pname]['type']]
@@ -553,8 +538,6 @@ class RCCodeGenerator(CodeGenerator):
         inout=[ do_par(n) for n,p in params.items()
                 if p['mode'] in ['IN','INOUT'] ]
         inout=[ "SEXP " + n for n in inout if n != "" ]
-        if 'PROGRESS' in self.func[function]['FLAGS']:
-            inout.append("SEXP verbose")
         return "SEXP R_" + function + "(" + ", ".join(inout) + ")"
         
     def chunk_declaration(self, function, params):
@@ -601,16 +584,6 @@ class RCCodeGenerator(CodeGenerator):
             retdecl=""
 
         return "\n".join(inout + out + [retdecl] + ["  SEXP result, names;"])
-
-    def chunk_before(self, function, params):
-        """Quite confusingly, there is a separate igraph_before()
-        function for functions with progress bar, so we call that if
-        the function has a 'PROGRESS' flag. This should be eliminated
-        in the future."""
-        if 'PROGRESS' in self.func[function]['FLAGS']:
-            return '  R_igraph_before2(verbose, "");'
-        else:
-            return '  R_igraph_before();'        
 
     def chunk_inconv(self, function, params):
         """Input conversions. Not only for types with mode 'IN' and
@@ -724,14 +697,6 @@ class RCCodeGenerator(CodeGenerator):
                           ["  UNPROTECT("+str(len(sets)+1)+");" ])
             
         return ret
-
-    def chunk_after(self, function, params):
-        """The pair of igraph_before(), different for functions with
-        progreess reporting."""
-        if 'PROGRESS' in self.func[function]['FLAGS']:
-            return '  R_igraph_after2(verbose);'
-        else:
-            return '  R_igraph_after();'
 
 ################################################################################
 # Java interface, experimental version using JNI (Java Native Interface)

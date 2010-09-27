@@ -60,7 +60,6 @@ layout.sphere <- function(graph, params) {
 }
 
 layout.fruchterman.reingold <- function(graph, ..., dim=2,
-                                        verbose=getIgraphOpt("verbose"),
                                         params=list()) {
 
   if (!is.igraph(graph)) {
@@ -105,12 +104,10 @@ layout.fruchterman.reingold <- function(graph, ..., dim=2,
         as.double(params$area), as.double(params$coolexp),
         as.double(params$repulserad), params$weights, params$start,
         params$miny, params$maxy,
-        as.logical(verbose),
         PACKAGE="igraph")
 }
 
 layout.fruchterman.reingold.grid <- function(graph, ...,
-                                             verbose=getIgraphOpt("verbose"),
                                              params=list()) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -137,14 +134,13 @@ layout.fruchterman.reingold.grid <- function(graph, ...,
         as.double(params$area), as.double(params$coolexp),
         as.double(params$repulserad), as.double(params$cellsize),
         params$start,
-        as.logical(verbose),
         PACKAGE="igraph")
 }
   
 
 # FROM SNA 0.5
 
-layout.kamada.kawai<-function(graph, ..., dim=2, verbose=getIgraphOpt("verbose"),
+layout.kamada.kawai<-function(graph, ..., dim=2,
                               params=list()) {
 
   if (!is.igraph(graph)) {
@@ -182,11 +178,10 @@ layout.kamada.kawai<-function(graph, ..., dim=2, verbose=getIgraphOpt("verbose")
         as.double(params$niter), as.double(params$initemp),
         as.double(params$coolexp), as.double(params$kkconst),
         as.double(params$sigma), params$start, as.logical(params$fixz),
-        as.logical(verbose),
         PACKAGE="igraph")
 }
 
-layout.graphopt <- function(graph, ..., verbose=getIgraphOpt("verbose"),
+layout.graphopt <- function(graph, ..., 
                             params=list()) {
   
   if (!is.igraph(graph)) {
@@ -212,7 +207,6 @@ layout.graphopt <- function(graph, ..., verbose=getIgraphOpt("verbose"),
         as.double(params$niter), as.double(params$charge),
         as.double(params$mass), as.double(params$spring.length),
         as.double(params$spring.constant), params$max.sa.movement,
-        params$start, as.logical(verbose),
         PACKAGE="igraph")
 }
 
@@ -276,8 +270,7 @@ layout.reingold.tilford <- function(graph, ..., params=list()) {
   res
 }
 
-layout.merge <- function(graphs, layouts, method="dla",
-                         verbose=getIgraphOpt("verbose")) {
+layout.merge <- function(graphs, layouts, method="dla") {
 
   if (!all(sapply(graphs, is.igraph))) {
     stop("Not a graph object")
@@ -285,8 +278,7 @@ layout.merge <- function(graphs, layouts, method="dla",
   if (method == "dla") {
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     res <- .Call("R_igraph_layout_merge_dla",
-                 graphs,
-                 layouts, as.logical(verbose),
+                 graphs, layouts,
                  PACKAGE="igraph")
   } else {
     stop("Invalid `method'.")

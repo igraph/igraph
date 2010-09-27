@@ -541,15 +541,14 @@ multilevel.community <- function(graph, weights=NULL) {
   res
 }
 
-optimal.community <- function(graph, verbose=getIgraphOpt("verbose")) {
+optimal.community <- function(graph) {
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
-  verbose <- as.logical(verbose)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
-  res <- .Call("R_igraph_community_optimal_modularity", graph, verbose,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_community_optimal_modularity", graph,
+               getIgraphOpt("verbose"), PACKAGE="igraph")
   res$vcount <- vcount(graph)
   res$algorithm <- "optimal"
   res$membership <- res$membership + 1

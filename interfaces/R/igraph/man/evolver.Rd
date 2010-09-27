@@ -63,65 +63,59 @@
 }
 \usage{
 evolver.d (nodes, kernel, outseq = NULL, outdist = NULL, m = 1, 
-           directed = TRUE, verbose = getIgraphOpt("verbose"))
+           directed = TRUE)
 
 revolver.d (graph, niter=5, sd=FALSE, norm=FALSE,
-           cites=FALSE, expected=FALSE, error=TRUE, debug=numeric(),
-           verbose=getIgraphOpt("verbose"))
+           cites=FALSE, expected=FALSE, error=TRUE, debug=numeric())
 revolver.ad (graph, niter=5, agebins=max(vcount(graph)/7100, 10),
             sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE, error=TRUE,
-            debug=matrix(nc=2, nr=0), verbose=getIgraphOpt("verbose"))
+            debug=matrix(nc=2, nr=0))
 revolver.ade (graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
              sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-             error=TRUE, debug=matrix(nc=2, nr=0),
-                        verbose=getIgraphOpt("verbose"))
+             error=TRUE, debug=matrix(nc=2, nr=0))
 revolver.e (graph, cats, niter=5, st=FALSE,
            sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-           error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose"))
+           error=TRUE, debug=numeric())
 revolver.de (graph, cats, niter=5,
             sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-            error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose"))
+            error=TRUE, debug=numeric())
 revolver.l (graph, niter=5, agebins=max(vcount(graph)/7100, 10),
            sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-           error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose"))
+           error=TRUE, debug=numeric())
 revolver.dl (graph, niter=5, agebins=max(vcount(graph)/7100, 10),
             sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-            error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose"))
+            error=TRUE, debug=numeric())
 revolver.el (graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
             sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-            error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose"))
+            error=TRUE, debug=numeric())
 revolver.r (graph, window, niter=5, sd=FALSE, norm=FALSE,
-           cites=FALSE, expected=FALSE, error=TRUE, debug=numeric(),
-           verbose=getIgraphOpt("verbose"))
+           cites=FALSE, expected=FALSE, error=TRUE, debug=numeric())
 revolver.ar (graph, window, niter=5, agebins=max(vcount(graph)/7100, 10),
             sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE, error=TRUE,
-            debug=matrix(nc=2, nr=0), verbose=getIgraphOpt("verbose"))
+            debug=matrix(nc=2, nr=0))
 revolver.di (graph, cats, niter=5,
             sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-            error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose"))
+            error=TRUE, debug=numeric())
 revolver.adi (graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
              sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-             error=TRUE, debug=matrix(nc=2, nr=0),
-             verbose=getIgraphOpt("verbose"))
+             error=TRUE, debug=matrix(nc=2, nr=0))
 revolver.il (graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
             sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-            error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose"))
+            error=TRUE, debug=numeric())
 revolver.ir (graph, cats, window, niter=5,
             sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-            error=TRUE, debug=numeric(), verbose=getIgraphOpt("verbose"))
+            error=TRUE, debug=numeric())
 revolver.air (graph, cats, window,
              niter=5, agebins=max(vcount(graph)/7100, 10),
              sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-             error=TRUE, debug=matrix(nc=2, nr=0),
-             verbose=getIgraphOpt("verbose"))
+             error=TRUE, debug=matrix(nc=2, nr=0))
 revolver.d.d (graph, vtime = V(graph)$time, etime = E(graph)$time, niter = 5, 
              sd = FALSE, norm = FALSE, cites = FALSE, expected = FALSE, 
-             error = TRUE, debug = matrix(nc = 2, nr = 0),
-             verbose = getIgraphOpt("verbose")) 
+             error = TRUE, debug = matrix(nc = 2, nr = 0))
 revolver.p.p (graph, events = get.graph.attribute(graph, "events"), 
              vtime = V(graph)$time, etime = E(graph)$time, niter = 5, sd = FALSE, 
              norm = FALSE, cites = FALSE, expected = FALSE, error = TRUE, 
-             debug = matrix(nc = 2, nr = 0), verbose = getIgraphOpt("verbose")) 
+             debug = matrix(nc = 2, nr = 0)) 
 revolver.error.d (graph, kernel)
 revolver.error.ad (graph, kernel)
 revolver.error.ade (graph, kernel, cats)
@@ -139,23 +133,18 @@ revolver.error.l (graph, kernel)
 revolver.error.r (graph, kernel, window)
 
 revolver.ml.ade (graph, niter, cats, agebins = 300, delta = 1e-10,
-    filter = NULL, verbose = getIgraphOpt("verbose"))
-revolver.ml.d (graph, niter, delta = 1e-10, filter = NULL,
-    verbose = getIgraphOpt("verbose")) 
-revolver.ml.de (graph, niter, cats, delta = 1e-10, filter = NULL,
-    verbose = getIgraphOpt("verbose")) 
-revolver.ml.df (graph, niter, delta = 1e-10,
-    verbose = getIgraphOpt("verbose")) 
-revolver.ml.f (graph, niter, delta = 1e-10,
-    verbose = getIgraphOpt("verbose")) 
+    filter = NULL)
+revolver.ml.d (graph, niter, delta = 1e-10, filter = NULL)
+revolver.ml.de (graph, niter, cats, delta = 1e-10, filter = NULL)
+revolver.ml.df (graph, niter, delta = 1e-10)
+revolver.ml.f (graph, niter, delta = 1e-10)
 revolver.ml.l (graph, niter, agebins = 300, delta = 1e-10)
 
 revolver.ml.AD.alpha.a.beta (graph, alpha, a, beta, abstol = 1e-08,
-    reltol = 1e-08, maxit = 1000, agebins = 300, filter = NULL,
-    verbose = getIgraphOpt("verbose"))
+    reltol = 1e-08, maxit = 1000, agebins = 300, filter = NULL)
 revolver.ml.AD.dpareto (graph, alpha, a, paralpha, parbeta, parscale,
     abstol = 1e-08, reltol = 1e-08, maxit = 1000, agebins = 300, filter
-    = NULL, verbose = getIgraphOpt("verbose"))
+    = NULL)
 revolver.ml.ADE.alpha.a.beta (graph, cats, alpha, a, beta, coeffs,
     abstol = 1e-08, reltol = 1e-08, maxit = 1000, agebins = 300, filter
     = NULL)
@@ -163,9 +152,9 @@ revolver.ml.ADE.dpareto (graph, cats, alpha, a, paralpha, parbeta, parscale,
     coeffs, abstol = 1e-08, reltol = 1e-08, maxit = 1000, agebins = 300, 
     filter = NULL)
 revolver.ml.D.alpha (graph, alpha, abstol = 1e-08, reltol = 1e-08, maxit
-    = 1000, filter = NULL, verbose = getIgraphOpt("verbose"))
+    = 1000, filter = NULL)
 revolver.ml.D.alpha.a (graph, alpha, a, abstol = 1e-08, reltol = 1e-08,
-    maxit = 1000, filter = NULL, verbose = getIgraphOpt("verbose"))
+    maxit = 1000, filter = NULL)
 revolver.ml.DE.alpha.a (graph, cats, alpha, a, coeffs, abstol = 1e-08,
     reltol = 1e-08, maxit = 1000, filter = NULL)
 
@@ -188,7 +177,6 @@ revolver.probs.ADE.dpareto (graph, par, cats, gcats, agebins)
   \item{outdist}{}
   \item{m}{}
   \item{directed}{}
-  \item{verbose}{}
   \item{graph}{}
   \item{niter}{}
   \item{sd}{}

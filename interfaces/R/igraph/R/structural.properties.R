@@ -276,8 +276,7 @@ subgraph <- function(graph, v) {
 }
 
 betweenness <- function(graph, v=V(graph), directed=TRUE, weights=NULL,
-                        nobigint=TRUE, normalized=FALSE,
-                        verbose=getIgraphOpt("verbose")) {
+                        nobigint=TRUE, normalized=FALSE) {
   
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -293,7 +292,6 @@ betweenness <- function(graph, v=V(graph), directed=TRUE, weights=NULL,
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_betweenness", graph, as.igraph.vs(graph, v)-1,
                as.logical(directed), weights, as.logical(nobigint),
-               as.logical(verbose),
                PACKAGE="igraph")
   if (normalized) {
     vc <- vcount(graph)

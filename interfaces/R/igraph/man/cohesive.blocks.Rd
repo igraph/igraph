@@ -13,7 +13,7 @@
 \title{Calculate Cohesive Blocks}
 \description{Calculates cohesive blocks for objects of class \code{igraph}.}
 \usage{
-cohesive.blocks(graph, verbose=getIgraphOpt("verbose"))
+cohesive.blocks(graph)
 
 blocks(blocks)
 blockGraphs(blocks, graph)
@@ -40,8 +40,6 @@ maxcohesion(blocks)
       be supplied whose cohesive block structure is given in the
       \code{blocks} argument.
     }
-    \item{verbose}{Logical, whether to show a progress bar and/or status
-      messages along the computation.}
     \item{blocks,x,object}{A \code{cohesiveBlocks} object, created with
       the \code{cohesive.blocks} function.}
     \item{file}{Defines the file (or connection) the Pajek file is

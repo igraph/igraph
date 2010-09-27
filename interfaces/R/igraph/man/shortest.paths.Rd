@@ -22,7 +22,7 @@ get.shortest.paths(graph, from, to=V(graph), mode = c("out", "all",
 get.all.shortest.paths(graph, from, to = V(graph), mode = c("out", 
       "all", "in"), weights=NULL) 
 average.path.length(graph, directed=TRUE, unconnected=TRUE)
-path.length.hist (graph, directed = TRUE, verbose = getIgraphOpt("verbose")) 
+path.length.hist (graph, directed = TRUE)
 }
 \arguments{
   \item{graph}{The graph to work on.}
@@ -72,8 +72,6 @@ path.length.hist (graph, directed = TRUE, verbose = getIgraphOpt("verbose"))
     FALSE the length of the missing paths are counted having length
     \code{vcount(graph)}, one longer than the longest possible geodesic
     in the network.}
-  \item{verbose}{Logical scalar, whether to draw a progress meter while
-    the calculation is running.}
 }
 \details{
   The shortest path, or geodesic between two pair of vertices is a path
