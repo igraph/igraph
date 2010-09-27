@@ -303,6 +303,7 @@ igraph_closeness:
                 NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL
         DEPS: vids ON graph, weights ON graph
         NAME-R: closeness
+        IGNORE: RR
 
 igraph_closeness_estimate:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \

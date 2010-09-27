@@ -12,7 +12,10 @@ kite <- graph.formula(Andre    - Beverly:Carol:Diane:Fernando,
                       Ike      - Heather:Jane,
                       Jane     - Ike)
 kite <- simplify(kite)
-clo <- structure(closeness(kite), names=V(kite)$name)
+clo <- structure(closeness(kite) * (vcount(kite)-1), names=V(kite)$name)
 round(sort(clo, decreasing=TRUE), 3)
+
+clo2 <- closeness(kite, normalized=TRUE)
+all(clo==clo2)
 
 ## TODO: weighted closeness

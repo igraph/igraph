@@ -7,7 +7,7 @@
   to access every other vertex from a given vertex.}
 \usage{
 closeness(graph, vids=V(graph), mode = c("out", "in", "all", "total"),
-        weights = NULL)
+        weights = NULL, normalized = FALSE)
 closeness.estimate(graph, vids=V(graph), mode = c("out", "in", "all",
        "total"), cutoff, weights = NULL) 
 }
@@ -19,6 +19,10 @@ closeness.estimate(graph, vids=V(graph), mode = c("out", "in", "all",
     paths \emph{to} a vertex, \dQuote{out} measures paths \emph{from} a
     vertex, \emph{all} uses undirected paths. This argument is ignored
     for undirected graphs.}
+  \item{normalized}{Logical scalar, whether to calculate the normalized
+    closeness. Normalization is performed by multiplying the raw
+    closeness by \eqn{n-1}, where \eqn{n} is the number of vertices in
+    the graph.}
   \item{cutoff}{The maximum path length to consider when calculating the
     betweenness. If zero or negative then there is no such limit.}
   \item{weights}{Optional positive weight vector for calculating
@@ -29,7 +33,7 @@ closeness.estimate(graph, vids=V(graph), mode = c("out", "in", "all",
   of the average length of the shortest paths to/from all the other
   vertices in the graph:
 
-  \deqn{\frac{|V|-1}{\sum_{i\ne v} d_vi}}{(|V|-1)/sum( d(v,i), i != v)}
+  \deqn{\frac{1}{\sum_{i\ne v} d_vi}}{1/sum( d(v,i), i != v)}
 
   If there is no (directed) path between vertex \eqn{v}{\code{v}} and
   \eqn{i}{\code{i}} then the total number of vertices is used in the

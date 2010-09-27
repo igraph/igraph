@@ -29,12 +29,16 @@ Type 'q()' to quit R.
 +                       Ike      - Heather:Jane,
 +                       Jane     - Ike)
 > kite <- simplify(kite)
-> clo <- structure(closeness(kite), names=V(kite)$name)
+> clo <- structure(closeness(kite) * (vcount(kite)-1), names=V(kite)$name)
 > round(sort(clo, decreasing=TRUE), 3)
 Fernando    Garth    Diane  Heather    Andre  Beverly    Carol       Ed 
    0.643    0.643    0.600    0.600    0.529    0.529    0.500    0.500 
      Ike     Jane 
    0.429    0.310 
+> 
+> clo2 <- closeness(kite, normalized=TRUE)
+> all(clo==clo2)
+[1] TRUE
 > 
 > ## TODO: weighted closeness
 > 

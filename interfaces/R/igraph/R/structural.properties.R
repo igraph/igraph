@@ -104,7 +104,8 @@ average.path.length <- function(graph, directed=TRUE, unconnected=TRUE) {
 }
 
 degree <- function(graph, v=V(graph),
-                   mode=c("all", "out", "in", "total"), loops=TRUE){
+                   mode=c("all", "out", "in", "total"), loops=TRUE,
+                   normalized=FALSE){
   
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -113,8 +114,10 @@ degree <- function(graph, v=V(graph),
   mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_degree", graph, as.igraph.vs(graph, v)-1, as.numeric(mode),
-        as.logical(loops), PACKAGE="igraph")
+  res <- .Call("R_igraph_degree", graph, as.igraph.vs(graph, v)-1,
+               as.numeric(mode), as.logical(loops), PACKAGE="igraph")
+  if (normalized) { res <- res / (vcount(graph)-1) }
+  res
 }
   
 degree.distribution <- function(graph, cumulative=FALSE, ...) {
@@ -273,7 +276,8 @@ subgraph <- function(graph, v) {
 }
 
 betweenness <- function(graph, v=V(graph), directed=TRUE, weights=NULL,
-                        nobigint=TRUE, verbose=igraph.par("verbose")) {
+                        nobigint=TRUE, normalized=FALSE,
+                        verbose=igraph.par("verbose")) {
   
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -287,10 +291,15 @@ betweenness <- function(graph, v=V(graph), directed=TRUE, weights=NULL,
     weights <- NULL
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_betweenness", graph, as.igraph.vs(graph, v)-1,
-        as.logical(directed), weights, as.logical(nobigint),
-        as.logical(verbose),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_betweenness", graph, as.igraph.vs(graph, v)-1,
+               as.logical(directed), weights, as.logical(nobigint),
+               as.logical(verbose),
+               PACKAGE="igraph")
+  if (normalized) {
+    vc <- vcount(graph)
+    res <- 2*res / ( vc*vc-3*vc+2)
+  }
+  res
 }
 
 transitivity <- function(graph, type=c("undirected", "global", "globalundirected",
@@ -930,5 +939,29 @@ unfold.tree <- function(graph, mode=c("all", "out", "in", "total"), roots) {
   # Function call
   res <- .Call("R_igraph_unfold_tree", graph, mode, roots,
         PACKAGE="igraph")
+  res
+}
+
+closeness <- function(graph, vids=V(graph),
+                      mode=c("out", "in", "all", "total"), weights=NULL,
+                      normalized=FALSE) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  vids <- as.igraph.vs(graph, vids)-1
+  mode <- switch(igraph.match.arg(mode), "out"=1, "in"=2, "all"=3, "total"=3)
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
+  weights <- E(graph)$weight 
+  } 
+  if (!is.null(weights) && any(!is.na(weights))) { 
+  weights <- as.numeric(weights) 
+  } else { 
+  weights <- NULL 
+  }
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_closeness", graph, vids, mode, weights,
+        PACKAGE="igraph")
+  if (!normalized) { res <- res / (vcount(graph)-1) }
   res
 }

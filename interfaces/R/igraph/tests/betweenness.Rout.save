@@ -39,6 +39,13 @@ Type 'q()' to quit R.
       Ed     Jane 
    0.000    0.000 
 > 
+> bet2 <- structure(betweenness(kite, normalized=TRUE), names=V(kite)$name)
+> round(sort(bet2, decreasing=TRUE), 3)
+ Heather Fernando    Garth      Ike    Diane    Andre  Beverly    Carol 
+   0.389    0.231    0.231    0.222    0.102    0.023    0.023    0.000 
+      Ed     Jane 
+   0.000    0.000 
+> 
 > ## Weighted
 > 
 > nontriv <- graph( c(0,19,0,16,0,20,1,19,2,5,3,7,3,8,

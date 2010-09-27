@@ -24,6 +24,9 @@ Type 'q()' to quit R.
 > all(table(el)==d[d!=0])
 [1] TRUE
 > 
+> all(degree(g) / (vcount(g)-1) == degree(g, normalized=TRUE))
+[1] TRUE
+> 
 > g2 <- erdos.renyi.game(100, 2/100, dir=TRUE)
 > din <- degree(g2, mode="in")
 > dout <- degree(g2, mode="out")
@@ -31,5 +34,15 @@ Type 'q()' to quit R.
 > all(table(el2[,1]) == dout[dout!=0])
 [1] TRUE
 > all(table(el2[,2]) == din[din!=0])
+[1] TRUE
+> 
+> all(degree(g2, mode="in") / (vcount(g2)-1) ==
++     degree(g2, mode="in", normalized=TRUE))
+[1] TRUE
+> all(degree(g2, mode="out") / (vcount(g2)-1) ==
++     degree(g2, mode="out", normalized=TRUE))
+[1] TRUE
+> all(degree(g2, mode="all") / (vcount(g2)-1) ==
++     degree(g2, mode="all", normalized=TRUE))
 [1] TRUE
 > 

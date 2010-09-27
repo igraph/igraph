@@ -18,6 +18,9 @@ nf <- (vcount(kite)-1) * (vcount(kite)-2) /2
 bet <- structure(betweenness(kite) / nf, names=V(kite)$name)
 round(sort(bet, decreasing=TRUE), 3)
 
+bet2 <- structure(betweenness(kite, normalized=TRUE), names=V(kite)$name)
+round(sort(bet2, decreasing=TRUE), 3)
+
 ## Weighted
 
 nontriv <- graph( c(0,19,0,16,0,20,1,19,2,5,3,7,3,8,
