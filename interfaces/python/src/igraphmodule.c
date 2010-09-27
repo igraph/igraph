@@ -145,7 +145,7 @@ int igraphmodule_igraph_status_hook(const char* message, void*data) {
   if (igraphmodule_status_handler) {
     PyObject *result;
     if (PyCallable_Check(igraphmodule_status_handler)) {
-      result = PyObject_CallFunction(igraphmodule_status_handler, "sd", message);
+      result = PyObject_CallFunction(igraphmodule_status_handler, "s", message);
       if (result)
         Py_DECREF(result);
       else
@@ -163,8 +163,9 @@ PyObject* igraphmodule_set_progress_handler(PyObject* self, PyObject* o) {
   }
   Py_XDECREF(igraphmodule_progress_handler);
   if (o == Py_None) {
-    if (igraphmodule_progress_handler)
+    if (igraphmodule_progress_handler) {
       Py_DECREF(igraphmodule_progress_handler);
+    }
     igraphmodule_progress_handler=NULL;
   } else {
     Py_INCREF(o);
@@ -180,8 +181,9 @@ PyObject* igraphmodule_set_status_handler(PyObject* self, PyObject* o) {
   }
   Py_XDECREF(igraphmodule_status_handler);
   if (o == Py_None) {
-    if (igraphmodule_status_handler)
+    if (igraphmodule_status_handler) {
       Py_DECREF(igraphmodule_status_handler);
+    }
     igraphmodule_status_handler=NULL;
   } else {
     Py_INCREF(o);

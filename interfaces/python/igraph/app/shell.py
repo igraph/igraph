@@ -21,7 +21,8 @@ Mac OS X users are likely to invoke igraph from the command line.
 
 # pylint: disable-msg=W0401
 # W0401: wildcard import. That's exactly what we need for the shell.
-from igraph import __version__, set_progress_handler, config
+from igraph import __version__, set_progress_handler, set_status_handler
+from igraph.configuration import Configuration
 import sys, re
 
 # pylint: disable-msg=C0103,R0903
@@ -209,28 +210,55 @@ class ProgressBar:
         self.header = self.term.render(self.HEADER % "".center(self.width))
         self.cleared = True #: true if we haven't drawn the bar yet.
 
-    def update(self, percent, message):
+        self.last_percent = 0
+        self.last_message = ""
+
+    def update(self, percent=None, message=None):
         """Updates the progress bar.
 
-        @param percent: the percentage to be shown
-        @param message: the message to be shown above the progress bar
+        @param percent: the percentage to be shown. If C{None}, the previous
+          value will be used.
+        @param message: the message to be shown above the progress bar. If
+          C{None}, the previous message will be used.
         """
         if self.cleared:
-            sys.stdout.write(self.header)
+            sys.stdout.write("\n"+self.header)
             self.cleared = False
+
+        if message is None:
+            message = self.last_message
+        else:
+            self.last_message = message
+
+        if percent is None:
+            percent = self.last_percent
+        else:
+            self.last_percent = percent
+
         n = int((self.width-10)*(percent/100.0))
         sys.stdout.write(
-            self.term.BOL + self.term.UP + self.term.CLEAR_EOL +
+            self.term.BOL + self.term.UP + self.term.UP + self.term.CLEAR_EOL +
             self.term.render(self.HEADER % message.center(self.width)) +
-            (self.progress_bar % (percent, '='*n, '-'*(self.width-10-n)))
+            (self.progress_bar % (percent, '='*n, '-'*(self.width-10-n))) + "\n"
             )
+
+    def update_message(self, message):
+        """Updates the message of the progress bar.
+
+        @param message: the message to be shown above the progress bar
+        """
+        return self.update(message=message.strip())
 
     def clear(self):
         """Clears the progress bar (i.e. removes it from the screen)"""
         if not self.cleared:
             sys.stdout.write(self.term.BOL + self.term.CLEAR_EOL +
+                             self.term.UP + self.term.CLEAR_EOL +
                              self.term.UP + self.term.CLEAR_EOL)
             self.cleared = True
+            self.last_percent = 0
+            self.last_message = ""
+
 
 class Shell(object):
     """Superclass of the embeddable shells supported by igraph"""
@@ -248,12 +276,27 @@ class Shell(object):
         called C{_progress_handler}."""
         return hasattr(self, "_progress_handler")
 
+    def supports_status_messages(self):
+        """Checks whether the shell supports status messages.
+
+        This is done by checking for the existence of an attribute
+        called C{_status_handler}."""
+        return hasattr(self, "_status_handler")
+
     # pylint: disable-msg=E1101
     def get_progress_handler(self):
         """Returns the progress handler (if exists) or None (if not)."""
         if self.supports_progress_bar():
             return self._progress_handler
         return None
+
+    # pylint: disable-msg=E1101
+    def get_status_handler(self):
+        """Returns the status handler (if exists) or None (if not)."""
+        if self.supports_status_messages():
+            return self._status_handler
+        return None
+
 
 class IDLEShell(Shell):
     """IDLE embedded shell interface.
@@ -296,7 +339,41 @@ class IDLEShell(Shell):
         self._root.destroy()
 
 
-class IPythonShell(Shell):
+class ConsoleProgressBarMixin(object):
+    """Mixin class for console shells that support a progress bar."""
+
+    def __init__(self):
+        try:
+            self.__class__.progress_bar = ProgressBar(TerminalController())
+        except ValueError:
+            # Terminal is not capable enough, disable progress handler
+            del self.__class__._progress_handler
+            del self.__class__._status_handler
+
+    @classmethod
+    def _progress_handler(cls, message, percentage):
+        """Progress bar handler, called when C{igraph} reports the progress
+        of an operation
+
+        @param message: message provided by C{igraph}
+        @param percentage: percentage provided by C{igraph}
+        """
+        if percentage >= 100:
+            cls.progress_bar.clear()
+        else:
+            cls.progress_bar.update(percentage, message)
+
+    @classmethod
+    def _status_handler(cls, message):
+        """Status message handler, called when C{igraph} sends a status
+        message to be displayed.
+
+        @param message: message provided by C{igraph}
+        """
+        cls.progress_bar.update_message(message)
+
+
+class IPythonShell(Shell, ConsoleProgressBarMixin):
     """IPython embedded shell interface.
 
     This class allows igraph to be embedded in IPython's interactive shell."""
@@ -306,15 +383,11 @@ class IPythonShell(Shell):
 
         Imports IPython's embedded shell with separator lines removed."""
         Shell.__init__(self)
+        ConsoleProgressBarMixin.__init__(self)
 
         from IPython.Shell import IPShellEmbed
         self._shell = IPShellEmbed(['-nosep'])
         self._shell.IP.runsource("from igraph import *")
-        try:
-            self.__class__.progress_bar = ProgressBar(TerminalController())
-        except ValueError:
-            # Terminal is not capable enough, disable progress handler
-            del self.__class__._progress_handler
 
     def __call__(self):
         """Starts the embedded shell."""
@@ -322,20 +395,8 @@ class IPythonShell(Shell):
         print self._shell.IP.BANNER,
         self._shell()
 
-    def _progress_handler(message, percentage):
-        """Progress bar handler, called when C{igraph} reports the progress
-        of an operation
 
-        @param message: message provided by C{igraph}
-        @param percentage: percentage provided by C{igraph}
-        """
-        if percentage >= 100:
-            IPythonShell.progress_bar.clear()
-        else:
-            IPythonShell.progress_bar.update(percentage, message)
-    _progress_handler = staticmethod(_progress_handler)
-
-class ClassicPythonShell(Shell):
+class ClassicPythonShell(Shell, ConsoleProgressBarMixin):
     """Classic Python shell interface.
 
     This class allows igraph to be embedded in Python's shell."""
@@ -363,22 +424,12 @@ class ClassicPythonShell(Shell):
 
         self._shell.interact()
 
-    def _progress_handler(message, percentage):
-        """Progress bar handler, called when C{igraph} reports the progress
-        of an operation
-
-        @param message: message provided by C{igraph}
-        @param percentage: percentage provided by C{igraph}
-        """
-        if percentage >= 100:
-            ClassicPythonShell.progress_bar.clear()
-        else:
-            ClassicPythonShell.progress_bar.update(percentage, message)
-    _progress_handler = staticmethod(_progress_handler)
 
 def main():
     """The main entry point for igraph when invoked from the command
     line shell"""
+    config = Configuration.instance()
+
     if config.filename:
         print >> sys.stderr, "Using configuration from %s" % config.filename
     else:
@@ -413,8 +464,12 @@ def main():
             pass
 
     if isinstance(shell, Shell):
-        if config["verbose"] and shell.supports_progress_bar():
-            set_progress_handler(shell.get_progress_handler())
+        if config["verbose"]:
+            if shell.supports_progress_bar():
+                set_progress_handler(shell.get_progress_handler())
+            if shell.supports_status_messages():
+                print "eee"
+                set_status_handler(shell.get_status_handler())
         shell()
     else:
         print >> sys.stderr, "No suitable Python shell was found."
