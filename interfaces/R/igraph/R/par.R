@@ -20,7 +20,7 @@
 #
 ###################################################################
 
-igraph.pars <- list("print.vertex.attributes"=FALSE,
+.igraph.pars <- list("print.vertex.attributes"=FALSE,
                     "print.edge.attributes"=FALSE,
                     "print.graph.attributes"=FALSE,
                     "verbose"=FALSE,
@@ -32,14 +32,14 @@ igraph.pars <- list("print.vertex.attributes"=FALSE,
 ## This is based on 'sm.options' in the 'sm' package
 
 igraph.options <- function(...) {
-  if (nargs() == 0) return(igraph.pars)
-  current <- igraph.pars
+  if (nargs() == 0) return(.igraph.pars)
+  current <- .igraph.pars
   temp <- list(...)
   if (length(temp) == 1 && is.null(names(temp))) {
     arg <- temp[[1]]
     switch(mode(arg),
            list = temp <- arg,
-           character = return(igraph.pars[arg]),
+           character = return(.igraph.pars[arg]),
            stop("invalid argument: ", sQuote(arg)))
   }
   if (length(temp) == 0) return(current)
@@ -48,7 +48,7 @@ igraph.options <- function(...) {
   changed <- current[n]
   current[n] <- temp
   if (sys.parent() == 0) env <- asNamespace("igraph") else env <- parent.frame()
-  assign("igraph.pars", current, envir = env)
+  assign(".igraph.pars", current, envir = env)
   invisible(current)
 }
 
@@ -67,10 +67,10 @@ igraph.par <- function(parid, parvalue=NULL) {
   .Deprecated("igraph.options", package="igraph")
   
   if (is.null(parvalue)) {
-    res <- igraph.pars[[parid]]
+    res <- .igraph.pars[[parid]]
     res
   } else {
-    igraph.pars[[parid]] <- parvalue
+    .igraph.pars[[parid]] <- parvalue
     invisible(parvalue)
   }
 }
