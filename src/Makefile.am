@@ -134,7 +134,8 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_strvector.h	../include/igraph_psumtree.h  \
 		../include/igraph_sparsemat.h   ../include/igraph_mixing.h    \
 		../include/igraph_version.h     ../include/igraph_blas.h      \
-		../include/igraph_separators.h  ../include/igraph_cohesive_blocks.h
+		../include/igraph_separators.h  ../include/igraph_cohesive_blocks.h \
+		../include/igraph_statusbar.h
 
 libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     basic_query.c games.c cocitation.c iterators.c \
@@ -180,7 +181,7 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     version.c optimal_modularity.c \
 			     igraph_fixed_vectorlist.c separators.c \
 			     igraph_marked_queue.c igraph_estack.c st-cuts.c \
-			     cohesive_blocks.c
+			     cohesive_blocks.c statusbar.c
 
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall

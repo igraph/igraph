@@ -1386,7 +1386,7 @@ igraph_cohesive_blocks:
         DEPS: blocks ON graph
         NAME-R: cohesive.blocks
         CLASS-R: cohesiveBlocks
-        IGNORE: RR
+        IGNORE: RR, RC
 
 #######################################
 # K-Cores

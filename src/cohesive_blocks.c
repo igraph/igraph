@@ -31,6 +31,7 @@
 #include "igraph_dqueue.h"
 #include "igraph_constructors.h"
 #include "igraph_interrupt.h"
+#include "igraph_statusbar.h"
 
 void igraph_i_cohesive_blocks_free(igraph_vector_ptr_t *ptr) {
   long int i, n=igraph_vector_ptr_size(ptr);
@@ -245,29 +246,34 @@ int igraph_cohesive_blocks(const igraph_t *graph,
   VECTOR(Qparent)[0] = -1;	/* Has no parent */
   IGRAPH_CHECK(igraph_vertex_connectivity(graph, &conn, /*checks=*/ 1));
   VECTOR(Qcohesion)[0] = conn;
-  VECTOR(Qcheck)[0] = 0;
-  
+  VECTOR(Qcheck)[0] = 0;  
+
   /* Then work until the queue is empty */
   while (Qptr < igraph_vector_ptr_size(&Q)) {
     igraph_t *mygraph=VECTOR(Q)[Qptr];
     igraph_bool_t mycheck=VECTOR(Qcheck)[Qptr];
     long int mynodes=igraph_vcount(mygraph);
     long int i, nsep;
-    long int no;
+    long int no, kept=0;
     long int cptr=0;
     long int nsepv=0;
     igraph_bool_t addedsep=0;
 
+    IGRAPH_STATUSF(("Candidate %li: %li vertices, ", 
+		    0, Qptr, mynodes));
     IGRAPH_ALLOW_INTERRUPTION();
 
     /* Get the separators */
     IGRAPH_CHECK(igraph_minimum_size_separators(mygraph, &separators));
     IGRAPH_FINALLY(igraph_i_cohesive_blocks_free3, &separators);
+    nsep=igraph_vector_ptr_size(&separators);
+    
+    IGRAPH_STATUSF(("%li separators, ", 0, nsep));
 
     /* Remove them from the graph, also mark them */    
     IGRAPH_CHECK(igraph_vector_bool_resize(&marked, mynodes));
     igraph_vector_bool_null(&marked);
-    for (i=0, nsep=igraph_vector_ptr_size(&separators); i<nsep; i++) {
+    for (i=0; i<nsep; i++) {
       igraph_vector_t *v=VECTOR(separators)[i];
       long int j, n=igraph_vector_size(v);
       for (j=0; j<n; j++) {
@@ -299,6 +305,8 @@ int igraph_cohesive_blocks(const igraph_t *graph,
       IGRAPH_CHECK(igraph_vector_long_push_back(&components, -1));
       no++;
     }
+
+    IGRAPH_STATUSF(("%li new candidates, ", 0, no));
 
     for (i=0; i<no; i++) {
       igraph_vector_t *newmapping;
@@ -335,6 +343,7 @@ int igraph_cohesive_blocks(const igraph_t *graph,
 				    IGRAPH_ALL, IGRAPH_LOOPS));
       if (maxdeg > VECTOR(Qcohesion)[Qptr]) {
 	igraph_integer_t newconn;
+	kept++;
 	IGRAPH_CHECK(igraph_vector_ptr_push_back(&Q, newgraph));
 	IGRAPH_FINALLY_CLEAN(2);
 	IGRAPH_CHECK(igraph_vector_ptr_push_back(&Qmapping, newmapping));
@@ -353,7 +362,9 @@ int igraph_cohesive_blocks(const igraph_t *graph,
 	IGRAPH_FINALLY_CLEAN(4);
       }
     }
-    
+
+    IGRAPH_STATUSF(("keeping %li.\n", 0, kept));
+
     igraph_destroy(mygraph);
     igraph_free(mygraph);
     VECTOR(Q)[Qptr] = 0;
@@ -436,7 +447,12 @@ int igraph_cohesive_blocks(const igraph_t *graph,
     if (parent) { IGRAPH_CHECK(igraph_vector_resize(parent, noblocks)); }
 
     for (i=0; i<Qptr; i++) {
-      if (VECTOR(removed)[i]) { continue; }
+      if (VECTOR(removed)[i]) { 
+	IGRAPH_STATUSF(("Candidate %li ignored.\n", 0, i));
+	continue; 
+      } else {
+	IGRAPH_STATUSF(("Candidata %li is a cohesive (sub)block\n", 0, i));
+      }
       VECTOR(rewritemap)[i] = resptr;
       if (cohesion) { VECTOR(*cohesion)[resptr]=VECTOR(Qcohesion)[i]; }
       if (parent || block_tree) {

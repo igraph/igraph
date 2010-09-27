@@ -1759,6 +1759,7 @@ void R_igraph_warning_handler(const char *reason, const char *file,
 igraph_interruption_handler_t *R_igraph_oldinterrupt;
 igraph_progress_handler_t *R_igraph_oldprogress;
 igraph_warning_handler_t *R_igraph_oldwarning;
+igraph_status_handler_t *R_igraph_oldstatus;
 
 extern int R_interrupts_pending;
 
@@ -1797,6 +1798,11 @@ int R_igraph_progress_handler(const char *message, igraph_real_t percent,
   return 0;
 }
 
+int R_igraph_status_handler(const char *message, void *data) {
+  EVAL(lang2(install("message"), ScalarString(mkChar(message))));
+  return 0;
+}
+
 static R_INLINE void R_igraph_before() {
   R_igraph_oldhandler=igraph_set_error_handler(R_igraph_myhandler);
   R_igraph_oldwarning=igraph_set_warning_handler(R_igraph_warning_handler);
@@ -1814,6 +1820,7 @@ static R_INLINE void R_igraph_before2(SEXP verbose, const char *str) {
   R_igraph_attribute_oldtable=
     igraph_i_set_attribute_table(&R_igraph_attribute_table);
   if (LOGICAL(verbose)[0]) {
+    R_igraph_oldstatus=igraph_set_status_handler(R_igraph_status_handler);
     R_igraph_oldprogress=igraph_set_progress_handler(R_igraph_progress_handler);
   }
 }  
@@ -1828,9 +1835,11 @@ static R_INLINE void R_igraph_after() {
 static R_INLINE void R_igraph_after2(SEXP verbose) {
   igraph_set_error_handler(R_igraph_oldhandler);
   igraph_set_warning_handler(R_igraph_oldwarning);
+  igraph_set_status_handler(R_igraph_oldstatus);
   igraph_set_interruption_handler(R_igraph_oldinterrupt);
   igraph_i_set_attribute_table(R_igraph_attribute_oldtable);
   if (LOGICAL(verbose)[0]) {
+    igraph_set_status_handler(R_igraph_oldstatus);
     igraph_set_progress_handler(R_igraph_oldprogress);
     fputc('\n', stderr);
   }
@@ -8000,6 +8009,71 @@ SEXP R_igraph_dfs(SEXP graph, SEXP proot, SEXP pneimode, SEXP punreachable,
   
   UNPROTECT(2);
   return result;
+}
+
+SEXP R_igraph_cohesive_blocks(SEXP graph, SEXP verbose) {
+                                        /* Declarations */
+  igraph_t c_graph;
+  igraph_vector_ptr_t c_blocks;
+  igraph_vector_t c_cohesion;
+  igraph_vector_t c_parent;
+  igraph_t c_blockTree;
+  SEXP blocks;
+  SEXP cohesion;
+  SEXP parent;
+  SEXP blockTree;
+  int c_result;
+  SEXP result, names;
+
+  R_igraph_before2(verbose, "Cohesive blocks");
+                                        /* Convert input */
+  R_SEXP_to_igraph(graph, &c_graph);
+  if (0 != igraph_vector_ptr_init(&c_blocks, 0)) { 
+  igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
+  } 
+  IGRAPH_FINALLY(R_igraph_vectorlist_destroy, &c_blocks);
+  if (0 != igraph_vector_init(&c_cohesion, 0)) { 
+  igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
+  } 
+  IGRAPH_FINALLY(igraph_vector_destroy, &c_cohesion);
+  if (0 != igraph_vector_init(&c_parent, 0)) { 
+  igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
+  } 
+  IGRAPH_FINALLY(igraph_vector_destroy, &c_parent);
+                                        /* Call igraph */
+  c_result=igraph_cohesive_blocks(&c_graph, &c_blocks, &c_cohesion, &c_parent, &c_blockTree);
+
+                                        /* Convert output */
+  PROTECT(result=NEW_LIST(4));
+  PROTECT(names=NEW_CHARACTER(4));
+  PROTECT(blocks=R_igraph_vectorlist_to_SEXP_p1(&c_blocks)); 
+  R_igraph_vectorlist_destroy(&c_blocks); 
+  IGRAPH_FINALLY_CLEAN(1);
+  PROTECT(cohesion=R_igraph_vector_to_SEXP(&c_cohesion)); 
+  igraph_vector_destroy(&c_cohesion); 
+  IGRAPH_FINALLY_CLEAN(1);
+  PROTECT(parent=R_igraph_vector_to_SEXPp1(&c_parent)); 
+  igraph_vector_destroy(&c_parent); 
+  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY(igraph_destroy, &c_blockTree); 
+  PROTECT(blockTree=R_igraph_to_SEXP(&c_blockTree));  
+  igraph_destroy(&c_blockTree); 
+  IGRAPH_FINALLY_CLEAN(1);
+  SET_VECTOR_ELT(result, 0, blocks);
+  SET_VECTOR_ELT(result, 1, cohesion);
+  SET_VECTOR_ELT(result, 2, parent);
+  SET_VECTOR_ELT(result, 3, blockTree);
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("blocks"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("cohesion"));
+  SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("parent"));
+  SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("blockTree"));
+  SET_NAMES(result, names);
+  UNPROTECT(5);
+
+  R_igraph_after2(verbose);
+
+  UNPROTECT(1);
+  return(result);
 }
 
 SEXP R_igraph_revolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,

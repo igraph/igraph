@@ -20,13 +20,14 @@
 #
 ###################################################################
 
-cohesive.blocks <- function(graph, labels=TRUE) {
+cohesive.blocks <- function(graph, labels=TRUE,
+                            verbose=getIgraphOpt("verbose")) {
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
-  res <- .Call("R_igraph_cohesive_blocks", graph,
+  res <- .Call("R_igraph_cohesive_blocks", graph, verbose,
         PACKAGE="igraph")
   class(res) <- "cohesiveBlocks"
   if (labels && "name" %in% list.vertex.attributes(graph)) {
