@@ -30,8 +30,20 @@
                     )
 
 igraph.pars.set.verbose <- function(verbose) {
-  verbose <- as.logical(verbose)
-  .Call("R_igraph_set_verbose", verbose, PACKAGE="igraph")
+  if (is.logical(verbose) && verbose) {
+    .Call("R_igraph_set_verbose", verbose, PACKAGE="igraph")
+  } else if (is.character(verbose)) {
+    if (!verbose %in% c("tk")) {
+      stop("Unknown 'verbose' value")
+    }
+    if (verbose=="tk" && !require("tcltk")) {
+      stop("tcltk package not available")
+    }
+    .Call("R_igraph_set_verbose", verbose, PACKAGE="igraph")
+  } else {
+    stop("'verbose' should be a logical or character scalar")
+  }
+  verbose
 }
 
 igraph.pars.callbacks <- list("verbose"=igraph.pars.set.verbose)
@@ -52,14 +64,14 @@ igraph.options <- function(...) {
   if (length(temp) == 0) return(current)
   n <- names(temp)
   if (is.null(n)) stop("options must be given by name")
-  changed <- current[n]
-  current[n] <- temp
-  if (sys.parent() == 0) env <- asNamespace("igraph") else env <- parent.frame()
-  assign(".igraph.pars", current, envir = env)
+  env <- asNamespace("igraph")
   cb <- intersect(names(igraph.pars.callbacks), n)
   for (cn in cb) {
-    igraph.pars.callbacks[[cn]](current[[cn]])
+    temp[[cn]] <- igraph.pars.callbacks[[cn]](temp[[cn]])
   }
+  current <- .igraph.pars               # callback might have updated it
+  current[n] <- temp
+  assign(".igraph.pars", current, envir = env)
   invisible(current)
 }
 

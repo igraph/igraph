@@ -1772,30 +1772,19 @@ int R_igraph_interrupt_handler(void *data) {
 
 int R_igraph_progress_handler(const char *message, igraph_real_t percent,
 			      void * data) {
-  static igraph_real_t last=0;
-  if (percent == 0) {
-    int i, l=strlen(message);
-    last=0;
-    fprintf(stderr, 
-	    "                    : --------------------------------------------------|\r");
-    for (i=0; i<l && i<20; i++) {
-      fputc(message[i], stderr);
-    }
-    for (; i<20; i++) {
-      fputc(' ', stderr);
-    }
-    fputc(':', stderr); fputc(' ', stderr);
-  } 
-  while (last < percent) {
-    fputc('*', stderr);
-    last+=2;
-  }
+  
+  EVAL(lang3(install(".igraph.progress"), ScalarReal(percent), 
+	     ScalarString(mkChar(message))));
   return 0;
 }
 
 int R_igraph_status_handler(const char *message, void *data) {
-  EVAL(lang2(install("message"), ScalarString(mkChar(message))));
-  return 0;
+  SEXP ec;
+  int ecint;
+  PROTECT(ec=EVAL(lang2(install("message"), ScalarString(mkChar(message)))));
+  ecint=INTEGER(ec)[0];
+  UNPROTECT(1);
+  return ecint;
 }
 
 SEXP R_igraph_init(SEXP progress, SEXP status) {

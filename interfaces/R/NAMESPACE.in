@@ -174,6 +174,10 @@ export(graph.intersection.by.name, graph.union.by.name,
 
 export(igraph.par, igraph.options, getIgraphOpt)
 
+# console
+
+export(.igraph.progress)
+
 # flows, cuts, etc.
 
 export(graph.mincut, vertex.connectivity, edge.connectivity,
