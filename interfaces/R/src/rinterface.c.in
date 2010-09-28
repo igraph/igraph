@@ -1772,19 +1772,18 @@ int R_igraph_interrupt_handler(void *data) {
 
 int R_igraph_progress_handler(const char *message, igraph_real_t percent,
 			      void * data) {
-  
-  EVAL(lang3(install(".igraph.progress"), ScalarReal(percent), 
-	     ScalarString(mkChar(message))));
-  return 0;
-}
-
-int R_igraph_status_handler(const char *message, void *data) {
   SEXP ec;
   int ecint;
-  PROTECT(ec=EVAL(lang2(install("message"), ScalarString(mkChar(message)))));
+  EVAL(lang3(install(".igraph.progress"), ScalarReal(percent), 
+	     ScalarString(mkChar(message))));
   ecint=INTEGER(ec)[0];
   UNPROTECT(1);
   return ecint;
+}
+
+int R_igraph_status_handler(const char *message, void *data) {
+  EVAL(lang2(install("message"), ScalarString(mkChar(message))));
+  return 0;
 }
 
 SEXP R_igraph_init(SEXP progress, SEXP status) {
@@ -1810,6 +1809,8 @@ SEXP R_igraph_set_verbose(SEXP verbose) {
 }
 
 SEXP R_igraph_finalizer() {
+  EVAL(lang4(install(".igraph.progress"), ScalarReal(0.0), 
+	     ScalarString(mkChar("")), ScalarLogical(1)));
   IGRAPH_FINALLY_FREE();
   return R_NilValue;
 }

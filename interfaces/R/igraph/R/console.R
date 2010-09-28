@@ -22,7 +22,11 @@
 
 .igraph.pb <- NULL
 
-.igraph.progress <- function(percent, message) {
+.igraph.progress <- function(percent, message, clean=FALSE) {
+  if (clean) {
+    if (!is.null(.igraph.pb)) { close(.igraph.pb) }
+    return(invisible())
+  }
   type <- getIgraphOpt("verbose")
   if (is.logical(type) && type) {
     .igraph.progress.txt(percent, message)
