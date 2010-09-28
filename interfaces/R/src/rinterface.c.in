@@ -1774,15 +1774,20 @@ int R_igraph_progress_handler(const char *message, igraph_real_t percent,
 			      void * data) {
   SEXP ec;
   int ecint;
-  EVAL(lang3(install(".igraph.progress"), ScalarReal(percent), 
-	     ScalarString(mkChar(message))));
+  PROTECT(ec=EVAL(lang3(install(".igraph.progress"), ScalarReal(percent), 
+			ScalarString(mkChar(message)))));
   ecint=INTEGER(ec)[0];
   UNPROTECT(1);
   return ecint;
 }
 
 int R_igraph_status_handler(const char *message, void *data) {
-  EVAL(lang2(install("message"), ScalarString(mkChar(message))));
+  SEXP ec;
+  int ecint;
+  PROTECT(ec=EVAL(lang2(install(".igraph.status"), 
+			ScalarString(mkChar(message)))));
+  ecint=INTEGER(ec)[0];
+  UNPROTECT(1);
   return 0;
 }
 

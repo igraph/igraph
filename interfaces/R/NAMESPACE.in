@@ -176,7 +176,7 @@ export(igraph.par, igraph.options, getIgraphOpt)
 
 # console
 
-export(.igraph.progress)
+export(.igraph.progress, .igraph.status)
 
 # flows, cuts, etc.
 
