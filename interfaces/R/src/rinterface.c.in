@@ -1809,6 +1809,9 @@ SEXP R_igraph_set_verbose(SEXP verbose) {
   if (LOGICAL(verbose)[0]) {
     igraph_set_status_handler(R_igraph_status_handler);    
     igraph_set_progress_handler(R_igraph_progress_handler);
+  } else {
+    igraph_set_status_handler(0);
+    igraph_set_progress_handler(0);
   }
   return R_NilValue;
 }
