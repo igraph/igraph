@@ -62,21 +62,44 @@ parent <- function(blocks) {
 }
 
 print.cohesiveBlocks <- function(x, ...) {
-  cat("Structurally cohesive block structure, with",
-      length(blocks(x)), "blocks.\n\n")
-  cat("Hierarchy:\n")
-  print(hierarchy(x))
-  cat("\nBlocks and their cohesion:\n")
+  cat("Cohesive block structure:\n")
   myb <- blocks(x)
-  lapply(seq_along(myb), function(b) {
-    cat(sep="", "[[", b, "]], cohesion: ", cohesion(x)[b],
-        ", parent: ", parent(x)[b], "\n")
-    if (!is.null(x$labels)) {
-      print(x$labels[ myb[[b]] ])
+  ch <- cohesion(x)
+  pp <- parent(x)
+  si <- sapply(myb, length)
+
+  cs <- 3 + 2 + nchar(length(x)) +
+    max(shortest.paths(hierarchy(x), mode="out", v=1)) * 3
+  
+  .plot <- function(b, ind="") {
+    if (b!=1) {
+      he <- format(paste(sep="", ind, "'- B-", b), width=cs)
+      ind <- paste("  ", ind)
     } else {
-      print(myb[[b]])
+      he <- format(paste(sep="", "B-", b), width=cs)
     }
-  })
+    cat(sep="", he,
+        "c ", format(ch[b], width=nchar(max(ch)), justify="right"),
+        ", n ", format(si[b], width=nchar(x$vcount), justify="right"))
+
+    if (x$vcount <= options("width")$width-40 && b != 1) {
+      o <- rep(".", x$vcount)
+      o[ myb[[b]] ] <- "o"
+      oo <- character()
+      for (i in 1:floor(x$vcount/10)) {
+        oo <- c(oo, o[((i-1)*10+1):(i*10)], " ")
+      }
+      if (x$vcount %% 10) { oo <- c(oo, o[(i*10+1):length(o)]) }
+      cat("  ", paste(oo, collapse=""), "\n")
+    } else {
+      cat("\n")
+    }
+
+    wc <- which(pp==b)
+    sapply(wc, .plot, ind=ind)
+  }
+  if (length(x) >0) .plot(1) else cat("No cohesive blocks found.")
+  
   invisible(x)
 }
 
@@ -185,3 +208,113 @@ maxcohesion <- function(blocks) {
   }
   res
 }
+
+#########################################################
+## Various designs to print the cohesive blocks
+
+## Cohesive block structure:
+## B-1          c. 1, n. 34
+## '- B-2       c. 2, n. 28    1,2,3,4,8,9,10,13,14,15,16,18,19,20,21,22,
+##    |                        23,24,25,26,27,28,29,30,31,32,33,34
+##    '- B-4    c. 4, n.  5    1,2,3,4,8
+##    '- B-5    c. 3, n.  7    1,2,3,9,31,33,34
+##    '- B-7    c. 4, n.  5    1,2,3,4,14
+##    '- B-8    c. 3, n. 10    3,24,25,26,28,29,30,32,33,34
+## '- B-3       c. 2, n.  6    1,5,6,7,11,17
+##    '- B-6    c. 3, n.  5    1,5,6,7,11
+
+## Cohesive block structure:
+## B-1          c. 1, n. 23
+## '- B-2       c. 2, n. 14    1,2,3,4,5,6,7,8,12,19,20,21,22,23
+##    '- B-4    c. 5, n.  7    1,2,3,4,5,6,7
+## '- B-3       c. 2, n. 10    7,9,10,11,13,14,15,16,17,18
+##    '- B-5    c. 3, n.  4    7,9,10,11
+
+## #########################################################
+
+## Cohesive block structure:
+## B-1        c 1, n 34    
+## '- B-2     c 2, n 28    oooo...ooo ..oooo.ooo oooooooooo oooo
+##    '- B-4  c 4, n  5    oooo...o.. .......... .......... ....
+##    '- B-5  c 3, n  7    ooo.....o. .......... .......... o.oo
+##    '- B-7  c 4, n  5    oooo...... ...o...... .......... ....
+##    '- B-8  c 3, n 10    ..o....... .......... ...ooo.ooo .ooo
+## '- B-3     c 2, n  6    o...ooo... o.....o... .......... ....
+##    '- B-6  c 3, n  5    o...ooo... o......... .......... ....
+
+## Cohesive block structure:
+## B-1        c 1, n 23    oooooooooo oooooooooo ooo
+## '- B-2     c 2, n 14    oooooooo.. .o......oo ooo
+##    '- B-4  c 5, n  7    ooooooo... .......... ...
+## '- B-3     c 2, n 10    ......o.oo o.oooooo.. ...
+##    '- B-5  c 3, n  4    ......o.oo o......... ...
+
+## #########################################################
+
+## Cohesive block structure:
+## B-1          c. 1, n. 34
+## '- B-2       c. 2, n. 28     1, 2, 3, 4, 8, 9,10,13,14,15,16,18,19,20,21,
+##    |                        22,23,24,25,26,27,28,29,30,31,32,33,34
+##    '- B-4    c. 4, n.  5     1, 2, 3, 4, 8
+##    '- B-5    c. 3, n.  7     1, 2, 3, 9,31,33,34
+##    '- B-7    c. 4, n.  5     1, 2, 3, 4,14
+##    '- B-8    c. 3, n. 10     3,24,25,26,28,29,30,32,33,34
+## '- B-3       c. 2, n.  6     1, 5, 6, 7,11,17
+##    '- B-6    c. 3, n.  5     1, 5, 6, 7,11
+
+## Cohesive block structure:
+## B-1          c. 1, n. 23
+## '- B-2       c. 2, n. 14     1, 2, 3, 4, 5, 6, 7, 8,12,19,20,21,22,23
+##    '- B-4    c. 5, n.  7     1, 2, 3, 4, 5, 6, 7
+## '- B-3       c. 2, n. 10     7, 9,10,11,13,14,15,16,17,18
+##    '- B-5    c. 3, n.  4     7, 9,10,11
+
+## #########################################################
+
+## Cohesive block structure:
+## B-1          c. 1, n. 34
+## '- B-2       c. 2, n. 28    1-4, 8-10, 13-16, 18-34
+##    '- B-4    c. 4, n.  5    1-4, 8
+##    '- B-5    c. 3, n.  7    1-3, 9, 31, 33-34
+##    '- B-7    c. 4, n.  5    1-4, 14
+##    '- B-8    c. 3, n. 10    3, 24-26, 28-30, 32-34
+## '- B-3       c. 2, n.  6    1, 5-7, 11, 17
+##    '- B-6    c. 3, n.  5    1, 5-7, 11
+
+## Cohesive block structure:
+## B-1          c. 1, n. 23
+## '- B-2       c. 2, n. 14    1-8, 12, 19-23
+##    '- B-4    c. 5, n.  7    1-7
+## '- B-3       c. 2, n. 10    7, 9-11, 13-18
+##    '- B-5    c. 3, n.  4    7, 9-11
+
+## ##########################################################
+
+## Cohesive block structure:
+## B-1        c. 1, n. 34    
+## |- B-2     c. 2, n. 28  [ 1] oooo...ooo ..oooo.ooo 
+## |  |                    [21] oooooooooo oooo
+## |  |- B-4  c. 4, n.  5  [ 1] oooo...o.. .......... 
+## |  |                    [21] .......... ....
+## |  |- B-5  c. 3, n.  7  [ 1] ooo.....o. .......... 
+## |  |                    [21] .......... o.oo
+## |  |- B-7  c. 4, n.  5  [ 1] oooo...... ...o...... 
+## |  |                    [21] .......... ....
+## |  |- B-8  c. 3, n. 10  [ 1] ..o....... .......... 
+## |                       [21] ...ooo.ooo .ooo
+## '- B-3     c. 2, n.  6  [ 1] o...ooo... o.....o... 
+##    |                    [21] .......... ....
+##    '- B-6  c. 3, n.  5  [ 1] o...ooo... o......... 
+##                         [21] .......... ....
+
+## Cohesive block structure:
+## B-1          c. 1, n. 23  [ 1] oooooooooo oooooooooo 
+## |                         [21] ooo
+## |- B-2       c. 2, n. 14  [ 1] oooooooo.. .o......oo 
+## |  |                      [21] ooo
+## |  '- B-4    c. 5, n.  7  [ 1] ooooooo... .......... 
+## |                         [21] ...
+## '- B-3       c. 2, n. 10  [ 1] ......o.oo o.oooooo.. 
+##    |                      [21] ...
+##    '- B-5    c. 3, n.  4  [ 1] ......o.oo o.........
+##                           [21] ...
