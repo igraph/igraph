@@ -117,7 +117,7 @@
   scr <- tkscrollbar(console, repeatinterval=5,
                      command=function(...) tkyview(txt, ...)) 
   txt <- tktext(console, yscrollcommand=function(...) tkset(scr, ...),
-                width=60, height=10, font=fn)
+                width=60, height=7, font=fn)
   tkconfigure(txt, state="disabled")
   pbar <- .igraph.progress.tkconsole.pbar(console)
 
@@ -133,7 +133,7 @@
   tkpack(logo, side="top", fill="none", expand=0, anchor="n",
          ipadx=10, ipady=10)
   tkpack(bclear, side="top", fill="x", expand=0, padx=10)
-  tkpack(bstop, side="top", fill="x", expand=0, padx=10)
+  ## tkpack(bstop, side="top", fill="x", expand=0, padx=10)
   tkpack(bclose, side="top", fill="x", expand=0, padx=10)  
   
   tkpack(lfr, side="left", fill="none", expand=0, anchor="n")
