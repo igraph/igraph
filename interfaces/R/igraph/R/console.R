@@ -89,7 +89,7 @@
   ## Open the console, if it is not open
   if (is.null(pb)) {
     startmess <- TRUE
-    pb <- .igraph.progress.tkconsole.create()
+    pb <- .igraph.progress.tkconsole.create(NA)
   }
 
   ## Update progress bar
@@ -103,7 +103,7 @@
   0L
 }
 
-.igraph.progress.tkconsole.create <- function() {
+.igraph.progress.tkconsole.create <- function(oldverb) {
   console <- tktoplevel()
   tktitle(console) <- "igraph console"
 
@@ -128,6 +128,9 @@
   })
   bstop  <- tkbutton(lfr, text="Stop",  command=function() {})
   bclose <- tkbutton(lfr, text="Close", command=function() {
+    if (!is.na(oldverb) && getIgraphOpt("verbose") == "tkconsole") {
+      igraph.options(verbose=oldverb)
+    }
     tkdestroy(console) })
 
   tkpack(logo, side="top", fill="none", expand=0, anchor="n",
@@ -142,10 +145,13 @@
   tkpack(txt, side="left", fill="both", expand=1)
 
   tkbind(console, "<Destroy>", function() {
+    if (!is.na(oldverb) && getIgraphOpt("verbose") == "tkconsole") {
+      igraph.options(verbose=oldverb)
+    }
     assign(".igraph.pb", NULL, env=asNamespace("igraph"))
   })
   
-  res <- list(top=console, txt=txt, pb=pbar$pb)
+  res <- list(top=console, txt=txt, pb=pbar$pb, oldverb=oldverb)
   class(res) <- "igraphconsole"
   res
 }
@@ -154,7 +160,7 @@
   txt <- get(".igraph.pb", asNamespace("igraph"))$txt
   if (is.null(txt)) {
     if (start) {
-      pb <- .igraph.progress.tkconsole.create()
+      pb <- .igraph.progress.tkconsole.create(NA)
       assign(".igraph.pb", pb, env=asNamespace("igraph"))
       txt <- pb$txt
     } else { 
@@ -208,4 +214,13 @@ close.igraphconsole <- function(con, ...) {
   set <- function(w, val) { tclvalue(.val) <<- val }
   pb <- list(widget=pBar, get=get, set=set, label=.lab)
   list(frame=frame, pb=pb)
+}
+
+igraph.console <- function() {
+  oldverb <- getIgraphOpt("verbose")
+  igraph.options(verbose="tkconsole")
+  pb <- .igraph.progress.tkconsole.create(oldverb)
+  assign(".igraph.pb", pb, env=asNamespace("igraph"))  
+  .igraph.progress.tkconsole.message("Console started.\n")
+  invisible()
 }
