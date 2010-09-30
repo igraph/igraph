@@ -148,10 +148,27 @@ maxcohesion(blocks)
 
   The generic function \code{summary} works on \code{cohesiveBlocks}
   objects and it prints a one line summary to the terminal.
+
   The generic function \code{print} is also defined on
   \code{cohesiveBlocks} objects and it is invoked automatically if the
-  name of the \code{cohesiveBlocks} object is typed in.
-
+  name of the \code{cohesiveBlocks} object is typed in. It produces
+  an output like this: \preformatted{
+    Cohesive block structure:
+    B-1         c 1, n 23
+    '- B-2      c 2, n 14   oooooooo.. .o......oo ooo 
+       '- B-4   c 5, n  7   ooooooo... .......... ... 
+    '- B-3      c 2, n 10   ......o.oo o.oooooo.. ... 
+       '- B-5   c 3, n  4   ......o.oo o......... ...     
+  }
+  The left part shows the block structure, in this case for five
+  blocks. The first block always corresponds to the whole graph, even if
+  its cohesion is zero. Then cohesion of the block and the number of
+  vertices in the block are shown. The last part is only printed if the
+  display is wide enough and shows the vertices in the blocks,
+  ordered by vertex ids. \sQuote{o} means that the vertex is included,
+  a dot means that it is not, and the vertices are shown in groups of
+  ten.
+  
   The generic function \code{plot} plots the graph, showing one or more
   cohesive blocks in it.  
 }
