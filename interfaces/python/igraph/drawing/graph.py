@@ -159,7 +159,7 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
             margin = [margin]
         while len(margin)<4:
             margin.extend(margin)
-        margin = [x + 5. for x in margin[:4]]
+        margin = [x + 20. for x in margin[:4]]
 
         # Contract the drawing area by the margin and fit the layout
         bbox = self.bbox.contract(margin)

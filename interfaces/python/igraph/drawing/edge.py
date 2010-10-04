@@ -54,10 +54,11 @@ class AbstractEdgeDrawer(object):
         ctx = self.context
         ctx.set_source_rgba(*edge.color)
         ctx.set_line_width(edge.width)
-        radius = src_vertex.size * 2
-        center_x = src_vertex.position[0] + cos(pi/4) * radius / 2.
-        center_y = src_vertex.position[0] - sin(pi/4) * radius / 2.
+        radius = vertex.size * 1.5
+        center_x = vertex.position[0] + cos(pi/4) * radius / 2.
+        center_y = vertex.position[0] - sin(pi/4) * radius / 2.
         ctx.arc(center_x, center_y, radius/2., 0, pi * 2)
+        ctx.stroke()
 
     def draw_undirected_edge(self, edge, src_vertex, dest_vertex):
         """Draws an undirected edge.

@@ -393,7 +393,10 @@ class Layout(object):
 
         for i, size in enumerate(sizes):
             if size == 0:
-                sizes[i] = 1
+                sizes[i] = 2
+                mins[i] -= 1
+                maxs[i] += 1
+
 
         ratios = [float(target_size) / current_size \
                   for current_size, target_size in izip(sizes, target_sizes)]
