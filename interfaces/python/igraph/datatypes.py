@@ -550,6 +550,10 @@ class UniqueIdGenerator(object):
     3
     >>> len(gen)      # Number of already used IDs
     4
+    >>> "C" in gen
+    True
+    >>> "E" in gen
+    False
     """
 
     def __init__(self, id_generator=None, initial=None):
@@ -570,6 +574,10 @@ class UniqueIdGenerator(object):
         if initial:
             for value in initial:
                 self.add(value)
+
+    def __contains__(self, item):
+        """Checks whether `item` already has an ID or not."""
+        return item in self._ids
 
     def __getitem__(self, item):
         """Retrieves the ID corresponding to `item`. Generates a new ID for
