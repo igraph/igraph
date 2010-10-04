@@ -51,7 +51,7 @@
 
 <section><title>Edge selector constructors</title>
 <!-- doxrox-include igraph_es_all -->
-<!-- doxrox-include igraph_es_adj -->
+<!-- doxrox-include igraph_es_incident -->
 <!-- doxrox-include igraph_es_none -->
 <!-- doxrox-include igraph_es_1 -->
 <!-- doxrox-include igraph_es_vector -->

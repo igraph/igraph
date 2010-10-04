@@ -535,7 +535,7 @@ void igraph_i_free_vectorlist(igraph_vector_ptr_t *list) {
  * Calculate biconnected components
  * 
  * A graph is biconnected if the removal of any single vertex (and
- * its adjacent edges) does not disconnect it.
+ * its incident edges) does not disconnect it.
  * 
  * </para><para>
  * A biconnected component of a graph is a maximal biconnected

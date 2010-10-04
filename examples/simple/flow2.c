@@ -78,8 +78,8 @@ int check_flow(int errorinc,
     for (i=0; i<n; i++) {
       long int n1, n2, j;
       igraph_real_t in_flow=0.0, out_flow=0.0;
-      igraph_adjacent(graph, &inedges,  i, IGRAPH_IN);
-      igraph_adjacent(graph, &outedges, i, IGRAPH_OUT);
+      igraph_incident(graph, &inedges,  i, IGRAPH_IN);
+      igraph_incident(graph, &outedges, i, IGRAPH_OUT);
       n1=igraph_vector_size(&inedges);
       n2=igraph_vector_size(&outedges);
       for (j=0; j<n1; j++) {

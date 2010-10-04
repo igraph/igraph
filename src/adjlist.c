@@ -34,7 +34,7 @@
  * \section about_adjlists
  * <para>Sometimes it is easier to work with a graph which is in
  * adjacency list format: a list of vectors; each vector contains the
- * neighbor vertices or adjacent edges of a given vertex. Typically,
+ * neighbor vertices or incident edges of a given vertex. Typically,
  * this representation is good if we need to iterate over the neigbors
  * of all vertices many times. E.g. when finding the shortest paths
  * between every pairs of vertices or calculating closeness centrality
@@ -353,7 +353,7 @@ int igraph_adjedgelist_print(const igraph_adjedgelist_t *al, FILE *outfile) {
  * \function igraph_adjedgelist_init
  * Initialize an adjacency list of edges
  * 
- * Create a list of vectors containing the adjacent edges for all
+ * Create a list of vectors containing the incident edges for all
  * vertices. The adjacency list is independent of the graph after
  * creation, subsequent changes of the graph object do not update the
  * adjacency list, and changes to the adjacency list do no update the
@@ -391,7 +391,7 @@ int igraph_adjedgelist_init(const igraph_t *graph,
   for (i=0; i<ael->length; i++) {
     IGRAPH_ALLOW_INTERRUPTION();
     IGRAPH_CHECK(igraph_vector_init(&ael->adjs[i], 0));
-    IGRAPH_CHECK(igraph_adjacent(graph, &ael->adjs[i], i, mode));
+    IGRAPH_CHECK(igraph_incident(graph, &ael->adjs[i], i, mode));
   }
   
   IGRAPH_FINALLY_CLEAN(1);
@@ -527,7 +527,7 @@ igraph_vector_t *igraph_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
  * 
  * Create a lazy adjacency list for edges. This function only
  * allocates some memory for storing the vectors of an adjacency list,
- * but the adjacent edges are not queried, only when \ref
+ * but the incident edges are not queried, only when \ref
  * igraph_lazy_adjedgelist_get() is called.
  * \param graph The input graph.
  * \param al Pointer to an uninitialized adjacency list.
@@ -600,7 +600,7 @@ igraph_vector_t *igraph_lazy_adjedgelist_get_real(igraph_lazy_adjedgelist_t *al,
     if (ret != 0) {
       igraph_error("", __FILE__, __LINE__, ret);
     }
-    ret=igraph_adjacent(al->graph, al->adjs[no], no, al->mode);
+    ret=igraph_incident(al->graph, al->adjs[no], no, al->mode);
     if (ret != 0) {
       igraph_error("", __FILE__, __LINE__, ret);
     }

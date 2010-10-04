@@ -462,7 +462,7 @@ int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
     IGRAPH_CHECK(igraph_dqueue_push(&q, i));
     while (! igraph_dqueue_empty(&q)) {
       long int act_node=igraph_dqueue_pop(&q);
-      IGRAPH_CHECK(igraph_adjacent(graph, &tmp, act_node, IGRAPH_ALL));
+      IGRAPH_CHECK(igraph_incident(graph, &tmp, act_node, IGRAPH_ALL));
       for (j=0; j<igraph_vector_size(&tmp); j++) {
 	long int edge=VECTOR(tmp)[j];
 	if (added_edges[edge]==0) {
@@ -596,7 +596,7 @@ int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
 
     already_added[i]=1;
     /* add all edges of the first vertex */
-    igraph_adjacent(graph, &adj, i, mode);
+    igraph_incident(graph, &adj, i, mode);
     for (j=0; j<igraph_vector_size(&adj); j++) {
       long int edgeno=VECTOR(adj)[j];
       igraph_integer_t edgefrom, edgeto;
@@ -627,7 +627,7 @@ int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
 	  already_added[(long int)to]=1;
 	  added_edges[edge]=1;
 	  /* add all outgoing edges */
-	  igraph_adjacent(graph, &adj, to, mode);
+	  igraph_incident(graph, &adj, to, mode);
 	  for (j=0; j<igraph_vector_size(&adj); j++) {
 	    long int edgeno=VECTOR(adj)[j];
 	    igraph_integer_t edgefrom, edgeto;
@@ -964,7 +964,7 @@ int igraph_get_shortest_paths(const igraph_t *graph,
   while (!igraph_dqueue_empty(&q) && reached < to_reach) {
     long int act=igraph_dqueue_pop(&q)-1;
     
-    IGRAPH_CHECK(igraph_adjacent(graph, &tmp, act, mode));
+    IGRAPH_CHECK(igraph_incident(graph, &tmp, act, mode));
     for (j=0; j<igraph_vector_size(&tmp); j++) {
       long int edge=VECTOR(tmp)[j];
       long int neighbor=IGRAPH_OTHER(graph, edge, act);
@@ -1960,7 +1960,7 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
 
     VECTOR(*my_vids_new2old)[new_vid] = i;
 
-    IGRAPH_CHECK(igraph_adjacent(graph, &nei_edges, i, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_incident(graph, &nei_edges, i, IGRAPH_OUT));
     n = igraph_vector_size(&nei_edges);
 
     if (directed) {
@@ -2186,7 +2186,7 @@ int igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
  *        function, and call \ref igraph_destroy() on it if you don't need
  *        it any more.
  * \param eids An edge selector describing which edges to keep.
- * \param delete_vertices Whether to delete the vertices not adjacent to any
+ * \param delete_vertices Whether to delete the vertices not incident on any
  *        of the specified edges as well. If \c FALSE, the number of vertices
  *        in the result graph will always be equal to the number of vertices
  *        in the input graph.
@@ -3110,7 +3110,7 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
   igraph_vector_t *adj1, *adj2;
   igraph_vector_long_t neis;
   igraph_vector_t actw;
-  igraph_lazy_adjedgelist_t adjacent;
+  igraph_lazy_adjedgelist_t incident;
   long int i;
   igraph_vector_t strength;
   
@@ -3136,8 +3136,8 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
   IGRAPH_CHECK(igraph_strength(graph, &strength, igraph_vss_all(), IGRAPH_ALL,
 			       IGRAPH_LOOPS, weights));  
   
-  igraph_lazy_adjedgelist_init(graph, &adjacent, IGRAPH_ALL);
-  IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjacent);  
+  igraph_lazy_adjedgelist_init(graph, &incident, IGRAPH_ALL);
+  IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &incident);  
 
   IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
   
@@ -3148,7 +3148,7 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    adj1=igraph_lazy_adjedgelist_get(&adjacent, node);
+    adj1=igraph_lazy_adjedgelist_get(&incident, node);
     adjlen1=igraph_vector_size(adj1);
     /* Mark the neighbors of the node */
     for (j=0; j<adjlen1; j++) {
@@ -3164,7 +3164,7 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
       long int edge1=VECTOR(*adj1)[j];
       igraph_real_t weight1=VECTOR(*weights)[edge1];
       long int v=IGRAPH_OTHER(graph, edge1, node);
-      adj2=igraph_lazy_adjedgelist_get(&adjacent, v);
+      adj2=igraph_lazy_adjedgelist_get(&incident, v);
       adjlen2=igraph_vector_size(adj2);
       for (k=0; k<adjlen2; k++) {
 	long int edge2=VECTOR(*adj2)[k];
@@ -3180,7 +3180,7 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
       VECTOR(*res)[i] = triangles/triples;
   }
 
-  igraph_lazy_adjedgelist_destroy(&adjacent);
+  igraph_lazy_adjedgelist_destroy(&incident);
   igraph_vector_destroy(&strength);
   igraph_vector_destroy(&actw);
   igraph_vector_long_destroy(&neis);
@@ -3200,7 +3200,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
   long int no_of_edges=igraph_ecount(graph);
   igraph_vector_t order, degree, rank;
   long int maxdegree;
-  igraph_adjedgelist_t adjacent;
+  igraph_adjedgelist_t incident;
   igraph_vector_long_t neis;
   igraph_vector_t *adj1, *adj2;
   igraph_vector_t actw;
@@ -3231,8 +3231,8 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
     VECTOR(rank)[ (long int)VECTOR(order)[i] ] = no_of_nodes-i-1;
   }
   
-  IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjacent, IGRAPH_ALL));
-  IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjacent);
+  IGRAPH_CHECK(igraph_adjedgelist_init(graph, &incident, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_adjedgelist_destroy, &incident);
   
   IGRAPH_CHECK(igraph_vector_long_init(&neis, no_of_nodes));
   IGRAPH_FINALLY(igraph_vector_long_destroy, &neis);
@@ -3249,7 +3249,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    adj1=igraph_adjedgelist_get(&adjacent, node);
+    adj1=igraph_adjedgelist_get(&incident, node);
     adjlen1=igraph_vector_size(adj1);
     triples = VECTOR(degree)[node] * (adjlen1-1) / 2.0;
     /* Mark the neighbors of the node */
@@ -3266,7 +3266,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
       long int nei=IGRAPH_OTHER(graph, edge1, node);
       long int j;
       if (VECTOR(rank)[nei] > VECTOR(rank)[node]) {
-	adj2=igraph_adjedgelist_get(&adjacent, nei);
+	adj2=igraph_adjedgelist_get(&incident, nei);
 	adjlen2=igraph_vector_size(adj2);
 	for (j=0; j<adjlen2; j++) {
 	  long int edge2=VECTOR(*adj2)[j];
@@ -3292,7 +3292,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
 
   igraph_vector_destroy(&actw);
   igraph_vector_long_destroy(&neis);
-  igraph_adjedgelist_destroy(&adjacent);
+  igraph_adjedgelist_destroy(&incident);
   igraph_vector_destroy(&rank);
   igraph_vector_destroy(&degree);
   igraph_vector_destroy(&order);
@@ -3307,7 +3307,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
  *
  * This is a local transitivity, i.e. a vertex-level index. For a
  * given vertex \c i, from all triangles in which it participates we
- * consider the weight of the edges adjacent to \c i. The transitivity
+ * consider the weight of the edges incident on \c i. The transitivity
  * is the sum of these weights divided by twice the strength of the
  * vertex (see \ref igraph_strength()) and the degree of the vertex
  * minus one. See   Alain Barrat, Marc Barthelemy, Romualdo
@@ -3528,8 +3528,8 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
     i=IGRAPH_VIT_GET(vit);
     
     /* get neighbors of i */
-    IGRAPH_CHECK(igraph_adjacent(graph, &ineis_in, i, IGRAPH_IN));
-    IGRAPH_CHECK(igraph_adjacent(graph, &ineis_out, i, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_incident(graph, &ineis_in, i, IGRAPH_IN));
+    IGRAPH_CHECK(igraph_incident(graph, &ineis_out, i, IGRAPH_OUT));
 
     /* NaN for isolates */
     if (igraph_vector_size(&ineis_in) == 0 &&
@@ -3592,8 +3592,8 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
       if (to==i) { to=from; }
       j=to;
       if (i == j) { continue; }
-      IGRAPH_CHECK(igraph_adjacent(graph, &jneis_in, j, IGRAPH_IN));
-      IGRAPH_CHECK(igraph_adjacent(graph, &jneis_out, j, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_incident(graph, &jneis_in, j, IGRAPH_IN));
+      IGRAPH_CHECK(igraph_incident(graph, &jneis_out, j, IGRAPH_OUT));
       for (c=0; c<igraph_vector_size(&jneis_in); c++) {
 	edge2=VECTOR(jneis_in)[c];
 	igraph_edge(graph, edge2, &from2, &to2);
@@ -3636,8 +3636,8 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
 	if (to==i) { to=from; }
 	j=to;
 	if (i == j) { continue; }
-	IGRAPH_CHECK(igraph_adjacent(graph, &jneis_in, j, IGRAPH_IN));
-	IGRAPH_CHECK(igraph_adjacent(graph, &jneis_out, j, IGRAPH_OUT));
+	IGRAPH_CHECK(igraph_incident(graph, &jneis_in, j, IGRAPH_IN));
+	IGRAPH_CHECK(igraph_incident(graph, &jneis_out, j, IGRAPH_OUT));
 	for (c=0; c<igraph_vector_size(&jneis_in); c++) {
 	  edge2=VECTOR(jneis_in)[c];
 	  igraph_edge(graph, edge2, &from2, &to2);
@@ -4712,7 +4712,7 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
   return 0;
 }
 
-/* Note to self: tried using adjacency lists instead of igraph_adjacent queries,
+/* Note to self: tried using adjacency lists instead of igraph_incident queries,
  * with minimal performance improvements on a graph with 70K vertices and 360K
  * edges. (1.09s instead of 1.10s). I think it's not worth the fuss. */
 int igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph) {
@@ -4733,7 +4733,7 @@ int igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph) {
     IGRAPH_ALLOW_INTERRUPTION();
 
     if (from != prev) {
-      IGRAPH_CHECK(igraph_adjacent(graph, &adjedges, from, IGRAPH_ALL));
+      IGRAPH_CHECK(igraph_incident(graph, &adjedges, from, IGRAPH_ALL));
     }
     n=igraph_vector_size(&adjedges);
     for (j=0; j<n; j++) {
@@ -4744,7 +4744,7 @@ int igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph) {
       }
     }
     
-    IGRAPH_CHECK(igraph_adjacent(graph, &adjedges2, to, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_incident(graph, &adjedges2, to, IGRAPH_ALL));
     n=igraph_vector_size(&adjedges2);
     for (j=0; j<n; j++) {
       long int e=VECTOR(adjedges2)[j];
@@ -4784,7 +4784,7 @@ int igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegraph) {
     IGRAPH_ALLOW_INTERRUPTION();
     
     if (from != prev) {
-      IGRAPH_CHECK(igraph_adjacent(graph, &adjedges, from, IGRAPH_IN));
+      IGRAPH_CHECK(igraph_incident(graph, &adjedges, from, IGRAPH_IN));
     }
     n=igraph_vector_size(&adjedges);
     for (j=0; j<n; j++) {
@@ -6316,7 +6316,7 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
       long int actnode=igraph_dqueue_pop(&Q);
       long int i, n;
       
-      IGRAPH_CHECK(igraph_adjacent(graph, &neis, actnode, mode));
+      IGRAPH_CHECK(igraph_incident(graph, &neis, actnode, mode));
       n=igraph_vector_size(&neis);
       for (i=0; i<n; i++) {
 
@@ -6672,7 +6672,7 @@ int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
  * Strength of the vertices, weighted vertex degree in other words
  * 
  * In an weighted network the strength of a vertex is the sum of the
- * weights of all adjacent edges. In a non-weighted networks this is
+ * weights of all incident edges. In a non-weighted networks this is
  * exactly the vertex degree.
  * \param graph The input graph.
  * \param res Pointer to an initialized vector, the result is stored
@@ -6724,7 +6724,7 @@ int igraph_strength(const igraph_t *graph, igraph_vector_t *res,
     for (i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
       long int vid=IGRAPH_VIT_GET(vit);
       long int j, n;
-      IGRAPH_CHECK(igraph_adjacent(graph, &neis, vid, mode));
+      IGRAPH_CHECK(igraph_incident(graph, &neis, vid, mode));
       n=igraph_vector_size(&neis);
       for (j=0; j<n; j++) {
 	long int edge=VECTOR(neis)[j];
@@ -6735,7 +6735,7 @@ int igraph_strength(const igraph_t *graph, igraph_vector_t *res,
     for (i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
       long int vid=IGRAPH_VIT_GET(vit);
       long int j, n;
-      IGRAPH_CHECK(igraph_adjacent(graph, &neis, vid, mode));
+      IGRAPH_CHECK(igraph_incident(graph, &neis, vid, mode));
       n=igraph_vector_size(&neis);
       for (j=0; j<n; j++) {
 	long int edge=VECTOR(neis)[j];

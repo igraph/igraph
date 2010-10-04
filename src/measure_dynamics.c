@@ -1575,7 +1575,7 @@ int igraph_measure_dynamics_d_d(const igraph_t *graph,
       xidx=VECTOR(degree)[ (long int)from ];
       yidx=VECTOR(degree)[ (long int)to ];
 
-      igraph_adjacent(graph, &adjedges, from, IGRAPH_ALL);
+      igraph_incident(graph, &adjedges, from, IGRAPH_ALL);
       for (i=0; i<igraph_vector_size(&adjedges); i++) {
 	igraph_integer_t e_from, e_to;
 	long int deg;
@@ -1590,7 +1590,7 @@ int igraph_measure_dynamics_d_d(const igraph_t *graph,
 	  MATRIX(ntkk, deg, xidx+1) =MATRIX(ntkk, xidx+1, deg);
 	}
       }
-      igraph_adjacent(graph, &adjedges, to, IGRAPH_ALL);
+      igraph_incident(graph, &adjedges, to, IGRAPH_ALL);
       for (i=0; i<igraph_vector_size(&adjedges); i++) {
 	igraph_integer_t e_from, e_to;
 	long int deg;
@@ -1776,7 +1776,7 @@ int igraph_measure_dynamics_d_d_st(const igraph_t *graph,        /* input */
       }
 
       /* Now update the edges */
-      igraph_adjacent(graph, &adjedges, from, IGRAPH_ALL);
+      igraph_incident(graph, &adjedges, from, IGRAPH_ALL);
       for (i=0; i<igraph_vector_size(&adjedges); i++) {
 	igraph_integer_t e_from, e_to;
 	long int deg;
@@ -1789,7 +1789,7 @@ int igraph_measure_dynamics_d_d_st(const igraph_t *graph,        /* input */
 	  akk_inc -= MATRIX(*akk, xidx+1, deg);
 	}
       }
-      igraph_adjacent(graph, &adjedges, to, IGRAPH_ALL);
+      igraph_incident(graph, &adjedges, to, IGRAPH_ALL);
       for (i=0; i<igraph_vector_size(&adjedges); i++) {
 	igraph_integer_t e_from, e_to;
 	long int deg;

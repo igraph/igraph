@@ -84,6 +84,8 @@ int igraph_get_eids_multi(const igraph_t *graph, igraph_vector_t *eids,
 			  const igraph_vector_t *path,
 			  igraph_bool_t directed);
 int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t vid,
+		    igraph_neimode_t mode);          /* deprecated */
+int igraph_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t vid,
 		    igraph_neimode_t mode);
 
 #define IGRAPH_FROM(g,e) (VECTOR((g)->from)[(long int)(e)])

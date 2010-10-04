@@ -1185,7 +1185,7 @@ int igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes,
 
 /**
  * \function igraph_recent_degree_game
- * \brief Stochastic graph generator based on the number of adjacent edges a node has gained recently
+ * \brief Stochastic graph generator based on the number of incident edges a node has gained recently
  * 
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of vertices in the graph, this is the same as
@@ -1203,7 +1203,7 @@ int igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes,
  *        argument is ignored if it is a null pointer or a zero length
  *        vector, is this case the constant \p m parameter is used. 
  * \param outpref Logical constant, if true the edges originated by a
- *        vertex also count as recent adjacent edges. It is false in
+ *        vertex also count as recent incident edges. It is false in
  *        most cases.
  * \param zero_appeal Constant giving the attractiveness of the
  *        vertices which haven't gained any edge recently. 
@@ -1493,7 +1493,7 @@ int igraph_barabasi_aging_game(igraph_t *graph,
  * 
  * </para><para>
  * This game is very similar to \ref igraph_barabasi_aging_game(),
- * except that instead of the total number of adjacent edges the
+ * except that instead of the total number of incident edges the
  * number of edges gained in the last \p time_window time steps are
  * counted. 
  * 
@@ -1519,7 +1519,7 @@ int igraph_barabasi_aging_game(igraph_t *graph,
  *        The age of the vertices is incremented by one after every \p
  *        aging_bin vertex added.
  * \param time_window The time window to use to count the number of 
- *        adjacent edges for the vertices.
+ *        incident edges for the vertices.
  * \param zero_appeal The degree dependent part of the attractiveness
  *        for zero degree vertices.
  * \param directed Logical constant, whether to create a directed

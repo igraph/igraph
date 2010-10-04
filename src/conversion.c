@@ -469,8 +469,8 @@ int igraph_to_undirected(igraph_t *graph,
       long int n_out, n_in;
       long int p1=-1, p2=-1;
       long int e1=0, e2=0, n1=0, n2=0;
-      IGRAPH_CHECK(igraph_adjacent(graph, &outadj, i, IGRAPH_OUT));
-      IGRAPH_CHECK(igraph_adjacent(graph, &inadj, i, IGRAPH_IN));
+      IGRAPH_CHECK(igraph_incident(graph, &outadj, i, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_incident(graph, &inadj, i, IGRAPH_IN));
       n_out=igraph_vector_size(&outadj);
       n_in=igraph_vector_size(&inadj);
 
@@ -592,8 +592,8 @@ int igraph_to_undirected(igraph_t *graph,
       long int n_out, n_in; 
       long int p1=-1, p2=-1;
       long int e1=0, e2=0, n1=0, n2=0;
-      IGRAPH_CHECK(igraph_adjacent(graph, &outadj, i, IGRAPH_OUT));
-      IGRAPH_CHECK(igraph_adjacent(graph, &inadj,  i, IGRAPH_IN));
+      IGRAPH_CHECK(igraph_incident(graph, &outadj, i, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_incident(graph, &inadj,  i, IGRAPH_IN));
       n_out=igraph_vector_size(&outadj);
       n_in=igraph_vector_size(&inadj);
 

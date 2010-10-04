@@ -103,7 +103,7 @@ To eliminate multiple edges from a graph, you can use
 <!-- doxrox-include igraph_get_eids -->
 <!-- doxrox-include igraph_get_eids_multi -->
 <!-- doxrox-include igraph_neighbors -->
-<!-- doxrox-include igraph_adjacent -->
+<!-- doxrox-include igraph_incident -->
 <!-- doxrox-include igraph_is_directed -->
 <!-- doxrox-include igraph_degree -->
 </section>
@@ -115,6 +115,11 @@ To eliminate multiple edges from a graph, you can use
 <!-- doxrox-include igraph_delete_edges -->
 <!-- doxrox-include igraph_delete_vertices -->
 </section>
+
+<section><title>Deprecated functions</title>
+<!-- doxrox-include igraph_adjacent -->
+</section>
+
 </section>
 
 </chapter>

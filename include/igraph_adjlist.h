@@ -99,7 +99,7 @@ int igraph_adjedgelist_print(const igraph_adjedgelist_t *al, FILE *outfile);
  * adjacency list containing edge ids. The vector can be modified,
  * resized, etc. as desired. 
  * \param graph ael The edge adjacency list.
- * \param no The vertex of which the adjacent edges are returned.
+ * \param no The vertex for which the incident edges are returned.
  * \return Pointer to an <type>igraph_vector_t</type> object.
  * 
  * Time complexity: O(1).
@@ -156,18 +156,18 @@ int igraph_lazy_adjedgelist_init(const igraph_t *graph,
 void igraph_lazy_adjedgelist_destroy(igraph_lazy_adjedgelist_t *al);
 /**
  * \define igraph_lazy_adjedgelist_get
- * Query adjacent edges
+ * Query incident edges
  * 
  * If the function is called for the first time for a vertex, then the
  * result is stored in the adjacency list and no further query
- * operations are needed when the adjacent edges of the same vertex are
+ * operations are needed when the incident edges of the same vertex are
  * queried again.
  * \param al The lazy adjacency list object.
  * \param no The vertex id to query.
  * \return Pointer to a vector. It is allowed to modify it and
  *   modification does not affect the original graph.
  * 
- * Time complexity: O(d), the number of adjacent edges for the first
+ * Time complexity: O(d), the number of incident edges for the first
  * time, O(1) for subsequent calls with the same \p no argument.
  */
 #define igraph_lazy_adjedgelist_get(al,no) \

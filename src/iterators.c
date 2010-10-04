@@ -803,10 +803,10 @@ int igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_t *v) {
  *        \c IGRAPH_EDGEORDER_ID, edge id order.
  *        \c IGRAPH_EDGEORDER_FROM, vertex id order, the id of the
  *           \em source vertex counts for directed graphs. The order
- *           of the adjacent edges of a given vertex is arbitrary.
+ *           of the incident edges of a given vertex is arbitrary.
  *        \c IGRAPH_EDGEORDER_TO, vertex id order, the id of the \em
  *           target vertex counts for directed graphs. The order
- *           of the adjacent edges of a given vertex is arbitrary.
+ *           of the incident edges of a given vertex is arbitrary.
  *        For undirected graph the latter two is the same. 
  * \return Error code.
  * \sa \ref igraph_ess_all()
@@ -856,11 +856,27 @@ igraph_es_t igraph_ess_all(igraph_edgeorder_type_t order) {
 /**
  * \function igraph_es_adj
  * \brief Adjacent edges of a vertex.
+ *
+ * This function was superseded by \ref igraph_es_incident() in igraph 0.6.
+ * Please use \ref igraph_es_incident() instead of this function.
+ *
+ * </para><para>
+ * Deprecated in version 0.6.
+ */
+int igraph_es_adj(igraph_es_t *es, 
+		  igraph_integer_t vid, igraph_neimode_t mode) {
+  IGRAPH_WARNING("igraph_es_adj is deprecated, use igraph_es_incident");
+  return igraph_es_incident(es, vid, mode);
+}
+
+/**
+ * \function igraph_es_incident
+ * \brief Edges incident on a given vertex.
  * 
  * \param es Pointer to an uninitialized edge selector object.
- * \param vid Vertex id, of which the adjacent edges will be
+ * \param vid Vertex id, of which the incident edges will be
  *        selected.
- * \param mode Constant giving the type of the adjacent edges to
+ * \param mode Constant giving the type of the incident edges to
  *        select. This is ignored for undirected graphs. Possible values:
  *        \c IGRAPH_OUT, outgoing edges
  *        \c IGRAPH_IN, incoming edges
@@ -870,11 +886,11 @@ igraph_es_t igraph_ess_all(igraph_edgeorder_type_t order) {
  * Time complexity: O(1).
  */
 
-int igraph_es_adj(igraph_es_t *es, 
+int igraph_es_incident(igraph_es_t *es, 
 		  igraph_integer_t vid, igraph_neimode_t mode) {
-  es->type=IGRAPH_ES_ADJ;
-  es->data.adj.vid=vid;
-  es->data.adj.mode=mode;
+  es->type=IGRAPH_ES_INCIDENT;
+  es->data.incident.vid=vid;
+  es->data.incident.mode=mode;
   return 0;
 }
 
@@ -1268,7 +1284,7 @@ void igraph_es_destroy(igraph_es_t *es) {
   case IGRAPH_ES_ALL:
   case IGRAPH_ES_ALLFROM:
   case IGRAPH_ES_ALLTO:
-  case IGRAPH_ES_ADJ:
+  case IGRAPH_ES_INCIDENT:
   case IGRAPH_ES_NONE:
   case IGRAPH_ES_1:
   case IGRAPH_ES_VECTORPTR:
@@ -1385,10 +1401,10 @@ int igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
       *result = igraph_ecount(graph);
       return 0;
 
-    case IGRAPH_ES_ADJ:
+    case IGRAPH_ES_INCIDENT:
       IGRAPH_VECTOR_INIT_FINALLY(&v, 0);
-      IGRAPH_CHECK(igraph_adjacent(graph, &v,
-				 es->data.adj.vid, es->data.adj.mode));
+      IGRAPH_CHECK(igraph_incident(graph, &v,
+				 es->data.incident.vid, es->data.incident.mode));
       *result = igraph_vector_size(&v);
       igraph_vector_destroy(&v);
       IGRAPH_FINALLY_CLEAN(1);
@@ -1507,7 +1523,7 @@ int igraph_i_eit_create_allfromto(const igraph_t *graph,
     igraph_vector_t adj;
     IGRAPH_VECTOR_INIT_FINALLY(&adj, 0);
     for (i=0; i<no_of_nodes; i++) {
-      igraph_adjacent(graph, &adj, i, mode);
+      igraph_incident(graph, &adj, i, mode);
       igraph_vector_append(vec, &adj);
     }
     igraph_vector_destroy(&adj);
@@ -1525,7 +1541,7 @@ int igraph_i_eit_create_allfromto(const igraph_t *graph,
     }
     IGRAPH_FINALLY(igraph_free, added);      
     for (i=0; i<no_of_nodes; i++) {
-      igraph_adjacent(graph, &adj, i, IGRAPH_ALL);
+      igraph_incident(graph, &adj, i, IGRAPH_ALL);
       for (j=0; j<igraph_vector_size(&adj); j++) {
 	if (!added[ (long int)VECTOR(adj)[j] ]) {
 	  igraph_vector_push_back(vec, VECTOR(adj)[j]);
@@ -1679,7 +1695,7 @@ int igraph_i_eit_path(const igraph_t *graph,
  * selectors created by \ref igraph_es_all(), \ref igraph_es_none(),
  * \ref igraph_es_1(), igraph_es_vector(), igraph_es_seq() it is
  * O(1). For \ref igraph_es_adj() it is O(d) where d is the number of
- * adjacent edges of the vertex.
+ * incident edges of the vertex.
  */
 
 int igraph_eit_create(const igraph_t *graph, 
@@ -1697,7 +1713,7 @@ int igraph_eit_create(const igraph_t *graph,
   case IGRAPH_ES_ALLTO:
     IGRAPH_CHECK(igraph_i_eit_create_allfromto(graph, es, eit, IGRAPH_IN));
     break;
-  case IGRAPH_ES_ADJ:
+  case IGRAPH_ES_INCIDENT:
     eit->type=IGRAPH_EIT_VECTOR;
     eit->pos=0;
     eit->start=0;
@@ -1707,8 +1723,8 @@ int igraph_eit_create(const igraph_t *graph,
     }
     IGRAPH_FINALLY(igraph_free, (igraph_vector_t*) eit->vec);
     IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t*)eit->vec, 0);
-    IGRAPH_CHECK(igraph_adjacent(graph, (igraph_vector_t*)eit->vec, 
-				 es.data.adj.vid, es.data.adj.mode));
+    IGRAPH_CHECK(igraph_incident(graph, (igraph_vector_t*)eit->vec, 
+				 es.data.incident.vid, es.data.incident.mode));
     eit->end=igraph_vector_size(eit->vec);
     IGRAPH_FINALLY_CLEAN(2);
     break;

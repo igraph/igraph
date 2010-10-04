@@ -1929,7 +1929,7 @@ int igraph_i_famous(igraph_t *graph, igraph_real_t *data) {
  *   \cli Noperfectmatching 
  *           A connected graph with 16 vertices and
  *           27 edges containing no perfect matching. A matching in a graph
- *           is a set of pairwise non-adjacent edges; that is, no two edges
+ *           is a set of pairwise non-incident edges; that is, no two edges
  *           share a common vertex. A perfect matching is a matching
  *           which covers all vertices of the graph. 
  *   \cli Nonline 

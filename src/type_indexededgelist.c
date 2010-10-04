@@ -1575,7 +1575,23 @@ int igraph_get_eids_multi(const igraph_t *graph, igraph_vector_t *eids,
 
 /**
  * \function igraph_adjacent
- * \brief Gives the adjacent edges of a vertex.
+ * \brief Gives the incident edges of a vertex.
+ *
+ * This function was superseded by \ref igraph_incident() in igraph 0.6.
+ * Please use \ref igraph_incident() instead of this function.
+ *
+ * </para><para>
+ * Added in version 0.2, deprecated in version 0.6.
+ */
+int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids,
+		    igraph_integer_t pnode, igraph_neimode_t mode) {
+  IGRAPH_WARNING("igraph_adjacent is deprecated, use igraph_incident");
+  return igraph_incident(graph, eids, pnode, mode);
+}
+
+/**
+ * \function igraph_incident
+ * \brief Gives the incident edges of a vertex.
  * 
  * \param graph The graph object.
  * \param eids An initialized \type vector_t object. It will be resized
@@ -1590,10 +1606,10 @@ int igraph_get_eids_multi(const igraph_t *graph, igraph_vector_t *eids,
  * 
  * Added in version 0.2.</para><para>
  * 
- * Time complexity: O(d), the number of adjacent edges to \p pnode.
+ * Time complexity: O(d), the number of incident edges to \p pnode.
  */
 
-int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids, 
+int igraph_incident(const igraph_t *graph, igraph_vector_t *eids, 
 		    igraph_integer_t pnode, igraph_neimode_t mode) {
   
   long int length=0, idx=0;   

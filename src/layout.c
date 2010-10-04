@@ -1012,7 +1012,7 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
       long int vid=VECTOR(vids)[j];
       long int k;
       IGRAPH_ALLOW_INTERRUPTION();
-      IGRAPH_CHECK(igraph_adjacent(graph, &eids, vid, IGRAPH_ALL));
+      IGRAPH_CHECK(igraph_incident(graph, &eids, vid, IGRAPH_ALL));
       for (k=0;k<igraph_vector_size(&eids);k++) {
 	long int eid=VECTOR(eids)[k];
 	igraph_integer_t from, to;

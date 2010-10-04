@@ -230,7 +230,7 @@ int igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_t *v);
 #define IGRAPH_ES_ALL       0
 #define IGRAPH_ES_ALLFROM   1
 #define IGRAPH_ES_ALLTO     2
-#define IGRAPH_ES_ADJ       3
+#define IGRAPH_ES_INCIDENT  3
 #define IGRAPH_ES_NONE      4
 #define IGRAPH_ES_1         5
 #define IGRAPH_ES_VECTORPTR 6
@@ -249,7 +249,7 @@ typedef struct igraph_es_t {
     struct {
       igraph_integer_t vid;
       igraph_neimode_t mode;
-    } adj;
+    } incident;
     struct {
       igraph_integer_t from;
       igraph_integer_t to;
@@ -266,6 +266,8 @@ int igraph_es_all(igraph_es_t *es,
 igraph_es_t igraph_ess_all(igraph_edgeorder_type_t order);
 
 int igraph_es_adj(igraph_es_t *es, 
+		  igraph_integer_t vid, igraph_neimode_t mode);     /* deprecated */
+int igraph_es_incident(igraph_es_t *es, 
 		  igraph_integer_t vid, igraph_neimode_t mode);
 
 int igraph_es_none(igraph_es_t *es);

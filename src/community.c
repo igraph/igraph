@@ -704,8 +704,8 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
  * Modularity on weighted graphs is also meaningful. When taking edge
  * weights into account, `Aij' becomes the weight of the corresponding
  * edge (or 0 if there is no edge), `ki' is the total weight of edges
- * adjacent to vertex `i', `kj' is the total weight of edges adjacent
- * to vertex `j' and `m' is the total weight of all edges.
+ * incident on vertex `i', `kj' is the total weight of edges incident
+ * on vertex `j' and `m' is the total weight of all edges.
  * 
  * </para><para>
  * See also MEJ Newman and M Girvan: Finding and evaluating community
@@ -2272,13 +2272,13 @@ int igraph_i_multilevel_community_link_cmp(const void *a, const void *b)
  * Given a graph, a community structure and a vertex ID, this method
  * calculates:
  *
- * - edges: the list of edge IDs that are adjacent to the vertex
+ * - edges: the list of edge IDs that are incident on the vertex
  * - weight_all: the total weight of these edges
  * - weight_inside: the total weight of edges that stay within the same
  *   community where the given vertex is right now, excluding loop edges
  * - weight_loop: the total weight of loop edges
  * - links_community and links_weight: together these two vectors list the
- *   communities adjacent to this vertex and the total weight of edges
+ *   communities incident on this vertex and the total weight of edges
  *   pointing to these communities
  */
 int igraph_i_multilevel_community_links(const igraph_t *graph,
@@ -2298,8 +2298,8 @@ int igraph_i_multilevel_community_links(const igraph_t *graph,
   igraph_vector_clear(links_community);
   igraph_vector_clear(links_weight);
 
-  /* Get the list of adjacent edges */
-  igraph_adjacent(graph, edges, vertex, IGRAPH_ALL);
+  /* Get the list of incident edges */
+  igraph_incident(graph, edges, vertex, IGRAPH_ALL);
 
   n = igraph_vector_size(edges);
   links = igraph_Calloc(n, igraph_i_multilevel_community_link);

@@ -3075,7 +3075,7 @@ int igraph_revolver_probs_d(const igraph_t *graph,
   
   for (t=0; t<no_of_nodes; t++) {
     long int n, nneis;
-    IGRAPH_CHECK(igraph_adjacent(graph, &neis, t, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_incident(graph, &neis, t, IGRAPH_OUT));
     nneis=igraph_vector_size(&neis);    
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -3173,7 +3173,7 @@ int igraph_revolver_probs_ad(const igraph_t *graph,
   
   for (t=0; t<no_of_nodes; t++) {
     long int n, nneis;
-    IGRAPH_CHECK(igraph_adjacent(graph, &neis, t, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_incident(graph, &neis, t, IGRAPH_OUT));
     nneis=igraph_vector_size(&neis);
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -3275,7 +3275,7 @@ int igraph_revolver_probs_de(const igraph_t *graph,
   
   for (t=0; t<no_of_nodes; t++) {
     long int n, nneis;
-    IGRAPH_CHECK(igraph_adjacent(graph, &neis, t, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_incident(graph, &neis, t, IGRAPH_OUT));
     nneis=igraph_vector_size(&neis);
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -3351,7 +3351,7 @@ int igraph_revolver_probs_ade(const igraph_t *graph,
   
   for (t=0; t<no_of_nodes; t++) {
     long int n, nneis;
-    IGRAPH_CHECK(igraph_adjacent(graph, &neis, t, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_incident(graph, &neis, t, IGRAPH_OUT));
     nneis=igraph_vector_size(&neis);
 
     IGRAPH_ALLOW_INTERRUPTION();
@@ -3448,7 +3448,7 @@ int igraph_revolver_probs_ADE(const igraph_t *graph,
     long int n, nneis;
     long int tcat=VECTOR(*gcats)[t];
     igraph_vector_view(&gpar, &MATRIX(*par,0,tcat), parlen);
-    IGRAPH_CHECK(igraph_adjacent(graph, &neis, t, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_incident(graph, &neis, t, IGRAPH_OUT));
     nneis=igraph_vector_size(&neis);
     
     IGRAPH_ALLOW_INTERRUPTION();

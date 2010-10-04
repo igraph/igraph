@@ -73,7 +73,7 @@ igraph_get_eids:
         PARAMS: GRAPH graph, OUT VECTOR eids, VECTOR pairs, BOOLEAN directed=True
         IGNORE: RR, RC, RNamespace
 
-igraph_adjacent:
+igraph_incident:
         PARAMS: GRAPH graph, OUT VECTOR eids, INTEGER vid, NEIMODE mode=ALL
         IGNORE: RR, RC, RNamespace
 
