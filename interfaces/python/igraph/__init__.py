@@ -141,6 +141,17 @@ class Graph(GraphBase):
                 key = str(key)
             self.es[key] = value
 
+    def adjacent(self, *args, **kwds):
+        """adjacent(vertex, type=OUT)
+
+        Returns the edges a given vertex is incident on.
+
+        This method is deprecated since igraph 0.6, please use Graph.incident()
+        instead."""
+        warn("Graph.adjacent() is deprecated since igraph 0.6, please use "
+             "Graph.incident() instead")
+        return self.incident(*args, **kwds)
+
     def delete_edges(self, *args, **kwds):
         """Deletes some edges from the graph.
 

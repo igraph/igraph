@@ -940,17 +940,17 @@ PyObject *igraphmodule_Graph_neighbors(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
- * \brief The adjacent edges of a given vertex in an \c igraph.Graph
+ * \brief The incident edges of a given vertex in an \c igraph.Graph
  * This method accepts a single vertex ID as a parameter, and returns the
- * IDS of the adjacent edges of the given vertex in the form of an integer list.
+ * IDs of the incident edges of the given vertex in the form of an integer list.
  * A second argument may be passed as well, meaning the type of neighbors to
  * be returned (\c OUT for successors, \c IN for predecessors or \c ALL
  * for both of them). This argument is ignored for undirected graphs.
  * 
  * \return the adjacency list as a Python list object
- * \sa igraph_adjacent
+ * \sa igraph_incident
  */
-PyObject *igraphmodule_Graph_adjacent(igraphmodule_GraphObject * self,
+PyObject *igraphmodule_Graph_incident(igraphmodule_GraphObject * self,
                                        PyObject * args, PyObject * kwds)
 {
   PyObject *list, *dtype_o = Py_None;
@@ -965,7 +965,7 @@ PyObject *igraphmodule_Graph_adjacent(igraphmodule_GraphObject * self,
 
   if (igraphmodule_PyObject_to_neimode_t(dtype_o, &dtype)) return NULL;
   igraph_vector_init(&result, 1);
-  if (igraph_adjacent(&self->g, &result, idx, (igraph_neimode_t) dtype)) {
+  if (igraph_incident(&self->g, &result, idx, (igraph_neimode_t) dtype)) {
     igraphmodule_handle_igraph_error();
     igraph_vector_destroy(&result);
     return NULL;
@@ -9507,7 +9507,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Returns the strength (weighted degree) of some vertices from the graph\n\n"
    "This method accepts a single vertex ID or a list of vertex IDs as a\n"
    "parameter, and returns the strength (that is, the sum of the weights\n"
-   "of all adjacent edges) of the given vertices (in the\n"
+   "of all incident edges) of the given vertices (in the\n"
    "form of a single integer or a list, depending on the input\n"
    "parameter).\n"
    "\n"
@@ -9631,11 +9631,11 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  graphs.\n"
    "@return: the edge IDs in a list\n"},
 
-  /* interface to igraph_adjacent */
-  {"adjacent", (PyCFunction) igraphmodule_Graph_adjacent,
+  /* interface to igraph_incident */
+  {"incident", (PyCFunction) igraphmodule_Graph_incident,
    METH_VARARGS | METH_KEYWORDS,
-   "adjacent(vertex, type=OUT)\n\n"
-   "Returns adjacent edges to a given vertex.\n\n"
+   "incident(vertex, type=OUT)\n\n"
+   "Returns the edges a given vertex is incident on.\n\n"
    "@param vertex: a vertex ID\n"
    "@param type: whether to return only predecessors (L{OUT}),\n"
    "  successors (L{IN}) or both (L{ALL}). Ignored for undirected\n"
@@ -10815,7 +10815,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Returns a subgraph spanned by the given edges.\n\n"
    "@param edges: a list containing the edge IDs which should\n"
    "  be included in the result.\n"
-   "@param delete_vertices: if C{True}, vertices not adjacent to\n"
+   "@param delete_vertices: if C{True}, vertices not incident on\n"
    "  any of the specified edges will be deleted from the result.\n"
    "  If C{False}, all vertices will be kept.\n"
    "@return: the subgraph\n"},
@@ -10991,7 +10991,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param loops: whether vertices should be considered adjacent to\n"
    "  themselves. Setting this to C{True} assumes a loop edge for all vertices\n"
    "  even if none is present in the graph. Setting this to C{False} may\n"
-   "  result in strange results: nonadjacent edges may have larger\n"
+   "  result in strange results: nonadjacent vertices may have larger\n"
    "  similarities compared to the case when an edge is added between them --\n"
    "  however, this might be exactly the result you want to get.\n"
    "@return: the pairwise similarity coefficients for the vertices specified,\n"
@@ -11030,7 +11030,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param loops: whether vertices should be considered adjacent to\n"
    "  themselves. Setting this to C{True} assumes a loop edge for all vertices\n"
    "  even if none is present in the graph. Setting this to C{False} may\n"
-   "  result in strange results: nonadjacent edges may have larger\n"
+   "  result in strange results: nonadjacent vertices may have larger\n"
    "  similarities compared to the case when an edge is added between them --\n"
    "  however, this might be exactly the result you want to get.\n"
    "@return: the pairwise similarity coefficients for the vertices specified,\n"
@@ -11532,7 +11532,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "not make much sense.\n\n"
    "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
    "  even an edge attribute name. When edge weights are used, the degree\n"
-   "  of a node is considered to be the weight of its adjacent edges.\n"
+   "  of a node is considered to be the weight of its incident edges.\n"
    "@param normalized: whether to return the normalized Laplacian matrix.\n"
    "@return: the Laplacian matrix.\n"},
 
@@ -12252,8 +12252,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "otherwise.\n\n"
    "If edge weights are given, the definition of modularity is modified as\n"
    "follows: M{Aij} becomes the weight of the corresponding edge, M{ki}\n"
-   "is the total weight of edges adjacent to vertex M{i}, M{kj} is the\n"
-   "total weight of edges adjacent to vertex M{j} and M{m} is the total\n"
+   "is the total weight of edges incident on vertex M{i}, M{kj} is the\n"
+   "total weight of edges incident on vertex M{j} and M{m} is the total\n"
    "edge weight in the graph.\n\n"
    "@attention: method overridden in L{Graph} to allow L{VertexClustering}\n"
    "  objects as a parameter. This method is not strictly necessary, since\n"
@@ -12391,7 +12391,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "local contribution to the overall modularity score. When a consensus is\n"
    "reached (i.e. no single move would increase the modularity score), every\n"
    "community in the original graph is shrank to a single vertex (while\n"
-   "keeping the total weight of the adjacent edges) and the process continues\n"
+   "keeping the total weight of the incident edges) and the process continues\n"
    "on the next level. The algorithm stops when it is not possible to increase\n"
    "the modularity any more after shrinking the communities to vertices.\n\n"
    "@attention: this function is wrapped in a more convenient syntax in the\n"
