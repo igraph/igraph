@@ -70,13 +70,11 @@ class Layout(object):
 
         @param coords: the coordinates to be stored in the layout.
         @param dim: the number of dimensions. If C{None}, the number of
-          dimensions is determined automatically from the length of the
-          first item of the coordinate list. An exception is thrown if
-          the coordinate list is empty and this parameter is C{None}.
-          Generally, this should be given if the length of the coordinate
-          list is zero, otherwise it should be left as is.
-        @raise ValueError: if the coordinate list is empty and the
-          number of dimensions is not given.
+        dimensions is determined automatically from the length of the first
+        item of the coordinate list. If there are no entries in the coordinate
+        list, the default will be 2.  Generally, this should be given if the
+        length of the coordinate list is zero, otherwise it should be left as
+        is.
         """
         if coords:
             self._coords = [list(coord) for coord in coords]
@@ -85,8 +83,7 @@ class Layout(object):
 
         if dim is None:
             if len(self._coords) == 0:
-                raise ValueError("the number of dimensions must be given "+
-                                 "if the coordinate list is empty")
+                self._dim = 2
             else:
                 self._dim = len(self._coords[0])
         else:
