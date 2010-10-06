@@ -60,7 +60,7 @@ Cairo do, so the preferred way to install Cairo on Windows along with
 its Python bindings is as follows:
 
 1. Get the latest PyCairo for Windows installer from
-   http://ftp.gnome.org/pub/GNOME/binaries/win32/pycairo/1.8. Make sure you
+   http://ftp.gnome.org/pub/gnome/binaries/win32/pycairo/1.8. Make sure you
    grab the one that matches your Python version. At the time of writing,
    the above folder contained installers for Python 2.6 only. You may
    also try and go one level up, then down then 1.4 subfolder -- these are
@@ -71,19 +71,20 @@ its Python bindings is as follows:
    installed. Unfortunately there are some extra DLLs which are required to
    make Cairo work, so we have to get these as well.
 
-3. Head to http://www.gtk.org/download-windows and get the binary versions of
-   Cairo (``cairo_1.8.10-3_win32.zip`` at the time of writing), Fontconfig
-   (``fontconfig_2.8.0-2_win32.zip``), Expat (``expat_2.0.1-1_win32.zip``),
-   ``libpng`` (``libpng_1.4.0-1_win32.zip``) and ``zlib`` (``zlib_1.2.4-2_win32.zip``).
-   Version numbers may vary, so be adaptive! Each ZIP file will contain a
-   ``bin`` subfolder with a DLL file in it. Put the following DLLs in
-   ``Lib\site-packages\cairo`` within your Python installation:
+3. Head to http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/ and get
+   the binary versions of Cairo (``cairo_1.8.10-3_win32.zip`` at the time of
+   writing), Fontconfig (``fontconfig_2.8.0-2_win32.zip``), Expat
+   (``expat_2.0.1-1_win32.zip``), ``libpng`` (``libpng_1.4.3-1_win32.zip``) and
+   ``zlib`` (``zlib_1.2.5-2_win32.zip``).  Version numbers may vary, so be
+   adaptive! Each ZIP file will contain a ``bin`` subfolder with a DLL file in
+   it. Put the following DLLs in ``Lib\site-packages\cairo`` within your Python
+   installation:
 
    - ``libcairo-2.dll`` (from ``cairo_1.8.10-3_win32.zip``)
    - ``libexpat-1.dll`` (from ``expat_2.0.1-1_win32.zip``)
    - ``libfontconfig-1.dll`` (from ``fontconfig_2.8.0-2_win32.zip``)
-   - ``libpng14-14.dll`` (from ``libpng_1.4.0-1_win32.zip``)
-   - ``zlib1.dll`` (from ``zlib_1.2.4-2_win32.zip``).
+   - ``libpng14-14.dll`` (from ``libpng_1.4.3-1_win32.zip``)
+   - ``zlib1.dll`` (from ``zlib_1.2.5-2_win32.zip``).
 
 Having done that, you can launch Python again and check if it worked:
 
