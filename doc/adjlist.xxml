@@ -18,10 +18,10 @@
 <!-- doxrox-include igraph_adjlist_simplify -->
 </section>
 
-<section><title>Adjacent edges</title>
-<!-- doxrox-include igraph_adjedgelist_init -->
-<!-- doxrox-include igraph_adjedgelist_destroy -->
-<!-- doxrox-include igraph_adjedgelist_get -->
+<section><title>Incident edges</title>
+<!-- doxrox-include igraph_inclist_init -->
+<!-- doxrox-include igraph_inclist_destroy -->
+<!-- doxrox-include igraph_inclist_get -->
 </section>
 
 <section><title>Lazy adjacency list for vertices</title>
@@ -30,7 +30,16 @@
 <!-- doxrox-include igraph_lazy_adjlist_get -->
 </section>
 
-<section><title>Lazy adjacency list for edges</title>
+<section><title>Lazy incidence list for edges</title>
+<!-- doxrox-include igraph_lazy_inclist_init -->
+<!-- doxrox-include igraph_lazy_inclist_destroy -->
+<!-- doxrox-include igraph_lazy_inclist_get -->
+</section>
+
+<section><title>Deprecated functions</title>
+<!-- doxrox-include igraph_adjedgelist_init -->
+<!-- doxrox-include igraph_adjedgelist_destroy -->
+<!-- doxrox-include igraph_adjedgelist_get -->
 <!-- doxrox-include igraph_lazy_adjedgelist_init -->
 <!-- doxrox-include igraph_lazy_adjedgelist_destroy -->
 <!-- doxrox-include igraph_lazy_adjedgelist_get -->

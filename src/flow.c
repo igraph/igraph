@@ -1072,7 +1072,7 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
   long int i;
   
   igraph_adjlist_t adjlist;
-  igraph_adjedgelist_t adjedgelist;
+  igraph_inclist_t inclist;
 
   igraph_vector_t mergehist;
   igraph_bool_t calc_cut=partition || partition2 || cut;
@@ -1090,8 +1090,8 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
   IGRAPH_CHECK(igraph_i_cutheap_init(&heap, no_of_nodes));
   IGRAPH_FINALLY(igraph_i_cutheap_destroy, &heap);
 
-  IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjedgelist, IGRAPH_OUT));
-  IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjedgelist);
+  IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_OUT));
+  IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
   IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
@@ -1108,7 +1108,7 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
       a=igraph_i_cutheap_popmax(&heap);
 
       /* update the weights of the active vertices connected to a */
-      edges=igraph_adjedgelist_get(&adjedgelist, a);
+      edges=igraph_inclist_get(&inclist, a);
       neis=igraph_adjlist_get(&adjlist, a);
       n=igraph_vector_size(edges);
       for (i=0; i<n; i++) {
@@ -1143,7 +1143,7 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
     }
     /* First remove the a--last edge if there is one, a is still the
        last deactivated vertex */
-    edges=igraph_adjedgelist_get(&adjedgelist, a);
+    edges=igraph_inclist_get(&inclist, a);
     neis=igraph_adjlist_get(&adjlist, a);
     n=igraph_vector_size(edges);
     for (i=0; i<n; ) {
@@ -1158,7 +1158,7 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
       }
     }
     
-    edges=igraph_adjedgelist_get(&adjedgelist, last);
+    edges=igraph_inclist_get(&inclist, last);
     neis=igraph_adjlist_get(&adjlist, last);
     n=igraph_vector_size(edges);
     for (i=0; i<n; ) {
@@ -1189,9 +1189,9 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
     }
     
     /* And append the lists of last to the lists of a */
-    edges=igraph_adjedgelist_get(&adjedgelist, a);
+    edges=igraph_inclist_get(&inclist, a);
     neis=igraph_adjlist_get(&adjlist, a);
-    edges2=igraph_adjedgelist_get(&adjedgelist, last);
+    edges2=igraph_inclist_get(&inclist, last);
     neis2=igraph_adjlist_get(&adjlist, last);
     IGRAPH_CHECK(igraph_vector_append(edges, edges2));
     IGRAPH_CHECK(igraph_vector_append(neis, neis2));
@@ -1204,7 +1204,7 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
 
   *res=mincut;
 
-  igraph_adjedgelist_destroy(&adjedgelist);
+  igraph_inclist_destroy(&inclist);
   igraph_adjlist_destroy(&adjlist);
   igraph_i_cutheap_destroy(&heap);
   IGRAPH_FINALLY_CLEAN(3);

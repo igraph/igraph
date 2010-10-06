@@ -3110,7 +3110,7 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
   igraph_vector_t *adj1, *adj2;
   igraph_vector_long_t neis;
   igraph_vector_t actw;
-  igraph_lazy_adjedgelist_t incident;
+  igraph_lazy_inclist_t incident;
   long int i;
   igraph_vector_t strength;
   
@@ -3136,8 +3136,8 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
   IGRAPH_CHECK(igraph_strength(graph, &strength, igraph_vss_all(), IGRAPH_ALL,
 			       IGRAPH_LOOPS, weights));  
   
-  igraph_lazy_adjedgelist_init(graph, &incident, IGRAPH_ALL);
-  IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &incident);  
+  igraph_lazy_inclist_init(graph, &incident, IGRAPH_ALL);
+  IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &incident);  
 
   IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
   
@@ -3148,7 +3148,7 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    adj1=igraph_lazy_adjedgelist_get(&incident, node);
+    adj1=igraph_lazy_inclist_get(&incident, node);
     adjlen1=igraph_vector_size(adj1);
     /* Mark the neighbors of the node */
     for (j=0; j<adjlen1; j++) {
@@ -3164,7 +3164,7 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
       long int edge1=VECTOR(*adj1)[j];
       igraph_real_t weight1=VECTOR(*weights)[edge1];
       long int v=IGRAPH_OTHER(graph, edge1, node);
-      adj2=igraph_lazy_adjedgelist_get(&incident, v);
+      adj2=igraph_lazy_inclist_get(&incident, v);
       adjlen2=igraph_vector_size(adj2);
       for (k=0; k<adjlen2; k++) {
 	long int edge2=VECTOR(*adj2)[k];
@@ -3180,7 +3180,7 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
       VECTOR(*res)[i] = triangles/triples;
   }
 
-  igraph_lazy_adjedgelist_destroy(&incident);
+  igraph_lazy_inclist_destroy(&incident);
   igraph_vector_destroy(&strength);
   igraph_vector_destroy(&actw);
   igraph_vector_long_destroy(&neis);
@@ -3200,7 +3200,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
   long int no_of_edges=igraph_ecount(graph);
   igraph_vector_t order, degree, rank;
   long int maxdegree;
-  igraph_adjedgelist_t incident;
+  igraph_inclist_t incident;
   igraph_vector_long_t neis;
   igraph_vector_t *adj1, *adj2;
   igraph_vector_t actw;
@@ -3231,8 +3231,8 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
     VECTOR(rank)[ (long int)VECTOR(order)[i] ] = no_of_nodes-i-1;
   }
   
-  IGRAPH_CHECK(igraph_adjedgelist_init(graph, &incident, IGRAPH_ALL));
-  IGRAPH_FINALLY(igraph_adjedgelist_destroy, &incident);
+  IGRAPH_CHECK(igraph_inclist_init(graph, &incident, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_inclist_destroy, &incident);
   
   IGRAPH_CHECK(igraph_vector_long_init(&neis, no_of_nodes));
   IGRAPH_FINALLY(igraph_vector_long_destroy, &neis);
@@ -3249,7 +3249,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    adj1=igraph_adjedgelist_get(&incident, node);
+    adj1=igraph_inclist_get(&incident, node);
     adjlen1=igraph_vector_size(adj1);
     triples = VECTOR(degree)[node] * (adjlen1-1) / 2.0;
     /* Mark the neighbors of the node */
@@ -3266,7 +3266,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
       long int nei=IGRAPH_OTHER(graph, edge1, node);
       long int j;
       if (VECTOR(rank)[nei] > VECTOR(rank)[node]) {
-	adj2=igraph_adjedgelist_get(&incident, nei);
+	adj2=igraph_inclist_get(&incident, nei);
 	adjlen2=igraph_vector_size(adj2);
 	for (j=0; j<adjlen2; j++) {
 	  long int edge2=VECTOR(*adj2)[j];
@@ -3292,7 +3292,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
 
   igraph_vector_destroy(&actw);
   igraph_vector_long_destroy(&neis);
-  igraph_adjedgelist_destroy(&incident);
+  igraph_inclist_destroy(&incident);
   igraph_vector_destroy(&rank);
   igraph_vector_destroy(&degree);
   igraph_vector_destroy(&order);
@@ -4454,12 +4454,12 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
 		       igraph_es_t es) {
   igraph_eit_t eit;
   long int i;
-  igraph_lazy_adjedgelist_t adjlist;
+  igraph_lazy_inclist_t inclist;
   
   IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
   IGRAPH_FINALLY(igraph_eit_destroy, &eit);
-  IGRAPH_CHECK(igraph_lazy_adjedgelist_init(graph, &adjlist, IGRAPH_OUT));
-  IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjlist);
+  IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, IGRAPH_OUT));
+  IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
   
   IGRAPH_CHECK(igraph_vector_bool_resize(res, IGRAPH_EIT_SIZE(eit)));
   
@@ -4467,7 +4467,7 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
     long int e=IGRAPH_EIT_GET(eit);
     long int from=IGRAPH_FROM(graph, e);
     long int to=IGRAPH_TO(graph, e);
-    igraph_vector_t *neis=igraph_lazy_adjedgelist_get(&adjlist, from);
+    igraph_vector_t *neis=igraph_lazy_inclist_get(&inclist, from);
     long int j, n=igraph_vector_size(neis);
     VECTOR(*res)[i]=0;
     for (j=0; j<n; j++) {
@@ -4479,7 +4479,7 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
     }
   }
   
-  igraph_lazy_adjedgelist_destroy(&adjlist);
+  igraph_lazy_inclist_destroy(&inclist);
   igraph_eit_destroy(&eit);
   IGRAPH_FINALLY_CLEAN(2);
   return 0;
@@ -4514,12 +4514,12 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
 int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es) {
   igraph_eit_t eit;
   long int i;
-  igraph_lazy_adjedgelist_t adjlist;
+  igraph_lazy_inclist_t inclist;
   
   IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
   IGRAPH_FINALLY(igraph_eit_destroy, &eit);
-  IGRAPH_CHECK(igraph_lazy_adjedgelist_init(graph, &adjlist, IGRAPH_OUT));
-  IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjlist);
+  IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, IGRAPH_OUT));
+  IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
   
   IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_EIT_SIZE(eit)));
   
@@ -4527,7 +4527,7 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
     long int e=IGRAPH_EIT_GET(eit);
     long int from=IGRAPH_FROM(graph, e);
     long int to=IGRAPH_TO(graph, e);
-    igraph_vector_t *neis=igraph_lazy_adjedgelist_get(&adjlist, from);
+    igraph_vector_t *neis=igraph_lazy_inclist_get(&inclist, from);
     long int j, n=igraph_vector_size(neis);
     VECTOR(*res)[i] = 0;
     for (j=0; j<n; j++) {
@@ -4539,7 +4539,7 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
     if (to == from) VECTOR(*res)[i] /= 2;
   }
   
-  igraph_lazy_adjedgelist_destroy(&adjlist);
+  igraph_lazy_inclist_destroy(&inclist);
   igraph_eit_destroy(&eit);
   IGRAPH_FINALLY_CLEAN(2);
   return 0;
@@ -4888,7 +4888,7 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
   long int *geodist;
   igraph_vector_t *eids, *ins_p, *outs_p, ins_v, outs_v;
   igraph_dqueue_t q;
-  igraph_adjedgelist_t adjlist;
+  igraph_inclist_t inclist;
   igraph_bool_t directed = igraph_is_directed(graph);
 
   if (result != 0) IGRAPH_CHECK(igraph_vector_resize(result, no_of_edges));
@@ -4924,8 +4924,8 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
   for (k=0; k<(directed?2:1); k++) {
     igraph_neimode_t neimode = (k==0)?IGRAPH_OUT:IGRAPH_IN;
     igraph_real_t *vec;
-    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjlist, neimode));
-    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjlist);
+    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, neimode));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
     vec = (k==0)?VECTOR(*ins_p):VECTOR(*outs_p);
     for (i=0; i<no_of_nodes; i++) {
       igraph_dqueue_clear(&q);
@@ -4937,7 +4937,7 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
         long int actnode=igraph_dqueue_pop(&q);
         long int actdist=igraph_dqueue_pop(&q);
         IGRAPH_ALLOW_INTERRUPTION();
-        eids=igraph_adjedgelist_get(&adjlist, actnode);
+        eids=igraph_inclist_get(&inclist, actnode);
         n=igraph_vector_size(eids);
         for (j=0; j<n; j++) {
           long int neighbor = IGRAPH_OTHER(graph, VECTOR(*eids)[j], actnode);
@@ -4971,7 +4971,7 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
       }
     }
 
-    igraph_adjedgelist_destroy(&adjlist);
+    igraph_inclist_destroy(&inclist);
     IGRAPH_FINALLY_CLEAN(1);
   }
 
@@ -5068,7 +5068,7 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
   igraph_2wheap_t Q;
   igraph_vit_t fromvit, tovit;
   long int no_of_from, no_of_to;
-  igraph_lazy_adjedgelist_t adjlist;
+  igraph_lazy_inclist_t inclist;
   long int i,j;
   igraph_real_t my_infinity=IGRAPH_INFINITY;
   igraph_bool_t all_to;
@@ -5091,8 +5091,8 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
   
   IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
   IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
-  IGRAPH_CHECK(igraph_lazy_adjedgelist_init(graph, &adjlist, mode));
-  IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjlist);
+  IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode));
+  IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
   if ( (all_to=igraph_vs_is_all(&to)) ) {
     no_of_to=no_of_nodes;
@@ -5143,7 +5143,7 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
       }
 
       /* Now check all neighbors of 'minnei' for a shorter path */
-      neis=igraph_lazy_adjedgelist_get(&adjlist, minnei);
+      neis=igraph_lazy_inclist_get(&inclist, minnei);
       nlen=igraph_vector_size(neis);
       for (j=0; j<nlen; j++) {
 	long int edge=VECTOR(*neis)[j];
@@ -5171,7 +5171,7 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(2);
   }  
   
-  igraph_lazy_adjedgelist_destroy(&adjlist);
+  igraph_lazy_inclist_destroy(&inclist);
   igraph_2wheap_destroy(&Q);
   igraph_vit_destroy(&fromvit);
   IGRAPH_FINALLY_CLEAN(3);
@@ -5272,7 +5272,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
   long int no_of_edges=igraph_ecount(graph);
   igraph_vit_t vit;
   igraph_2wheap_t Q;
-  igraph_lazy_adjedgelist_t adjlist;
+  igraph_lazy_inclist_t inclist;
   igraph_vector_t dists;
   long int *parents;
   igraph_bool_t *is_target;
@@ -5301,8 +5301,8 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 
   IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
   IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
-  IGRAPH_CHECK(igraph_lazy_adjedgelist_init(graph, &adjlist, mode));
-  IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjlist);
+  IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode));
+  IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
   IGRAPH_VECTOR_INIT_FINALLY(&dists, no_of_nodes);
 
@@ -5340,7 +5340,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 	}
 
     /* Now check all neighbors of 'minnei' for a shorter path */
-    neis=igraph_lazy_adjedgelist_get(&adjlist, minnei);
+    neis=igraph_lazy_inclist_get(&inclist, minnei);
     nlen=igraph_vector_size(neis);
     for (i=0; i<nlen; i++) {
       long int edge=VECTOR(*neis)[i];
@@ -5407,7 +5407,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     }
   }
   
-  igraph_lazy_adjedgelist_destroy(&adjlist);
+  igraph_lazy_inclist_destroy(&inclist);
   igraph_2wheap_destroy(&Q);
   igraph_vector_destroy(&dists);
   igraph_Free(is_target);
@@ -5575,7 +5575,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
   long int no_of_edges=igraph_ecount(graph);
   igraph_vit_t vit;
   igraph_2wheap_t Q;
-  igraph_lazy_adjedgelist_t adjlist;
+  igraph_lazy_inclist_t inclist;
   igraph_vector_t dists, order;
   igraph_vector_ptr_t parents;
   unsigned char *is_target;
@@ -5626,8 +5626,8 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
 
   /* lazy adjacency edge list to query neighbours efficiently */
-  IGRAPH_CHECK(igraph_lazy_adjedgelist_init(graph, &adjlist, mode));
-  IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjlist);
+  IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode));
+  IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
   /* Mark the vertices we need to reach */
   IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
@@ -5667,7 +5667,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_push_back(&order, minnei));
 
     /* Now check all neighbors of 'minnei' for a shorter path */
-    neis=igraph_lazy_adjedgelist_get(&adjlist, minnei);
+    neis=igraph_lazy_inclist_get(&inclist, minnei);
     nlen=igraph_vector_size(neis);
     for (i=0; i<nlen; i++) {
       long int edge=VECTOR(*neis)[i];
@@ -5701,7 +5701,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     IGRAPH_WARNING("Couldn't reach some vertices");
 
   /* we don't need these anymore */
-  igraph_lazy_adjedgelist_destroy(&adjlist);
+  igraph_lazy_inclist_destroy(&inclist);
   igraph_2wheap_destroy(&Q);
   IGRAPH_FINALLY_CLEAN(2);
 
@@ -5959,7 +5959,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
 				       igraph_neimode_t mode) {
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
-  igraph_lazy_adjedgelist_t adjlist;
+  igraph_lazy_inclist_t inclist;
   long int i,j,k;
   long int no_of_from, no_of_to;
   igraph_dqueue_t Q; 
@@ -5993,8 +5993,8 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
   IGRAPH_DQUEUE_INIT_FINALLY(&Q, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&clean_vertices, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&num_queued, no_of_nodes);
-  IGRAPH_CHECK(igraph_lazy_adjedgelist_init(graph, &adjlist, mode));
-  IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjlist);
+  IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode));
+  IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
   if ( (all_to=igraph_vs_is_all(&to)) ) {
     no_of_to=no_of_nodes;
@@ -6034,7 +6034,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
        * its edges */
       if (!IGRAPH_FINITE(VECTOR(dist)[j])) continue;
 
-      neis = igraph_lazy_adjedgelist_get(&adjlist, j);
+      neis = igraph_lazy_inclist_get(&inclist, j);
       nlen = igraph_vector_size(neis);
 
       for (k=0; k<nlen; k++) {
@@ -6068,7 +6068,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
   igraph_dqueue_destroy(&Q);
   igraph_vector_destroy(&clean_vertices);
   igraph_vector_destroy(&num_queued);
-  igraph_lazy_adjedgelist_destroy(&adjlist);
+  igraph_lazy_inclist_destroy(&inclist);
   IGRAPH_FINALLY_CLEAN(6);
 
   return 0;
@@ -6798,7 +6798,7 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
 
   igraph_vector_t dist;
   igraph_indheap_t Q;
-  igraph_adjedgelist_t adjlist;
+  igraph_inclist_t inclist;
   igraph_vector_long_t already_added;
   long int source;
   igraph_integer_t dirmode = directed ? IGRAPH_OUT : IGRAPH_ALL;
@@ -6824,8 +6824,8 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
   IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
   IGRAPH_CHECK(igraph_indheap_init(&Q, no_of_nodes));
   IGRAPH_FINALLY(igraph_indheap_destroy, &Q);
-  IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjlist, dirmode));
-  IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjlist);
+  IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, dirmode));
+  IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
   
   for (source=0; source < no_of_nodes; source++) {
 
@@ -6847,7 +6847,7 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
       }
       nodes_reached++;
 
-      neis=igraph_adjedgelist_get(&adjlist, minnei);
+      neis=igraph_inclist_get(&inclist, minnei);
       nlen=igraph_vector_size(neis);
       for (j=0; j<nlen; j++) {
 	long int edge=VECTOR(*neis)[j];
@@ -6879,7 +6879,7 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
     
   } /* source < no_of_nodes */
   
-  igraph_adjedgelist_destroy(&adjlist);
+  igraph_inclist_destroy(&inclist);
   igraph_indheap_destroy(&Q);
   igraph_vector_destroy(&dist);
   igraph_vector_long_destroy(&already_added);

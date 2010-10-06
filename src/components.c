@@ -591,7 +591,7 @@ int igraph_biconnected_components(const igraph_t *graph,
   igraph_vector_t *adjedges;
   igraph_stack_t path;
   igraph_vector_t edgestack;
-  igraph_adjedgelist_t adjedgelist;
+  igraph_inclist_t inclist;
   long int i, counter, rootdfs=0;  
   igraph_vector_long_t vertex_added;
   long int comps=0;
@@ -611,8 +611,8 @@ int igraph_biconnected_components(const igraph_t *graph,
   IGRAPH_VECTOR_INIT_FINALLY(&edgestack, 0);
   IGRAPH_CHECK(igraph_vector_reserve(&edgestack, 100));
 
-  IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjedgelist, IGRAPH_ALL));
-  IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjedgelist);
+  IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
   IGRAPH_CHECK(igraph_vector_long_init(&vertex_added, no_of_nodes));
   IGRAPH_FINALLY(igraph_vector_long_destroy, &vertex_added);
@@ -653,7 +653,7 @@ int igraph_biconnected_components(const igraph_t *graph,
       long int act=igraph_stack_top(&path);
       long int actnext=VECTOR(nextptr)[act];
       
-      adjedges=igraph_adjedgelist_get(&adjedgelist, act);
+      adjedges=igraph_inclist_get(&inclist, act);
       n=igraph_vector_size(adjedges);
       if (actnext < n) {
 	/* Step down (maybe) */
@@ -746,7 +746,7 @@ int igraph_biconnected_components(const igraph_t *graph,
 		IGRAPH_FINALLY(igraph_vector_destroy, v);
 		for (i=0; i<no_vert; i++) {
 		  long int vert=VECTOR(*nodes)[i];
-		  igraph_vector_t *edges=igraph_adjedgelist_get(&adjedgelist, 
+		  igraph_vector_t *edges=igraph_inclist_get(&inclist, 
 								vert);
 		  long int j, n=igraph_vector_size(edges);
 		  for (j=0; j<n; j++) {
@@ -781,7 +781,7 @@ int igraph_biconnected_components(const igraph_t *graph,
   }
 
   igraph_vector_long_destroy(&vertex_added);
-  igraph_adjedgelist_destroy(&adjedgelist);
+  igraph_inclist_destroy(&inclist);
   igraph_vector_destroy(&edgestack);
   igraph_stack_destroy(&path);
   igraph_vector_bool_destroy(&found);

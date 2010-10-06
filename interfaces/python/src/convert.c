@@ -23,6 +23,7 @@
 
 /************************ Miscellaneous functions *************************/
 
+#include <Python.h>
 #include <limits.h>
 #include "attributes.h"
 #include "graphobject.h"

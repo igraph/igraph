@@ -78,33 +78,33 @@ int igraph_adjlist_print(const igraph_adjlist_t *al, FILE *outfile);
 int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
 		   igraph_neimode_t mode, igraph_bool_t duplicate);
 
-typedef struct igraph_adjedgelist_t {
+typedef struct igraph_inclist_t {
   igraph_integer_t length;
-  igraph_vector_t *adjs;
-} igraph_adjedgelist_t;
+  igraph_vector_t *incs;
+} igraph_inclist_t;
 
-int igraph_adjedgelist_init(const igraph_t *graph, 
-			    igraph_adjedgelist_t *eal, 
+int igraph_inclist_init(const igraph_t *graph, 
+			    igraph_inclist_t *il, 
 			    igraph_neimode_t mode);
-void igraph_adjedgelist_destroy(igraph_adjedgelist_t *ael);
-int igraph_adjedgelist_remove_duplicate(const igraph_t *graph,
-					igraph_adjedgelist_t *al);
-int igraph_adjedgelist_print(const igraph_adjedgelist_t *al, FILE *outfile);
+void igraph_inclist_destroy(igraph_inclist_t *il);
+int igraph_inclist_remove_duplicate(const igraph_t *graph,
+					igraph_inclist_t *il);
+int igraph_inclist_print(const igraph_inclist_t *il, FILE *outfile);
 
 /**
- * \define igraph_adjedgelist_get
- * Query a vector in an adjedgelist
+ * \define igraph_inclist_get
+ * Query a vector in an incidence list
  *
  * Returns a pointer to an <type>igraph_vector_t</type> object from an
- * adjacency list containing edge ids. The vector can be modified,
+ * incidence list containing edge ids. The vector can be modified,
  * resized, etc. as desired. 
- * \param graph ael The edge adjacency list.
+ * \param graph il The incidence list.
  * \param no The vertex for which the incident edges are returned.
  * \return Pointer to an <type>igraph_vector_t</type> object.
  * 
  * Time complexity: O(1).
  */
-#define igraph_adjedgelist_get(ael,no) (&(ael)->adjs[(long int)(no)])
+#define igraph_inclist_get(il,no) (&(il)->incs[(long int)(no)])
 
 typedef struct igraph_lazy_adjlist_t {
   const igraph_t *graph;
@@ -143,26 +143,27 @@ void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al);
 igraph_vector_t *igraph_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
 						igraph_integer_t no);
 
-typedef struct igraph_lazy_adjedgelist_t {
+typedef struct igraph_lazy_inclist_t {
   const igraph_t *graph;
   igraph_integer_t length;
-  igraph_vector_t **adjs;
+  igraph_vector_t **incs;
   igraph_neimode_t mode;
-} igraph_lazy_adjedgelist_t;
+} igraph_lazy_inclist_t;
 
-int igraph_lazy_adjedgelist_init(const igraph_t *graph,
-				   igraph_lazy_adjedgelist_t *al,
+int igraph_lazy_inclist_init(const igraph_t *graph,
+				   igraph_lazy_inclist_t *il,
 				   igraph_neimode_t mode);
-void igraph_lazy_adjedgelist_destroy(igraph_lazy_adjedgelist_t *al);
+void igraph_lazy_inclist_destroy(igraph_lazy_inclist_t *il);
+
 /**
- * \define igraph_lazy_adjedgelist_get
+ * \define igraph_lazy_inclist_get
  * Query incident edges
  * 
  * If the function is called for the first time for a vertex, then the
- * result is stored in the adjacency list and no further query
+ * result is stored in the incidence list and no further query
  * operations are needed when the incident edges of the same vertex are
  * queried again.
- * \param al The lazy adjacency list object.
+ * \param al The lazy incidence list object.
  * \param no The vertex id to query.
  * \return Pointer to a vector. It is allowed to modify it and
  *   modification does not affect the original graph.
@@ -170,12 +171,60 @@ void igraph_lazy_adjedgelist_destroy(igraph_lazy_adjedgelist_t *al);
  * Time complexity: O(d), the number of incident edges for the first
  * time, O(1) for subsequent calls with the same \p no argument.
  */
-#define igraph_lazy_adjedgelist_get(al,no) \
-  ((al)->adjs[(long int)(no)] != 0 ? ((al)->adjs[(long int)(no)]) : \
-   (igraph_lazy_adjedgelist_get_real(al, no)))
-igraph_vector_t *igraph_lazy_adjedgelist_get_real(igraph_lazy_adjedgelist_t *al,
+#define igraph_lazy_inclist_get(al,no) \
+  ((al)->incs[(long int)(no)] != 0 ? ((al)->incs[(long int)(no)]) : \
+   (igraph_lazy_inclist_get_real(al, no)))
+igraph_vector_t *igraph_lazy_inclist_get_real(igraph_lazy_inclist_t *al,
 						    igraph_integer_t no);
 
+/************************************************************************* 
+ * DEPRECATED TYPES AND FUNCTIONS
+ */
+
+typedef igraph_inclist_t igraph_adjedgelist_t;
+
+int igraph_adjedgelist_init(const igraph_t *graph, 
+			    igraph_inclist_t *il, 
+			    igraph_neimode_t mode);
+void igraph_adjedgelist_destroy(igraph_inclist_t *il);
+int igraph_adjedgelist_remove_duplicate(const igraph_t *graph,
+					igraph_inclist_t *il);
+int igraph_adjedgelist_print(const igraph_inclist_t *il, FILE *outfile);
+
+/**
+ * \define igraph_adjedgelist_get
+ * Query a vector in an incidence list
+ *
+ * This macro was superseded by \ref igraph_inclist_get() in igraph 0.6.
+ * Please use \ref igraph_inclist_get() instead of this macro.
+ *
+ * </para><para>
+ * Deprecated in version 0.6.
+ */
+#define igraph_adjedgelist_get(ael,no) (&(ael)->incs[(long int)(no)])
+
+typedef igraph_lazy_inclist_t igraph_lazy_adjedgelist_t;
+
+int igraph_lazy_adjedgelist_init(const igraph_t *graph,
+				   igraph_lazy_inclist_t *il,
+				   igraph_neimode_t mode);
+void igraph_lazy_adjedgelist_destroy(igraph_lazy_inclist_t *il);
+
+/**
+ * \define igraph_lazy_adjedgelist_get
+ * Query a vector in a lazy incidence list
+ *
+ * This macro was superseded by \ref igraph_lazy_inclist_get() in igraph 0.6.
+ * Please use \ref igraph_lazy_inclist_get() instead of this macro.
+ *
+ * </para><para>
+ * Deprecated in version 0.6.
+ */
+#define igraph_lazy_adjedgelist_get(al,no) \
+  ((al)->incs[(long int)(no)] != 0 ? ((al)->incs[(long int)(no)]) : \
+   (igraph_lazy_adjedgelist_get_real(al, no)))
+igraph_vector_t *igraph_lazy_adjedgelist_get_real(igraph_lazy_inclist_t *al,
+						    igraph_integer_t no);
 __END_DECLS
 
 #endif

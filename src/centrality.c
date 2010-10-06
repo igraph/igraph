@@ -61,7 +61,7 @@ int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from
 
 typedef struct igraph_i_eigenvector_centrality_t {
   const igraph_t *graph;
-  const igraph_adjedgelist_t *adjedgelist;
+  const igraph_inclist_t *inclist;
   const igraph_vector_t *weights;
 } igraph_i_eigenvector_centrality_t;
 
@@ -70,13 +70,13 @@ int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *fro
 
   igraph_i_eigenvector_centrality_t *data=extra;
   const igraph_t *graph=data->graph;
-  const igraph_adjedgelist_t *adjedgelist=data->adjedgelist;
+  const igraph_inclist_t *inclist=data->inclist;
   const igraph_vector_t *weights=data->weights;
   igraph_vector_t *edges;
   long int i, j, nlen;
 
   for (i=0; i<n; i++) {
-    edges=igraph_adjedgelist_get(adjedgelist, i);
+    edges=igraph_inclist_get(inclist, i);
     nlen=igraph_vector_size(edges);
     to[i]=0.0;
     for (j=0; j<nlen; j++) {
@@ -192,18 +192,18 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
     
   } else {
     
-    igraph_adjedgelist_t adjedgelist;
-    igraph_i_eigenvector_centrality_t data = { graph, &adjedgelist, weights };
+    igraph_inclist_t inclist;
+    igraph_i_eigenvector_centrality_t data = { graph, &inclist, weights };
     
-    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjedgelist, IGRAPH_ALL));
-    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjedgelist);
+    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
-    IGRAPH_CHECK(igraph_adjedgelist_remove_duplicate(graph, &adjedgelist));
+    IGRAPH_CHECK(igraph_inclist_remove_duplicate(graph, &inclist));
     
     IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigenvector_centrality2,
 				       &data, options, 0, &values, &vectors));
     
-    igraph_adjedgelist_destroy(&adjedgelist);
+    igraph_inclist_destroy(&inclist);
     IGRAPH_FINALLY_CLEAN(1);
   }
 
@@ -338,8 +338,8 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
     IGRAPH_FINALLY_CLEAN(1);
 
   } else {
-    igraph_adjedgelist_t adjedgelist;
-    igraph_i_eigenvector_centrality_t data={ graph, &adjedgelist, weights };
+    igraph_inclist_t inclist;
+    igraph_i_eigenvector_centrality_t data={ graph, &inclist, weights };
 
     IGRAPH_CHECK(igraph_strength(graph, &indegree, igraph_vss_all(),
 				 IGRAPH_IN, /*loops=*/ 1, weights));
@@ -353,13 +353,13 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
     igraph_vector_destroy(&indegree);
     IGRAPH_FINALLY_CLEAN(1);
 
-    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjedgelist, IGRAPH_IN));
-    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjedgelist); 
+    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_IN));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &inclist); 
     
     IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_eigenvector_centrality2,
 				       &data, options, 0, &values, &vectors));
     
-    igraph_adjedgelist_destroy(&adjedgelist);
+    igraph_inclist_destroy(&inclist);
     IGRAPH_FINALLY_CLEAN(1);
   }
 
@@ -459,8 +459,8 @@ typedef struct igraph_i_kleinberg_data_t {
 /* struct for the weighted variant of the HITS algorithm */
 typedef struct igraph_i_kleinberg_data2_t {
   const igraph_t *graph;
-  igraph_adjedgelist_t *in;
-  igraph_adjedgelist_t *out;
+  igraph_inclist_t *in;
+  igraph_inclist_t *out;
   igraph_vector_t *tmp;
   const igraph_vector_t *weights;
 } igraph_i_kleinberg_data2_t;
@@ -505,8 +505,8 @@ int igraph_i_kleinberg_weighted(igraph_real_t *to,
                                 long int n, void *extra) {
 
   igraph_i_kleinberg_data2_t *data = (igraph_i_kleinberg_data2_t*)extra;
-  igraph_adjedgelist_t *in = data->in; 
-  igraph_adjedgelist_t *out = data->out; 
+  igraph_inclist_t *in = data->in; 
+  igraph_inclist_t *out = data->out; 
   igraph_vector_t *tmp = data->tmp;
   const igraph_vector_t *weights = data->weights; 
   const igraph_t *g = data->graph;
@@ -514,7 +514,7 @@ int igraph_i_kleinberg_weighted(igraph_real_t *to,
   long int i, j, nlen;
   
   for (i=0; i<n; i++) {
-    neis=igraph_adjedgelist_get(in, i);
+    neis=igraph_inclist_get(in, i);
     nlen=igraph_vector_size(neis);
     VECTOR(*tmp)[i]=0.0;
     for (j=0; j<nlen; j++) {
@@ -525,7 +525,7 @@ int igraph_i_kleinberg_weighted(igraph_real_t *to,
   }
   
   for (i=0; i<n; i++) {
-    neis=igraph_adjedgelist_get(out, i);
+    neis=igraph_inclist_get(out, i);
     nlen=igraph_vector_size(neis);
     to[i]=0.0;
     for (j=0; j<nlen; j++) {
@@ -544,9 +544,9 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
 		       igraph_arpack_options_t *options, int inout) {
   
   igraph_adjlist_t myinadjlist, myoutadjlist;
-  igraph_adjedgelist_t myinadjedgelist, myoutadjedgelist;
+  igraph_inclist_t myininclist, myoutinclist;
   igraph_adjlist_t *inadjlist, *outadjlist;
-  igraph_adjedgelist_t *inadjedgelist, *outadjedgelist;
+  igraph_inclist_t *ininclist, *outinclist;
   igraph_vector_t tmp;
   igraph_vector_t values;
   igraph_matrix_t vectors;
@@ -595,13 +595,13 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
   if (inout==0) {
     inadjlist=&myinadjlist; 
     outadjlist=&myoutadjlist;
-    inadjedgelist=&myinadjedgelist;
-    outadjedgelist=&myoutadjedgelist;
+    ininclist=&myininclist;
+    outinclist=&myoutinclist;
   } else if (inout==1) {
     inadjlist=&myoutadjlist;
     outadjlist=&myinadjlist;
-    inadjedgelist=&myoutadjedgelist;
-    outadjedgelist=&myinadjedgelist;
+    ininclist=&myoutinclist;
+    outinclist=&myininclist;
   } else {
     /* This should not happen */
     IGRAPH_ERROR("Invalid 'inout' argument, please do not call "
@@ -614,10 +614,10 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
     IGRAPH_CHECK(igraph_adjlist_init(graph, &myoutadjlist, IGRAPH_OUT));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &myoutadjlist);
   } else {
-    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &myinadjedgelist, IGRAPH_IN));
-    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &myinadjedgelist);
-    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &myoutadjedgelist, IGRAPH_OUT));
-    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &myoutadjedgelist);
+    IGRAPH_CHECK(igraph_inclist_init(graph, &myininclist, IGRAPH_IN));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &myininclist);
+    IGRAPH_CHECK(igraph_inclist_init(graph, &myoutinclist, IGRAPH_OUT));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &myoutinclist);
   }
 
   IGRAPH_CHECK(igraph_degree(graph, &tmp, igraph_vss_all(), IGRAPH_ALL, 0));
@@ -630,7 +630,7 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
   }
 	
   extra.in=inadjlist; extra.out=outadjlist; extra.tmp=&tmp;
-  extra2.in=inadjedgelist; extra2.out=outadjedgelist; extra2.tmp=&tmp;
+  extra2.in=ininclist; extra2.out=outinclist; extra2.tmp=&tmp;
   extra2.graph=graph; extra2.weights=weights;
 
   options->nev = 1;
@@ -649,8 +649,8 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
   } else {
     IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_kleinberg_weighted, &extra2,
                                        options, 0, &values, &vectors));
-    igraph_adjedgelist_destroy(&myoutadjedgelist);
-    igraph_adjedgelist_destroy(&myinadjedgelist);
+    igraph_inclist_destroy(&myoutinclist);
+    igraph_inclist_destroy(&myininclist);
 	IGRAPH_FINALLY_CLEAN(2);
   }
 
@@ -793,7 +793,7 @@ typedef struct igraph_i_pagerank_data_t {
 
 typedef struct igraph_i_pagerank_data2_t {
   const igraph_t *graph;
-  igraph_adjedgelist_t *adjedgelist;
+  igraph_inclist_t *inclist;
   const igraph_vector_t *weights;
   igraph_real_t damping;
   igraph_vector_t *outdegree;
@@ -849,7 +849,7 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
 
   igraph_i_pagerank_data2_t *data=extra;
   const igraph_t *graph=data->graph;
-  igraph_adjedgelist_t *adjedgelist=data->adjedgelist;
+  igraph_inclist_t *inclist=data->inclist;
   const igraph_vector_t *weights=data->weights;
   igraph_vector_t *outdegree=data->outdegree;
   igraph_vector_t *tmp=data->tmp;
@@ -865,7 +865,7 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
   }
   
   for (i=0; i<n; i++) {
-    neis=igraph_adjedgelist_get(adjedgelist, i);
+    neis=igraph_inclist_get(inclist, i);
     nlen=igraph_vector_size(neis);
     to[i]=0.0;
     for (j=0; j<nlen; j++) {
@@ -1212,12 +1212,12 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
     
   } else {
     
-    igraph_adjedgelist_t adjedgelist;
-    igraph_i_pagerank_data2_t data = { graph, &adjedgelist, weights,
+    igraph_inclist_t inclist;
+    igraph_i_pagerank_data2_t data = { graph, &inclist, weights,
 				       damping, &outdegree, &tmp, reset };    
 
-    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjedgelist, dirmode));
-    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjedgelist);
+    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, dirmode));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
     /* Weighted degree */
     for (i=0; i<no_of_edges; i++) {
@@ -1237,7 +1237,7 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
     IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_pagerank2,
 				       &data, options, 0, &values, &vectors));
     
-    igraph_adjedgelist_destroy(&adjedgelist);
+    igraph_inclist_destroy(&inclist);
     IGRAPH_FINALLY_CLEAN(1);
   }
 
@@ -1346,7 +1346,7 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   igraph_2wheap_t Q;
-  igraph_adjedgelist_t adjlist;
+  igraph_inclist_t inclist;
   igraph_adjlist_t fathers;
   long int source, j;
   igraph_stack_t S;
@@ -1365,8 +1365,8 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
 
   IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
   IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
-  IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjlist, mode));  
-  IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjlist);
+  IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode));  
+  IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
   IGRAPH_CHECK(igraph_adjlist_init(graph, &fathers, omode));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &fathers);
 
@@ -1405,7 +1405,7 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
       if (cutoff >=0 && VECTOR(dist)[minnei] >= cutoff+1.0) { continue; }
       
       /* Now check all neighbors of 'minnei' for a shorter path */
-      neis=igraph_adjedgelist_get(&adjlist, minnei);
+      neis=igraph_inclist_get(&inclist, minnei);
       nlen=igraph_vector_size(neis);
       for (j=0; j<nlen; j++) {
 	long int edge=VECTOR(*neis)[j];
@@ -1484,7 +1484,7 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
   igraph_vector_destroy(&dist);
   igraph_stack_destroy(&S);
   igraph_adjlist_destroy(&fathers);
-  igraph_adjedgelist_destroy(&adjlist);
+  igraph_inclist_destroy(&inclist);
   igraph_2wheap_destroy(&Q);
   IGRAPH_FINALLY_CLEAN(7);
   
@@ -1793,8 +1793,8 @@ int igraph_edge_betweenness_estimate_weighted(const igraph_t *graph,
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   igraph_2wheap_t Q;
-  igraph_adjedgelist_t adjedgelist;
-  igraph_adjedgelist_t fathers;
+  igraph_inclist_t inclist;
+  igraph_inclist_t fathers;
   igraph_integer_t mode= directed ? IGRAPH_OUT : IGRAPH_ALL;
   igraph_integer_t omode= directed ? IGRAPH_IN : IGRAPH_ALL;
   igraph_vector_t distance, tmpscore;
@@ -1809,10 +1809,10 @@ int igraph_edge_betweenness_estimate_weighted(const igraph_t *graph,
     IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
   }
   
-  IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjedgelist, mode));
-  IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjedgelist);
-  IGRAPH_CHECK(igraph_adjedgelist_init(graph, &fathers, omode));
-  IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjedgelist);
+  IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode));
+  IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
+  IGRAPH_CHECK(igraph_inclist_init(graph, &fathers, omode));
+  IGRAPH_FINALLY(igraph_inclist_destroy, &fathers);
 
   IGRAPH_VECTOR_INIT_FINALLY(&distance, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&tmpscore, no_of_nodes);
@@ -1854,7 +1854,7 @@ int igraph_edge_betweenness_estimate_weighted(const igraph_t *graph,
 
       if (cutoff >=0 && VECTOR(distance)[minnei] >= cutoff+1.0) { continue; }
 
-      neis=igraph_adjedgelist_get(&adjedgelist, minnei);
+      neis=igraph_inclist_get(&inclist, minnei);
       nlen=igraph_vector_size(neis);
       for (j=0; j<nlen; j++) {
 	long int edge=VECTOR(*neis)[j];
@@ -1864,7 +1864,7 @@ int igraph_edge_betweenness_estimate_weighted(const igraph_t *graph,
 	
 	if (curdist==0) {
 	  /* This is the first finite distance to 'to' */
-	  igraph_vector_t *v=igraph_adjlist_get(&fathers, to);
+	  igraph_vector_t *v=igraph_inclist_get(&fathers, to);
 /* 	  printf("Found first path to %li (from %li)\n", to, minnei); */
 	  igraph_vector_resize(v,1);
 	  VECTOR(*v)[0]=edge;
@@ -1873,7 +1873,7 @@ int igraph_edge_betweenness_estimate_weighted(const igraph_t *graph,
 	  IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
 	} else if (altdist < curdist-1) {
 	  /* This is a shorter path */
-	  igraph_vector_t *v =igraph_adjlist_get(&fathers, to);
+	  igraph_vector_t *v =igraph_inclist_get(&fathers, to);
 /* 	  printf("Found a shorter path to %li (from %li)\n", to, minnei); */
 	  igraph_vector_resize(v,1);
 	  VECTOR(*v)[0]=edge;
@@ -1881,7 +1881,7 @@ int igraph_edge_betweenness_estimate_weighted(const igraph_t *graph,
 	  VECTOR(distance)[to] = altdist+1.0;
 	  IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
 	} else if (altdist == curdist-1) {
-	  igraph_vector_t *v=igraph_adjlist_get(&fathers, to);
+	  igraph_vector_t *v=igraph_inclist_get(&fathers, to);
 /* 	  printf("Found a second SP to %li (from %li)\n", to, minnei); */
 	  igraph_vector_push_back(v, edge);
 	  VECTOR(nrgeo)[to] += VECTOR(nrgeo)[minnei];
@@ -1892,7 +1892,7 @@ int igraph_edge_betweenness_estimate_weighted(const igraph_t *graph,
 
     while (!igraph_stack_empty(&S)) {
       long int w=igraph_stack_pop(&S);
-      igraph_vector_t *fatv=igraph_adjedgelist_get(&fathers, w);
+      igraph_vector_t *fatv=igraph_inclist_get(&fathers, w);
       long int fatv_len=igraph_vector_size(fatv);
 /*       printf("Popping %li.\n", w); */
       for (j=0; j<fatv_len; j++) {
@@ -1909,7 +1909,7 @@ int igraph_edge_betweenness_estimate_weighted(const igraph_t *graph,
       VECTOR(tmpscore)[w]=0;
       VECTOR(distance)[w]=0;
       VECTOR(nrgeo)[w]=0;
-      igraph_vector_clear(igraph_adjedgelist_get(&fathers, w));
+      igraph_vector_clear(igraph_inclist_get(&fathers, w));
     }
     
   } /* source < no_of_nodes */
@@ -1926,8 +1926,8 @@ int igraph_edge_betweenness_estimate_weighted(const igraph_t *graph,
   igraph_2wheap_destroy(&Q);
   IGRAPH_FINALLY_CLEAN(2);
   
-  igraph_adjedgelist_destroy(&adjedgelist);
-  igraph_adjedgelist_destroy(&fathers);  
+  igraph_inclist_destroy(&inclist);
+  igraph_inclist_destroy(&fathers);  
   igraph_vector_destroy(&distance);
   igraph_vector_destroy(&tmpscore);
   igraph_vector_long_destroy(&nrgeo);
@@ -2025,8 +2025,8 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
   long int source;
   long int j;
 
-  igraph_adjedgelist_t elist_out, elist_in;
-  igraph_adjedgelist_t *elist_out_p, *elist_in_p;
+  igraph_inclist_t elist_out, elist_in;
+  igraph_inclist_t *elist_out_p, *elist_in_p;
   igraph_vector_t *neip;
   long int neino;
   long int i;
@@ -2041,16 +2041,16 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
   if (directed) {
     modeout=IGRAPH_OUT;
     modein=IGRAPH_IN;
-    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &elist_out, IGRAPH_OUT));
-    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &elist_out);
-    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &elist_in, IGRAPH_IN));
-    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &elist_in);
+    IGRAPH_CHECK(igraph_inclist_init(graph, &elist_out, IGRAPH_OUT));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &elist_out);
+    IGRAPH_CHECK(igraph_inclist_init(graph, &elist_in, IGRAPH_IN));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &elist_in);
     elist_out_p=&elist_out;
     elist_in_p=&elist_in;
   } else {
     modeout=modein=IGRAPH_ALL;
-    IGRAPH_CHECK(igraph_adjedgelist_init(graph,&elist_out, IGRAPH_ALL));
-    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &elist_out);
+    IGRAPH_CHECK(igraph_inclist_init(graph,&elist_out, IGRAPH_ALL));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &elist_out);
     elist_out_p=elist_in_p=&elist_out;
   }
   
@@ -2100,7 +2100,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
       /* TODO: we could just as well 'break' here, no? */
       if (cutoff > 0 && distance[actnode] >= cutoff ) continue;
 
-      neip=igraph_adjedgelist_get(elist_out_p, actnode);
+      neip=igraph_inclist_get(elist_out_p, actnode);
       neino=igraph_vector_size(neip);
       for (i=0; i<neino; i++) {
 	igraph_integer_t edge=VECTOR(*neip)[i], from, to;
@@ -2130,7 +2130,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
       if (distance[actnode]<1) { continue; } /* skip source node */
       
       /* set the temporary score of the friends */
-      neip=igraph_adjedgelist_get(elist_in_p, actnode);
+      neip=igraph_inclist_get(elist_in_p, actnode);
       neino=igraph_vector_size(neip);
       for (i=0; i<neino; i++) {
 	igraph_integer_t from, to;
@@ -2160,11 +2160,11 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
   IGRAPH_FINALLY_CLEAN(5);
 
   if (directed) {
-    igraph_adjedgelist_destroy(&elist_out);
-    igraph_adjedgelist_destroy(&elist_in);
+    igraph_inclist_destroy(&elist_out);
+    igraph_inclist_destroy(&elist_in);
     IGRAPH_FINALLY_CLEAN(2);
   } else {
-    igraph_adjedgelist_destroy(&elist_out);
+    igraph_inclist_destroy(&elist_out);
     IGRAPH_FINALLY_CLEAN(1);
   }
 
@@ -2256,7 +2256,7 @@ int igraph_closeness_estimate_weighted(const igraph_t *graph,
   igraph_vit_t vit;
   long int nodes_to_calc;
   
-  igraph_lazy_adjedgelist_t adjlist;
+  igraph_lazy_inclist_t inclist;
   long int i, j;
   
   igraph_vector_t dist;
@@ -2278,8 +2278,8 @@ int igraph_closeness_estimate_weighted(const igraph_t *graph,
   
   IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
   IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
-  IGRAPH_CHECK(igraph_lazy_adjedgelist_init(graph, &adjlist, mode));
-  IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjlist);
+  IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode));
+  IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
   IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
   IGRAPH_CHECK(igraph_vector_long_init(&which, no_of_nodes));
@@ -2302,7 +2302,7 @@ int igraph_closeness_estimate_weighted(const igraph_t *graph,
       igraph_real_t mindist=-igraph_2wheap_delete_max(&Q);
       
       /* Now check all neighbors of minnei for a shorter path */
-      igraph_vector_t *neis=igraph_lazy_adjedgelist_get(&adjlist, minnei);
+      igraph_vector_t *neis=igraph_lazy_inclist_get(&inclist, minnei);
       long int nlen=igraph_vector_size(neis);
 
       VECTOR(*res)[i] += mindist;
@@ -2336,7 +2336,7 @@ int igraph_closeness_estimate_weighted(const igraph_t *graph,
 
   igraph_vector_long_destroy(&which);
   igraph_vector_destroy(&dist);
-  igraph_lazy_adjedgelist_destroy(&adjlist);
+  igraph_lazy_inclist_destroy(&inclist);
   igraph_2wheap_destroy(&Q);
   igraph_vit_destroy(&vit);
   IGRAPH_FINALLY_CLEAN(5);

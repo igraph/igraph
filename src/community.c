@@ -371,8 +371,8 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
   igraph_stack_t stack=IGRAPH_STACK_NULL;
   long int source, i, e;
   
-  igraph_adjedgelist_t elist_out, elist_in;
-  igraph_adjedgelist_t *elist_out_p, *elist_in_p;
+  igraph_inclist_t elist_out, elist_in;
+  igraph_inclist_t *elist_out_p, *elist_in_p;
   igraph_vector_t *neip;
   long int neino;
   igraph_integer_t modein, modeout;
@@ -386,16 +386,16 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
   if (directed) {
     modeout=IGRAPH_OUT;
     modeout=IGRAPH_IN;
-    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &elist_out, IGRAPH_OUT));
-    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &elist_out);
-    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &elist_in, IGRAPH_IN));
-    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &elist_in);
+    IGRAPH_CHECK(igraph_inclist_init(graph, &elist_out, IGRAPH_OUT));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &elist_out);
+    IGRAPH_CHECK(igraph_inclist_init(graph, &elist_in, IGRAPH_IN));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &elist_in);
     elist_out_p=&elist_out;
     elist_in_p=&elist_in;
   } else {
     modeout=modein=IGRAPH_ALL;
-    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &elist_out, IGRAPH_ALL));
-    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &elist_out);
+    IGRAPH_CHECK(igraph_inclist_init(graph, &elist_out, IGRAPH_ALL));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &elist_out);
     elist_out_p=elist_in_p=&elist_out;
   }
   
@@ -455,7 +455,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
       while (!igraph_dqueue_empty(&q)) {
 	long int actnode=igraph_dqueue_pop(&q);
 	
-	neip=igraph_adjedgelist_get(elist_out_p, actnode);
+	neip=igraph_inclist_get(elist_out_p, actnode);
 	neino=igraph_vector_size(neip);
 	for (i=0; i<neino; i++) {
 	  igraph_integer_t edge=VECTOR(*neip)[i], from, to;
@@ -485,7 +485,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 	if (distance[actnode]<1) { continue; } /* skip source node */
 	
 	/* set the temporary score of the friends */
-	neip=igraph_adjedgelist_get(elist_in_p, actnode);
+	neip=igraph_inclist_get(elist_in_p, actnode);
 	neino=igraph_vector_size(neip);
 	for (i=0; i<neino; i++) {
 	  igraph_integer_t from, to;
@@ -518,13 +518,13 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
     passive[maxedge]=1;
     igraph_edge(graph, maxedge, &from, &to);
 
-    neip=igraph_adjedgelist_get(elist_in_p, to);
+    neip=igraph_inclist_get(elist_in_p, to);
     neino=igraph_vector_size(neip);
     igraph_vector_search(neip, 0, maxedge, &pos);
     VECTOR(*neip)[pos]=VECTOR(*neip)[neino-1];
     igraph_vector_pop_back(neip);
     
-    neip=igraph_adjedgelist_get(elist_out_p, from);
+    neip=igraph_inclist_get(elist_out_p, from);
     neino=igraph_vector_size(neip);
     igraph_vector_search(neip, 0, maxedge, &pos);
     VECTOR(*neip)[pos]=VECTOR(*neip)[neino-1];
@@ -541,11 +541,11 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(7);
   
   if (directed) {
-    igraph_adjedgelist_destroy(&elist_out);
-    igraph_adjedgelist_destroy(&elist_in);
+    igraph_inclist_destroy(&elist_out);
+    igraph_inclist_destroy(&elist_in);
     IGRAPH_FINALLY_CLEAN(2);
   } else {
-    igraph_adjedgelist_destroy(&elist_out);
+    igraph_inclist_destroy(&elist_out);
     IGRAPH_FINALLY_CLEAN(1);
   }
 
@@ -1945,7 +1945,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
   long int no_of_not_fixed_nodes=no_of_nodes;
   long int i, j, k;
   igraph_adjlist_t al;
-  igraph_adjedgelist_t ael;
+  igraph_inclist_t il;
   igraph_bool_t running = 1;
 
   igraph_vector_t label_counters, dominant_labels, node_order;
@@ -2015,8 +2015,8 @@ int igraph_community_label_propagation(const igraph_t *graph,
    * For the unweighted case, the adjacency list is enough. For the
    * weighted case, we need the adjacency edge list */
   if (weights) {
-    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &ael, IGRAPH_IN));
-    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &ael);
+    IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_IN));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &il);
   } else {
     IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_IN));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
@@ -2062,7 +2062,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
       igraph_vector_clear(&dominant_labels);
       max_count = 0.0;
       if (weights) {
-        neis = igraph_adjedgelist_get(&ael, v1);
+        neis = igraph_inclist_get(&il, v1);
         num_neis = igraph_vector_size(neis);
         for (j=0; j<num_neis; j++) {
           k = VECTOR(*membership)[(long)IGRAPH_OTHER(graph, VECTOR(*neis)[j], v1)];
@@ -2131,7 +2131,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
   }
 
   if (weights)
-    igraph_adjedgelist_destroy(&ael);
+    igraph_inclist_destroy(&il);
   else
     igraph_adjlist_destroy(&al);
 
