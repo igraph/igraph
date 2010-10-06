@@ -699,7 +699,7 @@ int igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
 }
 
 /**
- * \function igraph_spmatrix_wolsums
+ * \function igraph_spmatrix_rowsums
  * \brief Calculates the row sums of the matrix.
  * \param m The matrix.
  * \param res An initialized \c igraph_vector_t, the result will be stored here.

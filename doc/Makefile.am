@@ -35,9 +35,10 @@ doctemplate: $(DOCINCLUDES)
 igraph-docs.xml: $(DOCINCLUDES)
 	touch igraph-docs.xml
 
-vector.xml: vector.xxml $(INCLUDEDIR)/igraph_vector_pmt.h $(SRCDIR)/vector.pmt $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.c
+vector.xml: vector.xxml $(INCLUDEDIR)/igraph_vector_pmt.h $(INCLUDEDIR)/igraph_vector_ptr.h $(SRCDIR)/vector.pmt $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_vector_pmt.h \
-	$(SRCDIR)/vector.pmt $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.c
+	$(INCLUDEDIR)/igraph_vector_ptr.h $(SRCDIR)/vector.pmt \
+	$(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.c
 
 error.xml: error.xxml $(INCLUDEDIR)/igraph_error.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_error.h

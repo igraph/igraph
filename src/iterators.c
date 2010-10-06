@@ -1694,7 +1694,7 @@ int igraph_i_eit_path(const igraph_t *graph,
  * Time complexity: depends on the type of the edge selector. For edge
  * selectors created by \ref igraph_es_all(), \ref igraph_es_none(),
  * \ref igraph_es_1(), igraph_es_vector(), igraph_es_seq() it is
- * O(1). For \ref igraph_es_adj() it is O(d) where d is the number of
+ * O(1). For \ref igraph_es_incident() it is O(d) where d is the number of
  * incident edges of the vertex.
  */
 
