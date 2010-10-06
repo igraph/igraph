@@ -274,10 +274,12 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res);
  * \function igraph_is_connected
  * \brief Decides whether the graph is (weakly or strongly) connected.
  * 
+ * A graph with zero vertices is connected by definition.
+ *
  * \param graph The graph object to analyze.
  * \param res Pointer to a logical variable, the result will be stored
  *        here. 
- * \param mode For directed graph this specifies whether to calculate
+ * \param mode For a directed graph this specifies whether to calculate
  *        weak or strong connectedness. Possible values: 
  *        \c IGRAPH_WEAK,
  *        \c IGRAPH_STRONG. This argument is 
@@ -293,6 +295,11 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res);
 
 int igraph_is_connected(const igraph_t *graph, igraph_bool_t *res, 
 			igraph_connectedness_t mode) {
+  if (igraph_vcount(graph) == 0) {
+    *res = 1;
+    return IGRAPH_SUCCESS;
+  }
+
   if (mode==IGRAPH_WEAK || !igraph_is_directed(graph)) {
     return igraph_is_connected_weak(graph, res);
   } else if (mode==IGRAPH_STRONG) {
@@ -315,6 +322,11 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
   
   long int i, j;
+
+  if (no_of_nodes == 0) {
+    *res = 1;
+	return IGRAPH_SUCCESS;
+  }
 
   already_added=igraph_Calloc(no_of_nodes, char);
   if (already_added==0) {
