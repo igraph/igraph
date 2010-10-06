@@ -91,7 +91,8 @@ class Graph(GraphBase):
         
         Constructs a graph from scratch.
 
-        @keyword n: the number of vertices. Can be omitted.
+        @keyword n: the number of vertices. Can be omitted, the default is
+          zero.
         @keyword edges: the edge list where every list item is a pair of
           integers. If any of the integers is larger than M{n-1}, the number
           of vertices is adjusted accordingly.
@@ -107,7 +108,7 @@ class Graph(GraphBase):
         # in *args
         kwd_order = ["n", "edges", "directed", "graph_attrs", "vertex_attrs", \
                 "edge_attrs"]
-        params = [1, [], False, {}, {}, {}]
+        params = [0, [], False, {}, {}, {}]
         # If the first argument is a list, assume that the number of vertices
         # were omitted
         args = list(args)

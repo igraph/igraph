@@ -80,7 +80,7 @@ void igraphmodule_Graph_init_internal(igraphmodule_GraphObject * self)
  * This function is called whenever a new \c igraph.Graph object is created in
  * Python. An optional \c n parameter can be passed from Python,
  * representing the number of vertices in the graph. If it is omitted,
- * the default value is 1.
+ * the default value is 0.
  * 
  * <b>Example call from Python:</b>
 \verbatim

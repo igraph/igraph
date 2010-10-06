@@ -3,7 +3,10 @@ from igraph import *
 
 class BasicTests(unittest.TestCase):
     def testGraphCreation(self):
-        self.failUnless(isinstance(Graph(), Graph))
+        g = Graph()
+        self.failUnless(isinstance(g, Graph))
+        self.failUnless(g.vcount() == 0 and g.ecount() == 0 and g.is_directed() == False)
+
         g=Graph(3, [(0,1), (1,2), (2,0)])
         self.failUnless(g.vcount() == 3 and g.ecount() == 3 and g.is_directed() == False and g.is_simple() == True)
         g=Graph(2, [(0,1), (1,2), (2,3)], True)
