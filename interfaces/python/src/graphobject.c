@@ -12407,8 +12407,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  modularities (if C{return_levels} is C{True}).\n"
    "\n"
    "@newfield ref: Reference\n"
-   "@ref: A. Clauset, M. E. J. Newman and C. Moore: I{Finding community\n"
-   "  structure in very large networks.} Phys Rev E 70, 066111 (2004).\n"
+   "@ref: VD Blondel, J-L Guillaume, R Lambiotte and E Lefebvre: Fast\n"
+   "  unfolding of community hierarchies in large networks. J Stat Mech\n"
+   "  P10008 (2008), http://arxiv.org/abs/0803.0476\n"
    "@see: modularity()\n"
   },
   {"community_edge_betweenness",

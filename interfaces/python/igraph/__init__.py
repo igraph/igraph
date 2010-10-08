@@ -748,8 +748,9 @@ class Graph(GraphBase):
           corresponding to the best modularity.
 
         @newfield ref: Reference
-        @ref: A Clauset, MEJ Newman and C Moore: Finding community structure
-          in very large networks. Phys Rev E 70, 066111 (2004).
+        @ref: VD Blondel, J-L Guillaume, R Lambiotte and E Lefebvre: Fast
+          unfolding of community hierarchies in large networks, J Stat Mech
+          P10008 (2008), http://arxiv.org/abs/0803.0476
         """
         if self.is_directed():
             raise ValueError("input graph must be undirected")
