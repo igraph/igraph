@@ -1,0 +1,116 @@
+diff -ru lapack-3.2.2/SRC/dlarft.f lapack-3.2.2-new/SRC/dlarft.f
+--- lapack-3.2.2/SRC/dlarft.f	2009-04-16 20:10:16.000000000 +0200
++++ lapack-3.2.2-new/SRC/dlarft.f	2010-10-06 21:47:53.000000000 +0200
+@@ -145,9 +145,15 @@
+                V( I, I ) = ONE
+                IF( LSAME( STOREV, 'C' ) ) THEN
+ !                 Skip any trailing zeros.
+-                  DO LASTV = N, I+1, -1
+-                     IF( V( LASTV, I ).NE.ZERO ) EXIT
+-                  END DO
++                  LASTV = N
++ 14               IF (V(LASTV, I ) .NE. ZERO) GOTO 15
++                  IF (LASTV .EQ. I+1) GOTO 15
++                  LASTV = LASTV - 1
++                  GOTO 14
++ 15               CONTINUE
++*                 DO LASTV = N, I+1, -1
++*                    IF( V( LASTV, I ).NE.ZERO ) EXIT
++*                 END DO
+                   J = MIN( LASTV, PREVLASTV )
+ *
+ *                 T(1:i-1,i) := - tau(i) * V(i:j,1:i-1)' * V(i:j,i)
+@@ -157,9 +163,16 @@
+      $                        T( 1, I ), 1 )
+                ELSE
+ !                 Skip any trailing zeros.
+-                  DO LASTV = N, I+1, -1
+-                     IF( V( I, LASTV ).NE.ZERO ) EXIT
+-                  END DO
++                  LASTV = N
++ 16               IF (V(I, LASTV) .NE. ZERO) GOTO 17
++                  IF (LASTV .EQ. I+1) GOTO 17
++                  LASTV = LASTV - 1 
++                  GOTO 16
++ 17               CONTINUE
++*                 DO LASTV = N, I+1, -1
++*                    IF( V( I, LASTV ).NE.ZERO ) EXIT
++*                 END DO
++
+                   J = MIN( LASTV, PREVLASTV )
+ *
+ *                 T(1:i-1,i) := - tau(i) * V(1:i-1,i:j) * V(i,i:j)'
+@@ -201,9 +214,16 @@
+                      VII = V( N-K+I, I )
+                      V( N-K+I, I ) = ONE
+ !                    Skip any leading zeros.
+-                     DO LASTV = 1, I-1
+-                        IF( V( LASTV, I ).NE.ZERO ) EXIT
+-                     END DO
++                     LASTV = 1
++ 34                  IF (V(LASTV, I) .NE. ZERO) GOTO 35
++                     IF (LASTV .EQ. I-1) GOTO 35
++                     LASTV = LASTV + 1
++                     GOTO 34
++ 35                  CONTINUE
++*                    DO LASTV = 1, I-1
++*                       IF( V( LASTV, I ).NE.ZERO ) EXIT
++*                    END DO
++
+                      J = MAX( LASTV, PREVLASTV )
+ *
+ *                    T(i+1:k,i) :=
+@@ -217,9 +237,14 @@
+                      VII = V( I, N-K+I )
+                      V( I, N-K+I ) = ONE
+ !                    Skip any leading zeros.
+-                     DO LASTV = 1, I-1
+-                        IF( V( I, LASTV ).NE.ZERO ) EXIT
+-                     END DO
++                     LASTV = 1
++ 36                  IF (V(I, LASTV) .NE. ZERO) GOTO 37
++                     IF (LASTV .EQ. I-1) GOTO 37
++                     LASTV = LASTV + 1
++ 37                  CONTINUE
++*                    DO LASTV = 1, I-1
++*                       IF( V( I, LASTV ).NE.ZERO ) EXIT
++*                    END DO
+                      J = MAX( LASTV, PREVLASTV )
+ *
+ *                    T(i+1:k,i) :=
+diff -ru lapack-3.2.2/SRC/iladlr.f lapack-3.2.2-new/SRC/iladlr.f
+--- lapack-3.2.2/SRC/iladlr.f	2010-06-23 19:25:30.000000000 +0200
++++ lapack-3.2.2-new/SRC/iladlr.f	2010-10-06 21:54:13.000000000 +0200
+@@ -54,10 +54,16 @@
+       ELSE
+ *     Scan up each column tracking the last zero row seen.
+          ILADLR = 0
+-         DO J = 1, N
+-            DO I = M, 1, -1
+-               IF( A(I, J).NE.ZERO ) EXIT
+-            END DO
++         DO J = 1, N            
++*           DO I = M, 1, -1
++*              IF( A(I, J).NE.ZERO ) EXIT
++*           END DO
++            I = M
++ 10         IF (A(I, J) .NE. ZERO) GOTO 20
++            IF (M .EQ. 1) GOTO 20
++            M = M - 1
++            GOTO 10
++ 20         CONTINUE
+             ILADLR = MAX( ILADLR, I )
+          END DO
+       END IF
+diff -ru lapack-3.2.2/SRC/xerbla.f lapack-3.2.2-new/SRC/xerbla.f
+--- lapack-3.2.2/SRC/xerbla.f	2009-04-16 20:10:16.000000000 +0200
++++ lapack-3.2.2-new/SRC/xerbla.f	2010-10-08 17:53:21.000000000 +0200
+@@ -33,7 +33,7 @@
+ * =====================================================================
+ *
+ *     .. Intrinsic Functions ..
+-      INTRINSIC          LEN_TRIM
++      EXTERNAL          LEN_TRIM
+ *     ..
+ *     .. Executable Statements ..
+ *

@@ -42,7 +42,7 @@ __BEGIN_DECLS
 
 /**
  * \section about_arpack About the ARPACK interface in igraph
- * 
+ *
  * <para>
  * ARPACK is a library for solving large scale eigenvalue problems.
  * The package is designed to compute a few eigenvalues and corresponding
@@ -50,22 +50,22 @@ __BEGIN_DECLS
  * most appropriate for large sparse or structured matrices \c A where
  * structured means that a matrix-vector product <code>w &lt;- Av</code> requires
  * order \c n rather than the usual order <code>n^2</code> floating point
- * operations. Please see 
+ * operations. Please see
  * http://www.caam.rice.edu/software/ARPACK/ for details.
  * </para>
- * 
+ *
  * <para>
  * The eigenvalue calculation in ARPACK (in the simplest
  * case) involves the calculation of the \c Av product where \c A
  * is the matrix we work with and \c v is an arbitrary vector. A
- * user-defined function of type \ref igraph_arpack_function_t 
+ * user-defined function of type \ref igraph_arpack_function_t
  * is expected to perform this product. If the product can be done
  * efficiently, e.g. if the matrix is sparse, then ARPACK is usually
  * able to calculate the eigenvalues very quickly.
  * </para>
  *
  * <para>In igraph, eigenvalue/eigenvector calculations usually
- * involve the following steps: 
+ * involve the following steps:
  * \olist
  *   \oli Initialization of an \ref igraph_arpack_options_t data
  *        structure using \ref igraph_arpack_options_init.
@@ -80,7 +80,7 @@ __BEGIN_DECLS
  * The \ref igraph_arpack_options_t object can be used multiple
  * times.
  * </para>
- * 
+ *
  * <para>
  * If we have many eigenvalue problems to solve, then it might worth
  * to create an \ref igraph_arpack_storage_t object, and initialize it
@@ -93,7 +93,7 @@ __BEGIN_DECLS
  * calling \ref igraph_arpack_storage_destroy() on it, when it is not
  * needed any more.
  * </para>
- * 
+ *
  * <para>
  * igraph does not contain all
  * ARPACK routines, only the ones dealing with symmetric and
@@ -106,43 +106,43 @@ __BEGIN_DECLS
 /**
  * \struct igraph_arpack_options_t
  * \brief Options for ARPACK
- * 
+ *
  * This data structure contains the options of thee ARPACK eigenvalue
  * solver routines. It must be initialized by calling \ref
  * igraph_arpack_options_init() on it. Then it can be used for
  * multiple ARPACK calls, as the ARPACK solvers do not modify it.
- * 
+ *
  * Input options:
  * \member bmat Character. Whether to solve a standard ('I') ot a
  *    generalized problem ('B').
  * \member n Dimension of the eigenproblem.
  * \member which Specifies which eigenvalues/vectors to
- *    compute. Possible values for symmetric matrices: 
- *    \clist \cli LA 
+ *    compute. Possible values for symmetric matrices:
+ *    \clist \cli LA
  *                Compute \c nev largest (algebraic) eigenvalues.
- *           \cli SA 
+ *           \cli SA
  *                Compute \c nev smallest (algebraic) eigenvalues.
- *           \cli LM 
+ *           \cli LM
  *                Compute \c nev largest (in magnitude) eigenvalues.
- *           \cli SM 
+ *           \cli SM
  *                Compute \c nev smallest (in magnitude) eigenvalues.
- *           \cli BE 
+ *           \cli BE
  *                Compute \c nev eigenvalues, half from each end of
  *                   the spectrum. When \c nev is odd, compute one
  *                   more from the high en than from the low
  *                   end. \endclist
  *    Possible values for non-symmetric matrices:
- *    \clist \cli LM 
- *                Compute \c nev largest (in magnitude) eigenvalues. 
- *           \cli SM 
+ *    \clist \cli LM
+ *                Compute \c nev largest (in magnitude) eigenvalues.
+ *           \cli SM
  *                Compute \c nev smallest (in magnitude) eigenvalues.
- *           \cli LR 
+ *           \cli LR
  *                Compute \c nev eigenvalues of largest real part.
- *           \cli SR 
+ *           \cli SR
  *                Compute \c nev eigenvalues of smallest real part.
- *           \cli LI 
+ *           \cli LI
  *                Compute \c nev eigenvalues of largest imaginary part.
- *           \cli SI 
+ *           \cli SI
  *                Compute \c nev eigenvalues of smallest imaginary
  *                    part. \endclist
  * \member nev The number of eigenvalues to be computed.
@@ -157,7 +157,7 @@ __BEGIN_DECLS
  *    provided by the user via reverse communication. If one then exact
  *    shifts with respect to the reduced tridiagonal matrix \c T.
  *    Please always set this to one.
- * \member mxiter Maximum number of Arnoldi update iterations allowed. 
+ * \member mxiter Maximum number of Arnoldi update iterations allowed.
  * \member nb Blocksize to be used in the recurrence. Please always
  *    leave this on the default value, one.
  * \member mode The type of the eigenproblem to be solved.
@@ -189,16 +189,16 @@ __BEGIN_DECLS
  *     might not work properly.
  * \member start Whether to use the supplied starting vector (1), or
  *    use a random starting vector (0). The starting vector must be
- *    supplied in the first column of the \c vectors argument of the 
+ *    supplied in the first column of the \c vectors argument of the
  *    \ref igraph_arpack_rssolve() of \ref igraph_arpack_rnsolve() call.
- * 
+ *
  * Output options:
  * \member info Error flag of ARPACK. Possible values:
- *    \clist \cli 0 
+ *    \clist \cli 0
  *                Normal exit.
- *           \cli 1 
+ *           \cli 1
  *                Maximum number of iterations taken.
- *           \cli 3 
+ *           \cli 3
  *                No shifts could be applied during a cycle of the
  *         Implicitly restarted Arnoldi iteration. One possibility
  *         is to increase the size of \ ncv relative to \c
@@ -215,14 +215,14 @@ __BEGIN_DECLS
  * \member numop Total number of matrix-vector multiplications.
  * \member numopb Not used currently.
  * \member numreo Total number of steps of re-orthogonalization.
- * 
+ *
  * Internal options:
  * \member lworkl Do not modify this option.
  * \member sigma Do not modify this option.
  * \member sigmai Do not modify this option.
  * \member iparam Do not modify this option.
  * \member ipntr Do not modify this option.
- * 
+ *
  */
 
 typedef struct igraph_arpack_options_t {
@@ -245,7 +245,7 @@ typedef struct igraph_arpack_options_t {
 				   5: A*x = l*M*x, A symm., M symm. pos. semidef. */
   long int start;		/* 0: random, 1: use the supplied vector */
   long int lworkl;		/* Size of temporary storage, default is fine */
-  igraph_real_t sigma;          /* The shift for modes 3,4,5 */  
+  igraph_real_t sigma;          /* The shift for modes 3,4,5 */
   igraph_real_t sigmai;		/* The imaginary part of shift for rnsolve */
   /* OUTPUT */
   long int info;		/* What happened, see docs */
@@ -260,16 +260,16 @@ typedef struct igraph_arpack_options_t {
   long int ipntr[14];
 } igraph_arpack_options_t;
 
-/** 
+/**
  * \struct igraph_arpack_storage_t
  * \brief Storage for ARPACK
- * 
+ *
  * Public members, do not modify them directly, these are considered
- * to be read-only. 
+ * to be read-only.
  * \member maxn Maximum rank of matrix.
  * \member maxncv Maximum NCV.
  * \member maxldv Maximum LDV.
- * 
+ *
  * These members are considered to be private:
  * \member workl Working memory.
  * \member workd Working memory.
@@ -294,7 +294,7 @@ typedef struct igraph_arpack_storage_t {
   igraph_real_t *workev;
 } igraph_arpack_storage_t;
 
-void igraph_arpack_options_init(igraph_arpack_options_t *o);  
+void igraph_arpack_options_init(igraph_arpack_options_t *o);
 
 int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
 			       long int maxncv, long int maxldv, igraph_bool_t symm);
@@ -303,7 +303,7 @@ void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s);
 /**
  * \typedef igraph_arpack_function_t
  * Type of the ARPACK callback function
- * 
+ *
  * \param to Pointer to an \c igraph_real_t, the result of the
  *    matrix-vector product is expected to be stored here.
  * \param from Pointer to an \c igraph_real_t, the input matrix should
@@ -321,7 +321,7 @@ typedef int igraph_arpack_function_t(igraph_real_t *to, const igraph_real_t *fro
 				     long int n, void *extra);
 
 int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
-			  igraph_arpack_options_t *options, 
+			  igraph_arpack_options_t *options,
 			  igraph_arpack_storage_t *storage,
 			  igraph_vector_t *values, igraph_matrix_t *vectors);
 
@@ -330,7 +330,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 			  igraph_arpack_storage_t *storage,
 			  igraph_matrix_t *values, igraph_matrix_t *vectors);
 
-int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values, 
+int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
 				 long int nev);
 
 __END_DECLS

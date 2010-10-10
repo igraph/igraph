@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,9 +10,7 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Table of constant values */
 
@@ -26,7 +24,7 @@ static doublereal c_b4 = 1.;
     doublereal d__1, d__2;
 
     /* Builtin functions */
-    double igraphd_sign(doublereal *, doublereal *), sqrt(doublereal);
+    double d_sign(doublereal *, doublereal *), sqrt(doublereal);
 
     /* Local variables */
     static doublereal p, z__, aa, bb, cc, dd, cs1, sn1, sab, sac, eps, tau, 
@@ -34,69 +32,58 @@ static doublereal c_b4 = 1.;
     extern doublereal igraphdlapy2_(doublereal *, doublereal *), igraphdlamch_(char *);
 
 
-/*  -- LAPACK driver routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     June 30, 1999 */
+/*  -- LAPACK auxiliary routine (version 3.2.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       June 2010   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  DLANV2 computes the Schur factorization of a real 2-by-2 nonsymmetric */
-/*  matrix in standard form: */
+    DLANV2 computes the Schur factorization of a real 2-by-2 nonsymmetric   
+    matrix in standard form:   
 
-/*       [ A  B ] = [ CS -SN ] [ AA  BB ] [ CS  SN ] */
-/*       [ C  D ]   [ SN  CS ] [ CC  DD ] [-SN  CS ] */
+         [ A  B ] = [ CS -SN ] [ AA  BB ] [ CS  SN ]   
+         [ C  D ]   [ SN  CS ] [ CC  DD ] [-SN  CS ]   
 
-/*  where either */
-/*  1) CC = 0 so that AA and DD are real eigenvalues of the matrix, or */
-/*  2) AA = DD and BB*CC < 0, so that AA + or - sqrt(BB*CC) are complex */
-/*  conjugate eigenvalues. */
+    where either   
+    1) CC = 0 so that AA and DD are real eigenvalues of the matrix, or   
+    2) AA = DD and BB*CC < 0, so that AA + or - sqrt(BB*CC) are complex   
+    conjugate eigenvalues.   
 
-/*  Arguments */
-/*  ========= */
+    Arguments   
+    =========   
 
-/*  A       (input/output) DOUBLE PRECISION */
-/*  B       (input/output) DOUBLE PRECISION */
-/*  C       (input/output) DOUBLE PRECISION */
-/*  D       (input/output) DOUBLE PRECISION */
-/*          On entry, the elements of the input matrix. */
-/*          On exit, they are overwritten by the elements of the */
-/*          standardised Schur form. */
+    A       (input/output) DOUBLE PRECISION   
+    B       (input/output) DOUBLE PRECISION   
+    C       (input/output) DOUBLE PRECISION   
+    D       (input/output) DOUBLE PRECISION   
+            On entry, the elements of the input matrix.   
+            On exit, they are overwritten by the elements of the   
+            standardised Schur form.   
 
-/*  RT1R    (output) DOUBLE PRECISION */
-/*  RT1I    (output) DOUBLE PRECISION */
-/*  RT2R    (output) DOUBLE PRECISION */
-/*  RT2I    (output) DOUBLE PRECISION */
-/*          The real and imaginary parts of the eigenvalues. If the */
-/*          eigenvalues are a complex conjugate pair, RT1I > 0. */
+    RT1R    (output) DOUBLE PRECISION   
+    RT1I    (output) DOUBLE PRECISION   
+    RT2R    (output) DOUBLE PRECISION   
+    RT2I    (output) DOUBLE PRECISION   
+            The real and imaginary parts of the eigenvalues. If the   
+            eigenvalues are a complex conjugate pair, RT1I > 0.   
 
-/*  CS      (output) DOUBLE PRECISION */
-/*  SN      (output) DOUBLE PRECISION */
-/*          Parameters of the rotation matrix. */
+    CS      (output) DOUBLE PRECISION   
+    SN      (output) DOUBLE PRECISION   
+            Parameters of the rotation matrix.   
 
-/*  Further Details */
-/*  =============== */
+    Further Details   
+    ===============   
 
-/*  Modified by V. Sima, Research Institute for Informatics, Bucharest, */
-/*  Romania, to reduce the risk of cancellation errors, */
-/*  when computing real eigenvalues, and to ensure, if possible, that */
-/*  abs(RT1R) >= abs(RT2R). */
+    Modified by V. Sima, Research Institute for Informatics, Bucharest,   
+    Romania, to reduce the risk of cancellation errors,   
+    when computing real eigenvalues, and to ensure, if possible, that   
+    abs(RT1R) >= abs(RT2R).   
 
-/*  ===================================================================== */
+    ===================================================================== */
 
-/*     .. Parameters .. */
-/*     .. */
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. External Functions .. */
-/*     .. */
-/*     .. Intrinsic Functions .. */
-/*     .. */
-/*     .. Executable Statements .. */
 
     eps = igraphdlamch_("P");
     if (*c__ == 0.) {
@@ -116,7 +103,7 @@ static doublereal c_b4 = 1.;
 	*b = -(*c__);
 	*c__ = 0.;
 	goto L10;
-    } else if (*a - *d__ == 0. && igraphd_sign(&c_b4, b) != igraphd_sign(&c_b4, c__)) {
+    } else if (*a - *d__ == 0. && d_sign(&c_b4, b) != d_sign(&c_b4, c__)) {
 	*cs = 1.;
 	*sn = 0.;
 	goto L10;
@@ -129,21 +116,21 @@ static doublereal c_b4 = 1.;
 	bcmax = max(d__1,d__2);
 /* Computing MIN */
 	d__1 = abs(*b), d__2 = abs(*c__);
-	bcmis = min(d__1,d__2) * igraphd_sign(&c_b4, b) * igraphd_sign(&c_b4, c__);
+	bcmis = min(d__1,d__2) * d_sign(&c_b4, b) * d_sign(&c_b4, c__);
 /* Computing MAX */
 	d__1 = abs(p);
 	scale = max(d__1,bcmax);
 	z__ = p / scale * p + bcmax / scale * bcmis;
 
-/*        If Z is of the order of the machine accuracy, postpone the */
-/*        decision on the nature of eigenvalues */
+/*        If Z is of the order of the machine accuracy, postpone the   
+          decision on the nature of eigenvalues */
 
 	if (z__ >= eps * 4.) {
 
 /*           Real eigenvalues. Compute A and D. */
 
 	    d__1 = sqrt(scale) * sqrt(z__);
-	    z__ = p + igraphd_sign(&d__1, &p);
+	    z__ = p + d_sign(&d__1, &p);
 	    *a = *d__ + z__;
 	    *d__ -= bcmax / z__ * bcmis;
 
@@ -156,24 +143,24 @@ static doublereal c_b4 = 1.;
 	    *c__ = 0.;
 	} else {
 
-/*           Complex eigenvalues, or real (almost) equal eigenvalues. */
-/*           Make diagonal elements equal. */
+/*           Complex eigenvalues, or real (almost) equal eigenvalues.   
+             Make diagonal elements equal. */
 
 	    sigma = *b + *c__;
 	    tau = igraphdlapy2_(&sigma, &temp);
 	    *cs = sqrt((abs(sigma) / tau + 1.) * .5);
-	    *sn = -(p / (tau * *cs)) * igraphd_sign(&c_b4, &sigma);
+	    *sn = -(p / (tau * *cs)) * d_sign(&c_b4, &sigma);
 
-/*           Compute [ AA  BB ] = [ A  B ] [ CS -SN ] */
-/*                   [ CC  DD ]   [ C  D ] [ SN  CS ] */
+/*           Compute [ AA  BB ] = [ A  B ] [ CS -SN ]   
+                     [ CC  DD ]   [ C  D ] [ SN  CS ] */
 
 	    aa = *a * *cs + *b * *sn;
 	    bb = -(*a) * *sn + *b * *cs;
 	    cc = *c__ * *cs + *d__ * *sn;
 	    dd = -(*c__) * *sn + *d__ * *cs;
 
-/*           Compute [ A  B ] = [ CS  SN ] [ AA  BB ] */
-/*                   [ C  D ]   [-SN  CS ] [ CC  DD ] */
+/*           Compute [ A  B ] = [ CS  SN ] [ AA  BB ]   
+                     [ C  D ]   [-SN  CS ] [ CC  DD ] */
 
 	    *a = aa * *cs + cc * *sn;
 	    *b = bb * *cs + dd * *sn;
@@ -186,14 +173,14 @@ static doublereal c_b4 = 1.;
 
 	    if (*c__ != 0.) {
 		if (*b != 0.) {
-		    if (igraphd_sign(&c_b4, b) == igraphd_sign(&c_b4, c__)) {
+		    if (d_sign(&c_b4, b) == d_sign(&c_b4, c__)) {
 
 /*                    Real eigenvalues: reduce to upper triangular form */
 
 			sab = sqrt((abs(*b)));
 			sac = sqrt((abs(*c__)));
 			d__1 = sab * sac;
-			p = igraphd_sign(&d__1, c__);
+			p = d_sign(&d__1, c__);
 			tau = 1. / sqrt((d__1 = *b + *c__, abs(d__1)));
 			*a = temp + p;
 			*d__ = temp - p;

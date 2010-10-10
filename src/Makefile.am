@@ -9,51 +9,81 @@ AM_YFLAGS = -d
 
 lib_LTLIBRARIES         = libigraph.la
 
-if INTERNAL_LAPACK
-  LAPACK = lapack/dgeqr2.c  lapack/dlarnv.c  lapack/dlassq.c \
-	lapack/dlacpy.c  lapack/dlartg.c  lapack/dorm2r.c \
-	lapack/dlae2.c   lapack/dlaruv.c  lapack/dsteqr.c \
-	lapack/dlaev2.c  lapack/dlascl.c  lapack/dlanst.c \
-	lapack/dlaset.c  lapack/xerbla.c \
-	lapack/dlarf.c   lapack/dlasr.c   lapack/dlapy2.c \
-	lapack/dlarfg.c  lapack/dlasrt.c  lapack/dlabad.c \
-	lapack/dlanhs.c  lapack/dtrevc.c  lapack/dlanv2.c \
-        lapack/dlaln2.c  lapack/dladiv.c  lapack/dtrsen.c \
-        lapack/dlahqr.c  lapack/dlacon.c  lapack/dtrsyl.c \
-        lapack/dtrexc.c  lapack/dlange.c  lapack/dlaexc.c \
-        lapack/dlasy2.c  lapack/dlarfx.c 
-  noinst_LTLIBRARIES  = libdlamch.la
-  libdlamch_la_SOURCES = lapack/dlamch.c
-  libdlamch_la_CFLAGS = $(FLOATSTORE) -I$(top_srcdir)/include
-  LAPACK_DLAMCH = libdlamch.la
-else 
-  LAPACK = lapack/xerbla.c
-  LAPACK_DLAMCH = 
-endif
+include lapack/blas.inc
+include lapack/lapack.inc
+include lapack/arpack.inc
 
-if INTERNAL_ARPACK
-  ARPACK = arpack/dgetv0.c arpack/dmout.c arpack/dsaitr.c arpack/dsapps.c \
-         arpack/dsaup2.c arpack/dsaupd.c arpack/dsconv.c arpack/dseigt.c \
-         arpack/dsesrt.c arpack/dseupd.c arpack/dsgets.c arpack/dsortr.c \
-         arpack/dstats.c arpack/dstqrb.c arpack/dvout.c arpack/ivout.c \
-	 arpack/dnaitr.c arpack/dnapps.c arpack/dnaup2.c arpack/dnaupd.c \
-	 arpack/dnconv.c arpack/dsortc.c arpack/dneigh.c arpack/dngets.c \
-	 arpack/dstatn.c arpack/dlaqrb.c arpack/dneupd.c \
-         arpack/second.c
-else
-  ARPACK =
+F2C = 	f2c/f77vers.c	f2c/i77vers.c	f2c/main.c	f2c/s_rnge.c	\
+	f2c/abort_.c 	f2c/exit_.c 	f2c/getarg_.c 	f2c/iargc_.c	\
+        f2c/getenv_.c	f2c/signal_.c	f2c/s_stop.c	f2c/s_paus.c 	\
+	f2c/system_.c	f2c/cabs.c	f2c/ctype.c	f2c/derf_.c	\
+	f2c/derfc_.c	f2c/erf_.c	f2c/erfc_.c	f2c/sig_die.c	\
+	f2c/uninit.c	f2c/pow_ci.c	f2c/pow_dd.c	f2c/pow_di.c 	\
+	f2c/pow_hh.c	f2c/pow_ii.c	f2c/pow_ri.c	f2c/pow_zi.c	\
+	f2c/pow_zz.c 	f2c/c_abs.c 	f2c/c_cos.c 	f2c/c_div.c 	\
+	f2c/c_exp.c 	f2c/c_log.c 	f2c/c_sin.c 	f2c/c_sqrt.c	\
+	f2c/z_abs.c	f2c/z_cos.c	f2c/z_div.c	f2c/z_exp.c	\
+	f2c/z_log.c	f2c/z_sin.c	f2c/z_sqrt.c	f2c/r_abs.c	\
+	f2c/r_acos.c	f2c/r_asin.c	f2c/r_atan.c	f2c/r_atn2.c	\
+	f2c/r_cnjg.c	f2c/r_cos.c	f2c/r_cosh.c	f2c/r_dim.c 	\
+	f2c/r_exp.c	f2c/r_imag.c	f2c/r_int.c 	f2c/r_lg10.c 	\
+	f2c/r_log.c 	f2c/r_mod.c	f2c/r_nint.c	f2c/r_sign.c	\
+        f2c/r_sin.c	f2c/r_sinh.c	f2c/r_sqrt.c	f2c/r_tan.c 	\
+	f2c/r_tanh.c	f2c/d_abs.c	f2c/d_acos.c	f2c/d_asin.c	\
+	f2c/d_atan.c 	f2c/d_atn2.c	f2c/d_cnjg.c 	f2c/d_cos.c 	\
+	f2c/d_cosh.c 	f2c/d_dim.c 	f2c/d_exp.c	f2c/d_imag.c 	\
+	f2c/d_int.c	f2c/d_lg10.c	f2c/d_log.c	f2c/d_mod.c	\
+        f2c/d_nint.c	f2c/d_prod.c	f2c/d_sign.c	f2c/d_sin.c 	\
+	f2c/d_sinh.c	f2c/d_sqrt.c	f2c/d_tan.c	f2c/d_tanh.c	\
+	f2c/i_abs.c	f2c/i_dim.c	f2c/i_dnnt.c	f2c/i_indx.c	\
+	f2c/i_len.c	f2c/i_mod.c	f2c/i_nint.c	f2c/i_sign.c	\
+        f2c/lbitbits.c 	f2c/lbitshft.c	f2c/h_abs.c 	f2c/h_dim.c 	\
+	f2c/h_dnnt.c 	f2c/h_indx.c 	f2c/h_len.c 	f2c/h_mod.c 	\
+	f2c/h_nint.c 	f2c/h_sign.c	f2c/l_ge.c 	f2c/l_gt.c 	\
+	f2c/l_le.c 	f2c/l_lt.c 	f2c/hl_ge.c 	f2c/hl_gt.c 	\
+	f2c/hl_le.c 	f2c/hl_lt.c 	f2c/ef1asc_.c 	f2c/ef1cmc_.c	\
+	f2c/f77_aloc.c 	f2c/s_cat.c 	f2c/s_cmp.c 	f2c/s_copy.c	\
+	f2c/backspac.c 	f2c/close.c 	f2c/dfe.c 	f2c/dolio.c 	\
+	f2c/due.c 	f2c/endfile.c 	f2c/err.c	f2c/fmt.c 	\
+	f2c/fmtlib.c 	f2c/ftell_.c 	f2c/iio.c 	f2c/ilnw.c 	\
+	f2c/inquire.c 	f2c/lread.c 	f2c/lwrite.c 	f2c/open.c 	\
+	f2c/rdfmt.c 	f2c/rewind.c 	f2c/rsfe.c 	f2c/rsli.c 	\
+	f2c/rsne.c 	f2c/sfe.c 	f2c/sue.c	f2c/typesize.c	\
+	f2c/uio.c 	f2c/util.c 	f2c/wref.c 	f2c/wrtfmt.c 	\
+	f2c/wsfe.c 	f2c/wsle.c 	f2c/wsne.c 	f2c/xwsne.c	\
+	f2c/dtime_.c	f2c/etime_.c    f2c_dummy.c
+
+if INTERNAL_F2C
+  libf2c_la_SOURCES = $(F2C)
+  libf2c_la_CFLAGS = -DSkip_f2c_Undefs
+  f2c/arith.h: f2c/arithchk.c
+	$(CC) $(CFLAGS) -DNO_FPINIT f2c/aritchk.c -lm -o f2c/arith || \
+	$(CC) -DNO_LONG_LONG $(CFLAGS) -DNO_FPINIT f2c/arithchk.c \
+		-lm -o f2c/arith
+	f2c/arith > f2c/arith.h
+  f2c/sysdep1.h: f2c/sysdep1.h0
+	cp f2c/sysdep1.h0 f2c/sysdep1.h
+  f2c/signal1.h: f2c/signal1.h0
+	cp f2c/signal1.h0 f2c/signal1.h
+  F2C_LIB = libf2c.la
 endif
 
 if INTERNAL_BLAS
-  BLAS = blas/daxpy.c  blas/ddot.c   blas/dger.c   blas/dscal.c  blas/lsame.c \
-	blas/dcopy.c  blas/dgemv.c  blas/dnrm2.c  blas/dswap.c   blas/drot.c  \
-        blas/idamax.c blas/dtrmm.c  blas/dasum.c
-else
-  BLAS =
+  BLAS_LIB = libblas.la
+  libblas_la_SOURCES = $(BLAS)
 endif
 
-F2C = f2c/d_sign.c f2c/etime_.c  f2c/pow_dd.c f2c/pow_di.c f2c/s_cmp.c \
-	f2c/s_copy.c f2c/d_lg10.c f2c/i_dnnt.c
+if INTERNAL_LAPACK
+  liblapack_la_SOURCES = $(LAPACK)
+  LAPACK_LIB = liblapack.la
+endif
+
+if INTERNAL_ARPACK
+  libarpack_la_SOURCES = $(ARPACK)
+  ARPACK_LIB = libarpack.la
+endif
+
+noinst_LTLIBRARIES = $(F2C_LIB) $(BLAS_LIB) $(LAPACK_LIB) $(ARPACK_LIB)
 
 CS = cs/cs_add.c       cs/cs_happly.c    cs/cs_pvec.c         \
 	cs/cs_amd.c       cs/cs_house.c     cs/cs_qr.c        \
@@ -86,8 +116,6 @@ HEADERS_PRIVATE = atlas-edges.h \
 		igraph_gml_tree.h \
 		walktrap_graph.h	walktrap_communities.h \
 		walktrap_heap.h \
-		igraph_blas_internal.h \
-		igraph_arpack_internal.h	igraph_f2c.h \
 		igraph_math.h \
 		drl_layout.h drl_parse.h drl_graph.h \
 		drl_graph_3d.h		drl_layout_3d.h \
@@ -102,7 +130,8 @@ HEADERS_PRIVATE = atlas-edges.h \
 		gengraph_graph_molloy_optimized.h \
 		gengraph_hash.h gengraph_header.h gengraph_powerlaw.h \
 		gengraph_qsort.h gengraph_random.h gengraph_vertex_cover.h \
-		igraph_marked_queue.h igraph_estack.h
+		igraph_marked_queue.h igraph_estack.h \
+		igraph_blas_internal.h igraph_arpack_internal.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
@@ -165,7 +194,7 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     bliss_partition.cc bliss_graph.cc bliss_timer.cc \
 			     bliss_heap.cc bliss_utils.cc bliss.cc \
 			     cattributes.c revolver_ml_cit.c zeroin.c bfgs.c math.c \
-			     forestfire.c $(ARPACK) $(BLAS) $(LAPACK) $(F2C) \
+			     forestfire.c \
 			     blas.c arpack.c centrality.c drl_layout.cpp drl_parse.cpp \
 			     drl_graph.cpp DensityGrid.cpp \
 			     gengraph_box_list.cpp gengraph_degree_sequence.cpp \
@@ -185,7 +214,8 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall
 libigraph_la_LDFLAGS       = -no-undefined
-libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(FLIBS) $(LAPACK_DLAMCH)
+libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(F2C_LIB) $(BLAS_LIB) \
+				 $(LAPACK_LIB) $(ARPACK_LIB)
 
 includedir = $(prefix)/include/igraph
 include_HEADERS = $(HEADERS_PUBLIC)

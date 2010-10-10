@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,9 +10,7 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Table of constant values */
 
@@ -31,7 +29,7 @@ static integer c__2 = 2;
     doublereal d__1, d__2;
 
     /* Builtin functions */
-    double sqrt(doublereal), igraphd_sign(doublereal *, doublereal *);
+    double sqrt(doublereal), d_sign(doublereal *, doublereal *);
 
     /* Local variables */
     static doublereal b, c__, f, g;
@@ -63,7 +61,7 @@ static integer c__2 = 2;
     extern /* Subroutine */ int igraphdlartg_(doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *);
     static doublereal safmax;
-    extern /* Subroutine */ int igraphxerbla_(char *, integer *);
+    extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
     extern doublereal igraphdlanst_(char *, integer *, doublereal *, doublereal *);
     extern /* Subroutine */ int igraphdlasrt_(char *, integer *, doublereal *, 
 	    integer *);
@@ -73,93 +71,78 @@ static integer c__2 = 2;
     static doublereal ssfmax;
 
 
-/*  -- LAPACK routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     September 30, 1994 */
+/*  -- LAPACK routine (version 3.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2006   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
-/*     .. Array Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  DSTEQR computes all eigenvalues and, optionally, eigenvectors of a */
-/*  symmetric tridiagonal matrix using the implicit QL or QR method. */
-/*  The eigenvectors of a full or band symmetric matrix can also be found */
-/*  if DSYTRD or DSPTRD or DSBTRD has been used to reduce this matrix to */
-/*  tridiagonal form. */
+    DSTEQR computes all eigenvalues and, optionally, eigenvectors of a   
+    symmetric tridiagonal matrix using the implicit QL or QR method.   
+    The eigenvectors of a full or band symmetric matrix can also be found   
+    if DSYTRD or DSPTRD or DSBTRD has been used to reduce this matrix to   
+    tridiagonal form.   
 
-/*  Arguments */
-/*  ========= */
+    Arguments   
+    =========   
 
-/*  COMPZ   (input) CHARACTER*1 */
-/*          = 'N':  Compute eigenvalues only. */
-/*          = 'V':  Compute eigenvalues and eigenvectors of the original */
-/*                  symmetric matrix.  On entry, Z must contain the */
-/*                  orthogonal matrix used to reduce the original matrix */
-/*                  to tridiagonal form. */
-/*          = 'I':  Compute eigenvalues and eigenvectors of the */
-/*                  tridiagonal matrix.  Z is initialized to the identity */
-/*                  matrix. */
+    COMPZ   (input) CHARACTER*1   
+            = 'N':  Compute eigenvalues only.   
+            = 'V':  Compute eigenvalues and eigenvectors of the original   
+                    symmetric matrix.  On entry, Z must contain the   
+                    orthogonal matrix used to reduce the original matrix   
+                    to tridiagonal form.   
+            = 'I':  Compute eigenvalues and eigenvectors of the   
+                    tridiagonal matrix.  Z is initialized to the identity   
+                    matrix.   
 
-/*  N       (input) INTEGER */
-/*          The order of the matrix.  N >= 0. */
+    N       (input) INTEGER   
+            The order of the matrix.  N >= 0.   
 
-/*  D       (input/output) DOUBLE PRECISION array, dimension (N) */
-/*          On entry, the diagonal elements of the tridiagonal matrix. */
-/*          On exit, if INFO = 0, the eigenvalues in ascending order. */
+    D       (input/output) DOUBLE PRECISION array, dimension (N)   
+            On entry, the diagonal elements of the tridiagonal matrix.   
+            On exit, if INFO = 0, the eigenvalues in ascending order.   
 
-/*  E       (input/output) DOUBLE PRECISION array, dimension (N-1) */
-/*          On entry, the (n-1) subdiagonal elements of the tridiagonal */
-/*          matrix. */
-/*          On exit, E has been destroyed. */
+    E       (input/output) DOUBLE PRECISION array, dimension (N-1)   
+            On entry, the (n-1) subdiagonal elements of the tridiagonal   
+            matrix.   
+            On exit, E has been destroyed.   
 
-/*  Z       (input/output) DOUBLE PRECISION array, dimension (LDZ, N) */
-/*          On entry, if  COMPZ = 'V', then Z contains the orthogonal */
-/*          matrix used in the reduction to tridiagonal form. */
-/*          On exit, if INFO = 0, then if  COMPZ = 'V', Z contains the */
-/*          orthonormal eigenvectors of the original symmetric matrix, */
-/*          and if COMPZ = 'I', Z contains the orthonormal eigenvectors */
-/*          of the symmetric tridiagonal matrix. */
-/*          If COMPZ = 'N', then Z is not referenced. */
+    Z       (input/output) DOUBLE PRECISION array, dimension (LDZ, N)   
+            On entry, if  COMPZ = 'V', then Z contains the orthogonal   
+            matrix used in the reduction to tridiagonal form.   
+            On exit, if INFO = 0, then if  COMPZ = 'V', Z contains the   
+            orthonormal eigenvectors of the original symmetric matrix,   
+            and if COMPZ = 'I', Z contains the orthonormal eigenvectors   
+            of the symmetric tridiagonal matrix.   
+            If COMPZ = 'N', then Z is not referenced.   
 
-/*  LDZ     (input) INTEGER */
-/*          The leading dimension of the array Z.  LDZ >= 1, and if */
-/*          eigenvectors are desired, then  LDZ >= max(1,N). */
+    LDZ     (input) INTEGER   
+            The leading dimension of the array Z.  LDZ >= 1, and if   
+            eigenvectors are desired, then  LDZ >= max(1,N).   
 
-/*  WORK    (workspace) DOUBLE PRECISION array, dimension (max(1,2*N-2)) */
-/*          If COMPZ = 'N', then WORK is not referenced. */
+    WORK    (workspace) DOUBLE PRECISION array, dimension (max(1,2*N-2))   
+            If COMPZ = 'N', then WORK is not referenced.   
 
-/*  INFO    (output) INTEGER */
-/*          = 0:  successful exit */
-/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
-/*          > 0:  the algorithm has failed to find all the eigenvalues in */
-/*                a total of 30*N iterations; if INFO = i, then i */
-/*                elements of E have not converged to zero; on exit, D */
-/*                and E contain the elements of a symmetric tridiagonal */
-/*                matrix which is orthogonally similar to the original */
-/*                matrix. */
+    INFO    (output) INTEGER   
+            = 0:  successful exit   
+            < 0:  if INFO = -i, the i-th argument had an illegal value   
+            > 0:  the algorithm has failed to find all the eigenvalues in   
+                  a total of 30*N iterations; if INFO = i, then i   
+                  elements of E have not converged to zero; on exit, D   
+                  and E contain the elements of a symmetric tridiagonal   
+                  matrix which is orthogonally similar to the original   
+                  matrix.   
 
-/*  ===================================================================== */
+    =====================================================================   
 
-/*     .. Parameters .. */
-/*     .. */
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. External Functions .. */
-/*     .. */
-/*     .. External Subroutines .. */
-/*     .. */
-/*     .. Intrinsic Functions .. */
-/*     .. */
-/*     .. Executable Statements .. */
 
-/*     Test the input parameters. */
+       Test the input parameters.   
 
-    /* Parameter adjustments */
+       Parameter adjustments */
     --d__;
     --e;
     z_dim1 = *ldz;
@@ -183,12 +166,12 @@ static integer c__2 = 2;
 	*info = -1;
     } else if (*n < 0) {
 	*info = -2;
-    } else if (*ldz < 1 || (icompz > 0 && *ldz < max(1,*n))) {
+    } else if (*ldz < 1 || icompz > 0 && *ldz < max(1,*n)) {
 	*info = -6;
     }
     if (*info != 0) {
 	i__1 = -(*info);
-	igraphxerbla_("DSTEQR", &i__1);
+	igraphxerbla_("DSTEQR", &i__1, (ftnlen)6);
 	return 0;
     }
 
@@ -216,8 +199,8 @@ static integer c__2 = 2;
     ssfmax = sqrt(safmax) / 3.;
     ssfmin = sqrt(safmin) / eps2;
 
-/*     Compute the eigenvalues and eigenvectors of the tridiagonal */
-/*     matrix. */
+/*     Compute the eigenvalues and eigenvectors of the tridiagonal   
+       matrix. */
 
     if (icompz == 2) {
 	igraphdlaset_("Full", n, n, &c_b9, &c_b10, &z__[z_offset], ldz);
@@ -226,9 +209,9 @@ static integer c__2 = 2;
     nmaxit = *n * 30;
     jtot = 0;
 
-/*     Determine where the matrix splits and choose QL or QR iteration */
-/*     for each block, according to whether top or bottom diagonal */
-/*     element is smaller. */
+/*     Determine where the matrix splits and choose QL or QR iteration   
+       for each block, according to whether top or bottom diagonal   
+       element is smaller. */
 
     l1 = 1;
     nm1 = *n - 1;
@@ -302,9 +285,9 @@ L30:
 
     if (lend > l) {
 
-/*        QL Iteration */
+/*        QL Iteration   
 
-/*        Look for small subdiagonal element. */
+          Look for small subdiagonal element. */
 
 L40:
 	if (l != lend) {
@@ -333,8 +316,8 @@ L60:
 	    goto L80;
 	}
 
-/*        If remaining matrix is 2-by-2, use DLAE2 or SLAEV2 */
-/*        to compute its eigensystem. */
+/*        If remaining matrix is 2-by-2, use DLAE2 or SLAEV2   
+          to compute its eigensystem. */
 
 	if (m == l + 1) {
 	    if (icompz > 0) {
@@ -365,7 +348,7 @@ L60:
 
 	g = (d__[l + 1] - p) / (e[l] * 2.);
 	r__ = igraphdlapy2_(&g, &c_b10);
-	g = d__[m] - p + e[l] / (g + igraphd_sign(&r__, &g));
+	g = d__[m] - p + e[l] / (g + d_sign(&r__, &g));
 
 	s = 1.;
 	c__ = 1.;
@@ -423,9 +406,9 @@ L80:
 
     } else {
 
-/*        QR Iteration */
+/*        QR Iteration   
 
-/*        Look for small superdiagonal element. */
+          Look for small superdiagonal element. */
 
 L90:
 	if (l != lend) {
@@ -454,8 +437,8 @@ L110:
 	    goto L130;
 	}
 
-/*        If remaining matrix is 2-by-2, use DLAE2 or SLAEV2 */
-/*        to compute its eigensystem. */
+/*        If remaining matrix is 2-by-2, use DLAE2 or SLAEV2   
+          to compute its eigensystem. */
 
 	if (m == l - 1) {
 	    if (icompz > 0) {
@@ -487,7 +470,7 @@ L110:
 
 	g = (d__[l - 1] - p) / (e[l - 1] * 2.);
 	r__ = igraphdlapy2_(&g, &c_b10);
-	g = d__[m] - p + e[l - 1] / (g + igraphd_sign(&r__, &g));
+	g = d__[m] - p + e[l - 1] / (g + d_sign(&r__, &g));
 
 	s = 1.;
 	c__ = 1.;
@@ -564,8 +547,8 @@ L140:
 		info);
     }
 
-/*     Check for no convergence to an eigenvalue after a total */
-/*     of N*MAXIT iterations. */
+/*     Check for no convergence to an eigenvalue after a total   
+       of N*MAXIT iterations. */
 
     if (jtot < nmaxit) {
 	goto L10;

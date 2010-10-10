@@ -93,7 +93,7 @@ int igraph_i_arpack_err_dnaupd(long int error) {
   case -12:     return IGRAPH_ARPACK_ISHIFT;
   case -9999:   return IGRAPH_ARPACK_NOFACT;
   default:      return IGRAPH_ARPACK_UNKNOWN;
-  }  
+  }
 }
 
 int igraph_i_arpack_err_dneupd(long int error) {
@@ -114,15 +114,15 @@ int igraph_i_arpack_err_dneupd(long int error) {
   case -14:     return IGRAPH_ARPACK_FAILED;
   case -15:     return IGRAPH_ARPACK_EVDIFF;
   default:      return IGRAPH_ARPACK_UNKNOWN;
-  }    
+  }
 }
 
 /**
  * \function igraph_arpack_options_init
  * Initialize ARPACK options
- * 
- * Initializes ARPACK options, set them to default values. 
- * You can always pass the initialized \ref igraph_arpack_options_t 
+ *
+ * Initializes ARPACK options, set them to default values.
+ * You can always pass the initialized \ref igraph_arpack_options_t
  * object to built-in igraph functions without any modification. The
  * built-in igraph functions modify the options to perform their
  * calculation, e.g. \ref igraph_pagerank() always searches for the
@@ -133,7 +133,7 @@ int igraph_i_arpack_err_dneupd(long int error) {
  * calculation using ARPACK, however, you will likely need to set up
  * the fields for yourself.
  * \param o The \ref igraph_arpack_options_t object to initialize.
- * 
+ *
  * Time complexity: O(1).
  */
 
@@ -163,14 +163,14 @@ void igraph_arpack_options_init(igraph_arpack_options_t *o) {
 /**
  * \function igraph_arpack_storage_init
  * Initialize ARPACK storage
- * 
+ *
  * You only need this function if you want to run multiple eigenvalue
  * calculations using ARPACK, and want to spare the memory
- * allocation/deallocation between each two runs. Otherwise it is safe 
+ * allocation/deallocation between each two runs. Otherwise it is safe
  * to supply a null pointer as the \c storage argument of both \ref
  * igraph_arpack_rssolve() and \ref igraph_arpack_rnsolve() to make
  * memory allocated and deallocated automatically.
- * 
+ *
  * </para><para>Don't forget to call the \ref
  * igraph_arpack_storage_destroy() function on the storage object if
  * you don't need it any more.
@@ -182,16 +182,16 @@ void igraph_arpack_options_init(igraph_arpack_options_t *o) {
  *    solved using this \ref igraph_arpack_storage_t. (You cannot use
  *    the same storage both with symmetric and non-symmetric solvers.)
  * \return Error code.
- * 
+ *
  * Time complexity: O(maxncv*(maxldv+maxn)).
  */
 
 int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
-			       long int maxncv, long int maxldv, 
+			       long int maxncv, long int maxldv,
 			       igraph_bool_t symm) {
   
   /* TODO: check arguments */
-  s->maxn=maxn; 
+  s->maxn=maxn;
   s->maxncv=maxncv;
   s->maxldv=maxldv;
 
@@ -219,7 +219,7 @@ int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
     IGRAPH_FINALLY_CLEAN(2);
   }
 
-#undef CHECKMEM  
+#undef CHECKMEM
   
   IGRAPH_FINALLY_CLEAN(7);
   return 0;
@@ -228,16 +228,16 @@ int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
 /**
  * \function igraph_arpack_storage_destroy
  * Deallocate ARPACK storage
- * 
+ *
  * \param s The \ref igraph_arpack_storage_t object for which the
  *    memory will be deallocated.
- * 
+ *
  * Time complexity: operating system dependent.
  */
 
 void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s) {
   
-  if (s->di) { 
+  if (s->di) {
     igraph_Free(s->di);
   }
   if (s->workev) {
@@ -256,10 +256,10 @@ void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s) {
 /**
  * \function igraph_arpack_rssolve
  * \brief ARPACK solver for symmetric matrices
- * 
- * This is the ARPACK solver for symmetric matrices. Please use 
+ *
+ * This is the ARPACK solver for symmetric matrices. Please use
  * \ref igraph_arpack_rnsolve() for non-symmetric matrices.
- * \param fun Pointer to an \ref igraph_arpack_function_t object, 
+ * \param fun Pointer to an \ref igraph_arpack_function_t object,
  *     the function that performs the matrix-vector multiplication.
  * \param extra An extra argument to be passed to \c fun.
  * \param options An \ref igraph_arpack_options_t object.
@@ -273,7 +273,7 @@ void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s) {
  *     an initialized matrix. The eigenvectors will be stored in the
  *     columns of the matrix. The matrix will be resized as needed.
  * \return Error code.
- * 
+ *
  * Time complexity: depends on the matrix-vector
  * multiplication. Usually a small number of iterations is enough, so
  * if the matrix is sparse and the matrix-vector multiplication can be
@@ -282,7 +282,7 @@ void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s) {
  */
 
 int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
-			  igraph_arpack_options_t *options, 
+			  igraph_arpack_options_t *options,
 			  igraph_arpack_storage_t *storage,
 			  igraph_vector_t *values, igraph_matrix_t *vectors) {
   
@@ -315,7 +315,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
       IGRAPH_ERROR("Not enough storage for ARPACK (`ldv')", IGRAPH_EINVAL);
     }
 
-    v      = storage->v; 
+    v      = storage->v;
     workl  = storage->workl;
     workd  = storage->workd;
     d      = storage->d;
@@ -352,7 +352,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   options->iparam[4]=0;
   options->iparam[6]=options->mode;
   options->info=options->start;
-  if (options->start) { 
+  if (options->start) {
     for (i=0; i<options->n; i++) {
       resid[i]=MATRIX(*vectors, i, 0);
     }
@@ -361,10 +361,10 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   /* Ok, we have everything */
   while (1) {
     igraphdsaupd_(&ido, options->bmat, &options->n, options->which,
-		  &options->nev, &options->tol, 
-		  resid, &options->ncv, v, &options->ldv,
-		  options->iparam, options->ipntr,
-		  workd, workl, &options->lworkl, &options->info);
+    		  &options->nev, &options->tol,
+    		  resid, &options->ncv, v, &options->ldv,
+    		  options->iparam, options->ipntr,
+    		  workd, workl, &options->lworkl, &options->info);
 
     if (ido==-1 || ido==1) {
 
@@ -385,15 +385,15 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   }
   
   igraphdseupd_(&rvec, all, select, d, v, &options->ldv,
-		&options->sigma, options->bmat, &options->n,
-		options->which, &options->nev, &options->tol,
-		resid, &options->ncv, v, &options->ldv, options->iparam,
-		options->ipntr, workd, workl, &options->lworkl,
-		&options->ierr);
+  		&options->sigma, options->bmat, &options->n,
+  		options->which, &options->nev, &options->tol,
+  		resid, &options->ncv, v, &options->ldv, options->iparam,
+  		options->ipntr, workd, workl, &options->lworkl,
+  		&options->ierr);
   
   if (options->ierr != 0) {
     IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dseupd(options->ierr));
-  }    
+  }
   
   /* Save the result */
   
@@ -414,7 +414,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   if (vectors) {
     long int i, j, ptr=0;
     IGRAPH_CHECK(igraph_matrix_resize(vectors, options->n, options->nev));
-    for (j=0; j<options->nev; j++) {	
+    for (j=0; j<options->nev; j++) {
       for (i=0; i<options->n; i++) {
 	MATRIX(*vectors, i, j) = v[ptr++];
       }
@@ -443,11 +443,11 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 /**
  * \function igraph_arpack_rnsolve
  * \brief ARPACK solver for non-symmetric matrices
- * 
+ *
  * Please always consider calling \ref igraph_arpack_rssolve() if your
  * matrix is symmetric, it is much faster.
  * \ref igraph_arpack_rnsolve() for non-symmetric matrices.
- * \param fun Pointer to an \ref igraph_arpack_function_t object, 
+ * \param fun Pointer to an \ref igraph_arpack_function_t object,
  *     the function that performs the matrix-vector multiplication.
  * \param extra An extra argument to be passed to \c fun.
  * \param options An \ref igraph_arpack_options_t object.
@@ -464,7 +464,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
  *     an initialized matrix. The eigenvectors will be stored in the
  *     columns of the matrix. The matrix will be resized as needed.
  * \return Error code.
- * 
+ *
  * Time complexity: depends on the matrix-vector
  * multiplication. Usually a small number of iterations is enough, so
  * if the matrix is sparse and the matrix-vector multiplication can be
@@ -485,14 +485,15 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   long int rvec= vectors || storage ? 1 : 0;
   char *all="All";
   
-  long int origldv=options->ldv, origlworkl=options->lworkl, 
-    orignev=options->nev;
+  long int origldv=options->ldv, origlworkl=options->lworkl,
+    orignev=options->nev, origncv=options->ncv;
   char origwhich[2]={ options->which[0], options->which[1] };
   igraph_real_t origtol=options->tol;
   long int d_size;
   
   /* Brush up options if needed */
   if (options->ldv == 0) { options->ldv=options->n; }
+  if (options->ncv == 0) { options->ncv=options->nev * 2 + 1; }
   if (options->lworkl == 0) { options->lworkl=3*options->ncv*(options->ncv+2); }
   if (options->which[0] == 'X') { options->which[0]='L'; options->which[1]='M'; }
   
@@ -508,7 +509,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
       IGRAPH_ERROR("Not enough storage for ARPACK (`ldv')", IGRAPH_EINVAL);
     }
 
-    v      = storage->v; 
+    v      = storage->v;
     workl  = storage->workl;
     workd  = storage->workd;
     workev = storage->workev;
@@ -528,7 +529,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     } \
     IGRAPH_FINALLY(igraph_free, x);
 
-    v=igraph_Calloc(options->ldv * options->ncv, igraph_real_t); CHECKMEM(v);
+    v=igraph_Calloc(options->n * options->ncv, igraph_real_t); CHECKMEM(v);
     workl=igraph_Calloc(options->lworkl, igraph_real_t); CHECKMEM(workl);
     workd=igraph_Calloc(3*options->n, igraph_real_t); CHECKMEM(workd);
     d_size = 2*options->nev+1 > options->ncv ? 2*options->nev+1 : options->ncv;
@@ -549,7 +550,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   options->iparam[4]=0;
   options->iparam[6]=options->mode;
   options->info=options->start;
-  if (options->start) { 
+  if (options->start) {
     for (i=0; i<options->n; i++) {
       resid[i]=MATRIX(*vectors, i, 0);
     }
@@ -559,10 +560,10 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   while (1) {
     
     igraphdnaupd_(&ido, options->bmat, &options->n, options->which,
-		  &options->nev, &options->tol,
-		  resid, &options->ncv, v, &options->ldv,
-		  options->iparam, options->ipntr,
-		  workd, workl, &options->lworkl, &options->info);
+    		  &options->nev, &options->tol,
+    		  resid, &options->ncv, v, &options->ldv,
+    		  options->iparam, options->ipntr,
+    		  workd, workl, &options->lworkl, &options->info);
     
     if (ido==-1 || ido==1) {
       igraph_real_t *from=workd+options->ipntr[0]-1;
@@ -570,7 +571,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
       if (fun(to, from, options->n, extra) != 0) {
 	IGRAPH_ERROR("Arpack error while evaluating matrix-vector product",
 		     IGRAPH_ARPACK_PROD);
-      }      
+      }
       
     } else {
       break;
@@ -583,15 +584,15 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
   options->ierr=0;
   igraphdneupd_(&rvec, all, select, dr, di, v, &options->ldv,
-		&options->sigma, &options->sigmai, workev, options->bmat,
-		&options->n, options->which, &options->nev, &options->tol,
-		resid, &options->ncv, v, &options->ldv, options->iparam,
-		options->ipntr, workd, workl, &options->lworkl,
-		&options->ierr);
+  		&options->sigma, &options->sigmai, workev, options->bmat,
+  		&options->n, options->which, &options->nev, &options->tol,
+  		resid, &options->ncv, v, &options->ldv, options->iparam,
+  		options->ipntr, workd, workl, &options->lworkl,
+  		&options->ierr);
 
   if (options->ierr != 0) {
     IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dneupd(options->info));
-  }    
+  }
 
   /* Save the result */
   
@@ -613,7 +614,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   if (vectors) {
     long int i, j, ptr=0;
     IGRAPH_CHECK(igraph_matrix_resize(vectors, options->n, options->nev));
-    for (j=0; j<options->nev; j++) {	
+    for (j=0; j<options->nev; j++) {
       for (i=0; i<options->n; i++) {
 	MATRIX(*vectors, i, j) = v[ptr++];
       }
@@ -621,6 +622,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   }
 
   options->ldv=origldv;
+  options->ncv=origncv;
   options->lworkl=origlworkl;
   options->which[0] = origwhich[0]; options->which[1] = origwhich[1];
   options->tol=origtol;
@@ -638,18 +640,18 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     igraph_Free(v);
     IGRAPH_FINALLY_CLEAN(8);
   }
-  return 0;  
+  return 0;
 }
 
 /**
  * \function igraph_arpack_unpack_complex
  * \brief Make the result of the non-symmetric ARPACK solver more readable
- * 
- * This function works on the output of \ref igraph_arpack_rnsolve and 
- * brushes it up a bit: it only keeps \p nev eigenvalues/vectors and 
+ *
+ * This function works on the output of \ref igraph_arpack_rnsolve and
+ * brushes it up a bit: it only keeps \p nev eigenvalues/vectors and
  * every eigenvector is stored in two columns of the \p vectors
  * matrix.
- * 
+ *
  * </para><para>
  * The output of the non-symmetric ARPACK solver is somewhat hard to
  * parse, as real eigenvectors occupy only one column in the matrix,
@@ -660,19 +662,19 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
  * vectors and \p values argument and \c options->nev as \p nev.
  * \param vectors The eigenvector matrix, as returned by \ref
  *   igraph_arpack_rnsolve. It will be resized, typically it will be
- *   larger. 
+ *   larger.
  * \param values The eigenvalue matrix, as returned by \ref
  *   igraph_arpack_rnsolve. It will be resized, typically extra,
  *   unneeded rows (=eigenvalues) will be removed.
  * \param nev The number of eigenvalues/vectors to keep. Can be less
  *   or equal than the number originally requested from ARPACK.
  * \return Error code.
- * 
+ *
  * Time complexity: linear in the number of elements in the \p vectors
- * matrix. 
+ * matrix.
  */
 
-int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values, 
+int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
 				 long int nev) {
 
   long int origcol=igraph_matrix_ncol(vectors);
@@ -686,7 +688,7 @@ int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *valu
     IGRAPH_ERROR("`nev' cannot be negative", IGRAPH_EINVAL);
   }
   if (nev > no_evs) {
-    IGRAPH_ERROR("`nev' too large, we don't have that many in `values'", 
+    IGRAPH_ERROR("`nev' too large, we don't have that many in `values'",
 		 IGRAPH_EINVAL);
   }
 
@@ -719,21 +721,27 @@ int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *valu
 
       /* real */
       memset( &MATRIX(*vectors,0,k), 0, colsize);
-      memcpy( &MATRIX(*vectors,0,k-1), &MATRIX(*vectors,0,j), colsize);
+      if (k-1 != j) {
+	memcpy( &MATRIX(*vectors,0,k-1), &MATRIX(*vectors,0,j), colsize);
+      }
       k-=2;
       j-=1;
     } else {
       /* complex */
-      memcpy( &MATRIX(*vectors,0,k), &MATRIX(*vectors,0,j), colsize);
-      memcpy( &MATRIX(*vectors,0,k-1), &MATRIX(*vectors,0,j-1), colsize);
+      if (k!=j) {
+	/* Separate copy required, otherwise 'from' and 'to' might
+	   overlap */
+	memcpy( &MATRIX(*vectors,0,k), &MATRIX(*vectors,0,j), colsize);
+	memcpy( &MATRIX(*vectors,0,k-1), &MATRIX(*vectors,0,j-1), colsize);
+      }
 
       /* if negative Im part, then we need the conjugate */
-      if (MATRIX(*values,i,1) < 0) { 
+      if (MATRIX(*values,i,1) < 0) {
 	long int l;
 	for (l=0; l<nodes; l++) {
 	  MATRIX(*vectors,l,k) = - MATRIX(*vectors,l,k);
 	}
-      } else { 
+      } else {
 	j-=2;
       }
 	      

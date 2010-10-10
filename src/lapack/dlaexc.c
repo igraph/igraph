@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,9 +10,7 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Table of constant values */
 
@@ -62,89 +60,72 @@ static integer c__3 = 3;
     static doublereal thresh, smlnum;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     February 29, 1992 */
+/*  -- LAPACK auxiliary routine (version 3.2.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       June 2010   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
-/*     .. Array Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  DLAEXC swaps adjacent diagonal blocks T11 and T22 of order 1 or 2 in */
-/*  an upper quasi-triangular matrix T by an orthogonal similarity */
-/*  transformation. */
+    DLAEXC swaps adjacent diagonal blocks T11 and T22 of order 1 or 2 in   
+    an upper quasi-triangular matrix T by an orthogonal similarity   
+    transformation.   
 
-/*  T must be in Schur canonical form, that is, block upper triangular */
-/*  with 1-by-1 and 2-by-2 diagonal blocks; each 2-by-2 diagonal block */
-/*  has its diagonal elemnts equal and its off-diagonal elements of */
-/*  opposite sign. */
+    T must be in Schur canonical form, that is, block upper triangular   
+    with 1-by-1 and 2-by-2 diagonal blocks; each 2-by-2 diagonal block   
+    has its diagonal elemnts equal and its off-diagonal elements of   
+    opposite sign.   
 
-/*  Arguments */
-/*  ========= */
+    Arguments   
+    =========   
 
-/*  WANTQ   (input) LOGICAL */
-/*          = .TRUE. : accumulate the transformation in the matrix Q; */
-/*          = .FALSE.: do not accumulate the transformation. */
+    WANTQ   (input) LOGICAL   
+            = .TRUE. : accumulate the transformation in the matrix Q;   
+            = .FALSE.: do not accumulate the transformation.   
 
-/*  N       (input) INTEGER */
-/*          The order of the matrix T. N >= 0. */
+    N       (input) INTEGER   
+            The order of the matrix T. N >= 0.   
 
-/*  T       (input/output) DOUBLE PRECISION array, dimension (LDT,N) */
-/*          On entry, the upper quasi-triangular matrix T, in Schur */
-/*          canonical form. */
-/*          On exit, the updated matrix T, again in Schur canonical form. */
+    T       (input/output) DOUBLE PRECISION array, dimension (LDT,N)   
+            On entry, the upper quasi-triangular matrix T, in Schur   
+            canonical form.   
+            On exit, the updated matrix T, again in Schur canonical form.   
 
-/*  LDT     (input)  INTEGER */
-/*          The leading dimension of the array T. LDT >= max(1,N). */
+    LDT     (input) INTEGER   
+            The leading dimension of the array T. LDT >= max(1,N).   
 
-/*  Q       (input/output) DOUBLE PRECISION array, dimension (LDQ,N) */
-/*          On entry, if WANTQ is .TRUE., the orthogonal matrix Q. */
-/*          On exit, if WANTQ is .TRUE., the updated matrix Q. */
-/*          If WANTQ is .FALSE., Q is not referenced. */
+    Q       (input/output) DOUBLE PRECISION array, dimension (LDQ,N)   
+            On entry, if WANTQ is .TRUE., the orthogonal matrix Q.   
+            On exit, if WANTQ is .TRUE., the updated matrix Q.   
+            If WANTQ is .FALSE., Q is not referenced.   
 
-/*  LDQ     (input) INTEGER */
-/*          The leading dimension of the array Q. */
-/*          LDQ >= 1; and if WANTQ is .TRUE., LDQ >= N. */
+    LDQ     (input) INTEGER   
+            The leading dimension of the array Q.   
+            LDQ >= 1; and if WANTQ is .TRUE., LDQ >= N.   
 
-/*  J1      (input) INTEGER */
-/*          The index of the first row of the first block T11. */
+    J1      (input) INTEGER   
+            The index of the first row of the first block T11.   
 
-/*  N1      (input) INTEGER */
-/*          The order of the first block T11. N1 = 0, 1 or 2. */
+    N1      (input) INTEGER   
+            The order of the first block T11. N1 = 0, 1 or 2.   
 
-/*  N2      (input) INTEGER */
-/*          The order of the second block T22. N2 = 0, 1 or 2. */
+    N2      (input) INTEGER   
+            The order of the second block T22. N2 = 0, 1 or 2.   
 
-/*  WORK    (workspace) DOUBLE PRECISION array, dimension (N) */
+    WORK    (workspace) DOUBLE PRECISION array, dimension (N)   
 
-/*  INFO    (output) INTEGER */
-/*          = 0: successful exit */
-/*          = 1: the transformed matrix T would be too far from Schur */
-/*               form; the blocks are not swapped and T and Q are */
-/*               unchanged. */
+    INFO    (output) INTEGER   
+            = 0: successful exit   
+            = 1: the transformed matrix T would be too far from Schur   
+                 form; the blocks are not swapped and T and Q are   
+                 unchanged.   
 
-/*  ===================================================================== */
+    =====================================================================   
 
-/*     .. Parameters .. */
-/*     .. */
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. Local Arrays .. */
-/*     .. */
-/*     .. External Functions .. */
-/*     .. */
-/*     .. External Subroutines .. */
-/*     .. */
-/*     .. Intrinsic Functions .. */
-/*     .. */
-/*     .. Executable Statements .. */
 
-    /* Parameter adjustments */
+       Parameter adjustments */
     t_dim1 = *ldt;
     t_offset = 1 + t_dim1;
     t -= t_offset;
@@ -205,17 +186,17 @@ static integer c__3 = 3;
 
     } else {
 
-/*        Swapping involves at least one 2-by-2 block. */
+/*        Swapping involves at least one 2-by-2 block.   
 
-/*        Copy the diagonal block of order N1+N2 to the local array D */
-/*        and compute its norm. */
+          Copy the diagonal block of order N1+N2 to the local array D   
+          and compute its norm. */
 
 	nd = *n1 + *n2;
 	igraphdlacpy_("Full", &nd, &nd, &t[*j1 + *j1 * t_dim1], ldt, d__, &c__4);
 	dnorm = igraphdlange_("Max", &nd, &nd, d__, &c__4, &work[1]);
 
-/*        Compute machine-dependent threshold for test for accepting */
-/*        swap. */
+/*        Compute machine-dependent threshold for test for accepting   
+          swap. */
 
 	eps = igraphdlamch_("P");
 	smlnum = igraphdlamch_("S") / eps;
@@ -226,7 +207,7 @@ static integer c__3 = 3;
 /*        Solve T11*X - X*T22 = scale*T12 for X. */
 
 	igraphdlasy2_(&c_false, &c_false, &c_n1, n1, n2, d__, &c__4, &d__[*n1 + 1 + 
-		((*n1 + 1) << 2) - 5], &c__4, &d__[((*n1 + 1) << 2) - 4], &c__4, &
+		(*n1 + 1 << 2) - 5], &c__4, &d__[(*n1 + 1 << 2) - 4], &c__4, &
 		scale, x, &c__2, &xnorm, &ierr);
 
 /*        Swap the adjacent diagonal blocks. */
@@ -240,9 +221,9 @@ static integer c__3 = 3;
 
 L10:
 
-/*        N1 = 1, N2 = 2: generate elementary reflector H so that: */
+/*        N1 = 1, N2 = 2: generate elementary reflector H so that:   
 
-/*        ( scale, X11, X12 ) H = ( 0, 0, * ) */
+          ( scale, X11, X12 ) H = ( 0, 0, * ) */
 
 	u[0] = scale;
 	u[1] = x[0];
@@ -256,9 +237,9 @@ L10:
 	igraphdlarfx_("L", &c__3, &c__3, u, &tau, d__, &c__4, &work[1]);
 	igraphdlarfx_("R", &c__3, &c__3, u, &tau, d__, &c__4, &work[1]);
 
-/*        Test whether to reject swap. */
+/*        Test whether to reject swap.   
 
-/* Computing MAX */
+   Computing MAX */
 	d__2 = abs(d__[2]), d__3 = abs(d__[6]), d__2 = max(d__2,d__3), d__3 = 
 		(d__1 = d__[10] - t11, abs(d__1));
 	if (max(d__2,d__3) > thresh) {
@@ -287,11 +268,11 @@ L10:
 
 L20:
 
-/*        N1 = 2, N2 = 1: generate elementary reflector H so that: */
+/*        N1 = 2, N2 = 1: generate elementary reflector H so that:   
 
-/*        H (  -X11 ) = ( * ) */
-/*          (  -X21 ) = ( 0 ) */
-/*          ( scale ) = ( 0 ) */
+          H (  -X11 ) = ( * )   
+            (  -X21 ) = ( 0 )   
+            ( scale ) = ( 0 ) */
 
 	u[0] = -x[0];
 	u[1] = -x[1];
@@ -305,9 +286,9 @@ L20:
 	igraphdlarfx_("L", &c__3, &c__3, u, &tau, d__, &c__4, &work[1]);
 	igraphdlarfx_("R", &c__3, &c__3, u, &tau, d__, &c__4, &work[1]);
 
-/*        Test whether to reject swap. */
+/*        Test whether to reject swap.   
 
-/* Computing MAX */
+   Computing MAX */
 	d__2 = abs(d__[1]), d__3 = abs(d__[2]), d__2 = max(d__2,d__3), d__3 = 
 		(d__1 = d__[0] - t33, abs(d__1));
 	if (max(d__2,d__3) > thresh) {
@@ -336,13 +317,13 @@ L20:
 
 L30:
 
-/*        N1 = 2, N2 = 2: generate elementary reflectors H(1) and H(2) so */
-/*        that: */
+/*        N1 = 2, N2 = 2: generate elementary reflectors H(1) and H(2) so   
+          that:   
 
-/*        H(2) H(1) (  -X11  -X12 ) = (  *  * ) */
-/*                  (  -X21  -X22 )   (  0  * ) */
-/*                  ( scale    0  )   (  0  0 ) */
-/*                  (    0  scale )   (  0  0 ) */
+          H(2) H(1) (  -X11  -X12 ) = (  *  * )   
+                    (  -X21  -X22 )   (  0  * )   
+                    ( scale    0  )   (  0  0 )   
+                    (    0  scale )   (  0  0 ) */
 
 	u1[0] = -x[0];
 	u1[1] = -x[1];
@@ -366,9 +347,9 @@ L30:
 	igraphdlarfx_("L", &c__3, &c__4, u2, &tau2, &d__[1], &c__4, &work[1]);
 	igraphdlarfx_("R", &c__4, &c__3, u2, &tau2, &d__[4], &c__4, &work[1]);
 
-/*        Test whether to reject swap. */
+/*        Test whether to reject swap.   
 
-/* Computing MAX */
+   Computing MAX */
 	d__1 = abs(d__[2]), d__2 = abs(d__[6]), d__1 = max(d__1,d__2), d__2 = 
 		abs(d__[3]), d__1 = max(d__1,d__2), d__2 = abs(d__[7]);
 	if (max(d__1,d__2) > thresh) {

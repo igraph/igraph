@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,107 +10,86 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Table of constant values */
 
-static doublereal c_b14 = 1.;
 static integer c__1 = 1;
-static doublereal c_b16 = 0.;
 
 /* Subroutine */ int igraphdlarfx_(char *side, integer *m, integer *n, doublereal *
 	v, doublereal *tau, doublereal *c__, integer *ldc, doublereal *work)
 {
     /* System generated locals */
     integer c_dim1, c_offset, i__1;
-    doublereal d__1;
 
     /* Local variables */
     static integer j;
     static doublereal t1, t2, t3, t4, t5, t6, t7, t8, t9, v1, v2, v3, v4, v5, 
 	    v6, v7, v8, v9, t10, v10, sum;
-    extern /* Subroutine */ int igraphdger_(integer *, integer *, doublereal *, 
-	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
-	    integer *);
+    extern /* Subroutine */ int igraphdlarf_(char *, integer *, integer *, 
+	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
+	    doublereal *);
     extern logical igraphlsame_(char *, char *);
-    extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
-	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *, integer *);
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     February 29, 1992 */
+/*  -- LAPACK auxiliary routine (version 3.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2006   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
-/*     .. Array Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  DLARFX applies a real elementary reflector H to a real m by n */
-/*  matrix C, from either the left or the right. H is represented in the */
-/*  form */
+    DLARFX applies a real elementary reflector H to a real m by n   
+    matrix C, from either the left or the right. H is represented in the   
+    form   
 
-/*        H = I - tau * v * v' */
+          H = I - tau * v * v'   
 
-/*  where tau is a real scalar and v is a real vector. */
+    where tau is a real scalar and v is a real vector.   
 
-/*  If tau = 0, then H is taken to be the unit matrix */
+    If tau = 0, then H is taken to be the unit matrix   
 
-/*  This version uses inline code if H has order < 11. */
+    This version uses inline code if H has order < 11.   
 
-/*  Arguments */
-/*  ========= */
+    Arguments   
+    =========   
 
-/*  SIDE    (input) CHARACTER*1 */
-/*          = 'L': form  H * C */
-/*          = 'R': form  C * H */
+    SIDE    (input) CHARACTER*1   
+            = 'L': form  H * C   
+            = 'R': form  C * H   
 
-/*  M       (input) INTEGER */
-/*          The number of rows of the matrix C. */
+    M       (input) INTEGER   
+            The number of rows of the matrix C.   
 
-/*  N       (input) INTEGER */
-/*          The number of columns of the matrix C. */
+    N       (input) INTEGER   
+            The number of columns of the matrix C.   
 
-/*  V       (input) DOUBLE PRECISION array, dimension (M) if SIDE = 'L' */
-/*                                     or (N) if SIDE = 'R' */
-/*          The vector v in the representation of H. */
+    V       (input) DOUBLE PRECISION array, dimension (M) if SIDE = 'L'   
+                                       or (N) if SIDE = 'R'   
+            The vector v in the representation of H.   
 
-/*  TAU     (input) DOUBLE PRECISION */
-/*          The value tau in the representation of H. */
+    TAU     (input) DOUBLE PRECISION   
+            The value tau in the representation of H.   
 
-/*  C       (input/output) DOUBLE PRECISION array, dimension (LDC,N) */
-/*          On entry, the m by n matrix C. */
-/*          On exit, C is overwritten by the matrix H * C if SIDE = 'L', */
-/*          or C * H if SIDE = 'R'. */
+    C       (input/output) DOUBLE PRECISION array, dimension (LDC,N)   
+            On entry, the m by n matrix C.   
+            On exit, C is overwritten by the matrix H * C if SIDE = 'L',   
+            or C * H if SIDE = 'R'.   
 
-/*  LDC     (input) INTEGER */
-/*          The leading dimension of the array C. LDA >= (1,M). */
+    LDC     (input) INTEGER   
+            The leading dimension of the array C. LDA >= (1,M).   
 
-/*  WORK    (workspace) DOUBLE PRECISION array, dimension */
-/*                      (N) if SIDE = 'L' */
-/*                      or (M) if SIDE = 'R' */
-/*          WORK is not referenced if H has order < 11. */
+    WORK    (workspace) DOUBLE PRECISION array, dimension   
+                        (N) if SIDE = 'L'   
+                        or (M) if SIDE = 'R'   
+            WORK is not referenced if H has order < 11.   
 
-/*  ===================================================================== */
+    =====================================================================   
 
-/*     .. Parameters .. */
-/*     .. */
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. External Functions .. */
-/*     .. */
-/*     .. External Subroutines .. */
-/*     .. */
-/*     .. Executable Statements .. */
 
-    /* Parameter adjustments */
+       Parameter adjustments */
     --v;
     c_dim1 = *ldc;
     c_offset = 1 + c_dim1;
@@ -140,16 +119,7 @@ static doublereal c_b16 = 0.;
 
 /*        Code for general M */
 
-/*        w := C'*v */
-
-	igraphdgemv_("Transpose", m, n, &c_b14, &c__[c_offset], ldc, &v[1], &c__1, &
-		c_b16, &work[1], &c__1);
-
-/*        C := C - tau * v * w' */
-
-	d__1 = -(*tau);
-	igraphdger_(m, n, &d__1, &v[1], &c__1, &work[1], &c__1, &c__[c_offset], ldc)
-		;
+	igraphdlarf_(side, m, n, &v[1], &c__1, tau, &c__[c_offset], ldc, &work[1]);
 	goto L410;
 L10:
 
@@ -453,16 +423,7 @@ L190:
 
 /*        Code for general N */
 
-/*        w := C * v */
-
-	igraphdgemv_("No transpose", m, n, &c_b14, &c__[c_offset], ldc, &v[1], &
-		c__1, &c_b16, &work[1], &c__1);
-
-/*        C := C - tau * w * v' */
-
-	d__1 = -(*tau);
-	igraphdger_(m, n, &d__1, &work[1], &c__1, &v[1], &c__1, &c__[c_offset], ldc)
-		;
+	igraphdlarf_(side, m, n, &v[1], &c__1, tau, &c__[c_offset], ldc, &work[1]);
 	goto L410;
 L210:
 
