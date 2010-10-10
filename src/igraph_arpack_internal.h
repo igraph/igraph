@@ -123,38 +123,38 @@
 #define igraphi_dnnt_   i_dnnt_
 #endif
 
-int igraphdsaupd_(long int *ido, char *bmat, long int *n,
-		  char *which, long int *nev, igraph_real_t *tol,
-		  igraph_real_t *resid, long int *ncv, igraph_real_t *v,
-		  long int *ldv, long int *iparam, long int *ipntr, 
+int igraphdsaupd_(int *ido, char *bmat, int *n,
+		  char *which, int *nev, igraph_real_t *tol,
+		  igraph_real_t *resid, int *ncv, igraph_real_t *v,
+		  int *ldv, int *iparam, int *ipntr, 
 		  igraph_real_t *workd, igraph_real_t *workl,
-		  long int *lworkl, long int *info);
+		  int *lworkl, int *info);
 
-int igraphdseupd_(long int *rvec, char *howmny, long int *select,
-		  igraph_real_t *d, igraph_real_t *z, long int *ldz,
-		  igraph_real_t *sigma, char *bmat, long int *n,
-		  char *which, long int *nev, igraph_real_t *tol,
-		  igraph_real_t *resid, long int *ncv, igraph_real_t *v,
-		  long int *ldv, long int *iparam, long int *ipntr, 
+int igraphdseupd_(int *rvec, char *howmny, int *select,
+		  igraph_real_t *d, igraph_real_t *z, int *ldz,
+		  igraph_real_t *sigma, char *bmat, int *n,
+		  char *which, int *nev, igraph_real_t *tol,
+		  igraph_real_t *resid, int *ncv, igraph_real_t *v,
+		  int *ldv, int *iparam, int *ipntr, 
 		  igraph_real_t *workd, igraph_real_t *workl,
-		  long int *lworkl, long int *info);
+		  int *lworkl, int *info);
 
-int igraphdnaupd_(long int *ido, char *bmat, long int *n,
-		  char *which, long int *nev, igraph_real_t *tol,
-		  igraph_real_t *resid, long int *ncv, igraph_real_t *v,
-		  long int *ldv, long int *iparam, long int *ipntr, 
+int igraphdnaupd_(int *ido, char *bmat, int *n,
+		  char *which, int *nev, igraph_real_t *tol,
+		  igraph_real_t *resid, int *ncv, igraph_real_t *v,
+		  int *ldv, int *iparam, int *ipntr, 
 		  igraph_real_t *workd, igraph_real_t *workl,
-		  long int *lworkl, long int *info);
+		  int *lworkl, int *info);
 
-int igraphdneupd_(long int *rvec, char *howmny, long int *select,
+int igraphdneupd_(int *rvec, char *howmny, int *select,
 		  igraph_real_t *dr, igraph_real_t *di,
-		  igraph_real_t *z, long int *ldz,
+		  igraph_real_t *z, int *ldz,
 		  igraph_real_t *sigmar, igraph_real_t *sigmai, 
-		  igraph_real_t *workev, char *bmat, long int *n,
-		  char *which, long int *nev, igraph_real_t *tol,
-		  igraph_real_t *resid, long int *ncv, igraph_real_t *v,
-		  long int *ldv, long int *iparam, long int *ipntr, 
+		  igraph_real_t *workev, char *bmat, int *n,
+		  char *which, int *nev, igraph_real_t *tol,
+		  igraph_real_t *resid, int *ncv, igraph_real_t *v,
+		  int *ldv, int *iparam, int *ipntr, 
 		  igraph_real_t *workd, igraph_real_t *workl,
-		  long int *lworkl, long int *info);
+		  int *lworkl, int *info);
 
 #endif

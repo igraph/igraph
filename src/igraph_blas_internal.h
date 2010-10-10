@@ -48,8 +48,8 @@
 #define igraphdasum_    dasum_
 #endif
 
-int igraphdgemv_(char *trans, long int *m, long int *n, igraph_real_t *alpha,
-    igraph_real_t *a, long int *lda, igraph_real_t *x, long int *incx,
-    igraph_real_t *beta, igraph_real_t *y, long int *incy);
+int igraphdgemv_(char *trans, int *m, int *n, igraph_real_t *alpha,
+    igraph_real_t *a, int *lda, igraph_real_t *x, int *incx,
+    igraph_real_t *beta, igraph_real_t *y, int *incy);
 
 #endif

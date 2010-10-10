@@ -31,7 +31,7 @@
 
 /* The ARPACK example file dssimp.f is used as a template */
 
-int igraph_i_arpack_err_dsaupd(long int error) {
+int igraph_i_arpack_err_dsaupd(int error) {
   switch (error) {
   case  1:      return IGRAPH_ARPACK_MAXIT;
   case  3:      return IGRAPH_ARPACK_NOSHIFT;
@@ -53,7 +53,7 @@ int igraph_i_arpack_err_dsaupd(long int error) {
   }
 }
 
-int igraph_i_arpack_err_dseupd(long int error) {
+int igraph_i_arpack_err_dseupd(int error) {
   switch (error) {
   case -1:      return IGRAPH_ARPACK_NPOS;
   case -2:      return IGRAPH_ARPACK_NEVNPOS;
@@ -75,7 +75,7 @@ int igraph_i_arpack_err_dseupd(long int error) {
   
 }
 
-int igraph_i_arpack_err_dnaupd(long int error) {
+int igraph_i_arpack_err_dnaupd(int error) {
   switch (error) {
   case  1:      return IGRAPH_ARPACK_MAXIT;
   case  3:      return IGRAPH_ARPACK_NOSHIFT;
@@ -96,7 +96,7 @@ int igraph_i_arpack_err_dnaupd(long int error) {
   }
 }
 
-int igraph_i_arpack_err_dneupd(long int error) {
+int igraph_i_arpack_err_dneupd(int error) {
   switch (error) {
   case  1:      return IGRAPH_ARPACK_REORDER;
   case -1:      return IGRAPH_ARPACK_NPOS;
@@ -206,7 +206,7 @@ int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
   s->d=igraph_Calloc(2*maxncv, igraph_real_t); CHECKMEM(s->d);
   s->resid=igraph_Calloc(maxn, igraph_real_t); CHECKMEM(s->resid);
   s->ax=igraph_Calloc(maxn, igraph_real_t); CHECKMEM(s->ax);
-  s->select=igraph_Calloc(maxncv, long int); CHECKMEM(s->select);
+  s->select=igraph_Calloc(maxncv, int); CHECKMEM(s->select);
 
   if (symm) {
     s->workl=igraph_Calloc(maxncv*(maxncv+8), igraph_real_t); CHECKMEM(s->workl);
@@ -288,13 +288,13 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   
   igraph_real_t *v, *workl, *workd, *d, *resid, *ax;
   igraph_bool_t free_them=0;
-  long int *select, i;
+  int *select, i;
 
-  long int ido=0;
-  long int rvec= vectors || storage ? 1 : 0;	/* calculate eigenvectors? */
+  int ido=0;
+  int rvec= vectors || storage ? 1 : 0;	/* calculate eigenvectors? */
   char *all="All";
 
-  long int origldv=options->ldv, origlworkl=options->lworkl;
+  int origldv=options->ldv, origlworkl=options->lworkl;
   char origwhich[2]={ options->which[0], options->which[1] };
   igraph_real_t origtol=options->tol;
   
@@ -339,7 +339,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     d=igraph_Calloc(2*options->ncv, igraph_real_t); CHECKMEM(d);
     resid=igraph_Calloc(options->n, igraph_real_t); CHECKMEM(resid);
     ax=igraph_Calloc(options->n, igraph_real_t); CHECKMEM(ax);
-    select=igraph_Calloc(options->ncv, long int); CHECKMEM(select);
+    select=igraph_Calloc(options->ncv, int); CHECKMEM(select);
 
 #undef CHECKMEM
 
@@ -404,7 +404,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   options->numreo=options->iparam[10];
 
   if (values) {
-    long int i;
+    int i;
     IGRAPH_CHECK(igraph_vector_resize(values, options->nev));
     for (i=0; i<options->nev; i++) {
       VECTOR(*values)[i] = d[i];
@@ -412,7 +412,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   }
 
   if (vectors) {
-    long int i, j, ptr=0;
+    int i, j, ptr=0;
     IGRAPH_CHECK(igraph_matrix_resize(vectors, options->n, options->nev));
     for (j=0; j<options->nev; j++) {
       for (i=0; i<options->n; i++) {
@@ -479,17 +479,17 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
   igraph_real_t *v, *workl, *workd, *dr, *di, *resid, *workev;
   igraph_bool_t free_them=0;
-  long int *select, i;
+  int *select, i;
   
-  long int ido=0;
-  long int rvec= vectors || storage ? 1 : 0;
+  int ido=0;
+  int rvec= vectors || storage ? 1 : 0;
   char *all="All";
   
-  long int origldv=options->ldv, origlworkl=options->lworkl,
+  int origldv=options->ldv, origlworkl=options->lworkl,
     orignev=options->nev, origncv=options->ncv;
   char origwhich[2]={ options->which[0], options->which[1] };
   igraph_real_t origtol=options->tol;
-  long int d_size;
+  int d_size;
   
   /* Brush up options if needed */
   if (options->ldv == 0) { options->ldv=options->n; }
@@ -536,7 +536,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     dr=igraph_Calloc(d_size, igraph_real_t); CHECKMEM(dr);
     di=igraph_Calloc(d_size, igraph_real_t); CHECKMEM(di);
     resid=igraph_Calloc(options->n, igraph_real_t); CHECKMEM(resid);
-    select=igraph_Calloc(options->ncv, long int); CHECKMEM(select);
+    select=igraph_Calloc(options->ncv, int); CHECKMEM(select);
     workev=igraph_Calloc(3*options->ncv, igraph_real_t); CHECKMEM(workev);
     
 #undef CHECKMEM
@@ -603,7 +603,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   options->numreo=options->iparam[10];
 
   if (values) {
-    long int i;
+    int i;
     IGRAPH_CHECK(igraph_matrix_resize(values, options->nev, 2));
     for (i=0; i<options->nev; i++) {
       MATRIX(*values, i, 0) = dr[i];
@@ -612,7 +612,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   }
 
   if (vectors) {
-    long int i, j, ptr=0;
+    int i, j, ptr=0;
     IGRAPH_CHECK(igraph_matrix_resize(vectors, options->n, options->nev));
     for (j=0; j<options->nev; j++) {
       for (i=0; i<options->n; i++) {

@@ -69,7 +69,7 @@ TIME =	dtime_.o etime_.o
 OFILES = $(MISC) $(POW) $(CX) $(DCX) $(REAL) $(DBL) $(INT) \
 	$(HALF) $(CMP) $(EFL) $(CHAR) $(I77) $(TIME)
 
-all: f2c.h signal1.h sysdep1.h libf2c.a
+all: f2c.h signal1.h sysdep1.h $(OFILES)
 
 libf2c.a: $(OFILES)
 	ar r libf2c.a $?
@@ -126,7 +126,7 @@ install: libf2c.a
 	-ranlib $(LIBDIR)/libf2c.a
 
 clean:
-	rm -f libf2c.a *.o arith.h signal1.h sysdep1.h
+	rm -f *.o arith.h signal1.h sysdep1.h
 
 backspac.o:	fio.h
 close.o:	fio.h
