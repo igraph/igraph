@@ -164,7 +164,7 @@ lapackinc=/tmp/${destdir}/lapack.inc
 /bin/echo -n "LAPACK = " > ${lapackinc}
 for name in ${lapack[@]}; do
     /bin/echo -n "lapack/${name}.c "
-done >> ${lapackinc}
+done | sed 's/lapack\/dlamch\.c//' >> ${lapackinc}
 /bin/echo >> ${lapackinc}
 
 arpackinc=/tmp/${destdir}/arpack.inc

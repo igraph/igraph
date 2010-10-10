@@ -77,7 +77,9 @@ endif
 if INTERNAL_LAPACK
   liblapack_la_SOURCES = f2c.h $(LAPACK)
   liblapack_la_CFLAGS = -I.
-  LAPACK_LIB = liblapack.la
+  libdlamch_la_SOURCES = lapack/dlamch.c
+  libdlamch_la_CFLAGS = $(FLOATSTORE) -I.
+  LAPACK_LIB = liblapack.la libdlamch.la
 endif
 
 if INTERNAL_ARPACK
