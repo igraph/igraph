@@ -136,7 +136,8 @@ HEADERS_PRIVATE = atlas-edges.h \
 		gengraph_hash.h gengraph_header.h gengraph_powerlaw.h \
 		gengraph_qsort.h gengraph_random.h gengraph_vertex_cover.h \
 		igraph_marked_queue.h igraph_estack.h \
-		igraph_blas_internal.h igraph_arpack_internal.h
+		igraph_blas_internal.h igraph_arpack_internal.h \
+		igraph_lapack_internal.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
@@ -168,7 +169,8 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_strvector.h	../include/igraph_psumtree.h  \
 		../include/igraph_sparsemat.h   ../include/igraph_mixing.h    \
 		../include/igraph_version.h     ../include/igraph_blas.h      \
-		../include/igraph_separators.h  ../include/igraph_cohesive_blocks.h
+		../include/igraph_separators.h  ../include/igraph_cohesive_blocks.h \
+		../include/igraph_lapack.h
 
 libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     basic_query.c games.c cocitation.c iterators.c \
@@ -214,7 +216,7 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     version.c optimal_modularity.c \
 			     igraph_fixed_vectorlist.c separators.c \
 			     igraph_marked_queue.c igraph_estack.c st-cuts.c \
-			     cohesive_blocks.c
+			     cohesive_blocks.c lapack.c
 
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall

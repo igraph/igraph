@@ -86,7 +86,8 @@ static char *igraph_i_error_strings[]=
     /* 49 */ "GLPK Error, GLP_ETMLIM",
     /* 50 */ "GLPK Error, GLP_STOP",
     /* 51 */ "Internal attribute handler error",
-    /* 52 */ "Unimplemented attribute combination for this type"
+    /* 52 */ "Unimplemented attribute combination for this type",
+    /* 53 */ "LAPACK call resulted an error"
 };
 
 const char* igraph_strerror(const int igraph_errno) {

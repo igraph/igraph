@@ -15,7 +15,6 @@ len	[a-z][a-z0-9]*_len
 "s_cmp"{iofun}          |
 "i_len"{iofun}          |
 "len_trim__"{iofun}     |
-"xerbla_"{iofun}        |
 "do_fio"{iofun}         |
 "do_lio"{iofun}         { printf("%s", yytext); /* unchanged */ }
 {any}"ilaenv_("         |
