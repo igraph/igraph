@@ -932,7 +932,7 @@ typedef struct igraph_i_community_leading_eigenvector_naive_data_t {
 
 int igraph_i_community_leading_eigenvector_naive(igraph_real_t *to,
 						 const igraph_real_t *from,
-						 long int n, void *extra) {
+						 int n, void *extra) {
 
   igraph_i_community_leading_eigenvector_naive_data_t *data=extra;
   long int j, k, nlen, size=n;
@@ -1249,7 +1249,7 @@ typedef struct igraph_i_community_leading_eigenvector_data_t {
 
 int igraph_i_community_leading_eigenvector(igraph_real_t *to,
 					   const igraph_real_t *from,
-					   long int n, void *extra) {
+					   int n, void *extra) {
   
   igraph_i_community_leading_eigenvector_data_t *data=extra;
   long int j, k, nlen, size=n;
@@ -1583,7 +1583,7 @@ typedef struct igraph_i_community_leading_eigenvector_step_data_t {
 
 int igraph_i_community_leading_eigenvector_step(igraph_real_t *to,
 						const igraph_real_t *from,
-						long int n, void *extra) {
+						int n, void *extra) {
   
   igraph_i_community_leading_eigenvector_step_data_t *data=extra;
   long int j, k, nlen, size=n;

@@ -318,7 +318,7 @@ void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s);
  */
 
 typedef int igraph_arpack_function_t(igraph_real_t *to, const igraph_real_t *from,
-				     long int n, void *extra);
+				     int n, void *extra);
 
 int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 			  igraph_arpack_options_t *options,

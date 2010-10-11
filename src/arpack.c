@@ -551,6 +551,10 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   options->iparam[6]=options->mode;
   options->info=options->start;
   if (options->start) {
+    if (igraph_matrix_nrow(vectors) != options->n ||
+	igraph_matrix_ncol(vectors) != 1) {
+      IGRAPH_ERROR("Invalid starting vector size", IGRAPH_EINVAL);
+    }
     for (i=0; i<options->n; i++) {
       resid[i]=MATRIX(*vectors, i, 0);
     }
@@ -604,8 +608,8 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
   if (values) {
     int i;
-    IGRAPH_CHECK(igraph_matrix_resize(values, options->nev, 2));
-    for (i=0; i<options->nev; i++) {
+    IGRAPH_CHECK(igraph_matrix_resize(values, options->nconv, 2));
+    for (i=0; i<options->nconv; i++) {
       MATRIX(*values, i, 0) = dr[i];
       MATRIX(*values, i, 1) = di[i];
     }
@@ -613,8 +617,8 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
   if (vectors) {
     int i, j, ptr=0;
-    IGRAPH_CHECK(igraph_matrix_resize(vectors, options->n, options->nev));
-    for (j=0; j<options->nev; j++) {
+    IGRAPH_CHECK(igraph_matrix_resize(vectors, options->n, options->nconv));
+    for (j=0; j<options->nconv; j++) {
       for (i=0; i<options->n; i++) {
 	MATRIX(*vectors, i, j) = v[ptr++];
       }
@@ -677,7 +681,6 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
 				 long int nev) {
 
-  long int origcol=igraph_matrix_ncol(vectors);
   long int nodes=igraph_matrix_nrow(vectors);
   long int no_evs=igraph_matrix_nrow(values);
   long int i, j, k;
@@ -709,9 +712,9 @@ int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *valu
   }
   j--;
 
-  if (j>=origcol) {
-    IGRAPH_WARNING("Too few columns in `vectors', ARPACK results are likely wrong");
-  }
+  /* if (j>=origcol) { */
+  /*   IGRAPH_WARNING("Too few columns in `vectors', ARPACK results are likely wrong"); */
+  /* } */
 
   /* We copy the j-th eigenvector to the (k-1)-th and k-th column */
   k=nev*2-1;

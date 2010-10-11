@@ -710,7 +710,7 @@ int igraph_sparsemat_diag(igraph_sparsemat_t *A, int nzmax,
 
 int igraph_i_sparsemat_arpack_multiply(igraph_real_t *to, 
 				       const igraph_real_t *from,
-				       long int n,
+				       int n,
 				       void *extra) {
   igraph_sparsemat_t *A=extra;
   igraph_vector_t vto, vfrom;

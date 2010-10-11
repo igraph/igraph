@@ -154,6 +154,29 @@ int main() {
   igraph_sparsemat_destroy(&B);
 #undef DIM
 
+  igraph_small(&g1, 11, IGRAPH_DIRECTED,
+	       0, 1, 1, 3, 1, 8, 2, 10, 3, 6, 3, 10, 4, 2, 5, 4, 
+	       6, 1, 6, 4, 7, 9, 8, 5, 8, 7, 9, 8, 10, 0,
+	       -1);
+
+  igraph_get_sparsemat(&g1, &A);
+  igraph_destroy(&g1);
+  igraph_sparsemat_compress(&A, &B);
+  igraph_sparsemat_destroy(&A);
+  
+  igraph_matrix_init(&values2, 0, 0);
+  igraph_matrix_init(&vectors, 0, 0);
+  
+  igraph_sparsemat_arpack_rnsolve(&B, &options, /*storage=*/ 0,
+				  &values2, &vectors);
+
+  if (MATRIX(vectors, 0, 0) < 0.0) { 
+    igraph_matrix_scale(&vectors, -1.0);
+  }
+  
+  igraph_matrix_destroy(&values2);
+  igraph_matrix_destroy(&vectors);
+  igraph_sparsemat_destroy(&B);
 
   return 0;
 }

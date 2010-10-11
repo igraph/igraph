@@ -2459,7 +2459,7 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
 
 
 int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
-    long int n, void *extra) {
+    int n, void *extra) {
   igraph_matrix_t* matrix = (igraph_matrix_t*)extra;
   igraph_blas_dgemv_array(0, 1, matrix, from, 0, to);
   return 0;
