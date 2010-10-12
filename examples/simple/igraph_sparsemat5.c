@@ -47,11 +47,17 @@ int main() {
 
   igraph_vector_init(&values, 0);
   igraph_arpack_options_init(&options);
-  
+
+  options.mode=1;
   igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0, 
 				  &values, /*vectors=*/ 0);
-
   if (VECTOR(values)[0] != 1.0) { return 1; }
+
+  options.mode=3;
+  options.sigma=2;
+  igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0, 
+				  &values, /*vectors=*/ 0);
+  if (VECTOR(values)[0] != 1.0) { return 21; }
 
   igraph_vector_destroy(&values);
   igraph_sparsemat_destroy(&B);  
@@ -70,9 +76,9 @@ int main() {
   igraph_vector_init(&values, 0);
   igraph_matrix_init(&vectors, 0, 0);
   
+  options.mode=1;
   igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0,
 				  &values, /*vectors=*/ &vectors);
-
   if ( fabs(VECTOR(values)[0] - DIM) > EPS ) {
     printf("VECTOR(values)[0] numerical precision is only %g, should be %g",
 			fabs((double)VECTOR(values)[0]-DIM), EPS);
@@ -84,6 +90,22 @@ int main() {
   igraph_matrix_minmax(&vectors, &min, &max);
   if (fabs(min) > EPS) { return 3; }
   if (fabs(max) > EPS) { return 3; }
+
+  options.mode=3;
+  options.sigma=11;
+  igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0,
+				  &values, /*vectors=*/ &vectors);
+  if ( fabs(VECTOR(values)[0] - DIM) > EPS ) {
+    printf("VECTOR(values)[0] numerical precision is only %g, should be %g",
+			fabs((double)VECTOR(values)[0]-DIM), EPS);
+	return 22;
+  }
+
+  if ( fabs(fabs(MATRIX(vectors, DIM-1, 0)) - 1.0) > EPS) { return 23; }
+  MATRIX(vectors, DIM-1, 0) = 0.0;
+  igraph_matrix_minmax(&vectors, &min, &max);
+  if (fabs(min) > EPS) { return 23; }
+  if (fabs(max) > EPS) { return 23; }
   
   igraph_vector_destroy(&values);
   igraph_matrix_destroy(&vectors);
@@ -106,6 +128,19 @@ int main() {
   igraph_vector_init(&values, 0);
   igraph_matrix_init(&vectors, 0, 0);
   
+  options.mode=1;
+  igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0,
+				  &values, &vectors);
+
+  if (MATRIX(vectors, 0, 0) < 0.0) { 
+    igraph_matrix_scale(&vectors, -1.0);
+  }
+  
+  igraph_vector_print(&values);
+  igraph_matrix_print(&vectors);
+
+  options.mode=3;
+  options.sigma=VECTOR(values)[0] * 1.1;
   igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0,
 				  &values, &vectors);
 
@@ -139,6 +174,7 @@ int main() {
   igraph_matrix_init(&values2, 0, 0);
   igraph_matrix_init(&vectors, 0, 0);
   
+  options.mode=1;
   igraph_sparsemat_arpack_rnsolve(&B, &options, /*storage=*/ 0,
 				  &values2, &vectors);
 
@@ -166,7 +202,8 @@ int main() {
   
   igraph_matrix_init(&values2, 0, 0);
   igraph_matrix_init(&vectors, 0, 0);
-  
+
+  options.mode=1;  
   igraph_sparsemat_arpack_rnsolve(&B, &options, /*storage=*/ 0,
 				  &values2, &vectors);
 

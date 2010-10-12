@@ -32,10 +32,20 @@
 #include <stdio.h>
 
 struct cs_di_sparse;
+struct cs_di_symbolic;
+struct cs_di_numeric;
 
 typedef struct {
   struct cs_di_sparse *cs;
 } igraph_sparsemat_t;
+
+typedef struct {
+  struct cs_di_symbolic *symbolic;
+} igraph_sparsemat_symbolic_t;
+
+typedef struct {
+  struct cs_di_numeric *numeric;
+} igraph_sparsemat_numeric_t;
 
 typedef enum { IGRAPH_SPARSEMAT_TRIPLET, 
 	       IGRAPH_SPARSEMAT_CC        } igraph_sparsemat_type_t;
@@ -135,5 +145,25 @@ int igraph_sparsemat_arpack_rnsolve(const igraph_sparsemat_t *A,
 				    igraph_arpack_storage_t *storage,
 				    igraph_matrix_t *values, 
 				    igraph_matrix_t *vectors);
+
+int igraph_sparsemat_schol(long int order, const igraph_sparsemat_t *A, 
+			   igraph_sparsemat_symbolic_t *dis);
+
+int igraph_sparsemat_lu(const igraph_sparsemat_t *A, 
+			const igraph_sparsemat_symbolic_t *dis, 
+			igraph_sparsemat_numeric_t *din, double tol);
+
+int igraph_sparsemat_luresol(const igraph_sparsemat_symbolic_t *dis,
+			     const igraph_sparsemat_numeric_t *din, 
+			     const igraph_vector_t *b,
+			     igraph_vector_t *res,
+			     igraph_real_t tol);
+
+int igraph_sparsemat_symbqr(long int order, const igraph_sparsemat_t *A,
+			    igraph_sparsemat_symbolic_t *dis,
+			    int qr);
+
+void igraph_sparsemat_symbolic_destroy(igraph_sparsemat_symbolic_t *dis);
+void igraph_sparsemat_numeric_destroy(igraph_sparsemat_numeric_t *din);
 
 #endif

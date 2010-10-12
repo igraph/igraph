@@ -218,8 +218,9 @@ __BEGIN_DECLS
  *
  * Internal options:
  * \member lworkl Do not modify this option.
- * \member sigma Do not modify this option.
- * \member sigmai Do not modify this option.
+ * \member sigma The shift for the shift-invert mode.
+ * \member sigmai The imaginary part of the shift, for the
+ *    non-symmetric or complex shift-invert mode.
  * \member iparam Do not modify this option.
  * \member ipntr Do not modify this option.
  *
