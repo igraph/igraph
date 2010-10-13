@@ -97,6 +97,7 @@ print.igraph <- function(x,
 
   if (edge.attributes) {
     list <- list.edge.attributes(x)
+    list <- list[list!="name"]
   } else {
     list <- character()
   }
@@ -127,12 +128,17 @@ print.igraph <- function(x,
       omitted.edges <- nrow(el)-mp
       el <- el[1:mp,]
     }
+    ename <- if ("name" %in% list.edge.attributes(x)) {
+      paste(sep="", "'", E(x)$name, "'")
+    } else {
+      seq(length=nrow(el))
+    }
     if (ec==0 || 
         all(sapply(list, function(v) is.numeric(get.edge.attribute(x, v)) |
                    is.character(get.edge.attribute(x,v)) |
                    is.logical(get.edge.attribute(x, v))))) {
       ## create a table
-      tab <- data.frame(e=paste(sep="", "[", seq(length=nrow(el)), "]"), row.names="e")
+      tab <- data.frame(e=paste(sep="", "[", ename, "]"), row.names="e")
       if (is.numeric(el)) { w <- nchar(max(el)) } else { w <- max(nchar(el)) }
       tab[" "] <- paste(format(el[,1], width=w), arrow, format(el[,2], width=w))
       for (i in list) {
@@ -142,7 +148,7 @@ print.igraph <- function(x,
     } else {
       i <- 1
       apply(el, 1, function(v) {
-        cat(sep="", "[", i, "] ", v[1], " ", arrow, " ", v[2]);
+        cat(sep="", "[", ename[i], "] ", v[1], " ", arrow, " ", v[2]);
         if (edge.attributes) {
           lapply(list, function(n) {
             cat(sep="", "\n[[", i, "]][[", n, "]]\n")
