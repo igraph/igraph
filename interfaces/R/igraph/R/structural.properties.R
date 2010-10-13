@@ -777,7 +777,7 @@ is.loop <- function(graph, eids=E(graph)) {
     stop("Not a graph object");
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_is_loop", graph, as.igraph.es(eids)-1,
+  .Call("R_igraph_is_loop", graph, as.igraph.es(graph, eids)-1,
         PACKAGE="igraph")
 }
 
@@ -787,7 +787,7 @@ is.multiple <- function(graph, eids=E(graph)) {
     stop("Not a graph object");
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_is_multiple", graph, as.igraph.es(eids)-1,
+  .Call("R_igraph_is_multiple", graph, as.igraph.es(graph, eids)-1,
         PACKAGE="igraph")
 }
 
@@ -797,7 +797,7 @@ count.multiple <- function(graph, eids=E(graph)) {
     stop("Not a graph object");
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_count_multiple", graph, as.igraph.es(eids)-1,
+  .Call("R_igraph_count_multiple", graph, as.igraph.es(graph, eids)-1,
         PACKAGE="igraph")
 }
 
@@ -873,7 +873,7 @@ edge.betweenness <- function(graph, e=E(graph),
                              directed=TRUE, weights=NULL) {
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
-  e <- as.igraph.es(e)
+  e <- as.igraph.es(graph, e)
   directed <- as.logical(directed)
   if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
   weights <- E(graph)$weight 
@@ -895,7 +895,7 @@ edge.betweenness.estimate <- function(graph, e=E(graph),
                                       directed=TRUE, cutoff, weights=NULL) {
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
-  e <- as.igraph.es(e)
+  e <- as.igraph.es(graph, e)
   directed <- as.logical(directed)
   cutoff <- as.numeric(cutoff)
   if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 

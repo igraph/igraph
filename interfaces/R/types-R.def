@@ -97,7 +97,7 @@ VERTEX:
     INCONV: %I% <- as.igraph.vs(%I1%, %I%)-1
 
 EDGESET:
-    INCONV: %I% <- as.igraph.es(%I%)-1
+    INCONV: %I% <- as.igraph.es(%I1%, %I%)-1
     DEFAULT:
        ALL: E(%I1%)
 

@@ -1,0 +1,89 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> ## named edges
+> igraph.options(print.edge.attributes = TRUE)
+> g <- graph.ring(10)
+> E(g)$name <- letters[1:ecount(g)]
+> delete.edges(g, c("b", "d", "e"))
+Vertices: 10 
+Edges: 7 
+Directed: FALSE 
+Edges and their attributes:
+             name
+[1]  1 --  2    a
+[2]  3 --  4    c
+[3]  6 --  7    f
+[4]  7 --  8    g
+[5]  8 --  9    h
+[6]  9 -- 10    i
+[7]  1 -- 10    j
+> 
+> ## named vertices
+> g <- graph.ring(10)
+> V(g)$name <- letters[1:vcount(g)]
+> delete.edges(g, c("a|b", "f|g", "c|b"))
+Vertices: 10 
+Edges: 7 
+Directed: FALSE 
+Edges and their attributes:
+              
+[1] 'c' -- 'd'
+[2] 'd' -- 'e'
+[3] 'e' -- 'f'
+[4] 'g' -- 'h'
+[5] 'h' -- 'i'
+[6] 'i' -- 'j'
+[7] 'a' -- 'j'
+> 
+> ## no names at all, but select edges based on vertices
+> g <- graph.ring(10)
+> delete.edges(g, c("1|2", "8|7", "1|10"))
+Vertices: 10 
+Edges: 7 
+Directed: FALSE 
+Edges and their attributes:
+            
+[1]  2 --  3
+[2]  3 --  4
+[3]  4 --  5
+[4]  5 --  6
+[5]  6 --  7
+[6]  8 --  9
+[7]  9 -- 10
+> 
+> ## mix edge names and vertex names
+> g <- graph.ring(10)
+> V(g)$name <- letters[1:vcount(g)]
+> E(g)$name <- LETTERS[1:ecount(g)]
+> delete.edges(g, c("a|b", "F", "j|i"))
+Vertices: 10 
+Edges: 7 
+Directed: FALSE 
+Edges and their attributes:
+               name
+[1] 'b' -- 'c'    B
+[2] 'c' -- 'd'    C
+[3] 'd' -- 'e'    D
+[4] 'e' -- 'f'    E
+[5] 'g' -- 'h'    G
+[6] 'h' -- 'i'    H
+[7] 'a' -- 'j'    J
+> 

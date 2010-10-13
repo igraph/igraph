@@ -89,7 +89,7 @@ delete.edges <- function(graph, edges) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_delete_edges", graph, as.igraph.es(edges)-1,
+  .Call("R_igraph_delete_edges", graph, as.igraph.es(graph, edges)-1,
         PACKAGE="igraph")
 }
 
@@ -143,7 +143,16 @@ get.edges <- function(graph, es) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  res <- .Call("R_igraph_edges", graph, as.igraph.es(es)-1,
+  res <- .Call("R_igraph_edges", graph, as.igraph.es(graph, es)-1,
                PACKAGE="igraph")
   matrix(res, nc=2, byrow=TRUE)+1
 }
+
+get.edge.ids <- function(graph, vp, directed=TRUE) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  .Call("R_igraph_get_eids_multi", graph, as.igraph.vs(graph, vp)-1,
+        as.logical(directed), PACKAGE="igraph")+1
+}  
