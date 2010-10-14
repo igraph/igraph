@@ -1,0 +1,343 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> ## Are these vertices connected?
+> g <- graph.tree(20)
+> g[1,2]
+[1] TRUE
+> g[c(1,1,7), c(2,3,14)]
+[1] TRUE TRUE TRUE
+> g[c(1,1,7), c(5,3,12)]
+[1] FALSE  TRUE FALSE
+> g[c(1,1,1,1), c(2,3,2,2)]
+[1] TRUE TRUE TRUE TRUE
+> g[c(1,1,1,1), c(2,3,2,2), multi=TRUE]
+[1]  TRUE  TRUE FALSE FALSE
+> g[c(8,17), c(17,8)]
+[1]  TRUE FALSE
+> g[c(8,17), c(17,8), directed=FALSE]
+[1] TRUE TRUE
+> g[c(8,17), c(17,8), directed=FALSE, multi=TRUE]
+[1]  TRUE FALSE
+> 
+> ## The same with symbolic names
+> V(g)$name <- letters[1:vcount(g)]
+> g['a','b']
+[1] TRUE
+> g[c('a','a','g'), c('b','c','n')]
+[1] TRUE TRUE TRUE
+> g[c('a','a','g'), c('e','c','l')]
+[1] FALSE  TRUE FALSE
+> g[c('a','a','a','a'), c('b','c','b','b')]
+[1] TRUE TRUE TRUE TRUE
+> g[c('a','a','a','a'), c('b','c','b','b'), multi=TRUE]
+[1]  TRUE  TRUE FALSE FALSE
+> g[c('h','q'), c('q','h')]
+[1]  TRUE FALSE
+> g[c('h','q'), c('q','h'), directed=FALSE]
+[1] TRUE TRUE
+> g[c('h','q'), c('q','h'), directed=FALSE, multi=TRUE]
+[1]  TRUE FALSE
+> 
+> ## Weighted graphs
+> el <- get.edgelist(g, names=FALSE)
+> E(g)$weight <- el[,1] * el[,2]
+> g[1,2]
+[1] 2
+> g[c(1,1,7), c(2,3,14)]
+[1]  2  3 98
+> g[c(1,1,7), c(5,3,12)]
+[1] 0 3 0
+> g[c(1,1,1,1), c(2,3,2,2)]
+[1] 2 3 2 2
+> g[c(1,1,1,1), c(2,3,2,2), multi=TRUE]
+[1] 2 3 0 0
+> g[c(8,17), c(17,8)]
+[1] 136   0
+> g[c(8,17), c(17,8), directed=FALSE]
+[1] 136 136
+> g[c(8,17), c(17,8), directed=FALSE, multi=TRUE]
+[1] 136   0
+> 
+> ## Weighted graph, with symbolic names
+> g['a','b']
+[1] 2
+> g[c('a','a','g'), c('b','c','n')]
+[1]  2  3 98
+> g[c('a','a','g'), c('e','c','l')]
+[1] 0 3 0
+> g[c('a','a','a','a'), c('b','c','b','b')]
+[1] 2 3 2 2
+> g[c('a','a','a','a'), c('b','c','b','b'), multi=TRUE]
+[1] 2 3 0 0
+> g[c('h','q'), c('q','h')]
+[1] 136   0
+> g[c('h','q'), c('q','h'), directed=FALSE]
+[1] 136 136
+> g[c('h','q'), c('q','h'), directed=FALSE, multi=TRUE]
+[1] 136   0
+> 
+> ################################################################
+> 
+> ## Adjacent vertices
+> g[1, ]
+[1] 2 3
+> g[, 2]
+[1] 1
+> g[, 2, directed=FALSE]
+[1] 1 4 5
+> g[2, directed=FALSE]
+[1] 1 4 5
+> 
+> g[1:3, ]
+[1] 2 3 4 5 6 7
+> g[, 1:3]
+[1] 1
+> g[, 1:3, unique=FALSE]
+[1] 1 1
+> g[1:3, simplify=FALSE]
+[[1]]
+[1] 2 3
+
+[[2]]
+[1] 4 5
+
+[[3]]
+[1] 6 7
+
+> g[, 1:3, simplify=FALSE]
+[[1]]
+numeric(0)
+
+[[2]]
+[1] 1
+
+[[3]]
+[1] 1
+
+> 
+> # Same with vertex names
+> g['a', ]
+[1] 2 3
+> g[, 'b']
+[1] 1
+> g[, 'b', directed=FALSE]
+[1] 1 4 5
+> g['b', directed=FALSE]
+[1] 1 4 5
+> 
+> g[letters[1:3],]
+[1] 2 3 4 5 6 7
+> g[, letters[1:3]]
+[1] 1
+> g[, letters[1:3], unique=FALSE]
+[1] 1 1
+> g[letters[1:3], simplify=FALSE]
+[[1]]
+[1] 2 3
+
+[[2]]
+[1] 4 5
+
+[[3]]
+[1] 6 7
+
+> g[, letters[1:3], simplify=FALSE]
+[[1]]
+numeric(0)
+
+[[2]]
+[1] 1
+
+[[3]]
+[1] 1
+
+> 
+> ################################################################
+> 
+> # Incident vertices of some edges
+> get.edges(g, 1:3)
+     [,1] [,2]
+[1,]    1    2
+[2,]    1    3
+[3,]    2    4
+> g[edges=1:3]
+[1] 1 2 3 4
+> g[edges=1:3, simplify=FALSE]
+$`1`
+[1] 1 2
+
+$`2`
+[1] 1 3
+
+$`3`
+[1] 2 4
+
+> g[edges=1:3, unique=FALSE]
+[1] 1 2 1 3 2 4
+> 
+> # Same with edge names
+> E(g)$name <- LETTERS[1:ecount(g)]
+> g[edges=LETTERS[1:3]]
+[1] 1 2 3 4
+> g[edges=LETTERS[1:3], simplify=FALSE]
+$`1`
+[1] 1 2
+
+$`2`
+[1] 1 3
+
+$`3`
+[1] 2 4
+
+> g[edges=LETTERS[1:3], unique=FALSE]
+[1] 1 2 1 3 2 4
+> 
+> # Edge names based on vertex names
+> g[edges=c("a|b", "a|c", "b|d")]
+[1] 1 2 3 4
+> g[edges=c("a|b", "a|c", "b|d"), simplify=FALSE]
+$`1`
+[1] 1 2
+
+$`2`
+[1] 1 3
+
+$`3`
+[1] 2 4
+
+> g[edges=c("a|b", "a|c", "b|d"), unique=FALSE]
+[1] 1 2 1 3 2 4
+> 
+> ################################################################
+> 
+> ## Query edge ids
+> g[[1,2]]
+[1] 1
+> g[[c(1,1,7), c(2,3,14)]]
+[1]  1  2 13
+> g[[c(1,1,7), c(5,3,12)]]
+[1] NA  2 NA
+> g[[c(1,1,1,1), c(2,3,2,2)]]
+[1] 1 2 1 1
+> g[[c(1,1,1,1), c(2,3,2,2), multi=TRUE]]
+[1]  1  2 NA NA
+> g[[c(8,17), c(17,8)]]
+[1] 16 NA
+> g[[c(8,17), c(17,8), directed=FALSE]]
+[1] 16 16
+> g[[c(8,17), c(17,8), directed=FALSE, multi=TRUE]]
+[1] 16 NA
+> 
+> ## The same with symbolic names
+> g[['a','b']]
+[1] 1
+> g[[c('a','a','g'), c('b','c','n')]]
+[1]  1  2 13
+> g[[c('a','a','g'), c('e','c','l')]]
+[1] NA  2 NA
+> g[[c('a','a','a','a'), c('b','c','b','b')]]
+[1] 1 2 1 1
+> g[[c('a','a','a','a'), c('b','c','b','b'), multi=TRUE]]
+[1]  1  2 NA NA
+> g[[c('h','q'), c('q','h')]]
+[1] 16 NA
+> g[[c('h','q'), c('q','h'), directed=FALSE]]
+[1] 16 16
+> g[[c('h','q'), c('q','h'), directed=FALSE, multi=TRUE]]
+[1] 16 NA
+> 
+> ################################################################
+> 
+> ## Incident edges of vertices
+> g[[1, ]]
+[1] 1 2
+> g[[, 2]]
+[1] 1
+> g[[, 2, directed=FALSE]]
+[1] 3 4 1
+> g[[2, directed=FALSE]]
+[1] 3 4 1
+> 
+> g[[1:3, ]]
+[1] 1 2 3 4 5 6
+> g[[, 1:3]]
+[1] 1 2
+> g[[, 1:3, unique=FALSE]]
+[1] 1 2
+> g[[1:3, simplify=FALSE]]
+[[1]]
+[1] 1 2
+
+[[2]]
+[1] 3 4
+
+[[3]]
+[1] 5 6
+
+> g[[, 1:3, simplify=FALSE]]
+[[1]]
+numeric(0)
+
+[[2]]
+[1] 1
+
+[[3]]
+[1] 2
+
+> 
+> # Same with vertex names
+> g[['a', ]]
+[1] 1 2
+> g[[, 'b']]
+[1] 1
+> g[[, 'b', directed=FALSE]]
+[1] 3 4 1
+> g[['b', directed=FALSE]]
+[1] 3 4 1
+> 
+> g[[letters[1:3],]]
+[1] 1 2 3 4 5 6
+> g[[, letters[1:3]]]
+[1] 1 2
+> g[[, letters[1:3], unique=FALSE]]
+[1] 1 2
+> g[[letters[1:3], simplify=FALSE]]
+[[1]]
+[1] 1 2
+
+[[2]]
+[1] 3 4
+
+[[3]]
+[1] 5 6
+
+> g[[, letters[1:3], simplify=FALSE]]
+[[1]]
+numeric(0)
+
+[[2]]
+[1] 1
+
+[[3]]
+[1] 2
+
+> 
+> 
