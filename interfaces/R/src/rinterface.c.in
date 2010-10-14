@@ -7324,18 +7324,21 @@ SEXP R_igraph_cohesive_blocks(SEXP graph) {
   return(result);
 }
 
-SEXP R_igraph_get_eids_multi(SEXP graph, SEXP pvp, SEXP pdirected) {
+SEXP R_igraph_get_eids_multi(SEXP graph, SEXP pvp, SEXP pdirected,
+			     SEXP perror) {
   igraph_t g;
   igraph_vector_t vp;
   igraph_vector_t res;
   igraph_bool_t directed=LOGICAL(pdirected)[0];
+  igraph_bool_t error=LOGICAL(perror)[0];
   SEXP result;
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pvp, &vp);
   igraph_vector_init(&res, 0);
   
-  igraph_get_eids_multi(&g, &res, /*pairs=*/ &vp, /*path=*/ 0, directed);
+  igraph_get_eids_multi(&g, &res, /*pairs=*/ &vp, /*path=*/ 0, directed, 
+			error);
   
   PROTECT(result=R_igraph_vector_to_SEXP(&res));
   igraph_vector_destroy(&res);

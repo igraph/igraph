@@ -71,18 +71,15 @@ int igraph_edges(const igraph_t *graph, igraph_es_t eids,
 		 igraph_vector_t *edges);
 int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
 		   igraph_integer_t from, igraph_integer_t to,
-		   igraph_bool_t directed);
-int igraph_get_eid2(const igraph_t *graph, igraph_integer_t *eid,
-		   igraph_integer_t pfrom, igraph_integer_t pto,
-		    igraph_bool_t directed);
+		   igraph_bool_t directed, igraph_bool_t error);
 int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
                     const igraph_vector_t *pairs,
-					const igraph_vector_t *path,
-					igraph_bool_t directed);
+		    const igraph_vector_t *path,
+		    igraph_bool_t directed, igraph_bool_t error);
 int igraph_get_eids_multi(const igraph_t *graph, igraph_vector_t *eids,
 			  const igraph_vector_t *pairs, 
 			  const igraph_vector_t *path,
-			  igraph_bool_t directed);
+			  igraph_bool_t directed, igraph_bool_t error);
 int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t vid,
 		    igraph_neimode_t mode);          /* deprecated */
 int igraph_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t vid,
