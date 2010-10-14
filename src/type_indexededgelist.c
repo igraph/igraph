@@ -1074,7 +1074,7 @@ int igraph_edges(const igraph_t *graph, igraph_es_t eids,
  * \param directed Logical constant, whether to search for directed
  *        edges in a directed graph. Ignored for undirected graphs.
  * \param error Logical scalar, whether to report an error if the edge 
- *        was not found. If it is false, then \c IGRAPH_NAN is reported.
+ *        was not found. If it is false, then -1 is reported.
  * \return Error code. 
  * \sa \ref igraph_edge() for the opposite operation.
  * 
@@ -1117,8 +1117,6 @@ int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
   if (*eid < 0) {
     if (error) {
       IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
-    } else {
-      *eid = IGRAPH_NAN;
     }
   }
   
@@ -1154,12 +1152,9 @@ int igraph_get_eids_pairs(const igraph_t *graph, igraph_vector_t *eids,
 	FIND_DIRECTED_EDGE(graph,to,from,&eid);
       }
       
-      if (eid >= 0) {
-	VECTOR(*eids)[i]=eid;
-      } else if (error) {
+      VECTOR(*eids)[i]=eid;
+      if (eid < 0 && error) {
 	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
-      } else {
-	VECTOR(*eids)[i]=IGRAPH_NAN;
       }
     }
   } else {
@@ -1169,12 +1164,9 @@ int igraph_get_eids_pairs(const igraph_t *graph, igraph_vector_t *eids,
 
       eid=-1;
       FIND_UNDIRECTED_EDGE(graph,from,to,&eid);
-      if (eid >= 0) {
-	VECTOR(*eids)[i]=eid;
-      } else if (error) {
+      VECTOR(*eids)[i]=eid;
+      if (eid < 0 && error) {
 	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
-      } else {
-	VECTOR(*eids)[i]=IGRAPH_NAN;
       }
     }
   }
@@ -1208,12 +1200,9 @@ int igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids,
 	FIND_DIRECTED_EDGE(graph, to, from, &eid);
       }
       
-      if (eid >= 0) {
-	VECTOR(*eids)[i]=eid;
-      } else if (error) {
+      VECTOR(*eids)[i]=eid;
+      if (eid < 0 && error) {
 	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
-      } else {
-	VECTOR(*eids)[i]=IGRAPH_NAN;
       }
     }
   } else {
@@ -1223,12 +1212,9 @@ int igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids,
       
       eid=-1;
       FIND_UNDIRECTED_EDGE(graph, from, to, &eid);
-      if (eid >= 0) {
-	VECTOR(*eids)[i]=eid;
-      } else if (error) {
+      VECTOR(*eids)[i]=eid;
+      if (eid < 0 && error) {
 	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
-      } else {
-	VECTOR(*eids)[i]=IGRAPH_NAN;
       }
     }
   }
@@ -1261,7 +1247,7 @@ int igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids,
  * 
  * </para><para>
  * If the \c error argument is true, then it is an error to give pairs
- * of vertices that are not connected. Otherwise \c IGRAPH_NAN is
+ * of vertices that are not connected. Otherwise -1 is
  * reported for not connected vertices.
  * 
  * </para><para>
@@ -1280,7 +1266,7 @@ int igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids,
  * \param directed Logical scalar, whether to consider edge directions
  *        in directed graphs. This is ignored for undirected graphs.
  * \param error Logical scalar, whether it is an error to supply
- *        non-connected vertices. If false, then \c IGRAPH_NAN is
+ *        non-connected vertices. If false, then -1 is
  *        returned for non-connected pairs.
  * \return Error code.
  * 
@@ -1403,13 +1389,11 @@ int igraph_get_eids_multipairs(const igraph_t *graph, igraph_vector_t *eids,
 	FIND_DIRECTED_EDGE(graph,to,from,&eid,seen);
       }
       
+      VECTOR(*eids)[i]=eid;
       if (eid >= 0) {
-	VECTOR(*eids)[i]=eid;
 	seen[(long int)(eid)]=1;
       } else if (error) {
 	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
-      } else {
-	VECTOR(*eids)[i]=IGRAPH_NAN;
       }
     }
   } else {
@@ -1419,13 +1403,11 @@ int igraph_get_eids_multipairs(const igraph_t *graph, igraph_vector_t *eids,
 
       eid=-1;
       FIND_UNDIRECTED_EDGE(graph,from,to,&eid,seen);
+      VECTOR(*eids)[i]=eid;
       if (eid >= 0) {
-	VECTOR(*eids)[i]=eid;
 	seen[(long int)(eid)]=1;
       } else if (error) {
 	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
-      } else {
-	VECTOR(*eids)[i]=IGRAPH_NAN;
       }
     }
   }
@@ -1468,13 +1450,11 @@ int igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t *eids,
 	FIND_DIRECTED_EDGE(graph, to, from, &eid, seen);
       }
       
+      VECTOR(*eids)[i]=eid;
       if (eid >= 0) {
-	VECTOR(*eids)[i]=eid;
 	seen[(long int)(eid)]=1;
       } else if (error) {
 	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
-      } else {
-	VECTOR(*eids)[i]=IGRAPH_NAN;
       }
     }
   } else {
@@ -1484,13 +1464,11 @@ int igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t *eids,
       
       eid=-1;
       FIND_UNDIRECTED_EDGE(graph, from, to, &eid, seen);
+      VECTOR(*eids)[i]=eid;
       if (eid >= 0) {
-	VECTOR(*eids)[i]=eid;
 	seen[(long int)(eid)]=1;
       } else if (error) {
 	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
-      } else { 
-	VECTOR(*eids)[i]=IGRAPH_NAN;
       }
     }
   }
@@ -1524,7 +1502,7 @@ int igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t *eids,
  * 
  * </para><para>
  * If the \c error argument is true, then is an error to give pairs of
- * vertices that are not connected. Otherwise \c IGRAPH_NAN is
+ * vertices that are not connected. Otherwise -1 is
  * returned for not connected vertex pairs.
  *
  * </para><para>
@@ -1545,8 +1523,8 @@ int igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t *eids,
  * \param directed Logical scalar, whether to consider edge directions
  *        in directed graphs. This is ignored for undirected graphs.
  * \param error Logical scalar, whether to report an error if
- *        non-connected vertices are specified. If false, then \c
- *        IGRAPH_NAN is returned for non-connected vertex pairs.
+ *        non-connected vertices are specified. If false, then -1
+ *        is returned for non-connected vertex pairs.
  * \return Error code.
  * 
  * Time complexity: O(|E|+n log(d)), where |E| is the number of edges
