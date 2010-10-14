@@ -6,6 +6,11 @@ importFrom(stats, as.dendrogram)
 export(add.vertices, delete.edges,
        delete.vertices, ecount, neighbors, get.edges, get.edge.ids)
 
+export("[.igraph", "[[.igraph")
+
+S3method("[", "igraph")
+S3method("[[", "igraph")
+
 # Attributes
 
 export(get.graph.attribute, set.graph.attribute,

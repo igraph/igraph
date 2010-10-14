@@ -47,9 +47,13 @@ add.edges <- function(graph, edges, ..., attr=list()) {
   } else {
     idx <- numeric()
   }
+
+  oclass <- class(graph)
+  graph <- unclass(graph)
   for (i in seq(attrs)) {
     graph[[9]][[4]][[nam[i]]][idx] <- attrs[[nam[i]]]
   }  
+  class(graph) <- oclass
   
   graph
 }
@@ -77,9 +81,13 @@ add.vertices <- function(graph, nv, ..., attr=list()) {
   } else {
     idx <- numeric()
   }
+
+  oclass <- class(graph)
+  graph <- unclass(graph)
   for (i in seq(attrs)) {
     graph[[9]][[3]][[nam[i]]][idx] <- attrs[[nam[i]]]
   }
+  class(graph) <- oclass
                   
   graph
 }
