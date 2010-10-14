@@ -156,11 +156,12 @@ get.edges <- function(graph, es) {
   matrix(res, nc=2, byrow=TRUE)+1
 }
 
-get.edge.ids <- function(graph, vp, directed=TRUE, error=FALSE) {
+get.edge.ids <- function(graph, vp, directed=TRUE, error=FALSE, multi=FALSE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_get_eids_multi", graph, as.igraph.vs(graph, vp)-1,
-        as.logical(directed), as.logical(error), PACKAGE="igraph")+1
+  .Call("R_igraph_get_eids", graph, as.igraph.vs(graph, vp)-1,
+        as.logical(directed), as.logical(error), as.logical(multi),
+        PACKAGE="igraph")+1
 }  
