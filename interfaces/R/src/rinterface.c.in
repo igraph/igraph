@@ -2463,6 +2463,28 @@ SEXP R_igraph_neighbors(SEXP graph, SEXP pvid, SEXP pmode) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_incident(SEXP graph, SEXP pvid, SEXP pmode) {
+  
+  igraph_t g;
+  igraph_vector_t neis;
+  SEXP result;
+  igraph_real_t vid;
+  igraph_integer_t mode;
+  
+  igraph_vector_init(&neis, 0);
+  vid=REAL(pvid)[0];
+  mode=REAL(pmode)[0];
+  R_SEXP_to_igraph(graph, &g);
+  igraph_incident(&g, &neis, vid, mode);
+  
+  PROTECT(result=NEW_NUMERIC(igraph_vector_size(&neis)));
+  igraph_vector_copy_to(&neis, REAL(result));
+  igraph_vector_destroy(&neis);
+
+  UNPROTECT(1);
+  return result;
+}
   
 SEXP R_igraph_delete_edges(SEXP graph, SEXP edges) {
   

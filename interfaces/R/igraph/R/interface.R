@@ -137,6 +137,20 @@ neighbors <- function(graph, v, mode=1) {
   res+1
 }
 
+incident <- function(graph, v, mode=c("all", "out", "in", "total")) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  if (is.character(mode)) {
+    mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
+  }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  res <- .Call("R_igraph_incident", graph, as.igraph.vs(graph, v)-1,
+               as.numeric(mode),
+               PACKAGE="igraph")
+  res+1
+}  
+
 is.directed <- function(graph) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
