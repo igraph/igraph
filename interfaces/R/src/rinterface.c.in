@@ -5451,7 +5451,7 @@ SEXP R_igraph_es_adj(SEXP graph, SEXP x, SEXP pv, SEXP pmode) {
   memset(LOGICAL(result), 0, sizeof(LOGICAL(result)[0])*igraph_ecount(&g));
   
   while (!IGRAPH_VIT_END(vv)) {
-    igraph_adjacent(&g, &adje, IGRAPH_VIT_GET(vv), mode);
+    igraph_incident(&g, &adje, IGRAPH_VIT_GET(vv), mode);
     for (i=0; i<igraph_vector_size(&adje); i++) {
       long int edge=VECTOR(adje)[i];
       LOGICAL(result)[edge]=1;
@@ -6835,7 +6835,7 @@ SEXP R_igraph_get_adjedgelist(SEXP graph, SEXP pmode) {
   igraph_vector_init(&neis, 0);
   PROTECT(result=NEW_LIST(no_of_nodes));
   for (i=0; i<no_of_nodes; i++) {
-    igraph_adjacent(&g, &neis, i, mode);
+    igraph_incident(&g, &neis, i, mode);
     SET_VECTOR_ELT(result, i, R_igraph_vector_to_SEXP(&neis));
   }
   igraph_vector_destroy(&neis);
