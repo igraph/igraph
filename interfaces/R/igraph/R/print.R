@@ -138,7 +138,7 @@ print.igraph <- function(x,
                    is.character(get.edge.attribute(x,v)) |
                    is.logical(get.edge.attribute(x, v))))) {
       ## create a table
-      tab <- data.frame(e=paste(sep="", "[", ename, "]"), row.names="e")
+      tab <- data.frame(row.names=paste(sep="", "[", ename, "]"))
       if (is.numeric(el)) { w <- nchar(max(el)) } else { w <- max(nchar(el)) }
       tab[" "] <- paste(format(el[,1], width=w), arrow, format(el[,2], width=w))
       for (i in list) {
