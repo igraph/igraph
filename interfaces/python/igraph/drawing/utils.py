@@ -200,6 +200,7 @@ class Point(tuple):
     def __mul__(self, scalar):
         """Multiplies the coordinates by a scalar"""
         return self.__class__(x = self.x * scalar, y = self.y * scalar)
+    __rmul__ = __mul__
 
     def __div__(self, scalar):
         """Divides the coordinates by a scalar"""
@@ -221,6 +222,14 @@ class Point(tuple):
         """Returns the length of the vector pointing from the origin to this
         point."""
         return (self.x ** 2 + self.y ** 2) ** 0.5
+
+    def normalized(self):
+        """Normalizes the coordinates of the point s.t. its length will be 1
+        after normalization. Returns the normalized point."""
+        len = self.length()
+        if len == 0:
+            return Point(x = self.x, y = self.y)
+        return Point(x = self.x / len, y = self.y / len)
 
     def sq_length(self):
         """Returns the squared length of the vector pointing from the origin

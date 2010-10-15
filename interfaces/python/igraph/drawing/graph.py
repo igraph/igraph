@@ -229,11 +229,18 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
                 # Construct the polygon
                 polygon = [layout[idx] for idx in hull]
 
-                # Expand the polygon around its center of mass
-                center_of_mass = Point(*[sum(coords) / float(len(coords))
-                                  for coords in zip(*polygon)])
-                polygon = [Point(*point).towards(center_of_mass, -corner_radius)
-                           for point in polygon]
+                if len(polygon) == 2:
+                    # Expand the polygon (which is a flat line otherwise)
+                    a, b = Point(*polygon[0]), Point(*polygon[1])
+                    c = corner_radius * (a-b).normalized()
+                    n = Point(-c[1], c[0])
+                    polygon = [a + n, b + n, b - c, b - n, a - n, a + c]
+                else:
+                    # Expand the polygon around its center of mass
+                    center = Point(*[sum(coords) / float(len(coords))
+                                      for coords in zip(*polygon)])
+                    polygon = [Point(*point).towards(center, -corner_radius)
+                               for point in polygon]
 
                 # Draw the hull
                 context.set_source_rgba(color[0], color[1], color[2],
