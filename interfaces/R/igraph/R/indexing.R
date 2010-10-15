@@ -96,3 +96,49 @@
   }
   res
 }
+
+`[<-.igraph` <- function(x, i, j, ..., add=FALSE, value) {
+
+  if (!is.null(value) && !is.numeric(value) && !is.logical(value)) {
+    stop("The new value should be NULL, numeric or logical")
+  }
+  if (is.logical(value) && length(value) != 1) {
+    stop("If new value if logical, then it should be of length 1")
+  }
+  if (is.logical(value) && is.na(value)) {
+    stop("Logical value cannot be NA")
+  }
+  
+  if (is.null(value) || (is.logical(value) && !value)) {
+    ## Deletion, get the edges to be deleted
+    todel <- x[[i, j, ...]]
+    x <- delete.edges(x, todel)
+  } else {
+    ## Not deletion, can be addition or update or mixed
+    add <- add | ! x[i,j,...]
+    if (any(add)) {
+      if (is.logical(value)) {
+        ## Not weighted
+        toadd <- as.igraph.vs(x, as.vector(rbind(i[add],j[add])))
+        x <- add.edges(x, toadd)
+      } else {
+        ## Weighted
+        if (length(value) != 1 && length(value) != length(i)) {
+          stop("Invalid 'value' length, should be 1 or the same as the ",
+               "number of edges")
+        }
+        if (! "weight" %in% list.edge.attributes(x)) {
+          x <- set.edge.attribute(x, "weight", value=NA)
+        }
+        toadd <- as.igraph.vs(x, as.vector(rbind(i[add],j[add])))
+        x <- add.edges(x, toadd, weight=value)
+      }
+    }
+    if (any(!add) && is.numeric(value)) {
+      ## Update weights
+      toupd <- x[[i[!add],j[!add],...]]
+      x <- set.edge.attribute(x, "weight", toupd, value[!add])
+    }
+  }
+  x
+}
