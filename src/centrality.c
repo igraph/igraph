@@ -1389,6 +1389,8 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
   }
   
   for (source=0; source<no_of_nodes; source++) {
+    IGRAPH_PROGRESS("Betweenness centrality: ", 100.0*source/no_of_nodes, 0);
+    IGRAPH_ALLOW_INTERRUPTION();
 
     igraph_2wheap_push_with_index(&Q, source, 0);
     VECTOR(dist)[source]=1.0;
@@ -1479,6 +1481,8 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
     }
   }
   
+  IGRAPH_PROGRESS("Betweenness centrality: ", 100.0, 0);
+
   igraph_vector_destroy(&nrgeo);
   igraph_vector_destroy(&tmpscore);
   igraph_vector_destroy(&dist);
