@@ -125,13 +125,15 @@
     \item{shape}{The shape of the vertex, currently
       \dQuote{\code{circle}}, \dQuote{\code{square}},
       \dQuote{\code{csquare}}, \dQuote{\code{rectangle}},
-      \dQuote{\code{crectangle}}, \dQuote{\code{vrectangle}} and
+      \dQuote{\code{crectangle}}, \dQuote{\code{vrectangle}},
+      \dQuote{\code{\link[=vertex.shape.pie]{pie}}} and
       \dQuote{\code{none}} are supported,
       and only by the \code{\link{plot.igraph}}
       command. \dQuote{\code{none}} does not draw the vertices at all,
       although vertex label are plotted (if given). See
       \code{\link{igraph.vertex.shapes}} for details about vertex
-      shapes.
+      shapes and \code{\link{vertex.shape.pie}} for using pie charts as
+      vertices.
 
       By default vertices are drawn as circles.
     }
