@@ -134,11 +134,15 @@ int igraph_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
 
 int igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *res);
 
+typedef enum { IGRAPH_SPARSEMAT_SOLVE_LU,
+	       IGRAPH_SPARSEMAT_SOLVE_QR } igraph_sparsemat_solve_t;
+
 int igraph_sparsemat_arpack_rssolve(const igraph_sparsemat_t *A,
 				    igraph_arpack_options_t *options,
 				    igraph_arpack_storage_t *storage,
 				    igraph_vector_t *values,
-				    igraph_matrix_t *vectors);
+				    igraph_matrix_t *vectors, 
+				    igraph_sparsemat_solve_t solvemethod);
 
 int igraph_sparsemat_arpack_rnsolve(const igraph_sparsemat_t *A,
 				    igraph_arpack_options_t *options,
@@ -153,7 +157,17 @@ int igraph_sparsemat_lu(const igraph_sparsemat_t *A,
 			const igraph_sparsemat_symbolic_t *dis, 
 			igraph_sparsemat_numeric_t *din, double tol);
 
+int igraph_sparsemat_qr(const igraph_sparsemat_t *A,
+			const igraph_sparsemat_symbolic_t *dis,
+			igraph_sparsemat_numeric_t *din);
+
 int igraph_sparsemat_luresol(const igraph_sparsemat_symbolic_t *dis,
+			     const igraph_sparsemat_numeric_t *din, 
+			     const igraph_vector_t *b,
+			     igraph_vector_t *res,
+			     igraph_real_t tol);
+
+int igraph_sparsemat_qrresol(const igraph_sparsemat_symbolic_t *dis,
 			     const igraph_sparsemat_numeric_t *din, 
 			     const igraph_vector_t *b,
 			     igraph_vector_t *res,
