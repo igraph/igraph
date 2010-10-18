@@ -17,17 +17,10 @@ Type 'q()' to quit R.
 
 > 
 > library(igraph)
+> library(graph, warn.conflicts=FALSE)
 > 
 > g <- erdos.renyi.game(100, 5/100)
 > N <- igraph.to.graphNEL(g)
-Loading required package: graph
-
-Attaching package: 'graph'
-
-The following object(s) are masked from 'package:igraph':
-
-    degree
-
 > g2 <- igraph.from.graphNEL(N)
 > graph.isomorphic.vf2(g, g2)
 $iso

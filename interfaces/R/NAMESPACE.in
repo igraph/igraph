@@ -12,9 +12,11 @@ S3method("[", "igraph")
 S3method("[[", "igraph")
 S3method("[<-", "igraph")
 
-export(edge, edges, vertex, vertices, path, edgelist, adjacency, "+.igraph")
+export(edge, edges, vertex, vertices, path,
+       "+.igraph", "-.igraph")
 
 S3method("+", "igraph")
+S3method("-", "igraph")
 
 # Attributes
 

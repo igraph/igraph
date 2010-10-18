@@ -198,3 +198,27 @@ path <- function(...) {
   }
   res
 }
+
+`-.igraph` <- function(e1, e2) {
+  if (is.igraph(e2)) {
+    res <- graph.difference(e1, e2)
+  } else if ("igraph.vertex" %in% class(e2)) {
+    res <- delete.vertices(e1, unlist(e2, recursive=FALSE))
+  } else if ("igraph.edge" %in% class(e2)) {
+    res <- delete.edges(e1, unlist(e2, recursive=FALSE))
+  } else if ("igraph.path" %in% class(e2)) {
+    todel <- unlist(e2, recursive=FALSE)
+    lt <- length(todel)
+    if (lt >= 2) {
+      todel <- paste(todel[-lt], todel[-1], sep="|")
+      res <- delete.edges(e1, todel)
+    } else {
+      res <- e1
+    }
+  } else if (is.numeric(e2) || is.character(e2)) {
+    res <- delete.vertices(e1, e2)
+  } else {
+    stop("Cannot substract unknown type from igraph graph")
+  }
+  res
+}
