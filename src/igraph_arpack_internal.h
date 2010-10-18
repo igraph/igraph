@@ -157,4 +157,6 @@ int igraphdneupd_(int *rvec, char *howmny, int *select,
 		  igraph_real_t *workd, igraph_real_t *workl,
 		  int *lworkl, int *info);
 
+int igraphdsortr_(char *which, int *apply, int* n, igraph_real_t *x1,
+		  igraph_real_t *x2);
 #endif

@@ -41,8 +41,8 @@ for (i in 1:10000) {
 for (i in 1:10000) {
   M <- matrix(sample(0:1, 100, replace=TRUE, prob=c(8,2)), 10)
   M <- M+t(M)
-  res <- arp(M, nev=1, ncv=4)
-  w <- which.max(abs(res$values))
+  res <- arp(M, nev=2, ncv=4, maxiter=10000)
+  w <- 1
   if (residual(M, res$vectors[,w], res$values[w]) > 1e-12) {
     print("Gebasz!" ); break;
   }
@@ -54,8 +54,8 @@ for (i in 1:10000) {
 for (i in 1:10000) {
   M <- matrix(sample(0:1, 100, replace=TRUE, prob=c(14,1)), 10)
   M <- M+t(M)
-  res <- arp(M, nev=1, ncv=5, maxiter=1e7)
-  w <- which.max(abs(res$values))
+  res <- arp(M, nev=2, ncv=5, maxiter=1e7)
+  w <- 1
   if (residual(M, res$vectors[,w], res$values[w]) > 1e-12) {
     print("Gebasz!" ); break;
   }

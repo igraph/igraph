@@ -297,7 +297,9 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   int origldv=options->ldv, origlworkl=options->lworkl;
   char origwhich[2]={ options->which[0], options->which[1] };
   igraph_real_t origtol=options->tol;
-  
+
+  igraph_vector_t order;
+
   /* Brush up options if needed */
   if (options->ldv == 0) { options->ldv=options->n; }
   if (options->lworkl == 0) { options->lworkl=options->ncv*(options->ncv+8); }
@@ -403,6 +405,31 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   options->numopb=options->iparam[9];
   options->numreo=options->iparam[10];
 
+  /* Sort the eigenvalues/vectors */
+
+#define which(a,b) (options->which[0]==a && options->which[1]==b)
+
+  if (values || vectors) {
+    int apply=1;
+    char sort[2];
+    if (which('L','A')) {
+      sort[0]='S'; sort[1]='A';
+    } else if (which('S','A')) {
+      sort[0]='L'; sort[1]='A';
+    } else if (which('L','M')) {
+      sort[0]='S'; sort[1]='M';
+    } else if (which('S','M')) {
+      sort[0]='L'; sort[1]='M';
+    } else if (which('B','E')) {
+      sort[0]='S'; sort[1]='M';
+    }
+    IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, options->nev-1));
+    IGRAPH_FINALLY(igraph_vector_destroy, &order);
+    igraphdsortr_(sort, &apply, &options->nev, d, VECTOR(order));
+  }
+
+#undef which
+
   if (values) {
     int i;
     IGRAPH_CHECK(igraph_vector_resize(values, options->nev));
@@ -415,10 +442,16 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     int i, j, ptr=0;
     IGRAPH_CHECK(igraph_matrix_resize(vectors, options->n, options->nev));
     for (j=0; j<options->nev; j++) {
+      long int idx=VECTOR(order)[j];
       for (i=0; i<options->n; i++) {
-	MATRIX(*vectors, i, j) = v[ptr++];
+	MATRIX(*vectors, i, idx) = v[ptr++];
       }
     }
+  }
+
+  if (values || vectors) {
+    igraph_vector_destroy(&order);
+    IGRAPH_FINALLY_CLEAN(1);
   }
 
   options->ldv=origldv;
