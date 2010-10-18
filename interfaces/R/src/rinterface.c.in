@@ -7575,7 +7575,7 @@ typedef struct R_igraph_i_arpack_data_t {
 } R_igraph_i_arpack_data_t;
 
 int R_igraph_i_arpack_callback(igraph_real_t *to, const igraph_real_t *from,
-			       long int n, void *extra) {
+			       int n, void *extra) {
   SEXP s_from, s_to;
   SEXP R_fcall;
   R_igraph_i_arpack_data_t *data=extra;
