@@ -302,7 +302,8 @@ int igraph_sparsemat_transpose(const igraph_sparsemat_t *A,
 int igraph_sparsemat_dupl(igraph_sparsemat_t *A) {
 
   if (!cs_dupl(A->cs)) {
-    IGRAPH_ERROR("Cannot transpose sparse matrix", IGRAPH_FAILURE);
+    IGRAPH_ERROR("Cannot remove duplicates from sparse matrix", 
+		 IGRAPH_FAILURE);
   }
   
   return 0;
@@ -975,3 +976,83 @@ void igraph_sparsemat_numeric_destroy(igraph_sparsemat_numeric_t *din) {
   din->numeric=0;
 }
 
+int igraph_matrix_as_sparsemat(igraph_sparsemat_t *res,
+			       const igraph_matrix_t *mat,
+			       igraph_real_t tol) {
+  int nrow=igraph_matrix_nrow(mat);
+  int ncol=igraph_matrix_ncol(mat);
+  int i, j, nzmax=0;
+
+  for (i=0; i<nrow; i++) {
+    for (j=0; j<nrow; j++) {
+      if (fabs(MATRIX(*mat, i, j)) > tol) { nzmax++; }
+    }
+  }
+  
+  IGRAPH_CHECK(igraph_sparsemat_init(res, nrow, ncol, nzmax));
+  
+  for (i=0; i<nrow; i++) {
+    for (j=0; j<ncol; j++) {
+      if (fabs(MATRIX(*mat, i, j)) > tol) {
+	IGRAPH_CHECK(igraph_sparsemat_entry(res, i, j, MATRIX(*mat, i, j)));
+      }
+    }
+  }
+
+  return 0;
+}
+
+int igraph_i_sparsemat_as_matrix_cc(igraph_matrix_t *res,
+				    const igraph_sparsemat_t *spmat) {
+
+  int nrow=igraph_sparsemat_nrow(spmat);
+  int ncol=igraph_sparsemat_ncol(spmat);
+  int *p=spmat->cs->p;
+  int *i=spmat->cs->i;
+  igraph_real_t *x=spmat->cs->x;
+  int nzmax=spmat->cs->nzmax;
+  int from=0, to=0;
+
+  IGRAPH_CHECK(igraph_matrix_init(res, nrow, ncol));
+  
+  while (*p < nzmax) {
+    while (to < *(p+1)) {
+      MATRIX(*res, *i, from) += *x;
+      to++;
+      i++;
+      x++;
+    }
+    from++;
+    p++;
+  }
+
+  return 0;
+}
+
+int igraph_i_sparsemat_as_matrix_triplet(igraph_matrix_t *res,
+					 const igraph_sparsemat_t *spmat) {
+  int nrow=igraph_sparsemat_nrow(spmat);
+  int ncol=igraph_sparsemat_ncol(spmat);
+  int *i=spmat->cs->p;
+  int *j=spmat->cs->i;
+  igraph_real_t *x=spmat->cs->x;
+  int nz=spmat->cs->nz;
+  int e;
+  
+  IGRAPH_CHECK(igraph_matrix_init(res, nrow, ncol));
+
+  for (e=0; e<nz; e++, i++, j++, x++) {
+    MATRIX(*res, *j, *i) = *x;
+  }
+
+  return 0;
+}
+
+int igraph_sparsemat_as_matrix(igraph_matrix_t *res,
+			       const igraph_sparsemat_t *spmat) {
+  if (spmat->cs->nz < 0) {
+    return(igraph_i_sparsemat_as_matrix_cc(res, spmat));
+  } else {
+    return(igraph_i_sparsemat_as_matrix_triplet(res, spmat));
+  }
+}
