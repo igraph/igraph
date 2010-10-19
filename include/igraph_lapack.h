@@ -47,6 +47,17 @@ int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
 int igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
 			igraph_matrix_t *b, int *info);
 
+typedef enum { IGRAPH_LAPACK_DSYEV_ALL,
+	       IGRAPH_LAPACK_DSYEV_INTERVAL,
+	       IGRAPH_LAPACK_DSYEV_SELECT } igraph_lapack_dsyev_which_t;
+
+int igraph_lapack_dsyevr(igraph_matrix_t *A, 
+			 igraph_lapack_dsyev_which_t which,
+			 igraph_real_t vl, igraph_real_t vu, int vestimate, 
+			 int il, int iu, igraph_real_t abstol,
+			 igraph_vector_t *values, igraph_matrix_t *vectors,
+			 igraph_vector_int_t *support);
+
 __END_DECLS
 
 #endif

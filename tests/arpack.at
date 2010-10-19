@@ -27,6 +27,11 @@ AT_COMPILE_CHECK([simple/blas.c],
                  [simple/blas.out])
 AT_CLEANUP
 
+AT_SETUP([Dense symmetric eigenvalues and eigenvectors (igraph_lapack_dsyevr):])
+AT_KEYWORDS([lapack LAPACK dsyevr eigenvalue eigenvector dense])
+AT_COMPILE_CHECK([simple/igraph_lapack_dsyevr.c])
+AT_CLEANUP
+
 AT_SETUP([Solving linear systems with LU factorization (igraph_lapack_dgesv):])
 AT_KEYWORDS([lapack LAPACK dgesv solve LU factorization])
 AT_COMPILE_CHECK([simple/igraph_lapack_dgesv.c],

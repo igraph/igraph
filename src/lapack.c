@@ -210,3 +210,112 @@ int igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
   
   return 0;
 }
+
+int igraph_lapack_dsyevr(igraph_matrix_t *A, 
+			 igraph_lapack_dsyev_which_t which,
+			 igraph_real_t vl, igraph_real_t vu, int vestimate, 
+			 int il, int iu, igraph_real_t abstol,
+			 igraph_vector_t *values, igraph_matrix_t *vectors,
+			 igraph_vector_int_t *support) {
+
+  igraph_matrix_t Acopy;
+  char jobz = vectors ? 'V' : 'N', range, uplo='U';
+  int n=igraph_matrix_nrow(A), lda=n, ldz=n;
+  int m, info; 
+  igraph_vector_t *myvalues=values, vvalues;
+  igraph_vector_int_t *mysupport=support, vsupport;
+  igraph_vector_t work;
+  igraph_vector_int_t iwork;
+  int lwork=-1, liwork=-1;
+
+  if (n != igraph_matrix_ncol(A)) {
+    IGRAPH_ERROR("Cannot find eigenvalues/vectors", IGRAPH_NONSQUARE);
+  }
+  if (which==IGRAPH_LAPACK_DSYEV_INTERVAL && 
+      (vestimate < 1 || vestimate > n)) {
+    IGRAPH_ERROR("Estimated (upper bound) number of eigenvalues must be "
+		 "between 1 and n", IGRAPH_EINVAL);
+  }
+  if (which==IGRAPH_LAPACK_DSYEV_SELECT && iu-il < 0) {
+    IGRAPH_ERROR("Invalied 'il' and/or 'iu' values", IGRAPH_EINVAL);
+  }
+
+  IGRAPH_CHECK(igraph_matrix_copy(&Acopy, A));
+  IGRAPH_FINALLY(igraph_matrix_destroy, &Acopy);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&work, 1);
+  IGRAPH_CHECK(igraph_vector_int_init(&iwork, 1));
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &iwork);
+
+  if (!values) {
+    IGRAPH_VECTOR_INIT_FINALLY(&vvalues, 0);
+    myvalues=&vvalues;
+  }
+  if (!support) {
+    IGRAPH_CHECK(igraph_vector_int_init(&vsupport, 0));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &vsupport);
+    mysupport=&vsupport;
+  }
+  
+  switch (which) {
+  case IGRAPH_LAPACK_DSYEV_ALL:
+    range = 'A';
+    IGRAPH_CHECK(igraph_vector_resize(myvalues, n));
+    IGRAPH_CHECK(igraph_vector_int_resize(mysupport, 2*n));
+    if (vectors) { IGRAPH_CHECK(igraph_matrix_resize(vectors, n, n)); }
+    break;
+  case IGRAPH_LAPACK_DSYEV_INTERVAL:
+    range = 'V';
+    IGRAPH_CHECK(igraph_vector_resize(myvalues, vestimate));
+    IGRAPH_CHECK(igraph_vector_int_resize(mysupport, 2*vestimate));
+    if (vectors) { IGRAPH_CHECK(igraph_matrix_resize(vectors,n, vestimate)); }
+   break;
+  case IGRAPH_LAPACK_DSYEV_SELECT:
+    range = 'I';
+    IGRAPH_CHECK(igraph_vector_resize(myvalues, iu-il+1));
+    IGRAPH_CHECK(igraph_vector_int_resize(mysupport, 2*(iu-il+1)));
+    if (vectors) { IGRAPH_CHECK(igraph_matrix_resize(vectors, n, iu-il+1)); }
+    break;
+  }
+  
+  igraphdsyevr_(&jobz, &range, &uplo, &n, &MATRIX(Acopy,0,0), &lda,
+		&vl, &vu, &il, &iu, &abstol, &m, VECTOR(*myvalues), 
+		vectors ? &MATRIX(*vectors,0,0) : 0, &ldz, VECTOR(*mysupport),
+		VECTOR(work), &lwork, VECTOR(iwork), &liwork, &info);
+  
+  lwork=VECTOR(work)[0];
+  liwork=VECTOR(iwork)[0];
+  IGRAPH_CHECK(igraph_vector_resize(&work, lwork));
+  IGRAPH_CHECK(igraph_vector_int_resize(&iwork, liwork));
+
+  igraphdsyevr_(&jobz, &range, &uplo, &n, &MATRIX(Acopy,0,0), &lda,
+		&vl, &vu, &il, &iu, &abstol, &m, VECTOR(*myvalues), 
+		vectors ? &MATRIX(*vectors,0,0) : 0, &ldz, VECTOR(*mysupport),
+		VECTOR(work), &lwork, VECTOR(iwork), &liwork, &info);
+
+  if (values) { 
+    IGRAPH_CHECK(igraph_vector_resize(values, m));
+  }
+  if (vectors) { 
+    IGRAPH_CHECK(igraph_matrix_resize(vectors, n, m));
+  }
+  if (support) {
+    IGRAPH_CHECK(igraph_vector_int_resize(support, m));
+  }
+
+  if (!support) {
+    igraph_vector_int_destroy(&vsupport);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  if (!values) {
+    igraph_vector_destroy(&vvalues);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  igraph_vector_int_destroy(&iwork);
+  igraph_vector_destroy(&work);
+  igraph_matrix_destroy(&Acopy);
+  IGRAPH_FINALLY_CLEAN(3);
+  
+  return 0;
+}
