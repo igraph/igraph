@@ -9,9 +9,11 @@ This module contains routines to draw graphs on:
 It also contains routines to send an igraph graph directly to Cytoscape
 (L{http://www.cytoscape.org}) using the CytoscapeRPC plugin
 (L{http://gforge.nbic.nl/projects/cytoscaperpc/}), see
-L{CytoscapeGraphDrawer}.
+L{CytoscapeGraphDrawer}. L{CytoscapeGraphDrawer} can also fetch the current
+network from Cytoscape and convert it to igraph format.
 """
 
+from collections import defaultdict
 from itertools import izip
 from math import cos, pi, sin
 
@@ -421,8 +423,8 @@ class UbiGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
 #####################################################################
 
 class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
-    """Graph drawer that sends a given graph to Cytoscape as a new
-    network using CytoscapeRPC.
+    """Graph drawer that sends/receives graphs to/from Cytoscape using
+    CytoscapeRPC.
     
     This graph drawer cooperates with U{Cytoscape<http://www.cytoscape.org>}
     using U{CytoscapeRPC<http://wiki.nbic.nl/index.php/CytoscapeRPC>}.
@@ -454,6 +456,8 @@ class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
         """Sends the given graph to Cytoscape as a new network.
         
         @param name: the name of the network in Cytoscape."""
+        from xmlrpclib import Fault
+
         cy = self.service
 
         # Create the network
@@ -499,9 +503,14 @@ class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
                 continue
 
             # Resolve type conflicts (if any)
-            while attr in attr_names and \
-                  cy.getNetworkAttributeType(attr) != cy_type:
-                attr += "_"
+            try:
+                while attr in attr_names and \
+                      cy.getNetworkAttributeType(attr) != cy_type:
+                    attr += "_"
+            except Fault:
+                # getNetworkAttributeType is not available in some older versions
+                # so we simply pass here
+                pass
             cy.addNetworkAttributes(attr, cy_type, {network_id: value})
 
         # Send the node attributes
@@ -529,6 +538,74 @@ class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
                 attr += "_"
             # Send the attribute values
             cy.addEdgeAttributes(attr, cy_type, values)
+
+    def fetch(self, name = None, directed = False, keep_canonical_names = False):
+        """Fetches the network with the given name from Cytoscape.
+        
+        When fetching networks from Cytoscape, the C{canonicalName} attributes
+        of vertices and edges are not converted by default. Use the
+        C{keep_canonical_names} parameter to retrieve these attributes as well.
+
+        @param name: the name of the network in Cytoscape.
+        @param directed: whether the network is directed.
+        @param keep_canonical_names: whether to keep the C{canonicalName}
+            vertex/edge attributes that are added automatically by Cytoscape
+        @return: an appropriately constructed igraph L{Graph}."""
+        from igraph import Graph
+
+        cy = self.service
+
+        # Find out the ID of the network we are interested in
+        if name is None:
+            network_id = cy.getNetworkID()
+        else:
+            network_id = [k for k, v in cy.getNetworkList().iteritems()
+                          if v == name]
+            if not network_id:
+                raise ValueError("no such network: %r" % name)
+            elif len(network_id) > 1:
+                raise ValueError("more than one network exists with name: %r" % name)
+            network_id = network_id[0]
+
+        # Fetch the list of all the nodes and edges
+        vertices = cy.getNodes(network_id)
+        edges = cy.getEdges(network_id)
+        n, m = len(vertices), len(edges)
+
+        # Fetch the attributes
+        # TODO: it would be much more efficient to use getNodesAttributes and
+        # getEdgesAttributes, but unfortunately they throw an exception when not
+        # all the nodes have the given attribute, so we have to query them one
+        # by one.
+        graph_attrs = cy.getNetworkAttributes(network_id)
+        vertex_attrs = defaultdict(lambda: [None] * n)
+        edge_attrs = defaultdict(lambda: [None] * m)
+        for idx, vertex in enumerate(vertices):
+            for name, value in cy.getNodeAttributes(vertex).iteritems():
+                vertex_attrs[name][idx] = value
+        for idx, edge in enumerate(edges):
+            for name, value in cy.getEdgeAttributes(edge).iteritems():
+                edge_attrs[name][idx] = value
+        vertex_name_index = dict((v, k) for k, v in enumerate(vertices))
+        del vertices
+
+        # Remove the canonical names if we don't need them
+        if not keep_canonical_names:
+            if "canonicalName" in vertex_attrs:
+                del vertex_attrs["canonicalName"]
+            if "canonicalName" in edge_attrs:
+                del edge_attrs["canonicalName"]
+
+        # Remap the edges list to numeric IDs
+        edge_list = []
+        for edge in edges:
+            parts = edge.split()
+            edge_list.append((vertex_name_index[parts[0]], vertex_name_index[parts[2]]))
+        del edges
+
+        return Graph(n, edge_list, directed=directed,
+                graph_attrs=graph_attrs, vertex_attrs=vertex_attrs,
+                edge_attrs=edge_attrs)
 
     @staticmethod
     def infer_cytoscape_type(values):

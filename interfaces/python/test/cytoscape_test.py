@@ -54,6 +54,11 @@ def test():
     drawer = CytoscapeGraphDrawer()
     drawer.draw(g, layout="fr")
 
+    g2 = drawer.fetch()
+    if not g2.isomorphic(g):
+        raise ValueError("g2 not isomorphic to g")
+        
+
 if __name__ == "__main__":
     test()
 
