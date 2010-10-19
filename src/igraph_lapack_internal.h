@@ -157,4 +157,9 @@ int igraphdsyevr_(char *jobz, char *range, char *uplo, int *n,
 		  igraph_real_t *work, int *lwork, int *iwork, 
 		  int *liwork, int *info);
 
+int igraphdgeev_(char *jobvl, char *jobvr, int *n, igraph_real_t *a,
+		 int *lda, igraph_real_t *wr, igraph_real_t *wi, 
+		 igraph_real_t *vl, int *ldvl, igraph_real_t *vr, int *ldvr, 
+		 igraph_real_t *work, int *lwork, int *info);
+
 #endif

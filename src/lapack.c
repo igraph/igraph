@@ -211,7 +211,7 @@ int igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
   return 0;
 }
 
-int igraph_lapack_dsyevr(igraph_matrix_t *A, 
+int igraph_lapack_dsyevr(const igraph_matrix_t *A, 
 			 igraph_lapack_dsyev_which_t which,
 			 igraph_real_t vl, igraph_real_t vu, int vestimate, 
 			 int il, int iu, igraph_real_t abstol,
@@ -316,6 +316,89 @@ int igraph_lapack_dsyevr(igraph_matrix_t *A,
   igraph_vector_destroy(&work);
   igraph_matrix_destroy(&Acopy);
   IGRAPH_FINALLY_CLEAN(3);
+  
+  return 0;
+}
+
+int igraph_lapack_dgeev(igraph_bool_t leftvec, igraph_bool_t rightvec,
+			const igraph_matrix_t *A, igraph_vector_t *valuesreal,
+			igraph_vector_t *valuesimag, 
+			igraph_matrix_t *vectorsleft,
+			igraph_matrix_t *vectorsright, 
+			int *info) {
+
+  char jobvl= vectorsleft  ? 'V' : 'N';
+  char jobvr= vectorsright ? 'V' : 'N';
+  int n=igraph_matrix_nrow(A);
+  int lda=n, ldvl=n, ldvr=n, lwork=-1;
+  igraph_vector_t work;
+  igraph_vector_t *myreal=valuesreal, *myimag=valuesimag, vreal, vimag;
+  igraph_matrix_t Acopy;
+  int error=*info;
+
+  if (igraph_matrix_ncol(A) != n) { 
+    IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev)", IGRAPH_NONSQUARE);
+  }
+  
+  IGRAPH_CHECK(igraph_matrix_copy(&Acopy, A));
+  IGRAPH_FINALLY(igraph_matrix_destroy, &Acopy);
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&work, 1);
+  
+  if (!valuesreal) {
+    IGRAPH_VECTOR_INIT_FINALLY(&vreal, n);
+    myreal=&vreal;
+  } else {
+    IGRAPH_CHECK(igraph_vector_resize(myreal, n));
+  }
+  if (!valuesimag) {
+    IGRAPH_VECTOR_INIT_FINALLY(&vimag, n);
+    myimag=&vimag;
+  } else {
+    IGRAPH_CHECK(igraph_vector_resize(myimag, n));
+  }
+  if (vectorsleft) { 
+    IGRAPH_CHECK(igraph_matrix_resize(vectorsleft, n, n));
+  }
+  if (vectorsright) {
+    IGRAPH_CHECK(igraph_matrix_resize(vectorsright, n, n));
+  }
+
+  igraphdgeev_(&jobvl, &jobvr, &n, &MATRIX(Acopy,0,0), &lda, 
+	       VECTOR(*myreal), VECTOR(*myimag), 
+	       vectorsleft  ? &MATRIX(*vectorsleft ,0,0) : 0, &ldvl,
+	       vectorsright ? &MATRIX(*vectorsright,0,0) : 0, &ldvr,
+	       VECTOR(work), &lwork, info);
+
+  lwork=VECTOR(work)[0];
+  IGRAPH_CHECK(igraph_vector_resize(&work, lwork));
+  
+  igraphdgeev_(&jobvl, &jobvr, &n, &MATRIX(Acopy,0,0), &lda, 
+	       VECTOR(*myreal), VECTOR(*myimag), 
+	       vectorsleft  ? &MATRIX(*vectorsleft ,0,0) : 0, &ldvl,
+	       vectorsright ? &MATRIX(*vectorsright,0,0) : 0, &ldvr,
+	       VECTOR(work), &lwork, info);  
+
+  if (*info != 0) {
+    if (error==1) {
+      IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev)", IGRAPH_ELAPACK);
+    } else if (error==2) {
+      IGRAPH_WARNING("Cannot calculate eigenvalues (dgeev)");
+    }
+  }
+
+  igraph_vector_destroy(&work);
+  igraph_matrix_destroy(&Acopy);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  if (!valuesimag) {
+    igraph_vector_destroy(&vimag);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  if (!valuesreal) { 
+    igraph_vector_destroy(&vreal);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
   
   return 0;
 }

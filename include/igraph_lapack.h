@@ -51,13 +51,20 @@ typedef enum { IGRAPH_LAPACK_DSYEV_ALL,
 	       IGRAPH_LAPACK_DSYEV_INTERVAL,
 	       IGRAPH_LAPACK_DSYEV_SELECT } igraph_lapack_dsyev_which_t;
 
-int igraph_lapack_dsyevr(igraph_matrix_t *A, 
+int igraph_lapack_dsyevr(const igraph_matrix_t *A, 
 			 igraph_lapack_dsyev_which_t which,
 			 igraph_real_t vl, igraph_real_t vu, int vestimate, 
 			 int il, int iu, igraph_real_t abstol,
 			 igraph_vector_t *values, igraph_matrix_t *vectors,
 			 igraph_vector_int_t *support);
 
+int igraph_lapack_dgeev(igraph_bool_t leftvec, igraph_bool_t rightvec,
+			const igraph_matrix_t *A, 
+			igraph_vector_t *valuesreal,
+			igraph_vector_t *valuesimag, 
+			igraph_matrix_t *vectorsleft,
+			igraph_matrix_t *vectorsright, int *info);
+			
 __END_DECLS
 
 #endif
