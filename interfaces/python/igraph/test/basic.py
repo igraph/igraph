@@ -40,9 +40,9 @@ class BasicTests(unittest.TestCase):
         self.failUnless(g.incident(2) == [2, 3])
         self.failUnless(g.incident(2, IN) == [1])
         self.failUnless(g.incident(2, ALL) == [2, 3, 1])
-        self.failUnless(g.get_adjedgelist() == [[0], [1], [2,3], []])
-        self.failUnless(g.get_adjedgelist(IN) == [[2], [0], [1], [3]])
-        self.failUnless(g.get_adjedgelist(ALL) == [[0,2], [1,0], [2,3,1], [3]])
+        self.failUnless(g.get_inclist() == [[0], [1], [2,3], []])
+        self.failUnless(g.get_inclist(IN) == [[2], [0], [1], [3]])
+        self.failUnless(g.get_inclist(ALL) == [[0,2], [1,0], [2,3,1], [3]])
 
 
     def testMultiplesLoops(self):

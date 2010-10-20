@@ -8,7 +8,6 @@ class LayoutTests(unittest.TestCase):
         layout = Layout([(0,0,1), (0,1,0), (1,0,0)], 3)
         self.assertEqual(layout.dim, 3)
         self.assertRaises(ValueError, Layout, [(0,1), (1,0)], 3)
-        self.assertRaises(ValueError, Layout, [])
 
     def testIndexing(self):
         layout = Layout([(0,0,1), (0,1,0), (1,0,0), (2,1,3)])

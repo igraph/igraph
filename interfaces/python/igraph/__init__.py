@@ -147,8 +147,8 @@ class Graph(GraphBase):
 
         Returns the edges a given vertex is incident on.
 
-        This method is deprecated since igraph 0.6, please use Graph.incident()
-        instead."""
+        @deprecated: replaced by L{Graph.incident()} since igraph 0.6
+        """
         warn("Graph.adjacent() is deprecated since igraph 0.6, please use "
              "Graph.incident() instead")
         return self.incident(*args, **kwds)
@@ -435,15 +435,26 @@ class Graph(GraphBase):
         """
         return [self.neighbors(idx, type) for idx in xrange(self.vcount())]
 
-
-    def get_adjedgelist(self, type=OUT):
+    def get_adjedgelist(self, *args, **kwds):
         """get_adjedgelist(type=OUT)
 
-        Returns the adjacency edge list representation of the graph.
+        Returns the incidence list representation of the graph.
 
-        The adjacency edge list representation is a list of lists. Each
+        @deprecated: replaced by L{Graph.get_inclist()} since igraph 0.6
+        @see: Graph.get_inclist()
+        """
+        warn("Graph.get_adjedgelist() is deprecated since igraph 0.6, "
+             "please use Graph.get_inclist() instead")
+        return self.get_inclist(*args, **kwds)
+
+    def get_inclist(self, type=OUT):
+        """get_inclist(type=OUT)
+
+        Returns the incidence list representation of the graph.
+
+        The incidence list representation is a list of lists. Each
         item of the outer list belongs to a single vertex of the graph.
-        The inner list contains the IDs of the adjacent edges of the
+        The inner list contains the IDs of the incident edges of the
         given vertex.
 
         @param type: if L{OUT}, returns the successors of the vertex. If
@@ -451,8 +462,7 @@ class Graph(GraphBase):
           the predecessors and the successors will be returned. Ignored
           for undirected graphs.
         """
-        return [self.adjacent(idx, type) for idx in xrange(self.vcount())]
-
+        return [self.incident(idx, type) for idx in xrange(self.vcount())]
 
     def maxflow(self, source, target, capacity=None):
         """maxflow(source, target, capacity=None)
