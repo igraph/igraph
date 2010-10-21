@@ -94,16 +94,38 @@ class Palette(object):
             return self._cache[v]
         except KeyError:
             pass
-        if isinstance(v, int) or isinstance(v, long):
+        if isinstance(v, (int, long)):
             if v < 0:
-                raise ValueError("color index must be non-negative")
+                raise IndexError("color index must be non-negative")
             if v >= self._length:
-                raise ValueError("color index too large")
+                raise IndexError("color index too large")
             result = self._get(v)
         else:
             result = color_name_to_rgba(v)
         self._cache[v] = result
         return result
+
+    def get_many(self, colors):
+        """Returns multiple colors from the palette.
+
+        Values are cached: if the specific value given has already been
+        looked upon, its value will be returned from the cache instead of
+        calculating it again. Use L{Palette.clear_cache} to clear the cache
+        if necessary.
+
+        @param colors: the list of colors to be retrieved. The palette class
+          tries to make an educated guess here: if it is not possible to
+          interpret the value you passed here as a list of colors, the
+          class will simply try to interpret it as a single color by
+          forwarding the value to L{Palette.get}.
+        @return: the colors as a list of RGBA quadruplets. The result will
+          be a list even if you passed a single color index or color name.
+        """
+        if isinstance(colors, (basestring, int, long)):
+            # Single color name or index
+            return [self.get(colors)]
+        # Multiple colors
+        return [self.get(color) for color in colors]
 
     def _get(self, v):
         """Override this method in a subclass to create a custom palette.
