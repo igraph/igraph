@@ -310,7 +310,7 @@ class ComparisonTests(unittest.TestCase):
 
     def _testMethod(self, method, expected): 
         for clusters, result in zip(self.clusterings, expected):
-            self.assertAlmostEqual(compare_communities(*clusters, method=method),
+            self.assertAlmostEqual(compare_communities(method=method, *clusters),
                     result, places=3)
 
     def testCompareVI(self):
