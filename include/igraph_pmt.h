@@ -31,75 +31,48 @@
 #if defined(BASE_IGRAPH_REAL)
 #define BASE igraph_real_t
 #define SHORT
-#define ATOMIC
-#define MULTIPLICITY 1
-#define FP 1
-#define IN_FORMAT "%lg"
 #define OUT_FORMAT "%g"
-#define ATOMIC_IO ATOMIC
 #define ZERO 0.0
 #define ONE 1.0
-#define BASE_EPSILON GSL_DBL_EPSILON
 
 #elif defined(BASE_LONG)
 #define BASE long
 #define SHORT long
-#define ATOMIC long
-#define MULTIPLICITY 1
-#define IN_FORMAT "%ld"
 #define OUT_FORMAT "%ld"
-#define ATOMIC_IO ATOMIC
 #define ZERO 0L
 #define ONE 1L
 
 #elif defined(BASE_CHAR)
 #define BASE char
 #define SHORT char
-#define ATOMIC char
-#define MULTIPLICITY 1
-#define IN_FORMAT "%d"
 #define OUT_FORMAT "%d"
-#define ATOMIC_IO int
 #define ZERO 0
 #define ONE 1
 
 #elif defined(BASE_BOOL)
 #define BASE igraph_bool_t
 #define SHORT bool
-#define ATOMIC igraph_bool_t
-#define MULTIPLICITY 1
-#define IN_FORMAT "%d"
 #define OUT_FORMAT "%d"
-#define ATOMIC_IO int
 #define ZERO 0
 #define ONE 1
 
 #elif defined(BASE_INT)
 #define BASE int
 #define SHORT int
-#define ATOMIC int
-#define MULTIPLICITY 1
-#define IN_FORMAT "%d"
 #define OUT_FORMAT "%d"
-#define ATOMIC_IO int
 #define ZERO 0
 #define ONE 1
 
 #elif defined(BASE_LIMB)
 #define BASE limb_t
 #define SHORT limb
-#define ATOMIC limb_t
-#define MULTIPLICITY 1
 #define ZERO 0
 #define ONE 1
 
 #elif defined(BASE_PTR)
 #define BASE void*
 #define SHORT ptr
-#define ATOMIC ptr_t
-#define MULTIPLICITY 1
 #define ZERO 0
-/* #define ONE 1  */  /* makes no sense */
 
 #else
 #error unknown BASE_ directive
