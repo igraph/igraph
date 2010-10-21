@@ -162,3 +162,8 @@ AT_SETUP([Marked double ended queue (igraph_marked_queue_t): ])
 AT_KEYWORDS([dqueue queue igraph_marked_queue_t])
 AT_COMPILE_CHECK([simple/igraph_marked_queue.c], [], [], [INTERNAL])
 AT_CLEANUP
+
+AT_SETUP([Complex numbers (igraph_complex_t): ])
+AT_KEYWORDS([complex])
+AT_COMPILE_CHECK([simple/igraph_complex.c])
+AT_CLEANUP
