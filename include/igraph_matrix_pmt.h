@@ -144,12 +144,12 @@ long int FUNCTION(igraph_matrix,size)(const TYPE(igraph_matrix) *m);
 long int FUNCTION(igraph_matrix,nrow)(const TYPE(igraph_matrix) *m);
 long int FUNCTION(igraph_matrix,ncol)(const TYPE(igraph_matrix) *m);
 igraph_bool_t FUNCTION(igraph_matrix,is_symmetric)(const TYPE(igraph_matrix) *m);
-igraph_real_t FUNCTION(igraph_matrix,sum)(const TYPE(igraph_matrix) *m);
-igraph_real_t FUNCTION(igraph_matrix,prod)(const TYPE(igraph_matrix) *m);
+BASE FUNCTION(igraph_matrix,sum)(const TYPE(igraph_matrix) *m);
+BASE FUNCTION(igraph_matrix,prod)(const TYPE(igraph_matrix) *m);
 int FUNCTION(igraph_matrix,rowsum)(const TYPE(igraph_matrix) *m,
-				   igraph_vector_t *res);
+				   TYPE(igraph_vector) *res);
 int FUNCTION(igraph_matrix,colsum)(const TYPE(igraph_matrix) *m,
-				   igraph_vector_t *res);
+				   TYPE(igraph_vector) *res);
 igraph_bool_t FUNCTION(igraph_matrix,is_equal)(const TYPE(igraph_matrix) *m1, 
 					       const TYPE(igraph_matrix) *m2);
 BASE FUNCTION(igraph_matrix,maxdifference)(const TYPE(igraph_matrix) *m1,

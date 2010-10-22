@@ -34,6 +34,7 @@
 #define OUT_FORMAT "%g"
 #define ZERO 0.0
 #define ONE 1.0
+#define MULTIPLICITY 1
 
 #elif defined(BASE_LONG)
 #define BASE long
@@ -41,6 +42,7 @@
 #define OUT_FORMAT "%ld"
 #define ZERO 0L
 #define ONE 1L
+#define MULTIPLICITY 1
 
 #elif defined(BASE_CHAR)
 #define BASE char
@@ -48,6 +50,7 @@
 #define OUT_FORMAT "%d"
 #define ZERO 0
 #define ONE 1
+#define MULTIPLICITY 1
 
 #elif defined(BASE_BOOL)
 #define BASE igraph_bool_t
@@ -55,6 +58,7 @@
 #define OUT_FORMAT "%d"
 #define ZERO 0
 #define ONE 1
+#define MULTIPLICITY 1
 
 #elif defined(BASE_INT)
 #define BASE int
@@ -62,17 +66,33 @@
 #define OUT_FORMAT "%d"
 #define ZERO 0
 #define ONE 1
+#define MULTIPLICITY 1
 
 #elif defined(BASE_LIMB)
 #define BASE limb_t
 #define SHORT limb
 #define ZERO 0
 #define ONE 1
+#define MULTIPLICITY 1
 
 #elif defined(BASE_PTR)
 #define BASE void*
 #define SHORT ptr
 #define ZERO 0
+#define MULTIPLICITY 1
+
+#elif defined(BASE_COMPLEX)
+#define BASE igraph_complex_t
+#define SHORT complex
+#define ZERO igraph_complex(0,0)
+#define ONE {{1.0,0.0}}
+#define MULTIPLICITY 2
+#define NOTORDERED 1
+#define SUM(a,b,c) ((a) = igraph_complex_add((b),(c)))
+#define DIFF(a,b,c) ((a) = igraph_complex_sub((b),(c)))
+#define PROD(a,b,c) ((a) = igraph_complex_mul((b),(c)))
+#define DIV(a,b,c) ((a) = igraph_complex_div((b),(c)))
+#define EQ(a,b) IGRAPH_COMPLEX_EQ((a),(b))
 
 #else
 #error unknown BASE_ directive

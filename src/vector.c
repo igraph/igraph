@@ -23,6 +23,7 @@
 
 #include "igraph_types.h"
 #include "igraph_types_internal.h"
+#include "igraph_complex.h"
 #include "config.h"
 
 #define BASE_IGRAPH_REAL
@@ -54,6 +55,12 @@
 #include "vector.pmt"
 #include "igraph_pmt_off.h"
 #undef BASE_INT
+
+#define BASE_COMPLEX
+#include "igraph_pmt.h"
+#include "vector.pmt"
+#include "igraph_pmt_off.h"
+#undef BASE_COMPLEX
 
 #include "igraph_math.h"
 
@@ -253,3 +260,47 @@ int igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
   return 0;
 }
 
+int igraph_vector_complex_print(const igraph_vector_complex_t *v) {
+  long int i, n=igraph_vector_complex_size(v);
+  if (n!=0) {
+    igraph_complex_t z=VECTOR(*v)[0];
+    if (IGRAPH_IMAG(z) > 0) { 
+      printf("%g+%g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
+    } else {
+      printf("%g-%g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
+    }
+  }
+  for (i=1; i<n; i++) {
+    igraph_complex_t z=VECTOR(*v)[i];
+    if (IGRAPH_IMAG(z) > 0) { 
+      printf(" %g+%g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
+    } else {
+      printf(" %g-%g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
+    }
+  }
+  printf("\n");
+  return 0;
+}
+
+int igraph_vector_complex_fprint(const igraph_vector_complex_t *v, 
+				 FILE *file) {
+  long int i, n=igraph_vector_complex_size(v);
+  if (n!=0) {
+    igraph_complex_t z=VECTOR(*v)[0];
+    if (IGRAPH_IMAG(z) > 0) { 
+      fprintf(file, "%g+%g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
+    } else {
+      fprintf(file, "%g-%g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
+    }
+  }
+  for (i=1; i<n; i++) {
+    igraph_complex_t z=VECTOR(*v)[i];
+    if (IGRAPH_IMAG(z) > 0) { 
+      fprintf(file, " %g+%g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
+    } else {
+      fprintf(file, " %g-%g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
+    }
+  }
+  fprintf(file, "\n");
+  return 0;
+}

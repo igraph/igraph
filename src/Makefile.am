@@ -170,7 +170,7 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_sparsemat.h   ../include/igraph_mixing.h    \
 		../include/igraph_version.h     ../include/igraph_blas.h      \
 		../include/igraph_separators.h  ../include/igraph_cohesive_blocks.h \
-		../include/igraph_lapack.h
+		../include/igraph_lapack.h	../include/igraph_complex.h
 
 libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     basic_query.c games.c cocitation.c iterators.c \

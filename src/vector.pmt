@@ -159,6 +159,8 @@ const TYPE(igraph_vector)*FUNCTION(igraph_vector,view) (const TYPE(igraph_vector
   return v;
 }
 
+#ifndef BASE_COMPLEX
+
 /**
  * \ingroup vector
  * \function igraph_vector_init_real
@@ -344,6 +346,8 @@ int FUNCTION(igraph_vector_init,int_end)(TYPE(igraph_vector) *v, int endmark, ..
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+#endif /* ifndef BASE_COMPLEX */
 
 /**
  * \ingroup vector
@@ -695,6 +699,8 @@ BASE FUNCTION(igraph_vector,pop_back)(TYPE(igraph_vector)* v) {
   return tmp;
 }
 
+#ifndef NOTORDERED
+
 /**
  * \ingroup vector
  * \function igraph_vector_sort_cmp
@@ -789,6 +795,8 @@ long int FUNCTION(igraph_vector,qsort_ind)(TYPE(igraph_vector) *v,
   return 0;
 }
 
+#endif
+
 /**
  * \ingroup vector
  * \function igraph_vector_resize
@@ -823,6 +831,8 @@ int FUNCTION(igraph_vector,resize)(TYPE(igraph_vector)* v, long int newsize) {
   v->end = v->stor_begin+newsize;
   return 0;
 }
+
+#ifndef NOTORDERED
 
 /**
  * \ingroup vector
@@ -952,6 +962,8 @@ long int FUNCTION(igraph_vector,which_min)(const TYPE(igraph_vector)* v) {
   return which;
 }
 
+#endif
+
 /**
  * \ingroup vector
  * \function igraph_vector_init_copy
@@ -1052,12 +1064,16 @@ int FUNCTION(igraph_vector,copy)(TYPE(igraph_vector) *to,
  */
 
 BASE FUNCTION(igraph_vector,sum)(const TYPE(igraph_vector) *v) {
-  BASE res=0;
+  BASE res=ZERO;
   BASE *p;
   assert(v != NULL);
   assert(v->stor_begin != NULL);
   for (p=v->stor_begin; p<v->end; p++) {
+#ifdef SUM
+    SUM(res,res,*p);
+#else
     res += *p;
+#endif
   }
   return res;
 }
@@ -1077,15 +1093,21 @@ BASE FUNCTION(igraph_vector,sum)(const TYPE(igraph_vector) *v) {
  */
 
 BASE FUNCTION(igraph_vector,prod)(const TYPE(igraph_vector) *v) {
-  BASE res=1;
+  BASE res=ONE;
   BASE *p;
   assert(v != NULL);
   assert(v->stor_begin != NULL);
   for (p=v->stor_begin; p<v->end; p++) {
+#ifdef PROD
+    PROD(res,res,*p);
+#else
     res *= *p;
+#endif
   }
   return res;
 }
+
+#ifndef NOTORDERED
 
 /**
  * \ingroup vector
@@ -1116,6 +1138,8 @@ int FUNCTION(igraph_vector,init_seq)(TYPE(igraph_vector) *v,
   
   return 0;
 }
+
+#endif
 
 /**
  * \ingroup vector
@@ -1240,6 +1264,8 @@ void FUNCTION(igraph_vector,remove_negidx)(TYPE(igraph_vector) *v,
   v->end -= nremove;
 }
 
+#ifndef NOTORDERED
+
 /**
  * \ingroup vector
  * \function igraph_vector_isininterval
@@ -1298,6 +1324,8 @@ igraph_bool_t FUNCTION(igraph_vector,any_smaller)(const TYPE(igraph_vector) *v,
   return 0;
 }
 
+#endif
+
 /**
  * \ingroup vector
  * \function igraph_vector_is_equal
@@ -1326,7 +1354,13 @@ igraph_bool_t FUNCTION(igraph_vector,is_equal)(const TYPE(igraph_vector) *lhs,
     return 0;
   } else {
     for (i=0; i<s; i++) {
-      if (VECTOR(*lhs)[i] != VECTOR(*rhs)[i]) {
+      BASE l=VECTOR(*lhs)[i];
+      BASE r=VECTOR(*rhs)[i];
+#ifdef EQ
+      if (!EQ(l,r)) {
+#else
+      if (l!=r) {
+#endif
 	return 0;
       }
     }
@@ -1337,6 +1371,8 @@ igraph_bool_t FUNCTION(igraph_vector,is_equal)(const TYPE(igraph_vector) *lhs,
 igraph_bool_t FUNCTION(igraph_i_vector,binsearch_slice)(const TYPE(igraph_vector) *v,
                                                         BASE what, long int *pos,
                                                         long int start, long int end);
+
+#ifndef NOTORDERED
 
 /**
  * \ingroup vector
@@ -1436,6 +1472,8 @@ igraph_bool_t FUNCTION(igraph_vector,binsearch2)(const TYPE(igraph_vector) *v,
   return 0;
 }
 
+#endif
+
 /**
  * \function igraph_vector_scale
  * \brief Multiply all elements of a vector by a constant
@@ -1452,7 +1490,11 @@ igraph_bool_t FUNCTION(igraph_vector,binsearch2)(const TYPE(igraph_vector) *v,
 void FUNCTION(igraph_vector,scale)(TYPE(igraph_vector) *v, BASE by) {
   long int i;
   for (i=0; i<FUNCTION(igraph_vector,size)(v); i++) {
+#ifdef PROD
+    PROD(VECTOR(*v)[i], VECTOR(*v)[i], by);
+#else
     VECTOR(*v)[i] *= by;
+#endif
   }
 }
 
@@ -1471,7 +1513,11 @@ void FUNCTION(igraph_vector,scale)(TYPE(igraph_vector) *v, BASE by) {
 void FUNCTION(igraph_vector,add_constant)(TYPE(igraph_vector) *v, BASE plus) {
   long int i, n=FUNCTION(igraph_vector,size)(v);
   for (i=0; i<n; i++) {
+#ifdef SUM
+    SUM(VECTOR(*v)[i], VECTOR(*v)[i], plus);
+#else
     VECTOR(*v)[i] += plus;
+#endif
   }
 }
 
@@ -1492,7 +1538,11 @@ igraph_bool_t FUNCTION(igraph_vector,contains)(const TYPE(igraph_vector) *v,
 					       BASE e) {
   BASE *p=v->stor_begin;
   while (p<v->end) {
+#ifdef EQ
+    if (EQ(*p,e)) {
+#else
     if (*p==e) { 
+#endif
       return 1;
     }
     p++;
@@ -1525,7 +1575,11 @@ igraph_bool_t FUNCTION(igraph_vector,search)(const TYPE(igraph_vector) *v,
 					     long int *pos) {
   long int i, n=FUNCTION(igraph_vector,size)(v);  
   for (i=from; i<n; i++) {
+#ifdef EQ
+    if (EQ(VECTOR(*v)[i], what)) break;
+#else
     if (VECTOR(*v)[i]==what) break;
+#endif
   }
   
   if (i<n) {
@@ -1537,6 +1591,8 @@ igraph_bool_t FUNCTION(igraph_vector,search)(const TYPE(igraph_vector) *v,
     return 0;
   }
 }
+
+#ifndef NOTORDERED
 
 /**
  * \function igraph_vector_filter_smaller
@@ -1559,6 +1615,8 @@ int FUNCTION(igraph_vector,filter_smaller)(TYPE(igraph_vector) *v,
   FUNCTION(igraph_vector,remove_section)(v, 0, i+(s-i)/2);
   return 0;
 }
+
+#endif
 
 /**
  * \function igraph_vector_append
@@ -1598,6 +1656,8 @@ int FUNCTION(igraph_vector,get_interval)(const TYPE(igraph_vector) *v,
   return 0;
 }
 
+#ifndef NOTORDERED
+
 /**
  * \function igraph_vector_maxdifference
  * \brief The maximum absolute difference of \p m1 and \p m2
@@ -1630,6 +1690,8 @@ BASE FUNCTION(igraph_vector,maxdifference)(const TYPE(igraph_vector) *m1,
   
   return diff;
 }
+
+#endif
 
 /**
  * \function igraph_vector_update
@@ -1794,7 +1856,11 @@ int FUNCTION(igraph_vector,add)(TYPE(igraph_vector) *v1,
   }
   
   for (i=0; i<n1; i++) {
+#ifdef SUM
+    SUM(VECTOR(*v1)[i], VECTOR(*v1)[i], VECTOR(*v2)[i]);
+#else
     VECTOR(*v1)[i] += VECTOR(*v2)[i];
+#endif
   }
   
   return 0;
@@ -1826,7 +1892,11 @@ int FUNCTION(igraph_vector,sub)(TYPE(igraph_vector) *v1,
   }
   
   for (i=0; i<n1; i++) {
+#ifdef DIFF
+    DIFF(VECTOR(*v1)[i], VECTOR(*v1)[i], VECTOR(*v2)[i]);
+#else
     VECTOR(*v1)[i] -= VECTOR(*v2)[i];
+#endif
   }
   
   return 0;
@@ -1857,7 +1927,11 @@ int FUNCTION(igraph_vector,mul)(TYPE(igraph_vector) *v1,
   }
   
   for (i=0; i<n1; i++) {
+#ifdef PROD
+    PROD(VECTOR(*v1)[i], VECTOR(*v1)[i], VECTOR(*v2)[i]);
+#else
     VECTOR(*v1)[i] *= VECTOR(*v2)[i];
+#endif
   }
   
   return 0;
@@ -1890,11 +1964,17 @@ int FUNCTION(igraph_vector,div)(TYPE(igraph_vector) *v1,
   }
   
   for (i=0; i<n1; i++) {
+#ifdef DIV
+    DIV(VECTOR(*v1)[i], VECTOR(*v1)[i], VECTOR(*v2)[i]);
+#else
     VECTOR(*v1)[i] /= VECTOR(*v2)[i];
+#endif
   }
   
   return 0;
 }
+
+#ifndef NOTORDERED
 
 /**
  * \function igraph_vector_minmax
@@ -1966,6 +2046,8 @@ int FUNCTION(igraph_vector,which_minmax)(const TYPE(igraph_vector) *v,
   return 0;
 }
 
+#endif
+
 /**
  * \function igraph_vector_isnull
  * \brief Are all elements zero?
@@ -1983,12 +2065,18 @@ igraph_bool_t FUNCTION(igraph_vector,isnull)(const TYPE(igraph_vector) *v) {
   long int n=FUNCTION(igraph_vector,size)(v);
   long int i=0;
   
-  while ( i<n && VECTOR(*v)[i]==0) {
+#ifdef EQ
+  while (i<n && EQ(VECTOR(*v)[i], ZERO)) {
+#else
+  while (i<n && VECTOR(*v)[i]==ZERO) {
+#endif
     i++;
   }
   
   return i==n;
 }
+
+#ifndef NOTORDERED
 
 int FUNCTION(igraph_i_vector,intersect_sorted)(
     const TYPE(igraph_vector) *v1, long int begin1, long int end1,
@@ -2145,6 +2233,8 @@ int FUNCTION(igraph_vector,difference_sorted)(const TYPE(igraph_vector) *v1,
 
   return 0;
 }
+
+#endif
 
 #if defined(OUT_FORMAT)
 
