@@ -223,6 +223,10 @@ path <- function(...) {
     } else {
       res <- e1
     }
+  } else if ("igraph.vs" %in% class(e2)) {
+    res <- delete.vertices(e1, e2)
+  } else if ("igraph.es" %in% class(e2)) {
+    res <- delete.edges(e1, e2)
   } else if (is.numeric(e2) || is.character(e2)) {
     res <- delete.vertices(e1, e2)
   } else {

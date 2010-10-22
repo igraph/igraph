@@ -20,3 +20,6 @@ V(g)$name <- letters[1:10]
 g <- g - path("a", "b", "c", "d")
 g
 
+g - V(g)[c('d', 'g')]
+
+g - E(g)['f' %--% 'g']

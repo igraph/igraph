@@ -119,7 +119,7 @@ delete.vertices(graph, v)
       case a logical vector is returned.
     \item Weighted graphs behave somewhat differently. Instead of a
       logical vector, a numeric vector of edge weights is returned.
-      For non-existant edges the vector contains \code{NA} values.
+      For non-existant edges the vector contains zero weights.
     \item Query adjacent vertices of one or more vertices. To do
       this, you need to give only one of the \sQuote{\code{i}} and
       \sQuote{\code{j}} arguments: \preformatted{  graph[v, ]
@@ -272,6 +272,11 @@ delete.vertices(graph, v)
     deleted from the graph. Example: \preformatted{  g <- graph.ring(10)
   V(g)$name <- letters[1:10]
   g <- g - c("a", "b")}
+  \item If \code{e2} is a vertex sequence (e.g. created by the
+    \code{\link{V}} function), then these vertices will be deleted from
+    the graph.
+  \item If it is an edge sequence (e.g. created by the \code{\link{E}}
+    function), then these edges will be deleted from the graph.
   \item If it is an object created with the \code{vertex} (or the
     \code{vertices}) function, then all arguments of \code{vertices} are
     concatenated and the result is interpreted as a vector of vertex
@@ -321,6 +326,20 @@ delete.vertices(graph, v)
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 % \seealso{}
 \examples{
+# 10 vertices named a,b,c,... and no edges
+g <- graph.empty() + vertices(letters[1:10])
+
+# Add edges to make it a ring
+g <- g + path(letters[1:10], letters[1], color="grey")
+
+# Add some extra random edges
+g <- g + edges(sample(V(g), 10, replace=TRUE), color="red")
+g$layout <- layout.circle
+if (interactive()) {
+  plot(g)
+}
+
+# The old-style operations
 g <- graph.ring(10)
 add.edges(g, c(2,6,3,7) )
 delete.edges(g, E(g, P=c(1,10, 2,3)) )
