@@ -51,12 +51,34 @@ def test():
     # Mixed attribute
     g.es["mixed"] = [u"yay", 123, None, 0.7] * ((g.ecount()+3) / 4)
 
+    # Sending graph
     drawer = CytoscapeGraphDrawer()
     drawer.draw(g, layout="fr")
 
+    # Fetching graph
     g2 = drawer.fetch()
-    if not g2.isomorphic(g):
+    del g2.vs["hiddenLabel"]
+    del g2.es["interaction"]
+
+    # Check isomorphism
+    result = g2.isomorphic(g)
+    if not result:
         raise ValueError("g2 not isomorphic to g")
+
+    # Check the graph attributes
+    if set(g.attributes()) != set(g2.attributes()):
+        raise ValueError("Graph attribute name set mismatch")
+    for attr_name in g.attributes():
+        if g[attr_name] != g2[attr_name]:
+            raise ValueError("Graph attribute mismatch for %r" % attr_name)
+
+    # Check the vertex attribute names
+    if set(g.vertex_attributes()) != set(g2.vertex_attributes()):
+        raise ValueError("Vertex attribute name set mismatch")
+
+    # Check the edge attribute names
+    if set(g.edge_attributes()) != set(g2.edge_attributes()):
+        raise ValueError("Edge attribute name set mismatch")
         
 
 if __name__ == "__main__":

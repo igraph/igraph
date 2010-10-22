@@ -555,6 +555,11 @@ class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
 
         cy = self.service
 
+        # Check the version number. Anything older than 1.3 is bad.
+        if map(int, cy.version().split(".")[:2]) < (1, 3):
+            raise NotImplementedError("CytoscapeGraphDrawer requires "
+                                      "Cytoscape-RPC 1.3 or newer")
+
         # Find out the ID of the network we are interested in
         if name is None:
             network_id = cy.getNetworkID()
@@ -572,29 +577,44 @@ class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
         edges = cy.getEdges(network_id)
         n, m = len(vertices), len(edges)
 
-        # Fetch the attributes
-        # TODO: it would be much more efficient to use getNodesAttributes and
-        # getEdgesAttributes, but unfortunately they throw an exception when not
-        # all the nodes have the given attribute, so we have to query them one
-        # by one.
+        # Fetch the graph attributes
         graph_attrs = cy.getNetworkAttributes(network_id)
-        vertex_attrs = defaultdict(lambda: [None] * n)
-        edge_attrs = defaultdict(lambda: [None] * m)
-        for idx, vertex in enumerate(vertices):
-            for name, value in cy.getNodeAttributes(vertex).iteritems():
-                vertex_attrs[name][idx] = value
-        for idx, edge in enumerate(edges):
-            for name, value in cy.getEdgeAttributes(edge).iteritems():
-                edge_attrs[name][idx] = value
+
+        # Fetch the vertex attributes
+        vertex_attr_names = cy.getNodeAttributeNames()
+        vertex_attrs = {}
+        for attr_name in vertex_attr_names:
+            if attr_name == "canonicalName" and not keep_canonical_names:
+                continue
+            has_attr = cy.nodesHaveAttribute(attr_name, vertices)
+            filtered = [idx for idx, ok in enumerate(has_attr) if ok]
+            values = cy.getNodesAttributes(attr_name,
+                    [name for name, ok in izip(vertices, has_attr) if ok]
+            )
+            attrs = [None] * n
+            for idx, value in izip(filtered, values):
+                attrs[idx] = value
+            vertex_attrs[attr_name] = attrs
+
+        # Fetch the edge attributes
+        edge_attr_names = cy.getEdgeAttributeNames()
+        edge_attrs = {}
+        for attr_name in edge_attr_names:
+            if attr_name == "canonicalName" and not keep_canonical_names:
+                continue
+            has_attr = cy.edgesHaveAttribute(attr_name, edges)
+            filtered = [idx for idx, ok in enumerate(has_attr) if ok]
+            values = cy.getEdgesAttributes(attr_name,
+                    [name for name, ok in izip(edges, has_attr) if ok]
+            )
+            attrs = [None] * m
+            for idx, value in izip(filtered, values):
+                attrs[idx] = value
+            edge_attrs[attr_name] = attrs
+
+        # Create a vertex name index
         vertex_name_index = dict((v, k) for k, v in enumerate(vertices))
         del vertices
-
-        # Remove the canonical names if we don't need them
-        if not keep_canonical_names:
-            if "canonicalName" in vertex_attrs:
-                del vertex_attrs["canonicalName"]
-            if "canonicalName" in edge_attrs:
-                del edge_attrs["canonicalName"]
 
         # Remap the edges list to numeric IDs
         edge_list = []
