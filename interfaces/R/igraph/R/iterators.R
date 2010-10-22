@@ -220,9 +220,12 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   res
 } 
 
-"%--%" <- function(f, t) {
+"%--%" <- function(f, t) {  
   from <- get(".igraph.from", parent.frame())
   to <- get(".igraph.to", parent.frame())
+  graph <- get(".igraph.graph", parent.frame())
+  f <- as.igraph.vs(graph, f)-1
+  t <- as.igraph.vs(graph, t)-1
   (from %in% f & to %in% t) | (to %in% f & from %in% t)
 }
 
@@ -230,6 +233,8 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   from <- get(".igraph.from", parent.frame())
   to <- get(".igraph.to", parent.frame())
   graph <- get(".igraph.graph", parent.frame())
+  f <- as.igraph.vs(graph, f)-1
+  t <- as.igraph.vs(graph, t)-1
   if (is.directed(graph)) {
     from %in% f & to %in% t
   } else {
@@ -241,6 +246,8 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   from <- get(".igraph.from", parent.frame())
   to <- get(".igraph.to", parent.frame())
   graph <- get(".igraph.graph", parent.frame())
+  value <- as.igraph.vs(graph, value)-1
+  t <- as.igraph.vs(graph, t)-1
   if (is.directed(graph)) {
     from %in% value & to %in% t
   } else {
