@@ -130,6 +130,11 @@ path <- function(...) {
 }
 
 `+.igraph` <- function(e1, e2) {
+  if (!is.igraph(e1) && is.igraph(e2)) {
+    tmp <- e1
+    e1 <- e2
+    e2 <- tmp
+  }
   if (is.igraph(e2)) {
     ## Disjoint union of graphs
     res <- graph.disjoint.union(e1,e2)
