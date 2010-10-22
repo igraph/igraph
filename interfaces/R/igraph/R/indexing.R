@@ -33,6 +33,7 @@
     res <- get.edge.ids(x, rbind(i,j), directed=directed, error=FALSE,
                         multi=multi)
     if (weighted) {
+      res <- rep(NA, length(i))
       res[res!=0] <- get.edge.attribute(x, "weight", res[res!=0])
     } else {
       res <- as.logical(res)
