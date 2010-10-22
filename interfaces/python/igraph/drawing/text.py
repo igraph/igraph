@@ -310,15 +310,17 @@ def test():
 
     # Testing drawer.draw_at()
     for i, halign in enumerate(("left", "center", "right")):
+        # Mark the reference points
         context.move_to(i * 200, 40)
-
-        # Mark the reference point
+        mark_point(0, 0, 1)
+        context.move_to(i * 200, 140)
         mark_point(0, 0, 1)
 
         # Draw the text
         context.set_source_rgb(0, 0, 0)
         drawer.halign = halign
         drawer.draw_at(i * 200, 40)
+        drawer.draw_at(i * 200, 140, width=200)
 
         # Mark the new reference point
         mark_point(1, 0, 0)

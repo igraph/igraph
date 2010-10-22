@@ -275,7 +275,7 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
 
         # Draw the vertex labels
         context.select_font_face("sans-serif", cairo.FONT_SLANT_NORMAL, \
-            cairo.FONT_WEIGHT_BOLD)
+            cairo.FONT_WEIGHT_NORMAL)
 
         wrap = kwds.get("wrap_labels", None)
         if wrap is None:
@@ -283,7 +283,7 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
         else:
             wrap = bool(wrap)
 
-        label_drawer = TextDrawer(context, halign="center")
+        label_drawer = TextDrawer(context, halign="center", valign="center")
         for vertex, coords in izip(vertex_builder, layout):
             if vertex.label is None:
                 continue
@@ -298,7 +298,7 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
                 radius = vertex.label_dist * vertex.size / 2.
                 cx = coords[0] + cos(vertex.label_angle) * radius
                 cy = coords[1] + sin(vertex.label_angle) * radius
-                label_drawer.draw_at(cx, cy, width=vertex.size, wrap=wrap)
+                label_drawer.draw_at(cx, cy, wrap=wrap)
             else:
                 # Label is exactly in the center of the vertex
                 cx, cy = coords
