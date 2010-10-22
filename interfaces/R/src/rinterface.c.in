@@ -2463,6 +2463,28 @@ SEXP R_igraph_neighbors(SEXP graph, SEXP pvid, SEXP pmode) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_incident(SEXP graph, SEXP pvid, SEXP pmode) {
+  
+  igraph_t g;
+  igraph_vector_t neis;
+  SEXP result;
+  igraph_real_t vid;
+  igraph_integer_t mode;
+  
+  igraph_vector_init(&neis, 0);
+  vid=REAL(pvid)[0];
+  mode=REAL(pmode)[0];
+  R_SEXP_to_igraph(graph, &g);
+  igraph_incident(&g, &neis, vid, mode);
+  
+  PROTECT(result=NEW_NUMERIC(igraph_vector_size(&neis)));
+  igraph_vector_copy_to(&neis, REAL(result));
+  igraph_vector_destroy(&neis);
+
+  UNPROTECT(1);
+  return result;
+}
   
 SEXP R_igraph_delete_edges(SEXP graph, SEXP edges) {
   
@@ -7322,6 +7344,34 @@ SEXP R_igraph_cohesive_blocks(SEXP graph) {
 
   UNPROTECT(1);
   return(result);
+}
+
+SEXP R_igraph_get_eids(SEXP graph, SEXP pvp, SEXP pdirected,
+		       SEXP perror, SEXP pmulti) {
+  igraph_t g;
+  igraph_vector_t vp;
+  igraph_vector_t res;
+  igraph_bool_t directed=LOGICAL(pdirected)[0];
+  igraph_bool_t error=LOGICAL(perror)[0];
+  igraph_bool_t multi=LOGICAL(pmulti)[0];
+  SEXP result;
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_vector(pvp, &vp);
+  igraph_vector_init(&res, 0);
+  
+  if (multi) {
+    igraph_get_eids_multi(&g, &res, /*pairs=*/ &vp, /*path=*/ 0, directed, 
+			  error);
+  } else {
+    igraph_get_eids(&g, &res, /*pairs=*/ &vp, /*path=*/ 0, directed, error);
+  }
+  
+  PROTECT(result=R_igraph_vector_to_SEXP(&res));
+  igraph_vector_destroy(&res);
+  
+  UNPROTECT(1);
+  return result;
 }
 
 SEXP R_igraph_revolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,

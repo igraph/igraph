@@ -4,7 +4,19 @@ importFrom(stats, as.dendrogram)
 # The igraph interface
 
 export(add.vertices, delete.edges,
-       delete.vertices, ecount, neighbors, get.edges)
+       delete.vertices, ecount, neighbors, incident, get.edges, get.edge.ids)
+
+export("[.igraph", "[[.igraph", "[<-.igraph")
+
+S3method("[", "igraph")
+S3method("[[", "igraph")
+S3method("[<-", "igraph")
+
+export(edge, edges, vertex, vertices, path,
+       "+.igraph", "-.igraph")
+
+S3method("+", "igraph")
+S3method("-", "igraph")
 
 # Attributes
 

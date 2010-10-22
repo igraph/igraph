@@ -1,0 +1,209 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> g <- graph.ring(5) + graph.ring(5)
+> g
+Vertices: 10 
+Edges: 10 
+Directed: FALSE 
+Edges:
+             
+[1]   1 --  2
+[2]   2 --  3
+[3]   3 --  4
+[4]   4 --  5
+[5]   1 --  5
+[6]   6 --  7
+[7]   7 --  8
+[8]   8 --  9
+[9]   9 -- 10
+[10]  6 -- 10
+> 
+> ########################
+> 
+> g <- graph.empty(5)
+> g
+Vertices: 5 
+Edges: 0 
+Directed: TRUE 
+> 
+> g <- g + 1
+> g
+Vertices: 6 
+Edges: 0 
+Directed: TRUE 
+> 
+> g <- g + 4
+> g
+Vertices: 10 
+Edges: 0 
+Directed: TRUE 
+> 
+> g <- g + "a"
+> V(g)
+Vertex sequence:
+ [1] NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  "a"
+> vcount(g)
+[1] 11
+> 
+> g <- g + c("b", "c", "d")
+> V(g)
+Vertex sequence:
+ [1] NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  "a" "b" "c" "d"
+> vcount(g)
+[1] 14
+> 
+> g <- graph.empty(2)
+> g <- g + vertex(shape="circle", color="red")
+> print(g, v=T)
+Vertices: 3 
+Edges: 0 
+Directed: TRUE 
+Vertex attributes:
+     shape color
+[1]   <NA>  <NA>
+[2]   <NA>  <NA>
+[3] circle   red
+> 
+> g <- g + vertex("foo", color="blue")
+> print(g, v=T)
+Vertices: 4 
+Edges: 0 
+Directed: TRUE 
+Vertex attributes:
+     shape color name
+[1]   <NA>  <NA> <NA>
+[2]   <NA>  <NA> <NA>
+[3] circle   red <NA>
+[4]   <NA>  blue  foo
+> 
+> g <- g + vertex("bar", "foobar")
+> print(g, v=T)
+Vertices: 6 
+Edges: 0 
+Directed: TRUE 
+Vertex attributes:
+     shape color   name
+[1]   <NA>  <NA>   <NA>
+[2]   <NA>  <NA>   <NA>
+[3] circle   red   <NA>
+[4]   <NA>  blue    foo
+[5]   <NA>  <NA>    bar
+[6]   <NA>  <NA> foobar
+> 
+> g <- g + vertices("bar2", "foobar2", color=1:2, shape="rectangle")
+> print(g, v=T)
+Vertices: 8 
+Edges: 0 
+Directed: TRUE 
+Vertex attributes:
+        shape color    name
+[1]      <NA>  <NA>    <NA>
+[2]      <NA>  <NA>    <NA>
+[3]    circle   red    <NA>
+[4]      <NA>  blue     foo
+[5]      <NA>  <NA>     bar
+[6]      <NA>  <NA>  foobar
+[7] rectangle     1    bar2
+[8] rectangle     2 foobar2
+> 
+> #########################
+> 
+> g <- graph.empty(0) + vertices(letters[1:10]) +
++   vertices("foo", "bar", "bar2", "foobar2")
+> g <- g + edge("a", "b")
+> g
+Vertices: 14 
+Edges: 1 
+Directed: TRUE 
+Edges:
+              
+[1] 'a' -> 'b'
+> 
+> g <- g + edges("foo", "bar", "bar2", "foobar2")
+> g
+Vertices: 14 
+Edges: 3 
+Directed: TRUE 
+Edges:
+                          
+[1] 'a'       -> 'b'      
+[2] 'foo'     -> 'bar'    
+[3] 'bar2'    -> 'foobar2'
+> 
+> g <- g + edges(c("bar", "foo", "foobar2", "bar2"), color="red", weight=1:2)
+> print(g, e=T)
+Vertices: 14 
+Edges: 5 
+Directed: TRUE 
+Edges and their attributes:
+                           color weight
+[1] 'a'       -> 'b'        <NA>     NA
+[2] 'foo'     -> 'bar'      <NA>     NA
+[3] 'bar2'    -> 'foobar2'  <NA>     NA
+[4] 'bar'     -> 'foo'       red      1
+[5] 'foobar2' -> 'bar2'      red      2
+> 
+> #########################
+> 
+> g <- graph.empty() + vertices(letters[1:10])
+> g <- g + path("a", "b", "c", "d")
+> g
+Vertices: 10 
+Edges: 3 
+Directed: TRUE 
+Edges:
+              
+[1] 'a' -> 'b'
+[2] 'b' -> 'c'
+[3] 'c' -> 'd'
+> 
+> g <- g + path("e", "f", "g", weight=1:2, color="red")
+> print(g, e=T)
+Vertices: 10 
+Edges: 5 
+Directed: TRUE 
+Edges and their attributes:
+               weight color
+[1] 'a' -> 'b'     NA  <NA>
+[2] 'b' -> 'c'     NA  <NA>
+[3] 'c' -> 'd'     NA  <NA>
+[4] 'e' -> 'f'      1   red
+[5] 'f' -> 'g'      2   red
+> 
+> g <- g + path(c("f", "c", "j", "d"), width=1:3, color="green")
+> print(g, e=T)
+Vertices: 10 
+Edges: 8 
+Directed: TRUE 
+Edges and their attributes:
+               weight color width
+[1] 'a' -> 'b'     NA  <NA>    NA
+[2] 'b' -> 'c'     NA  <NA>    NA
+[3] 'c' -> 'd'     NA  <NA>    NA
+[4] 'e' -> 'f'      1   red    NA
+[5] 'f' -> 'g'      2   red    NA
+[6] 'f' -> 'c'     NA green     1
+[7] 'c' -> 'j'     NA green     2
+[8] 'j' -> 'd'     NA green     3
+> 
+> #########################
+> 
+> 

@@ -112,7 +112,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
         e <- which(e)
       }
       on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(e)-1,
+      tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(graph, e)-1,
                    as.numeric(3),
                    PACKAGE="igraph")
       tmp[as.numeric(x)]
@@ -123,7 +123,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
         e <- which(e)
       }
       on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(e)-1,
+      tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(graph, e)-1,
                    as.numeric(1),
                    PACKAGE="igraph")
       tmp[as.numeric(x)]
@@ -134,12 +134,12 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
         e <- which(e)
       }
       on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(e)-1,
+      tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(graph, e)-1,
                    as.numeric(2),
                    PACKAGE="igraph")
       tmp[as.numeric(x)]
     }
-    i <- eval(i, envir=c(graph[[9]][[3]], nei=nei, innei=innei,
+    i <- eval(i, envir=c(unclass(graph)[[9]][[3]], nei=nei, innei=innei,
                    outnei=outnei, adj=adj, from=from, to=to),
               enclos=parent.frame())
     if (is.numeric(i) || is.integer(i)) {
@@ -198,10 +198,10 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
                    PACKAGE="igraph")
       tmp[ as.numeric(x) ]
     }
-    i <- eval(i, envir=c(graph[[9]][[4]],
+    i <- eval(i, envir=c(unclass(graph)[[9]][[4]],
                    adj=adj, from=from, to=to,
-                   .igraph.from=list(graph[[3]][ as.numeric(x) ]),
-                   .igraph.to=list(graph[[4]][as.numeric(x)]),
+                   .igraph.from=list(unclass(graph)[[3]][ as.numeric(x) ]),
+                   .igraph.to=list(unclass(graph)[[4]][as.numeric(x)]),
                    .igraph.graph=list(graph),
                    `%--%`=`%--%`, `%->%`=`%->%`, `%<-%`=`%<-%`),
               enclos=parent.frame())
@@ -220,9 +220,12 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   res
 } 
 
-"%--%" <- function(f, t) {
+"%--%" <- function(f, t) {  
   from <- get(".igraph.from", parent.frame())
   to <- get(".igraph.to", parent.frame())
+  graph <- get(".igraph.graph", parent.frame())
+  f <- as.igraph.vs(graph, f)-1
+  t <- as.igraph.vs(graph, t)-1
   (from %in% f & to %in% t) | (to %in% f & from %in% t)
 }
 
@@ -230,6 +233,8 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   from <- get(".igraph.from", parent.frame())
   to <- get(".igraph.to", parent.frame())
   graph <- get(".igraph.graph", parent.frame())
+  f <- as.igraph.vs(graph, f)-1
+  t <- as.igraph.vs(graph, t)-1
   if (is.directed(graph)) {
     from %in% f & to %in% t
   } else {
@@ -241,6 +246,8 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   from <- get(".igraph.from", parent.frame())
   to <- get(".igraph.to", parent.frame())
   graph <- get(".igraph.graph", parent.frame())
+  value <- as.igraph.vs(graph, value)-1
+  t <- as.igraph.vs(graph, t)-1
   if (is.directed(graph)) {
     from %in% value & to %in% t
   } else {
@@ -359,4 +366,40 @@ as.igraph.vs <- function(graph, v) {
   }
 }
 
-as.igraph.es <- as.numeric
+as.igraph.es <- function(graph, e) {
+  if (is.character(e)) {
+    Pairs <- grep("|", e, fixed=TRUE)
+    Names <- if (length(Pairs)==0) seq_along(e) else -Pairs
+    res <- numeric(length(e))
+
+    ## Based on vertex ids/names
+    if (length(Pairs)!=0) {
+      vv <- strsplit(e[Pairs], "|", fixed=TRUE)
+      vl <- sapply(vv, length)
+      if (any(vl != 2)) {
+        stop("Invalid edge name: ", e[Pairs][vl!=2][1])
+      }
+      vp <- unlist(vv)
+      if (! "name" %in% list.vertex.attributes(graph)) {
+        vp <- as.numeric(vp)
+      }
+      res[Pairs] <- get.edge.ids(graph, vp)
+    }
+
+    ## Based on edge ids/names
+    if (length(Names) != 0) {
+      if ("name" %in% list.edge.attributes(graph)) {
+        res[Names] <- as.numeric(match(e[Names], E(graph)$name))
+      } else {
+        res[Names] <- as.numeric(e[Names])
+      }
+    }
+    
+  } else {
+    res <- as.numeric(e)
+  }
+  if (any(is.na(res))) {
+    stop("Invalid edge names")
+  }
+  res
+}

@@ -1,0 +1,85 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> g <- graph.ring(10)
+> V(g)$name <- letters[1:10]
+> E(g)$name <- LETTERS[1:10]
+> 
+> g <- g - c("a", "b")
+> g
+Vertices: 8 
+Edges: 7 
+Directed: FALSE 
+Edges:
+                
+['C'] 'c' -- 'd'
+['D'] 'd' -- 'e'
+['E'] 'e' -- 'f'
+['F'] 'f' -- 'g'
+['G'] 'g' -- 'h'
+['H'] 'h' -- 'i'
+['I'] 'i' -- 'j'
+> 
+> g <- g - edge("e|f")
+> g
+Vertices: 8 
+Edges: 6 
+Directed: FALSE 
+Edges:
+                
+['C'] 'c' -- 'd'
+['D'] 'd' -- 'e'
+['F'] 'f' -- 'g'
+['G'] 'g' -- 'h'
+['H'] 'h' -- 'i'
+['I'] 'i' -- 'j'
+> 
+> g <- g - edge("H")
+> g
+Vertices: 8 
+Edges: 5 
+Directed: FALSE 
+Edges:
+                
+['C'] 'c' -- 'd'
+['D'] 'd' -- 'e'
+['F'] 'f' -- 'g'
+['G'] 'g' -- 'h'
+['I'] 'i' -- 'j'
+> 
+> g <- graph.ring(10)
+> V(g)$name <- letters[1:10]
+> 
+> g <- g - path("a", "b", "c", "d")
+> g
+Vertices: 10 
+Edges: 7 
+Directed: FALSE 
+Edges:
+              
+[1] 'd' -- 'e'
+[2] 'e' -- 'f'
+[3] 'f' -- 'g'
+[4] 'g' -- 'h'
+[5] 'h' -- 'i'
+[6] 'i' -- 'j'
+[7] 'a' -- 'j'
+> 
+> 

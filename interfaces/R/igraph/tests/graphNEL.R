@@ -1,5 +1,6 @@
 
 library(igraph)
+library(graph, warn.conflicts=FALSE)
 
 g <- erdos.renyi.game(100, 5/100)
 N <- igraph.to.graphNEL(g)

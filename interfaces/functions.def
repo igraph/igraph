@@ -19,6 +19,7 @@ igraph_add_vertices:
 igraph_delete_edges:
         PARAMS: INOUT GRAPH graph, EDGESET edges
         NAME-R: delete.edges
+        DEPS: edges ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_delete_vertices:
@@ -62,6 +63,7 @@ igraph_edge:
 igraph_edges:
         PARAMS: GRAPH graph, EDGESET eids, OUT VECTOR edges
         NAME-R: get.edges
+        DEPS: eids ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_get_eid:
@@ -515,6 +517,7 @@ igraph_topological_sorting:
 
 igraph_is_loop:
         PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL
+        DEPS: es ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_is_dag:
@@ -527,10 +530,12 @@ igraph_is_simple:
 
 igraph_is_multiple:
         PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL
+        DEPS: es ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_count_multiple:
         PARAMS: GRAPH graph, OUT VECTOR res, EDGESET es=ALL
+        DEPS: es ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_girth:

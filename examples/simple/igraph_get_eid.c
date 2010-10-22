@@ -45,7 +45,7 @@ int main() {
   igraph_vector_init(&hist, 9);
 
   for (i=1; i<10; i++) {
-    igraph_get_eid(&g, &eid, 0, i, IGRAPH_DIRECTED);
+    igraph_get_eid(&g, &eid, 0, i, IGRAPH_DIRECTED, /*error=*/ 1);
     VECTOR(hist)[ (long int) eid ] = 1;
   }
   print_vector(&hist, stdout);
@@ -60,9 +60,9 @@ int main() {
   igraph_vector_init(&hist, 9);
 
   for (i=1; i<10; i++) {
-    igraph_get_eid(&g, &eid, 0, i, IGRAPH_UNDIRECTED);
+    igraph_get_eid(&g, &eid, 0, i, IGRAPH_UNDIRECTED, /*error=*/ 1);
     VECTOR(hist)[ (long int) eid ] += 1;
-    igraph_get_eid(&g, &eid, i, 0, IGRAPH_DIRECTED);
+    igraph_get_eid(&g, &eid, i, 0, IGRAPH_DIRECTED, /*error=*/ 1);
     VECTOR(hist)[ (long int) eid ] += 1;
   }
   print_vector(&hist, stdout);
@@ -76,7 +76,7 @@ int main() {
 
   igraph_set_error_handler(igraph_error_handler_ignore);
   
-  ret=igraph_get_eid(&g, &eid, 5, 6, IGRAPH_UNDIRECTED);
+  ret=igraph_get_eid(&g, &eid, 5, 6, IGRAPH_UNDIRECTED, /*error=*/ 1);
   if (ret != IGRAPH_EINVAL) {
     return 1;
   }
@@ -98,9 +98,9 @@ int main() {
 /*   n=igraph_ecount(&g); */
 /*   for (i=0; i<n; i++) { */
 /*     igraph_edge(&g, i, &from, &to); */
-/*     igraph_get_eid(&g, &eid, from, to, 1); */
-/*     igraph_get_eid(&g, &eid, to, from, 0); */
-/*     igraph_get_eid(&g, &eid, from, to, 0); */
+/*     igraph_get_eid(&g, &eid, from, to, 1, 1); */
+/*     igraph_get_eid(&g, &eid, to, from, 0, 1); */
+/*     igraph_get_eid(&g, &eid, from, to, 0, 1); */
 /*   } */
 /*   igraph_destroy(&g); */
 
@@ -108,8 +108,8 @@ int main() {
 /*   n=igraph_ecount(&g); */
 /*   for (i=0; i<n; i++) { */
 /*     igraph_edge(&g, i, &from, &to); */
-/*     igraph_get_eid(&g, &eid, from, to, 0); */
-/*     igraph_get_eid(&g, &eid, to, from, 0); */
+/*     igraph_get_eid(&g, &eid, from, to, 0, 1); */
+/*     igraph_get_eid(&g, &eid, to, from, 0, 1); */
 /*   } */
 /*   igraph_destroy(&g); */
 
@@ -118,8 +118,8 @@ int main() {
 /*   n=igraph_ecount(&g); */
 /*   for (i=0; i<n; i++) { */
 /*     igraph_edge(&g, i, &from, &to); */
-/*     igraph_get_eid(&g, &eid, from, to, 0); */
-/*     igraph_get_eid(&g, &eid, to, from, 0); */
+/*     igraph_get_eid(&g, &eid, from, to, 0, 1); */
+/*     igraph_get_eid(&g, &eid, to, from, 0, 1); */
 /*   } */
 /*   igraph_destroy(&g); */
 
@@ -127,7 +127,7 @@ int main() {
 /*   n=igraph_ecount(&g); */
 /*   for (i=0; i<n; i++) { */
 /*     igraph_edge(&g, i, &from, &to); */
-/*     igraph_get_eid(&g, &eid, from, to, 0); */
+/*     igraph_get_eid(&g, &eid, from, to, 0, 1); */
 /*   } */
 /*   igraph_destroy(&g); */
   
@@ -135,7 +135,7 @@ int main() {
 /*   n=igraph_ecount(&g); */
 /*   for (i=0; i<n; i++) { */
 /*     igraph_edge(&g, i, &from, &to); */
-/*     igraph_get_eid(&g, &eid, from, to, 0); */
+/*     igraph_get_eid(&g, &eid, from, to, 0, 1); */
 /*   } */
 /*   igraph_destroy(&g); */
 
@@ -143,7 +143,7 @@ int main() {
 /*   n=igraph_ecount(&g); */
 /*   for (i=0; i<n; i++) { */
 /*     igraph_edge(&g, i, &from, &to); */
-/*     igraph_get_eid(&g, &eid, from, to, 0); */
+/*     igraph_get_eid(&g, &eid, from, to, 0, 1); */
 /*   } */
 /*   igraph_destroy(&g); */
 
@@ -151,8 +151,8 @@ int main() {
 /*   n=igraph_ecount(&g); */
 /*   for (i=0; i<n; i++) { */
 /*     igraph_edge(&g, i, &from, &to); */
-/*     igraph_get_eid(&g, &eid, from, to, 0); */
-/*     igraph_get_eid(&g, &eid, to, from, 0); */
+/*     igraph_get_eid(&g, &eid, from, to, 0, 1); */
+/*     igraph_get_eid(&g, &eid, to, from, 0, 1); */
 /*   } */
 /*   igraph_destroy(&g); */
     

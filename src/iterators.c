@@ -1470,7 +1470,8 @@ int igraph_i_es_pairs_size(const igraph_t *graph,
     long int from=VECTOR(*es->data.path.ptr)[2*i];
     long int to=VECTOR(*es->data.path.ptr)[2*i+1];
     igraph_integer_t eid;
-    IGRAPH_CHECK(igraph_get_eid(graph, &eid, from, to, es->data.path.mode));
+    IGRAPH_CHECK(igraph_get_eid(graph, &eid, from, to, es->data.path.mode, 
+				/*error=*/ 1));
   }
   
   return 0;
@@ -1491,7 +1492,8 @@ int igraph_i_es_path_size(const igraph_t *graph,
     long int from=VECTOR(*es->data.path.ptr)[i];
     long int to=VECTOR(*es->data.path.ptr)[i+1];
     igraph_integer_t eid;
-    IGRAPH_CHECK(igraph_get_eid(graph, &eid, from, to, es->data.path.mode));
+    IGRAPH_CHECK(igraph_get_eid(graph, &eid, from, to, es->data.path.mode,
+				/*error=*/ 1));
   }
 
   return 0;
@@ -1593,7 +1595,8 @@ int igraph_i_eit_pairs(const igraph_t *graph,
     long int from=VECTOR(*es.data.path.ptr)[2*i];
     long int to=VECTOR(*es.data.path.ptr)[2*i+1];
     igraph_integer_t eid;
-    IGRAPH_CHECK(igraph_get_eid(graph, &eid, from, to, es.data.path.mode));
+    IGRAPH_CHECK(igraph_get_eid(graph, &eid, from, to, es.data.path.mode, 
+				/*error=*/ 1));
     VECTOR(*eit->vec)[i]=eid;
   }
   
@@ -1627,7 +1630,7 @@ int igraph_i_eit_multipairs(const igraph_t *graph,
   
   IGRAPH_CHECK(igraph_get_eids_multi(graph, (igraph_vector_t *) eit->vec,
 				     /*pairs=*/ es.data.path.ptr, /*path=*/ 0, 
-				     es.data.path.mode));
+				     es.data.path.mode, /*error=*/ 1));
   
   IGRAPH_FINALLY_CLEAN(2);
   return 0;
@@ -1665,7 +1668,8 @@ int igraph_i_eit_path(const igraph_t *graph,
     long int from=VECTOR(*es.data.path.ptr)[i];
     long int to=VECTOR(*es.data.path.ptr)[i+1];
     igraph_integer_t eid;
-    IGRAPH_CHECK(igraph_get_eid(graph, &eid, from, to, es.data.path.mode));
+    IGRAPH_CHECK(igraph_get_eid(graph, &eid, from, to, es.data.path.mode, 
+				/*error=*/ 1));
     VECTOR(*eit->vec)[i]=eid;
   }
 

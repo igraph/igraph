@@ -112,3 +112,125 @@ graph.compose <- function(g1, g2) {
 "%c%" <- function(x,y) {
   graph.compose(x,y)
 }
+
+edge <- function(...) {
+  structure(list(...), class="igraph.edge")
+}
+
+edges <- edge
+
+vertex <- function(...) {
+  structure(list(...), class="igraph.vertex")
+}
+
+vertices <- vertex
+
+path <- function(...) {
+  structure(list(...), class="igraph.path")
+}
+
+`+.igraph` <- function(e1, e2) {
+  if (!is.igraph(e1) && is.igraph(e2)) {
+    tmp <- e1
+    e1 <- e2
+    e2 <- tmp
+  }
+  if (is.igraph(e2)) {
+    ## Disjoint union of graphs
+    res <- graph.disjoint.union(e1,e2)
+
+  } else if ("igraph.edge" %in% class(e2)) {
+    ## Adding edges, possibly with attributes
+    ## Non-named arguments define the edges
+    if (is.null(names(e2))) {
+      toadd <- unlist(e2, recursive=FALSE)
+      attr <- list()
+    } else {
+      toadd <- unlist(e2[names(e2)==""])
+      attr <- e2[names(e2)!=""]
+    }
+    res <- add.edges(e1, as.igraph.vs(e1, toadd), attr=attr)
+
+  } else if ("igraph.vertex" %in% class(e2)) {
+    ## Adding vertices, possibly with attributes
+    ## If there is a single unnamed argument, that contains the vertex names
+    wn <- which(names(e2)=="")
+    if (length(wn)==1) {
+      names(e2)[wn] <- "name"
+    } else if (is.null(names(e2))) {
+    ## No names at all, everything is a vertex name
+      e2 <- list(name=unlist(e2, recursive=FALSE))
+    } else if (length(wn)==0) {
+    ## If there are no non-named arguments, we are fine
+    } else {
+    ## Otherwise, all unnamed arguments are collected and used as
+    ## vertex names
+      nn <- unlist(e2[wn], recursive=FALSE)
+      e2 <- c(list(name=nn), e2[names(e2)!=""])
+    }
+    la <- unique(sapply(e2, length))
+    res <- add.vertices(e1, la, attr=e2)
+
+  } else if ("igraph.path" %in% class(e2)) {
+    ## Adding edges along a path, possibly with attributes
+    ## Non-named arguments define the edges
+    if (is.null(names(e2))) {
+      toadd <- unlist(e2, recursive=FALSE)
+      attr <- list()
+    } else {
+      toadd <- unlist(e2[names(e2)==""])
+      attr <- e2[names(e2)!=""]
+    }
+    toadd <- as.igraph.vs(e1, toadd)
+    lt <- length(toadd)
+    if (lt >= 2) {
+      toadd <- c(toadd[1], rep(toadd[2:(lt-1)], each=2), toadd[lt])
+      res <- add.edges(e1, toadd, attr=attr)
+    } else {
+      res <- e1
+    }
+    
+  } else if (is.numeric(e2) && length(e2)==1) {
+    ## Adding some isolate vertices
+    res <- add.vertices(e1, e2)
+
+  } else if (is.character(e2)) {
+    ## Adding named vertices
+    res <- add.vertices(e1, length(e2), name=e2)
+    
+  } else {
+    stop("Cannot add unknown type to igraph graph")
+  }
+  res
+}
+
+`-.igraph` <- function(e1, e2) {
+  if (missing(e2)) {
+    stop("Non-numeric argument to negation operator")
+  }
+  if (is.igraph(e2)) {
+    res <- graph.difference(e1, e2)
+  } else if ("igraph.vertex" %in% class(e2)) {
+    res <- delete.vertices(e1, unlist(e2, recursive=FALSE))
+  } else if ("igraph.edge" %in% class(e2)) {
+    res <- delete.edges(e1, unlist(e2, recursive=FALSE))
+  } else if ("igraph.path" %in% class(e2)) {
+    todel <- unlist(e2, recursive=FALSE)
+    lt <- length(todel)
+    if (lt >= 2) {
+      todel <- paste(todel[-lt], todel[-1], sep="|")
+      res <- delete.edges(e1, todel)
+    } else {
+      res <- e1
+    }
+  } else if ("igraph.vs" %in% class(e2)) {
+    res <- delete.vertices(e1, e2)
+  } else if ("igraph.es" %in% class(e2)) {
+    res <- delete.edges(e1, e2)
+  } else if (is.numeric(e2) || is.character(e2)) {
+    res <- delete.vertices(e1, e2)
+  } else {
+    stop("Cannot substract unknown type from igraph graph")
+  }
+  res
+}

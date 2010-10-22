@@ -65,6 +65,18 @@
   that gives the vertices for which the degree is calculated. This
   argument can be given as a character vector of vertex names.
 
+  Edges can also have a \sQuote{name} attribute, and this is treated
+  specially as well. Just like for vertices, edges can also be selected
+  based on their names, e.g. in the \code{\link{delete.edges}} and
+  other functions.
+
+  We note here, that vertex names can also be used to select edges.
+  The form \sQuote{\code{from|to}}, where \sQuote{\code{from}} and
+  \sQuote{\code{to}} are vertex names, select a single, possibly
+  directed, edge going from \sQuote{\code{from}} to
+  \sQuote{\code{to}}. The two forms can also be mixed in the same edge
+  selector.
+  
   Other attributes define visualization parameters, see
   \code{\link{igraph.plotting}} for details.
 

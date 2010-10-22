@@ -1357,8 +1357,10 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
 	    end=1;
 	  } else if (edge_color1) {
 	    igraph_integer_t eid1, eid2;
-	    igraph_get_eid(graph1, &eid1, node, cand1, /*directed=*/ 1);
-	    igraph_get_eid(graph2, &eid2, node2, cand2, /*directed=*/ 1 );
+	    igraph_get_eid(graph1, &eid1, node, cand1, /*directed=*/ 1, 
+			   /*error=*/ 1);
+	    igraph_get_eid(graph2, &eid2, node2, cand2, /*directed=*/ 1,
+			   /*error=*/ 1);
 	    if (VECTOR(*edge_color1)[(long int)eid1] !=
 		VECTOR(*edge_color2)[(long int)eid2]) {
 	      end=1;
@@ -1382,8 +1384,10 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
 	    end=1;
 	  } else if (edge_color1) {
 	    igraph_integer_t eid1, eid2;
-	    igraph_get_eid(graph1, &eid1, cand1, node, /*directed=*/ 1);
-	    igraph_get_eid(graph2, &eid2, cand2, node2, /*directed=*/ 1);
+	    igraph_get_eid(graph1, &eid1, cand1, node, /*directed=*/ 1, 
+			   /*error=*/ 1);
+	    igraph_get_eid(graph2, &eid2, cand2, node2, /*directed=*/ 1,
+			   /*error=*/ 1);
 	    if (VECTOR(*edge_color1)[(long int)eid1] != 
 		VECTOR(*edge_color2)[(long int)eid2]) {
 	      end=1;
@@ -1407,8 +1411,10 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
 	    end=1;
 	  } else if (edge_color1) {
 	    igraph_integer_t eid1, eid2;
-	    igraph_get_eid(graph1, &eid1, node2, cand1, /*directed=*/ 1);
-	    igraph_get_eid(graph2, &eid2, node, cand2, /*directed=*/ 1);
+	    igraph_get_eid(graph1, &eid1, node2, cand1, /*directed=*/ 1, 
+			   /*error=*/ 1);
+	    igraph_get_eid(graph2, &eid2, node, cand2, /*directed=*/ 1,
+			   /*error=*/ 1);
 	    if (VECTOR(*edge_color1)[(long int)eid1] != 
 		VECTOR(*edge_color2)[(long int)eid2]) {
 	      end=1;
@@ -1432,8 +1438,10 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
 	    end=1;
 	  } else if (edge_color1) {
 	    igraph_integer_t eid1, eid2;
-	    igraph_get_eid(graph1, &eid1, cand1, node2, /*directed=*/ 1);
-	    igraph_get_eid(graph2, &eid2, cand2, node, /*directed=*/ 1);
+	    igraph_get_eid(graph1, &eid1, cand1, node2, /*directed=*/ 1, 
+			   /*error=*/ 1);
+	    igraph_get_eid(graph2, &eid2, cand2, node, /*directed=*/ 1, 
+			   /*error=*/ 1);
 	    if (VECTOR(*edge_color1)[(long int)eid1] != 
 		VECTOR(*edge_color2)[(long int)eid2]) {
 	      end=1;
@@ -2137,8 +2145,10 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
 	    end=1;
 	  } else if (edge_color1) {
 	    igraph_integer_t eid1, eid2;
-	    igraph_get_eid(graph1, &eid1, node2, cand1, /*directed=*/ 1);
-	    igraph_get_eid(graph2, &eid2, node, cand2, /*directed=*/ 1);
+	    igraph_get_eid(graph1, &eid1, node2, cand1, /*directed=*/ 1, 
+			   /*error=*/ 1);
+	    igraph_get_eid(graph2, &eid2, node, cand2, /*directed=*/ 1, 
+			   /*error=*/ 1);
 	    if (VECTOR(*edge_color1)[(long int)eid1] != 
 		VECTOR(*edge_color2)[(long int)eid2]) {
 	      end=1;
@@ -2162,8 +2172,10 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
 	    end=1;
 	  } else if (edge_color1) {
 	    igraph_integer_t eid1, eid2;
-	    igraph_get_eid(graph1, &eid1, cand1, node2, /*directed=*/ 1);
-	    igraph_get_eid(graph2, &eid2, cand2, node, /*directed=*/ 1);
+	    igraph_get_eid(graph1, &eid1, cand1, node2, /*directed=*/ 1, 
+			   /*error=*/ 1);
+	    igraph_get_eid(graph2, &eid2, cand2, node, /*directed=*/ 1,
+			   /*error=*/ 1);
 	    if (VECTOR(*edge_color1)[(long int)eid1] != 
 		VECTOR(*edge_color2)[(long int)eid2]) {
 	      end=1;

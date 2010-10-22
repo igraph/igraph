@@ -55,8 +55,8 @@ int igraph_are_connected(const igraph_t *graph,
     IGRAPH_ERROR("are connected", IGRAPH_EINVVID);
   }
 
-  igraph_get_eid2(graph, &eid, v1, v2, /*directed=*/1);
-  *res = (eid >= 0);
+  igraph_get_eid(graph, &eid, v1, v2, /*directed=*/1, /*error=*/ 0);
+  *res = (eid >=0);
 
   return IGRAPH_SUCCESS;
 }
