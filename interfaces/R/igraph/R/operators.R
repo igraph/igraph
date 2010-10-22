@@ -205,6 +205,9 @@ path <- function(...) {
 }
 
 `-.igraph` <- function(e1, e2) {
+  if (missing(e2)) {
+    stop("Non-numeric argument to negation operator")
+  }
   if (is.igraph(e2)) {
     res <- graph.difference(e1, e2)
   } else if ("igraph.vertex" %in% class(e2)) {
