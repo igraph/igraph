@@ -1,3 +1,29 @@
 This files lists the copyright holders and licenses of the various
 data sets in the igraphdata package:
 
+macaque
+-------
+
+This dataset is licensed under a Creative Commons
+Attribution-Share Alike 2.0 UK: England & Wales License, 
+see http://creativecommons.org/licenses/by-sa/2.0/uk/ for details.
+
+Please cite the following reference if you use this dataset:
+
+Négyessy L., Nepusz T., Kocsis L., Bazsó F.: Prediction of the main
+cortical areas and connections involved in the tactile function of the
+visual cortex by network analysis. European Journal of Neuroscience
+23(7):1919–1930, 2006. 
+
+UKfaculty
+---------
+
+This dataset is licensed under a Creative Commons
+Attribution-Share Alike 2.0 UK: England & Wales License, 
+see http://creativecommons.org/licenses/by-sa/2.0/uk/ for details.
+
+Please cite the following reference if you use this dataset:
+
+Nepusz T., Petróczi A., Négyessy L., Bazsó F.: Fuzzy communities and
+the concept of bridgeness in complex networks. Physical Review E
+77:016107, 2008.
