@@ -394,17 +394,17 @@ void igraph_strvector_clear(igraph_strvector_t *sv) {
 int igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
   long int toadd=newsize-v->len, i, j;
   char **tmp;
+  long int reallocsize=newsize;
+  if (reallocsize==0) { reallocsize=1; }
   
   assert(v != 0);
   assert(v->data != 0);
 /*   printf("resize %li to %li\n", v->len, newsize); */
   if (newsize < v->len) { 
-    long int i, reallocsize=newsize;
     for (i=newsize; i<v->len; i++) {
       igraph_Free(v->data[i]);
     }
     /* try to give back some space */
-    if (reallocsize==0) { reallocsize=1; }
     tmp=igraph_Realloc(v->data, reallocsize, char*);
 /*     printf("resize %li to %li, %p\n", v->len, newsize, tmp); */
     if (tmp != 0) {
@@ -412,7 +412,7 @@ int igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
     }
   } else if (newsize > v->len) {
     igraph_bool_t error=0;
-    tmp=igraph_Realloc(v->data, newsize, char*);
+    tmp=igraph_Realloc(v->data, reallocsize, char*);
     if (tmp==0) {
       IGRAPH_ERROR("cannot resize string vector", IGRAPH_ENOMEM);
     }
@@ -516,8 +516,8 @@ void igraph_strvector_permdelete(igraph_strvector_t *v, const igraph_vector_t *i
       igraph_Free(v->data[i]);
     }
   }
-  /* Try to make it shorter */
-  tmp=igraph_Realloc(v->data, v->len-nremove, char*);
+  /* Try to make it shorter */  
+  tmp=igraph_Realloc(v->data, v->len-nremove ? v->len-nremove : 1, char*);
   if (tmp != 0) {
     v->data=tmp;
   }
@@ -544,7 +544,7 @@ void igraph_strvector_remove_negidx(igraph_strvector_t *v, const igraph_vector_t
     }
   }
   /* Try to give back some memory */
-  tmp=igraph_Realloc(v->data, v->len-nremove, char*);
+  tmp=igraph_Realloc(v->data, v->len-nremove ? v->len-nremove : 1, char*);
   if (tmp != 0) {
     v->data=tmp;
   }
