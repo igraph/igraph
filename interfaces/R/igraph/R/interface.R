@@ -38,7 +38,7 @@ add.edges <- function(graph, edges, ..., attr=list()) {
   
   edges.orig <- ecount(graph)  
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  graph <- .Call("R_igraph_add_edges", graph, as.numeric(edges)-1,
+  graph <- .Call("R_igraph_add_edges", graph, as.igraph.vs(graph, edges)-1,
                  PACKAGE="igraph")
   edges.new <- ecount(graph)
   
