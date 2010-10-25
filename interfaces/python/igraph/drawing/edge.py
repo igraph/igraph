@@ -56,7 +56,7 @@ class AbstractEdgeDrawer(object):
         ctx.set_line_width(edge.width)
         radius = vertex.size * 1.5
         center_x = vertex.position[0] + cos(pi/4) * radius / 2.
-        center_y = vertex.position[0] - sin(pi/4) * radius / 2.
+        center_y = vertex.position[1] - sin(pi/4) * radius / 2.
         ctx.arc(center_x, center_y, radius/2., 0, pi * 2)
         ctx.stroke()
 
