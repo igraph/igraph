@@ -199,6 +199,7 @@ get.adjedgelist <- function(graph, mode=c("all", "out", "in", "total")) {
                PACKAGE="igraph")
   res <- lapply(res, function(x) x+1)
   if (is.named(graph)) names(res) <- V(graph)$name
+  res
 }
 
 igraph.from.graphNEL <- function(graphNEL, name=TRUE, weight=TRUE,
