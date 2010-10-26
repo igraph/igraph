@@ -18,129 +18,150 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
 ## 02110-1301 USA
 
-`[.igraph` <- function(x, i, j, ..., directed=TRUE, weighted=TRUE, 
-                       multi=FALSE, edges=NULL, simplify=TRUE, unique=TRUE,
-                       drop=TRUE) {
-  if (!is.null(edges) && (!missing(i) || !missing(j))) {
-    stop("Vertices cannot be given together with 'edges'")
-  }
-  if (!missing(i) && !missing(j)) {
-    ## Query about connections
-    weighted <- weighted && "weight" %in% list.edge.attributes(x)
-    if (length(i) != length(j)) {
-      stop("'i' and 'j' must have the same length")
-    }
-    res <- get.edge.ids(x, rbind(i,j), directed=directed, error=FALSE,
-                        multi=multi)
-    if (weighted) {
-      if (any(res!=0)) {
-        res[res!=0] <- get.edge.attribute(x, "weight", res[res!=0])
-      }
-    } else {
-      res <- as.logical(res)
-    }
-  } else if (!is.null(edges)) {
-    ## Query incident vertices for a set of edges
-    on.exit(.Call("R_igraph_finalizer", PACKAGE="igraph"))
-    res <- .Call("R_igraph_edges", x, as.igraph.es(x, edges)-1,
-                 PACKAGE="igraph")+1
-    if (!simplify) {
-      ## TODO: rewrite this in C to make it faster
-      res <- split(res, rep(seq_along(edges), each=2))
-    } else if (unique) {
-      res <- unique(res)
-    }
+# Indexing of igraph graphs.
+#
+# Goals:
+# 1. flexible graph manipulation
+# 2. to be as close to the usual matrix and adjacency list semantics,
+#    as possible
+# 3. simple
+# 4. fast
+# 5. orthogonal
+#
+# Rules:
+# - [ is about the existence of the edges.
+# - [ can be used for weights as well, if the graph is weighted.
+# - [[ is about adjacent vertices, and essentially works as an
+#   adjacency list.
+#
+# Use cases:
+# - G[1,2]      is there an edge from vertex 1 to vertex 2?
+# - G[1,1:3]    are there edges from vertex 1 to vertices 1:3?
+# - G[1:2,1:3]  are there adges from vertices 1:2 to vertices 1:3?
+#               this returns a (possibly sparse) matrix.
+# - G[degree(G)==0,1:4]
+#               logical vectors work
+# - G[1,-1]     negative indices work
+#
+# - G[[1,]]     adjacent vertices of 1
+# - G[[,1]]     adjacent predessors of 1
+# - G[[degree(G),]]
+#               logical vectors work
+# - G[[-1,]]    negative indices work
+#
+# - G[1,2,attr="value"]
+#               query an edge attribute
+# - G[1:3,2,eid=TRUE]
+#               create an edge sequence
+#
+# TODO: how to do query edges based on vertex id pairs?
+# maybe G[from=v, to=w] is good.
+
+`[.igraph` <- function(x, i, j, ..., sparse=getIgraphOpt("sparsematrices"),
+                       edges=FALSE, drop=TRUE,
+                       attr=if (is.weighted(x)) "weight" else NULL) {
+  ## TODO: make it faster, don't need the whole matrix usually
+  if (missing(i) && missing(j)) {
+    get.adjacency(x, sparse=sparse, attr=attr, eids=edges)
+  } else if (missing(j)) {
+    get.adjacency(x, sparse=sparse, attr=attr, eids=edges)[j,,drop=drop]
+  } else if (missing(i)) {
+    get.adjacency(x, sparse=sparse, attr=attr, eids=edges)[,i,drop=drop]
   } else {
-    ## Query adjacenct vertices for some vertices
-    ## TODO: do this with one C call
-    if (missing(i)) {
-      mode <- if (directed) "in" else "all"
-      v <- j
-    } else {
-      mode <- if (directed) "out" else "all"
-      v <- i
-    }
-    res <- lapply(v, neighbors, graph=x, mode=mode)
-    if (simplify) {
-      res <- unlist(res)
-      if (unique) { res <- unique(res) }
-    }
+    get.adjacency(x, sparse=sparse, attr=attr, eids=edges)[i,j,drop=drop]
   }
-  res
 }
 
-`[[.igraph` <- function(x, i, j, ..., directed=TRUE, multi=FALSE,
-                        simplify=TRUE, unique=TRUE, exact=TRUE) {
-
-  if (!missing(i) && !missing(j)) {
-    ## Query edge ids connection some vertices
-    if (length(i) != length(j)) {
-      stop("'i' and 'j' must have the same length")
-    }
-    res <- get.edge.ids(x, rbind(i,j), directed=directed, error=FALSE,
-                        multi=multi)
-    res[res==0] <- NA
+`[[.igraph` <- function(x, i, j, ..., directed=TRUE,
+                        edges=FALSE, exact=TRUE) {
+  ## TODO: make it faster, don't need the whole list usually
+  getfun <- if (edges) get.adjedgelist else get.adjlist
+  if (missing(i) && missing(j)) {
+    mode <- if (directed) "out" else "all"
+    getfun(x, mode=mode)
+  } else if (missing(j)) {
+    mode <- if (directed) "out" else "all"
+    getfun(x, mode=mode)[i]
+  } else if (missing(i)) {
+    mode <- if (directed) "in" else "all"
+    getfun(x, mode=mode)[j]
   } else {
-    ## Incident edges for some vertices
-    ## TODO: do this with one C call
-    if (missing(i)) {
-      mode <- if (directed) "in" else "all"
-      v <- j
+    mode <- if (directed) "out" else "all"
+    i <- as.igraph.vs(x, i)
+    j <- as.igraph.vs(x, j)
+    if (!edges) {
+      lapply(getfun(x, mode=mode)[i], intersect, j)
     } else {
-      mode <- if (directed) "out" else "all"
-      v <- i
-    }
-    res <- lapply(v, incident, graph=x, mode=mode)
-    if (simplify) {
-      res <- unlist(res)
-      if (unique) { res <- unique(res) }
+      ee <- get.adjedgelist(x, mode=mode)[i]
+      lapply(seq_along(i), function(yy) {
+        from <- i[yy]
+        el <- get.edges(x, ee[[yy]])
+        other <- ifelse(el[,1]==from, el[,2], el[,1])
+        ee[[yy]][other %in% j]
+      })
+      
     }
   }
-  res
 }
 
-`[<-.igraph` <- function(x, i, j, ..., add=FALSE, value) {
-
+`[<-.igraph` <- function(x, i, j, ...,
+                         attr=if (is.weighted(x)) "weight" else NULL,
+                         value) {
+  ## TODO: rewrite this in C to make it faster
   if (!is.null(value) && !is.numeric(value) && !is.logical(value)) {
-    stop("The new value should be NULL, numeric or logical")
+    stop("New value should be NULL, numeric or logical")
   }
   if (is.logical(value) && length(value) != 1) {
-    stop("If new value if logical, then it should be of length 1")
+    stop("Logical value must be of length 1")
   }
   if (is.logical(value) && is.na(value)) {
     stop("Logical value cannot be NA")
   }
-  
-  if (is.null(value) || (is.logical(value) && !value)) {
-    ## Deletion, get the edges to be deleted
-    todel <- x[[i, j, ...]]
+  if (is.numeric(value) && length(value) != 1) {
+    stop("Numeric value must be of length 1")
+  }
+  if (is.numeric(value) && is.na(value)) {
+    stop("Numeric value cannot contain NA")
+  }
+  if (is.null(value) ||
+      (is.logical(value) && !value) ||
+      (is.numeric(value) && value==0)) {
+    ## Delete edges
+    if (missing(i) && missing(j)) {
+      todel <- unlist(x[[ ,  , ..., edges=TRUE]])
+    } else if (missing(j)) {
+      todel <- unlist(x[[i,  , ..., edges=TRUE]])
+    } else if (missing(i)) {
+      todel <- unlist(x[[ , j, ..., edges=TRUE]])
+    } else {
+      todel <- unlist(x[[i, j, ..., edges=TRUE]])
+    }
     x <- delete.edges(x, todel)
   } else {
-    ## Not deletion, can be addition or update or mixed
-    add <- add | ! x[i,j,...]
-    if (any(add)) {
-      if (is.logical(value)) {
-        ## Not weighted
-        toadd <- as.igraph.vs(x, as.vector(rbind(i[add],j[add])))
+    ## Addition or update of an attribute (or both)
+    i <- if (missing(i)) as.numeric(V(x)) else as.igraph.vs(x, i)
+    j <- if (missing(j)) as.numeric(V(x)) else as.igraph.vs(x, j)
+    if (length(i) != 0 && length(j) != 0) {
+      ## Existing edges, and their endpoints
+      exe <- x[[i, j, ..., edges=TRUE]]
+      exv <- x[[i, j, ...]]
+      toadd <- unlist(lapply(seq_along(exv), function(idx) {
+        to <- setdiff(j, exv[[idx]])
+        if (length(to!=0)) {
+          rbind(i[idx], setdiff(j, exv[[idx]]))
+        } else {
+          numeric()
+        }
+      }))
+      ## Do the changes
+      if (is.null(attr)) {
         x <- add.edges(x, toadd)
       } else {
-        ## Weighted
-        if (length(value) != 1 && length(value) != length(i)) {
-          stop("Invalid 'value' length, should be 1 or the same as the ",
-               "number of edges")
-        }
-        if (! "weight" %in% list.edge.attributes(x)) {
-          x <- set.edge.attribute(x, "weight", value=NA)
-        }
-        toadd <- as.igraph.vs(x, as.vector(rbind(i[add],j[add])))
-        x <- add.edges(x, toadd, weight=value)
+        x <- add.edges(x, toadd, attr=structure(list(value), names=attr))
+        toupdate <- unlist(x[[i, j, ..., edges=TRUE]])
+        x <- set.edge.attribute(x, attr, toupdate, value)
       }
-    }
-    if (any(!add) && is.numeric(value)) {
-      ## Update weights
-      toupd <- x[[i[!add],j[!add],...]]
-      x <- set.edge.attribute(x, "weight", toupd, value[!add])
-    }
+    }    
   }
   x
 }

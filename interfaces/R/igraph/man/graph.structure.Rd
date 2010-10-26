@@ -15,12 +15,12 @@
 \description{These are the methods for simple manipulation of graphs:
   adding and deleting edges and vertices.}
 \usage{
-\method{[}{igraph}(x, i, j, \dots, directed=TRUE, weighted=TRUE,
-            multi=FALSE, edges=NULL, simplify=TRUE, unique=TRUE,
-            drop=TRUE)
-\method{[[}{igraph}(x, i, j, \dots, directed=TRUE, multi=FALSE,
-            simplify=TRUE, unique=TRUE, exact=TRUE)
-\method{[}{igraph}(x, i, j, \dots, add=FALSE) <- value 
+\method{[}{igraph}(x, i, j, \dots, sparse=getIgraphOpt("sparsematrices"),
+                   edges=FALSE, drop=TRUE,
+                   attr=if (is.weighted(x)) "weight" else NULL)
+\method{[[}{igraph}(x, i, j, \dots, directed=TRUE, edges=FALSE, exact=TRUE)
+\method{[}{igraph}(x, i, j, \dots,
+                   attr=if (is.weighted(x)) "weight" else NULL) <- value 
 
 \method{+}{igraph}(e1, e2)
 \method{-}{igraph}(e1, e2)
@@ -37,7 +37,7 @@ delete.vertices(graph, v)
 }
 \arguments{
   \item{x,graph,e1}{The graph to work on.}
-  \item{i,j}{Vertex ids or names. See details below.}
+  \item{i,j}{Vertex ids or names or logical vectors. See details below.}
   \item{\dots}{These are currently ignored for the indexing operators.
     For \code{vertex}, \code{vertices}, \code{edge}, \code{edges} and
     \code{path} see details below.
@@ -46,33 +46,18 @@ delete.vertices(graph, v)
     arguments have to be named.} 
   \item{directed}{Logical scalar, whether to consider edge directions
     in directed graphs. It is ignored for undirected graphs.}
-  \item{weighted}{Logical scalar, whether to use the
-    \sQuote{\code{weight}} edge attribute as edge weights.}
-  \item{multi}{Logical scalar, whether to handle multiple edges. If it
-     is true and the same pairs of vertices are given multiple times in
-     \sQuote{\code{i}} and \sQuote{\code{j}}, then multiple edges are
-     properly reported (if they exist). Otherwise an arbitrary edge is
-     reported between the pairs.}
-  \item{edges}{Edge sequence. For the indexing operator it gives the
-    edges whose incident vertices are returned. For \code{delete.edges}
-    these are the edges to remove.}
-  \item{simplify}{Logical scalar. Whether to put together
-    vertices/edges into a single vector, when querying adjacenct
-    vertices or incident edges.}
-  \item{unique}{Logical scalar. It is only used if
-    \code{simplify=TRUE}. Whether to make the result vector unique.}
+  \item{edges}{Logical scalar, whether to return edge ids.}
   \item{drop,exact}{These arguments are ignored.}
-  \item{add}{Logical scalar, whether to add a new edge to the graph,
-     even if an edge already exists between the specified vertices.}
-  \item{value}{A logical or numeric vector or scalar. If \code{FALSE},
-     then the specified edges will be deleted. If \code{TRUE}, then the
-     specified edges will be added. (By default only if they don't yet
-     exist, see also the \code{add} argument.) If numeric, then the
-     given values will be added as edge weights, together with the
-     edges if they don't yet exist.}
+  \item{value}{A logical or numeric scalar or \code{NULL}. If
+     \code{FALSE}, \code{NULL} or zero, then the specified edges will be
+     deleted. If \code{TRUE} or a non-zero numeric value, then the
+     specified edges will be added. (Only if they don't yet exist.)}
   \item{e2}{See details below.}
-  \item{attr}{Additional edge/vertex attributes to add. This will be
-    concatenated to the other supplied attributes.}
+  \item{attr}{For the indexing operators: if not \code{NULL}, then it
+     should be the name of an edge attribute. This attribute is queried,
+     or updated to the given value. For \code{add.edges} and
+     \code{add.vertices}: additional edge/vertex attributes to add. This
+     will be concatenated to the other supplied attributes.}
   \item{nv}{Numeric constant, the number of vertices to add.}
   \item{v}{Vector sequence, the vertices to remove.}
 }
@@ -82,9 +67,8 @@ delete.vertices(graph, v)
   \sQuote{\code{[[}} indexing operators on the graph object, very
   much like the graph was an adjacency matrix. The single bracket
   indexes the (possibly weighted) adjacency matrix of the graph. The
-  double bracket operator is similar, but indexes a matrix that contains
-  the ids of the edges, for connected pairs of vertices. (And \code{NA}
-  otherwise.) The details on how to use the indexing operators are
+  double bracket operator is similar, but queries the adjacencly list of
+  the graph. The details on how to use the indexing operators are
   discussed below.
 
   The addition (\sQuote{\code{+}}) and division (\sQuote{\code{-}})
@@ -103,86 +87,7 @@ delete.vertices(graph, v)
   straightforward query and update operations on graphs. Here is
   a little summary of what they can do.
 
-  \enumerate{
-    \item Check whether there is an edge between two vertices (\eqn{v}
-      and \eqn{w}) in the graph: \preformatted{  graph[v, w]}
-      A logical scalar is returned.
-
-      The \sQuote{\code{directed}} option can be used to ignore edge
-      direction in directed graphs, i.e.
-      \preformatted{  graph[v, w, directed=FALSE]}
-      returns \code{TRUE}
-      if an edge from \eqn{v} to \eqn{w}, or an edge from \eqn{w} to
-      \eqn{v} exists.
-    \item The same syntax can be used to check multiple vertex pairs,
-      in other words, \eqn{v} and \eqn{w} may be vectors, and in this
-      case a logical vector is returned.
-    \item Weighted graphs behave somewhat differently. Instead of a
-      logical vector, a numeric vector of edge weights is returned.
-      For non-existant edges the vector contains zero weights.
-    \item Query adjacent vertices of one or more vertices. To do
-      this, you need to give only one of the \sQuote{\code{i}} and
-      \sQuote{\code{j}} arguments: \preformatted{  graph[v, ]
-  graph[, w]}
-      Here the first line list all vertices reachable from
-      \eqn{v} via a directed edge, and the second line lists vertices
-      from which \eqn{w} is reachable by a directed edge.
-    \item The same syntax works for multiple vertices as well. By
-      default all adjacency vertices are put into a single vector,
-      but the \sQuote{\code{simplify}} and \sQuote{\code{unique}}
-      arguments change this behavior. If \sQuote{\code{unique}} is
-      \code{FALSE}, then a non-unique vector is returned. If
-      \sQuote{\code{simplify}} is \code{FALSE}, then a list of vectors
-      is returned, one vector for each vertex.
-    \item Incident vertices for an edge (or more edges). For this you
-      need to give the \sQuote{\code{edges}}
-      argument: \preformatted{  graph[edges=e]}
-      Whether a single vector is returned, or a list of vectors, is
-      controlled by the \sQuote{\code{simplify}} and
-      \sQuote{\code{unique}} arguments, just like in the previous
-      case.
-    \item The double-brackets indexing operator can be used to
-      query edge ids. E.g. \preformatted{  graph[[v, w]]}
-      returns the id of the edge from \eqn{v} to \eqn{w}.
-    \item To query the ids of incident edges, give only one of the
-      arguments: \preformatted{  graph[[v, ]]
-  graph[[, w]]}
-      The first form queries outgoing, the second incoming edges in
-      directed graphs. As before, the \sQuote{\code{simplify}} and
-      \sQuote{\code{unique}} arguments define whether to return a
-      list of edge id vectors, separately for each vertex, or a
-      (possibly unique) vector of all of them.
-    \item Adding edges. The single bracket (\sQuote{\code{[}}) operator
-      can be used for adding edges to the graph: \preformatted{  graph[v, w] <-TRUE}
-      adds a new (possibly directed) edge from vertex \eqn{v} to vertex
-      \eqn{w}. By default the new edge is only added, if it does not yet
-      exist an edge between the two vertices. If the \sQuote{\code{add}}
-      argument is set to \code{TRUE}, then a new edge is always added.
-    \item Adding several edges to the graph. The syntax in the previous
-      point can be used to add several edge to the graph, \code{v} and
-      \code{w} can be vectors of the same length, and then their
-      vertices will be pairwise connected.
-    \item Adding weighted edges. For weighted graphs, weighted edges
-      can be added to the graph, if the replacement value is not
-      logical, but a numeric vector: \preformatted{  graph[v, w] <- 1/2}
-      This adds a new edge from vertex \eqn{v} to vertex \eqn{w}, and
-      sets its weight to \eqn{1/2}. As previously, \code{v} and \code{w}
-      can be vectors of vertex ids, to add many edges at the same time.
-      In this case the replacement value can be a vector of the same
-      length as \code{v} and \code{w} to set different edge weights for
-      the new edges; or it can be a single number, to set the same
-      weight for all new edges.
-    \item Updating edge weights. The same syntax can be used to update
-      the edge weights of already existing edges. Even mixing the
-      addition of edges and the updating of weights is possibly, if some
-      of the specified edges already exist, but some don't.
-    \item Deleting edges. The replacement syntax allow the deletion of
-      edges, by specifying \code{FALSE} or \code{NULL} as the
-      replacement value: \preformatted{  graph[v, w] <- FALSE}
-      removes the edge from vertex \eqn{v} to vertex \eqn{w}.
-      As befre, the \code{v} and \code{w} arguments can be vectors of
-      vertex ids, to remove two or more edges at the same time.
-  }
+  TODO
 
   Of course, the indexing operators support vertex names,
   so instead of a numeric vertex id a vertex can also be given to
