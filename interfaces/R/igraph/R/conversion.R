@@ -132,7 +132,7 @@ get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
 
 get.adjacency <- function(graph, type=c("both", "upper", "lower"),
                           attr=NULL, eids=FALSE, names=TRUE, 
-                          sparse=FALSE) {
+                          sparse=getIgraphOpt("sparsematrices")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }

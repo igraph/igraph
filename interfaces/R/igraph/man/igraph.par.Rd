@@ -58,6 +58,9 @@ igraph.par(parid, parvalue = NULL)
       attributes if the graph is modified. The default value is
       \code{list(name="concat", "ignore")} See
       \code{\link{attribute.combination}} for details on this.}
+    \item{sparsematrices}{Whether to use the \code{Matrix} package for
+      (sparse) matrices. It is recommended, if the user works with
+      larger graphs.}
   }
 }
 \value{

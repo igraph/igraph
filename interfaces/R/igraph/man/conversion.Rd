@@ -8,7 +8,8 @@
   a graph, like an adjacency matrix or an edge list.}
 \usage{
 get.adjacency(graph, type=c("both", "upper", "lower"),
-       attr=NULL, eids=FALSE, names=TRUE, sparse=FALSE)
+       attr=NULL, eids=FALSE, names=TRUE,
+       sparse=getIgraphOpt("sparsematrix")
 get.edgelist(graph, names=TRUE)
 }
 \arguments{

@@ -26,7 +26,8 @@
                     "verbose"=FALSE,
                     "vertex.attr.comb"=list(name="concat", "ignore"),
                     "edge.attr.comb"=list(weight="sum", name="concat",
-                      "ignore")
+                      "ignore"),
+                     "sparsematrices"=TRUE
                     )
 
 igraph.pars.set.verbose <- function(verbose) {
