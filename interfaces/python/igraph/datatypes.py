@@ -92,6 +92,32 @@ class Matrix(object):
         """Returns the shape of the matrix as a tuple"""
         return self._nrow, self._ncol
 
+    def __add__(self, other):
+        """Adds the given value to the matrix.
+
+        @param other: either a scalar or a matrix. Scalars will
+          be added to each element of the matrix. Matrices will
+          be added together elementwise.
+        @return: the result matrix
+        """
+        if isinstance(other, Matrix):
+            if self.shape != other.shape:
+                raise ValueError("matrix shapes do not match")
+            return self.__class__([
+                [a+b for a, b in izip(row_a, row_b)]
+                for row_a, row_b in izip(self, other)
+            ])
+        else:
+            return self.__class__([
+                [item+other for item in row] for row in self])
+
+    def __eq__(self, other):
+        """Checks whether a given matrix is equal to another one"""
+        return isinstance(other, Matrix) and \
+                self._nrow == other._nrow and \
+                self._ncol == other._ncol and \
+                self._data == other._data
+
     def __getitem__(self, i):
         """Returns a single item, a row or a column of the matrix
 
@@ -122,6 +148,37 @@ class Matrix(object):
         else:
             raise IndexError("invalid matrix index")
 
+    def __iadd__(self, other):
+        """In-place addition of a matrix or scalar."""
+        if isinstance(other, Matrix):
+            if self.shape != other.shape:
+                raise ValueError("matrix shapes do not match")
+            for row_a, row_b in izip(self._data, other):
+                for i in xrange(len(row_a)):
+                    row_a[i] += row_b[i]
+        else:
+            for row in self._data:
+                for i in xrange(len(row)):
+                    row[i] += other
+        return self
+
+    def __isub__(self, other):
+        """In-place subtraction of a matrix or scalar."""
+        if isinstance(other, Matrix):
+            if self.shape != other.shape:
+                raise ValueError("matrix shapes do not match")
+            for row_a, row_b in izip(self._data, other):
+                for i in xrange(len(row_a)):
+                    row_a[i] -= row_b[i]
+        else:
+            for row in self._data:
+                for i in xrange(len(row)):
+                    row[i] -= other
+        return self
+
+    def __ne__(self, other):
+        """Checks whether a given matrix is not equal to another one"""
+        return not self == other
 
     def __setitem__(self, i, value):
         """Sets a single item, a row or a column of the matrix
@@ -167,6 +224,24 @@ class Matrix(object):
         else:
             raise IndexError("invalid matrix index")
 
+    def __sub__(self, other):
+        """Subtracts the given value from the matrix.
+
+        @param other: either a scalar or a matrix. Scalars will
+          be subtracted from each element of the matrix. Matrices will
+          be subtracted together elementwise.
+        @return: the result matrix
+        """
+        if isinstance(other, Matrix):
+            if self.shape != other.shape:
+                raise ValueError("matrix shapes do not match")
+            return self.__class__([
+                [a-b for a, b in izip(row_a, row_b)]
+                for row_a, row_b in izip(self, other)
+            ])
+        else:
+            return self.__class__([
+                [item-other for item in row] for row in self])
 
     def __repr__(self):
         class_name = self.__class__.__name__
