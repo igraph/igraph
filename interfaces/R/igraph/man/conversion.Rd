@@ -8,7 +8,7 @@
   a graph, like an adjacency matrix or an edge list.}
 \usage{
 get.adjacency(graph, type=c("both", "upper", "lower"),
-       attr=NULL, names=TRUE, binary=FALSE, sparse=FALSE)
+       attr=NULL, names=TRUE, sparse=FALSE)
 get.edgelist(graph, names=TRUE)
 }
 \arguments{
@@ -35,8 +35,6 @@ get.edgelist(graph, names=TRUE)
     matrix containing vertex names (ie. the \code{name} vertex
     attribute) if they exist or numeric vertex ids.
   }
-  \item{binary}{Logical, whether to return a binary matrix. This argument
-    is ignored if \code{attr} is not \code{NULL}.}
   \item{sparse}{Logical scalar, whether to create a sparse matrix. The
     \sQuote{\code{Matrix}} package must be installed for creating sparse
     matrices.}
