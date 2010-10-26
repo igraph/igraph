@@ -1107,7 +1107,8 @@ igraph_split_join_distance:
 #######################################
 
 igraph_get_adjacency:
-        PARAMS: GRAPH graph, OUT MATRIX res, GETADJACENCY type=BOTH
+        PARAMS: GRAPH graph, OUT MATRIX res, GETADJACENCY type=BOTH, \
+                BOOLEAN eids=False
         IGNORE: RR, RC, RNamespace
 
 igraph_get_edgelist:

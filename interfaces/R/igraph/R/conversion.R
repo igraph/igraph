@@ -21,7 +21,7 @@
 ###################################################################
 
 get.adjacency.dense <- function(graph, type=c("both", "upper", "lower"),
-                                attr=NULL, names=TRUE) {
+                                attr=NULL, eids=FALSE, names=TRUE) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -33,7 +33,7 @@ get.adjacency.dense <- function(graph, type=c("both", "upper", "lower"),
   if (is.null(attr)) {    
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     res <- .Call("R_igraph_get_adjacency", graph, as.numeric(type),
-                 PACKAGE="igraph")
+                 as.logical(eids), PACKAGE="igraph")
   } else {
     attr <- as.character(attr)
     if (! attr %in% list.edge.attributes(graph)) {
@@ -98,6 +98,8 @@ get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
       stop("no such edge attribute")
     }
     value <- get.edge.attribute(graph, name=attr)
+  } else if (eids) {
+    value <- seq_len(nrow(el))
   } else {
     value <- rep(1, nrow(el))
   }
@@ -129,16 +131,16 @@ get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
 }
 
 get.adjacency <- function(graph, type=c("both", "upper", "lower"),
-                          attr=NULL, names=TRUE,
+                          attr=NULL, eids=FALSE, names=TRUE, 
                           sparse=FALSE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
 
   if (!sparse) {
-    get.adjacency.dense(graph, type=type, attr=attr, names=names)
+    get.adjacency.dense(graph, type=type, attr=attr, eids=eids, names=names)
   } else {
-    get.adjacency.sparse(graph, type=type, attr=attr, names=names)
+    get.adjacency.sparse(graph, type=type, attr=attr, eids=eids, names=names)
   }  
 }
 

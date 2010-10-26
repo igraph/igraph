@@ -48,7 +48,7 @@ __BEGIN_DECLS
 /* -------------------------------------------------- */
 
 int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
-			 igraph_get_adjacency_t type);
+			 igraph_get_adjacency_t type, igraph_bool_t eids);
 int igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
 			        igraph_get_adjacency_t type);
 int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool_t bycol);

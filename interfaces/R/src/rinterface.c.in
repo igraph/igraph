@@ -4181,16 +4181,17 @@ SEXP R_igraph_get_edgelist(SEXP graph, SEXP pbycol) {
   return result;
 }
   
-SEXP R_igraph_get_adjacency(SEXP graph, SEXP ptype) {
+SEXP R_igraph_get_adjacency(SEXP graph, SEXP ptype, SEXP peids) {
   
   igraph_t g;
   igraph_matrix_t res;
   igraph_integer_t type=REAL(ptype)[0];
+  igraph_bool_t eids=LOGICAL(peids)[0];
   SEXP result;
   
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&res, 0, 0);
-  igraph_get_adjacency(&g, &res, type);
+  igraph_get_adjacency(&g, &res, type, eids);
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   
