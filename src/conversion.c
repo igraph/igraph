@@ -62,7 +62,7 @@
  */
 
 int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
-			 igraph_get_adjacency_t type) {
+			 igraph_get_adjacency_t type, igraph_bool_t eids) {
   
   igraph_eit_t edgeit;
   long int no_of_nodes=igraph_vcount(graph);
@@ -78,44 +78,76 @@ int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
   
   if (directed) {
     while (!IGRAPH_EIT_END(edgeit)) {
-      igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
+      long int edge=IGRAPH_EIT_GET(edgeit);
+      igraph_edge(graph, edge, &ffrom, &fto);
       from=ffrom;
       to=fto;
-      MATRIX(*res, from, to) += 1;
+      if (eids) { 
+	MATRIX(*res, from, to) = edge+1;
+      } else { 
+	MATRIX(*res, from, to) += 1;
+      }
       IGRAPH_EIT_NEXT(edgeit);
     }
   } else if (type==IGRAPH_GET_ADJACENCY_UPPER) {
     while (!IGRAPH_EIT_END(edgeit)) {  
-      igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
+      long int edge=IGRAPH_EIT_GET(edgeit);
+      igraph_edge(graph, edge, &ffrom, &fto);
       from=ffrom;
       to=fto;
       if (to < from) {
-	MATRIX(*res, to, from) += 1;
+	if (eids) { 
+	  MATRIX(*res, to, from) = edge+1;
+	} else {
+	  MATRIX(*res, to, from) += 1;
+	}
       } else {
-	MATRIX(*res, from, to) += 1;    
+	if (eids) {
+	  MATRIX(*res, from, to) = edge+1;
+	} else { 
+	  MATRIX(*res, from, to) += 1;    
+	}
       }
       IGRAPH_EIT_NEXT(edgeit);
     }
   } else if (type==IGRAPH_GET_ADJACENCY_LOWER) {
     while (!IGRAPH_EIT_END(edgeit)) {
-      igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
+      long int edge=IGRAPH_EIT_GET(edgeit);
+      igraph_edge(graph, edge, &ffrom, &fto);
       from=ffrom;
       to=fto;
       if (to < from) {
-	MATRIX(*res, from, to) += 1;
+	if (eids) {
+	  MATRIX(*res, from, to) = edge+1;
+	} else {
+	  MATRIX(*res, from, to) += 1;
+	}
       } else {
-	MATRIX(*res, to, from) += 1;
+	if (eids) { 
+	  MATRIX(*res, to, from) = edge+1;
+	} else {
+	  MATRIX(*res, to, from) += 1;
+	}
       }
       IGRAPH_EIT_NEXT(edgeit);
     }
   } else if (type==IGRAPH_GET_ADJACENCY_BOTH) {
     while (!IGRAPH_EIT_END(edgeit)) {
-      igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
+      long int edge=IGRAPH_EIT_GET(edgeit);
+      igraph_edge(graph, edge, &ffrom, &fto);
       from=ffrom;
       to=fto;
-      MATRIX(*res, from, to) += 1;
+      if (eids) { 
+	MATRIX(*res, from, to) = edge+1;
+      } else {
+	MATRIX(*res, from, to) += 1;
+      }
       if (from != to) {
-	MATRIX(*res, to, from) += 1;
+	if (eids) { 
+	  MATRIX(*res, to, from) = edge+1;
+	} else {
+	  MATRIX(*res, to, from) += 1;
+	}
       }
       IGRAPH_EIT_NEXT(edgeit);
     }

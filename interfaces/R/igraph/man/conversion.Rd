@@ -8,7 +8,7 @@
   a graph, like an adjacency matrix or an edge list.}
 \usage{
 get.adjacency(graph, type=c("both", "upper", "lower"),
-       attr=NULL, names=TRUE, sparse=FALSE)
+       attr=NULL, eids=FALSE, names=TRUE, sparse=FALSE)
 get.edgelist(graph, names=TRUE)
 }
 \arguments{
@@ -25,6 +25,9 @@ get.edgelist(graph, names=TRUE)
     attribute are included in the adjacency matrix. If the graph has
     multiple edges, the edge attribute of an arbitrarily chosen edge
     (for the multiple edges) is included.}
+  \item{eids}{Logical scalar, whether to return the edge ids in the
+    matrix. For non-existant edges zero is returned. This argument is
+    ignored is \code{attr} is not \code{NULL}.}
   \item{names}{Logical constant.
 
     For \code{graph.adjacenct} it gives whether to assign row and column names
