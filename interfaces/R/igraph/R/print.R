@@ -254,7 +254,7 @@ print.igraph <- function(x,
   if (vertex.attributes) .print.vertex.attributes(x)
   if (ecount(x)==0) {
     ## Do nothing
-  } else if (edge.attributes) {
+  } else if (edge.attributes && length(list.edge.attributes(x)) !=0 ) {
     .print.edges.edgelist(x, names)
   } else if (median(degree(x, mode="out")) < 3) {
     .print.edges.compressed(x, names)
