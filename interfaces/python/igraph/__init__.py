@@ -464,6 +464,22 @@ class Graph(GraphBase):
         """
         return [self.incident(idx, type) for idx in xrange(self.vcount())]
 
+    def is_named(self):
+        """is_named()
+
+        Returns whether the graph is named, i.e. whether it has a "name"
+        vertex attribute.
+        """
+        return "name" in self.vertex_attributes()
+
+    def is_weighted(self):
+        """is_weighted()
+
+        Returns whether the graph is weighted, i.e. whether it has a "weight"
+        edge attribute.
+        """
+        return "weight" in self.edge_attributes()
+
     def maxflow(self, source, target, capacity=None):
         """maxflow(source, target, capacity=None)
 
