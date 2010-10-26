@@ -180,7 +180,9 @@ get.adjlist <- function(graph, mode=c("all", "out", "in", "total")) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_get_adjlist", graph, mode,
                PACKAGE="igraph")
-  lapply(res, function(x) x+1)
+  res <- lapply(res, function(x) x+1)
+  if (is.named(graph)) names(res) <- V(graph)$name
+  res
 }
 
 get.adjedgelist <- function(graph, mode=c("all", "out", "in", "total")) {
@@ -193,7 +195,8 @@ get.adjedgelist <- function(graph, mode=c("all", "out", "in", "total")) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_get_adjedgelist", graph, mode,
                PACKAGE="igraph")
-  lapply(res, function(x) x+1)
+  res <- lapply(res, function(x) x+1)
+  if (is.named(graph)) names(res) <- V(graph)$name
 }
 
 igraph.from.graphNEL <- function(graphNEL, name=TRUE, weight=TRUE,
