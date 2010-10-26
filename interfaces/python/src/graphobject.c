@@ -1138,14 +1138,16 @@ PyObject *igraphmodule_Graph_are_connected(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_get_eid(igraphmodule_GraphObject * self,
                                      PyObject * args, PyObject * kwds)
 {
-  static char *kwlist[] = { "v1", "v2", "directed", NULL };
+  static char *kwlist[] = { "v1", "v2", "directed", "error", NULL };
   long v1, v2;
   igraph_integer_t result;
   PyObject *directed = Py_True;
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|O", kwlist, &v1, &v2,
-                                   &directed))
+  PyObject *error = Py_True;
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|OO", kwlist, &v1, &v2,
+                                   &directed, &error))
     return NULL;
-  if (igraph_get_eid(&self->g, &result, v1, v2, PyObject_IsTrue(directed)))
+  if (igraph_get_eid(&self->g, &result, v1, v2,
+        PyObject_IsTrue(directed), PyObject_IsTrue(error)))
     return igraphmodule_handle_igraph_error();
 
   return Py_BuildValue("l", (long)result);
@@ -1158,14 +1160,16 @@ PyObject *igraphmodule_Graph_get_eid(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_get_eids(igraphmodule_GraphObject * self,
                                       PyObject * args, PyObject * kwds)
 {
-  static char *kwlist[] = { "pairs", "path", "directed", NULL };
+  static char *kwlist[] = { "pairs", "path", "directed", "error", NULL };
   PyObject *pairs_o = Py_None, *path_o = Py_None;
   PyObject *directed = Py_True;
+  PyObject *error = Py_True;
   PyObject *result = NULL;
   igraph_vector_t pairs, path, res;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist,
-                                   &pairs_o, &path_o, &directed))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOO", kwlist,
+                                   &pairs_o, &path_o, &directed,
+                                   &error))
     return NULL;
 
   if (igraph_vector_init(&res, 0))
@@ -1189,7 +1193,8 @@ PyObject *igraphmodule_Graph_get_eids(igraphmodule_GraphObject * self,
   if (igraph_get_eids(&self->g, &res,
         pairs_o == Py_None ? 0 : &pairs,
         path_o  == Py_None ? 0 : &path,
-        PyObject_IsTrue(directed))) {
+        PyObject_IsTrue(directed),
+        PyObject_IsTrue(error))) {
     if (pairs_o != Py_None) igraph_vector_destroy(&pairs);
     if (path_o != Py_None)  igraph_vector_destroy(&path);
     igraph_vector_destroy(&res);
@@ -5852,12 +5857,12 @@ PyObject *igraphmodule_Graph_layout_reingold_tilford_circular(
 PyObject *igraphmodule_Graph_get_adjacency(igraphmodule_GraphObject * self,
                                            PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] = { "type", NULL };
+  static char *kwlist[] = { "type", "eids", NULL };
   igraph_get_adjacency_t t = IGRAPH_GET_ADJACENCY_BOTH;
   igraph_matrix_t m;
-  PyObject *result;
+  PyObject *result, *eids = Py_False;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|i", kwlist, &t))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|iO", kwlist, &t, &eids))
     return NULL;
 
   if (t != IGRAPH_GET_ADJACENCY_UPPER && t != IGRAPH_GET_ADJACENCY_LOWER &&
@@ -5873,7 +5878,7 @@ PyObject *igraphmodule_Graph_get_adjacency(igraphmodule_GraphObject * self,
     return NULL;
   }
 
-  if (igraph_get_adjacency(&self->g, &m, t)) {
+  if (igraph_get_adjacency(&self->g, &m, t, PyObject_IsTrue(eids))) {
     igraphmodule_handle_igraph_error();
     igraph_matrix_destroy(&m);
     return NULL;
@@ -9597,13 +9602,16 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_get_eid */
   {"get_eid", (PyCFunction) igraphmodule_Graph_get_eid,
    METH_VARARGS | METH_KEYWORDS,
-   "get_eid(v1, v2, directed=True)\n\n"
+   "get_eid(v1, v2, directed=True, error=True)\n\n"
    "Returns the edge ID of an arbitrary edge between vertices v1 and v2\n\n"
    "@param v1: the first vertex ID\n"
    "@param v2: the second vertex ID\n"
    "@param directed: whether edge directions should be considered in\n"
    "  directed graphs. The default is C{True}. Ignored for undirected\n"
    "  graphs.\n"
+   "@param error: if C{True}, an exception will be raised when the\n"
+   "  given edge does not exist. If C{False}, -1 will be returned in\n"
+   "  that case.\n"
    "@return: the edge ID of an arbitrary edge between vertices v1 and v2\n"},
 
   /* interface to igraph_get_eids */
@@ -9629,6 +9637,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param directed: whether edge directions should be considered in\n"
    "  directed graphs. The default is C{True}. Ignored for undirected\n"
    "  graphs.\n"
+   "@param error: if C{True}, an exception will be raised if a given\n"
+   "  edge does not exist. If C{False}, -1 will be returned in\n"
+   "  that case.\n"
    "@return: the edge IDs in a list\n"},
 
   /* interface to igraph_incident */
@@ -11472,12 +11483,17 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   // interface to igraph_get_adjacency
   {"get_adjacency", (PyCFunction) igraphmodule_Graph_get_adjacency,
    METH_VARARGS | METH_KEYWORDS,
-   "get_adjacency(type=GET_ADJACENCY_BOTH)\n\n"
+   "get_adjacency(type=GET_ADJACENCY_BOTH, eids=False)\n\n"
    "Returns the adjacency matrix of a graph.\n\n"
    "@param type: either C{GET_ADJACENCY_LOWER} (uses the\n"
    "  lower triangle of the matrix) or C{GET_ADJACENCY_UPPER}\n"
    "  (uses the upper triangle) or C{GET_ADJACENCY_BOTH}\n"
    "  (uses both parts). Ignored for directed graphs.\n"
+   "@param eids: if C{True}, the result matrix will contain\n"
+   "  zeros for non-edges and the ID of the edge plus one\n"
+   "  for edges in the appropriate cell. If C{False}, the\n"
+   "  result matrix will contain the number of edges for\n"
+   "  each vertex pair.\n"
    "@return: the adjacency matrix.\n"},
 
   // interface to igraph_get_edgelist

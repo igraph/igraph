@@ -44,9 +44,54 @@ class DirectedUndirectedTests(unittest.TestCase):
         )
 
 
+class GraphRepresentationTests(unittest.TestCase):
+    def testGetAdjacency(self):
+        # Undirected case
+        g = Graph.Tree(6, 3)
+        g.es["weight"] = range(5)
+        self.failUnless(g.get_adjacency() == Matrix([
+            [0, 1, 1, 1, 0, 0],
+            [1, 0, 0, 0, 1, 1],
+            [1, 0, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0, 0],
+            [0, 1, 0, 0, 0, 0],
+            [0, 1, 0, 0, 0, 0]
+        ]))
+        self.failUnless(g.get_adjacency(attribute="weight") == Matrix([
+            [0, 0, 1, 2, 0, 0],
+            [0, 0, 0, 0, 3, 4],
+            [1, 0, 0, 0, 0, 0],
+            [2, 0, 0, 0, 0, 0],
+            [0, 3, 0, 0, 0, 0],
+            [0, 4, 0, 0, 0, 0]
+        ]))
+        self.failUnless(g.get_adjacency(eids=True) == Matrix([
+            [0, 1, 2, 3, 0, 0],
+            [1, 0, 0, 0, 4, 5],
+            [2, 0, 0, 0, 0, 0],
+            [3, 0, 0, 0, 0, 0],
+            [0, 4, 0, 0, 0, 0],
+            [0, 5, 0, 0, 0, 0]
+        ])-1)
+
+        # Directed case
+        g = Graph.Tree(6, 3, "tree_out")
+        g.add_edges([(0,1), (1,0)])
+        self.failUnless(g.get_adjacency() == Matrix([
+            [0, 2, 1, 1, 0, 0],
+            [1, 0, 0, 0, 1, 1],
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0]
+        ]))
+
+
 def suite():
     direction_suite = unittest.makeSuite(DirectedUndirectedTests)
-    return unittest.TestSuite([direction_suite])
+    representation_suite = unittest.makeSuite(GraphRepresentationTests)
+    return unittest.TestSuite([direction_suite,
+        representation_suite])
 
 def test():
     runner = unittest.TextTestRunner()

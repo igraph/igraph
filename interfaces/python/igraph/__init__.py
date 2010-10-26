@@ -366,7 +366,7 @@ class Graph(GraphBase):
         return result
 
     def get_adjacency(self, type=GET_ADJACENCY_BOTH, attribute=None, \
-            default=None):
+            default=0, eids=False):
         """Returns the adjacency matrix of a graph.
 
         @param type: either C{GET_ADJACENCY_LOWER} (uses the lower
@@ -382,6 +382,13 @@ class Graph(GraphBase):
           will be unpredictable.
         @param default: the default value written to the cells in the
           case of adjacency matrices with attributes.
+        @param eids: specifies whether the edge IDs should be returned
+          in the adjacency matrix. Since zero is a valid edge ID, the
+          cells in the matrix that correspond to unconnected vertex
+          pairs will contain -1 instead of 0 if I{eids} is C{True}.
+          If I{eids} is C{False}, the number of edges will be returned
+          in the matrix for each vertex pair. This parameter is
+          ignored if I{attribute} is not C{None}.
         @return: the adjacency matrix as a L{Matrix}.
         """
         if type != GET_ADJACENCY_LOWER and type != GET_ADJACENCY_UPPER and \
@@ -392,7 +399,10 @@ class Graph(GraphBase):
                 type = GET_ADJACENCY_BOTH
 
         if attribute is None: 
-            return Matrix(GraphBase.get_adjacency(self, type))
+            result = Matrix(GraphBase.get_adjacency(self, type, eids))
+            if eids:
+                result -= 1
+            return result
 
         if attribute not in self.es.attribute_names():
             raise ValueError("Attribute does not exist")
