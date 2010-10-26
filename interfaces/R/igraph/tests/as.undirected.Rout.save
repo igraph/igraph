@@ -1,7 +1,8 @@
 
-R version 2.11.1 (2010-05-31)
+R version 2.12.0 (2010-10-15)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -28,55 +29,51 @@ Type 'q()' to quit R.
 > g4 <- as.undirected(g, mode="mutual")
 > 
 > print(g, e=TRUE, g=TRUE)
-Vertices: 4 
-Edges: 5 
-Directed: TRUE 
-Graph attributes:
+IGRAPH DNW- 4 5 -- Tiny graph
++ attr: name (g/c), name (v/c), weight (e/n)
++ graph attributes:
 [[name]]
 [1] "Tiny graph"
-Edges and their attributes:
-                   weight
-[1] 'A' -> 'B'  1.3709584
-[2] 'A' -> 'C' -0.5646982
-[3] 'B' -> 'A'  0.3631284
-[4] 'C' -> 'D'  0.6328626
-[5] 'D' -> 'C'  0.4042683
++ edges and their attributes:
+    edge     weight
+[1] A->B  1.3709584
+[2] A->C -0.5646982
+[3] B->A  0.3631284
+[4] C->D  0.6328626
+[5] D->C  0.4042683
 > print(g2, e=TRUE, g=TRUE)
-Vertices: 4 
-Edges: 3 
-Directed: FALSE 
-Graph attributes:
+IGRAPH UNW- 4 3 -- Tiny graph
++ attr: name (g/c), name (v/c), weight (e/n)
++ graph attributes:
 [[name]]
 [1] "Tiny graph"
-Edges and their attributes:
-                   weight
-[1] 'A' -- 'B'  1.7340869
-[2] 'A' -- 'C' -0.5646982
-[3] 'C' -- 'D'  1.0371309
++ edges and their attributes:
+    edge     weight
+[1] A--B  1.7340869
+[2] A--C -0.5646982
+[3] C--D  1.0371309
 > print(g3, e=TRUE, g=TRUE)
-Vertices: 4 
-Edges: 5 
-Directed: FALSE 
-Graph attributes:
+IGRAPH UNW- 4 5 -- Tiny graph
++ attr: name (g/c), name (v/c), weight (e/n)
++ graph attributes:
 [[name]]
 [1] "Tiny graph"
-Edges and their attributes:
-                   weight
-[1] 'A' -- 'B'  1.3709584
-[2] 'A' -- 'C' -0.5646982
-[3] 'A' -- 'B'  0.3631284
-[4] 'C' -- 'D'  0.6328626
-[5] 'C' -- 'D'  0.4042683
++ edges and their attributes:
+    edge     weight
+[1] A--B  1.3709584
+[2] A--C -0.5646982
+[3] A--B  0.3631284
+[4] C--D  0.6328626
+[5] C--D  0.4042683
 > print(g4, e=TRUE, g=TRUE)
-Vertices: 4 
-Edges: 2 
-Directed: FALSE 
-Graph attributes:
+IGRAPH UNW- 4 2 -- Tiny graph
++ attr: name (g/c), name (v/c), weight (e/n)
++ graph attributes:
 [[name]]
 [1] "Tiny graph"
-Edges and their attributes:
-                 weight
-[1] 'A' -- 'B' 1.734087
-[2] 'C' -- 'D' 1.037131
++ edges and their attributes:
+    edge   weight
+[1] A--B 1.734087
+[2] C--D 1.037131
 > 
 > 

@@ -1,7 +1,8 @@
 
-R version 2.11.1 (2010-05-31)
+R version 2.12.0 (2010-10-15)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -34,30 +35,29 @@ Type 'q()' to quit R.
 > ## graph and edge attributes are kept, vertex attributes are
 > ## combined using the 'toString' function.
 > print(g2, g=TRUE, v=TRUE, e=TRUE)
-Vertices: 5 
-Edges: 10 
-Directed: FALSE 
-Graph attributes:
+IGRAPH UNW- 5 10 -- Ring
++ attr: name (g/c), name (v/c), weight (e/n)
++ graph attributes:
 [[name]]
 [1] "Ring"
-Vertex attributes:
++ vertex attributes:
     name
 [1] a, b
 [2] c, d
 [3] e, f
 [4] g, h
 [5] i, j
-Edges and their attributes:
-                         weight
-[1]  'a, b' -- 'a, b' 0.9148060
-[2]  'a, b' -- 'c, d' 0.9370754
-[3]  'c, d' -- 'c, d' 0.2861395
-[4]  'c, d' -- 'e, f' 0.8304476
-[5]  'e, f' -- 'e, f' 0.6417455
-[6]  'e, f' -- 'g, h' 0.5190959
-[7]  'g, h' -- 'g, h' 0.7365883
-[8]  'g, h' -- 'i, j' 0.1346666
-[9]  'i, j' -- 'i, j' 0.6569923
-[10] 'a, b' -- 'i, j' 0.7050648
++ edges and their attributes:
+           edge    weight
+[1]  a, b--a, b 0.9148060
+[2]  a, b--c, d 0.9370754
+[3]  c, d--c, d 0.2861395
+[4]  c, d--e, f 0.8304476
+[5]  e, f--e, f 0.6417455
+[6]  e, f--g, h 0.5190959
+[7]  g, h--g, h 0.7365883
+[8]  g, h--i, j 0.1346666
+[9]  i, j--i, j 0.6569923
+[10] a, b--i, j 0.7050648
 > 
 > 

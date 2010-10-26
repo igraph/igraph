@@ -1,7 +1,8 @@
 
-R version 2.11.1 (2010-05-31)
+R version 2.12.0 (2010-10-15)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -34,35 +35,15 @@ Type 'q()' to quit R.
 > 
 > ge <- graph.empty(10)
 > summary(as.directed(ge))
-Vertices: 10 
-Edges: 0 
-Directed: TRUE 
-No graph attributes.
-No vertex attributes.
-No edge attributes.
+IGRAPH D--- 10 0 -- 
 > summary(as.directed(ge, "arbitrary"))
-Vertices: 10 
-Edges: 0 
-Directed: TRUE 
-No graph attributes.
-No vertex attributes.
-No edge attributes.
+IGRAPH D--- 10 0 -- 
 > 
 > ge2 <- graph.empty()
 > summary(as.directed(ge2))
-Vertices: 0 
-Edges: 0 
-Directed: TRUE 
-No graph attributes.
-No vertex attributes.
-No edge attributes.
+IGRAPH D--- 0 0 -- 
 > summary(as.directed(ge2, "arbitrary"))
-Vertices: 0 
-Edges: 0 
-Directed: TRUE 
-No graph attributes.
-No vertex attributes.
-No edge attributes.
+IGRAPH D--- 0 0 -- 
 > 
 > #### Keeping attributes
 > 
@@ -71,26 +52,15 @@ No edge attributes.
 > g2 <- as.directed(g, mode="mutual")
 > g3 <- as.directed(g, mode="arbitrary")
 > g2
-Vertices: 5 
-Edges: 6 
-Directed: TRUE 
-Edges:
-              
-[1] 'A' -> 'B'
-[2] 'A' -> 'D'
-[3] 'B' -> 'C'
-[4] 'B' -> 'A'
-[5] 'D' -> 'A'
-[6] 'C' -> 'B'
+IGRAPH DN-- 5 6 -- Small graph
++ attr: name (g/c), name (v/c)
++ edges (vertex names):
+[1] A->B A->D B->C B->A D->A C->B
 > g3
-Vertices: 5 
-Edges: 3 
-Directed: TRUE 
-Edges:
-              
-[1] 'A' -> 'B'
-[2] 'A' -> 'D'
-[3] 'B' -> 'C'
+IGRAPH DN-- 5 3 -- Small graph
++ attr: name (g/c), name (v/c)
++ edges (vertex names):
+[1] A->B A->D B->C
 > g2$name
 [1] "Small graph"
 > g3$name
@@ -99,25 +69,23 @@ Edges:
 > set.seed(42)
 > E(g)$weight <- runif(ecount(g))
 > print(as.directed(g, "mutual"), e=TRUE)
-Vertices: 5 
-Edges: 6 
-Directed: TRUE 
-Edges and their attributes:
-                  weight
-[1] 'A' -> 'B' 0.9148060
-[2] 'A' -> 'D' 0.9370754
-[3] 'B' -> 'C' 0.2861395
-[4] 'B' -> 'A' 0.9148060
-[5] 'D' -> 'A' 0.9370754
-[6] 'C' -> 'B' 0.2861395
+IGRAPH DNW- 5 6 -- Small graph
++ attr: name (g/c), name (v/c), weight (e/n)
++ edges and their attributes:
+    edge    weight
+[1] A->B 0.9148060
+[2] A->D 0.9370754
+[3] B->C 0.2861395
+[4] B->A 0.9148060
+[5] D->A 0.9370754
+[6] C->B 0.2861395
 > print(as.directed(g, "arbitrary"), e=TRUE)
-Vertices: 5 
-Edges: 3 
-Directed: TRUE 
-Edges and their attributes:
-                  weight
-[1] 'A' -> 'B' 0.9148060
-[2] 'A' -> 'D' 0.9370754
-[3] 'B' -> 'C' 0.2861395
+IGRAPH DNW- 5 3 -- Small graph
++ attr: name (g/c), name (v/c), weight (e/n)
++ edges and their attributes:
+    edge    weight
+[1] A->B 0.9148060
+[2] A->D 0.9370754
+[3] B->C 0.2861395
 > 
 > 

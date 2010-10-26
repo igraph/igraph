@@ -1,7 +1,8 @@
 
-R version 2.11.1 (2010-05-31)
+R version 2.12.0 (2010-10-15)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -21,27 +22,17 @@ Type 'q()' to quit R.
 > g <- graph.formula(A-B-C-D-E)
 > g2 <- add.vertices(g, 4)
 > g2
-Vertices: 9 
-Edges: 4 
-Directed: FALSE 
-Edges:
-              
-[1] 'A' -- 'B'
-[2] 'B' -- 'C'
-[3] 'C' -- 'D'
-[4] 'D' -- 'E'
+IGRAPH UN-- 9 4 -- 
++ attr: name (v/c)
++ edges (vertex names):
+[1] A--B B--C C--D D--E
 > 
 > g3 <- add.vertices(g, 3, attr=list(name=c("F","G","H"), weight=1:3))
 > g3
-Vertices: 8 
-Edges: 4 
-Directed: FALSE 
-Edges:
-              
-[1] 'A' -- 'B'
-[2] 'B' -- 'C'
-[3] 'C' -- 'D'
-[4] 'D' -- 'E'
+IGRAPH UN-- 8 4 -- 
++ attr: name (v/c), weight (v/n)
++ edges (vertex names):
+[1] A--B B--C C--D D--E
 > V(g3)
 Vertex sequence:
 [1] "A" "B" "C" "D" "E" "F" "G" "H"

@@ -1,7 +1,8 @@
 
-R version 2.11.1 (2010-05-31)
+R version 2.12.0 (2010-10-15)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -20,13 +21,13 @@ Type 'q()' to quit R.
 > 
 > I <- matrix(sample(0:1, 35, replace=TRUE, prob=c(3,1)), nc=5)
 > g <- graph.incidence(I)
-> is.bipartite(g)$res
+> bipartite.mapping(g)$res
 [1] TRUE
 > 
 > set.seed(42)
 > I <- matrix(sample(0:1, 35, replace=TRUE, prob=c(3,1)), nc=5)
 > g <- graph.incidence(I)
-> is.bipartite(g)
+> bipartite.mapping(g)
 $res
 [1] TRUE
 

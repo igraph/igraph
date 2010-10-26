@@ -1,7 +1,8 @@
 
-R version 2.11.1 (2010-05-31)
+R version 2.12.0 (2010-10-15)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -21,65 +22,34 @@ Type 'q()' to quit R.
 > g <- graph.empty(10)
 > g2 <- add.edges(g, c(1,2, 2,3, 3,4, 1,6, 1,7, 9,10) )
 > g2
-Vertices: 10 
-Edges: 6 
-Directed: TRUE 
-Edges:
-            
-[1]  1 ->  2
-[2]  2 ->  3
-[3]  3 ->  4
-[4]  1 ->  6
-[5]  1 ->  7
-[6]  9 -> 10
+IGRAPH D--- 10 6 -- 
++ edges:
+[1] 1-> 2 2-> 3 3-> 4 1-> 6 1-> 7 9->10
 > 
 > g3 <- add.edges(g, c(1,5, 2,6, 3,10, 4,5), attr=list(weight=c(1,2,1,-1)) )
 > g3
-Vertices: 10 
-Edges: 4 
-Directed: TRUE 
-Edges:
-            
-[1]  1 ->  5
-[2]  2 ->  6
-[3]  3 -> 10
-[4]  4 ->  5
+IGRAPH D-W- 10 4 -- 
++ attr: weight (e/n)
++ edges:
+[1] 1-> 5 2-> 6 3->10 4-> 5
 > E(g3)$weight
 [1]  1  2  1 -1
 > 
 > g4 <- add.edges(g2, c(1,4, 4,6, 7,1), attr=list(weight=c(-1,1,-2.5)))
 > g4
-Vertices: 10 
-Edges: 9 
-Directed: TRUE 
-Edges:
-            
-[1]  1 ->  2
-[2]  2 ->  3
-[3]  3 ->  4
-[4]  1 ->  6
-[5]  1 ->  7
-[6]  9 -> 10
-[7]  1 ->  4
-[8]  4 ->  6
-[9]  7 ->  1
+IGRAPH D-W- 10 9 -- 
++ attr: weight (e/n)
++ edges:
+[1] 1-> 2 2-> 3 3-> 4 1-> 6 1-> 7 9->10 1-> 4 4-> 6 7-> 1
 > E(g4)$weight
 [1]   NA   NA   NA   NA   NA   NA -1.0  1.0 -2.5
 > 
 > g5 <- add.edges(g3, c(10,9, 10,10, 1,1), attr=list(weight=c(100,100,100)) )
 > g5
-Vertices: 10 
-Edges: 7 
-Directed: TRUE 
-Edges:
-            
-[1]  1 ->  5
-[2]  2 ->  6
-[3]  3 -> 10
-[4]  4 ->  5
-[5] 10 ->  9
-[6] 10 -> 10
-[7]  1 ->  1
+IGRAPH D-W- 10 7 -- 
++ attr: weight (e/n)
++ edges:
+[1]  1-> 5  2-> 6  3->10  4-> 5 10-> 9 10->10  1-> 1
 > E(g5)$weight
 [1]   1   2   1  -1 100 100 100
 > 

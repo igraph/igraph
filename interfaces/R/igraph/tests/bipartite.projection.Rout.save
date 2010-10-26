@@ -1,7 +1,8 @@
 
-R version 2.11.1 (2010-05-31)
+R version 2.12.0 (2010-10-15)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -42,33 +43,31 @@ Ethel     1      1         0
 > g2$name <- "Event network"
 > proj2 <- bipartite.projection(g2)
 > print(proj2[[1]], g=TRUE, e=TRUE)
-Vertices: 5 
-Edges: 7 
-Directed: FALSE 
-Graph attributes:
+IGRAPH UNWB 5 7 -- Event network
++ attr: name (g/c), type (v/x), name (v/c), weight (e/n)
++ graph attributes:
 [[name]]
 [1] "Event network"
-Edges and their attributes:
-                       weight
-[1] 'Alice' -- 'Bob'        2
-[2] 'Alice' -- 'Dan'        2
-[3] 'Alice' -- 'Ethel'      2
-[4] 'Bob'   -- 'Dan'        2
-[5] 'Bob'   -- 'Ethel'      2
-[6] 'Bob'   -- 'Cecil'      1
-[7] 'Dan'   -- 'Ethel'      2
++ edges and their attributes:
+            edge weight
+[1] Alice--Bob        2
+[2] Alice--Dan        2
+[3] Alice--Ethel      2
+[4] Bob  --Dan        2
+[5] Bob  --Ethel      2
+[6] Bob  --Cecil      1
+[7] Dan  --Ethel      2
 > print(proj2[[2]], g=TRUE, e=TRUE)
-Vertices: 3 
-Edges: 3 
-Directed: FALSE 
-Graph attributes:
+IGRAPH UNWB 3 3 -- Event network
++ attr: name (g/c), type (v/x), name (v/c), weight (e/n)
++ graph attributes:
 [[name]]
 [1] "Event network"
-Edges and their attributes:
-                               weight
-[1] 'Party'     -- 'Skiing'         4
-[2] 'Party'     -- 'Badminton'      1
-[3] 'Skiing'    -- 'Badminton'      1
++ edges and their attributes:
+                    edge weight
+[1] Party    --Skiing         4
+[2] Party    --Badminton      1
+[3] Skiing   --Badminton      1
 > 
 > bipartite.projection.size(g2)
 $vcount1

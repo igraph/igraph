@@ -1,7 +1,8 @@
 
-R version 2.11.1 (2010-05-31)
+R version 2.12.0 (2010-10-15)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -24,62 +25,44 @@ Type 'q()' to quit R.
 > 
 > g <- g - c("a", "b")
 > g
-Vertices: 8 
-Edges: 7 
-Directed: FALSE 
-Edges:
-                
-['C'] 'c' -- 'd'
-['D'] 'd' -- 'e'
-['E'] 'e' -- 'f'
-['F'] 'f' -- 'g'
-['G'] 'g' -- 'h'
-['H'] 'h' -- 'i'
-['I'] 'i' -- 'j'
+IGRAPH UN-- 8 7 -- 
++ attr: name (v/c), name (e/c)
++ edges (vertex names):
+[1] c--d d--e e--f f--g g--h h--i i--j
 > 
 > g <- g - edge("e|f")
 > g
-Vertices: 8 
-Edges: 6 
-Directed: FALSE 
-Edges:
-                
-['C'] 'c' -- 'd'
-['D'] 'd' -- 'e'
-['F'] 'f' -- 'g'
-['G'] 'g' -- 'h'
-['H'] 'h' -- 'i'
-['I'] 'i' -- 'j'
+IGRAPH UN-- 8 6 -- 
++ attr: name (v/c), name (e/c)
++ edges (vertex names):
+[1] c--d d--e f--g g--h h--i i--j
 > 
 > g <- g - edge("H")
 > g
-Vertices: 8 
-Edges: 5 
-Directed: FALSE 
-Edges:
-                
-['C'] 'c' -- 'd'
-['D'] 'd' -- 'e'
-['F'] 'f' -- 'g'
-['G'] 'g' -- 'h'
-['I'] 'i' -- 'j'
+IGRAPH UN-- 8 5 -- 
++ attr: name (v/c), name (e/c)
++ edges (vertex names):
+[1] c--d d--e f--g g--h i--j
 > 
 > g <- graph.ring(10)
 > V(g)$name <- letters[1:10]
 > 
 > g <- g - path("a", "b", "c", "d")
 > g
-Vertices: 10 
-Edges: 7 
-Directed: FALSE 
-Edges:
-              
-[1] 'd' -- 'e'
-[2] 'e' -- 'f'
-[3] 'f' -- 'g'
-[4] 'g' -- 'h'
-[5] 'h' -- 'i'
-[6] 'i' -- 'j'
-[7] 'a' -- 'j'
+IGRAPH UN-- 10 7 -- 
++ attr: name (v/c)
++ edges (vertex names):
+[1] d--e e--f f--g g--h h--i i--j a--j
 > 
+> g - V(g)[c('d', 'g')]
+IGRAPH UN-- 8 4 -- 
++ attr: name (v/c)
++ edges (vertex names):
+[1] e--f h--i i--j a--j
+> 
+> g - E(g)['f' %--% 'g']
+IGRAPH UN-- 10 6 -- 
++ attr: name (v/c)
++ edges (vertex names):
+[1] d--e e--f g--h h--i i--j a--j
 > 

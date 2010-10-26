@@ -1,7 +1,8 @@
 
-R version 2.11.1 (2010-05-31)
+R version 2.12.0 (2010-10-15)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -30,23 +31,10 @@ $dom
  [1] "R" "R" "R" "R" "R" "C" "C" "D" "R" "R" "G" "R"
 
 $domtree
-Vertices: 13 
-Edges: 12 
-Directed: TRUE 
-Edges:
-               
-[1]  'R' -> 'A'
-[2]  'R' -> 'B'
-[3]  'R' -> 'C'
-[4]  'R' -> 'D'
-[5]  'R' -> 'E'
-[6]  'C' -> 'F'
-[7]  'C' -> 'G'
-[8]  'D' -> 'L'
-[9]  'R' -> 'H'
-[10] 'R' -> 'I'
-[11] 'G' -> 'J'
-[12] 'R' -> 'K'
+IGRAPH DN-- 13 12 -- 
++ attr: name (v/c)
++ edges (vertex names):
+ [1] R->A R->B R->C R->D R->E C->F C->G D->L R->H R->I G->J R->K
 
 $leftout
 character(0)
