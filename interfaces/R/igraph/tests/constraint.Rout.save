@@ -24,7 +24,7 @@ Type 'q()' to quit R.
 +     stop("Not a graph object")
 +   }
 +   idx <- degree(graph) != 0
-+   A <- get.adjacency(graph, attr=attr)
++   A <- get.adjacency(graph, attr=attr, sparse=FALSE)
 +   A <- A[idx, idx]
 +   n <- sum(idx)
 +   

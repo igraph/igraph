@@ -9,7 +9,7 @@ ashs <- function(graph, as=TRUE) {
     if (x[1] < 0) { x <- -x       }
     x
   }
-  A <- get.adjacency(graph)
+  A <- get.adjacency(graph, sparse=FALSE)
   if (as) { 
     s1 <- eigen(t(A) %*% A)$vectors[,1]
     s2 <- authority.score(graph)$vector

@@ -6,7 +6,7 @@ constraint.orig <- function(graph, nodes=V(graph), attr=NULL) {
     stop("Not a graph object")
   }
   idx <- degree(graph) != 0
-  A <- get.adjacency(graph, attr=attr)
+  A <- get.adjacency(graph, attr=attr, sparse=FALSE)
   A <- A[idx, idx]
   n <- sum(idx)
   

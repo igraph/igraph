@@ -57,8 +57,8 @@ $map21
 > 
 > all(V(g)$name == V(g2)$name)
 [1] TRUE
-> A <- get.adjacency(g, attr="weight")
-> A2 <- get.adjacency(g2, attr="weight")
+> A <- get.adjacency(g, attr="weight", sparse=FALSE)
+> A2 <- get.adjacency(g2, attr="weight", sparse=FALSE)
 > all(A == A2)
 [1] TRUE
 > g$name == g2$name

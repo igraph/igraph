@@ -18,8 +18,8 @@ g2 <- igraph.from.graphNEL(N)
 graph.isomorphic(g, g2)
 
 all(V(g)$name == V(g2)$name)
-A <- get.adjacency(g, attr="weight")
-A2 <- get.adjacency(g2, attr="weight")
+A <- get.adjacency(g, attr="weight", sparse=FALSE)
+A2 <- get.adjacency(g2, attr="weight", sparse=FALSE)
 all(A == A2)
 g$name == g2$name
 

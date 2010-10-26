@@ -38,17 +38,19 @@ IGRAPH D--- 10 1 --
 > g[1,2] <- FALSE
 > g
 IGRAPH D--- 10 0 -- 
-> g[c(1,2,3,4,5), c(2,3,4,5,6)] <- 1
+> 
+> g <- graph.empty(10)
+> g[-1,1] <- 1
 > g
-IGRAPH D-W- 10 5 -- 
-+ attr: weight (e/n)
+IGRAPH D--- 10 9 -- 
 + edges:
-[1] 1->2 2->3 3->4 4->5 5->6
+[1]  2->1  3->1  4->1  5->1  6->1  7->1  8->1  9->1 10->1
 > 
 > ## Weighted graph
 > 
 > igraph.options(print.edge.attributes=TRUE)
 > g <- graph.empty(10)
+> g <- set.edge.attribute(g, "weight", c(), 1)
 > g[1,2] <- 1
 > g
 IGRAPH D-W- 10 1 -- 
@@ -72,29 +74,27 @@ IGRAPH D-W- 10 2 --
     edge weight
 [1] 1->2      3
 [2] 2->1      2
-> g[1:5,2:6] <- -1
-> g
-IGRAPH D-W- 10 6 -- 
-+ attr: weight (e/n)
-+ edges and their attributes:
-    edge weight
-[1] 1->2     -1
-[2] 2->1      2
-[3] 2->3     -1
-[4] 3->4     -1
-[5] 4->5     -1
-[6] 5->6     -1
-> g[1,2] <- NULL
+> g[1:2,2:3] <- -1
 > g
 IGRAPH D-W- 10 5 -- 
 + attr: weight (e/n)
 + edges and their attributes:
     edge weight
+[1] 1->2     -1
+[2] 2->1      2
+[3] 1->3     -1
+[4] 2->2     -1
+[5] 2->3     -1
+> g[1,2] <- NULL
+> g
+IGRAPH D-W- 10 4 -- 
++ attr: weight (e/n)
++ edges and their attributes:
+    edge weight
 [1] 2->1      2
-[2] 2->3     -1
-[3] 3->4     -1
-[4] 4->5     -1
-[5] 5->6     -1
+[2] 1->3     -1
+[3] 2->2     -1
+[4] 2->3     -1
 > 
 > ## Using vertex names
 > 
@@ -105,32 +105,27 @@ IGRAPH D-W- 10 5 --
 > g
 IGRAPH DN-- 10 2 -- 
 + attr: name (v/c)
-+ edges and their attributes:
-    edge
-[1] a->b
-[2] b->c
++ edges (vertex names):
+[1] a->b b->c
 > g[c('a','f'),c('f','a')] <- TRUE
 > g
-IGRAPH DN-- 10 4 -- 
+IGRAPH DN-- 10 6 -- 
 + attr: name (v/c)
-+ edges and their attributes:
-    edge
-[1] a->b
-[2] b->c
-[3] a->f
-[4] f->a
-> g[c('a','c','h'), c('a','a','a')] <- 1:3
++ edges (vertex names):
+[1] a->b b->c a->f a->a f->f f->a
+> g[c('a','c','h'), c('a','a','a'), attr="weight"] <- 3
 > g
-IGRAPH DNW- 10 7 -- 
+IGRAPH DNW- 10 8 -- 
 + attr: name (v/c), weight (e/n)
 + edges and their attributes:
     edge weight
 [1] a->b     NA
 [2] b->c     NA
 [3] a->f     NA
-[4] f->a     NA
-[5] a->a      1
-[6] c->a      2
-[7] h->a      3
+[4] a->a      3
+[5] f->f     NA
+[6] f->a     NA
+[7] c->a      3
+[8] h->a      3
 > 
 > 

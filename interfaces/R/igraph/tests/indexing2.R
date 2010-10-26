@@ -10,20 +10,23 @@ g[2,1] <- NULL
 g
 g[1,2] <- FALSE
 g
-g[c(1,2,3,4,5), c(2,3,4,5,6)] <- 1
+
+g <- graph.empty(10)
+g[-1,1] <- 1
 g
 
 ## Weighted graph
 
 igraph.options(print.edge.attributes=TRUE)
 g <- graph.empty(10)
+g <- set.edge.attribute(g, "weight", c(), 1)
 g[1,2] <- 1
 g
 g[2,1] <- 2
 g
 g[1,2] <- 3
 g
-g[1:5,2:6] <- -1
+g[1:2,2:3] <- -1
 g
 g[1,2] <- NULL
 g
@@ -37,6 +40,6 @@ g['b','c'] <- TRUE
 g
 g[c('a','f'),c('f','a')] <- TRUE
 g
-g[c('a','c','h'), c('a','a','a')] <- 1:3
+g[c('a','c','h'), c('a','a','a'), attr="weight"] <- 3
 g
 

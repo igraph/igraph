@@ -42,29 +42,15 @@ IGRAPH U--- 10 7 --
 > delete.edges(g, c("a|b", "f|g", "c|b"))
 IGRAPH UN-- 10 7 -- 
 + attr: name (v/c)
-+ edges and their attributes:
-    edge
-[1] c--d
-[2] d--e
-[3] e--f
-[4] g--h
-[5] h--i
-[6] i--j
-[7] a--j
++ edges (vertex names):
+[1] c--d d--e e--f g--h h--i i--j a--j
 > 
 > ## no names at all, but select edges based on vertices
 > g <- graph.ring(10)
 > delete.edges(g, c("1|2", "8|7", "1|10"))
 IGRAPH U--- 10 7 -- 
-+ edges and their attributes:
-      edge
-[1]  2-- 3
-[2]  3-- 4
-[3]  4-- 5
-[4]  5-- 6
-[5]  6-- 7
-[6]  8-- 9
-[7]  9--10
++ edges:
+[1] 2-- 3 3-- 4 4-- 5 5-- 6 6-- 7 8-- 9 9--10
 > 
 > ## mix edge names and vertex names
 > g <- graph.ring(10)
