@@ -180,6 +180,29 @@ remove.edge.attribute <- function(graph, name) {
 
 #############
 
+is.named <- function(graph) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  "name" %in% list.vertex.attributes(graph)
+}
+
+is.weighted <- function(graph) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  "weight" %in% list.edge.attributes(graph)
+}
+
+is.bipartite <- function(graph) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  "type" %in% list.vertex.attributes(graph)
+}
+
+#############
+
 igraph.i.attribute.combination <- function(comb) {
   if (is.function(comb)) {
     comb <- list(comb)

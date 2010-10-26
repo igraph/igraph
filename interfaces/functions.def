@@ -759,7 +759,7 @@ igraph_get_incidence:
 
 igraph_is_bipartite:
         PARAMS: GRAPH graph, OUT BOOLEANPTR res, OUT VECTOR_BOOL_OR_0 type
-        NAME-R: is.bipartite
+        NAME-R: bipartite.mapping
 
 #######################################
 # Spectral properties
