@@ -54,15 +54,52 @@
 # - G[1:3,2,eid=TRUE]
 #               create an edge sequence
 #
-# TODO: how to do query edges based on vertex id pairs?
-# maybe G[from=v, to=w] is good.
+# TODO: from-to notation could take multiple values in [<-
 
-`[.igraph` <- function(x, i, j, ..., sparse=getIgraphOpt("sparsematrices"),
+`[.igraph` <- function(x, i, j, ..., from, to,
+                       sparse=getIgraphOpt("sparsematrices"),
                        edges=FALSE, drop=TRUE,
                        attr=if (is.weighted(x)) "weight" else NULL) {
   ## TODO: make it faster, don't need the whole matrix usually
-  if (missing(i) && missing(j)) {
-    get.adjacency(x, sparse=sparse, attr=attr, edges=edges)
+
+  ################################################################
+  ## Argument checks
+  if ((!missing(from) || !missing(to)) &&
+      (!missing(i)    || !missing(j))) {
+    stop("Cannot give 'from'/'to' together with regular indices")
+  }
+  if ((!missing(from) &&  missing(to)) ||
+      ( missing(from) && !missing(to))) {
+    stop("Cannot give 'from'/'to' without the other")
+  }
+  if (!missing(from)) {
+    if ((!is.numeric(from) && !is.character(from)) || any(is.na(from))) {
+      stop("'from' must be a numeric or character vector without NAs")
+    }
+    if ((!is.numeric(to) && !is.character(to)) || any(is.na(to))) {
+      stop("'to' must be a numeric or character vector without NAs")
+    }
+    if (length(from) != length(to)) {
+      stop("'from' and 'to' must have the same length")
+    }
+  }
+
+  ##################################################################
+  
+  if (!missing(from)) {
+    res <- get.edge.ids(x, rbind(from, to), error=FALSE)
+    if (edges) {
+      ## nop
+    } else if (!is.null(attr)) {
+      if (any(res!=0)) {
+        res[res!=0] <- get.edge.attribute(x, attr, res[res!=0])
+      }
+    } else {
+      res <- as.logical(res)+0
+    }
+    res
+  } else if (missing(i) && missing(j)) {
+    get.adjacency(x, sparse=sparse, attr=attr, eids=edges)
   } else if (missing(j)) {
     get.adjacency(x, sparse=sparse, attr=attr, edges=edges)[j,,drop=drop]
   } else if (missing(i)) {
@@ -104,10 +141,21 @@
   }
 }
 
-`[<-.igraph` <- function(x, i, j, ...,
+`[<-.igraph` <- function(x, i, j, ..., from, to,
                          attr=if (is.weighted(x)) "weight" else NULL,
                          value) {
   ## TODO: rewrite this in C to make it faster
+
+  ################################################################
+  ## Argument checks
+  if ((!missing(from) || !missing(to)) &&
+      (!missing(i)    || !missing(j))) {
+    stop("Cannot give 'from'/'to' together with regular indices")
+  }
+  if ((!missing(from) &&  missing(to)) ||
+      ( missing(from) && !missing(to))) {
+    stop("Cannot give 'from'/'to' without the other")
+  }
   if (!is.null(value) && !is.numeric(value) && !is.logical(value)) {
     stop("New value should be NULL, numeric or logical")
   }
@@ -123,7 +171,39 @@
   if (is.numeric(value) && is.na(value)) {
     stop("Numeric value cannot contain NA")
   }
-  if (is.null(value) ||
+  if (!missing(from)) {
+    if ((!is.numeric(from) && !is.character(from)) || any(is.na(from))) {
+      stop("'from' must be a numeric or character vector without NAs")
+    }
+    if ((!is.numeric(to) && !is.character(to)) || any(is.na(to))) {
+      stop("'to' must be a numeric or character vector without NAs")
+    }
+    if (length(from) != length(to)) {
+      stop("'from' and 'to' must have the same length")
+    }
+  }
+
+  ##################################################################
+
+  if (!missing(from)) {
+    if (is.null(value) ||
+        (is.logical(value) && !value) ||
+        (is.numeric(value) && value==0)) {
+      ## Delete edges
+      todel <- x[from=from, to=to, ..., edges=TRUE]
+      x <- delete.edges(x, todel)
+    } else {
+      ## Addition or update of an attribute (or both)
+      ids <- x[from=from, to=to, ..., edges=TRUE]
+      if (is.null(attr)) {
+        x <- add.edges(x, rbind(from[ids==0], to[ids==0]))
+      } else {
+        x <- add.edges(x, rbind(from[ids==0], to[ids==0]),
+                       attr=structure(list(value), names=attr))
+        x <- set.edge.attribute(x, attr, ids[ids!=0], value=value)
+      }
+    }
+  } else if (is.null(value) ||
       (is.logical(value) && !value) ||
       (is.numeric(value) && value==0)) {
     ## Delete edges

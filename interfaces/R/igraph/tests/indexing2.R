@@ -40,6 +40,20 @@ g['b','c'] <- TRUE
 g
 g[c('a','f'),c('f','a')] <- TRUE
 g
-g[c('a','c','h'), c('a','a','a'), attr="weight"] <- 3
+g[c('a','c','h'), c('a','b','c'), attr="weight"] <- 3
+print(g, e=T)
+
+## from-to
+
+g <- graph.empty(10)
+V(g)$name <- letters[1:vcount(g)]
+g[from=c('a','c','h'), to=c('a','b','c')] <- 1
+g[from=c('a','c','h','d'), to=c('a','b','c','e')]
 g
+
+g[from=c('a','c','h','a'), to=c('a','a','a','e'), attr="weight"] <- 3
+g[from=c('a','c','h','a','c','c'), to=c('a','a','a','e','f','b')]
+print(g, e=T)
+
+
 
