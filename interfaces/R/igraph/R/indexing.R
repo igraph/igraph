@@ -53,8 +53,7 @@
 #               query an edge attribute
 # - G[1:3,2,eid=TRUE]
 #               create an edge sequence
-#
-# TODO: from-to notation could take multiple values in [<-
+
 
 `[.igraph` <- function(x, i, j, ..., from, to,
                        sparse=getIgraphOpt("sparsematrices"),
@@ -156,20 +155,12 @@
       ( missing(from) && !missing(to))) {
     stop("Cannot give 'from'/'to' without the other")
   }
-  if (!is.null(value) && !is.numeric(value) && !is.logical(value)) {
+  if (is.null(attr) &&
+      (!is.null(value) && !is.numeric(value) && !is.logical(value))) {
     stop("New value should be NULL, numeric or logical")
-  }
-  if (is.logical(value) && length(value) != 1) {
-    stop("Logical value must be of length 1")
-  }
-  if (is.logical(value) && is.na(value)) {
-    stop("Logical value cannot be NA")
-  }
-  if (is.numeric(value) && length(value) != 1) {
-    stop("Numeric value must be of length 1")
-  }
-  if (is.numeric(value) && is.na(value)) {
-    stop("Numeric value cannot contain NA")
+  }  
+  if (is.null(attr) && !is.null(value) && length(value) != 1) {
+    stop("Logical or numeric value must be of length 1")
   }
   if (!missing(from)) {
     if ((!is.numeric(from) && !is.character(from)) || any(is.na(from))) {
@@ -185,7 +176,7 @@
 
   ##################################################################
 
-  if (!missing(from)) {
+  if (!missing(from)) {    
     if (is.null(value) ||
         (is.logical(value) && !value) ||
         (is.numeric(value) && value==0)) {
@@ -195,12 +186,12 @@
     } else {
       ## Addition or update of an attribute (or both)
       ids <- x[from=from, to=to, ..., edges=TRUE]
-      if (is.null(attr)) {
+      if (any(ids==0)) {
         x <- add.edges(x, rbind(from[ids==0], to[ids==0]))
-      } else {
-        x <- add.edges(x, rbind(from[ids==0], to[ids==0]),
-                       attr=structure(list(value), names=attr))
-        x <- set.edge.attribute(x, attr, ids[ids!=0], value=value)
+      }
+      if (!is.null(attr)) {
+        ids <- x[from=from, to=to, ..., edges=TRUE]
+        x <- set.edge.attribute(x, attr, ids, value=value)
       }
     }
   } else if (is.null(value) ||
