@@ -21,7 +21,7 @@
 ###################################################################
 
 get.adjacency.dense <- function(graph, type=c("both", "upper", "lower"),
-                                attr=NULL, eids=FALSE, names=TRUE) {
+                                attr=NULL, edges=FALSE, names=TRUE) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -30,10 +30,10 @@ get.adjacency.dense <- function(graph, type=c("both", "upper", "lower"),
   type <- igraph.match.arg(type)
   type <- switch(type, "upper"=0, "lower"=1, "both"=2)
   
-  if (eids || is.null(attr)) {    
+  if (edges || is.null(attr)) {    
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     res <- .Call("R_igraph_get_adjacency", graph, as.numeric(type),
-                 as.logical(eids), PACKAGE="igraph")
+                 as.logical(edges), PACKAGE="igraph")
   } else {
     attr <- as.character(attr)
     if (! attr %in% list.edge.attributes(graph)) {
@@ -79,7 +79,7 @@ get.adjacency.dense <- function(graph, type=c("both", "upper", "lower"),
 }
 
 get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
-                                 attr=NULL, eids=FALSE, names=TRUE) {
+                                 attr=NULL, edges=FALSE, names=TRUE) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -92,7 +92,7 @@ get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
   vc <- vcount(graph)
   
   el <- get.edgelist(graph, names=FALSE)
-  if (eids) {
+  if (edges) {
     value <- seq_len(nrow(el))
   } else if (!is.null(attr)) {
     attr <- as.character(attr)
@@ -131,16 +131,16 @@ get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
 }
 
 get.adjacency <- function(graph, type=c("both", "upper", "lower"),
-                          attr=NULL, eids=FALSE, names=TRUE, 
+                          attr=NULL, edges=FALSE, names=TRUE, 
                           sparse=getIgraphOpt("sparsematrices")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
 
   if (!sparse) {
-    get.adjacency.dense(graph, type=type, attr=attr, eids=eids, names=names)
+    get.adjacency.dense(graph, type=type, attr=attr, edges=edges, names=names)
   } else {
-    get.adjacency.sparse(graph, type=type, attr=attr, eids=eids, names=names)
+    get.adjacency.sparse(graph, type=type, attr=attr, edges=edges, names=names)
   }  
 }
 
