@@ -162,11 +162,9 @@
     i <- 1
     apply(el, 1, function(v) {
       cat(sep="", "[", ename[i], "] ", v[1], " ", arrow, " ", v[2]);
-      if (edge.attributes) {
-        lapply(list, function(n) {
-          cat(sep="", "\n[[", i, "]][[", n, "]]\n")
-          print(get.edge.attribute(x, n, i))})
-      }
+      lapply(list, function(n) {
+        cat(sep="", "\n[[", i, "]][[", n, "]]\n")
+        print(get.edge.attribute(x, n, i))})
       cat("\n")
       i <<- i+1
     })
