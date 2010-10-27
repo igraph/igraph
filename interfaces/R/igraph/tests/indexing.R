@@ -106,3 +106,16 @@ g[[, letters[1:3], edges=TRUE]]
 # Filtering on both ends
 g[[1:10, 1:10, edges=TRUE]]
 
+#################################################################
+
+## from & to
+g <- graph.tree(20)
+g[from=c(1,2,2,3), to=c(3,4,8,7)]
+
+V(g)$name <- letters[1:20]
+g[from=c("a","b","b","c"), to=c("c","d","h","g")]
+
+E(g)$weight <- (1:ecount(g)) ^ 2 
+g[from=c("a","b","b","c"), to=c("c","d","h","g")]
+
+g[from=c("a","b","b","c"), to=c("c","d","h","g"), edges=TRUE]

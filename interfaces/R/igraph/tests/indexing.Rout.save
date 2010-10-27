@@ -277,59 +277,59 @@ numeric(0)
 > 
 > ## Query edge ids
 > g[1,2, edges=TRUE]
-[1] 2
+[1] 1
 > g[c(1,1,7), c(2,3,14), edges=TRUE]
 3 x 3 sparse Matrix of class "dgTMatrix"
   b c  n
-a 2 3  .
-a 2 3  .
-g . . 98
+a 1 2  .
+a 1 2  .
+g . . 13
 > g[c(1,1,7), c(5,3,12), edges=TRUE]
 3 x 3 sparse Matrix of class "dgTMatrix"
   e c l
-a . 3 .
-a . 3 .
+a . 2 .
+a . 2 .
 g . . .
 > g[c(1,1,1,1), c(2,3,2,2), edges=TRUE]
 4 x 4 sparse Matrix of class "dgTMatrix"
   b c b b
-a 2 3 2 2
-a 2 3 2 2
-a 2 3 2 2
-a 2 3 2 2
+a 1 2 1 1
+a 1 2 1 1
+a 1 2 1 1
+a 1 2 1 1
 > g[c(8,17), c(17,8), edges=TRUE]
 2 x 2 sparse Matrix of class "dgTMatrix"
-    q h
-h 136 .
-q   . .
+   q h
+h 16 .
+q  . .
 > 
 > ## The same with symbolic names
 > g['a','b', edges=TRUE]
-[1] 2
+[1] 1
 > g[c('a','a','g'), c('b','c','n'), edges=TRUE]
 3 x 3 sparse Matrix of class "dgTMatrix"
   b c  n
-a 2 3  .
-a 2 3  .
-g . . 98
+a 1 2  .
+a 1 2  .
+g . . 13
 > g[c('a','a','g'), c('e','c','l'), edges=TRUE]
 3 x 3 sparse Matrix of class "dgTMatrix"
   e c l
-a . 3 .
-a . 3 .
+a . 2 .
+a . 2 .
 g . . .
 > g[c('a','a','a','a'), c('b','c','b','b'), edges=TRUE]
 4 x 4 sparse Matrix of class "dgTMatrix"
   b c b b
-a 2 3 2 2
-a 2 3 2 2
-a 2 3 2 2
-a 2 3 2 2
+a 1 2 1 1
+a 1 2 1 1
+a 1 2 1 1
+a 1 2 1 1
 > g[c('h','q'), c('q','h'), edges=TRUE]
 2 x 2 sparse Matrix of class "dgTMatrix"
-    q h
-h 136 .
-q   . .
+   q h
+h 16 .
+q  . .
 > 
 > ################################################################
 > 
@@ -444,4 +444,21 @@ numeric(0)
 numeric(0)
 
 > 
+> #################################################################
+> 
+> ## from & to
+> g <- graph.tree(20)
+> g[from=c(1,2,2,3), to=c(3,4,8,7)]
+[1] 1 1 0 1
+> 
+> V(g)$name <- letters[1:20]
+> g[from=c("a","b","b","c"), to=c("c","d","h","g")]
+[1] 1 1 0 1
+> 
+> E(g)$weight <- (1:ecount(g)) ^ 2 
+> g[from=c("a","b","b","c"), to=c("c","d","h","g")]
+[1]  4  9  0 36
+> 
+> g[from=c("a","b","b","c"), to=c("c","d","h","g"), edges=TRUE]
+[1] 2 3 0 6
 > 
