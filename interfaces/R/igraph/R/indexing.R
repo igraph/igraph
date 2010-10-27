@@ -98,7 +98,7 @@
     }
     res
   } else if (missing(i) && missing(j)) {
-    get.adjacency(x, sparse=sparse, attr=attr, eids=edges)
+    get.adjacency(x, sparse=sparse, attr=attr, edges=edges)
   } else if (missing(j)) {
     get.adjacency(x, sparse=sparse, attr=attr, edges=edges)[j,,drop=drop]
   } else if (missing(i)) {
