@@ -15,11 +15,12 @@
 \description{These are the methods for simple manipulation of graphs:
   adding and deleting edges and vertices.}
 \usage{
-\method{[}{igraph}(x, i, j, \dots, sparse=getIgraphOpt("sparsematrices"),
+\method{[}{igraph}(x, i, j, \dots, from, to,
+                   sparse=getIgraphOpt("sparsematrices"),
                    edges=FALSE, drop=TRUE,
                    attr=if (is.weighted(x)) "weight" else NULL)
 \method{[[}{igraph}(x, i, j, \dots, directed=TRUE, edges=FALSE, exact=TRUE)
-\method{[}{igraph}(x, i, j, \dots,
+\method{[}{igraph}(x, i, j, \dots, from, to,
                    attr=if (is.weighted(x)) "weight" else NULL) <- value 
 
 \method{+}{igraph}(e1, e2)
@@ -43,7 +44,22 @@ delete.vertices(graph, v)
     \code{path} see details below.
     For \code{add.edges} and \code{add.vertices} these additional
     parameters will be added as edge/vertex attributes. Note that these
-    arguments have to be named.} 
+    arguments have to be named.}
+  \item{from}{A numeric or character vector giving vertex ids or names.
+    Together with the \code{to} argument, it can be used to query/set
+    a sequence of edges. See details below.
+
+    This argument cannot be present together with any of the
+    \code{i} and \code{j} arguments and if it is present, then the
+    \code{to} argument must be present as well.}
+  \item{to}{A numeric or character vector giving vertex ids or names.
+    Together with the \code{from} argument, it can be used to query/set
+    a sequence of edges. See details below.
+
+    This argument cannot be present together with any of the
+    \code{i} and \code{j} arguments and if it is present, then the
+    \code{from} argument must be present as well.}
+  \item{sparse}{Logical scalar, whether to use sparse matrix.}
   \item{directed}{Logical scalar, whether to consider edge directions
     in directed graphs. It is ignored for undirected graphs.}
   \item{edges}{Logical scalar, whether to return edge ids.}
@@ -65,10 +81,11 @@ delete.vertices(graph, v)
   There are, by and large, three ways to manipulate the structure
   of a graph in igraph. The first way is using the \sQuote{\code{[}} and
   \sQuote{\code{[[}} indexing operators on the graph object, very
-  much like the graph was an adjacency matrix. The single bracket
-  indexes the (possibly weighted) adjacency matrix of the graph. The
-  double bracket operator is similar, but queries the adjacencly list of
-  the graph. The details on how to use the indexing operators are
+  much like the graph was an adjacency matrix (\code{[}) or an adjacency
+  list (\code{[}). The single bracket indexes the (possibly weighted)
+  adjacency matrix of the graph. The double bracket operator is
+  similar, but queries the adjacencly list of the graph. The details
+  on how to use the indexing operators are 
   discussed below.
 
   The addition (\sQuote{\code{+}}) and division (\sQuote{\code{-}})
@@ -77,22 +94,97 @@ delete.vertices(graph, v)
   also wants to add attributes, together with the new vertices/edges.
   Please see the details below.
 
-  In addition, the four functions \code{add.vertices}, \code{add.edges},
+  In addition, the four functions, \code{add.vertices}, \code{add.edges},
   \code{delete.vertices} and \code{delete.edges} can also be used
   to manipulate the structure.
 }
 \section{The indexing operators}{
   The one-bracket (\sQuote{\code{[}}) and two-brackets
   (\sQuote{\code{[[}}) indexing operators allow relatively
-  straightforward query and update operations on graphs. Here is
-  a little summary of what they can do.
+  straightforward query and update operations on graphs. The one bracket
+  operator works on the (imaginary) adjacency matrix of the graph.
+  Here is what you can do with it:
 
-  TODO
+  \enumerate{
+    \item Check whether there is an edge between two vertices (\eqn{v}
+      and \eqn{w}) in the graph: \preformatted{  graph[v, w]}
+      A numeric scalar is returned, one if the edge exists, zero
+      otherwise.
+    \item Extract the (sparse) adjacency matrix of the graph, or part of
+      it: \preformatted{  graph[]
+  graph[1:3,5:6]
+  graph[c(1,3,5),]}
+      The first variants returns the full adjacency matrix, the other
+      two return part of it.
+    \item The \code{from} and \code{to} arguments can be used to check
+      the existence of many edges. In this case, both \code{from} and
+      \code{to} must be present and they must have the same length. They
+      must contain vertex ids or names. A numeric vector is returned, of
+      the same length as \code{from} and \code{to}, it contains ones
+      for existing edges edges and zeros for non-existing ones.
+      Example: \preformatted{  graph[from=1:3, to=c(2,3,5)]}.
+    \item For weighted graphs, the \code{[} operator returns the edge
+      weights. For non-esistent edges zero weights are returned. Other
+      edge attributes can be queried as well, by giving the \code{attr}
+      argument. 
+    \item Querying edge ids instead of the existance of edges or edge
+      attributes. E.g. \preformatted{  graph[1, 2, edges=TRUE]}
+      returns the id of the edge between vertices 1 and 2, or zero if
+      there is no such edge.
+    \item Adding one or more edges to a graph. For this the element(s) of
+      the imaginary adjacency matrix must be set to a non-zero numeric
+      value (or \code{TRUE}): \preformatted{  graph[1, 2] <- 1
+  graph[1:3,1] <- 1
+  graph[from=1:3, to=c(2,3,5)] <- TRUE}
+      This does not affect edges that are already present in the graph,
+      i.e. no multiple edges are created.
+    \item Adding weighted edges to a graph. The \code{attr} argument
+      contains the name of the edge attribute to set, so it does not
+      have to be \sQuote{weight}: \preformatted{  graph[1, 2, attr="weight"]<- 5
+  graph[from=1:3, to=c(2,3,5)] <- c(1,-1,4)}
+      If an edge is already present in the network, then only its
+      weigths or other attribute are updated. If the graph is already
+      weighted, then the \code{attr="weight"} setting is implicit, and
+      one does not need to give it explicitly.
+    \item Deleting edges. The replacement syntax allow the deletion of
+      edges, by specifying \code{FALSE} or \code{NULL} as the
+      replacement value: \preformatted{  graph[v, w] <- FALSE}
+      removes the edge from vertex \eqn{v} to vertex \eqn{w}.
+      As this can be used to delete edges between two sets of vertices,
+      either pairwise: \preformatted{  graph[from=v, to=w] <- FALSE}
+      or not: \preformatted{  graph[v, w] <- FALSE }
+      if \eqn{v} and \eqn{w} are vectors of edge ids or names.
+  }
+
+  The double bracket operator indexes the (imaginary) adjacency list
+  of the graph. This can used for the following operations:
+  \enumerate{
+    \item Querying the adjacent vertices for one or more
+      vertices: \preformatted{  graph[[1:3,]]
+  graph[[,1:3]]}
+      The first form gives the successors, the second the predessors
+      or the 1:3 vertices. (For undirected graphs they are equivalent.)
+    \item Querying the incident edges for one or more vertices,
+      if the \code{edges} argument is set to
+      \code{TRUE}: \preformatted{  graph[[1:3, , edges=TRUE]]
+  graph[[, 1:3, edges=TRUE]]}
+    \item Querying the edge ids between two sets or vertices,
+      if both indices are used. E.g. \preformatted{  graph[[v, w, edges=TRUE]]}
+      gives the edge ids of all the edges that exist from vertices
+      \eqn{v} to vertices \eqn{w}.
+  }
+
+  Both the \sQuote{\code{[}} and \sQuote{\code{[[}} operators allow
+  logical indices and negative indices as well, with the usual R
+  semantics. E.g. \preformatted{  graph[degree(graph)==0, 1] <- 1}
+  adds an edge from every isolate vertex to vertex one,
+  and \preformatted{  G <- graph.empty(10)
+  G[-1,1] <- TRUE}
+  creates a star graph.
 
   Of course, the indexing operators support vertex names,
   so instead of a numeric vertex id a vertex can also be given to
-  \sQuote{\code{[}} and \sQuote{\code{[[}}. The same is true for
-  edge names as well.
+  \sQuote{\code{[}} and \sQuote{\code{[[}}.
 }
 \section{The plus operator for adding vertices and edges}{
   The plus operator can be used to add vertices or edges to graph.
