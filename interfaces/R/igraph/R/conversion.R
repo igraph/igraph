@@ -30,7 +30,7 @@ get.adjacency.dense <- function(graph, type=c("both", "upper", "lower"),
   type <- igraph.match.arg(type)
   type <- switch(type, "upper"=0, "lower"=1, "both"=2)
   
-  if (is.null(attr)) {    
+  if (eids || is.null(attr)) {    
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     res <- .Call("R_igraph_get_adjacency", graph, as.numeric(type),
                  as.logical(eids), PACKAGE="igraph")
@@ -92,14 +92,14 @@ get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
   vc <- vcount(graph)
   
   el <- get.edgelist(graph, names=FALSE)
-  if (!is.null(attr)) {
+  if (eids) {
+    value <- seq_len(nrow(el))
+  } else if (!is.null(attr)) {
     attr <- as.character(attr)
     if (!attr %in% list.edge.attributes(graph)) {
       stop("no such edge attribute")
     }
     value <- get.edge.attribute(graph, name=attr)
-  } else if (eids) {
-    value <- seq_len(nrow(el))
   } else {
     value <- rep(1, nrow(el))
   }

@@ -25,10 +25,10 @@ get.edgelist(graph, names=TRUE)
     returned. If not \code{NULL} then the values of the given edge
     attribute are included in the adjacency matrix. If the graph has
     multiple edges, the edge attribute of an arbitrarily chosen edge
-    (for the multiple edges) is included.}
+    (for the multiple edges) is included. This argument is ignored if
+    \code{eids} is \code{TRUE}.}
   \item{eids}{Logical scalar, whether to return the edge ids in the
-    matrix. For non-existant edges zero is returned. This argument is
-    ignored is \code{attr} is not \code{NULL}.}
+    matrix. For non-existant edges zero is returned.}
   \item{names}{Logical constant.
 
     For \code{graph.adjacenct} it gives whether to assign row and column names
