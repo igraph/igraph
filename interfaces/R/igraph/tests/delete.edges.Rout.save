@@ -24,7 +24,7 @@ Type 'q()' to quit R.
 > g2
 IGRAPH UN-- 6 10 -- 
 + attr: name (v/c)
-+ edges:
++ edges (vertex names):
 A -- D, E, F
 B -- D, E, F
 C -- D, E, F

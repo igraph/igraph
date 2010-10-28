@@ -67,7 +67,7 @@ IGRAPH UNW- 5 5 -- A ring
 > print(g, e=T)
 IGRAPH UNW- 5 5 -- A ring
 + attr: name (g/c), name (v/c), weight (e/n)
-+ edges and their attributes:
++ edges (vertex names) and their attributes:
     edge    weight
 [1] a--b 0.9148060
 [2] b--c 0.9370754
@@ -274,7 +274,7 @@ IGRAPH U--- 100 579 --
 > kite
 IGRAPH UN-- 10 18 -- 
 + attr: name (v/c)
-+ edges:
++ edges (vertex names):
 A -- B, C, D, F
 B -- A, D, E, G
 C -- A, D, F

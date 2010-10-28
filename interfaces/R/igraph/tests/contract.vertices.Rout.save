@@ -47,7 +47,7 @@ IGRAPH UNW- 5 10 -- Ring
 [3] e, f
 [4] g, h
 [5] i, j
-+ edges and their attributes:
++ edges (vertex names) and their attributes:
            edge    weight
 [1]  a, b--a, b 0.9148060
 [2]  a, b--c, d 0.9370754

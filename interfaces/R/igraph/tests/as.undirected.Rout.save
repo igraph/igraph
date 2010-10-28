@@ -34,7 +34,7 @@ IGRAPH DNW- 4 5 -- Tiny graph
 + graph attributes:
 [[name]]
 [1] "Tiny graph"
-+ edges and their attributes:
++ edges (vertex names) and their attributes:
     edge     weight
 [1] A->B  1.3709584
 [2] A->C -0.5646982
@@ -47,7 +47,7 @@ IGRAPH UNW- 4 3 -- Tiny graph
 + graph attributes:
 [[name]]
 [1] "Tiny graph"
-+ edges and their attributes:
++ edges (vertex names) and their attributes:
     edge     weight
 [1] A--B  1.7340869
 [2] A--C -0.5646982
@@ -58,7 +58,7 @@ IGRAPH UNW- 4 5 -- Tiny graph
 + graph attributes:
 [[name]]
 [1] "Tiny graph"
-+ edges and their attributes:
++ edges (vertex names) and their attributes:
     edge     weight
 [1] A--B  1.3709584
 [2] A--C -0.5646982
@@ -71,7 +71,7 @@ IGRAPH UNW- 4 2 -- Tiny graph
 + graph attributes:
 [[name]]
 [1] "Tiny graph"
-+ edges and their attributes:
++ edges (vertex names) and their attributes:
     edge   weight
 [1] A--B 1.734087
 [2] C--D 1.037131

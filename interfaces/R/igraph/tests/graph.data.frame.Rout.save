@@ -40,7 +40,7 @@ IGRAPH DN-- 5 6 --
 [3]     Cecil  45      F
 [4]     David  34      M
 [5] Esmeralda  21      F
-+ edges and their attributes:
++ edges (vertex names) and their attributes:
                     edge same.dept friendship advice
 [1] Bob      ->Alice         FALSE          4      4
 [2] Cecil    ->Bob           FALSE          5      5

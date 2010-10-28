@@ -71,7 +71,7 @@ IGRAPH DN-- 5 3 -- Small graph
 > print(as.directed(g, "mutual"), e=TRUE)
 IGRAPH DNW- 5 6 -- Small graph
 + attr: name (g/c), name (v/c), weight (e/n)
-+ edges and their attributes:
++ edges (vertex names) and their attributes:
     edge    weight
 [1] A->B 0.9148060
 [2] A->D 0.9370754
@@ -82,7 +82,7 @@ IGRAPH DNW- 5 6 -- Small graph
 > print(as.directed(g, "arbitrary"), e=TRUE)
 IGRAPH DNW- 5 3 -- Small graph
 + attr: name (g/c), name (v/c), weight (e/n)
-+ edges and their attributes:
++ edges (vertex names) and their attributes:
     edge    weight
 [1] A->B 0.9148060
 [2] A->D 0.9370754

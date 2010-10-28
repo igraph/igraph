@@ -119,7 +119,11 @@
   list <- list.edge.attributes(x)
   list <- list[list!="name"]
   arrow <- ifelse(is.directed(x), "->", "--")
-  cat("+ edges and their attributes:\n")
+  if (is.named(x)) {
+    cat("+ edges (vertex names) and their attributes:\n")
+  } else {
+    cat("+ edges and their attributes:\n")
+  }
   if (names && ! "name" %in% list.vertex.attributes(x)) {
     names <- FALSE
   }
@@ -225,7 +229,7 @@
 
 .print.edges.adjlist.named <- function(x) {
   ## TODO getOption("max.print")
-  cat("+ edges:\n")
+  cat("+ edges (vertex names):\n")
 
   arrow <- c(" -- ", " -> ")[is.directed(x)+1]
   vn <- V(x)$name

@@ -59,7 +59,7 @@ IGRAPH U--- 10 7 --
 > delete.edges(g, c("a|b", "F", "j|i"))
 IGRAPH UN-- 10 7 -- 
 + attr: name (v/c), name (e/c)
-+ edges and their attributes:
++ edges (vertex names) and their attributes:
       edge
 ['B'] b--c
 ['C'] c--d

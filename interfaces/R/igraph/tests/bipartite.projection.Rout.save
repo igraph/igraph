@@ -48,7 +48,7 @@ IGRAPH UNWB 5 7 -- Event network
 + graph attributes:
 [[name]]
 [1] "Event network"
-+ edges and their attributes:
++ edges (vertex names) and their attributes:
             edge weight
 [1] Alice--Bob        2
 [2] Alice--Dan        2
@@ -63,7 +63,7 @@ IGRAPH UNWB 3 3 -- Event network
 + graph attributes:
 [[name]]
 [1] "Event network"
-+ edges and their attributes:
++ edges (vertex names) and their attributes:
                     edge weight
 [1] Party    --Skiing         4
 [2] Party    --Badminton      1

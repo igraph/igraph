@@ -117,7 +117,7 @@ IGRAPH DN-- 10 6 --
 > print(g, e=T)
 IGRAPH DNW- 10 13 -- 
 + attr: name (v/c), weight (e/n)
-+ edges and their attributes:
++ edges (vertex names) and their attributes:
      edge weight
 [1]  a->b      3
 [2]  b->c     NA
@@ -152,7 +152,7 @@ IGRAPH DN-- 10 3 --
 > print(g, e=T)
 IGRAPH DNW- 10 6 -- 
 + attr: name (v/c), weight (e/n)
-+ edges and their attributes:
++ edges (vertex names) and their attributes:
     edge weight
 [1] a->a      3
 [2] c->b     NA
@@ -172,7 +172,7 @@ IGRAPH DNW- 10 6 --
 > print(g, e=T)
 IGRAPH DNW- 10 6 -- 
 + attr: name (v/c), weight (e/n)
-+ edges and their attributes:
++ edges (vertex names) and their attributes:
     edge weight
 [1] a->a      5
 [2] c->b     NA

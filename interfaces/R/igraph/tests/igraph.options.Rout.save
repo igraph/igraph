@@ -50,7 +50,7 @@ IGRAPH UNW- 5 5 -- A small ring
 > g
 IGRAPH UNW- 5 5 -- A small ring
 + attr: name (g/c), name (v/c), weight (e/n)
-+ edges and their attributes:
++ edges (vertex names) and their attributes:
     edge weight
 [1] a--b      5
 [2] b--c      4
@@ -65,7 +65,7 @@ IGRAPH UNW- 5 5 -- A small ring
 + graph attributes:
 [[name]]
 [1] "A small ring"
-+ edges and their attributes:
++ edges (vertex names) and their attributes:
     edge weight
 [1] a--b      5
 [2] b--c      4
