@@ -41,6 +41,26 @@ class SimplePropertiesTests(unittest.TestCase):
         d = self.tree.farthest_points(weights=weights)
         self.failUnless(d == (13, 6, 15) or d == (6, 13, 15))
 
+    def testEccentricity(self):
+        self.assertEquals(self.gfull.eccentricity(),
+                [1] * self.gfull.vcount())
+        self.assertEquals(self.gempty.eccentricity(),
+                [float('inf')] * self.gempty.vcount())
+        self.assertEquals(self.g.eccentricity(), [1, 1, 2, 2])
+        self.assertEquals(self.gdir.eccentricity(),
+                [1, 2, 3, 2])
+        self.assertEquals(self.tree.eccentricity(),
+                [3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5])
+        self.assertEquals(Graph(0).eccentricity(), [])
+
+    def testRadius(self):
+        self.assertEquals(self.gfull.radius(), 1)
+        self.assertEquals(self.gempty.radius(), float('inf'))
+        self.assertEquals(self.g.radius(), 1)
+        self.assertEquals(self.gdir.radius(), 1)
+        self.assertEquals(self.tree.radius(), 3)
+        self.assertRaises(ValueError, Graph(0).radius)
+
     def testTransitivity(self):
         self.failUnless(self.gfull.transitivity_undirected() == 1.0)
         self.failUnless(self.tree.transitivity_undirected() == 0.0)
