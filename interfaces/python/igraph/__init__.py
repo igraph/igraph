@@ -341,7 +341,7 @@ class Graph(GraphBase):
         considered and any other vertex in the graph.
 
         Please note that for any unconnected undirected graph, eccentricities
-        will all be equal to infinity. A not strongly connected directed graph
+        will all be equal to infinity. A not weakly connected directed graph
         will also exhibit the same behaviour.
 
         @param vertices: the vertices to consider. If C{None}, all
@@ -354,7 +354,7 @@ class Graph(GraphBase):
         if vertices is None:
             vertices = self.vs
 
-        if not self.is_connected(STRONG):
+        if not self.is_connected(WEAK):
             return [float('inf') for vertex in vertices]
         
         return [max(self.shortest_paths(vertex, mode=OUT)[0])
