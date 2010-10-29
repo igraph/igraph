@@ -604,6 +604,26 @@ class Graph(GraphBase):
         return self.personalized_pagerank(vertices, directed, damping, None, \
                 None, weights, arpack_options)
 
+    def radius(self):
+        """Calculates the radius of the graph.
+        
+        Radius is defined as the smallest vertex eccentricity in the graph.
+        Unconnected undirected graphs and not weakly connected directed
+        graphs have infinite radius. Graphs with no vertices throw
+        an exception.
+
+        @return: the radius of the graph
+        @raise ValueError: when the graph has no vertices at all
+        """
+        if self.vcount() == 0:
+            raise ValueError("graphs with no vertices have no radius")
+
+        if not self.is_connected(WEAK):
+            return float('inf')
+        
+        return min(max(self.shortest_paths(vertex, mode=OUT)[0])
+                for vertex in self.vs)
+
     def triad_census(self, *args, **kwds):
         """triad_census()
 
