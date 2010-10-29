@@ -337,15 +337,12 @@ class Graph(GraphBase):
     def eccentricity(self, vertices=None):
         """Calculates eccentricities for vertices with the given indices.
         
-        Eccentricity is given as the reciprocal of the greatest distance
-        between the vertex being considered and any other vertex in the
-        graph.
+        Eccentricity is given as the greatest distance between the vertex being
+        considered and any other vertex in the graph.
 
-        Please note that for any unconnected graph, eccentricities will
-        all be equal to 1 over the number of vertices, since for all vertices
-        the greatest distance will be equal to the number of vertices (this
-        is how L{shortest_paths} denotes vertex pairs where it is impossible
-        to reach one from the other).
+        Please note that for any unconnected undirected graph, eccentricities
+        will all be equal to infinity. A not strongly connected directed graph
+        will also exhibit the same behaviour.
 
         @param vertices: the vertices to consider. If C{None}, all
           vertices are considered.
@@ -353,17 +350,15 @@ class Graph(GraphBase):
         """
         if self.vcount() == 0:
             return []
-        if self.vcount() == 1:
-            return [1.0]
-        distance_matrix = self.shortest_paths(mode=OUT)
-        distance_maxs = [max(row) for row in distance_matrix]
-        
-        if vertices is None:
-            result = [1.0/x for x in distance_maxs]
-        else:
-            result = [1.0/distance_maxs[idx] for idx in vertices]
 
-        return result
+        if vertices is None:
+            vertices = self.vs
+
+        if not self.is_connected(STRONG):
+            return [float('inf') for vertex in vertices]
+        
+        return [max(self.shortest_paths(vertex, mode=OUT)[0])
+                for vertex in vertices]
 
     def get_adjacency(self, type=GET_ADJACENCY_BOTH, attribute=None, \
             default=0, eids=False):
