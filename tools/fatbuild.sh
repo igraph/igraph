@@ -10,6 +10,9 @@ if test x$NJOB = x; then
     NJOB=$NCPU
 fi
 
+# Generic configure flags you always want go here.
+CONFIG_GENERIC="--disable-gmp"
+
 # Generic, cross-platform CFLAGS you always want go here.
 CFLAGS="-O3"
 
@@ -221,7 +224,7 @@ done
 #
 if test x$configure_ppc = xyes; then
     (cd fatbuild/ppc && \
-     sh ../../configure $CONFIG_PPC CC="$CC_PPC" CXX="$CXX_PPC" CFLAGS="$CFLAGS $CFLAGS_PPC" CPPFLAGS="$CPPFLAGS_PPC" LDFLAGS="$LFLAGS_PPC") || exit 2
+     sh ../../configure $CONFIG_GENERIC $CONFIG_PPC CC="$CC_PPC" CXX="$CXX_PPC" CFLAGS="$CFLAGS $CFLAGS_PPC" CPPFLAGS="$CPPFLAGS_PPC" LDFLAGS="$LFLAGS_PPC") || exit 2
 fi
 if test x$make_ppc = xyes; then
     (cd fatbuild/ppc && ls src && make -j$NJOB) || exit 3
@@ -232,7 +235,7 @@ fi
 #
 if test x$configure_ppc64 = xyes; then
     (cd fatbuild/ppc64 && \
-     sh ../../configure $CONFIG_PPC64 CC="$CC_PPC64" CXX="$CXX_PPC64" CFLAGS="$CFLAGS $CFLAGS_PPC64" CPPFLAGS="$CPPFLAGS_PPC64" LDFLAGS="$LFLAGS_PPC64") || exit 2
+     sh ../../configure $CONFIG_GENERIC $CONFIG_PPC64 CC="$CC_PPC64" CXX="$CXX_PPC64" CFLAGS="$CFLAGS $CFLAGS_PPC64" CPPFLAGS="$CPPFLAGS_PPC64" LDFLAGS="$LFLAGS_PPC64") || exit 2
 fi
 if test x$make_ppc64 = xyes; then
     (cd fatbuild/ppc64 && ls src && make -j$NJOB) || exit 3
@@ -243,7 +246,7 @@ fi
 #
 if test x$configure_x86 = xyes; then
     (cd fatbuild/x86 && \
-     sh ../../configure $CONFIG_X86 CC="$CC_X86" CXX="$CXX_X86" CFLAGS="$CFLAGS $CFLAGS_X86" CPPFLAGS="$CPPFLAGS_X86" LDFLAGS="$LFLAGS_X86") || exit 2
+     sh ../../configure $CONFIG_GENERIC $CONFIG_X86 CC="$CC_X86" CXX="$CXX_X86" CFLAGS="$CFLAGS $CFLAGS_X86" CPPFLAGS="$CPPFLAGS_X86" LDFLAGS="$LFLAGS_X86") || exit 2
 fi
 if test x$make_x86 = xyes; then
     (cd fatbuild/x86 && make -j$NJOB) || exit 3
@@ -254,7 +257,7 @@ fi
 #
 if test x$configure_x64 = xyes; then
     (cd fatbuild/x64 && \
-     sh ../../configure $CONFIG_X64 CC="$CC_X64" CXX="$CXX_X64" CFLAGS="$CFLAGS $CFLAGS_X64" CPPFLAGS="$CPPFLAGS_X64" LDFLAGS="$LFLAGS_X64") || exit 2
+     sh ../../configure $CONFIG_GENERIC $CONFIG_X64 CC="$CC_X64" CXX="$CXX_X64" CFLAGS="$CFLAGS $CFLAGS_X64" CPPFLAGS="$CPPFLAGS_X64" LDFLAGS="$LFLAGS_X64") || exit 2
 fi
 if test x$make_x64 = xyes; then
     (cd fatbuild/x64 && make -j$NJOB) || exit 3
@@ -265,16 +268,16 @@ fi
 #
 if test x$merge = xyes; then
     cd fatbuild
-    output=.libs
+    output=.
 	mkdir -p $output
     target=`find . -mindepth 4 -maxdepth 4 -type f -name '*.dylib' | head -1 | sed 's|.*/||'`
     (lipo -create -o $output/$target `find . -mindepth 4 -maxdepth 4 -type f -name "*.dylib"` &&
      ln -sf $target $output/libigraph.dylib &&
 	 lipo -create -o $output/libigraph.a `find . -mindepth 4 -maxdepth 4 -type f -name "libigraph.a"` &&
      cp $native_path/src/.libs/libigraph.la $output &&
-     cp $native_path/src/.libs/libigraph.lai $output &&
-     echo "Build complete!" &&
-     echo "Files can be found in the fatbuild directory.") || exit 4
+     cp $native_path/src/.libs/libigraph.lai $output) || exit 4
+     echo "Build complete!"
+     echo "Files can be found in the fatbuild directory."
     cd ..
 fi
 

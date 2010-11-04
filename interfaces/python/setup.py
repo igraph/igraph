@@ -133,7 +133,7 @@ options = dict(
 if "macosx" in plat and "bdist_mpkg" in argv:
     # OS X specific stuff to build the .mpkg installer
     options["data_files"] = [ \
-            ('/usr/local/lib', [os.path.join('..', '..', 'fatbuild', '.libs', 'libigraph.0.dylib')])
+            ('/usr/local/lib', [os.path.join('..', '..', 'fatbuild', 'libigraph.0.dylib')])
     ]
 
 setup(**options)

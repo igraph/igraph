@@ -1,7 +1,7 @@
 #!/bin/sh
 # Creates the OS X installer package and puts it in a disk image
 
-FATLIB=../../fatbuild/.libs/libigraph.dylib
+FATLIB=../../fatbuild/libigraph.dylib
 PYTHON_VERSIONS="2.5 2.6"
 
 # Check whether we are running the script on Mac OS X
