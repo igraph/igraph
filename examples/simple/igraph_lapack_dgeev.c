@@ -73,8 +73,7 @@ int main() {
     }
   }
   
-  igraph_lapack_dgeev(/*leftvec=*/ 1, /*rightvec=*/ 1, &A, 
-		      &values_real, &values_imag, 
+  igraph_lapack_dgeev(&A, &values_real, &values_imag, 
 		      &vectors_left, &vectors_right, &info);
 
   if (check_ev(&A, &values_real, &values_imag, 
