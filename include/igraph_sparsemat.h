@@ -138,8 +138,8 @@ int igraph_matrix_as_sparsemat(igraph_sparsemat_t *res,
 			       const igraph_matrix_t *mat,
 			       igraph_real_t tol);
 
-int igraph_sparsemat_as_matrix(igraph_matrix_t *mat,
-			       const igraph_sparsemat_t *res);
+int igraph_sparsemat_as_matrix(igraph_matrix_t *res,
+			       const igraph_sparsemat_t *spmat);
 
 typedef enum { IGRAPH_SPARSEMAT_SOLVE_LU,
 	       IGRAPH_SPARSEMAT_SOLVE_QR } igraph_sparsemat_solve_t;

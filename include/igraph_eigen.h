@@ -65,6 +65,8 @@ typedef struct igraph_eigen_which_t {
   int howmany;
   int il, iu;
   igraph_real_t vl, vu;
+  int vestimate;
+  igraph_lapack_dgeevx_balance_t balance;
 } igraph_eigen_which_t;
     
 

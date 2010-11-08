@@ -82,5 +82,6 @@
 #include "igraph_mixing.h"
 #include "igraph_separators.h"
 #include "igraph_cohesive_blocks.h"
+#include "igraph_eigen.h"
 
 #endif

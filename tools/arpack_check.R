@@ -11,9 +11,10 @@ residual <- function(A, v, lambda) {
   sum(abs( A %*% v - lambda * v )^2)
 }
 
-arp <- function(M, sym=TRUE, which="LM", nev=1, maxiter=300, ...) {
+arp <- function(M, sym=TRUE, which="LM", nev=1, ncv=2*nev+2,
+                maxiter=300, ...) {
   res <- arpack(callback, extra=M, sym=sym,
-                options=list(n=nrow(M), nev=nev, ncv=2*nev+2,
+                options=list(n=nrow(M), nev=nev, ncv=ncv,
                   which=which, maxiter=maxiter, ...))
   res$vectors <- cbind(res$vectors)
   res
@@ -41,7 +42,7 @@ for (i in 1:10000) {
 for (i in 1:10000) {
   M <- matrix(sample(0:1, 100, replace=TRUE, prob=c(8,2)), 10)
   M <- M+t(M)
-  res <- arp(M, nev=2, ncv=4, maxiter=10000)
+  res <- arp(M, nev=1, ncv=3, maxiter=10000)
   w <- 1
   if (residual(M, res$vectors[,w], res$values[w]) > 1e-12) {
     print("Gebasz!" ); break;
@@ -54,7 +55,7 @@ for (i in 1:10000) {
 for (i in 1:10000) {
   M <- matrix(sample(0:1, 100, replace=TRUE, prob=c(14,1)), 10)
   M <- M+t(M)
-  res <- arp(M, nev=2, ncv=5, maxiter=1e7)
+  res <- arp(M, nev=1, maxiter=1e7)
   w <- 1
   if (residual(M, res$vectors[,w], res$values[w]) > 1e-12) {
     print("Gebasz!" ); break;
