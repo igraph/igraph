@@ -24,6 +24,33 @@
 #include "igraph_lapack.h"
 #include "igraph_lapack_internal.h"
 
+/**
+ * \function igraph_lapack_dgetrf
+ * Calls LAPACK to to LU factorize a general M-by-N matrix
+ * 
+ * The factorization has the form   
+ *      A = P * L * U   
+ * where P is a permutation matrix, L is lower triangular with unit   
+ * diagonal elements (lower trapezoidal if m > n), and U is upper   
+ * triangular (upper trapezoidal if m < n).   
+ * \param a The input/output matrix. On entry, the M-by-N matrix to be
+ *      factored. On exit, the factors L and U from the factorization 
+ *      A = P * L * U; the unit diagonal elements of L are not
+ *      stored.
+ * \param ipiv An integer vector, the pivot indices are stored here,
+ *      unless it is a null pointer. Row i of the matrix was
+ *      interchanged with row ipiv[i].
+ * \param info LAPACK error code. Zero on successful exit. If positive
+ *      and i, then U(i,i) is exactly zero. The factorization has been
+ *      completed, but the factor U is exactly singular, and division
+ *      by zero will occur if it is used to solve a system of
+ *      equations. If LAPACK returns an error, i.e. a negative info
+ *      value, then an igraph error is generated as well.
+ * \return Error code.
+ * 
+ * Time complexity: TODO.
+ */
+
 int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv, 
 			 int *info) {
   int m=igraph_matrix_nrow(a);
@@ -74,6 +101,26 @@ int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
   
   return 0;
 }
+
+/** 
+ * \function igraph_lapack_dgetrs
+ * Solve general system of linear equations using LU factorization
+ * 
+ * This function calls LAPACK to solve a system of linear equations   
+ *      A * X = B  or  A' * X = B   
+ * with a general N-by-N matrix A using the LU factorization
+ * computed by \ref igraph_lapack_dgetrf.
+ * \param transpose Logical scalar, whether to transpose the input
+ *      matrix.
+ * \param a A matrix containing the L and U factors from the
+ *      factorization A = P*L*U.
+ * \param ipiv An integer vector, the pivot indices from \ref
+ *      igraph_lapack_dgetrf must be given here.
+ * \param b The right hand side matrix must be given here.
+ * \return Error code.
+ * 
+ * Time complexity: TODO.
+ */
 
 int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
 			 igraph_vector_int_t *ipiv, igraph_matrix_t *b) {
@@ -131,6 +178,39 @@ int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
 		
   return 0;
 }
+
+/**
+ * \function igraph_lapack_dgesv
+ * Solve system of linear equations with LU factorization
+ * 
+ * This function computes the solution to a real system of linear
+ * equations A * X = B, where A is an N-by-N matrix and X and B are
+ * N-by-NRHS matrices.
+ * 
+ * </para><para>The LU decomposition with partial pivoting and row
+ * interchanges is used to factor A as   
+ *    A = P * L * U,   
+ * where P is a permutation matrix, L is unit lower triangular, and U is   
+ * upper triangular.  The factored form of A is then used to solve the   
+ * system of equations A * X = B.
+ * \param a Matrix. On entry the N-by-N coefficient matrix, on exit,
+ *        the factors L and U from the factorization A=P*L*U; the unit
+ *        diagonal elements of L are not stored.
+ * \param ipiv An integer vector or a null pointer. If not a null
+ *        pointer, then the pivot indices that define the permutation
+ *        matrix P, are stored here. Row i of the matrix was
+ *        interchanged with row IPIV(i).
+ * \param b Matrix, on entry the right hand side matrix should be
+ *        stored here. On exit, if there was no error, and the info
+ *        argument is zero, then it contains the solution matrix X.
+ * \param info The LAPACK info code. If it is positive, then 
+ *        U(info,info) is exactly zero. In this case the factorization   
+ *        has been completed, but the factor U is exactly   
+ *        singular, so the solution could not be computed. 
+ * \return Error code.
+ * 
+ * Time complexity: TODO.
+ */
 
 int igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
 			igraph_matrix_t *b, int *info) {
@@ -198,6 +278,65 @@ int igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
   
   return 0;
 }
+
+/**
+ * \function igraph_lapack_dsyevr
+ * Selected eigenvalues and optionally eigenvectors of a symmetric matrix
+ * 
+ * Calls the DSYEVR LAPACK function to compute selected eigenvalues
+ * and, optionally, eigenvectors of a real symmetric matrix A.
+ * Eigenvalues and eigenvectors can be selected by specifying either
+ * a range of values or a range of indices for the desired eigenvalues.   
+ *
+ * </para><para>See more in the LAPACK documentation.
+ * \param A Matrix, on entry it contains the symmetric input
+ *        matrix. Only the leading N-by-N upper triangular part is
+ *        used for the computation. On exit this upper triangular part
+ *        is destroyed.
+ * \param which Constant that gives which eigenvalues (and possibly
+ *        the corresponding eigenvectors) to calculate. Possible
+ *        values are \c IGRAPH_LAPACK_DSYEV_ALL, all eigenvalues;
+ *        \c IGRAPH_LAPACK_DSYEV_INTERVAL, all eigenvalues in the
+ *        half-open interval (vl,vu];
+ *        \c IGRAPH_LAPACK_DSYEV_SELECT, the il-th through iu-th
+ *        eigenvalues.
+ * \param vl If \p which is \c IGRAPH_LAPACK_DSYEV_INTERVAL, then 
+ *        this is the lower bound of the interval to be searched for
+ *        eigenvalues. See also the \p vestimate argument.
+ * \param vu If \p which is \c IGRAPH_LAPACK_DSYEV_INTERVAL, then
+ *        this is the upper bound of the interval to be searched for
+ *        eigenvalues. See also the \p vestimate argument.
+ * \param vestimate An upper bound for the number of eigenvalues in
+ *        the (vl,vu] interval, if \p which is \c
+ *        IGRAPH_LAPACK_DSYEV_INTERVAL. Memory is allocated only for
+ *        the given number of eigenvalues (and eigenvectors), so this
+ *        upper bound must be correct.
+ * \param il The index of the smallest eigenvalue to return, if \p
+ *        which is \c IGRAPH_LAPACK_DSYEV_SELECT.
+ * \param iu The index of the largets eigenvalue to return, if \p 
+ *        which is \c IGRAPH_LAPACK_DSYEV_SELECT.
+ * \param abstol The absolute error tolerance for the eigevalues. An
+ *        approximate eigenvalue is accepted as converged when it is
+ *        determined to lie in an interval [a,b] of width less than or
+ *        equal to abstol + EPS * max(|a|,|b|), where EPS is the
+ *        machine precision.
+ * \param values An initialized vector, the eigenvalues are stored
+ *        here, unless it is a null pointer. It will be resized as
+ *        needed.
+ * \param vectors An initialized matrix, the eigenvectors are stored
+ *        in its columns, unless it is a null pointer. It will be
+ *        resized as needed.
+ * \param support An integer vector. If not a null pointer, then it
+ *        will be resized to (2*max(1,M)) (M is a the total number of
+ *        eigenvalues found). Then the support of the eigenvectors in
+ *        \p vectors is stored here, i.e., the indices   
+ *        indicating the nonzero elements in \p vectors. 
+ *        The i-th eigenvector is nonzero only in elements
+ *        support(2*i-1) through support(2*i).
+ * \return Error code.
+ * 
+ * Time complexity: TODO.
+ */
 
 int igraph_lapack_dsyevr(const igraph_matrix_t *A, 
 			 igraph_lapack_dsyev_which_t which,
@@ -307,6 +446,63 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
   
   return 0;
 }
+
+/** 
+ * \function igraph_lapack_dgeev
+ * Eigenvalues and optionally eigenvectors of a non-symmetric matrix
+ * 
+ * This function calls LAPACK to compute, for an N-by-N real
+ * nonsymmetric matrix A, the eigenvalues and, optionally, the left
+ * and/or right eigenvectors.
+ * 
+ * </para><para>
+ * The right eigenvector v(j) of A satisfies   
+ *                    A * v(j) = lambda(j) * v(j)   
+ * where lambda(j) is its eigenvalue.   
+ * The left eigenvector u(j) of A satisfies   
+ *                u(j)**H * A = lambda(j) * u(j)**H   
+ * where u(j)**H denotes the conjugate transpose of u(j).   
+ *
+ * </para><para>
+ * The computed eigenvectors are normalized to have Euclidean norm   
+ * equal to 1 and largest component real.   
+ * 
+ * \param A Matrix. On entry it contains the N-by-N input matrix. On
+ *        exit it is overwritten.
+ * \param valuesreal Pointer to an initialized vector, or a null
+ *        pointer. If not a null pointer, then the real parts of the
+ *        eigenvalues are stored here. The vector will be resized as
+ *        needed.
+ * \param valuesimag Pointer to an initialized vector, or a null
+ *        pointer. If not a null pointer, then the imaginary parts of
+ *        the eigenvalues are stored here. The vector will be resized
+ *        as needed.
+ * \param vectorsleft Pointer to an initialized matrix, or a null
+ *        pointer. If not a null pointer, then the left eigenvectors
+ *        are stored in the columns of the matrix. The matrix will be
+ *        resized as needed.
+ * \param vectorsright Pointer to an initialized matrix, or a null
+ *        pointer. If not a null pointer, then the right eigenvectors
+ *        are stored in the columns of the matrix. The matrix will be
+ *        resized as needed.
+ * \param info This argument is used for two purposes. As an input
+ *        argument it gives whether an igraph error should be
+ *        generated if the QR algorithm fails to compute all
+ *        eigenvalues. If \p info is non-zero, then an error is
+ *        generated, otherwise only a warning is given.
+ *        On exit it contains the LAPACK error code. 
+ *        Zero means successful exit.
+ *        A negative values means that some of the arguments had an
+ *        illegal value, this always triggers an igraph error. An i
+ *        positive  value means that the QR algorithm failed to
+ *        compute all the eigenvalues, and no eigenvectors have been
+ *        computed; element i+1:N of \p valuesreal and \p valuesimag
+ *        contain eigenvalues which have converged. This case only
+ *        generated an igraph error, if \p info was non-zero on entry.
+ * \return Error code.
+ * 
+ * Time complexity: TODO.
+ */
 
 int igraph_lapack_dgeev(const igraph_matrix_t *A, 
 			igraph_vector_t *valuesreal,
