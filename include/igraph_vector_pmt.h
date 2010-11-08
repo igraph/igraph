@@ -207,6 +207,24 @@ long int FUNCTION(igraph_vector,qsort_ind)(TYPE(igraph_vector) *v,
 int FUNCTION(igraph_vector,print)(const TYPE(igraph_vector) *v);
 int FUNCTION(igraph_vector,fprint)(const TYPE(igraph_vector) *v, FILE *file);
 
+#ifdef BASE_COMPLEX
+
+int igraph_vector_complex_real(const igraph_vector_complex_t *v, 
+			       igraph_vector_t *real);
+int igraph_vector_complex_imag(const igraph_vector_complex_t *v, 
+			       igraph_vector_t *imag);
+int igraph_vector_complex_realimag(const igraph_vector_complex_t *v, 
+				   igraph_vector_t *real, 
+				   igraph_vector_t *imag);
+int igraph_vector_complex_create(igraph_vector_complex_t *v,
+				 const igraph_vector_t *real,
+				 const igraph_vector_t *imag);
+int igraph_vector_complex_create_polar(igraph_vector_complex_t *v,
+				       const igraph_vector_t *r,
+				       const igraph_vector_t *theta);
+
+#endif
+
 /* ----------------------------------------------------------------------------*/
 /* For internal use only, may be removed, rewritten ... */
 /* ----------------------------------------------------------------------------*/

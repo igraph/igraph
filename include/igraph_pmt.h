@@ -82,6 +82,7 @@
 #define MULTIPLICITY 1
 
 #elif defined(BASE_COMPLEX)
+#undef complex
 #define BASE igraph_complex_t
 #define SHORT complex
 #define ZERO igraph_complex(0,0)
