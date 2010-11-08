@@ -291,8 +291,7 @@ int igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
  * </para><para>See more in the LAPACK documentation.
  * \param A Matrix, on entry it contains the symmetric input
  *        matrix. Only the leading N-by-N upper triangular part is
- *        used for the computation. On exit this upper triangular part
- *        is destroyed.
+ *        used for the computation.
  * \param which Constant that gives which eigenvalues (and possibly
  *        the corresponding eigenvectors) to calculate. Possible
  *        values are \c IGRAPH_LAPACK_DSYEV_ALL, all eigenvalues;
@@ -467,8 +466,7 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
  * The computed eigenvectors are normalized to have Euclidean norm   
  * equal to 1 and largest component real.   
  * 
- * \param A Matrix. On entry it contains the N-by-N input matrix. On
- *        exit it is overwritten.
+ * \param A Matrix. On entry it contains the N-by-N input matrix.
  * \param valuesreal Pointer to an initialized vector, or a null
  *        pointer. If not a null pointer, then the real parts of the
  *        eigenvalues are stored here. The vector will be resized as
@@ -573,10 +571,6 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
     }
   }
 
-  igraph_vector_destroy(&work);
-  igraph_matrix_destroy(&Acopy);
-  IGRAPH_FINALLY_CLEAN(2);
-
   if (!valuesimag) {
     igraph_vector_destroy(&vimag);
     IGRAPH_FINALLY_CLEAN(1);
@@ -585,6 +579,158 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
     igraph_vector_destroy(&vreal);
     IGRAPH_FINALLY_CLEAN(1);
   }
+
+  igraph_vector_destroy(&work);
+  igraph_matrix_destroy(&Acopy);
+  IGRAPH_FINALLY_CLEAN(2);
   
+  return 0;
+}
+
+/**
+ * \function igraph_lapack_dgeevx
+ * 
+ */
+
+int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
+			 const igraph_matrix_t *A,
+			 igraph_vector_t *valuesreal,
+			 igraph_vector_t *valuesimag,
+			 igraph_matrix_t *vectorsleft,
+			 igraph_matrix_t *vectorsright,
+			 int *ilo, int *ihi, igraph_vector_t *scale,
+			 igraph_real_t *abnrm,
+			 igraph_vector_t *rconde,
+			 igraph_vector_t *rcondv,
+			 int *info) {
+
+  char balanc;
+  char jobvl= vectorsleft  ? 'V' : 'N';
+  char jobvr= vectorsright ? 'V' : 'N';
+  char sense;
+  int n=igraph_matrix_nrow(A);
+  int lda=n, ldvl=n, ldvr=n, lwork=-1;
+  igraph_vector_t work;
+  igraph_vector_int_t iwork;
+  igraph_matrix_t Acopy;
+  int error=*info;
+  igraph_vector_t *myreal=valuesreal, *myimag=valuesimag, vreal, vimag;
+  igraph_vector_t *myscale=scale, vscale;
+
+  if (igraph_matrix_ncol(A) != n) { 
+    IGRAPH_ERROR("Cannot calculate eigenvalues (dgeevx)", IGRAPH_NONSQUARE);
+  }
+  
+  switch (balance) {
+  case IGRAPH_LAPACK_DGEEVX_BALANCE_NONE:
+    balanc='N';
+    break;
+  case IGRAPH_LAPACK_DGEEVX_BALANCE_PERM:
+    balanc='P';
+    break;
+  case IGRAPH_LAPACK_DGEEVX_BALANCE_SCALE:
+    balanc='S';
+    break;
+  case IGRAPH_LAPACK_DGEEVX_BALANCE_BOTH:
+    balanc='B';
+    break;
+  default:
+    IGRAPH_ERROR("Invalid 'balance' argument", IGRAPH_EINVAL);
+    break;
+  }
+
+  if (!rconde && !rcondv) {
+    sense='N';
+  } else if (rconde && !rcondv) {
+    sense='E';
+  } else if (!rconde && rcondv) {
+    sense='V';
+  } else {
+    sense='B';
+  }
+  
+  IGRAPH_CHECK(igraph_matrix_copy(&Acopy, A));
+  IGRAPH_FINALLY(igraph_matrix_destroy, &Acopy);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&work, 1);
+  IGRAPH_CHECK(igraph_vector_int_init(&iwork, n));
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &iwork);
+  
+  if (!valuesreal) {
+    IGRAPH_VECTOR_INIT_FINALLY(&vreal, n);
+    myreal=&vreal;
+  } else {
+    IGRAPH_CHECK(igraph_vector_resize(myreal, n));
+  }
+  if (!valuesimag) {
+    IGRAPH_VECTOR_INIT_FINALLY(&vimag, n);
+    myimag=&vimag;
+  } else {
+    IGRAPH_CHECK(igraph_vector_resize(myimag, n));
+  }
+  if (!scale) {
+    IGRAPH_VECTOR_INIT_FINALLY(&vscale, n);
+    myscale=&vscale;
+  } else {
+    IGRAPH_CHECK(igraph_vector_resize(scale, n));
+  }
+  if (vectorsleft) { 
+    IGRAPH_CHECK(igraph_matrix_resize(vectorsleft, n, n));
+  }
+  if (vectorsright) {
+    IGRAPH_CHECK(igraph_matrix_resize(vectorsright, n, n));
+  }
+
+  igraphdgeevx_(&balanc, &jobvl, &jobvr, &sense, &n, &MATRIX(Acopy,0,0), 
+		&lda, VECTOR(*myreal), VECTOR(*myimag), 
+		vectorsleft  ? &MATRIX(*vectorsleft ,0,0) : 0, &ldvl,
+		vectorsright ? &MATRIX(*vectorsright,0,0) : 0, &ldvr,
+		ilo, ihi, VECTOR(*myscale), abnrm, 
+		rconde ? VECTOR(*rconde) : 0, 
+		rcondv ? VECTOR(*rcondv) : 0, 
+		VECTOR(work), &lwork, VECTOR(iwork), info);
+		
+  lwork=VECTOR(work)[0];
+  IGRAPH_CHECK(igraph_vector_resize(&work, lwork));
+  
+  igraphdgeevx_(&balanc, &jobvl, &jobvr, &sense, &n, &MATRIX(Acopy,0,0), 
+		&lda, VECTOR(*myreal), VECTOR(*myimag), 
+		vectorsleft  ? &MATRIX(*vectorsleft ,0,0) : 0, &ldvl,
+		vectorsright ? &MATRIX(*vectorsright,0,0) : 0, &ldvr,
+		ilo, ihi, VECTOR(*myscale), abnrm, 
+		rconde ? VECTOR(*rconde) : 0, 
+		rcondv ? VECTOR(*rcondv) : 0, 
+		VECTOR(work), &lwork, VECTOR(iwork), info);
+		
+  if (*info < 0) {
+      IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev)", IGRAPH_ELAPACK);
+  } else if (*info > 0) {    
+    if (error) {
+      IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev)", IGRAPH_ELAPACK);
+    } else {
+      IGRAPH_WARNING("Cannot calculate eigenvalues (dgeev)");
+    }
+  }
+
+  if (!scale) {
+    igraph_vector_destroy(&vscale);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  if (!valuesimag) {
+    igraph_vector_destroy(&vimag);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  if (!valuesreal) {
+    igraph_vector_destroy(&vreal);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  igraph_vector_int_destroy(&iwork);
+  igraph_vector_destroy(&work);
+  igraph_matrix_destroy(&Acopy);
+  IGRAPH_FINALLY_CLEAN(3);
+
   return 0;
 }

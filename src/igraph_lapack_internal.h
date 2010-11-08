@@ -33,6 +33,7 @@
 #include "config.h"
 
 #ifndef INTERNAL_LAPACK
+#define igraphdgeevx_   dgeevx_
 #define igraphdgeev_	dgeev_
 #define igraphdgebak_	dgebak_
 #define igraphxerbla_	xerbla_
@@ -161,5 +162,13 @@ int igraphdgeev_(char *jobvl, char *jobvr, int *n, igraph_real_t *a,
 		 int *lda, igraph_real_t *wr, igraph_real_t *wi, 
 		 igraph_real_t *vl, int *ldvl, igraph_real_t *vr, int *ldvr, 
 		 igraph_real_t *work, int *lwork, int *info);
+
+int igraphdgeevx_(char *balanc, char *jobvl, char *jobvr, char *sense, 
+		  int *n, igraph_real_t *a, int *lda, igraph_real_t *wr, 
+		  igraph_real_t *wi, igraph_real_t *vl, int *ldvl, 
+		  igraph_real_t *vr, int *ldvr, int *ilo, int *ihi, 
+		  igraph_real_t *scale, igraph_real_t *abnrm, 
+		  igraph_real_t *rconde, igraph_real_t *rcondv, 
+		  igraph_real_t *work, int *lwork, int *iwork, int *info);
 
 #endif
