@@ -76,14 +76,13 @@ int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
 }
 
 int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
-			 igraph_vector_int_t *ipiv, igraph_matrix_t *b, 
-			 int *info) {
+			 igraph_vector_int_t *ipiv, igraph_matrix_t *b) {
   char trans = transpose ? 'T' : 'N';
   int n=igraph_matrix_nrow(a);
   int nrhs=igraph_matrix_ncol(b);
   int lda= n > 0 ? n : 1;
   int ldb= n > 0 ? n : 1;
-  igraph_vector_int_t *myipiv=ipiv, vipiv;
+  int info;
 
   if (n != igraph_matrix_ncol(a)) {
     IGRAPH_ERROR("Cannot LU solve matrix", IGRAPH_NONSQUARE);
@@ -92,17 +91,11 @@ int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
     IGRAPH_ERROR("Cannot LU solve matrix, RHS of wrong size", IGRAPH_EINVAL);
   }
 
-  if (!ipiv) {
-    IGRAPH_CHECK(igraph_vector_int_init(&vipiv, n));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &vipiv);
-    myipiv=&vipiv;
-  }
-  
-  igraphdgetrs_(&trans, &n, &nrhs, VECTOR(a->data), &lda, VECTOR(*myipiv),
-		VECTOR(b->data), &ldb, info);
+  igraphdgetrs_(&trans, &n, &nrhs, VECTOR(a->data), &lda, VECTOR(*ipiv),
+		VECTOR(b->data), &ldb, &info);
 
-  if (*info < 0) {
-    switch(*info) { 
+  if (info < 0) {
+    switch(info) { 
     case -1:
       IGRAPH_ERROR("Invalid transpose argument", IGRAPH_ELAPACK);
       break;
@@ -136,11 +129,6 @@ int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
     }
   }
 		
-  if (!ipiv) {
-    igraph_vector_int_destroy(&vipiv);
-    IGRAPH_FINALLY_CLEAN(1);
-  }
-
   return 0;
 }
 
@@ -320,8 +308,8 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
   return 0;
 }
 
-int igraph_lapack_dgeev(igraph_bool_t leftvec, igraph_bool_t rightvec,
-			const igraph_matrix_t *A, igraph_vector_t *valuesreal,
+int igraph_lapack_dgeev(const igraph_matrix_t *A, 
+			igraph_vector_t *valuesreal,
 			igraph_vector_t *valuesimag, 
 			igraph_matrix_t *vectorsleft,
 			igraph_matrix_t *vectorsright, 
@@ -379,10 +367,12 @@ int igraph_lapack_dgeev(igraph_bool_t leftvec, igraph_bool_t rightvec,
 	       vectorsright ? &MATRIX(*vectorsright,0,0) : 0, &ldvr,
 	       VECTOR(work), &lwork, info);  
 
-  if (*info != 0) {
-    if (error==1) {
+  if (*info < 0) {
       IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev)", IGRAPH_ELAPACK);
-    } else if (error==2) {
+  } else if (*info > 0) {    
+    if (error) {
+      IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev)", IGRAPH_ELAPACK);
+    } else {
       IGRAPH_WARNING("Cannot calculate eigenvalues (dgeev)");
     }
   }

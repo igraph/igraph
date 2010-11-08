@@ -42,8 +42,7 @@ __BEGIN_DECLS
 int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
 			 int *info);
 int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
-			 igraph_vector_int_t *ipiv, igraph_matrix_t *b,
-			 int *info);
+			 igraph_vector_int_t *ipiv, igraph_matrix_t *b);
 int igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
 			igraph_matrix_t *b, int *info);
 
@@ -58,8 +57,7 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
 			 igraph_vector_t *values, igraph_matrix_t *vectors,
 			 igraph_vector_int_t *support);
 
-int igraph_lapack_dgeev(igraph_bool_t leftvec, igraph_bool_t rightvec,
-			const igraph_matrix_t *A, 
+int igraph_lapack_dgeev(const igraph_matrix_t *A, 
 			igraph_vector_t *valuesreal,
 			igraph_vector_t *valuesimag, 
 			igraph_matrix_t *vectorsleft,
