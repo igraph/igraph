@@ -185,6 +185,24 @@ int FUNCTION(igraph_matrix,print)(const TYPE(igraph_matrix) *m);
 int FUNCTION(igraph_matrix,fprint)(const TYPE(igraph_matrix) *m,
 				   FILE *file);
 
+#ifdef BASE_COMPLEX
+
+int igraph_matrix_complex_real(const igraph_matrix_complex_t *v, 
+			       igraph_matrix_t *real);
+int igraph_matrix_complex_imag(const igraph_matrix_complex_t *v, 
+			       igraph_matrix_t *imag);
+int igraph_matrix_complex_realimag(const igraph_matrix_complex_t *v, 
+				   igraph_matrix_t *real, 
+				   igraph_matrix_t *imag);
+int igraph_matrix_complex_create(igraph_matrix_complex_t *v,
+				 const igraph_matrix_t *real,
+				 const igraph_matrix_t *imag);
+int igraph_matrix_complex_create_polar(igraph_matrix_complex_t *v,
+				       const igraph_matrix_t *r,
+				       const igraph_matrix_t *theta);
+
+#endif
+
 /* ----------------------------------------------------------------------------*/
 /* For internal use only, may be removed, rewritten ... */
 /* ----------------------------------------------------------------------------*/

@@ -96,3 +96,39 @@ int igraph_matrix_complex_fprint(const igraph_matrix_complex_t *m,
   
   return 0;
 }
+
+int igraph_matrix_complex_real(const igraph_matrix_complex_t *v, 
+			       igraph_matrix_t *real) {
+  IGRAPH_CHECK(igraph_vector_complex_real(&v->data, &real->data));
+  return 0;
+}
+
+int igraph_matrix_complex_imag(const igraph_matrix_complex_t *v, 
+			       igraph_matrix_t *imag) {
+  IGRAPH_CHECK(igraph_vector_complex_imag(&v->data, &imag->data));
+  return 0;
+}
+
+int igraph_matrix_complex_realimag(const igraph_matrix_complex_t *v, 
+				   igraph_matrix_t *real, 
+				   igraph_matrix_t *imag) {
+  IGRAPH_CHECK(igraph_vector_complex_realimag(&v->data, &real->data, 
+					      &imag->data));
+  return 0;
+}
+
+int igraph_matrix_complex_create(igraph_matrix_complex_t *v,
+				 const igraph_matrix_t *real,
+				 const igraph_matrix_t *imag) {
+  IGRAPH_CHECK(igraph_vector_complex_create(&v->data, &real->data,
+					    &imag->data));
+  return 0;
+}
+
+int igraph_matrix_complex_create_polar(igraph_matrix_complex_t *v,
+				       const igraph_matrix_t *r,
+				       const igraph_matrix_t *theta) {
+  IGRAPH_CHECK(igraph_vector_complex_create_polar(&v->data, &r->data,
+						  &theta->data));
+  return 0;
+}
