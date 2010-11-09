@@ -1914,6 +1914,14 @@ int igraph_le_community_to_membership(const igraph_matrix_t *merges,
  * the ability to take edge weights into consideration and also
  * by allowing some labels to be fixed.
  * 
+ * </para><para>
+ * Weights are taken into account as follows: when the new label of node
+ * i is determined, the algorithm iterates over all edges incident on
+ * node i and calculate the total weight of edges leading to other
+ * nodes with label 0, 1, 2, ..., k-1 (where k is the number of possible
+ * labels). The new label of node i will then be the label whose edges
+ * (among the ones incident on node i) have the highest total weight.
+ * 
  * \param graph The input graph, should be undirected to make sense.
  * \param membership The membership vector, the result is returned here.
  *    For each vertex it gives the ID of its community (label).
@@ -2011,9 +2019,9 @@ int igraph_community_label_propagation(const igraph_t *graph,
     }
   }
 
-  /* Create an adjacency (edge) list representation for efficiency.
+  /* Create an adjacency/incidence list representation for efficiency.
    * For the unweighted case, the adjacency list is enough. For the
-   * weighted case, we need the adjacency edge list */
+   * weighted case, we need the incidence list */
   if (weights) {
     IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_IN));
     IGRAPH_FINALLY(igraph_inclist_destroy, &il);
