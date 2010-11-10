@@ -32,7 +32,8 @@ Type 'q()' to quit R.
 > g <- graph.data.frame(relations, directed=TRUE, vertices=actors)
 > print(g, e=TRUE, v=TRUE)
 IGRAPH DN-- 5 6 -- 
-+ attr: name (v/c), age (v/n), gender (v/c), same.dept (e/x),  friendship (e/n), advice (e/n)
++ attr: name (v/c), age (v/n), gender (v/c), same.dept (e/x),
+  friendship (e/n), advice (e/n)
 + vertex attributes:
          name age gender
 [1]     Alice  48      F

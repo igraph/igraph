@@ -58,7 +58,7 @@
   atxt <- paste(atxt[atxt!=""], collapse=", ")
   if (atxt != "") {
     atxt <- strwrap(paste(sep="", "+ attr: ", atxt), exdent=2)
-    cat(atxt, "\n", sep="")
+    cat(atxt, sep="\n")
   }
 }
 
@@ -303,7 +303,7 @@ summary.igraph <- function(object, ...) {
   atxt <- paste(atxt[atxt!=""], collapse=", ")
   if (atxt != "") {
     atxt <- strwrap(paste(sep="", "attr: ", atxt), exdent=2)
-    cat(atxt, "\n", sep="")
+    cat(atxt, sep="\n")
   }
 
   invisible(object)
