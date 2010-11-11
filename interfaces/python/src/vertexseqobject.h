@@ -31,8 +31,7 @@
  * \ingroup python_interface_vertexseq
  * \brief A structure representing the vertex sequence of a graph
  */
-typedef struct
-{
+typedef struct {
   PyObject_HEAD
   igraphmodule_GraphObject* gref;
   igraph_vs_t vs;

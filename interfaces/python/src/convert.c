@@ -34,6 +34,7 @@
 #include "convert.h"
 #include "error.h"
 #include "memory.h"
+#include "py2compat.h"
 
 /**
  * \brief Converts a Python integer to a C int
@@ -493,13 +494,27 @@ int igraphmodule_PyObject_to_igraph_t(PyObject *o, igraph_t **result) {
  */
 int igraphmodule_PyObject_to_integer_t(PyObject *object, igraph_integer_t *v) {
   if (object == NULL) {
-  } else if (PyInt_Check(object)) {
-    long l = PyInt_AS_LONG((PyIntObject*)object);
-    *v=l;
-    return 0;
   } else if (PyLong_Check(object)) {
     double d = PyLong_AsDouble(object);
     *v=d;
+    return 0;
+#ifdef IGRAPH_PYTHON3
+  } else if (PyNumber_Check(object)) {
+    PyObject *i = PyNumber_Long(object);
+    long l;
+    if (i == NULL)
+      return 1;
+    l = PyLong_AsLong(i);
+    if (PyErr_Occurred())
+      return 1;
+    Py_DECREF(i);
+    *v = l;
+    return 0;
+  }
+#else
+  } else if (PyInt_Check(object)) {
+    long l = PyInt_AS_LONG((PyIntObject*)object);
+    *v=l;
     return 0;
   } else if (PyNumber_Check(object)) {
     PyObject *i = PyNumber_Int(object);
@@ -510,6 +525,7 @@ int igraphmodule_PyObject_to_integer_t(PyObject *object, igraph_integer_t *v) {
     *v = l;
     return 0;
   }
+#endif
   PyErr_BadArgument();
   return 1;
 }
@@ -525,14 +541,16 @@ int igraphmodule_PyObject_to_integer_t(PyObject *object, igraph_integer_t *v) {
  */
 int igraphmodule_PyObject_to_real_t(PyObject *object, igraph_real_t *v) {
   if (object == NULL) {
-  } else if (PyInt_Check(object)) {
-    long l = PyInt_AS_LONG((PyIntObject*)object);
-    *v=(igraph_real_t)l;
-    return 0;
   } else if (PyLong_Check(object)) {
     double d = PyLong_AsDouble(object);
     *v=(igraph_real_t)d;
     return 0;
+#ifndef IGRAPH_PYTHON3
+  } else if (PyInt_Check(object)) {
+    long l = PyInt_AS_LONG((PyIntObject*)object);
+    *v=(igraph_real_t)l;
+    return 0;
+#endif
   } else if (PyFloat_Check(object)) {
     double d = PyFloat_AS_DOUBLE((PyFloatObject*)object);
     *v=(igraph_real_t)d;
@@ -599,7 +617,7 @@ int igraphmodule_PyObject_to_vector_t(PyObject *list, igraph_vector_t *v, igraph
   int i, j, k, ok;
   long idx=0, idx2=0;
 
-  if (PyString_Check(list) || PyUnicode_Check(list)) {
+  if (PyBaseString_Check(list)) {
     /* It is highly unlikely that a string (although it is a sequence) will
      * provide us with integers or integer pairs */
     if (pairs)
@@ -819,7 +837,7 @@ int igraphmodule_PyObject_float_to_vector_t(PyObject *list, igraph_vector_t *v) 
   igraph_real_t value=0;
   int i, j, k, ok;
 
-  if (PyString_Check(list) || PyUnicode_Check(list)) {
+  if (PyBaseString_Check(list)) {
     /* It is highly unlikely that a string (although it is a sequence) will
      * provide us with integers or integer pairs */
     PyErr_SetString(PyExc_TypeError, "expected a sequence or an iterable containing floats");
@@ -928,7 +946,7 @@ int igraphmodule_PyObject_to_vector_int_t(PyObject *list, igraph_vector_int_t *v
   int value=0;
   int i, j, k, ok;
 
-  if (PyString_Check(list) || PyUnicode_Check(list)) {
+  if (PyBaseString_Check(list)) {
     /* It is highly unlikely that a string (although it is a sequence) will
      * provide us with integers or integer pairs */
     PyErr_SetString(PyExc_TypeError, "expected a sequence or an iterable containing integers");
@@ -1038,7 +1056,7 @@ int igraphmodule_PyObject_to_vector_long_t(PyObject *list, igraph_vector_long_t 
   long value=0;
   int i, j, k, ok;
 
-  if (PyString_Check(list) || PyUnicode_Check(list)) {
+  if (PyBaseString_Check(list)) {
     /* It is highly unlikely that a string (although it is a sequence) will
      * provide us with integers or integer pairs */
     PyErr_SetString(PyExc_TypeError, "expected a sequence or an iterable containing integers");
@@ -1143,7 +1161,7 @@ int igraphmodule_PyObject_to_vector_bool_t(PyObject *list,
   PyObject *item;
   int i, j;
 
-  if (PyString_Check(list) || PyUnicode_Check(list)) {
+  if (PyBaseString_Check(list)) {
     /* It is highly unlikely that a string (although it is a sequence) will
      * provide us with integers or integer pairs */
     PyErr_SetString(PyExc_TypeError, "expected a sequence or an iterable");
@@ -2032,7 +2050,7 @@ int igraphmodule_PyObject_to_vid(PyObject *o, long int *vid, igraph_t *graph) {
   } else if (PyLong_Check(o)) {
     /* Single vertex ID */
     *vid = PyLong_AsLong(o);
-  } else if (PyString_Check(o) || PyUnicode_Check(o)) {
+  } else if (PyBaseString_Check(o)) {
     /* Single vertex ID from vertex name */
     if (igraphmodule_get_vertex_id_by_name(graph, o, vid))
       return 1;
@@ -2096,7 +2114,7 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
     PyObject *item;
     igraph_vector_t vector;
 
-    if (PyString_Check(o) || PyUnicode_Check(o)) {
+    if (PyBaseString_Check(o)) {
       /* Special case: strings and unicode objects are sequences, but they
        * will not yield valid vertex IDs */
       return 1;

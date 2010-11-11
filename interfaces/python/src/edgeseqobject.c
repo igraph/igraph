@@ -29,6 +29,7 @@
 #include "edgeseqobject.h"
 #include "edgeobject.h"
 #include "error.h"
+#include "py2compat.h"
 
 #define GET_GRAPH(obj) (((igraphmodule_GraphObject*)obj->gref)->g)
 
@@ -70,7 +71,7 @@ igraphmodule_EdgeSeqObject*
 igraphmodule_EdgeSeq_copy(igraphmodule_EdgeSeqObject* o) {
   igraphmodule_EdgeSeqObject *copy;
 
-  copy=(igraphmodule_EdgeSeqObject*)PyType_GenericNew(o->ob_type, 0, 0);
+  copy=(igraphmodule_EdgeSeqObject*)PyType_GenericNew(Py_TYPE(o), 0, 0);
   if (copy == NULL) return NULL;
  
   if (igraph_es_type(&o->es) == IGRAPH_ES_VECTOR) {
@@ -161,7 +162,7 @@ void igraphmodule_EdgeSeq_dealloc(igraphmodule_EdgeSeqObject* self) {
     Py_DECREF(self->gref);
     self->gref=0;
   }
-  self->ob_type->tp_free((PyObject*)self);
+  Py_TYPE(self)->tp_free((PyObject*)self);
 
   RC_DEALLOC("EdgeSeq", self);
 }
@@ -317,7 +318,7 @@ PyObject* igraphmodule_EdgeSeq_get_attribute_values_mapping(igraphmodule_EdgeSeq
     return igraphmodule_EdgeSeq_sq_item(self, PyInt_AsLong(o));
 
   /* Handle strings according to the mapping protocol */
-  if (PyString_Check(o) || PyUnicode_Check(o))
+  if (PyBaseString_Check(o))
     return igraphmodule_EdgeSeq_get_attribute_values(self, o);
 
   /* Handle iterables and slices by calling the select() method */
@@ -830,8 +831,7 @@ PyGetSetDef igraphmodule_EdgeSeq_getseters[] = {
  */
 PyTypeObject igraphmodule_EdgeSeqType =
 {
-  PyObject_HEAD_INIT(NULL)                  /* */
-  0,                                        /* ob_size */
+  PyVarObject_HEAD_INIT(0, 0)
   "igraph.core.EdgeSeq",                    /* tp_name */
   sizeof(igraphmodule_EdgeSeqObject),       /* tp_basicsize */
   0,                                        /* tp_itemsize */
@@ -839,7 +839,7 @@ PyTypeObject igraphmodule_EdgeSeqType =
   0,                                        /* tp_print */
   0,                                        /* tp_getattr */
   0,                                        /* tp_setattr */
-  0,                                        /* tp_compare */
+  0,                                        /* tp_compare (2.x) / tp_reserved (3.x) */
   0,                                        /* tp_repr */
   0,                                        /* tp_as_number */
   &igraphmodule_EdgeSeq_as_sequence,        /* tp_as_sequence */

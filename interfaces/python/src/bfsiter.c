@@ -22,9 +22,10 @@
 */
 
 #include "bfsiter.h"
-#include "vertexobject.h"
 #include "common.h"
 #include "error.h"
+#include "py2compat.h"
+#include "vertexobject.h"
 
 /**
  * \ingroup python_interface
@@ -219,8 +220,7 @@ PyMethodDef igraphmodule_BFSIter_methods[] = {
  */
 PyTypeObject igraphmodule_BFSIterType =
 {
-  PyObject_HEAD_INIT(NULL)                  //
-  0,                                        // ob_size
+  PyVarObject_HEAD_INIT(0, 0)
   "igraph.BFSIter",                         // tp_name
   sizeof(igraphmodule_BFSIterObject),       // tp_basicsize
   0,                                        // tp_itemsize
@@ -228,7 +228,7 @@ PyTypeObject igraphmodule_BFSIterType =
   0,                                        // tp_print
   0,                                        // tp_getattr
   0,                                        // tp_setattr
-  0,                                        // tp_compare
+  0,                                        /* tp_compare (2.x) / tp_reserved (3.x) */
   0,                                        // tp_repr
   0,                                        // tp_as_number
   0,                                        // tp_as_sequence

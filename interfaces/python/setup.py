@@ -17,8 +17,8 @@ LIBIGRAPH_FALLBACK_INCLUDE_DIRS = ['/usr/include', '/usr/local/include']
 LIBIGRAPH_FALLBACK_LIBRARIES = ['igraph']
 LIBIGRAPH_FALLBACK_LIBRARY_DIRS = []
 
-if version_info < (2, 4):
-    print "This module requires Python >= 2.4"
+if version_info < (2, 5):
+    print("This module requires Python >= 2.5")
     exit(0)
     
 def get_output(command):
@@ -27,22 +27,26 @@ def get_output(command):
     p.stdin.close()
     p.stderr.close()
     line=p.stdout.readline().strip()
-    exit_code=p.stdout.close()
-    return line, exit_code
+    p.wait()
+    if type(line).__name__ == "bytes":
+        line = str(line, encoding="utf-8")
+    return line, p.returncode
     
 def detect_igraph_include_dirs(default = LIBIGRAPH_FALLBACK_INCLUDE_DIRS):
     """Tries to detect the igraph include directory"""
     line, exit_code = get_output("pkg-config igraph --cflags")
-    if exit_code>0 or len(line) == 0: return default
+    if exit_code > 0 or len(line) == 0:
+        return default
     opts=line.split()
-    return [opt[2:] for opt in opts if opt[0:2]=="-I"]
+    return [opt[2:] for opt in opts if opt.startswith("-I")]
 
 def detect_igraph_libraries(default = LIBIGRAPH_FALLBACK_LIBRARIES):
     """Tries to detect the libraries that igraph uses"""
     line, exit_code = get_output("pkg-config igraph --libs")
-    if exit_code>0 or len(line) == 0: return default
+    if exit_code>0 or len(line) == 0:
+        return default
     opts=line.split()
-    return [opt[2:] for opt in opts if opt[0:2]=="-l"]
+    return [opt[2:] for opt in opts if opt.startswith("-l")]
     
 def detect_igraph_library_dirs(default = LIBIGRAPH_FALLBACK_LIBRARY_DIRS):
     """Tries to detect the igraph library directory"""
@@ -58,19 +62,19 @@ libraries=[]
 
 line, exit_code = get_output("pkg-config igraph")
 if exit_code>0:
-    print "Using default include and library paths for compilation"
-    print "If the compilation fails, please edit the LIBIGRAPH_FALLBACK_*"
-    print "variables in setup.py or include_dirs and library_dirs in "
-    print "setup.cfg to point to the correct directories and libraries"
-    print "where the C core of igraph is installed"
-    print
+    print("Using default include and library paths for compilation")
+    print("If the compilation fails, please edit the LIBIGRAPH_FALLBACK_*")
+    print("variables in setup.py or include_dirs and library_dirs in ")
+    print("setup.cfg to point to the correct directories and libraries")
+    print("where the C core of igraph is installed")
+    print()
     
 include_dirs.extend(detect_igraph_include_dirs())
 library_dirs.extend(detect_igraph_library_dirs())
 libraries.extend(detect_igraph_libraries())
 
-print "Include path:", " ".join(include_dirs)
-print "Library path:", " ".join(library_dirs)
+print("Include path: %s" % " ".join(include_dirs))
+print("Library path: %s" % " ".join(library_dirs))
 
 igraph_extension = Extension('igraph.core', sources, \
   library_dirs=library_dirs, libraries=libraries, \

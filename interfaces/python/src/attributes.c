@@ -25,6 +25,7 @@
 #include "attributes.h"
 #include "common.h"
 #include "convert.h"
+#include "py2compat.h"
 
 int igraphmodule_i_attribute_struct_init(igraphmodule_i_attribute_struct *attrs) {
   int i;
@@ -1167,13 +1168,13 @@ static int igraphmodule_i_attribute_get_info(const igraph_t *graph,
           }
           for (l=0; l<m && is_string; l++) {
             o=PyList_GetItem(values, l);
-            if (o != Py_None && !PyString_Check(o) && !PyUnicode_Check(o))
+            if (o != Py_None && !PyBaseString_Check(o))
               is_string=0;
           }
         } else {
           if (values != Py_None && !PyNumber_Check(values))
             is_numeric=0;
-          if (values != Py_None && !PyString_Check(values) && !PyUnicode_Check(values))
+          if (values != Py_None && !PyBaseString_Check(values))
             is_string=0;
         }
         if (is_numeric)
@@ -1249,12 +1250,12 @@ int igraphmodule_i_attribute_get_type(const igraph_t *graph,
     }
     for (i=0; i<j && is_string; i++) {
       PyObject *item = PyList_GET_ITEM(o, i);
-      if (item != Py_None && !PyString_Check(item) && !PyUnicode_Check(item))
+      if (item != Py_None && !PyBaseString_Check(item))
         is_string=0;
     }
   } else {
     if (o != Py_None && !PyNumber_Check(o)) is_numeric=0;
-    if (o != Py_None && !PyString_Check(o) && !PyUnicode_Check(o))
+    if (o != Py_None && !PyBaseString_Check(o))
       is_string=0;
   }
   if (is_numeric)

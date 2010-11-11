@@ -148,6 +148,10 @@ class Matrix(object):
         else:
             raise IndexError("invalid matrix index")
 
+    def __hash__(self):
+        """Returns a hash value for a matrix."""
+        return hash(self._nrow, self._ncol, self._data)
+
     def __iadd__(self, other):
         """In-place addition of a matrix or scalar."""
         if isinstance(other, Matrix):

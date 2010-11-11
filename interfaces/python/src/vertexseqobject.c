@@ -23,10 +23,12 @@
 
 */
 
+#include <Python.h>
 #include "attributes.h"
 #include "common.h"
 #include "convert.h"
 #include "error.h"
+#include "py2compat.h"
 #include "vertexseqobject.h"
 #include "vertexobject.h"
 
@@ -69,7 +71,7 @@ igraphmodule_VertexSeqObject*
 igraphmodule_VertexSeq_copy(igraphmodule_VertexSeqObject* o) {
   igraphmodule_VertexSeqObject *copy;
 
-  copy=(igraphmodule_VertexSeqObject*)PyType_GenericNew(o->ob_type, 0, 0);
+  copy=(igraphmodule_VertexSeqObject*)PyType_GenericNew(Py_TYPE(o), 0, 0);
   if (copy == NULL) return NULL;
  
   if (igraph_vs_type(&o->vs) == IGRAPH_VS_VECTOR) {
@@ -158,7 +160,7 @@ void igraphmodule_VertexSeq_dealloc(igraphmodule_VertexSeqObject* self) {
     Py_DECREF(self->gref);
     self->gref=0;
   }
-  self->ob_type->tp_free((PyObject*)self);
+  Py_TYPE(self)->tp_free((PyObject*)self);
   RC_DEALLOC("VertexSeq", self);
 }
 
@@ -309,7 +311,7 @@ PyObject* igraphmodule_VertexSeq_get_attribute_values_mapping(igraphmodule_Verte
     return igraphmodule_VertexSeq_sq_item(self, PyInt_AsLong(o));
 
   /* Handle strings according to the mapping protocol */
-  if (PyString_Check(o) || PyUnicode_Check(o))
+  if (PyBaseString_Check(o))
     return igraphmodule_VertexSeq_get_attribute_values(self, o);
 
   /* Handle iterables and slices by calling the select() method */
@@ -853,8 +855,7 @@ PyGetSetDef igraphmodule_VertexSeq_getseters[] = {
  */
 PyTypeObject igraphmodule_VertexSeqType =
 {
-  PyObject_HEAD_INIT(NULL)                    /* */
-  0,                                          /* ob_size */
+  PyVarObject_HEAD_INIT(0, 0)
   "igraph.core.VertexSeq",                    /* tp_name */
   sizeof(igraphmodule_VertexSeqObject),       /* tp_basicsize */
   0,                                          /* tp_itemsize */
@@ -862,7 +863,7 @@ PyTypeObject igraphmodule_VertexSeqType =
   0,                                          /* tp_print */
   0,                                          /* tp_getattr */
   0,                                          /* tp_setattr */
-  0,                                          /* tp_compare */
+  0,                                          /* tp_compare (2.x) / tp_reserved (3.x) */
   0,                                          /* tp_repr */
   0,                                          /* tp_as_number */
   &igraphmodule_VertexSeq_as_sequence,        /* tp_as_sequence */

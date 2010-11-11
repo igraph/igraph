@@ -27,6 +27,7 @@
 #include "edgeobject.h"
 #include "graphobject.h"
 #include "error.h"
+#include "py2compat.h"
 
 /**
  * \ingroup python_interface
@@ -91,16 +92,26 @@ void igraphmodule_Edge_dealloc(igraphmodule_EdgeObject* self) {
  * \return the formatted textual representation as a \c PyObject
  */
 PyObject* igraphmodule_Edge_repr(igraphmodule_EdgeObject *self) {
-  PyObject *s, *grepr, *drepr;
+  PyObject *s;
+
+#ifdef IGRAPH_PYTHON3
+  s = PyUnicode_FromFormat("igraph.Edge(%R, %ld, %R)",
+      (PyObject*)self->gref, igraphmodule_Edge_attributes(self));
+#else
+  PyObject *grepr, *drepr;
 
   grepr=PyObject_Repr((PyObject*)self->gref);
-  if (!grepr) return NULL;
   drepr=PyObject_Repr(igraphmodule_Edge_attributes(self));
-  if (!drepr) { Py_DECREF(grepr); return NULL; }
-  s=PyString_FromFormat("igraph.Edge(%s,%ld,%s)", PyString_AsString(grepr),
+  if (!grepr || !drepr) {
+    Py_XDECREF(grepr);
+    Py_XDECREF(drepr);
+    return NULL;
+  }
+  s=PyString_FromFormat("igraph.Edge(%s, %ld, %s)", PyString_AsString(grepr),
     self->idx, PyString_AsString(drepr));
   Py_DECREF(grepr);
   Py_DECREF(drepr);
+#endif
   return s;
 }
 
@@ -129,15 +140,19 @@ PyObject* igraphmodule_Edge_attribute_names(igraphmodule_EdgeObject* self) {
 PyObject* igraphmodule_Edge_attributes(igraphmodule_EdgeObject* self) {
   igraphmodule_GraphObject *o = self->gref;
   PyObject *names, *dict;
-  long i, n;
+  long int i, n;
 
   dict=PyDict_New();
-  if (!dict) return NULL;
+  if (!dict)
+    return NULL;
 
   names=igraphmodule_Graph_edge_attributes(o);
-  if (!names) { Py_DECREF(dict); return NULL; }
+  if (!names) {
+    Py_DECREF(dict);
+    return NULL;
+  }
 
-  n=PyList_Size(names);
+  n = PyList_Size(names);
   for (i=0; i<n; i++) {
     PyObject *name = PyList_GetItem(names, i);
     if (name) {
@@ -369,8 +384,7 @@ PyMappingMethods igraphmodule_Edge_as_mapping = {
  */
 PyTypeObject igraphmodule_EdgeType =
 {
-  PyObject_HEAD_INIT(NULL)                    //
-  0,                                          // ob_size
+  PyVarObject_HEAD_INIT(0, 0)
   "igraph.Edge",                              // tp_name
   sizeof(igraphmodule_EdgeObject),            // tp_basicsize
   0,                                          // tp_itemsize
@@ -378,7 +392,7 @@ PyTypeObject igraphmodule_EdgeType =
   0,                                          // tp_print
   0,                                          // tp_getattr
   0,                                          // tp_setattr
-  0,                                          // tp_compare
+  0,                                          /* tp_compare (2.x) / tp_reserved (3.x) */
   (reprfunc)igraphmodule_Edge_repr,           // tp_repr
   0,                                          // tp_as_number
   0,                                          // tp_as_sequence

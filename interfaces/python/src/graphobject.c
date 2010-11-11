@@ -30,12 +30,13 @@
 #include "error.h"
 #include "graphobject.h"
 #include "memory.h"
+#include "py2compat.h"
 #include "vertexseqobject.h"
 
 PyTypeObject igraphmodule_GraphType;
 
 #define CREATE_GRAPH(py_graph, c_graph) { \
-  py_graph = (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0); \
+  py_graph = (igraphmodule_GraphObject *) Py_TYPE(self)->tp_alloc(Py_TYPE(self), 0); \
   if (py_graph != NULL) { \
     igraphmodule_Graph_init_internal(py_graph); \
     py_graph->g = (c_graph); \
@@ -183,7 +184,7 @@ void igraphmodule_Graph_dealloc(igraphmodule_GraphObject * self)
 
   RC_DEALLOC("Graph", self);
 
-  self->ob_type->tp_free((PyObject*)self);
+  Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 /**
@@ -12566,30 +12567,38 @@ PyNumberMethods igraphmodule_Graph_as_number = {
   0,                            /* nb_add */
   0,                            /*nb_subtract */
   0,                            /*nb_multiply */
+#ifndef IGRAPH_PYTHON3
   0,                            /*nb_divide */
+#endif
   0,                            /*nb_remainder */
   0,                            /*nb_divmod */
   0,                            /*nb_power */
   0,                            /*nb_negative */
   0,                            /*nb_positive */
   0,                            /*nb_absolute */
-  0,                            /*nb_nonzero */
+  0,                            /*nb_nonzero (2.x) / nb_bool (3.x) */
   (unaryfunc) igraphmodule_Graph_complementer_op, /*nb_invert */
   0,                            /*nb_lshift */
   0,                            /*nb_rshift */
   (binaryfunc) igraphmodule_Graph_intersection, /*nb_and */
   0,                            /*nb_xor */
   (binaryfunc) igraphmodule_Graph_union,  /*nb_or */
+#ifndef IGRAPH_PYTHON3
   0,                            /*nb_coerce */
+#endif
   0,                            /*nb_int */
-  0,                            /*nb_long */
+  0,                            /*nb_long (2.x) / nb_reserved (3.x)*/
   0,                            /*nb_float */
+#ifndef IGRAPH_PYTHON3
   0,                            /*nb_oct */
   0,                            /*nb_hex */
+#endif
   0,                            /*nb_inplace_add */
   0,                            /*nb_inplace_subtract */
   0,                            /*nb_inplace_multiply */
+#ifndef IGRAPH_PYTHON3
   0,                            /*nb_inplace_divide */
+#endif
   0,                            /*nb_inplace_remainder */
   0,                            /*nb_inplace_power */
   0,                            /*nb_inplace_lshift */
@@ -12597,14 +12606,21 @@ PyNumberMethods igraphmodule_Graph_as_number = {
   0,                            /*nb_inplace_and */
   0,                            /*nb_inplace_xor */
   0,                            /*nb_inplace_or */
+
+#ifdef IGRAPH_PYTHON3
+  0,                            /*nb_floor_divide */
+  0,                            /*nb_true_divide */
+  0,                            /*nb_inplace_floor_divide */
+  0,                            /*nb_inplace_true_divide */
+  0,                            /*nb_index */
+#endif
 };
 
 /** \ingroup python_interface_graph
  * Python type object referencing the methods Python calls when it performs various operations on an igraph (creating, printing and so on)
  */
 PyTypeObject igraphmodule_GraphType = {
-  PyObject_HEAD_INIT(NULL)
-    0,                          /* ob_size */
+  PyVarObject_HEAD_INIT(0, 0)
   "igraph.Graph",               /* tp_name */
   sizeof(igraphmodule_GraphObject), /* tp_basicsize */
   0,                            /* tp_itemsize */
@@ -12612,7 +12628,7 @@ PyTypeObject igraphmodule_GraphType = {
   0,                            /* tp_print */
   0,                            /* tp_getattr */
   0,                            /* tp_setattr */
-  0,                            /* tp_compare */
+  0,                            /* tp_compare (2.x) / tp_reserved (3.x) */
   0,                            /* tp_repr */
   &igraphmodule_Graph_as_number,  /* tp_as_number */
   0,                            /* tp_as_sequence */

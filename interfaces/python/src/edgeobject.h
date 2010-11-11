@@ -31,8 +31,7 @@
  * \ingroup python_interface_edge
  * \brief A structure representing an edge of a graph
  */
-typedef struct
-{
+typedef struct {
   PyObject_HEAD
   igraphmodule_GraphObject* gref;
   long idx;

@@ -2,6 +2,19 @@
 import unittest
 from igraph import *
 
+class EdgeTests(unittest.TestCase):
+    def setUp(self):
+        self.g = Graph.Full(10)
+
+    def testRepr(self):
+        output = repr(self.g.es[0])
+        self.assertEquals(output, "igraph.Edge(%r, 0, {})" % self.g)
+
+        self.g.es["weight"] = range(10, 0, -1)
+        output = repr(self.g.es[3])
+        self.assertEquals(output, "igraph.Edge(%r, 3, {'weight': 7})" % self.g)
+
+
 class EdgeSeqTests(unittest.TestCase):
     def setUp(self):
         self.g = Graph.Full(10)
@@ -24,7 +37,7 @@ class EdgeSeqTests(unittest.TestCase):
         self.failUnless(self.g.es["test"] == expected)
         
         only_even["test2"] = range(23)
-        expected = [[i/2, None][i % 2] for i in xrange(self.g.ecount())]
+        expected = [[i//2, None][i % 2] for i in xrange(self.g.ecount())]
         self.failUnless(self.g.es["test2"] == expected)
 
     def testSequenceReusing(self):
@@ -145,8 +158,9 @@ class EdgeSeqTests(unittest.TestCase):
 
 
 def suite():
+    edge_suite = unittest.makeSuite(EdgeTests)
     es_suite = unittest.makeSuite(EdgeSeqTests)
-    return unittest.TestSuite([es_suite])
+    return unittest.TestSuite([edge_suite, es_suite])
 
 def test():
     runner = unittest.TextTestRunner()

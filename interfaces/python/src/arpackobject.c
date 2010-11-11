@@ -221,7 +221,7 @@ PyTypeObject igraphmodule_ARPACKOptionsType = {
   0,                                          /* tp_print */
   (getattrfunc)igraphmodule_ARPACKOptions_getattr,     /* tp_getattr */
   (setattrfunc)igraphmodule_ARPACKOptions_setattr,     /* tp_setattr */
-  0,                                          /* tp_compare */
+  0,                                          /* tp_compare (2.x) / tp_reserved (3.x) */
   0,                                          /* tp_repr */
   0,                                          /* tp_as_number */
   0,                                          /* tp_as_sequence */
