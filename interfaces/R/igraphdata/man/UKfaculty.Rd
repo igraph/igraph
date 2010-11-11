@@ -12,7 +12,7 @@ UKfaculty
 }
 \format{
   A directed \code{igraph} graph object with vertex attribute
-  \sQuote{group}, the numeric id of the school affiliation, and edge
+  \sQuote{Group}, the numeric id of the school affiliation, and edge
   attribute \sQuote{weight}, i.e. the graph is weighted.
 
   This dataset is licensed under a Creative Commons
