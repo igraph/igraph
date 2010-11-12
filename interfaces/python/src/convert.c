@@ -2347,24 +2347,28 @@ int igraphmodule_PyObject_to_attribute_values(PyObject *o,
 int igraphmodule_PyObject_to_drl_options_t(PyObject *obj,
     igraph_layout_drl_options_t *options) {
   if (obj == Py_None) {
-	igraph_layout_drl_options_init(options, IGRAPH_LAYOUT_DRL_DEFAULT);
+    igraph_layout_drl_options_init(options, IGRAPH_LAYOUT_DRL_DEFAULT);
   } else if (PyString_Check(obj)) {
     /* We have a string, so we are using a preset */
-	char* s=PyString_AsString(obj);
-	igraph_layout_drl_default_t def=IGRAPH_LAYOUT_DRL_DEFAULT;
-	if (strcmp(s, "default") == 0) def=IGRAPH_LAYOUT_DRL_DEFAULT;
-	else if (strcmp(s, "coarsen") == 0) def=IGRAPH_LAYOUT_DRL_COARSEN;
-	else if (strcmp(s, "coarsest") == 0) def=IGRAPH_LAYOUT_DRL_COARSEST;
-	else if (strcmp(s, "refine") == 0) def=IGRAPH_LAYOUT_DRL_REFINE;
-	else if (strcmp(s, "final") == 0) def=IGRAPH_LAYOUT_DRL_FINAL;
-	else {
+    igraph_layout_drl_default_t def=IGRAPH_LAYOUT_DRL_DEFAULT;
+    if (PyString_IsEqualToASCIIString(obj, "default"))
+      def=IGRAPH_LAYOUT_DRL_DEFAULT;
+    else if (PyString_IsEqualToASCIIString(obj, "coarsen"))
+      def=IGRAPH_LAYOUT_DRL_COARSEN;
+    else if (PyString_IsEqualToASCIIString(obj, "coarsest"))
+      def=IGRAPH_LAYOUT_DRL_COARSEST;
+    else if (PyString_IsEqualToASCIIString(obj, "refine"))
+      def=IGRAPH_LAYOUT_DRL_REFINE;
+    else if (PyString_IsEqualToASCIIString(obj, "final"))
+      def=IGRAPH_LAYOUT_DRL_FINAL;
+    else {
       PyErr_SetString(PyExc_ValueError, "unknown DrL template name. Must be one of: default, coarsen, coarsest, refine, final");
       return 1;
-	}
-	if (igraph_layout_drl_options_init(options, def)) {
-	  igraphmodule_handle_igraph_error();
-	  return 1;
-	}
+    }
+    if (igraph_layout_drl_options_init(options, def)) {
+      igraphmodule_handle_igraph_error();
+      return 1;
+    }
   } else {
     igraph_layout_drl_options_init(options, IGRAPH_LAYOUT_DRL_DEFAULT);
 #define CONVERT_DRL_OPTION(OPTION, TYPE) do { \

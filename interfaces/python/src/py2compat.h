@@ -42,17 +42,25 @@
 #define PyString_AS_STRING  PyUnicode_AS_UNICODE
 #define PyString_Check      PyUnicode_Check
 #define PyString_FromFormat PyUnicode_FromFormat
+#define PyString_FromString PyUnicode_FromString
 #define PyString_Type       PyUnicode_Type
+#define PyString_IsEqualToASCIIString(uni, string) \
+        (PyUnicode_CompareWithASCIIString(uni, string) == 0)
 
 #ifndef PyVarObject_HEAD_INIT
 #define PyVarObject_HEAD_INIT(type, size)            \
         PyObject_HEAD_INIT(type) size,
 #endif
 
+int PyString_IsEqualToUTF8String(PyObject* py_string,
+    const char* c_string);
+
 #else
 
 /* Python 2.x-specific part follows here */
 
 #define PyBaseString_Check(o) (PyString_Check(o) || PyUnicode_Check(o))
+#define PyString_IsEqualToASCIIString(pystr, cstr) \
+        (strcmp(PyString_AS_STRING(pystr), (cstr)) == 0)
 
 #endif

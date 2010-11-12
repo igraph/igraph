@@ -24,6 +24,7 @@
 #include "arpackobject.h"
 #include "graphobject.h"
 #include "error.h"
+#include "py2compat.h"
 
 PyObject* igraphmodule_arpack_options_default;
 
@@ -212,8 +213,7 @@ PyGetSetDef igraphmodule_ARPACKOptions_getseters[] = {
  * various operations on an ARPACK parameters object
  */
 PyTypeObject igraphmodule_ARPACKOptionsType = {
-  PyObject_HEAD_INIT(NULL)                    /* */
-  0,                                          /* ob_size */
+  PyVarObject_HEAD_INIT(0, 0)
   "igraph.ARPACKOptions",                     /* tp_name */
   sizeof(igraphmodule_ARPACKOptionsObject),   /* tp_basicsize */
   0,                                          /* tp_itemsize */

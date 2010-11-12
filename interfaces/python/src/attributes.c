@@ -112,14 +112,17 @@ int igraphmodule_get_vertex_id_by_name(igraph_t *graph, PyObject* o, long int* v
 
   o_vid = PyDict_GetItem(attrs->vertex_name_index, o);
   if (o_vid == NULL) {
+#ifdef IGRAPH_PYTHON3
+    PyErr_Format(PyExc_ValueError, "no such vertex: %R", o);
+#else
     PyObject* s = PyObject_Repr(o);
-    
     if (s) {
       PyErr_Format(PyExc_ValueError, "no such vertex: %s", PyString_AS_STRING(s));
       Py_DECREF(s);
     } else {
       PyErr_Format(PyExc_ValueError, "no such vertex: %p", o);
     }
+#endif
     return 1;
   }
 
@@ -164,8 +167,10 @@ static int igraphmodule_i_attribute_init(igraph_t *graph, igraph_vector_ptr_t *a
         break;
       case IGRAPH_ATTRIBUTE_STRING:
         igraph_strvector_get((igraph_strvector_t*)attr_rec->value, 0, &s);
-        if (s == 0) value=PyString_FromString("");
-        else value=PyString_FromString(s);
+        if (s == 0)
+          value=PyString_FromString("");
+        else
+          value=PyString_FromString(s);
         break;
       default:
         IGRAPH_WARNING("unsupported attribute type (not string and not numeric)");
@@ -290,7 +295,7 @@ static int igraphmodule_i_attribute_add_vertices(igraph_t *graph, long int nv, i
       j=igraph_vector_ptr_size(attr);
       for (i=0; i<j; i++) {
         attr_rec=VECTOR(*attr)[i];
-        if (!strcmp(attr_rec->name, PyString_AS_STRING(key))) {
+        if (PyString_IsEqualToASCIIString(key, attr_rec->name)) {
           added_attrs[i]=1;
           break;
         }
@@ -465,7 +470,7 @@ static int igraphmodule_i_attribute_add_edges(igraph_t *graph, const igraph_vect
       j=igraph_vector_ptr_size(attr);
       for (i=0; i<j; i++) {
         attr_rec=VECTOR(*attr)[i];
-        if (!strcmp(attr_rec->name, PyString_AS_STRING(key))) {
+        if (PyString_IsEqualToASCIIString(key, attr_rec->name)) {
           added_attrs[i]=1;
           break;
         }
@@ -1001,7 +1006,7 @@ static int igraphmodule_i_attribute_combine_dicts(PyObject *dict,
     PyObject *newvalue;
 
     /* Safety check */
-    if (strcmp(todo[i].name, PyString_AS_STRING(key))) {
+    if (!PyString_IsEqualToASCIIString(key, todo[i].name)) {
       IGRAPH_ERROR("PyDict_Next iteration order not consistent. "
           "This should never happen. Please report the bug to the igraph "
           "developers!", IGRAPH_FAILURE);
@@ -1293,20 +1298,53 @@ int igraphmodule_i_get_numeric_graph_attr(const igraph_t *graph,
 /* Getting string graph attributes */
 int igraphmodule_i_get_string_graph_attr(const igraph_t *graph,
 					 const char *name, igraph_strvector_t *value) {
-  PyObject *dict, *o, *result;
+  PyObject *dict, *o, *str = 0;
+  const char* c_str;
+
   dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_GRAPH];
   o = PyDict_GetItemString(dict, name);
-  if (!o) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+  if (!o)
+    IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   IGRAPH_CHECK(igraph_strvector_resize(value, 1));
-  if (PyUnicode_Check(o)) {
-    result = PyUnicode_AsEncodedString(o, "utf-8", "xmlcharrefreplace");
+
+#ifdef IGRAPH_PYTHON3
+  /* For Python 3.x, we simply call PyObject_Str, which produces a
+   * Unicode string, then encode it into UTF-8, except when we
+   * already have a PyBytes object -- this is assumed to be in
+   * UTF-8.
+   */
+  if (PyBytes_Check(o)) {
+    str = o;
+    Py_INCREF(str);
   } else {
-    result = PyObject_Str(o);
+    PyObject* unicode = PyObject_Str(o);
+    if (unicode == 0)
+      IGRAPH_ERROR("Internal error in PyObject_Str", IGRAPH_EINVAL);
+    str = PyUnicode_AsEncodedString(unicode, "utf-8", "xmlcharrefreplace");
+    Py_DECREF(unicode);
   }
-  if (result) {
-    IGRAPH_CHECK(igraph_strvector_set(value, 0, PyString_AsString(result)));
-    Py_DECREF(result);
-  } else IGRAPH_ERROR("Internal error in PyObject_Str", IGRAPH_EINVAL); 
+
+#else
+  /* For Python 2.x, we check whether we have received a string or a
+   * Unicode string. Unicode strings are encoded into UTF-8, strings
+   * are used intact.
+   */
+  if (PyUnicode_Check(o)) {
+    str = PyUnicode_AsEncodedString(o, "utf-8", "xmlcharrefreplace");
+  } else {
+    str = PyObject_Str(o);
+  }
+#endif
+
+  if (str == 0)
+    IGRAPH_ERROR("Internal error in PyObject_Str", IGRAPH_EINVAL);
+#ifdef IGRAPH_PYTHON3
+  c_str = PyBytes_AS_STRING(str);
+#else
+  c_str = PyString_AS_STRING(str);
+#endif
+  IGRAPH_CHECK(igraph_strvector_set(value, 0, c_str));
+  Py_XDECREF(str);
 
   return 0;
 }

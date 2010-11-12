@@ -45,6 +45,8 @@ typedef struct {
 int PyInt_AsInt(PyObject* obj, int* result);
 int PyLong_AsInt(PyObject* obj, int* result);
 
+/* Conversion from PyObject to enum types */
+
 int igraphmodule_PyObject_to_enum(PyObject *o,
   igraphmodule_enum_translation_table_entry_t *table, int *result);
 int igraphmodule_PyObject_to_add_weights_t(PyObject *o, igraph_add_weights_t *result);
@@ -68,6 +70,8 @@ int igraphmodule_PyObject_to_transitivity_mode_t(PyObject *o, igraph_transitivit
 int igraphmodule_PyObject_to_tree_mode_t(PyObject *o, igraph_tree_mode_t *result);
 int igraphmodule_PyObject_to_vconn_nei_t(PyObject *o, igraph_vconn_nei_t *result);
 
+/* Conversion from PyObject to igraph types */
+
 int igraphmodule_PyObject_to_integer_t(PyObject *object, igraph_real_t *v);
 int igraphmodule_PyObject_to_real_t(PyObject *object, igraph_real_t *v);
 int igraphmodule_PyObject_to_igraph_t(PyObject *o, igraph_t **result);
@@ -78,23 +82,7 @@ int igraphmodule_PyObject_float_to_vector_t(PyObject *list, igraph_vector_t *v);
 int igraphmodule_PyObject_to_vector_int_t(PyObject *list, igraph_vector_int_t *v);
 int igraphmodule_PyObject_to_vector_long_t(PyObject *list, igraph_vector_long_t *v);
 int igraphmodule_PyObject_to_vector_bool_t(PyObject *list, igraph_vector_bool_t *v);
-PyObject* igraphmodule_vector_bool_t_to_PyList(igraph_vector_bool_t *v);
-PyObject* igraphmodule_vector_t_to_PyList(igraph_vector_t *v, igraphmodule_conv_t type);
-PyObject* igraphmodule_vector_t_to_PyTuple(igraph_vector_t *v);
-int igraphmodule_attrib_to_vector_t(PyObject *o, igraphmodule_GraphObject *self,
-  igraph_vector_t **vptr, int attr_type);
-int igraphmodule_attrib_to_vector_int_t(PyObject *o, igraphmodule_GraphObject *self,
-  igraph_vector_int_t **vptr, int attr_type);
-int igraphmodule_attrib_to_vector_long_t(PyObject *o, igraphmodule_GraphObject *self,
-  igraph_vector_long_t **vptr, int attr_type);
-int igraphmodule_attrib_to_vector_bool_t(PyObject *o, igraphmodule_GraphObject *self,
-  igraph_vector_bool_t **vptr, int attr_type);
-PyObject* igraphmodule_vector_t_pair_to_PyList(igraph_vector_t *v1,
-					       igraph_vector_t *v2);
-PyObject* igraphmodule_vector_t_to_PyList_pairs(igraph_vector_t *v);
-PyObject* igraphmodule_vector_ptr_t_to_PyList(igraph_vector_ptr_t *v, igraphmodule_conv_t type);
-PyObject* igraphmodule_matrix_t_to_PyList(igraph_matrix_t *m,
-						 igraphmodule_conv_t type);
+
 int igraphmodule_PyList_to_matrix_t(PyObject *o, igraph_matrix_t *m);
 PyObject* igraphmodule_strvector_t_to_PyList(igraph_strvector_t *v);
 int igraphmodule_PyList_to_strvector_t(PyObject* v, igraph_strvector_t *result);
@@ -113,4 +101,27 @@ int igraphmodule_PyObject_to_drl_options_t(PyObject *obj,
                   igraph_layout_drl_options_t *options); 
 int igraphmodule_PyObject_to_attribute_combination_t(PyObject* object,
     igraph_attribute_combination_t *type);
+
+/* Conversion from attributes to igraph types */
+
+int igraphmodule_attrib_to_vector_t(PyObject *o, igraphmodule_GraphObject *self,
+  igraph_vector_t **vptr, int attr_type);
+int igraphmodule_attrib_to_vector_int_t(PyObject *o, igraphmodule_GraphObject *self,
+  igraph_vector_int_t **vptr, int attr_type);
+int igraphmodule_attrib_to_vector_long_t(PyObject *o, igraphmodule_GraphObject *self,
+  igraph_vector_long_t **vptr, int attr_type);
+int igraphmodule_attrib_to_vector_bool_t(PyObject *o, igraphmodule_GraphObject *self,
+  igraph_vector_bool_t **vptr, int attr_type);
+
+/* Conversion from igraph types to PyObjects */
+
+PyObject* igraphmodule_vector_bool_t_to_PyList(igraph_vector_bool_t *v);
+PyObject* igraphmodule_vector_t_to_PyList(igraph_vector_t *v, igraphmodule_conv_t type);
+PyObject* igraphmodule_vector_t_to_PyTuple(igraph_vector_t *v);
+PyObject* igraphmodule_vector_t_pair_to_PyList(igraph_vector_t *v1,
+					       igraph_vector_t *v2);
+PyObject* igraphmodule_vector_t_to_PyList_pairs(igraph_vector_t *v);
+PyObject* igraphmodule_vector_ptr_t_to_PyList(igraph_vector_ptr_t *v, igraphmodule_conv_t type);
+PyObject* igraphmodule_matrix_t_to_PyList(igraph_matrix_t *m,
+						 igraphmodule_conv_t type);
 #endif
