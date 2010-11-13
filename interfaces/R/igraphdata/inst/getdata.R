@@ -209,3 +209,33 @@ for (n in names(foodwebs)) {
 save(foodwebs, file="/tmp/foodwebs.rda")
 
 #####################################################################
+
+## Konigsberg
+
+library(igraph)
+
+edges <- '
+from,to,Euler_letter,name
+Altstadt-Loebenicht,Kneiphof,a,Kraemer Bruecke
+Altstadt-Loebenicht,Kneiphof,b,Schmiedebruecke
+Altstadt-Loebenicht,Lomse,f,Holzbruecke
+Kneiphof,Lomse,e,Honigbruecke
+Vorstadt-Haberberg,Lomse,g,Hohe Bruecke
+Vorstadt-Haberberg,Kneiphof,c,Gruene Bruecke
+Vorstadt-Haberberg,Kneiphof,d,Koettelbruecke'
+
+vertices <- "
+name,Euler_letter
+Altstadt-Loebenicht,B
+Kneiphof,A
+Vorstadt-Haberberg,C
+Lomse,D"
+
+Koenigsberg <- graph.data.frame(read.csv(textConnection(edges)),
+                                vertices=read.csv(textConnection(vertices)),
+                                directed=FALSE)
+
+Koenigsberg$name <- "The seven bidges of Koenigsberg"
+
+save(Koenigsberg, file="/tmp/Koenigsberg.rda")
+
