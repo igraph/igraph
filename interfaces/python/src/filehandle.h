@@ -24,8 +24,8 @@
 #ifndef PYTHON_FILEHANDLE_H
 #define PYTHON_FILEHANDLE_H
 
-#include <stdio.h>
 #include <Python.h>
+#include <stdio.h>
 
 /**
  * \defgroup python_interface_filehandle File handle object
@@ -47,4 +47,4 @@ int igraphmodule_filehandle_init(igraphmodule_filehandle_t* handle,
 FILE* igraphmodule_filehandle_get(const igraphmodule_filehandle_t* handle);
 void igraphmodule_filehandle_destroy(igraphmodule_filehandle_t* handle);
 
-#endif PYTHON_FILEHANDLE_H
+#endif

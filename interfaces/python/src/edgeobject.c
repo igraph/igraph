@@ -96,7 +96,8 @@ PyObject* igraphmodule_Edge_repr(igraphmodule_EdgeObject *self) {
 
 #ifdef IGRAPH_PYTHON3
   s = PyUnicode_FromFormat("igraph.Edge(%R, %ld, %R)",
-      (PyObject*)self->gref, igraphmodule_Edge_attributes(self));
+      (PyObject*)self->gref, self->idx,
+      igraphmodule_Edge_attributes(self));
 #else
   PyObject *grepr, *drepr;
 

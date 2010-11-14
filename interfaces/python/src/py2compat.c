@@ -89,7 +89,7 @@ char* PyString_CopyAsString(PyObject* string) {
   }
 
   result = strdup(PyString_AsString(string));
-  if (result == 0) {
+  if (result == 0)
     PyErr_NoMemory();
 
   return result;
