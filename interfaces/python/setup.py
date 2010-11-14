@@ -76,7 +76,7 @@ libraries.extend(detect_igraph_libraries())
 print("Include path: %s" % " ".join(include_dirs))
 print("Library path: %s" % " ".join(library_dirs))
 
-igraph_extension = Extension('igraph.core', sources, \
+igraph_extension = Extension('igraph._igraph', sources, \
   library_dirs=library_dirs, libraries=libraries, \
   include_dirs=include_dirs)
        

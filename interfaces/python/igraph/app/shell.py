@@ -468,7 +468,6 @@ def main():
             if shell.supports_progress_bar():
                 set_progress_handler(shell.get_progress_handler())
             if shell.supports_status_messages():
-                print "eee"
                 set_status_handler(shell.get_status_handler())
         shell()
     else:

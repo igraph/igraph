@@ -341,7 +341,7 @@ int igraphmodule_VertexSeq_set_attribute_values_mapping(igraphmodule_VertexSeqOb
   gr = self->gref;
   dict = ATTR_STRUCT_DICT(&gr->g)[ATTRHASH_IDX_VERTEX];
 
-  if (PyString_Check(attrname) && !strcmp(PyString_AS_STRING(attrname), "name"))
+  if (PyString_IsEqualToASCIIString(attrname, "name"))
     igraphmodule_invalidate_vertex_name_index(&gr->g);
 
   if (values == 0) {

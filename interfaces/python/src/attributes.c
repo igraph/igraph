@@ -976,6 +976,7 @@ static int igraphmodule_i_attribute_combine_dicts(PyObject *dict,
   PyObject *key, *value;
   Py_ssize_t pos;
   igraph_attribute_combination_record_t* todo;
+  char** todo_names;
   int i;
   if (!PyDict_Check(dict) || !PyDict_Check(newdict)) return 1;
 
@@ -988,10 +989,19 @@ static int igraphmodule_i_attribute_combine_dicts(PyObject *dict,
   }
   IGRAPH_FINALLY(free, todo);
 
+  todo_names = (char**)calloc(
+    PyDict_Size(dict), sizeof(char*)
+  );
+  if (todo_names == 0) {
+    IGRAPH_ERROR("cannot allocate memory for attribute combination", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(free, todo_names);
+
   /* Collect what to do for each attribute in the source dict */
   pos = 0; i = 0;
   while (PyDict_Next(dict, &pos, &key, &value)) {
-    todo[i].name = PyString_AS_STRING(key);
+    todo_names[i] = PyString_CopyAsString(key);
+    todo[i].name = todo_names[i];
     igraph_attribute_combination_query(comb, todo[i].name,
         &todo[i].type, &todo[i].func);
     i++;
@@ -1087,11 +1097,15 @@ static int igraphmodule_i_attribute_combine_dicts(PyObject *dict,
       }
     }
 
+    /* free the name, we don't need it any more */
+    free(todo_names[i]);
+
     i++;
   }
 
   free(todo);
-  IGRAPH_FINALLY_CLEAN(1);
+  free(todo_names);
+  IGRAPH_FINALLY_CLEAN(2);
 
   return 0;
 }

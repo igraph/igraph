@@ -115,13 +115,14 @@ int igraphmodule_PyObject_to_enum(PyObject *o,
       return PyInt_AsInt(o, result);
     if (PyLong_Check(o))
       return PyLong_AsInt(o, result);
-    if (!PyString_Check(o)) {
+    s = PyString_CopyAsString(o);
+    if (s == 0) {
         PyErr_SetString(PyExc_TypeError, "int, long or string expected");
         return -1;
     }
-    s=strdup(PyString_AS_STRING(o));
     /* Convert string to lowercase */
-    for (s2=s; *s2; s2++) *s2 = tolower(*s2);
+    for (s2=s; *s2; s2++)
+      *s2 = tolower(*s2);
     best = 0; best_unique = 0; best_result = -1;
     /* Search for matches */
     while (table->name != 0) {
@@ -566,38 +567,6 @@ int igraphmodule_PyObject_to_real_t(PyObject *object, igraph_real_t *v) {
   }
   PyErr_BadArgument();
   return 1;
-}
-
-/**
- * \ingroup python_interface_conversion
- * \brief Converts a Python object to a Python file object.
- *
- * If the Python object is a string, it will be interpreted as a filename
- * and will be opened in the given mode. If the Python object is a file
- * handle, it will be used intact.
- *
- * \param object a Python object to be converted
- * \param mode   file opening mode if the Python object is a string.
- * \return the file object if everything is OK, NULL otherwise.
- *   An appropriate exception is raised in this case.
- */
-PyObject* igraphmodule_PyObject_to_PyFile(PyObject *object, char* mode) {
-    PyObject* result;
-
-    if (object == NULL) {
-    } else if (PyString_Check(object)) {
-        result = PyFile_FromString(PyString_AsString(object), mode);
-        return result;
-    } else if (PyFile_Check(object)) {
-        /* Check if the file object has a corresponding FILE* handle */
-        if (PyFile_AsFile(object) == NULL)
-            return NULL;
-
-        Py_INCREF(object);
-        return object;
-    }
-    PyErr_SetString(PyExc_TypeError, "string or file handle expected");
-    return NULL;
 }
 
 /**
@@ -1959,31 +1928,25 @@ int igraphmodule_PyList_to_strvector_t(PyObject* v, igraph_strvector_t *result) 
     igraph_bool_t will_free = 0;
 
     if (PyUnicode_Check(item)) {
-      o = PyUnicode_AsEncodedString(item, "utf-8", "xmlcharrefreplace");
-      if (o == 0) {
-        igraph_strvector_destroy(result);
-        return 1;
-      }
-      ptr = strdup(PyString_AsString(o));
-      Py_DECREF(o);
+      ptr = PyString_CopyAsString(item);
       if (ptr == 0) {
-        PyErr_NoMemory();
         igraph_strvector_destroy(result);
         return 1;
       }
       will_free = 1;
+#ifndef IGRAPH_PYTHON3
     } else if (PyString_Check(item)) {
       ptr = PyString_AS_STRING(item);
+#endif
     } else {
       o = PyObject_Str(item);
       if (o == 0) {
         igraph_strvector_destroy(result);
         return 1;
       }
-      ptr = strdup(PyString_AsString(o));
+      ptr = PyString_CopyAsString(o);
       Py_DECREF(o);
       if (ptr == 0) {
-        PyErr_NoMemory();
         igraph_strvector_destroy(result);
         return 1;
       }

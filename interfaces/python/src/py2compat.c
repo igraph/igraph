@@ -27,6 +27,37 @@
 
 #ifdef IGRAPH_PYTHON3
 
+/* Python 3.x functions */
+
+PyObject* PyFile_FromObject(PyObject* filename, const char* mode) {
+  PyObject *ioModule, *fileObj;
+
+  ioModule = PyImport_ImportModule("io");
+  if (ioModule == 0)
+    return 0;
+
+  fileObj = PyObject_CallMethod(ioModule, "open", "Os", filename, mode);
+  Py_DECREF(ioModule);
+
+  return fileObj;
+}
+
+char* PyString_CopyAsString(PyObject* string) {
+  PyObject* bytes = PyUnicode_AsUTF8String(string);
+  char* result;
+  
+  if (bytes == 0)
+    return 0;
+  
+  result = strdup(PyBytes_AS_STRING(bytes));
+  Py_DECREF(bytes);
+
+  if (result == 0)
+    PyErr_NoMemory();
+
+  return result;
+}
+
 int PyString_IsEqualToUTF8String(PyObject* py_string,
 		const char* c_string) {
 	PyObject* c_string_conv;
@@ -43,6 +74,25 @@ int PyString_IsEqualToUTF8String(PyObject* py_string,
 	Py_DECREF(c_string_conv);
 
 	return result;
+}
+
+#else
+
+/* Python 2.x functions */
+
+char* PyString_CopyAsString(PyObject* string) {
+  char* result;
+
+  if (!PyBaseString_Check(string)) {
+    PyErr_SetString(PyExc_TypeError, "string or unicode object expected");
+    return 0;
+  }
+
+  result = strdup(PyString_AsString(string));
+  if (result == 0) {
+    PyErr_NoMemory();
+
+  return result;
 }
 
 #endif

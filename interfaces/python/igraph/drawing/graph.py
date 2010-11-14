@@ -17,7 +17,7 @@ from collections import defaultdict
 from itertools import izip
 from math import cos, pi, sin
 
-from igraph.core import convex_hull, VertexSeq
+from igraph._igraph import convex_hull, VertexSeq
 from igraph.configuration import Configuration
 from igraph.drawing.baseclasses import AbstractDrawer, AbstractCairoDrawer, \
                                        AbstractXMLRPCDrawer

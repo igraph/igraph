@@ -24,19 +24,19 @@
 #include <Python.h>
 #include <pythonrun.h>
 #include <igraph/igraph.h>
+#include "arpackobject.h"
 #include "attributes.h"
+#include "bfsiter.h"
 #include "common.h"
 #include "convert.h"
-#include "error.h"
-#include "random.h"
-#include "graphobject.h"
-#include "vertexseqobject.h"
-#include "vertexobject.h"
-#include "edgeseqobject.h"
 #include "edgeobject.h"
-#include "arpackobject.h"
-#include "bfsiter.h"
-//#include "config.h"
+#include "edgeseqobject.h"
+#include "error.h"
+#include "graphobject.h"
+#include "py2compat.h"
+#include "random.h"
+#include "vertexobject.h"
+#include "vertexseqobject.h"
 
 #define IGRAPH_MODULE
 #include "igraphmodule_api.h"
@@ -115,8 +115,35 @@ help(igraph.Graph)
  *    references.
  */
 
-static PyObject* igraphmodule_progress_handler=NULL;
-static PyObject* igraphmodule_status_handler=NULL;
+/**
+ * Whether the module was initialized already
+ */
+static igraph_bool_t igraphmodule_initialized = 0;
+
+/**
+ * Module-specific global variables
+ */
+struct module_state {
+  PyObject* progress_handler;
+  PyObject* status_handler;
+};
+static struct module_state _state = { 0, 0 };
+
+#define GETSTATE(m) (&_state)
+
+#ifdef IGRAPH_PYTHON3
+static int igraphmodule_traverse(PyObject *m, visitproc visit, void* arg) {
+  Py_VISIT(GETSTATE(m)->progress_handler);
+  Py_VISIT(GETSTATE(m)->status_handler);
+  return 0;
+}
+
+static int igraphmodule_clear(PyObject *m) {
+  Py_CLEAR(GETSTATE(m)->progress_handler);
+  Py_CLEAR(GETSTATE(m)->status_handler);
+  return 0;
+}
+#endif
 
 static int igraphmodule_igraph_interrupt_hook(void* data) {
   if (PyErr_CheckSignals()) {
@@ -128,13 +155,17 @@ static int igraphmodule_igraph_interrupt_hook(void* data) {
 
 int igraphmodule_igraph_progress_hook(const char* message, igraph_real_t percent,
 				       void* data) {
-  if (igraphmodule_progress_handler) {
+  PyObject* progress_handler = GETSTATE(0)->progress_handler;
+
+  if (progress_handler) {
     PyObject *result;
-    if (PyCallable_Check(igraphmodule_progress_handler)) {
-      result=PyObject_CallFunction(igraphmodule_progress_handler,
+    if (PyCallable_Check(progress_handler)) {
+      result=PyObject_CallFunction(progress_handler,
 				   "sd", message, (double)percent);
-      if (result) Py_DECREF(result);
-      else return IGRAPH_INTERRUPTED;
+      if (result)
+        Py_DECREF(result);
+      else
+        return IGRAPH_INTERRUPTED;
     }
   }
   
@@ -142,10 +173,12 @@ int igraphmodule_igraph_progress_hook(const char* message, igraph_real_t percent
 }
 
 int igraphmodule_igraph_status_hook(const char* message, void*data) {
-  if (igraphmodule_status_handler) {
+  PyObject* status_handler = GETSTATE(0)->status_handler;
+
+  if (status_handler) {
     PyObject *result;
-    if (PyCallable_Check(igraphmodule_status_handler)) {
-      result = PyObject_CallFunction(igraphmodule_status_handler, "s", message);
+    if (PyCallable_Check(status_handler)) {
+      result = PyObject_CallFunction(status_handler, "s", message);
       if (result)
         Py_DECREF(result);
       else
@@ -161,16 +194,17 @@ PyObject* igraphmodule_set_progress_handler(PyObject* self, PyObject* o) {
     PyErr_SetString(PyExc_TypeError, "Progress handler must be callable.");
     return NULL;
   }
-  Py_XDECREF(igraphmodule_progress_handler);
-  if (o == Py_None) {
-    if (igraphmodule_progress_handler) {
-      Py_DECREF(igraphmodule_progress_handler);
-    }
-    igraphmodule_progress_handler=NULL;
-  } else {
-    Py_INCREF(o);
-    igraphmodule_progress_handler=o;
-  }
+
+  PyObject* progress_handler = GETSTATE(self)->progress_handler;
+  if (o == progress_handler)
+    Py_RETURN_NONE;
+
+  Py_XDECREF(progress_handler);
+  if (o == Py_None)
+    o = 0;
+  Py_XINCREF(o);
+  GETSTATE(self)->progress_handler=o;
+
   Py_RETURN_NONE;
 }
 
@@ -179,16 +213,17 @@ PyObject* igraphmodule_set_status_handler(PyObject* self, PyObject* o) {
     PyErr_SetString(PyExc_TypeError, "Status handler must be callable.");
     return NULL;
   }
-  Py_XDECREF(igraphmodule_status_handler);
-  if (o == Py_None) {
-    if (igraphmodule_status_handler) {
-      Py_DECREF(igraphmodule_status_handler);
-    }
-    igraphmodule_status_handler=NULL;
-  } else {
-    Py_INCREF(o);
-    igraphmodule_status_handler=o;
-  }
+
+  PyObject* status_handler = GETSTATE(self)->status_handler;
+  if (o == status_handler)
+    Py_RETURN_NONE;
+
+  Py_XDECREF(status_handler);
+  if (o == Py_None)
+    o = 0;
+  Py_INCREF(o);
+  GETSTATE(self)->status_handler = o;
+
   Py_RETURN_NONE;
 }
 
@@ -468,6 +503,24 @@ static PyMethodDef igraphmodule_methods[] =
   {NULL, NULL, 0, NULL}
 };
 
+/**
+ * Module definition table (only for Python 3.x)
+ */
+#ifdef IGRAPH_PYTHON3
+static struct PyModuleDef moduledef = {
+  PyModuleDef_HEAD_INIT,
+  "igraph._igraph",                   /* m_name */
+  "Low-level Python interface for the igraph library. "
+  "Should not be used directly.",     /* m_doc */
+  sizeof(struct module_state),        /* m_size */
+  igraphmodule_methods,               /* m_methods */
+  0,                                  /* m_reload */
+  igraphmodule_traverse,              /* m_traverse */
+  igraphmodule_clear,                 /* m_clear */
+  0                                   /* m_free */
+};
+#endif
+
 /****************** Exported API functions *******************/
 
 /**
@@ -510,38 +563,66 @@ igraph_t* PyIGraph_ToCGraph(PyObject* graph) {
   return result;
 }
 
-#ifndef PyMODINIT_FUNC
-#define PyMODINIT_FUNC void
-#endif
-
 extern PyObject* igraphmodule_InternalError;
 extern PyObject* igraphmodule_arpack_options_default;
 
-PyMODINIT_FUNC initcore(void) {
+#ifdef IGRAPH_PYTHON3
+#  define INITERROR return NULL
+   PyObject* PyInit__igraph(void)
+#else
+#  define INITERROR return
+#  ifndef PyMODINIT_FUNC
+#    define PyMODINIT_FUNC void
+#  endif
+   PyMODINIT_FUNC init_igraph(void)
+#endif
+{
   PyObject* m;
   static void *PyIGraph_API[PyIGraph_API_pointers];
   PyObject *c_api_object;
 
+  /* Check if the module is already initialized (possibly in another Python
+   * interpreter. If so, bail out as we don't support this. */
+  if (igraphmodule_initialized) {
+    PyErr_SetString(PyExc_RuntimeError, "igraph module is already initialized "
+        "in a different Python interpreter");
+    INITERROR;
+  }
+
   /* Initialize VertexSeq, EdgeSeq */
-  if (PyType_Ready(&igraphmodule_VertexSeqType) < 0) return;
-  if (PyType_Ready(&igraphmodule_EdgeSeqType) < 0) return;
+  if (PyType_Ready(&igraphmodule_VertexSeqType) < 0)
+    INITERROR;
+  if (PyType_Ready(&igraphmodule_EdgeSeqType) < 0)
+    INITERROR;
   
   /* Initialize Vertex, Edge */
   igraphmodule_VertexType.tp_clear = (inquiry)igraphmodule_Vertex_clear;
-  if (PyType_Ready(&igraphmodule_VertexType) < 0) return;
+  if (PyType_Ready(&igraphmodule_VertexType) < 0)
+    INITERROR;
   
   igraphmodule_EdgeType.tp_clear = (inquiry)igraphmodule_Edge_clear;
-  if (PyType_Ready(&igraphmodule_EdgeType) < 0) return;
+  if (PyType_Ready(&igraphmodule_EdgeType) < 0)
+    INITERROR;
 
   /* Initialize Graph, BFSIter, ARPACKOptions etc */
-  if (PyType_Ready(&igraphmodule_GraphType) < 0) return;
-  if (PyType_Ready(&igraphmodule_BFSIterType) < 0) return;
-  if (PyType_Ready(&igraphmodule_ARPACKOptionsType) < 0) return;
+  if (PyType_Ready(&igraphmodule_GraphType) < 0)
+    INITERROR;
+  if (PyType_Ready(&igraphmodule_BFSIterType) < 0)
+    INITERROR;
+  if (PyType_Ready(&igraphmodule_ARPACKOptionsType) < 0)
+    INITERROR;
 
   /* Initialize the core module */
-  m = Py_InitModule3("igraph.core", igraphmodule_methods,
+#ifdef IGRAPH_PYTHON3
+  m = PyModule_Create(&moduledef);
+#else
+  m = Py_InitModule3("igraph._igraph", igraphmodule_methods,
 		     "Low-level Python interface for the igraph library. "
 		     "Should not be used directly.");
+#endif
+
+  if (m == NULL)
+    INITERROR;
 
   /* Initialize random number generator */
   igraphmodule_init_rng(m);
@@ -557,7 +638,7 @@ PyMODINIT_FUNC initcore(void) {
  
   /* Internal error exception type */
   igraphmodule_InternalError =
-    PyErr_NewException("igraph.core.InternalError", PyExc_Exception, NULL);
+    PyErr_NewException("igraph._igraph.InternalError", PyExc_Exception, NULL);
   PyModule_AddObject(m, "InternalError", igraphmodule_InternalError);
 
   /* ARPACK default options variable */
@@ -632,4 +713,10 @@ PyMODINIT_FUNC initcore(void) {
   if (c_api_object != 0) {
     PyModule_AddObject(m, "_C_API", c_api_object);
   }
+
+  igraphmodule_initialized = 1;
+
+#ifdef IGRAPH_PYTHON3
+  return m;
+#endif
 }

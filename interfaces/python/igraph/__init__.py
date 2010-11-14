@@ -31,8 +31,8 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 
 # pylint: disable-msg=W0401
 # W0401: wildcard import
-from igraph.core import *
-from igraph.core import __version__, __build_date__
+from igraph._igraph import *
+from igraph._igraph import __version__, __build_date__
 from igraph.clustering import *
 from igraph.cut import *
 from igraph.configuration import Configuration
@@ -600,7 +600,7 @@ class Graph(GraphBase):
         @return: a list with the Google PageRank values of the specified
           vertices."""
         if arpack_options is None:
-            arpack_options = core.arpack_options
+            arpack_options = _igraph.arpack_options
         return self.personalized_pagerank(vertices, directed, damping, None, \
                 None, weights, arpack_options)
 
@@ -1602,7 +1602,7 @@ class Graph(GraphBase):
             format = klass._identify_format(f)
         try:
             reader = klass._format_mapping[format][0]
-        except KeyError, IndexError:
+        except (KeyError, IndexError):
             raise IOError("unknown file format: %s" % str(format))
         if reader is None:
             raise IOError("no reader method for file format: %s" % str(format))
@@ -1635,10 +1635,11 @@ class Graph(GraphBase):
         @raises IOError: if the file format can't be identified and
           none was given.
         """
-        if format is None: format = self._identify_format(f)
+        if format is None:
+            format = self._identify_format(f)
         try:
             writer = self._format_mapping[format][1]
-        except KeyError, IndexError:
+        except (KeyError, IndexError):
             raise IOError("unknown file format: %s" % str(format))
         if writer is None:
             raise IOError("no writer method for file format: %s" % str(format))
@@ -2050,13 +2051,13 @@ class Graph(GraphBase):
                     return self.delete_vertices(other)
             else:
                 return self
-        elif isinstance(other, core.Vertex):
+        elif isinstance(other, _igraph.Vertex):
             return self.delete_vertices(other)
-        elif isinstance(other, core.VertexSeq):
+        elif isinstance(other, _igraph.VertexSeq):
             return self.delete_vertices(other)
-        elif isinstance(other, core.Edge):
+        elif isinstance(other, _igraph.Edge):
             return self.delete_edges(other)
-        elif isinstance(other, core.EdgeSeq):
+        elif isinstance(other, _igraph.EdgeSeq):
             return self.delete_edges(other)
         return NotImplemented
 
@@ -2083,13 +2084,13 @@ class Graph(GraphBase):
                     return self.copy().delete_vertices(other)
             else:
                 return self.copy()
-        elif isinstance(other, core.Vertex):
+        elif isinstance(other, _igraph.Vertex):
             return self.copy().delete_vertices(other)
-        elif isinstance(other, core.VertexSeq):
+        elif isinstance(other, _igraph.VertexSeq):
             return self.copy().delete_vertices(other)
-        elif isinstance(other, core.Edge):
+        elif isinstance(other, _igraph.Edge):
             return self.copy().delete_edges(other)
-        elif isinstance(other, core.EdgeSeq):
+        elif isinstance(other, _igraph.EdgeSeq):
             return self.copy().delete_edges(other)
         elif isinstance(other, Graph):
             return self.difference(other)
@@ -2129,13 +2130,13 @@ class Graph(GraphBase):
         """
         if type(other) in [int, tuple, list]:
             return self, other
-        if isinstance(other, core.Vertex):
+        if isinstance(other, _igraph.Vertex):
             return self, other
-        if isinstance(other, core.VertexSeq):
+        if isinstance(other, _igraph.VertexSeq):
             return self, other
-        if isinstance(other, core.Edge):
+        if isinstance(other, _igraph.Edge):
             return self, other
-        if isinstance(other, core.EdgeSeq):
+        if isinstance(other, _igraph.EdgeSeq):
             return self, other
         return NotImplemented
 
@@ -2374,7 +2375,7 @@ class Graph(GraphBase):
 
 ##############################################################
 
-class VertexSeq(core.VertexSeq):
+class VertexSeq(_igraph.VertexSeq):
     """Class representing a sequence of vertices in the graph.
     
     This class is most easily accessed by the C{vs} field of the
@@ -2544,7 +2545,7 @@ class VertexSeq(core.VertexSeq):
           >>> edges = g.vs.select(bs_gt=10, bs_lt=30)
 
         @return: the new, filtered vertex sequence"""
-        vs = core.VertexSeq.select(self, *args)
+        vs = _igraph.VertexSeq.select(self, *args)
 
         operators = {
             "lt": operator.lt, \
@@ -2585,7 +2586,7 @@ class VertexSeq(core.VertexSeq):
 
 ##############################################################
 
-class EdgeSeq(core.EdgeSeq):
+class EdgeSeq(_igraph.EdgeSeq):
     """Class representing a sequence of edges in the graph.
     
     This class is most easily accessed by the C{es} field of the
@@ -2789,7 +2790,7 @@ class EdgeSeq(core.EdgeSeq):
           >>> edges = g.es.select(bs_gt=10, bs_lt=30)
 
         @return: the new, filtered edge sequence"""
-        es = core.EdgeSeq.select(self, *args)
+        es = _igraph.EdgeSeq.select(self, *args)
 
         def _ensure_set(value):
             if isinstance(value, VertexSeq):
@@ -3044,7 +3045,7 @@ def compare_communities(comm1, comm2, method="vi", remove_none=False):
           Classification 2:193-218, 1985.
     """
     vec1, vec2 = _prepare_community_comparison(comm1, comm2, remove_none)
-    return core._compare_communities(vec1, vec2, method)
+    return _igraph._compare_communities(vec1, vec2, method)
 
 def split_join_distance(comm1, comm2, remove_none=False):
     """Calculates the split-join distance between two community structures.
@@ -3097,7 +3098,7 @@ def split_join_distance(comm1, comm2, remove_none=False):
       sum of them.
     """
     vec1, vec2 = _prepare_community_comparison(comm1, comm2, remove_none)
-    return core._split_join_distance(vec1, vec2)
+    return _igraph._split_join_distance(vec1, vec2)
 
 ##############################################################
 

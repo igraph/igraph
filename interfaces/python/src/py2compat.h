@@ -25,12 +25,14 @@
 
 #include <Python.h>
 
-#if PY_MAJOR_VERSION > 2
+#if PY_MAJOR_VERSION >= 3
 
 /* Python 3.x-specific part follows here */
 #define IGRAPH_PYTHON3
 
 #define PyBaseString_Check(o) PyUnicode_Check(o)
+
+PyObject* PyFile_FromObject(PyObject* filename, const char* mode);
 
 #define PyIntObject    PyLongObject
 #define PyInt_AsLong   PyLong_AsLong
@@ -54,13 +56,15 @@
 
 int PyString_IsEqualToUTF8String(PyObject* py_string,
     const char* c_string);
+char* PyString_CopyAsString(PyObject* string);
 
 #else
 
 /* Python 2.x-specific part follows here */
 
 #define PyBaseString_Check(o) (PyString_Check(o) || PyUnicode_Check(o))
+char* PyString_CopyAsString(PyObject* string);
 #define PyString_IsEqualToASCIIString(pystr, cstr) \
-        (strcmp(PyString_AS_STRING(pystr), (cstr)) == 0)
+        (PyString_Check(pystr) && strcmp(PyString_AS_STRING(pystr), (cstr)) == 0)
 
 #endif

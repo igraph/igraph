@@ -24,9 +24,10 @@
 */
 
 #include "attributes.h"
-#include "vertexobject.h"
-#include "graphobject.h"
 #include "error.h"
+#include "graphobject.h"
+#include "py2compat.h"
+#include "vertexobject.h"
 
 /**
  * \ingroup python_interface
@@ -198,7 +199,7 @@ int igraphmodule_Vertex_set_attribute(igraphmodule_VertexObject* self, PyObject*
   
   if (o==0) return -1;
 
-  if (PyString_Check(k) && !strcmp(PyString_AS_STRING(k), "name"))
+  if (PyString_IsEqualToASCIIString(k, "name"))
     igraphmodule_invalidate_vertex_name_index(&o->g);
 
   if (v==NULL)
@@ -320,27 +321,26 @@ PyGetSetDef igraphmodule_Vertex_getseters[] = {
  */
 PyTypeObject igraphmodule_VertexType =
 {
-  PyObject_HEAD_INIT(NULL)                    //
-  0,                                          // ob_size
-  "igraph.Vertex",                            // tp_name
-  sizeof(igraphmodule_VertexObject),          // tp_basicsize
-  0,                                          // tp_itemsize
-  (destructor)igraphmodule_Vertex_dealloc,    // tp_dealloc
-  0,                                          // tp_print
-  0,                                          // tp_getattr
-  0,                                          // tp_setattr
+  PyVarObject_HEAD_INIT(0, 0)
+  "igraph.Vertex",                            /* tp_name */
+  sizeof(igraphmodule_VertexObject),          /* tp_basicsize */
+  0,                                          /* tp_itemsize */
+  (destructor)igraphmodule_Vertex_dealloc,    /* tp_dealloc */
+  0,                                          /* tp_print */
+  0,                                          /* tp_getattr */
+  0,                                          /* tp_setattr */
   0,                                          /* tp_compare (2.x) / tp_reserved (3.x) */
-  (reprfunc)igraphmodule_Vertex_repr,         // tp_repr
-  0,                                          // tp_as_number
-  0,                                          // tp_as_sequence
-  &igraphmodule_Vertex_as_mapping,            // tp_as_mapping
-  0,                                          // tp_hash
-  0,                                          // tp_call
-  0,                                          // tp_str
-  0,                                          // tp_getattro
-  0,                                          // tp_setattro
-  0,                                          // tp_as_buffer
-  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,   // tp_flags
+  (reprfunc)igraphmodule_Vertex_repr,         /* tp_repr */
+  0,                                          /* tp_as_number */
+  0,                                          /* tp_as_sequence */
+  &igraphmodule_Vertex_as_mapping,            /* tp_as_mapping */
+  0,                                          /* tp_hash */
+  0,                                          /* tp_call */
+  0,                                          /* tp_str */
+  0,                                          /* tp_getattro */
+  0,                                          /* tp_setattro */
+  0,                                          /* tp_as_buffer */
+  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,   /* tp_flags */
   "Class representing a single vertex in a graph.\n\n"
   "The vertex is referenced by its index, so if the underlying graph\n"
   "changes, the semantics of the vertex object might change as well\n"
@@ -349,15 +349,15 @@ PyTypeObject igraphmodule_VertexType =
   "as a hash:\n\n"
   "  >>> v[\"color\"] = \"red\"                  #doctest: +SKIP\n"
   "  >>> print v[\"color\"]                      #doctest: +SKIP\n"
-  "  red\n", // tp_doc
-  0,                                          // tp_traverse
-  0,                                          // tp_clear
-  0,                                          // tp_richcompare
-  0,                                          // tp_weaklistoffset
-  0,                                          // tp_iter
-  0,                                          // tp_iternext
-  igraphmodule_Vertex_methods,                // tp_methods
-  0,                                          // tp_members
-  igraphmodule_Vertex_getseters,              // tp_getset
+  "  red\n", /* tp_doc */
+  0,                                          /* tp_traverse */
+  0,                                          /* tp_clear */
+  0,                                          /* tp_richcompare */
+  0,                                          /* tp_weaklistoffset */
+  0,                                          /* tp_iter */
+  0,                                          /* tp_iternext */
+  igraphmodule_Vertex_methods,                /* tp_methods */
+  0,                                          /* tp_members */
+  igraphmodule_Vertex_getseters,              /* tp_getset */
 };
 
