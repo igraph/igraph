@@ -22,6 +22,7 @@
 
 */
 
+#include "py2compat.h"
 #include "random.h"
 #include <limits.h>
 #include <igraph/igraph_random.h>

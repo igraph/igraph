@@ -34,10 +34,11 @@ def generate_edges(formula):
 
     # Tokenize the formula
     token_gen = tokenize.generate_tokens(StringIO(formula).next)
-    for token_type, tok, _, _, _ in token_gen:
+    for token_info in token_gen:
         # Do the state transitions
+        token_type, tok, _, _, _ = token_info
         if parsing_vertices:
-            if tok in edge_chars and token_type == token.OP:
+            if all(ch in edge_chars for ch in tok) and token_type == token.OP:
                 parsing_vertices = False
                 # Check the edge we currently have
                 if start_names and end_names:
@@ -46,7 +47,7 @@ def generate_edges(formula):
                 start_names, end_names = end_names, []
                 arrowheads = [False, False]
         else:
-            if tok not in edge_chars:
+            if any(ch not in edge_chars for ch in tok):
                 parsing_vertices = True
 
         if parsing_vertices:
@@ -68,14 +69,18 @@ def generate_edges(formula):
                 raise SyntaxError(msg)
         else:
             # We are parsing an edge operator
-            if tok == "<":
-                arrowheads[0] = True
-            elif tok == ">":
+            if "<" in tok:
+                if ">" in tok:
+                    arrowheads = [True, True]
+                else:
+                    arrowheads[0] = True
+            elif ">" in tok:
                 arrowheads[1] = True
-            elif tok == "<>":
-                arrowheads = [True, True]
-            elif tok == "+":
-                pass   # TODO!
+            elif "+" in tok:
+                if tok[0] == "+":
+                    arrowheads[0] = True
+                if len(tok) > 1 and tok[-1] == "+":
+                    arrowheads[1] = True
 
     # The final edge
     yield start_names, end_names, arrowheads

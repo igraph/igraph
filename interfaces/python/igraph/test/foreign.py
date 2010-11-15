@@ -9,11 +9,14 @@ from contextlib import contextmanager
 from textwrap import dedent
 
 @contextmanager
-def temporary_file(content, mode="w"):
+def temporary_file(content, mode="wt"):
     tmpf, tmpfname = tempfile.mkstemp()
     os.close(tmpf)
     tmpf = open(tmpfname, mode)
-    print >>tmpf, dedent(content)
+    if isinstance(content, basestring):
+        print >>tmpf, dedent(content)
+    else:
+        tmpf.write(content)
     tmpf.close()
     yield tmpfname
     os.unlink(tmpfname)
@@ -200,7 +203,13 @@ class ForeignTests(unittest.TestCase):
             g.write_adjacency(tmpfname)
 
     def testPickle(self):
-        pickle = '\x80\x02cigraph\nGraph\nq\x01(K\x03]q\x02K\x01K\x02\x86q\x03a\x89}}}tRq\x04}b.'
+        pickle = [128, 2, 99, 105, 103, 114, 97, 112, 104, 10, 71, 114, 97, 112,
+                  104, 10, 113, 1, 40, 75, 3, 93, 113, 2, 75, 1, 75, 2, 134, 113, 3, 97,
+                  137, 125, 125, 125, 116, 82, 113, 4, 125, 98, 46]
+        if sys.version_info > (3, 0):
+            pickle = bytes(pickle)
+        else:
+            pickle = "".join(map(chr, pickle))
         with temporary_file(pickle, "wb") as tmpfname:
             g = Graph.Read_Pickle(pickle)
             self.failUnless(isinstance(g, Graph))

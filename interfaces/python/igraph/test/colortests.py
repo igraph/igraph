@@ -6,8 +6,8 @@ from igraph import *
 class ColorTests(unittest.TestCase):
     def assertAlmostEqualsMany(self, items1, items2, eps):
         for idx, (item1, item2) in enumerate(izip(items1, items2)):
-            self.assertAlmostEquals(item1, item2, eps,
-                    "mismatch at index %d, %r != %r with %d digits"
+            self.assertAlmostEqual(item1, item2, places=eps,
+                    msg="mismatch at index %d, %r != %r with %d digits"
                     % (idx, items1, items2, eps))
 
     def setUp(self):

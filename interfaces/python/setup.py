@@ -20,7 +20,7 @@ LIBIGRAPH_FALLBACK_LIBRARY_DIRS = []
 if version_info < (2, 5):
     print("This module requires Python >= 2.5")
     exit(0)
-    
+
 def get_output(command):
     """Returns the output of a command returning a single line of output"""
     p = Popen(command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
@@ -139,5 +139,8 @@ if "macosx" in plat and "bdist_mpkg" in argv:
     options["data_files"] = [ \
             ('/usr/local/lib', [os.path.join('..', '..', 'fatbuild', 'libigraph.0.dylib')])
     ]
+
+if version_info > (3, 0):
+    options["use_2to3"] = True
 
 setup(**options)

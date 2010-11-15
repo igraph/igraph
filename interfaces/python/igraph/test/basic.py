@@ -78,7 +78,6 @@ class BasicTests(unittest.TestCase):
         g.es["data"]=["A", "B"]
         g.custom_data = None
         pickled=pickle.dumps(g)
-        self.failUnless(isinstance(pickled, str))
 
         g2=pickle.loads(pickled)
         self.failUnless(g["data"] == g2["data"])

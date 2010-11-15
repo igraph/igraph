@@ -25,6 +25,26 @@
 
 #include "py2compat.h"
 
+/* Common functions for both Python 2.x and Python 3.x */
+char* PyObject_ConvertToCString(PyObject* string) {
+  char* result;
+
+  if (string == 0)
+    return 0;
+
+  if (!PyBaseString_Check(string)) {
+    string = PyObject_Str(string);
+    if (string == 0)
+      return 0;
+  } else {
+    Py_INCREF(string);
+  }
+
+  result = PyString_CopyAsString(string);
+  Py_DECREF(string);
+  return result;
+}
+
 #ifdef IGRAPH_PYTHON3
 
 /* Python 3.x functions */
@@ -43,9 +63,16 @@ PyObject* PyFile_FromObject(PyObject* filename, const char* mode) {
 }
 
 char* PyString_CopyAsString(PyObject* string) {
-  PyObject* bytes = PyUnicode_AsUTF8String(string);
+  PyObject* bytes;
   char* result;
-  
+
+  if (PyBytes_Check(string)) {
+    bytes = string;
+    Py_INCREF(bytes);
+  } else {
+    bytes = PyUnicode_AsUTF8String(string);
+  }
+
   if (bytes == 0)
     return 0;
   
@@ -88,7 +115,11 @@ char* PyString_CopyAsString(PyObject* string) {
     return 0;
   }
 
-  result = strdup(PyString_AsString(string));
+  result = PyString_AsString(string);
+  if (result == 0)
+    return 0;
+
+  result = strdup(result);
   if (result == 0)
     PyErr_NoMemory();
 

@@ -82,7 +82,7 @@ class Configuration(object):
       True
 
     User-level configuration is stored in C{~/.igraphrc} per default on Linux
-    and Mac OS X systems, or in C{C:\Documents and Settings\username\.igraphrc}
+    and Mac OS X systems, or in C{C:\\Documents and Settings\\username\\.igraphrc}
     on Windows systems. However, this configuration is read only when C{igraph}
     is launched through its shell interface defined in L{igraph.app.shell}.
     This behaviour might change before version 1.0.
@@ -301,7 +301,7 @@ class Configuration(object):
           loaded.
         """
         stream = stream or get_user_config_file()
-        if not isinstance(stream, file):
+        if isinstance(stream, basestring):
             stream = open(stream, "r")
             file_was_open = True
         self._config.readfp(stream)

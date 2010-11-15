@@ -1142,7 +1142,8 @@ class Graph(GraphBase):
           note that igraph is able to read back the written adjacency matrix
           if and only if this is a single newline character
         """
-        if not isinstance(f, file): f = file(f, "w")
+        if isinstance(f, basestring):
+            f = open(f, "w")
         matrix = self.get_adjacency(*args, **kwds)
         for row in matrix:
             f.write(sep.join(map(str, row)))
@@ -1167,7 +1168,8 @@ class Graph(GraphBase):
           no weights are stored, values larger than 1 are considered as
           edge multiplicities.
         @return: the created graph"""
-        if not isinstance(f, file): f = file(f)
+        if isinstance(f, basestring):
+            f = open(f)
         matrix, ri, weights = [], 0, {} 
         for line in f:
             line = line.strip()
@@ -1320,15 +1322,19 @@ class Graph(GraphBase):
         @return: the created graph object.
         """
         import cPickle as pickle
-        if isinstance(fname, (str, unicode)) and\
-           len(fname)>40 and "cigraph\nGraph\n" in fname:
-            result = pickle.loads(fname)
-        elif not hasattr(fname, "write"):
-            fname = open(fname, 'rb')
+        if hasattr(fname, "read"):
+            # Probably a file or a file-like object
             result = pickle.load(fname)
-            fname.close()
         else:
-            result = pickle.load(fname)
+            fp = None
+            try:
+                fp = open(fname, "rb")
+            except IOError:
+                # No file with the given name, try unpickling directly
+                result = pickle.loads(fname)
+            if fp is not None:
+                result = pickle.load(fp)
+                fp.close()
         if not isinstance(result, klass):
             raise TypeError("unpickled object is not a %s" % klass.__name__)
         return result

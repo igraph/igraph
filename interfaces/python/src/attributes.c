@@ -690,7 +690,11 @@ static PyObject* igraphmodule_i_ac_builtin_func(PyObject* values,
   PyObject* func = 0;
 
   if (builtin_module_dict == 0) {
+#ifdef IGRAPH_PYTHON3
+    PyObject* builtin_module = PyImport_ImportModule("builtins");
+#else
     PyObject* builtin_module = PyImport_ImportModule("__builtin__");
+#endif
     if (builtin_module == 0)
       return 0;
     builtin_module_dict = PyModule_GetDict(builtin_module);
@@ -966,6 +970,16 @@ static PyObject* igraphmodule_i_ac_median(PyObject* values,
   return res;
 }
 
+static void igraphmodule_i_free_attribute_combination_records(
+    igraph_attribute_combination_record_t* records) {
+  igraph_attribute_combination_record_t* ptr = records;
+  while (ptr->name != 0) {
+    free((char*)ptr->name);
+    ptr++;
+  }
+  free(records);
+}
+
 /* Auxiliary function for the common parts of
  * igraphmodule_i_attribute_combine_vertices and
  * igraphmodule_i_attribute_combine_edges
@@ -976,32 +990,27 @@ static int igraphmodule_i_attribute_combine_dicts(PyObject *dict,
   PyObject *key, *value;
   Py_ssize_t pos;
   igraph_attribute_combination_record_t* todo;
-  char** todo_names;
-  int i;
+  int i, n;
   if (!PyDict_Check(dict) || !PyDict_Check(newdict)) return 1;
 
   /* Allocate memory for the attribute_combination_records */
+  n = PyDict_Size(dict);
   todo = (igraph_attribute_combination_record_t*)calloc(
-    PyDict_Size(dict), sizeof(igraph_attribute_combination_record_t)
+    n+1, sizeof(igraph_attribute_combination_record_t)
   );
   if (todo == 0) {
     IGRAPH_ERROR("cannot allocate memory for attribute combination", IGRAPH_ENOMEM);
   }
-  IGRAPH_FINALLY(free, todo);
-
-  todo_names = (char**)calloc(
-    PyDict_Size(dict), sizeof(char*)
-  );
-  if (todo_names == 0) {
-    IGRAPH_ERROR("cannot allocate memory for attribute combination", IGRAPH_ENOMEM);
-  }
-  IGRAPH_FINALLY(free, todo_names);
+  for (i = 0; i < n+1; i++)
+    todo[i].name = 0;       /* sentinel elements */
+  IGRAPH_FINALLY(igraphmodule_i_free_attribute_combination_records, todo);
 
   /* Collect what to do for each attribute in the source dict */
   pos = 0; i = 0;
   while (PyDict_Next(dict, &pos, &key, &value)) {
-    todo_names[i] = PyString_CopyAsString(key);
-    todo[i].name = todo_names[i];
+    todo[i].name = PyString_CopyAsString(key);
+    if (todo[i].name == 0)
+      IGRAPH_ERROR("PyString_CopyAsString failed", IGRAPH_FAILURE);
     igraph_attribute_combination_query(comb, todo[i].name,
         &todo[i].type, &todo[i].func);
     i++;
@@ -1097,15 +1106,11 @@ static int igraphmodule_i_attribute_combine_dicts(PyObject *dict,
       }
     }
 
-    /* free the name, we don't need it any more */
-    free(todo_names[i]);
-
     i++;
   }
 
-  free(todo);
-  free(todo_names);
-  IGRAPH_FINALLY_CLEAN(2);
+  igraphmodule_i_free_attribute_combination_records(todo);
+  IGRAPH_FINALLY_CLEAN(1);
 
   return 0;
 }
@@ -1414,7 +1419,8 @@ int igraphmodule_i_get_string_vertex_attr(const igraph_t *graph,
 
   dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_VERTEX];
   list = PyDict_GetItemString(dict, name);
-  if (!list) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+  if (!list)
+    IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
 
   if (igraph_vs_is_all(&vs)) {
     if (igraphmodule_PyList_to_strvector_t(list, &newvalue))
@@ -1429,17 +1435,24 @@ int igraphmodule_i_get_string_vertex_attr(const igraph_t *graph,
     IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_VIT_SIZE(it)));
     while (!IGRAPH_VIT_END(it)) {
       long int v=IGRAPH_VIT_GET(it);
+      char* str;
+
       result = PyList_GetItem(list, v);
-      if (PyUnicode_Check(result)) {
-        result = PyUnicode_AsEncodedString(result, "utf-8", "xmlcharrefreplace");
-      } else {
-        result = PyObject_Str(result);
-      }
-      if (result == 0) {
-        IGRAPH_ERROR("Internal error in PyObject_Str", IGRAPH_EINVAL);
-      }
-      igraph_strvector_set(value, i, PyString_AsString(result));
-      Py_XDECREF(result);
+      if (result == 0)
+        IGRAPH_ERROR("null element in PyList", IGRAPH_EINVAL);
+
+      str = PyObject_ConvertToCString(result);
+      if (str == 0)
+        IGRAPH_ERROR("error while calling PyObject_ConvertToCString", IGRAPH_EINVAL);
+
+      /* Note: this is a bit inefficient here, PyObject_ConvertToCString
+       * allocates a new string which could be copied into the string
+       * vector straight away. Instead of that, the string vector makes
+       * another copy. Probably the performance hit is not too severe.
+       */
+      igraph_strvector_set(value, i, str);
+      free(str);
+
       IGRAPH_VIT_NEXT(it);
       i++;
     }
@@ -1516,17 +1529,24 @@ int igraphmodule_i_get_string_edge_attr(const igraph_t *graph,
     IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_EIT_SIZE(it)));
     while (!IGRAPH_EIT_END(it)) {
       long int v=IGRAPH_EIT_GET(it);
+      char* str;
+
       result = PyList_GetItem(list, v);
-      if (PyUnicode_Check(result)) {
-        result = PyUnicode_AsEncodedString(result, "utf-8", "xmlcharrefreplace");
-      } else {
-        result = PyObject_Str(result);
-      }
-      if (result == 0) {
-        IGRAPH_ERROR("Internal error in PyObject_Str", IGRAPH_EINVAL);
-      }
-      igraph_strvector_set(value, i, PyString_AsString(result));
-      Py_XDECREF(result);
+      if (result == 0)
+        IGRAPH_ERROR("null element in PyList", IGRAPH_EINVAL);
+
+      str = PyObject_ConvertToCString(result);
+      if (str == 0)
+        IGRAPH_ERROR("error while calling PyObject_ConvertToCString", IGRAPH_EINVAL);
+
+      /* Note: this is a bit inefficient here, PyObject_ConvertToCString
+       * allocates a new string which could be copied into the string
+       * vector straight away. Instead of that, the string vector makes
+       * another copy. Probably the performance hit is not too severe.
+       */
+      igraph_strvector_set(value, i, str);
+      free(str);
+
       IGRAPH_EIT_NEXT(it);
       i++;
     }
