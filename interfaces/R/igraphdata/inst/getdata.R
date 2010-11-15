@@ -366,3 +366,26 @@ E(yeast)$Confidence <- ifelse(grepl("confidence: high", int[highmed]),
 
 save(yeast, file="/tmp/yeast.rda")
 
+###################################################################
+
+## Zachary karate club
+
+library(igraph)
+
+tmp <- tempdir()
+
+url <- "http://vlado.fmf.uni-lj.si/pub/networks/data/UciNet/zachary.dat"
+dest <- paste(tmp, sep="/", "k.dat")
+download.file(url=url, destfile=dest)
+
+l <- readLines(dest)
+l <- l[(grep("^DATA", l)+1):length(l)]
+l1 <- matrix(scan(textConnection(paste(l[1:34], collapse="\n"))), nr=34)
+l2 <- matrix(scan(textConnection(paste(l[1:34+34], collapse="\n"))), nr=34)
+
+karate <- graph.adjacency(l2, weighted=TRUE, mode="undirected")
+V(karate)$Faction <- c(1,1,1,1,1,1,1,1, 2,2, 1,1,1,1, 2,2, 1,1, 2, 1, 2, 1,
+                     2,2,2,2,2,2,2,2,2,2,2,2)
+karate$name <- "Zachary's karate club network"
+karate$Citation <- "Wayne W. Zachary. An Information Flow Model for Conflict and Fission in Small Groups. Journal of Anthropological Research Vol. 33, No. 4 452-473"
+karate$Author <- "Wayne W. Zachary"
