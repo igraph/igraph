@@ -239,3 +239,130 @@ Koenigsberg$name <- "The seven bidges of Koenigsberg"
 
 save(Koenigsberg, file="/tmp/Koenigsberg.rda")
 
+########################################################################
+
+## Yeast protein interactions
+
+## library(igraph)
+
+## tmp <- tempdir()
+
+## url <- "http://vlado.fmf.uni-lj.si/pub/networks/data/bio/Yeast/yeast.zip"
+## yzip <- paste(tmp, sep="/", "y.zip")
+## download.file(url=url, destfile=yzip)
+## system(paste("cd", tmp, ";", "unzip", yzip))
+
+## YS <- read.graph(paste(tmp, sep="/", "YeastS.net"), format="pajek")
+## YL <- read.graph(paste(tmp, sep="/", "YeastL.net"), format="pajek")
+## cluLines <- readLines(paste(tmp, sep="/", "Yeast.clu"))
+## cluLines <- cluLines[(grep("^\\*vertices", cluLines)+1):length(cluLines)]
+## ccode <- c("1"="T", "2"="M", "3"="U", "4"="C", "5"="F", "6"="P",
+##            "7"="G", "8"="D", "9"="O", "10"="E", "11"="R", "12"="B", "13"="A")
+
+## V(YS)$name <- V(YS)$id
+## V(YS)$Long_name <- V(YL)$id
+## YS <- remove.vertex.attribute(YS, "id")
+## V(YS)$Class <- ccode[cluLines]
+## YS$name <- "Yeast protein interaction network by Bu et al. 2003"
+## YS$Citation <- "Dongbo Bu, Yi Zhao, Lun Cai, Hong Xue, Xiaopeng Zhu, Hongchao Lu, Jingfen Zhang, Shiwei Sun, Lunjiang Ling, Nan Zhang, Guojie Li and Runsheng Chen: Topological structure analysis of the protein–protein interaction network in budding yeast. Nucl. Acids Res. (2003) 31 (9): 2443-2450."
+## YS$Author <- "Dongbo Bu, Yi Zhao, Lun Cai, Hong Xue, Xiaopeng Zhu, Hongchao Lu, Jingfen Zhang, Shiwei Sun, Lunjiang Ling, Nan Zhang, Guojie Li and Runsheng Chen"
+## YS$URL <- "http://www.bioinfo.org.cn/PIN/"
+
+## class <-
+## "Category,Description,Original MIPS category
+##  E,energy production,energy
+##  G,aminoacid metabolism,aminoacid metabolism
+##  M,other metabolism,all remaining metabolism categories
+##  P,translation,protein synthesis
+##  T,transcription,\"transcription, but without subcategory 'transcriptional control'\"
+##  B,transcriptional control,subcategory 'transcriptional control'
+##  F,protein fate,\"protein fate (folding, modification, destination)\"
+##  O,cellular organization,cellular transport and transport mechanisms
+##  A,transport and sensing,categories 'transport facilitation' and 'regulation of / interaction with cellular environment'
+##  R,stress and defense,\"cell rescue, defense and virulence\"
+##  D,genome maintenance,DNA processing and cell cycle
+##  C,cellular fate / organization,categories 'cell fate' and 'cellular communication / signal transduction' and 'control of cellular organization'
+##  U,uncharacterized,categories 'not yet clear-cut' and 'uncharacterized'
+## "
+
+## classes <- read.csv(textConnection(class), header=TRUE, stringsAsFactors=FALSE)
+## YS$Classes <- classes
+
+## yeast <- YS
+## save(yeast, file="/tmp/yeast.rda")
+
+###########################################################################
+
+## Yeast protein interactions, from the van Mering paper
+
+library(igraph)
+library(org.Sc.sgd.db)
+
+tmp <- tempdir()
+
+urls <- paste(sep="", "http://www.nature.com/nature/journal/v417/n6887/extref/nature750-s", 1:4, ".doc")
+dest <- paste(sep="", tmp, "/s", 1:4, ".txt")
+sapply(1:4, function(x) download.file(url=urls[x], destfile=dest[x]))
+
+## Proteins
+
+vert <- readLines(paste(tmp, sep="/", "s1.txt"))
+vert <- vert[grep("^Y", vert)[1]:length(vert)]
+vert <- vert[vert != ""]
+
+vert12 <- sub("\\][ ].*$", "]", vert)
+vert12 <- read.delim(textConnection(paste(vert12, sep="\n")),
+                     header=FALSE, stringsAsFactors=FALSE, sep=" ")
+vert12[,2] <- sub("\\]", "", sub("\\[", "", vert12[,2]))
+colnames(vert12) <- c("name", "Class")
+
+vert3 <- sub("^[^ ]+[ ][^ ]+[ ]", "", vert)
+
+## Connections
+
+int <- readLines(paste(tmp, sep="/", "s4.txt"))
+int <- int[grep("^Y", int)[1]:length(int)]
+int <- int[int != ""]
+
+fromto <- t(sapply(strsplit(int, "[ ]+"), "[", 1:2))
+highconf <- grep("confidence: high", int)
+highmed <- grep("confidence: low", int, invert=TRUE)
+
+## Classes
+
+class <-
+"Category,Description,Original MIPS category
+ E,energy production,energy
+ G,aminoacid metabolism,aminoacid metabolism
+ M,other metabolism,all remaining metabolism categories
+ P,translation,protein synthesis
+ T,transcription,\"transcription, but without subcategory 'transcriptional control'\"
+ B,transcriptional control,subcategory 'transcriptional control'
+ F,protein fate,\"protein fate (folding, modification, destination)\"
+ O,cellular organization,cellular transport and transport mechanisms
+ A,transport and sensing,categories 'transport facilitation' and 'regulation of / interaction with cellular environment'
+ R,stress and defense,\"cell rescue, defense and virulence\"
+ D,genome maintenance,DNA processing and cell cycle
+ C,cellular fate / organization,categories 'cell fate' and 'cellular communication / signal transduction' and 'control of cellular organization'
+ U,uncharacterized,categories 'not yet clear-cut' and 'uncharacterized'
+"
+
+classes <- read.csv(textConnection(class), header=TRUE, stringsAsFactors=FALSE)
+
+# Create the network
+
+yeast <- graph.data.frame(fromto[highmed,], directed=FALSE)
+yeast$name <- "Yeast protein interactions, von Mering et al."
+yeast$Citation <- "Comparative assessment of large-scale data sets of protein-protein interactions. Christian von Mering, Roland Krause, Berend Snel, Michael Cornell, Stephen G. Oliver, Stanley Fields and Peer Bork. Nature 417, 399-403 (2002)"
+yeast$Author <- "Christian von Mering, Roland Krause, Berend Snel, Michael Cornell, Stephen G. Oliver, Stanley Fields and Peer Bork"
+yeast$URL <- "http://www.nature.com/nature/journal/v417/n6887/full/nature750.html"
+yeast$Classes <- classes
+
+V(yeast)$Class <- vert12[,2][match(V(yeast)$name, vert12[,1])]
+V(yeast)$Description <- vert3[match(V(yeast)$name, vert12[,1])]
+
+E(yeast)$Confidence <- ifelse(grepl("confidence: high", int[highmed]),
+                              "high", "medium")
+
+save(yeast, file="/tmp/yeast.rda")
+
