@@ -93,16 +93,22 @@ void igraphmodule_Edge_dealloc(igraphmodule_EdgeObject* self) {
  */
 PyObject* igraphmodule_Edge_repr(igraphmodule_EdgeObject *self) {
   PyObject *s;
+  PyObject *attrs;
+
+  attrs = igraphmodule_Edge_attributes(self);
+  if (attrs == 0)
+    return NULL;
 
 #ifdef IGRAPH_PYTHON3
   s = PyUnicode_FromFormat("igraph.Edge(%R, %ld, %R)",
-      (PyObject*)self->gref, self->idx,
-      igraphmodule_Edge_attributes(self));
+      (PyObject*)self->gref, self->idx, attrs);
+  Py_DECREF(attrs);
 #else
   PyObject *grepr, *drepr;
 
   grepr=PyObject_Repr((PyObject*)self->gref);
-  drepr=PyObject_Repr(igraphmodule_Edge_attributes(self));
+  drepr=PyObject_Repr(attrs);
+  Py_DECREF(attrs);
   if (!grepr || !drepr) {
     Py_XDECREF(grepr);
     Py_XDECREF(drepr);

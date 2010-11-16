@@ -93,16 +93,22 @@ void igraphmodule_Vertex_dealloc(igraphmodule_VertexObject* self) {
  */
 PyObject* igraphmodule_Vertex_repr(igraphmodule_VertexObject *self) {
   PyObject *s;
+  PyObject *attrs;
+
+  attrs = igraphmodule_Vertex_attributes(self);
+  if (attrs == 0)
+    return NULL;
 
 #ifdef IGRAPH_PYTHON3
   s = PyUnicode_FromFormat("igraph.Vertex(%R, %ld, %R)",
-      (PyObject*)self->gref, self->idx,
-      igraphmodule_Vertex_attributes(self));
+      (PyObject*)self->gref, self->idx, attrs);
+  Py_DECREF(attrs);
 #else
   PyObject *grepr, *drepr;
 
   grepr=PyObject_Repr((PyObject*)self->gref);
   drepr=PyObject_Repr(igraphmodule_Vertex_attributes(self));
+  Py_DECREF(attrs);
   if (!grepr || !drepr) {
     Py_XDECREF(grepr);
     Py_XDECREF(drepr);
