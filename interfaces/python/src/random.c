@@ -114,7 +114,9 @@ unsigned long int igraph_rng_Python_get(void *state) {
     /* Fallback to the C random generator */
     return rand() * LONG_MAX;
   }
-  return PyInt_AsLong(result);
+  unsigned long int retval = PyInt_AsLong(result);
+  Py_DECREF(result);
+  return retval;
 }
 
 /**
@@ -129,7 +131,9 @@ igraph_real_t igraph_rng_Python_get_real(void *state) {
     /* Fallback to the C random generator */
     return rand();
   }
-  return PyFloat_AsDouble(result);
+  double retval = PyFloat_AsDouble(result);
+  Py_DECREF(result);
+  return retval;
 }
 
 /**
@@ -145,7 +149,9 @@ igraph_real_t igraph_rng_Python_get_norm(void *state) {
     /* Fallback to the C random generator */
     return 0;
   }
-  return PyFloat_AsDouble(result);
+  double retval = PyFloat_AsDouble(result);
+  Py_DECREF(result);
+  return retval;
 }
 
 /**

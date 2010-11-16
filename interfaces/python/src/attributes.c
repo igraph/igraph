@@ -1178,7 +1178,7 @@ static int igraphmodule_i_attribute_get_info(const igraph_t *graph,
     }
     if (t) {
       k=PyList_Size(keys);
-      igraph_vector_init(t, k);
+      igraph_vector_resize(t, k);
       for (j=0; j<k; j++) {
         int is_numeric = 1;
         int is_string = 1;

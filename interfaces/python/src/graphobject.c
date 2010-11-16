@@ -1493,10 +1493,14 @@ PyObject *igraphmodule_Graph_knn(igraphmodule_GraphObject *self,
   }
 
   knn_obj = igraphmodule_vector_t_to_PyList(&knn, IGRAPHMODULE_TYPE_FLOAT);
-  if (!knn_obj)
+  igraph_vector_destroy(&knn);
+  if (!knn_obj) {
+    igraph_vector_destroy(&knnk);
     return NULL;
+  }
 
   knnk_obj = igraphmodule_vector_t_to_PyList(&knnk, IGRAPHMODULE_TYPE_FLOAT);
+  igraph_vector_destroy(&knnk);
   if (!knnk_obj) {
     Py_DECREF(knn_obj);
     return NULL;
@@ -3419,17 +3423,10 @@ PyObject *igraphmodule_Graph_constraint(igraphmodule_GraphObject * self,
     return NULL;
   }
 
-  if (igraph_vector_init(&weights, 0)) {
-    igraphmodule_handle_igraph_error();
-    igraph_vector_destroy(&result);
-    return NULL;
-  }
-
   if (igraphmodule_PyObject_to_attribute_values(weight_obj, &weights,
                                                 self, ATTRHASH_IDX_EDGE,
                                                 1.0)) {
     igraph_vector_destroy(&result);
-    igraph_vector_destroy(&weights);
     return NULL;
   }
 
@@ -3526,10 +3523,12 @@ PyObject *igraphmodule_Graph_contract_vertices(igraphmodule_GraphObject * self,
 
   if (igraph_contract_vertices(&self->g, &mapping, &combination)) {
     igraph_attribute_combination_destroy(&combination);
+    igraph_vector_destroy(&mapping);
     return NULL;
   }
 
   igraph_attribute_combination_destroy(&combination);
+  igraph_vector_destroy(&mapping);
 
   Py_RETURN_NONE;
 }
@@ -3883,10 +3882,14 @@ PyObject *igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *
   from = (igraph_integer_t) from0;
 
   if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
-      ATTRIBUTE_TYPE_EDGE)) return NULL;
+      ATTRIBUTE_TYPE_EDGE)) {
+    igraph_vs_destroy(&to);
+    return NULL;
+  }
 
   if (igraph_vector_ptr_init(&res, 1)) {
     igraphmodule_handle_igraph_error();
+    igraph_vs_destroy(&to);
     if (weights) { igraph_vector_destroy(weights); free(weights); }
     return NULL;
   }
@@ -3895,10 +3898,12 @@ PyObject *igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *
         NULL, from, to, weights, mode)) {
     igraphmodule_handle_igraph_error();
     igraph_vector_ptr_destroy(&res);
+    igraph_vs_destroy(&to);
     if (weights) { igraph_vector_destroy(weights); free(weights); }
     return NULL;
   }
 
+  igraph_vs_destroy(&to);
   if (weights) { igraph_vector_destroy(weights); free(weights); }
 
   IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&res, igraph_vector_destroy);
@@ -4113,21 +4118,12 @@ PyObject *igraphmodule_Graph_personalized_pagerank(igraphmodule_GraphObject *sel
     }
   }
 
-  if (igraph_vector_init(&weights, 0)) {
-    igraph_vs_destroy(&vs);
-    if (rvsobj != Py_None) igraph_vs_destroy(&reset_vs);
-    if (reset) { igraph_vector_destroy(reset); free(reset); }
-    igraphmodule_handle_igraph_error();
-    return NULL;
-  }
-
   if (igraphmodule_PyObject_to_attribute_values(wobj, &weights,
                                                 self, ATTRHASH_IDX_EDGE,
                                                 1.0)) {
     igraph_vs_destroy(&vs);
     if (rvsobj != Py_None) igraph_vs_destroy(&reset_vs);
     if (reset) { igraph_vector_destroy(reset); free(reset); }
-    igraph_vector_destroy(&weights);
     return NULL;
   }
 
@@ -6150,10 +6146,9 @@ PyObject *igraphmodule_Graph_Read_DIMACS(PyTypeObject * type,
   igraphmodule_filehandle_destroy(&fobj);
 
   capacity_obj = igraphmodule_vector_t_to_PyList(&capacity, IGRAPHMODULE_TYPE_FLOAT);
-  if (!capacity_obj) {
-    igraph_vector_destroy(&capacity);
+  igraph_vector_destroy(&capacity);
+  if (!capacity_obj)
     return NULL;
-  }
 
   CREATE_GRAPH_FROM_TYPE(self, g, type);
 
@@ -8531,7 +8526,7 @@ PyObject *igraphmodule_Graph_cliques(igraphmodule_GraphObject * self,
     if (!item) {
       for (j = i; j < n; j++)
         igraph_vector_destroy((igraph_vector_t *) VECTOR(result)[j]);
-      igraph_vector_ptr_destroy(&result);
+      igraph_vector_ptr_destroy_all(&result);
       Py_DECREF(list);
       return NULL;
     }
@@ -8540,7 +8535,7 @@ PyObject *igraphmodule_Graph_cliques(igraphmodule_GraphObject * self,
     }
     igraph_vector_destroy(vec);
   }
-  igraph_vector_ptr_destroy(&result);
+  igraph_vector_ptr_destroy_all(&result);
 
   return list;
 }
@@ -8575,7 +8570,7 @@ PyObject *igraphmodule_Graph_largest_cliques(igraphmodule_GraphObject * self)
     if (!item) {
       for (j = i; j < n; j++)
         igraph_vector_destroy((igraph_vector_t *) VECTOR(result)[j]);
-      igraph_vector_ptr_destroy(&result);
+      igraph_vector_ptr_destroy_all(&result);
       Py_DECREF(list);
       return NULL;
     }
@@ -8584,7 +8579,7 @@ PyObject *igraphmodule_Graph_largest_cliques(igraphmodule_GraphObject * self)
     }
     igraph_vector_destroy(vec);
   }
-  igraph_vector_ptr_destroy(&result);
+  igraph_vector_ptr_destroy_all(&result);
 
   return list;
 }
@@ -8623,7 +8618,7 @@ PyObject *igraphmodule_Graph_maximal_cliques(igraphmodule_GraphObject * self,
     if (!item) {
       for (j = i; j < n; j++)
         igraph_vector_destroy((igraph_vector_t *) VECTOR(result)[j]);
-      igraph_vector_ptr_destroy(&result);
+      igraph_vector_ptr_destroy_all(&result);
       Py_DECREF(list);
       return NULL;
     }
@@ -8632,7 +8627,7 @@ PyObject *igraphmodule_Graph_maximal_cliques(igraphmodule_GraphObject * self,
     }
     igraph_vector_destroy(vec);
   }
-  igraph_vector_ptr_destroy(&result);
+  igraph_vector_ptr_destroy_all(&result);
 
   return list;
 }
@@ -8690,7 +8685,7 @@ PyObject *igraphmodule_Graph_independent_vertex_sets(igraphmodule_GraphObject
     if (!item) {
       for (j = i; j < n; j++)
         igraph_vector_destroy((igraph_vector_t *) VECTOR(result)[j]);
-      igraph_vector_ptr_destroy(&result);
+      igraph_vector_ptr_destroy_all(&result);
       Py_DECREF(list);
       return NULL;
     }
@@ -8699,7 +8694,7 @@ PyObject *igraphmodule_Graph_independent_vertex_sets(igraphmodule_GraphObject
     }
     igraph_vector_destroy(vec);
   }
-  igraph_vector_ptr_destroy(&result);
+  igraph_vector_ptr_destroy_all(&result);
 
   return list;
 }
@@ -8736,7 +8731,7 @@ PyObject
     if (!item) {
       for (j = i; j < n; j++)
         igraph_vector_destroy((igraph_vector_t *) VECTOR(result)[j]);
-      igraph_vector_ptr_destroy(&result);
+      igraph_vector_ptr_destroy_all(&result);
       Py_DECREF(list);
       return NULL;
     }
@@ -8745,7 +8740,7 @@ PyObject
     }
     igraph_vector_destroy(vec);
   }
-  igraph_vector_ptr_destroy(&result);
+  igraph_vector_ptr_destroy_all(&result);
 
   return list;
 }
@@ -8782,7 +8777,7 @@ PyObject
     if (!item) {
       for (j = i; j < n; j++)
         igraph_vector_destroy((igraph_vector_t *) VECTOR(result)[j]);
-      igraph_vector_ptr_destroy(&result);
+      igraph_vector_ptr_destroy_all(&result);
       Py_DECREF(list);
       return NULL;
     }
@@ -8791,7 +8786,7 @@ PyObject
     }
     igraph_vector_destroy(vec);
   }
-  igraph_vector_ptr_destroy(&result);
+  igraph_vector_ptr_destroy_all(&result);
 
   return list;
 }
