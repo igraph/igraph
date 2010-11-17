@@ -53,5 +53,3 @@ m4_include([arpack.at])
 m4_include([bipartite.at])
 m4_include([centralization.at])
 m4_include([separators.at])
-m4_include([eigen.at])
-

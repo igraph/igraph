@@ -362,14 +362,8 @@ int igraph_i_eigen_matrix_symmetric_lapack(const igraph_matrix_t *A,
 
   if (A) {
     n=igraph_matrix_nrow(A);
-    if (n != igraph_matrix_ncol(A)) {
-      IGRAPH_ERROR("Invalid matrix", IGRAPH_NONSQUARE);
-    }
   } else if (sA) {
     n=igraph_sparsemat_nrow(sA);
-    if (n != igraph_sparsemat_nrow(sA)) {
-      IGRAPH_ERROR("Invalid matrix", IGRAPH_NONSQUARE);
-    }
     IGRAPH_CHECK(igraph_sparsemat_as_matrix(&mA, sA));
     IGRAPH_FINALLY(igraph_matrix_destroy, &mA);
     myA=&mA;
@@ -426,6 +420,46 @@ int igraph_i_eigen_matrix_symmetric_lapack(const igraph_matrix_t *A,
 
   return 0;
 }
+
+int igraph_i_eigen_matrix_symmetric_arpack(const igraph_matrix_t *A, 
+			   const igraph_sparsemat_t *sA, 
+			   const igraph_arpack_function_t *fun, 
+			   int n, void *extra,
+			   const igraph_eigen_which_t *which, 
+			   igraph_arpack_options_t *options,
+			   igraph_vector_t *values, 
+			   igraph_matrix_t *vectors) {
+  
+  /* For ARPACK we need a matrix multiplication operation.
+     This can be done in any format, so everything is fine, 
+     we don't have to convert. */
+
+  IGRAPH_ERROR("ARPACK solver not implemented yet", IGRAPH_UNIMPLEMENTED);
+
+  switch (which->pos) {
+  case IGRAPH_EIGEN_LM:
+  case IGRAPH_EIGEN_SM:
+  case IGRAPH_EIGEN_LA:
+  case IGRAPH_EIGEN_SA:
+  case IGRAPH_EIGEN_BE:
+    /* TODO */
+    break;
+  case IGRAPH_EIGEN_ALL:
+    /* TODO */
+    break;
+  case IGRAPH_EIGEN_INTERVAL:
+    /* TODO */
+    break;
+  case IGRAPH_EIGEN_SELECT:
+    /* TODO */
+    break;
+  default:
+    /* This cannot happen */
+    break;
+  }
+
+  return 0;
+}
 					   
 /** 
  * \function igraph_eigen_matrix_symmetric
@@ -439,7 +473,6 @@ int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
 				  igraph_eigen_algorithm_t algorithm,
 				  const igraph_eigen_which_t *which,
 				  igraph_arpack_options_t *options,
-				  igraph_arpack_storage_t *storage,
 				  igraph_vector_t *values, 
 				  igraph_matrix_t *vectors) {
 
@@ -460,6 +493,18 @@ int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
       which->pos != IGRAPH_EIGEN_SELECT) {
     IGRAPH_ERROR("Invalid 'pos' position in 'which'", IGRAPH_EINVAL);
   }
+
+  if (A) {
+    n=igraph_matrix_nrow(A);
+    if (n != igraph_matrix_ncol(A)) {
+      IGRAPH_ERROR("Invalid matrix", IGRAPH_NONSQUARE);
+    }
+  } else if (sA) {
+    n=igraph_sparsemat_nrow(sA);
+    if (n != igraph_sparsemat_nrow(sA)) {
+      IGRAPH_ERROR("Invalid matrix", IGRAPH_NONSQUARE);
+    }
+  }
   
   switch (algorithm) {
   case IGRAPH_EIGEN_AUTO:
@@ -474,9 +519,10 @@ int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
 							vectors));
     break;
   case IGRAPH_EIGEN_ARPACK:
-    IGRAPH_ERROR("'ARPACK' algorithm not implemented yet", 
-		 IGRAPH_UNIMPLEMENTED);
-    /* TODO */
+    n = fun ? options->n : 0;
+    IGRAPH_CHECK(igraph_i_eigen_matrix_symmetric_arpack(A, sA, fun, n, extra,
+							which, options, 
+							values, vectors));
     break;
   case IGRAPH_EIGEN_COMP_AUTO:
     IGRAPH_ERROR("'COMP_AUTO' algorithm not implemented yet", 
@@ -512,7 +558,6 @@ int igraph_eigen_matrix(const igraph_matrix_t *A,
 			igraph_eigen_algorithm_t algorithm,
 			const igraph_eigen_which_t *which,
 			igraph_arpack_options_t *options,
-			igraph_arpack_storage_t *storage,
 			igraph_vector_complex_t *values,
 			igraph_matrix_complex_t *vectors) {
   
@@ -530,7 +575,6 @@ int igraph_eigen_adjacency(const igraph_t *graph,
 			   igraph_eigen_algorithm_t algorithm,
 			   const igraph_eigen_which_t *which,
 			   igraph_arpack_options_t *options,
-			   igraph_arpack_storage_t *storage,
 			   igraph_vector_t *values,
 			   igraph_matrix_t *vectors,
 			   igraph_vector_complex_t *cmplxvalues,
@@ -550,7 +594,6 @@ int igraph_eigen_laplacian(const igraph_t *graph,
 			   igraph_eigen_algorithm_t algorithm,
 			   const igraph_eigen_which_t *which,
 			   igraph_arpack_options_t *options,
-			   igraph_arpack_storage_t *storage,
 			   igraph_vector_t *values,
 			   igraph_matrix_t *vectors,
 			   igraph_vector_complex_t *cmplxvalues,
