@@ -35,7 +35,7 @@ def test():
         import testoob
         testoob.main(suite())
     except ImportError:
-        runner = unittest.TextTestRunner(verbosity=2)
+        runner = unittest.TextTestRunner(verbosity=1)
         runner.run(suite())
 
 if __name__ == "__main__": test()
