@@ -144,7 +144,8 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 					 igraph_vector_t *membership,
 					 igraph_integer_t steps,
 					 igraph_arpack_options_t *options, 
-					 igraph_real_t *modularity);
+					 igraph_real_t *modularity,
+					 igraph_bool_t start);
 
 int igraph_community_label_propagation(const igraph_t *graph,
                                        igraph_vector_t *membership,

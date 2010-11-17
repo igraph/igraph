@@ -1004,7 +1004,10 @@ int igraph_i_community_leading_eigenvector(igraph_real_t *to,
  * \param membership The membership of the vertices after all the
  *    splits were performed will be stored here. The vector must be
  *    initialized  before calling and will be resized as needed.
- *    This argument is ignored if it is \c NULL.
+ *    This argument is ignored if it is \c NULL. This argument can 
+ *    also be used to supply a starting configuration for the community 
+ *    finding, in the format of a membership vector. In this case the 
+ *    \p start argument must be set to 1.
  * \param steps The maximum number of steps to perform. It might
  *    happen that some component (or the whole network) has no
  *    underlying community structure and no further steps can be
@@ -1015,6 +1018,8 @@ int igraph_i_community_leading_eigenvector(igraph_real_t *to,
  * \param modularity If not a null pointer, then it must be a pointer
  *    to a real number and the modularity score of the final division
  *    is stored here.
+ * \param start Boolean, whether to use the community structure given 
+ *    in the \p membership argument as a starting point.
  * \return Error code.
  * 
  * \sa \ref igraph_community_walktrap() and \ref
@@ -1031,7 +1036,8 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 					 igraph_vector_t *membership,
 					 igraph_integer_t steps,
 					 igraph_arpack_options_t *options, 
-					 igraph_real_t *modularity) {
+					 igraph_real_t *modularity,
+					 igraph_bool_t start) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
@@ -1045,16 +1051,27 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   igraph_vector_t vmembership, *mymembership=membership;
   igraph_i_community_leading_eigenvector_data_t extra;
   igraph_arpack_storage_t storage;
+
+  if (start && !membership) { 
+    IGRAPH_ERROR("Cannot start from given configuration if memberships "
+		 "missing", IGRAPH_EINVAL);
+  }
   
+  if (start && membership && 
+      igraph_vector_size(membership) != no_of_nodes) {
+    IGRAPH_ERROR("Wrong length for vector of predefined memberships", 
+		 IGRAPH_EINVAL);
+  }
+
+  if (start && membership && igraph_vector_max(membership) >= no_of_nodes) {
+    IGRAPH_WARNING("Too many communities in membership start vector");
+  }
+
   if (igraph_is_directed(graph)) {
     IGRAPH_WARNING("This method was developed for undirected graphs");
   }
   
   if (steps < 0 || steps > no_of_nodes-1) {
-    steps=no_of_nodes-1;
-  }
-  
-  if (steps > no_of_nodes-1) {
     steps=no_of_nodes-1;
   }
   
@@ -1065,23 +1082,35 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   
   IGRAPH_VECTOR_INIT_FINALLY(&mymerges, 0);
   IGRAPH_CHECK(igraph_vector_reserve(&mymerges, steps*2));
-
-  /* Calculate the weakly connected components in the graph and use them as
-   * an initial split */
   IGRAPH_VECTOR_INIT_FINALLY(&idx, 0);
-  IGRAPH_CHECK(igraph_clusters(graph, mymembership, &idx, 0, IGRAPH_WEAK));
+
+  if (!start) {
+    /* Calculate the weakly connected components in the graph and use them as
+     * an initial split */
+    IGRAPH_CHECK(igraph_clusters(graph, mymembership, &idx, 0, IGRAPH_WEAK));
+    communities = igraph_vector_size(&idx);
+  } else {
+    /* Just create the idx vector for the given membership vector */
+    communities=igraph_vector_max(mymembership)+1;
+    IGRAPH_CHECK(igraph_vector_resize(&idx, communities));
+    igraph_vector_null(&idx);
+    for (i=0; i<no_of_nodes; i++) {
+      int t=VECTOR(*mymembership)[i];
+      VECTOR(idx)[t] += 1;
+    }
+  }
+
   IGRAPH_DQUEUE_INIT_FINALLY(&tosplit, 100);
-  for (i = 0; i < igraph_vector_size(&idx); i++) {
+  for (i = 0; i < communities; i++) {
     if (VECTOR(idx)[i] > 1) {
       igraph_dqueue_push(&tosplit, i);
     }
   }
-  for (i = 1; i < igraph_vector_size(&idx); i++) {
+  for (i=1; i<communities; i++) {
     /* Record merge */
     IGRAPH_CHECK(igraph_vector_push_back(&mymerges, i-1));
     IGRAPH_CHECK(igraph_vector_push_back(&mymerges, i));
   }
-  communities = igraph_vector_size(&idx);
   staken = communities - 1;
 
   IGRAPH_VECTOR_INIT_FINALLY(&tmp, no_of_nodes);

@@ -81,8 +81,9 @@ int main() {
   igraph_vector_init(&x, 0);
   igraph_arpack_options_init(&options);
 
-  igraph_community_leading_eigenvector(&g, &merges, &membership, 1, &options, 
-				       /*modularity=*/ 0);
+  igraph_community_leading_eigenvector(&g, &merges, &membership, 1, 
+				       &options, /*modularity=*/ 0, 
+				       /*start=*/ 0);
 
   print_matrix(&merges);
   print_vector(&membership);
@@ -92,7 +93,8 @@ int main() {
   /* Make all the steps */
   igraph_community_leading_eigenvector(&g, &merges, &membership, 
 				       igraph_vcount(&g),
-				       &options, /*modularity=*/ 0);
+				       &options, /*modularity=*/ 0, 
+				       /*start=*/ 0);
 
   print_matrix(&merges);
   print_vector(&membership);

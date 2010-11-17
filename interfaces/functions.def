@@ -1042,11 +1042,11 @@ igraph_community_leading_eigenvector:
         PARAMS: GRAPH graph, OUT MATRIX merges, OUT VECTOR membership, \
                 INTEGER steps=-1, \
                 INOUT ARPACKOPT options=igraph.arpack.default, \
-                OUT REALPTR modularity
+                OUT REALPTR modularity, BOOLEAN start=False
         DEFAULT-R: options=igraph.arpack.default
         CLASS-R: igraph.eigenc
         NAME-R: leading.eigenvector.community
-        IGNORE: RR
+        IGNORE: RR, RC
 
 igraph_community_label_propagation:
         PARAMS: GRAPH graph, OUT VECTOR membership, EDGEWEIGHTS weights=NULL, \

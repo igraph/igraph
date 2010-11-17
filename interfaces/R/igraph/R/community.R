@@ -426,16 +426,19 @@ community.to.membership <- function(graph, merges, steps, membership=TRUE,
         PACKAGE="igraph")
 }
 
-leading.eigenvector.community <- function(graph, steps=-1, options=igraph.arpack.default) {
+leading.eigenvector.community <- function(graph, steps=-1, start=NULL,
+                                          options=igraph.arpack.default) {
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
   steps <- as.numeric(steps)
+  if (!is.null(start)) { start <- as.numeric(start)-1 }
   options.tmp <- igraph.arpack.default; options.tmp[ names(options) ] <- options ; options <- options.tmp
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
-  res <- .Call("R_igraph_community_leading_eigenvector", graph, steps, options,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_community_leading_eigenvector", graph, steps,
+               options, start,
+               PACKAGE="igraph")
   res$algorithm <- "leading eigenvector"
   res$vcount <- vcount(graph)
   res$membership <- res$membership + 1
