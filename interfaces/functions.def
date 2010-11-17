@@ -1048,26 +1048,6 @@ igraph_community_leading_eigenvector:
         NAME-R: leading.eigenvector.community
         IGNORE: RR
 
-igraph_community_leading_eigenvector_naive:
-        PARAMS: GRAPH graph, OUT MATRIX merges, OUT VECTOR membership, \
-                INTEGER steps=-1, \
-                INOUT ARPACKOPT options=igraph.arpack.default, \
-                OUT REALPTR modularity
-        DEFAULT-R: options=igraph.arpack.default
-        CLASS-R: igraph.eigenc
-        NAME-R: leading.eigenvector.community.naive
-        IGNORE: RR
-
-igraph_community_leading_eigenvector_step:
-        PARAMS: GRAPH graph, INOUT VECTOR membership, INTEGER community, \
-                OUT BOOLEANPTR split, OUT VECTOR_OR_0 eigenvector, \
-                OUT REALPTR eigenvalue, INOUT ARPACKOPT options=igraph.arpack.default, \
-                NULL storage
-        DEFAULT-R: options=igraph.arpack.default
-        NAME-R: leading.eigenvector.community.step
-        CLASS-R: igraph.eigencstep
-        IGNORE: RR
-
 igraph_community_label_propagation:
         PARAMS: GRAPH graph, OUT VECTOR membership, EDGEWEIGHTS weights=NULL, \
                 VECTOR_OR_0 initial=NULL, VECTOR_BOOL_OR_0 fixed=NULL, \
