@@ -158,18 +158,29 @@ class Histogram(object):
 
     def __str__(self):
         """Returns the string representation of the histogram"""
-        if self._min is None or self._max is None: return "N = 0"
-        num_length = max(len("%.3f" % self._min), \
-                         len("%.3f" % self._max))
-        format_string = "[%%%d.3f, %%%d.3f): %%s" % (num_length, num_length)
+        if self._min is None or self._max is None:
+            return "N = 0"
+
+        # Determine how many decimal digits should we use
+        if int(self._min) == self._min and int(self._bin_width) == self._bin_width:
+            number_format = "%d"
+        else:
+            number_format = "%.3f"
+        num_length = max(len(number_format % self._min), \
+                         len(number_format % self._max))
+        number_format = "%" + str(num_length) + number_format[1:]
+        format_string = "[%s, %s): %%s" % (number_format, number_format)
+
         maxval = max(self._bins)
         scale = maxval // (70-2*num_length)
-        if scale<1: scale = 1
+        if scale < 1:
+            scale = 1
 
         result=["N = %d, mean +- sd: %.4f +- %.4f " % \
             (self.n, self.mean, self.sd)]
 
-        if scale>1: result.append("Each * represents %d items" % scale)
+        if scale > 1:
+            result.append("Each * represents %d items" % scale)
 
         for left, right, cnt in self.bins():
             cnt //= scale
