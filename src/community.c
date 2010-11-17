@@ -1037,7 +1037,8 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 					 igraph_integer_t steps,
 					 igraph_arpack_options_t *options, 
 					 igraph_real_t *modularity,
-					 igraph_bool_t start) {
+					 igraph_bool_t start,
+					 igraph_vector_t *eigenvalues) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
@@ -1083,6 +1084,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   IGRAPH_VECTOR_INIT_FINALLY(&mymerges, 0);
   IGRAPH_CHECK(igraph_vector_reserve(&mymerges, steps*2));
   IGRAPH_VECTOR_INIT_FINALLY(&idx, 0);
+  if (eigenvalues) { igraph_vector_clear(eigenvalues); }
 
   if (!start) {
     /* Calculate the weakly connected components in the graph and use them as
@@ -1110,6 +1112,9 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     /* Record merge */
     IGRAPH_CHECK(igraph_vector_push_back(&mymerges, i-1));
     IGRAPH_CHECK(igraph_vector_push_back(&mymerges, i));
+    if (eigenvalues) { 
+      IGRAPH_CHECK(igraph_vector_push_back(eigenvalues, IGRAPH_NAN));
+    }
   }
   staken = communities - 1;
 
@@ -1211,6 +1216,9 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     /* Record merge */
     IGRAPH_CHECK(igraph_vector_push_back(&mymerges, comm));
     IGRAPH_CHECK(igraph_vector_push_back(&mymerges, communities-1));
+    if (eigenvalues) {
+      IGRAPH_CHECK(igraph_vector_push_back(eigenvalues, storage.d[0]));
+    }
 
     /* Store the resulting communities in the queue if needed */
     if (l > 1) {

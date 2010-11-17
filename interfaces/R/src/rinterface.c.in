@@ -8002,7 +8002,8 @@ SEXP R_igraph_dfs(SEXP graph, SEXP proot, SEXP pneimode, SEXP punreachable,
   return result;
 }
 
-SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps, SEXP options, SEXP pstart) {
+SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps, 
+					    SEXP options, SEXP pstart) {
                                         /* Declarations */
   igraph_t c_graph;
   igraph_matrix_t c_merges;
@@ -8011,9 +8012,11 @@ SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps, SEXP options
   igraph_bool_t c_start=!isNull(pstart);
   igraph_arpack_options_t c_options;
   igraph_real_t c_modularity;
+  igraph_vector_t c_eigenvalues;
   SEXP merges;
   SEXP membership;
   SEXP modularity;
+  SEXP eigenvalues;
   int c_result;
   SEXP result, names;
 
@@ -8034,12 +8037,18 @@ SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps, SEXP options
   IGRAPH_FINALLY(igraph_vector_destroy, &c_membership);
   c_steps=REAL(steps)[0];
   R_SEXP_to_igraph_arpack_options(options, &c_options);
+  if (0 != igraph_vector_init(&c_eigenvalues, 0)) {
+  igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM);
+  }
                                         /* Call igraph */
-  c_result=igraph_community_leading_eigenvector(&c_graph, &c_merges, &c_membership, c_steps, &c_options, &c_modularity, c_start);
+  c_result=igraph_community_leading_eigenvector(&c_graph, &c_merges, 
+						&c_membership, c_steps, 
+						&c_options, &c_modularity, 
+						c_start, &c_eigenvalues);
 
                                         /* Convert output */
-  PROTECT(result=NEW_LIST(4));
-  PROTECT(names=NEW_CHARACTER(4));
+  PROTECT(result=NEW_LIST(5));
+  PROTECT(names=NEW_CHARACTER(5));
   PROTECT(merges=R_igraph_matrix_to_SEXP(&c_merges)); 
   igraph_matrix_destroy(&c_merges); 
   IGRAPH_FINALLY_CLEAN(1);
@@ -8049,16 +8058,20 @@ SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps, SEXP options
   PROTECT(options=R_igraph_arpack_options_to_SEXP(&c_options));
   PROTECT(modularity=NEW_NUMERIC(1)); 
   REAL(modularity)[0]=c_modularity;
+  PROTECT(eigenvalues=R_igraph_vector_to_SEXP(&c_eigenvalues));
+  igraph_vector_destroy(&c_eigenvalues);
   SET_VECTOR_ELT(result, 0, merges);
   SET_VECTOR_ELT(result, 1, membership);
   SET_VECTOR_ELT(result, 2, options);
   SET_VECTOR_ELT(result, 3, modularity);
+  SET_VECTOR_ELT(result, 4, eigenvalues);
   SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("merges"));
   SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("membership"));
   SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("options"));
   SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("modularity"));
+  SET_STRING_ELT(names, 4, CREATE_STRING_VECTOR("eigenvalues"));
   SET_NAMES(result, names);
-  UNPROTECT(5);
+  UNPROTECT(6);
 
   R_igraph_after();
 
