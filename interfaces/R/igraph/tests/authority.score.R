@@ -32,6 +32,36 @@ g3 <- graph.ring(100)
 all(authority.score(g3)$vector == 1)
 all(hub.score(g3)$vector == 1)
 
+## Stress-test
 
+is.principal <- function(M, lambda, eps=1e-12) {
+  abs(eigen(M)$values[1] - lambda) < eps
+}
 
+is.ev <- function(M, v, lambda, eps=1e-12) {
+  max(abs(M %*% v - lambda * v)) < eps
+}
 
+is.good <- function(M, v, lambda, eps=1e-12) {
+  is.principal(M, lambda, eps) && is.ev(M, v, lambda, eps)
+}
+
+for (i in 1:1000) {
+  G <- erdos.renyi.game(10, sample(1:20, 1), type="gnm")
+  as <- authority.score(G)
+  M <- get.adjacency(G)
+  if (!is.good(t(M) %*% M, as$vector, as$value)) {
+    print("Foobar!")
+    break
+  }
+}
+
+for (i in 1:1000) {
+  G <- erdos.renyi.game(10, sample(1:20, 1), type="gnm")
+  hs <- hub.score(G)
+  M <- get.adjacency(G)
+  if (!is.good(M %*% t(M), hs$vector, hs$value)) {
+    print("Foobar!")
+    break
+  }
+}
