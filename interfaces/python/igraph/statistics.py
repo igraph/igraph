@@ -156,8 +156,18 @@ class Histogram(object):
         # Draw the axes
         c.plot()
 
-    def __str__(self):
-        """Returns the string representation of the histogram"""
+    def to_string(self, max_width=78, show_bars=True, show_counts=True):
+        """Returns the string representation of the histogram.
+
+        @param max_width: the maximal width of each line of the string
+          This value may not be obeyed if it is too small.
+        @param show_bars: specify whether the histogram bars should be shown
+        @param show_counts: specify whether the histogram counts should be
+          shown. If both I{show_bars} and I{show_counts} are C{False},
+          only a general descriptive statistics (number of elements, mean and
+          standard deviation) is shown.
+        """
+
         if self._min is None or self._max is None:
             return "N = 0"
 
@@ -171,22 +181,39 @@ class Histogram(object):
         number_format = "%" + str(num_length) + number_format[1:]
         format_string = "[%s, %s): %%s" % (number_format, number_format)
 
-        maxval = max(self._bins)
-        scale = maxval // (70-2*num_length)
-        if scale < 1:
-            scale = 1
+        # Calculate the scale of the bars on the histogram
+        if show_bars:
+            maxval = max(self._bins)
+            if show_counts:
+                maxval_length = len(str(maxval))
+                scale = maxval // (max_width-2*num_length-maxval_length-9)
+            else:
+                scale = maxval // (max_width-2*num_length-6)
+            scale = max(scale, 1)
 
         result=["N = %d, mean +- sd: %.4f +- %.4f " % \
             (self.n, self.mean, self.sd)]
 
-        if scale > 1:
-            result.append("Each * represents %d items" % scale)
-
-        for left, right, cnt in self.bins():
-            cnt //= scale
-            result.append(format_string % (left, right, '*'*cnt))
+        if show_bars:
+            # Print the bars
+            if scale > 1:
+                result.append("Each * represents %d items" % scale)
+            if show_counts:
+                format_string += " (%d)"
+                for left, right, cnt in self.bins():
+                    result.append(format_string % (left, right, '*'*(cnt//scale), cnt))
+            else:
+                for left, right, cnt in self.bins():
+                    result.append(format_string % (left, right, '*'*(cnt//scale)))
+        elif show_counts:
+            # Print the counts only
+            for left, right, cnt in self.bins():
+                result.append(format_string % (left, right, cnt))
 
         return "\n".join(result)
+
+    def __str__(self):
+        return self.to_string()
 
 
 
