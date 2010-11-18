@@ -83,7 +83,8 @@ int main() {
 
   igraph_community_leading_eigenvector(&g, &merges, &membership, 1, 
 				       &options, /*modularity=*/ 0, 
-				       /*start=*/ 0);
+				       /*start=*/ 0, /*eigenvalues=*/ 0, 
+				       /*history=*/ 0);
 
   print_matrix(&merges);
   print_vector(&membership);
@@ -94,7 +95,8 @@ int main() {
   igraph_community_leading_eigenvector(&g, &merges, &membership, 
 				       igraph_vcount(&g),
 				       &options, /*modularity=*/ 0, 
-				       /*start=*/ 0);
+				       /*start=*/ 0, /*eigenvalues=*/ 0,
+				       /*history=*/ 0);
 
   print_matrix(&merges);
   print_vector(&membership);
