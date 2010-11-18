@@ -7354,10 +7354,12 @@ SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps,
   igraph_arpack_options_t c_options;
   igraph_real_t c_modularity;
   igraph_vector_t c_eigenvalues;
+  igraph_vector_t c_history;
   SEXP merges;
   SEXP membership;
   SEXP modularity;
   SEXP eigenvalues;
+  SEXP history;
   int c_result;
   SEXP result, names;
                                         /* Convert input */
@@ -7379,15 +7381,19 @@ SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps,
   if (0 != igraph_vector_init(&c_eigenvalues, 0)) {
   igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM);
   }
+  if (0 != igraph_vector_init(&c_history, 0)) {
+  igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM);
+  }
                                         /* Call igraph */
   c_result=igraph_community_leading_eigenvector(&c_graph, &c_merges, 
 						&c_membership, c_steps, 
 						&c_options, &c_modularity, 
-						c_start, &c_eigenvalues);
+						c_start, &c_eigenvalues, 
+						&c_history);
 
                                         /* Convert output */
-  PROTECT(result=NEW_LIST(5));
-  PROTECT(names=NEW_CHARACTER(5));
+  PROTECT(result=NEW_LIST(6));
+  PROTECT(names=NEW_CHARACTER(6));
   PROTECT(merges=R_igraph_matrix_to_SEXP(&c_merges)); 
   igraph_matrix_destroy(&c_merges); 
   IGRAPH_FINALLY_CLEAN(1);
@@ -7399,19 +7405,23 @@ SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps,
   REAL(modularity)[0]=c_modularity;
   PROTECT(eigenvalues=R_igraph_vector_to_SEXP(&c_eigenvalues));
   igraph_vector_destroy(&c_eigenvalues);
+  PROTECT(history=R_igraph_vector_to_SEXP(&c_history));
+  igraph_vector_destroy(&c_history);
   SET_VECTOR_ELT(result, 0, merges);
   SET_VECTOR_ELT(result, 1, membership);
   SET_VECTOR_ELT(result, 2, options);
   SET_VECTOR_ELT(result, 3, modularity);
   SET_VECTOR_ELT(result, 4, eigenvalues);
+  SET_VECTOR_ELT(result, 5, history);
   SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("merges"));
   SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("membership"));
   SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("options"));
   SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("modularity"));
   SET_STRING_ELT(names, 4, CREATE_STRING_VECTOR("eigenvalues"));
+  SET_STRING_ELT(names, 5, CREATE_STRING_VECTOR("history"));
   SET_NAMES(result, names);
 
-  UNPROTECT(6);
+  UNPROTECT(7);
 
   UNPROTECT(1);
   return(result);

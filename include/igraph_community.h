@@ -139,6 +139,12 @@ int igraph_modularity(const igraph_t *graph,
 int igraph_reindex_membership(igraph_vector_t *membership,
                               igraph_vector_t *new_to_old);
 
+typedef enum { IGRAPH_LEVC_HIST_SPLIT=1,
+	       IGRAPH_LEVC_HIST_FAILED,
+	       IGRAPH_LEVC_HIST_START_FULL,
+	       IGRAPH_LEVC_HIST_START_GIVEN
+} igraph_leading_eigenvector_community_history_t;
+
 int igraph_community_leading_eigenvector(const igraph_t *graph,
 					 igraph_matrix_t *merges,
 					 igraph_vector_t *membership,
@@ -146,7 +152,8 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 					 igraph_arpack_options_t *options, 
 					 igraph_real_t *modularity,
 					 igraph_bool_t start,
-					 igraph_vector_t *eigenvalues);
+					 igraph_vector_t *eigenvalues,
+					 igraph_vector_t *history);
 
 int igraph_community_label_propagation(const igraph_t *graph,
                                        igraph_vector_t *membership,

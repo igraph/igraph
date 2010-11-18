@@ -1012,7 +1012,7 @@ int igraph_i_community_leading_eigenvector(igraph_real_t *to,
  * \param steps The maximum number of steps to perform. It might
  *    happen that some component (or the whole network) has no
  *    underlying community structure and no further steps can be
- *    done. If you wany as many steps as possible then supply the 
+ *    done. If you want as many steps as possible then supply the 
  *    number of vertices in the network here.
  * \param options The options for ARPACK. \c n is always
  *    overwritten. \c ncv is set to at least 4.
@@ -1021,6 +1021,33 @@ int igraph_i_community_leading_eigenvector(igraph_real_t *to,
  *    is stored here.
  * \param start Boolean, whether to use the community structure given 
  *    in the \p membership argument as a starting point.
+ * \param eigenvalues Pointer to an initialized vector or a null
+ *    pointer. If not a null pointer, then the eigenvalues calculated
+ *    along the community structure detection are stored here. The
+ *    non-positive eigenvalues, that do not result a split, are stored
+ *    as well.
+ * \param history Pointer to an initialized vector or a null pointer. 
+ *    If not a null pointer, then a trace of the algorithm is stored
+ *    here, encoded numerically. The various operations:
+ *    \clist
+ *    \cli IGRAPH_LEVC_HIST_START_FULL
+ *      Start the algorithm from an initial state where each connected
+ *      component is a separate community.
+ *    \cli IGRAPH_LEVC_HIST_START_GIVEN
+ *      Start the algorithm from a given community structure. The next
+ *      value in the vector contains the initial number of
+ *      communities.
+ *    \cli IGRAPH_LEVC_HIST_SPLIT
+ *      Split a community into two communities. The id of the splitted
+ *      community is given in the next element of the history vector. 
+ *      The id of the first new community is the same as the id of the
+ *      splitted community. The id of the second community equals to
+ *      the number of communities before the split.
+ *    \cli IGRAPH_LEVC_HIST_FAILED
+ *      Tried to split a community, but it was not worth it, as it
+ *      does not result in a bigger modularity value. The id of the
+ *      community is given in the next element of the vector.
+ *    \endclist
  * \return Error code.
  * 
  * \sa \ref igraph_community_walktrap() and \ref
@@ -1039,7 +1066,8 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 					 igraph_arpack_options_t *options, 
 					 igraph_real_t *modularity,
 					 igraph_bool_t start,
-					 igraph_vector_t *eigenvalues) {
+					 igraph_vector_t *eigenvalues,
+					 igraph_vector_t *history) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
@@ -1085,7 +1113,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   IGRAPH_VECTOR_INIT_FINALLY(&mymerges, 0);
   IGRAPH_CHECK(igraph_vector_reserve(&mymerges, steps*2));
   IGRAPH_VECTOR_INIT_FINALLY(&idx, 0);
-  if (eigenvalues) { igraph_vector_clear(eigenvalues); }
+  if (eigenvalues)  { igraph_vector_clear(eigenvalues);      }
 
   IGRAPH_STATUS("Starting leading eigenvector method.\n", 0);
 
@@ -1094,12 +1122,21 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
      * an initial split */
     IGRAPH_CHECK(igraph_clusters(graph, mymembership, &idx, 0, IGRAPH_WEAK));
     communities = igraph_vector_size(&idx);
-    IGRAPH_STATUSF(("Starting from %li components.\n", 0, communities));
+    IGRAPH_STATUSF(("Starting from %li component(s).\n", 0, communities));
+    if (history) { 
+      IGRAPH_CHECK(igraph_vector_push_back(history, 
+					   IGRAPH_LEVC_HIST_START_FULL));
+    }
   } else {
     /* Just create the idx vector for the given membership vector */
     communities=igraph_vector_max(mymembership)+1;
     IGRAPH_STATUSF(("Starting from given membership vector with %li "
 		    "communities.\n", 0, communities));
+    if (history) { 
+      IGRAPH_CHECK(igraph_vector_push_back(history, 
+					   IGRAPH_LEVC_HIST_START_GIVEN));
+      IGRAPH_CHECK(igraph_vector_push_back(history, communities));
+    }
     IGRAPH_CHECK(igraph_vector_resize(&idx, communities));
     igraph_vector_null(&idx);
     for (i=0; i<no_of_nodes; i++) {
@@ -1120,6 +1157,10 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_push_back(&mymerges, i));
     if (eigenvalues) { 
       IGRAPH_CHECK(igraph_vector_push_back(eigenvalues, IGRAPH_NAN));
+    }
+    if (history) {
+      IGRAPH_CHECK(igraph_vector_push_back(history, IGRAPH_LEVC_HIST_SPLIT));
+      IGRAPH_CHECK(igraph_vector_push_back(history, i-1));
     }
   }
   staken = communities - 1;
@@ -1198,8 +1239,18 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 /*     printf("%f\n", storage.d[0]); */
 /*     for (j=0; j<size; j++) { printf("%g ", storage.v[j]); } */
 /*     printf("\n"); */
+
+    if (eigenvalues) {
+      IGRAPH_CHECK(igraph_vector_push_back(eigenvalues, storage.d[0]));
+    }
+
     if (storage.d[0] <= 0.00001) { 
       IGRAPH_STATUS("no split.\n", 0);
+      if (history) { 
+	IGRAPH_CHECK(igraph_vector_push_back(history, 
+					     IGRAPH_LEVC_HIST_FAILED));
+	IGRAPH_CHECK(igraph_vector_push_back(history, comm));
+      }					     
       continue; 
     }
     IGRAPH_STATUS("split.\n", 0);
@@ -1227,8 +1278,9 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     /* Record merge */
     IGRAPH_CHECK(igraph_vector_push_back(&mymerges, comm));
     IGRAPH_CHECK(igraph_vector_push_back(&mymerges, communities-1));
-    if (eigenvalues) {
-      IGRAPH_CHECK(igraph_vector_push_back(eigenvalues, storage.d[0]));
+    if (history) {
+      IGRAPH_CHECK(igraph_vector_push_back(history, IGRAPH_LEVC_HIST_SPLIT));
+      IGRAPH_CHECK(igraph_vector_push_back(history, comm));
     }
 
     /* Store the resulting communities in the queue if needed */
@@ -1248,7 +1300,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   igraph_vector_destroy(&idx2);
   IGRAPH_FINALLY_CLEAN(5);
 
-  IGRAPH_STATUS("Done", 0);
+  IGRAPH_STATUS("Done.\n", 0);
 
   /* reform the mymerges vector */
   if (merges) {

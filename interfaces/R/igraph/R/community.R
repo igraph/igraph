@@ -133,9 +133,9 @@ crossing <- function(communities, graph) {
 }
 
 is.hierarchical <- function(communities) {
-  if (algorithm(communities) %in% c("walktrap", "edge betweenness", "fast greedy")) {
+  if (algorithm(communities) %in% c("walktrap", "edge betweenness", "fast greedy", "leading eigenvector")) {
     TRUE
-  } else if (algorithm(communities) %in% c("spinglass", "leading eigenvector",
+  } else if (algorithm(communities) %in% c("spinglass",
                                  "label propagation", "multi level",
                                  "optimal")) {
     FALSE
@@ -256,6 +256,40 @@ cutat <- function(communities, no, steps) {
     steps <- communities$vcount-no
     community.to.membership2(mm, communities$vcount, steps)    
   }
+}
+
+showtrace <- function(communities) {
+
+  if (!inherits(communities, "communities")) {
+    stop("Not a community structure")
+  }
+  if (is.null(communities$history)) {
+    stop("History was not recorded")
+  }
+
+  res <- character()
+  i <- 1
+  while (i <= length(communities$history)) {
+    if (communities$history[i] == 2) {  # IGRAPH_LEVC_HIST_SPLIT
+      resnew <- paste("Splitting community", communities$history[i+1],
+                      "into two.")
+      i <- i + 2
+    } else if (communities$history[i]==3) { # IGRAPH_LEVC_HIST_FAILED
+      resnew <- paste("Failed splitting community",
+                      communities$history[i+1], "into two.")
+      i <- i + 2
+    } else if (communities$history[i]==4) { # IGRAPH_LEVC_START_FULL
+      resnew <- "Starting with the whole graph as a community."
+      i <- i + 1
+    } else if (communities$history[i]==5) { # IGRAPH_LEVC_START_GIVEN
+      resnew <- paste("Starting from the", communities$history[i+1],
+                      "given communities.")
+      i <- i + 2
+    }
+
+    res <- c(res, resnew)
+  }
+  res
 }
 
 #####################################################################
@@ -443,6 +477,7 @@ leading.eigenvector.community <- function(graph, steps=-1, start=NULL,
   res$vcount <- vcount(graph)
   res$membership <- res$membership + 1
   res$merges <- res$merges + 1
+  res$history <- res$history + 1
   class(res) <- "communities"
   res
 }
