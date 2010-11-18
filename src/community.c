@@ -35,6 +35,7 @@
 #include "igraph_dqueue.h"
 #include "igraph_stack.h"
 #include "igraph_spmatrix.h"
+#include "igraph_statusbar.h"
 #include "config.h"
 
 #include <string.h>
@@ -1086,14 +1087,19 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   IGRAPH_VECTOR_INIT_FINALLY(&idx, 0);
   if (eigenvalues) { igraph_vector_clear(eigenvalues); }
 
+  IGRAPH_STATUS("Starting leading eigenvector method.\n", 0);
+
   if (!start) {
     /* Calculate the weakly connected components in the graph and use them as
      * an initial split */
     IGRAPH_CHECK(igraph_clusters(graph, mymembership, &idx, 0, IGRAPH_WEAK));
     communities = igraph_vector_size(&idx);
+    IGRAPH_STATUSF(("Starting from %li components.\n", 0, communities));
   } else {
     /* Just create the idx vector for the given membership vector */
     communities=igraph_vector_max(mymembership)+1;
+    IGRAPH_STATUSF(("Starting from given membership vector with %li "
+		    "communities.\n", 0, communities));
     IGRAPH_CHECK(igraph_vector_resize(&idx, communities));
     igraph_vector_null(&idx);
     for (i=0; i<no_of_nodes; i++) {
@@ -1144,6 +1150,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     long int comm=igraph_dqueue_pop_back(&tosplit); /* depth first search */
     long int size=0;
 
+    IGRAPH_STATUSF(("Trying to split community %li... ", 0, comm));
     IGRAPH_ALLOW_INTERRUPTION();
 
     for (i=0; i<no_of_nodes; i++) {
@@ -1191,7 +1198,11 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 /*     printf("%f\n", storage.d[0]); */
 /*     for (j=0; j<size; j++) { printf("%g ", storage.v[j]); } */
 /*     printf("\n"); */
-    if (storage.d[0] <= 0.00001) { continue; }
+    if (storage.d[0] <= 0.00001) { 
+      IGRAPH_STATUS("no split.\n", 0);
+      continue; 
+    }
+    IGRAPH_STATUS("split.\n", 0);
 
     /* Count the number of vertices in each community after the split */
     l=0;
@@ -1236,6 +1247,8 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   igraph_vector_destroy(&tmp);
   igraph_vector_destroy(&idx2);
   IGRAPH_FINALLY_CLEAN(5);
+
+  IGRAPH_STATUS("Done", 0);
 
   /* reform the mymerges vector */
   if (merges) {
