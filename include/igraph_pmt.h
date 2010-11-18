@@ -31,75 +31,69 @@
 #if defined(BASE_IGRAPH_REAL)
 #define BASE igraph_real_t
 #define SHORT
-#define ATOMIC
-#define MULTIPLICITY 1
-#define FP 1
-#define IN_FORMAT "%lg"
 #define OUT_FORMAT "%g"
-#define ATOMIC_IO ATOMIC
 #define ZERO 0.0
 #define ONE 1.0
-#define BASE_EPSILON GSL_DBL_EPSILON
+#define MULTIPLICITY 1
 
 #elif defined(BASE_LONG)
 #define BASE long
 #define SHORT long
-#define ATOMIC long
-#define MULTIPLICITY 1
-#define IN_FORMAT "%ld"
 #define OUT_FORMAT "%ld"
-#define ATOMIC_IO ATOMIC
 #define ZERO 0L
 #define ONE 1L
+#define MULTIPLICITY 1
 
 #elif defined(BASE_CHAR)
 #define BASE char
 #define SHORT char
-#define ATOMIC char
-#define MULTIPLICITY 1
-#define IN_FORMAT "%d"
 #define OUT_FORMAT "%d"
-#define ATOMIC_IO int
 #define ZERO 0
 #define ONE 1
+#define MULTIPLICITY 1
 
 #elif defined(BASE_BOOL)
 #define BASE igraph_bool_t
 #define SHORT bool
-#define ATOMIC igraph_bool_t
-#define MULTIPLICITY 1
-#define IN_FORMAT "%d"
 #define OUT_FORMAT "%d"
-#define ATOMIC_IO int
 #define ZERO 0
 #define ONE 1
+#define MULTIPLICITY 1
 
 #elif defined(BASE_INT)
 #define BASE int
 #define SHORT int
-#define ATOMIC int
-#define MULTIPLICITY 1
-#define IN_FORMAT "%d"
 #define OUT_FORMAT "%d"
-#define ATOMIC_IO int
 #define ZERO 0
 #define ONE 1
+#define MULTIPLICITY 1
 
 #elif defined(BASE_LIMB)
 #define BASE limb_t
 #define SHORT limb
-#define ATOMIC limb_t
-#define MULTIPLICITY 1
 #define ZERO 0
 #define ONE 1
+#define MULTIPLICITY 1
 
 #elif defined(BASE_PTR)
 #define BASE void*
 #define SHORT ptr
-#define ATOMIC ptr_t
-#define MULTIPLICITY 1
 #define ZERO 0
-/* #define ONE 1  */  /* makes no sense */
+#define MULTIPLICITY 1
+
+#elif defined(BASE_COMPLEX)
+#undef complex
+#define BASE igraph_complex_t
+#define SHORT complex
+#define ZERO igraph_complex(0,0)
+#define ONE {{1.0,0.0}}
+#define MULTIPLICITY 2
+#define NOTORDERED 1
+#define SUM(a,b,c) ((a) = igraph_complex_add((b),(c)))
+#define DIFF(a,b,c) ((a) = igraph_complex_sub((b),(c)))
+#define PROD(a,b,c) ((a) = igraph_complex_mul((b),(c)))
+#define DIV(a,b,c) ((a) = igraph_complex_div((b),(c)))
+#define EQ(a,b) IGRAPH_COMPLEX_EQ((a),(b))
 
 #else
 #error unknown BASE_ directive

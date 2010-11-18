@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,9 +10,7 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Table of constant values */
 
@@ -32,102 +30,87 @@ static integer c__2 = 2;
     static logical wantq;
     extern /* Subroutine */ int igraphdlaexc_(logical *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, integer *, integer *, integer 
-	    *, doublereal *, integer *), igraphxerbla_(char *, integer *);
+	    *, doublereal *, integer *), igraphxerbla_(char *, integer *, ftnlen);
     static integer nbnext;
 
 
-/*  -- LAPACK routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     March 31, 1993 */
+/*  -- LAPACK routine (version 3.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2006   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
-/*     .. Array Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  DTREXC reorders the real Schur factorization of a real matrix */
-/*  A = Q*T*Q**T, so that the diagonal block of T with row index IFST is */
-/*  moved to row ILST. */
+    DTREXC reorders the real Schur factorization of a real matrix   
+    A = Q*T*Q**T, so that the diagonal block of T with row index IFST is   
+    moved to row ILST.   
 
-/*  The real Schur form T is reordered by an orthogonal similarity */
-/*  transformation Z**T*T*Z, and optionally the matrix Q of Schur vectors */
-/*  is updated by postmultiplying it with Z. */
+    The real Schur form T is reordered by an orthogonal similarity   
+    transformation Z**T*T*Z, and optionally the matrix Q of Schur vectors   
+    is updated by postmultiplying it with Z.   
 
-/*  T must be in Schur canonical form (as returned by DHSEQR), that is, */
-/*  block upper triangular with 1-by-1 and 2-by-2 diagonal blocks; each */
-/*  2-by-2 diagonal block has its diagonal elements equal and its */
-/*  off-diagonal elements of opposite sign. */
+    T must be in Schur canonical form (as returned by DHSEQR), that is,   
+    block upper triangular with 1-by-1 and 2-by-2 diagonal blocks; each   
+    2-by-2 diagonal block has its diagonal elements equal and its   
+    off-diagonal elements of opposite sign.   
 
-/*  Arguments */
-/*  ========= */
+    Arguments   
+    =========   
 
-/*  COMPQ   (input) CHARACTER*1 */
-/*          = 'V':  update the matrix Q of Schur vectors; */
-/*          = 'N':  do not update Q. */
+    COMPQ   (input) CHARACTER*1   
+            = 'V':  update the matrix Q of Schur vectors;   
+            = 'N':  do not update Q.   
 
-/*  N       (input) INTEGER */
-/*          The order of the matrix T. N >= 0. */
+    N       (input) INTEGER   
+            The order of the matrix T. N >= 0.   
 
-/*  T       (input/output) DOUBLE PRECISION array, dimension (LDT,N) */
-/*          On entry, the upper quasi-triangular matrix T, in Schur */
-/*          Schur canonical form. */
-/*          On exit, the reordered upper quasi-triangular matrix, again */
-/*          in Schur canonical form. */
+    T       (input/output) DOUBLE PRECISION array, dimension (LDT,N)   
+            On entry, the upper quasi-triangular matrix T, in Schur   
+            Schur canonical form.   
+            On exit, the reordered upper quasi-triangular matrix, again   
+            in Schur canonical form.   
 
-/*  LDT     (input) INTEGER */
-/*          The leading dimension of the array T. LDT >= max(1,N). */
+    LDT     (input) INTEGER   
+            The leading dimension of the array T. LDT >= max(1,N).   
 
-/*  Q       (input/output) DOUBLE PRECISION array, dimension (LDQ,N) */
-/*          On entry, if COMPQ = 'V', the matrix Q of Schur vectors. */
-/*          On exit, if COMPQ = 'V', Q has been postmultiplied by the */
-/*          orthogonal transformation matrix Z which reorders T. */
-/*          If COMPQ = 'N', Q is not referenced. */
+    Q       (input/output) DOUBLE PRECISION array, dimension (LDQ,N)   
+            On entry, if COMPQ = 'V', the matrix Q of Schur vectors.   
+            On exit, if COMPQ = 'V', Q has been postmultiplied by the   
+            orthogonal transformation matrix Z which reorders T.   
+            If COMPQ = 'N', Q is not referenced.   
 
-/*  LDQ     (input) INTEGER */
-/*          The leading dimension of the array Q.  LDQ >= max(1,N). */
+    LDQ     (input) INTEGER   
+            The leading dimension of the array Q.  LDQ >= max(1,N).   
 
-/*  IFST    (input/output) INTEGER */
-/*  ILST    (input/output) INTEGER */
-/*          Specify the reordering of the diagonal blocks of T. */
-/*          The block with row index IFST is moved to row ILST, by a */
-/*          sequence of transpositions between adjacent blocks. */
-/*          On exit, if IFST pointed on entry to the second row of a */
-/*          2-by-2 block, it is changed to point to the first row; ILST */
-/*          always points to the first row of the block in its final */
-/*          position (which may differ from its input value by +1 or -1). */
-/*          1 <= IFST <= N; 1 <= ILST <= N. */
+    IFST    (input/output) INTEGER   
+    ILST    (input/output) INTEGER   
+            Specify the reordering of the diagonal blocks of T.   
+            The block with row index IFST is moved to row ILST, by a   
+            sequence of transpositions between adjacent blocks.   
+            On exit, if IFST pointed on entry to the second row of a   
+            2-by-2 block, it is changed to point to the first row; ILST   
+            always points to the first row of the block in its final   
+            position (which may differ from its input value by +1 or -1).   
+            1 <= IFST <= N; 1 <= ILST <= N.   
 
-/*  WORK    (workspace) DOUBLE PRECISION array, dimension (N) */
+    WORK    (workspace) DOUBLE PRECISION array, dimension (N)   
 
-/*  INFO    (output) INTEGER */
-/*          = 0:  successful exit */
-/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
-/*          = 1:  two adjacent blocks were too close to swap (the problem */
-/*                is very ill-conditioned); T may have been partially */
-/*                reordered, and ILST points to the first row of the */
-/*                current position of the block being moved. */
+    INFO    (output) INTEGER   
+            = 0:  successful exit   
+            < 0:  if INFO = -i, the i-th argument had an illegal value   
+            = 1:  two adjacent blocks were too close to swap (the problem   
+                  is very ill-conditioned); T may have been partially   
+                  reordered, and ILST points to the first row of the   
+                  current position of the block being moved.   
 
-/*  ===================================================================== */
+    =====================================================================   
 
-/*     .. Parameters .. */
-/*     .. */
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. External Functions .. */
-/*     .. */
-/*     .. External Subroutines .. */
-/*     .. */
-/*     .. Intrinsic Functions .. */
-/*     .. */
-/*     .. Executable Statements .. */
 
-/*     Decode and test the input arguments. */
+       Decode and test the input arguments.   
 
-    /* Parameter adjustments */
+       Parameter adjustments */
     t_dim1 = *ldt;
     t_offset = 1 + t_dim1;
     t -= t_offset;
@@ -145,7 +128,7 @@ static integer c__2 = 2;
 	*info = -2;
     } else if (*ldt < max(1,*n)) {
 	*info = -4;
-    } else if (*ldq < 1 || (wantq && *ldq < max(1,*n))) {
+    } else if (*ldq < 1 || wantq && *ldq < max(1,*n)) {
 	*info = -6;
     } else if (*ifst < 1 || *ifst > *n) {
 	*info = -7;
@@ -154,7 +137,7 @@ static integer c__2 = 2;
     }
     if (*info != 0) {
 	i__1 = -(*info);
-	igraphxerbla_("DTREXC", &i__1);
+	igraphxerbla_("DTREXC", &i__1, (ftnlen)6);
 	return 0;
     }
 
@@ -164,8 +147,8 @@ static integer c__2 = 2;
 	return 0;
     }
 
-/*     Determine the first row of specified block */
-/*     and find out it is 1 by 1 or 2 by 2. */
+/*     Determine the first row of specified block   
+       and find out it is 1 by 1 or 2 by 2. */
 
     if (*ifst > 1) {
 	if (t[*ifst + (*ifst - 1) * t_dim1] != 0.) {
@@ -179,8 +162,8 @@ static integer c__2 = 2;
 	}
     }
 
-/*     Determine the first row of the final block */
-/*     and find out it is 1 by 1 or 2 by 2. */
+/*     Determine the first row of the final block   
+       and find out it is 1 by 1 or 2 by 2. */
 
     if (*ilst > 1) {
 	if (t[*ilst + (*ilst - 1) * t_dim1] != 0.) {
@@ -243,8 +226,8 @@ L10:
 
 	} else {
 
-/*           Current block consists of two 1 by 1 blocks each of which */
-/*           must be swapped individually */
+/*           Current block consists of two 1 by 1 blocks each of which   
+             must be swapped individually */
 
 	    nbnext = 1;
 	    if (here + 3 <= *n) {
@@ -337,8 +320,8 @@ L20:
 
 	} else {
 
-/*           Current block consists of two 1 by 1 blocks each of which */
-/*           must be swapped individually */
+/*           Current block consists of two 1 by 1 blocks each of which   
+             must be swapped individually */
 
 	    nbnext = 1;
 	    if (here >= 3) {

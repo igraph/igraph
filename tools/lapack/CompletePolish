@@ -1,0 +1,32 @@
+#!/bin/sh -
+# call this Unix script "MagicScript"
+# To use: MagicScript *.f 
+#	  that translates *.f to *.c and polish the resulting C code from f2c. 
+#
+# Note: define trans_dir as the directory that contains this file.
+#
+# trans_dir=/home/barad-dur/jwd/users/mercedes-tmp/LAPACK_v2.0/LAPACK_Final_Release2.0/NEW_CLAPACK/CLAPACK/Translate
+
+rm -f -r temp
+mkdir temp
+for file do	
+       base=`echo $file | sed -e 's/\.f//g'`
+   # run_stripper
+       f2c < ${base}.f | ${trans_dir}/lenscrub > ${base}.c
+   # run_macro (better vector and array indexing; from NAG)
+#   	${trans_dir}/substitute_locals.exe < ${base}.c > ${base}.u
+#  	${trans_dir}/test_tool.exe ${base}.u > ${base}.c
+#   	rm -f ${base}.u
+   # run_comment
+       sed -f ${trans_dir}/delete.sed ${base}.c > ${base}.t
+       mv -f ${base}.t ${base}.c
+       ${trans_dir}/comment < ${base}.c > ${base}.t
+       mv -f ${base}.t ${base}.c
+   # run_splitter
+#       sed -n -f ${trans_dir}/split.sed ${base}.c
+#       mv -f ${base}.c ${base}.t
+#       cat temp/header1 temp/header3 temp/comment temp/header2 temp/prologue \
+#       		temp/code > ${base}.c
+#       rm -f ${base}.t
+done
+rm -f -r temp

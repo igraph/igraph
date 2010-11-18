@@ -76,50 +76,29 @@ int main() {
 	       31, 32, 31, 33, 32, 33,
 	       -1);  
  
-  /* Make one step with all methods */
   igraph_matrix_init(&merges, 0, 0);
   igraph_vector_init(&membership, 0);
   igraph_vector_init(&x, 0);
   igraph_arpack_options_init(&options);
-  igraph_community_leading_eigenvector_naive(&g, &merges, &membership, 1, 
-					     &options, /*modularity=*/ 0);
+
+  igraph_community_leading_eigenvector(&g, &merges, &membership, 1, 
+				       &options, /*modularity=*/ 0, 
+				       /*start=*/ 0);
 
   print_matrix(&merges);
   print_vector(&membership);
-
-  igraph_community_leading_eigenvector(&g, &merges, &membership, 1, &options, 
-				       /*modularity=*/ 0);
-
-  print_matrix(&merges);
-  print_vector(&membership);
-
-  igraph_vector_null(&membership);
-  igraph_community_leading_eigenvector_step(&g, &membership, 0, &split,
-					    &x, &val, &options, 0);
-
-  print_vector(&membership);
-  print_vector(&x);
 
   printf("\n");
 
   /* Make all the steps */
   igraph_community_leading_eigenvector(&g, &merges, &membership, 
 				       igraph_vcount(&g),
-				       &options, /*modularity=*/ 0);
+				       &options, /*modularity=*/ 0, 
+				       /*start=*/ 0);
 
   print_matrix(&merges);
   print_vector(&membership);
 
-  /* Try to make one more step from here, should fail */
-  for (i=0; i<igraph_matrix_nrow(&merges)+1; i++) {
-    igraph_community_leading_eigenvector_step(&g, &membership,
-					      i, &split, &x, &val, &options, 0);
-    if (split) {
-      printf("Impossible, community %li splitted.\n", i);
-      return 1;
-    }
-  }
-  
   igraph_vector_destroy(&x);
   igraph_vector_destroy(&membership);
   igraph_matrix_destroy(&merges);

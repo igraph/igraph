@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,9 +10,7 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Subroutine */ int igraphdlasr_(char *side, char *pivot, char *direct, integer *m,
 	 integer *n, doublereal *c__, doublereal *s, doublereal *a, integer *
@@ -26,124 +24,146 @@
     static doublereal temp;
     extern logical igraphlsame_(char *, char *);
     static doublereal ctemp, stemp;
-    extern /* Subroutine */ int igraphxerbla_(char *, integer *);
+    extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     October 31, 1992 */
+/*  -- LAPACK auxiliary routine (version 3.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2006   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
-/*     .. Array Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  DLASR   performs the transformation */
+    DLASR applies a sequence of plane rotations to a real matrix A,   
+    from either the left or the right.   
 
-/*     A := P*A,   when SIDE = 'L' or 'l'  (  Left-hand side ) */
+    When SIDE = 'L', the transformation takes the form   
 
-/*     A := A*P',  when SIDE = 'R' or 'r'  ( Right-hand side ) */
+       A := P*A   
 
-/*  where A is an m by n real matrix and P is an orthogonal matrix, */
-/*  consisting of a sequence of plane rotations determined by the */
-/*  parameters PIVOT and DIRECT as follows ( z = m when SIDE = 'L' or 'l' */
-/*  and z = n when SIDE = 'R' or 'r' ): */
+    and when SIDE = 'R', the transformation takes the form   
 
-/*  When  DIRECT = 'F' or 'f'  ( Forward sequence ) then */
+       A := A*P**T   
 
-/*     P = P( z - 1 )*...*P( 2 )*P( 1 ), */
+    where P is an orthogonal matrix consisting of a sequence of z plane   
+    rotations, with z = M when SIDE = 'L' and z = N when SIDE = 'R',   
+    and P**T is the transpose of P.   
 
-/*  and when DIRECT = 'B' or 'b'  ( Backward sequence ) then */
+    When DIRECT = 'F' (Forward sequence), then   
 
-/*     P = P( 1 )*P( 2 )*...*P( z - 1 ), */
+       P = P(z-1) * ... * P(2) * P(1)   
 
-/*  where  P( k ) is a plane rotation matrix for the following planes: */
+    and when DIRECT = 'B' (Backward sequence), then   
 
-/*     when  PIVOT = 'V' or 'v'  ( Variable pivot ), */
-/*        the plane ( k, k + 1 ) */
+       P = P(1) * P(2) * ... * P(z-1)   
 
-/*     when  PIVOT = 'T' or 't'  ( Top pivot ), */
-/*        the plane ( 1, k + 1 ) */
+    where P(k) is a plane rotation matrix defined by the 2-by-2 rotation   
 
-/*     when  PIVOT = 'B' or 'b'  ( Bottom pivot ), */
-/*        the plane ( k, z ) */
+       R(k) = (  c(k)  s(k) )   
+            = ( -s(k)  c(k) ).   
 
-/*  c( k ) and s( k )  must contain the  cosine and sine that define the */
-/*  matrix  P( k ).  The two by two plane rotation part of the matrix */
-/*  P( k ), R( k ), is assumed to be of the form */
+    When PIVOT = 'V' (Variable pivot), the rotation is performed   
+    for the plane (k,k+1), i.e., P(k) has the form   
 
-/*     R( k ) = (  c( k )  s( k ) ). */
-/*              ( -s( k )  c( k ) ) */
+       P(k) = (  1                                            )   
+              (       ...                                     )   
+              (              1                                )   
+              (                   c(k)  s(k)                  )   
+              (                  -s(k)  c(k)                  )   
+              (                                1              )   
+              (                                     ...       )   
+              (                                            1  )   
 
-/*  This version vectorises across rows of the array A when SIDE = 'L'. */
+    where R(k) appears as a rank-2 modification to the identity matrix in   
+    rows and columns k and k+1.   
 
-/*  Arguments */
-/*  ========= */
+    When PIVOT = 'T' (Top pivot), the rotation is performed for the   
+    plane (1,k+1), so P(k) has the form   
 
-/*  SIDE    (input) CHARACTER*1 */
-/*          Specifies whether the plane rotation matrix P is applied to */
-/*          A on the left or the right. */
-/*          = 'L':  Left, compute A := P*A */
-/*          = 'R':  Right, compute A:= A*P' */
+       P(k) = (  c(k)                    s(k)                 )   
+              (         1                                     )   
+              (              ...                              )   
+              (                     1                         )   
+              ( -s(k)                    c(k)                 )   
+              (                                 1             )   
+              (                                      ...      )   
+              (                                             1 )   
 
-/*  DIRECT  (input) CHARACTER*1 */
-/*          Specifies whether P is a forward or backward sequence of */
-/*          plane rotations. */
-/*          = 'F':  Forward, P = P( z - 1 )*...*P( 2 )*P( 1 ) */
-/*          = 'B':  Backward, P = P( 1 )*P( 2 )*...*P( z - 1 ) */
+    where R(k) appears in rows and columns 1 and k+1.   
 
-/*  PIVOT   (input) CHARACTER*1 */
-/*          Specifies the plane for which P(k) is a plane rotation */
-/*          matrix. */
-/*          = 'V':  Variable pivot, the plane (k,k+1) */
-/*          = 'T':  Top pivot, the plane (1,k+1) */
-/*          = 'B':  Bottom pivot, the plane (k,z) */
+    Similarly, when PIVOT = 'B' (Bottom pivot), the rotation is   
+    performed for the plane (k,z), giving P(k) the form   
 
-/*  M       (input) INTEGER */
-/*          The number of rows of the matrix A.  If m <= 1, an immediate */
-/*          return is effected. */
+       P(k) = ( 1                                             )   
+              (      ...                                      )   
+              (             1                                 )   
+              (                  c(k)                    s(k) )   
+              (                         1                     )   
+              (                              ...              )   
+              (                                     1         )   
+              (                 -s(k)                    c(k) )   
 
-/*  N       (input) INTEGER */
-/*          The number of columns of the matrix A.  If n <= 1, an */
-/*          immediate return is effected. */
+    where R(k) appears in rows and columns k and z.  The rotations are   
+    performed without ever forming P(k) explicitly.   
 
-/*  C, S    (input) DOUBLE PRECISION arrays, dimension */
-/*                  (M-1) if SIDE = 'L' */
-/*                  (N-1) if SIDE = 'R' */
-/*          c(k) and s(k) contain the cosine and sine that define the */
-/*          matrix P(k).  The two by two plane rotation part of the */
-/*          matrix P(k), R(k), is assumed to be of the form */
-/*          R( k ) = (  c( k )  s( k ) ). */
-/*                   ( -s( k )  c( k ) ) */
+    Arguments   
+    =========   
 
-/*  A       (input/output) DOUBLE PRECISION array, dimension (LDA,N) */
-/*          The m by n matrix A.  On exit, A is overwritten by P*A if */
-/*          SIDE = 'R' or by A*P' if SIDE = 'L'. */
+    SIDE    (input) CHARACTER*1   
+            Specifies whether the plane rotation matrix P is applied to   
+            A on the left or the right.   
+            = 'L':  Left, compute A := P*A   
+            = 'R':  Right, compute A:= A*P**T   
 
-/*  LDA     (input) INTEGER */
-/*          The leading dimension of the array A.  LDA >= max(1,M). */
+    PIVOT   (input) CHARACTER*1   
+            Specifies the plane for which P(k) is a plane rotation   
+            matrix.   
+            = 'V':  Variable pivot, the plane (k,k+1)   
+            = 'T':  Top pivot, the plane (1,k+1)   
+            = 'B':  Bottom pivot, the plane (k,z)   
 
-/*  ===================================================================== */
+    DIRECT  (input) CHARACTER*1   
+            Specifies whether P is a forward or backward sequence of   
+            plane rotations.   
+            = 'F':  Forward, P = P(z-1)*...*P(2)*P(1)   
+            = 'B':  Backward, P = P(1)*P(2)*...*P(z-1)   
 
-/*     .. Parameters .. */
-/*     .. */
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. External Functions .. */
-/*     .. */
-/*     .. External Subroutines .. */
-/*     .. */
-/*     .. Intrinsic Functions .. */
-/*     .. */
-/*     .. Executable Statements .. */
+    M       (input) INTEGER   
+            The number of rows of the matrix A.  If m <= 1, an immediate   
+            return is effected.   
 
-/*     Test the input parameters */
+    N       (input) INTEGER   
+            The number of columns of the matrix A.  If n <= 1, an   
+            immediate return is effected.   
 
-    /* Parameter adjustments */
+    C       (input) DOUBLE PRECISION array, dimension   
+                    (M-1) if SIDE = 'L'   
+                    (N-1) if SIDE = 'R'   
+            The cosines c(k) of the plane rotations.   
+
+    S       (input) DOUBLE PRECISION array, dimension   
+                    (M-1) if SIDE = 'L'   
+                    (N-1) if SIDE = 'R'   
+            The sines s(k) of the plane rotations.  The 2-by-2 plane   
+            rotation part of the matrix P(k), R(k), has the form   
+            R(k) = (  c(k)  s(k) )   
+                   ( -s(k)  c(k) ).   
+
+    A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)   
+            The M-by-N matrix A.  On exit, A is overwritten by P*A if   
+            SIDE = 'R' or by A*P**T if SIDE = 'L'.   
+
+    LDA     (input) INTEGER   
+            The leading dimension of the array A.  LDA >= max(1,M).   
+
+    =====================================================================   
+
+
+       Test the input parameters   
+
+       Parameter adjustments */
     --c__;
     --s;
     a_dim1 = *lda;
@@ -168,7 +188,7 @@
 	info = 9;
     }
     if (info != 0) {
-	igraphxerbla_("DLASR ", &info);
+	igraphxerbla_("DLASR ", &info, (ftnlen)6);
 	return 0;
     }
 

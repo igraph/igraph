@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,9 +10,7 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Subroutine */ int igraphdlarfg_(integer *n, doublereal *alpha, doublereal *x, 
 	integer *incx, doublereal *tau)
@@ -22,7 +20,7 @@
     doublereal d__1;
 
     /* Builtin functions */
-    double igraphd_sign(doublereal *, doublereal *);
+    double d_sign(doublereal *, doublereal *);
 
     /* Local variables */
     static integer j, knt;
@@ -35,75 +33,60 @@
     static doublereal safmin, rsafmn;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     September 30, 1994 */
+/*  -- LAPACK auxiliary routine (version 3.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2006   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
-/*     .. Array Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  DLARFG generates a real elementary reflector H of order n, such */
-/*  that */
+    DLARFG generates a real elementary reflector H of order n, such   
+    that   
 
-/*        H * ( alpha ) = ( beta ),   H' * H = I. */
-/*            (   x   )   (   0  ) */
+          H * ( alpha ) = ( beta ),   H' * H = I.   
+              (   x   )   (   0  )   
 
-/*  where alpha and beta are scalars, and x is an (n-1)-element real */
-/*  vector. H is represented in the form */
+    where alpha and beta are scalars, and x is an (n-1)-element real   
+    vector. H is represented in the form   
 
-/*        H = I - tau * ( 1 ) * ( 1 v' ) , */
-/*                      ( v ) */
+          H = I - tau * ( 1 ) * ( 1 v' ) ,   
+                        ( v )   
 
-/*  where tau is a real scalar and v is a real (n-1)-element */
-/*  vector. */
+    where tau is a real scalar and v is a real (n-1)-element   
+    vector.   
 
-/*  If the elements of x are all zero, then tau = 0 and H is taken to be */
-/*  the unit matrix. */
+    If the elements of x are all zero, then tau = 0 and H is taken to be   
+    the unit matrix.   
 
-/*  Otherwise  1 <= tau <= 2. */
+    Otherwise  1 <= tau <= 2.   
 
-/*  Arguments */
-/*  ========= */
+    Arguments   
+    =========   
 
-/*  N       (input) INTEGER */
-/*          The order of the elementary reflector. */
+    N       (input) INTEGER   
+            The order of the elementary reflector.   
 
-/*  ALPHA   (input/output) DOUBLE PRECISION */
-/*          On entry, the value alpha. */
-/*          On exit, it is overwritten with the value beta. */
+    ALPHA   (input/output) DOUBLE PRECISION   
+            On entry, the value alpha.   
+            On exit, it is overwritten with the value beta.   
 
-/*  X       (input/output) DOUBLE PRECISION array, dimension */
-/*                         (1+(N-2)*abs(INCX)) */
-/*          On entry, the vector x. */
-/*          On exit, it is overwritten with the vector v. */
+    X       (input/output) DOUBLE PRECISION array, dimension   
+                           (1+(N-2)*abs(INCX))   
+            On entry, the vector x.   
+            On exit, it is overwritten with the vector v.   
 
-/*  INCX    (input) INTEGER */
-/*          The increment between elements of X. INCX > 0. */
+    INCX    (input) INTEGER   
+            The increment between elements of X. INCX > 0.   
 
-/*  TAU     (output) DOUBLE PRECISION */
-/*          The value tau. */
+    TAU     (output) DOUBLE PRECISION   
+            The value tau.   
 
-/*  ===================================================================== */
+    =====================================================================   
 
-/*     .. Parameters .. */
-/*     .. */
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. External Functions .. */
-/*     .. */
-/*     .. Intrinsic Functions .. */
-/*     .. */
-/*     .. External Subroutines .. */
-/*     .. */
-/*     .. Executable Statements .. */
 
-    /* Parameter adjustments */
+       Parameter adjustments */
     --x;
 
     /* Function Body */
@@ -125,14 +108,14 @@
 /*        general case */
 
 	d__1 = igraphdlapy2_(alpha, &xnorm);
-	beta = -igraphd_sign(&d__1, alpha);
+	beta = -d_sign(&d__1, alpha);
 	safmin = igraphdlamch_("S") / igraphdlamch_("E");
+	knt = 0;
 	if (abs(beta) < safmin) {
 
 /*           XNORM, BETA may be inaccurate; scale X and recompute them */
 
 	    rsafmn = 1. / safmin;
-	    knt = 0;
 L10:
 	    ++knt;
 	    i__1 = *n - 1;
@@ -148,27 +131,21 @@ L10:
 	    i__1 = *n - 1;
 	    xnorm = igraphdnrm2_(&i__1, &x[1], incx);
 	    d__1 = igraphdlapy2_(alpha, &xnorm);
-	    beta = -igraphd_sign(&d__1, alpha);
-	    *tau = (beta - *alpha) / beta;
-	    i__1 = *n - 1;
-	    d__1 = 1. / (*alpha - beta);
-	    igraphdscal_(&i__1, &d__1, &x[1], incx);
-
-/*           If ALPHA is subnormal, it may lose relative accuracy */
-
-	    *alpha = beta;
-	    i__1 = knt;
-	    for (j = 1; j <= i__1; ++j) {
-		*alpha *= safmin;
-/* L20: */
-	    }
-	} else {
-	    *tau = (beta - *alpha) / beta;
-	    i__1 = *n - 1;
-	    d__1 = 1. / (*alpha - beta);
-	    igraphdscal_(&i__1, &d__1, &x[1], incx);
-	    *alpha = beta;
+	    beta = -d_sign(&d__1, alpha);
 	}
+	*tau = (beta - *alpha) / beta;
+	i__1 = *n - 1;
+	d__1 = 1. / (*alpha - beta);
+	igraphdscal_(&i__1, &d__1, &x[1], incx);
+
+/*        If ALPHA is subnormal, it may lose relative accuracy */
+
+	i__1 = knt;
+	for (j = 1; j <= i__1; ++j) {
+	    beta *= safmin;
+/* L20: */
+	}
+	*alpha = beta;
     }
 
     return 0;

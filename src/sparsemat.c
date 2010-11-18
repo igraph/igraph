@@ -27,6 +27,7 @@
 #include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_constructors.h"
+#include "igraph_memory.h"
 
 int igraph_sparsemat_init(igraph_sparsemat_t *A, int rows, int cols, int nzmax) {
 
@@ -301,7 +302,8 @@ int igraph_sparsemat_transpose(const igraph_sparsemat_t *A,
 int igraph_sparsemat_dupl(igraph_sparsemat_t *A) {
 
   if (!cs_dupl(A->cs)) {
-    IGRAPH_ERROR("Cannot transpose sparse matrix", IGRAPH_FAILURE);
+    IGRAPH_ERROR("Cannot remove duplicates from sparse matrix", 
+		 IGRAPH_FAILURE);
   }
   
   return 0;
@@ -710,7 +712,7 @@ int igraph_sparsemat_diag(igraph_sparsemat_t *A, int nzmax,
 
 int igraph_i_sparsemat_arpack_multiply(igraph_real_t *to, 
 				       const igraph_real_t *from,
-				       long int n,
+				       int n,
 				       void *extra) {
   igraph_sparsemat_t *A=extra;
   igraph_vector_t vto, vfrom;
@@ -721,11 +723,41 @@ int igraph_i_sparsemat_arpack_multiply(igraph_real_t *to,
   return 0;
 }
 
+typedef struct igraph_i_sparsemat_arpack_rssolve_data_t {
+  igraph_sparsemat_symbolic_t *dis;
+  igraph_sparsemat_numeric_t *din;
+  igraph_real_t tol;
+  igraph_sparsemat_solve_t method;
+} igraph_i_sparsemat_arpack_rssolve_data_t;
+
+int igraph_i_sparsemat_arpack_solve(igraph_real_t *to, 
+				    const igraph_real_t *from,
+				    int n,
+				    void *extra) {
+
+  igraph_i_sparsemat_arpack_rssolve_data_t *data=extra;
+  igraph_vector_t vfrom, vto;
+
+  igraph_vector_view(&vfrom, from, n);
+  igraph_vector_view(&vto, to, n);
+
+  if (data->method == IGRAPH_SPARSEMAT_SOLVE_LU) {
+    IGRAPH_CHECK(igraph_sparsemat_luresol(data->dis, data->din, &vfrom, &vto,
+					  /*tol=*/ data->tol));
+  } else if (data->method == IGRAPH_SPARSEMAT_SOLVE_QR) {
+    IGRAPH_CHECK(igraph_sparsemat_qrresol(data->dis, data->din, &vfrom, &vto,
+					  /*tol=*/ data->tol));
+  }
+
+  return 0;
+}
+
 int igraph_sparsemat_arpack_rssolve(const igraph_sparsemat_t *A,
 				    igraph_arpack_options_t *options,
 				    igraph_arpack_storage_t *storage,
 				    igraph_vector_t *values,
-				    igraph_matrix_t *vectors) {
+				    igraph_matrix_t *vectors,
+				    igraph_sparsemat_solve_t solvemethod) {
 
   long int n=igraph_sparsemat_nrow(A);
 
@@ -735,10 +767,65 @@ int igraph_sparsemat_arpack_rssolve(const igraph_sparsemat_t *A,
 
   options->n=n;
 
-  return igraph_arpack_rssolve(igraph_i_sparsemat_arpack_multiply,
-			       (void*) A, options, storage, 
-			       values, vectors);
+  if (options->mode==1) {
+    IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_sparsemat_arpack_multiply,
+				       (void*) A, options, storage, 
+				       values, vectors));
+  } else if (options->mode==3) {
+    igraph_real_t sigma=options->sigma;
+    igraph_sparsemat_t OP, eye;
+    igraph_sparsemat_symbolic_t symb;
+    igraph_sparsemat_numeric_t num;
+    igraph_i_sparsemat_arpack_rssolve_data_t data;
+    /*-----------------------------------*/
+    /* We need to factor the (A-sigma*I) */
+    /*-----------------------------------*/
+    
+    /* Create (A-sigma*I) */
+    IGRAPH_CHECK(igraph_sparsemat_eye(&eye, /*n=*/ n, /*nzmax=*/ n, 
+				      /*value=*/ -sigma, /*compress=*/ 1));
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, &eye);
+    IGRAPH_CHECK(igraph_sparsemat_add(/*A=*/ A, /*B=*/ &eye, /*alpha=*/ 1.0,
+				      /*beta=*/ 1.0, /*res=*/ &OP));
+    igraph_sparsemat_destroy(&eye);
+    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, &OP);
+        
+    if (solvemethod==IGRAPH_SPARSEMAT_SOLVE_LU) {
+      /* Symbolic analysis */
+      IGRAPH_CHECK(igraph_sparsemat_symbqr(/*order=*/ 0, &OP, &symb, 
+					   /*qr=*/ 0));
+      IGRAPH_FINALLY(igraph_sparsemat_symbolic_destroy, &symb);
+      /* Numeric LU factorization */
+      IGRAPH_CHECK(igraph_sparsemat_lu(&OP, &symb, &num, /*tol=*/ 0));
+      IGRAPH_FINALLY(igraph_sparsemat_numeric_destroy, &num);
+    } else if (solvemethod==IGRAPH_SPARSEMAT_SOLVE_QR) {
+      /* Symbolic analysis */
+      IGRAPH_CHECK(igraph_sparsemat_symbqr(/*order=*/ 0, &OP, &symb, 
+					   /*qr=*/ 1));
+      IGRAPH_FINALLY(igraph_sparsemat_symbolic_destroy, &symb);
+      /* Numeric QR factorization */
+      IGRAPH_CHECK(igraph_sparsemat_qr(&OP, &symb, &num));
+      IGRAPH_FINALLY(igraph_sparsemat_numeric_destroy, &num);
+    }
+
+    data.dis=&symb;
+    data.din=&num;
+    data.tol=options->tol;
+    data.method=solvemethod;
+    IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_sparsemat_arpack_solve,
+				       (void*) &data, options, storage, 
+				       values, vectors));
+   
+    igraph_sparsemat_numeric_destroy(&num);
+    igraph_sparsemat_symbolic_destroy(&symb);
+    igraph_sparsemat_destroy(&OP);
+    IGRAPH_FINALLY_CLEAN(3);
+  }
+
+  return 0;
 }
+
 
 int igraph_sparsemat_arpack_rnsolve(const igraph_sparsemat_t *A,
 				    igraph_arpack_options_t *options,
@@ -759,3 +846,213 @@ int igraph_sparsemat_arpack_rnsolve(const igraph_sparsemat_t *A,
 			       values, vectors);
 }
 
+int igraph_sparsemat_schol(long int order, const igraph_sparsemat_t *A, 
+			   igraph_sparsemat_symbolic_t *dis) {
+
+  dis->symbolic = cs_schol(order, A->cs);
+  if (!dis->symbolic) {
+    IGRAPH_ERROR("Cannot do symbolic Cholesky decomposition", IGRAPH_FAILURE);
+  }
+
+  return 0;
+}
+
+int igraph_sparsemat_symbqr(long int order, const igraph_sparsemat_t *A,
+			    igraph_sparsemat_symbolic_t *dis, int qr) {
+
+  dis->symbolic = cs_sqr(order, A->cs, qr);
+  if (!dis->symbolic) {
+    IGRAPH_ERROR("Cannot do symbolic QR decomposition", IGRAPH_FAILURE);
+  }
+  
+  return 0;
+}
+
+int igraph_sparsemat_lu(const igraph_sparsemat_t *A, 
+			const igraph_sparsemat_symbolic_t *dis, 
+			igraph_sparsemat_numeric_t *din, double tol) {
+  din->numeric=cs_lu(A->cs, dis->symbolic, tol);
+  if (!din->numeric) {
+    IGRAPH_ERROR("Cannot do LU decomposition", IGRAPH_FAILURE);
+  }
+  return 0;
+}
+
+int igraph_sparsemat_qr(const igraph_sparsemat_t *A,
+			const igraph_sparsemat_symbolic_t *dis,
+			igraph_sparsemat_numeric_t *din) {
+  din->numeric=cs_qr(A->cs, dis->symbolic);
+  if (!din->numeric) {
+    IGRAPH_ERROR("Cannot do QR decomposition", IGRAPH_FAILURE);
+  }
+  return 0;
+}
+
+int igraph_sparsemat_luresol(const igraph_sparsemat_symbolic_t *dis,
+			     const igraph_sparsemat_numeric_t *din, 
+			     const igraph_vector_t *b,
+			     igraph_vector_t *res,
+			     igraph_real_t tol) {
+  int n=din->numeric->L->n;
+  igraph_real_t *workspace;
+
+  if (res != b) {
+    IGRAPH_CHECK(igraph_vector_update(res, b));
+  }
+  
+  workspace=igraph_Calloc(n, igraph_real_t);
+  if (!workspace) { 
+    IGRAPH_ERROR("Cannot LU (re)solve sparse matrix", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, workspace);
+
+  if (!cs_ipvec(din->numeric->pinv, VECTOR(*res), workspace, n)) {
+    IGRAPH_ERROR("Cannot LU (re)solve sparse matrix", IGRAPH_FAILURE);
+  }
+  if (!cs_lsolve(din->numeric->L, workspace)) {
+    IGRAPH_ERROR("Cannot LU (re)solve sparse matrix", IGRAPH_FAILURE);
+  }
+  if (!cs_usolve(din->numeric->U, workspace)) {
+    IGRAPH_ERROR("Cannot LU (re)solve sparse matrix", IGRAPH_FAILURE);
+  }
+  if (!cs_ipvec(dis->symbolic->q, workspace, VECTOR(*res), n)) {
+    IGRAPH_ERROR("Cannot LU (re)solve sparse matrix", IGRAPH_FAILURE);
+  }
+    
+  igraph_Free(workspace);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
+int igraph_sparsemat_qrresol(const igraph_sparsemat_symbolic_t *dis,
+			     const igraph_sparsemat_numeric_t *din, 
+			     const igraph_vector_t *b,
+			     igraph_vector_t *res,
+			     igraph_real_t tol) {
+  int n=din->numeric->L->n;
+  igraph_real_t *workspace;
+  int k;
+
+  if (res != b) {
+    IGRAPH_CHECK(igraph_vector_update(res, b));
+  }
+
+  workspace=igraph_Calloc(dis->symbolic ? dis->symbolic->m2 : 1, 
+			  igraph_real_t);
+  if (!workspace) { 
+    IGRAPH_ERROR("Cannot QR (re)solve sparse matrix", IGRAPH_FAILURE);
+  }
+  IGRAPH_FINALLY(igraph_free, workspace);
+
+  if (!cs_ipvec(dis->symbolic->pinv, VECTOR(*res), workspace, n)) {
+    IGRAPH_ERROR("Cannot QR (re)solve sparse matrix", IGRAPH_FAILURE);
+  }
+  for (k=0; k<n; k++) {
+    if (!cs_happly(din->numeric->L, k, din->numeric->B[k], workspace)) {
+      IGRAPH_ERROR("Cannot QR (re)solve sparse matrix", IGRAPH_FAILURE);
+    }
+  }
+  if (!cs_usolve(din->numeric->U, workspace)) {
+    IGRAPH_ERROR("Cannot QR (re)solve sparse matrix", IGRAPH_FAILURE);
+  }
+  if (!cs_ipvec(dis->symbolic->q, workspace, VECTOR(*res), n)) {
+    IGRAPH_ERROR("Cannot QR (re)solve sparse matrix", IGRAPH_FAILURE);
+  }
+
+  igraph_Free(workspace);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
+
+void igraph_sparsemat_symbolic_destroy(igraph_sparsemat_symbolic_t *dis) {
+  cs_sfree(dis->symbolic);
+  dis->symbolic=0;
+}
+
+void igraph_sparsemat_numeric_destroy(igraph_sparsemat_numeric_t *din) {
+  cs_nfree(din->numeric);
+  din->numeric=0;
+}
+
+int igraph_matrix_as_sparsemat(igraph_sparsemat_t *res,
+			       const igraph_matrix_t *mat,
+			       igraph_real_t tol) {
+  int nrow=igraph_matrix_nrow(mat);
+  int ncol=igraph_matrix_ncol(mat);
+  int i, j, nzmax=0;
+
+  for (i=0; i<nrow; i++) {
+    for (j=0; j<nrow; j++) {
+      if (fabs(MATRIX(*mat, i, j)) > tol) { nzmax++; }
+    }
+  }
+  
+  IGRAPH_CHECK(igraph_sparsemat_init(res, nrow, ncol, nzmax));
+  
+  for (i=0; i<nrow; i++) {
+    for (j=0; j<ncol; j++) {
+      if (fabs(MATRIX(*mat, i, j)) > tol) {
+	IGRAPH_CHECK(igraph_sparsemat_entry(res, i, j, MATRIX(*mat, i, j)));
+      }
+    }
+  }
+
+  return 0;
+}
+
+int igraph_i_sparsemat_as_matrix_cc(igraph_matrix_t *res,
+				    const igraph_sparsemat_t *spmat) {
+
+  int nrow=igraph_sparsemat_nrow(spmat);
+  int ncol=igraph_sparsemat_ncol(spmat);
+  int *p=spmat->cs->p;
+  int *i=spmat->cs->i;
+  igraph_real_t *x=spmat->cs->x;
+  int nzmax=spmat->cs->nzmax;
+  int from=0, to=0;
+
+  IGRAPH_CHECK(igraph_matrix_init(res, nrow, ncol));
+  
+  while (*p < nzmax) {
+    while (to < *(p+1)) {
+      MATRIX(*res, *i, from) += *x;
+      to++;
+      i++;
+      x++;
+    }
+    from++;
+    p++;
+  }
+
+  return 0;
+}
+
+int igraph_i_sparsemat_as_matrix_triplet(igraph_matrix_t *res,
+					 const igraph_sparsemat_t *spmat) {
+  int nrow=igraph_sparsemat_nrow(spmat);
+  int ncol=igraph_sparsemat_ncol(spmat);
+  int *i=spmat->cs->p;
+  int *j=spmat->cs->i;
+  igraph_real_t *x=spmat->cs->x;
+  int nz=spmat->cs->nz;
+  int e;
+  
+  IGRAPH_CHECK(igraph_matrix_init(res, nrow, ncol));
+
+  for (e=0; e<nz; e++, i++, j++, x++) {
+    MATRIX(*res, *j, *i) = *x;
+  }
+
+  return 0;
+}
+
+int igraph_sparsemat_as_matrix(igraph_matrix_t *res,
+			       const igraph_sparsemat_t *spmat) {
+  if (spmat->cs->nz < 0) {
+    return(igraph_i_sparsemat_as_matrix_cc(res, spmat));
+  } else {
+    return(igraph_i_sparsemat_as_matrix_triplet(res, spmat));
+  }
+}

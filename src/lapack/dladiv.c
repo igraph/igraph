@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,9 +10,7 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Subroutine */ int igraphdladiv_(doublereal *a, doublereal *b, doublereal *c__, 
 	doublereal *d__, doublereal *p, doublereal *q)
@@ -20,46 +18,39 @@
     static doublereal e, f;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     October 31, 1992 */
+/*  -- LAPACK auxiliary routine (version 3.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2006   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  DLADIV performs complex division in  real arithmetic */
+    DLADIV performs complex division in  real arithmetic   
 
-/*                        a + i*b */
-/*             p + i*q = --------- */
-/*                        c + i*d */
+                          a + i*b   
+               p + i*q = ---------   
+                          c + i*d   
 
-/*  The algorithm is due to Robert L. Smith and can be found */
-/*  in D. Knuth, The art of Computer Programming, Vol.2, p.195 */
+    The algorithm is due to Robert L. Smith and can be found   
+    in D. Knuth, The art of Computer Programming, Vol.2, p.195   
 
-/*  Arguments */
-/*  ========= */
+    Arguments   
+    =========   
 
-/*  A       (input) DOUBLE PRECISION */
-/*  B       (input) DOUBLE PRECISION */
-/*  C       (input) DOUBLE PRECISION */
-/*  D       (input) DOUBLE PRECISION */
-/*          The scalars a, b, c, and d in the above expression. */
+    A       (input) DOUBLE PRECISION   
+    B       (input) DOUBLE PRECISION   
+    C       (input) DOUBLE PRECISION   
+    D       (input) DOUBLE PRECISION   
+            The scalars a, b, c, and d in the above expression.   
 
-/*  P       (output) DOUBLE PRECISION */
-/*  Q       (output) DOUBLE PRECISION */
-/*          The scalars p and q in the above expression. */
+    P       (output) DOUBLE PRECISION   
+    Q       (output) DOUBLE PRECISION   
+            The scalars p and q in the above expression.   
 
-/*  ===================================================================== */
+    ===================================================================== */
 
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. Intrinsic Functions .. */
-/*     .. */
-/*     .. Executable Statements .. */
 
     if (abs(*d__) < abs(*c__)) {
 	e = *d__ / *c__;
@@ -77,5 +68,5 @@
 
 /*     End of DLADIV */
 
-} /* dladiv_ */
+} /* igraphdladiv_ */
 

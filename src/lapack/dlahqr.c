@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,9 +10,7 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Table of constant values */
 
@@ -24,151 +22,157 @@ static integer c__1 = 1;
 	integer *ldz, integer *info)
 {
     /* System generated locals */
-    integer h_dim1, h_offset, z_dim1, z_offset, i__1, i__2, i__3, i__4;
-    doublereal d__1, d__2;
+    integer h_dim1, h_offset, z_dim1, z_offset, i__1, i__2, i__3;
+    doublereal d__1, d__2, d__3, d__4;
 
     /* Builtin functions */
-    double sqrt(doublereal), igraphd_sign(doublereal *, doublereal *);
+    double sqrt(doublereal);
 
     /* Local variables */
     static integer i__, j, k, l, m;
     static doublereal s, v[3];
     static integer i1, i2;
-    static doublereal t1, t2, t3, v1, v2, v3, h00, h10, h11, h12, h21, h22, 
-	    h33, h44;
+    static doublereal t1, t2, t3, v2, v3, aa, ab, ba, bb, h11, h12, h21, h22, 
+	    cs;
     static integer nh;
-    static doublereal cs;
-    static integer nr;
     static doublereal sn;
+    static integer nr;
+    static doublereal tr;
     static integer nz;
-    static doublereal ave, h33s, h44s;
-    static integer itn, its;
-    static doublereal ulp, sum, tst1, h43h34, disc, unfl, ovfl;
+    static doublereal det, h21s;
+    static integer its;
+    static doublereal ulp, sum, tst, rt1i, rt2i, rt1r, rt2r;
     extern /* Subroutine */ int igraphdrot_(integer *, doublereal *, integer *, 
-	    doublereal *, integer *, doublereal *, doublereal *);
-    static doublereal work[1];
-    extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
-	    doublereal *, integer *), igraphdlanv2_(doublereal *, doublereal *, 
+	    doublereal *, integer *, doublereal *, doublereal *), igraphdcopy_(
+	    integer *, doublereal *, integer *, doublereal *, integer *), 
+	    igraphdlanv2_(doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
-	    doublereal *, doublereal *, doublereal *, doublereal *), igraphdlabad_(
-	    doublereal *, doublereal *);
+	    doublereal *, doublereal *), igraphdlabad_(doublereal *, doublereal *);
     extern doublereal igraphdlamch_(char *);
     extern /* Subroutine */ int igraphdlarfg_(integer *, doublereal *, doublereal *,
 	     integer *, doublereal *);
-    extern doublereal igraphdlanhs_(char *, integer *, doublereal *, integer *, 
-	    doublereal *);
-    static doublereal smlnum;
+    static doublereal safmin, safmax, rtdisc, smlnum;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     June 30, 1999 */
+/*  -- LAPACK auxiliary routine (version 3.2) --   
+       Univ. of Tennessee, Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..   
+       November 2006   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
-/*     .. Array Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+       Purpose   
+       =======   
 
-/*  DLAHQR is an auxiliary routine called by DHSEQR to update the */
-/*  eigenvalues and Schur decomposition already computed by DHSEQR, by */
-/*  dealing with the Hessenberg submatrix in rows and columns ILO to IHI. */
+       DLAHQR is an auxiliary routine called by DHSEQR to update the   
+       eigenvalues and Schur decomposition already computed by DHSEQR, by   
+       dealing with the Hessenberg submatrix in rows and columns ILO to   
+       IHI.   
 
-/*  Arguments */
-/*  ========= */
+       Arguments   
+       =========   
 
-/*  WANTT   (input) LOGICAL */
-/*          = .TRUE. : the full Schur form T is required; */
-/*          = .FALSE.: only eigenvalues are required. */
+       WANTT   (input) LOGICAL   
+            = .TRUE. : the full Schur form T is required;   
+            = .FALSE.: only eigenvalues are required.   
 
-/*  WANTZ   (input) LOGICAL */
-/*          = .TRUE. : the matrix of Schur vectors Z is required; */
-/*          = .FALSE.: Schur vectors are not required. */
+       WANTZ   (input) LOGICAL   
+            = .TRUE. : the matrix of Schur vectors Z is required;   
+            = .FALSE.: Schur vectors are not required.   
 
-/*  N       (input) INTEGER */
-/*          The order of the matrix H.  N >= 0. */
+       N       (input) INTEGER   
+            The order of the matrix H.  N >= 0.   
 
-/*  ILO     (input) INTEGER */
-/*  IHI     (input) INTEGER */
-/*          It is assumed that H is already upper quasi-triangular in */
-/*          rows and columns IHI+1:N, and that H(ILO,ILO-1) = 0 (unless */
-/*          ILO = 1). DLAHQR works primarily with the Hessenberg */
-/*          submatrix in rows and columns ILO to IHI, but applies */
-/*          transformations to all of H if WANTT is .TRUE.. */
-/*          1 <= ILO <= max(1,IHI); IHI <= N. */
+       ILO     (input) INTEGER   
+       IHI     (input) INTEGER   
+            It is assumed that H is already upper quasi-triangular in   
+            rows and columns IHI+1:N, and that H(ILO,ILO-1) = 0 (unless   
+            ILO = 1). DLAHQR works primarily with the Hessenberg   
+            submatrix in rows and columns ILO to IHI, but applies   
+            transformations to all of H if WANTT is .TRUE..   
+            1 <= ILO <= max(1,IHI); IHI <= N.   
 
-/*  H       (input/output) DOUBLE PRECISION array, dimension (LDH,N) */
-/*          On entry, the upper Hessenberg matrix H. */
-/*          On exit, if WANTT is .TRUE., H is upper quasi-triangular in */
-/*          rows and columns ILO:IHI, with any 2-by-2 diagonal blocks in */
-/*          standard form. If WANTT is .FALSE., the contents of H are */
-/*          unspecified on exit. */
+       H       (input/output) DOUBLE PRECISION array, dimension (LDH,N)   
+            On entry, the upper Hessenberg matrix H.   
+            On exit, if INFO is zero and if WANTT is .TRUE., H is upper   
+            quasi-triangular in rows and columns ILO:IHI, with any   
+            2-by-2 diagonal blocks in standard form. If INFO is zero   
+            and WANTT is .FALSE., the contents of H are unspecified on   
+            exit.  The output state of H if INFO is nonzero is given   
+            below under the description of INFO.   
 
-/*  LDH     (input) INTEGER */
-/*          The leading dimension of the array H. LDH >= max(1,N). */
+       LDH     (input) INTEGER   
+            The leading dimension of the array H. LDH >= max(1,N).   
 
-/*  WR      (output) DOUBLE PRECISION array, dimension (N) */
-/*  WI      (output) DOUBLE PRECISION array, dimension (N) */
-/*          The real and imaginary parts, respectively, of the computed */
-/*          eigenvalues ILO to IHI are stored in the corresponding */
-/*          elements of WR and WI. If two eigenvalues are computed as a */
-/*          complex conjugate pair, they are stored in consecutive */
-/*          elements of WR and WI, say the i-th and (i+1)th, with */
-/*          WI(i) > 0 and WI(i+1) < 0. If WANTT is .TRUE., the */
-/*          eigenvalues are stored in the same order as on the diagonal */
-/*          of the Schur form returned in H, with WR(i) = H(i,i), and, if */
-/*          H(i:i+1,i:i+1) is a 2-by-2 diagonal block, */
-/*          WI(i) = sqrt(H(i+1,i)*H(i,i+1)) and WI(i+1) = -WI(i). */
+       WR      (output) DOUBLE PRECISION array, dimension (N)   
+       WI      (output) DOUBLE PRECISION array, dimension (N)   
+            The real and imaginary parts, respectively, of the computed   
+            eigenvalues ILO to IHI are stored in the corresponding   
+            elements of WR and WI. If two eigenvalues are computed as a   
+            complex conjugate pair, they are stored in consecutive   
+            elements of WR and WI, say the i-th and (i+1)th, with   
+            WI(i) > 0 and WI(i+1) < 0. If WANTT is .TRUE., the   
+            eigenvalues are stored in the same order as on the diagonal   
+            of the Schur form returned in H, with WR(i) = H(i,i), and, if   
+            H(i:i+1,i:i+1) is a 2-by-2 diagonal block,   
+            WI(i) = sqrt(H(i+1,i)*H(i,i+1)) and WI(i+1) = -WI(i).   
 
-/*  ILOZ    (input) INTEGER */
-/*  IHIZ    (input) INTEGER */
-/*          Specify the rows of Z to which transformations must be */
-/*          applied if WANTZ is .TRUE.. */
-/*          1 <= ILOZ <= ILO; IHI <= IHIZ <= N. */
+       ILOZ    (input) INTEGER   
+       IHIZ    (input) INTEGER   
+            Specify the rows of Z to which transformations must be   
+            applied if WANTZ is .TRUE..   
+            1 <= ILOZ <= ILO; IHI <= IHIZ <= N.   
 
-/*  Z       (input/output) DOUBLE PRECISION array, dimension (LDZ,N) */
-/*          If WANTZ is .TRUE., on entry Z must contain the current */
-/*          matrix Z of transformations accumulated by DHSEQR, and on */
-/*          exit Z has been updated; transformations are applied only to */
-/*          the submatrix Z(ILOZ:IHIZ,ILO:IHI). */
-/*          If WANTZ is .FALSE., Z is not referenced. */
+       Z       (input/output) DOUBLE PRECISION array, dimension (LDZ,N)   
+            If WANTZ is .TRUE., on entry Z must contain the current   
+            matrix Z of transformations accumulated by DHSEQR, and on   
+            exit Z has been updated; transformations are applied only to   
+            the submatrix Z(ILOZ:IHIZ,ILO:IHI).   
+            If WANTZ is .FALSE., Z is not referenced.   
 
-/*  LDZ     (input) INTEGER */
-/*          The leading dimension of the array Z. LDZ >= max(1,N). */
+       LDZ     (input) INTEGER   
+            The leading dimension of the array Z. LDZ >= max(1,N).   
 
-/*  INFO    (output) INTEGER */
-/*          = 0: successful exit */
-/*          > 0: DLAHQR failed to compute all the eigenvalues ILO to IHI */
-/*               in a total of 30*(IHI-ILO+1) iterations; if INFO = i, */
-/*               elements i+1:ihi of WR and WI contain those eigenvalues */
-/*               which have been successfully computed. */
+       INFO    (output) INTEGER   
+             =   0: successful exit   
+            .GT. 0: If INFO = i, DLAHQR failed to compute all the   
+                    eigenvalues ILO to IHI in a total of 30 iterations   
+                    per eigenvalue; elements i+1:ihi of WR and WI   
+                    contain those eigenvalues which have been   
+                    successfully computed.   
 
-/*  Further Details */
-/*  =============== */
+                    If INFO .GT. 0 and WANTT is .FALSE., then on exit,   
+                    the remaining unconverged eigenvalues are the   
+                    eigenvalues of the upper Hessenberg matrix rows   
+                    and columns ILO thorugh INFO of the final, output   
+                    value of H.   
 
-/*  2-96 Based on modifications by */
-/*     David Day, Sandia National Laboratory, USA */
+                    If INFO .GT. 0 and WANTT is .TRUE., then on exit   
+            (*)       (initial value of H)*U  = U*(final value of H)   
+                    where U is an orthognal matrix.    The final   
+                    value of H is upper Hessenberg and triangular in   
+                    rows and columns INFO+1 through IHI.   
 
-/*  ===================================================================== */
+                    If INFO .GT. 0 and WANTZ is .TRUE., then on exit   
+                        (final value of Z)  = (initial value of Z)*U   
+                    where U is the orthogonal matrix in (*)   
+                    (regardless of the value of WANTT.)   
 
-/*     .. Parameters .. */
-/*     .. */
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. Local Arrays .. */
-/*     .. */
-/*     .. External Functions .. */
-/*     .. */
-/*     .. External Subroutines .. */
-/*     .. */
-/*     .. Intrinsic Functions .. */
-/*     .. */
-/*     .. Executable Statements .. */
+       Further Details   
+       ===============   
 
-    /* Parameter adjustments */
+       02-96 Based on modifications by   
+       David Day, Sandia National Laboratory, USA   
+
+       12-04 Further modifications by   
+       Ralph Byers, University of Kansas, USA   
+       This is a modified version of DLAHQR from LAPACK version 3.0.   
+       It is (1) more robust against overflow and underflow and   
+       (2) adopts the more conservative Ahues & Tisseur stopping   
+       criterion (LAWN 122, 1997).   
+
+       =========================================================   
+
+
+       Parameter adjustments */
     h_dim1 = *ldh;
     h_offset = 1 + h_dim1;
     h__ -= h_offset;
@@ -192,70 +196,106 @@ static integer c__1 = 1;
 	return 0;
     }
 
+/*     ==== clear out the trash ==== */
+    i__1 = *ihi - 3;
+    for (j = *ilo; j <= i__1; ++j) {
+	h__[j + 2 + j * h_dim1] = 0.;
+	h__[j + 3 + j * h_dim1] = 0.;
+/* L10: */
+    }
+    if (*ilo <= *ihi - 2) {
+	h__[*ihi + (*ihi - 2) * h_dim1] = 0.;
+    }
+
     nh = *ihi - *ilo + 1;
     nz = *ihiz - *iloz + 1;
 
 /*     Set machine-dependent constants for the stopping criterion. */
-/*     If norm(H) <= sqrt(OVFL), overflow should not occur. */
 
-    unfl = igraphdlamch_("Safe minimum");
-    ovfl = 1. / unfl;
-    igraphdlabad_(&unfl, &ovfl);
-    ulp = igraphdlamch_("Precision");
-    smlnum = unfl * (nh / ulp);
+    safmin = igraphdlamch_("SAFE MINIMUM");
+    safmax = 1. / safmin;
+    igraphdlabad_(&safmin, &safmax);
+    ulp = igraphdlamch_("PRECISION");
+    smlnum = safmin * ((doublereal) nh / ulp);
 
-/*     I1 and I2 are the indices of the first row and last column of H */
-/*     to which transformations must be applied. If eigenvalues only are */
-/*     being computed, I1 and I2 are set inside the main loop. */
+/*     I1 and I2 are the indices of the first row and last column of H   
+       to which transformations must be applied. If eigenvalues only are   
+       being computed, I1 and I2 are set inside the main loop. */
 
     if (*wantt) {
 	i1 = 1;
 	i2 = *n;
     }
 
-/*     ITN is the total number of QR iterations allowed. */
-
-    itn = nh * 30;
-
-/*     The main loop begins here. I is the loop index and decreases from */
-/*     IHI to ILO in steps of 1 or 2. Each iteration of the loop works */
-/*     with the active submatrix in rows and columns L to I. */
-/*     Eigenvalues I+1 to IHI have already converged. Either L = ILO or */
-/*     H(L,L-1) is negligible so that the matrix splits. */
+/*     The main loop begins here. I is the loop index and decreases from   
+       IHI to ILO in steps of 1 or 2. Each iteration of the loop works   
+       with the active submatrix in rows and columns L to I.   
+       Eigenvalues I+1 to IHI have already converged. Either L = ILO or   
+       H(L,L-1) is negligible so that the matrix splits. */
 
     i__ = *ihi;
-L10:
+L20:
     l = *ilo;
     if (i__ < *ilo) {
-	goto L150;
+	goto L160;
     }
 
-/*     Perform QR iterations on rows and columns ILO to I until a */
-/*     submatrix of order 1 or 2 splits off at the bottom because a */
-/*     subdiagonal element has become negligible. */
+/*     Perform QR iterations on rows and columns ILO to I until a   
+       submatrix of order 1 or 2 splits off at the bottom because a   
+       subdiagonal element has become negligible. */
 
-    i__1 = itn;
-    for (its = 0; its <= i__1; ++its) {
+    for (its = 0; its <= 30; ++its) {
 
 /*        Look for a single small subdiagonal element. */
 
-	i__2 = l + 1;
-	for (k = i__; k >= i__2; --k) {
-	    tst1 = (d__1 = h__[k - 1 + (k - 1) * h_dim1], abs(d__1)) + (d__2 =
-		     h__[k + k * h_dim1], abs(d__2));
-	    if (tst1 == 0.) {
-		i__3 = i__ - l + 1;
-		tst1 = igraphdlanhs_("1", &i__3, &h__[l + l * h_dim1], ldh, work);
+	i__1 = l + 1;
+	for (k = i__; k >= i__1; --k) {
+	    if ((d__1 = h__[k + (k - 1) * h_dim1], abs(d__1)) <= smlnum) {
+		goto L40;
 	    }
+	    tst = (d__1 = h__[k - 1 + (k - 1) * h_dim1], abs(d__1)) + (d__2 = 
+		    h__[k + k * h_dim1], abs(d__2));
+	    if (tst == 0.) {
+		if (k - 2 >= *ilo) {
+		    tst += (d__1 = h__[k - 1 + (k - 2) * h_dim1], abs(d__1));
+		}
+		if (k + 1 <= *ihi) {
+		    tst += (d__1 = h__[k + 1 + k * h_dim1], abs(d__1));
+		}
+	    }
+/*           ==== The following is a conservative small subdiagonal   
+             .    deflation  criterion due to Ahues & Tisseur (LAWN 122,   
+             .    1997). It has better mathematical foundation and   
+             .    improves accuracy in some cases.  ==== */
+	    if ((d__1 = h__[k + (k - 1) * h_dim1], abs(d__1)) <= ulp * tst) {
 /* Computing MAX */
-	    d__2 = ulp * tst1;
-	    if ((d__1 = h__[k + (k - 1) * h_dim1], abs(d__1)) <= max(d__2,
-		    smlnum)) {
-		goto L30;
+		d__3 = (d__1 = h__[k + (k - 1) * h_dim1], abs(d__1)), d__4 = (
+			d__2 = h__[k - 1 + k * h_dim1], abs(d__2));
+		ab = max(d__3,d__4);
+/* Computing MIN */
+		d__3 = (d__1 = h__[k + (k - 1) * h_dim1], abs(d__1)), d__4 = (
+			d__2 = h__[k - 1 + k * h_dim1], abs(d__2));
+		ba = min(d__3,d__4);
+/* Computing MAX */
+		d__3 = (d__1 = h__[k + k * h_dim1], abs(d__1)), d__4 = (d__2 =
+			 h__[k - 1 + (k - 1) * h_dim1] - h__[k + k * h_dim1], 
+			abs(d__2));
+		aa = max(d__3,d__4);
+/* Computing MIN */
+		d__3 = (d__1 = h__[k + k * h_dim1], abs(d__1)), d__4 = (d__2 =
+			 h__[k - 1 + (k - 1) * h_dim1] - h__[k + k * h_dim1], 
+			abs(d__2));
+		bb = min(d__3,d__4);
+		s = aa + ab;
+/* Computing MAX */
+		d__1 = smlnum, d__2 = ulp * (bb * (aa / s));
+		if (ba * (ab / s) <= max(d__1,d__2)) {
+		    goto L40;
+		}
 	    }
-/* L20: */
+/* L30: */
 	}
-L30:
+L40:
 	l = k;
 	if (l > *ilo) {
 
@@ -267,111 +307,143 @@ L30:
 /*        Exit from loop if a submatrix of order 1 or 2 has split off. */
 
 	if (l >= i__ - 1) {
-	    goto L140;
+	    goto L150;
 	}
 
-/*        Now the active submatrix is in rows and columns L to I. If */
-/*        eigenvalues only are being computed, only the active submatrix */
-/*        need be transformed. */
+/*        Now the active submatrix is in rows and columns L to I. If   
+          eigenvalues only are being computed, only the active submatrix   
+          need be transformed. */
 
 	if (! (*wantt)) {
 	    i1 = l;
 	    i2 = i__;
 	}
 
-	if (its == 10 || its == 20) {
+	if (its == 10) {
+
+/*           Exceptional shift. */
+
+	    s = (d__1 = h__[l + 1 + l * h_dim1], abs(d__1)) + (d__2 = h__[l + 
+		    2 + (l + 1) * h_dim1], abs(d__2));
+	    h11 = s * .75 + h__[l + l * h_dim1];
+	    h12 = s * -.4375;
+	    h21 = s;
+	    h22 = h11;
+	} else if (its == 20) {
 
 /*           Exceptional shift. */
 
 	    s = (d__1 = h__[i__ + (i__ - 1) * h_dim1], abs(d__1)) + (d__2 = 
 		    h__[i__ - 1 + (i__ - 2) * h_dim1], abs(d__2));
-	    h44 = s * .75 + h__[i__ + i__ * h_dim1];
-	    h33 = h44;
-	    h43h34 = s * -.4375 * s;
+	    h11 = s * .75 + h__[i__ + i__ * h_dim1];
+	    h12 = s * -.4375;
+	    h21 = s;
+	    h22 = h11;
 	} else {
 
-/*           Prepare to use Francis' double shift */
-/*           (i.e. 2nd degree generalized Rayleigh quotient) */
+/*           Prepare to use Francis' double shift   
+             (i.e. 2nd degree generalized Rayleigh quotient) */
 
-	    h44 = h__[i__ + i__ * h_dim1];
-	    h33 = h__[i__ - 1 + (i__ - 1) * h_dim1];
-	    h43h34 = h__[i__ + (i__ - 1) * h_dim1] * h__[i__ - 1 + i__ * 
-		    h_dim1];
-	    s = h__[i__ - 1 + (i__ - 2) * h_dim1] * h__[i__ - 1 + (i__ - 2) * 
-		    h_dim1];
-	    disc = (h33 - h44) * .5;
-	    disc = disc * disc + h43h34;
-	    if (disc > 0.) {
+	    h11 = h__[i__ - 1 + (i__ - 1) * h_dim1];
+	    h21 = h__[i__ + (i__ - 1) * h_dim1];
+	    h12 = h__[i__ - 1 + i__ * h_dim1];
+	    h22 = h__[i__ + i__ * h_dim1];
+	}
+	s = abs(h11) + abs(h12) + abs(h21) + abs(h22);
+	if (s == 0.) {
+	    rt1r = 0.;
+	    rt1i = 0.;
+	    rt2r = 0.;
+	    rt2i = 0.;
+	} else {
+	    h11 /= s;
+	    h21 /= s;
+	    h12 /= s;
+	    h22 /= s;
+	    tr = (h11 + h22) / 2.;
+	    det = (h11 - tr) * (h22 - tr) - h12 * h21;
+	    rtdisc = sqrt((abs(det)));
+	    if (det >= 0.) {
 
-/*              Real roots: use Wilkinson's shift twice */
+/*              ==== complex conjugate shifts ==== */
 
-		disc = sqrt(disc);
-		ave = (h33 + h44) * .5;
-		if (abs(h33) - abs(h44) > 0.) {
-		    h33 = h33 * h44 - h43h34;
-		    h44 = h33 / (igraphd_sign(&disc, &ave) + ave);
+		rt1r = tr * s;
+		rt2r = rt1r;
+		rt1i = rtdisc * s;
+		rt2i = -rt1i;
+	    } else {
+
+/*              ==== real shifts (use only one of them)  ==== */
+
+		rt1r = tr + rtdisc;
+		rt2r = tr - rtdisc;
+		if ((d__1 = rt1r - h22, abs(d__1)) <= (d__2 = rt2r - h22, abs(
+			d__2))) {
+		    rt1r *= s;
+		    rt2r = rt1r;
 		} else {
-		    h44 = igraphd_sign(&disc, &ave) + ave;
+		    rt2r *= s;
+		    rt1r = rt2r;
 		}
-		h33 = h44;
-		h43h34 = 0.;
+		rt1i = 0.;
+		rt2i = 0.;
 	    }
 	}
 
 /*        Look for two consecutive small subdiagonal elements. */
 
-	i__2 = l;
-	for (m = i__ - 2; m >= i__2; --m) {
-/*           Determine the effect of starting the double-shift QR */
-/*           iteration at row M, and see if this would make H(M,M-1) */
-/*           negligible. */
+	i__1 = l;
+	for (m = i__ - 2; m >= i__1; --m) {
+/*           Determine the effect of starting the double-shift QR   
+             iteration at row M, and see if this would make H(M,M-1)   
+             negligible.  (The following uses scaling to avoid   
+             overflows and most underflows.) */
 
-	    h11 = h__[m + m * h_dim1];
-	    h22 = h__[m + 1 + (m + 1) * h_dim1];
-	    h21 = h__[m + 1 + m * h_dim1];
-	    h12 = h__[m + (m + 1) * h_dim1];
-	    h44s = h44 - h11;
-	    h33s = h33 - h11;
-	    v1 = (h33s * h44s - h43h34) / h21 + h12;
-	    v2 = h22 - h11 - h33s - h44s;
-	    v3 = h__[m + 2 + (m + 1) * h_dim1];
-	    s = abs(v1) + abs(v2) + abs(v3);
-	    v1 /= s;
-	    v2 /= s;
-	    v3 /= s;
-	    v[0] = v1;
-	    v[1] = v2;
-	    v[2] = v3;
+	    h21s = h__[m + 1 + m * h_dim1];
+	    s = (d__1 = h__[m + m * h_dim1] - rt2r, abs(d__1)) + abs(rt2i) + 
+		    abs(h21s);
+	    h21s = h__[m + 1 + m * h_dim1] / s;
+	    v[0] = h21s * h__[m + (m + 1) * h_dim1] + (h__[m + m * h_dim1] - 
+		    rt1r) * ((h__[m + m * h_dim1] - rt2r) / s) - rt1i * (rt2i 
+		    / s);
+	    v[1] = h21s * (h__[m + m * h_dim1] + h__[m + 1 + (m + 1) * h_dim1]
+		     - rt1r - rt2r);
+	    v[2] = h21s * h__[m + 2 + (m + 1) * h_dim1];
+	    s = abs(v[0]) + abs(v[1]) + abs(v[2]);
+	    v[0] /= s;
+	    v[1] /= s;
+	    v[2] /= s;
 	    if (m == l) {
-		goto L50;
+		goto L60;
 	    }
-	    h00 = h__[m - 1 + (m - 1) * h_dim1];
-	    h10 = h__[m + (m - 1) * h_dim1];
-	    tst1 = abs(v1) * (abs(h00) + abs(h11) + abs(h22));
-	    if (abs(h10) * (abs(v2) + abs(v3)) <= ulp * tst1) {
-		goto L50;
+	    if ((d__1 = h__[m + (m - 1) * h_dim1], abs(d__1)) * (abs(v[1]) + 
+		    abs(v[2])) <= ulp * abs(v[0]) * ((d__2 = h__[m - 1 + (m - 
+		    1) * h_dim1], abs(d__2)) + (d__3 = h__[m + m * h_dim1], 
+		    abs(d__3)) + (d__4 = h__[m + 1 + (m + 1) * h_dim1], abs(
+		    d__4)))) {
+		goto L60;
 	    }
-/* L40: */
+/* L50: */
 	}
-L50:
+L60:
 
 /*        Double-shift QR step */
 
-	i__2 = i__ - 1;
-	for (k = m; k <= i__2; ++k) {
+	i__1 = i__ - 1;
+	for (k = m; k <= i__1; ++k) {
 
-/*           The first iteration of this loop determines a reflection G */
-/*           from the vector V and applies it from left and right to H, */
-/*           thus creating a nonzero bulge below the subdiagonal. */
+/*           The first iteration of this loop determines a reflection G   
+             from the vector V and applies it from left and right to H,   
+             thus creating a nonzero bulge below the subdiagonal.   
 
-/*           Each subsequent iteration determines a reflection G to */
-/*           restore the Hessenberg form in the (K-1)th column, and thus */
-/*           chases the bulge one step toward the bottom of the active */
-/*           submatrix. NR is the order of G. */
+             Each subsequent iteration determines a reflection G to   
+             restore the Hessenberg form in the (K-1)th column, and thus   
+             chases the bulge one step toward the bottom of the active   
+             submatrix. NR is the order of G.   
 
-/* Computing MIN */
-	    i__3 = 3, i__4 = i__ - k + 1;
-	    nr = min(i__3,i__4);
+   Computing MIN */
+	    i__2 = 3, i__3 = i__ - k + 1;
+	    nr = min(i__2,i__3);
 	    if (k > m) {
 		igraphdcopy_(&nr, &h__[k + (k - 1) * h_dim1], &c__1, v, &c__1);
 	    }
@@ -383,7 +455,11 @@ L50:
 		    h__[k + 2 + (k - 1) * h_dim1] = 0.;
 		}
 	    } else if (m > l) {
-		h__[k + (k - 1) * h_dim1] = -h__[k + (k - 1) * h_dim1];
+/*               ==== Use the following instead of   
+                 .    H( K, K-1 ) = -H( K, K-1 ) to   
+                 .    avoid a bug when v(2) and v(3)   
+                 .    underflow. ==== */
+		h__[k + (k - 1) * h_dim1] *= 1. - t1;
 	    }
 	    v2 = v[1];
 	    t2 = t1 * v2;
@@ -391,91 +467,91 @@ L50:
 		v3 = v[2];
 		t3 = t1 * v3;
 
-/*              Apply G from the left to transform the rows of the matrix */
-/*              in columns K to I2. */
+/*              Apply G from the left to transform the rows of the matrix   
+                in columns K to I2. */
 
-		i__3 = i2;
-		for (j = k; j <= i__3; ++j) {
+		i__2 = i2;
+		for (j = k; j <= i__2; ++j) {
 		    sum = h__[k + j * h_dim1] + v2 * h__[k + 1 + j * h_dim1] 
 			    + v3 * h__[k + 2 + j * h_dim1];
 		    h__[k + j * h_dim1] -= sum * t1;
 		    h__[k + 1 + j * h_dim1] -= sum * t2;
 		    h__[k + 2 + j * h_dim1] -= sum * t3;
-/* L60: */
+/* L70: */
 		}
 
-/*              Apply G from the right to transform the columns of the */
-/*              matrix in rows I1 to min(K+3,I). */
+/*              Apply G from the right to transform the columns of the   
+                matrix in rows I1 to min(K+3,I).   
 
-/* Computing MIN */
-		i__4 = k + 3;
-		i__3 = min(i__4,i__);
-		for (j = i1; j <= i__3; ++j) {
+   Computing MIN */
+		i__3 = k + 3;
+		i__2 = min(i__3,i__);
+		for (j = i1; j <= i__2; ++j) {
 		    sum = h__[j + k * h_dim1] + v2 * h__[j + (k + 1) * h_dim1]
 			     + v3 * h__[j + (k + 2) * h_dim1];
 		    h__[j + k * h_dim1] -= sum * t1;
 		    h__[j + (k + 1) * h_dim1] -= sum * t2;
 		    h__[j + (k + 2) * h_dim1] -= sum * t3;
-/* L70: */
+/* L80: */
 		}
 
 		if (*wantz) {
 
 /*                 Accumulate transformations in the matrix Z */
 
-		    i__3 = *ihiz;
-		    for (j = *iloz; j <= i__3; ++j) {
+		    i__2 = *ihiz;
+		    for (j = *iloz; j <= i__2; ++j) {
 			sum = z__[j + k * z_dim1] + v2 * z__[j + (k + 1) * 
 				z_dim1] + v3 * z__[j + (k + 2) * z_dim1];
 			z__[j + k * z_dim1] -= sum * t1;
 			z__[j + (k + 1) * z_dim1] -= sum * t2;
 			z__[j + (k + 2) * z_dim1] -= sum * t3;
-/* L80: */
+/* L90: */
 		    }
 		}
 	    } else if (nr == 2) {
 
-/*              Apply G from the left to transform the rows of the matrix */
-/*              in columns K to I2. */
+/*              Apply G from the left to transform the rows of the matrix   
+                in columns K to I2. */
 
-		i__3 = i2;
-		for (j = k; j <= i__3; ++j) {
+		i__2 = i2;
+		for (j = k; j <= i__2; ++j) {
 		    sum = h__[k + j * h_dim1] + v2 * h__[k + 1 + j * h_dim1];
 		    h__[k + j * h_dim1] -= sum * t1;
 		    h__[k + 1 + j * h_dim1] -= sum * t2;
-/* L90: */
+/* L100: */
 		}
 
-/*              Apply G from the right to transform the columns of the */
-/*              matrix in rows I1 to min(K+3,I). */
+/*              Apply G from the right to transform the columns of the   
+                matrix in rows I1 to min(K+3,I). */
 
-		i__3 = i__;
-		for (j = i1; j <= i__3; ++j) {
+		i__2 = i__;
+		for (j = i1; j <= i__2; ++j) {
 		    sum = h__[j + k * h_dim1] + v2 * h__[j + (k + 1) * h_dim1]
 			    ;
 		    h__[j + k * h_dim1] -= sum * t1;
 		    h__[j + (k + 1) * h_dim1] -= sum * t2;
-/* L100: */
+/* L110: */
 		}
 
 		if (*wantz) {
 
 /*                 Accumulate transformations in the matrix Z */
 
-		    i__3 = *ihiz;
-		    for (j = *iloz; j <= i__3; ++j) {
+		    i__2 = *ihiz;
+		    for (j = *iloz; j <= i__2; ++j) {
 			sum = z__[j + k * z_dim1] + v2 * z__[j + (k + 1) * 
 				z_dim1];
 			z__[j + k * z_dim1] -= sum * t1;
 			z__[j + (k + 1) * z_dim1] -= sum * t2;
-/* L110: */
+/* L120: */
 		    }
 		}
 	    }
-/* L120: */
+/* L130: */
 	}
 
-/* L130: */
+/* L140: */
     }
 
 /*     Failure to converge in remaining number of iterations */
@@ -483,7 +559,7 @@ L50:
     *info = i__;
     return 0;
 
-L140:
+L150:
 
     if (l == i__) {
 
@@ -493,10 +569,10 @@ L140:
 	wi[i__] = 0.;
     } else if (l == i__ - 1) {
 
-/*        H(I-1,I-2) is negligible: a pair of eigenvalues have converged. */
+/*        H(I-1,I-2) is negligible: a pair of eigenvalues have converged.   
 
-/*        Transform the 2-by-2 submatrix to standard Schur form, */
-/*        and compute and store the eigenvalues. */
+          Transform the 2-by-2 submatrix to standard Schur form,   
+          and compute and store the eigenvalues. */
 
 	igraphdlanv2_(&h__[i__ - 1 + (i__ - 1) * h_dim1], &h__[i__ - 1 + i__ * 
 		h_dim1], &h__[i__ + (i__ - 1) * h_dim1], &h__[i__ + i__ * 
@@ -525,14 +601,12 @@ L140:
 	}
     }
 
-/*     Decrement number of remaining iterations, and return to start of */
-/*     the main loop with new value of I. */
+/*     return to start of the main loop with new value of I. */
 
-    itn -= its;
     i__ = l - 1;
-    goto L10;
+    goto L20;
 
-L150:
+L160:
     return 0;
 
 /*     End of DLAHQR */

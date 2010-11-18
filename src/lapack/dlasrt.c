@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,9 +10,7 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Subroutine */ int igraphdlasrt_(char *id, integer *n, doublereal *d__, integer *
 	info)
@@ -30,66 +28,51 @@
     static integer stack[64]	/* was [2][32] */;
     static doublereal dmnmx;
     static integer start;
-    extern /* Subroutine */ int igraphxerbla_(char *, integer *);
+    extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
     static integer stkpnt;
 
 
-/*  -- LAPACK routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     September 30, 1994 */
+/*  -- LAPACK routine (version 3.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2006   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
-/*     .. Array Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  Sort the numbers in D in increasing order (if ID = 'I') or */
-/*  in decreasing order (if ID = 'D' ). */
+    Sort the numbers in D in increasing order (if ID = 'I') or   
+    in decreasing order (if ID = 'D' ).   
 
-/*  Use Quick Sort, reverting to Insertion sort on arrays of */
-/*  size <= 20. Dimension of STACK limits N to about 2**32. */
+    Use Quick Sort, reverting to Insertion sort on arrays of   
+    size <= 20. Dimension of STACK limits N to about 2**32.   
 
-/*  Arguments */
-/*  ========= */
+    Arguments   
+    =========   
 
-/*  ID      (input) CHARACTER*1 */
-/*          = 'I': sort D in increasing order; */
-/*          = 'D': sort D in decreasing order. */
+    ID      (input) CHARACTER*1   
+            = 'I': sort D in increasing order;   
+            = 'D': sort D in decreasing order.   
 
-/*  N       (input) INTEGER */
-/*          The length of the array D. */
+    N       (input) INTEGER   
+            The length of the array D.   
 
-/*  D       (input/output) DOUBLE PRECISION array, dimension (N) */
-/*          On entry, the array to be sorted. */
-/*          On exit, D has been sorted into increasing order */
-/*          (D(1) <= ... <= D(N) ) or into decreasing order */
-/*          (D(1) >= ... >= D(N) ), depending on ID. */
+    D       (input/output) DOUBLE PRECISION array, dimension (N)   
+            On entry, the array to be sorted.   
+            On exit, D has been sorted into increasing order   
+            (D(1) <= ... <= D(N) ) or into decreasing order   
+            (D(1) >= ... >= D(N) ), depending on ID.   
 
-/*  INFO    (output) INTEGER */
-/*          = 0:  successful exit */
-/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+    INFO    (output) INTEGER   
+            = 0:  successful exit   
+            < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-/*  ===================================================================== */
+    =====================================================================   
 
-/*     .. Parameters .. */
-/*     .. */
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. Local Arrays .. */
-/*     .. */
-/*     .. External Functions .. */
-/*     .. */
-/*     .. External Subroutines .. */
-/*     .. */
-/*     .. Executable Statements .. */
 
-/*     Test the input paramters. */
+       Test the input paramters.   
 
-    /* Parameter adjustments */
+       Parameter adjustments */
     --d__;
 
     /* Function Body */
@@ -107,7 +90,7 @@
     }
     if (*info != 0) {
 	i__1 = -(*info);
-	igraphxerbla_("DLASRT", &i__1);
+	igraphxerbla_("DLASRT", &i__1, (ftnlen)6);
 	return 0;
     }
 
@@ -174,9 +157,9 @@ L50:
 
     } else if (endd - start > 20) {
 
-/*        Partition D( START:ENDD ) and stack parts, largest one first */
+/*        Partition D( START:ENDD ) and stack parts, largest one first   
 
-/*        Choose partition entry as median of 3 */
+          Choose partition entry as median of 3 */
 
 	d1 = d__[start];
 	d2 = d__[endd];

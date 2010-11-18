@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,9 +10,7 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Table of constant values */
 
@@ -73,190 +71,150 @@ static logical c_true = TRUE_;
 	     igraphdlabad_(doublereal *, doublereal *);
     extern doublereal igraphdlamch_(char *);
     extern integer igraphidamax_(integer *, doublereal *, integer *);
-    extern /* Subroutine */ int igraphxerbla_(char *, integer *);
+    extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
     static doublereal bignum;
     static logical rightv;
     static doublereal smlnum;
 
 
-/*  -- LAPACK routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     June 30, 1999 */
+/*  -- LAPACK routine (version 3.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2006   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
-/*     .. Array Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  DTREVC computes some or all of the right and/or left eigenvectors of */
-/*  a real upper quasi-triangular matrix T. */
+    DTREVC computes some or all of the right and/or left eigenvectors of   
+    a real upper quasi-triangular matrix T.   
+    Matrices of this type are produced by the Schur factorization of   
+    a real general matrix:  A = Q*T*Q**T, as computed by DHSEQR.   
 
-/*  The right eigenvector x and the left eigenvector y of T corresponding */
-/*  to an eigenvalue w are defined by: */
+    The right eigenvector x and the left eigenvector y of T corresponding   
+    to an eigenvalue w are defined by:   
 
-/*               T*x = w*x,     y'*T = w*y' */
+       T*x = w*x,     (y**H)*T = w*(y**H)   
 
-/*  where y' denotes the conjugate transpose of the vector y. */
+    where y**H denotes the conjugate transpose of y.   
+    The eigenvalues are not input to this routine, but are read directly   
+    from the diagonal blocks of T.   
 
-/*  If all eigenvectors are requested, the routine may either return the */
-/*  matrices X and/or Y of right or left eigenvectors of T, or the */
-/*  products Q*X and/or Q*Y, where Q is an input orthogonal */
-/*  matrix. If T was obtained from the real-Schur factorization of an */
-/*  original matrix A = Q*T*Q', then Q*X and Q*Y are the matrices of */
-/*  right or left eigenvectors of A. */
+    This routine returns the matrices X and/or Y of right and left   
+    eigenvectors of T, or the products Q*X and/or Q*Y, where Q is an   
+    input matrix.  If Q is the orthogonal factor that reduces a matrix   
+    A to Schur form T, then Q*X and Q*Y are the matrices of right and   
+    left eigenvectors of A.   
 
-/*  T must be in Schur canonical form (as returned by DHSEQR), that is, */
-/*  block upper triangular with 1-by-1 and 2-by-2 diagonal blocks; each */
-/*  2-by-2 diagonal block has its diagonal elements equal and its */
-/*  off-diagonal elements of opposite sign.  Corresponding to each 2-by-2 */
-/*  diagonal block is a complex conjugate pair of eigenvalues and */
-/*  eigenvectors; only one eigenvector of the pair is computed, namely */
-/*  the one corresponding to the eigenvalue with positive imaginary part. */
+    Arguments   
+    =========   
 
-/*  Arguments */
-/*  ========= */
+    SIDE    (input) CHARACTER*1   
+            = 'R':  compute right eigenvectors only;   
+            = 'L':  compute left eigenvectors only;   
+            = 'B':  compute both right and left eigenvectors.   
 
-/*  SIDE    (input) CHARACTER*1 */
-/*          = 'R':  compute right eigenvectors only; */
-/*          = 'L':  compute left eigenvectors only; */
-/*          = 'B':  compute both right and left eigenvectors. */
+    HOWMNY  (input) CHARACTER*1   
+            = 'A':  compute all right and/or left eigenvectors;   
+            = 'B':  compute all right and/or left eigenvectors,   
+                    backtransformed by the matrices in VR and/or VL;   
+            = 'S':  compute selected right and/or left eigenvectors,   
+                    as indicated by the logical array SELECT.   
 
-/*  HOWMNY  (input) CHARACTER*1 */
-/*          = 'A':  compute all right and/or left eigenvectors; */
-/*          = 'B':  compute all right and/or left eigenvectors, */
-/*                  and backtransform them using the input matrices */
-/*                  supplied in VR and/or VL; */
-/*          = 'S':  compute selected right and/or left eigenvectors, */
-/*                  specified by the logical array SELECT. */
+    SELECT  (input/output) LOGICAL array, dimension (N)   
+            If HOWMNY = 'S', SELECT specifies the eigenvectors to be   
+            computed.   
+            If w(j) is a real eigenvalue, the corresponding real   
+            eigenvector is computed if SELECT(j) is .TRUE..   
+            If w(j) and w(j+1) are the real and imaginary parts of a   
+            complex eigenvalue, the corresponding complex eigenvector is   
+            computed if either SELECT(j) or SELECT(j+1) is .TRUE., and   
+            on exit SELECT(j) is set to .TRUE. and SELECT(j+1) is set to   
+            .FALSE..   
+            Not referenced if HOWMNY = 'A' or 'B'.   
 
-/*  SELECT  (input/output) LOGICAL array, dimension (N) */
-/*          If HOWMNY = 'S', SELECT specifies the eigenvectors to be */
-/*          computed. */
-/*          If HOWMNY = 'A' or 'B', SELECT is not referenced. */
-/*          To select the real eigenvector corresponding to a real */
-/*          eigenvalue w(j), SELECT(j) must be set to .TRUE..  To select */
-/*          the complex eigenvector corresponding to a complex conjugate */
-/*          pair w(j) and w(j+1), either SELECT(j) or SELECT(j+1) must be */
-/*          set to .TRUE.; then on exit SELECT(j) is .TRUE. and */
-/*          SELECT(j+1) is .FALSE.. */
+    N       (input) INTEGER   
+            The order of the matrix T. N >= 0.   
 
-/*  N       (input) INTEGER */
-/*          The order of the matrix T. N >= 0. */
+    T       (input) DOUBLE PRECISION array, dimension (LDT,N)   
+            The upper quasi-triangular matrix T in Schur canonical form.   
 
-/*  T       (input) DOUBLE PRECISION array, dimension (LDT,N) */
-/*          The upper quasi-triangular matrix T in Schur canonical form. */
+    LDT     (input) INTEGER   
+            The leading dimension of the array T. LDT >= max(1,N).   
 
-/*  LDT     (input) INTEGER */
-/*          The leading dimension of the array T. LDT >= max(1,N). */
+    VL      (input/output) DOUBLE PRECISION array, dimension (LDVL,MM)   
+            On entry, if SIDE = 'L' or 'B' and HOWMNY = 'B', VL must   
+            contain an N-by-N matrix Q (usually the orthogonal matrix Q   
+            of Schur vectors returned by DHSEQR).   
+            On exit, if SIDE = 'L' or 'B', VL contains:   
+            if HOWMNY = 'A', the matrix Y of left eigenvectors of T;   
+            if HOWMNY = 'B', the matrix Q*Y;   
+            if HOWMNY = 'S', the left eigenvectors of T specified by   
+                             SELECT, stored consecutively in the columns   
+                             of VL, in the same order as their   
+                             eigenvalues.   
+            A complex eigenvector corresponding to a complex eigenvalue   
+            is stored in two consecutive columns, the first holding the   
+            real part, and the second the imaginary part.   
+            Not referenced if SIDE = 'R'.   
 
-/*  VL      (input/output) DOUBLE PRECISION array, dimension (LDVL,MM) */
-/*          On entry, if SIDE = 'L' or 'B' and HOWMNY = 'B', VL must */
-/*          contain an N-by-N matrix Q (usually the orthogonal matrix Q */
-/*          of Schur vectors returned by DHSEQR). */
-/*          On exit, if SIDE = 'L' or 'B', VL contains: */
-/*          if HOWMNY = 'A', the matrix Y of left eigenvectors of T; */
-/*                           VL has the same quasi-lower triangular form */
-/*                           as T'. If T(i,i) is a real eigenvalue, then */
-/*                           the i-th column VL(i) of VL  is its */
-/*                           corresponding eigenvector. If T(i:i+1,i:i+1) */
-/*                           is a 2-by-2 block whose eigenvalues are */
-/*                           complex-conjugate eigenvalues of T, then */
-/*                           VL(i)+sqrt(-1)*VL(i+1) is the complex */
-/*                           eigenvector corresponding to the eigenvalue */
-/*                           with positive real part. */
-/*          if HOWMNY = 'B', the matrix Q*Y; */
-/*          if HOWMNY = 'S', the left eigenvectors of T specified by */
-/*                           SELECT, stored consecutively in the columns */
-/*                           of VL, in the same order as their */
-/*                           eigenvalues. */
-/*          A complex eigenvector corresponding to a complex eigenvalue */
-/*          is stored in two consecutive columns, the first holding the */
-/*          real part, and the second the imaginary part. */
-/*          If SIDE = 'R', VL is not referenced. */
+    LDVL    (input) INTEGER   
+            The leading dimension of the array VL.  LDVL >= 1, and if   
+            SIDE = 'L' or 'B', LDVL >= N.   
 
-/*  LDVL    (input) INTEGER */
-/*          The leading dimension of the array VL.  LDVL >= max(1,N) if */
-/*          SIDE = 'L' or 'B'; LDVL >= 1 otherwise. */
+    VR      (input/output) DOUBLE PRECISION array, dimension (LDVR,MM)   
+            On entry, if SIDE = 'R' or 'B' and HOWMNY = 'B', VR must   
+            contain an N-by-N matrix Q (usually the orthogonal matrix Q   
+            of Schur vectors returned by DHSEQR).   
+            On exit, if SIDE = 'R' or 'B', VR contains:   
+            if HOWMNY = 'A', the matrix X of right eigenvectors of T;   
+            if HOWMNY = 'B', the matrix Q*X;   
+            if HOWMNY = 'S', the right eigenvectors of T specified by   
+                             SELECT, stored consecutively in the columns   
+                             of VR, in the same order as their   
+                             eigenvalues.   
+            A complex eigenvector corresponding to a complex eigenvalue   
+            is stored in two consecutive columns, the first holding the   
+            real part and the second the imaginary part.   
+            Not referenced if SIDE = 'L'.   
 
-/*  VR      (input/output) DOUBLE PRECISION array, dimension (LDVR,MM) */
-/*          On entry, if SIDE = 'R' or 'B' and HOWMNY = 'B', VR must */
-/*          contain an N-by-N matrix Q (usually the orthogonal matrix Q */
-/*          of Schur vectors returned by DHSEQR). */
-/*          On exit, if SIDE = 'R' or 'B', VR contains: */
-/*          if HOWMNY = 'A', the matrix X of right eigenvectors of T; */
-/*                           VR has the same quasi-upper triangular form */
-/*                           as T. If T(i,i) is a real eigenvalue, then */
-/*                           the i-th column VR(i) of VR  is its */
-/*                           corresponding eigenvector. If T(i:i+1,i:i+1) */
-/*                           is a 2-by-2 block whose eigenvalues are */
-/*                           complex-conjugate eigenvalues of T, then */
-/*                           VR(i)+sqrt(-1)*VR(i+1) is the complex */
-/*                           eigenvector corresponding to the eigenvalue */
-/*                           with positive real part. */
-/*          if HOWMNY = 'B', the matrix Q*X; */
-/*          if HOWMNY = 'S', the right eigenvectors of T specified by */
-/*                           SELECT, stored consecutively in the columns */
-/*                           of VR, in the same order as their */
-/*                           eigenvalues. */
-/*          A complex eigenvector corresponding to a complex eigenvalue */
-/*          is stored in two consecutive columns, the first holding the */
-/*          real part and the second the imaginary part. */
-/*          If SIDE = 'L', VR is not referenced. */
+    LDVR    (input) INTEGER   
+            The leading dimension of the array VR.  LDVR >= 1, and if   
+            SIDE = 'R' or 'B', LDVR >= N.   
 
-/*  LDVR    (input) INTEGER */
-/*          The leading dimension of the array VR.  LDVR >= max(1,N) if */
-/*          SIDE = 'R' or 'B'; LDVR >= 1 otherwise. */
+    MM      (input) INTEGER   
+            The number of columns in the arrays VL and/or VR. MM >= M.   
 
-/*  MM      (input) INTEGER */
-/*          The number of columns in the arrays VL and/or VR. MM >= M. */
+    M       (output) INTEGER   
+            The number of columns in the arrays VL and/or VR actually   
+            used to store the eigenvectors.   
+            If HOWMNY = 'A' or 'B', M is set to N.   
+            Each selected real eigenvector occupies one column and each   
+            selected complex eigenvector occupies two columns.   
 
-/*  M       (output) INTEGER */
-/*          The number of columns in the arrays VL and/or VR actually */
-/*          used to store the eigenvectors. */
-/*          If HOWMNY = 'A' or 'B', M is set to N. */
-/*          Each selected real eigenvector occupies one column and each */
-/*          selected complex eigenvector occupies two columns. */
+    WORK    (workspace) DOUBLE PRECISION array, dimension (3*N)   
 
-/*  WORK    (workspace) DOUBLE PRECISION array, dimension (3*N) */
+    INFO    (output) INTEGER   
+            = 0:  successful exit   
+            < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-/*  INFO    (output) INTEGER */
-/*          = 0:  successful exit */
-/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+    Further Details   
+    ===============   
 
-/*  Further Details */
-/*  =============== */
+    The algorithm used in this program is basically backward (forward)   
+    substitution, with scaling to make the the code robust against   
+    possible overflow.   
 
-/*  The algorithm used in this program is basically backward (forward) */
-/*  substitution, with scaling to make the the code robust against */
-/*  possible overflow. */
+    Each eigenvector is normalized so that the element of largest   
+    magnitude has magnitude 1; here the magnitude of a complex number   
+    (x,y) is taken to be |x| + |y|.   
 
-/*  Each eigenvector is normalized so that the element of largest */
-/*  magnitude has magnitude 1; here the magnitude of a complex number */
-/*  (x,y) is taken to be |x| + |y|. */
+    =====================================================================   
 
-/*  ===================================================================== */
 
-/*     .. Parameters .. */
-/*     .. */
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. External Functions .. */
-/*     .. */
-/*     .. External Subroutines .. */
-/*     .. */
-/*     .. Intrinsic Functions .. */
-/*     .. */
-/*     .. Local Arrays .. */
-/*     .. */
-/*     .. Executable Statements .. */
+       Decode and test the input parameters   
 
-/*     Decode and test the input parameters */
-
-    /* Parameter adjustments */
+       Parameter adjustments */
     --select;
     t_dim1 = *ldt;
     t_offset = 1 + t_dim1;
@@ -287,15 +245,15 @@ static logical c_true = TRUE_;
 	*info = -4;
     } else if (*ldt < max(1,*n)) {
 	*info = -6;
-    } else if (*ldvl < 1 || (leftv && *ldvl < *n)) {
+    } else if (*ldvl < 1 || leftv && *ldvl < *n) {
 	*info = -8;
-    } else if (*ldvr < 1 || (rightv && *ldvr < *n)) {
+    } else if (*ldvr < 1 || rightv && *ldvr < *n) {
 	*info = -10;
     } else {
 
-/*        Set M to the number of columns required to store the selected */
-/*        eigenvectors, standardize the array SELECT if necessary, and */
-/*        test MM. */
+/*        Set M to the number of columns required to store the selected   
+          eigenvectors, standardize the array SELECT if necessary, and   
+          test MM. */
 
 	if (somev) {
 	    *m = 0;
@@ -336,7 +294,7 @@ static logical c_true = TRUE_;
     }
     if (*info != 0) {
 	i__1 = -(*info);
-	igraphxerbla_("DTREVC", &i__1);
+	igraphxerbla_("DTREVC", &i__1, (ftnlen)6);
 	return 0;
     }
 
@@ -355,8 +313,8 @@ static logical c_true = TRUE_;
     smlnum = unfl * (*n / ulp);
     bignum = (1. - ulp) / smlnum;
 
-/*     Compute 1-norm of each column of strictly upper triangular */
-/*     part of T to control overflow in triangular solver. */
+/*     Compute 1-norm of each column of strictly upper triangular   
+       part of T to control overflow in triangular solver. */
 
     work[1] = 0.;
     i__1 = *n;
@@ -370,10 +328,10 @@ static logical c_true = TRUE_;
 /* L30: */
     }
 
-/*     Index IP is used to specify the real or complex eigenvalue: */
-/*       IP = 0, real eigenvalue, */
-/*            1, first of conjugate complex pair: (wr,wi) */
-/*           -1, second of conjugate complex pair: (wr,wi) */
+/*     Index IP is used to specify the real or complex eigenvalue:   
+         IP = 0, real eigenvalue,   
+              1, first of conjugate complex pair: (wr,wi)   
+             -1, second of conjugate complex pair: (wr,wi) */
 
     n2 = *n << 1;
 
@@ -435,8 +393,8 @@ L40:
 /* L50: */
 		}
 
-/*              Solve the upper quasi-triangular system: */
-/*                 (T(1:KI-1,1:KI-1) - WR)*X = SCALE*WORK. */
+/*              Solve the upper quasi-triangular system:   
+                   (T(1:KI-1,1:KI-1) - WR)*X = SCALE*WORK. */
 
 		jnxt = ki - 1;
 		for (j = ki - 1; j >= 1; --j) {
@@ -462,8 +420,8 @@ L40:
 				n], n, &wr, &c_b25, x, &c__2, &scale, &xnorm, 
 				&ierr);
 
-/*                    Scale X(1,1) to avoid overflow when updating */
-/*                    the right-hand side. */
+/*                    Scale X(1,1) to avoid overflow when updating   
+                      the right-hand side. */
 
 			if (xnorm > 1.) {
 			    if (work[j] > bignum / xnorm) {
@@ -495,8 +453,8 @@ L40:
 				work[j - 1 + *n], n, &wr, &c_b25, x, &c__2, &
 				scale, &xnorm, &ierr);
 
-/*                    Scale X(1,1) and X(2,1) to avoid overflow when */
-/*                    updating the right-hand side. */
+/*                    Scale X(1,1) and X(2,1) to avoid overflow when   
+                      updating the right-hand side. */
 
 			if (xnorm > 1.) {
 /* Computing MAX */
@@ -562,11 +520,11 @@ L60:
 
 	    } else {
 
-/*              Complex right eigenvector. */
+/*              Complex right eigenvector.   
 
-/*              Initial solve */
-/*                [ (T(KI-1,KI-1) T(KI-1,KI) ) - (WR + I* WI)]*X = 0. */
-/*                [ (T(KI,KI-1)   T(KI,KI)   )               ] */
+                Initial solve   
+                  [ (T(KI-1,KI-1) T(KI-1,KI) ) - (WR + I* WI)]*X = 0.   
+                  [ (T(KI,KI-1)   T(KI,KI)   )               ] */
 
 		if ((d__1 = t[ki - 1 + ki * t_dim1], abs(d__1)) >= (d__2 = t[
 			ki + (ki - 1) * t_dim1], abs(d__2))) {
@@ -589,8 +547,8 @@ L60:
 /* L80: */
 		}
 
-/*              Solve upper quasi-triangular system: */
-/*              (T(1:KI-2,1:KI-2) - (WR+i*WI))*X = SCALE*(WORK+i*WORK2) */
+/*              Solve upper quasi-triangular system:   
+                (T(1:KI-2,1:KI-2) - (WR+i*WI))*X = SCALE*(WORK+i*WORK2) */
 
 		jnxt = ki - 2;
 		for (j = ki - 2; j >= 1; --j) {
@@ -616,8 +574,8 @@ L60:
 				n], n, &wr, &wi, x, &c__2, &scale, &xnorm, &
 				ierr);
 
-/*                    Scale X(1,1) and X(1,2) to avoid overflow when */
-/*                    updating the right-hand side. */
+/*                    Scale X(1,1) and X(1,2) to avoid overflow when   
+                      updating the right-hand side. */
 
 			if (xnorm > 1.) {
 			    if (work[j] > bignum / xnorm) {
@@ -656,8 +614,8 @@ L60:
 				work[j - 1 + *n], n, &wr, &wi, x, &c__2, &
 				scale, &xnorm, &ierr);
 
-/*                    Scale X to avoid overflow when updating */
-/*                    the right-hand side. */
+/*                    Scale X to avoid overflow when updating   
+                      the right-hand side. */
 
 			if (xnorm > 1.) {
 /* Computing MAX */
@@ -839,8 +797,8 @@ L150:
 /* L160: */
 		}
 
-/*              Solve the quasi-triangular system: */
-/*                 (T(KI+1:N,KI+1:N) - WR)'*X = SCALE*WORK */
+/*              Solve the quasi-triangular system:   
+                   (T(KI+1:N,KI+1:N) - WR)'*X = SCALE*WORK */
 
 		vmax = 1.;
 		vcrit = bignum;
@@ -863,10 +821,10 @@ L150:
 
 		    if (j1 == j2) {
 
-/*                    1-by-1 diagonal block */
+/*                    1-by-1 diagonal block   
 
-/*                    Scale if necessary to avoid overflow when forming */
-/*                    the right-hand side. */
+                      Scale if necessary to avoid overflow when forming   
+                      the right-hand side. */
 
 			if (work[j] > vcrit) {
 			    rec = 1. / vmax;
@@ -901,12 +859,12 @@ L150:
 
 		    } else {
 
-/*                    2-by-2 diagonal block */
+/*                    2-by-2 diagonal block   
 
-/*                    Scale if necessary to avoid overflow when forming */
-/*                    the right-hand side. */
+                      Scale if necessary to avoid overflow when forming   
+                      the right-hand side.   
 
-/* Computing MAX */
+   Computing MAX */
 			d__1 = work[j], d__2 = work[j + 1];
 			beta = max(d__1,d__2);
 			if (beta > vcrit) {
@@ -925,9 +883,9 @@ L150:
 			work[j + 1 + *n] -= igraphddot_(&i__3, &t[ki + 1 + (j + 1) *
 				 t_dim1], &c__1, &work[ki + 1 + *n], &c__1);
 
-/*                    Solve */
-/*                      [T(J,J)-WR   T(J,J+1)     ]'* X = SCALE*( WORK1 ) */
-/*                      [T(J+1,J)    T(J+1,J+1)-WR]             ( WORK2 ) */
+/*                    Solve   
+                        [T(J,J)-WR   T(J,J+1)     ]'* X = SCALE*( WORK1 )   
+                        [T(J+1,J)    T(J+1,J+1)-WR]             ( WORK2 ) */
 
 			igraphdlaln2_(&c_true, &c__2, &c__1, &smin, &c_b22, &t[j + 
 				j * t_dim1], ldt, &c_b22, &c_b22, &work[j + *
@@ -992,11 +950,11 @@ L170:
 
 	    } else {
 
-/*              Complex left eigenvector. */
+/*              Complex left eigenvector.   
 
-/*               Initial solve: */
-/*                 ((T(KI,KI)    T(KI,KI+1) )' - (WR - I* WI))*X = 0. */
-/*                 ((T(KI+1,KI) T(KI+1,KI+1))                ) */
+                 Initial solve:   
+                   ((T(KI,KI)    T(KI,KI+1) )' - (WR - I* WI))*X = 0.   
+                   ((T(KI+1,KI) T(KI+1,KI+1))                ) */
 
 		if ((d__1 = t[ki + (ki + 1) * t_dim1], abs(d__1)) >= (d__2 = 
 			t[ki + 1 + ki * t_dim1], abs(d__2))) {
@@ -1019,8 +977,8 @@ L170:
 /* L190: */
 		}
 
-/*              Solve complex quasi-triangular system: */
-/*              ( T(KI+2,N:KI+2,N) - (WR-i*WI) )*X = WORK1+i*WORK2 */
+/*              Solve complex quasi-triangular system:   
+                ( T(KI+2,N:KI+2,N) - (WR-i*WI) )*X = WORK1+i*WORK2 */
 
 		vmax = 1.;
 		vcrit = bignum;
@@ -1043,10 +1001,10 @@ L170:
 
 		    if (j1 == j2) {
 
-/*                    1-by-1 diagonal block */
+/*                    1-by-1 diagonal block   
 
-/*                    Scale if necessary to avoid overflow when */
-/*                    forming the right-hand side elements. */
+                      Scale if necessary to avoid overflow when   
+                      forming the right-hand side elements. */
 
 			if (work[j] > vcrit) {
 			    rec = 1. / vmax;
@@ -1092,12 +1050,12 @@ L170:
 
 		    } else {
 
-/*                    2-by-2 diagonal block */
+/*                    2-by-2 diagonal block   
 
-/*                    Scale if necessary to avoid overflow when forming */
-/*                    the right-hand side elements. */
+                      Scale if necessary to avoid overflow when forming   
+                      the right-hand side elements.   
 
-/* Computing MAX */
+   Computing MAX */
 			d__1 = work[j], d__2 = work[j + 1];
 			beta = max(d__1,d__2);
 			if (beta > vcrit) {
@@ -1126,9 +1084,9 @@ L170:
 			work[j + 1 + n2] -= igraphddot_(&i__3, &t[ki + 2 + (j + 1) *
 				 t_dim1], &c__1, &work[ki + 2 + n2], &c__1);
 
-/*                    Solve 2-by-2 complex linear equation */
-/*                      ([T(j,j)   T(j,j+1)  ]'-(wr-i*wi)*I)*X = SCALE*B */
-/*                      ([T(j+1,j) T(j+1,j+1)]             ) */
+/*                    Solve 2-by-2 complex linear equation   
+                        ([T(j,j)   T(j,j+1)  ]'-(wr-i*wi)*I)*X = SCALE*B   
+                        ([T(j+1,j) T(j+1,j+1)]             ) */
 
 			d__1 = -wi;
 			igraphdlaln2_(&c_true, &c__2, &c__2, &smin, &c_b22, &t[j + 
@@ -1162,7 +1120,6 @@ L200:
 
 /*              Copy the vector x or Q*x to VL and normalize. */
 
-/* L210: */
 		if (! over) {
 		    i__2 = *n - ki + 1;
 		    igraphdcopy_(&i__2, &work[ki + *n], &c__1, &vl[ki + is * 

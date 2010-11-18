@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,9 +10,7 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Table of constant values */
 
@@ -60,107 +58,90 @@ static integer c__0 = 0;
     static doublereal smlnum;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     October 31, 1992 */
+/*  -- LAPACK auxiliary routine (version 3.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2006   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
-/*     .. Array Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  DLASY2 solves for the N1 by N2 matrix X, 1 <= N1,N2 <= 2, in */
+    DLASY2 solves for the N1 by N2 matrix X, 1 <= N1,N2 <= 2, in   
 
-/*         op(TL)*X + ISGN*X*op(TR) = SCALE*B, */
+           op(TL)*X + ISGN*X*op(TR) = SCALE*B,   
 
-/*  where TL is N1 by N1, TR is N2 by N2, B is N1 by N2, and ISGN = 1 or */
-/*  -1.  op(T) = T or T', where T' denotes the transpose of T. */
+    where TL is N1 by N1, TR is N2 by N2, B is N1 by N2, and ISGN = 1 or   
+    -1.  op(T) = T or T', where T' denotes the transpose of T.   
 
-/*  Arguments */
-/*  ========= */
+    Arguments   
+    =========   
 
-/*  LTRANL  (input) LOGICAL */
-/*          On entry, LTRANL specifies the op(TL): */
-/*             = .FALSE., op(TL) = TL, */
-/*             = .TRUE., op(TL) = TL'. */
+    LTRANL  (input) LOGICAL   
+            On entry, LTRANL specifies the op(TL):   
+               = .FALSE., op(TL) = TL,   
+               = .TRUE., op(TL) = TL'.   
 
-/*  LTRANR  (input) LOGICAL */
-/*          On entry, LTRANR specifies the op(TR): */
-/*            = .FALSE., op(TR) = TR, */
-/*            = .TRUE., op(TR) = TR'. */
+    LTRANR  (input) LOGICAL   
+            On entry, LTRANR specifies the op(TR):   
+              = .FALSE., op(TR) = TR,   
+              = .TRUE., op(TR) = TR'.   
 
-/*  ISGN    (input) INTEGER */
-/*          On entry, ISGN specifies the sign of the equation */
-/*          as described before. ISGN may only be 1 or -1. */
+    ISGN    (input) INTEGER   
+            On entry, ISGN specifies the sign of the equation   
+            as described before. ISGN may only be 1 or -1.   
 
-/*  N1      (input) INTEGER */
-/*          On entry, N1 specifies the order of matrix TL. */
-/*          N1 may only be 0, 1 or 2. */
+    N1      (input) INTEGER   
+            On entry, N1 specifies the order of matrix TL.   
+            N1 may only be 0, 1 or 2.   
 
-/*  N2      (input) INTEGER */
-/*          On entry, N2 specifies the order of matrix TR. */
-/*          N2 may only be 0, 1 or 2. */
+    N2      (input) INTEGER   
+            On entry, N2 specifies the order of matrix TR.   
+            N2 may only be 0, 1 or 2.   
 
-/*  TL      (input) DOUBLE PRECISION array, dimension (LDTL,2) */
-/*          On entry, TL contains an N1 by N1 matrix. */
+    TL      (input) DOUBLE PRECISION array, dimension (LDTL,2)   
+            On entry, TL contains an N1 by N1 matrix.   
 
-/*  LDTL    (input) INTEGER */
-/*          The leading dimension of the matrix TL. LDTL >= max(1,N1). */
+    LDTL    (input) INTEGER   
+            The leading dimension of the matrix TL. LDTL >= max(1,N1).   
 
-/*  TR      (input) DOUBLE PRECISION array, dimension (LDTR,2) */
-/*          On entry, TR contains an N2 by N2 matrix. */
+    TR      (input) DOUBLE PRECISION array, dimension (LDTR,2)   
+            On entry, TR contains an N2 by N2 matrix.   
 
-/*  LDTR    (input) INTEGER */
-/*          The leading dimension of the matrix TR. LDTR >= max(1,N2). */
+    LDTR    (input) INTEGER   
+            The leading dimension of the matrix TR. LDTR >= max(1,N2).   
 
-/*  B       (input) DOUBLE PRECISION array, dimension (LDB,2) */
-/*          On entry, the N1 by N2 matrix B contains the right-hand */
-/*          side of the equation. */
+    B       (input) DOUBLE PRECISION array, dimension (LDB,2)   
+            On entry, the N1 by N2 matrix B contains the right-hand   
+            side of the equation.   
 
-/*  LDB     (input) INTEGER */
-/*          The leading dimension of the matrix B. LDB >= max(1,N1). */
+    LDB     (input) INTEGER   
+            The leading dimension of the matrix B. LDB >= max(1,N1).   
 
-/*  SCALE   (output) DOUBLE PRECISION */
-/*          On exit, SCALE contains the scale factor. SCALE is chosen */
-/*          less than or equal to 1 to prevent the solution overflowing. */
+    SCALE   (output) DOUBLE PRECISION   
+            On exit, SCALE contains the scale factor. SCALE is chosen   
+            less than or equal to 1 to prevent the solution overflowing.   
 
-/*  X       (output) DOUBLE PRECISION array, dimension (LDX,2) */
-/*          On exit, X contains the N1 by N2 solution. */
+    X       (output) DOUBLE PRECISION array, dimension (LDX,2)   
+            On exit, X contains the N1 by N2 solution.   
 
-/*  LDX     (input) INTEGER */
-/*          The leading dimension of the matrix X. LDX >= max(1,N1). */
+    LDX     (input) INTEGER   
+            The leading dimension of the matrix X. LDX >= max(1,N1).   
 
-/*  XNORM   (output) DOUBLE PRECISION */
-/*          On exit, XNORM is the infinity-norm of the solution. */
+    XNORM   (output) DOUBLE PRECISION   
+            On exit, XNORM is the infinity-norm of the solution.   
 
-/*  INFO    (output) INTEGER */
-/*          On exit, INFO is set to */
-/*             0: successful exit. */
-/*             1: TL and TR have too close eigenvalues, so TL or */
-/*                TR is perturbed to get a nonsingular equation. */
-/*          NOTE: In the interests of speed, this routine does not */
-/*                check the inputs for errors. */
+    INFO    (output) INTEGER   
+            On exit, INFO is set to   
+               0: successful exit.   
+               1: TL and TR have too close eigenvalues, so TL or   
+                  TR is perturbed to get a nonsingular equation.   
+            NOTE: In the interests of speed, this routine does not   
+                  check the inputs for errors.   
 
-/* ===================================================================== */
+   =====================================================================   
 
-/*     .. Parameters .. */
-/*     .. */
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. Local Arrays .. */
-/*     .. */
-/*     .. External Functions .. */
-/*     .. */
-/*     .. External Subroutines .. */
-/*     .. */
-/*     .. Intrinsic Functions .. */
-/*     .. */
-/*     .. Data statements .. */
-    /* Parameter adjustments */
+       Parameter adjustments */
     tl_dim1 = *ldtl;
     tl_offset = 1 + tl_dim1;
     tl -= tl_offset;
@@ -174,11 +155,9 @@ static integer c__0 = 0;
     x_offset = 1 + x_dim1;
     x -= x_offset;
 
-    /* Function Body */
-/*     .. */
-/*     .. Executable Statements .. */
+    /* Function Body   
 
-/*     Do not check the input parameters for errors */
+       Do not check the input parameters for errors */
 
     *info = 0;
 
@@ -223,14 +202,14 @@ L10:
     *xnorm = (d__1 = x[x_dim1 + 1], abs(d__1));
     return 0;
 
-/*     1 by 2: */
-/*     TL11*[X11 X12] + ISGN*[X11 X12]*op[TR11 TR12]  = [B11 B12] */
-/*                                       [TR21 TR22] */
+/*     1 by 2:   
+       TL11*[X11 X12] + ISGN*[X11 X12]*op[TR11 TR12]  = [B11 B12]   
+                                         [TR21 TR22] */
 
 L20:
 
-/* Computing MAX */
-/* Computing MAX */
+/* Computing MAX   
+   Computing MAX */
     d__7 = (d__1 = tl[tl_dim1 + 1], abs(d__1)), d__8 = (d__2 = tr[tr_dim1 + 1]
 	    , abs(d__2)), d__7 = max(d__7,d__8), d__8 = (d__3 = tr[(tr_dim1 <<
 	     1) + 1], abs(d__3)), d__7 = max(d__7,d__8), d__8 = (d__4 = tr[
@@ -251,13 +230,13 @@ L20:
     btmp[1] = b[(b_dim1 << 1) + 1];
     goto L40;
 
-/*     2 by 1: */
-/*          op[TL11 TL12]*[X11] + ISGN* [X11]*TR11  = [B11] */
-/*            [TL21 TL22] [X21]         [X21]         [B21] */
+/*     2 by 1:   
+            op[TL11 TL12]*[X11] + ISGN* [X11]*TR11  = [B11]   
+              [TL21 TL22] [X21]         [X21]         [B21] */
 
 L30:
-/* Computing MAX */
-/* Computing MAX */
+/* Computing MAX   
+   Computing MAX */
     d__7 = (d__1 = tr[tr_dim1 + 1], abs(d__1)), d__8 = (d__2 = tl[tl_dim1 + 1]
 	    , abs(d__2)), d__7 = max(d__7,d__8), d__8 = (d__3 = tl[(tl_dim1 <<
 	     1) + 1], abs(d__3)), d__7 = max(d__7,d__8), d__8 = (d__4 = tl[
@@ -278,8 +257,8 @@ L30:
     btmp[1] = b[b_dim1 + 2];
 L40:
 
-/*     Solve 2 by 2 system using complete pivoting. */
-/*     Set pivots less than SMIN to SMIN. */
+/*     Solve 2 by 2 system using complete pivoting.   
+       Set pivots less than SMIN to SMIN. */
 
     ipiv = igraphidamax_(&c__4, tmp, &c__1);
     u11 = tmp[ipiv - 1];
@@ -333,12 +312,12 @@ L40:
     }
     return 0;
 
-/*     2 by 2: */
-/*     op[TL11 TL12]*[X11 X12] +ISGN* [X11 X12]*op[TR11 TR12] = [B11 B12] */
-/*       [TL21 TL22] [X21 X22]        [X21 X22]   [TR21 TR22]   [B21 B22] */
+/*     2 by 2:   
+       op[TL11 TL12]*[X11 X12] +ISGN* [X11 X12]*op[TR11 TR12] = [B11 B12]   
+         [TL21 TL22] [X21 X22]        [X21 X22]   [TR21 TR22]   [B21 B22]   
 
-/*     Solve equivalent 4 by 4 system using complete pivoting. */
-/*     Set pivots less than SMIN to SMIN. */
+       Solve equivalent 4 by 4 system using complete pivoting.   
+       Set pivots less than SMIN to SMIN. */
 
 L50:
 /* Computing MAX */

@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,9 +10,7 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 doublereal igraphdlapy2_(doublereal *x, doublereal *y)
 {
@@ -26,36 +24,27 @@ doublereal igraphdlapy2_(doublereal *x, doublereal *y)
     static doublereal w, z__, xabs, yabs;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     October 31, 1992 */
+/*  -- LAPACK auxiliary routine (version 3.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2006   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  DLAPY2 returns sqrt(x**2+y**2), taking care not to cause unnecessary */
-/*  overflow. */
+    DLAPY2 returns sqrt(x**2+y**2), taking care not to cause unnecessary   
+    overflow.   
 
-/*  Arguments */
-/*  ========= */
+    Arguments   
+    =========   
 
-/*  X       (input) DOUBLE PRECISION */
-/*  Y       (input) DOUBLE PRECISION */
-/*          X and Y specify the values x and y. */
+    X       (input) DOUBLE PRECISION   
+    Y       (input) DOUBLE PRECISION   
+            X and Y specify the values x and y.   
 
-/*  ===================================================================== */
+    ===================================================================== */
 
-/*     .. Parameters .. */
-/*     .. */
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. Intrinsic Functions .. */
-/*     .. */
-/*     .. Executable Statements .. */
 
     xabs = abs(*x);
     yabs = abs(*y);

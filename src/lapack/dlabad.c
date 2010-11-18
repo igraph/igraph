@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,59 +10,52 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Subroutine */ int igraphdlabad_(doublereal *small, doublereal *large)
 {
     /* Builtin functions */
-    double igraphd_lg10(doublereal *), sqrt(doublereal);
+    double d_lg10(doublereal *), sqrt(doublereal);
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     October 31, 1992 */
+/*  -- LAPACK auxiliary routine (version 3.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2006   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  DLABAD takes as input the values computed by DLAMCH for underflow and */
-/*  overflow, and returns the square root of each of these values if the */
-/*  log of LARGE is sufficiently large.  This subroutine is intended to */
-/*  identify machines with a large exponent range, such as the Crays, and */
-/*  redefine the underflow and overflow limits to be the square roots of */
-/*  the values computed by DLAMCH.  This subroutine is needed because */
-/*  DLAMCH does not compensate for poor arithmetic in the upper half of */
-/*  the exponent range, as is found on a Cray. */
+    DLABAD takes as input the values computed by DLAMCH for underflow and   
+    overflow, and returns the square root of each of these values if the   
+    log of LARGE is sufficiently large.  This subroutine is intended to   
+    identify machines with a large exponent range, such as the Crays, and   
+    redefine the underflow and overflow limits to be the square roots of   
+    the values computed by DLAMCH.  This subroutine is needed because   
+    DLAMCH does not compensate for poor arithmetic in the upper half of   
+    the exponent range, as is found on a Cray.   
 
-/*  Arguments */
-/*  ========= */
+    Arguments   
+    =========   
 
-/*  SMALL   (input/output) DOUBLE PRECISION */
-/*          On entry, the underflow threshold as computed by DLAMCH. */
-/*          On exit, if LOG10(LARGE) is sufficiently large, the square */
-/*          root of SMALL, otherwise unchanged. */
+    SMALL   (input/output) DOUBLE PRECISION   
+            On entry, the underflow threshold as computed by DLAMCH.   
+            On exit, if LOG10(LARGE) is sufficiently large, the square   
+            root of SMALL, otherwise unchanged.   
 
-/*  LARGE   (input/output) DOUBLE PRECISION */
-/*          On entry, the overflow threshold as computed by DLAMCH. */
-/*          On exit, if LOG10(LARGE) is sufficiently large, the square */
-/*          root of LARGE, otherwise unchanged. */
+    LARGE   (input/output) DOUBLE PRECISION   
+            On entry, the overflow threshold as computed by DLAMCH.   
+            On exit, if LOG10(LARGE) is sufficiently large, the square   
+            root of LARGE, otherwise unchanged.   
 
-/*  ===================================================================== */
+    =====================================================================   
 
-/*     .. Intrinsic Functions .. */
-/*     .. */
-/*     .. Executable Statements .. */
 
-/*     If it looks like we're on a Cray, take the square root of */
-/*     SMALL and LARGE to avoid overflow and underflow problems. */
+       If it looks like we're on a Cray, take the square root of   
+       SMALL and LARGE to avoid overflow and underflow problems. */
 
-    if (igraphd_lg10(large) > 2e3) {
+    if (d_lg10(large) > 2e3) {
 	*small = sqrt(*small);
 	*large = sqrt(*large);
     }

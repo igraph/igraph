@@ -112,3 +112,27 @@
 #ifdef HEAPLESSEQ
 #undef HEAPLESSEQ
 #endif
+
+#ifdef SUM
+#undef SUM
+#endif
+
+#ifdef PROD
+#undef PROD
+#endif
+
+#ifdef NOTORDERED
+#undef NOTORDERED
+#endif
+
+#ifdef EQ
+#undef EQ
+#endif
+
+#ifdef DIFF
+#undef DIFF
+#endif
+
+#ifdef DIV
+#undef DIV
+#endif

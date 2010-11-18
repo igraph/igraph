@@ -342,6 +342,8 @@ int FUNCTION(igraph_matrix,copy)(TYPE(igraph_matrix) *to, const TYPE(igraph_matr
   return FUNCTION(igraph_vector,copy)(&to->data, &from->data);
 }
 
+#ifndef NOTORDERED
+
 /**
  * \function igraph_matrix_max
  * 
@@ -358,6 +360,8 @@ int FUNCTION(igraph_matrix,copy)(TYPE(igraph_matrix) *to, const TYPE(igraph_matr
 igraph_real_t FUNCTION(igraph_matrix,max)(const TYPE(igraph_matrix) *m) {
   return FUNCTION(igraph_vector,max)(&m->data);
 }
+
+#endif
 
 /**
  * \function igraph_matrix_scale
@@ -486,7 +490,7 @@ int FUNCTION(igraph_matrix,get_col)(const TYPE(igraph_matrix) *m,
  * Time complexity: O(mn), the number of elements in the matrix.
  */
 
-igraph_real_t FUNCTION(igraph_matrix,sum)(const TYPE(igraph_matrix) *m) {
+BASE FUNCTION(igraph_matrix,sum)(const TYPE(igraph_matrix) *m) {
   return FUNCTION(igraph_vector,sum)(&m->data);
 }
 
@@ -508,6 +512,8 @@ igraph_bool_t FUNCTION(igraph_matrix,is_equal)(const TYPE(igraph_matrix) *m1,
   return m1->ncol==m2->ncol && m1->nrow==m2->nrow &&
     FUNCTION(igraph_vector,is_equal)(&m1->data, &m2->data);
 }
+
+#ifndef NOTORDERED
 
 /**
  * \function igraph_matrix_maxdifference
@@ -535,6 +541,8 @@ BASE FUNCTION(igraph_matrix,maxdifference)(const TYPE(igraph_matrix) *m1,
   }
   return FUNCTION(igraph_vector,maxdifference)(&m1->data, &m2->data);
 }
+
+#endif
 
 /**
  * \function igraph_matrix_transpose
@@ -1007,6 +1015,8 @@ int FUNCTION(igraph_matrix,div_elements)(TYPE(igraph_matrix) *m1,
   return FUNCTION(igraph_vector,div)(&m1->data, &m2->data);
 }
 
+#ifndef NOTORDERED
+
 /**
  * \function igraph_matrix_min
  * Minimum element.
@@ -1120,6 +1130,8 @@ int FUNCTION(igraph_matrix,which_minmax)(const TYPE(igraph_matrix) *m,
   return 0;
 }
 
+#endif
+
 /**
  * \function igraph_matrix_isnull
  * Check for a null matrix.
@@ -1175,9 +1187,13 @@ igraph_bool_t FUNCTION(igraph_matrix,is_symmetric)(const TYPE(igraph_matrix) *m)
   }
   for (r=1; r<n; r++) {
     for (c=0; c<r; c++) {
-      if (MATRIX(*m, r, c) != MATRIX(*m, c, r)) {
-	return 0;
-      }
+      BASE a1=MATRIX(*m, r, c);
+      BASE a2=MATRIX(*m, c, r);
+#ifdef EQ      
+      if (!EQ(a1,a2)) { return 0; }
+#else
+      if (a1 != a2) { return 0; }
+#endif
     }
   }
   return 1;
@@ -1195,7 +1211,7 @@ igraph_bool_t FUNCTION(igraph_matrix,is_symmetric)(const TYPE(igraph_matrix) *m)
  * Time complexity: O(mn), the number of elements.
  */
 
-igraph_real_t FUNCTION(igraph_matrix,prod)(const TYPE(igraph_matrix) *m) {
+BASE FUNCTION(igraph_matrix,prod)(const TYPE(igraph_matrix) *m) {
   return FUNCTION(igraph_vector,prod)(&m->data);
 }
 
@@ -1213,15 +1229,19 @@ igraph_real_t FUNCTION(igraph_matrix,prod)(const TYPE(igraph_matrix) *m) {
  */
 
 int FUNCTION(igraph_matrix,rowsum)(const TYPE(igraph_matrix) *m,
-				   igraph_vector_t *res) {
+				   TYPE(igraph_vector) *res) {
   long int nrow=m->nrow, ncol=m->ncol;
   long int r, c;
-  igraph_real_t sum;
-  IGRAPH_CHECK(igraph_vector_resize(res, nrow));
+  BASE sum;
+  IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(res, nrow));
   for (r=0; r<nrow; r++) {
-    sum=0;
+    sum=ZERO;
     for (c=0; c<ncol; c++) {
+#ifdef SUM
+      SUM(sum, sum, MATRIX(*m, r, c));
+#else
       sum += MATRIX(*m, r, c);
+#endif
     }
     VECTOR(*res)[r]=sum;
   }
@@ -1242,15 +1262,19 @@ int FUNCTION(igraph_matrix,rowsum)(const TYPE(igraph_matrix) *m,
  */
 
 int FUNCTION(igraph_matrix,colsum)(const TYPE(igraph_matrix) *m,
-				   igraph_vector_t *res) {
+				   TYPE(igraph_vector) *res) {
   long int nrow=m->nrow, ncol=m->ncol;
   long int r, c;
-  igraph_real_t sum;
-  IGRAPH_CHECK(igraph_vector_resize(res, ncol));
+  BASE sum;
+  IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(res, ncol));
   for (c=0; c<ncol; c++) {
-    sum=0;
+    sum=ZERO;
     for (r=0; r<nrow; r++) {
+#ifdef SUM
+      SUM(sum, sum, MATRIX(*m, r, c));
+#else
       sum += MATRIX(*m, r, c);
+#endif
     }
     VECTOR(*res)[c]=sum;
   }
@@ -1375,6 +1399,8 @@ int FUNCTION(igraph_matrix,select_cols)(const TYPE(igraph_matrix) *m,
   return 0;
 }
 
+#ifdef OUT_FORMAT
+
 int FUNCTION(igraph_matrix,print)(const TYPE(igraph_matrix) *m) {
 
   long int nr=FUNCTION(igraph_matrix,nrow)(m);
@@ -1407,3 +1433,5 @@ int FUNCTION(igraph_matrix,fprint)(const TYPE(igraph_matrix) *m,
   
   return 0;
 }
+
+#endif

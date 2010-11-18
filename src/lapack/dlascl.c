@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,9 +10,7 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Subroutine */ int igraphdlascl_(char *type__, integer *kl, integer *ku, 
 	doublereal *cfrom, doublereal *cto, integer *m, integer *n, 
@@ -31,96 +29,82 @@
     static doublereal cfrom1;
     extern doublereal igraphdlamch_(char *);
     static doublereal cfromc;
-    extern /* Subroutine */ int igraphxerbla_(char *, integer *);
+    extern logical igraphdisnan_(doublereal *);
+    extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
     static doublereal bignum, smlnum;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     February 29, 1992 */
+/*  -- LAPACK auxiliary routine (version 3.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2006   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
-/*     .. Array Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  DLASCL multiplies the M by N real matrix A by the real scalar */
-/*  CTO/CFROM.  This is done without over/underflow as long as the final */
-/*  result CTO*A(I,J)/CFROM does not over/underflow. TYPE specifies that */
-/*  A may be full, upper triangular, lower triangular, upper Hessenberg, */
-/*  or banded. */
+    DLASCL multiplies the M by N real matrix A by the real scalar   
+    CTO/CFROM.  This is done without over/underflow as long as the final   
+    result CTO*A(I,J)/CFROM does not over/underflow. TYPE specifies that   
+    A may be full, upper triangular, lower triangular, upper Hessenberg,   
+    or banded.   
 
-/*  Arguments */
-/*  ========= */
+    Arguments   
+    =========   
 
-/*  TYPE    (input) CHARACTER*1 */
-/*          TYPE indices the storage type of the input matrix. */
-/*          = 'G':  A is a full matrix. */
-/*          = 'L':  A is a lower triangular matrix. */
-/*          = 'U':  A is an upper triangular matrix. */
-/*          = 'H':  A is an upper Hessenberg matrix. */
-/*          = 'B':  A is a symmetric band matrix with lower bandwidth KL */
-/*                  and upper bandwidth KU and with the only the lower */
-/*                  half stored. */
-/*          = 'Q':  A is a symmetric band matrix with lower bandwidth KL */
-/*                  and upper bandwidth KU and with the only the upper */
-/*                  half stored. */
-/*          = 'Z':  A is a band matrix with lower bandwidth KL and upper */
-/*                  bandwidth KU. */
+    TYPE    (input) CHARACTER*1   
+            TYPE indices the storage type of the input matrix.   
+            = 'G':  A is a full matrix.   
+            = 'L':  A is a lower triangular matrix.   
+            = 'U':  A is an upper triangular matrix.   
+            = 'H':  A is an upper Hessenberg matrix.   
+            = 'B':  A is a symmetric band matrix with lower bandwidth KL   
+                    and upper bandwidth KU and with the only the lower   
+                    half stored.   
+            = 'Q':  A is a symmetric band matrix with lower bandwidth KL   
+                    and upper bandwidth KU and with the only the upper   
+                    half stored.   
+            = 'Z':  A is a band matrix with lower bandwidth KL and upper   
+                    bandwidth KU.   
 
-/*  KL      (input) INTEGER */
-/*          The lower bandwidth of A.  Referenced only if TYPE = 'B', */
-/*          'Q' or 'Z'. */
+    KL      (input) INTEGER   
+            The lower bandwidth of A.  Referenced only if TYPE = 'B',   
+            'Q' or 'Z'.   
 
-/*  KU      (input) INTEGER */
-/*          The upper bandwidth of A.  Referenced only if TYPE = 'B', */
-/*          'Q' or 'Z'. */
+    KU      (input) INTEGER   
+            The upper bandwidth of A.  Referenced only if TYPE = 'B',   
+            'Q' or 'Z'.   
 
-/*  CFROM   (input) DOUBLE PRECISION */
-/*  CTO     (input) DOUBLE PRECISION */
-/*          The matrix A is multiplied by CTO/CFROM. A(I,J) is computed */
-/*          without over/underflow if the final result CTO*A(I,J)/CFROM */
-/*          can be represented without over/underflow.  CFROM must be */
-/*          nonzero. */
+    CFROM   (input) DOUBLE PRECISION   
+    CTO     (input) DOUBLE PRECISION   
+            The matrix A is multiplied by CTO/CFROM. A(I,J) is computed   
+            without over/underflow if the final result CTO*A(I,J)/CFROM   
+            can be represented without over/underflow.  CFROM must be   
+            nonzero.   
 
-/*  M       (input) INTEGER */
-/*          The number of rows of the matrix A.  M >= 0. */
+    M       (input) INTEGER   
+            The number of rows of the matrix A.  M >= 0.   
 
-/*  N       (input) INTEGER */
-/*          The number of columns of the matrix A.  N >= 0. */
+    N       (input) INTEGER   
+            The number of columns of the matrix A.  N >= 0.   
 
-/*  A       (input/output) DOUBLE PRECISION array, dimension (LDA,M) */
-/*          The matrix to be multiplied by CTO/CFROM.  See TYPE for the */
-/*          storage type. */
+    A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)   
+            The matrix to be multiplied by CTO/CFROM.  See TYPE for the   
+            storage type.   
 
-/*  LDA     (input) INTEGER */
-/*          The leading dimension of the array A.  LDA >= max(1,M). */
+    LDA     (input) INTEGER   
+            The leading dimension of the array A.  LDA >= max(1,M).   
 
-/*  INFO    (output) INTEGER */
-/*          0  - successful exit */
-/*          <0 - if INFO = -i, the i-th argument had an illegal value. */
+    INFO    (output) INTEGER   
+            0  - successful exit   
+            <0 - if INFO = -i, the i-th argument had an illegal value.   
 
-/*  ===================================================================== */
+    =====================================================================   
 
-/*     .. Parameters .. */
-/*     .. */
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. External Functions .. */
-/*     .. */
-/*     .. Intrinsic Functions .. */
-/*     .. */
-/*     .. External Subroutines .. */
-/*     .. */
-/*     .. Executable Statements .. */
 
-/*     Test the input arguments */
+       Test the input arguments   
 
-    /* Parameter adjustments */
+       Parameter adjustments */
     a_dim1 = *lda;
     a_offset = 1 + a_dim1;
     a -= a_offset;
@@ -148,11 +132,13 @@
 
     if (itype == -1) {
 	*info = -1;
-    } else if (*cfrom == 0.) {
+    } else if (*cfrom == 0. || igraphdisnan_(cfrom)) {
 	*info = -4;
+    } else if (igraphdisnan_(cto)) {
+	*info = -5;
     } else if (*m < 0) {
 	*info = -6;
-    } else if (*n < 0 || (itype == 4 && *n != *m) || (itype == 5 && *n != *m)) {
+    } else if (*n < 0 || itype == 4 && *n != *m || itype == 5 && *n != *m) {
 	*info = -7;
     } else if (itype <= 3 && *lda < max(1,*m)) {
 	*info = -9;
@@ -164,11 +150,11 @@
 	} else /* if(complicated condition) */ {
 /* Computing MAX */
 	    i__1 = *n - 1;
-	    if (*ku < 0 || *ku > max(i__1,0) || ((itype == 4 || itype == 5) && 
-						 *kl != *ku)) {
+	    if (*ku < 0 || *ku > max(i__1,0) || (itype == 4 || itype == 5) && 
+		    *kl != *ku) {
 		*info = -3;
-	    } else if ((itype == 4 && *lda < *kl + 1) || (itype == 5 && *lda < *
-		       ku + 1) || (itype == 6 && *lda < (*kl << 1) + *ku + 1)) {
+	    } else if (itype == 4 && *lda < *kl + 1 || itype == 5 && *lda < *
+		    ku + 1 || itype == 6 && *lda < (*kl << 1) + *ku + 1) {
 		*info = -9;
 	    }
 	}
@@ -176,7 +162,7 @@
 
     if (*info != 0) {
 	i__1 = -(*info);
-	igraphxerbla_("DLASCL", &i__1);
+	igraphxerbla_("DLASCL", &i__1, (ftnlen)6);
 	return 0;
     }
 
@@ -196,18 +182,32 @@
 
 L10:
     cfrom1 = cfromc * smlnum;
-    cto1 = ctoc / bignum;
-    if (abs(cfrom1) > abs(ctoc) && ctoc != 0.) {
-	mul = smlnum;
-	done = FALSE_;
-	cfromc = cfrom1;
-    } else if (abs(cto1) > abs(cfromc)) {
-	mul = bignum;
-	done = FALSE_;
-	ctoc = cto1;
-    } else {
+    if (cfrom1 == cfromc) {
+/*        CFROMC is an inf.  Multiply by a correctly signed zero for   
+          finite CTOC, or a NaN if CTOC is infinite. */
 	mul = ctoc / cfromc;
 	done = TRUE_;
+	cto1 = ctoc;
+    } else {
+	cto1 = ctoc / bignum;
+	if (cto1 == ctoc) {
+/*           CTOC is either 0 or an inf.  In both cases, CTOC itself   
+             serves as the correct multiplication factor. */
+	    mul = ctoc;
+	    done = TRUE_;
+	    cfromc = 1.;
+	} else if (abs(cfrom1) > abs(ctoc) && ctoc != 0.) {
+	    mul = smlnum;
+	    done = FALSE_;
+	    cfromc = cfrom1;
+	} else if (abs(cto1) > abs(cfromc)) {
+	    mul = bignum;
+	    done = FALSE_;
+	    ctoc = cto1;
+	} else {
+	    mul = ctoc / cfromc;
+	    done = TRUE_;
+	}
     }
 
     if (itype == 0) {
