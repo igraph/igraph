@@ -1050,6 +1050,7 @@ igraph_community_leading_eigenvector:
                 INOUT ARPACKOPT options=igraph.arpack.default, \
                 OUT REALPTR modularity, BOOLEAN start=False, \
                 OUT VECTOR_OR_0 eigenvalues, \
+                OUT VECTOR_OR_0 eigenvectors, \
                 OUT VECTOR_OR_0 history
         DEFAULT-R: options=igraph.arpack.default
         CLASS-R: igraph.eigenc

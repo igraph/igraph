@@ -38,6 +38,7 @@
 #include "igraph_datatype.h"
 #include "igraph_types.h"
 #include "igraph_arpack.h"
+#include "igraph_vector_ptr.h"
 
 __BEGIN_DECLS
 
@@ -153,6 +154,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 					 igraph_real_t *modularity,
 					 igraph_bool_t start,
 					 igraph_vector_t *eigenvalues,
+					 igraph_vector_ptr_t *eigenvectors,
 					 igraph_vector_t *history);
 
 int igraph_community_label_propagation(const igraph_t *graph,

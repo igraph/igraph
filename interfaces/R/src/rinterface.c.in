@@ -7354,11 +7354,13 @@ SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps,
   igraph_arpack_options_t c_options;
   igraph_real_t c_modularity;
   igraph_vector_t c_eigenvalues;
+  igraph_vector_ptr_t c_eigenvectors;
   igraph_vector_t c_history;
   SEXP merges;
   SEXP membership;
   SEXP modularity;
   SEXP eigenvalues;
+  SEXP eigenvectors;
   SEXP history;
   int c_result;
   SEXP result, names;
@@ -7381,6 +7383,9 @@ SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps,
   if (0 != igraph_vector_init(&c_eigenvalues, 0)) {
   igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM);
   }
+  if (0 != igraph_vector_ptr_init(&c_eigenvectors, 0)) {
+  igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM);
+  }
   if (0 != igraph_vector_init(&c_history, 0)) {
   igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM);
   }
@@ -7388,12 +7393,13 @@ SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps,
   c_result=igraph_community_leading_eigenvector(&c_graph, &c_merges, 
 						&c_membership, c_steps, 
 						&c_options, &c_modularity, 
-						c_start, &c_eigenvalues, 
+						c_start, &c_eigenvalues,
+						&c_eigenvectors,
 						&c_history);
 
                                         /* Convert output */
-  PROTECT(result=NEW_LIST(6));
-  PROTECT(names=NEW_CHARACTER(6));
+  PROTECT(result=NEW_LIST(7));
+  PROTECT(names=NEW_CHARACTER(7));
   PROTECT(merges=R_igraph_matrix_to_SEXP(&c_merges)); 
   igraph_matrix_destroy(&c_merges); 
   IGRAPH_FINALLY_CLEAN(1);
@@ -7405,6 +7411,8 @@ SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps,
   REAL(modularity)[0]=c_modularity;
   PROTECT(eigenvalues=R_igraph_vector_to_SEXP(&c_eigenvalues));
   igraph_vector_destroy(&c_eigenvalues);
+  PROTECT(eigenvectors=R_igraph_vectorlist_to_SEXP(&c_eigenvectors));
+  R_igraph_vectorlist_destroy(&c_eigenvectors);
   PROTECT(history=R_igraph_vector_to_SEXP(&c_history));
   igraph_vector_destroy(&c_history);
   SET_VECTOR_ELT(result, 0, merges);
@@ -7412,16 +7420,18 @@ SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps,
   SET_VECTOR_ELT(result, 2, options);
   SET_VECTOR_ELT(result, 3, modularity);
   SET_VECTOR_ELT(result, 4, eigenvalues);
-  SET_VECTOR_ELT(result, 5, history);
+  SET_VECTOR_ELT(result, 5, eigenvectors);
+  SET_VECTOR_ELT(result, 6, history);
   SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("merges"));
   SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("membership"));
   SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("options"));
   SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("modularity"));
   SET_STRING_ELT(names, 4, CREATE_STRING_VECTOR("eigenvalues"));
-  SET_STRING_ELT(names, 5, CREATE_STRING_VECTOR("history"));
+  SET_STRING_ELT(names, 5, CREATE_STRING_VECTOR("eigenvectors"));
+  SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("history"));
   SET_NAMES(result, names);
 
-  UNPROTECT(7);
+  UNPROTECT(8);
 
   UNPROTECT(1);
   return(result);

@@ -977,6 +977,17 @@ int igraph_i_community_leading_eigenvector(igraph_real_t *to,
   return 0;
 }
 
+void igraph_i_levc_free(igraph_vector_ptr_t *ptr) { 
+  long int i, n=igraph_vector_ptr_size(ptr);
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v=VECTOR(*ptr)[i];
+    if (v) {
+      igraph_vector_destroy(v);
+      igraph_free(v);
+    }
+  }
+}
+
 /**
  * \ingroup communities
  * \function igraph_community_leading_eigenvector
@@ -1067,6 +1078,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 					 igraph_real_t *modularity,
 					 igraph_bool_t start,
 					 igraph_vector_t *eigenvalues,
+					 igraph_vector_ptr_t *eigenvectors,
 					 igraph_vector_t *history) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -1114,6 +1126,10 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   IGRAPH_CHECK(igraph_vector_reserve(&mymerges, steps*2));
   IGRAPH_VECTOR_INIT_FINALLY(&idx, 0);
   if (eigenvalues)  { igraph_vector_clear(eigenvalues);      }
+  if (eigenvectors) { 
+    igraph_vector_ptr_clear(eigenvectors); 
+    IGRAPH_FINALLY(igraph_i_levc_free, eigenvectors);
+  }
 
   IGRAPH_STATUS("Starting leading eigenvector method.\n", 0);
 
@@ -1157,6 +1173,17 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_push_back(&mymerges, i));
     if (eigenvalues) { 
       IGRAPH_CHECK(igraph_vector_push_back(eigenvalues, IGRAPH_NAN));
+    }
+    if (eigenvectors) { 
+      igraph_vector_t *v=igraph_Calloc(1, igraph_vector_t);
+      if (!v) { 
+	IGRAPH_ERROR("Cannot do leading eigenvector community detection", 
+		     IGRAPH_ENOMEM); 
+      }
+      IGRAPH_FINALLY(igraph_free, v);
+      IGRAPH_VECTOR_INIT_FINALLY(v, 0);
+      IGRAPH_CHECK(igraph_vector_ptr_push_back(eigenvectors, v));
+      IGRAPH_FINALLY_CLEAN(2);
     }
     if (history) {
       IGRAPH_CHECK(igraph_vector_push_back(history, IGRAPH_LEVC_HIST_SPLIT));
@@ -1222,29 +1249,17 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
       IGRAPH_WARNING("Maximum number of ARPACK iterations reached");
     }
 
-    /* just to have the always the same result, we multiply by -1
-       if the first (nonzero) element is not positive  */
-    for (i=0; i<size; i++) {
-      if (storage.v[i] != 0) { break; }
-    }
-    if (storage.v[i]<0) {
-      for (; i<size; i++) {
-        storage.v[i] = - storage.v[i];
-      }
-    }
-
     /* Ok, we have the eigenvector */
-
-    /* Non-positive eigenvalue */
-/*     printf("%f\n", storage.d[0]); */
-/*     for (j=0; j<size; j++) { printf("%g ", storage.v[j]); } */
-/*     printf("\n"); */
+    /* To avoid numeric errors */
+    if (fabs(storage.d[0]) < 1e-10) { 
+      storage.d[0] = 0;
+    }
 
     if (eigenvalues) {
       IGRAPH_CHECK(igraph_vector_push_back(eigenvalues, storage.d[0]));
     }
 
-    if (storage.d[0] <= 0.00001) { 
+    if (storage.d[0] <= 0) {
       IGRAPH_STATUS("no split.\n", 0);
       if (history) { 
 	IGRAPH_CHECK(igraph_vector_push_back(history, 
@@ -1254,6 +1269,41 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
       continue; 
     }
     IGRAPH_STATUS("split.\n", 0);
+
+    /* We replace very small (in absolute value) elements of the 
+       leading eigenvector with zero, to get the same result, 
+       consistently.*/
+    for (i=0; i<size; i++) {
+      if (fabs(storage.v[i]) < 1e-10) {
+	storage.v[i]=0;
+      }
+    }
+
+    /* Just to have the always the same result, we multiply by -1
+       if the first (nonzero) element is not positive. */
+    for (i=0; i<size; i++) {
+      if (storage.v[i] != 0) { break; }
+    }
+    if (i<size && storage.v[i]<0) {
+      for (i=0; i<size; i++) {
+        storage.v[i] = - storage.v[i];
+      }
+    }
+
+    if (eigenvectors) { 
+      igraph_vector_t *v=igraph_Calloc(1, igraph_vector_t);
+      if (!v) { 
+	IGRAPH_ERROR("Cannot do leading eigenvector community detection", 
+		     IGRAPH_ENOMEM);
+      }
+      IGRAPH_FINALLY(igraph_free, v);
+      IGRAPH_VECTOR_INIT_FINALLY(v, size);
+      for (i=0; i<size; i++) {
+	VECTOR(*v)[i]=storage.v[i];
+      }
+      IGRAPH_CHECK(igraph_vector_ptr_push_back(eigenvectors, v));
+      IGRAPH_FINALLY_CLEAN(2);
+    }
 
     /* Count the number of vertices in each community after the split */
     l=0;
@@ -1325,6 +1375,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     }      
   }
   
+  if (eigenvectors) { IGRAPH_FINALLY_CLEAN(1); }
   igraph_vector_destroy(&idx);
   igraph_vector_destroy(&mymerges);
   IGRAPH_FINALLY_CLEAN(2);
