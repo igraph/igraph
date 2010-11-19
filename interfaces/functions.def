@@ -1051,7 +1051,8 @@ igraph_community_leading_eigenvector:
                 OUT REALPTR modularity, BOOLEAN start=False, \
                 OUT VECTOR_OR_0 eigenvalues, \
                 OUT VECTOR_OR_0 eigenvectors, \
-                OUT VECTOR_OR_0 history
+                OUT VECTOR_OR_0 history, \
+                LEVCFUNC callback
         DEFAULT-R: options=igraph.arpack.default
         CLASS-R: igraph.eigenc
         NAME-R: leading.eigenvector.community

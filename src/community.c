@@ -1071,15 +1071,17 @@ void igraph_i_levc_free(igraph_vector_ptr_t *ptr) {
  */
 
 int igraph_community_leading_eigenvector(const igraph_t *graph,
-					 igraph_matrix_t *merges,
-					 igraph_vector_t *membership,
-					 igraph_integer_t steps,
-					 igraph_arpack_options_t *options, 
-					 igraph_real_t *modularity,
-					 igraph_bool_t start,
-					 igraph_vector_t *eigenvalues,
-					 igraph_vector_ptr_t *eigenvectors,
-					 igraph_vector_t *history) {
+	igraph_matrix_t *merges,
+	igraph_vector_t *membership,
+	igraph_integer_t steps,
+	igraph_arpack_options_t *options, 
+	igraph_real_t *modularity,
+	igraph_bool_t start,
+	igraph_vector_t *eigenvalues,
+	igraph_vector_ptr_t *eigenvectors,
+	igraph_vector_t *history,
+        igraph_community_leading_eigenvector_callback_t *callback,
+        void *callback_extra) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
@@ -1093,6 +1095,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   igraph_vector_t vmembership, *mymembership=membership;
   igraph_i_community_leading_eigenvector_data_t extra;
   igraph_arpack_storage_t storage;
+  igraph_real_t mod=0;
 
   if (start && !membership) { 
     IGRAPH_ERROR("Cannot start from given configuration if memberships "
@@ -1202,7 +1205,6 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   if (options->ncv<4) { options->ncv=4; }
   if (options->ncv>no_of_nodes) { options->ncv=no_of_nodes; }
 
-
   /* Memory for ARPACK */
   IGRAPH_CHECK(igraph_arpack_storage_init(&storage, no_of_nodes, options->ncv, 
 					  no_of_nodes, 1));
@@ -1250,25 +1252,12 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     }
 
     /* Ok, we have the eigenvector */
+
+    /* ---------------------------------------------------------------*/
     /* To avoid numeric errors */
     if (fabs(storage.d[0]) < 1e-10) { 
       storage.d[0] = 0;
     }
-
-    if (eigenvalues) {
-      IGRAPH_CHECK(igraph_vector_push_back(eigenvalues, storage.d[0]));
-    }
-
-    if (storage.d[0] <= 0) {
-      IGRAPH_STATUS("no split.\n", 0);
-      if (history) { 
-	IGRAPH_CHECK(igraph_vector_push_back(history, 
-					     IGRAPH_LEVC_HIST_FAILED));
-	IGRAPH_CHECK(igraph_vector_push_back(history, comm));
-      }					     
-      continue; 
-    }
-    IGRAPH_STATUS("split.\n", 0);
 
     /* We replace very small (in absolute value) elements of the 
        leading eigenvector with zero, to get the same result, 
@@ -1289,6 +1278,23 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
         storage.v[i] = - storage.v[i];
       }
     }
+    /* ---------------------------------------------------------------*/
+
+    if (callback) {
+      igraph_vector_t vv;
+      int ret;
+      igraph_vector_view(&vv, storage.v, size);
+      ret=callback(mymembership, comm, storage.d[0], &vv, 
+		   igraph_i_community_leading_eigenvector, &extra,
+		   callback_extra);
+      if (ret) {
+	break;
+      }
+    }
+
+    if (eigenvalues) {
+      IGRAPH_CHECK(igraph_vector_push_back(eigenvalues, storage.d[0]));
+    }
 
     if (eigenvectors) { 
       igraph_vector_t *v=igraph_Calloc(1, igraph_vector_t);
@@ -1305,21 +1311,59 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
       IGRAPH_FINALLY_CLEAN(2);
     }
 
+    if (storage.d[0] <= 0) {
+      IGRAPH_STATUS("no split.\n", 0);
+      if (history) { 
+	IGRAPH_CHECK(igraph_vector_push_back(history, 
+					     IGRAPH_LEVC_HIST_FAILED));
+	IGRAPH_CHECK(igraph_vector_push_back(history, comm));
+      }					     
+      continue; 
+    }
+
     /* Count the number of vertices in each community after the split */
     l=0;
     for (j=0; j<size; j++) {
-      if (storage.v[j] <= 0) {
+      if (storage.v[j] < 0) {
+	storage.v[j] = -1;
         l++;
+      } else {
+	storage.v[j] = 1;
       }
     }
     if (l==0 || l==size) {
+      IGRAPH_STATUS("no split.\n", 0);
+      if (history) { 
+	IGRAPH_CHECK(igraph_vector_push_back(history, 
+					     IGRAPH_LEVC_HIST_FAILED));
+	IGRAPH_CHECK(igraph_vector_push_back(history, comm));
+      }					     
       continue;
     }
+
+    /* Check that Q increases with our choice of split */
+    igraph_i_community_leading_eigenvector(storage.v+size, storage.v, size, 
+					   &extra);
+    mod=0;
+    for (i=0; i<size; i++) {
+      mod += storage.v[size+i] * storage.v[i];
+    }
+    if (mod <= 1e-10) {
+      IGRAPH_STATUS("no modularity increase, no split.\n", 0);
+      if (history) { 
+	IGRAPH_CHECK(igraph_vector_push_back(history, 
+					     IGRAPH_LEVC_HIST_FAILED));
+	IGRAPH_CHECK(igraph_vector_push_back(history, comm));
+      }					     
+      continue;      
+    }
+
     communities++;
+    IGRAPH_STATUS("split.\n", 0);
     
     /* Rewrite the mymembership vector */
     for (j=0; j<size; j++) {
-      if (storage.v[j] <= 0) {
+      if (storage.v[j] < 0) {
         long int oldid=VECTOR(idx)[j];
         VECTOR(*mymembership)[oldid]=communities-1;
       }

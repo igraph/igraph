@@ -146,16 +146,27 @@ typedef enum { IGRAPH_LEVC_HIST_SPLIT=1,
 	       IGRAPH_LEVC_HIST_START_GIVEN
 } igraph_leading_eigenvector_community_history_t;
 
+typedef int igraph_community_leading_eigenvector_callback_t(
+	const igraph_vector_t *membership,
+	long int comm, 
+	igraph_real_t eigenvalue,
+	const igraph_vector_t *eigenvector,
+	igraph_arpack_function_t *arpack_multiplier,
+        void *arpack_extra,
+        void *extra);
+
 int igraph_community_leading_eigenvector(const igraph_t *graph,
-					 igraph_matrix_t *merges,
-					 igraph_vector_t *membership,
-					 igraph_integer_t steps,
-					 igraph_arpack_options_t *options, 
-					 igraph_real_t *modularity,
-					 igraph_bool_t start,
-					 igraph_vector_t *eigenvalues,
-					 igraph_vector_ptr_t *eigenvectors,
-					 igraph_vector_t *history);
+	igraph_matrix_t *merges,
+	igraph_vector_t *membership,
+	igraph_integer_t steps,
+	igraph_arpack_options_t *options, 
+	igraph_real_t *modularity,
+	igraph_bool_t start,
+	igraph_vector_t *eigenvalues,
+	igraph_vector_ptr_t *eigenvectors,
+        igraph_vector_t *history, 
+        igraph_community_leading_eigenvector_callback_t *callback,
+        void *callback_extra);
 
 int igraph_community_label_propagation(const igraph_t *graph,
                                        igraph_vector_t *membership,

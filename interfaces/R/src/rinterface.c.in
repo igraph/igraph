@@ -35,7 +35,7 @@
 
 int igraph_free(void *p);
 
-SEXP R_igraph_vector_to_SEXP(igraph_vector_t *v);
+SEXP R_igraph_vector_to_SEXP(const igraph_vector_t *v);
 SEXP R_igraph_vector_bool_to_SEXP(igraph_vector_bool_t *v);
 SEXP R_igraph_vector_long_to_SEXP(igraph_vector_long_t *v);
 SEXP R_igraph_0orvector_to_SEXP(igraph_vector_t *v);
@@ -60,6 +60,16 @@ int R_SEXP_to_igraph_es(SEXP rit, igraph_t *graph, igraph_es_t *it);
 int R_SEXP_to_igraph_adjlist(SEXP vectorlist, igraph_adjlist_t *ptr);
 int R_SEXP_to_vector_bool(SEXP sv, igraph_vector_bool_t *v);
 int R_SEXP_to_vector_int(SEXP sv, igraph_vector_int_t *v);
+
+
+SEXP R_igraph_i_lang7(SEXP s, SEXP t, SEXP u, SEXP v, SEXP w, SEXP x, SEXP y)
+{
+    PROTECT(s);
+    PROTECT(t);
+    s = LCONS(s, LCONS(t, list5(u, v, w, x, y)));
+    UNPROTECT(2);
+    return s;
+}
 
 /* get the list element named str, or return NULL */
 /* from the R Manual */
@@ -1827,7 +1837,7 @@ SEXP R_igraph_finalizer() {
  * functions to convert igraph objects to SEXP
  *****************************************************/
 
-SEXP R_igraph_vector_to_SEXP(igraph_vector_t *v) {
+SEXP R_igraph_vector_to_SEXP(const igraph_vector_t *v) {
   SEXP result;
   
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(v)));
@@ -7343,8 +7353,66 @@ SEXP R_igraph_cohesive_blocks(SEXP graph) {
   return result;
 }
 
+SEXP R_igraph_i_levc_arp(SEXP extP, SEXP extE, SEXP pv) {
+  igraph_arpack_function_t *fun=R_ExternalPtrAddr(extP);
+  void *extra=R_ExternalPtrAddr(extE);
+  SEXP res;
+  
+  PROTECT(res=NEW_NUMERIC(GET_LENGTH(pv)));
+  fun(REAL(res), REAL(pv), GET_LENGTH(pv), extra);
+  
+  UNPROTECT(1);
+  return res;
+}
+
+typedef struct R_igraph_i_levc_data_t {
+  SEXP fun;
+  SEXP extra;
+  SEXP rho;
+  SEXP rho2;
+} R_igraph_i_levc_data_t;
+
+int R_igraph_i_levc_callback(const igraph_vector_t *membership,
+		     long int comm,
+		     igraph_real_t eigenvalue,
+		     const igraph_vector_t *eigenvector,
+		     igraph_arpack_function_t *arpack_multiplier,
+		     void *arpack_extra,
+		     void *extra) {
+
+  SEXP s_memb, s_comm, s_evalue, s_evector, s_multip;
+  SEXP R_fcall, R_multip_call;
+  SEXP res;
+  int result;
+  R_igraph_i_levc_data_t *data=extra;
+
+  PROTECT(s_memb=R_igraph_vector_to_SEXP(membership));
+  PROTECT(s_comm=NEW_NUMERIC(1)); REAL(s_comm)[0]=comm;
+  PROTECT(s_evalue=NEW_NUMERIC(1)); REAL(s_evalue)[0]=eigenvalue;
+  PROTECT(s_evector=R_igraph_vector_to_SEXP(eigenvector));
+  PROTECT(R_multip_call =
+	  lang3(install("igraph.i.levc.arp"), 
+		R_MakeExternalPtr(arpack_multiplier, R_NilValue, R_NilValue),
+		R_MakeExternalPtr(arpack_extra, R_NilValue, R_NilValue)));
+  PROTECT(s_multip = eval(R_multip_call, data->rho2));
+
+  PROTECT(R_fcall = R_igraph_i_lang7(data->fun, s_memb, s_comm, 
+				     s_evalue, s_evector, s_multip, 
+				     data->extra));
+  PROTECT(res = eval(R_fcall, data->rho));
+  
+  result=REAL(AS_NUMERIC(res))[0];
+	  
+  UNPROTECT(8);
+  return result;
+}
+
 SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps, 
-					    SEXP options, SEXP pstart) {
+					    SEXP options, SEXP pstart, 
+					    SEXP callback, 
+					    SEXP callback_extra,
+					    SEXP callback_env,
+					    SEXP callback_env2) {
                                         /* Declarations */
   igraph_t c_graph;
   igraph_matrix_t c_merges;
@@ -7364,6 +7432,10 @@ SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps,
   SEXP history;
   int c_result;
   SEXP result, names;
+
+  R_igraph_i_levc_data_t callback_data = { callback, callback_extra, 
+					   callback_env, callback_env2 };
+
                                         /* Convert input */
   R_SEXP_to_igraph(graph, &c_graph);
   if (0 != igraph_matrix_init(&c_merges, 0, 0)) { 
@@ -7395,7 +7467,10 @@ SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps,
 						&c_options, &c_modularity, 
 						c_start, &c_eigenvalues,
 						&c_eigenvectors,
-						&c_history);
+						&c_history, 
+						isNull(callback) ? 0 : 
+						R_igraph_i_levc_callback,
+						&callback_data);
 
                                         /* Convert output */
   PROTECT(result=NEW_LIST(7));

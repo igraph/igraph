@@ -460,18 +460,30 @@ community.to.membership <- function(graph, merges, steps, membership=TRUE,
         PACKAGE="igraph")
 }
 
+igraph.i.levc.arp <- function(externalP, externalE) {
+  f <- function(v) {
+    v <- as.numeric(v)
+    .Call("R_igraph_i_levc_arp", externalP, externalE, v, PACKAGE="igraph");
+  }
+  f
+}
+
 leading.eigenvector.community <- function(graph, steps=-1, start=NULL,
-                                          options=igraph.arpack.default) {
+                                          options=igraph.arpack.default,
+                                          callback=NULL, extra=NULL,
+                                          env=parent.frame()){
+
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
   steps <- as.numeric(steps)
   if (!is.null(start)) { start <- as.numeric(start)-1 }
   options.tmp <- igraph.arpack.default; options.tmp[ names(options) ] <- options ; options <- options.tmp
-
+  
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
   res <- .Call("R_igraph_community_leading_eigenvector", graph, steps,
-               options, start,
+               options, start, callback, extra, env,
+               environment(igraph.i.levc.arp),
                PACKAGE="igraph")
   res$algorithm <- "leading eigenvector"
   res$vcount <- vcount(graph)
