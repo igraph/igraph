@@ -1096,6 +1096,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   igraph_i_community_leading_eigenvector_data_t extra;
   igraph_arpack_storage_t storage;
   igraph_real_t mod=0;
+  int offset;
 
   if (start && !membership) { 
     IGRAPH_ERROR("Cannot start from given configuration if memberships "
@@ -1166,7 +1167,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 
   IGRAPH_DQUEUE_INIT_FINALLY(&tosplit, 100);
   for (i = 0; i < communities; i++) {
-    if (VECTOR(idx)[i] > 1) {
+    if (VECTOR(idx)[i] > 2) {
       igraph_dqueue_push(&tosplit, i);
     }
   }
@@ -1202,12 +1203,12 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
-  if (options->ncv<4) { options->ncv=4; }
+  if (options->ncv<7) { options->ncv=7; }
   if (options->ncv>no_of_nodes) { options->ncv=no_of_nodes; }
 
   /* Memory for ARPACK */
   IGRAPH_CHECK(igraph_arpack_storage_init(&storage, no_of_nodes, options->ncv, 
-					  no_of_nodes, 1));
+					  no_of_nodes, 2));
   IGRAPH_FINALLY(igraph_arpack_storage_destroy, &storage);
   extra.idx=&idx;
   extra.idx2=&idx2;
@@ -1231,7 +1232,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     }
 
     staken++;
-    if (size==1) {
+    if (size<=2) {
       continue;
     }
     
@@ -1239,23 +1240,34 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     options->n=size;
     options->which[0]='L'; options->which[1]='A';
     options->info=0;
-    if (options->ncv < 4) { options->ncv=4; }
+    options->nev=2;
+    if (options->ncv < 7) { options->ncv=7; }
     if (options->ncv > options->n) { options->ncv=options->n; }
     extra.comm=comm;
-    
+
     /* Call ARPACK solver */
     IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_community_leading_eigenvector,
-				       &extra, options, &storage, 0, 0));
+				       &extra, options, &storage,
+				       /*values=*/ 0, /*vectors=*/ 0));
     
-    if (options->noiter > options->mxiter) {
-      IGRAPH_WARNING("Maximum number of ARPACK iterations reached");
+    if (options->nconv < 2) {
+      IGRAPH_ERROR("ARPACK did not converge", IGRAPH_ARPACK_FAILED);
     }
 
     /* Ok, we have the eigenvector */
+    
+    if (storage.d[0] < storage.d[1]) {
+      igraph_real_t tmp=storage.d[0];
+      storage.d[0]=storage.d[1];
+      storage.d[1]=tmp;
+      offset=size;
+    } else {
+      offset=0;
+    }
 
     /* ---------------------------------------------------------------*/
     /* To avoid numeric errors */
-    if (fabs(storage.d[0]) < 1e-10) { 
+    if (fabs(storage.d[0]) < 1e-8) { 
       storage.d[0] = 0;
     }
 
@@ -1263,19 +1275,19 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
        leading eigenvector with zero, to get the same result, 
        consistently.*/
     for (i=0; i<size; i++) {
-      if (fabs(storage.v[i]) < 1e-10) {
-	storage.v[i]=0;
+      if (fabs(storage.v[offset+i]) < 1e-8) {
+	storage.v[offset+i]=0;
       }
     }
 
     /* Just to have the always the same result, we multiply by -1
        if the first (nonzero) element is not positive. */
     for (i=0; i<size; i++) {
-      if (storage.v[i] != 0) { break; }
+      if (storage.v[offset+i] != 0) { break; }
     }
-    if (i<size && storage.v[i]<0) {
+    if (i<size && storage.v[offset+i]<0) {
       for (i=0; i<size; i++) {
-        storage.v[i] = - storage.v[i];
+        storage.v[offset+i] = - storage.v[offset+i];
       }
     }
     /* ---------------------------------------------------------------*/
@@ -1283,7 +1295,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     if (callback) {
       igraph_vector_t vv;
       int ret;
-      igraph_vector_view(&vv, storage.v, size);
+      igraph_vector_view(&vv, storage.v+offset, size);
       ret=callback(mymembership, comm, storage.d[0], &vv, 
 		   igraph_i_community_leading_eigenvector, &extra,
 		   callback_extra);
@@ -1305,7 +1317,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
       IGRAPH_FINALLY(igraph_free, v);
       IGRAPH_VECTOR_INIT_FINALLY(v, size);
       for (i=0; i<size; i++) {
-	VECTOR(*v)[i]=storage.v[i];
+	VECTOR(*v)[i]=storage.v[offset+i];
       }
       IGRAPH_CHECK(igraph_vector_ptr_push_back(eigenvectors, v));
       IGRAPH_FINALLY_CLEAN(2);
@@ -1324,11 +1336,11 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     /* Count the number of vertices in each community after the split */
     l=0;
     for (j=0; j<size; j++) {
-      if (storage.v[j] < 0) {
-	storage.v[j] = -1;
+      if (storage.v[offset+j] < 0) {
+	storage.v[offset+j] = -1;
         l++;
       } else {
-	storage.v[j] = 1;
+	storage.v[offset+j] = 1;
       }
     }
     if (l==0 || l==size) {
@@ -1342,13 +1354,14 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     }
 
     /* Check that Q increases with our choice of split */
-    igraph_i_community_leading_eigenvector(storage.v+size, storage.v, size, 
+    igraph_i_community_leading_eigenvector(storage.v+size-offset, 
+					   storage.v+offset, size, 
 					   &extra);
     mod=0;
     for (i=0; i<size; i++) {
-      mod += storage.v[size+i] * storage.v[i];
+      mod += storage.v[size-offset+i] * storage.v[offset+i];
     }
-    if (mod <= 1e-10) {
+    if (mod <= 1e-8) {
       IGRAPH_STATUS("no modularity increase, no split.\n", 0);
       if (history) { 
 	IGRAPH_CHECK(igraph_vector_push_back(history, 
@@ -1358,12 +1371,22 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
       continue;      
     }
 
+    if (fabs(storage.d[0]-storage.d[1]) < 1e-8) {
+      IGRAPH_STATUS("multiple principal eigenvalue, no split.\n", 0);
+      if (history) { 
+	IGRAPH_CHECK(igraph_vector_push_back(history, 
+					     IGRAPH_LEVC_HIST_FAILED));
+	IGRAPH_CHECK(igraph_vector_push_back(history, comm));
+      }					     
+      continue;
+    }
+
     communities++;
     IGRAPH_STATUS("split.\n", 0);
     
     /* Rewrite the mymembership vector */
     for (j=0; j<size; j++) {
-      if (storage.v[j] < 0) {
+      if (storage.v[offset+j] < 0) {
         long int oldid=VECTOR(idx)[j];
         VECTOR(*mymembership)[oldid]=communities-1;
       }

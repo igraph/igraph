@@ -11,7 +11,7 @@ sizes(lc)
 
 ## Stress-test
 
-for (i in 1:1000) {
+for (i in 1:100) {
   g <- erdos.renyi.game(20, sample(5:40, 1), type="gnm")
   lec1 <- leading.eigenvector.community(g)
   lec2 <- leading.eigenvector.community(g)
