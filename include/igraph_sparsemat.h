@@ -51,6 +51,8 @@ typedef enum { IGRAPH_SPARSEMAT_TRIPLET,
 	       IGRAPH_SPARSEMAT_CC        } igraph_sparsemat_type_t;
 
 int igraph_sparsemat_init(igraph_sparsemat_t *A, int rows, int cols, int nzmax);
+int igraph_sparsemat_copy(igraph_sparsemat_t *to, 
+			  const igraph_sparsemat_t *from);
 void igraph_sparsemat_destroy(igraph_sparsemat_t *A);
 int igraph_sparsemat_realloc(igraph_sparsemat_t *A, int nzmax);
 
@@ -82,6 +84,7 @@ int igraph_sparsemat_fkeep(igraph_sparsemat_t *A,
 			   int (*fkeep)(int, int, igraph_real_t, void*),
 			   void *other);
 int igraph_sparsemat_dropzeros(igraph_sparsemat_t *A);
+int igraph_sparsemat_droptol(igraph_sparsemat_t *A, igraph_real_t tol);
 int igraph_sparsemat_multiply(const igraph_sparsemat_t *A,
 			      const igraph_sparsemat_t *B,
 			      igraph_sparsemat_t *res);
@@ -186,5 +189,26 @@ int igraph_sparsemat_symbqr(long int order, const igraph_sparsemat_t *A,
 
 void igraph_sparsemat_symbolic_destroy(igraph_sparsemat_symbolic_t *dis);
 void igraph_sparsemat_numeric_destroy(igraph_sparsemat_numeric_t *din);
+
+igraph_real_t igraph_sparsemat_max(igraph_sparsemat_t *A);
+igraph_real_t igraph_sparsemat_min(igraph_sparsemat_t *A);
+int igraph_sparsemat_minmax(igraph_sparsemat_t *A, 
+			    igraph_real_t *min, igraph_real_t *max);
+
+long int igraph_sparsemat_count_nonzero(igraph_sparsemat_t *A);
+long int igraph_sparsemat_count_nonzerotol(igraph_sparsemat_t *A, 
+					   igraph_real_t tol);
+int igraph_sparsemat_rowsums(const igraph_sparsemat_t *A, 
+			     igraph_vector_t *res);
+int igraph_sparsemat_colsums(const igraph_sparsemat_t *A, 
+			     igraph_vector_t *res);
+
+int igraph_sparsemat_scale(igraph_sparsemat_t *A, igraph_real_t by);
+			   
+
+int igraph_sparsemat_add_rows(igraph_sparsemat_t *A, long int n);
+int igraph_sparsemat_add_cols(igraph_sparsemat_t *A, long int n);
+int igraph_sparsemet_resize(igraph_sparsemat_t *A, long int nrow, 
+			    long int ncol);
 
 #endif

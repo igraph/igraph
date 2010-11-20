@@ -148,6 +148,16 @@ AT_KEYWORDS([sparse matrix igraph_sparsemat_t])
 AT_COMPILE_CHECK([simple/igraph_sparsemat6.c])
 AT_CLEANUP
 
+AT_SETUP([Sparse matrix, min & max (igraph_sparsemat_t): ])
+AT_KEYWORDS([sparse matrix igraph_sparsemat_t])
+AT_COMPILE_CHECK([simple/igraph_sparsemat7.c])
+AT_CLEANUP
+
+AT_SETUP([Sparse matrix, other operations (igraph_sparsemat_t): ])
+AT_KEYWORDS([sparse matrix igraph_sparsemat_t])
+AT_COMPILE_CHECK([simple/igraph_sparsemat8.c])
+AT_CLEANUP
+
 AT_SETUP([Another sparse matrix (igraph_spmatrix_t): ])
 AT_KEYWORDS([sparse matrix igraph_spmatrix_t])
 AT_COMPILE_CHECK([simple/spmatrix.c], [simple/spmatrix.out])
