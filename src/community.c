@@ -1465,8 +1465,8 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
  * Vertex membership from the leading eigenvector community structure
  * 
  * This function creates a membership vector from the
- * result of \ref igraph_community_leading_eigenvector() or
- * \ref igraph_community_leading_eigenvector_naive(). It takes \c membership
+ * result of \ref igraph_community_leading_eigenvector(),
+ * It takes \c membership
  * and permformes \c steps merges, according to the supplied
  * \c merges matrix.
  * \param merges The matrix defining the merges to make. 
