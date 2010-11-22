@@ -11,7 +11,7 @@ DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      operators.xml flows.xml community.xml cliques.xml \
 	      sparsematrix.xml stack.xml dqueue.xml heap.xml strvector.xml \
 	      adjlist.xml arpack.xml bipartite.xml visitors.xml random.xml \
-	      separators.xml memory.xml
+	      separators.xml memory.xml sparsemat.xml
 
 DOCFIX = fdl.xml gpl.xml igraph-docs.xml installation.xml introduction.xml \
 	 tutorial.xml licenses.xml pmt.xml
@@ -48,6 +48,9 @@ matrix.xml: matrix.xxml $(INCLUDEDIR)/igraph_matrix.h $(SRCDIR)/matrix.pmt
 
 sparsematrix.xml: sparsematrix.xxml $(INCLUDEDIR)/igraph_spmatrix.h $(SRCDIR)/spmatrix.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_spmatrix.h $(SRCDIR)/spmatrix.c
+
+sparsemat.xml: sparsemat.xxml $(SRCDIR)/sparsemat.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/sparsemat.c
 
 basicigraph.xml: basicigraph.xxml $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c
