@@ -2964,7 +2964,6 @@ int igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
   }
 
   /* Start writing header */
-  CHECK(fprintf(outstream, "# Created by igraph %s\n", PACKAGE_VERSION));
   CHECK(fprintf(outstream, "LEDA.GRAPH\n"));
   
   switch (vertex_attr_type) {

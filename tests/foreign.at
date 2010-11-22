@@ -75,7 +75,12 @@ AT_COMPILE_CHECK([simple/lineendings.c], [simple/lineendings.out],
 AT_CLEANUP
 
 AT_SETUP([UNICET DL format:])
-AT_KEYWORDS([igraph_read_graph_dl DL UNINET])
+AT_KEYWORDS([igraph_read_graph_dl DL UCINET])
 AT_COMPILE_CHECK([simple/igraph_read_graph_dl.c], [simple/igraph_read_graph_dl.out],
         [simple/{edgelist1,edgelist2,edgelist3,edgelist4,edgelist5,edgelist6,fullmatrix1,fullmatrix2,fullmatrix3,fullmatrix4,nodelist1,nodelist2}.dl])
+AT_CLEANUP
+
+AT_SETUP([LEDA format:])
+AT_KEYWORDS([igraph_write_graph_leda LEDA])
+AT_COMPILE_CHECK([simple/igraph_write_graph_leda.c], [simple/igraph_write_graph_leda.out], [])
 AT_CLEANUP
