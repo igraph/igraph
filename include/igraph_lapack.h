@@ -39,6 +39,32 @@
 
 __BEGIN_DECLS
 
+/**
+ * \section about_lapack LAPACK interface in igraph
+ * 
+ * <para>
+ * LAPACK is written in Fortran90 and provides routines for solving
+ * systems of simultaneous linear equations, least-squares solutions
+ * of linear systems of equations, eigenvalue problems, and singular
+ * value problems. The associated matrix factorizations (LU, Cholesky,
+ * QR, SVD, Schur, generalized Schur) are also provided, as are
+ * related computations such as reordering of the Schur factorizations
+ * and estimating condition numbers. Dense and banded matrices are
+ * handled, but not general sparse matrices. In all areas, similar
+ * functionality is provided for real and complex matrices, in both
+ * single and double precision.
+ * </para>
+ * 
+ * <para>
+ * igraph provides an interface to a very limited set of LAPACK
+ * functions, using the regular igraph data structures.
+ * </para>
+ * 
+ * <para>
+ * See more about LAPACK at http://www.netlib.org/lapack/
+ * </para>
+ */
+
 int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
 			 int *info);
 int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,

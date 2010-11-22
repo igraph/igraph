@@ -26,13 +26,13 @@
 
 /**
  * \function igraph_lapack_dgetrf
- * Calls LAPACK to to LU factorize a general M-by-N matrix
+ * LU factorization of a general M-by-N matrix
  * 
  * The factorization has the form   
  *      A = P * L * U   
  * where P is a permutation matrix, L is lower triangular with unit   
  * diagonal elements (lower trapezoidal if m > n), and U is upper   
- * triangular (upper trapezoidal if m < n).   
+ * triangular (upper trapezoidal if m &lt; n).   
  * \param a The input/output matrix. On entry, the M-by-N matrix to be
  *      factored. On exit, the factors L and U from the factorization 
  *      A = P * L * U; the unit diagonal elements of L are not
@@ -589,7 +589,118 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
 
 /**
  * \function igraph_lapack_dgeevx
+ * Eigenvalues/vectors of nonsymmetric matrices, expert mode
  * 
+ * This function calculates the eigenvalues and optionally the left
+ * and/or right eigenvectors of a nonsymmetrix N-by-N real matrix.
+ * 
+ * </para><para>
+ * Optionally also, it computes a balancing transformation to improve   
+ * the conditioning of the eigenvalues and eigenvectors (\p ilo, \pihi,   
+ * \p scale, and \p abnrm), reciprocal condition numbers for the
+ * eigenvalues (\p rconde), and reciprocal condition numbers for the
+ * right eigenvectors (\p rcondv).   
+ * 
+ * </para><para>
+ * The right eigenvector v(j) of A satisfies   
+ *                   A * v(j) = lambda(j) * v(j)   
+ * where lambda(j) is its eigenvalue.   
+ * The left eigenvector u(j) of A satisfies   
+ *               u(j)**H * A = lambda(j) * u(j)**H   
+ * where u(j)**H denotes the conjugate transpose of u(j).   
+ *
+ * </para><para>
+ * The computed eigenvectors are normalized to have Euclidean norm   
+ * equal to 1 and largest component real.   
+ *
+ * </para><para>
+ * Balancing a matrix means permuting the rows and columns to make it   
+ * more nearly upper triangular, and applying a diagonal similarity   
+ * transformation D * A * D**(-1), where D is a diagonal matrix, to   
+ * make its rows and columns closer in norm and the condition numbers   
+ * of its eigenvalues and eigenvectors smaller.  The computed   
+ * reciprocal condition numbers correspond to the balanced matrix.   
+ * Permuting rows and columns will not change the condition numbers   
+ * (in exact arithmetic) but diagonal scaling will.  For further   
+ * explanation of balancing, see section 4.10.2 of the LAPACK   
+ * Users' Guide.   
+ * 
+ * \param balance Scalar that indicated, whether the input matrix
+ *   should be balanced. Possible values:
+ *   \clist
+ *     \cli IGRAPH_LAPACK_DGEEVX_BALANCE_NONE 
+ *          no not diagonally scale or permute. 
+ *     \cli IGRAPH_LAPACK_DGEEVX_BALANCE_PERM 
+ *          perform permutations to make the matrix more nearly upper
+ *          triangular. Do not diagonally scale.
+ *     \cli IGRAPH_LAPACK_DGEEVX_BALANCE_SCALE
+ *          diagonally scale the matrix, i.e. replace A by
+ *          D*A*D**(-1), where D is a diagonal matrix, chosen to make
+ *          the rows and columns of A more equal in norm. Do not
+ *          permute.
+ *     \cli IGRAPH_LAPACK_DGEEVX_BALANCE_BOTH
+ *          both diagonally scale and permute A.
+ *   \endclist
+ * \param A The input matrix, must be square.
+ * \param valuesreal An initialized vector, or a NULL pointer. If not
+ *   a NULL pointer, then the real parts of the eigenvalues are stored
+ *   here. The vector will be resized, as needed.
+ * \param valuesimag An initialized vector, or a NULL pointer. If not
+ *   a NULL pointer, then the imaginary parts of the eigenvalues are stored
+ *   here. The vector will be resized, as needed.
+ * \param vectorsleft An initialized matrix or a NULL pointer. If not
+ *   a null pointer, then the left eigenvectors are stored here. The
+ *   order corresponds to the eigenvalues and the eigenvectors are
+ *   stored in a compressed form. If the j-th eigenvalue is real then 
+ *   column j contains the corresponding eigenvector. If the j-th and
+ *   (j+1)-th eigenvalues form a complex conjugate pair, then the j-th
+ *   and (j+1)-th columns contain their corresponding eigenvectors.
+ * \param vectorsright An initialized matrix or a NULL pointer. If not
+ *   a null pointer, then the left eigenvectors are stored here. The
+ *   format is the same, as for the \p vectorsleft argument.
+ * \param ilo 
+ * \param ihi \p ilo and \p ihi are integer values determined when A was   
+ *   balanced.  The balanced A(i,j) = 0 if I>J and   
+ *   J=1,...,ilo-1 or I=ihi+1,...,N.
+ * \param scale Pointer to an initialized vector or a NULL pointer. If
+ *   not a NULL pointer, then details of the permutations and scaling
+ *   factors applied when balancing \param A, are stored here. 
+ *   If P(j) is the index of the row and column   
+ *   interchanged with row and column j, and D(j) is the scaling   
+ *   factor applied to row and column j, then
+ *   \clist
+ *      \cli scale(J) = P(J),    for J = 1,...,ilo-1   
+ *      \cli scale(J) = D(J),    for J = ilo,...,ihi   
+ *      \cli scale(J) = P(J)     for J = ihi+1,...,N.   
+ *   \endclist
+ *   The order in which the interchanges are made is N to \p ihi+1,
+ *   then 1 to \p ilo-1.   
+ * \param abnrm Pointer to a real variable, the one-norm of the
+ *   balanced matrix is stored here. (The one-norm is the maximum of
+ *   the sum of absolute values of elements in any column.)
+ * \param rconde An initialized vector or a NULL pointer. If not a
+ *   null pointer, then the reciprocal condition numbers of the
+ *   eigenvalues are stored here.
+ * \param rcondv An initialized vector or a NULL pointer. If not a
+ *   null pointer, then the reciprocal condition numbers of the right
+ *   eigenvectors are stored here.
+ * \param info This argument is used for two purposes. As an input
+ *        argument it gives whether an igraph error should be
+ *        generated if the QR algorithm fails to compute all
+ *        eigenvalues. If \p info is non-zero, then an error is
+ *        generated, otherwise only a warning is given.
+ *        On exit it contains the LAPACK error code. 
+ *        Zero means successful exit.
+ *        A negative values means that some of the arguments had an
+ *        illegal value, this always triggers an igraph error. An i
+ *        positive  value means that the QR algorithm failed to
+ *        compute all the eigenvalues, and no eigenvectors have been
+ *        computed; element i+1:N of \p valuesreal and \p valuesimag
+ *        contain eigenvalues which have converged. This case only
+ *        generated an igraph error, if \p info was non-zero on entry.
+ * \return Error code.
+ * 
+ * Time complexity: TODO
  */
 
 int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,

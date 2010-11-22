@@ -5,16 +5,30 @@
 ]>
 
 <chapter id="igraph-Arpack">
-<title>Using BLAS and ARPACK for igraph graphs</title>
+<title>Using BLAS, LAPACK and ARPACK for igraph matrices and graphs</title>
 
 <section>
 <!-- doxrox-include about_blas -->
+<!-- doxrox-include igraph_blas_dgemv -->
+<!-- doxrox-include igraph_blas_dgemv_array -->
+</section>
+
+<section>
+  <!-- doxrox-include about_lapack -->
+  <section><title>Matrix factorization, solving linear systems</title>
+  <!-- doxrox-include igraph_lapack_dgetrf -->
+  <!-- doxrox-include igraph_lapack_dgetrs -->
+  <!-- doxrox-include igraph_lapack_dgesv -->
+  </section>
+  <section><title>Eigenvalues and eigenvectors of matrices</title>
+  <!-- doxrox-include igraph_lapack_dsyevr -->
+  <!-- doxrox-include igraph_lapack_dgeev -->
+  <!-- doxrox-include igraph_lapack_dgeevx -->
+  </section>
 </section>
 
 <section>
 <!-- doxrox-include about_arpack -->
-</section>
-
 <section><title>Data structures</title>
 <!-- doxrox-include igraph_arpack_options_t -->
 <!-- doxrox-include igraph_arpack_storage_t -->
@@ -24,15 +38,12 @@
 <!-- doxrox-include igraph_arpack_storage_destroy -->
 </section>
 
-<section><title>BLAS routines</title>
-<!-- doxrox-include igraph_blas_dgemv -->
-<!-- doxrox-include igraph_blas_dgemv_array -->
-</section>
-
 <section><title>ARPACK solvers</title>
 <!-- doxrox-include igraph_arpack_rssolve -->
 <!-- doxrox-include igraph_arpack_rnsolve -->
 <!-- doxrox-include igraph_arpack_unpack_complex -->
+</section>
+
 </section>
 
 </chapter>

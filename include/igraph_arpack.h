@@ -41,7 +41,7 @@
 __BEGIN_DECLS
 
 /**
- * \section about_arpack About the ARPACK interface in igraph
+ * \section about_arpack ARPACK interface in igraph
  *
  * <para>
  * ARPACK is a library for solving large scale eigenvalue problems.
