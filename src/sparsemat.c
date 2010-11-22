@@ -1826,7 +1826,7 @@ int igraph_sparsemat_add_cols(igraph_sparsemat_t *A, long int n) {
  * Resize a sparse matrix
  */
 
-int igraph_sparsemet_resize(igraph_sparsemat_t *A, long int nrow, 
+int igraph_sparsemat_resize(igraph_sparsemat_t *A, long int nrow, 
 			    long int ncol) {
 
   /* TODO */

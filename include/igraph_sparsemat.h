@@ -208,7 +208,7 @@ int igraph_sparsemat_scale(igraph_sparsemat_t *A, igraph_real_t by);
 
 int igraph_sparsemat_add_rows(igraph_sparsemat_t *A, long int n);
 int igraph_sparsemat_add_cols(igraph_sparsemat_t *A, long int n);
-int igraph_sparsemet_resize(igraph_sparsemat_t *A, long int nrow, 
+int igraph_sparsemat_resize(igraph_sparsemat_t *A, long int nrow, 
 			    long int ncol);
 
 #endif
