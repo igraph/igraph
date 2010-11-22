@@ -36,8 +36,8 @@ class Histogram(object):
         >>> h << [2,3,2,7,8,5,5,0,7,9]     # Adding more items
         >>> print h
         N = 10, mean +- sd: 4.8000 +- 2.9740
-        [ 0.000,  5.000): ****
-        [ 5.000, 10.000): ******
+        [ 0,  5): **** (4)
+        [ 5, 10): ****** (6)
     """
 
     def __init__(self, bin_width = 1, data = None):
@@ -212,7 +212,7 @@ class Histogram(object):
                 scale = maxval // (max_width-2*num_length-6)
             scale = max(scale, 1)
 
-        result = ["N = %d, mean +- sd: %.4f +- %.4f " % \
+        result = ["N = %d, mean +- sd: %.4f +- %.4f" % \
             (self.n, self.mean, self.sd)]
 
         if show_bars:
@@ -297,8 +297,8 @@ class RunningMean(object):
         so you can use it to add elements as well:
             
           >>> rm=RunningMean()
-          >>> rm << [1,2,3,4]
-          (2.5, 1.6666666666667)
+          >>> rm << [1,2,3,4]             # doctest:+ELLIPSIS
+          (2.5, 1.290994...)
         
         @param values: the element(s) to be added
         @type values: iterable
