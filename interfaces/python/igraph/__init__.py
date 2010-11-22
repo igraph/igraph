@@ -1552,7 +1552,7 @@ class Graph(GraphBase):
         
         if ext in [".graphml", ".graphmlz", ".lgl", ".ncol", ".pajek",
             ".gml", ".dimacs", ".edgelist", ".edges", ".edge", ".net",
-            ".pickle", ".dot"]:
+            ".pickle", ".dot", ".gw", ".lgr"]:
             return ext[1:]
 
         if ext == ".txt" or ext == ".dat":
@@ -1631,13 +1631,32 @@ class Graph(GraphBase):
         @param format: the format of the file (if one wants to override the
           format determined from the filename extension, or the filename itself
           is a stream). C{None} means auto-detection. Possible values are:
-          C{"ncol"} (NCOL format), C{"lgl"} (LGL format), C{"graphml"},
-          C{"graphmlz"} (GraphML and gzipped GraphML format), C{"gml"} (GML
-          format), C{"dot"}, C{"graphviz"} (DOT format, used by GraphViz),
-          C{"net"}, C{"pajek"} (Pajek format), C{"dimacs"} (DIMACS format),
-          C{"edgelist"}, C{"edges"} or C{"edge"} (edge list), C{"adjacency"}
-          (adjacency matrix), C{"pickle"} (Python pickled format),
-          C{"svg"} (Scalable Vector Graphics).
+
+            - C{"adjacency"}: adjacency matrix format
+
+            - C{"dimacs"}: DIMACS format
+
+            - C{"dot"}, C{"graphviz"}: GraphViz DOT format
+
+            - C{"edgelist"}, C{"edges"} or C{"edge"}: numeric edge list format
+
+            - C{"gml"}: GML format
+
+            - C{"graphml"} and C{"graphmlz"}: standard and gzipped GraphML
+              format
+
+            - C{"gw"}, C{"leda"}, C{"lgr"}: LEDA native format
+
+            - C{"lgl"}: LGL format
+
+            - C{"ncol"}: NCOL format
+
+            - C{"net"}, C{"pajek"}: Pajek format
+
+            - C{"pickle"}: Python pickled format
+
+            - C{"svg"}: SVG format
+
         @raises IOError: if the file format can't be identified and
           none was given.
         """
@@ -2344,7 +2363,10 @@ class Graph(GraphBase):
           "edge":       ("Read_Edgelist", "write_edgelist"),
           "edges":      ("Read_Edgelist", "write_edgelist"),
           "pickle":     ("Read_Pickle", "write_pickle"),
-          "svg":        (None, "write_svg")
+          "svg":        (None, "write_svg"),
+          "gw":         (None, "write_leda"),
+          "leda":       (None, "write_leda"),
+          "lgr":        (None, "write_leda")
     }
 
     _layout_mapping = {

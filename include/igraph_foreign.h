@@ -85,6 +85,8 @@ int igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
 int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream, 
 			   const igraph_vector_t *id, const char *creator);
 int igraph_write_graph_dot(const igraph_t *graph, FILE *outstream);
+int igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
+        const char* vertex_attr_name, const char* edge_attr_name);
 
 __END_DECLS
 

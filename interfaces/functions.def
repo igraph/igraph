@@ -1180,6 +1180,10 @@ igraph_write_graph_lgl:
                 BOOLEAN isolates=True
         IGNORE: RR, RC, RNamespace
 
+igraph_write_graph_leda:
+        PARAMS: GRAPH graph, OUTFILE outstream, CSTRING names="name", CSTRING weights="weight"
+        IGNORE: RR, RC, RNamespace
+
 igraph_write_graph_graphml:
         PARAMS: GRAPH graph, OUTFILE outstream
         IGNORE: RR, RC, RNamespace

@@ -6753,6 +6753,40 @@ PyObject *igraphmodule_Graph_write_graphml(igraphmodule_GraphObject * self,
   Py_RETURN_NONE;
 }
 
+/** \ingroup python_interface_graph
+ * \brief Writes the edge list to a file in LEDA native format
+ * \return none
+ * \sa igraph_write_graph_leda
+ */
+PyObject *igraphmodule_Graph_write_leda(igraphmodule_GraphObject * self,
+                                        PyObject * args, PyObject * kwds)
+{
+  PyObject *fname = NULL;
+  char *vertex_attr_name = "name";
+  char *edge_attr_name = "weight";
+  igraphmodule_filehandle_t fobj;
+
+  static char *kwlist[] = { "f", "names", "weights", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|zz", kwlist,
+                                   &fname, &vertex_attr_name,
+								   &edge_attr_name))
+    return NULL;
+
+  if (igraphmodule_filehandle_init(&fobj, fname, "w"))
+    return NULL;
+
+  if (igraph_write_graph_leda(&self->g, igraphmodule_filehandle_get(&fobj),
+        vertex_attr_name, edge_attr_name)) {
+    igraphmodule_handle_igraph_error();
+    igraphmodule_filehandle_destroy(&fobj);
+    return NULL;
+  }
+  igraphmodule_filehandle_destroy(&fobj);
+
+  Py_RETURN_NONE;
+}
+
 /**********************************************************************
  * Routines related to graph isomorphism                              *
  **********************************************************************/
@@ -11787,6 +11821,23 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Writes the graph to a GraphML file.\n\n"
    "@param f: the name of the file to be written or a Python file handle\n"
   },
+  /* interface to igraph_write_graph_leda */
+  {"write_leda", (PyCFunction) igraphmodule_Graph_write_leda,
+   METH_VARARGS | METH_KEYWORDS,
+   "write_leda(f, names=\"name\", weights=\"weights\")\n\n"
+   "Writes the graph to a file in LEDA native format.\n\n"
+   "The LEDA format supports at most one attribute per vertex and edge. You can\n"
+   "specify which vertex and edge attribute you want to use. Note that the\n"
+   "name of the attribute is not saved in the LEDA file.\n\n"
+   "@param f: the name of the file to be written or a Python file handle\n"
+   "@param names: the name of the vertex attribute to be stored along with\n"
+   "  the vertices. It is usually used to store the vertex names (hence the\n"
+   "  name of the keyword argument), but you may also use a numeric attribute.\n"
+   "  If you don't want to store any vertex attributes, supply C{None} here.\n"
+   "@param edge_attr_name: the name of the edge attribute to be stored\n"
+   "  along with the edges. It is usually used to store the edge weights (hence\n"
+   "  the name of the keyword argument), but you may also use a string attribute.\n"
+   "  If you don't want to store any edge attributes, supply C{None} here.\n"},
 
   /////////////////
   // ISOMORPHISM //
