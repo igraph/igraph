@@ -738,9 +738,10 @@ int igraph_sparsemat_add(const igraph_sparsemat_t *A,
 int igraph_sparsemat_gaxpy(const igraph_sparsemat_t *A,
 			   const igraph_vector_t *x,
 			   igraph_vector_t *res) {
+
+  IGRAPH_CHECK(igraph_vector_resize(res, A->cs->m));
   
-  if (A->cs->n != igraph_vector_size(x) || 
-      A->cs->m != igraph_vector_size(res)) {
+  if (A->cs->n != igraph_vector_size(x)) {
     IGRAPH_ERROR("Invalid matrix/vector size for multiplication",
 		 IGRAPH_EINVAL);
   }
