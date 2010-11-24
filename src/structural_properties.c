@@ -6836,6 +6836,7 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
     igraph_indheap_push_with_index(&Q, source, -0);
     VECTOR(already_added)[source] = source+1;
     VECTOR(dist)[source] = 1.0;
+    nodes_reached = 0.0;
 
     while (!igraph_indheap_empty(&Q)) {
       long int minnei=igraph_indheap_max_index(&Q);

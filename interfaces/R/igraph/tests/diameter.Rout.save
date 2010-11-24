@@ -53,4 +53,11 @@ Type 'q()' to quit R.
 > max(sp, na.rm=TRUE) == diameter(g, unconnected=TRUE)
 [1] TRUE
 > 
+> #### Bug #680538
+> 
+> g <- graph.tree(30, mode="undirected")
+> E(g)$weight <- 1
+> diameter(g, unconnected=FALSE)
+[1] 8
+> 
 > 

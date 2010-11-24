@@ -31,3 +31,9 @@ sp <- shortest.paths(g, mode="out")
 sp[sp==Inf] <- NA
 max(sp, na.rm=TRUE) == diameter(g, unconnected=TRUE)
 
+#### Bug #680538
+
+g <- graph.tree(30, mode="undirected")
+E(g)$weight <- 1
+diameter(g, unconnected=FALSE)
+
