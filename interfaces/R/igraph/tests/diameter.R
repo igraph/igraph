@@ -34,6 +34,6 @@ max(sp, na.rm=TRUE) == diameter(g, unconnected=TRUE)
 #### Bug #680538
 
 g <- graph.tree(30, mode="undirected")
-E(g)$weight <- 1
+E(g)$weight <- 2
 diameter(g, unconnected=FALSE)
 
