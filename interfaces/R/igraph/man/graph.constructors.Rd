@@ -21,20 +21,14 @@
 \description{These method can create various (mostly regular) graphs:
   empty graphs, graphs with the given edges, graphs from adjacency
   matrices, star graphs, lattices, rings, trees.}
-\synopsis{
-graph.lattice(dimvector = NULL, length = NULL, dim = NULL, nei = 1,
-              directed = FALSE, mutual = FALSE, circular = FALSE, \dots)
-}
 \usage{
 graph.empty(n=0, directed=TRUE)
 graph(edges, n=max(edges)+1, directed=TRUE)
-graph.star(n, mode = "in", center = 0)
-graph.lattice(dimvector, nei = 1, directed = FALSE, mutual = FALSE, 
-              circular = FALSE)
-graph.lattice(length, dim, nei = 1, directed = FALSE, mutual = FALSE,
-              circular = FALSE)
+graph.star(n, mode = c("in", "out", "undirected"), center = 0)
+graph.lattice(dimvector = NULL, length = NULL, dim = NULL, nei = 1,
+              directed = FALSE, mutual = FALSE, circular = FALSE, \dots)
 graph.ring(n, directed = FALSE, mutual = FALSE, circular=TRUE)
-graph.tree(n, children = 2, mode="out")
+graph.tree(n, children = 2, mode=c("out", "in", "undirected"))
 graph.full(n, directed = FALSE, loops = FALSE)
 graph.full.citation(n, directed = TRUE)
 graph.atlas(n)
@@ -92,6 +86,7 @@ graph.extended.chordal.ring(n, w)
     details below.}
   \item{w}{A matrix which specifies the extended chordal ring. See
     details below.}
+  \item{\dots}{Currently ignored.}
 }
 \details{All these functions create graphs in a deterministic way.
 
@@ -103,7 +98,10 @@ graph.extended.chordal.ring(n, w)
   connected to the center vertex and nobody else.
 
   \code{graph.lattice} is a flexible function, it can create lattices of
-  arbitrary dimensions, periodic or unperiodic ones.
+  arbitrary dimensions, periodic or unperiodic ones. It has two
+  forms. In the first form you only supply \code{dimvector}, but not
+  \code{length} and \code{dim}. In the second form you omit
+  \code{dimvector} and supply \code{length} and \code{dim}.
 
   \code{graph.ring} is actually a special case of \code{graph.lattice},
   it creates a one dimensional circular lattice.

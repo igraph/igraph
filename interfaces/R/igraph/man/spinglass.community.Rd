@@ -6,18 +6,11 @@
 \title{Finding communities in graphs based on statistical meachanics}
 \description{This function tries to find communities in graphs via
   a spin-glass model and simulated annealing.}
-\synopsis{
+\usage{
 spinglass.community(graph, weights=NULL, vertex=NULL, spins=25,
                     parupdate=FALSE, start.temp=1, stop.temp=0.01,
                     cool.fact=0.99, update.rule=c("config", "random",
                     "simple"), gamma=1)
-}
-\usage{
-spinglass.community(graph, weights=NULL, spins=25, parupdate=FALSE,
-                    start.temp=1, stop.temp=0.1, cool.fact=0.99,
-                    update.rule=c("config", "random", "simple"), gamma=1)
-spinglass.community(graph, weights=NULL, vertex, spins=25,
-                    update.rule=c("config", "random", "simple"), gamma=1)
 }
 \arguments{
   \item{graph}{The input graph, can be directed but the direction of the
@@ -26,6 +19,9 @@ spinglass.community(graph, weights=NULL, vertex, spins=25,
     \code{NULL}. If it is null and the input graph has a \sQuote{weight}
     edge attribute then that will be used. If \code{NULL} and no such
     attribute is present then the edges will have equal weights.}
+  \item{vertex}{This parameter can be used to calculate the community of
+      a given vertex without calculating all communities. Note that if
+      this argument is present then some other arguments are ignored.}
   \item{spins}{Integer constant, the number of spins to use. This is the
     upper limit for the number of communities. It is not a problem to
     supply a (reasonably) big number here, in which case some
@@ -59,15 +55,22 @@ spinglass.community(graph, weights=NULL, vertex, spins=25,
     outside the community. The default 1.0 value makes existing and
     non-existing links equally important. Smaller values make the
     existing links, greater values the missing links more important.}
-  \item{vertex}{This parameter can be used to calculate the community of
-      a given vertex without calculating all communities. Note that if
-      this argument is present then some other arguments are ignored.}
 }
 \details{
   This function tries to find communities in a graph. A community is a
   set of nodes with many edges inside the community and  few edges
   between outside it (ie. between the community itself and the rest of
   the graph. 
+
+  The \code{spinglass.cummunity} function can solve two problems related
+  to community detection. If the \code{vertex} argument is not given (or
+  it is \code{NULL}), then the regular community detection problem is
+  solved (approximately), i.e. partitioning the vertices into
+  communities, by optimizing the an energy function.
+
+  If the \code{vertex} argument is given and it is not \code{NULL}, then
+  it must be a vertex id, and the same energy function is used to find
+  the community of the the given vertex. See also the examples below.
 }
 \value{
   If the \code{vertex} argument is not given, ie. the first form is used
