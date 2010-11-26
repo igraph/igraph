@@ -1453,28 +1453,6 @@ int igraph_sparsemat_arpack_rnsolve(const igraph_sparsemat_t *A,
 }
 
 /**
- * \function igraph_sparsemat_schol
- * Symbolic Cholesky decomposition
- * 
- * Ordering and symbolic analysis for a Cholesky factorization.
- * \param order 
- * \param A The input graph, in compressed-columns format.
- * \param dis 
- * \return Error code.
- */
-
-int igraph_sparsemat_schol(long int order, const igraph_sparsemat_t *A, 
-			   igraph_sparsemat_symbolic_t *dis) {
-
-  dis->symbolic = cs_schol(order, A->cs);
-  if (!dis->symbolic) {
-    IGRAPH_ERROR("Cannot do symbolic Cholesky decomposition", IGRAPH_FAILURE);
-  }
-
-  return 0;
-}
-
-/**
  * \function igraph_sparsemat_symbqr
  * Symbolic QR decomposition
  * 

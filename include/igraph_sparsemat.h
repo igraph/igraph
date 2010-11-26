@@ -160,9 +160,6 @@ int igraph_sparsemat_arpack_rnsolve(const igraph_sparsemat_t *A,
 				    igraph_matrix_t *values, 
 				    igraph_matrix_t *vectors);
 
-int igraph_sparsemat_schol(long int order, const igraph_sparsemat_t *A, 
-			   igraph_sparsemat_symbolic_t *dis);
-
 int igraph_sparsemat_lu(const igraph_sparsemat_t *A, 
 			const igraph_sparsemat_symbolic_t *dis, 
 			igraph_sparsemat_numeric_t *din, double tol);
