@@ -2786,7 +2786,8 @@ int igraph_i_compare_communities_nmi(const igraph_vector_t *v1,
 int igraph_i_compare_communities_rand(const igraph_vector_t *v1,
     const igraph_vector_t *v2, igraph_real_t* result, igraph_bool_t adjust);
 int igraph_i_split_join_distance(const igraph_vector_t *v1,
-    const igraph_vector_t *v2, igraph_real_t* distance12, igraph_real_t* distance21);
+    const igraph_vector_t *v2, igraph_integer_t* distance12,
+    igraph_integer_t* distance21);
 
 /**
  * \ingroup communities

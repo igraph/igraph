@@ -277,7 +277,9 @@ int igraphmodule_PyObject_to_vconn_nei_t(PyObject *o,
   igraph_vconn_nei_t *result) {
   static igraphmodule_enum_translation_table_entry_t vconn_nei_tt[] = {
         {"error", IGRAPH_VCONN_NEI_ERROR},
-        {"infinity", IGRAPH_VCONN_NEI_INFINITY},
+        {"negative", IGRAPH_VCONN_NEI_NEGATIVE},
+        {"number_of_nodes", IGRAPH_VCONN_NEI_NUMBER_OF_NODES},
+        {"nodes", IGRAPH_VCONN_NEI_NUMBER_OF_NODES},
         {"ignore", IGRAPH_VCONN_NEI_IGNORE},
         {0,0}
     };

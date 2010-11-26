@@ -799,7 +799,7 @@ igraph_integer_t igraph_i_cutheap_popmax(igraph_i_cutheap_t *ch) {
 
 int igraph_i_cutheap_update(igraph_i_cutheap_t *ch, igraph_integer_t index,
 			    igraph_real_t add) {
-  igraph_integer_t hidx=VECTOR(ch->hptr)[(long int)index];
+  igraph_real_t hidx=VECTOR(ch->hptr)[(long int)index];
   if (hidx != INACTIVE && hidx != UNDEFINED) {
     long int hidx2=hidx-INDEXINC;
 /*     printf("updating vertex %li, heap index %li\n", (long int) index, hidx2); */

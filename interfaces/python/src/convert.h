@@ -72,7 +72,7 @@ int igraphmodule_PyObject_to_vconn_nei_t(PyObject *o, igraph_vconn_nei_t *result
 
 /* Conversion from PyObject to igraph types */
 
-int igraphmodule_PyObject_to_integer_t(PyObject *object, igraph_real_t *v);
+int igraphmodule_PyObject_to_integer_t(PyObject *object, igraph_integer_t *v);
 int igraphmodule_PyObject_to_real_t(PyObject *object, igraph_real_t *v);
 int igraphmodule_PyObject_to_igraph_t(PyObject *o, igraph_t **result);
 

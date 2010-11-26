@@ -2146,8 +2146,9 @@ int igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
     if (igraph_vs_is_all(&vids))
       ratio = 1.0;
     else {
-      IGRAPH_CHECK(igraph_vs_size(graph, &vids, &ratio));
-      ratio /= igraph_vcount(graph);
+      igraph_integer_t num_vs;
+      IGRAPH_CHECK(igraph_vs_size(graph, &vids, &num_vs));
+      ratio = num_vs / ((double)igraph_vcount(graph));
     }
 
     if (ratio > 0.5)
@@ -3421,7 +3422,7 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
       (igraph_vector_size(&outneis)-op);
   }
 
-  *res= rec/(rec+nonrec);
+  *res= rec/((igraph_real_t)rec+nonrec);
   
   igraph_vector_destroy(&inneis);
   igraph_vector_destroy(&outneis);
@@ -3782,7 +3783,7 @@ int igraph_density(const igraph_t *graph, igraph_real_t *res,
 		   igraph_bool_t loops) {
 
   igraph_integer_t no_of_nodes=igraph_vcount(graph);
-  igraph_integer_t no_of_edges=igraph_ecount(graph);
+  igraph_real_t no_of_edges=igraph_ecount(graph);
   igraph_bool_t directed=igraph_is_directed(graph);
   
   if (!loops) {
@@ -6809,7 +6810,10 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
   long int nodes_reached=0;
   
   if (!weights) {
-    return igraph_diameter(graph, pres, pfrom, pto, path, directed, unconn);
+    igraph_integer_t diameter;
+    IGRAPH_CHECK(igraph_diameter(graph, &diameter, pfrom, pto, path, directed, unconn));
+    *pres = diameter;
+    return IGRAPH_SUCCESS;
   }
 
   if (weights && igraph_vector_size(weights) != no_of_edges) {

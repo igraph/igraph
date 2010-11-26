@@ -28,9 +28,9 @@ int main() {
   igraph_t g;
   igraph_integer_t girth;
   igraph_vector_t v;
-  igraph_integer_t chord[] = { 0, 50 };
+  igraph_real_t chord[] = { 0, 50 };
   igraph_ring(&g, 100, IGRAPH_UNDIRECTED, 0, 1);
-  igraph_vector_view(&v, chord, sizeof(chord)/sizeof(igraph_integer_t));
+  igraph_vector_view(&v, chord, sizeof(chord)/sizeof(igraph_real_t));
   igraph_add_edges(&g, &v, 0);
   igraph_girth(&g, &girth, 0);
   if (girth != 51) {

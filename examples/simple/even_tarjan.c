@@ -26,7 +26,7 @@
 int main() {
 
   igraph_t g, gbar;
-  igraph_integer_t k1, k2=IGRAPH_INFINITY;
+  igraph_integer_t k1, k2 = 2 << 31;
   igraph_real_t tmpk;
   long int i, j, n;
 
@@ -51,12 +51,13 @@ int main() {
     }
   }
 
-  if (k1 != k2) {
-    return 1;
-  }
-
   igraph_destroy(&gbar);
   igraph_destroy(&g);
   
+  if (k1 != k2) {
+    printf("k1 = %ld while k2 = %ld\n", k1, k2);
+    return 1;
+  }
+
   return 0;
 }

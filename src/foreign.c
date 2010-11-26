@@ -2279,7 +2279,8 @@ int igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
   
 
   while (!IGRAPH_EIT_END(it)) {
-    igraph_integer_t from, to, cap;
+    igraph_integer_t from, to;
+	igraph_real_t cap;
     igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
     cap=VECTOR(*capacity)[i++];
     ret=fprintf(outstream, "a %li %li %g\n",

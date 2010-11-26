@@ -1452,8 +1452,11 @@ int igraph_mincut(const igraph_t *graph,
       return igraph_mincut_value(graph, value, capacity);      
     }
   } else {
-    return igraph_i_mincut_undirected(graph, value, partition, 
-				      partition2, cut, capacity);
+	igraph_integer_t int_value;
+    IGRAPH_CHECK(igraph_i_mincut_undirected(graph, &int_value, partition, 
+				      partition2, cut, capacity));
+	*value = int_value;
+	return IGRAPH_SUCCESS;
   }
   
   return 0;
@@ -1512,7 +1515,9 @@ int igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
   minmaxflow=IGRAPH_INFINITY;
 
   if (!igraph_is_directed(graph)) {
-    IGRAPH_CHECK(igraph_i_mincut_value_undirected(graph, res, capacity));
+    igraph_integer_t int_res;
+    IGRAPH_CHECK(igraph_i_mincut_value_undirected(graph, &int_res, capacity));
+	*res = int_res;
     return 0;
   }    
 
@@ -1545,6 +1550,7 @@ int igraph_i_st_vertex_connectivity_directed(const igraph_t *graph,
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   igraph_vector_t edges;
+  igraph_real_t real_res;
   igraph_t newgraph;
   long int i;
   igraph_bool_t conn1;
@@ -1561,14 +1567,18 @@ int igraph_i_st_vertex_connectivity_directed(const igraph_t *graph,
       return 0;
     }
     break;
-  case IGRAPH_VCONN_NEI_INFINITY:
+  case IGRAPH_VCONN_NEI_NEGATIVE:
     IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn1));
     if (conn1) {
-/*       fprintf(stderr, "%li -> %li connected\n", (long int)source, (long int) target); */
-      *res=IGRAPH_INFINITY;
+      *res=-1;
       return 0;
-/*     } else { */
-/*       fprintf(stderr, "not connected\n"); */
+    }
+    break;
+  case IGRAPH_VCONN_NEI_NUMBER_OF_NODES:
+    IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn1));
+    if (conn1) {
+      *res=no_of_nodes;
+      return 0;
     }
     break;
   case IGRAPH_VCONN_NEI_IGNORE:
@@ -1609,9 +1619,10 @@ int igraph_i_st_vertex_connectivity_directed(const igraph_t *graph,
   no_of_nodes=igraph_vcount(&newgraph);
   no_of_edges=igraph_ecount(&newgraph);
   
-  IGRAPH_CHECK(igraph_maxflow_value(&newgraph, res, 
+  IGRAPH_CHECK(igraph_maxflow_value(&newgraph, &real_res, 
 				    source, target, 0));
-  
+  *res = (igraph_integer_t)real_res;
+
   igraph_destroy(&newgraph);
   IGRAPH_FINALLY_CLEAN(1);
   
@@ -1640,10 +1651,17 @@ int igraph_i_st_vertex_connectivity_undirected(const igraph_t *graph,
       return 0;
     }
     break;
-  case IGRAPH_VCONN_NEI_INFINITY:
+  case IGRAPH_VCONN_NEI_NEGATIVE:
     IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
     if (conn) {
-      *res=IGRAPH_INFINITY;
+      *res=-1;
+      return 0;
+    }
+    break;
+  case IGRAPH_VCONN_NEI_NUMBER_OF_NODES:
+    IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
+    if (conn) {
+      *res=no_of_nodes;
       return 0;
     }
     break;
@@ -1657,7 +1675,7 @@ int igraph_i_st_vertex_connectivity_undirected(const igraph_t *graph,
   IGRAPH_CHECK(igraph_copy(&newgraph, graph));
   IGRAPH_FINALLY(igraph_destroy, &newgraph);
   IGRAPH_CHECK(igraph_to_directed(&newgraph, IGRAPH_TO_DIRECTED_MUTUAL));
-  
+
   IGRAPH_CHECK(igraph_i_st_vertex_connectivity_directed(&newgraph, res, 
 							source, target, 
 							IGRAPH_VCONN_NEI_IGNORE));
@@ -1690,7 +1708,8 @@ int igraph_i_st_vertex_connectivity_undirected(const igraph_t *graph,
  * \param neighbors A constant giving what to do if the two vertices
  *     are connected. Possible values: 
  *     \c IGRAPH_VCONN_NEI_ERROR, stop with an error message,
- *     \c IGRAPH_VCONN_INFINITY, return infinity (ie. 1.0/0.0).
+ *     \c IGRAPH_VCONN_NEGATIVE, return -1.
+ *     \c IGRAPH_VCONN_NUMBER_OF_NODES, return the number of nodes.
  *     \c IGRAPH_VCONN_IGNORE, ignore the fact that the two vertices
  *        are connected and calculated the number of vertices needed
  *        to aliminate all paths except for the trivial (direct) paths
@@ -1742,7 +1761,7 @@ int igraph_i_vertex_connectivity_directed(const igraph_t *graph,
       IGRAPH_ALLOW_INTERRUPTION();
 
       IGRAPH_CHECK(igraph_st_vertex_connectivity(graph, &conn, i, j, 
-						 IGRAPH_VCONN_NEI_INFINITY));
+						 IGRAPH_VCONN_NEI_NUMBER_OF_NODES));
       if (conn < minconn) {
 	minconn = conn;
 	if (conn == 0) { break; }
@@ -1938,7 +1957,6 @@ int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
 
 int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
 			     igraph_bool_t checks) {
-  
   igraph_bool_t ret;
   
   /* Use that vertex.connectivity(G) <= edge.connectivity(G) <= min(degree(G)) */
@@ -1947,7 +1965,9 @@ int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
   }  
 
   if (!ret) {
-    IGRAPH_CHECK(igraph_mincut_value(graph, res, 0));
+    igraph_real_t real_res;
+    IGRAPH_CHECK(igraph_mincut_value(graph, &real_res, 0));
+	*res = (igraph_integer_t)real_res;
   }
 
   return 0;

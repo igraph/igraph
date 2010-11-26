@@ -331,9 +331,9 @@ int igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, long int vertex);
  */
 
 typedef struct s_set {
-  igraph_real_t* stor_begin;
-  igraph_real_t* stor_end;
-  igraph_real_t* end;
+  igraph_integer_t* stor_begin;
+  igraph_integer_t* stor_end;
+  igraph_integer_t* end;
 } igraph_set_t;
 
 #define IGRAPH_SET_NULL { 0,0,0 }
