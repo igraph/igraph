@@ -31,7 +31,7 @@ is.good <- function(M, v, lambda, eps=1e-12) {
 for (i in 1:1000) {
   G <- erdos.renyi.game(10, sample(1:20, 1), type="gnm")
   ev <- evcent(G)
-  if (!is.good(get.adjacency(G), ev$vector, ev$value)) {
+  if (!is.good(get.adjacency(G, sparse=FALSE), ev$vector, ev$value)) {
     print("Foobar!")
     break
   }
