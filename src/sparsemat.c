@@ -855,7 +855,7 @@ int igraph_sparsemat_usolve(const igraph_sparsemat_t *U,
 
 /**
  * \function igraph_sparsemat_utsolve
- * Solve a transposed upper-triangular linear system
+ * Solve a lower-triangular linear system
  * 
  * This is the same as \ref igraph_sparsemat_usolve(), but U'x=b is
  * solved, where the apostrophe denotes the transpose.
