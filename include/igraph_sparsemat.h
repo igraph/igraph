@@ -174,18 +174,19 @@ int igraph_sparsemat_qr(const igraph_sparsemat_t *A,
 int igraph_sparsemat_luresol(const igraph_sparsemat_symbolic_t *dis,
 			     const igraph_sparsemat_numeric_t *din, 
 			     const igraph_vector_t *b,
-			     igraph_vector_t *res,
-			     igraph_real_t tol);
+			     igraph_vector_t *res);
 
 int igraph_sparsemat_qrresol(const igraph_sparsemat_symbolic_t *dis,
 			     const igraph_sparsemat_numeric_t *din, 
 			     const igraph_vector_t *b,
-			     igraph_vector_t *res,
-			     igraph_real_t tol);
+			     igraph_vector_t *res);
 
 int igraph_sparsemat_symbqr(long int order, const igraph_sparsemat_t *A,
-			    igraph_sparsemat_symbolic_t *dis,
-			    int qr);
+			    igraph_sparsemat_symbolic_t *dis);
+
+int igraph_sparsemat_symblu(long int order, const igraph_sparsemat_t *A,
+			    igraph_sparsemat_symbolic_t *dis);
+
 
 void igraph_sparsemat_symbolic_destroy(igraph_sparsemat_symbolic_t *dis);
 void igraph_sparsemat_numeric_destroy(igraph_sparsemat_numeric_t *din);

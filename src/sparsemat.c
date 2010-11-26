@@ -1295,11 +1295,12 @@ int igraph_i_sparsemat_arpack_solve(igraph_real_t *to,
   igraph_vector_view(&vto, to, n);
 
   if (data->method == IGRAPH_SPARSEMAT_SOLVE_LU) {
-    IGRAPH_CHECK(igraph_sparsemat_luresol(data->dis, data->din, &vfrom, &vto,
-					  /*tol=*/ data->tol));
+    IGRAPH_CHECK(igraph_sparsemat_luresol(data->dis, data->din, &vfrom, 
+					  &vto));
   } else if (data->method == IGRAPH_SPARSEMAT_SOLVE_QR) {
-    IGRAPH_CHECK(igraph_sparsemat_qrresol(data->dis, data->din, &vfrom, &vto,
-					  /*tol=*/ data->tol));
+    IGRAPH_CHECK(igraph_sparsemat_qrresol(data->dis, data->din, &vfrom, 
+					  &vto));
+
   }
 
   return 0;
@@ -1377,16 +1378,14 @@ int igraph_sparsemat_arpack_rssolve(const igraph_sparsemat_t *A,
         
     if (solvemethod==IGRAPH_SPARSEMAT_SOLVE_LU) {
       /* Symbolic analysis */
-      IGRAPH_CHECK(igraph_sparsemat_symbqr(/*order=*/ 0, &OP, &symb, 
-					   /*qr=*/ 0));
+      IGRAPH_CHECK(igraph_sparsemat_symblu(/*order=*/ 0, &OP, &symb));
       IGRAPH_FINALLY(igraph_sparsemat_symbolic_destroy, &symb);
       /* Numeric LU factorization */
       IGRAPH_CHECK(igraph_sparsemat_lu(&OP, &symb, &num, /*tol=*/ 0));
       IGRAPH_FINALLY(igraph_sparsemat_numeric_destroy, &num);
     } else if (solvemethod==IGRAPH_SPARSEMAT_SOLVE_QR) {
       /* Symbolic analysis */
-      IGRAPH_CHECK(igraph_sparsemat_symbqr(/*order=*/ 0, &OP, &symb, 
-					   /*qr=*/ 1));
+      IGRAPH_CHECK(igraph_sparsemat_symbqr(/*order=*/ 0, &OP, &symb));
       IGRAPH_FINALLY(igraph_sparsemat_symbolic_destroy, &symb);
       /* Numeric QR factorization */
       IGRAPH_CHECK(igraph_sparsemat_qr(&OP, &symb, &num));
@@ -1479,12 +1478,9 @@ int igraph_sparsemat_schol(long int order, const igraph_sparsemat_t *A,
  * \function igraph_sparsemat_symbqr
  * Symbolic QR decomposition
  * 
- * TODO: have a symbLU function as well....
  * QR decomposition of sparse matrices involves two steps, the first
  * is calling this function, and then \ref
- * igraph_sparsemat_qr(). Somewhat confusingly, the first step of LU
- * decomposition also requires calling this function first, before
- * calling \ref igraph_sparsemat_lu(). 
+ * igraph_sparsemat_qr().
  * \param order The ordering to use: 0 means natural ordering, 1 means
  *   minimum degree ordering of A+A', 2 is minimum degree ordering of
  *   A'A after removing the dense rows from A, and 3 is the minimum
@@ -1493,19 +1489,47 @@ int igraph_sparsemat_schol(long int order, const igraph_sparsemat_t *A,
  * \param dis The result of the symbolic analysis is stored here. Once
  *    not needed anymore, it must be destroyed by calling \ref
  *    igraph_sparsemat_symbolic_destroy().
- * \param qr Whether to do a symbolic QR decomposition (1), or a
- *    symbolic LU decomposition.
  * \return Error code.
  * 
  * Time complexity: TODO.
  */
 
 int igraph_sparsemat_symbqr(long int order, const igraph_sparsemat_t *A,
-			    igraph_sparsemat_symbolic_t *dis, int qr) {
+			    igraph_sparsemat_symbolic_t *dis) {
 
-  dis->symbolic = cs_sqr(order, A->cs, qr);
+  dis->symbolic = cs_sqr(order, A->cs, /*qr=*/ 1);
   if (!dis->symbolic) {
     IGRAPH_ERROR("Cannot do symbolic QR decomposition", IGRAPH_FAILURE);
+  }
+  
+  return 0;
+}
+
+/**
+ * \function igraph_sparsemat_symblu
+ * Symbolic LU decomposition
+ * 
+ * LU decomposition of sparse matrices involves two steps, the first
+ * is calling this function, and then \ref igraph_sparsemat_lu().
+ * \param order The ordering to use: 0 means natural ordering, 1 means
+ *   minimum degree ordering of A+A', 2 is minimum degree ordering of
+ *   A'A after removing the dense rows from A, and 3 is the minimum
+ *   degree ordering of A'A. 
+ * \param A The input matrix, in column-compressed format.
+ * \param dis The result of the symbolic analysis is stored here. Once
+ *    not needed anymore, it must be destroyed by calling \ref
+ *    igraph_sparsemat_symbolic_destroy().
+ * \return Error code.
+ * 
+ * Time complexity: TODO.
+ */
+
+int igraph_sparsemat_symblu(long int order, const igraph_sparsemat_t *A,
+			    igraph_sparsemat_symbolic_t *dis) {
+  
+  dis->symbolic = cs_sqr(order, A->cs, /*qr=*/ 0);
+  if (!dis->symbolic) {
+    IGRAPH_ERROR("Cannot do symbolic LU decomposition", IGRAPH_FAILURE);
   }
   
   return 0;
@@ -1518,7 +1542,7 @@ int igraph_sparsemat_symbqr(long int order, const igraph_sparsemat_t *A,
  * Performs numeric sparse LU decomposition of a matrix.
  * \param A The input matrix, in column-compressed format.
  * \param dis The symbolic analysis for LU decomposition, coming from
- *    a call to the \ref igraph_sparsemat_symbqr() function.
+ *    a call to the \ref igraph_sparsemat_symblu() function.
  * \param din The numeric decomposition, the result is stored here. It
  *    can be used to solve linear systems with changing right hand
  *    side vectors, by calling \ref igraph_sparsemat_luresol(). Once
@@ -1575,14 +1599,13 @@ int igraph_sparsemat_qr(const igraph_sparsemat_t *A,
  * 
  * Uses the LU decomposition of a matrix to solve linear systems.
  * \param dis The symbolic analysis of the coefficient matrix, the
- *    result of \ref igraph_sparsemat_symbqr().
+ *    result of \ref igraph_sparsemat_symblu().
  * \param din The LU decomposition, the result of a call to \ref
  *    igraph_sparsemat_lu(). 
  * \param b A vector that defines the right hand side of the linear
  *    equation system.
  * \param res An initialized vector, the solution of the linear system
  *    is stored here.
- * \param tol The tolerance for the solution. TODO: not needed.
  * \return Error code.
  * 
  * Time complexity: TODO.
@@ -1591,8 +1614,7 @@ int igraph_sparsemat_qr(const igraph_sparsemat_t *A,
 int igraph_sparsemat_luresol(const igraph_sparsemat_symbolic_t *dis,
 			     const igraph_sparsemat_numeric_t *din, 
 			     const igraph_vector_t *b,
-			     igraph_vector_t *res,
-			     igraph_real_t tol) {
+			     igraph_vector_t *res) {
   int n=din->numeric->L->n;
   igraph_real_t *workspace;
 
@@ -1639,7 +1661,6 @@ int igraph_sparsemat_luresol(const igraph_sparsemat_symbolic_t *dis,
  *    system. 
  * \param res An initialized vector, the solution is stored here. It
  *    is resized as needed.
- * \param tol Not needed. TODO.
  * \return Error code.
  * 
  * Time complexity: TODO.
@@ -1648,8 +1669,7 @@ int igraph_sparsemat_luresol(const igraph_sparsemat_symbolic_t *dis,
 int igraph_sparsemat_qrresol(const igraph_sparsemat_symbolic_t *dis,
 			     const igraph_sparsemat_numeric_t *din, 
 			     const igraph_vector_t *b,
-			     igraph_vector_t *res,
-			     igraph_real_t tol) {
+			     igraph_vector_t *res) {
   int n=din->numeric->L->n;
   igraph_real_t *workspace;
   int k;
@@ -1690,7 +1710,8 @@ int igraph_sparsemat_qrresol(const igraph_sparsemat_symbolic_t *dis,
  * \function igraph_sparsemat_symbolic_destroy
  * Deallocate memory for a symbolic decomposition
  * 
- * Frees the memory allocated by \ref igraph_sparsemat_symbqr().
+ * Frees the memory allocated by \ref igraph_sparsemat_symbqr() or
+ * \ref igraph_sparsemat_symblu().
  * \param dis The symbolic analysis.
  * 
  * Time complexity: O(1).
