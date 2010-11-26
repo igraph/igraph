@@ -6,20 +6,12 @@
 \title{Finding communities in graphs based on statistical meachanics}
 \description{This function tries to find communities in graphs via
   a spin-glass model and simulated annealing.}
-\synopsis{
+\usage{
 spinglass.community(graph, weights=NULL, vertex=NULL, spins=25,
                     parupdate=FALSE, start.temp=1, stop.temp=0.01,
                     cool.fact=0.99, update.rule=c("config", "random",
                     "simple"), gamma=1, implementation=c("orig", "neg"),
                     lambda=1)
-}
-\usage{
-spinglass.community(graph, weights=NULL, spins=25, parupdate=FALSE,
-                    start.temp=1, stop.temp=0.1, cool.fact=0.99,
-                    update.rule=c("config", "random", "simple"),
-                    gamma=1, implementation=c("orig", "neg"), lambda=1)
-spinglass.community(graph, weights=NULL, vertex, spins=25,
-                    update.rule=c("config", "random", "simple"), gamma=1)
 }
 \arguments{
   \item{graph}{The input graph, can be directed but the direction of the
@@ -30,6 +22,9 @@ spinglass.community(graph, weights=NULL, vertex, spins=25,
     attribute is present then the edges will have equal weights. Set
     this to \code{NA} if the graph was a \sQuote{weight} edge attribute,
     but you don't want to use it for community detection.}
+  \item{vertex}{This parameter can be used to calculate the community of
+      a given vertex without calculating all communities. Note that if
+      this argument is present then some other arguments are ignored.}
   \item{spins}{Integer constant, the number of spins to use. This is the
     upper limit for the number of communities. It is not a problem to
     supply a (reasonably) big number here, in which case some
@@ -76,9 +71,6 @@ spinglass.community(graph, weights=NULL, vertex, spins=25,
     coloring algorithm, using the number of spins as the number of
     colors. This argument is ignored if the \sQuote{orig} implementation
     is chosen.}
-  \item{vertex}{This parameter can be used to calculate the community of
-      a given vertex without calculating all communities. Note that if
-      this argument is present then some other arguments are ignored.}
 }
 \details{
   This function tries to find communities in a graph. A community is a
@@ -90,6 +82,16 @@ spinglass.community(graph, weights=NULL, vertex, spins=25,
   ie. few negative edges inside a community and many negative edges
   between communities. Note that only the \sQuote{neg} implementation
   supports negative edge weights.
+
+  The \code{spinglass.cummunity} function can solve two problems related
+  to community detection. If the \code{vertex} argument is not given (or
+  it is \code{NULL}), then the regular community detection problem is
+  solved (approximately), i.e. partitioning the vertices into
+  communities, by optimizing the an energy function.
+
+  If the \code{vertex} argument is given and it is not \code{NULL}, then
+  it must be a vertex id, and the same energy function is used to find
+  the community of the the given vertex. See also the examples below.
 }
 \value{
   If the \code{vertex} argument is not given, ie. the first form is used
