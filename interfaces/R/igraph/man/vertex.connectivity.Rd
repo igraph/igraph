@@ -63,9 +63,9 @@ graph.cohesion(graph, checks=TRUE)
 \value{
   A scalar real value.
 }
-\references{Douglas R. White and Frank Harary: The cohesiveness of
-  blocks in social networks: node connectivity and conditional
-  density, TODO: citation}
+\references{White, Douglas R and Frank Harary 2001. The Cohesiveness of
+  Blocks In Social Networks: Node Connectivity and Conditional Density.
+  \emph{Sociological Methodology} 31 (1) : 305-359.}
 \author{ Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{\code{\link{graph.maxflow}}, \code{\link{edge.connectivity}},
   \code{\link{edge.disjoint.paths}}, \code{\link{graph.adhesion}}}
