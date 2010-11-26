@@ -6,7 +6,7 @@ GRAPH_OR_0:
     INCONV: if (!is.null(graph) && !is.igraph(%I%)) { stop("Not a graph object") }
 
 INTEGER:
-    INCONV: %I% <- as.numeric(%I%)
+    INCONV: %I% <- as.integer(%I%)
 
 REAL:
     INCONV: %I% <- as.numeric(%I%)
@@ -75,7 +75,7 @@ TOUNDIRECTED:
 
 INTEGERPTR:
     INCONV:
-       INOUT: %I% <- as.numeric(%I%)
+       INOUT: %I% <- as.integer(%I%)
 
 BOOLEANPTR:
 

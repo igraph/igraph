@@ -431,7 +431,7 @@ community.to.membership <- function(graph, merges, steps, membership=TRUE,
 leading.eigenvector.community <- function(graph, steps=-1, options=igraph.arpack.default) {
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
-  steps <- as.numeric(steps)
+  steps <- as.integer(steps)
   options.tmp <- igraph.arpack.default; options.tmp[ names(options) ] <- options ; options <- options.tmp
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
