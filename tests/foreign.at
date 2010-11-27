@@ -38,6 +38,11 @@ AT_COMPILE_CHECK([simple/igraph_write_graph_pajek.c],
  		 [simple/igraph_write_graph_pajek.out])
 AT_CLEANUP
 
+AT_SETUP([Pajek with number of edges present (igraph_read_graph_pajek):])
+AT_KEYWORDS([igraph_read_graph_pajek pajek foreign])
+AT_COMPILE_CHECK([simple/pajek.c], [], [simple/pajek{5,6}.net])
+AT_CLEANUP
+
 AT_SETUP([Reading an LGL file (igraph_read_graph_lgl):])
 AT_KEYWORDS([igraph_read_graph_lgl LGL foreign])
 AT_COMPILE_CHECK([simple/igraph_read_graph_lgl.c],

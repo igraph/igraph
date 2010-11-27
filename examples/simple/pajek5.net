@@ -1,0 +1,21 @@
+*Vertices 10
+1 "Vert 1" 0 0 box x_fact 1 y_fact 1 ic Green
+2 "Vert 2" 0 0 box x_fact 1 y_fact 1 ic Green
+3 "Vert 3" 0 0 box x_fact 1 y_fact 1 ic Green
+4 "Vert 4" 0 0 box x_fact 1 y_fact 1 ic Green
+5 "Vert 5" 0 0 box x_fact 1 y_fact 1 ic Green
+6 "Vert 6" 0 0 box x_fact 1 y_fact 1 ic Blue
+7 "Vert 7" 0 0 box x_fact 1 y_fact 1 ic Red
+8 "Vert 8" 0 0 box x_fact 1 y_fact 1 ic Green
+9 "Vert 9" 0 0 box x_fact 1 y_fact 1 ic Green
+10 "Vert 10" 0 0 box x_fact 1 y_fact 1 ic Green
+*Edges 9
+1 2
+2 3
+3 4
+4 5
+5 6
+6 7
+7 8
+8 9
+9 10
