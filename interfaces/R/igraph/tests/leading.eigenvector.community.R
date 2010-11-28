@@ -3,7 +3,7 @@ library(igraph)
 
 ## Check-test
 
-f <- function(membership, community, value, vector, multiplier, extra) { 
+f <- function(membership, community, value, vector, multiplier, extra) {
   M <- sapply(1:length(vector), function(x) {
     v <- rep(0, length(vector))
     v[x] <- 1
@@ -15,14 +15,9 @@ f <- function(membership, community, value, vector, multiplier, extra) {
   if (sign(ev$vectors[1,1]) != sign(vector[1])) { ev$vectors <- -ev$vectors }
   if (any(abs(ev$vectors[,1] - vector) > 1e-10)) { ret <- 1 }
 
-  if (ret) {
-    print("Error!")
-    print(M)
-    print(c(value, ev$values[1]))
-    print(cbind(vector, ev$vectors[,1]))
-  }
-  
-  ret
+  if (ret) { stop("Error") }
+
+  0
 }
 
 g <- graph.famous("Zachary")
@@ -32,6 +27,29 @@ lc$modularity == modularity(g, lc$membership)
 membership(lc)
 length(lc)
 sizes(lc)
+
+## Check that the modularity matrix is correct
+
+f <- function(membership, community, value, vector, multiplier, extra) {
+  M <- sapply(1:length(vector), function(x) {
+    v <- rep(0, length(vector))
+    v[x] <- 1
+    multiplier(v)
+  })
+  myc <- membership==community
+  B <- A[myc,myc] - (deg[myc] %*% t(deg[myc]))/2/ec
+  BG <- B-diag(rowSums(B))
+  
+  if (max(abs(M-BG)) > 1e-10) { stop("Error") }
+
+  0
+}
+
+g <- graph.famous("Zachary")
+A <- get.adjacency(g, sparse=FALSE)
+ec <- ecount(g)
+deg <- degree(g)
+lc <- leading.eigenvector.community(g, callback=f)
 
 ## Stress-test
 
@@ -45,4 +63,3 @@ for (i in 1:100) {
     break
   }
 }
-
