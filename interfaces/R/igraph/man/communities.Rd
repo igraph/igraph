@@ -35,9 +35,9 @@ cutat(communities, no, steps)
 
 \method{plot}{communities}(x, y,
    colbar=rainbow(length(x)),
-   col=colbar[membership(x)+1],
+   col=colbar[membership(x)],
    mark.groups=communities(x),
-   edge.color=c("green", "red")[crossing(x,y)+1],
+   edge.color=c("black", "red")[crossing(x,y)+1],
    \dots)
 }
 \arguments{

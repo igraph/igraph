@@ -144,7 +144,7 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
   \code{layout.reingold.tilford} generates a tree-like layout, so it is
   mainly for trees. Parameters and default values:
   \describe{
-    \item{root}{The id of the root vertex, defaults to 0.}
+    \item{root}{The id of the root vertex, defaults to 1.}
     \item{circular}{Logical scalar, whether to plot the tree in a
       circular fashion, defaults to \code{FALSE}.}
     \item{flip.y}{Logical scalar, whether to flip the \sQuote{y}

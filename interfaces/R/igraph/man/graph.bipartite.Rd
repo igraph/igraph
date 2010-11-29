@@ -1,5 +1,6 @@
 \name{graph.bipartite}
 \alias{graph.bipartite}
+\alias{is.bipartite}
 \concept{Bipartite graph}
 \concept{Two-mode network}
 \title{Create a bipartite graph}
@@ -8,6 +9,7 @@
 }
 \usage{
 graph.bipartite(types, edges, directed=FALSE)
+is.bipartite(graph)
 }
 \arguments{
   \item{types}{A vector giving the vertex types. It will be coerced into
@@ -20,6 +22,7 @@ graph.bipartite(types, edges, directed=FALSE)
   \item{directed}{Whether to create a directed graph, boolean
     constant. Note that by default undirected graphs are created, as
     this is more common for bipartite graphs.}
+  \item{graph}{The input graph.}
 }
 \details{
   Bipartite graphs have a \code{type} vertex attribute in
@@ -30,10 +33,16 @@ graph.bipartite(types, edges, directed=FALSE)
   tha \code{edges} vector against the vertex \code{types}. Then it
   creates a graph using the \code{edges} vector and finally it adds the
   \code{types} vector as a vertex attribute called \code{type}.
+
+  \code{is.bipartite} checks whether the graph is bipartite or not. It
+  just checks whether the graph has a vertex attribute called
+  \code{type}.
 }
 \value{
-  A bipartite igraph graph. In other words, an igraph graph that has a
-  vertex attribute named \code{type}. 
+  \code{graph.bipartite} returns a bipartite igraph graph. In other
+  words, an igraph graph that has a vertex attribute named \code{type}.
+
+  \code{is.bipartite} returns a logical scalar.
 }
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}

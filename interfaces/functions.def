@@ -628,7 +628,7 @@ igraph_centralization:
 
 igraph_centralization_degree:
         PARAMS: GRAPH graph, OUT VECTOR res, \
-                NEIMODE mode=ALL, BOOLEAN loops=False, \
+                NEIMODE mode=ALL, BOOLEAN loops=True, \
                 OUT REALPTR centralization, OUT REALPTR theoretical_max, \
                 BOOLEAN normalized=True
         NAME-R: centralization.degree
@@ -1348,7 +1348,7 @@ igraph_cohesion:
 igraph_dominator_tree: 
         PARAMS: GRAPH graph, VERTEX root, OUT VERTEXSET dom, \
                 OUT GRAPH_OR_0 domtree, OUT VERTEXSET leftout, \
-                NEIMODE mode=OUT
+                INOUTMODE mode=OUT
         DEPS: root ON graph
         NAME-R: dominator.tree
 

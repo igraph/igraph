@@ -15,7 +15,7 @@ dominator.tree (graph, root, mode = c("out", "in"))
   \item{root}{The id of the root (or source) vertex, this will be the
     root of the tree.}
   \item{mode}{Constant, must be \sQuote{\code{in}} or
-    \sQuote{\code{out}}. IF it is \sQuote{\code{in}}, then all
+    \sQuote{\code{out}}. If it is \sQuote{\code{in}}, then all
     directions are considered as opposite to the original one in the
     input graph.}
 }

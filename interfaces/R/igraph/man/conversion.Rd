@@ -9,7 +9,7 @@
 \usage{
 get.adjacency(graph, type=c("both", "upper", "lower"),
        attr=NULL, edges=FALSE, names=TRUE,
-       sparse=getIgraphOpt("sparsematrix")
+       sparse=getIgraphOpt("sparsematrices"))
 get.edgelist(graph, names=TRUE)
 }
 \arguments{

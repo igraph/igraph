@@ -9,11 +9,15 @@
 \alias{plotHierarchy}
 \alias{exportPajek}
 \alias{maxcohesion}
+\alias{plot.cohesiveBlocks}
+\alias{summary.cohesiveBlocks}
+\alias{length.cohesiveBlocks}
+\alias{print.cohesiveBlocks}
 \concept{Structurally cohesive blocks}
 \title{Calculate Cohesive Blocks}
 \description{Calculates cohesive blocks for objects of class \code{igraph}.}
 \usage{
-cohesive.blocks(graph)
+cohesive.blocks(graph, labels = TRUE)
 
 blocks(blocks)
 blockGraphs(blocks, graph)
@@ -21,7 +25,7 @@ cohesion(blocks)
 hierarchy(blocks)
 parent(blocks)
 plotHierarchy(blocks,
-   layout=layout.reingold.tilford(hierarchy(blocks), root=0), \dots)
+   layout=layout.reingold.tilford(hierarchy(blocks), root=1), \dots)
 exportPajek(blocks, graph, file, project.file = TRUE)
 maxcohesion(blocks)
 
@@ -40,6 +44,9 @@ maxcohesion(blocks)
       be supplied whose cohesive block structure is given in the
       \code{blocks} argument.
     }
+    \item{labels}{Logical scalar, whether to add the vertex labels to
+      the result object. These labels can be then used when reporting 
+      and plotting the cohesive blocks.}
     \item{blocks,x,object}{A \code{cohesiveBlocks} object, created with
       the \code{cohesive.blocks} function.}
     \item{file}{Defines the file (or connection) the Pajek file is

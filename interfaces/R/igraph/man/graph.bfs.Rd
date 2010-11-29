@@ -6,18 +6,27 @@
   \dQuote{simultaneously}. }
 \usage{
 graph.bfs (graph, root, neimode = c("out", "in", "all", "total"), 
-    order = TRUE, rank = FALSE, father = FALSE, pred = FALSE, 
-    succ = FALSE, dist = FALSE, callback = NULL, extra = NULL, 
+    unreachable = TRUE, restricted = NULL, order = TRUE,
+    rank = FALSE, father = FALSE, pred = FALSE, succ = FALSE,
+    dist = FALSE, callback = NULL, extra = NULL, 
     rho = parent.frame()) 
 }
 \arguments{
   \item{graph}{The input graph.}
-  \item{root}{The single root vertex to start the search from. }
+  \item{root}{Numeric vector, usually of length one. The root vertex, or
+    root vertices to start the search from.}
   \item{neimode}{For directed graphs specifies the type of edges to
     follow. \sQuote{out} follows outgoing, \sQuote{in} incoming
     edges. \sQuote{all} ignores edge directions
     completely. \sQuote{total} is a synonym for \sQuote{all}. This
     argument is ignored for undirected graphs.}
+  \item{unreachable}{Logical scalar, whether the search should visit
+    the vertices that are unreachable from the given root
+    vertex (or vertices). If \code{TRUE}, then additional searches are
+    performed until all vertices are visited.}
+  \item{restricted}{\code{NULL} (=no restriction), or a vector of
+    vertices (ids or symbolic names). In the latter case, the search is
+    restricted to the given vertices.}
   \item{order}{Logical scalar, whether to return the ordering of the
     vertices.}
   \item{rank}{Logical scalar, whether to return the rank of the

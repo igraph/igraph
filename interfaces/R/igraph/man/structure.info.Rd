@@ -2,6 +2,7 @@
 \alias{vcount}
 \alias{ecount}
 \alias{neighbors}
+\alias{incident}
 \alias{is.directed}
 \alias{are.connected}
 \alias{get.edge}
@@ -15,6 +16,7 @@
 vcount(graph)
 ecount(graph)
 neighbors(graph, v, mode = 1)
+incident(graph, v, mode=c("all", "out", "in", "total"))
 is.directed(graph)
 are.connected(graph, v1, v2)
 get.edge(graph, id)
@@ -22,13 +24,14 @@ get.edges(graph, es)
 }
 \arguments{
   \item{graph}{The graph.}
-  \item{v}{The vertex of which the neighbors are queried.}
-  \item{mode}{Character string, specifying the type of neighboring
-    vertices to list in a directed graph. If \dQuote{out} the vertices
-    \emph{to} which an edge exist are listed, if \dQuote{in} the
-    vertices \emph{from} which an edge is directed are listed,
-    \dQuote{all} lists all the vertices. This argument is ignored for
-    undirected graphs.} 
+  \item{v}{The vertex of which the adjacent vertices or incident edges
+    are queried.}
+  \item{mode}{Character string, specifying the type of adjacent vertices
+    or incident edges to list in a directed graph. If \dQuote{out}, then
+    only outgoing edges (or their corresponding vertices) are
+    considered; \dQuote{in} considers incoming edges; \sQuote{all}
+    ignores edge directions. This argument is ignored for undirected
+    graphs.}
   \item{v1}{The id of the first vertex. For directed graphs only edges
     pointing from \code{v1} to \code{v2} are searched.}
   \item{v2}{The id of the second vertex. For directed graphs only edges
@@ -46,6 +49,8 @@ get.edges(graph, es)
   \code{neighbors} gives the neighbors of a vertex. The vertices
   connected by multiple edges are listed as many times as the number of
   connecting edges.
+
+  \code{incident} gives the incident edges of a vertex.
   
   \code{is.directed} gives whether the graph is directed or not. It just
   gives its \code{directed} attribute.
@@ -75,6 +80,7 @@ g <- graph.ring(10)
 vcount(g)
 ecount(g)
 neighbors(g, 5)
+incident(g, 5)
 are.connected(g, 1, 2)
 are.connected(g, 2, 4)
 get.edges(g, 1:6)

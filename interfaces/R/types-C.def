@@ -124,6 +124,11 @@ NEIMODE:
   INCONV:
     IN: %C%=REAL(%I%)[0];
 
+INOUTMODE:
+  CTYPE: igraph_integer_t
+  INCONV:
+    IN: %C%=REAL(%I%)[0];
+
 TOUNDIRECTED:
   CTYPE: igraph_integer_t 
   INCONV:

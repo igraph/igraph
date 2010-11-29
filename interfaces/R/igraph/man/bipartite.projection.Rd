@@ -6,8 +6,9 @@
 \title{Project a bipartite graph}
 \description{A bipartite graph is projected into two one-mode networks}
 \usage{
-bipartite.projection.size(graph, types=NULL)
-bipartite.projection (graph, types=NULL, multiplicity = TRUE, probe1=-1)
+bipartite.projection.size(graph, types = NULL)
+bipartite.projection (graph, types = NULL, multiplicity = TRUE,
+       probe1 = NULL)
 }
 \arguments{
   \item{graph}{The input graph. It can be directed, but edge directions
@@ -22,8 +23,8 @@ bipartite.projection (graph, types=NULL, multiplicity = TRUE, probe1=-1)
     edge in the projection will be 2.}
   \item{probe1}{This argument can be used to specify the order of the
     projections in the resulting list. If given, then it is considered
-    as a vertex id; the projection containing the first one in the
-    result list.}
+    as a vertex id (or a symbolic vertex name); the projection
+    containing this vertex will be the first one in the result list.}
 }
 \details{
   Bipartite graphs have a \code{type} vertex attribute in

@@ -17,11 +17,11 @@
 \usage{
 centralize.scores (scores, theoretical.max, normalized = TRUE)
 
-centralization.degree (graph, vids = V(graph), mode = c("all", "out",
-    "in", "total"), loops = TRUE, normalized = TRUE) 
-centralization.closeness (graph, vids = V(graph), mode = c("out", "in",
-    "all", "total"), normalized = TRUE)
-centralization.betweenness (graph, vids = V(graph), directed = TRUE,
+centralization.degree (graph, mode = c("all", "out", "in", "total"),
+    loops = TRUE, normalized = TRUE) 
+centralization.closeness (graph, mode = c("out", "in", "all", "total"),
+    normalized = TRUE)
+centralization.betweenness (graph, directed = TRUE, nobigint = TRUE,
     normalized = TRUE)
 centralization.evcent (graph, directed = FALSE, scale = TRUE,
     options = igraph.arpack.default, normalized = TRUE)
@@ -45,16 +45,21 @@ centralization.evcent.tmax (graph = NULL, nodes = 0,
     centrality score by dividing the supplied theoretical maximum.}
   \item{graph}{The input graph. For the \dQuote{tmax} functions it can
     be \code{NULL}, see the details below.}
-  \item{vids}{The vertices for which the vertex level scores are
-    calculated, and the centralization is also performed based on these.}
   \item{mode}{This is the same as the \code{mode} argument of
     \code{degree} and \code{closeness}.}
   \item{loops}{Logical scalar, whether to consider loops edges when
     calculating the degree.}
   \item{directed}{logical scalar, whether to use directed shortest paths
     for calculating betweenness.}
+  \item{nobigint}{Logical scalar, whether to use big integers for the
+    betweenness calculation. This argument is passed to the
+    \code{\link{betweenness}} function.}
   \item{scale}{Whether to rescale the eigenvector centrality scores,
     such that the maximum score is one.}
+  \item{nodes}{The number of vertices. This is ignored if the graph is
+    given.}
+  \item{options}{This is passed to \code{\link{evcent}}, the options for
+    the ARPACK eigensolver.}
 }
 \details{
   Centralization is a general method for calculating a graph-level

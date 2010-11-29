@@ -6,7 +6,7 @@
 \title{Calculate Cohesive Blocks}
 \description{Calculates cohesive blocks for objects of class \code{igraph}.}
 \usage{
-cohesive.blocks(graph, db=NULL,
+cohesive.blocks.old(graph, db=NULL,
                 useDB=(vcount(graph)>400 && require(RSQLite)),
                 cutsetHeuristic=TRUE,
                 verbose=getIgraphOpt("verbose"))
@@ -44,13 +44,13 @@ specified in \code{db} is used. In either case the package
 \code{RSQLite} will be required. 
 
 \code{structurally.cohesive.blocks} is an alias to
-\code{cohesive.blocks}.
+\code{cohesive.blocks.old}.
 
 \code{is.bgraph} decides whether its argument is a \code{bgraph}
 object.
 }
 \value{
-\code{cohesive.blocks} returns a graph of class \code{c(bgraph,igraph)},
+\code{cohesive.blocks.old} returns a graph of class \code{c(bgraph,igraph)},
 with four (new) graph attributes:
 \item{blocks}{A list with one element for each cohesive block found. The
   elements are numeric vectors listing the indices of the nodes within
@@ -89,7 +89,7 @@ g <- graph.disjoint.union(g,g,g)
 g <- add.edges(g,c(1,7,2,8,1,13,5,1,5,2))
 
 ## Find cohesive blocks:
-gBlocks <- cohesive.blocks(g)
+gBlocks <- cohesive.blocks.old(g)
 
 ## Examine block membership and cohesion:
 gBlocks$blocks
@@ -108,7 +108,7 @@ write.pajek.bgraph(gBlocks,file="gBlocks")
 ## An example that works better with the "kanevsky" cutset algorithm
 \dontrun{
 g <- read.graph(file="http://intersci.ss.uci.edu/wiki/Vlado/SanJuanSur.net", format="pajek")
-gBlocks <- cohesive.blocks(g, cutsetAlgorithm="kanevsky")
+gBlocks <- cohesive.blocks.old(g, cutsetAlgorithm="kanevsky")
 }
 }
 \keyword{graphs}

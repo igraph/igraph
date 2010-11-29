@@ -68,6 +68,12 @@ NEIMODE:
        OUT: c("out", "in", "all", "total")
        IN: c("in", "out", "all", "total")
 
+INOUTMODE:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "out"=1, "in"=2)
+    DEFAULT:
+       OUT: c("out", "in")
+       IN: c("in", "out")
+
 TOUNDIRECTED:
     INCONV: %I% <- switch(igraph.match.arg(%I%), "collapse"=1, "each"=0, "mutual"=2)
     DEFAULT:

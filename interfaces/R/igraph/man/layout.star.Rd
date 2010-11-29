@@ -8,7 +8,7 @@
   circle and the rest of the vertices equidistantly on the perimeter.
 }
 \usage{
-layout.star(graph, center = V(graph)[0], order = NULL)
+layout.star(graph, center = V(graph)[1], order = NULL)
 }
 \arguments{
   \item{graph}{The graph to layout.}

@@ -9,7 +9,9 @@
 \alias{+.igraph}
 \alias{-.igraph}
 \alias{edge}
+\alias{edges}
 \alias{vertex}
+\alias{vertices}
 \alias{path}
 \title{Method for structural manipulation of graphs}
 \description{These are the methods for simple manipulation of graphs:

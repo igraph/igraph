@@ -5,8 +5,9 @@
   starts from a root vertex and tries to go quickly as far from as possible.}
 \usage{
 graph.dfs (graph, root, neimode = c("out", "in", "all", "total"), 
-    order = TRUE, order.out = FALSE, father = FALSE, dist = FALSE, 
-    in.callback = NULL, out.callback = NULL, extra = NULL, rho = parent.frame()) 
+    unreachable = TRUE, order = TRUE, order.out = FALSE,
+    father = FALSE, dist = FALSE, in.callback = NULL,
+    out.callback = NULL, extra = NULL, rho = parent.frame()) 
 }
 \arguments{
   \item{graph}{The input graph.}
@@ -16,6 +17,10 @@ graph.dfs (graph, root, neimode = c("out", "in", "all", "total"),
     edges. \sQuote{all} ignores edge directions
     completely. \sQuote{total} is a synonym for \sQuote{all}. This
     argument is ignored for undirected graphs.}
+  \item{unreachable}{Logical scalar, whether the search should visit
+    the vertices that are unreachable from the given root
+    vertex (or vertices). If \code{TRUE}, then additional searches are
+    performed until all vertices are visited.}
   \item{order}{Logical scalar, whether to return the DFS ordering of the
     vertices.}
   \item{order.out}{Logical scalar, whether to return the ordering based

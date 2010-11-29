@@ -8,7 +8,7 @@
   only the specified vertices and all the edges among them.}
 \usage{
 induced.subgraph(graph, vids, impl=c("auto", "copy_and_delete",
-     "create_from_scratch")
+     "create_from_scratch"))
 subgraph.edges(graph, eids, delete.vertices = TRUE)
 subgraph(graph, v)
 }
