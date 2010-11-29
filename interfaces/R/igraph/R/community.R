@@ -568,7 +568,9 @@ plot.communities <- function(x, y,
        ...)  
 }
 
-compare <- function(x, ...)
+compare <- function(comm1, comm2, method=c("vi", "nmi",
+                                       "split.join", "rand",
+                                       "adjusted.rand"))
   UseMethod("compare")
 
 compare.communities <- function(comm1, comm2, method=c("vi", "nmi",
