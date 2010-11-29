@@ -141,7 +141,7 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     basic_query.c games.c cocitation.c iterators.c \
 			     structural_properties.c components.c layout.c \
 			     structure_generators.c conversion.c \
-			     measure_dynamics.c type_indexededgelist.c \
+			     type_indexededgelist.c \
 			     error.c interrupt.c other.c foreign.c random.c \
 			     attributes.c \
 			     foreign-ncol-parser.y foreign-ncol-lexer.l \

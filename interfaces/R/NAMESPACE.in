@@ -145,11 +145,6 @@ export(igraph.arpack.default)
 
 # dynamics measurement
 
-export(measure.dynamics.id, measure.dynamics.idage, measure.dynamics.d.d,
-       measure.dynamics.citedcat.id.age, measure.dynamics.citingcat.id.age,
-       measure.dynamics.lastcit, measure.dynamics.age, measure.dynamics.citedcat,
-       measure.dynamics.citingcat.citedcat)
-
 export(revolver.d, revolver.error.d,
        revolver.ad, revolver.error.ad,
        revolver.ade, revolver.error.ade,
