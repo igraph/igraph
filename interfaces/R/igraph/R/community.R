@@ -603,5 +603,5 @@ compare.numeric <- function(comm1, comm2, method=c("vi", "nmi",
 compare.default <- function(comm1, comm2, method=c("vi", "nmi",
                                             "split.join", "rand",
                                             "adjusted.rand")) {
-  compare.numeric(as.numerirc(comm1), as.numeric(comm2), method)
+  compare.numeric(as.numeric(comm1), as.numeric(comm2), method)
 }

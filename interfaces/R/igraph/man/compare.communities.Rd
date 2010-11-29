@@ -1,13 +1,19 @@
 \name{compare.communities}
 \alias{compare.communities}
+\alias{compare.numeric}
+\alias{compare}
 \concept{Community structure}
 \title{Compares community structures using various metrics}
 \description{
   This function assesses the distance between two community structures.
 }
 \usage{
-compare.communities (comm1, comm2, method = c("vi", "nmi", "split.join",
-                                      "rand", "adjusted.rand"))
+\method{compare}{communities}(comm1, comm2, method = c("vi", "nmi",
+                                      "split.join", "rand",
+                                      "adjusted.rand"))
+\method{compare}{numeric}(comm1, comm2, method = c("vi", "nmi",
+                                      "split.join", "rand",
+                                      "adjusted.rand"))
 }
 \arguments{
   \item{comm1}{A \code{\link{communities}} object containing a community
