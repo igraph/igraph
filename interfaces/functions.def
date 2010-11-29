@@ -984,7 +984,7 @@ igraph_similarity_inverse_log_weighted:
 igraph_compare_communities:
         PARAMS: VECTOR comm1, VECTOR comm2, OUT REALPTR res, \
                 COMMCMP method=VI
-        NAME-R: compare.communities
+        IGNORE: RR, RNamespace
 
 igraph_community_spinglass:
         PARAMS: GRAPH graph, VECTOR_OR_0 weights, OUT REALPTR modularity,  \
@@ -1100,7 +1100,7 @@ igraph_community_optimal_modularity:
 igraph_split_join_distance:
         PARAMS: VECTOR comm1, VECTOR comm2, OUT REALPTR distance12, \
 		        OUT REALPTR distance21
-        NAME-R: split.join.distance
+        IGNORE: RR, RC, RNamespace
 
 #######################################
 # Conversion

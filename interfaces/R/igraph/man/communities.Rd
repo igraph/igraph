@@ -180,6 +180,9 @@ cutat(communities, no, steps)
 % \references{}
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{
+  \code{\link{compare.communities}} for comparing two community
+  structures on the same graph.
+  
   The different methods for finding communities, they all return a
   \code{communities} object:
   \code{\link{edge.betweenness.community}},

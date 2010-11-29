@@ -567,3 +567,39 @@ plot.communities <- function(x, y,
        edge.color=edge.color,
        ...)  
 }
+
+compare <- function(x, ...)
+  UseMethod("compare")
+
+compare.communities <- function(comm1, comm2, method=c("vi", "nmi",
+                                                "split.join", "rand",
+                                                "adjusted.rand")) {
+  compare.numeric(comm1, comm2, method)
+}
+
+compare.numeric <- function(comm1, comm2, method=c("vi", "nmi",
+                                            "split.join", "rand",
+                                            "adjusted.rand")) {
+  comm1 <- if (inherits(comm1, "communities")) {
+    membership(comm1)
+  } else {
+    as.numeric(comm1)
+  }
+  comm2 <- if (inherits(comm2, "communities")) {
+    membership(comm2)
+  } else {
+    as.numeric(comm2)
+  }
+  method <- switch(igraph.match.arg(method), vi = 0, nmi = 1, 
+                   split.join = 2, rand = 3, adjusted.rand = 4)
+  on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
+  res <- .Call("R_igraph_compare_communities", comm1, comm2, 
+               method, PACKAGE = "igraph")
+  res  
+}
+                                
+compare.default <- function(comm1, comm2, method=c("vi", "nmi",
+                                            "split.join", "rand",
+                                            "adjusted.rand")) {
+  compare.numeric(as.numerirc(comm1), as.numeric(comm2), method)
+}

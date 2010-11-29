@@ -191,9 +191,10 @@ ADJLIST:
     INCONV: %I% <- lapply(%I%, function(x) as.numeric(x)-1)
 
 COMMCMP:
-    INCONV: %I% <- switch(igraph.match.arg(%I%), "vi"=0, "nmi"=1)
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "vi"=0, "nmi"=1, \
+                          "split.join"=2, "rand"=3, "adjusted.rand"=4)
     DEFAULT:
-       VI: c("vi", "nmi")
+       VI: c("vi", "nmi", "split.join", "rand", "adjusted.rand")
 
 SUBGRAPH_IMPL:
     INCONV: %I% <- switch(igraph.match.arg(%I%), "auto"=0, "copy_and_delete"=1, "create_from_scratch"=2)
