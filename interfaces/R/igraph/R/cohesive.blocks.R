@@ -103,10 +103,10 @@ print.cohesiveBlocks <- function(x, ...) {
   invisible(x)
 }
 
-summary.cohesiveBlocks <- function(x, ...) {
+summary.cohesiveBlocks <- function(object, ...) {
   cat("Structurally cohesive block structure, with",
-      length(blocks(x)), "blocks.\n")
-  invisible(x)
+      length(blocks(object)), "blocks.\n")
+  invisible(object)
 }
 
 plot.cohesiveBlocks <- function(x, y,
