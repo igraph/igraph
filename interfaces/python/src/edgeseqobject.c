@@ -312,6 +312,12 @@ PyObject* igraphmodule_EdgeSeq_get_attribute_values(igraphmodule_EdgeSeqObject* 
   return result;
 }
 
+PyObject* igraphmodule_EdgeSeq_is_all(igraphmodule_EdgeSeqObject* self) {
+  if (igraph_es_is_all(&self->es))
+    Py_RETURN_TRUE;
+  Py_RETURN_FALSE;
+}
+
 PyObject* igraphmodule_EdgeSeq_get_attribute_values_mapping(igraphmodule_EdgeSeqObject *self, PyObject *o) {
   /* Handle integer indices according to the sequence protocol */
   if (PyInt_Check(o))
@@ -727,6 +733,12 @@ PyMethodDef igraphmodule_EdgeSeq_methods[] = {
    "get_attribute_values(attrname) -> list\n\n"
    "Returns the value of a given edge attribute for all edges.\n\n"
    "@param attrname: the name of the attribute\n"
+  },
+  {"is_all", (PyCFunction)igraphmodule_EdgeSeq_is_all, METH_NOARGS,
+   "is_all() -> bool\n\n"
+   "Returns whether the edge sequence contains all the edges exactly once, in\n"
+   "the order of their edge IDs.\n\n"
+   "This is used for optimizations in some of the edge selector routines.\n"
   },
   {"set_attribute_values", (PyCFunction)igraphmodule_EdgeSeq_set_attribute_values,
    METH_VARARGS | METH_KEYWORDS,

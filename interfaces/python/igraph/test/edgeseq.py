@@ -130,6 +130,7 @@ class EdgeSeqTests(unittest.TestCase):
     def testWithinFiltering(self):
         g = Graph.Lattice([10, 10])
         vs = [0, 1, 2, 10, 11, 12, 20, 21, 22] 
+        vs2 = (0, 1, 10, 11)
 
         es1 = g.es.select(_within = vs)
         es2 = g.es.select(_within = VertexSeq(g, vs))
@@ -137,6 +138,10 @@ class EdgeSeqTests(unittest.TestCase):
         for es in [es1, es2]:
             self.failUnless(len(es) == 12)
             self.failUnless(all(e.source in vs and e.target in vs for e in es))
+
+            es_filtered = es.select(_within = vs2)
+            self.failUnless(len(es_filtered) == 4)
+            self.failUnless(all(e.source in vs2 and e.target in vs2 for e in es_filtered))
 
     def testBetweenFiltering(self):
         g = Graph.Lattice([10, 10])
@@ -155,6 +160,12 @@ class EdgeSeqTests(unittest.TestCase):
         es = g.es(1,3,5,7,9)
         ebs = g.edge_betweenness()
         self.failUnless([ebs[i] for i in [1,3,5,7,9]] == es.edge_betweenness())
+
+    def testIsAll(self):
+        g = Graph.Full(5)
+        self.failUnless(g.es.is_all())
+        self.failIf(g.es.select(1,2,3).is_all())
+        self.failIf(g.es.select(_within=[1,2,3]).is_all())
 
 
 def suite():

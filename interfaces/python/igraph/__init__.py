@@ -2823,7 +2823,7 @@ class EdgeSeq(_igraph.EdgeSeq):
         def _ensure_set(value):
             if isinstance(value, VertexSeq):
                 value = set(v.index for v in value)
-            else:
+            elif not isinstance(value, (set, frozenset)):
                 value = set(value)
             return value
 
@@ -2858,26 +2858,54 @@ class EdgeSeq(_igraph.EdgeSeq):
                     if op == "in" or op == "notin":
                         value = _ensure_set(value)
                 elif attr == "_within":
-                    values = None
+                    func = None          # ignoring function, filtering here
                     value = _ensure_set(value)
-                    filtered_idxs = [i for i, e in enumerate(es) if \
-                            e.source in value and e.target in value]
+
+                    # Fetch all the edges that are incident on at least one of
+                    # the vertices specified
+                    candidates = set().union(*(es.graph.incident(v) for v in value))
+                    
+                    if not es.is_all():
+                        # Find those where both endpoints are OK
+                        filtered_idxs = [i for i, e in enumerate(es) if e.index in candidates
+                                and e.source in value and e.target in value]
+                    else:
+                        # Optimized version when the edge sequence contains all the edges
+                        # exactly once in increasing order of edge IDs
+                        filtered_idxs = [i for i in candidates
+                                if es[i].source in value and es[i].target in value]
                 elif attr == "_between":
-                    values = None
                     if len(value) != 2:
                         raise ValueError("_between selector requires two vertex ID lists")
+                    func = None          # ignoring function, filtering here
                     set1 = _ensure_set(value[0])
                     set2 = _ensure_set(value[1])
-                    filtered_idxs = [i for i, e in enumerate(es) if \
-                            (e.source in set1 and e.target in set2) or \
-                            (e.source in set2 and e.target in set1)]
+
+                    # Fetch all the edges that are incident on at least one of
+                    # the vertices specified
+                    candidates = set().union(*(es.graph.incident(v) for v in set1))
+                    candidates.update(*(es.graph.incident(v) for v in set2))
+
+                    if not es.is_all():
+                        # Find those where both endpoints are OK
+                        filtered_idxs = [i for i, e in enumerate(es)
+                                if (e.source in set1 and e.target in set2) or
+                                (e.target in set1 and e.source in set2)]
+                    else:
+                        # Optimized version when the edge sequence contains all the edges
+                        # exactly once in increasing order of edge IDs
+                        filtered_idxs = [i for i in candidates
+                                if (es[i].source in set1 and es[i].target in set2) or
+                                (es[i].target in set1 and es[i].source in set2)]
                 else:
                     # Method call, not an attribute
                     values = getattr(es.graph, attr[1:])(es) 
             else:
                 values = es[attr]
 
-            if values is not None:
+            # If we have a function to apply on the values, do that; otherwise
+            # we assume that filtered_idxs has already been calculated.
+            if func is not None:
                 filtered_idxs=[i for i, v in enumerate(values) \
                                if func(v, value)]
 
