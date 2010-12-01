@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
     igraph_strvector_set(&strvalues, i, strings[i]);
   SETVASV(&g, "name", &strvalues);
   igraph_write_graph_leda(&g, stdout, "name", 0);
-  igraph_vector_destroy(&values);
+  igraph_strvector_destroy(&strvalues);
   printf("===\n");
   igraph_destroy(&g);
 
@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
     igraph_strvector_set(&strvalues, i, strings[i]);
   SETEASV(&g, "weight", &strvalues);
   igraph_write_graph_leda(&g, stdout, 0, "weight");
-  igraph_vector_destroy(&values);
+  igraph_strvector_destroy(&strvalues);
   printf("===\n");
   igraph_destroy(&g);
 
