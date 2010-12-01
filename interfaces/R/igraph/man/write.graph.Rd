@@ -142,6 +142,24 @@ write.graph(graph, file, format=c("edgelist", "pajek", "ncol",
       \dQuote{Creator} line in the GML file. If this is \code{NULL} (the
       default) then the current date and time is added.}
   }
+
+  LEDA is a library for efficient data types and algorithms. 
+  The support for the LEDA format is very basic at the moment; igraph
+  writes only the LEDA graph section which supports one selected vertex
+  and edge attribute and no layout information or visual attributes.
+  See
+  \url{http://www.algorithmic-solutions.info/leda_guide/graphs/leda_native_graph_fileformat.html}
+  for the details of this format.
+
+  Additional arguments:
+  \describe{
+    \item{vertex.attr}{The name of the vertex attribute whose values
+      are to be stored in the output or \code{NULL} if no vertex
+      attribute has to be stored.} 
+    \item{edge.attr}{The name of the edge attribute whose values
+      are to be stored in the output or \code{NULL} if no edge attribute
+      has to be stored.}
+  }
 }
 \value{A NULL, invisibly.}
 \references{Adai AT, Date SV, Wieland S, Marcotte EM. LGL: creating a

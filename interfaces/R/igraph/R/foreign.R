@@ -93,7 +93,7 @@ read.graph <- function(file, format=c("edgelist", "pajek", "ncol", "lgl",
 }
 
 write.graph <- function(graph, file, format=c("edgelist", "pajek", "ncol", "lgl",
-                                       "graphml", "dimacs", "gml", "dot"), ...) {
+                                       "graphml", "dimacs", "gml", "dot", "leda"), ...) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -116,6 +116,7 @@ write.graph <- function(graph, file, format=c("edgelist", "pajek", "ncol", "lgl"
                 "dimacs"=write.graph.dimacs(graph, file, ...),
                 "gml"=write.graph.gml(graph, file, ...),
                 "dot"=write.graph.dot(graph, file, ...),
+                "leda"=write.graph.leda(graph, file, ...),
                 stop(paste("Unknown file format:",format))
                 )
 
@@ -425,5 +426,17 @@ read.graph.graphdb <- function(file, directed=TRUE, ...) {
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_read_graph_graphdb", file, as.logical(directed),
+        PACKAGE="igraph")
+}
+
+write.graph.leda <- function(graph, file, vertex.attr=NULL, edge.attr=NULL,
+                             ...) {
+  if (length(list(...))>0) {
+    stop("Unknown arguments to write.graph (LEDA format)")
+  }
+  if (!is.null(vertex.attr)) { vertex.attr <- as.character(vertex.attr) }
+  if (!is.null(edge.attr))   { edge.attr   <- as.character(edge.attr)   }
+  on.exit(.Call("R_igraph_finalizer", PACKAGE="igraph") )
+  .Call("R_igraph_write_graph_leda", graph, file, vertex.attr, edge.attr,
         PACKAGE="igraph")
 }
