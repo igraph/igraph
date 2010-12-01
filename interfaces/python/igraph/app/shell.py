@@ -385,15 +385,20 @@ class IPythonShell(Shell, ConsoleProgressBarMixin):
         Shell.__init__(self)
         ConsoleProgressBarMixin.__init__(self)
 
-        from IPython.Shell import IPShellEmbed
-        self._shell = IPShellEmbed(['-nosep'])
+        # We cannot use IPShellEmbed here because generator expressions do not
+        # work there (e.g., set(g.degree(x) for x in [1,2,3])) where g comes
+        # from an external context
+        import sys
+        sys.argv.append("-nosep")
+
+        import IPython.Shell
+        self._shell = IPython.Shell.start()
         self._shell.IP.runsource("from igraph import *")
 
     def __call__(self):
         """Starts the embedded shell."""
-        print "igraph %s running inside" % __version__,
-        print self._shell.IP.BANNER,
-        self._shell()
+        print "igraph %s running inside " % __version__,
+        self._shell.mainloop()
 
 
 class ClassicPythonShell(Shell, ConsoleProgressBarMixin):
