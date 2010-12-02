@@ -964,7 +964,7 @@ void igraph_spmatrix_iter_destroy(igraph_spmatrix_iter_t *mit) {
  * Time complexity: O(n), the number of non-zero elements.
  */
 int igraph_spmatrix_print(const igraph_spmatrix_t* matrix) {
-	igraph_spmatrix_fprint(matrix, stdout);
+	return igraph_spmatrix_fprint(matrix, stdout);
 }
 
 /**
@@ -989,9 +989,9 @@ int igraph_spmatrix_fprint(const igraph_spmatrix_t* matrix, FILE *file) {
     igraph_spmatrix_iter_next(&mit);
   }
   igraph_spmatrix_iter_destroy(&mit);
-	IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY_CLEAN(1);
 
-	return 0;
+  return 0;
 }
 
 
