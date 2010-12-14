@@ -65,6 +65,14 @@ int PyString_IsEqualToUTF8String(PyObject* py_string,
 #define PyString_IsEqualToASCIIString(pystr, cstr) \
         (PyString_Check(pystr) && strcmp(PyString_AS_STRING(pystr), (cstr)) == 0)
 
+#ifndef Py_TYPE
+#  define Py_TYPE(o) ((o)->ob_type)
+#endif
+
+#ifndef PyVarObject_HEAD_INIT
+#  define PyVarObject_HEAD_INIT(type, size) PyObject_HEAD_INIT(type) size,
+#endif
+
 #endif
 
 char* PyObject_ConvertToCString(PyObject* string);
