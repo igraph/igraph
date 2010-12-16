@@ -39,6 +39,16 @@ int permutation(igraph_vector_t *vec) {
   return 0;
 }
 
+void print_and_destroy_cliques(igraph_vector_ptr_t *cliques) {
+  int i;
+  for (i=0; i<igraph_vector_ptr_size(cliques); i++) {
+    igraph_vector_t *v=VECTOR(*cliques)[i];
+    igraph_vector_print(v);
+    igraph_vector_destroy(v);
+    igraph_free(v);
+  }
+}
+
 int main() {
   
   igraph_t g, g2, cli;
@@ -53,7 +63,7 @@ int main() {
   
   igraph_vector_init_seq(&perm, 0, NODES-1);
   igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, NODES, NODES, 
-			  /*directed=*/ 0, /*loops=*/ 0);
+        /*directed=*/ 0, /*loops=*/ 0);
   igraph_full(&cli, CLIQUE_SIZE, /*directed=*/ 0, /*loops=*/ 0);
 
   for (i=0; i<NO_CLIQUES; i++) {
@@ -77,21 +87,35 @@ int main() {
   
   igraph_vector_ptr_init(&cliques, 0);
   igraph_maximal_cliques(&g, &cliques, /*min_size=*/ 3,
-			 /*max_size=*/ 0 /*no limit*/);
+       /*max_size=*/ 0 /*no limit*/);
   
   /* Print and destroy them */
 
-  for (i=0; i<igraph_vector_ptr_size(&cliques); i++) {
-    igraph_vector_t *v=VECTOR(cliques)[i];
-    igraph_vector_print(v);
-    igraph_vector_destroy(v);
-    igraph_free(v);
-  }
+  print_and_destroy_cliques(&cliques);
   
   /* Clean up */
 
   igraph_vector_ptr_destroy(&cliques);
   igraph_destroy(&g);
+
+  /* Build a triangle with a loop (thanks to Emmanuel Navarro) */
+
+  igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 0, 0, 0, -1);
+
+  /* Find the maximal cliques */
+
+  igraph_vector_ptr_init(&cliques, 0);
+  igraph_maximal_cliques(&g, &cliques, /*min_size=*/ 3,
+    /*max_size=*/ 0 /*no limit*/);
+
+  /* Print and destroy them */
+
+  print_and_destroy_cliques(&cliques);
   
+  /* Clean up */
+
+  igraph_vector_ptr_destroy(&cliques);
+  igraph_destroy(&g);
+
   return 0;
 }
