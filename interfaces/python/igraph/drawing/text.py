@@ -4,6 +4,7 @@ Drawers for labels on plots.
 
 import re
 
+from igraph.compat import property
 from igraph.drawing.baseclasses import AbstractCairoDrawer
 from warnings import warn
 

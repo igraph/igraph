@@ -2863,7 +2863,9 @@ class EdgeSeq(_igraph.EdgeSeq):
 
                     # Fetch all the edges that are incident on at least one of
                     # the vertices specified
-                    candidates = set().union(*(es.graph.incident(v) for v in value))
+                    candidates = set()
+                    for v in value:
+                        candidates.update(es.graph.incident(v))
                     
                     if not es.is_all():
                         # Find those where both endpoints are OK
@@ -2883,8 +2885,11 @@ class EdgeSeq(_igraph.EdgeSeq):
 
                     # Fetch all the edges that are incident on at least one of
                     # the vertices specified
-                    candidates = set().union(*(es.graph.incident(v) for v in set1))
-                    candidates.update(*(es.graph.incident(v) for v in set2))
+                    candidates = set()
+                    for v in set1:
+                        candidates.update(es.graph.incident(v))
+                    for v in set2:
+                        candidates.update(es.graph.incident(v))
 
                     if not es.is_all():
                         # Find those where both endpoints are OK

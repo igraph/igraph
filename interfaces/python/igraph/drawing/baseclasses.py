@@ -2,6 +2,7 @@
 Abstract base classes for the drawing routines.
 """
 
+from igraph.compat import property
 from igraph.drawing.utils import BoundingBox
 
 #####################################################################

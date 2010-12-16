@@ -2,6 +2,7 @@
 Coordinate systems and related plotting routines
 """
 
+from igraph.compat import property
 from igraph.drawing.baseclasses import AbstractCairoDrawer
 
 __license__ = "GPL"

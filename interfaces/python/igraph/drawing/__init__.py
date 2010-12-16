@@ -20,6 +20,7 @@ import os
 import platform
 import time
 
+from igraph.compat import property
 from igraph.configuration import Configuration
 from igraph.drawing.colors import Palette, palettes
 from igraph.drawing.graph import DefaultGraphDrawer
