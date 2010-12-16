@@ -9285,7 +9285,7 @@ PyObject *igraphmodule_Graph_community_spinglass(igraphmodule_GraphObject *self,
         PyObject *args, PyObject *kwds) {
   static char *kwlist[] = {"weights", "spins", "parupdate",
       "start_temp", "stop_temp", "cool_fact", "update_rule",
-      "gamma", NULL};
+      "gamma", "implementation", "lambda", NULL};
   PyObject *weights_o = Py_None;
   PyObject *parupdate_o = Py_False;
   PyObject *update_rule_o = Py_None;
