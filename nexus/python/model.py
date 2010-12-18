@@ -101,3 +101,6 @@ def new_dataset_tag(dataset, tag):
 
 def list_data_formats():
     return db.select('format')
+
+def new_licence(**args):
+    return db.insert('licence', seqname="id", **args)

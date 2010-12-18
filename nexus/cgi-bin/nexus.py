@@ -18,6 +18,7 @@ urls = (
 #    '/blog',                               'Blog',
     '/about',                              'About',
     '/feedback',                           'Feedback',
+    '/addlicence',                         'AddLicence',
     '/add',                                'Add',
     '/(\w+)/?',                            'Index',
     '/(\w+)/dataset/(\d+)',                'Dataset',
@@ -452,6 +453,35 @@ class Add(Base):
             model.new_dataset_tag(dataset=did, tag="dynamic")
 
         return render.add(form, True)
+
+class AddLicence(Base):
+    
+    add_licence_form=web.form.Form(
+        web.form.Textbox("name", description="Name:", id="focused", size=50),
+        web.form.Textarea("text", description="Text:", cols=50, rows=2),
+        web.form.Textarea("fulltext", description="Full text:", cols=50, 
+                          rows=10),
+        web.form.Textbox("link", description="URL:", size=50),
+        web.form.Button("Add")
+        )
+
+    def GET(self):
+        form=self.add_licence_form()
+        return render.addlicence(form, False)
+
+    def POST(self):
+        if web.ctx.ip != "127.0.0.1":
+            return web.internalerror()
+
+        form=self.add_licence_form()
+        if not form.validates():
+            # TODO
+            None
+            
+        lid=model.new_licence(name=form.d.name, text=form.d.text, 
+                              fulltext=form.d.fulltext, link=form.d.link)
+
+        return render.addlicence(form, True)
         
 app = web.application(urls, globals())
 
