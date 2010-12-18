@@ -1,6 +1,15 @@
 $def with (ds, tags, formats, papers)
 
-<h2 class="dataset">$ds.name</h2>
+$if openid.status():
+  <form method="get" action="/edit/$ds.id">
+    <h2 class="dataset"> $ds.name
+      <button type="submit" style="margin-left:20px;">
+	<h2>Edit</h2>
+      </button>
+    </h2>
+  </form>
+$else:
+  <h2>$ds.name</h2>
 <p class="datasettags2">
   $ds.vertices vertices, $ds.edges edges.
   Tags:

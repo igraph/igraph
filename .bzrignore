@@ -96,3 +96,4 @@
 ./interfaces/java/reports
 ./fatbuild
 ./valgrind-testbed
+nexus/cgi-bin/.openid_secret_key

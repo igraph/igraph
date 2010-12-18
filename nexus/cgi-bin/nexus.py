@@ -13,6 +13,9 @@ web.config.debug=True
 
 urls = (
     '/?',                                  'About',
+    '/openid',                             'web.webopenid.host',
+    '/login',                              'Login',
+    '/admin',                              'Admin',
 #    '/advanced',                           'AdvancedSearch',
     '/donate',                             'Donate',
 #    '/blog',                               'Blog',
@@ -32,6 +35,9 @@ urls = (
 
 recaptcha_pubkey = "6Lfqjb8SAAAAAJyGZQrvqgs7JWjpNp_Vf9dpTMxy"
 recaptcha_private_key = "6Lfqjb8SAAAAAO_ElXNZyzVXbP5xffMs6IVypJbB"
+
+admins_openid=('https://launchpad.net/~gabor.csardi',
+               'https://launchpad.net/~ntamas')
 
 recaptcha_text = """
 <div class="recaptcha">
@@ -59,7 +65,8 @@ dataformats = { 'R-igraph': '.Rdata' }
 
 tempglob = { 'whatsnew': 'Nothing',
              'datatags': 'None',
-             'dataformats': dataformats}
+             'dataformats': dataformats,
+             'openid': web.webopenid      }
 
 render = web.template.render('templates', base='base', globals=tempglob)
 render_plain = web.template.render('templates', globals=tempglob)
@@ -403,8 +410,8 @@ add_form=web.form.Form(
 class Add(Base):
 
     def GET(self):
-#        if web.ctx.ip != "127.0.0.1":
-#            return web.internalerror()
+        if web.webopenid.status() not in admins_openid:
+            return web.seeother("/login")
 
         form=add_form()
         lic=model.get_licences('id,name')
@@ -412,8 +419,8 @@ class Add(Base):
         return render.add(form, False, False, None)
 
     def POST(self):
-        if web.ctx.ip != "127.0.0.1":
-            return web.internalerror()
+        if web.webopenid.status() not in admins_openid:
+            return web.seeother("/login")
 
         form=add_form()
         if not form.validates():
@@ -459,6 +466,8 @@ class Add(Base):
 class Edit(Base):
 
     def GET(self, id):
+        if web.webopenid.status() not in admins_openid:
+            return web.seeother("/login")
         
         form=add_form()
         form.Add.name='Submit'
@@ -483,8 +492,8 @@ class Edit(Base):
         return render.add(form, False, True, id)
 
     def POST(self, id):
-        if web.ctx.ip != "127.0.0.1":
-            return web.internalerror()
+        if web.webopenid.status() not in admins_openid:
+            return web.seeother("/login")
         
         form=add_form()
         if not form.validates():
@@ -529,12 +538,14 @@ class AddLicence(Base):
         )
 
     def GET(self):
+        if web.webopenid.status() not in admins_openid:
+            return web.seeother("/login")
         form=self.add_licence_form()
         return render.addlicence(form, False)
 
     def POST(self):
-        if web.ctx.ip != "127.0.0.1":
-            return web.internalerror()
+        if web.webopenid.status() not in admins_openid:
+            return web.seeother("/login")
 
         form=self.add_licence_form()
         if not form.validates():
@@ -545,6 +556,14 @@ class AddLicence(Base):
                               fulltext=form.d.fulltext, link=form.d.link)
 
         return render.addlicence(form, True)
+
+class Login(Base):
+    def GET(self):
+        return render.login(web.webopenid.form('/openid'))
+
+class Admin(Base):
+    def GET(self):
+        return render.admin()
         
 app = web.application(urls, globals())
 
