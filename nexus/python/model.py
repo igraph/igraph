@@ -39,10 +39,12 @@ def get_tags(id):
 
 def get_dataset(id):
     return db.query('''SELECT d.id id, d.name name, 
-                              d.description description, l.name licence,
+                              d.description description, l.id licence,
+                              l.name licence_name,
                               d.date date, n.id netid, 
                               n.description netdescription, 
-                              n.vertices vertices, n.edges edges
+                              n.vertices vertices, n.edges edges,
+                              n.filename, d.source source
                        FROM dataset d, licence l, network n
                        WHERE d.licence=l.id
                          AND d.id=$id AND d.id=n.dataset''',
@@ -75,8 +77,8 @@ def get_papers(id):
 def get_format(name):
     return db.select('format', where="name='%s'" % web.safestr(name))
 
-def get_licences():
-    return db.select('licence')
+def get_licences(what=None):
+    return db.select('licence', what=what)
 
 def new_dataset(**args):
     return db.insert('dataset', seqname='id', **args)
@@ -104,3 +106,22 @@ def list_data_formats():
 
 def new_licence(**args):
     return db.insert('licence', seqname="id", **args)
+
+def update_dataset(id, name, description, tags, licence, vertices,
+                   edges, filename, source, papers):
+
+    db.update('dataset', where='id=%s' % id, name=name, 
+              description=description, licence=int(licence), 
+              source=source)
+    db.update('network', where='dataset=%s AND id=1' % id, 
+              vertices=vertices, edges=edges, filename=filename)
+
+    db.delete('dataset_tag', where='dataset=%s' % id)
+    for t in tags:
+        new_dataset_tag(id, t)
+
+    db.delete('dataset_citation', where='dataset=%s' % id)
+    for p in papers:
+        new_citation(id, p)
+    
+    return True

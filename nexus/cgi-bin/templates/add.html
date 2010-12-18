@@ -1,14 +1,21 @@
-$def with (form, post)
+$def with (form, post, edit, id)
 
-$if post:
+$if edit:
+  <h2>Editing a dataset</h2>
+$else:
+  <h2>Add new dataset</h2>
+
+$if post and edit:
+  <p>Thank you for the update, you can look at this dataset 
+    <a href="/html/dataset/$id">here</a>.<p>
+$else:
   <p>Data set was added, fill the form again, to add another one.</p>
 
-<p>
-  <form action="" method="post" class="donateform" name="form">
-    $:form.render()
-  </form>
-  <script type="text/javascript">
-    document.form.focused.focus();
-  </script>
-</p>
-  
+  <p>
+    <form action="" method="post" class="donateform" name="form">
+      $:form.render()
+    </form>
+    <script type="text/javascript">
+      document.form.focused.focus();
+    </script>
+  </p>

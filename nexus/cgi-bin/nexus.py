@@ -20,6 +20,7 @@ urls = (
     '/feedback',                           'Feedback',
     '/addlicence',                         'AddLicence',
     '/add',                                'Add',
+    '/edit/(\d+)',                         'Edit',
     '/(\w+)/?',                            'Index',
     '/(\w+)/dataset/(\d+)',                'Dataset',
     '/([\w-]+)/getdata/(\d+)(?:/(\d+))?',  'GetData',
@@ -62,8 +63,6 @@ tempglob = { 'whatsnew': 'Nothing',
 
 render = web.template.render('templates', base='base', globals=tempglob)
 render_plain = web.template.render('templates', globals=tempglob)
-
-licencekeys=render_plain.licences(model.get_licences())
 
 def knownformat(fn):
     def new(*args):
@@ -113,7 +112,7 @@ class AdvancedSearch(Base):
 class Donate(Base):
 
     donate_form=web.form.Form(
-        web.form.Textbox("name", description="Your name:"),
+        web.form.Textbox("name", description="Your name:", id="focused"),
         web.form.Textbox("email", description="Your email address:"),
         web.form.Textbox("url", description="FTP or Web URL:"),
         web.form.Checkbox("directed", description="Directed:", 
@@ -125,7 +124,7 @@ class Donate(Base):
         web.form.Checkbox("dynamic", description="Dynamic:", 
                           value="True"),
         web.form.Textbox("tags", description="Tags:"),
-        web.form.Textbox("licence", description="Licence:"),
+        web.form.Dropdown("licence", description="Licence:", args=[]),
         web.form.Textarea("description", 
                           description="Data format description:", 
                           cols=50, rows=10),
@@ -136,6 +135,8 @@ class Donate(Base):
     
     def GET(self):
         form=self.donate_form()
+        lic=model.get_licences('id,name')
+        form.licence.args=[(l.id,  l.name) for l in lic]        
         return render.donate(form, False, False, False)
 
     def POST(self):
@@ -375,51 +376,52 @@ URL: %s""" % (format.name, format.shortdesc,
             web.header('Content-Type', 'text/plain')
             return render_plain.text_formats(formatted)
 
-class Add(Base):
+add_form=web.form.Form(
+    web.form.Textbox("name", description="Name:", id="focused", size=50),
+    web.form.Textarea("description", description="Description:",
+                      rows=10, cols=50),
+    web.form.Textbox("tags", description="Tags:",
+                     post="<br/> (comma separated)", size=50),
+    web.form.Checkbox("directed", description="Directed:",
+                      value="True"),
+    web.form.Checkbox("weighted", description="Weighted:",
+                      value="True"),
+    web.form.Checkbox("bipartite", description="Two-mode:",
+                      value="True"),
+    web.form.Checkbox("dynamic", description="Dynamic:",
+                      value="True"),
+    web.form.Dropdown("licence", description="Licence:", args=[]),
+    web.form.Textbox("vertices", description="Vertices:"),
+    web.form.Textbox("edges", description="Edges:"),
+    web.form.Textbox("filename", description="File name:", size=50),
+    web.form.Textbox("source", description="Source:", size=50),
+    web.form.Textarea("papers", description="Publication(s):", 
+                      rows=5, cols=50),
+    web.form.Button("Add")
+    )
 
-    add_form=web.form.Form(
-        web.form.Textbox("name", description="Name:", id="focused"),
-        web.form.Textarea("desc", description="Description:",
-                          rows=10, cols=50),
-        web.form.Textbox("tags", description="Tags:",
-                          post=" (comma separated)"),
-        web.form.Checkbox("directed", description="Directed:",
-                          value="True"),
-        web.form.Checkbox("weighted", description="Weighted:",
-                          value="True"),
-        web.form.Checkbox("bipartite", description="Two-mode:",
-                          value="True"),
-        web.form.Checkbox("dynamic", description="Dynamic:",
-                          value="True"),
-        web.form.Textbox("licence", description="Licence:", 
-                         post="<br/>" + str(licencekeys)),
-        web.form.Textbox("vertices", description="Vertices:"),
-        web.form.Textbox("edges", description="Edges:"),
-        web.form.Textbox("filename", description="File name:"),
-        web.form.Textbox("source", description="Source:"),
-        web.form.Textarea("papers", description="Publication(s):", 
-                          rows=5, cols=50),
-        web.form.Button("Add")
-        )
+class Add(Base):
 
     def GET(self):
 #        if web.ctx.ip != "127.0.0.1":
 #            return web.internalerror()
 
-        form=self.add_form()
-        return render.add(form, False)
+        form=add_form()
+        lic=model.get_licences('id,name')
+        form.licence.args=[(l.id,  l.name) for l in lic]
+        return render.add(form, False, False, None)
 
     def POST(self):
         if web.ctx.ip != "127.0.0.1":
             return web.internalerror()
 
-        form=self.add_form()
+        form=add_form()
         if not form.validates():
             ## TODO
             None
 
         did=model.new_dataset(name=form.d.name, 
-                              description=form.d.desc,
+                              description=form.d.description,
                               licence=int(form.d.licence),
                               source=form.d.source,
                               date=web.SQLLiteral("CURRENT_DATE"))
@@ -434,26 +436,87 @@ class Add(Base):
         for cit in cits:
             model.new_citation(dataset=did, citation=cit.strip())
         
-        tags=form.d.tags.split(",")
+        tags=[t.strip() for t in form.d.tags.split(",")]
         for tag in tags:
             model.new_dataset_tag(dataset=did, tag=tag.strip())
 
-        if form.d.directed:
+        if form.d.directed and 'directed' not in tags:
             model.new_dataset_tag(dataset=did, tag="directed")
-        else:
+        elif 'undirected' not in tags:
             model.new_dataset_tag(dataset=did, tag="undirected")
 
-        if form.d.weighted:
+        if form.d.weighted and 'weighted' not in tags:
             model.new_dataset_tag(dataset=did, tag="weighted")
 
-        if form.d.bipartite:
+        if form.d.bipartite and 'bipartite' not in tags:
             model.new_dataset_tag(dataset=did, tag="bipartite")
             
-        if form.d.dynamic:
+        if form.d.dynamic and 'dynamic' not in tags:
             model.new_dataset_tag(dataset=did, tag="dynamic")
 
-        return render.add(form, True)
+        return render.add(form, True, False, did)
 
+class Edit(Base):
+
+    def GET(self, id):
+        
+        form=add_form()
+        form.Add.name='Submit'
+        lic=model.get_licences('id,name')
+        form.licence.args=[(l.id,  l.name) for l in lic]
+        ds=model.get_dataset(id)
+        ds=[d for d in ds][0]
+        form.fill(ds)
+        papers=[p.citation for p in model.get_papers(id)]
+        form.papers.value="\n\n".join(papers)
+        tags=[t.tag for t in model.get_tags(id)]
+        form.directed.set_value('directed' in tags)
+        form.weighted.set_value('weighted' in tags)
+        form.bipartite.set_value('bipartite' in tags)
+        form.dynamic.set_value('dynamic' in tags)
+        form.directed.value=form.weighted.value=form.bipartite.value= \
+            form.dynamic.value="True"
+        tags=[t for t in tags if t not in ("weighted", "bipartite", 
+                                           "directed", "undirected", 
+                                           "dynamic")]
+        form.tags.value=", ".join(tags)
+        return render.add(form, False, True, id)
+
+    def POST(self, id):
+        if web.ctx.ip != "127.0.0.1":
+            return web.internalerror()
+        
+        form=add_form()
+        if not form.validates():
+            ## TODO
+            None
+
+        tags=[t.strip() for t in form.d.tags.split(',')]
+        print form.d
+        if form.d.weighted and 'weighted' not in tags:
+            tags.append('weighted')
+        if form.d.directed and 'directed' not in tags:
+            tags.append('directed')
+        if not form.d.directed and 'undirected' not in tags:
+            tags.append('undirected')
+        if form.d.bipartite and 'bipartite' not in tags:
+            tags.append('bipartite')
+        if form.d.dynamic and 'dynamic' not in tags:
+            tags.append('dynamic')
+
+        papers=[p.strip() for p in form.d.papers.split("\r\n\r\n")]
+
+        model.update_dataset(id=id, name=form.d.name, 
+                             description=form.d.description,
+                             tags=tags, licence=form.d.licence, 
+                             vertices=form.d.vertices,
+                             edges=form.d.edges,
+                             filename=form.d.filename,
+                             source=form.d.source,
+                             papers=papers)
+    
+        return render.add(form, True, True, id)
+    
 class AddLicence(Base):
     
     add_licence_form=web.form.Form(
