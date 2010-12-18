@@ -1,6 +1,11 @@
 import web
+import os.path
 
-db = web.database(dbn='sqlite', db='../db/nexus.db')
+if os.path.exists("../db/nexus.db"):
+    dbfile='../db/nexus.db'
+elif os.path.exists("../db/test.db"):
+    dbfile='../db/test.db'
+db = web.database(dbn='sqlite', db=dbfile)
 
 def get_list_tagged_as(tagname):
     return db.query('''SELECT d.id id, d.name name,
