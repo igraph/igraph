@@ -378,7 +378,7 @@ URL: %s""" % (format.name, format.shortdesc,
 class Add(Base):
 
     add_form=web.form.Form(
-        web.form.Textbox("name", description="Name:"),
+        web.form.Textbox("name", description="Name:", id="focused"),
         web.form.Textarea("desc", description="Description:",
                           rows=10, cols=50),
         web.form.Textbox("tags", description="Tags:",
