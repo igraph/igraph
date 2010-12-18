@@ -1,0 +1,28 @@
+$def with (ds, tags, formats, papers)
+
+<h2 class="dataset">$ds.name</h2>
+<p class="datasettags2">
+  $ds.vertices vertices, $ds.edges edges.
+  Tags:
+  $for t in tags:
+  <a href="/html/tagged/$t.tag">$t.tag</a>,
+<p class="datasetdate2">$ds.date</p>
+
+<h3>Download</h3>
+<p>
+$for k,f in dataformats.items():
+  <a href="/${k}/getdata/$ds.id/1">${k} format</a> &ndash; 
+  $formats[k].shortdesc,
+  <a href="/html/format/$k">more...</a>
+</p>
+
+<h3>Description</h3>
+<p>$ds.description</p>
+
+<h3>Publication(s)</h3>
+$for p in papers:
+  <p>$p.citation</p>
+
+
+<h3>Licence</h3>
+<p>$ds.licence</p>

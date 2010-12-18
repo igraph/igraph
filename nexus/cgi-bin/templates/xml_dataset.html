@@ -1,0 +1,19 @@
+$def with (ds, tags, papers)
+<?xml version="1.0"?>
+<dataset>
+  <id>$ds.id</id>
+  <name>$ds.name</name>
+  <description>$ds.description</description>
+  <vertices>$ds.vertices</vertices>
+  <edges>$ds.edges</edges>
+  <tags>
+  $for t in tags:
+    $t.tag,
+  </tags>
+  <date>$ds.date</date>
+  <licence>$ds.licence</licence>
+  $for p in papers:
+    <paper>$p.citation</paper>
+</dataset>
+
+  

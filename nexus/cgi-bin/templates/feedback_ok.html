@@ -1,0 +1,33 @@
+$def with (form, captcha, success)
+
+$if captcha:
+  $if success:
+    <p> 
+      Your message has been successfully sent. Thank you for your
+      feedback!
+    </p>
+    <p><a href="/">Return to the start page.</a></p>
+  $else:
+    <p>
+      We experience some technical difficulties right now and cannot
+      send your message. Your feedback is important for us, please try
+      sending it again in a couple of minutes.
+    </p>
+    <p>
+      <form action="" method="post" class="donateform">
+	$:form.render()
+      </form>
+    </p>
+$else:
+  <p class="error">
+    Please type in correctly the two words at the bottom of the
+    form. This is required for sending your messsage.
+  </p>
+  <p>
+    <form action="" method="post" class="failedcaptcha donateform">
+      $:form.render()
+    </form>
+  </p>
+
+
+

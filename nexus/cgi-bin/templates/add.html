@@ -1,0 +1,11 @@
+$def with (form, post)
+
+$if post:
+  <p>Data set was added, fill the form again, to add another one.</p>
+
+<p>
+  <form action="" method="post" class="donateform">
+    $:form.render()
+  </form>
+</p>
+  

@@ -1,0 +1,8 @@
+$def with (what)
+
+<ul class="whatsnew">
+$for t in what:
+  <li><h4><a href="/html/dataset/$t.id">$t.name</a></h4>
+    <p>$t.date</p>
+    <p>$t.description</p></li>
+</ul>

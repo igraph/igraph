@@ -1,0 +1,86 @@
+$def with (page)
+
+<html>
+<head>
+    $if page.has_key('title'):
+        <title>$page.title</title>
+    $else:
+        <title>Nexus</title>
+    <link rel="stylesheet" href="/static/general.css" type="text/css"/>
+</head>
+<body class="home">
+  <div id="wrapper" class="hfeed">
+    <div id="header">
+      <div id="masthead">
+	<div id="branding" role="banner">
+	  <h1 id="site-title">
+	    <span>
+	      <a href="/" title="Nexus" rel="home">Nexus</a>
+	    </span>
+	  </h1>
+	  <div id="site-description">THE NETWORK REPOSITORY</div>
+	</div><!-- #branding -->
+	<div id="access" role="navigation">
+	  <div class="skip-link screen-reader-text">
+	    <a href="#content" title="Skip to content">
+	      Skip to content
+	    </a>
+	  </div>
+	  <div class="menu"><ul>
+	      <!-- <li class="page_item"> -->
+	      <!-- 	<a href="/" title="Search">Search</a> -->
+	      <!-- </li> -->
+	      <li class="page_item">
+		<a href="/html" title="Browse data sets">Browse</a>
+	      </li>
+	      <!-- <li class="page_item"> -->
+	      <!-- 	<a href="/advanced" title="Advanced search"> -->
+	      <!-- 	Advanced search</a> -->
+	      <!-- </li> -->
+	      <li class="page_item">
+		<a href="/donate" title="Help Nexus">Donate data</a>
+	      </li>
+	      <!-- <li class="page_item"> -->
+	      <!-- 	<a href="/blog" title="What are we working on?">Blog</a> -->
+	      <!-- </li> -->
+	      <li class="page_item">
+		<a href="/about" title="What is Nexus?">About</a>
+	      </li>
+	      <li class="page_item">
+		<a href="/feedback" title="Write to us">Feedback</a>
+	      </li>
+	  </ul></div>	 
+	</div><!-- #access -->
+      </div><!-- #masthead -->
+    </div><!-- #header -->
+    
+    <div id="main">
+      <div id="container">
+	<div id="content" role="main">
+	  <div id="post-34" class="post-34 page type-page hentry">
+		$:page
+	    </div><!-- entry-content -->
+	  </div><!-- post-34 -->
+	</div><!-- content -->
+      <div id="primary" class="widget-area" role="complementary">
+	<h2> What's new? </h2>
+	$:whatsnew
+      </div><!-- #primary .widget-area -->
+      <div id="secondary" class="widget-area" role="complementary">
+	<h2> Data tags </h2>
+	$:datatags
+      </div>
+    </div><!-- main -->
+    <div id="footer" role="contentinfo">
+      <div id="colophon">
+	<div id="site-info">
+	  <a href="/" title="Nexus" rel="home">
+	    &copy; 2010 The Nexus team
+	  </a>
+	</div><!-- #site-info -->
+      </div><!-- #colophon -->
+    </div><!-- #footer -->
+  </div><!-- wrapper -->
+
+</body>
+</html>

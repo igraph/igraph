@@ -1,0 +1,17 @@
+$def with (datasets, tags, title)
+
+<h1>$title</h1>
+
+<ul class="datasets">
+$for ds in datasets:
+    <li><h4><a href="/html/dataset/$ds.id">$ds.name</a></h4>
+      <p>$ds.description</p>
+      <p class="datasettags">
+	$ds.vertices vertices, $ds.edges edges.
+	Tags:
+	$for t in tags[ds.id]:
+	<a href="/html/tagged/$t.tag">$t.tag</a>,
+      </p>
+      <p class="datasetdate">$ds.date</p>
+    </li>
+</ul>
