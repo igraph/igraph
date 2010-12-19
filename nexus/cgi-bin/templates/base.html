@@ -67,11 +67,11 @@ $def with (page)
 	</div><!-- content -->
       <div id="secondary" class="widget-area" role="complementary">
 	<h2> What's new? </h2>
-	$:whatsnew
+	$:get_whatsnew()
       </div><!-- #secondary .widget-area -->
       <div id="tertiary" class="widget-area" role="complementary">
 	<h2> Data tags </h2>
-	$:datatags
+	$:get_datatags()
       </div>
     </div><!-- main -->
     <div id="footer" role="contentinfo">
@@ -92,8 +92,7 @@ $def with (page)
 	  $else:
 	    <form method="post" action="/openid">
               <input type="text" name="openid" value="" class="openid" />
-              <input type="hidden" name="return_to" 
-		     value="$currentnotlogouturl()" />
+              <input type="hidden" name="return_to" value="/" />
               <button type="submit">Log in</button>
             </form>
 	</div>

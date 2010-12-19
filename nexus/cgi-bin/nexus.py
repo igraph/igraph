@@ -9,7 +9,7 @@ from recaptcha.client import captcha
 import math
 import random
 
-web.config.debug=False
+web.config.debug=True
 
 urls = (
     '/?',                                  'About',
@@ -73,13 +73,30 @@ def get_current_not_logout_url():
         fp='/'
     return fp
 
+def get_whatsnew():
+    w=model.whatsnew()
+    return render_plain.whatsnew(w)
+
+def get_datatags():
+        t=[tag for tag in model.datatags()]
+        c=[tag.count for tag in model.datatags()]
+        maxc=max(c)
+        c=[ int(math.log(cc+1) / math.log(maxc+1) * 5) for cc in c]
+        for i in range(len(c)):
+            t[i].count=c[i]
+        random.shuffle(t)
+        return render_plain.datatags(t)
+
+
 tempglob = { 'whatsnew': 'Nothing',
              'datatags': 'None',
              'dataformats': dataformats,
              'openid': web.webopenid,
              'getusername': model.get_username,
              'currenturl': get_current_url,
-             'currentnotlogouturl': get_current_not_logout_url }
+             'currentnotlogouturl': get_current_not_logout_url,
+             'get_whatsnew': get_whatsnew,
+             'get_datatags': get_datatags }
 
 render = web.template.render('templates', base='base', globals=tempglob)
 render_plain = web.template.render('templates', globals=tempglob)
@@ -98,37 +115,23 @@ def knowndataformat(fn):
         return fn(*args)
     return new
 
-class Base:
-    def __init__(self): 
-        global tempglob
-        w=model.whatsnew()
-        t=[tag for tag in model.datatags()]
-        c=[tag.count for tag in model.datatags()]
-        maxc=max(c)
-        c=[ int(math.log(cc+1) / math.log(maxc+1) * 5) for cc in c]
-        for i in range(len(c)):
-            t[i].count=c[i]
-        random.shuffle(t)
-        tempglob['whatsnew']=render_plain.whatsnew(w)
-        tempglob['datatags']=render_plain.datatags(t)
-
 class NotFound:
 
     def GET(self):
         return web.notfound()
 
-class Home(Base):
+class Home:
     
     def GET(self):
         return render.home()
 
-class AdvancedSearch(Base):
+class AdvancedSearch:
     
     def GET(self):
         ## TODO
         return render.home()
     
-class Donate(Base):
+class Donate:
 
     donate_form=web.form.Form(
         web.form.Textbox("name", description="Your name:", id="focused"),
@@ -196,17 +199,17 @@ class Donate(Base):
         except:
             return render.donate(form, True, True, False)
 
-class Blog(Base):
+class Blog:
     
     def GET(self):
         return render.blog()
 
-class About(Base):
+class About:
     
     def GET(self):
         return render.about()
 
-class Feedback(Base):
+class Feedback:
 
     feedback_form = web.form.Form(
         web.form.Textbox("name", description="Your name (optional):"),
@@ -248,7 +251,7 @@ class Feedback(Base):
         except:
             return render.feedback_ok(form, True, False)
 
-class Index(Base):
+class Index:
     
     @knownformat
     def GET(self, format='html'):
@@ -271,7 +274,7 @@ class Index(Base):
             return render_plain.text_index(datasets, tags, 
                                            'All data sets')
 
-class Dataset(Base):
+class Dataset:
 
     def format_text(self, dataset, tags, papers):
         tags=";".join([x.tag for x in tags])
@@ -311,7 +314,7 @@ Citation: %s
             web.header('Content-Type', 'text/plain')
             return render_plain.text_dataset(formatted)
 
-class Tagged(Base):
+class Tagged:
 
     @knownformat
     def GET(self, format, tagname=None):
@@ -339,7 +342,7 @@ class Tagged(Base):
                                            % tagname)
             
         
-class GetData(Base):
+class GetData:
     
     @knowndataformat
     def GET(self, format, id, nid):
@@ -361,7 +364,7 @@ class GetData(Base):
         except:
             return web.internalerror()
 
-class Format(Base):
+class Format:
 
     def format_one(self, format):
         return """Name: %s
@@ -419,7 +422,7 @@ add_form=web.form.Form(
     web.form.Button("Add")
     )
 
-class Add(Base):
+class Add:
 
     def GET(self):
         if web.webopenid.status() not in admins_openid:
@@ -475,7 +478,7 @@ class Add(Base):
 
         return render.add(form, True, False, did)
 
-class Edit(Base):
+class Edit:
 
     def GET(self, id):
         if web.webopenid.status() not in admins_openid:
@@ -537,7 +540,7 @@ class Edit(Base):
     
         return render.add(form, True, True, id)
     
-class AddLicence(Base):
+class AddLicence:
     
     add_licence_form=web.form.Form(
         web.form.Textbox("name", description="Name:", id="focused", size=50),
@@ -568,7 +571,7 @@ class AddLicence(Base):
 
         return render.addlicence(form, True)
 
-class Logout(Base):
+class Logout:
     def GET(self):
         web.webopenid.logout()
         return render.logout()
@@ -578,7 +581,7 @@ class Logout(Base):
         web.webopenid.logout()
         return render.logout()
 
-class OpenID(web.webopenid.host,Base):
+class OpenID(web.webopenid.host):
     def POST(self):
         i=web.input(return_to="/")
         user=model.get_username(i.openid)
@@ -587,11 +590,11 @@ class OpenID(web.webopenid.host,Base):
         else:
             return web.seeother("/loginfailed")
 
-class LoginFailed(Base):
+class LoginFailed:
     def GET(self):
         return render.loginfailed()
 
-class Admin(Base):
+class Admin:
     def GET(self):
         return render.admin()
         
