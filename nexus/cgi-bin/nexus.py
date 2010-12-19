@@ -9,6 +9,9 @@ from recaptcha.client import captcha
 import math
 import random
 import openid.store.filestore
+import datetime
+
+web.config.debug = True
 
 urls = (
     '/?',                                  'About',
@@ -60,7 +63,7 @@ recaptcha_text = """
 </div>
 """ % (recaptcha_pubkey, recaptcha_pubkey)
 
-formats = ('html', 'xml', 'text')
+formats = ('html', 'xml', 'text', 'rss')
 dataformats = { 'R-igraph': '.Rdata' }
 
 def get_current_url():
@@ -260,18 +263,26 @@ class Index:
         tags={}
         for i in ids:            
             tags[i] = [t for t in model.get_tags(i)]
+
         if format=='html':
-            return render.index(datasets, tags, "All data sets")
+            feed='/rss'
+            return render.index(datasets, tags, "All Nexus data sets", feed)
         elif format=='xml':
             web.header('Content-Type', 'text/xml')
             return render_plain.xml_index(datasets, tags, 
-                                          'All data sets')
+                                          'All Nexus data sets')
         elif format=='text':
             for k,t in tags.items():
                 tags[k]=";".join([x.tag for x in t])
             web.header('Content-Type', 'text/plain')
             return render_plain.text_index(datasets, tags, 
-                                           'All data sets')
+                                           'All Nexus data sets')
+        elif format=='rss':
+            date=datetime.datetime.today().strftime("%a, %d %b %Y %H:%M:%S +0200")
+            web.header('Content-Type', 'application/rss+xml')
+            return render_plain.rss_index(datasets, tags, 
+                                          "All Nexus data sets", 
+                                          date, web.ctx.homedomain, '')
 
 class Dataset:
 
@@ -325,8 +336,9 @@ class Tagged:
             tags[i] = [t for t in model.get_tags(i)]
 
         if format=='html':
+            feed='/rss/tagged/%s' % tagname
             return render.index(datasets, tags, 
-                                "Data sets tagged '%s'" % tagname)
+                                "Data sets tagged '%s'" % tagname, feed)
         elif format=='xml':
             web.header('Content-Type', 'text/xml')
             return render_plain.xml_index(datasets, tags, 
@@ -339,6 +351,15 @@ class Tagged:
             return render_plain.text_index(datasets, tags, 
                                            "Data sets tagged '%s'" 
                                            % tagname)
+        elif format=="rss":
+            date=datetime.datetime.today().strftime("%a, %d %b %Y %H:%M:%S +0200")
+            web.header('Content-Type', 'application/rss+xml')
+            return render_plain.rss_index(datasets, tags, 
+                                          "Nexus data sets tagged %s" 
+                                          % tagname, date,
+                                          web.ctx.homedomain, 'tagged/%s' 
+                                          % tagname)
+            
             
         
 class GetData:

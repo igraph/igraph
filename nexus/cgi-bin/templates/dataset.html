@@ -1,15 +1,17 @@
 $def with (ds, tags, formats, papers)
 
 $if openid.status():
-  <form method="get" action="/edit/$ds.id">
-    <h2 class="dataset"> $ds.name
+  <div class="feed">
+    <form method="get" action="/edit/$ds.id">
       <button type="submit" style="margin-left:20px;">
 	<h2>Edit</h2>
       </button>
-    </h2>
-  </form>
-$else:
-  <h2>$ds.name</h2>
+    </form>
+  </div>
+
+<div class="title"><h2>$ds.name</h2></div>
+
+<div class="dataset">
 <p class="datasettags2">
   $ds.vertices vertices, $ds.edges edges.
   Tags:
@@ -35,3 +37,5 @@ $for p in papers:
 
 <h3>Licence</h3>
 <p>$ds.licence_name</p>
+
+</div>

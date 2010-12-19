@@ -1,17 +1,24 @@
-$def with (datasets, tags, title)
+$def with (datasets, tags, title, feed)
 
+<div class="feed">
+  <a href="$feed">
+    <img src="/static/images/feed-icon-28x28.png" />
+  </a>
+</div>
+
+<div class="title">
 <h2>$title</h2>
+</div>
 
 <ul class="datasets">
 $for ds in datasets:
-    <li><h4><a href="/html/dataset/$ds.id">$ds.name</a></h4>
-      <p>$ds.description</p>
+    <li><h4><a href="/html/dataset/$ds.id">&#9658; $ds.name</a></h4>
       <p class="datasettags">
-	$ds.vertices vertices, $ds.edges edges.
+	$ds.date, $ds.vertices vertices, $ds.edges edges.
 	Tags:
 	$for t in tags[ds.id]:
 	<a href="/html/tagged/$t.tag">$t.tag</a>,
       </p>
-      <p class="datasetdate">$ds.date</p>
+      <p class="datasetdescription">$ds.description</p>
     </li>
 </ul>

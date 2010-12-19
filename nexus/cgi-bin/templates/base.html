@@ -49,9 +49,10 @@ $def with (page)
 	      <li class="page_item">
 		<a href="/feedback" title="Write to us">Feedback</a>
 	      </li>
-	      <li class="page_item">
-		<a href="/admin" title="Make changes">Admin</a>
-	      </li>
+	      $if openid.status():
+	        <li class="page_item">
+		  <a href="/admin" title="Make changes">Admin</a>
+		</li>
 	  </ul></div>	 
 	</div><!-- #access -->
       </div><!-- #masthead -->
@@ -66,8 +67,17 @@ $def with (page)
 	  </div><!-- post-34 -->
 	</div><!-- content -->
       <div id="secondary" class="widget-area" role="complementary">
-	<h2> What's new? </h2>
-	$:get_whatsnew()
+	<div class="feed">
+	  <a href="/feed">
+	    <img src="/static/images/feed-icon-14x14.png" />
+	  </a>
+	</div>
+	<div class="title">
+	  <h2> What's new? </h2>
+	</div>
+	<div>
+	  $:get_whatsnew()
+	</div>
       </div><!-- #secondary .widget-area -->
       <div id="tertiary" class="widget-area" role="complementary">
 	<h2> Data tags </h2>
