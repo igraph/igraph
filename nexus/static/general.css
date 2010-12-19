@@ -178,7 +178,7 @@ div.menu,
 }
 #wrapper {
 	background: #fff;
-	margin-top: 20px;
+	margin-top: 0px;
 	padding: 0 20px;
 }
 
@@ -344,7 +344,7 @@ a:hover {
 -------------------------------------------------------------- */
 
 #header {
-	padding: 30px 0 0 0;
+	padding: 10px 0 0 0;
 }
 #site-title {
 	float: left;
@@ -361,7 +361,7 @@ a:hover {
 #site-description {
 	clear: left;
 	float: left;
-	margin: 0px 0 18px 0;
+	margin: 0px 0 5px 0;
 	width: 220px;
 }
 
@@ -463,7 +463,7 @@ div.menu li {
 #main {
 	clear: both;
 	overflow: hidden;
-	padding: 40px 0 0 0;
+	padding: 20px 0 0 0;
 }
 #content {
 	margin-bottom: 36px;
@@ -505,13 +505,17 @@ div.menu li {
 }
 #content h1,
 #content h2,
-#content h3,
+#content h3 {
+	color: #000;
+	line-height: 1.5em;
+	margin: 0 0 10px 0;
+}
 #content h4,
 #content h5,
 #content h6 {
 	color: #000;
 	line-height: 1.5em;
-	margin: 0 0 20px 0;
+	margin: 0 0 0px 0;
 }
 #content table {
 	border: 0px solid #e7e7e7;
@@ -1371,11 +1375,11 @@ form.donateform th {
 #content ul.datasets {
     list-style: none;
     margin-bottom: 0px;
+    clear: both;
 }
 ul.datasets li {
-    border: 1px solid #eee;
-    padding: 10px;
-    margin-bottom: 5px;
+    padding: 0px;
+    margin-bottom: 20px;
     margin-top: 0px;
 }
 #content ul.datasets p {
@@ -1383,13 +1387,18 @@ ul.datasets li {
     padding: 0px;
     line-height: 1em;
 }
-p.datasettags {
-    font-size: 0.9em;
-    text-align: right;
-    font-style: italic;
+p.datasetdescription {
+    margin-left: 20px;
     margin-top: 5px;
 }
-
+p.datasettags {
+    font-size: 0.9em;
+    text-align: left;
+    font-style: italic;
+    margin-top: 0px;
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
 a { 
     text-decoration: none;
 }
@@ -1437,4 +1446,19 @@ input.openid {
 }
 span.username {
     color: green;
+}
+div.feed {
+    float: right;
+    width: 50px;
+    text-align: right;
+}
+div.loginbox {
+    float: right;
+}
+div.title {
+    float:left;
+    margin-bottom: 0px;
+}
+div.dataset {
+    clear: both;
 }
