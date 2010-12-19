@@ -8,8 +8,7 @@ import model
 from recaptcha.client import captcha
 import math
 import random
-
-web.config.debug=True
+import openid.store.filestore
 
 urls = (
     '/?',                                  'About',
@@ -599,6 +598,10 @@ class Admin:
         return render.admin()
         
 app = web.application(urls, globals())
+web.webopenid.sessions = \
+    web.session.Session(app, web.session.DiskStore('../sessions'),
+                        initializer={})
+web.webopenid.store=openid.store.filestore.FileOpenIDStore('../sessions')
 
 if __name__ == '__main__':
     app.run()
