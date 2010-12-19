@@ -71,8 +71,14 @@ DESCRIPTION: Two-column fixed layout with one sidebar right of content
 #content {
 	margin: 0 280px 0 20px;
 }
-#primary,
-#secondary {
+#primary {
+	float: right;
+	width: 233px;
+	padding: 0px;
+	margin-top: 0px;
+}
+#secondary,
+#tertiary {
 	float: right;
 	overflow: hidden;
 	width: 220px;
@@ -82,7 +88,8 @@ DESCRIPTION: Two-column fixed layout with one sidebar right of content
 	margin-bottom: 10px;
 	background: #f0f0fa;
 }
-#secondary {
+#secondary,
+#tertiary {
 	clear: right;
 }
 #footer {
@@ -1174,6 +1181,8 @@ h3#reply-title {
 }
 #secondary {
 }
+#tertiary {
+}
 
 /* Footer widget areas */
 #footer-widget-area {
@@ -1420,4 +1429,12 @@ span.tag4 {
 }
 span.tag5 {
     font-size: 2em;
+}
+input.openid {
+    background: url(http://openid.net/login-bg.gif) no-repeat; 
+    padding-left: 18px; 
+    background-position: 0 50%;
+}
+span.username {
+    color: green;
 }

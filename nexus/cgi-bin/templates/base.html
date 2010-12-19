@@ -49,14 +49,9 @@ $def with (page)
 	      <li class="page_item">
 		<a href="/feedback" title="Write to us">Feedback</a>
 	      </li>
-	      $if openid.status():
-	        <li class="page_item">
-		  <a href="/admin" title="Make changes">Admin</a>
-		</li>
-  	        <li class="page_item">
-		  <a href="/login" title="Logged in as $openid.status()">
-		    Log out</a>
-		</li>
+	      <li class="page_item">
+		<a href="/admin" title="Make changes">Admin</a>
+	      </li>
 	  </ul></div>	 
 	</div><!-- #access -->
       </div><!-- #masthead -->
@@ -70,11 +65,11 @@ $def with (page)
 	    </div><!-- entry-content -->
 	  </div><!-- post-34 -->
 	</div><!-- content -->
-      <div id="primary" class="widget-area" role="complementary">
+      <div id="secondary" class="widget-area" role="complementary">
 	<h2> What's new? </h2>
 	$:whatsnew
-      </div><!-- #primary .widget-area -->
-      <div id="secondary" class="widget-area" role="complementary">
+      </div><!-- #secondary .widget-area -->
+      <div id="tertiary" class="widget-area" role="complementary">
 	<h2> Data tags </h2>
 	$:datatags
       </div>
@@ -86,6 +81,22 @@ $def with (page)
 	    &copy; 2010 The Nexus team
 	  </a>
 	</div><!-- #site-info -->
+	<div class="loginbox" role="complementary">
+	  $if openid.status():
+	    <form method="post" action="/logout">
+	      <label>Logged in as 
+		<span class="username">$getusername()</span>.</label>
+	      <input type="hidden" name="return_to" value="$currenturl()" />
+	      <button type="submit">Log out</button>
+	    </form>
+	  $else:
+	    <form method="post" action="/openid">
+              <input type="text" name="openid" value="" class="openid" />
+              <input type="hidden" name="return_to" 
+		     value="$currentnotlogouturl()" />
+              <button type="submit">Log in</button>
+            </form>
+	</div>
       </div><!-- #colophon -->
     </div><!-- #footer -->
   </div><!-- wrapper -->

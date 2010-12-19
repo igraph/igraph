@@ -125,3 +125,13 @@ def update_dataset(id, name, description, tags, licence, vertices,
         new_citation(id, p)
     
     return True
+
+def get_username(openid=None):
+    if not openid:
+        openid=web.webopenid.status()
+    user=db.select('user', what='name', 
+                   where="openid='%s'" % openid)
+    if user:
+        return [u for u in user][0].name
+    else:
+        return None

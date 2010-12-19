@@ -9,12 +9,13 @@ from recaptcha.client import captcha
 import math
 import random
 
-web.config.debug=True
+web.config.debug=False
 
 urls = (
     '/?',                                  'About',
-    '/openid',                             'web.webopenid.host',
-    '/login',                              'Login',
+    '/openid',                             'OpenID',
+    '/loginfailed',                        'LoginFailed',
+    '/logout',                             'Logout',
     '/admin',                              'Admin',
 #    '/advanced',                           'AdvancedSearch',
     '/donate',                             'Donate',
@@ -63,10 +64,22 @@ recaptcha_text = """
 formats = ('html', 'xml', 'text')
 dataformats = { 'R-igraph': '.Rdata' }
 
+def get_current_url():
+    return web.ctx.fullpath
+
+def get_current_not_logout_url():
+    fp=web.ctx.fullpath
+    if fp in ('/logout', '/loginfailed'):
+        fp='/'
+    return fp
+
 tempglob = { 'whatsnew': 'Nothing',
              'datatags': 'None',
              'dataformats': dataformats,
-             'openid': web.webopenid      }
+             'openid': web.webopenid,
+             'getusername': model.get_username,
+             'currenturl': get_current_url,
+             'currentnotlogouturl': get_current_not_logout_url }
 
 render = web.template.render('templates', base='base', globals=tempglob)
 render_plain = web.template.render('templates', globals=tempglob)
@@ -90,7 +103,6 @@ class Base:
         global tempglob
         w=model.whatsnew()
         t=[tag for tag in model.datatags()]
-        print t
         c=[tag.count for tag in model.datatags()]
         maxc=max(c)
         c=[ int(math.log(cc+1) / math.log(maxc+1) * 5) for cc in c]
@@ -501,7 +513,6 @@ class Edit(Base):
             None
 
         tags=[t.strip() for t in form.d.tags.split(',')]
-        print form.d
         if form.d.weighted and 'weighted' not in tags:
             tags.append('weighted')
         if form.d.directed and 'directed' not in tags:
@@ -557,9 +568,28 @@ class AddLicence(Base):
 
         return render.addlicence(form, True)
 
-class Login(Base):
+class Logout(Base):
     def GET(self):
-        return render.login(web.webopenid.form('/openid'))
+        web.webopenid.logout()
+        return render.logout()
+
+    def POST(self):
+        user_input=web.input()
+        web.webopenid.logout()
+        return render.logout()
+
+class OpenID(web.webopenid.host,Base):
+    def POST(self):
+        i=web.input(return_to="/")
+        user=model.get_username(i.openid)
+        if user:
+            web.webopenid.host.POST(self)
+        else:
+            return web.seeother("/loginfailed")
+
+class LoginFailed(Base):
+    def GET(self):
+        return render.loginfailed()
 
 class Admin(Base):
     def GET(self):

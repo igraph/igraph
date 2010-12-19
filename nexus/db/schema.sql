@@ -75,4 +75,10 @@ CREATE TABLE metadata (
        PRIMARY KEY(dataset, network, type, name),
        FOREIGN KEY(dataset, network) REFERENCES network(dataset, network)
 );
-
+CREATE TABLE user (
+       name TEXT,
+       openid TEXT,
+       admin BOOLEAN,
+       PRIMARY KEY(openid),
+       UNIQUE(name)
+);

@@ -41,3 +41,6 @@ INSERT INTO format VALUES('R-igraph',
        'igraph is an R package for network analysis, with support for large graphs. This data file can be loaded into an R session via the ''load'' function, after loading the igraph package itself using the ''library'' function. See the igraph homepage for details.', 
        'http://igraph.sourceforge.net');
 	
+INSERT INTO user VALUES('gabor.csardi', 
+       'https://launchpad.net/~gabor.csardi', 1);
+INSERT INTO user VALUES('ntamas', 'https://launchpad.net/~ntamas', 1);
