@@ -1,18 +1,27 @@
 #! /usr/bin/python2.6
+# vim:set ts=4 sw=4 sts=4 et
 
 import sys
 sys.path.append("../python")
 
 import web
 import model
-from recaptcha.client import captcha
 import math
 import random
 import openid.store.filestore
-import datetime
+import os
+import url_helper
+
+from datetime import datetime
+from functools import wraps
+from itertools import izip
+from operator import attrgetter
+from recaptcha.client import captcha
+from textwrap import dedent
 
 web.config.debug = True
 
+# URL mappings used in the Nexus web application
 urls = (
     '/?',                                  'About',
     '/openid',                             'OpenID',
@@ -28,6 +37,7 @@ urls = (
     '/add',                                'Add',
     '/edit/(\d+)',                         'Edit',
     '/(\w+)/?',                            'Index',
+    '/(\w+)/dataset/?',                      'Index',
     '/(\w+)/dataset/(\d+)',                'Dataset',
     '/([\w-]+)/getdata/(\d+)(?:/(\d+))?',  'GetData',
     '/(\w+)/tagged/(\w+)',                 'Tagged',
@@ -36,12 +46,15 @@ urls = (
     '.*',                                  'NotFound'
     )
 
+# reCAPTCHA keys
 recaptcha_pubkey = "6Lfqjb8SAAAAAJyGZQrvqgs7JWjpNp_Vf9dpTMxy"
 recaptcha_private_key = "6Lfqjb8SAAAAAO_ElXNZyzVXbP5xffMs6IVypJbB"
 
+# OpenIDs of the site administrators
 admins_openid=('https://launchpad.net/~gabor.csardi',
                'https://launchpad.net/~ntamas')
 
+# Text to be included in the HTML output whenever a reCAPTCHA is needed
 recaptcha_text = """
 <div class="recaptcha">
 <script type="text/javascript">
@@ -63,31 +76,42 @@ recaptcha_text = """
 </div>
 """ % (recaptcha_pubkey, recaptcha_pubkey)
 
+# List of supported webpage formats
 formats = ('html', 'xml', 'text', 'rss', 'atom')
+
+# Dictionary mapping supported dataset formats to extensions
 dataformats = { 'R-igraph': '.Rdata' }
 
 def get_current_url():
+    """Returns the URL of the current page being produced"""
     return web.ctx.fullpath
 
 def get_current_not_logout_url():
+    """Returns the URL of the current page being produced, except for the
+    logout page.
+
+    For the logout and login failure pages, returns the root page."""
     fp=web.ctx.fullpath
     if fp in ('/logout', '/loginfailed'):
         fp='/'
     return fp
 
 def get_whatsnew():
+    """Retrieves the new datasets from the model and renders it."""
     w=model.whatsnew()
     return render_plain.whatsnew(w)
 
 def get_datatags():
-        t=[tag for tag in model.datatags()]
-        c=[tag.count for tag in model.datatags()]
-        maxc=max(c)
-        c=[ int(math.log(cc+1) / math.log(maxc+1) * 5) for cc in c]
-        for i in range(len(c)):
-            t[i].count=c[i]
-        random.shuffle(t)
-        return render_plain.datatags(t)
+    """Retrieves the list of tags and tag counts in the model and renders a
+    nice tag cloud."""
+    tags = [tag for tag in model.datatags()]
+    counts = [tag.count for tag in tags]
+    max_count = max(counts)
+    sizes = [ int(math.log(count+1) / math.log(max_count+1) * 5) for count in counts]
+    for tag, size in izip(tags, sizes):
+        tag.count = size
+    tags.sort(key = attrgetter("tag"))
+    return render_plain.datatags(tags)
 
 
 tempglob = { 'whatsnew': 'Nothing',
@@ -98,42 +122,56 @@ tempglob = { 'whatsnew': 'Nothing',
              'currenturl': get_current_url,
              'currentnotlogouturl': get_current_not_logout_url,
              'get_whatsnew': get_whatsnew,
-             'get_datatags': get_datatags }
+             'get_datatags': get_datatags}
+for name in url_helper.__all__:
+    tempglob[name] = getattr(url_helper, name)
 
 render = web.template.render('templates', base='base', globals=tempglob)
 render_plain = web.template.render('templates', globals=tempglob)
 
 def knownformat(fn):
-    def new(*args):
+    """Decorator that checks whether the format argument of a function is
+    one of the known page formats."""
+    @wraps(fn)
+    def new(*args, **kwds):
         if args[1] not in formats:
             return web.badrequest()
         return fn(*args)
     return new
 
 def knowndataformat(fn):
-    def new(*args):
+    """Decorator that checks whether the format argument of a function is
+    one of the known data formats."""
+    @wraps(fn)
+    def new(*args, **kwds):
         if args[1] not in dataformats:
             return web.badrequest()
-        return fn(*args)
+        return fn(*args, **kwds)
     return new
 
 class NotFound:
+    """Handler class for URLs that do not encode a known resource."""
 
     def GET(self):
+        """Responds with a HTTP error 404 for GET requests."""
         return web.notfound()
 
 class Home:
-    
+    """Handler class for the home URL."""
+
     def GET(self):
+        """Renders the homepage."""
         return render.home()
 
 class AdvancedSearch:
-    
+    """Handler class for the advanced search page."""
+
     def GET(self):
-        ## TODO
+        """Yet to be implemented."""
         return render.home()
     
 class Donate:
+    """Handler class for the "Donate data" page."""
 
     donate_form=web.form.Form(
         web.form.Textbox("name", description="Your name:", id="focused"),
@@ -207,11 +245,13 @@ class Blog:
         return render.blog()
 
 class About:
-    
+    """Renders the contents of the About page."""
+
     def GET(self):
         return render.about()
 
 class Feedback:
+    """Renders the feedback form."""
 
     feedback_form = web.form.Form(
         web.form.Textbox("name", description="Your name (optional):"),
@@ -229,7 +269,7 @@ class Feedback:
         form=self.feedback_form()
         if not form.validates():
             ## TODO
-            None
+            pass
 
         user_input=web.input()
         valid=captcha.submit(user_input.recaptcha_challenge_field,
@@ -254,15 +294,15 @@ class Feedback:
             return render.feedback_ok(form, True, False)
 
 class Index:
-    
+    """Renders the index page."""
+
     @knownformat
     def GET(self, format='html'):
-        datasets=model.get_list_of_datasets()
-        datasets=[d for d in datasets]
+        datasets=list(model.get_list_of_datasets())
         ids=[d.id for d in datasets]
         tags={}
-        for i in ids:            
-            tags[i] = [t for t in model.get_tags(i)]
+        for i in ids:
+            tags[i] = list(model.get_tags(i))
 
         if format=='html':
             feed='/atom'
@@ -272,19 +312,19 @@ class Index:
             return render_plain.xml_index(datasets, tags, 
                                           'All Nexus data sets')
         elif format=='text':
-            for k,t in tags.items():
-                tags[k]=";".join([x.tag for x in t])
+            for k, t in tags.iteritems():
+                tags[k]=";".join(x.tag for x in t)
             web.header('Content-Type', 'text/plain')
             return render_plain.text_index(datasets, tags, 
                                            'All Nexus data sets')
         elif format=='rss':
-            date=datetime.datetime.today().strftime("%a, %d %b %Y %H:%M:%S +0200")
+            date=datetime.today().strftime("%a, %d %b %Y %H:%M:%S +0200")
             web.header('Content-Type', 'application/rss+xml')
             return render_plain.rss_index(datasets, tags, 
                                           "All Nexus data sets", 
                                           date, web.ctx.homedomain, '')
         elif format=='atom':
-            date=datetime.datetime.today().strftime("%a, %d %b %Y %H:%M:%S +0200")
+            date=datetime.today().strftime("%a, %d %b %Y %H:%M:%S +0200")
             web.header('Content-Type', 'application/atom+xml')
             return render_plain.atom_index(datasets, tags, 
                                            "All Nexus data sets", 
@@ -292,33 +332,33 @@ class Index:
             
 
 class Dataset:
+    """Renders the page of a dataset."""
 
     def format_text(self, dataset, tags, papers):
         tags=";".join([x.tag for x in tags])
         papers=[p.citation.replace("\n", "\n  ").strip() for p in papers]
         papers="\n  .\n".join(papers)
-        return """Id: %i
-Name: %s
-Vertices: %s
-Edges: %s
-Tags: %s
-Date: %s
-Licence: %s
-Description: %s
-Citation: %s
-""" % (dataset.id, dataset.name, dataset.vertices, dataset.edges,
-       tags, dataset.date, dataset.licence, 
-       dataset.description.replace("\n", "\n  ").strip(), papers)
+        return dedent("""\
+                Id: %i
+                Name: %s
+                Vertices: %s
+                Edges: %s
+                Tags: %s
+                Date: %s
+                Licence: %s
+                Description: %s
+                Citation: %s
+        """ % (dataset.id, dataset.name, dataset.vertices, dataset.edges,
+               tags, dataset.date, dataset.licence, 
+               dataset.description.replace("\n", "\n  ").strip(), papers))
 
     @knownformat
     def GET(self, format, id):
         dataset=[d for d in model.get_dataset(id)][0]
         if not dataset:
             return web.notfound()
-        tags=[t for t in model.get_tags(dataset.id)]
-        formats={}
-        for f in model.get_formats():
-            formats[f.name] = f
+        tags=list(model.get_tags(dataset.id))
+        formats=dict((f.name, f) for f in model.get_formats())
         papers=model.get_papers(id)
 
         if format=='html':
@@ -332,15 +372,13 @@ Citation: %s
             return render_plain.text_dataset(formatted)
 
 class Tagged:
-
     @knownformat
     def GET(self, format, tagname=None):
-        datasets=model.get_list_tagged_as(tagname)
-        datasets=[d for d in datasets]
+        datasets=list(model.get_list_tagged_as(tagname))
         ids=[d.id for d in datasets]
         tags={}
         for i in ids:
-            tags[i] = [t for t in model.get_tags(i)]
+            tags[i] = list(model.get_tags(i))
 
         if format=='html':
             feed='/atom/tagged/%s' % tagname
@@ -359,7 +397,7 @@ class Tagged:
                                            "Data sets tagged '%s'" 
                                            % tagname)
         elif format=="rss":
-            date=datetime.datetime.today().strftime("%a, %d %b %Y %H:%M:%S +0200")
+            date=datetime.today().strftime("%a, %d %b %Y %H:%M:%S +0200")
             web.header('Content-Type', 'application/rss+xml')
             return render_plain.rss_index(datasets, tags, 
                                           "Nexus data sets tagged %s" 
@@ -367,7 +405,7 @@ class Tagged:
                                           web.ctx.homedomain, 'tagged/%s' 
                                           % tagname)
         elif format=="atom":
-            date=datetime.datetime.today().strftime("%a, %d %b %Y %H:%M:%S +0200")
+            date=datetime.today().strftime("%a, %d %b %Y %H:%M:%S +0200")
             web.header('Content-Type', 'application/atom+xml')
             return render_plain.atom_index(datasets, tags, 
                                            "Nexus data sets tagged %s" 
@@ -381,14 +419,15 @@ class GetData:
     
     @knowndataformat
     def GET(self, format, id, nid):
-        if nid==None: nid=1
+        if nid is None:
+            nid=1
         datafile=model.get_dataset_file(id, nid)
         if not datafile:
             return web.notfound()
         else:
             basename=[ d.filename for d in datafile][0]
             ext=dataformats[format]
-        filename='../data/' + id + '/' + basename + ext
+        filename=os.path.join('..', 'data', id, basename + ext)
         try:
             f=open(filename)
             data=f.read()
@@ -528,17 +567,15 @@ class Edit:
         form.fill(ds)
         papers=[p.citation for p in model.get_papers(id)]
         form.papers.value="\n\n".join(papers)
-        tags=[t.tag for t in model.get_tags(id)]
+        tags=set(t.tag for t in model.get_tags(id))
         form.directed.set_value('directed' in tags)
         form.weighted.set_value('weighted' in tags)
         form.bipartite.set_value('bipartite' in tags)
         form.dynamic.set_value('dynamic' in tags)
         form.directed.value=form.weighted.value=form.bipartite.value= \
             form.dynamic.value="True"
-        tags=[t for t in tags if t not in ("weighted", "bipartite", 
-                                           "directed", "undirected", 
-                                           "dynamic")]
-        form.tags.value=", ".join(tags)
+        tags -= ("weighted", "bipartite", "directed", "undirected", "dynamic")
+        form.tags.value=", ".join(sorted(tags))
         return render.add(form, False, True, id)
 
     def POST(self, id):

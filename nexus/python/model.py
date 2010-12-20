@@ -34,7 +34,8 @@ def get_list_of_datasets():
 def get_tags(id):
     return db.query('''SELECT t.id, t.tag 
                        FROM tag t, dataset_tag d
-                       WHERE t.id=d.tag AND dataset=$id''', 
+                       WHERE t.id=d.tag AND dataset=$id
+                       ORDER BY t.tag''', 
                     vars={'id': id})
 
 def get_dataset(id):

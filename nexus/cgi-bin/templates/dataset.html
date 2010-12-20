@@ -1,10 +1,18 @@
 $def with (ds, tags, formats, papers)
 
+$code:
+    def tag_link(tag, caption=None):
+        if caption is None:
+            caption = tag.tag
+        caption = websafe(caption)
+        tag = websafe(tag.tag)
+        return '<a href="/html/tagged/%s">%s</a>' % (tag, caption)
+
 $if openid.status():
   <div class="feed">
     <form method="get" action="/edit/$ds.id">
       <button type="submit" style="margin-left:20px;">
-	<h2>Edit</h2>
+        <h2>Edit</h2>
       </button>
     </form>
   </div>
@@ -15,8 +23,7 @@ $if openid.status():
 <p class="datasettags2">
   $ds.vertices vertices, $ds.edges edges.
   Tags:
-  $for t in tags:
-  <a href="/html/tagged/$t.tag">$t.tag</a>,
+  $:", ".join(link_to_tag(tag) for tag in tags)
 <p class="datasetdate2">$ds.date</p>
 
 <h3>Download</h3>

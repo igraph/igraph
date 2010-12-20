@@ -12,9 +12,9 @@ $if not post:
 
   <p>
     Please fill the following form to donate your data set. The data
-    itself must be placed on an FTP or web server, give its FTP or Web
-    address below. If you want to send your data in email, then please
-    leave this field empty and we will contact you.
+    itself must be placed on an FTP or web server, and you will be asked
+    to provide its FTP or Web address below. If you want to send your data
+    in email, please leave this field empty and we will contact you.
   </p>
 
   <p>
@@ -28,8 +28,8 @@ $if not post:
 $else:
   $if not captchaok:
     <p class="error">
-      Please type in correctly the two words at the bottom of the
-      form. This is required for sending your messsage.
+      Please type in the two words at the bottom of the form correctly.
+      This is required for sending your messsage.
     </p>
     <p>
       <form action="" method="post" class="failedcaptcha">
@@ -39,20 +39,20 @@ $else:
   $else:
     $if sentok:
       <p>
-	Thank you very much for your contribution! We will contact you
-	via email, once your data set has been added to our database!
+        Thank you very much for your contribution! We will contact you
+        via email once your data set has been added to our database.
       </p>
       <p><a href="/">Return to the start page.</a></p>
     $else:
       <p>
-	We experience some technical difficulties right now and cannot
-	send your message. Your feedback is important for us, please try
-	sending it again in a couple of minutes.
+        We experience some technical difficulties right now and cannot send
+        your message. Your contribution is very important for us, so please try
+        sending it again in a couple of minutes.
       </p>
       <p>
-	<form action="" method="post">
-	  $:form.render()
-	</form>
+        <form action="" method="post">
+       	  $:form.render()
+        </form>
       </p>
 
 

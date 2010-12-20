@@ -16,7 +16,7 @@ $def with (datasets, tags, title, date, home, link)
       $for ds in datasets
       <item>
          <title>$ds.name</title>
-         <link>$home/html/dataset/$ds.id</link>
+         <link>$home/$url_for_dataset($ds)</link>
          <description><![CDATA[$ds.description]]></description>
          <pubDate>$ds.date</pubDate>
       </item>

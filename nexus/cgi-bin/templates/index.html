@@ -12,13 +12,15 @@ $def with (datasets, tags, title, feed)
 
 <ul class="datasets">
 $for ds in datasets:
-    <li><h4><a href="/html/dataset/$ds.id">&#9658; $ds.name</a></h4>
-      <p class="datasettags">
-	$ds.date, $ds.vertices vertices, $ds.edges edges.
-	Tags:
-	$for t in tags[ds.id]:
-	<a href="/html/tagged/$t.tag">$t.tag</a>,
-      </p>
-      <p class="datasetdescription">$ds.description</p>
-    </li>
+  <li>
+    <h4>
+      $:link_to_dataset(ds, bullet=u"\u25b6 ")
+    </h4>
+    <p class="datasettags">
+      $ds.date, $ds.vertices vertices, $ds.edges edges.
+      Tags:
+      $:", ".join(link_to_tag(tag) for tag in tags[ds.id])
+    </p>
+    <p class="datasetdescription">$ds.description</p>
+  </li>
 </ul>

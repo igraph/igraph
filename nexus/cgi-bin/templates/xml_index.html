@@ -10,7 +10,7 @@ $for ds in datasets:
     <edges>$ds.edges</edges>
     <tags>
     $for t in tags[ds.id]:
-      $t.tag,
+      <tag>$t.tag</tag>
     </tags>
     <date>$ds.date</date>
   </dataset>

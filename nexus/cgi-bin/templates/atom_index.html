@@ -12,7 +12,7 @@ $def with (datasets, tags, title, date, home, link)
   $for ds in datasets:
   <entry>
     <title>$ds.name</title>
-    <link href="$home/html/dataset/$ds.id"/>
+    <link href="$home/$url_for_dataset(ds)"/>
     <id>tag:nexus.igraph.org,${ds.date[0:10]}:/dataset/$ds.id</id>
     <updated>$ds.date</updated>
     <content><![CDATA[$ds.description]]></content>
