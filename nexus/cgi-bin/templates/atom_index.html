@@ -1,0 +1,21 @@
+$def with (datasets, tags, title, date, home, link)
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>$title</title>
+  <link href="$home/html/$link"/>
+  <updated>$date</updated>
+  <author>
+    <name>The Nexus team</name>
+    <email>nexus@igraph.org</email>
+  </author>
+  
+  $for ds in datasets:
+  <entry>
+    <title>$ds.name</title>
+    <link href="$home/html/dataset/$ds.id"/>
+    <id>tag:nexus.igraph.org,${ds.date[0:10]}:/dataset/$ds.id</id>
+    <updated>$ds.date</updated>
+    <content><![CDATA[$ds.description]]></content>
+  </entry>
+</feed>
+  

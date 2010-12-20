@@ -63,7 +63,7 @@ recaptcha_text = """
 </div>
 """ % (recaptcha_pubkey, recaptcha_pubkey)
 
-formats = ('html', 'xml', 'text', 'rss')
+formats = ('html', 'xml', 'text', 'rss', 'atom')
 dataformats = { 'R-igraph': '.Rdata' }
 
 def get_current_url():
@@ -265,7 +265,7 @@ class Index:
             tags[i] = [t for t in model.get_tags(i)]
 
         if format=='html':
-            feed='/rss'
+            feed='/atom'
             return render.index(datasets, tags, "All Nexus data sets", feed)
         elif format=='xml':
             web.header('Content-Type', 'text/xml')
@@ -283,6 +283,13 @@ class Index:
             return render_plain.rss_index(datasets, tags, 
                                           "All Nexus data sets", 
                                           date, web.ctx.homedomain, '')
+        elif format=='atom':
+            date=datetime.datetime.today().strftime("%a, %d %b %Y %H:%M:%S +0200")
+            web.header('Content-Type', 'application/atom+xml')
+            return render_plain.atom_index(datasets, tags, 
+                                           "All Nexus data sets", 
+                                           date, web.ctx.homedomain, '')
+            
 
 class Dataset:
 
@@ -336,7 +343,7 @@ class Tagged:
             tags[i] = [t for t in model.get_tags(i)]
 
         if format=='html':
-            feed='/rss/tagged/%s' % tagname
+            feed='/atom/tagged/%s' % tagname
             return render.index(datasets, tags, 
                                 "Data sets tagged '%s'" % tagname, feed)
         elif format=='xml':
@@ -359,6 +366,14 @@ class Tagged:
                                           % tagname, date,
                                           web.ctx.homedomain, 'tagged/%s' 
                                           % tagname)
+        elif format=="atom":
+            date=datetime.datetime.today().strftime("%a, %d %b %Y %H:%M:%S +0200")
+            web.header('Content-Type', 'application/atom+xml')
+            return render_plain.atom_index(datasets, tags, 
+                                           "Nexus data sets tagged %s" 
+                                           % tagname, date,
+                                           web.ctx.homedomain, 'tagged/%s' 
+                                           % tagname)
             
             
         
