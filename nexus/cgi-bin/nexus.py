@@ -9,8 +9,6 @@ import model
 import math
 import random
 import openid.store.filestore
-import datetime
-import igraph
 import os
 import url_helper
 import odict
@@ -23,7 +21,7 @@ from operator import attrgetter
 from recaptcha.client import captcha
 from textwrap import dedent
 
-web.config.debug = True
+web.config.debug = False
 
 # URL mappings used in the Nexus web application
 urls = (
@@ -684,18 +682,17 @@ class Check:
 
         def run_r(cmd):
             args=["Rscript", "-e", cmd]
-            print args
             p=subprocess.Popen(args, stdout=subprocess.PIPE)
             ret=p.wait()
             out=p.stdout.read()
-            print [ret, out]
             return [ret, out]
 
         res=odict.odict()
         
         ## File exists
-        res['Data file exists'] = ok(os.path.exists(filename))
-        if not res['Data file exists']:
+        ex=os.path.exists(filename)
+        res['Data file exists'] = ok(ex)
+        if not ex:
             return res
 
         ## File can be loaded
@@ -739,8 +736,12 @@ class Check:
         ds=[d for d in ds][0]
         checkres=odict.odict()
         for k,v in dataformats.items():
-            checkres[k] = self.check(ds, k, "../data/" + str(id) + "/" + 
-                                     ds.filename + v)
+            try: 
+                checkres[k] = self.check(ds, k, "../data/" + str(id) + "/" + 
+                                         ds.filename + v)
+            except Exception, x:
+                checkres[k] = { "Cannot run check": str(x) }
+                
         return render.check(id, ds, checkres)      
         
 app = web.application(urls, globals())
