@@ -575,7 +575,8 @@ class Edit:
         form.dynamic.set_value('dynamic' in tags)
         form.directed.value=form.weighted.value=form.bipartite.value= \
             form.dynamic.value="True"
-        tags -= ("weighted", "bipartite", "directed", "undirected", "dynamic")
+        tags -= set(("weighted", "bipartite", "directed", "undirected", 
+                     "dynamic"))
         form.tags.value=", ".join(sorted(tags))
         return render.add(form, False, True, id)
 
