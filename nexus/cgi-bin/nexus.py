@@ -21,7 +21,7 @@ from operator import attrgetter
 from recaptcha.client import captcha
 from textwrap import dedent
 
-web.config.debug = False
+web.config.debug = True
 
 # URL mappings used in the Nexus web application
 urls = (
@@ -51,7 +51,6 @@ urls = (
 
 # reCAPTCHA keys
 recaptcha_pubkey = "6Lfqjb8SAAAAAJyGZQrvqgs7JWjpNp_Vf9dpTMxy"
-recaptcha_private_key = "6Lfqjb8SAAAAAO_ElXNZyzVXbP5xffMs6IVypJbB"
 
 # OpenIDs of the site administrators
 admins_openid=('https://launchpad.net/~gabor.csardi',
@@ -211,6 +210,8 @@ class Donate:
             None
         
         user_input=web.input()
+        recaptcha_private_key = \
+            file("../config/recaptcha_private_key").read().strip()
         valid=captcha.submit(user_input.recaptcha_challenge_field,
                              user_input.recaptcha_response_field,
                              recaptcha_private_key,
@@ -222,10 +223,10 @@ class Donate:
         web.config.smtp_server = 'smtp.gmail.com'
         web.config.smtp_port = 587
         web.config.smtp_username = 'nexus.repository@gmail.com'
-        web.config.smtp_password = 'bhu8nji9'
+        web.config.smtp_password = file("../config/emailpass").read().strip()
         web.config.smtp_starttls = True
         try:
-            web.sendmail(form.d.name, 'nexus.repository@gmail.com', 
+            web.sendmail(form.d.name, 'nexus@igraph.org', 
                          'Donation', 
                          'Name:        ' + form.d.name        + '\n'   +
                          'Email:       ' + form.d.email       + '\n'   +
@@ -275,6 +276,8 @@ class Feedback:
             pass
 
         user_input=web.input()
+        recaptcha_private_key = \
+            file("../config/recaptcha_private_key").read().strip()
         valid=captcha.submit(user_input.recaptcha_challenge_field,
                              user_input.recaptcha_response_field,
                              recaptcha_private_key,
@@ -286,14 +289,15 @@ class Feedback:
         web.config.smtp_server = 'smtp.gmail.com'
         web.config.smtp_port = 587
         web.config.smtp_username = 'nexus.repository@gmail.com'
-        web.config.smtp_password = 'bhu8nji9'
+        web.config.smtp_password = file("../config/emailpass").read().strip()
         web.config.smtp_starttls = True
         try:
-            web.sendmail(form.d.name, 'nexus.repository@gmail.com', 
+            web.sendmail(form.d.name, 'nexus@igraph.org', 
                          'Feedback', 
                          form.d.message + "\n\nEmail:" + form.d.email)
             return render.feedback_ok(form, True, True)
-        except:
+        except Exception, x:
+            print(str(x))
             return render.feedback_ok(form, True, False)
 
 class Index:
@@ -681,7 +685,8 @@ class Check:
     def check_r_igraph(self, ds, filename):
 
         def run_r(cmd):
-            args=["Rscript", "-e", cmd]
+            Rscript=file("../config/Rscript").read().strip()
+            args=[Rscript, "-e", cmd]
             p=subprocess.Popen(args, stdout=subprocess.PIPE)
             ret=p.wait()
             out=p.stdout.read()
