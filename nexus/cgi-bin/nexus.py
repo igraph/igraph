@@ -9,8 +9,12 @@ import model
 import math
 import random
 import openid.store.filestore
+import datetime
+import igraph
 import os
 import url_helper
+import odict
+import subprocess
 
 from datetime import datetime
 from functools import wraps
@@ -33,6 +37,7 @@ urls = (
 #    '/blog',                               'Blog',
     '/about',                              'About',
     '/feedback',                           'Feedback',
+    '/check/(\d+)',                        'Check',
     '/addlicence',                         'AddLicence',
     '/add',                                'Add',
     '/edit/(\d+)',                         'Edit',
@@ -669,6 +674,74 @@ class LoginFailed:
 class Admin:
     def GET(self):
         return render.admin()
+
+def ok(x):
+    return ('Error', 'OK')[x]
+
+class Check:
+
+    def check_r_igraph(self, ds, filename):
+
+        def run_r(cmd):
+            args=["Rscript", "-e", cmd]
+            print args
+            p=subprocess.Popen(args, stdout=subprocess.PIPE)
+            ret=p.wait()
+            out=p.stdout.read()
+            print [ret, out]
+            return [ret, out]
+
+        res=odict.odict()
+        
+        ## File exists
+        res['Data file exists'] = ok(os.path.exists(filename))
+        if not res['Data file exists']:
+            return res
+
+        ## File can be loaded
+        code = 'library(igraph) ; load("%s") ;' %filename
+        try:
+            run_r(code)
+            res['Data file can be loaded'] = ok(True)
+        except:
+            res['Data file can be loaded'] = ok(False)
+            return res
+        
+        ## File contains a single igraph graph
+        code = code + 'g <- get(ls()[1]) ; cat(is.igraph(g), " ") ;'
+        try:
+            ret, out=run_r(code)
+            if out[0:4] == 'TRUE':
+                res['File contains proper data'] = ok(True)
+            else:
+                res['File contains proper data'] = ok(False)
+                return res
+        except:
+            res['File contains proper data'] = ok(False)
+            return res
+
+        ## Number of vertices and edges 
+        code = code + 'cat(vcount(g), ecount(g), " ") ; '
+        ret, out=run_r(code)
+        nm=[int(n) for n in out.split()[1:]]
+        res['Number of vertices'] = ok(nm[0]==ds.vertices)
+        res['Number of edges'] = ok(nm[1]==ds.edges)
+
+        return res
+        
+    def check(self, ds, format, filename):
+        if format=="R-igraph":
+            return self.check_r_igraph(ds, filename)
+        return None
+
+    def GET(self, id):
+        ds=model.get_dataset(id)
+        ds=[d for d in ds][0]
+        checkres=odict.odict()
+        for k,v in dataformats.items():
+            checkres[k] = self.check(ds, k, "../data/" + str(id) + "/" + 
+                                     ds.filename + v)
+        return render.check(id, ds, checkres)      
         
 app = web.application(urls, globals())
 web.webopenid.sessions = \
