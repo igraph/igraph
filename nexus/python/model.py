@@ -136,3 +136,11 @@ def get_username(openid=None):
         return [u for u in user][0].name
     else:
         return None
+
+def get_licence(id):
+    return db.select('licence', where="id='%s'" % id)
+
+def update_licence(id, **args):
+    db.update('licence', where='id=%s' % id, **args)
+    return True
+

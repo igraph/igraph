@@ -42,6 +42,7 @@ urls = (
     '/feedback',                           'Feedback',
     '/check/(\d+)',                        'Check',
     '/addlicence',                         'AddLicence',
+    '/editlicence/(\d+)',                  'EditLicence',
     '/add',                                'Add',
     '/edit/(\d+)',                         'Edit',
     '/(\w+)/?',                            'Index',
@@ -51,6 +52,7 @@ urls = (
     '/(\w+)/tagged/(\w+)',                 'Tagged',
     '/(\w+)/format/?',                     'Format',
     '/(\w+)/format/([\w-]+)',              'Format',
+    '/(\w+)/licence/(\d+)',                'Licence',
     '.*',                                  'NotFound'
     )
 
@@ -614,17 +616,17 @@ class Edit:
     
         return render.add(form, True, True, id)
     
+add_licence_form=web.form.Form(
+    web.form.Textbox("name", description="Name:", id="focused", size=50),
+    web.form.Textarea("text", description="Text:", cols=50, rows=2),
+    web.form.Textarea("fulltext", description="Full text:", cols=50, 
+                      rows=10),
+    web.form.Textbox("link", description="URL:", size=50),
+    web.form.Button("Add")
+    )
+
 class AddLicence:
     
-    add_licence_form=web.form.Form(
-        web.form.Textbox("name", description="Name:", id="focused", size=50),
-        web.form.Textarea("text", description="Text:", cols=50, rows=2),
-        web.form.Textarea("fulltext", description="Full text:", cols=50, 
-                          rows=10),
-        web.form.Textbox("link", description="URL:", size=50),
-        web.form.Button("Add")
-        )
-
     def GET(self):
         if web.webopenid.status() not in admins_openid:
             return web.seeother("/login")
@@ -644,6 +646,32 @@ class AddLicence:
                               fulltext=form.d.fulltext, link=form.d.link)
 
         return render.addlicence(form, True)
+
+class EditLicence:
+    def GET(self, id):
+        if web.webopenid.status() not in admins_openid:
+            return web.seeother("/login")
+
+        form=add_licence_form()
+        form.Add.name='Submit'
+        lic=model.get_licence(id)
+        lic=list(lic)[0]
+        form.fill(lic)
+        return render.addlicence(form, False, False, False)
+
+    def POST(self, id):
+        if web.webopenid.status() not in admins_openid:
+            return web.seeother("/login")
+        
+        form=add_licence_form()
+        if not form.validates():
+            ## TODO
+            pass
+
+        model.update_licence(id=id, name=form.d.name, text=form.d.text,
+                             fulltext=form.d.fulltext, link=form.d.link)
+
+        return render.addlicence(form, True, True, int(id))
 
 class Logout:
     def GET(self):
@@ -743,6 +771,19 @@ class Check:
                 checkres[k] = { "Cannot run check": str(x) }
                 
         return render.check(id, ds, checkres)      
+
+class Licence:
+    
+    @knownformat
+    def GET(self, format, id):
+        lic=model.get_licence(id)
+        
+        if format=='html':
+            return render.licence(lic)
+        elif format=='xml':
+            return render_plain.xml_licence(lic)
+        elif format=='text':
+            return render_plain.text_licence(lic)
         
 app = web.application(urls, globals())
 web.webopenid.sessions = \

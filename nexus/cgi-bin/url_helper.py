@@ -5,7 +5,7 @@ Helper functions for generating URLs and links.
 # List of symbols to be exported from this module
 __all__ = [
     "link_to", "link_to_dataset", "link_to_dataset_id", "link_to_tag",
-    "url_for_dataset", "url_for_tag"
+    "link_to_licence", "url_for_dataset", "url_for_tag", "url_for_licence"
 ]
 
 from web import websafe
@@ -29,6 +29,13 @@ def link_to_dataset(dataset, caption=None, bullet=""):
         caption = u"%s%s" % (bullet, caption)
     return link_to(url_for_dataset(dataset.id), caption)
 
+def link_to_licence(licence, caption=None, bullet=""):
+    if caption is None:
+        caption = ""
+    if bullet:
+        caption = u"%s%s" % (bullet, caption)
+    return link_to(url_for_licence(licence), caption)
+
 def link_to_dataset_id(dataset_id, caption):
     """Generates a link to the dataset with the given ID. `caption` specifies
     the caption of the URL."""
@@ -50,6 +57,9 @@ def url_for_dataset(dataset, format="html"):
     if not isinstance(dataset, int):
         dataset = dataset.id
     return "/%s/dataset/%s" % (format, dataset)
+
+def url_for_licence(licence, format="html"):
+    return "/%s/licence/%s" % (format, licence)
 
 def url_for_tag(tag, format="html"):
     """Returns the URL where the list of datasets with a given tag are
