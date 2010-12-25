@@ -153,7 +153,7 @@ h3#reply-title,
 .widget-title,
 .wp-caption-text,
 input[type=submit] {
-	font-family: "Helvetica Neue", Arial, Helvetica, "Nimbus Sans L", sans-serif;
+	font-family: "Helvetica Neue", Helvetica, Arial, "Nimbus Sans L", sans-serif;
 }
 pre {
 	font-family: "Courier 10 Pitch", Courier, monospace;
