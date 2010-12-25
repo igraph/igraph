@@ -22,6 +22,11 @@ from recaptcha.client import captcha
 from textwrap import dedent
 
 web.config.debug = True
+web.config.smtp_server = '173.192.111.8'
+web.config.smtp_port = 26
+web.config.smtp_username = 'csardi@mail.igraph.org'
+web.config.smtp_password = file("../config/emailpass").read().strip()
+web.config.smtp_starttls = True
 
 # URL mappings used in the Nexus web application
 urls = (
@@ -220,14 +225,9 @@ class Donate:
         if not valid.is_valid:
             return render.donate(form, True, False, False)
 
-        web.config.smtp_server = 'smtp.gmail.com'
-        web.config.smtp_port = 587
-        web.config.smtp_username = 'nexus.repository@gmail.com'
-        web.config.smtp_password = file("../config/emailpass").read().strip()
-        web.config.smtp_starttls = True
         try:
-            web.sendmail(form.d.name, 'nexus@igraph.org', 
-                         'Donation', 
+            web.sendmail('nexus@igraph.org', 'nexus@igraph.org', 
+                         'Nexus donation', 
                          'Name:        ' + form.d.name        + '\n'   +
                          'Email:       ' + form.d.email       + '\n'   +
                          'URL:         ' + form.d.url         + '\n'   +
@@ -286,18 +286,12 @@ class Feedback:
         if not valid.is_valid:
             return render.feedback_ok(form, False, False)
 
-        web.config.smtp_server = 'smtp.gmail.com'
-        web.config.smtp_port = 587
-        web.config.smtp_username = 'nexus.repository@gmail.com'
-        web.config.smtp_password = file("../config/emailpass").read().strip()
-        web.config.smtp_starttls = True
         try:
-            web.sendmail(form.d.name, 'nexus@igraph.org', 
-                         'Feedback', 
+            web.sendmail('nexus@igraph.org', 'nexus@igraph.org', 
+                         'Nexus feedback', 
                          form.d.message + "\n\nEmail:" + form.d.email)
             return render.feedback_ok(form, True, True)
         except Exception, x:
-            print(str(x))
             return render.feedback_ok(form, True, False)
 
 class Index:
