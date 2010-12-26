@@ -671,12 +671,9 @@ class Admin:
     def GET(self):
         return render.admin()
 
-def ok(x):
-    return ('Error', 'OK')[x]
-
 class Check:
 
-    def check_r_igraph(self, ds, filename):
+    def check_r_igraph(self, ds, filename, tags, meta):
 
         def run_r(cmd):
             Rscript=file("../config/Rscript").read().strip()
@@ -690,44 +687,68 @@ class Check:
         
         ## File exists
         ex=os.path.exists(filename)
-        res['Data file exists'] = ok(ex)
+        res['Data file exists'] = ex
         if not ex:
             return res
 
         ## File can be loaded
-        code = 'library(igraph) ; load("%s") ;' %filename
+        loadcode = 'library(igraph) ; load("%s") ;' %filename
         try:
-            run_r(code)
-            res['Data file can be loaded'] = ok(True)
+            run_r(loadcode)
+            res['Data file can be loaded'] = True
         except:
-            res['Data file can be loaded'] = ok(False)
+            res['Data file can be loaded'] = False
             return res
         
         ## File contains a single igraph graph
-        code = code + 'g <- get(ls()[1]) ; cat(is.igraph(g), " ") ;'
+        code = loadcode + 'g <- get(ls()[1]) ; cat(is.igraph(g), " ") ;'
         try:
             ret, out=run_r(code)
             if out[0:4] == 'TRUE':
-                res['File contains proper data'] = ok(True)
+                res['File contains proper data'] = True
             else:
-                res['File contains proper data'] = ok(False)
+                res['File contains proper data'] = False
                 return res
         except:
-            res['File contains proper data'] = ok(False)
+            res['File contains proper data'] = False
             return res
 
         ## Number of vertices and edges 
-        code = code + 'cat(vcount(g), ecount(g), " ") ; '
+        code = code + 'cat(vcount(g), ecount(g), is.directed(g), ' + \
+            'is.weighted(g), is.bipartite(g), " ") ; '
         ret, out=run_r(code)
-        nm=[int(n) for n in out.split()[1:]]
-        res['Number of vertices'] = ok(nm[0]==ds.vertices)
-        res['Number of edges'] = ok(nm[1]==ds.edges)
+        nm=out.split()[1:]
+        res['Number of vertices'] = int(nm[0])==ds.vertices
+        res['Number of edges'] = int(nm[1])==ds.edges
+
+        ## Tags
+        tags=[t.tag for t in tags]
+        if 'directed' in tags:
+            res['Tags, directed'] = nm[2]=='TRUE'
+        if 'undirected' in tags:
+            res['Tags, undirected'] = nm[2]=='FALSE'
+        if 'weighted' in tags:
+            res['Tags, weighted'] = nm[3]=='TRUE'
+        if 'bipartite' in tags:
+            res['Tags, bipartite'] = nm[4]=='TRUE'
+
+        ## Metadata
+        code=loadcode + 'g <- get(ls()[1]) ; ' + \
+            'cat(list.vertex.attributes(g), sep="", "\\n") ;' + \
+            'cat(list.edge.attributes(g), sep="", "\\n") ;'
+        ret, out=run_r(code)
+        attr=out.split("\n")[0:2]
+        for m in meta:
+            if m.type == "vertex":
+                res["Metadata, vertex, '%s'" % m.name]=m.name in attr[0]
+            elif m.type == "edge":
+                res["Metadata, edge, '%s'" % m.name]=m.name in attr[1]
 
         return res
         
-    def check(self, ds, format, filename):
+    def check(self, ds, format, tags, meta, filename):
         if format=="R-igraph":
-            return self.check_r_igraph(ds, filename)
+            return self.check_r_igraph(ds, filename, tags, meta)
         return None
 
     def GET(self, id):
@@ -735,8 +756,11 @@ class Check:
         ds=[d for d in ds][0]
         checkres=odict.odict()
         for k,v in dataformats.items():
+            tags=model.get_tags(ds.id)
+            meta=model.get_metadata(ds.id)
             try: 
-                checkres[k] = self.check(ds, k, "../data/" + str(id) + "/" + 
+                checkres[k] = self.check(ds, k, tags, meta,
+                                         "../data/" + str(id) + "/" + 
                                          ds.filename + v)
             except Exception, x:
                 checkres[k] = { "Cannot run check": str(x) }

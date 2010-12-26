@@ -6,5 +6,10 @@ $for format, result in checkres.items():
   <h3>$format</h3>
   <ul>
   $for key, value in result.items():
-    <li>$key: $value</li>
+    <li>$key: 
+      $if value:
+        <span class="checkvalue">OK</span>.
+      $else:
+	<span class="checkvalue failure">Error</span>.
+    </li>
   </ul>

@@ -1467,3 +1467,9 @@ div.dataset {
 div.licence {
     clear: both;
 }
+span.checkvalue {
+    font-weight: bold;
+}
+span.failure {
+    color: red;
+}
