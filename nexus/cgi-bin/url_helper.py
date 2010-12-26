@@ -56,10 +56,10 @@ def url_for_dataset(dataset, format="html"):
     is the format of the dataset."""
     if not isinstance(dataset, int):
         dataset = dataset.id
-    return "/%s/dataset/%s" % (format, dataset)
+    return "/api/dataset_info?id=%s&format=%s" % (dataset, format)
 
 def url_for_licence(licence, format="html"):
-    return "/%s/licence/%s" % (format, licence)
+    return "/api/licence?id=%s&format=%s" % (licence, format)
 
 def url_for_tag(tag, format="html"):
     """Returns the URL where the list of datasets with a given tag are
@@ -67,5 +67,5 @@ def url_for_tag(tag, format="html"):
     attribute). `format` is the desired format of the result."""
     if hasattr(tag, "tag"):
         tag = tag.tag
-    return "/%s/tagged/%s" % (format, tag)
+    return "/api/dataset_info?tag=%s&format=%s" % (tag, format)
 

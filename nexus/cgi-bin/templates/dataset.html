@@ -1,21 +1,13 @@
 $def with (ds, tags, formats, papers)
 
-$code:
-    def tag_link(tag, caption=None):
-        if caption is None:
-            caption = tag.tag
-        caption = websafe(caption)
-        tag = websafe(tag.tag)
-        return '<a href="/html/tagged/%s">%s</a>' % (tag, caption)
-
 $if openid.status():
   <div class="feed">
-    <form method="get" action="/edit/$ds.id">
+    <form method="get" action="/web/edit/$ds.id">
       <button type="submit" style="margin-left:20px;">
         <h2>Edit</h2>
       </button>
     </form>
-    <form methof="get" action="/check/$ds.id">
+    <form methof="get" action="/web/check/$ds.id">
       <button type="submit" style="margin-left:20px;">
 	<h2>Check</h2>
       </button>
@@ -34,9 +26,9 @@ $if openid.status():
 <h3>Download</h3>
 <p>
 $for k,f in dataformats.items():
-  <a href="/${k}/getdata/$ds.id/1">${k} format</a> &ndash; 
+  <a href="/api/dataset?id=${ds.id}&format=$k">${k} format</a> &ndash; 
   $formats[k].shortdesc,
-  <a href="/html/format/$k">more...</a>
+  <a href="/api/format?id=$k&format=html">more...</a>
 </p>
 
 <h3>Description</h3>

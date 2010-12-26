@@ -28,32 +28,32 @@ web.config.smtp_username = 'csardi@mail.igraph.org'
 web.config.smtp_password = file("../config/emailpass").read().strip()
 web.config.smtp_starttls = True
 
-# URL mappings used in the Nexus web application
 urls = (
     '/?',                                  'About',
-    '/openid',                             'OpenID',
-    '/loginfailed',                        'LoginFailed',
-    '/logout',                             'Logout',
-    '/admin',                              'Admin',
-#    '/advanced',                           'AdvancedSearch',
-    '/donate',                             'Donate',
-#    '/blog',                               'Blog',
-    '/about',                              'About',
-    '/feedback',                           'Feedback',
-    '/check/(\d+)',                        'Check',
-    '/addlicence',                         'AddLicence',
-    '/editlicence/(\d+)',                  'EditLicence',
-    '/add',                                'Add',
-    '/edit/(\d+)',                         'Edit',
-    '/(\w+)/?',                            'Index',
-    '/(\w+)/dataset/?',                      'Index',
-    '/(\w+)/dataset/(\d+)',                'Dataset',
-    '/([\w-]+)/getdata/(\d+)(?:/(\d+))?',  'GetData',
-    '/(\w+)/tagged/(\w+)',                 'Tagged',
-    '/(\w+)/format/?',                     'Format',
-    '/(\w+)/format/([\w-]+)',              'Format',
-    '/(\w+)/licence/(\d+)',                'Licence',
-    '.*',                                  'NotFound'
+    '/api/dataset_info',                   'Index',
+    '/api/dataset',                        'Dataset',
+    '/api/format',                         'Format',
+    '/api/licence',                        'Licence',
+    '/web/about',                          'About',
+    '/web/addlicence',                     'AddLicence',
+    '/web/add',                            'Add',
+    '/web/admin',                          'Admin',
+    '/web/check/(\d+)',                    'Check',
+    '/web/donate',                         'Donate',
+    '/web/editlicence/(\d+)',              'EditLicence',
+    '/web/edit/(\d+)',                     'Edit',
+    '/web/feedback',                       'Feedback',
+    '/web/loginfailed',                    'LoginFailed',
+    '/web/logout',                         'Logout',
+    '/web/openid',                         'OpenID',
+    # '/(\w+)/dataset/?',                    'Index',
+    # '/(\w+)/dataset/(\d+)',                'Dataset',
+    # '/([\w-]+)/getdata/(\d+)(?:/(\d+))?',  'GetData',
+    # '/(\w+)/tagged/(\w+)',                 'Tagged',
+    # '/(\w+)/format/?',                     'Format',
+    # '/(\w+)/format/([\w-]+)',              'Format',
+    # '/(\w+)/licence/(\d+)',                'Licence',
+    '.*',                                  'NotFound'    
     )
 
 # reCAPTCHA keys
@@ -138,26 +138,6 @@ for name in url_helper.__all__:
 render = web.template.render('templates', base='base', globals=tempglob)
 render_plain = web.template.render('templates', globals=tempglob)
 
-def knownformat(fn):
-    """Decorator that checks whether the format argument of a function is
-    one of the known page formats."""
-    @wraps(fn)
-    def new(*args, **kwds):
-        if args[1] not in formats:
-            return web.badrequest()
-        return fn(*args)
-    return new
-
-def knowndataformat(fn):
-    """Decorator that checks whether the format argument of a function is
-    one of the known data formats."""
-    @wraps(fn)
-    def new(*args, **kwds):
-        if args[1] not in dataformats:
-            return web.badrequest()
-        return fn(*args, **kwds)
-    return new
-
 class NotFound:
     """Handler class for URLs that do not encode a known resource."""
 
@@ -165,20 +145,6 @@ class NotFound:
         """Responds with a HTTP error 404 for GET requests."""
         return web.notfound()
 
-class Home:
-    """Handler class for the home URL."""
-
-    def GET(self):
-        """Renders the homepage."""
-        return render.home()
-
-class AdvancedSearch:
-    """Handler class for the advanced search page."""
-
-    def GET(self):
-        """Yet to be implemented."""
-        return render.home()
-    
 class Donate:
     """Handler class for the "Donate data" page."""
 
@@ -245,11 +211,6 @@ class Donate:
         except:
             return render.donate(form, True, True, False)
 
-class Blog:
-    
-    def GET(self):
-        return render.blog()
-
 class About:
     """Renders the contents of the About page."""
 
@@ -299,8 +260,8 @@ class Feedback:
 class Index:
     """Renders the index page."""
 
-    @knownformat
-    def GET(self, format='html'):
+    def list_datasets(self, user_input):
+        format=user_input.format
         datasets=list(model.get_list_of_datasets())
         ids=[d.id for d in datasets]
         tags={}
@@ -308,7 +269,7 @@ class Index:
             tags[i] = list(model.get_tags(i))
 
         if format=='html':
-            feed='/atom'
+            feed='/api/dataset_info?format=atom'
             return render.index(datasets, tags, "All Nexus data sets", feed)
         elif format=='xml':
             web.header('Content-Type', 'text/xml')
@@ -332,10 +293,6 @@ class Index:
             return render_plain.atom_index(datasets, tags, 
                                            "All Nexus data sets", 
                                            date, web.ctx.homedomain, '')
-            
-
-class Dataset:
-    """Renders the page of a dataset."""
 
     def format_text(self, dataset, tags, papers):
         tags=";".join([x.tag for x in tags])
@@ -355,8 +312,9 @@ class Dataset:
                tags, dataset.date, dataset.licence, 
                dataset.description.replace("\n", "\n  ").strip(), papers))
 
-    @knownformat
-    def GET(self, format, id):
+    def dataset(self, user_input):
+        id=user_input.id
+        format=user_input.format
         dataset=[d for d in model.get_dataset(id)][0]
         if not dataset:
             return web.notfound()
@@ -374,9 +332,9 @@ class Dataset:
             web.header('Content-Type', 'text/plain')
             return render_plain.text_dataset(formatted)
 
-class Tagged:
-    @knownformat
-    def GET(self, format, tagname=None):
+    def list_tagged(self, user_input):
+        tagname=user_input.tag
+        format=user_input.format
         datasets=list(model.get_list_tagged_as(tagname))
         ids=[d.id for d in datasets]
         tags={}
@@ -384,7 +342,7 @@ class Tagged:
             tags[i] = list(model.get_tags(i))
 
         if format=='html':
-            feed='/atom/tagged/%s' % tagname
+            feed='/api/dataset_info?format=atom&tag=%s' % tagname
             return render.index(datasets, tags, 
                                 "Data sets tagged '%s'" % tagname, feed)
         elif format=='xml':
@@ -414,23 +372,34 @@ class Tagged:
                                            "Nexus data sets tagged %s" 
                                            % tagname, date,
                                            web.ctx.homedomain, 'tagged/%s' 
-                                           % tagname)
-            
-            
-        
-class GetData:
+                                           % tagname)        
+
+    def GET(self):
+        user_input=web.input(format="html", id=None, tag=None)
+        if user_input.tag is not None and user_input.id is not None:
+            return web.notfound()
+        if user_input.id is not None:
+            return self.dataset(user_input)            
+        elif user_input.tag is not None:
+            return self.list_tagged(user_input)
+        else:
+            return self.list_datasets(user_input)
+
+class Dataset:
     
-    @knowndataformat
-    def GET(self, format, id, nid):
-        if nid is None:
-            nid=1
-        datafile=model.get_dataset_file(id, nid)
+    def GET(self):
+        user_input=web.input(id=None, networkid=1)
+        format=user_input.format
+        if user_input.id is None:
+            return web.notfound()
+        
+        datafile=model.get_dataset_file(user_input.id, user_input.networkid)
         if not datafile:
             return web.notfound()
         else:
             basename=[ d.filename for d in datafile][0]
             ext=dataformats[format]
-        filename=os.path.join('..', 'data', id, basename + ext)
+        filename=os.path.join('..', 'data', user_input.id, basename + ext)
         try:
             f=open(filename)
             data=f.read()
@@ -451,13 +420,14 @@ URL: %s""" % (format.name, format.shortdesc,
               format.description.replace("\n", "\n  .\n").strip(),
               format.link)
 
-
-
     def format_text(self, formats):
         return "\n\n".join([ self.format_one(f) for f in formats ])
 
-    @knownformat
-    def GET(self, format, dataformat=None):
+    def GET(self):
+        user_input=web.input(format="html", dataformat=None)
+        format=user_input.format
+        dataformat=user_input.dataformat
+
         if dataformat:
             data=[d for d in model.get_format(dataformat)]
             if not data:
@@ -630,14 +600,14 @@ class AddLicence:
     def GET(self):
         if web.webopenid.status() not in admins_openid:
             return web.seeother("/login")
-        form=self.add_licence_form()
-        return render.addlicence(form, False)
+        form=add_licence_form()
+        return render.addlicence(form, False, False, False)
 
     def POST(self):
         if web.webopenid.status() not in admins_openid:
             return web.seeother("/login")
 
-        form=self.add_licence_form()
+        form=add_licence_form()
         if not form.validates():
             # TODO
             None
@@ -773,10 +743,18 @@ class Check:
         return render.check(id, ds, checkres)      
 
 class Licence:
+
+    def list_licences(self, user_input):
+        pass
     
-    @knownformat
-    def GET(self, format, id):
-        lic=model.get_licence(id)
+    def GET(self):
+        user_input=web.input(id=None, format="html")
+        format=user_input.format
+
+        if user_input.id is None:
+            return self.list_licences(user_input)
+
+        lic=model.get_licence(user_input.id)
         
         if format=='html':
             return render.licence(lic)

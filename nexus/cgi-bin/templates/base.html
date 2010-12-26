@@ -28,17 +28,19 @@ $def with (page)
 	  </div>
 	  <div class="menu"><ul>
 	      <!-- <li class="page_item"> -->
-	      <!-- 	<a href="/" title="Search">Search</a> -->
+	      <!-- 	<a href="/web/search" title="Search">Search</a> -->
 	      <!-- </li> -->
 	      <li class="page_item">
-		<a href="/html" title="Browse data sets">Browse</a>
+		<a href="/api/dataset_info" title="Browse data sets">
+		  Browse
+		</a>
 	      </li>
 	      <!-- <li class="page_item"> -->
 	      <!-- 	<a href="/advanced" title="Advanced search"> -->
 	      <!-- 	Advanced search</a> -->
 	      <!-- </li> -->
 	      <li class="page_item">
-		<a href="/donate" title="Help Nexus">Donate data</a>
+		<a href="/web/donate" title="Help Nexus">Donate data</a>
 	      </li>
 	      <!-- <li class="page_item"> -->
 	      <!-- 	<a href="/blog" title="What are we working on?">Blog</a> -->
@@ -47,11 +49,11 @@ $def with (page)
 	      <!-- 	<a href="/about" title="What is Nexus?">About</a> -->
 	      <!-- </li> -->
 	      <li class="page_item">
-		<a href="/feedback" title="Write to us">Feedback</a>
+		<a href="/web/feedback" title="Write to us">Feedback</a>
 	      </li>
 	      $if openid.status():
 	        <li class="page_item">
-		  <a href="/admin" title="Make changes">Admin</a>
+		  <a href="/web/admin" title="Make changes">Admin</a>
 		</li>
 	  </ul></div>	 
 	</div><!-- #access -->
@@ -68,7 +70,7 @@ $def with (page)
 	</div><!-- content -->
       <div id="secondary" class="widget-area" role="complementary">
 	<div class="feed">
-	  <a href="/atom">
+	  <a href="/api/dataset_info?format=atom">
 	    <img src="/static/images/feed-icon-14x14.png" />
 	  </a>
 	</div>
