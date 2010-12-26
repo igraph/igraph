@@ -144,3 +144,7 @@ def update_licence(id, **args):
     db.update('licence', where='id=%s' % id, **args)
     return True
 
+def get_metadata(id):
+    res=db.select('metadata', where='dataset=%s' % int(id), 
+                  order="type")
+    return list(res)

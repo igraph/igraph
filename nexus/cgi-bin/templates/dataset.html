@@ -1,4 +1,4 @@
-$def with (ds, tags, formats, papers)
+$def with (ds, tags, meta, formats, papers)
 
 $if openid.status():
   <div class="feed">
@@ -34,10 +34,16 @@ $for k,f in dataformats.items():
 <h3>Description</h3>
 <p>$ds.description</p>
 
+<h3>Metadata</h3>
+<dl class="metadata">
+$for m in meta:
+  <dt>$m.type.capitalize() attribute '$m.name'</dt>
+  <dd>$m.description</dd>
+</dl>
+
 <h3>Publication(s)</h3>
 $for p in papers:
   <p>$p.citation</p>
-
 
 <h3>Licence</h3>
 <p>$ds.licence_name</p>

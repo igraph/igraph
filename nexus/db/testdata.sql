@@ -1,9 +1,10 @@
 -- Test data
 
-INSERT INTO licence (id, name, text) VALUES(1, 'CC-ASA 2.0 UK', 
-       'Creative Commons Attribution-ShareAlike 2.0 UK: England & Wales');
-INSERT INTO licence (id, name, text) VALUES(2, 'Public Domain',
-       'In the Public Domain');
+INSERT INTO licence (id, name, text, link) VALUES(1, 'CC-ASA 2.0 UK', 
+       'Creative Commons Attribution-ShareAlike 2.0 UK: England & Wales',
+       'http://creativecommons.org/licenses/by-sa/2.0/uk/');
+INSERT INTO licence (id, name, text, link) VALUES(2, 'Public Domain',
+       'In the Public Domain', 'http://en.wikipedia.org/wiki/Public_domain');
 
 INSERT INTO dataset (id, name, description, licence, source) 
        VALUES(1, 'Zachary''s karate club',
@@ -35,6 +36,18 @@ INSERT INTO dataset_tag VALUES(1, 1);
 INSERT INTO dataset_tag VALUES(1, 3);
 INSERT INTO dataset_tag VALUES(2, 1);
 INSERT INTO dataset_tag VALUES(2, 4);
+
+INSERT INTO metadata values (1, 1, 'vertex', 'string', 'name', 
+       'Names of the actors. These are pseudonyms and only serve to identify the two distinguished actors of the network: Mr Hi and John A.');
+INSERT INTO metadata values (1, 1, 'vertex', 'numeric', 'Faction',
+       'Either 1 or 2, giving the faction of the actor after the split of the club.');
+INSERT INTO metadata values (1, 1, 'edge', 'numeric', 'weight', 
+       'Edge weights, the number of common activities the two club members took part of.');
+
+INSERT INTO metadata values (2, 1, 'vertex', 'numeric', 'Group',
+       'The numeric ID of the school affiliation');
+INSERT INTO metadata values (2, 1, 'edge', 'numeric', 'weight',
+       'Edge weights, based on the questionnaire');
 
 INSERT INTO format VALUES('R-igraph', 
        'Rdata file for use with the igraph R package',

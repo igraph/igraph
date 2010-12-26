@@ -46,13 +46,6 @@ urls = (
     '/web/loginfailed',                    'LoginFailed',
     '/web/logout',                         'Logout',
     '/web/openid',                         'OpenID',
-    # '/(\w+)/dataset/?',                    'Index',
-    # '/(\w+)/dataset/(\d+)',                'Dataset',
-    # '/([\w-]+)/getdata/(\d+)(?:/(\d+))?',  'GetData',
-    # '/(\w+)/tagged/(\w+)',                 'Tagged',
-    # '/(\w+)/format/?',                     'Format',
-    # '/(\w+)/format/([\w-]+)',              'Format',
-    # '/(\w+)/licence/(\d+)',                'Licence',
     '.*',                                  'NotFound'    
     )
 
@@ -317,13 +310,14 @@ class Index:
         format=user_input.format
         dataset=[d for d in model.get_dataset(id)][0]
         if not dataset:
-            return web.notfound()
+            return web.notfound()        
         tags=list(model.get_tags(dataset.id))
+        meta=list(model.get_metadata(dataset.id))
         formats=dict((f.name, f) for f in model.get_formats())
         papers=model.get_papers(id)
 
         if format=='html':
-            return render.dataset(dataset, tags, formats, papers)
+            return render.dataset(dataset, tags, meta, formats, papers)
         elif format=='xml':
             web.header('Content-Type', 'text/xml')
             return render_plain.xml_dataset(dataset, tags, papers)

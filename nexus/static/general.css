@@ -259,9 +259,11 @@ dl {
 	margin: 0 0 24px 0;
 }
 dt {
+        font-size: 0.9em;
 	font-weight: bold;
 }
 dd {
+        font-size: 0.9em;
 	margin-bottom: 18px;
 }
 strong {

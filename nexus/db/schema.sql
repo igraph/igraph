@@ -70,6 +70,7 @@ CREATE TABLE metadata (
        dataset INTEGER,
        network INTEGER,
        type VARCHAR(10),
+       datatype VARCHAR(10),
        name VARCHAR(30),
        description TEXT,
        PRIMARY KEY(dataset, network, type, name),
