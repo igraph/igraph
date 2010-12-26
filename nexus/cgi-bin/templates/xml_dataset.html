@@ -1,4 +1,4 @@
-$def with (ds, tags, papers)
+$def with (ds, tags, meta, papers)
 <?xml version="1.0"?>
 <dataset>
   <id>$ds.id</id>
@@ -10,6 +10,17 @@ $def with (ds, tags, papers)
     $for t in tags:
       <tag>$t.tag</tag>
   </tags>
+  <attributes>
+    $for m in meta:
+      <attribute>
+	<name>$m.name</name>
+	<type>$m.type</type>
+	<datatype>$m.datatype</datatype>
+	<description>
+	  $m.description
+	</description>
+      </attribute>
+  </attributes>
   <date>$ds.date</date>
   <licence>$ds.licence</licence>
   <papers>
@@ -17,5 +28,3 @@ $def with (ds, tags, papers)
       <paper>$p.citation</paper>
   </papers>
 </dataset>
-
-  

@@ -287,11 +287,16 @@ class Index:
                                            "All Nexus data sets", 
                                            date, web.ctx.homedomain, '')
 
-    def format_text(self, dataset, tags, papers):
+    def format_text(self, dataset, tags, meta, papers):
+
+        def format_attr(attr):
+            return "Attribute: %s %s %s\n  %s" % \
+                (attr.type, attr.datatype, attr.name, attr.description)
+
         tags=";".join([x.tag for x in tags])
         papers=[p.citation.replace("\n", "\n  ").strip() for p in papers]
         papers="\n  .\n".join(papers)
-        return dedent("""\
+        main=dedent("""\
                 Id: %i
                 Name: %s
                 Vertices: %s
@@ -304,6 +309,8 @@ class Index:
         """ % (dataset.id, dataset.name, dataset.vertices, dataset.edges,
                tags, dataset.date, dataset.licence, 
                dataset.description.replace("\n", "\n  ").strip(), papers))
+        meta="\n".join(format_attr(m) for m in meta)
+        return main + meta
 
     def dataset(self, user_input):
         id=user_input.id
@@ -320,9 +327,9 @@ class Index:
             return render.dataset(dataset, tags, meta, formats, papers)
         elif format=='xml':
             web.header('Content-Type', 'text/xml')
-            return render_plain.xml_dataset(dataset, tags, papers)
+            return render_plain.xml_dataset(dataset, tags, meta, papers)
         elif format=='text':
-            formatted=self.format_text(dataset, tags, papers)
+            formatted=self.format_text(dataset, tags, meta, papers)
             web.header('Content-Type', 'text/plain')
             return render_plain.text_dataset(formatted)
 
