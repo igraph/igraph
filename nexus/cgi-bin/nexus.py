@@ -13,6 +13,7 @@ import os
 import url_helper
 import odict
 import subprocess
+import markdown
 
 from datetime import datetime
 from functools import wraps
@@ -115,6 +116,12 @@ def get_datatags():
     tags.sort(key = attrgetter("tag"))
     return render_plain.datatags(tags)
 
+def mymarkdown(text, limit=4):
+    if text.count("\n") <= limit:
+        return markdown.markdown(text)
+    else:
+        res="\n".join(text.split("\n")[0:limit])
+        return markdown.markdown(res) + '&hellip;'
 
 tempglob = { 'whatsnew': 'Nothing',
              'datatags': 'None',
@@ -124,7 +131,9 @@ tempglob = { 'whatsnew': 'Nothing',
              'currenturl': get_current_url,
              'currentnotlogouturl': get_current_not_logout_url,
              'get_whatsnew': get_whatsnew,
-             'get_datatags': get_datatags}
+             'get_datatags': get_datatags,
+             'mymarkdown': mymarkdown,
+             'markdown': markdown.markdown}
 for name in url_helper.__all__:
     tempglob[name] = getattr(url_helper, name)
 
@@ -551,7 +560,7 @@ class Edit:
         tags -= set(("weighted", "bipartite", "directed", "undirected", 
                      "dynamic"))
         form.tags.value=", ".join(sorted(tags))
-        return render.add(form, False, True, id)
+        return render.add(form, False, True, int(id))
 
     def POST(self, id):
         if web.webopenid.status() not in admins_openid:
@@ -585,7 +594,7 @@ class Edit:
                              source=form.d.source,
                              papers=papers)
     
-        return render.add(form, True, True, id)
+        return render.add(form, True, True, int(id))
     
 add_licence_form=web.form.Form(
     web.form.Textbox("name", description="Name:", id="focused", size=50),
@@ -616,7 +625,7 @@ class AddLicence:
         lid=model.new_licence(name=form.d.name, text=form.d.text, 
                               fulltext=form.d.fulltext, link=form.d.link)
 
-        return render.addlicence(form, True)
+        return render.addlicence(form, True, False, lid)
 
 class EditLicence:
     def GET(self, id):
@@ -789,10 +798,15 @@ class Licence:
             return render_plain.text_licence(lic)
         
 app = web.application(urls, globals())
+
 web.webopenid.sessions = \
     web.session.Session(app, web.session.DiskStore('../sessions'),
                         initializer={})
 web.webopenid.store=openid.store.filestore.FileOpenIDStore('../sessions')
 
 if __name__ == '__main__':
-    app.run()
+    try:
+        app.run()
+    except Exception, x:
+        web.header('Content-Type', 'text/plain')
+        print str(x)

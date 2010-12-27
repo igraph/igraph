@@ -77,7 +77,7 @@ $def with (page)
 	<div class="title">
 	  <h2> What's new? </h2>
 	</div>
-	<div>
+	<div class="whatsnew">
 	  $:get_whatsnew()
 	</div>
       </div><!-- #secondary .widget-area -->
@@ -102,7 +102,7 @@ $def with (page)
 	      <button type="submit">Log out</button>
 	    </form>
 	  $else:
-	    <form method="post" action="/openid">
+	    <form method="post" action="/web/openid">
               <input type="text" name="openid" value="" class="openid" />
               <input type="hidden" name="return_to" value="/" />
               <button type="submit">Log in</button>

@@ -21,6 +21,8 @@ $for ds in datasets:
       Tags:
       $:", ".join(link_to_tag(tag) for tag in tags[ds.id])
     </p>
-    <p class="datasetdescription">$ds.description</p>
+    <div class="datasetdescription">
+      $:mymarkdown(ds.description)
+    </div>
   </li>
 </ul>

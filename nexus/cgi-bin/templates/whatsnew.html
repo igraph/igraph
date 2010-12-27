@@ -3,6 +3,6 @@ $def with (what)
 <ul class="whatsnew">
 $for t in what:
   <li><h4>$:link_to_dataset(t)</h4>
-    <p>$t.date</p>
-    <p>$t.description</p></li>
+    <p class="wndate">$t.date</p>
+    $:mymarkdown(t.description, 2)</li>
 </ul>

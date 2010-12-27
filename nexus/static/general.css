@@ -27,7 +27,6 @@ table, caption, tbody, tfoot, thead, tr, th, td {
 	vertical-align: baseline;
 }
 body {
-	line-height: 1;
 }
 h1, h2, h3, h4, h5, h6 {
 	clear: both;
@@ -230,7 +229,7 @@ hr {
 
 /* Text elements */
 p {
-	margin-bottom: 18px;
+    margin: 0px;
 }
 ul {
 	list-style: square;
@@ -483,7 +482,7 @@ div.menu li {
 #content dd,
 #content pre,
 #content hr {
-	margin-bottom: 24px;
+	margin-bottom: 10px;
 }
 #content ul ul,
 #content ol ol,
@@ -510,7 +509,7 @@ div.menu li {
 #content h3 {
 	color: #000;
 	line-height: 1.5em;
-	margin: 0 0 10px 0;
+	margin: 0 0 10px -10px;
 }
 #content h4,
 #content h5,
@@ -1347,13 +1346,17 @@ p.searchexamples {
     font-size: 0.8em;
 }
 
+div.whatsnew {
+    margin-top: 30px;
+    margin-bottom: 0px;
+}
 ul.whatsnew {
-    margin-top:5px;
     list-style: square;
+    margin-bottom: 0px;
 }
 
 ul.whatsnew li {
-    margin-bottom: 10px;
+    margin-top: 10px;
 }
 
 ul.whatsnew p {
@@ -1387,11 +1390,16 @@ ul.datasets li {
 #content ul.datasets p {
     margin-bottom: 0px;
     padding: 0px;
-    line-height: 1em;
 }
-p.datasetdescription {
-    margin-left: 20px;
+div.datasetdescription {
+    margin-left: 0px;
     margin-top: 5px;
+}
+div.datasetdescription p {
+}
+div.datasetdescription ol {
+    margin-top: 0px;
+    margin-left: 30px;
 }
 p.datasettags {
     font-size: 0.9em;
@@ -1472,4 +1480,10 @@ span.checkvalue {
 }
 span.failure {
     color: red;
+}
+span.edit a {
+    font-size: 0.6em;
+}
+p.wndate {
+    font-style: italic;
 }
