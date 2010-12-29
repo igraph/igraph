@@ -143,6 +143,33 @@ class Graph(GraphBase):
                 key = str(key)
             self.es[key] = value
 
+    def add_vertices(self, n):
+        """add_vertices(n)
+
+        Adds some vertices to the graph.
+
+        @param n: the number of vertices to be added, or the name of a single
+          vertex to be added, or an iterable of strings, each corresponding to the
+          name of a vertex to be added. Names will be assigned to the C{name}
+          vertex attribute.
+        """
+        if isinstance(n, basestring):
+            # Adding a single vertex with a name
+            m = self.vcount()
+            result = GraphBase.add_vertices(self, 1)
+            self.vs[m]["name"] = n
+            return result
+        elif hasattr(n, "__iter__"):
+            m = self.vcount()
+            if not hasattr(n, "__len__"):
+                names = list(n)
+            else:
+                names = n
+            result = GraphBase.add_vertices(self, len(names))
+            self.vs[m:]["name"] = names
+            return result
+        return GraphBase.add_vertices(self, n)
+
     def adjacent(self, *args, **kwds):
         """adjacent(vertex, type=OUT)
 
@@ -2011,17 +2038,21 @@ class Graph(GraphBase):
 
         @see: L{__add__}
         """
-        if isinstance(other, int):
-            return self.add_vertices(other)
+        if isinstance(other, (int, basestring)):
+            self.add_vertices(other)
+            return self
         elif isinstance(other, tuple) and len(other) == 2:
-            return self.add_edges([other])
+            self.add_edges([other])
+            return self
         elif isinstance(other, list):
-            if len(other)>0:
-                if isinstance(other[0], tuple):
-                    return self.add_edges(other)
-            else:
+            if not other:
                 return self
-
+            if isinstance(other[0], tuple):
+                self.add_edges(other)
+                return self
+            if isinstance(other[0], basestring):
+                self.add_vertices(other)
+                return self
         return NotImplemented
 
 
@@ -2030,12 +2061,14 @@ class Graph(GraphBase):
         the other object given.
 
         @param other: if it is an integer, the copy is extended by the given
-          number of vertices. If it is a tuple with two elements, the copy
+          number of vertices. If it is a string, the copy is extended by a
+          single vertex whose C{name} attribute will be equal to the given
+          string. If it is a tuple with two elements, the copy
           is extended by a single edge. If it is a list of tuples, the copy
           is extended by multiple edges. If it is a L{Graph}, a disjoint
           union is performed.
         """
-        if isinstance(other, int):
+        if isinstance(other, (int, basestring)):
             g = self.copy()
             g.add_vertices(other)
         elif isinstance(other, tuple) and len(other) == 2:
@@ -2046,6 +2079,9 @@ class Graph(GraphBase):
                 if isinstance(other[0], tuple):
                     g = self.copy()
                     g.add_edges(other)
+                elif isinstance(other[0], basestring):
+                    g = self.copy()
+                    g.add_vertices(other)
                 elif isinstance(other[0], Graph):
                     return self.disjoint_union(other)
                 else:
@@ -2066,26 +2102,26 @@ class Graph(GraphBase):
 
         @see: L{__sub__}"""
         if isinstance(other, int):
-            return self.delete_vertices(other)
+            self.delete_vertices(other)
         elif isinstance(other, tuple) and len(other) == 2:
-            return self.delete_edges([other])
+            self.delete_edges([other])
         elif isinstance(other, list):
             if len(other)>0:
                 if isinstance(other[0], tuple):
-                    return self.delete_edges(other)
+                    self.delete_edges(other)
                 elif isinstance(other[0], int):
-                    return self.delete_vertices(other)
-            else:
-                return self
+                    self.delete_vertices(other)
         elif isinstance(other, _igraph.Vertex):
-            return self.delete_vertices(other)
+            self.delete_vertices(other)
         elif isinstance(other, _igraph.VertexSeq):
-            return self.delete_vertices(other)
+            self.delete_vertices(other)
         elif isinstance(other, _igraph.Edge):
-            return self.delete_edges(other)
+            self.delete_edges(other)
         elif isinstance(other, _igraph.EdgeSeq):
-            return self.delete_edges(other)
-        return NotImplemented
+            self.delete_edges(other)
+        else:
+            return NotImplemented
+        return self
 
 
     def __sub__(self, other):
@@ -2099,29 +2135,33 @@ class Graph(GraphBase):
           mixed! Also accepts L{Edge} and L{EdgeSeq} objects.
         """
         if isinstance(other, int):
-            return self.copy().delete_vertices(other)
+            result = self.copy()
+            result.delete_vertices(other)
         elif isinstance(other, tuple) and len(other) == 2:
-            return self.copy().delete_edges(other)
+            result = self.copy()
+            result.delete_edges(other)
         elif isinstance(other, list):
+            result = self.copy()
             if len(other)>0:
                 if isinstance(other[0], tuple):
-                    return self.copy().delete_edges(other)
+                    result.delete_edges(other)
                 elif isinstance(other[0], int):
-                    return self.copy().delete_vertices(other)
+                    result.delete_vertices(other)
             else:
                 return self.copy()
         elif isinstance(other, _igraph.Vertex):
-            return self.copy().delete_vertices(other)
+            result.delete_vertices(other)
         elif isinstance(other, _igraph.VertexSeq):
-            return self.copy().delete_vertices(other)
+            result.delete_vertices(other)
         elif isinstance(other, _igraph.Edge):
-            return self.copy().delete_edges(other)
+            result.delete_edges(other)
         elif isinstance(other, _igraph.EdgeSeq):
-            return self.copy().delete_edges(other)
+            result.delete_edges(other)
         elif isinstance(other, Graph):
             return self.difference(other)
-
-        return NotImplemented
+        else:
+            return NotImplemented
+        return result
 
     def __mul__(self, other):
         """Copies exact replicas of the original graph an arbitrary number of
@@ -2152,9 +2192,9 @@ class Graph(GraphBase):
         """Coercion rules.
 
         This method is needed to allow the graph to react to additions
-        with lists, tuples, integers, vertices, edges and so on.
+        with lists, tuples, integers, strings, vertices, edges and so on.
         """
-        if type(other) in [int, tuple, list]:
+        if isinstance(other, (int, tuple, list, basestring)):
             return self, other
         if isinstance(other, _igraph.Vertex):
             return self, other

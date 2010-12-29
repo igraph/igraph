@@ -402,26 +402,18 @@ PyObject *igraphmodule_Graph_is_simple(igraphmodule_GraphObject *self) {
  * \sa igraph_add_vertices
  */
 PyObject *igraphmodule_Graph_add_vertices(igraphmodule_GraphObject * self,
-                                          PyObject * args, PyObject * kwds)
-{
+                                          PyObject * args, PyObject * kwds) {
   long n;
 
   if (!PyArg_ParseTuple(args, "l", &n))
     return NULL;
-  if (n < 0) {
-    // Throw an exception
-    PyErr_SetString(PyExc_AssertionError,
-                    "Number of vertices to be added can't be negative.");
-    return NULL;
-  }
+
   if (igraph_add_vertices(&self->g, (igraph_integer_t) n, 0)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
-  Py_INCREF(self);
-
-  return (PyObject *) self;
+  Py_RETURN_NONE;
 }
 
 /** \ingroup python_interface_graph
@@ -447,10 +439,7 @@ PyObject *igraphmodule_Graph_delete_vertices(igraphmodule_GraphObject * self,
   }
 
   igraph_vs_destroy(&vs);
-
-  Py_INCREF(self);
-
-  return (PyObject *) self;
+  Py_RETURN_NONE;
 }
 
 /** \ingroup python_interface_graph
@@ -469,30 +458,19 @@ PyObject *igraphmodule_Graph_add_edges(igraphmodule_GraphObject * self,
 
   if (!PyArg_ParseTuple(args, "O", &list))
     return NULL;
-  Py_INCREF(list);
 
-  if (igraphmodule_PyObject_to_vector_t(list, &v, 1, 1)) {
-    // something bad happened during conversion, release the
-    // list reference and return immediately
-    Py_DECREF(list);
+  if (igraphmodule_PyObject_to_vector_t(list, &v, 1, 1))
     return NULL;
-  }
 
-  // do the hard work :)
+  /* do the hard work :) */
   if (igraph_add_edges(&self->g, &v, 0)) {
     igraphmodule_handle_igraph_error();
-    Py_DECREF(list);
     igraph_vector_destroy(&v);
     return NULL;
   }
 
-  Py_DECREF(list);
-
-  Py_INCREF(self);
-
   igraph_vector_destroy(&v);
-
-  return (PyObject *) self;
+  Py_RETURN_NONE;
 }
 
 /** \ingroup python_interface_graph
@@ -524,10 +502,8 @@ PyObject *igraphmodule_Graph_delete_edges(igraphmodule_GraphObject * self,
     return NULL;
   }
 
-  Py_INCREF(self);
   igraph_es_destroy(&es);
-
-  return (PyObject *) self;
+  Py_RETURN_NONE;
 }
 
 /**********************************************************************
@@ -9515,23 +9491,22 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@return: C{True} if it is simple, C{False} otherwise.\n"
    "@rtype: boolean"},
 
-  // interface to igraph_add_vertices
+  /* interface to igraph_add_vertices */
   {"add_vertices", (PyCFunction) igraphmodule_Graph_add_vertices,
    METH_VARARGS,
    "add_vertices(n)\n\n"
    "Adds vertices to the graph.\n\n"
-   "@param n: the number of vertices to be added\n"
-   "@return: the same graph object\n"},
+   "@param n: the number of vertices to be added\n"},
 
-  // interface to igraph_delete_vertices
+  /* interface to igraph_delete_vertices */
   {"delete_vertices", (PyCFunction) igraphmodule_Graph_delete_vertices,
    METH_VARARGS,
    "delete_vertices(vs)\n\n"
    "Deletes vertices and all its edges from the graph.\n\n"
    "@param vs: a single vertex ID or the list of vertex IDs\n"
-   "  to be deleted.\n" "@return: the same graph object\n"},
+   "  to be deleted.\n"},
 
-  // interface to igraph_add_edges
+  /* interface to igraph_add_edges */
   {"add_edges", (PyCFunction) igraphmodule_Graph_add_edges,
    METH_VARARGS,
    "add_edges(es)\n\n"
@@ -9540,9 +9515,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  represented with a tuple, containing the vertex IDs of the\n"
    "  two endpoints. Vertices are enumerated from zero. It is\n"
    "  allowed to provide a single pair instead of a list consisting\n"
-   "  of only one pair.\n" "@return: the same graph object\n"},
+   "  of only one pair.\n"},
 
-  // interface to igraph_delete_edges
+  /* interface to igraph_delete_edges */
   {"delete_edges", (PyCFunction) igraphmodule_Graph_delete_edges,
    METH_VARARGS | METH_KEYWORDS,
    "delete_edges(es)\n\n"
@@ -9550,8 +9525,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "All vertices will be kept, even if they lose all their edges.\n"
    "Nonexistent edges will be silently ignored.\n\n"
    "@param es: the list of edges to be removed. Edges are identifed by\n"
-   "  edge IDs. L{EdgeSeq} objects are also accepted here.\n"
-   "@return: the same graph object\n"},
+   "  edge IDs. L{EdgeSeq} objects are also accepted here.\n"},
 
   // interface to igraph_degree
   {"degree", (PyCFunction) igraphmodule_Graph_degree,

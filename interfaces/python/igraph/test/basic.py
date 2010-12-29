@@ -16,6 +16,17 @@ class BasicTests(unittest.TestCase):
         g=Graph([(0,1), (0,0), (1,2)])
         self.failUnless(g.vcount() == 3 and g.ecount() == 3 and g.is_directed() == False and g.is_simple() == False)
 
+    def testAddVertices(self):
+        g = Graph()
+        g.add_vertices(2)
+        self.failUnless(g.vcount() == 2 and g.ecount() == 0)
+        g.add_vertices("spam")
+        self.failUnless(g.vcount() == 3 and g.ecount() == 0)
+        self.assertEquals(g.vs[2]["name"], "spam")
+        g.add_vertices(["bacon", "eggs"])
+        self.failUnless(g.vcount() == 5 and g.ecount() == 0)
+        self.assertEquals(g.vs[2:]["name"], ["spam", "bacon", "eggs"])
+
     def testGraphGetEids(self):
         g = Graph.Famous("petersen")
         eids = g.get_eids(pairs=[(0,1), (0,5), (1, 6), (4, 9), (8, 6)])

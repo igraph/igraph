@@ -24,15 +24,25 @@ class OperatorTests(unittest.TestCase):
         self.failUnless(g.vcount() == 5 and g.ecount() == 3
                         and g.clusters().membership == [0,0,0,1,2])
 
+        # Adding a vertex by name
+        g += "spam"
+        self.failUnless(g.vcount() == 6 and g.ecount() == 3
+                        and g.clusters().membership == [0,0,0,1,2,3])
+
         # Adding a single edge
         g += (2, 3)
-        self.failUnless(g.vcount() == 5 and g.ecount() == 4
-                        and g.clusters().membership == [0,0,0,0,1])
+        self.failUnless(g.vcount() == 6 and g.ecount() == 4
+                        and g.clusters().membership == [0,0,0,0,1,2])
 
         # Adding two edges
-        g += [(3, 4), (2, 4)]
-        self.failUnless(g.vcount() == 5 and g.ecount() == 6
-                        and g.clusters().membership == [0]*5)
+        g += [(3, 4), (2, 4), (4, 5)]
+        self.failUnless(g.vcount() == 6 and g.ecount() == 7
+                        and g.clusters().membership == [0]*6)
+
+        # Adding two more vertices
+        g += ["eggs", "bacon"]
+        self.assertEquals(g.vs["name"], [None, None, None, None, None,
+            "spam", "eggs", "bacon"])
 
         # Did we really use the original graph so far?
         # TODO: disjoint union should be modified so that this assertion
@@ -41,13 +51,13 @@ class OperatorTests(unittest.TestCase):
 
         # Adding another graph
         g += Graph.Full(3)
-        self.failUnless(g.vcount() == 8 and g.ecount() == 9
-                        and g.clusters().membership == [0,0,0,0,0,1,1,1])
+        self.failUnless(g.vcount() == 11 and g.ecount() == 10
+                        and g.clusters().membership == [0,0,0,0,0,0,1,2,3,3,3])
 
         # Adding two graphs
         g += [Graph.Full(3), Graph.Full(2)]
-        self.failUnless(g.vcount() == 13 and g.ecount() == 13
-                        and g.clusters().membership == [0,0,0,0,0,1,1,1,2,2,2,3,3])
+        self.failUnless(g.vcount() == 16 and g.ecount() == 14
+                        and g.clusters().membership == [0,0,0,0,0,0,1,2,3,3,3,4,4,4,5,5])
 
     def testAddition(self):
         g0 = Graph.Full(3)
@@ -58,22 +68,28 @@ class OperatorTests(unittest.TestCase):
                         and g.clusters().membership == [0,0,0,1,2])
         g0 = g
 
+        # Adding vertices by name
+        g = g0+"spam"
+        self.failUnless(g.vcount() == 6 and g.ecount() == 3
+                        and g.clusters().membership == [0,0,0,1,2,3])
+        g0 = g
+
         # Adding a single edge
         g = g0+(2,3)
-        self.failUnless(g.vcount() == 5 and g.ecount() == 4
-                        and g.clusters().membership == [0,0,0,0,1])
+        self.failUnless(g.vcount() == 6 and g.ecount() == 4
+                        and g.clusters().membership == [0,0,0,0,1,2])
         g0 = g
 
         # Adding two edges
-        g = g0+[(3, 4), (2, 4)]
-        self.failUnless(g.vcount() == 5 and g.ecount() == 6
-                        and g.clusters().membership == [0]*5)
+        g = g0+[(3, 4), (2, 4), (4, 5)]
+        self.failUnless(g.vcount() == 6 and g.ecount() == 7
+                        and g.clusters().membership == [0]*6)
         g0 = g
 
         # Adding another graph
         g = g0+Graph.Full(3)
-        self.failUnless(g.vcount() == 8 and g.ecount() == 9
-                        and g.clusters().membership == [0,0,0,0,0,1,1,1])
+        self.failUnless(g.vcount() == 9 and g.ecount() == 10
+                        and g.clusters().membership == [0,0,0,0,0,0,1,1,1])
 
     def testInPlaceSubtraction(self):
         g = Graph.Full(8)
