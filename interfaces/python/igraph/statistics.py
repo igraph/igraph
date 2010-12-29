@@ -25,7 +25,7 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 """
 import math
 
-__all__ = ["Histogram", "RunningMean", "power_law_fit"]
+__all__ = ["Histogram", "RunningMean", "median", "power_law_fit"]
 
 class Histogram(object):
     """Generic histogram class for real numbers
@@ -351,6 +351,26 @@ class RunningMean(object):
 
     def __len__(self):
         return self._nitems
+
+
+def median(xs, sort=True):
+    """Returns the median of an unsorted or sorted numeric vector.
+
+    @param xs: the vector itself.
+    @param sort: whether to sort the vector. If you know that the vector is
+      sorted already, pass C{False} here.
+    @return: the median, which will always be a float, even if the vector
+      contained integers originally.
+    """
+    if sort:
+        xs = sorted(xs)
+
+    mid = int(len(xs) / 2)
+    if 2 * mid == len(xs):
+        return float(xs[mid-1] + xs[mid]) / 2
+    else:
+        return float(xs[mid])
+
 
 def power_law_fit(x, xmin=None, method="discrete_approx"):
     """Fitting a power-law distribution to empirical data

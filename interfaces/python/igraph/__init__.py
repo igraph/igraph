@@ -41,6 +41,7 @@ from igraph.drawing.colors import *
 from igraph.datatypes import *
 from igraph.formula import *
 from igraph.layout import *
+from igraph.summary import *
 from igraph.utils import *
 
 import os
@@ -2307,43 +2308,35 @@ class Graph(GraphBase):
         drawer = DefaultGraphDrawer(context, bbox)
         drawer.draw(self, palette, *args, **kwds)
 
-    def summary(self, verbosity=0):
-        """Returns basic statistics about the graph in a string
+    def __str__(self):
+        """Returns a string representation of the graph.
+
+        Behind the scenes, this method constructs a L{GraphSummary}
+        instance and invokes its C{__str__} method with maximum verbosity.
+        See the documentation of L{GraphSummary} for more details about the
+        output.
+        """
+        return self.summary(verbosity=1, width=78)
+
+    def summary(self, verbosity=0, width=None, *args, **kwds):
+        """Returns the summary of the graph.
         
-        @param verbosity: the amount of statistics to be returned. 0 returns
-          the usual statistics (node, edge count, directedness, number of
-          strong components, density, reciprocity, average path length,
-          diameter). 1 also returns the detailed degree distributions."""
-        output=[]
-        output.append("%d nodes, %d edges, %sdirected" % \
-            (self.vcount(), self.ecount(), ["un", ""][self.is_directed()]))
-        output.append("")
-        output.append("Number of components: %d" % len(self.clusters()))
-        output.append("Diameter: %d" % self.diameter(unconn=True))
-        output.append("Density: %.4f" % self.density())
-        # output.append("Transitivity: %.4f" % self.transitivity())
-        if self.is_directed():
-            output.append("Reciprocity: %.4f" % self.reciprocity())
-        output.append("Average path length: %.4f" % self.average_path_length())
+        The output of this method is similar to the output of the
+        C{__str__} method. If I{verbosity} is zero, only the header line
+        is returned (see C{__str__} for more details), otherwise the
+        header line and the edge list is printed.
 
-        if verbosity>=1:
-            maxdegree=self.maxdegree()
-            binwidth=max(1, maxdegree/20)
-            output.append("")
-            output.append("Degree distribution:")
-            output.append(str(self.degree_distribution(binwidth)))
+        Behind the scenes, this method constructs a L{GraphSummary}
+        object and invokes its C{__str__} method.
 
-            if self.is_directed():
-                output.append("")
-                output.append("Degree distribution (only in-degrees):")
-                dd = self.degree_distribution(binwidth, type=IN)
-                output.append(str(dd))
-                output.append("")
-                output.append("Degree distribution (only out-degrees):")
-                dd = self.degree_distribution(binwidth, type=OUT)
-                output.append(str(dd))
-
-        return "\n".join(output)
+        @param verbosity: if zero, only the header line is returned
+          (see C{__str__} for more details), otherwise the header line
+          and the full edge list is printed.
+        @param width: the number of characters to use in one line.
+          If C{None}, no limit will be enforced on the line lengths.
+        @return: the summary of the graph.
+        """
+        return str(GraphSummary(self, verbosity, width, *args, **kwds))
 
     _format_mapping = {
           "ncol":       ("Read_Ncol", "write_ncol"),
@@ -3186,15 +3179,18 @@ def write(graph, filename, *args, **kwds):
     return graph.write(filename, *args, **kwds)
 save=write
 
-def summary(obj, stream=sys.stdout, *args, **kwds):
+def summary(obj, stream=None, *args, **kwds):
     """Prints a summary of object o to a given stream
 
     Positional and keyword arguments not explicitly mentioned here are passed
     on to the underlying C{summary()} method of the object if it has any.
 
     @param obj: the object about which a human-readable summary is requested.
-    @param stream: the stream to be used
+    @param stream: the stream to be used. If C{None}, the standard output
+      will be used.
     """
+    if stream is None:
+        stream = sys.stdout
     if hasattr(obj, "summary"):
         stream.write(obj.summary(*args, **kwds))
     else:
