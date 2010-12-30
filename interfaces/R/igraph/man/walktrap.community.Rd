@@ -12,7 +12,8 @@ walktrap.community(graph, weights = E(graph)$weight, steps = 4, merges =
           TRUE, modularity = TRUE, labels = TRUE, membership = TRUE)
 }
 \arguments{
-  \item{graph}{The input graph.}
+  \item{graph}{The input graph, edge directions are ignored in directed
+    graphs.}
   \item{weights}{The edge weights.}
   \item{steps}{The length of the random walks to perform.}
   \item{merges}{Logical scalar, whether to include the merge matrix in
