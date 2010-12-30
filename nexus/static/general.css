@@ -1487,3 +1487,6 @@ span.edit a {
 p.wndate {
     font-style: italic;
 }
+div.blogentry {
+    clear: both;
+}

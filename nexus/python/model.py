@@ -148,3 +148,24 @@ def get_metadata(id):
     res=db.select('metadata', where='dataset=%s' % int(id), 
                   order="type")
     return list(res)
+
+def get_blog(ids=None, unpublished=False):
+    if ids is None:
+        limit=5
+        order='date DESC'
+        where='1=1'
+    else:
+        limit=None
+        order='id'
+        where="id in (" + ",".join(ids) + ")"
+
+    if not unpublished:
+        where=where + " AND published=1"
+
+    return list(db.select('blog', limit=limit, order=order, where=where))
+
+def new_blog_entry(**args):
+    return db.insert('blog', seqname='id', **args)
+
+def update_blog(id, **args):
+    db.update('blog', where='id=%s' % id, **args)

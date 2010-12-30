@@ -83,3 +83,13 @@ CREATE TABLE user (
        PRIMARY KEY(openid),
        UNIQUE(name)
 );
+CREATE TABLE blog (
+       id INTEGER,
+       date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+       author TEXT,
+       title TEXT,
+       entry TEXT,
+       published INTEGER,
+       PRIMARY KEY(id),
+       FOREIGN KEY(author) REFERENCES user(name)
+);

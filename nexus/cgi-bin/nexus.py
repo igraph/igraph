@@ -22,7 +22,7 @@ from operator import attrgetter
 from recaptcha.client import captcha
 from textwrap import dedent
 
-web.config.debug = True
+web.config.debug = False
 web.config.smtp_server = '173.192.111.8'
 web.config.smtp_port = 26
 web.config.smtp_username = 'csardi@mail.igraph.org'
@@ -36,11 +36,14 @@ urls = (
     '/api/format',                         'Format',
     '/api/licence',                        'Licence',
     '/web/about',                          'About',
+    '/web/addblog',                        'AddBlog',
     '/web/addlicence',                     'AddLicence',
     '/web/add',                            'Add',
     '/web/admin',                          'Admin',
+    '/web/blog',                           'Blog',
     '/web/check/(\d+)',                    'Check',
     '/web/donate',                         'Donate',
+    '/web/editblog/(\d+)',                 'EditBlog',
     '/web/editlicence/(\d+)',              'EditLicence',
     '/web/edit/(\d+)',                     'Edit',
     '/web/feedback',                       'Feedback',
@@ -778,24 +781,102 @@ class Check:
 
 class Licence:
 
-    def list_licences(self, user_input):
-        pass
-    
+    def format_text(self, licences):
+        
+        def format_one(lic):
+            return dedent('''\
+                     Id: %s
+                     Name: %s
+                     Short Description: %s
+                     URL: %s''' % (lic.id, lic.name, lic.text, lic.link))
+        
+        return "\n".join(format_one(l) for l in licences)
+
     def GET(self):
         user_input=web.input(id=None, format="html")
         format=user_input.format
 
         if user_input.id is None:
-            return self.list_licences(user_input)
-
-        lic=model.get_licence(user_input.id)
+            lic=model.get_licences("*")
+        else:
+            lic=model.get_licence(user_input.id)
         
         if format=='html':
             return render.licence(lic)
         elif format=='xml':
+            web.header('Content-Type', 'text/xml')
             return render_plain.xml_licence(lic)
         elif format=='text':
-            return render_plain.text_licence(lic)
+            web.header('Content-Type', 'text/plain')
+            return self.format_text(lic)
+
+class Blog:
+    
+    def GET(self):
+        user_input=web.input(id=None, admin=False)
+        unpublished = web.webopenid.status() in admins_openid and \
+            user_input.admin
+        if user_input.id is None:
+            entries=model.get_blog(unpublished=unpublished)
+        else:
+            entries=model.get_blog(ids=[user_input.id], 
+                                   unpublished=unpublished)
+        return render.blog(entries, user_input.id)
+
+add_blog_form=web.form.Form(
+    web.form.Textbox('title', description='Title:', id='focused', size=50),
+    web.form.Textbox('date', description='Date:', size=50),
+    web.form.Textarea('entry', description='Text:', rows=20, cols=50),
+    web.form.Checkbox('published', description="Published?", value="True"),
+    web.form.Button("Add")
+    )
+
+class AddBlog:
+    
+    def GET(self):
+        if web.webopenid.status() not in admins_openid:
+            return web.seeother("/login")
+
+        form=add_blog_form()
+        return render.addblog(form, None, added=False, edit=False)
+
+    def POST(self):
+        if web.webopenid.status() not in admins_openid:
+            return web.seeother("/login")
+        form=add_blog_form()
+        if not form.validates():
+            pass
+        
+        bid=model.new_blog_entry(title=form.d.title, 
+                                 date=form.d.date,
+                                 entry=form.d.entry,
+                                 published=form.d.published)
+        
+        return render.addblog(form, bid, added=True, edit=False)
+
+class EditBlog:
+    
+    def GET(self, id):
+        if web.webopenid.status() not in admins_openid:
+            return web.seeother("/login")
+        form=add_blog_form()        
+        form.Add.name='Submit'
+        blog=model.get_blog(ids=[id], unpublished=True)
+        form.fill(blog[0])
+        return render.addblog(form, id, added=False, edit=True)
+
+    def POST(self, id):
+        if web.webopenid.status() not in admins_openid:
+            return web.seeother("/login")
+        form=add_blog_form()
+        if not form.validates():
+            # TODO
+            pass
+        
+        model.update_blog(id=id, title=form.d.title, date=form.d.date,
+                          entry=form.d.entry, published=form.d.published)
+        
+        return render.addblog(form, id, added=True, edit=True)
         
 app = web.application(urls, globals())
 

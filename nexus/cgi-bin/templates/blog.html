@@ -1,0 +1,21 @@
+$def with (entries, id)
+
+<h2>Blog</h2>
+
+$for e in entries:
+  <div class="title"><h3>$e.title
+      $if openid.status():
+        <span class="edit">
+	  <a href="/web/editblog/$e.id">[edit]</a>
+	</span>
+  </h3></div>
+  <div class="blogentry">
+    <p class="blogauthor">$e.author</p>
+    <p class="blogdate">$e.date</p>
+    <p class="blogsummary">
+      $if id is None:
+        $:mymarkdown(e.entry, 20)
+      $else:
+        $:markdown(e.entry)
+    </p>
+  </div>
