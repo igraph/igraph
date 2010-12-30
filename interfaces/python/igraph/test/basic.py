@@ -16,6 +16,20 @@ class BasicTests(unittest.TestCase):
         g=Graph([(0,1), (0,0), (1,2)])
         self.failUnless(g.vcount() == 3 and g.ecount() == 3 and g.is_directed() == False and g.is_simple() == False)
 
+    def testAddVertex(self):
+        g = Graph()
+        g.add_vertex()
+        self.failUnless(g.vcount() == 1 and g.ecount() == 0)
+        self.failIf("name" in g.vertex_attributes())
+        g.add_vertex("foo")
+        self.failUnless(g.vcount() == 2 and g.ecount() == 0)
+        self.failUnless("name" in g.vertex_attributes())
+        self.assertEquals(g.vs["name"], [None, "foo"])
+        g.add_vertex(3)
+        self.failUnless(g.vcount() == 3 and g.ecount() == 0)
+        self.failUnless("name" in g.vertex_attributes())
+        self.assertEquals(g.vs["name"], [None, "foo", 3])
+
     def testAddVertices(self):
         g = Graph()
         g.add_vertices(2)
@@ -26,6 +40,22 @@ class BasicTests(unittest.TestCase):
         g.add_vertices(["bacon", "eggs"])
         self.failUnless(g.vcount() == 5 and g.ecount() == 0)
         self.assertEquals(g.vs[2:]["name"], ["spam", "bacon", "eggs"])
+
+    def testAddEdges(self):
+        g = Graph()
+        g.add_vertices(["spam", "bacon", "eggs", "ham"])
+
+        g.add_edges([(0, 1)])
+        self.assertEquals(g.vcount(), 4)
+        self.assertEquals(g.get_edgelist(), [(0, 1)])
+
+        g.add_edges([(1, 2), (2, 3), (1, 3)])
+        self.assertEquals(g.vcount(), 4)
+        self.assertEquals(g.get_edgelist(), [(0, 1), (1, 2), (2, 3), (1, 3)])
+
+        g.add_edges([("spam", "eggs"), ("spam", "ham")])
+        self.assertEquals(g.vcount(), 4)
+        self.assertEquals(g.get_edgelist(), [(0, 1), (1, 2), (2, 3), (1, 3), (0, 2), (0, 3)])
 
     def testGraphGetEids(self):
         g = Graph.Famous("petersen")

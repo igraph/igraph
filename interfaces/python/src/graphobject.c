@@ -217,9 +217,9 @@ int igraphmodule_Graph_init(igraphmodule_GraphObject * self,
     return -1;
 
   if (edges && PyList_Check(edges)) {
-    // Caller specified an edge list, so we use igraph_create
-    // We have to convert the Python list to a igraph_vector_t
-    if (igraphmodule_PyObject_to_vector_t(edges, &edges_vector, 1, 1)) {
+    /* Caller specified an edge list, so we use igraph_create */
+    /* We have to convert the Python list to a igraph_vector_t */
+    if (igraphmodule_PyObject_to_edgelist(edges, &edges_vector, 0)) {
       igraphmodule_handle_igraph_error();
       return -1;
     }
@@ -459,7 +459,7 @@ PyObject *igraphmodule_Graph_add_edges(igraphmodule_GraphObject * self,
   if (!PyArg_ParseTuple(args, "O", &list))
     return NULL;
 
-  if (igraphmodule_PyObject_to_vector_t(list, &v, 1, 1))
+  if (igraphmodule_PyObject_to_edgelist(list, &v, &self->g))
     return NULL;
 
   /* do the hard work :) */
@@ -1154,7 +1154,7 @@ PyObject *igraphmodule_Graph_get_eids(igraphmodule_GraphObject * self,
     return igraphmodule_handle_igraph_error();
 
   if (pairs_o != Py_None) {
-    if (igraphmodule_PyObject_to_vector_t(pairs_o, &pairs, 1, 1)) {
+    if (igraphmodule_PyObject_to_edgelist(pairs_o, &pairs, &self->g)) {
       igraph_vector_destroy(&res);
       return NULL;
     }
@@ -1658,7 +1658,7 @@ PyObject *igraphmodule_Graph_Bipartite(PyTypeObject * type,
   if (igraphmodule_PyObject_to_vector_bool_t(types_o, &types))
     return NULL;
 
-  if (igraphmodule_PyObject_to_vector_t(edges_o, &edges, 1, 1)) {
+  if (igraphmodule_PyObject_to_edgelist(edges_o, &edges, 0)) {
     igraph_vector_bool_destroy(&types);
     return NULL;
   }
@@ -9513,9 +9513,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Adds edges to the graph.\n\n"
    "@param es: the list of edges to be added. Every edge is\n"
    "  represented with a tuple, containing the vertex IDs of the\n"
-   "  two endpoints. Vertices are enumerated from zero. It is\n"
-   "  allowed to provide a single pair instead of a list consisting\n"
-   "  of only one pair.\n"},
+   "  two endpoints. Vertices are enumerated from zero.\n"},
 
   /* interface to igraph_delete_edges */
   {"delete_edges", (PyCFunction) igraphmodule_Graph_delete_edges,

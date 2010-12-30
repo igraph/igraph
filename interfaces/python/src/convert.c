@@ -1305,6 +1305,80 @@ PyObject* igraphmodule_vector_t_to_PyList_pairs(igraph_vector_t *v) {
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts a Python iterable of non-negative integer pairs (i.e. an
+ * edge list) to an igraph \c igraph_vector_t
+ *
+ * The incoming \c igraph_vector_t should be uninitialized. Raises suitable
+ * Python exceptions when needed.
+ * 
+ * \param list the Python list to be converted
+ * \param v the \c igraph_vector_t containing the result
+ * \param graph  the graph that will be used to interpret vertex names
+ *               if a string is yielded by the Python iterable
+ * \return 0 if everything was OK, 1 otherwise
+ */
+int igraphmodule_PyObject_to_edgelist(PyObject *list, igraph_vector_t *v,
+    igraph_t *graph) {
+  PyObject *item, *i1, *i2, *it;
+  int ok;
+  long int idx1=0, idx2=0;
+
+  if (PyBaseString_Check(list)) {
+    /* It is highly unlikely that a string (although it is a sequence) will
+     * provide us with integers or integer pairs */
+    PyErr_SetString(PyExc_TypeError, "expected a sequence or an iterable containing integer or string pairs");
+    return 1;
+  }
+
+  it = PyObject_GetIter(list);
+  if (!it)
+    return 1;
+
+  igraph_vector_init(v, 0);
+  while ((item = PyIter_Next(it)) != 0) {
+    ok = 1;
+    if (!PySequence_Check(item) || PySequence_Size(item) != 2) {
+      PyErr_SetString(PyExc_TypeError, "iterable must return pairs of integers or strings");
+      ok=0;
+    } else {
+      i1 = PySequence_ITEM(item, 0);
+      if (i1 == 0) {
+        i2 = 0;
+      } else {
+        i2 = PySequence_ITEM(item, 1);
+      }
+      ok = (i1 != 0 && i2 != 0);
+      ok = ok && !igraphmodule_PyObject_to_vid(i1, &idx1, graph);
+      ok = ok && !igraphmodule_PyObject_to_vid(i2, &idx2, graph);
+      Py_XDECREF(i1); Py_XDECREF(i2); /* PySequence_ITEM returned new ref */
+    }
+
+    Py_DECREF(item);
+
+    if (ok) {
+      if (igraph_vector_push_back(v, idx1)) {
+        igraphmodule_handle_igraph_error();
+        ok = 0;
+      }
+      if (ok && igraph_vector_push_back(v, idx2)) {
+        igraphmodule_handle_igraph_error();
+        ok = 0;
+      }
+    }
+
+    if (!ok) {
+      igraph_vector_destroy(v);
+      Py_DECREF(it);
+      return 1;
+    }
+  }
+
+  Py_DECREF(it);
+  return 0;
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts an attribute name or a sequence to a vector_t
  *
  * This function is useful for the interface of igraph C calls accepting
@@ -1932,7 +2006,8 @@ int igraphmodule_append_PyIter_to_vector_ptr_t(PyObject *it, igraph_vector_ptr_t
  * \param o      the Python object
  * \param vid    the vertex ID will be stored here
  * \param graph  the graph that will be used to interpret vertex names
- *               if a string was given in o
+ *               if a string was given in o. It may also be a null pointer
+ *               if we don't need name lookups.
  * \return 0 if everything was OK, 1 otherwise
  */
 int igraphmodule_PyObject_to_vid(PyObject *o, long int *vid, igraph_t *graph) {
@@ -1944,7 +2019,7 @@ int igraphmodule_PyObject_to_vid(PyObject *o, long int *vid, igraph_t *graph) {
   } else if (PyLong_Check(o)) {
     /* Single vertex ID */
     *vid = PyLong_AsLong(o);
-  } else if (PyBaseString_Check(o)) {
+  } else if (graph != 0 && PyBaseString_Check(o)) {
     /* Single vertex ID from vertex name */
     if (igraphmodule_get_vertex_id_by_name(graph, o, vid))
       return 1;
@@ -1952,8 +2027,24 @@ int igraphmodule_PyObject_to_vid(PyObject *o, long int *vid, igraph_t *graph) {
     /* Single vertex ID from Vertex object */
     igraphmodule_VertexObject *vo = (igraphmodule_VertexObject*)o;
     *vid = igraphmodule_Vertex_get_index_long(vo);
+  } else if (PyIndex_Check(o)) {
+    /* Other numeric type that can be converted to an index */
+    PyObject* num = PyNumber_Index(o);
+    if (num) {
+      if (PyInt_Check(num))
+        *vid = PyInt_AsLong(num);
+      else if (PyLong_Check(num))
+        *vid = PyLong_AsLong(num);
+      else {
+        PyErr_SetString(PyExc_TypeError, "PyNumber_Index returned invalid type");
+        Py_DECREF(num);
+        return 1;
+      }
+      Py_DECREF(num);
+    } else
+      return 1;
   } else {
-    PyErr_SetString(PyExc_TypeError, "only integers, long integers or igraph.Vertex objects can be converted to vertex IDs");
+    PyErr_SetString(PyExc_TypeError, "only numbers, vertex names or igraph.Vertex objects can be converted to vertex IDs");
     return 1;
   }
 
@@ -2101,7 +2192,7 @@ int igraphmodule_PyObject_to_es_t(PyObject *o, igraph_es_t *es,
     PyObject *iterator = PyObject_GetIter(o);
     PyObject *item;
     igraph_vector_t vector;
-	igraph_vector_t tuples;
+    igraph_vector_t tuples;
 
     if (iterator == NULL) {
       PyErr_SetString(PyExc_TypeError, "integer, long, iterable, Edge, EdgeSeq or None expected");
@@ -2115,26 +2206,28 @@ int igraphmodule_PyObject_to_es_t(PyObject *o, igraph_es_t *es,
 
     while ((item = PyIter_Next(iterator))) {
       long val=-1;
-      if (PyInt_Check(item)) val=PyInt_AsLong(item);
-      else if (PyLong_Check(item)) val=PyLong_AsLong(item);
-	  else if (PyTuple_Check(item) && PyTuple_Size(item) >= 2) {
-		PyObject *o1, *o2;
-		o1=PyTuple_GetItem(item, 0);
-		o2=PyTuple_GetItem(item, 1);
-		if (PyInt_Check(o1) && PyInt_Check(o2)) {
-		  if (igraph_vector_push_back(&tuples, PyInt_AsLong(o1)))
-			PyErr_NoMemory();
-		  else if (igraph_vector_push_back(&tuples, PyInt_AsLong(o2)))
-			PyErr_NoMemory();
-		}
-		val=-2;
-	  }
+      if (PyInt_Check(item))
+        val=PyInt_AsLong(item);
+      else if (PyLong_Check(item))
+        val=PyLong_AsLong(item);
+      else if (PyTuple_Check(item) && PyTuple_Size(item) >= 2) {
+        PyObject *o1, *o2;
+        o1=PyTuple_GetItem(item, 0);
+        o2=PyTuple_GetItem(item, 1);
+        if (PyInt_Check(o1) && PyInt_Check(o2)) {
+          if (igraph_vector_push_back(&tuples, PyInt_AsLong(o1)))
+            PyErr_NoMemory();
+          else if (igraph_vector_push_back(&tuples, PyInt_AsLong(o2)))
+            PyErr_NoMemory();
+        }
+        val=-2;
+      }
 
       Py_DECREF(item);
 
       if (val >= 0) {
-		if (igraph_vector_push_back(&vector, val)) PyErr_NoMemory();
-	  } else if (val == -1) {
+        if (igraph_vector_push_back(&vector, val)) PyErr_NoMemory();
+      } else if (val == -1) {
         PyErr_SetString(PyExc_TypeError, "integer, long or integer tuple expected");
       }
 
@@ -2148,23 +2241,21 @@ int igraphmodule_PyObject_to_es_t(PyObject *o, igraph_es_t *es,
       IGRAPH_FINALLY_CLEAN(2);
       return 1;
     } else {
-      if (igraph_vector_size(&vector) > 0 &&
-		  igraph_vector_size(&tuples) == 0)
-		igraph_es_vector_copy(es, &vector);
-	  else if (igraph_vector_size(&tuples) > 0 &&
-		  igraph_vector_size(&vector) == 0)
-		igraph_es_pairs(es, &tuples, 1);
-	  else if (igraph_vector_size(&tuples) == 0 &&
-		  igraph_vector_size(&vector) == 0)
-		igraph_es_none(es);
-	  else
-		PyErr_SetString(PyExc_TypeError, "edge IDs and from-to tuples can not be mixed");
+      if (igraph_vector_size(&vector) > 0 && igraph_vector_size(&tuples) == 0)
+        igraph_es_vector_copy(es, &vector);
+      else if (igraph_vector_size(&tuples) > 0 && igraph_vector_size(&vector) == 0)
+        igraph_es_pairs(es, &tuples, 1);
+      else if (igraph_vector_size(&tuples) == 0 && igraph_vector_size(&vector) == 0)
+        igraph_es_none(es);
+      else
+        PyErr_SetString(PyExc_TypeError, "edge IDs and from-to tuples can not be mixed");
       igraph_vector_destroy(&vector);
       igraph_vector_destroy(&tuples);
       IGRAPH_FINALLY_CLEAN(2);
     }
   }
-  if (PyErr_Occurred()) return 1;
+  if (PyErr_Occurred())
+    return 1;
   return 0;
 }
 

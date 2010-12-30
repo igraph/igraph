@@ -82,6 +82,8 @@ int igraphmodule_PyObject_to_vector_int_t(PyObject *list, igraph_vector_int_t *v
 int igraphmodule_PyObject_to_vector_long_t(PyObject *list, igraph_vector_long_t *v);
 int igraphmodule_PyObject_to_vector_bool_t(PyObject *list, igraph_vector_bool_t *v);
 
+int igraphmodule_PyObject_to_edgelist(PyObject *list, igraph_vector_t *v, igraph_t *graph);
+
 int igraphmodule_PyList_to_matrix_t(PyObject *o, igraph_matrix_t *m);
 PyObject* igraphmodule_strvector_t_to_PyList(igraph_strvector_t *v);
 int igraphmodule_PyList_to_strvector_t(PyObject* v, igraph_strvector_t *result);

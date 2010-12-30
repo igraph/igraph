@@ -105,12 +105,15 @@ void igraphmodule_invalidate_vertex_name_index(igraph_t *graph) {
 
 int igraphmodule_get_vertex_id_by_name(igraph_t *graph, PyObject* o, long int* vid) {
   igraphmodule_i_attribute_struct* attrs = ATTR_STRUCT(graph);
-  PyObject* o_vid;
+  PyObject* o_vid = NULL;
 
-  if (igraphmodule_i_attribute_struct_index_vertex_names(attrs, 0))
-    return 1;
+  if (graph) {
+    attrs = ATTR_STRUCT(graph);
+    if (igraphmodule_i_attribute_struct_index_vertex_names(attrs, 0))
+      return 1;
+    o_vid = PyDict_GetItem(attrs->vertex_name_index, o);
+  }
 
-  o_vid = PyDict_GetItem(attrs->vertex_name_index, o);
   if (o_vid == NULL) {
 #ifdef IGRAPH_PYTHON3
     PyErr_Format(PyExc_ValueError, "no such vertex: %R", o);

@@ -54,6 +54,11 @@ from itertools import izip
 from tempfile import mkstemp
 from warnings import warn
 
+def deprecated(message):
+    """Prints a warning message related to the deprecation of some igraph
+    feature."""
+    warn(message, DeprecationWarning, stacklevel=3)
+
 # pylint: disable-msg=E1101
 class Graph(GraphBase):
     """Generic graph.
@@ -143,6 +148,52 @@ class Graph(GraphBase):
                 key = str(key)
             self.es[key] = value
 
+    def add_edge(self, source, target):
+        """add_edge(source, target)
+
+        Adds a single edge to the graph.
+
+        @param source: the source vertex of the edge or its name.
+        @param target: the target vertex of the edge or its name.
+        """
+        return self.add_edges([(source, target)])
+
+    def add_edges(self, es):
+        """add_edges(es)
+
+        Adds some edges to the graph.
+
+        @param es: the list of edges to be added. Every edge is represented
+          with a tuple containing the vertex IDs or names of the two
+          endpoints. Vertices are enumerated from zero. It is allowed to
+          use a single tuple containing two vertex IDs here instead of a
+          list, but this is deprecated from igraph 0.6 and will be removed
+          from 0.7.
+
+        @deprecated: this method will not accept a single pair of vertex IDs
+          as an argument from igraph 0.7. Use L{add_edge()} instead to add
+          a single edge.
+        """
+        if isinstance(es, tuple) and len(es) == 2:
+            deprecated("Graph.add_edges() will not accept a single integer pair "
+                    "from igraph 0.7. Use Graph.add_edge() instead.")
+
+            return GraphBase.add_edges(self, [es])
+        return GraphBase.add_edges(self, es)
+
+    def add_vertex(self, name=None):
+        """add_vertex(name=None)
+
+        Adds a single vertex to the graph.
+
+        @param name: the name of the vertex to be added. If C{None}, the new
+          vertex will be unnamed, otherwise the string given here will be
+          assigned to the C{name} attribute of the vertex.
+        """
+        if name is None:
+            return self.add_vertices(1)
+        return self.add_vertices([name])
+
     def add_vertices(self, n):
         """add_vertices(n)
 
@@ -177,8 +228,8 @@ class Graph(GraphBase):
 
         @deprecated: replaced by L{Graph.incident()} since igraph 0.6
         """
-        warn("Graph.adjacent() is deprecated since igraph 0.6, please use "
-             "Graph.incident() instead")
+        deprecated("Graph.adjacent() is deprecated since igraph 0.6, please use "
+                   "Graph.incident() instead")
         return self.incident(*args, **kwds)
 
     def delete_edges(self, *args, **kwds):
@@ -478,8 +529,8 @@ class Graph(GraphBase):
         @deprecated: replaced by L{Graph.get_inclist()} since igraph 0.6
         @see: Graph.get_inclist()
         """
-        warn("Graph.get_adjedgelist() is deprecated since igraph 0.6, "
-             "please use Graph.get_inclist() instead")
+        deprecated("Graph.get_adjedgelist() is deprecated since igraph 0.6, "
+                   "please use Graph.get_inclist() instead")
         return self.get_inclist(*args, **kwds)
 
     def get_inclist(self, type=OUT):
@@ -1782,7 +1833,7 @@ class Graph(GraphBase):
                     g.add_vertices(1)
                     g.vs[n][vertex_name_attr] = dst_name
                     n += 1
-                g.add_edges((v1, v2))
+                g.add_edge(v1, v2)
                 for k, v in edge_data.iteritems():
                     g.es[idx][k] = v
 
@@ -1918,8 +1969,8 @@ class Graph(GraphBase):
         result.vs["x"] = xs
         result.vs["y"] = ys
         if return_coordinates:
-            warn("The return_coordinates=... keyword argument of Graph.GRG() is "
-                 "deprecated. It will be removed in igraph 0.7.")
+            deprecated("The return_coordinates=... keyword argument of Graph.GRG() is "
+                       "deprecated. It will be removed in igraph 0.7.")
             return result, xs, ys
         return result
 
