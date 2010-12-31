@@ -64,6 +64,7 @@ class GraphSummary(object):
         self.print_edge_attributes = print_edge_attributes
         self.verbosity = verbosity
         self.width = width
+        self.wrapper = TextWrapper(width=self.width)
 
         if self._graph.is_named():
             self._edges_header = "+ edges (vertex names):"
@@ -87,7 +88,7 @@ class GraphSummary(object):
             format_str = "%%%ds %s %%s" % (maxlen, self._arrow)
             for v1, name in enumerate(names):
                 neis = self._graph.successors(v1)
-                neis = " ".join(str(names[v2]) for v2 in neis)
+                neis = ", ".join(str(names[v2]) for v2 in neis)
                 result.append(format_str % (name, neis))
         else:
             maxlen = len(str(self._graph.vcount()))
@@ -121,7 +122,7 @@ class GraphSummary(object):
 
         if self._graph.is_named():
             names = self._graph.vs["name"]
-            edges = " ".join(arrow % (names[edge.source], names[edge.target])
+            edges = ", ".join(arrow % (names[edge.source], names[edge.target])
                 for edge in self._graph.es)
         else:
             edges = " ".join(arrow % edge.tuple for edge in self._graph.es)
@@ -153,12 +154,12 @@ class GraphSummary(object):
 
     def _construct_vertex_attributes(self):
         """Constructs the part in the summary that lists the vertex attributes."""
-        attrs = self._graph.vertex_attributes()
+        attrs = set(self._graph.vertex_attributes())
+        attrs.discard("name")
         if not attrs:
             return []
 
         result = ["+ vertex attributes:"]
-        attrs.sort()
 
         # TODO
         return result
@@ -178,12 +179,24 @@ class GraphSummary(object):
             params["name"] = graph["name"]
         else:
             params["name"] = ""
-        return "IGRAPH %(directed)s%(named)s%(weighted)s%(typed)s "\
-                "%(vcount)d %(ecount)d -- %(name)s" % params
+        result = ["IGRAPH %(directed)s%(named)s%(weighted)s%(typed)s "\
+                  "%(vcount)d %(ecount)d -- %(name)s" % params]
+
+        attrs = ["%s (g)" % name for name in graph.attributes()]
+        attrs.extend("%s (v)" % name for name in graph.vertex_attributes())
+        attrs.extend("%s (e)" % name for name in graph.edge_attributes())
+        if attrs:
+            result.append("+ attr: %s" % ", ".join(attrs))
+            if self.wrapper is not None:
+                self.wrapper.subsequent_indent = '  '
+                result[-1:] = self.wrapper.wrap(result[-1])
+                self.wrapper.subsequent_indent = ''
+
+        return result
 
     def __str__(self):
         """Returns the summary representation as a string."""
-        output = [self._construct_header()]
+        output = self._construct_header()
         if self.verbosity <= 0:
             return "\n".join(output)
 
@@ -209,9 +222,8 @@ class GraphSummary(object):
             if hasattr(self, method_name):
                 output.extend(getattr(self, method_name)())
 
-        if self.width is not None:
-            wrapper = TextWrapper(width=self.width)
-            return "\n".join("\n".join(wrapper.wrap(line)) for line in output)
+        if self.wrapper is not None:
+            return "\n".join("\n".join(self.wrapper.wrap(line)) for line in output)
 
         return "\n".join(output)
 

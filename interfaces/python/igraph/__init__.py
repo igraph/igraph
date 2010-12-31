@@ -2153,15 +2153,17 @@ class Graph(GraphBase):
 
         @see: L{__sub__}"""
         if isinstance(other, int):
-            self.delete_vertices(other)
+            self.delete_vertices([other])
         elif isinstance(other, tuple) and len(other) == 2:
             self.delete_edges([other])
         elif isinstance(other, list):
             if len(other)>0:
                 if isinstance(other[0], tuple):
                     self.delete_edges(other)
-                elif isinstance(other[0], int):
+                elif isinstance(other[0], (int, long, basestring)):
                     self.delete_vertices(other)
+                else:
+                    return NotImplemented
         elif isinstance(other, _igraph.Vertex):
             self.delete_vertices(other)
         elif isinstance(other, _igraph.VertexSeq):
@@ -2185,19 +2187,21 @@ class Graph(GraphBase):
           lists of integers or lists of tuples as well, but they can't be
           mixed! Also accepts L{Edge} and L{EdgeSeq} objects.
         """
-        if isinstance(other, int):
+        if isinstance(other, (int, long, basestring)):
             result = self.copy()
-            result.delete_vertices(other)
+            result.delete_vertices([other])
         elif isinstance(other, tuple) and len(other) == 2:
             result = self.copy()
-            result.delete_edges(other)
+            result.delete_edges([other])
         elif isinstance(other, list):
             result = self.copy()
             if len(other)>0:
                 if isinstance(other[0], tuple):
                     result.delete_edges(other)
-                elif isinstance(other[0], int):
+                elif isinstance(other[0], (int, long, basestring)):
                     result.delete_vertices(other)
+                else:
+                    return NotImplemented
             else:
                 return self.copy()
         elif isinstance(other, _igraph.Vertex):
