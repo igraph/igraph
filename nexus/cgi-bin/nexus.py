@@ -42,6 +42,7 @@ urls = (
     '/web/admin',                          'Admin',
     '/web/blog',                           'Blog',
     '/web/check/(\d+)',                    'Check',
+    '/web/docs',                           'Docs',
     '/web/donate',                         'Donate',
     '/web/editblog/(\d+)',                 'EditBlog',
     '/web/editlicence/(\d+)',              'EditLicence',
@@ -882,6 +883,21 @@ class EditBlog:
                           entry=form.d.entry, published=form.d.published)
         
         return render.addblog(form, id, added=True, edit=True)
+
+docs='''
+# The Nexus API
+## Basics
+## Datasets
+## Data formats
+## Licences
+## XML schemas
+'''
+
+class Docs:
+    
+    def GET(self):
+        cc=markdown.markdown(docs)
+        return render.docs(cc)
         
 app = web.application(urls, globals())
 
