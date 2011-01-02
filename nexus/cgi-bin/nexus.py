@@ -22,7 +22,7 @@ from operator import attrgetter
 from recaptcha.client import captcha
 from textwrap import dedent
 
-web.config.debug = False
+# web.config.debug = False
 web.config.smtp_server = '173.192.111.8'
 web.config.smtp_port = 26
 web.config.smtp_username = 'csardi@mail.igraph.org'
@@ -98,7 +98,7 @@ def get_current_not_logout_url():
 
     For the logout and login failure pages, returns the root page."""
     fp=web.ctx.fullpath
-    if fp in ('/logout', '/loginfailed'):
+    if fp in ('/web/logout', '/web/loginfailed'):
         fp='/'
     return fp
 
@@ -346,22 +346,27 @@ class Index:
             return render_plain.text_dataset(formatted)
 
     def list_tagged(self, user_input):
-        tagname=user_input.tag
+        tagname=user_input.tag.split("|")
         format=user_input.format
-        datasets=list(model.get_list_tagged_as(tagname))
+        if user_input.operator not in ("and", "or"):
+            return web.notfound()
+        datasets=list(model.get_list_tagged_as(tagname, user_input.operator))
         ids=[d.id for d in datasets]
         tags={}
         for i in ids:
             tags[i] = list(model.get_tags(i))
 
+        tagname=["'%s'" % t for t in tagname]
+        tagname=(" " + user_input.operator + " ").join(tagname)
+
         if format=='html':
             feed='/api/dataset_info?format=atom&tag=%s' % tagname
             return render.index(datasets, tags, 
-                                "Data sets tagged '%s'" % tagname, feed)
+                                "Data sets tagged %s" % tagname, feed)
         elif format=='xml':
             web.header('Content-Type', 'text/xml')
             return render_plain.xml_index(datasets, tags, 
-                                          "Data sets tagged '%s'" 
+                                          "Data sets tagged %s" 
                                           % tagname)
         elif format=='text':
             for k,t in tags.items():
@@ -388,7 +393,7 @@ class Index:
                                            % tagname)        
 
     def GET(self):
-        user_input=web.input(format="html", id=None, tag=None)
+        user_input=web.input(format="html", id=None, tag=None, operator="or")
         if user_input.tag is not None and user_input.id is not None:
             return web.notfound()
         if user_input.id is not None:

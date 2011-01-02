@@ -7,8 +7,11 @@ elif os.path.exists("../db/test.db"):
     dbfile='../db/test.db'
 db = web.database(dbn='sqlite', db=dbfile)
 
-def get_list_tagged_as(tagname):
-    return db.query('''SELECT d.id id, d.name name,
+def get_list_tagged_as(tagname, operator="or"):
+    tagstr=["'%s'" % t for t in tagname]
+    tagstr='(' + ",".join(tagstr) + ")"
+    if operator=="or":
+        return db.query('''SELECT DISTINCT d.id id, d.name name,
                               d.description description, 
                               d.licence licence, d.date date,
                               n.id netid, n.description netdescription, 
@@ -16,10 +19,25 @@ def get_list_tagged_as(tagname):
                        FROM dataset d, dataset_tag dt, tag t, network n
                        WHERE d.id=dt.dataset
                          AND dt.tag=t.id
-                         AND t.tag=$tagname
+                         AND t.tag IN %s
                          AND d.id=n.dataset
-                       ORDER BY d.date DESC''',
-                    vars={'tagname': tagname})
+                       ORDER BY d.date DESC''' % tagstr)
+    else:
+        return db.query('''
+                 SELECT d.id id, d.name name,
+                        d.description description, d.licence licence,
+                        d.date date, n.id netid, 
+                        n.description netdescription, n.vertices vertices,
+                        n.edges edges
+                 FROM dataset d, network n
+                 WHERE d.id IN (SELECT id FROM 
+                                    (SELECT dt.dataset id, COUNT(*) count
+                                     FROM dataset_tag dt, tag t
+                                     WHERE dt.tag=t.id AND t.tag IN %s
+                                     GROUP BY dt.dataset)
+                                 WHERE count=%s)
+                 AND d.id=n.dataset
+         ''' % (tagstr, len(tagname)))
 
 def get_list_of_datasets():
     return db.query('''SELECT d.id id, d.name name, 

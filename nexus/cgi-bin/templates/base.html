@@ -95,7 +95,7 @@ $def with (page)
 	</div><!-- #site-info -->
 	<div class="loginbox" role="complementary">
 	  $if openid.status():
-	    <form method="post" action="/logout">
+	    <form method="post" action="/web/logout">
 	      <label>Logged in as 
 		<span class="username">$getusername()</span>.</label>
 	      <input type="hidden" name="return_to" value="$currenturl()" />
