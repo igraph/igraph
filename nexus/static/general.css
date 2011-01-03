@@ -1490,3 +1490,9 @@ p.wndate {
 div.blogentry {
     clear: both;
 }
+ul.download {
+    list-style: none;
+    margin: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}

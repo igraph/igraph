@@ -87,7 +87,9 @@ recaptcha_text = """
 formats = ('html', 'xml', 'text', 'rss', 'atom')
 
 # Dictionary mapping supported dataset formats to extensions
-dataformats = { 'R-igraph': '.Rdata' }
+dataformats = { 'R-igraph': '.Rdata', 
+                'GraphML': '.graphml',
+                'Pajek': '.net' }
 
 def get_current_url():
     """Returns the URL of the current page being produced"""

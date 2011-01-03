@@ -53,7 +53,17 @@ INSERT INTO format VALUES('R-igraph',
        'Rdata file for use with the igraph R package',
        'igraph is an R package for network analysis, with support for large graphs. This data file can be loaded into an R session via the ''load'' function, after loading the igraph package itself using the ''library'' function. See the igraph homepage for details.', 
        'http://igraph.sourceforge.net');
-	
+
+INSERT INTO format VALUES('GraphML',
+       'XML-based graph description language',
+       'GraphML is an XML-based file format (an XML application in the XML terminology) to describe graphs. It is a modern format, and can store graphs with an extensible set of vertex and edge attributes',
+       'http://graphml.graphdrawing.org');
+
+INSERT INTO format VALUES('Pajek',
+       'File format of the program Pajek',
+       'Pajek it a popular network analysis program for Windows.',
+       'http://vlado.fmf.uni-lj.si/pub/networks/pajek/');
+
 INSERT INTO user VALUES('gabor.csardi', 
        'https://launchpad.net/~gabor.csardi', 1);
 INSERT INTO user VALUES('ntamas', 'https://launchpad.net/~ntamas', 1);
