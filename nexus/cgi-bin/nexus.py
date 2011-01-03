@@ -363,7 +363,8 @@ class Index:
         tagname=(" " + user_input.operator + " ").join(tagname)
 
         if format=='html':
-            feed='/api/dataset_info?format=atom&tag=%s' % tagname
+            feed='/api/dataset_info?format=atom&tag=%s&operator=%s' % \
+                (user_input.tag, user_input.operator)
             return render.index(datasets, tags, 
                                 "Data sets tagged %s" % tagname, feed)
         elif format=='xml':
