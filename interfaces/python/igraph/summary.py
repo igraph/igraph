@@ -64,7 +64,16 @@ class GraphSummary(object):
         self.print_edge_attributes = print_edge_attributes
         self.verbosity = verbosity
         self.width = width
-        self.wrapper = TextWrapper(width=self.width)
+        if self.width is None:
+            class FakeWrapper(object):
+                def wrap(text):
+                    return [text]
+                def fill(text):
+                    return [text]
+            self.wrapper = FakeWrapper()
+        else:
+            self.wrapper = TextWrapper(width=self.width)
+        self.wrapper.break_on_hyphens = False
 
         if self._graph.is_named():
             self._edges_header = "+ edges (vertex names):"
