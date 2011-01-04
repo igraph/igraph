@@ -11840,9 +11840,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  the vertices. It is usually used to store the vertex names (hence the\n"
    "  name of the keyword argument), but you may also use a numeric attribute.\n"
    "  If you don't want to store any vertex attributes, supply C{None} here.\n"
-   "@param edge_attr_name: the name of the edge attribute to be stored\n"
-   "  along with the edges. It is usually used to store the edge weights (hence\n"
-   "  the name of the keyword argument), but you may also use a string attribute.\n"
+   "@param weights: the name of the edge attribute to be stored along with\n"
+   "  the edges. It is usually used to store the edge weights (hence the\n"
+   "  name of the keyword argument), but you may also use a string attribute.\n"
    "  If you don't want to store any edge attributes, supply C{None} here.\n"},
 
   /////////////////

@@ -89,7 +89,36 @@ PyObject* igraphmodule_Graph_adjmatrix_indexing(igraph_t* graph,
           graph, vid2, &vs1, IGRAPH_IN, values);
     } else {
       /* Retrieving a submatrix */
-      result = Py_None; Py_INCREF(result);
+      igraph_vit_t vit;
+      PyObject *item;
+
+      if (igraph_vit_create(graph, vs1, &vit)) {
+        igraphmodule_handle_igraph_error();
+        result = 0;
+      } else {
+        result = PyList_New(0);
+        if (result != 0) {
+          while (!IGRAPH_VIT_END(vit)) {
+            vid1 = IGRAPH_VIT_GET(vit);
+            item = igraphmodule_i_Graph_adjmatrix_indexing_row(graph, vid1, &vs2, IGRAPH_OUT, values);
+            if (item == 0) {
+              Py_DECREF(result);
+              result = 0;
+              break;
+            }
+            if (PyList_Append(result, item)) {
+              /* error while appending */
+              Py_DECREF(item);
+              Py_DECREF(result);
+              result = 0;
+              break;
+            }
+            Py_DECREF(item);
+            IGRAPH_VIT_NEXT(vit);
+          }
+        }
+        igraph_vit_destroy(&vit);
+      }
     }
 
     igraph_vs_destroy(&vs1);
@@ -155,7 +184,13 @@ static PyObject* igraphmodule_i_Graph_adjmatrix_indexing_row(igraph_t* graph,
       Py_DECREF(result);
       return 0;
     }
-    PyList_Append(result, item);
+    if (PyList_Append(result, item)) {
+      /* error while appending */
+      Py_DECREF(item);
+      Py_DECREF(result);
+      result = 0;
+      break;
+    }
     Py_DECREF(item);
     IGRAPH_VIT_NEXT(vit);
   }

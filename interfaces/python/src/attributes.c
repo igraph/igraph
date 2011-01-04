@@ -26,6 +26,7 @@
 #include "common.h"
 #include "convert.h"
 #include "py2compat.h"
+#include "pyhelpers.h"
 
 int igraphmodule_i_attribute_struct_init(igraphmodule_i_attribute_struct *attrs) {
   int i;
