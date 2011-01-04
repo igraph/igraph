@@ -2066,16 +2066,20 @@ int igraphmodule_PyObject_to_vid(PyObject *o, long int *vid, igraph_t *graph) {
  *               names (if the supplied Python object contains strings)
  * \param return_single will be 1 if the selector selected only a single vertex,
  *                      0 otherwise
+ * \param single_vid    if the selector selected only a single vertex, the ID
+ *                      of the selected vertex will also be returned here.
  *
  * \return 0 if everything was OK, 1 otherwise
  */
 int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
-    igraph_t *graph, igraph_bool_t *return_single) {
+    igraph_t *graph, igraph_bool_t *return_single, igraph_integer_t *single_vid) {
   long int vid;
+  igraph_vector_t vector;
 
   if (o == 0 || o == Py_None) {
     /* Returns a vertex sequence for all vertices */
-    if (return_single) *return_single = 0;
+    if (return_single)
+      *return_single = 0;
     igraph_vs_all(vs);
     return 0;
   }
@@ -2087,7 +2091,39 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
       igraphmodule_handle_igraph_error();
       return 1;
     }
-    if (return_single) *return_single = 0;
+    if (return_single)
+      *return_single = 0;
+    return 0;
+  }
+
+  if (PySlice_Check(o) && graph != 0) {
+    /* Returns a vertex sequence from a slice */
+    Py_ssize_t no_of_vertices = igraph_vcount(graph);
+    Py_ssize_t start, stop, step, slicelength, i;
+
+    if (PySlice_GetIndicesEx((PySliceObject*)o, no_of_vertices,
+          &start, &stop, &step, &slicelength))
+      return 1;
+
+    if (start == 0 && slicelength == no_of_vertices) {
+      igraph_vs_all(vs);
+    } else {
+      IGRAPH_CHECK(igraph_vector_init(&vector, slicelength));
+      IGRAPH_FINALLY(igraph_vector_destroy, &vector);
+
+      for (i = 0; i < slicelength; i++, start += step) {
+        VECTOR(vector)[i] = start;
+      }
+
+      IGRAPH_CHECK(igraph_vs_vector_copy(vs, &vector));
+
+      igraph_vector_destroy(&vector);
+      IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    if (return_single)
+      *return_single = 0;
+
     return 0;
   }
 
@@ -2097,7 +2133,6 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
 
     PyObject *iterator;
     PyObject *item;
-    igraph_vector_t vector;
 
     if (PyBaseString_Check(o)) {
       /* Special case: strings and unicode objects are sequences, but they
@@ -2111,7 +2146,7 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
     iterator = PyObject_GetIter(o);
 
     if (iterator == NULL) {
-      PyErr_SetString(PyExc_TypeError, "integer, long, iterable, Vertex, VertexSeq or None expected");
+      PyErr_SetString(PyExc_TypeError, "conversion to vertex sequence failed");
       return 1;
     }
 
@@ -2136,17 +2171,22 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
       return 1;
     }
 
-    igraph_vs_vector_copy(vs, &vector);
+    IGRAPH_CHECK(igraph_vs_vector_copy(vs, &vector));
     igraph_vector_destroy(&vector);
     IGRAPH_FINALLY_CLEAN(1);
 
-    if (return_single) *return_single = 0;
+    if (return_single)
+      *return_single = 0;
     
     return 0;
   }
 
   /* The object can be converted into a single vertex ID */
-  if (return_single) *return_single = 1;
+  if (return_single)
+    *return_single = 1;
+  if (single_vid)
+    *single_vid = vid;
+
   igraph_vs_1(vs, vid);
 
   return 0;

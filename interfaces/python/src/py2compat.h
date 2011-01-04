@@ -73,8 +73,7 @@ int PyString_IsEqualToUTF8String(PyObject* py_string,
 #  define PyVarObject_HEAD_INIT(type, size) PyObject_HEAD_INIT(type) size,
 #endif
 
-#endif
-
-char* PyObject_ConvertToCString(PyObject* string);
 char* PyString_CopyAsString(PyObject* string);
+
+#endif
 

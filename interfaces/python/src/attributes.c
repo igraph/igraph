@@ -139,6 +139,59 @@ int igraphmodule_get_vertex_id_by_name(igraph_t *graph, PyObject* o, long int* v
   return 0;
 }
 
+/**
+ * \brief Checks whether the given graph has the given graph attribute.
+ *
+ * \param  graph  the graph
+ * \param  name   the name of the attribute being searched for
+ */
+igraph_bool_t igraphmodule_has_graph_attribute(const igraph_t *graph, const char* name) {
+  PyObject *dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_GRAPH];
+  return dict != 0 && PyDict_GetItemString(dict, name) != 0;
+}
+
+/**
+ * \brief Checks whether the given graph has the given vertex attribute.
+ *
+ * \param  graph  the graph
+ * \param  name   the name of the attribute being searched for
+ */
+igraph_bool_t igraphmodule_has_vertex_attribute(const igraph_t *graph, const char* name) {
+  PyObject *dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_VERTEX];
+  return dict != 0 && PyDict_GetItemString(dict, name) != 0;
+}
+
+/**
+ * \brief Checks whether the given graph has the given edge attribute.
+ *
+ * \param  graph  the graph
+ * \param  name   the name of the attribute being searched for
+ */
+igraph_bool_t igraphmodule_has_edge_attribute(const igraph_t *graph, const char* name) {
+  PyObject *dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_EDGE];
+  return dict != 0 && PyDict_GetItemString(dict, name) != 0;
+}
+
+/**
+ * \brief Returns the values of the given edge attribute for all edges in the
+ *        given graph.
+ *
+ * This returns the actual list that we use to store the edge attributes, so
+ * be careful when modifying it - any modification will propagate back to the
+ * graph itself. You have been warned.
+ *
+ * \param  graph  the graph
+ * \param  name   the name of the attribute being searched for
+ * \returns  a Python list or \c NULL if there is no such attribute.
+ */
+PyObject* igraphmodule_get_edge_attribute_values(const igraph_t* graph,
+    const char* name) {
+  PyObject *dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_EDGE];
+  if (dict == 0)
+    return 0;
+  return PyDict_GetItemString(dict, name);
+}
+
 /* Attribute handlers for the Python interface */
 
 /* Initialization */ 
@@ -1223,17 +1276,16 @@ static int igraphmodule_i_attribute_get_info(const igraph_t *graph,
 igraph_bool_t igraphmodule_i_attribute_has_attr(const igraph_t *graph,
 						igraph_attribute_elemtype_t type,
 						const char* name) {
-  long int attrnum;
-  PyObject *o, *dict;
   switch (type) {
-  case IGRAPH_ATTRIBUTE_GRAPH:  attrnum=ATTRHASH_IDX_GRAPH;  break;
-  case IGRAPH_ATTRIBUTE_VERTEX: attrnum=ATTRHASH_IDX_VERTEX; break;
-  case IGRAPH_ATTRIBUTE_EDGE:   attrnum=ATTRHASH_IDX_EDGE;   break;
-  default: return 0; break;
+  case IGRAPH_ATTRIBUTE_GRAPH:
+    return igraphmodule_has_graph_attribute(graph, name);
+  case IGRAPH_ATTRIBUTE_VERTEX:
+    return igraphmodule_has_vertex_attribute(graph, name);
+  case IGRAPH_ATTRIBUTE_EDGE:
+    return igraphmodule_has_edge_attribute(graph, name);
+  default:
+    return 0;
   }
-  dict = ATTR_STRUCT_DICT(graph)[attrnum];
-  o = PyDict_GetItemString(dict, name);
-  return o != 0;
 }
 
 /* Returns the type of a given attribute */
