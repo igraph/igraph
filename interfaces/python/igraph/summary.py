@@ -191,9 +191,9 @@ class GraphSummary(object):
         result = ["IGRAPH %(directed)s%(named)s%(weighted)s%(typed)s "\
                   "%(vcount)d %(ecount)d -- %(name)s" % params]
 
-        attrs = ["%s (g)" % name for name in graph.attributes()]
-        attrs.extend("%s (v)" % name for name in graph.vertex_attributes())
-        attrs.extend("%s (e)" % name for name in graph.edge_attributes())
+        attrs = ["%s (g)" % (name, ) for name in graph.attributes()]
+        attrs.extend("%s (v)" % (name, ) for name in graph.vertex_attributes())
+        attrs.extend("%s (e)" % (name, ) for name in graph.edge_attributes())
         if attrs:
             result.append("+ attr: %s" % ", ".join(attrs))
             if self.wrapper is not None:
@@ -218,9 +218,9 @@ class GraphSummary(object):
             # Add the edge list
             if self.edge_list_format == "auto":
                 # Select the appropriate edge list format
-                if (self.print_edge_attributes and self._graph.edge_attributes()):
-                    format = "edgelist"
-                elif median(self._graph.degree(type="out")) < 3:
+                # if (self.print_edge_attributes and self._graph.edge_attributes()):
+                #     format = "edgelist"
+                if median(self._graph.degree(type="out")) < 3:
                     format = "compressed"
                 else:
                     format = "adjlist"
