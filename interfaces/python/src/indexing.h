@@ -27,7 +27,10 @@
 #include <Python.h>
 #include <igraph/igraph_datatype.h>
 
-PyObject* igraphmodule_Graph_adjmatrix_indexing(igraph_t* graph,
+PyObject* igraphmodule_Graph_adjmatrix_get_index(igraph_t* graph,
         PyObject* row_index, PyObject* column_index, PyObject* attr_name);
+int igraphmodule_Graph_adjmatrix_set_index(igraph_t* graph,
+        PyObject* row_index, PyObject* column_index, PyObject* attr_name,
+        PyObject* value);
 
 #endif

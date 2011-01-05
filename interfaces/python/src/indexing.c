@@ -27,6 +27,8 @@
 #include "indexing.h"
 #include "pyhelpers.h"
 
+/***************************************************************************/
+
 static PyObject* igraphmodule_i_Graph_adjmatrix_indexing_get_value_for_vertex_pair(
     igraph_t* graph, igraph_integer_t from, igraph_integer_t to, PyObject* values) {
   igraph_integer_t eid;
@@ -53,27 +55,27 @@ static PyObject* igraphmodule_i_Graph_adjmatrix_indexing_row(igraph_t* graph,
     igraph_integer_t from, igraph_vs_t* to, igraph_neimode_t neimode,
     PyObject* values);
 
-PyObject* igraphmodule_Graph_adjmatrix_indexing(igraph_t* graph,
+PyObject* igraphmodule_Graph_adjmatrix_get_index(igraph_t* graph,
         PyObject* row_index, PyObject* column_index, PyObject* attr_name) {
     PyObject *result = 0, *values;
     igraph_vs_t vs1, vs2;
     igraph_integer_t vid1 = -1, vid2 = -1;
     char* attr;
 
-    if (attr_name == 0) {
-      /* Using the "weight" attribute by default */
-      attr = strdup("weight");
-    } else {
-      /* Specifying the name of the attribute */
-      attr = PyObject_ConvertToCString(attr_name);
-    }
-
     if (igraphmodule_PyObject_to_vs_t(row_index, &vs1, graph, 0, &vid1))
       return NULL;
     if (igraphmodule_PyObject_to_vs_t(column_index, &vs2, graph, 0, &vid2))
       return NULL;
 
-    values = igraphmodule_get_edge_attribute_values(graph, attr);
+    if (attr_name == 0) {
+      /* Using the "weight" attribute by default */
+      values = igraphmodule_get_edge_attribute_values(graph, "weight");
+    } else {
+      /* Specifying the name of the attribute */
+      attr = PyObject_ConvertToCString(attr_name);
+      values = igraphmodule_get_edge_attribute_values(graph, attr);
+      free(attr);
+    }
 
     if (vid1 >= 0 && vid2 >= 0) {
       /* Retrieving an edge between vid1 and vid2 */
@@ -199,5 +201,70 @@ static PyObject* igraphmodule_i_Graph_adjmatrix_indexing_row(igraph_t* graph,
   IGRAPH_FINALLY_CLEAN(1);
 
   return result;
+}
+
+/***************************************************************************/
+
+static inline igraph_bool_t deleting_edge(PyObject* value) {
+  return value == Py_None || value == Py_False ||
+      (PyInt_Check(value) && PyInt_AsLong(value) == 0);
+}
+
+int igraphmodule_Graph_adjmatrix_set_index(igraph_t* graph,
+        PyObject* row_index, PyObject* column_index, PyObject* attr_name,
+        PyObject* new_value) {
+  PyObject *values;
+  igraph_vs_t vs1, vs2;
+  igraph_integer_t vid1 = -1, vid2 = -1, eid = -1;
+  igraph_bool_t ok = 1;
+  char* attr;
+
+  if (igraphmodule_PyObject_to_vs_t(row_index, &vs1, graph, 0, &vid1))
+    return -1;
+  if (igraphmodule_PyObject_to_vs_t(column_index, &vs2, graph, 0, &vid2))
+    return -1;
+
+  if (attr_name == 0) {
+    /* Using the "weight" attribute by default */
+    values = igraphmodule_get_edge_attribute_values(graph, "weight");
+  } else {
+    /* Specifying the name of the attribute */
+    attr = PyObject_ConvertToCString(attr_name);
+    values = igraphmodule_create_or_get_edge_attribute_values(graph, attr);
+    free(attr);
+  }
+
+  if (vid1 >= 0 && vid2 >= 0) {
+    /* Setting an edge between vid1 and vid2 */
+    igraph_get_eid(graph, &eid, vid1, vid2, /* directed = */1, /* error = */0);
+    if (deleting_edge(new_value)) {
+      if (eid != -1) {
+        /* Deleting the edge between vid1 and vid2 if it is there */
+        if (igraph_delete_edges(graph, igraph_ess_1(eid))) {
+          igraphmodule_handle_igraph_error();
+          ok = 0;
+        }
+      }
+    } else {
+      /* Adding the edge between vid1 and vid2 if it is not there */
+      if (eid == -1) {
+        eid = igraph_ecount(graph);
+        if (igraph_add_edge(graph, vid1, vid2)) {
+          igraphmodule_handle_igraph_error();
+          ok = 0;
+        }
+      }
+      if (ok && values != 0) {
+        /* Set the attribute value */
+        Py_INCREF(new_value);
+        PyList_SetItem(values, eid, new_value); /* reference stolen here */
+      }
+    }
+  }
+
+  igraph_vs_destroy(&vs1);
+  igraph_vs_destroy(&vs2);
+
+  return ok ? 0 : -1;
 }
 

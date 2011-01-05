@@ -7446,7 +7446,7 @@ PyObject *igraphmodule_Graph_mp_subscript(igraphmodule_GraphObject * self,
       return 0;
     }
 
-    return igraphmodule_Graph_adjmatrix_indexing(&self->g, ri, ci, attr);
+    return igraphmodule_Graph_adjmatrix_get_index(&self->g, ri, ci, attr);
   }
 
   /* Ordinary attribute retrieval */
@@ -7476,9 +7476,29 @@ int igraphmodule_Graph_mp_assign_subscript(igraphmodule_GraphObject * self,
 {
   PyObject* dict = ATTR_STRUCT_DICT(&self->g)[ATTRHASH_IDX_GRAPH];
 
-  if (PyTuple_Check(k) && PyTuple_Size(k) == 2) {
-    PyErr_SetString(PyExc_NotImplementedError, "not implemented yet");
-    return -1;
+  if (PyTuple_Check(k) && PyTuple_Size(k) >= 2) {
+    /* Adjacency matrix representation */
+    PyObject *ri, *ci, *attr;
+    
+    if (v == NULL) {
+      PyErr_SetString(PyExc_NotImplementedError, "cannot delete parts "
+          "of the adjacency matrix of a graph");
+      return -1;
+    }
+
+    ri = PyTuple_GET_ITEM(k, 0);
+    ci = PyTuple_GET_ITEM(k, 1);
+
+    if (PyTuple_Size(k) == 2) {
+      attr = 0;
+    } else if (PyTuple_Size(k) == 3) {
+      attr = PyTuple_GET_ITEM(k, 2);
+    } else {
+      PyErr_SetString(PyExc_TypeError, "adjacency matrix indexing must use at most three arguments");
+      return 0;
+    }
+
+    return igraphmodule_Graph_adjmatrix_set_index(&self->g, ri, ci, attr, v);
   }
 
   /* Ordinary attribute setting/deletion */
