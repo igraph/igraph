@@ -1,4 +1,4 @@
-#! /usr/bin/python2.6
+#! /bin/env /home/csardi/software/bin/mypython
 # vim:set ts=4 sw=4 sts=4 et
 
 import sys
@@ -23,7 +23,7 @@ from operator import attrgetter
 from recaptcha.client import captcha
 from textwrap import dedent
 
-web.config.debug = False
+# web.config.debug = False
 web.config.smtp_server = '173.192.111.8'
 web.config.smtp_port = 26
 web.config.smtp_username = 'csardi@mail.igraph.org'
@@ -53,6 +53,7 @@ urls = (
     '/web/loginfailed',                    'LoginFailed',
     '/web/logout',                         'Logout',
     '/web/openid',                         'OpenID',
+    '/web/recreate/(\d)+',                 'Recreate',
     '.*',                                  'NotFound'    
     )
 
@@ -839,17 +840,17 @@ class Admin:
     def GET(self):
         return render.admin()
 
+def run_r(cmd):
+    Rscript=file("../config/Rscript").read().strip()
+    args=[Rscript, "-e", cmd]
+    p=subprocess.Popen(args, stdout=subprocess.PIPE)
+    ret=p.wait()
+    out=p.stdout.read()
+    return [ret, out]
+
 class Check:
 
     def check_r_igraph(self, ds, filename, tags, meta):
-
-        def run_r(cmd):
-            Rscript=file("../config/Rscript").read().strip()
-            args=[Rscript, "-e", cmd]
-            p=subprocess.Popen(args, stdout=subprocess.PIPE)
-            ret=p.wait()
-            out=p.stdout.read()
-            return [ret, out]
 
         res=odict.odict()
         
@@ -1149,6 +1150,20 @@ class Delete:
             return web.seeother("/login")
         model.delete_dataset(int(id))
         return render.delete()
+
+class Recreate:
+    
+    def GET(self, id):
+        inputfile = list(model.get_dataset_file(id, 1))[0].filename
+        inputfile = "../data/%s/%s" % (id, os.path.basename(inputfile))
+        rcode = dedent('library(igraph) ; \
+                  load("%s.Rdata") ; \
+                  g <- get(ls()[1]) ; \
+                  write.graph(g, file="%s.graphml", format="graphml") ; \
+                  write.graph(g, file="%s.net", format="pajek") ; \
+                  ' % ((inputfile,) * 3))
+        ret, out=run_r(rcode)
+        return render.recreate(id)
         
 app = web.application(urls, globals())
 

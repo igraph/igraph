@@ -6,6 +6,7 @@ $if openid.status():
       <a href="/web/edit/$ds.id">[edit]</a>
       <a href="/web/check/$ds.id">[check]</a>
       <a href="/web/delete/$ds.id">[delete]</a>
+      <a href="/web/recreate/$ds.id">[recreate]</a>
     </span>
 </h2></div>
 
@@ -22,7 +23,7 @@ $for k,f in dataformats.items():
   <li>
   <a href="/api/dataset?id=${ds.id}&format=$k">${k} format</a> &ndash; 
   $formats[k].shortdesc,
-  <a href="/api/format?id=$k&format=html">more...</a>
+  <a href="/api/format?dataformat=$k&format=html">more...</a>
   </li>
 </ul>
 

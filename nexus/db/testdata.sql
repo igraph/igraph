@@ -65,7 +65,7 @@ INSERT INTO format VALUES('GraphML',
 
 INSERT INTO format VALUES('Pajek',
        'File format of the program Pajek',
-       'Pajek it a popular network analysis program for Windows.',
+       'Pajek it a popular network analysis program for Windows. Note that the Pajek data format does not support arbitrary attributes, so some of the metadata might be missing from the data file if you choose this format.',
        'http://vlado.fmf.uni-lj.si/pub/networks/pajek/');
 
 INSERT INTO user VALUES('gabor.csardi', 
