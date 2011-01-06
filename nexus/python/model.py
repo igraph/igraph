@@ -12,7 +12,8 @@ def get_list_tagged_as(tagname, operator="or"):
     tagstr='(' + ",".join(tagstr) + ")"
     if operator=="or":
         return db.query('''SELECT DISTINCT d.id id, d.name name,
-                              d.description description, 
+                              d.description description,
+                              d.shortdescription shortdescription,
                               d.licence licence, d.date date,
                               n.id netid, n.description netdescription, 
                               n.vertices vertices, n.edges edges
@@ -25,7 +26,9 @@ def get_list_tagged_as(tagname, operator="or"):
     else:
         return db.query('''
                  SELECT d.id id, d.name name,
-                        d.description description, d.licence licence,
+                        d.description description, 
+                        d.shortdescription shortdescription,
+                        d.licence licence,
                         d.date date, n.id netid, 
                         n.description netdescription, n.vertices vertices,
                         n.edges edges
@@ -42,6 +45,7 @@ def get_list_tagged_as(tagname, operator="or"):
 def get_list_of_datasets():
     return db.query('''SELECT d.id id, d.name name, 
                               d.description description, 
+                              d.shortdescription shortdescription,
                               d.licence licence, d.date date, 
                               n.id netid, n.description netdescription, 
                               n.vertices vertices, n.edges edges
@@ -58,8 +62,11 @@ def get_tags(id):
 
 def get_dataset(id):
     return db.query('''SELECT d.id id, d.name name, 
-                              d.description description, l.id licence,
+                              d.description description, 
+                              d.shortdescription shortdescription,
+                              l.id licence,
                               l.name licence_name,
+                              l.link licence_url,
                               d.date date, n.id netid, 
                               n.description netdescription, 
                               n.vertices vertices, n.edges edges,
@@ -68,6 +75,13 @@ def get_dataset(id):
                        WHERE d.licence=l.id
                          AND d.id=$id AND d.id=n.dataset''',
                     vars={'id': id})
+
+def delete_dataset(id):
+    db.delete('dataset', where='id=%s' % id)
+    db.delete('network', where='dataset=%s' % id)
+    db.delete('dataset_citation', where='dataset=%s' % id)
+    db.delete('dataset_tag', where='dataset=%s' %id)
+    db.delete('metadata', where='dataset=%s' % id)    
 
 def get_dataset_file(id, nid):
     return db.query('''SELECT filename FROM network 
@@ -126,10 +140,12 @@ def list_data_formats():
 def new_licence(**args):
     return db.insert('licence', seqname="id", **args)
 
-def update_dataset(id, name, description, tags, licence, vertices,
+def update_dataset(id, name, shortdescription,
+                   description, tags, licence, vertices,
                    edges, filename, source, papers):
 
-    db.update('dataset', where='id=%s' % id, name=name, 
+    db.update('dataset', where='id=%s' % id, name=name,
+              shortdescription=shortdescription,
               description=description, licence=int(licence), 
               source=source)
     db.update('network', where='dataset=%s AND id=1' % id, 
@@ -166,6 +182,17 @@ def get_metadata(id):
     res=db.select('metadata', where='dataset=%s' % int(id), 
                   order="type")
     return list(res)
+
+def delete_meta(id, type, name):
+    res=db.delete('metadata', where="type='%s' AND name='%s'" % (type, name))
+
+def update_meta(id, type, name, **args):
+    res=db.update('metadata', where="type='%s' AND name='%s'" % (type, name),
+                  type=type, name=name, **args)
+
+def add_meta(id, type, name, **args):
+    res=db.insert('metadata', dataset=id, network=1, type=type, name=name,
+                  **args)
 
 def get_blog(ids=None, unpublished=False):
     if ids is None:

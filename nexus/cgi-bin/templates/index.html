@@ -22,7 +22,11 @@ $for ds in datasets:
       $:", ".join(link_to_tag(tag) for tag in tags[ds.id])
     </p>
     <div class="datasetdescription">
-      $:mymarkdown(ds.description)
+      $:mymarkdown(ds.shortdescription)
     </div>
   </li>
+
+$if len(ds)==0:
+  <p>No data sets found.</p>
+
 </ul>

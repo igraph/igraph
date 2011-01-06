@@ -10,6 +10,7 @@ CREATE TABLE licence (
 CREATE TABLE dataset (
        id INTEGER,
        name TEXT,
+       shortdescription TEXT,
        description TEXT,
        licence INTEGER,
        source TEXT,

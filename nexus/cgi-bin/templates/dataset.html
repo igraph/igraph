@@ -5,6 +5,7 @@ $if openid.status():
     <span class="edit">
       <a href="/web/edit/$ds.id">[edit]</a>
       <a href="/web/check/$ds.id">[check]</a>
+      <a href="/web/delete/$ds.id">[delete]</a>
     </span>
 </h2></div>
 
@@ -42,6 +43,6 @@ $for p in papers:
   <p>$p.citation</p>
 
 <h3>Licence</h3>
-<p>$ds.licence_name</p>
+<p><a href="$ds.licence_url">$ds.licence_name</a></p>
 
 </div>

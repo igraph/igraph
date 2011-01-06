@@ -3,6 +3,9 @@ $def with (ds, tags, meta, papers)
 <dataset>
   <id>$ds.id</id>
   <name>$ds.name</name>
+  <shortdescription>
+    $ds.shortdescription
+  </shortdescription>
   <description>$ds.description</description>
   <vertices>$ds.vertices</vertices>
   <edges>$ds.edges</edges>
@@ -23,6 +26,7 @@ $def with (ds, tags, meta, papers)
   </attributes>
   <date>$ds.date</date>
   <licence>$ds.licence</licence>
+  <licenceurl>$ds.licence_url</licenceurl>
   <papers>
     $for p in papers:
       <paper>$p.citation</paper>

@@ -14,6 +14,7 @@ import url_helper
 import odict
 import subprocess
 import markdown
+import igraph
 
 from datetime import datetime
 from functools import wraps
@@ -22,7 +23,7 @@ from operator import attrgetter
 from recaptcha.client import captcha
 from textwrap import dedent
 
-# web.config.debug = False
+web.config.debug = False
 web.config.smtp_server = '173.192.111.8'
 web.config.smtp_port = 26
 web.config.smtp_username = 'csardi@mail.igraph.org'
@@ -42,6 +43,7 @@ urls = (
     '/web/admin',                          'Admin',
     '/web/blog',                           'Blog',
     '/web/check/(\d+)',                    'Check',
+    '/web/delete/(\d+)',                   'Delete',
     '/web/docs',                           'Docs',
     '/web/donate',                         'Donate',
     '/web/editblog/(\d+)',                 'EditBlog',
@@ -319,10 +321,12 @@ class Index:
                 Tags: %s
                 Date: %s
                 Licence: %s
+                Short description: %s
                 Description: %s
                 Citation: %s
         """ % (dataset.id, dataset.name, dataset.vertices, dataset.edges,
                tags, dataset.date, dataset.licence, 
+               dataset.shortdescription.replace("\n", "\n  ").strip(),
                dataset.description.replace("\n", "\n  ").strip(), papers))
         meta="\n".join(format_attr(m) for m in meta)
         return main + meta
@@ -467,8 +471,44 @@ URL: %s""" % (format.name, format.shortdesc,
             web.header('Content-Type', 'text/plain')
             return render_plain.text_formats(formatted)
 
-add_form=web.form.Form(
+class MyForm(web.form.Form):
+
+    def insert(self, where, *what):
+        
+        def find(f, seq):
+            """Return first item in sequence where f(item) == True."""
+            for idx, item in enumerate(seq):
+                if f(item): 
+                    return idx
+
+        self.inputs=list(self.inputs)
+        pos=find(lambda inp: inp.name==where, self.inputs)
+        self.inputs[pos:pos] = what
+
+class Spacer(web.form.Input):
+    def get_type(self):
+        return 'spacer'
+
+    def render(self):
+        return '<hr/>'
+    
+    def get_value(self):
+        return None
+
+class Label(web.form.Input):
+    def get_type(self):
+        return 'label'
+
+    def render(self):
+        return self.name
+
+    def get_value(self):
+        return None
+
+add_form=MyForm(
     web.form.Textbox("name", description="Name:", id="focused", size=50),
+    web.form.Textbox("shortdescription", description="Short description",
+                     size=50),
     web.form.Textarea("description", description="Description:",
                       rows=10, cols=50),
     web.form.Textbox("tags", description="Tags:",
@@ -488,8 +528,76 @@ add_form=web.form.Form(
     web.form.Textbox("source", description="Source:", size=50),
     web.form.Textarea("papers", description="Publication(s):", 
                       rows=5, cols=50),
-    web.form.Button("Add")
+    Spacer('spacer', description=''),
+    web.form.Button("Add", description="Add")
     )
+
+def add_meta_form(form, id):
+    meta=model.get_metadata(id)
+    for n, m in enumerate(meta):
+        mkeep=web.form.Dropdown('meta%skeep' %n, 
+                                description='Keep or delete:',
+                                args=['keep', 'delete'])
+        mtype=web.form.Dropdown("meta%stype" %n, 
+                                description='Type:', 
+                                args=['deleted', 'graph', 'vertex',
+                                      'edge'])
+        mtype.set_value(m.type)
+        mdatatype=web.form.Dropdown('meta%sdatatype' %n,
+                                    description='Data type:',
+                                    args=['numeric', 'string'])
+        mdatatype.set_value(m.datatype)
+        mname=web.form.Textbox('meta%sname' %n,
+                               description='Name:')
+        mname.set_value(m.name)
+        mdescription=web.form.Textarea('meta%sdescription' %n,
+                                       description='Description:', 
+                                       rows=5, cols=50)
+        mdescription.set_value(m.description)
+        form.insert("spacer", 
+                    Spacer(''), 
+                    Label('<h4>Meta data #%s</h4>' % str(int(n)+1), 
+                          description=''),
+                    mkeep, mtype, mdatatype, mname, mdescription)
+    form.insert("spacer",
+                Spacer(''),
+                Label('<h4>Additional meta data</h4>', description=""),
+                web.form.Dropdown('metaxadd', description='Add or not:',
+                                  args=['do not add', 'add']),
+                web.form.Dropdown("metaxtype", 
+                                description='Type:', 
+                                args=['graph', 'vertex', 'edge']),
+                web.form.Dropdown('metaxdatatype',
+                                    description='Data type:',
+                                    args=['numeric', 'string']),
+                web.form.Textbox('metaxname',
+                               description='Name:'),
+                web.form.Textarea('metaxdescription',
+                                       description='Description:', 
+                                       rows=5, cols=50))
+    return form
+
+def add_meta_form_add(form):
+    for n in range(0,5):
+        form.insert('spacer',
+                    Spacer(''),
+                    Label('<h4>Meta data #%s</h4>' % str(int(n)+1), 
+                          description=""),
+                    web.form.Dropdown('meta%sadd' % n, 
+                                      description='Add:',
+                                      args=['do not add', 'add']),
+                    web.form.Dropdown("meta%stype" % n, 
+                                      description='Type:', 
+                                      args=['graph', 'vertex', 'edge']),
+                    web.form.Dropdown('meta%sdatatype' % n,
+                                      description='Data type:',
+                                      args=['numeric', 'string']),
+                    web.form.Textbox('meta%sname' % n,
+                                     description='Name:'),
+                    web.form.Textarea('meta%sdescription' % n,
+                                      description='Description:', 
+                                      rows=5, cols=50))
+    return form
 
 class Add:
 
@@ -498,6 +606,7 @@ class Add:
             return web.seeother("/login")
 
         form=add_form()
+        form=add_meta_form_add(form)
         lic=model.get_licences('id,name')
         form.licence.args=[(l.id,  l.name) for l in lic]
         return render.add(form, False, False, None)
@@ -507,11 +616,13 @@ class Add:
             return web.seeother("/login")
 
         form=add_form()
+        form=add_meta_form_add(form)
         if not form.validates():
             ## TODO
             None
 
         did=model.new_dataset(name=form.d.name, 
+                              shortdescription=form.d.shortdescription,
                               description=form.d.description,
                               licence=int(form.d.licence),
                               source=form.d.source,
@@ -526,8 +637,11 @@ class Add:
         cits=form.d.papers.split("\r\n\r\n")
         for cit in cits:
             model.new_citation(dataset=did, citation=cit.strip())
-        
-        tags=[t.strip() for t in form.d.tags.split(",")]
+
+        if form.d.tags.strip()=="":
+            tags=[]
+        else:
+            tags=[t.strip() for t in form.d.tags.split(",")]
         for tag in tags:
             model.new_dataset_tag(dataset=did, tag=tag.strip())
 
@@ -545,6 +659,13 @@ class Add:
         if form.d.dynamic and 'dynamic' not in tags:
             model.new_dataset_tag(dataset=did, tag="dynamic")
 
+        for m in range(0,5):
+            if form.d['meta%sadd' % m] == "add":
+                model.add_meta(id=did, type=form.d['meta%stype' % m],
+                               name=form.d['meta%sname' % m],
+                               datatype=form.d['meta%sdatatype' % m],
+                               description=form.d['meta%sdescription' % m])
+                               
         return render.add(form, True, False, did)
 
 class Edit:
@@ -572,6 +693,8 @@ class Edit:
         tags -= set(("weighted", "bipartite", "directed", "undirected", 
                      "dynamic"))
         form.tags.value=", ".join(sorted(tags))
+        
+        form=add_meta_form(form, id)
         return render.add(form, False, True, int(id))
 
     def POST(self, id):
@@ -579,11 +702,15 @@ class Edit:
             return web.seeother("/login")
         
         form=add_form()
+        form=add_meta_form(form, id)
         if not form.validates():
             ## TODO
             None
 
-        tags=[t.strip() for t in form.d.tags.split(',')]
+        if form.d.tags.strip()=="":
+            tags=[]
+        else:
+            tags=[t.strip() for t in form.d.tags.split(',')]
         if form.d.weighted and 'weighted' not in tags:
             tags.append('weighted')
         if form.d.directed and 'directed' not in tags:
@@ -598,6 +725,7 @@ class Edit:
         papers=[p.strip() for p in form.d.papers.split("\r\n\r\n")]
 
         model.update_dataset(id=id, name=form.d.name, 
+                             shortdescription=form.d.shortdescription,
                              description=form.d.description,
                              tags=tags, licence=form.d.licence, 
                              vertices=form.d.vertices,
@@ -605,6 +733,25 @@ class Edit:
                              filename=form.d.filename,
                              source=form.d.source,
                              papers=papers)
+
+        m=0
+        while ('meta%skeep' % m ) in form.d:
+            if form.d['meta%skeep' % m] == "delete":
+                model.delete_meta(id, type=form.d['meta%stype' % m], 
+                                  name=form.d['meta%sname' % m])
+            else:
+                model.update_meta(id, type=form.d['meta%stype' % m],
+                                  name=form.d['meta%sname' % m],
+                                  datatype=form.d['meta%sdatatype' % m],
+                                  description=form.d['meta%sdescription' % m])
+            m=m+1
+
+        if form.d['metaxadd']=='add':
+            ## TODO: check that it does not exist already
+            model.add_meta(id=id, type=form.d['metaxtype'], 
+                           name=form.d['metaxname'],
+                           datatype=form.d['metaxdatatype'],
+                           description=form.d['metaxdescription'])
     
         return render.add(form, True, True, int(id))
     
@@ -766,10 +913,103 @@ class Check:
                 res["Metadata, edge, '%s'" % m.name]=m.name in attr[1]
 
         return res
-        
+
+    def check_graphml(self, ds, filename, tags, meta):
+        res=odict.odict()
+
+        ## File exists
+        ex=os.path.exists(filename)
+        res['Data file exists'] = ex
+        if not ex:
+            return res
+
+        ## File can be loaded
+        try:
+            g=igraph.Graph.Read_GraphML(filename)
+            res['Data file can be loaded'] = True
+        except Exception, x:
+            print str(x)
+            res['Data file can be loaded'] = False
+            return res
+
+        ## Number of vertices and edges
+        res['Number of vertices'] = ds.vertices == g.vcount()
+        res['Number of edges'] = ds.edges == g.ecount()
+
+        vattr=g.vs.attribute_names()
+        eattr=g.es.attribute_names()
+
+        ## Tags 
+        tags=[t.tag for t in tags]
+        if 'directed' in tags:
+            res['Tags, directed'] = g.is_directed()
+        if 'undirected' in tags:
+            res['Tags, undirected'] = not g.is_directed()
+        if 'weighted' in tags:
+            res['Tags, weighted'] = 'weight' in eattr
+        if 'bipartite' in tags:
+            res['Tags, bipartite'] = 'type' in vattr
+            
+        ## Metadata
+        for m in meta:
+            if m.type == "vertex":
+                res["Metadata, vertex, '%s'" % m.name] = m.name in vattr
+            elif m.type == "edge":
+                res["Metadata, edge, '%s'" % m.name] = m.name in eattr
+
+        return res
+
+    def check_pajek(self, ds, filename, tags, meta):
+        res=odict.odict()
+
+        ## File exists
+        ex=os.path.exists(filename)
+        res['Data file exists'] = ex
+        if not ex:
+            return res
+
+        ## File can be loaded
+        try:
+            g=igraph.Graph.Read_Pajek(filename)
+            res['Data file can be loaded'] = True
+        except Exception, x:
+            print str(x)
+            res['Data file can be loaded'] = False
+            return res
+
+        ## Number of vertices and edges 
+        res['Number of vertices'] = ds.vertices == g.vcount()
+        res['Number of edges'] = ds.edges == g.ecount()
+
+        vattr=g.vs.attribute_names()
+        eattr=g.es.attribute_names()
+
+        ## Tags 
+        tags=[t.tag for t in tags]
+        if 'directed' in tags:
+            res['Tags, directed'] = g.is_directed()
+        if 'undirected' in tags:
+            res['Tags, undirected'] = not g.is_directed()
+        if 'weighted' in tags:
+            res['Tags, weighted'] = 'weight' in eattr
+
+        pajek_meta=(('edge', 'weight'), ('vertex', 'id') )
+        meta=[ m for m in meta if (m.type, m.name) in pajek_meta ]
+        for m in meta:
+            if m.type == "vertex":
+                res["Metadata, vertex, '%s'" % m.name] = m.name in vattr
+            elif m.type == "edge":
+                res["Metadata, edge, '%s'" % m.name] = m.name in eattr        
+            
+        return res
+
     def check(self, ds, format, tags, meta, filename):
         if format=="R-igraph":
             return self.check_r_igraph(ds, filename, tags, meta)
+        elif format=="GraphML":
+            return self.check_graphml(ds, filename, tags, meta)
+        elif format=="Pajek":
+            return self.check_pajek(ds, filename, tags, meta)
         return None
 
     def GET(self, id):
@@ -901,6 +1141,14 @@ class Docs:
     def GET(self):
         cc=markdown.markdown(docs)
         return render.docs(cc)
+
+class Delete:
+
+    def GET(self, id):
+        if web.webopenid.status() not in admins_openid:
+            return web.seeother("/login")
+        model.delete_dataset(int(id))
+        return render.delete()
         
 app = web.application(urls, globals())
 

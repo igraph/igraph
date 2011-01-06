@@ -6,11 +6,15 @@ INSERT INTO licence (id, name, text, link) VALUES(1, 'CC-ASA 2.0 UK',
 INSERT INTO licence (id, name, text, link) VALUES(2, 'Public Domain',
        'In the Public Domain', 'http://en.wikipedia.org/wiki/Public_domain');
 
-INSERT INTO dataset (id, name, description, licence, source) 
+INSERT INTO dataset (id, name, shortdescription, description, licence, 
+                     source) 
        VALUES(1, 'Zachary''s karate club',
+       'Social network of a karate club',
        'Social network of a karate club', 2, 'Publication');
-INSERT INTO dataset (id, name, description, licence, source) 
+INSERT INTO dataset (id, name, shortdescription, description, licence, 
+                     source) 
        VALUES(2, 'UK faculty social network',
+       'Social network among faculty members at a UK university',
        'Social network among faculty members at a UK university', 1,
        'http://www.cs.rhul.ac.uk/home/tamas/research/datasets/');
 
