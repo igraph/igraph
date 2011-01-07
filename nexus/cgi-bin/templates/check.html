@@ -7,7 +7,9 @@ $for format, result in checkres.items():
   <ul>
   $for key, value in result.items():
     <li>$key: 
-      $if value:
+      $if type(value) == type('a'):
+        <span class="checkvalue failure">$value</span>.
+      $elif value:
         <span class="checkvalue">OK</span>.
       $else:
 	<span class="checkvalue failure">Error</span>.

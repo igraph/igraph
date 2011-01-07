@@ -111,7 +111,7 @@ def get_format(name):
     return db.select('format', where="name='%s'" % web.safestr(name))
 
 def get_licences(what=None):
-    return db.select('licence', what=what)
+    return db.select('licence', what=what, order="name")
 
 def new_dataset(**args):
     return db.insert('dataset', seqname='id', **args)

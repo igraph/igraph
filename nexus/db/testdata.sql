@@ -68,6 +68,11 @@ INSERT INTO format VALUES('Pajek',
        'Pajek it a popular network analysis program for Windows. Note that the Pajek data format does not support arbitrary attributes, so some of the metadata might be missing from the data file if you choose this format.',
        'http://vlado.fmf.uni-lj.si/pub/networks/pajek/');
 
+INSERT INTO format VALUES('Excel',
+       'Excel workbook containing all network and metadata',
+       'This is a standard file for MS Excel, and other tools capable of reading it, e.g. LibreOffice. The first worksheet includes the network itself and the edge metadata. The second worksheet contains the vertex metadata, if available. The third worksheet contains graph-level data.',
+       'http://office.microsoft.com/en-us/excel/');
+
 INSERT INTO user VALUES('gabor.csardi', 
        'https://launchpad.net/~gabor.csardi', 1);
 INSERT INTO user VALUES('ntamas', 'https://launchpad.net/~ntamas', 1);

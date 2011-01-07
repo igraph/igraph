@@ -15,6 +15,8 @@ import odict
 import subprocess
 import markdown
 import igraph
+import xlwt
+import xlrd
 
 from datetime import datetime
 from functools import wraps
@@ -92,7 +94,8 @@ formats = ('html', 'xml', 'text', 'rss', 'atom')
 # Dictionary mapping supported dataset formats to extensions
 dataformats = { 'R-igraph': '.Rdata', 
                 'GraphML': '.graphml',
-                'Pajek': '.net' }
+                'Pajek': '.net',
+                'Excel': '.xls'        }
 
 def get_current_url():
     """Returns the URL of the current page being produced"""
@@ -142,7 +145,8 @@ tempglob = { 'whatsnew': 'Nothing',
              'get_whatsnew': get_whatsnew,
              'get_datatags': get_datatags,
              'mymarkdown': mymarkdown,
-             'markdown': markdown.markdown}
+             'markdown': markdown.markdown,
+             'type': type }
 for name in url_helper.__all__:
     tempglob[name] = getattr(url_helper, name)
 
@@ -1004,6 +1008,58 @@ class Check:
             
         return res
 
+    def check_excel(self, ds, filename, tags, meta):
+        res=odict.odict()
+
+        ## File exists
+        ex=os.path.exists(filename)
+        res['Data file exists'] = ex
+        if not ex:
+            return res
+
+        ## File can be loaded
+        try:
+            wb=xlrd.open_workbook(filename)
+            res['Data file can be loaded'] = True
+        except Exception, x:
+            res['Data file can be loaded'] = False
+            return res
+
+        ## Number of sheets
+        res['Number of sheets'] = wb.nsheets in (2,3)        
+
+        ## Sheet names
+        shnames=wb.sheet_names()        
+        res['Sheet names'] = shnames[0] == 'Network' and \
+            shnames[1] == 'Edges' and shnames[2] == 'Vertices'
+
+        ## Number of vertices and edges
+        sh1=wb.sheet_by_index(0)
+        res['Number of vertices'] = int(sh1.cell_value(1,1)) == ds.vertices
+        res['Number of edges'] = int(sh1.cell_value(2,1)) == ds.edges
+
+        ## Tags
+        mytags=sh1.row(4)[1:]
+        mytags=[ t.value for t in mytags ]
+        tags=[ t.tag for t in tags ]
+        res['Tags'] = len(set(mytags) & set(tags)) == len(mytags)
+
+        ## Metadata
+        sh2=wb.sheet_by_index(1)
+        eattr=[ c.value for c in sh2.row(0)[2:] ]
+        if wb.nsheets == 3: 
+            sh3=wb.sheet_by_index(2)
+            vattr=[ c.value for c in sh3.row(0) ]
+        else:
+            vattr=[]
+        for m in meta:
+            if m.type == "vertex":
+                res["Metadata, vertex, '%s'" % m.name] = m.name in vattr
+            elif m.type == "edge":
+                res["Metadata, edge, '%s'" % m.name] = m.name in eattr
+
+        return res
+
     def check(self, ds, format, tags, meta, filename):
         if format=="R-igraph":
             return self.check_r_igraph(ds, filename, tags, meta)
@@ -1011,6 +1067,8 @@ class Check:
             return self.check_graphml(ds, filename, tags, meta)
         elif format=="Pajek":
             return self.check_pajek(ds, filename, tags, meta)
+        elif format=="Excel":
+            return self.check_excel(ds, filename, tags, meta)
         return None
 
     def GET(self, id):
@@ -1154,6 +1212,9 @@ class Delete:
 class Recreate:
     
     def GET(self, id):
+        if web.webopenid.status() not in admins_openid:
+            return web.seeother("/login")
+        
         inputfile = list(model.get_dataset_file(id, 1))[0].filename
         inputfile = "../data/%s/%s" % (id, os.path.basename(inputfile))
         rcode = dedent('library(igraph) ; \
@@ -1163,6 +1224,71 @@ class Recreate:
                   write.graph(g, file="%s.net", format="pajek") ; \
                   ' % ((inputfile,) * 3))
         ret, out=run_r(rcode)
+
+        g=igraph.Graph.Read_GraphML(inputfile + ".graphml")
+        wb=xlwt.Workbook()
+
+        ## The network
+        ds=list(model.get_dataset(id))[0]
+        tags=list(model.get_tags(id))
+        papers=list(model.get_papers(id))
+        sh1=wb.add_sheet('Network')
+        sh1.write(0, 0, 'Name')
+        sh1.write(0, 1, ds.name)
+        sh1.write(1, 0, 'Vertices')
+        sh1.write(1, 1, ds.vertices)
+        sh1.write(2, 0, 'Edges')
+        sh1.write(2, 1, ds.edges)
+        sh1.write(3, 0, 'Type')
+        if 'directed' in tags:
+            sh1.write(3, 1, 'directed')
+        else:
+            sh1.write(3, 1, 'undirected')
+        sh1.write(4, 0, 'Tags')
+        for n, t in enumerate(tags):
+            sh1.write(4, n+1, t.tag)
+        sh1.write(5, 0, 'Licence')
+        sh1.write(5, 1, ds.licence_name)
+        sh1.write(6, 0, 'Licence URL')
+        sh1.write(6, 1, ds.licence_url)
+        sh1.write(7, 0, 'Short description')
+        sh1.write(7, 1, ds.shortdescription)
+        sh1.write(8, 0, 'Description')
+        sh1.write(8, 1, ds.description)
+        for n, p in enumerate(papers):
+            sh1.write(9+n, 0, 'Paper')
+            sh1.write(9+n, 1, p.citation)
+
+        ## The edges
+        el=g.get_edgelist()
+        if 'name' in g.vs.attribute_names():
+            n=g.vs['name']
+            el=[ (n[e[0]], n[e[1]]) for e in el]
+        sh2=wb.add_sheet('Edges')
+        sh2.write(0, 0, 'From')
+        sh2.write(0, 1, 'To')
+        for n, e in enumerate(el):
+            sh2.write(n+1, 0, e[0])
+            sh2.write(n+1, 1, e[1])
+
+        ## Edge attributes
+        ea=g.es.attribute_names()
+        for n, attr in enumerate(ea):
+            sh2.write(0, n+2, attr)
+            for r, v in enumerate(g.es[attr]):
+                sh2.write(r+1, n+2, v)
+
+        ## Vertex attributes
+        va=g.vs.attribute_names()
+        if len(va) != 0:
+            sh3=wb.add_sheet('Vertices')
+            for n, attr in enumerate(va):
+                sh3.write(0, n, attr)
+                for r, v in enumerate(g.vs[attr]):
+                    sh3.write(r+1, n, v)
+            
+        wb.save(inputfile + ".xls")
+
         return render.recreate(id)
         
 app = web.application(urls, globals())

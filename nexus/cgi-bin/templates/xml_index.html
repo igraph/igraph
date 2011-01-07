@@ -12,6 +12,6 @@ $for ds in datasets:
     $for t in tags[ds.id]:
       <tag>$t.tag</tag>
     </tags>
-    <date>$ds.date</date>
+    <date>${ds.date[0:10]}</date>
   </dataset>
 </datasets>
