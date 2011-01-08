@@ -66,9 +66,9 @@ class GraphSummary(object):
         self.width = width
         if self.width is None:
             class FakeWrapper(object):
-                def wrap(text):
+                def wrap(self, text):
                     return [text]
-                def fill(text):
+                def fill(self, text):
                     return [text]
             self.wrapper = FakeWrapper()
         else:
@@ -157,7 +157,7 @@ class GraphSummary(object):
         result = ["+ graph attributes:"]
         attrs.sort()
         for attr in attrs:
-            result.append("[[%s]]" % attr)
+            result.append("[[%s]]" % (attr, ))
             result.append(str(self._graph[attr]))
         return result
 
