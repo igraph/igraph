@@ -17,6 +17,8 @@ $if openid.status():
   $:", ".join(link_to_tag(tag) for tag in tags)
 <p class="datasetdate2">$ds.date</p>
 
+<p>$ds.shortdescription</p>
+
 <h3>Download</h3>
 <ul class="download">
 $for k,f in dataformats.items():

@@ -326,13 +326,15 @@ class Index:
                 Tags: %s
                 Date: %s
                 Licence: %s
+                Licence URL: %s
                 Short description: %s
                 Description: %s
                 Citation: %s
-        """ % (dataset.id, dataset.name, dataset.vertices, dataset.edges,
-               tags, dataset.date, dataset.licence, 
-               dataset.shortdescription.replace("\n", "\n  ").strip(),
-               dataset.description.replace("\n", "\n  ").strip(), papers))
+        """) % (dataset.id, dataset.name, dataset.vertices, dataset.edges,
+                tags, dataset.date[0:10], dataset.licence_name, 
+                dataset.licence_url,
+                dataset.shortdescription.replace("\n", "\n  ").strip(),
+                dataset.description.replace("\n\n", "\n.\n").replace("\n", "\n  ").strip(), papers)
         meta="\n".join(format_attr(m) for m in meta)
         return main + meta
 

@@ -1,3 +1,7 @@
 $def with (datasets, tags, title)
 $for ds in datasets:
-  $ds.id $tags[ds.id] $ds.vertices/$ds.edges $:ds.name
+  Id: $ds.id
+  Name: $:ds.name
+  Vertices: $ds.vertices
+  Edges: $ds.edges
+  Tags: $tags[ds.id]
