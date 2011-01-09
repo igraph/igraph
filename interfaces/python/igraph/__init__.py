@@ -2558,6 +2558,11 @@ class VertexSeq(_igraph.VertexSeq):
       True
     """
 
+    def attributes(self):
+        """Returns the list of all the vertex attributes in the graph
+        associated to this vertex sequence."""
+        return self.graph.vertex_attributes()
+
     def select(self, *args, **kwds):
         """Selects a subset of the vertex sequence based on some criteria
         
@@ -2771,6 +2776,11 @@ class EdgeSeq(_igraph.EdgeSeq):
       >>> g.es.is_multiple() == g.is_multiple()
       True
     """
+
+    def attributes(self):
+        """Returns the list of all the edge attributes in the graph
+        associated to this edge sequence."""
+        return self.graph.edge_attributes()
 
     def select(self, *args, **kwds):
         """Selects a subset of the edge sequence based on some criteria
