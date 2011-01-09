@@ -33,6 +33,7 @@
 #include "indexing.h"
 #include "memory.h"
 #include "py2compat.h"
+#include "pyhelpers.h"
 #include "vertexseqobject.h"
 
 PyTypeObject igraphmodule_GraphType;
@@ -522,18 +523,25 @@ PyObject *igraphmodule_Graph_degree(igraphmodule_GraphObject * self,
   PyObject *list = Py_None;
   PyObject *loops = Py_True;
   PyObject *dtype_o = Py_None;
-  igraph_neimode_t dtype = IGRAPH_ALL;
+  PyObject *dmode_o = Py_None;
+  igraph_neimode_t dmode = IGRAPH_ALL;
   igraph_vector_t result;
   igraph_vs_t vs;
   igraph_bool_t return_single = 0;
 
-  static char *kwlist[] = { "vertices", "type", "loops", NULL };
+  static char *kwlist[] = { "vertices", "mode", "loops", "type", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist,
-                                   &list, &dtype_o, &loops))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOO", kwlist,
+                                   &list, &dmode_o, &loops, &dtype_o))
     return NULL;
 
-  if (igraphmodule_PyObject_to_neimode_t(dtype_o, &dtype)) return NULL;
+  if (dmode_o == Py_None && dtype_o != Py_None) {
+    dmode_o = dtype_o;
+    PY_IGRAPH_DEPRECATED("type=... keyword argument is deprecated since igraph 0.6, use mode=... instead");
+  }
+
+  if (igraphmodule_PyObject_to_neimode_t(dmode_o, &dmode))
+    return NULL;
 
   if (igraphmodule_PyObject_to_vs_t(list, &vs, &self->g, &return_single, 0)) {
     return NULL;
@@ -545,7 +553,7 @@ PyObject *igraphmodule_Graph_degree(igraphmodule_GraphObject * self,
   }
 
   if (igraph_degree(&self->g, &result, vs,
-                    dtype, PyObject_IsTrue(loops))) {
+                    dmode, PyObject_IsTrue(loops))) {
     igraphmodule_handle_igraph_error();
     igraph_vs_destroy(&vs);
     igraph_vector_destroy(&result);
@@ -574,19 +582,28 @@ PyObject *igraphmodule_Graph_strength(igraphmodule_GraphObject * self,
   PyObject *list = Py_None;
   PyObject *loops = Py_True;
   PyObject *dtype_o = Py_None;
+  PyObject *dmode_o = Py_None;
   PyObject *weights_o = Py_None;
-  igraph_neimode_t dtype = IGRAPH_ALL;
+  igraph_neimode_t dmode = IGRAPH_ALL;
   igraph_vector_t result, *weights = 0;
   igraph_vs_t vs;
   igraph_bool_t return_single = 0;
 
-  static char *kwlist[] = { "vertices", "type", "loops", "weights", NULL };
+  static char *kwlist[] = { "vertices", "mode", "loops", "weights",
+    "type", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOO", kwlist,
-                                   &list, &dtype_o, &loops, &weights_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOOO", kwlist,
+                                   &list, &dmode_o, &loops, &weights_o,
+                                   &dtype_o))
     return NULL;
 
-  if (igraphmodule_PyObject_to_neimode_t(dtype_o, &dtype)) return NULL;
+  if (dmode_o == Py_None && dtype_o != Py_None) {
+    dmode_o = dtype_o;
+    PY_IGRAPH_DEPRECATED("type=... keyword argument is deprecated since igraph 0.6, use mode=... instead");
+  }
+
+  if (igraphmodule_PyObject_to_neimode_t(dmode_o, &dmode))
+    return NULL;
 
   if (igraphmodule_PyObject_to_vs_t(list, &vs, &self->g, &return_single, 0)) {
     igraphmodule_handle_igraph_error();
@@ -605,7 +622,7 @@ PyObject *igraphmodule_Graph_strength(igraphmodule_GraphObject * self,
     return NULL;
   }
 
-  if (igraph_strength(&self->g, &result, vs, dtype,
+  if (igraph_strength(&self->g, &result, vs, dmode,
         PyObject_IsTrue(loops), weights)) {
     igraphmodule_handle_igraph_error();
     igraph_vs_destroy(&vs);
@@ -659,20 +676,26 @@ PyObject *igraphmodule_Graph_maxdegree(igraphmodule_GraphObject * self,
                                        PyObject * args, PyObject * kwds)
 {
   PyObject *list = Py_None;
-  igraph_neimode_t dtype = IGRAPH_ALL;
+  igraph_neimode_t dmode = IGRAPH_ALL;
   PyObject *dtype_o = Py_None;
+  PyObject *dmode_o = Py_None;
   PyObject *loops = Py_False;
   igraph_integer_t result;
   igraph_vs_t vs;
   igraph_bool_t return_single = 0;
 
-  static char *kwlist[] = { "vertices", "type", "loops", NULL };
+  static char *kwlist[] = { "vertices", "mode", "loops", "type", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist,
-                                   &list, &dtype_o, &loops))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOO", kwlist,
+                                   &list, &dmode_o, &loops, &dtype_o))
     return NULL;
 
-  if (igraphmodule_PyObject_to_neimode_t(dtype_o, &dtype)) return NULL;
+  if (dmode_o == Py_None && dtype_o != Py_None) {
+    dmode_o = dtype_o;
+    PY_IGRAPH_DEPRECATED("type=... keyword argument is deprecated since igraph 0.6, use mode=... instead");
+  }
+
+  if (igraphmodule_PyObject_to_neimode_t(dmode_o, &dmode)) return NULL;
 
   if (igraphmodule_PyObject_to_vs_t(list, &vs, &self->g, &return_single, 0)) {
     igraphmodule_handle_igraph_error();
@@ -680,7 +703,7 @@ PyObject *igraphmodule_Graph_maxdegree(igraphmodule_GraphObject * self,
   }
 
   if (igraph_maxdegree(&self->g, &result, vs,
-                       dtype, PyObject_IsTrue(loops))) {
+                       dmode, PyObject_IsTrue(loops))) {
     igraphmodule_handle_igraph_error();
     igraph_vs_destroy(&vs);
     return NULL;
@@ -894,19 +917,32 @@ PyObject *igraphmodule_Graph_count_multiple(igraphmodule_GraphObject *self,
 PyObject *igraphmodule_Graph_neighbors(igraphmodule_GraphObject * self,
                                        PyObject * args, PyObject * kwds)
 {
-  PyObject *list, *dtype_o=Py_None;
-  igraph_neimode_t dtype = IGRAPH_ALL;
-  long idx;
+  PyObject *list, *dtype_o=Py_None, *dmode_o=Py_None, *index_o;
+  igraph_neimode_t dmode = IGRAPH_ALL;
+  long int idx;
   igraph_vector_t result;
 
-  static char *kwlist[] = { "vertex", "type", NULL };
+  static char *kwlist[] = { "vertex", "mode", "type", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|O", kwlist, &idx, &dtype_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|OO", kwlist,
+        &index_o, &dmode_o, &dtype_o))
     return NULL;
 
-  if (igraphmodule_PyObject_to_neimode_t(dtype_o, &dtype)) return NULL;
-  if (igraph_vector_init(&result, 1)) return igraphmodule_handle_igraph_error();
-  if (igraph_neighbors(&self->g, &result, idx, (igraph_neimode_t) dtype)) {
+  if (dmode_o == Py_None && dtype_o != Py_None) {
+    dmode_o = dtype_o;
+    PY_IGRAPH_DEPRECATED("type=... keyword argument is deprecated since igraph 0.6, use mode=... instead");
+  }
+
+  if (igraphmodule_PyObject_to_neimode_t(dmode_o, &dmode))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vid(index_o, &idx, &self->g))
+    return NULL;
+
+  if (igraph_vector_init(&result, 1))
+    return igraphmodule_handle_igraph_error();
+
+  if (igraph_neighbors(&self->g, &result, idx, dmode)) {
     igraphmodule_handle_igraph_error();
     igraph_vector_destroy(&result);
     return NULL;
@@ -932,19 +968,30 @@ PyObject *igraphmodule_Graph_neighbors(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_incident(igraphmodule_GraphObject * self,
                                        PyObject * args, PyObject * kwds)
 {
-  PyObject *list, *dtype_o = Py_None;
-  igraph_neimode_t dtype = IGRAPH_OUT;
-  long idx;
+  PyObject *list, *dmode_o = Py_None, *dtype_o = Py_None, *index_o;
+  igraph_neimode_t dmode = IGRAPH_OUT;
+  long int idx;
   igraph_vector_t result;
 
-  static char *kwlist[] = { "vertex", "type", NULL };
+  static char *kwlist[] = { "vertex", "mode", "type", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|O", kwlist, &idx, &dtype_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|OO", kwlist,
+        &index_o, &dmode_o, &dtype_o))
     return NULL;
 
-  if (igraphmodule_PyObject_to_neimode_t(dtype_o, &dtype)) return NULL;
+  if (dmode_o == Py_None && dtype_o != Py_None) {
+    dmode_o = dtype_o;
+    PY_IGRAPH_DEPRECATED("type=... keyword argument is deprecated since igraph 0.6, use mode=... instead");
+  }
+
+  if (igraphmodule_PyObject_to_neimode_t(dmode_o, &dmode))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vid(index_o, &idx, &self->g))
+    return NULL;
+
   igraph_vector_init(&result, 1);
-  if (igraph_incident(&self->g, &result, idx, (igraph_neimode_t) dtype)) {
+  if (igraph_incident(&self->g, &result, idx, dmode)) {
     igraphmodule_handle_igraph_error();
     igraph_vector_destroy(&result);
     return NULL;
@@ -2708,15 +2755,16 @@ PyObject *igraphmodule_Graph_Tree(PyTypeObject * type,
                                   PyObject * args, PyObject * kwds)
 {
   long n, children;
-  PyObject* tree_mode_o = Py_None;
+  PyObject *tree_mode_o = Py_None, *tree_type_o = Py_None;
   igraph_tree_mode_t mode = IGRAPH_TREE_UNDIRECTED;
   igraphmodule_GraphObject *self;
   igraph_t g;
 
-  static char *kwlist[] = { "n", "children", "type", NULL };
+  static char *kwlist[] = { "n", "children", "mode", "type", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|O", kwlist,
-                                   &n, &children, &tree_mode_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|OO", kwlist,
+                                   &n, &children,
+                                   &tree_mode_o, &tree_type_o))
     return NULL;
 
   if (n < 0) {
@@ -2724,11 +2772,16 @@ PyObject *igraphmodule_Graph_Tree(PyTypeObject * type,
     return NULL;
   }
 
+  if (tree_mode_o == Py_None && tree_type_o != Py_None) {
+    tree_mode_o = tree_type_o;
+    PY_IGRAPH_DEPRECATED("type=... keyword argument is deprecated since igraph 0.6, use mode=... instead");
+  }
+
   if (igraphmodule_PyObject_to_tree_mode_t(tree_mode_o, &mode)) {
     return NULL;
   }
 
-  if (igraph_tree(&g, (igraph_integer_t) n, (igraph_integer_t) children, mode)) {
+  if (igraph_tree(&g, n, children, mode)) {
       igraphmodule_handle_igraph_error();
       return NULL;
   }
@@ -6028,7 +6081,7 @@ PyObject *igraphmodule_Graph_to_undirected(igraphmodule_GraphObject * self,
 
   if (kwds && PyDict_GetItemString(kwds, "collapse")) {
     mode_o = PyDict_GetItemString(kwds, "collapse");
-    PyErr_Warn(PyExc_Warning, "The collapse=... keyword argument of Graph.to_undirected() is obsolete, please use mode=... instead. This warning will be removed from igraph 0.7.");
+    PY_IGRAPH_DEPRECATED("The collapse=... keyword argument of Graph.to_undirected() is deprecated, please use mode=... instead. This warning will be removed from igraph 0.7.");
     PyDict_DelItemString(kwds, "collapse");
   }
 
@@ -6272,7 +6325,7 @@ PyObject *igraphmodule_Graph_Read_Lgl(PyTypeObject * type, PyObject * args,
       PyDict_GetItemString(kwds, "directed") == NULL) {
     if (PyErr_Occurred())
       return NULL;
-    PyErr_Warn(PyExc_Warning, "Graph.Read_Lgl creates directed networks by default from igraph 0.6. To get rid of this warning, specify directed=... explicitly. This warning will be removed from igraph 0.7.");
+    PY_IGRAPH_WARN("Graph.Read_Lgl creates directed networks by default from igraph 0.6. To get rid of this warning, specify directed=... explicitly. This warning will be removed from igraph 0.7.");
   }
 
   if (igraphmodule_filehandle_init(&fobj, fname, "r"))
@@ -9582,7 +9635,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   // interface to igraph_degree
   {"degree", (PyCFunction) igraphmodule_Graph_degree,
    METH_VARARGS | METH_KEYWORDS,
-   "degree(vertices, type=ALL, loops=True)\n\n"
+   "degree(vertices, mode=ALL, loops=True)\n\n"
    "Returns some vertex degrees from the graph.\n\n"
    "This method accepts a single vertex ID or a list of vertex IDs as a\n"
    "parameter, and returns the degree of the given vertices (in the\n"
@@ -9590,14 +9643,14 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "parameter).\n"
    "\n"
    "@param vertices: a single vertex ID or a list of vertex IDs\n"
-   "@param type: the type of degree to be returned (L{OUT} for\n"
+   "@param mode: the type of degree to be returned (L{OUT} for\n"
    "  out-degrees, L{IN} IN for in-degrees or L{ALL} for the sum of\n"
    "  them).\n" "@param loops: whether self-loops should be counted.\n"},
 
   /* interface to igraph_strength */
   {"strength", (PyCFunction) igraphmodule_Graph_strength,
    METH_VARARGS | METH_KEYWORDS,
-   "strength(vertices, type=ALL, loops=True, weights=None)\n\n"
+   "strength(vertices, mode=ALL, loops=True, weights=None)\n\n"
    "Returns the strength (weighted degree) of some vertices from the graph\n\n"
    "This method accepts a single vertex ID or a list of vertex IDs as a\n"
    "parameter, and returns the strength (that is, the sum of the weights\n"
@@ -9606,7 +9659,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "parameter).\n"
    "\n"
    "@param vertices: a single vertex ID or a list of vertex IDs\n"
-   "@param type: the type of degree to be returned (L{OUT} for\n"
+   "@param mode: the type of degree to be returned (L{OUT} for\n"
    "  out-degrees, L{IN} IN for in-degrees or L{ALL} for the sum of\n"
    "  them).\n"
    "@param loops: whether self-loops should be counted.\n"
@@ -9669,10 +9722,10 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_neighbors */
   {"neighbors", (PyCFunction) igraphmodule_Graph_neighbors,
    METH_VARARGS | METH_KEYWORDS,
-   "neighbors(vertex, type=ALL)\n\n"
+   "neighbors(vertex, mode=ALL)\n\n"
    "Returns adjacent vertices to a given vertex.\n\n"
    "@param vertex: a vertex ID\n"
-   "@param type: whether to return only predecessors (L{OUT}),\n"
+   "@param mode: whether to return only predecessors (L{OUT}),\n"
    "  successors (L{IN}) or both (L{ALL}). Ignored for undirected\n"
    "  graphs."},
 
@@ -10689,7 +10742,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_maxdegree */
   {"maxdegree", (PyCFunction) igraphmodule_Graph_maxdegree,
    METH_VARARGS | METH_KEYWORDS,
-   "maxdegree(vertices=None, type=ALL, loops=False)\n\n"
+   "maxdegree(vertices=None, mode=ALL, loops=False)\n\n"
    "Returns the maximum degree of a vertex set in the graph.\n\n"
    "This method accepts a single vertex ID or a list of vertex IDs as a\n"
    "parameter, and returns the degree of the given vertices (in the\n"
@@ -10698,7 +10751,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "\n"
    "@param vertices: a single vertex ID or a list of vertex IDs or\n"
    "  C{None} meaning all the vertices in the graph.\n"
-   "@param type: the type of degree to be returned (L{OUT} for\n"
+   "@param mode: the type of degree to be returned (L{OUT} for\n"
    "  out-degrees, L{IN} IN for in-degrees or L{ALL} for the sum of\n"
    "  them).\n" "@param loops: whether self-loops should be counted.\n"},
 

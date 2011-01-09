@@ -102,15 +102,15 @@ class GeneratorTests(unittest.TestCase):
 
     def testKautz(self):
         g=Graph.Kautz(2, 2)
-        deg_in=g.degree(type=IN)
-        deg_out=g.degree(type=OUT)
+        deg_in=g.degree(mode=IN)
+        deg_out=g.degree(mode=OUT)
         # This is not a proper test, but should spot most errors
         self.failUnless(g.is_directed() and deg_in==[2]*12 and deg_out==[2]*12)
 
     def testDeBruijn(self):
         g=Graph.De_Bruijn(2, 3)
-        deg_in=g.degree(type=IN, loops=True)
-        deg_out=g.degree(type=OUT, loops=True)
+        deg_in=g.degree(mode=IN, loops=True)
+        deg_out=g.degree(mode=OUT, loops=True)
         # This is not a proper test, but should spot most errors
         self.failUnless(g.is_directed() and deg_in==[2]*8 and deg_out==[2]*8)
 

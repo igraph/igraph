@@ -108,12 +108,12 @@ class DegreeTests(unittest.TestCase):
         self.failUnless(self.gempty.degree() == [0] * 10)
         self.failUnless(self.g.degree(loops=False) == [3, 3, 2, 2])
         self.failUnless(self.g.degree() == [5, 3, 2, 2])
-        self.failUnless(self.gdir.degree(type=IN) == [1, 2, 2, 2])
-        self.failUnless(self.gdir.degree(type=OUT) == [3, 2, 1, 1])
-        self.failUnless(self.gdir.degree(type=ALL) == [4, 4, 3, 3])
+        self.failUnless(self.gdir.degree(mode=IN) == [1, 2, 2, 2])
+        self.failUnless(self.gdir.degree(mode=OUT) == [3, 2, 1, 1])
+        self.failUnless(self.gdir.degree(mode=ALL) == [4, 4, 3, 3])
         vs = self.gdir.vs.select(0, 2)
-        self.failUnless(self.gdir.degree(vs, type=ALL) == [4, 3])
-        self.failUnless(self.gdir.degree(self.gdir.vs[1], type=ALL) == 4)
+        self.failUnless(self.gdir.degree(vs, mode=ALL) == [4, 3])
+        self.failUnless(self.gdir.degree(self.gdir.vs[1], mode=ALL) == 4)
 
     def testMaxDegree(self):
         self.failUnless(self.gfull.maxdegree() == 9)
@@ -121,9 +121,9 @@ class DegreeTests(unittest.TestCase):
         self.failUnless(self.g.maxdegree() == 3)
         self.failUnless(self.g.maxdegree(loops=True) == 5)
         self.failUnless(self.g.maxdegree([1, 2], loops=True) == 3)
-        self.failUnless(self.gdir.maxdegree(type=IN) == 2)
-        self.failUnless(self.gdir.maxdegree(type=OUT) == 3)
-        self.failUnless(self.gdir.maxdegree(type=ALL) == 4)
+        self.failUnless(self.gdir.maxdegree(mode=IN) == 2)
+        self.failUnless(self.gdir.maxdegree(mode=OUT) == 3)
+        self.failUnless(self.gdir.maxdegree(mode=ALL) == 4)
         
     def testStrength(self):
         # Turn off warnings about calling strength without weights
@@ -142,17 +142,17 @@ class DegreeTests(unittest.TestCase):
                 [7, 9, 5, 9])
         self.failUnless(self.g.strength(weights=ws) == [19, 9, 5, 9])
         ws = [1, 2, 3, 4, 5, 6, 7]
-        self.failUnless(self.gdir.strength(type=IN, weights=ws) == \
+        self.failUnless(self.gdir.strength(mode=IN, weights=ws) == \
                 [7, 5, 5, 11])
-        self.failUnless(self.gdir.strength(type=OUT, weights=ws) == \
+        self.failUnless(self.gdir.strength(mode=OUT, weights=ws) == \
                 [8, 9, 4, 7])
-        self.failUnless(self.gdir.strength(type=ALL, weights=ws) == \
+        self.failUnless(self.gdir.strength(mode=ALL, weights=ws) == \
                 [15, 14, 9, 18])
         vs = self.gdir.vs.select(0, 2)
-        self.failUnless(self.gdir.strength(vs, type=ALL, weights=ws) == \
+        self.failUnless(self.gdir.strength(vs, mode=ALL, weights=ws) == \
                 [15, 9])
         self.failUnless(self.gdir.strength(self.gdir.vs[1], \
-                type=ALL, weights=ws) == 14)
+                mode=ALL, weights=ws) == 14)
 
         
 

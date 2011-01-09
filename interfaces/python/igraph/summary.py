@@ -220,7 +220,7 @@ class GraphSummary(object):
                 # Select the appropriate edge list format
                 # if (self.print_edge_attributes and self._graph.edge_attributes()):
                 #     format = "edgelist"
-                if median(self._graph.degree(type="out")) < 3:
+                if median(self._graph.degree(mode="out")) < 3:
                     format = "compressed"
                 else:
                     format = "adjlist"

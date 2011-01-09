@@ -30,4 +30,10 @@ PyObject* PyList_NewFill(Py_ssize_t len, PyObject* item);
 PyObject* PyList_Zeroes(Py_ssize_t len);
 
 char* PyObject_ConvertToCString(PyObject* string);
+
+#define PY_IGRAPH_DEPRECATED(msg) \
+  PyErr_WarnEx(PyExc_DeprecationWarning, (msg), 1)
+#define PY_IGRAPH_WARN(msg) \
+  PyErr_WarnEx(PyExc_RuntimeWarning, (msg), 1)
+
 #endif

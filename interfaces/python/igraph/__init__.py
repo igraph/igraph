@@ -222,7 +222,7 @@ class Graph(GraphBase):
         return GraphBase.add_vertices(self, n)
 
     def adjacent(self, *args, **kwds):
-        """adjacent(vertex, type=OUT)
+        """adjacent(vertex, mode=OUT)
 
         Returns the edges a given vertex is incident on.
 
@@ -265,7 +265,7 @@ class Graph(GraphBase):
         
         See L{degree} for possible arguments.
         """
-        kwds['type'] = IN
+        kwds['mode'] = IN
         return self.degree(*args, **kwds)
 
     def outdegree(self, *args, **kwds):
@@ -273,7 +273,7 @@ class Graph(GraphBase):
         
         See L{degree} for possible arguments.
         """
-        kwds['type'] = OUT
+        kwds['mode'] = OUT
         return self.degree(*args, **kwds)
 
     def all_st_cuts(self, source, target):
@@ -505,8 +505,8 @@ class Graph(GraphBase):
         return Matrix(data)
 
 
-    def get_adjlist(self, type=OUT):
-        """get_adjlist(type=OUT)
+    def get_adjlist(self, mode=OUT):
+        """get_adjlist(mode=OUT)
 
         Returns the adjacency list representation of the graph.
 
@@ -514,15 +514,15 @@ class Graph(GraphBase):
         outer list belongs to a single vertex of the graph. The inner list
         contains the neighbors of the given vertex.
 
-        @param type: if L{OUT}, returns the successors of the vertex. If
+        @param mode: if L{OUT}, returns the successors of the vertex. If
           L{IN}, returns the predecessors of the vertex. If L{ALL}, both
           the predecessors and the successors will be returned. Ignored
           for undirected graphs.
         """
-        return [self.neighbors(idx, type) for idx in xrange(self.vcount())]
+        return [self.neighbors(idx, mode) for idx in xrange(self.vcount())]
 
     def get_adjedgelist(self, *args, **kwds):
-        """get_adjedgelist(type=OUT)
+        """get_adjedgelist(mode=OUT)
 
         Returns the incidence list representation of the graph.
 
@@ -533,8 +533,8 @@ class Graph(GraphBase):
                    "please use Graph.get_inclist() instead")
         return self.get_inclist(*args, **kwds)
 
-    def get_inclist(self, type=OUT):
-        """get_inclist(type=OUT)
+    def get_inclist(self, mode=OUT):
+        """get_inclist(mode=OUT)
 
         Returns the incidence list representation of the graph.
 
@@ -543,12 +543,12 @@ class Graph(GraphBase):
         The inner list contains the IDs of the incident edges of the
         given vertex.
 
-        @param type: if L{OUT}, returns the successors of the vertex. If
+        @param mode: if L{OUT}, returns the successors of the vertex. If
           L{IN}, returns the predecessors of the vertex. If L{ALL}, both
           the predecessors and the successors will be returned. Ignored
           for undirected graphs.
         """
-        return [self.incident(idx, type) for idx in xrange(self.vcount())]
+        return [self.incident(idx, mode) for idx in xrange(self.vcount())]
 
     def is_named(self):
         """is_named()
