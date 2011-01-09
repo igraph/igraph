@@ -1188,19 +1188,11 @@ class EditBlog:
         
         return render.addblog(form, id, added=True, edit=True)
 
-docs='''
-# The Nexus API
-## Basics
-## Datasets
-## Data formats
-## Licences
-## XML schemas
-'''
-
 class Docs:
     
     def GET(self):
-        cc=markdown.markdown(docs)
+        import docs
+        cc=markdown.markdown(docs.docs)
         return render.docs(cc)
 
 class Delete:

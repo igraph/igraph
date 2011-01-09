@@ -1496,3 +1496,63 @@ ul.download {
     margin-top: 0px;
     margin-bottom: 0px;
 }
+
+#content div.docs table {
+    background: #eaeaea;
+    padding-left: 20px;
+    border: 1px solid;
+}
+#content div.docs table td {
+    padding:10px;
+}
+div.docs > ol {
+    list-style-type: none;
+    counter-reset: contents;
+}
+div.docs > ol > li {
+    counter-increment: contents;
+}
+div.docs > ol > li:before { 
+    content: counters(contents, ".") " ";
+}
+div.docs > ol > li > ol {
+    list-style-type: none;
+    counter-reset: contents2;
+}
+div.docs > ol > li > ol > li{
+    counter-increment: contents2;
+}
+div.docs > ol > li > ol > li:before { 
+    content: counters(contents, ".") "." counters(contents2, ".") " ";
+}
+div.docs {
+    counter-reset: section;
+}
+div.docs > h1 {
+    counter-increment: section;
+    counter-reset: subsection;
+}
+div.docs > h1:before {   
+    content: counters(section, ".") " ";
+}
+div.docs > h2 {
+    counter-increment: subsection;
+    counter-reset: subsubsection;
+}
+div.docs > h2:before {   
+    content: counters(section, ".") "." counters(subsection, ".") " ";
+}
+div.docs > h3 {
+    counter-increment: subsubsection;
+    counter-reset: subsubsubsection;
+}
+div.docs > h3:before {   
+    content: counters(section, ".") "." counters(subsection, ".") "." counters(subsubsection, ".") " ";
+}
+div.docs > h4 {
+    counter-increment: subsubsubsection;
+}
+div.docs > h4:before {   
+    content: counters(section, ".") "." counters(subsection, ".") "."
+    counters(subsubsection, ".") "." counters(subsubsubsection, ".") " ";
+}
