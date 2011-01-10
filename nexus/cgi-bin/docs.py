@@ -95,6 +95,21 @@ Data set information can be queried using the
     are listed that have at least one of the given tags. If it is
     '<code>and</code>', then all tags are required for a data set to
     include it in the result.</td></tr>
+  <tr><td>order</td><td>Specifies the order of the data sets, in the
+    result. Possible values are in the table below.</td></tr>
+</table>
+
+Possible values for the '<code>order</code>' parameter:
+
+<table>
+  <tr><td>date</td><td>This is the default, newest data sets are
+    first. If two data sets were added on the same day, then the one
+    with the highest id is first. (This is most likely the newer of
+    the two.)</td></tr>
+  <tr><td>name</td><td>Alphabetical ordering, according to data sets
+    name.</td></tr>
+  <tr><td>popularity</td><td>Data sets that were downloaded many times
+    are first.</td></tr>
 </table>
 
 ### Examples
@@ -117,9 +132,9 @@ schemas below for the exact syntax.
 
 <code>[http://nexus.igraph.org/api/dataset_info?format=xml&tag=weighted|directed&operator=and](http://nexus.igraph.org/api/dataset_info?format=xml&tag=weighted|directed&operator=and)</code>
 
-#### List all data sets, plain text format
+#### List all data sets, plain text format, order by popularity
 
-<code>[http://nexus.igraph.org/api/dataset_info?format=text](http://nexus.igraph.org/api/dataset_info?format=text)</code>
+<code>[http://nexus.igraph.org/api/dataset_info?format=text&order=popularity](http://nexus.igraph.org/api/dataset_info?format=text&order=popularity)</code>
 
 #### Information about data set #2, plain text format
 

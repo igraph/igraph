@@ -374,6 +374,9 @@ a:hover {
 	display: block;
 }
 
+#branding #site-motto {
+    float: right;
+}
 
 /* =Menu
 -------------------------------------------------------------- */

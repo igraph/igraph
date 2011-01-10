@@ -15,6 +15,7 @@ CREATE TABLE dataset (
        licence INTEGER,
        source TEXT,
        date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+       downloads INTEGER,
        PRIMARY KEY(id),
        FOREIGN KEY(licence) REFERENCES licence(id)
 );

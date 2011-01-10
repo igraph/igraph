@@ -55,7 +55,7 @@ urls = (
     '/web/loginfailed',                    'LoginFailed',
     '/web/logout',                         'Logout',
     '/web/openid',                         'OpenID',
-    '/web/recreate/(\d)+',                 'Recreate',
+    '/web/recreate/(\d+)',                 'Recreate',
     '.*',                                  'NotFound'    
     )
 
@@ -135,15 +135,19 @@ def mymarkdown(text, limit=4):
         res="\n".join(text.split("\n")[0:limit])
         return markdown.markdown(res) + '&hellip;'
 
-tempglob = { 'whatsnew': 'Nothing',
-             'datatags': 'None',
-             'dataformats': dataformats,
+def get_motto():
+    tot=model.get_totals()
+    return str(tot.count) + " data sets, downloaded " + \
+        str(tot.downloads) + " times."
+
+tempglob = { 'dataformats': dataformats,
              'openid': web.webopenid,
              'getusername': model.get_username,
              'currenturl': get_current_url,
              'currentnotlogouturl': get_current_not_logout_url,
              'get_whatsnew': get_whatsnew,
              'get_datatags': get_datatags,
+             'get_motto': get_motto,
              'mymarkdown': mymarkdown,
              'markdown': markdown.markdown,
              'type': type }
@@ -277,7 +281,8 @@ class Index:
 
     def list_datasets(self, user_input):
         format=user_input.format
-        datasets=list(model.get_list_of_datasets())
+
+        datasets=list(model.get_list_of_datasets(order=user_input.order))
         ids=[d.id for d in datasets]
         tags={}
         for i in ids:
@@ -338,6 +343,15 @@ class Index:
         meta="\n".join(format_attr(m) for m in meta)
         return main + meta
 
+    def formats_for_dataset(self, id, filename):
+        def good(base, f):
+            fn=os.path.join("..", "data", id, base + dataformats[f])
+            return os.path.exists(fn)
+        base=list(model.get_dataset_file(id, 1))[0].filename
+        form=[(f.name, f) for f in model.get_formats()]
+        form=[ (n,f) for (n,f) in form if good(base, n) ]
+        return dict(form)
+
     def dataset(self, user_input):
         id=user_input.id
         format=user_input.format
@@ -346,10 +360,10 @@ class Index:
             return web.notfound()        
         tags=list(model.get_tags(dataset.id))
         meta=list(model.get_metadata(dataset.id))
-        formats=dict((f.name, f) for f in model.get_formats())
         papers=model.get_papers(id)
 
         if format=='html':
+            formats=self.formats_for_dataset(id, dataset.filename)
             return render.dataset(dataset, tags, meta, formats, papers)
         elif format=='xml':
             web.header('Content-Type', 'text/xml')
@@ -408,11 +422,14 @@ class Index:
                                            % tagname)        
 
     def GET(self):
-        user_input=web.input(format="html", id=None, tag=None, operator="or")
+        user_input=web.input(format="html", id=None, tag=None,
+                             operator="or", order="date")
+        if user_input.order not in ('date', 'name', 'popularity'):
+            return web.notfound()
         if user_input.tag is not None and user_input.id is not None:
             return web.notfound()
         if user_input.id is not None:
-            return self.dataset(user_input)            
+            return self.dataset(user_input)
         elif user_input.tag is not None:
             return self.list_tagged(user_input)
         else:
@@ -439,6 +456,7 @@ class Dataset:
             web.header('Content-Type', 'application/octet-stream')
             web.header('Content-Disposition', 
                        'attachment; filename="%s%s"' % (basename,ext))
+            model.increase_downloads(user_input.id)
             return data
         except:
             return web.internalerror()
@@ -1204,26 +1222,12 @@ class Delete:
         return render.delete()
 
 class Recreate:
-    
-    def GET(self, id):
-        if web.webopenid.status() not in admins_openid:
-            return web.seeother("/login")
-        
-        inputfile = list(model.get_dataset_file(id, 1))[0].filename
-        inputfile = "../data/%s/%s" % (id, os.path.basename(inputfile))
-        rcode = dedent('library(igraph) ; \
-                  load("%s.Rdata") ; \
-                  g <- get(ls()[1]) ; \
-                  write.graph(g, file="%s.graphml", format="graphml") ; \
-                  write.graph(g, file="%s.net", format="pajek") ; \
-                  ' % ((inputfile,) * 3))
-        ret, out=run_r(rcode)
 
+    def to_excel(self, inputfile, id, ds):
         g=igraph.Graph.Read_GraphML(inputfile + ".graphml")
         wb=xlwt.Workbook()
 
         ## The network
-        ds=list(model.get_dataset(id))[0]
         tags=list(model.get_tags(id))
         papers=list(model.get_papers(id))
         sh1=wb.add_sheet('Network')
@@ -1282,6 +1286,24 @@ class Recreate:
                     sh3.write(r+1, n, v)
             
         wb.save(inputfile + ".xls")
+    
+    def GET(self, id):
+        if web.webopenid.status() not in admins_openid:
+            return web.seeother("/login")
+        
+        inputfile = list(model.get_dataset_file(id, 1))[0].filename
+        inputfile = "../data/%s/%s" % (id, os.path.basename(inputfile))
+        rcode = dedent('library(igraph) ; \
+                  load("%s.Rdata") ; \
+                  g <- get(ls()[1]) ; \
+                  write.graph(g, file="%s.graphml", format="graphml") ; \
+                  write.graph(g, file="%s.net", format="pajek") ; \
+                  ' % ((inputfile,) * 3))
+        ret, out=run_r(rcode)
+
+        ds=list(model.get_dataset(id))[0]
+        if ds.vertices < 2**26 and ds.edges < 2**16:
+            self.to_excel(inputfile, id, ds)
 
         return render.recreate(id)
         

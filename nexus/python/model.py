@@ -42,7 +42,10 @@ def get_list_tagged_as(tagname, operator="or"):
                  AND d.id=n.dataset
          ''' % (tagstr, len(tagname)))
 
-def get_list_of_datasets():
+def get_list_of_datasets(order="date"):
+    ord={ 'date': 'd.date DESC, d.id DESC',
+          'name': 'd.name',
+          'popularity': 'd.downloads DESC, d.date DESC, d.id DESC' }
     return db.query('''SELECT d.id id, d.name name, 
                               d.description description, 
                               d.shortdescription shortdescription,
@@ -51,7 +54,7 @@ def get_list_of_datasets():
                               n.vertices vertices, n.edges edges
                        FROM dataset d, network n 
                        WHERE d.id=n.dataset
-                       ORDER BY d.date DESC''')
+                       ORDER BY %s''' % ord[order])
 
 def get_tags(id):
     return db.query('''SELECT t.id, t.tag 
@@ -70,7 +73,7 @@ def get_dataset(id):
                               d.date date, n.id netid, 
                               n.description netdescription, 
                               n.vertices vertices, n.edges edges,
-                              n.filename, d.source source
+                              n.filename filename, d.source source
                        FROM dataset d, licence l, network n
                        WHERE d.licence=l.id
                          AND d.id=$id AND d.id=n.dataset''',
@@ -89,7 +92,7 @@ def get_dataset_file(id, nid):
                     vars={'id': id, 'nid': nid})
 
 def whatsnew():
-    return db.select('dataset', limit=5, order="date DESC")
+    return db.select('dataset', limit=5, order="date DESC, id DESC")
 
 def datatags():
     return db.query('''SELECT t.tag tag, COUNT(*) count
@@ -214,3 +217,11 @@ def new_blog_entry(**args):
 
 def update_blog(id, **args):
     db.update('blog', where='id=%s' % id, **args)
+
+def increase_downloads(id):
+    db.query('''UPDATE dataset SET downloads=downloads+1 WHERE id=%s''' % id)
+
+def get_totals():
+    res=db.select('dataset', 
+                  what='COUNT(*) AS count, SUM(downloads) AS downloads')
+    return list(res)[0]
