@@ -123,12 +123,6 @@ instructions. The old package archive at
 http://cneurocvs.rmki.kfki.hu/packages</a> is not updated any
 more.
 
-<h3>Fedora Project packages</h3>
-
-<p><a href="http://www.fedoraproject.org">Fedora</a> users can find
-packages to their system <a href="https://admin.fedoraproject.org/pkgdb/packages/name/igraph">here</a>. Many thanks to Neal Becker for building and maintaining
-these packages!</p>
-
 <a name="dev"></a><h3>Obtaining the development version</h3>
 
 <p>You can get the latest development version of igraph (including the
