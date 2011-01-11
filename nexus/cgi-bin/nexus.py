@@ -140,7 +140,7 @@ def mymarkdown(text, limit=4):
 def get_motto():
     tot=model.get_totals()
     if tot.downloads is not None:
-        return "%s data sets, downloaded %s tiles" % (tot.count, tot.downloads)
+        return "%s data sets, downloaded %s times" % (tot.count, tot.downloads)
     return "%s data sets" % tot.count
 
 tempglob = { 'dataformats': dataformats,
