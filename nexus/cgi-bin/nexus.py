@@ -17,6 +17,7 @@ import markdown
 import igraph
 import xlwt
 import xlrd
+import pickle
 
 from datetime import datetime
 from functools import wraps
@@ -25,7 +26,7 @@ from operator import attrgetter
 from recaptcha.client import captcha
 from textwrap import dedent
 
-# web.config.debug = False
+web.config.debug = False
 web.config.smtp_server = '173.192.111.8'
 web.config.smtp_port = 26
 web.config.smtp_username = 'csardi@mail.igraph.org'
@@ -95,7 +96,8 @@ formats = ('html', 'xml', 'text', 'rss', 'atom')
 dataformats = { 'R-igraph': '.Rdata', 
                 'GraphML': '.graphml',
                 'Pajek': '.net',
-                'Excel': '.xls'        }
+                'Excel': '.xls',
+                'Python-igraph': '.pickle' }
 
 def get_current_url():
     """Returns the URL of the current page being produced"""
@@ -137,8 +139,9 @@ def mymarkdown(text, limit=4):
 
 def get_motto():
     tot=model.get_totals()
-    return str(tot.count) + " data sets, downloaded " + \
-        str(tot.downloads) + " times."
+    if tot.downloads is not None:
+        return "%s data sets, downloaded %s tiles" % (tot.count, tot.downloads)
+    return "%s data sets" % tot.count
 
 tempglob = { 'dataformats': dataformats,
              'openid': web.webopenid,
@@ -939,23 +942,8 @@ class Check:
 
         return res
 
-    def check_graphml(self, ds, filename, tags, meta):
-        res=odict.odict()
-
-        ## File exists
-        ex=os.path.exists(filename)
-        res['Data file exists'] = ex
-        if not ex:
-            return res
-
-        ## File can be loaded
-        try:
-            g=igraph.Graph.Read_GraphML(filename)
-            res['Data file can be loaded'] = True
-        except Exception, x:
-            print str(x)
-            res['Data file can be loaded'] = False
-            return res
+    def _check_igraph_graph(self, g, ds, filename, tags, meta):
+        res = odict.odict()
 
         ## Number of vertices and edges
         res['Number of vertices'] = ds.vertices == g.vcount()
@@ -984,6 +972,48 @@ class Check:
 
         return res
 
+    def check_python_igraph(self, ds, filename, tags, meta):
+        res=odict.odict()
+        
+        ## File exists
+        ex=os.path.exists(filename)
+        res['Data file exists'] = ex
+        if not ex:
+            return res
+
+        ## File can be loaded
+        try:
+            g=igraph.Graph.Read_Pickle(filename)
+            res['Data file can be loaded'] = True
+        except Exception, x:
+            print str(x)
+            res['Data file can be loaded'] = False
+            return res
+
+        res.update(self._check_igraph_graph(g, ds, filename, tags, meta))
+        return res
+
+    def check_graphml(self, ds, filename, tags, meta):
+        res=odict.odict()
+
+        ## File exists
+        ex=os.path.exists(filename)
+        res['Data file exists'] = ex
+        if not ex:
+            return res
+
+        ## File can be loaded
+        try:
+            g=igraph.Graph.Read_GraphML(filename)
+            res['Data file can be loaded'] = True
+        except Exception, x:
+            print str(x)
+            res['Data file can be loaded'] = False
+            return res
+
+        res.update(self._check_igraph_graph(g, ds, filename, tags, meta))
+        return res
+
     def check_pajek(self, ds, filename, tags, meta):
         res=odict.odict()
 
@@ -1002,30 +1032,7 @@ class Check:
             res['Data file can be loaded'] = False
             return res
 
-        ## Number of vertices and edges 
-        res['Number of vertices'] = ds.vertices == g.vcount()
-        res['Number of edges'] = ds.edges == g.ecount()
-
-        vattr=g.vs.attribute_names()
-        eattr=g.es.attribute_names()
-
-        ## Tags 
-        tags=[t.tag for t in tags]
-        if 'directed' in tags:
-            res['Tags, directed'] = g.is_directed()
-        if 'undirected' in tags:
-            res['Tags, undirected'] = not g.is_directed()
-        if 'weighted' in tags:
-            res['Tags, weighted'] = 'weight' in eattr
-
-        pajek_meta=(('edge', 'weight'), ('vertex', 'id') )
-        meta=[ m for m in meta if (m.type, m.name) in pajek_meta ]
-        for m in meta:
-            if m.type == "vertex":
-                res["Metadata, vertex, '%s'" % m.name] = m.name in vattr
-            elif m.type == "edge":
-                res["Metadata, edge, '%s'" % m.name] = m.name in eattr        
-            
+        res.update(self._check_igraph_graph(g, ds, filename, tags, meta))
         return res
 
     def check_excel(self, ds, filename, tags, meta):
@@ -1089,6 +1096,8 @@ class Check:
             return self.check_pajek(ds, filename, tags, meta)
         elif format=="Excel":
             return self.check_excel(ds, filename, tags, meta)
+        elif format=="Python-igraph":
+            return self.check_python_igraph(ds, filename, tags, meta)
         return None
 
     def GET(self, id):
@@ -1223,8 +1232,7 @@ class Delete:
 
 class Recreate:
 
-    def to_excel(self, inputfile, id, ds):
-        g=igraph.Graph.Read_GraphML(inputfile + ".graphml")
+    def to_excel(self, outputfile, g, id, ds):
         wb=xlwt.Workbook()
 
         ## The network
@@ -1285,12 +1293,17 @@ class Recreate:
                 for r, v in enumerate(g.vs[attr]):
                     sh3.write(r+1, n, v)
             
-        wb.save(inputfile + ".xls")
-    
+        wb.save(outputfile)
+
+    def to_pickle(self, outputfile, g):
+        pickle.dump(g, open(outputfile, "w"), protocol=-1)
+
     def GET(self, id):
         if web.webopenid.status() not in admins_openid:
             return web.seeother("/login")
-        
+
+        # First, create GraphML and Pajek exports from R using the
+        # Rdata file
         inputfile = list(model.get_dataset_file(id, 1))[0].filename
         inputfile = "../data/%s/%s" % (id, os.path.basename(inputfile))
         rcode = dedent('library(igraph) ; \
@@ -1301,9 +1314,18 @@ class Recreate:
                   ' % ((inputfile,) * 3))
         ret, out=run_r(rcode)
 
+        # Load the GraphML representation, we'll need it later
+        g=igraph.Graph.Read_GraphML(inputfile + ".graphml")
+
+        # If the size of the graph allows, create an Excel file
+        # from GraphML
         ds=list(model.get_dataset(id))[0]
         if ds.vertices < 2**26 and ds.edges < 2**16:
-            self.to_excel(inputfile, id, ds)
+            self.to_excel(inputfile + dataformats["Excel"], g, id, ds)
+
+        # Also create a pickled representation
+        self.to_pickle(inputfile + dataformats["Python-igraph"],
+                g, id, ds)
 
         return render.recreate(id)
         

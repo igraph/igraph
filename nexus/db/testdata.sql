@@ -73,6 +73,11 @@ INSERT INTO format VALUES('Excel',
        'This is a standard file for MS Excel, and other tools capable of reading it, e.g. LibreOffice. The first worksheet includes the network itself and the edge metadata. The second worksheet contains the vertex metadata, if available. The third worksheet contains graph-level data.',
        'http://office.microsoft.com/en-us/excel/');
 
+INSERT INTO format VALUES('Python-igraph',
+       'Pickled Python object for use with the igraph Python module',
+       'igraph is a Python module for network analysis, with support for large graphs. This file can be loaded from a Python script using the ''load'' function of the ''pickle'' module if you have installed the ''igraph'' module before. See the igraph homepage for details.',
+       'http://igraph.sourceforge.net');
+
 INSERT INTO user VALUES('gabor.csardi', 
        'https://launchpad.net/~gabor.csardi', 1);
 INSERT INTO user VALUES('ntamas', 'https://launchpad.net/~ntamas', 1);

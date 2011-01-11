@@ -98,3 +98,4 @@
 ./valgrind-testbed
 nexus/cgi-bin/.openid_secret_key
 nexus/sessions/*
+nexus/config/emailpass

@@ -4,14 +4,18 @@ $def with (id, ds, checkres)
 
 $for format, result in checkres.items():
   <h3>$format</h3>
-  <ul>
-  $for key, value in result.items():
-    <li>$key: 
-      $if type(value) == type('a'):
-        <span class="checkvalue failure">$value</span>.
-      $elif value:
-        <span class="checkvalue">OK</span>.
-      $else:
-	<span class="checkvalue failure">Error</span>.
-    </li>
-  </ul>
+
+  $if result is None:
+    <span class="checkvalue failure">No check routine implemented for this format</span>.
+  $else:
+    <ul>
+    $for key, value in result.items():
+      <li>$key: 
+        $if type(value) == type('a'):
+          <span class="checkvalue failure">$value</span>.
+        $elif value:
+          <span class="checkvalue">OK</span>.
+        $else:
+          <span class="checkvalue failure">Error</span>.
+      </li>
+    </ul>
