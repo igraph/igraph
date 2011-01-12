@@ -56,31 +56,27 @@ INSERT INTO metadata values (2, 1, 'edge', 'numeric', 'weight',
 INSERT INTO format VALUES('R-igraph', 
        'Rdata file for use with the igraph R package',
        'igraph is an R package for network analysis, with support for large graphs. This data file can be loaded into an R session via the ''load'' function, after loading the igraph package itself using the ''library'' function. See the igraph homepage for details.', 
-       '.Rdata',
-       'http://igraph.sourceforge.net');
+       'http://igraph.sourceforge.net', '.Rdata');
 
 INSERT INTO format VALUES('GraphML',
        'XML-based graph description language',
        'GraphML is an XML-based file format (an XML application in the XML terminology) to describe graphs. It is a modern format, and can store graphs with an extensible set of vertex and edge attributes', 
-       '.graphml',
-       'http://graphml.graphdrawing.org');
+       'http://graphml.graphdrawing.org', '.graphml');
 
 INSERT INTO format VALUES('Pajek',
        'File format of the program Pajek',
        'Pajek it a popular network analysis program for Windows. Note that the Pajek data format does not support arbitrary attributes, so some of the metadata might be missing from the data file if you choose this format.',
-       '.net',
-       'http://vlado.fmf.uni-lj.si/pub/networks/pajek/');
+       'http://vlado.fmf.uni-lj.si/pub/networks/pajek/', '.net');
 
 INSERT INTO format VALUES('Excel',
        'Excel workbook containing all network and metadata',
        'This is a standard file for MS Excel, and other tools capable of reading it, e.g. LibreOffice. The first worksheet includes the network itself and the edge metadata. The second worksheet contains the vertex metadata, if available. The third worksheet contains graph-level data.',
-       '.xls',
-       'http://office.microsoft.com/en-us/excel/');
+       'http://office.microsoft.com/en-us/excel/', '.xls');
 
 INSERT INTO format VALUES('Python-igraph',
        'Pickled Python object for use with the igraph Python module',
        'igraph is a Python module for network analysis, with support for large graphs. This file can be loaded from a Python script using the ''load'' function of the ''pickle'' module if you have installed the ''igraph'' module before. See the igraph homepage for details.',
-       'http://igraph.sourceforge.net');
+       'http://igraph.sourceforge.net', '.pickle');
 
 INSERT INTO user VALUES('gabor.csardi', 
        'https://launchpad.net/~gabor.csardi', 1);

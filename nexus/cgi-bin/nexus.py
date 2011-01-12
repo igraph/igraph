@@ -1373,14 +1373,17 @@ class Recreate:
 
         # First, create GraphML and Pajek exports from R using the
         # Rdata file
+        graphmlext=model.get_format_extension('GraphML')
+        pajekext=model.get_format_extension('Pajek')
         inputfile = list(model.get_dataset_file(id, 1))[0].filename
         inputfile = "../data/%s/%s" % (id, os.path.basename(inputfile))
         rcode = dedent('library(igraph) ; \
                   load("%s.Rdata") ; \
                   g <- get(ls()[1]) ; \
-                  write.graph(g, file="%s.graphml", format="graphml") ; \
-                  write.graph(g, file="%s.net", format="pajek") ; \
-                  ' % ((inputfile,) * 3))
+                  write.graph(g, file="%s%s", format="graphml") ; \
+                  write.graph(g, file="%s%s", format="pajek") ; \
+                  ') % (inputfile, inputfile, graphmlext, inputfile, 
+                       pajekext)
         ret, out=run_r(rcode)
 
         # Load the GraphML representation, we'll need it later
@@ -1390,10 +1393,11 @@ class Recreate:
         # from GraphML
         ds=list(model.get_dataset(id))[0]
         if ds.vertices < 2**26 and ds.edges < 2**16:
-            self.to_excel(inputfile + dataformats["Excel"], g, id, ds)
+            self.to_excel(inputfile + ".xls", g, id, ds)
 
         # Also create a pickled representation
-        self.to_pickle(inputfile + dataformats["Python-igraph"], g)
+        pickleext=model.get_format_extension('Python-igraph')
+        self.to_pickle(inputfile + pickleext, g)
 
         return render.recreate(id)
         
