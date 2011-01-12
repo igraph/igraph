@@ -70,7 +70,7 @@ Currently Nexus supports four services:
     licences.</td></tr>
 </table>
 
-and two data formats, XML and plain text.
+and two response formats, XML and plain text.
 
 <a name="dsq"></a>
 ## Data set queries
@@ -97,6 +97,11 @@ Data set information can be queried using the
     include it in the result.</td></tr>
   <tr><td>order</td><td>Specifies the order of the data sets, in the
     result. Possible values are in the table below.</td></tr>
+  <tr><td>offset</td><td>An offset to select part of the results. Results 
+    are listed from <code>offset</code>+1. Defaults to zero, i.e. results 
+    are listed from the beginning by default.</td></tr>
+  <tr><td>limit</td><td>Limit for the number of data sets returned.
+    By default it is 10.</td></tr>
 </table>
 
 Possible values for the '<code>order</code>' parameter:
@@ -171,7 +176,10 @@ service. Parameters:
 
 ### Supported formats
 
-See the current list of supported formats [here][8].
+See the current list of supported formats [here][8]. Note that not all 
+formats are supported for all data sets, because some formats have 
+limitations. E.g. the 'Excel' data format does not support graphs with more
+than 65,535 edges.
 
 ### Parameters
 

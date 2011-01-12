@@ -1,4 +1,8 @@
-$def with (datasets, tags, title)
+$def with (datasets, tags, length, count, offset, limit, title)
+Size: $length
+Totalsize: $count
+Offset: $offset
+Limit: $limit
 $for ds in datasets:
   Id: $ds.id
   Name: $:ds.name

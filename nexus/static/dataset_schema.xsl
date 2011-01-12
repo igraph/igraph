@@ -24,6 +24,7 @@
       <xsd:element name="licence" type="xsd:string" />
       <xsd:element name="licenceurl" type="xsd:anyURI" />
       <xsd:element name="papers" type="papersType" />
+      <xsd:element name="formats" type="formatsType" />
     </xsd:sequence>
   </xsd:complexType>
 
@@ -53,6 +54,13 @@
   <xsd:complexType name="papersType">
     <xsd:sequence>
       <xsd:element name="paper" type="xsd:string" minOccurs="0"
+		   maxOccurs="unbounded" />
+    </xsd:sequence>
+  </xsd:complexType>  
+
+  <xsd:complexType name="formatsType">
+    <xsd:sequence>
+      <xsd:element name="format" type="xsd:string" minOccurs="0"
 		   maxOccurs="unbounded" />
     </xsd:sequence>
   </xsd:complexType>  

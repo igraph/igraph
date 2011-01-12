@@ -70,19 +70,40 @@ print.nexusDatasetInfo <- function(x, ...) {
     cat(strwrap(paste(sep="", i, ": ", x[[i]]), initial="", prefix="  "),
         sep="\n")
   }
+  invisible(x)
 }
 
-nexus.list <- function(tags=NULL, operator=c("or", "and"),
+summary.nexusDatasetInfoList <- function(object, ...) {
+  cat(paste(sep="", "Nexus data set information list, results ",
+            as.numeric(attr(object, "Offset")) + 1, "-",
+            as.numeric(attr(object, "Offset")) +
+            as.numeric(attr(object, "Size")),
+            " out of ", attr(object, "Totalsize"), ".\n\n"))
+  invisible(object)
+}
+
+print.nexusDatasetInfoList <- function(x, ...) {
+  summary(x)
+  attributes(x) <- NULL
+  print(x)
+}
+
+nexus.list <- function(tags=NULL, offset=0, limit=10,
+                       operator=c("or", "and"),
+                       order=c("date", "name", "popularity"),
                        nexus.url=getIgraphOpt("nexus.url")) {
 
   operator=match.arg(operator)
+  order=match.arg(order)
   
   if (is.null(tags)) {
-    u <- paste(sep="", nexus.url, "/api/dataset_info?format=text")
+    u <- paste(sep="", nexus.url, "/api/dataset_info?format=text",
+               "&offset=", offset, "&limit=", limit, "&order=", order)
   } else {
     tags <- paste(tags, collapse="|")
     u <- paste(sep="", nexus.url, "/api/dataset_info?tag=", tags,
-               "&operator=", operator, "&format=text")
+               "&operator=", operator, "&format=text",
+               "&offset=", offset, "&limit=", limit, "&order=", order)
   }
   f <- url(URLencode(u))
   l <- readLines(f)
@@ -95,9 +116,18 @@ nexus.list <- function(tags=NULL, operator=c("or", "and"),
   l <- lapply(l, function(x) c(sub("[ ]*:[^:]*$", "", x),
                                sub("^[^:]*:[ ]*", "", x)))
   spos <- which(sapply(l, function(x) x[1]=="Id"))
-  epos <- c((spos-1)[-1], length(l))
+  epos <- c((spos-1), length(l))
+  ehead <- epos[1]
+  epos <- epos[-1]
+  
   res <- mapply(spos, epos, SIMPLIFY=FALSE, FUN=function(s, e)
                 makeNexusDatasetInfo(l[s:e]))
+  class(res) <- "nexusDatasetInfoList"
+
+  for (h in 1:ehead) {
+    attr(res, l[[h]][1]) <- l[[h]][2]
+  }
+  
   res
 }
 

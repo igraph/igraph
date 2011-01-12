@@ -65,6 +65,7 @@ CREATE TABLE format (
        shortdesc VARCHAR(100),
        description TEXT,
        link VARCHAR(200),
+       extension VARCHAR(20),
        PRIMARY KEY(name)
 );
 

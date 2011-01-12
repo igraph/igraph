@@ -1,6 +1,10 @@
-$def with (datasets, tags, title)
+$def with (datasets, tags, length, count, offset, limit, title)
 <?xml version="1.0"?>
 <datasets>
+  <size>$length</size>
+  <totalsize>$count</totalsize>
+  <offset>$offset</offset>
+  <limit>$limit</limit>
 $for ds in datasets:
   <dataset>
     <id>$ds.id</id>

@@ -1,4 +1,4 @@
-$def with (datasets, tags, title, feed)
+$def with (datasets, tags, title, feed, nohits, start, end, limit, user_input)
 
 <div class="feed">
   <a href="$feed">
@@ -8,6 +8,10 @@ $def with (datasets, tags, title, feed)
 
 <div class="title">
 <h2>$title</h2>
+</div>
+
+<div style="clear:left">
+<p>Results $start - $end out of $nohits.</p>
 </div>
 
 <ul class="datasets">
@@ -26,7 +30,11 @@ $for ds in datasets:
     </div>
   </li>
 
-$if len(ds)==0:
+$if len(datasets)==0:
   <p>No data sets found.</p>
 
 </ul>
+
+<div class="prevnexttable">
+$:prevnexttable(nohits, start, end, limit, user_input)
+</div>

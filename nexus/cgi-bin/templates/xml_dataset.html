@@ -1,4 +1,4 @@
-$def with (ds, tags, meta, papers)
+$def with (ds, tags, meta, formats, papers)
 <?xml version="1.0"?>
 <dataset>
   <id>$ds.id</id>
@@ -31,4 +31,8 @@ $def with (ds, tags, meta, papers)
     $for p in papers:
       <paper>$p.citation</paper>
   </papers>
+  <formats>
+    $for f,fv in formats.items():
+    <format>$f</format>
+  </formats>
 </dataset>

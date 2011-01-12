@@ -22,12 +22,16 @@ $if openid.status():
 <h3>Download</h3>
 <ul class="download">
 $for k,f in dataformats.items():
+  <li>
   $if k in formats.keys():
-    <li>
     <a href="/api/dataset?id=${ds.id}&format=$k">${k} format</a> &ndash; 
     $formats[k].shortdesc,
     <a href="/api/format?dataformat=$k&format=html">more...</a>
-    </li>
+  $else:
+    ${k} format &ndash; not available,
+    <a href="/api/format?dataformat=$k&format=html">more...</a>
+  </li>
+  
 </ul>
 
 <h3>Description</h3>

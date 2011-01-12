@@ -92,13 +92,6 @@ recaptcha_text = """
 # List of supported webpage formats
 formats = ('html', 'xml', 'text', 'rss', 'atom')
 
-# Dictionary mapping supported dataset formats to extensions
-dataformats = { 'R-igraph': '.Rdata', 
-                'GraphML': '.graphml',
-                'Pajek': '.net',
-                'Excel': '.xls',
-                'Python-igraph': '.pickle' }
-
 def get_current_url():
     """Returns the URL of the current page being produced"""
     return web.ctx.fullpath
@@ -143,7 +136,62 @@ def get_motto():
         return "%s data sets, downloaded %s times" % (tot.count, tot.downloads)
     return "%s data sets" % tot.count
 
-tempglob = { 'dataformats': dataformats,
+def get_available_formats(id, nid=1):
+    """Data formats that are available for a given data set"""
+    fn=list(model.get_dataset_file(id, nid))[0].filename
+    avexts=list(model.get_formats())
+    path=os.path.join("..", "data", str(id))
+    files=os.listdir(path)
+    exts=[ os.path.splitext(f) for f in files ]
+    exts=[ e[1] for e in exts if e[0]==fn ]
+    return dict( (v.name,v) for v in avexts if v.extension in exts )
+
+def make_link(keys, **extra):
+    def ex(k,v):
+        if k in extra:
+            return (k, extra[k])
+        else:
+            return (k,v)
+    args=[ '%s=%s' % ex(k,v) for k, v in keys.items() if v is not None ]
+    return "?" + "&".join(args)
+
+## TODO: what if there are too many pages. Currently not a problem,
+## only if we'll have hundreds of data sets.
+def prevnexttable(nohits, start, end, limit, user_input):
+
+    prevtext='<span class="prevpage">&lt;&lt;</span>'
+    nexttext='<span class="nextpage">&gt;&gt;</span>'
+
+    if start == 1:
+        prev=prevtext
+    else:
+        prev='<a href="%s">%s</a>' % (make_link(user_input, 
+                                                offset=start-limit-1),
+                                      prevtext)
+
+    if start+limit < nohits:
+        next='<a href="%s">%s</a>' % (make_link(user_input, 
+                                                offset=start+limit-1),
+                                      nexttext)
+    else:
+        next=nexttext
+    
+    if limit==0:
+        pages=0
+        actual=0
+    else:
+        pages=int(math.ceil(float(nohits) / limit))
+        actual=int(math.ceil(float(start) / limit))
+
+    pagelinks=[ '<a href="%s">%s</a>' % (make_link(user_input,
+                                                   offset=n*limit), n+1) 
+                for n in range(pages) ]
+    if actual != 0:
+        pagelinks[actual-1] = '<span class="actualpage">%s</span>' % (actual)
+
+    return prev + " " + " ".join(pagelinks) + " " + next
+
+tempglob = { 'dataformats': model.get_format_extensions(),
              'openid': web.webopenid,
              'getusername': model.get_username,
              'currenturl': get_current_url,
@@ -153,7 +201,8 @@ tempglob = { 'dataformats': dataformats,
              'get_motto': get_motto,
              'mymarkdown': mymarkdown,
              'markdown': markdown.markdown,
-             'type': type }
+             'type': type,
+             'prevnexttable': prevnexttable }
 for name in url_helper.__all__:
     tempglob[name] = getattr(url_helper, name)
 
@@ -285,7 +334,9 @@ class Index:
     def list_datasets(self, user_input):
         format=user_input.format
 
-        datasets=list(model.get_list_of_datasets(order=user_input.order))
+        datasets, co=list(model.get_list_of_datasets(order=user_input.order,
+                                                    limit=user_input.limit,
+                                                    offset=user_input.offset))
         ids=[d.id for d in datasets]
         tags={}
         for i in ids:
@@ -293,31 +344,40 @@ class Index:
 
         if format=='html':
             feed='/api/dataset_info?format=atom'
-            return render.index(datasets, tags, "All Nexus data sets", feed)
+            return render.index(datasets, tags, "All data sets", feed,
+                                co, int(user_input.offset)+1, 
+                                int(user_input.offset)+len(datasets), 
+                                int(user_input.limit), user_input)
         elif format=='xml':
             web.header('Content-Type', 'text/xml')
-            return render_plain.xml_index(datasets, tags, 
-                                          'All Nexus data sets')
+            return render_plain.xml_index(datasets, tags,
+                                          len(datasets), co,
+                                          int(user_input.offset),
+                                          int(user_input.limit),
+                                          'All data sets', )
         elif format=='text':
             for k, t in tags.iteritems():
                 tags[k]=";".join(x.tag for x in t)
             web.header('Content-Type', 'text/plain')
-            return render_plain.text_index(datasets, tags, 
-                                           'All Nexus data sets')
+            return render_plain.text_index(datasets, tags,
+                                           len(datasets), co,
+                                           int(user_input.offset),
+                                           int(user_input.limit),
+                                           'All data sets')
         elif format=='rss':
             date=datetime.today().strftime("%a, %d %b %Y %H:%M:%S +0200")
             web.header('Content-Type', 'application/rss+xml')
             return render_plain.rss_index(datasets, tags, 
-                                          "All Nexus data sets", 
+                                          "All data sets", 
                                           date, web.ctx.homedomain, '')
         elif format=='atom':
             date=datetime.today().strftime("%a, %d %b %Y %H:%M:%S +0200")
             web.header('Content-Type', 'application/atom+xml')
             return render_plain.atom_index(datasets, tags, 
-                                           "All Nexus data sets", 
+                                           "All data sets", 
                                            date, web.ctx.homedomain, '')
 
-    def format_text(self, dataset, tags, meta, papers):
+    def format_text(self, dataset, tags, meta, formats, papers):
 
         def format_attr(attr):
             return "Attribute: %s %s %s\n  %s" % \
@@ -325,7 +385,9 @@ class Index:
 
         tags=";".join([x.tag for x in tags])
         papers=[p.citation.replace("\n", "\n  ").strip() for p in papers]
-        papers="\n  .\n".join(papers)
+        papers="\n  ".join(papers)
+        desc=dataset.description.replace("\n\r\n", "\n.\n")
+        desc=desc.replace("\n", "\n  ").strip()
         main=dedent("""\
                 Id: %i
                 Name: %s
@@ -337,23 +399,16 @@ class Index:
                 Licence URL: %s
                 Short description: %s
                 Description: %s
+                Formats: %s
                 Citation: %s
         """) % (dataset.id, dataset.name, dataset.vertices, dataset.edges,
                 tags, dataset.date[0:10], dataset.licence_name, 
                 dataset.licence_url,
                 dataset.shortdescription.replace("\n", "\n  ").strip(),
-                dataset.description.replace("\n\n", "\n.\n").replace("\n", "\n  ").strip(), papers)
+                desc, ";".join(n for n,v in formats.items()),
+                papers)
         meta="\n".join(format_attr(m) for m in meta)
         return main + meta
-
-    def formats_for_dataset(self, id, filename):
-        def good(base, f):
-            fn=os.path.join("..", "data", id, base + dataformats[f])
-            return os.path.exists(fn)
-        base=list(model.get_dataset_file(id, 1))[0].filename
-        form=[(f.name, f) for f in model.get_formats()]
-        form=[ (n,f) for (n,f) in form if good(base, n) ]
-        return dict(form)
 
     def dataset(self, user_input):
         id=user_input.id
@@ -363,16 +418,17 @@ class Index:
             return web.notfound()        
         tags=list(model.get_tags(dataset.id))
         meta=list(model.get_metadata(dataset.id))
+        formats=get_available_formats(id)
         papers=model.get_papers(id)
 
         if format=='html':
-            formats=self.formats_for_dataset(id, dataset.filename)
             return render.dataset(dataset, tags, meta, formats, papers)
         elif format=='xml':
             web.header('Content-Type', 'text/xml')
-            return render_plain.xml_dataset(dataset, tags, meta, papers)
+            return render_plain.xml_dataset(dataset, tags, meta,
+                                            formats, papers)
         elif format=='text':
-            formatted=self.format_text(dataset, tags, meta, papers)
+            formatted=self.format_text(dataset, tags, meta, formats, papers)
             web.header('Content-Type', 'text/plain')
             return render_plain.text_dataset(formatted)
 
@@ -381,7 +437,10 @@ class Index:
         format=user_input.format
         if user_input.operator not in ("and", "or"):
             return web.notfound()
-        datasets=list(model.get_list_tagged_as(tagname, user_input.operator))
+        datasets, co=list(model.get_list_tagged_as(tagname,
+                                                   user_input.operator, 
+                                                   limit=user_input.limit,
+                                                   offset=user_input.offset))
         ids=[d.id for d in datasets]
         tags={}
         for i in ids:
@@ -394,10 +453,16 @@ class Index:
             feed='/api/dataset_info?format=atom&tag=%s&operator=%s' % \
                 (user_input.tag, user_input.operator)
             return render.index(datasets, tags, 
-                                "Data sets tagged %s" % tagname, feed)
+                                "Data sets tagged %s" % tagname, feed,
+                                co, int(user_input.offset)+1, 
+                                int(user_input.offset)+len(datasets),
+                                int(user_input.limit), user_input)
         elif format=='xml':
             web.header('Content-Type', 'text/xml')
             return render_plain.xml_index(datasets, tags, 
+                                          len(datasets), co,
+                                          int(user_input.offset),
+                                          int(user_input.limit),
                                           "Data sets tagged %s" 
                                           % tagname)
         elif format=='text':
@@ -405,6 +470,9 @@ class Index:
                 tags[k]=";".join([x.tag for x in t])
             web.header('Content-Type', 'text/plain')
             return render_plain.text_index(datasets, tags, 
+                                           len(datasets), co,
+                                           int(user_input.offset),
+                                           int(user_input.limit),
                                            "Data sets tagged '%s'" 
                                            % tagname)
         elif format=="rss":
@@ -426,7 +494,8 @@ class Index:
 
     def GET(self):
         user_input=web.input(format="html", id=None, tag=None,
-                             operator="or", order="date")
+                             operator="or", order="date", offset=0,
+                             limit=10)
         if user_input.order not in ('date', 'name', 'popularity'):
             return web.notfound()
         if user_input.tag is not None and user_input.id is not None:
@@ -451,7 +520,7 @@ class Dataset:
             return web.notfound()
         else:
             basename=[ d.filename for d in datafile][0]
-            ext=dataformats[format]
+            ext=model.get_format_extension(format)
         filename=os.path.join('..', 'data', user_input.id, basename + ext)
         try:
             f=open(filename)
@@ -1104,7 +1173,7 @@ class Check:
         ds=model.get_dataset(id)
         ds=[d for d in ds][0]
         checkres=odict.odict()
-        for k,v in dataformats.items():
+        for k,v in mode.get_format_extensions().items():
             tags=model.get_tags(ds.id)
             meta=model.get_metadata(ds.id)
             try: 

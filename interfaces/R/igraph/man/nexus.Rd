@@ -11,7 +11,9 @@
   network data sets. These functions can be used to query it and
   download data from it, directly as an igraph graph.}
 \usage{
-nexus.list(tags=NULL, operator=c("or", "and"),
+nexus.list(tags=NULL, offset=0, limit=10,
+           operator=c("or", "and"),
+           order=c("date", "name", "popularity"),
            nexus.url=getIgraphOpt("nexus.url"))
 nexus.info(id, nexus.url=getIgraphOpt("nexus.url"))
 nexus.get(id, nexus.url=getIgraphOpt("nexus.url"))
@@ -21,10 +23,15 @@ nexus.get(id, nexus.url=getIgraphOpt("nexus.url"))
 \arguments{
   \item{tags}{A character vector, the tags that are searched. If not
     given (or \code{NULL}), then all datasets are listed.}
+  \item{offset}{An offset to select part of the results. Results are
+    listed from \code{offset}+1.}
+  \item{limit}{The maximum number of results to return.}
   \item{operator}{A character scalar. If \sQuote{or} (the default),
     then all datasets that have at least one of the given tags, are
     returned. If it if \sQuote{and}, then only datasets that have all
     the given tags, are returned.}
+  \item{order}{The ordering of the results, possible values are:
+    \sQuote{date}, \sQuote{name}, \sQuote{popularity}.}
   \item{id}{The numeric id of the data set to query or download.}
   \item{nexus.url}{The URL of the Nexus server. Don't change this from
     the default, unless you set up your own Nexus server.}
@@ -86,7 +93,14 @@ nexus.get(id, nexus.url=getIgraphOpt("nexus.url"))
   }
 }
 \value{
-  \code{nexus.list} returns a list of \code{nexusDatasetInfo} objects.
+  \code{nexus.list} returns a list of \code{nexusDatasetInfo}
+  objects. The list also has these attributes:
+  \describe{
+    \item{Size}{The number of data sets returned by the query.}
+    \item{Totalsize}{The total number of data sets found for the query.}
+    \item{Offset}{The offset parameter of the query.}
+    \item{Limit}{The limit parameter of the query.}
+  }
   
   \code{nexus.info} returns a single \code{nexusDatasetInfo} object.
 
@@ -96,6 +110,7 @@ nexus.get(id, nexus.url=getIgraphOpt("nexus.url"))
 \seealso{ \url{http://nexus.igraph.org} }
 \examples{
 \dontrun{nexus.list(tag="weighted")
+nexus.list(limit=3, order="name")
 nexus.info(2)
 g <- nexus.get(2)
 summary(g)

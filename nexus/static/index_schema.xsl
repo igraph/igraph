@@ -12,6 +12,10 @@
 
   <xsd:complexType name="datasetsType">
     <xsd:sequence>
+      <xsd:element name="size" type="xsd:nonNegativeInteger" />
+      <xsd:element name="totalsize" type="xsd:nonNegativeInteger" />
+      <xsd:element name="offset" type="xsd:nonNegativeInteger" />
+      <xsd:element name="limit" type="xsd:nonNegativeInteger" />
       <xsd:element name="dataset" type="datasetSummaryType" minOccurs="0" 
 		   maxOccurs="unbounded" />
     </xsd:sequence>

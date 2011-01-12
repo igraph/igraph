@@ -1559,3 +1559,17 @@ div.docs > h4:before {
     content: counters(section, ".") "." counters(subsection, ".") "."
     counters(subsubsection, ".") "." counters(subsubsubsection, ".") " ";
 }
+
+div.prevnexttable {
+    text-align: center;
+}
+span.actualpage {
+    font-size: 1.3em;
+    font-weight: bold;
+}
+span.prevpage {
+    margin-right: 20px;
+}
+span.nextpage {
+    margin-left: 20px;
+}
