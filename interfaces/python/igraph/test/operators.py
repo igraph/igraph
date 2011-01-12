@@ -158,6 +158,30 @@ class OperatorTests(unittest.TestCase):
         self.failUnless(g2.vcount() == g.vcount())
         self.failUnless(g2.ecount() == g.ecount() - 1)
 
+    def testContractVertices(self):
+        g = Graph.Full(4) + Graph.Full(4) + [(0, 5), (1, 4)]
+
+        g2 = g.copy()
+        g2.contract_vertices([0, 1, 2, 3, 1, 0, 4, 5])
+        self.assertEquals(g2.vcount(), 6)
+        self.assertEquals(g2.ecount(), g.ecount())
+        self.assertEquals(sorted(g2.get_edgelist()),
+                [(0, 0), (0, 1), (0, 1), (0, 2), (0, 3), (0, 4), (0, 5),
+                 (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (2, 3), (4, 5)])
+
+        g2 = g.copy()
+        g2.contract_vertices([0, 1, 2, 3, 1, 0, 6, 7])
+        self.assertEquals(g2.vcount(), 8)
+        self.assertEquals(g2.ecount(), g.ecount())
+        self.assertEquals(sorted(g2.get_edgelist()),
+                [(0, 0), (0, 1), (0, 1), (0, 2), (0, 3), (0, 6), (0, 7),
+                 (1, 1), (1, 2), (1, 3), (1, 6), (1, 7), (2, 3), (6, 7)])
+
+        g2 = Graph(10)
+        g2.contract_vertices([0, 0, 1, 1, 2, 2, 3, 3, 4, 4])
+        self.assertEquals(g2.vcount(), 5)
+        self.assertEquals(g2.ecount(), 0)
+
 
 def suite():
     operator_suite = unittest.makeSuite(OperatorTests)

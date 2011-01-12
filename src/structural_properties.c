@@ -7008,7 +7008,7 @@ int igraph_contract_vertices(igraph_t *graph,
   long int no_of_edges=igraph_ecount(graph);
   igraph_bool_t vattr=vertex_comb && igraph_has_attribute_table();
   igraph_t res;
-  long int e, last=0;
+  long int e, last=-1;
   long int no_new_vertices;
 
   if (igraph_vector_size(mapping) != no_of_nodes) {
@@ -7018,7 +7018,10 @@ int igraph_contract_vertices(igraph_t *graph,
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges*2));
-  
+
+  if (no_of_nodes > 0)
+    last = igraph_vector_max(mapping);
+
   for (e=0; e<no_of_edges; e++) {
     long int from = IGRAPH_FROM(graph, e);
     long int to = IGRAPH_TO(graph, e);
@@ -7032,9 +7035,9 @@ int igraph_contract_vertices(igraph_t *graph,
     if (nfrom > last) { last = nfrom; }
     if (nto   > last) { last = nto;   }
   }
-			   
+ 
   no_new_vertices = last+1;
-  
+
   IGRAPH_CHECK(igraph_create(&res, &edges, no_new_vertices,
 			     igraph_is_directed(graph)));
   
