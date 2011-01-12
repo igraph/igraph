@@ -8,5 +8,7 @@ import igraph
 
 if __name__ == "__main__":
     doctest.testmod(igraph)
+    doctest.testmod(igraph.nexus)
     doctest.testmod(igraph.statistics)
+    doctest.testmod(igraph.utils)
 

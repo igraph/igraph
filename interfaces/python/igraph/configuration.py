@@ -140,6 +140,16 @@ class Configuration(object):
         - B{wrap_labels}: whether to try to wrap the labels of the
           vertices automatically if they don't fit within the vertex.
           Default: C{False}.
+
+    Remote repository settings
+    --------------------------
+
+    These settings specify how igraph should access remote graph repositories.
+    Currently only the Nexus repository is supported. All these settings are
+    stored in section C{remote}.
+
+        - B{nexus.url}: the root URL of the Nexus repository. Default:
+          C{http://nexus.igraph.org}.
     """
 
     # pylint: disable-msg=R0903
@@ -179,7 +189,7 @@ class Configuration(object):
         }
     }
 
-    _sections = ("general", "apps", "plotting", )
+    _sections = ("general", "apps", "plotting", "remote")
     _definitions = {
         "general.shells": { "default": "IPythonShell,ClassicPythonShell" },
         "general.verbose": { "default": True, "type": "boolean" },
@@ -189,7 +199,9 @@ class Configuration(object):
         "plotting.layout": { "default": "auto" },
         "plotting.mark_groups": { "default": False, "type": "boolean" },
         "plotting.palette": { "default": "gray" },
-        "plotting.wrap_labels": { "default": False, "type": "boolean" }
+        "plotting.wrap_labels": { "default": False, "type": "boolean" },
+
+        "remote.nexus.url": { "default": "http://nexus.igraph.org" }
     }
 
     # The singleton instance we are using throughout other modules
