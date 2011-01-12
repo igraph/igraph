@@ -5783,14 +5783,15 @@ PyObject *igraphmodule_Graph_layout_reingold_tilford(igraphmodule_GraphObject
   igraph_vector_t roots, *roots_p = 0;
   igraph_vector_t rootlevels, *rootlevels_p = 0;
   PyObject *roots_o=Py_None, *rootlevels_o=Py_None, *mode_o=Py_None;
-  igraph_neimode_t mode = IGRAPH_ALL;
+  igraph_neimode_t mode = IGRAPH_OUT;
   PyObject *result;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist,
     &mode_o, &roots_o, &rootlevels_o))
     return NULL;
 
-  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
+  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode))
+    return NULL;
 
   if (roots_o != Py_None) {
     roots_p = &roots;
@@ -11542,7 +11543,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"layout_reingold_tilford",
    (PyCFunction) igraphmodule_Graph_layout_reingold_tilford,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_reingold_tilford(mode=\"all\", root=None, rootlevel=None)\n"
+   "layout_reingold_tilford(mode=\"out\", root=None, rootlevel=None)\n"
    "Places the vertices on a 2D plane according to the Reingold-Tilford\n"
    "layout algorithm.\n\n"
    "This is a tree layout. If the given graph is not a tree, a breadth-first\n"
@@ -11550,7 +11551,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param mode: specifies which edges to consider when builing the tree.\n"
    "  If it is C{OUT} then only the outgoing, if it is C{IN} then only the\n"
    "  incoming edges of a parent are considered. If it is C{ALL} then all\n"
-   "  edges are used (this was the behaviour in igraph 0.5 and before.\n"
+   "  edges are used (this was the behaviour in igraph 0.5 and before).\n"
    "  This parameter also influences how the root vertices are calculated\n"
    "  if they are not given. See the I{root} parameter.\n"
    "@param root: the index of the root vertex or root vertices.\n"
