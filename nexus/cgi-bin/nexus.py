@@ -1324,8 +1324,7 @@ class Recreate:
             self.to_excel(inputfile + dataformats["Excel"], g, id, ds)
 
         # Also create a pickled representation
-        self.to_pickle(inputfile + dataformats["Python-igraph"],
-                g, id, ds)
+        self.to_pickle(inputfile + dataformats["Python-igraph"], g)
 
         return render.recreate(id)
         
