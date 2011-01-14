@@ -1144,10 +1144,10 @@ PyObject *igraphmodule_Graph_are_connected(igraphmodule_GraphObject * self,
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "OO", kwlist, &v1, &v2))
     return NULL;
 
-  if (!igraphmodule_PyObject_to_vid(v1, &idx1, &self->g))
+  if (igraphmodule_PyObject_to_vid(v1, &idx1, &self->g))
     return NULL;
 
-  if (!igraphmodule_PyObject_to_vid(v2, &idx2, &self->g))
+  if (igraphmodule_PyObject_to_vid(v2, &idx2, &self->g))
     return NULL;
 
   if (igraph_are_connected(&self->g, idx1, idx2, &res))
