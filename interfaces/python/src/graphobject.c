@@ -1136,25 +1136,26 @@ PyObject *igraphmodule_Graph_is_connected(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_are_connected(igraphmodule_GraphObject * self,
                                            PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] = { "v1", "v2", NULL };
-  long v1, v2;
+  static char *kwlist[] = { "v1", "v2", NULL };
+  PyObject *v1, *v2;
+  long int idx1, idx2;
   igraph_bool_t res;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll", kwlist, &v1, &v2))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "OO", kwlist, &v1, &v2))
     return NULL;
 
-  if (igraph_are_connected
-      (&self->g, (igraph_integer_t) v1, (igraph_integer_t) v2, &res))
+  if (!igraphmodule_PyObject_to_vid(v1, &idx1, &self->g))
     return NULL;
 
-  if (res) {
-    Py_INCREF(Py_True);
-    return Py_True;
-  }
-  else {
-    Py_INCREF(Py_False);
-    return Py_False;
-  }
+  if (!igraphmodule_PyObject_to_vid(v2, &idx2, &self->g))
+    return NULL;
+
+  if (igraph_are_connected(&self->g, idx1, idx2, &res))
+    return NULL;
+
+  if (res)
+    Py_RETURN_TRUE;
+  Py_RETURN_FALSE;
 }
 
 /** \ingroup python_interface_graph
