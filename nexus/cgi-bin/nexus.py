@@ -1467,11 +1467,10 @@ def parse_query(qstr):
 
     return tokens
 
-## TODO: other formats: xml, text, rss (?), atom (?)
 class Search:
     
     def GET(self):
-        user_input=web.input(q="", order="date",
+        user_input=web.input(q="", order="date", format='html',
                              offset=0, limit=10)
         q=parse_query(user_input.q)
         ids=unique(reduce(lambda a,b: a+b, 
@@ -1485,11 +1484,39 @@ class Search:
         for i in ids:
             tags[i] = list(model.get_tags(i))
 
-        return render.index(ds, tags, "Search results", None,
-                            co, user_input.offset+1, 
-                            user_input.offset+len(ds),
-                            user_input.limit, user_input, 
-                            user_input.q)
+        title="Nexus search results for '%s'" % user_input.q
+        if user_input.format=='html':
+            feed='/api/search?q=%s&format=atom' % user_input.q
+            return render.index(ds, tags, title, feed,
+                                co, user_input.offset+1, 
+                                user_input.offset+len(ds),
+                                user_input.limit, user_input, 
+                                user_input.q)
+        elif user_input.format=='xml':
+            web.header('Content-Type', 'text/xml')
+            return render_plain.xml_index(ds, tags, len(ds), co, 
+                                          int(user_input.offset),
+                                          int(user_input.limit),
+                                          title)
+        elif user_input.format=='text':
+            for k, t in tags.iteritems():
+                tags[k]=";".join(x.tag for x in t)
+            web.header('Content-Type', 'text/plain')
+            return render_plain.text_index(ds, tags,
+                                           len(ds), co,
+                                           int(user_input.offset),
+                                           int(user_input.limit),
+                                           title)
+        elif user_input.format=='rss':
+            date=datetime.today().strftime("%a, %d %b %Y %H:%M:%S +0200")
+            web.header('Content-Type', 'application/rss+xml')
+            return render_plain.rss_index(ds, tags, title,
+                                          date, web.ctx.homedomain, '')
+        elif user_input.format=='atom':
+            date=datetime.today().strftime("%a, %d %b %Y %H:%M:%S +0200")
+            web.header('Content-Type', 'application/atom+xml')
+            return render_plain.atom_index(ds, tags, title,
+                                           date, web.ctx.homedomain, '')
 
 class Searchpage:
     
