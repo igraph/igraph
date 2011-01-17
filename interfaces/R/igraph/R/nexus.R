@@ -88,31 +88,15 @@ print.nexusDatasetInfoList <- function(x, ...) {
   print(x)
 }
 
-nexus.list <- function(tags=NULL, offset=0, limit=10,
-                       operator=c("or", "and"),
-                       order=c("date", "name", "popularity"),
-                       nexus.url=getIgraphOpt("nexus.url")) {
-
-  operator=match.arg(operator)
-  order=match.arg(order)
+nexus.format.result <- function(l) {
   
-  if (is.null(tags)) {
-    u <- paste(sep="", nexus.url, "/api/dataset_info?format=text",
-               "&offset=", offset, "&limit=", limit, "&order=", order)
-  } else {
-    tags <- paste(tags, collapse="|")
-    u <- paste(sep="", nexus.url, "/api/dataset_info?tag=", tags,
-               "&operator=", operator, "&format=text",
-               "&offset=", offset, "&limit=", limit, "&order=", order)
-  }
-  f <- url(URLencode(u))
-  l <- readLines(f)
-  close(f)
-
   if (length(l)==0) {
-    return(list())
+    res <- list()
+    class(res) <- "nexusDatasetInfoList"
+    return(res)
   }
 
+  
   l <- lapply(l, function(x) c(sub("[ ]*:[^:]*$", "", x),
                                sub("^[^:]*:[ ]*", "", x)))
   spos <- which(sapply(l, function(x) x[1]=="Id"))
@@ -129,6 +113,30 @@ nexus.list <- function(tags=NULL, offset=0, limit=10,
   }
   
   res
+}
+
+nexus.list <- function(tags=NULL, offset=0, limit=10,
+                       operator=c("or", "and"),
+                       order=c("date", "name", "popularity"),
+                       nexus.url=getIgraphOpt("nexus.url")) {
+
+  operator=igraph.match.arg(operator)
+  order=igraph.match.arg(order)
+  
+  if (is.null(tags)) {
+    u <- paste(sep="", nexus.url, "/api/dataset_info?format=text",
+               "&offset=", offset, "&limit=", limit, "&order=", order)
+  } else {
+    tags <- paste(tags, collapse="|")
+    u <- paste(sep="", nexus.url, "/api/dataset_info?tag=", tags,
+               "&operator=", operator, "&format=text",
+               "&offset=", offset, "&limit=", limit, "&order=", order)
+  }
+  f <- url(URLencode(u))
+  l <- readLines(f)
+  close(f)
+
+  nexus.format.result(l)
 }
 
 nexus.info <- function(id, nexus.url=getIgraphOpt("nexus.url")) {
@@ -150,11 +158,53 @@ nexus.info <- function(id, nexus.url=getIgraphOpt("nexus.url")) {
   makeNexusDatasetInfo(l2)
 }  
 
-nexus.get <- function(id, nexus.url=getIgraphOpt("nexus.url")) {
-  u <- paste(sep="", nexus.url, "/api/dataset?id=", id, "&format=R-igraph")
-  env <- new.env()
-  rdata <- url(URLencode(u))
-  load(rdata, envir=env)
-  close(rdata)
-  return(get(ls(env)[1], env))
+nexus.get <- function(id=NULL, q=NULL, offset=0,
+                      order=c("date", "name", "popularity"),
+                      nexus.url=getIgraphOpt("nexus.url")) {
+
+  order=igraph.match.arg(order)
+  
+  if (( is.null(id) &&  is.null(q)) ||
+      (!is.null(id) && !is.null(q))) {
+    stop("Please give exactly one of `id' and `q'")
+  }
+
+  if (!missing(id)) {
+    u <- paste(sep="", nexus.url, "/api/dataset?id=", id, "&format=R-igraph")
+    env <- new.env()
+    rdata <- url(URLencode(u))
+    load(rdata, envir=env)
+    close(rdata)
+    return(get(ls(env)[1], env))
+  } else {
+    sres <- nexus.search(q=q, offset=offset, limit=1, order=order,
+                         nexus.url=nexus.url)
+    if (length(sres)==0) {
+      stop("Nexus search did not find anything")
+    }
+    id <- sres[[1]]$Id
+    return(nexus.get(id=id, nexus.url=nexus.url))
+  }
+}
+
+nexus.search <- function(q, offset=0, limit=10,
+                         order=c("date", "name", "popularity"),
+                         nexus.url=getIgraphOpt("nexus.url")) {
+
+  order=igraph.match.arg(order)
+
+  u <- paste(sep="", nexus.url, "/api/search?q=", q,
+             "&format=text","&offset=", offset, "&limit=", limit,
+             "&order=", order)
+  f <- url(URLencode(u))
+  l <- readLines(f)
+  close(f)
+
+  if (length(l)==0) {
+    res <- list()
+    class(res) <- "nexusDatasetInfoList"
+    return(res)
+  }
+
+  nexus.format.result(l)
 }

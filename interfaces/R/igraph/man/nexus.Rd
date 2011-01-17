@@ -16,7 +16,11 @@ nexus.list(tags=NULL, offset=0, limit=10,
            order=c("date", "name", "popularity"),
            nexus.url=getIgraphOpt("nexus.url"))
 nexus.info(id, nexus.url=getIgraphOpt("nexus.url"))
-nexus.get(id, nexus.url=getIgraphOpt("nexus.url"))
+nexus.get(id, q, offset=0, order=c("date", "name", "popularity"),
+          nexus.url=getIgraphOpt("nexus.url"))
+nexus.search(q, offset=10, limit=10,
+             order=c("date", "name", "popularity"),
+             nexus.url=getIgraphOpt("nexus.url"))
 
 \method{print}{nexusDatasetInfo}(x, \dots)
 }
@@ -33,6 +37,9 @@ nexus.get(id, nexus.url=getIgraphOpt("nexus.url"))
   \item{order}{The ordering of the results, possible values are:
     \sQuote{date}, \sQuote{name}, \sQuote{popularity}.}
   \item{id}{The numeric id of the data set to query or download.}
+  \item{q}{Nexus search string. See examples below. For the complete
+    documentation please see the Nexus homepage at
+    \url{http://nexus.igraph.org}.}
   \item{nexus.url}{The URL of the Nexus server. Don't change this from
     the default, unless you set up your own Nexus server.}
   \item{x}{The \code{nexusDatasetInfo} object to print.}
@@ -47,6 +54,16 @@ nexus.get(id, nexus.url=getIgraphOpt("nexus.url"))
   online database. They both return \code{nexusDatasetInfo} objects.
   \code{nexus.info} returns more information than \code{nexus.list}.
 
+  \code{nexus.search} searches Nexus, and returns a list of data sets,
+  as \code{nexusDatasetInfo} objects. See below for some search
+  examples.
+
+  \code{nexus.get} downloads a data set from Nexus, based on its numeric
+  id, or based on a Nexus search string. For search strings, only the
+  first search hit is downloaded, but see also the \code{offset}
+  argument. (If there are not data sets found, then the function returns
+  an error.)
+  
   The \code{nexusDatasetInfo} objects returned by \code{nexus.list} have
   the following fields:
   \describe{
@@ -93,8 +110,8 @@ nexus.get(id, nexus.url=getIgraphOpt("nexus.url"))
   }
 }
 \value{
-  \code{nexus.list} returns a list of \code{nexusDatasetInfo}
-  objects. The list also has these attributes:
+  \code{nexus.list} and \code{nexus.search} return a list of
+  \code{nexusDatasetInfo} objects. The list also has these attributes:
   \describe{
     \item{Size}{The number of data sets returned by the query.}
     \item{Totalsize}{The total number of data sets found for the query.}
@@ -114,6 +131,18 @@ nexus.list(limit=3, order="name")
 nexus.info(2)
 g <- nexus.get(2)
 summary(g)
+
+## Data sets related to 'US':
+nexus.search("US")
+
+## Search for data sets that have 'network' in their name:
+nexus.search("name:network")
+
+## Download the first data set that matches
+nexus.get(q="Euler")
+
+## Any word can match
+nexus.search("blog or US or karate")
 }
 }
 \keyword{graphs}

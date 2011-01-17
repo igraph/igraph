@@ -228,7 +228,7 @@ export(tkigraph,igraphdemo)
 
 # nexus
 
-export(nexus.get, nexus.list, nexus.info)
+export(nexus.get, nexus.list, nexus.info, nexus.search)
 S3method(print, nexusDatasetInfo)
 S3method(print, nexusDatasetInfoList)
 S3method(summary, nexusDatasetInfoList)

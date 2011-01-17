@@ -168,6 +168,10 @@ def make_link(keys, **extra):
 ## only if we'll have hundreds of data sets.
 def prevnexttable(nohits, start, end, limit, user_input):
 
+    start=int(start)
+    end=int(end)
+    limit=int(limit)
+
     prevtext='<span class="prevpage">&lt;&lt;</span>'
     nexttext='<span class="nextpage">&gt;&gt;</span>'
 
@@ -1486,11 +1490,12 @@ class Search:
 
         title="Nexus search results for '%s'" % user_input.q
         if user_input.format=='html':
+            title="Nexus search results for '<code>%s</code>'" % user_input.q
             feed='/api/search?q=%s&format=atom' % user_input.q
             return render.index(ds, tags, title, feed,
-                                co, user_input.offset+1, 
-                                user_input.offset+len(ds),
-                                user_input.limit, user_input, 
+                                co, int(user_input.offset)+1, 
+                                int(user_input.offset)+len(ds),
+                                int(user_input.limit), user_input, 
                                 user_input.q)
         elif user_input.format=='xml':
             web.header('Content-Type', 'text/xml')
