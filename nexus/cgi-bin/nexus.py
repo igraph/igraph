@@ -18,6 +18,9 @@ import igraph
 import xlwt
 import xlrd
 import pickle
+import re
+import tempfile
+import gzip
 
 from datetime import datetime
 from functools import wraps
@@ -150,7 +153,7 @@ def get_available_formats(id, nid=1):
     fn=list(model.get_dataset_file(id, nid))[0].filename
     avexts=list(model.get_formats())
     path=os.path.join("..", "data", str(id))
-    files=os.listdir(path)
+    files=[ re.sub('\.gz', '', f) for f in os.listdir(path) ]
     exts=[ os.path.splitext(f) for f in files ]
     exts=[ e[1] for e in exts if e[0]==fn ]
     return dict( (v.name,v) for v in avexts if v.extension in exts )
@@ -526,6 +529,13 @@ class Index:
         else:
             return self.list_datasets(user_input)
 
+def support_gzip():
+    if 'HTTP_ACCEPT_ENCODING' not in web.ctx.environ:
+        return False
+    else:
+        enc=web.ctx.environ['HTTP_ACCEPT_ENCODING']
+        return 'gzip' in [ e.strip() for e in enc.split(",")]
+
 class Dataset:
     
     def GET(self):
@@ -537,19 +547,34 @@ class Dataset:
         datafile=model.get_dataset_file(user_input.id, user_input.networkid)
         if not datafile:
             return web.notfound()
-        else:
-            basename=[ d.filename for d in datafile][0]
-            ext=model.get_format_extension(format)
+
+        basename=[ d.filename for d in datafile][0]
+        ext=model.get_format_extension(format)
         filename=os.path.join('..', 'data', user_input.id, basename + ext)
+        gzip=support_gzip()
+        web.header('Content-Type', 'application/octet-stream')
+        web.header('Content-Disposition', 
+                   'attachment; filename="%s%s"' % (basename,ext))
+        model.increase_downloads(user_input.id)
         try:
-            f=open(filename)
-            data=f.read()
-            web.header('Content-Type', 'application/octet-stream')
-            web.header('Content-Disposition', 
-                       'attachment; filename="%s%s"' % (basename,ext))
-            model.increase_downloads(user_input.id)
-            return data
-        except:
+            if gzip:
+                f=open(filename + '.gz')
+                data=f.read()
+                f.close()
+                web.header('Content-Encoding', 'gzip')
+                return data
+            else:
+                tmp=tempfile.NamedTemporaryFile(delete=False)
+                tmpname=tmp.name
+                tmp.close()
+                os.system('gzip -cd %s.gz > %s' % (filename, tmpname))
+                f=open(tmpname)
+                data=f.read()
+                f.close()
+                os.unlink(tmpname)
+                return data
+        except Exception, x:
+#            print str(x)
             return web.internalerror()
 
 class Format:
@@ -963,6 +988,13 @@ def run_r(cmd):
     out=p.stdout.read()
     return [ret, out]
 
+def tmpungzip(filename):
+    tmp=tempfile.NamedTemporaryFile(delete=False)
+    tmpname=tmp.name
+    tmp.close()
+    os.system('gzip -cd %s > %s' % (filename, tmpname))
+    return tmpname    
+
 class Check:
 
     def check_r_igraph(self, ds, filename, tags, meta):
@@ -970,13 +1002,13 @@ class Check:
         res=odict.odict()
         
         ## File exists
-        ex=os.path.exists(filename)
+        ex=os.path.exists(filename + '.gz')
         res['Data file exists'] = ex
         if not ex:
             return res
 
         ## File can be loaded
-        loadcode = 'library(igraph) ; load("%s") ;' %filename
+        loadcode = 'library(igraph) ; load("%s.gz") ;' %filename
         try:
             run_r(loadcode)
             res['Data file can be loaded'] = True
@@ -1064,17 +1096,17 @@ class Check:
         res=odict.odict()
         
         ## File exists
-        ex=os.path.exists(filename)
+        ex=os.path.exists(filename + '.gz')
         res['Data file exists'] = ex
         if not ex:
             return res
 
         ## File can be loaded
         try:
-            g=igraph.Graph.Read_Pickle(filename)
+            g=igraph.Graph.Read_Pickle(gzip.GzipFile(filename + '.gz'))
             res['Data file can be loaded'] = True
         except Exception, x:
-            print str(x)
+#            print str(x)
             res['Data file can be loaded'] = False
             return res
 
@@ -1085,17 +1117,19 @@ class Check:
         res=odict.odict()
 
         ## File exists
-        ex=os.path.exists(filename)
+        ex=os.path.exists(filename + '.gz')
         res['Data file exists'] = ex
         if not ex:
             return res
 
         ## File can be loaded
         try:
-            g=igraph.Graph.Read_GraphML(filename)
+            f=tmpungzip(filename + '.gz')
+            g=igraph.Graph.Read_GraphML(f)
             res['Data file can be loaded'] = True
+            os.unlink(f)
         except Exception, x:
-            print str(x)
+#            print str(x)
             res['Data file can be loaded'] = False
             return res
 
@@ -1106,17 +1140,19 @@ class Check:
         res=odict.odict()
 
         ## File exists
-        ex=os.path.exists(filename)
+        ex=os.path.exists(filename + '.gz')
         res['Data file exists'] = ex
         if not ex:
             return res
 
         ## File can be loaded
         try:
-            g=igraph.Graph.Read_Pajek(filename)
+            f=tmpungzip(filename + '.gz')
+            g=igraph.Graph.Read_Pajek(f)
             res['Data file can be loaded'] = True
+            os.unlink(f)
         except Exception, x:
-            print str(x)
+#            print str(x)
             res['Data file can be loaded'] = False
             return res
 
@@ -1127,15 +1163,17 @@ class Check:
         res=odict.odict()
 
         ## File exists
-        ex=os.path.exists(filename)
+        ex=os.path.exists(filename + '.gz')
         res['Data file exists'] = ex
         if not ex:
             return res
 
         ## File can be loaded
         try:
-            wb=xlrd.open_workbook(filename)
+            f=tmpungzip(filename + '.gz')
+            wb=xlrd.open_workbook(f)
             res['Data file can be loaded'] = True
+            os.unlink(f)
         except Exception, x:
             res['Data file can be loaded'] = False
             return res
@@ -1318,6 +1356,9 @@ class Delete:
         model.delete_dataset(int(id))
         return render.delete()
 
+def gzipout(filename):
+    os.system('gzip -f %s' % filename)
+
 class Recreate:
 
     def to_excel(self, outputfile, g, id, ds):
@@ -1382,9 +1423,11 @@ class Recreate:
                     sh3.write(r+1, n, v)
             
         wb.save(outputfile)
+        gzipout(outputfile)
 
     def to_pickle(self, outputfile, g):
         pickle.dump(g, open(outputfile, "w"), protocol=-1)
+        gzipout(outputfile)
 
     def GET(self, id):
         if web.webopenid.status() not in admins_openid:
@@ -1392,21 +1435,26 @@ class Recreate:
 
         # First, create GraphML and Pajek exports from R using the
         # Rdata file
+        rext=model.get_format_extension('R-igraph')
         graphmlext=model.get_format_extension('GraphML')
         pajekext=model.get_format_extension('Pajek')
         inputfile = list(model.get_dataset_file(id, 1))[0].filename
         inputfile = "../data/%s/%s" % (id, os.path.basename(inputfile))
         rcode = dedent('library(igraph) ; \
-                  load("%s.Rdata") ; \
+                  load("%s%s.gz") ; \
                   g <- get(ls()[1]) ; \
                   write.graph(g, file="%s%s", format="graphml") ; \
                   write.graph(g, file="%s%s", format="pajek") ; \
-                  ') % (inputfile, inputfile, graphmlext, inputfile, 
+                  ') % (inputfile, rext, inputfile, graphmlext, inputfile, 
                        pajekext)
         ret, out=run_r(rcode)
 
         # Load the GraphML representation, we'll need it later
         g=igraph.Graph.Read_GraphML(inputfile + graphmlext)
+
+        # Final format, compressed
+        gzipout('%s%s' % (inputfile, graphmlext))
+        gzipout('%s%s' % (inputfile, pajekext))
 
         # If the size of the graph allows, create an Excel file
         # from GraphML
