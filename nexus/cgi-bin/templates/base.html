@@ -72,6 +72,18 @@ $def with (page)
 	    </div><!-- entry-content -->
 	  </div><!-- post-34 -->
 	</div><!-- content -->
+	<div class="search" id="search">
+	    <div class="title">
+	      <h2>Search Nexus</h2>
+	    </div>
+	    <form action="/api/search" method="get" id="searchform">
+	      <input type="text" name="q" size="31" 
+		     $if page.has_key('searchvalue'):
+		       value="$page['searchvalue']"
+		     />
+	      <button id="Go">Go</button>
+	    </form>
+	</div>
       <div id="secondary" class="widget-area" role="complementary">
 	<div class="feed">
 	  <a href="/api/dataset_info?format=atom">

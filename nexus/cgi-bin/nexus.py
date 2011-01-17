@@ -21,12 +21,12 @@ import pickle
 
 from datetime import datetime
 from functools import wraps
-from itertools import izip
+from itertools import izip, chain
 from operator import attrgetter
 from recaptcha.client import captcha
 from textwrap import dedent
 
-web.config.debug = False
+# web.config.debug = False
 web.config.smtp_server = '173.192.111.8'
 web.config.smtp_port = 26
 web.config.smtp_username = 'csardi@mail.igraph.org'
@@ -39,6 +39,7 @@ urls = (
     '/api/dataset',                        'Dataset',
     '/api/format',                         'Format',
     '/api/licence',                        'Licence',
+    '/api/search',                         'Search',
     '/web/about',                          'About',
     '/web/addblog',                        'AddBlog',
     '/web/addlicence',                     'AddLicence',
@@ -57,7 +58,8 @@ urls = (
     '/web/logout',                         'Logout',
     '/web/openid',                         'OpenID',
     '/web/recreate/(\d+)',                 'Recreate',
-    '.*',                                  'NotFound'    
+    '/web/search',                         'Searchpage',
+    '.*',                                  'NotFound'
     )
 
 # reCAPTCHA keys
@@ -91,6 +93,13 @@ recaptcha_text = """
 
 # List of supported webpage formats
 formats = ('html', 'xml', 'text', 'rss', 'atom')
+
+def unique(seq):
+    # Not order preserving
+    keys = {}
+    for e in seq:
+        keys[e] = 1
+    return keys.keys()
 
 def get_current_url():
     """Returns the URL of the current page being produced"""
@@ -191,6 +200,11 @@ def prevnexttable(nohits, start, end, limit, user_input):
 
     return prev + " " + " ".join(pagelinks) + " " + next
 
+searchform=web.form.Form(
+    web.form.Textbox('q', description='Search:', id='focused'),
+    web.form.Button('Find')
+    )
+
 tempglob = { 'dataformats': model.get_format_extensions(),
              'openid': web.webopenid,
              'getusername': model.get_username,
@@ -202,7 +216,8 @@ tempglob = { 'dataformats': model.get_format_extensions(),
              'mymarkdown': mymarkdown,
              'markdown': markdown.markdown,
              'type': type,
-             'prevnexttable': prevnexttable }
+             'prevnexttable': prevnexttable,
+             'searchform': searchform }
 for name in url_helper.__all__:
     tempglob[name] = getattr(url_helper, name)
 
@@ -347,7 +362,7 @@ class Index:
             return render.index(datasets, tags, "All data sets", feed,
                                 co, int(user_input.offset)+1, 
                                 int(user_input.offset)+len(datasets), 
-                                int(user_input.limit), user_input)
+                                int(user_input.limit), user_input, None)
         elif format=='xml':
             web.header('Content-Type', 'text/xml')
             return render_plain.xml_index(datasets, tags,
@@ -456,7 +471,7 @@ class Index:
                                 "Data sets tagged %s" % tagname, feed,
                                 co, int(user_input.offset)+1, 
                                 int(user_input.offset)+len(datasets),
-                                int(user_input.limit), user_input)
+                                int(user_input.limit), user_input, None)
         elif format=='xml':
             web.header('Content-Type', 'text/xml')
             return render_plain.xml_index(datasets, tags, 
@@ -1173,7 +1188,7 @@ class Check:
         ds=model.get_dataset(id)
         ds=[d for d in ds][0]
         checkres=odict.odict()
-        for k,v in mode.get_format_extensions().items():
+        for k,v in model.get_format_extensions().items():
             tags=model.get_tags(ds.id)
             meta=model.get_metadata(ds.id)
             try: 
@@ -1387,12 +1402,12 @@ class Recreate:
         ret, out=run_r(rcode)
 
         # Load the GraphML representation, we'll need it later
-        g=igraph.Graph.Read_GraphML(inputfile + ".graphml")
+        g=igraph.Graph.Read_GraphML(inputfile + graphmlext)
 
         # If the size of the graph allows, create an Excel file
         # from GraphML
         ds=list(model.get_dataset(id))[0]
-        if ds.vertices < 2**26 and ds.edges < 2**16:
+        if ds.vertices < 2**16 and ds.edges < 2**16:
             self.to_excel(inputfile + ".xls", g, id, ds)
 
         # Also create a pickled representation
@@ -1400,7 +1415,87 @@ class Recreate:
         self.to_pickle(inputfile + pickleext, g)
 
         return render.recreate(id)
+
+def flatten(iterables):
+    return (elem for iterable in iterables for elem in iterable)
+
+class search_clause:
+    def __init__(key, field, neg):
+        self.key=key
+        self.field=field
+        self.neg=neg
+
+def parse_query(qstr):
+
+    ## Tokenize search string
+    state={ 'pos': 0, 'inquote': False, 'current': '', 
+            'infield': False, 'tokens': [] }    
+    while state['pos'] < len(qstr):
+        c=qstr[state['pos']]
+        if c=='"' and not state['inquote']:
+            state['inquote'] = True
+            state['current'] = ''
+        elif c=='"' and state['inquote']:
+            state['inquote'] = False
+            state['tokens'].append(state['current'])
+            state['current'] = ''
+        elif c=='-' and state['current']=='':
+            state['tokens'].append(u'-')
+        elif c==' ' and not state['inquote'] and state['current'] != '':
+            state['tokens'].append(state['current'])
+            state['current'] = ''
+        elif c==' ' and state['current'] == '':
+            pass
+        elif c==':' and state['current'] != '':
+            state['tokens'].append(state['current'] + ':')
+            state['current'] = ''            
+        elif c==':' and state['currnet'] == '':
+            pass
+        else:
+            state['current'] += c
+
+        state['pos'] += 1
         
+    if state['current'] != '':
+        state['tokens'].append(state['current'])
+
+    ## Split search expression at 'OR' keywords
+    OR=[ n for n,v in enumerate(state['tokens']) if v.lower() == 'or' ]
+    tokens=[]
+    for s, e in izip([-1]+OR, OR+[len(state['tokens'])]):
+        tokens.append(state['tokens'][s+1:e])
+
+    return tokens
+
+## TODO: other formats: xml, text, rss (?), atom (?)
+class Search:
+    
+    def GET(self):
+        user_input=web.input(q="", order="date",
+                             offset=0, limit=10)
+        q=parse_query(user_input.q)
+        ids=unique(reduce(lambda a,b: a+b, 
+                          [model.do_search_query(t) for t in q]))
+
+        ds, co=model.get_list_of_datasets(ids=ids, 
+                                          order=user_input.order,
+                                          limit=user_input.limit,
+                                          offset=user_input.offset)
+        tags={}
+        for i in ids:
+            tags[i] = list(model.get_tags(i))
+
+        return render.index(ds, tags, "Search results", None,
+                            co, user_input.offset+1, 
+                            user_input.offset+len(ds),
+                            user_input.limit, user_input, 
+                            user_input.q)
+
+class Searchpage:
+    
+    def GET(self):
+        pass
+
 app = web.application(urls, globals())
 
 web.webopenid.sessions = \

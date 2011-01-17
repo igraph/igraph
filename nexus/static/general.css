@@ -76,6 +76,7 @@ DESCRIPTION: Two-column fixed layout with one sidebar right of content
 	padding: 0px;
 	margin-top: 0px;
 }
+#search,
 #secondary,
 #tertiary {
 	float: right;
@@ -87,6 +88,7 @@ DESCRIPTION: Two-column fixed layout with one sidebar right of content
 	margin-bottom: 10px;
 	background: #f0f0fa;
 }
+#search,
 #secondary,
 #tertiary {
 	clear: right;
@@ -1185,12 +1187,6 @@ h3#reply-title {
 	margin-left: 1.3em;
 	padding: 0;
 }
-#primary {
-}
-#secondary {
-}
-#tertiary {
-}
 
 /* Footer widget areas */
 #footer-widget-area {
@@ -1572,4 +1568,7 @@ span.prevpage {
 }
 span.nextpage {
     margin-left: 20px;
+}
+#searchform {
+    margin-top: 27px;
 }

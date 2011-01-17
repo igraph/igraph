@@ -1,6 +1,8 @@
 import web
+import re
 import os.path
 from web import websafe
+from itertools import izip
 
 if os.path.exists("../db/nexus.db"):
     dbfile='../db/nexus.db'
@@ -53,11 +55,23 @@ def get_list_tagged_as(tagname, operator="or", order="date", limit=10,
     
     return list(res), count
 
-def get_list_of_datasets(order="date", limit=10, offset=0):
+def get_list_of_datasets(ids=None, order="date", limit=10, offset=0):
+
     ord={ 'date': 'd.date DESC, d.id DESC',
           'name': 'd.name',
           'popularity': 'd.downloads DESC, d.date DESC, d.id DESC' }
-    count=list(db.select('dataset', what='COUNT(id) count'))[0].count
+
+    if ids is None:
+        where=''
+        where2=None
+    else:
+        ids=[str(i) for i in ids]
+        where='AND d.id IN (' + ','.join(ids) + ')'
+        where2='id IN (' + ','.join(ids) + ')'
+
+    count=list(db.select('dataset', what='COUNT(id) count', 
+                         where=where2))[0].count
+
     res=db.query('''SELECT d.id id, d.name name, 
                            d.description description, 
                            d.shortdescription shortdescription,
@@ -65,10 +79,11 @@ def get_list_of_datasets(order="date", limit=10, offset=0):
                            n.id netid, n.description netdescription, 
                            n.vertices vertices, n.edges edges
                     FROM dataset d, network n 
-                    WHERE d.id=n.dataset
+                    WHERE d.id=n.dataset %s
                     ORDER BY %s
                     LIMIT %s 
-                    OFFSET %s''' % (ord[order], int(limit), int(offset)))
+                    OFFSET %s''' % (where, ord[order], int(limit), 
+                                    int(offset)))
     res=list(res)
     return res, count
 
@@ -253,3 +268,71 @@ def get_format_extension(format):
     res=db.select('format', what='extension', 
                   where="name='%s'" % websafe(format))
     return list(res)[0].extension
+
+def regexp(expr, item):
+    return int(re.search(expr, item, re.IGNORECASE) is not None)
+
+def install_regexp():
+    db._getctx().db.create_function('REGEXP', 2, regexp)
+
+## TODO: search in other fields: publication, metadata, number of vertices
+def do_search_query(tokens, offset=0, limit=10):
+
+    tokens=[ websafe(t) for t in tokens ]
+
+    if len(tokens)==0:
+        return range(1, get_totals().count+1)
+
+    install_regexp()
+
+    searchfields=['name', 'shortdescription', 'description']
+
+    recs=[]
+    i=0
+    while i < len(tokens):
+        if tokens[i] == '-' and i+1 < len(tokens) and tokens[i+1][-1] != ':':
+            recs.append( (None, tokens[i+1], True) )
+            i += 2
+        elif tokens[i] == '-' and i+2 < len(tokens) and \
+                tokens[i+1][-1] == ':':
+            recs.append( (tokens[i+1][:-1], tokens[i+2], True) )
+            i += 3
+        elif tokens[i] == '-':
+            i += 1
+        elif tokens[i][-1] == ':' and i+1 < len(tokens):
+            if tokens[i][:-1] in searchfields:
+                recs.append( (tokens[i][:-1], tokens[i+1]) )
+                i += 2
+            else:
+                recs.append( (None, tokens[i+1]) )
+                i += 2
+        else:
+            recs.append( (None, tokens[i]) )
+            i += 1
+
+    clause="%s %s REGEXP '\\b%s\\b'"
+
+    def allfields(rec):
+        if len(rec)>=3 and rec[2]:
+            n='NOT'
+            op=' AND '
+        else:
+            n=''
+            op=' OR '
+        return '(' + op.join([ clause % (f,n,rec[1]) 
+                               for f in searchfields]) + ')'
+
+    def term(rec):
+        if rec[0] is None:
+            return allfields(rec)
+        else:
+            if len(rec)>=3 and rec[2]:
+                n='NOT'
+            else:
+                n=''
+            return clause % (rec[0], n, rec[1])
+
+    where=' AND '.join([ term(r) for r in recs ])
+    
+    res=db.select('dataset', what='id', where=where)
+    return [r.id for r in res]
