@@ -8,6 +8,7 @@ docs='''
     1. [Basics](#basics)
     1. [Data set queries](#dsq)
     1. [Data set downloads](#dsd)
+    1. [Searching](#searching)
     1. [Data formats](#dformat)
     1. [Licences](#licence)
     1. [XML schemas](#schema)
@@ -22,14 +23,29 @@ combination of tags. To subscribe to the non-specific feed, click on
 the yellow feed icon at the top right corner of any Nexus page, in the
 'What's new?' box.
 
+## Browser support
+
 Not all browsers support Atom and RSS feeds out of the box, e.g. for
 the current version of Google Chrome, you need to install an extension
 first. 
+
+## Tag feeds
 
 For subscribing to feeds of data set tags, e.g. if you are only
 interested in weighted networks, click on the tag first in the tag
 cloud at the top right corner of any Nexus page, in the 'Data tags'
 box. Then click on the big yellow feed icon at the top of the page.
+
+## Arbitrary search feeds
+
+In addition to data set tags, Nexus provides Atom feeds for arbitrary
+Nexus searches (see [Searching](#searching) below). E.g. it is
+possible to create feed that contains only data sets related to
+football. One has to enter the necessary keywords in the search box at
+the top right of any Nexus page, press enter, and then on the list of
+results, click on the big yellow feed icon at the top of the page.
+
+## RSS feeds instead of Atom
 
 If you want to use RSS feeds instead of Atom feeds, then copy the feed
 URL and replace the '<code>format=atom</code>' part with
@@ -58,7 +74,7 @@ downloads. A Nexus query has the following parts:
 This gives the URI:
 <code>http://nexus.igraph.org/api/dataset_info?format=xml&id=1</code>.
 
-Currently Nexus supports four services: 
+Currently Nexus supports the followingservices: 
 
 <table>
   <tr><td><code>dataset_info?</code></td><td>Information about one or
@@ -68,6 +84,7 @@ Currently Nexus supports four services:
     </td></tr>
   <tr><td><code>licence?</code></td><td>Information about data set
     licences.</td></tr>
+  <tr><td><code>search?</code></td><td>Search Nexus</tr></tr>
 </table>
 
 and two response formats, XML and plain text.
@@ -170,6 +187,51 @@ service. Parameters:
 #### Download data set #1 in Excel format
 
 <code>[http://nexus.igraph.org/api/dataset?format=Excel&id=1](http://nexus.igraph.org/api/dataset?format=Excel&id=1)</code>
+
+<a name="searching"></a>
+## Searching Nexus
+
+The Nexus API provides a flexible search interface to facilitate the
+quick finding of interesting data sets.
+
+### Parameters
+
+The search service has the following parameters:
+
+<table>
+  <tr><td>q</td><td>The search query string, see details below.</td></tr>
+  <tr><td>order</td><td>The order of the data sets, possible values
+    are the same as for data set queries.</td></tr>
+  <tr><td>offset</td><td>An offset to select part of the results. Results 
+    are listed from <code>offset</code>+1. Defaults to zero, i.e. results 
+    are listed from the beginning by default.</td></tr>
+  <tr><td>limit</td><td>Limit for the number of data sets returned.
+    By default it is 10.</td></tr>
+</table>
+
+The following rules apply for the search query string:
+
+- All searches are case-insensitive.
+- Nexus search for complete words only, words are separated by
+  non-alphabetical characters in the search string:
+  <p>'<code>social network</code>'</p>
+- The special word 'OR' can be used to find data sets that contain
+  any of the given words:
+  <p>'<code>friendship OR social</code>'</p>
+- By default Nexus search for the given word(s) in the name and 
+  description of the data sets. It is possible to restrict the search 
+  to a given field, by using the name of the field (name,
+  shortdescription or description) as a prefix of the search term, and
+  a separating colon:
+  <p>'<code>name:karate</code>'<p>
+- Negative searches are also possible, one must prefix the search term 
+  with a minus sign, to find data sets that are _not_ related to the
+  search term:
+  <p>'<code>-social</code>'</p>
+- Negative and restricted searches can be combined:
+  <p>'<code>-name:2003 collaboration</code>'</p>
+- Search terms containing white space can be given, by quoting them:
+  <p>'<code>"social network"</code>'</p>
 
 <a name="dformat"></a>
 ## Data formats
