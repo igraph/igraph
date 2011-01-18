@@ -9,6 +9,7 @@ CREATE TABLE licence (
 
 CREATE TABLE dataset (
        id INTEGER,
+       sid TEXT,
        name TEXT,
        shortdescription TEXT,
        description TEXT,
@@ -17,6 +18,7 @@ CREATE TABLE dataset (
        date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
        downloads INTEGER,
        PRIMARY KEY(id),
+       UNIQUE(sid),
        FOREIGN KEY(licence) REFERENCES licence(id)
 );
 

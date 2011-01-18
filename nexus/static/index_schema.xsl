@@ -24,6 +24,7 @@
   <xsd:complexType name="datasetSummaryType">
     <xsd:sequence>
       <xsd:element name="id" type="xsd:positiveInteger" />
+      <xsd:element name="sid" type="xsd:string" />
       <xsd:element name="name" type="xsd:string" />
       <xsd:element name="description" type="xsd:string" />
       <xsd:element name="vertices" type="xsd:nonNegativeInteger" />

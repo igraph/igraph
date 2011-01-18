@@ -1,6 +1,6 @@
 $def with (ds, tags, meta, formats, papers)
 
-<div class="title"><h2>$ds.name
+<div class="title"><h2>$ds.name [$ds.sid]
 $if openid.status():
     <span class="edit">
       <a href="/web/edit/$ds.id">[edit]</a>
@@ -39,16 +39,18 @@ $for k,f in dataformats.items():
 $:markdown(ds.description)
 </div>
 
-<h3>Metadata</h3>
-<dl class="metadata">
-$for m in meta:
-  <dt>$m.type.capitalize() attribute '$m.name'</dt>
-  <dd>$m.description</dd>
-</dl>
+$if len(meta) > 0:
+  <h3>Metadata</h3>
+  <dl class="metadata">
+  $for m in meta:
+    <dt>$m.type.capitalize() attribute '$m.name'</dt>
+    <dd>$m.description</dd>
+  </dl>
 
-<h3>Publication(s)</h3>
-$for p in papers:
-  <p>$p.citation</p>
+$if len(papers) > 0:
+  <h3>Publication(s)</h3>
+  $for p in papers:
+    <p>$p.citation</p>
 
 <h3>Licence</h3>
 <p><a href="$ds.licence_url">$ds.licence_name</a></p>

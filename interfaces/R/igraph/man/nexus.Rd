@@ -36,7 +36,8 @@ nexus.search(q, offset=10, limit=10,
     the given tags, are returned.}
   \item{order}{The ordering of the results, possible values are:
     \sQuote{date}, \sQuote{name}, \sQuote{popularity}.}
-  \item{id}{The numeric id of the data set to query or download.}
+  \item{id}{The numeric or character id of the data set to query or
+    download.}
   \item{q}{Nexus search string. See examples below. For the complete
     documentation please see the Nexus homepage at
     \url{http://nexus.igraph.org}.}
@@ -68,6 +69,7 @@ nexus.search(q, offset=10, limit=10,
   the following fields:
   \describe{
     \item{Id}{The numeric id of the dataset.}
+    \item{Sid}{The character id of the dataset.}
     \item{Name}{Character scalar, the name of the dataset.}
     \item{Vertices}{Numeric scalar, the number of vertices in the
       graph.}

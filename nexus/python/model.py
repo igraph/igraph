@@ -19,7 +19,7 @@ def get_list_tagged_as(tagname, operator="or", order="date", limit=10,
     tagstr='(' + ",".join(tagstr) + ")"
     if operator=="or":
         table='dataset d, dataset_tag dt, tag t, network n'
-        what='''DISTINCT d.id id, d.name name,
+        what='''DISTINCT d.id id, d.sid sid, d.name name,
                          d.description description,
                          d.shortdescription shortdescription,
                          d.licence licence, d.date date,
@@ -35,7 +35,7 @@ def get_list_tagged_as(tagname, operator="or", order="date", limit=10,
                              where=where))[0].c
     else:
         table="dataset d, network n"
-        what='''d.id id, d.name name,
+        what='''d.id id, d.sid sid, d.name name,
                 d.description description, 
                 d.shortdescription shortdescription,
                 d.licence licence,
@@ -72,7 +72,7 @@ def get_list_of_datasets(ids=None, order="date", limit=10, offset=0):
     count=list(db.select('dataset', what='COUNT(id) count', 
                          where=where2))[0].count
 
-    res=db.query('''SELECT d.id id, d.name name, 
+    res=db.query('''SELECT d.id id, d.sid sid, d.name name, 
                            d.description description, 
                            d.shortdescription shortdescription,
                            d.licence licence, d.date date, 
@@ -95,7 +95,7 @@ def get_tags(id):
                     vars={'id': id})
 
 def get_dataset(id):
-    return db.query('''SELECT d.id id, d.name name, 
+    return db.query('''SELECT d.id id, d.sid sid, d.name name, 
                               d.description description, 
                               d.shortdescription shortdescription,
                               l.id licence,
@@ -174,11 +174,11 @@ def list_data_formats():
 def new_licence(**args):
     return db.insert('licence', seqname="id", **args)
 
-def update_dataset(id, name, shortdescription,
+def update_dataset(id, sid, name, shortdescription,
                    description, tags, licence, vertices,
                    edges, filename, source, papers):
 
-    db.update('dataset', where='id=%s' % int(id), name=name,
+    db.update('dataset', where='id=%s' % int(id), sid=sid, name=name,
               shortdescription=shortdescription,
               description=description, licence=int(licence), 
               source=source)
@@ -336,3 +336,11 @@ def do_search_query(tokens, offset=0, limit=10):
     
     res=db.select('dataset', what='id', where=where)
     return [r.id for r in res]
+
+def get_id_from_sid(sid):
+    res=list(db.select('dataset', what='id', 
+                       where="sid='%s'" % websafe(sid)))
+    if len(res)==0:
+        return None
+    else:
+        return str(res[0].id)

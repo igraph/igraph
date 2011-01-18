@@ -29,7 +29,7 @@ from operator import attrgetter
 from recaptcha.client import captcha
 from textwrap import dedent
 
-# web.config.debug = False
+web.config.debug = False
 web.config.smtp_server = '173.192.111.8'
 web.config.smtp_port = 26
 web.config.smtp_username = 'csardi@mail.igraph.org'
@@ -207,11 +207,6 @@ def prevnexttable(nohits, start, end, limit, user_input):
 
     return prev + " " + " ".join(pagelinks) + " " + next
 
-searchform=web.form.Form(
-    web.form.Textbox('q', description='Search:', id='focused'),
-    web.form.Button('Find')
-    )
-
 tempglob = { 'dataformats': model.get_format_extensions(),
              'openid': web.webopenid,
              'getusername': model.get_username,
@@ -223,8 +218,7 @@ tempglob = { 'dataformats': model.get_format_extensions(),
              'mymarkdown': mymarkdown,
              'markdown': markdown.markdown,
              'type': type,
-             'prevnexttable': prevnexttable,
-             'searchform': searchform }
+             'prevnexttable': prevnexttable }
 for name in url_helper.__all__:
     tempglob[name] = getattr(url_helper, name)
 
@@ -412,6 +406,7 @@ class Index:
         desc=desc.replace("\n", "\n  ").strip()
         main=dedent("""\
                 Id: %i
+                Sid: %s
                 Name: %s
                 Vertices: %s
                 Edges: %s
@@ -423,7 +418,8 @@ class Index:
                 Description: %s
                 Formats: %s
                 Citation: %s
-        """) % (dataset.id, dataset.name, dataset.vertices, dataset.edges,
+        """) % (dataset.id, dataset.sid, dataset.name, 
+                dataset.vertices, dataset.edges,
                 tags, dataset.date[0:10], dataset.licence_name, 
                 dataset.licence_url,
                 dataset.shortdescription.replace("\n", "\n  ").strip(),
@@ -434,6 +430,9 @@ class Index:
 
     def dataset(self, user_input):
         id=user_input.id
+        if not re.match('^[0-9]+$', id):
+            id=model.get_id_from_sid(id)
+
         format=user_input.format
         dataset=[d for d in model.get_dataset(id)][0]
         if not dataset:
@@ -441,7 +440,7 @@ class Index:
         tags=list(model.get_tags(dataset.id))
         meta=list(model.get_metadata(dataset.id))
         formats=get_available_formats(id)
-        papers=model.get_papers(id)
+        papers=list(model.get_papers(id))
 
         if format=='html':
             return render.dataset(dataset, tags, meta, formats, papers)
@@ -541,10 +540,15 @@ class Dataset:
     def GET(self):
         user_input=web.input(id=None, networkid=1)
         format=user_input.format
+        
+        if not re.match('^[0-9]+$', user_input.id):
+            user_input.id=model.get_id_from_sid(user_input.id)
+
         if user_input.id is None:
             return web.notfound()
-        
+
         datafile=model.get_dataset_file(user_input.id, user_input.networkid)
+
         if not datafile:
             return web.notfound()
 
@@ -647,7 +651,8 @@ class Label(web.form.Input):
         return None
 
 add_form=MyForm(
-    web.form.Textbox("name", description="Name:", id="focused", size=50),
+    web.form.Textbox("sid", description="Id:", id="focused", size=50),
+    web.form.Textbox("name", description="Name:", size=50),
     web.form.Textbox("shortdescription", description="Short description",
                      size=50),
     web.form.Textarea("description", description="Description:",
@@ -762,7 +767,7 @@ class Add:
             ## TODO
             None
 
-        did=model.new_dataset(name=form.d.name, 
+        did=model.new_dataset(sid=form.d.sid, name=form.d.name, 
                               shortdescription=form.d.shortdescription,
                               description=form.d.description,
                               licence=int(form.d.licence),
@@ -865,7 +870,7 @@ class Edit:
 
         papers=[p.strip() for p in form.d.papers.split("\r\n\r\n")]
 
-        model.update_dataset(id=id, name=form.d.name, 
+        model.update_dataset(id=id, sid=form.d.sid, name=form.d.name, 
                              shortdescription=form.d.shortdescription,
                              description=form.d.description,
                              tags=tags, licence=form.d.licence, 

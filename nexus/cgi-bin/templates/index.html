@@ -23,7 +23,7 @@ $else:
   <ul class="datasets">
   $for ds in datasets:
     <li>
-      <h4>$:link_to_dataset(ds, bullet=u"\u25b6 ")</h4>
+      <h4>$:link_to_dataset(ds, caption=u"\u25b6 %s [%s]" % (ds.name, ds.sid))</h4>
       <p class="datasettags">
 	$ds.date, $ds.vertices vertices, $ds.edges edges.
 	Tags:

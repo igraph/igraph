@@ -51,7 +51,7 @@ makeNexusDatasetInfo <- function(entries) {
 }
 
 print.nexusDatasetInfo <- function(x, ...) {
-  cat(sep="", "[Nexus dataset # ", x$Id, ", ", x$Vertices, "/",
+  cat(sep="", "[Nexus ", x$Sid, " #", x$Id, ", ", x$Vertices, "/",
       x$Edges, ", ", x$Name, "]\n")
   if (length(x$Tags) != 0) {
     cat("Tags: ")
@@ -59,7 +59,7 @@ print.nexusDatasetInfo <- function(x, ...) {
     cat("\n")
   }
   attr <- x[["Attributes"]]
-  printed <- c("Id", "Vertices", "Edges", "Name", "Tags", "Attributes")
+  printed <- c("Id", "Sid", "Vertices", "Edges", "Name", "Tags", "Attributes")
   x <- x[ setdiff(names(x), printed) ]
   for (a in attr) {
     cat(paste(sep="", "Attribute '", a$Name, "', ", a$Type,

@@ -8,6 +8,7 @@ $def with (datasets, tags, length, count, offset, limit, title)
 $for ds in datasets:
   <dataset>
     <id>$ds.id</id>
+    <sid>$ds.sid</sid>
     <name>$ds.name</name>
     <description>$ds.shortdescription</description>
     <vertices>$ds.vertices</vertices>
