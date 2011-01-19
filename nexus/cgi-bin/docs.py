@@ -98,11 +98,12 @@ Data set information can be queried using the
 '<code>dataset_info?</code>' service. It has the following parameters:
 
 <table>
-  <tr><td>id</td><td>The id of the data set to query. If not present,
-    then a list is returned, with basic information about all data
-    sets. (Or a subset of them, if the '<code>tag</code>' parameter is
-    present.) If '<code>id</code>' is given, then detailed information
-    is returned about a single dataset. See examples below.</td></tr>
+  <tr><td>id</td><td>The numeric or string id of the data set to
+    query. If not present, then a list is returned, with basic
+    information about all data sets. (Or a subset of them, if the
+    '<code>tag</code>' parameter is present.) If '<code>id</code>' is
+    given, then detailed information is returned about a single
+    dataset. See examples below.</td></tr> 
   <tr><td>tag</td><td>Tag or tags separated by a '<code>|</code>'
     character. Only data sets with these tag(s) are listed. You cannot
     give both '<code>id</code>', and '<code>tag</code>', this results an
