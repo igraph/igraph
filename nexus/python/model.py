@@ -218,12 +218,12 @@ def get_metadata(id):
     return list(res)
 
 def delete_meta(id, type, name):
-    res=db.delete('metadata', where="type='%s' AND name='%s'" % \
-                      (websafe(type), websafe(name)))
+    res=db.delete('metadata', where="dataset=%s AND type='%s' AND name='%s'" %
+                  (websafe(id), websafe(type), websafe(name)))
 
 def update_meta(id, type, name, **args):
-    res=db.update('metadata', where="type='%s' AND name='%s'" % 
-                  (websafe(type), websafe(name)),
+    res=db.update('metadata', where="dataset=%s AND type='%s' AND name='%s'" %
+                  (websafe(str(id)), websafe(type), websafe(name)),
                   type=type, name=name, **args)
 
 def add_meta(id, type, name, **args):
