@@ -4300,7 +4300,7 @@ int igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
   IGRAPH_CHECK(igraph_dqueue_init(&sources, 0));
   IGRAPH_FINALLY(igraph_dqueue_destroy, &sources);
-  IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_OUT, 0));
+  IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_OUT, 1));
 
   vertices_left = no_of_nodes;
 
@@ -4321,6 +4321,8 @@ int igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
     j=igraph_vector_size(&neis);
     for (i=0; i<j; i++) {
       nei = (long)VECTOR(neis)[i];
+      if (nei == node)
+        continue;
       VECTOR(degrees)[nei]--;
       if (VECTOR(degrees)[nei] == 0)
         IGRAPH_CHECK(igraph_dqueue_push(&sources, nei));
