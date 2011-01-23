@@ -937,7 +937,7 @@ class Graph(GraphBase):
           modularity.
         """
         merges, qs = GraphBase.community_edge_betweenness(self, directed)
-        dendrogram = VertexDendrogram(merges, modularity=qs)
+        dendrogram = VertexDendrogram(self, merges, modularity=qs)
         if clusters is not None:
             dendrogram.cut(clusters)
         return dendrogram

@@ -3404,7 +3404,7 @@ PyObject *igraphmodule_Graph_clusters(igraphmodule_GraphObject * self,
   igraph_connectedness_t mode = IGRAPH_STRONG;
   igraph_vector_t res1, res2;
   igraph_integer_t no;
-  PyObject *list, *mode_o;
+  PyObject *list, *mode_o = Py_None;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &mode_o))
     return NULL;
