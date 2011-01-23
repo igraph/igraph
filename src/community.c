@@ -302,7 +302,7 @@ long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
 
 /**
  * \function igraph_community_edge_betweenness
- * \brief Community findinf based on edge betweenness
+ * \brief Community finding based on edge betweenness
  * 
  * Community structure detection based on the betweenness of the edges
  * in the network. The algorithm was invented by M. Girvan and
@@ -350,8 +350,8 @@ long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
  * \sa \ref igraph_community_eb_get_merges(), \ref
  * igraph_community_spinglass(), \ref igraph_community_walktrap().
  * 
- * Time complexity: O(|V|^3), as the betweenness calculation requires
- * O(|V|^2) and we do it |V|-1 times.
+ * Time complexity: O(|V||E|^2), as the betweenness calculation requires
+ * O(|V||E|) and we do it |E|-1 times.
  */
   
 int igraph_community_edge_betweenness(const igraph_t *graph, 
