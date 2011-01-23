@@ -323,7 +323,8 @@ long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
  * \param graph The input graph.
  * \param result Pointer to an initialized vector, the result will be
  *     stored here, the ids of the removed edges in the order of their 
- *     removal. It will be resized as needed.
+ *     removal. It will be resized as needed. It may be NULL if
+ *     the edge IDs are not needed by the caller.
  * \param edge_betweenness Pointer to an initialized vector or
  *     NULL. In the former case the edge betweenness of the removed
  *     edge is stored here. The vector will be resized as needed.
@@ -379,8 +380,18 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
   igraph_vector_t eb;
   long int maxedge, pos;
   igraph_integer_t from, to;
+  igraph_bool_t result_owned = 0;
 
   char *passive;
+
+  if (result == 0) {
+    result = igraph_Calloc(1, igraph_vector_t);
+    if (result == 0)
+      IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
+    IGRAPH_FINALLY(igraph_free, result);
+    IGRAPH_VECTOR_INIT_FINALLY(result, 0);
+    result_owned = 1;
+  }
 
   directed=directed && igraph_is_directed(graph);
   if (directed) {
@@ -539,7 +550,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
   igraph_free(nrgeo);
   igraph_free(distance);
   IGRAPH_FINALLY_CLEAN(7);
-  
+
   if (directed) {
     igraph_inclist_destroy(&elist_out);
     igraph_inclist_destroy(&elist_in);
@@ -555,6 +566,12 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 						membership));
   }
   
+  if (result_owned) {
+    igraph_vector_destroy(result);
+    free(result);
+    IGRAPH_FINALLY_CLEAN(2);
+  }
+
   return 0;
 }
 
