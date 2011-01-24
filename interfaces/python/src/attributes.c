@@ -104,6 +104,10 @@ void igraphmodule_invalidate_vertex_name_index(igraph_t *graph) {
   igraphmodule_i_attribute_struct_invalidate_vertex_name_index(ATTR_STRUCT(graph));
 }
 
+void igraphmodule_index_vertex_names(igraph_t *graph, igraph_bool_t force) {
+  igraphmodule_i_attribute_struct_index_vertex_names(ATTR_STRUCT(graph), force);
+}
+
 int igraphmodule_get_vertex_id_by_name(igraph_t *graph, PyObject* o, long int* vid) {
   igraphmodule_i_attribute_struct* attrs = ATTR_STRUCT(graph);
   PyObject* o_vid = NULL;

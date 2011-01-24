@@ -768,6 +768,29 @@ PyObject* igraphmodule_VertexSeq_get_indices(igraphmodule_VertexSeqObject* self,
 
 /**
  * \ingroup python_interface_vertexseq
+ * Returns the internal dictionary mapping vertex names to vertex IDs.
+ */
+PyObject* igraphmodule_VertexSeq__name_index(igraphmodule_VertexSeqObject* self,
+  void* closure) {
+  igraphmodule_GraphObject *gr = self->gref;
+  PyObject* result = ATTR_NAME_INDEX(&gr->g);
+  if (result == 0)
+    Py_RETURN_NONE;
+  Py_INCREF(result);
+  return result;
+}
+
+/**
+ * \ingroup python_interface_vertexseq
+ * Re-creates the dictionary that maps vertex names to vertex IDs.
+ */
+PyObject* igraphmodule_VertexSeq__reindex_names(igraphmodule_VertexSeqObject* self) {
+  igraphmodule_index_vertex_names(&self->gref->g, 1);
+  Py_RETURN_NONE;
+}
+
+/**
+ * \ingroup python_interface_vertexseq
  * Method table for the \c igraph.VertexSeq object
  */
 PyMethodDef igraphmodule_VertexSeq_methods[] = {
@@ -797,6 +820,10 @@ PyMethodDef igraphmodule_VertexSeq_methods[] = {
   {"select", (PyCFunction)igraphmodule_VertexSeq_select,
    METH_VARARGS | METH_KEYWORDS,
    "select(...) -> VertexSeq\n\n"
+   "For internal use only.\n"
+  },
+  {"_reindex_names", (PyCFunction)igraphmodule_VertexSeq__reindex_names, METH_NOARGS,
+   "Re-creates the dictionary that maps vertex names to IDs.\n\n"
    "For internal use only.\n"
   },
   {NULL}
@@ -845,6 +872,9 @@ PyGetSetDef igraphmodule_VertexSeq_getseters[] = {
   },
   {"indices", (getter)igraphmodule_VertexSeq_get_indices, NULL,
       "The vertex indices in this vertex sequence", NULL,
+  },
+  {"_name_index", (getter)igraphmodule_VertexSeq__name_index, NULL,
+      "The internal index mapping vertex names to IDs", NULL
   },
   {NULL}
 };
