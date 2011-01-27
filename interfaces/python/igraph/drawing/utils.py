@@ -206,6 +206,13 @@ class Point(tuple):
         """Divides the coordinates by a scalar"""
         return self.__class__(x = self.x / scalar, y = self.y / scalar)
 
+    def as_polar(self):
+        """Returns the polar coordinate representation of the point.
+
+        @return: the radius and the angle in a tuple.
+        """
+        return len(self), atan2(self.y, self.x)
+
     def interpolate(self, other, ratio = 0.5):
         """Linearly interpolates between the coordinates of this point and
         another one.
@@ -245,4 +252,14 @@ class Point(tuple):
         angle = atan2(other.y - self.y, other.x - self.x)
         return Point(self.x + distance * cos(angle),
                      self.y + distance * sin(angle))
+
+    @classmethod
+    def FromPolar(cls, radius, angle):
+        """Constructs a point from polar coordinates.
+
+        `radius` is the distance of the point from the origin; `angle` is the
+        angle between the X axis and the vector pointing to the point from
+        the origin.
+        """
+        return cls(radius * cos(angle), radius * sin(angle))
 
