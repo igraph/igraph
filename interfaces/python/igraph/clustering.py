@@ -438,7 +438,7 @@ class VertexClustering(Clustering):
 
 ###############################################################################
 
-class Dendrogram(Clustering):
+class Dendrogram(object):
     """The hierarchical clustering (dendrogram) of some dataset.
 
     A hierarchical clustering means that we know not only the way the
@@ -473,7 +473,6 @@ class Dendrogram(Clustering):
         """Creates a hierarchical clustering.
 
         @param merges: the merge history either in matrix or tuple format"""
-        Clustering.__init__(self, [0]*(len(merges)+1))
         self._merges = [tuple(pair) for pair in merges]
         self._nmerges = len(self._merges)
         self._nitems = max(self._merges[-1])-self._nmerges+2
@@ -779,6 +778,7 @@ class Dendrogram(Clustering):
     def merges(self):
         """Returns the performed merges in matrix format"""
         return deepcopy(self._merges)
+
 
 class VertexDendrogram(Dendrogram):
     """The dendrogram resulting from the hierarchical clustering of the
