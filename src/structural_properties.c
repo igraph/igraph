@@ -5826,7 +5826,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_ptr_push_back(res, path));
     IGRAPH_FINALLY_CLEAN(1);  /* ownership of path passed to res */
     VECTOR(*path)[0] = from;
-    VECTOR(*paths_index)[0] = 1;
+    VECTOR(*paths_index)[(long int)from] = 1;
 
     for (i = 1; i < n; i++) {
       long int m, path_count;
