@@ -28,6 +28,7 @@ from math import pi
 from StringIO import StringIO
 
 from igraph import community_to_membership
+from igraph.compat import property
 from igraph.configuration import Configuration
 from igraph.datatypes import UniqueIdGenerator
 from igraph.drawing.colors import ClusterColoringPalette
@@ -172,7 +173,7 @@ class VertexClustering(Clustering):
     """
 
     def __init__(self, graph, membership = None, modularity = None, \
-                 params = None):
+                 params = None, modularity_params = None):
         """Creates a clustering object for a given graph.
 
         @param graph: the graph that will be associated to the clustering
@@ -182,9 +183,11 @@ class VertexClustering(Clustering):
         @param modularity: the modularity score of the clustering. If C{None},
           it will be calculated when needed.
         @param params: additional parameters to be stored in this object.
+        @param modularity_params: arguments that should be passed to
+          L{Graph.modularity} when the modularity is (re)calculated. If the
+          original graph was weighted, you should pass a dictionary
+          containing a C{weight} key with the appropriate value here.
         """
-        self._graph = graph
-
         if membership is None:
             Clustering.__init__(self, [0]*graph.vcount(), params)
         else:
@@ -192,7 +195,12 @@ class VertexClustering(Clustering):
                 raise ValueError("membership list has invalid length")
             Clustering.__init__(self, membership, params)
 
+        self._graph = graph
         self._modularity = modularity
+        if modularity_params is None:
+            self._modularity_params = {}
+        else:
+            self._modularity_params = dict(modularity_params)
 
     # pylint: disable-msg=C0103
     @classmethod
@@ -308,7 +316,8 @@ class VertexClustering(Clustering):
         
         @return: the new modularity score
         """
-        self._modularity = self._graph.modularity(self._membership)
+        self._modularity = self._graph.modularity(self._membership,
+                **self._modularity_params)
         return self._modularity
 
 
@@ -771,52 +780,34 @@ class Dendrogram(Clustering):
         """Returns the performed merges in matrix format"""
         return deepcopy(self._merges)
 
-class VertexDendrogram(VertexClustering, Dendrogram):
+class VertexDendrogram(Dendrogram):
     """The dendrogram resulting from the hierarchical clustering of the
     vertex set of a graph."""
 
-    def __init__(self, graph, merges, membership = None, modularity = None, \
-            params = None):
+    def __init__(self, graph, merges, optimal_count = None, params = None,
+            modularity_params = None):
         """Creates a dendrogram object for a given graph.
 
         @param graph: the graph that will be associated to the clustering
         @param merges: the merges performed given in matrix form.
-        @param membership: the membership list. The length of the list must
-          be equal to the number of vertices in the graph. If C{None}, the
-          dendrogram will be cut at the level where the modularity is maximized
-          and the membership list will represent this state.
-        @param modularity: the modularity score of the clustering on each
-          level of the dendrogram starting from the fully decomposed state.
-          If C{None}, it will be calculated.
+        @param optimal_count: the optimal number of clusters where the
+          dendrogram should be cut. This is a hint usually provided by the
+          clustering algorithm that produces the dendrogram. C{None} means
+          that such a hint is not available; the optimal count will then be
+          selected based on the modularity in such a case.
         @param params: additional parameters to be stored in this object.
+        @param modularity_params: arguments that should be passed to
+          L{Graph.modularity} when the modularity is (re)calculated. If the
+          original graph was weighted, you should pass a dictionary
+          containing a C{weight} key with the appropriate value here.
         """
-        if modularity is None:
-            # TODO: this is a fairly simple way to calculate the modularity
-            membs = range(graph.vcount())
-            modularity = []
-            n = graph.vcount()
-            for step in xrange(min(n-1, len(merges))):
-                membs = community_to_membership(merges, n, step)
-                modularity.append(graph.modularity(membs))
-
-        if membership is None:
-            maxmod = max(modularity)
-            maxidx = modularity.index(maxmod)
-            membership = community_to_membership(merges, graph.vcount(), maxidx)
-            
-            recoding, n = {}, 0
-            for idx, m in enumerate(membership):
-                try:
-                    membership[idx] = recoding[m]
-                except KeyError:
-                    recoding[m], membership[idx] = n, n
-                    n += 1
-
-        else:
-            maxmod = None
-
         Dendrogram.__init__(self, merges)
-        VertexClustering.__init__(self, graph, membership, maxmod, params)
+        self._graph = graph
+        self._optimal_count = optimal_count
+        if modularity_params is None:
+            self._modularity_params = {}
+        else:
+            self._modularity_params = dict(modularity_params)
 
     def as_clustering(self, n=None):
         """Cuts the dendrogram at the given level and returns a corresponding
@@ -825,34 +816,46 @@ class VertexDendrogram(VertexClustering, Dendrogram):
         @param n: the desired number of clusters. Merges are replayed from the
           beginning until the membership vector has exactly M{n} distinct elements
           or until there are no more recorded merges, whichever happens first.
-          If C{None}, the current membership vector will be used.
+          If C{None}, the optimal count hint given by the clustering algorithm
+          will be used If the optimal count was not given either, it will be
+          calculated by selecting the level where the modularity is maximal.
         @return: a new L{VertexClustering} object.
         """
-        if n is not None:
-            num_elts = self._graph.vcount()
-            membership = community_to_membership(self._merges, num_elts, \
-                                                 num_elts - n)
-            idgen = UniqueIdGenerator()
-            membership = [idgen[m] for m in membership]
-        else:
-            membership = self.membership
-        return VertexClustering(self._graph, membership)
-
-
-    def cut(self, n):
-        """Cuts the dendrogram at a given level.
-
-        @param n: the desired number of clusters. Merges are replayed from the
-          beginning until the membership vector has exactly M{n} distinct elements
-          or until there are no more recorded merges, whichever happens first.
-        @return: the membership vector
-        """
+        if n is None:
+            n = self.optimal_count
         num_elts = self._graph.vcount()
-        membership = community_to_membership(self._merges, num_elts, num_elts-n)
         idgen = UniqueIdGenerator()
-        self._membership = [idgen[m] for m in membership]
-        self._len = max(self._membership) + 1
-        return self._membership[:]
+        membership = community_to_membership(self._merges, num_elts, \
+                                             num_elts - n)
+        membership = [idgen[m] for m in membership]
+        return VertexClustering(self._graph, membership,
+                modularity_params=self._modularity_params)
+
+    @property
+    def optimal_count(self):
+        """Returns the optimal number of clusters for this dendrogram.
+
+        If an optimal count hint was given at construction time, this
+        property simply returns the hint. If such a count was not given,
+        this method calculates the optimal number of clusters by maximizing
+        the modularity along all the possible cuts in the dendrogram.
+        """
+        if self._optimal_count is not None:
+            return self._optimal_count
+
+        n = self._graph.vcount()
+        max_q, optimal_count = 0, 1
+        for step in xrange(min(n-1, len(self._merges))):
+            membs = community_to_membership(self._merges, n, step)
+            q = self._graph.modularity(membs, **self._modularity_params)
+            if q > max_q:
+                optimal_count = n-step
+                max_q = q
+        self._optimal_count = optimal_count
+
+    @optimal_count.setter
+    def optimal_count(self, value):
+        self._optimal_count = max(int(value), 1)
 
     def __plot__(self, context, bbox, palette, *args, **kwds):
         """Draws the vertex dendrogram on the given Cairo context

@@ -1,13 +1,14 @@
 """Utility functions that cannot be categorised anywhere else"""
 
 from contextlib import contextmanager
+from itertools import chain
 
 import os
 import tempfile
 
 __license__ = "GPL"
 
-__all__ = ["rescale"]
+__all__ = ["rescale", "safemin", "safemax"]
 __docformat__ = "restructuredtext en"
 
 @contextmanager
@@ -114,3 +115,44 @@ def consecutive_pairs(iterable, circular=False):
         except UnboundLocalError:
             yield first, first
 
+def safemax(iterable, default=0):
+    """Safer variant of C{max()} that returns a default value if the iterable
+    is empty.
+    
+    Example:
+        
+        >>> safemax([-5, 6, 4])
+        4
+        >>> safemax([])
+        0
+        >>> safemax((), 2)
+        2
+    """
+    it = iter(iterable)
+    try:
+        first = it.next()
+    except StopIteration:
+        return default
+    else:
+        return max(chain([first], it))
+
+def safemin(iterable, default=0):
+    """Safer variant of C{min()} that returns a default value if the iterable
+    is empty.
+    
+    Example:
+        
+        >>> safemin([-5, 6, 4])
+        -5
+        >>> safemin([])
+        0
+        >>> safemin((), 2)
+        2
+    """
+    it = iter(iterable)
+    try:
+        first = it.next()
+    except StopIteration:
+        return default
+    else:
+        return min(chain([first], it))

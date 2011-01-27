@@ -749,8 +749,13 @@ class Graph(GraphBase):
           in very large networks. Phys Rev E 70, 066111 (2004).
         """
         merges, qs = GraphBase.community_fastgreedy(self, weights)
-        return VertexDendrogram(self, merges, None, qs)
-
+        qs.reverse()
+        if qs:
+            optimal_count = qs.index(max(qs)) + 1
+        else:
+            optimal_count = 1
+        return VertexDendrogram(self, merges, optimal_count,
+                modularity_params=dict(weights=weights))
 
     def community_leading_eigenvector_naive(self, clusters = None, \
             return_merges = False):
@@ -785,12 +790,11 @@ class Graph(GraphBase):
         if merges is None:
             return VertexClustering(self, cl, modularity = q)
         else:
-            return VertexDendrogram(self, merges, cl, modularity = q)
+            return VertexDendrogram(self, merges, safemax(cl)+1)
 
 
-    def community_leading_eigenvector(self, clusters=None, \
-            return_merges=False):
-        """community_leading_eigenvector(clusters=None, return_merges=False)
+    def community_leading_eigenvector(self, clusters=None):
+        """community_leading_eigenvector(clusters=None)
         
         Newman's leading eigenvector method for detecting community structure.
         This is the proper implementation of the recursive, divisive algorithm:
@@ -809,8 +813,8 @@ class Graph(GraphBase):
         eigenvectors of matrices, arXiv:physics/0605087"""
         if clusters is None:
             clusters = -1
-        cl, merges, q = GraphBase.community_leading_eigenvector(self, clusters)
-        return VertexDendrogram(self, merges, cl)
+        membership, _, q = GraphBase.community_leading_eigenvector(self, clusters)
+        return VertexClustering(self, membership, modularity = q)
 
 
     def community_label_propagation(self, weights = None, initial = None, \
@@ -851,7 +855,8 @@ class Graph(GraphBase):
             fixed = [bool(o) for o in g.vs[fixed]]
         cl = GraphBase.community_label_propagation(self, \
                 weights, initial, fixed)
-        return VertexClustering(self, cl)
+        return VertexClustering(self, cl,
+                modularity_params=dict(weights=weights))
 
 
     def community_multilevel(self, weights=None, return_levels=False):
@@ -891,11 +896,12 @@ class Graph(GraphBase):
             levels, qs = GraphBase.community_multilevel(self, weights, True)
             result = []
             for level, q in zip(levels, qs):
-                result.append(VertexClustering(self, level, q))
+                result.append(VertexClustering(self, level, q,
+                    modularity_params=dict(weights=weights)))
         else:
             membership = GraphBase.community_multilevel(self, weights, False)
-            q = self.modularity(membership, weights)
-            result = VertexClustering(self, membership, q)
+            result = VertexClustering(self, membership,
+                    modularity_params=dict(weights=weights))
         return result
 
     def community_optimal_modularity(self, *args, **kwds):
@@ -937,10 +943,13 @@ class Graph(GraphBase):
           modularity.
         """
         merges, qs = GraphBase.community_edge_betweenness(self, directed)
-        dendrogram = VertexDendrogram(self, merges, modularity=qs)
-        if clusters is not None:
-            dendrogram.cut(clusters)
-        return dendrogram
+        qs.reverse()
+        if clusters is None:
+            if qs:
+                clusters = qs.index(max(qs))+1
+            else:
+                clusters = 1
+        return VertexDendrogram(self, merges, clusters)
 
     def community_spinglass(self, *args, **kwds):
         """community_spinglass(weights=None, spins=25, parupdate=False,
@@ -992,7 +1001,12 @@ class Graph(GraphBase):
           U{http://arxiv.org/abs/0811.2329}.
         """
         membership = GraphBase.community_spinglass(self, *args, **kwds)
-        return VertexClustering(self, membership)
+        if "weights" in kwds:
+            modularity_params=dict(weights=kwds["weights"])
+        else:
+            modularity_params={}
+        return VertexClustering(self, membership,
+                modularity_params=modularity_params)
 
     def community_walktrap(self, weights=None, steps=4):
         """Community detection algorithm of Latapy & Pons, based on random
@@ -1014,9 +1028,13 @@ class Graph(GraphBase):
           networks using random walks, U{http://arxiv.org/abs/physics/0512106}.
         """
         merges, qs = GraphBase.community_walktrap(self, weights, steps)
-        d = VertexDendrogram(self, merges, modularity=qs)
-        return d
-
+        qs.reverse()
+        if qs:
+            optimal_count = qs.index(max(qs))+1
+        else:
+            optimal_count = 1
+        return VertexDendrogram(self, merges, optimal_count,
+                modularity_params=dict(weights=weights))
 
     def k_core(self, *args):
         """Returns some k-cores of the graph.
