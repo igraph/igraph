@@ -1379,6 +1379,7 @@ form.donateform th {
 #content ul.datasets {
     list-style: none;
     margin-bottom: 0px;
+    margin-left: 0px;
     clear: both;
 }
 ul.datasets li {

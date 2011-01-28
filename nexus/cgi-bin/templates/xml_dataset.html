@@ -1,4 +1,4 @@
-$def with (ds, tags, meta, formats, papers)
+$def with (ds, tags, meta, formats, papers, networks)
 <?xml version="1.0"?>
 <dataset>
   <id>$ds.id</id>
@@ -8,8 +8,15 @@ $def with (ds, tags, meta, formats, papers)
     $ds.shortdescription
   </shortdescription>
   <description>$ds.description</description>
-  <vertices>$ds.vertices</vertices>
-  <edges>$ds.edges</edges>
+  <networks>
+    $for net in networks:
+      <network>
+	<id>$net.id</id>
+	<sid>$net.sid</sid>
+	<vertices>$net.vertices</vertices>
+	<edges>$net.edges</edges>
+      </network>
+  </networks>
   <tags>
     $for t in tags:
       <tag>$t.tag</tag>

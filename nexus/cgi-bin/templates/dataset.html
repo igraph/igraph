@@ -1,4 +1,4 @@
-$def with (ds, tags, meta, formats, papers)
+$def with (ds, tags, meta, formats, papers, networks=[])
 
 <div class="title"><h2>$ds.name [$ds.sid]
 $if openid.status():
@@ -12,7 +12,18 @@ $if openid.status():
 
 <div class="dataset">
 <p class="datasettags2">
-  $ds.vertices vertices, $ds.edges edges.
+  $if ds.nnets > 1:
+    $ds.nnets networks,
+  $if ds.minv==ds.maxv:
+    $ds.minv
+  $else:
+    $ds.minv-$ds.maxv
+  vertices, 
+  $if ds.mine==ds.maxe:
+    $ds.mine
+  $else:
+    $ds.mine-$ds.maxe 
+  edges.
   Tags:
   $:", ".join(link_to_tag(tag) for tag in tags)
 <p class="datasetdate2">$ds.date</p>
@@ -23,12 +34,16 @@ $if openid.status():
 <ul class="download">
 $for k,f in dataformats.items():
   <li>
+  <span style="width:35px;float:left;">
+    $if k in formats.keys():
+      <a href="/api/dataset?id=${ds.id}&format=$k">
+      <img src="/static/images/formats/${k}.png" 
+	   style="display:block;height:20px;margin-left:auto;margin-right:auto;" 
+	   alt="" title="Download in $k format" /></a>
+  </span>
   $if k in formats.keys():
     <a href="/api/dataset?id=${ds.id}&format=$k">${k} format</a> &ndash; 
     $formats[k].shortdesc,
-    <a href="/api/format?dataformat=$k&format=html">more...</a>
-  $else:
-    ${k} format &ndash; not available,
     <a href="/api/format?dataformat=$k&format=html">more...</a>
   </li>
   
@@ -38,6 +53,14 @@ $for k,f in dataformats.items():
 <div class="datasetdescription">
 $:markdown(ds.description)
 </div>
+
+$if ds.nnets > 1 and len(networks) > 1:
+  <h3>Networks</h3>
+  <dl class="networks">
+  $for net in networks:
+    <dt>'$net.sid'</dt>
+    <dd>$net.vertices vertices, $net.edges edges. $net.description</dd>
+    
 
 $if len(meta) > 0:
   <h3>Metadata</h3>

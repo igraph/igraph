@@ -1,4 +1,4 @@
-$def with (datasets, tags, length, count, offset, limit, title)
+$def with (datasets, tags, length, count, offset, limit, title, networks)
 <?xml version="1.0"?>
 <datasets>
   <size>$length</size>
@@ -11,8 +11,16 @@ $for ds in datasets:
     <sid>$ds.sid</sid>
     <name>$ds.name</name>
     <description>$ds.shortdescription</description>
-    <vertices>$ds.vertices</vertices>
-    <edges>$ds.edges</edges>
+    <networks>
+      $for net in networks[ds.id]:
+        <network>
+	  <id>$net.id</id>
+          <sid>$net.sid</sid>
+          <vertices>$net.vertices</vertices>
+          <edges>$net.edges</edges>
+	  <description>$net.description</description>
+	</network>
+    </networks>
     <tags>
     $for t in tags[ds.id]:
       <tag>$t.tag</tag>

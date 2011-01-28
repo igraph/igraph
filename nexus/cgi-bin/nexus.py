@@ -29,12 +29,17 @@ from operator import attrgetter
 from recaptcha.client import captcha
 from textwrap import dedent
 
-web.config.debug = False
+# web.config.debug = False
 web.config.smtp_server = '173.192.111.8'
 web.config.smtp_port = 26
 web.config.smtp_username = 'csardi@mail.igraph.org'
-web.config.smtp_password = file("../config/emailpass").read().strip()
+web.config.smtp_password = \
+    file(os.path.join("..", "config", "emailpass")).read().strip()
 web.config.smtp_starttls = True
+
+formwidth=65
+datadir=os.path.join("..", "data")
+compressed_ext=".gz"
 
 urls = (
     '/?',                                  'About',
@@ -148,15 +153,19 @@ def get_motto():
         return "%s data sets, downloaded %s times" % (tot.count, tot.downloads)
     return "%s data sets" % tot.count
 
-def get_available_formats(id, nid=1):
+def get_available_formats(id, sid=None):
     """Data formats that are available for a given data set"""
-    fn=list(model.get_dataset_file(id, nid))[0].filename
-    avexts=list(model.get_formats())
-    path=os.path.join("..", "data", str(id))
-    files=[ re.sub('\.gz', '', f) for f in os.listdir(path) ]
-    exts=[ os.path.splitext(f) for f in files ]
-    exts=[ e[1] for e in exts if e[0]==fn ]
-    return dict( (v.name,v) for v in avexts if v.extension in exts )
+    allf=model.get_formats()
+    fname=model.get_dataset_filename(id)
+    def fileexists(formatrec, filename, sid):
+        if sid is None:
+            ff=os.path.join(datadir, id, filename + formatrec.extension + 
+                            compressed_ext)
+        else:
+            ff=os.path.join(datadir, id, filename + "-" + sid + 
+                            formatrec.extension + compressed_ext)
+        return os.path.isfile(ff) 
+    return dict( (f.name, f) for f in allf if fileexists(f, fname, sid) )
 
 def make_link(keys, **extra):
     def ex(k,v):
@@ -207,6 +216,66 @@ def prevnexttable(nohits, start, end, limit, user_input):
 
     return prev + " " + " ".join(pagelinks) + " " + next
 
+def check_admin(redirect=True):
+    return True
+    adm=web.webopenid.status() in admins_openid
+    if not adm and redirect:
+        return web.seeother("/login")
+    return adm                
+
+add_form=web.form.Form(
+    web.form.Textbox("sid", description="Id:", id="focused", size=formwidth),
+    web.form.Textbox("name", description="Name:", size=formwidth),
+    web.form.Textarea("shortdescription", description="Short description:",
+                      rows=5, cols=formwidth),
+    web.form.Textarea("description", description="Description:",
+                      rows=10, cols=formwidth),
+    web.form.Textbox("tags", description="Tags:",
+                     post="<br/> (comma separated)", size=formwidth),
+    web.form.Dropdown("licence", description="Licence:", args=[]),
+    web.form.Textbox("source", description="Source:", size=formwidth),
+    web.form.Textarea("papers", description="Publication(s):", 
+                      rows=8, cols=formwidth)
+    )
+
+def add_net_form(no):
+    return web.form.Form(
+        web.form.Textbox("net%ssid" % no, description="Id:", size=formwidth),
+        web.form.Textbox('net%svertices' % no, description='Vertices:', 
+                         size=formwidth),
+        web.form.Textbox('net%sedges' % no, description='Edges:', 
+                         size=formwidth),
+        web.form.Textbox('net%sfilename' % no, description='Filename:', 
+                         size=formwidth),
+        web.form.Checkbox("net%sdirected" % no, description="Directed:", 
+                          value="True"),
+        web.form.Checkbox("net%sweighted" % no, description="Weighted:", 
+                          value="True"),
+        web.form.Checkbox("net%sbipartite" % no, description="Bipartite:", 
+                          value="True"),
+        web.form.Textarea('net%sdescription' % no,  rows=5, cols=formwidth,
+                          description="Short description:"),
+        web.form.Button('Delete network', 
+                        onClick="delNet('%s'); return false;" % no)
+        )
+
+def add_meta_form(no):
+    return web.form.Form(
+        web.form.Textbox("meta%sname" % no, description="Name:", 
+                         size=formwidth),
+        web.form.Dropdown("meta%stype" % no, description="Type:", 
+                          args=['graph', 'vertex', 'edge']),
+        web.form.Dropdown("meta%sdatatype" % no, description="Datatype:",
+                          args=['numeric', 'string', 'logical']),
+        web.form.Textbox("meta%snetwork" % no, description="Network:", 
+                         size=formwidth),
+        web.form.Textarea("meta%sdescription" % no, 
+                          description="Short description:", 
+                          rows=5, cols=formwidth),
+        web.form.Button('Delete attribute',
+                        onClick="delMeta('%s'); return false;" % no)
+        )
+
 tempglob = { 'dataformats': model.get_format_extensions(),
              'openid': web.webopenid,
              'getusername': model.get_username,
@@ -218,7 +287,10 @@ tempglob = { 'dataformats': model.get_format_extensions(),
              'mymarkdown': mymarkdown,
              'markdown': markdown.markdown,
              'type': type,
-             'prevnexttable': prevnexttable }
+             'prevnexttable': prevnexttable,
+             'add_net_form': add_net_form,
+             'add_meta_form': add_meta_form  }
+
 for name in url_helper.__all__:
     tempglob[name] = getattr(url_helper, name)
 
@@ -251,9 +323,9 @@ class Donate:
         web.form.Dropdown("licence", description="Licence:", args=[]),
         web.form.Textarea("description", 
                           description="Data format description:", 
-                          cols=50, rows=10),
+                          cols=formwidth, rows=10),
         web.form.Textarea("papers", description="Publication(s):", 
-                          cols=50, rows=10),
+                          cols=formwidth, rows=10),
         web.form.Button("Donate!", pre=recaptcha_text)
         )
     
@@ -271,7 +343,8 @@ class Donate:
         
         user_input=web.input()
         recaptcha_private_key = \
-            file("../config/recaptcha_private_key").read().strip()
+            file(os.path.join("..", "config", 
+                              "recaptcha_private_key")).read().strip()
         valid=captcha.submit(user_input.recaptcha_challenge_field,
                              user_input.recaptcha_response_field,
                              recaptcha_private_key,
@@ -311,7 +384,7 @@ class Feedback:
         web.form.Textbox("name", description="Your name (optional):"),
         web.form.Textbox("email", description="Your email (optional):"), 
         web.form.Textarea("message", description="Your message:", 
-                          cols=50, rows=10),
+                          cols=formwidth, rows=10),
         web.form.Button("Send message", pre=recaptcha_text)
         )
 
@@ -327,7 +400,8 @@ class Feedback:
 
         user_input=web.input()
         recaptcha_private_key = \
-            file("../config/recaptcha_private_key").read().strip()
+            file(os.path.join("..", "config",
+                              "recaptcha_private_key")).read().strip()
         valid=captcha.submit(user_input.recaptcha_challenge_field,
                              user_input.recaptcha_response_field,
                              recaptcha_private_key,
@@ -365,21 +439,27 @@ class Index:
                                 int(user_input.offset)+len(datasets), 
                                 int(user_input.limit), user_input, None)
         elif format=='xml':
+            networks={}
+            for i in ids:
+                networks[i] = model.get_networks(i)
             web.header('Content-Type', 'text/xml')
             return render_plain.xml_index(datasets, tags,
                                           len(datasets), co,
                                           int(user_input.offset),
                                           int(user_input.limit),
-                                          'All data sets', )
+                                          'All data sets', networks)
         elif format=='text':
             for k, t in tags.iteritems():
                 tags[k]=";".join(x.tag for x in t)
+            networks={}
+            for i in ids:
+                networks[i] = model.get_networks(i)
             web.header('Content-Type', 'text/plain')
             return render_plain.text_index(datasets, tags,
                                            len(datasets), co,
                                            int(user_input.offset),
                                            int(user_input.limit),
-                                           'All data sets')
+                                           'All data sets', networks)
         elif format=='rss':
             date=datetime.today().strftime("%a, %d %b %Y %H:%M:%S +0200")
             web.header('Content-Type', 'application/rss+xml')
@@ -396,8 +476,12 @@ class Index:
     def format_text(self, dataset, tags, meta, formats, papers):
 
         def format_attr(attr):
-            return "Attribute: %s %s %s\n  %s" % \
+            return "attribute: %s %s %s\n  %s" % \
                 (attr.type, attr.datatype, attr.name, attr.description)
+
+        nets=model.get_networks(dataset.id)
+        networks=" ".join([ "%s/%s" % (n.id, n.sid) for n in nets ])
+        vertedges=" ".join([ "%s/%s" % (n.vertices, n.edges) for n in nets ])
 
         tags=";".join([x.tag for x in tags])
         papers=[p.citation.replace("\n", "\n  ").strip() for p in papers]
@@ -405,26 +489,25 @@ class Index:
         desc=dataset.description.replace("\n\r\n", "\n.\n")
         desc=desc.replace("\n", "\n  ").strip()
         main=dedent("""\
-                Id: %i
-                Sid: %s
-                Name: %s
-                Vertices: %s
-                Edges: %s
-                Tags: %s
-                Date: %s
-                Licence: %s
-                Licence URL: %s
-                Short description: %s
-                Description: %s
-                Formats: %s
-                Citation: %s
-        """) % (dataset.id, dataset.sid, dataset.name, 
-                dataset.vertices, dataset.edges,
-                tags, dataset.date[0:10], dataset.licence_name, 
-                dataset.licence_url,
-                dataset.shortdescription.replace("\n", "\n  ").strip(),
-                desc, ";".join(n for n,v in formats.items()),
-                papers)
+                id: %i
+                sid: %s
+                name: %s
+                networks: %s
+                vertices/edges: %s
+                tags: %s
+                date: %s
+                licence: %s
+                licence url: %s
+                summary: %s
+                description: %s
+                formats: %s
+                citation: %s""") % \
+                (dataset.id, dataset.sid, dataset.name, networks, 
+                 vertedges, tags, dataset.date[0:10],
+                 dataset.licence_name, dataset.licence_url,
+                 dataset.shortdescription.replace("\n", "\n  ").strip(),
+                 desc, ";".join(n for n,v in formats.items()),
+                 papers)
         meta="\n".join(format_attr(m) for m in meta)
         return main + meta
 
@@ -441,13 +524,16 @@ class Index:
         meta=list(model.get_metadata(dataset.id))
         formats=get_available_formats(id)
         papers=list(model.get_papers(id))
+        networks=model.get_networks(id)
 
         if format=='html':
-            return render.dataset(dataset, tags, meta, formats, papers)
+            return render.dataset(dataset, tags, meta, formats, papers, 
+                                  networks)
         elif format=='xml':
+            networks=model.get_networks(id)
             web.header('Content-Type', 'text/xml')
             return render_plain.xml_dataset(dataset, tags, meta,
-                                            formats, papers)
+                                            formats, papers, networks)
         elif format=='text':
             formatted=self.format_text(dataset, tags, meta, formats, papers)
             web.header('Content-Type', 'text/plain')
@@ -479,23 +565,29 @@ class Index:
                                 int(user_input.offset)+len(datasets),
                                 int(user_input.limit), user_input, None)
         elif format=='xml':
+            networks={}
+            for i in ids:
+                networks[i] = model.get_networks(i)
             web.header('Content-Type', 'text/xml')
             return render_plain.xml_index(datasets, tags, 
                                           len(datasets), co,
                                           int(user_input.offset),
                                           int(user_input.limit),
                                           "Data sets tagged %s" 
-                                          % tagname)
+                                          % tagname, networks)
         elif format=='text':
             for k,t in tags.items():
                 tags[k]=";".join([x.tag for x in t])
+            networks={}
+            for i in ids:
+                networks[i] = model.get_networks(i)
             web.header('Content-Type', 'text/plain')
             return render_plain.text_index(datasets, tags, 
                                            len(datasets), co,
                                            int(user_input.offset),
                                            int(user_input.limit),
                                            "Data sets tagged '%s'" 
-                                           % tagname)
+                                           % tagname, networks)
         elif format=="rss":
             date=datetime.today().strftime("%a, %d %b %Y %H:%M:%S +0200")
             web.header('Content-Type', 'application/rss+xml')
@@ -538,31 +630,45 @@ def support_gzip():
 class Dataset:
     
     def GET(self):
-        user_input=web.input(id=None, networkid=1)
+        user_input=web.input(id=None)
         format=user_input.format
-        
-        if not re.match('^[0-9]+$', user_input.id):
-            user_input.id=model.get_id_from_sid(user_input.id)
 
         if user_input.id is None:
             return web.notfound()
+        
+        if re.match('^[0-9]+.?[0-9]*$', user_input.id):
+            id=user_input.id.split(".")
+            if len(id)==1:
+                id=id[0]
+                subid=None
+            else:
+                id=id[0]
+                subid=id[1]
+        else:
+            sid=user_input.id.split(".", 1)
+            if len(sid)==1:
+                id=model.get_id_from_sid(sid[0])
+                subid=None
+            else:
+                id=model.get_id_from_sid(sid[0])
+                subid=model.get_netid_from_netsid(sid[1])
 
-        datafile=model.get_dataset_file(user_input.id, user_input.networkid)
+        datafile=model.get_dataset_filename(id)
 
         if not datafile:
             return web.notfound()
 
-        basename=[ d.filename for d in datafile][0]
+        basename=datafile
         ext=model.get_format_extension(format)
-        filename=os.path.join('..', 'data', user_input.id, basename + ext)
+        filename=os.path.join(datadir, id, basename + ext)
         gzip=support_gzip()
         web.header('Content-Type', 'application/octet-stream')
         web.header('Content-Disposition', 
                    'attachment; filename="%s%s"' % (basename,ext))
-        model.increase_downloads(user_input.id)
+        model.increase_downloads(id)
         try:
             if gzip:
-                f=open(filename + '.gz')
+                f=open(filename + compressed_ext)
                 data=f.read()
                 f.close()
                 web.header('Content-Encoding', 'gzip')
@@ -571,7 +677,8 @@ class Dataset:
                 tmp=tempfile.NamedTemporaryFile(delete=False)
                 tmpname=tmp.name
                 tmp.close()
-                os.system('gzip -cd %s.gz > %s' % (filename, tmpname))
+                os.system('gzip -cd %s%s > %s' % (filename, compressed_ext,
+                                                  tmpname))
                 f=open(tmpname)
                 data=f.read()
                 f.close()
@@ -616,312 +723,232 @@ URL: %s""" % (format.name, format.shortdesc,
             web.header('Content-Type', 'text/plain')
             return render_plain.text_formats(formatted)
 
-class MyForm(web.form.Form):
-
-    def insert(self, where, *what):
-        
-        def find(f, seq):
-            """Return first item in sequence where f(item) == True."""
-            for idx, item in enumerate(seq):
-                if f(item): 
-                    return idx
-
-        self.inputs=list(self.inputs)
-        pos=find(lambda inp: inp.name==where, self.inputs)
-        self.inputs[pos:pos] = what
-
-class Spacer(web.form.Input):
-    def get_type(self):
-        return 'spacer'
-
-    def render(self):
-        return '<hr/>'
-    
-    def get_value(self):
-        return None
-
-class Label(web.form.Input):
-    def get_type(self):
-        return 'label'
-
-    def render(self):
-        return self.name
-
-    def get_value(self):
-        return None
-
-add_form=MyForm(
-    web.form.Textbox("sid", description="Id:", id="focused", size=50),
-    web.form.Textbox("name", description="Name:", size=50),
-    web.form.Textbox("shortdescription", description="Short description",
-                     size=50),
-    web.form.Textarea("description", description="Description:",
-                      rows=10, cols=50),
-    web.form.Textbox("tags", description="Tags:",
-                     post="<br/> (comma separated)", size=50),
-    web.form.Checkbox("directed", description="Directed:",
-                      value="True"),
-    web.form.Checkbox("weighted", description="Weighted:",
-                      value="True"),
-    web.form.Checkbox("bipartite", description="Two-mode:",
-                      value="True"),
-    web.form.Checkbox("dynamic", description="Dynamic:",
-                      value="True"),
-    web.form.Dropdown("licence", description="Licence:", args=[]),
-    web.form.Textbox("vertices", description="Vertices:"),
-    web.form.Textbox("edges", description="Edges:"),
-    web.form.Textbox("filename", description="File name:", size=50),
-    web.form.Textbox("source", description="Source:", size=50),
-    web.form.Textarea("papers", description="Publication(s):", 
-                      rows=5, cols=50),
-    Spacer('spacer', description=''),
-    web.form.Button("Add", description="Add")
-    )
-
-def add_meta_form(form, id):
-    meta=model.get_metadata(id)
-    for n, m in enumerate(meta):
-        mkeep=web.form.Dropdown('meta%skeep' %n, 
-                                description='Keep or delete:',
-                                args=['keep', 'delete'])
-        mtype=web.form.Dropdown("meta%stype" %n, 
-                                description='Type:', 
-                                args=['deleted', 'graph', 'vertex',
-                                      'edge'])
-        mtype.set_value(m.type)
-        mdatatype=web.form.Dropdown('meta%sdatatype' %n,
-                                    description='Data type:',
-                                    args=['numeric', 'string'])
-        mdatatype.set_value(m.datatype)
-        mname=web.form.Textbox('meta%sname' %n,
-                               description='Name:')
-        mname.set_value(m.name)
-        mdescription=web.form.Textarea('meta%sdescription' %n,
-                                       description='Description:', 
-                                       rows=5, cols=50)
-        mdescription.set_value(m.description)
-        form.insert("spacer", 
-                    Spacer(''), 
-                    Label('<h4>Meta data #%s</h4>' % str(int(n)+1), 
-                          description=''),
-                    mkeep, mtype, mdatatype, mname, mdescription)
-    form.insert("spacer",
-                Spacer(''),
-                Label('<h4>Additional meta data</h4>', description=""),
-                web.form.Dropdown('metaxadd', description='Add or not:',
-                                  args=['do not add', 'add']),
-                web.form.Dropdown("metaxtype", 
-                                description='Type:', 
-                                args=['graph', 'vertex', 'edge']),
-                web.form.Dropdown('metaxdatatype',
-                                    description='Data type:',
-                                    args=['numeric', 'string']),
-                web.form.Textbox('metaxname',
-                               description='Name:'),
-                web.form.Textarea('metaxdescription',
-                                       description='Description:', 
-                                       rows=5, cols=50))
-    return form
-
-def add_meta_form_add(form):
-    for n in range(0,5):
-        form.insert('spacer',
-                    Spacer(''),
-                    Label('<h4>Meta data #%s</h4>' % str(int(n)+1), 
-                          description=""),
-                    web.form.Dropdown('meta%sadd' % n, 
-                                      description='Add:',
-                                      args=['do not add', 'add']),
-                    web.form.Dropdown("meta%stype" % n, 
-                                      description='Type:', 
-                                      args=['graph', 'vertex', 'edge']),
-                    web.form.Dropdown('meta%sdatatype' % n,
-                                      description='Data type:',
-                                      args=['numeric', 'string']),
-                    web.form.Textbox('meta%sname' % n,
-                                     description='Name:'),
-                    web.form.Textarea('meta%sdescription' % n,
-                                      description='Description:', 
-                                      rows=5, cols=50))
-    return form
-
 class Add:
 
     def GET(self):
-        if web.webopenid.status() not in admins_openid:
-            return web.seeother("/login")
-
+        check_admin()
         form=add_form()
-        form=add_meta_form_add(form)
         lic=model.get_licences('id,name')
         form.licence.args=[(l.id,  l.name) for l in lic]
         return render.add(form, False, False, None)
-
+    
     def POST(self):
-        if web.webopenid.status() not in admins_openid:
-            return web.seeother("/login")
-
+        check_admin()
         form=add_form()
-        form=add_meta_form_add(form)
-        if not form.validates():
-            ## TODO
-            None
+        input=web.input()
+        form.validates()
 
-        did=model.new_dataset(sid=form.d.sid, name=form.d.name, 
-                              shortdescription=form.d.shortdescription,
-                              description=form.d.description,
-                              licence=int(form.d.licence),
-                              source=form.d.source,
+        ## TODO: validate
+
+        ## data set
+        did=model.new_dataset(sid=input['sid'], name=input['name'].strip(),
+                              shortdescription=\
+                                  input['shortdescription'].strip(),
+                              description=input['description'].strip(),
+                              licence=int(input['licence']),
+                              source=input['source'].strip(),
                               date=web.SQLLiteral("CURRENT_DATE"))
-
-        model.new_network(dataset=did, id=1, description="",
-                          vertices=form.d.vertices,
-                          edges=form.d.edges,
-                          filename=form.d.filename, 
-                          date=web.SQLLiteral("CURRENT_DATE"))
-
-        cits=form.d.papers.split("\r\n\r\n")
-        for cit in cits:
-            model.new_citation(dataset=did, citation=cit.strip())
-
-        if form.d.tags.strip()=="":
+        
+        ## tags
+        if input['tags']=="":
             tags=[]
         else:
-            tags=[t.strip() for t in form.d.tags.split(",")]
+            tags=[t.strip() for t in input['tags'].split(",")]
+
+        ## network(s)
+        netids=[ int(n[3:][:-3]) for n in input.keys() if 
+                 re.match('^net[0-9]+sid$', n) is not None ]
+        for i, no in enumerate(netids):
+            directed=('net%sdirected' % no) in input
+            if directed and 'directed' not in tags:
+                tags.append('directed')
+            if not directed and 'undirected' not in tags:
+                tags.append('undirected')
+            weighted=('net%sweighted' % no) in input
+            if weighted and 'weighted' not in tags:
+                tags.append('weighted')
+            bipartite=('net%sbipartite' % no) in input
+            if bipartite and 'bipartite' not in tags:
+                tags.append('bipartite')
+            model.new_network(dataset=did, id=i+1, 
+                              sid=input['net'+str(no)+'sid'].strip(),
+                              description=\
+                                  input['net'+str(no)+'description'].strip(),
+                              vertices=int(input['net'+str(no)+'vertices']),
+                              edges=int(input['net'+str(no)+'edges']),
+                              filename=input['net'+str(no)+'filename'],
+                              date=web.SQLLiteral("CURRENT_DATE"),
+                              directed=directed, weighted=weighted,
+                              bipartite=bipartite)
+
+        ## citations
+        cits=input['papers'].split("\r\n\r\n")
+        for cit in cits:
+            model.new_citation(dataset=did, citation=cit.strip())
+            
+        ## add the tags
         for tag in tags:
             model.new_dataset_tag(dataset=did, tag=tag.strip())
+        
+        ## attributes
+        netnames=[ input['net%ssid' % no] for no in netids ]
+        attrids=[ int(n[4:][:-4]) for n in input.keys() if 
+                  re.match('^meta[0-9]+name$', n) ]
+        for no in attrids:
+            netname=input['meta%snetwork' % no]
+            if netname == "":
+                for nid in netids:
+                    model.add_meta(id=did, network=nid,
+                                   type=input['meta%stype' % no],
+                                   name=input['meta%sname' % no],
+                                   datatype=input['meta%sdatatype' % no],
+                                   description=\
+                                       input['meta%sdescription'% no].strip())
+            else:
+                net=netnames.index(input['meta%snetwork' % no])
+                model.add_meta(id=did, network=net,
+                               type=input['meta%stype' % no],
+                               name=input['meta%sname' % no],
+                               datatype=input['meta%sdatatype' % no],
+                               description=\
+                                   input['meta%sdescription' % no].strip())
 
-        if form.d.directed and 'directed' not in tags:
-            model.new_dataset_tag(dataset=did, tag="directed")
-        elif 'undirected' not in tags:
-            model.new_dataset_tag(dataset=did, tag="undirected")
-
-        if form.d.weighted and 'weighted' not in tags:
-            model.new_dataset_tag(dataset=did, tag="weighted")
-
-        if form.d.bipartite and 'bipartite' not in tags:
-            model.new_dataset_tag(dataset=did, tag="bipartite")
-            
-        if form.d.dynamic and 'dynamic' not in tags:
-            model.new_dataset_tag(dataset=did, tag="dynamic")
-
-        for m in range(0,5):
-            if form.d['meta%sadd' % m] == "add":
-                model.add_meta(id=did, type=form.d['meta%stype' % m],
-                               name=form.d['meta%sname' % m],
-                               datatype=form.d['meta%sdatatype' % m],
-                               description=form.d['meta%sdescription' % m])
-                               
         return render.add(form, True, False, did)
 
 class Edit:
-
+    
     def GET(self, id):
-        if web.webopenid.status() not in admins_openid:
-            return web.seeother("/login")
-        
+        check_admin()
         form=add_form()
-        form.Add.name='Submit'
         lic=model.get_licences('id,name')
         form.licence.args=[(l.id,  l.name) for l in lic]
-        ds=model.get_dataset(id)
-        ds=[d for d in ds][0]
+        
+        ds=list(model.get_dataset(id))[0]
         form.fill(ds)
         papers=[p.citation for p in model.get_papers(id)]
         form.papers.value="\n\n".join(papers)
         tags=set(t.tag for t in model.get_tags(id))
-        form.directed.set_value('directed' in tags)
-        form.weighted.set_value('weighted' in tags)
-        form.bipartite.set_value('bipartite' in tags)
-        form.dynamic.set_value('dynamic' in tags)
-        form.directed.value=form.weighted.value=form.bipartite.value= \
-            form.dynamic.value="True"
-        tags -= set(("weighted", "bipartite", "directed", "undirected", 
-                     "dynamic"))
+        tags -= set(("weighted", "bipartite", "directed", "undirected"))
         form.tags.value=", ".join(sorted(tags))
         
-        form=add_meta_form(form, id)
-        return render.add(form, False, True, int(id))
+        nets=model.get_networks(id)
+        def netform(no, net):
+            f=add_net_form(no)()
+            f['net%ssid' % no].set_value(net.sid)
+            f['net%svertices' % no].set_value(net.vertices)
+            f['net%sedges' % no].set_value(net.edges)
+            f['net%sfilename' % no].set_value(net.filename)
+            f['net%sdirected' % no].set_value(net.directed)
+            f['net%sweighted' % no].set_value(net.weighted)
+            f['net%sbipartite' % no].set_value(net.bipartite)
+            return f
+        netforms=[ netform(i+1,n) for i,n in enumerate(nets) ]
+
+        meta=model.get_metadata(id)
+        def metaform(no, meta):
+            f=add_meta_form(no)()
+            f['meta%sname' % no].set_value(meta.name)
+            netname=model.get_net_sid_from_id(id, meta.network)
+            f['meta%snetwork' % no].set_value(netname)
+            f['meta%sdescription' % no].set_value(meta.description)
+            f['meta%stype' % no].set_value(meta.type)
+            f['meta%sdatatype' % no].set_value(meta.datatype)
+            return f
+        metaforms=[ metaform(i+1,n) for i,n in enumerate(meta) ]
+
+        return render.add(form, False, True, int(id), netforms, metaforms)
 
     def POST(self, id):
-        if web.webopenid.status() not in admins_openid:
-            return web.seeother("/login")
-        
+        check_admin()
         form=add_form()
-        form=add_meta_form(form, id)
-        if not form.validates():
-            ## TODO
-            None
+        input=web.input()
+        form.validates()
+
+        # TODO: validate
 
         if form.d.tags.strip()=="":
             tags=[]
         else:
             tags=[t.strip() for t in form.d.tags.split(',')]
-        if form.d.weighted and 'weighted' not in tags:
-            tags.append('weighted')
-        if form.d.directed and 'directed' not in tags:
-            tags.append('directed')
-        if not form.d.directed and 'undirected' not in tags:
-            tags.append('undirected')
-        if form.d.bipartite and 'bipartite' not in tags:
-            tags.append('bipartite')
-        if form.d.dynamic and 'dynamic' not in tags:
-            tags.append('dynamic')
+
+        oldnets=model.get_networks(id)
+        oldsids=[ o.sid for o in oldnets ]
+        
+        netids=[ int(n[3:][:-4]) for n in input.keys() if 
+                 re.match("^net[0-9]+name$", n) is not None ]
+        sids=[ input['net%ssid' % no] for no in netids ]
+        for i,no in enumerate(sorted(netids)):
+            directed=('net%sdirected' % no) in input
+            if directed and 'directed' not in tags:
+                tags.append['directed']
+            if not directed and 'undirected' not in tags:
+                tags.append['undirected']
+            weighted=('net%sweighted' % no) in input
+            if weighted and 'weighted' not in tags:
+                tags.append['weighted']
+            bipartite=('net%sbipartite' % no) in input
+            if bipartite and 'bipartite' not in tags:
+                tags.append['bipartite']
+            
+            sid=input['net%ssid' % no]
+            if sid in oldsids:
+                model.update_network(dataset=id, 
+                                     id=model.get_net_id_from_sid(id, sid),
+                                     description=input['net%sdesc' % no],
+                                     vertices=input['net%svert' % no],
+                                     edges=input['net%sedges' % no],
+                                     filename=input['net%sfile' % no],
+                                     directed=directed,
+                                     bipartite=bipartite,
+                                     weighted=weighted)
+            else:
+                model.new_network(dataset=id, sid=sid,
+                                  id=model.get_net_id_from_sid(id, sid),
+                                  description=input['net%sdesc' % no],
+                                  vertices=input['net%svert' % no],
+                                  edges=input['net%sedges' % no],
+                                  filename=input['net%sfile' % no],
+                                  directed=directed,
+                                  bipartite=bipartite,
+                                  weighted=weighted)
+
+        for s in set(oldsids)-set(sids):
+            model.delete_network(dataset=id, 
+                                 id=model.get_net_id_from_sid(id, s))
 
         papers=[p.strip() for p in form.d.papers.split("\r\n\r\n")]
 
         model.update_dataset(id=id, sid=form.d.sid, name=form.d.name, 
                              shortdescription=form.d.shortdescription,
                              description=form.d.description,
-                             tags=tags, licence=form.d.licence, 
-                             vertices=form.d.vertices,
-                             edges=form.d.edges,
-                             filename=form.d.filename,
+                             licence=form.d.licence, 
                              source=form.d.source,
                              papers=papers)
 
-        m=0
-        while ('meta%skeep' % m ) in form.d:
-            if form.d['meta%skeep' % m] == "delete":
-                model.delete_meta(id, type=form.d['meta%stype' % m], 
-                                  name=form.d['meta%sname' % m])
-            else:
-                model.update_meta(id, type=form.d['meta%stype' % m],
-                                  name=form.d['meta%sname' % m],
-                                  datatype=form.d['meta%sdatatype' % m],
-                                  description=form.d['meta%sdescription' % m])
-            m=m+1
+        model.delete_tags(id)
+        for t in tags:
+            model.new_dataset_tag(dataset=id, tag=t)
 
-        if form.d['metaxadd']=='add':
-            ## TODO: check that it does not exist already
-            model.add_meta(id=id, type=form.d['metaxtype'], 
-                           name=form.d['metaxname'],
-                           datatype=form.d['metaxdatatype'],
-                           description=form.d['metaxdescription'])
-    
         return render.add(form, True, True, int(id))
-    
+
 add_licence_form=web.form.Form(
-    web.form.Textbox("name", description="Name:", id="focused", size=50),
-    web.form.Textarea("text", description="Text:", cols=50, rows=2),
-    web.form.Textarea("fulltext", description="Full text:", cols=50, 
+    web.form.Textbox("name", description="Name:", id="focused", size=formwidth),
+    web.form.Textarea("text", description="Text:", cols=formwidth, rows=2),
+    web.form.Textarea("fulltext", description="Full text:", cols=formwidth, 
                       rows=10),
-    web.form.Textbox("link", description="URL:", size=50),
+    web.form.Textbox("link", description="URL:", size=formwidth),
     web.form.Button("Add")
     )
 
 class AddLicence:
     
     def GET(self):
-        if web.webopenid.status() not in admins_openid:
-            return web.seeother("/login")
+        check_admin()
         form=add_licence_form()
         return render.addlicence(form, False, False, False)
 
     def POST(self):
-        if web.webopenid.status() not in admins_openid:
-            return web.seeother("/login")
-
+        check_admin()
         form=add_licence_form()
         if not form.validates():
             # TODO
@@ -934,9 +961,7 @@ class AddLicence:
 
 class EditLicence:
     def GET(self, id):
-        if web.webopenid.status() not in admins_openid:
-            return web.seeother("/login")
-
+        check_admin()
         form=add_licence_form()
         form.Add.name='Submit'
         lic=model.get_licence(id)
@@ -945,9 +970,7 @@ class EditLicence:
         return render.addlicence(form, False, False, False)
 
     def POST(self, id):
-        if web.webopenid.status() not in admins_openid:
-            return web.seeother("/login")
-        
+        check_admin()        
         form=add_licence_form()
         if not form.validates():
             ## TODO
@@ -986,7 +1009,7 @@ class Admin:
         return render.admin()
 
 def run_r(cmd):
-    Rscript=file("../config/Rscript").read().strip()
+    Rscript=file(os.path.join("..", "config", "Rscript")).read().strip()
     args=[Rscript, "-e", cmd]
     p=subprocess.Popen(args, stdout=subprocess.PIPE)
     ret=p.wait()
@@ -1004,16 +1027,18 @@ class Check:
 
     def check_r_igraph(self, ds, filename, tags, meta):
 
+        
         res=odict.odict()
         
         ## File exists
-        ex=os.path.exists(filename + '.gz')
+        ex=os.path.exists(filename + compressed_ext)
         res['Data file exists'] = ex
         if not ex:
             return res
 
         ## File can be loaded
-        loadcode = 'library(igraph) ; load("%s.gz") ;' %filename
+        loadcode = 'library(igraph) ; load("%s%s") ;' % (filename, 
+                                                         compressed_ext)
         try:
             run_r(loadcode)
             res['Data file can be loaded'] = True
@@ -1039,8 +1064,8 @@ class Check:
             'is.weighted(g), is.bipartite(g), " ") ; '
         ret, out=run_r(code)
         nm=out.split()[1:]
-        res['Number of vertices'] = int(nm[0])==ds.vertices
-        res['Number of edges'] = int(nm[1])==ds.edges
+        res['Number of vertices'] = int(nm[0])==ds.minv
+        res['Number of edges'] = int(nm[1])==ds.mine
 
         ## Tags
         tags=[t.tag for t in tags]
@@ -1071,8 +1096,8 @@ class Check:
         res = odict.odict()
 
         ## Number of vertices and edges
-        res['Number of vertices'] = ds.vertices == g.vcount()
-        res['Number of edges'] = ds.edges == g.ecount()
+        res['Number of vertices'] = ds.minv == g.vcount()
+        res['Number of edges'] = ds.mine == g.ecount()
 
         vattr=g.vs.attribute_names()
         eattr=g.es.attribute_names()
@@ -1101,14 +1126,15 @@ class Check:
         res=odict.odict()
         
         ## File exists
-        ex=os.path.exists(filename + '.gz')
+        ex=os.path.exists(filename + compressed_ext)
         res['Data file exists'] = ex
         if not ex:
             return res
 
         ## File can be loaded
         try:
-            g=igraph.Graph.Read_Pickle(gzip.GzipFile(filename + '.gz'))
+            g=igraph.Graph.Read_Pickle(gzip.GzipFile(filename + 
+                                                     compressed_ext))
             res['Data file can be loaded'] = True
         except Exception, x:
 #            print str(x)
@@ -1122,14 +1148,14 @@ class Check:
         res=odict.odict()
 
         ## File exists
-        ex=os.path.exists(filename + '.gz')
+        ex=os.path.exists(filename + compressed_ext)
         res['Data file exists'] = ex
         if not ex:
             return res
 
         ## File can be loaded
         try:
-            f=tmpungzip(filename + '.gz')
+            f=tmpungzip(filename + compressed_ext)
             g=igraph.Graph.Read_GraphML(f)
             res['Data file can be loaded'] = True
             os.unlink(f)
@@ -1145,14 +1171,14 @@ class Check:
         res=odict.odict()
 
         ## File exists
-        ex=os.path.exists(filename + '.gz')
+        ex=os.path.exists(filename + compressed_ext)
         res['Data file exists'] = ex
         if not ex:
             return res
 
         ## File can be loaded
         try:
-            f=tmpungzip(filename + '.gz')
+            f=tmpungzip(filename + compressed_ext)
             g=igraph.Graph.Read_Pajek(f)
             res['Data file can be loaded'] = True
             os.unlink(f)
@@ -1168,14 +1194,14 @@ class Check:
         res=odict.odict()
 
         ## File exists
-        ex=os.path.exists(filename + '.gz')
+        ex=os.path.exists(filename + compressed_ext)
         res['Data file exists'] = ex
         if not ex:
             return res
 
         ## File can be loaded
         try:
-            f=tmpungzip(filename + '.gz')
+            f=tmpungzip(filename + compressed_ext)
             wb=xlrd.open_workbook(f)
             res['Data file can be loaded'] = True
             os.unlink(f)
@@ -1193,8 +1219,8 @@ class Check:
 
         ## Number of vertices and edges
         sh1=wb.sheet_by_index(0)
-        res['Number of vertices'] = int(sh1.cell_value(1,1)) == ds.vertices
-        res['Number of edges'] = int(sh1.cell_value(2,1)) == ds.edges
+        res['Number of vertices'] = int(sh1.cell_value(1,1)) == ds.minv
+        res['Number of edges'] = int(sh1.cell_value(2,1)) == ds.mine
 
         ## Tags
         mytags=sh1.row(4)[1:]
@@ -1240,8 +1266,9 @@ class Check:
             meta=model.get_metadata(ds.id)
             try: 
                 checkres[k] = self.check(ds, k, tags, meta,
-                                         "../data/" + str(id) + "/" + 
-                                         ds.filename + v)
+                                         os.path.join("..", "data",
+                                                      str(id), 
+                                                      ds.sid + v))
             except Exception, x:
                 checkres[k] = { "Cannot run check": str(x) }
                 
@@ -1292,9 +1319,9 @@ class Blog:
         return render.blog(entries, user_input.id)
 
 add_blog_form=web.form.Form(
-    web.form.Textbox('title', description='Title:', id='focused', size=50),
-    web.form.Textbox('date', description='Date:', size=50),
-    web.form.Textarea('entry', description='Text:', rows=20, cols=50),
+    web.form.Textbox('title', description='Title:', id='focused', size=formwidth),
+    web.form.Textbox('date', description='Date:', size=formwidth),
+    web.form.Textarea('entry', description='Text:', rows=20, cols=formwidth),
     web.form.Checkbox('published', description="Published?", value="True"),
     web.form.Button("Add")
     )
@@ -1302,15 +1329,12 @@ add_blog_form=web.form.Form(
 class AddBlog:
     
     def GET(self):
-        if web.webopenid.status() not in admins_openid:
-            return web.seeother("/login")
-
+        check_admin()
         form=add_blog_form()
         return render.addblog(form, None, added=False, edit=False)
 
     def POST(self):
-        if web.webopenid.status() not in admins_openid:
-            return web.seeother("/login")
+        check_admin()
         form=add_blog_form()
         if not form.validates():
             pass
@@ -1325,8 +1349,7 @@ class AddBlog:
 class EditBlog:
     
     def GET(self, id):
-        if web.webopenid.status() not in admins_openid:
-            return web.seeother("/login")
+        check_admin()
         form=add_blog_form()        
         form.Add.name='Submit'
         blog=model.get_blog(ids=[id], unpublished=True)
@@ -1334,8 +1357,7 @@ class EditBlog:
         return render.addblog(form, id, added=False, edit=True)
 
     def POST(self, id):
-        if web.webopenid.status() not in admins_openid:
-            return web.seeother("/login")
+        check_admin()
         form=add_blog_form()
         if not form.validates():
             # TODO
@@ -1356,17 +1378,64 @@ class Docs:
 class Delete:
 
     def GET(self, id):
-        if web.webopenid.status() not in admins_openid:
-            return web.seeother("/login")
+        check_admin()
         model.delete_dataset(int(id))
         return render.delete()
+
+def ungzip(filename):
+    os.system('gzip -dc %s%s > %s' % (filename, compressed_ext, filename))
 
 def gzipout(filename):
     os.system('gzip -f %s' % filename)
 
 class Recreate:
 
-    def to_excel(self, outputfile, g, id, ds):
+    def r_to_graphml(self, id):
+        nets=model.get_networks(id)
+        if len(nets) > 1:
+            return              # TODO
+
+        rext=model.get_format_extension('R-igraph')
+        outext=model.get_format_extension('GraphML')
+        inputfile = model.get_dataset_filename(id)
+        inputfile = os.path.join("..", "data", id, 
+                                 os.path.basename(inputfile))
+        rcode = dedent('source("../scripts/rutils.R") ; \
+                        r.to.graphml("%s%s%s", "%s%s") ; \
+                  ') % (inputfile, rext, compressed_ext, 
+                       inputfile, outext)
+        ret, out=run_r(rcode)
+        gzipout('%s%s' % (inputfile, outext))
+
+    def r_to_pajek(self, id):
+        rext=model.get_format_extension('R-igraph')
+        outext=model.get_format_extension('Pajek')
+        inputfile = model.get_dataset_filename(id)
+        inputfile = os.path.join("..", "data", id, 
+                                 os.path.basename(inputfile))
+        ds=list(model.get_dataset(id))[0]
+        rcode = dedent('source("../scripts/rutils.R") ; \
+                        r.to.pajek("%s%s%s", "%s%s", "%s") ; \
+                  ') % (inputfile, rext, compressed_ext, 
+                       inputfile, outext, ds.sid)
+        ret, out=run_r(rcode)
+        gzipout('%s%s' % (inputfile, outext))        
+                           
+    def graphml_to_excel(self, id):
+        nets=model.get_networks(id)
+        if len(nets) > 1:
+            return              # TODO
+        inputfile = model.get_dataset_filename(id)
+        inputfile = os.path.join("..", "data", id, 
+                                 os.path.basename(inputfile))
+        graphmlext=model.get_format_extension('GraphML')
+        excelext=model.get_format_extension('Excel')
+        ungzip('%s%s' % (inputfile, graphmlext))
+        g=igraph.Graph.Read_GraphML(inputfile + graphmlext)
+        os.unlink('%s%s' % (inputfile, graphmlext))
+
+        ds=list(model.get_dataset(id))[0]
+        
         wb=xlwt.Workbook()
 
         ## The network
@@ -1376,9 +1445,9 @@ class Recreate:
         sh1.write(0, 0, 'Name')
         sh1.write(0, 1, ds.name)
         sh1.write(1, 0, 'Vertices')
-        sh1.write(1, 1, ds.vertices)
+        sh1.write(1, 1, ds.minv)
         sh1.write(2, 0, 'Edges')
-        sh1.write(2, 1, ds.edges)
+        sh1.write(2, 1, ds.mine)
         sh1.write(3, 0, 'Type')
         if 'directed' in tags:
             sh1.write(3, 1, 'directed')
@@ -1427,50 +1496,33 @@ class Recreate:
                 for r, v in enumerate(g.vs[attr]):
                     sh3.write(r+1, n, v)
             
+        outputfile=inputfile + excelext
         wb.save(outputfile)
         gzipout(outputfile)
-
-    def to_pickle(self, outputfile, g):
-        pickle.dump(g, open(outputfile, "w"), protocol=-1)
-        gzipout(outputfile)
-
-    def GET(self, id):
-        if web.webopenid.status() not in admins_openid:
-            return web.seeother("/login")
-
-        # First, create GraphML and Pajek exports from R using the
-        # Rdata file
-        rext=model.get_format_extension('R-igraph')
+        
+        
+    def graphml_to_pickle(self, id):
+        nets=model.get_networks(id)
+        if len(nets) > 1:
+            return              # TODO
+        inputfile = model.get_dataset_filename(id)
+        inputfile = os.path.join("..", "data", id, 
+                                 os.path.basename(inputfile))
         graphmlext=model.get_format_extension('GraphML')
-        pajekext=model.get_format_extension('Pajek')
-        inputfile = list(model.get_dataset_file(id, 1))[0].filename
-        inputfile = "../data/%s/%s" % (id, os.path.basename(inputfile))
-        rcode = dedent('library(igraph) ; \
-                  load("%s%s.gz") ; \
-                  g <- get(ls()[1]) ; \
-                  write.graph(g, file="%s%s", format="graphml") ; \
-                  write.graph(g, file="%s%s", format="pajek") ; \
-                  ') % (inputfile, rext, inputfile, graphmlext, inputfile, 
-                       pajekext)
-        ret, out=run_r(rcode)
-
-        # Load the GraphML representation, we'll need it later
+        ungzip('%s%s' % (inputfile, graphmlext))
         g=igraph.Graph.Read_GraphML(inputfile + graphmlext)
-
-        # Final format, compressed
-        gzipout('%s%s' % (inputfile, graphmlext))
-        gzipout('%s%s' % (inputfile, pajekext))
-
-        # If the size of the graph allows, create an Excel file
-        # from GraphML
-        ds=list(model.get_dataset(id))[0]
-        if ds.vertices < 2**16 and ds.edges < 2**16:
-            self.to_excel(inputfile + ".xls", g, id, ds)
-
-        # Also create a pickled representation
-        pickleext=model.get_format_extension('Python-igraph')
-        self.to_pickle(inputfile + pickleext, g)
-
+        os.unlink('%s%s' % (inputfile, graphmlext))
+        outext = model.get_format_extension('Python-igraph')
+        outputfile=inputfile + outext
+        pickle.dump(g, open(outputfile, "w"), protocol=-1)
+        gzipout(inputfile + outext)
+    
+    def GET(self, id):
+        check_admin()
+        self.r_to_graphml(id)
+        self.r_to_pajek(id)
+        self.graphml_to_excel(id)
+        self.graphml_to_pickle(id)
         return render.recreate(id)
 
 def flatten(iterables):
@@ -1551,20 +1603,26 @@ class Search:
                                 int(user_input.limit), user_input, 
                                 user_input.q)
         elif user_input.format=='xml':
+            networks={}
+            for i in ids:
+                networks[i] = model.get_networks(i)
             web.header('Content-Type', 'text/xml')
             return render_plain.xml_index(ds, tags, len(ds), co, 
                                           int(user_input.offset),
                                           int(user_input.limit),
-                                          title)
+                                          title, networks)
         elif user_input.format=='text':
             for k, t in tags.iteritems():
                 tags[k]=";".join(x.tag for x in t)
+            networks={}
+            for i in ids:
+                networks[i] = model.get_networks(i)
             web.header('Content-Type', 'text/plain')
             return render_plain.text_index(ds, tags,
                                            len(ds), co,
                                            int(user_input.offset),
                                            int(user_input.limit),
-                                           title)
+                                           title, networks)
         elif user_input.format=='rss':
             date=datetime.today().strftime("%a, %d %b %Y %H:%M:%S +0200")
             web.header('Content-Type', 'application/rss+xml')
@@ -1584,9 +1642,11 @@ class Searchpage:
 app = web.application(urls, globals())
 
 web.webopenid.sessions = \
-    web.session.Session(app, web.session.DiskStore('../sessions'),
+    web.session.Session(app, 
+                        web.session.DiskStore(os.path.join("..", "sessions")),
                         initializer={})
-web.webopenid.store=openid.store.filestore.FileOpenIDStore('../sessions')
+web.webopenid.store=\
+    openid.store.filestore.FileOpenIDStore(os.path.join("..", "sessions"))
 
 if __name__ == '__main__':
     try:

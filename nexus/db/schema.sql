@@ -28,6 +28,9 @@ CREATE TABLE network (
        description TEXT,
        vertices INTEGER,
        edges INTEGER,
+       directed BOOLEAN,
+       bipartite BOOLEAN,
+       weighted BOOLEAN,
        filename TEXT,
        date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
        PRIMARY KEY(dataset, id)

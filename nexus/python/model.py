@@ -22,15 +22,17 @@ def get_list_tagged_as(tagname, operator="or", order="date", limit=10,
         what='''DISTINCT d.id id, d.sid sid, d.name name,
                          d.description description,
                          d.shortdescription shortdescription,
-                         d.licence licence, d.date date,
-                         n.id netid, n.description netdescription, 
-                         n.vertices vertices, n.edges edges'''
+                         d.licence licence, d.date date, 
+                         COUNT(n.vertices) nnets,
+                         MIN(n.vertices) minv, MAX(n.vertices) maxv, 
+                         MIN(n.edges) mine, MAX(n.edges) maxe'''
         where='''d.id=dt.dataset 
+                 AND n.dataset=d.id
                  AND dt.tag=t.id 
-                 AND t.tag IN %s 
-                 AND d.id=n.dataset''' % tagstr
+                 AND t.tag IN %s''' % tagstr
+        group="d.id"
         res=db.select(table, what=what, where=where, order=ord[order],
-                      offset=offset, limit=limit)
+                      offset=offset, limit=limit, group=group)
         count=list(db.select(table, what='COUNT(DISTINCT d.id) c',
                              where=where))[0].c
     else:
@@ -38,19 +40,21 @@ def get_list_tagged_as(tagname, operator="or", order="date", limit=10,
         what='''d.id id, d.sid sid, d.name name,
                 d.description description, 
                 d.shortdescription shortdescription,
-                d.licence licence,
-                d.date date, n.id netid, 
-                n.description netdescription, n.vertices vertices,
-                n.edges edges'''
+                d.licence licence, d.date date,
+                COUNT(n.vertices) nnets,
+                MIN(n.vertices) minv, MAX(n.vertices) maxv, 
+                MIN(n.edges) mine, MAX(n.edges) maxe'''
         where='''d.id IN (SELECT id FROM 
                                     (SELECT dt.dataset id, COUNT(*) count
                                      FROM dataset_tag dt, tag t
                                      WHERE dt.tag=t.id AND t.tag IN %s
                                      GROUP BY dt.dataset)
                                  WHERE count=%s)
-                 AND d.id=n.dataset''' % (tagstr, len(tagname))
+                 AND n.dataset=d.id
+                 ''' % (tagstr, len(tagname))
+        group="d.id"
         res=db.select(table, what=what, where=where, order=ord[order],
-                      offset=offset, limit=limit)
+                      offset=offset, limit=limit, group=group)
         count=list(db.select(table, what='COUNT(*) c', where=where))[0].c
     
     return list(res), count
@@ -75,15 +79,17 @@ def get_list_of_datasets(ids=None, order="date", limit=10, offset=0):
     res=db.query('''SELECT d.id id, d.sid sid, d.name name, 
                            d.description description, 
                            d.shortdescription shortdescription,
-                           d.licence licence, d.date date, 
-                           n.id netid, n.description netdescription, 
-                           n.vertices vertices, n.edges edges
-                    FROM dataset d, network n 
-                    WHERE d.id=n.dataset %s
+                           d.licence licence, d.date date,
+                           COUNT(n.vertices) nnets,
+                           MIN(n.vertices) minv, MAX(n.vertices) maxv, 
+                           MIN(n.edges) mine, MAX(n.edges) maxe
+                    FROM dataset d, network n
+                    WHERE n.dataset=d.id %s
+                    GROUP BY d.id
                     ORDER BY %s
                     LIMIT %s 
-                    OFFSET %s''' % (where, ord[order], int(limit), 
-                                    int(offset)))
+                    OFFSET %s''' % (where, ord[order], 
+                                    int(limit), int(offset)))
     res=list(res)
     return res, count
 
@@ -101,13 +107,14 @@ def get_dataset(id):
                               l.id licence,
                               l.name licence_name,
                               l.link licence_url,
-                              d.date date, n.id netid, 
-                              n.description netdescription, 
-                              n.vertices vertices, n.edges edges,
-                              n.filename filename, d.source source
+                              d.date date, d.source source,
+                              COUNT(n.vertices) nnets,
+                              MIN(n.vertices) minv, MAX(n.vertices) maxv, 
+                              MIN(n.edges) mine, MAX(n.edges) maxe
                        FROM dataset d, licence l, network n
                        WHERE d.licence=l.id
-                         AND d.id=$id AND d.id=n.dataset''',
+                         AND d.id=n.dataset
+                         AND d.id=$id''',
                     vars={'id': id})
 
 def delete_dataset(id):
@@ -117,10 +124,13 @@ def delete_dataset(id):
     db.delete('dataset_tag', where='dataset=%s' % int(id))
     db.delete('metadata', where='dataset=%s' % int(id))
 
-def get_dataset_file(id, nid):
-    return db.query('''SELECT filename FROM network 
-                         WHERE dataset=$id AND id=$nid''',
-                    vars={'id': id, 'nid': nid})
+def delete_network(dataset, id):
+    where='dataset=%s AND id=%s' % (websafe(dataset), websafe(id))
+    db.delete('network', where=where)
+
+def get_dataset_filename(id):
+    res=list(db.select('dataset', what='sid', where='id=%s' % websafe(id)))
+    return res[0].sid
 
 def whatsnew():
     return db.select('dataset', limit=5, order="date DESC, id DESC")
@@ -168,6 +178,9 @@ def new_dataset_tag(dataset, tag):
         tagid=ex[0].id
     db.insert('dataset_tag', seqname=None, dataset=dataset, tag=tagid)
 
+def delete_tags(id):
+    db.delete('dataset_tag', where='dataset=%s' % websafe(id))    
+
 def list_data_formats():
     return db.select('format')
 
@@ -175,24 +188,24 @@ def new_licence(**args):
     return db.insert('licence', seqname="id", **args)
 
 def update_dataset(id, sid, name, shortdescription,
-                   description, tags, licence, vertices,
-                   edges, filename, source, papers):
+                   description, licence, source, papers):
 
     db.update('dataset', where='id=%s' % int(id), sid=sid, name=name,
               shortdescription=shortdescription,
               description=description, licence=int(licence), 
               source=source)
-    db.update('network', where='dataset=%s AND id=1' % int(id), 
-              vertices=vertices, edges=edges, filename=filename)
 
     db.delete('dataset_tag', where='dataset=%s' % int(id))
-    for t in tags:
-        new_dataset_tag(id, t)
 
     db.delete('dataset_citation', where='dataset=%s' % int(id))
     for p in papers:
         new_citation(id, p)
     
+    return True
+
+def update_network(dataset, id, **args):
+    where='dataset=%s AND id=%s' % (websafe(dataset), websafe(id))
+    db.update('network', where=where, **args)
     return True
 
 def get_username(openid=None):
@@ -213,8 +226,9 @@ def update_licence(id, **args):
     return True
 
 def get_metadata(id):
-    res=db.select('metadata', where='dataset=%s' % int(id), 
-                  order="type")
+    res=db.select('metadata', 
+                  what="DISTINCT dataset, type, name, description, datatype",
+                  where='dataset=%s' % int(id), order="type")
     return list(res)
 
 def delete_meta(id, type, name):
@@ -227,7 +241,7 @@ def update_meta(id, type, name, **args):
                   type=type, name=name, **args)
 
 def add_meta(id, type, name, **args):
-    res=db.insert('metadata', dataset=id, network=1, type=type, name=name,
+    res=db.insert('metadata', dataset=id, type=type, name=name,
                   **args)
 
 def get_blog(ids=None, unpublished=False):
@@ -344,3 +358,28 @@ def get_id_from_sid(sid):
         return None
     else:
         return str(res[0].id)
+
+def get_networks(dataset):
+    return list(db.select('network', where='dataset=%s' % websafe(dataset),
+                          order="id"))
+
+def get_net_id_from_sid(dataset, sid):
+    where="dataset=%s AND sid='%s'" % (websafe(dataset), websafe(sid))
+    res=list(db.select('network', what='id', where=where))
+    if len(res)==0:
+        return None
+    else:
+        return str(res[0].id)    
+
+def get_net_sid_from_id(dataset, id):
+    where="dataset=%s AND id=%s" % (websafe(dataset), websafe(id))
+    res=list(db.select('network', what='sid', where=where))
+    if len(res)==0:
+        return None
+    else:
+        return str(res[0].sid)
+
+def get_networks(id):
+    res=db.select('network', where='dataset=%s' % websafe(str(id)), 
+                  order='id')
+    return list(res)
