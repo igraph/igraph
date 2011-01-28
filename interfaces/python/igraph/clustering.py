@@ -25,7 +25,8 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 from copy import deepcopy
 from itertools import izip
 from math import pi
-from StringIO import StringIO
+from cStringIO import StringIO
+from textwrap import TextWrapper
 
 from igraph import community_to_membership
 from igraph.compat import property
@@ -118,6 +119,9 @@ class Clustering(object):
         """
         return self._len
 
+    def __str__(self):
+        return self.summary(verbosity=1, width=78)
+
     @property
     def membership(self):
         """Returns the membership vector."""
@@ -157,6 +161,35 @@ class Clustering(object):
         @return: a L{Histogram} object
         """
         return Histogram(bin_width, self.sizes())
+
+    def summary(self, verbosity=0, width=None):
+        """Returns the summary of the clustering.
+        
+        The summary includes the number of items and clusters, and also the
+        list of members for each of the clusters if the verbosity is nonzero.
+        
+        @param verbosity: determines whether the cluster members should be
+          printed. Zero verbosity prints the number of items and clusters only.
+        @return: the summary of the clustering as a string.
+        """
+        out = StringIO()
+        print >>out, "Clustering, %d elements, %d clusters" % \
+                (len(self._membership), len(self))
+
+        if verbosity < 1:
+            return out.getvalue().strip()
+
+        ndigits = len(str(len(self)))
+
+        wrapper = TextWrapper(width=width)
+        wrapper.subsequent_indent = " " * (ndigits+3)
+
+        for idx, cluster in enumerate(self):
+            row = ", ".join(str(member) for member in cluster)
+            wrapper.initial_indent = "[%*d] " % (ndigits, idx)
+            print >>out, "\n".join(wrapper.wrap(row))
+
+        return out.getvalue().strip()
 
 
 class VertexClustering(Clustering):
@@ -530,17 +563,31 @@ class Dendrogram(object):
         return result
 
     def __str__(self):
-        return "Dendrogram, %d elements, %d merges" % \
-                (self._nitems, self._nmerges)
+        return self.summary(verbosity=1)
 
-    def summary(self):
-        """Draws the dendrogram of the hierarchical clustering in a string"""
+    def summary(self, verbosity=0, max_leaf_count=40):
+        """Returns the summary of the dendrogram.
+        
+        The summary includes the number of leafs and branches, and also an
+        ASCII art representation of the dendrogram unless it is too large.
+        
+        @param verbosity: determines whether the ASCII representation of the
+          dendrogram should be printed. Zero verbosity prints only the number
+          of leafs and branches.
+        @param max_leaf_count: the maximal number of leafs to print in the
+          ASCII representation. If the dendrogram has more leafs than this
+          limit, the ASCII representation will not be printed even if the
+          verbosity is larger than or equal to 1.
+        @return: the summary of the dendrogram as a string.
+        """
         from array import array
 
         out = StringIO()
-        print >>out, str(self)
-        if self._nitems == 0:
-            return out.getvalue()
+        print >>out, "Dendrogram, %d elements, %d merges" % \
+                (self._nitems, self._nmerges)
+
+        if self._nitems == 0 or verbosity < 1 or self._nitems > max_leaf_count:
+            return out.getvalue().strip()
             
         print >>out
 
@@ -581,7 +628,7 @@ class Dendrogram(object):
                 positions.append((pos1+pos2)/2)
 
                 dashes = "-" * (pos2 - pos1 - 1)
-                char_array[pos1:(pos2+1)] = array("c", "+%s+" % dashes)
+                char_array[pos1:(pos2+1)] = array("c", "`%s'" % dashes)
 
                 cidx_incr += 1
             
@@ -589,8 +636,7 @@ class Dendrogram(object):
 
             print >>out, char_array.tostring()
 
-
-        return out.getvalue()
+        return out.getvalue().strip()
 
     def _item_box_size(self, context, horiz, idx):
         """Calculates the amount of space needed for drawing an
