@@ -1038,13 +1038,16 @@ PyObject *igraphmodule_Graph_reciprocity(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_successors(igraphmodule_GraphObject * self,
                                         PyObject * args, PyObject * kwds)
 {
-  PyObject *list;
-  long idx;
+  PyObject *list, *index_o;
+  long int idx;
   igraph_vector_t result;
 
   static char *kwlist[] = { "vertex", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l", kwlist, &idx))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &index_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vid(index_o, &idx, &self->g))
     return NULL;
 
   igraph_vector_init(&result, 1);
@@ -1072,13 +1075,16 @@ PyObject *igraphmodule_Graph_successors(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_predecessors(igraphmodule_GraphObject * self,
                                           PyObject * args, PyObject * kwds)
 {
-  PyObject *list;
-  long idx;
+  PyObject *list, *index_o;
+  long int idx;
   igraph_vector_t result;
 
   static char *kwlist[] = { "vertex", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l", kwlist, &idx))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &index_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vid(index_o, &idx, &self->g))
     return NULL;
 
   igraph_vector_init(&result, 1);
@@ -3897,18 +3903,23 @@ PyObject *igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *
   igraph_vector_ptr_t res;
   igraph_vector_t *weights = 0;
   igraph_neimode_t mode = IGRAPH_OUT;
-  long from0, i, j;
+  long int from0, i, j;
   igraph_integer_t from;
   igraph_vs_t to;
-  PyObject *list, *item, *mode_o=Py_None, *to_o=Py_None, *weights_o=Py_None;
+  PyObject *list, *item, *from_o, *mode_o=Py_None, *to_o=Py_None, *weights_o=Py_None;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|OOO", kwlist, &from0,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|OOO", kwlist, &from_o,
         &to_o, &weights_o, &mode_o))
     return NULL;
 
-  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
+  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode))
+    return NULL;
 
-  if (igraphmodule_PyObject_to_vs_t(to_o, &to, &self->g, 0, 0)) return NULL;
+  if (igraphmodule_PyObject_to_vid(from_o, &from0, &self->g))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vs_t(to_o, &to, &self->g, 0, 0))
+    return NULL;
 
   from = (igraph_integer_t) from0;
 
