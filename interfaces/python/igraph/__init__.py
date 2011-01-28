@@ -1011,15 +1011,45 @@ class Graph(core.GraphBase):
         @param version: pickle protocol version to be used. If -1, uses
           the highest protocol available
         @return: C{None} if the graph was saved successfully to the
-          file given, or a string if C{fname} was C{None}.
+          given file, or a string if C{fname} was C{None}.
         """
-        import cPickle
-        if fname is None: return cPickle.dumps(self, version)
+        import cPickle as pickle
+        if fname is None:
+            return pickle.dumps(self, version)
         if not hasattr(fname, "write"):
             file_was_opened=True
             fname=open(fname, 'wb')
-        result=cPickle.dump(self, fname, version)
-        if file_was_opened: fname.close()
+        result=pickle.dump(self, fname, version)
+        if file_was_opened:
+            fname.close()
+        return result
+
+    def write_picklez(self, fname=None, version=-1):
+        """Saves the graph in Python pickled format, compressed with
+        gzip.
+
+        Saving in this format is a bit slower than saving in a Python pickle
+        without compression, but the final file takes up much less space on
+        the hard drive.
+
+        @param fname: the name of the file or a stream to save to.
+        @param version: pickle protocol version to be used. If -1, uses
+          the highest protocol available
+        @return: C{None} if the graph was saved successfully to the
+          given file.
+        """
+        import cPickle as pickle
+        if not hasattr(fname, "write"):
+            file_was_opened = True
+            fname = gzip.open(fname, "wb")
+        elif not isinstance(fname, gzip.GzipFile):
+            file_was_opened = True
+            fname = gzip.GzipFile(mode="wb", fileobj=fname)
+        else:
+            file_Was_opened = False
+        result = pickle.dump(self, fname, version)
+        if file_was_opened:
+            fname.close()
         return result
 
     @classmethod
@@ -1045,6 +1075,27 @@ class Graph(core.GraphBase):
             result = cPickle.load(fname)
         if not isinstance(result, klass):
             raise TypeError, "unpickled object is not a %s" % klass.__name__
+        return result
+
+    @classmethod
+    def Read_Picklez(klass, fname, *args, **kwds):
+        """Reads a graph from compressed Python pickled format, uncompressing
+        it on-the-fly.
+
+        @param fname: the name of the file or a stream to read from.
+        @return: the created graph object.
+        """
+        import cPickle as pickle
+        if hasattr(fname, "read"):
+            # Probably a file or a file-like object
+            if isinstance(fname, gzip.GzipFile):
+                result = pickle.load(fname)
+            else:
+                result = pickle.load(gzip.GzipFile(mode="rb", fileobj=fname))
+        else:
+            result = pickle.load(gzip.open(fname, "rb"))
+        if not isinstance(result, klass):
+            raise TypeError("unpickled object is not a %s" % klass.__name__)
         return result
 
     def write_svg(self, fname, layout, width = None, height = None, \
@@ -1254,21 +1305,31 @@ class Graph(core.GraphBase):
 
         root, ext = os.path.splitext(filename)
         ext = ext.lower()
-        
+
+        if ext == ".gz":
+            _, ext2 = os.path.splitext(root)
+            ext2 = ext2.lower()
+            if ext2 == ".pickle":
+                return "picklez"
+            elif ext2 == ".graphml":
+                return "graphmlz"
+
         if ext in [".graphml", ".graphmlz", ".lgl", ".ncol", ".pajek",
             ".gml", ".dimacs", ".edgelist", ".edges", ".edge", ".net",
-            ".pickle", ".dot"]:
+            ".pickle", ".picklez", ".dot"]:
             return ext[1:]
 
         if ext == ".txt" or ext == ".dat":
             # Most probably an adjacency matrix or an edge list
             f = open(filename, "r")
             line = f.readline()
-            if line is None: return "edges"
+            if line is None:
+                return "edges"
             parts = line.strip().split()
             if len(parts) == 2:
                 line = f.readline()
-                if line is None: return "edges"
+                if line is None:
+                    return "edges"
                 parts = line.strip().split()
                 if len(parts) == 2:
                     line = f.readline()
@@ -1304,7 +1365,8 @@ class Graph(core.GraphBase):
           GraphML format), C{"gml"} (GML format), C{"net"}, C{"pajek"}
           (Pajek format), C{"dimacs"} (DIMACS format), C{"edgelist"},
           C{"edges"} or C{"edge"} (edge list), C{"adjacency"}
-          (adjacency matrix), C{"pickle"} (Python pickled format).
+          (adjacency matrix), C{"pickle"} (Python pickled format),
+          C{"picklez"} (gzipped Python pickled format)
         @raises IOError: if the file format can't be identified and
           none was given.
         """
@@ -1340,8 +1402,8 @@ class Graph(core.GraphBase):
           C{"dot"}, C{"graphviz"} (DOT format, used by GraphViz), C{"net"},
           C{"pajek"} (Pajek format), C{"dimacs"} (DIMACS format),
           C{"edgelist"}, C{"edges"} or C{"edge"} (edge list), C{"adjacency"}
-          (adjacency matrix), C{"pickle"} (Python pickled format),
-          C{"svg"} (Scalable Vector Graphics).
+          (adjacency matrix), C{"pickle"}, C{"picklez"} (standard and gzipped
+          Python pickled format), C{"svg"} (Scalable Vector Graphics).
         @raises IOError: if the file format can't be identified and
           none was given.
         """
@@ -2096,6 +2158,7 @@ class Graph(core.GraphBase):
           "edge":       ("Read_Edgelist", "write_edgelist"),
           "edges":      ("Read_Edgelist", "write_edgelist"),
           "pickle":     ("Read_Pickle", "write_pickle"),
+          "picklez":    ("Read_Picklez", "write_picklez"),
           "svg":        (None, "write_svg")
     }
 
