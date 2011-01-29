@@ -184,12 +184,17 @@ class Clustering(object):
         wrapper = TextWrapper(width=width)
         wrapper.subsequent_indent = " " * (ndigits+3)
 
-        for idx, cluster in enumerate(self):
-            row = ", ".join(str(member) for member in cluster)
+        for idx, cluster in enumerate(self._formatted_cluster_iterator()):
             wrapper.initial_indent = "[%*d] " % (ndigits, idx)
-            print >>out, "\n".join(wrapper.wrap(row))
+            print >>out, "\n".join(wrapper.wrap(cluster))
 
         return out.getvalue().strip()
+
+    def _formatted_cluster_iterator(self):
+        """Iterates over the clusters and formats them into a string to be
+        presented in the summary."""
+        for cluster in self:
+            yield ", ".join(str(member) for member in cluster)
 
 
 class VertexClustering(Clustering):
@@ -467,6 +472,17 @@ class VertexClustering(Clustering):
 
         kwds["vertex_color"] = self.membership
         return self._graph.__plot__(context, bbox, palette, *args, **kwds)
+
+    def _formatted_cluster_iterator(self):
+        """Iterates over the clusters and formats them into a string to be
+        presented in the summary."""
+        if self._graph.is_named():
+            names = self._graph.vs["name"]
+            for cluster in self:
+                yield ", ".join(str(names[member]) for member in cluster)
+        else:
+            for cluster in self:
+                yield ", ".join(str(member) for member in cluster)
 
 
 ###############################################################################
