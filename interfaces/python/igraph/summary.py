@@ -7,6 +7,29 @@ from textwrap import TextWrapper
 
 __all__ = ["GraphSummary"]
 
+class FakeWrapper(object):
+    """Object whose interface is compatible with C{textwrap.TextWrapper}
+    but does no wrapping."""
+
+    def __init__(self, *args, **kwds):
+        pass
+
+    def fill(self, text):
+        return [text]
+
+    def wrap(self, text):
+        return [text]
+
+def _get_wrapper_for_width(width, *args, **kwds):
+    """Returns a text wrapper that wraps text for the given width.
+
+    @param width: the maximal width of each line that the text wrapper
+      produces. C{None} means that no wrapping will be performed.
+    """
+    if width is None:
+        return FakeWrapper(*args, **kwds)
+    return TextWrapper(width=width, *args, **kwds)
+
 class GraphSummary(object):
     """Summary representation of a graph.
 
@@ -64,16 +87,8 @@ class GraphSummary(object):
         self.print_edge_attributes = print_edge_attributes
         self.verbosity = verbosity
         self.width = width
-        if self.width is None:
-            class FakeWrapper(object):
-                def wrap(self, text):
-                    return [text]
-                def fill(self, text):
-                    return [text]
-            self.wrapper = FakeWrapper()
-        else:
-            self.wrapper = TextWrapper(width=self.width)
-        self.wrapper.break_on_hyphens = False
+        self.wrapper = _get_wrapper_for_width(self.width,
+                break_on_hyphens=False)
 
         if self._graph.is_named():
             self._edges_header = "+ edges (vertex names):"

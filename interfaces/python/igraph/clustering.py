@@ -26,7 +26,6 @@ from copy import deepcopy
 from itertools import izip
 from math import pi
 from cStringIO import StringIO
-from textwrap import TextWrapper
 
 from igraph import community_to_membership
 from igraph.compat import property
@@ -34,6 +33,7 @@ from igraph.configuration import Configuration
 from igraph.datatypes import UniqueIdGenerator
 from igraph.drawing.colors import ClusterColoringPalette
 from igraph.statistics import Histogram
+from igraph.summary import _get_wrapper_for_width
 
 class Clustering(object):
     """Class representing a clustering of an arbitrary ordered set.
@@ -193,9 +193,8 @@ class Clustering(object):
             return out.getvalue().strip()
 
         ndigits = len(str(len(self)))
-
-        wrapper = TextWrapper(width=width)
-        wrapper.subsequent_indent = " " * (ndigits+3)
+        wrapper = _get_wrapper_for_width(width,
+                subsequent_indent = " " * (ndigits+3))
 
         for idx, cluster in enumerate(self._formatted_cluster_iterator()):
             wrapper.initial_indent = "[%*d] " % (ndigits, idx)
@@ -736,6 +735,7 @@ class Dendrogram(object):
         orientation_aliases = {
             "left-right": "lr", "right-left": "rl",
             "top-bottom": "tb", "bottom-top": "bt",
+            "top-down": "tb", "bottom-up": "bt",
             "horizontal": "lr", "horiz": "lr", "h": "lr",
             "vertical": "bt", "vert": "bt", "v": "bt"
         }
@@ -1117,9 +1117,8 @@ class Cover(object):
             return out.getvalue().strip()
 
         ndigits = len(str(len(self)))
-
-        wrapper = TextWrapper(width=width)
-        wrapper.subsequent_indent = " " * (ndigits+3)
+        wrapper = _get_wrapper_for_width(width,
+                subsequent_indent = " " * (ndigits+3))
 
         for idx, cluster in enumerate(self._formatted_cluster_iterator()):
             wrapper.initial_indent = "[%*d] " % (ndigits, idx)
