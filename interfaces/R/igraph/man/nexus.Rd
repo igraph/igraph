@@ -142,7 +142,7 @@ nexus.search(q, offset=10, limit=10,
   set.
 
   Summary information about an individual Nexus data set is printed
-  as \preformatted{NEXUS B--- 39 109-223 -- #18 Kapferer tailor shop
+  as \preformatted{NEXUS B--- 39 109-223 #18 kaptail -- Kapferer tailor shop
 + tags: directed; social network; undirected
 + nets: 1/KAPFTI2; 2/KAPFTS2; 3/KAPFTI1; 4/KAPFTS1}
   This is very similar to the header that is used for printing igraph
@@ -153,8 +153,11 @@ nexus.search(q, offset=10, limit=10,
   data set contains both directed and undirected graphs. The second is
   \sQuote{\code{N}} named graphs. The third character is
   \sQuote{\code{W}} for weighted graphs, the fourth is \sQuote{\code{B}}
-  if the data set contains bipartite graphs. The end of the first list
-  contains the numeric id and the name of the data set. The second row
+  if the data set contains bipartite graphs. Then the number of vertices
+  and number of edges are printed, for data sets with multiple graphs,
+  the smallest and the largest values are given. Then comes the numeric
+  id, and the string id of the data set. The end of the first
+  line contains the name of the data set. The second row
   lists the data set tags, and the third row the networks that are
   included in the data set.
 

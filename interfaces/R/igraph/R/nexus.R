@@ -69,20 +69,20 @@ print.nexusDatasetInfo <- function(x, ...) {
     nc[4] <- "B"
   }
   nc <- paste(nc, collapse="")
-  head <- paste(sep="", "NEXUS ", nc, " ", ve[1], " ", ve[2], " -- #",
-                x$id, " ", x$sid, " ", x$name)
+  head <- paste(sep="", "NEXUS ", nc, " ", ve[1], " ", ve[2], " #",
+                x$id, " ", x$sid, " -- ", x$name)
   if (nchar(head) > getOption("width")) {
     head <- paste(sep="", substr(head, 1, getOption("width")-1), "+")
   }
   cat(head, sep="", "\n")
   if (length(x$tags) != 0) {
-    tt <- strwrap(paste(sep="", "+ tags:", paste(x$tags, collapse="; ")),
+    tt <- strwrap(paste(sep="", "+ tags: ", paste(x$tags, collapse="; ")),
                   initial="", prefix="  ")
     cat(tt, sep="\n")
   }
   if ("networks" %in% names(x)) {
     nets <- strsplit(x$networks, " ")[[1]]
-    nn <- strwrap(paste(sep="", "+ nets:", paste(nets, collapse="; ")),
+    nn <- strwrap(paste(sep="", "+ nets: ", paste(nets, collapse="; ")),
                   initial="", prefix="  ")
     cat(nn, sep="\n")
   }
