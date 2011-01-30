@@ -45,7 +45,12 @@ for (i in seq_along(KRACKAD)) {
   KRACKAD[[i]]$URL <- KRACKFR[[i]]$URL <- "http://vlado.fmf.uni-lj.si/pub/networks/data/ucinet/ucidata.htm"
 }
 
-save(KRACKAD, KRACKFR, file="/tmp/krackoffice.Rdata.gz")
+names(KRACKAD) <- paste(sep="", "KRACKAD-", seq_along(KRACKAD))
+names(KRACKFR) <- paste(sep="", "KRACKFR-", seq_along(KRACKFR))
+
+krackoffice <- c(KRACKAD, KRACKFR)
+
+save(krackoffice, file="/tmp/krackoffice.Rdata.gz")
 
 stop()
 
