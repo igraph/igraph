@@ -27,10 +27,26 @@
       <xsd:element name="sid" type="xsd:string" />
       <xsd:element name="name" type="xsd:string" />
       <xsd:element name="description" type="xsd:string" />
-      <xsd:element name="vertices" type="xsd:nonNegativeInteger" />
-      <xsd:element name="edges" type="xsd:nonNegativeInteger" />
+      <xsd:element name="networks" type="networksType" />
       <xsd:element name="tags" type="tagsType" />
       <xsd:element name="date" type="xsd:date" />      
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="networksType">
+    <xsd:sequence>
+      <xsd:element name="network" type="networkType" minOccurs="0"
+		   maxOccurs="unbounded" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="networkType">
+    <xsd:sequence>
+      <xsd:element name="id" type="xsd:positiveInteger" />
+      <xsd:element name="sid" type="xsd:string" />
+      <xsd:element name="vertices" type="xsd:nonNegativeInteger" />
+      <xsd:element name="edges" type="xsd:nonNegativeInteger" />
+      <xsd:element name="description" type="xsd:string" />
     </xsd:sequence>
   </xsd:complexType>
 
