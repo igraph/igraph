@@ -55,7 +55,7 @@ $def with (page)
 	      <li class="page_item">
 		<a href="/web/feedback" title="Write to us">Feedback</a>
 	      </li>
-	      $if openid.status():
+	      $if check_admin(redirect=False):
 	        <li class="page_item">
 		  <a href="/web/admin" title="Make changes">Admin</a>
 		</li>

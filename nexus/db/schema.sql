@@ -37,14 +37,14 @@ CREATE TABLE network (
 );
 
 CREATE TABLE citation (
-       id INTEGER,
+       id TEXT,
        citation TEXT,
        PRIMARY KEY (id)
 );
 
 CREATE TABLE dataset_citation (
        dataset INTEGER,
-       citation INTEGER,
+       citation TEXT,
        PRIMARY KEY(dataset, citation),
        FOREIGN KEY(dataset) REFERENCES dataset(id),
        FOREIGN KEY(citation) REFERENCES citation(id)

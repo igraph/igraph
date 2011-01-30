@@ -216,8 +216,12 @@ def prevnexttable(nohits, start, end, limit, user_input):
 
     return prev + " " + " ".join(pagelinks) + " " + next
 
+def makelinks(text):
+    return re.sub(r'(http://[^ \n\t]+)', r'<a href="\1">\1</a>', text)
+
 def check_admin(redirect=True):
-    return True
+    if web.ctx.environ['REMOTE_ADDR']=='127.0.0.1':
+        return True
     adm=web.webopenid.status() in admins_openid
     if not adm and redirect:
         return web.seeother("/login")
@@ -289,7 +293,9 @@ tempglob = { 'dataformats': model.get_format_extensions(),
              'type': type,
              'prevnexttable': prevnexttable,
              'add_net_form': add_net_form,
-             'add_meta_form': add_meta_form  }
+             'add_meta_form': add_meta_form,
+             'check_admin': check_admin,
+             'makelinks': makelinks }
 
 for name in url_helper.__all__:
     tempglob[name] = getattr(url_helper, name)
@@ -509,6 +515,7 @@ class Index:
                  desc, ";".join(n for n,v in formats.items()),
                  papers)
         meta="\n".join(format_attr(m) for m in meta)
+        if meta != "": meta = "\n" + meta
         return main + meta
 
     def dataset(self, user_input):
@@ -520,8 +527,8 @@ class Index:
         dataset=[d for d in model.get_dataset(id)][0]
         if not dataset:
             return web.notfound()        
-        tags=list(model.get_tags(dataset.id))
-        meta=list(model.get_metadata(dataset.id))
+        tags=list(model.get_tags(id))
+        meta=list(model.get_metadata(id))
         formats=get_available_formats(id)
         papers=list(model.get_papers(id))
         networks=model.get_networks(id)
@@ -747,7 +754,8 @@ class Add:
                               description=input['description'].strip(),
                               licence=int(input['licence']),
                               source=input['source'].strip(),
-                              date=web.SQLLiteral("CURRENT_DATE"))
+                              date=web.SQLLiteral("CURRENT_DATE"),
+                              downloads=0)
         
         ## tags
         if input['tags']=="":
@@ -797,21 +805,15 @@ class Add:
         for no in attrids:
             netname=input['meta%snetwork' % no]
             if netname == "":
-                for nid in netids:
-                    model.add_meta(id=did, network=nid,
-                                   type=input['meta%stype' % no],
-                                   name=input['meta%sname' % no],
-                                   datatype=input['meta%sdatatype' % no],
-                                   description=\
-                                       input['meta%sdescription'% no].strip())
+                net=web.db.sqlify(None)
             else:
                 net=netnames.index(input['meta%snetwork' % no])
-                model.add_meta(id=did, network=net,
-                               type=input['meta%stype' % no],
-                               name=input['meta%sname' % no],
-                               datatype=input['meta%sdatatype' % no],
-                               description=\
-                                   input['meta%sdescription' % no].strip())
+            model.add_meta(id=did, network=net,
+                           type=input['meta%stype' % no],
+                           name=input['meta%sname' % no],
+                           datatype=input['meta%sdatatype' % no],
+                           description=\
+                               input['meta%sdescription' % no].strip())
 
         return render.add(form, True, False, did)
 
@@ -841,6 +843,7 @@ class Edit:
             f['net%sdirected' % no].set_value(net.directed)
             f['net%sweighted' % no].set_value(net.weighted)
             f['net%sbipartite' % no].set_value(net.bipartite)
+            f['net%sdescription' %no].set_value(net.description)
             return f
         netforms=[ netform(i+1,n) for i,n in enumerate(nets) ]
 
@@ -874,40 +877,40 @@ class Edit:
         oldnets=model.get_networks(id)
         oldsids=[ o.sid for o in oldnets ]
         
-        netids=[ int(n[3:][:-4]) for n in input.keys() if 
-                 re.match("^net[0-9]+name$", n) is not None ]
+        netids=[ int(n[3:][:-3]) for n in input.keys() if 
+                 re.match("^net[0-9]+sid$", n) is not None ]
         sids=[ input['net%ssid' % no] for no in netids ]
         for i,no in enumerate(sorted(netids)):
             directed=('net%sdirected' % no) in input
             if directed and 'directed' not in tags:
-                tags.append['directed']
+                tags.append('directed')
             if not directed and 'undirected' not in tags:
-                tags.append['undirected']
+                tags.append('undirected')
             weighted=('net%sweighted' % no) in input
             if weighted and 'weighted' not in tags:
-                tags.append['weighted']
+                tags.append('weighted')
             bipartite=('net%sbipartite' % no) in input
             if bipartite and 'bipartite' not in tags:
-                tags.append['bipartite']
+                tags.append('bipartite')
             
             sid=input['net%ssid' % no]
             if sid in oldsids:
                 model.update_network(dataset=id, 
                                      id=model.get_net_id_from_sid(id, sid),
-                                     description=input['net%sdesc' % no],
-                                     vertices=input['net%svert' % no],
+                                     description=input['net%sdescription' % no],
+                                     vertices=input['net%svertices' % no],
                                      edges=input['net%sedges' % no],
-                                     filename=input['net%sfile' % no],
+                                     filename=input['net%sfilename' % no],
                                      directed=directed,
                                      bipartite=bipartite,
                                      weighted=weighted)
             else:
                 model.new_network(dataset=id, sid=sid,
                                   id=model.get_net_id_from_sid(id, sid),
-                                  description=input['net%sdesc' % no],
-                                  vertices=input['net%svert' % no],
+                                  description=input['net%sdescription' % no],
+                                  vertices=input['net%svertices' % no],
                                   edges=input['net%sedges' % no],
-                                  filename=input['net%sfile' % no],
+                                  filename=input['net%sfilename' % no],
                                   directed=directed,
                                   bipartite=bipartite,
                                   weighted=weighted)
@@ -928,6 +931,27 @@ class Edit:
         model.delete_tags(id)
         for t in tags:
             model.new_dataset_tag(dataset=id, tag=t)
+
+        ## Metadata
+        oldmeta = model.get_metadata(id)
+        for m in oldmeta:
+            model.delete_meta(id, m.type, m.name)
+
+        netnames=[ input['net%ssid' % no] for no in netids ]
+        attrids=[ int(n[4:][:-4]) for n in input.keys() if 
+                  re.match('^meta[0-9]+name$', n) ]
+        for no in attrids:
+            netname=input['meta%snetwork' % no]
+            if netname == "":
+                net=web.db.sqlify(None)
+            else:
+                net=netnames.index(input['meta%snetwork' % no])
+            model.add_meta(id=id, network=net,
+                           type=input['meta%stype' % no],
+                           name=input['meta%sname' % no],
+                           datatype=input['meta%sdatatype' % no],
+                           description=\
+                               input['meta%sdescription' % no].strip())
 
         return render.add(form, True, True, int(id))
 
@@ -1425,6 +1449,8 @@ class Recreate:
         nets=model.get_networks(id)
         if len(nets) > 1:
             return              # TODO
+        if nets[0].vertices >= 65536 or nets[0].edges >= 65536:
+            return
         inputfile = model.get_dataset_filename(id)
         inputfile = os.path.join("..", "data", id, 
                                  os.path.basename(inputfile))

@@ -1,7 +1,7 @@
 $def with (ds, tags, meta, formats, papers, networks=[])
 
 <div class="title"><h2>$ds.name [$ds.sid]
-$if openid.status():
+$if check_admin(redirect=False):
     <span class="edit">
       <a href="/web/edit/$ds.id">[edit]</a>
       <a href="/web/check/$ds.id">[check]</a>
@@ -58,7 +58,7 @@ $if ds.nnets > 1 and len(networks) > 1:
   <h3>Networks</h3>
   <dl class="networks">
   $for net in networks:
-    <dt>'$net.sid'</dt>
+    <dt>($net.id) '$net.sid'</dt>
     <dd>$net.vertices vertices, $net.edges edges. $net.description</dd>
     
 
@@ -67,13 +67,22 @@ $if len(meta) > 0:
   <dl class="metadata">
   $for m in meta:
     <dt>$m.type.capitalize() attribute '$m.name'</dt>
-    <dd>$m.description</dd>
+    <dd>
+      $if m.network=='NULL' and len(networks) > 1:
+        (all)
+      $elif len(networks) > 1:
+        ($m.network)
+      $m.description
+    </dd>
   </dl>
 
 $if len(papers) > 0:
   <h3>Publication(s)</h3>
   $for p in papers:
     <p>$p.citation</p>
+
+<h3>Source</h3>
+<p>$:makelinks(ds.source)</p>
 
 <h3>Licence</h3>
 <p><a href="$ds.licence_url">$ds.licence_name</a></p>

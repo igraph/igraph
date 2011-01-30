@@ -23,6 +23,7 @@ def get_list_tagged_as(tagname, operator="or", order="date", limit=10,
                          d.description description,
                          d.shortdescription shortdescription,
                          d.licence licence, d.date date, 
+                         d.source source,
                          COUNT(n.vertices) nnets,
                          MIN(n.vertices) minv, MAX(n.vertices) maxv, 
                          MIN(n.edges) mine, MAX(n.edges) maxe'''
@@ -40,7 +41,7 @@ def get_list_tagged_as(tagname, operator="or", order="date", limit=10,
         what='''d.id id, d.sid sid, d.name name,
                 d.description description, 
                 d.shortdescription shortdescription,
-                d.licence licence, d.date date,
+                d.licence licence, d.date date, d.source source,
                 COUNT(n.vertices) nnets,
                 MIN(n.vertices) minv, MAX(n.vertices) maxv, 
                 MIN(n.edges) mine, MAX(n.edges) maxe'''
@@ -79,7 +80,7 @@ def get_list_of_datasets(ids=None, order="date", limit=10, offset=0):
     res=db.query('''SELECT d.id id, d.sid sid, d.name name, 
                            d.description description, 
                            d.shortdescription shortdescription,
-                           d.licence licence, d.date date,
+                           d.licence licence, d.date date, d.source source,
                            COUNT(n.vertices) nnets,
                            MIN(n.vertices) minv, MAX(n.vertices) maxv, 
                            MIN(n.edges) mine, MAX(n.edges) maxe
@@ -164,8 +165,13 @@ def new_network(**args):
     db.insert('network', seqname=None, **args)
 
 def new_citation(dataset, citation):
-    citid=db.insert('citation', seqname='id', citation=citation)
-    db.insert('dataset_citation', seqname=None, 
+    ex=list(db.select('citation', what='id', where='citation=$citation',
+                      vars={ 'citation': citation}))
+    if not ex:        
+        citid=db.insert('citation', seqname=None, citation=citation)
+    else:
+        citid=ex[0].id
+    db.insert('dataset_citation', seqname='id', 
               dataset=dataset, citation=citid)
 
 def new_dataset_tag(dataset, tag):
@@ -226,8 +232,8 @@ def update_licence(id, **args):
     return True
 
 def get_metadata(id):
-    res=db.select('metadata', 
-                  what="DISTINCT dataset, type, name, description, datatype",
+    what="DISTINCT dataset, type, name, description, datatype, network"
+    res=db.select('metadata', what=what,
                   where='dataset=%s' % int(id), order="type")
     return list(res)
 
