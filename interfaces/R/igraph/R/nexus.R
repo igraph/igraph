@@ -70,21 +70,21 @@ print.nexusDatasetInfo <- function(x, ...) {
   }
   nc <- paste(nc, collapse="")
   head <- paste(sep="", "NEXUS ", nc, " ", ve[1], " ", ve[2], " -- #",
-                x$id, " ", x$name)
+                x$id, " ", x$sid, " ", x$name)
   if (nchar(head) > getOption("width")) {
     head <- paste(sep="", substr(head, 1, getOption("width")-1), "+")
   }
   cat(head, sep="", "\n")
   if (length(x$tags) != 0) {
-    cat("+ tags: ")
-    cat(strwrap(paste(x$tags, collapse="; "), exdent=2))
-    cat("\n")
+    tt <- strwrap(paste(sep="", "+ tags:", paste(x$tags, collapse="; ")),
+                  initial="", prefix="  ")
+    cat(tt, sep="\n")
   }
   if ("networks" %in% names(x)) {
     nets <- strsplit(x$networks, " ")[[1]]
-    cat("+ nets: ")
-    cat(strwrap(paste(nets, collapse="; "), exdent=2))
-    cat("\n")
+    nn <- strwrap(paste(sep="", "+ nets:", paste(nets, collapse="; ")),
+                  initial="", prefix="  ")
+    cat(nn, sep="\n")
   }
   attr <- x[["attributes"]]
   printed <- c("id", "sid", "vertices/edges", "name", "tags", "networks",
