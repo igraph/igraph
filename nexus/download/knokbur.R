@@ -30,18 +30,15 @@ colnames(mat1) <- rownames(mat1) <- colnames(mat2) <- rownames(mat2) <- names
 library(igraph)
 g1 <- graph.adjacency(mat1)
 g2 <- graph.adjacency(mat2)
-el <- data.frame(rbind(get.edgelist(g1), get.edgelist(g2)))
-el <- cbind(el, Type=rep(c("information", "money"),
-                  c(ecount(g1), ecount(g2))))
-g <- graph.data.frame(el, directed=TRUE)
-V(g)$Sector <- as.character(met$Sector)
-V(g)$Rating <- met$Rating
+V(g1)$Sector <- V(g2)$Sector <- as.character(met$Sector)
+V(g1)$Rating <- V(g2)$Rating <- met$Rating
 
-g$name <- "Knoke bureaucracies"
-g$Author <- "D. Knoke and J. Wood"
-g$Citation <- "Knoke D. and Wood J. (1981). Organized for action: Commitment in voluntary associations. New Brunswick, NJ: Rutgers University Press.\n\n
+g1$name <- "Knoke bureaucracies, KNOKM"
+g2$name <- "Knoke bureaucracies, KNOKI"
+g1$Author <- g2$Author <- "D. Knoke and J. Wood"
+g1$Citation <- g2$Citation <- "Knoke D. and Wood J. (1981). Organized for action: Commitment in voluntary associations. New Brunswick, NJ: Rutgers University Press.\n\n
 Knoke D. and Kuklinski J. (1982). Network analysis, Beverly Hills, CA: Sage."
-g$URL <- "http://vlado.fmf.uni-lj.si/pub/networks/data/ucinet/ucidata.htm"
+g1$URL <- g2$URL <- "http://vlado.fmf.uni-lj.si/pub/networks/data/ucinet/ucidata.htm"
 
-knokbur <- g
+knokbur <- list(KNOKM=g1, KNOKI=g2)
 save(knokbur, file="/tmp/knokbur.Rdata.gz")

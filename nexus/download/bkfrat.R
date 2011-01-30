@@ -17,20 +17,17 @@ mat2 <- mat[(length(mat)/2+1):length(mat)]
 mat1 <- matrix(mat1, sqrt(length(mat1)), byrow=TRUE)
 mat2 <- matrix(mat2, sqrt(length(mat2)), byrow=TRUE)
 
-mat3 <- mat1 + mat2/10
-
 library(igraph)
-g <- graph.adjacency(mat3, weighted="observed")
-E(g)$Observed <- floor(E(g)$weight)
-E(g)$Reported <- round((E(g)$weight-floor(E(g)$weight)) * 10)
-g <- remove.edge.attribute(g, "weight")
+g1 <- graph.adjacency(mat1, weighted=TRUE, mode="undirected")
+g2 <- graph.adjacency(mat1, weighted=TRUE, mode="directed")
 
-g$name <- "Bernard & Killworth fraternity"
-g$Author <- "H. Bernard H and P. Killworth"
-g$Citation <- "Bernard H, Killworth P and Sailer L. (1980). Informant accuracy in social network data IV. Social Networks, 2, 191-218.\n\nBernard H, Killworth P and Sailer L. (1982). Informant accuracy in social network data V. Social Science Research, 11, 30-66.\n\nRomney K and Weller S. (1984). Predicting informant accuracy from patterns of recall among individuals. Social Networks, 6, 59-78."
-g$URL <- "http://vlado.fmf.uni-lj.si/pub/networks/data/ucinet/ucidata.htm"
+g1$name <- "Bernard & Killworth fraternity, BKFRAB"
+g2$name <- "Bernard & Killworth fraternity, BKFRAC"
+g1$Author <- g2$Author <- "H. Bernard H and P. Killworth"
+g1$Citation <- g2$Citation <- "Bernard H, Killworth P and Sailer L. (1980). Informant accuracy in social network data IV. Social Networks, 2, 191-218.\n\nBernard H, Killworth P and Sailer L. (1982). Informant accuracy in social network data V. Social Science Research, 11, 30-66.\n\nRomney K and Weller S. (1984). Predicting informant accuracy from patterns of recall among individuals. Social Networks, 6, 59-78."
+g1$URL <- g2$URL <- "http://vlado.fmf.uni-lj.si/pub/networks/data/ucinet/ucidata.htm"
 
-bkfrat <- g
+bkfrat <- list(BKFRAB=g1, BKFRAC=g2)
 save(bkfrat, file="/tmp/bkfrat.Rdata.gz")
 
 
