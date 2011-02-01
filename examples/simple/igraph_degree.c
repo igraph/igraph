@@ -36,7 +36,9 @@ int main() {
   igraph_t g;
   igraph_vector_t v, seq;
   int ret;
-  igraph_integer_t mdeg;
+  igraph_integer_t mdeg, nedges;
+  long int i;
+  long int ndeg;
 
   /* Create graph */
   igraph_vector_init(&v, 8);
@@ -63,6 +65,19 @@ int main() {
 
   igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
   print_vector(&v, stdout);
+
+  igraph_set_error_handler(igraph_error_handler_ignore);
+
+  /* Consistency check of the handshaking lemma. */
+  /* If d is the sum of all vertex degrees, then d = 2|E|. */
+  ndeg = 0;
+  nedges = igraph_ecount(&g);
+  for (i = 0; i < igraph_vector_size(&v); i++) {
+    ndeg += (long int) VECTOR(v)[i];
+  }
+  if (ndeg != 2*nedges) {
+    return 1;
+  }
   
   igraph_destroy(&g);
   
@@ -91,6 +106,17 @@ int main() {
   igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
   print_vector(&v, stdout);
 
+  /* Consistency check of the handshaking lemma. */
+  /* If d is the sum of all vertex degrees, then d = 2|E|. */
+  ndeg = 0;
+  nedges = igraph_ecount(&g);
+  for (i = 0; i < igraph_vector_size(&v); i++) {
+    ndeg += (long int) VECTOR(v)[i];
+  }
+  if (ndeg != 2*nedges) {
+    return 2;
+  }
+
   /* Degree of the same vertex multiple times */
   
   igraph_vector_init(&seq, 3);
@@ -99,21 +125,19 @@ int main() {
   print_vector(&v, stdout);
 
   /* Errors */
-  igraph_set_error_handler(igraph_error_handler_ignore);
   ret=igraph_degree(&g, &v, igraph_vss_vector(&seq), (igraph_neimode_t)0, 
 		    IGRAPH_LOOPS);
   if (ret != IGRAPH_EINVMODE) {
-    return 1;
+    return 3;
   }
 
   VECTOR(seq)[0]=4;
   ret=igraph_degree(&g, &v, igraph_vss_vector(&seq), IGRAPH_ALL, IGRAPH_LOOPS);
   if (ret != IGRAPH_EINVVID) {
-    return 2;
+    return 4;
   }  
 
   igraph_destroy(&g);
-  igraph_vector_destroy(&v);
   igraph_vector_destroy(&seq);
 
   /* Maximum degree */
@@ -121,32 +145,66 @@ int main() {
   igraph_ring(&g, 10, 0 /*undirected*/, 0 /*undirected*/, 0/*uncircular*/);
   igraph_maxdegree(&g, &mdeg, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
   if (mdeg != 2) { 
-    return 3;
+    return 5;
+  }
+  /* Consistency check of the handshaking lemma. */
+  /* If d is the sum of all vertex degrees, then d = 2|E|. */
+  igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
+  ndeg = 0;
+  nedges = igraph_ecount(&g);
+  for (i = 0; i < igraph_vector_size(&v); i++) {
+    ndeg += (long int) VECTOR(v)[i];
+  }
+  if (ndeg != 2*nedges) {
+    return 6;
   }
   igraph_destroy(&g);
   
   igraph_full(&g, 10, 0 /*undirected*/, 0/*no loops*/);
   igraph_maxdegree(&g, &mdeg, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
   if (mdeg != 9) {
-    return 4;
+    return 7;
+  }
+  /* Consistency check of the handshaking lemma. */
+  /* If d is the sum of all vertex degrees, then d = 2|E|. */
+  igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
+  ndeg = 0;
+  nedges = igraph_ecount(&g);
+  for (i = 0; i < igraph_vector_size(&v); i++) {
+    ndeg += (long int) VECTOR(v)[i];
+  }
+  if (ndeg != 2*nedges) {
+    return 8;
   }
   igraph_destroy(&g);
 
   igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
   igraph_maxdegree(&g, &mdeg, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS);
   if (mdeg != 9) {
-    return 5;
+    return 9;
   }
   igraph_maxdegree(&g, &mdeg, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS);
   if (mdeg != 1) {
-    return 6;
+    return 10;
   }
   igraph_maxdegree(&g, &mdeg, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
   if (mdeg != 9) {
-    return 7;
+    return 11;
+  }
+  /* Consistency check of the handshaking lemma. */
+  /* If d is the sum of all vertex degrees, then d = 2|E|. */
+  igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
+  ndeg = 0;
+  nedges = igraph_ecount(&g);
+  for (i = 0; i < igraph_vector_size(&v); i++) {
+    ndeg += (long int) VECTOR(v)[i];
+  }
+  if (ndeg != 2*nedges) {
+    return 12;
   }
   igraph_destroy(&g);
-  
+
+  igraph_vector_destroy(&v);
 
   return 0;
 }
