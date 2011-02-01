@@ -5,7 +5,7 @@ if [ `id -u` != 0 ]; then
 	exit 2
 fi
 
-if [ $# -ne 3]; then
+if [ $# -ne 3 ]; then
     echo "Usage: $0 igraph_version debian_revision series"
 	echo "where igraph_version is the version number of igraph,"
 	echo "debian_revision is the Debian package revision number"
@@ -23,12 +23,22 @@ SERIES=$3
 
 DEST_DIR=$HOME/packages/$SERIES
 CURR_DIR=`pwd`
+BZR_IGRAPH_ROOT=$HOME/bzr/igraph
+
+function prechecks {
+  if [ ! -d ${BZR_IGRAPH_ROOT} ]; then
+    echo ${BZR_IGRAPH_ROOT} does not exist or is not a directory!
+    exit 1
+  fi
+}
 
 function install_build_dependencies {
+  apt-get update
   apt-get -y --no-install-recommends install \
-          debhelper automake autoconf gcc g++ pkg-config \
-          build-essential libxml2-dev python-all-dev \
-          python-central python-epydoc texlive-latex-base
+          debhelper devscripts fakeroot automake autoconf gcc g++ \
+          pkg-config flex bison build-essential libxml2-dev libglpk-dev \
+          libarpack2-dev libgmp3-dev libxml2-dev libblas-dev liblapack-dev \
+          python-all-dev python-central python-epydoc texlive-latex-base 
 }
 
 function make_destdir {
@@ -36,16 +46,20 @@ function make_destdir {
 }
 
 function bazaar_update {
-  pushd ${CURR_DIR}/bzr/0.6-main
+  pushd ${BZR_IGRAPH_ROOT}/0.6-main
   bzr update
   popd
 }
 
 function create_igraph_debian_pkg {
-  wget -O igraph_$1.orig.tar.gz http://switch.dl.sourceforge.net/sourceforge/igraph/igraph-$1.tar.gz
+  if [ -f ${CURR_DIR}/igraph_$1.orig.tar.gz ]; then
+    cp ${CURR_DIR}/igraph_$1.orig.tar.gz .
+  else
+    wget -O igraph_$1.orig.tar.gz http://switch.dl.sourceforge.net/sourceforge/igraph/igraph-$1.tar.gz
+  fi
   tar -xvvzf igraph_$1.orig.tar.gz
   cd igraph-$1
-  # cp -r ${CURR_DIR}/bzr/0.6-main/debian .
+  cp -r ${BZR_IGRAPH_ROOT}/0.6-main/debian .
   cat debian/changelog.in | sed -e "s/@VERSION@/@VERSION@-${DEBIAN_REVISION}/g" >debian/changelog.in.new
   mv debian/changelog.in.new debian/changelog.in
   debian/prepare
@@ -74,9 +88,8 @@ function compile_python_interface {
   debian/prepare
   cat debian/changelog | sed -e "s/unstable/${SERIES}/g" >debian/changelog.new
   mv debian/changelog.new debian/changelog
-  # dpkg-buildpackage -tc -rfakeroot
   debuild -b -us -uc
-  debuild -S -sa
+  # debuild -S -sa
   cd ..
 }
 
@@ -89,8 +102,11 @@ function remove_build_dir {
   rm -rf ${BUILD_DIR}
 }
 
+prechecks
+
 BUILD_DIR=`mktemp -d`
 cd ${BUILD_DIR}
+# trap "{ cd /; rm -rf \"${BUILD_DIR}\"; exit 255; }" INT EXIT TERM
 
 install_build_dependencies
 make_destdir

@@ -27,14 +27,14 @@ build: configure-stamp build-stamp
 build-stamp:
 	dh_testdir
 	$(MAKE)
-	cd doc && $(MAKE) igraph.info
+	[ -f doc/igraph.info ] || ( cd doc && $(MAKE) igraph.info )
 	touch build-stamp
 
 clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp configure-stamp
-	[ ! -f doc/Makefile ] || ( cd doc && $(MAKE) distclean )
+	# [ ! -f doc/Makefile ] || ( cd doc && $(MAKE) distclean )
 	[ ! -f Makefile ] || $(MAKE) distclean
 	dh_clean
 
