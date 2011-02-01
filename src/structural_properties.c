@@ -197,7 +197,7 @@ int igraph_diameter(const igraph_t *graph, igraph_integer_t *pres,
  * \param directed Boolean, whether to consider directed
  *        paths. Ignored for undirected graphs.
  * \param unconn What to do if the graph is not connected. If
- *        \c TRUE the average of thr geodesics
+ *        \c TRUE the average of the geodesics
  *        within the components 
  *        will be returned, otherwise the number of vertices is
  *        used for the length of non-existing geodesics. (The rationale
@@ -282,7 +282,7 @@ int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
 
 /**
  * \function igraph_path_length_hist
- * Create a histogram of all shortest path lenghts
+ * Create a histogram of all shortest path lengths.
  * 
  * This function calculates a histogram, by calculating the
  * shortest path length between each pair of vertices. For directed
@@ -540,7 +540,7 @@ int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
  *        Do \em not initialize this object before passing it to
  *        this function, but be sure to call \ref igraph_destroy() on it if
  *        you don't need it any more.
- * \param weights A vector containing the weights of the the edges.
+ * \param weights A vector containing the weights of the edges
  *        in the same order as the simple edge iterator visits them.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory.
@@ -694,7 +694,7 @@ int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
  * \param to Vector of the vertex ids to which the path length 
  *        calculations are done. It is not allowed to have duplicated
  *        vertex ids here.
- * \param mode The type of shortest paths to be use for the
+ * \param mode The type of shortest paths to be used for the
  *        calculation in directed graphs. Possible values: 
  *        \clist
  *        \cli IGRAPH_OUT 
@@ -868,7 +868,7 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
  * \param to Vertex sequence with the ids of the vertices to/from which the 
  *        shortest paths will be calculated. A vertex might be given multiple
  *        times.
- * \param mode The type of shortest paths to be use for the
+ * \param mode The type of shortest paths to be used for the
  *        calculation in directed graphs. Possible values: 
  *        \clist
  *        \cli IGRAPH_OUT 
@@ -1039,7 +1039,7 @@ int igraph_get_shortest_paths(const igraph_t *graph,
 
 /** 
  * \function igraph_get_shortest_path
- * Shortest path from one vertex to another one
+ * Shortest path from one vertex to another one.
  * 
  * Calculates and returns a single unweighted shortest path from a
  * given vertex to another one. If there are more than one shortest
@@ -1061,9 +1061,10 @@ int igraph_get_shortest_paths(const igraph_t *graph,
  * \param from The id of the source vertex.
  * \param to The id of the target vertex.
  * \param mode A constant specifying how edge directions are
- *        considered in directed graphs. \c IGRAPH_OUT follows edge
- *        directions, \c IGRAPH_IN follows the opposite directions,
- *        and \c IGRAPH_ALL ignores edge directions. This argument is
+ *        considered in directed graphs. Valid modes are:
+ *        \c IGRAPH_OUT, follows edge directions;
+ *        \c IGRAPH_IN, follows the opposite directions; and
+ *        \c IGRAPH_ALL, ignores edge directions. This argument is
  *        ignored for undirected graphs.
  * \return Error code.
  * 
@@ -1127,7 +1128,7 @@ void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v) {
 
 /**
  * \function igraph_get_all_shortest_paths
- * \brief Finds all shortest paths (geodesics) from a vertex to all other vertices 
+ * \brief Finds all shortest paths (geodesics) from a vertex to all other vertices.
  * 
  * \param graph The graph object.
  * \param res Pointer to an initialized pointer vector, the result
@@ -1703,7 +1704,7 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
  * rewiring edges while preserving the original graph's degree distribution.
  * Please note that the rewiring is done "in place", so no new graph will
  * be allocated. If you would like to keep the original graph intact, use
- * \ref igraph_copy() before.
+ * \ref igraph_copy() beforehand.
  * 
  * \param graph The graph object to be rewired.
  * \param n Number of rewiring trials to perform.
@@ -2049,7 +2050,7 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
  * 
  * </para><para>
  * This function is an alias to \ref igraph_induced_subgraph(), it is
- * left here to ensure API compatibility with igraph versions prior 0.6.
+ * left here to ensure API compatibility with igraph versions prior to 0.6.
  *
  * </para><para>
  * This function collects the specified vertices and all edges between
@@ -2398,7 +2399,7 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
 
 /**
  * \function igraph_transitivity_avglocal_undirected
- * \brief Average local transitivity (clustering coefficient)
+ * \brief Average local transitivity (clustering coefficient).
  * 
  * The transitivity measures the probability that two neighbors of a
  * vertex are connected. In case of the average local transitivity,
@@ -2912,7 +2913,7 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
 
 /**
  * \function igraph_transitivity_local_undirected
- * \brief Calculates the local transitivity (clustering coefficient) of a graph
+ * \brief Calculates the local transitivity (clustering coefficient) of a graph.
  * 
  * The transitivity measures the probability that two neighbors of a
  * vertex are connected. In case of the local transitivity, this
@@ -3431,7 +3432,7 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 
 /**
  * \function igraph_constraint
- * \brief Burt's constraint scores
+ * \brief Burt's constraint scores.
  * 
  * </para><para>
  * This function calculates Burt's constraint scores for the given
@@ -3446,7 +3447,7 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
  * C[i] = sum( sum( (p[i,q] p[q,j])^2, q in V[i], q != i,j ), j in
  * V[], j != i)
  * </para></blockquote>
- * for a graph of order (ie. number od vertices) N, where proportional
+ * for a graph of order (ie. number of vertices) N, where proportional
  * tie strengths are defined as 
  * <blockquote><para>
  * p[i,j]=(a[i,j]+a[j,i]) / sum(a[i,k]+a[k,i], k in V[i], k != i),
@@ -3770,8 +3771,8 @@ int igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
  * \param loops Logical constant, whether to include loops in the
  *   calculation. If this constant is TRUE then
  *   loop edges are thought to be possible in the graph (this does not
- *   neccessary means that the graph really contains any loops). If
- *   this FALSE then the result is only correct if the graph does not
+ *   necessarily mean that the graph really contains any loops). If
+ *   this is FALSE then the result is only correct if the graph does not
  *   contain loops.
  * \return Error code.
  *
@@ -3804,7 +3805,7 @@ int igraph_density(const igraph_t *graph, igraph_real_t *res,
 
 /**
  * \function igraph_neighborhood_size
- * \brief Calculates the size of the neighborhood of a given vertex
+ * \brief Calculates the size of the neighborhood of a given vertex.
  * 
  * The neighborhood of a given order of a vertex includes all vertices
  * which are closer to the vertex than the order. Ie. order 0 is
@@ -3917,7 +3918,7 @@ int igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
 
 /** 
  * \function igraph_neighborhood
- * Calculate the neighborhood of vertices
+ * Calculate the neighborhood of vertices.
  * 
  * The neighborhood of a given order of a vertex includes all vertices
  * which are closer to the vertex than the order. Ie. order 0 is
@@ -4044,7 +4045,7 @@ int igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *res,
 
 /**
  * \function igraph_neighborhood_graphs
- * Create graphs from the neighborhood(s) of some vertex/vertices
+ * Create graphs from the neighborhood(s) of some vertex/vertices.
  * 
  * The neighborhood of a given order of a vertex includes all vertices
  * which are closer to the vertex than the order. Ie. order 0 is
@@ -4180,7 +4181,7 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
 
 /**
  * \function igraph_topological_sorting
- * \brief Calculate a possible topological sorting of the graph
+ * \brief Calculate a possible topological sorting of the graph.
  *
  * </para><para>
  * A topological sorting of a directed acyclic graph is a linear ordering
@@ -4344,7 +4345,7 @@ int igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
 
 /**
  * \function igraph_is_simple
- * \brief Decides whether the input graph is a simple graph
+ * \brief Decides whether the input graph is a simple graph.
  * 
  * </para><para>
  * A graph is a simple graph if it does not contain loop edges and 
@@ -4393,7 +4394,7 @@ int igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
 
 /**
  * \function igraph_is_loop
- * \brief Find the loop edges in a graph
+ * \brief Find the loop edges in a graph.
  * 
  * </para><para>
  * A loop edge is an edge from a vertex to itself.
@@ -4429,7 +4430,7 @@ int igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
 
 /**
  * \function igraph_is_multiple
- * \brief Find the multiple edges in a graph
+ * \brief Find the multiple edges in a graph.
  * 
  * </para><para>
  * An edge is a multiple edge if there is another 
@@ -4437,7 +4438,7 @@ int igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
  * 
  * </para><para>
  * Note that this function returns true only for the second or more 
- * appereances of the multiple edges.
+ * appearances of the multiple edges.
  * \param graph The input graph.
  * \param res Pointer to a boolean vector, the result will be stored 
  *        here. It will be resized as needed.
@@ -4489,7 +4490,7 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
 
 /**
  * \function igraph_count_multiple
- * \brief Count the number of appearance of the edges in a graph
+ * \brief Count the number of appearances of the edges in a graph.
  * 
  * </para><para>
  * If the graph has no multiple edges then the result vector will be 
@@ -4809,7 +4810,7 @@ int igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegraph) {
 
 /**
  * \function igraph_linegraph
- * \brief Create the line graph of a graph
+ * \brief Create the line graph of a graph.
  *
  * The line graph L(G) of a G undirected graph is defined as follows. 
  * L(G) has one vertex for each edge in G and two vertices in L(G) are connected 
@@ -4843,14 +4844,14 @@ int igraph_linegraph(const igraph_t *graph, igraph_t *linegraph) {
 
 /**
  * \function igraph_add_edge
- * \brief Adds a single edge to a graph
+ * \brief Adds a single edge to a graph.
  * 
  * </para><para>
  * For directed graphs the edge points from \p from to \p to.
  * 
  * </para><para>
  * Note that if you want to add many edges to a big graph, then it is
- * unefficient to add them one by one, it is better to collect them into
+ * inefficient to add them one by one, it is better to collect them into
  * a vector and add all of them via a single \ref igraph_add_edges() call.
  * \param igraph The graph.
  * \param from The id of the first vertex of the edge.
@@ -5005,7 +5006,7 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
 
 /**
  * \function igraph_shortest_paths_dijkstra
- * Weighted shortest paths from some sources
+ * Weighted shortest paths from some sources.
  * 
  * This function is Dijkstra's algorithm to find the weighted 
  * shortest paths to all vertices from a single source. (It is run 
@@ -5422,10 +5423,10 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 
 /** 
  * \function igraph_get_shortest_path_dijkstra
- * Weighted shortest path from one vertex to another one
+ * Weighted shortest path from one vertex to another one.
  * 
- * Calculates a single single (positively) weighted shortest path from
- * a single vertex to another one, using Disjkstra's algorithm. 
+ * Calculates a single (positively) weighted shortest path from
+ * a single vertex to another one, using Dijkstra's algorithm. 
  * 
  * </para><para>This function is a special case (and a wrapper) to
  * \ref igraph_get_shortest_paths_dijkstra(). 
@@ -5512,7 +5513,7 @@ int igraph_i_vector_tail_cmp(const void* path1, const void* path2) {
 /**
  * \ingroup structural
  * \function igraph_get_all_shortest_paths_dijkstra
- * \brief Finds all shortest paths (geodesics) from a vertex to all other vertices 
+ * \brief Finds all shortest paths (geodesics) from a vertex to all other vertices.
  * 
  * \param graph The graph object.
  * \param res Pointer to an initialized pointer vector, the result
@@ -5920,7 +5921,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
 
 /**
  * \function igraph_shortest_paths_bellman_ford
- * Weighted shortest paths from some sources allowing negative weights
+ * Weighted shortest paths from some sources allowing negative weights.
  * 
  * This function is the Bellman-Ford algorithm to find the weighted 
  * shortest paths to all vertices from a single source. (It is run 
@@ -6078,7 +6079,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
 
 /**
  * \function igraph_shortest_paths_johnson
- * Calculate shortest paths from some sources using Johnson's algorithm
+ * Calculate shortest paths from some sources using Johnson's algorithm.
  * 
  * See Wikipedia at http://en.wikipedia.org/wiki/Johnson's_algorithm
  * for Johnson's algorithm. This algorithm works even if the graph
@@ -6248,7 +6249,7 @@ int igraph_shortest_paths_johnson(const igraph_t *graph,
 
 /**
  * \function igraph_unfold_tree
- * Unfolding a graph into a tree, by possibly multiplicating its vertices
+ * Unfolding a graph into a tree, by possibly multiplicating its vertices.
  *
  * A graph is converted into a tree (or forest, if it is unconnected),
  * by performing a breadth-first search on it, and replicating
@@ -6377,7 +6378,7 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
 /**
  * \function igraph_is_mutual
- * Check whether the edges of a directed graph are mutual
+ * Check whether the edges of a directed graph are mutual.
  * 
  * An (A,B) edge is mutual if the graph contains the (B,A) edge, too.
  * </para>
@@ -6549,7 +6550,7 @@ int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
 
 /**
  * \function igraph_avg_nearest_neighbor_degree
- * Average nearest neighbor degree
+ * Average nearest neighbor degree.
  *
  * Calculates the average degree of the neighbors for each vertex, and
  * optionally, the same quantity in the function of vertex degree.
@@ -6560,7 +6561,7 @@ int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
  * 
  * \param graph The input graph, it can be directed but the
  *   directedness of the edges is ignored.
- * \param vids The vertices for which the calculation is permformed. 
+ * \param vids The vertices for which the calculation is performed. 
  * \param knn Pointer to an initialized vector, the result will be
  *   stored here. It will be resized as needed. Supply a NULL pointer
  *   here, if you only want to calculate \c knnk.
@@ -6672,10 +6673,10 @@ int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
 
 /**
  * \function igraph_strength
- * Strength of the vertices, weighted vertex degree in other words
+ * Strength of the vertices, weighted vertex degree in other words.
  * 
- * In an weighted network the strength of a vertex is the sum of the
- * weights of all incident edges. In a non-weighted networks this is
+ * In a weighted network the strength of a vertex is the sum of the
+ * weights of all incident edges. In a non-weighted network this is
  * exactly the vertex degree.
  * \param graph The input graph.
  * \param res Pointer to an initialized vector, the result is stored
@@ -6760,7 +6761,7 @@ int igraph_strength(const igraph_t *graph, igraph_vector_t *res,
 
 /**
  * \function igraph_diameter_dijkstra
- * Weighted diameter using Dijkstra's algorithm, non-negative weights only
+ * Weighted diameter using Dijkstra's algorithm, non-negative weights only.
  * 
  * The diameter of a graph is its longest geodesic. I.e. the
  * (weighted) shortest path is calculated for all pairs of vertices
@@ -6982,7 +6983,7 @@ int igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
 
 /**
  * \function igraph_contract_vertices
- * Replace multiple vertices with a single one
+ * Replace multiple vertices with a single one.
  * 
  * This function creates a new graph, by merging several 
  * vertices into one. The vertices in the new graph correspond
