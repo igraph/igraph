@@ -106,7 +106,7 @@ prechecks
 
 BUILD_DIR=`mktemp -d`
 cd ${BUILD_DIR}
-# trap "{ cd /; rm -rf \"${BUILD_DIR}\"; exit 255; }" INT EXIT TERM
+trap "{ cd /; rm -rf \"${BUILD_DIR}\"; exit 255; }" INT EXIT TERM
 
 install_build_dependencies
 make_destdir
