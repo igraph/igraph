@@ -686,9 +686,9 @@ igraph_integer_t igraph_ecount(const igraph_t *graph) {
  *        be initialized beforehand and will be resized. Starting from igraph 
  *        version 0.4 this vector is always sorted, the vertex ids are
  *        in increasing order.
- * \param pnode The id of the node of which the adjacent vertices are
- *        searched. 
- * \param mode Defines the way adjacent vertices are searched for
+ * \param pnode The id of the node for which the adjacent vertices are
+ *        to be searched.
+ * \param mode Defines the way adjacent vertices are searched in
  *        directed graphs. It can have the following values:
  *        \c IGRAPH_OUT, vertices reachable by an
  *        edge from the specified vertex are searched;

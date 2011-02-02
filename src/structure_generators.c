@@ -766,6 +766,9 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector, igraph_int
  * \function igraph_ring
  * \brief Creates a \em ring graph, a one dimensional lattice.
  * 
+ * An undirected (circular) ring on n vertices is commonly known in graph
+ * theory as the cycle graph C_n.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of vertices in the ring.
  * \param directed Logical, whether to create a directed ring.

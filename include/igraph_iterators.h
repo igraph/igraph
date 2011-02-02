@@ -134,7 +134,7 @@ typedef struct igraph_vit_t {
  * of the vertices visited so far and to be visited. \ref
  * IGRAPH_VIT_RESET() resets the iterator, it will point to the first
  * vertex again. Finally \ref IGRAPH_VIT_GET() gives the current vertex
- * pointed by the iterator (call this only if \ref IGRAPH_VIT_END()
+ * pointed to by the iterator (call this only if \ref IGRAPH_VIT_END()
  * is false).
  * </para>
  * <para>
@@ -206,7 +206,7 @@ typedef struct igraph_vit_t {
  * \define IGRAPH_VIT_GET
  * \brief Query the current position.
  * 
- * Gives the vertex id of the current vertex poited to by the
+ * Gives the vertex id of the current vertex pointed to by the
  * iterator. 
  * \param vit The vertex iterator.
  * \return The vertex id of the current vertex.
@@ -348,7 +348,7 @@ typedef struct igraph_eit_t {
  * \ref IGRAPH_EIT_END() returns false.
  * \param eit The edge iterator to step.
  * 
- * Time complecity: O(1).
+ * Time complexity: O(1).
  */
 #define IGRAPH_EIT_NEXT(eit) (++((eit).pos))
 /**
@@ -378,7 +378,7 @@ typedef struct igraph_eit_t {
  * \define IGRAPH_EIT_RESET
  * \brief Reset an edge iterator.
  * 
- * Resets an ege iterator. After calling this macro the iterator will
+ * Resets an edge iterator. After calling this macro the iterator will
  * point to the first edge.
  * \param eit The edge iterator.
  * 
