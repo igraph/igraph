@@ -160,19 +160,19 @@ igraph.info: igraph-docs.xml $(DOCFIX2) igraph.info.diff
 igraph-docs.dvi: igraph-docs.xml $(DOCFIX2)
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
 	xmllint --xinclude -o igraph-docs2.xml igraph-docs.xml \
-	&& docbook2dvi igraph-docs2.xml \
+	&& env < /dev/null hash_extra=65000 docbook2dvi igraph-docs2.xml \
 	&& mv igraph-docs2.dvi igraph-docs.dvi
 
 igraph-docs.ps: igraph-docs.xml $(DOCFIX2)
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
 	xmllint --xinclude -o igraph-docs2.xml igraph-docs.xml \
-	&& docbook2ps igraph-docs2.xml \
+	&& env < /dev/null hash_extra=65000 docbook2ps igraph-docs2.xml \
 	&& mv igraph-docs2.ps igraph-docs.ps
 
 igraph-docs.pdf: igraph-docs.xml $(DOCFIX2)
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
 	xmllint --xinclude -o igraph-docs2.xml igraph-docs.xml \
-	&& docbook2pdf igraph-docs2.xml \
+	&& env < /dev/null hash_extra=65000 docbook2pdf igraph-docs2.xml \
 	&& mv igraph-docs2.pdf igraph-docs.pdf
 
 CLEANFILES=$(DOCINCLUDES) html/*.html html/stamp \
