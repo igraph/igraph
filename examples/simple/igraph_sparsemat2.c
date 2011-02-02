@@ -34,10 +34,10 @@ int igraph_matrix_dgemv(const igraph_matrix_t *m,
                         igraph_real_t beta,
                         igraph_bool_t transpose_m) {
   
-  long int nrow=igraph_matrix_nrow(m);
-  long int ncol=igraph_matrix_ncol(m);
+  int nrow=igraph_matrix_nrow(m);
+  int ncol=igraph_matrix_ncol(m);
   long int vlen=igraph_vector_size(v);
-  long int one=1;
+  int one=1;
   char t = transpose_m ? 't' : 'n';
   long int input_len  = transpose_m ? nrow : ncol;
   long int output_len = transpose_m ? ncol : nrow;
@@ -72,10 +72,10 @@ int my_dgemv(const igraph_matrix_t *m,
                        igraph_real_t beta,
                        igraph_bool_t transpose_m) {
   
-  long int nrow=igraph_matrix_nrow(m);
-  long int ncol=igraph_matrix_ncol(m);
+  int nrow=igraph_matrix_nrow(m);
+  int ncol=igraph_matrix_ncol(m);
   long int vlen=igraph_vector_size(v);
-  long int one=1;
+  int one=1;
   char t = transpose_m ? 't' : 'n';
   long int input_len  = transpose_m ? nrow : ncol;
   long int output_len = transpose_m ? ncol : nrow;
