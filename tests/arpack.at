@@ -19,12 +19,35 @@
 # Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
 # 02110-1301 USA
 
-AT_BANNER([[BLAS and ARPACK based functions]])
+AT_BANNER([[BLAS, LAPACK and ARPACK based functions]])
 
 AT_SETUP([Basic BLAS functions (igraph_blas_*):])
 AT_KEYWORDS([blas BLAS matrix vector dgemv igraph_blas_dgemv])
 AT_COMPILE_CHECK([simple/blas.c],
                  [simple/blas.out])
+AT_CLEANUP
+
+AT_SETUP([Dense symmetric eigenvalues and eigenvectors (igraph_lapack_dsyevr):])
+AT_KEYWORDS([lapack LAPACK dsyevr eigenvalue eigenvector dense])
+AT_COMPILE_CHECK([simple/igraph_lapack_dsyevr.c])
+AT_CLEANUP
+
+AT_SETUP([Dense non-symmetric eigenvalues and eigenvectors (igraph_lapack_dgeev):])
+AT_KEYWORDS([lapack LAPACK dgeev eigenvalue eigenvector dense])
+AT_COMPILE_CHECK([simple/igraph_lapack_dgeev.c], 
+                 [simple/igraph_lapack_dgeev.out])
+AT_CLEANUP
+
+AT_SETUP([Dense non-symmetric eigenvalues and eigenvectors (igraph_lapack_dgeevx):])
+AT_KEYWORDS([lapack LAPACK dgeevx eigenvalue eigenvector dense])
+AT_COMPILE_CHECK([simple/igraph_lapack_dgeevx.c], 
+                 [simple/igraph_lapack_dgeevx.out])
+AT_CLEANUP
+
+AT_SETUP([Solving linear systems with LU factorization (igraph_lapack_dgesv):])
+AT_KEYWORDS([lapack LAPACK dgesv solve LU factorization])
+AT_COMPILE_CHECK([simple/igraph_lapack_dgesv.c],
+		 [simple/igraph_lapack_dgesv.out])
 AT_CLEANUP
 
 AT_SETUP([Eigenvector centrality (igraph_eigenvector_centrality):])

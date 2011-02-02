@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,23 +10,17 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Subroutine */ int igraphdlartg_(doublereal *f, doublereal *g, doublereal *cs, 
 	doublereal *sn, doublereal *r__)
 {
-    /* Initialized data */
-
-    static logical first = TRUE_;
-
     /* System generated locals */
     integer i__1;
     doublereal d__1, d__2;
 
     /* Builtin functions */
-    double log(doublereal), igraphpow_di(doublereal *, integer *), sqrt(doublereal);
+    double log(doublereal), pow_di(doublereal *, integer *), sqrt(doublereal);
 
     /* Local variables */
     static integer i__;
@@ -37,76 +31,66 @@
     static doublereal safmin;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     September 30, 1994 */
+/*  -- LAPACK auxiliary routine (version 3.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2006   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  DLARTG generate a plane rotation so that */
+    DLARTG generate a plane rotation so that   
 
-/*     [  CS  SN  ]  .  [ F ]  =  [ R ]   where CS**2 + SN**2 = 1. */
-/*     [ -SN  CS  ]     [ G ]     [ 0 ] */
+       [  CS  SN  ]  .  [ F ]  =  [ R ]   where CS**2 + SN**2 = 1.   
+       [ -SN  CS  ]     [ G ]     [ 0 ]   
 
-/*  This is a slower, more accurate version of the BLAS1 routine DROTG, */
-/*  with the following other differences: */
-/*     F and G are unchanged on return. */
-/*     If G=0, then CS=1 and SN=0. */
-/*     If F=0 and (G .ne. 0), then CS=0 and SN=1 without doing any */
-/*        floating point operations (saves work in DBDSQR when */
-/*        there are zeros on the diagonal). */
+    This is a slower, more accurate version of the BLAS1 routine DROTG,   
+    with the following other differences:   
+       F and G are unchanged on return.   
+       If G=0, then CS=1 and SN=0.   
+       If F=0 and (G .ne. 0), then CS=0 and SN=1 without doing any   
+          floating point operations (saves work in DBDSQR when   
+          there are zeros on the diagonal).   
 
-/*  If F exceeds G in magnitude, CS will be positive. */
+    If F exceeds G in magnitude, CS will be positive.   
 
-/*  Arguments */
-/*  ========= */
+    Arguments   
+    =========   
 
-/*  F       (input) DOUBLE PRECISION */
-/*          The first component of vector to be rotated. */
+    F       (input) DOUBLE PRECISION   
+            The first component of vector to be rotated.   
 
-/*  G       (input) DOUBLE PRECISION */
-/*          The second component of vector to be rotated. */
+    G       (input) DOUBLE PRECISION   
+            The second component of vector to be rotated.   
 
-/*  CS      (output) DOUBLE PRECISION */
-/*          The cosine of the rotation. */
+    CS      (output) DOUBLE PRECISION   
+            The cosine of the rotation.   
 
-/*  SN      (output) DOUBLE PRECISION */
-/*          The sine of the rotation. */
+    SN      (output) DOUBLE PRECISION   
+            The sine of the rotation.   
 
-/*  R       (output) DOUBLE PRECISION */
-/*          The nonzero component of the rotated vector. */
+    R       (output) DOUBLE PRECISION   
+            The nonzero component of the rotated vector.   
 
-/*  ===================================================================== */
+    This version has a few statements commented out for thread safety   
+    (machine parameters are computed on each entry). 10 feb 03, SJH.   
 
-/*     .. Parameters .. */
-/*     .. */
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. External Functions .. */
-/*     .. */
-/*     .. Intrinsic Functions .. */
-/*     .. */
-/*     .. Save statement .. */
-/*     .. */
-/*     .. Data statements .. */
-/*     .. */
-/*     .. Executable Statements .. */
+    =====================================================================   
 
-    if (first) {
-	first = FALSE_;
-	safmin = igraphdlamch_("S");
-	eps = igraphdlamch_("E");
-	d__1 = igraphdlamch_("B");
-	i__1 = (integer) (log(safmin / eps) / log(igraphdlamch_("B")) / 
-		2.);
-	safmn2 = igraphpow_di(&d__1, &i__1);
-	safmx2 = 1. / safmn2;
-    }
+       LOGICAL            FIRST   
+       SAVE               FIRST, SAFMX2, SAFMIN, SAFMN2   
+       DATA               FIRST / .TRUE. /   
+
+       IF( FIRST ) THEN */
+    safmin = igraphdlamch_("S");
+    eps = igraphdlamch_("E");
+    d__1 = igraphdlamch_("B");
+    i__1 = (integer) (log(safmin / eps) / log(igraphdlamch_("B")) / 2.);
+    safmn2 = pow_di(&d__1, &i__1);
+    safmx2 = 1. / safmn2;
+/*        FIRST = .FALSE.   
+       END IF */
     if (*g == 0.) {
 	*cs = 1.;
 	*sn = 0.;

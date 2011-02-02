@@ -35,7 +35,7 @@
 
 int igraph_free(void *p);
 
-SEXP R_igraph_vector_to_SEXP(igraph_vector_t *v);
+SEXP R_igraph_vector_to_SEXP(const igraph_vector_t *v);
 SEXP R_igraph_vector_bool_to_SEXP(igraph_vector_bool_t *v);
 SEXP R_igraph_vector_long_to_SEXP(igraph_vector_long_t *v);
 SEXP R_igraph_0orvector_to_SEXP(igraph_vector_t *v);
@@ -60,6 +60,16 @@ int R_SEXP_to_igraph_es(SEXP rit, igraph_t *graph, igraph_es_t *it);
 int R_SEXP_to_igraph_adjlist(SEXP vectorlist, igraph_adjlist_t *ptr);
 int R_SEXP_to_vector_bool(SEXP sv, igraph_vector_bool_t *v);
 int R_SEXP_to_vector_int(SEXP sv, igraph_vector_int_t *v);
+
+
+SEXP R_igraph_i_lang7(SEXP s, SEXP t, SEXP u, SEXP v, SEXP w, SEXP x, SEXP y)
+{
+    PROTECT(s);
+    PROTECT(t);
+    s = LCONS(s, LCONS(t, list5(u, v, w, x, y)));
+    UNPROTECT(2);
+    return s;
+}
 
 /* get the list element named str, or return NULL */
 /* from the R Manual */
@@ -1827,7 +1837,7 @@ SEXP R_igraph_finalizer() {
  * functions to convert igraph objects to SEXP
  *****************************************************/
 
-SEXP R_igraph_vector_to_SEXP(igraph_vector_t *v) {
+SEXP R_igraph_vector_to_SEXP(const igraph_vector_t *v) {
   SEXP result;
   
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(v)));
@@ -2317,9 +2327,9 @@ SEXP R_igraph_arpack_options_to_SEXP(igraph_arpack_options_t *opt) {
   which[0]=opt->which[0]; which[1]=opt->which[1]; which[2]='\0';
   
   PROTECT(result = NEW_LIST(20));
-  SET_VECTOR_ELT(result, 0, NEW_CHARACTER(1)); SET_STRING_ELT(VECTOR_ELT(result, 0), 0, mkChar(bmat));
+  SET_VECTOR_ELT(result, 0, ScalarString(CREATE_STRING_VECTOR(bmat)));
   SET_VECTOR_ELT(result, 1, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 1))[0]=opt->n;
-  SET_VECTOR_ELT(result, 2, NEW_CHARACTER(1)); SET_STRING_ELT(VECTOR_ELT(result, 2), 0, mkChar(which));
+  SET_VECTOR_ELT(result, 2, ScalarString(CREATE_STRING_VECTOR(which)));
   SET_VECTOR_ELT(result, 3, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 3))[0]=opt->nev;
   SET_VECTOR_ELT(result, 4, NEW_NUMERIC(1)); REAL(VECTOR_ELT(result, 4))[0]=opt->tol;
   SET_VECTOR_ELT(result, 5, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 5))[0]=opt->ncv;
@@ -6163,7 +6173,7 @@ typedef struct R_igraph_i_arpack_data_t {
 } R_igraph_i_arpack_data_t;
 
 int R_igraph_i_arpack_callback(igraph_real_t *to, const igraph_real_t *from,
-			       long int n, void *extra) {
+			       int n, void *extra) {
   SEXP s_from, s_to;
   SEXP R_fcall;
   R_igraph_i_arpack_data_t *data=extra;
@@ -6574,22 +6584,21 @@ SEXP R_igraph_dfs(SEXP graph, SEXP proot, SEXP pneimode, SEXP punreachable,
   return result;
 }
 
+
 SEXP R_igraph_cohesive_blocks(SEXP graph) {
-                                        /* Declarations */
-  igraph_t c_graph;
   igraph_vector_ptr_t c_blocks;
   igraph_vector_t c_cohesion;
   igraph_vector_t c_parent;
   igraph_t c_blockTree;
+  int c_result;
+  igraph_t c_graph;
   SEXP blocks;
   SEXP cohesion;
   SEXP parent;
   SEXP blockTree;
-  int c_result;
-  SEXP result, names;
+  SEXP result;
+  SEXP names;
 
-                                        /* Convert input */
-  R_SEXP_to_igraph(graph, &c_graph);
   if (0 != igraph_vector_ptr_init(&c_blocks, 0)) { 
   igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
   } 
@@ -6602,10 +6611,9 @@ SEXP R_igraph_cohesive_blocks(SEXP graph) {
   igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
   } 
   IGRAPH_FINALLY(igraph_vector_destroy, &c_parent);
-                                        /* Call igraph */
+
   c_result=igraph_cohesive_blocks(&c_graph, &c_blocks, &c_cohesion, &c_parent, &c_blockTree);
 
-                                        /* Convert output */
   PROTECT(result=NEW_LIST(4));
   PROTECT(names=NEW_CHARACTER(4));
   PROTECT(blocks=R_igraph_vectorlist_to_SEXP_p1(&c_blocks)); 
@@ -6629,8 +6637,165 @@ SEXP R_igraph_cohesive_blocks(SEXP graph) {
   SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("cohesion"));
   SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("parent"));
   SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("blockTree"));
+
+  UNPROTECT(6);
+  return result;
+}
+
+SEXP R_igraph_i_levc_arp(SEXP extP, SEXP extE, SEXP pv) {
+  igraph_arpack_function_t *fun=R_ExternalPtrAddr(extP);
+  void *extra=R_ExternalPtrAddr(extE);
+  SEXP res;
+  
+  PROTECT(res=NEW_NUMERIC(GET_LENGTH(pv)));
+  fun(REAL(res), REAL(pv), GET_LENGTH(pv), extra);
+  
+  UNPROTECT(1);
+  return res;
+}
+
+typedef struct R_igraph_i_levc_data_t {
+  SEXP fun;
+  SEXP extra;
+  SEXP rho;
+  SEXP rho2;
+} R_igraph_i_levc_data_t;
+
+int R_igraph_i_levc_callback(const igraph_vector_t *membership,
+		     long int comm,
+		     igraph_real_t eigenvalue,
+		     const igraph_vector_t *eigenvector,
+		     igraph_arpack_function_t *arpack_multiplier,
+		     void *arpack_extra,
+		     void *extra) {
+
+  SEXP s_memb, s_comm, s_evalue, s_evector, s_multip;
+  SEXP R_fcall, R_multip_call;
+  SEXP res;
+  int result;
+  R_igraph_i_levc_data_t *data=extra;
+
+  PROTECT(s_memb=R_igraph_vector_to_SEXP(membership));
+  PROTECT(s_comm=NEW_NUMERIC(1)); REAL(s_comm)[0]=comm;
+  PROTECT(s_evalue=NEW_NUMERIC(1)); REAL(s_evalue)[0]=eigenvalue;
+  PROTECT(s_evector=R_igraph_vector_to_SEXP(eigenvector));
+  PROTECT(R_multip_call =
+	  lang3(install("igraph.i.levc.arp"), 
+		R_MakeExternalPtr(arpack_multiplier, R_NilValue, R_NilValue),
+		R_MakeExternalPtr(arpack_extra, R_NilValue, R_NilValue)));
+  PROTECT(s_multip = eval(R_multip_call, data->rho2));
+
+  PROTECT(R_fcall = R_igraph_i_lang7(data->fun, s_memb, s_comm, 
+				     s_evalue, s_evector, s_multip, 
+				     data->extra));
+  PROTECT(res = eval(R_fcall, data->rho));
+  
+  result=REAL(AS_NUMERIC(res))[0];
+	  
+  UNPROTECT(8);
+  return result;
+}
+
+SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps, 
+					    SEXP options, SEXP pstart, 
+					    SEXP callback, 
+					    SEXP callback_extra,
+					    SEXP callback_env,
+					    SEXP callback_env2) {
+                                        /* Declarations */
+  igraph_t c_graph;
+  igraph_matrix_t c_merges;
+  igraph_vector_t c_membership;
+  igraph_integer_t c_steps;
+  igraph_bool_t c_start=!isNull(pstart);
+  igraph_arpack_options_t c_options;
+  igraph_real_t c_modularity;
+  igraph_vector_t c_eigenvalues;
+  igraph_vector_ptr_t c_eigenvectors;
+  igraph_vector_t c_history;
+  SEXP merges;
+  SEXP membership;
+  SEXP modularity;
+  SEXP eigenvalues;
+  SEXP eigenvectors;
+  SEXP history;
+  int c_result;
+  SEXP result, names;
+
+  R_igraph_i_levc_data_t callback_data = { callback, callback_extra, 
+					   callback_env, callback_env2 };
+
+                                        /* Convert input */
+  R_SEXP_to_igraph(graph, &c_graph);
+  if (0 != igraph_matrix_init(&c_merges, 0, 0)) { 
+  igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
+  } 
+  IGRAPH_FINALLY(igraph_matrix_destroy, &c_merges);
+  if (c_start) {
+    R_SEXP_to_vector_copy(pstart, &c_membership);
+  } else {
+    if (0 != igraph_vector_init(&c_membership, 0)) { 
+      igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
+    }
+  }
+  IGRAPH_FINALLY(igraph_vector_destroy, &c_membership);
+  c_steps=REAL(steps)[0];
+  R_SEXP_to_igraph_arpack_options(options, &c_options);
+  if (0 != igraph_vector_init(&c_eigenvalues, 0)) {
+  igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM);
+  }
+  if (0 != igraph_vector_ptr_init(&c_eigenvectors, 0)) {
+  igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM);
+  }
+  if (0 != igraph_vector_init(&c_history, 0)) {
+  igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM);
+  }
+                                        /* Call igraph */
+  c_result=igraph_community_leading_eigenvector(&c_graph, &c_merges, 
+						&c_membership, c_steps, 
+						&c_options, &c_modularity, 
+						c_start, &c_eigenvalues,
+						&c_eigenvectors,
+						&c_history, 
+						isNull(callback) ? 0 : 
+						R_igraph_i_levc_callback,
+						&callback_data);
+
+                                        /* Convert output */
+  PROTECT(result=NEW_LIST(7));
+  PROTECT(names=NEW_CHARACTER(7));
+  PROTECT(merges=R_igraph_matrix_to_SEXP(&c_merges)); 
+  igraph_matrix_destroy(&c_merges); 
+  IGRAPH_FINALLY_CLEAN(1);
+  PROTECT(membership=R_igraph_vector_to_SEXP(&c_membership)); 
+  igraph_vector_destroy(&c_membership); 
+  IGRAPH_FINALLY_CLEAN(1);
+  PROTECT(options=R_igraph_arpack_options_to_SEXP(&c_options));
+  PROTECT(modularity=NEW_NUMERIC(1)); 
+  REAL(modularity)[0]=c_modularity;
+  PROTECT(eigenvalues=R_igraph_vector_to_SEXP(&c_eigenvalues));
+  igraph_vector_destroy(&c_eigenvalues);
+  PROTECT(eigenvectors=R_igraph_vectorlist_to_SEXP(&c_eigenvectors));
+  R_igraph_vectorlist_destroy(&c_eigenvectors);
+  PROTECT(history=R_igraph_vector_to_SEXP(&c_history));
+  igraph_vector_destroy(&c_history);
+  SET_VECTOR_ELT(result, 0, merges);
+  SET_VECTOR_ELT(result, 1, membership);
+  SET_VECTOR_ELT(result, 2, options);
+  SET_VECTOR_ELT(result, 3, modularity);
+  SET_VECTOR_ELT(result, 4, eigenvalues);
+  SET_VECTOR_ELT(result, 5, eigenvectors);
+  SET_VECTOR_ELT(result, 6, history);
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("merges"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("membership"));
+  SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("options"));
+  SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("modularity"));
+  SET_STRING_ELT(names, 4, CREATE_STRING_VECTOR("eigenvalues"));
+  SET_STRING_ELT(names, 5, CREATE_STRING_VECTOR("eigenvectors"));
+  SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("history"));
   SET_NAMES(result, names);
-  UNPROTECT(5);
+
+  UNPROTECT(8);
 
   UNPROTECT(1);
   return(result);

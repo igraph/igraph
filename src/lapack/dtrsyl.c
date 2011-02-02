@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,9 +10,7 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Table of constant values */
 
@@ -58,116 +56,99 @@ static logical c_true = TRUE_;
     extern doublereal igraphdlamch_(char *), igraphdlange_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *);
     static doublereal scaloc;
-    extern /* Subroutine */ int igraphxerbla_(char *, integer *);
+    extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
     static doublereal bignum;
     static logical notrna, notrnb;
     static doublereal smlnum;
 
 
-/*  -- LAPACK routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     March 31, 1993 */
+/*  -- LAPACK routine (version 3.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2006   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
-/*     .. Array Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  DTRSYL solves the real Sylvester matrix equation: */
+    DTRSYL solves the real Sylvester matrix equation:   
 
-/*     op(A)*X + X*op(B) = scale*C or */
-/*     op(A)*X - X*op(B) = scale*C, */
+       op(A)*X + X*op(B) = scale*C or   
+       op(A)*X - X*op(B) = scale*C,   
 
-/*  where op(A) = A or A**T, and  A and B are both upper quasi- */
-/*  triangular. A is M-by-M and B is N-by-N; the right hand side C and */
-/*  the solution X are M-by-N; and scale is an output scale factor, set */
-/*  <= 1 to avoid overflow in X. */
+    where op(A) = A or A**T, and  A and B are both upper quasi-   
+    triangular. A is M-by-M and B is N-by-N; the right hand side C and   
+    the solution X are M-by-N; and scale is an output scale factor, set   
+    <= 1 to avoid overflow in X.   
 
-/*  A and B must be in Schur canonical form (as returned by DHSEQR), that */
-/*  is, block upper triangular with 1-by-1 and 2-by-2 diagonal blocks; */
-/*  each 2-by-2 diagonal block has its diagonal elements equal and its */
-/*  off-diagonal elements of opposite sign. */
+    A and B must be in Schur canonical form (as returned by DHSEQR), that   
+    is, block upper triangular with 1-by-1 and 2-by-2 diagonal blocks;   
+    each 2-by-2 diagonal block has its diagonal elements equal and its   
+    off-diagonal elements of opposite sign.   
 
-/*  Arguments */
-/*  ========= */
+    Arguments   
+    =========   
 
-/*  TRANA   (input) CHARACTER*1 */
-/*          Specifies the option op(A): */
-/*          = 'N': op(A) = A    (No transpose) */
-/*          = 'T': op(A) = A**T (Transpose) */
-/*          = 'C': op(A) = A**H (Conjugate transpose = Transpose) */
+    TRANA   (input) CHARACTER*1   
+            Specifies the option op(A):   
+            = 'N': op(A) = A    (No transpose)   
+            = 'T': op(A) = A**T (Transpose)   
+            = 'C': op(A) = A**H (Conjugate transpose = Transpose)   
 
-/*  TRANB   (input) CHARACTER*1 */
-/*          Specifies the option op(B): */
-/*          = 'N': op(B) = B    (No transpose) */
-/*          = 'T': op(B) = B**T (Transpose) */
-/*          = 'C': op(B) = B**H (Conjugate transpose = Transpose) */
+    TRANB   (input) CHARACTER*1   
+            Specifies the option op(B):   
+            = 'N': op(B) = B    (No transpose)   
+            = 'T': op(B) = B**T (Transpose)   
+            = 'C': op(B) = B**H (Conjugate transpose = Transpose)   
 
-/*  ISGN    (input) INTEGER */
-/*          Specifies the sign in the equation: */
-/*          = +1: solve op(A)*X + X*op(B) = scale*C */
-/*          = -1: solve op(A)*X - X*op(B) = scale*C */
+    ISGN    (input) INTEGER   
+            Specifies the sign in the equation:   
+            = +1: solve op(A)*X + X*op(B) = scale*C   
+            = -1: solve op(A)*X - X*op(B) = scale*C   
 
-/*  M       (input) INTEGER */
-/*          The order of the matrix A, and the number of rows in the */
-/*          matrices X and C. M >= 0. */
+    M       (input) INTEGER   
+            The order of the matrix A, and the number of rows in the   
+            matrices X and C. M >= 0.   
 
-/*  N       (input) INTEGER */
-/*          The order of the matrix B, and the number of columns in the */
-/*          matrices X and C. N >= 0. */
+    N       (input) INTEGER   
+            The order of the matrix B, and the number of columns in the   
+            matrices X and C. N >= 0.   
 
-/*  A       (input) DOUBLE PRECISION array, dimension (LDA,M) */
-/*          The upper quasi-triangular matrix A, in Schur canonical form. */
+    A       (input) DOUBLE PRECISION array, dimension (LDA,M)   
+            The upper quasi-triangular matrix A, in Schur canonical form.   
 
-/*  LDA     (input) INTEGER */
-/*          The leading dimension of the array A. LDA >= max(1,M). */
+    LDA     (input) INTEGER   
+            The leading dimension of the array A. LDA >= max(1,M).   
 
-/*  B       (input) DOUBLE PRECISION array, dimension (LDB,N) */
-/*          The upper quasi-triangular matrix B, in Schur canonical form. */
+    B       (input) DOUBLE PRECISION array, dimension (LDB,N)   
+            The upper quasi-triangular matrix B, in Schur canonical form.   
 
-/*  LDB     (input) INTEGER */
-/*          The leading dimension of the array B. LDB >= max(1,N). */
+    LDB     (input) INTEGER   
+            The leading dimension of the array B. LDB >= max(1,N).   
 
-/*  C       (input/output) DOUBLE PRECISION array, dimension (LDC,N) */
-/*          On entry, the M-by-N right hand side matrix C. */
-/*          On exit, C is overwritten by the solution matrix X. */
+    C       (input/output) DOUBLE PRECISION array, dimension (LDC,N)   
+            On entry, the M-by-N right hand side matrix C.   
+            On exit, C is overwritten by the solution matrix X.   
 
-/*  LDC     (input) INTEGER */
-/*          The leading dimension of the array C. LDC >= max(1,M) */
+    LDC     (input) INTEGER   
+            The leading dimension of the array C. LDC >= max(1,M)   
 
-/*  SCALE   (output) DOUBLE PRECISION */
-/*          The scale factor, scale, set <= 1 to avoid overflow in X. */
+    SCALE   (output) DOUBLE PRECISION   
+            The scale factor, scale, set <= 1 to avoid overflow in X.   
 
-/*  INFO    (output) INTEGER */
-/*          = 0: successful exit */
-/*          < 0: if INFO = -i, the i-th argument had an illegal value */
-/*          = 1: A and B have common or very close eigenvalues; perturbed */
-/*               values were used to solve the equation (but the matrices */
-/*               A and B are unchanged). */
+    INFO    (output) INTEGER   
+            = 0: successful exit   
+            < 0: if INFO = -i, the i-th argument had an illegal value   
+            = 1: A and B have common or very close eigenvalues; perturbed   
+                 values were used to solve the equation (but the matrices   
+                 A and B are unchanged).   
 
-/*  ===================================================================== */
+    =====================================================================   
 
-/*     .. Parameters .. */
-/*     .. */
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. Local Arrays .. */
-/*     .. */
-/*     .. External Functions .. */
-/*     .. */
-/*     .. External Subroutines .. */
-/*     .. */
-/*     .. Intrinsic Functions .. */
-/*     .. */
-/*     .. Executable Statements .. */
 
-/*     Decode and Test input parameters */
+       Decode and Test input parameters   
 
-    /* Parameter adjustments */
+       Parameter adjustments */
     a_dim1 = *lda;
     a_offset = 1 + a_dim1;
     a -= a_offset;
@@ -204,12 +185,13 @@ static logical c_true = TRUE_;
     }
     if (*info != 0) {
 	i__1 = -(*info);
-	igraphxerbla_("DTRSYL", &i__1);
+	igraphxerbla_("DTRSYL", &i__1, (ftnlen)6);
 	return 0;
     }
 
 /*     Quick return if possible */
 
+    *scale = 1.;
     if (*m == 0 || *n == 0) {
 	return 0;
     }
@@ -228,25 +210,24 @@ static logical c_true = TRUE_;
 	    &b[b_offset], ldb, dum);
     smin = max(d__1,d__2);
 
-    *scale = 1.;
     sgn = (doublereal) (*isgn);
 
     if (notrna && notrnb) {
 
-/*        Solve    A*X + ISGN*X*B = scale*C. */
+/*        Solve    A*X + ISGN*X*B = scale*C.   
 
-/*        The (K,L)th block of X is determined starting from */
-/*        bottom-left corner column by column by */
+          The (K,L)th block of X is determined starting from   
+          bottom-left corner column by column by   
 
-/*         A(K,K)*X(K,L) + ISGN*X(K,L)*B(L,L) = C(K,L) - R(K,L) */
+           A(K,K)*X(K,L) + ISGN*X(K,L)*B(L,L) = C(K,L) - R(K,L)   
 
-/*        Where */
-/*                  M                         L-1 */
-/*        R(K,L) = SUM [A(K,I)*X(I,L)] + ISGN*SUM [X(K,J)*B(J,L)]. */
-/*                I=K+1                       J=1 */
+          Where   
+                    M                         L-1   
+          R(K,L) = SUM [A(K,I)*X(I,L)] + ISGN*SUM [X(K,J)*B(J,L)].   
+                  I=K+1                       J=1   
 
-/*        Start column loop (index = L) */
-/*        L1 (L2) : column index of the first (first) row of X(K,L). */
+          Start column loop (index = L)   
+          L1 (L2) : column index of the first (first) row of X(K,L). */
 
 	lnext = 1;
 	i__1 = *n;
@@ -269,8 +250,8 @@ static logical c_true = TRUE_;
 		}
 	    }
 
-/*           Start row loop (index = K) */
-/*           K1 (K2): row index of the first (last) row of X(K,L). */
+/*           Start row loop (index = K)   
+             K1 (K2): row index of the first (last) row of X(K,L). */
 
 	    knext = *m;
 	    for (k = *m; k >= 1; --k) {
@@ -504,20 +485,20 @@ L60:
 
     } else if (! notrna && notrnb) {
 
-/*        Solve    A' *X + ISGN*X*B = scale*C. */
+/*        Solve    A' *X + ISGN*X*B = scale*C.   
 
-/*        The (K,L)th block of X is determined starting from */
-/*        upper-left corner column by column by */
+          The (K,L)th block of X is determined starting from   
+          upper-left corner column by column by   
 
-/*          A(K,K)'*X(K,L) + ISGN*X(K,L)*B(L,L) = C(K,L) - R(K,L) */
+            A(K,K)'*X(K,L) + ISGN*X(K,L)*B(L,L) = C(K,L) - R(K,L)   
 
-/*        Where */
-/*                   K-1                        L-1 */
-/*          R(K,L) = SUM [A(I,K)'*X(I,L)] +ISGN*SUM [X(K,J)*B(J,L)] */
-/*                   I=1                        J=1 */
+          Where   
+                     K-1                        L-1   
+            R(K,L) = SUM [A(I,K)'*X(I,L)] +ISGN*SUM [X(K,J)*B(J,L)]   
+                     I=1                        J=1   
 
-/*        Start column loop (index = L) */
-/*        L1 (L2): column index of the first (last) row of X(K,L) */
+          Start column loop (index = L)   
+          L1 (L2): column index of the first (last) row of X(K,L) */
 
 	lnext = 1;
 	i__1 = *n;
@@ -540,8 +521,8 @@ L60:
 		}
 	    }
 
-/*           Start row loop (index = K) */
-/*           K1 (K2): row index of the first (last) row of X(K,L) */
+/*           Start row loop (index = K)   
+             K1 (K2): row index of the first (last) row of X(K,L) */
 
 	    knext = 1;
 	    i__2 = *m;
@@ -739,20 +720,20 @@ L120:
 
     } else if (! notrna && ! notrnb) {
 
-/*        Solve    A'*X + ISGN*X*B' = scale*C. */
+/*        Solve    A'*X + ISGN*X*B' = scale*C.   
 
-/*        The (K,L)th block of X is determined starting from */
-/*        top-right corner column by column by */
+          The (K,L)th block of X is determined starting from   
+          top-right corner column by column by   
 
-/*           A(K,K)'*X(K,L) + ISGN*X(K,L)*B(L,L)' = C(K,L) - R(K,L) */
+             A(K,K)'*X(K,L) + ISGN*X(K,L)*B(L,L)' = C(K,L) - R(K,L)   
 
-/*        Where */
-/*                     K-1                          N */
-/*            R(K,L) = SUM [A(I,K)'*X(I,L)] + ISGN*SUM [X(K,J)*B(L,J)']. */
-/*                     I=1                        J=L+1 */
+          Where   
+                       K-1                          N   
+              R(K,L) = SUM [A(I,K)'*X(I,L)] + ISGN*SUM [X(K,J)*B(L,J)'].   
+                       I=1                        J=L+1   
 
-/*        Start column loop (index = L) */
-/*        L1 (L2): column index of the first (last) row of X(K,L) */
+          Start column loop (index = L)   
+          L1 (L2): column index of the first (last) row of X(K,L) */
 
 	lnext = *n;
 	for (l = *n; l >= 1; --l) {
@@ -774,8 +755,8 @@ L120:
 		}
 	    }
 
-/*           Start row loop (index = K) */
-/*           K1 (K2): row index of the first (last) row of X(K,L) */
+/*           Start row loop (index = K)   
+             K1 (K2): row index of the first (last) row of X(K,L) */
 
 	    knext = 1;
 	    i__1 = *m;
@@ -1009,20 +990,20 @@ L180:
 
     } else if (notrna && ! notrnb) {
 
-/*        Solve    A*X + ISGN*X*B' = scale*C. */
+/*        Solve    A*X + ISGN*X*B' = scale*C.   
 
-/*        The (K,L)th block of X is determined starting from */
-/*        bottom-right corner column by column by */
+          The (K,L)th block of X is determined starting from   
+          bottom-right corner column by column by   
 
-/*            A(K,K)*X(K,L) + ISGN*X(K,L)*B(L,L)' = C(K,L) - R(K,L) */
+              A(K,K)*X(K,L) + ISGN*X(K,L)*B(L,L)' = C(K,L) - R(K,L)   
 
-/*        Where */
-/*                      M                          N */
-/*            R(K,L) = SUM [A(K,I)*X(I,L)] + ISGN*SUM [X(K,J)*B(L,J)']. */
-/*                    I=K+1                      J=L+1 */
+          Where   
+                        M                          N   
+              R(K,L) = SUM [A(K,I)*X(I,L)] + ISGN*SUM [X(K,J)*B(L,J)'].   
+                      I=K+1                      J=L+1   
 
-/*        Start column loop (index = L) */
-/*        L1 (L2): column index of the first (last) row of X(K,L) */
+          Start column loop (index = L)   
+          L1 (L2): column index of the first (last) row of X(K,L) */
 
 	lnext = *n;
 	for (l = *n; l >= 1; --l) {
@@ -1044,8 +1025,8 @@ L180:
 		}
 	    }
 
-/*           Start row loop (index = K) */
-/*           K1 (K2): row index of the first (last) row of X(K,L) */
+/*           Start row loop (index = K)   
+             K1 (K2): row index of the first (last) row of X(K,L) */
 
 	    knext = *m;
 	    for (k = *m; k >= 1; --k) {

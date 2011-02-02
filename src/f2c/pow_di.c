@@ -1,10 +1,12 @@
-#include "config.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifdef KR_headers
-double igraphpow_di(ap, bp) doublereal *ap; integer *bp;
+double pow_di(ap, bp) doublereal *ap; integer *bp;
 #else
-double igraphpow_di(doublereal *ap, integer *bp)
+double pow_di(doublereal *ap, integer *bp)
 #endif
 {
 double pow, x;
@@ -34,3 +36,6 @@ if(n != 0)
 	}
 return(pow);
 }
+#ifdef __cplusplus
+}
+#endif

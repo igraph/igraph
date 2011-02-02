@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,9 +10,7 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Subroutine */ int igraphdlassq_(integer *n, doublereal *x, integer *incx, 
 	doublereal *scale, doublereal *sumsq)
@@ -26,68 +24,57 @@
     static doublereal absxi;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     June 30, 1999 */
+/*  -- LAPACK auxiliary routine (version 3.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2006   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
-/*     .. Array Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  DLASSQ  returns the values  scl  and  smsq  such that */
+    DLASSQ  returns the values  scl  and  smsq  such that   
 
-/*     ( scl**2 )*smsq = x( 1 )**2 +...+ x( n )**2 + ( scale**2 )*sumsq, */
+       ( scl**2 )*smsq = x( 1 )**2 +...+ x( n )**2 + ( scale**2 )*sumsq,   
 
-/*  where  x( i ) = X( 1 + ( i - 1 )*INCX ). The value of  sumsq  is */
-/*  assumed to be non-negative and  scl  returns the value */
+    where  x( i ) = X( 1 + ( i - 1 )*INCX ). The value of  sumsq  is   
+    assumed to be non-negative and  scl  returns the value   
 
-/*     scl = max( scale, abs( x( i ) ) ). */
+       scl = max( scale, abs( x( i ) ) ).   
 
-/*  scale and sumsq must be supplied in SCALE and SUMSQ and */
-/*  scl and smsq are overwritten on SCALE and SUMSQ respectively. */
+    scale and sumsq must be supplied in SCALE and SUMSQ and   
+    scl and smsq are overwritten on SCALE and SUMSQ respectively.   
 
-/*  The routine makes only one pass through the vector x. */
+    The routine makes only one pass through the vector x.   
 
-/*  Arguments */
-/*  ========= */
+    Arguments   
+    =========   
 
-/*  N       (input) INTEGER */
-/*          The number of elements to be used from the vector X. */
+    N       (input) INTEGER   
+            The number of elements to be used from the vector X.   
 
-/*  X       (input) DOUBLE PRECISION array, dimension (N) */
-/*          The vector for which a scaled sum of squares is computed. */
-/*             x( i )  = X( 1 + ( i - 1 )*INCX ), 1 <= i <= n. */
+    X       (input) DOUBLE PRECISION array, dimension (N)   
+            The vector for which a scaled sum of squares is computed.   
+               x( i )  = X( 1 + ( i - 1 )*INCX ), 1 <= i <= n.   
 
-/*  INCX    (input) INTEGER */
-/*          The increment between successive values of the vector X. */
-/*          INCX > 0. */
+    INCX    (input) INTEGER   
+            The increment between successive values of the vector X.   
+            INCX > 0.   
 
-/*  SCALE   (input/output) DOUBLE PRECISION */
-/*          On entry, the value  scale  in the equation above. */
-/*          On exit, SCALE is overwritten with  scl , the scaling factor */
-/*          for the sum of squares. */
+    SCALE   (input/output) DOUBLE PRECISION   
+            On entry, the value  scale  in the equation above.   
+            On exit, SCALE is overwritten with  scl , the scaling factor   
+            for the sum of squares.   
 
-/*  SUMSQ   (input/output) DOUBLE PRECISION */
-/*          On entry, the value  sumsq  in the equation above. */
-/*          On exit, SUMSQ is overwritten with  smsq , the basic sum of */
-/*          squares from which  scl  has been factored out. */
+    SUMSQ   (input/output) DOUBLE PRECISION   
+            On entry, the value  sumsq  in the equation above.   
+            On exit, SUMSQ is overwritten with  smsq , the basic sum of   
+            squares from which  scl  has been factored out.   
 
-/* ===================================================================== */
+   =====================================================================   
 
-/*     .. Parameters .. */
-/*     .. */
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. Intrinsic Functions .. */
-/*     .. */
-/*     .. Executable Statements .. */
 
-    /* Parameter adjustments */
+       Parameter adjustments */
     --x;
 
     /* Function Body */

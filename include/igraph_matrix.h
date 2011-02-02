@@ -66,6 +66,12 @@ __BEGIN_DECLS
 #include "igraph_pmt_off.h"
 #undef BASE_BOOL
 
+#define BASE_COMPLEX
+#include "igraph_pmt.h"
+#include "igraph_matrix_pmt.h"
+#include "igraph_pmt_off.h"
+#undef BASE_COMPLEX
+
 #define IGRAPH_MATRIX_NULL { IGRAPH_VECTOR_NULL, 0, 0 }
 #define IGRAPH_MATRIX_INIT_FINALLY(m, nr, nc) \
   do { IGRAPH_CHECK(igraph_matrix_init(m, nr, nc)); \

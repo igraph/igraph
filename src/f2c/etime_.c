@@ -1,19 +1,12 @@
 #include "time.h"
-#include "config.h"
 
 #ifdef MSDOS
 #undef USE_CLOCK
 #define USE_CLOCK
 #endif
 
-#ifdef Win32
-#undef USE_CLOCK
-#define USE_CLOCK
-#endif
-
-#ifdef WIN32
-#undef USE_CLOCK
-#define USE_CLOCK
+#ifndef REAL
+#define REAL double
 #endif
 
 #ifndef USE_CLOCK
@@ -21,6 +14,9 @@
 #define _INCLUDE_XOPEN_SOURCE	/* for HP-UX */
 #include "sys/types.h"
 #include "sys/times.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 #endif
 
 #undef Hz
@@ -34,11 +30,11 @@
 #endif
 #endif
 
- double
+ REAL
 #ifdef KR_headers
-igraphetime_(tarray) float *tarray;
+etime_(tarray) float *tarray;
 #else
-igraphetime_(float *tarray)
+etime_(float *tarray)
 #endif
 {
 #ifdef USE_CLOCK
@@ -52,6 +48,10 @@ igraphetime_(float *tarray)
 	struct tms t;
 
 	times(&t);
-	return (tarray[0] = t.tms_utime/Hz) + (tarray[1] = t.tms_stime/Hz);
+	return	  (tarray[0] = (double)t.tms_utime/Hz)
+		+ (tarray[1] = (double)t.tms_stime/Hz);
 #endif
 	}
+#ifdef __cplusplus
+}
+#endif

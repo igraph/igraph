@@ -12,6 +12,7 @@
 \alias{length.communities}
 \alias{modularity.communities}
 \alias{as.dendrogram.communities}
+\alias{showtrace}
 \concept{Community structure}
 \title{Functions to deal with the result of network community detection}
 \description{igraph community detection functions return their results
@@ -32,6 +33,8 @@ merges(communities)
 cutat(communities, no, steps)
 \method{as.dendrogram}{communities}(object, hang=-1,
    use.modularity=FALSE, \dots)
+
+showtrace(communities)
 
 \method{plot}{communities}(x, y,
    colbar=rainbow(length(x)),
@@ -140,6 +143,12 @@ cutat(communities, no, steps)
   gives an error message to others. See \code{\link[stats]{dendrogram}}
   for details.
 
+  \code{showtrace} works (currently) only for communities found by the
+  leading eigenvector method
+  (\code{\link{leading.eigenvector.community}}), and returns a character
+  vector that gives the steps performed by the algorithm while finding
+  the communities.
+  
   It is possibly to call the \code{plot} function on \code{communities}
   objects. This will plot the graph (and uses \code{\link{plot.igraph}}
   internally), with the communities shown. By default it colores the
@@ -174,6 +183,8 @@ cutat(communities, no, steps)
   \code{as.dendrogram} returns a \code{\link[stats]{dendrogram}}
   object.
 
+  \code{showtrace} returns a character vector.
+  
   \code{plot} for \code{communities} objects returns \code{NULL},
   invisibly.
 }

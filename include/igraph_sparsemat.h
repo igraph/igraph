@@ -32,15 +32,27 @@
 #include <stdio.h>
 
 struct cs_di_sparse;
+struct cs_di_symbolic;
+struct cs_di_numeric;
 
 typedef struct {
   struct cs_di_sparse *cs;
 } igraph_sparsemat_t;
 
+typedef struct {
+  struct cs_di_symbolic *symbolic;
+} igraph_sparsemat_symbolic_t;
+
+typedef struct {
+  struct cs_di_numeric *numeric;
+} igraph_sparsemat_numeric_t;
+
 typedef enum { IGRAPH_SPARSEMAT_TRIPLET, 
 	       IGRAPH_SPARSEMAT_CC        } igraph_sparsemat_type_t;
 
 int igraph_sparsemat_init(igraph_sparsemat_t *A, int rows, int cols, int nzmax);
+int igraph_sparsemat_copy(igraph_sparsemat_t *to, 
+			  const igraph_sparsemat_t *from);
 void igraph_sparsemat_destroy(igraph_sparsemat_t *A);
 int igraph_sparsemat_realloc(igraph_sparsemat_t *A, int nzmax);
 
@@ -72,6 +84,7 @@ int igraph_sparsemat_fkeep(igraph_sparsemat_t *A,
 			   int (*fkeep)(int, int, igraph_real_t, void*),
 			   void *other);
 int igraph_sparsemat_dropzeros(igraph_sparsemat_t *A);
+int igraph_sparsemat_droptol(igraph_sparsemat_t *A, igraph_real_t tol);
 int igraph_sparsemat_multiply(const igraph_sparsemat_t *A,
 			      const igraph_sparsemat_t *B,
 			      igraph_sparsemat_t *res);
@@ -124,16 +137,76 @@ int igraph_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
 
 int igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *res);
 
+int igraph_matrix_as_sparsemat(igraph_sparsemat_t *res,
+			       const igraph_matrix_t *mat,
+			       igraph_real_t tol);
+
+int igraph_sparsemat_as_matrix(igraph_matrix_t *res,
+			       const igraph_sparsemat_t *spmat);
+
+typedef enum { IGRAPH_SPARSEMAT_SOLVE_LU,
+	       IGRAPH_SPARSEMAT_SOLVE_QR } igraph_sparsemat_solve_t;
+
 int igraph_sparsemat_arpack_rssolve(const igraph_sparsemat_t *A,
 				    igraph_arpack_options_t *options,
 				    igraph_arpack_storage_t *storage,
 				    igraph_vector_t *values,
-				    igraph_matrix_t *vectors);
+				    igraph_matrix_t *vectors, 
+				    igraph_sparsemat_solve_t solvemethod);
 
 int igraph_sparsemat_arpack_rnsolve(const igraph_sparsemat_t *A,
 				    igraph_arpack_options_t *options,
 				    igraph_arpack_storage_t *storage,
 				    igraph_matrix_t *values, 
 				    igraph_matrix_t *vectors);
+
+int igraph_sparsemat_lu(const igraph_sparsemat_t *A, 
+			const igraph_sparsemat_symbolic_t *dis, 
+			igraph_sparsemat_numeric_t *din, double tol);
+
+int igraph_sparsemat_qr(const igraph_sparsemat_t *A,
+			const igraph_sparsemat_symbolic_t *dis,
+			igraph_sparsemat_numeric_t *din);
+
+int igraph_sparsemat_luresol(const igraph_sparsemat_symbolic_t *dis,
+			     const igraph_sparsemat_numeric_t *din, 
+			     const igraph_vector_t *b,
+			     igraph_vector_t *res);
+
+int igraph_sparsemat_qrresol(const igraph_sparsemat_symbolic_t *dis,
+			     const igraph_sparsemat_numeric_t *din, 
+			     const igraph_vector_t *b,
+			     igraph_vector_t *res);
+
+int igraph_sparsemat_symbqr(long int order, const igraph_sparsemat_t *A,
+			    igraph_sparsemat_symbolic_t *dis);
+
+int igraph_sparsemat_symblu(long int order, const igraph_sparsemat_t *A,
+			    igraph_sparsemat_symbolic_t *dis);
+
+
+void igraph_sparsemat_symbolic_destroy(igraph_sparsemat_symbolic_t *dis);
+void igraph_sparsemat_numeric_destroy(igraph_sparsemat_numeric_t *din);
+
+igraph_real_t igraph_sparsemat_max(igraph_sparsemat_t *A);
+igraph_real_t igraph_sparsemat_min(igraph_sparsemat_t *A);
+int igraph_sparsemat_minmax(igraph_sparsemat_t *A, 
+			    igraph_real_t *min, igraph_real_t *max);
+
+long int igraph_sparsemat_count_nonzero(igraph_sparsemat_t *A);
+long int igraph_sparsemat_count_nonzerotol(igraph_sparsemat_t *A, 
+					   igraph_real_t tol);
+int igraph_sparsemat_rowsums(const igraph_sparsemat_t *A, 
+			     igraph_vector_t *res);
+int igraph_sparsemat_colsums(const igraph_sparsemat_t *A, 
+			     igraph_vector_t *res);
+
+int igraph_sparsemat_scale(igraph_sparsemat_t *A, igraph_real_t by);
+			   
+
+int igraph_sparsemat_add_rows(igraph_sparsemat_t *A, long int n);
+int igraph_sparsemat_add_cols(igraph_sparsemat_t *A, long int n);
+int igraph_sparsemat_resize(igraph_sparsemat_t *A, long int nrow, 
+			    long int ncol);
 
 #endif

@@ -40,7 +40,7 @@
 #include "bigint.h"
 
 int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
-				    long int n, void *extra) {
+				    int n, void *extra) {
   igraph_adjlist_t *adjlist=extra;
   igraph_vector_t *neis;
   long int i, j, nlen;
@@ -66,7 +66,7 @@ typedef struct igraph_i_eigenvector_centrality_t {
 } igraph_i_eigenvector_centrality_t;
 
 int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *from,
-				     long int n, void *extra) {
+				     int n, void *extra) {
 
   igraph_i_eigenvector_centrality_t *data=extra;
   const igraph_t *graph=data->graph;
@@ -307,7 +307,7 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
   options->which[0]='L' ; options->which[1]='M';
 
   IGRAPH_MATRIX_INIT_FINALLY(&values, 0, 0);
-  IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 2);
+  IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 1);
   
   IGRAPH_VECTOR_INIT_FINALLY(&indegree, options->n);
     
@@ -468,7 +468,7 @@ typedef struct igraph_i_kleinberg_data2_t {
 /* ARPACK auxiliary routine for the unweighted HITS algorithm */
 int igraph_i_kleinberg_unweighted(igraph_real_t *to,
                                   const igraph_real_t *from,
-                                  long int n, void *extra) {
+                                  int n, void *extra) {
   igraph_i_kleinberg_data_t *data = (igraph_i_kleinberg_data_t*)extra;
   igraph_adjlist_t *in = data->in;
   igraph_adjlist_t *out = data->out;
@@ -502,7 +502,7 @@ int igraph_i_kleinberg_unweighted(igraph_real_t *to,
 /* ARPACK auxiliary routine for the weighted HITS algorithm */
 int igraph_i_kleinberg_weighted(igraph_real_t *to,
                                 const igraph_real_t *from,
-                                long int n, void *extra) {
+                                int n, void *extra) {
 
   igraph_i_kleinberg_data2_t *data = (igraph_i_kleinberg_data2_t*)extra;
   igraph_inclist_t *in = data->in; 
@@ -802,7 +802,7 @@ typedef struct igraph_i_pagerank_data2_t {
 } igraph_i_pagerank_data2_t;
 
 int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
-		      long int n, void *extra) {
+		      int n, void *extra) {
   
   igraph_i_pagerank_data_t *data=extra;
   igraph_adjlist_t *adjlist=data->adjlist;
@@ -845,7 +845,7 @@ int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
 }
 
 int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
-		       long int n, void *extra) {
+		       int n, void *extra) {
 
   igraph_i_pagerank_data2_t *data=extra;
   const igraph_t *graph=data->graph;

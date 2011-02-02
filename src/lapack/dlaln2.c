@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,9 +10,7 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Subroutine */ int igraphdlaln2_(logical *ltrans, integer *na, integer *nw, 
 	doublereal *smin, doublereal *ca, doublereal *a, integer *lda, 
@@ -50,148 +48,129 @@
     static doublereal bignum, smlnum;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     October 31, 1992 */
+/*  -- LAPACK auxiliary routine (version 3.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2006   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
-/*     .. Array Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  DLALN2 solves a system of the form  (ca A - w D ) X = s B */
-/*  or (ca A' - w D) X = s B   with possible scaling ("s") and */
-/*  perturbation of A.  (A' means A-transpose.) */
+    DLALN2 solves a system of the form  (ca A - w D ) X = s B   
+    or (ca A' - w D) X = s B   with possible scaling ("s") and   
+    perturbation of A.  (A' means A-transpose.)   
 
-/*  A is an NA x NA real matrix, ca is a real scalar, D is an NA x NA */
-/*  real diagonal matrix, w is a real or complex value, and X and B are */
-/*  NA x 1 matrices -- real if w is real, complex if w is complex.  NA */
-/*  may be 1 or 2. */
+    A is an NA x NA real matrix, ca is a real scalar, D is an NA x NA   
+    real diagonal matrix, w is a real or complex value, and X and B are   
+    NA x 1 matrices -- real if w is real, complex if w is complex.  NA   
+    may be 1 or 2.   
 
-/*  If w is complex, X and B are represented as NA x 2 matrices, */
-/*  the first column of each being the real part and the second */
-/*  being the imaginary part. */
+    If w is complex, X and B are represented as NA x 2 matrices,   
+    the first column of each being the real part and the second   
+    being the imaginary part.   
 
-/*  "s" is a scaling factor (.LE. 1), computed by DLALN2, which is */
-/*  so chosen that X can be computed without overflow.  X is further */
-/*  scaled if necessary to assure that norm(ca A - w D)*norm(X) is less */
-/*  than overflow. */
+    "s" is a scaling factor (.LE. 1), computed by DLALN2, which is   
+    so chosen that X can be computed without overflow.  X is further   
+    scaled if necessary to assure that norm(ca A - w D)*norm(X) is less   
+    than overflow.   
 
-/*  If both singular values of (ca A - w D) are less than SMIN, */
-/*  SMIN*identity will be used instead of (ca A - w D).  If only one */
-/*  singular value is less than SMIN, one element of (ca A - w D) will be */
-/*  perturbed enough to make the smallest singular value roughly SMIN. */
-/*  If both singular values are at least SMIN, (ca A - w D) will not be */
-/*  perturbed.  In any case, the perturbation will be at most some small */
-/*  multiple of max( SMIN, ulp*norm(ca A - w D) ).  The singular values */
-/*  are computed by infinity-norm approximations, and thus will only be */
-/*  correct to a factor of 2 or so. */
+    If both singular values of (ca A - w D) are less than SMIN,   
+    SMIN*identity will be used instead of (ca A - w D).  If only one   
+    singular value is less than SMIN, one element of (ca A - w D) will be   
+    perturbed enough to make the smallest singular value roughly SMIN.   
+    If both singular values are at least SMIN, (ca A - w D) will not be   
+    perturbed.  In any case, the perturbation will be at most some small   
+    multiple of max( SMIN, ulp*norm(ca A - w D) ).  The singular values   
+    are computed by infinity-norm approximations, and thus will only be   
+    correct to a factor of 2 or so.   
 
-/*  Note: all input quantities are assumed to be smaller than overflow */
-/*  by a reasonable factor.  (See BIGNUM.) */
+    Note: all input quantities are assumed to be smaller than overflow   
+    by a reasonable factor.  (See BIGNUM.)   
 
-/*  Arguments */
-/*  ========== */
+    Arguments   
+    ==========   
 
-/*  LTRANS  (input) LOGICAL */
-/*          =.TRUE.:  A-transpose will be used. */
-/*          =.FALSE.: A will be used (not transposed.) */
+    LTRANS  (input) LOGICAL   
+            =.TRUE.:  A-transpose will be used.   
+            =.FALSE.: A will be used (not transposed.)   
 
-/*  NA      (input) INTEGER */
-/*          The size of the matrix A.  It may (only) be 1 or 2. */
+    NA      (input) INTEGER   
+            The size of the matrix A.  It may (only) be 1 or 2.   
 
-/*  NW      (input) INTEGER */
-/*          1 if "w" is real, 2 if "w" is complex.  It may only be 1 */
-/*          or 2. */
+    NW      (input) INTEGER   
+            1 if "w" is real, 2 if "w" is complex.  It may only be 1   
+            or 2.   
 
-/*  SMIN    (input) DOUBLE PRECISION */
-/*          The desired lower bound on the singular values of A.  This */
-/*          should be a safe distance away from underflow or overflow, */
-/*          say, between (underflow/machine precision) and  (machine */
-/*          precision * overflow ).  (See BIGNUM and ULP.) */
+    SMIN    (input) DOUBLE PRECISION   
+            The desired lower bound on the singular values of A.  This   
+            should be a safe distance away from underflow or overflow,   
+            say, between (underflow/machine precision) and  (machine   
+            precision * overflow ).  (See BIGNUM and ULP.)   
 
-/*  CA      (input) DOUBLE PRECISION */
-/*          The coefficient c, which A is multiplied by. */
+    CA      (input) DOUBLE PRECISION   
+            The coefficient c, which A is multiplied by.   
 
-/*  A       (input) DOUBLE PRECISION array, dimension (LDA,NA) */
-/*          The NA x NA matrix A. */
+    A       (input) DOUBLE PRECISION array, dimension (LDA,NA)   
+            The NA x NA matrix A.   
 
-/*  LDA     (input) INTEGER */
-/*          The leading dimension of A.  It must be at least NA. */
+    LDA     (input) INTEGER   
+            The leading dimension of A.  It must be at least NA.   
 
-/*  D1      (input) DOUBLE PRECISION */
-/*          The 1,1 element in the diagonal matrix D. */
+    D1      (input) DOUBLE PRECISION   
+            The 1,1 element in the diagonal matrix D.   
 
-/*  D2      (input) DOUBLE PRECISION */
-/*          The 2,2 element in the diagonal matrix D.  Not used if NW=1. */
+    D2      (input) DOUBLE PRECISION   
+            The 2,2 element in the diagonal matrix D.  Not used if NW=1.   
 
-/*  B       (input) DOUBLE PRECISION array, dimension (LDB,NW) */
-/*          The NA x NW matrix B (right-hand side).  If NW=2 ("w" is */
-/*          complex), column 1 contains the real part of B and column 2 */
-/*          contains the imaginary part. */
+    B       (input) DOUBLE PRECISION array, dimension (LDB,NW)   
+            The NA x NW matrix B (right-hand side).  If NW=2 ("w" is   
+            complex), column 1 contains the real part of B and column 2   
+            contains the imaginary part.   
 
-/*  LDB     (input) INTEGER */
-/*          The leading dimension of B.  It must be at least NA. */
+    LDB     (input) INTEGER   
+            The leading dimension of B.  It must be at least NA.   
 
-/*  WR      (input) DOUBLE PRECISION */
-/*          The real part of the scalar "w". */
+    WR      (input) DOUBLE PRECISION   
+            The real part of the scalar "w".   
 
-/*  WI      (input) DOUBLE PRECISION */
-/*          The imaginary part of the scalar "w".  Not used if NW=1. */
+    WI      (input) DOUBLE PRECISION   
+            The imaginary part of the scalar "w".  Not used if NW=1.   
 
-/*  X       (output) DOUBLE PRECISION array, dimension (LDX,NW) */
-/*          The NA x NW matrix X (unknowns), as computed by DLALN2. */
-/*          If NW=2 ("w" is complex), on exit, column 1 will contain */
-/*          the real part of X and column 2 will contain the imaginary */
-/*          part. */
+    X       (output) DOUBLE PRECISION array, dimension (LDX,NW)   
+            The NA x NW matrix X (unknowns), as computed by DLALN2.   
+            If NW=2 ("w" is complex), on exit, column 1 will contain   
+            the real part of X and column 2 will contain the imaginary   
+            part.   
 
-/*  LDX     (input) INTEGER */
-/*          The leading dimension of X.  It must be at least NA. */
+    LDX     (input) INTEGER   
+            The leading dimension of X.  It must be at least NA.   
 
-/*  SCALE   (output) DOUBLE PRECISION */
-/*          The scale factor that B must be multiplied by to insure */
-/*          that overflow does not occur when computing X.  Thus, */
-/*          (ca A - w D) X  will be SCALE*B, not B (ignoring */
-/*          perturbations of A.)  It will be at most 1. */
+    SCALE   (output) DOUBLE PRECISION   
+            The scale factor that B must be multiplied by to insure   
+            that overflow does not occur when computing X.  Thus,   
+            (ca A - w D) X  will be SCALE*B, not B (ignoring   
+            perturbations of A.)  It will be at most 1.   
 
-/*  XNORM   (output) DOUBLE PRECISION */
-/*          The infinity-norm of X, when X is regarded as an NA x NW */
-/*          real matrix. */
+    XNORM   (output) DOUBLE PRECISION   
+            The infinity-norm of X, when X is regarded as an NA x NW   
+            real matrix.   
 
-/*  INFO    (output) INTEGER */
-/*          An error flag.  It will be set to zero if no error occurs, */
-/*          a negative number if an argument is in error, or a positive */
-/*          number if  ca A - w D  had to be perturbed. */
-/*          The possible values are: */
-/*          = 0: No error occurred, and (ca A - w D) did not have to be */
-/*                 perturbed. */
-/*          = 1: (ca A - w D) had to be perturbed to make its smallest */
-/*               (or only) singular value greater than SMIN. */
-/*          NOTE: In the interests of speed, this routine does not */
-/*                check the inputs for errors. */
+    INFO    (output) INTEGER   
+            An error flag.  It will be set to zero if no error occurs,   
+            a negative number if an argument is in error, or a positive   
+            number if  ca A - w D  had to be perturbed.   
+            The possible values are:   
+            = 0: No error occurred, and (ca A - w D) did not have to be   
+                   perturbed.   
+            = 1: (ca A - w D) had to be perturbed to make its smallest   
+                 (or only) singular value greater than SMIN.   
+            NOTE: In the interests of speed, this routine does not   
+                  check the inputs for errors.   
 
-/* ===================================================================== */
+   =====================================================================   
 
-/*     .. Parameters .. */
-/*     .. */
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. Local Arrays .. */
-/*     .. */
-/*     .. External Functions .. */
-/*     .. */
-/*     .. External Subroutines .. */
-/*     .. */
-/*     .. Intrinsic Functions .. */
-/*     .. */
-/*     .. Equivalences .. */
-/*     .. */
-/*     .. Data statements .. */
-    /* Parameter adjustments */
+       Parameter adjustments */
     a_dim1 = *lda;
     a_offset = 1 + a_dim1;
     a -= a_offset;
@@ -202,11 +181,9 @@
     x_offset = 1 + x_dim1;
     x -= x_offset;
 
-    /* Function Body */
-/*     .. */
-/*     .. Executable Statements .. */
+    /* Function Body   
 
-/*     Compute BIGNUM */
+       Compute BIGNUM */
 
     smlnum = 2. * igraphdlamch_("Safe minimum");
     bignum = 1. / smlnum;
@@ -226,9 +203,9 @@
 
 	if (*nw == 1) {
 
-/*           Real 1x1 system. */
+/*           Real 1x1 system.   
 
-/*           C = ca A - w D */
+             C = ca A - w D */
 
 	    csr = *ca * a[a_dim1 + 1] - *wr * *d1;
 	    cnorm = abs(csr);
@@ -256,9 +233,9 @@
 	    *xnorm = (d__1 = x[x_dim1 + 1], abs(d__1));
 	} else {
 
-/*           Complex 1x1 system (w is complex) */
+/*           Complex 1x1 system (w is complex)   
 
-/*           C = ca A - w D */
+             C = ca A - w D */
 
 	    csr = *ca * a[a_dim1 + 1] - *wr * *d1;
 	    csi = -(*wi) * *d1;
@@ -295,9 +272,9 @@
 
     } else {
 
-/*        2x2 System */
+/*        2x2 System   
 
-/*        Compute the real part of  C = ca A - w D  (or  ca A' - w D ) */
+          Compute the real part of  C = ca A - w D  (or  ca A' - w D ) */
 
 	cr[0] = *ca * a[a_dim1 + 1] - *wr * *d1;
 	cr[3] = *ca * a[(a_dim1 << 1) + 2] - *wr * *d2;
@@ -311,9 +288,9 @@
 
 	if (*nw == 1) {
 
-/*           Real 2x2 system  (w is real) */
+/*           Real 2x2 system  (w is real)   
 
-/*           Find the largest element in C */
+             Find the largest element in C */
 
 	    cmax = 0.;
 	    icmax = 0;
@@ -405,9 +382,9 @@
 	    }
 	} else {
 
-/*           Complex 2x2 system  (w is complex) */
+/*           Complex 2x2 system  (w is complex)   
 
-/*           Find the largest element in C */
+             Find the largest element in C */
 
 	    ci[0] = -(*wi) * *d1;
 	    ci[1] = 0.;

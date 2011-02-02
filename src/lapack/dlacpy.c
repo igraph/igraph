@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,9 +10,7 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Subroutine */ int igraphdlacpy_(char *uplo, integer *m, integer *n, doublereal *
 	a, integer *lda, doublereal *b, integer *ldb)
@@ -25,62 +23,51 @@
     extern logical igraphlsame_(char *, char *);
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     February 29, 1992 */
+/*  -- LAPACK auxiliary routine (version 3.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2006   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
-/*     .. Array Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  DLACPY copies all or part of a two-dimensional matrix A to another */
-/*  matrix B. */
+    DLACPY copies all or part of a two-dimensional matrix A to another   
+    matrix B.   
 
-/*  Arguments */
-/*  ========= */
+    Arguments   
+    =========   
 
-/*  UPLO    (input) CHARACTER*1 */
-/*          Specifies the part of the matrix A to be copied to B. */
-/*          = 'U':      Upper triangular part */
-/*          = 'L':      Lower triangular part */
-/*          Otherwise:  All of the matrix A */
+    UPLO    (input) CHARACTER*1   
+            Specifies the part of the matrix A to be copied to B.   
+            = 'U':      Upper triangular part   
+            = 'L':      Lower triangular part   
+            Otherwise:  All of the matrix A   
 
-/*  M       (input) INTEGER */
-/*          The number of rows of the matrix A.  M >= 0. */
+    M       (input) INTEGER   
+            The number of rows of the matrix A.  M >= 0.   
 
-/*  N       (input) INTEGER */
-/*          The number of columns of the matrix A.  N >= 0. */
+    N       (input) INTEGER   
+            The number of columns of the matrix A.  N >= 0.   
 
-/*  A       (input) DOUBLE PRECISION array, dimension (LDA,N) */
-/*          The m by n matrix A.  If UPLO = 'U', only the upper triangle */
-/*          or trapezoid is accessed; if UPLO = 'L', only the lower */
-/*          triangle or trapezoid is accessed. */
+    A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
+            The m by n matrix A.  If UPLO = 'U', only the upper triangle   
+            or trapezoid is accessed; if UPLO = 'L', only the lower   
+            triangle or trapezoid is accessed.   
 
-/*  LDA     (input) INTEGER */
-/*          The leading dimension of the array A.  LDA >= max(1,M). */
+    LDA     (input) INTEGER   
+            The leading dimension of the array A.  LDA >= max(1,M).   
 
-/*  B       (output) DOUBLE PRECISION array, dimension (LDB,N) */
-/*          On exit, B = A in the locations specified by UPLO. */
+    B       (output) DOUBLE PRECISION array, dimension (LDB,N)   
+            On exit, B = A in the locations specified by UPLO.   
 
-/*  LDB     (input) INTEGER */
-/*          The leading dimension of the array B.  LDB >= max(1,M). */
+    LDB     (input) INTEGER   
+            The leading dimension of the array B.  LDB >= max(1,M).   
 
-/*  ===================================================================== */
+    =====================================================================   
 
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. External Functions .. */
-/*     .. */
-/*     .. Intrinsic Functions .. */
-/*     .. */
-/*     .. Executable Statements .. */
 
-    /* Parameter adjustments */
+       Parameter adjustments */
     a_dim1 = *lda;
     a_offset = 1 + a_dim1;
     a -= a_offset;

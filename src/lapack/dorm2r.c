@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,9 +10,7 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Table of constant values */
 
@@ -33,111 +31,96 @@ static integer c__1 = 1;
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *);
     extern logical igraphlsame_(char *, char *);
-    extern /* Subroutine */ int igraphxerbla_(char *, integer *);
+    extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
     static logical notran;
 
 
-/*  -- LAPACK routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     February 29, 1992 */
+/*  -- LAPACK routine (version 3.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2006   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
-/*     .. Array Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  DORM2R overwrites the general real m by n matrix C with */
+    DORM2R overwrites the general real m by n matrix C with   
 
-/*        Q * C  if SIDE = 'L' and TRANS = 'N', or */
+          Q * C  if SIDE = 'L' and TRANS = 'N', or   
 
-/*        Q'* C  if SIDE = 'L' and TRANS = 'T', or */
+          Q'* C  if SIDE = 'L' and TRANS = 'T', or   
 
-/*        C * Q  if SIDE = 'R' and TRANS = 'N', or */
+          C * Q  if SIDE = 'R' and TRANS = 'N', or   
 
-/*        C * Q' if SIDE = 'R' and TRANS = 'T', */
+          C * Q' if SIDE = 'R' and TRANS = 'T',   
 
-/*  where Q is a real orthogonal matrix defined as the product of k */
-/*  elementary reflectors */
+    where Q is a real orthogonal matrix defined as the product of k   
+    elementary reflectors   
 
-/*        Q = H(1) H(2) . . . H(k) */
+          Q = H(1) H(2) . . . H(k)   
 
-/*  as returned by DGEQRF. Q is of order m if SIDE = 'L' and of order n */
-/*  if SIDE = 'R'. */
+    as returned by DGEQRF. Q is of order m if SIDE = 'L' and of order n   
+    if SIDE = 'R'.   
 
-/*  Arguments */
-/*  ========= */
+    Arguments   
+    =========   
 
-/*  SIDE    (input) CHARACTER*1 */
-/*          = 'L': apply Q or Q' from the Left */
-/*          = 'R': apply Q or Q' from the Right */
+    SIDE    (input) CHARACTER*1   
+            = 'L': apply Q or Q' from the Left   
+            = 'R': apply Q or Q' from the Right   
 
-/*  TRANS   (input) CHARACTER*1 */
-/*          = 'N': apply Q  (No transpose) */
-/*          = 'T': apply Q' (Transpose) */
+    TRANS   (input) CHARACTER*1   
+            = 'N': apply Q  (No transpose)   
+            = 'T': apply Q' (Transpose)   
 
-/*  M       (input) INTEGER */
-/*          The number of rows of the matrix C. M >= 0. */
+    M       (input) INTEGER   
+            The number of rows of the matrix C. M >= 0.   
 
-/*  N       (input) INTEGER */
-/*          The number of columns of the matrix C. N >= 0. */
+    N       (input) INTEGER   
+            The number of columns of the matrix C. N >= 0.   
 
-/*  K       (input) INTEGER */
-/*          The number of elementary reflectors whose product defines */
-/*          the matrix Q. */
-/*          If SIDE = 'L', M >= K >= 0; */
-/*          if SIDE = 'R', N >= K >= 0. */
+    K       (input) INTEGER   
+            The number of elementary reflectors whose product defines   
+            the matrix Q.   
+            If SIDE = 'L', M >= K >= 0;   
+            if SIDE = 'R', N >= K >= 0.   
 
-/*  A       (input) DOUBLE PRECISION array, dimension (LDA,K) */
-/*          The i-th column must contain the vector which defines the */
-/*          elementary reflector H(i), for i = 1,2,...,k, as returned by */
-/*          DGEQRF in the first k columns of its array argument A. */
-/*          A is modified by the routine but restored on exit. */
+    A       (input) DOUBLE PRECISION array, dimension (LDA,K)   
+            The i-th column must contain the vector which defines the   
+            elementary reflector H(i), for i = 1,2,...,k, as returned by   
+            DGEQRF in the first k columns of its array argument A.   
+            A is modified by the routine but restored on exit.   
 
-/*  LDA     (input) INTEGER */
-/*          The leading dimension of the array A. */
-/*          If SIDE = 'L', LDA >= max(1,M); */
-/*          if SIDE = 'R', LDA >= max(1,N). */
+    LDA     (input) INTEGER   
+            The leading dimension of the array A.   
+            If SIDE = 'L', LDA >= max(1,M);   
+            if SIDE = 'R', LDA >= max(1,N).   
 
-/*  TAU     (input) DOUBLE PRECISION array, dimension (K) */
-/*          TAU(i) must contain the scalar factor of the elementary */
-/*          reflector H(i), as returned by DGEQRF. */
+    TAU     (input) DOUBLE PRECISION array, dimension (K)   
+            TAU(i) must contain the scalar factor of the elementary   
+            reflector H(i), as returned by DGEQRF.   
 
-/*  C       (input/output) DOUBLE PRECISION array, dimension (LDC,N) */
-/*          On entry, the m by n matrix C. */
-/*          On exit, C is overwritten by Q*C or Q'*C or C*Q' or C*Q. */
+    C       (input/output) DOUBLE PRECISION array, dimension (LDC,N)   
+            On entry, the m by n matrix C.   
+            On exit, C is overwritten by Q*C or Q'*C or C*Q' or C*Q.   
 
-/*  LDC     (input) INTEGER */
-/*          The leading dimension of the array C. LDC >= max(1,M). */
+    LDC     (input) INTEGER   
+            The leading dimension of the array C. LDC >= max(1,M).   
 
-/*  WORK    (workspace) DOUBLE PRECISION array, dimension */
-/*                                   (N) if SIDE = 'L', */
-/*                                   (M) if SIDE = 'R' */
+    WORK    (workspace) DOUBLE PRECISION array, dimension   
+                                     (N) if SIDE = 'L',   
+                                     (M) if SIDE = 'R'   
 
-/*  INFO    (output) INTEGER */
-/*          = 0: successful exit */
-/*          < 0: if INFO = -i, the i-th argument had an illegal value */
+    INFO    (output) INTEGER   
+            = 0: successful exit   
+            < 0: if INFO = -i, the i-th argument had an illegal value   
 
-/*  ===================================================================== */
+    =====================================================================   
 
-/*     .. Parameters .. */
-/*     .. */
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. External Functions .. */
-/*     .. */
-/*     .. External Subroutines .. */
-/*     .. */
-/*     .. Intrinsic Functions .. */
-/*     .. */
-/*     .. Executable Statements .. */
 
-/*     Test the input arguments */
+       Test the input arguments   
 
-    /* Parameter adjustments */
+       Parameter adjustments */
     a_dim1 = *lda;
     a_offset = 1 + a_dim1;
     a -= a_offset;
@@ -176,7 +159,7 @@ static integer c__1 = 1;
     }
     if (*info != 0) {
 	i__1 = -(*info);
-	igraphxerbla_("DORM2R", &i__1);
+	igraphxerbla_("DORM2R", &i__1, (ftnlen)6);
 	return 0;
     }
 
@@ -186,7 +169,7 @@ static integer c__1 = 1;
 	return 0;
     }
 
-    if ( (left && ! notran) || (! left && notran)) {
+    if (left && ! notran || ! left && notran) {
 	i1 = 1;
 	i2 = *k;
 	i3 = 1;

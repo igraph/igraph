@@ -38,6 +38,7 @@
 #include "igraph_datatype.h"
 #include "igraph_types.h"
 #include "igraph_arpack.h"
+#include "igraph_vector_ptr.h"
 
 __BEGIN_DECLS
 
@@ -139,26 +140,34 @@ int igraph_modularity(const igraph_t *graph,
 int igraph_reindex_membership(igraph_vector_t *membership,
                               igraph_vector_t *new_to_old);
 
-int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
-					       igraph_matrix_t *merges,
-					       igraph_vector_t *membership,
-					       igraph_integer_t steps,
-					       igraph_arpack_options_t *options,
-					       igraph_real_t *modularity);
+typedef enum { IGRAPH_LEVC_HIST_SPLIT=1,
+	       IGRAPH_LEVC_HIST_FAILED,
+	       IGRAPH_LEVC_HIST_START_FULL,
+	       IGRAPH_LEVC_HIST_START_GIVEN
+} igraph_leading_eigenvector_community_history_t;
+
+typedef int igraph_community_leading_eigenvector_callback_t(
+	const igraph_vector_t *membership,
+	long int comm, 
+	igraph_real_t eigenvalue,
+	const igraph_vector_t *eigenvector,
+	igraph_arpack_function_t *arpack_multiplier,
+        void *arpack_extra,
+        void *extra);
+
 int igraph_community_leading_eigenvector(const igraph_t *graph,
-					 igraph_matrix_t *merges,
-					 igraph_vector_t *membership,
-					 igraph_integer_t steps,
-					 igraph_arpack_options_t *options, 
-					 igraph_real_t *modularity);
-int igraph_community_leading_eigenvector_step(const igraph_t *graph,
-					      igraph_vector_t *membership,
-					      igraph_integer_t community,
-					      igraph_bool_t *split,
-					      igraph_vector_t *eigenvector,
-					      igraph_real_t *eigenvalue, 
-					      igraph_arpack_options_t *options,
-					      igraph_arpack_storage_t *storage);
+	igraph_matrix_t *merges,
+	igraph_vector_t *membership,
+	igraph_integer_t steps,
+	igraph_arpack_options_t *options, 
+	igraph_real_t *modularity,
+	igraph_bool_t start,
+	igraph_vector_t *eigenvalues,
+	igraph_vector_ptr_t *eigenvectors,
+        igraph_vector_t *history, 
+        igraph_community_leading_eigenvector_callback_t *callback,
+        void *callback_extra);
+
 int igraph_community_label_propagation(const igraph_t *graph,
                                        igraph_vector_t *membership,
                                        const igraph_vector_t *weights,
