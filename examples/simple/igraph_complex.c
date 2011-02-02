@@ -22,6 +22,7 @@
 */
 
 #include <igraph.h>
+#include <math.h>
 
 #define ARE 4
 #define AIM 5
@@ -89,8 +90,12 @@ int main() {
 
   /* div_real */
   c=igraph_complex_div_real(a, IGRAPH_REAL(b));
-  if (IGRAPH_REAL(c) != IGRAPH_REAL(a) / IGRAPH_REAL(b)) { return 16; }
-  if (IGRAPH_IMAG(c) != IGRAPH_IMAG(a) / IGRAPH_REAL(b)) { return 17; }
+  if (fabs(IGRAPH_REAL(c) - IGRAPH_REAL(a) / IGRAPH_REAL(b)) > 1e-15) { 
+    return 16; 
+  }
+  if (fabs(IGRAPH_IMAG(c) - IGRAPH_IMAG(a) / IGRAPH_REAL(b)) > 1e-15) { 
+    return 17; 
+  }
 
   /* div_imag */
   c=igraph_complex_div_imag(a, IGRAPH_IMAG(b));
