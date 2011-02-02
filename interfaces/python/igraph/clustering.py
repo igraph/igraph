@@ -1012,7 +1012,7 @@ class Cover(object):
     L{Clustering} objects can readily be converted to L{Cover} objects
     using the constructor:
 
-      >>> clustering = Clustering([0, 1, 2, 3], [4, 5, 6], [7, 8, 9])
+      >>> clustering = Clustering([0, 0, 0, 0, 1, 1, 1, 2, 2, 2])
       >>> cover = Cover(clustering)
       >>> list(clustering) == list(cover)
       True

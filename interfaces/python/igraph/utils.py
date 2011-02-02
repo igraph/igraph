@@ -122,7 +122,7 @@ def safemax(iterable, default=0):
     Example:
         
         >>> safemax([-5, 6, 4])
-        4
+        6
         >>> safemax([])
         0
         >>> safemax((), 2)

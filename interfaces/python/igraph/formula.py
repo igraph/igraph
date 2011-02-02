@@ -117,22 +117,31 @@ def construct_graph_from_formula(cls, formula = None, attr = "name",
 
     Some simple examples:
 
+      >>> from igraph import Graph
       >>> print Graph.Formula()           # empty graph
-      Undirected graph (|V| = 0, |E| = 0)
+      IGRAPH UN-- 0 0 --
+      + attr: name (v)
       >>> g = Graph.Formula("A-B")        # undirected graph
       >>> g.vs["name"]
-      ["A", "B"]
+      ['A', 'B']
       >>> print g
-      Undirected graph (|V| = 2, |E| = 1)
+      IGRAPH UN-- 2 1 --
+      + attr: name (v)
+      + edges (vertex names):
+      A--B
       >>> g.get_edgelist()
+      [(0, 1)]
       >>> g2 = Graph.Formula("A-----------B")
       >>> g2.isomorphic(g)
       True
       >>> g = Graph.Formula("A  --->  B") # directed graph
       >>> g.vs["name"]
-      ["A", "B"]
+      ['A', 'B']
       >>> print g
-      Directed graph (|V| = 2, |E| = 1)
+      IGRAPH DN-- 2 1 --
+      + attr: name (v)
+      + edges (vertex names):
+      A->B
       
     If you have may disconnected componnets, you can separate them
     with commas. You can also specify isolated vertices:
