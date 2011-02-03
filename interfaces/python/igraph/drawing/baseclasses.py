@@ -79,7 +79,7 @@ class AbstractXMLRPCDrawer(AbstractDrawer):
           be addressed to.
         @param service: the name of the service at the XML-RPC address. If
           C{None}, requests will be directed to the server proxy object
-          constructed by L{xmlrpclib.ServerProxy}; if not C{None}, the
+          constructed by C{xmlrpclib.ServerProxy}; if not C{None}, the
           given attribute will be looked up in the server proxy object.
         """
         import xmlrpclib

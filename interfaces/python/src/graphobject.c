@@ -9712,7 +9712,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_get_eids */
   {"get_eids", (PyCFunction) igraphmodule_Graph_get_eids,
    METH_VARARGS | METH_KEYWORDS,
-   "get_eids(pairs=None, path=None, directed=True)\n\n"
+   "get_eids(pairs=None, path=None, directed=True, error=True)\n\n"
    "Returns the edge IDs of some edges between some vertices.\n\n"
    "This method can operate in two different modes, depending on which\n"
    "of the keyword arguments C{pairs} and C{path} are given.\n\n"

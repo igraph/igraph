@@ -277,8 +277,7 @@ class Graph(GraphBase):
         return self.degree(*args, **kwds)
 
     def all_st_cuts(self, source, target):
-        """all_st_cuts(source, target)
-
+        """\
         Returns all the cuts between the source and target vertices in a
         directed graph.
 
@@ -297,8 +296,7 @@ class Graph(GraphBase):
                 for cut, part in izip(*GraphBase.all_st_cuts(self, source, target))]
 
     def all_st_mincuts(self, source, target, capacity=None):
-        """all_st_mincuts(source, target)
-
+        """\
         Returns all the mincuts between the source and target vertices in a
         directed graph.
 
@@ -320,8 +318,7 @@ class Graph(GraphBase):
                 for cut, part in izip(cuts, parts)]
 
     def biconnected_components(self, return_articulation_points=False):
-        """biconnected_components(return_articulation_points=False)
-
+        """\
         Calculates the biconnected components of the graph.
         
         @param return_articulation_points: whether to return the articulation
@@ -2430,7 +2427,7 @@ class Graph(GraphBase):
           - C{vertex_color}: color of the vertices. The corresponding vertex
             attribute is C{color}, the default is red.  Colors can be
             specified either by common X11 color names (see the source
-            code of L{igraph.colors} for a list of known colors), by
+            code of L{igraph.drawing.colors} for a list of known colors), by
             3-tuples of floats (ranging between 0 and 255 for the R, G and
             B components), by CSS-style string specifications (C{#rrggbb})
             or by integer color indices of the specified palette.

@@ -3,12 +3,12 @@ Drawing routines to draw graphs.
 
 This module contains routines to draw graphs on:
 
-- Cairo surfaces (L{DefaultGraphDrawer})
-- UbiGraph displays (L{UbiGraphDrawer}, see L{http://ubietylab.net/ubigraph})
+  - Cairo surfaces (L{DefaultGraphDrawer})
+  - UbiGraph displays (L{UbiGraphDrawer}, see U{http://ubietylab.net/ubigraph})
 
-It also contains routines to send an igraph graph directly to Cytoscape
-(L{http://www.cytoscape.org}) using the CytoscapeRPC plugin
-(L{http://gforge.nbic.nl/projects/cytoscaperpc/}), see
+It also contains routines to send an igraph graph directly to
+(U{Cytoscape<http://www.cytoscape.org>}) using the
+(U{CytoscapeRPC plugin<http://gforge.nbic.nl/projects/cytoscaperpc/>}), see
 L{CytoscapeGraphDrawer}. L{CytoscapeGraphDrawer} can also fetch the current
 network from Cytoscape and convert it to igraph format.
 """

@@ -38,7 +38,7 @@ class GraphSummary(object):
     four-character long code, the number of vertices, the number of
     edges, two dashes (C{--}) and the name of the graph (i.e.
     the contents of the C{name} attribute, if any). For instance,
-    a header line may look like this:
+    a header line may look like this::
 
         IGRAPH U--- 4 5 --
 

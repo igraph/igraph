@@ -73,8 +73,8 @@ class Plot(object):
     which surface class will be used. Please note that not all surfaces might
     be available, depending on your C{pycairo} installation.
 
-    A C{Plot} has an assigned default palette (see L{igraph.colors.Palette}) which
-    is used for plotting objects.
+    A C{Plot} has an assigned default palette (see L{igraph.drawing.colors.Palette})
+    which is used for plotting objects.
 
     A C{Plot} object also has a list of objects to be plotted with their
     respective bounding boxes, palettes and opacities. Palettes assigned
@@ -107,14 +107,14 @@ class Plot(object):
 
         @param palette: the palette primarily used on the plot if the
           added objects do not specify a private palette. Must be either
-          an L{igraph.colors.Palette} object or a string referring to a valid
-          key of C{igraph.colors.palettes} (see module L{igraph.colors}) or C{None}.
-          In the latter case, the default palette given by the configuration
-          key C{plotting.palette} is used.
+          an L{igraph.drawing.colors.Palette} object or a string referring
+          to a valid key of C{igraph.drawing.colors.palettes} (see module
+          L{igraph.drawing.colors}) or C{None}. In the latter case, the default
+          palette given by the configuration key C{plotting.palette} is used.
 
         @param background: the background color. If C{None}, the background
           will be transparent. You can use any color specification here that
-          is understood by L{igraph.colors.color_name_to_rgba}.
+          is understood by L{igraph.drawing.colors.color_name_to_rgba}.
         """
         self._filename = None
         self._surface_was_created = not isinstance(target, cairo.Surface)

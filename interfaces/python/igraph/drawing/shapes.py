@@ -260,9 +260,9 @@ class PolygonDrawer(AbstractCairoDrawer):
         """Constructs a new polygon drawer that draws on the given
         Cairo context.
 
-        @param  context  the Cairo context to draw on
-        @param  bbox     ignored, leave it at its default value
-        @param  points   the list of corner points
+        @param  context: the Cairo context to draw on
+        @param  bbox:    ignored, leave it at its default value
+        @param  points:  the list of corner points
         """
         super(PolygonDrawer, self).__init__(context, bbox)
         self.points = points

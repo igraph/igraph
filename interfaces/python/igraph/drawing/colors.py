@@ -27,8 +27,7 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 from math import ceil
 
 __all__ = ["Palette", "GradientPalette", "AdvancedGradientPalette", \
-    "RainbowPalette", \
-    "PrecalculatedPalette", "ClusterColoringPalette", \
+    "RainbowPalette", "PrecalculatedPalette", "ClusterColoringPalette", \
     "color_name_to_rgb", "color_name_to_rgba", \
     "hsv_to_rgb", "hsva_to_rgba", "hsl_to_rgb", "hsla_to_rgba", \
     "palettes", "known_colors"]
@@ -260,7 +259,7 @@ class RainbowPalette(Palette):
     def __init__(self, n=256, s=1, v=1, start=0, end=1, alpha=1):
         """Creates a rainbow palette.
 
-        @param colors: the number of colors in the palette.
+        @param n: the number of colors in the palette.
         @param s: the saturation of the colors in the palette.
         @param v: the value component of the colors in the palette.
         @param start: the hue at which the rainbow begins (between 0 and 1).
