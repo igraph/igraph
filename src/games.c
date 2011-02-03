@@ -2259,6 +2259,8 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
  *    directed or undirected.
  * \param prob The rewiring probability a constant between zero and
  *    one (inclusive).
+ * \param loops Boolean, whether loop edges are allowed in the new 
+ *    graph, or not.
  * \return Error code.
  * 
  * \sa \ref igraph_watts_strogatz_game() uses this function for the
@@ -2267,7 +2269,8 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
  * Time complexity: O(|V|+|E|).
  */
 
-int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob) {
+int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob, 
+			igraph_bool_t loops) {
 
   igraph_t newgraph;
   igraph_vector_t edges;
@@ -2295,7 +2298,13 @@ int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob) {
   if (prob != 0) {
     to_rewire=RNG_GEOM(prob)+1;
     while (to_rewire <= endpoints) {
-      VECTOR(edges)[ to_rewire-1 ] = RNG_INTEGER(0, no_of_nodes-1);
+      if (loops) {
+	VECTOR(edges)[ to_rewire-1 ] = RNG_INTEGER(0, no_of_nodes-1);
+      } else {
+	long int nei=VECTOR(edges)[to_rewire-2 + 2*(to_rewire % 2)];
+	long int r=RNG_INTEGER(0, no_of_nodes-2);
+	VECTOR(edges)[ to_rewire-1 ] = (r != nei ? r : no_of_nodes-1);
+      }
       to_rewire += RNG_GEOM(prob)+1;
     }
   }
@@ -2337,6 +2346,7 @@ int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob) {
  *    igraph_connect_neighborhood(). 
  * \param p The rewiring probability. A real number between zero and
  *   one (inclusive). 
+ * \param loops Logical, whether to generate loop edges.
  * \return Error code.
  * 
  * \sa \ref igraph_lattice(), \ref igraph_connect_neighborhood() and
@@ -2350,7 +2360,7 @@ int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob) {
 
 int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
 			       igraph_integer_t size, igraph_integer_t nei,
-			       igraph_real_t p) {
+			       igraph_real_t p, igraph_bool_t loops) {
   
   igraph_vector_t dimvector;
   long int i;
@@ -2382,7 +2392,7 @@ int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
   
   /* Rewire the edges then */
 
-  IGRAPH_CHECK(igraph_rewire_edges(graph, p));
+  IGRAPH_CHECK(igraph_rewire_edges(graph, p, loops));
 
   IGRAPH_FINALLY_CLEAN(1);
   return 0;

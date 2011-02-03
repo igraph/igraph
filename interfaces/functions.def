@@ -238,11 +238,12 @@ igraph_asymmetric_preference_game:
         IGNORE: RR, RC, RNamespace
 
 igraph_rewire_edges:
-        PARAMS: INOUT GRAPH graph, REAL prob
+        PARAMS: INOUT GRAPH graph, REAL prob, BOOLEAN loops=False
         IGNORE: RR, RC, RNamespace
 
 igraph_watts_strogatz_game:
-        PARAMS: OUT GRAPH graph, INTEGER dim, INTEGER size, INTEGER nei, REAL p
+        PARAMS: OUT GRAPH graph, INTEGER dim, INTEGER size, INTEGER nei, \
+                REAL p, BOOLEAN loops=False
         IGNORE: RR, RC, RNamespace
 
 igraph_lastcit_game:
