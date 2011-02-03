@@ -7,7 +7,7 @@
 \usage{
 igraph.console()
 }
-\arguments{}
+%\arguments{}
 \details{
   The console can be started by calling the \code{igraph.console}
   function. Then it stays open, until the user closes it.
