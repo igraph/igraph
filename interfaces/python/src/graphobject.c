@@ -2808,16 +2808,17 @@ PyObject *igraphmodule_Graph_Watts_Strogatz(PyTypeObject * type,
 {
   long nei = 1, dim, size;
   double p;
+  PyObject* loops = Py_False;
   igraphmodule_GraphObject *self;
   igraph_t g;
 
-  static char *kwlist[] = { "dim", "size", "nei", "p", NULL };
+  static char *kwlist[] = { "dim", "size", "nei", "p", "loops", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "llld", kwlist,
-                                   &dim, &size, &nei, &p))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "llld|O", kwlist,
+                                   &dim, &size, &nei, &p, &loops))
     return NULL;
 
-  if (igraph_watts_strogatz_game(&g, dim, size, nei, p)) {
+  if (igraph_watts_strogatz_game(&g, dim, size, nei, p, PyObject_IsTrue(loops))) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -9061,68 +9062,7 @@ PyObject *igraphmodule_Graph_community_edge_betweenness(igraphmodule_GraphObject
 }
 
 /**
- * Newman's leading eigenvector method, naive implementation
- */
-PyObject *igraphmodule_Graph_community_leading_eigenvector_naive(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
-  static char *kwlist[] = { "n", "return_merges", "arpack_options", NULL };
-  long int n=-1;
-  PyObject *return_merges = Py_False;
-  PyObject *cl, *res, *merges;
-  PyObject *arpack_options_o = igraphmodule_arpack_options_default;
-  igraphmodule_ARPACKOptionsObject *arpack_options;
-  igraph_vector_t members;
-  igraph_matrix_t *mptr = 0;
-  igraph_matrix_t m;
-  igraph_real_t q;
-
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lOO&", kwlist,
-    &n, &return_merges, &igraphmodule_ARPACKOptionsType, &arpack_options)) {
-    return NULL;
-  }
-
-  if (igraph_vector_init(&members, 0)) return igraphmodule_handle_igraph_error();
-  if (PyObject_IsTrue(return_merges)) {
-    mptr = &m;
-  if (igraph_matrix_init(mptr, 0, 0)) return igraphmodule_handle_igraph_error();
-  }
-
-  if (n<0)
-    n = igraph_vcount(&self->g);
-  else
-    n -= 1;
-
-  arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
-  if (igraph_community_leading_eigenvector_naive(&self->g, mptr, &members, n,
-      igraphmodule_ARPACKOptions_get(arpack_options), &q)){
-    if (mptr) igraph_matrix_destroy(mptr);
-    igraph_vector_destroy(&members);
-    return igraphmodule_handle_igraph_error();
-  }
-
-  cl = igraphmodule_vector_t_to_PyList(&members, IGRAPHMODULE_TYPE_INT);
-  igraph_vector_destroy(&members);
-  if (cl == 0) {
-    if (mptr) igraph_matrix_destroy(mptr);
-    return 0;
-  }
-
-  if (mptr) {
-    merges=igraphmodule_matrix_t_to_PyList(mptr, IGRAPHMODULE_TYPE_INT);
-    igraph_matrix_destroy(mptr);
-    if (merges == 0) return 0;
-  } else {
-    merges=Py_None;
-    Py_INCREF(merges);
-  }
-
-  res=Py_BuildValue("NNd", cl, merges, (double)q);
-
-  return res;
-}
-
-/**
  * Newman's leading eigenvector method, precise implementation
- * The code is almost exactly the same as igraphmodule_Graph_community_leading_eigenvector_naive
  */
 PyObject *igraphmodule_Graph_community_leading_eigenvector(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
   static char *kwlist[] = { "n", "arpack_options", NULL };
@@ -9152,7 +9092,7 @@ PyObject *igraphmodule_Graph_community_leading_eigenvector(igraphmodule_GraphObj
 
   arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
   if (igraph_community_leading_eigenvector(&self->g, &m, &members, n,
-      igraphmodule_ARPACKOptions_get(arpack_options), &q)){
+      igraphmodule_ARPACKOptions_get(arpack_options), &q, 0, 0, 0, 0, 0, 0)){
     igraph_matrix_destroy(&m);
     igraph_vector_destroy(&members);
     return igraphmodule_handle_igraph_error();
@@ -12527,28 +12467,6 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@ref: Raghavan, U.N. and Albert, R. and Kumara, S. Near linear\n"
    "  time algorithm to detect community structures in large-scale\n"
    "  networks. Phys Rev E 76:036106, 2007. U{http://arxiv.org/abs/0709.2938}.\n"
-  },
-  {"community_leading_eigenvector_naive", (PyCFunction) igraphmodule_Graph_community_leading_eigenvector_naive,
-   METH_VARARGS | METH_KEYWORDS,
-   "community_leading_eigenvector_naive(n=-1)\n\n"
-   "A naive implementation of Newman's eigenvector community structure\n"
-   "detection. This function splits the network into two components\n"
-   "according to the leading eigenvector of the modularity matrix and\n"
-   "then recursively takes the given number of steps by splitting the\n"
-   "communities as individual networks. This is not the correct way,\n"
-   "however, see the reference for explanation. Consider using the\n"
-   "correct L{community_leading_eigenvector} method instead.\n\n"
-   "@attention: this function is wrapped in a more convenient syntax in the\n"
-   "  derived class L{Graph}. It is advised to use that instead of this version.\n\n"
-   "@param n: the desired number of communities. If negative, the algorithm\n"
-   "  tries to do as many splits as possible. Note that the algorithm\n"
-   "  won't split a community further if the signs of the leading eigenvector\n"
-   "  are all the same.\n"
-   "@return: a tuple where the first element is the membership vector of the\n"
-   "  clustering and the second element is the merge matrix.\n"
-   "@newfield ref: Reference\n"
-   "@ref: MEJ Newman: Finding community structure in networks using the\n"
-   "  eigenvectors of matrices, arXiv:physics/0605087\n"
   },
   {"community_leading_eigenvector", (PyCFunction) igraphmodule_Graph_community_leading_eigenvector,
    METH_VARARGS | METH_KEYWORDS,

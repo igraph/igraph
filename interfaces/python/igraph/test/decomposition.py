@@ -165,7 +165,7 @@ class CommunityTests(unittest.TestCase):
     def testEigenvector(self):
         g = Graph.Full(5) + Graph.Full(5)
         g.add_edges([(0, 5)])
-        cl = g.community_leading_eigenvector_naive()
+        cl = g.community_leading_eigenvector()
         self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1])
         self.assertAlmostEqual(cl.q, 0.4523, places=3)
         cl = g.community_leading_eigenvector(2)
