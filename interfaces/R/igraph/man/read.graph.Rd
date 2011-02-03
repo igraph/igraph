@@ -28,10 +28,10 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 }
 \details{
   The \code{read.graph} function may have additional arguments depending
-  on the file format (the \code{format} argument).
-  \describe{
-    \item{edgelist}{
-      
+  on the file format (the \code{format} argument). See the details
+  separately for each file format, below.
+}
+\section{Edge list format}{
       This format is a simple text file with numeric vertex ids defining
       the edges. There is no need to have newline characters between the
       edges, a simple space will also do.
@@ -44,8 +44,8 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 	\item{directed}{Logical scalar, whether to create a directed
 	  graph. The default value is \code{TRUE}.}
       }
-    }
-    \item{pajek}{
+}
+\section{Pajek format}{
       Pajek it a popular network analysis program for Windows. (See the
       Pajek homepage at
       \url{http://vlado.fmf.uni-lj.si/pub/networks/pajek/}.)
@@ -139,8 +139,8 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
       }
       
       There are no additional arguments for this format.
-    }
-    \item{graphml}{
+}
+\section{GraphML file format}{
       GraphML is an XML-based file format (an XML application in the XML
       terminology) to describe graphs. It is a modern format, and can
       store graphs with an extensible set of vertex and edge attributes,
@@ -165,8 +165,8 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 	  this argument can be used to select the graph to read. By
 	  default the first graph is read (index 0).}
       }
-    }
-    \item{GML}{
+}
+\section{GML file format}{
       GML is a simple textual format, see
       \url{http://www.infosun.fim.uni-passau.de/Graphlet/GML/} for details.
  
@@ -195,8 +195,8 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
       limitations of the GML parser.
 
       There are not additional argument for this format.
-    }
-    \item{DL}{
+}
+\section{DL file format}{
       The DL format is a simple textual file format used by the UCINET
       software. See
       \url{http://www.analytictech.com/networks/dataentry.htm} for
@@ -212,14 +212,14 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 	\item{directed}{Logical scalar, whether to create a directed
 	  graph. The default is to make the graph directed.}
       }
-    }
-    \item{ncol}{
+}
+\section{NCOL format}{
       This format is used by the Large Graph Layout program
       (\url{http://bioinformatics.icmb.utexas.edu/lgl}), and it is
       simply a symbolic weighted edge list. It is a simple text file
       with one edge per line. An edge is defined by two symbolic vertex
       names separated by whitespace. (The symbolic vertex names
-      themselves cannot contain whitespace. They might followed by an
+      themselves cannot contain whitespace.) They might followed by an
       optional number, this will be the weight of the edge; the number
       can be negative and can be in scientific notation. If there is no
       weight specified to an edge it is assumed to be zero. 
@@ -244,8 +244,9 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 	\item{directed}{Logical constant, whether to create a directed
 	  graph. The default is undirected.} 
       }
-    }
-    \item{lgl}{The \code{lgl} format is used by the Large Graph Layout
+}
+\section{LGL file format}{
+      The \code{lgl} format is used by the Large Graph Layout
       visualization software
       (\url{http://bioinformatics.icmb.utexas.edu/lgl}), it can describe
       undirected optionally weighted graphs. From the LGL manual:
@@ -253,13 +254,10 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
       suffix). This is yet another graph file format that tries to be
       as stingy as possible with space, yet keeping the edge file in a
       human readable (not binary) format. The format itself is like
-      the following:
-      \preformatted{
-	# vertex1name 
+      the following: \preformatted{	 # vertex1name 
 	vertex2name [optionalWeight]
 	vertex3name [optionalWeight]
-      }
-      Here, the first vertex of an edge is preceded with a pound sign
+      } Here, the first vertex of an edge is preceded with a pound sign
       '\#'.  Then each vertex that shares an edge with that vertex is
       listed one per line on subsequent lines.}
       
@@ -280,8 +278,8 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 	  the file, otherwise not. The default is \sQuote{auto}.
 	}
       }      
-    }
-    \item{dimacs}{
+}
+\section{DIMACS file format}{
       The DIMACS file format, more specifically the 
       version for network flow problems, see the files at
       \url{ftp://dimacs.rutgers.edu/pub/netflow/general-info/}
@@ -313,8 +311,9 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 	  graph. By default a directed graph is created.
 	}
       }
-    }
-    \item{graphdb}{This is a binary format, used in the graph database
+}
+\section{GraphDB format}{
+      This is a binary format, used in the graph database
       for isomorphism testing (\url{http://amalfi.dis.unina.it/graph/})
       From the graph database homepage
       (\url{http://amalfi.dis.unina.it/graph/db/doc/graphdbat-2.html}):
@@ -339,8 +338,6 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 	\item{directed}{Logical scalar. Whether to create a directed
 	  graph.}
       }
-    }
-  }
 }
 \value{A graph object.}
 % \references{}

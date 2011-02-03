@@ -20,25 +20,29 @@ write.graph(graph, file, format=c("edgelist", "pajek", "ncol",
   }
   \item{\dots}{Other, format specific arguments, see below.}
 }
-\details{
+\section{Edge list format}{
   The \code{edgelist} format is a simple text file, with one edge in a
   line, the two vertex ids separated by a space character. The file is
   sorted by the first and the second column. This format has no
   additional arguments.
-
+}
+\section{Pajek format}{
   The Pajek format is a text file, see \code{\link{read.graph}} for
   details. Appropriate vertex and edge attributes are also written to
   the file. This format has no additional arguments.
-
+}
+\section{GraphML format}{
   The GraphML format is a flexible XML based format. See
   \code{\link{read.graph}} for GraphML details. Vertex and edge
   attributes are also written to the file. This format has no additional
   arguments.
-
+}
+\section{Dot format}{
   The dot format is used by the popular GraphViz program. Vertex and
   edge attributes are written to the file. There are no additional
   arguments for this format.
-  
+}
+\section{LGL format}{
   The \code{lgl} format is also a simple text file, this is the
   format expected by the 'Large Graph Layout' layout generator software.
   See \link{read.graph} for details.
@@ -56,7 +60,8 @@ write.graph(graph, file, format=c("edgelist", "pajek", "ncol",
     \item{isolates}{Logical, if \code{TRUE} the isolate vertices are
       also written to the file, they are omitted by default.}
   }
-
+}
+\section{NCOL format}{
   The \code{ncol} format is also used by LGL, it is a text file, see
   \link{read.graph} for details.
   Additional arguments:
@@ -71,7 +76,8 @@ write.graph(graph, file, format=c("edgelist", "pajek", "ncol",
       attribute \sQuote{weights} are used if they are installed.
       Supply \code{NULL} here if you want to omit the weights.}
   }
-
+}
+\section{Dimacs format}{
   The \code{dimacs} file format, more specifically the 
   version for network flow problems, see the files at
   \url{ftp://dimacs.rutgers.edu/pub/netflow/general-info/}
@@ -103,7 +109,8 @@ write.graph(graph, file, format=c("edgelist", "pajek", "ncol",
       \code{NULL} (the default) then it is taken from the
       \code{capacity} edge attribute.}
   }
-
+}
+\section{GML file format}{
   GML is a quite general textual format, see 
   \url{http://www.infosun.fim.uni-passau.de/Graphlet/GML/} for details.
  
@@ -142,7 +149,8 @@ write.graph(graph, file, format=c("edgelist", "pajek", "ncol",
       \dQuote{Creator} line in the GML file. If this is \code{NULL} (the
       default) then the current date and time is added.}
   }
-
+}
+\section{LEDA file format}{
   LEDA is a library for efficient data types and algorithms. 
   The support for the LEDA format is very basic at the moment; igraph
   writes only the LEDA graph section which supports one selected vertex
