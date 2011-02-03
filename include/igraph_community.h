@@ -146,6 +146,34 @@ typedef enum { IGRAPH_LEVC_HIST_SPLIT=1,
 	       IGRAPH_LEVC_HIST_START_GIVEN
 } igraph_leading_eigenvector_community_history_t;
 
+/**
+ * \typedef igraph_community_leading_eigenvector_callback_t
+ * Callback for the leading eigenvector community finding method.
+ *
+ * The leading eigenvector community finding implementation in igraph
+ * is able to call a callback function, after each eigenvalue
+ * calculation. This callback function must be of \c
+ * igraph_community_leading_eigenvector_callback_t type.
+ * The following arguments are passed to the callback:
+ * \param membership The actual membership vector, before recording
+ *    the potential change implied by the newly found eigenvalue.
+ * \param comm The id of the community that the algorithm tried to
+ *    split in the last iteration. The community ids are indexed from
+ *    zero here!
+ * \param eigenvalue The eigenvalue the algorithm has just found.
+ * \param eigenvector The eigenvector corresponding to the eigenvalue
+ *    the algorithm just found.
+ * \param arpack_multiplier A function that was passed to \ref
+ *    igraph_arpack_rssolve() to solve the last eigenproblem.
+ * \param arpack_extra The extra argument that was passed to the
+ *    ARPACK solver.
+ * \param extra Extra argument that as passed to \ref
+ *    igraph_community_leading_eigenvector().
+ *
+ * \sa \ref igraph_community_leading_eigenvector(), \ref
+ * igraph_arpack_function_t, \ref igraph_arpack_rssolve().
+ */
+
 typedef int igraph_community_leading_eigenvector_callback_t(
 	const igraph_vector_t *membership,
 	long int comm, 

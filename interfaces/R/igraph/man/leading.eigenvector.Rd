@@ -9,7 +9,8 @@
   modularity matrix of the graph.}
 \usage{
 leading.eigenvector.community(graph, steps = -1, start = NULL,
-       options = igraph.arpack.default)
+       options = igraph.arpack.default, callback = NULL, extra = NULL,
+       env = parent.frame())
 community.le.to.membership(merges, steps, membership) 
 }
 \arguments{
@@ -27,6 +28,12 @@ community.le.to.membership(merges, steps, membership)
     structure on which \code{steps} merges are performed.
   }
   \item{options}{A named list to override some ARPACK options.}
+  \item{callback}{If not \code{NULL}, then it must be callback
+    function. This is called after each iteration, after calculating the
+    leading eigenvector of the modularity matrix. See details below.}
+  \item{extra}{Additional argument to supply to the callback function.}
+  \item{env}{The environment in which the callback function is
+    evaluated.}
   \item{merges}{The merge matrix, possible from the result of
     \code{leading.eigenvector.community}.}
 }
@@ -58,6 +65,26 @@ community.le.to.membership(merges, steps, membership)
   result of \code{leading.eigenvector.community}. It takes
   \code{membership} and permformes \code{steps} merges, according to the
   supplied \code{merges} matrix.
+}
+\section{Callback functions}{
+  The \code{callback} argument can be used to supply a function that is
+  called after each eigenvector calculation. The following arguments are
+  supplied to this function:
+  \describe{
+    \item{membership}{The actual membership vector, with zero-based
+      indexing.}
+    \item{community}{The community that the algorithm just tried to
+      split, community numbering starts with zero here.}
+    \item{value}{The eigenvalue belonging to the leading eigenvector
+      the algorithm just found.}
+    \item{vector}{The leading eigenvector the algorithm just found.}
+    \item{multiplier}{An R function that can be used to multiple the
+      actual modularity matrix with an arbitrary vector. Supply the
+      vector as an argument to perform this multiplication. This
+      function can be used with ARPACK.}
+    \item{extra}{The \code{extra} argument that was passed to
+      \code{leading.eigenvector.community}. }
+  }
 }
 \value{
   \code{leading.eigenvector.community} returns a named list with

@@ -1143,6 +1143,15 @@ void igraph_i_levc_free(igraph_vector_ptr_t *ptr) {
  *      does not result in a bigger modularity value. The id of the
  *      community is given in the next element of the vector.
  *    \endclist
+ * \param callback A null pointer or a function of type \ref
+ *    igraph_community_leading_eigenvector_callback_t. If given, this
+ *    callback function is called after each eigenvector/eigenvalue
+ *    calculation. If the callback returns a non-zero value, then the
+ *    community finding algorithm stops. See the arguments passed to
+ *    the callback at the documentation of \ref
+ *    igraph_community_leading_eigenvector_callback_t. 
+ * \param callback_extra Extra argument to pass to the callback
+ *    function.
  * \return Error code.
  * 
  * \sa \ref igraph_community_walktrap() and \ref
