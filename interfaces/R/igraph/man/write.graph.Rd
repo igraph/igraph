@@ -6,7 +6,7 @@
   implemented right now.}
 \usage{
 write.graph(graph, file, format=c("edgelist", "pajek", "ncol",
-       "lgl", "graphml", "dimacs", "gml", "dot"), \dots)
+       "lgl", "graphml", "dimacs", "gml", "dot", "leda"), \dots)
 }
 \arguments{
   \item{graph}{The graph to export.}
