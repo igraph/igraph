@@ -84,7 +84,7 @@ void igraph_blas_dgemv(igraph_bool_t transpose, igraph_real_t alpha,
  *
  * Time complexity: O(nk) if the matrix is of size n x k
  *
- * \sa \ref igraph_blas_dgemv_array if you have vectors instead of
+ * \sa \ref igraph_blas_dgemv if you have vectors instead of
  *     arrays.
  */
 void igraph_blas_dgemv_array(igraph_bool_t transpose, igraph_real_t alpha,

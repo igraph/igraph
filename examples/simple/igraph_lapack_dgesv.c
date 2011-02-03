@@ -128,7 +128,10 @@ int main() {
 
   igraph_set_warning_handler(igraph_print_warning);
   igraph_lapack_dgesv(&A, /*ipiv=*/ 0, &RHS, &info);
-  if (info != 10) { return 7; }
+  if (info != 10) {
+    printf("LAPACK returned info = %d, should have been 10", info);
+    return 7;
+  }
   
   igraph_matrix_destroy(&A);
   igraph_matrix_destroy(&B);

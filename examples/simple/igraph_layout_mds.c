@@ -43,7 +43,6 @@ int main() {
   igraph_real_t vc;
   igraph_arpack_options_t options;
   int i, j;
-
   srand(time(0));
 
   igraph_arpack_options_init(&options);
@@ -51,6 +50,14 @@ int main() {
   igraph_tree(&g, 10, 2, IGRAPH_TREE_UNDIRECTED);
   igraph_matrix_init(&coords, 0, 0);
   igraph_layout_mds(&g, &coords, 0, 2, &options);
+  if (MATRIX(coords, 0, 0) > 0) {
+    for (i = 0; i < igraph_matrix_nrow(&coords); i++)
+      MATRIX(coords, i, 0) *= -1;
+  }
+  if (MATRIX(coords, 0, 1) < 0) {
+    for (i = 0; i < igraph_matrix_nrow(&coords); i++)
+      MATRIX(coords, i, 1) *= -1;
+  }
   igraph_matrix_print(&coords);
   igraph_matrix_destroy(&coords);
   igraph_destroy(&g);
