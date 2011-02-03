@@ -4,6 +4,12 @@
 #
 # Usage: ./mkdoc.sh [--sync] [directory]
 
+EPYDOC=`which epydoc`
+if [ x$EPYDOC = x ]; then
+  echo "epydoc not found, exiting..."
+  exit 1
+fi
+
 PACKAGES="igraph igraph.statistics igraph.app igraph.app.shell"
 
 PWD=`pwd`
