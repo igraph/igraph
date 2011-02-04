@@ -27,6 +27,67 @@
 
 #define DIM 10
 
+int real_cplx_mult(const igraph_matrix_t *A,
+		   const igraph_vector_t *v_real,
+		   const igraph_vector_t *v_imag, 
+		   igraph_vector_t *res_real,
+		   igraph_vector_t *res_imag) {
+
+  int n=igraph_vector_size(v_real);
+  int r, c;
+
+  if (igraph_matrix_nrow(A) != n || 
+      igraph_matrix_ncol(A) != n || 
+      igraph_vector_size(v_imag) != n) {
+    printf("Wrong matrix or vector size");
+    return 1;
+  }
+
+  igraph_vector_resize(res_real, n);
+  igraph_vector_resize(res_imag, n);
+
+  for (r=0; r<n; r++) {
+    igraph_real_t s_real=0.0;
+    igraph_real_t s_imag=0.0;
+    for (c=0; c<n; c++) {
+      s_real += MATRIX(*A, r, c) * VECTOR(*v_real)[c];
+      s_imag += MATRIX(*A, r, c) * VECTOR(*v_imag)[c];
+    }
+    VECTOR(*res_real)[r]=s_real;
+    VECTOR(*res_imag)[r]=s_imag;
+  }
+  
+  return 0;
+}
+
+int sc_cplx_cplx_mult(igraph_real_t lambda_real,
+		      igraph_real_t lambda_imag,
+		      const igraph_vector_t *v_real,
+		      const igraph_vector_t *v_imag,
+		      igraph_vector_t *res_real,
+		      igraph_vector_t *res_imag) {
+  
+  int r;
+  int n=igraph_vector_size(v_real);
+  
+  if (igraph_vector_size(v_imag) != n) {
+    printf("Wrong vector sizes");
+    return 1;
+  }
+  
+  igraph_vector_resize(res_real, n);
+  igraph_vector_resize(res_imag, n);
+
+  for (r=0; r<n; r++) {
+    VECTOR(*res_real)[r] = (lambda_real * VECTOR(*v_real)[r] -
+			    lambda_imag * VECTOR(*v_imag)[r]);
+    VECTOR(*res_imag)[r] = (lambda_imag * VECTOR(*v_real)[r] + 
+			    lambda_real * VECTOR(*v_imag)[r]);
+  }
+
+  return 0;
+}
+
 igraph_bool_t check_ev(const igraph_matrix_t *A, 
 		       const igraph_vector_t *values_real,
 		       const igraph_vector_t *values_imag,
@@ -35,7 +96,10 @@ igraph_bool_t check_ev(const igraph_matrix_t *A,
 		       igraph_real_t tol) {
 
   int n=igraph_matrix_nrow(A);
-  int i, j;
+  igraph_vector_t v_real, v_imag;
+  igraph_vector_t AV_real, AV_imag, lv_real, lv_imag;
+  igraph_vector_t null;
+  int i;
   
   if (igraph_matrix_ncol(A)             != n) { return 1; }
   if (igraph_vector_size(values_real)   != n) { return 1; }
@@ -45,8 +109,42 @@ igraph_bool_t check_ev(const igraph_matrix_t *A,
   if (igraph_matrix_nrow(vectors_right) != n) { return 1; }
   if (igraph_matrix_ncol(vectors_right) != n) { return 1; }
 
-  /* TODO, right now we just compare to the output that I 
-     checked in R */
+  igraph_vector_init(&AV_real, n);
+  igraph_vector_init(&AV_imag, n);
+  igraph_vector_init(&lv_real, n);
+  igraph_vector_init(&lv_imag, n);
+  igraph_vector_init(&null, n);
+  igraph_vector_null(&null);
+
+  for (i=0; i<n; i++) {
+    if (VECTOR(*values_imag)[i]==0.0) {
+      igraph_vector_view(&v_real, &MATRIX(*vectors_right, 0, i), n);
+      igraph_vector_view(&v_imag, VECTOR(null), n);
+    } else if (VECTOR(*values_imag)[i] > 0.0) {
+      igraph_vector_view(&v_real, &MATRIX(*vectors_right, 0, i), n);
+      igraph_vector_view(&v_imag, &MATRIX(*vectors_right, 0, i+1), n);
+    } else if (VECTOR(*values_imag)[i] < 0.0) {
+      igraph_vector_view(&v_real, &MATRIX(*vectors_right, 0, i-1), n);
+      igraph_vector_view(&v_imag, &MATRIX(*vectors_right, 0, i), n);
+      igraph_vector_scale(&v_imag, -1.0);
+    }
+    real_cplx_mult(A, &v_real, &v_imag, &AV_real, &AV_imag);
+    sc_cplx_cplx_mult(VECTOR(*values_real)[i], VECTOR(*values_imag)[i],
+		      &v_real, &v_imag, &lv_real, &lv_imag);
+    
+    if (igraph_vector_maxdifference(&AV_real, &lv_real) > tol ||
+	igraph_vector_maxdifference(&AV_imag, &lv_imag) > tol) {
+      igraph_vector_print(&AV_real); igraph_vector_print(&AV_imag);
+      igraph_vector_print(&lv_real); igraph_vector_print(&lv_imag);      
+      return 1;
+    }
+  }
+
+  igraph_vector_destroy(&null);
+  igraph_vector_destroy(&AV_imag);
+  igraph_vector_destroy(&AV_real);
+  igraph_vector_destroy(&lv_imag);
+  igraph_vector_destroy(&lv_real);
   
   return 0;
 }
@@ -86,11 +184,11 @@ int main() {
     return 1;
   }
   
-  igraph_matrix_print(&A);
-  igraph_vector_print(&values_real);
-  igraph_vector_print(&values_imag);
-  igraph_matrix_print(&vectors_left);
-  igraph_matrix_print(&vectors_right);
+  /* igraph_matrix_print(&A); */
+  /* igraph_vector_print(&values_real); */
+  /* igraph_vector_print(&values_imag); */
+  /* igraph_matrix_print(&vectors_left); */
+  /* igraph_matrix_print(&vectors_right); */
   
   igraph_vector_destroy(&values_imag);
   igraph_vector_destroy(&values_real);
