@@ -219,7 +219,7 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
   }  /* for */
 
   /* OK, we've the 'out' values for the nodes, let's use them in
-     descreasing order with the help of a heap */
+     decreasing order with the help of a heap */
 
   igraph_vector_null(&next_nei);                            /* mark already
 							added vertices */
@@ -274,7 +274,7 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res);
  * \function igraph_is_connected
  * \brief Decides whether the graph is (weakly or strongly) connected.
  * 
- * A graph with zero vertices is connected by definition.
+ * A graph with zero vertices (i.e. the null graph) is connected by definition.
  *
  * \param graph The graph object to analyze.
  * \param res Pointer to a logical variable, the result will be stored
@@ -283,7 +283,7 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res);
  *        weak or strong connectedness. Possible values: 
  *        \c IGRAPH_WEAK,
  *        \c IGRAPH_STRONG. This argument is 
- *        igrored for undirected graphs.
+ *        ignored for undirected graphs.
  * \return Error code:
  *        \c IGRAPH_EINVAL: invalid mode argument.
  *
@@ -291,7 +291,6 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res);
  * number of vertices 
  * plus the number of edges in the graph.
  */
-
 
 int igraph_is_connected(const igraph_t *graph, igraph_bool_t *res, 
 			igraph_connectedness_t mode) {
@@ -314,6 +313,25 @@ int igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
   return 0;
 }
 
+/**
+ * \ingroup structural
+ * \function igraph_is_connected_weak
+ * \brief Query whether the graph is weakly connected.
+ *
+ * A graph with zero vertices (i.e. the null graph) is weakly connected by
+ * definition. A directed graph is weakly connected if its undirected version
+ * is connected. In the case of undirected graphs, weakly connected and
+ * connected are equivalent.
+ *
+ * \param graph The graph object to analyze.
+ * \param res Pointer to a logical variable; the result will be stored here.
+ * \return Error code:
+ *        \c IGRAPH_ENOMEM: unable to allocate requested memory.
+ *
+ * Time complexity: O(|V|+|E|), the number of vertices plus the number of
+ * edges in the graph.
+ */
+
 int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -325,7 +343,7 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
 
   if (no_of_nodes == 0) {
     *res = 1;
-	return IGRAPH_SUCCESS;
+    return IGRAPH_SUCCESS;
   }
 
   already_added=igraph_Calloc(no_of_nodes, char);
@@ -368,7 +386,7 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
 
 /** 
  * \function igraph_decompose_destroy
- * \brief Free the memory allocated by \ref igraph_decompose()
+ * \brief Free the memory allocated by \ref igraph_decompose().
  * 
  * \param complist The list of graph components, as returned by 
  *        \ref igraph_decompose().
@@ -411,7 +429,7 @@ void igraph_decompose_destroy(igraph_vector_ptr_t *complist) {
  *    the number of components.
  * \param minelements The minimum number of vertices a component
  *    should contain in order to place it in the \p components
- *    vector. Eg. supply 2 here to ignore isolate vertices.
+ *    vector. Eg. supply 2 here to ignore isolated vertices.
  * \return Error code, \c IGRAPH_ENOMEM if there is not enough memory
  *   to perform the operation.
  *
@@ -556,7 +574,7 @@ void igraph_i_free_vectorlist(igraph_vector_ptr_t *list) {
  * one biconnected component. Note that this is not true for
  * vertices: the same vertex can be part of many biconnected
  * components.
- * \param graph The input graph
+ * \param graph The input graph.
  * \param no The number of biconnected components will be stored here.
  * \param tree_edges If not a NULL pointer, then the found components
  *     are stored here, in a list of vectors. Every vector in the list

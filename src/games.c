@@ -409,7 +409,7 @@ int igraph_i_barabasi_game_psumtree(igraph_t *graph,
  *        \cli IGRAPH_BARABASI_BAG
  *          This is the algorithm that was previously (before version
  *          0.6) solely implemented in igraph. It works by putting the
- *          ids of the vertices into a bag (mutliset, really), exactly
+ *          ids of the vertices into a bag (multiset, really), exactly
  *          as many times as their (in-)degree, plus once more. Then
  *          the required number of cited vertices are drawn from the
  *          bag, with replacement. This method might generate multiple
@@ -731,7 +731,7 @@ int igraph_erdos_renyi_game_gnm(igraph_t *graph, igraph_integer_t n, igraph_real
  *         \p type, \p n,
  *         \p p or \p m
  *          parameter.
- *         \c IGRAPH_ENOMEM: there is not enought
+ *         \c IGRAPH_ENOMEM: there is not enough
  *         memory for the operation.
  * 
  * Time complexity: O(|V|+|E|), the
@@ -833,7 +833,7 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
       long int from=RNG_INTEGER(0, bagp1-1);
       long int to=RNG_INTEGER(0, bagp2-1);
       igraph_vector_push_back(&edges, bag1[from]); /* safe, already reserved */
-      igraph_vector_push_back(&edges, bag2[to]);   /* detto */
+      igraph_vector_push_back(&edges, bag2[to]);   /* ditto */
       bag1[from]=bag1[bagp1-1];
       bag2[to]=bag2[bagp2-1];
       bagp1--; bagp2--;
@@ -846,7 +846,7 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
       bag1[from]=bag1[bagp1-1];
       bagp1--;
       to=RNG_INTEGER(0, bagp1-1);
-      igraph_vector_push_back(&edges, bag1[to]);   /* detto */
+      igraph_vector_push_back(&edges, bag1[to]);   /* ditto */
       bag1[to]=bag1[bagp1-1];
       bagp1--;
     }
@@ -1444,7 +1444,7 @@ int igraph_barabasi_aging_game(igraph_t *graph,
       VECTOR(edges)[edgeptr++] = i;
       VECTOR(edges)[edgeptr++] = to;
     }
-    /* update probabilites */
+    /* update probabilities */
     for (j=0; j<no_of_neighbors; j++) {
       long int n=VECTOR(edges)[edgeptr-2*j-1];
       long int age=(i-n)/binwidth;
@@ -1618,7 +1618,7 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
     }
     igraph_dqueue_push(&history, -1);
     
-    /* update probabilites */
+    /* update probabilities */
     for (j=0; j<no_of_neighbors; j++) {
       long int n=VECTOR(edges)[edgeptr-2*j-1];
       long int age=(i-n)/binwidth;
@@ -2406,7 +2406,7 @@ int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
  * evolving graph. In each time step a single vertex is added to the 
  * network and it cites a number of other vertices (as specified by 
  * the \p edges_per_step argument). The cited vertices are selected
- * based on the last time they were cited. Time is mesaured by the 
+ * based on the last time they were cited. Time is measured by the 
  * addition of vertices and it is binned into \p pagebins bins. 
  * So if the current time step is \c t and the last citation to a 
  * given \c i vertex was made in time step \c t0, then \c
