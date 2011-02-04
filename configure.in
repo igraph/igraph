@@ -199,7 +199,7 @@ if test "$internal_f2c" = "no"; then
         AC_CHECK_LIB([f2c], [F77_ALLOC_], [],
            AC_CHECK_LIB([f2c], [F77_ALLOC], [],
 	      [AC_MSG_RESULT(not found, trying to use -lf2c anyway.)]))))
-  LDFLAGS="${LDFLAGS} -lf2c"
+  LDFLAGS="${LDFLAGS}"
 else
   AC_DEFINE([INTERNAL_F2C], [1], [Define to 1 if you use the internal F2C library])
 fi
