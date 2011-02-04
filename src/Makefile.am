@@ -160,8 +160,7 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_flow.h	../include/igraph_topology.h  \
 		../include/igraph_foreign.h	../include/igraph_transitivity.h \
 		../include/igraph_games.h	../include/igraph_visitor.h   \
-		../include/igraph_interface.h	../include/igraph_adjlist.h   \
-		../include/igraph_progress.h	../include/igraph_constants.h \
+		../include/igraph_interface.h	../include/igraph_constants.h \
 		../include/igraph_vector_pmt.h	../include/igraph_matrix_pmt.h\
 		../include/igraph_array_pmt.h	../include/igraph_dqueue_pmt.h\
 		../include/igraph_stack_pmt.h	../include/igraph_heap_pmt.h  \
@@ -170,7 +169,6 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_sparsemat.h   ../include/igraph_mixing.h    \
 		../include/igraph_version.h     ../include/igraph_blas.h      \
 		../include/igraph_separators.h  ../include/igraph_cohesive_blocks.h \
-		../include/igraph_statusbar.h
 		../include/igraph_lapack.h	../include/igraph_complex.h   \
 		../include/igraph_eigen.h	../include/igraph_statusbar.h
 
