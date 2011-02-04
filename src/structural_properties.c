@@ -2324,6 +2324,42 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
   igraph_vector_t mergeinto;
   long int actedge;
 
+  if (!multiple && !loops)
+    /* nothing to do */
+    return IGRAPH_SUCCESS;
+
+  if (!multiple) {
+    /* removing loop edges only, this is simple. No need to combine anything
+     * and the whole process can be done in-place */
+    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
+    IGRAPH_FINALLY(igraph_es_destroy, &es);
+    IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
+    IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+
+    while (!IGRAPH_EIT_END(eit)) {
+      edge=IGRAPH_EIT_GET(eit);
+      from=IGRAPH_FROM(graph, edge);
+      to=IGRAPH_TO(graph, edge);
+      if (from == to)
+        IGRAPH_CHECK(igraph_vector_push_back(&edges, edge));
+      IGRAPH_EIT_NEXT(eit);
+    }
+
+    igraph_eit_destroy(&eit);
+    igraph_es_destroy(&es);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    if (igraph_vector_size(&edges) > 0) {
+      IGRAPH_CHECK(igraph_delete_edges(graph, igraph_ess_vector(&edges)));
+    }
+
+    igraph_vector_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+  }
+
   if (attr) {    
     IGRAPH_VECTOR_INIT_FINALLY(&mergeinto, no_of_edges);
   }
