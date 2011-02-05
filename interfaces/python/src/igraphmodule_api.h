@@ -60,7 +60,7 @@ extern "C" {
     PyObject *c_api_object;
     PyObject *module;
 
-    module = PyImport_ImportModule("igraph.core");
+    module = PyImport_ImportModule("igraph._igraph");
     if (module == 0)
       return -1;
 
