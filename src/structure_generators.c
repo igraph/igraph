@@ -783,6 +783,8 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector, igraph_int
  * number of vertices in the graph.
  *
  * \sa \ref igraph_lattice() for generating more general lattices.
+ * 
+ * \example examples/simple/igraph_ring.c
  */
 
 int igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_bool_t mutual,

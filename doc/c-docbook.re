@@ -639,3 +639,14 @@ WITH --------------------------------------------------------------------------
 
 </blockquote>
 
+REPLACE ----- example file  ---------------------------------------------------
+
+\\example\b\s*
+(?P<filename>[^\n]*?)\n
+
+WITH --------------------------------------------------------------------------
+
+<example><title>Example file \g<filename></title>
+  <programlisting><xi:include  href="../\g<filename>"  parse="text"  
+      xmlns:xi="http://www.w3.org/2001/XInclude"/></programlisting>
+</example>
