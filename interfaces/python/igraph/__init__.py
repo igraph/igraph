@@ -1458,8 +1458,6 @@ class Graph(GraphBase):
             if fp is not None:
                 result = pickle.load(fp)
                 fp.close()
-        if not isinstance(result, klass):
-            raise TypeError("unpickled object is not a %s" % klass.__name__)
         return result
 
     @classmethod
@@ -1479,8 +1477,6 @@ class Graph(GraphBase):
                 result = pickle.load(gzip.GzipFile(mode="rb", fileobj=fname))
         else:
             result = pickle.load(gzip.open(fname, "rb"))
-        if not isinstance(result, klass):
-            raise TypeError("unpickled object is not a %s" % klass.__name__)
         return result
 
     # pylint: disable-msg=C0301,C0323
