@@ -951,7 +951,7 @@ class Graph(GraphBase):
     def community_spinglass(self, *args, **kwds):
         """community_spinglass(weights=None, spins=25, parupdate=False,
         start_temp=1, stop_temp=0.01, cool_fact=0.99, update_rule="config",
-        gamma=1)
+        gamma=1, implementation="orig", lambda=1)
 
         Finds the community structure of the graph according to the
         spinglass community detection method of Reichardt & Bornholdt.
