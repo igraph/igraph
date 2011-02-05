@@ -951,7 +951,7 @@ class Graph(GraphBase):
     def community_spinglass(self, *args, **kwds):
         """community_spinglass(weights=None, spins=25, parupdate=False,
         start_temp=1, stop_temp=0.01, cool_fact=0.99, update_rule="config",
-        gamma=1, implementation="orig", lambda=1)
+        gamma=1, implementation="orig", lambda_=1)
 
         Finds the community structure of the graph according to the
         spinglass community detection method of Reichardt & Bornholdt.
@@ -980,13 +980,15 @@ class Graph(GraphBase):
           original implementation is the default. The other implementation
           is able to take into account negative weights, this can be
           chosen by setting C{implementation} to C{"neg"}
-        @keyword lambda: the lambda argument of the algorithm, which
+        @keyword lambda_: the lambda argument of the algorithm, which
           specifies the balance between the importance of present and missing
           negatively weighted edges within a community. Smaller values of
           lambda lead to communities with less negative intra-connectivity.
           If the argument is zero, the algorithm reduces to a graph coloring
           algorithm, using the number of spins as colors. This argument is
-          ignored if the original implementation is used.
+          ignored if the original implementation is used. Note the underscore
+          at the end of the argument name; this is due to the fact that
+          lambda is a reserved keyword in Python.
         @return: an appropriate L{VertexClustering} object.
 
         @newfield ref: Reference
