@@ -71,7 +71,7 @@ extern "C" {
     }
 
     if (PyCObject_Check(c_api_object))
-      PyIGraph_API = (void**)PyIGraph_AsVoidPtr(c_api_object);
+      PyIGraph_API = (void**)PyCObject_AsVoidPtr(c_api_object);
 
     Py_DECREF(c_api_object);
     Py_DECREF(module);
