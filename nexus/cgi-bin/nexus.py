@@ -632,7 +632,8 @@ def support_gzip():
         return False
     else:
         enc=web.ctx.environ['HTTP_ACCEPT_ENCODING']
-        return 'gzip' in [ e.strip() for e in enc.split(",")]
+        encodings = [ e.strip() for e in enc.split(",") ]
+        return 'gzip' in encodings or 'x-gzip' in encodings
 
 class Dataset:
     
@@ -679,6 +680,7 @@ class Dataset:
                 data=f.read()
                 f.close()
                 web.header('Content-Encoding', 'gzip')
+                web.header('Content-Length', len(data))
                 return data
             else:
                 tmp=tempfile.NamedTemporaryFile(delete=False)
@@ -690,6 +692,7 @@ class Dataset:
                 data=f.read()
                 f.close()
                 os.unlink(tmpname)
+                web.header('Content-Length', len(data))
                 return data
         except Exception, x:
 #            print str(x)
