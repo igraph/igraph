@@ -29,7 +29,7 @@ class NexusConnection(object):
           igraph's configuration file or uses the default URL if no URL
           is specified in the configuration file.
         """
-        self.url = Configuration.instance()["remote.nexus.url"]
+        self.url = nexus_url
         self._opener = urllib2.build_opener()
 
     def get(self, id):
@@ -113,7 +113,11 @@ class NexusConnection(object):
         """Sends a request to Nexus at the given path with the given parameters
         and returns a file-like object for the response. `compressed` denotes
         whether we accept compressed responses."""
-        url = "%s%s?%s" % (self.url, path, urlencode(params))
+        if self.url is None:
+            url = Configuration.instance()["remote.nexus.url"]
+        else:
+            url = self.url
+        url = "%s%s?%s" % (url, path, urlencode(params))
         request = urllib2.Request(url)
         if compressed:
             request.add_header("Accept-Encoding", "gzip")
@@ -172,11 +176,14 @@ class NexusConnection(object):
     def url(self, value):
         """Sets the root URL of the Nexus repository the connection is
         communicating with."""
-        value = str(value)
-        parts = urlparse(value, "http", False)
-        self._url = urlunparse(parts)
-        if self._url and self._url[-1] == "/":
-            self._url = self._url[:-1]
+        if value is None:
+            self._url = None
+        else:
+            value = str(value)
+            parts = urlparse(value, "http", False)
+            self._url = urlunparse(parts)
+            if self._url and self._url[-1] == "/":
+                self._url = self._url[:-1]
 
 
 class NexusDatasetInfo(object):
