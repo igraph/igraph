@@ -5,14 +5,17 @@ repository at U{http://nexus.igraph.org}."""
 
 __all__ = ["Nexus"]
 
+from cStringIO import StringIO
+from gzip import GzipFile
 from textwrap import TextWrapper
 from urllib import urlencode
-from urllib2 import urlopen
 from urlparse import urlparse, urlunparse
 
 from igraph.compat import property
 from igraph.configuration import Configuration
 from igraph.utils import multidict
+
+import urllib2
 
 class NexusConnection(object):
     """Connection to a remote Nexus server."""
@@ -27,6 +30,7 @@ class NexusConnection(object):
           is specified in the configuration file.
         """
         self.url = Configuration.instance()["remote.nexus.url"]
+        self._opener = urllib2.build_opener()
 
     def get(self, id):
         """Retrieves the dataset with the given ID from Nexus.
@@ -37,7 +41,8 @@ class NexusConnection(object):
         from igraph import load
 
         params = dict(format="Python-igraph", id=id)
-        response = self._get_response("/api/dataset", params)
+        response = self._get_response("/api/dataset", params, compressed=True)
+        response = self._ensure_uncompressed(response)
         return load(response, format="pickle")
 
     def info(self, id):
@@ -95,11 +100,24 @@ class NexusConnection(object):
         params = dict(q=query, order=order, format="text")
         return NexusDatasetInfoList(self, "/api/search", params)
 
-    def _get_response(self, path, params={}):
+    @staticmethod
+    def _ensure_uncompressed(response):
+        """Expects an HTTP response object, checks its Content-Encoding header,
+        decompresses the data and returns an in-memory buffer holding the
+        uncompressed data."""
+        if response.headers.get("Content-Encoding") == "gzip":
+            return GzipFile(fileobj=StringIO(response.read()))
+        return response
+
+    def _get_response(self, path, params={}, compressed=False):
         """Sends a request to Nexus at the given path with the given parameters
-        and returns a file-like object for the response."""
+        and returns a file-like object for the response. `compressed` denotes
+        whether we accept compressed responses."""
         url = "%s%s?%s" % (self.url, path, urlencode(params))
-        return urlopen(url)
+        request = urllib2.Request(url)
+        if compressed:
+            request.add_header("Accept-Encoding", "gzip")
+        return self._opener.open(request)
 
     @staticmethod
     def _parse_text_response(response):
