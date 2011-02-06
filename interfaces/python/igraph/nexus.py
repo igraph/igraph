@@ -41,10 +41,10 @@ class NexusConnection(object):
         return load(response, format="pickle")
 
     def info(self, id):
-        """Retrieves informations about the dataset with the given ID
-        from Nexus.
+        """Retrieves informations about the dataset with the given numeric
+        or string ID from Nexus.
 
-        @param id: the ID of the dataset to retrieve.
+        @param id: the numeric or string ID of the dataset to retrieve.
         @return: an instance of L{NexusDatasetInfo}.
         """
         params = dict(format="text", id=id)
@@ -164,10 +164,11 @@ class NexusConnection(object):
 class NexusDatasetInfo(object):
     """Information about a dataset in the Nexus repository."""
 
-    def __init__(self, id=None, name=None, vertices=None, edges=None,
-            tags=None, attributes=None, rest=None):
+    def __init__(self, id=None, sid=None, name=None, vertices=None,
+            edges=None, tags=None, attributes=None, rest=None):
         self._conn = None
         self.id = id
+        self.sid = sid
         self.name = name
         self.vertices = vertices
         self.edges = edges
@@ -179,7 +180,7 @@ class NexusDatasetInfo(object):
             self.rest = None
 
     def __repr__(self):
-        params = "(id=%(id)r, name=%(name)r, vertices=%(vertices)r, "\
+        params = "(id=%(id)r, sid=%(sid)r, name=%(name)r, vertices=%(vertices)r, "\
                  "edges=%(edges)r, tags=%(tags)r, attributes=%(attributes)r, "\
                  "rest=%(rest)r)" % self.__dict__
         return "%s%s" % (self.__class__.__name__, params)
@@ -217,6 +218,7 @@ class NexusDatasetInfo(object):
         key-value pairs, similar to the ones provided by the Nexus API in
         plain text response."""
         self.id = params.get("Id", None)
+        self.sid = params.get("Sid", None)
         self.name = params.get("Name", None)
         self.vertices = params.get("Vertices", None)
         self.edges = params.get("Edges", None)
@@ -309,6 +311,8 @@ class NexusDatasetInfoList(object):
                     offset += 1
                 current_dataset = NexusDatasetInfo(id=int(value))
                 current_dataset._conn = self._conn
+            elif key == "Sid":
+                current_dataset.sid = value
             elif key == "Name":
                 current_dataset.name = value
             elif key == "Vertices":
