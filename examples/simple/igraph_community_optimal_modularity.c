@@ -55,15 +55,23 @@ int main() {
 
   igraph_set_error_handler(&igraph_error_handler_printignore);
 
+  /* Zachary karate club */
   retval = igraph_community_optimal_modularity(&graph, &modularity,
     &membership, /*verbose=*/ 0);
   if (retval == IGRAPH_UNIMPLEMENTED) { return 77; }
-
   if (fabs(modularity - 0.4197896) > 0.0000001) { return 2; }
-  
-  igraph_vector_destroy(&membership);
   igraph_destroy(&graph);
-  
+
+  /* simple graph with loop edges */
+  igraph_small(&graph, 6, IGRAPH_UNDIRECTED,
+          0,1,1,2,2,3,3,4,4,5,5,0,0,0,2,2,-1);
+  igraph_community_optimal_modularity(&graph, &modularity,
+    &membership, /*verbose=*/ 0);
+  if (fabs(modularity - 0.28125) > 0.0000001) { return 3; }
+  igraph_destroy(&graph);
+
+  igraph_vector_destroy(&membership);
+
   return 0;
 }
 

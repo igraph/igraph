@@ -88,6 +88,10 @@ class BasicTests(unittest.TestCase):
 
     def testMultiplesLoops(self):
         g=Graph.Tree(7, 2)
+
+        # has_multiple
+        self.failIf(g.has_multiple())
+
         g.add_vertices(1)
         g.add_edges([(0,1), (7,7), (6,6), (6,6), (6,6)])
         
@@ -100,6 +104,9 @@ class BasicTests(unittest.TestCase):
         # is_multiple
         self.failUnless(g.is_multiple() == [False, False, False, False, \
             False, False, True, False, False, True, True])
+
+        # has_multiple
+        self.failUnless(g.has_multiple())
 
         # count_multiple
         self.failUnless(g.count_multiple() == [2, 1, 1, 1, 1, 1, 2, 1, 3, 3, 3])

@@ -4393,8 +4393,9 @@ int igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
  * \return Error code.
  * 
  * \sa \ref igraph_is_loop() and \ref igraph_is_multiple() to
- * find the loops and multiple edges and \ref igraph_simplify() to
- * get rid of them.
+ * find the loops and multiple edges, \ref igraph_simplify() to
+ * get rid of them, or \ref igraph_has_multiple() to decide whether
+ * there is at least one multiple edge.
  * 
  * Time complexity: O(|V|+|E|). 
  */
@@ -4408,16 +4409,18 @@ int igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
   } else {
     igraph_vector_t neis;
     long int i, j, n;
-    igraph_bool_t found=0;
+    igraph_bool_t found = 0;
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);    
-    for (i=0; !found && i<vc; i++) {
+    for (i=0; i < vc; i++) {
       igraph_neighbors(graph, &neis, i, IGRAPH_OUT);
       n=igraph_vector_size(&neis);
-      for (j=0; j<n; j++) {
-	if (VECTOR(neis)[j]==i) { found=1; break; }
-	if (j>0 && VECTOR(neis)[j-1]==VECTOR(neis)[j]) {
-	  found=1; break;
-	}
+      for (j=0; j < n; j++) {
+        if (VECTOR(neis)[j]==i) {
+          found=1; break;
+        }
+        if (j>0 && VECTOR(neis)[j-1]==VECTOR(neis)[j]) {
+          found=1; break;
+        }
       }
     }
     *res=!found;
@@ -4465,6 +4468,58 @@ int igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
 }
 
 /**
+ * \function igraph_has_multiple
+ * \brief Check whether the graph has at least one multiple edge.
+ * 
+ * </para><para>
+ * An edge is a multiple edge if there is another 
+ * edge with the same head and tail vertices in the graph.
+ * 
+ * \param graph The input graph.
+ * \param res Pointer to a boolean variable, the result will be stored here.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_count_multiple(), \ref igraph_is_multiple() and \ref igraph_simplify().
+ * 
+ * Time complexity: O(e*d), e is the number of edges to check and d is the 
+ * average degree (out-degree in directed graphs) of the vertices at the 
+ * tail of the edges.
+ */
+
+int igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
+  long int vc=igraph_vcount(graph);
+  long int ec=igraph_ecount(graph);
+  igraph_bool_t directed=igraph_is_directed(graph);
+
+  if (vc==0 || ec==0) {
+    *res=0;
+  } else {
+    igraph_vector_t neis;
+    long int i, j, n;
+    igraph_bool_t found=0;
+    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);    
+    for (i=0; i < vc; i++) {
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
+      n = igraph_vector_size(&neis);
+      for (j=1; j < n; j++) {
+	      if (VECTOR(neis)[j-1] == VECTOR(neis)[j]) {
+          /* If the graph is undirected, loop edges appear twice in the neighbor
+           * list, so check the next item as well */
+          if (directed || (j < n-1 && VECTOR(neis)[j] == VECTOR(neis)[j+1])) {
+            found=1; break;
+          }
+        }
+      }
+    }
+    *res=found;
+    igraph_vector_destroy(&neis);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  return 0;
+}
+
+/**
  * \function igraph_is_multiple
  * \brief Find the multiple edges in a graph.
  * 
@@ -4482,7 +4537,7 @@ int igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
  *        to check all edges.
  * \return Error code.
  * 
- * \sa \ref igraph_count_multiple() and \ref igraph_simplify().
+ * \sa \ref igraph_count_multiple(), \ref igraph_has_multiply() and \ref igraph_simplify().
  * 
  * Time complexity: O(e*d), e is the number of edges to check and d is the 
  * average degree (out-degree in directed graphs) of the vertices at the 

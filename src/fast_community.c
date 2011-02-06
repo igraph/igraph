@@ -478,9 +478,9 @@ int igraph_i_fastgreedy_commpair_cmp(const void* p1, const void* p2) {
  * structure in mega-scale social networks,
  * http://www.arxiv.org/abs/cs.CY/0702048v1 have also been implemented.
  *
- * \param graph The input graph. It must be a simple graph, i.e. a graph 
- *    without multiple and without loop edges. This is checked and an
- *    error message is given for non-simple graphs.
+ * \param graph The input graph. It must be a graph without multiple edges.
+ *    This is checked and an error message is given for graphs with multiple
+ *    edges.
  * \param weights Potentially a numeric vector containing edge
  *    weights. Supply a null pointer here for unweighted graphs. The
  *    weights are expected to be non-negative.
@@ -523,8 +523,8 @@ int igraph_community_fastgreedy(const igraph_t *graph,
   igraph_i_fastgreedy_commpair *pairs, *p1, *p2;
   igraph_i_fastgreedy_community_list communities;
   igraph_vector_t a;
-  igraph_real_t q, maxq, *dq, weight_sum;
-  igraph_bool_t simple;
+  igraph_real_t q, maxq, *dq, weight_sum, loop_weight_sum;
+  igraph_bool_t has_multiple;
 
   /*long int join_order[] = { 16,5, 5,6, 6,0, 4,0, 10,0, 26,29, 29,33, 23,33, 27,33, 25,24, 24,31, 12,3, 21,1, 30,8, 8,32, 9,2, 17,1, 11,0, 7,3, 3,2, 13,2, 1,2, 28,31, 31,33, 22,32, 18,32, 20,32, 32,33, 15,33, 14,33, 0,19, 19,2, -1,-1 };*/
   /*long int join_order[] = { 43,42, 42,41, 44,41, 41,36, 35,36, 37,36, 36,29, 38,29, 34,29, 39,29, 33,29, 40,29, 32,29, 14,29, 30,29, 31,29, 6,18, 18,4, 23,4, 21,4, 19,4, 27,4, 20,4, 22,4, 26,4, 25,4, 24,4, 17,4, 0,13, 13,2, 1,2, 11,2, 8,2, 5,2, 3,2, 10,2, 9,2, 7,2, 2,28, 28,15, 12,15, 29,16, 4,15, -1,-1 };*/
@@ -535,7 +535,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
   if (igraph_is_directed(graph)) {
 	IGRAPH_ERROR("fast greedy community detection works for undirected graphs only", IGRAPH_UNIMPLEMENTED);
   }
-  
+
   total_joins=no_of_nodes-1;
 
   if (weights != 0) {
@@ -546,9 +546,9 @@ int igraph_community_fastgreedy(const igraph_t *graph,
     weight_sum = igraph_vector_sum(weights);
   } else weight_sum = no_of_edges;
 
-  IGRAPH_CHECK(igraph_is_simple(graph, &simple));
-  if (!simple) {
-    IGRAPH_ERROR("fast-greedy community finding works only on simple graphs", IGRAPH_EINVAL);
+  IGRAPH_CHECK(igraph_has_multiple(graph, &has_multiple));
+  if (has_multiple) {
+    IGRAPH_ERROR("fast-greedy community finding works only on graphs without multiple edges", IGRAPH_EINVAL);
   }
 
   if (merges != 0) {
@@ -569,7 +569,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
     }
   } else {
     debug("Calculating degrees\n");
-    IGRAPH_CHECK(igraph_degree(graph, &a, igraph_vss_all(), IGRAPH_ALL, 0));
+    IGRAPH_CHECK(igraph_degree(graph, &a, igraph_vss_all(), IGRAPH_ALL, 1));
   }
 
   /* Create list of communities */
@@ -613,16 +613,17 @@ int igraph_community_fastgreedy(const igraph_t *graph,
 	IGRAPH_ERROR("can't run fast greedy community detection", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, pairs);
-  i=j=0;
-  while (!IGRAPH_EIT_END(edgeit)) {
+  loop_weight_sum = 0;
+  for (i=0, j=0; !IGRAPH_EIT_END(edgeit); i+=2, j++, IGRAPH_EIT_NEXT(edgeit)) {
     long int eidx = IGRAPH_EIT_GET(edgeit);
     igraph_edge(graph, eidx, &ffrom, &fto);
     
 	/* Create the pairs themselves */
 	from = (long int)ffrom; to = (long int)fto;
 	if (from == to) {
-	  IGRAPH_ERROR("loop edge detected, simplify the graph before starting community detection", IGRAPH_EINVAL);
-	}
+      loop_weight_sum += weights ? 2*VECTOR(*weights)[eidx] : 2;
+      continue;
+    }
 
 	if (from>to) {
 	  dummy=from; from=to; to=dummy;
@@ -648,10 +649,6 @@ int igraph_community_fastgreedy(const igraph_t *graph,
 	  communities.e[from].maxdq = &pairs[i];
 	if (communities.e[to].maxdq==0 || *communities.e[to].maxdq->dq < *pairs[i+1].dq)
 	  communities.e[to].maxdq = &pairs[i+1];
-
-    /* Iterate */
-	i+=2; j++;
-    IGRAPH_EIT_NEXT(edgeit);
   }
   igraph_eit_destroy(&edgeit);
   IGRAPH_FINALLY_CLEAN(1);
@@ -672,11 +669,17 @@ int igraph_community_fastgreedy(const igraph_t *graph,
   communities.no_of_communities = j;
 
   /* Calculate proper vector a (see paper) and initial modularity */
-  q=0;
-  igraph_vector_scale(&a, 1.0/(2.0 * (weights ? weight_sum : no_of_edges)));
-  for (i=0; i<no_of_nodes; i++)
-	q -= VECTOR(a)[i]*VECTOR(a)[i];
-  maxq=q;
+  q = 2.0 * (weights ? weight_sum : no_of_edges);
+  if (q == 0) {
+    /* All the weights are zero */
+    maxq = 0;
+  } else {
+    igraph_vector_scale(&a, 1.0 / q);
+    q = loop_weight_sum / q;
+    for (i=0; i<no_of_nodes; i++)
+	  q -= VECTOR(a)[i]*VECTOR(a)[i];
+    maxq = q;
+  }
 
   /* Initializing community heap */
   debug("Initializing community heap\n");
@@ -691,7 +694,8 @@ int igraph_community_fastgreedy(const igraph_t *graph,
 	IGRAPH_PROGRESS("fast greedy community detection", no_of_joins*100.0/total_joins, 0);
     
 	/* Store the modularity */
-	if (modularity) VECTOR(*modularity)[no_of_joins] = q;
+	if (modularity)
+      VECTOR(*modularity)[no_of_joins] = q;
     
 	/* Some debug info if needed */
 	/* igraph_i_fastgreedy_community_list_check_heap(&communities); */

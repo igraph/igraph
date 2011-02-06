@@ -349,14 +349,9 @@ PyObject *igraphmodule_Graph_is_dag(igraphmodule_GraphObject * self)
     return NULL;
   }
 
-  if (res) {
-    Py_INCREF(Py_True);
-    return Py_True;
-  }
-  else {
-    Py_INCREF(Py_False);
-    return Py_False;
-  }
+  if (res)
+    Py_RETURN_TRUE;
+  Py_RETURN_FALSE;
 }
 
 /** \ingroup python_interface_graph
@@ -366,14 +361,9 @@ PyObject *igraphmodule_Graph_is_dag(igraphmodule_GraphObject * self)
  */
 PyObject *igraphmodule_Graph_is_directed(igraphmodule_GraphObject * self)
 {
-  if (igraph_is_directed(&self->g)) {
-    Py_INCREF(Py_True);
-    return Py_True;
-  }
-  else {
-    Py_INCREF(Py_False);
-    return Py_False;
-  }
+  if (igraph_is_directed(&self->g))
+    Py_RETURN_TRUE;
+  Py_RETURN_FALSE;
 }
 
 /** \ingroup python_interface_graph
@@ -389,13 +379,9 @@ PyObject *igraphmodule_Graph_is_simple(igraphmodule_GraphObject *self) {
     return NULL;
   }
 
-  if (res) {
-    Py_INCREF(Py_True);
-    return Py_True;
-  } else {
-    Py_INCREF(Py_False);
-    return Py_False;
-  }
+  if (res)
+    Py_RETURN_TRUE;
+  Py_RETURN_FALSE;
 }
 
 /** \ingroup python_interface_graph
@@ -859,6 +845,24 @@ PyObject *igraphmodule_Graph_is_mutual(igraphmodule_GraphObject *self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Checks whether an \c igraph.Graph object has multiple edges.
+ * \return \c True if the graph has multiple edges, \c False otherwise.
+ * \sa igraph_has_multiple
+ */
+PyObject *igraphmodule_Graph_has_multiple(igraphmodule_GraphObject *self) {
+  igraph_bool_t res;
+
+  if (igraph_has_multiple(&self->g, &res)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (res)
+    Py_RETURN_TRUE;
+  Py_RETURN_FALSE;
+}
+
+/** \ingroup python_interface_graph
  * \brief Checks the multiplicity of the edges 
  * \return the edge multiplicities as a Python list
  * \sa igraph_count_multiple
@@ -1124,14 +1128,10 @@ PyObject *igraphmodule_Graph_is_connected(igraphmodule_GraphObject * self,
     igraphmodule_handle_igraph_error();
     return NULL;
   }
-  if (res) {
-    Py_INCREF(Py_True);
-    return Py_True;
-  }
-  else {
-    Py_INCREF(Py_False);
-    return Py_False;
-  }
+
+  if (res)
+    Py_RETURN_TRUE;
+  Py_RETURN_FALSE;
 }
 
 /** \ingroup python_interface_graph
@@ -9643,6 +9643,15 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param edges: edge indices which we want to check. If C{None}, all\n"
    "  edges are checked.\n"
    "@return: a list of booleans, one for every edge given\n"},
+
+  /* interface to igraph_has_multiple */
+  {"has_multiple", (PyCFunction) igraphmodule_Graph_has_multiple,
+   METH_NOARGS,
+   "has_multiple()\n\n"
+   "Checks whether the graph has multiple edges.\n\n"
+   "@return: C{True} if the graph has at least one multiple edge,\n"
+   "         C{False} otherwise.\n"
+   "@rtype: boolean"},
 
   /* interface to igraph_is_mutual */
   {"is_mutual", (PyCFunction) igraphmodule_Graph_is_mutual,

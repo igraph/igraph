@@ -534,6 +534,10 @@ igraph_is_multiple:
         DEPS: es ON graph
         IGNORE: RR, RC, RNamespace
 
+igraph_has_multiple:
+        PARAMS: GRAPH graph, OUT BOOLEANPTR res
+        NAME-R: has.multiple
+
 igraph_count_multiple:
         PARAMS: GRAPH graph, OUT VECTOR res, EDGESET es=ALL
         DEPS: es ON graph

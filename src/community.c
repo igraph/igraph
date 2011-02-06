@@ -769,6 +769,8 @@ int igraph_modularity(const igraph_t *graph,
     m=igraph_vector_sum(weights);
     for (i=0; i<no_of_edges; i++) {
       igraph_real_t w=VECTOR(*weights)[i];
+      if (w < 0)
+        IGRAPH_ERROR("negative weight in weight vector", IGRAPH_EINVAL);
       igraph_edge(graph, i, &from, &to);
       c1=VECTOR(*membership)[(long int)from];
       c2=VECTOR(*membership)[(long int)to];
@@ -789,10 +791,12 @@ int igraph_modularity(const igraph_t *graph,
   }
 
   *modularity=0.0;
-  for (i=0; i<types; i++) {
-    igraph_real_t tmp=VECTOR(a)[i]/2/m;
-    *modularity += VECTOR(e)[i]/2/m;
-    *modularity -= tmp*tmp;
+  if (m > 0) {
+    for (i=0; i<types; i++) {
+      igraph_real_t tmp=VECTOR(a)[i]/2/m;
+      *modularity += VECTOR(e)[i]/2/m;
+      *modularity -= tmp*tmp;
+    }
   }
   
   igraph_vector_destroy(&e);

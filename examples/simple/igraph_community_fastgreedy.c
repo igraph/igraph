@@ -121,9 +121,22 @@ int main() {
   show_results(&g, &modularity, &merges, stdout);
   igraph_destroy(&g);
 
+  /* Completely empty graph */
+  igraph_small(&g, 10, IGRAPH_UNDIRECTED, -1);
+  igraph_community_fastgreedy(&g, 0, &merges, &modularity, /*membership=*/ 0);
+  show_results(&g, &modularity, &merges, stdout);
+  igraph_destroy(&g);
+
+  /* Ring graph with loop edges */
+  igraph_small(&g, 6, IGRAPH_UNDIRECTED,
+          0,1,1,2,2,3,3,4,4,5,5,0,0,0,2,2,-1);
+  igraph_community_fastgreedy(&g, 0, &merges, &modularity, /*membership=*/ 0);
+  show_results(&g, &modularity, &merges, stdout);
+  igraph_destroy(&g);
+
   igraph_vector_destroy(&modularity);
   igraph_vector_destroy(&weights);
   igraph_matrix_destroy(&merges);
-  
+
   return 0;
 }
