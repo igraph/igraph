@@ -123,6 +123,7 @@ Get a newer version at http://docbook.sourceforge.net/projects/xsl/
   </xsl:template>
 
   <xsl:template name="user.head.content">
+    <script type="text/javascript" src="toggle.js"></script>
     <xsl:if test="$gtkdoc.version">
       <meta name="generator"
             content="GTK-Doc V{$gtkdoc.version} (XML mode)"/>
@@ -403,6 +404,13 @@ Get a newer version at http://docbook.sourceforge.net/projects/xsl/
         </td></tr>
        </table>
      </div>
+  </xsl:template>
+
+  <xsl:template match="example">
+    <xsl:variable name="id" select="@id"/>
+    <div class="hideshow" onClick="toggle(this)">
+      <xsl:apply-imports />
+    </div>
   </xsl:template>
   
 </xsl:stylesheet>

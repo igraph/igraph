@@ -646,7 +646,7 @@ REPLACE ----- example file  ---------------------------------------------------
 
 WITH --------------------------------------------------------------------------
 
-<example><title>Example file \g<filename></title>
-  <programlisting><xi:include  href="../\g<filename>"  parse="text"  
-      xmlns:xi="http://www.w3.org/2001/XInclude"/></programlisting>
+<example role="sourcefile">
+  <title> File <code>\g<filename></code></title>
+  <xi:include  href="../\g<filename>.xml" />
 </example>

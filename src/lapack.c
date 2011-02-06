@@ -500,6 +500,8 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
  * \return Error code.
  * 
  * Time complexity: TODO.
+ * 
+ * \example examples/simple/igraph_lapack_dgeev.c
  */
 
 int igraph_lapack_dgeev(const igraph_matrix_t *A, 

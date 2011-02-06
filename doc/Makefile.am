@@ -13,7 +13,7 @@ DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      adjlist.xml arpack.xml bipartite.xml visitors.xml random.xml \
 	      separators.xml memory.xml sparsemat.xml
 
-DOCFIX = fdl.xml gpl.xml igraph-docs.xml installation.xml introduction.xml \
+DOCFIX = fdl.xml gpl.xml installation.xml introduction.xml \
 	 tutorial.xml licenses.xml pmt.xml
 
 DOCFIX2 = $(patsubst %,$(top_srcdir)/doc/%,$(DOCFIX))
@@ -32,7 +32,15 @@ ps: igraph-docs.ps
 
 doctemplate: $(DOCINCLUDES)
 
-igraph-docs.xml: $(DOCINCLUDES)
+tags: $(DOCINCLUDES) $(DOCFIX)
+	cat $(DOCINCLUDES) $(DOCFIX)| grep 'id="[^"]*">' | sed 's/.*id="\([^"]*\)">.*/\1/' | sort > tags
+
+EXAMPLES = $(patsubst %.c,%.c.xml,$(wildcard ../examples/simple/*.c))
+
+../examples/simple/%.c.xml: ../examples/simple/%.c tags
+	source-highlight --src-lang c --out-format docbook --input $< --output $@ --gen-references=inline --ctags="" --outlang-def=docbook.outlang
+
+igraph-docs.xml: $(DOCINCLUDES) $(EXAMPLES)
 	touch igraph-docs.xml
 
 vector.xml: vector.xxml $(INCLUDEDIR)/igraph_vector_pmt.h $(INCLUDEDIR)/igraph_vector_ptr.h $(SRCDIR)/vector.pmt $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.c

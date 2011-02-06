@@ -1,0 +1,36 @@
+# by Stuart Rackham
+# http://www.methods.co.nz/asciidoc/source-highlight-filter.html
+
+extension "xml"
+
+bold "<emphasis role=\"strong\">$text</emphasis>"
+italics "<emphasis>$text</emphasis>"
+
+anchor "<anchor id=\"line$linenum\"/>$text"
+postline_reference "<link linkend='line$linenum'>$text -> $linenum</link>"
+postdoc_reference "<link linkend='line$linenum'>$text -> $linenum</link>"
+reference "<link linkend='$text'>$text</link>"
+
+doctemplate
+"<!DOCTYPE article PUBLIC \"-//OASIS//DTD DocBook//EN\">
+<article>
+<articleinfo>
+<title>$title</title>
+</articleinfo>
+<programlisting linenumbering=\"numbered\">"
+"</programlisting>
+</article>
+"
+end
+
+nodoctemplate
+"<programlisting linenumbering=\"numbered\">"
+"</programlisting>
+"
+end
+
+translations
+"&" "&amp;"
+"<" "&lt;"
+">" "&gt;"
+end
