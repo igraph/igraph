@@ -712,7 +712,8 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector, igraph_int
 	} else {
 	  new_nei = i - (VECTOR(*dimvector)[j]-1) * weights[j] + 1;
 	}
-	if (new_nei != i+1 && (VECTOR(*dimvector)[j] != 2 || coords[j] != 1)) {
+	if (new_nei != i+1 && 
+	    (VECTOR(*dimvector)[j] != 2 || coords[j] != 1 || directed)) {
 	  igraph_vector_push_back(&edges, i); /* reserved */
 	  igraph_vector_push_back(&edges, new_nei-1); /* reserved */
 	}
@@ -724,7 +725,8 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector, igraph_int
 	} else {
 	  new_nei=i+(VECTOR(*dimvector)[j]-1) * weights[j]+1;
 	}
-	if (VECTOR(*dimvector)[j] != 2 || coords[j] != 0) {
+	if (new_nei != i+1 && 
+	    (VECTOR(*dimvector)[j] != 2 || !circular)) {
 	  igraph_vector_push_back(&edges, i); /* reserved */
 	  igraph_vector_push_back(&edges, new_nei-1); /* reserved */
 	}
@@ -747,7 +749,7 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector, igraph_int
     
   } /* for i<no_of_nodes */
 
-  IGRAPH_CHECK(igraph_create(graph, &edges, 0, directed));
+  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
   if (nei >= 2) {
     IGRAPH_CHECK(igraph_connect_neighborhood(graph, nei, IGRAPH_ALL));
   }
