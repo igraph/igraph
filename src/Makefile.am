@@ -54,7 +54,9 @@ F2C =	f2c/abort_.c	  f2c/dolio.c	    f2c/iargc_.c      f2c/r_sin.c\
 	f2c/dfe.c	  f2c/i_sign.c	    f2c/r_sign.c      f2c/z_sqrt.c
 
 if INTERNAL_F2C
-  libf2c_la_SOURCES = f2c.h f2c/arith.h $(F2C)
+  libf2c_la_SOURCES = f2c.h f2c/arith.h f2c/fio.h f2c/fmt.h f2c/sysdep1.h\
+					  f2c/sysdep1.h0 f2c/lio.h f2c/fp.h f2c/signal1.h\
+					  f2c/signal1.h0 $(F2C)
   libf2c_la_CFLAGS = -DSkip_f2c_Undefs -I.
   f2c/arith.h: f2c/arithchk.c
 	$(CC) $(CFLAGS) -DNO_FPINIT f2c/arithchk.c -lm -o f2c/arith || \
