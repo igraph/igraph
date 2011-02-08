@@ -14,7 +14,7 @@ DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      separators.xml memory.xml sparsemat.xml
 
 DOCFIX = fdl.xml gpl.xml installation.xml introduction.xml \
-	 tutorial.xml licenses.xml pmt.xml
+	 tutorial.xml licenses.xml pmt.xml igraph-docs.xml
 
 DOCFIX2 = $(patsubst %,$(top_srcdir)/doc/%,$(DOCFIX))
 
