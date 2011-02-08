@@ -14,7 +14,7 @@ DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      separators.xml memory.xml sparsemat.xml
 
 DOCFIX = fdl.xml gpl.xml installation.xml introduction.xml \
-	 tutorial.xml licenses.xml pmt.xml igraph-docs.xml
+	 tutorial.xml licenses.xml pmt.xml
 
 DOCFIX2 = $(patsubst %,$(top_srcdir)/doc/%,$(DOCFIX))
 
@@ -41,6 +41,7 @@ EXAMPLES = $(patsubst %.c,%.c.xml,$(wildcard ../examples/simple/*.c))
 	source-highlight --src-lang c --out-format docbook --input $< --output $@ --gen-references=inline --ctags="" --outlang-def=docbook.outlang
 
 igraph-docs.xml: $(DOCINCLUDES) $(EXAMPLES)
+	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(top_srcdir)/doc/igraph-docs.xml . ; fi
 	touch igraph-docs.xml
 
 vector.xml: vector.xxml $(INCLUDEDIR)/igraph_vector_pmt.h $(INCLUDEDIR)/igraph_vector_ptr.h $(SRCDIR)/vector.pmt $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.c
