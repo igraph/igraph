@@ -320,7 +320,7 @@ PyObject* igraphmodule_VertexSeq_get_attribute_values_mapping(igraphmodule_Verte
     args = Py_BuildValue("(O)", o);
     if (!args)
       return NULL;
-    result = igraphmodule_VertexSeq_select(self, args, NULL);
+    result = igraphmodule_VertexSeq_select(self, args);
     Py_DECREF(args);
     return result;
   }
@@ -497,17 +497,88 @@ PyObject* igraphmodule_VertexSeq_set_attribute_values(igraphmodule_VertexSeqObje
 
 /**
  * \ingroup python_interface_vertexseq
+ * \brief Selects a single vertex from the vertex sequence based on some criteria
+ */
+PyObject* igraphmodule_VertexSeq_find(igraphmodule_VertexSeqObject *self, PyObject *args) {
+  PyObject *item;
+  long int i, n;
+  igraph_vit_t vit;
+
+  if (!PyArg_ParseTuple(args, "O", &item))
+    return NULL;
+
+  if (PyCallable_Check(item)) {
+    /* Call the callable for every vertex in the current sequence and return
+     * the first one for which it evaluates to True */
+    n = PySequence_Size((PyObject*)self);
+    for (i=0; i<n; i++) {
+      PyObject *vertex = PySequence_GetItem((PyObject*)self, i);
+      PyObject *call_result;
+      if (vertex == 0)
+        return NULL;
+      call_result = PyObject_CallFunctionObjArgs(item, vertex, NULL);
+      if (call_result == 0) {
+        Py_DECREF(vertex);
+        return NULL;
+      }
+      if (PyObject_IsTrue(call_result)) {
+        Py_DECREF(call_result);
+        return vertex;  /* reference passed to caller */
+      }
+      Py_DECREF(call_result);
+      Py_DECREF(vertex);
+    }
+  } else if (PyInt_Check(item)) {
+    /* Integers are interpreted as indices on the vertex set and NOT on the
+     * original, untouched vertex sequence of the graph */
+    return PySequence_GetItem((PyObject*)self, PyInt_AsLong(item));
+  } else if (PyBaseString_Check(item)) {
+    /* Strings are interpreted as vertex names */
+    if (igraphmodule_get_vertex_id_by_name(&self->gref->g, item, &i))
+      return NULL;
+
+    /* We now have the ID of the vertex in the graph. If the vertex sequence
+     * itself represents the full vertex sequence of the graph, we can return
+     * here. If not, we have to check whether the vertex sequence contains this
+     * ID or not. */
+    if (igraph_vs_is_all(&self->vs))
+      return PySequence_GetItem((PyObject*)self, i);
+
+    if (igraph_vit_create(&self->gref->g, self->vs, &vit)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+
+    for (n = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), n++) {
+      if (IGRAPH_VIT_GET(vit) == i) {
+        igraph_vit_destroy(&vit);
+        return PySequence_GetItem((PyObject*)self, n);
+      }
+    }
+
+    igraph_vit_destroy(&vit);
+    PyErr_SetString(PyExc_ValueError, "vertex with the given name exists but not in the current sequence");
+    return NULL;
+  }
+
+  PyErr_SetString(PyExc_IndexError, "no such vertex");
+  return NULL;
+}
+
+/**
+ * \ingroup python_interface_vertexseq
  * \brief Selects a subset of the vertex sequence based on some criteria
  */
 PyObject* igraphmodule_VertexSeq_select(igraphmodule_VertexSeqObject *self,
-  PyObject *args, PyObject *kwds) {
+  PyObject *args) {
   igraphmodule_VertexSeqObject *result;
   igraphmodule_GraphObject *gr;
   long i, j, n, m;
 
   gr=self->gref;
   result=igraphmodule_VertexSeq_copy(self);
-  if (result==0) return NULL;
+  if (result==0)
+    return NULL;
 
   /* First, filter by positional arguments */
   n = PyTuple_Size(args);
@@ -799,6 +870,11 @@ PyMethodDef igraphmodule_VertexSeq_methods[] = {
    "attribute_names() -> list\n\n"
    "Returns the attribute name list of the graph's vertices\n"
   },
+  {"find", (PyCFunction)igraphmodule_VertexSeq_find,
+   METH_VARARGS,
+   "find(condition) -> Vertex\n\n"
+   "For internal use only.\n"
+  },
   {"get_attribute_values", (PyCFunction)igraphmodule_VertexSeq_get_attribute_values,
    METH_O,
    "get_attribute_values(attrname) -> list\n"
@@ -818,7 +894,7 @@ PyMethodDef igraphmodule_VertexSeq_methods[] = {
    "@param values: the new attribute values in a list\n"
   },
   {"select", (PyCFunction)igraphmodule_VertexSeq_select,
-   METH_VARARGS | METH_KEYWORDS,
+   METH_VARARGS,
    "select(...) -> VertexSeq\n\n"
    "For internal use only.\n"
   },

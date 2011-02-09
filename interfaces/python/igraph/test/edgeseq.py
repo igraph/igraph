@@ -95,7 +95,7 @@ class EdgeSeqTests(unittest.TestCase):
         subset = self.g.es.select(2,3,4,2)
         self.failUnless(len(subset) == 4)
         self.failUnless(subset["test"] == [2,3,4,2])
-        self.assertRaises(TypeError, self.g.es, "select", 2, 3, 4, 2, None)
+        self.assertRaises(TypeError, self.g.es.select, 2, 3, 4, 2, None)
 
         subset = self.g.es[2,3,4,2]
         self.failUnless(len(subset) == 4)

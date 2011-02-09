@@ -46,8 +46,10 @@ void igraphmodule_VertexSeq_dealloc(igraphmodule_VertexSeqObject* self);
 
 int igraphmodule_VertexSeq_sq_length(igraphmodule_VertexSeqObject *self);
 
+PyObject* igraphmodule_VertexSeq_find(igraphmodule_VertexSeqObject *self,
+  PyObject *args);
 PyObject* igraphmodule_VertexSeq_select(igraphmodule_VertexSeqObject *self,
-  PyObject *args, PyObject *kwds);
+  PyObject *args);
 
 int igraphmodule_VertexSeq_to_vector_t(igraphmodule_VertexSeqObject *self,
   igraph_vector_t *v);

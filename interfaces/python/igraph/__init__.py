@@ -2754,15 +2754,14 @@ class VertexSeq(_igraph.VertexSeq):
             "in": lambda a, b: a in b, \
             "notin": lambda a, b: a not in b }
         for keyword, value in kwds.iteritems():
-            if "_" not in keyword or keyword.rindex("_") == 0: keyword = keyword+"_eq"
-            pos = keyword.rindex("_")
-            attr, op = keyword[0:pos], keyword[pos+1:]
+            if "_" not in keyword or keyword.rindex("_") == 0:
+                keyword = keyword+"_eq"
+            attr, _, op = keyword.rpartition("_")
             try:
                 func = operators[op]
             except KeyError:
                 # No such operator, assume that it's part of the attribute name
-                attr = "%s_%s" % (attr,op)
-                func = operators["eq"]
+                attr, func = keyword, operators["eq"]
 
             if attr[0] == '_':
                 # Method call, not an attribute
