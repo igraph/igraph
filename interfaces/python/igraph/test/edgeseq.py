@@ -166,10 +166,19 @@ class EdgeSeqTests(unittest.TestCase):
                                 (e.target in vs1 and e.source in vs2) for e in es))
 
     def testGraphMethodProxying(self):
+        idxs = [1, 3, 5, 7, 9]
         g = Graph.Barabasi(100)
-        es = g.es(1,3,5,7,9)
+        es = g.es(*idxs)
         ebs = g.edge_betweenness()
-        self.failUnless([ebs[i] for i in [1,3,5,7,9]] == es.edge_betweenness())
+        self.assertEquals([ebs[i] for i in idxs], es.edge_betweenness())
+
+        idxs = [1, 3]
+        g = Graph([(0, 1), (1, 2), (2, 0), (1, 0)], directed=True)
+        es = g.es(*idxs)
+        mutual = g.is_mutual(es)
+        self.assertEquals(mutual, es.is_mutual())
+        for e, m in zip(es, mutual):
+            self.assertEquals(e.is_mutual(), m)
 
     def testIsAll(self):
         g = Graph.Full(5)

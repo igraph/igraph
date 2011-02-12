@@ -126,8 +126,10 @@ class VertexSeqTests(unittest.TestCase):
     def testGraphMethodProxying(self):
         g = Graph.Barabasi(100)
         vs = g.vs(1,3,5,7,9)
-        self.failUnless(vs.degree() == g.degree(vs))
-        self.failUnless(g.degree(vs) == g.degree(vs.indices))
+        self.assertEquals(vs.degree(), g.degree(vs))
+        self.assertEquals(g.degree(vs), g.degree(vs.indices))
+        for v, d in zip(vs, vs.degree()):
+            self.assertEquals(v.degree(), d)
 
 def suite():
     vs_suite = unittest.makeSuite(VertexSeqTests)

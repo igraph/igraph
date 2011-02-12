@@ -3139,6 +3139,12 @@ restricted to this sequence, and returns the result.
     return decorated
 
 def _add_proxy_methods():
+
+    # Proxy methods for VertexSeq and EdgeSeq that forward their arguments to
+    # the corresponding Graph method are constructed here. Proxy methods for
+    # Vertex and Edge are added in the C source code. Make sure that you update
+    # the C source whenever you add a proxy method here if that makes sense for
+    # an individual vertex or edge
     decorated_methods = {}
     decorated_methods[VertexSeq] = \
         ["degree", "betweenness", "bibcoupling", "closeness", "cocitation",

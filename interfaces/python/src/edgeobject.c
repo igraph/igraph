@@ -333,6 +333,42 @@ PyObject* igraphmodule_Edge_get_tuple(igraphmodule_EdgeObject* self, void* closu
   return Py_BuildValue("(ii)", (long)from, (long)to);
 }
 
+#define GRAPH_PROXY_METHOD(FUNC, METHODNAME) \
+    PyObject* igraphmodule_Edge_##FUNC(igraphmodule_EdgeObject* self, PyObject* args, PyObject* kwds) { \
+      PyObject *new_args, *item, *result;                     \
+      long int i, num_args = args ? PyTuple_Size(args)+1 : 1; \
+                                                              \
+      /* Prepend ourselves to args */                         \
+      new_args = PyTuple_New(num_args);                       \
+      Py_INCREF(self); PyTuple_SET_ITEM(new_args, 0, (PyObject*)self);   \
+      for (i = 1; i < num_args; i++) {                        \
+        item = PyTuple_GET_ITEM(args, i-1);                   \
+        Py_INCREF(item); PyTuple_SET_ITEM(new_args, i, item); \
+      }                                                       \
+                                                              \
+      /* Get the method instance */                           \
+      item = PyObject_GetAttrString((PyObject*)(self->gref), METHODNAME);  \
+      result = PyObject_Call(item, new_args, kwds);           \
+      Py_DECREF(item);                                        \
+      Py_DECREF(new_args);                                    \
+      return result;                                          \
+    }
+
+GRAPH_PROXY_METHOD(count_multiple, "count_multiple");
+GRAPH_PROXY_METHOD(delete, "delete_edges");
+GRAPH_PROXY_METHOD(is_loop, "is_loop");
+GRAPH_PROXY_METHOD(is_multiple, "is_multiple");
+GRAPH_PROXY_METHOD(is_mutual, "is_mutual");
+
+#undef GRAPH_PROXY_METHOD
+
+#define GRAPH_PROXY_METHOD_SPEC(FUNC, METHODNAME) \
+  {METHODNAME, (PyCFunction)igraphmodule_Edge_##FUNC, METH_VARARGS | METH_KEYWORDS, \
+    "Proxy method to L{Graph." METHODNAME "()\n\n"              \
+    "This method calls the " METHODNAME " method of the L{Graph} class " \
+    "with this edge as the first argument, and returns the result.\n\n"\
+    "@see: Graph." METHODNAME "() for details."}
+
 /**
  * \ingroup python_interface_edge
  * Method table for the \c igraph.Edge object
@@ -348,6 +384,11 @@ PyMethodDef igraphmodule_Edge_methods[] = {
       "attribute_names() -> list\n\n"
       "Returns the list of edge attribute names\n"
   },
+  GRAPH_PROXY_METHOD_SPEC(count_multiple, "count_multiple"),
+  GRAPH_PROXY_METHOD_SPEC(delete, "delete"),
+  GRAPH_PROXY_METHOD_SPEC(is_loop, "is_loop"),
+  GRAPH_PROXY_METHOD_SPEC(is_multiple, "is_multiple"),
+  GRAPH_PROXY_METHOD_SPEC(is_mutual, "is_mutual"),
   {NULL}
 };
 

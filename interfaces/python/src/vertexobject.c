@@ -289,6 +289,54 @@ long igraphmodule_Vertex_get_index_long(igraphmodule_VertexObject* self) {
   return (long)self->idx;
 }
 
+#define GRAPH_PROXY_METHOD(FUNC, METHODNAME) \
+    PyObject* igraphmodule_Vertex_##FUNC(igraphmodule_VertexObject* self, PyObject* args, PyObject* kwds) { \
+      PyObject *new_args, *item, *result;                     \
+      long int i, num_args = args ? PyTuple_Size(args)+1 : 1; \
+                                                              \
+      /* Prepend ourselves to args */                         \
+      new_args = PyTuple_New(num_args);                       \
+      Py_INCREF(self); PyTuple_SET_ITEM(new_args, 0, (PyObject*)self);   \
+      for (i = 1; i < num_args; i++) {                        \
+        item = PyTuple_GET_ITEM(args, i-1);                   \
+        Py_INCREF(item); PyTuple_SET_ITEM(new_args, i, item); \
+      }                                                       \
+                                                              \
+      /* Get the method instance */                           \
+      item = PyObject_GetAttrString((PyObject*)(self->gref), METHODNAME);  \
+      result = PyObject_Call(item, new_args, kwds);           \
+      Py_DECREF(item);                                        \
+      Py_DECREF(new_args);                                    \
+      return result;                                          \
+    }
+
+GRAPH_PROXY_METHOD(betweenness, "betweenness");
+GRAPH_PROXY_METHOD(closeness, "closeness");
+GRAPH_PROXY_METHOD(constraint, "constraint");
+GRAPH_PROXY_METHOD(degree, "degree");
+GRAPH_PROXY_METHOD(delete, "delete_vertices");
+GRAPH_PROXY_METHOD(eccentricity, "eccentricity");
+GRAPH_PROXY_METHOD(get_shortest_paths, "get_shortest_paths");
+GRAPH_PROXY_METHOD(indegree, "indegree");
+GRAPH_PROXY_METHOD(is_minimal_separator, "is_minimal_separator");
+GRAPH_PROXY_METHOD(is_separator, "is_separator");
+GRAPH_PROXY_METHOD(neighbors, "neighbors");
+GRAPH_PROXY_METHOD(outdegree, "outdegree");
+GRAPH_PROXY_METHOD(pagerank, "pagerank");
+GRAPH_PROXY_METHOD(predecessors, "predecessors");
+GRAPH_PROXY_METHOD(personalized_pagerank, "personalized_pagerank");
+GRAPH_PROXY_METHOD(shortest_paths, "shortest_paths");
+GRAPH_PROXY_METHOD(successors, "successors");
+
+#undef GRAPH_PROXY_METHOD
+
+#define GRAPH_PROXY_METHOD_SPEC(FUNC, METHODNAME) \
+  {METHODNAME, (PyCFunction)igraphmodule_Vertex_##FUNC, METH_VARARGS | METH_KEYWORDS, \
+    "Proxy method to L{Graph." METHODNAME "()\n\n"              \
+    "This method calls the " METHODNAME " method of the L{Graph} class " \
+    "with this vertex as the first argument, and returns the result.\n\n"\
+    "@see: Graph." METHODNAME "() for details."}
+
 /**
  * \ingroup python_interface_vertex
  * Method table for the \c igraph.Vertex object
@@ -304,8 +352,27 @@ PyMethodDef igraphmodule_Vertex_methods[] = {
     "attribute_names() -> list\n\n"
     "Returns the list of vertex attribute names\n"
   },
+  GRAPH_PROXY_METHOD_SPEC(betweenness, "betweenness"),
+  GRAPH_PROXY_METHOD_SPEC(closeness, "closeness"),
+  GRAPH_PROXY_METHOD_SPEC(constraint, "constraint"),
+  GRAPH_PROXY_METHOD_SPEC(degree, "degree"),
+  GRAPH_PROXY_METHOD_SPEC(delete, "delete"),
+  GRAPH_PROXY_METHOD_SPEC(eccentricity, "eccentricity"),
+  GRAPH_PROXY_METHOD_SPEC(get_shortest_paths, "get_shortest_paths"),
+  GRAPH_PROXY_METHOD_SPEC(indegree, "indegree"),
+  GRAPH_PROXY_METHOD_SPEC(is_minimal_separator, "is_minimal_separator"),
+  GRAPH_PROXY_METHOD_SPEC(is_separator, "is_separator"),
+  GRAPH_PROXY_METHOD_SPEC(neighbors, "neighbors"),
+  GRAPH_PROXY_METHOD_SPEC(outdegree, "outdegree"),
+  GRAPH_PROXY_METHOD_SPEC(pagerank, "pagerank"),
+  GRAPH_PROXY_METHOD_SPEC(predecessors, "predecessors"),
+  GRAPH_PROXY_METHOD_SPEC(personalized_pagerank, "personalized_pagerank"),
+  GRAPH_PROXY_METHOD_SPEC(shortest_paths, "shortest_paths"),
+  GRAPH_PROXY_METHOD_SPEC(successors, "successors"),
   {NULL}
 };
+
+#undef GRAPH_PROXY_METHOD_SPEC
 
 /** \ingroup python_interface_vertex
  * This structure is the collection of functions necessary to implement
