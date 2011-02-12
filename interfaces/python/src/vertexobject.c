@@ -289,7 +289,44 @@ long igraphmodule_Vertex_get_index_long(igraphmodule_VertexObject* self) {
   return (long)self->idx;
 }
 
-#define GRAPH_PROXY_METHOD(FUNC, METHODNAME) \
+/**************************************************************************/
+/* Implementing proxy method in Vertex that just forward the call to the
+ * appropriate Graph method.
+ * 
+ * These methods may also execute a postprocessing function on the result
+ * of the Graph method; for instance, this mechanism is used to turn the
+ * result of Graph.neighbors() (which is a list of vertex indices) into a
+ * list of Vertex objects.
+ */
+
+/* Dummy postprocessing function that does nothing. */
+static PyObject* _identity(igraphmodule_VertexObject* vertex, PyObject* obj) {
+  Py_INCREF(obj);
+  return obj;
+}
+
+/* Postprocessing function that converts a Python list of integers into a
+ * list of vertices in-place. */
+static PyObject* _convert_to_vertex_list(igraphmodule_VertexObject* vertex, PyObject* obj) {
+  Py_ssize_t i, n;
+
+  if (!PyList_Check(obj))
+    PyErr_SetString(PyExc_TypeError, "_convert_to_vertex_list expected list of integers");
+
+  n = PyList_Size(obj);
+  for (i = 0; i < n; i++) {
+    PyObject* idx = PyList_GET_ITEM(obj, i);
+    if (!PyInt_Check(idx))
+      PyErr_SetString(PyExc_TypeError, "_convert_to_vertex_list expected list of integers");
+    PyObject* v = igraphmodule_Vertex_New(vertex->gref, PyInt_AsLong(idx));
+    PyList_SetItem(obj, i, v);   /* reference to v stolen, reference to idx discarded */
+  }
+
+  Py_INCREF(obj);
+  return obj;
+}
+
+#define GRAPH_PROXY_METHOD_PP(FUNC, METHODNAME, POSTPROCESS) \
     PyObject* igraphmodule_Vertex_##FUNC(igraphmodule_VertexObject* self, PyObject* args, PyObject* kwds) { \
       PyObject *new_args, *item, *result;                     \
       long int i, num_args = args ? PyTuple_Size(args)+1 : 1; \
@@ -307,8 +344,18 @@ long igraphmodule_Vertex_get_index_long(igraphmodule_VertexObject* self) {
       result = PyObject_Call(item, new_args, kwds);           \
       Py_DECREF(item);                                        \
       Py_DECREF(new_args);                                    \
-      return result;                                          \
+                                                              \
+      /* Optional postprocessing */                           \
+      if (result) {                                           \
+        PyObject* pp_result = POSTPROCESS(self, result);      \
+        Py_DECREF(result);                                    \
+        return pp_result;                                     \
+      }                                                       \
+      return NULL;                                            \
     }
+
+#define GRAPH_PROXY_METHOD(FUNC, METHODNAME) \
+        GRAPH_PROXY_METHOD_PP(FUNC, METHODNAME, _identity)
 
 GRAPH_PROXY_METHOD(betweenness, "betweenness");
 GRAPH_PROXY_METHOD(closeness, "closeness");
@@ -320,13 +367,13 @@ GRAPH_PROXY_METHOD(get_shortest_paths, "get_shortest_paths");
 GRAPH_PROXY_METHOD(indegree, "indegree");
 GRAPH_PROXY_METHOD(is_minimal_separator, "is_minimal_separator");
 GRAPH_PROXY_METHOD(is_separator, "is_separator");
-GRAPH_PROXY_METHOD(neighbors, "neighbors");
+GRAPH_PROXY_METHOD_PP(neighbors, "neighbors", _convert_to_vertex_list);
 GRAPH_PROXY_METHOD(outdegree, "outdegree");
 GRAPH_PROXY_METHOD(pagerank, "pagerank");
-GRAPH_PROXY_METHOD(predecessors, "predecessors");
+GRAPH_PROXY_METHOD_PP(predecessors, "predecessors", _convert_to_vertex_list);
 GRAPH_PROXY_METHOD(personalized_pagerank, "personalized_pagerank");
 GRAPH_PROXY_METHOD(shortest_paths, "shortest_paths");
-GRAPH_PROXY_METHOD(successors, "successors");
+GRAPH_PROXY_METHOD_PP(successors, "successors", _convert_to_vertex_list);
 
 #undef GRAPH_PROXY_METHOD
 
