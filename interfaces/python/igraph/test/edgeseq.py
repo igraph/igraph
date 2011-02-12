@@ -74,13 +74,18 @@ class EdgeSeqTests(unittest.TestCase):
         empty_es = self.g.es[()]
         self.failUnless(len(empty_es) == 0)
 
-    def testCallableFiltering(self):
+    def testCallableFilteringFind(self):
+        edge = self.g.es.find(lambda e: (e.index % 2 == 1))
+        self.failUnless(edge.index == 1)
+        self.assertRaises(IndexError, self.g.es.find, lambda e: (e.index % 2 == 3))
+
+    def testCallableFilteringSelect(self):
         only_even = self.g.es.select(lambda e: (e.index % 2 == 0))
         self.failUnless(len(only_even) == 23)
         self.assertRaises(KeyError, only_even.__getitem__, "nonexistent")
         self.failUnless(only_even["test"] == [i*2 for i in xrange(23)])
 
-    def testChainedCallableFiltering(self):
+    def testChainedCallableFilteringSelect(self):
         only_div_six = self.g.es.select(lambda e: (e.index % 2 == 0),
           lambda e: (e.index % 3 == 0))
         self.failUnless(len(only_div_six) == 8)
@@ -91,7 +96,12 @@ class EdgeSeqTests(unittest.TestCase):
         self.failUnless(len(only_div_six) == 8)
         self.failUnless(only_div_six["test"] == [0, 6, 12, 18, 24, 30, 36, 42])
 
-    def testIntegerFiltering(self):
+    def testIntegerFilteringFind(self):
+        self.assertEquals(self.g.es.find(3).index, 3)
+        self.assertEquals(self.g.es.select(2,3,4,2).find(3).index, 2)
+        self.assertRaises(IndexError, self.g.es.find, 178)
+
+    def testIntegerFilteringSelect(self):
         subset = self.g.es.select(2,3,4,2)
         self.failUnless(len(subset) == 4)
         self.failUnless(subset["test"] == [2,3,4,2])
@@ -101,12 +111,12 @@ class EdgeSeqTests(unittest.TestCase):
         self.failUnless(len(subset) == 4)
         self.failUnless(subset["test"] == [2,3,4,2])
 
-    def testIterableFiltering(self):
+    def testIterableFilteringSelect(self):
         subset = self.g.es.select(xrange(5,8))
         self.failUnless(len(subset) == 3)
         self.failUnless(subset["test"] == [5,6,7])
 
-    def testSliceFiltering(self):
+    def testSliceFilteringSelect(self):
         subset = self.g.es.select(slice(5, 8))
         self.failUnless(len(subset) == 3)
         self.failUnless(subset["test"] == [5,6,7])
@@ -114,7 +124,7 @@ class EdgeSeqTests(unittest.TestCase):
         self.failUnless(len(subset) == 3)
         self.failUnless(subset["test"] == [40,42,44])
 
-    def testKeywordFiltering(self):
+    def testKeywordFilteringSelect(self):
         g = Graph.Barabasi(1000, 2)
         g.es["betweenness"] = g.edge_betweenness()
         g.es["parity"] = [i % 2 for i in xrange(g.ecount())]
