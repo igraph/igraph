@@ -2195,7 +2195,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
       igraph_i_attribute_get_string_edge_attr(graph, estrnames[idx],
 					      igraph_ess_1(edge), &strv);
       igraph_strvector_get(&strv, 0, &s);
-      fprintf(outstream, " %s \"%s\"", estrnames2[idx], s);
+      fprintf(outstream, " %s %s", estrnames2[idx], s);
     }
 
     /* trailing newline */
