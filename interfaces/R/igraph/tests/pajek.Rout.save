@@ -1,0 +1,50 @@
+
+R version 2.12.0 (2010-10-15)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> g <- graph.ring(9)
+> V(g)$color <- c("red", "green", "yellow")
+> 
+> tc <- rawConnection(raw(0), "w")
+> write.graph(g, format="pajek", file=tc)
+> cat(rawToChar(rawConnectionValue(tc)))
+*Vertices 9
+1 "1" ic red
+2 "2" ic green
+3 "3" ic yellow
+4 "4" ic red
+5 "5" ic green
+6 "6" ic yellow
+7 "7" ic red
+8 "8" ic green
+9 "9" ic yellow
+*Edges
+1 2
+2 3
+3 4
+4 5
+5 6
+6 7
+7 8
+8 9
+1 9
+> close(tc)
+> 
+> 

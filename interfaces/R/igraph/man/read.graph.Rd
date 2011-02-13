@@ -83,17 +83,8 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 	vertexsize  \tab The size of the vertex when plotted (\code{size} in Pajek). \cr
 	shape 	    \tab The shape of the vertex when plotted. \cr
 	color 	    \tab Vertex color (\code{ic} in Pajek) if given with symbolic name \cr
-	color-red, \tab \cr
-	color-green, \tab \cr
-	color-blue \tab	Vertex color (\code{ic} in Pajek) if given in RGB notation \cr
 	framecolor  \tab Border color (\code{bc} in Pajek) if given with symbolic name \cr
-	framecolor-red, \tab \cr
-	framecolor-green, \tab \cr
-	framecolor-blue \tab Border color (\code{bc} in Pajek) if given in RGB notation \cr
 	labelcolor  \tab Label color (\code{lc} in Pajek) if given with symbolic name \cr
-	labelcolor-red, \tab \cr
-	labelcolor-green, \tab \cr
-	labelcolor-blue \tab Label color (\code{lc} in Pajek) if given in RGB notation \cr
 	xfact, yfact \tab The \code{x_fact} and \code{y_fact} Pajek attributes. \cr
 	labeldist \tab The distance of the label from the vertex. (\code{lr} in Pajek.) \cr
 	labeldegree, \tab \cr

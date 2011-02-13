@@ -1968,10 +1968,6 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
 
   /* Same order as the #define's */
   const char *vnames[] = { "id", "x", "y", "z", "shape", "xfact", "yfact",
-			   "color-red", "color-green", "color-blue",
-			   "framecolor-red", "framecolor-green", 
-			   "framecolor-blue", "labelcolor-red", 
-			   "labelcolor-green", "labelcolor-blue",
 			   "labeldist", "labeldegree2", "framewidth",
 			   "fontsize", "rotation", "radius", 
 			   "diamondratio", "labeldegree", "vertexsize", 
@@ -1988,7 +1984,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
 			      "labelcolor" };
   const char *vstrnames2[]= { "font", "url", "ic", "bc", "lc" };  
   
-  const char *enames[] = { "weight", "color-red", "color-green", "color-blue", 
+  const char *enames[] = { "weight",
 			   "arrowsize", "edgewidth", "hook1", "hook2", 
 			   "angle1", "angle2", "velocity1", "velocity2",
 			   "arrowpos", "labelpos", "labelangle",
@@ -2126,7 +2122,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
 	igraph_i_attribute_get_string_vertex_attr(graph, vstrnames[idx],
 						  igraph_vss_1(i), &strv);
 	igraph_strvector_get(&strv, 0, &s);
-	fprintf(outstream, " %s \"%s\"", vstrnames2[idx], s);
+	fprintf(outstream, " %s %s", vstrnames2[idx], s);
       }      
       
       /* trailing newline */
