@@ -1,0 +1,21 @@
+
+library(igraph)
+
+set.seed(42)
+
+pars <- list(sparse=c(0.35, 0.2/0.35),
+             densifying=c(0.37, 0.32/0.37),
+             dense=c(0.38, 0.38/0.37))
+
+N <- 5000
+G <- lapply(pars, function(x) forest.fire.game(N, fw=x[1], bw=x[2]))
+
+xv <- log(2:N)
+
+co <- sapply(G, function(x) {
+  yv <- log(cumsum(degree(x, mode="out"))[-1])
+  coef(lm( yv ~ xv ))[2]
+})
+
+co
+

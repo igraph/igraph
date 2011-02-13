@@ -1,0 +1,42 @@
+
+R version 2.12.0 (2010-10-15)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> set.seed(42)
+> 
+> pars <- list(sparse=c(0.35, 0.2/0.35),
++              densifying=c(0.37, 0.32/0.37),
++              dense=c(0.38, 0.38/0.37))
+> 
+> N <- 5000
+> G <- lapply(pars, function(x) forest.fire.game(N, fw=x[1], bw=x[2]))
+> 
+> xv <- log(2:N)
+> 
+> co <- sapply(G, function(x) {
++   yv <- log(cumsum(degree(x, mode="out"))[-1])
++   coef(lm( yv ~ xv ))[2]
++ })
+> 
+> co
+    sparse.xv densifying.xv      dense.xv 
+     1.060455      1.228010      1.962341 
+> 
+> 
