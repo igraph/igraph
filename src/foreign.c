@@ -535,18 +535,10 @@ extern char *igraph_i_pajek_errmsg;
  * </para><para>
  * In addition the following vertex attributes might be added: `\c id'
  * if there are vertex ids in the file, `\c x' and `\c y' or `\c x'
- * and `\c y' and `\c z' if there are vertex coordinates in the file,
- * `\c color-red', `\c color-green' and `\c color-blue' if the vertex
- * color is given in RGB notation, `\c framecolor-red', `\c
- * framecolor-green' and `\c framecolor-blue` if the frame color is
- * given in RGB notation and finally `\c labelcolor-red', `\c
- * labelcolor-green' and `\c labelcolor-blue' if the label color is
- * given in RGB notation.
+ * and `\c y' and `\c z' if there are vertex coordinates in the file.
  * 
- * </para><para>The following additional edge attributes might be
- * added: `\c weight' if there are edge weights present, `\c
- * color-red', `\c color-green' and `\c color-blue' if the edge color
- * is given in RGB notation. 
+ * </para><para>The `\c weight' edge attribute might be
+ * added if there are edge weights present.
  * 
  * </para><para>
  * See the pajek homepage:
