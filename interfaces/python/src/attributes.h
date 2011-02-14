@@ -25,11 +25,11 @@
 #define PY_IGRAPH_ATTRIBUTES_H
 
 #include <Python.h>
-#include <igraph/igraph_attributes.h>
-#include <igraph/igraph_datatype.h>
-#include <igraph/igraph_iterators.h>
-#include <igraph/igraph_strvector.h>
-#include <igraph/igraph_vector.h>
+#include <igraph_attributes.h>
+#include <igraph_datatype.h>
+#include <igraph_iterators.h>
+#include <igraph_strvector.h>
+#include <igraph_vector.h>
 
 #define ATTRHASH_IDX_GRAPH  0
 #define ATTRHASH_IDX_VERTEX 1

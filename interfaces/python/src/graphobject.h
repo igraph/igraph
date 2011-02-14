@@ -25,7 +25,7 @@
 #define PYTHON_GRAPHOBJECT_H
 
 #include <Python.h>
-#include <igraph/igraph.h>
+#include <igraph.h>
 #include "structmember.h"
 #include "common.h"
 

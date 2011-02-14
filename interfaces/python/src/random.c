@@ -25,7 +25,7 @@
 #include "py2compat.h"
 #include "random.h"
 #include <limits.h>
-#include <igraph/igraph_random.h>
+#include <igraph_random.h>
 
 /**
  * \ingroup python_interface_rng

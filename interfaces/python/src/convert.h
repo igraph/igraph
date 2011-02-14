@@ -30,8 +30,8 @@
 #define PYTHON_CONVERT_H
 
 #include <Python.h>
-#include <igraph/igraph_constants.h>
-#include <igraph/igraph_types.h>
+#include <igraph_constants.h>
+#include <igraph_types.h>
 #include "graphobject.h"
 
 typedef enum { IGRAPHMODULE_TYPE_INT=0, IGRAPHMODULE_TYPE_FLOAT }

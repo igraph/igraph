@@ -25,7 +25,7 @@
 #define PYTHON_ERROR_H
 
 #include <Python.h>
-#include <igraph/igraph_error.h>
+#include <igraph_error.h>
 
 /** \defgroup python_interface_errors Error handling
  * \ingroup python_interface */
