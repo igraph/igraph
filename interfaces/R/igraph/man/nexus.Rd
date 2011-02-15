@@ -3,6 +3,7 @@
 \alias{nexus.list}
 \alias{nexus.info}
 \alias{nexus.get}
+\alias{nexus.search}
 \alias{nexusDatasetInfo}
 \alias{print.nexusDatasetInfo}
 \alias{print.nexusDatasetInfoList}
@@ -20,7 +21,7 @@ nexus.list(tags=NULL, offset=0, limit=10,
 nexus.info(id, nexus.url=getIgraphOpt("nexus.url"))
 nexus.get(id, offset=0, order=c("date", "name", "popularity"),
           nexus.url=getIgraphOpt("nexus.url"))
-nexus.search(q, offset=10, limit=10,
+nexus.search(q, offset=0, limit=10,
              order=c("date", "name", "popularity"),
              nexus.url=getIgraphOpt("nexus.url"))
 
@@ -50,7 +51,7 @@ nexus.search(q, offset=10, limit=10,
     \url{http://nexus.igraph.org}.}
   \item{nexus.url}{The URL of the Nexus server. Don't change this from
     the default, unless you set up your own Nexus server.}
-  \item{x}{The \code{nexusDatasetInfo} object to print.}
+  \item{x,object}{The \code{nexusDatasetInfo} object to print.}
   \item{\dots}{Currently ignored.}
 }
 \details{
@@ -184,6 +185,7 @@ nexus.search(q, offset=10, limit=10,
 \examples{
 \dontrun{nexus.list(tag="weighted")
 nexus.list(limit=3, order="name")
+nexus.list(limit=3, order="name")[[1]]
 nexus.info(2)
 g <- nexus.get(2)
 summary(g)
