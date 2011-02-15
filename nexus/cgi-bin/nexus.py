@@ -21,6 +21,7 @@ import pickle
 import re
 import tempfile
 import gzip
+import shutil
 
 from datetime import datetime
 from functools import wraps
@@ -39,7 +40,6 @@ web.config.smtp_starttls = True
 
 formwidth=65
 datadir=os.path.join("..", "data")
-compressed_ext=".gz"
 
 urls = (
     '/?',                                  'About',
@@ -54,6 +54,8 @@ urls = (
     '/web/add',                            'Add',
     '/web/admin',                          'Admin',
     '/web/blog',                           'Blog',
+    '/web/checkall2',                      'Check',
+    '/web/checkall',                       'CheckAll',
     '/web/check/(\d+)',                    'Check',
     '/web/delete/(\d+)',                   'Delete',
     '/web/docs',                           'Docs',
@@ -65,6 +67,7 @@ urls = (
     '/web/loginfailed',                    'LoginFailed',
     '/web/logout',                         'Logout',
     '/web/openid',                         'OpenID',
+    '/web/recreateall/(.+)',               'RecreateAll',
     '/web/recreate/(\d+)',                 'Recreate',
     '/web/search',                         'Searchpage',
     '.*',                                  'NotFound'
@@ -159,11 +162,10 @@ def get_available_formats(id, sid=None):
     fname=model.get_dataset_filename(id)
     def fileexists(formatrec, filename, sid):
         if sid is None:
-            ff=os.path.join(datadir, id, filename + formatrec.extension + 
-                            compressed_ext)
+            ff=os.path.join(datadir, id, filename + formatrec.extension)
         else:
             ff=os.path.join(datadir, id, filename + "-" + sid + 
-                            formatrec.extension + compressed_ext)
+                            formatrec.extension)
         return os.path.isfile(ff) 
     return dict( (f.name, f) for f in allf if fileexists(f, fname, sid) )
 
@@ -669,31 +671,15 @@ class Dataset:
         basename=datafile
         ext=model.get_format_extension(format)
         filename=os.path.join(datadir, id, basename + ext)
-        gzip=support_gzip()
         web.header('Content-Type', 'application/octet-stream')
         web.header('Content-Disposition', 
                    'attachment; filename="%s%s"' % (basename,ext))
         model.increase_downloads(id)
         try:
-            if gzip:
-                f=open(filename + compressed_ext)
-                data=f.read()
-                f.close()
-                web.header('Content-Encoding', 'gzip')
-                web.header('Content-Length', len(data))
-                return data
-            else:
-                tmp=tempfile.NamedTemporaryFile(delete=False)
-                tmpname=tmp.name
-                tmp.close()
-                os.system('gzip -cd %s%s > %s' % (filename, compressed_ext,
-                                                  tmpname))
-                f=open(tmpname)
-                data=f.read()
-                f.close()
-                os.unlink(tmpname)
-                web.header('Content-Length', len(data))
-                return data
+            f=open(filename)
+            data=f.read()
+            f.close()
+            return data
         except Exception, x:
 #            print str(x)
             return web.internalerror()
@@ -705,7 +691,7 @@ class Format:
 Short description: %s
 Description: %s
 URL: %s""" % (format.name, format.shortdesc, 
-              format.description.replace("\n", "\n  .\n").strip(),
+              format.description.replace("\n\r\n", "\n  .\n").strip(),
               format.link)
 
     def format_text(self, formats):
@@ -1052,160 +1038,140 @@ def tmpungzip(filename):
 
 class Check:
 
-    def check_r_igraph(self, ds, filename, tags, meta):
-
-        
+    def check_r_igraph(self, ds, networks, filename, tags, meta):
         res=odict.odict()
-        
-        ## File exists
-        ex=os.path.exists(filename + compressed_ext)
-        res['Data file exists'] = ex
-        if not ex:
-            return res
 
-        ## File can be loaded
-        loadcode = 'library(igraph) ; load("%s%s") ;' % (filename, 
-                                                         compressed_ext)
-        try:
-            run_r(loadcode)
-            res['Data file can be loaded'] = True
-        except:
-            res['Data file can be loaded'] = False
-            return res
-        
-        ## File contains a single igraph graph
-        code = loadcode + 'g <- get(ls()[1]) ; cat(is.igraph(g), " ") ;'
-        try:
-            ret, out=run_r(code)
-            if out[0:4] == 'TRUE':
-                res['File contains proper data'] = True
+        tagstr=";".join(t.tag for t in tags)
+        netnames=";".join(n.sid for n in networks)
+        netno=";".join(str(n.id) for n in networks)
+        metastr=";;".join("%s;%s;%s" % (m.type, m.name, m.network) 
+                          for m in meta)
+
+        rcode=dedent('source("../scripts/rutils.R") ; \
+                      r.check("%s","%s","%s","%s","%s") ; \
+                     ') % (filename, tagstr, netnames, netno, metastr)
+        ret, out=run_r(rcode)
+        out=[ o.split(":", 1) for o in out.strip().split("\n") ]
+        for k,v in out:
+            if v=='TRUE':
+                res[k]=True
             else:
-                res['File contains proper data'] = False
-                return res
-        except:
-            res['File contains proper data'] = False
-            return res
-
-        ## Number of vertices and edges 
-        code = code + 'cat(vcount(g), ecount(g), is.directed(g), ' + \
-            'is.weighted(g), is.bipartite(g), " ") ; '
-        ret, out=run_r(code)
-        nm=out.split()[1:]
-        res['Number of vertices'] = int(nm[0])==ds.minv
-        res['Number of edges'] = int(nm[1])==ds.mine
-
-        ## Tags
-        tags=[t.tag for t in tags]
-        if 'directed' in tags:
-            res['Tags, directed'] = nm[2]=='TRUE'
-        if 'undirected' in tags:
-            res['Tags, undirected'] = nm[2]=='FALSE'
-        if 'weighted' in tags:
-            res['Tags, weighted'] = nm[3]=='TRUE'
-        if 'bipartite' in tags:
-            res['Tags, bipartite'] = nm[4]=='TRUE'
-
-        ## Metadata
-        code=loadcode + 'g <- get(ls()[1]) ; ' + \
-            'cat(list.vertex.attributes(g), sep="", "\\n") ;' + \
-            'cat(list.edge.attributes(g), sep="", "\\n") ;'
-        ret, out=run_r(code)
-        attr=out.split("\n")[0:2]
-        for m in meta:
-            if m.type == "vertex":
-                res["Metadata, vertex, '%s'" % m.name]=m.name in attr[0]
-            elif m.type == "edge":
-                res["Metadata, edge, '%s'" % m.name]=m.name in attr[1]
+                res[k]=v
+        v=";".join(str(n.vertices) for n in networks)
+        e=";".join(str(n.edges) for n in networks)
+        res['Vertices'] = (res['Vertices'] == v)
+        res['Edges'] = (res['Edges'] == e)
 
         return res
 
-    def _check_igraph_graph(self, g, ds, filename, tags, meta):
+    def _check_igraph_graph(self, g, ds, networks, filename, tags, meta):
         res = odict.odict()
 
         ## Number of vertices and edges
-        res['Number of vertices'] = ds.minv == g.vcount()
-        res['Number of edges'] = ds.mine == g.ecount()
+        res['Number of vertices'] = all([ g[n.sid].vcount() == n.vertices
+                                          for n in networks ])
+        res['Number of edges'] = [ g[n.sid].ecount() == n.edges
+                                   for n in networks ]
+        
+        vattr=dict( (i, j.vs.attribute_names()) for i, j in g.items() )
+        eattr=dict( (i, j.es.attribute_names()) for i, j in g.items() )
 
-        vattr=g.vs.attribute_names()
-        eattr=g.es.attribute_names()
+        print vattr
+        print eattr
 
         ## Tags 
         tags=[t.tag for t in tags]
         if 'directed' in tags:
-            res['Tags, directed'] = g.is_directed()
+            res['Tags, directed'] = any(i.is_directed() for i in g.values())
         if 'undirected' in tags:
-            res['Tags, undirected'] = not g.is_directed()
+            res['Tags, undirected'] = any([ not i.is_directed()
+                                            for i in g.values()])
         if 'weighted' in tags:
-            res['Tags, weighted'] = 'weight' in eattr
+            res['Tags, weighted'] = any(['weight' in e 
+                                         for e in eattr.values()])
         if 'bipartite' in tags:
-            res['Tags, bipartite'] = 'type' in vattr
-            
+            res['Tags, bipartite'] = any(['type' in v 
+                                          for v in vattr.values()])
+
         ## Metadata
+        nets=dict( (n.id, n) for n in networks )
         for m in meta:
             if m.type == "vertex":
-                res["Metadata, vertex, '%s'" % m.name] = m.name in vattr
+                att=vattr
             elif m.type == "edge":
-                res["Metadata, edge, '%s'" % m.name] = m.name in eattr
+                att=eattr
+            if m.network=="NULL":
+                res["Metadata, %s, '%s'" % (m.type, m.name)] = \
+                    all(m.name in a for a in att.values())
+            else:
+                res["Metadata, %s, '%s'" % (m.type, m.name)] = \
+                    m.name in att[nets[m.network].sid]
 
         return res
 
-    def check_python_igraph(self, ds, filename, tags, meta):
+    def check_python_igraph(self, ds, networks, filename, tags, meta):
         res=odict.odict()
         
         ## File exists
-        ex=os.path.exists(filename + compressed_ext)
+        ex=os.path.exists(filename)
         res['Data file exists'] = ex
         if not ex:
             return res
 
         ## File can be loaded
         try:
-            g=igraph.Graph.Read_Pickle(gzip.GzipFile(filename + 
-                                                     compressed_ext))
+            g=pickle.load(gzip.GzipFile(filename))
             res['Data file can be loaded'] = True
         except Exception, x:
 #            print str(x)
             res['Data file can be loaded'] = False
             return res
 
-        res.update(self._check_igraph_graph(g, ds, filename, tags, meta))
+        res.update(self._check_igraph_graph(g, ds, networks, filename, 
+                                            tags, meta))
         return res
 
-    def check_graphml(self, ds, filename, tags, meta):
+    def check_graphml(self, ds, networks, filename, tags, meta):
         res=odict.odict()
 
         ## File exists
-        ex=os.path.exists(filename + compressed_ext)
+        ex=os.path.exists(filename)
         res['Data file exists'] = ex
         if not ex:
             return res
 
         ## File can be loaded
         try:
-            f=tmpungzip(filename + compressed_ext)
-            g=igraph.Graph.Read_GraphML(f)
+            tmp=os.path.join(tempfile.gettempdir(), "nexus")
+            shutil.rmtree(tmp, ignore_errors=True)
+            os.mkdir(tmp)
+            os.system("unzip -d %s %s" % (tmp, filename))
+            g=dict((n.sid, igraph.Graph.Read_GraphML('%s/%s.GraphML' % 
+                                                     (tmp, n.sid)))
+                   for n in networks)
             res['Data file can be loaded'] = True
-            os.unlink(f)
+            shutil.rmtree(tmp)
         except Exception, x:
-#            print str(x)
+            print str(x)
             res['Data file can be loaded'] = False
             return res
 
-        res.update(self._check_igraph_graph(g, ds, filename, tags, meta))
+        res.update(self._check_igraph_graph(g, ds, networks, filename, 
+                                            tags, meta))
         return res
 
-    def check_pajek(self, ds, filename, tags, meta):
+    def check_pajek(self, ds, networks, filename, tags, meta):
         res=odict.odict()
 
         ## File exists
-        ex=os.path.exists(filename + compressed_ext)
+        ex=os.path.exists(filename)
         res['Data file exists'] = ex
         if not ex:
             return res
 
         ## File can be loaded
         try:
-            f=tmpungzip(filename + compressed_ext)
+            f=tmpungzip(filename)
             g=igraph.Graph.Read_Pajek(f)
             res['Data file can be loaded'] = True
             os.unlink(f)
@@ -1214,21 +1180,22 @@ class Check:
             res['Data file can be loaded'] = False
             return res
 
-        res.update(self._check_igraph_graph(g, ds, filename, tags, meta))
+        res.update(self._check_igraph_graph(g, ds, networks, filename, 
+                                            tags, meta))
         return res
 
-    def check_excel(self, ds, filename, tags, meta):
+    def check_excel(self, ds, networks, filename, tags, meta):
         res=odict.odict()
 
         ## File exists
-        ex=os.path.exists(filename + compressed_ext)
+        ex=os.path.exists(filename)
         res['Data file exists'] = ex
         if not ex:
             return res
 
         ## File can be loaded
         try:
-            f=tmpungzip(filename + compressed_ext)
+            f=tmpungzip(filename)
             wb=xlrd.open_workbook(f)
             res['Data file can be loaded'] = True
             os.unlink(f)
@@ -1271,35 +1238,63 @@ class Check:
 
         return res
 
-    def check(self, ds, format, tags, meta, filename):
+    def check(self, ds, networks, format, tags, meta, filename):
         if format=="R-igraph":
-            return self.check_r_igraph(ds, filename, tags, meta)
+            return self.check_r_igraph(ds, networks, filename, tags, meta)
         elif format=="GraphML":
-            return self.check_graphml(ds, filename, tags, meta)
+            return self.check_graphml(ds, networks, filename, tags, meta)
         elif format=="Pajek":
-            return self.check_pajek(ds, filename, tags, meta)
+            return self.check_pajek(ds, networks, filename, tags, meta)
         elif format=="Excel":
-            return self.check_excel(ds, filename, tags, meta)
+            return self.check_excel(ds, networks, filename, tags, meta)
         elif format=="Python-igraph":
-            return self.check_python_igraph(ds, filename, tags, meta)
+            return self.check_python_igraph(ds, networks, filename, 
+                                            tags, meta)
         return None
 
-    def GET(self, id):
-        ds=model.get_dataset(id)
-        ds=[d for d in ds][0]
+    def check_all_formats(self, id):
+        ds=list(model.get_dataset(int(id)))[0]
         checkres=odict.odict()
+        networks=model.get_networks(ds.id)
+        tags=list(model.get_tags(ds.id))
+        meta=list(model.get_metadata(ds.id))
         for k,v in model.get_format_extensions().items():
-            tags=model.get_tags(ds.id)
-            meta=model.get_metadata(ds.id)
             try: 
-                checkres[k] = self.check(ds, k, tags, meta,
-                                         os.path.join("..", "data",
-                                                      str(id), 
-                                                      ds.sid + v))
+                if k in ('R-igraph', 'GraphML', 'Python-igraph'):
+                    checkres[k] = self.check(ds, networks, k, tags, meta,
+                                             os.path.join("..", "data",
+                                                          str(id), 
+                                                          ds.sid + v))
             except Exception, x:
                 checkres[k] = { "Cannot run check": str(x) }
-                
-        return render.check(id, ds, checkres)      
+
+        return checkres
+
+    def GET(self, id=None):
+        
+        if id is None:
+            ids=model.get_dataset_ids()
+            web.header('Content-type','text/html')
+            web.header('Transfer-Encoding','chunked')
+            yield ('<html><head><title>Checking datasets...</title>' +
+                   '<link rel="stylesheet" href="/static/general.css" \
+                          type="text/css"/>' + 
+                   '<link rel="icon" type="image/png" \
+	                  href="/static/nexus_logo_black_small.png" />' +
+                   '</head><body>')
+            for id in ids:
+                ds=list(model.get_dataset(id.id))[0]
+                yield render_plain.check(id.id, ds,
+                                         self.check_all_formats(id.id))
+            yield '<h1>Done</h1></body></html>'
+        else:
+            ds=list(model.get_dataset(id))[0]
+            yield render.check(id, ds, self.check_all_formats(id))
+
+class CheckAll:
+
+    def GET(self):
+        return render.checkall()
 
 class Licence:
 
@@ -1410,29 +1405,24 @@ class Delete:
         return render.delete()
 
 def ungzip(filename):
-    os.system('gzip -dc %s%s > %s' % (filename, compressed_ext, filename))
+    os.system('gzip -dc %s > %s' % (filename, filename))
 
 def gzipout(filename):
     os.system('gzip -f %s' % filename)
 
-class Recreate:
+class RecreateBase:
 
     def r_to_graphml(self, id):
         nets=model.get_networks(id)
-        if len(nets) > 1:
-            return              # TODO
-
         rext=model.get_format_extension('R-igraph')
         outext=model.get_format_extension('GraphML')
         inputfile = model.get_dataset_filename(id)
         inputfile = os.path.join("..", "data", id, 
                                  os.path.basename(inputfile))
         rcode = dedent('source("../scripts/rutils.R") ; \
-                        r.to.graphml("%s%s%s", "%s%s") ; \
-                  ') % (inputfile, rext, compressed_ext, 
-                       inputfile, outext)
+                        r.to.graphml("%s%s", "%s%s") ; \
+                  ') % (inputfile, rext, inputfile, outext)
         ret, out=run_r(rcode)
-        gzipout('%s%s' % (inputfile, outext))
 
     def r_to_pajek(self, id):
         rext=model.get_format_extension('R-igraph')
@@ -1440,15 +1430,13 @@ class Recreate:
         inputfile = model.get_dataset_filename(id)
         inputfile = os.path.join("..", "data", id, 
                                  os.path.basename(inputfile))
-        ds=list(model.get_dataset(id))[0]
         rcode = dedent('source("../scripts/rutils.R") ; \
-                        r.to.pajek("%s%s%s", "%s%s", "%s") ; \
-                  ') % (inputfile, rext, compressed_ext, 
-                       inputfile, outext, ds.sid)
+                        r.to.pajek("%s%s", "%s%s") ; \
+                  ') % (inputfile, rext, inputfile, outext)
         ret, out=run_r(rcode)
-        gzipout('%s%s' % (inputfile, outext))        
                            
     def graphml_to_excel(self, id):
+        return
         nets=model.get_networks(id)
         if len(nets) > 1:
             return              # TODO
@@ -1527,32 +1515,71 @@ class Recreate:
             
         outputfile=inputfile + excelext
         wb.save(outputfile)
-        gzipout(outputfile)
         
         
     def graphml_to_pickle(self, id):
         nets=model.get_networks(id)
-        if len(nets) > 1:
-            return              # TODO
-        inputfile = model.get_dataset_filename(id)
-        inputfile = os.path.join("..", "data", id, 
-                                 os.path.basename(inputfile))
+        basename = model.get_dataset_filename(id)
+        basename = os.path.join("..", "data", id, 
+                                os.path.basename(basename))
         graphmlext=model.get_format_extension('GraphML')
-        ungzip('%s%s' % (inputfile, graphmlext))
-        g=igraph.Graph.Read_GraphML(inputfile + graphmlext)
-        os.unlink('%s%s' % (inputfile, graphmlext))
-        outext = model.get_format_extension('Python-igraph')
-        outputfile=inputfile + outext
-        pickle.dump(g, open(outputfile, "w"), protocol=-1)
-        gzipout(inputfile + outext)
-    
-    def GET(self, id):
+        outext = model.get_format_extension('Python-igraph')        
+        inputfile = basename + graphmlext
+        outputfile = basename + outext[:-3]
+
+        tmp=os.path.join(tempfile.gettempdir(), "nexus")
+        shutil.rmtree(tmp, ignore_errors=True)
+        os.mkdir(tmp)
+        os.system("unzip -d %s %s" % (tmp, inputfile))
+        graphs=dict((n.sid, igraph.Graph.Read_GraphML('%s/%s.GraphML'
+                                                      % (tmp, n.sid)))
+                    for n in nets)
+        pickle.dump(graphs, open(outputfile, "w"), protocol=-1)
+        shutil.rmtree(tmp)
+        gzipout(outputfile)
+
+class Recreate(RecreateBase):    
+
+    def GET(self, id=None):
         check_admin()
         self.r_to_graphml(id)
         self.r_to_pajek(id)
         self.graphml_to_excel(id)
         self.graphml_to_pickle(id)
-        return render.recreate(id)
+        return render.recreate(id)    
+
+class RecreateAll(RecreateBase):
+    
+    def GET(self, format):
+        web.header('Content-type','text/html')
+        web.header('Transfer-Encoding','chunked')
+        if format[0]!='!':
+            yield render.recreateall(format)
+        
+        format=format[1:]
+        ids=model.get_dataset_ids()
+        format=format.lower()
+
+        def to_excel(id):
+            self.r_to_graphml(id)
+            self.graphml_to_excel(id)
+
+        def to_pickle(id):
+            self.r_to_graphml(id)
+            self.graphml_to_pickle(id)
+            
+        def to_r(id):
+            pass
+
+        funcs= { 'graphml': self.r_to_graphml, 
+                 'pajek': self.r_to_pajek, 
+                 'excel': to_excel,
+                 'python-igraph': to_pickle,
+                 'r-igraph': to_r }
+        for id in ids:
+            funcs[format](str(id.id))
+            ds=list(model.get_dataset(id.id))[0]
+            yield render_plain.recreate(id.id, "'" + ds.name + "'")
 
 def flatten(iterables):
     return (elem for iterable in iterables for elem in iterable)

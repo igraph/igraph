@@ -28,6 +28,8 @@ g$Citation <- "Allison Davis, Burleigh Bradford Gardner, Mary R. Gardner, Deep s
 g$URL <- "http://vlado.fmf.uni-lj.si/pub/networks/data/ucinet/ucidata.htm"
 g$Description <- "These data were collected by Davis et al in the 1930s. They represent observed attendance at 14 social events by 18 Southern women."
 
+V(g)$type <- as.numeric(grepl("^E[0-9][0-9]?$", V(g)$name))
+
 Davis <- g
 save(Davis, file="/tmp/Davis.Rdata.gz")
 

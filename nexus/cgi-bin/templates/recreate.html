@@ -1,6 +1,6 @@
-$def with (id)
+$def with (id, name="")
 
 <p>
-Dataset was recreated, you take a look at it 
-$:link_to_dataset_id(int(id), "here").
+  Dataset $name was recreated, you take a look at it 
+  $:link_to_dataset_id(int(id), "here").
 </p>

@@ -94,6 +94,9 @@ def get_list_of_datasets(ids=None, order="date", limit=10, offset=0):
     res=list(res)
     return res, count
 
+def get_dataset_ids():
+    return list(db.select('dataset', what='id', order='id'))
+
 def get_tags(id):
     return db.query('''SELECT t.id, t.tag 
                        FROM tag t, dataset_tag d

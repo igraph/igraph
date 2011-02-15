@@ -23,7 +23,7 @@ mat2 <- mat[21:40,]
 
 library(igraph)
 g1 <- graph.adjacency(mat1, mode="directed")
-g2 <- graph.adjacency(mat2, mode="undirected")
+g2 <- graph.adjacency(mat2, mode="undirected", weighted=TRUE)
 
 g1$name <- "Wolfe primates, putative kin relationships"
 g2$name <- "Wolfe primates, interactions"
