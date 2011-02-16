@@ -2,6 +2,8 @@
 Utility classes for drawing routines.
 """
 
+from igraph.compat import property
+from itertools import izip
 from math import atan2, cos, sin
 from operator import itemgetter
 
@@ -10,10 +12,10 @@ __license__ = "GPL"
 
 #####################################################################
 
-class BoundingBox(object):
-    """Class representing a bounding box (a rectangular area)."""
+class Rectangle(object):
+    """Class representing a rectangle."""
 
-    __slots__ = ("_coords", )
+    __slots__ = ("_left", "_top", "_right", "_bottom")
 
     def __init__(self, *args):
         """Creates a bounding box.
@@ -42,7 +44,6 @@ class BoundingBox(object):
         except ValueError:
             raise ValueError("invalid coordinate format, numbers expected")
 
-        self._coords = None    # to make pylint happy
         self.coords = coords
 
     def _set_coords(self, coords):
@@ -50,15 +51,15 @@ class BoundingBox(object):
 
         @param coords: a 4-tuple with the coordinates of the corners
         """
-        if coords[0] > coords[2]:
-            coords = (coords[2], coords[1], coords[0], coords[3])
-        if coords[1] > coords[3]:
-            coords = (coords[0], coords[3], coords[2], coords[1])
-        self._coords = coords
+        self._left, self._top, self._right, self._bottom = coords
+        if self._left > self._right:
+            self._left, self._right = self._right, self._left
+        if self._top > self._bottom:
+            self._bottom, self._top = self._top, self._bottom
 
     def _get_coords(self):
         """Returns the coordinates of the corners."""
-        return self._coords
+        return self._left, self._top, self._right, self._bottom
 
     coords = property(_get_coords, _set_coords,
         doc="Sets or returns the coordinates of the corners")
@@ -66,37 +67,71 @@ class BoundingBox(object):
     @property
     def width(self):
         """Returns the width of the bounding box"""
-        return self._coords[2]-self._coords[0]
+        return self._right - self._left
+
+    @width.setter
+    def width(self, value):
+        """Sets the width of the bounding box by adjusting the right edge."""
+        self._right = self._left + value
 
     @property
     def height(self):
         """Returns the height of the bounding box"""
-        return self._coords[3]-self._coords[1]
+        return self._bottom - self._top
+
+    @height.setter
+    def height(self, value):
+        """Sets the height of the bounding box by adjusting the bottom edge."""
+        self._bottom = self._top + value
 
     @property
     def left(self):
         """Returns the X coordinate of the left side of the box"""
-        return self._coords[0]
+        return self._left
+
+    @left.setter
+    def left(self, value):
+        """Sets the X coordinate of the left side of the box"""
+        self._left = float(value)
+        self._right = max(self._left, self._right)
 
     @property
     def right(self):
         """Returns the X coordinate of the right side of the box"""
-        return self._coords[2]
+        return self._right
+
+    @right.setter
+    def right(self, value):
+        """Sets the X coordinate of the right side of the box"""
+        self._right = float(value)
+        self._left = min(self._left, self._right)
 
     @property
     def top(self):
         """Returns the Y coordinate of the top edge of the box"""
-        return self._coords[1]
+        return self._top
+
+    @top.setter
+    def top(self, value):
+        """Sets the Y coordinate of the top edge of the box"""
+        self._top = value
+        self._bottom = max(self._bottom, self._top)
 
     @property
     def bottom(self):
         """Returns the Y coordinate of the bottom edge of the box"""
-        return self._coords[3]
+        return self._bottom
+
+    @bottom.setter
+    def bottom(self, value):
+        """Sets the Y coordinate of the bottom edge of the box"""
+        self._bottom = value
+        self._top = min(self._bottom, self._top)
 
     @property
     def shape(self):
         """Returns the shape of the bounding box (width, height)"""
-        return self._coords[2]-self._coords[0], self._coords[3]-self._coords[1]
+        return self._right - self._left, self._bottom - self._top
 
     def contract(self, margins):
         """Contracts the bounding box by the given margins.
@@ -107,8 +142,8 @@ class BoundingBox(object):
             margins = [float(margins)] * 4
         if len(margins) != 4:
             raise ValueError("margins must be a 4-tuple or a single number")
-        nx1, ny1 = self._coords[0]+margins[0], self._coords[1]+margins[1]
-        nx2, ny2 = self._coords[2]-margins[2], self._coords[3]-margins[3]
+        nx1, ny1 = self._left+margins[0], self._top+margins[1]
+        nx2, ny2 = self._right-margins[2], self._bottom-margins[3]
         if nx1 > nx2:
             nx1 = (nx1+nx2)/2.
             nx2 = nx1
@@ -119,15 +154,61 @@ class BoundingBox(object):
 
     def __repr__(self):
         return "%s(%s, %s, %s, %s)" % (self.__class__.__name__, \
-            self._coords[0], self._coords[1], self._coords[2], \
-            self._coords[3])
+            self._left, self._top, self._right, self._bottom)
 
     def __eq__(self, other):
         return self.coords == other.coords
+
     def __ne__(self, other):
         return self.coords != other.coords
+
     def __hash__(self):
         return hash(self.coords)
+
+#####################################################################
+
+class BoundingBox(Rectangle):
+    """Class representing a bounding box (a rectangular area) that
+    encloses some objects."""
+
+    def __ior__(self, other):
+        """Replaces this bounding box with the union of itself and
+        another.
+
+        Example::
+            
+            >>> box1 = BoundingBox(10, 20, 50, 60)
+            >>> box2 = BoundingBox(70, 40, 100, 90)
+            >>> box1 |= box2
+            >>> print(box1)
+            BoundingBox(10.0, 20.0, 100.0, 90.0)
+        """
+        self._left   = min(self._left, other._left)
+        self._top    = min(self._top, other._top)
+        self._right  = max(self._right, other._right)
+        self._bottom = max(self._bottom, other._bottom)
+        return self
+
+    def __or__(self, other):
+        """Takes the union of this bounding box with another.
+
+        The result is a bounding box which encloses both bounding
+        boxes.
+        
+        Example::
+            
+            >>> box1 = BoundingBox(10, 20, 50, 60)
+            >>> box2 = BoundingBox(70, 40, 100, 90)
+            >>> box1 | box2
+            BoundingBox(10.0, 20.0, 100.0, 90.0)
+        """
+        return self.__class__(
+                       min(self._left, other._left),
+                       min(self._top, other._top),
+                       max(self._right, other._right),
+                       max(self._bottom, other._bottom)
+        )
+
 
 #####################################################################
 

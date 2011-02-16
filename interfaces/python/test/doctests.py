@@ -11,6 +11,7 @@ if __name__ == "__main__":
     doctest.testmod(igraph.clustering)
     doctest.testmod(igraph.cut)
     doctest.testmod(igraph.datatypes)
+    doctest.testmod(igraph.drawing.utils)
     doctest.testmod(igraph.formula)
     doctest.testmod(igraph.statistics)
 
