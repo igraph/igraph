@@ -26,7 +26,7 @@ class Rectangle(object):
         and height, the upper left corner is assumed to be at (0,0))"""
         coords = None
         if len(args) == 1:
-            if isinstance(args[0], BoundingBox):
+            if isinstance(args[0], Rectangle):
                 coords = args[0].coords
             elif len(args[0]) >= 4:
                 coords = tuple(args[0])[0:4]
@@ -136,7 +136,7 @@ class Rectangle(object):
     def contract(self, margins):
         """Contracts the bounding box by the given margins.
 
-        @return: a new L{BoundingBox} object.
+        @return: a new L{Rectangle} object.
         """
         if isinstance(margins, int) or isinstance(margins, float):
             margins = [float(margins)] * 4
@@ -150,7 +150,7 @@ class Rectangle(object):
         if ny1 > ny2:
             ny1 = (ny1+ny2)/2.
             ny2 = ny1
-        return BoundingBox(nx1, ny1, nx2, ny2)
+        return self.__class__(nx1, ny1, nx2, ny2)
 
     def __repr__(self):
         return "%s(%s, %s, %s, %s)" % (self.__class__.__name__, \

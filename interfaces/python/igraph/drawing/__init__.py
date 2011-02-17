@@ -395,6 +395,12 @@ def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
       0.5 and then plot its spanning tree over it with opacity 0.1. To
       achieve this, you'll need to modify the L{Plot} object returned with
       L{Plot.add}.
+
+    @keyword margin: the top, right, bottom, left margins as a 4-tuple.
+      If it has less than 4 elements or is a single float, the elements
+      will be re-used until the length is at least 4. The default margin
+      is 20 on each side.
+
     @return: an appropriate L{Plot} object.
 
     @see: Graph.__plot__
@@ -403,7 +409,14 @@ def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
         bbox = BoundingBox(bbox)
 
     result = Plot(target, bbox, background="white")
+
+    if "margin" in kwds:
+        bbox = bbox.contract(kwds["margin"])
+        del kwds["margin"]
+    else:
+        bbox = bbox.contract(20)
     result.add(obj, bbox, *args, **kwds)
+
     if target is None:
         result.show()
 

@@ -154,14 +154,14 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
         layout = self.ensure_layout(kwds.get("layout", None), graph)
 
         # Determine the size of the margin on each side
-        margin = kwds.get("margin", [0., 0., 0., 0.])
+        margin = kwds.get("margin", 0)
         try:
             margin = list(margin)
         except TypeError:
             margin = [margin]
         while len(margin)<4:
             margin.extend(margin)
-        margin = [x + 20. for x in margin[:4]]
+        # margin = [x + 20. for x in margin[:4]]
 
         # Contract the drawing area by the margin and fit the layout
         bbox = self.bbox.contract(margin)
