@@ -121,7 +121,8 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
     this drawer."""
 
     def __init__(self, context, bbox, \
-                 edge_drawer_factory = ArrowEdgeDrawer):
+                 edge_drawer_factory = ArrowEdgeDrawer,
+                 label_drawer_factory = TextDrawer):
         """Constructs the graph drawer and associates it to the given
         Cairo context and the given L{BoundingBox}.
 
@@ -137,9 +138,13 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
                         here to control the style of edges drawn by
                         igraph. The default edge drawer is
                         L{ArrowEdgeDrawer}.
+        @param label_drawer_factory: a factory method that returns a
+                        L{TextDrawer} instance bound to a given Cairo
+                        context. The default label drawer is L{TextDrawer}.
         """
         AbstractCairoGraphDrawer.__init__(self, context, bbox)
         self.edge_drawer_factory = edge_drawer_factory
+        self.label_drawer_factory = label_drawer_factory
 
     # pylint: disable-msg=W0142,W0221,E1101
     # W0142: Used * or ** magic
@@ -283,7 +288,7 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
         else:
             wrap = bool(wrap)
 
-        label_drawer = TextDrawer(context, halign="center", valign="center")
+        label_drawer = self.label_drawer_factory(context)
         for vertex, coords in izip(vertex_builder, layout):
             if vertex.label is None:
                 continue
