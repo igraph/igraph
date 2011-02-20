@@ -10154,7 +10154,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_watts_strogatz_game */
   {"Watts_Strogatz", (PyCFunction) igraphmodule_Graph_Watts_Strogatz,
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-   "Watts_Strogatz(dim, size, nei=1, p)\n\n"
+   "Watts_Strogatz(dim, size, nei, p)\n\n"
    "@param dim: the dimension of the lattice\n"
    "@param size: the size of the lattice along all dimensions\n"
    "@param nei: value giving the distance (number of steps) within which\n"
