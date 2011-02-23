@@ -152,6 +152,51 @@ class Rectangle(object):
             ny2 = ny1
         return self.__class__(nx1, ny1, nx2, ny2)
 
+    def isdisjoint(self, other):
+        """Returns ``True`` if the two rectangles have no intersection.
+        
+        Example::
+            
+            >>> r1 = Rectangle(10, 10, 30, 30)
+            >>> r2 = Rectangle(20, 20, 50, 50)
+            >>> r3 = Rectangle(70, 70, 90, 90)
+            >>> r1.isdisjoint(r2)
+            False
+            >>> r2.isdisjoint(r1)
+            False
+            >>> r1.isdisjoint(r3)
+            True
+            >>> r3.isdisjoint(r1)
+            True
+        """
+        return self._left > other._right or self._right < other._left \
+                or self._top > other._bottom or self._bottom < other._top
+
+    def intersection(self, other):
+        """Returns the intersection of this rectangle with another.
+        
+        Example::
+            
+            >>> r1 = Rectangle(10, 10, 30, 30)
+            >>> r2 = Rectangle(20, 20, 50, 50)
+            >>> r3 = Rectangle(70, 70, 90, 90)
+            >>> r1.intersection(r2)
+            Rectangle(20.0, 20.0, 30.0, 30.0)
+            >>> r2 & r1
+            Rectangle(20.0, 20.0, 30.0, 30.0)
+            >>> r2.intersection(r1) == r1.intersection(r2)
+            True
+            >>> r1.intersection(r3)
+            Rectangle(0.0, 0.0, 0.0, 0.0)
+        """
+        if self.isdisjoint(other):
+            return Rectangle(0, 0, 0, 0)
+        return Rectangle(max(self._left, other._left),
+                max(self._top, other._top),
+                min(self._right, other._right),
+                min(self._bottom, other._bottom))
+    __and__ = intersection
+
     def __repr__(self):
         return "%s(%s, %s, %s, %s)" % (self.__class__.__name__, \
             self._left, self._top, self._right, self._bottom)
@@ -161,6 +206,12 @@ class Rectangle(object):
 
     def __ne__(self, other):
         return self.coords != other.coords
+
+    def __nonzero__(self):
+        """Returns ``True`` if the rectangle has non-zero width or
+        height, ``False`` otherwise."""
+        return self._left != self._right or self._top != self._bottom
+    __bool__ = __nonzero__
 
     def __hash__(self):
         return hash(self.coords)
