@@ -2460,6 +2460,19 @@ class Graph(GraphBase):
             Corresponding vertex attribute: C{label_angle}. The
             default is C{-math.pi/2}.
 
+          - C{vertex_order}: drawing order of the vertices. This must be
+            a list or tuple containing vertex indices; vertices are then
+            drawn according to this order.
+
+          - C{vertex_order_by}: an alternative way to specify the drawing
+            order of the vertices; this attribute is interpreted as the name
+            of a vertex attribute, and vertices are drawn such that those
+            with a smaller attribute value are drawn first. You may also
+            reverse the order by passing a tuple here; the first element of
+            the tuple should be the name of the attribute, the second element
+            specifies whether the order is reversed (C{True}, C{False},
+            C{"asc"} and C{"desc"} are accepted values).
+
           - C{edge_color}: color of the edges. The corresponding edge
             attribute is C{color}, the default is red. See C{vertex_color}
             for color specification syntax.

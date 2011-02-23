@@ -268,9 +268,40 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
             src_vertex, dest_vertex = vertex_builder[src], vertex_builder[dest]
             drawer_method(visual_edge, src_vertex, dest_vertex)
 
+        # Calculate the desired vertex order
+        if "vertex_order" in kwds:
+            # Vertex order specified explicitly
+            vertex_order = kwds["vertex_order"]
+        elif kwds.get("vertex_order_by") is not None:
+            # Vertex order by another attribute
+            vertex_order_by = kwds["vertex_order_by"]
+            if isinstance(vertex_order_by, tuple):
+                vertex_order_by, reverse = vertex_order_by
+                if isinstance(reverse, basestring) and reverse.lower().startswith("asc"):
+                    reverse = False
+                else:
+                    reverse = bool(reversed)
+            else:
+                reverse = False
+            attrs = graph.vs[vertex_order_by]
+            vertex_order = sorted(range(graph.vcount()), key=attrs.__getitem__,
+                    reverse=reverse)
+            del attrs
+        else:
+            # Default vertex order
+            vertex_order = None
+
+        if vertex_order is None:
+            # Default vertex order
+            vertex_coord_iter = izip(vertex_builder, layout)
+        else:
+            # Specified vertex order
+            vertex_coord_iter = ((vertex_builder[i], layout[i])
+                    for i in vertex_order)
+
         # Draw the vertices
         context.set_line_width(1)
-        for vertex, coords in izip(vertex_builder, layout):
+        for vertex, coords in vertex_coord_iter:
             vertex.shape.draw_path(context, \
                     coords[0], coords[1], vertex.size)
             context.set_source_rgba(*vertex.color)
@@ -288,8 +319,16 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
         else:
             wrap = bool(wrap)
 
+        if vertex_order is None:
+            # Default vertex order
+            vertex_coord_iter = izip(vertex_builder, layout)
+        else:
+            # Specified vertex order
+            vertex_coord_iter = ((vertex_builder[i], layout[i])
+                    for i in vertex_order)
+
         label_drawer = self.label_drawer_factory(context)
-        for vertex, coords in izip(vertex_builder, layout):
+        for vertex, coords in vertex_coord_iter:
             if vertex.label is None:
                 continue
 
