@@ -7,7 +7,7 @@ from itertools import izip
 from math import atan2, cos, sin
 from operator import itemgetter
 
-__all__ = ["BoundingBox", "FakeModule", "Point"]
+__all__ = ["BoundingBox", "FakeModule", "Point", "Rectangle"]
 __license__ = "GPL"
 
 #####################################################################
@@ -127,6 +127,30 @@ class Rectangle(object):
         """Sets the Y coordinate of the bottom edge of the box"""
         self._bottom = value
         self._top = min(self._bottom, self._top)
+
+    @property
+    def midx(self):
+        """Returns the X coordinate at the center of the box"""
+        return (self._left + self._right) / 2.0
+
+    @midx.setter
+    def midx(self, value):
+        """Moves the center of the box to the given X coordinate"""
+        dx = value - (self._left + self._right) / 2.0
+        self._left += dx
+        self._right += dx
+
+    @property
+    def midy(self):
+        """Returns the Y coordinate at the center of the box"""
+        return (self._top + self._bottom) / 2.0
+
+    @midy.setter
+    def midy(self, value):
+        """Moves the center of the box to the given Y coordinate"""
+        dy = value - (self._top + self._bottom) / 2.0
+        self._top += dy
+        self._bottom += dy
 
     @property
     def shape(self):

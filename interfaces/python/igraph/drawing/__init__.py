@@ -24,10 +24,10 @@ from igraph.compat import property
 from igraph.configuration import Configuration
 from igraph.drawing.colors import Palette, palettes
 from igraph.drawing.graph import DefaultGraphDrawer
-from igraph.drawing.utils import BoundingBox, Point
+from igraph.drawing.utils import BoundingBox, Point, Rectangle
 from igraph.utils import named_temporary_file
 
-__all__ = ["BoundingBox", "DefaultGraphDrawer", "Plot", "Point", "plot"]
+__all__ = ["BoundingBox", "DefaultGraphDrawer", "Plot", "Point", "Rectangle", "plot"]
 
 __license__ = "GPL"
 
