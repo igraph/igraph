@@ -273,7 +273,7 @@ class RunningMean(object):
         if items is not None:
             if n != 0 or mean != 0 or sd != 0:
                 raise ValueError("n, mean and sd must be zeros if items is not None")
-            self.reset()
+            self.clear()
             self.add_many(items)
         else:
             self._nitems = float(n)
