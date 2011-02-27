@@ -273,8 +273,7 @@ class RunningMean(object):
         if items is not None:
             if n != 0 or mean != 0 or sd != 0:
                 raise ValueError("n, mean and sd must be zeros if items is not None")
-            self._nitems, self._mean = 0.0, 0.0
-            self._sqdiff, self._sd = 0.0, 0.0
+            self.reset()
             self.add_many(items)
         else:
             self._nitems = float(n)
@@ -324,6 +323,11 @@ class RunningMean(object):
             iterator = iter([values])
         for value in iterator:
             self.add(value)
+
+    def clear(self):
+        """Resets the running mean calculator."""
+        self._nitems, self._mean = 0.0, 0.0
+        self._sqdiff, self._sd = 0.0, 0.0
 
     @property
     def result(self):

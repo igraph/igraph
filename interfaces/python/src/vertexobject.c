@@ -373,6 +373,7 @@ GRAPH_PROXY_METHOD(pagerank, "pagerank");
 GRAPH_PROXY_METHOD_PP(predecessors, "predecessors", _convert_to_vertex_list);
 GRAPH_PROXY_METHOD(personalized_pagerank, "personalized_pagerank");
 GRAPH_PROXY_METHOD(shortest_paths, "shortest_paths");
+GRAPH_PROXY_METHOD(strength, "strength");
 GRAPH_PROXY_METHOD_PP(successors, "successors", _convert_to_vertex_list);
 
 #undef GRAPH_PROXY_METHOD
@@ -415,6 +416,7 @@ PyMethodDef igraphmodule_Vertex_methods[] = {
   GRAPH_PROXY_METHOD_SPEC(predecessors, "predecessors"),
   GRAPH_PROXY_METHOD_SPEC(personalized_pagerank, "personalized_pagerank"),
   GRAPH_PROXY_METHOD_SPEC(shortest_paths, "shortest_paths"),
+  GRAPH_PROXY_METHOD_SPEC(strength, "strength"),
   GRAPH_PROXY_METHOD_SPEC(successors, "successors"),
   {NULL}
 };
