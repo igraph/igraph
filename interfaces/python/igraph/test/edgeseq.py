@@ -14,6 +14,18 @@ class EdgeTests(unittest.TestCase):
         output = repr(self.g.es[3])
         self.assertEquals(output, "igraph.Edge(%r, 3, {'weight': 7})" % self.g)
 
+    def testUpdateAttributes(self):
+        e = self.g.es[0]
+
+        e.update_attributes(a=2)
+        self.assertEquals(e["a"], 2)
+
+        e.update_attributes([("a", 3), ("b", 4)], c=5, d=6)
+        self.assertEquals(e.attributes(), dict(a=3, b=4, c=5, d=6))
+
+        e.update_attributes(dict(b=44, c=55))
+        self.assertEquals(e.attributes(), dict(a=3, b=44, c=55, d=6))
+
 
 class EdgeSeqTests(unittest.TestCase):
     def setUp(self):

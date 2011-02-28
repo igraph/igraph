@@ -174,6 +174,109 @@ PyObject* igraphmodule_Vertex_attributes(igraphmodule_VertexObject* self) {
   return dict;
 }
 
+/**
+ * \ingroup python_interface_vertex
+ * \brief Updates some attributes of a vertex
+ * 
+ * Incidentally, this method is re-used intact in edgeobject.c for edges.
+ *
+ * \param self the vertex object
+ * \param args positional arguments
+ * \param kwds keyword arguments
+ */
+PyObject* igraphmodule_Vertex_update_attributes(PyObject* self, PyObject* args,
+    PyObject* kwds) {
+  PyObject* items[] = { Py_None, kwds, 0 };
+  PyObject** pObj;
+  PyObject *key, *value, *it, *item, *keys;
+
+  igraph_bool_t ok = 1;
+
+  if (!PyArg_ParseTuple(args, "|O", &items[0]))
+    return NULL;
+
+  pObj = items;
+  for (pObj = items; ok && *pObj != 0; pObj++) {
+    PyObject* obj = *pObj;
+    PyObject* keys_func;
+
+    if (obj == Py_None)
+      continue;
+
+    keys_func = PyObject_GetAttrString(obj, "keys");
+    if (keys_func == 0)
+      PyErr_Clear();
+
+    if (keys_func != 0 && PyCallable_Check(keys_func)) {
+      /* Object has a "keys" method, so we iterate over the keys */
+      keys = PyObject_CallObject(keys_func, 0);
+      if (keys == 0) {
+        ok = 0;
+      } else {
+        /* Iterate over the keys */
+        it = PyObject_GetIter(keys);
+        if (it == 0) {
+          ok = 0;
+        } else {
+          while (ok && ((key = PyIter_Next(it)) != 0)) {
+            value = PyObject_GetItem(obj, key);
+            if (value == 0) {
+              ok = 0;
+            } else {
+              PyObject_SetItem((PyObject*)self, key, value);
+              Py_DECREF(value);
+            }
+            Py_DECREF(key);
+          }
+          Py_DECREF(it);
+          if (PyErr_Occurred())
+            ok = 0;
+        }
+        Py_DECREF(keys);
+      }
+    } else {
+      /* Object does not have a "keys" method; assume that it
+       * yields tuples when treated as an iterator */
+      it = PyObject_GetIter(obj);
+      if (!it) {
+        ok = 0;
+      } else {
+        while (ok && ((item = PyIter_Next(it)) != 0)) {
+          if (!PySequence_Check(item) || PyBaseString_Check(item)) {
+            PyErr_SetString(PyExc_TypeError, "cannot convert update sequence element to a sequence");
+            ok = 0;
+          } else {
+            key = PySequence_GetItem(item, 0);
+            if (key == 0) {
+              ok = 0;
+            } else {
+              value = PySequence_GetItem(item, 1);
+              if (value == 0) {
+                ok = 0;
+              } else {
+                PyObject_SetItem((PyObject*)self, key, value);
+                Py_DECREF(value);
+              }
+              Py_DECREF(key);
+            }
+          }
+          Py_DECREF(item);
+        }
+        Py_DECREF(it);
+        if (PyErr_Occurred())
+          ok = 0;
+      }
+    }
+
+    if (keys_func != 0)
+      Py_DECREF(keys_func);
+  }
+
+  if (ok)
+    Py_RETURN_NONE;
+  return 0;
+}
+
 /** \ingroup python_interface_vertex
  * \brief Returns the corresponding value to a given attribute of the vertex
  * \param self the vertex object
@@ -399,6 +502,16 @@ PyMethodDef igraphmodule_Vertex_methods[] = {
     METH_NOARGS,
     "attribute_names() -> list\n\n"
     "Returns the list of vertex attribute names\n"
+  },
+  {"update_attributes", (PyCFunction)igraphmodule_Vertex_update_attributes,
+    METH_VARARGS | METH_KEYWORDS,
+    "update_attributes(E, **F) -> None\n\n"
+    "Updates the attributes of the vertex from dict/iterable E and F.\n\n"
+    "If E has a C{keys()} method, it does: C{for k in E: self[k] = E[k]}.\n"
+    "If E lacks a C{keys()} method, it does: C{for (k, v) in E: self[k] = v}.\n"
+    "In either case, this is followed by: C{for k in F: self[k] = F[k]}.\n\n"
+    "This method thus behaves similarly to the C{update()} method of Python\n"
+    "dictionaries."
   },
   GRAPH_PROXY_METHOD_SPEC(betweenness, "betweenness"),
   GRAPH_PROXY_METHOD_SPEC(closeness, "closeness"),

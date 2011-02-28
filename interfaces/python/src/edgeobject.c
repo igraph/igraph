@@ -26,6 +26,7 @@
 #include "attributes.h"
 #include "edgeobject.h"
 #include "graphobject.h"
+#include "vertexobject.h"
 #include "error.h"
 #include "py2compat.h"
 
@@ -180,20 +181,16 @@ PyObject* igraphmodule_Edge_attributes(igraphmodule_EdgeObject* self) {
 
 /**
  * \ingroup python_interface_edge
- * Returns the edge index
+ * \brief Updates some attributes of an edge
+ * 
+ * \param self the edge object
+ * \param args positional arguments
+ * \param kwds keyword arguments
  */
-PyObject* igraphmodule_Edge_get_index(igraphmodule_EdgeObject* self, void* closure) {
-  return PyInt_FromLong((long)self->idx);
+PyObject* igraphmodule_Edge_update_attributes(PyObject* self, PyObject* args,
+    PyObject* kwds) {
+  return igraphmodule_Vertex_update_attributes(self, args, kwds);
 }
-
-/**
- * \ingroup python_interface_edge
- * Returns the edge index as an ordinary C long
- */
-long igraphmodule_Edge_get_index_long(igraphmodule_EdgeObject* self) {
-  return (long)self->idx;
-}
-
 
 /** \ingroup python_interface_edge
  * \brief Returns the corresponding value to a given attribute of the edge
@@ -321,6 +318,22 @@ PyObject* igraphmodule_Edge_get_to(igraphmodule_EdgeObject* self, void* closure)
 
 /**
  * \ingroup python_interface_edge
+ * Returns the edge index
+ */
+PyObject* igraphmodule_Edge_get_index(igraphmodule_EdgeObject* self, void* closure) {
+  return PyInt_FromLong((long)self->idx);
+}
+
+/**
+ * \ingroup python_interface_edge
+ * Returns the edge index as an ordinary C long
+ */
+long igraphmodule_Edge_get_index_long(igraphmodule_EdgeObject* self) {
+  return (long)self->idx;
+}
+
+/**
+ * \ingroup python_interface_edge
  * Returns the target node index of an edge
  */
 PyObject* igraphmodule_Edge_get_tuple(igraphmodule_EdgeObject* self, void* closure) {
@@ -383,6 +396,16 @@ PyMethodDef igraphmodule_Edge_methods[] = {
       METH_NOARGS,
       "attribute_names() -> list\n\n"
       "Returns the list of edge attribute names\n"
+  },
+  {"update_attributes", (PyCFunction)igraphmodule_Edge_update_attributes,
+    METH_VARARGS | METH_KEYWORDS,
+    "update_attributes(E, **F) -> None\n\n"
+    "Updates the attributes of the edge from dict/iterable E and F.\n\n"
+    "If E has a C{keys()} method, it does: C{for k in E: self[k] = E[k]}.\n"
+    "If E lacks a C{keys()} method, it does: C{for (k, v) in E: self[k] = v}.\n"
+    "In either case, this is followed by: C{for k in F: self[k] = F[k]}.\n\n"
+    "This method thus behaves similarly to the C{update()} method of Python\n"
+    "dictionaries."
   },
   GRAPH_PROXY_METHOD_SPEC(count_multiple, "count_multiple"),
   GRAPH_PROXY_METHOD_SPEC(delete, "delete"),

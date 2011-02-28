@@ -2,6 +2,23 @@
 import unittest
 from igraph import *
 
+class VertexTests(unittest.TestCase):
+    def setUp(self):
+        self.g = Graph.Full(10)
+
+    def testUpdateAttributes(self):
+        v = self.g.vs[0]
+
+        v.update_attributes(a=2)
+        self.assertEquals(v["a"], 2)
+
+        v.update_attributes([("a", 3), ("b", 4)], c=5, d=6)
+        self.assertEquals(v.attributes(), dict(a=3, b=4, c=5, d=6))
+
+        v.update_attributes(dict(b=44, c=55))
+        self.assertEquals(v.attributes(), dict(a=3, b=44, c=55, d=6))
+
+
 class VertexSeqTests(unittest.TestCase):
     def setUp(self):
         self.g = Graph.Full(10)
@@ -131,9 +148,11 @@ class VertexSeqTests(unittest.TestCase):
         for v, d in zip(vs, vs.degree()):
             self.assertEquals(v.degree(), d)
 
+
 def suite():
+    vertex_suite = unittest.makeSuite(VertexTests)
     vs_suite = unittest.makeSuite(VertexSeqTests)
-    return unittest.TestSuite([vs_suite])
+    return unittest.TestSuite([vertex_suite, vs_suite])
 
 def test():
     runner = unittest.TextTestRunner()
