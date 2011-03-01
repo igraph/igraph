@@ -560,6 +560,7 @@ int igraph_i_minimum_size_separators_append(igraph_vector_ptr_t *old,
       igraph_vector_destroy(newvec);
       igraph_free(newvec);
     }
+    VECTOR(*new)[i]=0;
   }
   igraph_vector_ptr_clear(new);
 
@@ -589,6 +590,19 @@ int igraph_i_minimum_size_separators_topkdeg(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(2);
 
   return 0;
+}
+
+void igraph_i_separators_stcuts_free(igraph_vector_ptr_t *p) {
+  long int i, n=igraph_vector_ptr_size(p);
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v=VECTOR(*p)[i];
+    if (v) { 
+      igraph_vector_destroy(v);
+      igraph_free(v);
+      VECTOR(*p)[i]=0;
+    }
+  }
+  igraph_vector_ptr_destroy(p);
 }
 
 /** 
@@ -684,8 +698,7 @@ int igraph_minimum_size_separators(const igraph_t *graph,
     return 0;
   }
 
-  /* Work on a copy of 'graph' 
-     TODO: we don't actually need this copy... */
+  /* Work on a copy of 'graph' */
   IGRAPH_CHECK(igraph_copy(&graph_copy, graph));
   IGRAPH_FINALLY(igraph_destroy, &graph_copy);
 
@@ -747,8 +760,7 @@ int igraph_minimum_size_separators(const igraph_t *graph,
 	/* 5-6-7. Find all k-sets separating x[i] and v[j]. */
 	igraph_vector_ptr_t stcuts;
 	IGRAPH_CHECK(igraph_vector_ptr_init(&stcuts, 0));
-	IGRAPH_FINALLY(igraph_vector_ptr_destroy, &stcuts);
-	/* TODO: proper destructor for stcuts */
+	IGRAPH_FINALLY(igraph_i_separators_stcuts_free, &stcuts);
 	IGRAPH_CHECK(igraph_all_st_mincuts(&Gbar, /*value=*/ 0, 
 					   /*cuts=*/ &stcuts,
 					   /*partition1s=*/ 0, 
