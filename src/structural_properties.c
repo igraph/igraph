@@ -4537,7 +4537,7 @@ int igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
  *        to check all edges.
  * \return Error code.
  * 
- * \sa \ref igraph_count_multiple(), \ref igraph_has_multiply() and \ref igraph_simplify().
+ * \sa \ref igraph_count_multiple(), \ref igraph_has_multiple() and \ref igraph_simplify().
  * 
  * Time complexity: O(e*d), e is the number of edges to check and d is the 
  * average degree (out-degree in directed graphs) of the vertices at the 
