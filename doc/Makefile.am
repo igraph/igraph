@@ -33,7 +33,7 @@ ps: igraph-docs.ps
 doctemplate: $(DOCINCLUDES)
 
 tags: $(DOCINCLUDES) $(DOCFIX)
-	cat $(DOCINCLUDES) $(DOCFIX)| grep 'id="[^"]*">' | sed 's/.*id="\([^"]*\)">.*/\1/' | sort > tags
+	cat $(DOCINCLUDES) $(DOCFIX)| grep 'id="[^-"]*">' | sed 's/.*id="\([^"]*\)">.*/\1@@/' | tr '@' '\t' | sort > tags
 
 EXAMPLES = $(patsubst %.c,%.c.xml,$(wildcard ../examples/simple/*.c))
 
