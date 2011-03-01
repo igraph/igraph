@@ -24,6 +24,10 @@
 #include "igraph_complex.h"
 #include <math.h>
 
+/**
+ * \example igraph_complex.c
+ */
+
 igraph_complex_t igraph_complex(igraph_real_t x, igraph_real_t y) {
   igraph_complex_t res;
   IGRAPH_REAL(res) = x;

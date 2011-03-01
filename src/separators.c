@@ -138,6 +138,8 @@ int igraph_i_is_separator(const igraph_t *graph,
  * \return Error code.
  * 
  * Time complexity: O(|V|+|E|), linear in the number vertices and edges.
+ * 
+ * \example examples/simple/igraph_is_separator.c
  */
 
 int igraph_is_separator(const igraph_t *graph, 
@@ -194,6 +196,8 @@ int igraph_is_separator(const igraph_t *graph,
  * Time complexity: O(n(|V|+|E|)), |V| is the number of vertices, |E|
  * is the number of edges, n is the number vertices in the candidate
  * separator.
+ * 
+ * \example examples/simple/igraph_is_minimal_separator.c
  */
 
 int igraph_is_minimal_separator(const igraph_t *graph,
@@ -410,6 +414,8 @@ void igraph_i_separators_free(igraph_vector_ptr_t *separators) {
  * 
  * Time complexity: O(n|V|^3), |V| is the number of vertices, n is the
  * number of separators.
+ * 
+ * \example examples/simple/igraph_minimal_separators.c
  */
 
 int igraph_all_minimal_st_separators(const igraph_t *graph, 
@@ -628,6 +634,8 @@ void igraph_i_separators_stcuts_free(igraph_vector_ptr_t *p) {
  * \return Error code.
  * 
  * Time complexity: TODO.
+ * 
+ * \example examples/simple/igraph_minimum_size_separators.c
  */
 
 int igraph_minimum_size_separators(const igraph_t *graph,

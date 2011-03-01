@@ -464,6 +464,7 @@ int igraph_i_eigen_matrix_symmetric_arpack(const igraph_matrix_t *A,
 /** 
  * \function igraph_eigen_matrix_symmetric
  * 
+ * \example examples/simple/igraph_eigen_matrix_symmetric.c
  */ 
 
 int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,

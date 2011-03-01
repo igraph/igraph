@@ -984,6 +984,8 @@ int igraph_i_xml_escape(char* src, char** dest) {
  *         incorrect.
  *         \c IGRAPH_UNIMPLEMENTED: the GraphML functionality was disabled
  *         at compile-time
+ * 
+ * \example examples/simple/graphml.c
  */
 int igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
 			      int index) {
@@ -1059,6 +1061,8 @@ int igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
  * Time complexity: O(|V|+|E|) otherwise. All
  * file operations are expected to have time complexity 
  * O(1). 
+ * 
+ * \example examples/simple/graphml.c
  */
 int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream) {
   int ret;

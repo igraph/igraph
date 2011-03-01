@@ -436,6 +436,9 @@ int igraph_i_barabasi_game_psumtree(igraph_t *graph,
  * 
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges.
+ * 
+ * \example examples/simple/igraph_barabasi_game.c
+ * \example examples/simple/igraph_barabasi_game2.c
  */
 
 int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
@@ -738,6 +741,8 @@ int igraph_erdos_renyi_game_gnm(igraph_t *graph, igraph_integer_t n, igraph_real
  * number of vertices plus the number of edges in the graph.
  * 
  * \sa \ref igraph_barabasi_game(), \ref igraph_growing_random_game()
+ * 
+ * \example examples/simple/igraph_erdos_renyi_game.c
  */
 
 int igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
@@ -916,6 +921,8 @@ int igraph_degree_sequence_game_vl(igraph_t *graph,
  * number of vertices plus the number of edges.
  * 
  * \sa \ref igraph_barabasi_game(), \ref igraph_erdos_renyi_game()
+ * 
+ * \example examples/simple/igraph_degree_sequence_game.c
  */
 
 int igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
@@ -959,6 +966,8 @@ int igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
  *
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges.
+ * 
+ * \example examples/simple/igraph_growing_random_game.c
  */
 int igraph_growing_random_game(igraph_t *graph, igraph_integer_t n, 
 			       igraph_integer_t m, igraph_bool_t directed,
@@ -1678,6 +1687,8 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
  * \return Error code.
  * 
  * Time complexity: TODO, less than O(|V|^2+|E|).
+ * 
+ * \example examples/simple/igraph_grg_game.c
  */
 				    
 int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
@@ -1830,6 +1841,8 @@ void igraph_i_preference_game_free_vids_by_type(igraph_vector_ptr_t *vecs) {
  * number of vertices plus the number of edges in the graph.
  * 
  * \sa igraph_establishment_game()
+ * 
+ * \example examples/simple/igraph_preference_game.c
  */
 
 int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,

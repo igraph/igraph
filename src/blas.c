@@ -47,6 +47,8 @@
  *
  * \sa \ref igraph_blas_dgemv_array if you have arrays instead of
  *     vectors.
+ * 
+ * \example examples/simple/blas.c
  */
 void igraph_blas_dgemv(igraph_bool_t transpose, igraph_real_t alpha,
         const igraph_matrix_t* a, const igraph_vector_t* x,

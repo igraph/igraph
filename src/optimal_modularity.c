@@ -72,6 +72,8 @@ void igraph_i_optmod_hook(glp_tree *tree, void *info) {
  * for an algorithm that finds a local optimum in a greedy way. 
  * 
  * Time complexity: exponential in the number of vertices.
+ * 
+ * \example examples/simple/igraph_community_optimal_modularity.c
  */
 
 int igraph_community_optimal_modularity(const igraph_t *graph,

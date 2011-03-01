@@ -355,6 +355,8 @@ vertex3name [optionalWeight] \endverbatim
  * while |E| is the number of edges. 
  * 
  * \sa \ref igraph_read_graph_ncol(), \ref igraph_write_graph_lgl()
+ * 
+ * \example examples/simple/igraph_read_graph_lgl.c
  */
 
 int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
@@ -554,6 +556,8 @@ extern char *igraph_i_pajek_errmsg;
  * 
  * \sa \ref igraph_write_graph_pajek() for writing Pajek files, \ref
  * igraph_read_graph_graphml() for reading GraphML files.
+ * 
+ * \example examples/simple/foreign.c
  */
 
 int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
@@ -925,6 +929,8 @@ int igraph_i_read_graph_graphdb_getword(FILE *instream) {
  * 
  * Time complexity: O(|V|+|E|), the number of vertices plus the 
  * number of edges.
+ * 
+ * \example examples/simple/igraph_read_graph_graphdb.c
  */
 
 int igraph_read_graph_graphdb(igraph_t *graph, FILE *instream, 
@@ -1086,6 +1092,8 @@ const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, long int pos) {
  * 
  * \sa \ref igraph_read_graph_graphml() for a more modern format, 
  * \ref igraph_write_graph_gml() for writing GML files.
+ * 
+ * \example examples/simple/gml.c
  */
 
 int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
@@ -1667,6 +1675,8 @@ int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
  * O(1). 
  *
  * \sa \ref igraph_read_graph_lgl(), \ref igraph_write_graph_ncol()
+ * 
+ * \example examples/simple/igraph_write_graph_lgl.c
  */
 
 int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
@@ -1949,6 +1959,8 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
  * \sa \ref igraph_read_graph_pajek() for reading Pajek graphs, \ref
  * igraph_write_graph_graphml() for writing a graph in GraphML format,
  * this suites <command>igraph</command> graphs better.
+ * 
+ * \example examples/simple/igraph_write_graph_pajek.c
  */
 
 int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
@@ -2360,6 +2372,8 @@ int igraph_i_gml_convert_to_key(const char *orig, char **key) {
  * 
  * \sa \ref igraph_read_graph_gml() for reading GML files, 
  * \ref igraph_read_graph_graphml() for a more modern format.
+ * 
+ * \example examples/simple/gml.c
  */
 
 int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream, 
@@ -2590,6 +2604,8 @@ int igraph_i_dot_escape(const char *orig, char **result) {
  * to the file.
  * 
  * \sa \ref igraph_write_graph_graphml() for a more modern format.
+ * 
+ * \example examples/simple/dot.c
  */
 int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
   int ret;
@@ -2775,6 +2791,8 @@ igraph_i_dl_parsedata_t igraph_i_dl_data;
  * Time complexity: linear in terms of the number of edges and
  * vertices, except for the matrix format, which is quadratic in the
  * number of vertices. 
+ * 
+ * \example examples/simple/igraph_read_graph_dl.c
  */
 
 int igraph_read_graph_dl(igraph_t *graph, FILE *instream, 
@@ -2901,6 +2919,8 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
  * 
  * Time complexity: O(|V|+|E|), the number of vertices and edges in the
  * graph.
+ * 
+ * \example examples/simple/igraph_write_graph_leda.c
  */
 
 int igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,

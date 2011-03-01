@@ -61,6 +61,8 @@
  * union.
  * 
  * Time complexity: O(|V1|+|V2|+|E1|+|E2|).
+ * 
+ * \example examples/simple/igraph_disjoint_union.c
  */
 
 int igraph_disjoint_union(igraph_t *res, const igraph_t *left, 
@@ -198,6 +200,8 @@ int igraph_disjoint_union_many(igraph_t *res,
  * Time complexity: O(|V|+|E|), |V| is the number of nodes, |E|
  * is the number of edges in the smaller graph of the two. (The one 
  * containing less vertices is considered smaller.)
+ * 
+ * \example examples/simple/igraph_intersection.c
  */
 
 int igraph_intersection(igraph_t *res,
@@ -452,6 +456,8 @@ int igraph_intersection_many(igraph_t *res,
  * 
  * Time complexity: O(|V|+|E|), |V| is the number of
  * vertices, |E| the number of edges in the result graph.
+ * 
+ * \example examples/simple/igraph_union.c
  */
 
 int igraph_union(igraph_t *res, 
@@ -556,6 +562,8 @@ void igraph_i_union_many_free(igraph_vector_ptr_t *v) {
  * 
  * Time complexity: O(|V|+|E|), |V| is the number of vertices
  * in largest graph and |E| is the number of edges in the result graph.
+ * 
+ * \example examples/simple/igraph_union.c
  */
 
 int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs) {
@@ -696,6 +704,8 @@ int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs) {
  * Time complexity: O(|V|+|E|), |V| is the number vertices in
  * the smaller graph, |E| is the
  * number of edges in the result graph.
+ * 
+ * \example examples/simple/igraph_difference.c
  */
 
 int igraph_difference(igraph_t *res, 
@@ -829,6 +839,8 @@ int igraph_difference(igraph_t *res,
  * Time complexity: O(|V|+|E1|+|E2|), |V| is the number of
  * vertices in the graph, |E1| is the number of edges in the original
  * and |E2| in the complementer graph.
+ * 
+ * \example examples/simple/igraph_complementer.c
  */
 
 int igraph_complementer(igraph_t *res, const igraph_t *graph, 
@@ -911,6 +923,8 @@ int igraph_complementer(igraph_t *res, const igraph_t *graph,
  * Time complexity: O(|V|*d1*d2), |V| is the number of vertices in the
  * first graph, d1 and d2 the average degree in the first and second
  * graphs. 
+ * 
+ * \example examples/simple/igraph_compose.c
  */
 
 int igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2) {

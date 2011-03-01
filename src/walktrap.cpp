@@ -115,6 +115,8 @@ using namespace std;
  * 
  * Time complexity: O(|E||V|^2) in the worst case, O(|V|^2 log|V|) typically, 
  * |V| is the number of vertices, |E| is the number of edges.
+ * 
+ * \example examples/simple/walktrap.c
  */
 
 int igraph_community_walktrap(const igraph_t *graph, 

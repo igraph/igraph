@@ -1556,6 +1556,8 @@ int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_
  * are determined by looking for other nodes that have this node as parent)
  * 
  * \sa \ref igraph_layout_reingold_tilford_circular().
+ * 
+ * \example examples/simple/igraph_layout_reingold_tilford.c
  */
 
 int igraph_layout_reingold_tilford(const igraph_t *graph,

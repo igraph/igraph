@@ -1607,6 +1607,8 @@ igraph_bool_t igraph_i_isomorphic_vf2(igraph_vector_t *map12,
  * \ref igraph_get_isomorphisms_vf2(),
  * 
  * Time complexity: exponential, what did you expect?
+ * 
+ * \example examples/simple/igraph_isomorphic_vf2.c
  */
 
 int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2, 

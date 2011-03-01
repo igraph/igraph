@@ -437,6 +437,8 @@ void igraph_decompose_destroy(igraph_vector_ptr_t *complist) {
  * 
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges. 
+ * 
+ * \example examples/simple/igraph_decompose.c
  */
 
 int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components, 
@@ -605,6 +607,8 @@ void igraph_i_free_vectorlist(igraph_vector_ptr_t *list) {
  * vertices.
  * 
  * \sa \ref igraph_articulation_points(), \ref igraph_clusters().
+ * 
+ * \example examples/simple/igraph_biconnected_components.c
  */
 
 int igraph_biconnected_components(const igraph_t *graph,

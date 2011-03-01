@@ -112,6 +112,8 @@ int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
  *         \c IGRAPH_ENOMEM: not enough memory
  * 
  * Time complexity: O(n log(n)) where n is the number of vertices
+ * 
+ * \example examples/simple/igraph_convex_hull.c
  */
 int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
 		       igraph_matrix_t *rescoords) {
