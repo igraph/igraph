@@ -1960,6 +1960,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
 
   /* Same order as the #define's */
   const char *vnames[] = { "id", "x", "y", "z", "shape", "xfact", "yfact",
+               0, 0, 0, 0, 0, 0, 0, 0, 0,
 			   "labeldist", "labeldegree2", "framewidth",
 			   "fontsize", "rotation", "radius", 
 			   "diamondratio", "labeldegree", "vertexsize", 
@@ -1976,7 +1977,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
 			      "labelcolor" };
   const char *vstrnames2[]= { "font", "url", "ic", "bc", "lc" };  
   
-  const char *enames[] = { "weight",
+  const char *enames[] = { "weight", 0, 0, 0,
 			   "arrowsize", "edgewidth", "hook1", "hook2", 
 			   "angle1", "angle2", "velocity1", "velocity2",
 			   "arrowpos", "labelpos", "labelangle",

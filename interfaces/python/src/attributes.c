@@ -152,7 +152,7 @@ int igraphmodule_get_vertex_id_by_name(igraph_t *graph, PyObject* o, long int* v
  */
 igraph_bool_t igraphmodule_has_graph_attribute(const igraph_t *graph, const char* name) {
   PyObject *dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_GRAPH];
-  return dict != 0 && PyDict_GetItemString(dict, name) != 0;
+  return name != 0 && dict != 0 && PyDict_GetItemString(dict, name) != 0;
 }
 
 /**
@@ -163,7 +163,7 @@ igraph_bool_t igraphmodule_has_graph_attribute(const igraph_t *graph, const char
  */
 igraph_bool_t igraphmodule_has_vertex_attribute(const igraph_t *graph, const char* name) {
   PyObject *dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_VERTEX];
-  return dict != 0 && PyDict_GetItemString(dict, name) != 0;
+  return name != 0 && dict != 0 && PyDict_GetItemString(dict, name) != 0;
 }
 
 /**
@@ -174,7 +174,7 @@ igraph_bool_t igraphmodule_has_vertex_attribute(const igraph_t *graph, const cha
  */
 igraph_bool_t igraphmodule_has_edge_attribute(const igraph_t *graph, const char* name) {
   PyObject *dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_EDGE];
-  return dict != 0 && PyDict_GetItemString(dict, name) != 0;
+  return name != 0 && dict != 0 && PyDict_GetItemString(dict, name) != 0;
 }
 
 /**
