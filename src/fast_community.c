@@ -510,6 +510,8 @@ int igraph_i_fastgreedy_commpair_cmp(const void* p1, const void* p2) {
  * Time complexity: O(|E||V|log|V|) in the worst case,
  * O(|E|+|V|log^2|V|) typically, |V| is the number of vertices, |E| is
  * the number of edges.
+ * 
+ * \example examples/simple/igraph_community_fastgreedy.c
  */
 int igraph_community_fastgreedy(const igraph_t *graph,
 				const igraph_vector_t *weights,

@@ -319,6 +319,8 @@ int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
  * \sa \ref igraph_largest_cliques() and \ref igraph_clique_number().
  *
  * Time complexity: TODO
+ * 
+ * \example examples/simple/igraph_cliques.c
  */
 int igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
                    igraph_integer_t min_size, igraph_integer_t max_size) {
@@ -375,6 +377,8 @@ int igraph_i_maximal_or_largest_cliques_or_indsets(const igraph_t *graph,
  * \ref igraph_independence_number().
  *
  * Time complexity: TODO
+ * 
+ * \example examples/simple/igraph_independent_sets.c
  */
 int igraph_independent_vertex_sets(const igraph_t *graph,
 				   igraph_vector_ptr_t *res,
@@ -868,6 +872,8 @@ int igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
  * igraph_clique_number() 
  * 
  * Time complexity: O(3^(|V|/3)) worst case.
+ * 
+ * \example examples/simple/igraph_maximal_cliques.c
  */
 int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
         igraph_integer_t min_size, igraph_integer_t max_size) {

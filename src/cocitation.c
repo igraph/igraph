@@ -60,6 +60,8 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
  * the vertices in the graph.
  *
  * \sa \ref igraph_bibcoupling()
+ * 
+ * \example examples/simple/igraph_cocitation.c
  */
 
 int igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res, 
@@ -149,6 +151,8 @@ int igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
  * |V| is the number of vertices in
  * the graph, d is the (maximum)
  * degree of the vertices in the graph.
+ * 
+ * \example examples/simple/igraph_similarity.c
  */
 
 int igraph_similarity_inverse_log_weighted(const igraph_t *graph,
@@ -311,6 +315,8 @@ int igraph_i_neisets_intersect(const igraph_vector_t *v1,
  *
  * \sa \ref igraph_similarity_dice(), a measure very similar to the Jaccard
  *   coefficient
+ * 
+ * \example examples/simple/igraph_similarity.c
  */
 int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
     const igraph_vs_t vids, igraph_neimode_t mode, igraph_bool_t loops) {
@@ -409,6 +415,8 @@ int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
  *
  * \sa \ref igraph_similarity_jaccard(), a measure very similar to the Dice
  *   coefficient
+ * 
+ * \example examples/simple/igraph_similarity.c
  */
 int igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
     const igraph_vs_t vids, igraph_neimode_t mode, igraph_bool_t loops) {

@@ -163,6 +163,8 @@ int igraph_vs_adj(igraph_vs_t *vs,
  * \return Error code.
  *
  * Time complexity: O(1).
+ * 
+ * \example examples/simple/igraph_vs_nonadj.c
  */
 
 int igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid, 
@@ -267,6 +269,8 @@ igraph_vs_t igraph_vss_1(igraph_integer_t vid) {
  * \sa \ref igraph_vss_vector()
  * 
  * Time complexity: O(1).
+ * 
+ * \example examples/simple/igraph_vs_vector.c
  */
 
 int igraph_vs_vector(igraph_vs_t *vs,
@@ -400,6 +404,8 @@ int igraph_vs_vector_copy(igraph_vs_t *vs,
  * \sa \ref igraph_vss_seq()
  * 
  * Time complexity: O(1).
+ * 
+ * \example examples/simple/igraph_vs_seq.c
  */
 
 int igraph_vs_seq(igraph_vs_t *vs, 
@@ -884,6 +890,8 @@ int igraph_es_adj(igraph_es_t *es,
  * \return Error code.
  * 
  * Time complexity: O(1).
+ * 
+ * \example examples/simple/igraph_es_adj.c
  */
 
 int igraph_es_incident(igraph_es_t *es, 
@@ -1060,6 +1068,8 @@ igraph_es_t igraph_ess_vector(const igraph_vector_t *v) {
  * \return Error code.
  * 
  * Time complexity: O(1).
+ * 
+ * \example examples/simple/igraph_es_fromto.c
  */
 
 int igraph_es_fromto(igraph_es_t *es,
@@ -1130,6 +1140,8 @@ igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to) {
  * \sa \ref igraph_es_pairs_small()
  * 
  * Time complexity: O(n), the number of edges being selected.
+ * 
+ * \example examples/simple/igraph_es_pairs.c
  */
 
 int igraph_es_pairs(igraph_es_t *es, const igraph_vector_t *v, 
@@ -1215,6 +1227,10 @@ int igraph_es_multipairs(igraph_es_t *es, const igraph_vector_t *v,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+/**
+ * \example examples/simple/igraph_es_path.c
+ */
 
 int igraph_es_path(igraph_es_t *es, const igraph_vector_t *v, 
 		   igraph_bool_t directed) {

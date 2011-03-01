@@ -40,6 +40,10 @@
  * names is returned in a string vector by \ref
  * igraph_cattribute_list(). Do not expect great performace from this
  * type.</para>
+ * 
+ * <para>
+ * \example examples/simple/igraph_strvector.c
+ * </para>
  */
 
 /**

@@ -109,6 +109,12 @@
  * </para>
  * </section>
  *
+ * <section><title>Example</title>
+ * <para>
+ * \example examples/simple/random_seed.c
+ * </para>
+ * </section>
+ *
  * </section>
  */
 

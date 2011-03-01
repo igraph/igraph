@@ -78,6 +78,8 @@
  * Time complexity: O(|V|*d^2+|E|), |V| is the number of vertices, |E|
  * is the number of edges, d is the average (total) degree of the
  * graphs.
+ * 
+ * \example examples/simple/igraph_bipartite_projection.c
  */
 
 int igraph_bipartite_projection_size(const igraph_t *graph,
@@ -279,6 +281,8 @@ int igraph_i_bipartite_projection(const igraph_t *graph,
  * Time complexity: O(|V|*d^2+|E|), |V| is the number of vertices, |E|
  * is the number of edges, d is the average (total) degree of the
  * graphs.
+ * 
+ * \example examples/simple/igraph_bipartite_projection.c
  */
 
 int igraph_bipartite_projection(const igraph_t *graph, 
@@ -463,6 +467,8 @@ int igraph_full_bipartite(igraph_t *graph,
  * 
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
+ * 
+ * \example examples/simple/igraph_bipartite_create.c
  */
  
 int igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,

@@ -98,6 +98,8 @@ extern unsigned int igraph_i_isoclass_4u_idx[];
  * number of motifs of a given size in a graph.
  * 
  * Time complexity: TODO.
+ * 
+ * \example examples/simple/igraph_motifs_randesu.c
  */
 
 int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist, 

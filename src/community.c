@@ -354,6 +354,8 @@ long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
  * 
  * Time complexity: O(|V||E|^2), as the betweenness calculation requires
  * O(|V||E|) and we do it |E|-1 times.
+ * 
+ * \example examples/simple/igraph_community_edge_betweenness.c
  */
   
 int igraph_community_edge_betweenness(const igraph_t *graph, 
@@ -925,6 +927,10 @@ int igraph_reindex_membership(igraph_vector_t *membership,
  * implemented in \ref igraph_community_leading_eigenvector(). 
  * After the initial split, the following splits are done in a
  * way to optimize modularity regarding to the original network. 
+ * </para>
+ * 
+ * <para>
+ * \example examples/simple/igraph_community_leading_eigenvector.c
  * </para>
  */
 
@@ -1695,6 +1701,8 @@ int igraph_le_community_to_membership(const igraph_matrix_t *merges,
  * \return Error code.
  * 
  * Time complexity: O(m+n)
+ * 
+ * \example examples/simple/igraph_community_label_propagation.c
  */
 int igraph_community_label_propagation(const igraph_t *graph,
                                        igraph_vector_t *membership,
@@ -2433,6 +2441,8 @@ int igraph_i_community_multilevel_step(igraph_t *graph,
  * \return Error code.
  *
  * Time complexity: in average near linear on sparse graphs.
+ * 
+ * \example examples/simple/igraph_community_multilevel.c
  */
 
 int igraph_community_multilevel(const igraph_t *graph,

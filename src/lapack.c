@@ -210,6 +210,8 @@ int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
  * \return Error code.
  * 
  * Time complexity: TODO.
+ * 
+ * \example examples/simple/igraph_lapack_dgesv.c
  */
 
 int igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
@@ -335,6 +337,8 @@ int igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
  * \return Error code.
  * 
  * Time complexity: TODO.
+ * 
+ * \example examples/simple/igraph_lapack_dsyevr.c
  */
 
 int igraph_lapack_dsyevr(const igraph_matrix_t *A, 
@@ -703,6 +707,8 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
  * \return Error code.
  * 
  * Time complexity: TODO
+ * 
+ * \example examples/simple/igraph_lapack_dgeevx.c
  */
 
 int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,

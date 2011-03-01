@@ -44,6 +44,8 @@
 /*
  * \function igraph_even_tarjan_reduction
  * Even-Tarjan reduction of a graph
+ * 
+ * \example examples/simple/even_tarjan.c
  */
 
 int igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar,
@@ -377,6 +379,8 @@ long int igraph_i_dominator_EVAL(long int v,
  * edges and vertices. More precisely, it is O(|V|+|E|alpha(|E|,|V|)),
  * where alpha(|E|,|V|) is a functional inverse of Ackermann's
  * function.
+ * 
+ * \example examples/simple/dominator_tree.c
  */
 
 int igraph_dominator_tree(const igraph_t *graph,
@@ -955,6 +959,8 @@ int igraph_provan_shier_list(const igraph_t *graph,
  * 
  * Time complexity: O(n(|V|+|E|)), where |V| is the number of
  * vertices, |E| is the number of edges, and n is the number of cuts.
+ * 
+ * \example examples/simple/igraph_all_st_cuts.c
  */
 
 int igraph_all_st_cuts(const igraph_t *graph,
@@ -1267,6 +1273,8 @@ int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
  * vertices, |E| is the number of edges, and n is the number of cuts;
  * O(F) is the time complexity of the maximum flow algorithm, see \ref
  * igraph_maxflow().
+ * 
+ * \example examples/simple/igraph_all_st_mincuts.c
  */
 
 int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,

@@ -287,6 +287,9 @@ int igraph_i_maxflow_undirected(const igraph_t *graph,
  * \sa \ref igraph_mincut_value(), \ref igraph_edge_connectivity(),
  * \ref igraph_vertex_connectivity() for 
  * properties based on the maximum flow.
+ * 
+ * \example examples/simple/flow.c
+ * \example examples/simple/flow2.c
  */
 
 int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
@@ -1435,6 +1438,8 @@ int igraph_i_mincut_directed(const igraph_t *graph,
  * remarks at \ref igraph_maxflow(). For undirected graphs it is
  * O(|V||E|+|V|^2 log|V|). |V| and |E| are the number of vertices and
  * edges respectively.
+ * 
+ * \example examples/simple/igraph_mincut.c
  */
 
 int igraph_mincut(const igraph_t *graph,

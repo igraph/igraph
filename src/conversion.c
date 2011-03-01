@@ -427,6 +427,8 @@ int igraph_to_directed(igraph_t *graph,
  * 
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges. 
+ * 
+ * \example examples/simple/igraph_to_undirected.c
  */
 
 int igraph_to_undirected(igraph_t *graph,

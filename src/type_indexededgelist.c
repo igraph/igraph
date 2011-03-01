@@ -67,6 +67,8 @@ int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el, igraph_vect
  * 
  * Time complexity: O(|V|) for a graph with
  * |V| vertices (and no edges).
+ * 
+ * \example examples/simple/igraph_empty.c
  */
 int igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
   return igraph_empty_attrs(graph, n, directed, 0);
@@ -181,6 +183,8 @@ int igraph_destroy(igraph_t *graph) {
  * Time complexity:  O(|V|+|E|) for a
  * graph with |V| vertices and
  * |E| edges.
+ * 
+ * \example examples/simple/igraph_copy.c
  */
 
 int igraph_copy(igraph_t *to, const igraph_t *from) {
@@ -234,6 +238,8 @@ int igraph_copy(igraph_t *to, const igraph_t *from) {
  * |V| is the number of vertices and
  * |E| is the number of
  * edges in the \em new, extended graph.
+ * 
+ * \example examples/simple/igraph_add_edges.c
  */
 int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges,
 		     void *attr) {
@@ -336,6 +342,8 @@ int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges,
  * Time complexity: O(|V|) where
  * |V| is 
  * the number of vertices in the \em new, extended graph.
+ * 
+ * \example examples/simple/igraph_add_vertices.c
  */
 int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
   long int ec=igraph_ecount(graph);
@@ -386,6 +394,8 @@ int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
  * |V| 
  * and |E| are the number of vertices
  * and edges in the \em original graph, respectively.
+ * 
+ * \example examples/simple/igraph_delete_edges.c
  */
 int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
   long int no_of_edges=igraph_ecount(graph);
@@ -498,6 +508,8 @@ int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
  * |V| and 
  * |E| are the number of vertices and
  * edges in the original graph.
+ * 
+ * \example examples/simple/igraph_delete_vertices.c
  */
 int igraph_delete_vertices(igraph_t *graph, const igraph_vs_t vertices) {
   return igraph_delete_vertices_idx(graph, vertices, /* idx= */ 0, 
@@ -705,6 +717,8 @@ igraph_integer_t igraph_ecount(const igraph_t *graph) {
  * Time complexity: O(d),
  * d is the number
  * of adjacent vertices to the queried vertex.
+ * 
+ * \example examples/simple/igraph_neighbors.c
  */
 int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_integer_t pnode, 
 		     igraph_neimode_t mode) {
@@ -852,6 +866,8 @@ int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el, igraph_vect
  * <code>FALSE</code> otherwise.
  *
  * Time complexity: O(1)
+ * 
+ * \example examples/simple/igraph_is_directed.c
  */
 
 igraph_bool_t igraph_is_directed(const igraph_t *graph) {
@@ -893,6 +909,8 @@ igraph_bool_t igraph_is_directed(const igraph_t *graph) {
  *
  * \sa \ref igraph_strength() for the version that takes into account
  * edge weights.
+ * 
+ * \example examples/simple/igraph_degree.c
  */
 int igraph_degree(const igraph_t *graph, igraph_vector_t *res, 
 		  const igraph_vs_t vids, 
@@ -1088,6 +1106,7 @@ int igraph_edges(const igraph_t *graph, igraph_es_t eids,
  * is false, then it is O(log(d)+log(d2)), where d is the same as before and 
  * d2 is the minimum of the out-degree of \c to and the in-degree of \c from.
  * 
+ * \example examples/simple/igraph_get_eid.c
  * 
  * Added in version 0.2.</para><para>
  */
@@ -1281,6 +1300,8 @@ int igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids,
  * \sa \ref igraph_get_eid() for a single edge, \ref
  * igraph_get_eids_multi() for a version that handles multiple edges
  * better (at a cost).
+ * 
+ * \example examples/simple/igraph_get_eids.c
  */
 
 int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,

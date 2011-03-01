@@ -70,6 +70,8 @@
  * |V| is the number of vertices,
  * |E| the number of edges in the
  * graph. 
+ * 
+ * \example examples/simple/igraph_create.c
  */
 int igraph_create(igraph_t *graph, const igraph_vector_t *edges, igraph_integer_t n, 
 		  igraph_bool_t directed) {
@@ -244,6 +246,8 @@ int igraph_i_adjacency_min(igraph_matrix_t *adjmatrix, igraph_vector_t *edges) {
  * 
  * Time complexity: O(|V||V|),
  * |V| is the number of vertices in the graph.
+ * 
+ * \example examples/simple/igraph_adjacency.c
  */
 
 int igraph_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
@@ -466,6 +470,8 @@ int igraph_i_weighted_adjacency_min(igraph_matrix_t *adjmatrix,
  * 
  * Time complexity: O(|V||V|),
  * |V| is the number of vertices in the graph.a
+ * 
+ * \example examples/simple/igraph_weighted_adjacency.c
  */
 
 int igraph_weighted_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
@@ -573,6 +579,8 @@ int igraph_weighted_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
  *
  * \sa \ref igraph_lattice(), \ref igraph_ring(), \ref igraph_tree()
  * for creating other regular structures.
+ * 
+ * \example examples/simple/igraph_star.c
  */
 
 int igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode, 
@@ -838,6 +846,8 @@ int igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igr
  * 
  * \sa \ref igraph_lattice(), \ref igraph_star() for creating other regular
  * structures. 
+ * 
+ * \example examples/simple/igraph_tree.c
  */
 
 int igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children, 
@@ -917,6 +927,8 @@ int igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
  * 
  * \sa \ref igraph_lattice(), \ref igraph_star(), \ref igraph_tree()
  * for creating other regular structures.
+ * 
+ * \example examples/simple/igraph_full.c
  */
 
 int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_bool_t loops) {
@@ -1038,6 +1050,8 @@ int igraph_full_citation(igraph_t *graph, igraph_integer_t n,
  * 
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges in the graph to create.
+ * 
+ * \example examples/simple/igraph_small.c
  */
 
 int igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, 
@@ -1584,6 +1598,8 @@ int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
  * 
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.
+ * 
+ * \example examples/simple/igraph_lcf.c
  */
 
 int igraph_lcf(igraph_t *graph, igraph_integer_t n, ...) {

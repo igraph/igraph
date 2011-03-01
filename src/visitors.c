@@ -87,6 +87,9 @@
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
+ * 
+ * \example examples/simple/igraph_bfs.c
+ * \example examples/simple/igraph_bfs2.c
  */
 
 int igraph_bfs(const igraph_t *graph, 

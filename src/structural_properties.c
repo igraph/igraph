@@ -81,6 +81,8 @@
  *
  * Time complexity: O(|V||E|), the
  * number of vertices times the number of edges.
+ * 
+ * \example examples/simple/igraph_diameter.c
  */
 
 int igraph_diameter(const igraph_t *graph, igraph_integer_t *pres, 
@@ -209,6 +211,8 @@ int igraph_diameter(const igraph_t *graph, igraph_integer_t *pres,
  *
  * Time complexity: O(|V||E|), the
  * number of vertices times the number of edges.
+ * 
+ * \example examples/simple/igraph_average_path_length.c
  */
 
 int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
@@ -553,6 +557,8 @@ int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
  * graph. 
  *
  * \sa \ref igraph_minimum_spanning_tree_unweighted() for unweighted graphs.
+ * 
+ * \example examples/simple/igraph_minimum_spanning_tree.c
  */
 
 int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
@@ -897,6 +903,8 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
  *
  * \sa \ref igraph_shortest_paths() if you only need the path length but
  * not the paths themselves.
+ * 
+ * \example examples/simple/igraph_get_shortest_paths.c
  */
  
 
@@ -1725,6 +1733,8 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
  *         \endclist
  *
  * Time complexity: TODO.
+ * 
+ * \example examples/simple/igraph_rewire.c
  */
 
 int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
@@ -2306,6 +2316,8 @@ void igraph_i_simplify_free(igraph_vector_ptr_t *p) {
  *    \c IGRAPH_ENOMEM if we are out of memory.
  *
  * Time complexity: O(|V|+|E|).
+ * 
+ * \example examples/simple/igraph_simplify.c
  */
 
 int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, 
@@ -3047,6 +3059,8 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
  *
  * Time complexity: O(|V|*d^2), |V| is the number of vertices in 
  * the graph, d is the average node degree. 
+ * 
+ * \example examples/simple/igraph_transitivity.c
  */
 
 
@@ -3413,6 +3427,8 @@ int igraph_transitivity_barrat(const igraph_t *graph,
  * 
  * Time complexity: O(|V|+|E|), |V| is the number of vertices, 
  * |E| is the number of edges.
+ * 
+ * \example examples/simple/igraph_reciprocity.c
  */
 
 int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res, 
@@ -4243,6 +4259,8 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
  *
  * \sa \ref igraph_is_dag() if you are only interested in whether a given
  *     graph is a DAG or not.
+ * 
+ * \example examples/simple/igraph_topological_sorting.c
  */
 int igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
 			       igraph_neimode_t mode) {
@@ -4446,6 +4464,8 @@ int igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
  * \sa \ref igraph_simplify() to get rid of loop edges.
  *
  * Time complexity: O(e), the number of edges to check.
+ * 
+ * \example examples/simple/igraph_is_loop.c
  */
 
 int igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res, 
@@ -4484,6 +4504,8 @@ int igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
  * Time complexity: O(e*d), e is the number of edges to check and d is the 
  * average degree (out-degree in directed graphs) of the vertices at the 
  * tail of the edges.
+ * 
+ * \example examples/simple/igraph_has_multiple.c
  */
 
 int igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
@@ -4542,6 +4564,8 @@ int igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
  * Time complexity: O(e*d), e is the number of edges to check and d is the 
  * average degree (out-degree in directed graphs) of the vertices at the 
  * tail of the edges.
+ * 
+ * \example examples/simple/igraph_is_multiple.c
  */
 
 int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res, 
@@ -4667,6 +4691,8 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
  * is the number of edges in the general case. If the graph has no
  * circles at all then the function needs O(|V|+|E|) time to realize
  * this and then it stops.
+ * 
+ * \example examples/simple/igraph_girth.c
  */
 
 int igraph_girth(const igraph_t *graph, igraph_integer_t *girth, 
@@ -4973,6 +4999,9 @@ int igraph_add_edge(igraph_t *graph, igraph_integer_t from, igraph_integer_t to)
   return ret;
 }
 
+/*
+ * \example examples/simple/graph_convergence_degree.c
+ */
 
 int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
   igraph_vector_t *ins, igraph_vector_t *outs) {
@@ -5132,6 +5161,8 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
  * version or \ref igraph_shortest_paths_bellman_ford() for a weighted
  * variant that works in the presence of negative edge weights (but no
  * negative loops).
+ * 
+ * \example examples/simple/dijkstra.c
  */
 
 int igraph_shortest_paths_dijkstra(const igraph_t *graph,
@@ -5335,6 +5366,8 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
  * \sa \ref igraph_shortest_paths_dijkstra() if you only need the path length but
  * not the paths themselves, \ref igraph_get_shortest_paths() if all edge
  * weights are equal. 
+ * 
+ * \example examples/simple/igraph_get_shortest_paths_dijkstra.c
  */
 int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
                                        igraph_vector_ptr_t *vertices,
@@ -5654,6 +5687,8 @@ int igraph_i_vector_tail_cmp(const void* path1, const void* path2) {
  * \sa \ref igraph_shortest_paths_dijkstra() if you only need the path
  * length but not the paths themselves, \ref igraph_get_all_shortest_paths()
  * if all edge weights are equal. 
+ * 
+ * \example examples/simple/igraph_get_all_shortest_paths_dijkstra.c
  */
 int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                igraph_vector_ptr_t *res, 
@@ -6043,6 +6078,8 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
  * \sa \ref igraph_shortest_paths() for a faster unweighted version
  * or \ref igraph_shortest_paths_dijkstra() if you do not have negative
  * edge weights.
+ * 
+ * \example examples/simple/bellman_ford.c
  */
 
 int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
@@ -6669,6 +6706,8 @@ int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
  * 
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
+ * 
+ * \example examples/simple/igraph_knn.c
  */
 
 int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,

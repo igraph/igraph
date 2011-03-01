@@ -179,6 +179,8 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
  * of a single vertex.
  * 
  * Time complexity: TODO.
+ * 
+ * \example examples/simple/spinglass.c
  */
 
 int igraph_community_spinglass(const igraph_t *graph,
