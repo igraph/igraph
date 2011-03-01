@@ -31,7 +31,7 @@ typedef struct {
   igraph_real_t edges[];
 } ring_test_t;
 
-/*---------------n--m--di-mu-ci-edges---------------------------------------*/
+/*-------------------------n--m--di-mu-ci-edges----------------------------*/
 ring_test_t ring_uc_6  = { 6, 6, 0, 0, 1, { 0,1, 1,2, 2,3, 3,4, 4,5, 5,0 } };
 ring_test_t ring_uc_0  = { 0, 0, 0, 0, 1, { } };
 ring_test_t ring_uc_1  = { 1, 0, 0, 0, 1, { } };
@@ -41,6 +41,16 @@ ring_test_t ring_u_6   = { 6, 5, 0, 0, 0, { 0,1, 1,2, 2,3, 3,4, 4,5 } };
 ring_test_t ring_u_0   = { 0, 0, 0, 0, 0, { } };
 ring_test_t ring_u_1   = { 1 ,0, 0, 0, 0, { } };
 ring_test_t ring_u_2   = { 2, 1, 0, 0, 0, { 0,1 } };
+
+ring_test_t ring_umc_6 = { 6, 6, 0, 1, 1, { 0,1, 1,2, 2,3, 3,4, 4,5, 5,0 } };
+ring_test_t ring_umc_0 = { 0, 0, 0, 1, 1, { } };
+ring_test_t ring_umc_1 = { 1, 0, 0, 1, 1, { } };
+ring_test_t ring_umc_2 = { 2, 1, 0, 1, 1, { 0,1 } };
+
+ring_test_t ring_um_6  = { 6, 5, 0, 1, 0, { 0,1, 1,2, 2,3, 3,4, 4,5 } };
+ring_test_t ring_um_0  = { 0, 0, 0, 1, 0, { } };
+ring_test_t ring_um_1  = { 1 ,0, 0, 1, 0, { } };
+ring_test_t ring_um_2  = { 2, 1, 0, 1, 0, { 0,1 } };
 
 ring_test_t ring_dc_6  = { 6, 6, 1, 0, 1, { 0,1, 1,2, 2,3, 3,4, 4,5, 5,0 } };
 ring_test_t ring_dc_0  = { 0, 0, 1, 0, 1, { } };
@@ -63,18 +73,22 @@ ring_test_t ring_dm_6  = { 6,10, 1, 1, 0, { 0,1, 1,2, 2,3, 3,4, 4,5,
 ring_test_t ring_dm_0  = { 0, 0, 1, 1, 0, { } };
 ring_test_t ring_dm_1  = { 1, 0, 1, 1, 0, { } };
 ring_test_t ring_dm_2  = { 2, 2, 1, 1, 0, { 0,1, 1,0 } };
-/*---------------n--m--di-mu-ci-edges---------------------------------------*/
+/*-------------------------n--m--di-mu-ci-edges-----------------------------*/
 
 ring_test_t *all_checks[] = { /*  1 */ &ring_uc_6,   /*  2 */ &ring_uc_0,
 			      /*  3 */ &ring_uc_1,   /*  4 */ &ring_uc_2,
 			      /*  5 */ &ring_u_6,    /*  6 */ &ring_u_0,
 			      /*  7 */ &ring_u_1,    /*  8 */ &ring_u_2,
-			      /*  9 */ &ring_dc_6,   /* 10 */ &ring_dc_0,
-			      /* 11 */ &ring_dc_1,   /* 12 */ &ring_dc_2,
-			      /* 13 */ &ring_dmc_6,  /* 14 */ &ring_dmc_0,
-			      /* 15 */ &ring_dmc_1,  /* 16 */ &ring_dmc_2,
-			      /* 17 */ &ring_dm_6,   /* 18 */ &ring_dm_0,
-			      /* 19 */ &ring_dm_1,   /* 20 */ &ring_dm_2,
+			      /*  9 */ &ring_umc_6,  /* 10 */ &ring_umc_0,
+			      /* 11 */ &ring_umc_1,  /* 12 */ &ring_umc_2,
+			      /* 13 */ &ring_um_6,   /* 14 */ &ring_um_0,
+			      /* 15 */ &ring_um_1,   /* 16 */ &ring_um_2,
+			      /* 17 */ &ring_dc_6,   /* 18 */ &ring_dc_0,
+			      /* 19 */ &ring_dc_1,   /* 20 */ &ring_dc_2,
+			      /* 21 */ &ring_dmc_6,  /* 22 */ &ring_dmc_0,
+			      /* 23 */ &ring_dmc_1,  /* 24 */ &ring_dmc_2,
+			      /* 25 */ &ring_dm_6,   /* 26 */ &ring_dm_0,
+			      /* 27 */ &ring_dm_1,   /* 28 */ &ring_dm_2,
 			      0 };
 
 int check_ring_properties(const igraph_t *ring, igraph_bool_t directed,
