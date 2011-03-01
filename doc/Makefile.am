@@ -44,10 +44,10 @@ igraph-docs.xml: $(DOCINCLUDES) $(EXAMPLES)
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(top_srcdir)/doc/igraph-docs.xml . ; fi
 	touch igraph-docs.xml
 
-vector.xml: vector.xxml $(INCLUDEDIR)/igraph_vector_pmt.h $(INCLUDEDIR)/igraph_vector_ptr.h $(SRCDIR)/vector.pmt $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.c
+vector.xml: vector.xxml $(INCLUDEDIR)/igraph_vector_pmt.h $(SRCDIR)/vector.pmt $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.c $(INCLUDEDIR)/igraph_vector_ptr.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_vector_pmt.h \
-	$(INCLUDEDIR)/igraph_vector_ptr.h $(SRCDIR)/vector.pmt \
-	$(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.c
+	$(SRCDIR)/vector.pmt $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.c \
+	$(INCLUDEDIR)/igraph_vector_ptr.h
 
 error.xml: error.xxml $(INCLUDEDIR)/igraph_error.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_error.h
