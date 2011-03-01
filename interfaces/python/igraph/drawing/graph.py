@@ -16,6 +16,7 @@ network from Cytoscape and convert it to igraph format.
 from collections import defaultdict
 from itertools import izip
 from math import cos, pi, sin
+from warnings import warn
 
 from igraph._igraph import convex_hull, VertexSeq
 from igraph.configuration import Configuration
@@ -496,20 +497,32 @@ class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
         super(CytoscapeGraphDrawer, self).__init__(url, "Cytoscape")
         self.network_id = None
 
-    def draw(self, graph, name = "Network from igraph", *args, **kwds):
+    def draw(self, graph, name="Network from igraph", create_view=True,
+            *args, **kwds):
         """Sends the given graph to Cytoscape as a new network.
         
         @param name: the name of the network in Cytoscape.
+        @param create_view: whether to create a view for the network
+          in Cytoscape.The default is C{True}.
         @keyword node_ids: specifies the identifiers of the nodes to
           be used in Cytoscape. This must either be the name of a
           vertex attribute or a list specifying the identifiers, one
-          for each node in the graph."""
+          for each node in the graph. The default is C{None}, which
+          simply uses the vertex index for each vertex."""
         from xmlrpclib import Fault
 
         cy = self.service
 
         # Create the network
-        network_id = cy.createNetwork(name)
+        if not create_view:
+            try:
+                network_id = cy.createNetwork(name, False)
+            except Fault:
+                warn("CytoscapeRPC too old, cannot create network without view."
+                    " Consider upgrading CytoscapeRPC to use this feature.")
+                network_id = cy.createNetwork(name)
+        else:
+            network_id = cy.createNetwork(name)
         self.network_id = network_id
 
         # Create the nodes
