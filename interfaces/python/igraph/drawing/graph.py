@@ -499,7 +499,11 @@ class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
     def draw(self, graph, name = "Network from igraph", *args, **kwds):
         """Sends the given graph to Cytoscape as a new network.
         
-        @param name: the name of the network in Cytoscape."""
+        @param name: the name of the network in Cytoscape.
+        @keyword node_ids: specifies the identifiers of the nodes to
+          be used in Cytoscape. This must either be the name of a
+          vertex attribute or a list specifying the identifiers, one
+          for each node in the graph."""
         from xmlrpclib import Fault
 
         cy = self.service
@@ -509,7 +513,13 @@ class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
         self.network_id = network_id
 
         # Create the nodes
-        node_ids = [str(idx) for idx in xrange(graph.vcount())]
+        if "node_ids" in kwds:
+            node_ids = kwds["node_ids"]
+            if isinstance(node_ids, basestring):
+                node_ids = graph.vs[node_ids]
+        else:
+            node_ids = xrange(graph.vcount())
+        node_ids = [str(identifier) for identifier in node_ids]
         cy.createNodes(network_id, node_ids)
 
         # Create the edges
