@@ -53,8 +53,14 @@ F2C =	f2c/abort_.c	  f2c/dolio.c	    f2c/iargc_.c      f2c/r_sin.c\
 	f2c/derfc_.c	  f2c/i_nint.c	    f2c/r_nint.c      f2c/z_sin.c\
 	f2c/dfe.c	  f2c/i_sign.c	    f2c/r_sign.c      f2c/z_sqrt.c
 
+# We also have to pack f2c/arithchk.c in the distribution in case the
+# user wants to compile it using the internal f2c. f2c/arithchk.c is
+# not linked into libf2c.la (hence we cannot add it to libf2c_la_SOURCES)
+# but is needed to build f2c/arith.h
+EXTRA_DIST      = f2c/arithchk.c
+
 if INTERNAL_F2C
-  libf2c_la_SOURCES = f2c.h f2c/arith.h f2c/fio.h f2c/fmt.h f2c/sysdep1.h\
+  libf2c_la_SOURCES = f2c.h f2c/fio.h f2c/fmt.h f2c/sysdep1.h\
 					  f2c/sysdep1.h0 f2c/lio.h f2c/fp.h f2c/signal1.h\
 					  f2c/signal1.h0 $(F2C)
   libf2c_la_CFLAGS = -DSkip_f2c_Undefs -I.
