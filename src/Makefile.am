@@ -74,6 +74,8 @@ if INTERNAL_F2C
   f2c/signal1.h: f2c/signal1.h0
 	cp f2c/signal1.h0 f2c/signal1.h
   F2C_LIB = libf2c.la
+
+  BUILT_SOURCES += f2c/arith.h
 endif
 
 if INTERNAL_BLAS
