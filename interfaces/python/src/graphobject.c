@@ -11256,7 +11256,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Places the vertices of the graph uniformly on a circle or a sphere.\n\n"
    "@param dim: the desired number of dimensions for the layout. dim=2\n"
    "  means a 2D layout, dim=3 means a 3D layout.\n"
-   "@return: the calculated coordinate pairs in a list."},
+   "@return: the calculated layout."},
 
   /* interface to igraph_layout_star */
   {"layout_star", (PyCFunction) igraphmodule_Graph_layout_star,
@@ -11267,6 +11267,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param order: a numeric vector giving the order of the vertices\n"
    "  (including the center vertex!). If it is C{None}, the vertices\n"
    "  will be placed in increasing vertex ID order.\n"
+   "@return: the calculated layout."
   },
 
   // interface to igraph_layout_kamada_kawai
@@ -11290,7 +11291,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  as the starting position.\n"
    "@param dim: the desired number of dimensions for the layout. dim=2\n"
    "  means a 2D layout, dim=3 means a 3D layout.\n"
-   "@return: the calculated coordinate pairs in a list."},
+   "@return: the calculated layout."
+  },
 
   /* interface to igraph_layout_drl */
   {"layout_drl",
@@ -11349,7 +11351,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  default from the C{default} preset will be used.\n\n"
    "@param dim: the desired number of dimensions for the layout. dim=2\n"
    "  means a 2D layout, dim=3 means a 3D layout.\n"
-   "@return: the calculated coordinate pairs in a list."
+   "@return: the calculated layout."
   },
 
   /* interface to igraph_layout_fruchterman_reingold */
@@ -11387,7 +11389,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  as the starting position.\n"
    "@param dim: the desired number of dimensions for the layout. dim=2\n"
    "  means a 2D layout, dim=3 means a 3D layout.\n"
-   "@return: the calculated coordinate pairs in a list."},
+   "@return: the calculated layout."
+  },
 
   /* interface to igraph_layout_graphopt */
   {"layout_graphopt",
@@ -11411,8 +11414,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param spring_constant: the spring constant\n"
    "@param max_sa_movement: the maximum amount of movement allowed in a single\n"
    "  step along a single axis.\n"
-	 "@param seed: a matrix containing a seed layout from which the algorithm\n"
-	 "  will be started. If C{None}, a random layout will be used.\n"
+   "@param seed: a matrix containing a seed layout from which the algorithm\n"
+   "  will be started. If C{None}, a random layout will be used.\n"
+   "@return: the calculated layout."
   },
 
   /* interface to igraph_layout_grid_fruchterman_reingold */
@@ -11441,7 +11445,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param seed: if C{None}, uses a random starting layout for the\n"
    "  algorithm. If a matrix (list of lists), uses the given matrix\n"
    "  as the starting position.\n"
-   "@return: the calculated coordinate pairs in a list."},
+   "@return: the calculated layout."
+  },
 
   /* interface to igraph_layout_lgl */
   {"layout_lgl", (PyCFunction) igraphmodule_Graph_layout_lgl,
@@ -11465,7 +11470,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param root: the root vertex, this is placed first, its neighbors\n"
    "  in the first iteration, second neighbors in the second,\n"
    "  etc. A negative number means a random vertex.\n"
-   "@return: the calculated coordinate pairs in a list."},
+   "@return: the calculated layout."
+  },
 
   /* interface to igraph_layout_mds */
   {"layout_mds",
@@ -11494,7 +11500,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param arpack_options: an L{ARPACKOptions} object used to fine-tune\n"
    "  the ARPACK eigenvector calculation. If omitted, the module-level\n"
    "  variable called C{arpack_options} is used.\n"
-   "@return: the calculated layout as a list of lists.\n\n"
+   "@return: the calculated layout.\n\n"
    "@newfield ref: Reference\n"
    "@ref: Cox & Cox: Multidimensional Scaling (1994), Chapman and\n"
    "  Hall, London.\n"
@@ -11524,7 +11530,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param rootlevel: this argument is useful when drawing forests which are\n"
    "  not trees. It specifies the level of the root vertices for every tree\n"
    "  in the forest.\n"
-   "@return: the calculated coordinate pairs in a list.\n\n"
+   "@return: the calculated layout.\n\n"
    "@see: layout_reingold_tilford_circular\n"
    "@newfield ref: Reference\n"
    "@ref: EM Reingold, JS Tilford: I{Tidier Drawings of Trees.}\n"
@@ -11539,7 +11545,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "This layout is similar to the Reingold-Tilford layout, but the vertices\n"
    "are placed in a circular way, with the root vertex in the center.\n\n"
    "See L{layout_reingold_tilford} for the explanation of the parameters.\n\n"
-   "@return: the calculated coordinate pairs in a list.\n\n"
+   "@return: the calculated layout.\n\n"
    "@see: layout_reingold_tilford\n"
    "@newfield ref: Reference\n"
    "@ref: EM Reingold, JS Tilford: I{Tidier Drawings of Trees.}\n"

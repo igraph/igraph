@@ -50,6 +50,7 @@ import math
 import gzip
 import sys
 import operator
+
 from collections import defaultdict
 from itertools import izip
 from tempfile import mkstemp
@@ -3188,6 +3189,29 @@ def _add_proxy_methods():
       lambda self, result: [result[i] for i in self.indices], "edge_betweenness"))
 
 _add_proxy_methods()
+
+##############################################################
+# Making sure that layout methods always return a Layout
+
+def _layout_method_wrapper(func):
+    """Wraps an existing layout method to ensure that it returns a Layout
+    instead of a list of lists.
+
+    @param func: the method to wrap. Must be a method of the Graph object.
+    @return: a new method
+    """
+    def result(*args, **kwds):
+        layout = func(*args, **kwds)
+        if not isinstance(layout, Layout):
+            layout = Layout(layout)
+        return layout
+    result.__name__ = func.__name__
+    result.__doc__  = func.__doc__
+    return result
+
+for name in dir(Graph):
+    if name.startswith("layout_") and name != "layout_auto":
+        setattr(Graph, name, _layout_method_wrapper(getattr(Graph, name)))
 
 ##############################################################
 # Adding aliases for the 3D versions of the layout methods

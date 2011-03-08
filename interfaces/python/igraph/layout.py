@@ -110,6 +110,20 @@ class Layout(object):
     def __copy__(self):
         return self.__class__(self.coords, self.dim)
 
+    def __repr__(self):
+        if not self.coords:
+            vertex_count = "no vertices"
+        elif len(self.coords) == 1:
+            vertex_count = "1 vertex"
+        else:
+            vertex_count = "%d vertices" % len(self.coords)
+        if self.dim == 1:
+            dim_count = "1 dimension"
+        else:
+            dim_count = "%d dimensions" % self.dim
+        return "<%s with %s and %s>" % (self.__class__.__name__,
+                vertex_count, dim_count)
+
     @property
     def dim(self):
         """Returns the number of dimensions"""
