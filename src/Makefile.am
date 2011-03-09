@@ -25,7 +25,7 @@ F2C =	f2c/abort_.c	  f2c/dolio.c	    f2c/iargc_.c      f2c/r_sin.c\
 	f2c/c_sqrt.c	  f2c/etime_.c	    f2c/lbitshft.c    f2c/rsne.c\
 	f2c/cabs.c	  f2c/exit_.c	    f2c/lread.c	      f2c/s_cat.c\
 	f2c/close.c	  f2c/f77_aloc.c    f2c/lwrite.c      f2c/s_cmp.c\
-	f2c/ctype.c	  f2c/f77vers.c	    f2c/main.c	      f2c/s_copy.c\
+	f2c/ctype.c	  f2c/f77vers.c	    f2c/s_copy.c\
 	f2c/d_abs.c	  f2c/fmt.c	    f2c/open.c	      f2c/s_paus.c\
 	f2c/d_acos.c	  f2c/fmtlib.c	    f2c/pow_ci.c      f2c/s_rnge.c\
 	f2c/d_asin.c	  f2c/ftell_.c	    f2c/pow_dd.c      f2c/s_stop.c\
