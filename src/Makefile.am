@@ -13,7 +13,7 @@ include lapack/blas.inc
 include lapack/lapack.inc
 include lapack/arpack.inc
 
-F2C =	f2c/abort_.c	  f2c/dolio.c	    f2c/iargc_.c      f2c/r_sin.c\
+F2C =	f2c/abort_.c	  f2c/dolio.c	    f2c/r_sin.c\
 	f2c/dummy.c	  f2c/dtime_.c	    f2c/iio.c	      f2c/r_sinh.c\
 	f2c/backspac.c	  f2c/due.c	    f2c/ilnw.c	      f2c/r_sqrt.c\
 	f2c/c_abs.c	  f2c/ef1asc_.c	    f2c/inquire.c     f2c/r_tan.c\
@@ -29,7 +29,7 @@ F2C =	f2c/abort_.c	  f2c/dolio.c	    f2c/iargc_.c      f2c/r_sin.c\
 	f2c/d_abs.c	  f2c/fmt.c	    f2c/open.c	      f2c/s_paus.c\
 	f2c/d_acos.c	  f2c/fmtlib.c	    f2c/pow_ci.c      f2c/s_rnge.c\
 	f2c/d_asin.c	  f2c/ftell_.c	    f2c/pow_dd.c      f2c/s_stop.c\
-	f2c/d_atan.c	  f2c/getarg_.c	    f2c/pow_di.c      f2c/sfe.c\
+	f2c/d_atan.c	  f2c/pow_di.c      f2c/sfe.c\
 	f2c/d_atn2.c	  f2c/getenv_.c	    f2c/pow_hh.c      f2c/sig_die.c\
 	f2c/d_cnjg.c	  f2c/h_abs.c	    f2c/pow_ii.c      f2c/signal_.c\
 	f2c/d_cos.c	  f2c/h_dim.c	    f2c/pow_ri.c      f2c/signbit.c\
