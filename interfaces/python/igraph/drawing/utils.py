@@ -18,9 +18,9 @@ class Rectangle(object):
     __slots__ = ("_left", "_top", "_right", "_bottom")
 
     def __init__(self, *args):
-        """Creates a bounding box.
+        """Creates a rectangle.
 
-        The corners of the bounding box can be specified by either a tuple
+        The corners of the rectangle can be specified by either a tuple
         (four items, two for each corner, respectively), four separate numbers
         (X and Y coordinates for each corner) or two separate numbers (width
         and height, the upper left corner is assumed to be at (0,0))"""
@@ -46,7 +46,17 @@ class Rectangle(object):
 
         self.coords = coords
 
-    def _set_coords(self, coords):
+    @property
+    def coords(self):
+        """The coordinates of the corners.
+        
+        The coordinates are returned as a 4-tuple in the following order:
+        left edge, top edge, right edge, bottom edge.
+        """
+        return self._left, self._top, self._right, self._bottom
+
+    @coords.setter
+    def coords(self, coords):
         """Sets the coordinates of the corners.
 
         @param coords: a 4-tuple with the coordinates of the corners
@@ -57,36 +67,29 @@ class Rectangle(object):
         if self._top > self._bottom:
             self._bottom, self._top = self._top, self._bottom
 
-    def _get_coords(self):
-        """Returns the coordinates of the corners."""
-        return self._left, self._top, self._right, self._bottom
-
-    coords = property(_get_coords, _set_coords,
-        doc="Sets or returns the coordinates of the corners")
-
     @property
     def width(self):
-        """Returns the width of the bounding box"""
+        """The width of the rectangle"""
         return self._right - self._left
 
     @width.setter
     def width(self, value):
-        """Sets the width of the bounding box by adjusting the right edge."""
+        """Sets the width of the rectangle by adjusting the right edge."""
         self._right = self._left + value
 
     @property
     def height(self):
-        """Returns the height of the bounding box"""
+        """The height of the rectangle"""
         return self._bottom - self._top
 
     @height.setter
     def height(self, value):
-        """Sets the height of the bounding box by adjusting the bottom edge."""
+        """Sets the height of the rectangle by adjusting the bottom edge."""
         self._bottom = self._top + value
 
     @property
     def left(self):
-        """Returns the X coordinate of the left side of the box"""
+        """The X coordinate of the left side of the box"""
         return self._left
 
     @left.setter
@@ -97,7 +100,7 @@ class Rectangle(object):
 
     @property
     def right(self):
-        """Returns the X coordinate of the right side of the box"""
+        """The X coordinate of the right side of the box"""
         return self._right
 
     @right.setter
@@ -108,7 +111,7 @@ class Rectangle(object):
 
     @property
     def top(self):
-        """Returns the Y coordinate of the top edge of the box"""
+        """The Y coordinate of the top edge of the box"""
         return self._top
 
     @top.setter
@@ -119,7 +122,7 @@ class Rectangle(object):
 
     @property
     def bottom(self):
-        """Returns the Y coordinate of the bottom edge of the box"""
+        """The Y coordinate of the bottom edge of the box"""
         return self._bottom
 
     @bottom.setter
@@ -130,7 +133,7 @@ class Rectangle(object):
 
     @property
     def midx(self):
-        """Returns the X coordinate at the center of the box"""
+        """The X coordinate of the center of the box"""
         return (self._left + self._right) / 2.0
 
     @midx.setter
@@ -142,7 +145,7 @@ class Rectangle(object):
 
     @property
     def midy(self):
-        """Returns the Y coordinate at the center of the box"""
+        """The Y coordinate of the center of the box"""
         return (self._top + self._bottom) / 2.0
 
     @midy.setter
@@ -154,11 +157,16 @@ class Rectangle(object):
 
     @property
     def shape(self):
-        """Returns the shape of the bounding box (width, height)"""
+        """The shape of the rectangle (width, height)"""
         return self._right - self._left, self._bottom - self._top
 
+    @shape.setter
+    def shape(self, shape):
+        """Sets the shape of the rectangle (width, height)."""
+        self.width, self.height = shape
+
     def contract(self, margins):
-        """Contracts the bounding box by the given margins.
+        """Contracts the rectangle by the given margins.
 
         @return: a new L{Rectangle} object.
         """
@@ -175,6 +183,15 @@ class Rectangle(object):
             ny1 = (ny1+ny2)/2.
             ny2 = ny1
         return self.__class__(nx1, ny1, nx2, ny2)
+
+    def expand(self, margins):
+        """Expands the rectangle by the given margins.
+
+        @return: a new L{Rectangle} object.
+        """
+        if isinstance(margins, int) or isinstance(margins, float):
+            return self.contract(-float(margins))
+        return self.contract([-float(margin) for margin in margins])
 
     def isdisjoint(self, other):
         """Returns ``True`` if the two rectangles have no intersection.
@@ -220,6 +237,54 @@ class Rectangle(object):
                 min(self._right, other._right),
                 min(self._bottom, other._bottom))
     __and__ = intersection
+
+    def union(self, other):
+        """Returns the union of this rectangle with another.
+        
+        The resulting rectangle is the smallest rectangle that contains both
+        rectangles.
+
+        Example::
+
+            >>> r1 = Rectangle(10, 10, 30, 30)
+            >>> r2 = Rectangle(20, 20, 50, 50)
+            >>> r3 = Rectangle(70, 70, 90, 90)
+            >>> r1.union(r2)
+            Rectangle(10.0, 10.0, 50.0, 50.0)
+            >>> r2 | r1
+            Rectangle(10.0, 10.0, 50.0, 50.0)
+            >>> r2.union(r1) == r1.union(r2)
+            True
+            >>> r1.union(r3)
+            Rectangle(10.0, 10.0, 90.0, 90.0)
+        """
+        return Rectangle(min(self._left, other._left),
+                min(self._top, other._top),
+                max(self._right, other._right),
+                max(self._bottom, other._bottom))
+    __or__ = union
+
+    def __ior__(self, other):
+        """Expands this rectangle to include itself and another completely while
+        still being as small as possible.
+
+        Example::
+
+            >>> r1 = Rectangle(10, 10, 30, 30)
+            >>> r2 = Rectangle(20, 20, 50, 50)
+            >>> r3 = Rectangle(70, 70, 90, 90)
+            >>> r1 |= r2
+            >>> r1
+            Rectangle(10.0, 10.0, 50.0, 50.0)
+            >>> r1 |= r3
+            >>> r1
+            Rectangle(10.0, 10.0, 90.0, 90.0)
+        """
+        self._left   = min(self._left,   other._left)
+        self._top    = min(self._top,    other._top)
+        self._right  = max(self._right,  other._right)
+        self._bottom = max(self._bottom, other._bottom)
+        return self
 
     def __repr__(self):
         return "%s(%s, %s, %s, %s)" % (self.__class__.__name__, \
