@@ -172,6 +172,10 @@ int IGRAPH_FINALLY_STACK_SIZE(void) {
 
 static igraph_warning_handler_t *igraph_i_warning_handler=0;
 
+void igraph_warning_handler_ignore (const char *reason, const char *file,
+				   int line, int igraph_errno) {
+}
+
 void igraph_warning_handler_print (const char *reason, const char *file,
 				   int line, int igraph_errno) {
   fprintf(stderr, "Warning: %s in file %s, line %i\n", reason, file, line);

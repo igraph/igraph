@@ -578,6 +578,7 @@ typedef igraph_error_handler_t igraph_warning_handler_t;
 igraph_warning_handler_t*
 igraph_set_warning_handler(igraph_warning_handler_t* new_handler);
 
+extern igraph_warning_handler_t igraph_warning_handler_ignore;
 extern igraph_warning_handler_t igraph_warning_handler_print;
 
 int igraph_warning(const char *reason, const char *file, int line,

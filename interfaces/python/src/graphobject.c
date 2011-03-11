@@ -4812,19 +4812,34 @@ PyObject *igraphmodule_Graph_topological_sorting(igraphmodule_GraphObject *
                                                  self, PyObject * args,
                                                  PyObject * kwds)
 {
-  static char *kwlist[] = { "mode", NULL };
+  static char *kwlist[] = { "mode", "warnings", NULL };
   PyObject *list, *mode_o=Py_None;
+  PyObject *warnings_o=Py_True;
   igraph_neimode_t mode = IGRAPH_OUT;
   igraph_vector_t result;
+  igraph_warning_handler_t* old_handler = 0;
+  int retval;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &mode_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist, &mode_o, &warnings_o))
     return NULL;
   if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
 
   if (igraph_vector_init(&result, 0)) 
     return igraphmodule_handle_igraph_error();
 
-  if (igraph_topological_sorting(&self->g, &result, mode)) {
+  if (!PyObject_IsTrue(warnings_o)) {
+    /* Turn off the warnings temporarily */
+    old_handler = igraph_set_warning_handler(igraph_warning_handler_ignore);
+  }
+
+  retval = igraph_topological_sorting(&self->g, &result, mode);
+
+  if (!PyObject_IsTrue(warnings_o)) {
+    /* Restore the warning handler */
+    igraph_set_warning_handler(old_handler);
+  }
+
+  if (retval) {
     igraphmodule_handle_igraph_error();
     igraph_vector_destroy(&result);
     return NULL;
