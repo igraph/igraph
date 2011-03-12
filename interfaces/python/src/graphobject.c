@@ -5286,18 +5286,21 @@ PyObject *igraphmodule_Graph_layout_star(igraphmodule_GraphObject* self,
     { "center", "order", NULL };
 
   igraph_matrix_t m;
-  PyObject *result, *order_o = Py_None;
+  PyObject *result, *order_o = Py_None, *center_o = Py_None;
   long int center = 0;
   igraph_vector_t* order = 0;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lO", kwlist,
-        &center, &order_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist,
+        &center_o, &order_o))
     return NULL;
 
   if (igraph_matrix_init(&m, 1, 1)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
+
+  if (igraphmodule_PyObject_to_vid(center_o, &center, &self->g))
+    return NULL;
 
   if (order_o != Py_None) {
     order = (igraph_vector_t*)calloc(1, sizeof(igraph_vector_t));
