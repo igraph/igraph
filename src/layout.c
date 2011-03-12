@@ -1699,7 +1699,6 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
     } else {
       IGRAPH_CHECK(igraph_sort_vertex_ids_by_degree(graph, &order,
             igraph_vss_all(), IGRAPH_ALL, 0, IGRAPH_ASCENDING, 0));
-      igraph_vector_print(&order);
     }
     
     IGRAPH_VECTOR_INIT_FINALLY(&membership, no_of_nodes);
