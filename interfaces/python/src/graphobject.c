@@ -5308,6 +5308,7 @@ PyObject *igraphmodule_Graph_layout_star(igraphmodule_GraphObject* self,
     }
     if (igraphmodule_PyObject_to_vector_t(order_o, order, 1, 0)) {
       igraph_matrix_destroy(&m);
+      free(order);
       igraphmodule_handle_igraph_error();
       return NULL;
     }
