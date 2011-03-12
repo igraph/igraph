@@ -5228,6 +5228,55 @@ PyObject *igraphmodule_Graph_layout_random(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Places the vertices on a grid
+ * \sa igraph_layout_grid, igraph_layout_grid_3d
+ */
+PyObject *igraphmodule_Graph_layout_grid(igraphmodule_GraphObject* self,
+		PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = { "width", "height", "dim", NULL };
+
+  igraph_matrix_t m;
+  PyObject *result;
+  long int width = 0, height = 0, dim = 2;
+  int ret;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lll", kwlist,
+        &width, &height, &dim))
+    return NULL;
+
+  if (dim == 2 && height > 0) {
+    PyErr_SetString(PyExc_ValueError, "height must not be given if dim=2");
+    return NULL;
+  }
+
+  if (dim != 2 && dim != 3) {
+    PyErr_SetString(PyExc_ValueError, "number of dimensions must be either 2 or 3");
+    return NULL;
+  }
+
+  if (igraph_matrix_init(&m, 1, 1)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (dim == 2)
+    ret = igraph_layout_grid(&self->g, &m, width);
+  else
+    ret = igraph_layout_grid_3d(&self->g, &m, width, height);
+
+  if (ret != IGRAPH_SUCCESS) {
+    igraphmodule_handle_igraph_error();
+    igraph_matrix_destroy(&m);
+    return NULL;
+  }
+
+  result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
+  igraph_matrix_destroy(&m);
+
+  return (PyObject *) result;
+}
+
+/** \ingroup python_interface_graph
  * \brief Places the vertices in a star-like layout
  * \sa igraph_layout_star
  */
@@ -5237,7 +5286,7 @@ PyObject *igraphmodule_Graph_layout_star(igraphmodule_GraphObject* self,
     { "center", "order", NULL };
 
   igraph_matrix_t m;
-  PyObject *result, *order_o = 0;
+  PyObject *result, *order_o = Py_None;
   long int center = 0;
   igraph_vector_t* order = 0;
 
@@ -11269,6 +11318,21 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    METH_VARARGS | METH_KEYWORDS,
    "layout_circle(dim=2)\n\n"
    "Places the vertices of the graph uniformly on a circle or a sphere.\n\n"
+   "@param dim: the desired number of dimensions for the layout. dim=2\n"
+   "  means a 2D layout, dim=3 means a 3D layout.\n"
+   "@return: the calculated layout."},
+
+  /* interface to igraph_layout_grid */
+  {"layout_grid", (PyCFunction) igraphmodule_Graph_layout_grid,
+   METH_VARARGS | METH_KEYWORDS,
+   "layout_grid(width=0, height=0, dim=2)\n\n"
+   "Places the vertices of a graph in a 2D or 3D grid.\n\n"
+   "@param width: the number of vertices in a single row of the layout.\n"
+   "  Zero or negative numbers mean that the width should be determined\n"
+   "  automatically.\n"
+   "@param height: the number of vertices in a single column of the layout.\n"
+   "  Zero or negative numbers mean that the height should be determined\n"
+   "  automatically. It must not be given if the number of dimensions is 2.\n"
    "@param dim: the desired number of dimensions for the layout. dim=2\n"
    "  means a 2D layout, dim=3 means a 3D layout.\n"
    "@return: the calculated layout."},

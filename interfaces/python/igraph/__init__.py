@@ -1100,6 +1100,10 @@ class Graph(GraphBase):
           - C{fr_3d}, C{fr3d}, C{fruchterman_reingold_3d}: 3D Fruchterman-
             Reingold layout (see L{Graph.layout_fruchterman_reingold}).
 
+          - C{grid}: regular grid layout in 2D (see L{Graph.layout_grid}) 
+
+          - C{grid_3d}: regular grid layout in 3D (see L{Graph.layout_grid_3d})
+
           - C{graphopt}: the graphopt algorithm (see L{Graph.layout_graphopt})
 
           - C{gfr}, C{grid_fr}, C{grid_fruchterman_reingold}: grid-based
@@ -2558,6 +2562,7 @@ class Graph(GraphBase):
         "fruchterman_reingold": "layout_fruchterman_reingold",
         "gfr": "layout_grid_fruchterman_reingold",
         "graphopt": "layout_graphopt",
+        "grid": "layout_grid",
         "grid_fr": "layout_grid_fruchterman_reingold",
         "grid_fruchterman_reingold": "layout_grid_fruchterman_reingold",
         "kk": "layout_kamada_kawai",
@@ -3236,6 +3241,7 @@ def _3d_version_for(func):
 Graph.layout_fruchterman_reingold_3d=_3d_version_for(Graph.layout_fruchterman_reingold)
 Graph.layout_kamada_kawai_3d=_3d_version_for(Graph.layout_kamada_kawai)
 Graph.layout_random_3d=_3d_version_for(Graph.layout_random)
+Graph.layout_grid_3d=_3d_version_for(Graph.layout_grid)
 Graph.layout_sphere=_3d_version_for(Graph.layout_circle)
 
 ##############################################################
