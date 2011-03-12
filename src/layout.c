@@ -66,8 +66,8 @@ int igraph_i_layout_sphere_3d(igraph_matrix_t *coords, igraph_real_t *x, igraph_
  * \brief Places the vertices uniform randomly on a plane.
  * 
  * \param graph Pointer to an initialized graph object.
- * \param res Pointer to an initialized graph object. This will
- *        contain the result and will be resized in needed.
+ * \param res Pointer to an initialized matrix object. This will
+ *        contain the result and will be resized as needed.
  * \return Error code. The current implementation always returns with
  * success. 
  * 
@@ -135,8 +135,8 @@ int igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *res) {
  * \brief Places the vertices uniformly on a circle, in the order of vertex ids.
  * 
  * \param graph Pointer to an initialized graph object.
- * \param res Pointer to an initialized graph object. This will
- *        contain the result and will be resized in needed.
+ * \param res Pointer to an initialized matrix object. This will
+ *        contain the result and will be resized as needed.
  * \return Error code.
  * 
  * Time complexity: O(|V|), the
@@ -164,7 +164,8 @@ int igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res) {
  * Generate a star-like layout
  * 
  * \param graph The input graph.
- * \param res Pointer to an initialized matrix, the layout is stored here.
+ * \param res Pointer to an initialized matrix object. This will
+ *        contain the result and will be resized as needed.
  * \param center The id of the vertex to put in the center.
  * \param order A numeric vector giving the order of the vertices 
  *      (including the center vertex!). If a null pointer, then the
@@ -221,8 +222,8 @@ int igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
  * 5--11.  
  * 
  * \param graph Pointer to an initialized graph object.
- * \param res Pointer to an initialized matrix object, the will be
- * stored here. It will be resized.
+ * \param res Pointer to an initialized matrix object. This will
+ *        contain the result and will be resized as needed.
  * \return Error code. The current implementation always returns with
  * success. 
  * 
@@ -270,6 +271,95 @@ int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
 
 /**
  * \ingroup layout
+ * \function igraph_layout_grid
+ * \brief Places the vertices on a regular grid on the plane.
+ *
+ * \param graph Pointer to an initialized graph object.
+ * \param res Pointer to an initialized matrix object. This will
+ *        contain the result and will be resized as needed.
+ * \param width The number of vertices in a single row of the grid.
+ *        When zero or negative, the width of the grid will be the
+ *        square root of the number of vertices, rounded up if needed.
+ * \return Error code. The current implementation always returns with
+ *         success. 
+ * 
+ * Time complexity: O(|V|), the number of vertices. 
+ */
+int igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, long int width) {
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i, j;
+  igraph_real_t x, y;
+
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));  
+
+  if (width <= 0) {
+    width = ceil(sqrt(no_of_nodes));
+  }
+
+  x = y = 0;
+  for (i = 0; i < no_of_nodes; i++) {
+    MATRIX(*res, i, 0) = x++;
+    MATRIX(*res, i, 1) = y;
+    if (x == width) {
+      x = 0; y++;
+    }
+  }
+  
+  return 0;
+}
+
+/**
+ * \ingroup layout
+ * \function igraph_layout_grid_3d
+ * \brief Places the vertices on a regular grid in the 3D space.
+ *
+ * \param graph Pointer to an initialized graph object.
+ * \param res Pointer to an initialized matrix object. This will
+ *        contain the result and will be resized as needed.
+ * \param width  The number of vertices in a single row of the grid. When
+ *               zero or negative, the width is determined automatically.
+ * \param height The number of vertices in a single column of the grid. When
+ *               zero or negative, the height is determined automatically.
+ *
+ * \return Error code. The current implementation always returns with
+ *         success. 
+ * 
+ * Time complexity: O(|V|), the number of vertices. 
+ */
+int igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
+    long int width, long int height) {
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i, j;
+  igraph_real_t x, y, z;
+
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 3));  
+
+  if (width <= 0 && height <= 0) {
+    width = height = ceil(pow(no_of_nodes, 1.0 / 3));
+  } else if (width <= 0) {
+    width = ceil(sqrt(no_of_nodes / (double)height));
+  } else if (height <= 0) {
+    height = ceil(sqrt(no_of_nodes / (double)width));
+  }
+
+  x = y = z = 0;
+  for (i = 0; i < no_of_nodes; i++) {
+    MATRIX(*res, i, 0) = x++;
+    MATRIX(*res, i, 1) = y;
+    MATRIX(*res, i, 2) = z;
+    if (x == width) {
+      x = 0; y++;
+      if (y == height) {
+        y = 0; z++;
+      }
+    }
+  }
+  
+  return 0;
+}
+
+/**
+ * \ingroup layout
  * \function igraph_layout_fruchterman_reingold
  * \brief Places the vertices on a plane according to the Fruchterman-Reingold algorithm.
  *
@@ -281,7 +371,7 @@ int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
  * This function was ported from the SNA R package.
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will
- *        contain the result and will be resized in needed.
+ *        contain the result and will be resized as needed.
  * \param niter The number of iterations to do. A reasonable
  *        default value is 500.
  * \param maxdelta The maximum distance to move a vertex in an
@@ -437,7 +527,7 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
  * This function was ported from the SNA R package.
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will
- *        contain the result and will be resized in needed.
+ *        contain the result and will be resized as needed.
  * \param niter The number of iterations to do. A reasonable
  *        default value is 500.
  * \param maxdelta The maximum distance to move a vertex in an

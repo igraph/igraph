@@ -21,6 +21,11 @@
 
 AT_BANNER([[Layouts]])
 
+AT_SETUP([Grid layout (igraph_layout_grid, igraph_layout_grid_3d):])
+AT_KEYWORDS([igraph_layout_grid igraph_layout_grid_3d grid layout])
+AT_COMPILE_CHECK([simple/igraph_layout_grid.c], [simple/igraph_layout_grid.out])
+AT_CLEANUP
+
 AT_SETUP([Large Graph Layout (igraph_layout_lgl):])
 AT_KEYWORDS([igraph_layout_lgl LGL])
 AT_COMPILE_CHECK([simple/igraph_layout_lgl.c])
