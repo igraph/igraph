@@ -8,7 +8,6 @@ import web
 import model
 import math
 import random
-import openid.store.filestore
 import os
 import url_helper
 import odict
@@ -30,7 +29,7 @@ from operator import attrgetter
 from recaptcha.client import captcha
 from textwrap import dedent
 
-# web.config.debug = False
+web.config.debug = False
 web.config.smtp_server = '173.192.111.8'
 web.config.smtp_port = 26
 web.config.smtp_username = 'csardi@mail.igraph.org'
@@ -64,9 +63,6 @@ urls = (
     '/web/editlicence/(\d+)',              'EditLicence',
     '/web/edit/(\d+)',                     'Edit',
     '/web/feedback',                       'Feedback',
-    '/web/loginfailed',                    'LoginFailed',
-    '/web/logout',                         'Logout',
-    '/web/openid',                         'OpenID',
     '/web/recreateall/(.+)',               'RecreateAll',
     '/web/recreate/(\d+)',                 'Recreate',
     '/web/search',                         'Searchpage',
@@ -75,10 +71,6 @@ urls = (
 
 # reCAPTCHA keys
 recaptcha_pubkey = "6Lfqjb8SAAAAAJyGZQrvqgs7JWjpNp_Vf9dpTMxy"
-
-# OpenIDs of the site administrators
-admins_openid=('https://launchpad.net/~gabor.csardi',
-               'https://launchpad.net/~ntamas')
 
 # Text to be included in the HTML output whenever a reCAPTCHA is needed
 recaptcha_text = """
@@ -115,16 +107,6 @@ def unique(seq):
 def get_current_url():
     """Returns the URL of the current page being produced"""
     return web.ctx.fullpath
-
-def get_current_not_logout_url():
-    """Returns the URL of the current page being produced, except for the
-    logout page.
-
-    For the logout and login failure pages, returns the root page."""
-    fp=web.ctx.fullpath
-    if fp in ('/web/logout', '/web/loginfailed'):
-        fp='/'
-    return fp
 
 def get_whatsnew():
     """Retrieves the new datasets from the model and renders it."""
@@ -224,10 +206,8 @@ def makelinks(text):
 def check_admin(redirect=True):
     if web.ctx.environ['REMOTE_ADDR']=='127.0.0.1':
         return True
-    adm=web.webopenid.status() in admins_openid
-    if not adm and redirect:
-        return web.seeother("/login")
-    return adm                
+    else:
+        return False
 
 add_form=web.form.Form(
     web.form.Textbox("sid", description="Id:", id="focused", size=formwidth),
@@ -283,10 +263,8 @@ def add_meta_form(no):
         )
 
 tempglob = { 'dataformats': model.get_format_extensions(),
-             'openid': web.webopenid,
              'getusername': model.get_username,
              'currenturl': get_current_url,
-             'currentnotlogouturl': get_current_not_logout_url,
              'get_whatsnew': get_whatsnew,
              'get_datatags': get_datatags,
              'get_motto': get_motto,
@@ -994,29 +972,6 @@ class EditLicence:
 
         return render.addlicence(form, True, True, int(id))
 
-class Logout:
-    def GET(self):
-        web.webopenid.logout()
-        return render.logout()
-
-    def POST(self):
-        user_input=web.input()
-        web.webopenid.logout()
-        return render.logout()
-
-class OpenID(web.webopenid.host):
-    def POST(self):
-        i=web.input(return_to="/")
-        user=model.get_username(i.openid)
-        if user:
-            web.webopenid.host.POST(self)
-        else:
-            return web.seeother("/loginfailed")
-
-class LoginFailed:
-    def GET(self):
-        return render.loginfailed()
-
 class Admin:
     def GET(self):
         return render.admin()
@@ -1331,8 +1286,7 @@ class Blog:
     
     def GET(self):
         user_input=web.input(id=None, admin=False)
-        unpublished = web.webopenid.status() in admins_openid and \
-            user_input.admin
+        unpublished = check_admin()
         if user_input.id is None:
             entries=model.get_blog(unpublished=unpublished)
         else:
@@ -1696,13 +1650,6 @@ class Searchpage:
         pass
 
 app = web.application(urls, globals())
-
-web.webopenid.sessions = \
-    web.session.Session(app, 
-                        web.session.DiskStore(os.path.join("..", "sessions")),
-                        initializer={})
-web.webopenid.store=\
-    openid.store.filestore.FileOpenIDStore(os.path.join("..", "sessions"))
 
 if __name__ == '__main__':
     try:

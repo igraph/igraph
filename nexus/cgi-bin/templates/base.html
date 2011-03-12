@@ -111,21 +111,6 @@ $def with (page)
 	    &copy; 2011 The Nexus team
 	  </a>
 	</div><!-- #site-info -->
-	<div class="loginbox" role="complementary">
-	  $if openid.status():
-	    <form method="post" action="/web/logout">
-	      <label>Logged in as 
-		<span class="username">$getusername()</span>.</label>
-	      <input type="hidden" name="return_to" value="$currenturl()" />
-	      <button type="submit">Log out</button>
-	    </form>
-	  $else:
-	    <form method="post" action="/web/openid">
-              <input type="text" name="openid" value="" class="openid" />
-              <input type="hidden" name="return_to" value="/" />
-              <button type="submit">Log in</button>
-            </form>
-	</div>
       </div><!-- #colophon -->
     </div><!-- #footer -->
   </div><!-- wrapper -->
