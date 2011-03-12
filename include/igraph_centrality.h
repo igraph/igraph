@@ -120,6 +120,7 @@ int igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
 				     igraph_vs_t vids,
 				     igraph_neimode_t mode, 
 				     igraph_bool_t loops,
+                     igraph_order_t order,
 				     igraph_bool_t only_indices);
 
 igraph_real_t igraph_centralization(const igraph_vector_t *scores,

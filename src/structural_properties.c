@@ -7058,7 +7058,8 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
  * \brief Calculate a list of vertex ids sorted by degree of the corresponding vertex.
  * 
  * The list of vertex ids is returned in a vector that is sorted
- * in decreasing order of vertex degree.
+ * in ascending or descending order of vertex degree.
+ *
  * \param graph The input graph.
  * \param outvids Pointer to an initialized vector that will be
  *        resized and will contain the ordered vertex ids.
@@ -7072,6 +7073,8 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
  *        This parameter is ignored for undirected graphs. 
  * \param loops Boolean, gives whether the self-loops should be
  *        counted.
+ * \param order Specifies whether the ordering should be ascending
+ *        (\c IGRAPH_ASCENDING) or descending (\c IGRAPH_DESCENDING).
  * \param only_indices If true, then return a sorted list of indices
  *        into a vector corresponding to \c vids, rather than a list
  *        of vertex ids. This parameter is ignored if \c vids is set
@@ -7089,12 +7092,14 @@ int igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
 				     igraph_vs_t vids,
 				     igraph_neimode_t mode, 
 				     igraph_bool_t loops,
+             igraph_order_t order,
 				     igraph_bool_t only_indices) {
   long int i;
   igraph_vector_t degrees, vs_vec;
   IGRAPH_VECTOR_INIT_FINALLY(&degrees, 0);
   IGRAPH_CHECK(igraph_degree(graph, &degrees, vids, mode, loops));
-  IGRAPH_CHECK(igraph_vector_qsort_ind(&degrees, outvids));
+  IGRAPH_CHECK(igraph_vector_qsort_ind(&degrees, outvids,
+        order == IGRAPH_DESCENDING));
   if (only_indices || igraph_vs_is_all(&vids) ) {
     igraph_vector_destroy(&degrees);
     IGRAPH_FINALLY_CLEAN(1);

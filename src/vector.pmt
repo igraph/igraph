@@ -738,14 +738,24 @@ void FUNCTION(igraph_vector,sort)(TYPE(igraph_vector) *v) {
 }
 
 /**
- * comparison function passed to qsort from  igraph_vector_qsort_ind
+ * Ascending comparison function passed to qsort from  igraph_vector_qsort_ind
  */
-
-int FUNCTION(igraph_vector,qsort_ind_cmp)(const void *p1 , const void *p2) {
+int FUNCTION(igraph_vector,i_qsort_ind_cmp_asc)(const void *p1 , const void *p2) {
   BASE **pa = (BASE **) p1;
   BASE **pb = (BASE **) p2;
   if( **pa < **pb ) return -1;
   if( **pa > **pb) return 1;
+  return 0;
+}
+
+/**
+ * Descending comparison function passed to qsort from  igraph_vector_qsort_ind
+ */
+int FUNCTION(igraph_vector,i_qsort_ind_cmp_desc)(const void *p1 , const void *p2) {
+  BASE **pa = (BASE **) p1;
+  BASE **pb = (BASE **) p2;
+  if( **pa < **pb ) return 1;
+  if( **pa > **pb) return -1;
   return 0;
 }
 
@@ -755,11 +765,15 @@ int FUNCTION(igraph_vector,qsort_ind_cmp)(const void *p1 , const void *p2) {
  *
  * Takes an unsorted array \c v as input and computes an array of
  * indices inds such that v[ inds[i] ], with i increasing from 0, is
- * an ordered (and decreasing) array. The order of indices for
- * identical elements is not defined. 
+ * an ordered array (either ascending or descending, depending on
+ * \v order). The order of indices for identical elements is not
+ * defined.
+ *
  * \param v the array to be sorted
  * \param inds the output array of indices. this must be initialized,
  *         but will be resized 
+ * \param descending whether the output array should be sorted in descending
+ *        order.
  * \return Error code.
  *
  * This routine uses the C library qsort routine.
@@ -774,7 +788,7 @@ int FUNCTION(igraph_vector,qsort_ind_cmp)(const void *p1 , const void *p2) {
  */
 
 long int FUNCTION(igraph_vector,qsort_ind)(TYPE(igraph_vector) *v, 
-					   igraph_vector_t *inds ) {
+					   igraph_vector_t *inds, igraph_bool_t descending) {
   long int i;
   BASE **vind, *first;
   long int n = FUNCTION(igraph_vector,size)(v);
@@ -787,9 +801,12 @@ long int FUNCTION(igraph_vector,qsort_ind)(TYPE(igraph_vector) *v,
     vind[i] = &VECTOR(*v)[i];
   }
   first = vind[0];
-  qsort(vind, n, sizeof(BASE**), FUNCTION(igraph_vector,qsort_ind_cmp));
+  if (descending)
+    qsort(vind, n, sizeof(BASE**), FUNCTION(igraph_vector,i_qsort_ind_cmp_desc));
+  else
+    qsort(vind, n, sizeof(BASE**), FUNCTION(igraph_vector,i_qsort_ind_cmp_asc));
   for(i=0; i<n; i++) {
-    VECTOR(*inds)[n-i-1] = vind[i]-first;
+    VECTOR(*inds)[i] = vind[i]-first;
   }
   igraph_Free(vind);
   return 0;

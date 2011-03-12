@@ -286,8 +286,7 @@ int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
  * Time complexity: O(|V|), the number of vertices. 
  */
 int igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, long int width) {
-  long int no_of_nodes=igraph_vcount(graph);
-  long int i, j;
+  long int i, no_of_nodes=igraph_vcount(graph);
   igraph_real_t x, y;
 
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));  
@@ -328,8 +327,7 @@ int igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, long int wid
  */
 int igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
     long int width, long int height) {
-  long int no_of_nodes=igraph_vcount(graph);
-  long int i, j;
+  long int i, no_of_nodes=igraph_vcount(graph);
   igraph_real_t x, y, z;
 
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 3));  
@@ -1639,12 +1637,6 @@ int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_
  *
  * Added in version 0.2.
  * 
- * </para><para>
- * TODO: possible speedup could be achieved if we use a table for storing
- * the children of each node in the tree. (Now the implementation uses a
- * single array containing the parent of each node and a node's children
- * are determined by looking for other nodes that have this node as parent)
- * 
  * \sa \ref igraph_layout_reingold_tilford_circular().
  * 
  * \example examples/simple/igraph_layout_reingold_tilford.c
@@ -1666,6 +1658,12 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
   const igraph_vector_t *proots=roots;
   igraph_neimode_t mode2;
   
+  /* TODO: possible speedup could be achieved if we use a table for storing
+   * the children of each node in the tree. (Now the implementation uses a
+   * single array containing the parent of each node and a node's children
+   * are determined by looking for other nodes that have this node as parent)
+   */
+
   if (!igraph_is_directed(graph)) {
     mode=IGRAPH_ALL;
   }
@@ -1684,21 +1682,24 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
 
   /* ----------------------------------------------------------------------- */
   /* If root vertices are not given, then do a topological sort and take 
-     the last element from every component */
+     the last element from every component for directed graphs, or select the
+     vertex with the maximum degree from each component for undirected graphs */
 
   if (!roots || igraph_vector_size(roots)==0) {
     
     igraph_vector_t order, membership;
     igraph_integer_t no_comps;
     long int i, noseen=0;
-    IGRAPH_VECTOR_INIT_FINALLY(&myroots, 0);
 
-    if (mode != IGRAPH_ALL) {
-      IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&myroots, 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
+
+    if (igraph_is_directed(graph) && mode != IGRAPH_ALL) {
       IGRAPH_CHECK(igraph_topological_sorting(graph, &order, mode2));
     } else {
-      IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, no_of_nodes-1));
-      IGRAPH_FINALLY(igraph_vector_destroy, &order);
+      IGRAPH_CHECK(igraph_sort_vertex_ids_by_degree(graph, &order,
+            igraph_vss_all(), IGRAPH_ALL, 0, IGRAPH_ASCENDING, 0));
+      igraph_vector_print(&order);
     }
     
     IGRAPH_VECTOR_INIT_FINALLY(&membership, no_of_nodes);
@@ -1712,8 +1713,8 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
       long int v=VECTOR(order)[i];
       long int mem=VECTOR(membership)[v];
       if (VECTOR(myroots)[mem]==0) {
-	noseen += 1;
-	VECTOR(myroots)[mem]=v+1;
+        noseen += 1;
+        VECTOR(myroots)[mem]=v+1;
       }
     }
 
