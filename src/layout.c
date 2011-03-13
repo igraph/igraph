@@ -39,6 +39,7 @@
 #include "igraph_dqueue.h"
 #include "igraph_arpack.h"
 #include "igraph_blas.h"
+#include "igraph_centrality.h"
 #include "config.h"
 #include <math.h>
 #include "igraph_math.h"
@@ -421,7 +422,12 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
     IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
   }
 
-  /* TODO: check miny & maxy if present */
+  if (miny && igraph_vector_size(miny) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid miny vector length", IGRAPH_EINVAL);
+  }
+  if (maxy && igraph_vector_size(maxy) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid maxy vector length", IGRAPH_EINVAL);
+  }
   
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
   if (!use_seed) {
@@ -497,9 +503,9 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
       MATRIX(*res, j, 0)+=MATRIX(dxdy, j, 0); /* Update positions */
       MATRIX(*res, j, 1)+=MATRIX(dxdy, j, 1);
       if (miny && MATRIX(*res, j, 1) < VECTOR(*miny)[j]) {
-	MATRIX(*res, j, 1) = VECTOR(*miny)[j];
+        MATRIX(*res, j, 1) = VECTOR(*miny)[j];
       } else if (maxy && MATRIX(*res, j, 1) > VECTOR(*maxy)[j]) {
-	MATRIX(*res, j, 1) = VECTOR(*maxy)[j];
+        MATRIX(*res, j, 1) = VECTOR(*maxy)[j];
       }
     }
   }
@@ -1241,6 +1247,9 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
  * \param use_seed Logical, if true, the coordinates passed in \p res
  *   (should have the appropriate size) will be used for the first
  *   iteration.
+ * \param weight Pointer to a vector containing edge weights, 
+ *        the attraction along the edges will be multiplied by these. 
+ *        It will be ignored if it is a null-pointer.
  * \return Error code.
  *
  * Added in version 0.2.</para><para>
@@ -1250,12 +1259,13 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
  */
 
 int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph, 
-					    igraph_matrix_t *res,
-					    igraph_integer_t niter, igraph_real_t maxdelta, 
-					    igraph_real_t area, igraph_real_t coolexp,
-					    igraph_real_t repulserad, 
-					    igraph_real_t cellsize,
-					    igraph_bool_t use_seed) {
+               igraph_matrix_t *res,
+               igraph_integer_t niter, igraph_real_t maxdelta, 
+               igraph_real_t area, igraph_real_t coolexp,
+               igraph_real_t repulserad, 
+               igraph_real_t cellsize,
+               igraph_bool_t use_seed,
+               const igraph_vector_t *weight) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
@@ -1266,6 +1276,10 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
   igraph_2dgrid_iterator_t vidit;  
 
   igraph_real_t frk=sqrt(area/no_of_nodes);
+
+  if (weight && igraph_vector_size(weight) != igraph_ecount(graph)) {
+    IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+  }
 
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
   IGRAPH_VECTOR_INIT_FINALLY(&forcex, no_of_nodes);
@@ -1307,11 +1321,12 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
       igraph_integer_t from, to;
       igraph_real_t xd, yd, dist, force;
       igraph_edge(graph, j, &from, &to);
+      igraph_real_t w= weight ? VECTOR(*weight)[j] : 1.0;
       xd=MATRIX(*res, (long int)from, 0)-MATRIX(*res, (long int)to, 0);
       yd=MATRIX(*res, (long int)from, 1)-MATRIX(*res, (long int)to, 1);
       dist=sqrt(xd*xd+yd*yd);
       if (dist != 0) { xd/=dist; yd/=dist; }
-      force=dist*dist/frk;
+      force=dist*dist/frk*w;
       VECTOR(forcex)[(long int)from] -= xd*force;
       VECTOR(forcex)[(long int)to]   += xd*force;
       VECTOR(forcey)[(long int)from] -= yd*force;

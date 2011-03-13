@@ -890,7 +890,7 @@ igraph_layout_fruchterman_reingold:
 igraph_layout_grid_fruchterman_reingold:
         PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=500, REAL maxdelta=VCOUNT(graph), \
                 REAL area=VCOUNT(graph)^2, REAL coolexp=1.5, REAL repulserad=VCOUNT(graph)^3, REAL cellsize=VCOUNT(graph), \
-                NULL use_seed
+                NULL use_seed, VECTOR_OR_0 weight
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_kamada_kawai:
