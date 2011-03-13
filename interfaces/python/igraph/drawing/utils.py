@@ -434,6 +434,19 @@ class Point(tuple):
         """
         return len(self), atan2(self.y, self.x)
 
+    def distance_from(self, other):
+        """Returns the distance of the point from another one.
+        
+        Example:
+            
+            >>> p1 = Point(5, 7)
+            >>> p2 = Point(8, 3)
+            >>> p1.distance_from(p2)
+            5.0
+        """
+        dx, dy = self.x - other.x, self.y - other.y
+        return (dx * dx + dy * dy) ** 0.5
+    
     def interpolate(self, other, ratio = 0.5):
         """Linearly interpolates between the coordinates of this point and
         another one.
