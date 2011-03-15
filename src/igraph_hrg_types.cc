@@ -1978,8 +1978,129 @@ void dendro::recordConsensusTree(const string f_out) {
 	
 }
 
-void dendro::recordConsensusTree(igraph_hrg_t *hrg) {
-  // TODO
+void dendro::recordConsensusTree(igraph_vector_t *parents, igraph_vector_t *weights) {
+  
+  keyValuePairSplit *curr, *prev;
+  bool flag_debug = false;
+  child *newChild;
+  int orig_nodes=g->numNodes();
+  
+  // First, cull the split hist so that only splits with weight >= 0.5
+  // remain 
+  cullSplitHist();
+  int treesize = splithist->returnNodecount();
+
+  // Now, initialize the various arrays we use to keep track of the
+  // internal structure of the consensus tree.
+  ctree		 = new cnode   [treesize];
+  cancestor       = new int     [n];
+  for (int i=0; i<treesize; i++) { ctree[i].index = i;  }
+  for (int i=0; i<n; i++)        { cancestor[i]   = -1; }
+  int ii = 0;
+	
+  // To build the majority consensus tree, we do the following: For
+  // each possible number of Ms in the split string (a number that
+  // ranges from n-2 down to 0), and for each split with that number
+  // of Ms, we create a new internal node of the tree, and connect the
+  // oldest ancestor of each C to that node (at most once). Then, we
+  // update our list of oldest ancestors to reflect this new join, and
+  // proceed.
+  for (int i=n-2; i>=0; i--) {
+    // First, we get a list of all the splits with this exactly i Ms
+    curr = splithist->returnTheseSplits(i);
+    // if (curr != NULL) { cout << ">> M[" << i << "] <<" << endl; }
+    
+    // Now we loop over that list
+    while (curr != NULL) {
+      splithist->deleteItem(curr->x);
+      // add weight to this internal node
+      ctree[ii].weight = curr->y; 
+      // examine each letter of this split
+      for (int j=0; j<n; j++) {	
+	if (curr->x[j] == 'C') { 
+	  // - node is child of this internal node
+	  if (cancestor[j] == -1) {
+	     // - first time this leaf has ever been seen
+	    newChild        = new child;
+	    newChild->type  = GRAPH;
+	    newChild->index = j;
+	    newChild->next  = NULL;
+	    // - attach child to list
+	    if (ctree[ii].lastChild == NULL) {	
+	      ctree[ii].children  = newChild;
+	      ctree[ii].lastChild = newChild;
+	      ctree[ii].degree    = 1;
+	    } else {
+	      ctree[ii].lastChild->next = newChild;
+	      ctree[ii].lastChild       = newChild;
+	      ctree[ii].degree   += 1;
+	    }
+	  } else {
+	    // - this leaf has been seen before
+	    // If the parent of the ancestor of this leaf is the
+	    // current internal node then this leaf is already a
+	    // descendant of this internal node, and we can move on;
+	    // otherwise, we need to add that ancestor to this
+	    // internal node's child list, and update various
+	    // relations
+	    if (ctree[cancestor[j]].parent != ii) {
+	      ctree[cancestor[j]].parent = ii;
+	      newChild        = new child;
+	      newChild->type  = DENDRO;
+	      newChild->index = cancestor[j];
+	      newChild->next  = NULL;
+	      // - attach child to list
+	      if (ctree[ii].lastChild == NULL) {
+		ctree[ii].children  = newChild;
+		ctree[ii].lastChild = newChild;
+		ctree[ii].degree    = 1;
+	      } else {
+		ctree[ii].lastChild->next = newChild;
+		ctree[ii].lastChild       = newChild;
+		ctree[ii].degree   += 1;
+	      }
+	    }
+	  }
+	  // note new ancestry for this leaf
+	  cancestor[j] = ii;
+	}
+      }
+      // update internal node index
+      ii++;
+      if (flag_debug) { printConsensusTree(); }
+      prev = curr;
+      curr = curr->next;
+      delete prev;
+    }
+  }
+
+  // Return the consensus tree
+  igraph_vector_resize(parents, ii + orig_nodes);
+  if (weights) { igraph_vector_resize(weights, ii); }
+
+  for (int i=0; i<ii; i++) {
+    child *sat, *sit=ctree[i].children;    
+    while (sit) {
+      VECTOR(*parents)[orig_nodes + i] = 
+	ctree[i].parent < 0 ? -1 : orig_nodes + ctree[i].parent;
+      if (sit->type == GRAPH) { 
+	VECTOR(*parents)[sit->index] = orig_nodes + i;
+      }
+      sat=sit;
+      sit=sit->next;
+      delete sat;
+    }
+    if (weights) { VECTOR(*weights)[i] = ctree[i].weight; }
+  }
+  
+  // Plus the isolate nodes
+  for (int i=0; i<n; i++) {
+    if (cancestor[i] == -1) {
+      VECTOR(*parents)[i] = -1;
+    }
+  }    
+
+
 }
 
 // ********************************************************************************************************
@@ -2128,7 +2249,7 @@ bool	dendro::sampleSplitLikelihoods(int &sample_num) {
 	if (splithist->returnNodecount() > split_max) {
 		
 		k=1;
-		cout << "Culling the splithist = " << splithist->returnNodecount() << " -> ";
+		// cout << "Culling the splithist = " << splithist->returnNodecount() << " -> ";
 		while (splithist->returnNodecount() > split_max) {
 			array = splithist->returnArrayOfKeys();
 			tot   = splithist->returnTotal();

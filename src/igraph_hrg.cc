@@ -74,7 +74,31 @@ int markovChainMonteCarlo(dendro *d, unsigned int period,
 }
 
 int markovChainMonteCarlo2(dendro *d, int num_samples) {
-  // TODO
+  bool flag_taken;
+  double dL, ptest = 1.0/(50.0*(double)(d->g->numNodes()));
+  int sample_num=0, t=1, thresh = 200 * d->g->numNodes();
+  MTRand mtr;			// TODO: igraph RNG
+  
+  // Since we're sampling uniformly at random over the equilibrium
+  // walk, we just need to do a bunch of MCMC moves and let the
+  // sampling happen on its own.
+  while (sample_num < num_samples) {
+    // Make a single MCMC move
+    d->monteCarloMove(dL, flag_taken, 1.0);
+		
+    // We sample the dendrogram space once every n MCMC moves (on
+    // average). Depending on the flags on the command line, we sample
+    // different aspects of the dendrograph structure.
+    if (t > thresh and mtr.randExc() < ptest) {
+      sample_num++;
+      d->sampleSplitLikelihoods(sample_num);
+    }
+		
+    t++;
+  }
+	
+  // correct floating-point errors O(n)
+  d->refreshLikelihood();
   return 0;
 }
 
@@ -108,7 +132,7 @@ int MCMCEquilibrium_Find(dendro *d, igraph_hrg_t *hrg) {
   }
   
   // Record the result
-  d->recordDendrogramStructure(hrg);
+  if (hrg) { d->recordDendrogramStructure(hrg); }
 
   return 0;
 }
@@ -271,7 +295,6 @@ int igraph_hrg_sample(const igraph_t *input_graph,
   // Need to find equilibrium first?
   if (start) {
     d->importDendrogramStructure(hrg);
-    d->recordDendrogramStructure(string("/tmp/dend.txt"));
   } else {
     IGRAPH_CHECK(MCMCEquilibrium_Find(d, hrg));
   }
@@ -369,24 +392,34 @@ int igraph_hrg_dendrogram(igraph_t *graph,
 }
 
 int igraph_hrg_consensus(const igraph_t *graph,
+			 igraph_vector_t *parents,
+			 igraph_vector_t *weights,
 			 igraph_hrg_t *hrg,
 			 igraph_bool_t start, 
 			 int num_samples) {
 
-  // TODO: implement 'start'
-
   dendro *d;
   igraph_real_t bestL;
-  
+
+  if (start && !hrg) {
+    IGRAPH_ERROR("`hrg' must be given is `start' is true", IGRAPH_EINVAL);
+  }
+
   d = new dendro;
   
   IGRAPH_CHECK(igraph_i_hrg_getgraph(graph, d));
-  
+
+  if (start) {
+    d->importDendrogramStructure(hrg);
+  } else {
+    IGRAPH_CHECK(MCMCEquilibrium_Find(d, hrg));    
+  }
+
   bestL=d->getLikelihood();
 
   IGRAPH_CHECK(markovChainMonteCarlo2(d, num_samples));
   
-  d->recordConsensusTree(hrg);
+  d->recordConsensusTree(parents, weights);
 
   return 0;
 }

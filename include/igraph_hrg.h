@@ -67,8 +67,11 @@ int igraph_hrg_dendrogram(igraph_t *graph,
 			  const igraph_hrg_t *hrg);
 
 int igraph_hrg_consensus(const igraph_t *graph,
+			 igraph_vector_t *parents,
+			 igraph_vector_t *weights,
 			 igraph_hrg_t *hrg,
-			 igraph_bool_t start);
+			 igraph_bool_t start, 
+			 int num_samples);
 
 __END_DECLS
 

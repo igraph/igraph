@@ -227,7 +227,7 @@ public:
 	void            makeRandomGraph();
 	bool			monteCarloMove(double&, bool&, const double);// make single MCMC move
 	void			recordConsensusTree(const string);			// record consensus tree from splithist
-	void                    recordConsensusTree(igraph_hrg_t *hrg);
+	void                    recordConsensusTree(igraph_vector_t *parents, igraph_vector_t *weights);
 	void			recordDendrogramStructure(const string);	// record D structure to file
 	void                    recordDendrogramStructure(igraph_hrg_t *hrg);
 	void			recordGraphStructure(const string);		// record G structure to file
