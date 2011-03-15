@@ -382,12 +382,17 @@ def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
           Cairo can handle.
 
         - C{string} -- a file with the given name will be created and an
-          appropriate Cairo surface will be attached to it.
+          appropriate Cairo surface will be attached to it. The supported image
+          formats are: PNG, PDF, SVG and PostScript.
           
-    @param bbox: the bounding box of the plot. It must be a tuple with four
-      integers, the first two denoting the X and Y coordinates of a corner
-      and the latter two denoting the X and Y coordinates of the opposite
-      corner. It can also be a L{BoundingBox} object.
+    @param bbox: the bounding box of the plot. It must be a tuple with either
+      two or four integers, or a L{BoundingBox} object. If this is a tuple
+      with two integers, it is interpreted as the width and height of the plot
+      (in pixels for PNG images and on-screen plots, or in points for PDF,
+      SVG and PostScript plots, where 72 pt = 1 inch = 2.54 cm). If this is
+      a tuple with four integers, the first two denotes the X and Y coordinates
+      of a corner and the latter two denoting the X and Y coordinates of the
+      opposite corner.
 
     @keyword opacity: the opacity of the object being plotted. It can be
       used to overlap several plots of the same graph if you use the same

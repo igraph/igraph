@@ -26,7 +26,8 @@ def named_temporary_file(*args, **kwds):
     finally:
         os.unlink(tmpfile)
 
-def rescale(values, out_range = (0., 1.), in_range = None, clamp = False):
+def rescale(values, out_range = (0., 1.), in_range = None, clamp = False,
+        scale = None):
     """Rescales a list of numbers into a given range.
 
     `out_range` gives the range of the output values; by default, the minimum
@@ -44,7 +45,13 @@ def rescale(values, out_range = (0., 1.), in_range = None, clamp = False):
     If `clamp` is ``True``, elements which are outside the given `out_range`
     after rescaling are clamped to the output range to ensure that no number
     will be outside `out_range` in the result.
-    
+
+    If `scale` is not ``None``, it will be called for every element of `values`
+    and the rescaling will take place on the results instead. This can be used,
+    for instance, to transform the logarithm of the original values instead of
+    the actual values. A typical use-case is to map a range of values to color
+    identifiers on a logarithmic scale.
+
     Examples:
         
         >>> rescale(range(5), (0, 8))
@@ -57,11 +64,21 @@ def rescale(values, out_range = (0., 1.), in_range = None, clamp = False):
         [0.0, 0.0, 2.0, 4.0, 4.0]
         >>> rescale([0]*5, (1, 3))
         [2.0, 2.0, 2.0, 2.0, 2.0]
+        >>> from math import log10
+        >>> rescale([1, 10, 100, 1000, 10000], (0, 8), scale=log10)
+        [0.0, 2.0, 4.0, 6.0, 8.0]
+        >>> rescale([1, 10, 100, 1000, 10000], (0, 4), (1, 3), scale=log10)
+        [-2.0, 0.0, 2.0, 4.0, 6.0]
     """
+    if scale is not None:
+        values = [scale(value) for value in values]
+
     if in_range is None:
         mi, ma = min(values), max(values)
     else:
         mi, ma = in_range
+        if scale is not None:
+            mi, ma = scale(mi), scale(ma)
 
     ratio = float(ma - mi)
     if not ratio:

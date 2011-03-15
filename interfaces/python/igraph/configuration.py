@@ -241,6 +241,15 @@ class Configuration(object):
             section, key = "general", item
         return section, key
 
+    def __contains__(self, item):
+        """Checks whether the given configuration item is set.
+
+        @param item: the configuration key to check.
+        @return: C{True} if the key has an associated value, C{False} otherwise.
+        """
+        section, key = self._item_to_section_key(item)
+        return self._config.has_option(section, key)
+
     def __getitem__(self, item):
         """Returns the given configuration item.
 
