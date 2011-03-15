@@ -419,9 +419,7 @@ def color_name_to_rgba(color, palette=None):
       contain floats in the range 0.0-1.0
     """
     if not isinstance(color, basestring):
-        try:
-            components = [c/255. for c in color]
-        except TypeError:
+        if not hasattr(color, "__iter__"):
             # A single index is given as a number
             try:
                 components = palette.get(color)
