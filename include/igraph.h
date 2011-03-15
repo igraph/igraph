@@ -84,5 +84,6 @@
 #include "igraph_separators.h"
 #include "igraph_cohesive_blocks.h"
 #include "igraph_eigen.h"
+#include "igraph_hrg.h"
 
 #endif
