@@ -46,6 +46,7 @@ SEXP R_igraph_strvector_to_SEXP(const igraph_strvector_t *m);
 SEXP R_igraph_to_SEXP(igraph_t *graph);
 SEXP R_igraph_vectorlist_to_SEXP(const igraph_vector_ptr_t *ptr);
 void R_igraph_vectorlist_destroy(igraph_vector_ptr_t *ptr);
+SEXP R_igraph_hrg_to_SEXP(const igraph_hrg_t *hrg);
 
 int R_igraph_SEXP_to_strvector(SEXP rval, igraph_strvector_t *sv);
 int R_igraph_SEXP_to_strvector_copy(SEXP rval, igraph_strvector_t *sv);
@@ -60,7 +61,7 @@ int R_SEXP_to_igraph_es(SEXP rit, igraph_t *graph, igraph_es_t *it);
 int R_SEXP_to_igraph_adjlist(SEXP vectorlist, igraph_adjlist_t *ptr);
 int R_SEXP_to_vector_bool(SEXP sv, igraph_vector_bool_t *v);
 int R_SEXP_to_vector_int(SEXP sv, igraph_vector_int_t *v);
-
+int R_SEXP_to_hrg(SEXP shrg, igraph_hrg_t *hrg);
 
 SEXP R_igraph_i_lang7(SEXP s, SEXP t, SEXP u, SEXP v, SEXP w, SEXP x, SEXP y)
 {
@@ -2093,6 +2094,37 @@ void R_igraph_vectorlist_destroy(igraph_vector_ptr_t *ptr) {
     igraph_free(v);
   }
   igraph_vector_ptr_destroy(ptr);
+}
+
+SEXP R_igraph_hrg_to_SEXP(const igraph_hrg_t *hrg) {
+  SEXP result, names;
+  
+  PROTECT(result=NEW_LIST(5));
+  SET_VECTOR_ELT(result, 0, R_igraph_vector_to_SEXP(&hrg->left));
+  SET_VECTOR_ELT(result, 1, R_igraph_vector_to_SEXP(&hrg->right));
+  SET_VECTOR_ELT(result, 2, R_igraph_vector_to_SEXP(&hrg->prob));
+  SET_VECTOR_ELT(result, 3, R_igraph_vector_to_SEXP(&hrg->edges));
+  SET_VECTOR_ELT(result, 4, R_igraph_vector_to_SEXP(&hrg->vertices));
+  
+  PROTECT(names=NEW_CHARACTER(5));
+  SET_STRING_ELT(names, 0, mkChar("left"));
+  SET_STRING_ELT(names, 1, mkChar("right"));
+  SET_STRING_ELT(names, 2, mkChar("prob"));
+  SET_STRING_ELT(names, 3, mkChar("edges"));
+  SET_STRING_ELT(names, 4, mkChar("vertices"));
+  SET_NAMES(result, names);
+  
+  UNPROTECT(2);
+  return result;  
+}
+
+int R_SEXP_to_hrg(SEXP shrg, igraph_hrg_t *hrg) {
+  R_SEXP_to_vector(VECTOR_ELT(shrg, 0), &hrg->left);
+  R_SEXP_to_vector(VECTOR_ELT(shrg, 1), &hrg->right);
+  R_SEXP_to_vector(VECTOR_ELT(shrg, 2), &hrg->prob);
+  R_SEXP_to_vector(VECTOR_ELT(shrg, 3), &hrg->edges);
+  R_SEXP_to_vector(VECTOR_ELT(shrg, 4), &hrg->vertices);
+  return 0;
 }
 
 int R_SEXP_to_igraph_adjlist(SEXP vectorlist, igraph_adjlist_t *ptr) {

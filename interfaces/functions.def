@@ -1099,6 +1099,19 @@ igraph_split_join_distance:
 		        OUT REALPTR distance21
         IGNORE: RR, RC, RNamespace
 
+igraph_hrg_fit:
+        PARAMS: GRAPH graph, OUT HRG hrg, BOOLEAN start=False, INT steps=0
+        NAME-R: hrg.fit
+        CLASS-R: igraphHRG
+
+igraph_hrg_game:
+        PARAMS: OUT GRAPH graph, HRG hrg
+        NAME-R: hrg.game
+
+igraph_hrg_dendrogram:
+        PARAMS: OUT GRAPH graph, HRG hrg
+        NAME-R: hrg.dendrogram
+
 #######################################
 # Conversion
 #######################################
