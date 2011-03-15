@@ -47,6 +47,7 @@ typedef struct igraph_hrg_t {
 int igraph_hrg_init(igraph_hrg_t *hrg, int no_of_nodes);
 void igraph_hrg_destroy(igraph_hrg_t *hrg);
 int igraph_hrg_size(const igraph_hrg_t *hrg);
+int igraph_hrg_resize(igraph_hrg_t *hrg, int newsize);
 
 int igraph_hrg_fit(const igraph_t *graph, 
 		   igraph_hrg_t *hrg,
@@ -64,6 +65,10 @@ int igraph_hrg_game(igraph_t *graph,
 
 int igraph_hrg_dendrogram(igraph_t *graph,
 			  const igraph_hrg_t *hrg);
+
+int igraph_hrg_consensus(const igraph_t *graph,
+			 igraph_hrg_t *hrg,
+			 igraph_bool_t start);
 
 __END_DECLS
 

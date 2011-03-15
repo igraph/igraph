@@ -148,7 +148,7 @@ HEADERS_PRIVATE = atlas-edges.h \
 		igraph_blas_internal.h igraph_arpack_internal.h \
 		igraph_lapack_internal.h \
 		igraph_marked_queue.h igraph_estack.h hrg_MersenneTwister.h \
-		hrg_dendro.h hrg_graph.h hrg_rbtree.h
+		hrg_dendro.h hrg_graph.h hrg_rbtree.h hrg_splittree_eq.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \

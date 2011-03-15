@@ -27,6 +27,7 @@
 #include "igraph_constructors.h"
 #include "igraph_attributes.h"
 #include "igraph_foreign.h"
+#include "igraph_hrg.h"
 
 #include "hrg_dendro.h"
 #include "hrg_graph.h"
@@ -55,7 +56,7 @@ int markovChainMonteCarlo(dendro *d, unsigned int period,
   for (unsigned int i=0; i<period; i++) {
     
     // make a MCMC move
-    IGRAPH_CHECK(! d->monteCarloMove(dL, flag_taken));
+    IGRAPH_CHECK(! d->monteCarloMove(dL, flag_taken, 1.0));
     
     // get likelihood of this D given G
     igraph_real_t cl= d->getLikelihood(); 
@@ -69,6 +70,11 @@ int markovChainMonteCarlo(dendro *d, unsigned int period,
   // corrects floating-point errors O(n)
   d->refreshLikelihood();	
   
+  return 0;
+}
+
+int markovChainMonteCarlo2(dendro *d, int num_samples) {
+  // TODO
   return 0;
 }
 
@@ -91,7 +97,7 @@ int MCMCEquilibrium_Find(dendro *d, igraph_hrg_t *hrg) {
     oldMeanL = newMeanL;
     newMeanL = 0.0;
     for (int i=0; i<65536; i++) {
-      IGRAPH_CHECK(! d->monteCarloMove(dL, flag_taken));
+      IGRAPH_CHECK(! d->monteCarloMove(dL, flag_taken, 1.0));
       Likeli = d->getLikelihood();
       if (Likeli > bestL) { bestL = Likeli; }
       newMeanL += Likeli;
@@ -107,8 +113,8 @@ int MCMCEquilibrium_Find(dendro *d, igraph_hrg_t *hrg) {
   return 0;
 }
 
-int igraph_i_community_hierarchy_getgraph(const igraph_t *igraph,
-					  dendro *d) {
+int igraph_i_hrg_getgraph(const igraph_t *igraph,
+			  dendro *d) {
   
   int no_of_nodes = igraph_vcount(igraph);
   int no_of_edges = igraph_ecount(igraph);
@@ -198,7 +204,7 @@ int igraph_hrg_fit(const igraph_t *graph,
   d = new dendro;  
 
   // Convert the igraph graph
-  IGRAPH_CHECK(igraph_i_community_hierarchy_getgraph(graph, d));
+  IGRAPH_CHECK(igraph_i_hrg_getgraph(graph, d));
 
   bestL = d->getLikelihood();
 
@@ -359,5 +365,28 @@ int igraph_hrg_dendrogram(igraph_t *graph,
   igraph_vector_destroy(&prob);
   IGRAPH_FINALLY_CLEAN(4);	// + 1 for graph
   
+  return 0;
+}
+
+int igraph_hrg_consensus(const igraph_t *graph,
+			 igraph_hrg_t *hrg,
+			 igraph_bool_t start, 
+			 int num_samples) {
+
+  // TODO: implement 'start'
+
+  dendro *d;
+  igraph_real_t bestL;
+  
+  d = new dendro;
+  
+  IGRAPH_CHECK(igraph_i_hrg_getgraph(graph, d));
+  
+  bestL=d->getLikelihood();
+
+  IGRAPH_CHECK(markovChainMonteCarlo2(d, num_samples));
+  
+  d->recordConsensusTree(hrg);
+
   return 0;
 }

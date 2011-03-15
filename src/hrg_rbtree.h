@@ -113,6 +113,8 @@ public:
 												// points foundNode at the corresponding node
 	void			insertItem(int newKey, int newValue);	// insert a new key with stored value
 	void			deleteItem(int killKey);				// selete a node with given key
+ 	void			replaceItem(int key, int newValue);	// replace value of a node with given key
+ 	void			incrementValue(int key);			// increment the value of the given key
 	void			deleteTree();						// delete the entire tree
 	int*			returnArrayOfKeys();				// return array of keys in tree
 	list*		returnListOfKeys();					// return list of keys in tree

@@ -32,6 +32,7 @@
 #include "hrg_rbtree.h"
 #include "hrg_dendro.h"
 #include "hrg_graph.h"
+#include "hrg_splittree_eq.h"
 
 #include "igraph_hrg.h"
 #include "igraph_constructors.h"
@@ -342,6 +343,20 @@ void rbtree::insertCleanup(elementrb *z) {
 }
 
 // ******** Delete Functions ******************************************************************************
+void rbtree::replaceItem(int key, int newValue) {
+  elementrb* ptr;
+  ptr = findItem(key);
+  ptr->value = newValue;
+  return;
+}
+ 
+void rbtree::incrementValue(int key) {
+  elementrb* ptr;
+  ptr = findItem(key);
+  ptr->value = 1+ptr->value;
+  return;
+}
+
 // public delete function
 void rbtree::deleteItem(int killKey) {
 	elementrb *x, *y, *z;
@@ -558,7 +573,9 @@ void rbtree::printSubTree(elementrb *z) {
 
 dendro:: dendro() { root   = NULL; internal   = NULL;
 				leaf   = NULL; d          = NULL;
-				paths  = NULL; g          = NULL; 
+				paths  = NULL;
+				g      = NULL; splithist  = NULL;
+				ctree  = NULL; cancestor  = NULL;
 }
 dendro::~dendro() {
 	list *curr, *prev;
@@ -566,7 +583,10 @@ dendro::~dendro() {
 	if (internal  != NULL) { delete [] internal; internal  = NULL; }    // O(n)
 	if (leaf      != NULL) { delete [] leaf;     leaf	     = NULL; }    // O(n)
 	if (d         != NULL) { delete d;           d         = NULL; }    // O(n)
+	if (splithist != NULL) { delete splithist;   splithist = NULL; }    // potentially a long time
 	if (paths     != NULL) { for (int i=0; i<n; i++) { curr = paths[i]; while (curr != NULL) { prev = curr;   curr = curr->next;   delete prev;   prev = NULL; } paths[i] = NULL; } delete [] paths; } paths = NULL;
+	if (ctree     != NULL) { delete ctree;       ctree     = NULL; }    // O(n)
+	if (cancestor != NULL) { delete cancestor;   cancestor = NULL; }    // O(n)
 }
 
 // ********************************************************************************************************
@@ -593,7 +613,7 @@ void dendro::binarySearchInsert(elementd* x, elementd* y) {
 // ********************************************************************************************************
 
 list* dendro::binarySearchFind(const double v) {
-	list *head=0, *tail=0, *newlist;
+	list *head, *tail, *newlist;
 	elementd *current = root;
 	bool flag_stopSearch = false;
 	
@@ -611,6 +631,56 @@ list* dendro::binarySearchFind(const double v) {
 		}
 	}
 	return head;
+}
+
+// ********************************************************************************************************
+
+string dendro::buildSplit(elementd* thisNode) {
+	// A "split" is defined as the bipartition of vertices into the sets of leaves below the
+	// internal vertex in the tree (denoted by "C"), and those above it (denoted as "M"). For
+	// simplicity, we represent this bipartition as a character string of length n, where the
+	// ith character denotes the partition membership (C,M) of the ith leaf node.
+
+	bool      flag_go = true;
+	const short int k = 1+DENDRO+GRAPH;
+	elementd* curr;;
+	split sp;
+
+	sp.initializeSplit(n);						// default split string O(n)
+	
+	curr = thisNode;							// - set start node as top this sub-tree
+	curr->type = k+1;							// - initialize in-order tree traversal
+	while (flag_go) {						
+		if (curr->type == k+1 and
+		    curr->L->type == GRAPH) {		// - is it time, and is left child a graph node?
+			sp.s[curr->L->index] = 'C';	// - mark this leaf
+			curr->type           = k+2;	// 
+		}
+		if (curr->type == k+2 and		
+		    curr->R->type == GRAPH) {		// - is it time, and is right child a graph node?
+			sp.s[curr->R->index] = 'C';	// - mark this leaf
+			curr->type           = k+3;	//
+		}
+		if (curr->type == k+1) {			// - go left
+			curr->type = k+2;			//
+			curr       = curr->L;		//
+			curr->type = k+1; }
+		else if (curr->type == k+2) {		// - else go right
+			curr->type = k+3;			// 
+			curr       = curr->R;		// 
+			curr->type = k+1;	
+		} else {						// - else go up a level
+			curr->type = DENDRO;		// 
+			if (curr->index == thisNode->index || curr->M == NULL) { flag_go = false; curr = NULL; }
+			else { curr = curr->M; }		//
+		}
+	}
+
+	// any leaf that was not already marked must be in the remainder of the tree
+	for (int i=0; i<n; i++) {  if (sp.s[i] != 'C') { sp.s[i] = 'M'; } }
+	if (!sp.checkSplit()) { cout << "buildSplit:: malformed split at [ " << thisNode->index <<" ]: " << sp.s << endl; }
+
+	return sp.s;
 }
 
 // ********************************************************************************************************
@@ -635,7 +705,6 @@ void dendro::buildDendrogram() {
 	// After allocating the memory for D and G, we need to mark the nodes for G as being
 	// non-internal vertices, and then insert them into a random binary tree structure.
 	// For simplicity, we make the first internal node in the array the root.
-	
 	bool flag_debug = false;
 	n		= g->numNodes();		// size of graph
 	leaf		= new elementd [n];		// allocate memory for G, O(n)
@@ -666,7 +735,6 @@ void dendro::buildDendrogram() {
 	// the leafs. As a hack to ensure that we can find the leafs later using a binary search,
 	// we assign each of them the p value of their parent, perturbed slightly so as to preserve
 	// the binary search property.
-	
 	block* array; array = new block [n];
 	for (int i=0; i<n; i++) { array[i].x = mtr.randExc();  array[i].y = i; }
 	QsortMain(array, 0, n-1);
@@ -691,7 +759,6 @@ void dendro::buildDendrogram() {
 	// Using the binary search property, we can find each leaf node in O(log n) time. The
 	// binarySearchFind() function returns the list of internal node indices that the search
 	// crossed, in the order of root -> ... -> leaf, for use in the subsequent few operations.
-	
 	if (paths != NULL) { list *curr, *prev; for (int i=0; i<n; i++) { curr = paths[i]; while (curr != NULL) { prev = curr;   curr = curr->next;   delete prev;   prev = NULL; } paths[i] = NULL; } delete [] paths; } paths = NULL;
 	paths = new list* [n];
 	for (int i=0; i<n; i++) { paths[i] = binarySearchFind(leaf[i].p); }
@@ -706,7 +773,6 @@ void dendro::buildDendrogram() {
 	// tree (given by our random dendrogram), the vast majority of vertices take basically
 	// constant time to find their common ancestor. Note that because our adjacency list
 	// is symmetric, we overcount each e by a factor of 2, so we need to correct this after.
-	
 	elementd* ancestor; edge* curr;
 	for (int i=0; i<(n-1); i++) { internal[i].e = 0; internal[i].label = -1; }
 	for (int i=0; i<n; i++) {
@@ -724,7 +790,6 @@ void dendro::buildDendrogram() {
 	// --- Count n for each internal node O(n log n)
 	// To tabulate the number of leafs in each subtree rooted at an internal node,
 	// we use the path information computed above.
-	
 	for (int i=0; i<n; i++) {
 		ancestor = &leaf[i];
 		ancestor = ancestor->M;
@@ -750,7 +815,6 @@ void dendro::buildDendrogram() {
 			ancestor = ancestor->M;
 		}
 	}
-	
 	if (flag_debug) { cout << ">> dendro: labeled all internal vertices" << endl; }
 	
 	// --- Exchange children to enforce order-property O(n)
@@ -758,7 +822,6 @@ void dendro::buildDendrogram() {
 	// smallest index of its left subtree. The dendrogram so far doesn't reflect this, so we
 	// need to step through each internal vertex and make that adjustment (swapping nL and nR
 	// if we make a change).
-	
 	elementd *tempe;
 	for (int i=0; i<(n-1); i++) {
 		if (internal[i].L->label > internal[i].label) {
@@ -779,14 +842,14 @@ void dendro::buildDendrogram() {
 	
 	for (int i=0; i<(n-1); i++) {
 		if (internal[i].L->type == DENDRO) { d->addEdge     (i, internal[i].L->index, LEFT    ); }
+		// cout << "(" << i << " " << internal[i].L->index << " L) "; }
 		if (internal[i].R->type == DENDRO) { d->addEdge     (i, internal[i].R->index, RIGHT    ); }
-	}
-	
+		// cout << "(" << i << " " << internal[i].R->index << " R) "; }
+	}	
 	if (flag_debug) { cout << ">> dendro: tabulated internal dendrogram edges" << endl; }
 	
 	// --- Clear memory for paths O(n log n)
 	// Now that we're finished using the paths, we need to deallocate them manually.
-	
 	list *current, *previous;
 	for (int i=0; i<n; i++) {
 		current = paths[i];
@@ -802,7 +865,6 @@ void dendro::buildDendrogram() {
 	// pieces, we may calculate this value for each internal node. Given these, we can then
 	// calculate the log-likelihood of the entire dendrogram structure
 	// \log(L) = \sum_{i=1}^{n} ( ( e_i \log[p_i] ) + ( (nL_i*nR_i - e_i) \log[1-p_i] ) )
-	
 	L = 0.0; double dL;
 	int nL_nR, ei;
 	for (int i=0; i<(n-1); i++) {
@@ -811,13 +873,14 @@ void dendro::buildDendrogram() {
 		internal[i].p = (double)(ei) / (double)(nL_nR);
 		if (ei == 0 or ei == nL_nR) { dL = 0.0; }
 		else                        { dL = ei * log(internal[i].p) + (nL_nR - ei) * log(1.0-internal[i].p); }
+//		cout << "p[" << i << "] = " << internal[i].p << "\tdL = " << dL << endl; // << "\t (1) " << ei * log(internal[i].p) << "\t (2) " << (nL_nR - ei) * log(1.0-internal[i].p)
 		internal[i].logL = dL;
 		L += dL;
 	}
 	
 	if (flag_debug) {
 		cout << ">> dendro: computed internal node probability value" << endl;
-//		if (n<100) { printDendrogram(); }
+		if (n<100) { printDendrogram(); }
 		cout << "Log-Likelihood = " << L << endl;
 	}
 	char pauseme;
@@ -832,8 +895,24 @@ void dendro::buildDendrogram() {
 	}
 		
 	// --- Dendrogram is now built
+//	d->printEdgeList();
 	if (flag_debug) { cout << ">> dendro: build dendrogram complete" << endl; }
 
+	return;
+}
+
+// ********************************************************************************************************
+
+void dendro::clearDendrograph() {
+	// Clear out the memory and references used by the dendrograph structure - this is 
+	// intended to be called just before an importDendrogramStructure call so as to avoid
+	// memory leaks and overwriting the references therein.
+	if (g        != NULL) { delete    g;        g        = NULL; }    // O(m)
+	if (leaf     != NULL) { delete [] leaf;     leaf     = NULL; }    // O(n)
+	if (internal != NULL) { delete [] internal; internal = NULL; }    // O(n)
+	if (d        != NULL) { delete    d;	    d        = NULL; }    // O(n)
+	root = NULL;
+	
 	return;
 }
 
@@ -864,7 +943,6 @@ int dendro::computeEdgeCount(const int a, const short int atype, const int b, co
 		curr->type = k+1;					//
 		nA         = 0;					//
 		while (flag_go) {
-			
 			if (curr->index == internal[a].M->index) {
 				internal[a].type = DENDRO;
 				flag_go          = false;
@@ -894,7 +972,6 @@ int dendro::computeEdgeCount(const int a, const short int atype, const int b, co
 					curr       = curr->M;		// 
 					if (curr == NULL) {
 						flag_go = false;
-//						cout << "A exit: reached null parent" << endl;
 					}
 				}
 			}
@@ -911,7 +988,6 @@ int dendro::computeEdgeCount(const int a, const short int atype, const int b, co
 		curr->type = k+1;					// 
 		nB		 = 0;					//
 		while (flag_go) {
-			
 			if (curr->index == internal[b].M->index) {
 				internal[b].type = DENDRO;
 				flag_go = false;
@@ -982,7 +1058,40 @@ int dendro::computeEdgeCount(const int a, const short int atype, const int b, co
 		delete [] treeList;
 	}
 
+//	cout << "finished edge counting; count = " << count << endl;
+
 	return count;
+}
+
+// ********************************************************************************************************
+
+int dendro::countChildren(const string s) {
+	char pauseme;
+	int len = s.size();
+	if (len != n) { cout << "something is wrong: length(" << s << ") = " << len << " != " << n << endl; cin >> pauseme; }
+	int numC = 0;
+	for (int i=0; i<len; i++) {
+		if (s[i] == 'C') { numC++; } else
+			if (s[i] != 'M') { cout << "something is wrong: s[" << i << "] = " << s << endl; cin >> pauseme; }
+	}
+	return numC;
+}
+
+// ********************************************************************************************************
+
+void dendro::cullSplitHist() {
+	string* array;
+	int tot, leng;
+	
+	array = splithist->returnArrayOfKeys();
+	tot   = splithist->returnTotal();
+	leng  = splithist->returnNodecount();
+	for (int i=0; i<leng; i++) {
+		if ((splithist->returnValue(array[i]) / tot) < 0.5) { splithist->deleteItem(array[i]); }
+	}
+	delete [] array; array = NULL;
+	
+	return;
 }
 
 // ********************************************************************************************************
@@ -990,7 +1099,7 @@ int dendro::computeEdgeCount(const int a, const short int atype, const int b, co
 elementd* dendro::findCommonAncestor(list** paths, const int i, const int j) {
 	list* headOne = paths[i];
 	list* headTwo = paths[j];
-	elementd* lastStep=0;
+	elementd* lastStep;
 	while (headOne->x == headTwo->x) {
 		lastStep = &internal[headOne->x];
 		headOne  = headOne->next;
@@ -1002,7 +1111,65 @@ elementd* dendro::findCommonAncestor(list** paths, const int i, const int j) {
 
 // ********************************************************************************************************
 
-double  dendro::getLikelihood()     { return L;      }
+int dendro::getConsensusSize() {
+	string    *array;
+	double     value, tot;
+	int		 numSplits, numCons;
+	numSplits = splithist->returnNodecount();
+	array     = splithist->returnArrayOfKeys();
+	tot       = splithist->returnTotal();
+	numCons	= 0;
+	for (int i=0; i<numSplits; i++) {
+		value = splithist->returnValue(array[i]);
+		if (value / tot > 0.5) { numCons++; }
+	}
+	delete [] array; array = NULL;
+	return numCons;
+}
+
+// ********************************************************************************************************
+
+splittree* dendro::getConsensusSplits() {
+	string    *array;
+	splittree *consensusTree;
+	double     value, tot;
+	consensusTree  = new splittree;
+	int numSplits;
+	
+	// We look at all of the splits in our split histogram and add any one that's in the
+	// majority to our consensusTree, which we then return (note that consensusTree needs to
+	// be deallocated by the user).
+	numSplits = splithist->returnNodecount();
+	array     = splithist->returnArrayOfKeys();
+	tot       = splithist->returnTotal();
+	for (int i=0; i<numSplits; i++) {
+		value = splithist->returnValue(array[i]);
+		if (value / tot > 0.5) { consensusTree->insertItem(array[i], value / tot); }
+	}
+	delete [] array; array = NULL;
+	return consensusTree;
+}
+
+// ********************************************************************************************************
+
+double dendro::getLikelihood() { return L; }
+
+// ********************************************************************************************************
+
+void dendro::getSplitList(splittree* split_tree) {
+	string sp;
+	for (int i=0; i<(n-1); i++) {
+		sp = d->getSplit(i);
+		if (sp != "" and sp[1] != '-') { split_tree->insertItem(sp,0.0); }
+	}
+	return;
+}
+
+// ********************************************************************************************************
+
+double dendro::getSplitTotalWeight() { 
+	if (splithist != NULL) { return splithist->returnTotal(); } else { return 0; }
+}
 
 // ********************************************************************************************************
 
@@ -1011,7 +1178,7 @@ bool dendro::importDendrogramStructure(const string in_file) {
 	int sindex, sLindex, sRindex, snume, snumn;
 	double sprob;
 	bool safeExit   = true;
-	bool flag_debug = true;
+	bool flag_debug = false;
 	n = 1;
 	
 	ifstream fscan(in_file.c_str(), ios::in);
@@ -1094,7 +1261,7 @@ bool dendro::importDendrogramStructure(const string in_file) {
 	}
 	if (flag_debug) {
 		cout << ">> dendro: computed log-likelihood" << endl;
-		cout << "   Log-Likelihood = " << L << endl;
+		cout << "Log-Likelihood = " << L << endl;
 	}
 	
 	// --- Dendrogram is now built
@@ -1242,7 +1409,7 @@ void dendro::makeRandomGraph() {
 
 // ********************************************************************************************************
 
-bool dendro::monteCarloMove(double& delta, bool& ftaken) {
+bool dendro::monteCarloMove(double& delta, bool& ftaken, const double T) {
 	// A single MC move begins with the selection of a random internal edge (a,b) of the
 	// dendrogram. This also determines the three subtrees i, j, k that we will rearrange,
 	// and we choose uniformly from among the options.
@@ -1258,12 +1425,17 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken) {
 	// For each of these moves, we need to know what the change in likelihood will be, so
 	// that we can determine with what probability we execute the move.
 	
-	elementd	*temp, *tempe;
+	bool		flag_debug = false;
+	elementd	*temp;
 	ipair	*tempPair;
 	int		x, y, e_x, e_y, n_i, n_j, n_k, n_x, n_y;
 	short int t;
 	double    p_x, p_y, L_x, L_y, dLogL;
+	string    new_split;
 	
+	// The remainder of the code executes a single MCMC move, where we sample the dendrograms 
+	// proportionally to their likelihoods (i.e., temperature=1, if you're comparing it to the
+	// usual MCMC framework). 
 	delta    = 0.0;
 	ftaken   = false;
 	tempPair = d->getRandomEdge();	// returns address; no need to deallocate
@@ -1271,13 +1443,19 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken) {
 	y        = tempPair->y;			//    into local variables
 	t        = tempPair->t;
 	
+	if (flag_debug) {
+		if (t == LEFT) {
+		} else if (t == RIGHT) {
+		} else { cout << " bad edge (i,j,k)" << endl; }
+	}
+	
 	if (t == LEFT) {								// 
 		if (mtr.randExc() < 0.5) {					// ## LEFT ALPHA move: ((i,j),k) -> ((i,k),j)
-			// I need to calculate the change in the likelihood that would result from
+			// We need to calculate the change in the likelihood (dLogL) that would result from
 			// this move. Most of the information needed to do this is already available,
 			// the exception being e_ik, the number of edges that span the i and k subtrees.
 			// I use a slow algorithm O(n) to do this, since I don't know of a better way at
-			// this point.
+			// this point. (After several attempts to find a faster method, no luck.)
 
 			n_i = internal[y].L->n;
 			n_j = internal[y].R->n;
@@ -1294,9 +1472,9 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken) {
 			p_x  = (double)(e_x) / (double)(n_x);
 			if (e_x == 0 or e_x == n_x)	{ L_x = 0.0; }
 			else						{ L_x = (double)(e_x) * log(p_x) + (double)(n_x - e_x) * log(1.0-p_x); }
-						
+			
 			dLogL = (L_x - internal[x].logL) + (L_y - internal[y].logL);
-			if ((dLogL > 0.0) or (mtr.randExc() < exp(dLogL))) {  // make LEFT ALPHA move
+			if ((dLogL > 0.0) or (mtr.randExc() < exp(T*dLogL))) {  // make LEFT ALPHA move
 				ftaken = true;
 				d->swapEdges(x, internal[x].R->index, RIGHT, y, internal[y].R->index, RIGHT);
 				temp             = internal[x].R;			// - swap j and k
@@ -1320,21 +1498,29 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken) {
 					printDendrogram();
 					if (internal[x].label > internal[x].L->label) {
 						cout << "**** WARNING - order property violated by internal[" << x << "]" << endl;
-						cout << "x    (p = " << internal[x].p << "\te = "   << internal[x].e << "\tnL = " << internal[x].L->n << "\tnR = " << internal[x].R->n << "\tlabel = " << internal[x].label << ")\tinternal[" << x << "]\t(D)" << endl;
-						if (internal[x].L->type==GRAPH) { cout << "x->L [" << internal[x].L->index << "]\t(G)"<< endl; } else { cout << "i->L (p = " << internal[x].L->p << "\te = "   << internal[x].L->e << "\tnL = " << internal[x].L->L->n << "\tnR = " << internal[x].L->R->n << "\tlabel = " << internal[x].L->label << ")\tinternal[" << internal[x].L->index << "]\t(D)"<< endl; }
-						if (internal[x].R->type==GRAPH) { cout << "x->R [" << internal[x].R->index << "]\t(G)"<< endl; } else { cout << "i->R (p = " << internal[x].R->p << "\te = "   << internal[x].R->e << "\tnL = " << internal[x].R->L->n << "\tnR = " << internal[x].R->R->n << "\tlabel = " << internal[x].R->label << ")\tinternal[" << internal[x].R->index << "]\t(D)"<< endl; }
+						cout << "x    (p = " << internal[x].p << "\te = "   << internal[x].e << "\tnL = ";
+						cout << internal[x].L->n << "\tnR = " << internal[x].R->n << "\tlabel = " << internal[x].label << ")\tinternal[" << x << "]\t(D)" << endl;
+						if (internal[x].L->type==GRAPH) { cout << "x->L [" << internal[x].L->index << "]\t(G)"<< endl; } else { 
+							cout << "i->L (p = " << internal[x].L->p << "\te = "   << internal[x].L->e << "\tnL = ";
+							cout << internal[x].L->L->n << "\tnR = " << internal[x].L->R->n << "\tlabel = " << internal[x].L->label << ")\tinternal[" << internal[x].L->index << "]\t(D)"<< endl; }
+						if (internal[x].R->type==GRAPH) { cout << "x->R [" << internal[x].R->index << "]\t(G)"<< endl; } else { 
+							cout << "i->R (p = " << internal[x].R->p << "\te = "   << internal[x].R->e << "\tnL = ";
+							cout << internal[x].R->L->n << "\tnR = " << internal[x].R->R->n << "\tlabel = " << internal[x].R->label << ")\tinternal[" << internal[x].R->index << "]\t(D)"<< endl; }
 					}
 					if (internal[y].label > internal[y].L->label) {
 						cout << "**** WARNING - order property violated by internal[" << y << "]" << endl;
-						cout << "y    (p = " << internal[y].p << "\te = "   << internal[y].e << "\tnL = " << internal[y].L->n << "\tnR = " << internal[y].R->n << "\tlabel = " << internal[y].label << ")\tinternal[" << y << "]\t(D)" << endl;
-						if (internal[y].L->type==GRAPH) { cout << "y->L [" << internal[y].L->index << "]\t(G)"<< endl; } else { cout << "i->L (p = " << internal[y].L->p << "\te = "   << internal[y].L->e << "\tnL = " << internal[y].L->L->n << "\tnR = " << internal[y].L->R->n << "\tlabel = " << internal[y].L->label << ")\tinternal[" << internal[y].L->index << "]\t(D)"<< endl; }
-						if (internal[y].R->type==GRAPH) { cout << "y->R [" << internal[y].R->index << "]\t(G)"<< endl; } else { cout << "i->R (p = " << internal[y].R->p << "\te = "   << internal[y].R->e << "\tnL = " << internal[y].R->L->n << "\tnR = " << internal[y].R->R->n << "\tlabel = " << internal[y].R->label << ")\tinternal[" << internal[y].R->index << "]\t(D)"<< endl; }
+						cout << "y    (p = " << internal[y].p << "\te = "   << internal[y].e << "\tnL = ";
+						cout << internal[y].L->n << "\tnR = " << internal[y].R->n << "\tlabel = " << internal[y].label << ")\tinternal[" << y << "]\t(D)" << endl;
+						if (internal[y].L->type==GRAPH) { cout << "y->L [" << internal[y].L->index << "]\t(G)"<< endl; } else { 
+							cout << "i->L (p = " << internal[y].L->p << "\te = "   << internal[y].L->e << "\tnL = ";
+							cout << internal[y].L->L->n << "\tnR = " << internal[y].L->R->n << "\tlabel = " << internal[y].L->label << ")\tinternal[" << internal[y].L->index << "]\t(D)"<< endl; }
+						if (internal[y].R->type==GRAPH) { cout << "y->R [" << internal[y].R->index << "]\t(G)"<< endl; } else { 
+							cout << "i->R (p = " << internal[y].R->p << "\te = "   << internal[y].R->e << "\tnL = ";
+							cout << internal[y].R->L->n << "\tnR = " << internal[y].R->R->n << "\tlabel = " << internal[y].R->label << ")\tinternal[" << internal[y].R->index << "]\t(D)"<< endl; }
 					}
 					return false;
 				}
-
 			}
-
 		} else {									// ## LEFT BETA move:  ((i,j),k) -> (i,(j,k))
 			n_i = internal[y].L->n;
 			n_j = internal[y].R->n;
@@ -1353,7 +1539,7 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken) {
 			else						{ L_x = (double)(e_x) * log(p_x) + (double)(n_x - e_x) * log(1.0-p_x); }
 			
 			dLogL = (L_x - internal[x].logL) + (L_y - internal[y].logL);
-			if ((dLogL > 0.0) or (mtr.randExc() < exp(dLogL))) {  // make LEFT BETA move
+			if ((dLogL > 0.0) or (mtr.randExc() < exp(T*dLogL))) {  // make LEFT BETA move
 				ftaken = true;
 				d->swapEdges(y, internal[y].L->index, LEFT, y, internal[y].R->index, RIGHT);
 				temp			  = internal[y].L;			// - swap L and R of [y]
@@ -1391,15 +1577,25 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken) {
 					printDendrogram();
 					if (internal[x].label > internal[x].L->label) {
 						cout << "**** WARNING - order property violated by internal[" << x << "]" << endl;
-						cout << "x    (p = " << internal[x].p << "\te = "   << internal[x].e << "\tnL = " << internal[x].L->n << "\tnR = " << internal[x].R->n << "\tlabel = " << internal[x].label << ")\tinternal[" << x << "]\t(D)" << endl;
-						if (internal[x].L->type==GRAPH) { cout << "x->L [" << internal[x].L->index << "]\t(G)"<< endl; } else { cout << "i->L (p = " << internal[x].L->p << "\te = "   << internal[x].L->e << "\tnL = " << internal[x].L->L->n << "\tnR = " << internal[x].L->R->n << "\tlabel = " << internal[x].L->label << ")\tinternal[" << internal[x].L->index << "]\t(D)"<< endl; }
-						if (internal[x].R->type==GRAPH) { cout << "x->R [" << internal[x].R->index << "]\t(G)"<< endl; } else { cout << "i->R (p = " << internal[x].R->p << "\te = "   << internal[x].R->e << "\tnL = " << internal[x].R->L->n << "\tnR = " << internal[x].R->R->n << "\tlabel = " << internal[x].R->label << ")\tinternal[" << internal[x].R->index << "]\t(D)"<< endl; }
+						cout << "x    (p = " << internal[x].p << "\te = "   << internal[x].e << "\tnL = ";
+						cout << internal[x].L->n << "\tnR = " << internal[x].R->n << "\tlabel = " << internal[x].label << ")\tinternal[" << x << "]\t(D)" << endl;
+						if (internal[x].L->type==GRAPH) { cout << "x->L [" << internal[x].L->index << "]\t(G)"<< endl; } else { 
+							cout << "i->L (p = " << internal[x].L->p << "\te = "   << internal[x].L->e << "\tnL = ";
+							cout << internal[x].L->L->n << "\tnR = " << internal[x].L->R->n << "\tlabel = " << internal[x].L->label << ")\tinternal[" << internal[x].L->index << "]\t(D)"<< endl; }
+						if (internal[x].R->type==GRAPH) { cout << "x->R [" << internal[x].R->index << "]\t(G)"<< endl; } else { 
+							cout << "i->R (p = " << internal[x].R->p << "\te = "   << internal[x].R->e << "\tnL = ";
+							cout << internal[x].R->L->n << "\tnR = " << internal[x].R->R->n << "\tlabel = " << internal[x].R->label << ")\tinternal[" << internal[x].R->index << "]\t(D)"<< endl; }
 					}
 					if (internal[y].label > internal[y].L->label) {
 						cout << "**** WARNING - order property violated by internal[" << y << "]" << endl;
-						cout << "y    (p = " << internal[y].p << "\te = "   << internal[y].e << "\tnL = " << internal[y].L->n << "\tnR = " << internal[y].R->n << "\tlabel = " << internal[y].label << ")\tinternal[" << y << "]\t(D)" << endl;
-						if (internal[y].L->type==GRAPH) { cout << "y->L [" << internal[y].L->index << "]\t(G)"<< endl; } else { cout << "i->L (p = " << internal[y].L->p << "\te = "   << internal[y].L->e << "\tnL = " << internal[y].L->L->n << "\tnR = " << internal[y].L->R->n << "\tlabel = " << internal[y].L->label << ")\tinternal[" << internal[y].L->index << "]\t(D)"<< endl; }
-						if (internal[y].R->type==GRAPH) { cout << "y->R [" << internal[y].R->index << "]\t(G)"<< endl; } else { cout << "i->R (p = " << internal[y].R->p << "\te = "   << internal[y].R->e << "\tnL = " << internal[y].R->L->n << "\tnR = " << internal[y].R->R->n << "\tlabel = " << internal[y].R->label << ")\tinternal[" << internal[y].R->index << "]\t(D)"<< endl; }
+						cout << "y    (p = " << internal[y].p << "\te = "   << internal[y].e << "\tnL = ";
+						cout << internal[y].L->n << "\tnR = " << internal[y].R->n << "\tlabel = " << internal[y].label << ")\tinternal[" << y << "]\t(D)" << endl;
+						if (internal[y].L->type==GRAPH) { cout << "y->L [" << internal[y].L->index << "]\t(G)"<< endl; } else { 
+							cout << "i->L (p = " << internal[y].L->p << "\te = "   << internal[y].L->e << "\tnL = ";
+							cout << internal[y].L->L->n << "\tnR = " << internal[y].L->R->n << "\tlabel = " << internal[y].L->label << ")\tinternal[" << internal[y].L->index << "]\t(D)"<< endl; }
+						if (internal[y].R->type==GRAPH) { cout << "y->R [" << internal[y].R->index << "]\t(G)"<< endl; } else { 
+							cout << "i->R (p = " << internal[y].R->p << "\te = "   << internal[y].R->e << "\tnL = ";
+							cout << internal[y].R->L->n << "\tnR = " << internal[y].R->R->n << "\tlabel = " << internal[y].R->label << ")\tinternal[" << internal[y].R->index << "]\t(D)"<< endl; }
 					}
 					return false;
 				}
@@ -1424,7 +1620,7 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken) {
 			else						{ L_x = (double)(e_x) * log(p_x) + (double)(n_x - e_x) * log(1.0-p_x); }
 
 			dLogL = (L_x - internal[x].logL) + (L_y - internal[y].logL);
-			if ((dLogL > 0.0) or (mtr.randExc() < exp(dLogL))) {  // make RIGHT ALPHA move
+			if ((dLogL > 0.0) or (mtr.randExc() < exp(T*dLogL))) {  // make RIGHT ALPHA move
 				ftaken = true;
 				d->swapEdges(x, internal[x].L->index, LEFT, x, internal[x].R->index, RIGHT);
 				temp			   = internal[x].L;			// - swap L and R of [x]
@@ -1452,19 +1648,27 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken) {
 					printDendrogram();
 					if (internal[x].label > internal[x].L->label) {
 						cout << "**** WARNING - order property violated by internal[" << x << "]" << endl;
-						cout << "x    (p = " << internal[x].p << "\te = "   << internal[x].e << "\tnL = " << internal[x].L->n << "\tnR = " << internal[x].R->n << "\tlabel = " << internal[x].label << ")\tinternal[" << x << "]\t(D)" << endl;
-						if (internal[x].L->type==GRAPH) { cout << "x->L [" << internal[x].L->index << "]\t(G)"<< endl; } else { cout << "i->L (p = " << internal[x].L->p << "\te = "   << internal[x].L->e << "\tnL = " << internal[x].L->L->n << "\tnR = " << internal[x].L->R->n << "\tlabel = " << internal[x].L->label << ")\tinternal[" << internal[x].L->index << "]\t(D)"<< endl; }
-						if (internal[x].R->type==GRAPH) { cout << "x->R [" << internal[x].R->index << "]\t(G)"<< endl; } else { cout << "i->R (p = " << internal[x].R->p << "\te = "   << internal[x].R->e << "\tnL = " << internal[x].R->L->n << "\tnR = " << internal[x].R->R->n << "\tlabel = " << internal[x].R->label << ")\tinternal[" << internal[x].R->index << "]\t(D)"<< endl; }
+						cout << "x    (p = " << internal[x].p << "\te = "   << internal[x].e << "\tnL = ";
+						cout << internal[x].L->n << "\tnR = " << internal[x].R->n << "\tlabel = " << internal[x].label << ")\tinternal[" << x << "]\t(D)" << endl;
+						if (internal[x].L->type==GRAPH) { cout << "x->L [" << internal[x].L->index << "]\t(G)"<< endl; } else {
+							cout << "i->L (p = " << internal[x].L->p << "\te = "   << internal[x].L->e << "\tnL = ";
+							cout << internal[x].L->L->n << "\tnR = " << internal[x].L->R->n << "\tlabel = " << internal[x].L->label << ")\tinternal[" << internal[x].L->index << "]\t(D)"<< endl; }
+						if (internal[x].R->type==GRAPH) { cout << "x->R [" << internal[x].R->index << "]\t(G)"<< endl; } else {
+							cout << "i->R (p = " << internal[x].R->p << "\te = "   << internal[x].R->e << "\tnL = ";
+							cout << internal[x].R->L->n << "\tnR = " << internal[x].R->R->n << "\tlabel = " << internal[x].R->label << ")\tinternal[" << internal[x].R->index << "]\t(D)"<< endl; }
 					}
 					if (internal[y].label > internal[y].L->label) {
 						cout << "**** WARNING - order property violated by internal[" << y << "]" << endl;
 						cout << "y    (p = " << internal[y].p << "\te = "   << internal[y].e << "\tnL = " << internal[y].L->n << "\tnR = " << internal[y].R->n << "\tlabel = " << internal[y].label << ")\tinternal[" << y << "]\t(D)" << endl;
-						if (internal[y].L->type==GRAPH) { cout << "y->L [" << internal[y].L->index << "]\t(G)"<< endl; } else { cout << "i->L (p = " << internal[y].L->p << "\te = "   << internal[y].L->e << "\tnL = " << internal[y].L->L->n << "\tnR = " << internal[y].L->R->n << "\tlabel = " << internal[y].L->label << ")\tinternal[" << internal[y].L->index << "]\t(D)"<< endl; }
-						if (internal[y].R->type==GRAPH) { cout << "y->R [" << internal[y].R->index << "]\t(G)"<< endl; } else { cout << "i->R (p = " << internal[y].R->p << "\te = "   << internal[y].R->e << "\tnL = " << internal[y].R->L->n << "\tnR = " << internal[y].R->R->n << "\tlabel = " << internal[y].R->label << ")\tinternal[" << internal[y].R->index << "]\t(D)"<< endl; }
+						if (internal[y].L->type==GRAPH) { cout << "y->L [" << internal[y].L->index << "]\t(G)"<< endl; } else {
+							cout << "i->L (p = " << internal[y].L->p << "\te = "   << internal[y].L->e << "\tnL = ";
+							cout << internal[y].L->L->n << "\tnR = " << internal[y].L->R->n << "\tlabel = " << internal[y].L->label << ")\tinternal[" << internal[y].L->index << "]\t(D)"<< endl; }
+						if (internal[y].R->type==GRAPH) { cout << "y->R [" << internal[y].R->index << "]\t(G)"<< endl; } else { 
+							cout << "i->R (p = " << internal[y].R->p << "\te = "   << internal[y].R->e << "\tnL = ";
+							cout << internal[y].R->L->n << "\tnR = " << internal[y].R->R->n << "\tlabel = " << internal[y].R->label << ")\tinternal[" << internal[y].R->index << "]\t(D)"<< endl; }
 					}
 					return false;
 				}
-
 			}
 		} else {									// beta move:  (i,(j,k)) -> ((i,j),k)
 			n_i = internal[x].L->n;
@@ -1482,9 +1686,9 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken) {
 			p_x  = (double)(e_x) / (double)(n_x);
 			if (e_x == 0 or e_x == n_x)	{ L_x = 0.0; }
 			else						{ L_x = (double)(e_x) * log(p_x) + (double)(n_x - e_x) * log(1.0-p_x); }
-			
+
 			dLogL = (L_x - internal[x].logL) + (L_y - internal[y].logL);
-			if ((dLogL > 0.0) or (mtr.randExc() < exp(dLogL))) {  // make RIGHT BETA move
+			if ((dLogL > 0.0) or (mtr.randExc() < exp(T*dLogL))) {  // make RIGHT BETA move
 				ftaken = true;
 				d->swapEdges(x, internal[x].L->index, LEFT, x, internal[x].R->index, RIGHT);
 				temp			   = internal[x].L;			// - swap L and R of [x]
@@ -1516,21 +1720,28 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken) {
 					printDendrogram();
 					if (internal[x].label > internal[x].L->label) {
 						cout << "**** WARNING - order property violated by internal[" << x << "]" << endl;
-						cout << "x    (p = " << internal[x].p << "\te = "   << internal[x].e << "\tnL = " << internal[x].L->n << "\tnR = " << internal[x].R->n << "\tlabel = " << internal[x].label << ")\tinternal[" << x << "]\t(D)" << endl;
-						if (internal[x].L->type==GRAPH) { cout << "x->L [" << internal[x].L->index << "]\t(G)"<< endl; } else { cout << "i->L (p = " << internal[x].L->p << "\te = "   << internal[x].L->e << "\tnL = " << internal[x].L->L->n << "\tnR = " << internal[x].L->R->n << "\tlabel = " << internal[x].L->label << ")\tinternal[" << internal[x].L->index << "]\t(D)"<< endl; }
-						if (internal[x].R->type==GRAPH) { cout << "x->R [" << internal[x].R->index << "]\t(G)"<< endl; } else { cout << "i->R (p = " << internal[x].R->p << "\te = "   << internal[x].R->e << "\tnL = " << internal[x].R->L->n << "\tnR = " << internal[x].R->R->n << "\tlabel = " << internal[x].R->label << ")\tinternal[" << internal[x].R->index << "]\t(D)"<< endl; }
+						cout << "x    (p = " << internal[x].p << "\te = "   << internal[x].e << "\tnL = ";
+						cout << internal[x].L->n << "\tnR = " << internal[x].R->n << "\tlabel = " << internal[x].label << ")\tinternal[" << x << "]\t(D)" << endl;
+						if (internal[x].L->type==GRAPH) { cout << "x->L [" << internal[x].L->index << "]\t(G)"<< endl; } else { 
+							cout << "i->L (p = " << internal[x].L->p << "\te = "   << internal[x].L->e << "\tnL = ";
+							cout << internal[x].L->L->n << "\tnR = " << internal[x].L->R->n << "\tlabel = " << internal[x].L->label << ")\tinternal[" << internal[x].L->index << "]\t(D)"<< endl; }
+						if (internal[x].R->type==GRAPH) { cout << "x->R [" << internal[x].R->index << "]\t(G)"<< endl; } else { 
+							cout << "i->R (p = " << internal[x].R->p << "\te = "   << internal[x].R->e << "\tnL = ";
+							cout << internal[x].R->L->n << "\tnR = " << internal[x].R->R->n << "\tlabel = " << internal[x].R->label << ")\tinternal[" << internal[x].R->index << "]\t(D)"<< endl; }
 					}
 					if (internal[y].label > internal[y].L->label) {
 						cout << "**** WARNING - order property violated by internal[" << y << "]" << endl;
-						cout << "y    (p = " << internal[y].p << "\te = "   << internal[y].e << "\tnL = " << internal[y].L->n << "\tnR = " << internal[y].R->n << "\tlabel = " << internal[y].label << ")\tinternal[" << y << "]\t(D)" << endl;
-						if (internal[y].L->type==GRAPH) { cout << "y->L [" << internal[y].L->index << "]\t(G)"<< endl; } else { cout << "i->L (p = " << internal[y].L->p << "\te = "   << internal[y].L->e << "\tnL = " << internal[y].L->L->n << "\tnR = " << internal[y].L->R->n << "\tlabel = " << internal[y].L->label << ")\tinternal[" << internal[y].L->index << "]\t(D)"<< endl; }
-						if (internal[y].R->type==GRAPH) { cout << "y->R [" << internal[y].R->index << "]\t(G)"<< endl; } else { cout << "i->R (p = " << internal[y].R->p << "\te = "   << internal[y].R->e << "\tnL = " << internal[y].R->L->n << "\tnR = " << internal[y].R->R->n << "\tlabel = " << internal[y].R->label << ")\tinternal[" << internal[y].R->index << "]\t(D)"<< endl; }
+						cout << "y    (p = " << internal[y].p << "\te = "   << internal[y].e << "\tnL = ";
+						cout << internal[y].L->n << "\tnR = " << internal[y].R->n << "\tlabel = " << internal[y].label << ")\tinternal[" << y << "]\t(D)" << endl;
+						if (internal[y].L->type==GRAPH) { cout << "y->L [" << internal[y].L->index << "]\t(G)"<< endl; } else { 
+							cout << "i->L (p = " << internal[y].L->p << "\te = "   << internal[y].L->e << "\tnL = ";
+							cout << internal[y].L->L->n << "\tnR = " << internal[y].L->R->n << "\tlabel = " << internal[y].L->label << ")\tinternal[" << internal[y].L->index << "]\t(D)"<< endl; }
+						if (internal[y].R->type==GRAPH) { cout << "y->R [" << internal[y].R->index << "]\t(G)"<< endl; } else { 
+							cout << "i->R (p = " << internal[y].R->p << "\te = "   << internal[y].R->e << "\tnL = ";
+							cout << internal[y].R->L->n << "\tnR = " << internal[y].R->R->n << "\tlabel = " << internal[y].R->label << ")\tinternal[" << internal[y].R->index << "]\t(D)"<< endl; }
 					}
 					return false;
 				}
-				if (internal[x].label > internal[x].L->label) { tempe = internal[x].L; internal[x].L  = internal[x].R; internal[x].R  = tempe; }
-				if (internal[y].label > internal[y].L->label) { tempe = internal[y].L; internal[y].L  = internal[y].R; internal[y].R  = tempe; }
-
 			}
 		}
 	}
@@ -1540,7 +1751,46 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken) {
 
 // ********************************************************************************************************
 
-void dendro::printDendrogram() { cout << "\nLEAFS = " << n << endl << "# "; printSubTree(root); return; }
+void dendro::printConsensusTree() {
+	child *curr;
+	int treesize = splithist->returnNodecount();
+	if (ctree != NULL) {
+		for (int i=0; i<treesize; i++) {
+			cout << "tree[" << i << "].index  = " << ctree[i].index << endl;
+			cout << "tree[" << i << "].weight = " << ctree[i].weight << endl;
+			cout << "tree[" << i << "].degree = " << ctree[i].degree << endl;
+			cout << "tree[" << i << "].parent = " << ctree[i].parent << endl;
+			curr = ctree[i].children;
+			while (curr != NULL) {
+				cout << curr->index << "\n";
+				curr = curr->next;
+			}
+			cout << endl;
+		}
+	}
+	return;
+}
+
+// ********************************************************************************************************
+
+void dendro::printConsensusTreeDense() {
+	int treesize = splithist->returnNodecount();
+	if (ctree != NULL) {
+		cout << "------------ internal[ 0 - " << treesize-1 << " ] ------------ " << endl;
+		for (int i=0; i<treesize; i++) { cout << ctree[i].parent << "  "; } cout << endl;
+	}
+	if (cancestor != NULL) {
+		cout << "------------ ancestor[ 1 - " << n << " ] ------------ " << endl;
+		for (int i=0; i<n; i++) { cout << cancestor[i] << "  "; } cout << endl;
+	}
+	return;
+}
+
+// ********************************************************************************************************
+
+void dendro::printDendrogram()      { cout << "\nLEAFS = " << n << endl << "# "; printSubTree(root); return; }
+void dendro::printSplitStats()      { splithist->printTreeAsList();		return; }
+void dendro::printSplitStatsShort() { splithist->printTreeAsShortList();	return; }
 
 void dendro::printSubTree(elementd *z) {
 	if (z != NULL) {
@@ -1619,6 +1869,121 @@ int dendro::QsortPartition (block* array, int left, int right, int index) {
 
 // ********************************************************************************************************
 
+void dendro::recordConsensusTree(const string f_out) {
+	
+	keyValuePairSplit *curr, *prev;
+	bool flag_debug = false;
+	child *newChild;
+	
+	// First, cull the split hist so that only splits with weight >= 0.5 remain
+	cullSplitHist();
+	int treesize = splithist->returnNodecount();
+
+	// Now, initialize the various arrays we use to keep track of the internal structure of the
+	// consensus tree.
+	ctree		 = new cnode   [treesize];
+	cancestor       = new int     [n];
+	for (int i=0; i<treesize; i++) { ctree[i].index = i;  }
+	for (int i=0; i<n; i++)        { cancestor[i]   = -1; }
+	int ii = 0;
+	
+	// To build the majority consensus tree, we do the following:
+	// For each possible number of Ms in the split string (a number that ranges from n-2 down to 0),
+	// and for each split with that number of Ms, we create a new internal node of the tree, and 
+	// connect the oldest ancestor of each C to that node (at most once). Then, we update our list
+	// of oldest ancestors to reflect this new join, and proceed.
+	for (int i=n-2; i>=0; i--) {
+		// First, we get a list of all the splits with this exactly i Ms
+		curr = splithist->returnTheseSplits(i);
+//		if (curr != NULL) { cout << ">> M[" << i << "] <<" << endl; }
+		
+		// Now we loop over that list
+		while (curr != NULL) {
+			splithist->deleteItem(curr->x);				// 
+//			cout << curr->x << " (" << countChildren(curr->x) << ") " << curr->y << endl;
+			ctree[ii].weight = curr->y;					// add weight to this internal node
+			for (int j=0; j<n; j++) {					// examine each letter of this split
+				if (curr->x[j] == 'C') {					// - node is child of this internal node
+					if (cancestor[j] == -1) {				// - first time this leaf has ever been seen
+						newChild        = new child;		//   
+						newChild->type  = GRAPH;			// 
+						newChild->index = j;			// 
+						newChild->next  = NULL;
+						if (ctree[ii].lastChild == NULL) {	// - attach child to list
+							ctree[ii].children  = newChild;
+							ctree[ii].lastChild = newChild;
+							ctree[ii].degree    = 1;
+						} else {
+							ctree[ii].lastChild->next = newChild;
+							ctree[ii].lastChild       = newChild;
+							ctree[ii].degree   += 1;
+						}
+					} else {							// - this leaf has been seen before
+						// If the parent of the ancestor of this leaf is the current internal node
+						// then this leaf is already a descendant of this internal node, and we 
+						// can move on; otherwise, we need to add that ancestor to this internal
+						// node's child list, and update various relations
+						if (ctree[cancestor[j]].parent != ii) {
+							ctree[cancestor[j]].parent = ii;	// 
+							newChild        = new child;		// 
+							newChild->type  = DENDRO;		// 
+							newChild->index = cancestor[j];	// 
+							newChild->next  = NULL;
+							if (ctree[ii].lastChild == NULL) {	// - attach child to list
+								ctree[ii].children  = newChild;
+								ctree[ii].lastChild = newChild;
+								ctree[ii].degree    = 1;
+							} else {
+								ctree[ii].lastChild->next = newChild;
+								ctree[ii].lastChild       = newChild;
+								ctree[ii].degree   += 1;
+							}
+						}
+					}
+					cancestor[j] = ii;					// note new ancestry for this leaf
+				}
+			}
+			ii++;									// update internal node index
+			if (flag_debug) { printConsensusTree(); }
+			prev = curr;
+			curr = curr->next;
+			delete prev;
+		}
+	}
+	
+	// write consensus tree structure to file
+	child *sit, *sat;
+	ofstream fout(f_out.c_str(), ios::trunc);
+	for (int i=0; i<ii; i++) {
+		fout << "[ " << i << " ]\t" << ctree[i].weight << "\tP= " << ctree[i].parent << "\tN= " << ctree[i].degree << " ";
+		sit = ctree[i].children;
+		while (sit != NULL) {
+			if (sit->type == GRAPH) { fout << g->getName(sit->index) << " (G) "; }
+			else                    { fout << sit->index << " (D) ";             }
+			sat = sit;
+			sit = sit->next;
+			delete sat;
+		}
+		fout << "\n";
+	}
+	for (int i=0; i<n; i++) {
+		if (cancestor[i] == -1) {
+			fout << "[ " << ii++ << " ]\t1.000000\tP= " << -1 << "\tN= " << 1 << " " << g->getName(i) << " (G)\n";
+		}
+	}
+	fout.close();
+	cout << ">> exported consensus tree ( " << f_out << " )" << endl; 
+	
+	return;
+	
+}
+
+void dendro::recordConsensusTree(igraph_hrg_t *hrg) {
+  // TODO
+}
+
+// ********************************************************************************************************
+
 void dendro::recordDendrogramStructure(const string out_file) {
 	
 	ofstream fout(out_file.c_str(), ios::trunc);
@@ -1649,12 +2014,11 @@ void dendro::recordDendrogramStructure(igraph_hrg_t *hrg) {
   }
 }
 
-// ********************************************************************************************************
 
 void dendro::recordGraphStructure(const string out_file) {
 	edge* curr;
 	string thisName;
-	bool flag_debug = true;
+	bool flag_debug = false;
 	if (flag_debug) { cout << ">> dendro: writing random graph to file" << endl; }
 	
 	ofstream fout(out_file.c_str(), ios::trunc);
@@ -1700,6 +2064,13 @@ void dendro::recordGraphStructure(igraph_t *graph) {
 
 // ********************************************************************************************************
 
+void dendro::recordSplitHistogram(const string out_file) {
+	splithist->recordTreeAsList(out_file, 0.01); // exclude splits with < 0.01 weight
+	return;
+}
+
+// ********************************************************************************************************
+
 list* dendro::reversePathToRoot(const int leafIndex) {
 	list *head, *subhead, *newlist;
 	head = subhead = newlist = NULL;
@@ -1715,6 +2086,76 @@ list* dendro::reversePathToRoot(const int leafIndex) {
 	}
 	return head;
 }
+
+// ********************************************************************************************************
+
+bool	dendro::sampleSplitLikelihoods(int &sample_num) {
+	// In order to compute the majority agreement dendrogram at equilibrium, we need to calculate
+	// the leaf partition defined by each split (internal edge) of the tree. Because splits are 
+	// only defined on a Cayley tree, the buildSplit() function returns the default "--...--" 
+	// string for the root and the root's left child. When tabulating the frequency of splits, 
+	// one of these needs to be excluded.
+	bool flag_debug = false;
+	string* array;
+	int     k;
+	double  tot;
+
+	if (flag_debug) { cout << "dendro:: decomposing dendrogram into its splits" << endl; }
+	string new_split;
+	// To decompose the tree into its splits, we simply loop over all the internal nodes and
+	// replace the old split for the ith internal node with its new split. This is a bit
+	// time consuming to do O(n^2), so try not to do this very often. Once the decomposition
+	// is had, we insert them into the split histogram, which tracks the cumulative weight
+	// for each respective split observed.
+	
+	if (splithist == NULL) { splithist = new splittree; }
+	for (int i=0; i<(n-1); i++) {
+		new_split = buildSplit(&internal[i]);
+		d->replaceSplit(i, new_split);
+		if (new_split != "" and new_split[1] != '-') {
+			if (!splithist->insertItem(new_split, 1.0)) { return false; } }
+	}
+	splithist->finishedThisRound();
+	
+	// For large graphs, the split histogram can get extremely large, so we need to employ some 
+	// measures to prevent it from swamping the available memory. When the number of splits exceeds 
+	// a threshold (say, a million), we progressively delete splits that have a weight less than 
+	// a rising (k*0.001 of the total weight) fraction of the splits, on the assumption that losing 
+	// such weight is unlikely to effect the ultimate split statistics. This deletion procedure is 
+	// slow O(m lg m), but should only happen very rarely.
+	int split_max = n*500;
+	int leng;
+	if (splithist->returnNodecount() > split_max) {
+		
+		k=1;
+		cout << "Culling the splithist = " << splithist->returnNodecount() << " -> ";
+		while (splithist->returnNodecount() > split_max) {
+			array = splithist->returnArrayOfKeys();
+			tot   = splithist->returnTotal();
+			leng  = splithist->returnNodecount();
+			for (int i=0; i<leng; i++) {
+				if ((splithist->returnValue(array[i]) / tot) < k*0.001) { splithist->deleteItem(array[i]); }
+			}
+			delete [] array; array = NULL;
+			k++;
+		}
+		cout << splithist->returnNodecount() << endl;
+//		cin >> pauseme;
+		
+		// An alternative is to just bail-out of the sampling when we exceed the split_max threshold
+//		cout << "WARNING: maximum number of observed splits (" << split_max << ") exceeded.\n";
+//		cout << "         Halting sampling at " << sample_num << " samples.\n";
+//		sample_num = 2000000000;	
+	}
+	
+//	splithist->printTreeAsShortList();
+//	splithist->printTreeAsList();
+//	cin >> pauseme;
+	return true;
+}
+
+// ********************************************************************************************************
+// ********************************************************************************************************
 
 // ********************************************************************************************************
 // ********************************************************************************************************
@@ -1856,10 +2297,13 @@ bool graph::setName(const int i, const string text) { if (i >= 0 and i < n) { no
 
 // ********************************************************************************************************
 
+// ********************************************************************************************************
+
 interns::interns(const int n)  {
 	q         = n;
 	count     = 0;
 	edgelist  = new ipair  [q];
+	splitlist = new string [q+1];
 	indexLUT  = new int*   [q+1];
 	for (int i=0; i<(q+1); i++) {
 		indexLUT[i]    = new int [2];
@@ -1868,6 +2312,7 @@ interns::interns(const int n)  {
 }
 interns::~interns() {
 	delete [] edgelist;
+	delete [] splitlist;
 	for (int i=0; i<(q+1); i++) { delete [] indexLUT[i]; }
 	delete [] indexLUT;
 }
@@ -1881,6 +2326,10 @@ ipair* interns::getEdge(const int i) { return &edgelist[i]; }
 
 // NOTE: Returns an address to another object -- do not deallocate
 ipair* interns::getRandomEdge() { return &edgelist[(int)(floor((double)(q)*mtr.randExc()))]; }
+
+// ********************************************************************************************************
+
+string interns::getSplit(const int i) { if (i >= 0 and i <= q) { return splitlist[i]; } else { return ""; } }
 
 // ********************************************************************************************************
 
@@ -1908,6 +2357,21 @@ void interns::printEdgeList() {
 	}
 	cout << endl;
 	return;
+}
+
+// ********************************************************************************************************
+
+void interns::printSplitList() { for (int i=0; i<=q; i++) { cout << "internal[" << i << "] = " << splitlist[i] << endl; } return; }
+
+// ********************************************************************************************************
+
+bool	interns::replaceSplit(const int i, const string sp) {
+	// When an internal edge is changed, its split must be replaced as well. This function provides
+	// that access; it stores the split defined by an internal edge (x,y) at the location [y], which
+	// is unique.
+
+	if (i >= 0 and i <= q) { splitlist[i] = sp; return true; }
+	return false;
 }
 
 // ********************************************************************************************************
@@ -1954,3 +2418,616 @@ bool interns::swapEdges(const int one_x, const int one_y, const short int one_ty
 		return true;
 	} else { return false; }
 }
+
+// ******** Red-Black Tree Methods ************************************************************************
+
+splittree::splittree() {
+	root = new elementsp;
+	leaf = new elementsp;
+
+	leaf->parent   = root;
+
+	root->left	= leaf;
+	root->right    = leaf;
+	support		= 0;
+	total_weight	= 0.0;
+	total_count	= 0;
+}
+
+splittree::~splittree() {
+	if (root != NULL && (root->left != leaf || root->right != leaf)) { deleteSubTree(root); }
+	support      = 0;
+	total_weight = 0.0;
+	total_count  = 0;
+	delete leaf;
+	root		   = NULL;
+	leaf		   = NULL;
+}
+
+void splittree::deleteTree() { if (root != NULL) { deleteSubTree(root); } return; }
+
+void splittree::deleteSubTree(elementsp *z) {
+
+	if (z->left  != leaf) { deleteSubTree(z->left);  }
+	if (z->right != leaf) { deleteSubTree(z->right); }
+	delete z;
+	z = NULL;
+	return;
+}
+
+// ******** Reset Functions *******************************************************************************
+
+void splittree::clearTree() { // O(n lg n)
+	string *array = returnArrayOfKeys();
+	for (int i=0; i<support; i++) { deleteItem(array[i]); }
+	delete [] array;
+	return;
+}
+
+// ******** Search Functions ******************************************************************************
+// public search function - if there exists a elementsp in the tree with key=searchKey,
+// it returns TRUE and foundNode is set to point to the found node; otherwise, it sets
+// foundNode=NULL and returns FALSE
+elementsp* splittree::findItem(const string searchKey) {
+
+	elementsp *current;    current = root;
+	if (current->split=="") { return NULL; }						// empty tree; bail out
+	while (current != leaf) {
+		if (searchKey < current->split) {							// left-or-right?
+			if (current->left  != leaf) { current = current->left;  }	// try moving down-left
+			else { return NULL; }								//   failure; bail out
+		} else {												// 
+			if (searchKey > current->split) {							// left-or-right?
+				if (current->right  != leaf) { current = current->right;  }	// try moving down-left
+				else { return NULL; }							//   failure; bail out
+			} else { return current; }							// found (searchKey==current->split)
+		}
+	}
+	return NULL;
+}
+
+double splittree::returnValue(const string searchKey) {
+	elementsp* test = findItem(searchKey);
+	if (test == NULL) { return 0.0; } else { return test->weight; }
+}
+
+
+// ******** Return Item Functions *************************************************************************
+// public function which returns the tree, via pre-order traversal, as a linked list
+
+string* splittree::returnArrayOfKeys() {
+	string* array;
+	array = new string [support];
+	bool flag_go = true;
+	int index = 0;
+	elementsp *curr;
+	
+	if (support == 1) { array[0] = root->split; }
+	else if (support == 2) {
+		array[0] = root->split;
+		if (root->left == leaf) { array[1] = root->right->split; } 
+		else { array[1] = root->left->split; }
+	} else {
+		for (int i=0; i<support; i++) { array[i] = -1; }
+		// non-recursive traversal of tree structure
+		curr		 = root;
+		curr->mark = 1;
+		while (flag_go) {
+			
+			if (curr->mark == 1 and curr->left == leaf) {		// - is it time, and is left child the leaf node?
+				curr->mark = 2;							// 
+			}
+			if (curr->mark == 2 and curr->right == leaf) {		// - is it time, and is right child the leaf node?
+				curr->mark = 3;							// 
+			}
+			if (curr->mark == 1) {							// - go left
+				curr->mark = 2;							// 
+				curr       = curr->left;						// 
+				curr->mark = 1;							// 
+			} else if (curr->mark == 2) {						// - else go right
+				curr->mark = 3;							// 
+				curr       = curr->right;					// 
+				curr->mark = 1;							// 
+			} else {										// - else go up a level
+				curr->mark = 0;							// 
+				array[index++] = curr->split;					// 
+				curr = curr->parent;						// 
+				if (curr == NULL) { flag_go = false; }			// 
+			}
+		}
+	}
+	
+	return array;
+} // This does not leak memory (unlike returnListOfKeys)
+
+slist* splittree::returnListOfKeys() {
+	keyValuePairSplit	*curr, *prev;
+	slist			*head, *tail, *newlist;
+
+	curr = returnTreeAsList();
+	while (curr != NULL) {
+		newlist    = new slist;
+		newlist->x = curr->x;
+		if (head == NULL) { head       = newlist; tail = head;    }
+		else              { tail->next = newlist; tail = newlist; }
+		prev = curr;
+		curr = curr->next;
+		delete prev;
+		prev = NULL;
+	}
+	return head;
+}
+
+keyValuePairSplit* splittree::returnTreeAsList() { // pre-order traversal
+	keyValuePairSplit  *head, *tail;
+
+	head    = new keyValuePairSplit;
+	head->x = root->split;
+	head->y = root->weight;
+	head->c = root->count;
+	tail    = head;
+
+	if (root->left  != leaf) { tail = returnSubtreeAsList(root->left,  tail); }
+	if (root->right != leaf) { tail = returnSubtreeAsList(root->right, tail); }
+	
+	if (head->x == "") { return NULL; /* empty tree */ } else { return head; }
+}
+
+keyValuePairSplit* splittree::returnSubtreeAsList(elementsp *z, keyValuePairSplit *head) {
+	keyValuePairSplit *newnode, *tail;
+	
+	newnode    = new keyValuePairSplit;
+	newnode->x = z->split;
+	newnode->y = z->weight;
+	newnode->c = z->count;
+	head->next = newnode;
+	tail       = newnode;
+	
+	if (z->left  != leaf) { tail = returnSubtreeAsList(z->left,  tail); }
+	if (z->right != leaf) { tail = returnSubtreeAsList(z->right, tail); }
+	
+	return tail;
+}
+
+keyValuePairSplit splittree::returnMaxKey() {
+	keyValuePairSplit themax;
+	elementsp *current;
+	current = root;
+	while (current->right != leaf) {		// search to bottom-right corner of tree
+		current = current->right; }		// 
+	themax.x = current->split;			// store the data found
+	themax.y = current->weight;			// 
+	
+	return themax;						// return that data
+}
+
+keyValuePairSplit splittree::returnMinKey() {
+	keyValuePairSplit themin;
+	elementsp *current;
+	current = root;
+	while (current->left != leaf) {		// search to bottom-left corner of tree
+		current = current->left; }		// 
+	themin.x = current->split;			// store the data found
+	themin.y = current->weight;			// 
+	
+	return themin;						// return that data
+}
+
+// private functions for deleteItem() (although these could easily be made public, I suppose)
+elementsp* splittree::returnMinKey(elementsp *z) {
+	elementsp *current;
+
+	current = z;
+	while (current->left != leaf) {		// search to bottom-right corner of tree
+		current = current->left; }		// 
+	return current;					// return pointer to the minimum
+}
+
+elementsp* splittree::returnSuccessor(elementsp *z) {
+	elementsp *current, *w;
+	
+	w = z;
+	if (w->right != leaf) {				// if right-subtree exists, return min of it
+		return returnMinKey(w->right); }
+	current = w->parent;				// else search up in tree
+	while ((current!=NULL) && (w==current->right)) {
+		w       = current;
+		current = current->parent;		// move up in tree until find a non-right-child
+	}
+	return current;
+}
+
+int splittree::returnNodecount() { return support; }
+
+keyValuePairSplit* splittree::returnTheseSplits(const int target) {
+	keyValuePairSplit *head, *curr, *prev, *newhead, *newtail, *newpair;
+	int count, len;
+	
+	head = returnTreeAsList();
+	prev = newhead = newtail = newpair = NULL;
+	curr = head;
+	
+	while (curr != NULL) {
+		count = 0;
+		len   = curr->x.size();
+		for (int i=0; i<len; i++) { if (curr->x[i] == 'M') { count++; } }
+		if (count == target and curr->x[1] != '*') {
+			newpair       = new keyValuePairSplit;
+			newpair->x    = curr->x;
+			newpair->y    = curr->y;
+			newpair->next = NULL;
+			if (newhead == NULL) { newhead = newpair; newtail = newpair; }
+			else { newtail->next = newpair; newtail = newpair; }
+		}
+		prev = curr;
+		curr = curr->next;
+		delete prev;
+		prev = NULL;
+	}
+	
+	return newhead;
+}
+
+double splittree::returnTotal() { return total_weight; }
+
+// ******** Insert Functions ******************************************************************************
+
+void splittree::finishedThisRound() {
+	// We need to also keep a running total of how much weight has been added to the histogram.
+	if (total_count == 0) { total_weight  = 1.0; total_count = 1; }
+	else				  { total_weight += 1.0; total_count++; }
+	return;
+}	
+
+// public insert function
+bool splittree::insertItem(string newKey, double newValue) {
+	
+	// first we check to see if newKey is already present in the tree; if so, we do nothing;
+	// if not, we must find where to insert the key
+	elementsp *newNode, *current;
+	
+	current = findItem(newKey);						// find newKey in tree; return pointer to it O(log k)
+	if (current != NULL) {
+		// Add weight to the existing item's weight
+		if (current->weight > total_weight) {
+			cout << "ERROR: " << current->weight << " > " << total_weight << endl;
+			cout << "for split " << current->split << endl;
+			return false;
+		}
+		current->weight += 1.0;
+		// And finally, we keep track of how many observations went into the histogram
+		current->count++;
+		return true;
+	} else {
+		newNode			= new elementsp;			// elementsp for the splittree
+		newNode->split		= newKey;					//  store newKey
+		newNode->weight	= newValue;  				//  store newValue
+		newNode->color		= true;					//  new nodes are always RED
+		newNode->parent	= NULL;					//  new node initially has no parent
+		newNode->left		= leaf;					//  left leaf
+		newNode->right		= leaf;					//  right leaf
+		newNode->count		= 1;						// 
+		support++;								// increment node count in splittree
+		
+		// must now search for where to insert newNode, i.e., find the correct parent and
+		// set the parent and child to point to each other properly
+		current = root;
+		if (current->split=="") {									// insert as root
+			delete root;											//   delete old root
+			root			= newNode;								//   set root to newNode
+			leaf->parent   = newNode;								//   set leaf's parent
+			current		= leaf;									//   skip next loop
+		}
+		
+		while (current != leaf) {									// search for insertion point
+			if (newKey < current->split) {							// left-or-right?
+				if (current->left  != leaf) { current = current->left;  }	// try moving down-left
+				else {											// else found new parent
+					newNode->parent	= current;					//    set parent
+					current->left		= newNode;					//    set child
+					current			= leaf;						//    exit search
+				}
+			} else {												// 
+				if (current->right != leaf) { current = current->right; }   // try moving down-right
+				else {											// else found new parent
+					newNode->parent	= current;					//    set parent
+					current->right		= newNode;					//    set child
+					current			= leaf;						//    exit search
+				}
+			}
+		}
+
+		// now do the house-keeping necessary to preserve the red-black properties
+		insertCleanup(newNode);			// do house-keeping to maintain balance
+		
+	}
+	return true;
+}
+
+// private house-keeping function for insertion
+void splittree::insertCleanup(elementsp *z) {
+	
+	if (z->parent==NULL) {						// fix now if z is root
+		z->color = false; return; }
+	elementsp *temp;
+	while (z->parent!=NULL && z->parent->color) {	// while z is not root and z's parent is RED
+		if (z->parent == z->parent->parent->left) {  // z's parent is LEFT-CHILD
+			temp = z->parent->parent->right;		// grab z's uncle
+			if (temp->color) {
+				z->parent->color		= false;  // color z's parent BLACK	(Case 1)
+				temp->color			= false;  // color z's uncle BLACK		(Case 1)
+				z->parent->parent->color = true;   // color z's grandparent RED  (Case 1)
+				z = z->parent->parent;			// set z = z's grandparent    (Case 1)
+			} else {
+				if (z == z->parent->right) {		// z is RIGHT-CHILD
+					z = z->parent;				// set z = z's parent		(Case 2)
+					rotateLeft(z);				// perform left-rotation		(Case 2)
+				}
+				z->parent->color		= false;  // color z's parent BLACK	(Case 3)
+				z->parent->parent->color = true;   // color z's grandparent RED  (Case 3)
+				rotateRight(z->parent->parent);    // perform right-rotation	(Case 3)
+			}
+		} else {								// z's parent is RIGHT-CHILD
+			temp = z->parent->parent->left;		// grab z's uncle
+			if (temp->color) {
+				z->parent->color		= false;  // color z's parent BLACK	(Case 1)
+				temp->color			= false;  // color z's uncle BLACK		(Case 1)
+				z->parent->parent->color = true;   // color z's grandparent RED  (Case 1)
+				z = z->parent->parent;			// set z = z's grandparent    (Case 1)
+			} else {
+				if (z == z->parent->left) {		// z is LEFT-CHILD
+					z = z->parent;				// set z = z's parent		(Case 2)
+					rotateRight(z);			// perform right-rotation	(Case 2)
+				}
+				z->parent->color		= false;  // color z's parent BLACK	(Case 3)
+				z->parent->parent->color = true;   // color z's grandparent RED  (Case 3)
+				rotateLeft(z->parent->parent);	// perform left-rotation		(Case 3)
+			}
+		}
+	}
+
+	root->color = false;						// color the root BLACK
+	return;
+}
+
+// ******** Delete Functions ******************************************************************************
+// public delete function
+void splittree::deleteItem(string killKey) {
+	elementsp *x, *y, *z;
+	
+	z = findItem(killKey);
+	if (z == NULL) { return; }						// item not present; bail out
+
+	if (support==1) {								// -- attempt to delete the root
+		root->split	= "";						// restore root node to default state
+		root->weight    = 0.0;						// 
+		root->color    = false;						// 
+		root->parent   = NULL;						// 
+		root->left	= leaf;						// 
+		root->right    = leaf;						// 
+		support--;								// set support to zero
+		total_weight   = 0.0;						// set total weight to zero
+		total_count--;								// 
+		return;									// exit - no more work to do
+	}
+	
+	if (z != NULL) {
+		support--;								// decrement node count
+		if ((z->left == leaf) || (z->right==leaf)) {		// case of less than two children
+			  y = z; }							//    set y to be z
+		else { y = returnSuccessor(z); }				//    set y to be z's key-successor
+		
+		if (y->left!=leaf) { x = y->left; }			// pick y's one child (left-child)
+		else			    { x = y->right; }			//				  (right-child)
+		x->parent = y->parent;						// make y's child's parent be y's parent
+
+		if (y->parent==NULL) { root = x; }				// if y is the root, x is now root
+		else {									// 
+			if (y == y->parent->left) {				// decide y's relationship with y's parent
+				y->parent->left  = x;				//   replace x as y's parent's left child
+			} else {								// 
+				y->parent->right = x; }				//   replace x as y's parent's left child
+		}										// 
+
+		if (y!=z) {								// insert y into z's spot
+			z->split		= y->split;				// copy y data into z
+			z->weight		= y->weight;				// 
+			z->count		= y->count;				// 
+		}										// 
+
+		if (y->color==false) { deleteCleanup(x); }		// do house-keeping to maintain balance
+		delete y;									// deallocate y
+		y = NULL;									// point y to NULL for safety
+	}											// 
+		
+	return;
+}
+
+void splittree::deleteCleanup(elementsp *x) {
+	elementsp *w, *t;
+	while ((x != root) && (x->color==false)) {			// until x is the root, or x is RED
+		if (x==x->parent->left) {					// branch on x being a LEFT-CHILD
+			w = x->parent->right;					// grab x's sibling
+			if (w->color==true) {					// if x's sibling is RED
+				w->color = false;					// color w BLACK				(case 1)
+				x->parent->color = true;				// color x's parent RED			(case 1)
+				rotateLeft(x->parent);				// left rotation on x's parent	(case 1)
+				w = x->parent->right;				// make w be x's right sibling	(case 1)
+			}
+			if ((w->left->color==false) && (w->right->color==false)) {
+				w->color = true;					// color w RED					(case 2)
+				x = x->parent;						// examine x's parent			(case 2)
+			} else {								// 
+				if (w->right->color==false) {			// 
+					w->left->color = false;			// color w's left child BLACK		(case 3)
+					w->color = true;				// color w RED					(case 3)
+					t = x->parent;					// store x's parent
+					rotateRight(w);				// right rotation on w			(case 3)
+					x->parent = t;					// restore x's parent
+					w = x->parent->right;			// make w be x's right sibling	(case 3)
+				}								// 
+				w->color			= x->parent->color; // make w's color = x's parent's   (case 4)
+				x->parent->color    = false;			// color x's parent BLACK		(case 4)
+				w->right->color	= false;			// color w's right child BLACK	(case 4)
+				rotateLeft(x->parent);				// left rotation on x's parent	(case 4)
+				x = root;							// finished work. bail out		(case 4)
+			}									// 
+		} else {									// x is RIGHT-CHILD
+			w = x->parent->left;					// grab x's sibling
+			if (w->color==true) {					// if x's sibling is RED
+				w->color			= false;			// color w BLACK				(case 1)
+				x->parent->color    = true;			// color x's parent RED			(case 1)
+				rotateRight(x->parent);				// right rotation on x's parent	(case 1)
+				w				= x->parent->left;  // make w be x's left sibling		(case 1)
+			}
+			if ((w->right->color==false) && (w->left->color==false)) {
+				w->color = true;					// color w RED					(case 2)
+				x= x->parent;						// examine x's parent			(case 2)
+			} else {								// 
+				if (w->left->color==false) {			// 
+					w->right->color	= false;		// color w's right child BLACK	(case 3)
+					w->color			= true;		// color w RED					(case 3)
+					t				= x->parent;   // store x's parent
+					rotateLeft(w);					// left rotation on w			(case 3)
+					x->parent			= t;			// restore x's parent
+					w = x->parent->left;			// make w be x's left sibling		(case 3)
+				}								// 
+				w->color = x->parent->color;			// make w's color = x's parent's   (case 4)
+				x->parent->color    = false;			// color x's parent BLACK		(case 4)
+				w->left->color		= false;			// color w's left child BLACK		(case 4)
+				rotateRight(x->parent);				// right rotation on x's parent    (case 4)
+				x				= root;			// x is now the root			(case 4)
+			}
+		}
+	}
+	x->color = false;								// color x (the root) BLACK		(exit)
+
+	return;
+}
+
+// ******** Rotation Functions ****************************************************************************
+
+void splittree::rotateLeft(elementsp *x) {
+	elementsp *y;
+	// do pointer-swapping operations for left-rotation
+	y               = x->right;					// grab right child
+	x->right        = y->left;					// make x's RIGHT-CHILD be y's LEFT-CHILD
+	y->left->parent = x;						// make x be y's LEFT-CHILD's parent
+	y->parent       = x->parent;					// make y's new parent be x's old parent
+
+	if (x->parent==NULL) { root = y; }				// if x was root, make y root
+	else {									// 
+		if (x == x->parent->left)				// if x is LEFT-CHILD, make y be x's parent's
+			{ x->parent->left  = y; }			//    left-child
+		else { x->parent->right = y; }			//    right-child
+	}										// 
+	y->left   = x;								// make x be y's LEFT-CHILD
+	x->parent = y;								// make y be x's parent
+	
+	return;
+}
+
+void splittree::rotateRight(elementsp *y) {
+	elementsp *x;
+	// do pointer-swapping operations for right-rotation
+	x                = y->left;					// grab left child
+	y->left          = x->right;					// replace left child yith x's right subtree
+	x->right->parent = y;						// replace y as x's right subtree's parent
+	
+	x->parent        = y->parent;					// make x's new parent be y's old parent
+	if (y->parent==NULL) { root = x; }				// if y was root, make x root
+	else {
+		if (y == y->parent->right)				// if y is RIGHT-CHILD, make x be y's parent's
+			{ y->parent->right  = x; }			//    right-child
+		else { y->parent->left   = x; }			//    left-child
+	}
+	x->right  = y;								// make y be x's RIGHT-CHILD
+	y->parent = x;								// make x be y's parent
+	
+	return;
+}
+
+// ******** Display Functions *****************************************************************************
+// public
+void splittree::printTree() {
+	cout << "\nTREE SIZE = " << support << "\t" << total_weight << "\t" << total_count << endl;
+	cout << "# "; printSubTree(root);
+	return;
+}
+
+// private
+void splittree::printSubTree(elementsp *z) {
+	if (z==leaf) { return; }
+	else {
+		cout << "(" << z->split << " " << z->weight << " " << z->count << " " << z->color << ")"<<endl;
+		cout << "L "; printSubTree(z->left); cout << endl;
+		cout << "R "; printSubTree(z->right); cout << endl;
+	}
+	return;
+}
+
+// public
+void	splittree::printTreeAsList() {
+	keyValuePairSplit *curr, *prev;
+	curr = returnTreeAsList();
+	int temp = 0;
+	while (curr != NULL) {
+		if (curr->y > 5) {
+			cout << curr->x;
+			if (curr->y >= 0.5*total_weight) { cout << "\t* "; temp++; } else { cout << "\t  "; }
+			cout << curr->y << "\t" << curr->c / total_weight << "\n";
+		}
+		prev = curr;
+		curr = curr->next;
+		delete prev; prev = NULL;
+	}
+	curr = NULL;
+	cout << "total_count   = " << total_count  << endl;
+	cout << "total_weight  = " << total_weight << endl;
+	cout << "total_size    = " << support << endl;
+	cout << "weight >= 1/2 = " << temp << endl;
+
+	return;
+}
+
+void	splittree::printTreeAsShortList() {
+	keyValuePairSplit *curr, *prev;
+	curr = returnTreeAsList();
+	cout << "numSplits = " << support << endl;
+	int temp = 0;
+	while (curr != NULL) {
+		if (curr->y / total_weight >= 0.5) {
+			cout << curr->x << "\t* ";
+			temp++;
+			cout << curr->y << "\t" << curr->y / total_weight << "\n";
+		}
+		prev = curr;
+		curr = curr->next;
+		delete prev; prev = NULL;
+	}
+	curr = NULL;
+	cout << "maximum = " << total_weight << endl;
+	cout << "weight >= 1/2 = " << temp << endl;
+	
+	return;
+}
+
+void splittree::recordTreeAsList(const string file_out, const double threshold) {
+	keyValuePairSplit *curr, *prev;
+	curr = returnTreeAsList();
+	
+	ofstream fout(file_out.c_str(), ios::trunc);
+	fout.precision(8);
+//	for (int i=0; i<len; i++) { fout << "*"; } fout << "\t" << total_weight << "\n";
+	while (curr != NULL) {
+		if (curr->y / total_weight >= threshold) { fout << curr->x << "\t" << curr->y / total_weight << "\n"; }
+		prev = curr;
+		curr = curr->next;
+		delete prev; prev = NULL;
+	}
+	curr = NULL;
+	fout.close();
+	
+	return;
+}
+
