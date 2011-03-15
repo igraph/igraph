@@ -25,7 +25,8 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 """
 import math
 
-__all__ = ["Histogram", "RunningMean", "mean", "median", "power_law_fit"]
+__all__ = ["Histogram", "RunningMean", "mean", "median", "percentile",
+           "quantile", "power_law_fit"]
 
 class Histogram(object):
     """Generic histogram class for real numbers
@@ -409,6 +410,39 @@ def median(xs, sort=True):
     else:
         return float(xs[mid])
 
+def percentile(xs, p=(25, 50, 75), sort=True):
+    """Returns the pth percentile of an unsorted or sorted numeric vector.
+
+    This is equivalent to calling quantile(xs, p/100.0); see L{quantile}
+    for more details on the calculation.
+
+    Example:
+
+        >>> round(percentile([15, 20, 40, 35, 50], 40), 2)
+        26.0
+        >>> for perc in percentile([15, 20, 40, 35, 50], (0, 25, 50, 75, 100)):
+        ...     print "%.2f" % perc
+        ...
+        15.00
+        17.50
+        35.00
+        45.00
+        50.00
+
+    @param xs: the vector itself.
+    @param p: the percentile we are looking for. It may also be a list if you
+      want to calculate multiple quantiles with a single call. The default
+      value calculates the 25th, 50th and 75th percentile.
+    @param sort: whether to sort the vector. If you know that the vector is
+      sorted already, pass C{False} here.
+    @return: the pth percentile, which will always be a float, even if the vector
+      contained integers originally. If p is a list, the result will also be a
+      list containing the percentiles for each item in the list.
+    """
+    if hasattr(p, "__iter__"):
+        return quantile(xs, (x/100.0 for x in p), sort)
+    return quantile(xs, p/100.0, sort)
+
 def power_law_fit(x, xmin=None, method="discrete_approx"):
     """Fitting a power-law distribution to empirical data
 
@@ -456,6 +490,61 @@ def power_law_fit(x, xmin=None, method="discrete_approx"):
         return 1.0+len(filtered_xs)/log_sum
 
     raise ValueError("unknown method: %s" % method)
+
+def quantile(xs, q=(0.25, 0.5, 0.75), sort=True):
+    """Returns the qth quantile of an unsorted or sorted numeric vector.
+
+    There are a number of different ways to calculate the sample quantile. The
+    method implemented by igraph is the one recommended by NIST. First we
+    calculate a rank n as q(N+1), where N is the number of items in xs, then we
+    split n into its integer component k and decimal component d. If k <= 1,
+    we return the first element; if k >= N, we return the last element,
+    otherwise we return the linear interpolation between xs[k-1] and xs[k]
+    using a factor d.
+
+    Example:
+
+        >>> round(quantile([15, 20, 40, 35, 50], 0.4), 2)
+        26.0
+
+    @param xs: the vector itself.
+    @param q: the quantile we are looking for. It may also be a list if you
+      want to calculate multiple quantiles with a single call. The default
+      value calculates the 25th, 50th and 75th percentile.
+    @param sort: whether to sort the vector. If you know that the vector is
+      sorted already, pass C{False} here.
+    @return: the qth quantile, which will always be a float, even if the vector
+      contained integers originally. If q is a list, the result will also be a
+      list containing the quantiles for each item in the list.
+    """
+    if not xs:
+        raise ValueError("xs must not be empty")
+
+    if sort:
+        xs = sorted(xs)
+
+    if hasattr(q, "__iter__"):
+        qs = q
+        return_single = False
+    else:
+        qs = [q]
+        return_single = True
+
+    result = []
+    for q in qs:
+        if q < 0 or q > 1:
+            raise ValueError("q must be between 0 and 1")
+        n = float(q) * (len(xs)+1)
+        k, d = int(n), n-int(n)
+        if k >= len(xs):
+            result.append(xs[-1])
+        elif k < 1:
+            result.append(xs[0])
+        else:
+            result.append((1-d) * xs[k-1] + d * xs[k])
+    if return_single:
+        result = result[0]
+    return result
 
 def sd(xs):
     """Returns the standard deviation of an iterable.
