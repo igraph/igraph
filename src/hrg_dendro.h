@@ -47,7 +47,6 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "hrg_MersenneTwister.h"
 #include "hrg_graph.h"
 #include "hrg_rbtree.h"
 #include "hrg_splittree_eq.h"
@@ -135,7 +134,6 @@ private:
 	int**     indexLUT;					// table of indices of internal edges in edgelist
 	int		q;						// number of internal edges
 	int		count;					// (for adding edges) edgelist index of new edge to add
-	MTRand    mtr;						// Mersenne Twister random number generator instance
 
 public:
 	interns(const int); ~interns();
@@ -192,7 +190,6 @@ private:
 	splittree*	splithist;		// histogram of cumulative split weights
 	list**		paths;			// array of path-lists from root to leaf
 	double		L;				// log-likelihood of graph G given dendrogram D
-	MTRand		mtr;				// Mersenne Twister random number generator instance
 	rbtree		subtreeL, subtreeR;	// trees for computeEdgeCount() function
 	cnode*		ctree;			// (consensus tree) array of internal tree nodes
 	int*			cancestor;		// (consensus tree) oldest ancetor's index for each leaf

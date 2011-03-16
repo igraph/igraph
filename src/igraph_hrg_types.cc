@@ -36,6 +36,7 @@
 
 #include "igraph_hrg.h"
 #include "igraph_constructors.h"
+#include "igraph_random.h"
 
 using namespace fitHRG;
 
@@ -720,11 +721,11 @@ void dendro::buildDendrogram() {
 	root		  = &internal[0];		// initialize internal nodes
 	root->label = 0;
 	root->index = 0;
-	root->p     = mtr.randExc();
+	root->p     = RNG_UNIF01();
 	for (int i=1; i<(n-1); i++) {		// insert remaining internal vertices, O(n log n)
 		internal[i].label = i;
 		internal[i].index = i;
-		internal[i].p = mtr.randExc();
+		internal[i].p = RNG_UNIF01();
 		binarySearchInsert(root, &internal[i]);
 	}
 	if (flag_debug) { cout << ">> dendro: inserted internal vertices into random binary tree" << endl; }
@@ -736,7 +737,7 @@ void dendro::buildDendrogram() {
 	// we assign each of them the p value of their parent, perturbed slightly so as to preserve
 	// the binary search property.
 	block* array; array = new block [n];
-	for (int i=0; i<n; i++) { array[i].x = mtr.randExc();  array[i].y = i; }
+	for (int i=0; i<n; i++) { array[i].x = RNG_UNIF01();  array[i].y = i; }
 	QsortMain(array, 0, n-1);
 
 	int k=0;						// replace NULLs with leaf nodes, and
@@ -1392,7 +1393,7 @@ void dendro::makeRandomGraph() {
 	for (int i=0; i<n; i++) {			// O((h+d)*n^2) - h: height of D; d: average degree in G
 		for (int j=(i+1); j<n; j++) {		// decide neighbors of v_i
 			commonAncestor = findCommonAncestor(paths,i,j);
-			if (mtr.randExc() < commonAncestor->p) { 
+			if (RNG_UNIF01() < commonAncestor->p) { 
 				if (!(g->doesLinkExist(i,j))) { if (!(g->addLink(i,j))) { cout << "Error: (" << j << " " << i << ")" << endl; } }
 				if (!(g->doesLinkExist(j,i))) { if (!(g->addLink(j,i))) { cout << "Error: (" << j << " " << i << ")" << endl; } }
 			}
@@ -1450,7 +1451,7 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken, const double T) {
 	}
 	
 	if (t == LEFT) {								// 
-		if (mtr.randExc() < 0.5) {					// ## LEFT ALPHA move: ((i,j),k) -> ((i,k),j)
+	  if (RNG_UNIF01() < 0.5) {					// ## LEFT ALPHA move: ((i,j),k) -> ((i,k),j)
 			// We need to calculate the change in the likelihood (dLogL) that would result from
 			// this move. Most of the information needed to do this is already available,
 			// the exception being e_ik, the number of edges that span the i and k subtrees.
@@ -1474,7 +1475,7 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken, const double T) {
 			else						{ L_x = (double)(e_x) * log(p_x) + (double)(n_x - e_x) * log(1.0-p_x); }
 			
 			dLogL = (L_x - internal[x].logL) + (L_y - internal[y].logL);
-			if ((dLogL > 0.0) or (mtr.randExc() < exp(T*dLogL))) {  // make LEFT ALPHA move
+			if ((dLogL > 0.0) or (RNG_UNIF01() < exp(T*dLogL))) {  // make LEFT ALPHA move
 				ftaken = true;
 				d->swapEdges(x, internal[x].R->index, RIGHT, y, internal[y].R->index, RIGHT);
 				temp             = internal[x].R;			// - swap j and k
@@ -1539,7 +1540,7 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken, const double T) {
 			else						{ L_x = (double)(e_x) * log(p_x) + (double)(n_x - e_x) * log(1.0-p_x); }
 			
 			dLogL = (L_x - internal[x].logL) + (L_y - internal[y].logL);
-			if ((dLogL > 0.0) or (mtr.randExc() < exp(T*dLogL))) {  // make LEFT BETA move
+			if ((dLogL > 0.0) or (RNG_UNIF01() < exp(T*dLogL))) {  // make LEFT BETA move
 				ftaken = true;
 				d->swapEdges(y, internal[y].L->index, LEFT, y, internal[y].R->index, RIGHT);
 				temp			  = internal[y].L;			// - swap L and R of [y]
@@ -1602,7 +1603,7 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken, const double T) {
 			}
 		}
 	} else {										// right-edge: t == RIGHT
-		if (mtr.randExc() < 0.5) {					// alpha move: (i,(j,k)) -> ((i,k),j)
+	  if (RNG_UNIF01() < 0.5) {					// alpha move: (i,(j,k)) -> ((i,k),j)
 			n_i = internal[x].L->n;
 			n_j = internal[y].L->n;
 			n_k = internal[y].R->n;
@@ -1620,7 +1621,7 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken, const double T) {
 			else						{ L_x = (double)(e_x) * log(p_x) + (double)(n_x - e_x) * log(1.0-p_x); }
 
 			dLogL = (L_x - internal[x].logL) + (L_y - internal[y].logL);
-			if ((dLogL > 0.0) or (mtr.randExc() < exp(T*dLogL))) {  // make RIGHT ALPHA move
+			if ((dLogL > 0.0) or (RNG_UNIF01() < exp(T*dLogL))) {  // make RIGHT ALPHA move
 				ftaken = true;
 				d->swapEdges(x, internal[x].L->index, LEFT, x, internal[x].R->index, RIGHT);
 				temp			   = internal[x].L;			// - swap L and R of [x]
@@ -1688,7 +1689,7 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken, const double T) {
 			else						{ L_x = (double)(e_x) * log(p_x) + (double)(n_x - e_x) * log(1.0-p_x); }
 
 			dLogL = (L_x - internal[x].logL) + (L_y - internal[y].logL);
-			if ((dLogL > 0.0) or (mtr.randExc() < exp(T*dLogL))) {  // make RIGHT BETA move
+			if ((dLogL > 0.0) or (RNG_UNIF01() < exp(T*dLogL))) {  // make RIGHT BETA move
 				ftaken = true;
 				d->swapEdges(x, internal[x].L->index, LEFT, x, internal[x].R->index, RIGHT);
 				temp			   = internal[x].L;			// - swap L and R of [x]
@@ -2600,7 +2601,7 @@ ipair* interns::getEdge(const int i) { return &edgelist[i]; }
 // ********************************************************************************************************
 
 // NOTE: Returns an address to another object -- do not deallocate
-ipair* interns::getRandomEdge() { return &edgelist[(int)(floor((double)(q)*mtr.randExc()))]; }
+ipair* interns::getRandomEdge() { return &edgelist[(int)(floor((double)(q)*RNG_UNIF01()))]; }
 
 // ********************************************************************************************************
 

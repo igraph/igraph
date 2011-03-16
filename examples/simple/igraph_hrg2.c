@@ -60,8 +60,8 @@ int main() {
   
   igraph_vector_init(&parents, 0);
   igraph_vector_init(&weights, 0);
-  igraph_hrg_consensus(&karate, &parents, &weights, /* hrg= */ 0, /* start= */ 0, 
-		       /* num_samples= */ 100);
+  igraph_hrg_consensus(&karate, &parents, &weights, /* hrg= */ 0, 
+		       /* start= */ 0, /* num_samples= */ 100);
 
   /* Check */
   igraph_vector_print(&parents);

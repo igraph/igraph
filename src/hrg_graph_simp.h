@@ -41,7 +41,6 @@
 #include <string>
 #include "stdlib.h"
 
-#include "hrg_MersenneTwister.h"
 #include "hrg_rbtree.h"
 
 using namespace std;
@@ -122,8 +121,6 @@ private:
 	int			n;				// number of vertices
 	int			m;				// number of directed edges
 	int			num_groups;		// number of bins in node histograms
-	MTRand		mtr;				// Mersenne Twister random number generator instance
-
 	void			QsortMain(block*, int, int);						// quicksort functions
 	int			QsortPartition(block*, int, int, int);
 };

@@ -147,7 +147,7 @@ HEADERS_PRIVATE = atlas-edges.h \
 		gengraph_qsort.h gengraph_random.h gengraph_vertex_cover.h \
 		igraph_blas_internal.h igraph_arpack_internal.h \
 		igraph_lapack_internal.h \
-		igraph_marked_queue.h igraph_estack.h hrg_MersenneTwister.h \
+		igraph_marked_queue.h igraph_estack.h \
 		hrg_dendro.h hrg_graph.h hrg_rbtree.h hrg_splittree_eq.h \
 		hrg_graph_simp.h
 
