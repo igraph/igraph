@@ -2260,7 +2260,7 @@ bool	dendro::sampleSplitLikelihoods(int &sample_num) {
 			delete [] array; array = NULL;
 			k++;
 		}
-		cout << splithist->returnNodecount() << endl;
+		// cout << splithist->returnNodecount() << endl;
 //		cin >> pauseme;
 		
 		// An alternative is to just bail-out of the sampling when we exceed the split_max threshold
