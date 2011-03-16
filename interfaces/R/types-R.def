@@ -222,3 +222,5 @@ ADD_WEIGHTS:
 
 HRG:
     INCONV: %I% <- lapply(%I%[c("left","right","prob","edges","vertices")], as.numeric)
+    DEFAULT:
+       Default: list(left=c(), right=c(), prob=c(), edges=c(), vertices=c())

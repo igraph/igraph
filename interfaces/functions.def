@@ -1112,6 +1112,12 @@ igraph_hrg_dendrogram:
         PARAMS: OUT GRAPH graph, HRG hrg
         NAME-R: hrg.dendrogram
 
+igraph_hrg_consensus:
+        PARAMS: GRAPH graph, OUT VECTOR parents, OUT VECTOR weights, \
+                INOUT HRG hrg=Default, BOOLEAN start=False, \
+                INT num_samples=10000
+        NAME-R: hrg.consensus
+
 #######################################
 # Conversion
 #######################################

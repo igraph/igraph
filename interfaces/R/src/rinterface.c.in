@@ -62,6 +62,7 @@ int R_SEXP_to_igraph_adjlist(SEXP vectorlist, igraph_adjlist_t *ptr);
 int R_SEXP_to_vector_bool(SEXP sv, igraph_vector_bool_t *v);
 int R_SEXP_to_vector_int(SEXP sv, igraph_vector_int_t *v);
 int R_SEXP_to_hrg(SEXP shrg, igraph_hrg_t *hrg);
+int R_SEXP_to_hrg_copy(SEXP shrg, igraph_hrg_t *hrg);
 
 SEXP R_igraph_i_lang7(SEXP s, SEXP t, SEXP u, SEXP v, SEXP w, SEXP x, SEXP y)
 {
@@ -2124,6 +2125,15 @@ int R_SEXP_to_hrg(SEXP shrg, igraph_hrg_t *hrg) {
   R_SEXP_to_vector(VECTOR_ELT(shrg, 2), &hrg->prob);
   R_SEXP_to_vector(VECTOR_ELT(shrg, 3), &hrg->edges);
   R_SEXP_to_vector(VECTOR_ELT(shrg, 4), &hrg->vertices);
+  return 0;
+}
+
+int R_SEXP_to_hrg_copy(SEXP shrg, igraph_hrg_t *hrg) {
+  R_SEXP_to_vector_copy(VECTOR_ELT(shrg, 0), &hrg->left);
+  R_SEXP_to_vector_copy(VECTOR_ELT(shrg, 1), &hrg->right);
+  R_SEXP_to_vector_copy(VECTOR_ELT(shrg, 2), &hrg->prob);
+  R_SEXP_to_vector_copy(VECTOR_ELT(shrg, 3), &hrg->edges);
+  R_SEXP_to_vector_copy(VECTOR_ELT(shrg, 4), &hrg->vertices);
   return 0;
 }
 
