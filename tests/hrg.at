@@ -30,3 +30,8 @@ AT_SETUP([Consensus tree (igraph_hrg_consensus) :])
 AT_KEYWORDS([hierarchical random graph consensus tree])
 AT_COMPILE_CHECK([simple/igraph_hrg2.c])
 AT_CLEANUP
+
+AT_SETUP([Missing edge prediction (igraph_hrg_predict) :])
+AT_KEYWORDS([hierarchical random graph missing edge prediction])
+AT_COMPILE_CHECK([simple/igraph_hrg3.c])
+AT_CLEANUP
