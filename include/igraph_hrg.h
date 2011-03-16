@@ -73,6 +73,14 @@ int igraph_hrg_consensus(const igraph_t *graph,
 			 igraph_bool_t start, 
 			 int num_samples);
 
+int igraph_hrg_predict(const igraph_t *graph,
+		       igraph_vector_t *edges,
+		       igraph_vector_t *prob,
+		       igraph_hrg_t *hrg,
+		       igraph_bool_t start, 
+		       int num_samples,
+		       int num_bins);
+
 __END_DECLS
 
 #endif	/* IGRAPH_HRG_H */

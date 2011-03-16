@@ -234,6 +234,8 @@ public:
 	void			recordGraphStructure(igraph_t *graph);		// record G structure to igraph graph
 	void			recordSplitHistogram(const string);		// record split histogram
 	void			refreshLikelihood();					// force refresh of log-likelihood value
+	void			sampleAdjacencyLikelihoods();				// sample dendrogram edge likelihoods and update edge histograms
+	void                    resetDendrograph();                                             // reset the dendrograph structures
 	bool			sampleSplitLikelihoods(int&);				// sample dendrogram's splits and update the split histogram
 	void			resetAllSplits();						// reset splits histogram
 	void			printDendrogram();						// write dendrogram structure to terminal

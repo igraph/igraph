@@ -382,6 +382,8 @@ inline std::istream& operator>>( std::istream& is, MTRand& mtrand )
 	return is;
 }
 
+} // namespace figHRG
+
 #endif  // MERSENNETWISTER_H
 
 // Change log:
@@ -424,4 +426,3 @@ inline std::istream& operator>>( std::istream& is, MTRand& mtrand )
 //      - Improved portability by substituting literal constants for long enum's
 //      - Changed license from GNU LGPL to BSD
 
-}

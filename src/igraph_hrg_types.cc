@@ -571,7 +571,7 @@ void rbtree::printSubTree(elementrb *z) {
 
 // ******** Dendrogram Methods ****************************************************************************
 
-dendro:: dendro() { root   = NULL; internal   = NULL;
+dendro::dendro() { root   = NULL; internal   = NULL;
 				leaf   = NULL; d          = NULL;
 				paths  = NULL;
 				g      = NULL; splithist  = NULL;
@@ -2275,6 +2275,52 @@ bool	dendro::sampleSplitLikelihoods(int &sample_num) {
 	return true;
 }
 
+void	dendro::sampleAdjacencyLikelihoods() {
+	// Here, we sample the probability values associated with every adjacency in A, weighted by 
+	// their likelihood. The weighted histogram is stored in the graph data structure, so we simply 
+	// need to add an observation to each node-pair that corresponds to the associated branch point's
+	// probability and the dendrogram's overall likelihood.
+	bool   flag_debug = false;
+	double nn;
+	double norm = ((double)(n) * (double)(n)) / 4.0;
+	
+	if (flag_debug) { cout << "dendro:: tabulating A'" << endl; }
+	if (L > 0.0) { L = 0.0; }
+	elementd* ancestor;
+	list	*currL, *prevL;
+	if (paths != NULL) { for (int i=0; i<n; i++) { currL = paths[i]; while (currL != NULL) { prevL = currL;   currL = currL->next;   delete prevL;   prevL = NULL; } paths[i] = NULL; } delete [] paths; } paths = NULL;
+	paths = new list* [n];
+	for (int i=0; i<n; i++) { paths[i] = reversePathToRoot(i); }	// construct paths from root, O(n^2) at worst
+	for (int i=0; i<n; i++) {								// add obs for every node-pair, always O(n^2)
+		for (int j=i+1; j<n; j++) {
+			ancestor = findCommonAncestor(paths, i, j);			// find internal node, O(n) at worst
+			nn       = ((double)(ancestor->L->n) * (double)(ancestor->R->n)) / norm;
+			g->addAdjacencyObs(i, j, ancestor->p, nn);			// add obs of ->p to (i,j) histogram, and
+			g->addAdjacencyObs(j, i, ancestor->p, nn);			// add obs of ->p to (j,i) histogram
+		}												// 
+	}													// 
+	g->addAdjacencyEnd();									// finish-up: upate total weight in histograms
+	
+	return;
+}
+
+void dendro::resetDendrograph() {
+       // Reset the dendrograph structure for the next trial
+       if (leaf      != NULL) { delete [] leaf;     leaf      = NULL; }    // O(n)
+       if (internal  != NULL) { delete [] internal; internal  = NULL; }    // O(n)
+       if (d         != NULL) { delete d;                      d         = NULL; }    // O(n)
+       root = NULL;
+       if (paths != NULL) {
+               list *curr, *prev; for (int i=0; i<n; i++) {
+                       curr = paths[i]; while (curr != NULL) { prev = curr;   curr = curr->next;   delete prev;   prev = NULL; } paths[i] = NULL; }
+               delete [] paths;
+       } paths = NULL;
+       L = 1.0;
+        
+       return;
+ }
+
+
 // ********************************************************************************************************
 // ********************************************************************************************************
 
@@ -2320,13 +2366,23 @@ bool	dendro::sampleSplitLikelihoods(int &sample_num) {
 
 // ******** Constructor / Destructor **********************************************************************
 
-graph::graph(const int size)  {
-	n			= size;
-	m			= 0;
-	nodes		= new vert  [n];
-	nodeLink		= new edge* [n];
-	nodeLinkTail   = new edge* [n];
-	for (int i=0; i<n; i++) { nodeLink[i] = NULL; nodeLinkTail[i] = NULL; }
+graph::graph(const int size, bool predict) : predict(predict)  {
+  n			= size;
+  m			= 0;
+  nodes		= new vert  [n];
+  nodeLink		= new edge* [n];
+  nodeLinkTail   = new edge* [n];
+  for (int i=0; i<n; i++) { nodeLink[i] = NULL; nodeLinkTail[i] = NULL; }
+  if (predict) {
+    A = new double** [n];
+    for (int i=0; i<n; i++) {
+      A[i] = new double* [n];
+    }
+    obs_count = 0;
+    total_weight = 0.0;
+    bin_resolution = 0.0;
+    num_bins = 0;
+  }
 }
 
 graph::~graph() {
@@ -2342,6 +2398,14 @@ graph::~graph() {
 	delete [] nodeLink;		nodeLink		= NULL;
 	delete [] nodeLinkTail;  nodeLinkTail   = NULL;
 	delete [] nodes;		nodes		= NULL;
+	
+	if (predict) {
+	  for (int i=0; i<n; i++) {
+	    for (int j=0; j<n; j++) { delete [] A[i][j]; }
+	    delete [] A[i];
+	  }
+	  delete [] A;			A			= NULL;
+	}
 }
 
 // ********************************************************************************************************
@@ -2368,6 +2432,30 @@ bool graph::addLink(const int i, const int j) {
 
 // ********************************************************************************************************
 
+bool graph::addAdjacencyObs(const int i, const int j, const double probability, const double size) {
+	// Adds the observation obs to the histogram of the edge (i,j)
+	// Note: user must manually add observation to edge (j,i) by calling this function with that argument
+	if (bin_resolution > 0.0 and probability >= 0.0 and probability <= 1.0 
+	    and size >= 0.0 and size <= 1.0 and i >= 0 and i < n and j >= 0 and j < n) {
+		int index = (int)(round(probability/bin_resolution));
+		if (index < 0) { index = 0; } else if (index > num_bins) { index = num_bins; }
+		// Add the weight to the proper probability bin
+		if (A[i][j][index] < 0.5) { A[i][j][index] = 1.0; } else { A[i][j][index] += 1.0; }
+		return true;
+	}
+	return false;
+}
+
+// ********************************************************************************************************
+
+void graph::addAdjacencyEnd() {
+	// We need to also keep a running total of how much weight has been added
+	// to the histogram, and the number of observations in the histogram.
+	if (obs_count==0) { total_weight  = 1.0; obs_count = 1; }
+	else              { total_weight += 1.0; obs_count++;   }
+	return;
+}
+
 bool graph::doesLinkExist(const int i, const int j) {
 	// This function determines if the edge (i,j) already exists in the adjacency list of v_i
 	edge* curr;
@@ -2388,10 +2476,27 @@ string graph::getName(const int i)         { if (i >= 0 and i < n) { return node
 // NOTE: Returns address; deallocation of returned object is dangerous
 edge*  graph::getNeighborList(const int i) { if (i >= 0 and i < n) { return nodeLink[i];     } else { return NULL; } }
 
+double* graph::getAdjacencyHist(const int i, const int j) {
+  if (i >= 0 and i < n and j >= 0 and j < n) { return A[i][j]; } else { return NULL; }
+}
+
 // ********************************************************************************************************
+double graph::getAdjacencyAverage(const int i, const int j) {
+       double average = 0.0;
+       if (i != j) {
+               for (int k=0; k<num_bins; k++) {
+                       if (A[i][j][k] > 0.0) { average += (A[i][j][k] / total_weight)*((double)(k)*bin_resolution); }
+               }
+       }
+       return average;
+}
+
 
 int    graph::numLinks()      { return m; }
 int    graph::numNodes()      { return n; }
+double graph::getBinResolution() { return bin_resolution; }
+int	  graph::getNumBins()       { return num_bins; }
+double graph::getTotalWeight()   { return total_weight; }
 
 // ********************************************************************************************************
 
@@ -2410,6 +2515,55 @@ void graph::printPairs() {
 }
 
 // ********************************************************************************************************
+
+void graph::resetAllAdjacencies() {
+       for (int i=0; i<n; i++) { for (int j=0; j<n; j++) { for (int k=0; k<num_bins; k++) { A[i][j][k] = 0.0; } } }
+       obs_count    = 0;
+       total_weight = 0.0;
+       return;
+}
+
+// ********************************************************************************************************
+
+void graph::resetAdjacencyHistogram(const int i, const int j) {
+       if (i >= 0 and i < n and j >= 0 and j < n) { for (int k=0; k<num_bins; k++) { A[i][j][k] = 0.0; } }
+       return;
+}
+
+// ********************************************************************************************************
+
+void graph::resetLinks() {
+       edge *curr, *prev;
+       for (int i=0; i<n; i++) {
+               curr = nodeLink[i];
+               while (curr != NULL) {
+                       prev = curr;
+                       curr = curr->next;
+                       delete prev;
+               }
+               nodeLink[i]     = NULL;
+               nodeLinkTail[i] = NULL;
+               nodes[i].degree = 0;
+       }
+       m = 0;
+       return;
+}
+
+// ********************************************************************************************************
+
+void graph::setAdjacencyHistograms(const int bin_count) {
+       // For all possible adjacencies, setup an edge histograms
+       num_bins = bin_count+1;
+       bin_resolution = 1.0 / (double)(bin_count);
+       for (int i=0; i<n; i++) {
+               for (int j=0; j<n; j++) {
+                       A[i][j] = new double [num_bins];
+                       for (int k=0; k<num_bins; k++) { A[i][j][k] = 0.0; }
+               }
+       }
+        return;
+ }
+
 
 bool graph::setName(const int i, const string text) { if (i >= 0 and i < n) { nodes[i].name = text; return true; } else { return false; } }
 

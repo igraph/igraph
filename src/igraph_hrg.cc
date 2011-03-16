@@ -31,8 +31,13 @@
 
 #include "hrg_dendro.h"
 #include "hrg_graph.h"
+#include "hrg_graph_simp.h"
 
 using namespace fitHRG;
+
+namespace fitHRG {
+  struct pblock { double L; int i; int j; };
+}
 
 int markovChainMonteCarlo(dendro *d, unsigned int period, 
 			  igraph_hrg_t *hrg) {
@@ -95,10 +100,11 @@ int markovChainMonteCarlo2(dendro *d, int num_samples) {
     }
 		
     t++;
+
+    // correct floating-point errors O(n)
+    d->refreshLikelihood();	// TODO: less frequently    
   }
 	
-  // correct floating-point errors O(n)
-  d->refreshLikelihood();
   return 0;
 }
 
@@ -114,8 +120,7 @@ int MCMCEquilibrium_Find(dendro *d, igraph_hrg_t *hrg) {
   bool flag_taken;
   igraph_real_t dL, Likeli;
   igraph_real_t oldMeanL;
-  igraph_real_t newMeanL=1e-49;
-  igraph_real_t bestL=d->getLikelihood();
+  igraph_real_t newMeanL=-1e-49;
   
   while (1) {
     oldMeanL = newMeanL;
@@ -123,7 +128,6 @@ int MCMCEquilibrium_Find(dendro *d, igraph_hrg_t *hrg) {
     for (int i=0; i<65536; i++) {
       IGRAPH_CHECK(! d->monteCarloMove(dL, flag_taken, 1.0));
       Likeli = d->getLikelihood();
-      if (Likeli > bestL) { bestL = Likeli; }
       newMeanL += Likeli;
     }
     // corrects floating-point errors O(n)
@@ -158,6 +162,34 @@ int igraph_i_hrg_getgraph(const igraph_t *igraph,
   
   d->buildDendrogram();
 
+  return 0;
+}
+
+int igraph_i_hrg_getsimplegraph(const igraph_t *igraph, 
+				dendro *d, simpleGraph **sg, 
+				int num_bins) {
+
+  int no_of_nodes = igraph_vcount(igraph);
+  int no_of_edges = igraph_ecount(igraph);
+  int i;
+  
+  // Create graphs
+  d->g = new graph(no_of_nodes, true);
+  d->g->setAdjacencyHistograms(num_bins);
+  (*sg) = new simpleGraph(no_of_nodes);
+  
+  for (i=0; i<no_of_edges; i++) {
+    int from=IGRAPH_FROM(igraph, i);
+    int to=IGRAPH_TO(igraph, i);
+    if (from==to) { continue; }
+    if (!d->g->doesLinkExist(from, to)) { d->g->addLink(from, to); }
+    if (!d->g->doesLinkExist(to, from)) { d->g->addLink(to, from); }
+    if (!(*sg)->doesLinkExist(from, to)) { (*sg)->addLink(from, to); }
+    if (!(*sg)->doesLinkExist(to, from)) { (*sg)->addLink(to, from); }
+  }
+
+  d->buildDendrogram();
+  
   return 0;
 }
 
@@ -399,7 +431,6 @@ int igraph_hrg_consensus(const igraph_t *graph,
 			 int num_samples) {
 
   dendro *d;
-  igraph_real_t bestL;
 
   if (start && !hrg) {
     IGRAPH_ERROR("`hrg' must be given is `start' is true", IGRAPH_EINVAL);
@@ -416,11 +447,179 @@ int igraph_hrg_consensus(const igraph_t *graph,
     IGRAPH_CHECK(MCMCEquilibrium_Find(d, hrg));
   }
 
-  bestL=d->getLikelihood();
-
   IGRAPH_CHECK(markovChainMonteCarlo2(d, num_samples));
   
   d->recordConsensusTree(parents, weights);
 
+  return 0;
+}
+
+int MCMCEquilibrium_Sample(dendro *d, int num_samples, MTRand *mtr) {
+
+  // Because moves in the dendrogram space are chosen (Monte
+  // Carlo) so that we sample dendrograms with probability
+  // proportional to their likelihood, a likelihood-proportional
+  // sampling of the dendrogram models would be equivalent to a
+  // uniform sampling of the walk itself. We would still have to
+  // decide how often to sample the walk (at most once every n steps
+  // is recommended) but for simplicity, the code here simply runs the
+  // MCMC itself. To actually compute something over the set of
+  // sampled dendrogram models (in a Bayesian model averaging sense),
+  // you'll need to code that yourself.
+  
+  double dL;
+  bool flag_taken;
+  int sample_num=0;
+  int t=1, thresh=100 * d->g->numNodes();
+  double ptest=1.0/10.0/d->g->numNodes();
+
+  while (sample_num < num_samples) {
+    d->monteCarloMove(dL, flag_taken, 1.0);
+    if (t > thresh && mtr->randExc() < ptest) {
+      sample_num++;
+      d->sampleAdjacencyLikelihoods();
+    }
+    d->refreshLikelihood();	// TODO: less frequently
+    t++;
+  }
+  
+  return 0;
+}
+
+int QsortPartition (pblock* array, int left, int right, int index) {
+  pblock p_value, temp;
+  p_value.L = array[index].L;
+  p_value.i = array[index].i;
+  p_value.j = array[index].j;
+  
+  // swap(array[p_value], array[right])
+  temp.L = array[right].L;
+  temp.i = array[right].i;
+  temp.j = array[right].j;
+  array[right].L = array[index].L;
+  array[right].i = array[index].i;
+  array[right].j = array[index].j;
+  array[index].L = temp.L;
+  array[index].i = temp.i;
+  array[index].j = temp.j;
+	
+  int stored = left;
+  for (int i=left; i<right; i++) {
+    if (array[i].L <= p_value.L) {
+      // swap(array[stored], array[i])
+      temp.L = array[i].L;
+      temp.i = array[i].i;
+      temp.j = array[i].j;
+      array[i].L = array[stored].L;
+      array[i].i = array[stored].i;
+      array[i].j = array[stored].j;
+      array[stored].L = temp.L;
+      array[stored].i = temp.i;
+      array[stored].j = temp.j;
+      stored++;
+    }
+  }
+  // swap(array[right], array[stored])
+  temp.L = array[stored].L;
+  temp.i = array[stored].i;
+  temp.j = array[stored].j;
+  array[stored].L = array[right].L;
+  array[stored].i = array[right].i;
+  array[stored].j = array[right].j;
+  array[right].L  = temp.L;
+  array[right].i  = temp.i;
+  array[right].j  = temp.j;
+  
+  return stored;
+}
+
+void QsortMain (pblock* array, int left, int right) {
+  if (right > left) {
+    int pivot = left;
+    int part  = QsortPartition(array, left, right, pivot);
+    QsortMain(array, left,   part-1);
+    QsortMain(array, part+1, right  );
+  }
+  return;
+}
+
+int rankCandidatesByProbability(simpleGraph *sg, dendro *d, 
+				pblock *br_list, MTRand *mtr, int mk) {
+  int mkk=0;
+  int n=sg->getNumNodes();
+  for (int i=0; i<n; i++) {
+    for (int j=i+1; j<n; j++) {
+      if (sg->getAdjacency(i, j) < 0.5) {
+	double temp=d->g->getAdjacencyAverage(i, j);
+	br_list[mkk].L = temp * (1.0 + mtr->randExc()/1000.0);
+	br_list[mkk].i = i;
+	br_list[mkk].j = j;
+	mkk++;
+      }
+    }
+  }
+  
+  // Sort the candidates by their average probability
+  QsortMain(br_list, 0, mk-1);  
+
+  return 0;
+}
+
+int recordPredictions(dendro *d, pblock *br_list, igraph_vector_t *edges, 
+		      igraph_vector_t *prob, int mk) {
+    
+  IGRAPH_CHECK(igraph_vector_resize(edges, mk*2));
+  IGRAPH_CHECK(igraph_vector_resize(prob, mk));
+  
+  for (int i=mk-1, idx=0, idx2=0; i>=0; i--) {
+    VECTOR(*edges)[idx++] = br_list[i].i;
+    VECTOR(*edges)[idx++] = br_list[i].j;
+    VECTOR(*prob)[idx2++] = br_list[i].L;
+  }
+
+  return 0;
+}
+
+int igraph_hrg_predict(const igraph_t *graph,
+		       igraph_vector_t *edges,
+		       igraph_vector_t *prob,
+		       igraph_hrg_t *hrg,
+		       igraph_bool_t start, 
+		       int num_samples, 
+		       int num_bins) {
+
+  dendro *d;
+  pblock *br_list;
+  int mk;
+  simpleGraph *sg;
+  MTRand mtr;			// TODO: igraph RNG
+
+  if (start && !hrg) {
+    IGRAPH_ERROR("`hrg' must be given is `start' is true", IGRAPH_EINVAL);
+  }
+
+  d = new dendro;
+
+  IGRAPH_CHECK(igraph_i_hrg_getsimplegraph(graph, d, &sg, num_bins));
+
+  mk = sg->getNumNodes() * (sg->getNumNodes()-1) / 2 - sg->getNumLinks()/2;
+  br_list = new pblock[mk];
+  for (int i=0; i<mk; i++) { 
+    br_list[i].L = 0.0; 
+    br_list[i].i = -1; 
+    br_list[i].j = -1; 
+  }
+  
+  if (start) {
+    d->importDendrogramStructure(hrg);
+  } else {
+    if (hrg) { igraph_hrg_resize(hrg, igraph_vcount(graph)); }
+    IGRAPH_CHECK(MCMCEquilibrium_Find(d, hrg));
+  }
+
+  IGRAPH_CHECK(MCMCEquilibrium_Sample(d, num_samples, &mtr));
+  IGRAPH_CHECK(rankCandidatesByProbability(sg, d, br_list, &mtr, mk));
+  IGRAPH_CHECK(recordPredictions(d, br_list, edges, prob, mk));
+  
   return 0;
 }

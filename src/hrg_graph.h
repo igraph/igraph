@@ -55,9 +55,12 @@ namespace fitHRG {
 class edge {
 public:
 	int		x;				// stored integer value  (edge terminator)
+	double* h;                                              // (histogram) weights of edge existence
+	double  total_weight;                           // (histogram) total weight observed
+	int             obs_count;                              // (histogram) number of observations in histogram
 	edge*	next;			// pointer to next elementd
-	edge()  { x = -1; next = NULL; }
-	~edge() { }
+	edge()  { x = -1; next = NULL; h = NULL; total_weight = 0.0; obs_count = 0; }
+	~edge() { if (h != NULL) { delete [] h; } h = NULL; }
 };
 #endif
 
@@ -77,25 +80,42 @@ public:
 
 class graph {
 public:
-	graph(const int);
+        graph(const int, bool predict=false);
 	~graph();
 
 	bool		addLink(const int, const int);					// add (i,j) to graph
+	bool		addAdjacencyObs(const int, const int, const double, const double);	// add weight to (i,j)'s histogram
+	void		addAdjacencyEnd();								// add to obs_count and total_weight
 	bool		doesLinkExist(const int, const int);				// true if (i,j) is already in graph
 	int		getDegree(const int);							// returns degree of vertex i
 	string	getName(const int);								// returns name of vertex i
 	edge*	getNeighborList(const int);						// returns edge list of vertex i
+	double*	getAdjacencyHist(const int, const int);				// return ptr to histogram of edge (i,j)
+	double	getAdjacencyAverage(const int, const int);			// return average value of adjacency A(i,j)
+	double	getBinResolution();								// returns bin_resolution
+	int		getNumBins();									// returns num_bins
 	int		numLinks();									// returns m
 	int		numNodes();									// returns n
+	double  getTotalWeight();                                                               // returns total_weight
+	void            resetAdjacencyHistogram(const int, const int);          // reset edge (i,j)'s histogram
+	void            resetAllAdjacencies();                                                  // reset all edge histograms
+	void            resetLinks();                                                                   // clear all links from graph
+	void            setAdjacencyHistograms(const int);                                      // allocate edge histograms
 	void		printPairs();									// prints all edges in graph
 	bool		setName(const int, const string);					// set name of vertex i
 
 private:
+	bool predict; // do we need prediction?
 	vert*	nodes;			// list of nodes
 	edge**	nodeLink;			// linked list of neighbors to vertex
 	edge**	nodeLinkTail;		// pointers to tail of neighbor list
+	double***	A;				// stochastic adjacency matrix for this graph
+	int		obs_count;		// number of observations in A
+	double	total_weight;		// total weight added to A
 	int		n;				// number of vertices
 	int		m;				// number of directed edges
+	int		num_bins;			// number of bins in edge histograms
+	double	bin_resolution;	// width of histogram bin
 };
 
 }
