@@ -404,7 +404,7 @@ int igraph_hrg_consensus(const igraph_t *graph,
   if (start && !hrg) {
     IGRAPH_ERROR("`hrg' must be given is `start' is true", IGRAPH_EINVAL);
   }
-
+  
   d = new dendro;
   
   IGRAPH_CHECK(igraph_i_hrg_getgraph(graph, d));
@@ -412,7 +412,8 @@ int igraph_hrg_consensus(const igraph_t *graph,
   if (start) {
     d->importDendrogramStructure(hrg);
   } else {
-    IGRAPH_CHECK(MCMCEquilibrium_Find(d, hrg));    
+    if (hrg) { igraph_hrg_resize(hrg, igraph_vcount(graph)); }
+    IGRAPH_CHECK(MCMCEquilibrium_Find(d, hrg));
   }
 
   bestL=d->getLikelihood();
