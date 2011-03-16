@@ -1118,6 +1118,12 @@ igraph_hrg_consensus:
                 INT num_samples=10000
         NAME-R: hrg.consensus
 
+igraph_hrg_predict:
+        PARAMS: GRAPH graph, OUT VECTOR edges, OUT VECTOR prob, \
+                INOUT HRG hrg=Default, BOOLEAN start=False, \
+                INT num_samples=10000, INT num_bins=25
+        NAME-R: hrg.predict
+
 #######################################
 # Conversion
 #######################################
