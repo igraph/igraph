@@ -1,3 +1,26 @@
+/* -*- mode: C++ -*-  */
+/* 
+   IGraph library.
+   Copyright (C) 2011  Gabor Csardi <csardi.gabor@gmail.com>
+   Rue de l'Industrie 5, Lausanne 1005, Switzerland
+   
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+   02110-1301 USA
+
+*/
+
 // ****************************************************************************************************
 // *** COPYRIGHT NOTICE *******************************************************************************
 // graph.h - graph data structure for hierarchical random graphs
@@ -35,12 +58,12 @@
 // 
 // ****************************************************************************************************
 
-#if !defined(graph_INCLUDED)
-#define graph_INCLUDED
+#ifndef IGRAPH_HRG_GRAPH
+#define IGRAPH_HRG_GRAPH
 
-#include <stdio.h>
-#include <string>
-#include "stdlib.h"
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
 
 #include "hrg_rbtree.h"
 
@@ -48,76 +71,97 @@ using namespace std;
 
 namespace fitHRG {
 
-// ******** Basic Structures ******************************************************************************
+// ******** Basic Structures *********************************************
 
-#if !defined(edge_INCLUDED)
-#define edge_INCLUDED
+#ifndef IGRAPH_HRG_EDGE
+#define IGRAPH_HRG_EDGE
 class edge {
 public:
-	int		x;				// stored integer value  (edge terminator)
-	double* h;                                              // (histogram) weights of edge existence
-	double  total_weight;                           // (histogram) total weight observed
-	int             obs_count;                              // (histogram) number of observations in histogram
-	edge*	next;			// pointer to next elementd
-	edge()  { x = -1; next = NULL; h = NULL; total_weight = 0.0; obs_count = 0; }
-	~edge() { if (h != NULL) { delete [] h; } h = NULL; }
+  int x;		    // stored integer value  (edge terminator)
+  double* h;		    // (histogram) weights of edge existence
+  double total_weight;	    // (histogram) total weight observed
+  int obs_count;	    // number of observations in histogram
+  edge* next;		    // pointer to next elementd
+  edge(): x(-1), h(0), total_weight(0.0), obs_count(0), next(0)  { }
+ ~edge() { 
+   if (h != NULL) { delete [] h; }
+   h = NULL; 
+ }
 };
 #endif
 
-#if !defined(vert_INCLUDED)
-#define vert_INCLUDED
+#ifndef IGRAPH_HRG_VERT
+#define IGRAPH_HRG_VERT
 class vert {
 public:
-	string	name;			// (external) name of vertex
-	int		degree;			// degree of this vertex
+ string name;			// (external) name of vertex
+ int degree;			// degree of this vertex
 
-	vert()  { name = ""; degree = 0; }
-	~vert() { }
+  vert(): name(""), degree(0) { }
+ ~vert() { }
 };
 #endif
 
-// ******** Graph Class with Edge Statistics *************************************************************
+// ******** Graph Class with Edge Statistics *****************************
 
 class graph {
 public:
-        graph(const int, bool predict=false);
-	~graph();
+  graph(const int, bool predict=false);
+ ~graph();
 
-	bool		addLink(const int, const int);					// add (i,j) to graph
-	bool		addAdjacencyObs(const int, const int, const double, const double);	// add weight to (i,j)'s histogram
-	void		addAdjacencyEnd();								// add to obs_count and total_weight
-	bool		doesLinkExist(const int, const int);				// true if (i,j) is already in graph
-	int		getDegree(const int);							// returns degree of vertex i
-	string	getName(const int);								// returns name of vertex i
-	edge*	getNeighborList(const int);						// returns edge list of vertex i
-	double*	getAdjacencyHist(const int, const int);				// return ptr to histogram of edge (i,j)
-	double	getAdjacencyAverage(const int, const int);			// return average value of adjacency A(i,j)
-	double	getBinResolution();								// returns bin_resolution
-	int		getNumBins();									// returns num_bins
-	int		numLinks();									// returns m
-	int		numNodes();									// returns n
-	double  getTotalWeight();                                                               // returns total_weight
-	void            resetAdjacencyHistogram(const int, const int);          // reset edge (i,j)'s histogram
-	void            resetAllAdjacencies();                                                  // reset all edge histograms
-	void            resetLinks();                                                                   // clear all links from graph
-	void            setAdjacencyHistograms(const int);                                      // allocate edge histograms
-	void		printPairs();									// prints all edges in graph
-	bool		setName(const int, const string);					// set name of vertex i
+  // add (i,j) to graph
+  bool addLink(const int, const int);
+  // add weight to (i,j)'s histogram
+  bool addAdjacencyObs(const int, const int, const double, const double);
+  // add to obs_count and total_weight
+  void addAdjacencyEnd();
+  // true if (i,j) is already in graph
+  bool doesLinkExist(const int, const int);
+  // returns degree of vertex i
+  int getDegree(const int);
+  // returns name of vertex i
+  string getName(const int);
+  // returns edge list of vertex i
+  edge* getNeighborList(const int);
+  // return ptr to histogram of edge (i,j)
+  double* getAdjacencyHist(const int, const int);
+  // return average value of adjacency A(i,j)
+  double getAdjacencyAverage(const int, const int);
+  // returns bin_resolution
+  double getBinResolution();
+  // returns num_bins
+  int getNumBins();
+  // returns m
+  int numLinks();
+  // returns n
+  int numNodes();
+  // returns total_weight
+  double getTotalWeight();
+  // reset edge (i,j)'s histogram
+  void resetAdjacencyHistogram(const int, const int);
+  // reset all edge histograms
+  void resetAllAdjacencies();
+  // clear all links from graph
+  void resetLinks();
+  // allocate edge histograms
+  void setAdjacencyHistograms(const int);
+  // set name of vertex i
+  bool setName(const int, const string);
 
 private:
-	bool predict; // do we need prediction?
-	vert*	nodes;			// list of nodes
-	edge**	nodeLink;			// linked list of neighbors to vertex
-	edge**	nodeLinkTail;		// pointers to tail of neighbor list
-	double***	A;				// stochastic adjacency matrix for this graph
-	int		obs_count;		// number of observations in A
-	double	total_weight;		// total weight added to A
-	int		n;				// number of vertices
-	int		m;				// number of directed edges
-	int		num_bins;			// number of bins in edge histograms
-	double	bin_resolution;	// width of histogram bin
+  bool predict;		 // do we need prediction?
+  vert* nodes;		 // list of nodes
+  edge** nodeLink;	 // linked list of neighbors to vertex
+  edge** nodeLinkTail;	 // pointers to tail of neighbor list
+  double*** A;		 // stochastic adjacency matrix for this graph
+  int obs_count;	 // number of observations in A
+  double total_weight;	 // total weight added to A
+  int n;		 // number of vertices
+  int m;		 // number of directed edges
+  int num_bins;		 // number of bins in edge histograms
+  double bin_resolution; // width of histogram bin
 };
 
-}
+} // namespace fitHRG
 
 #endif
