@@ -37,7 +37,9 @@ hrg.consensus <- function(graph, hrg=NULL, start=FALSE, num.samples=10000) {
   res <- .Call("R_igraph_hrg_consensus", graph, hrg, start, num.samples,
         PACKAGE="igraph")
   res$parents <- res$parents + 1
-  class(res) <- "igraphHRGConsensus"
+  res <- list(consensus=list(parents=res$parents, weights=res$weights),
+              hrg=res$hrg)
+  class(res$consensus) <- "igraphHRGConsensus"
   class(res$hrg) <- "igraphHRG"
   res
 }
@@ -98,7 +100,7 @@ print1.igraphHRG <- function(x, level=3, ...) {
   }
   cs <- .depth(1, c(1, 0))
   pw <- cs[2]
-  cs <- cs[1] * 4
+  cs <- cs[1] * 3
   vw <- nchar(as.character(length(x$left)+1))
   sp <- paste(collapse="", rep(" ", cs+pw+2+2))
 
@@ -121,10 +123,10 @@ print1.igraphHRG <- function(x, level=3, ...) {
   ## Recursive printing
   .plot <- function(b, l, ind = "") {
     if (b != 1) {
-      he <- format(paste(sep="", ind, "'- B-", b), width=cs)
-      ind <- paste("   ", ind)
+      he <- format(paste(sep="", ind, "'- g", b), width=cs)
+      ind <- paste("  ", ind)
     } else {
-      he <- format(paste(sep="", ind, "B-", b), width=cs)
+      he <- format(paste(sep="", ind, "g", b), width=cs)
     }
     ## whether to go left and/or right
     gol <- x$left[b]  < 0 && l < level
@@ -133,10 +135,10 @@ print1.igraphHRG <- function(x, level=3, ...) {
     ## the children to print
     ch1 <- character()
     if (!gol && x$left[b] < 0) {
-      ch1 <- c(ch1, paste(sep="", "B-", -x$left[b]))
+      ch1 <- c(ch1, paste(sep="", "g", -x$left[b]))
     }
     if (!gor && x$right[b] < 0) {
-      ch1 <- c(ch1, paste(sep="", "B-", -x$right[b]))
+      ch1 <- c(ch1, paste(sep="", "g", -x$right[b]))
     }
     ch2 <- character()
     if (!gol) {
@@ -174,27 +176,61 @@ print1.igraphHRG <- function(x, level=3, ...) {
 }
 
 print2.igraphHRG <- function(x, ...) {
-  cat(sep="", "Hierarchical random graph:\n")
-  bw <- ceiling(log10(length(x$left)+1))+2
+  cat("Hierarchical random graph:\n")
+  bw <- ceiling(log10(length(x$left)+1))+1
   p <- format(x$prob, digits=1)
   pw <- 4 + max(nchar(p))
   op <- sapply(seq_along(x$left), function(i) {
     lc <- if (x$left[i] < 0) {
-      paste(sep="", "B-", -x$left[i])
+      paste(sep="", "g", -x$left[i])
     } else {
       x$left[i]+1
     }
     rc <- if (x$right[i] < 0) {
-      paste(sep="", "B-", -x$right[i])
+      paste(sep="", "g", -x$right[i])
     } else {
       x$right[i]+1
     }
-    paste(sep="", format(paste(sep="", "B-", i), width=bw),
+    paste(sep="", format(paste(sep="", "g", i), width=bw),
           format(paste(sep="", " p=", p[i]), width=pw),
           "-> ", lc, " ", rc)
   })
   op <- format(op, justify="left")
-  cat(op, sep="  ", fill=TRUE)
+  cat(op, sep="   ", fill=TRUE)
+  invisible(x)
+}
+
+print.igraphHRGConsensus <- function(x, ...) {
+  cat("HRG consensus tree:\n")
+  n <- length(x$parents) - length(x$weights)
+  id <- c(seq_len(n), paste(sep="", "g", seq_along(x$weights)))
+  ch <- tapply(id, x$parents, c)[-1]   # first is zero
+  bw <- nchar(as.character(length(x$weights)))
+  vw <- max(nchar(id))
+  op <- sapply(seq_along(x$weights), function(i) {
+    mych <- format(ch[[i]], width=vw)
+    if (length(ch[[i]])*(vw+1) + bw + 4 > getOption("width")) {
+      mych <- gsub(" ", "x", mych, fixed=TRUE)
+      mych <- paste(collapse=" ", mych)
+      pref <- paste(collapse="", rep(" ", bw+5))
+      mych <- strwrap(mych, width=getOption("width") - bw - 4,
+                      initial="", prefix=pref)
+      mych <- gsub("x", " ", mych, fixed=TRUE)
+      mych <- paste(collapse="\n", mych)
+    } else {
+      mych <- paste(collapse=" ", mych)
+    }
+    paste(sep="", "g", format(i, width=bw), " <- ", mych)
+  })
+  if (max(nchar(op)) < (getOption("width")-4)/2) {
+    op <- format(op, justify="left")
+    cat(op, sep="   ", fill=TRUE)
+  } else {
+    ## TODO: break
+    cat(op, sep="\n")
+  }
+  
+  invisible(x)
 }
 
 "

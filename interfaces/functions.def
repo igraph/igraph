@@ -1117,7 +1117,6 @@ igraph_hrg_consensus:
                 INOUT HRG hrg=Default, BOOLEAN start=False, \
                 INT num_samples=10000
         NAME-R: hrg.consensus
-        CLASS-R: igraphHRGConsensus
 
 igraph_hrg_predict:
         PARAMS: GRAPH graph, OUT VERTEXSET edges, OUT VECTOR prob, \
