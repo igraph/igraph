@@ -176,6 +176,10 @@ if test "x$enable_glpk" != "xno"; then
   ])
 fi
 
+AC_ARG_WITH([external-f2c], [AS_HELP_STRING([--with-external-f2c],
+		                      [Use external F2C library [default=no]])],
+            [internal_f2c=no],
+	    [internal_f2c=yes])
 AC_ARG_WITH([external-blas], [AS_HELP_STRING([--with-external-blas],
 		                      [Use external BLAS library [default=no]])],
             [internal_blas=no],
@@ -188,6 +192,17 @@ AC_ARG_WITH([external-arpack], [AS_HELP_STRING([--with-external-arpack],
 		                      [Use external ARPACK library [default=no]])],
             [internal_arpack=no],
 	    [internal_arpack=yes])
+
+if test "$internal_f2c" = "no"; then
+  AC_CHECK_LIB([f2c], [f77_alloc_], [],
+     AC_CHECK_LIB([f2c], [f77_alloc], [],
+        AC_CHECK_LIB([f2c], [F77_ALLOC_], [],
+           AC_CHECK_LIB([f2c], [F77_ALLOC], [],
+	      [AC_MSG_RESULT(not found, trying to use -lf2c anyway.)]))))
+  LDFLAGS="${LDFLAGS}"
+else
+  AC_DEFINE([INTERNAL_F2C], [1], [Define to 1 if you use the internal F2C library])
+fi
 
 if test "$internal_blas" = "no"; then
   AC_CHECK_LIB([blas], [daxpy_], [],
@@ -225,6 +240,7 @@ fi
 AM_CONDITIONAL(INTERNAL_ARPACK, test x$internal_arpack = xyes)
 AM_CONDITIONAL(INTERNAL_LAPACK, test x$internal_lapack = xyes)
 AM_CONDITIONAL(INTERNAL_BLAS, test x$internal_blas = xyes)
+AM_CONDITIONAL(INTERNAL_F2C, test x$internal_f2c = xyes)
 
 if test "$debug" = "yes"; then
   CFLAGS="${CFLAGS} -ggdb -DRC_DEBUG -O0"
@@ -248,5 +264,6 @@ AC_MSG_RESULT([  GLPK library support   -- $glpk_support])
 AC_MSG_RESULT([  Use internal ARPACK    -- $internal_arpack])
 AC_MSG_RESULT([  Use internal LAPACK    -- $internal_lapack])
 AC_MSG_RESULT([  Use internal BLAS      -- $internal_blas])
+AC_MSG_RESULT([  Use internal F2C       -- $internal_f2c])
 AC_MSG_RESULT([  Debug build            -- $debug])
 AC_MSG_RESULT([  Profiling              -- $use_gprof])

@@ -333,7 +333,7 @@ PyObject* igraphmodule_EdgeSeq_get_attribute_values_mapping(igraphmodule_EdgeSeq
     args = Py_BuildValue("(O)", o);
     if (!args)
       return NULL;
-    result = igraphmodule_EdgeSeq_select(self, args, NULL);
+    result = igraphmodule_EdgeSeq_select(self, args);
     Py_DECREF(args);
     return result;
   }
@@ -499,18 +499,60 @@ PyObject* igraphmodule_EdgeSeq_set_attribute_values(igraphmodule_EdgeSeqObject *
 }
 
 /**
+ * \ingroup python_interface_edgqseq
+ * \brief Selects a single edge from the edge sequence based on some criteria
+ */
+PyObject* igraphmodule_EdgeSeq_find(igraphmodule_EdgeSeqObject *self, PyObject *args) {
+  PyObject *item;
+  long int i, n;
+
+  if (!PyArg_ParseTuple(args, "O", &item))
+    return NULL;
+
+  if (PyCallable_Check(item)) {
+    /* Call the callable for every edge in the current sequence and return
+     * the first one for which it evaluates to True */
+    n = PySequence_Size((PyObject*)self);
+    for (i=0; i<n; i++) {
+      PyObject *edge = PySequence_GetItem((PyObject*)self, i);
+      PyObject *call_result;
+      if (edge == 0)
+        return NULL;
+      call_result = PyObject_CallFunctionObjArgs(item, edge, NULL);
+      if (call_result == 0) {
+        Py_DECREF(edge);
+        return NULL;
+      }
+      if (PyObject_IsTrue(call_result)) {
+        Py_DECREF(call_result);
+        return edge;  /* reference passed to caller */
+      }
+      Py_DECREF(call_result);
+      Py_DECREF(edge);
+    }
+  } else if (PyInt_Check(item)) {
+    /* Integers are interpreted as indices on the edge set and NOT on the
+     * original, untouched edge sequence of the graph */
+    return PySequence_GetItem((PyObject*)self, PyInt_AsLong(item));
+  }
+
+  PyErr_SetString(PyExc_IndexError, "no such edge");
+  return NULL;
+}
+
+/**
  * \ingroup python_interface_edgeseq
  * \brief Selects a subset of the edge sequence based on some criteria
  */
-PyObject* igraphmodule_EdgeSeq_select(igraphmodule_EdgeSeqObject *self,
-  PyObject *args, PyObject *kwds) {
+PyObject* igraphmodule_EdgeSeq_select(igraphmodule_EdgeSeqObject *self, PyObject *args) {
   igraphmodule_EdgeSeqObject *result;
   igraphmodule_GraphObject *gr;
   long i, j, n, m;
 
   gr=self->gref;
   result=igraphmodule_EdgeSeq_copy(self);
-  if (result==0) return NULL;
+  if (result == 0)
+    return NULL;
 
   /* First, filter by positional arguments */
   n = PyTuple_Size(args);
@@ -728,6 +770,11 @@ PyMethodDef igraphmodule_EdgeSeq_methods[] = {
    "attribute_names() -> list\n\n"
    "Returns the attribute name list of the graph's edges\n"
   },
+  {"find", (PyCFunction)igraphmodule_EdgeSeq_find,
+   METH_VARARGS,
+   "find(condition) -> Edge\n\n"
+   "For internal use only.\n"
+  },
   {"get_attribute_values", (PyCFunction)igraphmodule_EdgeSeq_get_attribute_values,
    METH_O,
    "get_attribute_values(attrname) -> list\n\n"
@@ -748,7 +795,7 @@ PyMethodDef igraphmodule_EdgeSeq_methods[] = {
    "@param values: the new attribute values in a list\n"
   },
   {"select", (PyCFunction)igraphmodule_EdgeSeq_select,
-   METH_VARARGS | METH_KEYWORDS,
+   METH_VARARGS,
    "select(...) -> VertexSeq\n\n"
    "For internal use only.\n"
   },

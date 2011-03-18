@@ -26,6 +26,7 @@
 #include "attributes.h"
 #include "edgeobject.h"
 #include "graphobject.h"
+#include "vertexobject.h"
 #include "error.h"
 #include "py2compat.h"
 
@@ -180,20 +181,16 @@ PyObject* igraphmodule_Edge_attributes(igraphmodule_EdgeObject* self) {
 
 /**
  * \ingroup python_interface_edge
- * Returns the edge index
+ * \brief Updates some attributes of an edge
+ * 
+ * \param self the edge object
+ * \param args positional arguments
+ * \param kwds keyword arguments
  */
-PyObject* igraphmodule_Edge_get_index(igraphmodule_EdgeObject* self, void* closure) {
-  return PyInt_FromLong((long)self->idx);
+PyObject* igraphmodule_Edge_update_attributes(PyObject* self, PyObject* args,
+    PyObject* kwds) {
+  return igraphmodule_Vertex_update_attributes(self, args, kwds);
 }
-
-/**
- * \ingroup python_interface_edge
- * Returns the edge index as an ordinary C long
- */
-long igraphmodule_Edge_get_index_long(igraphmodule_EdgeObject* self) {
-  return (long)self->idx;
-}
-
 
 /** \ingroup python_interface_edge
  * \brief Returns the corresponding value to a given attribute of the edge
@@ -321,6 +318,22 @@ PyObject* igraphmodule_Edge_get_to(igraphmodule_EdgeObject* self, void* closure)
 
 /**
  * \ingroup python_interface_edge
+ * Returns the edge index
+ */
+PyObject* igraphmodule_Edge_get_index(igraphmodule_EdgeObject* self, void* closure) {
+  return PyInt_FromLong((long)self->idx);
+}
+
+/**
+ * \ingroup python_interface_edge
+ * Returns the edge index as an ordinary C long
+ */
+long igraphmodule_Edge_get_index_long(igraphmodule_EdgeObject* self) {
+  return (long)self->idx;
+}
+
+/**
+ * \ingroup python_interface_edge
  * Returns the target node index of an edge
  */
 PyObject* igraphmodule_Edge_get_tuple(igraphmodule_EdgeObject* self, void* closure) {
@@ -332,6 +345,42 @@ PyObject* igraphmodule_Edge_get_tuple(igraphmodule_EdgeObject* self, void* closu
   }
   return Py_BuildValue("(ii)", (long)from, (long)to);
 }
+
+#define GRAPH_PROXY_METHOD(FUNC, METHODNAME) \
+    PyObject* igraphmodule_Edge_##FUNC(igraphmodule_EdgeObject* self, PyObject* args, PyObject* kwds) { \
+      PyObject *new_args, *item, *result;                     \
+      long int i, num_args = args ? PyTuple_Size(args)+1 : 1; \
+                                                              \
+      /* Prepend ourselves to args */                         \
+      new_args = PyTuple_New(num_args);                       \
+      Py_INCREF(self); PyTuple_SET_ITEM(new_args, 0, (PyObject*)self);   \
+      for (i = 1; i < num_args; i++) {                        \
+        item = PyTuple_GET_ITEM(args, i-1);                   \
+        Py_INCREF(item); PyTuple_SET_ITEM(new_args, i, item); \
+      }                                                       \
+                                                              \
+      /* Get the method instance */                           \
+      item = PyObject_GetAttrString((PyObject*)(self->gref), METHODNAME);  \
+      result = PyObject_Call(item, new_args, kwds);           \
+      Py_DECREF(item);                                        \
+      Py_DECREF(new_args);                                    \
+      return result;                                          \
+    }
+
+GRAPH_PROXY_METHOD(count_multiple, "count_multiple");
+GRAPH_PROXY_METHOD(delete, "delete_edges");
+GRAPH_PROXY_METHOD(is_loop, "is_loop");
+GRAPH_PROXY_METHOD(is_multiple, "is_multiple");
+GRAPH_PROXY_METHOD(is_mutual, "is_mutual");
+
+#undef GRAPH_PROXY_METHOD
+
+#define GRAPH_PROXY_METHOD_SPEC(FUNC, METHODNAME) \
+  {METHODNAME, (PyCFunction)igraphmodule_Edge_##FUNC, METH_VARARGS | METH_KEYWORDS, \
+    "Proxy method to L{Graph." METHODNAME "()\n\n"              \
+    "This method calls the " METHODNAME " method of the L{Graph} class " \
+    "with this edge as the first argument, and returns the result.\n\n"\
+    "@see: Graph." METHODNAME "() for details."}
 
 /**
  * \ingroup python_interface_edge
@@ -348,6 +397,21 @@ PyMethodDef igraphmodule_Edge_methods[] = {
       "attribute_names() -> list\n\n"
       "Returns the list of edge attribute names\n"
   },
+  {"update_attributes", (PyCFunction)igraphmodule_Edge_update_attributes,
+    METH_VARARGS | METH_KEYWORDS,
+    "update_attributes(E, **F) -> None\n\n"
+    "Updates the attributes of the edge from dict/iterable E and F.\n\n"
+    "If E has a C{keys()} method, it does: C{for k in E: self[k] = E[k]}.\n"
+    "If E lacks a C{keys()} method, it does: C{for (k, v) in E: self[k] = v}.\n"
+    "In either case, this is followed by: C{for k in F: self[k] = F[k]}.\n\n"
+    "This method thus behaves similarly to the C{update()} method of Python\n"
+    "dictionaries."
+  },
+  GRAPH_PROXY_METHOD_SPEC(count_multiple, "count_multiple"),
+  GRAPH_PROXY_METHOD_SPEC(delete, "delete"),
+  GRAPH_PROXY_METHOD_SPEC(is_loop, "is_loop"),
+  GRAPH_PROXY_METHOD_SPEC(is_multiple, "is_multiple"),
+  GRAPH_PROXY_METHOD_SPEC(is_mutual, "is_mutual"),
   {NULL}
 };
 

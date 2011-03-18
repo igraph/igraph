@@ -35,6 +35,7 @@
 #endif
 
 #include "igraph_types.h"
+#include "igraph_complex.h"
 
 #ifdef HAVE_STDINT_H
 #  include <stdint.h>
@@ -79,6 +80,12 @@ __BEGIN_DECLS
 #include "igraph_vector_pmt.h"
 #include "igraph_pmt_off.h"
 #undef BASE_INT
+
+#define BASE_COMPLEX
+#include "igraph_pmt.h"
+#include "igraph_vector_pmt.h"
+#include "igraph_pmt_off.h"
+#undef BASE_COMPLEX
 
 int igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to);
 int igraph_vector_round(const igraph_vector_t *from, igraph_vector_long_t *to);

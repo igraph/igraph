@@ -199,6 +199,8 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
  * Time complexity: O(|V||V|),
  * |V| is the 
  * number of vertices in the graph.
+ * 
+ * \example examples/simple/igraph_laplacian.c
  */
 
 int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,

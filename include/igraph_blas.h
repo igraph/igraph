@@ -41,7 +41,7 @@
 __BEGIN_DECLS
 
 /**
- * \section about_blas About the BLAS interface in igraph
+ * \section about_blas BLAS interface in igraph
  * 
  * <para>
  * BLAS is a highly optimized library for basic linear algebra operations

@@ -2,7 +2,7 @@ import unittest
 from igraph.test import basic, layouts, games, foreign, structural, flow, \
     spectral, attributes, cliques, decomposition, operators, generators, \
     isomorphism, colortests, vertexseq, edgeseq, iterators, bipartite, \
-    conversion, rng, separators
+    conversion, rng, separators, indexing
 
 def suite():
     return unittest.TestSuite( \
@@ -26,17 +26,22 @@ def suite():
          bipartite.suite(),
          colortests.suite(),
          rng.suite(),
-         separators.suite()] \
+         separators.suite(),
+         indexing.suite()] \
     )
     
-def test():
+def run_tests(verbosity=1):
     try:
         # Support for testoob to have nice colored output
         import testoob
         testoob.main(suite())
     except ImportError:
-        runner = unittest.TextTestRunner(verbosity=1)
+        runner = unittest.TextTestRunner(verbosity=verbosity)
         runner.run(suite())
 
-if __name__ == "__main__": test()
+# Make nosetest skip run_tests
+run_tests.__test__ = False
+
+if __name__ == "__main__":
+    run_tests()
 

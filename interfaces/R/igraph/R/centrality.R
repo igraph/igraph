@@ -41,7 +41,7 @@ arpack <- function(func, extra=NULL, sym=FALSE, options=igraph.arpack.default,
                PACKAGE="igraph")
 
   if (complex) {
-    rew <- arpack.unpack.complex(res$vectors, res$values, res$options$nev)
+    rew <- arpack.unpack.complex(res$vectors, res$values, res$options$nconv)
     res$vectors <- rew$vectors
     res$values <- rew$values
 

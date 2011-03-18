@@ -14,6 +14,13 @@ Description: Transitional dummy package for libigraph0
  This is a dummy package to ease the transition from libigraph to
  libigraph0.
 
+Package: libigraph-dev
+Architecture: all
+Depends: libigraph0-dev, ${misc:Depends}
+Description: Transitional dummy package for libigraph0-dev
+ This is a dummy package to ease the transition from libigraph-dev to
+ libigraph0-dev.
+
 Package: libigraph0
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
@@ -27,7 +34,7 @@ Description: A library for creating and manipulating graphs
  .
  This is the runtime library package.
 
-Package: libigraph-dev
+Package: libigraph0-dev
 Architecture: any
 Section: libdevel
 Depends: libigraph0 (= ${binary:Version}), ${misc:Depends}

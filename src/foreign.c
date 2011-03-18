@@ -355,6 +355,8 @@ vertex3name [optionalWeight] \endverbatim
  * while |E| is the number of edges. 
  * 
  * \sa \ref igraph_read_graph_ncol(), \ref igraph_write_graph_lgl()
+ * 
+ * \example examples/simple/igraph_read_graph_lgl.c
  */
 
 int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
@@ -535,18 +537,10 @@ extern char *igraph_i_pajek_errmsg;
  * </para><para>
  * In addition the following vertex attributes might be added: `\c id'
  * if there are vertex ids in the file, `\c x' and `\c y' or `\c x'
- * and `\c y' and `\c z' if there are vertex coordinates in the file,
- * `\c color-red', `\c color-green' and `\c color-blue' if the vertex
- * color is given in RGB notation, `\c framecolor-red', `\c
- * framecolor-green' and `\c framecolor-blue` if the frame color is
- * given in RGB notation and finally `\c labelcolor-red', `\c
- * labelcolor-green' and `\c labelcolor-blue' if the label color is
- * given in RGB notation.
+ * and `\c y' and `\c z' if there are vertex coordinates in the file.
  * 
- * </para><para>The following additional edge attributes might be
- * added: `\c weight' if there are edge weights present, `\c
- * color-red', `\c color-green' and `\c color-blue' if the edge color
- * is given in RGB notation. 
+ * </para><para>The `\c weight' edge attribute might be
+ * added if there are edge weights present.
  * 
  * </para><para>
  * See the pajek homepage:
@@ -562,6 +556,8 @@ extern char *igraph_i_pajek_errmsg;
  * 
  * \sa \ref igraph_write_graph_pajek() for writing Pajek files, \ref
  * igraph_read_graph_graphml() for reading GraphML files.
+ * 
+ * \example examples/simple/foreign.c
  */
 
 int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
@@ -933,6 +929,8 @@ int igraph_i_read_graph_graphdb_getword(FILE *instream) {
  * 
  * Time complexity: O(|V|+|E|), the number of vertices plus the 
  * number of edges.
+ * 
+ * \example examples/simple/igraph_read_graph_graphdb.c
  */
 
 int igraph_read_graph_graphdb(igraph_t *graph, FILE *instream, 
@@ -1094,6 +1092,8 @@ const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, long int pos) {
  * 
  * \sa \ref igraph_read_graph_graphml() for a more modern format, 
  * \ref igraph_write_graph_gml() for writing GML files.
+ * 
+ * \example examples/simple/gml.c
  */
 
 int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
@@ -1675,6 +1675,8 @@ int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
  * O(1). 
  *
  * \sa \ref igraph_read_graph_lgl(), \ref igraph_write_graph_ncol()
+ * 
+ * \example examples/simple/igraph_write_graph_lgl.c
  */
 
 int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
@@ -1957,6 +1959,8 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
  * \sa \ref igraph_read_graph_pajek() for reading Pajek graphs, \ref
  * igraph_write_graph_graphml() for writing a graph in GraphML format,
  * this suites <command>igraph</command> graphs better.
+ * 
+ * \example examples/simple/igraph_write_graph_pajek.c
  */
 
 int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
@@ -1968,10 +1972,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
 
   /* Same order as the #define's */
   const char *vnames[] = { "id", "x", "y", "z", "shape", "xfact", "yfact",
-			   "color-red", "color-green", "color-blue",
-			   "framecolor-red", "framecolor-green", 
-			   "framecolor-blue", "labelcolor-red", 
-			   "labelcolor-green", "labelcolor-blue",
+               0, 0, 0, 0, 0, 0, 0, 0, 0,
 			   "labeldist", "labeldegree2", "framewidth",
 			   "fontsize", "rotation", "radius", 
 			   "diamondratio", "labeldegree", "vertexsize", 
@@ -1988,7 +1989,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
 			      "labelcolor" };
   const char *vstrnames2[]= { "font", "url", "ic", "bc", "lc" };  
   
-  const char *enames[] = { "weight", "color-red", "color-green", "color-blue", 
+  const char *enames[] = { "weight", 0, 0, 0,
 			   "arrowsize", "edgewidth", "hook1", "hook2", 
 			   "angle1", "angle2", "velocity1", "velocity2",
 			   "arrowpos", "labelpos", "labelangle",
@@ -2126,7 +2127,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
 	igraph_i_attribute_get_string_vertex_attr(graph, vstrnames[idx],
 						  igraph_vss_1(i), &strv);
 	igraph_strvector_get(&strv, 0, &s);
-	fprintf(outstream, " %s \"%s\"", vstrnames2[idx], s);
+	fprintf(outstream, " %s %s", vstrnames2[idx], s);
       }      
       
       /* trailing newline */
@@ -2207,7 +2208,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
       igraph_i_attribute_get_string_edge_attr(graph, estrnames[idx],
 					      igraph_ess_1(edge), &strv);
       igraph_strvector_get(&strv, 0, &s);
-      fprintf(outstream, " %s \"%s\"", estrnames2[idx], s);
+      fprintf(outstream, " %s %s", estrnames2[idx], s);
     }
 
     /* trailing newline */
@@ -2372,6 +2373,8 @@ int igraph_i_gml_convert_to_key(const char *orig, char **key) {
  * 
  * \sa \ref igraph_read_graph_gml() for reading GML files, 
  * \ref igraph_read_graph_graphml() for a more modern format.
+ * 
+ * \example examples/simple/gml.c
  */
 
 int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream, 
@@ -2602,6 +2605,8 @@ int igraph_i_dot_escape(const char *orig, char **result) {
  * to the file.
  * 
  * \sa \ref igraph_write_graph_graphml() for a more modern format.
+ * 
+ * \example examples/simple/dot.c
  */
 int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
   int ret;
@@ -2787,6 +2792,8 @@ igraph_i_dl_parsedata_t igraph_i_dl_data;
  * Time complexity: linear in terms of the number of edges and
  * vertices, except for the matrix format, which is quadratic in the
  * number of vertices. 
+ * 
+ * \example examples/simple/igraph_read_graph_dl.c
  */
 
 int igraph_read_graph_dl(igraph_t *graph, FILE *instream, 
@@ -2913,6 +2920,8 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
  * 
  * Time complexity: O(|V|+|E|), the number of vertices and edges in the
  * graph.
+ * 
+ * \example examples/simple/igraph_write_graph_leda.c
  */
 
 int igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,

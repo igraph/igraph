@@ -1,14 +1,19 @@
-#include "config.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 #ifdef KR_headers
 double pow();
-double igraphpow_dd(ap, bp) doublereal *ap, *bp;
+double pow_dd(ap, bp) doublereal *ap, *bp;
 #else
 #undef abs
 #include "math.h"
-double igraphpow_dd(doublereal *ap, doublereal *bp)
+#ifdef __cplusplus
+extern "C" {
+#endif
+double pow_dd(doublereal *ap, doublereal *bp)
 #endif
 {
 return(pow(*ap, *bp) );
 }
+#ifdef __cplusplus
+}
+#endif

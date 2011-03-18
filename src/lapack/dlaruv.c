@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20050501).
+/*  -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -10,9 +10,7 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "config.h"
-#include "igraph_arpack_internal.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
 
 /* Subroutine */ int igraphdlaruv_(integer *iseed, integer *n, doublereal *x)
 {
@@ -65,70 +63,55 @@
     static integer i__, i1, i2, i3, i4, it1, it2, it3, it4;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     October 31, 1992 */
+/*  -- LAPACK auxiliary routine (version 3.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2006   
 
-/*     .. Scalar Arguments .. */
-/*     .. */
-/*     .. Array Arguments .. */
-/*     .. */
 
-/*  Purpose */
-/*  ======= */
+    Purpose   
+    =======   
 
-/*  DLARUV returns a vector of n random real numbers from a uniform (0,1) */
-/*  distribution (n <= 128). */
+    DLARUV returns a vector of n random real numbers from a uniform (0,1)   
+    distribution (n <= 128).   
 
-/*  This is an auxiliary routine called by DLARNV and ZLARNV. */
+    This is an auxiliary routine called by DLARNV and ZLARNV.   
 
-/*  Arguments */
-/*  ========= */
+    Arguments   
+    =========   
 
-/*  ISEED   (input/output) INTEGER array, dimension (4) */
-/*          On entry, the seed of the random number generator; the array */
-/*          elements must be between 0 and 4095, and ISEED(4) must be */
-/*          odd. */
-/*          On exit, the seed is updated. */
+    ISEED   (input/output) INTEGER array, dimension (4)   
+            On entry, the seed of the random number generator; the array   
+            elements must be between 0 and 4095, and ISEED(4) must be   
+            odd.   
+            On exit, the seed is updated.   
 
-/*  N       (input) INTEGER */
-/*          The number of random numbers to be generated. N <= 128. */
+    N       (input) INTEGER   
+            The number of random numbers to be generated. N <= 128.   
 
-/*  X       (output) DOUBLE PRECISION array, dimension (N) */
-/*          The generated random numbers. */
+    X       (output) DOUBLE PRECISION array, dimension (N)   
+            The generated random numbers.   
 
-/*  Further Details */
-/*  =============== */
+    Further Details   
+    ===============   
 
-/*  This routine uses a multiplicative congruential method with modulus */
-/*  2**48 and multiplier 33952834046453 (see G.S.Fishman, */
-/*  'Multiplicative congruential random number generators with modulus */
-/*  2**b: an exhaustive analysis for b = 32 and a partial analysis for */
-/*  b = 48', Math. Comp. 189, pp 331-344, 1990). */
+    This routine uses a multiplicative congruential method with modulus   
+    2**48 and multiplier 33952834046453 (see G.S.Fishman,   
+    'Multiplicative congruential random number generators with modulus   
+    2**b: an exhaustive analysis for b = 32 and a partial analysis for   
+    b = 48', Math. Comp. 189, pp 331-344, 1990).   
 
-/*  48-bit integers are stored in 4 integer array elements with 12 bits */
-/*  per element. Hence the routine is portable across machines with */
-/*  integers of 32 bits or more. */
+    48-bit integers are stored in 4 integer array elements with 12 bits   
+    per element. Hence the routine is portable across machines with   
+    integers of 32 bits or more.   
 
-/*  ===================================================================== */
+    =====================================================================   
 
-/*     .. Parameters .. */
-/*     .. */
-/*     .. Local Scalars .. */
-/*     .. */
-/*     .. Local Arrays .. */
-/*     .. */
-/*     .. Intrinsic Functions .. */
-/*     .. */
-/*     .. Data statements .. */
-    /* Parameter adjustments */
+       Parameter adjustments */
     --iseed;
     --x;
 
     /* Function Body */
-/*     .. */
-/*     .. Executable Statements .. */
 
     i1 = iseed[1];
     i2 = iseed[2];
@@ -137,6 +120,8 @@
 
     i__1 = min(*n,128);
     for (i__ = 1; i__ <= i__1; ++i__) {
+
+L20:
 
 /*        Multiply the seed by i-th power of the multiplier modulo 2**48 */
 
@@ -159,6 +144,23 @@
 	x[i__] = ((doublereal) it1 + ((doublereal) it2 + ((doublereal) it3 + (
 		doublereal) it4 * 2.44140625e-4) * 2.44140625e-4) * 
 		2.44140625e-4) * 2.44140625e-4;
+
+	if (x[i__] == 1.) {
+/*           If a real number has n bits of precision, and the first   
+             n bits of the 48-bit integer above happen to be all 1 (which   
+             will occur about once every 2**n calls), then X( I ) will   
+             be rounded to exactly 1.0.   
+             Since X( I ) is not supposed to return exactly 0.0 or 1.0,   
+             the statistically correct thing to do in this situation is   
+             simply to iterate again.   
+             N.B. the case X( I ) = 0.0 should not be possible. */
+	    i1 += 2;
+	    i2 += 2;
+	    i3 += 2;
+	    i4 += 2;
+	    goto L20;
+	}
+
 /* L10: */
     }
 

@@ -37,6 +37,7 @@
 #include "igraph_statusbar.h"
 
 #include "igraph_types.h"
+#include "igraph_complex.h"
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
 #include "igraph_array.h"
@@ -77,9 +78,11 @@
 #include "igraph_adjlist.h"
 #include "igraph_attributes.h"
 #include "igraph_blas.h"
+#include "igraph_lapack.h"
 #include "igraph_arpack.h"
 #include "igraph_mixing.h"
 #include "igraph_separators.h"
 #include "igraph_cohesive_blocks.h"
+#include "igraph_eigen.h"
 
 #endif

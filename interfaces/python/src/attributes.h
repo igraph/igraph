@@ -25,11 +25,11 @@
 #define PY_IGRAPH_ATTRIBUTES_H
 
 #include <Python.h>
-#include <igraph/igraph_attributes.h>
-#include <igraph/igraph_datatype.h>
-#include <igraph/igraph_iterators.h>
-#include <igraph/igraph_strvector.h>
-#include <igraph/igraph_vector.h>
+#include <igraph_attributes.h>
+#include <igraph_datatype.h>
+#include <igraph_iterators.h>
+#include <igraph_strvector.h>
+#include <igraph_vector.h>
 
 #define ATTRHASH_IDX_GRAPH  0
 #define ATTRHASH_IDX_VERTEX 1
@@ -42,6 +42,7 @@ typedef struct {
 
 #define ATTR_STRUCT(graph) ((igraphmodule_i_attribute_struct*)((graph)->attr))
 #define ATTR_STRUCT_DICT(graph) ((igraphmodule_i_attribute_struct*)((graph)->attr))->attrs
+#define ATTR_NAME_INDEX(graph) ((igraphmodule_i_attribute_struct*)((graph)->attr))->vertex_name_index
 
 int igraphmodule_i_attribute_get_type(const igraph_t *graph,
 				      igraph_attribute_type_t *type,
@@ -69,8 +70,20 @@ int igraphmodule_i_get_string_edge_attr(const igraph_t *graph,
 					igraph_strvector_t *value);
 
 void igraphmodule_initialize_attribute_handler(void);
+void igraphmodule_index_vertex_names(igraph_t *graph, igraph_bool_t force);
 void igraphmodule_invalidate_vertex_name_index(igraph_t *graph);
 int igraphmodule_get_vertex_id_by_name(igraph_t *graph, PyObject* o, long int* id);
+
+PyObject* igraphmodule_create_edge_attribute(const igraph_t* graph,
+    const char* name);
+PyObject* igraphmodule_create_or_get_edge_attribute_values(const igraph_t* graph,
+    const char* name);
+PyObject* igraphmodule_get_edge_attribute_values(const igraph_t* graph,
+    const char* name);
+
+igraph_bool_t igraphmodule_has_graph_attribute(const igraph_t *graph, const char* name);
+igraph_bool_t igraphmodule_has_vertex_attribute(const igraph_t *graph, const char* name);
+igraph_bool_t igraphmodule_has_edge_attribute(const igraph_t *graph, const char* name);
 
 #endif
 

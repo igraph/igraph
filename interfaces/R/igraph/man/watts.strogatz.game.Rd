@@ -6,7 +6,7 @@
 \description{Generate a graph according to the Watts-Strogatz network
   model.}
 \usage{
-watts.strogatz.game(dim, size, nei, p)
+watts.strogatz.game(dim, size, nei, p, loops=FALSE)
 }
 \arguments{
   \item{dim}{Integer constant, the dimension of the starting lattice.}
@@ -14,7 +14,10 @@ watts.strogatz.game(dim, size, nei, p)
     dimension.}
   \item{nei}{Integer constant, the neighborhood within which the
     vertices of the lattice will be connected.}
-  \item{p}{Real constant between zero and one, the rewiring probability. }
+  \item{p}{Real constant between zero and one, the rewiring
+    probability. }
+  \item{loops}{Logical scalar, whether loops edges are allowed in the
+    generated graph.}
 }
 \details{
   First a lattice is created with the given \code{dim}, \code{size} and

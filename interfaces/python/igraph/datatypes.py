@@ -496,16 +496,17 @@ class DyadCensus(tuple):
 
     Examples:
 
+      >>> from igraph import Graph
       >>> g=Graph.Erdos_Renyi(100, 0.2, directed=True)
       >>> dc=g.dyad_census()
-      >>> print dc.mutual
+      >>> print dc.mutual             #doctest:+SKIP
       179
-      >>> print dc["asym"]
+      >>> print dc["asym"]            #doctest:+SKIP
       1609
-      >>> print tuple(dc), list(dc)
+      >>> print tuple(dc), list(dc)   #doctest:+SKIP
       (179, 1609, 3162) [179, 1609, 3162]
-      >>> print dc.as_dict()
-      {"mutual": 179, "asymmetric": 1609, "null": 3162}
+      >>> print sorted(dc.as_dict().items())   #doctest:+ELLIPSIS
+      [('asymmetric', ...), ('mutual', ...), ('null', ...)]
     """
     _remap = {"mutual": 0, "mut": 0, "sym": 0, "symm": 0,
         "asy": 1, "asym": 1, "asymm": 1, "asymmetric": 1, "null": 2}
@@ -559,11 +560,12 @@ class TriadCensus(tuple):
 
     Examples:
 
+      >>> from igraph import Graph
       >>> g=Graph.Erdos_Renyi(100, 0.2, directed=True)
       >>> tc=g.triad_census()
-      >>> print tc.t003
+      >>> print tc.t003                     #doctest:+SKIP
       39864
-      >>> print tc["030C"]
+      >>> print tc["030C"]                  #doctest:+SKIP
       1206
     """
     _remap = {"003": 0, "012": 1, "102": 2, "021D": 3, "021U": 4, "021C": 5, \

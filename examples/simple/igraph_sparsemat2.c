@@ -24,11 +24,8 @@
 #include <cs/cs.h>
 #include <igraph.h>
 #include <igraph_sparsemat.h>
+#include <igraph_blas_internal.h>
 #include <igraph_arpack_internal.h>
-
-void igraphdgemv_(char *trans, long int *m, long int *n, igraph_real_t *alpha, 
-            igraph_real_t *a, long int *lda, igraph_real_t *x, long int *incx, 
-            igraph_real_t *beta, igraph_real_t *y, long int *incy);
 
 int igraph_matrix_dgemv(const igraph_matrix_t *m,
                         const igraph_vector_t *v,
@@ -37,10 +34,10 @@ int igraph_matrix_dgemv(const igraph_matrix_t *m,
                         igraph_real_t beta,
                         igraph_bool_t transpose_m) {
   
-  long int nrow=igraph_matrix_nrow(m);
-  long int ncol=igraph_matrix_ncol(m);
+  int nrow=igraph_matrix_nrow(m);
+  int ncol=igraph_matrix_ncol(m);
   long int vlen=igraph_vector_size(v);
-  long int one=1;
+  int one=1;
   char t = transpose_m ? 't' : 'n';
   long int input_len  = transpose_m ? nrow : ncol;
   long int output_len = transpose_m ? ncol : nrow;
@@ -75,10 +72,10 @@ int my_dgemv(const igraph_matrix_t *m,
                        igraph_real_t beta,
                        igraph_bool_t transpose_m) {
   
-  long int nrow=igraph_matrix_nrow(m);
-  long int ncol=igraph_matrix_ncol(m);
+  int nrow=igraph_matrix_nrow(m);
+  int ncol=igraph_matrix_ncol(m);
   long int vlen=igraph_vector_size(v);
-  long int one=1;
+  int one=1;
   char t = transpose_m ? 't' : 'n';
   long int input_len  = transpose_m ? nrow : ncol;
   long int output_len = transpose_m ? ncol : nrow;

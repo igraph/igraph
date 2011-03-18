@@ -85,7 +85,7 @@ using namespace std;
  * Note that the graph must not contain isolated vertices in order to
  * use this method.
  *
- * \param graph The input graph.
+ * \param graph The input graph, edge directions are ignored.
  * \param weights Numeric vector giving the weights of the edges. 
  *     If it is a NULL pointer then all edges will have equal
  *     weights. The weights are expected to be positive.
@@ -115,6 +115,8 @@ using namespace std;
  * 
  * Time complexity: O(|E||V|^2) in the worst case, O(|V|^2 log|V|) typically, 
  * |V| is the number of vertices, |E| is the number of edges.
+ * 
+ * \example examples/simple/walktrap.c
  */
 
 int igraph_community_walktrap(const igraph_t *graph, 

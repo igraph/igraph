@@ -38,6 +38,7 @@
 #include "igraph_datatype.h"
 #include "igraph_types.h"
 #include "igraph_arpack.h"
+#include "igraph_vector_ptr.h"
 
 __BEGIN_DECLS
 
@@ -139,26 +140,62 @@ int igraph_modularity(const igraph_t *graph,
 int igraph_reindex_membership(igraph_vector_t *membership,
                               igraph_vector_t *new_to_old);
 
-int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
-					       igraph_matrix_t *merges,
-					       igraph_vector_t *membership,
-					       igraph_integer_t steps,
-					       igraph_arpack_options_t *options,
-					       igraph_real_t *modularity);
+typedef enum { IGRAPH_LEVC_HIST_SPLIT=1,
+	       IGRAPH_LEVC_HIST_FAILED,
+	       IGRAPH_LEVC_HIST_START_FULL,
+	       IGRAPH_LEVC_HIST_START_GIVEN
+} igraph_leading_eigenvector_community_history_t;
+
+/**
+ * \typedef igraph_community_leading_eigenvector_callback_t
+ * Callback for the leading eigenvector community finding method.
+ *
+ * The leading eigenvector community finding implementation in igraph
+ * is able to call a callback function, after each eigenvalue
+ * calculation. This callback function must be of \c
+ * igraph_community_leading_eigenvector_callback_t type.
+ * The following arguments are passed to the callback:
+ * \param membership The actual membership vector, before recording
+ *    the potential change implied by the newly found eigenvalue.
+ * \param comm The id of the community that the algorithm tried to
+ *    split in the last iteration. The community ids are indexed from
+ *    zero here!
+ * \param eigenvalue The eigenvalue the algorithm has just found.
+ * \param eigenvector The eigenvector corresponding to the eigenvalue
+ *    the algorithm just found.
+ * \param arpack_multiplier A function that was passed to \ref
+ *    igraph_arpack_rssolve() to solve the last eigenproblem.
+ * \param arpack_extra The extra argument that was passed to the
+ *    ARPACK solver.
+ * \param extra Extra argument that as passed to \ref
+ *    igraph_community_leading_eigenvector().
+ *
+ * \sa \ref igraph_community_leading_eigenvector(), \ref
+ * igraph_arpack_function_t, \ref igraph_arpack_rssolve().
+ */
+
+typedef int igraph_community_leading_eigenvector_callback_t(
+	const igraph_vector_t *membership,
+	long int comm, 
+	igraph_real_t eigenvalue,
+	const igraph_vector_t *eigenvector,
+	igraph_arpack_function_t *arpack_multiplier,
+        void *arpack_extra,
+        void *extra);
+
 int igraph_community_leading_eigenvector(const igraph_t *graph,
-					 igraph_matrix_t *merges,
-					 igraph_vector_t *membership,
-					 igraph_integer_t steps,
-					 igraph_arpack_options_t *options, 
-					 igraph_real_t *modularity);
-int igraph_community_leading_eigenvector_step(const igraph_t *graph,
-					      igraph_vector_t *membership,
-					      igraph_integer_t community,
-					      igraph_bool_t *split,
-					      igraph_vector_t *eigenvector,
-					      igraph_real_t *eigenvalue, 
-					      igraph_arpack_options_t *options,
-					      igraph_arpack_storage_t *storage);
+	igraph_matrix_t *merges,
+	igraph_vector_t *membership,
+	igraph_integer_t steps,
+	igraph_arpack_options_t *options, 
+	igraph_real_t *modularity,
+	igraph_bool_t start,
+	igraph_vector_t *eigenvalues,
+	igraph_vector_ptr_t *eigenvectors,
+        igraph_vector_t *history, 
+        igraph_community_leading_eigenvector_callback_t *callback,
+        void *callback_extra);
+
 int igraph_community_label_propagation(const igraph_t *graph,
                                        igraph_vector_t *membership,
                                        const igraph_vector_t *weights,

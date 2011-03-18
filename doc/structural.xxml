@@ -117,6 +117,7 @@
 <!-- doxrox-include igraph_is_simple -->
 <!-- doxrox-include igraph_is_loop -->
 <!-- doxrox-include igraph_is_multiple -->
+<!-- doxrox-include igraph_has_multiple -->
 <!-- doxrox-include igraph_count_multiple -->
 <!-- doxrox-include igraph_simplify -->
 </section>

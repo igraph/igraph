@@ -25,13 +25,15 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 from copy import deepcopy
 from itertools import izip
 from math import pi
-from StringIO import StringIO
+from cStringIO import StringIO
 
 from igraph import community_to_membership
+from igraph.compat import property
 from igraph.configuration import Configuration
 from igraph.datatypes import UniqueIdGenerator
 from igraph.drawing.colors import ClusterColoringPalette
 from igraph.statistics import Histogram
+from igraph.summary import _get_wrapper_for_width
 
 class Clustering(object):
     """Class representing a clustering of an arbitrary ordered set.
@@ -117,6 +119,22 @@ class Clustering(object):
         """
         return self._len
 
+    def __str__(self):
+        return self.summary(verbosity=1, width=78)
+
+    def as_cover(self):
+        """Returns a L{Cover} that contains the same clusters as this clustering."""
+        return Cover(self._graph, self)
+
+    def compare_to(self, other, *args, **kwds):
+        """Compares this clustering to another one using some similarity or
+        distance metric.
+
+        This is a convenience method that simply calls L{compare_communities}
+        with the two clusterings as arguments. Any extra positional or keyword
+        argument is also forwarded to L{compare_communities}."""
+        return compare_communities(self, other, *args, **kwds)
+
     @property
     def membership(self):
         """Returns the membership vector."""
@@ -157,6 +175,39 @@ class Clustering(object):
         """
         return Histogram(bin_width, self.sizes())
 
+    def summary(self, verbosity=0, width=None):
+        """Returns the summary of the clustering.
+        
+        The summary includes the number of items and clusters, and also the
+        list of members for each of the clusters if the verbosity is nonzero.
+        
+        @param verbosity: determines whether the cluster members should be
+          printed. Zero verbosity prints the number of items and clusters only.
+        @return: the summary of the clustering as a string.
+        """
+        out = StringIO()
+        print >>out, "Clustering with %d elements and %d clusters" % \
+                (len(self._membership), len(self))
+
+        if verbosity < 1:
+            return out.getvalue().strip()
+
+        ndigits = len(str(len(self)))
+        wrapper = _get_wrapper_for_width(width,
+                subsequent_indent = " " * (ndigits+3))
+
+        for idx, cluster in enumerate(self._formatted_cluster_iterator()):
+            wrapper.initial_indent = "[%*d] " % (ndigits, idx)
+            print >>out, "\n".join(wrapper.wrap(cluster))
+
+        return out.getvalue().strip()
+
+    def _formatted_cluster_iterator(self):
+        """Iterates over the clusters and formats them into a string to be
+        presented in the summary."""
+        for cluster in self:
+            yield ", ".join(str(member) for member in cluster)
+
 
 class VertexClustering(Clustering):
     """The clustering of the vertex set of a graph.
@@ -172,7 +223,7 @@ class VertexClustering(Clustering):
     """
 
     def __init__(self, graph, membership = None, modularity = None, \
-                 params = None):
+                 params = None, modularity_params = None):
         """Creates a clustering object for a given graph.
 
         @param graph: the graph that will be associated to the clustering
@@ -182,9 +233,11 @@ class VertexClustering(Clustering):
         @param modularity: the modularity score of the clustering. If C{None},
           it will be calculated when needed.
         @param params: additional parameters to be stored in this object.
+        @param modularity_params: arguments that should be passed to
+          L{Graph.modularity} when the modularity is (re)calculated. If the
+          original graph was weighted, you should pass a dictionary
+          containing a C{weight} key with the appropriate value here.
         """
-        self._graph = graph
-
         if membership is None:
             Clustering.__init__(self, [0]*graph.vcount(), params)
         else:
@@ -192,7 +245,12 @@ class VertexClustering(Clustering):
                 raise ValueError("membership list has invalid length")
             Clustering.__init__(self, membership, params)
 
+        self._graph = graph
         self._modularity = modularity
+        if modularity_params is None:
+            self._modularity_params = {}
+        else:
+            self._modularity_params = dict(modularity_params)
 
     # pylint: disable-msg=C0103
     @classmethod
@@ -248,6 +306,11 @@ class VertexClustering(Clustering):
         idgen[None] = None
         vec = [idgen[i] for i in vec]
         return cls(graph, vec, None, params)
+
+    def as_cover(self):
+        """Returns a L{VertexCover} that contains the same clusters as this
+        clustering."""
+        return VertexCover(self._graph, self)
 
     def cluster_graph(self, combine_vertices=None, combine_edges=None):
         """Returns a graph where each cluster is contracted into a single
@@ -308,7 +371,8 @@ class VertexClustering(Clustering):
         
         @return: the new modularity score
         """
-        self._modularity = self._graph.modularity(self._membership)
+        self._modularity = self._graph.modularity(self._membership,
+                **self._modularity_params)
         return self._modularity
 
 
@@ -426,10 +490,21 @@ class VertexClustering(Clustering):
         kwds["vertex_color"] = self.membership
         return self._graph.__plot__(context, bbox, palette, *args, **kwds)
 
+    def _formatted_cluster_iterator(self):
+        """Iterates over the clusters and formats them into a string to be
+        presented in the summary."""
+        if self._graph.is_named():
+            names = self._graph.vs["name"]
+            for cluster in self:
+                yield ", ".join(str(names[member]) for member in cluster)
+        else:
+            for cluster in self:
+                yield ", ".join(str(member) for member in cluster)
+
 
 ###############################################################################
 
-class Dendrogram(Clustering):
+class Dendrogram(object):
     """The hierarchical clustering (dendrogram) of some dataset.
 
     A hierarchical clustering means that we know not only the way the
@@ -464,7 +539,6 @@ class Dendrogram(Clustering):
         """Creates a hierarchical clustering.
 
         @param merges: the merge history either in matrix or tuple format"""
-        Clustering.__init__(self, [0]*(len(merges)+1))
         self._merges = [tuple(pair) for pair in merges]
         self._nmerges = len(self._merges)
         self._nitems = max(self._merges[-1])-self._nmerges+2
@@ -522,17 +596,31 @@ class Dendrogram(Clustering):
         return result
 
     def __str__(self):
-        return "Dendrogram, %d elements, %d merges" % \
-                (self._nitems, self._nmerges)
+        return self.summary(verbosity=1)
 
-    def summary(self):
-        """Draws the dendrogram of the hierarchical clustering in a string"""
+    def summary(self, verbosity=0, max_leaf_count=40):
+        """Returns the summary of the dendrogram.
+        
+        The summary includes the number of leafs and branches, and also an
+        ASCII art representation of the dendrogram unless it is too large.
+        
+        @param verbosity: determines whether the ASCII representation of the
+          dendrogram should be printed. Zero verbosity prints only the number
+          of leafs and branches.
+        @param max_leaf_count: the maximal number of leafs to print in the
+          ASCII representation. If the dendrogram has more leafs than this
+          limit, the ASCII representation will not be printed even if the
+          verbosity is larger than or equal to 1.
+        @return: the summary of the dendrogram as a string.
+        """
         from array import array
 
         out = StringIO()
-        print >>out, str(self)
-        if self._nitems == 0:
-            return out.getvalue()
+        print >>out, "Dendrogram, %d elements, %d merges" % \
+                (self._nitems, self._nmerges)
+
+        if self._nitems == 0 or verbosity < 1 or self._nitems > max_leaf_count:
+            return out.getvalue().strip()
             
         print >>out
 
@@ -573,7 +661,7 @@ class Dendrogram(Clustering):
                 positions.append((pos1+pos2)/2)
 
                 dashes = "-" * (pos2 - pos1 - 1)
-                char_array[pos1:(pos2+1)] = array("c", "+%s+" % dashes)
+                char_array[pos1:(pos2+1)] = array("c", "`%s'" % dashes)
 
                 cidx_incr += 1
             
@@ -581,8 +669,7 @@ class Dendrogram(Clustering):
 
             print >>out, char_array.tostring()
 
-
-        return out.getvalue()
+        return out.getvalue().strip()
 
     def _item_box_size(self, context, horiz, idx):
         """Calculates the amount of space needed for drawing an
@@ -648,6 +735,7 @@ class Dendrogram(Clustering):
         orientation_aliases = {
             "left-right": "lr", "right-left": "rl",
             "top-bottom": "tb", "bottom-top": "bt",
+            "top-down": "tb", "bottom-up": "bt",
             "horizontal": "lr", "horiz": "lr", "h": "lr",
             "vertical": "bt", "vert": "bt", "v": "bt"
         }
@@ -771,52 +859,35 @@ class Dendrogram(Clustering):
         """Returns the performed merges in matrix format"""
         return deepcopy(self._merges)
 
-class VertexDendrogram(VertexClustering, Dendrogram):
+
+class VertexDendrogram(Dendrogram):
     """The dendrogram resulting from the hierarchical clustering of the
     vertex set of a graph."""
 
-    def __init__(self, graph, merges, membership = None, modularity = None, \
-            params = None):
+    def __init__(self, graph, merges, optimal_count = None, params = None,
+            modularity_params = None):
         """Creates a dendrogram object for a given graph.
 
         @param graph: the graph that will be associated to the clustering
         @param merges: the merges performed given in matrix form.
-        @param membership: the membership list. The length of the list must
-          be equal to the number of vertices in the graph. If C{None}, the
-          dendrogram will be cut at the level where the modularity is maximized
-          and the membership list will represent this state.
-        @param modularity: the modularity score of the clustering on each
-          level of the dendrogram starting from the fully decomposed state.
-          If C{None}, it will be calculated.
+        @param optimal_count: the optimal number of clusters where the
+          dendrogram should be cut. This is a hint usually provided by the
+          clustering algorithm that produces the dendrogram. C{None} means
+          that such a hint is not available; the optimal count will then be
+          selected based on the modularity in such a case.
         @param params: additional parameters to be stored in this object.
+        @param modularity_params: arguments that should be passed to
+          L{Graph.modularity} when the modularity is (re)calculated. If the
+          original graph was weighted, you should pass a dictionary
+          containing a C{weight} key with the appropriate value here.
         """
-        if modularity is None:
-            # TODO: this is a fairly simple way to calculate the modularity
-            membs = range(graph.vcount())
-            modularity = []
-            n = graph.vcount()
-            for step in xrange(min(n-1, len(merges))):
-                membs = community_to_membership(merges, n, step)
-                modularity.append(graph.modularity(membs))
-
-        if membership is None:
-            maxmod = max(modularity)
-            maxidx = modularity.index(maxmod)
-            membership = community_to_membership(merges, graph.vcount(), maxidx)
-            
-            recoding, n = {}, 0
-            for idx, m in enumerate(membership):
-                try:
-                    membership[idx] = recoding[m]
-                except KeyError:
-                    recoding[m], membership[idx] = n, n
-                    n += 1
-
-        else:
-            maxmod = None
-
         Dendrogram.__init__(self, merges)
-        VertexClustering.__init__(self, graph, membership, maxmod, params)
+        self._graph = graph
+        self._optimal_count = optimal_count
+        if modularity_params is None:
+            self._modularity_params = {}
+        else:
+            self._modularity_params = dict(modularity_params)
 
     def as_clustering(self, n=None):
         """Cuts the dendrogram at the given level and returns a corresponding
@@ -825,34 +896,46 @@ class VertexDendrogram(VertexClustering, Dendrogram):
         @param n: the desired number of clusters. Merges are replayed from the
           beginning until the membership vector has exactly M{n} distinct elements
           or until there are no more recorded merges, whichever happens first.
-          If C{None}, the current membership vector will be used.
+          If C{None}, the optimal count hint given by the clustering algorithm
+          will be used If the optimal count was not given either, it will be
+          calculated by selecting the level where the modularity is maximal.
         @return: a new L{VertexClustering} object.
         """
-        if n is not None:
-            num_elts = self._graph.vcount()
-            membership = community_to_membership(self._merges, num_elts, \
-                                                 num_elts - n)
-            idgen = UniqueIdGenerator()
-            membership = [idgen[m] for m in membership]
-        else:
-            membership = self.membership
-        return VertexClustering(self._graph, membership)
-
-
-    def cut(self, n):
-        """Cuts the dendrogram at a given level.
-
-        @param n: the desired number of clusters. Merges are replayed from the
-          beginning until the membership vector has exactly M{n} distinct elements
-          or until there are no more recorded merges, whichever happens first.
-        @return: the membership vector
-        """
+        if n is None:
+            n = self.optimal_count
         num_elts = self._graph.vcount()
-        membership = community_to_membership(self._merges, num_elts, num_elts-n)
         idgen = UniqueIdGenerator()
-        self._membership = [idgen[m] for m in membership]
-        self._len = max(self._membership) + 1
-        return self._membership[:]
+        membership = community_to_membership(self._merges, num_elts, \
+                                             num_elts - n)
+        membership = [idgen[m] for m in membership]
+        return VertexClustering(self._graph, membership,
+                modularity_params=self._modularity_params)
+
+    @property
+    def optimal_count(self):
+        """Returns the optimal number of clusters for this dendrogram.
+
+        If an optimal count hint was given at construction time, this
+        property simply returns the hint. If such a count was not given,
+        this method calculates the optimal number of clusters by maximizing
+        the modularity along all the possible cuts in the dendrogram.
+        """
+        if self._optimal_count is not None:
+            return self._optimal_count
+
+        n = self._graph.vcount()
+        max_q, optimal_count = 0, 1
+        for step in xrange(min(n-1, len(self._merges))):
+            membs = community_to_membership(self._merges, n, step)
+            q = self._graph.modularity(membs, **self._modularity_params)
+            if q > max_q:
+                optimal_count = n-step
+                max_q = q
+        self._optimal_count = optimal_count
+
+    @optimal_count.setter
+    def optimal_count(self, value):
+        self._optimal_count = max(int(value), 1)
 
     def __plot__(self, context, bbox, palette, *args, **kwds):
         """Draws the vertex dendrogram on the given Cairo context
@@ -929,7 +1012,7 @@ class Cover(object):
     L{Clustering} objects can readily be converted to L{Cover} objects
     using the constructor:
 
-      >>> clustering = Clustering([0, 1, 2, 3], [4, 5, 6], [7, 8, 9])
+      >>> clustering = Clustering([0, 0, 0, 0, 1, 1, 1, 2, 2, 2])
       >>> cover = Cover(clustering)
       >>> list(clustering) == list(cover)
       True
@@ -968,6 +1051,10 @@ class Cover(object):
     def __len__(self):
         """Returns the number of clusters in this cover."""
         return len(self._clusters)
+
+    def __str__(self):
+        """Returns a string representation of the cover."""
+        return self.summary(verbosity=1, width=78)
 
     @property
     def membership(self):
@@ -1013,6 +1100,38 @@ class Cover(object):
         """
         return Histogram(bin_width, self.sizes())
 
+    def summary(self, verbosity=0, width=None):
+        """Returns the summary of the cover.
+        
+        The summary includes the number of items and clusters, and also the
+        list of members for each of the clusters if the verbosity is nonzero.
+        
+        @param verbosity: determines whether the cluster members should be
+          printed. Zero verbosity prints the number of items and clusters only.
+        @return: the summary of the cover as a string.
+        """
+        out = StringIO()
+        print >>out, "Cover with %d clusters" % len(self)
+
+        if verbosity < 1:
+            return out.getvalue().strip()
+
+        ndigits = len(str(len(self)))
+        wrapper = _get_wrapper_for_width(width,
+                subsequent_indent = " " * (ndigits+3))
+
+        for idx, cluster in enumerate(self._formatted_cluster_iterator()):
+            wrapper.initial_indent = "[%*d] " % (ndigits, idx)
+            print >>out, "\n".join(wrapper.wrap(cluster))
+
+        return out.getvalue().strip()
+
+    def _formatted_cluster_iterator(self):
+        """Iterates over the clusters and formats them into a string to be
+        presented in the summary."""
+        for cluster in self:
+            yield ", ".join(str(member) for member in cluster)
+
 
 class VertexCover(Cover):
     """The cover of the vertex set of a graph.
@@ -1034,7 +1153,7 @@ class VertexCover(Cover):
           that there is only a single cluster that covers the whole graph.
         """
         if clusters is None:
-            clusters = range(graph.vcount())
+            clusters = [range(graph.vcount())]
 
         Cover.__init__(self, clusters, n = graph.vcount())
         if self._n > graph.vcount():
@@ -1142,6 +1261,17 @@ class VertexCover(Cover):
                     kwds["mark_groups"], self)
 
         return self._graph.__plot__(context, bbox, palette, *args, **kwds)
+
+    def _formatted_cluster_iterator(self):
+        """Iterates over the clusters and formats them into a string to be
+        presented in the summary."""
+        if self._graph.is_named():
+            names = self._graph.vs["name"]
+            for cluster in self:
+                yield ", ".join(str(names[member]) for member in cluster)
+        else:
+            for cluster in self:
+                yield ", ".join(str(member) for member in cluster)
 
 
 class CohesiveBlocks(VertexCover):
@@ -1314,5 +1444,146 @@ def _handle_mark_groups_arg_for_clustering(mark_groups, clustering):
 
     return cluster_index_resolver()
 
+##############################################################
+
+def _prepare_community_comparison(comm1, comm2, remove_none=False):
+    """Auxiliary method that takes two community structures either as
+    membership lists or instances of L{Clustering}, and returns a
+    tuple whose two elements are membership lists.
+
+    This is used by L{compare_communities} and L{split_join_distance}.
+
+    @param comm1: the first community structure as a membership list or
+      as a L{Clustering} object.
+    @param comm2: the second community structure as a membership list or
+      as a L{Clustering} object.
+    @param remove_none: whether to remove C{None} entries from the membership
+      lists. If C{remove_none} is C{False}, a C{None} entry in either C{comm1}
+      or C{comm2} will result in an exception. If C{remove_none} is C{True},
+      C{None} values are filtered away and only the remaining lists are
+      compared.
+    """
+    def _ensure_list(obj):
+        if isinstance(obj, Clustering):
+            return obj.membership
+        return list(obj)
+
+    vec1, vec2 = _ensure_list(comm1), _ensure_list(comm2)
+    if len(vec1) != len(vec2):
+        raise ValueError("the two membership vectors must be equal in length")
+
+    if remove_none and (None in vec1 or None in vec2):
+        idxs_to_remove = [i for i in xrange(len(vec1)) \
+                if vec1[i] is None or vec2[i] is None]
+        idxs_to_remove.reverse()
+        n = len(vec1)
+        for i in idxs_to_remove:
+            n -= 1
+            vec1[i], vec1[n] = vec1[n], vec1[i]
+            vec2[i], vec2[n] = vec2[n], vec2[i]
+        del vec1[n:]
+        del vec2[n:]
+
+    return vec1, vec2
+
+
+def compare_communities(comm1, comm2, method="vi", remove_none=False):
+    """Compares two community structures using various distance measures.
+
+    @param comm1: the first community structure as a membership list or
+      as a L{Clustering} object.
+    @param comm2: the second community structure as a membership list or
+      as a L{Clustering} object.
+    @param method: the measure to use. C{"vi"} or C{"meila"} means the
+      variation of information metric of Meila (2003), C{"nmi"} or C{"danon"}
+      means the normalized mutual information as defined by Danon et al (2005),
+      C{"split-join"} means the split-join distance of van Dongen (2000),
+      C{"rand"} means the Rand index of Rand (1971), C{"adjusted_rand"}
+      means the adjusted Rand index of Hubert and Arabie (1985).
+    @param remove_none: whether to remove C{None} entries from the membership
+      lists. This is handy if your L{Clustering} object was constructed using
+      L{VertexClustering.FromAttribute} using an attribute which was not defined
+      for all the vertices. If C{remove_none} is C{False}, a C{None} entry in
+      either C{comm1} or C{comm2} will result in an exception. If C{remove_none}
+      is C{True}, C{None} values are filtered away and only the remaining lists
+      are compared.
+
+    @return: the calculated measure.
+    @newfield ref: Reference
+    @ref: Meila M: Comparing clusterings by the variation of information.
+          In: Scholkopf B, Warmuth MK (eds). Learning Theory and Kernel
+          Machines: 16th Annual Conference on Computational Learning Theory
+          and 7th Kernel Workship, COLT/Kernel 2003, Washington, DC, USA.
+          Lecture Notes in Computer Science, vol. 2777, Springer, 2003.
+          ISBN: 978-3-540-40720-1.
+    @ref: Danon L, Diaz-Guilera A, Duch J, Arenas A: Comparing community
+          structure identification. J Stat Mech P09008, 2005.
+    @ref: van Dongen D: Performance criteria for graph clustering and Markov
+          cluster experiments. Technical Report INS-R0012, National Research
+          Institute for Mathematics and Computer Science in the Netherlands,
+          Amsterdam, May 2000.
+    @ref: Rand WM: Objective criteria for the evaluation of clustering
+          methods. J Am Stat Assoc 66(336):846-850, 1971.
+    @ref: Hubert L and Arabie P: Comparing partitions. Journal of
+          Classification 2:193-218, 1985.
+    """
+    import _igraph
+    vec1, vec2 = _prepare_community_comparison(comm1, comm2, remove_none)
+    return _igraph._compare_communities(vec1, vec2, method)
+
+
+def split_join_distance(comm1, comm2, remove_none=False):
+    """Calculates the split-join distance between two community structures.
+
+    The split-join distance is a distance measure defined on the space of
+    partitions of a given set. It is the sum of the projection distance of
+    one partition from the other and vice versa, where the projection
+    number of A from B is if calculated as follows:
+
+      1. For each set in A, find the set in B with which it has the
+         maximal overlap, and take note of the size of the overlap.
+
+      2. Take the sum of the maximal overlap sizes for each set in A.
+
+      3. Subtract the sum from M{n}, the number of elements in the
+         partition.
+
+    Note that the projection distance is asymmetric, that's why it has to be
+    calculated in both directions and then added together.  This function
+    returns the projection distance of C{comm1} from C{comm2} and the
+    projection distance of C{comm2} from C{comm1}, and returns them in a pair.
+    The actual split-join distance is the sum of the two distances. The reason
+    why it is presented this way is that one of the elements being zero then
+    implies that one of the partitions is a subpartition of the other (and if
+    it is close to zero, then one of the partitions is close to being a
+    subpartition of the other).
+
+    @param comm1: the first community structure as a membership list or
+      as a L{Clustering} object.
+    @param comm2: the second community structure as a membership list or
+      as a L{Clustering} object.
+    @param remove_none: whether to remove C{None} entries from the membership
+      lists. This is handy if your L{Clustering} object was constructed using
+      L{VertexClustering.FromAttribute} using an attribute which was not defined
+      for all the vertices. If C{remove_none} is C{False}, a C{None} entry in
+      either C{comm1} or C{comm2} will result in an exception. If C{remove_none}
+      is C{True}, C{None} values are filtered away and only the remaining lists
+      are compared.
+
+    @return: the projection distance of C{comm1} from C{comm2} and vice versa
+      in a tuple. The split-join distance is the sum of the two.
+    @newfield ref: Reference
+    @ref: van Dongen D: Performance criteria for graph clustering and Markov
+          cluster experiments. Technical Report INS-R0012, National Research
+          Institute for Mathematics and Computer Science in the Netherlands,
+          Amsterdam, May 2000.
+
+    @see: L{compare_communities()} with C{method = "split-join"} if you are
+      not interested in the individual projection distances but only the
+      sum of them.
+    """
+    import _igraph
+    vec1, vec2 = _prepare_community_comparison(comm1, comm2, remove_none)
+    return _igraph._split_join_distance(vec1, vec2)
 
 

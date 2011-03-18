@@ -182,10 +182,43 @@ class Configuration(object):
                 raise ValueError("value cannot be coerced to boolean type")
             obj.set(section, key, value)
 
+        @staticmethod
+        def setint(obj, section, key, value):
+            """Sets an integer value in the given configuration object.
+            
+            @param obj: a configuration object
+            @param section: the section of the value to be set
+            @param key: the key of the value to be set
+            @param value: the value itself.
+            """
+            obj.set(section, key, str(int(value)))
+
+        @staticmethod
+        def setfloat(obj, section, key, value):
+            """Sets a float value in the given configuration object.
+
+            Note that float values are converted to strings in the configuration
+            object, which may lead to some precision loss.
+
+            @param obj: a configuration object
+            @param section: the section of the value to be set
+            @param key: the key of the value to be set
+            @param value: the value itself.
+            """
+            obj.set(section, key, str(float(value)))
+
     _types = {
         "boolean": {
             "getter": SafeConfigParser.getboolean,
             "setter": Types.setboolean
+        },
+        "int": {
+            "getter": SafeConfigParser.getint,
+            "setter": Types.setint
+        },
+        "float": {
+            "getter": SafeConfigParser.getfloat,
+            "setter": Types.setfloat
         }
     }
 
@@ -237,6 +270,17 @@ class Configuration(object):
         information."""
         return self._filename
 
+    def _get(self, section, key):
+        """Internal function that returns the value of a given key in a
+        given section."""
+        definition = self._definitions.get("%s.%s" % (section, key), {})
+        getter = None
+        if "type" in definition:
+            getter = self._types[definition["type"]].get("getter")
+        if getter is None:
+            getter = self._config.__class__.get
+        return getter(self._config, section, key)
+
     @staticmethod
     def _item_to_section_key(item):
         """Converts an item description to a section-key pair.
@@ -253,19 +297,28 @@ class Configuration(object):
             section, key = "general", item
         return section, key
 
+    def __contains__(self, item):
+        """Checks whether the given configuration item is set.
+
+        @param item: the configuration key to check.
+        @return: C{True} if the key has an associated value, C{False} otherwise.
+        """
+        section, key = self._item_to_section_key(item)
+        return self._config.has_option(section, key)
+
     def __getitem__(self, item):
         """Returns the given configuration item.
 
         @param item: the configuration key to retrieve.
         @return: the configuration value"""
         section, key = self._item_to_section_key(item)
-        definition = self._definitions.get("%s.%s" % (section, key), {})
-        getter = None
-        if "type" in definition:
-            getter = self._types[definition["type"]].get("getter", None)
-        if getter is None:
-            getter = self._config.__class__.get
-        return getter(self._config, section, key)
+        if key == "*":
+            # Special case: retrieving all the keys within a section and
+            # returning it in a dict
+            keys = self._config.items(section)
+            return dict((key, self._get(section, key)) for key, _ in keys)
+        else:
+            return self._get(section, key)
 
     def __setitem__(self, item, value):
         """Sets the given configuration item.

@@ -25,7 +25,8 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 """
 import math
 
-__all__ = ["Histogram", "RunningMean", "power_law_fit"]
+__all__ = ["Histogram", "RunningMean", "mean", "median", "percentile",
+           "quantile", "power_law_fit"]
 
 class Histogram(object):
     """Generic histogram class for real numbers
@@ -250,25 +251,40 @@ class RunningMean(object):
     """
 
     # pylint: disable-msg=C0103
-    def __init__(self, n = 0.0, mean = 0.0, sd = 0.0):
-        """RunningMean(n=0.0, mean=0.0, sd=0.0)
+    def __init__(self, items=None, n=0.0, mean=0.0, sd=0.0):
+        """RunningMean(items=None, n=0.0, mean=0.0, sd=0.0)
         
-        Initializes the running mean calculator. Optionally the
-        number of already processed elements and an initial mean
-        can be supplied if we want to continue an interrupted
+        Initializes the running mean calculator.
+        
+        There are two possible ways to initialize the calculator.
+        First, one can provide an iterable of items; alternatively,
+        one can specify the number of items, the mean and the
+        standard deviation if we want to continue an interrupted
         calculation.
 
-        @param n: the initial number of elements already processed
-        @param mean: the initial mean
-        @param sd: the initial standard deviation"""
-        self._nitems = float(n)
-        self._mean = float(mean)
-        if n > 1:
-            self._sqdiff = float(sd) ** 2 * float(n-1)
-            self._sd = float(sd)
+        @param items: the items that are used to initialize the
+          running mean calcuator. If C{items} is given, C{n},
+          C{mean} and C{sd} must be zeros.
+        @param n: the initial number of elements already processed.
+          If this is given, C{items} must be C{None}.
+        @param mean: the initial mean. If this is given, C{items}
+          must be C{None}.
+        @param sd: the initial standard deviation. If this is given,
+          C{items} must be C{None}."""
+        if items is not None:
+            if n != 0 or mean != 0 or sd != 0:
+                raise ValueError("n, mean and sd must be zeros if items is not None")
+            self.clear()
+            self.add_many(items)
         else:
-            self._sqdiff = 0.0
-            self._sd = 0.0
+            self._nitems = float(n)
+            self._mean = float(mean)
+            if n > 1:
+                self._sqdiff = float(sd) ** 2 * float(n-1)
+                self._sd = float(sd)
+            else:
+                self._sqdiff = 0.0
+                self._sd = 0.0
         
     def add(self, value, repeat=1):
         """RunningMean.add(value, repeat=1)
@@ -278,7 +294,7 @@ class RunningMean(object):
 
         @param value: the element to be added
         @param repeat: number of repeated additions
-        @return: the new mean and standard deviation as a tuple"""
+        """
         repeat = int(repeat)
         self._nitems += repeat
         delta = value - self._mean
@@ -286,7 +302,6 @@ class RunningMean(object):
         self._sqdiff += (repeat*delta) * (value - self._mean)
         if self._nitems > 1:
             self._sd = (self._sqdiff / (self._nitems-1)) ** 0.5
-        return self._mean, self._sd
 
     def add_many(self, values):
         """RunningMean.add(values)
@@ -297,19 +312,23 @@ class RunningMean(object):
         so you can use it to add elements as well:
             
           >>> rm=RunningMean()
-          >>> rm << [1,2,3,4]             # doctest:+ELLIPSIS
+          >>> rm << [1,2,3,4] 
+          >>> rm.result               # doctest:+ELLIPSIS
           (2.5, 1.290994...)
         
         @param values: the element(s) to be added
-        @type values: iterable
-        @return: the new mean"""
+        @type values: iterable"""
         try:
             iterator = iter(values)
         except TypeError:
             iterator = iter([values])
         for value in iterator:
             self.add(value)
-        return self._mean, self._sd
+
+    def clear(self):
+        """Resets the running mean calculator."""
+        self._nitems, self._mean = 0.0, 0.0
+        self._sqdiff, self._sd = 0.0, 0.0
 
     @property
     def result(self):
@@ -331,6 +350,11 @@ class RunningMean(object):
         """Returns the current variation"""
         return self._sd ** 2
 
+    def __repr__(self):
+        return "%s(n=%r, mean=%r, sd=%r)" % \
+                (self.__class__.__name__, int(self._nitems),
+                        self._mean, self._sd)
+
     def __str__(self):
         return "Running mean (N=%d, %f +- %f)" % \
             (self._nitems, self._mean, self._sd)
@@ -351,6 +375,73 @@ class RunningMean(object):
 
     def __len__(self):
         return self._nitems
+
+
+def mean(xs):
+    """Returns the mean of an iterable.
+
+    Example:
+
+        >>> mean([1, 4, 7, 11])
+        5.75
+
+    @param xs: an iterable yielding numbers.
+    @return: the mean of the numbers provided by the iterable.
+
+    @see: RunningMean() if you also need the variance or the standard deviation
+    """
+    return RunningMean(xs).mean
+
+def median(xs, sort=True):
+    """Returns the median of an unsorted or sorted numeric vector.
+
+    @param xs: the vector itself.
+    @param sort: whether to sort the vector. If you know that the vector is
+      sorted already, pass C{False} here.
+    @return: the median, which will always be a float, even if the vector
+      contained integers originally.
+    """
+    if sort:
+        xs = sorted(xs)
+
+    mid = int(len(xs) / 2)
+    if 2 * mid == len(xs):
+        return float(xs[mid-1] + xs[mid]) / 2
+    else:
+        return float(xs[mid])
+
+def percentile(xs, p=(25, 50, 75), sort=True):
+    """Returns the pth percentile of an unsorted or sorted numeric vector.
+
+    This is equivalent to calling quantile(xs, p/100.0); see L{quantile}
+    for more details on the calculation.
+
+    Example:
+
+        >>> round(percentile([15, 20, 40, 35, 50], 40), 2)
+        26.0
+        >>> for perc in percentile([15, 20, 40, 35, 50], (0, 25, 50, 75, 100)):
+        ...     print "%.2f" % perc
+        ...
+        15.00
+        17.50
+        35.00
+        45.00
+        50.00
+
+    @param xs: the vector itself.
+    @param p: the percentile we are looking for. It may also be a list if you
+      want to calculate multiple quantiles with a single call. The default
+      value calculates the 25th, 50th and 75th percentile.
+    @param sort: whether to sort the vector. If you know that the vector is
+      sorted already, pass C{False} here.
+    @return: the pth percentile, which will always be a float, even if the vector
+      contained integers originally. If p is a list, the result will also be a
+      list containing the percentiles for each item in the list.
+    """
+    if hasattr(p, "__iter__"):
+        return quantile(xs, (x/100.0 for x in p), sort)
+    return quantile(xs, p/100.0, sort)
 
 def power_law_fit(x, xmin=None, method="discrete_approx"):
     """Fitting a power-law distribution to empirical data
@@ -400,3 +491,87 @@ def power_law_fit(x, xmin=None, method="discrete_approx"):
 
     raise ValueError("unknown method: %s" % method)
 
+def quantile(xs, q=(0.25, 0.5, 0.75), sort=True):
+    """Returns the qth quantile of an unsorted or sorted numeric vector.
+
+    There are a number of different ways to calculate the sample quantile. The
+    method implemented by igraph is the one recommended by NIST. First we
+    calculate a rank n as q(N+1), where N is the number of items in xs, then we
+    split n into its integer component k and decimal component d. If k <= 1,
+    we return the first element; if k >= N, we return the last element,
+    otherwise we return the linear interpolation between xs[k-1] and xs[k]
+    using a factor d.
+
+    Example:
+
+        >>> round(quantile([15, 20, 40, 35, 50], 0.4), 2)
+        26.0
+
+    @param xs: the vector itself.
+    @param q: the quantile we are looking for. It may also be a list if you
+      want to calculate multiple quantiles with a single call. The default
+      value calculates the 25th, 50th and 75th percentile.
+    @param sort: whether to sort the vector. If you know that the vector is
+      sorted already, pass C{False} here.
+    @return: the qth quantile, which will always be a float, even if the vector
+      contained integers originally. If q is a list, the result will also be a
+      list containing the quantiles for each item in the list.
+    """
+    if not xs:
+        raise ValueError("xs must not be empty")
+
+    if sort:
+        xs = sorted(xs)
+
+    if hasattr(q, "__iter__"):
+        qs = q
+        return_single = False
+    else:
+        qs = [q]
+        return_single = True
+
+    result = []
+    for q in qs:
+        if q < 0 or q > 1:
+            raise ValueError("q must be between 0 and 1")
+        n = float(q) * (len(xs)+1)
+        k, d = int(n), n-int(n)
+        if k >= len(xs):
+            result.append(xs[-1])
+        elif k < 1:
+            result.append(xs[0])
+        else:
+            result.append((1-d) * xs[k-1] + d * xs[k])
+    if return_single:
+        result = result[0]
+    return result
+
+def sd(xs):
+    """Returns the standard deviation of an iterable.
+
+    Example:
+
+        >>> sd([1, 4, 7, 11])       #doctest:+ELLIPSIS
+        4.2720...
+
+    @param xs: an iterable yielding numbers.
+    @return: the standard deviation of the numbers provided by the iterable.
+
+    @see: RunningMean() if you also need the mean
+    """
+    return RunningMean(xs).sd
+
+def var(xs):
+    """Returns the variance of an iterable.
+
+    Example:
+
+        >>> var([1, 4, 8, 11])            #doctest:+ELLIPSIS
+        19.333333...
+
+    @param xs: an iterable yielding numbers.
+    @return: the variance of the numbers provided by the iterable.
+
+    @see: RunningMean() if you also need the mean
+    """
+    return RunningMean(xs).var

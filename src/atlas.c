@@ -56,6 +56,8 @@
  * 
  * Time complexity: O(|V|+|E|), the number of vertices plus the number of 
  * edges.
+ * 
+ * \example examples/simple/igraph_atlas.c
  */
 int igraph_atlas(igraph_t *graph, int number) {
   

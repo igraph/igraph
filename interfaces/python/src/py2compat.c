@@ -25,26 +25,6 @@
 
 #include "py2compat.h"
 
-/* Common functions for both Python 2.x and Python 3.x */
-char* PyObject_ConvertToCString(PyObject* string) {
-  char* result;
-
-  if (string == 0)
-    return 0;
-
-  if (!PyBaseString_Check(string)) {
-    string = PyObject_Str(string);
-    if (string == 0)
-      return 0;
-  } else {
-    Py_INCREF(string);
-  }
-
-  result = PyString_CopyAsString(string);
-  Py_DECREF(string);
-  return result;
-}
-
 #ifdef IGRAPH_PYTHON3
 
 /* Python 3.x functions */

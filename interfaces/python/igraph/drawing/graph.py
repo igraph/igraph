@@ -3,12 +3,12 @@ Drawing routines to draw graphs.
 
 This module contains routines to draw graphs on:
 
-- Cairo surfaces (L{DefaultGraphDrawer})
-- UbiGraph displays (L{UbiGraphDrawer}, see L{http://ubietylab.net/ubigraph})
+  - Cairo surfaces (L{DefaultGraphDrawer})
+  - UbiGraph displays (L{UbiGraphDrawer}, see U{http://ubietylab.net/ubigraph})
 
-It also contains routines to send an igraph graph directly to Cytoscape
-(L{http://www.cytoscape.org}) using the CytoscapeRPC plugin
-(L{http://gforge.nbic.nl/projects/cytoscaperpc/}), see
+It also contains routines to send an igraph graph directly to
+(U{Cytoscape<http://www.cytoscape.org>}) using the
+(U{CytoscapeRPC plugin<http://gforge.nbic.nl/projects/cytoscaperpc/>}), see
 L{CytoscapeGraphDrawer}. L{CytoscapeGraphDrawer} can also fetch the current
 network from Cytoscape and convert it to igraph format.
 """
@@ -16,6 +16,7 @@ network from Cytoscape and convert it to igraph format.
 from collections import defaultdict
 from itertools import izip
 from math import cos, pi, sin
+from warnings import warn
 
 from igraph._igraph import convex_hull, VertexSeq
 from igraph.configuration import Configuration
@@ -121,7 +122,8 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
     this drawer."""
 
     def __init__(self, context, bbox, \
-                 edge_drawer_factory = ArrowEdgeDrawer):
+                 edge_drawer_factory = ArrowEdgeDrawer,
+                 label_drawer_factory = TextDrawer):
         """Constructs the graph drawer and associates it to the given
         Cairo context and the given L{BoundingBox}.
 
@@ -137,9 +139,13 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
                         here to control the style of edges drawn by
                         igraph. The default edge drawer is
                         L{ArrowEdgeDrawer}.
+        @param label_drawer_factory: a factory method that returns a
+                        L{TextDrawer} instance bound to a given Cairo
+                        context. The default label drawer is L{TextDrawer}.
         """
         AbstractCairoGraphDrawer.__init__(self, context, bbox)
         self.edge_drawer_factory = edge_drawer_factory
+        self.label_drawer_factory = label_drawer_factory
 
     # pylint: disable-msg=W0142,W0221,E1101
     # W0142: Used * or ** magic
@@ -154,14 +160,14 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
         layout = self.ensure_layout(kwds.get("layout", None), graph)
 
         # Determine the size of the margin on each side
-        margin = kwds.get("margin", [0., 0., 0., 0.])
+        margin = kwds.get("margin", 0)
         try:
             margin = list(margin)
         except TypeError:
             margin = [margin]
         while len(margin)<4:
             margin.extend(margin)
-        margin = [x + 20. for x in margin[:4]]
+        # margin = [x + 20. for x in margin[:4]]
 
         # Contract the drawing area by the margin and fit the layout
         bbox = self.bbox.contract(margin)
@@ -263,9 +269,40 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
             src_vertex, dest_vertex = vertex_builder[src], vertex_builder[dest]
             drawer_method(visual_edge, src_vertex, dest_vertex)
 
+        # Calculate the desired vertex order
+        if "vertex_order" in kwds:
+            # Vertex order specified explicitly
+            vertex_order = kwds["vertex_order"]
+        elif kwds.get("vertex_order_by") is not None:
+            # Vertex order by another attribute
+            vertex_order_by = kwds["vertex_order_by"]
+            if isinstance(vertex_order_by, tuple):
+                vertex_order_by, reverse = vertex_order_by
+                if isinstance(reverse, basestring) and reverse.lower().startswith("asc"):
+                    reverse = False
+                else:
+                    reverse = bool(reversed)
+            else:
+                reverse = False
+            attrs = graph.vs[vertex_order_by]
+            vertex_order = sorted(range(graph.vcount()), key=attrs.__getitem__,
+                    reverse=reverse)
+            del attrs
+        else:
+            # Default vertex order
+            vertex_order = None
+
+        if vertex_order is None:
+            # Default vertex order
+            vertex_coord_iter = izip(vertex_builder, layout)
+        else:
+            # Specified vertex order
+            vertex_coord_iter = ((vertex_builder[i], layout[i])
+                    for i in vertex_order)
+
         # Draw the vertices
         context.set_line_width(1)
-        for vertex, coords in izip(vertex_builder, layout):
+        for vertex, coords in vertex_coord_iter:
             vertex.shape.draw_path(context, \
                     coords[0], coords[1], vertex.size)
             context.set_source_rgba(*vertex.color)
@@ -283,8 +320,16 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
         else:
             wrap = bool(wrap)
 
-        label_drawer = TextDrawer(context, halign="center", valign="center")
-        for vertex, coords in izip(vertex_builder, layout):
+        if vertex_order is None:
+            # Default vertex order
+            vertex_coord_iter = izip(vertex_builder, layout)
+        else:
+            # Specified vertex order
+            vertex_coord_iter = ((vertex_builder[i], layout[i])
+                    for i in vertex_order)
+
+        label_drawer = self.label_drawer_factory(context)
+        for vertex, coords in vertex_coord_iter:
             if vertex.label is None:
                 continue
 
@@ -452,20 +497,42 @@ class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
         super(CytoscapeGraphDrawer, self).__init__(url, "Cytoscape")
         self.network_id = None
 
-    def draw(self, graph, name = "Network from igraph", *args, **kwds):
+    def draw(self, graph, name="Network from igraph", create_view=True,
+            *args, **kwds):
         """Sends the given graph to Cytoscape as a new network.
         
-        @param name: the name of the network in Cytoscape."""
+        @param name: the name of the network in Cytoscape.
+        @param create_view: whether to create a view for the network
+          in Cytoscape.The default is C{True}.
+        @keyword node_ids: specifies the identifiers of the nodes to
+          be used in Cytoscape. This must either be the name of a
+          vertex attribute or a list specifying the identifiers, one
+          for each node in the graph. The default is C{None}, which
+          simply uses the vertex index for each vertex."""
         from xmlrpclib import Fault
 
         cy = self.service
 
         # Create the network
-        network_id = cy.createNetwork(name)
+        if not create_view:
+            try:
+                network_id = cy.createNetwork(name, False)
+            except Fault:
+                warn("CytoscapeRPC too old, cannot create network without view."
+                    " Consider upgrading CytoscapeRPC to use this feature.")
+                network_id = cy.createNetwork(name)
+        else:
+            network_id = cy.createNetwork(name)
         self.network_id = network_id
 
         # Create the nodes
-        node_ids = [str(idx) for idx in xrange(graph.vcount())]
+        if "node_ids" in kwds:
+            node_ids = kwds["node_ids"]
+            if isinstance(node_ids, basestring):
+                node_ids = graph.vs[node_ids]
+        else:
+            node_ids = xrange(graph.vcount())
+        node_ids = [str(identifier) for identifier in node_ids]
         cy.createNodes(network_id, node_ids)
 
         # Create the edges
@@ -556,7 +623,7 @@ class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
         cy = self.service
 
         # Check the version number. Anything older than 1.3 is bad.
-        if map(int, cy.version().split(".")[:2]) < (1, 3):
+        if tuple(map(int, cy.version().split(".")[:2])) < (1, 3):
             raise NotImplementedError("CytoscapeGraphDrawer requires "
                                       "Cytoscape-RPC 1.3 or newer")
 

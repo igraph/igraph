@@ -36,12 +36,12 @@
  * <para>Everything about vertices and vertex selectors also applies
  * to edges and edge selectors unless explicitly noted otherwise.</para>
  *
- * <para>The vertex (and edge) selector notion was introduced in igraph 0.2,
- * and it is a way to reference to sequence of vertices or edges
+ * <para>The vertex (and edge) selector notion was introduced in igraph 0.2.
+ * It is a way to reference a sequence of vertices or edges
  * independently of the graph.</para>
  *
  * <para>While this might sound quite mysterious, it is actually very
- * simple. For example all vertex of graph can be selected by
+ * simple. For example all vertices of a graph can be selected by
  * \ref igraph_vs_all(), and the graph independence means that
  * \ref igraph_vs_all() is not parametrized by a graph object. Ie. 
  * \ref igraph_vs_all() is the \em concept of selecting all vertices
@@ -143,10 +143,10 @@ int igraph_vs_adj(igraph_vs_t *vs,
 
 /**
  * \function igraph_vs_nonadj
- * \brief Non-adjacent vertices of a vertex
+ * \brief Non-adjacent vertices of a vertex.
  * 
  * All non-neighboring vertices of a given vertex. The \p mode
- * argument controls the type of neighboring vertics \em not to
+ * argument controls the type of neighboring vertices \em not to
  * select.
  * \param vs Pointer to an uninitialized vertex selector object.
  * \param vid Vertex id, the \quote center \endquote of the
@@ -157,12 +157,14 @@ int igraph_vs_adj(igraph_vs_t *vs,
  *           which there is a directed edge from \p vid.
  *        \c IGRAPH_IN, all vertices will be selected except those
  *           from which there is a directed edge to \p vid.
- *        \c IGRAPH_ALL, all vertices will be selected exvept those 
+ *        \c IGRAPH_ALL, all vertices will be selected except those 
  *           from or to which there is a directed edge to or from \p
  *           vid. 
  * \return Error code.
  *
  * Time complexity: O(1).
+ * 
+ * \example examples/simple/igraph_vs_nonadj.c
  */
 
 int igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid, 
@@ -231,7 +233,7 @@ int igraph_vs_1(igraph_vs_t *vs, igraph_integer_t vid) {
 
 /**
  * \function igraph_vss_1
- * \brief Vertex set with a single vertex (immediate version)
+ * \brief Vertex set with a single vertex (immediate version).
  * 
  * The immediate version of the single-vertex selector.
  * 
@@ -267,6 +269,8 @@ igraph_vs_t igraph_vss_1(igraph_integer_t vid) {
  * \sa \ref igraph_vss_vector()
  * 
  * Time complexity: O(1).
+ * 
+ * \example examples/simple/igraph_vs_vector.c
  */
 
 int igraph_vs_vector(igraph_vs_t *vs,
@@ -303,7 +307,7 @@ igraph_vs_t igraph_vss_vector(const igraph_vector_t *v) {
  *
  * This function can be used to create a vertex selector with a couple
  * of vertices. Do not forget to include a <code>-1</code> after the
- * last vertex id, the behavior of the function is undefined if you
+ * last vertex id. The behavior of the function is undefined if you
  * don't use a <code>-1</code> properly.
  * 
  * </para><para>
@@ -400,6 +404,8 @@ int igraph_vs_vector_copy(igraph_vs_t *vs,
  * \sa \ref igraph_vss_seq()
  * 
  * Time complexity: O(1).
+ * 
+ * \example examples/simple/igraph_vs_seq.c
  */
 
 int igraph_vs_seq(igraph_vs_t *vs, 
@@ -446,7 +452,7 @@ igraph_vs_t igraph_vss_seq(igraph_integer_t from, igraph_integer_t to) {
  * 
  * \param vs Pointer to a vertex selector object.
  * 
- * Time complecity: operating system dependent, usually O(1).
+ * Time complexity: operating system dependent, usually O(1).
  */
 
 void igraph_vs_destroy(igraph_vs_t *vs) {
@@ -473,14 +479,14 @@ void igraph_vs_destroy(igraph_vs_t *vs) {
  * \brief Check whether all vertices are included.
  * 
  * This function checks whether the vertex selector object was created
- * by \ref igraph_vs_all() of \ref igraph_vss_all(). Note that the
+ * by \ref igraph_vs_all() or \ref igraph_vss_all(). Note that the
  * vertex selector might contain all vertices in a given graph but if
  * it wasn't created by the two constructors mentioned here the return
  * value will be FALSE.
  * 
  * \param vs Pointer to a vertex selector object.
  * \return TRUE (1) if the vertex selector contains all vertices and
- *         FALSE (1) otherwise.
+ *         FALSE (0) otherwise.
  * 
  * Time complexity: O(1).
  */
@@ -504,9 +510,9 @@ int igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs,
 
 /**
  * \function igraph_vs_copy
- * \brief Creates a copy of a vertex iterator
- * \param src the iterator being copied
- * \param dest an uninitialized iterator that will contain the copy
+ * \brief Creates a copy of a vertex iterator.
+ * \param src The iterator being copied.
+ * \param dest An uninitialized iterator that will contain the copy.
  */
 int igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src) {
   memcpy(dest, src, sizeof(igraph_vs_t));
@@ -524,19 +530,19 @@ int igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src) {
 
 /**
  * \function igraph_vs_type
- * \brief Returns the type of the vertex selector
+ * \brief Returns the type of the vertex selector.
  */
 int igraph_vs_type(const igraph_vs_t *vs) { return vs->type; }
 
 /**
  * \function igraph_vs_size
- * \brief Returns the size of the vertex selector
+ * \brief Returns the size of the vertex selector.
  *
  * The size of the vertex selector is the number of vertices it will
  * yield when it is iterated over.
  *
- * \param graph the graph over which we will iterate
- * \param result the result will be returned here
+ * \param graph The graph over which we will iterate.
+ * \param result The result will be returned here.
  */
 int igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
   igraph_integer_t *result) {
@@ -878,12 +884,14 @@ int igraph_es_adj(igraph_es_t *es,
  *        selected.
  * \param mode Constant giving the type of the incident edges to
  *        select. This is ignored for undirected graphs. Possible values:
- *        \c IGRAPH_OUT, outgoing edges
- *        \c IGRAPH_IN, incoming edges
- *        \c IGRAPH_ALL, all edges
+ *        \c IGRAPH_OUT, outgoing edges;
+ *        \c IGRAPH_IN, incoming edges;
+ *        \c IGRAPH_ALL, all edges.
  * \return Error code.
  * 
  * Time complexity: O(1).
+ * 
+ * \example examples/simple/igraph_es_adj.c
  */
 
 int igraph_es_incident(igraph_es_t *es, 
@@ -1060,6 +1068,8 @@ igraph_es_t igraph_ess_vector(const igraph_vector_t *v) {
  * \return Error code.
  * 
  * Time complexity: O(1).
+ * 
+ * \example examples/simple/igraph_es_fromto.c
  */
 
 int igraph_es_fromto(igraph_es_t *es,
@@ -1114,7 +1124,7 @@ igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to) {
 
 /**
  * \function igraph_es_pairs
- * \brief Edge selector, multiple edges defined by their endpoints in a vector
+ * \brief Edge selector, multiple edges defined by their endpoints in a vector.
  * 
  * The edges between the given pairs of vertices will be included in the
  * edge selection. The vertex pairs must be defined in the vector <code>v</code>,
@@ -1130,6 +1140,8 @@ igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to) {
  * \sa \ref igraph_es_pairs_small()
  * 
  * Time complexity: O(n), the number of edges being selected.
+ * 
+ * \example examples/simple/igraph_es_pairs.c
  */
 
 int igraph_es_pairs(igraph_es_t *es, const igraph_vector_t *v, 
@@ -1150,7 +1162,7 @@ int igraph_es_pairs(igraph_es_t *es, const igraph_vector_t *v,
 
 /**
  * \function igraph_es_pairs_small
- * \brief Edge selector, multiple edges defined by their endpoints as arguments
+ * \brief Edge selector, multiple edges defined by their endpoints as arguments.
  * 
  * The edges between the given pairs of vertices will be included in the
  * edge selection. The vertex pairs must be given as the arguments of the
@@ -1206,7 +1218,7 @@ int igraph_es_multipairs(igraph_es_t *es, const igraph_vector_t *v,
   es->data.path.mode=directed;
   es->data.path.ptr=igraph_Calloc(1, igraph_vector_t);
   if (es->data.path.ptr==0) {
-    IGRAPH_ERROR("Cannor create edge selector", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("Cannot create edge selector", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, (igraph_vector_t*) es->data.path.ptr);
   
@@ -1215,6 +1227,10 @@ int igraph_es_multipairs(igraph_es_t *es, const igraph_vector_t *v,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+/**
+ * \example examples/simple/igraph_es_path.c
+ */
 
 int igraph_es_path(igraph_es_t *es, const igraph_vector_t *v, 
 		   igraph_bool_t directed) {
@@ -1322,9 +1338,9 @@ igraph_bool_t igraph_es_is_all(const igraph_es_t *es) {
 
 /**
  * \function igraph_es_copy
- * \brief Creates a copy of an edge iterator
- * \param src the iterator being copied
- * \param dest an uninitialized iterator that will contain the copy
+ * \brief Creates a copy of an edge iterator.
+ * \param src The iterator being copied.
+ * \param dest An uninitialized iterator that will contain the copy.
  */
 int igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
   memcpy(dest, src, sizeof(igraph_es_t));
@@ -1363,7 +1379,7 @@ int igraph_es_as_vector(const igraph_t *graph, igraph_es_t es,
 
 /**
  * \function igraph_es_type
- * \brief Returns the type of the edge selector
+ * \brief Returns the type of the edge selector.
  */
 int igraph_es_type(const igraph_es_t *es) { return es->type; }
 
@@ -1376,13 +1392,13 @@ int igraph_i_es_multipairs_size(const igraph_t *graph,
 
 /**
  * \function igraph_es_size
- * \brief Returns the size of the edge selector
+ * \brief Returns the size of the edge selector.
  *
  * The size of the edge selector is the number of vertices it will
  * yield when it is iterated over.
  *
- * \param graph the graph over which we will iterate
- * \param result the result will be returned here
+ * \param graph The graph over which we will iterate.
+ * \param result The result will be returned here.
  */
 int igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
   igraph_integer_t *result) {
@@ -1782,7 +1798,7 @@ int igraph_eit_create(const igraph_t *graph,
 
 /**
  * \function igraph_eit_destroy
- * \brief Destroys an edge iterator
+ * \brief Destroys an edge iterator.
  * 
  * \param eit Pointer to an edge iterator to destroy.
  * \sa \ref igraph_eit_create()

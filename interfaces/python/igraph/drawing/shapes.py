@@ -203,7 +203,7 @@ class UpTriangleDrawer(ShapeDrawer):
         ctx.move_to(center_x-width/2., center_y+height/2.)
         ctx.line_to(center_x, center_y-height/2.)
         ctx.line_to(center_x+width/2., center_y+height/2.)
-        ctx.line_to(center_x-width/2., center_y+height/2.)
+        ctx.close_path()
 
     @staticmethod
     def intersection_point(center_x, center_y, source_x, source_y, \
@@ -231,12 +231,41 @@ class DownTriangleDrawer(ShapeDrawer):
         ctx.move_to(center_x-width/2., center_y-height/2.)
         ctx.line_to(center_x, center_y+height/2.)
         ctx.line_to(center_x+width/2., center_y-height/2.)
-        ctx.line_to(center_x-width/2., center_y-height/2.)
+        ctx.close_path()
 
     @staticmethod
     def intersection_point(center_x, center_y, source_x, source_y, \
             width, height=None):
         """Determines where the triangle centered at (center_x, center_y)
+        intersects with a line drawn from (source_x, source_y) to
+        (center_x, center_y).
+
+        @see: ShapeDrawer.intersection_point"""
+        # TODO: finish it properly
+        height = height or width
+        return center_x, center_y
+
+class DiamondDrawer(ShapeDrawer):
+    """Static class which draws diamonds (i.e. rhombuses)"""
+    names = "diamond rhombus"
+
+    @staticmethod
+    def draw_path(ctx, center_x, center_y, width, height=None):
+        """Draws a rhombus on the Cairo context without stroking or
+        filling it.
+        
+        @see: ShapeDrawer.draw_path"""
+        height = height or width
+        ctx.move_to(center_x-width/2., center_y)
+        ctx.line_to(center_x, center_y+height/2.)
+        ctx.line_to(center_x+width/2., center_y)
+        ctx.line_to(center_x, center_y-height/2.)
+        ctx.close_path()
+
+    @staticmethod
+    def intersection_point(center_x, center_y, source_x, source_y, \
+            width, height=None):
+        """Determines where the rhombus centered at (center_x, center_y)
         intersects with a line drawn from (source_x, source_y) to
         (center_x, center_y).
 
@@ -260,9 +289,9 @@ class PolygonDrawer(AbstractCairoDrawer):
         """Constructs a new polygon drawer that draws on the given
         Cairo context.
 
-        @param  context  the Cairo context to draw on
-        @param  bbox     ignored, leave it at its default value
-        @param  points   the list of corner points
+        @param  context: the Cairo context to draw on
+        @param  bbox:    ignored, leave it at its default value
+        @param  points:  the list of corner points
         """
         super(PolygonDrawer, self).__init__(context, bbox)
         self.points = points

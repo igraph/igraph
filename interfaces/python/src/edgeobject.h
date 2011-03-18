@@ -45,6 +45,8 @@ PyObject* igraphmodule_Edge_repr(igraphmodule_EdgeObject *self);
 PyObject* igraphmodule_Edge_attributes(igraphmodule_EdgeObject* self);
 PyObject* igraphmodule_Edge_attribute_names(igraphmodule_EdgeObject* self);
 long igraphmodule_Edge_get_index_long(igraphmodule_EdgeObject* self);
+PyObject* igraphmodule_Edge_update_attributes(PyObject* self, PyObject* args,
+    PyObject* kwds);
 
 extern PyTypeObject igraphmodule_EdgeType;
 

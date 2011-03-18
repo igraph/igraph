@@ -60,7 +60,7 @@ extern "C" {
     PyObject *c_api_object;
     PyObject *module;
 
-    module = PyImport_ImportModule("igraph.core");
+    module = PyImport_ImportModule("igraph._igraph");
     if (module == 0)
       return -1;
 
@@ -71,7 +71,7 @@ extern "C" {
     }
 
     if (PyCObject_Check(c_api_object))
-      PyIGraph_API = (void**)PyIGraph_AsVoidPtr(c_api_object);
+      PyIGraph_API = (void**)PyCObject_AsVoidPtr(c_api_object);
 
     Py_DECREF(c_api_object);
     Py_DECREF(module);

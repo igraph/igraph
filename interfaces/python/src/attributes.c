@@ -26,6 +26,7 @@
 #include "common.h"
 #include "convert.h"
 #include "py2compat.h"
+#include "pyhelpers.h"
 
 int igraphmodule_i_attribute_struct_init(igraphmodule_i_attribute_struct *attrs) {
   int i;
@@ -103,14 +104,21 @@ void igraphmodule_invalidate_vertex_name_index(igraph_t *graph) {
   igraphmodule_i_attribute_struct_invalidate_vertex_name_index(ATTR_STRUCT(graph));
 }
 
+void igraphmodule_index_vertex_names(igraph_t *graph, igraph_bool_t force) {
+  igraphmodule_i_attribute_struct_index_vertex_names(ATTR_STRUCT(graph), force);
+}
+
 int igraphmodule_get_vertex_id_by_name(igraph_t *graph, PyObject* o, long int* vid) {
   igraphmodule_i_attribute_struct* attrs = ATTR_STRUCT(graph);
-  PyObject* o_vid;
+  PyObject* o_vid = NULL;
 
-  if (igraphmodule_i_attribute_struct_index_vertex_names(attrs, 0))
-    return 1;
+  if (graph) {
+    attrs = ATTR_STRUCT(graph);
+    if (igraphmodule_i_attribute_struct_index_vertex_names(attrs, 0))
+      return 1;
+    o_vid = PyDict_GetItem(attrs->vertex_name_index, o);
+  }
 
-  o_vid = PyDict_GetItem(attrs->vertex_name_index, o);
   if (o_vid == NULL) {
 #ifdef IGRAPH_PYTHON3
     PyErr_Format(PyExc_ValueError, "no such vertex: %R", o);
@@ -134,6 +142,127 @@ int igraphmodule_get_vertex_id_by_name(igraph_t *graph, PyObject* o, long int* v
   *vid = PyInt_AsLong(o_vid);
 
   return 0;
+}
+
+/**
+ * \brief Checks whether the given graph has the given graph attribute.
+ *
+ * \param  graph  the graph
+ * \param  name   the name of the attribute being searched for
+ */
+igraph_bool_t igraphmodule_has_graph_attribute(const igraph_t *graph, const char* name) {
+  PyObject *dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_GRAPH];
+  return name != 0 && dict != 0 && PyDict_GetItemString(dict, name) != 0;
+}
+
+/**
+ * \brief Checks whether the given graph has the given vertex attribute.
+ *
+ * \param  graph  the graph
+ * \param  name   the name of the attribute being searched for
+ */
+igraph_bool_t igraphmodule_has_vertex_attribute(const igraph_t *graph, const char* name) {
+  PyObject *dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_VERTEX];
+  return name != 0 && dict != 0 && PyDict_GetItemString(dict, name) != 0;
+}
+
+/**
+ * \brief Checks whether the given graph has the given edge attribute.
+ *
+ * \param  graph  the graph
+ * \param  name   the name of the attribute being searched for
+ */
+igraph_bool_t igraphmodule_has_edge_attribute(const igraph_t *graph, const char* name) {
+  PyObject *dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_EDGE];
+  return name != 0 && dict != 0 && PyDict_GetItemString(dict, name) != 0;
+}
+
+/**
+ * \brief Creates a new edge attribute and sets the values to None.
+ *
+ * This returns the actual list that we use to store the edge attributes, so
+ * be careful when modifying it - any modification will propagate back to the
+ * graph itself. You have been warned.
+ *
+ * \param  graph  the graph
+ * \param  name   the name of the attribute being created
+ * \returns  a Python list of the values or \c NULL if the given
+ *           attribute exists already (no exception set). The returned
+ *           reference is borrowed.
+ */
+PyObject* igraphmodule_create_edge_attribute(const igraph_t* graph,
+    const char* name) {
+  PyObject *dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_EDGE];
+  PyObject *values;
+  Py_ssize_t i, n;
+
+  if (dict == 0) {
+    dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_EDGE] = PyDict_New();
+  }
+  if (PyDict_GetItemString(dict, name))
+    return 0;
+
+  n = igraph_ecount(graph);
+  values = PyList_New(n);
+  if (values == 0)
+    return 0;
+
+  for (i = 0; i < n; i++) {
+    Py_INCREF(Py_None);
+    PyList_SET_ITEM(values, i, Py_None);   /* reference stolen */
+  }
+
+  if (PyDict_SetItemString(dict, name, values)) {
+    Py_DECREF(values);
+    return 0;
+  }
+
+  Py_DECREF(values);
+  return values;
+}
+
+/**
+ * \brief Returns the values of the given edge attribute for all edges in the
+ *        given graph.
+ *
+ * This returns the actual list that we use to store the edge attributes, so
+ * be careful when modifying it - any modification will propagate back to the
+ * graph itself. You have been warned.
+ *
+ * \param  graph  the graph
+ * \param  name   the name of the attribute being searched for
+ * \returns  a Python list or \c NULL if there is no such attribute
+ *           (no exception set). The returned reference is borrowed.
+ */
+PyObject* igraphmodule_get_edge_attribute_values(const igraph_t* graph,
+    const char* name) {
+  PyObject *dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_EDGE];
+  if (dict == 0)
+    return 0;
+  return PyDict_GetItemString(dict, name);
+}
+
+/**
+ * \brief Returns the values of the given edge attribute for all edges in the
+ *        given graph, optionally creating it if it does not exist.
+ *
+ * This returns the actual list that we use to store the edge attributes, so
+ * be careful when modifying it - any modification will propagate back to the
+ * graph itself. You have been warned.
+ *
+ * \param  graph  the graph
+ * \param  name   the name of the attribute being searched for
+ * \returns  a Python list (borrowed reference)
+ */
+PyObject* igraphmodule_create_or_get_edge_attribute_values(const igraph_t* graph,
+    const char* name) {
+  PyObject *dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_EDGE], *result;
+  if (dict == 0)
+    return 0;
+  result = PyDict_GetItemString(dict, name);
+  if (result != 0)
+    return result;
+  return igraphmodule_create_edge_attribute(graph, name);
 }
 
 /* Attribute handlers for the Python interface */
@@ -1220,17 +1349,16 @@ static int igraphmodule_i_attribute_get_info(const igraph_t *graph,
 igraph_bool_t igraphmodule_i_attribute_has_attr(const igraph_t *graph,
 						igraph_attribute_elemtype_t type,
 						const char* name) {
-  long int attrnum;
-  PyObject *o, *dict;
   switch (type) {
-  case IGRAPH_ATTRIBUTE_GRAPH:  attrnum=ATTRHASH_IDX_GRAPH;  break;
-  case IGRAPH_ATTRIBUTE_VERTEX: attrnum=ATTRHASH_IDX_VERTEX; break;
-  case IGRAPH_ATTRIBUTE_EDGE:   attrnum=ATTRHASH_IDX_EDGE;   break;
-  default: return 0; break;
+  case IGRAPH_ATTRIBUTE_GRAPH:
+    return igraphmodule_has_graph_attribute(graph, name);
+  case IGRAPH_ATTRIBUTE_VERTEX:
+    return igraphmodule_has_vertex_attribute(graph, name);
+  case IGRAPH_ATTRIBUTE_EDGE:
+    return igraphmodule_has_edge_attribute(graph, name);
+  default:
+    return 0;
   }
-  dict = ATTR_STRUCT_DICT(graph)[attrnum];
-  o = PyDict_GetItemString(dict, name);
-  return o != 0;
 }
 
 /* Returns the type of a given attribute */

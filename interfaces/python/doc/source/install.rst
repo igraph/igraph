@@ -73,13 +73,15 @@ its Python bindings is as follows:
 
 3. Head to http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/ and get
    the binary versions of Cairo (``cairo_1.8.10-3_win32.zip`` at the time of
-   writing), Fontconfig (``fontconfig_2.8.0-2_win32.zip``), Expat
-   (``expat_2.0.1-1_win32.zip``), ``libpng`` (``libpng_1.4.3-1_win32.zip``) and
-   ``zlib`` (``zlib_1.2.5-2_win32.zip``).  Version numbers may vary, so be
+   writing), Fontconfig (``fontconfig_2.8.0-2_win32.zip``), Freetype
+   (``freetype_2.4.4-1_win32.zip``), Expat (``expat_2.0.1-1_win32.zip``),
+   ``libpng`` (``libpng_1.4.3-1_win32.zip``) and ``zlib``
+   (``zlib_1.2.5-2_win32.zip``).  Version numbers may vary, so be
    adaptive! Each ZIP file will contain a ``bin`` subfolder with a DLL file in
    it. Put the following DLLs in ``Lib\site-packages\cairo`` within your Python
    installation:
 
+   - ``freetype6.dll`` (from ``freetype_2.4.4-1_win32.zip``)
    - ``libcairo-2.dll`` (from ``cairo_1.8.10-3_win32.zip``)
    - ``libexpat-1.dll`` (from ``expat_2.0.1-1_win32.zip``)
    - ``libfontconfig-1.dll`` (from ``fontconfig_2.8.0-2_win32.zip``)

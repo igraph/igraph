@@ -87,6 +87,9 @@
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
+ * 
+ * \example examples/simple/igraph_bfs.c
+ * \example examples/simple/igraph_bfs2.c
  */
 
 int igraph_bfs(const igraph_t *graph, 
@@ -110,7 +113,7 @@ int igraph_bfs(const igraph_t *graph,
   long int pred_vec=-1;
   
   long int rootpos=0;
-  long int noroots= roots ? igraph_vector_size(roots) : root;
+  long int noroots= roots ? igraph_vector_size(roots) : 1;
 
   if (!roots && (root < 0 || root >= no_of_nodes)) {
     IGRAPH_ERROR("Invalid root vertex in BFS", IGRAPH_EINVAL);

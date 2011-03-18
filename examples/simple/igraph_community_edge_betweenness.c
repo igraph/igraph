@@ -68,6 +68,16 @@ int main() {
   }
   printf("\n");
 
+  /* Try it once again without storage space for edges */
+  igraph_community_edge_betweenness(&g, 0, &eb, 0 /*merges */,
+				    0 /*bridges */, /*modularity=*/ 0,
+				    /*membership=*/ 0,
+				    IGRAPH_UNDIRECTED);
+  for (i=0; i<no_of_edges; i++) {
+    printf("%.2f ", VECTOR(eb)[i]);
+  }
+  printf("\n");
+
   igraph_vector_destroy(&eb);
   igraph_vector_destroy(&edges);
   igraph_destroy(&g);

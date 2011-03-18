@@ -1,12 +1,14 @@
-#include "config.h"
-#include "igraph_f2c.h"
+#include "f2c.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* compare two strings */
 
 #ifdef KR_headers
-integer igraphs_cmp(a0, b0, la, lb) char *a0, *b0; ftnlen la, lb;
+integer s_cmp(a0, b0, la, lb) char *a0, *b0; ftnlen la, lb;
 #else
-integer igraphs_cmp(char *a0, char *b0, ftnlen la, ftnlen lb)
+integer s_cmp(char *a0, char *b0, ftnlen la, ftnlen lb)
 #endif
 {
 register unsigned char *a, *aend, *b, *bend;
@@ -43,3 +45,6 @@ else
 	}
 return(0);
 }
+#ifdef __cplusplus
+}
+#endif

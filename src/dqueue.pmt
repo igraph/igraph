@@ -30,6 +30,19 @@
 #include <string.h> 		/* memcpy & co. */
 #include <stdlib.h>
 
+/** 
+ * \section igraph_dqueue
+ * <para>
+ * This is the classic data type of the double ended queue. Most of
+ * the time it is used if a First-In-First-Out (FIFO) behavior is
+ * needed. See the operations below.
+ * </para>
+ * 
+ * <para>
+ * \example examples/simple/dqueue.c
+ * </para>
+ */
+
 /**
  * \ingroup dqueue
  * \function igraph_dqueue_init

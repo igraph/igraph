@@ -174,6 +174,109 @@ PyObject* igraphmodule_Vertex_attributes(igraphmodule_VertexObject* self) {
   return dict;
 }
 
+/**
+ * \ingroup python_interface_vertex
+ * \brief Updates some attributes of a vertex
+ * 
+ * Incidentally, this method is re-used intact in edgeobject.c for edges.
+ *
+ * \param self the vertex object
+ * \param args positional arguments
+ * \param kwds keyword arguments
+ */
+PyObject* igraphmodule_Vertex_update_attributes(PyObject* self, PyObject* args,
+    PyObject* kwds) {
+  PyObject* items[] = { Py_None, kwds, 0 };
+  PyObject** pObj;
+  PyObject *key, *value, *it, *item, *keys;
+
+  igraph_bool_t ok = 1;
+
+  if (!PyArg_ParseTuple(args, "|O", &items[0]))
+    return NULL;
+
+  pObj = items;
+  for (pObj = items; ok && *pObj != 0; pObj++) {
+    PyObject* obj = *pObj;
+    PyObject* keys_func;
+
+    if (obj == Py_None)
+      continue;
+
+    keys_func = PyObject_GetAttrString(obj, "keys");
+    if (keys_func == 0)
+      PyErr_Clear();
+
+    if (keys_func != 0 && PyCallable_Check(keys_func)) {
+      /* Object has a "keys" method, so we iterate over the keys */
+      keys = PyObject_CallObject(keys_func, 0);
+      if (keys == 0) {
+        ok = 0;
+      } else {
+        /* Iterate over the keys */
+        it = PyObject_GetIter(keys);
+        if (it == 0) {
+          ok = 0;
+        } else {
+          while (ok && ((key = PyIter_Next(it)) != 0)) {
+            value = PyObject_GetItem(obj, key);
+            if (value == 0) {
+              ok = 0;
+            } else {
+              PyObject_SetItem((PyObject*)self, key, value);
+              Py_DECREF(value);
+            }
+            Py_DECREF(key);
+          }
+          Py_DECREF(it);
+          if (PyErr_Occurred())
+            ok = 0;
+        }
+        Py_DECREF(keys);
+      }
+    } else {
+      /* Object does not have a "keys" method; assume that it
+       * yields tuples when treated as an iterator */
+      it = PyObject_GetIter(obj);
+      if (!it) {
+        ok = 0;
+      } else {
+        while (ok && ((item = PyIter_Next(it)) != 0)) {
+          if (!PySequence_Check(item) || PyBaseString_Check(item)) {
+            PyErr_SetString(PyExc_TypeError, "cannot convert update sequence element to a sequence");
+            ok = 0;
+          } else {
+            key = PySequence_GetItem(item, 0);
+            if (key == 0) {
+              ok = 0;
+            } else {
+              value = PySequence_GetItem(item, 1);
+              if (value == 0) {
+                ok = 0;
+              } else {
+                PyObject_SetItem((PyObject*)self, key, value);
+                Py_DECREF(value);
+              }
+              Py_DECREF(key);
+            }
+          }
+          Py_DECREF(item);
+        }
+        Py_DECREF(it);
+        if (PyErr_Occurred())
+          ok = 0;
+      }
+    }
+
+    if (keys_func != 0)
+      Py_DECREF(keys_func);
+  }
+
+  if (ok)
+    Py_RETURN_NONE;
+  return 0;
+}
+
 /** \ingroup python_interface_vertex
  * \brief Returns the corresponding value to a given attribute of the vertex
  * \param self the vertex object
@@ -289,6 +392,102 @@ long igraphmodule_Vertex_get_index_long(igraphmodule_VertexObject* self) {
   return (long)self->idx;
 }
 
+/**************************************************************************/
+/* Implementing proxy method in Vertex that just forward the call to the
+ * appropriate Graph method.
+ * 
+ * These methods may also execute a postprocessing function on the result
+ * of the Graph method; for instance, this mechanism is used to turn the
+ * result of Graph.neighbors() (which is a list of vertex indices) into a
+ * list of Vertex objects.
+ */
+
+/* Dummy postprocessing function that does nothing. */
+static PyObject* _identity(igraphmodule_VertexObject* vertex, PyObject* obj) {
+  Py_INCREF(obj);
+  return obj;
+}
+
+/* Postprocessing function that converts a Python list of integers into a
+ * list of vertices in-place. */
+static PyObject* _convert_to_vertex_list(igraphmodule_VertexObject* vertex, PyObject* obj) {
+  Py_ssize_t i, n;
+
+  if (!PyList_Check(obj))
+    PyErr_SetString(PyExc_TypeError, "_convert_to_vertex_list expected list of integers");
+
+  n = PyList_Size(obj);
+  for (i = 0; i < n; i++) {
+    PyObject* idx = PyList_GET_ITEM(obj, i);
+    if (!PyInt_Check(idx))
+      PyErr_SetString(PyExc_TypeError, "_convert_to_vertex_list expected list of integers");
+    PyObject* v = igraphmodule_Vertex_New(vertex->gref, PyInt_AsLong(idx));
+    PyList_SetItem(obj, i, v);   /* reference to v stolen, reference to idx discarded */
+  }
+
+  Py_INCREF(obj);
+  return obj;
+}
+
+#define GRAPH_PROXY_METHOD_PP(FUNC, METHODNAME, POSTPROCESS) \
+    PyObject* igraphmodule_Vertex_##FUNC(igraphmodule_VertexObject* self, PyObject* args, PyObject* kwds) { \
+      PyObject *new_args, *item, *result;                     \
+      long int i, num_args = args ? PyTuple_Size(args)+1 : 1; \
+                                                              \
+      /* Prepend ourselves to args */                         \
+      new_args = PyTuple_New(num_args);                       \
+      Py_INCREF(self); PyTuple_SET_ITEM(new_args, 0, (PyObject*)self);   \
+      for (i = 1; i < num_args; i++) {                        \
+        item = PyTuple_GET_ITEM(args, i-1);                   \
+        Py_INCREF(item); PyTuple_SET_ITEM(new_args, i, item); \
+      }                                                       \
+                                                              \
+      /* Get the method instance */                           \
+      item = PyObject_GetAttrString((PyObject*)(self->gref), METHODNAME);  \
+      result = PyObject_Call(item, new_args, kwds);           \
+      Py_DECREF(item);                                        \
+      Py_DECREF(new_args);                                    \
+                                                              \
+      /* Optional postprocessing */                           \
+      if (result) {                                           \
+        PyObject* pp_result = POSTPROCESS(self, result);      \
+        Py_DECREF(result);                                    \
+        return pp_result;                                     \
+      }                                                       \
+      return NULL;                                            \
+    }
+
+#define GRAPH_PROXY_METHOD(FUNC, METHODNAME) \
+        GRAPH_PROXY_METHOD_PP(FUNC, METHODNAME, _identity)
+
+GRAPH_PROXY_METHOD(betweenness, "betweenness");
+GRAPH_PROXY_METHOD(closeness, "closeness");
+GRAPH_PROXY_METHOD(constraint, "constraint");
+GRAPH_PROXY_METHOD(degree, "degree");
+GRAPH_PROXY_METHOD(delete, "delete_vertices");
+GRAPH_PROXY_METHOD(eccentricity, "eccentricity");
+GRAPH_PROXY_METHOD(get_shortest_paths, "get_shortest_paths");
+GRAPH_PROXY_METHOD(indegree, "indegree");
+GRAPH_PROXY_METHOD(is_minimal_separator, "is_minimal_separator");
+GRAPH_PROXY_METHOD(is_separator, "is_separator");
+GRAPH_PROXY_METHOD_PP(neighbors, "neighbors", _convert_to_vertex_list);
+GRAPH_PROXY_METHOD(outdegree, "outdegree");
+GRAPH_PROXY_METHOD(pagerank, "pagerank");
+GRAPH_PROXY_METHOD_PP(predecessors, "predecessors", _convert_to_vertex_list);
+GRAPH_PROXY_METHOD(personalized_pagerank, "personalized_pagerank");
+GRAPH_PROXY_METHOD(shortest_paths, "shortest_paths");
+GRAPH_PROXY_METHOD(strength, "strength");
+GRAPH_PROXY_METHOD_PP(successors, "successors", _convert_to_vertex_list);
+
+#undef GRAPH_PROXY_METHOD
+
+#define GRAPH_PROXY_METHOD_SPEC(FUNC, METHODNAME) \
+  {METHODNAME, (PyCFunction)igraphmodule_Vertex_##FUNC, METH_VARARGS | METH_KEYWORDS, \
+    "Proxy method to L{Graph." METHODNAME "()\n\n"              \
+    "This method calls the " METHODNAME " method of the L{Graph} class " \
+    "with this vertex as the first argument, and returns the result.\n\n"\
+    "@see: Graph." METHODNAME "() for details."}
+
 /**
  * \ingroup python_interface_vertex
  * Method table for the \c igraph.Vertex object
@@ -304,8 +503,38 @@ PyMethodDef igraphmodule_Vertex_methods[] = {
     "attribute_names() -> list\n\n"
     "Returns the list of vertex attribute names\n"
   },
+  {"update_attributes", (PyCFunction)igraphmodule_Vertex_update_attributes,
+    METH_VARARGS | METH_KEYWORDS,
+    "update_attributes(E, **F) -> None\n\n"
+    "Updates the attributes of the vertex from dict/iterable E and F.\n\n"
+    "If E has a C{keys()} method, it does: C{for k in E: self[k] = E[k]}.\n"
+    "If E lacks a C{keys()} method, it does: C{for (k, v) in E: self[k] = v}.\n"
+    "In either case, this is followed by: C{for k in F: self[k] = F[k]}.\n\n"
+    "This method thus behaves similarly to the C{update()} method of Python\n"
+    "dictionaries."
+  },
+  GRAPH_PROXY_METHOD_SPEC(betweenness, "betweenness"),
+  GRAPH_PROXY_METHOD_SPEC(closeness, "closeness"),
+  GRAPH_PROXY_METHOD_SPEC(constraint, "constraint"),
+  GRAPH_PROXY_METHOD_SPEC(degree, "degree"),
+  GRAPH_PROXY_METHOD_SPEC(delete, "delete"),
+  GRAPH_PROXY_METHOD_SPEC(eccentricity, "eccentricity"),
+  GRAPH_PROXY_METHOD_SPEC(get_shortest_paths, "get_shortest_paths"),
+  GRAPH_PROXY_METHOD_SPEC(indegree, "indegree"),
+  GRAPH_PROXY_METHOD_SPEC(is_minimal_separator, "is_minimal_separator"),
+  GRAPH_PROXY_METHOD_SPEC(is_separator, "is_separator"),
+  GRAPH_PROXY_METHOD_SPEC(neighbors, "neighbors"),
+  GRAPH_PROXY_METHOD_SPEC(outdegree, "outdegree"),
+  GRAPH_PROXY_METHOD_SPEC(pagerank, "pagerank"),
+  GRAPH_PROXY_METHOD_SPEC(predecessors, "predecessors"),
+  GRAPH_PROXY_METHOD_SPEC(personalized_pagerank, "personalized_pagerank"),
+  GRAPH_PROXY_METHOD_SPEC(shortest_paths, "shortest_paths"),
+  GRAPH_PROXY_METHOD_SPEC(strength, "strength"),
+  GRAPH_PROXY_METHOD_SPEC(successors, "successors"),
   {NULL}
 };
+
+#undef GRAPH_PROXY_METHOD_SPEC
 
 /** \ingroup python_interface_vertex
  * This structure is the collection of functions necessary to implement

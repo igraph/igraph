@@ -230,7 +230,7 @@ int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
 	  long int which=RNG_INTEGER(0, ileft-1);
 	  long int nei=VECTOR(*inv)[which];
 	  VECTOR(*inv)[which] = VECTOR(*inv)[ileft-1];
-	  VECTOR(*inv)[ileft-1] = which;
+	  VECTOR(*inv)[ileft-1] = nei;
 	  if (VECTOR(visited)[nei] != actnode+1) {
 	    ADD_EDGE_TO(nei);
 	    i++;

@@ -143,6 +143,21 @@ AT_KEYWORDS([sparse matrix igraph_sparsemat_t ARPACK])
 AT_COMPILE_CHECK([simple/igraph_sparsemat5.c], [simple/igraph_sparsemat5.out])
 AT_CLEANUP
 
+AT_SETUP([Sparse matrix, conversion to dense (igraph_sparsemat_t): ])
+AT_KEYWORDS([sparse matrix igraph_sparsemat_t])
+AT_COMPILE_CHECK([simple/igraph_sparsemat6.c])
+AT_CLEANUP
+
+AT_SETUP([Sparse matrix, min & max (igraph_sparsemat_t): ])
+AT_KEYWORDS([sparse matrix igraph_sparsemat_t])
+AT_COMPILE_CHECK([simple/igraph_sparsemat7.c])
+AT_CLEANUP
+
+AT_SETUP([Sparse matrix, other operations (igraph_sparsemat_t): ])
+AT_KEYWORDS([sparse matrix igraph_sparsemat_t])
+AT_COMPILE_CHECK([simple/igraph_sparsemat8.c])
+AT_CLEANUP
+
 AT_SETUP([Another sparse matrix (igraph_spmatrix_t): ])
 AT_KEYWORDS([sparse matrix igraph_spmatrix_t])
 AT_COMPILE_CHECK([simple/spmatrix.c], [simple/spmatrix.out])
@@ -156,4 +171,9 @@ AT_CLEANUP
 AT_SETUP([Marked double ended queue (igraph_marked_queue_t): ])
 AT_KEYWORDS([dqueue queue igraph_marked_queue_t])
 AT_COMPILE_CHECK([simple/igraph_marked_queue.c], [], [], [INTERNAL])
+AT_CLEANUP
+
+AT_SETUP([Complex numbers (igraph_complex_t): ])
+AT_KEYWORDS([complex])
+AT_COMPILE_CHECK([simple/igraph_complex.c])
 AT_CLEANUP

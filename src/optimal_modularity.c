@@ -72,6 +72,8 @@ void igraph_i_optmod_hook(glp_tree *tree, void *info) {
  * for an algorithm that finds a local optimum in a greedy way. 
  * 
  * Time complexity: exponential in the number of vertices.
+ * 
+ * \example examples/simple/igraph_community_optimal_modularity.c
  */
 
 int igraph_community_optimal_modularity(const igraph_t *graph,
@@ -159,17 +161,16 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
   /* objective function */
   for (i=0; i<no_of_nodes; i++) {
     for (j=i; j<no_of_nodes; j++) {
-      long int ii = i < j ? i : j;
-      long int jj = i < j ? j : i;
       igraph_real_t c=1.0/2.0/no_of_edges;
       igraph_bool_t con;
       igraph_real_t e;
-      igraph_are_connected(graph, ii, jj, &con);
-      if (!con && directed) { igraph_are_connected(graph, jj, ii, &con); }
+      igraph_are_connected(graph, i, j, &con);
+      if (!con && directed) { igraph_are_connected(graph, j, i, &con); }
       e= con ? 1.0 : 0.0;
-      c *= e-VECTOR(degree)[ii]*VECTOR(degree)[jj] / 2.0 / no_of_edges;
-      if (ii != jj) { c *= 2.0; }
-      glp_set_obj_coef(ip, st+IDX(ii,jj), c);
+			if (i == j) e *= 2;
+      c *= e-VECTOR(degree)[i]*VECTOR(degree)[j] / 2.0 / no_of_edges;
+      if (i != j) { c *= 2.0; }
+      glp_set_obj_coef(ip, st+IDX(i,j), c);
     }
   }
 

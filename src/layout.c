@@ -39,6 +39,7 @@
 #include "igraph_dqueue.h"
 #include "igraph_arpack.h"
 #include "igraph_blas.h"
+#include "igraph_centrality.h"
 #include "config.h"
 #include <math.h>
 #include "igraph_math.h"
@@ -66,8 +67,8 @@ int igraph_i_layout_sphere_3d(igraph_matrix_t *coords, igraph_real_t *x, igraph_
  * \brief Places the vertices uniform randomly on a plane.
  * 
  * \param graph Pointer to an initialized graph object.
- * \param res Pointer to an initialized graph object. This will
- *        contain the result and will be resized in needed.
+ * \param res Pointer to an initialized matrix object. This will
+ *        contain the result and will be resized as needed.
  * \return Error code. The current implementation always returns with
  * success. 
  * 
@@ -135,8 +136,8 @@ int igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *res) {
  * \brief Places the vertices uniformly on a circle, in the order of vertex ids.
  * 
  * \param graph Pointer to an initialized graph object.
- * \param res Pointer to an initialized graph object. This will
- *        contain the result and will be resized in needed.
+ * \param res Pointer to an initialized matrix object. This will
+ *        contain the result and will be resized as needed.
  * \return Error code.
  * 
  * Time complexity: O(|V|), the
@@ -164,7 +165,8 @@ int igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res) {
  * Generate a star-like layout
  * 
  * \param graph The input graph.
- * \param res Pointer to an initialized matrix, the layout is stored here.
+ * \param res Pointer to an initialized matrix object. This will
+ *        contain the result and will be resized as needed.
  * \param center The id of the vertex to put in the center.
  * \param order A numeric vector giving the order of the vertices 
  *      (including the center vertex!). If a null pointer, then the
@@ -221,8 +223,8 @@ int igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
  * 5--11.  
  * 
  * \param graph Pointer to an initialized graph object.
- * \param res Pointer to an initialized matrix object, the will be
- * stored here. It will be resized.
+ * \param res Pointer to an initialized matrix object. This will
+ *        contain the result and will be resized as needed.
  * \return Error code. The current implementation always returns with
  * success. 
  * 
@@ -270,6 +272,93 @@ int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
 
 /**
  * \ingroup layout
+ * \function igraph_layout_grid
+ * \brief Places the vertices on a regular grid on the plane.
+ *
+ * \param graph Pointer to an initialized graph object.
+ * \param res Pointer to an initialized matrix object. This will
+ *        contain the result and will be resized as needed.
+ * \param width The number of vertices in a single row of the grid.
+ *        When zero or negative, the width of the grid will be the
+ *        square root of the number of vertices, rounded up if needed.
+ * \return Error code. The current implementation always returns with
+ *         success. 
+ * 
+ * Time complexity: O(|V|), the number of vertices. 
+ */
+int igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, long int width) {
+  long int i, no_of_nodes=igraph_vcount(graph);
+  igraph_real_t x, y;
+
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));  
+
+  if (width <= 0) {
+    width = ceil(sqrt(no_of_nodes));
+  }
+
+  x = y = 0;
+  for (i = 0; i < no_of_nodes; i++) {
+    MATRIX(*res, i, 0) = x++;
+    MATRIX(*res, i, 1) = y;
+    if (x == width) {
+      x = 0; y++;
+    }
+  }
+  
+  return 0;
+}
+
+/**
+ * \ingroup layout
+ * \function igraph_layout_grid_3d
+ * \brief Places the vertices on a regular grid in the 3D space.
+ *
+ * \param graph Pointer to an initialized graph object.
+ * \param res Pointer to an initialized matrix object. This will
+ *        contain the result and will be resized as needed.
+ * \param width  The number of vertices in a single row of the grid. When
+ *               zero or negative, the width is determined automatically.
+ * \param height The number of vertices in a single column of the grid. When
+ *               zero or negative, the height is determined automatically.
+ *
+ * \return Error code. The current implementation always returns with
+ *         success. 
+ * 
+ * Time complexity: O(|V|), the number of vertices. 
+ */
+int igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
+    long int width, long int height) {
+  long int i, no_of_nodes=igraph_vcount(graph);
+  igraph_real_t x, y, z;
+
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 3));  
+
+  if (width <= 0 && height <= 0) {
+    width = height = ceil(pow(no_of_nodes, 1.0 / 3));
+  } else if (width <= 0) {
+    width = ceil(sqrt(no_of_nodes / (double)height));
+  } else if (height <= 0) {
+    height = ceil(sqrt(no_of_nodes / (double)width));
+  }
+
+  x = y = z = 0;
+  for (i = 0; i < no_of_nodes; i++) {
+    MATRIX(*res, i, 0) = x++;
+    MATRIX(*res, i, 1) = y;
+    MATRIX(*res, i, 2) = z;
+    if (x == width) {
+      x = 0; y++;
+      if (y == height) {
+        y = 0; z++;
+      }
+    }
+  }
+  
+  return 0;
+}
+
+/**
+ * \ingroup layout
  * \function igraph_layout_fruchterman_reingold
  * \brief Places the vertices on a plane according to the Fruchterman-Reingold algorithm.
  *
@@ -281,7 +370,7 @@ int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
  * This function was ported from the SNA R package.
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will
- *        contain the result and will be resized in needed.
+ *        contain the result and will be resized as needed.
  * \param niter The number of iterations to do. A reasonable
  *        default value is 500.
  * \param maxdelta The maximum distance to move a vertex in an
@@ -333,7 +422,12 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
     IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
   }
 
-  /* TODO: check miny & maxy if present */
+  if (miny && igraph_vector_size(miny) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid miny vector length", IGRAPH_EINVAL);
+  }
+  if (maxy && igraph_vector_size(maxy) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid maxy vector length", IGRAPH_EINVAL);
+  }
   
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
   if (!use_seed) {
@@ -409,9 +503,9 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
       MATRIX(*res, j, 0)+=MATRIX(dxdy, j, 0); /* Update positions */
       MATRIX(*res, j, 1)+=MATRIX(dxdy, j, 1);
       if (miny && MATRIX(*res, j, 1) < VECTOR(*miny)[j]) {
-	MATRIX(*res, j, 1) = VECTOR(*miny)[j];
+        MATRIX(*res, j, 1) = VECTOR(*miny)[j];
       } else if (maxy && MATRIX(*res, j, 1) > VECTOR(*maxy)[j]) {
-	MATRIX(*res, j, 1) = VECTOR(*maxy)[j];
+        MATRIX(*res, j, 1) = VECTOR(*maxy)[j];
       }
     }
   }
@@ -437,7 +531,7 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
  * This function was ported from the SNA R package.
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will
- *        contain the result and will be resized in needed.
+ *        contain the result and will be resized as needed.
  * \param niter The number of iterations to do. A reasonable
  *        default value is 500.
  * \param maxdelta The maximum distance to move a vertex in an
@@ -1153,6 +1247,9 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
  * \param use_seed Logical, if true, the coordinates passed in \p res
  *   (should have the appropriate size) will be used for the first
  *   iteration.
+ * \param weight Pointer to a vector containing edge weights, 
+ *        the attraction along the edges will be multiplied by these. 
+ *        It will be ignored if it is a null-pointer.
  * \return Error code.
  *
  * Added in version 0.2.</para><para>
@@ -1162,12 +1259,13 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
  */
 
 int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph, 
-					    igraph_matrix_t *res,
-					    igraph_integer_t niter, igraph_real_t maxdelta, 
-					    igraph_real_t area, igraph_real_t coolexp,
-					    igraph_real_t repulserad, 
-					    igraph_real_t cellsize,
-					    igraph_bool_t use_seed) {
+               igraph_matrix_t *res,
+               igraph_integer_t niter, igraph_real_t maxdelta, 
+               igraph_real_t area, igraph_real_t coolexp,
+               igraph_real_t repulserad, 
+               igraph_real_t cellsize,
+               igraph_bool_t use_seed,
+               const igraph_vector_t *weight) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
@@ -1178,6 +1276,10 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
   igraph_2dgrid_iterator_t vidit;  
 
   igraph_real_t frk=sqrt(area/no_of_nodes);
+
+  if (weight && igraph_vector_size(weight) != igraph_ecount(graph)) {
+    IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+  }
 
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
   IGRAPH_VECTOR_INIT_FINALLY(&forcex, no_of_nodes);
@@ -1219,11 +1321,12 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
       igraph_integer_t from, to;
       igraph_real_t xd, yd, dist, force;
       igraph_edge(graph, j, &from, &to);
+      igraph_real_t w= weight ? VECTOR(*weight)[j] : 1.0;
       xd=MATRIX(*res, (long int)from, 0)-MATRIX(*res, (long int)to, 0);
       yd=MATRIX(*res, (long int)from, 1)-MATRIX(*res, (long int)to, 1);
       dist=sqrt(xd*xd+yd*yd);
       if (dist != 0) { xd/=dist; yd/=dist; }
-      force=dist*dist/frk;
+      force=dist*dist/frk*w;
       VECTOR(forcex)[(long int)from] -= xd*force;
       VECTOR(forcex)[(long int)to]   += xd*force;
       VECTOR(forcey)[(long int)from] -= yd*force;
@@ -1549,13 +1652,9 @@ int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_
  *
  * Added in version 0.2.
  * 
- * </para><para>
- * TODO: possible speedup could be achieved if we use a table for storing
- * the children of each node in the tree. (Now the implementation uses a
- * single array containing the parent of each node and a node's children
- * are determined by looking for other nodes that have this node as parent)
- * 
  * \sa \ref igraph_layout_reingold_tilford_circular().
+ * 
+ * \example examples/simple/igraph_layout_reingold_tilford.c
  */
 
 int igraph_layout_reingold_tilford(const igraph_t *graph,
@@ -1574,6 +1673,12 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
   const igraph_vector_t *proots=roots;
   igraph_neimode_t mode2;
   
+  /* TODO: possible speedup could be achieved if we use a table for storing
+   * the children of each node in the tree. (Now the implementation uses a
+   * single array containing the parent of each node and a node's children
+   * are determined by looking for other nodes that have this node as parent)
+   */
+
   if (!igraph_is_directed(graph)) {
     mode=IGRAPH_ALL;
   }
@@ -1592,21 +1697,23 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
 
   /* ----------------------------------------------------------------------- */
   /* If root vertices are not given, then do a topological sort and take 
-     the last element from every component */
+     the last element from every component for directed graphs, or select the
+     vertex with the maximum degree from each component for undirected graphs */
 
   if (!roots || igraph_vector_size(roots)==0) {
     
     igraph_vector_t order, membership;
     igraph_integer_t no_comps;
     long int i, noseen=0;
-    IGRAPH_VECTOR_INIT_FINALLY(&myroots, 0);
 
-    if (mode != IGRAPH_ALL) {
-      IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&myroots, 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
+
+    if (igraph_is_directed(graph) && mode != IGRAPH_ALL) {
       IGRAPH_CHECK(igraph_topological_sorting(graph, &order, mode2));
     } else {
-      IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, no_of_nodes-1));
-      IGRAPH_FINALLY(igraph_vector_destroy, &order);
+      IGRAPH_CHECK(igraph_sort_vertex_ids_by_degree(graph, &order,
+            igraph_vss_all(), IGRAPH_ALL, 0, IGRAPH_ASCENDING, 0));
     }
     
     IGRAPH_VECTOR_INIT_FINALLY(&membership, no_of_nodes);
@@ -1620,8 +1727,8 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
       long int v=VECTOR(order)[i];
       long int mem=VECTOR(membership)[v];
       if (VECTOR(myroots)[mem]==0) {
-	noseen += 1;
-	VECTOR(myroots)[mem]=v+1;
+        noseen += 1;
+        VECTOR(myroots)[mem]=v+1;
       }
     }
 
@@ -2459,7 +2566,7 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
 
 
 int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
-    long int n, void *extra) {
+    int n, void *extra) {
   igraph_matrix_t* matrix = (igraph_matrix_t*)extra;
   igraph_blas_dgemv_array(0, 1, matrix, from, 0, to);
   return 0;

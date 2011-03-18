@@ -132,10 +132,11 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
 				      igraph_vector_t *node_type_out_vec,
 				      igraph_bool_t loops);
 
-int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob);
+int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob, 
+			igraph_bool_t loops);
 int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
 			       igraph_integer_t size, igraph_integer_t nei,
-			       igraph_real_t p);
+			       igraph_real_t p, igraph_bool_t loops);
 
 int igraph_lastcit_game(igraph_t *graph, 
 			igraph_integer_t nodes, igraph_integer_t edges_per_node, 

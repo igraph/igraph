@@ -24,10 +24,10 @@ from igraph.compat import property
 from igraph.configuration import Configuration
 from igraph.drawing.colors import Palette, palettes
 from igraph.drawing.graph import DefaultGraphDrawer
-from igraph.drawing.utils import BoundingBox, Point
+from igraph.drawing.utils import BoundingBox, Point, Rectangle
 from igraph.utils import named_temporary_file
 
-__all__ = ["BoundingBox", "DefaultGraphDrawer", "Plot", "Point", "plot"]
+__all__ = ["BoundingBox", "DefaultGraphDrawer", "Plot", "Point", "Rectangle", "plot"]
 
 __license__ = "GPL"
 
@@ -73,8 +73,8 @@ class Plot(object):
     which surface class will be used. Please note that not all surfaces might
     be available, depending on your C{pycairo} installation.
 
-    A C{Plot} has an assigned default palette (see L{igraph.colors.Palette}) which
-    is used for plotting objects.
+    A C{Plot} has an assigned default palette (see L{igraph.drawing.colors.Palette})
+    which is used for plotting objects.
 
     A C{Plot} object also has a list of objects to be plotted with their
     respective bounding boxes, palettes and opacities. Palettes assigned
@@ -107,14 +107,14 @@ class Plot(object):
 
         @param palette: the palette primarily used on the plot if the
           added objects do not specify a private palette. Must be either
-          an L{igraph.colors.Palette} object or a string referring to a valid
-          key of C{igraph.colors.palettes} (see module L{igraph.colors}) or C{None}.
-          In the latter case, the default palette given by the configuration
-          key C{plotting.palette} is used.
+          an L{igraph.drawing.colors.Palette} object or a string referring
+          to a valid key of C{igraph.drawing.colors.palettes} (see module
+          L{igraph.drawing.colors}) or C{None}. In the latter case, the default
+          palette given by the configuration key C{plotting.palette} is used.
 
         @param background: the background color. If C{None}, the background
           will be transparent. You can use any color specification here that
-          is understood by L{igraph.colors.color_name_to_rgba}.
+          is understood by L{igraph.drawing.colors.color_name_to_rgba}.
         """
         self._filename = None
         self._surface_was_created = not isinstance(target, cairo.Surface)
@@ -382,12 +382,17 @@ def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
           Cairo can handle.
 
         - C{string} -- a file with the given name will be created and an
-          appropriate Cairo surface will be attached to it.
+          appropriate Cairo surface will be attached to it. The supported image
+          formats are: PNG, PDF, SVG and PostScript.
           
-    @param bbox: the bounding box of the plot. It must be a tuple with four
-      integers, the first two denoting the X and Y coordinates of a corner
-      and the latter two denoting the X and Y coordinates of the opposite
-      corner. It can also be a L{BoundingBox} object.
+    @param bbox: the bounding box of the plot. It must be a tuple with either
+      two or four integers, or a L{BoundingBox} object. If this is a tuple
+      with two integers, it is interpreted as the width and height of the plot
+      (in pixels for PNG images and on-screen plots, or in points for PDF,
+      SVG and PostScript plots, where 72 pt = 1 inch = 2.54 cm). If this is
+      a tuple with four integers, the first two denotes the X and Y coordinates
+      of a corner and the latter two denoting the X and Y coordinates of the
+      opposite corner.
 
     @keyword opacity: the opacity of the object being plotted. It can be
       used to overlap several plots of the same graph if you use the same
@@ -395,6 +400,12 @@ def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
       0.5 and then plot its spanning tree over it with opacity 0.1. To
       achieve this, you'll need to modify the L{Plot} object returned with
       L{Plot.add}.
+
+    @keyword margin: the top, right, bottom, left margins as a 4-tuple.
+      If it has less than 4 elements or is a single float, the elements
+      will be re-used until the length is at least 4. The default margin
+      is 20 on each side.
+
     @return: an appropriate L{Plot} object.
 
     @see: Graph.__plot__
@@ -403,7 +414,14 @@ def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
         bbox = BoundingBox(bbox)
 
     result = Plot(target, bbox, background="white")
+
+    if "margin" in kwds:
+        bbox = bbox.contract(kwds["margin"])
+        del kwds["margin"]
+    else:
+        bbox = bbox.contract(20)
     result.add(obj, bbox, *args, **kwds)
+
     if target is None:
         result.show()
 

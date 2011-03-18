@@ -146,32 +146,31 @@ class CommunityTests(unittest.TestCase):
     def testClauset(self):
         g = Graph.Full(5) + Graph.Full(5)
         g.add_edges([(0, 5)])
-        cl = g.community_fastgreedy()
-        self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1])
+        cl = g.community_fastgreedy().as_clustering()
+        self.assertEquals(cl.membership, [0,0,0,0,0,1,1,1,1,1])
         self.assertAlmostEqual(cl.q, 0.4523, places=3)
 
         g = Graph.Full(4) + Graph.Full(2)
         g.add_edges([(3,4)])
         weights = [1, 1, 1, 1, 1, 1, 10, 10]
-        cl = g.community_fastgreedy(weights)
-        self.failUnless(cl.membership == [0, 0, 0, 1, 1, 1])
+        cl = g.community_fastgreedy(weights).as_clustering()
+        self.assertEquals(cl.membership, [0, 0, 0, 1, 1, 1])
         self.assertAlmostEqual(cl.q, 0.1708, places=3)
         
         g.es["weight"] = [3] * g.ecount()
-        cl = g.community_fastgreedy("weight")
-        self.failUnless(cl.membership == [0, 0, 0, 0, 1, 1])
+        cl = g.community_fastgreedy("weight").as_clustering()
+        self.assertEquals(cl.membership, [0, 0, 0, 0, 1, 1])
         self.assertAlmostEqual(cl.q, 0.1796, places=3)
 
     def testEigenvector(self):
         g = Graph.Full(5) + Graph.Full(5)
         g.add_edges([(0, 5)])
-        cl = g.community_leading_eigenvector_naive()
+        cl = g.community_leading_eigenvector()
         self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1])
         self.assertAlmostEqual(cl.q, 0.4523, places=3)
         cl = g.community_leading_eigenvector(2)
         self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1])
         self.assertAlmostEqual(cl.q, 0.4523, places=3)
-
 
     def testLabelPropagation(self):
         # Nothing to test there really, since the algorithm
@@ -240,9 +239,9 @@ class CommunityTests(unittest.TestCase):
     def testWalktrap(self):
         g = Graph.Full(5) + Graph.Full(5) + Graph.Full(5)
         g += [(0,5), (5,10), (10, 0)]
-        cl = g.community_walktrap()
+        cl = g.community_walktrap().as_clustering()
         self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1,2,2,2,2,2])
-        cl = g.community_walktrap(steps=3)
+        cl = g.community_walktrap(steps=3).as_clustering()
         self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1,2,2,2,2,2])
        
 

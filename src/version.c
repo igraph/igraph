@@ -43,6 +43,8 @@ static const char *igraph_version_string=IGRAPH_VERSION;
  * \return Error code.
  * 
  * Time complexity: O(1).
+ * 
+ * \example examples/simple/igraph_version.c
  */
 
 int igraph_version(const char **version_string,

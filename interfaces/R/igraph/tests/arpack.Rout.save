@@ -40,7 +40,7 @@ Type 'q()' to quit R.
 > r2 <- eigen(graph.laplacian(graph.star(10, mode="undirected")))
 > 
 > correctSign <- function(x) { if (x[1]<0) { -x } else { x } }
-> r1$values == r2$values[1]
+> max(abs(r1$values - r2$values[1])) < 1e-14
 [1] TRUE
 > max(abs(correctSign(r1$vectors) - correctSign(r2$vectors[,1]))) < 1e-14
 [1] TRUE

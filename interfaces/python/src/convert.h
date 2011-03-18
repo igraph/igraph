@@ -30,8 +30,8 @@
 #define PYTHON_CONVERT_H
 
 #include <Python.h>
-#include <igraph/igraph_constants.h>
-#include <igraph/igraph_types.h>
+#include <igraph_constants.h>
+#include <igraph_types.h>
 #include "graphobject.h"
 
 typedef enum { IGRAPHMODULE_TYPE_INT=0, IGRAPHMODULE_TYPE_FLOAT }
@@ -82,13 +82,16 @@ int igraphmodule_PyObject_to_vector_int_t(PyObject *list, igraph_vector_int_t *v
 int igraphmodule_PyObject_to_vector_long_t(PyObject *list, igraph_vector_long_t *v);
 int igraphmodule_PyObject_to_vector_bool_t(PyObject *list, igraph_vector_bool_t *v);
 
+int igraphmodule_PyObject_to_edgelist(PyObject *list, igraph_vector_t *v, igraph_t *graph);
+
 int igraphmodule_PyList_to_matrix_t(PyObject *o, igraph_matrix_t *m);
 PyObject* igraphmodule_strvector_t_to_PyList(igraph_strvector_t *v);
 int igraphmodule_PyList_to_strvector_t(PyObject* v, igraph_strvector_t *result);
 int igraphmodule_append_PyIter_to_vector_ptr_t(PyObject *it, igraph_vector_ptr_t *v);
 int igraphmodule_PyObject_to_vid(PyObject *o, long int *vid, igraph_t *graph);
 int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
-                  igraph_t *graph, igraph_bool_t *return_single);
+                  igraph_t *graph, igraph_bool_t *return_single,
+				  igraph_integer_t *single_vid);
 int igraphmodule_PyObject_to_es_t(PyObject *o, igraph_es_t *vs,
 				  igraph_bool_t *return_single);
 int igraphmodule_PyObject_to_attribute_values(PyObject *o,

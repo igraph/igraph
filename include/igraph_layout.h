@@ -52,6 +52,7 @@ int igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res);
 int igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res);
 int igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
 		       igraph_integer_t center, const igraph_vector_t *order);
+int igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, long int width);
 int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *res,
 				       igraph_integer_t niter, igraph_real_t maxdelta,
 				       igraph_real_t area, igraph_real_t coolexp, 
@@ -64,7 +65,8 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
 					    igraph_integer_t niter, igraph_real_t maxdelta, 
 					    igraph_real_t area, igraph_real_t coolexp,
 					    igraph_real_t repulserad, 
-					    igraph_real_t cellsize, igraph_bool_t use_seed);
+					    igraph_real_t cellsize, igraph_bool_t use_seed,
+                        const igraph_vector_t *weight);
 int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
 			       igraph_integer_t niter, igraph_real_t sigma, 
 			       igraph_real_t initemp, igraph_real_t coolexp,
@@ -88,6 +90,8 @@ int igraph_layout_reingold_tilford_circular(const igraph_t *graph,
 
 int igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *res);
 int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res);
+int igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
+        long int width, long int height);
 int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph, 
 					  igraph_matrix_t *res,
 					  igraph_integer_t niter, igraph_real_t maxdelta,

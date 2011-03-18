@@ -50,8 +50,7 @@ print.communities <- function(x, ...) {
     cat("Modularity (best split):", modularity(x), "\n")
     cat("Membership vector:\n")
     print(membership(x))
-  } else if (algorithm(x) %in% c("leading eigenvector",
-                                "leading eigenvector, naive")) {
+  } else if (algorithm(x) %in% c("leading eigenvector")) {
     cat("Number of communities (best split):", max(membership(x)), "\n")
     cat("Modularity (best split):", modularity(x), "\n")
     cat("Membership vector:\n")
@@ -134,10 +133,9 @@ crossing <- function(communities, graph) {
 }
 
 is.hierarchical <- function(communities) {
-  if (algorithm(communities) %in% c("walktrap", "edge betweenness", "fast greedy")) {
+  if (algorithm(communities) %in% c("walktrap", "edge betweenness", "fast greedy", "leading eigenvector")) {
     TRUE
-  } else if (algorithm(communities) %in% c("spinglass", "leading eigenvector",
-                                 "leading eigenvector, naive",
+  } else if (algorithm(communities) %in% c("spinglass",
                                  "label propagation", "multi level",
                                  "optimal")) {
     FALSE
@@ -258,6 +256,40 @@ cutat <- function(communities, no, steps) {
     steps <- communities$vcount-no
     community.to.membership2(mm, communities$vcount, steps)    
   }
+}
+
+showtrace <- function(communities) {
+
+  if (!inherits(communities, "communities")) {
+    stop("Not a community structure")
+  }
+  if (is.null(communities$history)) {
+    stop("History was not recorded")
+  }
+
+  res <- character()
+  i <- 1
+  while (i <= length(communities$history)) {
+    if (communities$history[i] == 2) {  # IGRAPH_LEVC_HIST_SPLIT
+      resnew <- paste("Splitting community", communities$history[i+1],
+                      "into two.")
+      i <- i + 2
+    } else if (communities$history[i]==3) { # IGRAPH_LEVC_HIST_FAILED
+      resnew <- paste("Failed splitting community",
+                      communities$history[i+1], "into two.")
+      i <- i + 2
+    } else if (communities$history[i]==4) { # IGRAPH_LEVC_START_FULL
+      resnew <- "Starting with the whole graph as a community."
+      i <- i + 1
+    } else if (communities$history[i]==5) { # IGRAPH_LEVC_START_GIVEN
+      resnew <- paste("Starting from the", communities$history[i+1],
+                      "given communities.")
+      i <- i + 2
+    }
+
+    res <- c(res, resnew)
+  }
+  res
 }
 
 #####################################################################
@@ -428,67 +460,37 @@ community.to.membership <- function(graph, merges, steps, membership=TRUE,
         PACKAGE="igraph")
 }
 
-leading.eigenvector.community <- function(graph, steps=-1, options=igraph.arpack.default) {
+igraph.i.levc.arp <- function(externalP, externalE) {
+  f <- function(v) {
+    v <- as.numeric(v)
+    .Call("R_igraph_i_levc_arp", externalP, externalE, v, PACKAGE="igraph");
+  }
+  f
+}
+
+leading.eigenvector.community <- function(graph, steps=-1, start=NULL,
+                                          options=igraph.arpack.default,
+                                          callback=NULL, extra=NULL,
+                                          env=parent.frame()){
+
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
   steps <- as.numeric(steps)
+  if (!is.null(start)) { start <- as.numeric(start)-1 }
   options.tmp <- igraph.arpack.default; options.tmp[ names(options) ] <- options ; options <- options.tmp
-
+  
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
-  res <- .Call("R_igraph_community_leading_eigenvector", graph, steps, options,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_community_leading_eigenvector", graph, steps,
+               options, start, callback, extra, env,
+               environment(igraph.i.levc.arp),
+               PACKAGE="igraph")
   res$algorithm <- "leading eigenvector"
   res$vcount <- vcount(graph)
   res$membership <- res$membership + 1
   res$merges <- res$merges + 1
+  res$history <- res$history + 1
   class(res) <- "communities"
-  res
-}
-
-leading.eigenvector.community.naive <- function(graph, steps=-1, options=igraph.arpack.default) {
-  # Argument checks
-  if (!is.igraph(graph)) { stop("Not a graph object") }
-  steps <- as.numeric(steps)
-  options.tmp <- igraph.arpack.default; options.tmp[ names(options) ] <- options ; options <- options.tmp
-
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  # Function call
-  res <- .Call("R_igraph_community_leading_eigenvector_naive", graph, steps, options,
-        PACKAGE="igraph")
-  res$algorithm <- "leading eigenvector, naive"
-  res$vcount <- vcount(graph)
-  res$membership <- res$membership + 1
-  res$merges <- res$merges + 1
-  class(res) <- "communities"
-  res
-}
-
-leading.eigenvector.community.step <- function(graph, fromhere=NULL,
-                                               membership=rep(0, vcount(graph)),
-                                               community=0,
-                                               options=igraph.arpack.default) {
-
-  if (!is.igraph(graph)) {
-    stop("Not a graph object!")
-  }
-  if (!is.null(fromhere)) {
-    if (class(fromhere) != "igraph.eigencstep") {
-      stop("invalid community structure object given")
-    }
-    membership <- fromhere[["membership"]]
-  }
-
-  options.tmp <- igraph.arpack.default
-  options.tmp[names(options)] <- options
-  options <- options.tmp
-
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  res <- .Call("R_igraph_community_leading_eigenvector_step",
-               graph, as.numeric(membership), as.numeric(community),
-               options,
-               PACKAGE="igraph")
-  class(res) <- "igraph.eigencstep"
   res
 }
 

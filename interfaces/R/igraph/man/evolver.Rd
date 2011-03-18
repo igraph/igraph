@@ -171,42 +171,63 @@ revolver.probs.de (graph, kernel, cats)
 revolver.probs.ADE.dpareto (graph, par, cats, gcats, agebins)
 }
 \arguments{
-  \item{nodes}{}
-  \item{kernel}{}
-  \item{outseq}{}
-  \item{outdist}{}
-  \item{m}{}
-  \item{directed}{}
-  \item{graph}{}
-  \item{niter}{}
-  \item{sd}{}
-  \item{norm}{}
-  \item{cites}{}
-  \item{expected}{}
-  \item{error}{}
-  \item{debug}{}
-  \item{agebins}{}
-  \item{cats}{}
-  \item{window}{}
-  \item{vtime}{}
-  \item{etime}{}
-  \item{events}{}
-  \item{delta}{}
-  \item{filter}{}
-  \item{alpha}{}
-  \item{a}{}
-  \item{paralpha}{}
-  \item{parbeta}{}
-  \item{parscale}{}
-  \item{abstol}{}
-  \item{reltol}{}
-  \item{maxit}{}
-  \item{beta}{}
-  \item{coeffs}{}
-  \item{par}{}
-  \item{ntk}{}
-  \item{gcats}{}
-  \item{st}{}
+  \item{nodes}{The number of vertices in the generated network.}
+  \item{kernel}{The kernel function, a vector, matrix or array,
+    depending on the number of model parameters.}
+  \item{outseq}{The out-degree sequence, or \code{NULL} if no out-degree
+    sequence is used.}
+  \item{outdist}{The out-degree distribution, or \code{NULL} if all
+    vertices have the same out-degree. This argument is ignored if the
+    \code{outseq} argument is not \code{NULL}.}
+  \item{m}{Numeric scalar, the out-degree of the verticec. It is ignored
+    if at least one of \code{outseq} and \code{outdist} is not
+    \code{NULL}.}
+  \item{directed}{Logical scalar, whether to create a directed graph.}
+  \item{graph}{The input graph.}
+  \item{niter}{The number of iterations to perform.}
+  \item{sd}{Logical scalar, whether to return the standard deviation of
+    the estimates.}
+  \item{norm}{Logical scalar, whether to return the normalizing factors.}
+  \item{cites}{Logical scalar, whether to return the number of citations
+    to the different vertex types.}
+  \item{expected}{Logical scalar, whether to return the expected number
+    of citations for the different vertex types.}
+  \item{error}{Logical scalar, whether to return the error of the fit.}
+  \item{debug}{Currently not used.}
+  \item{agebins}{The number of bins for vertex age.}
+  \item{cats}{The number of categories to use.}
+  \item{window}{The width of the time window to use, measured in number
+    of vertices.}
+  \item{vtime}{Numeric vector, the time steps when the vertices where
+    added to the network.}
+  \item{etime}{Numeric vector, the time steps when the edges where added
+    to the network.}
+  \item{events}{A list of numeric vectors, each vector represents an
+    event, with the participation of the listed vertices.}
+  \item{delta}{Real scalar, the error margin that is allowed for the
+    convergence.}
+  \item{filter}{Logical vector, length is the number of vertices. Only
+    vertices corresponding to \code{TRUE} entries are used in the
+    fitting.}
+  \item{alpha}{Starting value for the \sQuote{\code{alpha}} parameter.}
+  \item{a}{Starting value for the \sQuote{\code{a}} parameter.}
+  \item{paralpha}{Starting value for the \sQuote{\code{paralpha}}
+    (Pareto alpha) parameter.}
+  \item{parbeta}{Starting value for the \sQuote{\code{parbeta}} (Pareto
+    beta) parameter.}
+  \item{parscale}{Starting value for the \sQuote{\code{parscale}}
+    (Pareto scale) parameter.}
+  \item{abstol}{Real scalar, absolute tolerance for the ML fitting.}
+  \item{reltol}{Real scalar, relative tolerance for the ML fitting.}
+  \item{maxit}{Numeric scalar, the maximum number of iterations.}
+  \item{beta}{Real scalar, starting value for the \sQuote{\code{beta}}
+    parameter.}
+  \item{coeffs}{Numeric vector, starting values for the coefficients.}
+  \item{par}{Pareto parameters for the different vertex types, in a
+    matrix.}
+  \item{ntk}{Logical scalar, whether to return the Ntk values.}
+  \item{gcats}{Numeric vector, the vertex types.}
+  \item{st}{Logical scalar, whether to return the S(t) values.}
 }
 \details{
   The functions should be considered as experimental, so no

@@ -2026,6 +2026,11 @@ igraph_attribute_table_t igraph_cattribute_table={
  * vertex might have an attribute called <code>name</code>, but it is
  * not possible to have a <code>coords</code> graph (or other)
  * attribute which is a vector of numbers.</para>
+ * 
+ * \example examples/simple/cattributes.c
+ * \example examples/simple/cattributes2.c
+ * \example examples/simple/cattributes3.c
+ * \example examples/simple/cattributes4.c
  */
 
 /**

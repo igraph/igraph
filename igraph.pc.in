@@ -6,5 +6,7 @@ includedir=@includedir@
 Name: libigraph
 Description: A library for creating and manipulating graphs
 Version: @VERSION@
+URL: http://igraph.sourceforge.net
 Libs: -L${libdir} -ligraph
-Cflags: -I${includedir}
+Libs.private: -lxml2 -lz -lm
+Cflags: -I${includedir}/igraph

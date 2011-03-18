@@ -184,11 +184,11 @@ tkigraph <- function() {
         command=function() { .tkigraph.dist.matrix() })
   tkadd(distances.menu, "command", label="Distances from/to vertex",
         command=function() { .tkigraph.distance.tofrom() })
-  tkadd(distances.menu, "command", label="Diameter",
+  tkadd(distances.menu, "command", label="Diameter (undirected)",
         command=function() { .tkigraph.diameter() })
   tkadd(distances.menu, "command", label="Draw diameter",
         command=function() { .tkigraph.plot.diameter(simple=FALSE) })
-  tkadd(distances.menu, "command", label="Average path length",
+  tkadd(distances.menu, "command", label="Average path length (undirected)",
         command=function() { .tkigraph.diameter(mode="path") })
   tkadd(main.menu, "cascade", label="Distances", menu=distances.menu)
 
@@ -1343,7 +1343,7 @@ tkigraph <- function() {
   graphs <- get("graphs", .tkigraph.env)
   for (i in seq(along=gnos)) {
     if (mode=="dia") {
-      dia[i] <- diameter(graphs[[ gnos[i] ]])
+      dia[i] <- diameter(graphs[[ gnos[i] ]], directed=FALSE)
     } else if (mode=="path") {
       dia[i] <- average.path.length(graphs[[ gnos[i] ]], directed=FALSE)
     }

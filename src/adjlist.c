@@ -65,7 +65,10 @@
  * vertices), but you don't know how many vertices you will visit
  * during the computation.
  * </para>
- * 
+ *
+ * <para>
+ * \example examples/simple/adjlist.c
+ * </para>
  */
 
 /**

@@ -54,6 +54,8 @@
  * 
  * \sa \ref igraph_assortativity if the vertex types are defines by
  * numeric values (e.g. vertex degree), instead of categories. 
+ * 
+ * \example examples/simple/assortativity.c
  */
 
 int igraph_assortativity_nominal(const igraph_t *graph, 
@@ -158,6 +160,8 @@ int igraph_assortativity_nominal(const igraph_t *graph,
  * categories instead of numeric labels, and \ref
  * igraph_assortativity_degree() for the special case of assortativity
  * based on vertex degree.
+ * 
+ * \example examples/simple/assortativity.c
  */
 
 int igraph_assortativity(const igraph_t *graph,
@@ -256,6 +260,8 @@ int igraph_assortativity(const igraph_t *graph,
  * 
  * \sa \ref igraph_assortativity() for the general function
  * calculating assortativity for any kind of numeric vertex values.
+ * 
+ * \example examples/simple/assortativity.c
  */
 
 int igraph_assortativity_degree(const igraph_t *graph,

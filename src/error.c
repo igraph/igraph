@@ -86,7 +86,8 @@ static char *igraph_i_error_strings[]=
     /* 49 */ "GLPK Error, GLP_ETMLIM",
     /* 50 */ "GLPK Error, GLP_STOP",
     /* 51 */ "Internal attribute handler error",
-    /* 52 */ "Unimplemented attribute combination for this type"
+    /* 52 */ "Unimplemented attribute combination for this type",
+    /* 53 */ "LAPACK call resulted an error"
 };
 
 const char* igraph_strerror(const int igraph_errno) {
@@ -170,6 +171,10 @@ int IGRAPH_FINALLY_STACK_SIZE(void) {
 }
 
 static igraph_warning_handler_t *igraph_i_warning_handler=0;
+
+void igraph_warning_handler_ignore (const char *reason, const char *file,
+				   int line, int igraph_errno) {
+}
 
 void igraph_warning_handler_print (const char *reason, const char *file,
 				   int line, int igraph_errno) {

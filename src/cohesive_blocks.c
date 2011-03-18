@@ -154,6 +154,23 @@ igraph_bool_t igraph_i_cb_isin(const igraph_vector_t *needle,
   return np==nlen;
 }
 
+/**
+ * \function igraph_cohesive_blocks
+ * Identifies the hierarchical cohesive block structure of a graph
+ * 
+ * TODO
+ * \param graph
+ * \param blocks
+ * \param cohesion
+ * \param parent
+ * \param block_tree
+ * \return Error code.
+ * 
+ * Time complexity: TODO.
+ * 
+ * \example examples/simple/cohesive_blocks.c
+ */
+
 int igraph_cohesive_blocks(const igraph_t *graph,
 			   igraph_vector_ptr_t *blocks,
 			   igraph_vector_t *cohesion,

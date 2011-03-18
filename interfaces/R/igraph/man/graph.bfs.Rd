@@ -91,7 +91,8 @@ graph.bfs (graph, root, neimode = c("out", "in", "all", "total"),
 \examples{
 ## Two rings
 graph.bfs(graph.ring(10) \%du\% graph.ring(10), root=1, "out",
-          TRUE, TRUE, TRUE, TRUE, TRUE, TRUE)
+          order=TRUE, rank=TRUE, father=TRUE, pred=TRUE,
+          succ=TRUE, dist=TRUE)
 
 ## How to use a callback
 f <- function(graph, data, extra) {

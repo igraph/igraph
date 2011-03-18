@@ -23,7 +23,7 @@
 
 #include <Python.h>
 #include <pythonrun.h>
-#include <igraph/igraph.h>
+#include <igraph.h>
 #include "arpackobject.h"
 #include "attributes.h"
 #include "bfsiter.h"

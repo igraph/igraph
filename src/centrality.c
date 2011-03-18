@@ -40,7 +40,7 @@
 #include "bigint.h"
 
 int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
-				    long int n, void *extra) {
+				    int n, void *extra) {
   igraph_adjlist_t *adjlist=extra;
   igraph_vector_t *neis;
   long int i, j, nlen;
@@ -66,7 +66,7 @@ typedef struct igraph_i_eigenvector_centrality_t {
 } igraph_i_eigenvector_centrality_t;
 
 int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *from,
-				     long int n, void *extra) {
+				     int n, void *extra) {
 
   igraph_i_eigenvector_centrality_t *data=extra;
   const igraph_t *graph=data->graph;
@@ -307,7 +307,7 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
   options->which[0]='L' ; options->which[1]='M';
 
   IGRAPH_MATRIX_INIT_FINALLY(&values, 0, 0);
-  IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 2);
+  IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 1);
   
   IGRAPH_VECTOR_INIT_FINALLY(&indegree, options->n);
     
@@ -431,6 +431,8 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
  * 
  * \sa \ref igraph_pagerank and \ref igraph_personalized_pagerank for 
  *   modifications of eigenvector centrality.
+ * 
+ * \example examples/simple/eigenvector_centrality.c
  */
 
 int igraph_eigenvector_centrality(const igraph_t *graph, 
@@ -468,7 +470,7 @@ typedef struct igraph_i_kleinberg_data2_t {
 /* ARPACK auxiliary routine for the unweighted HITS algorithm */
 int igraph_i_kleinberg_unweighted(igraph_real_t *to,
                                   const igraph_real_t *from,
-                                  long int n, void *extra) {
+                                  int n, void *extra) {
   igraph_i_kleinberg_data_t *data = (igraph_i_kleinberg_data_t*)extra;
   igraph_adjlist_t *in = data->in;
   igraph_adjlist_t *out = data->out;
@@ -502,7 +504,7 @@ int igraph_i_kleinberg_unweighted(igraph_real_t *to,
 /* ARPACK auxiliary routine for the weighted HITS algorithm */
 int igraph_i_kleinberg_weighted(igraph_real_t *to,
                                 const igraph_real_t *from,
-                                long int n, void *extra) {
+                                int n, void *extra) {
 
   igraph_i_kleinberg_data2_t *data = (igraph_i_kleinberg_data2_t*)extra;
   igraph_inclist_t *in = data->in; 
@@ -802,7 +804,7 @@ typedef struct igraph_i_pagerank_data2_t {
 } igraph_i_pagerank_data2_t;
 
 int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
-		      long int n, void *extra) {
+		      int n, void *extra) {
   
   igraph_i_pagerank_data_t *data=extra;
   igraph_adjlist_t *adjlist=data->adjlist;
@@ -845,7 +847,7 @@ int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
 }
 
 int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
-		       long int n, void *extra) {
+		       int n, void *extra) {
 
   igraph_i_pagerank_data2_t *data=extra;
   const igraph_t *graph=data->graph;
@@ -951,6 +953,8 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * \ref igraph_personalized_pagerank() and \ref igraph_personalized_pagerank_vs()
  * for the personalized PageRank measure, \ref igraph_arpack_rssolve() and
  * \ref igraph_arpack_rnsolve() for the underlying machinery.
+ * 
+ * \example examples/simple/igraph_pagerank.c
  */
 
 int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
@@ -1327,6 +1331,8 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
  *     See \ref igraph_edge_betweenness() for calculating the betweenness score
  *     of the edges in a graph. See \ref igraph_betweenness_estimate() to
  *     estimate the betweenness score of the vertices in a graph.
+ * 
+ * \example examples/simple/igraph_betweenness.c
  */
 int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
 		       const igraph_vs_t vids, igraph_bool_t directed, 
@@ -1971,6 +1977,8 @@ int igraph_edge_betweenness_estimate_weighted(const igraph_t *graph,
  *     See \ref igraph_edge_betweenness() for calculating the betweenness score
  *     of the edges in a graph. See \ref igraph_edge_betweenness_estimate() to
  *     estimate the betweenness score of the edges in a graph.
+ * 
+ * \example examples/simple/igraph_edge_betweenness.c
  */
 int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
                             igraph_bool_t directed, 
@@ -2538,6 +2546,8 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
  * centralization functions.
  * 
  * Time complexity: O(n), the length of the score vector.
+ * 
+ * \example examples/simple/centralization.c
  */
 
 igraph_real_t igraph_centralization(const igraph_vector_t *scores,

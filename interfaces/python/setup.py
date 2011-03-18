@@ -116,6 +116,8 @@ options = dict(
     scripts = ['scripts/igraph'],
     test_suite = "igraph.test.suite",
 
+    headers = ['src/igraphmodule_api.h'],
+
     platforms = 'ALL',
     keywords = ['graph', 'network', 'mathematics', 'math', 'graph theory', 'discrete mathematics'],
     classifiers = [

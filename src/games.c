@@ -409,7 +409,7 @@ int igraph_i_barabasi_game_psumtree(igraph_t *graph,
  *        \cli IGRAPH_BARABASI_BAG
  *          This is the algorithm that was previously (before version
  *          0.6) solely implemented in igraph. It works by putting the
- *          ids of the vertices into a bag (mutliset, really), exactly
+ *          ids of the vertices into a bag (multiset, really), exactly
  *          as many times as their (in-)degree, plus once more. Then
  *          the required number of cited vertices are drawn from the
  *          bag, with replacement. This method might generate multiple
@@ -436,6 +436,9 @@ int igraph_i_barabasi_game_psumtree(igraph_t *graph,
  * 
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges.
+ * 
+ * \example examples/simple/igraph_barabasi_game.c
+ * \example examples/simple/igraph_barabasi_game2.c
  */
 
 int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
@@ -731,13 +734,15 @@ int igraph_erdos_renyi_game_gnm(igraph_t *graph, igraph_integer_t n, igraph_real
  *         \p type, \p n,
  *         \p p or \p m
  *          parameter.
- *         \c IGRAPH_ENOMEM: there is not enought
+ *         \c IGRAPH_ENOMEM: there is not enough
  *         memory for the operation.
  * 
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
  * 
  * \sa \ref igraph_barabasi_game(), \ref igraph_growing_random_game()
+ * 
+ * \example examples/simple/igraph_erdos_renyi_game.c
  */
 
 int igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
@@ -833,7 +838,7 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
       long int from=RNG_INTEGER(0, bagp1-1);
       long int to=RNG_INTEGER(0, bagp2-1);
       igraph_vector_push_back(&edges, bag1[from]); /* safe, already reserved */
-      igraph_vector_push_back(&edges, bag2[to]);   /* detto */
+      igraph_vector_push_back(&edges, bag2[to]);   /* ditto */
       bag1[from]=bag1[bagp1-1];
       bag2[to]=bag2[bagp2-1];
       bagp1--; bagp2--;
@@ -846,7 +851,7 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
       bag1[from]=bag1[bagp1-1];
       bagp1--;
       to=RNG_INTEGER(0, bagp1-1);
-      igraph_vector_push_back(&edges, bag1[to]);   /* detto */
+      igraph_vector_push_back(&edges, bag1[to]);   /* ditto */
       bag1[to]=bag1[bagp1-1];
       bagp1--;
     }
@@ -916,6 +921,8 @@ int igraph_degree_sequence_game_vl(igraph_t *graph,
  * number of vertices plus the number of edges.
  * 
  * \sa \ref igraph_barabasi_game(), \ref igraph_erdos_renyi_game()
+ * 
+ * \example examples/simple/igraph_degree_sequence_game.c
  */
 
 int igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
@@ -959,6 +966,8 @@ int igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
  *
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges.
+ * 
+ * \example examples/simple/igraph_growing_random_game.c
  */
 int igraph_growing_random_game(igraph_t *graph, igraph_integer_t n, 
 			       igraph_integer_t m, igraph_bool_t directed,
@@ -1444,7 +1453,7 @@ int igraph_barabasi_aging_game(igraph_t *graph,
       VECTOR(edges)[edgeptr++] = i;
       VECTOR(edges)[edgeptr++] = to;
     }
-    /* update probabilites */
+    /* update probabilities */
     for (j=0; j<no_of_neighbors; j++) {
       long int n=VECTOR(edges)[edgeptr-2*j-1];
       long int age=(i-n)/binwidth;
@@ -1618,7 +1627,7 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
     }
     igraph_dqueue_push(&history, -1);
     
-    /* update probabilites */
+    /* update probabilities */
     for (j=0; j<no_of_neighbors; j++) {
       long int n=VECTOR(edges)[edgeptr-2*j-1];
       long int age=(i-n)/binwidth;
@@ -1678,6 +1687,8 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
  * \return Error code.
  * 
  * Time complexity: TODO, less than O(|V|^2+|E|).
+ * 
+ * \example examples/simple/igraph_grg_game.c
  */
 				    
 int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
@@ -1830,6 +1841,8 @@ void igraph_i_preference_game_free_vids_by_type(igraph_vector_ptr_t *vecs) {
  * number of vertices plus the number of edges in the graph.
  * 
  * \sa igraph_establishment_game()
+ * 
+ * \example examples/simple/igraph_preference_game.c
  */
 
 int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
@@ -2259,6 +2272,8 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
  *    directed or undirected.
  * \param prob The rewiring probability a constant between zero and
  *    one (inclusive).
+ * \param loops Boolean, whether loop edges are allowed in the new 
+ *    graph, or not.
  * \return Error code.
  * 
  * \sa \ref igraph_watts_strogatz_game() uses this function for the
@@ -2267,7 +2282,8 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
  * Time complexity: O(|V|+|E|).
  */
 
-int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob) {
+int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob, 
+			igraph_bool_t loops) {
 
   igraph_t newgraph;
   igraph_vector_t edges;
@@ -2295,7 +2311,13 @@ int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob) {
   if (prob != 0) {
     to_rewire=RNG_GEOM(prob)+1;
     while (to_rewire <= endpoints) {
-      VECTOR(edges)[ to_rewire-1 ] = RNG_INTEGER(0, no_of_nodes-1);
+      if (loops) {
+	VECTOR(edges)[ to_rewire-1 ] = RNG_INTEGER(0, no_of_nodes-1);
+      } else {
+	long int nei=VECTOR(edges)[to_rewire-2 + 2*(to_rewire % 2)];
+	long int r=RNG_INTEGER(0, no_of_nodes-2);
+	VECTOR(edges)[ to_rewire-1 ] = (r != nei ? r : no_of_nodes-1);
+      }
       to_rewire += RNG_GEOM(prob)+1;
     }
   }
@@ -2337,6 +2359,7 @@ int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob) {
  *    igraph_connect_neighborhood(). 
  * \param p The rewiring probability. A real number between zero and
  *   one (inclusive). 
+ * \param loops Logical, whether to generate loop edges.
  * \return Error code.
  * 
  * \sa \ref igraph_lattice(), \ref igraph_connect_neighborhood() and
@@ -2350,7 +2373,7 @@ int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob) {
 
 int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
 			       igraph_integer_t size, igraph_integer_t nei,
-			       igraph_real_t p) {
+			       igraph_real_t p, igraph_bool_t loops) {
   
   igraph_vector_t dimvector;
   long int i;
@@ -2382,7 +2405,7 @@ int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
   
   /* Rewire the edges then */
 
-  IGRAPH_CHECK(igraph_rewire_edges(graph, p));
+  IGRAPH_CHECK(igraph_rewire_edges(graph, p, loops));
 
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
@@ -2396,7 +2419,7 @@ int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
  * evolving graph. In each time step a single vertex is added to the 
  * network and it cites a number of other vertices (as specified by 
  * the \p edges_per_step argument). The cited vertices are selected
- * based on the last time they were cited. Time is mesaured by the 
+ * based on the last time they were cited. Time is measured by the 
  * addition of vertices and it is binned into \p pagebins bins. 
  * So if the current time step is \c t and the last citation to a 
  * given \c i vertex was made in time step \c t0, then \c

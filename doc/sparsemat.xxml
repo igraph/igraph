@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<section id="igraph-SparseMatrices2">
+<title>Sparse matrices, another kind</title>
+
+<section>
+<!-- doxrox-include about_sparsemat -->
+</section>
+
+<section><title>Creating sparse matrix objects</title>
+<!-- doxrox-include igraph_sparsemat_init -->
+<!-- doxrox-include igraph_sparsemat_copy -->
+<!-- doxrox-include igraph_sparsemat_realloc -->
+<!-- doxrox-include igraph_sparsemat_destroy -->
+<!-- doxrox-include igraph_sparsemat_eye -->
+<!-- doxrox-include igraph_sparsemat_diag -->
+</section>
+
+<section><title>Query properties of a sparse matrix</title>
+<!-- doxrox-include igraph_sparsemat_index -->
+<!-- doxrox-include igraph_sparsemat_nrow -->
+<!-- doxrox-include igraph_sparsemat_ncol -->
+<!-- doxrox-include igraph_sparsemat_type -->
+<!-- doxrox-include igraph_sparsemat_is_triplet -->
+<!-- doxrox-include igraph_sparsemat_is_cc -->
+<!-- doxrox-include igraph_sparsemat_min-->
+<!-- doxrox-include igraph_sparsemat_max-->
+<!-- doxrox-include igraph_sparsemat_minmax-->
+<!-- doxrox-include igraph_sparsemat_count_nonzero-->
+<!-- doxrox-include igraph_sparsemat_count_nonzerotol-->
+<!-- doxrox-include igraph_sparsemat_rowsums-->
+<!-- doxrox-include igraph_sparsemat_colsums-->
+</section>
+
+<section><title>Operations on sprase matrices</title>
+<!-- doxrox-include igraph_sparsemat_entry -->
+<!-- doxrox-include igraph_sparsemat_fkeep -->
+<!-- doxrox-include igraph_sparsemat_dropzeros -->
+<!-- doxrox-include igraph_sparsemat_droptol -->
+<!-- doxrox-include igraph_sparsemat_scale -->
+<!-- doxrox-include igraph_sparsemat_permute -->
+<!-- doxrox-include igraph_sparsemat_transpose -->
+<!-- doxrox-include igraph_sparsemat_add -->
+<!-- doxrox-include igraph_sparsemat_multiply -->
+<!-- doxrox-include igraph_sparsemat_gaxpy -->
+<!-- doxrox-include igraph_sparsemat_add_rows -->
+<!-- doxrox-include igraph_sparsemat_add_cols -->
+<!-- doxrox-include igraph_sparsemat_resize -->
+</section>
+
+<section><title>Operations that change the internal representation</title>
+<!-- doxrox-include igraph_sparsemat_compress -->
+<!-- doxrox-include igraph_sparsemat_dupl -->
+</section>
+
+<section><title>Decompositions and solving linear systems</title>
+<!-- doxrox-include igraph_sparsemat_symblu -->
+<!-- doxrox-include igraph_sparsemat_symbqr -->
+<!-- doxrox-include igraph_sparsemat_lsolve -->
+<!-- doxrox-include igraph_sparsemat_ltsolve -->
+<!-- doxrox-include igraph_sparsemat_usolve -->
+<!-- doxrox-include igraph_sparsemat_utsolve -->
+<!-- doxrox-include igraph_sparsemat_cholsol -->
+<!-- doxrox-include igraph_sparsemat_lusol -->
+<!-- doxrox-include igraph_sparsemat_lu -->
+<!-- doxrox-include igraph_sparsemat_qr -->
+<!-- doxrox-include igraph_sparsemat_luresol -->
+<!-- doxrox-include igraph_sparsemat_qrresol -->
+<!-- doxrox-include igraph_sparsemat_symbolic_destroy -->
+<!-- doxrox-include igraph_sparsemat_numeric_destroy -->
+</section>
+
+<section><title>Eigenvalues and eigenvectors</title>
+<!-- doxrox-include igraph_sparsemat_arpack_rssolve -->
+<!-- doxrox-include igraph_sparsemat_arpack_rnsolve -->
+</section>
+
+<section><title>Conversion to other data types</title>
+<!-- doxrox-include igraph_sparsemat -->
+<!-- doxrox-include igraph_get_sparsemat -->
+<!-- doxrox-include igraph_matrix_as_sparsemat -->
+<!-- doxrox-include igraph_sparsemat_as_matrix -->
+</section>
+
+<section><title>Writing to a file, or to the screen</title>
+<!-- doxrox-include igraph_sparsemat_print -->
+</section>
+
+</section>

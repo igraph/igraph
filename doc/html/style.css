@@ -146,7 +146,7 @@ ul.download-links li.download-external {
 
 a { color: #00f; text-decoration: none }
 a:visited { color: #00c }
-a:hover { color: #00f; text-decoration: underline }
+a:hover { color: #00f; text-decoration: underline; cursor: hand; }
 h1 a, h1 a:visited, h1 a:hover { color: #fff; text-decoration: none }
 h2 a, h2 a:visited, h2 a:hover { color: #000; text-decoration: none }
 h3 a, h3 a:visited, h3 a:hover { color: #000; text-decoration: none }
@@ -218,4 +218,19 @@ div.explanation {
   border-left: 130px solid white;
   font-size: 0.8em;
   color: #888;
+}
+div.example-contents {
+  display: none;
+}
+.example p.title {
+  color: blue;
+  font-size:0.8em;
+}
+.example p.title b:before {
+  content: '\25B6\00a0';
+}
+.example p.title:hover { 
+  color: #00f; 
+  text-decoration: underline;
+  cursor: hand;
 }

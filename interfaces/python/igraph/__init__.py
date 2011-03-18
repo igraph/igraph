@@ -42,6 +42,8 @@ from igraph.datatypes import *
 from igraph.formula import *
 from igraph.layout import *
 from igraph.nexus import *
+from igraph.statistics import *
+from igraph.summary import *
 from igraph.utils import *
 
 import os
@@ -49,10 +51,16 @@ import math
 import gzip
 import sys
 import operator
+
 from collections import defaultdict
 from itertools import izip
 from tempfile import mkstemp
 from warnings import warn
+
+def deprecated(message):
+    """Prints a warning message related to the deprecation of some igraph
+    feature."""
+    warn(message, DeprecationWarning, stacklevel=3)
 
 # pylint: disable-msg=E1101
 class Graph(GraphBase):
@@ -143,16 +151,109 @@ class Graph(GraphBase):
                 key = str(key)
             self.es[key] = value
 
+    def add_edge(self, source, target):
+        """add_edge(source, target)
+
+        Adds a single edge to the graph.
+
+        @param source: the source vertex of the edge or its name.
+        @param target: the target vertex of the edge or its name.
+        """
+        return self.add_edges([(source, target)])
+
+    def add_edges(self, es):
+        """add_edges(es)
+
+        Adds some edges to the graph.
+
+        @param es: the list of edges to be added. Every edge is represented
+          with a tuple containing the vertex IDs or names of the two
+          endpoints. Vertices are enumerated from zero. It is allowed to
+          use a single tuple containing two vertex IDs here instead of a
+          list, but this is deprecated from igraph 0.6 and will be removed
+          from 0.7.
+
+        @deprecated: this method will not accept a single pair of vertex IDs
+          as an argument from igraph 0.7. Use L{add_edge()} instead to add
+          a single edge.
+        """
+        if isinstance(es, tuple) and len(es) == 2:
+            deprecated("Graph.add_edges() will not accept a single integer pair "
+                    "from igraph 0.7. Use Graph.add_edge() instead.")
+
+            return GraphBase.add_edges(self, [es])
+        return GraphBase.add_edges(self, es)
+
+    def add_vertex(self, name=None):
+        """add_vertex(name=None)
+
+        Adds a single vertex to the graph.
+
+        @param name: the name of the vertex to be added. If C{None}, the new
+          vertex will be unnamed, otherwise the string given here will be
+          assigned to the C{name} attribute of the vertex.
+        """
+        if name is None:
+            return self.add_vertices(1)
+        return self.add_vertices([name])
+
+    def add_vertices(self, n):
+        """add_vertices(n)
+
+        Adds some vertices to the graph.
+
+        @param n: the number of vertices to be added, or the name of a single
+          vertex to be added, or an iterable of strings, each corresponding to the
+          name of a vertex to be added. Names will be assigned to the C{name}
+          vertex attribute.
+        """
+        if isinstance(n, basestring):
+            # Adding a single vertex with a name
+            m = self.vcount()
+            result = GraphBase.add_vertices(self, 1)
+            self.vs[m]["name"] = n
+            return result
+        elif hasattr(n, "__iter__"):
+            m = self.vcount()
+            if not hasattr(n, "__len__"):
+                names = list(n)
+            else:
+                names = n
+            result = GraphBase.add_vertices(self, len(names))
+            self.vs[m:]["name"] = names
+            return result
+        return GraphBase.add_vertices(self, n)
+
     def adjacent(self, *args, **kwds):
-        """adjacent(vertex, type=OUT)
+        """adjacent(vertex, mode=OUT)
 
         Returns the edges a given vertex is incident on.
 
         @deprecated: replaced by L{Graph.incident()} since igraph 0.6
         """
-        warn("Graph.adjacent() is deprecated since igraph 0.6, please use "
-             "Graph.incident() instead")
+        deprecated("Graph.adjacent() is deprecated since igraph 0.6, please use "
+                   "Graph.incident() instead")
         return self.incident(*args, **kwds)
+
+    def as_directed(self, *args, **kwds):
+        """as_directed(*args, **kwds)
+
+        Returns a directed copy of this graph. Arguments are passed on
+        to L{Graph.to_directed()} that is invoked on the copy.
+        """
+        copy = self.copy()
+        copy.to_directed()
+        return copy
+
+    def as_undirected(self, *args, **kwds):
+        """as_undirected(*args, **kwds)
+
+        Returns an undirected copy of this graph. Arguments are passed on
+        to L{Graph.to_undirected()} that is invoked on the copy.
+        """
+        copy = self.copy()
+        copy.to_undirected()
+        return copy
 
     def delete_edges(self, *args, **kwds):
         """Deletes some edges from the graph.
@@ -187,7 +288,7 @@ class Graph(GraphBase):
         
         See L{degree} for possible arguments.
         """
-        kwds['type'] = IN
+        kwds['mode'] = IN
         return self.degree(*args, **kwds)
 
     def outdegree(self, *args, **kwds):
@@ -195,12 +296,11 @@ class Graph(GraphBase):
         
         See L{degree} for possible arguments.
         """
-        kwds['type'] = OUT
+        kwds['mode'] = OUT
         return self.degree(*args, **kwds)
 
     def all_st_cuts(self, source, target):
-        """all_st_cuts(source, target)
-
+        """\
         Returns all the cuts between the source and target vertices in a
         directed graph.
 
@@ -219,8 +319,7 @@ class Graph(GraphBase):
                 for cut, part in izip(*GraphBase.all_st_cuts(self, source, target))]
 
     def all_st_mincuts(self, source, target, capacity=None):
-        """all_st_mincuts(source, target)
-
+        """\
         Returns all the mincuts between the source and target vertices in a
         directed graph.
 
@@ -242,8 +341,7 @@ class Graph(GraphBase):
                 for cut, part in izip(cuts, parts)]
 
     def biconnected_components(self, return_articulation_points=False):
-        """biconnected_components(return_articulation_points=False)
-
+        """\
         Calculates the biconnected components of the graph.
         
         @param return_articulation_points: whether to return the articulation
@@ -427,8 +525,8 @@ class Graph(GraphBase):
         return Matrix(data)
 
 
-    def get_adjlist(self, type=OUT):
-        """get_adjlist(type=OUT)
+    def get_adjlist(self, mode=OUT):
+        """get_adjlist(mode=OUT)
 
         Returns the adjacency list representation of the graph.
 
@@ -436,27 +534,27 @@ class Graph(GraphBase):
         outer list belongs to a single vertex of the graph. The inner list
         contains the neighbors of the given vertex.
 
-        @param type: if L{OUT}, returns the successors of the vertex. If
+        @param mode: if L{OUT}, returns the successors of the vertex. If
           L{IN}, returns the predecessors of the vertex. If L{ALL}, both
           the predecessors and the successors will be returned. Ignored
           for undirected graphs.
         """
-        return [self.neighbors(idx, type) for idx in xrange(self.vcount())]
+        return [self.neighbors(idx, mode) for idx in xrange(self.vcount())]
 
     def get_adjedgelist(self, *args, **kwds):
-        """get_adjedgelist(type=OUT)
+        """get_adjedgelist(mode=OUT)
 
         Returns the incidence list representation of the graph.
 
         @deprecated: replaced by L{Graph.get_inclist()} since igraph 0.6
         @see: Graph.get_inclist()
         """
-        warn("Graph.get_adjedgelist() is deprecated since igraph 0.6, "
-             "please use Graph.get_inclist() instead")
+        deprecated("Graph.get_adjedgelist() is deprecated since igraph 0.6, "
+                   "please use Graph.get_inclist() instead")
         return self.get_inclist(*args, **kwds)
 
-    def get_inclist(self, type=OUT):
-        """get_inclist(type=OUT)
+    def get_inclist(self, mode=OUT):
+        """get_inclist(mode=OUT)
 
         Returns the incidence list representation of the graph.
 
@@ -465,12 +563,12 @@ class Graph(GraphBase):
         The inner list contains the IDs of the incident edges of the
         given vertex.
 
-        @param type: if L{OUT}, returns the successors of the vertex. If
+        @param mode: if L{OUT}, returns the successors of the vertex. If
           L{IN}, returns the predecessors of the vertex. If L{ALL}, both
           the predecessors and the successors will be returned. Ignored
           for undirected graphs.
         """
-        return [self.incident(idx, type) for idx in xrange(self.vcount())]
+        return [self.incident(idx, mode) for idx in xrange(self.vcount())]
 
     def is_named(self):
         """is_named()
@@ -671,8 +769,13 @@ class Graph(GraphBase):
           in very large networks. Phys Rev E 70, 066111 (2004).
         """
         merges, qs = GraphBase.community_fastgreedy(self, weights)
-        return VertexDendrogram(self, merges, None, qs)
-
+        qs.reverse()
+        if qs:
+            optimal_count = qs.index(max(qs)) + 1
+        else:
+            optimal_count = 1
+        return VertexDendrogram(self, merges, optimal_count,
+                modularity_params=dict(weights=weights))
 
     def community_leading_eigenvector_naive(self, clusters = None, \
             return_merges = False):
@@ -707,12 +810,11 @@ class Graph(GraphBase):
         if merges is None:
             return VertexClustering(self, cl, modularity = q)
         else:
-            return VertexDendrogram(self, merges, cl, modularity = q)
+            return VertexDendrogram(self, merges, safemax(cl)+1)
 
 
-    def community_leading_eigenvector(self, clusters=None, \
-            return_merges=False):
-        """community_leading_eigenvector(clusters=None, return_merges=False)
+    def community_leading_eigenvector(self, clusters=None):
+        """community_leading_eigenvector(clusters=None)
         
         Newman's leading eigenvector method for detecting community structure.
         This is the proper implementation of the recursive, divisive algorithm:
@@ -731,8 +833,8 @@ class Graph(GraphBase):
         eigenvectors of matrices, arXiv:physics/0605087"""
         if clusters is None:
             clusters = -1
-        cl, merges, q = GraphBase.community_leading_eigenvector(self, clusters)
-        return VertexDendrogram(self, merges, cl)
+        membership, _, q = GraphBase.community_leading_eigenvector(self, clusters)
+        return VertexClustering(self, membership, modularity = q)
 
 
     def community_label_propagation(self, weights = None, initial = None, \
@@ -773,7 +875,8 @@ class Graph(GraphBase):
             fixed = [bool(o) for o in g.vs[fixed]]
         cl = GraphBase.community_label_propagation(self, \
                 weights, initial, fixed)
-        return VertexClustering(self, cl)
+        return VertexClustering(self, cl,
+                modularity_params=dict(weights=weights))
 
 
     def community_multilevel(self, weights=None, return_levels=False):
@@ -813,11 +916,12 @@ class Graph(GraphBase):
             levels, qs = GraphBase.community_multilevel(self, weights, True)
             result = []
             for level, q in zip(levels, qs):
-                result.append(VertexClustering(self, level, q))
+                result.append(VertexClustering(self, level, q,
+                    modularity_params=dict(weights=weights)))
         else:
             membership = GraphBase.community_multilevel(self, weights, False)
-            q = self.modularity(membership, weights)
-            result = VertexClustering(self, membership, q)
+            result = VertexClustering(self, membership,
+                    modularity_params=dict(weights=weights))
         return result
 
     def community_optimal_modularity(self, *args, **kwds):
@@ -859,15 +963,18 @@ class Graph(GraphBase):
           modularity.
         """
         merges, qs = GraphBase.community_edge_betweenness(self, directed)
-        dendrogram = VertexDendrogram(merges, modularity=qs)
-        if clusters is not None:
-            dendrogram.cut(clusters)
-        return dendrogram
+        qs.reverse()
+        if clusters is None:
+            if qs:
+                clusters = qs.index(max(qs))+1
+            else:
+                clusters = 1
+        return VertexDendrogram(self, merges, clusters)
 
     def community_spinglass(self, *args, **kwds):
         """community_spinglass(weights=None, spins=25, parupdate=False,
         start_temp=1, stop_temp=0.01, cool_fact=0.99, update_rule="config",
-        gamma=1)
+        gamma=1, implementation="orig", lambda_=1)
 
         Finds the community structure of the graph according to the
         spinglass community detection method of Reichardt & Bornholdt.
@@ -896,13 +1003,15 @@ class Graph(GraphBase):
           original implementation is the default. The other implementation
           is able to take into account negative weights, this can be
           chosen by setting C{implementation} to C{"neg"}
-        @keyword lambda: the lambda argument of the algorithm, which
+        @keyword lambda_: the lambda argument of the algorithm, which
           specifies the balance between the importance of present and missing
           negatively weighted edges within a community. Smaller values of
           lambda lead to communities with less negative intra-connectivity.
           If the argument is zero, the algorithm reduces to a graph coloring
           algorithm, using the number of spins as colors. This argument is
-          ignored if the original implementation is used.
+          ignored if the original implementation is used. Note the underscore
+          at the end of the argument name; this is due to the fact that
+          lambda is a reserved keyword in Python.
         @return: an appropriate L{VertexClustering} object.
 
         @newfield ref: Reference
@@ -914,7 +1023,12 @@ class Graph(GraphBase):
           U{http://arxiv.org/abs/0811.2329}.
         """
         membership = GraphBase.community_spinglass(self, *args, **kwds)
-        return VertexClustering(self, membership)
+        if "weights" in kwds:
+            modularity_params=dict(weights=kwds["weights"])
+        else:
+            modularity_params={}
+        return VertexClustering(self, membership,
+                modularity_params=modularity_params)
 
     def community_walktrap(self, weights=None, steps=4):
         """Community detection algorithm of Latapy & Pons, based on random
@@ -936,9 +1050,13 @@ class Graph(GraphBase):
           networks using random walks, U{http://arxiv.org/abs/physics/0512106}.
         """
         merges, qs = GraphBase.community_walktrap(self, weights, steps)
-        d = VertexDendrogram(self, merges, modularity=qs)
-        return d
-
+        qs.reverse()
+        if qs:
+            optimal_count = qs.index(max(qs))+1
+        else:
+            optimal_count = 1
+        return VertexDendrogram(self, merges, optimal_count,
+                modularity_params=dict(weights=weights))
 
     def k_core(self, *args):
         """Returns some k-cores of the graph.
@@ -1002,6 +1120,10 @@ class Graph(GraphBase):
 
           - C{fr_3d}, C{fr3d}, C{fruchterman_reingold_3d}: 3D Fruchterman-
             Reingold layout (see L{Graph.layout_fruchterman_reingold}).
+
+          - C{grid}: regular grid layout in 2D (see L{Graph.layout_grid}) 
+
+          - C{grid_3d}: regular grid layout in 3D (see L{Graph.layout_grid_3d})
 
           - C{graphopt}: the graphopt algorithm (see L{Graph.layout_graphopt})
 
@@ -1365,8 +1487,25 @@ class Graph(GraphBase):
             if fp is not None:
                 result = pickle.load(fp)
                 fp.close()
-        if not isinstance(result, klass):
-            raise TypeError("unpickled object is not a %s" % klass.__name__)
+        return result
+
+    @classmethod
+    def Read_Picklez(klass, fname, *args, **kwds):
+        """Reads a graph from compressed Python pickled format, uncompressing
+        it on-the-fly.
+
+        @param fname: the name of the file or a stream to read from.
+        @return: the created graph object.
+        """
+        import cPickle as pickle
+        if hasattr(fname, "read"):
+            # Probably a file or a file-like object
+            if isinstance(fname, gzip.GzipFile):
+                result = pickle.load(fname)
+            else:
+                result = pickle.load(gzip.GzipFile(mode="rb", fileobj=fname))
+        else:
+            result = pickle.load(gzip.open(fname, "rb"))
         return result
 
     @classmethod
@@ -1817,7 +1956,7 @@ class Graph(GraphBase):
                     g.add_vertices(1)
                     g.vs[n][vertex_name_attr] = dst_name
                     n += 1
-                g.add_edges((v1, v2))
+                g.add_edge(v1, v2)
                 for k, v in edge_data.iteritems():
                     g.es[idx][k] = v
 
@@ -1953,8 +2092,8 @@ class Graph(GraphBase):
         result.vs["x"] = xs
         result.vs["y"] = ys
         if return_coordinates:
-            warn("The return_coordinates=... keyword argument of Graph.GRG() is "
-                 "deprecated. It will be removed in igraph 0.7.")
+            deprecated("The return_coordinates=... keyword argument of Graph.GRG() is "
+                       "deprecated. It will be removed in igraph 0.7.")
             return result, xs, ys
         return result
 
@@ -2073,17 +2212,21 @@ class Graph(GraphBase):
 
         @see: L{__add__}
         """
-        if isinstance(other, int):
-            return self.add_vertices(other)
+        if isinstance(other, (int, basestring)):
+            self.add_vertices(other)
+            return self
         elif isinstance(other, tuple) and len(other) == 2:
-            return self.add_edges([other])
+            self.add_edges([other])
+            return self
         elif isinstance(other, list):
-            if len(other)>0:
-                if isinstance(other[0], tuple):
-                    return self.add_edges(other)
-            else:
+            if not other:
                 return self
-
+            if isinstance(other[0], tuple):
+                self.add_edges(other)
+                return self
+            if isinstance(other[0], basestring):
+                self.add_vertices(other)
+                return self
         return NotImplemented
 
 
@@ -2092,12 +2235,14 @@ class Graph(GraphBase):
         the other object given.
 
         @param other: if it is an integer, the copy is extended by the given
-          number of vertices. If it is a tuple with two elements, the copy
+          number of vertices. If it is a string, the copy is extended by a
+          single vertex whose C{name} attribute will be equal to the given
+          string. If it is a tuple with two elements, the copy
           is extended by a single edge. If it is a list of tuples, the copy
           is extended by multiple edges. If it is a L{Graph}, a disjoint
           union is performed.
         """
-        if isinstance(other, int):
+        if isinstance(other, (int, basestring)):
             g = self.copy()
             g.add_vertices(other)
         elif isinstance(other, tuple) and len(other) == 2:
@@ -2108,6 +2253,9 @@ class Graph(GraphBase):
                 if isinstance(other[0], tuple):
                     g = self.copy()
                     g.add_edges(other)
+                elif isinstance(other[0], basestring):
+                    g = self.copy()
+                    g.add_vertices(other)
                 elif isinstance(other[0], Graph):
                     return self.disjoint_union(other)
                 else:
@@ -2128,26 +2276,28 @@ class Graph(GraphBase):
 
         @see: L{__sub__}"""
         if isinstance(other, int):
-            return self.delete_vertices(other)
+            self.delete_vertices([other])
         elif isinstance(other, tuple) and len(other) == 2:
-            return self.delete_edges([other])
+            self.delete_edges([other])
         elif isinstance(other, list):
             if len(other)>0:
                 if isinstance(other[0], tuple):
-                    return self.delete_edges(other)
-                elif isinstance(other[0], int):
-                    return self.delete_vertices(other)
-            else:
-                return self
+                    self.delete_edges(other)
+                elif isinstance(other[0], (int, long, basestring)):
+                    self.delete_vertices(other)
+                else:
+                    return NotImplemented
         elif isinstance(other, _igraph.Vertex):
-            return self.delete_vertices(other)
+            self.delete_vertices(other)
         elif isinstance(other, _igraph.VertexSeq):
-            return self.delete_vertices(other)
+            self.delete_vertices(other)
         elif isinstance(other, _igraph.Edge):
-            return self.delete_edges(other)
+            self.delete_edges(other)
         elif isinstance(other, _igraph.EdgeSeq):
-            return self.delete_edges(other)
-        return NotImplemented
+            self.delete_edges(other)
+        else:
+            return NotImplemented
+        return self
 
 
     def __sub__(self, other):
@@ -2160,30 +2310,36 @@ class Graph(GraphBase):
           lists of integers or lists of tuples as well, but they can't be
           mixed! Also accepts L{Edge} and L{EdgeSeq} objects.
         """
-        if isinstance(other, int):
-            return self.copy().delete_vertices(other)
+        if isinstance(other, (int, long, basestring)):
+            result = self.copy()
+            result.delete_vertices([other])
         elif isinstance(other, tuple) and len(other) == 2:
-            return self.copy().delete_edges(other)
+            result = self.copy()
+            result.delete_edges([other])
         elif isinstance(other, list):
+            result = self.copy()
             if len(other)>0:
                 if isinstance(other[0], tuple):
-                    return self.copy().delete_edges(other)
-                elif isinstance(other[0], int):
-                    return self.copy().delete_vertices(other)
+                    result.delete_edges(other)
+                elif isinstance(other[0], (int, long, basestring)):
+                    result.delete_vertices(other)
+                else:
+                    return NotImplemented
             else:
                 return self.copy()
         elif isinstance(other, _igraph.Vertex):
-            return self.copy().delete_vertices(other)
+            result.delete_vertices(other)
         elif isinstance(other, _igraph.VertexSeq):
-            return self.copy().delete_vertices(other)
+            result.delete_vertices(other)
         elif isinstance(other, _igraph.Edge):
-            return self.copy().delete_edges(other)
+            result.delete_edges(other)
         elif isinstance(other, _igraph.EdgeSeq):
-            return self.copy().delete_edges(other)
+            result.delete_edges(other)
         elif isinstance(other, Graph):
             return self.difference(other)
-
-        return NotImplemented
+        else:
+            return NotImplemented
+        return result
 
     def __mul__(self, other):
         """Copies exact replicas of the original graph an arbitrary number of
@@ -2214,9 +2370,9 @@ class Graph(GraphBase):
         """Coercion rules.
 
         This method is needed to allow the graph to react to additions
-        with lists, tuples, integers, vertices, edges and so on.
+        with lists, tuples, integers, strings, vertices, edges and so on.
         """
-        if type(other) in [int, tuple, list]:
+        if isinstance(other, (int, tuple, list, basestring)):
             return self, other
         if isinstance(other, _igraph.Vertex):
             return self, other
@@ -2317,7 +2473,7 @@ class Graph(GraphBase):
           - C{vertex_color}: color of the vertices. The corresponding vertex
             attribute is C{color}, the default is red.  Colors can be
             specified either by common X11 color names (see the source
-            code of L{igraph.colors} for a list of known colors), by
+            code of L{igraph.drawing.colors} for a list of known colors), by
             3-tuples of floats (ranging between 0 and 255 for the R, G and
             B components), by CSS-style string specifications (C{#rrggbb})
             or by integer color indices of the specified palette.
@@ -2351,6 +2507,19 @@ class Graph(GraphBase):
             Corresponding vertex attribute: C{label_angle}. The
             default is C{-math.pi/2}.
 
+          - C{vertex_order}: drawing order of the vertices. This must be
+            a list or tuple containing vertex indices; vertices are then
+            drawn according to this order.
+
+          - C{vertex_order_by}: an alternative way to specify the drawing
+            order of the vertices; this attribute is interpreted as the name
+            of a vertex attribute, and vertices are drawn such that those
+            with a smaller attribute value are drawn first. You may also
+            reverse the order by passing a tuple here; the first element of
+            the tuple should be the name of the attribute, the second element
+            specifies whether the order is reversed (C{True}, C{False},
+            C{"asc"} and C{"desc"} are accepted values).
+
           - C{edge_color}: color of the edges. The corresponding edge
             attribute is C{color}, the default is red. See C{vertex_color}
             for color specification syntax.
@@ -2370,43 +2539,35 @@ class Graph(GraphBase):
         drawer = DefaultGraphDrawer(context, bbox)
         drawer.draw(self, palette, *args, **kwds)
 
-    def summary(self, verbosity=0):
-        """Returns basic statistics about the graph in a string
+    def __str__(self):
+        """Returns a string representation of the graph.
+
+        Behind the scenes, this method constructs a L{GraphSummary}
+        instance and invokes its C{__str__} method with maximum verbosity.
+        See the documentation of L{GraphSummary} for more details about the
+        output.
+        """
+        return self.summary(verbosity=1, width=78)
+
+    def summary(self, verbosity=0, width=None, *args, **kwds):
+        """Returns the summary of the graph.
         
-        @param verbosity: the amount of statistics to be returned. 0 returns
-          the usual statistics (node, edge count, directedness, number of
-          strong components, density, reciprocity, average path length,
-          diameter). 1 also returns the detailed degree distributions."""
-        output=[]
-        output.append("%d nodes, %d edges, %sdirected" % \
-            (self.vcount(), self.ecount(), ["un", ""][self.is_directed()]))
-        output.append("")
-        output.append("Number of components: %d" % len(self.clusters()))
-        output.append("Diameter: %d" % self.diameter(unconn=True))
-        output.append("Density: %.4f" % self.density())
-        # output.append("Transitivity: %.4f" % self.transitivity())
-        if self.is_directed():
-            output.append("Reciprocity: %.4f" % self.reciprocity())
-        output.append("Average path length: %.4f" % self.average_path_length())
+        The output of this method is similar to the output of the
+        C{__str__} method. If I{verbosity} is zero, only the header line
+        is returned (see C{__str__} for more details), otherwise the
+        header line and the edge list is printed.
 
-        if verbosity>=1:
-            maxdegree=self.maxdegree()
-            binwidth=max(1, maxdegree/20)
-            output.append("")
-            output.append("Degree distribution:")
-            output.append(str(self.degree_distribution(binwidth)))
+        Behind the scenes, this method constructs a L{GraphSummary}
+        object and invokes its C{__str__} method.
 
-            if self.is_directed():
-                output.append("")
-                output.append("Degree distribution (only in-degrees):")
-                dd = self.degree_distribution(binwidth, type=IN)
-                output.append(str(dd))
-                output.append("")
-                output.append("Degree distribution (only out-degrees):")
-                dd = self.degree_distribution(binwidth, type=OUT)
-                output.append(str(dd))
-
-        return "\n".join(output)
+        @param verbosity: if zero, only the header line is returned
+          (see C{__str__} for more details), otherwise the header line
+          and the full edge list is printed.
+        @param width: the number of characters to use in one line.
+          If C{None}, no limit will be enforced on the line lengths.
+        @return: the summary of the graph.
+        """
+        return str(GraphSummary(self, verbosity, width, *args, **kwds))
 
     _format_mapping = {
           "ncol":       ("Read_Ncol", "write_ncol"),
@@ -2443,6 +2604,7 @@ class Graph(GraphBase):
         "fruchterman_reingold": "layout_fruchterman_reingold",
         "gfr": "layout_grid_fruchterman_reingold",
         "graphopt": "layout_graphopt",
+        "grid": "layout_grid",
         "grid_fr": "layout_grid_fruchterman_reingold",
         "grid_fruchterman_reingold": "layout_grid_fruchterman_reingold",
         "kk": "layout_kamada_kawai",
@@ -2533,6 +2695,11 @@ class VertexSeq(_igraph.VertexSeq):
       >>> g.vs.degree() == g.degree()
       True
     """
+
+    def attributes(self):
+        """Returns the list of all the vertex attributes in the graph
+        associated to this vertex sequence."""
+        return self.graph.vertex_attributes()
 
     def select(self, *args, **kwds):
         """Selects a subset of the vertex sequence based on some criteria
@@ -2649,15 +2816,14 @@ class VertexSeq(_igraph.VertexSeq):
             "in": lambda a, b: a in b, \
             "notin": lambda a, b: a not in b }
         for keyword, value in kwds.iteritems():
-            if "_" not in keyword or keyword.rindex("_") == 0: keyword = keyword+"_eq"
-            pos = keyword.rindex("_")
-            attr, op = keyword[0:pos], keyword[pos+1:]
+            if "_" not in keyword or keyword.rindex("_") == 0:
+                keyword = keyword+"_eq"
+            attr, _, op = keyword.rpartition("_")
             try:
                 func = operators[op]
             except KeyError:
                 # No such operator, assume that it's part of the attribute name
-                attr = "%s_%s" % (attr,op)
-                func = operators["eq"]
+                attr, func = keyword, operators["eq"]
 
             if attr[0] == '_':
                 # Method call, not an attribute
@@ -2747,6 +2913,11 @@ class EdgeSeq(_igraph.EdgeSeq):
       >>> g.es.is_multiple() == g.is_multiple()
       True
     """
+
+    def attributes(self):
+        """Returns the list of all the edge attributes in the graph
+        associated to this edge sequence."""
+        return self.graph.edge_attributes()
 
     def select(self, *args, **kwds):
         """Selects a subset of the edge sequence based on some criteria
@@ -3030,6 +3201,12 @@ restricted to this sequence, and returns the result.
     return decorated
 
 def _add_proxy_methods():
+
+    # Proxy methods for VertexSeq and EdgeSeq that forward their arguments to
+    # the corresponding Graph method are constructed here. Proxy methods for
+    # Vertex and Edge are added in the C source code. Make sure that you update
+    # the C source whenever you add a proxy method here if that makes sense for
+    # an individual vertex or edge
     decorated_methods = {}
     decorated_methods[VertexSeq] = \
         ["degree", "betweenness", "bibcoupling", "closeness", "cocitation",
@@ -3061,6 +3238,29 @@ def _add_proxy_methods():
 _add_proxy_methods()
 
 ##############################################################
+# Making sure that layout methods always return a Layout
+
+def _layout_method_wrapper(func):
+    """Wraps an existing layout method to ensure that it returns a Layout
+    instead of a list of lists.
+
+    @param func: the method to wrap. Must be a method of the Graph object.
+    @return: a new method
+    """
+    def result(*args, **kwds):
+        layout = func(*args, **kwds)
+        if not isinstance(layout, Layout):
+            layout = Layout(layout)
+        return layout
+    result.__name__ = func.__name__
+    result.__doc__  = func.__doc__
+    return result
+
+for name in dir(Graph):
+    if name.startswith("layout_") and name != "layout_auto":
+        setattr(Graph, name, _layout_method_wrapper(getattr(Graph, name)))
+
+##############################################################
 # Adding aliases for the 3D versions of the layout methods
 
 def _3d_version_for(func):
@@ -3083,147 +3283,8 @@ def _3d_version_for(func):
 Graph.layout_fruchterman_reingold_3d=_3d_version_for(Graph.layout_fruchterman_reingold)
 Graph.layout_kamada_kawai_3d=_3d_version_for(Graph.layout_kamada_kawai)
 Graph.layout_random_3d=_3d_version_for(Graph.layout_random)
+Graph.layout_grid_3d=_3d_version_for(Graph.layout_grid)
 Graph.layout_sphere=_3d_version_for(Graph.layout_circle)
-
-
-##############################################################
-
-def _prepare_community_comparison(comm1, comm2, remove_none=False):
-    """Auxiliary method that takes two community structures either as
-    membership lists or instances of L{Clustering}, and returns a
-    tuple whose two elements are membership lists.
-
-    This is used by L{compare_communities} and L{split_join_distance}.
-
-    @param comm1: the first community structure as a membership list or
-      as a L{Clustering} object.
-    @param comm2: the second community structure as a membership list or
-      as a L{Clustering} object.
-    @param remove_none: whether to remove C{None} entries from the membership
-      lists. If C{remove_none} is C{False}, a C{None} entry in either C{comm1}
-      or C{comm2} will result in an exception. If C{remove_none} is C{True},
-      C{None} values are filtered away and only the remaining lists are
-      compared.
-    """
-    def _ensure_list(obj):
-        if isinstance(obj, Clustering):
-            return obj.membership
-        return list(obj)
-
-    vec1, vec2 = _ensure_list(comm1), _ensure_list(comm2)
-    if len(vec1) != len(vec2):
-        raise ValueError("the two membership vectors must be equal in length")
-
-    if remove_none and (None in vec1 or None in vec2):
-        idxs_to_remove = [i for i in xrange(len(vec1)) \
-                if vec1[i] is None or vec2[i] is None]
-        idxs_to_remove.reverse()
-        n = len(vec1)
-        for i in idxs_to_remove:
-            n -= 1
-            vec1[i], vec1[n] = vec1[n], vec1[i]
-            vec2[i], vec2[n] = vec2[n], vec2[i]
-        del vec1[n:]
-        del vec2[n:]
-
-    return vec1, vec2
-
-
-def compare_communities(comm1, comm2, method="vi", remove_none=False):
-    """Compares two community structures using various distance measures.
-
-    @param comm1: the first community structure as a membership list or
-      as a L{Clustering} object.
-    @param comm2: the second community structure as a membership list or
-      as a L{Clustering} object.
-    @param method: the measure to use. C{"vi"} or C{"meila"} means the
-      variation of information metric of Meila (2003), C{"nmi"} or C{"danon"}
-      means the normalized mutual information as defined by Danon et al (2005),
-      C{"split-join"} means the split-join distance of van Dongen (2000),
-      C{"rand"} means the Rand index of Rand (1971), C{"adjusted_rand"}
-      means the adjusted Rand index of Hubert and Arabie (1985).
-    @param remove_none: whether to remove C{None} entries from the membership
-      lists. This is handy if your L{Clustering} object was constructed using
-      L{VertexClustering.FromAttribute} using an attribute which was not defined
-      for all the vertices. If C{remove_none} is C{False}, a C{None} entry in
-      either C{comm1} or C{comm2} will result in an exception. If C{remove_none}
-      is C{True}, C{None} values are filtered away and only the remaining lists
-      are compared.
-
-    @return: the calculated measure.
-    @newfield ref: Reference
-    @ref: Meila M: Comparing clusterings by the variation of information.
-          In: Scholkopf B, Warmuth MK (eds). Learning Theory and Kernel
-          Machines: 16th Annual Conference on Computational Learning Theory
-          and 7th Kernel Workship, COLT/Kernel 2003, Washington, DC, USA.
-          Lecture Notes in Computer Science, vol. 2777, Springer, 2003.
-          ISBN: 978-3-540-40720-1.
-    @ref: Danon L, Diaz-Guilera A, Duch J, Arenas A: Comparing community
-          structure identification. J Stat Mech P09008, 2005.
-    @ref: van Dongen D: Performance criteria for graph clustering and Markov
-          cluster experiments. Technical Report INS-R0012, National Research
-          Institute for Mathematics and Computer Science in the Netherlands,
-          Amsterdam, May 2000.
-    @ref: Rand WM: Objective criteria for the evaluation of clustering
-          methods. J Am Stat Assoc 66(336):846-850, 1971.
-    @ref: Hubert L and Arabie P: Comparing partitions. Journal of
-          Classification 2:193-218, 1985.
-    """
-    vec1, vec2 = _prepare_community_comparison(comm1, comm2, remove_none)
-    return _igraph._compare_communities(vec1, vec2, method)
-
-def split_join_distance(comm1, comm2, remove_none=False):
-    """Calculates the split-join distance between two community structures.
-
-    The split-join distance is a distance measure defined on the space of
-    partitions of a given set. It is the sum of the projection distance of
-    one partition from the other and vice versa, where the projection
-    number of A from B is if calculated as follows:
-
-      1. For each set in A, find the set in B with which it has the
-         maximal overlap, and take note of the size of the overlap.
-
-      2. Take the sum of the maximal overlap sizes for each set in A.
-
-      3. Subtract the sum from M{n}, the number of elements in the
-         partition.
-
-    Note that the projection distance is asymmetric, that's why it has to be
-    calculated in both directions and then added together.  This function
-    returns the projection distance of C{comm1} from C{comm2} and the
-    projection distance of C{comm2} from C{comm1}, and returns them in a pair.
-    The actual split-join distance is the sum of the two distances. The reason
-    why it is presented this way is that one of the elements being zero then
-    implies that one of the partitions is a subpartition of the other (and if
-    it is close to zero, then one of the partitions is close to being a
-    subpartition of the other).
-
-    @param comm1: the first community structure as a membership list or
-      as a L{Clustering} object.
-    @param comm2: the second community structure as a membership list or
-      as a L{Clustering} object.
-    @param remove_none: whether to remove C{None} entries from the membership
-      lists. This is handy if your L{Clustering} object was constructed using
-      L{VertexClustering.FromAttribute} using an attribute which was not defined
-      for all the vertices. If C{remove_none} is C{False}, a C{None} entry in
-      either C{comm1} or C{comm2} will result in an exception. If C{remove_none}
-      is C{True}, C{None} values are filtered away and only the remaining lists
-      are compared.
-
-    @return: the projection distance of C{comm1} from C{comm2} and vice versa
-      in a tuple. The split-join distance is the sum of the two.
-    @newfield ref: Reference
-    @ref: van Dongen D: Performance criteria for graph clustering and Markov
-          cluster experiments. Technical Report INS-R0012, National Research
-          Institute for Mathematics and Computer Science in the Netherlands,
-          Amsterdam, May 2000.
-
-    @see: L{compare_communities()} with C{method = "split-join"} if you are
-      not interested in the individual projection distances but only the
-      sum of them.
-    """
-    vec1, vec2 = _prepare_community_comparison(comm1, comm2, remove_none)
-    return _igraph._split_join_distance(vec1, vec2)
 
 ##############################################################
 
@@ -3250,15 +3311,18 @@ def write(graph, filename, *args, **kwds):
     return graph.write(filename, *args, **kwds)
 save=write
 
-def summary(obj, stream=sys.stdout, *args, **kwds):
+def summary(obj, stream=None, *args, **kwds):
     """Prints a summary of object o to a given stream
 
     Positional and keyword arguments not explicitly mentioned here are passed
     on to the underlying C{summary()} method of the object if it has any.
 
     @param obj: the object about which a human-readable summary is requested.
-    @param stream: the stream to be used
+    @param stream: the stream to be used. If C{None}, the standard output
+      will be used.
     """
+    if stream is None:
+        stream = sys.stdout
     if hasattr(obj, "summary"):
         stream.write(obj.summary(*args, **kwds))
     else:

@@ -110,6 +110,20 @@ class Layout(object):
     def __copy__(self):
         return self.__class__(self.coords, self.dim)
 
+    def __repr__(self):
+        if not self.coords:
+            vertex_count = "no vertices"
+        elif len(self.coords) == 1:
+            vertex_count = "1 vertex"
+        else:
+            vertex_count = "%d vertices" % len(self.coords)
+        if self.dim == 1:
+            dim_count = "1 dimension"
+        else:
+            dim_count = "%d dimensions" % self.dim
+        return "<%s with %s and %s>" % (self.__class__.__name__,
+                vertex_count, dim_count)
+
     @property
     def dim(self):
         """Returns the number of dimensions"""
@@ -141,17 +155,28 @@ class Layout(object):
                 row[current_dim] *= -1
 
 
-    def rotate(self, degree, dim1=0, dim2=1):
-        """Rotates the layout by the given degrees along the plane defined by
-        the given two dimensions"""
-        radian = degree * pi / 180.
+    def rotate(self, angle, dim1=0, dim2=1, **kwds):
+        """Rotates the layout by the given degrees on the plane defined by
+        the given two dimensions.
+
+        @param angle: the angle of the rotation, specified in degrees.
+        @param dim1: the first axis of the plane of the rotation.
+        @param dim2: the second axis of the plane of the rotation.
+        @keyword origin: the origin of the rotation. If not specified, the
+          origin will be the origin of the coordinate system.
+        """
+
+        origin = list(kwds.get("origin", [0.]*self._dim))
+        if len(origin) != self._dim:
+            raise ValueError("origin must have %d dimensions" % self._dim)
+
+        radian = angle * pi / 180.
         cos_alpha, sin_alpha = cos(radian), sin(radian)
         
         for idx, row in enumerate(self._coords): 
-            new_row = list(row)
-            new_row[dim1] = cos_alpha*row[dim1] - sin_alpha*row[dim2]
-            new_row[dim2] = sin_alpha*row[dim1] + cos_alpha*row[dim2]
-            self._coords[idx] = new_row
+            x, y = row[dim1] - origin[dim1], row[dim2] - origin[dim2]
+            row[dim1] = cos_alpha*x - sin_alpha*y + origin[dim1]
+            row[dim2] = sin_alpha*x + cos_alpha*y + origin[dim2]
 
 
     def scale(self, *args, **kwds):

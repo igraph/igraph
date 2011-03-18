@@ -3,7 +3,12 @@
 Simple script that runs the unit tests of igraph.
 """
 
-from igraph.test import test
+import sys
+from igraph.test import run_tests
 
 if __name__ == "__main__":
-	test()
+    if "-v" in sys.argv:
+        verbosity = 2
+    else:
+        verbosity = 1
+    run_tests(verbosity=verbosity)

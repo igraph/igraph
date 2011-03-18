@@ -25,6 +25,7 @@
 #define PYTHON_ERROR_H
 
 #include <Python.h>
+#include <igraph_error.h>
 
 /** \defgroup python_interface_errors Error handling
  * \ingroup python_interface */
@@ -36,4 +37,13 @@ void igraphmodule_igraph_error_hook(const char *reason, const char *file,
 				    int line, int igraph_errno);
 
 extern PyObject* igraphmodule_InternalError;
+
+#define IGRAPH_PYCHECK(a) do { \
+	int igraph_i_pyret=(a); \
+	if (IGRAPH_UNLIKELY(igraph_i_pyret != 0)) {\
+		igraphmodule_handle_igraph_error();  \
+		IGRAPH_FINALLY_FREE();               \
+		return 0;                            \
+	} } while (0)
+
 #endif

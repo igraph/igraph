@@ -68,11 +68,12 @@ igraph_edges:
 
 igraph_get_eid:
         PARAMS: GRAPH graph, OUT INTEGERPTR eid, INTEGER from, \
-                INTEGER to, BOOLEAN directed=True
+                INTEGER to, BOOLEAN directed=True, BOOLEAN error=True
         IGNORE: RR, RC, RNamespace
 
 igraph_get_eids:
-        PARAMS: GRAPH graph, OUT VECTOR eids, VECTOR pairs, BOOLEAN directed=True
+        PARAMS: GRAPH graph, OUT VECTOR eids, VECTOR pairs, \
+                BOOLEAN directed=True, BOOLEAN error=True
         IGNORE: RR, RC, RNamespace
 
 igraph_incident:
@@ -168,8 +169,10 @@ igraph_full_bipartite:
 #######################################
 
 igraph_barabasi_game:
-        PARAMS: OUT GRAPH graph, INTEGER n, INTEGER m=1, VECTOR_OR_0 outseq, \
-                BOOLEAN outpref=False, BOOLEAN directed=True
+        PARAMS: OUT GRAPH graph, INTEGER n, INTEGER m=1, REAL power=1.0, \
+                VECTOR_OR_0 outseq, BOOLEAN outpref=False, REAL A=1.0, \
+                BOOLEAN directed=True, BARABASI_ALGORITHM algo=BAG, \
+                GRAPH_OR_0 start_from=0
         IGNORE: RR, RC, RNamespace
 
 igraph_erdos_renyi_game_gnp:
@@ -238,11 +241,12 @@ igraph_asymmetric_preference_game:
         IGNORE: RR, RC, RNamespace
 
 igraph_rewire_edges:
-        PARAMS: INOUT GRAPH graph, REAL prob
+        PARAMS: INOUT GRAPH graph, REAL prob, BOOLEAN loops=False
         IGNORE: RR, RC, RNamespace
 
 igraph_watts_strogatz_game:
-        PARAMS: OUT GRAPH graph, INTEGER dim, INTEGER size, INTEGER nei, REAL p
+        PARAMS: OUT GRAPH graph, INTEGER dim, INTEGER size, INTEGER nei, \
+                REAL p, BOOLEAN loops=False
         IGNORE: RR, RC, RNamespace
 
 igraph_lastcit_game:
@@ -532,6 +536,10 @@ igraph_is_multiple:
         PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL
         DEPS: es ON graph
         IGNORE: RR, RC, RNamespace
+
+igraph_has_multiple:
+        PARAMS: GRAPH graph, OUT BOOLEANPTR res
+        NAME-R: has.multiple
 
 igraph_count_multiple:
         PARAMS: GRAPH graph, OUT VECTOR res, EDGESET es=ALL
@@ -866,6 +874,14 @@ igraph_layout_star:
         DEPS: center ON graph
         NAME-R: layout.star
 
+igraph_layout_grid:
+        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER width=0
+        NAME-R: layout.grid
+
+igraph_layout_grid_3d:
+        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER width=0, INTEGER height=0
+        NAME-R: layout.grid.3d
+
 igraph_layout_fruchterman_reingold:
         PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=500, REAL maxdelta=VCOUNT(graph), \
                 REAL area=VCOUNT(graph)^2, REAL coolexp=1.5, REAL repulserad=VCOUNT(graph)^3, NULL use_seed, \
@@ -877,7 +893,7 @@ igraph_layout_fruchterman_reingold:
 igraph_layout_grid_fruchterman_reingold:
         PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=500, REAL maxdelta=VCOUNT(graph), \
                 REAL area=VCOUNT(graph)^2, REAL coolexp=1.5, REAL repulserad=VCOUNT(graph)^3, REAL cellsize=VCOUNT(graph), \
-                NULL use_seed
+                NULL use_seed, VECTOR_OR_0 weight
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_kamada_kawai:
@@ -1048,31 +1064,15 @@ igraph_community_leading_eigenvector:
         PARAMS: GRAPH graph, OUT MATRIX merges, OUT VECTOR membership, \
                 INTEGER steps=-1, \
                 INOUT ARPACKOPT options=igraph.arpack.default, \
-                OUT REALPTR modularity
+                OUT REALPTR modularity, BOOLEAN start=False, \
+                OUT VECTOR_OR_0 eigenvalues, \
+                OUT VECTOR_OR_0 eigenvectors, \
+                OUT VECTOR_OR_0 history, \
+                LEVCFUNC callback
         DEFAULT-R: options=igraph.arpack.default
         CLASS-R: igraph.eigenc
         NAME-R: leading.eigenvector.community
-        IGNORE: RR
-
-igraph_community_leading_eigenvector_naive:
-        PARAMS: GRAPH graph, OUT MATRIX merges, OUT VECTOR membership, \
-                INTEGER steps=-1, \
-                INOUT ARPACKOPT options=igraph.arpack.default, \
-                OUT REALPTR modularity
-        DEFAULT-R: options=igraph.arpack.default
-        CLASS-R: igraph.eigenc
-        NAME-R: leading.eigenvector.community.naive
-        IGNORE: RR
-
-igraph_community_leading_eigenvector_step:
-        PARAMS: GRAPH graph, INOUT VECTOR membership, INTEGER community, \
-                OUT BOOLEANPTR split, OUT VECTOR_OR_0 eigenvector, \
-                OUT REALPTR eigenvalue, INOUT ARPACKOPT options=igraph.arpack.default, \
-                NULL storage
-        DEFAULT-R: options=igraph.arpack.default
-        NAME-R: leading.eigenvector.community.step
-        CLASS-R: igraph.eigencstep
-        IGNORE: RR
+        IGNORE: RR, RC
 
 igraph_community_label_propagation:
         PARAMS: GRAPH graph, OUT VECTOR membership, EDGEWEIGHTS weights=NULL, \

@@ -639,3 +639,15 @@ WITH --------------------------------------------------------------------------
 
 </blockquote>
 
+REPLACE ----- example file  ---------------------------------------------------
+
+\\example\b\s*
+(?P<filename>[^\n]*?)\n
+
+WITH --------------------------------------------------------------------------
+
+<example role="sourcefile">
+  <title> File <code>\g<filename></code></title>
+  <xi:include  href="../\g<filename>.xml"
+      xmlns:xi="http://www.w3.org/2001/XInclude"/>
+</example>

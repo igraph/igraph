@@ -19,4 +19,10 @@
 # Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
 # 02110-1301 USA
 
-# AT_BANNER([[Eigenvalues, eigenvectors]])
+AT_BANNER([[Eigenvalues, eigenvectors]])
+
+AT_SETUP([Symmetric matrix, LAPACK (igraph_eigen_matrix_symmetric):])
+AT_KEYWORDS([eigenvalue lapack LAPACK])
+AT_COMPILE_CHECK([simple/igraph_eigen_matrix_symmetric.c],
+		 [simple/igraph_eigen_matrix_symmetric.out])
+AT_CLEANUP
