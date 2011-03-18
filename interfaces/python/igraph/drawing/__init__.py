@@ -191,7 +191,8 @@ class Plot(object):
         """
         if opacity < 0.0 or opacity > 1.0:
             raise ValueError("opacity must be between 0.0 and 1.0")
-        bbox = bbox or self.bbox
+        if bbox is None:
+            bbox = self.bbox
         if not isinstance(bbox, BoundingBox):
             bbox = BoundingBox(bbox)
         self._objects.append((obj, bbox, palette, opacity, args, kwds))
