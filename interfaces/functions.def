@@ -68,11 +68,12 @@ igraph_edges:
 
 igraph_get_eid:
         PARAMS: GRAPH graph, OUT INTEGERPTR eid, INTEGER from, \
-                INTEGER to, BOOLEAN directed=True
+                INTEGER to, BOOLEAN directed=True, BOOLEAN error=True
         IGNORE: RR, RC, RNamespace
 
 igraph_get_eids:
-        PARAMS: GRAPH graph, OUT VECTOR eids, VECTOR pairs, BOOLEAN directed=True
+        PARAMS: GRAPH graph, OUT VECTOR eids, VECTOR pairs, \
+                BOOLEAN directed=True, BOOLEAN error=True
         IGNORE: RR, RC, RNamespace
 
 igraph_incident:
@@ -168,8 +169,10 @@ igraph_full_bipartite:
 #######################################
 
 igraph_barabasi_game:
-        PARAMS: OUT GRAPH graph, INTEGER n, INTEGER m=1, VECTOR_OR_0 outseq, \
-                BOOLEAN outpref=False, BOOLEAN directed=True
+        PARAMS: OUT GRAPH graph, INTEGER n, INTEGER m=1, REAL power=1.0, \
+                VECTOR_OR_0 outseq, BOOLEAN outpref=False, REAL A=1.0, \
+                BOOLEAN directed=True, BARABASI_ALGORITHM algo=BAG, \
+                GRAPH_OR_0 start_from=0
         IGNORE: RR, RC, RNamespace
 
 igraph_erdos_renyi_game_gnp:
