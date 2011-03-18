@@ -238,6 +238,24 @@ class Rectangle(object):
                 min(self._bottom, other._bottom))
     __and__ = intersection
 
+    def translate(self, dx, dy):
+        """Translates the rectangle in-place.
+
+        Example:
+
+            >>> r = Rectangle(10, 20, 50, 70)
+            >>> r.translate(30, -10)
+            >>> r
+            Rectangle(40.0, 10.0, 80.0, 60.0)
+
+        @param dx: the X coordinate of the translation vector
+        @param dy: the Y coordinate of the translation vector
+        """
+        self._left += dx
+        self._right += dx
+        self._top += dy
+        self._bottom += dy
+
     def union(self, other):
         """Returns the union of this rectangle with another.
         
