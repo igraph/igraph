@@ -27,6 +27,7 @@ from copy import deepcopy
 from StringIO import StringIO
 from igraph import community_to_membership
 from igraph.colors import ClusterColoringPalette
+from igraph.datatypes import UniqueIdGenerator
 try:
     set, frozenset
 except NameError:
