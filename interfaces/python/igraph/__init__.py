@@ -234,6 +234,26 @@ class Graph(GraphBase):
                    "Graph.incident() instead")
         return self.incident(*args, **kwds)
 
+    def as_directed(self, *args, **kwds):
+        """as_directed(*args, **kwds)
+
+        Returns a directed copy of this graph. Arguments are passed on
+        to L{Graph.to_directed()} that is invoked on the copy.
+        """
+        copy = self.copy()
+        copy.to_directed()
+        return copy
+
+    def as_undirected(self, *args, **kwds):
+        """as_undirected(*args, **kwds)
+
+        Returns an undirected copy of this graph. Arguments are passed on
+        to L{Graph.to_undirected()} that is invoked on the copy.
+        """
+        copy = self.copy()
+        copy.to_undirected()
+        return copy
+
     def delete_edges(self, *args, **kwds):
         """Deletes some edges from the graph.
 
