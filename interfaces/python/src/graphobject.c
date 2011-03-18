@@ -5736,7 +5736,7 @@ PyObject
 
   if (igraph_layout_grid_fruchterman_reingold
       (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, cellsize,
-       use_seed)) {
+       use_seed, weights)) {
     igraph_matrix_destroy(&m);
     if (weights) {
       igraph_vector_destroy(weights); free(weights);
