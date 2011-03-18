@@ -61,6 +61,7 @@ rbtree::~rbtree() {
       (root->left != leaf || root->right != leaf)) { 
     deleteSubTree(root); 
   }
+  if (root) delete root;
   delete leaf;
   support = 0;
   root = 0;
@@ -657,6 +658,7 @@ dendro::dendro(): root(0), internal(0), leaf(0), d(0), splithist(0),
 		  paths(0), ctree(0), cancestor(0), g(0) { }
 dendro::~dendro() {
   list *curr, *prev;
+  
   if (g)        { delete    g;         g        =0; } // O(m)
   if (internal) { delete [] internal;  internal =0; } // O(n)
   if (leaf)     { delete [] leaf;      leaf     =0; } // O(n)
@@ -678,8 +680,8 @@ dendro::~dendro() {
   } 
   paths=0;
 
-  if (ctree)    { delete ctree;     ctree     = 0; } // O(n)
-  if (cancestor){ delete cancestor; cancestor = 0; } // O(n)
+  if (ctree)    { delete [] ctree;     ctree     = 0; } // O(n)
+  if (cancestor){ delete [] cancestor; cancestor = 0; } // O(n)
 }
 
 // *********************************************************************
@@ -1869,8 +1871,8 @@ void dendro::recordConsensusTree(igraph_vector_t *parents,
 
   // Now, initialize the various arrays we use to keep track of the
   // internal structure of the consensus tree.
-  ctree  = new cnode   [treesize];
-  cancestor       = new int     [n];
+  ctree  = new cnode[treesize];
+  cancestor = new int[n];
   for (int i=0; i<treesize; i++) { ctree[i].index = i;  }
   for (int i=0; i<n; i++)        { cancestor[i]   = -1; }
   int ii = 0;
@@ -1885,7 +1887,6 @@ void dendro::recordConsensusTree(igraph_vector_t *parents,
   for (int i=n-2; i>=0; i--) {
     // First, we get a list of all the splits with this exactly i Ms
     curr = splithist->returnTheseSplits(i);
-    // if (curr != NULL) { cout << ">> M[" << i << "] <<" << endl; }
     
     // Now we loop over that list
     while (curr != NULL) {
@@ -1967,6 +1968,7 @@ void dendro::recordConsensusTree(igraph_vector_t *parents,
       delete sat;
     }
     if (weights) { VECTOR(*weights)[i] = ctree[i].weight; }
+    ctree[i].children=0;
   }
   
   // Plus the isolate nodes
@@ -2640,6 +2642,7 @@ splittree::~splittree() {
   support      = 0;
   total_weight = 0.0;
   total_count  = 0;
+  if (root) delete root;
   delete leaf;
   root    = NULL;
   leaf    = NULL;

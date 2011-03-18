@@ -270,6 +270,8 @@ int igraph_hrg_fit(const igraph_t *graph,
     IGRAPH_CHECK(MCMCEquilibrium_Find(d, hrg));
   }
   
+  delete d;
+
   RNG_END();
 
   return 0;
@@ -360,6 +362,8 @@ int igraph_hrg_sample(const igraph_t *input_graph,
     }
   }
 
+  delete d;
+
   RNG_END();
 
   return 0;
@@ -441,10 +445,10 @@ int igraph_hrg_consensus(const igraph_t *graph,
   if (start && !hrg) {
     IGRAPH_ERROR("`hrg' must be given is `start' is true", IGRAPH_EINVAL);
   }
-  
-  d = new dendro;
 
   RNG_BEGIN();
+  
+  d = new dendro;
   
   IGRAPH_CHECK(igraph_i_hrg_getgraph(graph, d));
 
@@ -457,9 +461,11 @@ int igraph_hrg_consensus(const igraph_t *graph,
 
   IGRAPH_CHECK(markovChainMonteCarlo2(d, num_samples));
 
-  RNG_END();
-
   d->recordConsensusTree(parents, weights);
+
+  delete d;
+  
+  RNG_END();
 
   return 0;
 }
@@ -631,7 +637,11 @@ int igraph_hrg_predict(const igraph_t *graph,
   IGRAPH_CHECK(MCMCEquilibrium_Sample(d, num_samples));
   IGRAPH_CHECK(rankCandidatesByProbability(sg, d, br_list, mk));
   IGRAPH_CHECK(recordPredictions(d, br_list, edges, prob, mk));
-  
+
+  delete d;
+  delete sg;
+  delete [] br_list;
+
   RNG_END();
 
   return 0;

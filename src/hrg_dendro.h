@@ -113,7 +113,7 @@ public:
   int parent;			// index of parent node
   double weight;		// sampled posterior weight
   child* children;		// list of children (and their types)
-  child*	lastChild;	// pointer to last child in list
+  child* lastChild;		// pointer to last child in list
   cnode(): index(-1), degree(0), parent(-1), weight(0.0), 
 	   children(0), lastChild(0)  { }
   ~cnode() {
