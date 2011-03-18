@@ -873,11 +873,11 @@ igraph_layout_star:
 
 igraph_layout_grid:
         PARAMS: GRAPH graph, OUT MATRIX res, INTEGER width=0
-		NAME-R: layout.grid
+        NAME-R: layout.grid
 
 igraph_layout_grid_3d:
         PARAMS: GRAPH graph, OUT MATRIX res, INTEGER width=0, INTEGER height=0
-		NAME-R: layout.grid.3d
+        NAME-R: layout.grid.3d
 
 igraph_layout_fruchterman_reingold:
         PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=500, REAL maxdelta=VCOUNT(graph), \
