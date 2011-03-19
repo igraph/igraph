@@ -24,6 +24,8 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 
+from igraph.datatypes import Matrix
+from igraph.utils import str_to_orientation
 from math import ceil
 
 __all__ = ["Palette", "GradientPalette", "AdvancedGradientPalette", \
@@ -48,14 +50,6 @@ class Palette(object):
     def __init__(self, n):
         self._length = n
         self._cache = {}
-
-    @property
-    def length(self):
-        """Returns the number of colors in this palette"""
-        return self._length
-
-    def __len__(self):
-        return self._length
 
     def clear_cache(self):
         """Clears the result cache.
@@ -137,6 +131,55 @@ class Palette(object):
         raise NotImplementedError("abstract class")
 
     __getitem__ = get
+
+    @property
+    def length(self):
+        """Returns the number of colors in this palette"""
+        return self._length
+
+    def __len__(self):
+        """Returns the number of colors in this palette"""
+        return self._length
+
+    def __plot__(self, context, bbox, palette, *args, **kwds):
+        """Plots the colors of the palette on the given Cairo context
+
+        Supported keyword arguments are:
+
+          - C{border_width}: line width of the border shown around the palette.
+            If zero or negative, the border is turned off. Default is C{1}.
+
+          - C{grid_width}: line width of the grid that separates palette cells.
+            If zero or negative, the grid is turned off. The grid is also
+            turned off if the size of a cell is less than three times the given
+            line width. Default is C{0}.  Fractional widths are also allowed.
+
+          - C{orientation}: the orientation of the palette. Must be one of
+            the following values: C{left-right}, C{bottom-top}, C{right-left}
+            or C{top-bottom}. Possible aliases: C{horizontal} = C{left-right},
+            C{vertical} = C{bottom-top}, C{lr} = C{left-right},
+            C{rl} = C{right-left}, C{tb} = C{top-bottom}, C{bt} = C{bottom-top}.
+            The default is C{left-right}.
+        """
+        border_width = float(kwds.get("border_width", 1.))
+        grid_width = float(kwds.get("grid_width", 0.))
+        orientation = str_to_orientation(kwds.get("orientation", "lr"))
+
+        # Construct a matrix and plot that
+        indices = range(len(self))
+        if orientation in ("rl", "bt"):
+            indices.reverse()
+        if orientation in ("lr", "rl"):
+            matrix = Matrix([indices])
+        else:
+            matrix = Matrix([[i] for i in indices])
+
+        return matrix.__plot__(context, bbox, self, style="palette",
+                square=False, grid_width=grid_width,
+                border_width=border_width)
+
+    def __repr__(self):
+        return "<%s with %d colors>" % (self.__class__.__name__, self._length)
 
 
 class GradientPalette(Palette):
@@ -2945,7 +2988,14 @@ known_colors = \
 
 palettes = {
     "gray": GradientPalette("black", "white"),
-    "red-blue": GradientPalette("red", "blue")
+    "red-blue": GradientPalette("red", "blue"),
+    "red-green": AdvancedGradientPalette(["red", "yellow", "green"]),
+    "red-black-green": AdvancedGradientPalette(["red", "black", "green"]),
+    "rainbow": RainbowPalette(),
+    "heat": AdvancedGradientPalette(["red", "yellow", "white"],
+        indices=[0, 192, 255]),
+    "terrain": AdvancedGradientPalette(["hsv(120, 100%, 65%)",
+        "hsv(60, 100%, 90%)", "hsv(0, 0%, 95%)"])
 }
 
 

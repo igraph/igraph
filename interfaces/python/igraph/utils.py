@@ -93,6 +93,44 @@ def rescale(values, out_range = (0., 1.), in_range = None, clamp = False,
     else:
         return result
 
+def str_to_orientation(value, reversed_horizontal=False, reversed_vertical=False):
+    """Tries to interpret a string as an orientation value.
+
+    The following basic values are understood: ``left-right``, ``bottom-top``,
+    ``right-left``, ``top-bottom``. Possible aliases are:
+    
+      - ``horizontal``, ``horiz``, ``h`` and ``lr`` for ``left-right``
+
+      - ``vertical``, ``vert``, ``v`` and ``tb`` for top-bottom.
+
+      - ``lr`` for ``left-right``.
+
+      - ``rl`` for ``right-left``.
+
+    ``reversed_horizontal`` reverses the meaning of ``horizontal``, ``horiz``
+    and ``h`` to ``rl`` (instead of ``lr``); similarly, ``reversed_vertical``
+    reverses the meaning of ``vertical``, ``vert`` and ``v`` to ``bt``
+    (instead of ``tb``).
+
+    Returns one of ``lr``, ``rl``, ``tb`` or ``bt``, or throws ``ValueError``
+    if the string cannot be interpreted as an orientation.
+    """
+
+    aliases = {"left-right": "lr", "right-left": "rl", "top-bottom": "tb",
+            "bottom-top": "bt", "top-down": "tb", "bottom-up": "bt"}
+
+    dir = ["lr", "rl"][reversed_horizontal]
+    aliases.update(horizontal=dir, horiz=dir, h=dir)
+
+    dir = ["tb", "bt"][reversed_vertical]
+    aliases.update(vertical=dir, vert=dir, v=dir)
+
+    result = aliases.get(value, value)
+    if result not in ("lr", "rl", "tb", "bt"):
+        raise ValueError("unknown orientation: %s" % result)
+    return result
+
+
 def consecutive_pairs(iterable, circular=False):
     """Returns consecutive pairs of items from the given iterable.
 

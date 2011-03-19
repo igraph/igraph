@@ -34,6 +34,7 @@ from igraph.datatypes import UniqueIdGenerator
 from igraph.drawing.colors import ClusterColoringPalette
 from igraph.statistics import Histogram
 from igraph.summary import _get_wrapper_for_width
+from igraph.utils import str_to_orientation
 
 class Clustering(object):
     """Class representing a clustering of an arbitrary ordered set.
@@ -730,18 +731,8 @@ class Dendrogram(object):
         if self._names is None:
             self._names = [str(x) for x in xrange(self._nitems)]
 
-        orientation = kwds.get("orientation", "lr")
-        
-        orientation_aliases = {
-            "left-right": "lr", "right-left": "rl",
-            "top-bottom": "tb", "bottom-top": "bt",
-            "top-down": "tb", "bottom-up": "bt",
-            "horizontal": "lr", "horiz": "lr", "h": "lr",
-            "vertical": "bt", "vert": "bt", "v": "bt"
-        }
-        orientation = orientation_aliases.get(orientation, orientation)
-        if orientation not in ("lr", "rl", "tb", "bt"):
-            raise ValueError("unknown orientation: %s" % orientation)
+        orientation = str_to_orientation(kwds.get("orientation", "lr"),
+                reversed_vertical=True)
         horiz = orientation in ("lr", "rl")
 
         # Get the font height
@@ -797,7 +788,6 @@ class Dendrogram(object):
         # delta_x, delta_y: displacement of the dendrogram tree
         width, height = float(bbox.width), float(bbox.height)
         delta_x, delta_y = 0, 0
-        bbox = layout.bounding_box()
         if horiz:
             width -= maxw
             if orientation == "lr":
@@ -807,7 +797,6 @@ class Dendrogram(object):
             if orientation == "tb":
                 delta_y = maxh
 
-        layout.translate(-bbox.left, -bbox.top)
         if horiz:
             delta_y += font_height / 2.
         else:
@@ -815,6 +804,9 @@ class Dendrogram(object):
         layout.fit_into((delta_x, delta_y, width - delta_x, height - delta_y),
                         keep_aspect_ratio=False)
 
+        context.save()
+
+        context.translate(bbox.left, bbox.top)
         context.set_source_rgb(0., 0., 0.)
         context.set_line_width(1)
         
@@ -853,6 +845,8 @@ class Dendrogram(object):
                 context.line_to(x2, y1)
                 context.line_to(x1, y1)
                 context.stroke()
+
+        context.restore()
 
     @property
     def merges(self):

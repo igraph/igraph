@@ -383,6 +383,12 @@ class Matrix(object):
             grid_width = 0.
         if grid_width > 0:
             context.set_line_width(grid_width)
+        else:
+            # When the grid width is zero, we will still stroke the
+            # rectangles, but with the same color as the fill color
+            # of the cell - otherwise we would get thin white lines
+            # between the cells as a drawing artifact
+            context.set_line_width(1)
 
         # Draw row names (if any)
         context.set_source_rgb(0., 0., 0.)
@@ -430,7 +436,8 @@ class Matrix(object):
                     context.set_source_rgb(0.5, 0.5, 0.5)
                     context.stroke()
                 else:
-                    context.fill()
+                    context.fill_preserve()
+                    context.stroke()
                 x += dx
             x, y = ox, y+dy
 
