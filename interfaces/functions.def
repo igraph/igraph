@@ -1125,6 +1125,12 @@ igraph_hrg_predict:
         NAME-R: hrg.predict
         IGNORE: RR
 
+igraph_hrg_create:
+        PARAMS: OUT HRG hrg, GRAPH graph, VECTOR prob
+        NAME-R: hrg.create
+        DEPS: prob ON graph
+        CLASS-R: igraphHRG
+
 #######################################
 # Conversion
 #######################################

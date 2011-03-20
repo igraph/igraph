@@ -646,3 +646,154 @@ int igraph_hrg_predict(const igraph_t *graph,
 
   return 0;
 }
+
+int igraph_hrg_create(igraph_hrg_t *hrg,
+		      const igraph_t *graph, 
+		      const igraph_vector_t *prob) {
+
+  int no_of_nodes=igraph_vcount(graph);
+  int no_of_internal=(no_of_nodes-1)/2;
+  igraph_vector_t deg, idx;
+  int root=0;
+  int d0=0, d1=0, d2=0;
+  int ii=0, il=0;
+  igraph_vector_t neis;
+  igraph_vector_t path;
+
+  // --------------------------------------------------------
+  // CHECKS
+  // --------------------------------------------------------
+
+  // At least three vertices are required
+  if (no_of_nodes < 3) {
+    IGRAPH_ERROR("HRG tree must have at least three vertices",
+		 IGRAPH_EINVAL);
+  }
+
+  // Prob vector was given
+  if (!prob) {
+    IGRAPH_ERROR("Probability vector must be given for HRG", 
+		 IGRAPH_EINVAL);
+  }
+
+  // Length of prob vector
+  if (igraph_vector_size(prob) != no_of_nodes) {
+    IGRAPH_ERROR("HRG probability vector of wrong size", IGRAPH_EINVAL);
+  }
+
+  // Must be a directed graph
+  if (!igraph_is_directed(graph)) {
+    IGRAPH_ERROR("HRG graph must be directed", IGRAPH_EINVAL);
+  }
+
+  // Number of nodes must be odd
+  if (! no_of_nodes / 2) {
+    IGRAPH_ERROR("Complete HRG graph must have odd number of vertices", 
+		 IGRAPH_EINVAL);
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&deg, 0);
+
+  // Every vertex, except for the root must have in-degree one.
+  IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_IN,
+			     IGRAPH_LOOPS));
+  for (int i=0; i<no_of_nodes; i++) {
+    int d=VECTOR(deg)[i];
+    switch (d) {
+    case 0: d0++; root=i; break;
+    case 1: d1++; break;
+    default:
+      IGRAPH_ERROR("HRG nodes must have in-degree one, except for the "
+		   "root vertex", IGRAPH_EINVAL);
+    }
+  }
+  if (d1 != no_of_nodes-1 || d0 != 1) {
+    IGRAPH_ERROR("HRG nodes must have in-degree one, except for the "
+		 "root vertex", IGRAPH_EINVAL);
+  }
+  
+  // Every internal vertex must have out-degree two,
+  // leaves out-degree zero
+  d0=d1=d2=0;
+  IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_OUT, 
+			     IGRAPH_LOOPS));
+  for (int i=0; i<no_of_nodes; i++) {
+    int d=VECTOR(deg)[i];
+    switch (d) {
+    case 0: d0++; break;
+    case 2: d2++; break;
+    default:
+      IGRAPH_ERROR("HRG nodes must have out-degree 2 (internal nodes) or "
+		   "degree 0 (leaves)", IGRAPH_EINVAL);
+    }            
+  }
+  
+  // Number of internal and external nodes is correct
+  // This basically checks that the graph has one component
+  if (d0 != d2+1) {
+    IGRAPH_ERROR("HRG degrees are incorrect, maybe multiple components?",
+		 IGRAPH_EINVAL);
+  }
+  
+  // --------------------------------------------------------
+  // Graph is good, do the conversion
+  // --------------------------------------------------------
+
+  // Create an index, that maps the root node as first, then
+  // the internal nodes, then the leaf nodes
+  IGRAPH_VECTOR_INIT_FINALLY(&idx, no_of_nodes);
+  VECTOR(idx)[root] = - (ii++) - 1;
+  for (int i=0; i<no_of_nodes; i++) {
+    int d=VECTOR(deg)[i];
+    if (i==root) { continue; }
+    if (d==2) { VECTOR(idx)[i] = - (ii++) - 1; }
+    if (d==0) { VECTOR(idx)[i] = (il++); }
+  }
+
+  igraph_hrg_resize(hrg, no_of_internal+1);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  for (int i=0; i<no_of_nodes; i++) {
+    int ri=VECTOR(idx)[i];
+    if (ri >= 0) { continue; }
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
+    VECTOR(hrg->left )[-ri-1] = VECTOR(idx)[ (int) VECTOR(neis)[0] ];
+    VECTOR(hrg->right)[-ri-1] = VECTOR(idx)[ (int) VECTOR(neis)[1] ];
+    VECTOR(hrg->prob )[-ri-1] = VECTOR(*prob)[i];
+  }
+
+  // Calculate the number of vertices and edges in each subtree
+  igraph_vector_null(&hrg->edges);
+  igraph_vector_null(&hrg->vertices);
+  IGRAPH_VECTOR_INIT_FINALLY(&path, 0);
+  IGRAPH_CHECK(igraph_vector_push_back(&path, VECTOR(idx)[root]));
+  while (!igraph_vector_empty(&path)) {
+    int tail=igraph_vector_tail(&path);
+    int ri=igraph_vector_tail(&path);
+    int lc=VECTOR(hrg->left)[-ri-1];
+    int rc=VECTOR(hrg->right)[-ri-1];
+    if (lc < 0 && VECTOR(hrg->vertices)[-lc-1]==0) {
+      // Go left
+      IGRAPH_CHECK(igraph_vector_push_back(&path, lc));
+    } else if (rc < 0 && VECTOR(hrg->vertices)[-rc-1]==0) {
+      // Go right
+      IGRAPH_CHECK(igraph_vector_push_back(&path, rc));
+    } else {
+      // Subtrees are done, update node and go up
+      VECTOR(hrg->vertices)[-ri-1] += 
+	lc < 0 ? VECTOR(hrg->vertices)[-lc-1] : 1;
+      VECTOR(hrg->vertices)[-ri-1] += 
+	rc < 0 ? VECTOR(hrg->vertices)[-rc-1] : 1;
+      VECTOR(hrg->edges)[-ri-1] += lc < 0 ? VECTOR(hrg->edges)[-lc-1]+1 : 1;
+      VECTOR(hrg->edges)[-ri-1] += rc < 0 ? VECTOR(hrg->edges)[-rc-1]+1 : 1;
+      igraph_vector_pop_back(&path);
+    }
+  }
+
+  igraph_vector_destroy(&path);
+  igraph_vector_destroy(&neis);
+  igraph_vector_destroy(&idx);
+  igraph_vector_destroy(&deg);
+  IGRAPH_FINALLY_CLEAN(4);
+
+  return 0;
+}

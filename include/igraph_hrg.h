@@ -81,6 +81,10 @@ int igraph_hrg_predict(const igraph_t *graph,
 		       int num_samples,
 		       int num_bins);
 
+int igraph_hrg_create(igraph_hrg_t *hrg,
+		      const igraph_t *graph, 
+		      const igraph_vector_t *prob);
+
 __END_DECLS
 
 #endif	/* IGRAPH_HRG_H */

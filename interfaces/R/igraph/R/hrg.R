@@ -200,6 +200,8 @@ print2.igraphHRG <- function(x, ...) {
   invisible(x)
 }
 
+# TODO: print as a tree
+
 print.igraphHRGConsensus <- function(x, ...) {
   cat("HRG consensus tree:\n")
   n <- length(x$parents) - length(x$weights)
@@ -226,7 +228,6 @@ print.igraphHRGConsensus <- function(x, ...) {
     op <- format(op, justify="left")
     cat(op, sep="   ", fill=TRUE)
   } else {
-    ## TODO: break
     cat(op, sep="\n")
   }
   
