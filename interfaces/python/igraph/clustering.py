@@ -599,6 +599,34 @@ class Dendrogram(object):
     def __str__(self):
         return self.summary(verbosity=1)
 
+    def format(self, format="newick"):
+        """Formats the dendrogram in a foreign format.
+
+        Currently only the Newick format is supported.
+        
+        Example:
+            
+            >>> d = Dendrogram([(2, 3), (0, 1), (4, 5)])
+            >>> d.format()
+            '((2,3)4,(0,1)5)6;'
+            >>> d.names = list("ABCDEFG")
+            >>> d.format()
+            '((C,D)E,(A,B)F)G;'
+        """
+        if format == "newick":
+            n = self._nitems + self._nmerges
+            if self._names is None:
+                nodes = range(n)
+            else:
+                nodes = list(self._names)
+            if len(nodes) < n:
+                nodes.extend("" for _ in xrange(n - len(nodes)))
+            for k, (i, j) in enumerate(self._merges, self._nitems):
+                nodes[k] = "(%s,%s)%s" % (nodes[i], nodes[j], nodes[k])
+                nodes[i] = nodes[j] = None
+            return nodes[-1] + ";"
+        raise ValueError("unsupported format: %r" % format)
+
     def summary(self, verbosity=0, max_leaf_count=40):
         """Returns the summary of the dendrogram.
         
@@ -675,7 +703,7 @@ class Dendrogram(object):
     def _item_box_size(self, context, horiz, idx):
         """Calculates the amount of space needed for drawing an
         individual vertex at the bottom of the dendrogram."""
-        if self._names[idx] is None:
+        if self._names is None or self._names[idx] is None:
             x_bearing, _, _, height, x_advance, _ = context.text_extents("")
         else:
             x_bearing, _, _, height, x_advance, _ = context.text_extents(str(self._names[idx]))
@@ -694,7 +722,7 @@ class Dendrogram(object):
         @param x: the X position of the item
         @param y: the Y position of the item
         """
-        if self._names[idx] is None:
+        if self._names is None or self._names[idx] is None:
             return
 
         height = self._item_box_size(context, True, idx)[1]
@@ -852,6 +880,27 @@ class Dendrogram(object):
     def merges(self):
         """Returns the performed merges in matrix format"""
         return deepcopy(self._merges)
+
+    @property
+    def names(self):
+        """Returns the names of the nodes in the dendrogram"""
+        return self._names
+
+    @names.setter
+    def names(self, items):
+        """Sets the names of the nodes in the dendrogram"""
+        if items is None:
+            self._names = None
+            return
+
+        items = list(items)
+        if len(items) < self._nitems:
+            raise ValueError("must specify at least %d names" % self._nitems)
+
+        n = self._nitems + self._nmerges
+        self._names = items[:n]
+        if len(self._names) < n:
+            self._names.extend("" for _ in xrange(n-len(self._names)))
 
 
 class VertexDendrogram(Dendrogram):
