@@ -15,7 +15,7 @@ network from Cytoscape and convert it to igraph format.
 
 from collections import defaultdict
 from itertools import izip
-from math import cos, pi, sin
+from math import atan2, cos, pi, sin, tan
 from warnings import warn
 
 from igraph._igraph import convex_hull, VertexSeq
@@ -342,9 +342,47 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
                 _, _, w, h, _, _ = label_drawer.text_extents()
                 w, h = w/2.0, h/2.0
                 radius = vertex.label_dist * vertex.size / 2.
-                cx = coords[0] + cos(vertex.label_angle) * (radius + w) - w
-                cy = coords[1] - sin(vertex.label_angle) * (radius + h) + h
-                label_drawer.draw_at(cx, cy, wrap=wrap)
+                # First we find the reference point that is at distance `radius'
+                # from the vertex in the direction given by `label_angle'.
+                # Then we place the label in a way that the line connecting the
+                # center of the bounding box of the label with the center of the
+                # vertex goes through the reference point and the reference
+                # point lies exactly on the bounding box of the vertex.
+                alpha = vertex.label_angle % (2*pi)
+                cx = coords[0] + radius * cos(alpha)
+                cy = coords[1] - radius * sin(alpha)
+                # Now we have the reference point. We have to decide which side
+                # of the label box will intersect with the line that connects
+                # the center of the label with the center of the vertex.
+                if w > 0:
+                    beta = atan2(h, w) % (2*pi)
+                else:
+                    beta = pi/2.
+                gamma = pi - beta
+                if alpha > 2*pi-beta or alpha <= beta:
+                    # Intersection at left edge of label
+                    cx += w
+                    cy -= tan(alpha) * w
+                elif alpha > beta and alpha <= gamma:
+                    # Intersection at bottom edge of label
+                    try:
+                        cx += h / tan(alpha)
+                    except:
+                        pass    # tan(alpha) == inf
+                    cy -= h
+                elif alpha > gamma and alpha <= gamma + 2*beta:
+                    # Intersection at right edge of label
+                    cx -= w
+                    cy += tan(alpha) * w
+                else:
+                    # Intersection at top edge of label
+                    try:
+                        cx -= h / tan(alpha)
+                    except:
+                        pass    # tan(alpha) == inf
+                    cy += h
+                # Draw the label
+                label_drawer.draw_at(cx-w, cy+h, wrap=wrap)
             else:
                 # Label is exactly in the center of the vertex
                 cx, cy = coords
