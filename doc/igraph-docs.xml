@@ -76,6 +76,8 @@
 
   <xi:include href="structural.xml"/>
 
+  <xi:include href="hrg.xml"/>
+
   <xi:include href="visitors.xml"/>
 
   <xi:include href="cliques.xml"/>

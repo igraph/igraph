@@ -40,11 +40,44 @@
 
 __BEGIN_DECLS
 
+/**
+ * \struct igraph_hrg_t
+ * Data structure to store a hierarchical random graph
+ * 
+ * A hierarchical random graph (HRG) can be given as a binary tree,
+ * where the internal vertices are labeled with real numbers.
+ * 
+ * </para><para>Note that you don't necessarily have to know this
+ * internal representation for using the HRG functions, just pass the
+ * HRG objects created by one igraph function, to another igraph
+ * function.
+ * 
+ * </para><para>
+ * It has the following members:
+ * \member left Vector that contains the left children of the internal
+ *    tree vertices. The first vertex is always the root vertex, so
+ *    the first element of the vector is the left child of the root
+ *    vertex. Internal vertices are denoted with negative numbers,
+ *    starting from -1 and going down, i.e. the root vertex is
+ *    -1. Leaf vertices are denoted by non-negative number, starting
+ *    from zero and up.
+ * \member right Vector that contains the right children of the
+ *    vertices, with the same encoding as the \c left vector.
+ * \member prob The connection probabilities attached to the internal
+ *    vertices, the first number belongs to the root vertex
+ *    (i.e. internal vertex -1), the second to internal vertex -2,
+ *    etc.
+ * \member edges The number of edges in the subtree below the given
+ *    internal vertex.
+ * \member vertices The number of vertices in the subtree below the
+ *    given internal vertex, including itself.
+ */
+
 typedef struct igraph_hrg_t {
   igraph_vector_t left, right, prob, edges, vertices;
 } igraph_hrg_t;
 
-int igraph_hrg_init(igraph_hrg_t *hrg, int no_of_nodes);
+int igraph_hrg_init(igraph_hrg_t *hrg, int n);
 void igraph_hrg_destroy(igraph_hrg_t *hrg);
 int igraph_hrg_size(const igraph_hrg_t *hrg);
 int igraph_hrg_resize(igraph_hrg_t *hrg, int newsize);

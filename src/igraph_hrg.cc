@@ -36,6 +36,44 @@
 
 using namespace fitHRG;
 
+/**
+ * \section hrg_intro Introduction
+ * 
+ * <para>A hierarchical random graph is an ensemble of undirected
+ * graphs with \c n vertices. It is defined via a binary tree with \c
+ * n leaf and \c n-1 internal vertices, where the
+ * internal vertices are labeled with probabilities.
+ * The probability that two vertices are connected in the random graph
+ * is given by the probability label at their closest common
+ * ancestor.
+ * </para>
+ * 
+ * <para>Please read the following two articles for more about
+ * hierarchical random graphs: A. Clauset, C. Moore, and M.E.J. Newman. 
+ * Hierarchical structure and the prediction of missing links in networks.
+ * Nature 453, 98 - 101 (2008); and A. Clauset, C. Moore, and M.E.J. Newman. 
+ * Structural Inference of Hierarchies in Networks. In E. M. Airoldi
+ * et al. (Eds.): ICML 2006 Ws, Lecture Notes in Computer Science
+ * 4503, 1-13. Springer-Verlag, Berlin Heidelberg (2007).
+ * </para>
+ * 
+ * <para>
+ * igraph contains functions for fitting HRG models to a given network
+ * (\ref igraph_hrg_fit), for generating networks from a given HRG
+ * ensemble (\ref igraph_hrg_game, \ref igraph_hrg_sample), converting
+ * and an igraph graph to a HRG and back (\ref igraph_hrg_create, \ref
+ * igraph_hrg_dendrogram), for calculating a consensus tree from a
+ * set of sampled HRGs (\ref igraph_hrg_consensus) and for predicting
+ * missing edges in a network based on its HRG models (\ref
+ * igraph_hrg_predict). 
+ * </para>
+ * 
+ * <para>The igraph HRG implementation is heavily based on the code
+ * published by Aaron Clauset, at his website,
+ * http://tuvalu.santafe.edu/~aaronc/hierarchy/
+ * </para>
+ */
+
 namespace fitHRG {
   struct pblock { double L; int i; int j; };
 }
@@ -193,7 +231,21 @@ int igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
   return 0;
 }
 
-int igraph_hrg_init(igraph_hrg_t *hrg, int no_of_nodes) {
+/**
+ * \function igraph_hrg_init
+ * Allocate memory for a HRG.
+ * 
+ * This function must be called before passing an \ref igraph_hrg_t to
+ * an igraph function.
+ * \param hrg Pointer to the HRG data structure to initialize.
+ * \param n The number of vertices in the graph that is modeled by
+ *    this HRG. It can be zero, if this is not yet known.
+ * \return Error code.
+ * 
+ * Time complexity: O(n), the number of vertices in the graph.
+ */
+
+int igraph_hrg_init(igraph_hrg_t *hrg, int n) {
   IGRAPH_VECTOR_INIT_FINALLY(&hrg->left,      no_of_nodes-1);
   IGRAPH_VECTOR_INIT_FINALLY(&hrg->right,     no_of_nodes-1);
   IGRAPH_VECTOR_INIT_FINALLY(&hrg->prob,      no_of_nodes-1);  
@@ -203,6 +255,17 @@ int igraph_hrg_init(igraph_hrg_t *hrg, int no_of_nodes) {
   return 0;
 }
 
+/** 
+ * \function igraph_hrg_destroy
+ * Deallocate memory for an HRG.
+ * 
+ * The HRG data structure can be reinitialized again with an \ref
+ * igraph_hrg_destroy call.
+ * \param hrg Pointer to the HRG data structure to deallocate.
+ * 
+ * Time complexity: operating system dependent.
+ */
+
 void igraph_hrg_destroy(igraph_hrg_t *hrg) {
   igraph_vector_destroy(&hrg->left);
   igraph_vector_destroy(&hrg->right);
@@ -211,9 +274,31 @@ void igraph_hrg_destroy(igraph_hrg_t *hrg) {
   igraph_vector_destroy(&hrg->vertices);
 }
 
+/**
+ * \function igraph_hrg_size
+ * Returns the size of the HRG, the number of leaf nodes.
+ * 
+ * \param hrg Pointer to the HRG.
+ * \return The number of leaf nodes in the HRG.
+ * 
+ * Time complexity: O(1).
+ */
+
 int igraph_hrg_size(const igraph_hrg_t *hrg) {
   return igraph_vector_size(&hrg->left)+1;
 }
+
+/**
+ * \function igraph_hrg_resize
+ * Resize a HRG.
+ * 
+ * \param hrg Pointer to an initialized (see \ref igraph_hrg_init)
+ *   HRG.
+ * \param newsize The new size, i.e. the number of leaf nodes.
+ * \return Error code.
+ * 
+ * Time complexity: O(n), n is the new size.
+ */
 
 int igraph_hrg_resize(igraph_hrg_t *hrg, int newsize) {
   int origsize=igraph_hrg_size(hrg);
@@ -244,6 +329,21 @@ int igraph_hrg_resize(igraph_hrg_t *hrg, int newsize) {
 /**
  * \function igraph_hrg_fit
  * Fit a hierarchical random graph model to a network
+ * 
+ * \param graph The igraph graph to fit the model to. Edge directions
+ *   are ignored in directed graphs.
+ * \param hrg Pointer to an initialized HRG, the result of the fitting
+ *   is stored here. It can also be used to pass a HRG to the
+ *   function, that can be used as the starting point of the Markov
+ *   Chain Monte Carlo fitting, if the \c start argument is true.
+ * \param start Logical, whether to start the fitting from the given
+ *   HRG. 
+ * \param steps Integer, the number of MCMC steps to take in the
+ *   fitting procedure. If this is zero, then the fitting stop is a
+ *   convergence criteria is fulfilled.
+ * \return Error code.
+ * 
+ * Time complexity: TODO.
  */
 
 int igraph_hrg_fit(const igraph_t *graph, 
@@ -281,6 +381,33 @@ int igraph_hrg_fit(const igraph_t *graph,
 /**
  * \function igraph_hrg_sample
  * Sample from a hierarchical random graph model
+ * 
+ * Sample from a hierarchical random graph ensemble. The ensemble can
+ * be given as a graph (\c input_graph), or as a HRG object (\c hrg).
+ * If a graph is given, then first an MCMC optimization is performed
+ * to find the optimal fitting model; then the MCMC is used to sample
+ * the graph(s).
+ * \param input_graph An igraph graph, or a null pointer. If not a
+ *   null pointer, then a HRG is first fitted to the graph, possibly
+ *   starting from the given HRG, if the \c start argument is true. If
+ *   is is a null pointer, then the given HRG is used as a starting
+ *   point, to  find the optimum of the Markov chain, before the
+ *   sampling.
+ * \param sample Pointer to an uninitialized graph, or a null
+ *   pointer. If only one sample is requested, and it is not a null
+ *   pointer, then the sample is stored here.
+ * \param samples An initialized vector of pointers. If more than one
+ *   samples are requested, then they are stored here. Note that to
+ *   free this data structure, you need to call \ref igraph_destroy on
+ *   each graph first, then \c free() on all pointers, and finally
+ *   \ref igraph_vector_ptr_destroy.
+ * \param no_samples The number of samples to generate.
+ * \param hrg A HRG. It is modified during the sampling.
+ * \param start Logical, whether to start the MCMC from the given
+ *   HRG.
+ * \return Error code.
+ * 
+ * Time complexity: TODO.
  */
 
 int igraph_hrg_sample(const igraph_t *input_graph,
@@ -372,6 +499,16 @@ int igraph_hrg_sample(const igraph_t *input_graph,
 /** 
  * \function igraph_hrg_game
  * Generate a hierarchical random graph
+ * 
+ * This function is a simple shortcut to \ref igraph_hrg_sample. 
+ * It creates a single graph, from the given HRG.
+ * \param graph Pointer to an uninitialized graph, the new graph is
+ *   created here.
+ * \param hrg The hierarchical random graph model to sample from. It
+ *   is modified during the MCMC process.
+ * \return Error code.
+ * 
+ * Time complexity: TODO.
  */
 
 int igraph_hrg_game(igraph_t *graph,
@@ -381,6 +518,20 @@ int igraph_hrg_game(igraph_t *graph,
 			   /* hrg= */ (igraph_hrg_t*) hrg, 
 			   /* start= */ 1);
 }
+
+/**
+ * \function igraph_hrg_dendrogram
+ * Create a dendrogram from a hierarchical random graph.
+ * 
+ * Creates the igraph graph equivalent of an \ref igraph_hrg_t data
+ * structure. 
+ * \param graph Pointer to an uninitialized graph, the result is
+ *   stored here.
+ * \param hrg The hierarchical random graph to convert.
+ * \return Error code.
+ * 
+ * Time complexity: O(n), the number of vertices in the graph.
+ */
 
 int igraph_hrg_dendrogram(igraph_t *graph,
 			  const igraph_hrg_t *hrg) {
@@ -432,6 +583,34 @@ int igraph_hrg_dendrogram(igraph_t *graph,
   
   return 0;
 }
+
+/** 
+ * \function igraph_hrg_consensus
+ * Calculate a consensus tree for a HRG.
+ * 
+ * The calculation can be started from the given HRG (\c hrg), or (if
+ * \c start is false), a HRG is first fitted to the given graph.
+ * 
+ * \param graph The input graph.
+ * \param parents An initialized vector, the results are stored
+ *   here. For each vertex, the id of its parent vertex is stored, or
+ *   zero, if the vertex is the root vertex in the tree. The first n
+ *   vertex ids (from 0) refer to the original vertices of the graph,
+ *   the other ids refer to vertex groups.
+ * \param weights Numeric vector, counts the number of times a given
+ *   tree split occured in the generated network samples, for each
+ *   internal vertices.
+ * \param hrg A hierarchical random graph. It is used as a starting
+ *   point for the sampling, if the \c start argument is true. It is
+ *   modified along the MCMC.
+ * \param start Logical, whether to use the supplied HRG (in \c hrg)
+ *   as a starting point for the MCMC.
+ * \param num_samples The number of samples to generate for creating
+ *   the consensus tree.
+ * \return Error code.
+ * 
+ * Time complexity: TODO.
+ */
 
 int igraph_hrg_consensus(const igraph_t *graph,
 			 igraph_vector_t *parents,
@@ -596,6 +775,29 @@ int recordPredictions(dendro *d, pblock *br_list, igraph_vector_t *edges,
   return 0;
 }
 
+/**
+ * \function igraph_hrg_predict
+ * Predict missing edges in a graph, based on HRG models
+ * 
+ * Samples HRG models for a network, and estimated the probability
+ * that an edge was falsely observed as non-existent in the network.
+ * \param graph The input graph.
+ * \param edges The list of missing edges is stored here, the first
+ *   two elements are the first edge, the next two the second edge,
+ *   etc. 
+ * \param prob Vector of probabilies for the existence of missing
+ *   edges, in the order corresponding to \c edges.
+ * \param hrg A HRG, it is used as a starting point if \c start is
+ *   true. It is also modified during the MCMC sampling.
+ * \param start Logical, whether to start the MCMC from the given HRG.
+ * \param num_samples The number of samples to generate.
+ * \param num_bins Controls the resolution of the edge
+ *   probabilities. Higher numbers result higher resolution. 
+ * \return Error code.
+ * 
+ * Time complexity: TODO.
+ */
+
 int igraph_hrg_predict(const igraph_t *graph,
 		       igraph_vector_t *edges,
 		       igraph_vector_t *prob,
@@ -646,6 +848,23 @@ int igraph_hrg_predict(const igraph_t *graph,
 
   return 0;
 }
+
+/**
+ * \function igraph_hrg_create
+ * Create a HRG from an igraph graph.
+ * 
+ * \param hrg Pointer to an initialized \ref igraph_hrg_t. The result
+ *    is stored here.
+ * \param graph The igraph graph to convert. It must be a directed
+ *    binary tree, with n-1 internal and n leaf vertices. The root
+ *    vertex must have in-degree zero.
+ * \param prob The vector of probabilities, this is used to label the
+ *    internal nodes of the hierarchical random graph. The values
+ *    corresponding to the leaves are ignored.
+ * \return Error code.
+ * 
+ * Time complexity: O(n), the number of vertices in the tree.
+ */
 
 int igraph_hrg_create(igraph_hrg_t *hrg,
 		      const igraph_t *graph, 
@@ -767,7 +986,6 @@ int igraph_hrg_create(igraph_hrg_t *hrg,
   IGRAPH_VECTOR_INIT_FINALLY(&path, 0);
   IGRAPH_CHECK(igraph_vector_push_back(&path, VECTOR(idx)[root]));
   while (!igraph_vector_empty(&path)) {
-    int tail=igraph_vector_tail(&path);
     int ri=igraph_vector_tail(&path);
     int lc=VECTOR(hrg->left)[-ri-1];
     int rc=VECTOR(hrg->right)[-ri-1];
