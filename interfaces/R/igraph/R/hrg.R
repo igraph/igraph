@@ -222,7 +222,7 @@ print.igraphHRGConsensus <- function(x, ...) {
     } else {
       mych <- paste(collapse=" ", mych)
     }
-    paste(sep="", "g", format(i, width=bw), " <- ", mych)
+    paste(sep="", "g", format(i, width=bw), " -> ", mych)
   })
   if (max(nchar(op)) < (getOption("width")-4)/2) {
     op <- format(op, justify="left")
