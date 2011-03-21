@@ -1,5 +1,7 @@
 """Additional auxiliary data types"""
 
+from itertools import islice
+
 class Matrix(object):
     """Simple matrix data type.
 
@@ -277,10 +279,11 @@ class Matrix(object):
             will be shown with a white box and C{True} with a black box.
             C{palette} uses the given palette to represent numbers by colors,
             the minimum will be assigned to palette color index 0 and the maximum
-            will be assigned to the length of the palette. The default style is
-            C{boolean} (but it may change in the future). C{None} values in
-            the matrix are treated specially in both cases: nothing is drawn in
-            the cell corresponding to C{None}.
+            will be assigned to the length of the palette. C{None} draws transparent
+            cell backgrounds only. The default style is C{boolean} (but it may
+            change in the future). C{None} values in the matrix are treated
+            specially in both cases: nothing is drawn in the cell corresponding
+            to C{None}.
 
           - C{square}: whether the cells of the matrix should be square or not.
             Default is C{True}.
@@ -290,7 +293,7 @@ class Matrix(object):
             of a cell is less than three times the given line width. Default is C{1}.
             Fractional widths are also allowed.
 
-          - C{border_width}: line width of the border shown around the matrix.
+          - C{border_width}: line width of the border drawn around the matrix.
             If zero or negative, the border is turned off. Default is C{1}.
 
           - C{row_names}: the names of the rows
@@ -321,22 +324,24 @@ class Matrix(object):
         grid_width = float(kwds.get("grid_width", 1.))
         border_width = float(kwds.get("border_width", 1.))
         style = kwds.get("style", "boolean")
-        row_names = kwds.get("row_names", None)
+        row_names = kwds.get("row_names")
         col_names = kwds.get("col_names", row_names)
-        values = kwds.get("values", None)
+        values = kwds.get("values")
         value_format = kwds.get("value_format", str)
 
         # Validations
-        if style not in ("boolean", "palette"):
+        if style not in ("boolean", "palette", "none", None):
             raise ValueError("invalid style")
+        if style == "none":
+            style = None
         if row_names is None and col_names is not None:
             row_names = col_names
         if row_names is not None:
-            row_names = list(row_names)[0:self._nrow]
+            row_names = [str(name) for name in islice(row_names, self._nrow)]
             if len(row_names) < self._nrow:
                 row_names.extend([""]*(self._nrow-len(row_names)))
         if col_names is not None:
-            col_names = list(col_names)[0:self._ncol]
+            col_names = [str(name) for name in islice(col_names, self._ncol)]
             if len(col_names) < self._ncol:
                 col_names.extend([""]*(self._ncol-len(col_names)))
         if values == False:
@@ -415,6 +420,10 @@ class Matrix(object):
 
         # Draw matrix
         x, y = ox, oy
+        if style is None:
+            fill = lambda: None
+        else:
+            fill = context.fill_preserve
         for row in self:
             for item in row:
                 if item is None:
@@ -432,11 +441,11 @@ class Matrix(object):
                     context.set_source_rgba(*palette.get(cidx))
                 context.rectangle(x, y, dx, dy)
                 if grid_width > 0:
-                    context.fill_preserve()
+                    fill()
                     context.set_source_rgb(0.5, 0.5, 0.5)
                     context.stroke()
                 else:
-                    context.fill_preserve()
+                    fill()
                     context.stroke()
                 x += dx
             x, y = ox, y+dy

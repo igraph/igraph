@@ -117,7 +117,8 @@ def str_to_orientation(value, reversed_horizontal=False, reversed_vertical=False
     """
 
     aliases = {"left-right": "lr", "right-left": "rl", "top-bottom": "tb",
-            "bottom-top": "bt", "top-down": "tb", "bottom-up": "bt"}
+            "bottom-top": "bt", "top-down": "tb", "bottom-up": "bt",
+            "top-bottom": "tb", "bottom-top": "bt", "td": "tb", "bu": "bt"}
 
     dir = ["lr", "rl"][reversed_horizontal]
     aliases.update(horizontal=dir, horiz=dir, h=dir)
