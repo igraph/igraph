@@ -21,14 +21,14 @@
   graph.}
 \usage{
 get.graph.attribute(graph, name)
-graph <- set.graph.attribute(graph, attrname, value)
-graph <- remove.graph.attribute(graph, attrname)
+set.graph.attribute(graph, name, value)
+remove.graph.attribute(graph, name)
 get.vertex.attribute(graph, name, index=V(graph))
-graph <- set.vertex.attribute(graph, attrname, index=V(graph), value)
-graph <- remove.vertex.attribute(graph, attrname)
+set.vertex.attribute(graph, name, index=V(graph), value)
+remove.vertex.attribute(graph, name)
 get.edge.attribute(graph, name, index=E(graph))
-graph <- set.edge.attribute(graph, attrname, index=E(graph), value)
-graph <- remove.edge.attribute(graph, attrname)
+set.edge.attribute(graph, name, index=E(graph), value)
+remove.edge.attribute(graph, name)
 }
 \arguments{
   \item{graph}{The graph object to work on. Note that the original graph
@@ -75,6 +75,12 @@ graph <- remove.edge.attribute(graph, attrname)
   assigned graph attributes are listed with
   \code{list.graph.attributes}.
 
+  Note that \code{set.graph.attribute} and
+  \code{remove.graph.attribute} both return a new graph, they do
+  \emph{not} change their argument! If you don't want to lose the
+  results, you have to assign their return value to a
+  variable: \preformatted{  G <- set.graph.attribute(G, "name", "My favorite graph")
+  G <- remove.graph.attribute(G, "name")}
   There is a simpler notation for using graph attributes: the
   \sQuote{\code{$}} operator. It can be used both to query and set graph
   attributes, see an example below.
@@ -85,6 +91,15 @@ graph <- remove.edge.attribute(graph, attrname)
   for edge attributes they are \code{set.edge.attribute},
   \code{get.edge.attribute}, \code{remove.edge.attribute} and
   \code{list.edge.attributes}.
+
+  Note that \code{set.vertex.attribute},
+  \code{remove.vertex.attribute}, \code{set.edge.attribute} and
+  \code{remove.edge.attribute} do \emph{not} change their argument,
+  you have to assign their return value to a
+  variable: \preformatted{  G <- set.vertex.attribute(G, "label", value=letters[1:10])
+  G <- remove.vertex.attribute(G, "label")
+  G <- set.edge.attribute(G, "weight", value=runif(ecount(G)))
+  G <- remove.edge.attribute(G, "weight")}
   
   There is however a (syntactically) much simpler way to handle vertex
   and edge attribute by using vertex and edge selectors, it works like this:
@@ -94,10 +109,10 @@ graph <- remove.edge.attribute(graph, attrname)
   \code{name} attribute for the vertices in the vertex set.
 
   This form can also be used to set the values of the attributes, like
-  the regular R convention:
-  \preformatted{V(g)$color <- "red"}
-  It works for vertex subsets as well:
-  \preformatted{V(g)[0:5]$color <- "green"}
+  the regular R
+  convention: \preformatted{V(g)$color <- "red"}
+  It works for vertex subsets as
+  well: \preformatted{V(g)[0:5]$color <- "green"}
 
   The notation for edges is similar: \code{E(g)} means all edges
   \code{E(g)$weight} is the \code{weight} attribute for all edges, etc.
