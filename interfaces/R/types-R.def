@@ -219,3 +219,13 @@ VERTEX_ATTRIBUTE_COMBINATION:
 
 ADD_WEIGHTS:
     INCONV: %I% <- switch(igraph.match.arg(%I%), "no"=0, "yes"=1, "auto"=2)
+
+HRG:
+    INCONV: if (is.null(%I%)) { \
+            %I% <- list(left=c(), right=c(), prob=c(), edges=c(), \
+                        vertices=c()) \
+            } \
+            %I% <- lapply(%I%[c("left","right","prob","edges","vertices")], \
+                          as.numeric)
+    DEFAULT:
+       Default: NULL

@@ -124,6 +124,11 @@ layout.fruchterman.reingold.grid <- function(graph, ...,
   if (is.null(params$repulserad)){ params$repulserad <- params$area * vc }
   if (is.null(params$cellsize))  { params$cellsize   <-
                                      (sqrt(sqrt(params$area))) }
+  if (is.null(params$weights))   {
+    params$weights <- NULL
+  } else {
+    params$weights <- as.numeric(params$weights)
+  }
   if (!is.null(params$start)) {
     params$start <- structure(as.numeric(params$start), dim=dim(params$start))
   }
@@ -133,7 +138,7 @@ layout.fruchterman.reingold.grid <- function(graph, ...,
         as.double(params$niter), as.double(params$maxdelta),
         as.double(params$area), as.double(params$coolexp),
         as.double(params$repulserad), as.double(params$cellsize),
-        params$start,
+        params$start, params$weights,
         PACKAGE="igraph")
 }
   

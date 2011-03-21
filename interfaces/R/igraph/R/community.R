@@ -607,3 +607,4 @@ compare.default <- function(comm1, comm2, method=c("vi", "nmi",
                                             "adjusted.rand")) {
   compare.numeric(as.numeric(comm1), as.numeric(comm2), method)
 }
+

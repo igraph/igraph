@@ -1,0 +1,123 @@
+/* -*- mode: C -*-  */
+/* 
+   IGraph library.
+   Copyright (C) 2009  Gabor Csardi <csardi@rmki.kfki.hu>
+   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   02110-1301 USA
+
+*/
+
+#ifndef IGRAPH_HRG_H
+#define IGRAPH_HRG_H
+
+#undef __BEGIN_DECLS
+#undef __END_DECLS
+#ifdef __cplusplus
+# define __BEGIN_DECLS extern "C" {
+# define __END_DECLS }
+#else
+# define __BEGIN_DECLS /* empty */
+# define __END_DECLS /* empty */
+#endif
+
+#include "igraph_vector.h"
+#include "igraph_vector_ptr.h"
+#include "igraph_datatype.h"
+
+__BEGIN_DECLS
+
+/**
+ * \struct igraph_hrg_t
+ * Data structure to store a hierarchical random graph
+ * 
+ * A hierarchical random graph (HRG) can be given as a binary tree,
+ * where the internal vertices are labeled with real numbers.
+ * 
+ * </para><para>Note that you don't necessarily have to know this
+ * internal representation for using the HRG functions, just pass the
+ * HRG objects created by one igraph function, to another igraph
+ * function.
+ * 
+ * </para><para>
+ * It has the following members:
+ * \member left Vector that contains the left children of the internal
+ *    tree vertices. The first vertex is always the root vertex, so
+ *    the first element of the vector is the left child of the root
+ *    vertex. Internal vertices are denoted with negative numbers,
+ *    starting from -1 and going down, i.e. the root vertex is
+ *    -1. Leaf vertices are denoted by non-negative number, starting
+ *    from zero and up.
+ * \member right Vector that contains the right children of the
+ *    vertices, with the same encoding as the \c left vector.
+ * \member prob The connection probabilities attached to the internal
+ *    vertices, the first number belongs to the root vertex
+ *    (i.e. internal vertex -1), the second to internal vertex -2,
+ *    etc.
+ * \member edges The number of edges in the subtree below the given
+ *    internal vertex.
+ * \member vertices The number of vertices in the subtree below the
+ *    given internal vertex, including itself.
+ */
+
+typedef struct igraph_hrg_t {
+  igraph_vector_t left, right, prob, edges, vertices;
+} igraph_hrg_t;
+
+int igraph_hrg_init(igraph_hrg_t *hrg, int n);
+void igraph_hrg_destroy(igraph_hrg_t *hrg);
+int igraph_hrg_size(const igraph_hrg_t *hrg);
+int igraph_hrg_resize(igraph_hrg_t *hrg, int newsize);
+
+int igraph_hrg_fit(const igraph_t *graph, 
+		   igraph_hrg_t *hrg,
+		   igraph_bool_t start,
+		   int steps);
+
+int igraph_hrg_sample(const igraph_t *graph,
+		      igraph_t *sample,
+		      igraph_vector_ptr_t *samples,
+		      igraph_hrg_t *hrg,
+		      igraph_bool_t start);
+
+int igraph_hrg_game(igraph_t *graph,
+		    const igraph_hrg_t *hrg);
+
+int igraph_hrg_dendrogram(igraph_t *graph,
+			  const igraph_hrg_t *hrg);
+
+int igraph_hrg_consensus(const igraph_t *graph,
+			 igraph_vector_t *parents,
+			 igraph_vector_t *weights,
+			 igraph_hrg_t *hrg,
+			 igraph_bool_t start, 
+			 int num_samples);
+
+int igraph_hrg_predict(const igraph_t *graph,
+		       igraph_vector_t *edges,
+		       igraph_vector_t *prob,
+		       igraph_hrg_t *hrg,
+		       igraph_bool_t start, 
+		       int num_samples,
+		       int num_bins);
+
+int igraph_hrg_create(igraph_hrg_t *hrg,
+		      const igraph_t *graph, 
+		      const igraph_vector_t *prob);
+
+__END_DECLS
+
+#endif	/* IGRAPH_HRG_H */

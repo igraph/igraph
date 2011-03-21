@@ -297,7 +297,9 @@ int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges,
 
   /* Attributes */
   if (graph->attr) { 
+    igraph_set_error_handler(oldhandler);
     ret1=igraph_i_attribute_add_edges(graph, edges, attr);
+    igraph_set_error_handler(igraph_error_handler_ignore);
     if (ret1 != 0) {
       igraph_vector_resize(&graph->from, no_of_edges);
       igraph_vector_resize(&graph->to, no_of_edges);

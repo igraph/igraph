@@ -217,7 +217,7 @@
     alstr <- paste(sep="", mark, alstr)
     maxw <- max(nchar(alstr))
     sep <- "   "
-    ncol <- trunc((getOption("width")-1+nchar(sep)) / (maxw+length(sep)))
+    ncol <- trunc((getOption("width")-1+nchar(sep)) / (maxw+nchar(sep)))
     if (ncol > 1) {
       alstr <- format(alstr, width=maxw, justify="left")
       fac <- rep(1:(vc/ncol+1), each=ncol, length=vc)

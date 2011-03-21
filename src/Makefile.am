@@ -145,9 +145,11 @@ HEADERS_PRIVATE = atlas-edges.h \
 		gengraph_graph_molloy_optimized.h \
 		gengraph_hash.h gengraph_header.h gengraph_powerlaw.h \
 		gengraph_qsort.h gengraph_random.h gengraph_vertex_cover.h \
-		igraph_marked_queue.h igraph_estack.h \
 		igraph_blas_internal.h igraph_arpack_internal.h \
-		igraph_lapack_internal.h
+		igraph_lapack_internal.h \
+		igraph_marked_queue.h igraph_estack.h \
+		hrg_dendro.h hrg_graph.h hrg_rbtree.h hrg_splittree_eq.h \
+		hrg_graph_simp.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
@@ -180,7 +182,8 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_version.h     ../include/igraph_blas.h      \
 		../include/igraph_separators.h  ../include/igraph_cohesive_blocks.h \
 		../include/igraph_lapack.h	../include/igraph_complex.h   \
-		../include/igraph_eigen.h	../include/igraph_statusbar.h
+		../include/igraph_eigen.h	../include/igraph_statusbar.h \
+		../include/igraph_hrg.h
 
 libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     basic_query.c games.c cocitation.c iterators.c \
@@ -227,7 +230,8 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     igraph_fixed_vectorlist.c separators.c \
 			     igraph_marked_queue.c igraph_estack.c st-cuts.c \
 			     cohesive_blocks.c statusbar.c \
-			     lapack.c complex.c eigen.c
+			     lapack.c complex.c eigen.c \
+			     igraph_hrg_types.cc igraph_hrg.cc
 
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall

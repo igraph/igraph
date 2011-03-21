@@ -1102,6 +1102,39 @@ igraph_split_join_distance:
 		        OUT REALPTR distance21
         IGNORE: RR, RC, RNamespace
 
+igraph_hrg_fit:
+        PARAMS: GRAPH graph, INOUT HRG hrg=Default, BOOLEAN start=False, \
+                INT steps=0
+        NAME-R: hrg.fit
+        CLASS-R: igraphHRG
+
+igraph_hrg_game:
+        PARAMS: OUT GRAPH graph, HRG hrg
+        NAME-R: hrg.game
+
+igraph_hrg_dendrogram:
+        PARAMS: OUT GRAPH graph, HRG hrg
+        NAME-R: hrg.dendrogram
+
+igraph_hrg_consensus:
+        PARAMS: GRAPH graph, OUT VECTOR parents, OUT VECTOR weights, \
+                INOUT HRG hrg=Default, BOOLEAN start=False, \
+                INT num_samples=10000
+        NAME-R: hrg.consensus
+
+igraph_hrg_predict:
+        PARAMS: GRAPH graph, OUT VERTEXSET edges, OUT VECTOR prob, \
+                INOUT HRG hrg=Default, BOOLEAN start=False, \
+                INT num_samples=10000, INT num_bins=25
+        NAME-R: hrg.predict
+        IGNORE: RR
+
+igraph_hrg_create:
+        PARAMS: OUT HRG hrg, GRAPH graph, VECTOR prob
+        NAME-R: hrg.create
+        DEPS: prob ON graph
+        CLASS-R: igraphHRG
+
 #######################################
 # Conversion
 #######################################
