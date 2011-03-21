@@ -61,7 +61,7 @@ using namespace fitHRG;
  * igraph contains functions for fitting HRG models to a given network
  * (\ref igraph_hrg_fit), for generating networks from a given HRG
  * ensemble (\ref igraph_hrg_game, \ref igraph_hrg_sample), converting
- * and an igraph graph to a HRG and back (\ref igraph_hrg_create, \ref
+ * an igraph graph to a HRG and back (\ref igraph_hrg_create, \ref
  * igraph_hrg_dendrogram), for calculating a consensus tree from a
  * set of sampled HRGs (\ref igraph_hrg_consensus) and for predicting
  * missing edges in a network based on its HRG models (\ref
@@ -594,12 +594,12 @@ int igraph_hrg_dendrogram(igraph_t *graph,
  * \param graph The input graph.
  * \param parents An initialized vector, the results are stored
  *   here. For each vertex, the id of its parent vertex is stored, or
- *   zero, if the vertex is the root vertex in the tree. The first n
+ *   -1, if the vertex is the root vertex in the tree. The first n
  *   vertex ids (from 0) refer to the original vertices of the graph,
  *   the other ids refer to vertex groups.
  * \param weights Numeric vector, counts the number of times a given
  *   tree split occured in the generated network samples, for each
- *   internal vertices.
+ *   internal vertices. The order is the same as in \c parents.
  * \param hrg A hierarchical random graph. It is used as a starting
  *   point for the sampling, if the \c start argument is true. It is
  *   modified along the MCMC.
