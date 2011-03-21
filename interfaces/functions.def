@@ -1100,7 +1100,8 @@ igraph_split_join_distance:
         IGNORE: RR, RC, RNamespace
 
 igraph_hrg_fit:
-        PARAMS: GRAPH graph, OUT HRG hrg, BOOLEAN start=False, INT steps=0
+        PARAMS: GRAPH graph, INOUT HRG hrg=Default, BOOLEAN start=False, \
+                INT steps=0
         NAME-R: hrg.fit
         CLASS-R: igraphHRG
 
