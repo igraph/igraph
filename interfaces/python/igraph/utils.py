@@ -170,7 +170,7 @@ class multidict(MutableMapping):
 
         Example:
 
-           >>> d = multidict([("spam", "eggs"), ("spam", "bacon")])
+            >>> d = multidict([("spam", "eggs"), ("spam", "bacon")])
             >>> d["spam"]
             'eggs'
         """
@@ -222,7 +222,7 @@ class multidict(MutableMapping):
         """Removes all the items from the multidict."""
         self._dict.clear()
 
-    def get(self, key, default):
+    def get(self, key, default=None):
         """Returns an arbitrary item associated to the given `key`. If `key`
         does not exist or has zero associated items, `default` will be
         returned."""

@@ -15,6 +15,7 @@ from igraph.compat import property
 from igraph.configuration import Configuration
 from igraph.utils import multidict
 
+import re
 import urllib2
 
 class NexusConnection(object):
@@ -29,21 +30,56 @@ class NexusConnection(object):
           igraph's configuration file or uses the default URL if no URL
           is specified in the configuration file.
         """
+        self.debug = False
         self.url = nexus_url
         self._opener = urllib2.build_opener()
 
     def get(self, id):
         """Retrieves the dataset with the given ID from Nexus.
 
+        Dataset IDs are formatted as follows: the name of a dataset on its own
+        means that a single network should be returned if the dataset contains
+        a single network, or multiple networks should be returned if the dataset
+        contains multiple networks. When the name is followed by a dot and a
+        network ID, only a single network will be returned: the one that has the
+        given network ID. When the name is followed by a dot and a star, a
+        dictionary mapping network IDs to networks will be returned even if the
+        original dataset contains a single network only.
+
+        E.g., getting C{"karate"} would return a single network since the
+        Zachary karate club dataset contains one network only. Getting
+        C{"karate.*"} on the other hand would return a dictionary with one
+        entry that contains the Zachary karate club network.
+
         @param id: the ID of the dataset to retrieve.
-        @return: an instance of L{Graph}.
+        @return: an instance of L{Graph} (if a single graph has to be returned)
+          or a dictionary mapping network IDs to instances of L{Graph}.
         """
         from igraph import load
 
-        params = dict(format="Python-igraph", id=id)
+        dataset_id, network_id = self._parse_dataset_id(id)
+
+        params = dict(format="Python-igraph", id=dataset_id)
         response = self._get_response("/api/dataset", params, compressed=True)
         response = self._ensure_uncompressed(response)
-        return load(response, format="pickle")
+        result = load(response, format="pickle")
+
+        if network_id is None:
+            # If result contains a single network only, return that network.
+            # Otherwise return the whole dictionary
+            if not isinstance(result, dict):
+                return result
+            if len(result) == 1:
+                return result[result.keys()[0]]
+            return result
+
+        if network_id == "*":
+            # Return a dict no matter what
+            if not isinstance(result, dict):
+                result = dict(dataset_id=result)
+            return result
+
+        return result[network_id]
 
     def info(self, id):
         """Retrieves informations about the dataset with the given numeric
@@ -105,8 +141,14 @@ class NexusConnection(object):
         """Expects an HTTP response object, checks its Content-Encoding header,
         decompresses the data and returns an in-memory buffer holding the
         uncompressed data."""
-        if response.headers.get("Content-Encoding") == "gzip":
-            return GzipFile(fileobj=StringIO(response.read()))
+        compressed = response.headers.get("Content-Encoding") == "gzip"
+        if not compressed:
+            content_disp = response.headers.get("Content-Disposition", "")
+            compressed = bool(re.match(r'attachment; *filename=.*\.gz\"?$',
+                    content_disp))
+        if compressed:
+            return GzipFile(fileobj=StringIO(response.read()), mode="rb")
+        print response.headers
         return response
 
     def _get_response(self, path, params={}, compressed=False):
@@ -121,7 +163,21 @@ class NexusConnection(object):
         request = urllib2.Request(url)
         if compressed:
             request.add_header("Accept-Encoding", "gzip")
+        if self.debug:
+            print "[debug] Sending request: %s" % url
         return self._opener.open(request)
+
+    @staticmethod
+    def _parse_dataset_id(id):
+        """Parses a dataset ID used in the `get` request.
+
+        Returns the dataset ID and the network ID (the latter being C{None}
+        if the original ID did not contain a network ID ).
+        """
+        dataset_id, _, network_id = str(id).partition(".")
+        if not network_id:
+            network_id = None
+        return dataset_id, network_id
 
     @staticmethod
     def _parse_text_response(response):
@@ -220,9 +276,9 @@ class NexusDatasetInfo(object):
             wrapper = TextWrapper(width=76, subsequent_indent='  ')
 
             keys = sorted(self.rest.iterkeys())
-            if "Attribute" in self.rest:
-                keys.remove("Attribute")
-                keys.append("Attribute")
+            if "attribute" in self.rest:
+                keys.remove("attribute")
+                keys.append("attribute")
 
             for key in keys:
                 for value in self.rest.getlist(key):
@@ -242,16 +298,25 @@ class NexusDatasetInfo(object):
         """Updates the dataset object from a multidict representation of
         key-value pairs, similar to the ones provided by the Nexus API in
         plain text response."""
-        self.id = params.get("Id", None)
-        self.sid = params.get("Sid", None)
-        self.name = params.get("Name", None)
-        self.vertices = params.get("Vertices", None)
-        self.edges = params.get("Edges", None)
-        self.tags = params.get("Tags", None)
+        self.id = params.get("id")
+        self.sid = params.get("sid")
+        self.name = params.get("name")
+        self.vertices = params.get("vertices")
+        self.edges = params.get("edges")
+        self.tags = params.get("tags")
+
+        keys_to_ignore = set("id sid name vertices edges tags".split())
+
+        if self.vertices is None and self.edges is None:
+            # Try "vertices/edges"
+            s = params.get("vertices/edges")
+            keys_to_ignore.add("vertices/edges")
+            if s and "/" in s:
+                self.vertices, self.edges = s.split("/", 1)
 
         if self.rest is None:
             self.rest = multidict()
-        for k in set(params.iterkeys()) - set("Id Name Vertices Edges Tags".split()):
+        for k in set(params.iterkeys()) - keys_to_ignore:
             for v in params.getlist(k):
                 self.rest.add(k, v)
 
@@ -273,14 +338,24 @@ class NexusDatasetInfo(object):
         result._update_from_multidict(dict)
         return result
 
-    def download(self):
+    def download(self, network_id=None):
         """Retrieves the actual dataset from Nexus.
 
-        Returns a L{Graph} instance."""
+        @param network_id: if the dataset contains multiple networks, the ID
+          of the network to be retrieved. C{None} returns a single network if
+          the dataset contains a single network, or a dictionary of networks
+          if the dataset contains more than one network. C{"*"} retrieves
+          a dictionary even if the dataset contains a single network only.
+
+        @return: a L{Graph} instance or a dictionary mapping network names to
+          L{Graph} instances.
+        """
         if self.id is None:
             raise ValueError("dataset ID is empty")
         conn = self._conn or Nexus
-        return conn.get(self.id)
+        if network_id is None:
+            return conn.get(self.id)
+        return conn.get("%s.%s" % (self.id, network_id))
 
     get = download
 
@@ -325,26 +400,27 @@ class NexusDatasetInfoList(object):
         current_dataset = None
         for line in response:
             key, value = line.strip().split(": ", 1)
+            key = key.lower()
 
-            if key == "Totalsize":
+            if key == "totalsize":
                 # Total number of items in the search result
                 self._length = int(value)
-            elif key == "Id":
+            elif key == "id":
                 # Starting a new dataset
                 if current_dataset:
                     self._datasets[offset] = current_dataset
                     offset += 1
                 current_dataset = NexusDatasetInfo(id=int(value))
                 current_dataset._conn = self._conn
-            elif key == "Sid":
+            elif key == "sid":
                 current_dataset.sid = value
-            elif key == "Name":
+            elif key == "name":
                 current_dataset.name = value
-            elif key == "Vertices":
+            elif key == "vertices":
                 current_dataset.vertices = int(value)
-            elif key == "Edges":
+            elif key == "edges":
                 current_dataset.edges = int(value)
-            elif key == "Tags":
+            elif key == "tags":
                 current_dataset.tags = value.split(";")
 
         if current_dataset:
