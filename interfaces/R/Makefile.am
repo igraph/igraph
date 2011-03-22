@@ -69,13 +69,38 @@ SRCFILES_ORIGPLACE7 = 	$(wildcard $(top_srcdir)/src/cs/*.c)
 
 SRCFILES_ORIGPLACE8 = 	$(wildcard $(top_srcdir)/src/cs/*.h)
 
+SRCFILES_ORIGPLACE9 =   $(wildcard $(top_srcdir)/optional/glpk/*.c)
+
+SRCFILES_ORIGPLACE10 =  $(wildcard $(top_srcdir)/optional/glpk/*.h)
+
+SRCFILES_ORIGPLACE11 =  $(wildcard $(top_srcdir)/optional/glpk/amd/*.c)
+
+SRCFILES_ORIGPLACE12 =  $(wildcard $(top_srcdir)/optional/glpk/amd/*.h)
+
+SRCFILES_ORIGPLACE13 =  $(wildcard $(top_srcdir)/optional/glpk/colamd/*.c)
+
+SRCFILES_ORIGPLACE14 =  $(wildcard $(top_srcdir)/optional/glpk/colamd/*.h)
+
 SRCFILES = $(patsubst $(top_srcdir)/src/%,igraph/src/%,$(SRCFILES_ORIGPLACE)) \
 	$(patsubst $(top_srcdir)/include/%,igraph/src/%,$(SRCFILES_ORIGPLACE6)) \
 	$(patsubst $(top_srcdir)/src/cs/%,igraph/src/%,$(SRCFILES_ORIGPLACE7)) \
-	$(patsubst $(top_srcdir)/src/cs/%,igraph/src/cs/%,$(SRCFILES_ORIGPLACE8))
+	$(patsubst $(top_srcdir)/src/cs/%,igraph/src/cs/%,$(SRCFILES_ORIGPLACE8)) \
+	$(patsubst $(top_srcdir)/optional/glpk/%,igraph/src/%,$(SRCFILES_ORIGPLACE9)) \
+	$(patsubst $(top_srcdir)/optional/glpk/%,igraph/src/glpk/%,$(SRCFILES_ORIGPLACE10)) \
+	$(patsubst $(top_srcdir)/optional/glpk/amd/%,igraph/src/%,$(SRCFILES_ORIGPLACE11)) \
+	$(patsubst $(top_srcdir)/optional/glpk/amd/%,igraph/src/glpk/amd/%,$(SRCFILES_ORIGPLACE12)) \
+	$(patsubst $(top_srcdir)/optional/glpk/colamd/%,igraph/src/%,$(SRCFILES_ORIGPLACE13)) \
+	$(patsubst $(top_srcdir)/optional/glpk/colamd/%,igraph/src/glpk/colamd/%,$(SRCFILES_ORIGPLACE14))
 
 igraph/src/cs/%.h: $(top_srcdir)/src/cs/%.h
 	cp $(top_srcdir)/src/cs/$(@F) igraph/src/cs/$(@F)
+
+igraph/src/glpk/amd/%.h: $(top_srcdir)/optional/glpk/amd/%.h
+	cp $(top_srcdir)/optional/glpk/amd/$(@F) igraph/src/glpk/amd/$(@F)
+igraph/src/glpk/colamd/%.h: $(top_srcdir)/optional/glpk/colamd/%.h
+	cp $(top_srcdir)/optional/glpk/colamd/$(@F) igraph/src/glpk/colamd/$(@F)
+igraph/src/glpk/%.h: $(top_srcdir)/optional/glpk/%.h
+	cp $(top_srcdir)/optional/glpk/$(@F) igraph/src/$(@F)
 
 igraph/src/%.c: $(top_srcdir)/src/%.c
 	cp $(top_srcdir)/src/$(@F) $@
@@ -92,11 +117,18 @@ igraph/src/%.h: $(top_srcdir)/src/%.h
 
 igraph/src/%.c: $(top_srcdir)/src/cs/%.c
 	cp $(top_srcdir)/src/cs/$(@F) igraph/src/$(@F)
+igraph/src/%.c: $(top_srcdir)/optional/glpk/amd/%.c
+	cp $(top_srcdir)/optional/glpk/amd/$(@F) igraph/src/$(@F)
+igraph/src/%.c: $(top_srcdir)/optional/glpk/colamd/%.c
+	cp $(top_srcdir)/optional/glpk/colamd/$(@F) igraph/src/$(@F)
+igraph/src/%.c: $(top_srcdir)/optional/glpk/%.c
+	cp $(top_srcdir)/optional/glpk/$(@F) igraph/src/$(@F)
 
 igraph/src/%.h: $(top_srcdir)/include/%.h
 	cp $(top_srcdir)/include/$(@F) $@
 
 igraph_$(VERSION).tar.gz: $(RFILES) $(SRCFILES)
+	echo $(top_scrdir)
 	rm -f igraph/R/config.R
 	rm -f igraph/src/config.h
 	touch igraph/src/config.h
