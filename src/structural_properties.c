@@ -3974,7 +3974,8 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
  * vertices and edges in the original input graph.
  *
  * \sa \ref igraph_is_dag() if you are only interested in whether a given
- *     graph is a DAG or not.
+ *     graph is a DAG or not, or \ref igraph_feedback_arc_set() to find a
+ *     set of edges whose removal makes the graph a DAG.
  * 
  * \example examples/simple/igraph_topological_sorting.c
  */

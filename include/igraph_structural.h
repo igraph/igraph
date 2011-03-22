@@ -126,6 +126,9 @@ int igraph_contract_vertices(igraph_t *graph,
 int igraph_transitive_closure_dag(const igraph_t *graph,
 				  igraph_t *closure);
 
+int igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *result,
+        const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
+
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
 /* -------------------------------------------------- */
