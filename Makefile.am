@@ -1,8 +1,7 @@
 
 
-SUBDIRS=src tests interfaces
+SUBDIRS=src tests interfaces 
 DOC_FILES = 	$(top_builddir)/doc/book/Makefile.in \
-	$(top_builddir)/doc/igraph.info \
 	$(top_srcdir)/doc/Makefile.in \
 	$(top_srcdir)/doc/igraph.3
 
@@ -12,7 +11,8 @@ pkgconfig_DATA = igraph.pc
 EXTRA_DIST = igraph.pc $(top_srcdir)/include/* $(DOC_FILES) \
 	examples $(top_srcdir)/interfaces/R/Makefile.in \
 	$(top_srcdir)/interfaces/R/DESCRIPTION.in \
-	$(top_srcdir)/interfaces/R/configure.in.in
+	$(top_srcdir)/interfaces/R/configure.in.in \
+	optional
 
 install-exec-hook:
 	if test -f $(top_builddir)/src/.libs/cygigraph-0.dll ; \

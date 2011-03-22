@@ -1,0 +1,39 @@
+                                                     Olga K. gewidmet
+
+GLPK (GNU Linear Programming Kit) Version 4.45
+
+Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
+2009, 2010 Andrew Makhorin, Department for Applied Informatics,
+Moscow Aviation Institute, Moscow, Russia. All rights reserved.
+E-mail: <mao@gnu.org>.
+
+GLPK is part of the GNU Project released under the aegis of GNU.
+
+GLPK is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+See the file COPYING for the GNU General Public License.
+
+See the file INSTALL for compilation and installation instructions.
+
+The GLPK package is a set of routines written in ANSI C and organized
+in the form of a callable library. This package is intended for solving
+large-scale linear programming (LP), mixed integer linear programming
+(MIP), and other related problems.
+
+The GLPK package includes the following main components:
+
+* implementation of the simplex method;
+* implementation of the exact simplex method based on bignum (rational)
+  arithmetic;
+* implementation of the primal-dual interior-point method;
+* implementation of the branch-and-cut method;
+* application program interface (API);
+* GNU MathProg modeling language (a subset of AMPL);
+* GLPSOL, a stand-alone LP/MIP solver.
+
+See GLPK webpage <http://www.gnu.org/software/glpk/glpk.html>.
+
+Please report bugs to <bug-glpk@gnu.org>.

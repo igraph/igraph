@@ -157,25 +157,6 @@ if test "x$enable_gmp" != "xno"; then
   ])
 fi
 
-glpk_support=no
-AC_ARG_ENABLE(glpk, AC_HELP_STRING([--disable-glpk], [Compile without the GLPK library]))
-if test "x$enable_glpk" != "xno"; then
-  AC_CHECK_LIB([glpk], [glp_read_mps], [
-    AC_CHECK_HEADER([glpk.h], [
-      AC_EGREP_CPP(yes, [
-        #include <glpk.h>
-        #if GLP_MAJOR_VERSION > 4 || (GLP_MAJOR_VERSION == 4 && GLP_MINOR_VERSION >= 38)
-          yes
-        #endif
-      ], [ 
-        AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
-        glpk_support=yes
-        LDFLAGS="${LDFLAGS} -lglpk"
-      ])
-    ])
-  ])
-fi
-
 AC_ARG_WITH([external-f2c], [AS_HELP_STRING([--with-external-f2c],
 		                      [Use external F2C library [default=no]])],
             [internal_f2c=no],
@@ -192,6 +173,11 @@ AC_ARG_WITH([external-arpack], [AS_HELP_STRING([--with-external-arpack],
 		                      [Use external ARPACK library [default=no]])],
             [internal_arpack=no],
 	    [internal_arpack=yes])
+
+AC_ARG_WITH([external-glpk], [AS_HELP_STRING([--with-external-glpk],
+				      [Use external GLPK library [default=no]])],
+            [internal_glpk=no],
+            [internal_glpk=yes])
 
 if test "$internal_f2c" = "no"; then
   AC_CHECK_LIB([f2c], [f77_alloc_], [],
@@ -237,6 +223,29 @@ else
   AC_DEFINE([INTERNAL_ARPACK], [1], [Define to 1 if you use the internal ARPACK library])
 fi
 
+glpk_support=no
+if test "$internal_glpk" = "no"; then
+  AC_CHECK_LIB([glpk], [glp_read_mps], [
+    AC_CHECK_HEADER([glpk.h], [
+      AC_EGREP_CPP(yes, [
+        #include <glpk.h>
+        #if GLP_MAJOR_VERSION > 4 || (GLP_MAJOR_VERSION == 4 && GLP_MINOR_VERSION >= 38)
+          yes
+        #endif
+      ], [
+        AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
+        glpk_support=yes
+        LDFLAGS="${LDFLAGS} -lglpk"
+      ])
+    ])
+  ])
+else
+  AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
+  AC_DEFINE([INTERNAL_GLPK], [1], [Define to 1 if you use the internal GLPK library])
+  glpk_support=yes
+fi
+
+AM_CONDITIONAL(INTERNAL_GLPK, test x$internal_glpk = xyes)
 AM_CONDITIONAL(INTERNAL_ARPACK, test x$internal_arpack = xyes)
 AM_CONDITIONAL(INTERNAL_LAPACK, test x$internal_lapack = xyes)
 AM_CONDITIONAL(INTERNAL_BLAS, test x$internal_blas = xyes)
@@ -265,5 +274,6 @@ AC_MSG_RESULT([  Use internal ARPACK    -- $internal_arpack])
 AC_MSG_RESULT([  Use internal LAPACK    -- $internal_lapack])
 AC_MSG_RESULT([  Use internal BLAS      -- $internal_blas])
 AC_MSG_RESULT([  Use internal F2C       -- $internal_f2c])
+AC_MSG_RESULT([  Use internal GLPK      -- $internal_glpk])
 AC_MSG_RESULT([  Debug build            -- $debug])
 AC_MSG_RESULT([  Profiling              -- $use_gprof])
