@@ -100,7 +100,7 @@ igraph/src/glpk/amd/%.h: $(top_srcdir)/optional/glpk/amd/%.h
 igraph/src/glpk/colamd/%.h: $(top_srcdir)/optional/glpk/colamd/%.h
 	cp $(top_srcdir)/optional/glpk/colamd/$(@F) igraph/src/glpk/colamd/$(@F)
 igraph/src/glpk/%.h: $(top_srcdir)/optional/glpk/%.h
-	cp $(top_srcdir)/optional/glpk/$(@F) igraph/src/$(@F)
+	cp $(top_srcdir)/optional/glpk/$(@F) igraph/src/glpk/$(@F)
 
 igraph/src/%.c: $(top_srcdir)/src/%.c
 	cp $(top_srcdir)/src/$(@F) $@
