@@ -624,8 +624,8 @@ graph.famous <- function(name) {
 graph.full.bipartite <- function(n1, n2, directed=FALSE,
                                  mode=c("all", "out", "in")) {
 
-  n1 <- as.numeric(n1)
-  n2 <- as.numeric(n2)
+  n1 <- as.integer(n1)
+  n2 <- as.integer(n2)
   directed <- as.logical(directed)
   mode <- switch(igraph.match.arg(mode), "out"=1, "in"=2, "all"=3, "total"=3)  
   

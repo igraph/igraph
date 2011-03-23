@@ -45,7 +45,7 @@ __BEGIN_DECLS
 #include <math.h>
 #include <stdio.h>
 
-typedef double igraph_integer_t;
+typedef int    igraph_integer_t;
 typedef double igraph_real_t;
 typedef int    igraph_bool_t;
 

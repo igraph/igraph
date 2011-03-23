@@ -1098,8 +1098,9 @@ igraph_community_optimal_modularity:
         IGNORE: RR
 
 igraph_split_join_distance:
-        PARAMS: VECTOR comm1, VECTOR comm2, OUT REALPTR distance12, \
-		        OUT REALPTR distance21
+        PARAMS: VECTOR comm1, VECTOR comm2, OUT INTEGERPTR distance12, \
+		        OUT INTEGERPTR distance21
+        NAME-R: split.join.distance
         IGNORE: RR, RC, RNamespace
 
 igraph_hrg_fit:
@@ -1339,7 +1340,7 @@ igraph_mincut:
 
 igraph_st_vertex_connectivity:
         PARAMS: GRAPH graph, OUT INTEGERPTR res, VERTEX source, VERTEX target, \
-                VCONNNEI neighbors=INFINITY
+                VCONNNEI neighbors=NUMBER_OF_NODES
         DEPS: source ON graph, target ON graph
         IGNORE: RR, RC, RNamespace
 

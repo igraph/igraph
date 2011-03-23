@@ -41,17 +41,17 @@ GRAPH_OR_0:
 INTEGER:  
   CTYPE: igraph_integer_t
   INCONV: 
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=INTEGER(%I%)[0];
   OUTCONV:
-    OUT: PROTECT(%I%=NEW_NUMERIC(1)); \
-         REAL(%I%)[0]=%C%;
+    OUT: PROTECT(%I%=NEW_INTEGER(1)); \
+         INTEGER(%I%)[0]=%C%;
 
 INTEGERPTR:
   CTYPE: igraph_integer_t
   CALL: &%C%
   OUTCONV:
-    OUT: PROTECT(%I%=NEW_NUMERIC(1)); \
-         REAL(%I%)[0]=%C%;
+    OUT: PROTECT(%I%=NEW_INTEGER(1)); \
+         INTEGER(%I%)[0]=%C%;
 
 INT:
   CTYPE: int

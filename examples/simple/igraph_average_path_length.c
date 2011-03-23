@@ -26,7 +26,7 @@
 int main() {
   
   igraph_t g;
-  igraph_integer_t result;
+  igraph_real_t result;
   
   igraph_barabasi_game(&g, 30, /*power=*/ 1, 30, 0, 0, /*A=*/ 1, 
 		       IGRAPH_DIRECTED, IGRAPH_BARABASI_BAG,

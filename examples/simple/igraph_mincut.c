@@ -56,7 +56,7 @@ int main() {
   
   igraph_t g;
   igraph_vector_t weights, partition, partition2, cut;
-  igraph_integer_t value;
+  igraph_real_t value;
 
   igraph_vector_init(&partition, 0);
   igraph_vector_init(&partition2, 0);

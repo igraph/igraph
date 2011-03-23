@@ -96,8 +96,9 @@ typedef enum { IGRAPH_TO_UNDIRECTED_EACH=0,
                IGRAPH_TO_UNDIRECTED_MUTUAL} igraph_to_undirected_t;
 
 typedef enum { IGRAPH_VCONN_NEI_ERROR=0,
-	       IGRAPH_VCONN_NEI_INFINITY,
-	       IGRAPH_VCONN_NEI_IGNORE }igraph_vconn_nei_t;
+	       IGRAPH_VCONN_NEI_NUMBER_OF_NODES,
+	       IGRAPH_VCONN_NEI_IGNORE, 
+	       IGRAPH_VCONN_NEI_NEGATIVE } igraph_vconn_nei_t;
 
 typedef enum { IGRAPH_SPINCOMM_UPDATE_SIMPLE=0,
 	       IGRAPH_SPINCOMM_UPDATE_CONFIG } igraph_spincomm_update_t; 

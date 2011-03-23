@@ -27,7 +27,8 @@ class MaxFlowTests(unittest.TestCase):
         self.failUnless(Graph.Tree(10, 3, TREE_OUT).cohesion() == 0)
         self.assertRaises(ValueError, self.g.vertex_connectivity, 0)
         self.assertRaises(InternalError, self.g.vertex_connectivity, 0, 1)
-        self.failUnless(self.g.vertex_connectivity(0, 1, neighbors="infinity") > 1000)
+        self.failUnless(self.g.vertex_connectivity(0, 1, neighbors="nodes") == 4)
+        self.failUnless(self.g.vertex_connectivity(0, 1, neighbors="negative") == -1)
 
     def testMaxFlowValue(self):
         self.failUnless(self.g.maxflow_value(0, 3) == 2)

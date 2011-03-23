@@ -30,7 +30,7 @@ int main() {
   igraph_t g;
   igraph_vector_t v, weights;
   long int i;
-  igraph_integer_t value, retcode;
+  igraph_real_t value;
   igraph_arpack_options_t options;
   
   igraph_star(&g, 100, IGRAPH_STAR_UNDIRECTED, 0);

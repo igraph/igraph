@@ -475,7 +475,7 @@ leading.eigenvector.community <- function(graph, steps=-1, start=NULL,
 
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
-  steps <- as.numeric(steps)
+  steps <- as.integer(steps)
   if (!is.null(start)) { start <- as.numeric(start)-1 }
   options.tmp <- igraph.arpack.default; options.tmp[ names(options) ] <- options ; options <- options.tmp
   
