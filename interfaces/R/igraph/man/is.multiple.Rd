@@ -1,4 +1,5 @@
 \name{is.multiple}
+\alias{has.multiple}
 \alias{is.loop}
 \alias{is.multiple}
 \alias{count.multiple}
@@ -10,6 +11,7 @@
   simple graph.}
 \usage{
 is.loop(graph, eids=E(graph))
+has.multiple(graph)
 is.multiple(graph, eids=E(graph))
 count.multiple(graph, eids=E(graph))
 }
@@ -19,6 +21,16 @@ count.multiple(graph, eids=E(graph))
     this is all edges in the graph.}
 }
 \details{
+  \code{is.loop} decides whether the edges of the graph are loop edges.
+  
+  \code{has.multiple} decides whether the graph has any multiple edges.
+
+  \code{is.multiple} decides whether the edges of the graph are multiple
+  edges.
+
+  \code{count.multiple} counts the multiplicity of each edge of a
+  graph.
+  
   Note that the semantics for \code{is.multiple} and
   \code{count.multiple} is different. \code{is.multiple} gives \code{TRUE}
   for all occurences of a multiple edge except for one. Ie. if there are
@@ -30,6 +42,7 @@ count.multiple(graph, eids=E(graph))
   original multiplicity as an edge attribute.
 }
 \value{
+  \code{has.multiple} returns a logical scalar.
   \code{is.loop} and \code{is.multiple} return a logical
   vector. \code{count.multiple} returns a numeric vector.
 }
@@ -43,6 +56,7 @@ is.loop(g)
 
 # Multiple edges
 g <- barabasi.game(10, m=3, algorithm="bag")
+has.multiple(g)
 is.multiple(g)
 count.multiple(g)
 is.multiple(simplify(g))
