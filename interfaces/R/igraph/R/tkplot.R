@@ -561,6 +561,7 @@ tkplot.export.postscript <- function(tkp.id) {
 
 tkplot.getcoords <- function(tkp.id, norm=FALSE) {
   coords <- .tkplot.get(tkp.id, "coords")
+  coords[,2] <- max(coords[,2]) - coords[,2]
   if (norm) {
     # Shift
     coords[,1] <- coords[,1]-min(coords[,1])
