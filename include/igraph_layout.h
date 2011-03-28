@@ -87,6 +87,10 @@ int igraph_layout_reingold_tilford_circular(const igraph_t *graph,
 					    igraph_neimode_t mode,
 					    const igraph_vector_t *roots,
 					    const igraph_vector_t *rootlevel);
+int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
+        igraph_t *extended_graph, const igraph_vector_t* layers,
+        igraph_real_t hgap, igraph_real_t vgap, long int maxiter,
+        const igraph_vector_t *weights);
 
 int igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *res);
 int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res);

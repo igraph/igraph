@@ -231,7 +231,7 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     igraph_marked_queue.c igraph_estack.c st-cuts.c \
 			     cohesive_blocks.c statusbar.c \
 			     lapack.c complex.c eigen.c feedback_arc_set.c \
-			     igraph_hrg_types.cc igraph_hrg.cc \
+			     sugiyama.c igraph_hrg_types.cc igraph_hrg.cc \
 			     distances.c
 
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall
