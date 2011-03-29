@@ -17,7 +17,7 @@ assortativity.degree (graph, directed = TRUE)
 \arguments{
   \item{graph}{The input graph, it can be directed or undirected.}
   \item{types}{Vector giving the vertex types. They as assumed to be
-    integer numbers, starting with zero. Non-integer values are
+    integer numbers, starting with one. Non-integer values are
     converted to integers with \code{\link{as.integer}}.}
   \item{types1}{The vertex values, these can be arbitrary numeric
     values.}
