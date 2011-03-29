@@ -55,6 +55,7 @@ typedef struct igraph_rng_type_t {
   igraph_real_t (*get_norm)(void *state);
   igraph_real_t (*get_geom)(void *state, igraph_real_t p);
   igraph_real_t (*get_binom)(void *state, long int n, igraph_real_t p);
+  igraph_real_t (*get_exp)(void *state, igraph_real_t rate);
 } igraph_rng_type_t;
 
 typedef struct igraph_rng_t {
@@ -83,7 +84,9 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng);
 igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p);
 igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n, 
 				   igraph_real_t p);
+igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
 unsigned long int igraph_rng_get_int31(igraph_rng_t *rng);
+igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
 
 /* --------------------------------- */
 
@@ -119,6 +122,7 @@ void PutRNGstate(void);
 #define RNG_UNIF01()     (igraph_rng_get_unif01(&igraph_rng_default))
 #define RNG_GEOM(p)      (igraph_rng_get_geom(&igraph_rng_default,(p)))
 #define RNG_BINOM(n,p)   (igraph_rng_get_binom(&igraph_rng_default,(n),(p)))
+#define RNG_EXP(r)       (igraph_rng_get_exp(&igraph_rng_default,(r)))
 #define RNG_INT31()      (igraph_rng_get_int31(&igraph_rng_default))
 
 __END_DECLS

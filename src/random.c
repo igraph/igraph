@@ -236,7 +236,8 @@ igraph_rng_type_t igraph_rngtype_glibc2 = {
   /* get_real= */  igraph_rng_glibc2_get_real,
   /* get_norm= */  0,
   /* get_geom= */  0,
-  /* get_binom= */ 0
+  /* get_binom= */ 0,
+  /* get_exp= */   0
 };
 
 /* ------------------------------------ */
@@ -311,7 +312,8 @@ igraph_rng_type_t igraph_rngtype_rand = {
   /* get_real= */  igraph_rng_rand_get_real,
   /* get_norm= */  0,
   /* get_geom= */  0,
-  /* get_binom= */ 0
+  /* get_binom= */ 0,
+  /* get_exp= */   0
 };
 
 /* ------------------------------------ */
@@ -462,7 +464,8 @@ igraph_rng_type_t igraph_rngtype_mt19937 = {
   /* get_real= */  igraph_rng_mt19937_get_real,
   /* get_norm= */  0,
   /* get_geom= */  0,
-  /* get_binom= */ 0
+  /* get_binom= */ 0,
+  /* get_exp= */   0
 };
 
 #undef N
@@ -522,6 +525,7 @@ igraph_rng_t igraph_rng_default = {
 
 double  unif_rand(void);
 double  norm_rand(void);
+double  exp_rand(void);
 double  Rf_rgeom(double);
 double  Rf_rbinom(double, double);
 
@@ -563,6 +567,15 @@ igraph_real_t igraph_rng_R_get_binom(void *state, long int n,
   return Rf_rbinom(n, p);
 }
 
+igraph_real_t igraph_rng_R_get_exp(void *state, igraph_real_t rate) {
+  igraph_real_t scale = 1.0 / rate;
+  if (!IGRAPH_FINITE(scale) || scale <= 0.0) {
+    if (scale == 0.0) { return 0.0; }
+    return IGRAPH_NAN;
+  }
+  return scale * exp_rand();
+}
+
 igraph_rng_type_t igraph_rngtype_R = {
   /* name= */      "GNU R",
   /* min=  */      0,
@@ -574,7 +587,8 @@ igraph_rng_type_t igraph_rngtype_R = {
   /* get_real= */  igraph_rng_R_get_real,
   /* get_norm= */  igraph_rng_R_get_norm,
   /* get_geom= */  igraph_rng_R_get_geom,
-  /* get_binom= */ igraph_rng_R_get_binom
+  /* get_binom= */ igraph_rng_R_get_binom,
+  /* get_exp= */   igraph_rng_R_get_exp
 };
 
 igraph_rng_t igraph_rng_default = { 
@@ -590,6 +604,7 @@ igraph_rng_t igraph_rng_default = {
 double igraph_norm_rand(igraph_rng_t *rng);
 double igraph_rgeom(igraph_rng_t *rng, double p);
 double igraph_rbinom(igraph_rng_t *rng, double nin, double pp);
+double igraph_rexp(igraph_rng_t *rng, double rate);
 
 /** 
  * \function igraph_rng_init
@@ -851,6 +866,16 @@ unsigned long int igraph_rng_get_int31(igraph_rng_t *rng) {
     return igraph_rng_get_unif01(rng)*0x7FFFFFFFUL;
   }
 }
+
+igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate) {
+  const igraph_rng_type_t *type=rng->type;
+  if (type->get_exp) {
+    return type->get_exp(rng->state, rate);
+  } else { 
+    return igraph_rexp(rng, rate);
+  }
+}
+
 
 int igraph_rng_inited = 0;
 
@@ -1954,6 +1979,15 @@ double igraph_rbinom(igraph_rng_t *rng, double nin, double pp)
     if (psave > 0.5)
 	 ix = n - ix;
   return (double)ix;
+}
+
+igraph_real_t igraph_rexp(igraph_rng_t *rng, double rate) {
+  igraph_real_t scale = 1.0 / rate;
+  if (!IGRAPH_FINITE(scale) || scale <= 0.0) {
+    if (scale == 0.0) { return 0.0; }
+    return IGRAPH_NAN;
+  }
+  return scale * igraph_exp_rand(rng);
 }
 
 #endif

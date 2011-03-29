@@ -1,8 +1,8 @@
 # Check functions for other miscellaneous functions
 
 # Test suite for the IGraph library.
-# Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
-# MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+# Copyright (C) 2011  Gabor Csardi <csardi.gabor@gmail.com>
+# 334 Harvard st, Cambridge MA, 02139, USA
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,10 +19,18 @@
 # Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
 # 02110-1301 USA
 
-AT_BANNER([[Miscellaneous functions]])
-
-AT_SETUP([Convex hull calculation (igraph_convex_hull):])
-AT_KEYWORDS([igraph_convex_hull other])
-AT_COMPILE_CHECK([simple/igraph_convex_hull.c], [simple/igraph_convex_hull.out])
+AT_SETUP([Random seed:])
+AT_KEYWORDS([RNG seed random])
+AT_COMPILE_CHECK([simple/random_seed.c])
 AT_CLEANUP
 
+AT_SETUP([MT19937 RNG on 64 bit machines:])
+AT_KEYWORDS([RNG MT19937])
+AT_COMPILE_CHECK([simple/mt.c])
+AT_CLEANUP
+
+AT_SETUP([Exponentially distributed random numbers:])
+AT_KEYWORDS([exponential random numbers])
+AT_COMPILE_CHECK([simple/igraph_rng_get_exp.c], 
+		 [simple/igraph_rng_get_exp.out])
+AT_CLEANUP
