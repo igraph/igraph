@@ -1530,6 +1530,18 @@ igraph_automorphisms:
         PARAMS: GRAPH graph, BLISSSH sh="fm", OUT BLISSINFO info
 
 #######################################
+# SCG
+#######################################
+
+igraph_scg_grouping:
+        PARAMS: MATRIX V, OUT VECTORM1 groups, INTEGER intervals, \
+                VECTOR_OR_0 intervals_vector, SCGMAT matrix_type=Default, \
+                SCGALGO algorithm=Default, VECTOR_OR_0 p=NULL, \
+		INTEGER maxiter=100
+        NAME-R: scg.grouping
+        IGNORE: RR
+
+#######################################
 # Other, not graph related
 #######################################
 

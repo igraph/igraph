@@ -229,3 +229,15 @@ HRG:
                           as.numeric)
     DEFAULT:
        Default: NULL
+
+SCGMAT:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "symmetric"=1, \
+                          "laplacian"=2, "stochastic"=3)
+    DEFAULT:
+      Default: c("symmetric", "laplacian", "stochastic")
+
+SCGALGO:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "optimum"=1, "interv_km"=2, \
+                          "interv"=3, "exact_scg"=4)
+    DEFAULT:
+      Default: c("optimum", "interv_km", "interv", "exact_scg")

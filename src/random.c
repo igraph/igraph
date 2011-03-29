@@ -1078,7 +1078,7 @@ int igraph_random_sample(igraph_vector_t *res, igraph_integer_t l, igraph_intege
   
 #ifdef USING_R
 
-/* These are never called. */
+/* These are never called. But they are correct, nevertheless */
 
 double igraph_norm_rand(igraph_rng_t *rng) {
   return norm_rand();
@@ -1090,6 +1090,15 @@ double igraph_rgeom(igraph_rng_t *rng, double p) {
 
 double igraph_rbinom(igraph_rng_t *rng, double nin, double pp) {
   return Rf_rbinom(nin, pp);
+}
+
+double igraph_rexp(igraph_rng_t *rng, double rate) {
+  igraph_real_t scale = 1.0 / rate;
+  if (!IGRAPH_FINITE(scale) || scale <= 0.0) {
+    if (scale == 0.0) { return 0.0; }
+    return IGRAPH_NAN;
+  }
+  return scale * exp_rand();
 }
 
 #else

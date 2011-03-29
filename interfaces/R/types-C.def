@@ -640,3 +640,13 @@ HRG:
          igraph_hrg_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
 
+SCGMAT:
+  CTYPE: igraph_integer_t
+  INCONV:
+    IN: %C%=REAL(%I%)[0];
+
+SCGALGO:
+  CTYPE: igraph_integer_t
+  INCONV:
+    IN: %C%=REAL(%I%)[0];
+

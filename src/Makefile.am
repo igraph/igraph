@@ -149,7 +149,7 @@ HEADERS_PRIVATE = atlas-edges.h \
 		igraph_lapack_internal.h \
 		igraph_marked_queue.h igraph_estack.h \
 		hrg_dendro.h hrg_graph.h hrg_rbtree.h hrg_splittree_eq.h \
-		hrg_graph_simp.h
+		hrg_graph_simp.h scg_headers.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
@@ -183,7 +183,7 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_separators.h  ../include/igraph_cohesive_blocks.h \
 		../include/igraph_lapack.h	../include/igraph_complex.h   \
 		../include/igraph_eigen.h	../include/igraph_statusbar.h \
-		../include/igraph_hrg.h
+		../include/igraph_hrg.h		../include/igraph_scg.h
 
 libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     basic_query.c games.c cocitation.c iterators.c \
@@ -231,7 +231,9 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     igraph_marked_queue.c igraph_estack.c st-cuts.c \
 			     cohesive_blocks.c statusbar.c \
 			     lapack.c complex.c eigen.c \
-			     igraph_hrg_types.cc igraph_hrg.cc
+			     igraph_hrg_types.cc igraph_hrg.cc \
+			     scg.c scg_approximate_methods.c scg_exact_scg.c \
+			     scg_kmeans.c scg_utils.c scg_optimal_method.c
 
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall
