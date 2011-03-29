@@ -269,8 +269,10 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
   long int comp_idx;
   long int next_extd_vertex_id = no_of_nodes;
   igraph_bool_t directed = igraph_is_directed(graph);
-  igraph_integer_t no_of_components;
-  igraph_vector_t membership, extd_edgelist;
+  igraph_integer_t no_of_components;  /* number of components of the original graph */
+  igraph_vector_t membership;         /* components of the original graph */
+  igraph_vector_t extd_edgelist;   /* edge list of the extended graph */
+  igraph_real_t dx = 0;   /* displacement of the current component on the X axis */
 
   if (layers && igraph_vector_size(layers) < no_of_nodes) {
     IGRAPH_ERROR("layer vector too short", IGRAPH_EINVAL);
@@ -440,14 +442,21 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
       IGRAPH_CHECK(igraph_matrix_add_rows(res, j));
       for (i = 0; i < component_size; i++) {
         l = (long int)VECTOR(new2old_vertex_ids)[i];
-        MATRIX(*res, l, 0) = MATRIX(layout, i, 0);
+        MATRIX(*res, l, 0) = MATRIX(layout, i, 0) + dx;
         MATRIX(*res, l, 1) = MATRIX(layout, i, 1) * vgap;
       }
       for (i = component_size; i < next_new_vertex_id; i++) {
-        MATRIX(*res, k, 0) = MATRIX(layout, i, 0);
+        MATRIX(*res, k, 0) = MATRIX(layout, i, 0) + dx;
         MATRIX(*res, k, 1) = MATRIX(layout, i, 1) * vgap;
         k++;
       }
+
+      /* Adjust dx so that the next component does not overlap this one */
+      for (i = 0; i < next_new_vertex_id; i++) {
+        if (dx < MATRIX(layout, i, 0))
+          dx = MATRIX(layout, i, 0);
+      }
+      dx += hgap;
 
       igraph_destroy(&subgraph);
       igraph_i_layering_destroy(&layering);
@@ -833,9 +842,11 @@ static int igraph_i_layout_sugiyama_vertical_alignment(const igraph_t* graph,
   long int no_of_layers = igraph_i_layering_num_layers(layering);
   long int no_of_nodes = igraph_vcount(graph);
   igraph_neimode_t neimode = (reverse ? IGRAPH_OUT : IGRAPH_IN);
-  igraph_vector_t neis;
+  igraph_vector_t neis, xs, inds;
 
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&xs, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&inds, 0);
 
   IGRAPH_CHECK(igraph_vector_resize(roots, no_of_nodes));
   IGRAPH_CHECK(igraph_vector_resize(align, no_of_nodes));
@@ -846,13 +857,13 @@ static int igraph_i_layout_sugiyama_vertical_alignment(const igraph_t* graph,
 
   /* When reverse = False, we are aligning "upwards" in the tree, hence we
    * have to loop i from 1 to no_of_layers-1 (inclusive) and use neimode=IGRAPH_IN.
-   * When reverse = True, we are aligning "upwards", hence we have to loop
+   * When reverse = True, we are aligning "downwards", hence we have to loop
    * i from no_of_layers-2 to 0 (inclusive) and use neimode=IGRAPH_OUT.
    */
   i       = reverse ? (no_of_layers-2) : 1;
   di      = reverse ? -1 : 1;
   i_limit = reverse ? -1 : no_of_layers;
-  for (; i != i_limit; i+= di) {
+  for (; i != i_limit; i += di) {
     igraph_vector_t *layer = igraph_i_layering_get(layering, i);
 
     /* r = 0 in the paper, but C arrays are indexed from 0 */
@@ -879,21 +890,30 @@ static int igraph_i_layout_sugiyama_vertical_alignment(const igraph_t* graph,
       if (n == 0)
         /* No neighbors in this direction, continue */
         continue;
+      if (n == 1) {
+        /* Just one neighbor; the median is trivial */
+      } else {
+        /* Sort the neighbors by their X coordinates */
+        IGRAPH_CHECK(igraph_vector_resize(&xs, n));
+        for (k = 0; k < n; k++)
+          VECTOR(xs)[k] = X_POS((long int)VECTOR(neis)[k]);
+        IGRAPH_CHECK(igraph_vector_qsort_ind(&xs, &inds, 0));
+      }
 
       if (n % 2 == 1) {
         /* Odd number of neighbors, so the median is unique */
-        medians[0] = VECTOR(neis)[n / 2];
+        medians[0] = VECTOR(neis)[(long int)VECTOR(inds)[n / 2]];
         medians[1] = -1;
       } else {
         /* Even number of neighbors, so we have two medians. The order
          * depends on whether we are processing the layer in leftmost
          * or rightmost fashion. */
         if (align_right) {
-          medians[0] = VECTOR(neis)[n / 2];
-          medians[1] = VECTOR(neis)[n / 2 - 1];
+          medians[0] = VECTOR(neis)[(long int)VECTOR(inds)[n / 2]];
+          medians[1] = VECTOR(neis)[(long int)VECTOR(inds)[n / 2 - 1]];
         } else {
-          medians[0] = VECTOR(neis)[n / 2 - 1];
-          medians[1] = VECTOR(neis)[n / 2];
+          medians[0] = VECTOR(neis)[(long int)VECTOR(inds)[n / 2 - 1]];
+          medians[1] = VECTOR(neis)[(long int)VECTOR(inds)[n / 2]];
         }
       }
 
@@ -923,8 +943,10 @@ static int igraph_i_layout_sugiyama_vertical_alignment(const igraph_t* graph,
     }
   }
 
+  igraph_vector_destroy(&inds);
   igraph_vector_destroy(&neis);
-  IGRAPH_FINALLY_CLEAN(1);
+  igraph_vector_destroy(&xs);
+  IGRAPH_FINALLY_CLEAN(3);
 
   return IGRAPH_SUCCESS;
 }
