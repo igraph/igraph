@@ -74,6 +74,10 @@ int igraph_assortativity_nominal(const igraph_t *graph,
     IGRAPH_ERROR("Invalid `types' vector length", IGRAPH_EINVAL);
   }
 
+  if (igraph_vector_min(types) < 0) {
+    IGRAPH_ERROR("Invalid `types' vector", IGRAPH_EINVAL);
+  }
+
   directed = directed && igraph_is_directed(graph);
 
   no_of_types=igraph_vector_max(types)+1;
