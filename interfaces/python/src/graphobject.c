@@ -6207,16 +6207,20 @@ PyObject *igraphmodule_Graph_layout_reingold_tilford_circular(
 PyObject *igraphmodule_Graph_layout_sugiyama(
   igraphmodule_GraphObject * self, PyObject * args, PyObject * kwds)
 {
-  static char *kwlist[] = { "layers", "weights", "hgap", "vgap", "maxiter", NULL };
+  static char *kwlist[] = { "layers", "weights", "hgap", "vgap", "maxiter",
+    "return_extended_graph", NULL };
   igraph_matrix_t m;
+  igraph_t extd_graph;
   igraph_vector_t *weights = 0, *layers = 0;
   double hgap = 1, vgap = 1;
   long int maxiter = 100;
   PyObject *layers_o = Py_None, *weights_o = Py_None;
+  PyObject *return_extended_graph = Py_False;
   PyObject *result;
+  igraphmodule_GraphObject *graph_o;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOddl", kwlist,
-    &layers_o, &weights_o, &hgap, &vgap, &maxiter))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOddlO", kwlist,
+    &layers_o, &weights_o, &hgap, &vgap, &maxiter, &return_extended_graph))
     return NULL;
 
   if (igraph_matrix_init(&m, 1, 1)) {
@@ -6237,7 +6241,9 @@ PyObject *igraphmodule_Graph_layout_sugiyama(
     return NULL;
   }
 
-  if (igraph_layout_sugiyama(&self->g, &m, 0, layers, hgap, vgap, maxiter, weights)) {
+  if (igraph_layout_sugiyama(&self->g, &m,
+        (PyObject_IsTrue(return_extended_graph) ? &extd_graph : 0),
+        layers, hgap, vgap, maxiter, weights)) {
     if (layers != 0) { igraph_vector_destroy(layers); free(layers); }
     if (weights != 0) { igraph_vector_destroy(weights); free(weights); }
     igraph_matrix_destroy(&m);
@@ -6251,7 +6257,12 @@ PyObject *igraphmodule_Graph_layout_sugiyama(
   result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
   igraph_matrix_destroy(&m);
 
-  return (PyObject *) result;
+  if (PyObject_IsTrue(return_extended_graph)) {
+    CREATE_GRAPH(graph_o, extd_graph);
+    return Py_BuildValue("NN", result, graph_o);
+  } else {
+    return (PyObject *) result;
+  }
 }
 
 /**********************************************************************
@@ -12011,7 +12022,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  be assigned to layers using a breadth first search from the node with the\n"
    "  largest degree. For directed graphs, cycles are broken by reversing the\n"
    "  direction of edges in an approximate feedback arc set using the heuristic\n"
-   "  of Eades, Lin and Smyth, and then using the Coffman-Graham algorithm to\n"
+   "  of Eades, Lin and Smyth, and then using Gansner's algorithm to\n"
    "  place the vertices in layers.\n"
    "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
    "  even an edge attribute name.\n"
@@ -12019,15 +12030,25 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param vgap: minimum vertical gap between layers.\n"
    "@param maxiter: maximum number of iterations to take in the crossing reduction\n"
    "  step. Increase this if you feel that you are getting too many edge crossings.\n"
+   "@param return_extended_graph: specifies that the extended graph with the added\n"
+   "  dummy vertices should also be returned. When this is C{True}, the result will\n"
+   "  be a tuple containing the layout and the extended graph. The first |V| nodes\n"
+   "  of the extended graph will correspond to the nodes of the original graph,\n"
+   "  the remaining ones are dummy nodes. Plotting the extended graph with the\n"
+   "  returned layout and hidden dummy nodes will produce a layout that is similar\n"
+   "  to the original graph, but with the added edge bends.\n"
    "@return: the calculated layout, which may (and usually will) have more rows\n"
    "  than the number of vertices; the remaining rows correspond to the dummy nodes\n"
-   "  introduced in the layering step.\n\n"
+   "  introduced in the layering step. When C{return_extended_graph} is C{True},\n"
+   "  it will also contain the extended graph.\n\n"
    "@newfield ref: Reference\n"
    "@ref: K Sugiyama, S Tagawa, M Toda: Methods for visual understanding of\n"
    "  hierarchical system structures. IEEE Systems, Man and Cybernetics\n"
    "  11(2):109-125, 1981.\n"
    "@ref: P Eades, X Lin and WF Smyth: A fast effective heuristic for the\n"
    "  feedback arc set problem. Information Processing Letters 47:319-323, 1993.\n"
+   "@ref: ER Gansner, E Koutsofios, SC North, K-P Vo: A technique for drawing\n"
+   "  directed graphs."
   },
 
   ////////////////////////////

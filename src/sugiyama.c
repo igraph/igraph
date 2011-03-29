@@ -272,6 +272,10 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
   igraph_integer_t no_of_components;
   igraph_vector_t membership, extd_edgelist;
 
+  if (layers && igraph_vector_size(layers) < no_of_nodes) {
+    IGRAPH_ERROR("layer vector too short", IGRAPH_EINVAL);
+  }
+
   if (extended_graph != 0) {
     IGRAPH_VECTOR_INIT_FINALLY(&extd_edgelist, 0);
   }
