@@ -6199,6 +6199,61 @@ PyObject *igraphmodule_Graph_layout_reingold_tilford_circular(
   return (PyObject *) result;
 }
 
+/** \ingroup python_interface_graph
+ * \brief Places the vertices of a graph according to the Sugiyama layout.
+ * \return the calculated coordinates as a Python list of lists
+ * \sa igraph_layout_sugiyama
+ */
+PyObject *igraphmodule_Graph_layout_sugiyama(
+  igraphmodule_GraphObject * self, PyObject * args, PyObject * kwds)
+{
+  static char *kwlist[] = { "layers", "weights", "hgap", "vgap", "maxiter", NULL };
+  igraph_matrix_t m;
+  igraph_vector_t *weights = 0, *layers = 0;
+  double hgap = 1, vgap = 1;
+  long int maxiter = 100;
+  PyObject *layers_o = Py_None, *weights_o = Py_None;
+  PyObject *result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOddl", kwlist,
+    &layers_o, &weights_o, &hgap, &vgap, &maxiter))
+    return NULL;
+
+  if (igraph_matrix_init(&m, 1, 1)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraphmodule_attrib_to_vector_t(layers_o, self, &layers,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    igraph_matrix_destroy(&m);
+    return NULL;
+  }
+
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    if (layers != 0) { igraph_vector_destroy(layers); free(layers); }
+    igraph_matrix_destroy(&m);
+    return NULL;
+  }
+
+  if (igraph_layout_sugiyama(&self->g, &m, 0, layers, hgap, vgap, maxiter, weights)) {
+    if (layers != 0) { igraph_vector_destroy(layers); free(layers); }
+    if (weights != 0) { igraph_vector_destroy(weights); free(weights); }
+    igraph_matrix_destroy(&m);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (layers != 0) { igraph_vector_destroy(layers); free(layers); }
+  if (weights != 0) { igraph_vector_destroy(weights); free(weights); }
+
+  result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
+  igraph_matrix_destroy(&m);
+
+  return (PyObject *) result;
+}
+
 /**********************************************************************
  * Conversion between various graph representations                   *
  **********************************************************************/
@@ -11934,6 +11989,46 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param dim: the desired number of dimensions for the layout. dim=2\n"
    "  means a 2D layout, dim=3 means a 3D layout.\n"
    "@return: the coordinate pairs in a list."},
+
+  /* interface to igraph_layout_sugiyama */
+  {"layout_sugiyama",
+   (PyCFunction) igraphmodule_Graph_layout_sugiyama,
+   METH_VARARGS | METH_KEYWORDS,
+   "layout_sugiyama(layers=None, weights=None, hgap=1, vgap=1, maxiter=100)\n"
+   "Places the vertices using a layered Sugiyama layout.\n\n"
+   "This is a layered layout that is most suitable for directed acyclic graphs,\n"
+   "although it works on undirected or cyclic graphs as well.\n\n"
+   "Each vertex is assigned to a layer and each layer is placed on a horizontal\n"
+   "line. Vertices within the same layer are then permuted using the barycenter\n"
+   "heuristic that tries to minimize edge crossings.\n\n"
+   "Dummy vertices will be added on edges that span more than one layer. The\n"
+   "returned layout therefore contains more rows than the number of nodes in\n"
+   "the original graph; the extra rows correspond to the dummy vertices.\n\n"
+   "@param layers: a vector specifying a non-negative integer layer index for\n"
+   "  each vertex, or the name of a numeric vertex attribute that contains\n"
+   "  the layer indices. If C{None}, a layering will be determined automatically.\n"
+   "  For undirected graphs, a spanning tree will be extracted and vertices will\n"
+   "  be assigned to layers using a breadth first search from the node with the\n"
+   "  largest degree. For directed graphs, cycles are broken by reversing the\n"
+   "  direction of edges in an approximate feedback arc set using the heuristic\n"
+   "  of Eades, Lin and Smyth, and then using the Coffman-Graham algorithm to\n"
+   "  place the vertices in layers.\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name.\n"
+   "@param hgap: minimum horizontal gap between vertices in the same layer.\n"
+   "@param vgap: minimum vertical gap between layers.\n"
+   "@param maxiter: maximum number of iterations to take in the crossing reduction\n"
+   "  step. Increase this if you feel that you are getting too many edge crossings.\n"
+   "@return: the calculated layout, which may (and usually will) have more rows\n"
+   "  than the number of vertices; the remaining rows correspond to the dummy nodes\n"
+   "  introduced in the layering step.\n\n"
+   "@newfield ref: Reference\n"
+   "@ref: K Sugiyama, S Tagawa, M Toda: Methods for visual understanding of\n"
+   "  hierarchical system structures. IEEE Systems, Man and Cybernetics\n"
+   "  11(2):109-125, 1981.\n"
+   "@ref: P Eades, X Lin and WF Smyth: A fast effective heuristic for the\n"
+   "  feedback arc set problem. Information Processing Letters 47:319-323, 1993.\n"
+  },
 
   ////////////////////////////
   // VISITOR-LIKE FUNCTIONS //

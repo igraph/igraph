@@ -267,8 +267,14 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
   long int i, j, k, l, nei;
   long int no_of_nodes = (long int)igraph_vcount(graph);
   long int comp_idx;
+  long int next_extd_vertex_id = no_of_nodes;
+  igraph_bool_t directed = igraph_is_directed(graph);
   igraph_integer_t no_of_components;
-  igraph_vector_t membership;
+  igraph_vector_t membership, extd_edgelist;
+
+  if (extended_graph != 0) {
+    IGRAPH_VECTOR_INIT_FINALLY(&extd_edgelist, 0);
+  }
 
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
   IGRAPH_VECTOR_INIT_FINALLY(&membership, 0);
@@ -322,20 +328,27 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
     }
     component_size = next_new_vertex_id;
 
+    /* Construct a proper layering of the component in new_graph where each edge
+     * points downwards and spans exactly one layer. */
     for (i = 0; i < no_of_nodes; i++) {
       if (VECTOR(membership)[i] != comp_idx)
         continue;
 
       /* Okay, this vertex is in the component we are considering.
        * Add the neighbors of this vertex, excluding loops */
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_ALL));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
       j = igraph_vector_size(&neis);
       for (k = 0; k < j; k++) {
         nei = VECTOR(neis)[k];
-        if (nei < i)   /* to avoid considering edges twice */
+        if (!directed && nei < i)   /* to avoid considering edges twice */
           continue;
         if (VECTOR(*layers)[i] == VECTOR(*layers)[nei]) {
-          /* Edge goes within the same layer, we don't need this. */
+          /* Edge goes within the same layer, we don't need this in the
+           * layered graph, but we need it in the extended graph */
+          if (extended_graph != 0) {
+            IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, i));
+            IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, nei));
+          }
           continue;
         }
         if (VECTOR(*layers)[i] > VECTOR(*layers)[nei]) {
@@ -349,6 +362,16 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
           }
           IGRAPH_CHECK(igraph_vector_push_back(&edgelist, 
                        VECTOR(old2new_vertex_ids)[i]));
+          /* Also add the edge to the extended graph if needed, but this time
+           * with the proper orientation */
+          if (extended_graph != 0) {
+            IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, i));
+            for (l = VECTOR(*layers)[i]-1; l > VECTOR(*layers)[nei]; l--) {
+              IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, next_extd_vertex_id));
+              IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, next_extd_vertex_id++));
+            }
+            IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, nei));
+          }
         } else {
           /* Edge goes downwards */
           IGRAPH_CHECK(igraph_vector_push_back(&edgelist, 
@@ -360,6 +383,15 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
           }
           IGRAPH_CHECK(igraph_vector_push_back(&edgelist, 
                        VECTOR(old2new_vertex_ids)[nei]));
+          /* Also add the edge to the extended graph */
+          if (extended_graph != 0) {
+            IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, i));
+            for (l = VECTOR(*layers)[i]+1; l < VECTOR(*layers)[nei]; l++) {
+              IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, next_extd_vertex_id));
+              IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, next_extd_vertex_id++));
+            }
+            IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, nei));
+          }
         }
       }
     }
@@ -429,6 +461,13 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
 
   igraph_vector_destroy(&membership);
   IGRAPH_FINALLY_CLEAN(1);
+
+  if (extended_graph != 0) {
+    IGRAPH_CHECK(igraph_create(extended_graph, &extd_edgelist, next_extd_vertex_id,
+          igraph_is_directed(graph)));
+    igraph_vector_destroy(&extd_edgelist);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
 
   return IGRAPH_SUCCESS;
 }

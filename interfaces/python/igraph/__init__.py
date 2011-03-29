@@ -1134,6 +1134,8 @@ class Graph(GraphBase):
 
           - C{star}: star layout (see L{Graph.layout_star})
 
+          - C{sugiyama}: Sugiyama layout (see L{Graph.layout_sugiyama})
+
         @param layout: the layout to use. This can be one of the registered
           layout names or a callable which returns either a L{Layout} object or
           a list of lists containing the coordinates. If C{None}, uses the
@@ -2586,6 +2588,7 @@ class Graph(GraphBase):
         "sphere": "layout_sphere",
         "spherical": "layout_sphere",
         "star": "layout_star",
+        "sugiyama": "layout_sugiyama",
     }
 
     # After adjusting something here, don't forget to update the docstring
