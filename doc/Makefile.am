@@ -87,13 +87,14 @@ structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 		$(SRCDIR)/spectral_properties.c $(SRCDIR)/cores.c \
 		$(SRCDIR)/centrality.c $(SRCDIR)/decomposition.c \
 		$(SRCDIR)/mixing.c $(INCLUDEDIR)/igraph_arpack.h \
-		$(SRCDIR)/distances.c
+		$(SRCDIR)/distances.c $(SRCDIR)/feedback_arc_set.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ \
 	$(SRCDIR)/structural_properties.c $(SRCDIR)/spanning_trees.c \
 	$(SRCDIR)/conversion.c $(SRCDIR)/basic_query.c $(SRCDIR)/cocitation.c \
 	$(SRCDIR)/components.c $(SRCDIR)/spectral_properties.c $(SRCDIR)/cores.c \
 	$(SRCDIR)/centrality.c $(SRCDIR)/decomposition.c $(SRCDIR)/mixing.c \
-	$(INCLUDEDIR)/igraph_arpack.h  $(SRCDIR)/distances.c
+	$(INCLUDEDIR)/igraph_arpack.h  $(SRCDIR)/distances.c \
+	$(SRCDIR)/feedback_arc_set.c
 
 iterators.xml: iterators.xxml $(SRCDIR)/iterators.c $(INCLUDEDIR)/igraph_iterators.h
 	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/iterators.c \
@@ -103,8 +104,8 @@ attributes.xml: attributes.xxml $(SRCDIR)/attributes.c $(INCLUDEDIR)/igraph_attr
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/attributes.c \
 	$(INCLUDEDIR)/igraph_attributes.h $(SRCDIR)/cattributes.c
 
-layout.xml: layout.xxml $(SRCDIR)/layout.c $(INCLUDEDIR)/igraph_layout.h $(SRCDIR)/drl_layout.cpp $(SRCDIR)/drl_layout_3d.cpp
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/layout.c $(INCLUDEDIR)/igraph_layout.h $(SRCDIR)/drl_layout.cpp $(SRCDIR)/drl_layout_3d.cpp
+layout.xml: layout.xxml $(SRCDIR)/layout.c $(INCLUDEDIR)/igraph_layout.h $(SRCDIR)/drl_layout.cpp $(SRCDIR)/drl_layout_3d.cpp $(SRCDIR)/sugiyama.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/layout.c $(INCLUDEDIR)/igraph_layout.h $(SRCDIR)/drl_layout.cpp $(SRCDIR)/drl_layout_3d.cpp $(SRCDIR)/sugiyama.c
 
 foreign.xml: foreign.xxml $(SRCDIR)/foreign.c $(SRCDIR)/foreign-graphml.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/foreign.c \
