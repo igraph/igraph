@@ -74,6 +74,7 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
  *          For more details, see Eades P, Lin X and Smyth WF: A fast and effective
  *          heuristic for the feedback arc set problem. In: Proc Inf Process Lett
  *          319-323, 1993.
+ *        \endclist
  *
  * \return Error code:
  *         \c IGRAPH_EINVAL if an unknown method was specified or the weight vector
