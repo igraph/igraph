@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<chapter id="igraph-HRG">
+<title>Hierarchical random graphs</title>
+
+<section>
+<!-- doxrox-include hrg_intro -->
+</section>
+
+<section><title>Representing HRGs</title>
+<!-- doxrox-include igraph_hrg_t -->
+<!-- doxrox-include igraph_hrg_init -->
+<!-- doxrox-include igraph_hrg_destroy -->
+<!-- doxrox-include igraph_hrg_size -->
+<!-- doxrox-include igraph_hrg_resize -->
+</section>
+
+<section><title>Fitting HRGs</title>
+<!-- doxrox-include igraph_hrg_fit -->
+<!-- doxrox-include igraph_hrg_consensus -->
+</section>
+
+<section><title>HRG sampling</title>
+<!-- doxrox-include igraph_hrg_sample -->
+<!-- doxrox-include igraph_hrg_game -->
+</section>
+
+<section><title>Conversion to and from igraph graphs</title>
+<!-- doxrox-include igraph_hrg_dendrogram -->
+<!-- doxrox-include igraph_hrg_create -->
+</section>
+
+<section><title>Predicting missing edges</title>
+<!-- doxrox-include igraph_hrg_predict -->
+</section>
+
+</chapter>
