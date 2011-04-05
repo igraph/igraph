@@ -34,8 +34,6 @@
 
 int igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph_vector_t *result,
         const igraph_vector_t *weights);
-int igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *result,
-        const igraph_vector_t *weights);
 int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
         const igraph_vector_t *weights);
 
@@ -99,7 +97,7 @@ int igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *result,
       return igraph_i_feedback_arc_set_ip(graph, result, weights);
 
     case IGRAPH_FAS_APPROX_EADES:
-      return igraph_i_feedback_arc_set_eades(graph, result, weights);
+      return igraph_i_feedback_arc_set_eades(graph, result, weights, 0);
 
     default:
       IGRAPH_ERROR("Invalid algorithm", IGRAPH_EINVAL);
@@ -118,7 +116,7 @@ int igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph_vector_t 
  * Solves the feedback arc set problem using the heuristics of Eades et al.
  */
 int igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *result,
-        const igraph_vector_t *weights) {
+        const igraph_vector_t *weights, igraph_vector_t *layers) {
   long int i, j, k, v, eid, no_of_nodes=igraph_vcount(graph), nodes_left;
   igraph_dqueue_t sources, sinks;
   igraph_vector_t neis;
@@ -294,15 +292,32 @@ int igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *resu
   }
 
   /* Find the feedback edges based on the ordering */
-  igraph_vector_clear(result);
-  j = igraph_ecount(graph);
-  for (i = 0; i < j; i++) {
-    if (ordering[(long)IGRAPH_FROM(graph, i)] > ordering[(long)IGRAPH_TO(graph, i)])
-      IGRAPH_CHECK(igraph_vector_push_back(result, i));
+  if (result != 0) {
+    igraph_vector_clear(result);
+    j = igraph_ecount(graph);
+    for (i = 0; i < j; i++) {
+      if (ordering[(long)IGRAPH_FROM(graph, i)] > ordering[(long)IGRAPH_TO(graph, i)])
+        IGRAPH_CHECK(igraph_vector_push_back(result, i));
+    }
   }
 
-  igraph_free(ordering);
+  /* If we have also requested a layering, return that as well */
+  if (layers != 0) {
+    IGRAPH_CHECK(igraph_vector_resize(layers, no_of_nodes));
+    igraph_vector_null(layers);
+    j = igraph_ecount(graph);
+    for (i = 0; i < j; i++) {
+      /* Skip feedback edges */
+      long int from = IGRAPH_FROM(graph, i), to = IGRAPH_TO(graph, i);
+      if (ordering[from] > ordering[to])
+        continue;
+      if (VECTOR(*layers)[to] < VECTOR(*layers)[from] + 1)
+        VECTOR(*layers)[to] = VECTOR(*layers)[from] + 1;
+    }
+  }
 
+  /* Free the ordering vector */
+  igraph_free(ordering);
   IGRAPH_FINALLY_CLEAN(1);
 
   return IGRAPH_SUCCESS;

@@ -63,6 +63,15 @@ int main() {
   igraph_destroy(&extd_g);
   printf("===\n");
 
+  /* Same, but with automatic layering */
+  igraph_layout_sugiyama(&g, &coords, 0, 0,
+          /* hgap = */ 1,
+          /* vgap = */ 1,
+          /* maxiter = */ 100,
+          /* weights = */ 0);
+  igraph_matrix_print(&coords);
+  printf("===\n");
+
   igraph_vector_destroy(&edgelist);
   igraph_vector_destroy(&layers);
   igraph_matrix_destroy(&coords);
