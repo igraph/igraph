@@ -120,7 +120,7 @@ int igraphmodule_EdgeSeq_init(igraphmodule_EdgeSeqObject *self,
     /* We selected a single edge */
     long idx = PyInt_AsLong(esobj);
     if (idx < 0 || idx >= igraph_ecount(&((igraphmodule_GraphObject*)g)->g)) {
-      PyErr_SetString(PyExc_ValueError, "edge index out of bounds");
+      PyErr_SetString(PyExc_ValueError, "edge index out of range");
       return -1;
     }
     igraph_es_1(&es, idx);
@@ -132,7 +132,7 @@ int igraphmodule_EdgeSeq_init(igraphmodule_EdgeSeqObject *self,
       return -1;
     if (!igraph_vector_isininterval(&v, 0, n-1)) {
       igraph_vector_destroy(&v);
-      PyErr_SetString(PyExc_ValueError, "edge index out of bounds");
+      PyErr_SetString(PyExc_ValueError, "edge index out of range");
       return -1;
     }
     if (igraph_es_vector_copy(&es, &v)) {
@@ -631,6 +631,7 @@ PyObject* igraphmodule_EdgeSeq_select(igraphmodule_EdgeSeqObject *self, PyObject
         igraphmodule_handle_igraph_error();
         return 0;
       }
+      m = igraph_vector_size(&v2);
       for (; i<n; i++) {
         PyObject *item2 = PyTuple_GET_ITEM(args, i);
         long idx;
@@ -642,6 +643,12 @@ PyObject* igraphmodule_EdgeSeq_select(igraphmodule_EdgeSeqObject *self, PyObject
           return NULL;
         }
         idx = PyInt_AsLong(item2);
+        if (idx >= m || idx < 0) {
+          PyErr_SetString(PyExc_ValueError, "edge index out of range");
+          igraph_vector_destroy(&v);
+          igraph_vector_destroy(&v2);
+          return NULL;
+        }
         if (igraph_vector_push_back(&v, VECTOR(v2)[idx])) {
           Py_DECREF(result);
           igraphmodule_handle_igraph_error();
@@ -680,6 +687,7 @@ PyObject* igraphmodule_EdgeSeq_select(igraphmodule_EdgeSeqObject *self, PyObject
         igraphmodule_handle_igraph_error();
         return 0;
       }
+      m = igraph_vector_size(&v2);
 
       /* Create an appropriate iterator */
       if (PySlice_Check(item)) {
@@ -724,6 +732,14 @@ PyObject* igraphmodule_EdgeSeq_select(igraphmodule_EdgeSeqObject *self, PyObject
         if (PyInt_Check(item2)) {
           long idx = PyInt_AsLong(item2);
           Py_DECREF(item2);
+          if (idx >= m || idx < 0) {
+            PyErr_SetString(PyExc_ValueError, "vertex index out of range");
+            Py_DECREF(result);
+            Py_DECREF(iter);
+            igraph_vector_destroy(&v);
+            igraph_vector_destroy(&v2);
+            return NULL;
+          }
           if (igraph_vector_push_back(&v, VECTOR(v2)[idx])) {
             Py_DECREF(result);
             Py_DECREF(iter);

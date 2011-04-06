@@ -177,6 +177,15 @@ class EdgeSeqTests(unittest.TestCase):
             self.failUnless(all((e.source in vs1 and e.target in vs2) or \
                                 (e.target in vs1 and e.source in vs2) for e in es))
 
+    def testIndexOutOfBoundsSelect(self):
+        g = Graph.Full(3)
+        self.assertRaises(ValueError, g.es.select, 4)
+        self.assertRaises(ValueError, g.es.select, 4, 5)
+        self.assertRaises(ValueError, g.es.select, (4, 5))
+        self.assertRaises(ValueError, g.es.select, 2, -1)
+        self.assertRaises(ValueError, g.es.select, (2, -1))
+        self.assertRaises(ValueError, g.es.__getitem__, (0, 1000000))
+ 
     def testGraphMethodProxying(self):
         idxs = [1, 3, 5, 7, 9]
         g = Graph.Barabasi(100)

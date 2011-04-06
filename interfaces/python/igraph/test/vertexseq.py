@@ -140,6 +140,15 @@ class VertexSeqTests(unittest.TestCase):
         del g.vs["degree"]
         self.failUnless(len(g.vs(_degree_gt=30)) == l)
 
+    def testIndexOutOfBoundsSelect(self):
+        g = Graph.Full(3)
+        self.assertRaises(ValueError, g.vs.select, 4)
+        self.assertRaises(ValueError, g.vs.select, 4, 5)
+        self.assertRaises(ValueError, g.vs.select, (4, 5))
+        self.assertRaises(ValueError, g.vs.select, 2, -1)
+        self.assertRaises(ValueError, g.vs.select, (2, -1))
+        self.assertRaises(ValueError, g.vs.__getitem__, (0, 1000000))
+ 
     def testGraphMethodProxying(self):
         g = Graph.Barabasi(100)
         vs = g.vs(1,3,5,7,9)
