@@ -2989,7 +2989,9 @@ known_colors = \
 palettes = {
     "gray": GradientPalette("black", "white"),
     "red-blue": GradientPalette("red", "blue"),
-    "red-green": AdvancedGradientPalette(["red", "yellow", "green"]),
+    "red-purple-blue": AdvancedGradientPalette(["red", "purple", "blue"]),
+    "red-green": GradientPalette("red", "green"),
+    "red-yellow-green": AdvancedGradientPalette(["red", "yellow", "green"]),
     "red-black-green": AdvancedGradientPalette(["red", "black", "green"]),
     "rainbow": RainbowPalette(),
     "heat": AdvancedGradientPalette(["red", "yellow", "white"],

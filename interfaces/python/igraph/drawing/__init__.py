@@ -402,6 +402,13 @@ def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
       achieve this, you'll need to modify the L{Plot} object returned with
       L{Plot.add}.
 
+    @keyword palette: the palette primarily used on the plot if the
+      added objects do not specify a private palette. Must be either
+      an L{igraph.drawing.colors.Palette} object or a string referring
+      to a valid key of C{igraph.drawing.colors.palettes} (see module
+      L{igraph.drawing.colors}) or C{None}. In the latter case, the default
+      palette given by the configuration key C{plotting.palette} is used.
+
     @keyword margin: the top, right, bottom, left margins as a 4-tuple.
       If it has less than 4 elements or is a single float, the elements
       will be re-used until the length is at least 4. The default margin
