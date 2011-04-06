@@ -53,6 +53,16 @@ int main() {
     return 2;
   igraph_destroy(&g);
 
+  /* Simple unweighted graph with loops */
+  igraph_small(&g, 0, IGRAPH_DIRECTED, 0,1, 1,2, 2,0, 2,3, 2,4, 0,4, 4,3, 5,0, 6,5, 1,1, 4,4, -1);
+  igraph_feedback_arc_set(&g, &result, 0, IGRAPH_FAS_APPROX_EADES);
+  igraph_vector_print(&result);
+  igraph_delete_edges(&g, igraph_ess_vector(&result));
+  igraph_is_dag(&g, &dag);
+  if (!dag)
+    return 3;
+  igraph_destroy(&g);
+
   igraph_vector_destroy(&result);
   igraph_vector_destroy(&weights);
 

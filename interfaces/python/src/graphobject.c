@@ -3855,6 +3855,47 @@ PyObject *igraphmodule_Graph_eigenvector_centrality(
   return res_o;
 }
 
+/** \ingroup python_interface_graph
+ * \brief Calculates a feedback arc set for a graph
+ * \return a list containing the indices in the chosen feedback arc set
+ * \sa igraph_feedback_arc_set
+ */
+PyObject *igraphmodule_Graph_feedback_arc_set(
+    igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = { "weights", "method", NULL };
+  igraph_vector_t* weights = 0;
+  igraph_vector_t result;
+  igraph_fas_algorithm_t algo = IGRAPH_FAS_APPROX_EADES;
+  PyObject *weights_o = Py_None, *result_o = NULL, *algo_o = NULL;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist, &weights_o, &algo_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_fas_algorithm_t(algo_o, &algo))
+    return NULL;
+
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE))
+    return NULL;
+
+  if (igraph_vector_init(&result, 0)) {
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
+  }
+
+  if (igraph_feedback_arc_set(&self->g, &result, weights, algo)) {
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
+    igraph_vector_destroy(&result);
+    return NULL;
+  }
+
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
+
+  result_o = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&result);
+
+  return result_o;
+}
+
 
 /** \ingroup python_interface_graph
  * \brief Calculates the shortest paths from/to a given node in the graph
@@ -4726,7 +4767,6 @@ PyObject *igraphmodule_Graph_similarity_inverse_log_weighted(
 
   return list;
 }
-
 
 /** \ingroup python_interface_graph
  * \brief Calculates a spanning tree for a graph
@@ -10915,6 +10955,34 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  variable called C{arpack_options} is used.\n"
    "@return: the eigenvector centralities in a list and optionally the\n"
    "  largest eigenvalue (as a second member of a tuple)"
+  },
+
+  /* interface to igraph_feedback_arc_set */
+  {"feedback_arc_set", (PyCFunction) igraphmodule_Graph_feedback_arc_set,
+   METH_VARARGS | METH_KEYWORDS,
+   "feedback_arc_set(weights=None, method=\"eades\")\n\n"
+   "Calculates an approximately or exactly minimal feedback arc set.\n\n"
+   "A feedback arc set is a set of edges whose removal makes the graph acyclic.\n"
+   "Since this is always possible by removing all the edges, we are in general\n"
+   "interested in removing the smallest possible number of edges, or an edge set\n"
+   "with as small total weight as possible. This method calculates one such edge\n"
+   "set. Note that the task is trivial for an undirected graph as it is enough to\n"
+   "find a spanning tree and then remove all the edges not in the spanning tree.\n"
+   "Of course it is more complicated for directed graphs.\n\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name. When given, the algorithm will strive to remove\n"
+   "  lightweight edges in order to minimize the total weight of the feedback arc\n"
+   "  set.\n"
+   "@param method: the algorithm to use. L{\"eades\"} uses the greedy cycle breaking\n"
+   "  heuristic of Eades, Lin and Smyth, which is linear in the number of edges\n"
+   "  but not necessarily optimal; however, it guarantees that the number of edges\n"
+   "  to be removed is smaller than |E|/2 - |V|/6. L{\"ip\"} uses an integer\n"
+   "  programming formulation which is guaranteed to yield an optimal result, but is\n"
+   "  too slow for large graphs.\n"
+   "@return: the IDs of the edges to be removed, in a list.\n\n"
+   "@newfield ref: Reference\n"
+   "@ref: Eades P, Lin X and Smyth WF: A fast and effective heuristic for the\n"
+   "  feedback arc set problem. In: Proc Inf Process Lett 319-323, 1993.\n"
   },
 
   // interface to igraph_get_shortest_paths

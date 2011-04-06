@@ -296,7 +296,8 @@ int igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *resu
     igraph_vector_clear(result);
     j = igraph_ecount(graph);
     for (i = 0; i < j; i++) {
-      if (ordering[(long)IGRAPH_FROM(graph, i)] > ordering[(long)IGRAPH_TO(graph, i)])
+      long int from = IGRAPH_FROM(graph, i), to = IGRAPH_TO(graph, i);
+      if (from == to || ordering[from] > ordering[to])
         IGRAPH_CHECK(igraph_vector_push_back(result, i));
     }
   }
