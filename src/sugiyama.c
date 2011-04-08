@@ -992,7 +992,7 @@ static int igraph_i_layout_sugiyama_horizontal_compaction(const igraph_t* graph,
     VECTOR(sinks)[i] = i;
   }
   igraph_vector_fill(&shifts, INFINITY);
-  igraph_vector_fill(xs, 0);
+  igraph_vector_fill(xs, -1);
 
   /* Calculate the coordinates of the vertices relative to their sinks
    * in their own class. At the end of this for loop, xs will contain the
@@ -1039,7 +1039,7 @@ static int igraph_i_layout_sugiyama_horizontal_compaction_place_block(long int v
   long int u, w;
   long int u_sink, v_sink;
 
-  if (VECTOR(*xs)[v] < 0)
+  if (VECTOR(*xs)[v] >= 0)
     return IGRAPH_SUCCESS;
 
   VECTOR(*xs)[v] = 0;

@@ -23,10 +23,12 @@
 */
 
 #include "igraph_centrality.h"
+#include "igraph_components.h"
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
 #include "igraph_dqueue.h"
 #include "igraph_error.h"
+#include "igraph_glpk_support.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_structural.h"
@@ -304,17 +306,37 @@ int igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *resu
 
   /* If we have also requested a layering, return that as well */
   if (layers != 0) {
+    igraph_vector_t ranks;
+    igraph_vector_long_t order_vec;
+
     IGRAPH_CHECK(igraph_vector_resize(layers, no_of_nodes));
     igraph_vector_null(layers);
-    j = igraph_ecount(graph);
-    for (i = 0; i < j; i++) {
-      /* Skip feedback edges */
-      long int from = IGRAPH_FROM(graph, i), to = IGRAPH_TO(graph, i);
-      if (ordering[from] > ordering[to])
-        continue;
-      if (VECTOR(*layers)[to] < VECTOR(*layers)[from] + 1)
-        VECTOR(*layers)[to] = VECTOR(*layers)[from] + 1;
+
+    igraph_vector_long_view(&order_vec, ordering, no_of_nodes);
+
+    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&ranks, 0);
+
+    IGRAPH_CHECK(igraph_vector_long_qsort_ind(&order_vec, &ranks, 0));
+
+    for (i = 0; i < no_of_nodes; i++) {
+      long int from = VECTOR(ranks)[i];
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, IGRAPH_OUT));
+      k = igraph_vector_size(&neis);
+      for (j = 0; j < k; j++) {
+        long int to = VECTOR(neis)[j];
+        if (from == to)
+          continue;
+        if (ordering[from] > ordering[to])
+          continue;
+        if (VECTOR(*layers)[to] < VECTOR(*layers)[from] + 1)
+          VECTOR(*layers)[to] = VECTOR(*layers)[from] + 1;
+      }
     }
+
+    igraph_vector_destroy(&neis);
+    igraph_vector_destroy(&ranks);
+    IGRAPH_FINALLY_CLEAN(2);
   }
 
   /* Free the ordering vector */
@@ -332,7 +354,213 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
 #ifndef HAVE_GLPK
   IGRAPH_ERROR("GLPK is not available", IGRAPH_UNIMPLEMENTED);    
 #else
-  IGRAPH_ERROR("TODO", IGRAPH_UNIMPLEMENTED);
+
+  igraph_integer_t no_of_components;
+  igraph_integer_t no_of_vertices = igraph_vcount(graph);
+  igraph_integer_t no_of_edges = igraph_ecount(graph);
+  igraph_vector_t membership, ordering, vertex_remapping;
+  igraph_vector_ptr_t vertices_by_components, edges_by_components;
+  long int i, j, k, l, m, n, from, to;
+  igraph_real_t weight;
+  glp_prob *ip;
+  glp_iocp parm;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&membership, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&ordering, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&vertex_remapping, no_of_vertices);
+  
+  igraph_vector_clear(result);
+
+  /* Decompose the graph into connected components */
+  IGRAPH_CHECK(igraph_clusters(graph, &membership, 0, &no_of_components,
+        IGRAPH_WEAK));
+
+  /* Construct vertex and edge lists for each of the components */
+  IGRAPH_CHECK(igraph_vector_ptr_init(&vertices_by_components, no_of_components));
+  IGRAPH_CHECK(igraph_vector_ptr_init(&edges_by_components, no_of_components));
+  IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &vertices_by_components);
+  IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &edges_by_components);
+  for (i = 0; i < no_of_components; i++) {
+    igraph_vector_t* vptr;
+    vptr = igraph_Calloc(1, igraph_vector_t);
+    if (vptr == 0)
+      IGRAPH_ERROR("cannot calculate feedback arc set using IP", IGRAPH_ENOMEM);
+    IGRAPH_FINALLY(free, vptr);
+    IGRAPH_CHECK(igraph_vector_init(vptr, 0));
+    IGRAPH_FINALLY_CLEAN(1);
+    VECTOR(vertices_by_components)[i] = vptr;
+  }
+  IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&vertices_by_components, igraph_vector_destroy);
+  for (i = 0; i < no_of_components; i++) {
+    igraph_vector_t* vptr;
+    vptr = igraph_Calloc(1, igraph_vector_t);
+    if (vptr == 0)
+      IGRAPH_ERROR("cannot calculate feedback arc set using IP", IGRAPH_ENOMEM);
+    IGRAPH_FINALLY(free, vptr);
+    IGRAPH_CHECK(igraph_vector_init(vptr, 0));
+    IGRAPH_FINALLY_CLEAN(1);
+    VECTOR(edges_by_components)[i] = vptr;
+  }
+  IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&edges_by_components, igraph_vector_destroy);
+  for (i = 0; i < no_of_vertices; i++) {
+    j = VECTOR(membership)[i];
+    IGRAPH_CHECK(igraph_vector_push_back(VECTOR(vertices_by_components)[j], i));
+  }
+  for (i = 0; i < no_of_edges; i++) {
+    j = VECTOR(membership)[(long)IGRAPH_FROM(graph, i)];
+    IGRAPH_CHECK(igraph_vector_push_back(VECTOR(edges_by_components)[j], i));
+  }
+
+#define VAR2IDX(i, j) (i*(n-1)+j-(i+1)*i/2)
+
+  /* Configure GLPK */
+  glp_term_out(GLP_OFF);
+  glp_init_iocp(&parm);
+  parm.br_tech = GLP_BR_DTH;
+  parm.bt_tech = GLP_BT_BLB;
+  parm.pp_tech = GLP_PP_ALL;
+  parm.presolve = GLP_ON;
+  parm.binarize = GLP_OFF;
+  parm.cb_func = igraph_i_glpk_interruption_hook;
+
+  /* Solve an IP for feedback arc sets in each of the components */
+  for (i = 0; i < no_of_components; i++) {
+    igraph_vector_t* vertices_in_comp = (igraph_vector_t*)VECTOR(vertices_by_components)[i];
+    igraph_vector_t* edges_in_comp = (igraph_vector_t*)VECTOR(edges_by_components)[i];
+
+    /*
+     * Let x_ij denote whether layer(i) < layer(j).
+     *
+     * The standard formulation of the problem is as follows:
+     *
+     * max sum_{i,j} w_ij x_ij
+     *
+     * subject to
+     *
+     * (1) x_ij + x_ji = 1   (i.e. either layer(i) < layer(j) or layer(i) > layer(j))
+     *     for all i < j
+     * (2) x_ij + x_jk + x_ki <= 2 for all i < j, i < k, j != k
+     *
+     * Note that x_ij = 1 implies that x_ji = 0 and vice versa; in other words,
+     * x_ij = 1 - x_ji. Thus, we can get rid of the (1) constraints and half of the
+     * x_ij variables (where j < i) if we rewrite constraints of type (2) as follows:
+     *
+     * (2a) x_ij + x_jk - x_ik <= 1 for all i < j, i < k, j < k
+     * (2b) x_ij - x_kj - x_ik <= 0 for all i < j, i < k, j > k
+     *
+     * The goal function then becomes:
+     *
+     * max sum_{i<j} (w_ij-w_ji) x_ij
+     */
+    n = igraph_vector_size(vertices_in_comp);
+    ip = glp_create_prob();
+    IGRAPH_FINALLY(glp_delete_prob, ip);
+    glp_set_obj_dir(ip, GLP_MAX);
+
+    /* Construct a mapping from vertex IDs to the [0; n-1] range */
+    for (j = 0; j < n; j++)
+      VECTOR(vertex_remapping)[(long)VECTOR(*vertices_in_comp)[j]] = j;
+
+    /* Set up variables */
+    k = n*(n-1)/2;
+    glp_add_cols(ip, k);
+    for (j = 1; j <= k; j++)
+      glp_set_col_kind(ip, j, GLP_BV);
+
+    /* Set up coefficients in the goal function */
+    k = igraph_vector_size(edges_in_comp);
+    for (j = 0; j < k; j++) {
+      l = VECTOR(*edges_in_comp)[j];
+      from = VECTOR(vertex_remapping)[(long)IGRAPH_FROM(graph, l)];
+      to = VECTOR(vertex_remapping)[(long)IGRAPH_TO(graph, l)];
+      if (from == to)
+        continue;
+
+      weight = weights ? VECTOR(*weights)[l] : 1;
+
+      if (from < to) {
+        l = VAR2IDX(from, to);
+        glp_set_obj_coef(ip, l, glp_get_obj_coef(ip, l) + weight);
+      } else {
+        l = VAR2IDX(to, from);
+        glp_set_obj_coef(ip, l, glp_get_obj_coef(ip, l) - weight);
+      }
+    }
+
+    /* Add constraints */
+    glp_add_rows(ip, n*(n-1)/2 + n*(n-1)*(n-2)/3);
+    m = 1;
+    for (j = 0; j < n; j++) {
+      int ind[4];
+      double val[4] = {0, 1, 1, -1};
+      for (k = j+1; k < n; k++) {
+        ind[1] = VAR2IDX(j, k);
+        /* Type (2a) */
+        val[2] = 1;
+        for (l = k+1; l < n; l++, m++) {
+          ind[2] = VAR2IDX(k, l);
+          ind[3] = VAR2IDX(j, l);
+          glp_set_row_bnds(ip, m, GLP_UP, 1, 1);
+          glp_set_mat_row(ip, m, 3, ind, val);
+        }
+        /* Type (2b) */
+        val[2] = -1;
+        for (l = j+1; l < k; l++, m++) {
+          ind[2] = VAR2IDX(l, k);
+          ind[3] = VAR2IDX(j, l);
+          glp_set_row_bnds(ip, m, GLP_UP, 0, 0);
+          glp_set_mat_row(ip, m, 3, ind, val);
+        }
+      }
+    }
+
+    /* Solve the problem */
+    igraph_i_glpk_check(glp_intopt(ip, &parm), "Feedback arc set using IP failed");
+
+    /* Find the ordering of the vertices */
+    IGRAPH_CHECK(igraph_vector_resize(&ordering, n));
+    igraph_vector_null(&ordering);
+    m = n * (n-1) / 2;
+    j = 0; k = 1;
+    for (l = 1; l <= m; l++) {
+      /* variable l always corresponds to the (j, k) vertex pair */
+      /* printf("(%ld, %ld) = %g\n", i, j, glp_mip_col_val(ip, l)); */
+      if (glp_mip_col_val(ip, l) > 0) {
+        /* j comes earlier in the ordering than k */
+        VECTOR(ordering)[j]++;
+      } else {
+        /* k comes earlier in the ordering than j */
+        VECTOR(ordering)[k]++;
+      }
+      k++;
+      if (k == n) {
+        j++; k = j+1;
+      }
+    }
+
+    /* Find the feedback edges */
+    k = igraph_vector_size(edges_in_comp);
+    for (j = 0; j < k; j++) {
+      l = VECTOR(*edges_in_comp)[j];
+      from = VECTOR(vertex_remapping)[(long)IGRAPH_FROM(graph, l)];
+      to = VECTOR(vertex_remapping)[(long)IGRAPH_TO(graph, l)];
+      if (from == to || VECTOR(ordering)[from] < VECTOR(ordering)[to])
+        IGRAPH_CHECK(igraph_vector_push_back(result, l));
+    }
+
+    /* Clean up */
+    glp_delete_prob(ip);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  igraph_vector_ptr_destroy_all(&vertices_by_components);
+  igraph_vector_ptr_destroy_all(&edges_by_components);
+  igraph_vector_destroy(&vertex_remapping);
+  igraph_vector_destroy(&ordering);
+  igraph_vector_destroy(&membership);
+  IGRAPH_FINALLY_CLEAN(5);
+
+  return IGRAPH_SUCCESS;
 #endif
 }
 

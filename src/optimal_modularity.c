@@ -26,16 +26,12 @@
 #include "igraph_structural.h"
 #include "igraph_community.h"
 #include "igraph_error.h"
+#include "igraph_glpk_support.h"
 #include "igraph_interrupt.h"
 #include "config.h"
 
 #ifdef HAVE_GLPK
 #include <glpk.h>
-
-void igraph_i_optmod_hook(glp_tree *tree, void *info) {
-  IGRAPH_ALLOW_INTERRUPTION_NORETURN();
-}
-
 #endif
 
 /**
@@ -92,7 +88,6 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
   long int i, j, k, st;
   int idx[] = { 0, 0, 0, 0 };
   double coef[] = { 0.0, 1.0, 1.0, -2.0 };
-  int ret;
 
   igraph_vector_t degree;
 
@@ -180,46 +175,8 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
   parm.bt_tech = GLP_BT_BLB;
   parm.presolve = GLP_ON;
   parm.binarize = GLP_ON;
-  parm.cb_func = igraph_i_optmod_hook;
-  ret=glp_intopt(ip, &parm);
-
-  /* handle errors */
-  switch (ret) {
-  case 0: 
-    break;
-  case GLP_EBOUND:
-    IGRAPH_ERROR("Modularity optimization failed (GLP_EBOUND)", 
-		 IGRAPH_GLP_EBOUND);
-    break;
-  case GLP_EROOT:
-    IGRAPH_ERROR("Modularity optimization failed (GLP_EROOT)", 
-		 IGRAPH_GLP_EROOT);
-    break;
-  case GLP_ENOPFS:
-    IGRAPH_ERROR("Modularity optimization failed (GLP_ENOPFS)", 
-		 IGRAPH_GLP_ENOPFS);
-    break;
-  case GLP_ENODFS:
-    IGRAPH_ERROR("Modularity optimization failed (GLP_ENODFS)", 
-		 IGRAPH_GLP_ENODFS);
-    break;
-  case GLP_EFAIL:
-    IGRAPH_ERROR("Modularity optimization failed (GLP_EFAIL)", 
-		 IGRAPH_GLP_EFAIL);
-    break;
-  case GLP_EMIPGAP:
-    IGRAPH_ERROR("Modularity optimization failed (GLP_EMIPGAP)", 
-		 IGRAPH_GLP_EMIPGAP);
-    break;
-  case GLP_ETMLIM:
-    IGRAPH_ERROR("Modularity optimization failed (GLP_ETMLIM)", 
-		 IGRAPH_GLP_ETMLIM);
-    break;
-  case GLP_ESTOP:
-    IGRAPH_ERROR("Modularity optimization failed (GLP_ESTOP)", 
-		 IGRAPH_GLP_ESTOP);
-    break;        
-  }
+  parm.cb_func = igraph_i_glpk_interruption_hook;
+  igraph_i_glpk_check(glp_intopt(ip, &parm), "Modularity optimization failed");
   
   /* store the results */
   if (modularity) {

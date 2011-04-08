@@ -32,6 +32,10 @@ int main() {
 
   igraph_vector_init(&result, 0);
 
+  /***********************************************************************/
+  /* Approximation with Eades' method                                    */
+  /***********************************************************************/
+
   /* Simple unweighted graph */
   igraph_small(&g, 0, IGRAPH_DIRECTED, 0,1, 1,2, 2,0, 2,3, 2,4, 0,4, 4,3, 5,0, 6,5, -1);
   igraph_feedback_arc_set(&g, &result, 0, IGRAPH_FAS_APPROX_EADES);
@@ -61,6 +65,54 @@ int main() {
   igraph_is_dag(&g, &dag);
   if (!dag)
     return 3;
+  igraph_destroy(&g);
+
+  /***********************************************************************/
+  /* Exact solution with integer programming                             */
+  /***********************************************************************/
+
+  /* Simple unweighted graph */
+  igraph_small(&g, 0, IGRAPH_DIRECTED, 0,1, 1,2, 2,0, 2,3, 2,4, 0,4, 4,3, 5,0, 6,5, -1);
+  igraph_feedback_arc_set(&g, &result, 0, IGRAPH_FAS_EXACT_IP);
+  igraph_vector_print(&result);
+  igraph_delete_edges(&g, igraph_ess_vector(&result));
+  igraph_is_dag(&g, &dag);
+  if (!dag)
+    return 1;
+  igraph_destroy(&g);
+
+  /* Simple weighted graph */
+  igraph_small(&g, 0, IGRAPH_DIRECTED, 0,1, 1,2, 2,0, 2,3, 2,4, 0,4, 4,3, 5,0, 6,5, -1);
+  igraph_vector_init_int_end(&weights, -1, 1, 1, 3, 1, 1, 1, 1, 1, 1, -1);
+  igraph_feedback_arc_set(&g, &result, &weights, IGRAPH_FAS_EXACT_IP);
+  igraph_vector_print(&result);
+  igraph_delete_edges(&g, igraph_ess_vector(&result));
+  igraph_is_dag(&g, &dag);
+  if (!dag)
+    return 2;
+  igraph_destroy(&g);
+
+  /* Simple unweighted graph with loops */
+  igraph_small(&g, 0, IGRAPH_DIRECTED, 0,1, 1,2, 2,0, 2,3, 2,4, 0,4, 4,3, 5,0, 6,5, 1,1, 4,4, -1);
+  igraph_feedback_arc_set(&g, &result, 0, IGRAPH_FAS_EXACT_IP);
+  igraph_vector_print(&result);
+  igraph_delete_edges(&g, igraph_ess_vector(&result));
+  igraph_is_dag(&g, &dag);
+  if (!dag)
+    return 3;
+  igraph_destroy(&g);
+
+  /* Disjoint union of two almost identical graphs */
+  igraph_small(&g, 0, IGRAPH_DIRECTED,
+      0,1, 1,2, 2,0, 2,3,  2,4,  0,4,  4,3,    5,0,  6,5, 1,1, 4,4,
+      7,8, 8,9, 9,7, 9,10, 9,11, 7,11, 11,10, 12,7, 13,12,
+      -1);
+  igraph_feedback_arc_set(&g, &result, 0, IGRAPH_FAS_EXACT_IP);
+  igraph_vector_print(&result);
+  igraph_delete_edges(&g, igraph_ess_vector(&result));
+  igraph_is_dag(&g, &dag);
+  if (!dag)
+    return 4;
   igraph_destroy(&g);
 
   igraph_vector_destroy(&result);

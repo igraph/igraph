@@ -146,7 +146,7 @@ HEADERS_PRIVATE = atlas-edges.h \
 		gengraph_hash.h gengraph_header.h gengraph_powerlaw.h \
 		gengraph_qsort.h gengraph_random.h gengraph_vertex_cover.h \
 		igraph_blas_internal.h igraph_arpack_internal.h \
-		igraph_lapack_internal.h \
+		igraph_lapack_internal.h igraph_glpk_support.h \
 		igraph_marked_queue.h igraph_estack.h \
 		hrg_dendro.h hrg_graph.h hrg_rbtree.h hrg_splittree_eq.h \
 		hrg_graph_simp.h
@@ -231,7 +231,8 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     igraph_marked_queue.c igraph_estack.c st-cuts.c \
 			     cohesive_blocks.c statusbar.c \
 			     lapack.c complex.c eigen.c feedback_arc_set.c \
-			     sugiyama.c igraph_hrg_types.cc igraph_hrg.cc \
+			     sugiyama.c glpk_support.c \
+				 igraph_hrg_types.cc igraph_hrg.cc \
 			     distances.c
 
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall
