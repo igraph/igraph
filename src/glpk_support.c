@@ -38,7 +38,7 @@ void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info) {
 
 int igraph_i_glpk_check(int retval, const char* message) {
   char* code = "none";
-  char* message_and_code = 0;
+  char* message_and_code[4096];
 
   if (retval == 0)
     return;
@@ -59,7 +59,6 @@ int igraph_i_glpk_check(int retval, const char* message) {
   }
 #undef HANDLE_CODE
 
-  message_and_code = (char*)calloc(strlen(message) + strlen(code) + 4, sizeof(char));
   sprintf(message_and_code, "%s (%s)", message, code);
   IGRAPH_ERROR(message_and_code, retval);
 }
