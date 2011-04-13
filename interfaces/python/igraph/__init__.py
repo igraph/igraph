@@ -1229,6 +1229,73 @@ class Graph(GraphBase):
             algo = "drl"
         return self.layout(algo, *args, **kwds)
 
+    def layout_sugiyama(self, layers=None, weights=None, hgap=1, vgap=1,
+            maxiter=100, return_extended_graph=False):
+        """layout_sugiyama(layers=None, weights=None, hgap=1, vgap=1, maxiter=100,
+                        return_extended_graph=False)
+
+        Places the vertices using a layered Sugiyama layout.
+
+        This is a layered layout that is most suitable for directed acyclic graphs,
+        although it works on undirected or cyclic graphs as well.
+
+        Each vertex is assigned to a layer and each layer is placed on a horizontal
+        line. Vertices within the same layer are then permuted using the barycenter
+        heuristic that tries to minimize edge crossings.
+
+        Dummy vertices will be added on edges that span more than one layer. The
+        returned layout therefore contains more rows than the number of nodes in
+        the original graph; the extra rows correspond to the dummy vertices.
+
+        @param layers: a vector specifying a non-negative integer layer index for
+          each vertex, or the name of a numeric vertex attribute that contains
+          the layer indices. If C{None}, a layering will be determined
+          automatically. For undirected graphs, a spanning tree will be extracted
+          and vertices will be assigned to layers using a breadth first search from
+          the node with the largest degree. For directed graphs, cycles are broken
+          by reversing the direction of edges in an approximate feedback arc set
+          using the heuristic of Eades, Lin and Smyth, and then using longest path
+          layering to place the vertices in layers.
+        @param weights: edge weights to be used. Can be a sequence or iterable or
+          even an edge attribute name.
+        @param hgap: minimum horizontal gap between vertices in the same layer.
+        @param vgap: vertical gap between layers. The layer index will be
+          multiplied by I{vgap} to obtain the Y coordinate.
+        @param maxiter: maximum number of iterations to take in the crossing
+          reduction step. Increase this if you feel that you are getting too many
+          edge crossings.
+        @param return_extended_graph: specifies that the extended graph with the
+          added dummy vertices should also be returned. When this is C{True}, the
+          result will be a tuple containing the layout and the extended graph. The
+          first |V| nodes of the extended graph will correspond to the nodes of the
+          original graph, the remaining ones are dummy nodes. Plotting the extended
+          graph with the returned layout and hidden dummy nodes will produce a layout
+          that is similar to the original graph, but with the added edge bends.
+          The extended graph also contains an edge attribute called C{_original_eid}
+          which specifies the ID of the edge in the original graph from which the
+          edge of the extended graph was created.
+        @return: the calculated layout, which may (and usually will) have more rows
+          than the number of vertices; the remaining rows correspond to the dummy
+          nodes introduced in the layering step. When C{return_extended_graph} is
+          C{True}, it will also contain the extended graph.
+
+        @newfield ref: Reference
+        @ref: K Sugiyama, S Tagawa, M Toda: Methods for visual understanding of
+          hierarchical system structures. IEEE Systems, Man and Cybernetics\
+          11(2):109-125, 1981.
+        @ref: P Eades, X Lin and WF Smyth: A fast effective heuristic for the
+          feedback arc set problem. Information Processing Letters 47:319-323, 1993.
+        """
+        if not return_extended_graph:
+            return Layout(GraphBase._layout_sugiyama(self, layers, weights, hgap,
+                    vgap, maxiter, return_extended_graph))
+
+        layout, extd_graph, extd_to_orig_eids = \
+                GraphBase._layout_sugiyama(self, layers, weights, hgap,
+                        vgap, maxiter, return_extended_graph)
+        extd_graph.es["_original_eid"] = extd_to_orig_eids
+        return Layout(layout), extd_graph
+
     # Auxiliary I/O functions
 
     def write_adjacency(self, f, sep=" ", eol="\n", *args, **kwds):
@@ -3283,8 +3350,11 @@ def _layout_method_wrapper(func):
     return result
 
 for name in dir(Graph):
-    if name.startswith("layout_") and name != "layout_auto":
-        setattr(Graph, name, _layout_method_wrapper(getattr(Graph, name)))
+    if not name.startswith("layout_"):
+        continue
+    if name in ("layout_auto", "layout_sugiyama"):
+        continue
+    setattr(Graph, name, _layout_method_wrapper(getattr(Graph, name)))
 
 ##############################################################
 # Adding aliases for the 3D versions of the layout methods

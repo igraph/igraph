@@ -38,7 +38,7 @@
 #ifdef _MSC_VER
 /* MSVC does not support variadic macros */
 #include <stdarg.h>
-void debug(const char* fmt, ...) {
+static void debug(const char* fmt, ...) {
   va_list args;
   va_start(args, fmt);
 #ifdef SUGIYAMA_DEBUG
@@ -261,9 +261,9 @@ static inline igraph_real_t igraph_i_median_4(igraph_real_t x1,
  *                weights when breaking the cycles.
  */
 int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
-        igraph_t *extended_graph, const igraph_vector_t* layers,
-        igraph_real_t hgap, igraph_real_t vgap, long int maxiter,
-        const igraph_vector_t *weights) {
+        igraph_t *extd_graph, igraph_vector_t *extd_to_orig_eids,
+        const igraph_vector_t* layers, igraph_real_t hgap, igraph_real_t vgap,
+        long int maxiter, const igraph_vector_t *weights) {
   long int i, j, k, l, nei;
   long int no_of_nodes = (long int)igraph_vcount(graph);
   long int comp_idx;
@@ -272,19 +272,23 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
   igraph_integer_t no_of_components;  /* number of components of the original graph */
   igraph_vector_t membership;         /* components of the original graph */
   igraph_vector_t extd_edgelist;   /* edge list of the extended graph */
-  igraph_vector_t* layers_own;
+  igraph_vector_t layers_own;  /* layer indices after having eliminated empty layers */
   igraph_real_t dx = 0;   /* displacement of the current component on the X axis */
+  igraph_vector_t layer_to_y; /* mapping from layer indices to final Y coordinates */
 
-  if (layers && igraph_vector_size(layers) < no_of_nodes) {
-    IGRAPH_ERROR("layer vector too short", IGRAPH_EINVAL);
+  if (layers && igraph_vector_size(layers) != no_of_nodes) {
+    IGRAPH_ERROR("layer vector too short or too long", IGRAPH_EINVAL);
   }
 
-  if (extended_graph != 0) {
+  if (extd_graph != 0) {
     IGRAPH_VECTOR_INIT_FINALLY(&extd_edgelist, 0);
+    if (extd_to_orig_eids != 0)
+      igraph_vector_clear(extd_to_orig_eids);
   }
 
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
   IGRAPH_VECTOR_INIT_FINALLY(&membership, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&layer_to_y, 0);
 
   /* 1. Find the connected components. */
   IGRAPH_CHECK(igraph_clusters(graph, &membership, 0, &no_of_components,
@@ -294,18 +298,35 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
    *    a layering, we can leave all the edges as is as they will be re-oriented
    *    to point downwards only anyway. */
   if (layers == 0) {
-    layers_own = igraph_Calloc(1, igraph_vector_t);
-    IGRAPH_FINALLY(igraph_free, layers_own);
-    IGRAPH_VECTOR_INIT_FINALLY(layers_own, no_of_nodes);
-    IGRAPH_CHECK(igraph_i_feedback_arc_set_eades(graph, 0, weights, layers_own));
+    IGRAPH_VECTOR_INIT_FINALLY(&layers_own, no_of_nodes);
+    IGRAPH_CHECK(igraph_i_feedback_arc_set_eades(graph, 0, weights, &layers_own));
   } else {
-    /* Casting the constness away; this is intentional */
-    layers_own = (igraph_vector_t*)layers;
+    IGRAPH_CHECK(igraph_vector_copy(&layers_own, layers));
+    IGRAPH_FINALLY(igraph_vector_destroy, &layers_own);
   }
 
-  /* TODO: normalize layering, eliminate empty layers */
+  /* Normalize layering, eliminate empty layers */
+  if (no_of_nodes > 0) {
+    igraph_vector_t inds;
+    IGRAPH_VECTOR_INIT_FINALLY(&inds, 0);
+    IGRAPH_CHECK(igraph_vector_qsort_ind(&layers_own, &inds, 0));
+    j = -1; dx = VECTOR(layers_own)[(long int)VECTOR(inds)[0]] - 1;
+    for (i = 0; i < no_of_nodes; i++) {
+      long int k = (long int)VECTOR(inds)[i];
+      if (VECTOR(layers_own)[k] > dx) {
+        /* New layer starts here */
+        dx = VECTOR(layers_own)[k];
+        j++;
+        IGRAPH_CHECK(igraph_vector_push_back(&layer_to_y, dx * vgap));
+      }
+      VECTOR(layers_own)[k] = j;
+    }
+    igraph_vector_destroy(&inds);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
 
   /* 3. For each component... */
+  dx = 0;
   for (comp_idx = 0; comp_idx < no_of_components; comp_idx++) {
     /* Extract the edges of the comp_idx'th component and add dummy nodes for edges
      * spanning more than one layer. */
@@ -327,7 +348,7 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
     /* Construct a mapping from the old vertex ids to the new ones */
     for (i = 0, next_new_vertex_id = 0; i < no_of_nodes; i++) {
       if (VECTOR(membership)[i] == comp_idx) {
-        IGRAPH_CHECK(igraph_vector_push_back(&new_layers, VECTOR(*layers_own)[i]));
+        IGRAPH_CHECK(igraph_vector_push_back(&new_layers, VECTOR(layers_own)[i]));
         VECTOR(new2old_vertex_ids)[next_new_vertex_id] = i;
         VECTOR(old2new_vertex_ids)[i] = next_new_vertex_id;
         next_new_vertex_id++;
@@ -343,26 +364,33 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
 
       /* Okay, this vertex is in the component we are considering.
        * Add the neighbors of this vertex, excluding loops */
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_incident(graph, &neis, i, IGRAPH_OUT));
       j = igraph_vector_size(&neis);
       for (k = 0; k < j; k++) {
-        nei = VECTOR(neis)[k];
-        if (!directed && nei < i)   /* to avoid considering edges twice */
-          continue;
-        if (VECTOR(*layers_own)[i] == VECTOR(*layers_own)[nei]) {
+        long int eid = VECTOR(neis)[k];
+        if (directed) {
+          nei = IGRAPH_TO(graph, eid);
+        } else {
+          nei = IGRAPH_OTHER(graph, eid, i);
+          if (nei < i)   /* to avoid considering edges twice */
+            continue;
+        }
+        if (VECTOR(layers_own)[i] == VECTOR(layers_own)[nei]) {
           /* Edge goes within the same layer, we don't need this in the
            * layered graph, but we need it in the extended graph */
-          if (extended_graph != 0) {
+          if (extd_graph != 0) {
             IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, i));
             IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, nei));
+            if (extd_to_orig_eids != 0)
+              IGRAPH_CHECK(igraph_vector_push_back(extd_to_orig_eids, eid));
           }
           continue;
         }
-        if (VECTOR(*layers_own)[i] > VECTOR(*layers_own)[nei]) {
+        if (VECTOR(layers_own)[i] > VECTOR(layers_own)[nei]) {
           /* Edge goes upwards, we have to flip it */
           IGRAPH_CHECK(igraph_vector_push_back(&edgelist, 
                        VECTOR(old2new_vertex_ids)[nei]));
-          for (l = VECTOR(*layers_own)[nei]+1; l < VECTOR(*layers_own)[i]; l++) {
+          for (l = VECTOR(layers_own)[nei]+1; l < VECTOR(layers_own)[i]; l++) {
             IGRAPH_CHECK(igraph_vector_push_back(&new_layers, l));
             IGRAPH_CHECK(igraph_vector_push_back(&edgelist, next_new_vertex_id));
             IGRAPH_CHECK(igraph_vector_push_back(&edgelist, next_new_vertex_id++));
@@ -371,19 +399,23 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
                        VECTOR(old2new_vertex_ids)[i]));
           /* Also add the edge to the extended graph if needed, but this time
            * with the proper orientation */
-          if (extended_graph != 0) {
+          if (extd_graph != 0) {
             IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, i));
-            for (l = VECTOR(*layers_own)[i]-1; l > VECTOR(*layers_own)[nei]; l--) {
+            for (l = VECTOR(layers_own)[i]-1; l > VECTOR(layers_own)[nei]; l--) {
               IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, next_extd_vertex_id));
               IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, next_extd_vertex_id++));
+              if (extd_to_orig_eids != 0)
+                IGRAPH_CHECK(igraph_vector_push_back(extd_to_orig_eids, eid));
             }
             IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, nei));
+            if (extd_to_orig_eids != 0)
+              IGRAPH_CHECK(igraph_vector_push_back(extd_to_orig_eids, eid));
           }
         } else {
           /* Edge goes downwards */
           IGRAPH_CHECK(igraph_vector_push_back(&edgelist, 
                        VECTOR(old2new_vertex_ids)[i]));
-          for (l = VECTOR(*layers_own)[i]+1; l < VECTOR(*layers_own)[nei]; l++) {
+          for (l = VECTOR(layers_own)[i]+1; l < VECTOR(layers_own)[nei]; l++) {
             IGRAPH_CHECK(igraph_vector_push_back(&new_layers, l));
             IGRAPH_CHECK(igraph_vector_push_back(&edgelist, next_new_vertex_id));
             IGRAPH_CHECK(igraph_vector_push_back(&edgelist, next_new_vertex_id++));
@@ -391,13 +423,17 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
           IGRAPH_CHECK(igraph_vector_push_back(&edgelist, 
                        VECTOR(old2new_vertex_ids)[nei]));
           /* Also add the edge to the extended graph */
-          if (extended_graph != 0) {
+          if (extd_graph != 0) {
             IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, i));
-            for (l = VECTOR(*layers_own)[i]+1; l < VECTOR(*layers_own)[nei]; l++) {
+            for (l = VECTOR(layers_own)[i]+1; l < VECTOR(layers_own)[nei]; l++) {
               IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, next_extd_vertex_id));
               IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, next_extd_vertex_id++));
+              if (extd_to_orig_eids != 0)
+                IGRAPH_CHECK(igraph_vector_push_back(extd_to_orig_eids, eid));
             }
             IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, nei));
+            if (extd_to_orig_eids != 0)
+              IGRAPH_CHECK(igraph_vector_push_back(extd_to_orig_eids, eid));
           }
         }
       }
@@ -444,11 +480,11 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
       for (i = 0; i < component_size; i++) {
         l = (long int)VECTOR(new2old_vertex_ids)[i];
         MATRIX(*res, l, 0) = MATRIX(layout, i, 0) + dx;
-        MATRIX(*res, l, 1) = MATRIX(layout, i, 1) * vgap;
+        MATRIX(*res, l, 1) = VECTOR(layer_to_y)[(long)MATRIX(layout, i, 1)];
       }
       for (i = component_size; i < next_new_vertex_id; i++) {
         MATRIX(*res, k, 0) = MATRIX(layout, i, 0) + dx;
-        MATRIX(*res, k, 1) = MATRIX(layout, i, 1) * vgap;
+        MATRIX(*res, k, 1) = VECTOR(layer_to_y)[(long)MATRIX(layout, i, 1)];
         k++;
       }
 
@@ -475,16 +511,16 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
 
   if (layers == 0) {
     /* We have created our own layers vector, so we have to destroy it */
-    igraph_vector_destroy(layers_own);
-    igraph_free(layers_own);
-    IGRAPH_FINALLY_CLEAN(2);
+    igraph_vector_destroy(&layers_own);
+    IGRAPH_FINALLY_CLEAN(1);
   }
 
+  igraph_vector_destroy(&layer_to_y);
   igraph_vector_destroy(&membership);
-  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY_CLEAN(2);
 
-  if (extended_graph != 0) {
-    IGRAPH_CHECK(igraph_create(extended_graph, &extd_edgelist, next_extd_vertex_id,
+  if (extd_graph != 0) {
+    IGRAPH_CHECK(igraph_create(extd_graph, &extd_edgelist, next_extd_vertex_id,
           igraph_is_directed(graph)));
     igraph_vector_destroy(&extd_edgelist);
     IGRAPH_FINALLY_CLEAN(1);

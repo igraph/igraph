@@ -28,10 +28,11 @@
 int main() {
   igraph_t g, extd_g;
   igraph_matrix_t coords;
-  igraph_vector_t edgelist, extd_edgelist;
+  igraph_vector_t edgelist, extd_edgelist, extd_to_orig_eids;
   igraph_vector_t layers;
 
   igraph_matrix_init(&coords, 0, 0);
+  igraph_vector_init(&extd_to_orig_eids, 0);
 
   /* Layout on simple graph with predefined layers */
   igraph_vector_init_int_end(&layers, -1, 0,1,1,2,3,3,4,4,5, -1);
@@ -40,7 +41,7 @@ int main() {
           3,8, 8,1, 8,2, -1);
   igraph_create(&g, &edgelist, 0, 1);
 
-  igraph_layout_sugiyama(&g, &coords, 0, &layers,
+  igraph_layout_sugiyama(&g, &coords, 0, 0, &layers,
           /* hgap = */ 1,
           /* vgap = */ 1,
           /* maxiter = */ 100,
@@ -49,7 +50,7 @@ int main() {
   printf("===\n");
 
   /* Same, but this time also return the extended graph */
-  igraph_layout_sugiyama(&g, &coords, &extd_g, &layers,
+  igraph_layout_sugiyama(&g, &coords, &extd_g, &extd_to_orig_eids, &layers,
           /* hgap = */ 1,
           /* vgap = */ 1,
           /* maxiter = */ 100,
@@ -62,9 +63,11 @@ int main() {
   igraph_vector_destroy(&extd_edgelist);
   igraph_destroy(&extd_g);
   printf("===\n");
+  igraph_vector_print(&extd_to_orig_eids);
+  printf("===\n");
 
   /* Same, but with automatic layering */
-  igraph_layout_sugiyama(&g, &coords, 0, 0,
+  igraph_layout_sugiyama(&g, &coords, 0, 0, 0,
           /* hgap = */ 1,
           /* vgap = */ 1,
           /* maxiter = */ 100,
@@ -75,6 +78,7 @@ int main() {
   igraph_vector_destroy(&edgelist);
   igraph_vector_destroy(&layers);
   igraph_matrix_destroy(&coords);
+  igraph_vector_destroy(&extd_to_orig_eids);
   igraph_destroy(&g);
 
   return 0;
