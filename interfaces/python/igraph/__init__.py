@@ -1603,7 +1603,16 @@ class Graph(GraphBase):
         sizes = [width-2*vertex_size, height-2*vertex_size]
         halfsizes = [(bbox.left + bbox.right) / 2., \
                    (bbox.top + bbox.bottom) / 2.]
-        ratios = [sizes[0] / bbox.width, sizes[1] / bbox.height]
+        w, h = bbox.width, bbox.height
+        ratios = []
+        if w == 0:
+            ratios.append(1.0)
+        else:
+            ratios.append(sizes[0] / w)
+        if h == 0:
+            ratios.append(1.0)
+        else:
+            ratios.append(sizes[1] / h)
         layout = [[(row[0] - halfsizes[0]) * ratios[0], \
                   (row[1] - halfsizes[1]) * ratios[1]] \
                   for row in layout]
@@ -1667,7 +1676,7 @@ class Graph(GraphBase):
         print >>f, "  <!-- Vertices -->"
         for vidx in range(self.vcount()):
             print >>f, "    <g transform=\"translate(%.4f %.4f)\">" % \
-                    layout[vidx]
+                    tuple(layout[vidx])
             if shapes[vidx] == 1:
                 # Undocumented feature: can handle two colors
                 c = str(colors[vidx])
