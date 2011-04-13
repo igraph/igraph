@@ -264,7 +264,7 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
         igraph_t *extd_graph, igraph_vector_t *extd_to_orig_eids,
         const igraph_vector_t* layers, igraph_real_t hgap, igraph_real_t vgap,
         long int maxiter, const igraph_vector_t *weights) {
-  long int i, j, k, l, nei;
+  long int i, j, k, l, m, nei;
   long int no_of_nodes = (long int)igraph_vcount(graph);
   long int comp_idx;
   long int next_extd_vertex_id = no_of_nodes;
@@ -312,7 +312,7 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_CHECK(igraph_vector_qsort_ind(&layers_own, &inds, 0));
     j = -1; dx = VECTOR(layers_own)[(long int)VECTOR(inds)[0]] - 1;
     for (i = 0; i < no_of_nodes; i++) {
-      long int k = (long int)VECTOR(inds)[i];
+      k = (long int)VECTOR(inds)[i];
       if (VECTOR(layers_own)[k] > dx) {
         /* New layer starts here */
         dx = VECTOR(layers_own)[k];
@@ -401,9 +401,10 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
            * with the proper orientation */
           if (extd_graph != 0) {
             IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, i));
-            for (l = VECTOR(layers_own)[i]-1; l > VECTOR(layers_own)[nei]; l--) {
-              IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, next_extd_vertex_id));
-              IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, next_extd_vertex_id++));
+            next_extd_vertex_id += VECTOR(layers_own)[i] - VECTOR(layers_own)[nei] - 1;
+            for (l = VECTOR(layers_own)[i]-1, m = 1; l > VECTOR(layers_own)[nei]; l--, m++) {
+              IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, next_extd_vertex_id-m));
+              IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, next_extd_vertex_id-m));
               if (extd_to_orig_eids != 0)
                 IGRAPH_CHECK(igraph_vector_push_back(extd_to_orig_eids, eid));
             }
