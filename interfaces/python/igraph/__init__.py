@@ -1197,7 +1197,13 @@ class Graph(core.GraphBase):
                 
         sizes=[width-2*vertex_size, height-2*vertex_size]
         halfsizes=[(maxs[dim]+mins[dim])/2.0 for dim in range(2)]
-        ratios=[sizes[dim]/(maxs[dim]-mins[dim]) for dim in range(2)]
+        ratios=[]
+        for dim in range(2):
+            d = maxs[dim] - mins[dim]
+            if d == 0:
+                ratios.append(1)
+            else:
+                ratios.append(sizes[dim]/d)
         layout=[[(row[0]-halfsizes[0])*ratios[0], \
                  (row[1]-halfsizes[1])*ratios[1]] \
                 for row in layout]
