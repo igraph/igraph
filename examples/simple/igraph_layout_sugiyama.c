@@ -66,6 +66,8 @@ int main() {
   igraph_vector_print(&extd_to_orig_eids);
   printf("===\n");
 
+  igraph_vector_destroy(&layers);
+
   /* Same, but with automatic layering */
   igraph_layout_sugiyama(&g, &coords, 0, 0, 0,
           /* hgap = */ 1,
@@ -75,8 +77,17 @@ int main() {
   igraph_matrix_print(&coords);
   printf("===\n");
 
+  /* Layering with gaps in it */
+  igraph_vector_init_int_end(&layers, -1, 0,2,2,4,6,6,12,12,15, -1);
+  igraph_layout_sugiyama(&g, &coords, 0, 0, &layers,
+          /* hgap = */ 1,
+          /* vgap = */ 1,
+          /* maxiter = */ 100,
+          /* weights = */ 0);
+  igraph_matrix_print(&coords);
+  printf("===\n");
+
   igraph_vector_destroy(&edgelist);
-  igraph_vector_destroy(&layers);
   igraph_matrix_destroy(&coords);
   igraph_vector_destroy(&extd_to_orig_eids);
   igraph_destroy(&g);
