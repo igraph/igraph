@@ -569,7 +569,7 @@ int igraph_sparsemat_transpose(const igraph_sparsemat_t *A,
   if (! (res->cs=cs_transpose(A->cs, values)) ) {
     IGRAPH_ERROR("Cannot transpose sparse matrix", IGRAPH_FAILURE);
   }
-
+  
   return 0;
 }
 
@@ -735,12 +735,13 @@ int igraph_sparsemat_add(const igraph_sparsemat_t *A,
 
 /**
  * \function igraph_sparsemat_gaxpy
- * Matrix-vector product
+ * Matrix-vector product, added to another vector.
  * 
  * \param A The input matrix, in column-compressed format.
  * \param x The input vector, its size must match the number of
  *    columns in \p A.
- * \param res An initialized vector, result is stored here.
+ * \param res This vector is added to the matrix-vector product 
+ *    and it is overwritten by the result.
  * \return Error code.
  * 
  * Time complexity: TODO.
@@ -750,9 +751,8 @@ int igraph_sparsemat_gaxpy(const igraph_sparsemat_t *A,
 			   const igraph_vector_t *x,
 			   igraph_vector_t *res) {
 
-  IGRAPH_CHECK(igraph_vector_resize(res, A->cs->m));
-  
-  if (A->cs->n != igraph_vector_size(x)) {
+  if (A->cs->n != igraph_vector_size(x) || 
+      A->cs->m != igraph_vector_size(res)) {
     IGRAPH_ERROR("Invalid matrix/vector size for multiplication",
 		 IGRAPH_EINVAL);
   }

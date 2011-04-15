@@ -196,6 +196,7 @@ int main() {
   igraph_vector_init(&x, NROW);
   igraph_vector_init(&y, NROW);
   my_gaxpy(&M, &v, &x);
+  igraph_vector_null(&y);
   igraph_sparsemat_gaxpy(&B, &w, &y);
   
   if (!igraph_vector_is_equal(&x, &y)) { return 1; }
