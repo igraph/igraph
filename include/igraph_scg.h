@@ -27,6 +27,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
+#include "igraph_sparsemat.h"
 
 typedef enum { IGRAPH_SCG_SYMMETRIC=1, IGRAPH_SCG_LAPLACIAN=2,
 	       IGRAPH_SCG_STOCHASTIC=3 } igraph_scg_matrix_t;
@@ -34,6 +35,9 @@ typedef enum { IGRAPH_SCG_SYMMETRIC=1, IGRAPH_SCG_LAPLACIAN=2,
 typedef enum { IGRAPH_SCG_OPTIMUM=1, IGRAPH_SCG_INTERV_KM=2,
 	       IGRAPH_SCG_INTERV=3, IGRAPH_SCG_EXACT=4 } 
   igraph_scg_algorithm_t;
+
+typedef enum { IGRAPH_SCG_NORM_ROW=1, IGRAPH_SCG_NORM_COL=2 }
+  igraph_scg_norm_t;
 
 int igraph_scg_grouping(const igraph_matrix_t *V, 
 			igraph_vector_t *groups,
@@ -43,5 +47,14 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
 			igraph_scg_algorithm_t algorithm,
 			const igraph_vector_t *p,
 			igraph_integer_t maxiter);
+
+int igraph_scg_semiprojectors(const igraph_vector_t *groups,
+			      igraph_scg_matrix_t matrix_type,
+			      igraph_matrix_t *L,
+			      igraph_matrix_t *R,
+			      igraph_sparsemat_t *Lsparse,
+			      igraph_sparsemat_t *Rsparse, 
+			      const igraph_vector_t *p,
+			      igraph_scg_norm_t norm);
 
 #endif

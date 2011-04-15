@@ -56,3 +56,10 @@ igraph.match.arg <- function(arg, choices, several.ok=FALSE) {
   match.arg(arg=arg, choices=choices, several.ok=several.ok)
 }
 
+igraph.i.spMatrix <- function(M) {
+  if (M$type == "triplet") {
+    spMatrix(nrow=M$dim[1], ncol=M$dim[2], i=M$i+1L, j=M$p+1L, x=M$x)
+  } else {
+    stop("This is not implemented yet")
+  }
+}

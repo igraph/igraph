@@ -46,3 +46,31 @@ scg.grouping <- function(V, groups,
                PACKAGE="igraph")
   res
 }
+
+scg.semiProjectors <- function(groups,
+                               matrix.type=c("symmetric", "laplacian",
+                                 "stochastic"), p=NULL,
+                               norm=c("row", "col"),
+                               sparse=getIgraphOpt("sparsematrices")) {
+  # Argument checks
+  groups <- as.numeric(groups)-1
+  matrix.type <- switch(igraph.match.arg(matrix.type), "symmetric"=1, 
+  "laplacian"=2, "stochastic"=3)
+  if (!is.null(p)) p <- as.numeric(p)
+  norm <- switch(igraph.match.arg(norm), "row"=1, "col"=2)
+  sparse <- as.logical(sparse)
+  if (sparse && !require(Matrix)) { sparse <- FALSE }
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_scg_semiprojectors", groups, matrix.type, p, norm,
+               sparse,
+               PACKAGE="igraph")
+
+  if (sparse) {
+    res$L <- igraph.i.spMatrix(res$L)
+    res$R <- igraph.i.spMatrix(res$R)
+  }
+                
+  res
+}

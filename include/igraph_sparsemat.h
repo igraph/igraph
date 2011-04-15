@@ -207,6 +207,10 @@ int igraph_sparsemat_scale(igraph_sparsemat_t *A, igraph_real_t by);
 int igraph_sparsemat_add_rows(igraph_sparsemat_t *A, long int n);
 int igraph_sparsemat_add_cols(igraph_sparsemat_t *A, long int n);
 int igraph_sparsemat_resize(igraph_sparsemat_t *A, long int nrow, 
-			    long int ncol);
-
+			    long int ncol, int nzmax);
+int igraph_sparsemat_nonzero_storage(const igraph_sparsemat_t *A);
+int igraph_sparsemat_getelements(const igraph_sparsemat_t *A, 
+				 igraph_vector_int_t *i,
+				 igraph_vector_int_t *j, 
+				 igraph_vector_t *x);
 #endif

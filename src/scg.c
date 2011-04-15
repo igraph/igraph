@@ -79,6 +79,8 @@
 
 #include "scg_headers.h"
 
+#include "math.h"
+
 int igraph_scg_grouping(const igraph_matrix_t *V, 
 			igraph_vector_t *groups,
 			igraph_integer_t intervals,
@@ -107,6 +109,11 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
     if (min <= 1 || max >= no_of_nodes) {
       IGRAPH_ERROR("Invalid interval specification", IGRAPH_EINVAL);
     }
+  }
+
+  if (matrix_type == IGRAPH_SCG_STOCHASTIC && !p) {
+    IGRAPH_ERROR("`p' must be given for the stochastic matrix case", 
+		 IGRAPH_EINVAL);
   }
 
   if (p && igraph_vector_size(p) != no_of_nodes) {
@@ -185,80 +192,328 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
   return 0;
 }
 
-/* void grouping(REAL **v, UINT *gr, const UINT n, const UINT *nt, const UINT nev, */
-/* 			const UINT matrix, const REAL *p, const UINT algo, const UINT maxiter) */
-/* { */
-/* 	UINT i,j; */
-/* 	UINT **gr_mat = uint_matrix(nev,n); */
-/* 	UINT **gr_mat_t = uint_matrix(n,nev); */
-	
-/* 	switch (algo) */
-/* 	{ */
-/* 		case 1: */
-/* 			for(i=0; i<nev; i++) */
-/* 				optimal_partition(v[i], gr_mat[i], n, nt[i], matrix, p);               */
-/* 			break; */
-			
-/* 		case 2: */
-/* 			for(i=0; i<nev; i++){ */
-/* 				if(!intervals_plus_kmeans(v[i], gr_mat[i], n, nt[i], maxiter)) */
-/* 					warning("kmeans did not converge"); */
-/* 			} */
-/* 			break; */
-			
-/* 		case 3: */
-/* 			for(i=0; i<nev; i++) */
-/* 				intervals_method(v[i], gr_mat[i], n, nt[i]); */
-/* 			break; */
-			
-/* 		case 4: */
-/* 			for(i=0; i<nev; i++) */
-/* 				exact_coarse_graining(v[i],gr_mat[i],n); */
-/* 			break;	 */
-	 
-/* 		default: */
-/* 			free_uint_matrix(gr_mat, nev); */
-/* 			free_uint_matrix(gr_mat_t, n); */
-/* 			error("Choose a grouping method: 1-Optimal, 2-Fixed_size intervals+kmeans\ */
-/* 					3-Fixed_size intervals, 4-Exact coarse graining"); */
-/* 	} */
-	
-/* 	//If only one vector copy the groups and jump out */
-/*  	if(nev==1){ */
-/* 		for(i=0; i<n; i++) */
-/* 			gr[i] = gr_mat[0][i]; */
-			
-/* 		free_uint_matrix(gr_mat, nev); */
-/* 		free_uint_matrix(gr_mat_t, n); */
-		
-/* 		return; */
-/* 	} */
-	
-/* 	//Otherwise works out the final groups as decribed in section 5.4.2 */
-/* 		//First, works with the tranpose of gr_mat */
-/* 	for(i=0; i<n; i++) */
-/* 		for(j=0; j<nev; j++) */
-/* 			gr_mat_t[i][j] = gr_mat[j][i]; */
-/* 	free_uint_matrix(gr_mat, nev); */
-	
-/* 		//Then computes the final groups. Use qsort for speed */
-/* 	GROUPS *g = (GROUPS*)CALLOC(n, sizeof(GROUPS)); */
-/* 	for(i=0; i<n; i++){ */
-/* 		g[i].ind = i; */
-/* 		g[i].n = nev; */
-/* 		g[i].gr = gr_mat_t[i]; */
-/* 	} */
-		
-/* 	qsort(g, n, sizeof(GROUPS), compare_groups); */
-/* 	UINT gr_nb = FIRST_GROUP_NB; */
-/* 	gr[g[0].ind] = gr_nb; */
-/* 	for(i=1; i<n; i++){ */
-/* 		if(compare_groups(&g[i], &g[i-1]) != 0) gr_nb++; */
-/* 		gr[g[i].ind] = gr_nb; */
-/* 	} */
-/* 	FREE(g); */
-/* 	free_uint_matrix(gr_mat_t,n); */
-/* } */
+int igraph_i_scg_semiprojectors_sym(const igraph_vector_t *groups,
+				    igraph_matrix_t *L,
+				    igraph_matrix_t *R,
+				    igraph_sparsemat_t *Lsparse,
+				    igraph_sparsemat_t *Rsparse,
+				    int no_of_groups,
+				    int no_of_nodes) {
 
+  igraph_vector_t tab;
+  int i;
 
+  IGRAPH_VECTOR_INIT_FINALLY(&tab, no_of_groups);
+  for (i=0; i<no_of_nodes; i++) {
+    VECTOR(tab)[ (int) VECTOR(*groups)[i] ] += 1;
+  }
+  for (i=0; i<no_of_groups; i++) {
+    VECTOR(tab)[i] = sqrt(VECTOR(tab)[i]);
+  }
+  
+  if (L) { 
+    IGRAPH_CHECK(igraph_matrix_resize(L, no_of_groups, no_of_nodes));
+    igraph_matrix_null(L);
+    for (i=0; i<no_of_nodes; i++) {
+      int g=VECTOR(*groups)[i];
+      MATRIX(*L, g, i) = 1/VECTOR(tab)[g];
+    }
+  }
+  
+  if (R) {
+    if (L) { 
+      IGRAPH_CHECK(igraph_matrix_update(R, L));
+    } else {
+      IGRAPH_CHECK(igraph_matrix_resize(R, no_of_groups, no_of_nodes));
+      igraph_matrix_null(R);
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	MATRIX(*R, g, i) = 1/VECTOR(tab)[g];
+      }
+    }
+  }
+  
+  if (Lsparse) {
+    IGRAPH_CHECK(igraph_sparsemat_resize(Lsparse, no_of_groups, no_of_nodes, 
+					 /* nzmax= */ no_of_nodes));
+    for (i=0; i<no_of_nodes; i++) {
+      int g=VECTOR(*groups)[i];
+      IGRAPH_CHECK(igraph_sparsemat_entry(Lsparse, g, i, 1/VECTOR(tab)[g]));
+    }
+  }
+  
+  if (Rsparse) {
+    IGRAPH_CHECK(igraph_sparsemat_resize(Rsparse, no_of_groups, no_of_nodes,
+					 /* nzmax= */ no_of_nodes));
+    for (i=0; i<no_of_nodes; i++) {
+      int g=VECTOR(*groups)[i];
+      IGRAPH_CHECK(igraph_sparsemat_entry(Rsparse, g, i, 1/VECTOR(tab)[g]));
+    }    
+  }
+
+  igraph_vector_destroy(&tab);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
+
+int igraph_i_scg_semiprojectors_lap(const igraph_vector_t *groups,
+				    igraph_matrix_t *L,
+				    igraph_matrix_t *R,
+				    igraph_sparsemat_t *Lsparse,
+				    igraph_sparsemat_t *Rsparse,
+				    int no_of_groups,
+				    int no_of_nodes,
+				    igraph_scg_norm_t norm) {
+  
+  igraph_vector_t tab;
+  int i;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&tab, no_of_groups);
+  for (i=0; i<no_of_nodes; i++) {
+    VECTOR(tab)[ (int) VECTOR(*groups)[i] ] += 1;
+  }
+  for (i=0; i<no_of_groups; i++) {
+    VECTOR(tab)[i] = sqrt(VECTOR(tab)[i]);
+  }
+
+  if (norm == IGRAPH_SCG_NORM_ROW) {
+    if (L) {
+      IGRAPH_CHECK(igraph_matrix_resize(L, no_of_groups, no_of_nodes));
+      igraph_matrix_null(L);
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	MATRIX(*L, g, i) = 1.0;
+      }
+    }
+    if (R) {
+      IGRAPH_CHECK(igraph_matrix_resize(R, no_of_groups, no_of_nodes));
+      igraph_matrix_null(R);
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	MATRIX(*R, g, i) = 1.0 / VECTOR(tab)[g];
+      }
+    }
+    if (Lsparse) {
+      IGRAPH_CHECK(igraph_sparsemat_resize(Lsparse, no_of_groups, no_of_nodes,
+					   /* nzmax= */ no_of_nodes));
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	IGRAPH_CHECK(igraph_sparsemat_entry(Lsparse, g, i, 1.0));
+      }
+    }
+    if (Rsparse) {
+      IGRAPH_CHECK(igraph_sparsemat_resize(Rsparse, no_of_groups, no_of_nodes,
+					   /* nzmax= */ no_of_nodes));
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	IGRAPH_CHECK(igraph_sparsemat_entry(Rsparse, g, i, 
+					    1.0 / VECTOR(tab)[g]));
+      }
+    }
+  } else {
+    if (L) {
+      IGRAPH_CHECK(igraph_matrix_resize(L, no_of_groups, no_of_nodes));
+      igraph_matrix_null(L);
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	MATRIX(*L, g, i) = 1.0 / VECTOR(tab)[g];
+      }
+    }
+    if (R) {
+      IGRAPH_CHECK(igraph_matrix_resize(R, no_of_groups, no_of_nodes));
+      igraph_matrix_null(R);
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	MATRIX(*R, g, i) = 1.0;
+      }
+    }
+    if (Lsparse) {
+      IGRAPH_CHECK(igraph_sparsemat_resize(Lsparse, no_of_groups, no_of_nodes,
+					   /* nzmax= */ no_of_nodes));
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	IGRAPH_CHECK(igraph_sparsemat_entry(Lsparse, g, i, 
+					    1.0 / VECTOR(tab)[g]));
+      }
+    }
+    if (Rsparse) {
+      IGRAPH_CHECK(igraph_sparsemat_resize(Rsparse, no_of_groups, no_of_nodes,
+					   /* nzmax= */ no_of_nodes));
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	IGRAPH_CHECK(igraph_sparsemat_entry(Rsparse, g, i, 1.0));
+      }
+    }
+    
+  }
+
+  igraph_vector_destroy(&tab);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
+int igraph_i_scg_semiprojectors_sto(const igraph_vector_t *groups,
+				    igraph_matrix_t *L,
+				    igraph_matrix_t *R,
+				    igraph_sparsemat_t *Lsparse,
+				    igraph_sparsemat_t *Rsparse,
+				    int no_of_groups,
+				    int no_of_nodes,
+				    const igraph_vector_t *p,
+				    igraph_scg_norm_t norm) {
+  
+  igraph_vector_t pgr, pnormed;
+  int i;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&pgr, no_of_groups);
+  IGRAPH_VECTOR_INIT_FINALLY(&pnormed, no_of_nodes);
+  for (i=0; i<no_of_nodes; i++) {
+    int g=VECTOR(*groups)[i];
+    VECTOR(pgr)[g] += VECTOR(*p)[i];
+  }
+  for (i=0; i<no_of_nodes; i++) {
+    int g=VECTOR(*groups)[i];
+    VECTOR(pnormed)[i] = VECTOR(*p)[i] / VECTOR(pgr)[g];
+  }
+  
+  if (norm == IGRAPH_SCG_NORM_ROW) {
+    if (L) {
+      IGRAPH_CHECK(igraph_matrix_resize(L, no_of_groups, no_of_nodes));
+      igraph_matrix_null(L);
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	MATRIX(*L, g, i) = VECTOR(pnormed)[i];
+      }
+    }
+    if (R) {
+      IGRAPH_CHECK(igraph_matrix_resize(R, no_of_groups, no_of_nodes));
+      igraph_matrix_null(R);
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	MATRIX(*R, g, i) = 1.0;
+      }      
+    }
+    if (Lsparse) {
+      IGRAPH_CHECK(igraph_sparsemat_resize(Lsparse, no_of_groups, no_of_nodes,
+					   /* nzmax= */ no_of_nodes));
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	IGRAPH_CHECK(igraph_sparsemat_entry(Lsparse, g, i,
+					    VECTOR(pnormed)[i]));
+      }
+    }
+    if (Rsparse) {
+      IGRAPH_CHECK(igraph_sparsemat_resize(Rsparse, no_of_groups, no_of_nodes,
+					   /* nzmax= */ no_of_nodes));
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	IGRAPH_CHECK(igraph_sparsemat_entry(Rsparse, g, i, 1.0));
+      }
+    }
+  } else {
+    if (L) {
+      IGRAPH_CHECK(igraph_matrix_resize(L, no_of_groups, no_of_nodes));
+      igraph_matrix_null(L);
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	MATRIX(*L, g, i) = 1.0;
+      }
+    }
+    if (R) {
+      IGRAPH_CHECK(igraph_matrix_resize(R, no_of_groups, no_of_nodes));
+      igraph_matrix_null(R);
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	MATRIX(*R, g, i) = VECTOR(pnormed)[i];
+      }      
+    }
+    if (Lsparse) {
+      IGRAPH_CHECK(igraph_sparsemat_resize(Lsparse, no_of_groups, no_of_nodes,
+					   /* nzmax= */ no_of_nodes));
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	IGRAPH_CHECK(igraph_sparsemat_entry(Lsparse, g, i, 1.0));
+      }
+    }
+    if (Rsparse) {
+      IGRAPH_CHECK(igraph_sparsemat_resize(Rsparse, no_of_groups, no_of_nodes,
+					   /* nzmax= */ no_of_nodes));
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	IGRAPH_CHECK(igraph_sparsemat_entry(Rsparse, g, i,
+					    VECTOR(pnormed)[i]));
+      }
+    }
+  }
+  
+  
+  igraph_vector_destroy(&pnormed);
+  igraph_vector_destroy(&pgr);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return 0;
+}
+
+int igraph_scg_semiprojectors(const igraph_vector_t *groups,
+			      igraph_scg_matrix_t matrix_type,
+			      igraph_matrix_t *L,
+			      igraph_matrix_t *R,
+			      igraph_sparsemat_t *Lsparse,
+			      igraph_sparsemat_t *Rsparse, 
+			      const igraph_vector_t *p,
+			      igraph_scg_norm_t norm) {
+  
+  int no_of_nodes=igraph_vector_size(groups);
+  int no_of_groups;
+  igraph_real_t min, max;
+
+  igraph_vector_minmax(groups, &min, &max);
+  no_of_groups=max+1;
+
+  if (min < 0 || max >= no_of_nodes) {
+    IGRAPH_ERROR("Invalid membership vector", IGRAPH_EINVAL);
+  }
+
+  if (matrix_type == IGRAPH_SCG_STOCHASTIC && !p) {
+    IGRAPH_ERROR("`p' must be given for the stochastic matrix case", 
+		 IGRAPH_EINVAL);
+  }
+
+  if (p && igraph_vector_size(p) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid `p' vector length, should match number of vertices",
+		 IGRAPH_EINVAL);
+  }
+
+  if (Lsparse && !igraph_sparsemat_is_triplet) {
+    IGRAPH_ERROR("Sparse matrix must be in triplet format", IGRAPH_EINVAL);
+  }
+
+  if (Rsparse && !igraph_sparsemat_is_triplet) {
+    IGRAPH_ERROR("Sprase matrix must be in triplet format", IGRAPH_EINVAL);
+  }
+  
+  switch (matrix_type) {
+  case IGRAPH_SCG_SYMMETRIC:
+    IGRAPH_CHECK(igraph_i_scg_semiprojectors_sym(groups, L, R, Lsparse, 
+						 Rsparse, no_of_groups,
+						 no_of_nodes));
+    break;
+
+  case IGRAPH_SCG_LAPLACIAN:
+    IGRAPH_CHECK(igraph_i_scg_semiprojectors_lap(groups, L, R, Lsparse, 
+						 Rsparse, no_of_groups,
+						 no_of_nodes, norm));
+    break;
+
+  case IGRAPH_SCG_STOCHASTIC:
+    IGRAPH_CHECK(igraph_i_scg_semiprojectors_sto(groups, L, R, Lsparse,
+						 Rsparse, no_of_groups,
+						 no_of_nodes, p, norm));
+    break;    
+  }
+  
+  return 0;
+}
 

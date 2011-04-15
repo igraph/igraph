@@ -1541,6 +1541,14 @@ igraph_scg_grouping:
         NAME-R: scg.grouping
         IGNORE: RR
 
+igraph_scg_semiprojectors:
+        PARAMS: VECTORM1 groups, SCGMAT matrix_type=Default, \
+                OUT MATRIX_OR_0 L, OUT MATRIX_OR_0 R, \
+                OUT SPARSEMAT_OR_0 Lsparse, OUT SPARSEMAT_OR_0 Rsparse, \
+                VECTOR_OR_0 p=NULL, SCGNORM norm=Default
+        NAME-R: scg.semiProjectors
+        IGNORE: RR, RC
+
 #######################################
 # Other, not graph related
 #######################################

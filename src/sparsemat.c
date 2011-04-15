@@ -2191,11 +2191,47 @@ int igraph_sparsemat_add_cols(igraph_sparsemat_t *A, long int n) {
  */
 
 int igraph_sparsemat_resize(igraph_sparsemat_t *A, long int nrow, 
-			    long int ncol) {
+			    long int ncol, int nzmax) {
 
-  /* TODO */
-  IGRAPH_ERROR("Resizing sparse matrices not implemented yet", 
-	       IGRAPH_UNIMPLEMENTED);
+  if (A->cs->nz < 0) {
+    IGRAPH_ERROR("Resizing column-compressed sparse matrices "
+		 "not implemented yet", IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+  } else {
+    IGRAPH_CHECK(igraph_sparsemat_realloc(A, nzmax));
+    A->cs->m = nrow;
+    A->cs->n = ncol;
+    A->cs->nz = 0;
+  }
   return 0;
 }
 
+int igraph_sparsemat_nonzero_storage(const igraph_sparsemat_t *A) {
+  if (A->cs->nz < 0) {
+    IGRAPH_ERROR("Nonzero-storage for column-compressed sparse matrices "
+		 "is not implemented yet", IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+  } else {
+    return A->cs->nz;
+  }
+}
+
+int igraph_sparsemat_getelements(const igraph_sparsemat_t *A, 
+				igraph_vector_int_t *i,
+				igraph_vector_int_t *j, 
+				igraph_vector_t *x) {
+  int nz=A->cs->nz;
+  if (nz < 0) {
+    IGRAPH_ERROR("Getelements for column-compressed sparse matrices "
+		 "is not implemented yet", IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+  } else {
+    IGRAPH_CHECK(igraph_vector_int_resize(i, nz));
+    IGRAPH_CHECK(igraph_vector_int_resize(j, nz));
+    IGRAPH_CHECK(igraph_vector_resize(x, nz));
+    memcpy(VECTOR(*i), A->cs->i, nz * sizeof(int));
+    memcpy(VECTOR(*j), A->cs->p, nz * sizeof(int));
+    memcpy(VECTOR(*x), A->cs->x, nz * sizeof(igraph_real_t));
+  }
+  return 0;
+}

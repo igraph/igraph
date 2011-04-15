@@ -47,6 +47,8 @@ SEXP R_igraph_to_SEXP(igraph_t *graph);
 SEXP R_igraph_vectorlist_to_SEXP(const igraph_vector_ptr_t *ptr);
 void R_igraph_vectorlist_destroy(igraph_vector_ptr_t *ptr);
 SEXP R_igraph_hrg_to_SEXP(const igraph_hrg_t *hrg);
+SEXP R_igraph_sparsemat_to_SEXP(igraph_sparsemat_t *sp);
+SEXP R_igraph_0orsparsemat_to_SEXP(igraph_sparsemat_t *sp);
 
 int R_igraph_SEXP_to_strvector(SEXP rval, igraph_strvector_t *sv);
 int R_igraph_SEXP_to_strvector_copy(SEXP rval, igraph_strvector_t *sv);
@@ -2135,6 +2137,60 @@ int R_SEXP_to_hrg_copy(SEXP shrg, igraph_hrg_t *hrg) {
   R_SEXP_to_vector_copy(VECTOR_ELT(shrg, 3), &hrg->edges);
   R_SEXP_to_vector_copy(VECTOR_ELT(shrg, 4), &hrg->vertices);
   return 0;
+}
+
+SEXP R_igraph_sparsemat_to_SEXP_triplet(igraph_sparsemat_t *sp) {
+  SEXP res, names;
+  int nz=igraph_sparsemat_nonzero_storage(sp);
+
+  PROTECT(res=NEW_LIST(5));
+  SET_VECTOR_ELT(res, 0, ScalarString(CREATE_STRING_VECTOR("triplet")));
+  SET_VECTOR_ELT(res, 1, NEW_INTEGER(2));
+  INTEGER(VECTOR_ELT(res, 1))[0] = igraph_sparsemat_nrow(sp);
+  INTEGER(VECTOR_ELT(res, 1))[1] = igraph_sparsemat_ncol(sp);
+  SET_VECTOR_ELT(res, 2, NEW_INTEGER(nz));
+  SET_VECTOR_ELT(res, 3, NEW_INTEGER(nz));
+  SET_VECTOR_ELT(res, 4, NEW_NUMERIC(nz));
+  if (nz > 0) {
+    igraph_vector_int_t i, j;
+    igraph_vector_t x;
+    igraph_vector_int_view(&i, INTEGER(VECTOR_ELT(res, 2)), nz);
+    igraph_vector_int_view(&j, INTEGER(VECTOR_ELT(res, 3)), nz);
+    igraph_vector_view(&x, REAL(VECTOR_ELT(res, 4)), nz);
+    igraph_sparsemat_getelements(sp, &j, &i, &x);
+  }
+
+  PROTECT(names=NEW_CHARACTER(5));
+  SET_STRING_ELT(names, 0, mkChar("type"));
+  SET_STRING_ELT(names, 1, mkChar("dim"));
+  SET_STRING_ELT(names, 2, mkChar("p"));
+  SET_STRING_ELT(names, 3, mkChar("i"));
+  SET_STRING_ELT(names, 4, mkChar("x"));
+  SET_NAMES(res, names);
+
+  UNPROTECT(2);
+  return res;
+}
+
+SEXP R_igraph_sparsemat_to_SEXP_cc(igraph_sparsemat_t *sp) {
+  printf("Not implemented.\n");
+  return R_NilValue;
+}
+
+SEXP R_igraph_sparsemat_to_SEXP(igraph_sparsemat_t *sp) {
+  if (igraph_sparsemat_is_triplet(sp)) {
+    return R_igraph_sparsemat_to_SEXP_triplet(sp);
+  } else {
+    return R_igraph_sparsemat_to_SEXP_cc(sp);
+  }
+}
+
+SEXP R_igraph_0orsparsemat_to_SEXP(igraph_sparsemat_t *sp) {
+  if (!sp) {
+    return R_NilValue;
+  } else {
+    return R_igraph_sparsemat_to_SEXP(sp);
+  }
 }
 
 int R_SEXP_to_igraph_adjlist(SEXP vectorlist, igraph_adjlist_t *ptr) {
@@ -6879,6 +6935,86 @@ SEXP R_igraph_get_eids(SEXP graph, SEXP pvp, SEXP pdirected,
   
   UNPROTECT(1);
   return result;
+}
+
+SEXP R_igraph_scg_semiprojectors(SEXP groups, SEXP matrix_type, SEXP p, 
+				 SEXP norm, SEXP psparse) {
+                                        /* Declarations */
+  igraph_vector_t c_groups;
+  igraph_integer_t c_matrix_type;
+  igraph_matrix_t c_L;
+  igraph_matrix_t c_R;
+  igraph_sparsemat_t c_Lsparse;
+  igraph_sparsemat_t c_Rsparse;
+  igraph_vector_t c_p;
+  igraph_integer_t c_norm;
+  SEXP L;
+  SEXP R;
+  SEXP Lsparse;
+  SEXP Rsparse;
+  igraph_bool_t sparse=LOGICAL(psparse)[0];
+  int c_result;
+  SEXP result, names;
+                                        /* Convert input */
+  R_SEXP_to_vector(groups, &c_groups);
+  c_matrix_type=REAL(matrix_type)[0];
+  if (!sparse) {
+    if (0 != igraph_matrix_init(&c_L, 0, 0)) { 
+      igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
+    } 
+    IGRAPH_FINALLY(igraph_matrix_destroy, &c_L); 
+    if (0 != igraph_matrix_init(&c_R, 0, 0)) { 
+      igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
+    } 
+    IGRAPH_FINALLY(igraph_matrix_destroy, &c_R); 
+  } else {
+    if (0 != igraph_sparsemat_init(&c_Lsparse, 1, 1, 0)) { 
+      igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
+    } 
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, &c_Lsparse); 
+    if (0 != igraph_sparsemat_init(&c_Rsparse, 1, 1, 0)) { 
+      igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
+    } 
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, &c_Rsparse); 
+  }
+  if (!isNull(p)) { R_SEXP_to_vector(p, &c_p); }
+  c_norm=REAL(norm)[0];
+                                        /* Call igraph */
+  c_result=igraph_scg_semiprojectors(&c_groups, c_matrix_type, 
+				     (sparse ? 0 : &c_L), (sparse ? 0 : &c_R),
+				     (sparse ? &c_Lsparse : 0), 
+				     (sparse ? &c_Rsparse : 0), 
+				     (isNull(p) ? 0 : &c_p), c_norm);
+
+                                        /* Convert output */
+  PROTECT(result=NEW_LIST(2));
+  PROTECT(names=NEW_CHARACTER(2));
+  if (!sparse) { 
+    PROTECT(L=R_igraph_0ormatrix_to_SEXP(&c_L)); 
+    igraph_matrix_destroy(&c_L); 
+    IGRAPH_FINALLY_CLEAN(1);
+    PROTECT(R=R_igraph_0ormatrix_to_SEXP(&c_R)); 
+    igraph_matrix_destroy(&c_R); 
+    IGRAPH_FINALLY_CLEAN(1);
+    SET_VECTOR_ELT(result, 0, L);
+    SET_VECTOR_ELT(result, 1, R);
+  } else {
+    PROTECT(Lsparse=R_igraph_0orsparsemat_to_SEXP(&c_Lsparse)); 
+    igraph_sparsemat_destroy(&c_Lsparse); 
+    IGRAPH_FINALLY_CLEAN(1);
+    PROTECT(Rsparse=R_igraph_0orsparsemat_to_SEXP(&c_Rsparse)); 
+    igraph_sparsemat_destroy(&c_Rsparse); 
+    IGRAPH_FINALLY_CLEAN(1);
+    SET_VECTOR_ELT(result, 0, Lsparse);
+    SET_VECTOR_ELT(result, 1, Rsparse);
+  }
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("L"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("R"));
+  SET_NAMES(result, names);
+  UNPROTECT(3);
+
+  UNPROTECT(1);
+  return(result);
 }
 
 SEXP R_igraph_revolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,

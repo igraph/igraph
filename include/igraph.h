@@ -48,6 +48,7 @@
 #include "igraph_strvector.h"
 #include "igraph_vector_ptr.h"
 #include "igraph_spmatrix.h"
+#include "igraph_sparsemat.h"
 
 #include "igraph_constants.h"
 #include "igraph_datatype.h"

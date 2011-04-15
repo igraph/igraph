@@ -241,3 +241,12 @@ SCGALGO:
                           "interv"=3, "exact_scg"=4)
     DEFAULT:
       Default: c("optimum", "interv_km", "interv", "exact_scg")
+
+SCGNORM:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "row"=1, "col"=2)
+    DEFAULT:
+      Default: c("row", "col")
+
+SPARSEMAT:
+
+SPARSEMAT_OR_0:
