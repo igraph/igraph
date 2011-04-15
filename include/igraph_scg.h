@@ -57,4 +57,11 @@ int igraph_scg_semiprojectors(const igraph_vector_t *groups,
 			      const igraph_vector_t *p,
 			      igraph_scg_norm_t norm);
 
+int igraph_scg_norm_eps(const igraph_matrix_t *V,
+			const igraph_vector_t *groups,
+			igraph_vector_t *eps,
+			igraph_scg_matrix_t matrix_type,
+			const igraph_vector_t *p,
+			igraph_scg_norm_t norm);
+
 #endif

@@ -486,11 +486,11 @@ int igraph_scg_semiprojectors(const igraph_vector_t *groups,
 		 IGRAPH_EINVAL);
   }
 
-  if (Lsparse && !igraph_sparsemat_is_triplet) {
+  if (Lsparse && !igraph_sparsemat_is_triplet(Lsparse)) {
     IGRAPH_ERROR("Sparse matrix must be in triplet format", IGRAPH_EINVAL);
   }
 
-  if (Rsparse && !igraph_sparsemat_is_triplet) {
+  if (Rsparse && !igraph_sparsemat_is_triplet(Rsparse)) {
     IGRAPH_ERROR("Sprase matrix must be in triplet format", IGRAPH_EINVAL);
   }
   
@@ -517,3 +517,88 @@ int igraph_scg_semiprojectors(const igraph_vector_t *groups,
   return 0;
 }
 
+int igraph_scg_norm_eps(const igraph_matrix_t *V,
+			const igraph_vector_t *groups,
+			igraph_vector_t *eps,
+			igraph_scg_matrix_t matrix_type,
+			const igraph_vector_t *p,
+			igraph_scg_norm_t norm) {
+
+  int no_of_nodes=igraph_vector_size(groups);
+  int no_of_groups;
+  int no_of_vectors=igraph_matrix_ncol(V);
+  igraph_real_t min, max;
+  igraph_sparsemat_t Lsparse, Rsparse, Lsparse2, Rsparse2, Rsparse3, proj;
+  igraph_vector_t x, res;
+  int k, i;
+  
+  if (igraph_matrix_nrow(V) != no_of_nodes) {
+    IGRAPH_ERROR("Eigenvector length and group vector length do not match",
+		 IGRAPH_EINVAL);
+  }
+
+  igraph_vector_minmax(groups, &min, &max);
+  no_of_groups=max+1;
+  
+  if (min < 0 || max >= no_of_nodes) {
+    IGRAPH_ERROR("Invalid membership vector", IGRAPH_EINVAL);
+  }
+
+  if (matrix_type == IGRAPH_SCG_STOCHASTIC && !p) {
+    IGRAPH_ERROR("`p' must be given for the stochastic matrix case", 
+		 IGRAPH_EINVAL);
+  }
+
+  if (p && igraph_vector_size(p) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid `p' vector length, should match number of vertices",
+		 IGRAPH_EINVAL);
+  }
+
+  IGRAPH_CHECK(igraph_sparsemat_init(&Lsparse, no_of_groups, no_of_nodes,
+				     no_of_nodes));
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &Lsparse);
+  IGRAPH_CHECK(igraph_sparsemat_init(&Rsparse, no_of_groups, no_of_nodes,
+				     no_of_nodes));
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &Rsparse);
+  
+  IGRAPH_CHECK(igraph_scg_semiprojectors(groups, matrix_type, /* L= */ 0, 
+					 /* R= */ 0, &Lsparse, &Rsparse, p,
+					 norm));
+
+  IGRAPH_CHECK(igraph_sparsemat_compress(&Lsparse, &Lsparse2));
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &Lsparse2);
+  IGRAPH_CHECK(igraph_sparsemat_compress(&Rsparse, &Rsparse2));
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &Rsparse2);
+  IGRAPH_CHECK(igraph_sparsemat_transpose(&Rsparse2, &Rsparse3, 
+					  /*values=*/ 1));
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &Rsparse3);
+  
+  IGRAPH_CHECK(igraph_sparsemat_multiply(&Rsparse3, &Lsparse2, &proj));
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &proj);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&res, no_of_nodes);
+  IGRAPH_CHECK(igraph_vector_resize(eps, no_of_vectors));
+  
+  for (k = 0; k < no_of_vectors; k++) {
+    igraph_vector_view(&x, &MATRIX(*V, 0, k), no_of_nodes);
+    igraph_vector_null(&res);
+    IGRAPH_CHECK(igraph_sparsemat_gaxpy(&proj, &x, &res));
+    VECTOR(*eps)[k] = 0.0;
+    for (i = 0; i < no_of_nodes; i++) {
+      igraph_real_t di=MATRIX(*V, i, k) - VECTOR(res)[i];
+      VECTOR(*eps)[k] += di * di;
+    }
+    VECTOR(*eps)[k] = sqrt(VECTOR(*eps)[k]);
+  }
+
+  igraph_vector_destroy(&res);
+  igraph_sparsemat_destroy(&proj);
+  igraph_sparsemat_destroy(&Rsparse3);
+  igraph_sparsemat_destroy(&Rsparse2);
+  igraph_sparsemat_destroy(&Lsparse2);
+  igraph_sparsemat_destroy(&Rsparse);
+  igraph_sparsemat_destroy(&Lsparse);
+  IGRAPH_FINALLY_CLEAN(7);
+
+  return 0;
+}

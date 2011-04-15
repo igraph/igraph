@@ -1549,6 +1549,12 @@ igraph_scg_semiprojectors:
         NAME-R: scg.semiProjectors
         IGNORE: RR, RC
 
+igraph_scg_norm_eps:
+        PARAMS: MATRIX V, VECTORM1 groups, OUT VECTOR eps, \
+                SCGMAT matrix_type=Default, VECTOR_OR_0 p=NULL, \
+                SCGNORM norm=Default
+        NAME-R: scg.normEps
+
 #######################################
 # Other, not graph related
 #######################################
