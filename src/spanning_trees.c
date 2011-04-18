@@ -71,6 +71,8 @@ int igraph_i_minimum_spanning_tree_prim(const igraph_t *graph,
  * \sa \ref igraph_minimum_spanning_tree_unweighted() and
  *     \ref igraph_minimum_spanning_tree_prim() if you only need the
  *     tree as a separate graph object.
+ * 
+ * \example examples/simple/igraph_minimum_spanning_tree.c
  */
 int igraph_minimum_spanning_tree(const igraph_t* graph,
     igraph_vector_t* res, const igraph_vector_t* weights) {
