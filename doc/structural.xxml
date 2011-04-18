@@ -92,7 +92,8 @@
 <!-- doxrox-include igraph_similarity_inverse_log_weighted -->
 </section>
 
-<section><title>Spanning Tree</title>
+<section><title>Spanning Trees</title>
+<!-- doxrox-include igraph_minimum_spanning_tree -->
 <!-- doxrox-include igraph_minimum_spanning_tree_unweighted -->
 <!-- doxrox-include igraph_minimum_spanning_tree_prim -->
 </section>

@@ -54,10 +54,13 @@ int igraph_are_connected(const igraph_t *graph, igraph_integer_t v1, igraph_inte
 /* Structural properties                              */
 /* -------------------------------------------------- */
 
+int igraph_minimum_spanning_tree(const igraph_t *graph, igraph_vector_t *res,
+        const igraph_vector_t *weights);
 int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph, 
 					    igraph_t *mst);
 int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
 				      const igraph_vector_t *weights);
+
 int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real_t vid, 
 			igraph_neimode_t mode);	
 int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode);
