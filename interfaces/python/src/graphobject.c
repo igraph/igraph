@@ -4518,7 +4518,8 @@ PyObject *igraphmodule_Graph_similarity_inverse_log_weighted(
 
 /** \ingroup python_interface_graph
  * \brief Calculates a spanning tree for a graph
- * \return a list containing the edge betweenness for every edge
+ * \return the spanning tree or a list of edges participating in the spanning tree
+ * \sa igraph_minimum_spanning_tree_unweighted
  * \sa igraph_minimum_spanning_tree_unweighted
  * \sa igraph_minimum_spanning_tree_prim
  */
@@ -4526,36 +4527,34 @@ PyObject *igraphmodule_Graph_spanning_tree(igraphmodule_GraphObject * self,
                                            PyObject * args, PyObject * kwds)
 {
   static char *kwlist[] = { "weights", NULL };
-  igraph_t mst;
-  int err;
-  igraph_vector_t ws;
-  PyObject *weights = NULL;
-  igraphmodule_GraphObject *result = NULL;
+  igraph_vector_t* ws = 0;
+  igraph_vector_t res;
+  PyObject *weights_o = Py_None, *result = NULL;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &weights))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &weights_o))
     return NULL;
 
-  if (igraph_vector_init(&ws, 0)) return igraphmodule_handle_igraph_error();
-
-  if (!weights || weights == Py_None)
-    err = igraph_minimum_spanning_tree_unweighted(&self->g, &mst);
-  else {
-    if (igraphmodule_PyObject_to_attribute_values(weights, &ws, self, ATTRIBUTE_TYPE_EDGE, 1)) {
-	  igraph_vector_destroy(&ws);
-	  return NULL;
-	}
-    err = igraph_minimum_spanning_tree_prim(&self->g, &mst, &ws);
-	igraph_vector_destroy(&ws);
-  }
-
-  if (err) {
+  if (igraph_vector_init(&res, 0)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
-  CREATE_GRAPH(result, mst);
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &ws, ATTRIBUTE_TYPE_EDGE)) {
+    igraph_vector_destroy(&res);
+    return NULL;
+  }
 
-  return (PyObject *) result;
+  if (igraph_minimum_spanning_tree(&self->g, &res, ws)) {
+	if (ws != 0) { igraph_vector_destroy(ws); free(ws); }
+    igraph_vector_destroy(&res);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (ws != 0) { igraph_vector_destroy(ws); free(ws); }
+  result = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&res);
+  return result;
 }
 
 /** \ingroup python_interface_graph
@@ -10984,19 +10983,12 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  the attributes not specified explicitly in the dictionary.\n"
   },
 
-  // interface to igraph_minimum_spanning_tree_unweighted and
-  // igraph_minimum_spanning_tree_prim
-  {"spanning_tree", (PyCFunction) igraphmodule_Graph_spanning_tree,
+  /* interface to igraph_minimum_spanning_tree */
+  {"_spanning_tree", (PyCFunction) igraphmodule_Graph_spanning_tree,
    METH_VARARGS | METH_KEYWORDS,
-   "spanning_tree(weights=None)\n\n"
-   "Calculates a minimum spanning tree for a graph (weighted or unweighted)\n\n"
-   "@param weights: a vector containing weights for every edge in\n"
-   "  the graph. C{None} means that the graph is unweighted.\n"
-   "@return: the spanning tree as a L{Graph} object.\n\n"
-   "@newfield ref: Reference\n"
-   "@ref: Prim, R.C.: I{Shortest connection networks and some\n"
-   "  generalizations}, Bell System Technical Journal, Vol. 36.,\n"
-   "  1957, 1389--1401."},
+   "_spanning_tree(weights=None)\n\n"
+   "Internal function, undocumented.\n\n"
+   "@see: Graph.spanning_tree()"},
 
   // interface to igraph_subcomponent
   {"subcomponent", (PyCFunction) igraphmodule_Graph_subcomponent,
