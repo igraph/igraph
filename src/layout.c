@@ -722,7 +722,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
 			       igraph_real_t initemp, igraph_real_t coolexp,
 			       igraph_real_t kkconst, igraph_bool_t use_seed) {
 
-  igraph_real_t temp, candx, candy;
+  igraph_real_t temp, candx, candy, dx, dy;
   igraph_real_t dpot, odis, ndis, osqd, nsqd;
   long int n,i,j,k;
   igraph_matrix_t elen;
@@ -737,11 +737,29 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
   IGRAPH_CHECK(igraph_matrix_resize(res, n, 2));
   IGRAPH_MATRIX_INIT_FINALLY(&elen, n, n);
   IGRAPH_CHECK(igraph_shortest_paths(graph, &elen, igraph_vss_all(),
-				     igraph_vss_all(),
-				     IGRAPH_ALL));
+				     igraph_vss_all(), IGRAPH_ALL));
+
+  /* Scan the distance matrix and introduce an upper limit.
+   * This helps with disconnected graphs. */
+  temp = 0.0;
+  for (i=0; i<n; i++) {
+    for (j=i+1; j<n; j++) {
+      if (!igraph_finite(MATRIX(elen, i, j)))
+        continue;
+      if (MATRIX(elen, i, j) > temp)
+        temp = MATRIX(elen, i, j);
+    }
+  }
+  for (i=0; i<n; i++) {
+    for (j=0; j<n; j++) {
+      if (MATRIX(elen, i, j) > temp)
+        MATRIX(elen, i, j) = temp;
+    }
+  }
+
+  /* Initialize the layout if needed */
   if (!use_seed) {
     for (i=0; i<n; i++) {
-      MATRIX(elen, i, i) = sqrt(n);
       MATRIX(*res, i, 0) = RNG_NORMAL(0, n/4.0);
       MATRIX(*res, i, 1) = RNG_NORMAL(0, n/4.0);
     }
@@ -750,7 +768,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
   /*Perform the annealing loop*/
   temp=initemp;
   for(i=0;i<niter;i++){
-    /* Report progress in approx. every 100th step */
+    /* Report progress in approx. every 10th step */
     if (i%10 == 0)
       IGRAPH_PROGRESS("Kamada-Kawai layout: ",
 		      100.0*i/niter, NULL);
@@ -762,18 +780,20 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
       candy=RNG_NORMAL(MATRIX(*res, j, 1),sigma*temp/initemp);
       /*Calculate the potential difference for the new position*/
       dpot=0.0;
-      for(k=0;k<n;k++)  /*Potential differences for pairwise effects*/
+      for(k=0;k<n;k++) {
+        /*Potential differences for pairwise effects*/
         if(j!=k){
-          odis=sqrt((MATRIX(*res, j, 0)-MATRIX(*res, k, 0))*
-		    (MATRIX(*res, j, 0)-MATRIX(*res, k, 0))+
-		    (MATRIX(*res, j, 1)-MATRIX(*res, k, 1))*
-		    (MATRIX(*res, j, 1)-MATRIX(*res, k, 1)));
-          ndis=sqrt((candx-MATRIX(*res, k, 0))*(candx-MATRIX(*res, k, 0))+
-		    (candy-MATRIX(*res, k, 1))*(candy-MATRIX(*res, k, 1)));
-          osqd=(odis-MATRIX(elen, j, k))*(odis-MATRIX(elen, j, k));
-          nsqd=(ndis-MATRIX(elen, j, k))*(ndis-MATRIX(elen, j, k));
-          dpot+=kkconst*(osqd-nsqd)/(MATRIX(elen, j, k)*MATRIX(elen, j, k));
+          dx = MATRIX(*res, j, 0) - MATRIX(*res, k, 0);
+          dy = MATRIX(*res, j, 1) - MATRIX(*res, k, 1);
+          odis = sqrt(dx*dx + dy*dy);
+          dx = candx - MATRIX(*res, k, 0);
+          dy = candy - MATRIX(*res, k, 1);
+          ndis = sqrt(dx*dx + dy*dy);
+          osqd = (odis-MATRIX(elen, j, k))*(odis-MATRIX(elen, j, k));
+          nsqd = (ndis-MATRIX(elen, j, k))*(ndis-MATRIX(elen, j, k));
+          dpot += kkconst*(osqd-nsqd)/(MATRIX(elen, j, k)*MATRIX(elen, j, k));
         }
+      }
       /*Make a keep/reject decision*/
       if(log(RNG_UNIF(0.0,1.0))<dpot/temp){
         MATRIX(*res, j, 0)=candx;
@@ -848,9 +868,26 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
 				     igraph_vss_all(),
 				     IGRAPH_ALL));
   
+  /* Scan the distance matrix and introduce an upper limit.
+   * This helps with disconnected graphs. */
+  temp = 0.0;
+  for (i=0; i<no_of_nodes; i++) {
+    for (j=i+1; j<no_of_nodes; j++) {
+      if (!igraph_finite(MATRIX(elen, i, j)))
+        continue;
+      if (MATRIX(elen, i, j) > temp)
+        temp = MATRIX(elen, i, j);
+    }
+  }
+  for (i=0; i<no_of_nodes; i++) {
+    for (j=0; j<no_of_nodes; j++) {
+      if (MATRIX(elen, i, j) > temp)
+        MATRIX(elen, i, j) = temp;
+    }
+  }
+
   if (!use_seed) {
     for (i=0; i<no_of_nodes; i++) {
-      MATRIX(elen, i, i) = sqrt(no_of_nodes);
       MATRIX(*res, i, 0) = RNG_NORMAL(0, no_of_nodes/4.0);
       MATRIX(*res, i, 1) = RNG_NORMAL(0, no_of_nodes/4.0);
       MATRIX(*res, i, 2) = RNG_NORMAL(0, no_of_nodes/4.0);
