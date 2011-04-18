@@ -176,7 +176,7 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
   parm.presolve = GLP_ON;
   parm.binarize = GLP_ON;
   parm.cb_func = igraph_i_glpk_interruption_hook;
-  igraph_i_glpk_check(glp_intopt(ip, &parm), "Modularity optimization failed");
+  IGRAPH_GLPK_CHECK(glp_intopt(ip, &parm), "Modularity optimization failed");
   
   /* store the results */
   if (modularity) {

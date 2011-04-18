@@ -23,11 +23,13 @@
 */
 
 #include "config.h"
+#include "igraph_centrality.h"
 #include "igraph_components.h"
 #include "igraph_constants.h"
 #include "igraph_constructors.h"
 #include "igraph_datatype.h"
 #include "igraph_error.h"
+#include "igraph_glpk_support.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_structural.h"
@@ -143,6 +145,9 @@ typedef struct {
   igraph_vector_ptr_t layers;
 } igraph_i_layering_t;
 
+/**
+ * Initializes a layering.
+ */
 int igraph_i_layering_init(igraph_i_layering_t* layering,
     const igraph_vector_t* membership) {
   long int i, n, num_layers;
@@ -175,20 +180,35 @@ int igraph_i_layering_init(igraph_i_layering_t* layering,
   return IGRAPH_SUCCESS;
 }
 
+/**
+ * Destroys a layering.
+ */
 void igraph_i_layering_destroy(igraph_i_layering_t* layering) {
   igraph_vector_ptr_destroy_all(&layering->layers);
 }
 
+/**
+ * Returns the number of layers in a layering.
+ */
 int igraph_i_layering_num_layers(const igraph_i_layering_t* layering) {
   return igraph_vector_ptr_size(&layering->layers);
 }
 
+/**
+ * Returns the list of vertices in a given layer
+ */
 igraph_vector_t* igraph_i_layering_get(const igraph_i_layering_t* layering,
     long int index) {
   return (igraph_vector_t*)VECTOR(layering->layers)[index];
 }
 
 
+/**
+ * Forward declarations
+ */
+
+static int igraph_i_layout_sugiyama_place_nodes_vertically(const igraph_t* graph,
+    const igraph_vector_t* weights, igraph_vector_t* membership);
 static int igraph_i_layout_sugiyama_order_nodes_horizontally(const igraph_t* graph,
     igraph_matrix_t* layout, const igraph_i_layering_t* layering,
     long int maxiter);
@@ -196,6 +216,9 @@ static int igraph_i_layout_sugiyama_place_nodes_horizontally(const igraph_t* gra
     igraph_matrix_t* layout, const igraph_i_layering_t* layering,
     igraph_real_t hgap, igraph_integer_t no_of_real_nodes);
 
+/**
+ * Calculated the median of four numbers (not necessarily sorted).
+ */
 static inline igraph_real_t igraph_i_median_4(igraph_real_t x1,
     igraph_real_t x2, igraph_real_t x3, igraph_real_t x4) {
   igraph_real_t arr[4] = { x1, x2, x3, x4 };
@@ -299,7 +322,8 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
    *    to point downwards only anyway. */
   if (layers == 0) {
     IGRAPH_VECTOR_INIT_FINALLY(&layers_own, no_of_nodes);
-    IGRAPH_CHECK(igraph_i_feedback_arc_set_eades(graph, 0, weights, &layers_own));
+    IGRAPH_CHECK(igraph_i_layout_sugiyama_place_nodes_vertically(
+          graph, weights, &layers_own));
   } else {
     IGRAPH_CHECK(igraph_vector_copy(&layers_own, layers));
     IGRAPH_FINALLY(igraph_vector_destroy, &layers_own);
@@ -526,6 +550,118 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
     igraph_vector_destroy(&extd_edgelist);
     IGRAPH_FINALLY_CLEAN(1);
   }
+
+  return IGRAPH_SUCCESS;
+}
+
+static int igraph_i_layout_sugiyama_place_nodes_vertically(const igraph_t* graph,
+    const igraph_vector_t* weights, igraph_vector_t* membership) {
+  long int no_of_nodes = igraph_vcount(graph);
+  IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+
+#ifdef HAVE_GLPK
+  if (igraph_is_directed(graph) && no_of_nodes <= 1000) {
+    /* Network simplex algorithm of Gansner et al, using the original linear
+     * programming formulation */
+    long int i, j, no_of_edges = igraph_ecount(graph);
+    igraph_vector_t outdegs, indegs, feedback_edges;
+    glp_prob *ip;
+    glp_smcp parm;
+
+    /* Allocate storage and create the problem */
+    ip = glp_create_prob();
+    IGRAPH_FINALLY(glp_delete_prob, ip);
+    IGRAPH_VECTOR_INIT_FINALLY(&feedback_edges, 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&outdegs, no_of_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&indegs, no_of_nodes);
+
+    /* Find an approximate feedback edge set */
+    IGRAPH_CHECK(igraph_i_feedback_arc_set_eades(graph, &feedback_edges, weights, 0));
+    igraph_vector_sort(&feedback_edges);
+
+    /* Calculate in- and out-strengths for the remaining edges */
+    IGRAPH_CHECK(igraph_strength(graph, &indegs, igraph_vss_all(),
+          IGRAPH_IN, 1, weights));
+    IGRAPH_CHECK(igraph_strength(graph, &outdegs, igraph_vss_all(),
+          IGRAPH_IN, 1, weights));
+    j = igraph_vector_size(&feedback_edges);
+    for (i = 0; i < j; i++) {
+      long int eid = VECTOR(feedback_edges)[i];
+      long int from = IGRAPH_FROM(graph, eid);
+      long int to = IGRAPH_TO(graph, eid);
+      VECTOR(outdegs)[from] -= weights ? VECTOR(*weights)[eid] : 1;
+      VECTOR(indegs)[to] -= weights ? VECTOR(*weights)[eid] : 1;
+    }
+
+    /* Configure GLPK */
+    glp_term_out(GLP_OFF);
+    glp_init_smcp(&parm);
+    parm.msg_lev = GLP_MSG_OFF;
+    parm.presolve = GLP_OFF;
+
+    /* Set up variables and objective function coefficients */
+    glp_set_obj_dir(ip, GLP_MIN);
+    glp_add_cols(ip, no_of_nodes);
+    IGRAPH_CHECK(igraph_vector_sub(&outdegs, &indegs));
+    for (i = 1; i <= no_of_nodes; i++) {
+      glp_set_col_kind(ip, i, GLP_IV);
+      glp_set_col_bnds(ip, i, GLP_LO, 0.0, 0.0);
+      glp_set_obj_coef(ip, i, VECTOR(outdegs)[i-1]);
+    }
+    igraph_vector_destroy(&indegs);
+    igraph_vector_destroy(&outdegs);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    /* Add constraints */
+    glp_add_rows(ip, no_of_edges);
+    IGRAPH_CHECK(igraph_vector_push_back(&feedback_edges, -1));
+    j = 0;
+    for (i = 0; i < no_of_edges; i++) {
+      int ind[3];
+      double val[3] = {0, -1, 1};
+      ind[1] = IGRAPH_FROM(graph, i)+1;
+      ind[2] = IGRAPH_TO(graph, i)+1;
+
+      if (ind[1] == ind[2]) {
+        if (VECTOR(feedback_edges)[j] == i)
+          j++;
+        continue;
+      }
+
+      if (VECTOR(feedback_edges)[j] == i) {
+        /* This is a feedback edge, add it reversed */
+        glp_set_row_bnds(ip, i+1, GLP_UP, -1, -1);
+        j++;
+      } else {
+        glp_set_row_bnds(ip, i+1, GLP_LO, 1, 1);
+      }
+      glp_set_mat_row(ip, i+1, 2, ind, val);
+    }
+
+    /* Solve the problem */
+    IGRAPH_GLPK_CHECK(glp_simplex(ip, &parm),
+        "Vertical arrangement step using IP failed");
+
+    /* The problem is totally unimodular, therefore the output of the simplex
+     * solver can be converted to an integer solution easily */
+    for (i = 0; i < no_of_nodes; i++)
+      VECTOR(*membership)[i] = floor(glp_get_col_prim(ip, i+1));
+
+    glp_delete_prob(ip);
+    igraph_vector_destroy(&feedback_edges);
+    IGRAPH_FINALLY_CLEAN(2);
+  } else if (igraph_is_directed(graph)) {
+    IGRAPH_CHECK(igraph_i_feedback_arc_set_eades(graph, 0, weights, membership));
+  } else {
+    IGRAPH_CHECK(igraph_i_feedback_arc_set_undirected(graph, 0, weights, membership));
+  }
+#else
+  if (igraph_is_directed(graph)) {
+    IGRAPH_CHECK(igraph_i_feedback_arc_set_eades(graph, 0, weights, membership));
+  } else {
+    IGRAPH_CHECK(igraph_i_feedback_arc_set_undirected(graph, 0, weights, membership));
+  }
+#endif
 
   return IGRAPH_SUCCESS;
 }

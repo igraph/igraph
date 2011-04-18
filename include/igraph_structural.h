@@ -141,6 +141,8 @@ int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 /* Internal functions, may change any time            */
 /* -------------------------------------------------- */
 
+int igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph_vector_t *result,
+        const igraph_vector_t *weights, igraph_vector_t *layering);
 int igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *result,
         const igraph_vector_t *weights, igraph_vector_t *layering);
 

@@ -6553,10 +6553,8 @@ int igraph_strength(const igraph_t *graph, igraph_vector_t *res,
   igraph_vector_t neis;
   long int i;
 
-  if (!weights) {
-    IGRAPH_WARNING("No edge weights for strength calculation, normal degree");
+  if (!weights)
     return igraph_degree(graph, res, vids, mode, loops);
-  }
   
   if (igraph_vector_size(weights) != igraph_ecount(graph)) {
     IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);

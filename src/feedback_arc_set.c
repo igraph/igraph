@@ -34,8 +34,6 @@
 #include "igraph_structural.h"
 #include "igraph_types.h"
 
-int igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph_vector_t *result,
-        const igraph_vector_t *weights);
 int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
         const igraph_vector_t *weights);
 
@@ -92,7 +90,7 @@ int igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *result,
       IGRAPH_EINVAL);
 
   if (!igraph_is_directed(graph))
-    return igraph_i_feedback_arc_set_undirected(graph, result, weights);
+    return igraph_i_feedback_arc_set_undirected(graph, result, weights, 0);
 
   switch (algo) {
     case IGRAPH_FAS_EXACT_IP:
@@ -110,8 +108,27 @@ int igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *result,
  * Solves the feedback arc set problem for undirected graphs.
  */
 int igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph_vector_t *result,
-        const igraph_vector_t *weights) {
-  IGRAPH_ERROR("TODO", IGRAPH_UNIMPLEMENTED);
+        const igraph_vector_t *weights, igraph_vector_t *layering) {
+  igraph_vector_t degrees;
+  long int i, root, no_of_nodes = igraph_vcount(graph);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&degrees, no_of_nodes);
+  IGRAPH_CHECK(igraph_strength(graph, &degrees, igraph_vss_all(),
+        IGRAPH_ALL, 0, weights));
+  root = igraph_vector_which_max(degrees);
+  igraph_vector_destroy(&degrees);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  if (weights) {
+    /* Find a maximum weight spanning tree. igraph has a routine for minimum
+     * spanning trees, so we negate the weights */
+    IGRAPH_ERROR("TODO", IGRAPH_UNIMPLEMENTED);
+  } else {
+    /* Any spanning tree will do. We simply do a shortest path search */
+    IGRAPH_ERROR("TODO", IGRAPH_UNIMPLEMENTED);
+  }
+
+  return IGRAPH_SUCCESS;
 }
 
 /**
@@ -515,7 +532,7 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
     }
 
     /* Solve the problem */
-    igraph_i_glpk_check(glp_intopt(ip, &parm), "Feedback arc set using IP failed");
+    IGRAPH_GLPK_CHECK(glp_intopt(ip, &parm), "Feedback arc set using IP failed");
 
     /* Find the ordering of the vertices */
     IGRAPH_CHECK(igraph_vector_resize(&ordering, n));

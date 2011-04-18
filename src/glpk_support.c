@@ -30,7 +30,7 @@
 #include "igraph_interrupt.h"
 #include <glpk.h>
 #include <memory.h>
-#include <string.h>
+#include <stdio.h>
 
 void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info) {
   IGRAPH_ALLOW_INTERRUPTION_NORETURN();
@@ -38,13 +38,14 @@ void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info) {
 
 int igraph_i_glpk_check(int retval, const char* message) {
   char* code = "none";
-  char* message_and_code[4096];
+  char message_and_code[4096];
 
-  if (retval == 0)
-    return;
+  if (retval == IGRAPH_SUCCESS)
+    return IGRAPH_SUCCESS;
 
   /* handle errors */
 #define HANDLE_CODE(c) case c: code = #c; retval = IGRAPH_##c; break;
+#define HANDLE_CODE2(c) case c: code = #c; retval = IGRAPH_FAILURE; break;
   switch (retval) {
     HANDLE_CODE(GLP_EBOUND);
     HANDLE_CODE(GLP_EROOT);
@@ -54,8 +55,16 @@ int igraph_i_glpk_check(int retval, const char* message) {
     HANDLE_CODE(GLP_EMIPGAP);
     HANDLE_CODE(GLP_ETMLIM);
     HANDLE_CODE(GLP_ESTOP);
+
+    HANDLE_CODE2(GLP_EBADB);
+    HANDLE_CODE2(GLP_ESING);
+    HANDLE_CODE2(GLP_ECOND);
+    HANDLE_CODE2(GLP_EOBJLL);
+    HANDLE_CODE2(GLP_EOBJUL);
+    HANDLE_CODE2(GLP_EITLIM);
+
     default:
-    break;
+      IGRAPH_ERROR("unknown GLPK error", IGRAPH_FAILURE);
   }
 #undef HANDLE_CODE
 
