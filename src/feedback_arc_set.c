@@ -109,24 +109,55 @@ int igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *result,
  */
 int igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph_vector_t *result,
         const igraph_vector_t *weights, igraph_vector_t *layering) {
-  igraph_vector_t degrees;
-  long int i, root, no_of_nodes = igraph_vcount(graph);
+  igraph_vector_t edges;
+  long int i, j, n, no_of_nodes = igraph_vcount(graph);
 
-  IGRAPH_VECTOR_INIT_FINALLY(&degrees, no_of_nodes);
-  IGRAPH_CHECK(igraph_strength(graph, &degrees, igraph_vss_all(),
-        IGRAPH_ALL, 0, weights));
-  root = igraph_vector_which_max(degrees);
-  igraph_vector_destroy(&degrees);
-  IGRAPH_FINALLY_CLEAN(1);
-
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_nodes);
   if (weights) {
     /* Find a maximum weight spanning tree. igraph has a routine for minimum
      * spanning trees, so we negate the weights */
-    IGRAPH_ERROR("TODO", IGRAPH_UNIMPLEMENTED);
+    igraph_vector_t vcopy;
+    IGRAPH_CHECK(igraph_vector_copy(&vcopy, weights));
+    IGRAPH_FINALLY(igraph_vector_destroy, &vcopy);
+    igraph_vector_scale(&vcopy, -1);
+    IGRAPH_CHECK(igraph_minimum_spanning_tree(graph, &edges, &vcopy));
+    igraph_vector_destroy(&vcopy);
+    IGRAPH_FINALLY_CLEAN(1);
   } else {
-    /* Any spanning tree will do. We simply do a shortest path search */
-    IGRAPH_ERROR("TODO", IGRAPH_UNIMPLEMENTED);
+    /* Any spanning tree will do */
+    IGRAPH_CHECK(igraph_minimum_spanning_tree(graph, &edges, 0));
   }
+
+  /* Now we have a bunch of edges that constitute a spanning forest. We have
+   * to come up with a layering, and return those edges that are not in the
+   * spanning forest */
+  igraph_vector_sort(&edges);
+  IGRAPH_CHECK(igraph_vector_push_back(&edges, -1));  /* guard element */
+
+  if (result != 0) {
+    igraph_vector_clear(result);
+    n = igraph_ecount(graph);
+    for (i = 0, j = 0; i < n; i++) {
+      if (i == VECTOR(edges)[j]) {
+        j++;
+        continue;
+      }
+      IGRAPH_CHECK(igraph_vector_push_back(result, i));
+    }
+  }
+
+  if (layering != 0) {
+    igraph_vector_t degrees;
+    IGRAPH_VECTOR_INIT_FINALLY(&degrees, no_of_nodes);
+    IGRAPH_CHECK(igraph_strength(graph, &degrees, igraph_vss_all(),
+        IGRAPH_ALL, 0, weights));
+    /* TODO */
+    igraph_vector_destroy(&degrees);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
 
   return IGRAPH_SUCCESS;
 }
