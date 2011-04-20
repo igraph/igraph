@@ -4053,6 +4053,57 @@ PyObject *igraphmodule_Graph_linegraph(igraphmodule_GraphObject * self) {
   return (PyObject *) result;
 }
 
+/**
+ * \ingroup python_interface_graph
+ * \brief Returns the size of the k-neighborhood of some vertices in the
+ *   graph.
+ * \sa igraph_neighborhood_size
+ */
+PyObject *igraphmodule_Graph_neighborhood_size(igraphmodule_GraphObject *self,
+    PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = { "vertices", "order", "mode", NULL };
+  PyObject *vobj = Py_None;
+  PyObject *mode_o = 0;
+  PyObject *result;
+  long int order = 1;
+  igraph_neimode_t mode = IGRAPH_ALL;
+  igraph_bool_t return_single = 0;
+  igraph_vs_t vs;
+  igraph_vector_t res;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OlO", kwlist,
+        &vobj, &order, &mode_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &self->g, &return_single, 0)) {
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (igraph_vector_init(&res, 0)) {
+    igraph_vs_destroy(&vs);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (igraph_neighborhood_size(&self->g, &res, vs, order, mode)) {
+    igraph_vs_destroy(&vs);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  igraph_vs_destroy(&vs);
+
+  if (!return_single)
+    result = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
+  else
+    result = PyInt_FromLong((long)VECTOR(res)[0]);
+
+  igraph_vector_destroy(&res);
+
+  return result;
+}
+
 /** \ingroup python_interface_graph
  * \brief Calculates the Google PageRank value of some vertices in the graph
  *   (old algorithm, for compatibility)
@@ -10800,11 +10851,33 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "form of a single integer or a list, depending on the input\n"
    "parameter).\n"
    "\n"
-   "@param vertices: a single vertex ID or a list of vertex IDs or\n"
+   "@param vertices: a single vertex ID or a list of vertex IDs, or\n"
    "  C{None} meaning all the vertices in the graph.\n"
    "@param mode: the type of degree to be returned (L{OUT} for\n"
    "  out-degrees, L{IN} IN for in-degrees or L{ALL} for the sum of\n"
-   "  them).\n" "@param loops: whether self-loops should be counted.\n"},
+   "  them).\n"
+   "@param loops: whether self-loops should be counted.\n"},
+
+  /* interface to igraph_neighborhood_size */
+  {"neighborhood_size", (PyCFunction) igraphmodule_Graph_neighborhood_size,
+   METH_VARARGS | METH_KEYWORDS,
+   "neighborhood_size(vertices=None, order=1, mode=ALL)\n\n"
+   "For each vertex specified by I{vertices}, returns the number of\n"
+   "vertices reachable from that vertex in at most I{order} steps.\n\n"
+   "@param vertices: a single vertex ID or a list of vertex IDs, or\n"
+   "  C{None} meaning all the vertices in the graph.\n"
+   "@param mode: specifies how to take into account the direction of\n"
+   "  the edges if a directed graph is analyzed. C{\"out\"} means that\n"
+   "  only the outgoing edges are followed, so all vertices reachable\n"
+   "  from the source vertex in at most I{order} steps are counted.\n"
+   "  C{\"in\"} means that only the incoming edges are followed (in\n"
+   "  reverse direction of course), so all vertices from which the source\n"
+   "  vertex is reachable in at most I{order} steps are counted. C{\"all\"}\n"
+   "  treats directed edges as undirected.\n"
+   "@return: a single number specifying the neighborhood size if I{vertices}\n"
+   "  was an integer specifying a single vertex index, or a list of sizes\n"
+   "  if I{vertices} was a list or C{None}.\n"
+  },
 
   /* interface to igraph_personalized_pagerank */
   {"personalized_pagerank", (PyCFunction) igraphmodule_Graph_personalized_pagerank,
