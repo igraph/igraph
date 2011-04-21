@@ -23,6 +23,7 @@
 
 #include "config.h"
 #include "igraph_error.h"
+#include "igraph_threading.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -132,7 +133,7 @@ igraph_set_error_handler (igraph_error_handler_t * new_handler)
   return previous_handler;
 }
 
-struct igraph_i_protectedPtr igraph_i_finally_stack[100];
+IGRAPH_THREAD_LOCAL struct igraph_i_protectedPtr igraph_i_finally_stack[100];
 
 /*
  * Adds another element to the free list
