@@ -3,6 +3,8 @@ AC_CONFIG_SRCDIR(src/games.c)
 AM_INIT_AUTOMAKE(igraph, 0.6)
 AM_CONFIG_HEADER(config.h)
 
+m4_include(tools/autoconf/ax_tls.m4)
+
 # Test suite
 AC_CONFIG_TESTDIR(tests)
 AC_CONFIG_FILES([tests/Makefile tests/atlocal])
@@ -177,12 +179,19 @@ if test "x$enable_glpk" != "xno"; then
 fi
 
 tls_support=no
+HAVE_TLS=0
+THREAD_LOCAL=
 AC_ARG_ENABLE(tls, AC_HELP_STRING([--enable-tls], [Compile with thread-local storage]))
 if test "x$enable_tls" != "xno"; then
-	# TODO: check whether TLS is supported by the compiler
-	AC_DEFINE([HAVE_TLS], [1], [Define to 1 if you want to use thread-local storage for global igraph structures])
-	tls_support=yes
+  AX_TLS([
+    AC_DEFINE([HAVE_TLS], [1], [Define to 1 if you want to use thread-local storage for global igraph structures])
+    tls_support=yes
+    HAVE_TLS=1
+    THREAD_LOCAL=$ac_cv_tls
+  ], [])
 fi
+AC_SUBST(HAVE_TLS)
+AC_SUBST(THREAD_LOCAL)
 
 AC_ARG_WITH([external-f2c], [AS_HELP_STRING([--with-external-f2c],
 		                      [Use external F2C library [default=no]])],
@@ -262,7 +271,7 @@ if test "$use_gprof" = "yes"; then
   CXXFLAGS="${CFLAGS} -pg"
 fi
 
-AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile doc/book/Makefile interfaces/R/configure.in interfaces/R/Makefile interfaces/R/src/Makevars.win interfaces/R/DESCRIPTION interfaces/Makefile include/igraph_version.h])
+AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile doc/book/Makefile interfaces/R/configure.in interfaces/R/Makefile interfaces/R/src/Makevars.win interfaces/R/DESCRIPTION interfaces/Makefile include/igraph_version.h include/igraph_threading.h])
 AC_OUTPUT
 
 AC_MSG_RESULT([igraph successfully configured.])
