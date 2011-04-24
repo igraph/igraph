@@ -191,7 +191,8 @@ if test "x$enable_tls" != "xno"; then
   ], [])
 fi
 AC_SUBST(HAVE_TLS)
-AC_SUBST(THREAD_LOCAL)
+AC_DEFINE_UNQUOTED([IGRAPH_THREAD_LOCAL], $THREAD_LOCAL,
+          [Keyword for thread local storage, or empty if not available])
 
 AC_ARG_WITH([external-f2c], [AS_HELP_STRING([--with-external-f2c],
 		                      [Use external F2C library [default=no]])],
