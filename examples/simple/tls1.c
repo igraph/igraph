@@ -38,7 +38,7 @@ int main() {
     return 77;
   }
   
-  /* Tun a thread that leaves some junk in the error stack */
+  /* Run a thread that leaves some junk in the error stack */
   pthread_create(&thread_id, NULL, thread_function, 0);
   pthread_join(thread_id, &exit_status);
 
