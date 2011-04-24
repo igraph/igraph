@@ -23,7 +23,6 @@
 
 #include "config.h"
 #include "igraph_error.h"
-#include "igraph_threading.h"
 
 #include <stdio.h>
 #include <stdlib.h>
