@@ -298,8 +298,8 @@ igraph_diameter_dijkstra:
 
 igraph_minimum_spanning_tree:
         PARAMS: GRAPH graph, OUT VECTOR res, EDGEWEIGHTS weights=NULL
-		DEPS: weights ON graph
-		IGNORE: RR, RC, RNamespace
+        DEPS: weights ON graph
+        IGNORE: RR, RC, RNamespace
 
 igraph_minimum_spanning_tree_unweighted:
         PARAMS: GRAPH graph, OUT GRAPH mst
