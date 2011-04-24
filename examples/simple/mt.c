@@ -28,7 +28,7 @@ int main() {
   
   long int i;
   for (i=0; i<1000; i++) {
-    igraph_real_t r=igraph_rng_get_unif01(&igraph_rng_default);
+    igraph_real_t r=igraph_rng_get_unif01(igraph_rng_default());
     if (r<0 || r>1) {
       return 1;
     }

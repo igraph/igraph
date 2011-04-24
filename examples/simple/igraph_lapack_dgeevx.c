@@ -159,7 +159,7 @@ int main() {
   int ilo, ihi;
   igraph_real_t abnrm;
   
-  igraph_rng_seed(&igraph_rng_default, 42);
+  igraph_rng_seed(igraph_rng_default(), 42);
   
   igraph_matrix_init(&A, DIM, DIM);
   igraph_matrix_init(&vectors_left, 0, 0);
@@ -169,7 +169,7 @@ int main() {
 
   for (i=0; i<DIM; i++) {
     for (j=0; j<DIM; j++) {
-      MATRIX(A, i, j) = igraph_rng_get_integer(&igraph_rng_default, 1, 10);
+      MATRIX(A, i, j) = igraph_rng_get_integer(igraph_rng_default(), 1, 10);
     }
   }
   

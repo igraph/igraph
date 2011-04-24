@@ -26,7 +26,7 @@
 #define DIM1 10
 #define DIM2 5
 
-#define INT(a) (igraph_rng_get_integer(&igraph_rng_default, 0, (a)))
+#define INT(a) (igraph_rng_get_integer(igraph_rng_default(), 0, (a)))
 
 int main() {
   igraph_matrix_t mat, mat2;
@@ -36,7 +36,7 @@ int main() {
   igraph_vector_t sums1, sums2;
   
   
-  igraph_rng_seed(&igraph_rng_default, 42);
+  igraph_rng_seed(igraph_rng_default(), 42);
 
   /* COPY */
 
