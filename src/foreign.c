@@ -975,12 +975,13 @@ int igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
   return 0;
 }
 
-extern int igraph_gml_yyparse(void);
-extern FILE *igraph_gml_yyin;
-extern int igraph_gml_eof;
-extern igraph_gml_tree_t *igraph_i_gml_parsed_tree;
-long int igraph_gml_mylineno;
-extern char *igraph_i_gml_errmsg;
+#include "foreign-gml-header.h"
+
+int igraph_gml_yylex_init_extra (igraph_i_gml_parsedata_t* user_defined,
+				void* scanner);
+int igraph_gml_yylex_destroy (void *scanner );
+int igraph_gml_yyparse (igraph_i_gml_parsedata_t* context);
+void igraph_gml_yyset_in  (FILE * in_str, void* yyscanner );
 
 void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {  
   long int i;
@@ -1112,18 +1113,22 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     vattrs=IGRAPH_VECTOR_PTR_NULL, eattrs=IGRAPH_VECTOR_PTR_NULL;
   igraph_vector_ptr_t *attrs[3];
   long int edgeptr=0;
+  igraph_i_gml_parsedata_t context;
   
   attrs[0]=&gattrs; attrs[1]=&vattrs; attrs[2]=&eattrs;
   
-  igraph_gml_yyin=instream;
-  igraph_gml_mylineno=1;
-  igraph_gml_eof=0;
-  igraph_i_gml_errmsg=0;
+  context.eof=0;
+  context.tree=0;
 
-  i=igraph_gml_yyparse();
+  igraph_gml_yylex_init_extra(&context, &context.scanner);
+  IGRAPH_FINALLY(igraph_gml_yylex_destroy, context.scanner);
+
+  igraph_gml_yyset_in(instream, context.scanner);
+
+  i=igraph_gml_yyparse(&context);
   if (i != 0) {
-    if (igraph_i_gml_errmsg) {
-      IGRAPH_ERROR(igraph_i_gml_errmsg, IGRAPH_PARSEERROR);
+    if (context.errmsg) {
+      IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
     } else {
       IGRAPH_ERROR("Cannot read GML file", IGRAPH_PARSEERROR);
     }
@@ -1132,25 +1137,25 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 
   /* Check version, if present, integer and not '1' then ignored */
-  i=igraph_gml_tree_find(igraph_i_gml_parsed_tree, "Version", 0);
+  i=igraph_gml_tree_find(context.tree, "Version", 0);
   if (i>=0 &&
-      igraph_gml_tree_type(igraph_i_gml_parsed_tree, i)==IGRAPH_I_GML_TREE_INTEGER &&
-      igraph_gml_tree_get_integer(igraph_i_gml_parsed_tree, i) != 1) {
-    igraph_gml_tree_destroy(igraph_i_gml_parsed_tree);
+      igraph_gml_tree_type(context.tree, i)==IGRAPH_I_GML_TREE_INTEGER &&
+      igraph_gml_tree_get_integer(context.tree, i) != 1) {
+    igraph_gml_tree_destroy(context.tree);
     IGRAPH_ERROR("Unknown GML version", IGRAPH_UNIMPLEMENTED);
     /* RETURN HERE!!!! */
   }
   
   /* get the graph */
-  gidx=igraph_gml_tree_find(igraph_i_gml_parsed_tree, "graph", 0);
+  gidx=igraph_gml_tree_find(context.tree, "graph", 0);
   if (gidx==-1) {
     IGRAPH_ERROR("No 'graph' object in GML file", IGRAPH_PARSEERROR);
   }
-  if (igraph_gml_tree_type(igraph_i_gml_parsed_tree, gidx) !=
+  if (igraph_gml_tree_type(context.tree, gidx) !=
       IGRAPH_I_GML_TREE_TREE) {
     IGRAPH_ERROR("Invalid type for 'graph' object in GML file", IGRAPH_PARSEERROR);
   }
-  gtree=igraph_gml_tree_get_tree(igraph_i_gml_parsed_tree, gidx);
+  gtree=igraph_gml_tree_get_tree(context.tree, gidx);
 
   IGRAPH_FINALLY(igraph_i_gml_destroy_attrs, &attrs);
   igraph_vector_ptr_init(&gattrs, 0);
@@ -1404,7 +1409,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     }
   }
   
-  igraph_gml_tree_destroy(igraph_i_gml_parsed_tree);
+  igraph_gml_tree_destroy(context.tree);
   
   igraph_trie_destroy(&trie);
   igraph_trie_destroy(&gattrnames);
@@ -1418,7 +1423,8 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 
   igraph_i_gml_destroy_attrs(attrs);
   igraph_vector_destroy(&edges);
-  IGRAPH_FINALLY_CLEAN(2);
+  igraph_gml_yylex_destroy(context.scanner);
+  IGRAPH_FINALLY_CLEAN(3);
   
   return 0;
 }

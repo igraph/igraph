@@ -46,13 +46,10 @@
 
 #include "config.h"
 #include <stdlib.h>
+#include "foreign-gml-header.h"
 #include "foreign-gml-parser.h"
-extern long int igraph_gml_mylineno;
-extern int igraph_gml_mode;
-int igraph_gml_eof;
-void igraph_i_gml_reset_scanner() {
-  YY_FLUSH_BUFFER;
-}
+#define YY_EXTRA_TYPE igraph_i_gml_parsedata_t*
+#define YY_USER_ACTION yylloc->first_line = yylineno;
 %}
 
 %option noyywrap
@@ -60,27 +57,30 @@ void igraph_i_gml_reset_scanner() {
 %option outfile="lex.yy.c"
 %option nounput
 %option noinput
+%option reentrant
+%option bison-bridge
+%option bison-locations
 
 digit       [0-9]
 whitespace  [ \r\n\t]
 
 %%
 
-^#[^\n\r]*[\n]|[\r]     { igraph_gml_mylineno++; /* comments ignored */ }
+^#[^\n\r]*[\n]|[\r]     { /* comments ignored */ }
 
 \"[^\"]*\"                                      { return STRING; }
 \-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? { return NUM; }
 [a-zA-Z_][a-zA-Z_0-9]*  { return KEYWORD; }
 \[                      { return LISTOPEN; }
 \]                      { return LISTCLOSE; }
-\n\r|\r\n|\r|\n         { igraph_gml_mylineno++; }
+\n\r|\r\n|\r|\n         { }
 {whitespace}            { /* other whitespace ignored */ }
 
 <<EOF>>                 { 
-                          if (igraph_gml_eof) {
+                          if (yyextra->eof) {
 			    yyterminate();
 			  } else {
-			    igraph_gml_eof=1;
+			    yyextra->eof=1;
 			    return EOFF;
 			  }			  
                         }
