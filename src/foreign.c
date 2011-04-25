@@ -287,15 +287,13 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
   return 0;
 }
 
-extern int igraph_lgl_yyparse(void);
-extern FILE *igraph_lgl_yyin;
-extern int igraph_i_lgl_eof;
-long int igraph_lgl_mylineno;
-igraph_bool_t igraph_lgl_has_weights=0;
-igraph_vector_t *igraph_lgl_vector=0;
-igraph_vector_t *igraph_lgl_weights=0;
-igraph_trie_t *igraph_lgl_trie=0;
-extern char *igraph_i_lgl_errmsg;
+#include "foreign-lgl-header.h"
+
+int igraph_lgl_yylex_init_extra (igraph_i_lgl_parsedata_t* user_defined,
+				void* scanner);
+int igraph_lgl_yylex_destroy (void *scanner );
+int igraph_lgl_yyparse (igraph_i_lgl_parsedata_t* context);
+void igraph_lgl_yyset_in  (FILE * in_str, void* yyscanner );
 
 /**
  * \ingroup loadsave
@@ -360,8 +358,9 @@ vertex3name [optionalWeight] \endverbatim
  */
 
 int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
-			   igraph_bool_t names, igraph_add_weights_t weights,
-			   igraph_bool_t directed) {
+			  igraph_bool_t names, 
+			  igraph_add_weights_t weights,
+			  igraph_bool_t directed) {
 
   igraph_vector_t edges=IGRAPH_VECTOR_NULL, ws=IGRAPH_VECTOR_NULL;
   igraph_trie_t trie=IGRAPH_TRIE_NULL;
@@ -369,23 +368,26 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
   igraph_vector_ptr_t *pname=0, *pweight=0;
   igraph_attribute_record_t namerec, weightrec;
   const char *namestr="name", *weightstr="weight";
-  
+  igraph_i_lgl_parsedata_t context;
+
   IGRAPH_VECTOR_INIT_FINALLY(&ws, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   IGRAPH_TRIE_INIT_FINALLY(&trie, names);
   
-  igraph_lgl_has_weights=0;
-  igraph_lgl_vector=&edges;
-  igraph_lgl_weights=&ws;
-  igraph_lgl_trie=&trie;
-  igraph_lgl_yyin=instream;
-  igraph_lgl_mylineno=1;
-  igraph_i_lgl_eof=0;
-  igraph_i_lgl_errmsg=0;
+  context.has_weights=0;
+  context.vector=&edges;
+  context.weights=&ws;
+  context.trie=&trie;
+  context.eof=0;
 
-  if (igraph_lgl_yyparse()) {
-    if (igraph_i_lgl_errmsg) {
-      IGRAPH_ERROR(igraph_i_lgl_errmsg, IGRAPH_PARSEERROR);
+  igraph_lgl_yylex_init_extra(&context, &context.scanner);
+  IGRAPH_FINALLY(igraph_lgl_yylex_destroy, context.scanner);
+
+  igraph_lgl_yyset_in(instream, context.scanner);  
+
+  if (igraph_lgl_yyparse(&context)) {
+    if (context.errmsg) {
+      IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
     } else {
       IGRAPH_ERROR("Cannot read LGL file", IGRAPH_PARSEERROR);
     }
@@ -407,7 +409,7 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
   }
 
   if (weights == IGRAPH_ADD_WEIGHTS_YES ||
-      (weights == IGRAPH_ADD_WEIGHTS_IF_PRESENT && igraph_lgl_has_weights)) {
+      (weights == IGRAPH_ADD_WEIGHTS_IF_PRESENT && context.has_weights)) {
     IGRAPH_CHECK(igraph_vector_ptr_init(&weight, 1)); 
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, &weight);
     pweight=&weight;
@@ -431,7 +433,8 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
   igraph_trie_destroy(&trie);
   igraph_vector_destroy(&edges);
   igraph_vector_destroy(&ws);
-  IGRAPH_FINALLY_CLEAN(4);
+  igraph_lgl_yylex_destroy(context.scanner);
+  IGRAPH_FINALLY_CLEAN(5);
   
   return 0;
 }

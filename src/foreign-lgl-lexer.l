@@ -47,11 +47,9 @@
 #include "config.h"
 #include <stdlib.h>
 #include "foreign-lgl-parser.h"
-extern long int igraph_lgl_mylineno;
-int igraph_i_lgl_eof;
-void igraph_i_lgl_reset_scanner() {
-  YY_FLUSH_BUFFER;
-}
+#include "foreign-lgl-header.h"
+#define YY_EXTRA_TYPE igraph_i_lgl_parsedata_t*
+#define YY_USER_ACTION yylloc->first_line = yylineno;
 %}
 
 %option noyywrap
@@ -59,6 +57,9 @@ void igraph_i_lgl_reset_scanner() {
 %option outfile="lex.yy.c"
 %option nounput
 %option noinput
+%option reentrant
+%option bison-bridge
+%option bison-locations
 
 alnum [^ \t\r\n#]
 
@@ -71,15 +72,15 @@ alnum [^ \t\r\n#]
 [ \t]*               { }
 
  /* ---------------------------------------------------newline------*/
-\n\r|\r\n|\n|\r      { igraph_lgl_mylineno++; return NEWLINE; }
+\n\r|\r\n|\n|\r      { return NEWLINE; }
 
  /* ----------------------------------------------alphanumeric------*/
 {alnum}+             { return ALNUM; }
 
-<<EOF>>           { if (igraph_i_lgl_eof) {
+<<EOF>>           { if (yyextra->eof) {
                        yyterminate();
                     } else {
-                       igraph_i_lgl_eof=1;
+                       yyextra->eof=1;
                        return NEWLINE; 
                     }
                   }

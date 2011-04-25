@@ -63,7 +63,6 @@ int igraph_gml_yyerror(YYLTYPE* locp, igraph_i_gml_parsedata_t *context,
 		       char *s);
 char *igraph_gml_yyget_text (yyscan_t yyscanner );
 int igraph_gml_yyget_leng (yyscan_t yyscanner );
-void igraph_i_gml_reset_scanner(void);
 void igraph_i_gml_get_keyword(char *s, int len, void *res);
 void igraph_i_gml_get_string(char *s, int len, void *res);
 double igraph_i_gml_get_real(char *s, int len);
