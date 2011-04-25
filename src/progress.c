@@ -24,7 +24,7 @@
 #include "igraph_progress.h"
 #include "config.h"
 
-static igraph_progress_handler_t *igraph_i_progress_handler=0;
+static IGRAPH_THREAD_LOCAL igraph_progress_handler_t *igraph_i_progress_handler=0;
 
 int igraph_progress(const char *message, igraph_real_t percent, void *data) {
   if (igraph_i_progress_handler) {

@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-static igraph_error_handler_t *igraph_i_error_handler=0;
+static IGRAPH_THREAD_LOCAL igraph_error_handler_t *igraph_i_error_handler=0;
 
 static char *igraph_i_error_strings[]=
   { /*  0 */ "No error",
@@ -170,7 +170,7 @@ int IGRAPH_FINALLY_STACK_SIZE(void) {
   return igraph_i_finally_stack[0].all;
 }
 
-static igraph_warning_handler_t *igraph_i_warning_handler=0;
+static IGRAPH_THREAD_LOCAL igraph_warning_handler_t *igraph_i_warning_handler=0;
 
 void igraph_warning_handler_ignore (const char *reason, const char *file,
 				   int line, int igraph_errno) {
