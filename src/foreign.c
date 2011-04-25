@@ -120,15 +120,13 @@ int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
   return 0;
 }
 
-extern int igraph_ncol_yyparse(void);
-extern FILE *igraph_ncol_yyin;
-extern int igraph_i_ncol_eof;
-long int igraph_ncol_mylineno;
-igraph_bool_t igraph_ncol_has_weights=0;
-igraph_vector_t *igraph_ncol_vector=0;
-igraph_vector_t *igraph_ncol_weights=0;
-igraph_trie_t *igraph_ncol_trie=0;
-extern char *igraph_i_ncol_errmsg;
+#include "foreign-ncol-header.h"
+
+int igraph_ncol_yylex_init_extra (igraph_i_ncol_parsedata_t* user_defined,
+				void* scanner);
+int igraph_ncol_yylex_destroy (void *scanner );
+int igraph_ncol_yyparse (igraph_i_ncol_parsedata_t* context);
+void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
 
 /**
  * \ingroup loadsave
@@ -194,7 +192,8 @@ extern char *igraph_i_ncol_errmsg;
 
 int igraph_read_graph_ncol(igraph_t *graph, FILE *instream, 
 			   igraph_strvector_t *predefnames,
-			   igraph_bool_t names, igraph_add_weights_t weights,
+			   igraph_bool_t names, 
+			   igraph_add_weights_t weights,
 			   igraph_bool_t directed) {
   
   igraph_vector_t edges, ws;
@@ -204,6 +203,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
   igraph_vector_ptr_t *pname=0, *pweight=0;
   igraph_attribute_record_t namerec, weightrec;
   const char *namestr="name", *weightstr="weight";
+  igraph_i_ncol_parsedata_t context;
 
   IGRAPH_CHECK(igraph_empty(graph, 0, directed));
   IGRAPH_FINALLY(igraph_destroy, graph);
@@ -227,18 +227,20 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     }
   }
   
-  igraph_ncol_has_weights=0;
-  igraph_ncol_vector=&edges;
-  igraph_ncol_weights=&ws;
-  igraph_ncol_trie=&trie;
-  igraph_ncol_yyin=instream;
-  igraph_ncol_mylineno=1;
-  igraph_i_ncol_eof=0;
-  igraph_i_ncol_errmsg=0;
+  context.has_weights=0;
+  context.vector=&edges;
+  context.weights=&ws;
+  context.trie=&trie;
+  context.eof=0;
 
-  if (igraph_ncol_yyparse()) {
-    if (igraph_i_ncol_errmsg) {
-      IGRAPH_ERROR(igraph_i_ncol_errmsg, IGRAPH_PARSEERROR);
+  igraph_ncol_yylex_init_extra(&context, &context.scanner);
+  IGRAPH_FINALLY(igraph_ncol_yylex_destroy, context.scanner);
+
+  igraph_ncol_yyset_in(instream, context.scanner);  
+
+  if (igraph_ncol_yyparse(&context)) {
+    if (context.errmsg) {
+      IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
     } else {
       IGRAPH_ERROR("Cannot read NCOL file", IGRAPH_PARSEERROR);
     }
@@ -261,7 +263,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
   }
 
   if (weights == IGRAPH_ADD_WEIGHTS_YES ||
-      (weights == IGRAPH_ADD_WEIGHTS_IF_PRESENT && igraph_ncol_has_weights)) {
+      (weights == IGRAPH_ADD_WEIGHTS_IF_PRESENT && context.has_weights)) {
     IGRAPH_CHECK(igraph_vector_ptr_init(&weight, 1)); 
     pweight=&weight;
     weightrec.name=weightstr;

@@ -46,29 +46,37 @@
 
 #include <stdio.h>
 #include <string.h>
-extern int igraph_ncol_yylex(void);
-extern long int igraph_ncol_mylineno;
-extern char *igraph_ncol_yytext;
-extern int igraph_ncol_yyleng;
-char *igraph_i_ncol_errmsg=0;
-int igraph_ncol_yyerror(char *s);
 #include "igraph_types.h" 
 #include "igraph_types_internal.h"
 #include "igraph_math.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "config.h"
-extern igraph_bool_t igraph_ncol_has_weights;
-extern igraph_vector_t *igraph_ncol_vector;
-extern igraph_vector_t *igraph_ncol_weights;
-extern igraph_trie_t *igraph_ncol_trie;
+#include "foreign-ncol-header.h"
+#include "foreign-ncol-parser.h"
+
+#define yyscan_t void*
+
+int igraph_ncol_yylex(YYSTYPE* lvalp, YYLTYPE* llocp, 
+		      void* scanner);
+int igraph_ncol_yyerror(YYLTYPE* locp, 
+			igraph_i_ncol_parsedata_t *context, 
+			char *s);
+char *igraph_ncol_yyget_text (yyscan_t yyscanner );
+int igraph_ncol_yyget_leng (yyscan_t yyscanner );
 igraph_real_t igraph_ncol_get_number(const char *str, long int len);
-void igraph_i_ncol_reset_scanner(void);
+
+#define scanner context->scanner
 %}
 
+%pure-parser
 %output="y.tab.c"
 %name-prefix="igraph_ncol_yy"
 %defines
+%locations
+%error-verbose
+%parse-param { igraph_i_ncol_parsedata_t* context }
+%lex-param { void *scanner }
 
 %union {
   long int edgenum;
@@ -89,34 +97,34 @@ input :    /* empty */
 ;
 
 edge :   edgeid edgeid NEWLINE        { 
-           igraph_vector_push_back(igraph_ncol_vector, $1);
-           igraph_vector_push_back(igraph_ncol_vector, $2);
-           igraph_vector_push_back(igraph_ncol_weights, 0);
+           igraph_vector_push_back(context->vector, $1);
+           igraph_vector_push_back(context->vector, $2);
+           igraph_vector_push_back(context->weights, 0);
        }
        | edgeid edgeid weight NEWLINE { 
-           igraph_vector_push_back(igraph_ncol_vector, $1);
-           igraph_vector_push_back(igraph_ncol_vector, $2);
-           igraph_vector_push_back(igraph_ncol_weights, $3);
-		   igraph_ncol_has_weights = 1;
+           igraph_vector_push_back(context->vector, $1);
+           igraph_vector_push_back(context->vector, $2);
+           igraph_vector_push_back(context->weights, $3);
+	   context->has_weights = 1;
        }
 ;
 
-edgeid : ALNUM  { igraph_trie_get2(igraph_ncol_trie, 
-				   igraph_ncol_yytext, 
-				   igraph_ncol_yyleng, &$$); };
+edgeid : ALNUM  { igraph_trie_get2(context->trie, 
+				   igraph_ncol_yyget_text(scanner),
+				   igraph_ncol_yyget_leng(scanner), 
+				   &$$); };
 
-weight : ALNUM  { $$=igraph_ncol_get_number(igraph_ncol_yytext, 
-					   igraph_ncol_yyleng); } ;
+weight : ALNUM  { $$=igraph_ncol_get_number(igraph_ncol_yyget_text(scanner), 
+					    igraph_ncol_yyget_leng(scanner)); } ;
 
 %%
 
-int igraph_ncol_yyerror (char *s)
-{
-  static char str[300];  
-  igraph_i_ncol_reset_scanner();
-  snprintf(str, sizeof(str), "Parse error in NCOL file, line %li (%s)", 
-	   (long)igraph_ncol_mylineno, s);
-  igraph_i_ncol_errmsg=str;
+int igraph_ncol_yyerror(YYLTYPE* locp, 
+			igraph_i_ncol_parsedata_t *context, 
+			char *s) {
+  snprintf(context->errmsg, sizeof(context->errmsg)/sizeof(char)-1, 
+	   "Parse error in NCOL file, line %i (%s)", 
+	   locp->first_line, s);
   return 0;
 }
 
