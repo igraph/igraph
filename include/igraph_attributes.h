@@ -284,7 +284,7 @@ typedef struct igraph_attribute_table_t {
 extern igraph_attribute_table_t *igraph_i_attribute_table;
 
 igraph_attribute_table_t *
-igraph_i_set_attribute_table(igraph_attribute_table_t * table);
+igraph_i_set_attribute_table(const igraph_attribute_table_t * table);
 
 igraph_bool_t igraph_has_attribute_table(void);
 
@@ -364,7 +364,7 @@ int igraph_i_attribute_get_string_edge_attr(const igraph_t *graph,
 
 /* Experimental attribute handler in C */
 
-extern igraph_attribute_table_t igraph_cattribute_table;
+extern const igraph_attribute_table_t igraph_cattribute_table;
 
 igraph_real_t igraph_cattribute_GAN(const igraph_t *graph, const char *name);
 const char* igraph_cattribute_GAS(const igraph_t *graph, const char *name);

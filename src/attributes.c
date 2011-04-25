@@ -234,7 +234,7 @@ igraph_attribute_table_t *igraph_i_attribute_table=0;
  */
   
 igraph_attribute_table_t *
-igraph_i_set_attribute_table(igraph_attribute_table_t * table) {
+igraph_i_set_attribute_table(const igraph_attribute_table_t * table) {
   igraph_attribute_table_t *old=igraph_i_attribute_table;
   igraph_i_attribute_table=table;
   return old;

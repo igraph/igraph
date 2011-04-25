@@ -225,7 +225,7 @@ void igraph_rng_glibc2_destroy(void *vstate) {
  * This generator was ported from the GNU Scientific Library.
  */
 
-igraph_rng_type_t igraph_rngtype_glibc2 = {
+const igraph_rng_type_t igraph_rngtype_glibc2 = {
   /* name= */      "LIBC",
   /* min=  */      0,
   /* max=  */      RAND_MAX,
@@ -300,7 +300,7 @@ void igraph_rng_rand_destroy(void *vstate) {
  * This generator was ported from the GNU Scientific Library.
  */
 
-igraph_rng_type_t igraph_rngtype_rand = {
+const igraph_rng_type_t igraph_rngtype_rand = {
   /* name= */      "RAND",
   /* min=  */      0,
   /* max=  */      0x7fffffffUL,
@@ -451,7 +451,7 @@ void igraph_rng_mt19937_destroy(void *vstate) {
  * This generator was ported from the GNU Scientific Library.
  */
 
-igraph_rng_type_t igraph_rngtype_mt19937 = {
+const igraph_rng_type_t igraph_rngtype_mt19937 = {
   /* name= */      "MT19937",
   /* min=  */      0,
   /* max=  */      0xffffffffUL,
