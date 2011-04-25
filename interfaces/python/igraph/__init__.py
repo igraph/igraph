@@ -2712,6 +2712,37 @@ class VertexSeq(_igraph.VertexSeq):
         associated to this vertex sequence."""
         return self.graph.vertex_attributes()
 
+    def find(self, *args, **kwds):
+        """Returns the first vertex of the vertex sequence that matches some
+        criteria.
+
+        The selection criteria are equal to the ones allowed by L{VertexSeq.select}.
+        See L{VertexSeq.select} for more details.
+
+        For instance, to find the first vertex with name C{foo} in graph C{g}:
+
+            >>> g.vs.find(name="foo")
+
+        To find an arbitrary isolated vertex:
+
+            >>> g.vs.find(_degree=0)
+        """
+        if args:
+            # Selecting first based on positional arguments, then checking
+            # the criteria specified by the keyword arguments
+            vertex = _igraph.VertexSeq.find(self, *args)
+            if not kwds:
+                return vertex
+            vs = self.graph.vs[vertex.index]
+        else:
+            vs = self
+
+        # Selecting based on positional arguments
+        vs = vs.select(**kwds)
+        if vs:
+            return vs[0]
+        raise ValueError("no such vertex")
+
     def select(self, *args, **kwds):
         """Selects a subset of the vertex sequence based on some criteria
         
@@ -2929,6 +2960,33 @@ class EdgeSeq(_igraph.EdgeSeq):
         """Returns the list of all the edge attributes in the graph
         associated to this edge sequence."""
         return self.graph.edge_attributes()
+
+    def find(self, *args, **kwds):
+        """Returns the first edge of the edge sequence that matches some
+        criteria.
+
+        The selection criteria are equal to the ones allowed by L{VertexSeq.select}.
+        See L{VertexSeq.select} for more details.
+
+        For instance, to find the first edge with weight larger than 5 in graph C{g}:
+
+            >>> g.es.find(weight_gt=5)
+        """
+        if args:
+            # Selecting first based on positional arguments, then checking
+            # the criteria specified by the keyword arguments
+            edge = _igraph.EdgeSeq.find(self, *args)
+            if not kwds:
+                return edge
+            es = self.graph.es[edge.index]
+        else:
+            es = self
+
+        # Selecting based on positional arguments
+        es = es.select(**kwds)
+        if es:
+            return es[0]
+        raise ValueError("no such edge")
 
     def select(self, *args, **kwds):
         """Selects a subset of the edge sequence based on some criteria
