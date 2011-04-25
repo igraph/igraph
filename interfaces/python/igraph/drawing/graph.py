@@ -339,7 +339,7 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
 
             if vertex.label_dist:
                 # Label is displaced from the center of the vertex.
-                _, _, w, h, _, _ = label_drawer.text_extents()
+                _, yb, w, h, _, _ = label_drawer.text_extents()
                 w, h = w/2.0, h/2.0
                 radius = vertex.label_dist * vertex.size / 2.
                 # First we find the reference point that is at distance `radius'
@@ -382,7 +382,7 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
                         pass    # tan(alpha) == inf
                     cy += h
                 # Draw the label
-                label_drawer.draw_at(cx-w, cy+h, wrap=wrap)
+                label_drawer.draw_at(cx-w, cy-h-yb, wrap=wrap)
             else:
                 # Label is exactly in the center of the vertex
                 cx, cy = coords

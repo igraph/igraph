@@ -4,6 +4,7 @@ Abstract base classes for the drawing routines.
 
 from igraph.compat import property
 from igraph.drawing.utils import BoundingBox
+from math import pi
 
 #####################################################################
 
@@ -63,6 +64,32 @@ class AbstractCairoDrawer(AbstractDrawer):
     def draw(self, *args, **kwds):
         """Abstract method, must be implemented in derived classes."""
         raise NotImplementedError("abstract class")
+
+    def _mark_point(self, x, y, color=0, size=4):
+        """Marks the given point with a small circle on the canvas.
+        Used primarily for debugging purposes.
+
+        @param x: the X coordinate of the point to mark
+        @param y: the Y coordinate of the point to mark
+        @param color: the color of the marker. It can be a
+          3-tuple (RGB components, alpha=0.5), a 4-tuple
+          (RGBA components) or an index where zero means red, 1 means
+          green, 2 means blue and so on.
+        @param size: the diameter of the marker.
+        """
+        if isinstance(color, int):
+            colors = [(1, 0, 0), (0, 1, 0), (0, 0, 1), (1, 1, 0),
+                    (0, 1, 1), (1, 0, 1)]
+            color = colors[color % len(colors)]
+        if len(color) == 3:
+            color += (0.5, )
+
+        ctx = self.context
+        ctx.save()
+        ctx.set_source_rgba(*color)
+        ctx.arc(x, y, size / 2.0, 0, 2*pi)
+        ctx.fill()
+        ctx.restore()
 
 #####################################################################
 
