@@ -868,8 +868,6 @@ unsigned long int igraph_rng_get_int31(igraph_rng_t *rng) {
   }
 }
 
-int igraph_rng_inited = 0;
-
 #ifndef HAVE_EXPM1
 #ifndef USING_R			/* R provides a replacement */
 /* expm1 replacement */
