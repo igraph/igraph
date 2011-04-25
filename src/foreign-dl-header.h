@@ -27,6 +27,9 @@ typedef enum { IGRAPH_DL_MATRIX,
 	       IGRAPH_DL_EDGELIST1, IGRAPH_DL_NODELIST1 } igraph_i_dl_type_t;
 
 typedef struct {
+  void *scanner;
+  int eof;
+  int mode;
   long int n;
   long int from, to;
   igraph_vector_t edges;

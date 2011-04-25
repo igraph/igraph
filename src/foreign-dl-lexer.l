@@ -49,20 +49,8 @@
 #include <stdarg.h>
 #include "foreign-dl-header.h"
 #include "foreign-dl-parser.h"
-extern long int igraph_dl_mylineno;
-extern int igraph_dl_mode;
-extern int igraph_dl_eof;
-extern char *igraph_dl_yytext;
-int igraph_i_dl_mode=0;
-void igraph_i_dl_reset_scanner() {
-  YY_FLUSH_BUFFER;
-}
-int myprintf(const char *arg, ...) {
-/*   va_list argptr; */
-/*   va_start(argptr, arg); */
-/*   printf(arg, argptr); */
-  return 0;
-}
+#define YY_EXTRA_TYPE igraph_i_dl_parsedata_t*
+#define YY_USER_ACTION yylloc->first_line = yylineno;
 %}
 
 %option noyywrap
@@ -70,6 +58,9 @@ int myprintf(const char *arg, ...) {
 %option outfile="lex.yy.c"
 %option nounput
 %option noinput
+%option reentrant
+%option bison-bridge
+%option bison-locations
 
 digit      [0-9]
 whitespace [ \t\v\f]
@@ -78,61 +69,60 @@ whitespace [ \t\v\f]
 
 %% 
 
-<*>\n\r|\r\n|\r|\n         { igraph_dl_mylineno++; myprintf("newline\n"); return NEWLINE; }
+<*>\n\r|\r\n|\r|\n         { return NEWLINE; }
 
-[dD][lL]{whitespace}+      { myprintf("dl\n"); return DL; }
+[dD][lL]{whitespace}+      { return DL; }
 [nN]{whitespace}*[=]{whitespace}* {
-  myprintf("n=\n"); return NEQ; }
-{digit}+                   { myprintf("num\n"); return NUM; }
+  return NEQ; }
+{digit}+                   { return NUM; }
 
 <INITIAL,LABELM>[dD][aA][tT][aA][:]        { 
-  switch (igraph_i_dl_mode) { 
+  switch (yyextra->mode) { 
   case 0: BEGIN(FULLMATRIX); 
-    myprintf("full matrix mode\n");
     break;
   case 1: BEGIN(EDGELIST);
     break;
   case 2: BEGIN(NODELIST);
     break;
   } 
-  myprintf("data\n"); return DATA; }
+  return DATA; }
 
-[lL][aA][bB][eE][lL][sS]:  { BEGIN(LABELM); myprintf("labels\n"); return LABELS; }
+[lL][aA][bB][eE][lL][sS]:  { BEGIN(LABELM); return LABELS; }
 <INITIAL,LABELM>[lL][aA][bB][eE][lL][sS]{whitespace}+[eE][mM][bB][eE][dD][dD][eE][dD]:?{whitespace}* {
-  myprintf("labels embedded\n"); return LABELSEMBEDDED; }
+  return LABELSEMBEDDED; }
 [fF][oO][rR][mM][aA][tT]{whitespace}*[=]{whitespace}*[fF][uU][lL][lL][mM][aA][tT][rR][iI][xX]{whitespace}* {
-  igraph_i_dl_mode=0; myprintf("format fm\n"); return FORMATFULLMATRIX; }
+  yyextra->mode=0; return FORMATFULLMATRIX; }
 [fF][oO][rR][mM][aA][tT]{whitespace}*[=]{whitespace}*[eE][dD][gG][eE][lL][iI][sS][tT][1]{whitespace}* {
-  igraph_i_dl_mode=1; myprintf("format el\n"); return FORMATEDGELIST1; }
+  yyextra->mode=1; return FORMATEDGELIST1; }
 [fF][oO][rR][mM][aA][tT]{whitespace}*[=]{whitespace}*[nN][oO][dD][eE][lL][iI][sS][tT][1]{whitespace}* {
-  igraph_i_dl_mode=2; myprintf("format nl\n"); return FORMATNODELIST1; }
+  yyextra->mode=2; return FORMATNODELIST1; }
 
-<LABELM>[, ]                               { myprintf(","); /* eaten up */ }
-<LABELM>[^, \t\n\r\f\v]+{whitespace}*      { myprintf("label1\n"); return LABEL; }
+<LABELM>[, ]                               { /* eaten up */ }
+<LABELM>[^, \t\n\r\f\v]+{whitespace}*      { return LABEL; }
 
-<FULLMATRIX>{digit}{whitespace}*          { myprintf("digit"); return DIGIT; }
-<FULLMATRIX>[^ \t\n\r\v\f,]+              { myprintf("label"); return LABEL; }
+<FULLMATRIX>{digit}{whitespace}*          { return DIGIT; }
+<FULLMATRIX>[^ \t\n\r\v\f,]+              { return LABEL; }
 <FULLMATRIX>{whitespace}                  { }
 
-<EDGELIST>\-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)?  { myprintf("num "); return NUM; }
-<EDGELIST>[^ \t\n\r\v\f,]+                                 { myprintf("label "); return LABEL; }
+<EDGELIST>\-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)?  { return NUM; }
+<EDGELIST>[^ \t\n\r\v\f,]+                                 { return LABEL; }
 <EDGELIST>{whitespace}*                                    { }
 
-<NODELIST>{digit}+                      { myprintf("num3 "); return NUM; }
-<NODELIST>[^ \t\r\n\v\f,]+              { myprintf("label3 "); return LABEL; }
+<NODELIST>{digit}+                      { return NUM; }
+<NODELIST>[^ \t\r\n\v\f,]+              { return LABEL; }
 <NODELIST>{whitespace}*                 { }
 
 {whitespace}+                      { /* eaten up */ }
 
 <<EOF>>                 { 
-                          if (igraph_dl_eof) {
+                          if (yyextra->eof) {
 			    yyterminate();
 			  } else {
-			    myprintf("EOF");
-			    igraph_dl_eof=1;
+			    yyextra->eof=1;
 			    BEGIN(INITIAL);
 			    return EOFF;
 			  }			  
                         }
 
-<*>. { myprintf("gebasz---%s---", igraph_dl_yytext); return 0; }
+<*>. { return 0; }
+

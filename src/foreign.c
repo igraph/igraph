@@ -2764,13 +2764,11 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
 
 #include "foreign-dl-header.h"
 
-extern int igraph_dl_yyparse(void);
-extern FILE *igraph_dl_yyin;
-int igraph_dl_eof;
-long int igraph_dl_mylineno;
-char *igraph_i_dl_errmsg;
-extern int igraph_i_dl_mode;
-igraph_i_dl_parsedata_t igraph_i_dl_data;
+int igraph_dl_yylex_init_extra (igraph_i_dl_parsedata_t* user_defined,
+				void* scanner);
+int igraph_dl_yylex_destroy (void *scanner );
+int igraph_dl_yyparse (igraph_i_dl_parsedata_t* context);
+void igraph_dl_yyset_in  (FILE * in_str, void* yyscanner );
 
 /** 
  * \function igraph_read_graph_dl
@@ -2806,42 +2804,46 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
   igraph_vector_ptr_t name, weight;
   igraph_vector_ptr_t *pname=0, *pweight=0;
   igraph_attribute_record_t namerec, weightrec;
-  const char *namestr="name", *weightstr="weight";
+  const char *namestr="name", *weightstr="weight";  
+  igraph_i_dl_parsedata_t context;
 
-  igraph_dl_yyin=instream;
-  igraph_dl_mylineno=1;
-  igraph_dl_eof=0;
-  igraph_i_dl_mode=0;
+  context.eof=0;
+  context.mode=0;
+  context.n=-1;
+  context.from=0;
+  context.to=0;
 
-  igraph_i_dl_data.n=-1;
-  igraph_i_dl_data.from=0;
-  igraph_i_dl_data.to=0;
-  IGRAPH_VECTOR_INIT_FINALLY(&igraph_i_dl_data.edges, 0);
-  IGRAPH_VECTOR_INIT_FINALLY(&igraph_i_dl_data.weights, 0);
-  IGRAPH_CHECK(igraph_strvector_init(&igraph_i_dl_data.labels, 0));
-  IGRAPH_FINALLY(igraph_strvector_destroy, &igraph_i_dl_data.labels);
-  IGRAPH_TRIE_INIT_FINALLY(&igraph_i_dl_data.trie, /*names=*/ 1);  
+  IGRAPH_VECTOR_INIT_FINALLY(&context.edges, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&context.weights, 0);
+  IGRAPH_CHECK(igraph_strvector_init(&context.labels, 0));
+  IGRAPH_FINALLY(igraph_strvector_destroy, &context.labels);
+  IGRAPH_TRIE_INIT_FINALLY(&context.trie, /*names=*/ 1);  
+
+  igraph_dl_yylex_init_extra(&context, &context.scanner);
+  IGRAPH_FINALLY(igraph_dl_yylex_destroy, context.scanner);
+
+  igraph_dl_yyset_in(instream, context.scanner);
   
-  i=igraph_dl_yyparse();
+  i=igraph_dl_yyparse(&context);
   if (i != 0) {
     IGRAPH_ERROR("Cannot read DL file", IGRAPH_PARSEERROR);
   }
 
   /* Extend the weight vector, if needed */
-  n=igraph_vector_size(&igraph_i_dl_data.weights);
-  n2=igraph_vector_size(&igraph_i_dl_data.edges) / 2;
+  n=igraph_vector_size(&context.weights);
+  n2=igraph_vector_size(&context.edges) / 2;
   if (n != 0) {
-    igraph_vector_resize(&igraph_i_dl_data.weights, n2);
+    igraph_vector_resize(&context.weights, n2);
     for (; n<n2; n++) {
-      VECTOR(igraph_i_dl_data.weights)[n] = IGRAPH_NAN;
+      VECTOR(context.weights)[n] = IGRAPH_NAN;
     }
   }
 
   /* Check number of vertices */
-  n=igraph_vector_max(&igraph_i_dl_data.edges);
-  if (n >= igraph_i_dl_data.n) {
+  n=igraph_vector_max(&context.edges);
+  if (n >= context.n) {
     IGRAPH_WARNING("More vertices than specified in `DL' file");
-    igraph_i_dl_data.n=n;
+    context.n=n;
   }
 
   /* OK, everything is ready, create the graph */
@@ -2849,10 +2851,10 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
   IGRAPH_FINALLY(igraph_destroy, graph);
 
   /* Labels */
-  if (igraph_strvector_size(&igraph_i_dl_data.labels) != 0) {
-    namevec=(const igraph_strvector_t*) &igraph_i_dl_data.labels;
-  } else if (igraph_trie_size(&igraph_i_dl_data.trie) != 0) {
-    igraph_trie_getkeys(&igraph_i_dl_data.trie, &namevec);
+  if (igraph_strvector_size(&context.labels) != 0) {
+    namevec=(const igraph_strvector_t*) &context.labels;
+  } else if (igraph_trie_size(&context.trie) != 0) {
+    igraph_trie_getkeys(&context.trie, &namevec);
   }
   if (namevec) {
     IGRAPH_CHECK(igraph_vector_ptr_init(&name, 1));
@@ -2865,18 +2867,18 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
   }
 
   /* Weights */
-  if (igraph_vector_size(&igraph_i_dl_data.weights) != 0) {
+  if (igraph_vector_size(&context.weights) != 0) {
     IGRAPH_CHECK(igraph_vector_ptr_init(&weight, 1));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, &name);
     pweight=&weight;
     weightrec.name=weightstr;
     weightrec.type=IGRAPH_ATTRIBUTE_NUMERIC;
-    weightrec.value=&igraph_i_dl_data.weights;
+    weightrec.value=&context.weights;
     VECTOR(weight)[0]=&weightrec;
   }
 
-  IGRAPH_CHECK(igraph_add_vertices(graph, igraph_i_dl_data.n, pname));
-  IGRAPH_CHECK(igraph_add_edges(graph, &igraph_i_dl_data.edges, pweight));
+  IGRAPH_CHECK(igraph_add_vertices(graph, context.n, pname));
+  IGRAPH_CHECK(igraph_add_edges(graph, &context.edges, pweight));
 
   if (pweight) {
     igraph_vector_ptr_destroy(pweight);
@@ -2888,11 +2890,12 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
     IGRAPH_FINALLY_CLEAN(1);
   }
 
-  igraph_trie_destroy(&igraph_i_dl_data.trie);
-  igraph_strvector_destroy(&igraph_i_dl_data.labels);
-  igraph_vector_destroy(&igraph_i_dl_data.edges);
-  igraph_vector_destroy(&igraph_i_dl_data.weights);
-  IGRAPH_FINALLY_CLEAN(4);
+  igraph_trie_destroy(&context.trie);
+  igraph_strvector_destroy(&context.labels);
+  igraph_vector_destroy(&context.edges);
+  igraph_vector_destroy(&context.weights);
+  igraph_dl_yylex_destroy(context.scanner);
+  IGRAPH_FINALLY_CLEAN(5);
   
   return 0;
 }
