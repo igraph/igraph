@@ -37,4 +37,5 @@ typedef struct {
   igraph_strvector_t labels;
   igraph_trie_t trie;
   igraph_i_dl_type_t type;
+  char errmsg[300];
 } igraph_i_dl_parsedata_t;

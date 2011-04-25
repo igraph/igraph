@@ -268,10 +268,10 @@ labeltolist: | labeltolist elabel {
 
 int igraph_dl_yyerror(YYLTYPE* locp, igraph_i_dl_parsedata_t* context, 
 		      const char *s) {
-  char err[300];
-  snprintf(err, sizeof(err)/sizeof(char)-1, "%s in line %i", s,
-	   locp->first_line);
-  return igraph_error(err, __FILE__, __LINE__, IGRAPH_PARSEERROR);
+  snprintf(context->errmsg, 
+	   sizeof(context->errmsg)/sizeof(char)-1, 
+	   "%s in line %i", s, locp->first_line);
+  return 0;
 }
 
 int igraph_i_dl_add_str(char *newstr, int length, 

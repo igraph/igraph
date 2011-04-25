@@ -2826,7 +2826,11 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
   
   i=igraph_dl_yyparse(&context);
   if (i != 0) {
-    IGRAPH_ERROR("Cannot read DL file", IGRAPH_PARSEERROR);
+    if (context.errmsg) { 
+      IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
+    } else {
+      IGRAPH_ERROR("Cannot read DL file", IGRAPH_PARSEERROR);
+    }
   }
 
   /* Extend the weight vector, if needed */
