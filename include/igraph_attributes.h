@@ -281,8 +281,6 @@ typedef struct igraph_attribute_table_t {
 			      igraph_strvector_t *value);
 } igraph_attribute_table_t;
 
-extern igraph_attribute_table_t *igraph_i_attribute_table;
-
 igraph_attribute_table_t *
 igraph_i_set_attribute_table(const igraph_attribute_table_t * table);
 
