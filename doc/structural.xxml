@@ -88,7 +88,11 @@
 <!-- doxrox-include igraph_bibcoupling -->
 <!-- doxrox-include igraph_cocitation -->
 <!-- doxrox-include igraph_similarity_jaccard -->
+<!-- doxrox-include igraph_similarity_jaccard_pairs -->
+<!-- doxrox-include igraph_similarity_jaccard_es -->
 <!-- doxrox-include igraph_similarity_dice -->
+<!-- doxrox-include igraph_similarity_dice_pairs -->
+<!-- doxrox-include igraph_similarity_dice_es -->
 <!-- doxrox-include igraph_similarity_inverse_log_weighted -->
 </section>
 
