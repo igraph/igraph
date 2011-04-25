@@ -4449,40 +4449,79 @@ PyObject *igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject * self,
  */
 PyObject *igraphmodule_Graph_similarity_jaccard(igraphmodule_GraphObject * self,
   PyObject * args, PyObject * kwds) {
-  static char *kwlist[] = { "vertices", "mode", "loops", NULL };
-  PyObject *vobj = NULL, *list = NULL, *loops = Py_True, *mode_o = Py_None;
-  igraph_matrix_t res;
+  static char *kwlist[] = { "vertices", "pairs", "mode", "loops", NULL };
+  PyObject *vertices_o = Py_None, *pairs_o = Py_None;
+  PyObject *list = NULL, *loops = Py_True, *mode_o = Py_None;
   igraph_neimode_t mode = IGRAPH_ALL;
-  int return_single = 0;
-  igraph_vs_t vs;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist, &vobj,
-	&mode_o, &loops))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOO", kwlist, &vertices_o,
+        &pairs_o, &mode_o, &loops))
     return NULL;
 
-  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
-  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &self->g, &return_single, 0)) return NULL; 
+  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode))
+    return NULL;
 
-  if (igraph_matrix_init(&res, 0, 0)) {
-    igraph_vs_destroy(&vs);
-    return igraphmodule_handle_igraph_error();
+  if (vertices_o != Py_None && pairs_o != Py_None) {
+    PyErr_SetString(PyExc_ValueError, "at most one of `vertices` and `pairs` "
+        "must be given");
+    return NULL;
   }
 
-  if (igraph_similarity_jaccard(&self->g,&res,vs,mode,PyObject_IsTrue(loops))) {
+  if (pairs_o == Py_None) {
+    /* Case #1: vertices, returning matrix */
+    igraph_matrix_t res;
+    igraph_vs_t vs;
+    int return_single = 0;
+
+    if (igraphmodule_PyObject_to_vs_t(vertices_o, &vs, &self->g, &return_single, 0))
+      return NULL;
+
+    if (igraph_matrix_init(&res, 0, 0)) {
+      igraph_vs_destroy(&vs);
+      return igraphmodule_handle_igraph_error();
+    }
+
+    if (igraph_similarity_jaccard(&self->g, &res, vs, mode, PyObject_IsTrue(loops))) {
+      igraph_matrix_destroy(&res);
+      igraph_vs_destroy(&vs);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+
+    igraph_vs_destroy(&vs);
+
+    list = igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT);
     igraph_matrix_destroy(&res);
-    igraph_vs_destroy(&vs);
-    igraphmodule_handle_igraph_error();
-    return NULL;
+  } else {
+    /* Case #2: vertex pairs or edges, returning list */
+    igraph_vector_t edges;
+    igraph_vector_t res;
+
+    if (igraphmodule_PyObject_to_vector_t(pairs_o, &edges, 1, 1))
+      return NULL;
+
+    if (igraph_vector_init(&res, igraph_vector_size(&edges) / 2)) {
+      igraph_vector_destroy(&edges);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+
+    if (igraph_similarity_jaccard_pairs(&self->g, &res, &edges, mode,
+          PyObject_IsTrue(loops))) {
+      igraph_vector_destroy(&res);
+      igraph_vector_destroy(&edges);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+
+    igraph_vector_destroy(&edges);
+
+    list = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT);
+    igraph_vector_destroy(&res);
   }
-
-  list = igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT);
-
-  igraph_matrix_destroy(&res);
-  igraph_vs_destroy(&vs);
 
   return list;
 }
-
 
 /** \ingroup python_interface_graph
  * \brief Calculates the Dice similarities of some vertices in a graph.
@@ -4491,36 +4530,76 @@ PyObject *igraphmodule_Graph_similarity_jaccard(igraphmodule_GraphObject * self,
  */
 PyObject *igraphmodule_Graph_similarity_dice(igraphmodule_GraphObject * self,
   PyObject * args, PyObject * kwds) {
-  static char *kwlist[] = { "vertices", "mode", "loops", NULL };
-  PyObject *vobj = NULL, *list = NULL, *loops = Py_True, *mode_o = Py_None;
-  igraph_matrix_t res;
+  static char *kwlist[] = { "vertices", "pairs", "mode", "loops", NULL };
+  PyObject *vertices_o = Py_None, *pairs_o = Py_None;
+  PyObject *list = NULL, *loops = Py_True, *mode_o = Py_None;
   igraph_neimode_t mode = IGRAPH_ALL;
-  int return_single = 0;
-  igraph_vs_t vs;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist, &vobj,
-	&mode_o, &loops))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOO", kwlist, &vertices_o,
+        &pairs_o, &mode_o, &loops))
     return NULL;
 
-  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
-  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &self->g, &return_single, 0)) return NULL;
+  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode))
+    return NULL;
 
-  if (igraph_matrix_init(&res, 0, 0)) {
-    igraph_vs_destroy(&vs);
-    return igraphmodule_handle_igraph_error();
+  if (vertices_o != Py_None && pairs_o != Py_None) {
+    PyErr_SetString(PyExc_ValueError, "at most one of `vertices` and `pairs` "
+        "must be given");
+    return NULL;
   }
 
-  if (igraph_similarity_dice(&self->g,&res,vs,mode,PyObject_IsTrue(loops))) {
+  if (pairs_o == Py_None) {
+    /* Case #1: vertices, returning matrix */
+    igraph_matrix_t res;
+    igraph_vs_t vs;
+    int return_single = 0;
+
+    if (igraphmodule_PyObject_to_vs_t(vertices_o, &vs, &self->g, &return_single, 0))
+      return NULL;
+
+    if (igraph_matrix_init(&res, 0, 0)) {
+      igraph_vs_destroy(&vs);
+      return igraphmodule_handle_igraph_error();
+    }
+
+    if (igraph_similarity_dice(&self->g, &res, vs, mode, PyObject_IsTrue(loops))) {
+      igraph_matrix_destroy(&res);
+      igraph_vs_destroy(&vs);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+
+    igraph_vs_destroy(&vs);
+
+    list = igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT);
     igraph_matrix_destroy(&res);
-    igraph_vs_destroy(&vs);
-    igraphmodule_handle_igraph_error();
-    return NULL;
+  } else {
+    /* Case #2: vertex pairs or edges, returning list */
+    igraph_vector_t edges;
+    igraph_vector_t res;
+
+    if (igraphmodule_PyObject_to_vector_t(pairs_o, &edges, 1, 1))
+      return NULL;
+
+    if (igraph_vector_init(&res, igraph_vector_size(&edges) / 2)) {
+      igraph_vector_destroy(&edges);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+
+    if (igraph_similarity_dice_pairs(&self->g, &res, &edges, mode,
+          PyObject_IsTrue(loops))) {
+      igraph_vector_destroy(&res);
+      igraph_vector_destroy(&edges);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+
+    igraph_vector_destroy(&edges);
+
+    list = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT);
+    igraph_vector_destroy(&res);
   }
-
-  list = igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT);
-
-  igraph_matrix_destroy(&res);
-  igraph_vs_destroy(&vs);
 
   return list;
 }
@@ -11248,14 +11327,17 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_similarity_dice */
   {"similarity_dice", (PyCFunction) igraphmodule_Graph_similarity_dice,
    METH_VARARGS | METH_KEYWORDS,
-   "similarity_dice(vertices=None, mode=IGRAPH_ALL, loops=True)\n\n"
+   "similarity_dice(vertices=None, edges=None, mode=IGRAPH_ALL, loops=True)\n\n"
    "Dice similarity coefficient of vertices.\n\n"
    "The Dice similarity coefficient of two vertices is twice the number of\n"
    "their common neighbors divided by the sum of their degrees. This\n"
    "coefficient is very similar to the Jaccard coefficient, but usually\n"
    "gives higher similarities than its counterpart.\n\n"
-   "@param vertices: the vertices to be analysed. If C{None}, all vertices\n"
-   "  will be considered.\n"
+   "@param vertices: the vertices to be analysed. If C{None} and I{edges} is also\n"
+   "  C{None}, all vertices will be considered.\n"
+   "@param pairs: the vertex pairs to be analysed. If this is given, I{vertices}\n"
+   "  must be C{None}, and the similarity values will be calculated only for the\n"
+   "  given pairs. Vertex pairs must be specified as tuples of vertex IDs.\n"
    "@param mode: which neighbors should be considered for directed graphs.\n"
    "  Can be L{ALL}, L{IN} or L{OUT}, ignored for undirected graphs.\n"
    "@param loops: whether vertices should be considered adjacent to\n"
@@ -11265,7 +11347,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  similarities compared to the case when an edge is added between them --\n"
    "  however, this might be exactly the result you want to get.\n"
    "@return: the pairwise similarity coefficients for the vertices specified,\n"
-   "  in the form of a matrix (list of lists).\n"
+   "  in the form of a matrix if C{pairs} is C{None} or in the form of a list\n"
+   "  if C{pairs} is not C{None}.\n"
   },
   /* interface to igraph_similarity_inverse_log_weighted */
   {"similarity_inverse_log_weighted",
@@ -11288,13 +11371,16 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_similarity_jaccard */
   {"similarity_jaccard", (PyCFunction) igraphmodule_Graph_similarity_jaccard,
    METH_VARARGS | METH_KEYWORDS,
-   "similarity_jaccard(vertices=None, mode=IGRAPH_ALL, loops=True)\n\n"
+   "similarity_jaccard(vertices=None, edges=None, mode=IGRAPH_ALL, loops=True)\n\n"
    "Jaccard similarity coefficient of vertices.\n\n"
    "The Jaccard similarity coefficient of two vertices is the number of their\n"
    "common neighbors divided by the number of vertices that are adjacent to\n"
    "at least one of them.\n\n"
-   "@param vertices: the vertices to be analysed. If C{None}, all vertices\n"
-   "  will be considered.\n"
+   "@param vertices: the vertices to be analysed. If C{None} and I{edges} is also\n"
+   "  C{None}, all vertices will be considered.\n"
+   "@param pairs: the vertex pairs to be analysed. If this is given, I{vertices}\n"
+   "  must be C{None}, and the similarity values will be calculated only for the\n"
+   "  given pairs. Vertex pairs must be specified as tuples of vertex IDs.\n"
    "@param mode: which neighbors should be considered for directed graphs.\n"
    "  Can be L{ALL}, L{IN} or L{OUT}, ignored for undirected graphs.\n"
    "@param loops: whether vertices should be considered adjacent to\n"
@@ -11304,7 +11390,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  similarities compared to the case when an edge is added between them --\n"
    "  however, this might be exactly the result you want to get.\n"
    "@return: the pairwise similarity coefficients for the vertices specified,\n"
-   "  in the form of a matrix (list of lists).\n"
+   "  in the form of a matrix if C{pairs} is C{None} or in the form of a list\n"
+   "  if C{pairs} is not C{None}.\n"
   },
 
   /******************/
