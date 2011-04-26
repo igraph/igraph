@@ -21,12 +21,10 @@ integer igraphiladlr_(integer *m, integer *n, doublereal *a, integer *lda)
     static integer i__, j;
 
 
-/*  -- LAPACK auxiliary routine (version 3.2.2)                        --   
-
-    -- June 2010                                                       --   
-
+/*  -- LAPACK auxiliary routine (version 3.3.1)                        --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -68,20 +66,10 @@ integer igraphiladlr_(integer *m, integer *n, doublereal *a, integer *lda)
 	ret_val = 0;
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
-/*           DO I = M, 1, -1   
-                IF( A(I, J).NE.ZERO ) EXIT   
-             END DO */
 	    i__ = *m;
-L10:
-	    if (a[i__ + j * a_dim1] != 0.) {
-		goto L20;
+	    while(a[i__ + j * a_dim1] != 0. && i__ >= 1) {
+		--i__;
 	    }
-	    if (*m == 1) {
-		goto L20;
-	    }
-	    --(*m);
-	    goto L10;
-L20:
 	    ret_val = max(ret_val,i__);
 	}
     }

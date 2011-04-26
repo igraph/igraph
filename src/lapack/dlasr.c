@@ -315,7 +315,7 @@
 	}
     } else if (igraphlsame_(side, "R")) {
 
-/*        Form A * P' */
+/*        Form A * P**T */
 
 	if (igraphlsame_(pivot, "V")) {
 	    if (igraphlsame_(direct, "F")) {

@@ -30,7 +30,7 @@
     static doublereal gam, gap1, gap2;
 
 
-/*  -- LAPACK routine (version 3.2)                                    --   
+/*  -- LAPACK routine (version 3.3.1)                                    --   
 
     -- Contributed by Osni Marques of the Lawrence Berkeley National   --   
     -- Laboratory and Beresford Parlett of the Univ. of California at  --   
@@ -46,6 +46,9 @@
 
     DLASQ4 computes an approximation TAU to the smallest eigenvalue   
     using values of d from the previous transform.   
+
+    Arguments   
+    =========   
 
     I0    (input) INTEGER   
           First index.   

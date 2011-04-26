@@ -35,17 +35,17 @@ static integer c_n1 = -1;
     static logical notran;
 
 
-/*  -- LAPACK routine (version 3.2) --   
+/*  -- LAPACK routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
     =======   
 
     DGETRS solves a system of linear equations   
-       A * X = B  or  A' * X = B   
+       A * X = B  or  A**T * X = B   
     with a general N-by-N matrix A using the LU factorization computed   
     by DGETRF.   
 
@@ -55,8 +55,8 @@ static integer c_n1 = -1;
     TRANS   (input) CHARACTER*1   
             Specifies the form of the system of equations:   
             = 'N':  A * X = B  (No transpose)   
-            = 'T':  A'* X = B  (Transpose)   
-            = 'C':  A'* X = B  (Conjugate transpose = Transpose)   
+            = 'T':  A**T* X = B  (Transpose)   
+            = 'C':  A**T* X = B  (Conjugate transpose = Transpose)   
 
     N       (input) INTEGER   
             The order of the matrix A.  N >= 0.   
@@ -147,14 +147,14 @@ static integer c_n1 = -1;
 		a[a_offset], lda, &b[b_offset], ldb);
     } else {
 
-/*        Solve A' * X = B.   
+/*        Solve A**T * X = B.   
 
-          Solve U'*X = B, overwriting B with X. */
+          Solve U**T *X = B, overwriting B with X. */
 
 	igraphdtrsm_("Left", "Upper", "Transpose", "Non-unit", n, nrhs, &c_b12, &a[
 		a_offset], lda, &b[b_offset], ldb);
 
-/*        Solve L'*X = B, overwriting B with X. */
+/*        Solve L**T *X = B, overwriting B with X. */
 
 	igraphdtrsm_("Left", "Lower", "Transpose", "Unit", n, nrhs, &c_b12, &a[
 		a_offset], lda, &b[b_offset], ldb);

@@ -44,17 +44,17 @@ static doublereal c_b14 = -1.;
 	    , ftnlen);
 
 
-/*  -- LAPACK routine (version 3.2) --   
+/*  -- LAPACK routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
     =======   
 
     DSYTD2 reduces a real symmetric matrix A to symmetric tridiagonal   
-    form T by an orthogonal similarity transformation: Q' * A * Q = T.   
+    form T by an orthogonal similarity transformation: Q**T * A * Q = T.   
 
     Arguments   
     =========   
@@ -116,7 +116,7 @@ static doublereal c_b14 = -1.;
 
     Each H(i) has the form   
 
-       H(i) = I - tau * v * v'   
+       H(i) = I - tau * v * v**T   
 
     where tau is a real scalar, and v is a real vector with   
     v(i+1:n) = 0 and v(i) = 1; v(1:i-1) is stored on exit in   
@@ -129,7 +129,7 @@ static doublereal c_b14 = -1.;
 
     Each H(i) has the form   
 
-       H(i) = I - tau * v * v'   
+       H(i) = I - tau * v * v**T   
 
     where tau is a real scalar, and v is a real vector with   
     v(1:i) = 0 and v(i+1) = 1; v(i+2:n) is stored on exit in A(i+2:n,i),   
@@ -190,7 +190,7 @@ static doublereal c_b14 = -1.;
 
 	for (i__ = *n - 1; i__ >= 1; --i__) {
 
-/*           Generate elementary reflector H(i) = I - tau * v * v'   
+/*           Generate elementary reflector H(i) = I - tau * v * v**T   
              to annihilate A(1:i-1,i+1) */
 
 	    igraphdlarfg_(&i__, &a[i__ + (i__ + 1) * a_dim1], &a[(i__ + 1) * a_dim1 
@@ -208,7 +208,7 @@ static doublereal c_b14 = -1.;
 		igraphdsymv_(uplo, &i__, &taui, &a[a_offset], lda, &a[(i__ + 1) * 
 			a_dim1 + 1], &c__1, &c_b8, &tau[1], &c__1);
 
-/*              Compute  w := x - 1/2 * tau * (x'*v) * v */
+/*              Compute  w := x - 1/2 * tau * (x**T * v) * v */
 
 		alpha = taui * -.5 * igraphddot_(&i__, &tau[1], &c__1, &a[(i__ + 1) 
 			* a_dim1 + 1], &c__1);
@@ -216,7 +216,7 @@ static doublereal c_b14 = -1.;
 			1], &c__1);
 
 /*              Apply the transformation as a rank-2 update:   
-                   A := A - v * w' - w * v' */
+                   A := A - v * w**T - w * v**T */
 
 		igraphdsyr2_(uplo, &i__, &c_b14, &a[(i__ + 1) * a_dim1 + 1], &c__1, 
 			&tau[1], &c__1, &a[a_offset], lda);
@@ -235,7 +235,7 @@ static doublereal c_b14 = -1.;
 	i__1 = *n - 1;
 	for (i__ = 1; i__ <= i__1; ++i__) {
 
-/*           Generate elementary reflector H(i) = I - tau * v * v'   
+/*           Generate elementary reflector H(i) = I - tau * v * v**T   
              to annihilate A(i+2:n,i) */
 
 	    i__2 = *n - i__;
@@ -258,7 +258,7 @@ static doublereal c_b14 = -1.;
 			lda, &a[i__ + 1 + i__ * a_dim1], &c__1, &c_b8, &tau[
 			i__], &c__1);
 
-/*              Compute  w := x - 1/2 * tau * (x'*v) * v */
+/*              Compute  w := x - 1/2 * tau * (x**T * v) * v */
 
 		i__2 = *n - i__;
 		alpha = taui * -.5 * igraphddot_(&i__2, &tau[i__], &c__1, &a[i__ + 
@@ -268,7 +268,7 @@ static doublereal c_b14 = -1.;
 			i__], &c__1);
 
 /*              Apply the transformation as a rank-2 update:   
-                   A := A - v * w' - w * v' */
+                   A := A - v * w**T - w * v**T */
 
 		i__2 = *n - i__;
 		igraphdsyr2_(uplo, &i__2, &c_b14, &a[i__ + 1 + i__ * a_dim1], &c__1,

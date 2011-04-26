@@ -71,10 +71,10 @@ static integer c__2 = 2;
     static doublereal ssfmax;
 
 
-/*  -- LAPACK routine (version 3.2) --   
+/*  -- LAPACK routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -253,7 +253,7 @@ L30:
 /*     Scale submatrix in rows and columns L to LEND */
 
     i__1 = lend - l + 1;
-    anorm = igraphdlanst_("I", &i__1, &d__[l], &e[l]);
+    anorm = igraphdlanst_("M", &i__1, &d__[l], &e[l]);
     iscale = 0;
     if (anorm == 0.) {
 	goto L10;

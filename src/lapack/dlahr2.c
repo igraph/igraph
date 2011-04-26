@@ -48,7 +48,7 @@ static doublereal c_b38 = 0.;
 	    doublereal *, integer *);
 
 
-/*  -- LAPACK auxiliary routine (version 3.2.1)                        --   
+/*  -- LAPACK auxiliary routine (version 3.3.1)                        --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
     -- April 2009                                                      --   
@@ -60,8 +60,8 @@ static doublereal c_b38 = 0.;
     DLAHR2 reduces the first NB columns of A real general n-BY-(n-k+1)   
     matrix A so that elements below the k-th subdiagonal are zero. The   
     reduction is performed by an orthogonal similarity transformation   
-    Q' * A * Q. The routine returns the matrices V and T which determine   
-    Q as a block reflector I - V*T*V', and also the matrix Y = A * V * T.   
+    Q**T * A * Q. The routine returns the matrices V and T which determine   
+    Q as a block reflector I - V*T*V**T, and also the matrix Y = A * V * T.   
 
     This is an auxiliary routine called by DGEHRD.   
 
@@ -116,7 +116,7 @@ static doublereal c_b38 = 0.;
 
     Each H(i) has the form   
 
-       H(i) = I - tau * v * v'   
+       H(i) = I - tau * v * v**T   
 
     where tau is a real scalar, and v is a real vector with   
     v(1:i+k-1) = 0, v(i+k) = 1; v(i+k+1:n) is stored on exit in   
@@ -125,7 +125,7 @@ static doublereal c_b38 = 0.;
     The elements of the vectors v together form the (n-k+1)-by-nb matrix   
     V which is needed, with T and Y, to apply the transformation to the   
     unreduced part of the matrix, using an update of the form:   
-    A := (I - V*T*V') * (A - Y*V').   
+    A := (I - V*T*V**T) * (A - Y*V**T).   
 
     The contents of A on exit are illustrated by the following example   
     with n = 7, k = 3 and nb = 2:   
@@ -183,7 +183,7 @@ static doublereal c_b38 = 0.;
 
 /*           Update A(K+1:N,I)   
 
-             Update I-th column of A - Y * V' */
+             Update I-th column of A - Y * V**T */
 
 	    i__2 = *n - *k;
 	    i__3 = i__ - 1;
@@ -191,7 +191,7 @@ static doublereal c_b38 = 0.;
 		    ldy, &a[*k + i__ - 1 + a_dim1], lda, &c_b5, &a[*k + 1 + 
 		    i__ * a_dim1], &c__1);
 
-/*           Apply I - V * T' * V' to this column (call it b) from the   
+/*           Apply I - V * T**T * V**T to this column (call it b) from the   
              left, using the last column of T as workspace   
 
              Let  V = ( V1 )   and   b = ( b1 )   (first I-1 rows)   
@@ -199,7 +199,7 @@ static doublereal c_b38 = 0.;
 
              where V1 is unit lower triangular   
 
-             w := V1' * b1 */
+             w := V1**T * b1 */
 
 	    i__2 = i__ - 1;
 	    igraphdcopy_(&i__2, &a[*k + 1 + i__ * a_dim1], &c__1, &t[*nb * t_dim1 + 
@@ -208,7 +208,7 @@ static doublereal c_b38 = 0.;
 	    igraphdtrmv_("Lower", "Transpose", "UNIT", &i__2, &a[*k + 1 + a_dim1], 
 		    lda, &t[*nb * t_dim1 + 1], &c__1);
 
-/*           w := w + V2'*b2 */
+/*           w := w + V2**T * b2 */
 
 	    i__2 = *n - *k - i__ + 1;
 	    i__3 = i__ - 1;
@@ -216,7 +216,7 @@ static doublereal c_b38 = 0.;
 		    lda, &a[*k + i__ + i__ * a_dim1], &c__1, &c_b5, &t[*nb * 
 		    t_dim1 + 1], &c__1);
 
-/*           w := T'*w */
+/*           w := T**T * w */
 
 	    i__2 = i__ - 1;
 	    igraphdtrmv_("Upper", "Transpose", "NON-UNIT", &i__2, &t[t_offset], ldt,

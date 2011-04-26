@@ -88,10 +88,10 @@ static integer c__2 = 2;
     static doublereal isrght, bsrtol, dpivot;
 
 
-/*  -- LAPACK auxiliary routine (version 3.2.2) --   
+/*  -- LAPACK auxiliary routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       June 2010   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -114,7 +114,7 @@ static integer c__2 = 2;
     Arguments   
     =========   
 
-    RANGE   (input) CHARACTER   
+    RANGE   (input) CHARACTER*1   
             = 'A': ("All")   all eigenvalues will be found.   
             = 'V': ("Value") all eigenvalues in the half-open interval   
                              (VL, VU] will be found.   
@@ -583,6 +583,9 @@ L21:
 /*           The initial SIGMA was to the outer end of the spectrum   
              the matrix is definite and we need not retreat. */
 	    tau = spdiam * eps * *n + *pivmin * 2.;
+/* Computing MAX */
+	    d__1 = tau, d__2 = eps * 2. * abs(sigma);
+	    tau = max(d__1,d__2);
 	} else {
 	    if (mb > 1) {
 		clwdth = w[wend] + werr[wend] - w[wbegin] - werr[wbegin];

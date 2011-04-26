@@ -71,10 +71,10 @@ static integer c__0 = 0;
     static logical toofew;
 
 
-/*  -- LAPACK routine (version 3.2) --   
+/*  -- LAPACK routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
        8-18-00:  Increase FUDGE factor for T3E (eca)   
 
 
@@ -343,7 +343,6 @@ static integer c__0 = 0;
     work[*n] = 0.;
     pivmin = 1.;
 
-/* DIR$ NOVECTOR */
     i__1 = *n;
     for (j = 2; j <= i__1; ++j) {
 /* Computing 2nd power */

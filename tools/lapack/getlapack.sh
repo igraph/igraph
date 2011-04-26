@@ -179,7 +179,7 @@ done >> ${arpackinc}
 
 echo "Sources are ready, to update your tree please run:
 
-  bzr rm ${origdir}/../src/lapack
+  bzr rm ${origdir}/../../src/lapack
   mv /tmp/${destdir} ${origdir}/../../src/lapack
   bzr add ${origdir}/../../src/lapack
 

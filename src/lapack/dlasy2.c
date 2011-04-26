@@ -72,7 +72,7 @@ static integer c__0 = 0;
            op(TL)*X + ISGN*X*op(TR) = SCALE*B,   
 
     where TL is N1 by N1, TR is N2 by N2, B is N1 by N2, and ISGN = 1 or   
-    -1.  op(T) = T or T', where T' denotes the transpose of T.   
+    -1.  op(T) = T or T**T, where T**T denotes the transpose of T.   
 
     Arguments   
     =========   
@@ -80,12 +80,12 @@ static integer c__0 = 0;
     LTRANL  (input) LOGICAL   
             On entry, LTRANL specifies the op(TL):   
                = .FALSE., op(TL) = TL,   
-               = .TRUE., op(TL) = TL'.   
+               = .TRUE., op(TL) = TL**T.   
 
     LTRANR  (input) LOGICAL   
             On entry, LTRANR specifies the op(TR):   
               = .FALSE., op(TR) = TR,   
-              = .TRUE., op(TR) = TR'.   
+              = .TRUE., op(TR) = TR**T.   
 
     ISGN    (input) INTEGER   
             On entry, ISGN specifies the sign of the equation   

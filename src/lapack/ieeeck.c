@@ -22,10 +22,10 @@ integer igraphieeeck_(integer *ispec, real *zero, real *one)
 	    newzro;
 
 
-/*  -- LAPACK auxiliary routine (version 3.2.2) --   
+/*  -- LAPACK auxiliary routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       June 2010   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -55,7 +55,9 @@ integer igraphieeeck_(integer *ispec, real *zero, real *one)
 
     RETURN VALUE:  INTEGER   
             = 0:  Arithmetic failed to produce the correct answers   
-            = 1:  Arithmetic produced the correct answers */
+            = 1:  Arithmetic produced the correct answers   
+
+    ===================================================================== */
 
     ret_val = 1;
 

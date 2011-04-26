@@ -31,7 +31,7 @@
 
     DSYR2  performs the symmetric rank 2 operation   
 
-       A := alpha*x*y' + alpha*y*x' + A,   
+       A := alpha*x*y**T + alpha*y*x**T + A,   
 
     where alpha is a scalar, x and y are n element vectors and A is an n   
     by n symmetric matrix.   
@@ -103,6 +103,8 @@
              max( 1, n ).   
              Unchanged on exit.   
 
+    Further Details   
+    ===============   
 
     Level 2 Blas routine.   
 
@@ -112,6 +114,7 @@
        Sven Hammarling, Nag Central Office.   
        Richard Hanson, Sandia National Labs.   
 
+    =====================================================================   
 
 
        Test the input parameters.   

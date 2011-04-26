@@ -107,17 +107,17 @@ static integer c__2 = 2;
     static integer isupmx;
 
 
-/*  -- LAPACK auxiliary routine (version 3.2.2) --   
+/*  -- LAPACK auxiliary routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       June 2010   
+    -- April 2011                                                      --   
 
 
     Purpose   
     =======   
 
     DLARRV computes the eigenvectors of the tridiagonal matrix   
-    T = L D L^T given L, D and APPROXIMATIONS to the eigenvalues of L D L^T.   
+    T = L D L**T given L, D and APPROXIMATIONS to the eigenvalues of L D L**T.   
     The input eigenvalues should have been computed by DLARRE.   
 
     Arguments   

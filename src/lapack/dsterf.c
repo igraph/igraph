@@ -16,7 +16,7 @@
 
 static integer c__0 = 0;
 static integer c__1 = 1;
-static doublereal c_b32 = 1.;
+static doublereal c_b33 = 1.;
 
 /* Subroutine */ int igraphdsterf_(integer *n, doublereal *d__, doublereal *e, 
 	integer *info)
@@ -36,7 +36,9 @@ static doublereal c_b32 = 1.;
     static doublereal bb, rt1, rt2, eps, rte;
     static integer lsv;
     static doublereal eps2, oldc;
-    static integer lend, jtot;
+    static integer lend;
+    static doublereal rmax;
+    static integer jtot;
     extern /* Subroutine */ int igraphdlae2_(doublereal *, doublereal *, doublereal 
 	    *, doublereal *, doublereal *);
     static doublereal gamma, alpha, sigma, anorm;
@@ -57,10 +59,10 @@ static doublereal c_b32 = 1.;
     static doublereal ssfmax;
 
 
-/*  -- LAPACK routine (version 3.2) --   
+/*  -- LAPACK routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -125,6 +127,7 @@ static doublereal c_b32 = 1.;
     safmax = 1. / safmin;
     ssfmax = sqrt(safmax) / 3.;
     ssfmin = sqrt(safmin) / eps2;
+    rmax = igraphdlamch_("O");
 
 /*     Compute the eigenvalues of the tridiagonal matrix. */
 
@@ -169,8 +172,11 @@ L30:
 /*     Scale submatrix in rows and columns L to LEND */
 
     i__1 = lend - l + 1;
-    anorm = igraphdlanst_("I", &i__1, &d__[l], &e[l]);
+    anorm = igraphdlanst_("M", &i__1, &d__[l], &e[l]);
     iscale = 0;
+    if (anorm == 0.) {
+	goto L10;
+    }
     if (anorm > ssfmax) {
 	iscale = 1;
 	i__1 = lend - l + 1;
@@ -257,7 +263,7 @@ L70:
 
 	rte = sqrt(e[l]);
 	sigma = (d__[l + 1] - p) / (rte * 2.);
-	r__ = igraphdlapy2_(&sigma, &c_b32);
+	r__ = igraphdlapy2_(&sigma, &c_b33);
 	sigma = p - rte / (sigma + d_sign(&r__, &sigma));
 
 	c__ = 1.;
@@ -355,7 +361,7 @@ L120:
 
 	rte = sqrt(e[l - 1]);
 	sigma = (d__[l - 1] - p) / (rte * 2.);
-	r__ = igraphdlapy2_(&sigma, &c_b32);
+	r__ = igraphdlapy2_(&sigma, &c_b33);
 	sigma = p - rte / (sigma + d_sign(&r__, &sigma));
 
 	c__ = 1.;

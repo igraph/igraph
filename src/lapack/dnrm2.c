@@ -34,11 +34,14 @@ doublereal igraphdnrm2_(integer *n, doublereal *x, integer *incx)
 
        DNRM2 := sqrt( x'*x )   
 
+    Further Details   
+    ===============   
 
     -- This version written on 25-October-1982.   
        Modified on 14-October-1993 to inline the call to DLASSQ.   
        Sven Hammarling, Nag Ltd.   
 
+    =====================================================================   
 
        Parameter adjustments */
     --x;

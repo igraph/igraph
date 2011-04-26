@@ -31,10 +31,10 @@
     static doublereal bignum;
 
 
-/*  -- LAPACK auxiliary routine (version 3.2) --   
+/*  -- LAPACK auxiliary routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -42,7 +42,7 @@
 
     DLAGTS may be used to solve one of the systems of equations   
 
-       (T - lambda*I)*x = y   or   (T - lambda*I)'*x = y,   
+       (T - lambda*I)*x = y   or   (T - lambda*I)**T*x = y,   
 
     where T is an n by n tridiagonal matrix, for x, following the   
     factorization of (T - lambda*I) as   
@@ -65,9 +65,9 @@
                   and, if overflow would otherwise occur, the diagonal   
                   elements of U are to be perturbed. See argument TOL   
                   below.   
-            =  2: The equations  (T - lambda*I)'x = y  are to be solved,   
+            =  2: The equations  (T - lambda*I)**Tx = y  are to be solved,   
                   but diagonal elements of U are not to be perturbed.   
-            = -2: The equations  (T - lambda*I)'x = y  are to be solved   
+            = -2: The equations  (T - lambda*I)**Tx = y  are to be solved   
                   and, if overflow would otherwise occur, the diagonal   
                   elements of U are to be perturbed. See argument TOL   
                   below.   
