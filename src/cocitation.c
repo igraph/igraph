@@ -684,7 +684,7 @@ int igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
  */
 int igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector_t *res,
 	const igraph_vector_t *pairs, igraph_neimode_t mode, igraph_bool_t loops) {
-  long int i, j, n;
+  long int i, n;
 
   IGRAPH_CHECK(igraph_similarity_jaccard_pairs(graph, res, pairs, mode, loops));
   n = igraph_vector_size(res);
@@ -749,7 +749,7 @@ int igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector_t *res,
  */
 int igraph_similarity_dice_es(const igraph_t *graph, igraph_vector_t *res,
 	const igraph_es_t es, igraph_neimode_t mode, igraph_bool_t loops) {
-  long int i, j, n;
+  long int i, n;
 
   IGRAPH_CHECK(igraph_similarity_jaccard_es(graph, res, es, mode, loops));
   n = igraph_vector_size(res);
