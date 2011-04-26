@@ -284,7 +284,8 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
   igraph_vector_destroy(&ws); 
   igraph_trie_destroy(&trie);
   igraph_vector_destroy(&edges);
-  IGRAPH_FINALLY_CLEAN(4);
+  igraph_ncol_yylex_destroy(context.scanner);
+  IGRAPH_FINALLY_CLEAN(5);
 
   return 0;
 }
@@ -441,43 +442,13 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
   return 0;
 }
 
-extern int igraph_pajek_yyparse(void);
-extern FILE *igraph_pajek_yyin;
-extern int igraph_i_pajek_eof;
-long int igraph_pajek_mylineno;
-igraph_vector_t *igraph_pajek_vector=0;
-igraph_bool_t igraph_pajek_directed;
-long int igraph_pajek_vcount;
-long int igraph_pajek_actfrom, igraph_pajek_actto;
-int igraph_pajek_mode=0;	/* 0 - general, 1 - vertex, 2 - edge */
-igraph_trie_t *igraph_i_pajek_vertex_attribute_names;
-igraph_vector_ptr_t *igraph_i_pajek_vertex_attributes;
-igraph_trie_t *igraph_i_pajek_edge_attribute_names;
-igraph_vector_ptr_t *igraph_i_pajek_edge_attributes;
-long int igraph_i_pajek_vertexid=0;
-long int igraph_i_pajek_actvertex=0;
-long int igraph_i_pajek_actedge=0;
-extern char *igraph_i_pajek_errmsg;
+#include "foreign-pajek-header.h"
 
-/* int vector_print(igraph_vector_t *v) { */
-/*   long int i, size=igraph_vector_size(v); */
-/*   for (i=0; i<size; i++) { */
-/*     printf("%f|", VECTOR(*v)[i]); */
-/*   } */
-/*   printf("\n"); */
-/*   return 0; */
-/* } */
-
-/* int strvector_print(igraph_strvector_t *sv) { */
-/*   long int i, size=igraph_strvector_size(sv); */
-/*   char *str; */
-/*   for (i=0; i<size; i++) { */
-/*     igraph_strvector_get(sv, i, &str); */
-/*     printf("%s|", str); */
-/*   } */
-/*   printf("\n"); */
-/*   return 0; */
-/* } */
+int igraph_pajek_yylex_init_extra(igraph_i_pajek_parsedata_t* user_defined,
+				  void* scanner);
+int igraph_pajek_yylex_destroy (void *scanner );
+int igraph_pajek_yyparse (igraph_i_pajek_parsedata_t* context);
+void igraph_pajek_yyset_in  (FILE * in_str, void* yyscanner );
 
 /**
  * \function igraph_read_graph_pajek
@@ -572,9 +543,8 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
   igraph_vector_ptr_t vattrs;
   igraph_trie_t eattrnames;
   igraph_vector_ptr_t eattrs;
-  /* igraph_hashtable_t vattrhash; */
-  /* igraph_hashtable_t eattrhash; */
   long int i, j;
+  igraph_i_pajek_parsedata_t context;
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 
@@ -583,30 +553,31 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
   IGRAPH_TRIE_INIT_FINALLY(&eattrnames, 1);
   IGRAPH_VECTOR_PTR_INIT_FINALLY(&eattrs, 0);
 
-  igraph_pajek_vector=&edges;
-  igraph_pajek_yyin=instream;
+  context.vector=&edges;
+  context.mode=0;
+  context.vcount=-1;
+  context.vertexid=0;
+  context.vertex_attribute_names=&vattrnames;
+  context.vertex_attributes=&vattrs;
+  context.edge_attribute_names=&eattrnames;
+  context.edge_attributes=&eattrs;
+  context.actedge=0;
+  context.eof=0;
 
-  igraph_pajek_mode=0;
-  igraph_pajek_vcount=-1;
-  igraph_i_pajek_vertexid=0;
-  igraph_i_pajek_vertex_attribute_names=&vattrnames;
-  igraph_i_pajek_vertex_attributes=&vattrs;
-  igraph_i_pajek_edge_attribute_names=&eattrnames;
-  igraph_i_pajek_edge_attributes=&eattrs;
-  igraph_i_pajek_actedge=0;
-  igraph_pajek_mylineno=1;
-  igraph_i_pajek_eof=0;
-  igraph_i_pajek_errmsg=0;
+  igraph_pajek_yylex_init_extra(&context, &context.scanner);
+  IGRAPH_FINALLY(igraph_pajek_yylex_destroy, context.scanner);
 
-  if (igraph_pajek_yyparse()) {
-    if (igraph_i_pajek_errmsg) {
-      IGRAPH_ERROR(igraph_i_pajek_errmsg, IGRAPH_PARSEERROR);
+  igraph_pajek_yyset_in(instream, context.scanner);    
+
+  if (igraph_pajek_yyparse(&context)) {
+    if (context.errmsg) {
+      IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
     } else {
       IGRAPH_ERROR("Cannot read Pajek file", IGRAPH_PARSEERROR);
     }
   }
 
-  if (igraph_pajek_vcount < 0)
+  if (context.vcount < 0)
     IGRAPH_ERROR("invalid vertex count in Pajek file", IGRAPH_EINVAL);
 
   for (i=0; i<igraph_vector_ptr_size(&eattrs); i++) {
@@ -614,23 +585,23 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     if (rec->type==IGRAPH_ATTRIBUTE_NUMERIC) {
       igraph_vector_t *vec=(igraph_vector_t*)rec->value;
       long int origsize=igraph_vector_size(vec);
-      igraph_vector_resize(vec, igraph_i_pajek_actedge);
-      for (j=origsize; j<igraph_i_pajek_actedge; j++) {
+      igraph_vector_resize(vec, context.actedge);
+      for (j=origsize; j<context.actedge; j++) {
 	VECTOR(*vec)[j] = IGRAPH_NAN;
       }
     } else if (rec->type==IGRAPH_ATTRIBUTE_STRING) {
       igraph_strvector_t *strvec=(igraph_strvector_t*)rec->value;
       long int origsize=igraph_strvector_size(strvec);
-      igraph_strvector_resize(strvec, igraph_i_pajek_actedge);
-      for (j=origsize; j<igraph_i_pajek_actedge; j++) {
+      igraph_strvector_resize(strvec, context.actedge);
+      for (j=origsize; j<context.actedge; j++) {
 	igraph_strvector_set(strvec, j, "");
       }
     }
   }
 
-  IGRAPH_CHECK(igraph_empty(graph, 0, igraph_pajek_directed));
+  IGRAPH_CHECK(igraph_empty(graph, 0, context.directed));
   IGRAPH_FINALLY(igraph_destroy, graph);
-  IGRAPH_CHECK(igraph_add_vertices(graph, igraph_pajek_vcount, &vattrs));
+  IGRAPH_CHECK(igraph_add_vertices(graph, context.vcount, &vattrs));
   IGRAPH_CHECK(igraph_add_edges(graph, &edges, &eattrs));
 
   for (i=0; i<igraph_vector_ptr_size(&vattrs); i++) {
@@ -668,8 +639,9 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
   igraph_trie_destroy(&eattrnames);
   igraph_vector_ptr_destroy(&vattrs);
   igraph_trie_destroy(&vattrnames);
+  igraph_pajek_yylex_destroy(context.scanner);
 
-  IGRAPH_FINALLY_CLEAN(6);
+  IGRAPH_FINALLY_CLEAN(7);
   return 0;
 }
 
