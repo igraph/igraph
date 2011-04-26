@@ -32,7 +32,6 @@
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "igraph_random.h"
-#include "igraph_interrupt.h"
 #include "igraph_progress.h"
 #include "igraph_statusbar.h"
 

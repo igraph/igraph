@@ -28,7 +28,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
-igraph_interruption_handler_t *igraph_i_interruption_handler=0;
+IGRAPH_THREAD_LOCAL igraph_interruption_handler_t 
+  *igraph_i_interruption_handler=0;
 
 int igraph_allow_interruption(void* data) {
   if (igraph_i_interruption_handler) {

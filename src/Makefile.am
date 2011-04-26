@@ -151,14 +151,14 @@ HEADERS_PRIVATE = atlas-edges.h \
 		hrg_dendro.h hrg_graph.h hrg_rbtree.h hrg_splittree_eq.h \
 		hrg_graph_simp.h foreign-gml-header.h \
 		foreign-ncol-header.h foreign-lgl-header.h \
-		foreign-pajek-header.h
+		foreign-pajek-header.h igraph_interrupt.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
 		../include/igraph_vector.h 	../include/igraph_matrix.h    \
 		../include/igraph_array.h 	../include/igraph_dqueue.h    \
 		../include/igraph_stack.h 	../include/igraph_heap.h      \
-		../include/igraph_arpack.h 	../include/igraph_interrupt.h \
+		../include/igraph_arpack.h 	\
 		../include/igraph_attributes.h 	../include/igraph_error.h     \
 		../include/igraph_pmt.h 	../include/igraph_pmt_off.h   \
 		../include/igraph_adjlist.h	../include/igraph_iterators.h \
