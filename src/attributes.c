@@ -236,7 +236,7 @@ int igraph_i_attribute_get_string_edge_attr(const igraph_t *graph,
 igraph_attribute_table_t *
 igraph_i_set_attribute_table(const igraph_attribute_table_t * table) {
   igraph_attribute_table_t *old=igraph_i_attribute_table;
-  igraph_i_attribute_table=table;
+  igraph_i_attribute_table=(igraph_attribute_table_t*) table;
   return old;
 }
 
