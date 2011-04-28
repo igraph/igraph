@@ -2321,14 +2321,15 @@ class Graph(GraphBase):
           lists of integers or lists of tuples as well, but they can't be
           mixed! Also accepts L{Edge} and L{EdgeSeq} objects.
         """
+        if isinstance(other, Graph):
+            return self.difference(other)
+
+        result = self.copy()
         if isinstance(other, (int, long, basestring)):
-            result = self.copy()
             result.delete_vertices([other])
         elif isinstance(other, tuple) and len(other) == 2:
-            result = self.copy()
             result.delete_edges([other])
         elif isinstance(other, list):
-            result = self.copy()
             if len(other)>0:
                 if isinstance(other[0], tuple):
                     result.delete_edges(other)
@@ -2337,7 +2338,7 @@ class Graph(GraphBase):
                 else:
                     return NotImplemented
             else:
-                return self.copy()
+                return result
         elif isinstance(other, _igraph.Vertex):
             result.delete_vertices(other)
         elif isinstance(other, _igraph.VertexSeq):
@@ -2346,10 +2347,9 @@ class Graph(GraphBase):
             result.delete_edges(other)
         elif isinstance(other, _igraph.EdgeSeq):
             result.delete_edges(other)
-        elif isinstance(other, Graph):
-            return self.difference(other)
         else:
             return NotImplemented
+
         return result
 
     def __mul__(self, other):
