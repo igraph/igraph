@@ -81,10 +81,7 @@ static void debug(const char* fmt, ...) {
  *
  * The steps of the algorithm are as follows:
  *
- *   1. Extracting weakly connected components. The remaining steps are
- *      executed for each component.
- *
- *   2. Cycle removal by finding an approximately minimal feedback arc set
+ *   1. Cycle removal by finding an approximately minimal feedback arc set
  *      and reversing the direction of edges in the set.  Algorithms for
  *      finding minimal feedback arc sets are as follows:
  *
@@ -120,7 +117,10 @@ static void debug(const char* fmt, ...) {
  *          B or from B to A in the cut, depending on which one is smaller. Yes,
  *          this is time-consuming.
  *
- *   3. Assigning vertices to layers according to [2].
+ *   2. Assigning vertices to layers according to [2].
+ *
+ *   3. Extracting weakly connected components. The remaining steps are
+ *      executed for each component.
  *
  *   4. Compacting the layering using the method of [4]. TODO
  *      Steps 2-4 are performed only when no layering is given in advance.
@@ -228,6 +228,7 @@ static inline igraph_real_t igraph_i_median_4(igraph_real_t x1,
   return (arr[1] + arr[2]) / 2.0;
 }
 
+
 /**
  * \ingroup layout
  * \function igraph_layout_sugiyama
@@ -313,11 +314,7 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
   IGRAPH_VECTOR_INIT_FINALLY(&membership, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&layer_to_y, 0);
 
-  /* 1. Find the connected components. */
-  IGRAPH_CHECK(igraph_clusters(graph, &membership, 0, &no_of_components,
-              IGRAPH_WEAK));
-
-  /* 2. Find a feedback arc set if we don't have a layering yet. If we do have
+  /* 1. Find a feedback arc set if we don't have a layering yet. If we do have
    *    a layering, we can leave all the edges as is as they will be re-oriented
    *    to point downwards only anyway. */
   if (layers == 0) {
@@ -348,6 +345,10 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
     igraph_vector_destroy(&inds);
     IGRAPH_FINALLY_CLEAN(1);
   }
+
+  /* 2. Find the connected components. */
+  IGRAPH_CHECK(igraph_clusters(graph, &membership, 0, &no_of_components,
+              IGRAPH_WEAK));
 
   /* 3. For each component... */
   dx = 0;
@@ -408,9 +409,7 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
             if (extd_to_orig_eids != 0)
               IGRAPH_CHECK(igraph_vector_push_back(extd_to_orig_eids, eid));
           }
-          continue;
-        }
-        if (VECTOR(layers_own)[i] > VECTOR(layers_own)[nei]) {
+        } else if (VECTOR(layers_own)[i] > VECTOR(layers_own)[nei]) {
           /* Edge goes upwards, we have to flip it */
           IGRAPH_CHECK(igraph_vector_push_back(&edgelist, 
                        VECTOR(old2new_vertex_ids)[nei]));
@@ -683,10 +682,15 @@ static int igraph_i_layout_sugiyama_calculate_barycenters(const igraph_t* graph,
   for (i = 0; i < n; i++) {
     IGRAPH_CHECK(igraph_neighbors(graph, &neis, VECTOR(*layer_members)[i], direction));
     m = igraph_vector_size(&neis);
-    for (j = 0; j < m; j++) {
-      VECTOR(*barycenters)[i] += MATRIX(*layout, (long)VECTOR(neis)[j], 0);
+    if (m == 0) {
+      /* No neighbors in this direction. Just use the current X coordinate */
+      VECTOR(*barycenters)[i] = MATRIX(*layout, i, 0);
+    } else {
+      for (j = 0; j < m; j++) {
+        VECTOR(*barycenters)[i] += MATRIX(*layout, (long)VECTOR(neis)[j], 0);
+      }
+      VECTOR(*barycenters)[i] /= m;
     }
-    VECTOR(*barycenters)[i] /= m;
   }
 
   igraph_vector_destroy(&neis);
@@ -748,7 +752,9 @@ static int igraph_i_layout_sugiyama_order_nodes_horizontally(const igraph_t* gra
 #endif
       IGRAPH_CHECK(igraph_vector_qsort_ind(&barycenters, &sort_indices, 0));
       for (i = 0; i < n; i++) {
-        VECTOR(barycenters)[i] = VECTOR(*layer_members)[(long)VECTOR(sort_indices)[i]];
+        nei = (long)VECTOR(*layer_members)[(long)VECTOR(sort_indices)[i]];
+        VECTOR(barycenters)[i] = nei;
+        MATRIX(*layout, nei, 0) = i;
       }
       if (!igraph_vector_is_equal(layer_members, &barycenters)) {
         IGRAPH_CHECK(igraph_vector_update(layer_members, &barycenters));
@@ -979,6 +985,8 @@ static int igraph_i_layout_sugiyama_place_nodes_horizontally(const igraph_t* gra
      * the max X coordinate of the alignment with the smallest width.
      */
     for (i = 0; i < 4; i++) {
+      if (j == i)
+        continue;
       if (i % 2 == 0) {
         /* Leftmost alignment */
         diff = mins[j] - mins[i];
