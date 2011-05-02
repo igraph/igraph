@@ -41,7 +41,8 @@ int main() {
   for (i=0; i<3; i++) MATRIX(pmat, i, i) = 0.2;
 
   /* undirected, no loops */
-  IGRAPH_CHECK(igraph_preference_game(&g, 1000, 3, &tdist, &pmat, 0, 0, 0));
+  IGRAPH_CHECK(igraph_preference_game(&g, 1000, 3, &tdist, /*fixed_sizes=*/ 0,
+				      &pmat, 0, 0, 0));
   if (igraph_vcount(&g) != 1000) return 18;
   if (igraph_is_directed(&g)) return 2;
   igraph_is_connected(&g, &conn, IGRAPH_STRONG);
@@ -55,7 +56,8 @@ int main() {
   for (i=0; i<2; i++) MATRIX(pmat, i, i+1) = 0.1;
 
   /* directed, no loops */
-  IGRAPH_CHECK(igraph_preference_game(&g, 1000, 3, &tdist, &pmat, 0, 1, 0));
+  IGRAPH_CHECK(igraph_preference_game(&g, 1000, 3, &tdist, /*fixed_sizes=*/0, 
+				      &pmat, 0, 1, 0));
   if (igraph_vcount(&g) != 1000) return 17;
   if (!igraph_is_directed(&g)) return 6;
   igraph_is_loop(&g, &bs, igraph_ess_all(IGRAPH_EDGEORDER_ID));
@@ -66,7 +68,8 @@ int main() {
 
   /* undirected, loops */
   for (i=0; i<3; i++) MATRIX(pmat, i, i) = 1.0;
-  IGRAPH_CHECK(igraph_preference_game(&g, 100, 3, &tdist, &pmat, 0, 0, 1));
+  IGRAPH_CHECK(igraph_preference_game(&g, 100, 3, &tdist, /*fixed_sizes=*/ 0,
+				      &pmat, 0, 0, 1));
   if (igraph_vcount(&g) != 100) return 16;
   if (igraph_ecount(&g) < 1395) return 20;
   if (igraph_is_directed(&g)) return 9;
@@ -77,7 +80,8 @@ int main() {
   igraph_destroy(&g);
 
   /* directed, loops */
-  IGRAPH_CHECK(igraph_preference_game(&g, 100, 3, &tdist, &pmat, 0, 1, 1));
+  IGRAPH_CHECK(igraph_preference_game(&g, 100, 3, &tdist, /*fixed_sizes=*/ 0,
+				      &pmat, 0, 1, 1));
   if (igraph_vcount(&g) != 100) return 15;
   if (igraph_ecount(&g) < 2700) return 19;
   if (!igraph_is_directed(&g)) return 12;

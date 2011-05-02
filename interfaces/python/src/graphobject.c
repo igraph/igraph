@@ -2462,7 +2462,7 @@ NULL };
   }
 
   if (igraph_preference_game(&g, (igraph_integer_t) n,
-                             (igraph_integer_t) types, &td, &pm,
+                             (igraph_integer_t) types, &td, 0, &pm,
                              store_attribs ? &type_vec : 0,
                              PyObject_IsTrue(directed),
                              PyObject_IsTrue(loops))) {

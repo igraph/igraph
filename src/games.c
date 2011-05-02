@@ -1813,17 +1813,30 @@ void igraph_i_preference_game_free_vids_by_type(igraph_vector_ptr_t *vecs) {
  * \brief Generates a graph with vertex types and connection preferences 
  * 
  * </para><para>
- * This is practically the nongrowing variant of \ref igraph_establishment_game .
- * A given number of vertices are generated. Every vertex is assigned to a
- * vertex type according to the given type probabilities. Finally, every
+ * This is practically the nongrowing variant of \ref
+ * igraph_establishment_game. A given number of vertices are
+ * generated. Every vertex is assigned to a vertex type according to
+ * the given type probabilities. Finally, every
  * vertex pair is evaluated and an edge is created between them with a
  * probability depending on the types of the vertices involved.
+ * 
+ * </para><para>
+ * In other words, this function generates a graph according to a
+ * block-model. Vertices are divided into groups (or blocks), and
+ * the probability the two vertices are connected depends on their
+ * groups only.
  * 
  * \param graph Pointer to an uninitialized graph.
  * \param nodes The number of vertices in the graph.
  * \param types The number of vertex types.
- * \param type_dist Vector giving the distribution of vertex types. If \c NULL ,
- *   all vertex types will have equal probability.
+ * \param type_dist Vector giving the distribution of vertex types. If
+ *   \c NULL, all vertex types will have equal probability. See also the
+ *   \c fixed_sizes argument.
+ * \param fixed_sizes Boolean. If true, then the number of vertices with a 
+ *   given vertex type is fixed and the \c type_dist argument gives these
+ *   numbers for each vertex type. If true, and \c type_dist is \c NULL, 
+ *   then the function tries to make vertex groups of the same size. If this 
+ *   is not possible, then some groups will have an extra vertex.
  * \param pref_matrix Matrix giving the connection probabilities for
  *   different vertex types. This should be symmetric if the requested
  *   graph is undirected.
@@ -1846,16 +1859,16 @@ void igraph_i_preference_game_free_vids_by_type(igraph_vector_ptr_t *vecs) {
  */
 
 int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
-			   igraph_integer_t types,
-			   igraph_vector_t *type_dist,
-			   igraph_matrix_t *pref_matrix,
+			   igraph_integer_t types,	
+			   const igraph_vector_t *type_dist,
+			   igraph_bool_t fixed_sizes,
+			   const igraph_matrix_t *pref_matrix,
 			   igraph_vector_t *node_type_vec,
 			   igraph_bool_t directed,
 			   igraph_bool_t loops) {
   
   long int i, j;
   igraph_vector_t edges, s;
-  igraph_vector_t cumdist;
   igraph_vector_t* nodetypes;
   igraph_vector_ptr_t vids_by_type;
   igraph_real_t maxcum, maxedges;
@@ -1872,7 +1885,12 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
       igraph_matrix_ncol(pref_matrix) < types)
     IGRAPH_ERROR("pref_matrix too small", IGRAPH_EINVAL);
 
-  IGRAPH_VECTOR_INIT_FINALLY(&cumdist, types+1);
+  if (fixed_sizes && type_dist) {
+    if (igraph_vector_sum(type_dist) != nodes) {
+      IGRAPH_ERROR("Invalid group sizes, their sum must match the number"
+		   " of vertices", IGRAPH_EINVAL);
+    }
+  }
 
   if (node_type_vec) {
     IGRAPH_CHECK(igraph_vector_resize(node_type_vec, nodes));
@@ -1898,28 +1916,60 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
   IGRAPH_FINALLY_CLEAN(1);   /* removing igraph_vector_ptr_destroy_all */
   IGRAPH_FINALLY(igraph_i_preference_game_free_vids_by_type, &vids_by_type);
 
-  VECTOR(cumdist)[0]=0;
-  if (type_dist) {
-    for (i=0; i<types; i++) 
-      VECTOR(cumdist)[i+1] = VECTOR(cumdist)[i]+VECTOR(*type_dist)[i];
-  } else {
-    for (i=0; i<types; i++) VECTOR(cumdist)[i+1] = i+1;
-  }
-  maxcum=igraph_vector_tail(&cumdist);
+  if (!fixed_sizes) {
 
-  RNG_BEGIN();
+    igraph_vector_t cumdist;
+    IGRAPH_VECTOR_INIT_FINALLY(&cumdist, types+1);
 
-  for (i=0; i<nodes; i++) {
-    long int type1;
-    igraph_real_t uni1=RNG_UNIF(0, maxcum);
-    igraph_vector_binsearch(&cumdist, uni1, &type1);
-    VECTOR(*nodetypes)[i] = type1-1;
-    IGRAPH_CHECK(igraph_vector_push_back(
+    VECTOR(cumdist)[0]=0;
+    if (type_dist) {
+      for (i=0; i<types; i++) 
+	VECTOR(cumdist)[i+1] = VECTOR(cumdist)[i]+VECTOR(*type_dist)[i];
+    } else {
+      for (i=0; i<types; i++) VECTOR(cumdist)[i+1] = i+1;
+    }
+    maxcum=igraph_vector_tail(&cumdist);
+
+    RNG_BEGIN();
+    
+    for (i=0; i<nodes; i++) {
+      long int type1;
+      igraph_real_t uni1=RNG_UNIF(0, maxcum);
+      igraph_vector_binsearch(&cumdist, uni1, &type1);
+      VECTOR(*nodetypes)[i] = type1-1;
+      IGRAPH_CHECK(igraph_vector_push_back(
 	    (igraph_vector_t*)VECTOR(vids_by_type)[type1-1], i));
-  }
+    }
 
-  igraph_vector_destroy(&cumdist);
-  IGRAPH_FINALLY_CLEAN(1);
+    igraph_vector_destroy(&cumdist);
+    IGRAPH_FINALLY_CLEAN(1);
+
+  } else {
+
+    int an=0;
+    if (type_dist) {
+      for (i=0; i<types; i++) {
+	int no=VECTOR(*type_dist)[i];
+	igraph_vector_t *v=VECTOR(vids_by_type)[i];
+	for (j=0; j<no && an < nodes; j++) {
+	  VECTOR(*nodetypes)[an] = i;
+	  IGRAPH_CHECK(igraph_vector_push_back(v, an));
+	  an++;
+	}
+      }
+    } else {
+      int fixno=ceil( (double)nodes / types);
+      for (i=0; i<types; i++) {
+	igraph_vector_t *v=VECTOR(vids_by_type)[i];
+	for (j=0; j<fixno && an < nodes; j++) {
+	  VECTOR(*nodetypes)[an++] = i;
+	  IGRAPH_CHECK(igraph_vector_push_back(v, an));
+	  an++;
+	}
+      }
+    }
+
+  }
 
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&s, 0);

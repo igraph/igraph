@@ -4,7 +4,7 @@
 \title{Trait-based random generation}
 \description{Generation of random graphs based on different vertex types.}
 \usage{
-preference.game(nodes, types, type.dist=rep(1, types),
+preference.game(nodes, types, type.dist=rep(1, types), fixed.sizes=FALSE,
     pref.matrix=matrix(1, types, types), directed=FALSE, loops=FALSE) 
 asymmetric.preference.game(nodes, types,
     type.dist.matrix=matrix(1,types,types),
@@ -16,6 +16,10 @@ asymmetric.preference.game(nodes, types,
   \item{type.dist}{The distribution of the vertex types, a numeric
     vector of length \sQuote{types} containing non-negative numbers. The
     vector will be normed to obtain probabilities.}
+  \item{fixed.sizes}{Fix the number of vertices with a given
+    vertex type label. The \code{type.dist} argument gives the group
+    sizes (i.e. number of vertices with the different labels) in this
+    case.}
   \item{type.dist.matrix}{The joint distribution of the in- and
     out-vertex types.}
   \item{pref.matrix}{A square matrix giving the preferences of the

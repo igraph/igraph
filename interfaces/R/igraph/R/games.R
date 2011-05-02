@@ -227,6 +227,7 @@ grg.game <- function(nodes, radius, torus=FALSE, coords=FALSE) {
 }
 
 preference.game <- function(nodes, types, type.dist=rep(1, types),
+                            fixed.sizes=FALSE,
                             pref.matrix=matrix(1, types, types),
                             directed=FALSE, loops=FALSE) {
 
@@ -235,10 +236,14 @@ preference.game <- function(nodes, types, type.dist=rep(1, types),
   }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_preference_game", as.double(nodes), as.double(types),
-        as.double(type.dist), matrix(as.double(pref.matrix), types, types),
-        as.logical(directed), as.logical(loops),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_preference_game", as.double(nodes),
+               as.double(types),
+               as.double(type.dist), as.logical(fixed.sizes),
+               matrix(as.double(pref.matrix), types, types),
+               as.logical(directed), as.logical(loops),
+               PACKAGE="igraph")
+  V(res[[1]])$type <- res[[2]]+1
+  res[[1]]
 }
 
 asymmetric.preference.game <- function(nodes, types,

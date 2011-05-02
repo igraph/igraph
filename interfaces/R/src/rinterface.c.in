@@ -5417,24 +5417,37 @@ SEXP R_igraph_neighborhood_graphs(SEXP graph, SEXP pvids, SEXP porder,
   return result;
 }
 
-SEXP R_igraph_preference_game(SEXP pnodes, SEXP ptypes,
-			      SEXP ptype_dist, SEXP pmatrix,
+SEXP R_igraph_preference_game(SEXP pnodes, SEXP ptypes, SEXP ptype_dist,
+			      SEXP pfixed_sizes, SEXP pmatrix,
 			      SEXP pdirected, SEXP ploops) {
   igraph_t g;
   igraph_integer_t nodes=REAL(pnodes)[0];
   igraph_integer_t types=REAL(ptypes)[0];
   igraph_vector_t type_dist;
+  igraph_bool_t fixed_sizes=LOGICAL(pfixed_sizes)[0];
   igraph_matrix_t matrix;
   igraph_bool_t directed=LOGICAL(pdirected)[0];
   igraph_bool_t loops=LOGICAL(ploops)[0];
+  igraph_vector_t vtypes;
   SEXP result;
   
   R_SEXP_to_vector(ptype_dist, &type_dist);
   R_SEXP_to_matrix(pmatrix, &matrix);
-  igraph_preference_game(&g, nodes, types, &type_dist, &matrix, 0,
-			 directed, loops);
-  PROTECT(result=R_igraph_to_SEXP(&g));
+  if (0!=igraph_vector_init(&vtypes, 0)) {
+    igraph_error("Cannot run preference game",
+		 __FILE__, __LINE__, IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_vector_destroy, &vtypes);
+  igraph_preference_game(&g, nodes, types, &type_dist, fixed_sizes, 
+			 &matrix, &vtypes,
+			 directed, loops);  
+  IGRAPH_FINALLY(igraph_destroy, &g);
+  PROTECT(result=NEW_LIST(2));
+  SET_VECTOR_ELT(result, 0, R_igraph_to_SEXP(&g));
+  SET_VECTOR_ELT(result, 1, R_igraph_vector_to_SEXP(&vtypes));
   igraph_destroy(&g);
+  igraph_vector_destroy(&vtypes);
+  IGRAPH_FINALLY_CLEAN(2);
   
   UNPROTECT(1);
   return result;
