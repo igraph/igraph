@@ -108,13 +108,15 @@ int igraph_rng_Python_seed(void *state, unsigned long int seed) {
  */
 unsigned long int igraph_rng_Python_get(void *state) {
   PyObject* result = PyObject_CallFunction(igraph_rng_Python_state.randint_func, "kk", 0, LONG_MAX);
+  unsigned long int retval;
+
   if (result == 0) {
     PyErr_WriteUnraisable(PyErr_Occurred());
     PyErr_Clear();
     /* Fallback to the C random generator */
     return rand() * LONG_MAX;
   }
-  unsigned long int retval = PyInt_AsLong(result);
+  retval = PyInt_AsLong(result);
   Py_DECREF(result);
   return retval;
 }
@@ -125,13 +127,16 @@ unsigned long int igraph_rng_Python_get(void *state) {
  */
 igraph_real_t igraph_rng_Python_get_real(void *state) {
   PyObject* result = PyObject_CallFunction(igraph_rng_Python_state.random_func, NULL);
+  double retval;
+
   if (result == 0) {
     PyErr_WriteUnraisable(PyErr_Occurred());
     PyErr_Clear();
     /* Fallback to the C random generator */
     return rand();
   }
-  double retval = PyFloat_AsDouble(result);
+
+  retval = PyFloat_AsDouble(result);
   Py_DECREF(result);
   return retval;
 }
@@ -143,13 +148,16 @@ igraph_real_t igraph_rng_Python_get_real(void *state) {
  */
 igraph_real_t igraph_rng_Python_get_norm(void *state) {
   PyObject* result = PyObject_CallFunction(igraph_rng_Python_state.gauss_func, "dd", 0.0, 1.0);
+  double retval;
+
   if (result == 0) {
     PyErr_WriteUnraisable(PyErr_Occurred());
     PyErr_Clear();
     /* Fallback to the C random generator */
     return 0;
   }
-  double retval = PyFloat_AsDouble(result);
+
+  retval = PyFloat_AsDouble(result);
   Py_DECREF(result);
   return retval;
 }
@@ -174,10 +182,12 @@ igraph_rng_type_t igraph_rngtype_Python = {
 };
 
 void igraphmodule_init_rng(PyObject* igraph_module) {
+  PyObject* random_module;
+
   if (igraph_rng_Python.state != 0)
     return;
 
-  PyObject* random_module = PyImport_ImportModule("random");
+  random_module = PyImport_ImportModule("random");
   if (random_module == 0) {
     PyErr_WriteUnraisable(PyErr_Occurred());
     PyErr_Clear();

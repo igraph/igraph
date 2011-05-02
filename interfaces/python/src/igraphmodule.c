@@ -190,12 +190,14 @@ int igraphmodule_igraph_status_hook(const char* message, void*data) {
 }
 
 PyObject* igraphmodule_set_progress_handler(PyObject* self, PyObject* o) {
+  PyObject* progress_handler;
+
   if (!PyCallable_Check(o) && o != Py_None) {
     PyErr_SetString(PyExc_TypeError, "Progress handler must be callable.");
     return NULL;
   }
 
-  PyObject* progress_handler = GETSTATE(self)->progress_handler;
+  progress_handler = GETSTATE(self)->progress_handler;
   if (o == progress_handler)
     Py_RETURN_NONE;
 
@@ -209,12 +211,14 @@ PyObject* igraphmodule_set_progress_handler(PyObject* self, PyObject* o) {
 }
 
 PyObject* igraphmodule_set_status_handler(PyObject* self, PyObject* o) {
+  PyObject* status_handler;
+
   if (!PyCallable_Check(o) && o != Py_None) {
     PyErr_SetString(PyExc_TypeError, "Status handler must be callable.");
     return NULL;
   }
 
-  PyObject* status_handler = GETSTATE(self)->status_handler;
+  status_handler = GETSTATE(self)->status_handler;
   if (o == status_handler)
     Py_RETURN_NONE;
 

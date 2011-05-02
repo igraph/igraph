@@ -49,6 +49,10 @@ typedef int    igraph_integer_t;
 typedef double igraph_real_t;
 typedef int    igraph_bool_t;
 
+/* igraph_i_fdiv is needed here instead of in igraph_math.h because
+ * some constants use it */
+double igraph_i_fdiv(const double a, const double b);
+
 #if defined(INFINITY)
 #  define IGRAPH_INFINITY INFINITY
 #  define IGRAPH_POSINFINITY INFINITY
@@ -67,7 +71,6 @@ int igraph_finite(double x);
 #elif defined(INFINITY)
 #  define IGRAPH_NAN (INFINITY/INFINITY)
 #else
-#  include "igraph_math.h"
 #  define IGRAPH_NAN (igraph_i_fdiv(0.0, 0.0))
 #endif
 

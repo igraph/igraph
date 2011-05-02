@@ -94,6 +94,9 @@ void igraphmodule_Vertex_dealloc(igraphmodule_VertexObject* self) {
 PyObject* igraphmodule_Vertex_repr(igraphmodule_VertexObject *self) {
   PyObject *s;
   PyObject *attrs;
+#ifndef IGRAPH_PYTHON3
+  PyObject *grepr, *drepr;
+#endif
 
   attrs = igraphmodule_Vertex_attributes(self);
   if (attrs == 0)
@@ -104,8 +107,6 @@ PyObject* igraphmodule_Vertex_repr(igraphmodule_VertexObject *self) {
       (PyObject*)self->gref, self->idx, attrs);
   Py_DECREF(attrs);
 #else
-  PyObject *grepr, *drepr;
-
   grepr=PyObject_Repr((PyObject*)self->gref);
   drepr=PyObject_Repr(igraphmodule_Vertex_attributes(self));
   Py_DECREF(attrs);
@@ -419,9 +420,11 @@ static PyObject* _convert_to_vertex_list(igraphmodule_VertexObject* vertex, PyOb
   n = PyList_Size(obj);
   for (i = 0; i < n; i++) {
     PyObject* idx = PyList_GET_ITEM(obj, i);
+    PyObject* v;
+
     if (!PyInt_Check(idx))
       PyErr_SetString(PyExc_TypeError, "_convert_to_vertex_list expected list of integers");
-    PyObject* v = igraphmodule_Vertex_New(vertex->gref, PyInt_AsLong(idx));
+    v = igraphmodule_Vertex_New(vertex->gref, PyInt_AsLong(idx));
     PyList_SetItem(obj, i, v);   /* reference to v stolen, reference to idx discarded */
   }
 

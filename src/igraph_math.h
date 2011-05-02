@@ -43,7 +43,6 @@ __BEGIN_DECLS
 /*
  * Compiler-related hacks, mostly because of Microsoft Visual C++
  */
-double igraph_i_fdiv(const double a, const double b);
 double igraph_i_round(double X);
 int igraph_i_snprintf(char *buffer, size_t count, const char *format, ...);
 
