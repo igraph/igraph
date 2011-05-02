@@ -1357,8 +1357,8 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
     for (j=0; j<no_of_edges; j++) {
       igraph_integer_t from, to;
       igraph_real_t xd, yd, dist, force;
+      igraph_real_t w = weight ? VECTOR(*weight)[j] : 1.0;
       igraph_edge(graph, j, &from, &to);
-      igraph_real_t w= weight ? VECTOR(*weight)[j] : 1.0;
       xd=MATRIX(*res, (long int)from, 0)-MATRIX(*res, (long int)to, 0);
       yd=MATRIX(*res, (long int)from, 1)-MATRIX(*res, (long int)to, 1);
       dist=sqrt(xd*xd+yd*yd);

@@ -51,7 +51,7 @@ void parse::print_syntax( const char *error_string )
   cout << endl << "Layout" << endl
 	   <<     "------" << endl
 	   << "S. Martin" << endl
-	   << "Version " << VERSION << endl << endl
+	   << "Version " << DRL_VERSION << endl << endl
 	   << "This program provides a parallel adaptation of a force directed" << endl
 	   << "graph layout algorithm for use with large datasets." << endl << endl
 	   << "Usage: layout [options] root_file" << endl << endl

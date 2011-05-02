@@ -919,7 +919,7 @@ int igraph_i_cattributes_sn_concat(const igraph_attribute_record_t *oldrec,
   for (i=0; i<newlen; i++) {
     igraph_vector_t *idx=VECTOR(*merges)[i];
     long int j, n=igraph_vector_size(idx);
-    long int len=0;
+    size_t len=0;
     char *tmp, *tmp2;
     for (j=0; j<n; j++) {
       igraph_strvector_get(oldv, j, &tmp);

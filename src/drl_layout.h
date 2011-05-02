@@ -33,7 +33,7 @@
 // This file contains compile time parameters which affect the entire
 // DrL program.
 
-#define VERSION "3.2 5/5/2006"
+#define DRL_VERSION "3.2 5/5/2006"
 
 // compile time parameters for MPI message passing
 #define MAX_PROCS 256	   // maximum number of processors

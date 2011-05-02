@@ -29,6 +29,7 @@
 #include "config.h"
 #include <math.h>
 #include <stdarg.h>
+#include <string.h>
 
 /**
  * \ingroup nongraph
@@ -254,5 +255,17 @@ int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
 double igraph_i_fdiv(const double a, const double b) 
 {
    return a / b;
+}
+
+/**
+ * Internal function, drop-in replacement for stdup
+ * Used only in compilers that do not have strdup or _strdup
+ */
+char* igraph_i_strdup(const char *s) {
+    size_t n = strlen(s) + 1;
+    char* result = (char*)malloc(sizeof(char) * n);
+    if (result)
+        memcpy(result, s, n);
+    return result;
 }
 

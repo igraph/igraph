@@ -67,6 +67,7 @@ int igraph_finite(double x);
 #elif defined(INFINITY)
 #  define IGRAPH_NAN (INFINITY/INFINITY)
 #else
+#  include "igraph_math.h"
 #  define IGRAPH_NAN (igraph_i_fdiv(0.0, 0.0))
 #endif
 

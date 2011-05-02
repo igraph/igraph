@@ -2221,6 +2221,7 @@ Cell *Graph::find_next_cell_to_be_splitted(Cell *cell)
     return sh_first_largest_max_neighbours(cell);
   default:
     assert(false && "Unknown splitting heuristics");
+    return 0;
   }
 }
 

@@ -273,7 +273,7 @@ void igraph_strvector_move_interval(igraph_strvector_t *v, long int begin,
   }
   for (i=0; i<end-begin; i++) {
     if (v->data[begin+i] != 0) {
-      long int len=strlen(v->data[begin+i])+1;
+      size_t len=strlen(v->data[begin+i])+1;
       v->data[to+i]=igraph_Calloc(len, char);
       memcpy(v->data[to+i], v->data[begin+i], sizeof(char)*len);
     }

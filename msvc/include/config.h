@@ -7,6 +7,9 @@
 /* Define to 1 if you have the `expm1' function. */
 /* #undef HAVE_EXPM1 */
 
+/* Define to 1 if you have the `fabsl' function. */
+#define HAVE_FABSL 1
+
 /* Define to 1 if you have the `finite' function. */
 #define HAVE_FINITE 1
 

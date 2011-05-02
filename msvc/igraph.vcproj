@@ -21,7 +21,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include"
-				PreprocessorDefinitions="Win32;WIN32;_WINDOWS;_USRDLL;IGRAPH_EXPORTS"
+				PreprocessorDefinitions="Win32;WIN32;_WINDOWS;_USRDLL;IGRAPH_EXPORTS;USE_CLOCK"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -60,7 +60,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include"
-				PreprocessorDefinitions="Win32;WIN32;_DEBUG;_WINDOWS;_USRDLL;IGRAPH_EXPORTS"
+				PreprocessorDefinitions="Win32;WIN32;_DEBUG;_WINDOWS;_USRDLL;IGRAPH_EXPORTS;USE_CLOCK"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -189,37 +189,34 @@
 				RelativePath=".\src\f2c\d_sign.c">
 			</File>
 			<File
-				RelativePath=".\src\blas\dasum.c">
+				RelativePath=".\src\lapack\dasum.c">
 			</File>
 			<File
-				RelativePath=".\src\blas\daxpy.c">
+				RelativePath=".\src\lapack\daxpy.c">
 			</File>
 			<File
-				RelativePath=".\src\blas\dcopy.c">
+				RelativePath=".\src\lapack\dcopy.c">
 			</File>
 			<File
-				RelativePath=".\src\blas\ddot.c">
+				RelativePath=".\src\lapack\ddot.c">
 			</File>
 			<File
 				RelativePath=".\src\DensityGrid.cpp">
 			</File>
 			<File
-				RelativePath=".\src\blas\dgemv.c">
+				RelativePath=".\src\lapack\dgemv.c">
 			</File>
 			<File
 				RelativePath=".\src\lapack\dgeqr2.c">
 			</File>
 			<File
-				RelativePath=".\src\blas\dger.c">
+				RelativePath=".\src\lapack\dger.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dgetv0.c">
+				RelativePath=".\src\lapack\dgetv0.c">
 			</File>
 			<File
 				RelativePath=".\src\lapack\dlabad.c">
-			</File>
-			<File
-				RelativePath=".\src\lapack\dlacon.c">
 			</File>
 			<File
 				RelativePath=".\src\lapack\dlacpy.c">
@@ -261,7 +258,7 @@
 				RelativePath=".\src\lapack\dlapy2.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dlaqrb.c">
+				RelativePath=".\src\lapack\dlaqrb.c">
 			</File>
 			<File
 				RelativePath=".\src\lapack\dlarf.c">
@@ -300,34 +297,34 @@
 				RelativePath=".\src\lapack\dlasy2.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dmout.c">
+				RelativePath=".\src\lapack\dmout.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dnaitr.c">
+				RelativePath=".\src\lapack\dnaitr.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dnapps.c">
+				RelativePath=".\src\lapack\dnapps.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dnaup2.c">
+				RelativePath=".\src\lapack\dnaup2.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dnaupd.c">
+				RelativePath=".\src\lapack\dnaupd.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dnconv.c">
+				RelativePath=".\src\lapack\dnconv.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dneigh.c">
+				RelativePath=".\src\lapack\dneigh.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dneupd.c">
+				RelativePath=".\src\lapack\dneupd.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dngets.c">
+				RelativePath=".\src\lapack\dngets.c">
 			</File>
 			<File
-				RelativePath=".\src\blas\dnrm2.c">
+				RelativePath=".\src\lapack\dnrm2.c">
 			</File>
 			<File
 				RelativePath=".\src\lapack\dorm2r.c">
@@ -345,58 +342,58 @@
 				RelativePath=".\src\drl_parse.cpp">
 			</File>
 			<File
-				RelativePath=".\src\blas\drot.c">
+				RelativePath=".\src\lapack\drot.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dsaitr.c">
+				RelativePath=".\src\lapack\dsaitr.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dsapps.c">
+				RelativePath=".\src\lapack\dsapps.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dsaup2.c">
+				RelativePath=".\src\lapack\dsaup2.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dsaupd.c">
+				RelativePath=".\src\lapack\dsaupd.c">
 			</File>
 			<File
-				RelativePath=".\src\blas\dscal.c">
+				RelativePath=".\src\lapack\dscal.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dsconv.c">
+				RelativePath=".\src\lapack\dsconv.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dseigt.c">
+				RelativePath=".\src\lapack\dseigt.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dsesrt.c">
+				RelativePath=".\src\lapack\dsesrt.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dseupd.c">
+				RelativePath=".\src\lapack\dseupd.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dsgets.c">
+				RelativePath=".\src\lapack\dsgets.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dsortc.c">
+				RelativePath=".\src\lapack\dsortc.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dsortr.c">
+				RelativePath=".\src\lapack\dsortr.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dstatn.c">
+				RelativePath=".\src\lapack\dstatn.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dstats.c">
+				RelativePath=".\src\lapack\dstats.c">
 			</File>
 			<File
 				RelativePath=".\src\lapack\dsteqr.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dstqrb.c">
+				RelativePath=".\src\lapack\dstqrb.c">
 			</File>
 			<File
-				RelativePath=".\src\blas\dswap.c">
+				RelativePath=".\src\lapack\dswap.c">
 			</File>
 			<File
 				RelativePath=".\src\lapack\dtrevc.c">
@@ -405,7 +402,7 @@
 				RelativePath=".\src\lapack\dtrexc.c">
 			</File>
 			<File
-				RelativePath=".\src\blas\dtrmm.c">
+				RelativePath=".\src\lapack\dtrmm.c">
 			</File>
 			<File
 				RelativePath=".\src\lapack\dtrsen.c">
@@ -414,7 +411,7 @@
 				RelativePath=".\src\lapack\dtrsyl.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\dvout.c">
+				RelativePath=".\src\lapack\dvout.c">
 			</File>
 			<File
 				RelativePath=".\src\error.c">
@@ -498,7 +495,7 @@
 				RelativePath=".\src\f2c\i_dnnt.c">
 			</File>
 			<File
-				RelativePath=".\src\blas\idamax.c">
+				RelativePath=".\src\lapack\idamax.c">
 			</File>
 			<File
 				RelativePath=".\src\igraph_buckets.c">
@@ -534,22 +531,19 @@
 				RelativePath=".\src\iterators.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\ivout.c">
+				RelativePath=".\src\lapack\ivout.c">
 			</File>
 			<File
 				RelativePath=".\src\layout.c">
 			</File>
 			<File
-				RelativePath=".\src\blas\lsame.c">
+				RelativePath=".\src\lapack\lsame.c">
 			</File>
 			<File
 				RelativePath=".\src\math.c">
 			</File>
 			<File
 				RelativePath=".\src\matrix.c">
-			</File>
-			<File
-				RelativePath=".\src\measure_dynamics.c">
 			</File>
 			<File
 				RelativePath=".\src\memory.c">
@@ -603,7 +597,7 @@
 				RelativePath=".\src\f2c\s_copy.c">
 			</File>
 			<File
-				RelativePath=".\src\arpack\second.c">
+				RelativePath=".\src\lapack\second.c">
 			</File>
 			<File
 				RelativePath=".\src\spectral_properties.c">
