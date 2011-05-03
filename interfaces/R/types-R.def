@@ -247,6 +247,29 @@ SCGNORM:
     DEFAULT:
       Default: c("row", "col")
 
+SCGDIR:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "default"=1, "left"=2, "right"=3)
+    DEFAULT: 
+      Default: c("default", "left", "right")
+
 SPARSEMAT:
+    INCONV: require(Matrix); %I% <- as(%I%, "dgCMatrix")
 
 SPARSEMAT_OR_0:
+    INCONV: if (!is.null(%I%)) { \
+               require(Matrix); %I% <- as(%I%, "dgCMatrix") \
+            }
+
+CVECTOR:
+    INCONV: %I% <- as.complex(%I%)
+
+CMATRIX:
+    INCONV: %I% <- structure(as.complex(%I%), dim=dim(%I%))
+
+CVECTOR_OR_0:
+    if (!is.null(%I%)) { INCONV: %I% <- as.complex(%I%) }
+
+CMATRIX_OR_0:
+    if (!is.null(%I%)) { \
+       INCONV: %I% <- structure(as.complex(%I%), dim=dim(%I%)) \
+    }
