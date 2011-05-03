@@ -11327,13 +11327,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_similarity_dice */
   {"similarity_dice", (PyCFunction) igraphmodule_Graph_similarity_dice,
    METH_VARARGS | METH_KEYWORDS,
-   "similarity_dice(vertices=None, edges=None, mode=IGRAPH_ALL, loops=True)\n\n"
+   "similarity_dice(vertices=None, pairs=None, mode=IGRAPH_ALL, loops=True)\n\n"
    "Dice similarity coefficient of vertices.\n\n"
    "The Dice similarity coefficient of two vertices is twice the number of\n"
    "their common neighbors divided by the sum of their degrees. This\n"
    "coefficient is very similar to the Jaccard coefficient, but usually\n"
    "gives higher similarities than its counterpart.\n\n"
-   "@param vertices: the vertices to be analysed. If C{None} and I{edges} is also\n"
+   "@param vertices: the vertices to be analysed. If C{None} and I{pairs} is also\n"
    "  C{None}, all vertices will be considered.\n"
    "@param pairs: the vertex pairs to be analysed. If this is given, I{vertices}\n"
    "  must be C{None}, and the similarity values will be calculated only for the\n"
@@ -11371,12 +11371,12 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_similarity_jaccard */
   {"similarity_jaccard", (PyCFunction) igraphmodule_Graph_similarity_jaccard,
    METH_VARARGS | METH_KEYWORDS,
-   "similarity_jaccard(vertices=None, edges=None, mode=IGRAPH_ALL, loops=True)\n\n"
+   "similarity_jaccard(vertices=None, pairs=None, mode=IGRAPH_ALL, loops=True)\n\n"
    "Jaccard similarity coefficient of vertices.\n\n"
    "The Jaccard similarity coefficient of two vertices is the number of their\n"
    "common neighbors divided by the number of vertices that are adjacent to\n"
    "at least one of them.\n\n"
-   "@param vertices: the vertices to be analysed. If C{None} and I{edges} is also\n"
+   "@param vertices: the vertices to be analysed. If C{None} and I{pairs} is also\n"
    "  C{None}, all vertices will be considered.\n"
    "@param pairs: the vertex pairs to be analysed. If this is given, I{vertices}\n"
    "  must be C{None}, and the similarity values will be calculated only for the\n"

@@ -738,8 +738,7 @@ class Graph(GraphBase):
 
         @newfield ref: Reference
         @ref: Prim, R.C.: I{Shortest connection networks and some
-          generalizations}. Bell System Technical Journal 36:1389-1401,
-          1957.
+          generalizations}. Bell System Technical Journal 36:1389-1401, 1957.
         """
         result = GraphBase._spanning_tree(self, weights)
         if not eids:
@@ -3246,7 +3245,8 @@ def _graphmethod(func=None, name=None):
       C{None}, it defaults to the name of the decorated function.
     @return: the decorated function
     """
-    if name is None: name = func.__name__
+    if name is None:
+        name = func.__name__
     method = getattr(Graph, name)
 
     if hasattr(func, "__call__"):

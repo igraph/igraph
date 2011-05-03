@@ -39,7 +39,7 @@ which latex >/dev/null && PDF=1
 
 if [ $PDF -eq 1 ]; then
   echo "Generating PDF documentation..."
-  epydoc --pdf -o pdf --exclude=igraph.test --inheritance=listed -v --name="IGraph library" --url="http://cneurocvs.rmki.kfki.hu/igraph" $PACKAGES
+  epydoc --pdf -o pdf --exclude=igraph.test --inheritance=listed -v --name="IGraph library" --url="http://igraph.sourceforge.net" $PACKAGES
 
   echo "Moving PDF documentation to the HTML subdirectory..."
   mv pdf/api.pdf html/igraph.pdf
