@@ -264,7 +264,7 @@ igraph_set_error_handler(igraph_error_handler_t* new_handler);
 /**
  * \typedef igraph_error_type_t
  * \brief Error code type.
- * These are the possible valued returned by \a igraph functions.
+ * These are the possible values returned by \a igraph functions.
  * Note that these are interesting only if you defined an error handler
  * with \ref igraph_set_error_handler(). Otherwise the program is aborted 
  * and the function causing the error never returns.
@@ -286,7 +286,7 @@ igraph_set_error_handler(igraph_error_handler_t* new_handler);
  *    square matrix was expected.
  * \enumval IGRAPH_EINVMODE Invalid mode parameter.
  * \enumval IGRAPH_EFILE A file operation failed. Eg. a file doesn't exist,
- *   or the user ha no rights to open it.
+ *   or the user has no rights to open it.
  * \enumval IGRAPH_UNIMPLEMENTED Attempted to call an unimplemented or
  *   disabled (at compile-time) function.
  * \enumval IGRAPH_DIVERGED A numeric algorithm failed to converge.
@@ -399,9 +399,9 @@ typedef enum {
  * handler without returning from the current function, call
  * \ref igraph_error() directly.
  * \param reason Textual description of the error. This should be
- *   something more explaning than the text associated with the error
+ *   something more descriptive than the text associated with the error
  *   code. Eg. if the error code is \c IGRAPH_EINVAL,
- *   its asssociated text (see  \ref igraph_strerror()) is "Invalid
+ *   its associated text (see  \ref igraph_strerror()) is "Invalid
  *   value" and this string should explain which parameter was invalid
  *   and maybe why. 
  * \param igraph_errno The \a igraph error code.
@@ -417,7 +417,7 @@ typedef enum {
  * \function igraph_error
  * \brief Trigger an error.
  *
- * \a igraph functions usually call this fuction (most often via the 
+ * \a igraph functions usually call this function (most often via the 
  * \ref IGRAPH_ERROR macro) if they notice an error.
  * It calls the currently installed error handler function with the
  * supplied arguments. 
@@ -451,7 +451,7 @@ const char* igraph_strerror(const int igraph_errno);
 #define IGRAPH_ERROR_SELECT_4(a,b,c,d)   ((a) != IGRAPH_SUCCESS ? (a) : IGRAPH_ERROR_SELECT_3(b,c,d))
 #define IGRAPH_ERROR_SELECT_5(a,b,c,d,e) ((a) != IGRAPH_SUCCESS ? (a) : IGRAPH_ERROR_SELECT_4(b,c,d,e))
 
-/* Now comes the more conveninent error handling macro arsenal.
+/* Now comes the more convenient error handling macro arsenal.
  * Ideas taken from exception.{h,c} by Laurent Deniau see
  * http://cern.ch/Laurent.Deniau/html/oopc/oopc.html#Exceptions for more 
  * information. We don't use the exception handling code though.  */
@@ -556,12 +556,12 @@ int IGRAPH_FINALLY_STACK_SIZE(void);
  * 
  * </para><para>There is only one reason to use this macro when writing 
  * \a igraph functions. If the user installs an error handler which
- * returns to the auxilary calling code (like \ref
+ * returns to the auxiliary calling code (like \ref
  * igraph_error_handler_ignore and \ref
  * igraph_error_handler_printignore), and the \a igraph function
  * signalling the error is called from another \a igraph function 
  * then we need to make sure that the error is propagated back to 
- * the auxilary (ie. non-igraph) calling function. This is achieved
+ * the auxiliary (ie. non-igraph) calling function. This is achieved
  * by using <function>IGRAPH_CHECK</function> on every \a igraph
  * call which can return an error code.
  */

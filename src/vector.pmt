@@ -1056,7 +1056,7 @@ int FUNCTION(igraph_vector,copy)(TYPE(igraph_vector) *to,
   assert(from->stor_begin != NULL);
   to->stor_begin=igraph_Calloc(FUNCTION(igraph_vector,size)(from), BASE);
   if (to->stor_begin==0) {
-    IGRAPH_ERROR("canot copy vector", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("cannot copy vector", IGRAPH_ENOMEM);
   }
   to->stor_end=to->stor_begin+FUNCTION(igraph_vector,size)(from);
   to->end=to->stor_end;
@@ -1767,10 +1767,10 @@ int FUNCTION(igraph_vector,swap)(TYPE(igraph_vector) *v1, TYPE(igraph_vector) *v
  * \function igraph_vector_swap_elements
  * \brief Swap two elements in a vector.
  * 
- * Note that currently no range checking if performed.
+ * Note that currently no range checking is performed.
  * \param v The input vector.
  * \param i Index of the first element.
- * \param j index of the second element. (Might be the same the
+ * \param j index of the second element. (Might be the same as the
  * first.)
  * \return Error code, currently always \c IGRAPH_SUCCESS.
  * 
@@ -1887,7 +1887,7 @@ int FUNCTION(igraph_vector,add)(TYPE(igraph_vector) *v1,
  * \function igraph_vector_sub
  * \brief Subtract a vector from another one.
  * 
- * Substract the elements of \p v2 from \p v1, the result is stored in
+ * Subtract the elements of \p v2 from \p v1, the result is stored in
  * \p v1. The two vectors must have the same length.
  * \param v1 The first vector, to subtract from. The result is stored
  *    here.
