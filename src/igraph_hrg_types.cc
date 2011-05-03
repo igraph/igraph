@@ -2637,7 +2637,7 @@ splittree::splittree() {
 
 splittree::~splittree() {
   if (root != NULL && (root->left != leaf || root->right != leaf)) { 
-    deleteSubTree(root); 
+    deleteSubTree(root); root = NULL;
   }
   support      = 0;
   total_weight = 0.0;
@@ -2649,15 +2649,16 @@ splittree::~splittree() {
 }
 
 void splittree::deleteTree() { 
-  if (root != NULL) { deleteSubTree(root); } 
+  if (root != NULL) { deleteSubTree(root); root = NULL; } 
   return; 
 }
 
 void splittree::deleteSubTree(elementsp *z) {
-  if (z->left  != leaf) { deleteSubTree(z->left);  }
-  if (z->right != leaf) { deleteSubTree(z->right); }
+  if (z->left  != leaf) { deleteSubTree(z->left); z->left = NULL; }
+  if (z->right != leaf) { deleteSubTree(z->right); z->right = NULL; }
   delete z;
-  z = NULL;
+  /* No point in setting z to NULL here because z is passed by value */
+  /* z = NULL; */
   return;
 }
 

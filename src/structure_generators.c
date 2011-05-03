@@ -701,9 +701,11 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector, igraph_int
     IGRAPH_ERROR("lattice failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, weights);
-  weights[0]=1;
-  for (i=1; i<dims; i++) {
-    weights[i]=weights[i-1]*VECTOR(*dimvector)[i-1];
+  if (dims > 0) {
+    weights[0]=1;
+    for (i=1; i<dims; i++) {
+      weights[i]=weights[i-1]*VECTOR(*dimvector)[i-1];
+    }
   }
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);

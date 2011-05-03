@@ -1751,7 +1751,7 @@ int igraph_matrix_as_sparsemat(igraph_sparsemat_t *res,
   int i, j, nzmax=0;
 
   for (i=0; i<nrow; i++) {
-    for (j=0; j<nrow; j++) {
+    for (j=0; j<ncol; j++) {
       if (fabs(MATRIX(*mat, i, j)) > tol) { nzmax++; }
     }
   }

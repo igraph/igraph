@@ -135,6 +135,7 @@ int check_lattice(const lat_test_t *test) {
   /* Check its properties */
   if (ret=check_lattice_properties(&graph, &dimvector, test->directed, 
 				   test->mutual, test->circular)) {
+    igraph_destroy(&graph);
     printf("Lattice properties are not satisfied\n");
     return ret;
   }
@@ -149,9 +150,13 @@ int check_lattice(const lat_test_t *test) {
     igraph_write_graph_edgelist(&graph, stdout);
     printf("--\n");
     igraph_write_graph_edgelist(&othergraph, stdout);
+    igraph_destroy(&graph);
+    igraph_destroy(&othergraph);
     return 50;    
   }  
 
+  igraph_destroy(&graph);
+  igraph_destroy(&othergraph);
   return 0;
 }
 
