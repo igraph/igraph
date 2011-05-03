@@ -997,14 +997,17 @@ int igraph_i_sparsemat_cc(igraph_t *graph, const igraph_sparsemat_t *A,
   
   while (*p < no_of_edges) {
     while (to < *(p+1)) {
-      VECTOR(edges)[e++] = from;
-      VECTOR(edges)[e++] = (*i);
+      if (directed || from >= *i) {
+	VECTOR(edges)[e++] = from;
+	VECTOR(edges)[e++] = (*i);
+      }
       to++;
       i++;      
     }
     from++;
     p++;
   }
+  igraph_vector_resize(&edges, e);
 
   IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
   igraph_vector_destroy(&edges);
@@ -1030,9 +1033,12 @@ int igraph_i_sparsemat_triplet(igraph_t *graph, const igraph_sparsemat_t *A,
   IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges*2);
   
   for (e=0; e<2*no_of_edges; i++, j++) {
-    VECTOR(edges)[e++] = (*i);
-    VECTOR(edges)[e++] = (*j);
+    if (directed || *i >= *j) {
+      VECTOR(edges)[e++] = (*i);
+      VECTOR(edges)[e++] = (*j);
+    }
   }
+  igraph_vector_resize(&edges, e);
   
   IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
   igraph_vector_destroy(&edges);
