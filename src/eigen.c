@@ -25,7 +25,7 @@
 #include <string.h>
 #include <math.h>
 
-int igraph_i_eigen_arpackfun_to_mat(const igraph_arpack_function_t *fun,
+int igraph_i_eigen_arpackfun_to_mat(igraph_arpack_function_t *fun,
 				    int n, void *extra, 
 				    igraph_matrix_t *res) {
   
@@ -349,7 +349,7 @@ int igraph_i_eigen_matrix_symmetric_lapack_sel(const igraph_matrix_t *A,
 
 int igraph_i_eigen_matrix_symmetric_lapack(const igraph_matrix_t *A,
 			   const igraph_sparsemat_t *sA,
-			   const igraph_arpack_function_t *fun,
+			   igraph_arpack_function_t *fun,
 			   int n, void *extra,
 			   const igraph_eigen_which_t *which,
 			   igraph_vector_t *values,
@@ -423,7 +423,7 @@ int igraph_i_eigen_matrix_symmetric_lapack(const igraph_matrix_t *A,
 
 int igraph_i_eigen_matrix_symmetric_arpack(const igraph_matrix_t *A, 
 			   const igraph_sparsemat_t *sA, 
-			   const igraph_arpack_function_t *fun, 
+			   igraph_arpack_function_t *fun, 
 			   int n, void *extra,
 			   const igraph_eigen_which_t *which, 
 			   igraph_arpack_options_t *options,
@@ -469,7 +469,7 @@ int igraph_i_eigen_matrix_symmetric_arpack(const igraph_matrix_t *A,
 
 int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
 				  const igraph_sparsemat_t *sA,
-				  const igraph_arpack_function_t *fun, 
+				  igraph_arpack_function_t *fun, 
 				  void *extra,
 				  igraph_eigen_algorithm_t algorithm,
 				  const igraph_eigen_which_t *which,
@@ -554,7 +554,7 @@ int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
 
 int igraph_eigen_matrix(const igraph_matrix_t *A,
 			const igraph_sparsemat_t *sA,
-			const igraph_arpack_function_t *fun,
+			igraph_arpack_function_t *fun,
 			void *extra,
 			igraph_eigen_algorithm_t algorithm,
 			const igraph_eigen_which_t *which,

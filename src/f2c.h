@@ -131,7 +131,7 @@ union Multitype {	/* for multiple entry points */
 	/* longint j; */
 	real r;
 	doublereal d;
-	complex c;
+	f2c_complex c;
 	doublecomplex z;
 	};
 

@@ -447,6 +447,9 @@
 				RelativePath=".\src\lapack\dvout.c">
 			</File>
 			<File
+				RelativePath=".\src\eigen.c">
+			</File>
+			<File
 				RelativePath=".\src\error.c">
 			</File>
 			<File
