@@ -3,7 +3,7 @@
 #ifdef KR_headers
 extern double sin(), cos(), sinh(), cosh();
 
-VOID c_sin(r, z) complex *r, *z;
+VOID c_sin(r, z) f2c_complex *r, *z;
 #else
 #undef abs
 #include "math.h"
@@ -11,7 +11,7 @@ VOID c_sin(r, z) complex *r, *z;
 extern "C" {
 #endif
 
-void c_sin(complex *r, complex *z)
+void c_sin(f2c_complex *r, f2c_complex *z)
 #endif
 {
 	double zi = z->i, zr = z->r;

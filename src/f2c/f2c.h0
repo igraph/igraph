@@ -18,7 +18,7 @@ typedef char *address;
 typedef short int shortint;
 typedef float real;
 typedef double doublereal;
-typedef struct { real r, i; } complex;
+typedef struct { real r, i; } f2c_complex;
 typedef struct { doublereal r, i; } doublecomplex;
 #if defined(__alpha__) || defined(__sparc64__) || defined(__x86_64__) || defined(__ia64__)
 typedef int logical;

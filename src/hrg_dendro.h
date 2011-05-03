@@ -143,7 +143,7 @@ class split {
     for (int i=0; i<n; i++) { s += "-"; } 
   }
   bool checkSplit() { 
-    if (s == "" || s.find("-",0) != string::npos) { 
+    if (s.empty() || s.find("-",0) != string::npos) { 
       return false; 
     } else { 
       return true; 

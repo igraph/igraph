@@ -149,11 +149,11 @@ int* rbtree::returnArrayOfKeys() {
     curr->mark = 1;
     while (flag_go) {
       // - is it time, and is left child the leaf node?
-      if (curr->mark == 1 and curr->left == leaf) {
+      if (curr->mark == 1 && curr->left == leaf) {
 	curr->mark = 2;	
       }
       // - is it time, and is right child the leaf node?
-      if (curr->mark == 2 and curr->right == leaf) {
+      if (curr->mark == 2 && curr->right == leaf) {
 	curr->mark = 3;	
       }
       if (curr->mark == 1) {
@@ -761,13 +761,13 @@ string dendro::buildSplit(elementd* thisNode) {
   while (flag_go) { 
 
     // - is it time, and is left child a graph node?
-    if (curr->type == k+1 and curr->L->type == GRAPH) {
+    if (curr->type == k+1 && curr->L->type == GRAPH) {
       sp.s[curr->L->index] = 'C'; // - mark this leaf
       curr->type = k+2;
     }
 
     // - is it time, and is right child a graph node?
-    if (curr->type == k+2 and curr->R->type == GRAPH) {
+    if (curr->type == k+2 && curr->R->type == GRAPH) {
       sp.s[curr->R->index] = 'C'; // - mark this leaf
       curr->type           = k+3;
     }
@@ -1022,7 +1022,7 @@ void dendro::buildDendrogram() {
     nL_nR = internal[i].L->n*internal[i].R->n;
     ei = internal[i].e;
     internal[i].p = (double)(ei) / (double)(nL_nR);
-    if (ei == 0 or ei == nL_nR) { 
+    if (ei == 0 || ei == nL_nR) { 
       dL = 0.0; 
     } else { 
       dL = ei * log(internal[i].p) + (nL_nR - ei) * log(1.0-internal[i].p); 
@@ -1100,13 +1100,13 @@ int dendro::computeEdgeCount(const int a, const short int atype,
 	flag_go = false;
       } else {
 	// - is it time, and is left child a graph node?
-	if (curr->type == k+1 and curr->L->type == GRAPH) {
+	if (curr->type == k+1 && curr->L->type == GRAPH) {
 	  subtreeL.insertItem(curr->L->index, -1);
 	  curr->type = k+2;
 	  nA++;
 	}
 	// - is it time, and is right child a graph node?
-	if (curr->type == k+2 and curr->R->type == GRAPH) {
+	if (curr->type == k+2 && curr->R->type == GRAPH) {
 	  subtreeL.insertItem(curr->R->index, -1);
 	  curr->type = k+3;
 	  nA++;
@@ -1147,13 +1147,13 @@ int dendro::computeEdgeCount(const int a, const short int atype,
 	flag_go = false;
       } else {
 	// - is it time, and is left child a graph node?
-	if (curr->type == k+1 and curr->L->type == GRAPH) {
+	if (curr->type == k+1 && curr->L->type == GRAPH) {
 	  subtreeR.insertItem(curr->L->index, 1);
 	  curr->type = k+2;
 	  nB++;
 	}
 	// - is it time, and is right child a graph node?
-	if (curr->type == k+2 and curr->R->type == GRAPH) {
+	if (curr->type == k+2 && curr->R->type == GRAPH) {
 	  subtreeR.insertItem(curr->R->index, 1);
 	  curr->type = k+3;
 	  nB++;
@@ -1262,7 +1262,7 @@ elementd* dendro::findCommonAncestor(list** paths, const int i, const int j) {
     lastStep = &internal[headOne->x];
     headOne  = headOne->next;
     headTwo  = headTwo->next;
-    if (headOne == NULL or headTwo == NULL) { break; }
+    if (headOne == NULL || headTwo == NULL) { break; }
   }
   return lastStep; // Returns address of an internal node; do not deallocate
 }
@@ -1321,7 +1321,7 @@ void dendro::getSplitList(splittree* split_tree) {
   string sp;
   for (int i=0; i<(n-1); i++) {
     sp = d->getSplit(i);
-    if (sp != "" and sp[1] != '-') { split_tree->insertItem(sp,0.0); }
+    if (!sp.empty() && sp[1] != '-') { split_tree->insertItem(sp,0.0); }
   }
   return;
 }
@@ -1431,7 +1431,7 @@ bool dendro::importDendrogramStructure(const igraph_hrg_t *hrg) {
   for (int i=0; i<(n-1); i++) {
     nL_nR = internal[i].L->n*internal[i].R->n;
     ei    = internal[i].e;
-    if (ei == 0 or ei == nL_nR) { 
+    if (ei == 0 || ei == nL_nR) { 
       dL = 0.0; 
     } else { 
       dL = (double)(ei) * log(internal[i].p) + 
@@ -1553,7 +1553,7 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken, const double T) {
       e_y = computeEdgeCount(internal[y].L->index, internal[y].L->type, 
 			     internal[x].R->index, internal[x].R->type);
       p_y  = (double)(e_y) / (double)(n_y);
-      if (e_y == 0 or e_y == n_y) { 
+      if (e_y == 0 || e_y == n_y) { 
 	L_y = 0.0; 
       } else { 
 	L_y = (double)(e_y) * log(p_y) + (double)(n_y - e_y) * log(1.0-p_y); 
@@ -1562,14 +1562,14 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken, const double T) {
       n_x  = (n_i+n_k)*n_j;
       e_x  = internal[x].e + internal[y].e - e_y; // e_yj
       p_x  = (double)(e_x) / (double)(n_x);
-      if (e_x == 0 or e_x == n_x) { 
+      if (e_x == 0 || e_x == n_x) { 
 	L_x = 0.0; 
       } else { 
 	L_x = (double)(e_x) * log(p_x) + (double)(n_x - e_x) * log(1.0-p_x); 
       }
  
       dLogL = (L_x - internal[x].logL) + (L_y - internal[y].logL);
-      if ((dLogL > 0.0) or (RNG_UNIF01() < exp(T*dLogL))) {
+      if ((dLogL > 0.0) || (RNG_UNIF01() < exp(T*dLogL))) {
 
 	// make LEFT ALPHA move
 
@@ -1605,21 +1605,21 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken, const double T) {
       e_y  = computeEdgeCount(internal[y].R->index, internal[y].R->type,
 			      internal[x].R->index, internal[x].R->type);
       p_y  = (double)(e_y) / (double)(n_y);
-      if (e_y == 0 or e_y == n_y)   { L_y = 0.0; }
+      if (e_y == 0 || e_y == n_y)   { L_y = 0.0; }
       else { L_y = (double)(e_y) * log(p_y) + 
 	  (double)(n_y - e_y) * log(1.0-p_y); }
  
       n_x  = (n_j+n_k)*n_i;
       e_x  = internal[x].e + internal[y].e - e_y; // e_yj
       p_x  = (double)(e_x) / (double)(n_x);
-      if (e_x == 0 or e_x == n_x) { 
+      if (e_x == 0 || e_x == n_x) { 
 	L_x = 0.0; 
       } else { 
 	L_x = (double)(e_x) * log(p_x) + (double)(n_x - e_x) * log(1.0-p_x); 
       }
  
       dLogL = (L_x - internal[x].logL) + (L_y - internal[y].logL);
-      if ((dLogL > 0.0) or (RNG_UNIF01() < exp(T*dLogL))) {
+      if ((dLogL > 0.0) || (RNG_UNIF01() < exp(T*dLogL))) {
 	
 	// make LEFT BETA move
 	
@@ -1677,7 +1677,7 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken, const double T) {
       e_y  = computeEdgeCount(internal[x].L->index, internal[x].L->type,
 			      internal[y].R->index, internal[y].R->type);
       p_y  = (double)(e_y) / (double)(n_y);
-      if (e_y == 0 or e_y == n_y)   { 
+      if (e_y == 0 || e_y == n_y)   { 
 	L_y = 0.0; 
       } else { 
 	L_y = (double)(e_y) * log(p_y) + (double)(n_y - e_y) * log(1.0-p_y); 
@@ -1686,14 +1686,14 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken, const double T) {
       n_x  = (n_i+n_k)*n_j;
       e_x  = internal[x].e + internal[y].e - e_y; // e_yj
       p_x  = (double)(e_x) / (double)(n_x);
-      if (e_x == 0 or e_x == n_x) {
+      if (e_x == 0 || e_x == n_x) {
 	L_x = 0.0; 
       } else {
 	L_x = (double)(e_x) * log(p_x) + (double)(n_x - e_x) * log(1.0-p_x); 
       }
 
       dLogL = (L_x - internal[x].logL) + (L_y - internal[y].logL);
-      if ((dLogL > 0.0) or (RNG_UNIF01() < exp(T*dLogL))) { 
+      if ((dLogL > 0.0) || (RNG_UNIF01() < exp(T*dLogL))) { 
 	
 	// make RIGHT ALPHA move
 	
@@ -1733,7 +1733,7 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken, const double T) {
       e_y  = computeEdgeCount(internal[x].L->index, internal[x].L->type,
 			      internal[y].L->index, internal[y].L->type);
       p_y  = (double)(e_y) / (double)(n_y);
-      if (e_y == 0 or e_y == n_y)   { 
+      if (e_y == 0 || e_y == n_y)   { 
 	L_y = 0.0; 
       } else {
 	L_y = (double)(e_y) * log(p_y) + (double)(n_y - e_y) * log(1.0-p_y); 
@@ -1742,14 +1742,14 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken, const double T) {
       n_x  = (n_i+n_j)*n_k;
       e_x  = internal[x].e + internal[y].e - e_y; // e_yk
       p_x  = (double)(e_x) / (double)(n_x);
-      if (e_x == 0 or e_x == n_x) { 
+      if (e_x == 0 || e_x == n_x) { 
 	L_x = 0.0; 
       } else { 
 	L_x = (double)(e_x) * log(p_x) + (double)(n_x - e_x) * log(1.0-p_x); 
       }
 
       dLogL = (L_x - internal[x].logL) + (L_y - internal[y].logL);
-      if ((dLogL > 0.0) or (RNG_UNIF01() < exp(T*dLogL))) { 
+      if ((dLogL > 0.0) || (RNG_UNIF01() < exp(T*dLogL))) { 
 	
 	// make RIGHT BETA move
 	
@@ -1797,7 +1797,7 @@ void dendro::refreshLikelihood() {
     nL_nR = internal[i].L->n*internal[i].R->n;
     ei    = internal[i].e;
     internal[i].p = (double)(ei) / (double)(nL_nR);
-    if (ei == 0 or ei == nL_nR) { 
+    if (ei == 0 || ei == nL_nR) { 
       dL = 0.0; 
     } else { 
       dL = ei * log(internal[i].p) + (nL_nR - ei) * log(1.0-internal[i].p); 
@@ -2073,7 +2073,7 @@ bool dendro::sampleSplitLikelihoods(int &sample_num) {
   for (int i=0; i<(n-1); i++) {
     new_split = buildSplit(&internal[i]);
     d->replaceSplit(i, new_split);
-    if (new_split != "" and new_split[1] != '-') {
+    if (!new_split.empty() && new_split[1] != '-') {
       if (!splithist->insertItem(new_split, 1.0)) { return false; } 
     }
   }
@@ -2277,7 +2277,7 @@ graph::~graph() {
 bool graph::addLink(const int i, const int j) {
   // Adds the directed edge (i,j) to the adjacency list for v_i
   edge* newedge;
-  if (i >= 0 and i < n and j >= 0 and j < n) {
+  if (i >= 0 && i < n && j >= 0 && j < n) {
     newedge  = new edge;
     newedge->x = j;
     if (nodeLink[i] == NULL) { 
@@ -2304,10 +2304,10 @@ bool graph::addAdjacencyObs(const int i, const int j,
   // Adds the observation obs to the histogram of the edge (i,j)
   // Note: user must manually add observation to edge (j,i) by calling
   // this function with that argument
-  if (bin_resolution > 0.0 and probability >= 0.0 and probability <= 1.0 
-      and size >= 0.0 and size <= 1.0
-      and i >= 0 and i < n and j >= 0 and j < n) {
-    int index = (int)(round(probability/bin_resolution));
+  if (bin_resolution > 0.0 && probability >= 0.0 && probability <= 1.0 
+      && size >= 0.0 && size <= 1.0
+      && i >= 0 && i < n && j >= 0 && j < n) {
+    int index = (int)(probability/bin_resolution + 0.5);
     if (index < 0) { 
       index = 0; 
     } else if (index > num_bins) { 
@@ -2342,7 +2342,7 @@ bool graph::doesLinkExist(const int i, const int j) {
   // This function determines if the edge (i,j) already exists in the
   // adjacency list of v_i
   edge* curr;
-  if (i >= 0 and i < n and j >= 0 and j < n) {
+  if (i >= 0 && i < n && j >= 0 && j < n) {
     curr = nodeLink[i];
     while (curr != NULL) {
       if (curr->x == j) { 
@@ -2357,20 +2357,20 @@ bool graph::doesLinkExist(const int i, const int j) {
 // **********************************************************************
 
 int graph::getDegree(const int i) { 
-  if (i >= 0 and i < n) { return nodes[i].degree; } else { return -1; } 
+  if (i >= 0 && i < n) { return nodes[i].degree; } else { return -1; } 
 }
 
 string graph::getName(const int i)  { 
-  if (i >= 0 and i < n) { return nodes[i].name; } else { return ""; } 
+  if (i >= 0 && i < n) { return nodes[i].name; } else { return ""; } 
 }
 
 // NOTE: Returns address; deallocation of returned object is dangerous
 edge* graph::getNeighborList(const int i) { 
-  if (i >= 0 and i < n) { return nodeLink[i]; } else { return NULL; } 
+  if (i >= 0 && i < n) { return nodeLink[i]; } else { return NULL; } 
 }
 
 double* graph::getAdjacencyHist(const int i, const int j) {
-  if (i >= 0 and i < n and j >= 0 and j < n) { 
+  if (i >= 0 && i < n && j >= 0 && j < n) { 
     return A[i][j]; 
   } else { 
     return NULL; 
@@ -2419,7 +2419,7 @@ void graph::resetAllAdjacencies() {
 // **********************************************************************
 
 void graph::resetAdjacencyHistogram(const int i, const int j) {
-  if (i >= 0 and i < n and j >= 0 and j < n) { 
+  if (i >= 0 && i < n && j >= 0 && j < n) { 
     for (int k=0; k<num_bins; k++) { 
       A[i][j][k] = 0.0; 
     } 
@@ -2462,7 +2462,7 @@ void graph::setAdjacencyHistograms(const int bin_count) {
 }
 
 bool graph::setName(const int i, const string text) { 
-  if (i >= 0 and i < n) { 
+  if (i >= 0 && i < n) { 
     nodes[i].name = text; 
     return true; 
   } else { 
@@ -2505,7 +2505,7 @@ ipair* interns::getRandomEdge() {
 // ***********************************************************************
 
 string interns::getSplit(const int i) { 
-  if (i >= 0 and i <= q) { 
+  if (i >= 0 && i <= q) { 
     return splitlist[i]; 
   } else { 
     return "";
@@ -2522,8 +2522,8 @@ bool interns::addEdge(const int new_x, const int new_y,
   // indexLUT and then puts the input values into that edgelist
   // location.
 
-  if (count < q and new_x >= 0 and new_x < (q+1) and new_y >= 0 and
-      new_y < (q+2) and (new_type == LEFT or new_type == RIGHT)) {
+  if (count < q && new_x >= 0 && new_x < (q+1) && new_y >= 0 &&
+      new_y < (q+2) && (new_type == LEFT || new_type == RIGHT)) {
     if (new_type == LEFT) { 
       indexLUT[new_x][0] = count; 
     } else { 
@@ -2547,7 +2547,7 @@ bool interns::replaceSplit(const int i, const string sp) {
   // defined by an internal edge (x,y) at the location [y], which
   // is unique.
 
-  if (i >= 0 and i <= q) { splitlist[i] = sp; return true; }
+  if (i >= 0 && i <= q) { splitlist[i] = sp; return true; }
   return false;
 }
 
@@ -2564,17 +2564,17 @@ bool interns::swapEdges(const int one_x, const int one_y,
   bool one_isInternal = false;
   bool two_isInternal = false;
  
-  if (one_x >= 0 and one_x < (q+1) and two_x >= 0 and two_x < (q+1) and 
-      (two_type == LEFT or two_type == RIGHT) and 
-      one_y >= 0 and one_y < (q+2) and two_y >= 0 and 
-      two_y < (q+2) and (one_type == LEFT or one_type == RIGHT)) {
+  if (one_x >= 0 && one_x < (q+1) && two_x >= 0 && two_x < (q+1) && 
+      (two_type == LEFT || two_type == RIGHT) && 
+      one_y >= 0 && one_y < (q+2) && two_y >= 0 && 
+      two_y < (q+2) && (one_type == LEFT || one_type == RIGHT)) {
  
     if (one_type == LEFT) { temp = 0; } else { temp = 1; }
     if (indexLUT[one_x][temp] > -1) { one_isInternal = true; }
     if (two_type == LEFT) { temp = 0; } else { temp = 1; }
     if (indexLUT[two_x][temp] > -1) { two_isInternal = true; }
  
-    if (one_isInternal and two_isInternal) {
+    if (one_isInternal && two_isInternal) {
       if (one_type == LEFT)  { 
 	index = indexLUT[one_x][0]; } else { index = indexLUT[one_x][1]; 
       }
@@ -2679,9 +2679,9 @@ void splittree::clearTree() {
 elementsp* splittree::findItem(const string searchKey) {
 
   elementsp *current=root;
-  if (current->split=="") { return NULL; } // empty tree; bail out
+  if (current->split.empty()) { return NULL; } // empty tree; bail out
   while (current != leaf) {
-    if (searchKey < current->split) { // left-or-right?
+    if (searchKey.compare(current->split) < 0) { // left-or-right?
       // try moving down-left
       if (current->left  != leaf) {
 	current = current->left;  
@@ -2690,7 +2690,7 @@ elementsp* splittree::findItem(const string searchKey) {
 	return NULL; 
       }
     } else { 
-      if (searchKey > current->split) {
+      if (searchKey.compare(current->split) > 0) {
 	// left-or-right?
 	if (current->right != leaf) { 
 	  // try moving down-left
@@ -2743,11 +2743,11 @@ string* splittree::returnArrayOfKeys() {
     while (flag_go) {
  
       // - is it time, and is left child the leaf node?
-      if (curr->mark == 1 and curr->left == leaf) {
+      if (curr->mark == 1 && curr->left == leaf) {
 	curr->mark = 2;
       }
       // - is it time, and is right child the leaf node?
-      if (curr->mark == 2 and curr->right == leaf) {
+      if (curr->mark == 2 && curr->right == leaf) {
 	curr->mark = 3;
       }
       if (curr->mark == 1) {		       // - go left
@@ -2772,7 +2772,7 @@ string* splittree::returnArrayOfKeys() {
 
 slist* splittree::returnListOfKeys() {
   keyValuePairSplit *curr, *prev;
-  slist *head, *tail, *newlist;
+  slist *head = NULL, *tail, *newlist;
 
   curr = returnTreeAsList();
   while (curr != NULL) {
@@ -2804,7 +2804,7 @@ keyValuePairSplit* splittree::returnTreeAsList() {
   if (root->left  != leaf) { tail = returnSubtreeAsList(root->left,  tail); }
   if (root->right != leaf) { tail = returnSubtreeAsList(root->right, tail); }
  
-  if (head->x == "") { return NULL; /* empty tree */ } else { return head; }
+  if (head->x.empty()) { return NULL; /* empty tree */ } else { return head; }
 }
 
 keyValuePairSplit* splittree::returnSubtreeAsList(elementsp *z,
@@ -2898,7 +2898,7 @@ keyValuePairSplit* splittree::returnTheseSplits(const int target) {
     count = 0;
     len   = curr->x.size();
     for (int i=0; i<len; i++) { if (curr->x[i] == 'M') { count++; } }
-    if (count == target and curr->x[1] != '*') {
+    if (count == target && curr->x[1] != '*') {
       newpair       = new keyValuePairSplit;
       newpair->x    = curr->x;
       newpair->y    = curr->y;
@@ -2964,7 +2964,7 @@ bool splittree::insertItem(string newKey, double newValue) {
     // correct parent and set the parent and child to point to each
     // other properly 
     current = root;
-    if (current->split=="") {	// insert as root
+    if (current->split.empty()) {	// insert as root
       delete root;		//   delete old root
       root = newNode;		//   set root to newNode
       leaf->parent   = newNode; //   set leaf's parent
@@ -2974,7 +2974,7 @@ bool splittree::insertItem(string newKey, double newValue) {
     // search for insertion point
     while (current != leaf) {
       // left-or-right?
-      if (newKey < current->split) {
+      if (newKey.compare(current->split)) {
 	// try moving down-left
 	if (current->left  != leaf) { 
 	  current = current->left;  
@@ -3296,7 +3296,7 @@ simpleGraph::~simpleGraph() {
 // ***********************************************************************
 
 bool simpleGraph::addGroup(const int i, const int group_index) {
-  if (i >= 0 and i < n) {
+  if (i >= 0 && i < n) {
     nodes[i].group_true = group_index;
     return true;
   } else { 
@@ -3309,7 +3309,7 @@ bool simpleGraph::addGroup(const int i, const int group_index) {
 bool simpleGraph::addLink(const int i, const int j) {
   // Adds the directed edge (i,j) to the adjacency list for v_i
   simpleEdge* newedge;
-  if (i >= 0 and i < n and j >= 0 and j < n) {
+  if (i >= 0 && i < n && j >= 0 && j < n) {
     A[i][j] = 1.0;
     newedge  = new simpleEdge;
     newedge->x = j;
@@ -3333,7 +3333,7 @@ bool simpleGraph::addLink(const int i, const int j) {
 bool simpleGraph::doesLinkExist(const int i, const int j) {
   // This function determines if the edge (i,j) already exists in the
   // adjacency list of v_i
-  if (i >= 0 and i < n and j >= 0 and j < n) { 
+  if (i >= 0 && i < n && j >= 0 && j < n) { 
     if (A[i][j] > 0.1) {
       return true; 
     } else { 
@@ -3348,7 +3348,7 @@ bool simpleGraph::doesLinkExist(const int i, const int j) {
 // **********************************************************************
 
 double simpleGraph::getAdjacency(const int i, const int j) {
-  if (i >= 0 and i < n and j >= 0 and j < n) { 
+  if (i >= 0 && i < n && j >= 0 && j < n) { 
     return A[i][j]; 
   } else { 
     return -1.0; 
@@ -3356,7 +3356,7 @@ double simpleGraph::getAdjacency(const int i, const int j) {
 }
 
 int simpleGraph::getDegree(const int i) { 
-  if (i >= 0 and i < n) {
+  if (i >= 0 && i < n) {
     return nodes[i].degree;
   } else {
     return -1; 
@@ -3364,7 +3364,7 @@ int simpleGraph::getDegree(const int i) {
 }
 
 int simpleGraph::getGroupLabel(const int i) {
-  if (i >= 0 and i < n) {
+  if (i >= 0 && i < n) {
     return nodes[i].group_true;
   } else {
     return -1; 
@@ -3372,7 +3372,7 @@ int simpleGraph::getGroupLabel(const int i) {
 }
 
 string simpleGraph::getName(const int i) { 
-  if (i >= 0 and i < n) {
+  if (i >= 0 && i < n) {
     return nodes[i].name;
   } else {
     return ""; 
@@ -3382,7 +3382,7 @@ string simpleGraph::getName(const int i) {
 // NOTE: The following three functions return addresses; deallocation
 // of returned object is dangerous 
 simpleEdge* simpleGraph::getNeighborList(const int i) {
-  if (i >= 0 and i < n) {
+  if (i >= 0 && i < n) {
     return nodeLink[i];
   } else {
     return NULL; 
@@ -3396,7 +3396,7 @@ int simpleGraph::getNumGroups() { return num_groups; }
 int simpleGraph::getNumLinks()  { return m; }
 int simpleGraph::getNumNodes()  { return n; }
 simpleVert* simpleGraph::getNode(const int i) { 
-  if (i >= 0 and i<n) { 
+  if (i >= 0 && i<n) { 
     return &nodes[i];
   } else {
     return NULL;
@@ -3406,7 +3406,7 @@ simpleVert* simpleGraph::getNode(const int i) {
 // **********************************************************************
 
 bool simpleGraph::setName(const int i, const string text) {
-  if (i >= 0 and i < n) { 
+  if (i >= 0 && i < n) { 
     nodes[i].name = text;
     return true; 
   } else {

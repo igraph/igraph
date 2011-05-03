@@ -16,6 +16,9 @@
 /* Define to 1 if you have the `fmin' function. */
 /* #undef HAVE_FMIN */
 
+/* Define to 1 if you have the `ftruncate' function. */
+/* #undef HAVE_FTRUNCATE */
+
 /* Define to 1 if you have the `strcasecmp' function. */
 #define HAVE_STRCASECMP 1
 

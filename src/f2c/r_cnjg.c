@@ -4,9 +4,9 @@ extern "C" {
 #endif
 
 #ifdef KR_headers
-VOID r_cnjg(r, z) complex *r, *z;
+VOID r_cnjg(r, z) f2c_complex *r, *z;
 #else
-VOID r_cnjg(complex *r, complex *z)
+VOID r_cnjg(f2c_complex *r, f2c_complex *z)
 #endif
 {
 	real zi = z->i;

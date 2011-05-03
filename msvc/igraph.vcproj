@@ -121,7 +121,16 @@
 				RelativePath=".\src\bfgs.c">
 			</File>
 			<File
+				RelativePath=".\src\bigint.c">
+			</File>
+			<File
+				RelativePath=".\src\bignum.c">
+			</File>
+			<File
 				RelativePath=".\src\bipartite.c">
+			</File>
+			<File
+				RelativePath=".\src\blas.c">
 			</File>
 			<File
 				RelativePath=".\src\bliss.cc"
@@ -171,7 +180,13 @@
 				RelativePath=".\src\cocitation.c">
 			</File>
 			<File
+				RelativePath=".\src\cohesive_blocks.c">
+			</File>
+			<File
 				RelativePath=".\src\community.c">
+			</File>
+			<File
+				RelativePath=".\src\complex.c">
 			</File>
 			<File
 				RelativePath=".\src\components.c">
@@ -204,6 +219,9 @@
 				RelativePath=".\src\DensityGrid.cpp">
 			</File>
 			<File
+				RelativePath=".\src\DensityGrid_3d.cpp">
+			</File>
+			<File
 				RelativePath=".\src\lapack\dgemv.c">
 			</File>
 			<File
@@ -216,10 +234,16 @@
 				RelativePath=".\src\lapack\dgetv0.c">
 			</File>
 			<File
+				RelativePath=".\src\lapack\disnan.c">
+			</File>
+			<File
 				RelativePath=".\src\lapack\dlabad.c">
 			</File>
 			<File
 				RelativePath=".\src\lapack\dlacpy.c">
+			</File>
+			<File
+				RelativePath=".\src\lapack\dlacn2.c">
 			</File>
 			<File
 				RelativePath=".\src\lapack\dladiv.c">
@@ -235,6 +259,9 @@
 			</File>
 			<File
 				RelativePath=".\src\lapack\dlahqr.c">
+			</File>
+			<File
+				RelativePath=".\src\lapack\dlaisnan.c">
 			</File>
 			<File
 				RelativePath=".\src\lapack\dlaln2.c">
@@ -336,7 +363,13 @@
 				RelativePath=".\src\drl_graph.cpp">
 			</File>
 			<File
+				RelativePath=".\src\drl_graph_3d.cpp">
+			</File>
+			<File
 				RelativePath=".\src\drl_layout.cpp">
+			</File>
+			<File
+				RelativePath=".\src\drl_layout_3d.cpp">
 			</File>
 			<File
 				RelativePath=".\src\drl_parse.cpp">
@@ -429,6 +462,12 @@
 				RelativePath=".\src\flow.c">
 			</File>
 			<File
+				RelativePath=".\src\foreign-dl-lexer.c">
+			</File>
+			<File
+				RelativePath=".\src\foreign-dl-parser.c">
+			</File>
+			<File
 				RelativePath=".\src\foreign-gml-lexer.c">
 			</File>
 			<File
@@ -501,6 +540,12 @@
 				RelativePath=".\src\igraph_buckets.c">
 			</File>
 			<File
+				RelativePath=".\src\igraph_estack.c">
+			</File>
+			<File
+				RelativePath=".\src\igraph_fixed_vectorlist.c">
+			</File>
+			<File
 				RelativePath=".\src\igraph_grid.c">
 			</File>
 			<File
@@ -508,6 +553,15 @@
 			</File>
 			<File
 				RelativePath=".\src\igraph_heap.c">
+			</File>
+			<File
+				RelativePath=".\src\igraph_hrg.cc">
+			</File>
+			<File
+				RelativePath=".\src\igraph_hrg_types.cc">
+			</File>
+			<File
+				RelativePath=".\src\igraph_marked_queue.c">
 			</File>
 			<File
 				RelativePath=".\src\igraph_psumtree.c">
@@ -525,6 +579,12 @@
 				RelativePath=".\src\igraph_trie.c">
 			</File>
 			<File
+				RelativePath=".\src\lapack\iladlc.c">
+			</File>
+			<File
+				RelativePath=".\src\lapack\iladlr.c">
+			</File>
+			<File
 				RelativePath=".\src\interrupt.c">
 			</File>
 			<File
@@ -535,6 +595,9 @@
 			</File>
 			<File
 				RelativePath=".\src\layout.c">
+			</File>
+			<File
+				RelativePath=".\src\lapack\len_trim.c">
 			</File>
 			<File
 				RelativePath=".\src\lapack\lsame.c">
@@ -562,6 +625,9 @@
 			</File>
 			<File
 				RelativePath=".\src\operators.c">
+			</File>
+			<File
+				RelativePath=".\src\optimal_modularity.c">
 			</File>
 			<File
 				RelativePath=".\src\other.c">
@@ -600,10 +666,22 @@
 				RelativePath=".\src\lapack\second.c">
 			</File>
 			<File
+				RelativePath=".\src\separators.c">
+			</File>
+			<File
+				RelativePath=".\src\statusbar.c">
+			</File>
+			<File
+				RelativePath=".\src\spanning_trees.c">
+			</File>
+			<File
 				RelativePath=".\src\spectral_properties.c">
 			</File>
 			<File
 				RelativePath=".\src\spmatrix.c">
+			</File>
+			<File
+				RelativePath=".\src\st-cuts.c">
 			</File>
 			<File
 				RelativePath=".\src\structural_properties.c">
@@ -622,6 +700,9 @@
 			</File>
 			<File
 				RelativePath=".\src\vector_ptr.c">
+			</File>
+			<File
+				RelativePath=".\src\version.c">
 			</File>
 			<File
 				RelativePath=".\src\visitors.c">
@@ -667,6 +748,12 @@
 			</File>
 			<File
 				RelativePath=".\src\attributes.h">
+			</File>
+			<File
+				RelativePath=".\src\bigint.h">
+			</File>
+			<File
+				RelativePath=".\src\bignum.h">
 			</File>
 			<File
 				RelativePath=".\src\bliss_bignum.hh"
@@ -719,6 +806,9 @@
 				RelativePath=".\src\DensityGrid.h">
 			</File>
 			<File
+				RelativePath=".\src\DensityGrid_3d.h">
+			</File>
+			<File
 				RelativePath=".\src\dqueue.h">
 			</File>
 			<File
@@ -729,10 +819,19 @@
 				RelativePath=".\src\drl_graph.h">
 			</File>
 			<File
+				RelativePath=".\src\drl_graph_3d.h">
+			</File>
+			<File
 				RelativePath=".\src\drl_layout.h">
 			</File>
 			<File
+				RelativePath=".\src\drl_layout_3d.h">
+			</File>
+			<File
 				RelativePath=".\src\drl_Node.h">
+			</File>
+			<File
+				elativePath=".\src\drl_Node_3d.h">
 			</File>
 			<File
 				RelativePath=".\src\drl_parse.h">
@@ -742,6 +841,12 @@
 			</File>
 			<File
 				RelativePath=".\src\f2c.h">
+			</File>
+			<File
+				RelativePath=".\src\foreign-dl-header.h">
+			</File>
+			<File
+				RelativePath=".\src\foreign-dl-parser.h">
 			</File>
 			<File
 				RelativePath=".\src\foreign-gml-parser.h">
@@ -799,7 +904,28 @@
 				FileType="2">
 			</File>
 			<File
+				RelativePath=".\src\hrg_dendro.h">
+			</File>
+			<File
+				RelativePath=".\src\hrg_graph.h">
+			</File>
+			<File
+				RelativePath=".\src\hrg_graph_simp.h">
+			</File>
+			<File
+				RelativePath=".\src\hrg_rbtree.h">
+			</File>
+			<File
+				RelativePath=".\src\hrg_splittree_eq.h">
+			</File>
+			<File
 				RelativePath=".\src\igraph.h">
+			</File>
+			<File
+				RelativePath=".\src\igraph_estack.h">
+			</File>
+			<File
+				RelativePath=".\src\igraph_marked_queue.h">
 			</File>
 			<File
 				RelativePath=".\src\igraph_pmt.h">

@@ -1,5 +1,10 @@
 #ifndef SYSDEP_H_INCLUDED
 #define SYSDEP_H_INCLUDED
+
+#ifdef _MSC_VER
+#define FTRUNCATE chsize
+#endif
+
 #undef USE_LARGEFILE
 #ifndef NO_LONG_LONG
 
