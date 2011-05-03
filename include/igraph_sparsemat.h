@@ -217,4 +217,7 @@ int igraph_sparsemat_scale_rows(igraph_sparsemat_t *A,
 				const igraph_vector_t *fact);
 int igraph_sparsemat_scale_cols(igraph_sparsemat_t *A,
 				const igraph_vector_t *fact);
+
+int igraph_i_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n, 
+			    int *p, int *i, double *x, int nz);
 #endif

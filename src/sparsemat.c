@@ -2306,3 +2306,16 @@ int igraph_sparsemat_scale_cols(igraph_sparsemat_t *A,
   }
 }
 
+int igraph_i_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n, 
+			    int *p, int *i, double *x, int nz) {
+
+  A->cs->nzmax = nzmax;
+  A->cs->m = m;
+  A->cs->n = n;
+  A->cs->p = p;
+  A->cs->i = i;
+  A->cs->x = x;
+  A->cs->nz = nz;
+  
+  return 0;
+}
