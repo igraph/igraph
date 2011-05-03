@@ -228,9 +228,10 @@ igraph_grg_game:
         IGNORE: RR, RC, RNamespace
 
 igraph_preference_game:
-        PARAMS: OUT GRAPH graph, INTEGER nodes, INTEGER types, VECTOR type_dist, \
-                MATRIX pref_matrix, OUT VECTOR node_type_vec, BOOLEAN directed=False, \
-                BOOLEAN loops=False
+        PARAMS: OUT GRAPH graph, INTEGER nodes, INTEGER types, \
+                VECTOR type_dist, BOOLEAN fixed_sizes=False, \
+                MATRIX pref_matrix, OUT VECTOR node_type_vec, \
+                BOOLEAN directed=False, BOOLEAN loops=False
         IGNORE: RR, RC, RNamespace
 
 igraph_asymmetric_preference_game:
