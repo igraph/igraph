@@ -2226,9 +2226,13 @@ int igraph_sparsemat_getelements(const igraph_sparsemat_t *A,
 				igraph_vector_t *x) {
   int nz=A->cs->nz;
   if (nz < 0) {
-    IGRAPH_ERROR("Getelements for column-compressed sparse matrices "
-		 "is not implemented yet", IGRAPH_UNIMPLEMENTED);
-    /* TODO */
+    nz=A->cs->p[A->cs->n];
+    IGRAPH_CHECK(igraph_vector_int_resize(i, nz));
+    IGRAPH_CHECK(igraph_vector_int_resize(j, A->cs->n+1));
+    IGRAPH_CHECK(igraph_vector_resize(x, nz));
+    memcpy(VECTOR(*i), A->cs->i, nz * sizeof(int));
+    memcpy(VECTOR(*j), A->cs->p, (A->cs->n+1) * sizeof(int));
+    memcpy(VECTOR(*x), A->cs->x, nz * sizeof(igraph_real_t));
   } else {
     IGRAPH_CHECK(igraph_vector_int_resize(i, nz));
     IGRAPH_CHECK(igraph_vector_int_resize(j, nz));
