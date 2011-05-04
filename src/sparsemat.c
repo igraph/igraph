@@ -2214,9 +2214,7 @@ int igraph_sparsemat_resize(igraph_sparsemat_t *A, long int nrow,
 
 int igraph_sparsemat_nonzero_storage(const igraph_sparsemat_t *A) {
   if (A->cs->nz < 0) {
-    IGRAPH_ERROR("Nonzero-storage for column-compressed sparse matrices "
-		 "is not implemented yet", IGRAPH_UNIMPLEMENTED);
-    /* TODO */
+    return A->cs->p[A->cs->n];
   } else {
     return A->cs->nz;
   }
