@@ -2235,8 +2235,38 @@ SEXP R_igraph_sparsemat_to_SEXP_triplet(igraph_sparsemat_t *sp) {
 }
 
 SEXP R_igraph_sparsemat_to_SEXP_cc(igraph_sparsemat_t *sp) {
-  printf("Not implemented.\n");
-  return R_NilValue;
+  SEXP res, names;
+  int nz=igraph_sparsemat_nonzero_storage(sp);
+  int m=igraph_sparsemat_nrow(sp);
+  int n=igraph_sparsemat_ncol(sp);
+
+  PROTECT(res=NEW_LIST(5));
+  SET_VECTOR_ELT(res, 0, ScalarString(CREATE_STRING_VECTOR("cc")));
+  SET_VECTOR_ELT(res, 1, NEW_INTEGER(2));
+  INTEGER(VECTOR_ELT(res, 1))[0] = m;
+  INTEGER(VECTOR_ELT(res, 1))[1] = n;
+  SET_VECTOR_ELT(res, 2, NEW_INTEGER(n+1));
+  SET_VECTOR_ELT(res, 3, NEW_INTEGER(nz));
+  SET_VECTOR_ELT(res, 4, NEW_NUMERIC(nz));
+  if (nz > 0) {
+    igraph_vector_int_t i, p;
+    igraph_vector_t x;
+    igraph_vector_int_view(&p, INTEGER(VECTOR_ELT(res, 2)), n+1);
+    igraph_vector_int_view(&i, INTEGER(VECTOR_ELT(res, 3)), nz);
+    igraph_vector_view(&x, REAL(VECTOR_ELT(res, 4)), nz);
+    igraph_sparsemat_getelements_sorted(sp, &i, &p, &x);
+  }
+
+  PROTECT(names=NEW_CHARACTER(5));
+  SET_STRING_ELT(names, 0, mkChar("type"));
+  SET_STRING_ELT(names, 1, mkChar("dim"));
+  SET_STRING_ELT(names, 2, mkChar("p"));
+  SET_STRING_ELT(names, 3, mkChar("i"));
+  SET_STRING_ELT(names, 4, mkChar("x"));
+  SET_NAMES(res, names);
+
+  UNPROTECT(2);
+  return res;
 }
 
 SEXP R_igraph_sparsemat_to_SEXP(igraph_sparsemat_t *sp) {

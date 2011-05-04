@@ -60,6 +60,7 @@ igraph.i.spMatrix <- function(M) {
   if (M$type == "triplet") {
     spMatrix(nrow=M$dim[1], ncol=M$dim[2], i=M$i+1L, j=M$p+1L, x=M$x)
   } else {
-    stop("This is not implemented yet")
+    new("dgCMatrix", Dim=M$dim, Dimnames=list(NULL, NULL),
+        factors=list(), i=M$i, p=M$p, x=M$x)
   }
 }
