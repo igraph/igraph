@@ -7123,6 +7123,46 @@ SEXP R_igraph_scg_semiprojectors(SEXP groups, SEXP matrix_type, SEXP p,
   return(result);
 }
 
+SEXP R_igraph_laplacian(SEXP graph, SEXP normalized, SEXP weights,
+			SEXP psparse) {
+                                        /* Declarations */
+  igraph_t c_graph;
+  igraph_matrix_t c_res;
+  igraph_sparsemat_t c_sparseres;
+  igraph_bool_t c_normalized;
+  igraph_vector_t c_weights;
+  igraph_bool_t c_sparse=LOGICAL(psparse)[0];
+  SEXP result;
+  int c_result;
+                                        /* Convert input */
+  R_SEXP_to_igraph(graph, &c_graph);
+  if (!c_sparse) {
+    if (0 != igraph_matrix_init(&c_res, 0, 0)) { 
+      igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
+    } 
+    IGRAPH_FINALLY(igraph_matrix_destroy, &c_res); 
+  }
+  c_normalized=LOGICAL(normalized)[0];
+  if (!isNull(weights)) { R_SEXP_to_vector(weights, &c_weights); }
+                                        /* Call igraph */
+  c_result=igraph_laplacian(&c_graph, (c_sparse ? 0 : &c_res), 
+			    (c_sparse ? &c_sparseres : 0),
+			    c_normalized, (isNull(weights) ? 0 : &c_weights));
+
+                                        /* Convert output */
+  if (!c_sparse) {
+    PROTECT(result=R_igraph_matrix_to_SEXP(&c_res)); 
+    igraph_matrix_destroy(&c_res); 
+    IGRAPH_FINALLY_CLEAN(1);
+  } else {
+    PROTECT(result=R_igraph_sparsemat_to_SEXP(&c_sparseres));
+    igraph_sparsemat_destroy(&c_sparseres);
+  }
+
+  UNPROTECT(1);
+  return(result);
+}
+
 SEXP R_igraph_revolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
 			 SEXP pcites, SEXP pexpected, SEXP perror, 
 			 SEXP pdebug) {

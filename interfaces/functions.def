@@ -779,6 +779,7 @@ igraph_laplacian:
                 OUT SPARSEMAT_OR_0 sparseres, BOOLEAN normalized=False, \
                 EDGEWEIGHTS weights=NULL
         DEPS: weights ON graph
+        IGNORE: RR, RC
 
 #######################################
 # Components
