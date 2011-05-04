@@ -41,6 +41,7 @@
 #include "igraph_datatype.h"
 #include "igraph_iterators.h"
 #include "igraph_attributes.h"
+#include "igraph_sparsemat.h"
 
 __BEGIN_DECLS
 
@@ -128,9 +129,9 @@ int igraph_transitive_closure_dag(const igraph_t *graph,
 /* -------------------------------------------------- */
 
 int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
+		     igraph_sparsemat_t *sparseres,
 		     igraph_bool_t normalized, 
 		     const igraph_vector_t *weights);
-
 
 __END_DECLS
 

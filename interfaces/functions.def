@@ -775,7 +775,8 @@ igraph_is_bipartite:
 #######################################
 
 igraph_laplacian:
-        PARAMS: GRAPH graph, OUT MATRIX res, BOOLEAN normalized=False, \
+        PARAMS: GRAPH graph, OUT MATRIX_OR_0 res, \
+                OUT SPARSEMAT_OR_0 sparseres, BOOLEAN normalized=False, \
                 EDGEWEIGHTS weights=NULL
         DEPS: weights ON graph
 
