@@ -217,7 +217,14 @@ int igraph_sparsemat_scale_rows(igraph_sparsemat_t *A,
 				const igraph_vector_t *fact);
 int igraph_sparsemat_scale_cols(igraph_sparsemat_t *A,
 				const igraph_vector_t *fact);
+int igraph_sparsemat_multiply_by_dense(const igraph_sparsemat_t *A,
+				       const igraph_matrix_t *B,
+				       igraph_matrix_t *res);
+int igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
+				    const igraph_sparsemat_t *B,
+				    igraph_matrix_t *res);
 
 int igraph_i_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n, 
 			    int *p, int *i, double *x, int nz);
+
 #endif

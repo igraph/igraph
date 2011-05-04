@@ -2308,6 +2308,69 @@ int igraph_sparsemat_scale_cols(igraph_sparsemat_t *A,
   }
 }
 
+int igraph_sparsemat_multiply_by_dense(const igraph_sparsemat_t *A,
+				       const igraph_matrix_t *B,
+				       igraph_matrix_t *res) {
+
+  int m=igraph_sparsemat_nrow(A);
+  int n=igraph_sparsemat_ncol(A);
+  int p=igraph_matrix_ncol(B);
+  int i;
+  
+  if (igraph_matrix_nrow(B) != n) {
+    IGRAPH_ERROR("Invalid dimensions in sparse-dense matrix product",
+		 IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_CHECK(igraph_matrix_resize(res, m, p));
+  igraph_matrix_null(res);
+
+  for (i=0; i<p; i++) {
+    if (!(cs_gaxpy(A->cs, &MATRIX(*B, 0, i), &MATRIX(*res, 0, i)))) {
+      IGRAPH_ERROR("Cannot perform sparse-dense matrix multiplication",
+		   IGRAPH_FAILURE);
+    }
+  }
+  
+  return 0;
+}
+
+int igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
+				    const igraph_sparsemat_t *B,
+				    igraph_matrix_t *res) {
+  int m=igraph_matrix_nrow(A);
+  int n=igraph_matrix_ncol(A);
+  int p=igraph_sparsemat_ncol(B);
+  int r, c;
+  int *Bp=B->cs->p;
+  
+  if (igraph_sparsemat_nrow(B) != n) {
+    IGRAPH_ERROR("Invalid dimensions in dense-sparse matrix product",
+		 IGRAPH_EINVAL);
+  }
+
+  if (!igraph_sparsemat_is_cc(B)) {
+    IGRAPH_ERROR("Dense-sparse product is only implemented for "
+		 "column-compressed sparse matrices", IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_CHECK(igraph_matrix_resize(res, m, p));
+  igraph_matrix_null(res);
+  
+  for (c=0; c<p; c++) {
+    for (r=0; r<m; r++) {
+      int idx=*Bp;
+      while (idx < *(Bp+1)) {
+	MATRIX(*res, r, c) += MATRIX(*A, r, B->cs->i[idx]) * B->cs->x[idx];
+	idx++;
+      }
+    }
+    Bp++;
+  }
+  
+  return 0;
+}
+
 int igraph_i_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n, 
 			    int *p, int *i, double *x, int nz) {
 
