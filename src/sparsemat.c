@@ -2384,3 +2384,35 @@ int igraph_i_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n,
   
   return 0;
 }
+
+int igraph_sparsemat_sort(const igraph_sparsemat_t *A, 
+			  igraph_sparsemat_t *sorted) {
+  
+  igraph_sparsemat_t tmp;
+
+  IGRAPH_CHECK(igraph_sparsemat_transpose(A, &tmp, /*values=*/ 1));
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmp);
+  IGRAPH_CHECK(igraph_sparsemat_transpose(&tmp, sorted, /*values=*/ 1));
+  igraph_sparsemat_destroy(&tmp);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
+int igraph_sparsemat_getelements_sorted(const igraph_sparsemat_t *A, 
+					igraph_vector_int_t *i,
+					igraph_vector_int_t *j, 
+					igraph_vector_t *x) {
+  if (A->cs->nz < 0) {
+    igraph_sparsemat_t tmp;
+    IGRAPH_CHECK(igraph_sparsemat_sort(A, &tmp));
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmp);
+    IGRAPH_CHECK(igraph_sparsemat_getelements(&tmp, i, j, x));
+    igraph_sparsemat_destroy(&tmp);
+    IGRAPH_FINALLY_CLEAN(1);
+  } else {
+    IGRAPH_CHECK(igraph_sparsemat_getelements(A, i, j, x));
+  }
+
+  return 0;
+}
