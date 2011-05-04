@@ -234,7 +234,7 @@ int igraph_i_scg_semiprojectors_sym(const igraph_vector_t *groups,
   }
   
   if (Lsparse) {
-    IGRAPH_CHECK(igraph_sparsemat_resize(Lsparse, no_of_groups, no_of_nodes, 
+    IGRAPH_CHECK(igraph_sparsemat_init(Lsparse, no_of_groups, no_of_nodes, 
 					 /* nzmax= */ no_of_nodes));
     for (i=0; i<no_of_nodes; i++) {
       int g=VECTOR(*groups)[i];
@@ -243,7 +243,7 @@ int igraph_i_scg_semiprojectors_sym(const igraph_vector_t *groups,
   }
   
   if (Rsparse) {
-    IGRAPH_CHECK(igraph_sparsemat_resize(Rsparse, no_of_groups, no_of_nodes,
+    IGRAPH_CHECK(igraph_sparsemat_init(Rsparse, no_of_groups, no_of_nodes,
 					 /* nzmax= */ no_of_nodes));
     for (i=0; i<no_of_nodes; i++) {
       int g=VECTOR(*groups)[i];
@@ -295,15 +295,15 @@ int igraph_i_scg_semiprojectors_lap(const igraph_vector_t *groups,
       }
     }
     if (Lsparse) {
-      IGRAPH_CHECK(igraph_sparsemat_resize(Lsparse, no_of_groups, no_of_nodes,
-					   /* nzmax= */ no_of_nodes));
+      IGRAPH_CHECK(igraph_sparsemat_init(Lsparse, no_of_groups, no_of_nodes,
+					 /* nzmax= */ no_of_nodes));
       for (i=0; i<no_of_nodes; i++) {
 	int g=VECTOR(*groups)[i];
 	IGRAPH_CHECK(igraph_sparsemat_entry(Lsparse, g, i, 1.0));
       }
     }
     if (Rsparse) {
-      IGRAPH_CHECK(igraph_sparsemat_resize(Rsparse, no_of_groups, no_of_nodes,
+      IGRAPH_CHECK(igraph_sparsemat_init(Rsparse, no_of_groups, no_of_nodes,
 					   /* nzmax= */ no_of_nodes));
       for (i=0; i<no_of_nodes; i++) {
 	int g=VECTOR(*groups)[i];
@@ -329,8 +329,8 @@ int igraph_i_scg_semiprojectors_lap(const igraph_vector_t *groups,
       }
     }
     if (Lsparse) {
-      IGRAPH_CHECK(igraph_sparsemat_resize(Lsparse, no_of_groups, no_of_nodes,
-					   /* nzmax= */ no_of_nodes));
+      IGRAPH_CHECK(igraph_sparsemat_init(Lsparse, no_of_groups, no_of_nodes,
+					 /* nzmax= */ no_of_nodes));
       for (i=0; i<no_of_nodes; i++) {
 	int g=VECTOR(*groups)[i];
 	IGRAPH_CHECK(igraph_sparsemat_entry(Lsparse, g, i, 
@@ -338,8 +338,8 @@ int igraph_i_scg_semiprojectors_lap(const igraph_vector_t *groups,
       }
     }
     if (Rsparse) {
-      IGRAPH_CHECK(igraph_sparsemat_resize(Rsparse, no_of_groups, no_of_nodes,
-					   /* nzmax= */ no_of_nodes));
+      IGRAPH_CHECK(igraph_sparsemat_init(Rsparse, no_of_groups, no_of_nodes,
+					 /* nzmax= */ no_of_nodes));
       for (i=0; i<no_of_nodes; i++) {
 	int g=VECTOR(*groups)[i];
 	IGRAPH_CHECK(igraph_sparsemat_entry(Rsparse, g, i, 1.0));
@@ -396,8 +396,8 @@ int igraph_i_scg_semiprojectors_sto(const igraph_vector_t *groups,
       }      
     }
     if (Lsparse) {
-      IGRAPH_CHECK(igraph_sparsemat_resize(Lsparse, no_of_groups, no_of_nodes,
-					   /* nzmax= */ no_of_nodes));
+      IGRAPH_CHECK(igraph_sparsemat_init(Lsparse, no_of_groups, no_of_nodes,
+					 /* nzmax= */ no_of_nodes));
       for (i=0; i<no_of_nodes; i++) {
 	int g=VECTOR(*groups)[i];
 	IGRAPH_CHECK(igraph_sparsemat_entry(Lsparse, g, i,
@@ -405,8 +405,8 @@ int igraph_i_scg_semiprojectors_sto(const igraph_vector_t *groups,
       }
     }
     if (Rsparse) {
-      IGRAPH_CHECK(igraph_sparsemat_resize(Rsparse, no_of_groups, no_of_nodes,
-					   /* nzmax= */ no_of_nodes));
+      IGRAPH_CHECK(igraph_sparsemat_init(Rsparse, no_of_groups, no_of_nodes,
+					 /* nzmax= */ no_of_nodes));
       for (i=0; i<no_of_nodes; i++) {
 	int g=VECTOR(*groups)[i];
 	IGRAPH_CHECK(igraph_sparsemat_entry(Rsparse, g, i, 1.0));
@@ -430,7 +430,7 @@ int igraph_i_scg_semiprojectors_sto(const igraph_vector_t *groups,
       }      
     }
     if (Lsparse) {
-      IGRAPH_CHECK(igraph_sparsemat_resize(Lsparse, no_of_groups, no_of_nodes,
+      IGRAPH_CHECK(igraph_sparsemat_init(Lsparse, no_of_groups, no_of_nodes,
 					   /* nzmax= */ no_of_nodes));
       for (i=0; i<no_of_nodes; i++) {
 	int g=VECTOR(*groups)[i];
@@ -438,7 +438,7 @@ int igraph_i_scg_semiprojectors_sto(const igraph_vector_t *groups,
       }
     }
     if (Rsparse) {
-      IGRAPH_CHECK(igraph_sparsemat_resize(Rsparse, no_of_groups, no_of_nodes,
+      IGRAPH_CHECK(igraph_sparsemat_init(Rsparse, no_of_groups, no_of_nodes,
 					   /* nzmax= */ no_of_nodes));
       for (i=0; i<no_of_nodes; i++) {
 	int g=VECTOR(*groups)[i];
@@ -486,14 +486,6 @@ int igraph_scg_semiprojectors(const igraph_vector_t *groups,
 		 IGRAPH_EINVAL);
   }
 
-  if (Lsparse && !igraph_sparsemat_is_triplet(Lsparse)) {
-    IGRAPH_ERROR("Sparse matrix must be in triplet format", IGRAPH_EINVAL);
-  }
-
-  if (Rsparse && !igraph_sparsemat_is_triplet(Rsparse)) {
-    IGRAPH_ERROR("Sprase matrix must be in triplet format", IGRAPH_EINVAL);
-  }
-  
   switch (matrix_type) {
   case IGRAPH_SCG_SYMMETRIC:
     IGRAPH_CHECK(igraph_i_scg_semiprojectors_sym(groups, L, R, Lsparse, 

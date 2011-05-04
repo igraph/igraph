@@ -665,29 +665,20 @@ SPARSEMAT:
   CALL: &%C%
   INCONV: 
     IN: R_SEXP_to_sparsemat(%I%, &%C%);
-    OUT: if (0 != igraph_sparsemat_init(&%C%, 1, 1, 0)) { \
-            igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
-         } \
-         IGRAPH_FINALLY(igraph_sparsemat_destroy, &%C%);
+    OUT: /* Nothing to do */
   OUTCONV:
     OUT: PROTECT(%I%=R_igraph_sparsemat_to_SEXP(&%C%)); \
-         igraph_sparsemat_destroy(&%C%); \
-         IGRAPH_FINALLY_CLEAN(1);
+         igraph_sparsemat_destroy(&%C%);
 
 SPARSEMAT_OR_0:
   CTYPE: igraph_sparsemat_t
   CALL: (isNull(%I%) ? 0 : &%C%)
   INCONV:
     IN: if (!isNull(%I%)) { R_SEXP_to_sparsemat(%I%, &%C%); }
-    OUT: if (0 != igraph_sparsemat_init(&%C%, 1, 1, 0)) { \
-           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
-         } \
-         IGRAPH_FINALLY(igraph_sparsemat_destroy, &%C%); \
-         %I%=NEW_NUMERIC(0); /* hack to have a non-NULL value */
+    OUT: /* Nothing to do */
   OUTCONV:
     OUT: PROTECT(%I%=R_igraph_0orsparsemat_to_SEXP(&%C%)); \
-         igraph_sparsemat_destroy(&%C%); \
-         IGRAPH_FINALLY_CLEAN(1);
+         igraph_sparsemat_destroy(&%C%);
 
 CVECTOR:
   CTYPE: igraph_vector_complex_t
