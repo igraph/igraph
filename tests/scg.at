@@ -26,3 +26,8 @@ AT_KEYWORDS([SCG spectral coarse graining grouping])
 AT_COMPILE_CHECK([simple/igraph_scg_grouping.c], 
 		 [simple/igraph_scg_grouping.out])
 AT_CLEANUP
+
+AT_SETUP([SCG of a graph (igraph_scg) :])
+AT_KEYWORDS([SCG spectral coarse graining])
+AT_COMPILE_CHECK([simple/scg.c])
+AT_CLEANUP

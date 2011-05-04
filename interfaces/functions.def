@@ -1558,6 +1558,41 @@ igraph_scg_norm_eps:
                 SCGNORM norm=Default
         NAME-R: scg.normEps
 
+igraph_scg:
+        PARAMS: GRAPH graph, VECTOR ev, INTEGER intervals, \
+                VECTOR_OR_0 intervals_vector, SCGMAT matrix_type=Default, \
+                SCGALGO algorithm=Default, SCGNORM norm=Default, \
+                SCGDIR direction=Default, MATRIX_OR_0 evec=NULL, \
+                CMATRIX_OR_0 evec_cplx=NULL, VECTOR_OR_0 given_p=NULL, \
+                VECTOR_OR_0 given_groups=NULL, BOOLEAN use_arpack=False, \
+                INTEGER maxiter=300, OUT GRAPH_OR_0 scg_graph, \
+                OUT MATRIX_OR_0 scg_matrix, OUT SPARSEMAT scg_sparsemat, \
+                OUT MATRIX_OR_0 L, OUT MATRIX_OR_0 R, \
+                OUT SPARSEMAT Lsparse, OUT SPARSEMAT Rsparse, \
+                OUT VECTOR eigenvalues, OUT CVECTOR_OR_0 eigenvalues_cplx, \
+                OUT MATRIX eigenvectors, OUT CMATRIX_OR_0 eigenvectors_cplx, \
+                OUT VECTOR groups, OUT VECTOR p
+        NAME-R: scg
+        IGNORE: RR
+
+igraph_scg_matrix:
+        PARAMS: MATRIX_OR_0 matrix, SPARSEMAT_OR_0 sparsemat, \
+                VECTOR ev, INTEGER intervals, \
+                VECTOR_OR_0 intervals_vector, SCGMAT matrix_type=Default, \
+                SCGALGO algorithm=Default, SCGNORM norm=Default, \
+                SCGDIR direction=Default, MATRIX_OR_0 evec, \
+                CMATRIX_OR_0 evec_cplx, VECTOR_OR_0 given_p, \
+                VECTOR_OR_0 given_groups, BOOLEAN use_arpack=False, \
+                INTEGER maxiter=300, OUT GRAPH_OR_0 scg_graph, \
+                OUT MATRIX_OR_0 scg_matrix, OUT SPARSEMAT scg_sparsemat, \
+                OUT MATRIX_OR_0 L, OUT MATRIX_OR_0 R, \
+                OUT SPARSEMAT Lsparse, OUT SPARSEMAT Rsparse, \
+                OUT VECTOR eigenvalues, OUT CVECTOR_OR_0 eigenvalues_cplx, \
+                OUT MATRIX eigenvectors, OUT CMATRIX_OR_0 eigenvectors_cplx, \
+                OUT VECTOR groups, OUT VECTOR p
+        NAME-R: scg.matrix
+        IGNORE: RR
+
 #######################################
 # Other, not graph related
 #######################################
