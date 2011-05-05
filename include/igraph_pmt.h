@@ -100,11 +100,16 @@
 #endif
 
 #if defined(BASE_IGRAPH_REAL)
-#define FUNCTION(dir,name) CONCAT2(dir,name)
-#define TYPE(dir) CONCAT2(dir,t)
+#  define FUNCTION(dir,name) CONCAT2(dir,name)
+#  define TYPE(dir) CONCAT2(dir,t)
+#elif defined(BASE_BOOL)
+   /* Special case because stdbool.h defines bool as a macro to _Bool which would
+    * screw things up */
+#  define FUNCTION(a,c) CONCAT3x(a,bool,c)
+#  define TYPE(dir) CONCAT3x(dir,bool,t)
 #else
-#define FUNCTION(a,c) CONCAT3(a,SHORT,c)
-#define TYPE(dir) CONCAT3(dir,SHORT,t)
+#  define FUNCTION(a,c) CONCAT3(a,SHORT,c)
+#  define TYPE(dir) CONCAT3(dir,SHORT,t)
 #endif
 
 #if defined(HEAP_TYPE_MIN)
