@@ -63,7 +63,7 @@
  * seed of this RNG is the output of the <code>time(0)</code> function
  * call, using the <code>time</code> function from the standard C
  * library. This ensures that igraph creates a different random graph,
- * easch time the C program is called.
+ * each time the C program is called.
  * </para>
  * 
  * <para> 
@@ -75,7 +75,7 @@
  * <section><title>Reproducible simulations</title>
  * <para> 
  * If reproducible results are needed, then the user should set the
- * seed of the default random number generator explixitly, using the 
+ * seed of the default random number generator explicitly, using the 
  * \ref igraph_rng_seed() function on the default generator, \ref
  * igraph_rng_default. When setting the seed to the same number,
  * igraph generates exactly the same random graph (or series of random
@@ -476,7 +476,7 @@ igraph_rng_type_t igraph_rngtype_mt19937 = {
  * 
  * \param rng The random number generator to use as default from now
  *    on. Calling \ref igraph_rng_destroy() on it, while it is still
- *    being used as the default will result craches and/or
+ *    being used as the default will result in crashes and/or
  *    unpredictable results.
  * 
  * Time complexity: O(1).
@@ -752,7 +752,7 @@ igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng,
  * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default
  *        here to use the default igraph RNG.
  * \param l The lower bound, it can be negative.
- * \param h The uppoer bound, it can be negative, but it has to be
+ * \param h The upper bound, it can be negative, but it has to be
  *        larger than the lower bound.
  * \return The generated uniformly distributed random number.
  * 
@@ -861,7 +861,7 @@ static double expm1 (double x)
 {
     if (fabs(x) < M_LN2)
     {
-        /* Compute the taylor series S = x + (1/2!) x^2 + (1/3!) x^3 + ... */
+        /* Compute the Taylor series S = x + (1/2!) x^2 + (1/3!) x^3 + ... */
 
         double i = 1.0;
         double sum = x;
@@ -946,12 +946,12 @@ int igraph_random_sample_alga(igraph_vector_t *res, igraph_integer_t l, igraph_i
  * \brief Generates an increasing random sequence of integers.
  * 
  * </para><para>
- * This function generates an incresing sequence of random integer
+ * This function generates an increasing sequence of random integer
  * numbers from a given interval. The algorithm is taken literally
  * from Jeffrey Scott Vitter: 'An Efficient Algorithm for Sequential
  * Random Sampling', ACM Transactions on Mathematical Software, 13/1,
  * 58--67. This method can be used for generating numbers from a
- * \em very large interval, it is primilarly created for randomly
+ * \em very large interval, it is primarily created for randomly
  * selecting some edges from the sometimes huge set of possible edges
  * in a large graph.
  * \param res Pointer to an initialized vector, this will hold the
@@ -1166,7 +1166,7 @@ double igraph_rbinom(igraph_rng_t *rng, double nin, double pp) {
 #define ME_PRECISION	8
 /*	does not have "full" precision */
 #define ME_UNDERFLOW	16
-/*	and underflow occured (important for IEEE)*/
+/*	and underflow occurred (important for IEEE)*/
 
 #define ML_ERR_return_NAN { ML_ERROR(ME_DOMAIN); return ML_NAN; }
 
@@ -1634,7 +1634,7 @@ double igraph_rpois(igraph_rng_t *rng, double mu)
 	if (big_mu) {
 	    new_big_mu = TRUE;
 	    /* Case A. (recalculation of s,d,l	because mu has changed):
-	     * The poisson probabilities pk exceed the discrete normal
+	     * The Poisson probabilities pk exceed the discrete normal
 	     * probabilities fk whenever k >= m(mu).
 	     */
 	    muprev = mu;
@@ -1662,7 +1662,7 @@ double igraph_rpois(igraph_rng_t *rng, double mu)
 		    return 0.;
 
 		/* Step T. table comparison until the end pp[l] of the
-		   pp-table of cumulative poisson probabilities
+		   pp-table of cumulative Poisson probabilities
 		   (0.458 > ~= pp[9](= 0.45792971447) for mu=10 ) */
 		if (l != 0) {
 		    for (k = (u <= 0.458) ? 1 : imin2(l, m);  k <= l; k++)
@@ -1671,7 +1671,7 @@ double igraph_rpois(igraph_rng_t *rng, double mu)
 		    if (l == 35) /* u > pp[35] */
 			continue;
 		}
-		/* Step C. creation of new poisson
+		/* Step C. creation of new Poisson
 		   probabilities p[l..] and their cumulatives q =: pp[k] */
 		l++;
 		for (k = l; k <= 35; k++) {
@@ -1917,7 +1917,7 @@ double igraph_rbinom(igraph_rng_t *rng, double nin, double pp)
 	  if (alv < ynorm - amaxp)
 	      goto finis;
 	  if (alv <= ynorm + amaxp) {
-	      /* stirling's formula to machine accuracy */
+	      /* Stirling's formula to machine accuracy */
 	      /* for the final acceptance/rejection test */
 	      x1 = ix + 1;
 	      f1 = fm + 1.0;

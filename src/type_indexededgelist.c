@@ -1091,11 +1091,12 @@ int igraph_edges(const igraph_t *graph, igraph_es_t eids,
  * \function igraph_get_eid
  * \brief Get the edge id from the end points of an edge.
  * 
- * For undirected graphs \c from and \c to are exchangeable.
+ * For undirected graphs \c pfrom and \c pto are exchangeable.
+ *
  * \param graph The graph object.
  * \param eid Pointer to an integer, the edge id will be stored here.
- * \param from The starting point of the edge.
- * \param to The end point of the edge.
+ * \param pfrom The starting point of the edge.
+ * \param pto The end point of the edge.
  * \param directed Logical constant, whether to search for directed
  *        edges in a directed graph. Ignored for undirected graphs.
  * \param error Logical scalar, whether to report an error if the edge 
@@ -1104,9 +1105,9 @@ int igraph_edges(const igraph_t *graph, igraph_es_t eids,
  * \sa \ref igraph_edge() for the opposite operation.
  * 
  * Time complexity: O(log (d)), where d is smaller of the out-degree 
- * of \c from and in-degree of \c to if \p directed is true. If \p directed 
+ * of \c pfrom and in-degree of \c pto if \p directed is true. If \p directed 
  * is false, then it is O(log(d)+log(d2)), where d is the same as before and 
- * d2 is the minimum of the out-degree of \c to and the in-degree of \c from.
+ * d2 is the minimum of the out-degree of \c pto and the in-degree of \c pfrom.
  * 
  * \example examples/simple/igraph_get_eid.c
  * 
