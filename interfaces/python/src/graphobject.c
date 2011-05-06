@@ -3794,10 +3794,10 @@ PyObject *igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *
   igraph_integer_t from, no_of_target_nodes;
   igraph_vs_t to;
   PyObject *list, *item, *mode_o=Py_None, *weights_o=Py_None,
-           *output_o=Py_None, *to_o=Py_None;
+           *output_o=Py_None, *from_o = Py_None, *to_o=Py_None;
   igraph_vector_ptr_t *ptrvec=0;
   igraph_bool_t use_edges = 0;
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|OOOO!", kwlist, &from0,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|OOOO!", kwlist, &from_o,
         &to_o, &weights_o, &mode_o, &PyString_Type, &output_o))
     return NULL;
 
@@ -3811,7 +3811,11 @@ PyObject *igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *
     return NULL;
   }
 
-  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
+  if (igraphmodule_PyObject_to_vid(from_o, &from0, &self->g))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode))
+    return NULL;
   
   if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
       ATTRIBUTE_TYPE_EDGE)) return NULL;
