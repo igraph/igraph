@@ -21,8 +21,8 @@
 
 #include <igraph.h>
 
-#define R_INTEGER(a,b) (igraph_rng_get_integer(igraph_rng_default(), (a), (b)))
-#define R_UNIF(a,b) (igraph_rng_get_unif(igraph_rng_default()), (a), (b))
+#define R_INTEGER(a,b) (igraph_rng_get_integer(&igraph_rng_default, (a), (b)))
+#define R_UNIF(a,b) (igraph_rng_get_unif(&igraph_rng_default, (a), (b)))
 
 int main() {
   igraph_real_t d;
@@ -91,8 +91,7 @@ int main() {
   igraph_vector_sort(&u);
   igraph_vector_sort(&v);
   if (!igraph_vector_is_equal(&u, &v)) {
-      return 5;
-    }
+    return 5;
   }
   igraph_vector_destroy(&u);
   igraph_vector_destroy(&v);
