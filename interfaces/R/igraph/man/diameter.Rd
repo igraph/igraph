@@ -16,9 +16,10 @@ farthest.nodes (graph, directed = TRUE, unconnected = TRUE, weights = NULL)
   \item{directed}{Logical, whether directed or undirected paths are to
     be considered. This is ignored for undirected graphs.}
   \item{unconnected}{Logical, what to do if the graph is unconnected. If
-    FALSE, the function will return the largest possible diameter which
-    is the number of vertices. If TRUE, the diameters of the connected
-    components will be calculated and the largest one will be returned.}
+    FALSE, the function will return a number that is one larger the
+    largest possible diameter, which is always the number of
+    vertices. If TRUE, the diameters of the connected components will be
+    calculated and the largest one will be returned.}
   \item{weights}{Optional positive weight vector for calculating
     weighted distances. If the graph has a \code{weight} edge
     attribute, then this is used by default.}
