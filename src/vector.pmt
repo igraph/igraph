@@ -381,8 +381,8 @@ void FUNCTION(igraph_vector,destroy)   (TYPE(igraph_vector)* v) {
  * </para><para>
  * \a igraph vectors are flexible, they can grow and
  * shrink. Growing 
- * however occasionally needs the data in the vector to be copyed.
- * In order to avoid you can call this function to reserve space for
+ * however occasionally needs the data in the vector to be copied.
+ * In order to avoid this, you can call this function to reserve space for
  * future growth of the vector. 
  * 
  * </para><para>
@@ -394,7 +394,7 @@ void FUNCTION(igraph_vector,destroy)   (TYPE(igraph_vector)* v) {
  * \param v The vector object.
  * \param size The new \em allocated size of the vector.
  * \return Error code:
- *         \c IGRPAH_ENOMEM if there is not enough memory.
+ *         \c IGRAPH_ENOMEM if there is not enough memory.
  *
  * Time complexity: operating system dependent, should be around
  * O(n), n 
@@ -487,7 +487,7 @@ void FUNCTION(igraph_vector,clear)     (TYPE(igraph_vector)* v) {
  * \return Error code:
  *         \c IGRAPH_ENOMEM: not enough memory.
  * 
- * Time complexity: operating system dependent. What is important that
+ * Time complexity: operating system dependent. What is important is that
  * a sequence of n
  * subsequent calls to this function has time complexity
  * O(n), even if there 
@@ -704,7 +704,7 @@ BASE FUNCTION(igraph_vector,pop_back)(TYPE(igraph_vector)* v) {
 /**
  * \ingroup vector
  * \function igraph_vector_sort_cmp
- * \brief Internal comparision function of vector elements, used by 
+ * \brief Internal comparison function of vector elements, used by 
  * \ref igraph_vector_sort().
  */
 
