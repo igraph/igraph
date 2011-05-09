@@ -19,6 +19,10 @@
 <!-- doxrox-include igraph_random_sample -->
 </section>
 
+<section><title>Fisher-Yates shuffle of a sequence</title>
+<!-- doxrox-include igraph_fisher_yates_shuffle -->
+</section>
+
 <section><title>Convex hull of a set of points on a plane</title>
 <!-- doxrox-include igraph_convex_hull -->
 </section>

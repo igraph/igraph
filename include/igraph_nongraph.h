@@ -35,8 +35,9 @@
 #endif
 
 #include "igraph_constants.h"
-#include "igraph_types.h"
 #include "igraph_matrix.h"
+#include "igraph_types.h"
+#include "igraph_vector.h"
 
 __BEGIN_DECLS
 
@@ -46,6 +47,7 @@ __BEGIN_DECLS
 
 int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res, 
 			igraph_integer_t binwidth);
+int igraph_fisher_yates_shuffle(igraph_vector_t *seq);
 int igraph_random_sample(igraph_vector_t *res, igraph_integer_t l, igraph_integer_t h, 
 			 igraph_integer_t length);
 int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,

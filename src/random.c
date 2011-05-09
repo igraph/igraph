@@ -1050,6 +1050,61 @@ int igraph_random_sample(igraph_vector_t *res, igraph_integer_t l, igraph_intege
   
   return retval;
 }
+
+/**
+ * \ingroup nongraph
+ * \function igraph_fisher_yates_shuffle
+ * \brief The Fisher-Yates shuffle, otherwise known as Knuth shuffle.
+ *
+ * The Fisher-Yates shuffle generates a random permutation of a sequence.
+ *
+ * \param seq A sequence of at least one object, indexed from zero. A
+ *        sequence of one object is trivially permuted, hence nothing further
+ *        is done with this sequence.
+ * \return Error code:
+ *         \clist
+ *         \cli IGRAPH_EINVAL
+ *           Invalid sequence; \p seq is a null object or it has zero elements.
+ *         \endclist
+ *
+ * Time complexity: depends on the random number generator used, but should
+ * usually be O(n), where n is the length of \p seq.
+ *
+ * </para><para>
+ * References:
+ * \clist
+ * \cli (Fisher &amp; Yates 1963)
+ *   R. A. Fisher and F. Yates. \emb Statistical Tables for Biological,
+ *   Agricultural and Medical Research. \eme Oliver and Boyd, 6th edition,
+ *   1963, page 37.
+ * \cli (Knuth 1998)
+ *   D. E. Knuth. \emb Seminumerical Algorithms, \eme volume 2 of \emb The Art
+ *   of Computer Programming. \eme Addison-Wesley, 3rd edition, 1998, page 145.
+ * \endclist
+ *
+ * \example examples/simple/igraph_fisher_yates_shuffle.c
+ */
+
+int igraph_fisher_yates_shuffle(igraph_vector_t *seq) {
+  /* sanity checks */
+  if (seq == NULL) {
+    IGRAPH_ERROR("Sequence is a null pointer", IGRAPH_EINVAL);
+  }
+  if (igraph_vector_size(seq) < 1) {
+    IGRAPH_ERROR("Empty sequence", IGRAPH_EINVAL);
+  }
+  /* obtain random permutation */
+  long int i, k;
+  RNG_BEGIN();
+  for (i = igraph_vector_size(seq) - 1; i > 0; i--) {
+    k = RNG_INTEGER(0, i);  /* 0 <= k <= i */
+    /* We possibly have k == i, in which case we leave seq[i] alone. */
+    IGRAPH_CHECK(igraph_vector_swap_elements(seq, k, i));
+  }
+  RNG_END();
+
+  return 0;
+}
   
 #ifdef USING_R
 
