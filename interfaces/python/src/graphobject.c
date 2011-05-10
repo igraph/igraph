@@ -1540,6 +1540,36 @@ PyObject *igraphmodule_Graph_knn(igraphmodule_GraphObject *self,
   return Py_BuildValue("NN", knn_obj, knnk_obj);
 }
 
+/** \ingroup python_interface_graph
+ * \brief Calculates the radius of an \c igraph.Graph
+ * 
+ * \return the radius as a Python integer
+ * \sa igraph_radius
+ */
+PyObject *igraphmodule_Graph_radius(igraphmodule_GraphObject * self,
+                                      PyObject * args, PyObject * kwds)
+{
+  PyObject *mode_o = Py_None;
+  igraph_neimode_t mode = IGRAPH_OUT;
+  igraph_real_t radius;
+
+  static char *kwlist[] = { "mode", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist,
+                                   &mode_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode))
+    return NULL;
+
+  if (igraph_radius(&self->g, &radius, mode)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  return PyFloat_FromDouble((double)radius);
+}
+
 /**********************************************************************
  * Deterministic and non-deterministic graph generators               *
  **********************************************************************/
@@ -3618,6 +3648,54 @@ PyObject *igraphmodule_Graph_decompose(igraphmodule_GraphObject * self,
   }
 
   igraph_vector_ptr_destroy(&components);
+
+  return list;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Calculates the eccentricities of some vertices in a graph.
+ * \return the eccentricities as a list (or a single float)
+ * \sa igraph_eccentricity
+ */
+PyObject *igraphmodule_Graph_eccentricity(igraphmodule_GraphObject* self,
+                                          PyObject* args, PyObject* kwds) {
+  static char *kwlist[] = { "vertices", "mode", NULL };
+  PyObject *vobj = Py_None, *list = NULL, *mode_o = Py_None;
+  igraph_vector_t res;
+  igraph_neimode_t mode = IGRAPH_OUT;
+  int return_single = 0;
+  igraph_vs_t vs;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist, &vobj, &mode_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &self->g, &return_single, 0)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_vector_init(&res, 0)) {
+    igraph_vs_destroy(&vs);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (igraph_eccentricity(&self->g, &res, vs, mode)) {
+    igraph_vs_destroy(&vs);
+    igraph_vector_destroy(&res);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (!return_single)
+    list = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT);
+  else
+    list = PyFloat_FromDouble(VECTOR(res)[0]);
+
+  igraph_vector_destroy(&res);
+  igraph_vs_destroy(&vs);
 
   return list;
 }
@@ -10695,6 +10773,23 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  The IDs are C{None} if the graph is unconnected and C{unconn}\n"
    "  is C{False}."},
 
+  /* interface to igraph_eccentricity */
+  {"eccentricity", (PyCFunction) igraphmodule_Graph_eccentricity,
+   METH_VARARGS | METH_KEYWORDS,
+   "eccentricity(vertices=None, mode=ALL)\n\n"
+   "Calculates the eccentricities of given vertices in a graph.\n\n"
+   "The eccentricity of a vertex is calculated by measuring the\n"
+   "shortest distance from (or to) the vertex, to (or from) all other\n"
+   "vertices in the graph, and taking the maximum.\n\n"
+   "@param vertices: the vertices for which the eccentricity scores must\n"
+   "  be returned. If C{None}, uses all of the vertices in the graph.\n"
+   "@param mode: must be one of L{IN}, L{OUT} and L{ALL}. L{IN} means\n"
+   "  that edge directions are followed; C{OUT} means that edge directions\n"
+   "  are followed the opposite direction; C{ALL} means that directions are\n"
+   "  ignored. The argument has no effect for undirected graphs.\n"
+   "@return: the calculated eccentricities in a list, or a single number if\n"
+   "  a single vertex was supplied.\n"},
+
   /* interface to igraph_edge_betweenness[_estimate] */
   {"edge_betweenness", (PyCFunction) igraphmodule_Graph_edge_betweenness,
    METH_VARARGS | METH_KEYWORDS,
@@ -11045,6 +11140,22 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "in the new graph. No validity checks are performed on the permutation\n"
    "vector.\n\n"
    "@return: the new graph\n"
+  },
+
+  /* interfaces to igraph_radius */
+  {"radius", (PyCFunction) igraphmodule_Graph_radius,
+   METH_VARARGS | METH_KEYWORDS,
+   "radius(mode=OUT)\n\n"
+   "Calculates the radius of the graph.\n\n"
+   "The radius of a graph is defined as the minimum eccentricity of\n"
+   "its vertices (see L{eccentricity()}).\n"
+   "@param mode: what kind of paths to consider for the calculation\n"
+   "  in case of directed graphs. C{OUT} considers paths that follow\n"
+   "  edge directions, C{IN} considers paths that follow the opposite\n"
+   "  edge directions, C{ALL} ignores edge directions. The argument is\n"
+   "  ignored for undirected graphs.\n"
+   "@return: the radius"
+   "@see: L{Graph.eccentricity()}"
   },
 
   /* interface to igraph_reciprocity */

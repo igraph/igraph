@@ -432,32 +432,6 @@ class Graph(GraphBase):
         """
         return DyadCensus(GraphBase.dyad_census(self, *args, **kwds))
 
-    def eccentricity(self, vertices=None):
-        """Calculates eccentricities for vertices with the given indices.
-        
-        Eccentricity is given as the greatest distance between the vertex being
-        considered and any other vertex in the graph.
-
-        Please note that for any unconnected undirected graph, eccentricities
-        will all be equal to infinity. A not weakly connected directed graph
-        will also exhibit the same behaviour.
-
-        @param vertices: the vertices to consider. If C{None}, all
-          vertices are considered.
-        @return: the eccentricities in a list
-        """
-        if self.vcount() == 0:
-            return []
-
-        if vertices is None:
-            vertices = self.vs
-
-        if not self.is_connected(WEAK):
-            return [float('inf') for vertex in vertices]
-        
-        return [max(self.shortest_paths(vertex, mode=OUT)[0])
-                for vertex in vertices]
-
     def get_adjacency(self, type=GET_ADJACENCY_BOTH, attribute=None, \
             default=0, eids=False):
         """Returns the adjacency matrix of a graph.
@@ -701,26 +675,6 @@ class Graph(GraphBase):
             arpack_options = _igraph.arpack_options
         return self.personalized_pagerank(vertices, directed, damping, None, \
                 None, weights, arpack_options)
-
-    def radius(self):
-        """Calculates the radius of the graph.
-        
-        Radius is defined as the smallest vertex eccentricity in the graph.
-        Unconnected undirected graphs and not weakly connected directed
-        graphs have infinite radius. Graphs with no vertices throw
-        an exception.
-
-        @return: the radius of the graph
-        @raise ValueError: when the graph has no vertices at all
-        """
-        if self.vcount() == 0:
-            raise ValueError("graphs with no vertices have no radius")
-
-        if not self.is_connected(WEAK):
-            return float('inf')
-        
-        return min(max(self.shortest_paths(vertex, mode=OUT)[0])
-                for vertex in self.vs)
 
     def spanning_tree(self, weights=None, eids=False):
         """Calculates a minimum spanning tree for a graph.

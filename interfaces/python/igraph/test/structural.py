@@ -1,6 +1,7 @@
 import unittest
-from igraph import *
 
+from igraph import *
+from math import isnan
 
 class SimplePropertiesTests(unittest.TestCase):
     gfull  = Graph.Full(10)
@@ -45,7 +46,7 @@ class SimplePropertiesTests(unittest.TestCase):
         self.assertEquals(self.gfull.eccentricity(),
                 [1] * self.gfull.vcount())
         self.assertEquals(self.gempty.eccentricity(),
-                [float('inf')] * self.gempty.vcount())
+                [0] * self.gempty.vcount())
         self.assertEquals(self.g.eccentricity(), [1, 1, 2, 2])
         self.assertEquals(self.gdir.eccentricity(),
                 [1, 2, 3, 2])
@@ -55,11 +56,11 @@ class SimplePropertiesTests(unittest.TestCase):
 
     def testRadius(self):
         self.assertEquals(self.gfull.radius(), 1)
-        self.assertEquals(self.gempty.radius(), float('inf'))
+        self.assertEquals(self.gempty.radius(), 0)
         self.assertEquals(self.g.radius(), 1)
         self.assertEquals(self.gdir.radius(), 1)
         self.assertEquals(self.tree.radius(), 3)
-        self.assertRaises(ValueError, Graph().radius)
+        self.assertTrue(isnan(Graph().radius()))
 
     def testTransitivity(self):
         self.failUnless(self.gfull.transitivity_undirected() == 1.0)
