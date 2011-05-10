@@ -173,3 +173,14 @@ AT_KEYWORDS([transitive closure DAG])
 AT_COMPILE_CHECK([simple/igraph_transitive_closure_dag.c],
                  [simple/igraph_transitive_closure_dag.out])
 AT_CLEANUP
+
+AT_SETUP([Eccentricity (igraph_eccentricity): ])
+AT_KEYWORDS([eccentricity])
+AT_COMPILE_CHECK([simple/igraph_eccentricity.c])
+AT_CLEANUP
+
+AT_SETUP([Radius (igraph_radius): ])
+AT_KEYWORDS([radius eccentricity])
+AT_COMPILE_CHECK([simple/igraph_radius.c])
+AT_CLEANUP
+

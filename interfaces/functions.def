@@ -709,6 +709,16 @@ igraph_contract_vertices:
                 VERTEX_ATTRIBUTE_COMBINATION vertex_attr_comb=Default
         NAME-R: contract.vertices
 
+igraph_eccentricity:
+        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
+                NEIMODE mode=ALL
+        DEPS: vids ON graph
+        NAME-R: eccentricity
+
+igraph_radius:
+        PARAMS: GRAPH graph, OUT REALPTR radius, NEIMODE mode=ALL
+        NAME-R: radius
+
 #######################################
 # Visitors
 #######################################

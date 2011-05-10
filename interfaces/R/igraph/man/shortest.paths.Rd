@@ -91,7 +91,7 @@ path.length.hist (graph, directed = TRUE)
   arbitrary edge weights, but (naturally) only for graphs that don't
   have a negative cycle.
 
-  igraph can choose automatically between algorithm, and chooses the
+  igraph can choose automatically between algorithms, and chooses the
   most efficient one that is appropriate for the supplied weights (if
   any). For automatic algorithm selection, supply
   \sQuote{\code{automatic}} as the \code{algorithm} argument. (This is

@@ -118,6 +118,13 @@ int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
 int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
 			    igraph_real_t *unconnected, igraph_bool_t directed);
 
+int igraph_eccentricity(const igraph_t *graph, 
+			igraph_vector_t *res,
+			igraph_vs_t vids,
+			igraph_neimode_t mode);
+
+int igraph_radius(const igraph_t *graph, igraph_real_t *radius, 
+		  igraph_neimode_t mode);
 
 __END_DECLS
 
