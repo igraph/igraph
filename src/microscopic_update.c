@@ -23,7 +23,7 @@
 #include "igraph_microscopic_update.h"
 #include "igraph_nongraph.h"
 
-/**
+/*
  * Internal use only.
  * A set of standard tests to be performed prior to strategy updates. The
  * tests contained in this function are common to many strategy revision
@@ -94,7 +94,13 @@ int igraph_microscopic_standard_tests(const igraph_t *graph,
                                       igraph_integer_t vid,
                                       const igraph_vector_t *quantities,
                                       const igraph_vector_t *strategies,
-                                      igraph_neimode_t mode) {
+                                      igraph_neimode_t mode,
+				      igraph_bool_t *updates) {
+
+  igraph_integer_t nvert;
+  igraph_vector_t degv;
+  *updates=1;
+
   /* sanity checks */
   if (graph == NULL) {
     IGRAPH_ERROR("Graph is a null pointer", IGRAPH_EINVAL);
@@ -106,8 +112,8 @@ int igraph_microscopic_standard_tests(const igraph_t *graph,
     IGRAPH_ERROR("Strategies vector is a null pointer", IGRAPH_EINVAL);
   }
 
-  igraph_integer_t nvert = igraph_vcount(graph);
   /* the empty graph */
+  nvert=igraph_vcount(graph);
   if (nvert < 1) {
     IGRAPH_ERROR("Graph cannot be the empty graph", IGRAPH_EINVAL);
   }
@@ -126,22 +132,19 @@ int igraph_microscopic_standard_tests(const igraph_t *graph,
    */
   /* given graph has < 2 vertices */
   if (nvert < 2) {
-    return IGRAPH_FAILURE;
+    *updates=0;
   }
   /* graph has >= 2 vertices, but no edges */
   if (igraph_ecount(graph) < 1) {
-    return IGRAPH_FAILURE;
+    *updates=0;
   }
   /* Given vertex is isolated (undirected graph), has zero out-degree (for */
   /* out-neighbours), or has zero in-degree (for in-neighbours). */
-  igraph_vector_t degv;
   IGRAPH_VECTOR_INIT_FINALLY(&degv, 1);
   IGRAPH_CHECK(igraph_degree(graph, &degv, igraph_vss_1(vid),
 			     mode, IGRAPH_NO_LOOPS));
   if (VECTOR(degv)[0] < 1) {
-    igraph_vector_destroy(&degv);
-    IGRAPH_FINALLY_CLEAN(1);
-    return IGRAPH_FAILURE;
+    *updates=0;
   }
   igraph_vector_destroy(&degv);
   IGRAPH_FINALLY_CLEAN(1);
@@ -239,14 +242,12 @@ int igraph_deterministic_optimal_imitation(const igraph_t *graph,
   igraph_real_t q;
   igraph_vector_t adj;
   int ret;
+  igraph_bool_t updates;
 
-  ret = igraph_microscopic_standard_tests(graph, vid, quantities,
-					  strategies, mode);
-  if (ret != IGRAPH_SUCCESS) {
-    /* no strategy update should take place, so successful exit */
-    return IGRAPH_SUCCESS;
-  }
-
+  IGRAPH_CHECK(igraph_microscopic_standard_tests(graph, vid, quantities,
+						 strategies, mode, &updates));
+  if (!updates) { return IGRAPH_SUCCESS; } /* Nothing to do */
+  
   /* Choose a locally optimal strategy to imitate. This can be either maximum
    * or minimum deterministic imitation. By now we know that the given vertex v
    * has degree >= 1 and at least 1 edge. Then within its immediate

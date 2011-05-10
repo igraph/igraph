@@ -40,12 +40,6 @@
 
 __BEGIN_DECLS
 
-int igraph_microscopic_standard_tests(const igraph_t *graph,
-                                      igraph_integer_t vid,
-                                      const igraph_vector_t *quantities,
-                                      const igraph_vector_t *strategies,
-                                      igraph_neimode_t mode);
-
 int igraph_deterministic_optimal_imitation(const igraph_t *graph,
 					   igraph_integer_t vid,
 					   igraph_optimal_t optimality,
