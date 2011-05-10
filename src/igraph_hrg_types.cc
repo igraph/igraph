@@ -710,7 +710,7 @@ void dendro::binarySearchInsert(elementd* x, elementd* y) {
 // **********************************************************************
 
 list* dendro::binarySearchFind(const double v) {
-  list *head, *tail, *newlist;
+  list *head = NULL, *tail = NULL, *newlist;
   elementd *current = root;
   bool flag_stopSearch = false;
  
@@ -724,15 +724,15 @@ list* dendro::binarySearchFind(const double v) {
     }
     if (v < current->p) {	// now try left subtree
       if (current->L->type == GRAPH) { 
-	flag_stopSearch = true;       
+        flag_stopSearch = true;       
       } else { 
-	current = current->L; 
+        current = current->L; 
       }
     } else {			// else try right subtree
       if (current->R->type == GRAPH) { 
-	flag_stopSearch = true;       
+        flag_stopSearch = true;       
       } else  { 
-	current = current->R; 
+        current = current->R; 
       }
     }
   }
@@ -1257,7 +1257,7 @@ void dendro::cullSplitHist() {
 elementd* dendro::findCommonAncestor(list** paths, const int i, const int j) {
   list* headOne = paths[i];
   list* headTwo = paths[j];
-  elementd* lastStep;
+  elementd* lastStep = NULL;
   while (headOne->x == headTwo->x) {
     lastStep = &internal[headOne->x];
     headOne  = headOne->next;
@@ -2773,7 +2773,7 @@ string* splittree::returnArrayOfKeys() {
 
 slist* splittree::returnListOfKeys() {
   keyValuePairSplit *curr, *prev;
-  slist *head = NULL, *tail, *newlist;
+  slist *head = NULL, *tail = NULL, *newlist;
 
   curr = returnTreeAsList();
   while (curr != NULL) {
