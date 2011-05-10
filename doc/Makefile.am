@@ -11,7 +11,7 @@ DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      operators.xml flows.xml community.xml cliques.xml \
 	      sparsematrix.xml stack.xml dqueue.xml heap.xml strvector.xml \
 	      adjlist.xml arpack.xml bipartite.xml visitors.xml random.xml \
-	      separators.xml memory.xml sparsemat.xml hrg.xml
+	      separators.xml memory.xml sparsemat.xml hrg.xml spatialgames.xml
 
 DOCFIX = fdl.xml gpl.xml installation.xml introduction.xml \
 	 tutorial.xml licenses.xml pmt.xml
@@ -67,11 +67,18 @@ hrg.xml: hrg.xxml $(SRCDIR)/igraph_hrg.cc $(INCLUDEDIR)/igraph_hrg.h
 basicigraph.xml: basicigraph.xxml $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c
 
-generators.xml: generators.xxml $(SRCDIR)/structure_generators.c $(SRCDIR)/games.c \
-		$(SRCDIR)/atlas.c $(SRCDIR)/structural_properties.c $(SRCDIR)/forestfire.c
+generators.xml: generators.xxml \
+		$(SRCDIR)/atlas.c \
+		$(SRCDIR)/forestfire.c \
+		$(SRCDIR)/games.c \
+		$(SRCDIR)/structure_generators.c \
+		$(SRCDIR)/structural_properties.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ \
-	$(SRCDIR)/structure_generators.c $(SRCDIR)/games.c $(SRCDIR)/atlas.c \
-	$(SRCDIR)/structural_properties.c $(SRCDIR)/forestfire.c
+	$(SRCDIR)/atlas.c \
+	$(SRCDIR)/forestfire.c \
+	$(SRCDIR)/games.c \
+	$(SRCDIR)/structure_generators.c \
+	$(SRCDIR)/structural_properties.c
 
 structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 		$(SRCDIR)/spanning_trees.c \
@@ -157,6 +164,11 @@ separators.xml: separators.xxml $(SRCDIR)/separators.c $(SRCDIR)/st-cuts.c
 
 memory.xml: memory.xxml $(SRCDIR)/memory.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/memory.c
+
+spatialgames.xml: spatialgames.xxml \
+		   $(SRCDIR)/microscopic_update.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ \
+	$(SRCDIR)/microscopic_update.c
 
 html/stamp: igraph-docs.xml $(DOCFIX2) gtk-doc.xsl
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \

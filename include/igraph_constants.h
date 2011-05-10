@@ -49,6 +49,8 @@ typedef enum { IGRAPH_NO_LOOPS=0, IGRAPH_LOOPS=1 } igraph_i_loops_t;
 
 typedef enum { IGRAPH_ASCENDING=0, IGRAPH_DESCENDING=1 } igraph_order_t;
 
+typedef enum { IGRAPH_MINIMUM=0, IGRAPH_MAXIMUM=1 } igraph_optimal_t;
+
 typedef enum { IGRAPH_OUT=1, IGRAPH_IN=2, IGRAPH_ALL=3,
 	       IGRAPH_TOTAL=3 } igraph_neimode_t;
 

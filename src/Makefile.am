@@ -183,7 +183,7 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_separators.h  ../include/igraph_cohesive_blocks.h \
 		../include/igraph_lapack.h	../include/igraph_complex.h   \
 		../include/igraph_eigen.h	../include/igraph_statusbar.h \
-		../include/igraph_hrg.h
+		../include/igraph_hrg.h         ../include/igraph_microscopic_update.h
 
 libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     basic_query.c games.c cocitation.c iterators.c \
@@ -214,7 +214,7 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     bliss_partition.cc bliss_graph.cc bliss_timer.cc \
 			     bliss_heap.cc bliss_utils.cc bliss.cc \
 			     cattributes.c revolver_ml_cit.c zeroin.c bfgs.c math.c \
-			     forestfire.c \
+			     forestfire.c microscopic_update.c \
 			     blas.c arpack.c centrality.c drl_layout.cpp drl_parse.cpp \
 			     drl_graph.cpp DensityGrid.cpp \
 			     gengraph_box_list.cpp gengraph_degree_sequence.cpp \

@@ -963,3 +963,5 @@ doc/structural.xml
 doc/strvector.xml
 doc/vector.xml
 doc/visitors.xml
+examples/simple/igraph_deterministic_optimal_imitation.c.xml
+doc/spatialgames.xml
