@@ -206,7 +206,7 @@ int igraph_i_adjacency_min(igraph_matrix_t *adjmatrix, igraph_vector_t *edges) {
  *        (A(i,j) 
  *        is the element in row i and column
  *        j in the adjacency matrix
- *        (\p adjmatrix): 
+ *        \p adjmatrix): 
  *        \clist
  *        \cli IGRAPH_ADJ_DIRECTED
  *          the graph will be directed and
@@ -216,20 +216,20 @@ int igraph_i_adjacency_min(igraph_matrix_t *adjmatrix, igraph_vector_t *edges) {
  *          for convenience. 
  *        \cli IGRAPH_ADJ_MAX
  *          undirected graph will be created
- *          and the number of edges between vertex
+ *          and the number of edges between vertices
  *          i and 
  *          j is
  *          max(A(i,j), A(j,i)). 
  *        \cli IGRAPH_ADJ_MIN
  *          undirected graph will be created
  *          with min(A(i,j), A(j,i))
- *          edges between vertex 
+ *          edges between vertices
  *          i and
  *          j. 
  *        \cli IGRAPH_ADJ_PLUS 
  *          undirected graph will be created 
  *          with A(i,j)+A(j,i) edges
- *          between vertex 
+ *          between vertices
  *          i and
  *          j.  
  *        \cli IGRAPH_ADJ_UPPER 
@@ -428,7 +428,7 @@ int igraph_i_weighted_adjacency_min(igraph_matrix_t *adjmatrix,
  *        (A(i,j) 
  *        is the element in row i and column
  *        j in the adjacency matrix
- *        (\p adjmatrix): 
+ *        \p adjmatrix): 
  *        \clist
  *        \cli IGRAPH_ADJ_DIRECTED
  *          the graph will be directed and
@@ -438,20 +438,20 @@ int igraph_i_weighted_adjacency_min(igraph_matrix_t *adjmatrix,
  *          for convenience. 
  *        \cli IGRAPH_ADJ_MAX
  *          undirected graph will be created
- *          and the weight of the edge between vertex
+ *          and the weight of the edge between vertices
  *          i and 
  *          j is
  *          max(A(i,j), A(j,i)). 
  *        \cli IGRAPH_ADJ_MIN
  *          undirected graph will be created
  *          with edge weight min(A(i,j), A(j,i))
- *          between vertex 
+ *          between vertices
  *          i and
  *          j. 
  *        \cli IGRAPH_ADJ_PLUS 
  *          undirected graph will be created 
  *          with edge weight A(i,j)+A(j,i)
- *          between vertex 
+ *          between vertices
  *          i and
  *          j.  
  *        \cli IGRAPH_ADJ_UPPER 
@@ -650,7 +650,7 @@ int igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
 /**
  * \ingroup generators 
  * \function igraph_lattice
- * \brief Creates most kind of lattices.
+ * \brief Creates most kinds of lattices.
  *
  * \param graph An uninitialized graph object.
  * \param dimvector Vector giving the sizes of the lattice in each of
@@ -671,7 +671,7 @@ int igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
  *         dimension vector. 
  *
  * Time complexity: if \p nei is less than two then it is O(|V|+|E|) (as
- * far as i remember), |V| and |E| are the number of vertices 
+ * far as I remember), |V| and |E| are the number of vertices 
  * and edges in the generated graph. Otherwise it is O(|V|*d^o+|E|), d
  * is the average degree of the graph, o is the \p nei argument.
  */
@@ -1032,7 +1032,7 @@ int igraph_full_citation(igraph_t *graph, igraph_integer_t n,
  * 
  * </para><para>
  * This function is handy when a relatively small graph needs to be created. 
- * Instead giving the edges in vector, they are given simply as
+ * Instead of giving the edges as a vector, they are given simply as
  * arguments and a '-1' needs to be given after the last meaningful
  * edge argument. 
  * 
@@ -1083,7 +1083,7 @@ int igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
  * \function igraph_extended_chordal_ring
  * Create an extended chordal ring
  * 
- * An extended chordal ring is regular graph, each node has the same
+ * An extended chordal ring is a regular graph, each node has the same
  * degree. It can be obtained from a simple ring by adding some extra
  * edges specified by a matrix. Let p denote the number of columns in
  * the <parameter>W</parameter> matrix. The extra edges of vertex i
@@ -1162,7 +1162,7 @@ int igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes,
  * \function igraph_connect_neighborhood
  * \brief Connects every vertex to its neighborhood
  * 
- * This function adds new edges to graph. For each vertex 
+ * This function adds new edges to the input graph. For each vertex 
  * vertices reachable by at most \p order steps and not yet connected
  * to the vertex a new edge is created.
  * 
@@ -1171,7 +1171,7 @@ int igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes,
  * the original graph as well.
  * 
  * </para><para> For undirected graphs reachability is always
- * symmetric, if vertex A can be reached from vertex B in at
+ * symmetric: if vertex A can be reached from vertex B in at
  * most \p order steps, then the opposite is also true. Only one
  * undirected (A,B) edge will be added in this case.
  * \param graph The input graph, this is the output graph as well.
@@ -1583,9 +1583,9 @@ int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
  * 
  * </para><para>
  * LCF is short for Lederberg-Coxeter-Frucht, it is a concise notation for
- * 3-regular Hamiltonian graphs. It consists of three parameters, the
+ * 3-regular Hamiltonian graphs. It consists of three parameters: the
  * number of vertices in the graph, a list of shifts giving additional
- * edges to a cycle backbone and another integer giving how many times
+ * edges to a cycle backbone, and another integer giving how many times
  * the shifts should be performed. See
  * http://mathworld.wolfram.com/LCFNotation.html for details. 
  * 
@@ -1883,7 +1883,7 @@ int igraph_i_famous(igraph_t *graph, igraph_real_t *data) {
  * The following graphs are supported:
  * \clist
  *   \cli Bull
- *           The bull graph, 5 vertices, 5 edges, resembles to the
+ *           The bull graph, 5 vertices, 5 edges, resembles the
  *           head of a bull if drawn properly.
  *   \cli Chvatal 
  *           This is the smallest triangle-free graph that is
@@ -1898,7 +1898,7 @@ int igraph_i_famous(igraph_t *graph, igraph_real_t *data) {
  *           The Platonic graph of the cube. A convex regular
  *           polyhedron with 8 vertices and 12 edges.
  *   \cli Diamond
- *           A graph with 4 vertices and 5 edges, resembles to a
+ *           A graph with 4 vertices and 5 edges, resembles a
  *           schematic diamond if drawn properly.
  *   \cli Dodecahedral, Dodecahedron
  *           Another Platonic solid
@@ -2111,7 +2111,7 @@ int igraph_famous(igraph_t *graph, const char *name) {
  * An adjacency list is list of vectors, containing the neighbors 
  * of all vertices. For operations that involve many changes of the
  * graph structure, it is recommended that you convert the graph into
- * and adjacency list via \ref igraph_adjlist_init(), perform the
+ * an adjacency list via \ref igraph_adjlist_init(), perform the
  * modifications (these are cheap for an adjacency list) and then
  * recreate the igraph graph via this function.
  * 
