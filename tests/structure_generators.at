@@ -110,3 +110,8 @@ AT_SETUP([Graphs in LCF notation (igraph_lcf{,_vector}):])
 AT_KEYWORDS([LCF graph constructor])
 AT_COMPILE_CHECK([simple/igraph_lcf.c])
 AT_CLEANUP
+
+AT_SETUP([Watts-Strogatz graphs (igraph_watts_strogatz_game):])
+AT_KEYWORDS([small world small-world Watts Strogratz])
+AT_COMPILE_CHECK([simple/watts_strogatz_game.c])
+AT_CLEANUP

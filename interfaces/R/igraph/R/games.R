@@ -280,19 +280,22 @@ connect.neighborhood <- function(graph, order, mode=c("all", "out", "in", "total
         PACKAGE="igraph")
 }
 
-rewire.edges <- function(graph, prob, loops=FALSE) {
+rewire.edges <- function(graph, prob, loops=FALSE, multiple=FALSE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_rewire_edges", graph, as.numeric(prob), as.logical(loops),
+        as.logical(multiple),
         PACKAGE="igraph")
 }
 
-watts.strogatz.game <- function(dim, size, nei, p, loops=FALSE) {
+watts.strogatz.game <- function(dim, size, nei, p, loops=FALSE,
+                                multiple=FALSE) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_watts_strogatz_game", as.numeric(dim), as.numeric(size),
         as.numeric(nei), as.numeric(p), as.logical(loops),
+        as.logical(multiple),
         PACKAGE="igraph")
 }
 
