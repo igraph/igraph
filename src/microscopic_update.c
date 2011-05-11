@@ -75,6 +75,17 @@
  *          relevant if \p graph is a digraph. Also use this value if
  *          \p graph is undirected.
  *        \endclist
+ * \param updates Boolean; at the end of this test suite, this flag
+ *        indicates whether to proceed with strategy revision. If true then
+ *        strategy revision should proceed; otherwise there is no need to
+ *        continue with revising a vertex's strategy. A caller function that
+ *        invokes this function would use the value of \p updates to
+ *        determine whether to proceed with strategy revision.
+ * \param islocal Boolean; this flag controls which perspective to use. If
+ *        true then we use the local perspective; otherwise we use the global
+ *        perspective. The local perspective for \p vid is the set of all
+ *        immediate neighbours of \p vid. In contrast, the global perspective
+ *        for \p vid is the vertex set of \p graph.
  * \return Codes:
  *         \clist
  *         \cli IGRAPH_EINVAL
@@ -85,8 +96,9 @@
  *           vertices in \p graph. (3) The parameter \p graph is the empty
  *           or null graph, i.e. the graph with zero vertices and edges.
  *         \cli IGRAPH_SUCCESS
- *           This signal is returned if we should proceed with strategy update.
- *           Otherwise no strategy revision is necessary.
+ *           This signal is returned if no errors were raised. You should use
+ *           the value of the boolean \p updates to decide whether to go
+ *           ahead with updating a vertex's strategy.
  *         \endclist
  */
 
@@ -95,7 +107,8 @@ int igraph_microscopic_standard_tests(const igraph_t *graph,
                                       const igraph_vector_t *quantities,
                                       const igraph_vector_t *strategies,
                                       igraph_neimode_t mode,
-				      igraph_bool_t *updates) {
+				      igraph_bool_t *updates, 
+				      igraph_bool_t islocal) {
 
   igraph_integer_t nvert;
   igraph_vector_t degv;
@@ -138,17 +151,28 @@ int igraph_microscopic_standard_tests(const igraph_t *graph,
   if (igraph_ecount(graph) < 1) {
     *updates=0;
   }
-  /* Given vertex is isolated (undirected graph), has zero out-degree (for */
-  /* out-neighbours), or has zero in-degree (for in-neighbours). */
-  IGRAPH_VECTOR_INIT_FINALLY(&degv, 1);
-  IGRAPH_CHECK(igraph_degree(graph, &degv, igraph_vss_1(vid),
-			     mode, IGRAPH_NO_LOOPS));
-  if (VECTOR(degv)[0] < 1) {
-    *updates=0;
-  }
-  igraph_vector_destroy(&degv);
-  IGRAPH_FINALLY_CLEAN(1);
 
+  /* Test for vertex isolation, depending on the perspective given. For
+   * undirected graphs, a given vertex v is isolated if its degree is zero.
+   * If we are considering in-neighbours (respectively out-neighbours), then
+   * we say that v is isolated if its in-degree (respectively out-degree) is
+   * zero. In general, this vertex isolation test is only relevant if we are
+   * using a local perspective, i.e. if we only consider the immediate
+   * neighbours (local perspective) of v as opposed to all vertices in the
+   * vertex set of the graph (global perspective).
+   */
+  if (islocal) {
+    /* Moving on ahead with vertex isolation test, since local perspective */
+    /* is requested. */
+    IGRAPH_VECTOR_INIT_FINALLY(&degv, 1);
+    IGRAPH_CHECK(igraph_degree(graph, &degv, igraph_vss_1(vid),
+			       mode, IGRAPH_NO_LOOPS));
+    if (VECTOR(degv)[0] < 1)
+      *updates = 0;
+    igraph_vector_destroy(&degv);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
   return IGRAPH_SUCCESS;
 }
 
@@ -241,11 +265,11 @@ int igraph_deterministic_optimal_imitation(const igraph_t *graph,
   igraph_integer_t i, k, v;
   igraph_real_t q;
   igraph_vector_t adj;
-  int ret;
   igraph_bool_t updates;
 
   IGRAPH_CHECK(igraph_microscopic_standard_tests(graph, vid, quantities,
-						 strategies, mode, &updates));
+                                                 strategies, mode, &updates,
+                                                 /*is local?*/ 1));
   if (!updates) { return IGRAPH_SUCCESS; } /* Nothing to do */
   
   /* Choose a locally optimal strategy to imitate. This can be either maximum
