@@ -37,7 +37,7 @@ typedef struct {
  */
 int error_tests() {
   igraph_t g, h;
-  igraph_vector_t quant, strat,  v;
+  igraph_vector_t quant, strat;
   int i, n, ret;
   strategy_test_t *test;
 
@@ -49,7 +49,7 @@ int error_tests() {
 
   {
     /* test parameters */
-    /*--------graph--vertex--optimality--quantities--strategies--mode------*/
+    /*--graph--vertex--optimality--quantities--strategies--mode--retval--*/
     /* null pointer for graph */
     strategy_test_t null_graph = { NULL, 0, 0, NULL, NULL, IGRAPH_ALL, 
 				   IGRAPH_EINVAL };
@@ -158,7 +158,7 @@ int isolated_vertex_test() {
  */
 int petersen_game_test() {
   igraph_t g;
-  igraph_vector_t known_max_v, known_min_v, quant, strat, stratcopy, v;
+  igraph_vector_t known_max_v, known_min_v, quant, strat, stratcopy;
   int i, nedge, nvert;  
 
   /* the Petersen graph */
