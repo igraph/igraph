@@ -2839,16 +2839,18 @@ PyObject *igraphmodule_Graph_Watts_Strogatz(PyTypeObject * type,
   long nei = 1, dim, size;
   double p;
   PyObject* loops = Py_False;
+  PyObject* multiple = Py_False;
   igraphmodule_GraphObject *self;
   igraph_t g;
 
-  static char *kwlist[] = { "dim", "size", "nei", "p", "loops", NULL };
+  static char *kwlist[] = { "dim", "size", "nei", "p", "loops", "multiple", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "llld|O", kwlist,
-                                   &dim, &size, &nei, &p, &loops))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "llld|OO", kwlist,
+                                   &dim, &size, &nei, &p, &loops, &multiple))
     return NULL;
 
-  if (igraph_watts_strogatz_game(&g, dim, size, nei, p, PyObject_IsTrue(loops))) {
+  if (igraph_watts_strogatz_game(&g, dim, size, nei, p, PyObject_IsTrue(loops),
+        PyObject_IsTrue(multiple))) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -10575,13 +10577,16 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_watts_strogatz_game */
   {"Watts_Strogatz", (PyCFunction) igraphmodule_Graph_Watts_Strogatz,
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-   "Watts_Strogatz(dim, size, nei, p)\n\n"
+   "Watts_Strogatz(dim, size, nei, p, loops=False, multiple=False)\n\n"
    "@param dim: the dimension of the lattice\n"
    "@param size: the size of the lattice along all dimensions\n"
    "@param nei: value giving the distance (number of steps) within which\n"
    "   two vertices will be connected.\n"
    "@param p: rewiring probability\n\n"
-   "@see: L{Lattice()}, L{rewire()} if more flexibility is needed\n"
+   "@param loops: specifies whether loop edges are allowed\n"
+   "@param multiple: specifies whether multiple edges are allowed\n"
+   "@see: L{Lattice()}, L{rewire()}, L{rewire_edges()} if more flexibility is\n"
+   "  needed\n"
    "@newfield ref: Reference\n"
    "@ref: Duncan J Watts and Steven H Strogatz: I{Collective dynamics of\n"
    "  small world networks}, Nature 393, 440-442, 1998\n"},
