@@ -302,6 +302,7 @@ examples/simple/vector.c.xml
 examples/simple/vector2.c.xml
 examples/simple/vector_ptr.c.xml
 examples/simple/walktrap.c.xml
+examples/simple/watts_strogatz_game.c.xml
 interfaces/R/arpack/stamp
 doc/html/stamp
 doc/tags
