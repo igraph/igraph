@@ -676,16 +676,16 @@ class Graph(GraphBase):
         return self.personalized_pagerank(vertices, directed, damping, None, \
                 None, weights, arpack_options)
 
-    def spanning_tree(self, weights=None, eids=False):
+    def spanning_tree(self, weights=None, return_tree=True):
         """Calculates a minimum spanning tree for a graph.
 
         @param weights: a vector containing weights for every edge in
           the graph. C{None} means that the graph is unweighted.
-        @param eids: whether to return the minimum spanning tree (when eids
-          is C{False}) or to return the IDs of the edges in the minimum
-          spanning tree instead (when eids is C{True}). The default is
-          C{False} for historical reasons as this argument was introduced
-          in igraph 0.6.
+        @param return_tree: whether to return the minimum spanning tree (when
+          C{return_tree} is C{True}) or to return the IDs of the edges in
+          the minimum spanning tree instead (when C{return_tree} is C{False}).
+          The default is C{True} for historical reasons as this argument was
+          introduced in igraph 0.6.
         @return: the spanning tree as a L{Graph} object if C{return_tree}
           is C{True} or the IDs of the edges that constitute the spanning
           tree if C{return_tree} is C{False}.
@@ -695,7 +695,7 @@ class Graph(GraphBase):
           generalizations}. Bell System Technical Journal 36:1389-1401, 1957.
         """
         result = GraphBase._spanning_tree(self, weights)
-        if not eids:
+        if return_tree:
             return self.subgraph_edges(result, delete_vertices=False)
         return result
 

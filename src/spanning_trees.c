@@ -123,7 +123,7 @@ int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
 					    igraph_t *mst) {
   igraph_vector_t edges=IGRAPH_VECTOR_NULL;
 
-  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, igraph_vcount(graph)-1);
   IGRAPH_CHECK(igraph_i_minimum_spanning_tree_unweighted(graph, &edges));
   IGRAPH_CHECK(igraph_subgraph_edges(graph, mst,
         igraph_ess_vector(&edges), /* delete_vertices = */ 0));
@@ -187,7 +187,7 @@ int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
 				      const igraph_vector_t *weights) {
   igraph_vector_t edges=IGRAPH_VECTOR_NULL;
 
-  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, igraph_vcount(graph)-1);
   IGRAPH_CHECK(igraph_i_minimum_spanning_tree_prim(graph, &edges, weights));
   IGRAPH_CHECK(igraph_subgraph_edges(graph, mst,
         igraph_ess_vector(&edges), /* delete_vertices = */ 0));
@@ -209,6 +209,8 @@ int igraph_i_minimum_spanning_tree_unweighted(const igraph_t* graph,
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
   igraph_vector_t tmp=IGRAPH_VECTOR_NULL;
   long int i, j;
+
+  igraph_vector_clear(res);
 
   added_edges=igraph_Calloc(no_of_edges, char);
   if (added_edges==0) {
@@ -273,6 +275,8 @@ int igraph_i_minimum_spanning_tree_prim(const igraph_t* graph,
   igraph_vector_t adj;
 
   long int i, j;
+
+  igraph_vector_clear(res);
 
   if (weights == 0)
     return igraph_i_minimum_spanning_tree_unweighted(graph, res);

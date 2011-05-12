@@ -33,6 +33,7 @@
 #include "igraph_memory.h"
 #include "igraph_structural.h"
 #include "igraph_types.h"
+#include "igraph_visitor.h"
 
 int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
         const igraph_vector_t *weights);
@@ -112,7 +113,7 @@ int igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph_vector_t 
   igraph_vector_t edges;
   long int i, j, n, no_of_nodes = igraph_vcount(graph);
 
-  IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_nodes-1);
   if (weights) {
     /* Find a maximum weight spanning tree. igraph has a routine for minimum
      * spanning trees, so we negate the weights */
@@ -148,12 +149,32 @@ int igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph_vector_t 
 
   if (layering != 0) {
     igraph_vector_t degrees;
+    igraph_vector_t roots;
+
     IGRAPH_VECTOR_INIT_FINALLY(&degrees, no_of_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&roots, no_of_nodes);
+
     IGRAPH_CHECK(igraph_strength(graph, &degrees, igraph_vss_all(),
         IGRAPH_ALL, 0, weights));
-    /* TODO */
+    IGRAPH_CHECK(igraph_vector_qsort_ind(&degrees, &roots, /* descending = */ 1));
+    IGRAPH_CHECK(igraph_bfs(graph,
+          /* root = */ 0,
+          /* roots = */ &roots,
+          /* mode = */ IGRAPH_OUT,
+          /* unreachable = */ 0,
+          /* restricted = */ 0,
+          /* order = */ 0,
+          /* rank = */ 0,
+          /* father = */ 0,
+          /* pred = */ 0,
+          /* succ = */ 0,
+          /* dist = */ layering,
+          /* callback = */ 0,
+          /* extra = */ 0));
+
     igraph_vector_destroy(&degrees);
-    IGRAPH_FINALLY_CLEAN(1);
+    igraph_vector_destroy(&roots);
+    IGRAPH_FINALLY_CLEAN(2);
   }
 
   igraph_vector_destroy(&edges);
