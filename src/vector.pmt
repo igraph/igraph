@@ -760,7 +760,7 @@ int FUNCTION(igraph_vector,i_qsort_ind_cmp_desc)(const void *p1 , const void *p2
 }
 
 /**
- * \function vector_qsort_ind
+ * \function igraph_vector_qsort_ind
  * \brief Return a permutation of indices that sorts a vector 
  *
  * Takes an unsorted array \c v as input and computes an array of

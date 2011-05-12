@@ -3855,6 +3855,47 @@ PyObject *igraphmodule_Graph_eigenvector_centrality(
   return res_o;
 }
 
+/** \ingroup python_interface_graph
+ * \brief Calculates a feedback arc set for a graph
+ * \return a list containing the indices in the chosen feedback arc set
+ * \sa igraph_feedback_arc_set
+ */
+PyObject *igraphmodule_Graph_feedback_arc_set(
+    igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = { "weights", "method", NULL };
+  igraph_vector_t* weights = 0;
+  igraph_vector_t result;
+  igraph_fas_algorithm_t algo = IGRAPH_FAS_APPROX_EADES;
+  PyObject *weights_o = Py_None, *result_o = NULL, *algo_o = NULL;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist, &weights_o, &algo_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_fas_algorithm_t(algo_o, &algo))
+    return NULL;
+
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE))
+    return NULL;
+
+  if (igraph_vector_init(&result, 0)) {
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
+  }
+
+  if (igraph_feedback_arc_set(&self->g, &result, weights, algo)) {
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
+    igraph_vector_destroy(&result);
+    return NULL;
+  }
+
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
+
+  result_o = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&result);
+
+  return result_o;
+}
+
 
 /** \ingroup python_interface_graph
  * \brief Calculates the shortest paths from/to a given node in the graph
@@ -4726,7 +4767,6 @@ PyObject *igraphmodule_Graph_similarity_inverse_log_weighted(
 
   return list;
 }
-
 
 /** \ingroup python_interface_graph
  * \brief Calculates a spanning tree for a graph
@@ -6196,6 +6236,86 @@ PyObject *igraphmodule_Graph_layout_reingold_tilford_circular(
 
   result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
   igraph_matrix_destroy(&m);
+  return (PyObject *) result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Places the vertices of a graph according to the Sugiyama layout.
+ * \return the calculated coordinates as a Python list of lists
+ * \sa igraph_layout_sugiyama
+ */
+PyObject *igraphmodule_Graph_layout_sugiyama(
+  igraphmodule_GraphObject * self, PyObject * args, PyObject * kwds)
+{
+  static char *kwlist[] = { "layers", "weights", "hgap", "vgap", "maxiter",
+    "return_extended_graph", NULL };
+  igraph_matrix_t m;
+  igraph_t extd_graph;
+  igraph_vector_t extd_to_orig_eids;
+  igraph_vector_t *weights = 0, *layers = 0;
+  double hgap = 1, vgap = 1;
+  long int maxiter = 100;
+  PyObject *layers_o = Py_None, *weights_o = Py_None, *extd_to_orig_eids_o = Py_None;
+  PyObject *return_extended_graph = Py_False;
+  PyObject *result;
+  igraphmodule_GraphObject *graph_o;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOddlO", kwlist,
+    &layers_o, &weights_o, &hgap, &vgap, &maxiter, &return_extended_graph))
+    return NULL;
+
+  if (igraph_vector_init(&extd_to_orig_eids, 0)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_matrix_init(&m, 1, 1)) {
+    igraph_vector_destroy(&extd_to_orig_eids);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraphmodule_attrib_to_vector_t(layers_o, self, &layers,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    igraph_vector_destroy(&extd_to_orig_eids);
+    igraph_matrix_destroy(&m);
+    return NULL;
+  }
+
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    if (layers != 0) { igraph_vector_destroy(layers); free(layers); }
+    igraph_vector_destroy(&extd_to_orig_eids);
+    igraph_matrix_destroy(&m);
+    return NULL;
+  }
+
+  if (igraph_layout_sugiyama(&self->g, &m,
+        (PyObject_IsTrue(return_extended_graph) ? &extd_graph : 0),
+        (PyObject_IsTrue(return_extended_graph) ? &extd_to_orig_eids : 0),
+        layers, hgap, vgap, maxiter, weights)) {
+    if (layers != 0) { igraph_vector_destroy(layers); free(layers); }
+    if (weights != 0) { igraph_vector_destroy(weights); free(weights); }
+    igraph_vector_destroy(&extd_to_orig_eids);
+    igraph_matrix_destroy(&m);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (layers != 0) { igraph_vector_destroy(layers); free(layers); }
+  if (weights != 0) { igraph_vector_destroy(weights); free(weights); }
+
+  result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
+  igraph_matrix_destroy(&m);
+
+  if (PyObject_IsTrue(return_extended_graph)) {
+    CREATE_GRAPH(graph_o, extd_graph);
+    extd_to_orig_eids_o = igraphmodule_vector_t_to_PyList(&extd_to_orig_eids,
+        IGRAPHMODULE_TYPE_INT);
+    result = Py_BuildValue("NNN", result, graph_o, extd_to_orig_eids_o);
+  }
+
+  igraph_vector_destroy(&extd_to_orig_eids);
   return (PyObject *) result;
 }
 
@@ -10851,6 +10971,34 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  largest eigenvalue (as a second member of a tuple)"
   },
 
+  /* interface to igraph_feedback_arc_set */
+  {"feedback_arc_set", (PyCFunction) igraphmodule_Graph_feedback_arc_set,
+   METH_VARARGS | METH_KEYWORDS,
+   "feedback_arc_set(weights=None, method=\"eades\")\n\n"
+   "Calculates an approximately or exactly minimal feedback arc set.\n\n"
+   "A feedback arc set is a set of edges whose removal makes the graph acyclic.\n"
+   "Since this is always possible by removing all the edges, we are in general\n"
+   "interested in removing the smallest possible number of edges, or an edge set\n"
+   "with as small total weight as possible. This method calculates one such edge\n"
+   "set. Note that the task is trivial for an undirected graph as it is enough\n"
+   "to find a spanning tree and then remove all the edges not in the spanning\n"
+   "tree. Of course it is more complicated for directed graphs.\n\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name. When given, the algorithm will strive to\n"
+   "  remove lightweight edges in order to minimize the total weight of the\n"
+   "  feedback arc set.\n"
+   "@param method: the algorithm to use. C{\"eades\"} uses the greedy cycle\n"
+   "  breaking heuristic of Eades, Lin and Smyth, which is linear in the number\n"
+   "  of edges but not necessarily optimal; however, it guarantees that the\n"
+   "  number of edges to be removed is smaller than |E|/2 - |V|/6. C{\"ip\"} uses\n"
+   "  an integer programming formulation which is guaranteed to yield an optimal\n"
+   "  result, but is too slow for large graphs.\n"
+   "@return: the IDs of the edges to be removed, in a list.\n\n"
+   "@newfield ref: Reference\n"
+   "@ref: Eades P, Lin X and Smyth WF: A fast and effective heuristic for the\n"
+   "  feedback arc set problem. In: Proc Inf Process Lett 319-323, 1993.\n"
+  },
+
   // interface to igraph_get_shortest_paths
   {"get_shortest_paths", (PyCFunction) igraphmodule_Graph_get_shortest_paths,
    METH_VARARGS | METH_KEYWORDS,
@@ -11934,6 +12082,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param dim: the desired number of dimensions for the layout. dim=2\n"
    "  means a 2D layout, dim=3 means a 3D layout.\n"
    "@return: the coordinate pairs in a list."},
+
+  /* interface to igraph_layout_sugiyama */
+  {"_layout_sugiyama",
+   (PyCFunction) igraphmodule_Graph_layout_sugiyama,
+   METH_VARARGS | METH_KEYWORDS,
+   "Internal function, undocumented.\n\n"
+   "@see: Graph.layout_sugiyama()\n\n"},
 
   ////////////////////////////
   // VISITOR-LIKE FUNCTIONS //

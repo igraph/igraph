@@ -37,6 +37,11 @@ AT_COMPILE_CHECK([simple/igraph_layout_reingold_tilford.c], [],
   [simple/igraph_layout_reingold_tilford.in])
 AT_CLEANUP
 
+AT_SETUP([Sugiyama layout (igraph_layout_sugiyama):])
+AT_KEYWORDS([sugiyama layout igraph_layout_sugiyama])
+AT_COMPILE_CHECK([simple/igraph_layout_sugiyama.c], [simple/igraph_layout_sugiyama.out])
+AT_CLEANUP
+
 AT_SETUP([Multidimensional scaling (igraph_layout_mds):])
 AT_KEYWORDS([multidimensional scaling layout igraph_layout_mds])
 AT_COMPILE_CHECK([simple/igraph_layout_mds.c], [simple/igraph_layout_mds.out])

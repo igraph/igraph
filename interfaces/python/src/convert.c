@@ -343,6 +343,24 @@ int igraphmodule_PyObject_to_degseq_t(PyObject *o,
 }
 
 /**
+ * \ingroup python_interface_conversion
+ * \brief Converts a Python object to an igraph \c igraph_fas_algorithm_t
+ */
+int igraphmodule_PyObject_to_fas_algorithm_t(PyObject *o,
+  igraph_fas_algorithm_t *result) {
+  static igraphmodule_enum_translation_table_entry_t fas_algorithm_tt[] = {
+        {"approx_eades", IGRAPH_FAS_APPROX_EADES},
+        {"eades", IGRAPH_FAS_APPROX_EADES},
+        {"exact", IGRAPH_FAS_EXACT_IP},
+        {"exact_ip", IGRAPH_FAS_EXACT_IP},
+        {"ip", IGRAPH_FAS_EXACT_IP},
+        {0,0}
+    };
+
+  return igraphmodule_PyObject_to_enum(o, fas_algorithm_tt, (int*)result);
+}
+
+/**
  * \brief Converts a Python object to an igraph \c igraph_spinglass_implementation_t
  */
 int igraphmodule_PyObject_to_spinglass_implementation_t(PyObject *o, igraph_spinglass_implementation_t *result) {

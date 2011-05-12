@@ -139,9 +139,10 @@
 <!-- doxrox-include igraph_coreness -->
 </section>
 
-<section><title>Topological sorting</title>
+<section><title>Topological sorting, directed acyclic graphs</title>
 <!-- doxrox-include igraph_is_dag -->
 <!-- doxrox-include igraph_topological_sorting -->
+<!-- doxrox-include igraph_feedback_arc_set -->
 </section>
 
 <section><title>Maximum cardinality search, graph decomposition, chordal graphs</title>

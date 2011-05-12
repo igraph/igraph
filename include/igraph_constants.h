@@ -128,6 +128,9 @@ typedef enum { IGRAPH_BARABASI_BAG = 0,
 	       IGRAPH_BARABASI_PSUMTREE, 
 	       IGRAPH_BARABASI_PSUMTREE_MULTIPLE} igraph_barabasi_algorithm_t;
 
+typedef enum { IGRAPH_FAS_EXACT_IP = 0,
+	       IGRAPH_FAS_APPROX_EADES } igraph_fas_algorithm_t;
+
 typedef enum { IGRAPH_SUBGRAPH_AUTO = 0,
 	           IGRAPH_SUBGRAPH_COPY_AND_DELETE,
 			   IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH

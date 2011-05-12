@@ -3974,7 +3974,8 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
  * vertices and edges in the original input graph.
  *
  * \sa \ref igraph_is_dag() if you are only interested in whether a given
- *     graph is a DAG or not.
+ *     graph is a DAG or not, or \ref igraph_feedback_arc_set() to find a
+ *     set of edges whose removal makes the graph a DAG.
  * 
  * \example examples/simple/igraph_topological_sorting.c
  */
@@ -6552,10 +6553,8 @@ int igraph_strength(const igraph_t *graph, igraph_vector_t *res,
   igraph_vector_t neis;
   long int i;
 
-  if (!weights) {
-    IGRAPH_WARNING("No edge weights for strength calculation, normal degree");
+  if (!weights)
     return igraph_degree(graph, res, vids, mode, loops);
-  }
   
   if (igraph_vector_size(weights) != igraph_ecount(graph)) {
     IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
