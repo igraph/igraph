@@ -297,7 +297,7 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
   igraph_vector_t membership;         /* components of the original graph */
   igraph_vector_t extd_edgelist;   /* edge list of the extended graph */
   igraph_vector_t layers_own;  /* layer indices after having eliminated empty layers */
-  igraph_real_t dx = 0;   /* displacement of the current component on the X axis */
+  igraph_real_t dx=0, dx2=0;  /* displacement of the current component on the X axis */
   igraph_vector_t layer_to_y; /* mapping from layer indices to final Y coordinates */
 
   if (layers && igraph_vector_size(layers) != no_of_nodes) {
@@ -497,27 +497,27 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
       IGRAPH_CHECK(igraph_i_layout_sugiyama_place_nodes_horizontally(&subgraph, &layout,
             &layering, hgap, component_size));
 
-      /* Re-assign rows into the result matrix */
+      /* Re-assign rows into the result matrix, and at the same time, */
+      /* adjust dx so that the next component does not overlap this one */
       j = next_new_vertex_id - component_size;
       k = igraph_matrix_nrow(res);
       IGRAPH_CHECK(igraph_matrix_add_rows(res, j));
+      dx2 = dx;
       for (i = 0; i < component_size; i++) {
         l = (long int)VECTOR(new2old_vertex_ids)[i];
         MATRIX(*res, l, 0) = MATRIX(layout, i, 0) + dx;
         MATRIX(*res, l, 1) = VECTOR(layer_to_y)[(long)MATRIX(layout, i, 1)];
+        if (dx2 < MATRIX(*res, l, 0))
+          dx2 = MATRIX(*res, l, 0);
       }
       for (i = component_size; i < next_new_vertex_id; i++) {
         MATRIX(*res, k, 0) = MATRIX(layout, i, 0) + dx;
         MATRIX(*res, k, 1) = VECTOR(layer_to_y)[(long)MATRIX(layout, i, 1)];
+        if (dx2 < MATRIX(*res, k, 0))
+          dx2 = MATRIX(*res, k, 0);
         k++;
       }
-
-      /* Adjust dx so that the next component does not overlap this one */
-      for (i = 0; i < next_new_vertex_id; i++) {
-        if (dx < MATRIX(layout, i, 0))
-          dx = MATRIX(layout, i, 0);
-      }
-      dx += hgap;
+      dx = dx2 + hgap;
 
       igraph_destroy(&subgraph);
       igraph_i_layering_destroy(&layering);
