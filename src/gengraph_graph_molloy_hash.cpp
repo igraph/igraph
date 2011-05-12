@@ -776,7 +776,7 @@ bool graph_molloy_hash::havelhakimi() {
 bool graph_molloy_hash::make_connected() {
   assert(verify());
   if(a/2 < n-1) {
-    fprintf(stderr,"\ngraph::make_connected() failed : #edges < #vertices-1\n");
+    // fprintf(stderr,"\ngraph::make_connected() failed : #edges < #vertices-1\n");
     return false;
   }
   int i;

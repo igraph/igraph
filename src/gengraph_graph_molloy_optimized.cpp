@@ -408,7 +408,7 @@ bool graph_molloy_opt::is_connected() {
 bool graph_molloy_opt::make_connected() {
   //assert(verify());
   if(a/2 < n-1) {
-    fprintf(stderr,"\ngraph::make_connected() failed : #edges < #vertices-1\n");
+    // fprintf(stderr,"\ngraph::make_connected() failed : #edges < #vertices-1\n");
     return false;
   }
   int i;
