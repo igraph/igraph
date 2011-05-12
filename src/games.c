@@ -2505,6 +2505,11 @@ int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
 		 IGRAPH_EINVAL);
   }
 
+  if (prob == 0) {
+    /* This is easy, just leave things as they are */
+    return IGRAPH_SUCCESS;
+  }
+    
   IGRAPH_VECTOR_INIT_FINALLY(&edges, endpoints);
     
   RNG_BEGIN();
