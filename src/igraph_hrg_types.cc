@@ -2975,7 +2975,7 @@ bool splittree::insertItem(string newKey, double newValue) {
     // search for insertion point
     while (current != leaf) {
       // left-or-right?
-      if (newKey.compare(current->split)) {
+      if (newKey.compare(current->split) < 0) {
 	// try moving down-left
 	if (current->left  != leaf) { 
 	  current = current->left;  
