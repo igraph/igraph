@@ -99,7 +99,11 @@
  * </para><para>
  * Every vector needs to be initialized before it can be used, and
  * there are a number of initialization functions or otherwise called
- * constructors. 
+ * constructors. This function constructs a vector of the given size and
+ * initializes each entry to 0. Note that \ref igraph_vector_null() can be
+ * used to set each element of a vector to zero. However, if you want a
+ * vector of zeros, it is much faster to use this function than to create a
+ * vector and then invoke \ref igraph_vector_null().
  * 
  * </para><para>
  * Every vector object initialized by this function should be
@@ -620,7 +624,8 @@ void FUNCTION(igraph_vector,set)       (TYPE(igraph_vector)* v,
  * </para><para>
  * Note that \ref igraph_vector_init() sets the elements to zero as well, so
  * it makes no sense to call this function on a just initialized
- * vector. 
+ * vector. Thus if you want to construct a vector of zeros, then you should
+ * use \ref igraph_vector_init().
  * \param v The vector object.
  *
  * Time complexity: O(n), the size of

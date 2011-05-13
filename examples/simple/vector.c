@@ -43,6 +43,11 @@ int main() {
   igraph_vector_init(&v, 0);
   igraph_vector_destroy(&v);
 
+  /* vector of zeros */
+  igraph_vector_init(&v, 10);
+  print_vector(&v, stdout);
+  igraph_vector_destroy(&v);
+
   /* VECTOR(), igraph_vector_size */
   igraph_vector_init(&v, 10);
   for (i=0; i<igraph_vector_size(&v); i++) {
