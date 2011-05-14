@@ -24,3 +24,8 @@ AT_SETUP([Deterministic optimal imitation:])
 AT_KEYWORDS([deterministic imitation strategy])
 AT_COMPILE_CHECK([simple/igraph_deterministic_optimal_imitation.c])
 AT_CLEANUP
+
+AT_SETUP([Stochastic imitation via uniform selection:])
+AT_KEYWORDS([stochastic imitation strategy uniform selection])
+AT_COMPILE_CHECK([simple/igraph_stochastic_imitation.c])
+AT_CLEANUP

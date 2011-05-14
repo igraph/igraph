@@ -270,6 +270,7 @@ examples/simple/igraph_sparsemat6.c.xml
 examples/simple/igraph_sparsemat7.c.xml
 examples/simple/igraph_sparsemat8.c.xml
 examples/simple/igraph_star.c.xml
+examples/simple/igraph_stochastic_imitation.c.xml
 examples/simple/igraph_strvector.c.xml
 examples/simple/igraph_to_undirected.c.xml
 examples/simple/igraph_topological_sorting.c.xml
