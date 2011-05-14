@@ -9,6 +9,7 @@
 
 <section><title>Microscopic Update Rules</title>
 <!-- doxrox-include igraph_deterministic_optimal_imitation -->
+<!-- doxrox-include igraph_roulette_wheel_imitation -->
 <!-- doxrox-include igraph_stochastic_imitation -->
 </section>
 

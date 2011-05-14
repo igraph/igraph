@@ -257,6 +257,7 @@ examples/simple/igraph_read_graph_lgl.c.xml
 examples/simple/igraph_reciprocity.c.xml
 examples/simple/igraph_rewire.c.xml
 examples/simple/igraph_ring.c.xml
+examples/simple/igraph_roulette_wheel_imitation.c.xml
 examples/simple/igraph_set.c.xml
 examples/simple/igraph_similarity.c.xml
 examples/simple/igraph_simplify.c.xml

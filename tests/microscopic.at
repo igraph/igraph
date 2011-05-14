@@ -29,3 +29,8 @@ AT_SETUP([Stochastic imitation via uniform selection:])
 AT_KEYWORDS([stochastic imitation strategy uniform selection])
 AT_COMPILE_CHECK([simple/igraph_stochastic_imitation.c])
 AT_CLEANUP
+
+AT_SETUP([Stochastic imitation via roulette selection:])
+AT_KEYWORDS([stochastic imitation strategy roulette wheel])
+AT_COMPILE_CHECK([simple/igraph_roulette_wheel_imitation.c])
+AT_CLEANUP
