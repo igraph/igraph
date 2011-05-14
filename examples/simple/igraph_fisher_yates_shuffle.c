@@ -20,6 +20,7 @@
 */
 
 #include <igraph.h>
+#include <time.h>
 
 #define R_INTEGER(a,b) (igraph_rng_get_integer(&igraph_rng_default, (a), (b)))
 #define R_UNIF(a,b) (igraph_rng_get_unif(&igraph_rng_default, (a), (b)))
@@ -40,7 +41,7 @@ int main() {
    */
   n = 1;
   igraph_vector_init(&v, n);
-
+  igraph_rng_seed(&igraph_rng_default, time(0));
   k = R_INTEGER(-1000, 1000);
   VECTOR(v)[0] = k;
   igraph_fisher_yates_shuffle(&v);
