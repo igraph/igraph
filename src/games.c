@@ -2521,14 +2521,15 @@ int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
 	 so the "skips" between the really rewired endpoints follow a 
 	 geometric distribution. */
       IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
-      to_rewire=RNG_GEOM(prob)+1;
-      while (to_rewire <= endpoints) {
+      to_rewire=RNG_GEOM(prob);
+      while (to_rewire < endpoints) {
 	if (loops) {
-	  VECTOR(edges)[ to_rewire-1 ] = RNG_INTEGER(0, no_of_nodes-1);
+	  VECTOR(edges)[to_rewire] = RNG_INTEGER(0, no_of_nodes-1);
 	} else {
-	  long int nei=VECTOR(edges)[to_rewire-2 + 2*(to_rewire % 2)];
+	  long int opos = to_rewire % 2 ? to_rewire-1 : to_rewire+1;
+	  long int nei= VECTOR(edges)[opos];
 	  long int r=RNG_INTEGER(0, no_of_nodes-2);
-	  VECTOR(edges)[ to_rewire-1 ] = (r != nei ? r : no_of_nodes-1);
+	  VECTOR(edges)[ to_rewire ] = (r != nei ? r : no_of_nodes-1);
 	}
 	to_rewire += RNG_GEOM(prob)+1;
       }
