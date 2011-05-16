@@ -56,6 +56,9 @@ typedef enum { IGRAPH_OUT=1, IGRAPH_IN=2, IGRAPH_ALL=3,
 
 typedef enum { IGRAPH_WEAK=1, IGRAPH_STRONG=2 } igraph_connectedness_t;
 
+typedef enum { IGRAPH_RECIPROCITY_DEFAULT=0, 
+	       IGRAPH_RECIPROCITY_RATIO=1 } igraph_reciprocity_t;
+
 typedef enum { IGRAPH_ADJ_DIRECTED=0, 
 	       IGRAPH_ADJ_UNDIRECTED=1, IGRAPH_ADJ_MAX=1,
                IGRAPH_ADJ_UPPER, IGRAPH_ADJ_LOWER, IGRAPH_ADJ_MIN,

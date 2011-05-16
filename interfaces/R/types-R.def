@@ -229,3 +229,8 @@ HRG:
                           as.numeric)
     DEFAULT:
        Default: NULL
+
+RECIP:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), 'default'=0, 'ratio'=1)
+    DEFAULT:
+       Default: c('default', 'ratio')

@@ -484,7 +484,8 @@ igraph_transitivity_barrat:
         IGNORE: RR, RC, RNamespace
 
 igraph_reciprocity:
-        PARAMS: GRAPH graph, OUT REALPTR res, BOOLEAN ignore_loops=True
+        PARAMS: GRAPH graph, OUT REALPTR res, BOOLEAN ignore_loops=True, \
+                RECIP mode=Default
         IGNORE: RR, RC, RNamespace
 
 igraph_constraint:

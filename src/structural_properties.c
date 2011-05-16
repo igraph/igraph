@@ -3126,16 +3126,14 @@ int igraph_transitivity_barrat(const igraph_t *graph,
  * \brief Calculates the reciprocity of a directed graph.
  * 
  * </para><para>
- * A vertex pair (A, B) is said to be reciprocal if there are edges
- * between them in both directions. The reciprocity of a directed graph
- * is the proportion of all possible (A, B) pairs which are reciprocal,
- * provided there is at least one edge between A and B. The reciprocity
- * of an empty graph is undefined (results in an error code). Undirected
- * graphs always have a reciprocity of 1.0 unless they are empty.
- * 
+ * TODO
+ *
  * \param graph The graph object.
  * \param res Pointer to an \c igraph_real_t which will contain the result.
  * \param ignore_loops Whether to ignore loop edges.
+ * \param mode Type of reciprocity to calculate, possible values are 
+ *    \c IGRAPH_RECIPROCITY_DEFAULT and \c IGRAPH_RECIPROCITY_RATIO,
+ *    please see their description above.
  * \return Error code:
  *         \c IGRAPH_EINVAL: graph has no edges
  *         \c IGRAPH_ENOMEM: not enough memory for
@@ -3148,12 +3146,19 @@ int igraph_transitivity_barrat(const igraph_t *graph,
  */
 
 int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res, 
-		       igraph_bool_t ignore_loops) {
+		       igraph_bool_t ignore_loops, 
+		       igraph_reciprocity_t mode) {
+
   igraph_integer_t nonrec=0, rec=0;
   igraph_vector_t inneis, outneis;
   long int i;
   long int no_of_nodes=igraph_vcount(graph);
-  
+
+  if (mode != IGRAPH_RECIPROCITY_DEFAULT && 
+      mode != IGRAPH_RECIPROCITY_RATIO) { 
+    IGRAPH_ERROR("Invalid reciprocity type", IGRAPH_EINVAL);
+  }
+
   /* THIS IS AN EXIT HERE !!!!!!!!!!!!!! */
   if (!igraph_is_directed(graph)) {
     *res=1.0;
@@ -3190,7 +3195,11 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
       (igraph_vector_size(&outneis)-op);
   }
 
-  *res= rec/((igraph_real_t)rec+nonrec);
+  if (mode==IGRAPH_RECIPROCITY_DEFAULT) {
+    *res= rec/((igraph_real_t)igraph_ecount(graph));
+  } else if (mode==IGRAPH_RECIPROCITY_RATIO) {
+    *res= rec/((igraph_real_t)rec+nonrec);
+  }
   
   igraph_vector_destroy(&inneis);
   igraph_vector_destroy(&outneis);

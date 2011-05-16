@@ -640,3 +640,7 @@ HRG:
          igraph_hrg_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
 
+RECIP:
+  CTYPE: igraph_reciprocity_t
+  INCONV:
+    IN: %C%=REAL(%I%)[0];

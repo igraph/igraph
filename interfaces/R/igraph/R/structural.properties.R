@@ -486,15 +486,17 @@ constraint <- function(graph, nodes=V(graph), weights=NULL) {
         PACKAGE="igraph")
 }
 
-reciprocity <- function(graph, ignore.loops=TRUE) {
+reciprocity <- function(graph, ignore.loops=TRUE,
+                        mode=c("default", "ratio")) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  mode <- switch(igraph.match.arg(mode), 'default'=0, 'ratio'=1)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_reciprocity", graph, as.logical(ignore.loops),
-        PACKAGE="igraph")
+        as.numeric(mode), PACKAGE="igraph")
 }
 
 rewire <- function(graph, mode="simple", niter=100) {

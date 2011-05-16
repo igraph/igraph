@@ -79,7 +79,8 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
 		    igraph_bool_t loops,
 		    const igraph_attribute_combination_t *edge_comb);
 int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
-		       igraph_bool_t ignore_loops);
+		       igraph_bool_t ignore_loops,
+		       igraph_reciprocity_t mode);
 
 int igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
 		     igraph_vs_t vids, igraph_neimode_t mode, 

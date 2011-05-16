@@ -752,7 +752,8 @@ int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
     IGRAPH_WARNING("Dyad census called on undirected graph");
   }
 
-  IGRAPH_CHECK(igraph_reciprocity(graph, &rec, 1));
+  IGRAPH_CHECK(igraph_reciprocity(graph, &rec, /*loops=*/1, 
+				  IGRAPH_RECIPROCITY_RATIO));
   *mut = rec*ec/(rec+1);
   *asym = ec-2*(*mut);
   *null = vc*(vc-1)/2-(*mut)-(*asym);
