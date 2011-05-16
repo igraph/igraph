@@ -3149,7 +3149,7 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 		       igraph_bool_t ignore_loops, 
 		       igraph_reciprocity_t mode) {
 
-  igraph_integer_t nonrec=0, rec=0;
+  igraph_integer_t nonrec=0, rec=0, loops=0;
   igraph_vector_t inneis, outneis;
   long int i;
   long int no_of_nodes=igraph_vcount(graph);
@@ -3183,10 +3183,15 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 	nonrec += 1;
 	op++;
       } else { 
+
 	/* loop edge? */
-	if (!ignore_loops || VECTOR(inneis)[ip] != i) {
+	if (VECTOR(inneis)[ip]==i) {
+	  loops += 1;
+	  if (!ignore_loops) { rec += 1 }
+	} else { 
 	  rec += 1;
 	}
+
 	ip++;
 	op++;
       }
@@ -3196,7 +3201,11 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
   }
 
   if (mode==IGRAPH_RECIPROCITY_DEFAULT) {
-    *res= rec/((igraph_real_t)igraph_ecount(graph));
+    if (ignore_loops) {
+      *res= rec/((igraph_real_t)igraph_ecount(graph)-loops);
+    } else {
+      *res= rec/((igraph_real_t)igraph_ecount(graph));
+    }
   } else if (mode==IGRAPH_RECIPROCITY_RATIO) {
     *res= rec/((igraph_real_t)rec+nonrec);
   }
