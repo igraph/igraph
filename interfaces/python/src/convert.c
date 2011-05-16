@@ -361,6 +361,18 @@ int igraphmodule_PyObject_to_fas_algorithm_t(PyObject *o,
 }
 
 /**
+ * \brief Converts a Python object to an igraph \c igraph_reciprocity_t
+ */
+int igraphmodule_PyObject_to_reciprocity_t(PyObject *o, igraph_reciprocity_t *result) {
+  static igraphmodule_enum_translation_table_entry_t reciprocity_tt[] = {
+    {"default", IGRAPH_RECIPROCITY_DEFAULT},
+    {"ratio", IGRAPH_RECIPROCITY_RATIO}
+  };
+
+  return igraphmodule_PyObject_to_enum(o, reciprocity_tt, (int*)result);
+}
+
+/**
  * \brief Converts a Python object to an igraph \c igraph_spinglass_implementation_t
  */
 int igraphmodule_PyObject_to_spinglass_implementation_t(PyObject *o, igraph_spinglass_implementation_t *result) {

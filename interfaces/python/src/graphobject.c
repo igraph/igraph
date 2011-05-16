@@ -1015,14 +1015,18 @@ PyObject *igraphmodule_Graph_incident(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_reciprocity(igraphmodule_GraphObject * self,
                                          PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] = { "ignore_loops", NULL };
+  char *kwlist[] = { "ignore_loops", "mode", NULL };
   igraph_real_t result;
-  PyObject *ignore_loops = Py_True;
+  igraph_reciprocity_t mode = IGRAPH_RECIPROCITY_DEFAULT;
+  PyObject *ignore_loops = Py_True, *mode_o = Py_None;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &ignore_loops))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist, &ignore_loops, &mode_o))
     return NULL;
 
-  if (igraph_reciprocity(&self->g, &result, PyObject_IsTrue(ignore_loops))) {
+  if (igraphmodule_PyObject_to_reciprocity_t(mode_o, &mode))
+    return NULL;
+
+  if (igraph_reciprocity(&self->g, &result, PyObject_IsTrue(ignore_loops), mode)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -11314,7 +11318,27 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_reciprocity */
   {"reciprocity", (PyCFunction) igraphmodule_Graph_reciprocity,
    METH_VARARGS | METH_KEYWORDS,
-   "reciprocity()\n\n" "@return: the reciprocity of the graph."},
+   "reciprocity(ignore_loops=True, mode=\"default\")\n\n"
+   "@return: the reciprocity of the graph.\n\n"
+   "Reciprocity defines the proportion of mutual connections in a\n"
+   "directed graph. It is most commonly defined as the probability\n"
+   "that the opposite counterpart of a directed edge is also included\n"
+   "in the graph. This measure is calculated if C{mode} is C{\"default\"}.\n"
+   "\n"
+   "Prior to igraph 0.6, another measure was implemented, defined as\n"
+   "the probability of mutual connection between a vertex pair if we\n"
+   "know that there is a (possibly non-mutual) connection between them.\n"
+   "In other words, (unordered) vertex pairs are classified into three\n"
+   "groups: (1) disconnected, (2) non-reciprocally connected and (3)\n"
+   "reciprocally connected. The result is the size of group (3), divided\n"
+   "by the sum of sizes of groups (2) and (3). This measure is calculated\n"
+   "if C{mode} is C{\"ratio\"}.\n"
+   "\n"
+   "@param ignore_loops: whether loop edges should be ignored.\n"
+   "@param mode: the algorithm to use to calculate the reciprocity; see\n"
+   "  above for more details.\n"
+   "@return: the reciprocity of the graph\n"
+  },
 
   // interface to igraph_rewire
   {"rewire", (PyCFunction) igraphmodule_Graph_rewire,
