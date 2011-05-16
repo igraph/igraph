@@ -469,7 +469,7 @@ int igraph_i_weighted_adjacency_min(igraph_matrix_t *adjmatrix,
  *         \c IGRAPH_NONSQUARE: non-square matrix.
  * 
  * Time complexity: O(|V||V|),
- * |V| is the number of vertices in the graph.a
+ * |V| is the number of vertices in the graph.
  * 
  * \example examples/simple/igraph_weighted_adjacency.c
  */
@@ -2108,8 +2108,8 @@ int igraph_famous(igraph_t *graph, const char *name) {
  * \function igraph_adjlist
  * Create a graph from an adjacency list
  * 
- * An adjacency list is list of vectors, containing the neighbors 
- * of all vertices. For operations that involve many changes of the
+ * An adjacency list is a list of vectors, containing the neighbors 
+ * of all vertices. For operations that involve many changes to the
  * graph structure, it is recommended that you convert the graph into
  * an adjacency list via \ref igraph_adjlist_init(), perform the
  * modifications (these are cheap for an adjacency list) and then
