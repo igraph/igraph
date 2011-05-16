@@ -3126,10 +3126,10 @@ int igraph_transitivity_barrat(const igraph_t *graph,
  * \brief Calculates the reciprocity of a directed graph.
  * 
  * </para><para>
- * The measure of reciprocity defines the proporsion of mutual
+ * The measure of reciprocity defines the proportion of mutual
  * connections, in a directed graph. It is most commonly defined as
  * the probability that the opposite counterpart of a directed edge is
- * also included in the graph. Or in adjacency matrix notation: 
+ * also included in the graph. In adjacency matrix notation: 
  * <code>sum(i, j, (A.*A')ij) / sum(i, j, Aij)</code>, where
  * <code>A.*A'</code> is the element-wise product of matrix
  * <code>A</code> and its transpose. This measure is
@@ -3139,9 +3139,9 @@ int igraph_transitivity_barrat(const igraph_t *graph,
  * </para><para>
  * Prior to igraph version 0.6, another measure was implemented,
  * defined as the probability of mutual connection between a vertex
- * pair, if we know that there is a (possibly non-mutual) connection
+ * pair if we know that there is a (possibly non-mutual) connection
  * between them. In other words, (unordered) vertex pairs are
- * classified into three groups: (1) not-connected, (2)
+ * classified into three groups: (1) disconnected, (2)
  * non-reciprocaly connected, (3) reciprocally connected. 
  * The result is the size of group (3), divided by the sum of group
  * sizes (2)+(3). This measure is calculated if \p mode is \c
@@ -3206,7 +3206,7 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 	/* loop edge? */
 	if (VECTOR(inneis)[ip]==i) {
 	  loops += 1;
-	  if (!ignore_loops) { rec += 1 }
+	  if (!ignore_loops) { rec += 1; }
 	} else { 
 	  rec += 1;
 	}
