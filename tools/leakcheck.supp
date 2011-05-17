@@ -1,0 +1,6 @@
+{
+	malloc/glp_init_env
+	Memcheck:Leak
+	fun:malloc
+	fun:glp_init_env
+}

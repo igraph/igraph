@@ -85,6 +85,7 @@ int main() {
           /* maxiter = */ 100,
           /* weights = */ 0);
   igraph_matrix_print(&coords);
+  igraph_vector_destroy(&layers);
   printf("===\n");
 
   igraph_vector_destroy(&edgelist);

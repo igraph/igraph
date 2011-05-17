@@ -55,6 +55,7 @@ int main() {
   igraph_is_dag(&g, &dag);
   if (!dag)
     return 2;
+  igraph_vector_destroy(&weights);
   igraph_destroy(&g);
 
   /* Simple unweighted graph with loops */
@@ -90,6 +91,7 @@ int main() {
   igraph_is_dag(&g, &dag);
   if (!dag)
     return 2;
+  igraph_vector_destroy(&weights);
   igraph_destroy(&g);
 
   /* Simple unweighted graph with loops */
@@ -116,7 +118,6 @@ int main() {
   igraph_destroy(&g);
 
   igraph_vector_destroy(&result);
-  igraph_vector_destroy(&weights);
 
   return 0;
 }

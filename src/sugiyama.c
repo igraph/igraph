@@ -533,15 +533,10 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_FINALLY_CLEAN(5);
   }
 
-  if (layers == 0) {
-    /* We have created our own layers vector, so we have to destroy it */
-    igraph_vector_destroy(&layers_own);
-    IGRAPH_FINALLY_CLEAN(1);
-  }
-
+  igraph_vector_destroy(&layers_own);
   igraph_vector_destroy(&layer_to_y);
   igraph_vector_destroy(&membership);
-  IGRAPH_FINALLY_CLEAN(2);
+  IGRAPH_FINALLY_CLEAN(3);
 
   if (extd_graph != 0) {
     IGRAPH_CHECK(igraph_create(extd_graph, &extd_edgelist, next_extd_vertex_id,
