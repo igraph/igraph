@@ -80,6 +80,7 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
  *            is invalid.
  *
  * \example examples/simple/igraph_feedback_arc_set.c
+ * \example examples/simple/igraph_feedback_arc_set_ip.c
  *
  * Time complexity: depends on \p algo, see the time complexities there.
  */

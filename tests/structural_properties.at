@@ -132,9 +132,14 @@ AT_KEYWORDS([topological sorting directed acyclic graphs])
 AT_COMPILE_CHECK([simple/igraph_topological_sorting.c], [simple/igraph_topological_sorting.out])
 AT_CLEANUP
 
-AT_SETUP([Feedback arc sets (igraph_feedback_arc_set): ])
+AT_SETUP([Feedback arc sets, Eades heuristics (igraph_feedback_arc_set): ])
 AT_KEYWORDS([feedback arc set directed graphs])
 AT_COMPILE_CHECK([simple/igraph_feedback_arc_set.c], [simple/igraph_feedback_arc_set.out])
+AT_CLEANUP
+
+AT_SETUP([Feedback arc sets, integer programming (igraph_feedback_arc_set): ])
+AT_KEYWORDS([feedback arc set directed graphs])
+AT_COMPILE_CHECK([simple/igraph_feedback_arc_set_ip.c], [simple/igraph_feedback_arc_set_ip.out])
 AT_CLEANUP
 
 AT_SETUP([Loop edges test (igraph_is_loop): ])
