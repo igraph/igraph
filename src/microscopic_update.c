@@ -27,6 +27,162 @@
 
 /*
  * Internal use only.
+ * Compute the cumulative proportionate values of a vector. The vector is
+ * assumed to hold values associated with vertices.
+ *
+ * \param graph The graph object representing the game network. No error
+ *        checks will be performed on this graph. You are responsible for
+ *        ensuring that this is a valid graph for the particular
+ *        microscopic update rule at hand.
+ * \param U A vector of vertex values for which we want to compute cumulative
+ *        proportionate values. The vector could be, for example, a vector of
+ *        fitness for vertices of \p graph. It is assumed that each value of U
+ *        is nonnegative; it is your responsibility to ensure this. Also U, or
+ *        a combination of interest, is assumed to sum to a positive value;
+ *        this condition will be checked.
+ * \param V Pointer to an uninitialized vector. The cumulative proportionate
+ *        values will be computed and stored here. No error checks will be
+ *        performed on this parameter.
+ * \param islocal Boolean; this flag controls which perspective to use. If
+ *        true then we use the local perspective; otherwise we use the global
+ *        perspective. The local perspective for a vertex v is the set of all
+ *        immediate neighbours of v. In contrast, the global perspective
+ *        for v is the vertex set of \p graph.
+ * \param vid The vertex to use if we are considering a local perspective,
+ *        i.e. if \p islocal is true. This vertex will be ignored if
+ *        \p islocal is false. That is, if \p islocal is false then it is safe
+ *        pass the value -1 here. On the other hand, if \p islocal is true then
+ *        it is assumed that this is indeed a vertex of \p graph.
+ * \param mode Defines the sort of neighbourhood to consider for \p vid. This
+ *        is only relevant if we are considering the local perspective, i.e. if
+ *        \p islocal is true. If we are considering the global perspective,
+ *        then this parameter would be ignored. In other words, if \p islocal
+ *        is false then it is safe to pass the value \p IGRAPH_ALL here. If
+ *        \p graph is undirected, then we use all the immediate neighbours of
+ *        \p vid. Thus if you know that \p graph is undirected, then it is
+ *        safe to pass the value \p IGRAPH_ALL here. Supported values are:
+ *        \clist
+ *        \cli IGRAPH_OUT
+ *          Use the out-neighbours of \p vid. This option is only relevant
+ *          when \p graph is a digraph and we are considering the local
+ *          perspective.
+ *        \cli IGRAPH_IN
+ *          Use the in-neighbours of \p vid. Again this option is only relevant
+ *          when \p graph is a directed graph and we are considering the local
+ *          perspective.
+ *        \cli IGRAPH_ALL
+ *          Use both the in- and out-neighbours of \p vid. This option is only
+ *          relevant if \p graph is a digraph and we are considering a local
+ *          perspective. Also use this value if \p graph is undirected or we
+ *          are considering the global perspective.
+ *        \endclist
+ * \return Codes:
+ *         \clist
+ *         \cli IGRAPH_EINVAL
+ *           This error code is returned in the following case: The vector
+ *           \p U, or some combination of its values, sums to zero.
+ *         \cli IGRAPH_SUCCESS
+ *           This signal is returned if the cumulative proportionate values
+ *           were successfully computed.
+ *         \endclist
+ *
+ * Time complexity: O(2n) where n is the number of vertices in the
+ * perspective of vid.
+ */
+
+int igraph_vcumulative_proportionate_values(const igraph_t *graph,
+                                                  const igraph_vector_t *U,
+                                                  igraph_vector_t *V,
+                                                  igraph_bool_t islocal,
+                                                  igraph_integer_t vid,
+                                                  igraph_neimode_t mode) {
+  igraph_integer_t v;
+  igraph_real_t C;  /* cumulative probability */
+  igraph_real_t P;  /* probability */
+  igraph_real_t S;  /* sum of values */
+  igraph_vit_t A;   /* all vertices in v's perspective */
+  igraph_vs_t vs;
+  long int i;
+
+  /* Set the perspective. Let v be the vertex under consideration; it might */
+  /* be that we want to update v's strategy. The local perspective for v */
+  /* consists of its immediate neighbours. In contrast, the global */
+  /* perspective for v are all the vertices in the given graph. Hence in the */
+  /* global perspective, we will ignore the given vertex and the given */
+  /* neighbourhood type, but instead consider all vertices in the given */
+  /* graph. */
+  if (islocal)
+    IGRAPH_CHECK(igraph_vs_adj(&vs, vid, mode));
+  else
+    IGRAPH_CHECK(igraph_vs_all(&vs));
+  IGRAPH_FINALLY(igraph_vs_destroy, &vs);
+
+  /* Sum up all the values of vector U in the perspective for v. This */
+  /* sum will be used in normalizing each value. If we are using a local */
+  /* perspective, then we also need to consider the quantity of v in */
+  /* computing the sum. */
+  /* NOTE: Here we assume that each value to be summed is nonnegative, */
+  /* and at least one of the values is nonzero. The behaviour resulting */
+  /* from all values being zero would be division by zero later on when */
+  /* we normalize each value. We check to see that the values sum to zero. */
+  /* NOTE: In this function, the order in which we iterate through the */
+  /* vertices of interest should be the same as the order in which we do so */
+  /* in the caller function. If the caller function doesn't care about the */
+  /* order of values in the resulting vector V, then there's no need to take */
+  /* special notice of that order. But in some cases the order of values in */
+  /* V is taken into account, for example, in roulette wheel selection. */
+  S = 0.0;
+  IGRAPH_CHECK(igraph_vit_create(graph, vs, &A));
+  IGRAPH_FINALLY(igraph_vit_destroy, &A);
+  while (!IGRAPH_VIT_END(A)) {
+    v = (igraph_integer_t)IGRAPH_VIT_GET(A);
+    S += (igraph_real_t)VECTOR(*U)[v];
+    IGRAPH_VIT_NEXT(A);
+  }
+  if (islocal)
+    S += (igraph_real_t)VECTOR(*U)[vid];
+  /* avoid division by zero later on */
+  if (S == (igraph_real_t)0.0) {
+    igraph_vit_destroy(&A);
+    igraph_vs_destroy(&vs);
+    IGRAPH_FINALLY_CLEAN(2);
+    IGRAPH_ERROR("Vector of values sums to zero", IGRAPH_EINVAL);
+  }
+
+  /* Get cumulative probability and relative value for each vertex in the */
+  /* perspective of v. The vector V holds the cumulative proportionate */
+  /* values of all vertices in v's perspective. The value V[0] is the */
+  /* cumulative proportionate value of the first vertex in the vertex */
+  /* iterator A. The value V[1] is the cumulative proportionate value of */
+  /* the second vertex in the iterator A. And so on. If we are using the */
+  /* local perspective, then we also need to consider the cumulative */
+  /* proportionate value of v. In the case of the local perspective, we */
+  /* don't need to compute and store v's cumulative proportionate value, */
+  /* but we pretend that such value is appended to the vector V. */
+  C = 0.0;
+  i = 0;
+  IGRAPH_VIT_RESET(A);
+  IGRAPH_VECTOR_INIT_FINALLY(V, IGRAPH_VIT_SIZE(A));
+  while (!IGRAPH_VIT_END(A)) {
+    v = (igraph_integer_t)IGRAPH_VIT_GET(A);
+    /* NOTE: Beware of division by zero here. This can happen if the vector */
+    /* of values, or a combination of interest, sums to zero. */
+    P = (igraph_real_t)VECTOR(*U)[v] / S;
+    C += P;
+    VECTOR(*V)[i] = C;
+    i++;
+    IGRAPH_VIT_NEXT(A);
+  }
+
+  igraph_vit_destroy(&A);
+  igraph_vs_destroy(&vs);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return IGRAPH_SUCCESS;
+}
+
+/*
+ * Internal use only.
  * A set of standard tests to be performed prior to strategy updates. The
  * tests contained in this function are common to many strategy revision
  * functions in this file. This function is meant to be invoked from within
@@ -419,10 +575,7 @@ int igraph_roulette_wheel_imitation(const igraph_t *graph,
                                     igraph_neimode_t mode) {
   igraph_bool_t updates;
   igraph_integer_t u;
-  igraph_real_t C;    /* cumulative probability */
-  igraph_real_t P;    /* probability */
   igraph_real_t r;    /* random number */
-  igraph_real_t S;    /* sum of quantities */
   igraph_vector_t V;  /* vector of cumulative proportionate quantities */
   igraph_vit_t A;     /* all vertices in v's perspective */
   igraph_vs_t vs;
@@ -434,67 +587,17 @@ int igraph_roulette_wheel_imitation(const igraph_t *graph,
   if (!updates)
     return IGRAPH_SUCCESS;  /* nothing further to do */
 
-  /* Set the perspective. Let v be the vertex whose strategy we want to */
-  /* revise. The local perspective for v consists of its immediate */
-  /* neighbours. In contrast, the global perspective for v are all the */
-  /* vertices in the given graph. */
+  /* set the perspective */
   if (islocal)
     IGRAPH_CHECK(igraph_vs_adj(&vs, vid, mode));
   else
     IGRAPH_CHECK(igraph_vs_all(&vs));
   IGRAPH_FINALLY(igraph_vs_destroy, &vs);
-
-  /* Sum up all the quantities of vertices in the perspective for v. This */
-  /* sum will be used in normalizing each quantity. If we are using a local */
-  /* perspective, then we also need to consider the quantity of v in */
-  /* computing the sum. */
-  /* NOTE: Here we assume that each quantity to be summed is nonnegative, */
-  /* and at least one of the quantities is nonzero. The behaviour resulting */
-  /* from all quantities being zero would be division by zero later on when */
-  /* we normalize each quantity. We check to see that the quantities sum */
-  /* to zero. */
-  S = 0.0;
   IGRAPH_CHECK(igraph_vit_create(graph, vs, &A));
   IGRAPH_FINALLY(igraph_vit_destroy, &A);
-  while (!IGRAPH_VIT_END(A)) {
-    u = (igraph_integer_t)IGRAPH_VIT_GET(A);
-    S += (igraph_real_t)VECTOR(*quantities)[u];
-    IGRAPH_VIT_NEXT(A);
-  }
-  if (islocal)
-    S += (igraph_real_t)VECTOR(*quantities)[vid];
-  /* avoid division by zero later on */
-  if (S == (igraph_real_t)0.0) {
-    igraph_vit_destroy(&A);
-    igraph_vs_destroy(&vs);
-    IGRAPH_FINALLY_CLEAN(2);
-    IGRAPH_ERROR("Quantities vector sums to zero", IGRAPH_EINVAL);
-  }
 
-  /* Get cumulative probability and relative quantity for each vertex in the */
-  /* perspective of v. The vector V holds the cumulative proportionate */
-  /* quantities of all vertices in v's perspective. The value V[0] is the */
-  /* cumulative proportionate quantity of the first vertex in the vertex */
-  /* iterator A. The value V[1] is the cumulative proportionate quantity of */
-  /* the second vertex in the iterator A. And so on. If we are using the */
-  /* local perspective, then we also need to consider the cumulative */
-  /* proportionate quantity of v. In the case of the local perspective, we */
-  /* don't need to compute and store v's cumulative proportionate quantity, */
-  /* but we pretend that such quantity is appended to the vector V. */
-  C = 0.0;
-  i = 0;
-  IGRAPH_VIT_RESET(A);
-  IGRAPH_VECTOR_INIT_FINALLY(&V, IGRAPH_VIT_SIZE(A));
-  while (!IGRAPH_VIT_END(A)) {
-    u = IGRAPH_VIT_GET(A);
-    /* NOTE: Beware of division by zero here. This can happen if the vector */
-    /* of quantities sums to zero. */
-    P = (igraph_real_t)VECTOR(*quantities)[u] / S;
-    C += P;
-    VECTOR(V)[i] = C;
-    i++;
-    IGRAPH_VIT_NEXT(A);
-  }
+  IGRAPH_CHECK(igraph_vcumulative_proportionate_values(graph, quantities, &V,
+                                                       islocal, vid, mode));
 
   /* Finally, choose a vertex u to imitate. The vertex u is chosen */
   /* proportionate to its quantity. In the case of a local perspective, we */
@@ -506,16 +609,19 @@ int igraph_roulette_wheel_imitation(const igraph_t *graph,
   /* perspective, if r > V[i] for all i < n - 1 then v would adopt the */
   /* strategy of the vertex whose cumulative proportionate quantity is */
   /* V[n-1]. */
+  /* NOTE: Here we assume that the order in which we iterate through the */
+  /* vertices in A is the same as the order in which we do so in the */
+  /* invoked function igraph_vcumulative_proportionate_values(). */
+  /* Otherwise we would incorrectly associate each V[i] with a vertex in A. */
   RNG_BEGIN();
   r = RNG_UNIF01();
   RNG_END();
   i = 0;
-  IGRAPH_VIT_RESET(A);
   while (!IGRAPH_VIT_END(A)) {
     if (r <= VECTOR(V)[i]) {
       /* We have found our candidate vertex for imitation. Update strategy */
       /* of v to that of u, and exit the selection loop. */
-      u = IGRAPH_VIT_GET(A);
+      u = (igraph_integer_t)IGRAPH_VIT_GET(A);
       VECTOR(*strategies)[vid] = VECTOR(*strategies)[u];
       break;
     }
