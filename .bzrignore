@@ -248,6 +248,7 @@ examples/simple/igraph_mincut.c.xml
 examples/simple/igraph_minimal_separators.c.xml
 examples/simple/igraph_minimum_size_separators.c.xml
 examples/simple/igraph_minimum_spanning_tree.c.xml
+examples/simple/igraph_moran_process.c.xml
 examples/simple/igraph_motifs_randesu.c.xml
 examples/simple/igraph_neighbors.c.xml
 examples/simple/igraph_pagerank.c.xml

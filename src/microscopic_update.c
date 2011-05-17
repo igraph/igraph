@@ -25,6 +25,157 @@
 #include "igraph_nongraph.h"
 #include "igraph_random.h"
 
+#include <assert.h>
+
+/*
+ * Internal use only.
+ * Compute the cumulative proportionate values of a vector. The vector is
+ * assumed to hold values associated with edges.
+ *
+ * \param graph The graph object representing the game network. No error
+ *        checks will be performed on this graph. You are responsible for
+ *        ensuring that this is a valid graph for the particular
+ *        microscopic update rule at hand.
+ * \param U A vector of edge values for which we want to compute cumulative
+ *        proportionate values. So U[i] is the value of the edge with ID i.
+ *        With a local perspective, we would only compute cumulative
+ *        proportionate values for some combination of U. This vector could
+ *        be, for example, a vector of weights for edges in \p graph. It is
+ *        assumed that each value of U is nonnegative; it is your
+ *        responsibility to ensure this. Furthermore, this vector must have a
+ *        length the same as the number of edges in \p graph; you are
+ *        responsible for ensuring this condition holds.
+ * \param V Pointer to an uninitialized vector. The cumulative proportionate
+ *        values will be computed and stored here. No error checks will be
+ *        performed on this parameter.
+ * \param islocal Boolean; this flag controls which perspective to use. If
+ *        true then we use the local perspective; otherwise we use the global
+ *        perspective. In the context of this function, the local perspective
+ *        for a vertex v consists of all edges incident on v. In contrast, the
+ *        global perspective for v consists of all edges in \p graph.
+ * \param vid The vertex to use if we are considering a local perspective,
+ *        i.e. if \p islocal is true. This vertex will be ignored if
+ *        \p islocal is false. That is, if \p islocal is false then it is safe
+ *        pass the value -1 here. On the other hand, if \p islocal is true then
+ *        it is assumed that this is indeed a vertex of \p graph.
+ * \param mode Defines the sort of neighbourhood to consider for \p vid. This
+ *        is only relevant if we are considering the local perspective, i.e. if
+ *        \p islocal is true. If we are considering the global perspective,
+ *        then this parameter would be ignored. In other words, if \p islocal
+ *        is false then it is safe to pass the value \p IGRAPH_ALL here. If
+ *        \p graph is undirected, then we use all the immediate neighbours of
+ *        \p vid. Thus if you know that \p graph is undirected, then it is
+ *        safe to pass the value \p IGRAPH_ALL here. Supported values are:
+ *        \clist
+ *        \cli IGRAPH_OUT
+ *          Use the out-neighbours of \p vid. This option is only relevant
+ *          when \p graph is a digraph and we are considering the local
+ *          perspective.
+ *        \cli IGRAPH_IN
+ *          Use the in-neighbours of \p vid. Again this option is only relevant
+ *          when \p graph is a directed graph and we are considering the local
+ *          perspective.
+ *        \cli IGRAPH_ALL
+ *          Use both the in- and out-neighbours of \p vid. This option is only
+ *          relevant if \p graph is a digraph and we are considering a local
+ *          perspective. Also use this value if \p graph is undirected or we
+ *          are considering the global perspective.
+ *        \endclist
+ * \return Codes:
+ *         \clist
+ *         \cli IGRAPH_EINVAL
+ *           This error code is returned in the following case: The vector
+ *           \p U, or some combination of its values, sums to zero.
+ *         \cli IGRAPH_SUCCESS
+ *           This signal is returned if the cumulative proportionate values
+ *           were successfully computed.
+ *         \endclist
+ *
+ * Time complexity: O(2n) where n is the number of edges in the perspective
+ * of \p vid.
+ */
+
+int igraph_ecumulative_proportionate_values(const igraph_t *graph,
+                                            const igraph_vector_t *U,
+                                            igraph_vector_t *V,
+                                            igraph_bool_t islocal,
+                                            igraph_integer_t vid,
+                                            igraph_neimode_t mode) {
+  igraph_eit_t A;   /* all edges in v's perspective */
+  igraph_es_t es;
+  igraph_integer_t e;
+  igraph_real_t C;  /* cumulative probability */
+  igraph_real_t P;  /* probability */
+  igraph_real_t S;  /* sum of values */
+  long int i;
+
+  /* Set the perspective. Let v be the vertex under consideration. The local */
+  /* perspective for v consists of edges incident on it. In contrast, the */
+  /* global perspective for v are all edges in the given graph. Hence in the */
+  /* global perspective, we will ignore the given vertex and the given */
+  /* neighbourhood type, but instead consider all edges in the given graph. */
+  if (islocal)
+    IGRAPH_CHECK(igraph_es_incident(&es, vid, mode));
+  else
+    IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
+  IGRAPH_FINALLY(igraph_es_destroy, &es);
+
+  /* Sum up all the values of vector U in the perspective for v. This sum */
+  /* will be used in normalizing each value. */
+  /* NOTE: Here we assume that each value to be summed is nonnegative, */
+  /* and at least one of the values is nonzero. The behaviour resulting */
+  /* from all values being zero would be division by zero later on when */
+  /* we normalize each value. We check to see that the values sum to zero. */
+  /* NOTE: In this function, the order in which we iterate through the */
+  /* edges of interest should be the same as the order in which we do so */
+  /* in the caller function. If the caller function doesn't care about the */
+  /* order of values in the resulting vector V, then there's no need to take */
+  /* special notice of that order. But in some cases the order of values in */
+  /* V is taken into account, for example, in the Moran process. */
+  S = 0.0;
+  IGRAPH_CHECK(igraph_eit_create(graph, es, &A));
+  IGRAPH_FINALLY(igraph_eit_destroy, &A);
+  while (!IGRAPH_EIT_END(A)) {
+    e = (igraph_integer_t)IGRAPH_EIT_GET(A);
+    S += (igraph_real_t)VECTOR(*U)[e];
+    IGRAPH_EIT_NEXT(A);
+  }
+  /* avoid division by zero later on */
+  if (S == (igraph_real_t)0.0) {
+    igraph_eit_destroy(&A);
+    igraph_es_destroy(&es);
+    IGRAPH_FINALLY_CLEAN(2);
+    IGRAPH_ERROR("Vector of values sums to zero", IGRAPH_EINVAL);
+  }
+
+  /* Get cumulative probability and relative value for each edge in the */
+  /* perspective of v. The vector V holds the cumulative proportionate */
+  /* values of all edges in v's perspective. The value V[0] is the */
+  /* cumulative proportionate value of the first edge in the edge iterator */
+  /* A. The value V[1] is the cumulative proportionate value of the second */
+  /* edge in the iterator A. And so on. */
+  C = 0.0;
+  i = 0;
+  IGRAPH_EIT_RESET(A);
+  IGRAPH_VECTOR_INIT_FINALLY(V, IGRAPH_EIT_SIZE(A));
+  while (!IGRAPH_EIT_END(A)) {
+    e = (igraph_integer_t)IGRAPH_EIT_GET(A);
+    /* NOTE: Beware of division by zero here. This can happen if the vector */
+    /* of values, or the combination of interest, sums to zero. */
+    P = (igraph_real_t)VECTOR(*U)[e] / S;
+    C += P;
+    VECTOR(*V)[i] = C;
+    i++;
+    IGRAPH_EIT_NEXT(A);
+  }
+
+  igraph_eit_destroy(&A);
+  igraph_es_destroy(&es);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return IGRAPH_SUCCESS;
+}
+
 /*
  * Internal use only.
  * Compute the cumulative proportionate values of a vector. The vector is
@@ -467,6 +618,242 @@ int igraph_deterministic_optimal_imitation(const igraph_t *graph,
   VECTOR(*strategies)[vid] = VECTOR(*strategies)[i];
   igraph_vector_destroy(&adj);
   IGRAPH_FINALLY_CLEAN(1);
+
+  return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup spatialgames
+ * \function igraph_moran_process
+ * \brief The Moran process in a network setting.
+ *
+ * This is an extension of the classic Moran process to a network setting.
+ * The Moran process is a model of haploid (asexual) reproduction within a
+ * population having a fixed size. In the network setting, the Moran process
+ * operates on a weighted graph. At each time step a vertex a is chosen for
+ * reproduction and another vertex b is chosen for death. Vertex a gives birth
+ * to an identical clone c, which replaces b. Vertex c is a clone of a in that
+ * c inherits both the current quantity (e.g. fitness) and current strategy
+ * of a.
+ *
+ * </para><para>
+ * The graph G representing the game network is assumed to be simple,
+ * i.e. free of loops and without multiple edges. If, on the other hand, G has
+ * a loop incident on some vertex v, then it is possible that when v is chosen
+ * for reproduction it would forgo this opportunity. In particular, when v is
+ * chosen for reproduction and v is also chosen for death, the clone of v
+ * would be v itself with its current vertex ID. In effect v forgoes its
+ * chance for reproduction.
+ *
+ * \param graph The graph object representing the game network. This cannot
+ *        be the empty or trivial graph, but must have at least two vertices
+ *        and one edge. The Moran process will not take place in each of the
+ *        following cases: (1) If \p graph has one vertex. (2) If \p graph has
+ *        at least two vertices but zero edges.
+ * \param weights A vector of all edge weights for \p graph. Thus weights[i]
+ *        means the weight of the edge with edge ID i. For the purpose of the
+ *        Moran process, each weight is assumed to be positive; it is your
+ *        responsibility to ensure this condition holds. The length of this
+ *        vector must be the same as the number of edges in \p graph.
+ * \param quantities A vector of quantities providing the quantity of each
+ *        vertex in \p graph. The quantity of the new clone will be stored
+ *        here. Think of each entry of the vector as being generated by a
+ *        function such as the fitness function for the game. So if the vector
+ *        represents fitness quantities, then each vector entry is the fitness
+ *        of some vertex. The length of this vector must be the same as the
+ *        number of vertices in the vertex set of \p graph. For the purpose of
+ *        the Moran process, each vector entry is assumed to be nonnegative;
+ *        no checks will be performed for this. It is your responsibility to
+ *        ensure that at least one entry is positive. Furthermore, this vector
+ *        cannot be a vector of zeros; this condition will be checked.
+ * \param strategies A vector of the current strategies for the vertex
+ *        population. The strategy of the new clone will be stored here. Each
+ *        strategy is identified with a nonnegative integer, whose
+ *        interpretation depends on the payoff matrix of the game. Generally
+ *        we use the strategy ID as a row or column index of the payoff
+ *        matrix. The length of this vector must be the same as the number of
+ *        vertices in the vertex set of \p graph.
+ * \param mode Defines the sort of neighbourhood to consider for the vertex a
+ *        chosen for reproduction. This is only relevant if \p graph is
+ *        directed. If \p graph is undirected, then it is safe to pass the
+ *        value \p IGRAPH_ALL here. Supported values are:
+ *        \clist
+ *        \cli IGRAPH_OUT
+ *          Use the out-neighbours of a. This option is only relevant when
+ *          \p graph is directed.
+ *        \cli IGRAPH_IN
+ *          Use the in-neighbours of a. Again this option is only relevant
+ *          when \p graph is directed.
+ *        \cli IGRAPH_ALL
+ *          Use both the in- and out-neighbours of a. This option is only
+ *          relevant if \p graph is directed. Also use this value if
+ *          \p graph is undirected.
+ *        \endclist
+ * \return The error code \p IGRAPH_EINVAL is returned in each of the following
+ *         cases: (1) Any of the parameters \p graph, \p weights,
+ *         \p quantities or \p strategies is a null pointer. (2) The vector
+ *         \p quantities or \p strategies has a length different from the
+ *         number of vertices in \p graph. (3) The vector \p weights has a
+ *         length different from the number of edges in \p graph. (4) The
+ *         parameter \p graph is the empty or null graph, i.e. the graph with
+ *         zero vertices and edges. (5) The vector \p weights, or the
+ *         combination of interest, sums to zero. (6) The vector \p quantities,
+ *         or the combination of interest, sums to zero.
+ *
+ * Time complexity: depends on the random number generator, but is usually
+ * O(n) where n is the number of vertices in \p graph.
+ *
+ * </para><para>
+ * References:
+ * \clist
+ * \cli (Lieberman et al. 2005)
+ *   E. Lieberman, C. Hauert, and M. A. Nowak. Evolutionary dynamics on
+ *   graphs. \emb Nature, \eme 433(7023):312--316, 2005.
+ * \cli (Moran 1958)
+ *   P. A. P. Moran. Random processes in genetics. \emb Mathematical
+ *   Proceedings of the Cambridge Philosophical Society, \eme 54(1):60--71,
+ *   1958.
+ * \endclist
+ *
+ * \example examples/simple/igraph_moran_process.c
+ */
+
+int igraph_moran_process(const igraph_t *graph,
+                         const igraph_vector_t *weights,
+                         igraph_vector_t *quantities,
+                         igraph_vector_t *strategies,
+                         igraph_neimode_t mode) {
+  igraph_bool_t updates;
+  igraph_integer_t a = -1;  /* vertex chosen for reproduction */
+  igraph_integer_t b = -1;  /* vertex chosen for death */
+  igraph_integer_t e, nedge, u, v;
+  igraph_real_t r;          /* random number */
+  igraph_vector_t deg;
+  igraph_vector_t V;        /* vector of cumulative proportionate values */
+  igraph_vit_t vA;          /* vertex list */
+  igraph_eit_t eA;          /* edge list */
+  igraph_vs_t vs;
+  igraph_es_t es;
+  long int i;
+
+  /* don't test for vertex isolation, hence vid = -1 and islocal = 0 */
+  IGRAPH_CHECK(igraph_microscopic_standard_tests(graph, /*vid*/ -1,
+                                                 quantities, strategies, mode,
+                                                 &updates, /*is local?*/ 0));
+  if (!updates)
+    return IGRAPH_SUCCESS;  /* nothing more to do */
+  if (weights == NULL)
+    IGRAPH_ERROR("Weights vector is a null pointer", IGRAPH_EINVAL);
+  nedge = igraph_ecount(graph);
+  if (nedge != (igraph_integer_t)igraph_vector_size(weights)) {
+    IGRAPH_ERROR("Size of weights vector different from number of edges",
+                 IGRAPH_EINVAL);
+  }
+
+  /* Cumulative proportionate quantities. We are using the global */
+  /* perspective, hence islocal = 0, vid = -1 and mode = IGRAPH_ALL. */
+  IGRAPH_CHECK(igraph_vcumulative_proportionate_values(graph, quantities, &V,
+                                                       /*is local?*/ 0,
+                                                       /*vid*/ -1,
+                                                       /*mode*/ IGRAPH_ALL));
+
+  /* Choose a vertex for reproduction from among all vertices in the graph. */
+  /* The vertex is chosen proportionate to its quantity and such that its */
+  /* degree is >= 1. In case we are considering in-neighbours (respectively */
+  /* out-neighbours), the chosen vertex must have in-degree (respectively */
+  /* out-degree) >= 1. All loops will be ignored. At this point, we know */
+  /* that the graph has at least one edge, which may be directed or not. */
+  /* Furthermore the quantities of all vertices sum to a positive value. */
+  /* Hence at least one vertex will be chosen for reproduction. */
+  IGRAPH_CHECK(igraph_vs_all(&vs));
+  IGRAPH_FINALLY(igraph_vs_destroy, &vs);
+  IGRAPH_CHECK(igraph_vit_create(graph, vs, &vA));
+  IGRAPH_FINALLY(igraph_vit_destroy, &vA);
+  RNG_BEGIN();
+  r = RNG_UNIF01();
+  RNG_END();
+  i = 0;
+  IGRAPH_VECTOR_INIT_FINALLY(&deg, 1);
+  while (!IGRAPH_VIT_END(vA)) {
+    u = (igraph_integer_t)IGRAPH_VIT_GET(vA);
+    IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_1(u), mode,
+                               IGRAPH_NO_LOOPS));
+    if (VECTOR(deg)[0] < 1) {
+      i++;
+      IGRAPH_VIT_NEXT(vA);
+      continue;
+    }
+    if (r <= VECTOR(V)[i]) {
+      /* we have found our candidate vertex for reproduction */
+      a = u;
+      break;
+    }
+    i++;
+    IGRAPH_VIT_NEXT(vA);
+  }
+  /* By now we should have chosen a vertex for reproduction. Check this. */
+  assert(a >= 0);
+
+  /* Cumulative proportionate weights. We are using the local perspective */
+  /* with respect to vertex a, which has been chosen for reproduction. */
+  /* The degree of a is deg(a) >= 1 with respect to the mode "mode", which */
+  /* can flag either the in-degree, out-degree or all degree of a. But it */
+  /* still might happen that the edge weights of interest would sum to zero. */
+  /* An error would be raised in that case. */
+  igraph_vector_destroy(&V);
+  IGRAPH_CHECK(igraph_ecumulative_proportionate_values(graph, weights, &V,
+                                                       /*is local?*/ 1,
+                                                       /*vertex*/ a, mode));
+
+  /* Choose a vertex for death from among all vertices in a's perspective. */
+  /* Let E be all the edges in the perspective of a. If (u,v) \in E is any */
+  /* such edge, then we have a = u or a = v. That is, any edge in E has a */
+  /* for one of its endpoints. As G is assumed to be a simple graph, then */
+  /* exactly one of u or v is the vertex a. Without loss of generality, we */
+  /* assume that each edge in E has the form (a, v_i). Then the vertex v_j */
+  /* chosen for death is chosen proportionate to the weight of the edge */
+  /* (a, v_j). */
+  IGRAPH_CHECK(igraph_es_incident(&es, a, mode));
+  IGRAPH_FINALLY(igraph_es_destroy, &es);
+  IGRAPH_CHECK(igraph_eit_create(graph, es, &eA));
+  IGRAPH_FINALLY(igraph_eit_destroy, &eA);
+  RNG_BEGIN();
+  r = RNG_UNIF01();
+  RNG_END();
+  i = 0;
+  while (!IGRAPH_EIT_END(eA)) {
+    e = (igraph_integer_t)IGRAPH_EIT_GET(eA);
+    if (r <= VECTOR(V)[i]) {
+      /* We have found our candidate vertex for death; call this vertex b. */
+      /* As G is simple, then a =/= b. Check the latter condition. */
+      IGRAPH_CHECK(igraph_edge(graph, /*edge ID*/ e,
+                               /*tail vertex*/ &u, /*head vertex*/ &v));
+      if (a == u)
+        b = v;
+      else
+        b = u;
+      assert(a != b);  /* always true if G is simple */
+      break;
+    }
+    i++;
+    IGRAPH_EIT_NEXT(eA);
+  }
+
+  /* By now a vertex a is chosen for reproduction and a vertex b is chosen */
+  /* for death. Check that b has indeed been chosen. Clone vertex a and kill */
+  /* vertex b. Let the clone c have the vertex ID of b, and the strategy and */
+  /* quantity of a. */
+  assert(b >= 0);
+  VECTOR(*quantities)[b] = VECTOR(*quantities)[a];
+  VECTOR(*strategies)[b] = VECTOR(*strategies)[a];
+
+  igraph_vector_destroy(&deg);
+  igraph_vector_destroy(&V);
+  igraph_vit_destroy(&vA);
+  igraph_eit_destroy(&eA);
+  igraph_vs_destroy(&vs);
+  igraph_es_destroy(&es);
+  IGRAPH_FINALLY_CLEAN(6);
 
   return IGRAPH_SUCCESS;
 }
