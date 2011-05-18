@@ -21,7 +21,7 @@ configure: configure-stamp
 configure-stamp:
 	dh_testdir
 	if [ ! -f configure ]; then ./bootstrap.sh; fi
-	./configure --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --sysconfdir=/etc --with-external-blas --with-external-lapack --with-external-arpack
+	./configure --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --sysconfdir=/etc --with-external-blas --with-external-lapack --with-external-arpack --with-external-f2c
 	touch configure-stamp
 
 build: configure-stamp build-stamp
