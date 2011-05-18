@@ -1,0 +1,8 @@
+igraph (0.6) unstable; urgency=low
+
+  * Initial release.
+
+  * Debian changelog files are maintained by hand from now no, no
+    debian/prepare script anymore.
+
+ -- Tamas Nepusz <ntamas@gmail.com>  Wed, 18 May 2011 12:11:00 +0200
