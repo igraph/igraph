@@ -199,6 +199,8 @@ examples/simple/igraph_es_adj.c.xml
 examples/simple/igraph_es_fromto.c.xml
 examples/simple/igraph_es_pairs.c.xml
 examples/simple/igraph_es_path.c.xml
+examples/simple/igraph_feedback_arc_set.c.xml
+examples/simple/igraph_feedback_arc_set_ip.c.xml
 examples/simple/igraph_fisher_yates_shuffle.c.xml
 examples/simple/igraph_full.c.xml
 examples/simple/igraph_get_all_shortest_paths_dijkstra.c.xml
@@ -237,6 +239,7 @@ examples/simple/igraph_layout_lgl.c.xml
 examples/simple/igraph_layout_mds.c.xml
 examples/simple/igraph_layout_merge.c.xml
 examples/simple/igraph_layout_reingold_tilford.c.xml
+examples/simple/igraph_layout_sugiyama.c.xml
 examples/simple/igraph_lcf.c.xml
 examples/simple/igraph_local_transitivity.c.xml
 examples/simple/igraph_marked_queue.c.xml
@@ -245,6 +248,7 @@ examples/simple/igraph_mincut.c.xml
 examples/simple/igraph_minimal_separators.c.xml
 examples/simple/igraph_minimum_size_separators.c.xml
 examples/simple/igraph_minimum_spanning_tree.c.xml
+examples/simple/igraph_moran_process.c.xml
 examples/simple/igraph_motifs_randesu.c.xml
 examples/simple/igraph_neighbors.c.xml
 examples/simple/igraph_pagerank.c.xml

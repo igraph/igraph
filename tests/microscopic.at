@@ -34,3 +34,8 @@ AT_SETUP([Stochastic imitation via roulette selection:])
 AT_KEYWORDS([stochastic imitation strategy roulette wheel])
 AT_COMPILE_CHECK([simple/igraph_roulette_wheel_imitation.c])
 AT_CLEANUP
+
+AT_SETUP([Moran process:])
+AT_KEYWORDS([Moran process haploid reproduction])
+AT_COMPILE_CHECK([simple/igraph_moran_process.c])
+AT_CLEANUP

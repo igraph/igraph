@@ -46,6 +46,11 @@ int igraph_deterministic_optimal_imitation(const igraph_t *graph,
 					   const igraph_vector_t *quantities,
 					   igraph_vector_t *strategies,
 					   igraph_neimode_t mode);
+int igraph_moran_process(const igraph_t *graph,
+                         const igraph_vector_t *weights,
+                         igraph_vector_t *quantities,
+                         igraph_vector_t *strategies,
+                         igraph_neimode_t mode);
 int igraph_roulette_wheel_imitation(const igraph_t *graph,
                                     igraph_integer_t vid,
                                     igraph_bool_t islocal,
