@@ -41,23 +41,33 @@
  * independently of the graph.</para>
  *
  * <para>While this might sound quite mysterious, it is actually very
- * simple. For example all vertices of a graph can be selected by
- * \ref igraph_vs_all(), and the graph independence means that
- * \ref igraph_vs_all() is not parametrized by a graph object. Ie. 
- * \ref igraph_vs_all() is the \em concept of selecting all vertices
- * of a graph.</para>
+ * simple. For example, all vertices of a graph can be selected by
+ * \ref igraph_vs_all() and the graph independence means that
+ * \ref igraph_vs_all() is not parametrized by a graph object. That is,
+ * \ref igraph_vs_all() is the general \em concept of selecting all vertices
+ * of a graph. A vertex selector is then a way to specify the class of vertices
+ * to be visited. The selector might specify that all vertices of a graph or
+ * all the neighbours of a vertex are to be visited. A vertex selector is a
+ * way of saying that you want to visit a bunch of vertices, as opposed to a
+ * vertex iterator which is a concrete plan for visiting each of the
+ * chosen vertices of a specific graph.</para>
+ *
+ * <para>To determine the actual vertex IDs implied by a vertex selector, you
+ * need to apply the concept of selecting vertices to a specific graph object.
+ * This can be accomplished by instantiating a vertex iterator using a
+ * specific vertex selection concept and a specific graph object. The notion
+ * of vertex iterators can be thought of in the following way. Given a
+ * specific graph object and the class of vertices to be visited, a vertex
+ * iterator is a road map, plan or route for how to visit the chosen
+ * vertices.</para>
  * 
- * <para>This means that for determining the actual vertex id's implied
- * by a vertex selector it needs to be instantiated with a graph
- * object, the instantiation results a vertex iterator.</para>
- * 
- * <para>Some vertex selectors have \em immediate versions, these have
- * prefix <code>igraph_vss</code> instead of <code>igraph_vs</code>, eg. 
- * \ref igraph_vss_all() instead of \ref igraph_vs_all(). 
- * These immediate versions are to be used in the parameter list of the igraph
- * functions, like \ref igraph_degree(). These functions are not
- * associated with any \type igraph_vs_t object, so they have no
- * separate constructors and destructors (destroy functions).</para> 
+ * <para>Some vertex selectors have \em immediate versions. These have the
+ * prefix \c igraph_vss instead of \c igraph_vs, e.g. \ref igraph_vss_all()
+ * instead of \ref igraph_vs_all(). The immediate versions are to be used in
+ * the parameter list of the igraph functions, such as \ref igraph_degree().
+ * These functions are not associated with any \type igraph_vs_t object, so
+ * they have no separate constructors and destructors
+ * (destroy functions).</para>
  */ 
 
 /**
