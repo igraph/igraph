@@ -255,6 +255,7 @@ examples/simple/igraph_pagerank.c.xml
 examples/simple/igraph_preference_game.c.xml
 examples/simple/igraph_psumtree.c.xml
 examples/simple/igraph_radius.c.xml
+examples/simple/igraph_random_sample.c.xml
 examples/simple/igraph_read_graph_dl.c.xml
 examples/simple/igraph_read_graph_graphdb.c.xml
 examples/simple/igraph_read_graph_lgl.c.xml
