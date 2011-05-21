@@ -948,21 +948,27 @@ int igraph_random_sample_alga(igraph_vector_t *res, igraph_integer_t l, igraph_i
  * </para><para>
  * This function generates an increasing sequence of random integer
  * numbers from a given interval. The algorithm is taken literally
- * from Jeffrey Scott Vitter: 'An Efficient Algorithm for Sequential
- * Random Sampling', ACM Transactions on Mathematical Software, 13/1,
- * 58--67. This method can be used for generating numbers from a
- * \em very large interval, it is primarily created for randomly
+ * from (Vitter 1987). This method can be used for generating numbers from a
+ * \em very large interval. It is primarily created for randomly
  * selecting some edges from the sometimes huge set of possible edges
  * in a large graph.
- * \param res Pointer to an initialized vector, this will hold the
+ * \param res Pointer to an initialized vector. This will hold the
  *        result. It will be resized to the proper size.
  * \param l The lower limit of the generation interval (inclusive).
  * \param h The upper limit of the generation interval (inclusive).
  * \param length The number of random integers to generate.
  * \return Error code.
  *
- * Time complexity: according to the referenced paper, the expected
+ * Time complexity: according to (Vitter 1987), the expected
  * running time is O(length).
+ *
+ * </para><para>
+ * Reference:
+ * \clist
+ * \cli (Vitter 1987)
+ *   J. S. Vitter. An efficient algorithm for sequential random sampling.
+ *   \emb ACM Transactions on Mathematical Software, \eme 13(1):58--67, 1987.
+ * \endclist
  */
 
 int igraph_random_sample(igraph_vector_t *res, igraph_integer_t l, igraph_integer_t h, 
