@@ -1786,7 +1786,8 @@ int igraph_i_sparsemat_as_matrix_cc(igraph_matrix_t *res,
   int nzmax=spmat->cs->nzmax;
   int from=0, to=0;
 
-  IGRAPH_CHECK(igraph_matrix_init(res, nrow, ncol));
+  IGRAPH_CHECK(igraph_matrix_resize(res, nrow, ncol));
+  igraph_matrix_null(res);
   
   while (*p < nzmax) {
     while (to < *(p+1)) {
@@ -1812,7 +1813,8 @@ int igraph_i_sparsemat_as_matrix_triplet(igraph_matrix_t *res,
   int nz=spmat->cs->nz;
   int e;
   
-  IGRAPH_CHECK(igraph_matrix_init(res, nrow, ncol));
+  IGRAPH_CHECK(igraph_matrix_resize(res, nrow, ncol));
+  igraph_matrix_null(res);
 
   for (e=0; e<nz; e++, i++, j++, x++) {
     MATRIX(*res, *j, *i) += *x;
@@ -1825,8 +1827,8 @@ int igraph_i_sparsemat_as_matrix_triplet(igraph_matrix_t *res,
  * \function igraph_sparsemat_as_matrix
  * Convert a sparse matrix to a dense matrix
  * 
- * \param res Pointer to an uninitialized matrix, the result is stored
- *    here.
+ * \param res Pointer to an initialized matrix, the result is stored
+ *    here. It will be resized to the required size.
  * \param spmat The input sparse matrix, in triplet or
  *    column-compressed format.
  * \return Error code.

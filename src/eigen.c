@@ -364,8 +364,9 @@ int igraph_i_eigen_matrix_symmetric_lapack(const igraph_matrix_t *A,
     n=igraph_matrix_nrow(A);
   } else if (sA) {
     n=igraph_sparsemat_nrow(sA);
-    IGRAPH_CHECK(igraph_sparsemat_as_matrix(&mA, sA));
+    IGRAPH_CHECK(igraph_matrix_init(&mA, 0, 0));
     IGRAPH_FINALLY(igraph_matrix_destroy, &mA);
+    IGRAPH_CHECK(igraph_sparsemat_as_matrix(&mA, sA));
     myA=&mA;
   } else if (fun) {
     IGRAPH_CHECK(igraph_i_eigen_arpackfun_to_mat(fun, n, extra, &mA));

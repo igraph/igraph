@@ -72,6 +72,7 @@ int test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
   /* No loop or multiple edges */
   igraph_ring(&g, 5, dir, 0, 1);
   igraph_laplacian(&g, &m, &sm, 0, weights);
+  igraph_matrix_init(&m2, 0, 0);
   igraph_sparsemat_as_matrix(&m2, &sm);
   igraph_sparsemat_destroy(&sm);
   if (!igraph_matrix_is_equal(&m, &m2)) { 
@@ -91,6 +92,7 @@ int test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
   }
 
   igraph_laplacian(&g, &m, &sm, 0, weights);
+  igraph_matrix_init(&m2, 0, 0);
   igraph_sparsemat_as_matrix(&m2, &sm);
   igraph_sparsemat_destroy(&sm);
   if (!igraph_matrix_is_equal(&m, &m2)) { 
@@ -110,6 +112,7 @@ int test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
   }
 
   igraph_laplacian(&g, &m, &sm, 0, weights);
+  igraph_matrix_init(&m2, 0, 0);
   igraph_sparsemat_as_matrix(&m2, &sm);
   igraph_sparsemat_destroy(&sm);
   if (!igraph_matrix_is_equal(&m, &m2)) { 
@@ -144,6 +147,7 @@ int test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
   /* Undirected graph, no loop or multiple edges */
   igraph_ring(&g, 5, dir, 0, 1);
   igraph_laplacian(&g, &m, &sm, 1, weights);
+  igraph_matrix_init(&m2, 0, 0);
   igraph_sparsemat_as_matrix(&m2, &sm);
   igraph_sparsemat_destroy(&sm);
   if (!igraph_matrix_is_equal(&m, &m2)) { 
@@ -162,6 +166,7 @@ int test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
   }
 
   igraph_laplacian(&g, &m, &sm, 1, weights);
+  igraph_matrix_init(&m2, 0, 0);
   igraph_sparsemat_as_matrix(&m2, &sm);
   igraph_sparsemat_destroy(&sm);
   if (!igraph_matrix_is_equal(&m, &m2)) { 
@@ -180,6 +185,7 @@ int test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
   }
 
   igraph_laplacian(&g, &m, &sm, 1, weights);
+  igraph_matrix_init(&m2, 0, 0);
   igraph_sparsemat_as_matrix(&m2, &sm);
   igraph_sparsemat_destroy(&sm);
   if (!igraph_matrix_is_equal(&m, &m2)) { 

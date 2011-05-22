@@ -51,11 +51,14 @@ int main() {
   igraph_sparsemat_compress(&sA, &sC);
   igraph_sparsemat_destroy(&sA);
 
+  igraph_matrix_init(&B, 0, 0);
   igraph_sparsemat_as_matrix(&B, &sB);
+  igraph_matrix_init(&C, 0, 0);
   igraph_sparsemat_as_matrix(&C, &sC);
   
   /* All possible products */
   igraph_sparsemat_multiply(&sB, &sC, &sA);
+  igraph_matrix_init(&A1, 0, 0);
   igraph_sparsemat_as_matrix(&A1, &sA);
   igraph_matrix_init(&A2, 0, 0);
   igraph_sparsemat_dense_multiply(&B, &sC, &A2);

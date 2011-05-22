@@ -46,6 +46,7 @@ int main() {
   igraph_sparsemat_entry(&spmat, 3, 2, 10.0);
   
   igraph_sparsemat_compress(&spmat, &spmat2);
+  igraph_matrix_init(&mat, 0, 0);
   igraph_sparsemat_as_matrix(&mat, &spmat2);
   m1=igraph_sparsemat_min(&spmat2);
   m2=igraph_matrix_min(&mat);
