@@ -90,12 +90,19 @@ int igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
  * </para><para>
  * Use this instead of \ref igraph_empty() if you wish to add some graph
  * attributes right after initialization. This function is currently
- * not very interesting for the ordinary user, just supply 0 here or 
+ * not very interesting for the ordinary user. Just supply 0 here or 
  * use \ref igraph_empty().
  * \param graph Pointer to a not-yet initialized graph object.
- * \param n The number of vertices in the graph, a non-negative
+ * \param n The number of vertices in the graph; a non-negative
  *          integer number is expected.
- * \param directed Whether the graph is directed or not.
+ * \param directed Boolean; whether the graph is directed or not. Supported
+ *        values are:
+ *        \clist
+ *        \cli IGRAPH_DIRECTED
+ *          Create a \em directed graph.
+ *        \cli IGRAPH_UNDIRECTED
+ *          Create an \em undirected graph.
+ *        \endclist
  * \param attr The attributes. 
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid number of vertices.
