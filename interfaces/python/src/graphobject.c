@@ -2951,6 +2951,38 @@ PyObject *igraphmodule_Graph_articulation_points(igraphmodule_GraphObject *self)
 }
 
 /** \ingroup python_interface_graph
+ * \brief Calculates the nominal assortativity coefficient
+ * \sa igraph_assortativity_nominal
+ */
+PyObject *igraphmodule_Graph_assortativity_nominal(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds)
+{
+  static char *kwlist[] = { "types", "directed", NULL };
+  PyObject *types_o = Py_None, *directed = Py_True;
+  igraph_real_t res;
+  int ret;
+  igraph_vector_t *types = 0;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &types_o, &directed))
+    return NULL;
+
+  if (igraphmodule_attrib_to_vector_t(types_o, self, &types, ATTRIBUTE_TYPE_VERTEX))
+    return NULL;
+
+  ret = igraph_assortativity_nominal(&self->g, types, &res, PyObject_IsTrue(directed));
+
+  if (types) {
+    igraph_vector_destroy(types); free(types);
+  }
+
+  if (ret) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  return Py_BuildValue("d", (double)(res));
+}
+
+/** \ingroup python_interface_graph
  * \brief Calculates the assortativity coefficient
  * \sa igraph_assortativity
  */
@@ -2962,7 +2994,7 @@ PyObject *igraphmodule_Graph_assortativity(igraphmodule_GraphObject *self, PyObj
   int ret;
   igraph_vector_t *types1 = 0, *types2 = 0;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist, &types1_o, &types2_o, &directed))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|OO", kwlist, &types1_o, &types2_o, &directed))
     return NULL;
 
   if (igraphmodule_attrib_to_vector_t(types1_o, self, &types1, ATTRIBUTE_TYPE_VERTEX))
@@ -2972,16 +3004,33 @@ PyObject *igraphmodule_Graph_assortativity(igraphmodule_GraphObject *self, PyObj
     return NULL;
   }
 
-  if (types1) {
-    ret = igraph_assortativity(&self->g, types1, types2, &res, PyObject_IsTrue(directed));
-  } else {
-    ret = igraph_assortativity_degree(&self->g, &res, PyObject_IsTrue(directed));
-  }
+  ret = igraph_assortativity(&self->g, types1, types2, &res, PyObject_IsTrue(directed));
 
   if (types1) { igraph_vector_destroy(types1); free(types1); }
   if (types2) { igraph_vector_destroy(types2); free(types2); }
 
   if (ret) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  return Py_BuildValue("d", (double)(res));
+}
+
+/** \ingroup python_interface_graph
+ * \brief Calculates the assortativity coefficient for degrees
+ * \sa igraph_assortativity_degree
+ */
+PyObject *igraphmodule_Graph_assortativity_degree(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds)
+{
+  static char *kwlist[] = { "directed", NULL };
+  PyObject *directed = Py_True;
+  igraph_real_t res;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &directed))
+    return NULL;
+
+  if (igraph_assortativity_degree(&self->g, &res, PyObject_IsTrue(directed))) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -10642,22 +10691,69 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "connected components in the graph.\n"
   },
 
-  /* interface to igraph_assortativity{_degree} */
+  /* interface to igraph_assortativity */
   {"assortativity", (PyCFunction)igraphmodule_Graph_assortativity,
    METH_VARARGS | METH_KEYWORDS,
-   "assortativity(types1=None, types2=None, directed=True)\n\n"
-   "Returns the assortativity degree of the graph.\n\n"
+   "assortativity(types1, types2=None, directed=True)\n\n"
+   "Returns the assortativity of the graph based on numeric properties\n"
+   "of the vertices.\n\n"
+   "This coefficient is basically the correlation between the actual\n"
+   "connectivity patterns of the vertices and the pattern expected from the\n"
+   "disribution of the vertex types.\n\n"
+   "See equation (21) in Newman MEJ: Mixing patterns in networks, Phys Rev E\n"
+   "67:026126 (2003) for the proper definition. The actual calculation is\n"
+   "performed using equation (26) in the same paper for directed graphs, and\n"
+   "equation (4) in Newman MEJ: Assortative mixing in networks, Phys Rev Lett\n"
+   "89:208701 (2002) for undirected graphs.\n\n"
    "@param types1: vertex types in a list or the name of a vertex attribute\n"
    "  holding vertex types. Types are ideally denoted by numeric values.\n"
-   "  If C{None}, the vertex out-degrees are used.\n\n"
    "@param types2: in directed assortativity calculations, each vertex can\n"
    "  have an out-type and an in-type. In this case, I{types1} contains the\n"
    "  out-types and this parameter contains the in-types in a list or the\n"
-   "  name of a vertex attribute. If C{None} and I{types1} is given, it is\n"
-   "  assumed to be equal to I{types1}, otherwise it is assumed to contain\n"
-   "  the in-degrees of the vertices.\n\n"
+   "  name of a vertex attribute. If C{None}, it is assumed to be equal\n"
+   "  to I{types1}.\n\n"
    "@param directed: whether to consider edge directions or not.\n"
-   "@return: the assortativity coefficient\n"
+   "@return: the assortativity coefficient\n\n"
+   "@newfield ref: Reference\n"
+   "@ref: Newman MEJ: Mixing patterns in networks, Phys Rev E 67:026126, 2003.\n"
+   "@ref: Newman MEJ: Assortative mixing in networks, Phys Rev Lett 89:208701,\n"
+   "  2002."
+   "@see: L{assortativity_degree()} when the types are the vertex degrees\n"
+  },
+
+  /* interface to igraph_assortativity_degree */
+  {"assortativity_degree", (PyCFunction)igraphmodule_Graph_assortativity_degree,
+   METH_VARARGS | METH_KEYWORDS,
+   "assortativity_degree(directed=True)\n\n"
+   "Returns the assortativity of a graph based on vertex degrees.\n\n"
+   "See L{assortativity()} for the details. L{assortativity_degree()} simply\n"
+   "calls L{assortativity()} with the vertex degrees as types.\n\n"
+   "@param directed: whether to consider edge directions for directed graphs\n"
+   "  or not. This argument is ignored for undirected graphs.\n"
+   "@return: the assortativity coefficient\n\n"
+   "@see: L{assortativity()}\n"
+  },
+
+  /* interface to igraph_assortativity_nominal */
+  {"assortativity_nominal", (PyCFunction)igraphmodule_Graph_assortativity_nominal,
+   METH_VARARGS | METH_KEYWORDS,
+   "assortativity_nominal(types, directed=True)\n\n"
+   "Returns the assortativity of the graph based on vertex categories.\n\n"
+   "Assuming that the vertices belong to different categories, this\n"
+   "function calculates the assortativity coefficient, which specifies\n"
+   "the extent to which the connections stay within categories. The\n"
+   "assortativity coefficient is one if all the connections stay within\n"
+   "categories and minus one if all the connections join vertices of\n"
+   "different categories. For a randomly connected network, it is\n"
+   "asymptotically zero.\n\n"
+   "See equation (2) in Newman MEJ: Mixing patterns in networks, Phys Rev E\n"
+   "67:026126 (2003) for the proper definition.\n\n"
+   "@param types: vertex types in a list or the name of a vertex attribute\n"
+   "  holding vertex types. Types should be denoted by numeric values.\n"
+   "@param directed: whether to consider edge directions or not.\n"
+   "@return: the assortativity coefficient\n\n"
+   "@newfield ref: Reference\n"
+   "@ref: Newman MEJ: Mixing patterns in networks, Phys Rev E 67:026126, 2003.\n"
   },
 
   /* interface to igraph_average_path_length */
