@@ -125,19 +125,25 @@ igraph_vs_t igraph_vss_all(void) {
  * All neighboring vertices of a given vertex are selected by this
  * selector. The \c mode argument controls the type of the neighboring 
  * vertices to be selected. The vertices are visited in increasing vertex
- * id order, as of igraph version 0.4.
+ * ID order, as of igraph version 0.4.
  * 
  * \param vs Pointer to an uninitialized vertex selector object.
- * \param vid Vertex id, the center of the neighborhood.
+ * \param vid Vertex ID, the center of the neighborhood.
  * \param mode Decides the type of the neighborhood for directed
- *        graphs. Possible values:
- *        \c IGRAPH_OUT,  all vertices to which there is a directed edge
- *           from \c vid.
- *        \c IGRAPH_IN, all vertices from which there is a directed
- *           edge from \c vid.
- *        \c IGRAPH_ALL, all vertices to which or from which there is
- *           a directed edge from/to \c vid.
- *        This parameter is ignored for undirected graphs.
+ *        graphs. This parameter is ignored for undirected graphs.
+ *        Possible values:
+ *        \clist
+ *        \cli IGRAPH_OUT
+ *          All vertices to which there is a directed edge from \c vid. That
+ *          is, all the out-neighbors of \c vid.
+ *        \cli IGRAPH_IN
+ *          All vertices from which there is a directed edge to \c vid. In
+ *          other words, all the in-neighbors of \c vid.
+ *        \cli IGRAPH_ALL
+ *          All vertices to which or from which there is a directed edge
+ *          from/to \c vid. That is, all the neighbors of \c vid considered
+ *          as if the graph is undirected.
+ *        \endclist
  * \return Error code.
  * 
  * Time complexity: O(1).
