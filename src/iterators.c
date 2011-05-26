@@ -163,19 +163,29 @@ int igraph_vs_adj(igraph_vs_t *vs,
  * 
  * All non-neighboring vertices of a given vertex. The \p mode
  * argument controls the type of neighboring vertices \em not to
- * select.
+ * select. Instead of selecting immediate neighbors of \c vid as is done by
+ * \ref igraph_vs_adj(), the current function selects vertices that are \em not
+ * immediate neighbors of \c vid.
+ *
  * \param vs Pointer to an uninitialized vertex selector object.
- * \param vid Vertex id, the \quote center \endquote of the
+ * \param vid Vertex ID, the \quote center \endquote of the
  *        non-neighborhood.
  * \param mode The type of neighborhood not to select in directed
  *        graphs. Possible values:
- *        \c IGRAPH_OUT, all vertices will be selected except those to
- *           which there is a directed edge from \p vid.
- *        \c IGRAPH_IN, all vertices will be selected except those
- *           from which there is a directed edge to \p vid.
- *        \c IGRAPH_ALL, all vertices will be selected except those 
- *           from or to which there is a directed edge to or from \p
- *           vid. 
+ *        \clist
+ *        \cli IGRAPH_OUT
+ *          All vertices will be selected except those to which there is a
+ *          directed edge from \c vid. That is, we select all vertices
+ *          excluding the out-neighbors of \c vid.
+ *        \cli IGRAPH_IN
+ *          All vertices will be selected except those from which there is a
+ *          directed edge to \c vid. In other words, we select all vertices
+ *          but the in-neighbors of \c vid.
+ *        \cli IGRAPH_ALL
+ *          All vertices will be selected except those from or to which there
+ *          is a directed edge to or from \c vid. That is, we select all
+ *          vertices of \c vid except for its immediate neighbors.
+ *        \endclist
  * \return Error code.
  *
  * Time complexity: O(1).
