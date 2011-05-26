@@ -954,10 +954,17 @@ int igraph_random_sample_alga(igraph_vector_t *res, igraph_integer_t l, igraph_i
  * in a large graph.
  * \param res Pointer to an initialized vector. This will hold the
  *        result. It will be resized to the proper size.
- * \param l The lower limit of the generation interval (inclusive).
- * \param h The upper limit of the generation interval (inclusive).
+ * \param l The lower limit of the generation interval (inclusive). This must
+ *        be less than or equal to the upper limit.
+ * \param h The upper limit of the generation interval (inclusive). This must
+ *        be greater than or equal to the lower limit.
  * \param length The number of random integers to generate.
- * \return Error code.
+ * \return The error code \c IGRAPH_EINVAL is returned in each of the
+ *         following cases: (1) The given lower limit is greater than the
+ *         given upper limit, i.e. \c l &gt; \c h. (2) Assumming that
+ *         \c l &lt; \c h and N is the sample size, the above error code is
+ *         returned if N &gt; |\c h - \c l|, i.e. the sample size exceeds the
+ *         size of the candidate pool.
  *
  * Time complexity: according to (Vitter 1987), the expected
  * running time is O(length).
@@ -969,6 +976,8 @@ int igraph_random_sample_alga(igraph_vector_t *res, igraph_integer_t l, igraph_i
  *   J. S. Vitter. An efficient algorithm for sequential random sampling.
  *   \emb ACM Transactions on Mathematical Software, \eme 13(1):58--67, 1987.
  * \endclist
+ *
+ * \example examples/simple/igraph_random_sample.c
  */
 
 int igraph_random_sample(igraph_vector_t *res, igraph_integer_t l, igraph_integer_t h, 
@@ -986,7 +995,20 @@ int igraph_random_sample(igraph_vector_t *res, igraph_integer_t l, igraph_intege
   igraph_real_t negalphainv=-13;
   igraph_real_t threshold=-negalphainv*n;
   igraph_real_t S;
-  
+
+  /* getting back some sense of sanity */
+  if (l > h)
+    IGRAPH_ERROR("Lower limit is greater than upper limit", IGRAPH_EINVAL);
+  /* now we know that l <= h */
+  if (length > N)
+    IGRAPH_ERROR("Sample size exceeds size of candidate pool", IGRAPH_EINVAL);
+
+  if (l==h) {
+    IGRAPH_CHECK(igraph_vector_resize(res, 1));
+    VECTOR(*res)[0] = l;
+    return 0;
+  }
+
   igraph_vector_clear(res);
   IGRAPH_CHECK(igraph_vector_reserve(res, length));  
 
