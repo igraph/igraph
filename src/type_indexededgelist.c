@@ -61,7 +61,14 @@ int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el, igraph_vect
  * \param graph Pointer to a not-yet initialized graph object.
  * \param n The number of vertices in the graph, a non-negative
  *          integer number is expected.
- * \param directed Whether the graph is directed or not.
+ * \param directed Boolean; whether the graph is directed or not. Supported
+ *        values are:
+ *        \clist
+ *        \cli IGRAPH_DIRECTED
+ *          The graph will be \em directed.
+ *        \cli IGRAPH_UNDIRECTED
+ *          The graph will be \em undirected.
+ *        \endclist
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid number of vertices.
  * 
