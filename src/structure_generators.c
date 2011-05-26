@@ -1028,7 +1028,7 @@ int igraph_full_citation(igraph_t *graph, igraph_integer_t n,
 
 /**
  * \function igraph_small
- * \brief Shorthand to create a short graph, giving the edges as arguments
+ * \brief Shorthand to create a short graph, giving the edges as arguments.
  * 
  * </para><para>
  * This function is handy when a relatively small graph needs to be created. 
@@ -1040,11 +1040,17 @@ int igraph_full_citation(igraph_t *graph, igraph_integer_t n,
  * the highest value of the 'int' type can be created this way. If you
  * give larger values then the result is undefined.
  * 
- * \param graph Pointer to an uninitialized graph object, the result
+ * \param graph Pointer to an uninitialized graph object. The result
  *        will be stored here.
- * \param n The number of vertices in the graph, an integer.
- * \param directed Logical constant, gives whether the graph should be
- *        directed. 
+ * \param n The number of vertices in the graph; a nonnegative integer.
+ * \param directed Logical constant; gives whether the graph should be
+ *        directed. Supported values are:
+ *        \clist
+ *        \cli IGRAPH_DIRECTED
+ *          The graph to be created will be \em directed.
+ *        \cli IGRAPH_UNDIRECTED
+ *          The graph to be created will be \em undirected.
+ *        \endclist
  * \param ... The additional arguments giving the edges of the
  *        graph. Don't forget to supply an additional '-1' after the last
  *        (meaningful) argument.
