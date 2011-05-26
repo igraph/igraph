@@ -162,6 +162,14 @@ int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
 			    igraph_real_t fw_prob, igraph_real_t bw_factor,
 			    igraph_integer_t ambs, igraph_bool_t directed);
 
+
+int igraph_simple_interconnected_islands_game(
+				igraph_t *graph, 
+				igraph_integer_t islands_n, 
+				igraph_integer_t islands_size,
+				igraph_real_t islands_pin, 
+				igraph_integer_t n_inter);
+
 __END_DECLS
 
 #endif
