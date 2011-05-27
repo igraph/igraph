@@ -94,6 +94,9 @@ if test "${enableval}" = yes; then
   IGRAPH_WARNING(-Wshadow)
   IGRAPH_WARNING(-Wstrict-prototypes)
   IGRAPH_WARNING(-Wwrite-strings)
+else
+  WARNING_CFLAGS=                                                              
+  IGRAPH_WARNING(-Wall)
 fi
 
 use_gprof=no
