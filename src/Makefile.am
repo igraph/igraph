@@ -63,11 +63,11 @@ if INTERNAL_F2C
   libf2c_la_SOURCES = f2c.h f2c/fio.h f2c/fmt.h f2c/sysdep1.h\
 					  f2c/sysdep1.h0 f2c/lio.h f2c/fp.h f2c/signal1.h\
 					  f2c/signal1.h0 $(F2C)
-  libf2c_la_CFLAGS = -DSkip_f2c_Undefs -I.
+  libf2c_la_CFLAGS = -DSkip_f2c_Undefs -I. $(WARNING_CFLAGS)
   f2c/arith.h: f2c/arithchk.c
 	$(CC) $(CFLAGS) -DNO_FPINIT f2c/arithchk.c -lm -o f2c/arith || \
 	$(CC) -DNO_LONG_LONG $(CFLAGS) -DNO_FPINIT f2c/arithchk.c \
-		-lm -o f2c/arith
+		$(WARNING_CFLAGS) -lm -o f2c/arith
 	f2c/arith > f2c/arith.h
   f2c/sysdep1.h: f2c/sysdep1.h0
 	cp f2c/sysdep1.h0 f2c/sysdep1.h
@@ -80,21 +80,21 @@ endif
 
 if INTERNAL_BLAS
   libblas_la_SOURCES = f2c.h $(BLAS)
-  libblas_la_CFLAGS = -I.
+  libblas_la_CFLAGS = -I. $(WARNING_CFLAGS)
   BLAS_LIB = libblas.la
 endif
 
 if INTERNAL_LAPACK
   liblapack_la_SOURCES = f2c.h $(LAPACK)
-  liblapack_la_CFLAGS = -I.
+  liblapack_la_CFLAGS = -I. $(WARNING_CFLAGS)
   libdlamch_la_SOURCES = lapack/dlamch.c
-  libdlamch_la_CFLAGS = $(FLOATSTORE) -I.
+  libdlamch_la_CFLAGS = $(FLOATSTORE) -I. $(WARNING_CFLAGS)
   LAPACK_LIB = liblapack.la libdlamch.la
 endif
 
 if INTERNAL_ARPACK
   libarpack_la_SOURCES = f2c.h $(ARPACK)
-  libarpack_la_CFLAGS = -I.
+  libarpack_la_CFLAGS = -I. $(WARNING_CFLAGS)
   ARPACK_LIB = libarpack.la
 endif
 
@@ -236,7 +236,7 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     distances.c
 
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
-libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall
+libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
 libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(F2C_LIB) $(BLAS_LIB) \
 				 $(LAPACK_LIB) $(ARPACK_LIB)
