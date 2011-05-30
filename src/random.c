@@ -57,9 +57,9 @@
  * 
  * <section><title>Normal (default) use</title>
  * <para> 
- * If the user does use any of the RNG functions explicitly, but calls
+ * If the user does not use any of the RNG functions explicitly, but calls
  * some of the randomized igraph functions, then a default RNG is set
- * up, the first time an igraph function needs random numbers. The
+ * up the first time an igraph function needs random numbers. The
  * seed of this RNG is the output of the <code>time(0)</code> function
  * call, using the <code>time</code> function from the standard C
  * library. This ensures that igraph creates a different random graph,
@@ -88,7 +88,7 @@
  * By default igraph uses the \ref igraph_rng_default random number
  * generator. This can be changed any time by calling \ref
  * igraph_rng_set_default(), with an already initialized random number
- * generator. Note, that the old (replaced) generator is not
+ * generator. Note that the old (replaced) generator is not
  * destroyed, so no memory is deallocated.
  * </para>
  * </section>
@@ -102,7 +102,7 @@
  * </para>
  * 
  * <para>
- * Note, that initializing a new random number generator is
+ * Note that initializing a new random number generator is
  * independent of the generator that the igraph functions themselves
  * use. If you want to replace that, then please use \ref
  * igraph_rng_set_default().
@@ -961,7 +961,7 @@ int igraph_random_sample_alga(igraph_vector_t *res, igraph_integer_t l, igraph_i
  * \param length The number of random integers to generate.
  * \return The error code \c IGRAPH_EINVAL is returned in each of the
  *         following cases: (1) The given lower limit is greater than the
- *         given upper limit, i.e. \c l &gt; \c h. (2) Assumming that
+ *         given upper limit, i.e. \c l &gt; \c h. (2) Assuming that
  *         \c l &lt; \c h and N is the sample size, the above error code is
  *         returned if N &gt; |\c h - \c l|, i.e. the sample size exceeds the
  *         size of the candidate pool.
