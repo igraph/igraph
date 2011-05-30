@@ -389,3 +389,5 @@ V(karate)$Faction <- c(1,1,1,1,1,1,1,1, 2,2, 1,1,1,1, 2,2, 1,1, 2, 1, 2, 1,
 karate$name <- "Zachary's karate club network"
 karate$Citation <- "Wayne W. Zachary. An Information Flow Model for Conflict and Fission in Small Groups. Journal of Anthropological Research Vol. 33, No. 4 452-473"
 karate$Author <- "Wayne W. Zachary"
+
+save(karate, file="/tmp/karate.rda")
