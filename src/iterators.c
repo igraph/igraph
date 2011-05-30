@@ -540,9 +540,9 @@ int igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs,
 
 /**
  * \function igraph_vs_copy
- * \brief Creates a copy of a vertex iterator.
- * \param src The iterator being copied.
- * \param dest An uninitialized iterator that will contain the copy.
+ * \brief Creates a copy of a vertex selector.
+ * \param src The selector being copied.
+ * \param dest An uninitialized selector that will contain the copy.
  */
 int igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src) {
   memcpy(dest, src, sizeof(igraph_vs_t));
@@ -1371,9 +1371,9 @@ igraph_bool_t igraph_es_is_all(const igraph_es_t *es) {
 
 /**
  * \function igraph_es_copy
- * \brief Creates a copy of an edge iterator.
- * \param src The iterator being copied.
- * \param dest An uninitialized iterator that will contain the copy.
+ * \brief Creates a copy of an edge selector.
+ * \param src The selector being copied.
+ * \param dest An uninitialized selector that will contain the copy.
  * \sa \ref igraph_es_destroy()
  */
 int igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
@@ -1428,7 +1428,7 @@ int igraph_i_es_multipairs_size(const igraph_t *graph,
  * \function igraph_es_size
  * \brief Returns the size of the edge selector.
  *
- * The size of the edge selector is the number of vertices it will
+ * The size of the edge selector is the number of edges it will
  * yield when it is iterated over.
  *
  * \param graph The graph over which we will iterate.
