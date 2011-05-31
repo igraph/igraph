@@ -45,8 +45,8 @@ __BEGIN_DECLS
  * \section errorhandlingbasics Error handling basics
  * 
  * <para>\a igraph functions can run into various problems preventing them 
- * from normal operation: the user might have supplied invalid arguments,
- * eg. a non-square matrix when a square-matrix was expected, or the program 
+ * from normal operation. The user might have supplied invalid arguments,
+ * e.g. a non-square matrix when a square-matrix was expected, or the program 
  * has run out of memory while some more memory allocation is required, etc.
  * </para>
  * 
@@ -71,13 +71,13 @@ __BEGIN_DECLS
  * </para>
  * <para>
  * The \ref igraph_set_error_handler() function can be used to set a new
- * error handler function of type \ref igraph_error_handler_t, see the
+ * error handler function of type \ref igraph_error_handler_t; see the
  * documentation of this type for details.
  * </para>
  * <para>
  * There are two other predefined error handler functions,
- * \ref igraph_error_handler_ignore and \ref igraph_error_handler_printignore, 
- * these deallocate the temporarily allocated memory (more about this
+ * \ref igraph_error_handler_ignore and \ref igraph_error_handler_printignore.
+ * These deallocate the temporarily allocated memory (more about this
  * later) and return with the error code. The latter also prints an
  * error message. If you use these error handlers you need to take
  * care about possible errors yourself by checking the return value of
@@ -138,8 +138,8 @@ __BEGIN_DECLS
  * \ref IGRAPH_ERROR macro with a textual description of the error and an
  * \a igraph error code. This macro calls (through the \ref
  * igraph_error() function) the installed error handler. Another useful
- * macro is \ref IGRAPH_CHECK(), this checks the return value of its
- * argument which is normally a function call, and calls \ref
+ * macro is \ref IGRAPH_CHECK(). This checks the return value of its
+ * argument, which is normally a function call, and calls \ref
  * IGRAPH_ERROR if it is not \c IGRAPH_SUCCESS. 
  * </para>
  */
@@ -172,7 +172,7 @@ __BEGIN_DECLS
  * of the functions and call \ref IGRAPH_ERROR if they are invalid. Second,
  * call \ref IGRAPH_FINALLY on each dynamically allocated object and call
  * \ref IGRAPH_FINALLY_CLEAN() with the proper argument before returning. Third, use
- * IGRAPH_CHECK on all \a igraph function calls which can generate errors.
+ * \ref IGRAPH_CHECK on all \a igraph function calls which can generate errors.
  * </para>
  * <para>
  * The size of the stack used for this bookkeeping is fixed, and
@@ -311,7 +311,7 @@ igraph_set_error_handler(igraph_error_handler_t* new_handler);
  * \enumval IGRAPH_ARPACK_EVDIFF Different number of converged Ritz values.
  * \enumval IGRAPH_ARPACK_SHUR Error from calculation of a real Schur form.
  * \enumval IGRAPH_ARPACK_LAPACK LAPACK (dtrevc) error for calculating eigenvectors.
- * \enumval IGRAPH_ARPACK_UNKNOWN Unkown ARPACK error.
+ * \enumval IGRAPH_ARPACK_UNKNOWN Unknown ARPACK error.
  * \enumval IGRAPH_ENEGLOOP Negative loop detected while calculating shortest paths.
  * \enumval IGRAPH_EINTERNAL Internal error, likely a bug in igraph.
  * \enumval IGRAPH_EDIVZERO Big integer division by zero.
