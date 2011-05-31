@@ -952,16 +952,24 @@ int igraph_random_sample_alga(igraph_vector_t *res, igraph_integer_t l, igraph_i
  * \em very large interval. It is primarily created for randomly
  * selecting some edges from the sometimes huge set of possible edges
  * in a large graph.
+ * </para><para>
+ * Note that the type of the lower and the upper limit is \c igraph_real_t,
+ * not \c igraph_integer_t. This does not mean that you can pass fractional
+ * numbers there; these values must still be integral, but we need the
+ * longer range of \c igraph_real_t in several places in the library
+ * (for instance, when generating Erdős-Rényi graphs).
  * \param res Pointer to an initialized vector. This will hold the
  *        result. It will be resized to the proper size.
  * \param l The lower limit of the generation interval (inclusive). This must
- *        be less than or equal to the upper limit.
+ *        be less than or equal to the upper limit, and it must be integral.
+ *        Passing a fractional number here results in undefined behaviour.
  * \param h The upper limit of the generation interval (inclusive). This must
- *        be greater than or equal to the lower limit.
+ *        be greater than or equal to the lower limit, and it must be integral.
+ *        Passing a fractional number here results in undefined behaviour.
  * \param length The number of random integers to generate.
  * \return The error code \c IGRAPH_EINVAL is returned in each of the
  *         following cases: (1) The given lower limit is greater than the
- *         given upper limit, i.e. \c l &gt; \c h. (2) Assumming that
+ *         given upper limit, i.e. \c l &gt; \c h. (2) Assuming that
  *         \c l &lt; \c h and N is the sample size, the above error code is
  *         returned if N &gt; |\c h - \c l|, i.e. the sample size exceeds the
  *         size of the candidate pool.
@@ -980,7 +988,7 @@ int igraph_random_sample_alga(igraph_vector_t *res, igraph_integer_t l, igraph_i
  * \example examples/simple/igraph_random_sample.c
  */
 
-int igraph_random_sample(igraph_vector_t *res, igraph_integer_t l, igraph_integer_t h, 
+int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h, 
 			 igraph_integer_t length) {
   igraph_real_t N=h-l+1;
   igraph_real_t n=length;

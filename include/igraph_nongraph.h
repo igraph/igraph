@@ -48,7 +48,7 @@ __BEGIN_DECLS
 int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res, 
 			igraph_integer_t binwidth);
 int igraph_fisher_yates_shuffle(igraph_vector_t *seq);
-int igraph_random_sample(igraph_vector_t *res, igraph_integer_t l, igraph_integer_t h, 
+int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h, 
 			 igraph_integer_t length);
 int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
 		       igraph_matrix_t *rescoords);

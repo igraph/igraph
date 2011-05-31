@@ -544,16 +544,16 @@ int igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph_integer_t n, igraph_real
   } else {
 
     long int i;
-    double maxedges, last;
+    double maxedges = n, last;
     if (directed && loops) 
-      { maxedges = n * n; }
+      { maxedges *= n; }
     else if (directed && !loops)
-      { maxedges = n * (n-1); }
+      { maxedges *= (n-1); }
     else if (!directed && loops) 
-      { maxedges = n * (n+1)/2; }
+      { maxedges *= (n+1)/2.0; }
     else 
-      { maxedges = n * (n-1)/2; }
-    
+      { maxedges *= (n-1)/2.0; }
+
     IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
     IGRAPH_CHECK(igraph_vector_reserve(&s, maxedges*p*1.1));
 
@@ -635,20 +635,20 @@ int igraph_erdos_renyi_game_gnm(igraph_t *graph, igraph_integer_t n, igraph_real
   } else {
 
     long int i;    
-    double maxedges;
+    double maxedges = n;
     if (directed && loops) 
-      { maxedges = n * n; }
+      { maxedges *= n; }
     else if (directed && !loops)
-      { maxedges = n * (n-1); }
+      { maxedges *= (n-1); }
     else if (!directed && loops) 
-      { maxedges = n * (n+1)/2; }
+      { maxedges *= (n+1)/2.0; }
     else 
-      { maxedges = n * (n-1)/2; }
+      { maxedges *= (n-1)/2.0; }
     
     if (no_of_edges > maxedges) {
       IGRAPH_ERROR("Invalid number (too large) of edges", IGRAPH_EINVAL);
     }
-    
+
     if (maxedges == no_of_edges) {
       retval=igraph_full(graph, n, directed, loops);
     } else {
