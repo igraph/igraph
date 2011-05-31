@@ -156,6 +156,7 @@ examples/simple/igraph_add_vertices.c.xml
 examples/simple/igraph_adjacency.c.xml
 examples/simple/igraph_all_st_cuts.c.xml
 examples/simple/igraph_all_st_mincuts.c.xml
+examples/simple/igraph_are_connected.c.xml
 examples/simple/igraph_array.c.xml
 examples/simple/igraph_atlas.c.xml
 examples/simple/igraph_average_path_length.c.xml
