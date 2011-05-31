@@ -3142,7 +3142,7 @@ int igraph_transitivity_barrat(const igraph_t *graph,
  * pair if we know that there is a (possibly non-mutual) connection
  * between them. In other words, (unordered) vertex pairs are
  * classified into three groups: (1) disconnected, (2)
- * non-reciprocaly connected, (3) reciprocally connected. 
+ * non-reciprocally connected, (3) reciprocally connected. 
  * The result is the size of group (3), divided by the sum of group
  * sizes (2)+(3). This measure is calculated if \p mode is \c
  * IGRAPH_RECIPROCITY_RATIO.
@@ -3359,7 +3359,7 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
       VECTOR(contrib)[j]=0.0;
     }
 
-    /* add the direct contibutions, in-neighbors and out-neighbors */
+    /* add the direct contributions, in-neighbors and out-neighbors */
     for (b=0; b<igraph_vector_size(&ineis_in); b++) {
       edge=VECTOR(ineis_in)[b];
       igraph_edge(graph, edge, &from, &to);
