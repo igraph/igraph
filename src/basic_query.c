@@ -36,7 +36,8 @@
  * \param v2 The second vertex.
  * \param res Boolean, \c TRUE if there is an edge from
  *         \p v1 to \p v2, \c FALSE otherwise.
- * \return Error code.
+ * \return The error code \c IGRAPH_EINVVID is returned if an invalid
+ *         vertex ID is given.
  * 
  * The function is of course symmetric for undirected graphs.
  *
