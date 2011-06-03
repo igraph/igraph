@@ -35,7 +35,7 @@ void print_vector(igraph_vector_t *v, FILE *f) {
 int main() {
 
   igraph_t g;
-  igraph_vector_t v, res, reset;
+  igraph_vector_t v, res, reset, weights;
   igraph_arpack_options_t arpack_options;
   igraph_real_t value;
   int ret;
@@ -127,8 +127,8 @@ int main() {
     return 5;
   }
   igraph_vector_destroy(&reset);
-  
   igraph_destroy(&g);
+  igraph_set_error_handler(igraph_error_handler_abort);
 
   /* Special cases: check for empty graph */
   igraph_empty(&g, 10, 0);
@@ -148,6 +148,16 @@ int main() {
   if (igraph_finite(value)) {
     return 7;
   }
+  print_vector(&res, stdout);
+  igraph_destroy(&g);
+
+  /* Another test case for PageRank (bug #792352) */
+  igraph_small(&g, 9, 1, 0, 5, 1, 5, 2, 0, 3, 1, 5, 4, 5, 7, 6, 0, 8, 0, 8, 1, -1);
+  igraph_vector_init(&weights, 9);
+  VECTOR(weights)[0] = 4; VECTOR(weights)[1] = 5; VECTOR(weights)[2] = 5;
+  VECTOR(weights)[3] = 4; VECTOR(weights)[4] = 4; VECTOR(weights)[5] = 4;
+  VECTOR(weights)[6] = 3; VECTOR(weights)[7] = 4; VECTOR(weights)[8] = 4;
+  igraph_pagerank(&g, &res, 0, igraph_vss_all(), 1, 0.85, &weights, &arpack_options);
   print_vector(&res, stdout);
   igraph_destroy(&g);
 
