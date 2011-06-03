@@ -1011,9 +1011,18 @@ int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
   if (length > N)
     IGRAPH_ERROR("Sample size exceeds size of candidate pool", IGRAPH_EINVAL);
 
+  /* treat rare cases quickly */
   if (l==h) {
     IGRAPH_CHECK(igraph_vector_resize(res, 1));
     VECTOR(*res)[0] = l;
+    return 0;
+  }
+  if (length==N) {
+    long int i = 0;
+    IGRAPH_CHECK(igraph_vector_resize(res, length));
+    for (i = 0; i < length; i++) {
+      VECTOR(*res)[i] = l++;
+    }
     return 0;
   }
 
@@ -1023,6 +1032,7 @@ int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
   RNG_BEGIN();
   
   Vprime=exp(log(RNG_UNIF01())*ninv);
+  l=l-1;
 
   while (n>1 && threshold < N) {
     igraph_real_t X, U;
@@ -1033,7 +1043,7 @@ int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
       while(1) {
 	X=Nreal*(-Vprime+1.0);
 	S=floor(X);
-	if (S==0) { S=1; }
+	// if (S==0) { S=1; }
 	if (S <qu1) { break; }
 	Vprime = exp(log(RNG_UNIF01())*ninv);
       }
@@ -1065,7 +1075,7 @@ int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
       Vprime=exp(log(RNG_UNIF01())*ninv);
     }
         
-    l+=S;
+    l+=S+1;
     igraph_vector_push_back(res, l);	/* allocated */
     N=-S+(-1+N);   Nreal=negSreal+(-1.0+Nreal);
     n=-1+n;   nreal=-1.0+nreal; ninv=nmin1inv;
@@ -1074,11 +1084,11 @@ int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
   }
   
   if (n>1) {
-    retval=igraph_random_sample_alga(res, l, h, n);
+    retval=igraph_random_sample_alga(res, l+1, h, n);
   } else {
     retval=0;
     S=floor(N*Vprime);
-    l+=S;
+    l+=S+1;
     igraph_vector_push_back(res, l);	/* allocated */
   }
 

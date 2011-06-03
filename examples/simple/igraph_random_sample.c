@@ -166,7 +166,30 @@ int random_sample_test() {
 
 int equal_test() {
   igraph_vector_t V;
+  int i;
+
+  igraph_vector_init(&V, 0);
+
+  igraph_random_sample(&V, 0, 0, 1);
+  if (igraph_vector_size(&V) != 1) { return 1; }
+  if (VECTOR(V)[0] != 0) { return 2; }
+
+  igraph_random_sample(&V, 10, 10, 1);
+  if (igraph_vector_size(&V) != 1) { return 3; }
+  if (VECTOR(V)[0] != 10) { return 4; }
   
+  igraph_random_sample(&V, 2, 12, 11);
+  if (igraph_vector_size(&V) != 11) { return 5; }
+  for (i = 0; i < 11; i++)
+    if (VECTOR(V)[i] != i+2) { return 6; }
+  
+  igraph_vector_destroy(&V);
+  return 0;
+}
+
+int rare_test() {
+  igraph_vector_t V;
+
   igraph_vector_init(&V, 0);
 
   igraph_random_sample(&V, 0, 0, 1);
@@ -193,6 +216,9 @@ int main() {
   ret = equal_test();
   if (ret)
     return 3;
+  ret = rare_test();
+  if (ret)
+    return 4;
 
   return 0;
 }
