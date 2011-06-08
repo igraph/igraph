@@ -21,10 +21,8 @@
 
 */
 
-#ifndef IGRAPH_DQUEUE_H
-#define IGRAPH_DQUEUE_H
-
-#include "igraph_types.h"
+#ifndef IGRAPH_MATCHING_H
+#define IGRAPH_MATCHING_H
 
 #undef __BEGIN_DECLS
 #undef __END_DECLS
@@ -36,40 +34,29 @@
 # define __END_DECLS /* empty */
 #endif
 
+#include "igraph_constants.h"
+#include "igraph_datatype.h"
+#include "igraph_types.h"
+#include "igraph_vector.h"
+
 __BEGIN_DECLS
 
 /* -------------------------------------------------- */
-/* double ended queue, very useful                    */
+/* Matchings in graphs                                */
 /* -------------------------------------------------- */
 
-#define BASE_IGRAPH_REAL
-#include "igraph_pmt.h"
-#include "igraph_dqueue_pmt.h"
-#include "igraph_pmt_off.h"
-#undef BASE_IGRAPH_REAL
+int igraph_is_matching(const igraph_t* graph,
+    const igraph_vector_bool_t* types, const igraph_vector_long_t* matching,
+    igraph_bool_t* result);
 
-#define BASE_LONG
-#include "igraph_pmt.h"
-#include "igraph_dqueue_pmt.h"
-#include "igraph_pmt_off.h"
-#undef BASE_LONG
+int igraph_maximum_bipartite_matching(const igraph_t* graph,
+    const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
+    igraph_real_t* matching_weight, igraph_vector_long_t* matching,
+    const igraph_vector_t* weights);
 
-#define BASE_CHAR
-#include "igraph_pmt.h"
-#include "igraph_dqueue_pmt.h"
-#include "igraph_pmt_off.h"
-#undef BASE_CHAR
-
-#define BASE_BOOL
-#include "igraph_pmt.h"
-#include "igraph_dqueue_pmt.h"
-#include "igraph_pmt_off.h"
-#undef BASE_BOOL
-
-#define IGRAPH_DQUEUE_NULL { 0,0,0,0 }
-#define IGRAPH_DQUEUE_INIT_FINALLY(v, size) \
-  do { IGRAPH_CHECK(igraph_dqueue_init(v, size)); \
-  IGRAPH_FINALLY(igraph_dqueue_destroy, v); } while (0)
+int igraph_maximum_matching(const igraph_t* graph, igraph_integer_t* matching_size,
+    igraph_real_t* matching_weight, igraph_vector_long_t* matching,
+    const igraph_vector_t* weights);
 
 __END_DECLS
 
