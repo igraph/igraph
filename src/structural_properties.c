@@ -3593,15 +3593,15 @@ int igraph_density(const igraph_t *graph, igraph_real_t *res,
   
   if (!loops) {
     if (directed) {
-      *res = no_of_edges / (no_of_nodes*(no_of_nodes-1));
+      *res = no_of_edges / no_of_nodes / (no_of_nodes-1);
     } else {
-      *res = no_of_edges / (no_of_nodes*(no_of_nodes-1)/2);
+      *res = no_of_edges / no_of_nodes * 2.0 / (no_of_nodes-1);
     }
   } else {
     if (directed) {
-      *res = no_of_edges / (no_of_nodes*no_of_nodes);
+      *res = no_of_edges / no_of_nodes / no_of_nodes;
     } else {
-      *res = no_of_edges / (no_of_nodes*no_of_nodes/2);
+      *res = no_of_edges / no_of_nodes * 2.0 / no_of_nodes;
     }
   }
   
