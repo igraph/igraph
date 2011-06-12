@@ -957,7 +957,7 @@ int igraph_random_sample_alga(igraph_vector_t *res, igraph_integer_t l, igraph_i
  * not \c igraph_integer_t. This does not mean that you can pass fractional
  * numbers there; these values must still be integral, but we need the
  * longer range of \c igraph_real_t in several places in the library
- * (for instance, when generating Erdős-Rényi graphs).
+ * (for instance, when generating Erdos-Renyi graphs).
  * \param res Pointer to an initialized vector. This will hold the
  *        result. It will be resized to the proper size.
  * \param l The lower limit of the generation interval (inclusive). This must
