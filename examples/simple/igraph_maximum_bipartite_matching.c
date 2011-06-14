@@ -62,7 +62,7 @@ int test_graph_from_leda_tutorial() {
     fprintf(stderr, "matching_weight is %ld, expected: 6", (long)matching_weight);
     return 2;
   }
-  igraph_is_matching(&graph, &types, &matching, &is_matching);
+  igraph_is_maximal_matching(&graph, &types, &matching, &is_matching);
   if (!is_matching) {
     printf("not a matching: ");
     igraph_vector_long_print(&matching);
