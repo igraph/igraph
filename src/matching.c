@@ -63,6 +63,11 @@ int igraph_is_matching(const igraph_t* graph,
     *result = 0; return IGRAPH_SUCCESS;
   }
 
+  /* Checking type vector length */
+  if (types != 0 && igraph_vector_bool_size(types) < no_of_nodes) {
+    IGRAPH_ERROR("type vector too short", IGRAPH_EINVAL);
+  }
+
   for (i = 0; i < no_of_nodes; i++) {
     j = VECTOR(*matching)[i];
 
@@ -101,6 +106,53 @@ int igraph_is_matching(const igraph_t* graph,
   }
 
   *result = 1;
+  return IGRAPH_SUCCESS;
+}
+
+/**
+ * TODO: documentation
+ */
+int igraph_is_maximal_matching(const igraph_t* graph,
+    const igraph_vector_bool_t* types, const igraph_vector_long_t* matching,
+    igraph_bool_t* result) {
+  long int i, j, n, no_of_nodes = igraph_vcount(graph);
+  igraph_vector_t neis;
+  igraph_bool_t valid;
+
+  /* First, check the validity of the matching */
+  IGRAPH_CHECK(igraph_is_matching(graph, types, matching, &valid));
+  if (!valid) {
+    *result = 0; return IGRAPH_SUCCESS;
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+
+  /* Now, check whether it is maximal */
+  valid = 1;
+  for (i = 0; i < no_of_nodes; i++) {
+    if (VECTOR(*matching)[i] != -1)
+      continue;
+
+    /* i is unmatched, so all its neighbors must be matched */
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_ALL));
+    n = igraph_vector_size(&neis);
+    for (j = 0; j < n; j++) {
+      if (VECTOR(*matching)[(long int)VECTOR(neis)[j]] == -1) {
+        /* i has an unmatched neighbor. For bipartite graphs, we
+         * also check the type */
+        if (types == 0 ||
+            VECTOR(*types)[i] != VECTOR(*types)[(long int)VECTOR(neis)[j]]) {
+          valid = 0;
+          break;
+        }
+      }
+    }
+  }
+
+  igraph_vector_destroy(&neis);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  *result = valid;
   return IGRAPH_SUCCESS;
 }
 
