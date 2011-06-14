@@ -637,9 +637,6 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
 
   options->nev = 1;
   options->ncv = 3;
-  if (options->n < options->ncv) {
-    options->ncv = options->n;
-  }
   options->which[0]='L'; options->which[1]='M';
 
   if (weights == 0) {
@@ -860,7 +857,13 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
   igraph_real_t sumfrom=0.0;
   igraph_vector_t *neis;
   igraph_real_t fact=1-data->damping;
-  
+
+  /*
+  printf("PageRank weighted: multiplying vector: ");
+  for (i=0; i<n; i++) { printf(" %.4f", from[i]); }
+  printf("\n");
+  */
+
   for (i=0; i<n; i++) {
     sumfrom += VECTOR(*outdegree)[i]!=0 ? from[i] * fact : from[i];
     VECTOR(*tmp)[i] = from[i] / VECTOR(*outdegree)[i];
@@ -888,7 +891,13 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
       to[i] += sumfrom / n;
     }
   }
-  
+
+  /*
+  printf("PageRank weighted: multiplied vector: ");
+  for (i=0; i<n; i++) { printf(" %.4f", to[i]); }
+  printf("\n");
+  */
+
   return 0;
 }
 
@@ -1119,6 +1128,7 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
   igraph_matrix_t vectors;
   igraph_integer_t dirmode;
   igraph_vector_t outdegree;
+  igraph_vector_t indegree;
   igraph_vector_t tmp;
 
   long int i;
@@ -1176,6 +1186,7 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
 
   if (directed) { dirmode=IGRAPH_IN; } else { dirmode=IGRAPH_ALL; }
 
+  IGRAPH_VECTOR_INIT_FINALLY(&indegree, options->n);
   IGRAPH_VECTOR_INIT_FINALLY(&outdegree, options->n);
   IGRAPH_VECTOR_INIT_FINALLY(&tmp, options->n);
 
@@ -1200,10 +1211,12 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
 
     IGRAPH_CHECK(igraph_degree(graph, &outdegree, igraph_vss_all(),
 			       directed ? IGRAPH_OUT : IGRAPH_ALL, /*loops=*/ 0));
+    IGRAPH_CHECK(igraph_degree(graph, &indegree, igraph_vss_all(),
+			       directed ? IGRAPH_IN : IGRAPH_ALL, /*loops=*/ 0));
     /* Avoid division by zero */
     for (i=0; i<options->n; i++) {
-      MATRIX(vectors, i, 0) = VECTOR(outdegree)[i];
-    } 
+      MATRIX(vectors, i, 0) = VECTOR(indegree)[i];
+    }
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, dirmode));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
@@ -1229,13 +1242,15 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
       long int to=IGRAPH_TO(graph, i);
       igraph_real_t weight=VECTOR(*weights)[i];
       VECTOR(outdegree)[from] += weight;
+      VECTOR(indegree) [to]   += weight;
       if (!directed) { 
         VECTOR(outdegree)[to]   += weight;
+        VECTOR(indegree) [from] += weight;
       }
     }
     /* Avoid division by zero */
     for (i=0; i<options->n; i++) {
-      MATRIX(vectors, i, 0) = VECTOR(outdegree)[i];
+      MATRIX(vectors, i, 0) = VECTOR(indegree)[i];
     }     
     
     IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_pagerank2,
@@ -1249,7 +1264,8 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
 
   igraph_vector_destroy(&tmp);
   igraph_vector_destroy(&outdegree);
-  IGRAPH_FINALLY_CLEAN(2);
+  igraph_vector_destroy(&indegree);
+  IGRAPH_FINALLY_CLEAN(3);
 
   if (value) {
     *value=MATRIX(values, 0, 0);
