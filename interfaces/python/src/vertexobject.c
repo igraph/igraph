@@ -269,8 +269,9 @@ PyObject* igraphmodule_Vertex_update_attributes(PyObject* self, PyObject* args,
       }
     }
 
-    if (keys_func != 0)
+    if (keys_func != 0) {
       Py_DECREF(keys_func);
+    }
   }
 
   if (ok)

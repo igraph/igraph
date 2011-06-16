@@ -86,5 +86,6 @@
 #include "igraph_cohesive_blocks.h"
 #include "igraph_eigen.h"
 #include "igraph_hrg.h"
+#include "igraph_matching.h"
 
 #endif

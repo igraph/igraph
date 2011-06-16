@@ -9301,6 +9301,53 @@ PyObject *igraphmodule_Graph_largest_cliques(igraphmodule_GraphObject * self)
 }
 
 /** \ingroup python_interface_graph
+ * \brief Finds a maximum matching in a bipartite graph
+ */
+PyObject *igraphmodule_Graph_maximum_bipartite_matching(igraphmodule_GraphObject* self,
+    PyObject* args, PyObject* kwds) {
+  static char* kwlist[] = { "types", "weights", NULL };
+  PyObject *types_o = Py_None, *weights_o = Py_None, *result_o;
+  igraph_vector_bool_t* types = 0;
+  igraph_vector_t* weights = 0;
+  igraph_vector_long_t result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &types_o,
+        &weights_o))
+    return NULL;
+
+  if (igraphmodule_attrib_to_vector_bool_t(types_o, self, &types, ATTRIBUTE_TYPE_VERTEX))
+	return NULL;
+
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights, ATTRIBUTE_TYPE_EDGE)) {
+    if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+	return NULL;
+  }
+
+  if (igraph_vector_long_init(&result, 0)) {
+    if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+    if (weights != 0) { igraph_vector_destroy(weights); free(weights); }
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_maximum_bipartite_matching(&self->g, types, 0, 0, &result, weights)) {
+    if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+    if (weights != 0) { igraph_vector_destroy(weights); free(weights); }
+    igraph_vector_long_destroy(&result);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+  if (weights != 0) { igraph_vector_destroy(weights); free(weights); }
+
+  result_o = igraphmodule_vector_long_t_to_PyList(&result);
+  igraph_vector_long_destroy(&result);
+
+  return result_o;
+}
+
+/** \ingroup python_interface_graph
  * \brief Find all maximal cliques in a graph
  */
 PyObject *igraphmodule_Graph_maximal_cliques(igraphmodule_GraphObject * self,
@@ -13446,6 +13493,26 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@ref: Pascal Pons, Matthieu Latapy: Computing communities in large networks\n"
    "  using random walks, U{http://arxiv.org/abs/physics/0512106}.\n"
    "@see: modularity()\n"
+  },
+
+  /*************/
+  /* MATCHINGS */
+  /*************/
+  {"maximum_bipartite_matching", (PyCFunction)igraphmodule_Graph_maximum_bipartite_matching,
+   METH_VARARGS | METH_KEYWORDS,
+   "maximum_bipartite_matching(types, weights=None)\n\n"
+   "Finds a maximum matching in a bipartite graph.\n\n"
+   "A maximum matching is a set of edges such that each vertex is incident on at\n"
+   "most one matched edge and the number (or weight) of such edges in the set is\n"
+   "as large as possible.\n\n"
+   "@param types: vertex types in a list or the name of a vertex attribute\n"
+   "  holding vertex types. Types should be denoted by zeros and ones for the\n"
+   "  two sides of the bipartite graph.\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name.\n"
+   "@return: a list where element M{i} contains the index of the vertex that is\n"
+   "  matched with vertex M{i}. If vertex M{i} is unmatched, the corresponding\n"
+   "  element in the list is -1.\n"
   },
 
   /**********************/
