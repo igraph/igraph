@@ -87,5 +87,6 @@
 #include "igraph_hrg.h"
 #include "igraph_threading.h"
 #include "igraph_interrupt.h"
+#include "igraph_matching.h"
 
 #endif

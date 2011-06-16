@@ -1277,6 +1277,34 @@ PyObject* igraphmodule_vector_t_to_PyList(igraph_vector_t *v,
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts an igraph \c igraph_vector_long_t to a Python integer list
+ * 
+ * \param v the \c igraph_vector_long_t containing the vector to be converted
+ * \return the Python integer list as a \c PyObject*, or \c NULL if an error occurred
+ */
+PyObject* igraphmodule_vector_long_t_to_PyList(igraph_vector_long_t *v) {
+  PyObject *list, *item;
+  int n, i;
+   
+  n = igraph_vector_long_size(v);
+  if (n<0)
+    return igraphmodule_handle_igraph_error();
+
+  list=PyList_New(n);
+  for (i=0; i<n; i++) {
+    item = PyInt_FromLong(VECTOR(*v)[i]);
+    if (!item) {
+      Py_DECREF(list);
+      return NULL;
+    }
+    PyList_SET_ITEM(list, i, item);
+  }
+
+  return list;
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts an igraph \c igraph_vector_t to a Python integer tuple
  * 
  * \param v the \c igraph_vector_t containing the vector to be converted
