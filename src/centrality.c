@@ -1,4 +1,5 @@
 /* -*- mode: C -*-  */
+/* vim:set ts=2 sts=2 sw=2 et: */
 /* 
    IGraph library.
    Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
@@ -38,6 +39,39 @@
 #include "config.h"
 
 #include "bigint.h"
+
+igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector) {
+  /* Many of the centrality measures correspond to the eigenvector of some
+   * matrix. When v is an eigenvector, c*v is also an eigenvector, therefore
+   * it may happen that all the scores in the eigenvector are negative, in which
+   * case we want to negate them since the centrality scores should be positive.
+   * However, since ARPACK is not always stable, sometimes it happens that
+   * *some* of the centrality scores are small negative numbers. This function
+   * helps distinguish between the two cases; it should return true if most of
+   * the values are relatively large negative numbers, in which case we should
+   * negate the eigenvector.
+   */
+  long int i, n = igraph_vector_size(vector);
+
+  if (n == 0)
+    return 0;
+
+  igraph_real_t mi = VECTOR(*vector)[0], ma = VECTOR(*vector)[0];
+  for (i = 1; i < n; i++) {
+    if (VECTOR(*vector)[i] < mi)
+      mi = VECTOR(*vector)[i];
+    if (VECTOR(*vector)[i] > ma)
+      ma = VECTOR(*vector)[i];
+  }
+
+  if (mi >= 0)
+    return 0;
+  if (ma <= 0)
+    return 1;
+
+  mi /= ma;
+  return (mi < 1e-5) ? 1 : 0;
+}
 
 int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
 				    int n, void *extra) {
@@ -224,8 +258,14 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
     }
     if (scale && amax!=0) { 
       igraph_vector_scale(vector, 1/VECTOR(*vector)[which]); 
-    } else if (VECTOR(*vector)[0] < 0) {
+    } else if (igraph_i_vector_mostly_negative(vector)) {
       igraph_vector_scale(vector, -1.0);
+    }
+
+    /* Correction for numeric inaccuracies (eliminating -0.0) */
+    for (i=0; i<options->n; i++) {
+      if (VECTOR(*vector)[i] < 0)
+		  VECTOR(*vector)[i] = 0;
     }
   }
 
@@ -380,8 +420,14 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
     }
     if (scale && amax!=0) { 
       igraph_vector_scale(vector, 1/VECTOR(*vector)[which]); 
-    } else if (VECTOR(*vector)[0] < 0) {
+    } else if (igraph_i_vector_mostly_negative(vector)) {
       igraph_vector_scale(vector, -1.0);
+    }
+
+    /* Correction for numeric inaccuracies (eliminating -0.0) */
+    for (i=0; i<options->n; i++) {
+      if (VECTOR(*vector)[i] < 0)
+		  VECTOR(*vector)[i] = 0;
     }
   }
 
@@ -413,7 +459,7 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
  *     corresponding to the found eigenvector is stored here.
  * \param directed Boolean scalar, whether to consider edge directions
  *     in a directed graph. It is ignored for undirected graphs.
- * \param scale If not zero then the result will be scaled, such that
+ * \param scale If not zero then the result will be scaled such that
  *     the absolute value of the maximum centrality is one.
  * \param weights A null pointer (=no edge weights), or a vector
  *     giving the weights of the edges. The algorithm might result
@@ -671,11 +717,16 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
       tmp=fabs(VECTOR(*vector)[i]);
       if (tmp>amax) { amax=tmp; which=i; }
     }
-    if (scale && amax!=0) { igraph_vector_scale(vector, 1/VECTOR(*vector)[which]); }
+    if (scale && amax!=0) {
+      igraph_vector_scale(vector, 1/VECTOR(*vector)[which]);
+    } else if (igraph_i_vector_mostly_negative(vector)) {
+      igraph_vector_scale(vector, -1.0);
+	}
 
     /* Correction for numeric inaccuracies (eliminating -0.0) */
     for (i=0; i<options->n; i++) {
-      if (VECTOR(*vector)[i] <= 0) VECTOR(*vector)[i] = 0;
+      if (VECTOR(*vector)[i] < 0)
+		  VECTOR(*vector)[i] = 0;
     }
   }
   
@@ -708,7 +759,7 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
  *    stored here. If a null pointer then it is ignored.
  * \param value If not a null pointer then the eigenvalue
  *    corresponding to the calculated eigenvector is stored here.
- * \param scale If not zero then the result will be scaled, such that
+ * \param scale If not zero then the result will be scaled such that
  *     the absolute value of the maximum centrality is one.
  * \param weights A null pointer (=no edge weights), or a vector
  *     giving the weights of the edges.
@@ -754,7 +805,7 @@ int igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
  *    stored here. If a null pointer then it is ignored.
  * \param value If not a null pointer then the eigenvalue
  *    corresponding to the calculated eigenvector is stored here.
- * \param scale If not zero then the result will be scaled, such that
+ * \param scale If not zero then the result will be scaled such that
  *     the absolute value of the maximum centrality is one.
  * \param weights A null pointer (=no edge weights), or a vector
  *     giving the weights of the edges.
@@ -1141,7 +1192,7 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
       *value = IGRAPH_NAN;
     if (vector) {
       igraph_vector_resize(vector, no_of_nodes);
-      igraph_vector_fill(vector, 1);
+      igraph_vector_fill(vector, 1.0 / no_of_nodes);
     }
 	return IGRAPH_SUCCESS;
   }
