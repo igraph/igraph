@@ -241,7 +241,7 @@ class Graph(GraphBase):
         to L{Graph.to_directed()} that is invoked on the copy.
         """
         copy = self.copy()
-        copy.to_directed()
+        copy.to_directed(*args, **kwds)
         return copy
 
     def as_undirected(self, *args, **kwds):
@@ -251,7 +251,7 @@ class Graph(GraphBase):
         to L{Graph.to_undirected()} that is invoked on the copy.
         """
         copy = self.copy()
-        copy.to_undirected()
+        copy.to_undirected(*args, **kwds)
         return copy
 
     def delete_edges(self, *args, **kwds):
