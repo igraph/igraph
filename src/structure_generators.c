@@ -73,8 +73,8 @@
  * 
  * \example examples/simple/igraph_create.c
  */
-int igraph_create(igraph_t *graph, const igraph_vector_t *edges, igraph_integer_t n, 
-		  igraph_bool_t directed) {
+int igraph_create(igraph_t *graph, const igraph_vector_t *edges,
+		igraph_integer_t n, igraph_bool_t directed) {
   igraph_real_t max=igraph_vector_max(edges)+1;
 
   if (igraph_vector_size(edges) % 2 != 0) {
@@ -675,8 +675,9 @@ int igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
  * and edges in the generated graph. Otherwise it is O(|V|*d^o+|E|), d
  * is the average degree of the graph, o is the \p nei argument.
  */
-int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector, igraph_integer_t nei, 
-		   igraph_bool_t directed, igraph_bool_t mutual, igraph_bool_t circular) {
+int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
+		igraph_integer_t nei, igraph_bool_t directed, igraph_bool_t mutual,
+		igraph_bool_t circular) {
 
   long int dims=igraph_vector_size(dimvector);
   long int no_of_nodes=igraph_vector_prod(dimvector);
@@ -799,8 +800,8 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector, igraph_int
  * \example examples/simple/igraph_ring.c
  */
 
-int igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_bool_t mutual,
-		igraph_bool_t circular) {
+int igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
+		igraph_bool_t mutual, igraph_bool_t circular) {
   
   igraph_vector_t v=IGRAPH_VECTOR_NULL;
 
@@ -933,7 +934,8 @@ int igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
  * \example examples/simple/igraph_full.c
  */
 
-int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_bool_t loops) {
+int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
+		igraph_bool_t loops) {
   
   igraph_vector_t edges=IGRAPH_VECTOR_NULL;
   long int i, j;
