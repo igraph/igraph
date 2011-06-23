@@ -41,6 +41,7 @@ from igraph.drawing.colors import *
 from igraph.datatypes import *
 from igraph.formula import *
 from igraph.layout import *
+from igraph.matching import *
 from igraph.statistics import *
 from igraph.summary import *
 from igraph.utils import *
@@ -1296,6 +1297,23 @@ class Graph(GraphBase):
         extd_graph.es["_original_eid"] = extd_to_orig_eids
         return Layout(layout), extd_graph
 
+    def maximum_bipartite_matching(self, types, weights=None):
+        """Finds a maximum matching in a bipartite graph.
+        
+        A maximum matching is a set of edges such that each vertex is incident on
+        at most one matched edge and the number (or weight) of such edges in the
+        set is as large as possible.
+        
+        @param types: vertex types in a list or the name of a vertex attribute
+          holding vertex types. Types should be denoted by zeros and ones (or
+          C{False} and C{True}) for the two sides of the bipartite graph.
+        @param weights: edge weights to be used. Can be a sequence or iterable or
+          even an edge attribute name.
+        @return: an instance of L{Matching}."""
+        matches = GraphBase._maximum_bipartite_matching(self, types, weights)
+        return Matching(self, matches, types=types)
+
+    #############################################
     # Auxiliary I/O functions
 
     def write_adjacency(self, f, sep=" ", eol="\n", *args, **kwds):

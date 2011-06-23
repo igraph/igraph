@@ -104,6 +104,45 @@ int igraph_is_matching(const igraph_t* graph,
   return IGRAPH_SUCCESS;
 }
 
+/**
+ * TODO: documentation
+ */
+int igraph_is_maximal_matching(const igraph_t* graph,
+    const igraph_vector_bool_t* types, const igraph_vector_long_t* matching,
+    igraph_bool_t* result) {
+  long int i, j, n, no_of_nodes = igraph_vcount(graph);
+  igraph_vector_t neis;
+  igraph_bool_t valid;
+
+  IGRAPH_CHECK(igraph_is_matching(graph, types, matching, &valid));
+  if (!valid) {
+    *result = 0; return IGRAPH_SUCCESS;
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+
+  valid = 1;
+  for (i = 0; i < no_of_nodes; i++) {
+    j = VECTOR(*matching)[i];
+    if (j != -1)
+      continue;
+
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_ALL));
+    n = igraph_vector_size(&neis);
+    for (j = 0; j < n; j++) {
+      if (VECTOR(*matching)[(long int)VECTOR(neis)[j]] == -1) {
+        if (types == 0 ||
+            VECTOR(*types)[i] != VECTOR(*types)[(long int)VECTOR(neis)[j]]) {
+          valid = 0; break;
+        }
+      }
+    }
+  }
+
+  *result = valid;
+  return IGRAPH_SUCCESS;
+}
+
 int igraph_i_maximum_bipartite_matching_unweighted(const igraph_t* graph,
     const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
     igraph_vector_long_t* matching);
