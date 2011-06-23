@@ -366,6 +366,91 @@ PyObject *igraphmodule_Graph_is_directed(igraphmodule_GraphObject * self)
   Py_RETURN_FALSE;
 }
 
+/**
+ * \ingroup python_interface_graph
+ * \brief Checks whether a matching is valid in the context of an \c igraph.Graph
+ * object.
+ * \sa igraph_is_matching
+ */
+PyObject *igraphmodule_Graph_is_matching(igraphmodule_GraphObject* self,
+    PyObject* args, PyObject* kwds) {
+  static char* kwlist[] = { "matching", "types", NULL };
+  PyObject *matching_o, *types_o = Py_None;
+  igraph_vector_long_t* matching = 0;
+  igraph_vector_bool_t* types = 0;
+  igraph_bool_t result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &matching_o,
+        &types_o))
+    return NULL;
+
+  if (igraphmodule_attrib_to_vector_long_t(matching_o, self, &matching,
+        ATTRIBUTE_TYPE_VERTEX))
+	return NULL;
+
+  if (igraphmodule_attrib_to_vector_bool_t(types_o, self, &types, ATTRIBUTE_TYPE_VERTEX)) {
+    if (matching != 0) { igraph_vector_long_destroy(matching); free(matching); }
+	return NULL;
+  }
+
+  if (igraph_is_matching(&self->g, types, matching, &result)) {
+    if (matching != 0) { igraph_vector_long_destroy(matching); free(matching); }
+    if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (matching != 0) { igraph_vector_long_destroy(matching); free(matching); }
+  if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+
+  if (result)
+    Py_RETURN_TRUE;
+  Py_RETURN_FALSE;
+}
+
+/**
+ * \ingroup python_interface_graph
+ * \brief Checks whether a matching is valid and maximal in the context of an
+ *        \c igraph.Graph object.
+ * \sa igraph_is_maximal_matching
+ */
+PyObject *igraphmodule_Graph_is_maximal_matching(igraphmodule_GraphObject* self,
+    PyObject* args, PyObject* kwds) {
+  static char* kwlist[] = { "matching", "types", NULL };
+  PyObject *matching_o, *types_o = Py_None;
+  igraph_vector_long_t* matching = 0;
+  igraph_vector_bool_t* types = 0;
+  igraph_bool_t result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &matching_o,
+        &types_o))
+    return NULL;
+
+  if (igraphmodule_attrib_to_vector_long_t(matching_o, self, &matching,
+        ATTRIBUTE_TYPE_VERTEX))
+	return NULL;
+
+  if (igraphmodule_attrib_to_vector_bool_t(types_o, self, &types, ATTRIBUTE_TYPE_VERTEX)) {
+    if (matching != 0) { igraph_vector_long_destroy(matching); free(matching); }
+	return NULL;
+  }
+
+  if (igraph_is_maximal_matching(&self->g, types, matching, &result)) {
+    if (matching != 0) { igraph_vector_long_destroy(matching); free(matching); }
+    if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (matching != 0) { igraph_vector_long_destroy(matching); free(matching); }
+  if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+
+  if (result)
+    Py_RETURN_TRUE;
+  Py_RETURN_FALSE;
+}
+
+
 /** \ingroup python_interface_graph
  * \brief Checks whether an \c igraph.Graph object is simple.
  * \return \c True if the graph is simple, \c False otherwise.
@@ -13598,21 +13683,22 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /*************/
   /* MATCHINGS */
   /*************/
-  {"maximum_bipartite_matching", (PyCFunction)igraphmodule_Graph_maximum_bipartite_matching,
+  {"_is_matching", (PyCFunction)igraphmodule_Graph_is_matching,
    METH_VARARGS | METH_KEYWORDS,
-   "maximum_bipartite_matching(types, weights=None)\n\n"
-   "Finds a maximum matching in a bipartite graph.\n\n"
-   "A maximum matching is a set of edges such that each vertex is incident on at\n"
-   "most one matched edge and the number (or weight) of such edges in the set is\n"
-   "as large as possible.\n\n"
-   "@param types: vertex types in a list or the name of a vertex attribute\n"
-   "  holding vertex types. Types should be denoted by zeros and ones for the\n"
-   "  two sides of the bipartite graph.\n"
-   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
-   "  even an edge attribute name.\n"
-   "@return: a list where element M{i} contains the index of the vertex that is\n"
-   "  matched with vertex M{i}. If vertex M{i} is unmatched, the corresponding\n"
-   "  element in the list is -1.\n"
+   "_is_matching(matching, types=None)\n\n"
+   "Internal function, undocumented.\n\n"
+  },
+  {"_is_maximal_matching", (PyCFunction)igraphmodule_Graph_is_maximal_matching,
+   METH_VARARGS | METH_KEYWORDS,
+   "_is_maximal_matching(matching, types=None)\n\n"
+   "Internal function, undocumented.\n\n"
+   "Use L{Matching.is_maximal} instead.\n"
+  },
+  {"_maximum_bipartite_matching", (PyCFunction)igraphmodule_Graph_maximum_bipartite_matching,
+   METH_VARARGS | METH_KEYWORDS,
+   "_maximum_bipartite_matching(types, weights=None)\n\n"
+   "Internal function, undocumented.\n\n"
+   "@see: L{Graph.maximum_bipartite_matching}\n"
   },
 
   /**********************/
