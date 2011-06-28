@@ -84,7 +84,7 @@
  * 
  * \param vs Pointer to an uninitialized \type igraph_vs_t object.
  * \return Error code.
- * \sa \ref igraph_vss_all().
+ * \sa \ref igraph_vss_all(), \ref igraph_vs_destroy()
  *
  * This selector includes all vertices of a given graph in
  * increasing vertex id order.
@@ -145,6 +145,7 @@ igraph_vs_t igraph_vss_all(void) {
  *          as if the graph is undirected.
  *        \endclist
  * \return Error code.
+ * \sa \ref igraph_vs_destroy()
  * 
  * Time complexity: O(1).
  */
@@ -187,6 +188,7 @@ int igraph_vs_adj(igraph_vs_t *vs,
  *          vertices of \c vid except for its immediate neighbors.
  *        \endclist
  * \return Error code.
+ * \sa \ref igraph_vs_destroy()
  *
  * Time complexity: O(1).
  * 
@@ -201,7 +203,7 @@ int igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid,
   return 0;
 }
 
-/** 
+/**
  * \function igraph_vs_none
  * \brief Empty vertex set.
  * 
@@ -209,7 +211,7 @@ int igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid,
  *
  * \param vs Pointer to an uninitialized vertex selector object.
  * \return Error code.
- * \sa \ref igraph_vss_none.
+ * \sa \ref igraph_vss_none(), \ref igraph_vs_destroy()
  * 
  * Time complexity: O(1).
  */
@@ -246,7 +248,7 @@ igraph_vs_t igraph_vss_none(void) {
  * \param vs Pointer to an uninitialized vertex selector object.
  * \param vid The vertex id to be selected.
  * \return Error Code.
- * \sa \ref igraph_vss_1()
+ * \sa \ref igraph_vss_1(), \ref igraph_vs_destroy()
  * 
  * Time complexity: O(1).
  */
@@ -292,7 +294,7 @@ igraph_vs_t igraph_vss_1(igraph_integer_t vid) {
  * \param vs Pointer to an uninitialized vertex selector.
  * \param v Pointer to a \type igraph_vector_t object.
  * \return Error code.
- * \sa \ref igraph_vss_vector()
+ * \sa \ref igraph_vss_vector(), \ref igraph_vs_destroy()
  * 
  * Time complexity: O(1).
  * 
@@ -346,6 +348,7 @@ igraph_vs_t igraph_vss_vector(const igraph_vector_t *v) {
  *        be included in the vertex selector. Supply a <code>-1</code>
  *        after the last vertex id.
  * \return Error code.
+ * \sa \ref igraph_vs_destroy()
  *
  * Time complexity: O(n), the number of vertex ids supplied.
  */
@@ -396,6 +399,7 @@ int igraph_vs_vector_small(igraph_vs_t *vs, ...) {
  * \param vs Pointer to an uninitialized vertex selector.
  * \param v Pointer to a \type igraph_vector_t object.
  * \return Error code.
+ * \sa \ref igraph_vs_destroy()
  * 
  * Time complexity: O(1).
  */
@@ -427,7 +431,7 @@ int igraph_vs_vector_copy(igraph_vs_t *vs,
  * \param to The last vertex id to be included in the vertex
  *        selector. 
  * \return Error code.
- * \sa \ref igraph_vss_seq()
+ * \sa \ref igraph_vss_seq(), \ref igraph_vs_destroy()
  * 
  * Time complexity: O(1).
  * 
@@ -841,7 +845,7 @@ int igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_t *v) {
  *           of the incident edges of a given vertex is arbitrary.
  *        For undirected graph the latter two is the same. 
  * \return Error code.
- * \sa \ref igraph_ess_all()
+ * \sa \ref igraph_ess_all(), \ref igraph_es_destroy()
  * 
  * Time complexity: O(1).
  */
@@ -914,6 +918,7 @@ int igraph_es_adj(igraph_es_t *es,
  *        \c IGRAPH_IN, incoming edges;
  *        \c IGRAPH_ALL, all edges.
  * \return Error code.
+ * \sa \ref igraph_es_destroy()
  * 
  * Time complexity: O(1).
  * 
@@ -935,7 +940,7 @@ int igraph_es_incident(igraph_es_t *es,
  * \param es Pointer to an uninitialized edge selector object to
  * initialize.
  * \return Error code.
- * \sa \ref igraph_ess_none()
+ * \sa \ref igraph_ess_none(), \ref igraph_es_destroy()
  * 
  * Time complexity: O(1).
  */
@@ -971,7 +976,7 @@ igraph_es_t igraph_ess_none(void) {
  * \param es Pointer to an uninitialized edge selector object.
  * \param eid Edge id of the edge to select.
  * \return Error code.
- * \sa \ref igraph_ess_1()
+ * \sa \ref igraph_ess_1(), \ref igraph_es_destroy()
  * 
  * Time complexity: O(1).
  */
@@ -1014,7 +1019,7 @@ igraph_es_t igraph_ess_1(igraph_integer_t eid) {
  * \param es Pointer to an uninitialized edge selector.
  * \param v Vector containing edge ids.
  * \return Error code.
- * \sa \ref igraph_ess_vector()
+ * \sa \ref igraph_ess_vector(), \ref igraph_es_destroy()
  * 
  * Time complexity: O(1).
  */
@@ -1041,6 +1046,7 @@ int igraph_es_vector(igraph_es_t *es,
  * \param es Pointer to an uninitialized edge selector.
  * \param v Pointer to a \type igraph_vector_t object.
  * \return Error code.
+ * \sa \ref igraph_es_destroy()
  * 
  * Time complexity: O(1).
  */
@@ -1092,6 +1098,7 @@ igraph_es_t igraph_ess_vector(const igraph_vector_t *v) {
  * \param to Vertex selector, their incoming edges will be selected
  *        from the previous selection.
  * \return Error code.
+ * \sa \ref igraph_es_destroy()
  * 
  * Time complexity: O(1).
  * 
@@ -1115,7 +1122,7 @@ int igraph_es_fromto(igraph_es_t *es,
  * \param from The first edge id to be included.
  * \param to The last edge id to be included.
  * \return Error code.
- * \sa \ref igraph_ess_seq()
+ * \sa \ref igraph_ess_seq(), \ref igraph_es_destroy()
  * 
  * Time complexity: O(1).
  */
@@ -1163,7 +1170,7 @@ igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to) {
  * \param v The vector containing the endpoints of the edges.
  * \param directed Whether the graph is directed or not.
  * \return Error code.
- * \sa \ref igraph_es_pairs_small()
+ * \sa \ref igraph_es_pairs_small(), \ref igraph_es_destroy()
  * 
  * Time complexity: O(n), the number of edges being selected.
  * 
@@ -1200,7 +1207,7 @@ int igraph_es_pairs(igraph_es_t *es, const igraph_vector_t *v,
  * \param es Pointer to an uninitialized edge selector object.
  * \param directed Whether the graph is directed or not.
  * \return Error code.
- * \sa \ref igraph_es_pairs()
+ * \sa \ref igraph_es_pairs(), \ref igraph_es_destroy()
  * 
  * Time complexity: O(n), the number of edges being selected.
  */
@@ -1367,6 +1374,7 @@ igraph_bool_t igraph_es_is_all(const igraph_es_t *es) {
  * \brief Creates a copy of an edge iterator.
  * \param src The iterator being copied.
  * \param dest An uninitialized iterator that will contain the copy.
+ * \sa \ref igraph_es_destroy()
  */
 int igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
   memcpy(dest, src, sizeof(igraph_es_t));
@@ -1736,6 +1744,7 @@ int igraph_i_eit_path(const igraph_t *graph,
  * \param es The edge selector to instantiate.
  * \param eit Pointer to an uninitialized edge iterator. 
  * \return Error code.
+ * \sa \ref igraph_eit_destroy()
  * 
  * Time complexity: depends on the type of the edge selector. For edge
  * selectors created by \ref igraph_es_all(), \ref igraph_es_none(),
