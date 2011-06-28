@@ -21,14 +21,14 @@
   graph.}
 \usage{
 get.graph.attribute(graph, name)
-graph <- set.graph.attribute(graph, attrname, value)
-graph <- remove.graph.attribute(graph, attrname)
+set.graph.attribute(graph, name, value)
+remove.graph.attribute(graph, name)
 get.vertex.attribute(graph, name, index=V(graph))
-graph <- set.vertex.attribute(graph, attrname, index=V(graph), value)
-graph <- remove.vertex.attribute(graph, attrname)
+set.vertex.attribute(graph, name, index=V(graph), value)
+remove.vertex.attribute(graph, name)
 get.edge.attribute(graph, name, index=E(graph))
-graph <- set.edge.attribute(graph, attrname, index=E(graph), value)
-graph <- remove.edge.attribute(graph, attrname)
+set.edge.attribute(graph, name, index=E(graph), value)
+remove.edge.attribute(graph, name)
 }
 \arguments{
   \item{graph}{The graph object to work on. Note that the original graph
