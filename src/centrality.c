@@ -159,7 +159,7 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
   if (igraph_ecount(graph) == 0) {
     /* special case: empty graph */
     if (value)
-      *value = IGRAPH_NAN;
+      *value = 0;
     if (vector) {
       igraph_vector_resize(vector, igraph_vcount(graph));
       igraph_vector_fill(vector, 1);
@@ -178,7 +178,7 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
     if (min == 0 && max == 0) {
       /* special case: all weights are zeros */
       if (value)
-        *value = IGRAPH_NAN;
+        *value = 0;
       if (vector) {
         igraph_vector_resize(vector, igraph_vcount(graph));
         igraph_vector_fill(vector, 1);
@@ -193,13 +193,15 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
   IGRAPH_VECTOR_INIT_FINALLY(&degree, options->n);
   IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), 
 			     IGRAPH_ALL, /*loops=*/ 0));
+  RNG_BEGIN();
   for (i=0; i<options->n; i++) {
     if (VECTOR(degree)[i]) {
-      MATRIX(vectors, i, 0) = VECTOR(degree)[i];
+      MATRIX(vectors, i, 0) = VECTOR(degree)[i] + RNG_UNIF(-1e-4, 1e-4);
     } else {
       MATRIX(vectors, i, 0) = 1.0;
     }
   }
+  RNG_END();
   igraph_vector_destroy(&degree);
   IGRAPH_FINALLY_CLEAN(1);
   
@@ -250,22 +252,31 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
     long int which=0;
     long int i;
     IGRAPH_CHECK(igraph_vector_resize(vector, options->n));
-    for (i=0; i<options->n; i++) {
-      igraph_real_t tmp;
-      VECTOR(*vector)[i] = MATRIX(vectors, i, 0);
-      tmp=fabs(VECTOR(*vector)[i]);
-      if (tmp>amax) { amax=tmp; which=i; }
-    }
-    if (scale && amax!=0) { 
-      igraph_vector_scale(vector, 1/VECTOR(*vector)[which]); 
-    } else if (igraph_i_vector_mostly_negative(vector)) {
-      igraph_vector_scale(vector, -1.0);
-    }
 
-    /* Correction for numeric inaccuracies (eliminating -0.0) */
-    for (i=0; i<options->n; i++) {
-      if (VECTOR(*vector)[i] < 0)
-		  VECTOR(*vector)[i] = 0;
+    if (VECTOR(values)[0] <= 0) {
+      /* Pathological case: largest eigenvalue is zero, therefore all the
+       * scores can also be zeros, this will be a valid eigenvector.
+       * This usually happens with graphs that have lots of sinks and
+       * sources only. */
+      igraph_vector_fill(vector, 0);
+    } else {
+      for (i=0; i<options->n; i++) {
+        igraph_real_t tmp;
+        VECTOR(*vector)[i] = MATRIX(vectors, i, 0);
+        tmp=fabs(VECTOR(*vector)[i]);
+        if (tmp>amax) { amax=tmp; which=i; }
+      }
+      if (scale && amax!=0) { 
+        igraph_vector_scale(vector, 1/VECTOR(*vector)[which]); 
+      } else if (igraph_i_vector_mostly_negative(vector)) {
+        igraph_vector_scale(vector, -1.0);
+      }
+
+      /* Correction for numeric inaccuracies (eliminating -0.0) */
+      for (i=0; i<options->n; i++) {
+        if (VECTOR(*vector)[i] < 0)
+		    VECTOR(*vector)[i] = 0;
+      }
     }
   }
 
@@ -304,7 +315,7 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
   if (igraph_ecount(graph) == 0) {
     /* special case: empty graph */
     if (value)
-      *value = IGRAPH_NAN;
+      *value = 0;
     if (vector) {
       igraph_vector_resize(vector, igraph_vcount(graph));
       igraph_vector_fill(vector, 1);
@@ -331,7 +342,7 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
     if (min == 0.0 && max == 0.0) {
       /* special case: all weights are zeros */
       if (value)
-        *value = IGRAPH_NAN;
+        *value = 0;
       if (vector) {
         igraph_vector_resize(vector, igraph_vcount(graph));
         igraph_vector_fill(vector, 1);
@@ -343,29 +354,31 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
   options->n=igraph_vcount(graph);
   options->start=1;
   options->nev=1;
-  options->ncv=3;
-  options->which[0]='L' ; options->which[1]='M';
+  options->ncv=options->n < 4 ? 3 : 4;
+  /* LM mode is not OK here because +1 and -1 can be eigenvalues at the
+   * same time, e.g.: a -> b -> a, c -> a */
+  options->which[0]='L' ; options->which[1]='R';
 
   IGRAPH_MATRIX_INIT_FINALLY(&values, 0, 0);
   IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 1);
   
   IGRAPH_VECTOR_INIT_FINALLY(&indegree, options->n);
-    
-  if (!weights) {
-
-    igraph_adjlist_t adjlist;
-
-    IGRAPH_CHECK(igraph_degree(graph, &indegree, igraph_vss_all(), 
-			       IGRAPH_IN, /*loops=*/ 1));
-    for (i=0; i<options->n; i++) {
-      if (VECTOR(indegree)[i]) {
-	MATRIX(vectors, i, 0) = VECTOR(indegree)[i];
-      } else {
-	MATRIX(vectors, i, 0) = 1.0;
-      }
+  IGRAPH_CHECK(igraph_strength(graph, &indegree, igraph_vss_all(), 
+	       IGRAPH_IN, /*loops=*/ 1, weights));
+  RNG_BEGIN();
+  for (i=0; i<options->n; i++) {
+    if (VECTOR(indegree)[i]) {
+      MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(-1e-4, 1e-4);
+    } else {
+      MATRIX(vectors, i, 0) = 1.0;
     }
-    igraph_vector_destroy(&indegree);
-    IGRAPH_FINALLY_CLEAN(1);
+  }
+  RNG_END();
+  igraph_vector_destroy(&indegree);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  if (!weights) {
+    igraph_adjlist_t adjlist;
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
@@ -376,22 +389,9 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
     
     igraph_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(1);
-
   } else {
     igraph_inclist_t inclist;
     igraph_i_eigenvector_centrality_t data={ graph, &inclist, weights };
-
-    IGRAPH_CHECK(igraph_strength(graph, &indegree, igraph_vss_all(),
-				 IGRAPH_IN, /*loops=*/ 1, weights));
-    for (i=0; i<options->n; i++) {
-      if (VECTOR(indegree)[i]) {
-	MATRIX(vectors, i, 0) = VECTOR(indegree)[i];
-      } else {
-	MATRIX(vectors, i, 0) = 1.0;
-      }
-    }
-    igraph_vector_destroy(&indegree);
-    IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_IN));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist); 
@@ -412,22 +412,32 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
     long int which=0;
     long int i;
     IGRAPH_CHECK(igraph_vector_resize(vector, options->n));
-    for (i=0; i<options->n; i++) {
-      igraph_real_t tmp;
-      VECTOR(*vector)[i] = MATRIX(vectors, i, 0);
-      tmp=fabs(VECTOR(*vector)[i]);
-      if (tmp>amax) { amax=tmp; which=i; }
-    }
-    if (scale && amax!=0) { 
-      igraph_vector_scale(vector, 1/VECTOR(*vector)[which]); 
-    } else if (igraph_i_vector_mostly_negative(vector)) {
-      igraph_vector_scale(vector, -1.0);
+
+    if (MATRIX(values, 0, 0) <= 0) {
+      /* Pathological case: largest eigenvalue is zero, therefore all the
+       * scores can also be zeros, this will be a valid eigenvector.
+       * This usually happens with graphs that have lots of sinks and
+       * sources only. */
+      igraph_vector_fill(vector, 0);
+      MATRIX(values, 0, 0) = 0;
+    } else {
+      for (i=0; i<options->n; i++) {
+        igraph_real_t tmp;
+        VECTOR(*vector)[i] = MATRIX(vectors, i, 0);
+        tmp=fabs(VECTOR(*vector)[i]);
+        if (tmp>amax) { amax=tmp; which=i; }
+      }
+      if (scale && amax!=0) { 
+        igraph_vector_scale(vector, 1/VECTOR(*vector)[which]); 
+      } else if (igraph_i_vector_mostly_negative(vector)) {
+        igraph_vector_scale(vector, -1.0);
+      }
     }
 
     /* Correction for numeric inaccuracies (eliminating -0.0) */
     for (i=0; i<options->n; i++) {
       if (VECTOR(*vector)[i] < 0)
-		  VECTOR(*vector)[i] = 0;
+		    VECTOR(*vector)[i] = 0;
     }
   }
 
@@ -1189,7 +1199,7 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
   if (no_of_edges == 0) {
     /* special case: empty graph */
     if (value)
-      *value = IGRAPH_NAN;
+      *value = 1.0;
     if (vector) {
       igraph_vector_resize(vector, no_of_nodes);
       igraph_vector_fill(vector, 1.0 / no_of_nodes);
@@ -1201,7 +1211,7 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
   options->nev = 1;
   options->ncv = 3;
   options->which[0]='L'; options->which[1]='M';
-  options->start=1;		/* no random start vector */
+  options->start = 1;		/* no random start vector */
 
   directed = directed && igraph_is_directed(graph);
 
@@ -1217,10 +1227,10 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
     if (min == 0 && max == 0) {
       /* special case: all weights are zeros */
       if (value)
-        *value = IGRAPH_NAN;
+        *value = 1.0;
       if (vector) {
         igraph_vector_resize(vector, igraph_vcount(graph));
-        igraph_vector_fill(vector, 1);
+        igraph_vector_fill(vector, 1.0 / no_of_nodes);
       }
       return IGRAPH_SUCCESS;
     }
@@ -1264,14 +1274,18 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
 			       directed ? IGRAPH_OUT : IGRAPH_ALL, /*loops=*/ 0));
     IGRAPH_CHECK(igraph_degree(graph, &indegree, igraph_vss_all(),
 			       directed ? IGRAPH_IN : IGRAPH_ALL, /*loops=*/ 0));
-    /* Avoid division by zero */
+    /* Set up an appropriate starting vector. We start from the in-degrees
+     * plus some small random noise to avoid convergence problems */
     for (i=0; i<options->n; i++) {
-      MATRIX(vectors, i, 0) = VECTOR(indegree)[i];
+      if (VECTOR(indegree)[i])
+        MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(-1e-4, 1e-4);
+      else
+        MATRIX(vectors, i, 0) = 1;
     }
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, dirmode));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
-    
+
     IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_pagerank,
 				       &data, options, 0, &values, &vectors));
 
@@ -1299,10 +1313,14 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
         VECTOR(indegree) [from] += weight;
       }
     }
-    /* Avoid division by zero */
+    /* Set up an appropriate starting vector. We start from the in-degrees
+     * plus some small random noise to avoid convergence problems */
     for (i=0; i<options->n; i++) {
-      MATRIX(vectors, i, 0) = VECTOR(indegree)[i];
-    }     
+      if (VECTOR(indegree)[i])
+        MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(-1e-4, 1e-4);
+      else
+        MATRIX(vectors, i, 0) = 1;
+    }
     
     IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_pagerank2,
 				       &data, options, 0, &values, &vectors));
