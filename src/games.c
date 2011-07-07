@@ -3045,8 +3045,6 @@ int igraph_simple_interconnected_islands_game(
 	int i,j, is;
 	for (is=1; is<=islands_n; is++) { // for each island
 	 
- 		long int slen;
-      
 		// index for start and end of nodes in this island
 		startIsland = islands_size*(is-1); 
 		endIsland = startIsland+islands_size -1;  
