@@ -65,7 +65,8 @@ int igraph_i_minimum_spanning_tree_prim(const igraph_t *graph,
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data. 
  *
- * Time complexity: O(|V|+|E|), |V| is the number of vertices, |E| the
+ * Time complexity: O(|V|+|E|) for the unweighted case, O(|E| log |V|)
+ * for the weighted case. |V| is the number of vertices, |E| the
  * number of edges in the graph. 
  *
  * \sa \ref igraph_minimum_spanning_tree_unweighted() and
@@ -171,7 +172,7 @@ int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
  *         \c IGRAPH_EINVAL, length of weight vector does not
  *           match number of edges.
  *
- * Time complexity: O(|V|+|E|),
+ * Time complexity: O(|E| log |V|),
  * |V| is the number of vertices,
  * |E| the number of edges in the 
  * graph. 
