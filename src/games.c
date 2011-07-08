@@ -3378,6 +3378,8 @@ int igraph_static_power_law_game(igraph_t *graph,
     j += pow(no_of_nodes, 1 + 0.5 / alpha_out) *
          pow(10*sqrt(2)*(1 + alpha_out), -1.0 / alpha_out)-1;
   }
+  if (j < no_of_nodes)
+    j = no_of_nodes;
   for (i = 0; i < no_of_nodes; i++, j--) {
     VECTOR(fitness_out)[i] = pow(j, alpha_out);
   }
@@ -3399,7 +3401,9 @@ int igraph_static_power_law_game(igraph_t *graph,
       j += pow(no_of_nodes, 1 + 0.5 / alpha_in) *
            pow(10*sqrt(2)*(1 + alpha_in), -1.0 / alpha_in)-1;
     }
-    for (i = 0, j = no_of_nodes; i < no_of_nodes; i++, j--) {
+    if (j < no_of_nodes)
+      j = no_of_nodes;
+    for (i = 0; i < no_of_nodes; i++, j--) {
       VECTOR(fitness_in)[i] = pow(j, alpha_in);
     }
     IGRAPH_CHECK(igraph_vector_shuffle(&fitness_in));
