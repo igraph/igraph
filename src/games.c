@@ -1,4 +1,5 @@
 /* -*- mode: C -*-  */
+/* vim:set ts=8 sw=2 sts=2 et: */
 /* 
    IGraph R library.
    Copyright (C) 2003, 2004  Gabor Csardi <csardi@rmki.kfki.hu>
@@ -2991,7 +2992,7 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid parameter
- *         \c IGRAPH_ENOMEM: there is not enought
+ *         \c IGRAPH_ENOMEM: there is not enough
  *         memory for the operation.
  * 
  * Time complexity: O(|V|+|E|), the
@@ -2999,125 +3000,423 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
  * 
  */
 int igraph_simple_interconnected_islands_game(
-				igraph_t 		*graph, 
-				igraph_integer_t 	islands_n, 
-				igraph_integer_t 	islands_size,
-				igraph_real_t 		islands_pin, 
-				igraph_integer_t 	n_inter) {
+                igraph_t        *graph, 
+                igraph_integer_t    islands_n, 
+                igraph_integer_t    islands_size,
+                igraph_real_t       islands_pin, 
+                igraph_integer_t    n_inter) {
 
-	
-	igraph_vector_t edges=IGRAPH_VECTOR_NULL;
-	igraph_vector_t s=IGRAPH_VECTOR_NULL;
-	int retval=0;
+    
+    igraph_vector_t edges=IGRAPH_VECTOR_NULL;
+    igraph_vector_t s=IGRAPH_VECTOR_NULL;
+    int retval=0;
+    int nbNodes;
+    double maxpossibleedgesPerIsland;
+    double maxedgesPerIsland;
+    int nbEdgesInterIslands;
+    double maxedges;
+    int startIsland = 0;
+    int endIsland = 0;
+    int i, j, is;
+    double rand, last;
 
-	if (islands_n<0) {
-	IGRAPH_ERROR("Invalid number of islands", IGRAPH_EINVAL);
-	}
-	if (islands_size<0) {
-	IGRAPH_ERROR("Invalid size for islands", IGRAPH_EINVAL);
-	}
-	if (islands_pin<0 || islands_pin>1) {
-	IGRAPH_ERROR("Invalid probability for islands", IGRAPH_EINVAL);
-	}
-	if ( (n_inter<0) || (n_inter>islands_size) ) {
-	IGRAPH_ERROR("Invalid number of inter-islands links", IGRAPH_EINVAL);
-	}
+    if (islands_n<0) {
+        IGRAPH_ERROR("Invalid number of islands", IGRAPH_EINVAL);
+    }
+    if (islands_size<0) {
+        IGRAPH_ERROR("Invalid size for islands", IGRAPH_EINVAL);
+    }
+    if (islands_pin<0 || islands_pin>1) {
+        IGRAPH_ERROR("Invalid probability for islands", IGRAPH_EINVAL);
+    }
+    if ( (n_inter<0) || (n_inter>islands_size) ) {
+        IGRAPH_ERROR("Invalid number of inter-islands links", IGRAPH_EINVAL);
+    }
 
-	// how much memory ?
-	int nbNodes = islands_n*islands_size;
-	double maxpossibleedgesPerIsland = ((double)islands_size*((double)islands_size-(double)1))/(double)2;
-	double maxedgesPerIsland = islands_pin*maxpossibleedgesPerIsland;
-	int nbEdgesInterIslands = n_inter*(islands_n*(islands_n-1))/2;
-	double maxedges = maxedgesPerIsland*islands_n + nbEdgesInterIslands;
+    // how much memory ?
+    nbNodes = islands_n*islands_size;
+    maxpossibleedgesPerIsland = ((double)islands_size*((double)islands_size-(double)1))/(double)2;
+    maxedgesPerIsland = islands_pin*maxpossibleedgesPerIsland;
+    nbEdgesInterIslands = n_inter*(islands_n*(islands_n-1))/2;
+    maxedges = maxedgesPerIsland*islands_n + nbEdgesInterIslands;
 
-	// debug&tests : printf("total nodes %d, maxedgesperisland %f, maxedgesinterislands %d, maxedges %f\n", nbNodes, maxedgesPerIsland, nbEdgesInterIslands, maxedges);
+    // debug&tests : printf("total nodes %d, maxedgesperisland %f, maxedgesinterislands %d, maxedges %f\n", nbNodes, maxedgesPerIsland, nbEdgesInterIslands, maxedges);
 
-	// reserve enough place for all the edges, thanks !
-	IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-      	IGRAPH_CHECK(igraph_vector_reserve(&edges, maxedges));
+    // reserve enough place for all the edges, thanks !
+    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_CHECK(igraph_vector_reserve(&edges, maxedges));
 
-	RNG_BEGIN();
+    RNG_BEGIN();
 
-	// first create all the islands
-	  
-	int startIsland = 0;
-	int endIsland = 0;
-	int i,j, is;
-	for (is=1; is<=islands_n; is++) { // for each island
-	 
-		// index for start and end of nodes in this island
-		startIsland = islands_size*(is-1); 
-		endIsland = startIsland+islands_size -1;  
-	
+    // first create all the islands
+    for (is=1; is<=islands_n; is++) { // for each island
+     
+        // index for start and end of nodes in this island
+        startIsland = islands_size*(is-1); 
+        endIsland = startIsland+islands_size -1;  
+    
 
-		// debug&tests : printf("start %d,end %d\n", startIsland, endIsland);
+        // debug&tests : printf("start %d,end %d\n", startIsland, endIsland);
 
-		// create the random numbers to be used (into s)
-		IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
-		IGRAPH_CHECK(igraph_vector_reserve(&s, maxedgesPerIsland));
+        // create the random numbers to be used (into s)
+        IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
+        IGRAPH_CHECK(igraph_vector_reserve(&s, maxedgesPerIsland));
 
+        last=RNG_GEOM(islands_pin);
+        // debug&tests : printf("last=%f \n", last);
+        while (last < maxpossibleedgesPerIsland) { // maxedgesPerIsland
+            IGRAPH_CHECK(igraph_vector_push_back(&s, last));
+            rand = RNG_GEOM(islands_pin);
+            last += rand; //RNG_GEOM(islands_pin);
+            //printf("rand=%f , last=%f \n", rand, last);
+            last += 1;
+        }
 
+    
 
-		double rand;
-		double last=RNG_GEOM(islands_pin);
-		// debug&tests : printf("last=%f \n", last);
-		while (last < maxpossibleedgesPerIsland) { // maxedgesPerIsland
-			IGRAPH_CHECK(igraph_vector_push_back(&s, last));
-			rand = RNG_GEOM(islands_pin);
-			last += rand; //RNG_GEOM(islands_pin);
-			//printf("rand=%f , last=%f \n", rand, last);
-			last += 1;
-		}
+        // change this to edges !
+        for (i=0; i<igraph_vector_size(&s); i++) {
 
-	
+            long int to=floor((sqrt(8*VECTOR(s)[i]+1)+1)/2);
+            long int from=VECTOR(s)[i]-(((igraph_real_t)to)*(to-1))/2;
+            to += startIsland;
+            from += startIsland;
+            // debug&tests : printf("from %d to %d\n", from, to);
+            igraph_vector_push_back(&edges, from);
+            igraph_vector_push_back(&edges, to);
+        }
 
-		// change this to edges !
-		for (i=0; i<igraph_vector_size(&s); i++) {
-
-			long int to=floor((sqrt(8*VECTOR(s)[i]+1)+1)/2);
-			long int from=VECTOR(s)[i]-(((igraph_real_t)to)*(to-1))/2;
-			to += startIsland;
-			from += startIsland;
-			// debug&tests : printf("from %d to %d\n", from, to);
-			igraph_vector_push_back(&edges, from);
-			igraph_vector_push_back(&edges, to);
-		}
-
-		// clear the memory used for random number for this island
-		igraph_vector_destroy(&s);
-		IGRAPH_FINALLY_CLEAN(1);
-
-
-		// create the links with other islands
-		for (i=is+1; i<=islands_n; i++) { // for each other island (not the previous ones)
-				
-			// debug&tests : printf("link islands %d and %d\n", is, i);
-			for (j=0; j<n_inter; j++) { // for each link between islands
-
-				long int from = RNG_UNIF(startIsland, endIsland);
-				long int to = RNG_UNIF((i-1)*islands_size, i*islands_size);
-				//printf("from %d to %d\n", from, to);
-				igraph_vector_push_back(&edges, from);
-				igraph_vector_push_back(&edges, to);
-			}
-			
-		}
-	}
+        // clear the memory used for random number for this island
+        igraph_vector_destroy(&s);
+        IGRAPH_FINALLY_CLEAN(1);
 
 
+        // create the links with other islands
+        for (i=is+1; i<=islands_n; i++) { // for each other island (not the previous ones)
+                
+            // debug&tests : printf("link islands %d and %d\n", is, i);
+            for (j=0; j<n_inter; j++) { // for each link between islands
 
-	RNG_END();
+                long int from = RNG_UNIF(startIsland, endIsland);
+                long int to = RNG_UNIF((i-1)*islands_size, i*islands_size);
+                //printf("from %d to %d\n", from, to);
+                igraph_vector_push_back(&edges, from);
+                igraph_vector_push_back(&edges, to);
+            }
+            
+        }
+    }
+
+    RNG_END();
+
+    // actually fill the graph object
+    IGRAPH_CHECK(retval=igraph_create(graph, &edges, nbNodes, 0));
+
+    // an clear remaining things
+    igraph_vector_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return retval;
+}
 
 
-	// actually fill the graph object
-	IGRAPH_CHECK(retval=igraph_create(graph, &edges, nbNodes, 0));
+/**
+ * \ingroup generators
+ * \function igraph_static_fitness_game
+ * \brief Generates a non-growing random graph with edge probabilities
+ *        proportional to node fitness scores.
+ *
+ * This game generates a directed or undirected random graph where the
+ * probability of an edge between vertices i and j depends on the fitness
+ * scores of the two vertices involved. For undirected graphs, each vertex
+ * has a single fitness score. For directed graphs, each vertex has an out-
+ * and an in-fitness, and the probability of an edge from i to j depends on
+ * the out-fitness of vertex i and the in-fitness of vertex j.
+ *
+ * </para><para>
+ * The generation process goes as follows. We start from N disconnected nodes
+ * (where N is given by the length of the fitness vector). Then we randomly
+ * select two vertices i and j, with probabilities proportional to their
+ * fitnesses. (When the generated graph is directed, i is selected according to
+ * the out-fitnesses and j is selected according to the in-fitnesses). If the
+ * vertices are not connected yet (or if multiple edges are allowed), we
+ * connect them; otherwise we select a new pair. This is repeated until the
+ * desired number of links are created.
+ *
+ * </para><para>
+ * It can be shown that the \em expected degree of each vertex will be
+ * proportional to its fitness, although the actual, observed degree will not
+ * be. If you need to generate a graph with an exact degree sequence, consider
+ * \ref igraph_degree_sequence_game instead.
+ *
+ * </para><para>
+ * This model is commonly used to generate static scale-free networks. To
+ * achieve this, you have to draw the fitness scores from the desired power-law
+ * distribution. Alternatively, you may use \ref igraph_static_power_law_game
+ * which generates the fitnesses for you with a given exponent.
+ * 
+ * </para><para>
+ * Reference: Goh K-I, Kahng B, Kim D: Universal behaviour of load distribution
+ * in scale-free networks. Phys Rev Lett 87(27):278701, 2001.
+ *
+ * \param graph        Pointer to an uninitialized graph object.
+ * \param fitness_out  A numeric vector containing the fitness of each vertex.
+ *                     For directed graphs, this specifies the out-fitness
+ *                     of each vertex.
+ * \param fitness_in   If \c NULL, the generated graph will be undirected.
+ *                     If not \c NULL, this argument specifies the in-fitness
+ *                     of each vertex.
+ * \param no_of_edges  The number of edges in the generated graph.
+ * \param loops        Whether to allow loop edges in the generated graph.
+ * \param multiple     Whether to allow multiple edges in the generated graph.
+ *
+ * \return Error code:
+ *         \c IGRAPH_EINVAL: invalid parameter
+ *         \c IGRAPH_ENOMEM: there is not enough
+ *         memory for the operation.
+ * 
+ * Time complexity: O(|V| + |E| log |E|).
+ */
+int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
+                igraph_vector_t* fitness_out, igraph_vector_t* fitness_in,
+                igraph_bool_t loops, igraph_bool_t multiple) {
+  igraph_vector_t edges=IGRAPH_VECTOR_NULL;
+  igraph_integer_t no_of_nodes;
+  igraph_vector_t cum_fitness_in, cum_fitness_out;
+  igraph_vector_t *p_cum_fitness_in, *p_cum_fitness_out;
+  igraph_real_t x, max_in, max_out;
+  igraph_bool_t is_directed = (fitness_in != 0);
+  long int from, to;
 
-	// an clear remaining things
-	igraph_vector_destroy(&edges);
-	IGRAPH_FINALLY_CLEAN(1);
+  if (fitness_out == 0) {
+    IGRAPH_ERROR("fitness_out must not be null", IGRAPH_EINVAL);
+  }
+
+  if (no_of_edges < 0) {
+    IGRAPH_ERROR("Invalid number of edges", IGRAPH_EINVAL);
+  }
+
+  no_of_nodes = igraph_vector_size(fitness_out);
+  if (no_of_nodes == 0) {
+    IGRAPH_CHECK(igraph_empty(graph, 0, is_directed));
+    return IGRAPH_SUCCESS;
+  }
+
+  /* Sanity checks for the fitnesses */
+  if (igraph_vector_min(fitness_out) < 0) {
+    IGRAPH_ERROR("Fitness scores must be non-negative", IGRAPH_EINVAL);
+  }
+  if (fitness_in != 0 && igraph_vector_min(fitness_in) < 0) {
+    IGRAPH_ERROR("Fitness scores must be non-negative", IGRAPH_EINVAL);
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+
+  /* Calculate the cumulative fitness scores */
+  IGRAPH_VECTOR_INIT_FINALLY(&cum_fitness_out, no_of_nodes);
+  IGRAPH_CHECK(igraph_vector_cumsum(&cum_fitness_out, fitness_out));
+  max_out = igraph_vector_tail(&cum_fitness_out);
+  p_cum_fitness_out = &cum_fitness_out;
+  if (is_directed) {
+    IGRAPH_VECTOR_INIT_FINALLY(&cum_fitness_in, no_of_nodes);
+    IGRAPH_CHECK(igraph_vector_cumsum(&cum_fitness_in, fitness_in));
+    max_in = igraph_vector_tail(&cum_fitness_in);
+    p_cum_fitness_in = &cum_fitness_in;
+  } else {
+    max_in = max_out;
+    p_cum_fitness_in = &cum_fitness_out;
+  }
+
+  RNG_BEGIN();
+
+  if (multiple) {
+    /* Generating when multiple edges are allowed */
+    IGRAPH_CHECK(igraph_vector_reserve(&edges, 2 * no_of_edges));
+    while (no_of_edges > 0) {
+      x = RNG_UNIF(0, max_out);
+      igraph_vector_binsearch(p_cum_fitness_out, x, &from);
+      x = RNG_UNIF(0, max_in);
+      igraph_vector_binsearch(p_cum_fitness_in, x, &to);
+
+      if (loops && from == to)
+        continue;
+
+      igraph_vector_push_back(&edges, from);
+      igraph_vector_push_back(&edges, to);
+
+      no_of_edges--;
+    }
+  } else {
+    /* Multiple edges are disallowed */
+    // TODO
+
+    IGRAPH_CHECK(igraph_vector_reserve(&edges, 2 * no_of_edges));
+  }
+  RNG_END();
+
+  /* Cleanup before we create the graph */
+  if (is_directed) {
+    igraph_vector_destroy(&cum_fitness_in);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  igraph_vector_destroy(&cum_fitness_out);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  /* Create the graph */
+  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, is_directed));
+  
+  /* Clear the edge list */
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return IGRAPH_SUCCESS;
+}
 
 
-	return retval;
+/**
+ * \ingroup generators
+ * \function igraph_static_power_law_game
+ * \brief Generates a non-growing random graph with expected power-law degree
+ *        distributions.
+ *
+ * This game generates a directed or undirected random graph where the
+ * degrees of vertices follow power-law distributions with prescribed
+ * exponents. For directed graphs, the exponents of the in- and out-degree
+ * distributions may be specified separately.
+ *
+ * </para><para>
+ * The game simply uses \ref igraph_static_fitness_game with appropriately
+ * constructed fitness vectors. In particular, the fitness of vertex i
+ * is i<sup>-alpha</sup>, where alpha = 1/(gamma-1) and gamma is the 
+ * exponent given in the arguments.
+ *
+ * </para><para>
+ * To remove correlations between in- and out-degrees in case of directed
+ * graphs, the in-fitness vector will be shuffled after it has been set up
+ * and before \ref igraph_static_fitness_game is called.
+ *
+ * </para><para>
+ * Note that significant finite size effects may be observed for exponents
+ * smaller than 3 in the original formulation of the game. This function
+ * provides an argument that lets you remove the finite size effects by
+ * assuming that the fitness of vertex i is (i+i0-1)<sup>-alpha</sup>,
+ * where i0 is a constant chosen appropriately to ensure that the maximum
+ * degree is less than the square root of the number of edges times the
+ * average degree; see the paper of Chung and Lu, and Cho et al for more
+ * details.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Goh K-I, Kahng B, Kim D: Universal behaviour of load distribution
+ * in scale-free networks. Phys Rev Lett 87(27):278701, 2001.
+ *
+ * </para><para>
+ * Chung F and Lu L: Connected components in a random graph with given
+ * degree sequences. Annals of Combinatorics 6, 125-145, 2002.
+ *
+ * </para><para>
+ * Cho YS, Kim JS, Park J, Kahng B, Kim D: Percolation transitions in
+ * scale-free networks under the Achlioptas process. Phys Rev Lett
+ * 103:135702, 2009.
+ *
+ * \param graph        Pointer to an uninitialized graph object.
+ * \param no_of_nodes  The number of nodes in the generated graph.
+ * \param no_of_edges  The number of edges in the generated graph.
+ * \param exponent_out The power law exponent of the degree distribution.
+ *                     For directed graphs, this specifies the exponent of the
+ *                     out-degree distribution. It must be greater than or
+ *                     equal to 2. If you pass \c IGRAPH_INFINITY here, you
+ *                     will get back an Erdos-Renyi random network.
+ * \param exponent_in  If negative, the generated graph will be undirected.
+ *                     If greater than or equal to 2, this argument specifies
+ *                     the exponent of the in-degree distribution. If
+ *                     non-negative but less than 2, an error will be
+ *                     generated.
+ * \param loops        Whether to allow loop edges in the generated graph.
+ * \param multiple     Whether to allow multiple edges in the generated graph.
+ * \param finite_size_correction  Whether to use the proposed finite size
+ *                     correction of Cho et al.
+ *
+ * \return Error code:
+ *         \c IGRAPH_EINVAL: invalid parameter
+ *         \c IGRAPH_ENOMEM: there is not enough
+ *         memory for the operation.
+ * 
+ * Time complexity: O(|V| + |E| log |E|).
+ */
+int igraph_static_power_law_game(igraph_t *graph,
+    igraph_integer_t no_of_nodes, igraph_integer_t no_of_edges,
+    igraph_real_t exponent_out, igraph_real_t exponent_in,
+    igraph_bool_t loops, igraph_bool_t multiple,
+    igraph_bool_t finite_size_correction) {
 
+  igraph_vector_t fitness_out, fitness_in;
+  igraph_real_t alpha_out = 0.0, alpha_in = 0.0;
+  long int i;
+  igraph_real_t j;
+
+  if (no_of_nodes < 0) {
+    IGRAPH_ERROR("Invalid number of nodes", IGRAPH_EINVAL);
+  }
+
+  /* Calculate alpha_out */
+  if (exponent_out < 2) {
+    IGRAPH_ERROR("out-degree exponent must be >= 2", IGRAPH_EINVAL);
+  } else if (igraph_finite(exponent_out)) {
+    alpha_out = -1.0 / (exponent_out - 1);
+  } else {
+    alpha_out = 0.0;
+  }
+
+  /* Construct the out-fitnesses */
+  IGRAPH_VECTOR_INIT_FINALLY(&fitness_out, no_of_nodes);
+  j = no_of_nodes;
+  if (finite_size_correction && alpha_out < -0.5) {
+    /* See the Cho et al paper, first page first column + footnote 7 */
+    j += pow(no_of_nodes, 1 + 0.5 / alpha_out) *
+         pow(10*sqrt(2)*(1 + alpha_out), -1.0 / alpha_out)-1;
+  }
+  for (i = 0; i < no_of_nodes; i++, j--) {
+    VECTOR(fitness_out)[i] = pow(j, alpha_out);
+  }
+
+  if (exponent_in >= 0) {
+    if (exponent_in < 2) {
+      IGRAPH_ERROR("in-degree exponent must be >= 2; use negative numbers "
+          "for undirected graphs", IGRAPH_EINVAL);
+    } else if (igraph_finite(exponent_in)) {
+      alpha_in = -1.0 / (exponent_in - 1);
+    } else {
+      alpha_in = 0.0;
+    }
+
+    IGRAPH_VECTOR_INIT_FINALLY(&fitness_in, no_of_nodes);
+    j = no_of_nodes;
+    if (finite_size_correction && alpha_in < -0.5) {
+      /* See the Cho et al paper, first page first column + footnote 7 */
+      j += pow(no_of_nodes, 1 + 0.5 / alpha_in) *
+           pow(10*sqrt(2)*(1 + alpha_in), -1.0 / alpha_in)-1;
+    }
+    for (i = 0, j = no_of_nodes; i < no_of_nodes; i++, j--) {
+      VECTOR(fitness_in)[i] = pow(j, alpha_in);
+    }
+    IGRAPH_CHECK(igraph_vector_shuffle(&fitness_in));
+
+    IGRAPH_CHECK(igraph_static_fitness_game(graph, no_of_edges,
+          &fitness_out, &fitness_in, loops, multiple));
+
+    igraph_vector_destroy(&fitness_in);
+    IGRAPH_FINALLY_CLEAN(1);
+  } else {
+    IGRAPH_CHECK(igraph_static_fitness_game(graph, no_of_edges,
+          &fitness_out, 0, loops, multiple));
+  }
+
+  igraph_vector_destroy(&fitness_out);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return IGRAPH_SUCCESS;
 }
 

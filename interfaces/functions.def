@@ -270,6 +270,25 @@ igraph_forest_fire_game:
         NAME-R: forest.fire.game
         FLAGS: PROGRESS
 
+igraph_simple_interconnected_islands_game:
+        PARAMS: OUT GRAPH graph, INTEGER islands_n, INTEGER islands_size, \
+                REAL islands_pin, INTEGER n_inter
+        NAME-R: interconnected.islands.game
+
+igraph_static_fitness_game:
+        PARAMS: OUT GRAPH graph, INTEGER no_of_edges, VECTOR fitness_out, \
+                VECTOR_OR_0 fitness_in, BOOLEAN loops=False, \
+                BOOLEAN multiple=False
+        NAME-R: static.fitness.game
+        FLAGS: PROGRESS
+
+igraph_static_power_law_game:
+        PARAMS: OUT GRAPH graph, INTEGER no_of_nodes, INTEGER no_of_edges, \
+                REAL exponent_out, REAL exponent_in=-1, \
+                BOOLEAN loops=False, BOOLEAN multiple=False
+        NAME-R: static.power.law.game
+        FLAGS: PROGRESS
+                
 #######################################
 # Basic query functions
 #######################################

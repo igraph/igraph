@@ -1129,6 +1129,45 @@ BASE FUNCTION(igraph_vector,prod)(const TYPE(igraph_vector) *v) {
   return res;
 }
 
+/**
+ * \ingroup vector
+ * \function igraph_vector_cumsum
+ * \brief Calculates the cumulative sum of the elements in the vector.
+ *
+ * </para><para>
+ * \param to An initialized vector object that will store the cumulative
+ *           sums. Element i of this vector will store the sum of the elements
+ *           of the 'from' vector, up to and including element i.
+ * \param from The input vector.
+ * \return Error code.
+ * 
+ * Time complexity: O(n), the size of the vector. 
+ */
+
+int FUNCTION(igraph_vector,cumsum)(TYPE(igraph_vector) *to,
+                                   const TYPE(igraph_vector) *from) {
+  BASE res=ZERO;
+  BASE *p, *p2;
+
+  assert(from != NULL);
+  assert(from->stor_begin != NULL);
+  assert(to != NULL);
+  assert(to->stor_begin != NULL);
+
+  IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(to, FUNCTION(igraph_vector,size)(from)));
+
+  for (p = from->stor_begin, p2 = to->stor_begin; p < from->end; p++, p2++) {
+#ifdef SUM
+    SUM(res,res,*p);
+#else
+    res += *p;
+#endif
+    *p2 = res;
+  }
+
+  return 0;
+}
+
 #ifndef NOTORDERED
 
 /**
