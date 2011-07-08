@@ -44,14 +44,14 @@ int main() {
   igraph_rng_seed(&igraph_rng_default, time(0));
   k = R_INTEGER(-1000, 1000);
   VECTOR(v)[0] = k;
-  igraph_fisher_yates_shuffle(&v);
+  igraph_vector_shuffle(&v);
   if (VECTOR(v)[0] != k) {
     return 1;
   }
   d = R_UNIF(-1000.0, 1000.0);
 
   VECTOR(v)[0] = d;
-  igraph_fisher_yates_shuffle(&v);
+  igraph_vector_shuffle(&v);
   if (VECTOR(v)[0] != d) {
     return 2;
   }
@@ -80,7 +80,7 @@ int main() {
     VECTOR(v)[i] = k;
   }
 
-  igraph_fisher_yates_shuffle(&v);
+  igraph_vector_shuffle(&v);
   /* must have same length */
   if (igraph_vector_size(&v) != n) {
     return 3;
@@ -97,22 +97,9 @@ int main() {
   igraph_vector_destroy(&u);
   igraph_vector_destroy(&v);
 
-  /********************************
-   * Error tests
-   ********************************/
-
-  igraph_set_error_handler(igraph_error_handler_ignore);
-  /* NULL pointer */
-  ret = igraph_fisher_yates_shuffle(NULL);
-  if (ret != IGRAPH_EINVAL) {
-    return 6;
-  }
   /* empty sequence */
   igraph_vector_init(&v, 0);
-  ret = igraph_fisher_yates_shuffle(&v);
-  if (ret != IGRAPH_EINVAL) {
-    return 7;
-  }
+  ret = igraph_vector_shuffle(&v);
   igraph_vector_destroy(&v);
 
   return 0;

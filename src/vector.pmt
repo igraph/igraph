@@ -1872,6 +1872,20 @@ int FUNCTION(igraph_vector,reverse)(TYPE(igraph_vector) *v) {
  * Time complexity: O(n),
  * n is the number of elements in the
  * vector. 
+ *
+ * </para><para>
+ * References:
+ * \clist
+ * \cli (Fisher &amp; Yates 1963)
+ *   R. A. Fisher and F. Yates. \emb Statistical Tables for Biological,
+ *   Agricultural and Medical Research. \eme Oliver and Boyd, 6th edition,
+ *   1963, page 37.
+ * \cli (Knuth 1998)
+ *   D. E. Knuth. \emb Seminumerical Algorithms, \eme volume 2 of \emb The Art
+ *   of Computer Programming. \eme Addison-Wesley, 3rd edition, 1998, page 145.
+ * \endclist
+ *
+ * \example examples/simple/igraph_fisher_yates_shuffle.c
  */
 
 int FUNCTION(igraph_vector,shuffle)(TYPE(igraph_vector) *v) {
