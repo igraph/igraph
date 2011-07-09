@@ -133,6 +133,8 @@ int FUNCTION(igraph_vector,mul)(TYPE(igraph_vector) *v1,
 				const TYPE(igraph_vector) *v2);
 int FUNCTION(igraph_vector,div)(TYPE(igraph_vector) *v1, 
 				const TYPE(igraph_vector) *v2);
+int FUNCTION(igraph_vector,cumsum)(TYPE(igraph_vector) *to,
+                const TYPE(igraph_vector) *from);
 
 /*------------------------------*/
 /* Finding minimum and maximum  */

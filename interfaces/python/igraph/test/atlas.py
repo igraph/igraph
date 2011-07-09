@@ -1,6 +1,7 @@
+from __future__ import division
+
 import unittest
 from igraph import *
-
 
 class TestBase(unittest.TestCase):
     def testPageRank(self):
@@ -18,7 +19,7 @@ class TestBase(unittest.TestCase):
     def testEigenvectorCentrality(self):
         for idx, g in enumerate(self.__class__.graphs):
             try:
-                ec = g.evcent()
+                ec, eval = g.evcent(return_eigenvalue=True)
             except Exception as ex:
                 self.assertTrue(False, msg="Eigenvector centrality threw exception for graph #%d: %s" % (idx, ex))
                 raise
@@ -27,10 +28,24 @@ class TestBase(unittest.TestCase):
                 self.assertEquals([], ec)
                 continue
 
+            n = g.vcount()
+            if abs(eval) < 1e-4:
+                self.assertTrue(min(ec) >= -1e-10,
+                        msg="Minimum eigenvector centrality is smaller than 0 for graph #%d" % idx)
+                self.assertTrue(max(ec) <= 1,
+                        msg="Maximum eigenvector centrality is greater than 1 for graph #%d" % idx)
+                continue
+
             self.assertAlmostEquals(max(ec), 1, places=7, \
                     msg="Maximum eigenvector centrality is not 1 for graph #%d" % idx)
             self.assertTrue(min(ec) >= 0, \
                     msg="Minimum eigenvector centrality is less than 0 for graph #%d" % idx)
+
+            ec2 = [sum(ec[u.index] for u in v.predecessors()) for v in g.vs]
+            for i in xrange(n):
+                self.assertAlmostEquals(ec[i] * eval, ec2[i], places=7, \
+                        msg="Eigenvector centrality in graph #%d seems to be invalid "\
+                        "for vertex %d" % (idx, i))
 
     def testHubScore(self):
         for idx, g in enumerate(self.__class__.graphs):

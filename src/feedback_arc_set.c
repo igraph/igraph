@@ -230,6 +230,7 @@ int igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *resu
         /* Isolated vertex, we simply ignore it */
         nodes_left--;
         ordering[i] = order_next_pos++;
+        VECTOR(indegrees)[i] = VECTOR(outdegrees)[i] = -1;
       } else {
         /* This is a source */
         igraph_dqueue_push(&sources, i);
