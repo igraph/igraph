@@ -3276,8 +3276,7 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
 /**
  * \ingroup generators
  * \function igraph_static_power_law_game
- * \brief Generates a non-growing random graph with expected power-law degree
- *        distributions.
+ * \brief Generates a non-growing random graph with expected power-law degree distributions.
  *
  * This game generates a directed or undirected random graph where the
  * degrees of vertices follow power-law distributions with prescribed
@@ -3287,8 +3286,8 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
  * </para><para>
  * The game simply uses \ref igraph_static_fitness_game with appropriately
  * constructed fitness vectors. In particular, the fitness of vertex i
- * is i<sup>-alpha</sup>, where alpha = 1/(gamma-1) and gamma is the 
- * exponent given in the arguments.
+ * is i<superscript>-alpha</superscript>, where alpha = 1/(gamma-1) 
+ * and gamma is the exponent given in the arguments.
  *
  * </para><para>
  * To remove correlations between in- and out-degrees in case of directed
@@ -3299,7 +3298,8 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
  * Note that significant finite size effects may be observed for exponents
  * smaller than 3 in the original formulation of the game. This function
  * provides an argument that lets you remove the finite size effects by
- * assuming that the fitness of vertex i is (i+i0-1)<sup>-alpha</sup>,
+ * assuming that the fitness of vertex i is 
+ * (i+i0-1)<superscript>-alpha</superscript>,
  * where i0 is a constant chosen appropriately to ensure that the maximum
  * degree is less than the square root of the number of edges times the
  * average degree; see the paper of Chung and Lu, and Cho et al for more
