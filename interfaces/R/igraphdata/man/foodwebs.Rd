@@ -3,7 +3,7 @@
 \alias{foodwebs}
 \title{A collection of food webs}
 \description{A list of graphs. Each one is a food web, i.e. a directed
-  graph a predator-prey relationships.}
+  graph of predator-prey relationships.}
 \usage{
 foodwebs
 }
@@ -108,27 +108,27 @@ foodwebs
     \item{\sQuote{mangwet}}{Mangrove Estuary, Wet Season.
       
       Reference: same as for \sQuote{mangdry}.}
-
-    Each graph has the following vertex attributes: \sQuote{name} is the
-    name of the species, \sQuote{ECO} is the type of the node, and
-    integer value between one and five, meaning:
-    \enumerate{
-      \item Living/producing compartment
-      \item Other compartment
-      \item Input
-      \item Output
-      \item Respiration.
-    }
-    The \sQuote{Biomass} vertex attribute contains the biomass of the
-    species.
-
-    Edges are weighted, and the weights denote energy flux between the
-    species involved.
-
-    The graphs also contain some informative graph attributes:
-    \sQuote{Author}, \sQuote{Citation}, \sQuote{URL}, and
-    \sQuote{name}.
   }
+
+  Each graph has the following vertex attributes: \sQuote{name} is the
+  name of the species, \sQuote{ECO} is the type of the node, and
+  integer value between one and five, meaning:
+  \enumerate{
+    \item Living/producing compartment
+    \item Other compartment
+    \item Input
+    \item Output
+    \item Respiration.
+  }
+  The \sQuote{Biomass} vertex attribute contains the biomass of the
+  species.
+  
+  Edges are weighted, and the weights denote energy flux between the
+  species involved.
+  
+  The graphs also contain some informative graph attributes:
+  \sQuote{Author}, \sQuote{Citation}, \sQuote{URL}, and
+  \sQuote{name}.
 }
 \source{See references for the individual webs above. The data itself
   was downloaded from
