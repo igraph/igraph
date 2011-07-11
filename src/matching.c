@@ -50,7 +50,34 @@ static void debug(const char* fmt, ...) {
 #endif
 
 /**
- * TODO: documentation
+ * \function igraph_is_matching
+ * Checks whether the given matching is valid for the given graph.
+ *
+ * This function checks a matching vector and verifies whether its length
+ * matches the number of vertices in the given graph, its values are between
+ * -1 (inclusive) and the number of vertices (exclusive), and whether there
+ * exists a corresponding edge in the graph for every matched vertex pair.
+ * For bipartite graphs, it also verifies whether the matched vertices are
+ * in different parts of the graph.
+ *
+ * \param graph The input graph. It can be directed but the edge directions
+ *              will be ignored.
+ * \param types If the graph is bipartite and you are interested in bipartite
+ *              matchings only, pass the vertex types here. If the graph is
+ *              non-bipartite, simply pass \c NULL.
+ * \param matching The matching itself. It must be a vector where element i
+ *                 contains the ID of the vertex that vertex i is matched to,
+ *                 or -1 if vertex i is unmatched.
+ * \param result Pointer to a boolean variable, the result will be returned
+ *               here.
+ *
+ * \sa \ref igraph_is_maximal_matching() if you are also interested in whether
+ *     the matching is maximal (i.e. non-extendable).
+ *
+ * Time complexity: O(|V|+|E|) where |V| is the number of vertices and
+ * |E| is the number of edges.
+ * 
+ * \example examples/simple/igraph_maximum_bipartite_matching.c
  */
 int igraph_is_matching(const igraph_t* graph,
     const igraph_vector_bool_t* types, const igraph_vector_long_t* matching,
@@ -105,7 +132,30 @@ int igraph_is_matching(const igraph_t* graph,
 }
 
 /**
- * TODO: documentation
+ * \function igraph_is_maximal_matching
+ * Checks whether a matching in a graph is maximal.
+ *
+ * A matching is maximal if and only if there exists no unmatched vertex in a
+ * graph such that one of its neighbors is also unmatched.
+ *
+ * \param graph The input graph. It can be directed but the edge directions
+ *              will be ignored.
+ * \param types If the graph is bipartite and you are interested in bipartite
+ *              matchings only, pass the vertex types here. If the graph is
+ *              non-bipartite, simply pass \c NULL.
+ * \param matching The matching itself. It must be a vector where element i
+ *                 contains the ID of the vertex that vertex i is matched to,
+ *                 or -1 if vertex i is unmatched.
+ * \param result Pointer to a boolean variable, the result will be returned
+ *               here.
+ *
+ * \sa \ref igraph_is_matching() if you are only interested in whether a
+ *     matching vector is valid for a given graph.
+ *
+ * Time complexity: O(|V|+|E|) where |V| is the number of vertices and
+ * |E| is the number of edges.
+ * 
+ * \example examples/simple/igraph_maximum_bipartite_matching.c
  */
 int igraph_is_maximal_matching(const igraph_t* graph,
     const igraph_vector_bool_t* types, const igraph_vector_long_t* matching,
@@ -139,6 +189,9 @@ int igraph_is_maximal_matching(const igraph_t* graph,
     }
   }
 
+  igraph_vector_destroy(&neis);
+  IGRAPH_FINALLY_CLEAN(1);
+
   *result = valid;
   return IGRAPH_SUCCESS;
 }
@@ -155,7 +208,56 @@ int igraph_i_maximum_bipartite_matching_weighted(const igraph_t* graph,
 #define UNMATCHED(v) (!MATCHED(v))
 
 /**
- * TODO: documentation
+ * \function igraph_maximum_bipartite_matching
+ * Calculates a maximum matching in a bipartite graph.
+ *
+ * A matching in a bipartite graph is a partial assignment of vertices
+ * of the first kind to vertices of the second kind such that each vertex of
+ * the first kind is matched to at most one vertex of the second kind and
+ * vice versa, and matched vertices must be connected by an edge in the graph.
+ * The size (or cardinality) of a matching is the number of edges.
+ * A matching is a maximum matching if there exists no other matching with
+ * larger cardinality. For weighted graphs, a maximum matching is a matching
+ * whose edges have the largest possible total weight among all possible
+ * matchings.
+ *
+ * </para><para>
+ * Maximum matchings in bipartite graphs are found by the push-relabel algorithm
+ * with greedy initialization and a global relabeling after every n/2 steps where
+ * n is the number of vertices in the graph.
+ *
+ * </para><para>
+ * References: Cherkassky BV, Goldberg AV, Martin P, Setubal JC and Stolfi J:
+ * Augment or push: A computational study of bipartite matching and
+ * unit-capacity flow algorithms. ACM Journal of Experimental Algorithmics 3,
+ * 1998.
+ *
+ * </para><para>
+ * Kaya K, Langguth J, Manne F and Ucar B: Experiments on push-relabel-based
+ * maximum cardinality matching algorithms for bipartite graphs. Technical
+ * Report TR/PA/11/33 of the Centre Europeen de Recherche et de Formation
+ * Avancee en Calcul Scientifique, 2011.
+ *
+ * \param graph The input graph. It can be directed but the edge directions
+ *              will be ignored.
+ * \param types Boolean vector giving the vertex types of the graph.
+ * \param matching_size The size of the matching (i.e. the number of matched
+ *                      vertex pairs will be returned here). It may be \c NULL
+ *                      if you don't need this.
+ * \param matching_weight The weight of the matching if the edges are weighted,
+ *                        or the size of the matching again if the edges are
+ *                        unweighted. It may be \c NULL if you don't need this.
+ * \param matching The matching itself. It must be a vector where element i
+ *                 contains the ID of the vertex that vertex i is matched to,
+ *                 or -1 if vertex i is unmatched.
+ * \param weights A null pointer (=no edge weights), or a vector giving the
+ *                weights of the edges.
+ * \return Error code.
+ *
+ * Time complexity: O(sqrt(|V|) |E|) according to the technical report
+ * referenced above.
+ * 
+ * \example examples/simple/igraph_maximum_bipartite_matching.c
  */
 int igraph_maximum_bipartite_matching(const igraph_t* graph,
     const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
@@ -173,6 +275,10 @@ int igraph_maximum_bipartite_matching(const igraph_t* graph,
         matching_size, matching_weight, matching, weights);
   }
 }
+
+int igraph_i_maximum_bipartite_matching_unweighted_relabel(const igraph_t* graph,
+    const igraph_vector_bool_t* types, igraph_vector_t* labels,
+    igraph_vector_long_t* matching, igraph_bool_t smaller_set);
 
 /**
  * Finding maximum bipartite matchings on bipartite graphs using the
@@ -198,6 +304,8 @@ int igraph_i_maximum_bipartite_matching_unweighted(const igraph_t* graph,
   igraph_dqueue_long_t q;           /* a FIFO for push ordering */
   igraph_bool_t smaller_set;        /* denotes which part of the bipartite graph is smaller */
   long int size_of_smaller_set;
+  long int label_changed = 0;       /* Counter to decide when to run a global relabeling */
+  long int relabeling_freq = no_of_nodes / 2;
 
   /* We will use:
    * - FIFO push ordering
@@ -241,6 +349,10 @@ int igraph_i_maximum_bipartite_matching_unweighted(const igraph_t* graph,
   size_of_smaller_set = (smaller_set ? j : no_of_nodes-j);
 
   /* (4) Set the initial labeling -- lines 1 and 2 in the tech report */
+  IGRAPH_CHECK(igraph_i_maximum_bipartite_matching_unweighted_relabel(
+      graph, types, &labels, &match, smaller_set));
+
+  /*
   for (i = 0; i < no_of_nodes; i++) {
     if (VECTOR(*types)[i] == smaller_set) {
       VECTOR(labels)[i] = 1;
@@ -248,20 +360,30 @@ int igraph_i_maximum_bipartite_matching_unweighted(const igraph_t* graph,
       VECTOR(labels)[i] = 0;
     }
   }
+  */
 
-  /* (5) Fill the push queue with the unmatched nodes from the smaller set.
-   *     These are called the "columns" in the referenced tech report.
-   *     See line 3. */
+  /* Smaller set now has label 1, larger set has label 0. The tech report
+   * calls the smaller set "columns" and the larger set "rows". */
+
+  /* (5) Fill the push queue with the unmatched nodes from the smaller set. */
   for (i = 0; i < no_of_nodes; i++) {
     if (UNMATCHED(i) && VECTOR(*types)[i] == smaller_set)
       IGRAPH_CHECK(igraph_dqueue_long_push(&q, i));
   }
 
   /* (6) Main loop from the referenced tech report -- lines 4--13 */
+  label_changed = 0;
   while (!igraph_dqueue_long_empty(&q)) {
     long int v = igraph_dqueue_long_pop(&q);             /* Line 13 */
     long int u = -1, label_u = 2 * no_of_nodes;
     long int w;
+
+    if (label_changed >= relabeling_freq) {
+      /* Run global relabeling */
+      IGRAPH_CHECK(igraph_i_maximum_bipartite_matching_unweighted_relabel(
+            graph, types, &labels, &match, smaller_set));
+      label_changed = 0;
+    }
 
     debug("Considering vertex %ld\n", v);
 
@@ -272,6 +394,7 @@ int igraph_i_maximum_bipartite_matching_unweighted(const igraph_t* graph,
       if (VECTOR(labels)[(long int)VECTOR(neis)[i]] < label_u) {
         u = VECTOR(neis)[i];
         label_u = VECTOR(labels)[u];
+        label_changed++;
       }
     }
 
@@ -281,17 +404,18 @@ int igraph_i_maximum_bipartite_matching_unweighted(const igraph_t* graph,
       VECTOR(labels)[v] = VECTOR(labels)[u] + 1;         /* Line 7 */
       if (MATCHED(u)) {                                  /* Line 8 */
         w = VECTOR(match)[u];
-        debug("  Vertex %ld is matched to %ld, performing a double push", u, w);
+        debug("  Vertex %ld is matched to %ld, performing a double push\n", u, w);
         if (w != v) {
           VECTOR(match)[u] = -1; VECTOR(match)[w] = -1;  /* Line 9 */
           IGRAPH_CHECK(igraph_dqueue_long_push(&q, w));  /* Line 10 */
-          debug("  Unmatching & activating vertex %ld", w);
+          debug("  Unmatching & activating vertex %ld\n", w);
           num_matched--;
         }
       }
       VECTOR(match)[u] = v; VECTOR(match)[v] = u;      /* Line 11 */
       num_matched++;
       VECTOR(labels)[u] += 2;                          /* Line 12 */
+      label_changed++;
     }
   }
 
@@ -313,11 +437,65 @@ int igraph_i_maximum_bipartite_matching_unweighted(const igraph_t* graph,
   return IGRAPH_SUCCESS;
 }
 
+int igraph_i_maximum_bipartite_matching_unweighted_relabel(const igraph_t* graph,
+    const igraph_vector_bool_t* types, igraph_vector_t* labels,
+    igraph_vector_long_t* match, igraph_bool_t smaller_set) {
+  long int i, j, n, no_of_nodes = igraph_vcount(graph), matched_to;
+  igraph_dqueue_long_t q;
+  igraph_vector_t neis;
+
+  debug("Running global relabeling.\n");
+
+  /* Set all the labels to no_of_nodes first */
+  igraph_vector_fill(labels, no_of_nodes);
+
+  /* Allocate vector for neighbors */
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+
+  /* Create a FIFO for the BFS and initialize it with the unmatched rows
+   * (i.e. members of the larger set) */
+  IGRAPH_CHECK(igraph_dqueue_long_init(&q, 0));
+  IGRAPH_FINALLY(igraph_dqueue_long_destroy, &q);
+  for (i = 0; i < no_of_nodes; i++) {
+    if (VECTOR(*types)[i] != smaller_set && VECTOR(*match)[i] == -1) {
+      IGRAPH_CHECK(igraph_dqueue_long_push(&q, i));
+      VECTOR(*labels)[i] = 0;
+    }
+  }
+
+  /* Run the BFS */
+  while (!igraph_dqueue_long_empty(&q)) {
+    long int v = igraph_dqueue_long_pop(&q);
+    long int w;
+
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, IGRAPH_ALL));
+
+    n = igraph_vector_size(&neis);
+    for (j = 0; j < n; j++) {
+      w = VECTOR(neis)[j];
+      if (VECTOR(*labels)[w] == no_of_nodes) {
+        VECTOR(*labels)[w] = VECTOR(*labels)[v] + 1;
+        matched_to = VECTOR(*match)[w];
+        if (matched_to != -1 && VECTOR(*labels)[matched_to] == no_of_nodes) {
+          IGRAPH_CHECK(igraph_dqueue_long_push(&q, matched_to));
+          VECTOR(*labels)[matched_to] = VECTOR(*labels)[w] + 1;
+        }
+      }
+    }
+  }
+
+  igraph_dqueue_long_destroy(&q);
+  igraph_vector_destroy(&neis);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return IGRAPH_SUCCESS;
+}
+
 int igraph_i_maximum_bipartite_matching_weighted(const igraph_t* graph,
     const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
     igraph_real_t* matching_weight, igraph_vector_long_t* matching,
     const igraph_vector_t* weights) {
-  IGRAPH_ERROR("maximum matching on bipartite graphs not implemented yet",
+  IGRAPH_ERROR("maximum weighted matching on bipartite graphs not implemented yet",
       IGRAPH_UNIMPLEMENTED);
 }
 

@@ -55,11 +55,11 @@ int test_graph_from_leda_tutorial() {
   igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
       &matching_weight, &matching, 0);
   if (matching_size != 6) {
-    fprintf(stderr, "matching_size is %ld, expected: 6", (long)matching_size);
+    printf("matching_size is %ld, expected: 6\n", (long)matching_size);
     return 1;
   }
   if (matching_weight != 6) {
-    fprintf(stderr, "matching_weight is %ld, expected: 6", (long)matching_weight);
+    printf("matching_weight is %ld, expected: 6\n", (long)matching_weight);
     return 2;
   }
   igraph_is_maximal_matching(&graph, &types, &matching, &is_matching);
@@ -80,8 +80,10 @@ int main() {
   if (test_graph_from_leda_tutorial())
     return 1;
 
-  if (!IGRAPH_FINALLY_STACK_EMPTY)
+  if (!IGRAPH_FINALLY_STACK_EMPTY) {
+    printf("Finally stack still has %d elements.\n", IGRAPH_FINALLY_STACK_SIZE());
     return 2;
+  }
 
   return 0;
 }
