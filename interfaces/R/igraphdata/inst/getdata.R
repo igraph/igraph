@@ -391,3 +391,99 @@ karate$Citation <- "Wayne W. Zachary. An Information Flow Model for Conflict and
 karate$Author <- "Wayne W. Zachary"
 
 save(karate, file="/tmp/karate.rda")
+
+#####################################################################
+## US airport network
+
+tab <- read.csv("~/Downloads/1067890998_T_T100D_SEGMENT_ALL_CARRIER.csv")
+tab <- tab[ tab$PASSENGERS != 0, ]
+
+tab2 <- tab[,c("ORIGIN", "DEST", "UNIQUE_CARRIER_NAME", "DEPARTURES_PERFORMED", "SEATS", "PASSENGERS", "AIRCRAFT_TYPE", "DISTANCE")]
+
+vert <- rbind(data.frame(name=tab$ORIGIN, CITY=tab$ORIGIN_CITY_NAME),
+              data.frame(name=tab$DEST,CITY=tab$DEST_CITY_NAME))
+vert <- vert[ !duplicated(vert$name), ]
+
+names(tab2) <- c("from", "to", "Carrier", "Departures", "Seats", "Passengers", "Aircraft", "Distance")
+names(vert) <- c("name", "City")
+
+library(igraph)
+
+USairports <- graph.data.frame(tab2, vertices=vert)
+USairports$name <- "US airports"
+
+## Add positions
+
+temp <- "http://www.armcode.com/airports/airport-%s.htm"
+
+codes <- lapply(letters, function(x) {
+  print(x)
+  l <- readLines(sprintf(temp, x))
+  r <- grep('class="row3"', l, value=TRUE)
+  r2 <- sub("<TR><TD[^<]*</TD><TD[^<]*</TD><TD[^<]*</TD><TD[^>]*>", "", r)
+  r3 <- grep("^<", r2, invert=TRUE, value=TRUE)
+  c1 <- substr(r3, 1, 3)
+  c2 <- sub("^.*>(.*)</a></TD></TR>", "\\1", r3)
+  list(code=c1, pos=c2)
+})
+
+iata <- unlist(lapply(codes, "[[", 1))
+pos  <- unlist(lapply(codes, "[[", 2))
+
+miss <- setdiff(V(USairports)$name, iata)
+misspos <- sapply(miss, function(code) {
+  print(code)
+  try({
+    l <- readLines(sprintf("http://www.airnav.com/airport/%s", code))
+    e <- grep("Lat/Long:&nbsp;", l, value=TRUE)
+    e2 <- sub("^.*Lat/Long:&nbsp;.*valign=top>([^<]*)<BR>.*$", "\\1", e)
+    g <- gsub("[^NSEW]", "", strsplit(e2, "/",)[[1]])
+    co <- round(as.numeric(gsub("[^0-9.]", "", strsplit(e2, "/")[[1]])))
+    paste(g, co, sep="")
+  })
+})
+
+stillmiss <- miss[sapply(misspos, inherits, "try-error")]
+stillmiss <- cbind(stillmiss, V(USairports)[stillmiss]$City)
+stillpos <- c("344059N 0902050W",
+              "664903N 1610120W",
+              "572817N 1534855W",
+              "573300N 1534500W",
+              "581000N 1523000W",
+              "574500N 1531900W",
+              "552431N 1321945W",
+              "621402N 1544405W",
+              "642215N 1611326W",
+              "635310N 1521807W",
+              "603522N 1520928W",
+              "594336N 1571533W",
+              "630150N 1633158W",
+              "551400N 1321300W",
+              "555656N 1333943W",
+              "555059N 1331340W",
+              "551421N 1320651W",
+              "581401N 1572101W",
+              "561904N 1583526W",
+              "592559N 1545827W",
+              "560021N 1603338W",
+              "605742N 1511954W",
+              "591900N 1545500W",
+              "355919N 1134836W",
+              "174449N 0644218W",
+              "181443N 0653836W",
+              "581300N 1573000W")
+
+bak <- misspos
+misspos[stillmiss[,1]] <- stillpos
+misspos <- unlist(sapply(misspos, paste, collapse=" "))
+
+misspos <- sub("([0-9]+)([NS]) ([0-9]+)([WE])", "\\2\\1 \\4\\3", misspos)
+
+iata <- c(iata, names(misspos))
+pos <- c(pos, unname(misspos))
+
+V(USairports)$Position <- pos[match(V(USairports)$name, iata)]
+
+save(USairports, file="/tmp/USairports.rda")
+
+
