@@ -55,7 +55,7 @@ int main() {
   /* Special cases: check for empty graph */
   igraph_empty(&g, 10, 0);
   igraph_eigenvector_centrality(&g, &v, &value, 0, 0, 0, &options);
-  if (igraph_finite(value)) {
+  if (value != 0.0) {
     return 1;
   }
   for (i=0; i<igraph_vector_size(&v); i++) {
@@ -70,7 +70,7 @@ int main() {
   igraph_vector_fill(&weights, 0);
   igraph_eigenvector_centrality(&g, &v, &value, 0, 0, &weights, &options);
   igraph_vector_destroy(&weights);
-  if (igraph_finite(value)) {
+  if (value != 0.0) {
     return 2;
   }
   for (i=0; i<igraph_vector_size(&v); i++) {
