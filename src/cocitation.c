@@ -189,28 +189,28 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
                            igraph_vector_t *weights) {
 
   long int no_of_nodes=igraph_vcount(graph);
-  long int from, i, j;
-  igraph_bool_t *calc;
-  igraph_matrix_t tmpres=IGRAPH_MATRIX_NULL;
+  long int no_of_vids;
+  long int from, i, j, k, l, u, v;
   igraph_vector_t neis=IGRAPH_VECTOR_NULL;
+  igraph_vector_t vid_reverse_index;
   igraph_vit_t vit;
   
   IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
   IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
-  calc=igraph_Calloc(no_of_nodes, igraph_bool_t);
-  if (calc==0) {
-    IGRAPH_ERROR("cannot calculate cocitation/bibcoupling", IGRAPH_ENOMEM);
-  }  
-  IGRAPH_FINALLY(free, calc);   /* TODO: hack */
+  no_of_vids = IGRAPH_VIT_SIZE(vit);
 
-  for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-    calc[ (long int) IGRAPH_VIT_GET(vit) ] = 1;
+  /* Create a mapping from vertex IDs to the row of the matrix where
+   * the result for this vertex will appear */
+  IGRAPH_VECTOR_INIT_FINALLY(&vid_reverse_index, no_of_vids);
+  igraph_vector_fill(&vid_reverse_index, -1);
+  for (IGRAPH_VIT_RESET(vit), i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+    VECTOR(vid_reverse_index)[(long int) IGRAPH_VIT_GET(vit)] = i;
   }
-  
-  IGRAPH_MATRIX_INIT_FINALLY(&tmpres, no_of_nodes, no_of_nodes);
+
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
-  IGRAPH_CHECK(igraph_matrix_resize(res, IGRAPH_VIT_SIZE(vit), no_of_nodes));
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_vids, no_of_nodes));
+  igraph_matrix_null(res);
 
   /* The result */
   
@@ -219,35 +219,28 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
 
     IGRAPH_ALLOW_INTERRUPTION();
     IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, mode));
-    if (weights) weight = VECTOR(*weights)[from];
+    if (weights)
+      weight = VECTOR(*weights)[from];
 
     for (i=0; i < igraph_vector_size(&neis)-1; i++) {
-      if (calc[ (long int)VECTOR(neis)[i] ]) {
-        for (j=i+1; j<igraph_vector_size(&neis); j++) {
-          MATRIX(tmpres, (long int)VECTOR(neis)[i], 
-                 (long int)VECTOR(neis)[j]) += weight;
-          MATRIX(tmpres, (long int)VECTOR(neis)[j], 
-                 (long int)VECTOR(neis)[i]) += weight;
-        }
+      u = VECTOR(neis)[i];
+      k = VECTOR(vid_reverse_index)[u];
+      for (j=i+1; j<igraph_vector_size(&neis); j++) {
+        v = VECTOR(neis)[j];
+        l = VECTOR(vid_reverse_index)[v];
+        if (k != -1)
+          MATRIX(*res, k, v) += weight;
+        if (l != -1)
+          MATRIX(*res, l, u) += weight;
       }
     }
   }
 
-  /* Copy result */
-  for (IGRAPH_VIT_RESET(vit), i=0; 
-       !IGRAPH_VIT_END(vit); 
-       IGRAPH_VIT_NEXT(vit), i++) {
-    for (j=0; j<no_of_nodes; j++) {
-      MATRIX(*res, i, j) = MATRIX(tmpres, (long int) IGRAPH_VIT_GET(vit), j);
-    }
-  }  
-  
   /* Clean up */
-  igraph_matrix_destroy(&tmpres);
   igraph_vector_destroy(&neis);
-  igraph_Free(calc);
+  igraph_vector_destroy(&vid_reverse_index);
   igraph_vit_destroy(&vit);
-  IGRAPH_FINALLY_CLEAN(4);
+  IGRAPH_FINALLY_CLEAN(3);
 
   return 0;
 }
