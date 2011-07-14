@@ -133,7 +133,7 @@ int main() {
   /* Special cases: check for empty graph */
   igraph_empty(&g, 10, 0);
   igraph_pagerank(&g, &res, &value, igraph_vss_all(), 1, 0.85, 0, &arpack_options);
-  if (igraph_finite(value)) {
+  if (value != 1.0) {
     return 6;
   }
   print_vector(&res, stdout);
@@ -145,7 +145,7 @@ int main() {
   igraph_vector_fill(&v, 0);
   igraph_pagerank(&g, &res, &value, igraph_vss_all(), 1, 0.85, &v, &arpack_options);
   igraph_vector_destroy(&v);
-  if (igraph_finite(value)) {
+  if (value != 1.0) {
     return 7;
   }
   print_vector(&res, stdout);
