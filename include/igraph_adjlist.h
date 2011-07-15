@@ -47,6 +47,7 @@ typedef struct igraph_adjlist_t {
 
 int igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al, 
 			  igraph_neimode_t mode);
+int igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t no_of_nodes);
 igraph_integer_t igraph_adjlist_size(const igraph_adjlist_t *al); 
 int igraph_adjlist_init_complementer(const igraph_t *graph,
 				     igraph_adjlist_t *al, 

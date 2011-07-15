@@ -73,7 +73,7 @@
 
 /**
  * \function igraph_adjlist_init
- * Initialize an adjacency list of vertices
+ * Initialize an adjacency list of vertices from a given graph
  * 
  * Create a list of vectors containing the neighbors of all vertices
  * in a graph. The adjacency list is independent of the graph after
@@ -116,6 +116,38 @@ int igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
   }
 
   IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
+/**
+ * \function igraph_adjlist_init_empty
+ * Initialize an empty adjacency list
+ * 
+ * Creates a list of vectors, one for each vertex. This is useful when you
+ * are \em constructing a graph using an adjacency list representation as
+ * it does not require your graph to exist yet.
+ * \param no_of_nodes The number of vertices
+ * \param al Pointer to an uninitialized <type>igraph_adjlist_t</type> object.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|), linear in the number of vertices.
+ */
+
+int igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t no_of_nodes) {
+  long int i;
+
+  al->length=no_of_nodes;
+  al->adjs=igraph_Calloc(al->length, igraph_vector_t);
+  if (al->adjs == 0) {
+    IGRAPH_ERROR("Cannot create adjlist view", IGRAPH_ENOMEM);
+  }
+
+  IGRAPH_FINALLY(igraph_adjlist_destroy, al);
+  for (i=0; i<al->length; i++) {
+    IGRAPH_CHECK(igraph_vector_init(&al->adjs[i], 0));
+  }
+  IGRAPH_FINALLY_CLEAN(1);
+
   return 0;
 }
 
