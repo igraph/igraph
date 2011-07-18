@@ -202,10 +202,13 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
 
   /* Create a mapping from vertex IDs to the row of the matrix where
    * the result for this vertex will appear */
-  IGRAPH_VECTOR_INIT_FINALLY(&vid_reverse_index, no_of_vids);
+  IGRAPH_VECTOR_INIT_FINALLY(&vid_reverse_index, no_of_nodes);
   igraph_vector_fill(&vid_reverse_index, -1);
   for (IGRAPH_VIT_RESET(vit), i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-    VECTOR(vid_reverse_index)[(long int) IGRAPH_VIT_GET(vit)] = i;
+    v = IGRAPH_VIT_GET(vit);
+    if (v < 0 || v >= no_of_nodes)
+      IGRAPH_ERROR("invalid vertex ID in vertex selector", IGRAPH_EINVAL);
+    VECTOR(vid_reverse_index)[v] = i;
   }
 
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);

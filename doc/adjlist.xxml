@@ -11,6 +11,7 @@
 
 <section><title>Adjacent vertices</title>
 <!-- doxrox-include igraph_adjlist_init -->
+<!-- doxrox-include igraph_adjlist_init_empty -->
 <!-- doxrox-include igraph_adjlist_init_complementer -->
 <!-- doxrox-include igraph_adjlist_destroy -->
 <!-- doxrox-include igraph_adjlist_get -->

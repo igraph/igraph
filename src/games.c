@@ -35,6 +35,7 @@
 #include "igraph_dqueue.h"
 #include "igraph_adjlist.h"
 #include "igraph_iterators.h"
+#include "igraph_progress.h"
 #include "config.h"
 
 #include <math.h>
@@ -3186,7 +3187,8 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
   igraph_vector_t *p_cum_fitness_in, *p_cum_fitness_out;
   igraph_real_t x, max_in, max_out;
   igraph_bool_t is_directed = (fitness_in != 0);
-  long int from, to;
+  float num_steps;
+  long int from, to, pos;
 
   if (fitness_out == 0) {
     IGRAPH_ERROR("fitness_out must not be null", IGRAPH_EINVAL);
@@ -3210,8 +3212,6 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
     IGRAPH_ERROR("Fitness scores must be non-negative", IGRAPH_EINVAL);
   }
 
-  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-
   /* Calculate the cumulative fitness scores */
   IGRAPH_VECTOR_INIT_FINALLY(&cum_fitness_out, no_of_nodes);
   IGRAPH_CHECK(igraph_vector_cumsum(&cum_fitness_out, fitness_out));
@@ -3228,17 +3228,27 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
   }
 
   RNG_BEGIN();
-
+  num_steps = no_of_edges;
   if (multiple) {
     /* Generating when multiple edges are allowed */
+
+    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_reserve(&edges, 2 * no_of_edges));
+
     while (no_of_edges > 0) {
+      /* Report progress after every 10000 edges */
+      if (no_of_edges % 10000 == 0) {
+        IGRAPH_PROGRESS("Static fitness game", 100.0*(1 - no_of_edges/num_steps), NULL);
+        IGRAPH_ALLOW_INTERRUPTION();
+      }
+
       x = RNG_UNIF(0, max_out);
       igraph_vector_binsearch(p_cum_fitness_out, x, &from);
       x = RNG_UNIF(0, max_in);
       igraph_vector_binsearch(p_cum_fitness_in, x, &to);
 
-      if (loops && from == to)
+      /* Skip if loop edge and loops = false */
+      if (!loops && from == to)
         continue;
 
       igraph_vector_push_back(&edges, from);
@@ -3246,13 +3256,66 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
 
       no_of_edges--;
     }
+
+    /* Create the graph */
+    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, is_directed));
+    
+    /* Clear the edge list */
+    igraph_vector_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
   } else {
     /* Multiple edges are disallowed */
-    // TODO
+    igraph_adjlist_t al;
+    igraph_vector_t* neis;
 
-    IGRAPH_CHECK(igraph_vector_reserve(&edges, 2 * no_of_edges));
+    IGRAPH_CHECK(igraph_adjlist_init_empty(&al, no_of_nodes));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
+    while (no_of_edges > 0) {
+      /* Report progress after every 10000 edges */
+      if (no_of_edges % 10000 == 0) {
+        IGRAPH_PROGRESS("Static fitness game", 100.0*(1 - no_of_edges/num_steps), NULL);
+        IGRAPH_ALLOW_INTERRUPTION();
+      }
+
+      x = RNG_UNIF(0, max_out);
+      igraph_vector_binsearch(p_cum_fitness_out, x, &from);
+      x = RNG_UNIF(0, max_in);
+      igraph_vector_binsearch(p_cum_fitness_in, x, &to);
+      
+      /* Skip if loop edge and loops = false */
+      if (!loops && from == to)
+        continue;
+
+      /* For undirected graphs, ensure that from < to */
+      if (!is_directed && from > to) {
+        pos = from; from = to; to = pos;
+      }
+
+      /* Is there already an edge? If so, try again */
+      neis = igraph_adjlist_get(&al, from);
+      if (igraph_vector_binsearch(neis, to, &pos))
+        continue;
+
+      /* Insert the edge */
+      IGRAPH_CHECK(igraph_vector_insert(neis, pos, to));
+
+      no_of_edges--;
+    }
+
+    /* Create the graph. We cannot use IGRAPH_ALL here for undirected graphs
+     * because we did not add edges in both directions in the adjacency list.
+     * We will use igraph_to_undirected in an extra step. */
+    IGRAPH_CHECK(igraph_adjlist(graph, &al, IGRAPH_OUT, 1));
+    if (!is_directed)
+      IGRAPH_CHECK(igraph_to_undirected(graph, IGRAPH_TO_UNDIRECTED_EACH, 0));
+
+    /* Clear the adjacency list */
+    igraph_adjlist_destroy(&al);
+    IGRAPH_FINALLY_CLEAN(1);
   }
   RNG_END();
+
+  IGRAPH_PROGRESS("Static fitness game", 100.0, NULL);
 
   /* Cleanup before we create the graph */
   if (is_directed) {
@@ -3262,13 +3325,6 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
   igraph_vector_destroy(&cum_fitness_out);
   IGRAPH_FINALLY_CLEAN(1);
 
-  /* Create the graph */
-  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, is_directed));
-  
-  /* Clear the edge list */
-  igraph_vector_destroy(&edges);
-  IGRAPH_FINALLY_CLEAN(1);
-  
   return IGRAPH_SUCCESS;
 }
 
