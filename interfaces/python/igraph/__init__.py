@@ -150,15 +150,26 @@ class Graph(GraphBase):
                 key = str(key)
             self.es[key] = value
 
-    def add_edge(self, source, target):
-        """add_edge(source, target)
+    def add_edge(self, source, target, **kwds):
+        """add_edge(source, target, **kwds)
 
         Adds a single edge to the graph.
+
+        Keyword arguments (except the source and target arguments) will be
+        assigned to the edge as attributes.
 
         @param source: the source vertex of the edge or its name.
         @param target: the target vertex of the edge or its name.
         """
-        return self.add_edges([(source, target)])
+        if not kwds:
+            return self.add_edges([(source, target)])
+
+        eid = self.ecount()
+        result = self.add_edges([(source, target)])
+        edge = self.es[eid]
+        for key, value in kwds.iteritems():
+            edge[key] = value
+        return result
 
     def add_edges(self, es):
         """add_edges(es)
@@ -183,18 +194,26 @@ class Graph(GraphBase):
             return GraphBase.add_edges(self, [es])
         return GraphBase.add_edges(self, es)
 
-    def add_vertex(self, name=None):
-        """add_vertex(name=None)
+    def add_vertex(self, name=None, **kwds):
+        """add_vertex(name=None, **kwds)
 
-        Adds a single vertex to the graph.
-
-        @param name: the name of the vertex to be added. If C{None}, the new
-          vertex will be unnamed, otherwise the string given here will be
-          assigned to the C{name} attribute of the vertex.
+        Adds a single vertex to the graph. Keyword arguments will be assigned
+        as vertex attributes. Note that C{name} as a keyword argument is treated
+        specially; if a graph has C{name} as a vertex attribute, it allows one
+        to refer to vertices by their names in most places where igraph expects
+        a vertex ID.
         """
-        if name is None:
+        if not kwds and name is None:
             return self.add_vertices(1)
-        return self.add_vertices([name])
+
+        vid = self.vcount()
+        result = self.add_vertices(1)
+        vertex = self.vs[vid]
+        for key, value in kwds.iteritems():
+            vertex[key] = value
+        if name is not None:
+            vertex["name"] = name
+        return result
 
     def add_vertices(self, n):
         """add_vertices(n)

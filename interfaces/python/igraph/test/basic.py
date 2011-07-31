@@ -29,6 +29,15 @@ class BasicTests(unittest.TestCase):
         self.failUnless(g.vcount() == 3 and g.ecount() == 0)
         self.failUnless("name" in g.vertex_attributes())
         self.assertEquals(g.vs["name"], [None, "foo", 3])
+        g.add_vertex(name="bar")
+        self.failUnless(g.vcount() == 4 and g.ecount() == 0)
+        self.failUnless("name" in g.vertex_attributes())
+        self.assertEquals(g.vs["name"], [None, "foo", 3, "bar"])
+        g.add_vertex(name="frob", spam="cheese", ham=42)
+        self.failUnless(g.vcount() == 5 and g.ecount() == 0)
+        self.assertEquals(sorted(g.vertex_attributes()), ["ham", "name", "spam"])
+        self.assertEquals(g.vs["spam"], [None]*4 + ["cheese"])
+        self.assertEquals(g.vs["ham"], [None]*4 + [42])
 
     def testAddVertices(self):
         g = Graph()
