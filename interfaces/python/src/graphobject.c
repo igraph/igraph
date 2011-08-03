@@ -2822,11 +2822,11 @@ PyObject *igraphmodule_Graph_Static_Fitness(PyTypeObject *type,
     return NULL;
   }
 
-  if (igraphmodule_PyObject_to_vector_t(fitness_out_o, &fitness_out, 1, 0))
+  if (igraphmodule_PyObject_float_to_vector_t(fitness_out_o, &fitness_out))
     return NULL;
 
   if (fitness_in_o != Py_None) {
-    if (igraphmodule_PyObject_to_vector_t(fitness_in_o, &fitness_in, 1, 0)) {
+    if (igraphmodule_PyObject_float_to_vector_t(fitness_in_o, &fitness_in)) {
       igraph_vector_destroy(&fitness_out);
       return NULL;
     }

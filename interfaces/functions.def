@@ -274,6 +274,7 @@ igraph_simple_interconnected_islands_game:
         PARAMS: OUT GRAPH graph, INTEGER islands_n, INTEGER islands_size, \
                 REAL islands_pin, INTEGER n_inter
         NAME-R: interconnected.islands.game
+        IGNORE: RR, RC
 
 igraph_static_fitness_game:
         PARAMS: OUT GRAPH graph, INTEGER no_of_edges, VECTOR fitness_out, \
@@ -285,7 +286,8 @@ igraph_static_fitness_game:
 igraph_static_power_law_game:
         PARAMS: OUT GRAPH graph, INTEGER no_of_nodes, INTEGER no_of_edges, \
                 REAL exponent_out, REAL exponent_in=-1, \
-                BOOLEAN loops=False, BOOLEAN multiple=False
+                BOOLEAN loops=False, BOOLEAN multiple=False, \
+		BOOLEAN finite_size_correction=True
         NAME-R: static.power.law.game
         FLAGS: PROGRESS
                 
