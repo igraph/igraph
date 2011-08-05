@@ -394,14 +394,28 @@ class IPythonShell(Shell, ConsoleProgressBarMixin):
         import sys
         sys.argv.append("-nosep")
 
-        import IPython.Shell
-        self._shell = IPython.Shell.start()
-        self._shell.IP.runsource("from igraph import *")
+        from IPython import __version__ as ipython_version
+        self.ipython_version = ipython_version
+
+        try:
+            # IPython >= 0.11 supports this
+            from IPython.frontend.terminal.ipapp import TerminalIPythonApp
+            self._shell = TerminalIPythonApp.instance()
+        except ImportError:
+            # IPython 0.10 and earlier
+            import IPython.Shell
+            self._shell = IPython.Shell.start()
+            self._shell.IP.runsource("from igraph import *")
 
     def __call__(self):
         """Starts the embedded shell."""
         print "igraph %s running inside " % __version__,
-        self._shell.mainloop()
+        if self._shell.__class__.__name__ == "TerminalIPythonApp":
+            self._shell.initialize()
+            self._shell.shell.ex("from igraph import *")
+            self._shell.start()
+        else:
+            self._shell.mainloop()
 
 
 class ClassicPythonShell(Shell, ConsoleProgressBarMixin):
