@@ -12,6 +12,8 @@ using namespace std;
 #include "drl_Node_3d.h"
 #include "DensityGrid_3d.h"
 
+#define GET_BIN(z, y, x) (Bins[(z*GRID_SIZE+y)*GRID_SIZE+x])
+
 namespace drl3d {
 
 //*******************************************************
@@ -39,7 +41,7 @@ void DensityGrid::Init()
     {
       Density = new float[GRID_SIZE][GRID_SIZE][GRID_SIZE];
       fall_off = new float[RADIUS*2+1][RADIUS*2+1][RADIUS*2+1];
-      Bins = new deque<Node>[GRID_SIZE][GRID_SIZE][GRID_SIZE];
+      Bins = new deque<Node>[GRID_SIZE*GRID_SIZE*GRID_SIZE];
     }
   catch (bad_alloc errora)
     {
@@ -57,7 +59,7 @@ void DensityGrid::Init()
     for (int j=0; j< GRID_SIZE; j++) 
       for (int k=0; k < GRID_SIZE; k++) {
 	Density[i][j][k] = 0;
-	Bins[i][j][k].erase(Bins[i][j][k].begin(),Bins[i][j][k].end());
+	GET_BIN(i,j,k).erase(GET_BIN(i,j,k).begin(),GET_BIN(i,j,k).end());
       }
   
   // Compute fall off
@@ -104,7 +106,7 @@ float DensityGrid::GetDensity(float Nx, float Ny, float Nz,bool fineDensity)
 	      for(int j=x_grid-1; j<=x_grid+1; j++) {
 		      
 		// Look through bin and add fine repulsions
-		for(BI = Bins[k][i][j].begin(); BI < Bins[k][i][j].end(); ++BI) {
+		for(BI = GET_BIN(k,i,j).begin(); BI < GET_BIN(k,i,j).end(); ++BI) {
 		  x_dist =  Nx-(BI->x);
 		  y_dist =  Ny-(BI->y);
 		  z_dist =  Nz-(BI->z);
@@ -235,7 +237,7 @@ void DensityGrid::fineSubtract(Node &N)
   x_grid = (int)((N.sub_x+HALF_VIEW+.5)*VIEW_TO_GRID);
   y_grid = (int)((N.sub_y+HALF_VIEW+.5)*VIEW_TO_GRID);
   z_grid = (int)((N.sub_z+HALF_VIEW+.5)*VIEW_TO_GRID);
-  Bins[z_grid][y_grid][x_grid].pop_front();
+  GET_BIN(z_grid,y_grid,x_grid).pop_front();
 }
 
 /***************************************************
@@ -253,7 +255,7 @@ void DensityGrid::fineAdd(Node &N)
   N.sub_x = N.x;
   N.sub_y = N.y;
   N.sub_z = N.z;
-  Bins[z_grid][y_grid][x_grid].push_back(N);
+  GET_BIN(z_grid,y_grid,x_grid).push_back(N);
 }
 
 } // namespace drl3d

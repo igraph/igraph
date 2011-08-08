@@ -12,6 +12,8 @@ using namespace std;
 #include "drl_Node.h"
 #include "DensityGrid.h"
 
+#define GET_BIN(y, x) (Bins[y*GRID_SIZE+x])
+
 namespace drl {
 
 //*******************************************************
@@ -39,7 +41,7 @@ void DensityGrid::Init()
     {
       Density = new float[GRID_SIZE][GRID_SIZE];
       fall_off = new float[RADIUS*2+1][RADIUS*2+1];
-      Bins = new deque<Node>[GRID_SIZE][GRID_SIZE];
+      Bins = new deque<Node>[GRID_SIZE*GRID_SIZE];
     }
   catch (bad_alloc errora)
     {
@@ -56,7 +58,7 @@ void DensityGrid::Init()
   for (i=0; i< GRID_SIZE; i++) 
     for (int j=0; j< GRID_SIZE; j++) {
       Density[i][j] = 0;
-      Bins[i][j].erase(Bins[i][j].begin(),Bins[i][j].end());
+      GET_BIN(i, j).erase(GET_BIN(i, j).begin(), GET_BIN(i, j).end());
     }
   
   // Compute fall off
@@ -67,7 +69,6 @@ void DensityGrid::Init()
     }
 	
 }
-
 
 /***************************************************
  * Function: DensityGrid::GetDensity               *
@@ -97,14 +98,13 @@ float DensityGrid::GetDensity(float Nx, float Ny, bool fineDensity)
 			for(int j=x_grid-1; j<=x_grid+1; j++) {
 
 			// Look through bin and add fine repulsions
-			for(BI = Bins[i][j].begin(); BI < Bins[i][j].end(); ++BI) {
+			for(BI = GET_BIN(i, j).begin(); BI != GET_BIN(i, j).end(); ++BI) {
 				x_dist =  Nx-(BI->x);
 				y_dist =  Ny-(BI->y);
 				distance = x_dist*x_dist+y_dist*y_dist;
 				density += 1e-4/(distance + 1e-50);
 		 }
 		}
-
 	// Course density
 	} else {
 
@@ -218,7 +218,7 @@ void DensityGrid::fineSubtract(Node &N)
   /* Where to subtract */
   x_grid = (int)((N.sub_x+HALF_VIEW+.5)*VIEW_TO_GRID);
   y_grid = (int)((N.sub_y+HALF_VIEW+.5)*VIEW_TO_GRID);
-  Bins[y_grid][x_grid].pop_front();
+  GET_BIN(y_grid, x_grid).pop_front();
 }
 
 /***************************************************
@@ -234,7 +234,7 @@ void DensityGrid::fineAdd(Node &N)
   y_grid = (int)((N.y+HALF_VIEW+.5)*VIEW_TO_GRID);
   N.sub_x = N.x;
   N.sub_y = N.y;
-  Bins[y_grid][x_grid].push_back(N);
+  GET_BIN(y_grid, x_grid).push_back(N);
 }
 
 } // namespace drl

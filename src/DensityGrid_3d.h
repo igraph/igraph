@@ -42,7 +42,7 @@ private:
 	  // new dynamic variables -- SBM
 	  float (*fall_off)[RADIUS*2+1][RADIUS*2+1];
 	  float (*Density)[GRID_SIZE][GRID_SIZE];
-	  deque<Node> (*Bins)[GRID_SIZE][GRID_SIZE];
+	  deque<Node>* Bins;
 
 	  // old static variables
 	  //float fall_off[RADIUS*2+1][RADIUS*2+1];
