@@ -2485,7 +2485,16 @@ class Graph(GraphBase):
 
         Besides the usual self-explanatory plotting parameters (C{context},
         C{bbox}, C{palette}), it accepts the following keyword arguments:
-        
+
+          - C{drawer_factory}: a subclass of L{AbstractCairoGraphDrawer}
+            which will be used to draw the graph. You may also provide
+            a function here which takes two arguments: the Cairo context
+            to draw on and a bounding box (an instance of L{BoundingBox}).
+            If this keyword argument is missing, igraph will use the
+            default graph drawer which should be suitable for most purposes.
+            It is safe to omit this keyword argument unless you need to use
+            a specific graph drawer.
+
           - C{layout}: the layout to be used. If not an instance of
             L{Layout}, it will be passed to L{Graph.layout} to calculate
             the layout. Note that if you want a deterministic layout that
@@ -2588,7 +2597,10 @@ class Graph(GraphBase):
             corresponding edge attribute is C{arrow_width}, the default
             is 1.
         """
-        drawer = DefaultGraphDrawer(context, bbox)
+        drawer_factory = kwds.get("drawer_factory", DefaultGraphDrawer)
+        if "drawer_factory" in kwds:
+            del kwds["drawer_factory"]
+        drawer = drawer_factory(context, bbox)
         drawer.draw(self, palette, *args, **kwds)
 
     def __str__(self):
