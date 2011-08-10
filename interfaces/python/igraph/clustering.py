@@ -222,12 +222,12 @@ class VertexClustering(Clustering):
                 raise ValueError, "membership list has invalid length"
             Clustering.__init__(self, membership, params)
 
-        if modularity is None:
-            self._q = graph.modularity(membership)
-        else:
-            self._q = modularity
+        self._q = modularity
 
-    def _get_modularity(self): return self._q
+    def _get_modularity(self):
+        if self._q is None:
+            self._q = self.recalculate_modularity()
+        return self._q
     modularity = property(_get_modularity, doc = "The modularity score")
     q = modularity
 
@@ -329,10 +329,7 @@ class OverlappingVertexClustering(OverlappingClustering, VertexClustering):
                 raise ValueError, "membership list is too short"
             OverlappingClustering.__init__(self, membership, params)
 
-        if modularity is None:
-            self._q = self.recalculate_modularity()
-        else:
-            self._q = modularity
+        self._q = modularity
 
     def recalculate_modularity(self):
         """Recalculates the stored modularity value.
@@ -357,7 +354,8 @@ class OverlappingVertexClustering(OverlappingClustering, VertexClustering):
         for v1 in xrange(n):
             for v2 in xrange(n):
                 if len(self._membership[v1].intersection(self._membership[v2]))>0:
-                    if (v1,v2) in el: result += 1.0
+                    if (v1,v2) in el:
+                        result += 1.0
                     result -= degrees[v1]*degrees[v2] / ecount
 
         self._q = result / ecount
