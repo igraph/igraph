@@ -176,7 +176,7 @@ int igraph_i_community_eb_get_merges2(const igraph_t *graph,
  * gradually removed from the network and you would like to know how
  * the network falls apart into separate components. The edge sequence
  * may come from the \ref igraph_community_edge_betweenness()
- * function, but this is not neccessary. Note that \ref
+ * function, but this is not necessary. Note that \ref
  * igraph_community_edge_betweenness can also calculate the
  * dendrogram, via its \p merges argument.
  *
@@ -320,7 +320,7 @@ long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
  * This way sooner or later the network falls off to two components,
  * then after a while one of these components falls off to two smaller 
  * components, etc. until all edges are removed. This is a divisive
- * hieararchical approach, the result is a dendrogram.
+ * hierarchical approach, the result is a dendrogram.
  * \param graph The input graph.
  * \param result Pointer to an initialized vector, the result will be
  *     stored here, the ids of the removed edges in the order of their 
@@ -591,7 +591,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
  * 
  * </para><para>
  * Many community detection algorithms return with a \em merges
- * matrix, \ref igraph_community_walktrap() an \ref
+ * matrix, \ref igraph_community_walktrap() and \ref
  * igraph_community_edge_betweenness() are two examples. The matrix
  * contains the merge operations performed while mapping the
  * hierarchical structure of a network. If the matrix has \c n-1 rows,
@@ -604,7 +604,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
  * the \p merges matrix and returns the current state of the network.
  * 
  * </para><para>
- * If if \p merges is not a complete dendrogram, it is possible to
+ * If \p merges is not a complete dendrogram, it is possible to
  * take \p steps steps if \p steps is not bigger than the number 
  * lines in \p merges.
  * \param merges The two-column matrix containing the merge
@@ -612,7 +612,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
  *    detailed syntax.
  * \param nodes The number of leaf nodes in the dendrogram
  * \param steps Integer constant, the number of steps to take.
- * \param membership Pointer to an initialied vector, the membership
+ * \param membership Pointer to an initialized vector, the membership
  *    results will be stored here, if not NULL. The vector will be
  *    resized as needed.
  * \param csize Pointer to an initialized vector, or NULL. If not NULL
@@ -918,7 +918,7 @@ int igraph_reindex_membership(igraph_vector_t *membership,
  * then separating vertices into two community based on the sign of
  * the corresponding element in the eigenvector. If all elements in
  * the eigenvector are of the same sign that means that the network
- * has no underlying comuunity structure.
+ * has no underlying community structure.
  * Check Newman's paper to understand why this is a good method for
  * detecting community structure. </para>
  * 
@@ -1585,7 +1585,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
  * This function creates a membership vector from the
  * result of \ref igraph_community_leading_eigenvector(),
  * It takes \c membership
- * and permformes \c steps merges, according to the supplied
+ * and performs \c steps merges, according to the supplied
  * \c merges matrix.
  * \param merges The matrix defining the merges to make. 
  *     This is usually from the output of the leading eigenvector community
@@ -1593,7 +1593,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
  * \param steps The number of steps to make according to \c merges.
  * \param membership Initially the starting membership vector, 
  *     on output the resulting membership vector, after performing \c steps merges.
- * \param csize Optionally the sizes of the commmunities is stored here, 
+ * \param csize Optionally the sizes of the communities is stored here, 
  *     if this is not a null pointer, but an initialized vector.
  * \return Error code.
  * 
@@ -2415,7 +2415,7 @@ int igraph_i_community_multilevel_step(igraph_t *graph,
  * community hierarchies in large networks, J Stat Mech P10008 (2008)
  * for the details (preprint: http://arxiv.org/abs/arXiv:0803.0476).
  *
- * It is based on the modularity measure and a hierarchial approach.
+ * It is based on the modularity measure and a hierarchical approach.
  * Initially, each vertex is assigned to a community on its own. In every step,
  * vertices are re-assigned to communities in a local, greedy way: each vertex
  * is moved to the community with which it achieves the highest contribution to
