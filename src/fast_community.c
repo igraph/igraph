@@ -493,7 +493,7 @@ int igraph_i_fastgreedy_commpair_cmp(const void* p1, const void* p2) {
  *    in the first merge, component \c n+1 in the second merge, etc.
  *    The matrix will be resized as needed. If this argument is NULL
  *    then it is ignored completely.
- * \param modularity Pointer to an initialized matrix or NULL pointer,
+ * \param modularity Pointer to an initialized vector or NULL pointer,
  *    in the former case the modularity scores along the stages of the
  *    computation are recorded here. The vector will be resized as
  *    needed.
