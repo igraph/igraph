@@ -2585,6 +2585,13 @@ class Graph(GraphBase):
             attribute is C{color}, the default is red. See C{vertex_color}
             for color specification syntax.
 
+          - C{edge_curved}: whether the edges should be curved. Positive
+            numbers correspond to edges curved in a counter-clockwise
+            direction, negative numbers correspond to edges curved in a
+            clockwise direction. Zero represents straight edges. C{True}
+            is interpreted as 0.5, C{False} is interpreted as 0. The
+            default is 0 which makes all the edges straight.
+
           - C{edge_width}: width of the edges in the default unit of the
             Cairo context on which we are drawing. The corresponding
             edge attribute is C{width}, the default is 1.

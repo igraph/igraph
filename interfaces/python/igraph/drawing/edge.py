@@ -29,6 +29,16 @@ class AbstractEdgeDrawer(object):
         """
         self.context = context
 
+    @staticmethod
+    def _curvature_to_float(value):
+        """Converts values given to the 'curved' edge style argument
+        in plotting calls to floating point values."""
+        if value is None or value is False:
+            return 0.0
+        if value is True:
+            return 0.5
+        return float(value)
+
     def draw_directed_edge(self, edge, src_vertex, dest_vertex):
         """Draws a directed edge.
 
@@ -80,7 +90,17 @@ class AbstractEdgeDrawer(object):
         ctx.set_source_rgba(*edge.color)
         ctx.set_line_width(edge.width)
         ctx.move_to(*src_vertex.position)
-        ctx.line_to(*dest_vertex.position)
+
+        if edge.curved:
+            (x1, y1), (x2, y2) = src_vertex.position, dest_vertex.position
+            aux1 = (2*x1+x2) / 3.0 - edge.curved * 0.5 * (y2-y1), \
+                   (2*y1+y2) / 3.0 + edge.curved * 0.5 * (x2-x1)
+            aux2 = (x1+2*x2) / 3.0 - edge.curved * 0.5 * (y2-y1), \
+                   (y1+2*y2) / 3.0 + edge.curved * 0.5 * (x2-x1)
+            ctx.curve_to(aux1[0], aux1[1], aux2[0], aux2[1], *dest_vertex.position)
+        else:
+            ctx.line_to(*dest_vertex.position)
+
         ctx.stroke()
 
 
@@ -93,37 +113,48 @@ class ArrowEdgeDrawer(AbstractEdgeDrawer):
         if src_vertex == dest_vertex:    # TODO
             return self.draw_loop_edge(edge, src_vertex)
 
-        # Determine where the edge intersects the circumference of the
-        # vertex shape.
-        src_pos, dest_pos = src_vertex.position, dest_vertex.position
-        dest_pos = dest_vertex.shape.intersection_point(
-                dest_pos[0], dest_pos[1], src_pos[0], src_pos[1],
-                dest_vertex.size
-        )
-
         ctx = self.context
+        (x1, y1), (x2, y2) = src_vertex.position, dest_vertex.position
+
 
         # Draw the edge
         ctx.set_source_rgba(*edge.color)
         ctx.set_line_width(edge.width)
-        ctx.move_to(*src_pos)
-        ctx.line_to(*dest_pos)
+        ctx.move_to(x1, y1)
+
+        if edge.curved:
+            # Calculate the curve
+            aux1 = (2*x1+x2) / 3.0 - edge.curved * 0.5 * (y2-y1), \
+                   (2*y1+y2) / 3.0 + edge.curved * 0.5 * (x2-x1)
+            aux2 = (x1+2*x2) / 3.0 - edge.curved * 0.5 * (y2-y1), \
+                   (y1+2*y2) / 3.0 + edge.curved * 0.5 * (x2-x1)
+            ctx.curve_to(aux1[0], aux1[1], aux2[0], aux2[1], x2, y2)
+            x1, y1 = aux2
+        else:
+            # Draw the line
+            ctx.line_to(x2, y2)
+
+        # Determine where the edge intersects the circumference of the
+        # vertex shape.
+        x2, y2 = dest_vertex.shape.intersection_point(
+                x2, y2, x1, y1, dest_vertex.size)
+
         ctx.stroke()
 
         # Draw the arrowhead
-        angle = atan2(dest_pos[1]-src_pos[1], dest_pos[0]-src_pos[0])
+        angle = atan2(y2-y1, x2-x1)
         arrow_size  = 15. * edge.arrow_size
         arrow_width = 10. / edge.arrow_width
         aux_points = [
-            (dest_pos[0] - arrow_size * cos(angle - pi/arrow_width),
-             dest_pos[1] - arrow_size * sin(angle - pi/arrow_width)),
-            (dest_pos[0] - arrow_size * cos(angle + pi/arrow_width),
-             dest_pos[1] - arrow_size * sin(angle + pi/arrow_width)),
+            (x2 - arrow_size * cos(angle - pi/arrow_width),
+             y2 - arrow_size * sin(angle - pi/arrow_width)),
+            (x2 - arrow_size * cos(angle + pi/arrow_width),
+             y2 - arrow_size * sin(angle + pi/arrow_width)),
         ]
-        ctx.move_to(*dest_pos)
+        ctx.move_to(x2, y2)
         ctx.line_to(*aux_points[0])
         ctx.line_to(*aux_points[1])
-        ctx.line_to(*dest_pos)
+        ctx.line_to(x2, y2)
         ctx.fill()
 
 

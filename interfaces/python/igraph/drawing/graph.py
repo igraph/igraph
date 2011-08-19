@@ -190,10 +190,11 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
         class VisualEdgeBuilder(AttributeCollectorBase):
             """Collects some visual properties of an edge for drawing"""
             _kwds_prefix = "edge_"
-            arrow_size = 1.0
+            arrow_size  = 1.0
             arrow_width = 1.0
-            color = ("#444", palette.get)
-            width = 1.0
+            color       = ("#444", palette.get)
+            curved      = (0.0, ArrowEdgeDrawer._curvature_to_float)
+            width       = 1.0
 
         vertex_builder = VisualVertexBuilder(graph.vs, kwds)
         edge_builder = VisualEdgeBuilder(graph.es, kwds)
