@@ -3422,6 +3422,69 @@ Graph.layout_sphere=_3d_version_for(Graph.layout_circle)
 
 ##############################################################
 
+def autocurve(graph, attribute="curved", default=0):
+    """Calculates curvature values for each of the edges in the graph to make
+    sure that multiple edges are shown properly on a graph plot.
+
+    This function checks the multiplicity of each edge in the graph and
+    assigns curvature values (numbers between -1 and 1, corresponding to
+    CCW (-1), straight (0) and CW (1) curved edges) to them. The assigned
+    values are either stored in an edge attribute or returned as a list,
+    depending on the value of the I{attribute} argument.
+
+    @param graph: the graph on which the calculation will be run
+    @param attribute: the name of the edge attribute to save the curvature
+      values to. The default value is C{curved}, which is the name of the
+      edge attribute the default graph plotter checks to decide whether an
+      edge should be curved on the plot or not. If I{attribute} is C{None},
+      the result will not be stored.
+    @param default: the default curvature for single edges. Zero means that
+      single edges will be straight. If you want single edges to be curved
+      as well, try passing 0.5 or -0.5 here.
+    @return: the list of curvature values if I{attribute} is C{None},
+      otherwise C{None}.
+    """
+
+    # The following loop could be re-written in C if it turns out to be a
+    # bottleneck. Unfortunately we cannot use Graph.count_multiple() here
+    # because we have to ignore edge directions.
+    multiplicities = defaultdict(list)
+    for edge in graph.es:
+        u, v = edge.tuple
+        if u > v:
+            multiplicities[v, u].append(edge.index)
+        else:
+            multiplicities[u, v].append(edge.index)
+
+    result = [default] * graph.ecount()
+    for pair, eids in multiplicities.iteritems():
+        # Is it a single edge?
+        if len(eids) < 2:
+            continue
+
+        if len(eids) % 2 == 1:
+            # Odd number of edges; the last will be straight
+            result[eids.pop()] = 0
+
+        # Arrange the remaining edges
+        curve = 2.0 / (len(eids) + 2)
+        dcurve, sign = curve, 1
+        for idx, eid in enumerate(eids):
+            edge = graph.es[eid]
+            if edge.source > edge.target:
+                result[eid] = -sign*curve
+            else:
+                result[eid] = sign*curve
+            if idx % 2 == 1:
+                curve += dcurve
+            sign *= -1
+
+    if attribute is None:
+        return result
+
+    graph.es[attribute] = result
+
+
 def read(filename, *args, **kwds):
     """Loads a graph from the given filename.
 

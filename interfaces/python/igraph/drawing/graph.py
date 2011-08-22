@@ -173,6 +173,17 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
         bbox = self.bbox.contract(margin)
         layout.fit_into(bbox, keep_aspect_ratio=False)
 
+        # Decide whether we need to calculate the curvature of edges
+        # automatically -- and calculate them if needed.
+        autocurve = kwds.get("autocurve", None)
+        if autocurve or (autocurve is None and graph.ecount() < 10000):
+            from igraph import autocurve
+            default = kwds.get("edge_curved", 0)
+            if default is True:
+                default = 0.5
+            default = float(default)
+            kwds["edge_curved"] = autocurve(graph, attribute=None, default=default)
+
         # Construct the visual vertex/edge builders
         class VisualVertexBuilder(AttributeCollectorBase):
             """Collects some visual properties of a vertex for drawing"""
