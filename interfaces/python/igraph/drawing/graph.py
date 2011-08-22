@@ -176,7 +176,9 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
         # Decide whether we need to calculate the curvature of edges
         # automatically -- and calculate them if needed.
         autocurve = kwds.get("autocurve", None)
-        if autocurve or (autocurve is None and graph.ecount() < 10000):
+        if autocurve or (autocurve is None and \
+                "edge_curved" not in kwds and "curved" not in graph.edge_attributes() \
+                and graph.ecount() < 10000):
             from igraph import autocurve
             default = kwds.get("edge_curved", 0)
             if default is True:
