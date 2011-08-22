@@ -2486,6 +2486,11 @@ class Graph(GraphBase):
         Besides the usual self-explanatory plotting parameters (C{context},
         C{bbox}, C{palette}), it accepts the following keyword arguments:
 
+          - C{autocurve}: whether to use curves instead of straight lines for
+            multiple edges on the graph plot. This argument may be C{True}
+            or C{False}; when omitted, C{True} is assumed for graphs with
+            less than 10.000 edges and C{False} otherwise.
+
           - C{drawer_factory}: a subclass of L{AbstractCairoGraphDrawer}
             which will be used to draw the graph. You may also provide
             a function here which takes two arguments: the Cairo context
