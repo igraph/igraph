@@ -48,6 +48,17 @@ extern unsigned int igraph_i_isoclass_3u_idx[];
 extern unsigned int igraph_i_isoclass_4u_idx[];
 
 /**
+ * Callback function for igraph_motifs_randesu that counts the motifs by
+ * isomorphism class in a histogram.
+ */
+igraph_bool_t igraph_i_motifs_randesu_update_hist(const igraph_t *graph,
+    igraph_vector_t *vids, int isoclass, void* extra) {
+  igraph_vector_t *hist = (igraph_vector_t*)extra;
+  VECTOR(*hist)[isoclass]++;
+  return 0;
+}
+
+/**
  * \function igraph_motifs_randesu
  * \brief Count the number of motifs in a graph
  * 
@@ -95,15 +106,74 @@ extern unsigned int igraph_i_isoclass_4u_idx[];
  * \sa \ref igraph_motifs_randesu_estimate() for estimating the number
  * of motifs in a graph, this can help to set the \c cut_prob
  * parameter; \ref igraph_motifs_randesu_no() to calculate the total
- * number of motifs of a given size in a graph.
+ * number of motifs of a given size in a graph;
+ * \ref igraph_motifs_randesu_callback() for calling a callback function
+ * for every motif found.
+ * 
+ * Time complexity: TODO.
+ * 
+ * \example examples/simple/igraph_motifs_randesu.c
+ */
+int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist, 
+			  int size, const igraph_vector_t *cut_prob) {
+  int histlen;
+
+  if (size != 3 && size != 4) {
+    IGRAPH_ERROR("Only 3 and 4 vertex motifs are implemented",
+		 IGRAPH_EINVAL);
+  }
+  if (size==3) {
+    histlen = igraph_is_directed(graph) ? 16 : 4;
+  } else {
+    histlen = igraph_is_directed(graph) ? 218 : 11;
+  }
+
+  IGRAPH_CHECK(igraph_vector_resize(hist, histlen));
+  igraph_vector_null(hist);
+
+  IGRAPH_CHECK(igraph_motifs_randesu_callback(graph, size, cut_prob,
+	&igraph_i_motifs_randesu_update_hist, hist));
+
+  return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_motifs_randesu_callback
+ * \brief Finds motifs in a graph and calls a function for each of them
+ * 
+ * </para><para>
+ * Similarly to \ref igraph_motifs_randesu(), this function is able to find the
+ * different motifs of size three and four (ie. the number of different
+ * subgraphs with three and four vertices) in the network. However, instead of
+ * counting them, the function will call a callback function for each motif
+ * found to allow further tests or post-processing.
+ * 
+ * </para><para>
+ * The \c cut_prob argument also allows sampling the motifs, just like for
+ * \ref igraph_motifs_randesu(). Set the \c cut_prob argument to a zero vector
+ * for finding all motifs. 
+ * 
+ * \param graph The graph to find the motifs in.
+ * \param size The size of the motifs to search for. Only three and
+ *        four are implemented currently. The limitation is not in the
+ *        motif finding code, but the graph isomorphism code.
+ * \param cut_prob Vector of probabilities for cutting the search tree
+ *        at a given level. The first element is the first level, etc.
+ *        Supply all zeros here (of length \c size) to find all motifs 
+ *        in a graph.
+ * \param callback A pointer to a function of type \ref igraph_motifs_handler_t.
+ *        This function will be called whenever a new motif is found.
+ * \param extra Extra argument to pass to the callback function.
+ * \return Error code.
  * 
  * Time complexity: TODO.
  * 
  * \example examples/simple/igraph_motifs_randesu.c
  */
 
-int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist, 
-			  int size, const igraph_vector_t *cut_prob) {
+int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
+		const igraph_vector_t *cut_prob, igraph_motifs_handler_t *callback,
+		void* extra) {
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_adjlist_t allneis, alloutneis;
@@ -118,10 +188,11 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
   long int *added;
   char *subg;
   
-  long int histlen;
   unsigned int *arr_idx, *arr_code;
   int code=0;
   unsigned char mul, idx;
+  
+  igraph_bool_t terminate = 0;
 
   if (size != 3 && size != 4) {
     IGRAPH_ERROR("Only 3 and 4 vertex motifs are implemented",
@@ -130,30 +201,23 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
   if (size==3) {
     mul=3;
     if (igraph_is_directed(graph)) {
-      histlen=16;
       arr_idx=igraph_i_isoclass_3_idx;
       arr_code=igraph_i_isoclass2_3;
     } else {
-      histlen=4;
       arr_idx=igraph_i_isoclass_3u_idx;
       arr_code=igraph_i_isoclass2_3u;
     }
   } else {
     mul=4;
     if (igraph_is_directed(graph)) {
-      histlen=218;
       arr_idx=igraph_i_isoclass_4_idx;
       arr_code=igraph_i_isoclass2_4;
     } else {
-      histlen=11;
       arr_idx=igraph_i_isoclass_4u_idx;
       arr_code=igraph_i_isoclass2_4u;
     }
   }
 
-  IGRAPH_CHECK(igraph_vector_resize(hist, histlen));
-  igraph_vector_null(hist);
-  
   added=igraph_Calloc(no_of_nodes, long int);
   if (added==0) {
     IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM);
@@ -239,11 +303,18 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
 	    }
 	  }
 
+	  if (callback(graph, &vids, arr_code[code], extra)) {
+	    terminate = 1;
+	    break;
+	  }
 	  igraph_vector_pop_back(&vids);
 	  subg[last]=0;
-	  VECTOR(*hist)[arr_code[code]] += 1;
 	}
       }
+
+      /* did the callback function asked us to terminate the search? */
+      if (terminate)
+	break;
 
       /* can we step down? */
       if (level < size-1 && 
@@ -299,6 +370,10 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
       }
       
     } /* while */
+
+    /* did the callback function asked us to terminate the search? */
+    if (terminate)
+      break;
 
     /* clear the added vector */
     added[father] -= 1;

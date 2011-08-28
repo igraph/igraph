@@ -32,6 +32,14 @@ void print_vector(igraph_vector_t *v) {
   printf("\n");
 }
 
+igraph_bool_t print_motif(const igraph_t *graph, igraph_vector_t *vids,
+    int isoclass, void* extra) {
+  printf("Class %d: ", isoclass);
+  igraph_vector_print(vids);
+  return 0;
+}
+
+
 int main() {
 
   igraph_t g;
@@ -46,7 +54,12 @@ int main() {
   print_vector(&hist);
   igraph_destroy(&g);
   igraph_vector_destroy(&hist);
+
+  igraph_famous(&g, "bull");
+  igraph_motifs_randesu_callback(&g, 3, &cp, &print_motif, 0);
+  igraph_motifs_randesu_callback(&g, 4, &cp, &print_motif, 0);
+  igraph_destroy(&g);
+
   igraph_vector_destroy(&cp);
-  
   return 0;
 }
