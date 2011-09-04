@@ -20,6 +20,8 @@ by Holland and Leinhardt, and named dyad census and triad census.
 <!-- doxrox-include igraph_motifs_randesu -->
 <!-- doxrox-include igraph_motifs_randesu_no -->
 <!-- doxrox-include igraph_motifs_randesu_estimate -->
+<!-- doxrox-include igraph_motifs_randesu_callback -->
+<!-- doxrox-include igraph_motifs_handler_t -->
 </section>
 
 </chapter>
