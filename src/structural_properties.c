@@ -3524,6 +3524,8 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
  * \param graph The input graph.
  * \param res Pointer to an integer (\c igraph_integer_t), the result
  *        will be stored here.
+ * \param vids Vector giving the vertex IDs for which the maximum degree will
+ *        be calculated.
  * \param mode Defines the type of the degree.
  *        \c IGRAPH_OUT, out-degree,
  *        \c IGRAPH_IN, in-degree,
