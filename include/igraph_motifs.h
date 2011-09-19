@@ -69,7 +69,7 @@ __BEGIN_DECLS
 
 typedef igraph_bool_t igraph_motifs_handler_t(const igraph_t *graph,
 					      igraph_vector_t *vids,
-					      igraph_integer_t isoclass,
+					      int isoclass,
 					      void* extra);
 
 int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist, 
