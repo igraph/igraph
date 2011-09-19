@@ -1131,6 +1131,13 @@ void igraph_i_levc_free(igraph_vector_ptr_t *ptr) {
  *    along the community structure detection are stored here. The
  *    non-positive eigenvalues, that do not result a split, are stored
  *    as well.
+ * \param eigenvectors If not a null pointer, then the eigenvectors 
+ *    that are calculated in each step of the algorithm, are stored here, 
+ *    in a pointer vector. Each eigenvector is stored in an
+ *    \ref igraph_vector_t object. The user is responsible of
+ *    deallocating the memory that belongs to the individual vectors,
+ *    by calling first \ref igraph_vector_destroy(), and then
+ *    <code>free()</code> on them.
  * \param history Pointer to an initialized vector or a null pointer. 
  *    If not a null pointer, then a trace of the algorithm is stored
  *    here, encoded numerically. The various operations:
