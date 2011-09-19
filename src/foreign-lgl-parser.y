@@ -90,7 +90,7 @@ vertex : vertexdef edges ;
 
 vertexdef : HASH edgeid NEWLINE       { igraph_lgl_actvertex=$2; } ;
 
-edges :   /* empty */ | edge edges ;
+edges :   /* empty */ | edges edge ;
 
 edge :   edgeid NEWLINE             { 
              igraph_vector_push_back(igraph_lgl_vector, igraph_lgl_actvertex);
