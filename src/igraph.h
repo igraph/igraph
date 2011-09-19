@@ -1469,8 +1469,42 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
 /* Graph motifs                                       */
 /* -------------------------------------------------- */
 
+/**
+ * \typedef igraph_motifs_handler_t
+ * Callback type for \c igraph_motifs_randesu_callback
+ * 
+ * \ref igraph_motifs_randesu_callback() calls a specified callback
+ * function whenever a new motif is found during a motif search. This
+ * callback function must be of type \c igraph_motifs_handler_t. It has
+ * the following arguments:
+ * \param graph The graph that that algorithm is working on. Of course
+ *   this must not be modified.
+ * \param vids The IDs of the vertices in the motif that has just been
+ *   found. This vector is owned by the motif search algorithm, so do not
+ *   modify or destroy it; make a copy of it if you need it later.
+ * \param isoclass The isomorphism class of the motif that has just been
+ *   found. Use \ref igraph_isoclass or \ref igraph_isoclass_subgraph to find
+ *   out which isomorphism class belongs to a given motif.
+ * \param extra The extra argument that was passed to \ref
+ *   igraph_motifs_randesu_callback().
+ * \return A logical value, if TRUE (=non-zero), that is interpreted
+ *    as a request to stop the motif search and return to the caller.
+ * 
+ * \sa \ref igraph_motifs_randesu_callback()
+ */
+
+typedef igraph_bool_t igraph_motifs_handler_t(const igraph_t *graph,
+					      igraph_vector_t *vids,
+					      int isoclass,
+					      void* extra);
+
 int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist, 
 			  int size, const igraph_vector_t *cut_prob);
+
+int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
+				   const igraph_vector_t *cut_prob,
+				   igraph_motifs_handler_t *callback,
+				   void* extra);
 
 int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
 				   int size, const igraph_vector_t *cut_prob, 
