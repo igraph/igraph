@@ -906,7 +906,7 @@ static float rintf (float x)
  * result vector.
  */
 
-int igraph_random_sample_alga(igraph_vector_t *res, igraph_integer_t l, igraph_integer_t h, 
+int igraph_i_random_sample_alga(igraph_vector_t *res, igraph_integer_t l, igraph_integer_t h, 
 			      igraph_integer_t length) {
   igraph_real_t N=h-l+1;
   igraph_real_t n=length;
@@ -1084,7 +1084,7 @@ int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
   }
   
   if (n>1) {
-    retval=igraph_random_sample_alga(res, l+1, h, n);
+    retval=igraph_i_random_sample_alga(res, l+1, h, n);
   } else {
     retval=0;
     S=floor(N*Vprime);
