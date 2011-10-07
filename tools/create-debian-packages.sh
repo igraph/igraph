@@ -28,7 +28,8 @@ function install_build_dependencies {
   apt-get -y --no-install-recommends install \
           debhelper automake autoconf gcc g++ pkg-config \
           build-essential libxml2-dev python-all-dev \
-          python-central python-epydoc texlive-latex-base
+          python-central python-epydoc texlive-latex-base \
+          texlive-latex-extra libtool source-highlight docbook2x
 }
 
 function make_destdir {
