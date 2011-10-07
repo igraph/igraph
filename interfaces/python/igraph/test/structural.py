@@ -1,7 +1,7 @@
 import unittest
 
 from igraph import *
-from math import isnan
+from igraph.compat import isnan
 
 class SimplePropertiesTests(unittest.TestCase):
     gfull  = Graph.Full(10)

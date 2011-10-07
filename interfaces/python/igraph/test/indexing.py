@@ -30,9 +30,9 @@ class GraphAdjacencyMatrixLikeIndexingTests(unittest.TestCase):
     def testSingleEdgeRetrievalAttrName(self):
         g = Graph.Famous("krackhardt_kite")
         g.es["value"] = range(20, g.ecount()+20)
-        for idx, (v1, v2) in enumerate(g.get_edgelist(), 20):
-            self.assertEquals(g[v1, v2, "value"], idx)
-            self.assertEquals(g[v2, v1, "value"], idx)
+        for idx, (v1, v2) in enumerate(g.get_edgelist()):
+            self.assertEquals(g[v1, v2, "value"], idx+20)
+            self.assertEquals(g[v2, v1, "value"], idx+20)
         for v1 in xrange(g.vcount()):
             for v2 in set(range(g.vcount())) - set(g.neighbors(v1)):
                 self.assertEquals(g[v1, v2, "value"], 0)

@@ -7,6 +7,15 @@ to enable igraph to run on Python 2.5.
 import sys
 
 #############################################################################
+# Simulating math.isnan
+
+try:
+    from math import isnan
+except ImportError:
+    def isnan(num):
+        return num != num
+
+#############################################################################
 # Providing @property.setter syntax for Python 2.5
 
 if sys.version_info < (2, 6):

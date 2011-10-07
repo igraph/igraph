@@ -20,7 +20,7 @@ class TestBase(unittest.TestCase):
         for idx, g in enumerate(self.__class__.graphs):
             try:
                 ec, eval = g.evcent(return_eigenvalue=True)
-            except Exception as ex:
+            except Exception, ex:
                 self.assertTrue(False, msg="Eigenvector centrality threw exception for graph #%d: %s" % (idx, ex))
                 raise
 
