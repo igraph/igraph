@@ -61,6 +61,7 @@ plot.igraph <- function(x,
   arrow.size         <- params("edge", "arrow.size")[1]
   arrow.width        <- params("edge", "arrow.width")[1]
   curved             <- params("edge", "curved")
+  if (is.function(curved)) { curved <- curved(graph) }
   
   layout             <- params("plot", "layout")
   margin             <- params("plot", "margin")

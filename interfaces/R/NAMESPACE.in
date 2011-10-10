@@ -129,7 +129,8 @@ export(subgraph, degree, degree.distribution, diameter,
 
 export(plot.igraph, tkplot, tkplot.close, tkplot.off, tkplot.fit.to.screen,
        tkplot.reshape, tkplot.export.postscript, tkplot.getcoords,
-       tkplot.center, tkplot.rotate, rglplot.igraph, rglplot)
+       tkplot.center, tkplot.rotate, rglplot.igraph, rglplot,
+       autocurve.edges)
 
 S3method(rglplot, igraph)
 

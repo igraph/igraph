@@ -284,7 +284,7 @@
     \item{label.color}{The color of the edge labels, see the
       \code{color} vertex parameters on how to specify colors. }
     \item{curved}{Specifies whether to draw curved edges, or not. This
-      can be a logical or a numeric vector or scalar.
+      can be a logical or a numeric vector or scalar. 
 
       First the vector is replicated to have the same length as the
       number of edges in the graph. Then it is interpreted for each edge
@@ -293,7 +293,10 @@
       edge bends clockwise, positive values the opposite. \code{TRUE}
       means curvature 0.5, \code{FALSE} means curvature zero.
 
-      This parameter is ignored for loop edges.
+      By default the vector specifying the curvatire is calculated via a
+      call to the \code{\link{autocurve.edges}} function. This function makes
+      sure that multiple edges are curved and are all visible. This
+      parameter is ignored for loop edges. 
       
       The default value is \code{FALSE}.
       

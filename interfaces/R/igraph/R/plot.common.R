@@ -255,6 +255,28 @@ igraph.check.shapes <- function(x) {
   x
 }
 
+autocurve.edges <- function(graph, start=0.5) {
+  cm <- count.multiple(graph)
+  el <- apply(get.edgelist(graph, names=FALSE), 1, paste, collapse=":")
+  ord <- order(el)
+  res <- numeric(length(ord))
+
+  p <- 1
+  while (p <= length(res)) {
+    m <- cm[ord[p]]
+    idx <- p:(p+m-1)
+    if (m==1) {
+      r <- 0
+    } else {
+      r <- seq(-start, start, length=m)
+    }
+    res[ord[idx]] <- r
+    p <- p + m
+  }
+
+  res
+}
+
 i.default.values <- list(vertex=list(color="SkyBlue2",
                            size=15,
                            size2=15,
@@ -287,7 +309,7 @@ i.default.values <- list(vertex=list(color="SkyBlue2",
                            label.color="darkblue",
                            arrow.size=1,
                            arrow.mode=i.get.arrow.mode,
-                           curved=FALSE,
+                           curved=autocurve.edges,
                            arrow.width=1),
                          plot=list(layout=layout.auto,
                            margin=c(0,0,0,0),
