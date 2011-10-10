@@ -70,7 +70,7 @@ tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
   curved <- params("edge", "curved")
   curved <- rep(curved, length=ecount(graph))
   
-  layout <- params("plot", "layout")
+  layout <- unname(params("plot", "layout"))
   layout[,2] <- -layout[,2]
   margin <- params("plot", "margin")
   margin <- rep(margin, length=4)
