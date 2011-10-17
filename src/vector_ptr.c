@@ -290,7 +290,7 @@ void *igraph_vector_ptr_pop_back (igraph_vector_ptr_t *v) {
 	tmp=*(v->end);
 	v->end -= 1;
 	  
-	return 0;
+	return tmp;
 }
 
 /**
