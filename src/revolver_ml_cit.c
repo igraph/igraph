@@ -313,7 +313,7 @@ int igraph_revolver_ml_D_alpha(const igraph_t *graph,
   igraph_vector_destroy(&res);
   IGRAPH_FINALLY_CLEAN(1);
 
-  return 0;
+  return ret;
 }
 
 /* These functions assemble the A(d)=d^alpha+a kernel function and 
@@ -374,7 +374,7 @@ int igraph_revolver_ml_D_alpha_a(const igraph_t *graph,
   igraph_vector_destroy(&res);
   IGRAPH_FINALLY_CLEAN(1);
   
-  return 0;
+  return ret;
 }
 
 /*------------------------------------------------------------------*/
@@ -625,7 +625,7 @@ int igraph_revolver_ml_DE(const igraph_t *graph,
   igraph_matrix_destroy(&info.A_vect);
   IGRAPH_FINALLY_CLEAN(10);
 
-  return 0;
+  return ret;
 }
  
 igraph_real_t igraph_i_revolver_ml_DE_alpha_a_f(const igraph_vector_t *var,
@@ -697,7 +697,7 @@ int igraph_revolver_ml_DE_alpha_a(const igraph_t *graph,
   igraph_vector_destroy(&res);
   IGRAPH_FINALLY_CLEAN(1);
 
-  return 0;
+  return ret;
 }
 
 /*------------------------------------------------------------------*/
@@ -973,7 +973,7 @@ int igraph_revolver_ml_AD(const igraph_t *graph,
   igraph_matrix_destroy(&info.A_vect);
   IGRAPH_FINALLY_CLEAN(11);
 
-  return 0;
+  return ret;
 }
 
 igraph_real_t igraph_i_revolver_ml_AD_alpha_a_beta_f(const igraph_vector_t *var,
@@ -1420,7 +1420,7 @@ int igraph_revolver_ml_ADE(const igraph_t *graph,
   igraph_array3_destroy(&info.A_vect);
   IGRAPH_FINALLY_CLEAN(10);
 
-  return 0;
+  return ret;
 }
 
 igraph_real_t igraph_i_revolver_ml_ADE_alpha_a_beta_f(const igraph_vector_t *var,
