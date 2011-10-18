@@ -647,7 +647,6 @@ int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_intege
 		     igraph_neimode_t mode) {
 
   long int length=0, idx=0;   
-  long int no_of_edges;
   long int i, j;
 
   long int node=pnode;
@@ -660,7 +659,6 @@ int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_intege
     IGRAPH_ERROR("cannot get neighbors", IGRAPH_EINVMODE);
   }
 
-  no_of_edges=igraph_vector_size(&graph->from);
   if (! graph->directed) {
     mode=IGRAPH_ALL;
   }
@@ -1231,7 +1229,6 @@ int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids,
 		    igraph_integer_t pnode, igraph_neimode_t mode) {
   
   long int length=0, idx=0;   
-  long int no_of_edges;
   long int i, j;
 
   long int node=pnode;
@@ -1244,7 +1241,6 @@ int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids,
     IGRAPH_ERROR("cannot get neighbors", IGRAPH_EINVMODE);
   }
 
-  no_of_edges=igraph_vector_size(&graph->from);
   if (! graph->directed) {
     mode=IGRAPH_ALL;
   }

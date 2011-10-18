@@ -144,7 +144,7 @@ int igraph_community_spinglass(const igraph_t *graph,
   unsigned long changes, runs;
   igraph_bool_t use_weights=0;
   bool zeroT;
-  double Q, kT, acc, prob;
+  double kT, acc, prob;
   ClusterList<NNode*> *cl_cur;
   network *net;
   PottsModel *pm;
@@ -203,7 +203,6 @@ int igraph_community_spinglass(const igraph_t *graph,
   if (!zeroT) kT=pm->FindStartTemp(gamma, prob, starttemp); else kT=stoptemp;
   /* assign random initial configuration */
   pm->assign_initial_conf(-1);
-  Q=pm->initialize_Qmatrix();
   runs=0;
   changes=1;
 

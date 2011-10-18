@@ -338,7 +338,7 @@ void igraph_i_fastgreedy_community_remove_nei(
 int igraph_i_fastgreedy_community_update_dq(
   igraph_i_fastgreedy_community_list* list,
   igraph_i_fastgreedy_commpair* p, igraph_real_t newdq) {
-  long int i,j,n,to,from;
+  long int i,j,to,from;
   igraph_real_t olddq;
   igraph_i_fastgreedy_community *comm_to, *comm_from;
   to=p->first; from=p->second;
@@ -428,7 +428,6 @@ int igraph_i_fastgreedy_community_update_dq(
 	  /* case (1) */
 	  /* This is the worst, we have to re-scan the whole community to find
 	   * the new maximum and update the global maximum as well if necessary */
-      n = igraph_vector_ptr_size(&comm_to->neis);
       igraph_i_fastgreedy_community_rescan_max(comm_to);
 	  /* The maximum was decreased, so perform a sift-down in the heap */
 	  i = igraph_i_fastgreedy_community_list_find_in_heap(list, to);
@@ -512,7 +511,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
   igraph_i_fastgreedy_commpair *pairs, *p1, *p2;
   igraph_i_fastgreedy_community_list communities;
   igraph_vector_t a;
-  igraph_real_t q, maxq, *dq, weight_sum;
+  igraph_real_t q, *dq, weight_sum;
   igraph_bool_t simple;
 
   /*long int join_order[] = { 16,5, 5,6, 6,0, 4,0, 10,0, 26,29, 29,33, 23,33, 27,33, 25,24, 24,31, 12,3, 21,1, 30,8, 8,32, 9,2, 17,1, 11,0, 7,3, 3,2, 13,2, 1,2, 28,31, 31,33, 22,32, 18,32, 20,32, 32,33, 15,33, 14,33, 0,19, 19,2, -1,-1 };*/
@@ -665,7 +664,6 @@ int igraph_community_fastgreedy(const igraph_t *graph,
   igraph_vector_scale(&a, 1.0/(2.0 * (weights ? weight_sum : no_of_edges)));
   for (i=0; i<no_of_nodes; i++)
 	q -= VECTOR(a)[i]*VECTOR(a)[i];
-  maxq=q;
 
   /* Initializing community heap */
   debug("Initializing community heap\n");

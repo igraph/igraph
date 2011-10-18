@@ -374,12 +374,11 @@ int igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, long int to, long int f
  */
 
 int igraph_spmatrix_resize(igraph_spmatrix_t *m, long int nrow, long int ncol) {
-  long int i, j, ci, ei, mincol, nelem;
+  long int i, j, ci, ei, mincol;
   assert(m != NULL);
   /* Iterating through the matrix data and deleting unnecessary data. */
   /* At the same time, we create the new indices as well */
   if (nrow < m->nrow) {
-    nelem = igraph_vector_size(&m->data);
     ei = j = 0;
     mincol = (m->ncol < ncol) ? m->ncol : ncol;
     for (ci=0; ci < mincol; ci++) {
@@ -489,9 +488,8 @@ long int igraph_spmatrix_ncol(const igraph_spmatrix_t *m) {
  */
 
 int igraph_spmatrix_copy_to(const igraph_spmatrix_t *m, igraph_real_t *to) {
-  long int c, dest_idx, idx, no_of_elements;
+  long int c, dest_idx, idx;
 
-  no_of_elements=igraph_spmatrix_count_nonzero(m);
   memset(to, 0, sizeof(igraph_real_t)*igraph_spmatrix_size(m));
   for (c=0, dest_idx=0; c < m->ncol; c++, dest_idx+=m->nrow) {
     for (idx=VECTOR(m->cidx)[c]; idx<VECTOR(m->cidx)[c+1]; idx++) {

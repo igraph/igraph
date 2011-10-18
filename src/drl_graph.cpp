@@ -543,9 +543,6 @@ int graph::ReCompute( )
   // carryover from original VxOrd
   int MIN = 1;
   
-  // energy information is across processors
-  float tot_energy;
-  
   /*
   // output parameters (for debugging)
   cout << "ReCompute is using the following parameters: "<< endl;
@@ -619,11 +616,6 @@ int graph::ReCompute( )
 			damping_mult = expansion.damping_mult;
 			iterations = 0;
 
-		    tot_energy = get_tot_energy ();
-// 			if ( myid == 0 )
-// 				cout << endl << "Liquid stage completed in " << liquid.time_elapsed
-// 					 << " seconds, total energy = " << tot_energy << "." << endl;
-			
 			// go to next stage
 			STAGE = 1;
 			start_time = time( NULL );
@@ -652,11 +644,6 @@ int graph::ReCompute( )
 			expansion.time_elapsed = expansion.time_elapsed + (stop_time - start_time);
 		  	min_edges = 12;
 			damping_mult = cooldown.damping_mult;
-			
-			tot_energy = get_tot_energy ();
-// 			if ( myid == 0 )
-// 				cout << endl << "Finished expansion stage in " << expansion.time_elapsed
-// 					 << " seconds, total energy = " << tot_energy << "." << endl;
 			
 			STAGE = 2;
 			attraction = cooldown.attraction;
@@ -695,11 +682,6 @@ int graph::ReCompute( )
 			min_edges = MIN;
 			//min_edges = 99; // In other words: no more cutting
 			
-			tot_energy = get_tot_energy ();
-// 			if ( myid == 0 )
-// 				cout << endl << "Completed cool-down stage in " << cooldown.time_elapsed
-// 					 << " seconds, total energy = " << tot_energy << "." << endl;
-			
 			STAGE = 3;
 			iterations = 0;
 			attraction = crunch.attraction;
@@ -729,11 +711,6 @@ int graph::ReCompute( )
 			min_edges = 99;
 			fineDensity = true;
 			
-			tot_energy = get_tot_energy ();
-// 			if ( myid == 0 )
-// 				cout << endl << "Finished crunch stage in " << crunch.time_elapsed
-// 					 << " seconds, total energy = " << tot_energy << "." << endl;
-			
 			STAGE = 5;
 			start_time = time( NULL );
 				
@@ -753,11 +730,6 @@ int graph::ReCompute( )
 			stop_time = time( NULL );
 			simmer.time_elapsed = simmer.time_elapsed + (stop_time - start_time);
 			
-			tot_energy = get_tot_energy();
-// 			if ( myid == 0 )
-// 				cout << endl << "Finished simmer stage in " << simmer.time_elapsed
-// 					 << " seconds, total energy = "<< tot_energy << "." << endl;
-
 			STAGE = 6;
 			
 // 			if ( myid == 0 )

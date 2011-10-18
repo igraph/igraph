@@ -1356,7 +1356,6 @@ int R_SEXP_to_igraph_layout_drl_options(SEXP in, igraph_layout_drl_options_t *op
 }
 
 int R_SEXP_to_igraph_arpack_options(SEXP in, igraph_arpack_options_t *opt) {
-  SEXP tmp;
   const char *tmpstr;
   igraph_arpack_options_init(opt);
   opt -> bmat[0] = CHAR(STRING_ELT(AS_CHARACTER
@@ -3786,8 +3785,10 @@ SEXP R_igraph_read_graph_graphdb(SEXP pvfile, SEXP pdirected) {
 SEXP R_igraph_write_graph_edgelist(SEXP graph, SEXP file) {
   igraph_t g;
   FILE *stream;
+#if HAVE_OPEN_MEMSTREAM == 1
   char *bp;
   size_t size;
+#endif
   SEXP result;
   
   R_igraph_before();
@@ -3819,8 +3820,10 @@ SEXP R_igraph_write_graph_edgelist(SEXP graph, SEXP file) {
 SEXP R_igraph_write_graph_gml(SEXP graph, SEXP file, SEXP pid, SEXP pcreator) {
   igraph_t g;
   FILE *stream;
+#if HAVE_OPEN_MEMSTREAM == 1
   char *bp;
   size_t size;
+#endif
   igraph_vector_t id, *ppid=0;
   const char *creator=0;
   SEXP result;
@@ -3856,8 +3859,10 @@ SEXP R_igraph_write_graph_gml(SEXP graph, SEXP file, SEXP pid, SEXP pcreator) {
 SEXP R_igraph_write_graph_dot(SEXP graph, SEXP file) {
   igraph_t g;
   FILE *stream;
+#if HAVE_OPEN_MEMSTREAM == 1
   char *bp;
   size_t size;
+#endif
   SEXP result;
   
   R_igraph_before();
@@ -3890,8 +3895,10 @@ SEXP R_igraph_write_graph_pajek(SEXP graph, SEXP file) {
   
   igraph_t g;
   FILE *stream;
+#if HAVE_OPEN_MEMSTREAM == 1
   char *bp;
   size_t size;
+#endif
   SEXP result;
   
   R_igraph_before();
@@ -3959,8 +3966,10 @@ SEXP R_igraph_write_graph_ncol(SEXP graph, SEXP file, SEXP pnames,
 			       SEXP pweights) {
   igraph_t g;
   FILE *stream;
+#if HAVE_OPEN_MEMSTREAM == 1
   char *bp;
   size_t size;
+#endif
   const char *names, *weights;
   SEXP result;
 
@@ -4032,8 +4041,10 @@ SEXP R_igraph_write_graph_lgl(SEXP graph, SEXP file, SEXP pnames,
 			      SEXP pweights, SEXP pisolates) {
   igraph_t g;
   FILE *stream;
+#if HAVE_OPEN_MEMSTREAM == 1
   char *bp;
   size_t size;
+#endif
   const char *names, *weights;
   igraph_bool_t isolates=LOGICAL(pisolates)[0];
   SEXP result;
@@ -4867,8 +4878,10 @@ SEXP R_igraph_write_graph_graphml(SEXP graph, SEXP file) {
   
   igraph_t g;
   FILE *stream;
+#if HAVE_OPEN_MEMSTREAM == 1
   char *bp;
   size_t size;
+#endif
   SEXP result;
   
   R_igraph_before();
@@ -5025,7 +5038,7 @@ SEXP R_igraph_grg_game(SEXP pn, SEXP pradius, SEXP ptorus,
   igraph_bool_t torus=LOGICAL(ptorus)[0];
   igraph_bool_t coords=LOGICAL(pcoords)[0];
   igraph_vector_t x, y, *px=0, *py=0;
-  SEXP result, names;
+  SEXP result;
 
   R_igraph_before();
   
@@ -5162,8 +5175,10 @@ SEXP R_igraph_write_graph_dimacs(SEXP graph, SEXP file,
   
   igraph_t g;
   FILE *stream;
+#if HAVE_OPEN_MEMSTREAM == 1
   char *bp;
   size_t size;
+#endif
   igraph_integer_t source=REAL(psource)[0];
   igraph_integer_t target=REAL(ptarget)[0];
   igraph_vector_t cap;

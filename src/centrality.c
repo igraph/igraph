@@ -877,7 +877,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   igraph_stack_t stack=IGRAPH_STACK_NULL;
   long int source;
   long int j, k;
-  igraph_integer_t modein, modeout;
+  igraph_integer_t modein;
   igraph_vit_t vit;
   igraph_vector_t *neis;
 
@@ -889,7 +889,6 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
 
   directed=directed && igraph_is_directed(graph);
   if (directed) {
-    modeout=IGRAPH_OUT;
     modein=IGRAPH_IN;
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist_out, IGRAPH_OUT));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist_out);
@@ -898,7 +897,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
     adjlist_out_p=&adjlist_out;
     adjlist_in_p=&adjlist_in;
   } else {
-    modeout=modein=IGRAPH_ALL;
+    modein=IGRAPH_ALL;
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist_out, IGRAPH_ALL));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist_out);
     adjlist_out_p=adjlist_in_p=&adjlist_out;
@@ -1107,11 +1106,10 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
   igraph_vector_t *neip;
   long int neino;
   long int i;
-  igraph_integer_t modein, modeout;
+  igraph_integer_t modein;
 
   directed=directed && igraph_is_directed(graph);
   if (directed) {
-    modeout=IGRAPH_OUT;
     modein=IGRAPH_IN;
     IGRAPH_CHECK(igraph_adjedgelist_init(graph, &elist_out, IGRAPH_OUT));
     IGRAPH_FINALLY(igraph_adjedgelist_destroy, &elist_out);
@@ -1120,7 +1118,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
     elist_out_p=&elist_out;
     elist_in_p=&elist_in;
   } else {
-    modeout=modein=IGRAPH_ALL;
+    modein=IGRAPH_ALL;
     IGRAPH_CHECK(igraph_adjedgelist_init(graph,&elist_out, IGRAPH_ALL));
     IGRAPH_FINALLY(igraph_adjedgelist_destroy, &elist_out);
     elist_out_p=elist_in_p=&elist_out;
