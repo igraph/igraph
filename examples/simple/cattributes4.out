@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
          http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 <!-- Created by igraph -->
-  <key id="color" for="edge" attr.name="color" attr.type="string"/>
+  <key id="e_color" for="edge" attr.name="color" attr.type="string"/>
   <graph id="G" edgedefault="directed">
     <node id="n0">
     </node>
@@ -15,13 +15,13 @@
     <node id="n3">
     </node>
     <edge source="n0" target="n1">
-      <data key="color">green</data>
+      <data key="e_color">green</data>
     </edge>
     <edge source="n1" target="n2">
-      <data key="color">white</data>
+      <data key="e_color">white</data>
     </edge>
     <edge source="n2" target="n3">
-      <data key="color">black</data>
+      <data key="e_color">black</data>
     </edge>
   </graph>
 </graphml>
@@ -31,7 +31,7 @@
          xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
          http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 <!-- Created by igraph -->
-  <key id="color" for="edge" attr.name="color" attr.type="string"/>
+  <key id="e_color" for="edge" attr.name="color" attr.type="string"/>
   <graph id="G" edgedefault="directed">
     <node id="n0">
     </node>
@@ -42,13 +42,13 @@
     <node id="n3">
     </node>
     <edge source="n0" target="n1">
-      <data key="color">blue</data>
+      <data key="e_color">blue</data>
     </edge>
     <edge source="n1" target="n2">
-      <data key="color">white</data>
+      <data key="e_color">white</data>
     </edge>
     <edge source="n2" target="n3">
-      <data key="color">black</data>
+      <data key="e_color">black</data>
     </edge>
   </graph>
 </graphml>
@@ -58,7 +58,7 @@
          xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
          http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 <!-- Created by igraph -->
-  <key id="color" for="edge" attr.name="color" attr.type="string"/>
+  <key id="e_color" for="edge" attr.name="color" attr.type="string"/>
   <graph id="G" edgedefault="directed">
     <node id="n0">
     </node>
@@ -69,13 +69,13 @@
     <node id="n3">
     </node>
     <edge source="n0" target="n1">
-      <data key="color">greenredblue</data>
+      <data key="e_color">greenredblue</data>
     </edge>
     <edge source="n1" target="n2">
-      <data key="color">green</data>
+      <data key="e_color">green</data>
     </edge>
     <edge source="n2" target="n3">
-      <data key="color">green</data>
+      <data key="e_color">green</data>
     </edge>
   </graph>
 </graphml>

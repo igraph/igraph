@@ -168,116 +168,116 @@ graph
          xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
          http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 <!-- Created by igraph -->
-  <key id="name" for="graph" attr.name="name" attr.type="string"/>
-  <key id="vertices" for="graph" attr.name="vertices" attr.type="double"/>
-  <key id="edges" for="graph" attr.name="edges" attr.type="double"/>
-  <key id="id" for="node" attr.name="id" attr.type="double"/>
-  <key id="name" for="node" attr.name="name" attr.type="string"/>
-  <key id="id" for="edge" attr.name="id" attr.type="double"/>
-  <key id="name" for="edge" attr.name="name" attr.type="string"/>
+  <key id="g_name" for="graph" attr.name="name" attr.type="string"/>
+  <key id="g_vertices" for="graph" attr.name="vertices" attr.type="double"/>
+  <key id="g_edges" for="graph" attr.name="edges" attr.type="double"/>
+  <key id="v_id" for="node" attr.name="id" attr.type="double"/>
+  <key id="v_name" for="node" attr.name="name" attr.type="string"/>
+  <key id="e_id" for="edge" attr.name="id" attr.type="double"/>
+  <key id="e_name" for="edge" attr.name="name" attr.type="string"/>
   <graph id="G" edgedefault="undirected">
-    <data key="name">Petersen&apos;s graph</data>
-    <data key="vertices">10</data>
-    <data key="edges">15</data>
+    <data key="g_name">Petersen&apos;s graph</data>
+    <data key="g_vertices">10</data>
+    <data key="g_edges">15</data>
     <node id="n0">
-      <data key="id">1</data>
-      <data key="name">foo</data>
+      <data key="v_id">1</data>
+      <data key="v_name">foo</data>
     </node>
     <node id="n1">
-      <data key="id">2</data>
-      <data key="name">foobar</data>
+      <data key="v_id">2</data>
+      <data key="v_name">foobar</data>
     </node>
     <node id="n2">
-      <data key="id">3</data>
-      <data key="name"></data>
+      <data key="v_id">3</data>
+      <data key="v_name"></data>
     </node>
     <node id="n3">
-      <data key="id">4</data>
-      <data key="name"></data>
+      <data key="v_id">4</data>
+      <data key="v_name"></data>
     </node>
     <node id="n4">
-      <data key="id">5</data>
-      <data key="name"></data>
+      <data key="v_id">5</data>
+      <data key="v_name"></data>
     </node>
     <node id="n5">
-      <data key="id">6</data>
-      <data key="name"></data>
+      <data key="v_id">6</data>
+      <data key="v_name"></data>
     </node>
     <node id="n6">
-      <data key="id">7</data>
-      <data key="name"></data>
+      <data key="v_id">7</data>
+      <data key="v_name"></data>
     </node>
     <node id="n7">
-      <data key="id">8</data>
-      <data key="name"></data>
+      <data key="v_id">8</data>
+      <data key="v_name"></data>
     </node>
     <node id="n8">
-      <data key="id">9</data>
-      <data key="name"></data>
+      <data key="v_id">9</data>
+      <data key="v_name"></data>
     </node>
     <node id="n9">
-      <data key="id">10</data>
-      <data key="name"></data>
+      <data key="v_id">10</data>
+      <data key="v_name"></data>
     </node>
     <edge source="n0" target="n1">
-      <data key="id">1</data>
-      <data key="name">FOO</data>
+      <data key="e_id">1</data>
+      <data key="e_name">FOO</data>
     </edge>
     <edge source="n0" target="n4">
-      <data key="id">2</data>
-      <data key="name">FOOBAR</data>
+      <data key="e_id">2</data>
+      <data key="e_name">FOOBAR</data>
     </edge>
     <edge source="n0" target="n5">
-      <data key="id">3</data>
-      <data key="name"></data>
+      <data key="e_id">3</data>
+      <data key="e_name"></data>
     </edge>
     <edge source="n1" target="n2">
-      <data key="id">4</data>
-      <data key="name"></data>
+      <data key="e_id">4</data>
+      <data key="e_name"></data>
     </edge>
     <edge source="n1" target="n6">
-      <data key="id">5</data>
-      <data key="name"></data>
+      <data key="e_id">5</data>
+      <data key="e_name"></data>
     </edge>
     <edge source="n2" target="n3">
-      <data key="id">6</data>
-      <data key="name"></data>
+      <data key="e_id">6</data>
+      <data key="e_name"></data>
     </edge>
     <edge source="n2" target="n7">
-      <data key="id">7</data>
-      <data key="name"></data>
+      <data key="e_id">7</data>
+      <data key="e_name"></data>
     </edge>
     <edge source="n3" target="n4">
-      <data key="id">8</data>
-      <data key="name"></data>
+      <data key="e_id">8</data>
+      <data key="e_name"></data>
     </edge>
     <edge source="n3" target="n8">
-      <data key="id">9</data>
-      <data key="name"></data>
+      <data key="e_id">9</data>
+      <data key="e_name"></data>
     </edge>
     <edge source="n4" target="n9">
-      <data key="id">10</data>
-      <data key="name"></data>
+      <data key="e_id">10</data>
+      <data key="e_name"></data>
     </edge>
     <edge source="n5" target="n7">
-      <data key="id">11</data>
-      <data key="name"></data>
+      <data key="e_id">11</data>
+      <data key="e_name"></data>
     </edge>
     <edge source="n5" target="n8">
-      <data key="id">12</data>
-      <data key="name"></data>
+      <data key="e_id">12</data>
+      <data key="e_name"></data>
     </edge>
     <edge source="n6" target="n8">
-      <data key="id">13</data>
-      <data key="name"></data>
+      <data key="e_id">13</data>
+      <data key="e_name"></data>
     </edge>
     <edge source="n6" target="n9">
-      <data key="id">14</data>
-      <data key="name"></data>
+      <data key="e_id">14</data>
+      <data key="e_name"></data>
     </edge>
     <edge source="n7" target="n9">
-      <data key="id">15</data>
-      <data key="name"></data>
+      <data key="e_id">15</data>
+      <data key="e_name"></data>
     </edge>
   </graph>
 </graphml>

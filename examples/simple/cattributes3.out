@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
          http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 <!-- Created by igraph -->
-  <key id="weight" for="edge" attr.name="weight" attr.type="double"/>
+  <key id="e_weight" for="edge" attr.name="weight" attr.type="double"/>
   <graph id="G" edgedefault="directed">
     <node id="n0">
     </node>
@@ -15,13 +15,13 @@
     <node id="n3">
     </node>
     <edge source="n0" target="n1">
-      <data key="weight">6</data>
+      <data key="e_weight">6</data>
     </edge>
     <edge source="n1" target="n2">
-      <data key="weight">4</data>
+      <data key="e_weight">4</data>
     </edge>
     <edge source="n2" target="n3">
-      <data key="weight">5</data>
+      <data key="e_weight">5</data>
     </edge>
   </graph>
 </graphml>
@@ -31,7 +31,7 @@
          xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
          http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 <!-- Created by igraph -->
-  <key id="weight" for="edge" attr.name="weight" attr.type="double"/>
+  <key id="e_weight" for="edge" attr.name="weight" attr.type="double"/>
   <graph id="G" edgedefault="directed">
     <node id="n0">
     </node>
@@ -42,13 +42,13 @@
     <node id="n3">
     </node>
     <edge source="n0" target="n1">
-      <data key="weight">6</data>
+      <data key="e_weight">6</data>
     </edge>
     <edge source="n1" target="n2">
-      <data key="weight">4</data>
+      <data key="e_weight">4</data>
     </edge>
     <edge source="n2" target="n3">
-      <data key="weight">5</data>
+      <data key="e_weight">5</data>
     </edge>
   </graph>
 </graphml>
@@ -58,7 +58,7 @@
          xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
          http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 <!-- Created by igraph -->
-  <key id="weight" for="edge" attr.name="weight" attr.type="double"/>
+  <key id="e_weight" for="edge" attr.name="weight" attr.type="double"/>
   <graph id="G" edgedefault="directed">
     <node id="n0">
     </node>
@@ -69,13 +69,13 @@
     <node id="n3">
     </node>
     <edge source="n0" target="n1">
-      <data key="weight">1</data>
+      <data key="e_weight">1</data>
     </edge>
     <edge source="n1" target="n2">
-      <data key="weight">4</data>
+      <data key="e_weight">4</data>
     </edge>
     <edge source="n2" target="n3">
-      <data key="weight">5</data>
+      <data key="e_weight">5</data>
     </edge>
   </graph>
 </graphml>
@@ -85,7 +85,7 @@
          xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
          http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 <!-- Created by igraph -->
-  <key id="weight" for="edge" attr.name="weight" attr.type="double"/>
+  <key id="e_weight" for="edge" attr.name="weight" attr.type="double"/>
   <graph id="G" edgedefault="directed">
     <node id="n0">
     </node>
@@ -96,13 +96,13 @@
     <node id="n3">
     </node>
     <edge source="n0" target="n1">
-      <data key="weight">3</data>
+      <data key="e_weight">3</data>
     </edge>
     <edge source="n1" target="n2">
-      <data key="weight">4</data>
+      <data key="e_weight">4</data>
     </edge>
     <edge source="n2" target="n3">
-      <data key="weight">5</data>
+      <data key="e_weight">5</data>
     </edge>
   </graph>
 </graphml>
@@ -112,7 +112,7 @@
          xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
          http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 <!-- Created by igraph -->
-  <key id="weight" for="edge" attr.name="weight" attr.type="double"/>
+  <key id="e_weight" for="edge" attr.name="weight" attr.type="double"/>
   <graph id="G" edgedefault="directed">
     <node id="n0">
     </node>
@@ -123,13 +123,13 @@
     <node id="n3">
     </node>
     <edge source="n0" target="n1">
-      <data key="weight">1</data>
+      <data key="e_weight">1</data>
     </edge>
     <edge source="n1" target="n2">
-      <data key="weight">4</data>
+      <data key="e_weight">4</data>
     </edge>
     <edge source="n2" target="n3">
-      <data key="weight">5</data>
+      <data key="e_weight">5</data>
     </edge>
   </graph>
 </graphml>
@@ -139,7 +139,7 @@
          xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
          http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 <!-- Created by igraph -->
-  <key id="weight" for="edge" attr.name="weight" attr.type="double"/>
+  <key id="e_weight" for="edge" attr.name="weight" attr.type="double"/>
   <graph id="G" edgedefault="directed">
     <node id="n0">
     </node>
@@ -150,13 +150,13 @@
     <node id="n3">
     </node>
     <edge source="n0" target="n1">
-      <data key="weight">3</data>
+      <data key="e_weight">3</data>
     </edge>
     <edge source="n1" target="n2">
-      <data key="weight">4</data>
+      <data key="e_weight">4</data>
     </edge>
     <edge source="n2" target="n3">
-      <data key="weight">5</data>
+      <data key="e_weight">5</data>
     </edge>
   </graph>
 </graphml>
@@ -166,7 +166,7 @@
          xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
          http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 <!-- Created by igraph -->
-  <key id="weight" for="edge" attr.name="weight" attr.type="double"/>
+  <key id="e_weight" for="edge" attr.name="weight" attr.type="double"/>
   <graph id="G" edgedefault="directed">
     <node id="n0">
     </node>
@@ -177,13 +177,13 @@
     <node id="n3">
     </node>
     <edge source="n0" target="n1">
-      <data key="weight">2</data>
+      <data key="e_weight">2</data>
     </edge>
     <edge source="n1" target="n2">
-      <data key="weight">4</data>
+      <data key="e_weight">4</data>
     </edge>
     <edge source="n2" target="n3">
-      <data key="weight">5</data>
+      <data key="e_weight">5</data>
     </edge>
   </graph>
 </graphml>
@@ -193,7 +193,7 @@
          xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
          http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 <!-- Created by igraph -->
-  <key id="weight" for="edge" attr.name="weight" attr.type="double"/>
+  <key id="e_weight" for="edge" attr.name="weight" attr.type="double"/>
   <graph id="G" edgedefault="directed">
     <node id="n0">
     </node>
@@ -204,13 +204,13 @@
     <node id="n3">
     </node>
     <edge source="n0" target="n1">
-      <data key="weight">0</data>
+      <data key="e_weight">0</data>
     </edge>
     <edge source="n1" target="n2">
-      <data key="weight">0</data>
+      <data key="e_weight">0</data>
     </edge>
     <edge source="n2" target="n3">
-      <data key="weight">0</data>
+      <data key="e_weight">0</data>
     </edge>
   </graph>
 </graphml>
@@ -220,7 +220,7 @@
          xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
          http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 <!-- Created by igraph -->
-  <key id="weight" for="edge" attr.name="weight" attr.type="double"/>
+  <key id="e_weight" for="edge" attr.name="weight" attr.type="double"/>
   <graph id="G" edgedefault="directed">
     <node id="n0">
     </node>
@@ -231,13 +231,13 @@
     <node id="n3">
     </node>
     <edge source="n0" target="n1">
-      <data key="weight">2</data>
+      <data key="e_weight">2</data>
     </edge>
     <edge source="n1" target="n2">
-      <data key="weight">4</data>
+      <data key="e_weight">4</data>
     </edge>
     <edge source="n2" target="n3">
-      <data key="weight">5</data>
+      <data key="e_weight">5</data>
     </edge>
   </graph>
 </graphml>

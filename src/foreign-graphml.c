@@ -1109,10 +1109,10 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream) {
     igraph_strvector_get(&gnames, i, &name);
     IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
     if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
-      ret=fprintf(outstream, "  <key id=\"%s\" for=\"graph\" attr.name=\"%s\" attr.type=\"string\"/>\n", name_escaped, name_escaped);
+      ret=fprintf(outstream, "  <key id=\"g_%s\" for=\"graph\" attr.name=\"%s\" attr.type=\"string\"/>\n", name_escaped, name_escaped);
       if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);      
     } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
-      ret=fprintf(outstream, "  <key id=\"%s\" for=\"graph\" attr.name=\"%s\" attr.type=\"double\"/>\n", name_escaped, name_escaped);
+      ret=fprintf(outstream, "  <key id=\"g_%s\" for=\"graph\" attr.name=\"%s\" attr.type=\"double\"/>\n", name_escaped, name_escaped);
       if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);            
     }
     igraph_Free(name_escaped);
@@ -1124,10 +1124,10 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream) {
     igraph_strvector_get(&vnames, i, &name);
     IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
     if (VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
-      ret=fprintf(outstream, "  <key id=\"%s\" for=\"node\" attr.name=\"%s\" attr.type=\"string\"/>\n", name_escaped, name_escaped);
+      ret=fprintf(outstream, "  <key id=\"v_%s\" for=\"node\" attr.name=\"%s\" attr.type=\"string\"/>\n", name_escaped, name_escaped);
       if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);      
     } else if (VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
-      ret=fprintf(outstream, "  <key id=\"%s\" for=\"node\" attr.name=\"%s\" attr.type=\"double\"/>\n", name_escaped, name_escaped);
+      ret=fprintf(outstream, "  <key id=\"v_%s\" for=\"node\" attr.name=\"%s\" attr.type=\"double\"/>\n", name_escaped, name_escaped);
       if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);            
     }
     igraph_Free(name_escaped);
@@ -1139,10 +1139,10 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream) {
     igraph_strvector_get(&enames, i, &name);
     IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
     if (VECTOR(etypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
-      ret=fprintf(outstream, "  <key id=\"%s\" for=\"edge\" attr.name=\"%s\" attr.type=\"string\"/>\n", name_escaped, name_escaped);
+      ret=fprintf(outstream, "  <key id=\"e_%s\" for=\"edge\" attr.name=\"%s\" attr.type=\"string\"/>\n", name_escaped, name_escaped);
       if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
     } else if (VECTOR(etypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
-      ret=fprintf(outstream, "  <key id=\"%s\" for=\"edge\" attr.name=\"%s\" attr.type=\"double\"/>\n", name_escaped, name_escaped);
+      ret=fprintf(outstream, "  <key id=\"e_%s\" for=\"edge\" attr.name=\"%s\" attr.type=\"double\"/>\n", name_escaped, name_escaped);
       if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
     }
     igraph_Free(name_escaped);
@@ -1160,7 +1160,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream) {
       IGRAPH_CHECK(igraph_i_attribute_get_numeric_graph_attr(graph, name, &numv));
       if (!isnan(VECTOR(numv)[0])) {
         IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
-        ret=fprintf(outstream, "    <data key=\"%s\">%g</data>\n",
+        ret=fprintf(outstream, "    <data key=\"g_%s\">%g</data>\n",
                     name_escaped, VECTOR(numv)[0]);
         igraph_Free(name_escaped);
         if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
@@ -1169,7 +1169,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream) {
       char *s, *s_escaped;
       igraph_strvector_get(&gnames, i, &name);
       IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
-      ret=fprintf(outstream, "    <data key=\"%s\">", name_escaped);
+      ret=fprintf(outstream, "    <data key=\"g_%s\">", name_escaped);
       igraph_Free(name_escaped);
       IGRAPH_CHECK(igraph_i_attribute_get_string_graph_attr(graph, name, &strv));
       igraph_strvector_get(&strv, 0, &s);
@@ -1197,7 +1197,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream) {
                      igraph_vss_1(l), &numv));
         if (!isnan(VECTOR(numv)[0])) {
           IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
-          ret=fprintf(outstream, "      <data key=\"%s\">%g</data>\n",
+          ret=fprintf(outstream, "      <data key=\"v_%s\">%g</data>\n",
                       name_escaped, VECTOR(numv)[0]);
           igraph_Free(name_escaped);
           if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
@@ -1206,7 +1206,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream) {
         char *s, *s_escaped;
         igraph_strvector_get(&vnames, i, &name);
         IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
-        ret=fprintf(outstream, "      <data key=\"%s\">", name_escaped);
+        ret=fprintf(outstream, "      <data key=\"v_%s\">", name_escaped);
         igraph_Free(name_escaped);
         IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, name,
                      igraph_vss_1(l), &strv));
@@ -1243,7 +1243,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream) {
                      igraph_ess_1(edge), &numv));
         if (!isnan(VECTOR(numv)[0])) {
           IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
-          ret=fprintf(outstream, "      <data key=\"%s\">%g</data>\n",
+          ret=fprintf(outstream, "      <data key=\"e_%s\">%g</data>\n",
                       name_escaped, VECTOR(numv)[0]);
           igraph_Free(name_escaped);
           if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
@@ -1252,7 +1252,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream) {
         char *s, *s_escaped;
         igraph_strvector_get(&enames, i, &name);
         IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
-        ret=fprintf(outstream, "      <data key=\"%s\">", name_escaped);
+        ret=fprintf(outstream, "      <data key=\"e_%s\">", name_escaped);
         igraph_Free(name_escaped);
         IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph, name,
                      igraph_ess_1(edge), &strv));
