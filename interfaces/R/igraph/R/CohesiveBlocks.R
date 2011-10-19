@@ -116,7 +116,8 @@ cohesive.blocks <- function(graph, db=NULL,
             v <- sort(branchMembership$vertexId[branchMembership$branchId==branchId])
             maxId <- max(branches$branchId)
         }
-        
+
+        cbid <- NULL # To fix a check NOTE
         g <- subgraph(graph, V(graph)[cbid %in% v])
 
         ## check if trivial or fully connected, else treat normally
@@ -179,7 +180,7 @@ cohesive.blocks <- function(graph, db=NULL,
                 if(newk>k){
                     kcomp <- list(as.numeric(V(g)))
                 } else {
-                    kcomp <- kComponents(g, k, cutsetAlgorithm=cutsetAlgorithm, verbose=verbose)
+                    kcomp <- kComponents(g, k, verbose=verbose)
                 }
             } else { ## otherwise just use kComponents()
                 kcomp <- kComponents(g, k, cutsetHeuristic, verbose=verbose)
@@ -838,7 +839,6 @@ kCutsets <- function(g, k=NULL, cl=NULL){
         if(class(tryL)=="try-error"){ ## not sure why I need this,  but Moody-White example was crashing with parLapply here
             warning(paste("Parallel execution on MPI failed with message: ", tryL, " Defaulted to sequential execution", sep=""))
             L <- lapply(L, graph.antichains, cl=NULL)
-            if (verbose) cat("*")
         } else {
             L <- tryL
         }
@@ -873,7 +873,8 @@ graph.residual <- function(g, i, j){ ## NOT GENERIC: deletes edges once they get
     while(!done){
         p <- get.shortest.paths(g.r, i, j, mode="out")[[1]]
         if(length(p)<1) done <- TRUE
-        E(g.r, path=p)$capacity <- E(g.r, path=p)$capacity - 1 
+        E(g.r, path=p)$capacity <- E(g.r, path=p)$capacity - 1
+        capacity <- NULL # eliminate a check NOTE
         g.r <- delete.edges(g.r, E(g.r)[capacity<=0])
         if(vertex.disjoint.paths(g.r, i, j)==0) done <- TRUE
     }

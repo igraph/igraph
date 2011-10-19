@@ -25,10 +25,8 @@
 ###################################################################
 
 # the environment containing all the plots
-if (!exists(".tkplot.env")) {
-  .tkplot.env <- new.env()
-  assign(".next", 1, .tkplot.env)
-}
+.tkplot.env <- new.env()
+assign(".next", 1, .tkplot.env)
 
 ###################################################################
 # Main function
