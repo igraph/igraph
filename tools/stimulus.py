@@ -570,10 +570,13 @@ class RCCodeGenerator(CodeGenerator):
         out=[ "  SEXP "+n+";" for n,p in params.items()
               if p['mode']=='OUT' ]
 
+        retpars=[ n for n,p in params.items() if p['mode'] in 
+                  ['OUT', 'INOUT'] ]
+
         rt=self.types[self.func[function]['RETURN']]    
         if 'DECL' in rt:
             retdecl="  " + rt['DECL']
-        elif 'CTYPE' in rt:
+        elif 'CTYPE' in rt and len(retpars)==0:
             ctype=rt['CTYPE']
             if type(ctype)==dict:
                 mode=params[pname]['mode']
@@ -583,7 +586,12 @@ class RCCodeGenerator(CodeGenerator):
         else:
             retdecl=""
 
-        return "\n".join(inout + out + [retdecl] + ["  SEXP result, names;"])
+        if len(retpars)<=1:
+            res = "\n".join(inout + out + [retdecl] + ["  SEXP result;"])
+        else:
+            res = "\n".join(inout + out + [retdecl] + 
+                            ["  SEXP result, names;"])
+        return res
 
     def chunk_inconv(self, function, params):
         """Input conversions. Not only for types with mode 'IN' and
@@ -631,7 +639,12 @@ class RCCodeGenerator(CodeGenerator):
                   params.keys() )
         call=map( lambda c, n: c.replace("%C%", "c_"+n).replace("%I%", n),
                   call, params.keys() )
-        return "  c_result=" + function + "(" + ", ".join(call) + ");\n"
+        retpars=[ n for n,p in params.items() if p['mode'] in 
+                  ['OUT', 'INOUT'] ]
+        res="  " + function + "(" + ", ".join(call) + ");\n"
+        if len(retpars)==0:
+            res="  c_result=" + res
+        return res
 
     def chunk_outconv(self, function, params):
         """The output conversions, this is quite difficult. A function
