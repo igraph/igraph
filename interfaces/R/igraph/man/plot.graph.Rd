@@ -6,7 +6,7 @@
   device. It is the non-interactive companion of the \code{tkplot}
   function.}
 \usage{
-plot.igraph(x, axes=FALSE, xlab="", ylab="", add=FALSE,
+\method{plot}{igraph}(x, axes=FALSE, xlab="", ylab="", add=FALSE,
       xlim=c(-1,1), ylim=c(-1,1), main="", sub="", \dots)
 }
 \arguments{
