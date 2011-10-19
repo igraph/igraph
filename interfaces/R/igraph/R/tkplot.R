@@ -25,10 +25,8 @@
 ###################################################################
 
 # the environment containing all the plots
-if (!exists(".tkplot.env")) {
-  .tkplot.env <- new.env()
-  assign(".next", 1, .tkplot.env)
-}
+.tkplot.env <- new.env()
+assign(".next", 1, .tkplot.env)
 
 ###################################################################
 # Main function
@@ -1479,19 +1477,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
 
     ## set tkfamily
     if (family=="symbol" || font==5) {
-      ## try to find a symbol font
-      fams <- as.character(tkplot.families())
-      if ("symbol" %in% fams) {
-        tkfamily <- "symbol"
-      } else {
-        i <- grep("symbol", fams, ignore.case=TRUE)
-        if (length(i)>=1) {
-          tkfamily <- fams[i[1]]
-        } else {
-          warning("Could not find proper symbol font.")
-          tkfamily <- "Times"
-        }
-      }
+      tkfamily <- "symbol"
     } else if (family=="serif") {
       tkfamily <- "Times"
     } else if (family=="sans") {

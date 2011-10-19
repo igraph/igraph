@@ -5153,7 +5153,7 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
   long int source;
   igraph_integer_t dirmode = directed ? IGRAPH_OUT : IGRAPH_ALL;
 
-  long int from, to;
+  long int from=0, to=0;
   igraph_real_t res=0;
   long int nodes_reached=0;
   

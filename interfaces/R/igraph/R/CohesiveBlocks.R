@@ -116,7 +116,8 @@ cohesive.blocks <- function(graph, db=NULL,
             v <- sort(branchMembership$vertexId[branchMembership$branchId==branchId])
             maxId <- max(branches$branchId)
         }
-        
+
+        cbid <- NULL # To fix a check NOTE
         g <- subgraph(graph, V(graph)[cbid %in% v])
 
         ## check if trivial or fully connected, else treat normally
@@ -179,7 +180,7 @@ cohesive.blocks <- function(graph, db=NULL,
                 if(newk>k){
                     kcomp <- list(as.numeric(V(g)))
                 } else {
-                    kcomp <- kComponents(g, k, cutsetAlgorithm=cutsetAlgorithm, verbose=verbose)
+                    kcomp <- kComponents(g, k, verbose=verbose)
                 }
             } else { ## otherwise just use kComponents()
                 kcomp <- kComponents(g, k, cutsetHeuristic, verbose=verbose)
@@ -756,7 +757,7 @@ write.pajek.kCore.bgraph <- function(graph, filename, remove.multiple=TRUE, remo
 ## cutsets of size k in the given graph.            ##
 ######################################################
 
-kCutsets <- function(g, k=NULL, cl=NULL){
+kCutsets <- function(g, k=NULL){
     if(!is.igraph(g)){
         stop("g must be an igraph object")
     }
@@ -791,76 +792,36 @@ kCutsets <- function(g, k=NULL, cl=NULL){
         G[[i]] <- add.edges(g, as.numeric(t(P[1:(i-1), ])))
     }
     
-    if(is.null(cl)){ 
-        Gbar <- lapply(G, etReduction) #4 (sequential)
-        mflow <- unlist(lapply(1:nrow(P), function(i){graph.maxflow(Gbar[[i]], P[i, 1]+vcount(g), P[i, 2])}))
+    Gbar <- lapply(G, etReduction) #4 (sequential)
+    mflow <- unlist(lapply(1:nrow(P), function(i){graph.maxflow(Gbar[[i]], P[i, 1]+vcount(g), P[i, 2])}))
+    
+    Gbar <- Gbar[mflow==k] #5 (sequential)
+    P <- P[mflow==k, ]
         
-        Gbar <- Gbar[mflow==k] #5 (sequential)
-        P <- P[mflow==k, ]
+    if(nrow(P)<1) return(list())
+    GbarRes <- lapply(1:nrow(P), function(i){graph.residual(Gbar[[i]], P[i, 1]+vcount(g), P[i, 2])}) #6 (sequential)
+    comp <- lapply(GbarRes, clusters, mode="strong")
+    L <- lapply(1:length(comp), function(i){graph.shrink(GbarRes[[i]], comp=comp[[i]])})
+    
+    L <- lapply(L, graph.antichains) #7 (sequential)
+    
+    ## convert antichains in L to vertex sets in g
+    res <- lapply(1:length(L), 
+                  function(i){
+                    gc()
+                    l <- L[[i]]
+                    cmp <- comp[[i]]
+                    thisres <- list()
+                    for(cn in l){
+                      thisres <- unique(c(thisres, list(unique(sort((which(cmp$membership %in% cn)-1) %% vcount(g))))))
+                    }
+                    return(thisres)
+                  }
+                  )
+    res <- unlist(res, recursive=FALSE)
         
-        if(nrow(P)<1) return(list())
-        GbarRes <- lapply(1:nrow(P), function(i){graph.residual(Gbar[[i]], P[i, 1]+vcount(g), P[i, 2])}) #6 (sequential)
-        comp <- lapply(GbarRes, clusters, mode="strong")
-        L <- lapply(1:length(comp), function(i){graph.shrink(GbarRes[[i]], comp=comp[[i]])})
-        
-        L <- lapply(L, graph.antichains, cl=cl) #7 (sequential)
-        
-        ## convert antichains in L to vertex sets in g
-        res <- lapply(1:length(L), 
-            function(i){
-                gc()
-                l <- L[[i]]
-                cmp <- comp[[i]]
-                thisres <- list()
-                for(cn in l){
-                    thisres <- unique(c(thisres, list(unique(sort((which(cmp$membership %in% cn)-1) %% vcount(g))))))
-                }
-                return(thisres)
-            }
-        )
-        res <- unlist(res, recursive=FALSE)
-        
-        ## and see which are cutsets
-        res <- unique(res[unlist(lapply(res, function(x){length(x)==k && is.cutset(x, g)}))])
-    } else {
-        Gbar <- parLapply(cl, G, etReduction) #4 (parallel)
-        mflow <- unlist(parLapply(cl, 1:nrow(P), function(i){graph.maxflow(Gbar[[i]], P[i, 1]+vcount(g), P[i, 2])}))
-        
-        Gbar <- Gbar[mflow==k] #5 (parallel)
-        P <- P[mflow==k, ]
-        
-        if(nrow(P)<1) return(list())
-        GbarRes <- parLapply(cl, 1:nrow(P), function(i){graph.residual(Gbar[[i]], P[i, 1]+vcount(g), P[i, 2])}) #6 (parallel)
-        comp <- parLapply(cl, GbarRes, clusters, mode="strong")
-        L <- parLapply(cl, 1:length(comp), function(i){graph.shrink(GbarRes[[i]], comp=comp[[i]])})
-        
-        tryL <- try(parLapply(cl, L, graph.antichains, cl=NULL), silent=TRUE) #7 (parallel)
-        if(class(tryL)=="try-error"){ ## not sure why I need this,  but Moody-White example was crashing with parLapply here
-            warning(paste("Parallel execution on MPI failed with message: ", tryL, " Defaulted to sequential execution", sep=""))
-            L <- lapply(L, graph.antichains, cl=NULL)
-            if (verbose) cat("*")
-        } else {
-            L <- tryL
-        }
-        
-        ## convert antichains in L to vertex sets in g
-        res <- parLapply(cl, 1:length(L), 
-            function(i){
-              gc()
-              l <- L[[i]]
-                cmp <- comp[[i]]
-                thisres <- list()
-                for(cn in l){
-                    thisres <- unique(c(thisres, list(unique(sort((which(cmp$membership %in% cn)-1) %% vcount(g))))))
-                }
-                return(thisres)
-            }
-        )
-        res <- unlist(res, recursive=FALSE)
-        
-        ## and see which are cutsets
-        res <- unique(res[unlist(parLapply(cl, res, function(x){length(x)==k && is.cutset(x, g)}))])
-    }
+    ## and see which are cutsets
+    res <- unique(res[unlist(lapply(res, function(x){length(x)==k && is.cutset(x, g)}))])
     
     return(res)
 }
@@ -873,7 +834,8 @@ graph.residual <- function(g, i, j){ ## NOT GENERIC: deletes edges once they get
     while(!done){
         p <- get.shortest.paths(g.r, i, j, mode="out")[[1]]
         if(length(p)<1) done <- TRUE
-        E(g.r, path=p)$capacity <- E(g.r, path=p)$capacity - 1 
+        E(g.r, path=p)$capacity <- E(g.r, path=p)$capacity - 1
+        capacity <- NULL # eliminate a check NOTE
         g.r <- delete.edges(g.r, E(g.r)[capacity<=0])
         if(vertex.disjoint.paths(g.r, i, j)==0) done <- TRUE
     }
@@ -890,7 +852,7 @@ graph.shrink <- function(g, comp=clusters(g, mode="strong"), remove.multiple=TRU
     return(res)
 }
 
-graph.antichains <- function(g, cl=NULL){ ## g must be a directed acyclic graph Ñ not checked!
+graph.antichains <- function(g){ ## g must be a directed acyclic graph Ñ not checked!
     ## add edges from every vertex to each of its descendants
     gc()
     for(i in as.numeric(V(g))){
@@ -910,22 +872,12 @@ graph.antichains <- function(g, cl=NULL){ ## g must be a directed acyclic graph 
     acount <- 0
     while(length(res) != acount){
         acount <- length(res)
-        if(is.null(cl)){
-            newchains <- combn(1:acount, 2, 
-                function(x){
-                    thisChain <- unique(unlist(res[x]))
-                    if(all(adj[thisChain+1, thisChain+1]==0)) return(sort(thisChain))
-                    return(NA)
-                }, simplify=FALSE)
-        } else {
-            cn <- combn(1:acount, 2)
-            newchains <- parLapply(cl, cn, 
-                function(x){
-                    thisChain <- unique(unlist(res[x]))
-                    if(all(adj[thisChain+1, thisChain+1]==0)) return(sort(thisChain))
-                    return(NA)
-                }, simplify=FALSE)
-        }
+        newchains <- combn(1:acount, 2, 
+                           function(x){
+                             thisChain <- unique(unlist(res[x]))
+                             if(all(adj[thisChain+1, thisChain+1]==0)) return(sort(thisChain))
+                             return(NA)
+                           }, simplify=FALSE)
         newchains <- newchains[!is.na(newchains)]
         res <- unique(c(res, newchains))
     }
