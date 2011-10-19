@@ -169,6 +169,12 @@ int R_igraph_attribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
     case IGRAPH_ATTRIBUTE_R_OBJECT:
       IGRAPH_ERROR("R_objects not implemented yet", IGRAPH_UNIMPLEMENTED);
       break;
+    case IGRAPH_ATTRIBUTE_DEFAULT:
+    case IGRAPH_ATTRIBUTE_PY_OBJECT:
+    default:
+      IGRAPH_ERROR("Unknown attribute type, this should not happen",
+		   IGRAPH_EINTERNAL);
+      break;
     }
   }
   SET_NAMES(gal, names);
