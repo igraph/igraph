@@ -1512,9 +1512,9 @@ int igraph_i_layout_reingold_tilford(const igraph_t *graph,
 int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilford_vertex *vdata,
                                                  igraph_matrix_t *res, long int node,
 												 long int vcount, igraph_real_t xpos) {
-  long int i, n;
+  long int i;
   MATRIX(*res, node, 0) = xpos;
-  for (i=0, n=0; i<vcount; i++) {
+  for (i=0; i<vcount; i++) {
     if (i == node) continue;
     if (vdata[i].parent == node) {
       igraph_i_layout_reingold_tilford_calc_coords(vdata, res, i, vcount,
@@ -1526,7 +1526,7 @@ int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilfor
 
 int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_vertex *vdata,
                                                long int node, long int vcount) {
-  long int i, j, childcount, leftroot, leftrootidx, leftleftroot;
+  long int i, j, childcount, leftroot, leftrootidx;
   igraph_real_t avg;
   
   /* printf("Starting visiting node %d\n", node); */
@@ -1552,7 +1552,7 @@ int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_
    * as close to each other as possible. leftroot stores the root of the
    * rightmost subtree of the already placed subtrees - its right contour
    * will be checked against the left contour of the next subtree */
-  leftleftroot=leftroot=leftrootidx=-1;
+  leftroot=leftrootidx=-1;
   avg=0.0;
   /*printf("Visited node %d and arranged its subtrees\n", node);*/
   for (i=0, j=0; i<vcount; i++) {

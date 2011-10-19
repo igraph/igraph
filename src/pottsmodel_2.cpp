@@ -483,13 +483,11 @@ double PottsModel::HeatBathLookupZeroTemp(double gamma, double prob, unsigned in
   unsigned long changes;
   double delta=0, h, deltaE, deltaEmin,w,degree;
   //HugeArray<int> neighbours;
-  bool cyclic;
 
   sweep=0;
   changes=0;
   while (sweep<max_sweeps)
   {
-    cyclic=true;
     sweep++;
     //ueber alle Knoten im Netz
     for (unsigned long n=0; n<num_of_nodes; n++)
@@ -600,7 +598,7 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
   long max_q;
   unsigned long changes, /*degree,*/ problemcount;
   //HugeArray<int> neighbours;
-  double h, delta=0, norm, r, beta,minweight, mag, prefac=0,w, degree;
+  double h, delta=0, norm, r, beta,minweight, prefac=0,w, degree;
   bool cyclic=0, found;
   unsigned long num_of_nodes;
 
@@ -746,7 +744,6 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
   }  // while markov
   max_q=0;
   for (unsigned int i=1; i<=q; i++) if (color_field[i]>max_q) max_q=long(color_field[i]);
-  mag=(double(max_q*q)/double(num_of_nodes)-1.0)/double(q-1);
 
   //again, we would not like to end up in cyclic attractors
   if (cyclic && changes)  {
@@ -775,15 +772,14 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
   unsigned long changes, /*degree,*/ problemcount;
   double degree,w, delta=0, h;
   //HugeArray<int> neighbours;
-  double norm, r, beta,minweight, mag, prefac=0;
-  bool cyclic, found;
+  double norm, r, beta,minweight, prefac=0;
+  bool found;
   long int num_of_nodes;
   sweep=0;
   changes=0;
   num_of_nodes=net->node_list->Size();
   while (sweep<max_sweeps)
   {
-    cyclic=true;
     sweep++;
     //loop over all nodes in network
     for (int n=0; n<num_of_nodes; n++)
@@ -908,7 +904,6 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
   max_q=0;
 
   for (unsigned int i=1; i<=q; i++) if (color_field[i]>max_q) max_q=long(color_field[i]+0.5);
-  mag=(double(max_q*q)/double(num_of_nodes)-1.0)/double(q-1);
 
     acceptance=double(changes)/double(num_of_nodes)/double(sweep);
     return acceptance;
@@ -934,7 +929,7 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
   double degree, delta_aff_add, delta_aff_rem, max_delta_aff, Ks=0.0, Kr=0, kis, kir, w;
   long community_marker=5;
   long to_do_marker=10;
-  double inner_links=0, outer_links=0, aff_r, aff_s, css;
+  double inner_links=0, outer_links=0, aff_r, aff_s;
 
   to_do=new DLList<NNode*>;
   community=new DLList<NNode*>;
@@ -1028,8 +1023,6 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
 	}
 	aff_r=kir-gamma/total_degree_sum*(Kr-degree)*degree;
 	aff_s=kis-gamma/total_degree_sum*Ks*degree;
-	css=-gamma/total_degree_sum*degree*degree*0.5;
-	//printf("Node: %s\taff_r:%f\taff_s:%f\tcss:%f\tsum:%f\n",node->Get_Name(),aff_r,aff_s,css,aff_r+aff_s+2.0*css);
 	delta_aff_add=aff_r-aff_s;
 	// 	if (aff_s>=aff_r && delta_aff_add<=max_delta_aff) {
 	if (delta_aff_add<=max_delta_aff) {
@@ -1075,8 +1068,6 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
 // 	if (kir+kis!=degree) {  printf("error kir=%f\tkis=%f\tk=%f\n",kir,kis,degree); }
 	aff_r=kir-gamma/total_degree_sum*Kr*degree;
 	aff_s=kis-gamma/total_degree_sum*(Ks-degree)*degree;
-	//css=-gamma/total_degree_sum*degree*degree*0.5;
-	//printf("Node: %s\taff_r:%f\taff_s:%f\tcss:%f\tsum:%f\n",node->Get_Name(),aff_r,aff_s,css,aff_r+aff_s+2.0*css);
 	delta_aff_rem=aff_s-aff_r;
 	node->Set_Affinity(aff_s);
 	// we should not remove the nodes, we have just added
@@ -1182,8 +1173,7 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 			       double kT, double gamma)
 {
   NNode *n_cur, *n_cur2;
-  bool found;
-  double p_in, p_out, log_num_exp, a1,a2,a3,p,p1,p2;
+  double a1,a2,a3,p,p1,p2;
   long n,N,lin,lout;
   DLList_Iter<NNode*> iter, iter2;
   HugeArray<int> inner_links;
@@ -1236,10 +1226,6 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 	  {
 	    inner_links[spin]/=2;
 	    //    fprintf(file,"Cluster\tNodes\tInnerLinks\tOuterLinks\tp_in\tp_out\n");
-	    if (nodes[spin]>1)
-	      p_in=2.0*double(inner_links[spin])/double(nodes[spin])/double(nodes[spin]-1);
-	    else p_in=0.0;
-	    p_out=double(outer_links[spin])/double(nodes[spin])/double(num_of_nodes-nodes[spin]);
 	    N=num_of_nodes;
 	    n=nodes[spin];
 	    lin=inner_links[spin];
@@ -1256,7 +1242,6 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 		   lout*log((double)lout        )+lout;
 	    p1=(lin+lout)*log((double)p);
 	    p2=(0.5*n*(n-1)-lin + n*(N-n)-lout)*log((double)1.0-p);
-	    log_num_exp=a1+a2+a3+p1+p2;
 	    //       fprintf(file,"%d\t%d\t%d\t%d\t%f\t%f\t%f\n",spin,nodes[spin], inner_links[spin], outer_links[spin], p_in, p_out,log_num_exp);
 	    IGRAPH_CHECK(igraph_vector_push_back(csize, nodes[spin]));
 	  }
@@ -1273,7 +1258,6 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 	if (nodes[spin]>0) {
 	  no++;
 	}
-	found=false;
 	n_cur=iter.First(net->node_list);
 	while (!iter.End())
 	  {
@@ -1281,11 +1265,9 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 	      {
 		//         fprintf(file,"%d\t%s\n",spin,n_cur->Get_Name());
 		VECTOR(*membership)[ n_cur->Get_Index() ]=no;
-		found=true;
 	      }
 	    n_cur=iter.Next();
 	  }
-	//     if (found) fprintf(file,"\n");
       }
   }
   

@@ -731,7 +731,6 @@ void igraph_i_graphml_sax_handler_start_element(void *state0,
     (struct igraph_i_graphml_parser_state*)state0;
   xmlChar** it;
   long int id1, id2;
-  unsigned short int directed;
 
   switch (state->st) {
   case START:
@@ -780,7 +779,7 @@ void igraph_i_graphml_sax_handler_start_element(void *state0,
   case INSIDE_GRAPH:
     /* If we are in the INSIDE_GRAPH state, check for node and edge tags */
     if (xmlStrEqual(name, toXmlChar("edge"))) {
-      id1=-1; id2=-1; directed=state->edges_directed;
+      id1=-1; id2=-1; 
       for (it=(xmlChar**)attrs; *it; it+=2) {
 	if (xmlStrEqual(*it, toXmlChar("source"))) {
 	  igraph_trie_get(&state->node_trie, fromXmlChar(*(it+1)), &id1);
