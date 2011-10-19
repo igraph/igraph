@@ -7,6 +7,8 @@
 #   * keyboard shortcuts
 #   * implement min & max in .tkigraph.dialog
 
+.tkigraph.env <- new.env()
+
 tkigraph <- function() {
 
   require(tcltk) || stop("tcl/tk library not available")
@@ -27,7 +29,7 @@ tkigraph <- function() {
   tktitle(top) <- "iGraph GUI (Social Network Basics)"
   topframe <- tkframe(top, relief="sunken", borderwidth=1)
   scr <- tkscrollbar(top, repeatinterval=5,
-                     command=function(...) tkyview(toptopframe))
+                     command=function(...) tkyview(topframe))
   tkplace(topframe, x=0, y=0, relwidth=1.0)
   
   # Store myself in the environment if needed
@@ -532,6 +534,7 @@ tkigraph <- function() {
   filename <- paste(as.character(filename), collapse=" ")
   if (filename=="") { return() }
   g <- read.graph(file=filename, format="pajek")
+  color <- NULL # To eliminate a check NOTE
   if ("color" %in% list.vertex.attributes(g)) { V(g)[ color=="" ]$color <- "black" }
   if ("color" %in% list.edge.attributes(g)) { E(g)[ color=="" ]$color <- "black" }
   g <- set.graph.attribute(g, "name", "Imported Pajek fie")
@@ -1837,6 +1840,7 @@ tkigraph <- function() {
   tkinsert(txt, "end", paste("  Outer links:", comm$outer.links, "\n"))
 
   tkinsert(txt, "end", "\nThe community:\n")
+  .tkigraph.ttt <- NULL
   con <- textConnection(".tkigraph.ttt", open="w")
   cat(sort(comm$community), file=con, fill=TRUE, sep=", ")
   close(con)
@@ -2006,6 +2010,7 @@ tkigraph <- function() {
         stop("rownumbers argument must be TRUE, FALSE or have length nrow(dataframe)")
     oldwidth <- unlist(options("width"))
     options(width = 10000)
+    .tkigraph.ttt <- NULL
     conn <- textConnection(".tkigraph.ttt", open="w")
     sink(conn)
     options(max.print=10000000)
