@@ -14,7 +14,7 @@
 \section{Creating graphs}{
   There are many functions in igraph for creating graphs, both
   deterministic and stochastic; stochastic graph constructors are called
-  \sQuote{games} is igraph.
+  \sQuote{games} in igraph.
 
   To create small graphs with a given structure probably the
   \code{\link{graph.formula}} function is easiest. It uses R's formula
