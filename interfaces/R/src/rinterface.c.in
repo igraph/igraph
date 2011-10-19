@@ -4904,7 +4904,7 @@ SEXP R_igraph_read_graph_dimacs(SEXP pvfile, SEXP pdirected) {
   igraph_strvector_t problem;
   igraph_integer_t source, target;
   igraph_vector_t cap;
-  SEXP result;
+  SEXP result=R_NilValue;
   
 #if HAVE_FMEMOPEN == 1
   file=fmemopen(RAW(pvfile), GET_LENGTH(pvfile), "r");
