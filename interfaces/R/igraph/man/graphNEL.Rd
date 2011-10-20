@@ -1,4 +1,4 @@
-\name{igraph from/to graphNEL conversion}
+\name{conversion between igraph and graphNEL graphs}
 \alias{igraph.from.graphNEL}
 \alias{igraph.to.graphNEL}
 \concept{Conversion}
