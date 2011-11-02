@@ -131,6 +131,7 @@ HEADERS_PRIVATE = atlas-edges.h \
 		igraph_gml_tree.h \
 		walktrap_graph.h	walktrap_communities.h \
 		walktrap_heap.h \
+		infomap_Greedy.h infomap_Node.h infomap_Greedy.h infomap_FlowGraph.h \
 		igraph_math.h \
 		drl_layout.h drl_parse.h drl_graph.h \
 		drl_graph_3d.h		drl_layout_3d.h \
@@ -208,6 +209,7 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     igraph_set.c cliques.c revolver_cit.c revolver_grow.c\
 			     walktrap.cpp walktrap_heap.cpp \
 			     walktrap_graph.cpp walktrap_communities.cpp \
+			     infomap.cc infomap_Greedy.cc infomap_Node.cc infomap_FlowGraph.cc \
 			     spmatrix.c community.c fast_community.c \
 			     evolver_cit.c gml_tree.c \
 			     bliss_orbit.cc bliss_eqrefhash.cc \

@@ -209,6 +209,7 @@ PyObject* igraphmodule_Graph_independence_number(igraphmodule_GraphObject* self)
 
 PyObject* igraphmodule_Graph_community_edge_betweenness(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_community_fastgreedy(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
+PyObject *igraphmodule_Graph_community_infomap(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_community_label_propagation(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_community_leading_eigenvector(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_community_leading_eigenvector_naive(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);

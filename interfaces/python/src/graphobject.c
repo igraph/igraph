@@ -9753,6 +9753,72 @@ PyObject *igraphmodule_Graph_community_fastgreedy(igraphmodule_GraphObject * sel
 }
 
 /**
+ * Infomap community detection algorithm of Martin Rosvall and Carl T. Bergstrom,
+ */
+PyObject *igraphmodule_Graph_community_infomap(igraphmodule_GraphObject * self,
+  PyObject * args, PyObject * kwds)
+{
+  static char *kwlist[] = { "e_weights", "v_weights", "nb_trials", NULL };
+  PyObject *e_weights = Py_None, *v_weights = Py_None;
+  unsigned int nb_trials = 10;
+  igraph_vector_t *e_ws = NULL, *v_ws = NULL;
+  
+  igraph_vector_t membership;
+  PyObject *res = Py_False;
+  igraph_real_t codelength;
+  
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOI", kwlist, &e_weights, &v_weights, &nb_trials)) {
+    return NULL;
+  }
+
+  if (igraph_vector_init(&membership, igraph_vcount(&self->g))) {
+	igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraphmodule_attrib_to_vector_t(e_weights, self, &e_ws, ATTRIBUTE_TYPE_EDGE)){
+    return NULL;
+  }
+  
+  if (igraphmodule_attrib_to_vector_t(v_weights, self, &v_ws, ATTRIBUTE_TYPE_VERTEX)){
+    if (e_ws) {
+      igraph_vector_destroy(e_ws);
+      free(e_ws);
+    }
+    return NULL;
+  }
+  
+  if (igraph_community_infomap(/*in */ &self->g, 
+                                    /*e_weight=*/ e_ws, /*v_weight=*/ v_ws,
+                                    /*nb_trials=*/nb_trials,
+                              /*out*/ &membership, &codelength)) {
+	igraphmodule_handle_igraph_error();
+	igraph_vector_destroy(&membership);
+    return NULL;
+  }
+  
+  if (e_ws) {
+    igraph_vector_destroy(e_ws);
+    free(e_ws);
+  }
+  
+  if (v_ws) {
+    igraph_vector_destroy(v_ws);
+    free(v_ws);
+  }
+  
+  res = igraphmodule_vector_t_to_PyList(&membership, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&membership);
+  
+  if (!res)
+	return NULL;
+  
+  return Py_BuildValue("Nd", res, (double)codelength);
+}
+
+
+/**
  * The label propagation algorithm of Raghavan et al
  */
 PyObject *igraphmodule_Graph_community_label_propagation(
@@ -13268,6 +13334,30 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@ref: A. Clauset, M. E. J. Newman and C. Moore: I{Finding community\n"
    "  structure in very large networks.} Phys Rev E 70, 066111 (2004).\n"
    "@see: modularity()\n"
+  },
+  {"community_infomap",
+   (PyCFunction) igraphmodule_Graph_community_infomap,
+   METH_VARARGS | METH_KEYWORDS,
+   "community_infomap(e_weights=None, v_weights=None, nb_trials=10)\n\n"
+   "Finds the community structure of the network according to the Infomap\n"
+   "method of Martin Rosvall and Carl T. Bergstrom.\n\n"
+   " See :\n"
+   " [1] Visualization of the math and the map generator: http://www.mapequation.org\n"
+   " [2] The original paper: M. Rosvall and C. T. Bergstrom, Maps of\n"
+   " information flow reveal community structure in complex networks, PNAS\n"
+   " 105, 1118 (2008) [http://dx.doi.org/10.1073/pnas.0706851105 ,\n"
+   " http://arxiv.org/abs/0707.0609]\n"
+   " [3] A more detailed paper: M. Rosvall, D. Axelsson, and C. T. Bergstrom,\n"
+   " The map equation, Eur. Phys. J. Special Topics 178, 13 (2009).\n"
+   " [http://dx.doi.org/10.1140/epjst/e2010-01179-1 ,\n"
+   " http://arxiv.org/abs/0906.1405]\n\n"
+   "@param e_weights: name of an edge attribute or a list containing\n"
+   "  edge weights.\n"
+   "@param v_weights: name of an vertex attribute or a list containing\n"
+   "  vertex weights.\n"
+   "@param nb_trials: the number of attempts to partition the network.\n"
+   "@return: the calculated membership vector and the corresponding\n"
+   "  codelength in a tuple.\n"
   },
   {"community_label_propagation",
    (PyCFunction) igraphmodule_Graph_community_label_propagation,

@@ -101,6 +101,13 @@ int igraph_community_walktrap(const igraph_t *graph,
 			      igraph_vector_t *modularity, 
 			      igraph_vector_t *membership);
 
+int igraph_community_infomap(const igraph_t * graph,
+			     const igraph_vector_t *e_weights,
+			     const igraph_vector_t *v_weights,
+			     int nb_trials,
+			     igraph_vector_t *membership,
+			     igraph_real_t *codelength);
+
 int igraph_community_edge_betweenness(const igraph_t *graph, 
 				      igraph_vector_t *result,
 				      igraph_vector_t *edge_betweenness,

@@ -1173,6 +1173,14 @@ igraph_hrg_create:
         DEPS: prob ON graph
         CLASS-R: igraphHRG
 
+igraph_community_infomap:
+        PARAMS: GRAPH graph, EDGEWEIGHTS e_weights=NULL, \
+                VERTEXWEIGHTS v_weights=NULL, INT nb_trials=10, \
+                OUT VECTOR membership, OUT REALPTR codelength
+        NAME-R: infomap.community
+        DEPS: e_weights ON graph, v_weights ON graph
+        IGNORE: RR
+
 #######################################
 # Conversion
 #######################################

@@ -117,6 +117,16 @@ EDGEWEIGHTS:
                %I% <- NULL \
             }
 
+VERTEXWEIGHTS:
+    INCONV: if (is.null(%I%) && "weight" %in% list.vertex.attributes(%I1%)) { \
+               %I% <- V(%I1%)$weight \
+            } \
+            if (!is.null(%I%) && any(!is.na(%I%))) { \
+               %I% <- as.numeric(%I%) \
+            } else { \
+               %I% <- NULL \
+            }
+
 EDGECAPACITY:
     INCONV: if (is.null(%I%) && "capacity" %in% list.edge.attributes(%I1%)) { \
                %I% <- E(%I1%)$capacity \

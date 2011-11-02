@@ -70,6 +70,13 @@ print.communities <- function(x, ...) {
     cat("Modularity:", modularity(x), "\n")
     cat("Membership vector:\n")
     print(membership(x))
+  } else if (algorithm(x) == "infomap") {
+    cat("Number of communities:", max(membership(x)), "\n")
+    if (!is.null(x$modularity)) {
+      cat("Modularity:", modularity(x), "\n")
+    }
+    cat("Membership vector:\n")
+    print(membership(x))
   }
   invisible(x)
 }
@@ -130,6 +137,10 @@ crossing <- function(communities, graph) {
   m <- membership(communities)
   el <- get.edgelist(graph, names=FALSE)
   m[el[,1]] != m[el[,2]]
+}
+
+code.length <- function(communities) {
+  communities$codelength
 }
 
 is.hierarchical <- function(communities) {
@@ -556,6 +567,45 @@ optimal.community <- function(graph) {
   res$vcount <- vcount(graph)
   res$algorithm <- "optimal"
   res$membership <- res$membership + 1
+  class(res) <- "communities"
+  res
+}
+
+infomap.community <- function(graph, e.weights=NULL, v.weights=NULL,
+                              nb.trials=10, modularity=TRUE) {
+  
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (is.null(e.weights) && "weight" %in% list.edge.attributes(graph)) { 
+    e.weights <- E(graph)$weight 
+  } 
+  if (!is.null(e.weights) && any(!is.na(e.weights))) { 
+    e.weights <- as.numeric(e.weights) 
+  } else { 
+    e.weights <- NULL 
+  }
+  if (is.null(v.weights) && "weight" %in% list.vertex.attributes(graph)) { 
+    v.weights <- V(graph)$weight 
+  } 
+  if (!is.null(v.weights) && any(!is.na(v.weights))) { 
+    v.weights <- as.numeric(v.weights) 
+  } else { 
+    v.weights <- NULL 
+  }
+  nb.trials <- as.integer(nb.trials)
+  
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_community_infomap", graph, e.weights,
+               v.weights, nb.trials,
+               PACKAGE="igraph")
+
+  res$vcount <- vcount(graph)
+  res$algorithm <- "infomap"
+  res$membership <- res$membership + 1
+  if (modularity) {
+    res$modularity <- modularity(graph, res$membership, weights=e.weights)
+  }
   class(res) <- "communities"
   res
 }

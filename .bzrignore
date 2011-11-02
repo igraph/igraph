@@ -446,3 +446,4 @@ interfaces/R/igraph/tests/unfold.tree.Rout
 interfaces/R/igraph/tests/walktrap.community.Rout
 interfaces/R/igraph/tests/watts.strogatz.game.Rout
 interfaces/R/igraph/tests/startup.Rs
+examples/simple/igraph_community_infomap.c.xml
