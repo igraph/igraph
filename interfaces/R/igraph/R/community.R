@@ -160,6 +160,8 @@ as.dendrogram.communities <- function(object, hang=-1,
     }
     r
   }
+
+  storage.mode(object$merges) <- "integer"
   
   if (is.null(object$labels))
     object$labels <- 1:(nrow(object$merges)+1)
@@ -406,7 +408,7 @@ edge.betweenness.community <- function(graph, directed=TRUE,
   res$vcount <- vcount(graph)
   res$algorithm <- "edge betweenness"
   res$membership <- res$membership + 1
-  res$merged <- res$merges + 1
+  res$merges <- res$merges + 1
   class(res) <- "communities"
   res
 }
