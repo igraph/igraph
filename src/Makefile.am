@@ -98,7 +98,15 @@ if INTERNAL_ARPACK
   ARPACK_LIB = libarpack.la
 endif
 
-noinst_LTLIBRARIES = $(F2C_LIB) $(BLAS_LIB) $(LAPACK_LIB) $(ARPACK_LIB)
+include ../optional/glpk/glpk.inc
+
+if INTERNAL_GLPK
+  libglpk_la_SOURCES = 	$(GLPK)
+  libglpk_la_CFLAGS = -I../optional/glpk
+  GLPK_LIB = libglpk.la
+endif
+
+noinst_LTLIBRARIES = $(F2C_LIB) $(BLAS_LIB) $(LAPACK_LIB) $(ARPACK_LIB) $(GLPK_LIB)
 
 CS = cs/cs_add.c       cs/cs_happly.c    cs/cs_pvec.c         \
 	cs/cs_amd.c       cs/cs_house.c     cs/cs_qr.c        \
@@ -241,7 +249,7 @@ libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include $
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
 libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(F2C_LIB) $(BLAS_LIB) \
-				 $(LAPACK_LIB) $(ARPACK_LIB)
+				 $(LAPACK_LIB) $(ARPACK_LIB) $(GLPK_LIB)
 
 includedir = $(prefix)/include/igraph
 include_HEADERS = $(HEADERS_PUBLIC)

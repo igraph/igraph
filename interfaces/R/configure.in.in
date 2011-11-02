@@ -79,27 +79,10 @@ fi
 AC_SUBST(HAVE_GMP)
 AC_SUBST(GMP_LIBS)
 
+glpk_support=yes
+AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
 HAVE_GLPK=0
 GLPK_LIBS=""
-glpk_support=no
-AC_ARG_ENABLE(glpk, AC_HELP_STRING([--disable-glpk], [Compile without the GLPK library]))
-if test "x$enable_glpk" != "xno"; then
-  AC_CHECK_LIB([glpk], [glp_read_mps], [
-    AC_CHECK_HEADER([glpk.h], [
-      AC_EGREP_CPP(yes, [
-        #include <glpk.h>
-        #if GLP_MAJOR_VERSION > 4 || (GLP_MAJOR_VERSION == 4 && GLP_MINOR_VERSION >= 38)
-          yes
-        #endif
-      ], [ 
-      	HAVE_GLPK=1
-        AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
-        glpk_support=yes
-	GLPK_LIBS="-lglpk"
-      ])
-    ])
-  ])
-fi
 AC_SUBST(HAVE_GLPK)
 AC_SUBST(GLPK_LIBS)
 
