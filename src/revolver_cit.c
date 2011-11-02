@@ -1024,7 +1024,7 @@ int igraph_revolver_ade(const igraph_t *graph,
 					    maxdegree, agebins));
       }
       
-      /* error calculattion */
+      /* error calculation */
       if (logprob || lognull) {
 	IGRAPH_CHECK(igraph_revolver_error_ade(graph, kernel, &st,
 					      cats, nocats, maxdegree, 

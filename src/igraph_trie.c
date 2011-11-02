@@ -338,7 +338,7 @@ int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length,
   char *tmp=igraph_Calloc(length+1, char);
 
   if (tmp==0) {
-    IGRAPH_ERROR("canot get from trie", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("Cannot get from trie", IGRAPH_ENOMEM);
   }
   
   strncpy(tmp, key, length);

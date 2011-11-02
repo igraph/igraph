@@ -3035,7 +3035,7 @@ void igraph_cattribute_remove_g(igraph_t *graph, const char *name) {
     igraph_i_cattribute_free_rec(VECTOR(*gal)[j]);
     igraph_vector_ptr_remove(gal, j);
   } else {
-    IGRAPH_WARNING("Cannot remove non-existant graph attribute");
+    IGRAPH_WARNING("Cannot remove non-existent graph attribute");
   }  
 }
 
@@ -3060,7 +3060,7 @@ void igraph_cattribute_remove_v(igraph_t *graph, const char *name) {
     igraph_i_cattribute_free_rec(VECTOR(*val)[j]);
     igraph_vector_ptr_remove(val, j);
   } else {
-    IGRAPH_WARNING("Cannot remove non-existant graph attribute");
+    IGRAPH_WARNING("Cannot remove non-existent graph attribute");
   }  
 }
 
@@ -3085,7 +3085,7 @@ void igraph_cattribute_remove_e(igraph_t *graph, const char *name) {
     igraph_i_cattribute_free_rec(VECTOR(*eal)[j]);
     igraph_vector_ptr_remove(eal, j);
   } else {
-    IGRAPH_WARNING("Cannot remove non-existant graph attribute");
+    IGRAPH_WARNING("Cannot remove non-existent graph attribute");
   }  
 }
 

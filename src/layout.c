@@ -968,7 +968,7 @@ void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y) {
  * algorithm and program
  * (http://bioinformatics.icmb.utexas.edu/lgl/). But unlike LGL, this
  * version uses a Fruchterman-Reingold style simulated annealing
- * algorithm for placing the vertices. The speedup is achived by
+ * algorithm for placing the vertices. The speedup is achieved by
  * placing the vertices on a grid and calculating the repulsion only
  * for vertices which are closer to each other than a limit. 
  * 
@@ -986,7 +986,7 @@ void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y) {
  * \param coolexp The cooling exponent. A reasonable default value is
  *   1.5.
  * \param repulserad Determines the radius at which vertex-vertex 
- *   repulsion cancels out attraction of adjacenct vertices. A
+ *   repulsion cancels out attraction of adjacent vertices. A
  *   reasonable default value is \p area times the number of vertices.
  * \param cellsize The size of the grid cells, one side of the
  *   square. A reasonable default value is the fourth root of
@@ -1999,7 +1999,7 @@ int igraph_i_determine_electric_axal_forces(const igraph_matrix_t *pos,
 					    long int this_node) {
   
   // We know what the directed force is.  We now need to translate it
-  // into the appropriate x and y componenets.
+  // into the appropriate x and y components.
   // First, assume: 
   //                 other_node
   //                    /|
@@ -2201,7 +2201,7 @@ int igraph_i_move_nodes(igraph_matrix_t *pos,
  * This is a port of the graphopt layout algorithm by Michael Schmuhl.
  * graphopt version 0.4.1 was rewritten in C and the support for 
  * layers was removed (might be added later) and a code was a bit 
- * reorganized to avoid some unneccessary steps is the node charge (see below) 
+ * reorganized to avoid some unnecessary steps is the node charge (see below) 
  * is zero.
  * 
  * </para><para>
@@ -2304,7 +2304,7 @@ int igraph_layout_graphopt(const igraph_t *graph, igraph_matrix_t *res,
 	  // will only happen in extremely rare circumstances, and when
 	  // it does, springs will probably pull them apart anyway.
 	  // also, if we are more than 50 away, the electric force 
-	  // will be negligable.  
+	  // will be negligible.  
 	  // ***** may not always be desirable ****
 	  if ((distance != 0.0) && (distance < 500.0)) {
 	    //	  if (distance != 0.0) {

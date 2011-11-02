@@ -35,7 +35,7 @@
  * <para>Sometimes it is easier to work with a graph which is in
  * adjacency list format: a list of vectors; each vector contains the
  * neighbor vertices or incident edges of a given vertex. Typically,
- * this representation is good if we need to iterate over the neigbors
+ * this representation is good if we need to iterate over the neighbors
  * of all vertices many times. E.g. when finding the shortest paths
  * between every pairs of vertices or calculating closeness centrality
  * for all the vertices.</para>
@@ -515,7 +515,7 @@ void igraph_inclist_destroy(igraph_inclist_t *il) {
  *   (<code>IGRAPH_ALL</code>) are considered. It is ignored for
  *   undirected graphs.
  * \param simplify Constant, it gives whether to simplify the vectors
- *   in the adjacency list (<code>IGRAPH_SIMPLIFY</code>) ot not
+ *   in the adjacency list (<code>IGRAPH_SIMPLIFY</code>) or not
  *   (<code>IGRAPH_DONT_SIMPLIFY</code>).
  * \return Error code.
  * 

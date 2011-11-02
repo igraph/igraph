@@ -454,7 +454,7 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
 
 /**
  * \function igraph_eigenvector_centrality
- * Eigenvector centrality of the verices
+ * Eigenvector centrality of the vertices
  * 
  * Eigenvector centrality is a measure of the importance of a node in a
  * network. It assigns relative scores to all nodes in the network based

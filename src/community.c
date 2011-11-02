@@ -3012,7 +3012,7 @@ int igraph_i_compare_communities_rand(const igraph_vector_t *v1,
    *                               - sum (n(*,j) choose 2)
    *                               + 2 * sum (n(i,j) choose 2).
    *
-   * Since a+b+c+d = (n choose 2) and this goes in the denumerator, we can
+   * Since a+b+c+d = (n choose 2) and this goes in the denominator, we can
    * just as well start dividing each term in a+d by (n choose 2), which
    * yields:
    *

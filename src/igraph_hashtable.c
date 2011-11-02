@@ -45,7 +45,7 @@ void igraph_hashtable_destroy(igraph_hashtable_t *ht) {
   igraph_strvector_destroy(&ht->defaults);
 }
 
-/* Note: may leave the hashtable in an inconsistent state if a new
+/* Note: may leave the hash table in an inconsistent state if a new
    element is added, but this is not a big problem, since while the
    defaults, or the defaults plus the elements may contain more elements
    than the keys trie, but the data is always retrieved based on the trie

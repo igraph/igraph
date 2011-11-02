@@ -127,7 +127,7 @@ const igraph_vector_ptr_t *igraph_vector_ptr_view (const igraph_vector_ptr_t *v,
  * 
  * Time complexity: operating system dependent, the \quote time
  * \endquote required to deallocate O(n) bytes, n is the number of
- * elements allocated for the pointer vector (not neccessarily the
+ * elements allocated for the pointer vector (not necessarily the
  * number of elements in the vector).
  */
 
@@ -293,7 +293,7 @@ void igraph_vector_ptr_clear     (igraph_vector_ptr_t* v) {
 /**
  * \ingroup vectorptr
  * \function igraph_vector_ptr_push_back
- * \brief Appends an elements to the back of a pointer vector.
+ * \brief Appends an element to the back of a pointer vector.
  * 
  * \param v The pointer vector.
  * \param e The new element to include in the pointer vector.
@@ -474,7 +474,7 @@ void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to) {
  *
  * </para><para>
  * This function creates a pointer vector by copying another one. This
- * is shallow copy, only the pointers in the vector will be copyed.
+ * is shallow copy, only the pointers in the vector will be copied.
  *
  * </para><para>
  * It is potentially dangerous to copy a pointer vector with an associated

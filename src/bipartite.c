@@ -454,7 +454,7 @@ int igraph_full_bipartite(igraph_t *graph,
  * the graph is indeed bipartite with respect to the given \p types
  * vector. If there is an edge connecting two vertices of the same
  * kind, then an error is reported.
- * \param graph Pointer to an uninitlized graph object, the result is
+ * \param graph Pointer to an uninitialized graph object, the result is
  *   created here.
  * \param types Boolean vector giving the vertex types. The length of
  *   the vector defines the number of vertices in the graph.

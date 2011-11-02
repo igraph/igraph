@@ -29,8 +29,8 @@
  * Assortativity of a graph based on vertex categories
  * 
  * Assuming the vertices of the input graph belong to different
- * categories, this function calculates the assortativity coeffient of
- * the graph. The assortativity coeffient is between minus one and one
+ * categories, this function calculates the assortativity coefficient of
+ * the graph. The assortativity coefficient is between minus one and one
  * and it is one if all connections stay within categories, it is
  * minus one, if the network is perfectly disassortative. For a
  * randomly connected network it is (asymptotically) zero.
@@ -49,7 +49,7 @@
  *    graphs.
  * \return Error code.
  * 
- * Time complecity: O(|E|+t), |E| is the number of edges, t is the
+ * Time complexity: O(|E|+t), |E| is the number of edges, t is the
  * number of vertex types.
  * 
  * \sa \ref igraph_assortativity if the vertex types are defines by

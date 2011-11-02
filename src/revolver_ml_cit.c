@@ -163,7 +163,7 @@ igraph_real_t igraph_i_revolver_ml_D_f(const igraph_vector_t *par,
   return data->lastf;
 }
 
-/* This function gievs the gradient of the objective function at
+/* This function gives the gradient of the objective function at
    the supplied parameter vector. Called by the optimizer.
 */
 

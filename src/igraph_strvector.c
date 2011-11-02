@@ -38,7 +38,7 @@
  * The current implementation is very simple and not too efficient. It
  * works fine for not too many strings, e.g. the list of attribute
  * names is returned in a string vector by \ref
- * igraph_cattribute_list(). Do not expect great performace from this
+ * igraph_cattribute_list(). Do not expect great performance from this
  * type.</para>
  * 
  * <para>
@@ -323,7 +323,7 @@ int igraph_strvector_copy(igraph_strvector_t *to,
  * Concatenate two string vectors.
  * 
  * \param to The first string vector, the result is stored here.
- * \param from The second string vector, it is kep unchanged.
+ * \param from The second string vector, it is kept unchanged.
  * \return Error code.
  * 
  * Time complexity: O(n+l2), n is the number of strings in the new
@@ -443,7 +443,7 @@ int igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
       if (tmp != 0) {
 	v->data=tmp;
       }
-      IGRAPH_ERROR("canot resize string vector", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("Cannot resize string vector", IGRAPH_ENOMEM);
     }
   }
   v->len = newsize;

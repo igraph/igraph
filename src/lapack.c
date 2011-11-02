@@ -367,7 +367,7 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
 		 "between 1 and n", IGRAPH_EINVAL);
   }
   if (which==IGRAPH_LAPACK_DSYEV_SELECT && iu-il < 0) {
-    IGRAPH_ERROR("Invalied 'il' and/or 'iu' values", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid 'il' and/or 'iu' values", IGRAPH_EINVAL);
   }
 
   IGRAPH_CHECK(igraph_matrix_copy(&Acopy, A));
@@ -598,7 +598,7 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
  * Eigenvalues/vectors of nonsymmetric matrices, expert mode
  * 
  * This function calculates the eigenvalues and optionally the left
- * and/or right eigenvectors of a nonsymmetrix N-by-N real matrix.
+ * and/or right eigenvectors of a nonsymmetric N-by-N real matrix.
  * 
  * </para><para>
  * Optionally also, it computes a balancing transformation to improve   

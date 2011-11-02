@@ -158,7 +158,7 @@ extern char *igraph_i_ncol_errmsg;
  * \param instream Pointer to a stream, it should be readable.
  * \param predefnames Pointer to the symbolic names of the vertices in
  *        the file. If \c NULL is given here then vertex ids will be
- *        assigned to vertex names in the order of their appearence in
+ *        assigned to vertex names in the order of their appearance in
  *        the \c .ncol file. If it is not \c NULL and some unknown
  *        vertex names are found in the \c .ncol file then new vertex
  *        ids will be assigned to them. 
@@ -1367,7 +1367,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     snprintf(name, sizeof(name)/sizeof(char)-1, "%li", to);
     IGRAPH_CHECK(igraph_trie_get(&trie, name, &to));
     if (igraph_trie_size(&trie) != no_of_nodes) {
-      IGRAPH_ERROR("Unkown node id found at an edge", IGRAPH_PARSEERROR);
+      IGRAPH_ERROR("Unknown node id found at an edge", IGRAPH_PARSEERROR);
     }
     VECTOR(edges)[edgeptr++]=from;
     VECTOR(edges)[edgeptr++]=to;
@@ -2339,7 +2339,7 @@ int igraph_i_gml_convert_to_key(const char *orig, char **key) {
  * file as well, if they are numeric of string.
  * 
  * </para><para> As igraph is more forgiving about attribute names, it might 
- * be neccessary to simplify the them before writing to the GML file.
+ * be necessary to simplify the them before writing to the GML file.
  * This way we'll have a syntactically correct GML file. The following 
  * simple procedure is performed on each attribute name: first the alphanumeric 
  * characters are extracted, the others are ignored. Then if the first character

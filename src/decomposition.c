@@ -102,7 +102,7 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
     VECTOR(prev)[v]=v;
   }
   VECTOR(next)[no_of_nodes-1] = 0;
-  /* size is allready all zero */
+  /* size is already all zero */
 
   /***************/
   /* i:=n; j:=0; */
@@ -222,7 +222,7 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
  * chordless cycles have at most three nodes.
  *
  * If either \p alpha or \p alpha1 is given, then the other is
- * calculated by taking simply the inverse. If neighter are given,
+ * calculated by taking simply the inverse. If neither are given,
  * then \ref igraph_maximum_cardinality_search() is called to calculate
  * them.
  * \param graph The input graph, it might be directed, but edge

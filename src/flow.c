@@ -63,9 +63,9 @@
  * (15) edge connectivity, directed graph
  * (16) edge connectivity, undirected graph
  * (17) s-t vertex connectivity, directed graph
- * (18) s-t vertex connectivity, undireced graph
+ * (18) s-t vertex connectivity, undirected graph
  * (19) vertex connectivity, directed graph
- * (20) vertex connectivity, undireced graph
+ * (20) vertex connectivity, undirected graph
  * (21) s-t number of edge disjoint paths, directed graph
  * (22) s-t number of edge disjoint paths, undirected graph
  * (23) s-t number of vertex disjoint paths, directed graph
@@ -885,7 +885,7 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
  * target vertex. The maximum flow is the flow with the maximum
  * value. </para>
  * 
- * <para> According to a theorem by Ford and Furkelson 
+ * <para> According to a theorem by Ford and Fulkerson 
  * (L. R. Ford Jr. and D. R. Fulkerson. Maximal flow through a
  * network. Canadian J. Math., 8:399-404, 1956.) the maximum flow
  * between two vertices is the same as the 
@@ -985,7 +985,7 @@ int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *value,
  *        vertices in the first partition of the cut are stored
  *        here. This argument is ignored if it is a null pointer.
  * \param partition2 Pointer to a real vector, the vertex ids of the
- *        vertices in the second partinio of the cut are stored here.
+ *        vertices in the second partition of the cut are stored here.
  *        This argument is ignored if it is a null pointer.
  * \param source Integer, the id of the source vertex.
  * \param target Integer, the id of the target vertex.
@@ -996,7 +996,7 @@ int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *value,
  * 
  * \sa \ref igraph_maxflow().
  * 
- * Time complecity: see \ref igraph_maxflow().
+ * Time complexity: see \ref igraph_maxflow().
  */
 
 int igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
@@ -1054,7 +1054,7 @@ int igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
 /* } */
 
 /*
- * This is the Stoer-Wagner algorithm, it works for calcuating the
+ * This is the Stoer-Wagner algorithm, it works for calculating the
  * minimum cut for undirected graphs, for the whole graph. 
  * I.e. this is basically the edge-connectivity of the graph. 
  * It can also calculate the cut itself, not just the cut value.
@@ -1219,7 +1219,7 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
     char *mark;
     mark=igraph_Calloc(no_of_nodes, char);
     if (!mark) { 
-      IGRAPH_ERROR("Not enough memory for minumum cut", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("Not enough memory for minimum cut", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, mark);
     
@@ -1401,7 +1401,7 @@ int igraph_i_mincut_directed(const igraph_t *graph,
  * This function calculates the minimum cut in a graph. 
  * The minimum cut is the minimum set of edges which needs to be
  * removed to disconnect the graph. The minimum is calculated using
- * the weigths (\p capacity) of the edges, so the cut with the minimum
+ * the weights (\p capacity) of the edges, so the cut with the minimum
  * total capacity is calculated. 
  * 
  * </para><para> For directed graphs an implementation based on
@@ -1717,7 +1717,7 @@ int igraph_i_st_vertex_connectivity_undirected(const igraph_t *graph,
  *     \c IGRAPH_VCONN_NUMBER_OF_NODES, return the number of nodes.
  *     \c IGRAPH_VCONN_IGNORE, ignore the fact that the two vertices
  *        are connected and calculated the number of vertices needed
- *        to aliminate all paths except for the trivial (direct) paths
+ *        to eliminate all paths except for the trivial (direct) paths
  *        between \c source and \c vertex. TOOD: what about neighbors?
  * \return Error code.
  * 
@@ -1862,7 +1862,7 @@ int igraph_i_connectivity_checks(const igraph_t *graph,
  *    They were suggested by Peter McMahan, thanks Peter.
  * \return Error code.
  * 
- * Time complecity: O(|V|^5).
+ * Time complexity: O(|V|^5).
  * 
  * \sa \ref igraph_st_vertex_connectivity(), \ref igraph_maxflow_value(),
  * and \ref igraph_edge_connectivity(). 
@@ -1997,7 +1997,7 @@ int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
  * \param target The id of the target vertex.
  * \return Error code.
  * 
- * Time complecity: O(|V|^3), but see the discussion at \ref
+ * Time complexity: O(|V|^3), but see the discussion at \ref
  * igraph_maxflow_value().
  * 
  * \sa \ref igraph_vertex_disjoint_paths(), \ref

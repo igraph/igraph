@@ -108,7 +108,7 @@ int igraph_disjoint_union(igraph_t *res, const igraph_t *left,
  * \brief The disjint union of many graphs.
  *
  * </para><para>
- * First the vertices in the graphs will be relabed with new vertex
+ * First the vertices in the graphs will be relabeled with new vertex
  * ids to have pairwise disjoint vertex id sets and then the union of
  * the graphs is formed.
  * The number of vertices and edges in the result is the total number
@@ -544,7 +544,7 @@ void igraph_i_union_many_free(igraph_vector_ptr_t *v) {
  * 
  * </para><para> 
  * The result graph will contain as many vertices as the largest graph
- * among the agruments does, and an edge will be included in it if it
+ * among the arguments does, and an edge will be included in it if it
  * is part of at least one operand graph.
  * 
  * </para><para>
@@ -916,7 +916,7 @@ int igraph_complementer(igraph_t *res, const igraph_t *graph,
  * 
  * \param res Pointer to an uninitialized graph object, the result
  *        will be stored here.
- * \param g1 The firs operarand, a graph object.
+ * \param g1 The firs operand, a graph object.
  * \param g2 The second operand, another graph object.
  * \return Error code.
  * 

@@ -799,7 +799,7 @@ int igraph_i_largest_cliques_store(const igraph_vector_t* clique, void* data, ig
  * in the graph which contains more vertices. 
  * 
  * </para><para>
- * Note that this is not neccessarily the same as a maximal clique,
+ * Note that this is not necessarily the same as a maximal clique,
  * ie. the largest cliques are always maximal but a maximal clique is
  * not always largest.
  *

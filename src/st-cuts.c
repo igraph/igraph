@@ -865,7 +865,7 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
   return 0;
 }
 
-/* TODO: This is a temporary resursive version, without proper error
+/* TODO: This is a temporary recursive version, without proper error
    handling */
 
 int igraph_provan_shier_list(const igraph_t *graph,

@@ -665,7 +665,7 @@ unsigned int igraph_i_classedges_4u[] = { 2,3, 1,3, 0,3, 1,2, 0,2, 0,1 };
  * 
  * </para><para>
  * All graphs with a given number of vertices belong to a number of
- * isomorpism classes, with every graph in a given class being
+ * isomorphism classes, with every graph in a given class being
  * isomorphic to each other.
  * 
  * </para><para>
@@ -1016,7 +1016,7 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
  * matching large graphs, Proc. of the 3rd IAPR-TC-15 International
  * Workshop on Graph-based Representations, Italy, 2001.</para>
  * 
- * <para>For using it you need to define a calback function of type
+ * <para>For using it you need to define a callback function of type
  * \ref igraph_isohandler_t. This function will be called whenever VF2
  * finds an isomorphism between the two graphs. The mapping between
  * the two graphs will be also provided to this function. If the

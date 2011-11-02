@@ -91,7 +91,7 @@
  * \param rows The number of rows in the matrix.
  * \param cols The number of columns.
  * \param nzmax The maximum number of non-zero elements in the
- *    matrix. It is not compulsary to get this right, but it is
+ *    matrix. It is not compulsory to get this right, but it is
  *    useful for the allocation of the proper amount of memory.
  * \return Error code.
  * 
@@ -220,7 +220,7 @@ long int igraph_sparsemat_ncol(const igraph_sparsemat_t *A) {
 
 /**
  * \function igraph_sparsemat_type
- * Type of a sprase matrix (triplet or column-compressed)
+ * Type of a sparse matrix (triplet or column-compressed)
  * 
  * Gives whether a sparse matrix is stored in the triplet format or in
  * column-compressed format.
@@ -295,7 +295,7 @@ int igraph_sparsemat_permute(const igraph_sparsemat_t *A,
     IGRAPH_ERROR("Invalid row permutation length", IGRAPH_FAILURE);
   }
   if (ncol != igraph_vector_int_size(q)) {
-    IGRAPH_ERROR("Invalud column permutation length", IGRAPH_FAILURE);
+    IGRAPH_ERROR("Invalid column permutation length", IGRAPH_FAILURE);
   }
 
   /* We invert the permutation by hand */
@@ -669,7 +669,7 @@ int igraph_sparsemat_dropzeros(igraph_sparsemat_t *A) {
 int igraph_sparsemat_droptol(igraph_sparsemat_t *A, igraph_real_t tol) {
   
   if (!cs_droptol(A->cs, tol)) {
-    IGRAPH_ERROR("Cannor drop (almost) zeros from sparse matrix", 
+    IGRAPH_ERROR("Cannot drop (almost) zeros from sparse matrix", 
 		 IGRAPH_FAILURE);
   }
   
@@ -1319,7 +1319,7 @@ int igraph_i_sparsemat_arpack_solve(igraph_real_t *to,
 
 /**
  * \function igraph_sparsemat_arpack_rssolve
- * Eigenvalues and eigenvectors of a symmetrix sparse matrix via ARPACK
+ * Eigenvalues and eigenvectors of a symmetric sparse matrix via ARPACK
  * 
  * \param The input matrix, must be column-compressed.
  * \param options It is passed to \ref igraph_arpack_rssolve(). See
@@ -1642,7 +1642,7 @@ int igraph_sparsemat_luresol(const igraph_sparsemat_symbolic_t *dis,
  * 
  * Solves a linear system using a QR decomposition of its coefficient
  * matrix.
- * \param dis Symbolic analyis of the coefficient matrix, the result
+ * \param dis Symbolic analysis of the coefficient matrix, the result
  *    of \ref igraph_sparsemat_symbqr().
  * \param din The QR decomposition of the coefficient matrix, the
  *    result of \ref igraph_sparsemat_qr().
@@ -1968,7 +1968,7 @@ long int igraph_sparsemat_count_nonzero(igraph_sparsemat_t *A) {
  * \function igraph_sparsemat_count_nonzerotol
  * Count nonzero elements of a sparse matrix, ignoring elements close to zero
  * 
- * Count the number of matric entries that are closer to zero than \p
+ * Count the number of matrix entries that are closer to zero than \p
  * tol.
  * \param The input matrix, column-compressed.
  * \param Real scalar, the tolerance. 

@@ -411,7 +411,7 @@ int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
  *        \endclist
  * 
  * Time complexity: O(nd), n is the number of pairs in the given vector, d is
- * the (maximum) degree of the vertices in the grpah.
+ * the (maximum) degree of the vertices in the graph.
  *
  * \sa \ref igraph_similarity_jaccard() to calculate the Jaccard similarity
  *   between all pairs of a vertex set, or \ref igraph_similarity_dice() and
@@ -524,7 +524,7 @@ int igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
  *        \endclist
  * 
  * Time complexity: O(nd), n is the number of edges in the edge selector, d is
- * the (maximum) degree of the vertices in the grpah.
+ * the (maximum) degree of the vertices in the graph.
  *
  * \sa \ref igraph_similarity_jaccard() and \ref igraph_similarity_jaccard_pairs()
  *   to calculate the Jaccard similarity between all pairs of a vertex set or
@@ -669,7 +669,7 @@ int igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
  *        \endclist
  * 
  * Time complexity: O(nd), n is the number of pairs in the given vector, d is
- * the (maximum) degree of the vertices in the grpah.
+ * the (maximum) degree of the vertices in the graph.
  *
  * \sa \ref igraph_similarity_dice() to calculate the Dice similarity
  *   between all pairs of a vertex set, or \ref igraph_similarity_jaccard(),
@@ -733,7 +733,7 @@ int igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector_t *res,
  *        \endclist
  * 
  * Time complexity: O(nd), n is the number of pairs in the given vector, d is
- * the (maximum) degree of the vertices in the grpah.
+ * the (maximum) degree of the vertices in the graph.
  *
  * \sa \ref igraph_similarity_dice() and \ref igraph_similarity_dice_pairs()
  *   to calculate the Dice similarity between all pairs of a vertex set or
