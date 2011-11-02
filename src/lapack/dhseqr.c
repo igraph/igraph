@@ -35,13 +35,13 @@ static integer c__49 = 49;
        Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
 
     /* Local variables */
-    static integer i__;
-    static doublereal hl[2401]	/* was [49][49] */;
-    static integer kbot, nmin;
+    integer i__;
+    doublereal hl[2401]	/* was [49][49] */;
+    integer kbot, nmin;
     extern logical igraphlsame_(char *, char *);
-    static logical initz;
-    static doublereal workl[49];
-    static logical wantt, wantz;
+    logical initz;
+    doublereal workl[49];
+    logical wantt, wantz;
     extern /* Subroutine */ int igraphdlaqr0_(logical *, logical *, integer *, 
 	    integer *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *, integer *, doublereal *, integer *, 
@@ -55,7 +55,7 @@ static integer c__49 = 49;
     extern integer igraphilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
-    static logical lquery;
+    logical lquery;
 
 
 /*  -- LAPACK computational routine (version 3.2.2) --   

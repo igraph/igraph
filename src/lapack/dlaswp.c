@@ -19,8 +19,8 @@
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4;
 
     /* Local variables */
-    static integer i__, j, k, i1, i2, n32, ip, ix, ix0, inc;
-    static doublereal temp;
+    integer i__, j, k, i1, i2, n32, ip, ix, ix0, inc;
+    doublereal temp;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) --   

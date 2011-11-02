@@ -32,7 +32,7 @@ static integer c_n1 = -1;
 	    doublereal *, integer *), igraphxerbla_(
 	    char *, integer *, ftnlen), igraphdlaswp_(integer *, doublereal *, 
 	    integer *, integer *, integer *, integer *, integer *);
-    static logical notran;
+    logical notran;
 
 
 /*  -- LAPACK routine (version 3.3.1) --   

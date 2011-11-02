@@ -31,21 +31,21 @@
     static doublereal equiv_0[4], equiv_1[4];
 
     /* Local variables */
-    static integer j;
+    integer j;
 #define ci (equiv_0)
 #define cr (equiv_1)
-    static doublereal bi1, bi2, br1, br2, xi1, xi2, xr1, xr2, ci21, ci22, 
-	    cr21, cr22, li21, csi, ui11, lr21, ui12, ui22;
+    doublereal bi1, bi2, br1, br2, xi1, xi2, xr1, xr2, ci21, ci22, cr21, cr22,
+	     li21, csi, ui11, lr21, ui12, ui22;
 #define civ (equiv_0)
-    static doublereal csr, ur11, ur12, ur22;
+    doublereal csr, ur11, ur12, ur22;
 #define crv (equiv_1)
-    static doublereal bbnd, cmax, ui11r, ui12s, temp, ur11r, ur12s, u22abs;
-    static integer icmax;
-    static doublereal bnorm, cnorm, smini;
+    doublereal bbnd, cmax, ui11r, ui12s, temp, ur11r, ur12s, u22abs;
+    integer icmax;
+    doublereal bnorm, cnorm, smini;
     extern doublereal igraphdlamch_(char *);
     extern /* Subroutine */ int igraphdladiv_(doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *);
-    static doublereal bignum, smlnum;
+    doublereal bignum, smlnum;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) --   

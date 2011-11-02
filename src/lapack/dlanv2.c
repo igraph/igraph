@@ -27,8 +27,8 @@ static doublereal c_b4 = 1.;
     double d_sign(doublereal *, doublereal *), sqrt(doublereal);
 
     /* Local variables */
-    static doublereal p, z__, aa, bb, cc, dd, cs1, sn1, sab, sac, eps, tau, 
-	    temp, scale, bcmax, bcmis, sigma;
+    doublereal p, z__, aa, bb, cc, dd, cs1, sn1, sab, sac, eps, tau, temp, 
+	    scale, bcmax, bcmis, sigma;
     extern doublereal igraphdlapy2_(doublereal *, doublereal *), igraphdlamch_(char *);
 
 

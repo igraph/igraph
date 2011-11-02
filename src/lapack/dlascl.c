@@ -20,18 +20,18 @@
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4, i__5;
 
     /* Local variables */
-    static integer i__, j, k1, k2, k3, k4;
-    static doublereal mul, cto1;
-    static logical done;
-    static doublereal ctoc;
+    integer i__, j, k1, k2, k3, k4;
+    doublereal mul, cto1;
+    logical done;
+    doublereal ctoc;
     extern logical igraphlsame_(char *, char *);
-    static integer itype;
-    static doublereal cfrom1;
+    integer itype;
+    doublereal cfrom1;
     extern doublereal igraphdlamch_(char *);
-    static doublereal cfromc;
+    doublereal cfromc;
     extern logical igraphdisnan_(doublereal *);
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
-    static doublereal bignum, smlnum;
+    doublereal bignum, smlnum;
 
 
 /*  -- LAPACK auxiliary routine (version 3.3.0) --   

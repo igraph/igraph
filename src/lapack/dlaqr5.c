@@ -34,24 +34,24 @@ static integer c__2 = 2;
     doublereal d__1, d__2, d__3, d__4, d__5;
 
     /* Local variables */
-    static integer i__, j, k, m, i2, j2, i4, j4, k1;
-    static doublereal h11, h12, h21, h22;
-    static integer m22, ns, nu;
-    static doublereal vt[3], scl;
-    static integer kdu, kms;
-    static doublereal ulp;
-    static integer knz, kzs;
-    static doublereal tst1, tst2, beta;
-    static logical blk22, bmp22;
-    static integer mend, jcol, jlen, jbot, mbot;
-    static doublereal swap;
-    static integer jtop, jrow, mtop;
-    static doublereal alpha;
-    static logical accum;
+    integer i__, j, k, m, i2, j2, i4, j4, k1;
+    doublereal h11, h12, h21, h22;
+    integer m22, ns, nu;
+    doublereal vt[3], scl;
+    integer kdu, kms;
+    doublereal ulp;
+    integer knz, kzs;
+    doublereal tst1, tst2, beta;
+    logical blk22, bmp22;
+    integer mend, jcol, jlen, jbot, mbot;
+    doublereal swap;
+    integer jtop, jrow, mtop;
+    doublereal alpha;
+    logical accum;
     extern /* Subroutine */ int igraphdgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
-    static integer ndcol, incol, krcol, nbmps;
+    integer ndcol, incol, krcol, nbmps;
     extern /* Subroutine */ int igraphdtrmm_(char *, char *, char *, char *, 
 	    integer *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *, integer *), igraphdlaqr1_(
@@ -62,12 +62,12 @@ static integer c__2 = 2;
     extern /* Subroutine */ int igraphdlarfg_(integer *, doublereal *, doublereal *,
 	     integer *, doublereal *), igraphdlacpy_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *);
-    static doublereal safmin;
+    doublereal safmin;
     extern /* Subroutine */ int igraphdlaset_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, doublereal *, integer *);
-    static doublereal safmax, refsum;
-    static integer mstart;
-    static doublereal smlnum;
+    doublereal safmax, refsum;
+    integer mstart;
+    doublereal smlnum;
 
 
 /*  -- LAPACK auxiliary routine (version 3.3.0) --   

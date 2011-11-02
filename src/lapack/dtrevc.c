@@ -35,35 +35,35 @@ static logical c_true = TRUE_;
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer i__, j, k;
-    static doublereal x[4]	/* was [2][2] */;
-    static integer j1, j2, n2, ii, ki, ip, is;
-    static doublereal wi, wr, rec, ulp, beta, emax;
-    static logical pair;
+    integer i__, j, k;
+    doublereal x[4]	/* was [2][2] */;
+    integer j1, j2, n2, ii, ki, ip, is;
+    doublereal wi, wr, rec, ulp, beta, emax;
+    logical pair;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static logical allv;
-    static integer ierr;
-    static doublereal unfl, ovfl, smin;
-    static logical over;
-    static doublereal vmax;
-    static integer jnxt;
+    logical allv;
+    integer ierr;
+    doublereal unfl, ovfl, smin;
+    logical over;
+    doublereal vmax;
+    integer jnxt;
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
-    static doublereal scale;
+    doublereal scale;
     extern logical igraphlsame_(char *, char *);
     extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *);
-    static doublereal remax;
+    doublereal remax;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static logical leftv, bothv;
+    logical leftv, bothv;
     extern /* Subroutine */ int igraphdaxpy_(integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *);
-    static doublereal vcrit;
-    static logical somev;
-    static doublereal xnorm;
+    doublereal vcrit;
+    logical somev;
+    doublereal xnorm;
     extern /* Subroutine */ int igraphdlaln2_(logical *, integer *, integer *, 
 	    doublereal *, doublereal *, doublereal *, integer *, doublereal *,
 	     doublereal *, doublereal *, integer *, doublereal *, doublereal *
@@ -72,9 +72,9 @@ static logical c_true = TRUE_;
     extern doublereal igraphdlamch_(char *);
     extern integer igraphidamax_(integer *, doublereal *, integer *);
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
-    static doublereal bignum;
-    static logical rightv;
-    static doublereal smlnum;
+    doublereal bignum;
+    logical rightv;
+    doublereal smlnum;
 
 
 /*  -- LAPACK routine (version 3.3.1) --   

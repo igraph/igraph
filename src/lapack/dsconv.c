@@ -85,12 +85,12 @@ static doublereal c_b3 = .66666666666666663;
     double pow_dd(doublereal *, doublereal *);
 
     /* Local variables */
-    static integer i__;
-    static real t0, t1;
-    static doublereal eps23, temp;
+    integer i__;
+    real t0, t1;
+    doublereal eps23, temp;
     extern doublereal igraphdlamch_(char *);
     extern /* Subroutine */ int igraphsecond_(real *);
-    static real tsconv;
+    real tsconv;
 
 
 /*     %----------------------------------------------------%   

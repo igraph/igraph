@@ -20,14 +20,14 @@
     integer a_dim1, a_offset, b_dim1, b_offset, i__1, i__2, i__3;
 
     /* Local variables */
-    static integer i__, j, k, info;
-    static doublereal temp;
-    static logical lside;
+    integer i__, j, k, info;
+    doublereal temp;
+    logical lside;
     extern logical igraphlsame_(char *, char *);
-    static integer nrowa;
-    static logical upper;
+    integer nrowa;
+    logical upper;
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
-    static logical nounit;
+    logical nounit;
 
 
 /*  Purpose   

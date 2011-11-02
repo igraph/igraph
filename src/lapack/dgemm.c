@@ -22,12 +22,12 @@
 	    i__3;
 
     /* Local variables */
-    static integer i__, j, l, info;
-    static logical nota, notb;
-    static doublereal temp;
-    static integer ncola;
+    integer i__, j, l, info;
+    logical nota, notb;
+    doublereal temp;
+    integer ncola;
     extern logical igraphlsame_(char *, char *);
-    static integer nrowa, nrowb;
+    integer nrowa, nrowb;
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
 
 

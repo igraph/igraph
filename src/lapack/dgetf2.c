@@ -25,12 +25,12 @@ static doublereal c_b8 = -1.;
     doublereal d__1;
 
     /* Local variables */
-    static integer i__, j, jp;
+    integer i__, j, jp;
     extern /* Subroutine */ int igraphdger_(integer *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *), igraphdscal_(integer *, doublereal *, doublereal *, integer 
 	    *);
-    static doublereal sfmin;
+    doublereal sfmin;
     extern /* Subroutine */ int igraphdswap_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
     extern doublereal igraphdlamch_(char *);

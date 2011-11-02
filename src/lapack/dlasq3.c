@@ -27,11 +27,11 @@
     double sqrt(doublereal);
 
     /* Local variables */
-    static doublereal s, t;
-    static integer j4, nn;
-    static doublereal eps, tol;
-    static integer n0in, ipn4;
-    static doublereal tol2, temp;
+    doublereal s, t;
+    integer j4, nn;
+    doublereal eps, tol;
+    integer n0in, ipn4;
+    doublereal tol2, temp;
     extern /* Subroutine */ int igraphdlasq4_(integer *, integer *, doublereal *, 
 	    integer *, integer *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, integer *,

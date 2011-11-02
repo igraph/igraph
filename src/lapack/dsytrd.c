@@ -29,10 +29,10 @@ static doublereal c_b23 = 1.;
     integer a_dim1, a_offset, i__1, i__2, i__3;
 
     /* Local variables */
-    static integer i__, j, nb, kk, nx, iws;
+    integer i__, j, nb, kk, nx, iws;
     extern logical igraphlsame_(char *, char *);
-    static integer nbmin, iinfo;
-    static logical upper;
+    integer nbmin, iinfo;
+    logical upper;
     extern /* Subroutine */ int igraphdsytd2_(char *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, doublereal *, integer *), igraphdsyr2k_(char *, char *, integer *, integer *, doublereal 
 	    *, doublereal *, integer *, doublereal *, integer *, doublereal *,
@@ -42,8 +42,8 @@ static doublereal c_b23 = 1.;
 	    integer *, ftnlen);
     extern integer igraphilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);
-    static integer ldwork, lwkopt;
-    static logical lquery;
+    integer ldwork, lwkopt;
+    logical lquery;
 
 
 /*  -- LAPACK routine (version 3.3.1) --   

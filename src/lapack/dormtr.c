@@ -31,11 +31,11 @@ static integer c__2 = 2;
        Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
 
     /* Local variables */
-    static integer i1, i2, nb, mi, ni, nq, nw;
-    static logical left;
+    integer i1, i2, nb, mi, ni, nq, nw;
+    logical left;
     extern logical igraphlsame_(char *, char *);
-    static integer iinfo;
-    static logical upper;
+    integer iinfo;
+    logical upper;
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
     extern integer igraphilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);
@@ -45,8 +45,8 @@ static integer c__2 = 2;
 	    igraphdormqr_(char *, char *, integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *, integer *, integer *);
-    static integer lwkopt;
-    static logical lquery;
+    integer lwkopt;
+    logical lquery;
 
 
 /*  -- LAPACK routine (version 3.2) --   

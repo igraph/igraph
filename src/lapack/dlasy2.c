@@ -38,24 +38,24 @@ static integer c__0 = 0;
     doublereal d__1, d__2, d__3, d__4, d__5, d__6, d__7, d__8;
 
     /* Local variables */
-    static integer i__, j, k;
-    static doublereal x2[2], l21, u11, u12;
-    static integer ip, jp;
-    static doublereal u22, t16[16]	/* was [4][4] */, gam, bet, eps, sgn, 
-	    tmp[4], tau1, btmp[4], smin;
-    static integer ipiv;
-    static doublereal temp;
-    static integer jpiv[4];
-    static doublereal xmax;
-    static integer ipsv, jpsv;
-    static logical bswap;
+    integer i__, j, k;
+    doublereal x2[2], l21, u11, u12;
+    integer ip, jp;
+    doublereal u22, t16[16]	/* was [4][4] */, gam, bet, eps, sgn, tmp[4], 
+	    tau1, btmp[4], smin;
+    integer ipiv;
+    doublereal temp;
+    integer jpiv[4];
+    doublereal xmax;
+    integer ipsv, jpsv;
+    logical bswap;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), igraphdswap_(integer *, doublereal *, integer 
 	    *, doublereal *, integer *);
-    static logical xswap;
+    logical xswap;
     extern doublereal igraphdlamch_(char *);
     extern integer igraphidamax_(integer *, doublereal *, integer *);
-    static doublereal smlnum;
+    doublereal smlnum;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) --   

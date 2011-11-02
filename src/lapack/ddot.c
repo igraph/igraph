@@ -20,8 +20,8 @@ doublereal igraphddot_(integer *n, doublereal *dx, integer *incx, doublereal *dy
     doublereal ret_val;
 
     /* Local variables */
-    static integer i__, m, ix, iy, mp1;
-    static doublereal dtemp;
+    integer i__, m, ix, iy, mp1;
+    doublereal dtemp;
 
 
 /*  Purpose   

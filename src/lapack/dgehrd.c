@@ -30,15 +30,15 @@ static doublereal c_b26 = 1.;
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4;
 
     /* Local variables */
-    static integer i__, j;
-    static doublereal t[4160]	/* was [65][64] */;
-    static integer ib;
-    static doublereal ei;
-    static integer nb, nh, nx, iws;
+    integer i__, j;
+    doublereal t[4160]	/* was [65][64] */;
+    integer ib;
+    doublereal ei;
+    integer nb, nh, nx, iws;
     extern /* Subroutine */ int igraphdgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
-    static integer nbmin, iinfo;
+    integer nbmin, iinfo;
     extern /* Subroutine */ int igraphdtrmm_(char *, char *, char *, char *, 
 	    integer *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *, integer *), igraphdaxpy_(
@@ -52,8 +52,8 @@ static doublereal c_b26 = 1.;
 	    doublereal *, integer *, doublereal *, integer *), igraphxerbla_(char *, integer *, ftnlen);
     extern integer igraphilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);
-    static integer ldwork, lwkopt;
-    static logical lquery;
+    integer ldwork, lwkopt;
+    logical lquery;
 
 
 /*  -- LAPACK routine (version 3.3.1)                                  --   

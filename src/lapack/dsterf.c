@@ -29,34 +29,34 @@ static doublereal c_b33 = 1.;
     double sqrt(doublereal), d_sign(doublereal *, doublereal *);
 
     /* Local variables */
-    static doublereal c__;
-    static integer i__, l, m;
-    static doublereal p, r__, s;
-    static integer l1;
-    static doublereal bb, rt1, rt2, eps, rte;
-    static integer lsv;
-    static doublereal eps2, oldc;
-    static integer lend;
-    static doublereal rmax;
-    static integer jtot;
+    doublereal c__;
+    integer i__, l, m;
+    doublereal p, r__, s;
+    integer l1;
+    doublereal bb, rt1, rt2, eps, rte;
+    integer lsv;
+    doublereal eps2, oldc;
+    integer lend;
+    doublereal rmax;
+    integer jtot;
     extern /* Subroutine */ int igraphdlae2_(doublereal *, doublereal *, doublereal 
 	    *, doublereal *, doublereal *);
-    static doublereal gamma, alpha, sigma, anorm;
+    doublereal gamma, alpha, sigma, anorm;
     extern doublereal igraphdlapy2_(doublereal *, doublereal *), igraphdlamch_(char *);
-    static integer iscale;
+    integer iscale;
     extern /* Subroutine */ int igraphdlascl_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
 	    integer *, integer *);
-    static doublereal oldgam, safmin;
+    doublereal oldgam, safmin;
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
-    static doublereal safmax;
+    doublereal safmax;
     extern doublereal igraphdlanst_(char *, integer *, doublereal *, doublereal *);
     extern /* Subroutine */ int igraphdlasrt_(char *, integer *, doublereal *, 
 	    integer *);
-    static integer lendsv;
-    static doublereal ssfmin;
-    static integer nmaxit;
-    static doublereal ssfmax;
+    integer lendsv;
+    doublereal ssfmin;
+    integer nmaxit;
+    doublereal ssfmax;
 
 
 /*  -- LAPACK routine (version 3.3.1) --   

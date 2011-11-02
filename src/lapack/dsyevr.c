@@ -35,40 +35,40 @@ static integer c_n1 = -1;
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer i__, j, nb, jj;
-    static doublereal eps, vll, vuu, tmp1;
-    static integer indd, inde;
-    static doublereal anrm;
-    static integer imax;
-    static doublereal rmin, rmax;
-    static integer inddd, indee;
+    integer i__, j, nb, jj;
+    doublereal eps, vll, vuu, tmp1;
+    integer indd, inde;
+    doublereal anrm;
+    integer imax;
+    doublereal rmin, rmax;
+    integer inddd, indee;
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
-    static doublereal sigma;
+    doublereal sigma;
     extern logical igraphlsame_(char *, char *);
-    static integer iinfo;
-    static char order[1];
-    static integer indwk;
+    integer iinfo;
+    char order[1];
+    integer indwk;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), igraphdswap_(integer *, doublereal *, integer 
 	    *, doublereal *, integer *);
-    static integer lwmin;
-    static logical lower, wantz;
+    integer lwmin;
+    logical lower, wantz;
     extern doublereal igraphdlamch_(char *);
-    static logical alleig, indeig;
-    static integer iscale, ieeeok, indibl, indifl;
-    static logical valeig;
-    static doublereal safmin;
+    logical alleig, indeig;
+    integer iscale, ieeeok, indibl, indifl;
+    logical valeig;
+    doublereal safmin;
     extern integer igraphilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
-    static doublereal abstll, bignum;
-    static integer indtau, indisp;
+    doublereal abstll, bignum;
+    integer indtau, indisp;
     extern /* Subroutine */ int igraphdstein_(integer *, doublereal *, doublereal *,
 	     integer *, doublereal *, integer *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, integer *, integer *), 
 	    igraphdsterf_(integer *, doublereal *, doublereal *, integer *);
-    static integer indiwo, indwkn;
+    integer indiwo, indwkn;
     extern doublereal igraphdlansy_(char *, char *, integer *, doublereal *, 
 	    integer *, doublereal *);
     extern /* Subroutine */ int igraphdstebz_(char *, char *, integer *, doublereal 
@@ -80,18 +80,18 @@ static integer c_n1 = -1;
 	    doublereal *, doublereal *, integer *, integer *, integer *, 
 	    logical *, doublereal *, integer *, integer *, integer *, integer 
 	    *);
-    static integer liwmin;
-    static logical tryrac;
+    integer liwmin;
+    logical tryrac;
     extern /* Subroutine */ int igraphdormtr_(char *, char *, char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *, integer *);
-    static integer llwrkn, llwork, nsplit;
-    static doublereal smlnum;
+    integer llwrkn, llwork, nsplit;
+    doublereal smlnum;
     extern /* Subroutine */ int igraphdsytrd_(char *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, doublereal *, doublereal *,
 	     integer *, integer *);
-    static integer lwkopt;
-    static logical lquery;
+    integer lwkopt;
+    logical lquery;
 
 
 /*  -- LAPACK driver routine (version 3.2.2) --   

@@ -34,20 +34,20 @@ static integer c__3 = 3;
     doublereal d__1, d__2, d__3, d__4;
 
     /* Local variables */
-    static integer i__, k;
-    static doublereal aa, bb, cc, dd;
-    static integer ld;
-    static doublereal cs;
-    static integer nh, it, ks, kt;
-    static doublereal sn;
-    static integer ku, kv, ls, ns;
-    static doublereal ss;
-    static integer nw, inf, kdu, nho, nve, kwh, nsr, nwr, kwv, ndec, ndfl, 
-	    kbot, nmin;
-    static doublereal swap;
-    static integer ktop;
-    static doublereal zdum[1]	/* was [1][1] */;
-    static integer kacc22, itmax, nsmax, nwmax, kwtop;
+    integer i__, k;
+    doublereal aa, bb, cc, dd;
+    integer ld;
+    doublereal cs;
+    integer nh, it, ks, kt;
+    doublereal sn;
+    integer ku, kv, ls, ns;
+    doublereal ss;
+    integer nw, inf, kdu, nho, nve, kwh, nsr, nwr, kwv, ndec, ndfl, kbot, 
+	    nmin;
+    doublereal swap;
+    integer ktop;
+    doublereal zdum[1]	/* was [1][1] */;
+    integer kacc22, itmax, nsmax, nwmax, kwtop;
     extern /* Subroutine */ int igraphdlanv2_(doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *), igraphdlaqr3_(
@@ -65,7 +65,7 @@ static integer c__3 = 3;
 	    integer *, doublereal *, integer *, doublereal *, integer *, 
 	    integer *, doublereal *, integer *, integer *, doublereal *, 
 	    integer *);
-    static integer nibble;
+    integer nibble;
     extern /* Subroutine */ int igraphdlahqr_(logical *, logical *, integer *, 
 	    integer *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *, integer *, doublereal *, integer *, 
@@ -73,10 +73,10 @@ static integer c__3 = 3;
 	    integer *, doublereal *, integer *);
     extern integer igraphilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);
-    static char jbcmpz[2];
-    static integer nwupbd;
-    static logical sorted;
-    static integer lwkopt;
+    char jbcmpz[2];
+    integer nwupbd;
+    logical sorted;
+    integer lwkopt;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) --   

@@ -19,7 +19,7 @@
     integer a_dim1, a_offset, i__1, i__2, i__3;
 
     /* Local variables */
-    static integer i__, j;
+    integer i__, j;
     extern logical igraphlsame_(char *, char *);
 
 

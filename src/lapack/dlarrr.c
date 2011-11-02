@@ -23,12 +23,12 @@
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer i__;
-    static doublereal eps, tmp, tmp2, rmin;
+    integer i__;
+    doublereal eps, tmp, tmp2, rmin;
     extern doublereal igraphdlamch_(char *);
-    static doublereal offdig, safmin;
-    static logical yesrel;
-    static doublereal smlnum, offdig2;
+    doublereal offdig, safmin;
+    logical yesrel;
+    doublereal smlnum, offdig2;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) --   

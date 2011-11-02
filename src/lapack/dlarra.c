@@ -24,8 +24,8 @@
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer i__;
-    static doublereal tmp1, eabs;
+    integer i__;
+    doublereal tmp1, eabs;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2.2) --   

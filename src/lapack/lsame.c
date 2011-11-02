@@ -18,7 +18,7 @@ logical igraphlsame_(char *ca, char *cb)
     logical ret_val;
 
     /* Local variables */
-    static integer inta, intb, zcode;
+    integer inta, intb, zcode;
 
 
 /*  -- LAPACK auxiliary routine (version 3.1) --   

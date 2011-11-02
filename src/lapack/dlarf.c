@@ -27,8 +27,8 @@ static integer c__1 = 1;
     doublereal d__1;
 
     /* Local variables */
-    static integer i__;
-    static logical applyleft;
+    integer i__;
+    logical applyleft;
     extern /* Subroutine */ int igraphdger_(integer *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
@@ -36,7 +36,7 @@ static integer c__1 = 1;
     extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *);
-    static integer lastc, lastv;
+    integer lastc, lastv;
     extern integer igraphiladlc_(integer *, integer *, doublereal *, integer *), 
 	    igraphiladlr_(integer *, integer *, doublereal *, integer *);
 

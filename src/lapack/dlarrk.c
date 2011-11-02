@@ -24,12 +24,12 @@
     double log(doublereal);
 
     /* Local variables */
-    static integer i__, it;
-    static doublereal mid, eps, tmp1, tmp2, left, atoli, right;
-    static integer itmax;
-    static doublereal rtoli, tnorm;
+    integer i__, it;
+    doublereal mid, eps, tmp1, tmp2, left, atoli, right;
+    integer itmax;
+    doublereal rtoli, tnorm;
     extern doublereal igraphdlamch_(char *);
-    static integer negcnt;
+    integer negcnt;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) --   

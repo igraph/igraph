@@ -30,25 +30,25 @@ static integer c__1 = 1;
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer i__;
-    static doublereal s, bestshift, smlgrowth, eps, tmp, max1, max2, rrr1, 
-	    rrr2, znm2, growthbound, fail, fact, oldp;
-    static integer indx;
-    static doublereal prod;
-    static integer ktry;
-    static doublereal fail2, avgap, ldmax, rdmax;
-    static integer shift;
+    integer i__;
+    doublereal s, bestshift, smlgrowth, eps, tmp, max1, max2, rrr1, rrr2, 
+	    znm2, growthbound, fail, fact, oldp;
+    integer indx;
+    doublereal prod;
+    integer ktry;
+    doublereal fail2, avgap, ldmax, rdmax;
+    integer shift;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static logical dorrr1;
+    logical dorrr1;
     extern doublereal igraphdlamch_(char *);
-    static doublereal ldelta;
-    static logical nofail;
-    static doublereal mingap, lsigma, rdelta;
+    doublereal ldelta;
+    logical nofail;
+    doublereal mingap, lsigma, rdelta;
     extern logical igraphdisnan_(doublereal *);
-    static logical forcer;
-    static doublereal rsigma, clwdth;
-    static logical sawnan1, sawnan2, tryrrr1;
+    logical forcer;
+    doublereal rsigma, clwdth;
+    logical sawnan1, sawnan2, tryrrr1;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2.2) --   

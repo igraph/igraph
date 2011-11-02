@@ -33,27 +33,27 @@ static logical c_false = FALSE_;
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer i__, j, k, n2;
-    static doublereal cs;
-    static integer nn, ks;
-    static doublereal sn, mu, eps, est;
-    static integer kase;
-    static doublereal cond;
+    integer i__, j, k, n2;
+    doublereal cs;
+    integer nn, ks;
+    doublereal sn, mu, eps, est;
+    integer kase;
+    doublereal cond;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static logical pair;
-    static integer ierr;
-    static doublereal dumm, prod;
-    static integer ifst;
-    static doublereal lnrm;
-    static integer ilst;
-    static doublereal rnrm;
+    logical pair;
+    integer ierr;
+    doublereal dumm, prod;
+    integer ifst;
+    doublereal lnrm;
+    integer ilst;
+    doublereal rnrm;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
-    static doublereal prod1, prod2, scale, delta;
+    doublereal prod1, prod2, scale, delta;
     extern logical igraphlsame_(char *, char *);
-    static integer isave[3];
-    static logical wants;
-    static doublereal dummy[1];
+    integer isave[3];
+    logical wants;
+    doublereal dummy[1];
     extern /* Subroutine */ int igraphdlacn2_(integer *, doublereal *, doublereal *,
 	     integer *, doublereal *, integer *, integer *);
     extern doublereal igraphdlapy2_(doublereal *, doublereal *);
@@ -62,16 +62,16 @@ static logical c_false = FALSE_;
     extern /* Subroutine */ int igraphdlacpy_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *), 
 	    igraphxerbla_(char *, integer *, ftnlen);
-    static doublereal bignum;
-    static logical wantbh;
+    doublereal bignum;
+    logical wantbh;
     extern /* Subroutine */ int igraphdlaqtr_(logical *, logical *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,
 	     doublereal *, doublereal *, integer *), igraphdtrexc_(char *, integer *
 	    , doublereal *, integer *, doublereal *, integer *, integer *, 
 	    integer *, doublereal *, integer *);
-    static logical somcon;
-    static doublereal smlnum;
-    static logical wantsp;
+    logical somcon;
+    doublereal smlnum;
+    logical wantsp;
 
 
 /*  -- LAPACK routine (version 3.3.1) --   

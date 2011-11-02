@@ -24,7 +24,7 @@ integer igraphiparmq_(integer *ispec, char *name__, char *opts, integer *n, inte
     integer i_nint(real *);
 
     /* Local variables */
-    static integer nh, ns;
+    integer nh, ns;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) --   

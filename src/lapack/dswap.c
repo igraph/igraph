@@ -19,8 +19,8 @@
     integer i__1;
 
     /* Local variables */
-    static integer i__, m, ix, iy, mp1;
-    static doublereal dtemp;
+    integer i__, m, ix, iy, mp1;
+    doublereal dtemp;
 
 
 /*  Purpose   

@@ -119,15 +119,15 @@ static integer c__1 = 1;
     integer s_cmp(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static real t0, t1;
-    static integer kevd2;
+    real t0, t1;
+    integer kevd2;
     extern /* Subroutine */ int igraphdswap_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), igraphdcopy_(integer *, doublereal *, integer 
 	    *, doublereal *, integer *), igraphdvout_(integer *, integer *, 
 	    doublereal *, integer *, char *, ftnlen), igraphivout_(integer *, 
 	    integer *, integer *, integer *, char *, ftnlen), igraphsecond_(real *);
-    static integer logfil, ndigit, msgets, msglvl;
-    static real tsgets;
+    integer logfil=0, ndigit, msgets=0, msglvl;
+    real tsgets;
     extern /* Subroutine */ int igraphdsortr_(char *, logical *, integer *, 
 	    doublereal *, doublereal *);
 

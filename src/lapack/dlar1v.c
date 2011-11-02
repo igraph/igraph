@@ -27,17 +27,17 @@
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer i__;
-    static doublereal s;
-    static integer r1, r2;
-    static doublereal eps, tmp;
-    static integer neg1, neg2, indp, inds;
-    static doublereal dplus;
+    integer i__;
+    doublereal s;
+    integer r1, r2;
+    doublereal eps, tmp;
+    integer neg1, neg2, indp, inds;
+    doublereal dplus;
     extern doublereal igraphdlamch_(char *);
     extern logical igraphdisnan_(doublereal *);
-    static integer indlpl, indumn;
-    static doublereal dminus;
-    static logical sawnan1, sawnan2;
+    integer indlpl, indumn;
+    doublereal dminus;
+    logical sawnan1, sawnan2;
 
 
 /*  -- LAPACK auxiliary routine (version 3.3.1) --   

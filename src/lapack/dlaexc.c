@@ -30,19 +30,19 @@ static integer c__3 = 3;
     doublereal d__1, d__2, d__3;
 
     /* Local variables */
-    static doublereal d__[16]	/* was [4][4] */;
-    static integer k;
-    static doublereal u[3], x[4]	/* was [2][2] */;
-    static integer j2, j3, j4;
-    static doublereal u1[3], u2[3];
-    static integer nd;
-    static doublereal cs, t11, t22, t33, sn, wi1, wi2, wr1, wr2, eps, tau, 
-	    tau1, tau2;
-    static integer ierr;
-    static doublereal temp;
+    doublereal d__[16]	/* was [4][4] */;
+    integer k;
+    doublereal u[3], x[4]	/* was [2][2] */;
+    integer j2, j3, j4;
+    doublereal u1[3], u2[3];
+    integer nd;
+    doublereal cs, t11, t22, t33, sn, wi1, wi2, wr1, wr2, eps, tau, tau1, 
+	    tau2;
+    integer ierr;
+    doublereal temp;
     extern /* Subroutine */ int igraphdrot_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *);
-    static doublereal scale, dnorm, xnorm;
+    doublereal scale, dnorm, xnorm;
     extern /* Subroutine */ int igraphdlanv2_(doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *), igraphdlasy2_(
@@ -57,7 +57,7 @@ static integer c__3 = 3;
 	    igraphdlartg_(doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *), igraphdlarfx_(char *, integer *, integer *, doublereal *,
 	     doublereal *, doublereal *, integer *, doublereal *);
-    static doublereal thresh, smlnum;
+    doublereal thresh, smlnum;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2.2) --   

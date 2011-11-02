@@ -19,11 +19,11 @@
     integer a_dim1, a_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i__, j, ix, jx, kx, info;
-    static doublereal temp;
+    integer i__, j, ix, jx, kx, info;
+    doublereal temp;
     extern logical igraphlsame_(char *, char *);
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
-    static logical nounit;
+    logical nounit;
 
 
 /*  Purpose   

@@ -24,15 +24,15 @@ static integer c__1 = 1;
     integer a_dim1, a_offset, c_dim1, c_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i__, i1, i2, i3, ic, jc, mi, ni, nq;
-    static doublereal aii;
-    static logical left;
+    integer i__, i1, i2, i3, ic, jc, mi, ni, nq;
+    doublereal aii;
+    logical left;
     extern /* Subroutine */ int igraphdlarf_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *);
     extern logical igraphlsame_(char *, char *);
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
-    static logical notran;
+    logical notran;
 
 
 /*  -- LAPACK routine (version 3.3.1) --   

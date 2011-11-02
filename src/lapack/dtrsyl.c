@@ -31,20 +31,19 @@ static logical c_true = TRUE_;
     doublereal d__1, d__2;
 
     /* Local variables */
-    static integer j, k, l;
-    static doublereal x[4]	/* was [2][2] */;
-    static integer k1, k2, l1, l2;
-    static doublereal a11, db, da11, vec[4]	/* was [2][2] */, dum[1], eps,
-	     sgn;
+    integer j, k, l;
+    doublereal x[4]	/* was [2][2] */;
+    integer k1, k2, l1, l2;
+    doublereal a11, db, da11, vec[4]	/* was [2][2] */, dum[1], eps, sgn;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static integer ierr;
-    static doublereal smin, suml, sumr;
+    integer ierr;
+    doublereal smin, suml, sumr;
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
     extern logical igraphlsame_(char *, char *);
-    static integer knext, lnext;
-    static doublereal xnorm;
+    integer knext, lnext;
+    doublereal xnorm;
     extern /* Subroutine */ int igraphdlaln2_(logical *, integer *, integer *, 
 	    doublereal *, doublereal *, doublereal *, integer *, doublereal *,
 	     doublereal *, doublereal *, integer *, doublereal *, doublereal *
@@ -55,11 +54,11 @@ static logical c_true = TRUE_;
 	    integer *), igraphdlabad_(doublereal *, doublereal *);
     extern doublereal igraphdlamch_(char *), igraphdlange_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *);
-    static doublereal scaloc;
+    doublereal scaloc;
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
-    static doublereal bignum;
-    static logical notrna, notrnb;
-    static doublereal smlnum;
+    doublereal bignum;
+    logical notrna, notrnb;
+    doublereal smlnum;
 
 
 /*  -- LAPACK routine (version 3.3.1) --   

@@ -334,46 +334,46 @@ static doublereal c_b71 = -1.;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer j, k, ih;
-    static doublereal vl[1]	/* was [1][1] */;
-    static integer ibd, ldh, ldq, iri;
-    static doublereal sep;
-    static integer irr, wri, wrr;
+    integer j, k, ih;
+    doublereal vl[1]	/* was [1][1] */;
+    integer ibd, ldh, ldq, iri;
+    doublereal sep;
+    integer irr, wri, wrr;
     extern /* Subroutine */ int igraphdger_(integer *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static integer mode;
-    static doublereal eps23;
-    static integer ierr;
-    static doublereal temp;
-    static integer iwev;
-    static char type__[6];
+    integer mode;
+    doublereal eps23;
+    integer ierr;
+    doublereal temp;
+    integer iwev;
+    char type__[6];
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
-    static doublereal temp1;
+    doublereal temp1;
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
-    static integer ihbds, iconj;
+    integer ihbds, iconj;
     extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *);
-    static doublereal conds;
-    static logical reord;
+    doublereal conds;
+    logical reord;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static integer nconv;
+    integer nconv;
     extern /* Subroutine */ int igraphdtrmm_(char *, char *, char *, char *, 
 	    integer *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static doublereal thres;
+    doublereal thres;
     extern /* Subroutine */ int igraphdmout_(integer *, integer *, integer *, 
 	    doublereal *, integer *, integer *, char *, ftnlen);
-    static integer iwork[1];
-    static doublereal rnorm;
-    static integer ritzi;
+    integer iwork[1];
+    doublereal rnorm;
+    integer ritzi;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen), igraphivout_(integer *, integer *, integer *
 	    , integer *, char *, ftnlen);
-    static integer ritzr;
+    integer ritzr;
     extern /* Subroutine */ int igraphdgeqr2_(integer *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
     extern doublereal igraphdlapy2_(doublereal *, doublereal *);
@@ -381,7 +381,7 @@ static doublereal c_b71 = -1.;
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *);
     extern doublereal igraphdlamch_(char *);
-    static integer iheigi, iheigr;
+    integer iheigi, iheigr;
     extern /* Subroutine */ int igraphdlahqr_(logical *, logical *, integer *, 
 	    integer *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *, integer *, doublereal *, integer *, 
@@ -389,16 +389,16 @@ static doublereal c_b71 = -1.;
 	    integer *, doublereal *, integer *), igraphdlaset_(char *, 
 	    integer *, integer *, doublereal *, doublereal *, doublereal *, 
 	    integer *);
-    static integer logfil, ndigit;
+    integer logfil=0, ndigit;
     extern /* Subroutine */ int igraphdtrevc_(char *, char *, logical *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *, integer *, integer *, doublereal *, integer *);
-    static integer mneupd, bounds;
+    integer mneupd=0, bounds;
     extern /* Subroutine */ int igraphdtrsen_(char *, char *, logical *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,
 	     integer *, integer *, integer *, integer *);
-    static integer msglvl, ktrord, invsub, iuptri, outncv;
+    integer msglvl, ktrord, invsub, iuptri, outncv;
 
 
 /*     %----------------------------------------------------%   

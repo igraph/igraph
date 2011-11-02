@@ -33,35 +33,35 @@ static integer c__2 = 2;
     double sqrt(doublereal), log(doublereal);
 
     /* Local variables */
-    static integer i__, j;
-    static doublereal s1, s2;
-    static integer mb;
-    static doublereal gl;
-    static integer in, mm;
-    static doublereal gu;
-    static integer cnt;
-    static doublereal eps, tau, tmp, rtl;
-    static integer cnt1, cnt2;
-    static doublereal tmp1, eabs;
-    static integer iend, jblk;
-    static doublereal eold;
-    static integer indl;
-    static doublereal dmax__, emax;
-    static integer wend, idum, indu;
-    static doublereal rtol;
-    static integer iseed[4];
-    static doublereal avgap, sigma;
+    integer i__, j;
+    doublereal s1, s2;
+    integer mb;
+    doublereal gl;
+    integer in, mm;
+    doublereal gu;
+    integer cnt;
+    doublereal eps, tau, tmp, rtl;
+    integer cnt1, cnt2;
+    doublereal tmp1, eabs;
+    integer iend, jblk;
+    doublereal eold;
+    integer indl;
+    doublereal dmax__, emax;
+    integer wend, idum, indu;
+    doublereal rtol;
+    integer iseed[4];
+    doublereal avgap, sigma;
     extern logical igraphlsame_(char *, char *);
-    static integer iinfo;
+    integer iinfo;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static logical norep;
+    logical norep;
     extern /* Subroutine */ int igraphdlasq2_(integer *, doublereal *, integer *);
     extern doublereal igraphdlamch_(char *);
-    static integer ibegin;
-    static logical forceb;
-    static integer irange;
-    static doublereal sgndef;
+    integer ibegin;
+    logical forceb;
+    integer irange;
+    doublereal sgndef;
     extern /* Subroutine */ int igraphdlarra_(integer *, doublereal *, doublereal *,
 	     doublereal *, doublereal *, doublereal *, integer *, integer *, 
 	    integer *), igraphdlarrb_(integer *, doublereal *, doublereal *, 
@@ -70,22 +70,22 @@ static integer c__2 = 2;
 	     doublereal *, doublereal *, integer *, integer *), igraphdlarrc_(char *
 	    , integer *, doublereal *, doublereal *, doublereal *, doublereal 
 	    *, doublereal *, integer *, integer *, integer *, integer *);
-    static integer wbegin;
+    integer wbegin;
     extern /* Subroutine */ int igraphdlarrd_(char *, char *, integer *, doublereal 
 	    *, doublereal *, integer *, integer *, doublereal *, doublereal *,
 	     doublereal *, doublereal *, doublereal *, doublereal *, integer *
 	    , integer *, integer *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, integer *, integer *, doublereal *, integer *, 
 	    integer *);
-    static doublereal safmin, spdiam;
+    doublereal safmin, spdiam;
     extern /* Subroutine */ int igraphdlarrk_(integer *, integer *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, integer *);
-    static logical usedqd;
-    static doublereal clwdth, isleft;
+    logical usedqd;
+    doublereal clwdth, isleft;
     extern /* Subroutine */ int igraphdlarnv_(integer *, integer *, integer *, 
 	    doublereal *);
-    static doublereal isrght, bsrtol, dpivot;
+    doublereal isrght, bsrtol, dpivot;
 
 
 /*  -- LAPACK auxiliary routine (version 3.3.1) --   

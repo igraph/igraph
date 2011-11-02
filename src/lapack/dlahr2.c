@@ -29,8 +29,8 @@ static doublereal c_b38 = 0.;
     doublereal d__1;
 
     /* Local variables */
-    static integer i__;
-    static doublereal ei;
+    integer i__;
+    doublereal ei;
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *), igraphdgemm_(char *, char *, integer *, integer *, integer *
 	    , doublereal *, doublereal *, integer *, doublereal *, integer *, 

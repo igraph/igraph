@@ -21,11 +21,11 @@
     doublereal d__1, d__2;
 
     /* Local variables */
-    static doublereal d__;
-    static integer j4, j4p2;
-    static doublereal emin, temp;
+    doublereal d__;
+    integer j4, j4p2;
+    doublereal emin, temp;
     extern doublereal igraphdlamch_(char *);
-    static doublereal safmin;
+    doublereal safmin;
 
 
 /*  -- LAPACK routine (version 3.2)                                    --   

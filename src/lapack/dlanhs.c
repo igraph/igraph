@@ -27,10 +27,10 @@ doublereal igraphdlanhs_(char *norm, integer *n, doublereal *a, integer *lda,
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer i__, j;
-    static doublereal sum, scale;
+    integer i__, j;
+    doublereal sum, scale;
     extern logical igraphlsame_(char *, char *);
-    static doublereal value;
+    doublereal value;
     extern /* Subroutine */ int igraphdlassq_(integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *);
 

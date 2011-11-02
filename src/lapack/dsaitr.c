@@ -240,24 +240,30 @@ static integer c__2 = 2;
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer i__, j;
-    static real t0, t1, t2, t3, t4, t5;
-    static integer jj, ipj, irj, nbx, ivj;
+    integer i__;
+    static integer j;
+    real t0, t1, t2, t3, t4, t5;
+    integer jj;
+    static integer ipj, irj;
+    integer nbx;
+    static integer ivj;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static integer ierr, iter, nopx, itry;
+    static integer ierr, iter;
+    integer nopx;
+    static integer itry;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
-    static doublereal temp1;
+    doublereal temp1;
     static logical orth1, orth2, step3, step4;
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *), igraphdgemv_(char *, integer *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *);
-    static integer infol;
+    integer infol;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static doublereal xtemp[2];
-    static real tmvbx;
+    doublereal xtemp[2];
+    real tmvbx;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen);
     static doublereal wnorm;
@@ -270,16 +276,17 @@ static integer c__2 = 2;
     extern /* Subroutine */ int igraphdlascl_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
 	    integer *, integer *), igraphsecond_(real *);
-    static integer logfil;
+    integer logfil=0;
     static doublereal safmin;
-    static integer ndigit, nitref;
-    static real titref;
-    static integer msaitr, msglvl;
-    static real tsaitr;
-    static integer nrorth;
+    integer ndigit, nitref;
+    real titref;
+    integer msaitr=0;
+    static integer msglvl;
+    real tsaitr;
+    integer nrorth;
     static logical rstart;
-    static integer nrstrt;
-    static real tmvopx;
+    integer nrstrt;
+    real tmvopx;
 
 
 /*     %----------------------------------------------------%   

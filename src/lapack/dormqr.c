@@ -33,12 +33,12 @@ static integer c__65 = 65;
        Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
 
     /* Local variables */
-    static integer i__;
-    static doublereal t[4160]	/* was [65][64] */;
-    static integer i1, i2, i3, ib, ic, jc, nb, mi, ni, nq, nw, iws;
-    static logical left;
+    integer i__;
+    doublereal t[4160]	/* was [65][64] */;
+    integer i1, i2, i3, ib, ic, jc, nb, mi, ni, nq, nw, iws;
+    logical left;
     extern logical igraphlsame_(char *, char *);
-    static integer nbmin, iinfo;
+    integer nbmin, iinfo;
     extern /* Subroutine */ int igraphdorm2r_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *), igraphdlarfb_(char 
@@ -48,9 +48,9 @@ static integer c__65 = 65;
 	    *, integer *, doublereal *, doublereal *, integer *), igraphxerbla_(char *, integer *, ftnlen);
     extern integer igraphilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);
-    static logical notran;
-    static integer ldwork, lwkopt;
-    static logical lquery;
+    logical notran;
+    integer ldwork, lwkopt;
+    logical lquery;
 
 
 /*  -- LAPACK routine (version 3.3.1) --   

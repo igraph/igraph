@@ -15,7 +15,7 @@
 /* Subroutine */ int igraphdladiv_(doublereal *a, doublereal *b, doublereal *c__, 
 	doublereal *d__, doublereal *p, doublereal *q)
 {
-    static doublereal e, f;
+    doublereal e, f;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) --   

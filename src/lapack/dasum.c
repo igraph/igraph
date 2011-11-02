@@ -19,9 +19,9 @@ doublereal igraphdasum_(integer *n, doublereal *dx, integer *incx)
     doublereal ret_val, d__1, d__2, d__3, d__4, d__5, d__6;
 
     /* Local variables */
-    static integer i__, m, mp1;
-    static doublereal dtemp;
-    static integer nincx;
+    integer i__, m, mp1;
+    doublereal dtemp;
+    integer nincx;
 
 
 /*  Purpose   

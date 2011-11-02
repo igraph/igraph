@@ -29,19 +29,18 @@ static integer c__1 = 1;
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer i__, j, k, l, m;
-    static doublereal s, v[3];
-    static integer i1, i2;
-    static doublereal t1, t2, t3, v2, v3, aa, ab, ba, bb, h11, h12, h21, h22, 
-	    cs;
-    static integer nh;
-    static doublereal sn;
-    static integer nr;
-    static doublereal tr;
-    static integer nz;
-    static doublereal det, h21s;
-    static integer its;
-    static doublereal ulp, sum, tst, rt1i, rt2i, rt1r, rt2r;
+    integer i__, j, k, l, m;
+    doublereal s, v[3];
+    integer i1, i2;
+    doublereal t1, t2, t3, v2, v3, aa, ab, ba, bb, h11, h12, h21, h22, cs;
+    integer nh;
+    doublereal sn;
+    integer nr;
+    doublereal tr;
+    integer nz;
+    doublereal det, h21s;
+    integer its;
+    doublereal ulp, sum, tst, rt1i, rt2i, rt1r, rt2r;
     extern /* Subroutine */ int igraphdrot_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *), igraphdcopy_(
 	    integer *, doublereal *, integer *, doublereal *, integer *), 
@@ -51,7 +50,7 @@ static integer c__1 = 1;
     extern doublereal igraphdlamch_(char *);
     extern /* Subroutine */ int igraphdlarfg_(integer *, doublereal *, doublereal *,
 	     integer *, doublereal *);
-    static doublereal safmin, safmax, rtdisc, smlnum;
+    doublereal safmin, safmax, rtdisc, smlnum;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) --   

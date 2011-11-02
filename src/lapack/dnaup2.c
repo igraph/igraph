@@ -237,7 +237,7 @@ static integer c__2 = 2;
 	    , logical *, integer *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *);
     extern doublereal igraphdlapy2_(doublereal *, doublereal *);
-    static integer mnaup2;
+    static integer mnaup2=0;
     static real tnaup2;
     extern doublereal igraphdlamch_(char *);
     extern /* Subroutine */ int igraphdneigh_(doublereal *, integer *, doublereal *,
@@ -245,7 +245,7 @@ static integer c__2 = 2;
 	    , integer *, doublereal *, integer *);
     static integer nevbef;
     extern /* Subroutine */ int igraphsecond_(real *);
-    static integer logfil, ndigit;
+    static integer logfil=0, ndigit;
     extern /* Subroutine */ int igraphdnaitr_(integer *, char *, integer *, integer 
 	    *, integer *, integer *, doublereal *, doublereal *, doublereal *,
 	     integer *, doublereal *, integer *, integer *, doublereal *, 

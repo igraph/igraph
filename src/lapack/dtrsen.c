@@ -30,17 +30,17 @@ static integer c_n1 = -1;
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer k, n1, n2, kk, nn, ks;
-    static doublereal est;
-    static integer kase;
-    static logical pair;
-    static integer ierr;
-    static logical swap;
-    static doublereal scale;
+    integer k, n1, n2, kk, nn, ks;
+    doublereal est;
+    integer kase;
+    logical pair;
+    integer ierr;
+    logical swap;
+    doublereal scale;
     extern logical igraphlsame_(char *, char *);
-    static integer isave[3], lwmin;
-    static logical wantq, wants;
-    static doublereal rnorm;
+    integer isave[3], lwmin;
+    logical wantq, wants;
+    doublereal rnorm;
     extern /* Subroutine */ int igraphdlacn2_(integer *, doublereal *, doublereal *,
 	     integer *, doublereal *, integer *, integer *);
     extern doublereal igraphdlange_(char *, integer *, integer *, doublereal *, 
@@ -48,12 +48,12 @@ static integer c_n1 = -1;
     extern /* Subroutine */ int igraphdlacpy_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *), 
 	    igraphxerbla_(char *, integer *, ftnlen);
-    static logical wantbh;
+    logical wantbh;
     extern /* Subroutine */ int igraphdtrexc_(char *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, integer *, integer *, 
 	    doublereal *, integer *);
-    static integer liwmin;
-    static logical wantsp, lquery;
+    integer liwmin;
+    logical wantsp, lquery;
     extern /* Subroutine */ int igraphdtrsyl_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *);

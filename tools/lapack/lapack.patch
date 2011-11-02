@@ -97,7 +97,7 @@ diff -ru lapack-3.3.1/INSTALL/dlamch.f lapack-3.3.1-new/INSTALL/dlamch.f
        EXTERNAL           LSAME
  *     ..
  *     .. Intrinsic Functions ..
--      EXTERNAL           DIGITS, EPSILON, HUGE, MAXEXPONENT,
+-      INTRINSIC          DIGITS, EPSILON, HUGE, MAXEXPONENT,
 -     $                   MINEXPONENT, RADIX, TINY
 +      EXTERNAL           DIGITSDBL, EPSILONDBL, HUGEDBL, MAXEXPONENTDBL,
 +     $                   MINEXPONENTDBL, RADIXDBL, TINYDBL

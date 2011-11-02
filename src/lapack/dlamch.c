@@ -22,15 +22,14 @@ doublereal igraphdlamch_(char *cmach)
     doublereal ret_val;
 
     /* Local variables */
-    static doublereal rnd, eps;
-    extern integer minexponentdbl_(doublereal *);
-    extern integer maxexponentdbl_(doublereal *);
-    extern doublereal hugedbl_(doublereal *), tinydbl_(doublereal *);
-    static doublereal rmach;
+    extern doublereal radixdbl_(doublereal *), digitsdbl_(doublereal *), 
+	    epsilondbl_(doublereal *);
+    doublereal rnd, eps, rmach;
     extern logical igraphlsame_(char *, char *);
-    extern doublereal radixdbl_(doublereal *);
-    static doublereal small, sfmin;
-    extern doublereal digitsdbl_(doublereal *), epsilondbl_(doublereal *);
+    doublereal small, sfmin;
+    extern integer minexponentdbl_(doublereal *), maxexponentdbl_(doublereal *
+	    );
+    extern doublereal hugedbl_(doublereal *), tinydbl_(doublereal *);
 
 
 /*  -- LAPACK auxiliary routine (version 3.3.0) --   

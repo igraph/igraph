@@ -27,7 +27,7 @@ static integer c__2 = 2;
     integer a_dim1, a_offset, i__1, i__2, i__3;
 
     /* Local variables */
-    static integer i__, j, l, ib, nb, ki, kk, nx, iws, nbmin, iinfo;
+    integer i__, j, l, ib, nb, ki, kk, nx, iws, nbmin, iinfo;
     extern /* Subroutine */ int igraphdorg2r_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *), 
 	    igraphdlarfb_(char *, char *, char *, char *, integer *, integer *, 
@@ -36,8 +36,8 @@ static integer c__2 = 2;
 	    doublereal *, integer *, doublereal *, doublereal *, integer *), igraphxerbla_(char *, integer *, ftnlen);
     extern integer igraphilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);
-    static integer ldwork, lwkopt;
-    static logical lquery;
+    integer ldwork, lwkopt;
+    logical lquery;
 
 
 /*  -- LAPACK routine (version 3.2) --   

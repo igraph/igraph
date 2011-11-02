@@ -23,14 +23,14 @@
     double d_sign(doublereal *, doublereal *);
 
     /* Local variables */
-    static integer j, knt;
-    static doublereal beta;
+    integer j, knt;
+    doublereal beta;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
-    static doublereal xnorm;
+    doublereal xnorm;
     extern doublereal igraphdlapy2_(doublereal *, doublereal *), igraphdlamch_(char *);
-    static doublereal safmin, rsafmn;
+    doublereal safmin, rsafmn;
 
 
 /*  -- LAPACK auxiliary routine (version 3.3.1) --   

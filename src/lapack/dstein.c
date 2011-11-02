@@ -31,24 +31,24 @@ static integer c_n1 = -1;
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer i__, j, b1, j1, bn;
-    static doublereal xj, scl, eps, sep, nrm, tol;
-    static integer its;
-    static doublereal xjm, ztr, eps1;
-    static integer jblk, nblk;
+    integer i__, j, b1, j1, bn;
+    doublereal xj, scl, eps, sep, nrm, tol;
+    integer its;
+    doublereal xjm, ztr, eps1;
+    integer jblk, nblk;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static integer jmax;
+    integer jmax;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
-    static integer iseed[4], gpind, iinfo;
+    integer iseed[4], gpind, iinfo;
     extern doublereal igraphdasum_(integer *, doublereal *, integer *);
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), igraphdaxpy_(integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *);
-    static doublereal ortol;
-    static integer indrv1, indrv2, indrv3, indrv4, indrv5;
+    doublereal ortol;
+    integer indrv1, indrv2, indrv3, indrv4, indrv5;
     extern doublereal igraphdlamch_(char *);
     extern /* Subroutine */ int igraphdlagtf_(integer *, doublereal *, doublereal *,
 	     doublereal *, doublereal *, doublereal *, doublereal *, integer *
@@ -57,11 +57,11 @@ static integer c_n1 = -1;
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen), igraphdlagts_(
 	    integer *, integer *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *);
-    static integer nrmchk;
+    integer nrmchk;
     extern /* Subroutine */ int igraphdlarnv_(integer *, integer *, integer *, 
 	    doublereal *);
-    static integer blksiz;
-    static doublereal onenrm, dtpcrt, pertol;
+    integer blksiz;
+    doublereal onenrm, dtpcrt, pertol;
 
 
 /*  -- LAPACK routine (version 3.2) --   

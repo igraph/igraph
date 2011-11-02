@@ -22,7 +22,7 @@
     double sqrt(doublereal);
 
     /* Local variables */
-    static doublereal ab, df, tb, sm, rt, adf, acmn, acmx;
+    doublereal ab, df, tb, sm, rt, adf, acmn, acmx;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) --   

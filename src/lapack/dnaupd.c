@@ -462,11 +462,16 @@ static integer c__1 = 1;
 	    void), do_fio(integer *, char *, ftnlen);
 
     /* Local variables */
-    static integer j;
-    static real t0, t1;
-    static integer nb, ih, iq, np, iw, ldh, ldq, nbx, nev0, mode, ierr, iupd, 
-	    next, nopx, levec;
-    static real trvec, tmvbx;
+    integer j;
+    real t0, t1;
+    static integer nb, ih, iq, np, iw, ldh, ldq;
+    integer nbx;
+    static integer nev0, mode;
+    integer ierr;
+    static integer iupd, next;
+    integer nopx;
+    static integer levec;
+    real trvec, tmvbx;
     static integer ritzi;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen), igraphivout_(integer *, integer *, integer *
@@ -478,19 +483,23 @@ static integer c__1 = 1;
 	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,
 	     doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static real tnaup2, tgetv0;
+    real tnaup2, tgetv0;
     extern doublereal igraphdlamch_(char *);
     extern /* Subroutine */ int igraphsecond_(real *);
-    static integer logfil, ndigit;
-    static real tneigh;
-    static integer mnaupd, ishift, nitref, bounds;
-    static real tnaupd;
+    integer logfil=0, ndigit;
+    real tneigh;
+    integer mnaupd=0;
+    static integer ishift;
+    integer nitref;
+    static integer bounds;
+    real tnaupd;
     extern /* Subroutine */ int igraphdstatn_(void);
-    static real titref, tnaitr;
+    real titref, tnaitr;
     static integer msglvl;
-    static real tngets, tnapps, tnconv;
-    static integer mxiter, nrorth, nrstrt;
-    static real tmvopx;
+    real tngets, tnapps, tnconv;
+    static integer mxiter;
+    integer nrorth, nrstrt;
+    real tmvopx;
 
     /* Fortran I/O blocks */
     static cilist io___30 = { 0, 6, 0, fmt_1000, 0 };

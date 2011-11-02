@@ -20,17 +20,17 @@
     integer v_dim1, v_offset, i__1;
 
     /* Local variables */
-    static integer i__, k;
-    static doublereal s;
-    static integer ii;
+    integer i__, k;
+    doublereal s;
+    integer ii;
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
     extern logical igraphlsame_(char *, char *);
     extern /* Subroutine */ int igraphdswap_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static logical leftv;
+    logical leftv;
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
-    static logical rightv;
+    logical rightv;
 
 
 /*  -- LAPACK routine (version 3.2) --   

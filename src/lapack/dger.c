@@ -20,8 +20,8 @@
     integer a_dim1, a_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i__, j, ix, jy, kx, info;
-    static doublereal temp;
+    integer i__, j, ix, jy, kx, info;
+    doublereal temp;
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
 
 

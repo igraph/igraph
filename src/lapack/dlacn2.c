@@ -29,14 +29,14 @@ static doublereal c_b11 = 1.;
     integer i_dnnt(doublereal *);
 
     /* Local variables */
-    static integer i__;
-    static doublereal temp;
+    integer i__;
+    doublereal temp;
     extern doublereal igraphdasum_(integer *, doublereal *, integer *);
-    static integer jlast;
+    integer jlast;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
     extern integer igraphidamax_(integer *, doublereal *, integer *);
-    static doublereal altsgn, estold;
+    doublereal altsgn, estold;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) --   

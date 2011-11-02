@@ -153,34 +153,34 @@ static doublereal c_b29 = -1.;
     double sqrt(doublereal);
 
     /* Local variables */
-    static real t0, t1, t2, t3;
-    static integer jj, nbx;
+    real t0, t1, t2, t3;
+    integer jj, nbx;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
     static integer iter;
     static logical orth;
-    static integer nopx;
+    integer nopx;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
     static integer iseed[4];
     extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *);
-    static integer idist;
+    integer idist;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
     static logical first;
-    static real tmvbx;
+    real tmvbx;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen);
-    static integer mgetv0;
-    static real tgetv0;
+    integer mgetv0=0;
+    real tgetv0;
     static doublereal rnorm0;
     extern /* Subroutine */ int igraphsecond_(real *);
-    static integer logfil, ndigit;
+    integer logfil=0, ndigit;
     extern /* Subroutine */ int igraphdlarnv_(integer *, integer *, integer *, 
 	    doublereal *);
     static integer msglvl;
-    static real tmvopx;
+    real tmvopx;
 
 
 /*     %----------------------------------------------------%   

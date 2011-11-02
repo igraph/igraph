@@ -35,76 +35,75 @@ static integer c__2 = 2;
     double log(doublereal);
 
     /* Local variables */
-    static integer minwsize, i__, j, k, p, q, miniwsize, ii;
-    static doublereal gl;
-    static integer im, in;
-    static doublereal gu, gap, eps, tau, tol, tmp;
-    static integer zto;
-    static doublereal ztz;
-    static integer iend, jblk;
-    static doublereal lgap;
-    static integer done;
-    static doublereal rgap, left;
-    static integer wend, iter;
-    static doublereal bstw;
-    static integer itmp1;
+    integer minwsize, i__, j, k, p, q, miniwsize, ii;
+    doublereal gl;
+    integer im, in;
+    doublereal gu, gap, eps, tau, tol, tmp;
+    integer zto;
+    doublereal ztz;
+    integer iend, jblk;
+    doublereal lgap;
+    integer done;
+    doublereal rgap, left;
+    integer wend, iter;
+    doublereal bstw;
+    integer itmp1;
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
-    static integer indld;
-    static doublereal fudge;
-    static integer idone;
-    static doublereal sigma;
-    static integer iinfo, iindr;
-    static doublereal resid;
-    static logical eskip;
-    static doublereal right;
+    integer indld;
+    doublereal fudge;
+    integer idone;
+    doublereal sigma;
+    integer iinfo, iindr;
+    doublereal resid;
+    logical eskip;
+    doublereal right;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static integer nclus, zfrom;
-    static doublereal rqtol;
-    static integer iindc1, iindc2;
+    integer nclus, zfrom;
+    doublereal rqtol;
+    integer iindc1, iindc2;
     extern /* Subroutine */ int igraphdlar1v_(integer *, integer *, integer *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, logical *,
 	     integer *, doublereal *, doublereal *, integer *, integer *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *);
-    static logical stp2ii;
-    static doublereal lambda;
+    logical stp2ii;
+    doublereal lambda;
     extern doublereal igraphdlamch_(char *);
-    static integer ibegin, indeig;
-    static logical needbs;
-    static integer indlld;
-    static doublereal sgndef, mingma;
+    integer ibegin, indeig;
+    logical needbs;
+    integer indlld;
+    doublereal sgndef, mingma;
     extern /* Subroutine */ int igraphdlarrb_(integer *, doublereal *, doublereal *,
 	     integer *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, integer *,
 	     doublereal *, doublereal *, integer *, integer *);
-    static integer oldien, oldncl, wbegin;
-    static doublereal spdiam;
-    static integer negcnt;
+    integer oldien, oldncl, wbegin;
+    doublereal spdiam;
+    integer negcnt;
     extern /* Subroutine */ int igraphdlarrf_(integer *, doublereal *, doublereal *,
 	     doublereal *, integer *, integer *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, integer *);
-    static integer oldcls;
-    static doublereal savgap;
-    static integer ndepth;
-    static doublereal ssigma;
+    integer oldcls;
+    doublereal savgap;
+    integer ndepth;
+    doublereal ssigma;
     extern /* Subroutine */ int igraphdlaset_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, doublereal *, integer *);
-    static logical usedbs;
-    static integer iindwk, offset;
-    static doublereal gaptol;
-    static integer newcls, oldfst, indwrk, windex, oldlst;
-    static logical usedrq;
-    static integer newfst, newftt, parity, windmn, windpl, isupmn, newlst, 
-	    zusedl;
-    static doublereal bstres;
-    static integer newsiz, zusedu, zusedw;
-    static doublereal nrminv, rqcorr;
-    static logical tryrqc;
-    static integer isupmx;
+    logical usedbs;
+    integer iindwk, offset;
+    doublereal gaptol;
+    integer newcls, oldfst, indwrk, windex, oldlst;
+    logical usedrq;
+    integer newfst, newftt, parity, windmn, windpl, isupmn, newlst, zusedl;
+    doublereal bstres;
+    integer newsiz, zusedu, zusedw;
+    doublereal nrminv, rqcorr;
+    logical tryrqc;
+    integer isupmx;
 
 
 /*  -- LAPACK auxiliary routine (version 3.3.1) --   

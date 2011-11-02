@@ -27,10 +27,10 @@ static doublereal c_b16 = 0.;
     integer a_dim1, a_offset, w_dim1, w_offset, i__1, i__2, i__3;
 
     /* Local variables */
-    static integer i__, iw;
+    integer i__, iw;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static doublereal alpha;
+    doublereal alpha;
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
     extern logical igraphlsame_(char *, char *);

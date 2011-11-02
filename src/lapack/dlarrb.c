@@ -26,15 +26,15 @@
     double log(doublereal);
 
     /* Local variables */
-    static integer i__, k, r__, i1, ii, ip;
-    static doublereal gap, mid, tmp, back, lgap, rgap, left;
-    static integer iter, nint, prev, next;
-    static doublereal cvrgd, right, width;
+    integer i__, k, r__, i1, ii, ip;
+    doublereal gap, mid, tmp, back, lgap, rgap, left;
+    integer iter, nint, prev, next;
+    doublereal cvrgd, right, width;
     extern integer igraphdlaneg_(integer *, doublereal *, doublereal *, doublereal *
 	    , doublereal *, integer *);
-    static integer negcnt;
-    static doublereal mnwdth;
-    static integer olnint, maxitr;
+    integer negcnt;
+    doublereal mnwdth;
+    integer olnint, maxitr;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) --   

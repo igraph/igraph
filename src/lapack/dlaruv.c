@@ -60,7 +60,7 @@
     integer i__1;
 
     /* Local variables */
-    static integer i__, i1, i2, i3, i4, it1, it2, it3, it4;
+    integer i__, i1, i2, i3, i4, it1, it2, it3, it4;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) --   

@@ -23,9 +23,9 @@ static integer c__1 = 1;
     integer c_dim1, c_offset, i__1;
 
     /* Local variables */
-    static integer j;
-    static doublereal t1, t2, t3, t4, t5, t6, t7, t8, t9, v1, v2, v3, v4, v5, 
-	    v6, v7, v8, v9, t10, v10, sum;
+    integer j;
+    doublereal t1, t2, t3, t4, t5, t6, t7, t8, t9, v1, v2, v3, v4, v5, v6, v7,
+	     v8, v9, t10, v10, sum;
     extern /* Subroutine */ int igraphdlarf_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *);

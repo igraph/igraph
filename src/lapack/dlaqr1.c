@@ -21,7 +21,7 @@
     doublereal d__1, d__2, d__3;
 
     /* Local variables */
-    static doublereal s, h21s, h31s;
+    doublereal s, h21s, h31s;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) --   

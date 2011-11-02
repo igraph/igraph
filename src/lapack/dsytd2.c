@@ -25,18 +25,18 @@ static doublereal c_b14 = -1.;
     integer a_dim1, a_offset, i__1, i__2, i__3;
 
     /* Local variables */
-    static integer i__;
+    integer i__;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static doublereal taui;
+    doublereal taui;
     extern /* Subroutine */ int igraphdsyr2_(char *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static doublereal alpha;
+    doublereal alpha;
     extern logical igraphlsame_(char *, char *);
     extern /* Subroutine */ int igraphdaxpy_(integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *);
-    static logical upper;
+    logical upper;
     extern /* Subroutine */ int igraphdsymv_(char *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *), igraphdlarfg_(integer *, doublereal *,

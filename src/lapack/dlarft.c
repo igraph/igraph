@@ -26,13 +26,13 @@ static doublereal c_b10 = 0.;
     doublereal d__1;
 
     /* Local variables */
-    static integer i__, j, prevlastv;
-    static doublereal vii;
+    integer i__, j, prevlastv;
+    doublereal vii;
     extern logical igraphlsame_(char *, char *);
     extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *);
-    static integer lastv;
+    integer lastv;
     extern /* Subroutine */ int igraphdtrmv_(char *, char *, char *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *);
 

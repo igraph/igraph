@@ -23,12 +23,12 @@
     double log(doublereal), pow_di(doublereal *, integer *), sqrt(doublereal);
 
     /* Local variables */
-    static integer i__;
-    static doublereal f1, g1, eps, scale;
-    static integer count;
-    static doublereal safmn2, safmx2;
+    integer i__;
+    doublereal f1, g1, eps, scale;
+    integer count;
+    doublereal safmn2, safmx2;
     extern doublereal igraphdlamch_(char *);
-    static doublereal safmin;
+    doublereal safmin;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) --   

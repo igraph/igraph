@@ -25,9 +25,9 @@
     double sqrt(doublereal);
 
     /* Local variables */
-    static doublereal s, a2, b1, b2;
-    static integer i4, nn, np;
-    static doublereal gam, gap1, gap2;
+    doublereal s, a2, b1, b2;
+    integer i4, nn, np;
+    doublereal gam, gap1, gap2;
 
 
 /*  -- LAPACK routine (version 3.3.1)                                    --   

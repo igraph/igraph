@@ -18,8 +18,7 @@ integer igraphieeeck_(integer *ispec, real *zero, real *one)
     integer ret_val;
 
     /* Local variables */
-    static real nan1, nan2, nan3, nan4, nan5, nan6, neginf, posinf, negzro, 
-	    newzro;
+    real nan1, nan2, nan3, nan4, nan5, nan6, neginf, posinf, negzro, newzro;
 
 
 /*  -- LAPACK auxiliary routine (version 3.3.1) --   

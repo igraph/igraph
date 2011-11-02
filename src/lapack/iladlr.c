@@ -18,7 +18,7 @@ integer igraphiladlr_(integer *m, integer *n, doublereal *a, integer *lda)
     integer a_dim1, a_offset, ret_val, i__1;
 
     /* Local variables */
-    static integer i__, j;
+    integer i__, j;
 
 
 /*  -- LAPACK auxiliary routine (version 3.3.1)                        --   

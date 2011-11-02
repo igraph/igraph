@@ -246,31 +246,37 @@ static integer c__2 = 2;
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer i__, j;
-    static real t0, t1, t2, t3, t4, t5;
-    static integer jj, ipj, irj, nbx, ivj;
-    static doublereal ulp, tst1;
+    integer i__;
+    static integer j;
+    real t0, t1, t2, t3, t4, t5;
+    integer jj;
+    static integer ipj, irj;
+    integer nbx;
+    static integer ivj;
+    static doublereal ulp;
+    doublereal tst1;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
     static integer ierr, iter;
     static doublereal unfl, ovfl;
-    static integer nopx, itry;
+    integer nopx;
+    static integer itry;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
-    static doublereal temp1;
+    doublereal temp1;
     static logical orth1, orth2, step3, step4;
     static doublereal betaj;
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *), igraphdgemv_(char *, integer *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *);
-    static integer infol;
+    integer infol;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), igraphdaxpy_(integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *), igraphdmout_(integer 
 	    *, integer *, integer *, doublereal *, integer *, integer *, char 
 	    *, ftnlen);
-    static doublereal xtemp[2];
-    static real tmvbx;
+    doublereal xtemp[2];
+    real tmvbx;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen);
     static doublereal wnorm;
@@ -286,14 +292,14 @@ static integer c__2 = 2;
     extern doublereal igraphdlanhs_(char *, integer *, doublereal *, integer *, 
 	    doublereal *);
     extern /* Subroutine */ int igraphsecond_(real *);
-    static integer logfil, ndigit, nitref, mnaitr;
-    static real titref, tnaitr;
+    integer logfil=0, ndigit, nitref, mnaitr=0;
+    real titref, tnaitr;
     static integer msglvl;
     static doublereal smlnum;
-    static integer nrorth;
+    integer nrorth;
     static logical rstart;
-    static integer nrstrt;
-    static real tmvopx;
+    integer nrstrt;
+    real tmvopx;
 
 
 /*     %----------------------------------------------------%   

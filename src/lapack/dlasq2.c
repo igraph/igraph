@@ -31,34 +31,34 @@ static integer c__11 = 11;
     double sqrt(doublereal);
 
     /* Local variables */
-    static doublereal d__, e, g;
-    static integer k;
-    static doublereal s, t;
-    static integer i0, i4, n0;
-    static doublereal dn;
-    static integer pp;
-    static doublereal dn1, dn2, dee, eps, tau, tol;
-    static integer ipn4;
-    static doublereal tol2;
-    static logical ieee;
-    static integer nbig;
-    static doublereal dmin__, emin, emax;
-    static integer kmin, ndiv, iter;
-    static doublereal qmin, temp, qmax, zmax;
-    static integer splt;
-    static doublereal dmin1, dmin2;
-    static integer nfail;
-    static doublereal desig, trace, sigma;
-    static integer iinfo, ttype;
+    doublereal d__, e, g;
+    integer k;
+    doublereal s, t;
+    integer i0, i4, n0;
+    doublereal dn;
+    integer pp;
+    doublereal dn1, dn2, dee, eps, tau, tol;
+    integer ipn4;
+    doublereal tol2;
+    logical ieee;
+    integer nbig;
+    doublereal dmin__, emin, emax;
+    integer kmin, ndiv, iter;
+    doublereal qmin, temp, qmax, zmax;
+    integer splt;
+    doublereal dmin1, dmin2;
+    integer nfail;
+    doublereal desig, trace, sigma;
+    integer iinfo, ttype;
     extern /* Subroutine */ int igraphdlasq3_(integer *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, doublereal *, doublereal *,
 	     integer *, integer *, integer *, logical *, integer *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *);
     extern doublereal igraphdlamch_(char *);
-    static doublereal deemin;
-    static integer iwhila, iwhilb;
-    static doublereal oldemn, safmin;
+    doublereal deemin;
+    integer iwhila, iwhilb;
+    doublereal oldemn, safmin;
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
     extern integer igraphilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);

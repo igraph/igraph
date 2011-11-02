@@ -22,8 +22,8 @@ doublereal igraphdnrm2_(integer *n, doublereal *x, integer *incx)
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer ix;
-    static doublereal ssq, norm, scale, absxi;
+    integer ix;
+    doublereal ssq, norm, scale, absxi;
 
 
 /*  Purpose   

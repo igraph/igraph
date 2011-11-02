@@ -19,8 +19,8 @@ integer igraphidamax_(integer *n, doublereal *dx, integer *incx)
     doublereal d__1;
 
     /* Local variables */
-    static integer i__, ix;
-    static doublereal dmax__;
+    integer i__, ix;
+    doublereal dmax__;
 
 
 /*  Purpose   

@@ -24,11 +24,11 @@
     double d_sign(doublereal *, doublereal *);
 
     /* Local variables */
-    static integer k;
-    static doublereal ak, eps, temp, pert, absak, sfmin;
+    integer k;
+    doublereal ak, eps, temp, pert, absak, sfmin;
     extern doublereal igraphdlamch_(char *);
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
-    static doublereal bignum;
+    doublereal bignum;
 
 
 /*  -- LAPACK auxiliary routine (version 3.3.1) --   

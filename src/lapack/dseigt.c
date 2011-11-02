@@ -111,16 +111,16 @@ static integer c__1 = 1;
     doublereal d__1;
 
     /* Local variables */
-    static integer k;
-    static real t0, t1;
+    integer k;
+    real t0, t1;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), igraphdvout_(integer *, integer *, doublereal 
 	    *, integer *, char *, ftnlen), igraphsecond_(real *);
-    static integer logfil, ndigit, mseigt;
+    integer logfil=0, ndigit, mseigt=0;
     extern /* Subroutine */ int igraphdstqrb_(integer *, doublereal *, doublereal *,
 	     doublereal *, doublereal *, integer *);
-    static real tseigt;
-    static integer msglvl;
+    real tseigt;
+    integer msglvl;
 
 
 /*     %----------------------------------------------------%   

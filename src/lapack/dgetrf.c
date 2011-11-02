@@ -26,11 +26,11 @@ static doublereal c_b19 = -1.;
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4, i__5;
 
     /* Local variables */
-    static integer i__, j, jb, nb;
+    integer i__, j, jb, nb;
     extern /* Subroutine */ int igraphdgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
-    static integer iinfo;
+    integer iinfo;
     extern /* Subroutine */ int igraphdtrsm_(char *, char *, char *, char *, 
 	    integer *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *, integer *), igraphdgetf2_(

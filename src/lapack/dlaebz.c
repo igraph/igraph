@@ -25,9 +25,9 @@
     doublereal d__1, d__2, d__3, d__4;
 
     /* Local variables */
-    static integer j, kf, ji, kl, jp, jit;
-    static doublereal tmp1, tmp2;
-    static integer itmp1, itmp2, kfnew, klnew;
+    integer j, kf, ji, kl, jp, jit;
+    doublereal tmp1, tmp2;
+    integer itmp1, itmp2, kfnew, klnew;
 
 
 /*  -- LAPACK auxiliary routine (version 3.3.1) --   

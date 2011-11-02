@@ -28,20 +28,20 @@ static doublereal c_b25 = -1.;
 	    work_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i__, j;
+    integer i__, j;
     extern /* Subroutine */ int igraphdgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
     extern logical igraphlsame_(char *, char *);
-    static integer lastc;
+    integer lastc;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), igraphdtrmm_(char *, char *, char *, char *, 
 	    integer *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static integer lastv;
+    integer lastv;
     extern integer igraphiladlc_(integer *, integer *, doublereal *, integer *), 
 	    igraphiladlr_(integer *, integer *, doublereal *, integer *);
-    static char transt[1];
+    char transt[1];
 
 
 /*  -- LAPACK auxiliary routine (version 3.3.1) --   
