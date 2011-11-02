@@ -4,6 +4,7 @@ DOXROX=$(top_srcdir)/doc/doxrox.py
 REGEX=$(top_srcdir)/doc/c-docbook.re
 SRCDIR=$(top_srcdir)/src
 INCLUDEDIR=$(top_srcdir)/include
+REMOVEEXAMPLES=$(top_srcdir)/tools/removeexamples.py
 
 DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      structural.xml iterators.xml attributes.xml layout.xml \
@@ -181,7 +182,11 @@ igraph.info: igraph-docs.xml $(DOCFIX2) igraph.info.diff
 	cat tutorial.xml | sed '/<link/{N;s/<link\n*[^>]*>//g}' | \
 	  sed 's/<\/link>//g' >tutorial-info.xml \
 	&& sed 's/tutorial\.xml/tutorial-info.xml/' igraph-docs.xml > igraph-docs-info.xml \
-	&& db2x_xsltproc --xinclude -s texi igraph-docs-info.xml -o igraph.txml \
+	&& xmllint --xinclude -o igraph-docs-info2.xml igraph-docs-info.xml \
+	&& $(REMOVEEXAMPLES) igraph-docs-info2.xml igraph-docs-info3.xml \
+	&& sed '/<book/q' igraph-docs-info2.xml | grep -v '<book' >igraph-docs-info4.xml\
+	&& cat igraph-docs-info3.xml >> igraph-docs-info4.xml \
+	&& db2x_xsltproc --xinclude -s texi igraph-docs-info4.xml -o igraph.txml \
 	&& db2x_texixml igraph.txml \
 	&& mv igraph_reference_manual.texi igraph.texi \
 	&& makeinfo --no-split --number-sections igraph.texi \
@@ -191,20 +196,29 @@ igraph.info: igraph-docs.xml $(DOCFIX2) igraph.info.diff
 igraph-docs.dvi: igraph-docs.xml $(DOCFIX2)
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
 	xmllint --xinclude -o igraph-docs2.xml igraph-docs.xml \
-	&& env < /dev/null hash_extra=65000 docbook2dvi igraph-docs2.xml \
-	&& mv igraph-docs2.dvi igraph-docs.dvi
+	&& $(REMOVEEXAMPLES) igraph-docs2.xml igraph-docs3.xml \
+	&& sed '/<book/q' igraph-docs2.xml | grep -v '<book' >igraph-docs4.xml\
+	&& cat igraph-docs3.xml >> igraph-docs4.xml \
+	&& env < /dev/null hash_extra=65000 docbook2dvi igraph-docs4.xml \
+	&& mv igraph-docs4.dvi igraph-docs.dvi
 
 igraph-docs.ps: igraph-docs.xml $(DOCFIX2)
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
 	xmllint --xinclude -o igraph-docs2.xml igraph-docs.xml \
-	&& env < /dev/null hash_extra=65000 docbook2ps igraph-docs2.xml \
-	&& mv igraph-docs2.ps igraph-docs.ps
+	&& $(REMOVEEXAMPLES) igraph-docs2.xml igraph-docs3.xml \
+	&& sed '/<book/q' igraph-docs2.xml | grep -v '<book' >igraph-docs4.xml\
+	&& cat igraph-docs3.xml >> igraph-docs4.xml \
+	&& env < /dev/null hash_extra=65000 docbook2s igraph-docs4.xml \
+	&& mv igraph-docs4.ps igraph-docs.ps
 
 igraph-docs.pdf: igraph-docs.xml $(DOCFIX2)
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
 	xmllint --xinclude -o igraph-docs2.xml igraph-docs.xml \
-	&& env < /dev/null hash_extra=65000 docbook2pdf igraph-docs2.xml \
-	&& mv igraph-docs2.pdf igraph-docs.pdf
+	&& $(REMOVEEXAMPLES) igraph-docs2.xml igraph-docs3.xml \
+	&& sed '/<book/q' igraph-docs2.xml | grep -v '<book' >igraph-docs4.xml\
+	&& cat igraph-docs3.xml >> igraph-docs4.xml \
+	&& env < /dev/null hash_extra=65000 docbook2pdf igraph-docs4.xml \
+	&& mv igraph-docs4.pdf igraph-docs.pdf
 
 CLEANFILES=$(DOCINCLUDES) html/*.html html/stamp \
 	igraph-docs.{dvi,info,pdf,ps,texi,txml} igraph-docs2.xml 
