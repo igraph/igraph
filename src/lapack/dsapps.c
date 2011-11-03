@@ -156,7 +156,7 @@ static doublereal c_b20 = -1.;
 {
     /* Initialized data */
 
-    static logical first = TRUE_;
+    IGRAPH_F77_SAVE logical first = TRUE_;
 
     /* System generated locals */
     integer h_dim1, h_offset, q_dim1, q_offset, v_dim1, v_offset, i__1, i__2, 
@@ -185,7 +185,7 @@ static doublereal c_b20 = -1.;
 	    integer *, doublereal *, integer *, doublereal *, integer *), igraphdlartg_(doublereal *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *), igraphdlaset_(char *, integer *, integer *,
 	     doublereal *, doublereal *, doublereal *, integer *);
-    static doublereal epsmch;
+    IGRAPH_F77_SAVE doublereal epsmch;
     integer logfil=0, ndigit, msapps=0, msglvl, istart;
     real tsapps;
     integer kplusp;

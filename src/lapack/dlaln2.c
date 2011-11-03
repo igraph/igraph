@@ -28,7 +28,7 @@
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, x_dim1, x_offset;
     doublereal d__1, d__2, d__3, d__4, d__5, d__6;
-    static doublereal equiv_0[4], equiv_1[4];
+    IGRAPH_F77_SAVE doublereal equiv_0[4], equiv_1[4];
 
     /* Local variables */
     integer j;

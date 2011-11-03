@@ -175,6 +175,11 @@ for name in ${arpack[@]}; do
 done >> ${arpackinc}
 /bin/echo >> ${arpackinc}
 
+## This is a patch to make ARPACK thread-safe
+
+cd /tmp/${destdir}
+patch -p2 < ${origdir}/mt.patch
+
 ## We are done
 
 echo "Sources are ready, to update your tree please run:

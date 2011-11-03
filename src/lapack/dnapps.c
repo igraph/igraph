@@ -168,7 +168,7 @@ static doublereal c_b43 = -1.;
 {
     /* Initialized data */
 
-    static logical first = TRUE_;
+    IGRAPH_F77_SAVE logical first = TRUE_;
 
     /* System generated locals */
     integer h_dim1, h_offset, v_dim1, v_offset, q_dim1, q_offset, i__1, i__2, 
@@ -183,10 +183,10 @@ static doublereal c_b43 = -1.;
     doublereal h11, h12, h21, h22, h32;
     integer jj, ir, nr;
     doublereal tau;
-    static doublereal ulp;
+    IGRAPH_F77_SAVE doublereal ulp;
     doublereal tst1;
     integer iend;
-    static doublereal unfl, ovfl;
+    IGRAPH_F77_SAVE doublereal unfl, ovfl;
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *), igraphdlarf_(char *, integer *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *);
@@ -218,7 +218,7 @@ static doublereal c_b43 = -1.;
     integer mnapps=0, msglvl;
     real tnapps;
     integer istart;
-    static doublereal smlnum;
+    IGRAPH_F77_SAVE doublereal smlnum;
     integer kplusp;
 
 
