@@ -254,7 +254,6 @@ int infomap_partition(FlowGraph * fgraph, bool rcall) {
  *     weights. The weights are expected to be positive.
  * \param nb_trials The number of attempts to partition the network
  *     (can be any integer value equal or larger than 1).
- * \param rand_seed A random seed (can be any positive integer value).
  * \param membership Pointer to a vector. The membership vector is
  *    stored here. 
  * \param codelength Pointer to a real. If not NULL the code length of the
