@@ -1,5 +1,14 @@
 
-all: igraph_$(VERSION).tar.gz
+DATAVERSION=0.1
+
+all: igraph_$(VERSION).tar.gz igraphdata_$(DATAVERSION).tar.gz
+
+DATAFILES = $(wildcard igraphdata/data/*.rda) igraphdata/DESCRIPTION \
+	igraphdata/LICENSE $(wildcard igraphdata/man/*.Rd) \
+	$(wildcard igraphdata/inst/*)
+
+igraphdata_$(DATAVERSION).tar.gz: $(DATAFILES)
+	R CMD build igraphdata
 
 RFILES = $(wildcard igraph/R/*.R) $(wildcard igraph/man/*.Rd) \
 	igraph/src/config.h igraph/src/config.h.in igraph/src/Makevars.in \

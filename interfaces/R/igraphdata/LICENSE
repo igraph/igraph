@@ -1,0 +1,78 @@
+This files lists the copyright holders and licenses (if known) of the
+various data sets in the igraphdata package:
+
+Koenigsberg
+-----------
+
+This data set was collected from Public Domain sources, and it is 
+int the Public Domain itself.
+
+Please cite the following publication if you use this data set:
+
+Euler, L.: Solutio problematis ad geometriam situs pertinentis.
+Commentarii academiae scientiarum Petropolitanae, 128-140, 1741.
+
+
+UKfaculty
+---------
+
+This dataset is licensed under a Creative Commons
+Attribution-Share Alike 2.0 UK: England & Wales License, 
+see http://creativecommons.org/licenses/by-sa/2.0/uk/ for details.
+
+Please cite the following reference if you use this dataset:
+
+Nepusz T., Petróczi A., Négyessy L., Bazsó F.: Fuzzy communities and
+the concept of bridgeness in complex networks. Physical Review E
+77:016107, 2008.
+
+USairports
+----------
+
+The data is from the Research and Innovative Technology Administration, 
+and it is in the Public Domain.
+
+foodwebs
+--------
+
+The data was downloaded from 
+http://vlado.fmf.uni-lj.si/pub/networks/data/bio/foodweb/foodweb.htm
+Please see the manual page of the data set for the publications 
+that you should cite, if you use some of this data.
+
+karate
+------
+
+The data was extracted from the original publication.
+Please cite:
+
+Wayne W. Zachary. An Information Flow Model for Conflict and
+Fission in Small Groups. Journal of Anthropological Research
+Vol. 33, No. 4 452-473
+
+macaque
+-------
+
+This dataset is licensed under a Creative Commons
+Attribution-Share Alike 2.0 UK: England & Wales License, 
+see http://creativecommons.org/licenses/by-sa/2.0/uk/ for details.
+
+Please cite the following reference if you use this dataset:
+
+Négyessy L., Nepusz T., Kocsis L., Bazsó F.: Prediction of the main
+cortical areas and connections involved in the tactile function of the
+visual cortex by network analysis. European Journal of Neuroscience
+23(7):1919–1930, 2006. 
+
+yeast
+-----
+
+The data was downloaded from 
+http://www.nature.com/nature/journal/v417/n6887/suppinfo/nature750.html
+
+Please cite the following paper if you use this data set:
+
+Comparative assessment of large-scale data sets of protein-protein
+interactions. Christian von Mering, Roland Krause, Berend Snel,
+Michael Cornell, Stephen G. Oliver, Stanley Fields and Peer Bork.
+Nature 417, 399-403 (2002)
