@@ -247,48 +247,48 @@ static doublereal c_b119 = 1.;
     double pow_dd(doublereal *, doublereal *);
 
     /* Local variables */
-    static integer j, k, ih, iq, iw;
-    static doublereal kv[2];
-    static integer ibd, ihb, ihd, ldh, ilg, ldq, ism, irz;
+    integer j, k, ih, iq, iw;
+    doublereal kv[2];
+    integer ibd, ihb, ihd, ldh, ilg, ldq, ism, irz;
     extern /* Subroutine */ int igraphdger_(integer *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static integer mode;
-    static doublereal eps23;
-    static integer ierr;
-    static doublereal temp;
-    static integer next;
-    static char type__[6];
-    static integer ritz;
+    integer mode;
+    doublereal eps23;
+    integer ierr;
+    doublereal temp;
+    integer next;
+    char type__[6];
+    integer ritz;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
-    static logical reord;
+    logical reord;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static integer nconv;
-    static doublereal rnorm;
+    integer nconv;
+    doublereal rnorm;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen), igraphivout_(integer *, integer *, integer *
 	    , integer *, char *, ftnlen), igraphdgeqr2_(integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *);
-    static doublereal bnorm2;
+    doublereal bnorm2;
     extern /* Subroutine */ int igraphdorm2r_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *);
-    static doublereal thres1, thres2;
+    doublereal thres1, thres2;
     extern doublereal igraphdlamch_(char *);
     extern /* Subroutine */ int igraphdlacpy_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *);
-    static integer logfil, ndigit, bounds, mseupd;
+    integer logfil=0, ndigit, bounds, mseupd=0;
     extern /* Subroutine */ int igraphdsteqr_(char *, integer *, doublereal *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *);
-    static integer msglvl, ktrord;
+    integer msglvl, ktrord;
     extern /* Subroutine */ int igraphdsesrt_(char *, logical *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *), 
 	    igraphdsortr_(char *, logical *, integer *, doublereal *, doublereal *);
-    static doublereal tempbnd;
-    static integer leftptr, rghtptr;
+    doublereal tempbnd;
+    integer leftptr, rghtptr;
 
 
 /*     %----------------------------------------------------%   

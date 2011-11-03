@@ -81,8 +81,8 @@
     integer s_cmp(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer i__, j, igap;
-    static doublereal temp;
+    integer i__, j, igap;
+    doublereal temp;
 
 
 /*     %------------------%   

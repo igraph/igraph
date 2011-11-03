@@ -27,23 +27,23 @@
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer i__;
-    static doublereal s;
-    static integer r1, r2;
-    static doublereal eps, tmp;
-    static integer neg1, neg2, indp, inds;
-    static doublereal dplus;
+    integer i__;
+    doublereal s;
+    integer r1, r2;
+    doublereal eps, tmp;
+    integer neg1, neg2, indp, inds;
+    doublereal dplus;
     extern doublereal igraphdlamch_(char *);
     extern logical igraphdisnan_(doublereal *);
-    static integer indlpl, indumn;
-    static doublereal dminus;
-    static logical sawnan1, sawnan2;
+    integer indlpl, indumn;
+    doublereal dminus;
+    logical sawnan1, sawnan2;
 
 
-/*  -- LAPACK auxiliary routine (version 3.2) --   
+/*  -- LAPACK auxiliary routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -51,14 +51,14 @@
 
     DLAR1V computes the (scaled) r-th column of the inverse of   
     the sumbmatrix in rows B1 through BN of the tridiagonal matrix   
-    L D L^T - sigma I. When sigma is close to an eigenvalue, the   
+    L D L**T - sigma I. When sigma is close to an eigenvalue, the   
     computed vector is an accurate eigenvector. Usually, r corresponds   
     to the index where the eigenvector is largest in magnitude.   
     The following steps accomplish this computation :   
-    (a) Stationary qd transform,  L D L^T - sigma I = L(+) D(+) L(+)^T,   
-    (b) Progressive qd transform, L D L^T - sigma I = U(-) D(-) U(-)^T,   
+    (a) Stationary qd transform,  L D L**T - sigma I = L(+) D(+) L(+)**T,   
+    (b) Progressive qd transform, L D L**T - sigma I = U(-) D(-) U(-)**T,   
     (c) Computation of the diagonal elements of the inverse of   
-        L D L^T - sigma I by combining the above transforms, and choosing   
+        L D L**T - sigma I by combining the above transforms, and choosing   
         r as the index where the diagonal of the inverse is (one of the)   
         largest in magnitude.   
     (d) Computation of the (scaled) r-th column of the inverse using the   
@@ -69,18 +69,18 @@
     =========   
 
     N        (input) INTEGER   
-             The order of the matrix L D L^T.   
+             The order of the matrix L D L**T.   
 
     B1       (input) INTEGER   
-             First index of the submatrix of L D L^T.   
+             First index of the submatrix of L D L**T.   
 
     BN       (input) INTEGER   
-             Last index of the submatrix of L D L^T.   
+             Last index of the submatrix of L D L**T.   
 
     LAMBDA    (input) DOUBLE PRECISION   
              The shift. In order to compute an accurate eigenvector,   
              LAMBDA should be a good approximation to an eigenvalue   
-             of L D L^T.   
+             of L D L**T.   
 
     L        (input) DOUBLE PRECISION array, dimension (N-1)   
              The (n-1) subdiagonal elements of the unit bidiagonal matrix   
@@ -112,20 +112,20 @@
 
     NEGCNT   (output) INTEGER   
              If WANTNC is .TRUE. then NEGCNT = the number of pivots < pivmin   
-             in the  matrix factorization L D L^T, and NEGCNT = -1 otherwise.   
+             in the  matrix factorization L D L**T, and NEGCNT = -1 otherwise.   
 
     ZTZ      (output) DOUBLE PRECISION   
              The square of the 2-norm of Z.   
 
     MINGMA   (output) DOUBLE PRECISION   
              The reciprocal of the largest (in magnitude) diagonal   
-             element of the inverse of L D L^T - sigma I.   
+             element of the inverse of L D L**T - sigma I.   
 
     R        (input/output) INTEGER   
              The twist index for the twisted factorization used to   
              compute Z.   
              On input, 0 <= R <= N. If R is input as 0, R is set to   
-             the index where (L D L^T - sigma I)^{-1} is largest   
+             the index where (L D L**T - sigma I)^{-1} is largest   
              in magnitude. If 1 <= R <= N, R is unchanged.   
              On output, R contains the twist index used to compute Z.   
              Ideally, R designates the position of the maximum entry in the   

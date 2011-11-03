@@ -37,24 +37,24 @@ static integer c__12 = 12;
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer i__, j, k;
-    static doublereal s, aa, bb, cc, dd, cs, sn;
-    static integer jw;
-    static doublereal evi, evk, foo;
-    static integer kln;
-    static doublereal tau, ulp;
-    static integer lwk1, lwk2, lwk3;
-    static doublereal beta;
-    static integer kend, kcol, info, nmin, ifst, ilst, ltop, krow;
+    integer i__, j, k;
+    doublereal s, aa, bb, cc, dd, cs, sn;
+    integer jw;
+    doublereal evi, evk, foo;
+    integer kln;
+    doublereal tau, ulp;
+    integer lwk1, lwk2, lwk3;
+    doublereal beta;
+    integer kend, kcol, info, nmin, ifst, ilst, ltop, krow;
     extern /* Subroutine */ int igraphdlarf_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *), igraphdgemm_(char *, char *, integer *, integer *
 	    , integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
-    static logical bulge;
+    logical bulge;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static integer infqr, kwtop;
+    integer infqr, kwtop;
     extern /* Subroutine */ int igraphdlanv2_(doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *), igraphdlaqr4_(
@@ -71,10 +71,10 @@ static integer c__12 = 12;
 	    doublereal *, integer *, integer *, doublereal *, integer *, 
 	    integer *), igraphdlacpy_(char *, integer *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *);
-    static doublereal safmin;
+    doublereal safmin;
     extern integer igraphilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);
-    static doublereal safmax;
+    doublereal safmax;
     extern /* Subroutine */ int igraphdlaset_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, doublereal *, integer *), 
 	    igraphdtrexc_(char *, integer *, doublereal *, integer *, doublereal *, 
@@ -82,9 +82,9 @@ static integer c__12 = 12;
 	     igraphdormhr_(char *, char *, integer *, integer *, integer *, integer 
 	    *, doublereal *, integer *, doublereal *, doublereal *, integer *,
 	     doublereal *, integer *, integer *);
-    static logical sorted;
-    static doublereal smlnum;
-    static integer lwkopt;
+    logical sorted;
+    doublereal smlnum;
+    integer lwkopt;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2.2)                        --   

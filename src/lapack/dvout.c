@@ -36,6 +36,7 @@ static integer c__1 = 1;
    Subroutine */ int igraphdvout_(integer *lout, integer *n, doublereal *sx, 
 	integer *idigit, char *ifmt, ftnlen ifmt_len)
 {
+
     /* Format strings */
     static char fmt_9999[] = "(/1x,a,/1x,a)";
     static char fmt_9998[] = "(1x,i4,\002 - \002,i4,\002:\002,1p,10d12.3)";
@@ -52,9 +53,9 @@ static integer c__1 = 1;
 	     ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer i__, k1, k2, lll;
-    static char line[80];
-    static integer ndigit;
+    integer i__, k1, k2, lll;
+    char line[80];
+    integer ndigit;
 
     /* Fortran I/O blocks */
     static cilist io___4 = { 0, 0, 0, fmt_9999, 0 };

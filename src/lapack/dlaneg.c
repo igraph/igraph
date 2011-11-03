@@ -19,16 +19,16 @@ integer igraphdlaneg_(integer *n, doublereal *d__, doublereal *lld, doublereal *
     integer ret_val, i__1, i__2, i__3, i__4;
 
     /* Local variables */
-    static integer j;
-    static doublereal p, t;
-    static integer bj;
-    static doublereal tmp;
-    static integer neg1, neg2;
-    static doublereal bsav, gamma, dplus;
+    integer j;
+    doublereal p, t;
+    integer bj;
+    doublereal tmp;
+    integer neg1, neg2;
+    doublereal bsav, gamma, dplus;
     extern logical igraphdisnan_(doublereal *);
-    static integer negcnt;
-    static logical sawnan;
-    static doublereal dminus;
+    integer negcnt;
+    logical sawnan;
+    doublereal dminus;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2.2) --   

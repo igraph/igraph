@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#define R_INTEGER(a,b) (igraph_rng_get_integer(&igraph_rng_default, (a), (b)))
+#define R_INTEGER(a,b) (igraph_rng_get_integer(igraph_rng_default(), (a), (b)))
 
 /* Crash the library function here. We expect error codes to be returned here.
  */
@@ -33,7 +33,7 @@ int error_test() {
   igraph_integer_t nvert, u, v;
   int ret;
 
-  igraph_rng_seed(&igraph_rng_default, time(0));
+  igraph_rng_seed(igraph_rng_default(), time(0));
   igraph_small(&g, /*nvert*/ 0, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,0, -1);
   nvert = igraph_vcount(&g);
   u = (igraph_integer_t)R_INTEGER(-100*nvert, 100*nvert);
@@ -57,7 +57,7 @@ int connected_test() {
   igraph_bool_t connected;
   igraph_integer_t nvert, u, v;
 
-  igraph_rng_seed(&igraph_rng_default, time(0));
+  igraph_rng_seed(igraph_rng_default(), time(0));
 
   /* A complete graph on n vertices. Any two distinct vertices are connected */
   /* by an edge. Hence we expect the test to return true for any given pair */

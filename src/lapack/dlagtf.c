@@ -21,8 +21,8 @@
     doublereal d__1, d__2;
 
     /* Local variables */
-    static integer k;
-    static doublereal tl, eps, piv1, piv2, temp, mult, scale1, scale2;
+    integer k;
+    doublereal tl, eps, piv1, piv2, temp, mult, scale1, scale2;
     extern doublereal igraphdlamch_(char *);
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
 

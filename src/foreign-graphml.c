@@ -914,7 +914,7 @@ void igraph_i_graphml_sax_handler_chars(void* state0, const xmlChar* ch, int len
   }
 }
 
-static xmlSAXHandler igraph_i_graphml_sax_handler={
+static const xmlSAXHandler igraph_i_graphml_sax_handler={
   NULL, NULL, NULL, NULL, NULL,
     igraph_i_graphml_sax_handler_get_entity,
     NULL, NULL, NULL, NULL, NULL, NULL,

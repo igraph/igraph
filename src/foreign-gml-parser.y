@@ -53,15 +53,16 @@
 #include "config.h"
 #include "igraph_math.h"
 #include "igraph_gml_tree.h"
+#include "foreign-gml-header.h"
+#include "foreign-gml-parser.h"
 
-extern int igraph_gml_yylex(void);
-extern long int igraph_gml_mylineno;
-extern char *igraph_gml_yytext;
-extern int igraph_gml_yyleng;
-igraph_gml_tree_t *igraph_i_gml_parsed_tree=0;
-char *igraph_i_gml_errmsg=0;
-int igraph_gml_yyerror(char *s);
-void igraph_i_gml_reset_scanner(void);
+#define yyscan_t void*
+
+int igraph_gml_yylex(YYSTYPE* lvalp, YYLTYPE* llocp, void *scanner);
+int igraph_gml_yyerror(YYLTYPE* locp, igraph_i_gml_parsedata_t *context, 
+		       char *s);
+char *igraph_gml_yyget_text (yyscan_t yyscanner );
+int igraph_gml_yyget_leng (yyscan_t yyscanner );
 void igraph_i_gml_get_keyword(char *s, int len, void *res);
 void igraph_i_gml_get_string(char *s, int len, void *res);
 double igraph_i_gml_get_real(char *s, int len);
@@ -73,11 +74,20 @@ igraph_gml_tree_t *igraph_i_gml_make_string(char* s, int len,
 igraph_gml_tree_t *igraph_i_gml_make_list(char* s, int len, 
 					  igraph_gml_tree_t *list);
 igraph_gml_tree_t *igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_t* t2);
+
+#define scanner context->scanner
+#define USE(x) /*(x)*/
+
 %}
 
+%pure-parser
 %output="y.tab.c"
 %name-prefix="igraph_gml_yy"
 %defines
+%locations
+%error-verbose
+%parse-param { igraph_i_gml_parsedata_t* context }
+%lex-param { void *scanner }
 
 %union {
    struct {
@@ -106,8 +116,8 @@ igraph_gml_tree_t *igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_t* 
 
 %%
 
-input:   list      { igraph_i_gml_parsed_tree=$1; } 
-       | list EOFF { igraph_i_gml_parsed_tree=$1; }
+input:   list      { context->tree=$1; } 
+       | list EOFF { context->tree=$1; }
 ;
 
 list:   keyvalue      { $$=$1; } 
@@ -123,23 +133,23 @@ keyvalue:   key num
             { $$=igraph_i_gml_make_numeric2($1.s, $1.len, $2.s, $2.len); }
 ;
 
-key: KEYWORD { igraph_i_gml_get_keyword(igraph_gml_yytext, 
-					igraph_gml_yyleng, &$$); };
-num : NUM { $$=igraph_i_gml_get_real(igraph_gml_yytext, igraph_gml_yyleng); };
+key: KEYWORD { igraph_i_gml_get_keyword(igraph_gml_yyget_text(scanner), 
+					igraph_gml_yyget_leng(scanner), 
+					&$$); USE($1) };
+num : NUM { $$=igraph_i_gml_get_real(igraph_gml_yyget_text(scanner), 
+				     igraph_gml_yyget_leng(scanner)); };
 
-string: STRING { igraph_i_gml_get_string(igraph_gml_yytext, 
-					 igraph_gml_yyleng, &$$); };
+string: STRING { igraph_i_gml_get_string(igraph_gml_yyget_text(scanner), 
+					 igraph_gml_yyget_leng(scanner), 
+					 &$$); };
 
 %%
 
-int igraph_gml_yyerror(char *s)
-{
-  static char str[300];
-  igraph_i_gml_reset_scanner();
-
-  snprintf(str, sizeof(str)-1, "Parse error in GML file, line %li (%s)", 
-	   (long)igraph_gml_mylineno, s);
-  igraph_i_gml_errmsg=str;
+int igraph_gml_yyerror(YYLTYPE* locp, igraph_i_gml_parsedata_t *context, 
+		       char *s) {
+  snprintf(context->errmsg, sizeof(context->errmsg)/sizeof(char)-1, 
+	   "Parse error in GML file, line %i (%s)", 
+	   locp->first_line, s);
   return 0;
 }
 

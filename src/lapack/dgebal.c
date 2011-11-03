@@ -24,21 +24,21 @@ static integer c__1 = 1;
     doublereal d__1, d__2;
 
     /* Local variables */
-    static doublereal c__, f, g;
-    static integer i__, j, k, l, m;
-    static doublereal r__, s, ca, ra;
-    static integer ica, ira, iexc;
+    doublereal c__, f, g;
+    integer i__, j, k, l, m;
+    doublereal r__, s, ca, ra;
+    integer ica, ira, iexc;
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
     extern logical igraphlsame_(char *, char *);
     extern /* Subroutine */ int igraphdswap_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static doublereal sfmin1, sfmin2, sfmax1, sfmax2;
+    doublereal sfmin1, sfmin2, sfmax1, sfmax2;
     extern doublereal igraphdlamch_(char *);
     extern integer igraphidamax_(integer *, doublereal *, integer *);
     extern logical igraphdisnan_(doublereal *);
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
-    static logical noconv;
+    logical noconv;
 
 
 /*  -- LAPACK routine (version 3.2.2) --   

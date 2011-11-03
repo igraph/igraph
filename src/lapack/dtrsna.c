@@ -33,27 +33,27 @@ static logical c_false = FALSE_;
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer i__, j, k, n2;
-    static doublereal cs;
-    static integer nn, ks;
-    static doublereal sn, mu, eps, est;
-    static integer kase;
-    static doublereal cond;
+    integer i__, j, k, n2;
+    doublereal cs;
+    integer nn, ks;
+    doublereal sn, mu, eps, est;
+    integer kase;
+    doublereal cond;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static logical pair;
-    static integer ierr;
-    static doublereal dumm, prod;
-    static integer ifst;
-    static doublereal lnrm;
-    static integer ilst;
-    static doublereal rnrm;
+    logical pair;
+    integer ierr;
+    doublereal dumm, prod;
+    integer ifst;
+    doublereal lnrm;
+    integer ilst;
+    doublereal rnrm;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
-    static doublereal prod1, prod2, scale, delta;
+    doublereal prod1, prod2, scale, delta;
     extern logical igraphlsame_(char *, char *);
-    static integer isave[3];
-    static logical wants;
-    static doublereal dummy[1];
+    integer isave[3];
+    logical wants;
+    doublereal dummy[1];
     extern /* Subroutine */ int igraphdlacn2_(integer *, doublereal *, doublereal *,
 	     integer *, doublereal *, integer *, integer *);
     extern doublereal igraphdlapy2_(doublereal *, doublereal *);
@@ -62,22 +62,22 @@ static logical c_false = FALSE_;
     extern /* Subroutine */ int igraphdlacpy_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *), 
 	    igraphxerbla_(char *, integer *, ftnlen);
-    static doublereal bignum;
-    static logical wantbh;
+    doublereal bignum;
+    logical wantbh;
     extern /* Subroutine */ int igraphdlaqtr_(logical *, logical *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,
 	     doublereal *, doublereal *, integer *), igraphdtrexc_(char *, integer *
 	    , doublereal *, integer *, doublereal *, integer *, integer *, 
 	    integer *, doublereal *, integer *);
-    static logical somcon;
-    static doublereal smlnum;
-    static logical wantsp;
+    logical somcon;
+    doublereal smlnum;
+    logical wantsp;
 
 
-/*  -- LAPACK routine (version 3.2) --   
+/*  -- LAPACK routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
        Modified to call DLACN2 in place of DLACON, 5 Feb 03, SJH.   
 
@@ -202,10 +202,10 @@ static logical c_false = FALSE_;
     The reciprocal of the condition number of an eigenvalue lambda is   
     defined as   
 
-            S(lambda) = |v'*u| / (norm(u)*norm(v))   
+            S(lambda) = |v**T*u| / (norm(u)*norm(v))   
 
     where u and v are the right and left eigenvectors of T corresponding   
-    to lambda; v' denotes the conjugate-transpose of v, and norm(u)   
+    to lambda; v**T denotes the transpose of v, and norm(u)   
     denotes the Euclidean norm. These reciprocal condition numbers always   
     lie between zero (very badly conditioned) and one (very well   
     conditioned). If n = 1, S(lambda) is defined to be 1.   
@@ -480,12 +480,12 @@ static logical c_false = FALSE_;
 
 /*                 Form   
 
-                   C' = WORK(2:N,2:N) + i*[rwork(1) ..... rwork(n-1) ]   
-                                          [   mu                     ]   
-                                          [         ..               ]   
-                                          [             ..           ]   
-                                          [                  mu      ]   
-                   where C' is conjugate transpose of complex matrix C,   
+                   C**T = WORK(2:N,2:N) + i*[rwork(1) ..... rwork(n-1) ]   
+                                            [   mu                     ]   
+                                            [         ..               ]   
+                                            [             ..           ]   
+                                            [                  mu      ]   
+                   where C**T is transpose of matrix C,   
                    and RWORK is stored starting in the N+1-st column of   
                    WORK. */
 
@@ -509,7 +509,7 @@ static logical c_false = FALSE_;
 		    nn = *n - 1 << 1;
 		}
 
-/*              Estimate norm(inv(C')) */
+/*              Estimate norm(inv(C**T)) */
 
 		est = 0.;
 		kase = 0;
@@ -520,7 +520,7 @@ L50:
 		    if (kase == 1) {
 			if (n2 == 1) {
 
-/*                       Real eigenvalue: solve C'*x = scale*c. */
+/*                       Real eigenvalue: solve C**T*x = scale*c. */
 
 			    i__2 = *n - 1;
 			    igraphdlaqtr_(&c_true, &c_true, &i__2, &work[(work_dim1 
@@ -530,7 +530,7 @@ L50:
 			} else {
 
 /*                       Complex eigenvalue: solve   
-                         C'*(p+iq) = scale*(c+id) in real arithmetic. */
+                         C**T*(p+iq) = scale*(c+id) in real arithmetic. */
 
 			    i__2 = *n - 1;
 			    igraphdlaqtr_(&c_true, &c_false, &i__2, &work[(

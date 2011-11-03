@@ -28,24 +28,24 @@
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, x_dim1, x_offset;
     doublereal d__1, d__2, d__3, d__4, d__5, d__6;
-    static doublereal equiv_0[4], equiv_1[4];
+    IGRAPH_F77_SAVE doublereal equiv_0[4], equiv_1[4];
 
     /* Local variables */
-    static integer j;
+    integer j;
 #define ci (equiv_0)
 #define cr (equiv_1)
-    static doublereal bi1, bi2, br1, br2, xi1, xi2, xr1, xr2, ci21, ci22, 
-	    cr21, cr22, li21, csi, ui11, lr21, ui12, ui22;
+    doublereal bi1, bi2, br1, br2, xi1, xi2, xr1, xr2, ci21, ci22, cr21, cr22,
+	     li21, csi, ui11, lr21, ui12, ui22;
 #define civ (equiv_0)
-    static doublereal csr, ur11, ur12, ur22;
+    doublereal csr, ur11, ur12, ur22;
 #define crv (equiv_1)
-    static doublereal bbnd, cmax, ui11r, ui12s, temp, ur11r, ur12s, u22abs;
-    static integer icmax;
-    static doublereal bnorm, cnorm, smini;
+    doublereal bbnd, cmax, ui11r, ui12s, temp, ur11r, ur12s, u22abs;
+    integer icmax;
+    doublereal bnorm, cnorm, smini;
     extern doublereal igraphdlamch_(char *);
     extern /* Subroutine */ int igraphdladiv_(doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *);
-    static doublereal bignum, smlnum;
+    doublereal bignum, smlnum;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) --   
@@ -58,8 +58,8 @@
     =======   
 
     DLALN2 solves a system of the form  (ca A - w D ) X = s B   
-    or (ca A' - w D) X = s B   with possible scaling ("s") and   
-    perturbation of A.  (A' means A-transpose.)   
+    or (ca A**T - w D) X = s B   with possible scaling ("s") and   
+    perturbation of A.  (A**T means A-transpose.)   
 
     A is an NA x NA real matrix, ca is a real scalar, D is an NA x NA   
     real diagonal matrix, w is a real or complex value, and X and B are   
@@ -274,7 +274,7 @@
 
 /*        2x2 System   
 
-          Compute the real part of  C = ca A - w D  (or  ca A' - w D ) */
+          Compute the real part of  C = ca A - w D  (or  ca A**T - w D ) */
 
 	cr[0] = *ca * a[a_dim1 + 1] - *wr * *d1;
 	cr[3] = *ca * a[(a_dim1 << 1) + 2] - *wr * *d2;

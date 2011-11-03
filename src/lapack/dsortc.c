@@ -88,8 +88,8 @@
     integer s_cmp(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer i__, j, igap;
-    static doublereal temp, temp1, temp2;
+    integer i__, j, igap;
+    doublereal temp, temp1, temp2;
     extern doublereal igraphdlapy2_(doublereal *, doublereal *);
 
 

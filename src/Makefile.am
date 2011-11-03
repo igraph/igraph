@@ -158,14 +158,16 @@ HEADERS_PRIVATE = atlas-edges.h \
 		igraph_lapack_internal.h igraph_glpk_support.h \
 		igraph_marked_queue.h igraph_estack.h \
 		hrg_dendro.h hrg_graph.h hrg_rbtree.h hrg_splittree_eq.h \
-		hrg_graph_simp.h
+		hrg_graph_simp.h foreign-gml-header.h \
+		foreign-ncol-header.h foreign-lgl-header.h \
+		foreign-pajek-header.h igraph_interrupt.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
 		../include/igraph_vector.h 	../include/igraph_matrix.h    \
 		../include/igraph_array.h 	../include/igraph_dqueue.h    \
 		../include/igraph_stack.h 	../include/igraph_heap.h      \
-		../include/igraph_arpack.h 	../include/igraph_interrupt.h \
+		../include/igraph_arpack.h 	\
 		../include/igraph_attributes.h 	../include/igraph_error.h     \
 		../include/igraph_pmt.h 	../include/igraph_pmt_off.h   \
 		../include/igraph_adjlist.h	../include/igraph_iterators.h \
@@ -243,7 +245,7 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     lapack.c complex.c eigen.c feedback_arc_set.c \
 			     sugiyama.c glpk_support.c \
 				 igraph_hrg_types.cc igraph_hrg.cc \
-			     distances.c
+			     distances.c fortran_intrinsics.c
 
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)

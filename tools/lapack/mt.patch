@@ -1,0 +1,498 @@
+=== modified file 'src/lapack/dgetv0.c'
+--- src/lapack/dgetv0.c	2011-11-02 20:55:12 +0000
++++ src/lapack/dgetv0.c	2011-11-03 13:12:52 +0000
+@@ -144,7 +144,7 @@
+ {
+     /* Initialized data */
+ 
+-    static logical inits = TRUE_;
++    IGRAPH_F77_SAVE logical inits = TRUE_;
+ 
+     /* System generated locals */
+     integer v_dim1, v_offset, i__1;
+@@ -157,29 +157,29 @@
+     integer jj, nbx;
+     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
+ 	    integer *);
+-    static integer iter;
+-    static logical orth;
++    IGRAPH_F77_SAVE integer iter;
++    IGRAPH_F77_SAVE logical orth;
+     integer nopx;
+     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
+-    static integer iseed[4];
++    IGRAPH_F77_SAVE integer iseed[4];
+     extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
+ 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
+ 	    doublereal *, doublereal *, integer *);
+     integer idist;
+     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
+ 	    doublereal *, integer *);
+-    static logical first;
++    IGRAPH_F77_SAVE logical first;
+     real tmvbx;
+     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
+ 	    integer *, char *, ftnlen);
+     integer mgetv0=0;
+     real tgetv0;
+-    static doublereal rnorm0;
++    IGRAPH_F77_SAVE doublereal rnorm0;
+     extern /* Subroutine */ int igraphsecond_(real *);
+     integer logfil=0, ndigit;
+     extern /* Subroutine */ int igraphdlarnv_(integer *, integer *, integer *, 
+ 	    doublereal *);
+-    static integer msglvl;
++    IGRAPH_F77_SAVE integer msglvl;
+     real tmvopx;
+ 
+ 
+
+=== modified file 'src/lapack/dlaln2.c'
+--- src/lapack/dlaln2.c	2011-11-02 20:55:12 +0000
++++ src/lapack/dlaln2.c	2011-11-03 13:47:19 +0000
+@@ -28,7 +28,7 @@
+     /* System generated locals */
+     integer a_dim1, a_offset, b_dim1, b_offset, x_dim1, x_offset;
+     doublereal d__1, d__2, d__3, d__4, d__5, d__6;
+-    static doublereal equiv_0[4], equiv_1[4];
++    IGRAPH_F77_SAVE doublereal equiv_0[4], equiv_1[4];
+ 
+     /* Local variables */
+     integer j;
+
+=== modified file 'src/lapack/dnaitr.c'
+--- src/lapack/dnaitr.c	2011-11-02 20:55:12 +0000
++++ src/lapack/dnaitr.c	2011-11-03 13:12:52 +0000
+@@ -236,7 +236,7 @@
+ {
+     /* Initialized data */
+ 
+-    static logical first = TRUE_;
++    IGRAPH_F77_SAVE logical first = TRUE_;
+ 
+     /* System generated locals */
+     integer h_dim1, h_offset, v_dim1, v_offset, i__1, i__2;
+@@ -247,24 +247,24 @@
+ 
+     /* Local variables */
+     integer i__;
+-    static integer j;
++    IGRAPH_F77_SAVE integer j;
+     real t0, t1, t2, t3, t4, t5;
+     integer jj;
+-    static integer ipj, irj;
++    IGRAPH_F77_SAVE integer ipj, irj;
+     integer nbx;
+-    static integer ivj;
+-    static doublereal ulp;
++    IGRAPH_F77_SAVE integer ivj;
++    IGRAPH_F77_SAVE doublereal ulp;
+     doublereal tst1;
+     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
+ 	    integer *);
+-    static integer ierr, iter;
+-    static doublereal unfl, ovfl;
++    IGRAPH_F77_SAVE integer ierr, iter;
++    IGRAPH_F77_SAVE doublereal unfl, ovfl;
+     integer nopx;
+-    static integer itry;
++    IGRAPH_F77_SAVE integer itry;
+     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
+     doublereal temp1;
+-    static logical orth1, orth2, step3, step4;
+-    static doublereal betaj;
++    IGRAPH_F77_SAVE logical orth1, orth2, step3, step4;
++    IGRAPH_F77_SAVE doublereal betaj;
+     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
+ 	    integer *), igraphdgemv_(char *, integer *, integer *, doublereal *, 
+ 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
+@@ -279,12 +279,12 @@
+     real tmvbx;
+     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
+ 	    integer *, char *, ftnlen);
+-    static doublereal wnorm;
++    IGRAPH_F77_SAVE doublereal wnorm;
+     extern /* Subroutine */ int igraphivout_(integer *, integer *, integer *, 
+ 	    integer *, char *, ftnlen), igraphdgetv0_(integer *, char *, integer *, 
+ 	    logical *, integer *, integer *, doublereal *, integer *, 
+ 	    doublereal *, doublereal *, integer *, doublereal *, integer *), igraphdlabad_(doublereal *, doublereal *);
+-    static doublereal rnorm1;
++    IGRAPH_F77_SAVE doublereal rnorm1;
+     extern doublereal igraphdlamch_(char *);
+     extern /* Subroutine */ int igraphdlascl_(char *, integer *, integer *, 
+ 	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
+@@ -294,10 +294,10 @@
+     extern /* Subroutine */ int igraphsecond_(real *);
+     integer logfil=0, ndigit, nitref, mnaitr=0;
+     real titref, tnaitr;
+-    static integer msglvl;
+-    static doublereal smlnum;
++    IGRAPH_F77_SAVE integer msglvl;
++    IGRAPH_F77_SAVE doublereal smlnum;
+     integer nrorth;
+-    static logical rstart;
++    IGRAPH_F77_SAVE logical rstart;
+     integer nrstrt;
+     real tmvopx;
+ 
+
+=== modified file 'src/lapack/dnapps.c'
+--- src/lapack/dnapps.c	2011-11-02 20:55:12 +0000
++++ src/lapack/dnapps.c	2011-11-03 13:12:52 +0000
+@@ -168,7 +168,7 @@
+ {
+     /* Initialized data */
+ 
+-    static logical first = TRUE_;
++    IGRAPH_F77_SAVE logical first = TRUE_;
+ 
+     /* System generated locals */
+     integer h_dim1, h_offset, v_dim1, v_offset, q_dim1, q_offset, i__1, i__2, 
+@@ -183,10 +183,10 @@
+     doublereal h11, h12, h21, h22, h32;
+     integer jj, ir, nr;
+     doublereal tau;
+-    static doublereal ulp;
++    IGRAPH_F77_SAVE doublereal ulp;
+     doublereal tst1;
+     integer iend;
+-    static doublereal unfl, ovfl;
++    IGRAPH_F77_SAVE doublereal unfl, ovfl;
+     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
+ 	    integer *), igraphdlarf_(char *, integer *, integer *, doublereal *, 
+ 	    integer *, doublereal *, doublereal *, integer *, doublereal *);
+@@ -218,7 +218,7 @@
+     integer mnapps=0, msglvl;
+     real tnapps;
+     integer istart;
+-    static doublereal smlnum;
++    IGRAPH_F77_SAVE doublereal smlnum;
+     integer kplusp;
+ 
+ 
+
+=== modified file 'src/lapack/dnaup2.c'
+--- src/lapack/dnaup2.c	2011-11-02 20:55:12 +0000
++++ src/lapack/dnaup2.c	2011-11-03 13:12:52 +0000
+@@ -213,44 +213,44 @@
+     double sqrt(doublereal);
+ 
+     /* Local variables */
+-    static integer j;
+-    static real t0, t1, t2, t3;
+-    static integer kp[4], np0, nbx, nev0;
++    IGRAPH_F77_SAVE integer j;
++    IGRAPH_F77_SAVE real t0, t1, t2, t3;
++    IGRAPH_F77_SAVE integer kp[4], np0, nbx, nev0;
+     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
+ 	    integer *);
+-    static doublereal eps23;
+-    static integer ierr, iter;
+-    static doublereal temp;
++    IGRAPH_F77_SAVE doublereal eps23;
++    IGRAPH_F77_SAVE integer ierr, iter;
++    IGRAPH_F77_SAVE doublereal temp;
+     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
+-    static logical getv0, cnorm;
++    IGRAPH_F77_SAVE logical getv0, cnorm;
+     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
+ 	    doublereal *, integer *);
+-    static integer nconv;
++    IGRAPH_F77_SAVE integer nconv;
+     extern /* Subroutine */ int igraphdmout_(integer *, integer *, integer *, 
+ 	    doublereal *, integer *, integer *, char *, ftnlen);
+-    static logical initv;
+-    static doublereal rnorm;
+-    static real tmvbx;
++    IGRAPH_F77_SAVE logical initv;
++    IGRAPH_F77_SAVE doublereal rnorm;
++    IGRAPH_F77_SAVE real tmvbx;
+     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
+ 	    integer *, char *, ftnlen), igraphivout_(integer *, integer *, integer *
+ 	    , integer *, char *, ftnlen), igraphdgetv0_(integer *, char *, integer *
+ 	    , logical *, integer *, integer *, doublereal *, integer *, 
+ 	    doublereal *, doublereal *, integer *, doublereal *, integer *);
+     extern doublereal igraphdlapy2_(doublereal *, doublereal *);
+-    static integer mnaup2=0;
+-    static real tnaup2;
++    IGRAPH_F77_SAVE integer mnaup2=0;
++    IGRAPH_F77_SAVE real tnaup2;
+     extern doublereal igraphdlamch_(char *);
+     extern /* Subroutine */ int igraphdneigh_(doublereal *, integer *, doublereal *,
+ 	     integer *, doublereal *, doublereal *, doublereal *, doublereal *
+ 	    , integer *, doublereal *, integer *);
+-    static integer nevbef;
++    IGRAPH_F77_SAVE integer nevbef;
+     extern /* Subroutine */ int igraphsecond_(real *);
+-    static integer logfil=0, ndigit;
++    IGRAPH_F77_SAVE integer logfil=0, ndigit;
+     extern /* Subroutine */ int igraphdnaitr_(integer *, char *, integer *, integer 
+ 	    *, integer *, integer *, doublereal *, doublereal *, doublereal *,
+ 	     integer *, doublereal *, integer *, integer *, doublereal *, 
+ 	    integer *);
+-    static logical update;
++    IGRAPH_F77_SAVE logical update;
+     extern /* Subroutine */ int igraphdngets_(integer *, char *, integer *, integer 
+ 	    *, doublereal *, doublereal *, doublereal *, doublereal *, 
+ 	    doublereal *), igraphdnapps_(integer *, integer *, integer *, 
+@@ -259,9 +259,9 @@
+ 	    doublereal *), igraphdnconv_(integer *, doublereal *, doublereal *, 
+ 	    doublereal *, doublereal *, integer *), igraphdsortc_(char *, logical *,
+ 	     integer *, doublereal *, doublereal *, doublereal *);
+-    static logical ushift;
+-    static char wprime[2];
+-    static integer msglvl, nptemp, numcnv, kplusp;
++    IGRAPH_F77_SAVE logical ushift;
++    IGRAPH_F77_SAVE char wprime[2];
++    IGRAPH_F77_SAVE integer msglvl, nptemp, numcnv, kplusp;
+ 
+ 
+ /*     %----------------------------------------------------%   
+
+=== modified file 'src/lapack/dnaupd.c'
+--- src/lapack/dnaupd.c	2011-11-02 20:55:12 +0000
++++ src/lapack/dnaupd.c	2011-11-03 13:12:52 +0000
+@@ -464,19 +464,19 @@
+     /* Local variables */
+     integer j;
+     real t0, t1;
+-    static integer nb, ih, iq, np, iw, ldh, ldq;
++    IGRAPH_F77_SAVE integer nb, ih, iq, np, iw, ldh, ldq;
+     integer nbx;
+-    static integer nev0, mode;
++    IGRAPH_F77_SAVE integer nev0, mode;
+     integer ierr;
+-    static integer iupd, next;
++    IGRAPH_F77_SAVE integer iupd, next;
+     integer nopx;
+-    static integer levec;
++    IGRAPH_F77_SAVE integer levec;
+     real trvec, tmvbx;
+-    static integer ritzi;
++    IGRAPH_F77_SAVE integer ritzi;
+     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
+ 	    integer *, char *, ftnlen), igraphivout_(integer *, integer *, integer *
+ 	    , integer *, char *, ftnlen);
+-    static integer ritzr;
++    IGRAPH_F77_SAVE integer ritzr;
+     extern /* Subroutine */ int igraphdnaup2_(integer *, char *, integer *, char *, 
+ 	    integer *, integer *, doublereal *, doublereal *, integer *, 
+ 	    integer *, integer *, integer *, doublereal *, integer *, 
+@@ -489,15 +489,15 @@
+     integer logfil=0, ndigit;
+     real tneigh;
+     integer mnaupd=0;
+-    static integer ishift;
++    IGRAPH_F77_SAVE integer ishift;
+     integer nitref;
+-    static integer bounds;
++    IGRAPH_F77_SAVE integer bounds;
+     real tnaupd;
+     extern /* Subroutine */ int igraphdstatn_(void);
+     real titref, tnaitr;
+-    static integer msglvl;
++    IGRAPH_F77_SAVE integer msglvl;
+     real tngets, tnapps, tnconv;
+-    static integer mxiter;
++    IGRAPH_F77_SAVE integer mxiter;
+     integer nrorth, nrstrt;
+     real tmvopx;
+ 
+
+=== modified file 'src/lapack/dsaitr.c'
+--- src/lapack/dsaitr.c	2011-11-02 20:55:12 +0000
++++ src/lapack/dsaitr.c	2011-11-03 13:12:53 +0000
+@@ -231,7 +231,7 @@
+ {
+     /* Initialized data */
+ 
+-    static logical first = TRUE_;
++    IGRAPH_F77_SAVE logical first = TRUE_;
+ 
+     /* System generated locals */
+     integer h_dim1, h_offset, v_dim1, v_offset, i__1;
+@@ -241,20 +241,20 @@
+ 
+     /* Local variables */
+     integer i__;
+-    static integer j;
++    IGRAPH_F77_SAVE integer j;
+     real t0, t1, t2, t3, t4, t5;
+     integer jj;
+-    static integer ipj, irj;
++    IGRAPH_F77_SAVE integer ipj, irj;
+     integer nbx;
+-    static integer ivj;
++    IGRAPH_F77_SAVE integer ivj;
+     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
+ 	    integer *);
+-    static integer ierr, iter;
++    IGRAPH_F77_SAVE integer ierr, iter;
+     integer nopx;
+-    static integer itry;
++    IGRAPH_F77_SAVE integer itry;
+     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
+     doublereal temp1;
+-    static logical orth1, orth2, step3, step4;
++    IGRAPH_F77_SAVE logical orth1, orth2, step3, step4;
+     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
+ 	    integer *), igraphdgemv_(char *, integer *, integer *, doublereal *, 
+ 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
+@@ -266,25 +266,25 @@
+     real tmvbx;
+     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
+ 	    integer *, char *, ftnlen);
+-    static doublereal wnorm;
++    IGRAPH_F77_SAVE doublereal wnorm;
+     extern /* Subroutine */ int igraphivout_(integer *, integer *, integer *, 
+ 	    integer *, char *, ftnlen), igraphdgetv0_(integer *, char *, integer *, 
+ 	    logical *, integer *, integer *, doublereal *, integer *, 
+ 	    doublereal *, doublereal *, integer *, doublereal *, integer *);
+-    static doublereal rnorm1;
++    IGRAPH_F77_SAVE doublereal rnorm1;
+     extern doublereal igraphdlamch_(char *);
+     extern /* Subroutine */ int igraphdlascl_(char *, integer *, integer *, 
+ 	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
+ 	    integer *, integer *), igraphsecond_(real *);
+     integer logfil=0;
+-    static doublereal safmin;
++    IGRAPH_F77_SAVE doublereal safmin;
+     integer ndigit, nitref;
+     real titref;
+     integer msaitr=0;
+-    static integer msglvl;
++    IGRAPH_F77_SAVE integer msglvl;
+     real tsaitr;
+     integer nrorth;
+-    static logical rstart;
++    IGRAPH_F77_SAVE logical rstart;
+     integer nrstrt;
+     real tmvopx;
+ 
+
+=== modified file 'src/lapack/dsapps.c'
+--- src/lapack/dsapps.c	2011-11-02 20:55:12 +0000
++++ src/lapack/dsapps.c	2011-11-03 13:12:53 +0000
+@@ -156,7 +156,7 @@
+ {
+     /* Initialized data */
+ 
+-    static logical first = TRUE_;
++    IGRAPH_F77_SAVE logical first = TRUE_;
+ 
+     /* System generated locals */
+     integer h_dim1, h_offset, q_dim1, q_offset, v_dim1, v_offset, i__1, i__2, 
+@@ -185,7 +185,7 @@
+ 	    integer *, doublereal *, integer *, doublereal *, integer *), igraphdlartg_(doublereal *, doublereal *, doublereal *, 
+ 	    doublereal *, doublereal *), igraphdlaset_(char *, integer *, integer *,
+ 	     doublereal *, doublereal *, doublereal *, integer *);
+-    static doublereal epsmch;
++    IGRAPH_F77_SAVE doublereal epsmch;
+     integer logfil=0, ndigit, msapps=0, msglvl, istart;
+     real tsapps;
+     integer kplusp;
+
+=== modified file 'src/lapack/dsaup2.c'
+--- src/lapack/dsaup2.c	2011-11-02 20:55:12 +0000
++++ src/lapack/dsaup2.c	2011-11-03 13:12:53 +0000
+@@ -221,26 +221,26 @@
+     integer j;
+     real t0, t1, t2, t3;
+     integer kp[3];
+-    static integer np0;
++    IGRAPH_F77_SAVE integer np0;
+     integer nbx;
+-    static integer nev0;
++    IGRAPH_F77_SAVE integer nev0;
+     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
+ 	    integer *);
+-    static doublereal eps23;
++    IGRAPH_F77_SAVE doublereal eps23;
+     integer ierr;
+-    static integer iter;
++    IGRAPH_F77_SAVE integer iter;
+     doublereal temp;
+     integer nevd2;
+     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
+-    static logical getv0;
++    IGRAPH_F77_SAVE logical getv0;
+     integer nevm2;
+-    static logical cnorm;
++    IGRAPH_F77_SAVE logical cnorm;
+     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
+ 	    doublereal *, integer *), igraphdswap_(integer *, doublereal *, integer 
+ 	    *, doublereal *, integer *);
+-    static integer nconv;
+-    static logical initv;
+-    static doublereal rnorm;
++    IGRAPH_F77_SAVE integer nconv;
++    IGRAPH_F77_SAVE logical initv;
++    IGRAPH_F77_SAVE doublereal rnorm;
+     real tmvbx;
+     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
+ 	    integer *, char *, ftnlen), igraphivout_(integer *, integer *, integer *
+@@ -255,7 +255,7 @@
+     integer logfil=0, ndigit;
+     extern /* Subroutine */ int igraphdseigt_(doublereal *, integer *, doublereal *,
+ 	     integer *, doublereal *, doublereal *, doublereal *, integer *);
+-    static logical update;
++    IGRAPH_F77_SAVE logical update;
+     extern /* Subroutine */ int igraphdsaitr_(integer *, char *, integer *, integer 
+ 	    *, integer *, integer *, doublereal *, doublereal *, doublereal *,
+ 	     integer *, doublereal *, integer *, integer *, doublereal *, 
+@@ -265,13 +265,13 @@
+ 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
+ 	    integer *, doublereal *), igraphdsconv_(integer *, doublereal *, 
+ 	    doublereal *, doublereal *, integer *);
+-    static logical ushift;
++    IGRAPH_F77_SAVE logical ushift;
+     char wprime[2];
+-    static integer msglvl;
++    IGRAPH_F77_SAVE integer msglvl;
+     integer nptemp;
+     extern /* Subroutine */ int igraphdsortr_(char *, logical *, integer *, 
+ 	    doublereal *, doublereal *);
+-    static integer kplusp;
++    IGRAPH_F77_SAVE integer kplusp;
+ 
+ 
+ /*     %----------------------------------------------------%   
+
+=== modified file 'src/lapack/dsaupd.c'
+--- src/lapack/dsaupd.c	2011-11-02 20:55:12 +0000
++++ src/lapack/dsaupd.c	2011-11-03 13:12:53 +0000
+@@ -465,11 +465,11 @@
+     /* Local variables */
+     integer j;
+     real t0, t1;
+-    static integer nb, ih, iq, np, iw, ldh, ldq;
++    IGRAPH_F77_SAVE integer nb, ih, iq, np, iw, ldh, ldq;
+     integer nbx;
+-    static integer nev0, mode, ierr, iupd, next;
++    IGRAPH_F77_SAVE integer nev0, mode, ierr, iupd, next;
+     integer nopx;
+-    static integer ritz;
++    IGRAPH_F77_SAVE integer ritz;
+     real tmvbx;
+     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
+ 	    integer *, char *, ftnlen), igraphivout_(integer *, integer *, integer *
+@@ -483,14 +483,14 @@
+     extern doublereal igraphdlamch_(char *);
+     extern /* Subroutine */ int igraphsecond_(real *);
+     integer logfil=0, ndigit;
+-    static integer ishift;
++    IGRAPH_F77_SAVE integer ishift;
+     integer nitref, msaupd=0;
+-    static integer bounds;
++    IGRAPH_F77_SAVE integer bounds;
+     real titref, tseigt, tsaupd;
+     extern /* Subroutine */ int igraphdstats_(void);
+-    static integer msglvl;
++    IGRAPH_F77_SAVE integer msglvl;
+     real tsaitr;
+-    static integer mxiter;
++    IGRAPH_F77_SAVE integer mxiter;
+     real tsgets, tsapps;
+     integer nrorth;
+     real tsconv;
+

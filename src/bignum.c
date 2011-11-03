@@ -21,6 +21,7 @@
  ******************************************************************************/
 #include <math.h>
 #include "bignum.h"
+#include "config.h"
 
 #ifndef	ASM_X86
 #ifdef	X86
@@ -41,8 +42,8 @@
  */
 const char *bn2x(limb_t *a, count_t nlimb)
 {
-	static count_t which = 0;
-	static char *xbuff[8] = {
+	static IGRAPH_THREAD_LOCAL count_t which = 0;
+	static IGRAPH_THREAD_LOCAL char *xbuff[8] = {
 		NULL, NULL, NULL, NULL,
 		NULL, NULL, NULL, NULL
 	};
@@ -80,12 +81,12 @@ const char *bn2x(limb_t *a, count_t nlimb)
  */
 const char *bn2d(limb_t *a, count_t nlimb)
 {
-	static count_t which = 0;
-	static char *dbuff[8] = {
+	static IGRAPH_THREAD_LOCAL count_t which = 0;
+	static IGRAPH_THREAD_LOCAL char *dbuff[8] = {
 		NULL, NULL, NULL, NULL,
 		NULL, NULL, NULL, NULL
 	};
-	static limb_t v[BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t v[BN_MAXSIZE];
 	limb_t r;
 	char *dst;
 	count_t size;
@@ -126,13 +127,13 @@ const char *bn2d(limb_t *a, count_t nlimb)
  */
 const char *bn2f(limb_t *a, count_t alimb, limb_t *b, count_t blimb)
 {
-	static count_t which = 0;
-	static char *dbuff[8] = {
+	static IGRAPH_THREAD_LOCAL count_t which = 0;
+	static IGRAPH_THREAD_LOCAL char *dbuff[8] = {
 		NULL, NULL, NULL, NULL,
 		NULL, NULL, NULL, NULL
 	};
-	static limb_t v[BN_MAXSIZE];
-	static limb_t w[BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t v[BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t w[BN_MAXSIZE];
 	limb_t r;
 	char *dst;
 	count_t size;
@@ -176,8 +177,8 @@ const char *bn2f(limb_t *a, count_t alimb, limb_t *b, count_t blimb)
  */
 const char *bn2b(limb_t *a, count_t nlimb)
 {
-	static count_t which = 0;
-	static char *bbuff[8] = {
+	static IGRAPH_THREAD_LOCAL count_t which = 0;
+	static IGRAPH_THREAD_LOCAL char *bbuff[8] = {
 		NULL, NULL, NULL, NULL,
 		NULL, NULL, NULL, NULL
 	};
@@ -512,7 +513,7 @@ limb_t bn_div_limb(limb_t q[], limb_t u[], limb_t v, count_t nlimb)
  */
 limb_t bn_mod_limb(limb_t u[], limb_t v, count_t nlimb)
 {
-	static limb_t q[2*BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t q[2*BN_MAXSIZE];
 	limb_t r;
 
 	r = bn_div_limb(q, u, v, nlimb);
@@ -914,7 +915,7 @@ int sl_modinv(limb_t *inv, limb_t u, limb_t v)
  */
 int sl_modmul(limb_t *a, limb_t x, limb_t y, limb_t m)
 {
-	static limb_t pp[2];
+	static IGRAPH_THREAD_LOCAL limb_t pp[2];
 
 	/* pp[] = x * y */
 	sl_mul(pp, x, y);
@@ -1425,9 +1426,9 @@ static int quot_overflow(limb_t quot, limb_t rem, limb_t v, limb_t u)
 int bn_div(limb_t q[], limb_t r[], limb_t u[], limb_t v[],
 	count_t ulimb, count_t vlimb)
 {
-	static limb_t qq[BN_MAXSIZE];
-	static limb_t uu[BN_MAXSIZE];
-	static limb_t vv[BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t qq[BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t uu[BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t vv[BN_MAXSIZE];
 	limb_t mask;
 	limb_t overflow;
 	limb_t quot;
@@ -1611,8 +1612,8 @@ int bn_div(limb_t q[], limb_t r[], limb_t u[], limb_t v[],
  */
 limb_t bn_mod(limb_t r[], limb_t u[], count_t ulimb, limb_t v[], count_t vlimb)
 {
-	static limb_t qq[2*BN_MAXSIZE];
-	static limb_t rr[2*BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t qq[2*BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t rr[2*BN_MAXSIZE];
 	limb_t d0;
 
 	/* rr[] = u[] % v[n] */
@@ -1643,8 +1644,8 @@ limb_t bn_mod(limb_t r[], limb_t u[], count_t ulimb, limb_t v[], count_t vlimb)
  */
 int bn_gcd(limb_t g[], limb_t x[], limb_t y[], count_t nlimb)
 {	
-	static limb_t yy[BN_MAXSIZE];
-	static limb_t xx[BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t yy[BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t xx[BN_MAXSIZE];
 	
 	bn_copy(xx, x, nlimb);
 	bn_copy(yy, y, nlimb);
@@ -1742,7 +1743,7 @@ int bn_modexp(limb_t y[], limb_t x[], limb_t e[], limb_t m[], count_t nlimb)
  */
 limb_t bn_modmul(limb_t a[], limb_t x[], limb_t y[], limb_t m[], count_t nlimb)
 {
-	static limb_t pp[2*BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t pp[2*BN_MAXSIZE];
 	limb_t d0;
 
 	/* pp[] = x[] * y[] (NB: double size pp[]) */
@@ -1774,14 +1775,14 @@ limb_t bn_modmul(limb_t a[], limb_t x[], limb_t y[], limb_t m[], count_t nlimb)
 int bn_modinv(limb_t inv[], limb_t u[], limb_t v[], count_t nlimb)
 {
 	/* Allocate temp variables */
-	static limb_t u1[BN_MAXSIZE];
-	static limb_t u3[BN_MAXSIZE];
-	static limb_t v1[BN_MAXSIZE];
-	static limb_t v3[BN_MAXSIZE];
-	static limb_t t1[BN_MAXSIZE];
-	static limb_t t3[BN_MAXSIZE];
-	static limb_t q[BN_MAXSIZE];
-	static limb_t w[2*BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t u1[BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t u3[BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t v1[BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t v3[BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t t1[BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t t3[BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t q[BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t w[2*BN_MAXSIZE];
 	int iter;
 
 	/* Step X1. Initialize */
@@ -1856,9 +1857,9 @@ int bn_modinv(limb_t inv[], limb_t u[], limb_t v[], count_t nlimb)
  */
 int bn_sqrt(limb_t q[], limb_t r[], limb_t u[], count_t rlimb, count_t ulimb)
 {
-	static limb_t step[BN_MAXSIZE];
-	static limb_t accu[BN_MAXSIZE];
-	static limb_t w[2*BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t step[BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t accu[BN_MAXSIZE];
+	static IGRAPH_THREAD_LOCAL limb_t w[2*BN_MAXSIZE];
 	limb_t d;
 	count_t m, n;
 	count_t shift;

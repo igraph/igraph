@@ -20,8 +20,8 @@
     integer a_dim1, a_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i__, j, ix, jy, kx, info;
-    static doublereal temp;
+    integer i__, j, ix, jy, kx, info;
+    doublereal temp;
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
 
 
@@ -30,7 +30,7 @@
 
     DGER   performs the rank 1 operation   
 
-       A := alpha*x*y' + A,   
+       A := alpha*x*y**T + A,   
 
     where alpha is a scalar, x is an m element vector, y is an n element   
     vector and A is an m by n matrix.   
@@ -85,6 +85,8 @@
              max( 1, m ).   
              Unchanged on exit.   
 
+    Further Details   
+    ===============   
 
     Level 2 Blas routine.   
 
@@ -94,6 +96,7 @@
        Sven Hammarling, Nag Central Office.   
        Richard Hanson, Sandia National Labs.   
 
+    =====================================================================   
 
 
        Test the input parameters.   

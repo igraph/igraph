@@ -29,7 +29,7 @@ int main() {
   igraph_sparsemat_t spmat, spmat2;
   int i;
 
-  igraph_rng_seed(&igraph_rng_default, 42);
+  igraph_rng_seed(igraph_rng_default(), 42);
 
 #define NROW 10
 #define NCOL 7  
@@ -37,9 +37,9 @@ int main() {
 
   igraph_matrix_init(&mat, NROW, NCOL);
   for (i=0; i<NZERO; i++) {
-    int r=igraph_rng_get_integer(&igraph_rng_default, 0, NROW-1);
-    int c=igraph_rng_get_integer(&igraph_rng_default, 0, NCOL-1);
-    igraph_real_t val=igraph_rng_get_integer(&igraph_rng_default, 1, 10);
+    int r=igraph_rng_get_integer(igraph_rng_default(), 0, NROW-1);
+    int c=igraph_rng_get_integer(igraph_rng_default(), 0, NCOL-1);
+    igraph_real_t val=igraph_rng_get_integer(igraph_rng_default(), 1, 10);
     MATRIX(mat, r, c) = val;
   }
   

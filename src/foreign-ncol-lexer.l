@@ -47,11 +47,9 @@
 #include "config.h"
 #include <stdlib.h>
 #include "foreign-ncol-parser.h"
-extern long int igraph_ncol_mylineno;
-int igraph_i_ncol_eof;
-void igraph_i_ncol_reset_scanner() {
-  YY_FLUSH_BUFFER;
-}
+#include "foreign-ncol-header.h"
+#define YY_EXTRA_TYPE igraph_i_ncol_parsedata_t*
+#define YY_USER_ACTION yylloc->first_line = yylineno;
 %}
 
 %option noyywrap
@@ -59,6 +57,9 @@ void igraph_i_ncol_reset_scanner() {
 %option outfile="lex.yy.c"
 %option nounput
 %option noinput
+%option reentrant
+%option bison-bridge
+%option bison-locations
 
 alnum [^ \t\n\r]
 
@@ -68,15 +69,15 @@ alnum [^ \t\n\r]
 [ \t]*               { }
 
  /* ---------------------------------------------------newline------*/
-\n\r|\r\n|\n|\r      { igraph_ncol_mylineno++; return NEWLINE; }
+\n\r|\r\n|\n|\r      { return NEWLINE; }
 
  /* ----------------------------------------------alphanumeric------*/
 {alnum}+             { return ALNUM; }
 
-<<EOF>>           { if (igraph_i_ncol_eof) {
+<<EOF>>           { if (yyextra->eof) {
                        yyterminate();
                     } else {
-                       igraph_i_ncol_eof=1;
+                       yyextra->eof=1;
                        return NEWLINE; 
                     }
                   }

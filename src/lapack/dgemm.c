@@ -22,12 +22,12 @@
 	    i__3;
 
     /* Local variables */
-    static integer i__, j, l, info;
-    static logical nota, notb;
-    static doublereal temp;
-    static integer ncola;
+    integer i__, j, l, info;
+    logical nota, notb;
+    doublereal temp;
+    integer ncola;
     extern logical igraphlsame_(char *, char *);
-    static integer nrowa, nrowb;
+    integer nrowa, nrowb;
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
 
 
@@ -40,7 +40,7 @@
 
     where  op( X ) is one of   
 
-       op( X ) = X   or   op( X ) = X',   
+       op( X ) = X   or   op( X ) = X**T,   
 
     alpha and beta are scalars, and A, B and C are matrices, with op( A )   
     an m by k matrix,  op( B )  a  k by n matrix and  C an m by n matrix.   
@@ -54,9 +54,9 @@
 
                 TRANSA = 'N' or 'n',  op( A ) = A.   
 
-                TRANSA = 'T' or 't',  op( A ) = A'.   
+                TRANSA = 'T' or 't',  op( A ) = A**T.   
 
-                TRANSA = 'C' or 'c',  op( A ) = A'.   
+                TRANSA = 'C' or 'c',  op( A ) = A**T.   
 
              Unchanged on exit.   
 
@@ -66,9 +66,9 @@
 
                 TRANSB = 'N' or 'n',  op( B ) = B.   
 
-                TRANSB = 'T' or 't',  op( B ) = B'.   
+                TRANSB = 'T' or 't',  op( B ) = B**T.   
 
-                TRANSB = 'C' or 'c',  op( B ) = B'.   
+                TRANSB = 'C' or 'c',  op( B ) = B**T.   
 
              Unchanged on exit.   
 
@@ -141,6 +141,8 @@
              max( 1, m ).   
              Unchanged on exit.   
 
+    Further Details   
+    ===============   
 
     Level 3 Blas routine.   
 
@@ -150,6 +152,7 @@
        Jeremy Du Croz, Numerical Algorithms Group Ltd.   
        Sven Hammarling, Numerical Algorithms Group Ltd.   
 
+    =====================================================================   
 
 
        Set  NOTA  and  NOTB  as  true if  A  and  B  respectively are not   
@@ -282,7 +285,7 @@
 	    }
 	} else {
 
-/*           Form  C := alpha*A'*B + beta*C */
+/*           Form  C := alpha*A**T*B + beta*C */
 
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
@@ -308,7 +311,7 @@
     } else {
 	if (nota) {
 
-/*           Form  C := alpha*A*B' + beta*C */
+/*           Form  C := alpha*A*B**T + beta*C */
 
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
@@ -342,7 +345,7 @@
 	    }
 	} else {
 
-/*           Form  C := alpha*A'*B' + beta*C */
+/*           Form  C := alpha*A**T*B**T + beta*C */
 
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {

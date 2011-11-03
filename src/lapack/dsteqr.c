@@ -32,49 +32,49 @@ static integer c__2 = 2;
     double sqrt(doublereal), d_sign(doublereal *, doublereal *);
 
     /* Local variables */
-    static doublereal b, c__, f, g;
-    static integer i__, j, k, l, m;
-    static doublereal p, r__, s;
-    static integer l1, ii, mm, lm1, mm1, nm1;
-    static doublereal rt1, rt2, eps;
-    static integer lsv;
-    static doublereal tst, eps2;
-    static integer lend, jtot;
+    doublereal b, c__, f, g;
+    integer i__, j, k, l, m;
+    doublereal p, r__, s;
+    integer l1, ii, mm, lm1, mm1, nm1;
+    doublereal rt1, rt2, eps;
+    integer lsv;
+    doublereal tst, eps2;
+    integer lend, jtot;
     extern /* Subroutine */ int igraphdlae2_(doublereal *, doublereal *, doublereal 
 	    *, doublereal *, doublereal *);
     extern logical igraphlsame_(char *, char *);
     extern /* Subroutine */ int igraphdlasr_(char *, char *, char *, integer *, 
 	    integer *, doublereal *, doublereal *, doublereal *, integer *);
-    static doublereal anorm;
+    doublereal anorm;
     extern /* Subroutine */ int igraphdswap_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), igraphdlaev2_(doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *);
-    static integer lendm1, lendp1;
+    integer lendm1, lendp1;
     extern doublereal igraphdlapy2_(doublereal *, doublereal *), igraphdlamch_(char *);
-    static integer iscale;
+    integer iscale;
     extern /* Subroutine */ int igraphdlascl_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
 	    integer *, integer *), igraphdlaset_(char *, integer *, integer 
 	    *, doublereal *, doublereal *, doublereal *, integer *);
-    static doublereal safmin;
+    doublereal safmin;
     extern /* Subroutine */ int igraphdlartg_(doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *);
-    static doublereal safmax;
+    doublereal safmax;
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
     extern doublereal igraphdlanst_(char *, integer *, doublereal *, doublereal *);
     extern /* Subroutine */ int igraphdlasrt_(char *, integer *, doublereal *, 
 	    integer *);
-    static integer lendsv;
-    static doublereal ssfmin;
-    static integer nmaxit, icompz;
-    static doublereal ssfmax;
+    integer lendsv;
+    doublereal ssfmin;
+    integer nmaxit, icompz;
+    doublereal ssfmax;
 
 
-/*  -- LAPACK routine (version 3.2) --   
+/*  -- LAPACK routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -253,7 +253,7 @@ L30:
 /*     Scale submatrix in rows and columns L to LEND */
 
     i__1 = lend - l + 1;
-    anorm = igraphdlanst_("I", &i__1, &d__[l], &e[l]);
+    anorm = igraphdlanst_("M", &i__1, &d__[l], &e[l]);
     iscale = 0;
     if (anorm == 0.) {
 	goto L10;

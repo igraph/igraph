@@ -22,9 +22,9 @@
     double log(doublereal), sqrt(doublereal), cos(doublereal);
 
     /* Local variables */
-    static integer i__;
-    static doublereal u[128];
-    static integer il, iv, il2;
+    integer i__;
+    doublereal u[128];
+    integer il, iv, il2;
     extern /* Subroutine */ int igraphdlaruv_(integer *, integer *, doublereal *);
 
 

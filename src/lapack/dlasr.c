@@ -20,10 +20,10 @@
     integer a_dim1, a_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i__, j, info;
-    static doublereal temp;
+    integer i__, j, info;
+    doublereal temp;
     extern logical igraphlsame_(char *, char *);
-    static doublereal ctemp, stemp;
+    doublereal ctemp, stemp;
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
 
 
@@ -315,7 +315,7 @@
 	}
     } else if (igraphlsame_(side, "R")) {
 
-/*        Form A * P' */
+/*        Form A * P**T */
 
 	if (igraphlsame_(pivot, "V")) {
 	    if (igraphlsame_(direct, "F")) {

@@ -45,30 +45,36 @@
 */
 #include <stdio.h>
 #include <string.h>
-extern int igraph_lgl_yylex(void);
-extern long int igraph_lgl_mylineno;
-extern char *igraph_lgl_yytext;
-extern int igraph_lgl_yyleng;
-char *igraph_i_lgl_errmsg=0;
-int igraph_lgl_yyerror(char *s);
 #include "igraph_types.h" 
 #include "igraph_types_internal.h"
 #include "igraph_math.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "config.h"
-extern igraph_bool_t igraph_lgl_has_weights;
-extern igraph_vector_t *igraph_lgl_vector;
-extern igraph_vector_t *igraph_lgl_weights;
-extern igraph_trie_t *igraph_lgl_trie;
+#include "foreign-lgl-header.h"
+#include "foreign-lgl-parser.h"
+
+#define yyscan_t void*
+
+int igraph_lgl_yylex(YYSTYPE* lvalp, YYLTYPE* llocp, 
+		     void* scanner);
+int igraph_lgl_yyerror(YYLTYPE* locp, igraph_i_lgl_parsedata_t *context, 
+		       char *s);
+char *igraph_lgl_yyget_text (yyscan_t yyscanner );
+int igraph_lgl_yyget_leng (yyscan_t yyscanner );
 igraph_real_t igraph_lgl_get_number(const char *str, long int len);
-void igraph_i_lgl_reset_scanner(void);
-long int igraph_lgl_actvertex;
+
+#define scanner context->scanner
 %}
 
+%pure-parser
 %output="y.tab.c"
 %name-prefix="igraph_lgl_yy"
 %defines
+%locations
+%error-verbose
+%parse-param { igraph_i_lgl_parsedata_t* context }
+%lex-param { void *scanner }
 
 %union {
   long int edgenum;
@@ -91,41 +97,39 @@ input :    /* empty */
 
 vertex : vertexdef edges ;
 
-vertexdef : HASH edgeid NEWLINE       { igraph_lgl_actvertex=$2; } ;
+vertexdef : HASH edgeid NEWLINE       { context->actvertex=$2; } ;
 
 edges :   /* empty */ | edges edge ;
 
 edge :   edgeid NEWLINE             { 
-             igraph_vector_push_back(igraph_lgl_vector, igraph_lgl_actvertex);
-             igraph_vector_push_back(igraph_lgl_vector, $1);
-             igraph_vector_push_back(igraph_lgl_weights, 0);
+             igraph_vector_push_back(context->vector, context->actvertex);
+             igraph_vector_push_back(context->vector, $1);
+             igraph_vector_push_back(context->weights, 0);
            }
        | edgeid weight NEWLINE      { 
-             igraph_vector_push_back(igraph_lgl_vector, igraph_lgl_actvertex);
-             igraph_vector_push_back(igraph_lgl_vector, $1);
-             igraph_vector_push_back(igraph_lgl_weights, $2);
-			 igraph_lgl_has_weights = 1;
+	     igraph_vector_push_back(context->vector, context->actvertex);
+             igraph_vector_push_back(context->vector, $1);
+             igraph_vector_push_back(context->weights, $2);
+	     context->has_weights = 1;
            } 
 ;
 
 
-edgeid : ALNUM  { igraph_trie_get2(igraph_lgl_trie, 
-				   igraph_lgl_yytext, 
-				   igraph_lgl_yyleng, &$$); };
+edgeid : ALNUM  { igraph_trie_get2(context->trie, 
+				   igraph_lgl_yyget_text(scanner), 
+				   igraph_lgl_yyget_leng(scanner), 
+				   &$$); };
 
-weight : ALNUM  { $$=igraph_lgl_get_number(igraph_lgl_yytext, 
-					   igraph_lgl_yyleng); } ;
+weight : ALNUM  { $$=igraph_lgl_get_number(igraph_lgl_yyget_text(scanner), 
+					   igraph_lgl_yyget_leng(scanner)); } ;
 
 %%
 
-int igraph_lgl_yyerror (char *s)
-{
-  static char str[300];  
-  igraph_i_lgl_reset_scanner();
-
-  snprintf(str, sizeof(str), "Parse error in LGL file, line %li (%s)", 
-	   (long)igraph_lgl_mylineno, s);
-  igraph_i_lgl_errmsg=str;
+int igraph_lgl_yyerror(YYLTYPE* locp, igraph_i_lgl_parsedata_t *context, 
+		       char *s) {
+  snprintf(context->errmsg, sizeof(context->errmsg)/sizeof(char), 
+	   "Parse error in LGL file, line %i (%s)", 
+	   locp->first_line, s);
   return 0;
 }
 

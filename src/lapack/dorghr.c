@@ -25,15 +25,15 @@ static integer c_n1 = -1;
     integer a_dim1, a_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i__, j, nb, nh, iinfo;
+    integer i__, j, nb, nh, iinfo;
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
     extern integer igraphilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);
     extern /* Subroutine */ int igraphdorgqr_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    integer *);
-    static integer lwkopt;
-    static logical lquery;
+    integer lwkopt;
+    logical lquery;
 
 
 /*  -- LAPACK routine (version 3.2) --   

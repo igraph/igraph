@@ -3,6 +3,8 @@ AC_CONFIG_SRCDIR(src/games.c)
 AM_INIT_AUTOMAKE(igraph, 0.6)
 AM_CONFIG_HEADER(config.h)
 
+m4_include(tools/autoconf/ax_tls.m4)
+
 # Test suite
 AC_CONFIG_TESTDIR(tests)
 AC_CONFIG_FILES([tests/Makefile tests/atlocal])
@@ -160,6 +162,24 @@ if test "x$enable_gmp" != "xno"; then
   ])
 fi
 
+tls_support=no
+HAVE_TLS=0
+THREAD_LOCAL=
+AC_ARG_ENABLE(tls, AC_HELP_STRING([--enable-tls], [Compile with thread-local storage]))
+if test "x$enable_tls" != "xno"; then
+  AX_TLS([
+    AC_DEFINE([HAVE_TLS], [1], [Define to 1 if you want to use thread-local storage for global igraph structures])
+    tls_support=yes
+    HAVE_TLS=1
+    THREAD_LOCAL=$ac_cv_tls
+  ], [])
+fi
+AC_SUBST(HAVE_TLS)
+AC_DEFINE_UNQUOTED([IGRAPH_THREAD_LOCAL], $THREAD_LOCAL,
+          [Keyword for thread local storage, or empty if not available])
+AC_DEFINE_UNQUOTED([IGRAPH_F77_SAVE], [static IGRAPH_THREAD_LOCAL],
+          [Keyword for thread local storage, or just static if not available])
+
 AC_ARG_WITH([external-f2c], [AS_HELP_STRING([--with-external-f2c],
 		                      [Use external F2C library [default=no]])],
             [internal_f2c=no],
@@ -266,13 +286,14 @@ if test "$use_gprof" = "yes"; then
   CXXFLAGS="${CFLAGS} -pg"
 fi
 
-AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile doc/book/Makefile interfaces/R/configure.in interfaces/R/Makefile interfaces/R/src/Makevars.win interfaces/R/DESCRIPTION interfaces/Makefile include/igraph_version.h])
+AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile doc/book/Makefile interfaces/R/configure.in interfaces/R/Makefile interfaces/R/src/Makevars.win interfaces/R/DESCRIPTION interfaces/Makefile include/igraph_version.h include/igraph_threading.h])
 AC_OUTPUT
 
 AC_MSG_RESULT([igraph successfully configured.])
 AC_MSG_RESULT([  GraphML format support -- $graphml_support])
 AC_MSG_RESULT([  GMP library support    -- $gmp_support])
 AC_MSG_RESULT([  GLPK library support   -- $glpk_support])
+AC_MSG_RESULT([  Thread-local storage   -- $tls_support])
 AC_MSG_RESULT([  Use internal ARPACK    -- $internal_arpack])
 AC_MSG_RESULT([  Use internal LAPACK    -- $internal_lapack])
 AC_MSG_RESULT([  Use internal BLAS      -- $internal_blas])

@@ -32,18 +32,18 @@
 #include "igraph_attributes.h"
 #include "config.h"
 
-unsigned int igraph_i_isoclass_3[] = {  0, 1, 1, 3, 1, 5, 6, 7,
-                                         1, 6,10,11, 3, 7,11,15,
-                                         1, 6, 5, 7,10,21,21,23,
-                                         6,25,21,27,11,27,30,31,
-                                         1,10, 6,11, 6,21,25,27,
-                                         5,21,21,30, 7,23,27,31,
-                                         3,11, 7,15,11,30,27,31,
-                                         7,27,23,31,15,31,31,63 };
+const unsigned int igraph_i_isoclass_3[] = {  0, 1, 1, 3, 1, 5, 6, 7,
+					      1, 6,10,11, 3, 7,11,15,
+					      1, 6, 5, 7,10,21,21,23,
+					      6,25,21,27,11,27,30,31,
+					      1,10, 6,11, 6,21,25,27,
+					      5,21,21,30, 7,23,27,31,
+					      3,11, 7,15,11,30,27,31,
+					      7,27,23,31,15,31,31,63 };
 
-unsigned int igraph_i_isoclass_3_idx[] = { 0, 4, 16, 1, 0, 32, 2, 8, 0 };
+const unsigned int igraph_i_isoclass_3_idx[] = { 0, 4, 16, 1, 0, 32, 2, 8, 0 };
 
-unsigned int igraph_i_isoclass_4[] = { 
+const unsigned int igraph_i_isoclass_4[] = { 
      0,   1,   1,   3,   1,   3,   3,   7,   1,   9,  10,  11,  10,
     11,  14,  15,   1,  10,  18,  19,  20,  21,  22,  23,   3,  11,
     19,  27,  21,  29,  30,  31,   1,  10,  20,  21,  18,  19,  22,
@@ -361,38 +361,38 @@ unsigned int igraph_i_isoclass_4[] = {
    767,1919, 767,1919,1791,2047, 511,1023,1023,2047,1023,2047,2047,
   4095 };
 
-unsigned int igraph_i_isoclass_4_idx[] = {
+const unsigned int igraph_i_isoclass_4_idx[] = {
   0, 8, 64, 512, 1, 0, 128, 1024, 2, 16, 0, 2048, 4, 32, 256, 0 };
 
-unsigned int igraph_i_isoclass_3u[] = { 0,1,1,3,1,3,3,7 };
+const unsigned int igraph_i_isoclass_3u[] = { 0,1,1,3,1,3,3,7 };
 
-unsigned int igraph_i_isoclass_3u_idx[] = { 0,1,2,1,0,4,2,4,0 };
+const unsigned int igraph_i_isoclass_3u_idx[] = { 0,1,2,1,0,4,2,4,0 };
 
-unsigned int igraph_i_isoclass_4u[] = {
+const unsigned int igraph_i_isoclass_4u[] = {
   0, 1, 1, 3, 1, 3, 3, 7, 1, 3, 3,11,12,13,13,15, 1, 3,12,13, 3,11,13,15, 3, 7,
  13,15,13,15,30,31, 1,12, 3,13, 3,13,11,15, 3,13, 7,15,13,30,15,31, 3,13,13,30,
   7,15,15,31,11,15,15,31,15,31,31,63 };
 
-unsigned int igraph_i_isoclass_4u_idx[] = {
+const unsigned int igraph_i_isoclass_4u_idx[] = {
   0, 1, 2, 8, 1, 0, 4, 16, 2, 4, 0, 32, 8, 16, 32, 0 };
 
-unsigned int igraph_i_isoclass2_3[] = {
+const unsigned int igraph_i_isoclass2_3[] = {
  0, 1, 1, 2, 1, 3, 4, 5, 1, 4, 6, 7, 2, 5, 7, 8, 1, 4, 3, 5, 6, 9, 9,10, 4,11,
  9,12, 7,12,13,14, 1, 6, 4, 7, 4, 9,11,12, 3, 9, 9,13, 5,10,12,14, 2, 7, 5, 8,
  7,13,12,14, 5,12,10,14, 8,14,14,15
 };
 
-unsigned int igraph_i_isoclass2_3u[] = {
+const unsigned int igraph_i_isoclass2_3u[] = {
   0,1,1,2,1,2,2,3 
 };
 
-unsigned int igraph_i_isoclass2_4u[] = { 
+const unsigned int igraph_i_isoclass2_4u[] = { 
  0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 4, 5, 6, 6, 7, 1, 2, 5, 6, 2, 4, 6, 7, 2, 3,
  6, 7, 6, 7, 8, 9, 1, 5, 2, 6, 2, 6, 4, 7, 2, 6, 3, 7, 6, 8, 7, 9, 2, 6, 6, 8,
  3, 7, 7, 9, 4, 7, 7, 9, 7, 9, 9,10
 };
 
-unsigned int igraph_i_isoclass2_4[] = {
+const unsigned int igraph_i_isoclass2_4[] = {
   0,  1,  1,  2,  1,  2,  2,  3,  1,  4,  5,  6,  5,  6,  7,  8,  1,  5,  9, 10,
  11, 12, 13, 14,  2,  6, 10, 15, 12, 16, 17, 18,  1,  5, 11, 12,  9, 10, 13, 14,
   2,  6, 12, 16, 10, 15, 17, 18,  2,  7, 13, 17, 13, 17, 19, 20,  3,  8, 14, 18,
@@ -600,10 +600,10 @@ unsigned int igraph_i_isoclass2_4[] = {
  75,195,167,212,167,212,205,216, 91,198,198,216,198,216,216,217
 };
 
-unsigned int igraph_i_isographs_3[] =  { 0, 1, 3, 5, 6, 7, 10, 11, 15, 21, 
-					 23, 25, 27, 30, 31, 63 };
-unsigned int igraph_i_isographs_3u[] = { 0, 1, 3, 7 };
-unsigned int igraph_i_isographs_4[] = {
+const unsigned int igraph_i_isographs_3[] =  { 0, 1, 3, 5, 6, 7, 10, 11, 15, 21, 
+					       23, 25, 27, 30, 31, 63 };
+const unsigned int igraph_i_isographs_3u[] = { 0, 1, 3, 7 };
+const unsigned int igraph_i_isographs_4[] = {
    0,    1,    3,    7,    9,   10,   11,   14,   15,   18,   19,   20,   21, 
   22,   23,   27,   29,   30,   31,   54,   55,   63,   73,   75,   76,   77, 
   79,   81,   83,   84,   85,   86,   87,   90,   91,   92,   93,   94,   95, 
@@ -621,14 +621,14 @@ unsigned int igraph_i_isographs_4[] = {
  887,  891,  892,  893,  894,  895,  947,  949,  951,  955,  957,  958,  959, 
 1019, 1020, 1021, 1023, 1755, 1757, 1758, 1759, 1782, 1783, 1791, 1883, 1887, 
 1907, 1911, 1917, 1918, 1919, 2029, 2031, 2039, 2047, 4095};
-unsigned int igraph_i_isographs_4u[] = { 0, 1, 3, 7, 11, 12, 13, 
+const unsigned int igraph_i_isographs_4u[] = { 0, 1, 3, 7, 11, 12, 13, 
 					15, 30, 31, 63};
 
-unsigned int igraph_i_classedges_3[] = { 1,2, 0,2, 2,1, 0,1, 2,0, 1,0 };
-unsigned int igraph_i_classedges_3u[] = { 1,2, 0,2, 0,1 };
-unsigned int igraph_i_classedges_4[] = { 2,3, 1,3, 0,3, 3,2, 1,2, 0,2,
-					 3,1, 2,1, 0,1, 3,0, 2,0, 1,0 };
-unsigned int igraph_i_classedges_4u[] = { 2,3, 1,3, 0,3, 1,2, 0,2, 0,1 };
+const unsigned int igraph_i_classedges_3[] = { 1,2, 0,2, 2,1, 0,1, 2,0, 1,0 };
+const unsigned int igraph_i_classedges_3u[] = { 1,2, 0,2, 0,1 };
+const unsigned int igraph_i_classedges_4[] = { 2,3, 1,3, 0,3, 3,2, 1,2, 0,2,
+					       3,1, 2,1, 0,1, 3,0, 2,0, 1,0 };
+const unsigned int igraph_i_classedges_4u[] = { 2,3, 1,3, 0,3, 1,2, 0,2, 0,1 };
 
 /**
  * \section about_graph_isomorphism
@@ -700,7 +700,7 @@ int igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
   long int no_of_edges=igraph_ecount(graph);
   igraph_integer_t from, to;
   unsigned char idx, mul;
-  unsigned int *arr_idx, *arr_code;
+  const unsigned int *arr_idx, *arr_code;
   int code=0;
 
   if (no_of_nodes < 3 || no_of_nodes > 4) {
@@ -854,7 +854,7 @@ int igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
   igraph_vector_t neis;
   
   unsigned char mul, idx;
-  unsigned int *arr_idx, *arr_code;
+  const unsigned int *arr_idx, *arr_code;
   int code=0;
   
   long int i, j, s;
@@ -931,7 +931,7 @@ int igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
 int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
 			   igraph_integer_t number, igraph_bool_t directed) {
   igraph_vector_t edges;
-  unsigned int *classedges;
+  const unsigned int *classedges;
   long int power;
   long int code;
   long int pos;

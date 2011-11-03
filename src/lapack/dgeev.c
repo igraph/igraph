@@ -32,19 +32,19 @@ static integer c_n1 = -1;
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer i__, k;
-    static doublereal r__, cs, sn;
-    static integer ihi;
-    static doublereal scl;
-    static integer ilo;
-    static doublereal dum[1], eps;
-    static integer ibal;
-    static char side[1];
-    static doublereal anrm;
-    static integer ierr, itau;
+    integer i__, k;
+    doublereal r__, cs, sn;
+    integer ihi;
+    doublereal scl;
+    integer ilo;
+    doublereal dum[1], eps;
+    integer ibal;
+    char side[1];
+    doublereal anrm;
+    integer ierr, itau;
     extern /* Subroutine */ int igraphdrot_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *);
-    static integer iwrk, nout;
+    integer iwrk, nout;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
@@ -55,9 +55,9 @@ static integer c_n1 = -1;
 	    integer *, doublereal *, integer *, integer *), 
 	    igraphdgebal_(char *, integer *, doublereal *, integer *, integer *, 
 	    integer *, doublereal *, integer *);
-    static logical scalea;
+    logical scalea;
     extern doublereal igraphdlamch_(char *);
-    static doublereal cscale;
+    doublereal cscale;
     extern doublereal igraphdlange_(char *, integer *, integer *, doublereal *, 
 	    integer *, doublereal *);
     extern /* Subroutine */ int igraphdgehrd_(integer *, integer *, integer *, 
@@ -70,10 +70,10 @@ static integer c_n1 = -1;
 	    doublereal *, integer *, doublereal *, integer *), 
 	    igraphdlartg_(doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *), igraphxerbla_(char *, integer *, ftnlen);
-    static logical select[1];
+    logical select[1];
     extern integer igraphilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);
-    static doublereal bignum;
+    doublereal bignum;
     extern /* Subroutine */ int igraphdorghr_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    integer *), igraphdhseqr_(char *, char *, integer *, integer *, integer 
@@ -81,17 +81,17 @@ static integer c_n1 = -1;
 	    doublereal *, integer *, doublereal *, integer *, integer *), igraphdtrevc_(char *, char *, logical *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *, integer *, integer *, doublereal *, integer *);
-    static integer minwrk, maxwrk;
-    static logical wantvl;
-    static doublereal smlnum;
-    static integer hswork;
-    static logical lquery, wantvr;
+    integer minwrk, maxwrk;
+    logical wantvl;
+    doublereal smlnum;
+    integer hswork;
+    logical lquery, wantvr;
 
 
-/*  -- LAPACK driver routine (version 3.2) --   
+/*  -- LAPACK driver routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -104,8 +104,8 @@ static integer c_n1 = -1;
                      A * v(j) = lambda(j) * v(j)   
     where lambda(j) is its eigenvalue.   
     The left eigenvector u(j) of A satisfies   
-                  u(j)**H * A = lambda(j) * u(j)**H   
-    where u(j)**H denotes the conjugate transpose of u(j).   
+                  u(j)**T * A = lambda(j) * u(j)**T   
+    where u(j)**T denotes the transpose of u(j).   
 
     The computed eigenvectors are normalized to have Euclidean norm   
     equal to 1 and largest component real.   

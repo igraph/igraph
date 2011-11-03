@@ -21,12 +21,13 @@
 
 */
 
+#include "config.h"
 #include "igraph_statusbar.h"
 #include "igraph_error.h"
 #include <stdio.h>
 #include <stdarg.h>
 
-static igraph_status_handler_t *igraph_i_status_handler=0;
+static IGRAPH_THREAD_LOCAL igraph_status_handler_t *igraph_i_status_handler=0;
 
 int igraph_status(const char *message, void *data) {
   if (igraph_i_status_handler) {

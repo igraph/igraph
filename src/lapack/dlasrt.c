@@ -19,17 +19,17 @@
     integer i__1, i__2;
 
     /* Local variables */
-    static integer i__, j;
-    static doublereal d1, d2, d3;
-    static integer dir;
-    static doublereal tmp;
-    static integer endd;
+    integer i__, j;
+    doublereal d1, d2, d3;
+    integer dir;
+    doublereal tmp;
+    integer endd;
     extern logical igraphlsame_(char *, char *);
-    static integer stack[64]	/* was [2][32] */;
-    static doublereal dmnmx;
-    static integer start;
+    integer stack[64]	/* was [2][32] */;
+    doublereal dmnmx;
+    integer start;
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
-    static integer stkpnt;
+    integer stkpnt;
 
 
 /*  -- LAPACK routine (version 3.2) --   

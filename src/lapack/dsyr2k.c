@@ -21,11 +21,11 @@
 	    i__3;
 
     /* Local variables */
-    static integer i__, j, l, info;
-    static doublereal temp1, temp2;
+    integer i__, j, l, info;
+    doublereal temp1, temp2;
     extern logical igraphlsame_(char *, char *);
-    static integer nrowa;
-    static logical upper;
+    integer nrowa;
+    logical upper;
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
 
 
@@ -34,11 +34,11 @@
 
     DSYR2K  performs one of the symmetric rank 2k operations   
 
-       C := alpha*A*B' + alpha*B*A' + beta*C,   
+       C := alpha*A*B**T + alpha*B*A**T + beta*C,   
 
     or   
 
-       C := alpha*A'*B + alpha*B'*A + beta*C,   
+       C := alpha*A**T*B + alpha*B**T*A + beta*C,   
 
     where  alpha and beta  are scalars, C is an  n by n  symmetric matrix   
     and  A and B  are  n by k  matrices  in the  first  case  and  k by n   
@@ -64,13 +64,13 @@
              On entry,  TRANS  specifies the operation to be performed as   
              follows:   
 
-                TRANS = 'N' or 'n'   C := alpha*A*B' + alpha*B*A' +   
+                TRANS = 'N' or 'n'   C := alpha*A*B**T + alpha*B*A**T +   
                                           beta*C.   
 
-                TRANS = 'T' or 't'   C := alpha*A'*B + alpha*B'*A +   
+                TRANS = 'T' or 't'   C := alpha*A**T*B + alpha*B**T*A +   
                                           beta*C.   
 
-                TRANS = 'C' or 'c'   C := alpha*A'*B + alpha*B'*A +   
+                TRANS = 'C' or 'c'   C := alpha*A**T*B + alpha*B**T*A +   
                                           beta*C.   
 
              Unchanged on exit.   
@@ -145,6 +145,8 @@
              max( 1, n ).   
              Unchanged on exit.   
 
+    Further Details   
+    ===============   
 
     Level 3 Blas routine.   
 
@@ -155,6 +157,7 @@
        Jeremy Du Croz, Numerical Algorithms Group Ltd.   
        Sven Hammarling, Numerical Algorithms Group Ltd.   
 
+    =====================================================================   
 
 
        Test the input parameters.   
@@ -261,7 +264,7 @@
 
     if (igraphlsame_(trans, "N")) {
 
-/*        Form  C := alpha*A*B' + alpha*B*A' + C. */
+/*        Form  C := alpha*A*B**T + alpha*B*A**T + C. */
 
 	if (upper) {
 	    i__1 = *n;
@@ -332,7 +335,7 @@
 	}
     } else {
 
-/*        Form  C := alpha*A'*B + alpha*B'*A + C. */
+/*        Form  C := alpha*A**T*B + alpha*B**T*A + C. */
 
 	if (upper) {
 	    i__1 = *n;

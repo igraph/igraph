@@ -463,11 +463,14 @@ static integer c__1 = 1;
 	    void), do_fio(integer *, char *, ftnlen);
 
     /* Local variables */
-    static integer j;
-    static real t0, t1;
-    static integer nb, ih, iq, np, iw, ldh, ldq, nbx, nev0, mode, ierr, iupd, 
-	    next, nopx, ritz;
-    static real tmvbx;
+    integer j;
+    real t0, t1;
+    IGRAPH_F77_SAVE integer nb, ih, iq, np, iw, ldh, ldq;
+    integer nbx;
+    IGRAPH_F77_SAVE integer nev0, mode, ierr, iupd, next;
+    integer nopx;
+    IGRAPH_F77_SAVE integer ritz;
+    real tmvbx;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen), igraphivout_(integer *, integer *, integer *
 	    , integer *, char *, ftnlen), igraphdsaup2_(integer *, char *, integer *
@@ -476,20 +479,23 @@ static integer c__1 = 1;
 	    *, doublereal *, integer *, doublereal *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static real tgetv0, tsaup2;
+    real tgetv0, tsaup2;
     extern doublereal igraphdlamch_(char *);
     extern /* Subroutine */ int igraphsecond_(real *);
-    static integer logfil, ndigit, ishift, nitref, msaupd, bounds;
-    static real titref, tseigt, tsaupd;
+    integer logfil=0, ndigit;
+    IGRAPH_F77_SAVE integer ishift;
+    integer nitref, msaupd=0;
+    IGRAPH_F77_SAVE integer bounds;
+    real titref, tseigt, tsaupd;
     extern /* Subroutine */ int igraphdstats_(void);
-    static integer msglvl;
-    static real tsaitr;
-    static integer mxiter;
-    static real tsgets, tsapps;
-    static integer nrorth;
-    static real tsconv;
-    static integer nrstrt;
-    static real tmvopx;
+    IGRAPH_F77_SAVE integer msglvl;
+    real tsaitr;
+    IGRAPH_F77_SAVE integer mxiter;
+    real tsgets, tsapps;
+    integer nrorth;
+    real tsconv;
+    integer nrstrt;
+    real tmvopx;
 
     /* Fortran I/O blocks */
     static cilist io___28 = { 0, 6, 0, fmt_1000, 0 };

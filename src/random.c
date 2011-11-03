@@ -67,8 +67,8 @@
  * </para>
  * 
  * <para> 
- * The created default generator is stored in the \ref
- * igraph_rng_default variable.
+ * The created default generator is stored internally and can be
+ * queried with the \ref igraph_rng_default() function.
  * </para>
  * </section>
  * 
@@ -77,7 +77,7 @@
  * If reproducible results are needed, then the user should set the
  * seed of the default random number generator explicitly, using the 
  * \ref igraph_rng_seed() function on the default generator, \ref
- * igraph_rng_default. When setting the seed to the same number,
+ * igraph_rng_default(). When setting the seed to the same number,
  * igraph generates exactly the same random graph (or series of random
  * graphs).
  * </para>
@@ -85,7 +85,7 @@
  * 
  * <section><title>Changing the default generator</title>
  * <para> 
- * By default igraph uses the \ref igraph_rng_default random number
+ * By default igraph uses the \ref igraph_rng_default() random number
  * generator. This can be changed any time by calling \ref
  * igraph_rng_set_default(), with an already initialized random number
  * generator. Note that the old (replaced) generator is not
@@ -225,7 +225,7 @@ void igraph_rng_glibc2_destroy(void *vstate) {
  * This generator was ported from the GNU Scientific Library.
  */
 
-igraph_rng_type_t igraph_rngtype_glibc2 = {
+const igraph_rng_type_t igraph_rngtype_glibc2 = {
   /* name= */      "LIBC",
   /* min=  */      0,
   /* max=  */      RAND_MAX,
@@ -300,7 +300,7 @@ void igraph_rng_rand_destroy(void *vstate) {
  * This generator was ported from the GNU Scientific Library.
  */
 
-igraph_rng_type_t igraph_rngtype_rand = {
+const igraph_rng_type_t igraph_rngtype_rand = {
   /* name= */      "RAND",
   /* min=  */      0,
   /* max=  */      0x7fffffffUL,
@@ -451,7 +451,7 @@ void igraph_rng_mt19937_destroy(void *vstate) {
  * This generator was ported from the GNU Scientific Library.
  */
 
-igraph_rng_type_t igraph_rngtype_mt19937 = {
+const igraph_rng_type_t igraph_rngtype_mt19937 = {
   /* name= */      "MT19937",
   /* min=  */      0,
   /* max=  */      0xffffffffUL,
@@ -470,43 +470,27 @@ igraph_rng_type_t igraph_rngtype_mt19937 = {
 
 /* ------------------------------------ */
 
-/** 
- * \function igraph_rng_set_default
- * Set the default igraph random number generator
- * 
- * \param rng The random number generator to use as default from now
- *    on. Calling \ref igraph_rng_destroy() on it, while it is still
- *    being used as the default will result in crashes and/or
- *    unpredictable results.
- * 
- * Time complexity: O(1).
- */
-
-void igraph_rng_set_default(igraph_rng_t *rng) {
-  igraph_rng_default = (*rng);
-}
-
 #ifndef USING_R
-
-#define addr(a) (&a)
 
 igraph_i_rng_mt19937_state_t igraph_i_rng_default_state;
 
-/** 
- * \var igraph_rng_default
+#define addr(a) (&a)
+
+/**
+ * \var igraph_i_rng_default
  * The default igraph random number generator
  * 
  * This generator is used by all builtin igraph functions that need to
  * generate random numbers; e.g. all random graph generators. 
  * 
- * You can use \ref igraph_rng_default with \ref igraph_rng_seed()
+ * You can use \ref igraph_i_rng_default with \ref igraph_rng_seed()
  * to set its seed.
  * 
  * You can change the default generator using the \ref
  * igraph_rng_set_default() function. 
  */
 
-igraph_rng_t igraph_rng_default = { 
+IGRAPH_THREAD_LOCAL igraph_rng_t igraph_i_rng_default = { 
   addr(igraph_rngtype_mt19937),
   addr(igraph_i_rng_default_state),
   /* def= */ 1
@@ -514,7 +498,24 @@ igraph_rng_t igraph_rng_default = {
 
 #undef addr
 
+/** 
+ * \function igraph_rng_set_default
+ * Set the default igraph random number generator
+ * 
+ * \param rng The random number generator to use as default from now
+ *    on. Calling \ref igraph_rng_destroy() on it, while it is still
+ *    being used as the default will result craches and/or
+ *    unpredictable results.
+ * 
+ * Time complexity: O(1).
+ */
+
+void igraph_rng_set_default(igraph_rng_t *rng) {
+  igraph_i_rng_default = (*rng);
+}
+
 #endif
+
 
 /* ------------------------------------ */
 
@@ -536,7 +537,7 @@ void igraph_rng_R_destroy(void *state) {
 	       __FILE__, __LINE__, IGRAPH_EINTERNAL);
 }
 
-int igraph_rng_R_seed(void *state) {
+int igraph_rng_R_seed(void *state, unsigned long int seed) {
   IGRAPH_ERROR("R RNG error, unsupported function called",
 	       IGRAPH_EINTERNAL);
   return 0;
@@ -577,13 +578,28 @@ igraph_rng_type_t igraph_rngtype_R = {
   /* get_binom= */ igraph_rng_R_get_binom
 };
 
-igraph_rng_t igraph_rng_default = { 
+IGRAPH_THREAD_LOCAL igraph_rng_t igraph_i_rng_default = { 
   &igraph_rngtype_R,
   0,
   /* def= */ 1
 };
 
 #endif
+
+/* ------------------------------------ */
+
+/**
+ * \function igraph_rng_default
+ * Query the default random number generator.
+ * 
+ * \return A pointer to the default random number generator.
+ * 
+ * \sa igraph_rng_set_default()
+ */
+
+igraph_rng_t *igraph_rng_default() {
+  return &igraph_i_rng_default;
+}
 
 /* ------------------------------------ */
 
@@ -698,7 +714,7 @@ const char *igraph_rng_name(igraph_rng_t *rng) {
  * Generate an integer random number from an interval
  * 
  * \param rng Pointer to the RNG to use for the generation. Use \ref
- *        igraph_rng_default here to use the default igraph RNG.
+ *        igraph_rng_default() here to use the default igraph RNG.
  * \param l Lower limit, inclusive, it can be negative as well.
  * \param h Upper limit, inclusive, it can be negative as well, but it
  *        should be at least <code>l</code>.
@@ -726,7 +742,7 @@ long int igraph_rng_get_integer(igraph_rng_t *rng,
  * \function igraph_rng_get_normal
  * Normally distributed random numbers
  * 
- * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default
+ * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
  * \param m The mean.
  * \param s Standard deviation.
@@ -749,7 +765,7 @@ igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng,
  * \function igraph_rng_get_unif
  * Generate real, uniform random numbers from an interval
  * 
- * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default
+ * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
  * \param l The lower bound, it can be negative.
  * \param h The upper bound, it can be negative, but it has to be
@@ -776,7 +792,7 @@ igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng,
  * \function igraph_rng_get_unif01
  * Generate real, uniform random number from the unit interval
  *
- * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default
+ * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
  * \return The generated uniformly distributed random number.
  * 
@@ -799,7 +815,7 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
  * \function igraph_rng_get_geom
  * Generate geometrically distributed random numbers
  * 
- * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default
+ * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
  * \param p The probability of success in each trial. Must be larger
  *        than zero and smaller or equal to 1.
@@ -821,7 +837,7 @@ igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p) {
  * \function igraph_rng_get_binom
  * Generate binomially distributed random numbers
  * 
- * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default
+ * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
  * \param n Number of observations.
  * \param p Probability of an event.
@@ -851,8 +867,6 @@ unsigned long int igraph_rng_get_int31(igraph_rng_t *rng) {
     return igraph_rng_get_unif01(rng)*0x7FFFFFFFUL;
   }
 }
-
-int igraph_rng_inited = 0;
 
 #ifndef HAVE_EXPM1
 #ifndef USING_R			/* R provides a replacement */
@@ -1653,12 +1667,12 @@ double igraph_rpois(igraph_rng_t *rng, double mu)
     };
 
     /* These are static --- persistent between calls for same mu : */
-    static int l, m;
+    static IGRAPH_THREAD_LOCAL int l, m;
 
-    static double b1, b2, c, c0, c1, c2, c3;
-    static double pp[36], p0, p, q, s, d, omega;
-    static double big_l;/* integer "w/o overflow" */
-    static double muprev = 0., muprev2 = 0.;/*, muold	 = 0.*/
+    static IGRAPH_THREAD_LOCAL double b1, b2, c, c0, c1, c2, c3;
+    static IGRAPH_THREAD_LOCAL double pp[36], p0, p, q, s, d, omega;
+    static IGRAPH_THREAD_LOCAL double big_l;/* integer "w/o overflow" */
+    static IGRAPH_THREAD_LOCAL double muprev = 0., muprev2 = 0.;/*, muold	 = 0.*/
 
     /* Local Vars  [initialize some for -Wall]: */
     double del, difmuk= 0., E= 0., fk= 0., fx, fy, g, px, py, t, u= 0., v, x;
@@ -1849,12 +1863,12 @@ double igraph_rbinom(igraph_rng_t *rng, double nin, double pp)
 {
     /* FIXME: These should become THREAD_specific globals : */
 
-    static double c, fm, npq, p1, p2, p3, p4, qn;
-    static double xl, xll, xlr, xm, xr;
+    static IGRAPH_THREAD_LOCAL double c, fm, npq, p1, p2, p3, p4, qn;
+    static IGRAPH_THREAD_LOCAL double xl, xll, xlr, xm, xr;
 
-    static double psave = -1.0;
-    static int nsave = -1;
-    static int m;
+    static IGRAPH_THREAD_LOCAL double psave = -1.0;
+    static IGRAPH_THREAD_LOCAL int nsave = -1;
+    static IGRAPH_THREAD_LOCAL int m;
 
     double f, f1, f2, u, v, w, w2, x, x1, x2, z, z2;
     double p, q, np, g, r, al, alv, amaxp, ffm, ynorm;

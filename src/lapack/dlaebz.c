@@ -25,15 +25,15 @@
     doublereal d__1, d__2, d__3, d__4;
 
     /* Local variables */
-    static integer j, kf, ji, kl, jp, jit;
-    static doublereal tmp1, tmp2;
-    static integer itmp1, itmp2, kfnew, klnew;
+    integer j, kf, ji, kl, jp, jit;
+    doublereal tmp1, tmp2;
+    integer itmp1, itmp2, kfnew, klnew;
 
 
-/*  -- LAPACK auxiliary routine (version 3.2) --   
+/*  -- LAPACK auxiliary routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -272,7 +272,6 @@
 /*        Compute the number of eigenvalues in the initial intervals. */
 
 	*mout = 0;
-/* DIR$ NOVECTOR */
 	i__1 = *minp;
 	for (ji = 1; ji <= i__1; ++ji) {
 	    for (jp = 1; jp <= 2; ++jp) {
@@ -461,21 +460,6 @@
 		    tmp2 = min(d__1,d__2);
 		}
 
-/*              A series of compiler directives to defeat vectorization   
-                for the next loop   
-
-   $PL$ CMCHAR=' '   
-   DIR$          NEXTSCALAR   
-   $DIR          SCALAR   
-   DIR$          NEXT SCALAR   
-   VD$L          NOVECTOR   
-   DEC$          NOVECTOR   
-   VD$           NOVECTOR   
-   VDIR          NOVECTOR   
-   VOCL          LOOP,SCALAR   
-   IBM           PREFER SCALAR   
-   $PL$ CMCHAR='*' */
-
 		i__3 = *n;
 		for (j = 2; j <= i__3; ++j) {
 		    tmp2 = d__[j] - e2[j - 1] / tmp2 - tmp1;
@@ -549,8 +533,6 @@
 /* L100: */
 	    }
 	    kl = klnew;
-
-/*           End of Serial Version of the loop */
 
 	}
 

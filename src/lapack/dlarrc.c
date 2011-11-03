@@ -21,11 +21,11 @@
     doublereal d__1;
 
     /* Local variables */
-    static integer i__;
-    static doublereal sl, su, tmp, tmp2;
-    static logical matt;
+    integer i__;
+    doublereal sl, su, tmp, tmp2;
+    logical matt;
     extern logical igraphlsame_(char *, char *);
-    static doublereal lpivot, rpivot;
+    doublereal lpivot, rpivot;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) --   

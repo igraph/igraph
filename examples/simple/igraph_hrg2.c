@@ -28,7 +28,7 @@ int main() {
   igraph_t karate;
   igraph_vector_t parents, weights;
 
-  igraph_rng_seed(&igraph_rng_default, 42);
+  igraph_rng_seed(igraph_rng_default(), 42);
   
   igraph_small(&karate, 34, IGRAPH_UNDIRECTED,
                0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,10,0,11,0,12,0,13,

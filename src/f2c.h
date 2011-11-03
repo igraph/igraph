@@ -220,4 +220,7 @@ typedef doublereal E_f;	/* real function with -R not specified */
 #undef unix
 #undef vax
 #endif
+
+#include "config.h"
+
 #endif

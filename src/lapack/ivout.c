@@ -52,9 +52,9 @@ static integer c__1 = 1;
 	     ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer i__, k1, k2, lll;
-    static char line[80];
-    static integer ndigit;
+    integer i__, k1, k2, lll;
+    char line[80];
+    integer ndigit;
 
     /* Fortran I/O blocks */
     static cilist io___4 = { 0, 0, 0, fmt_2000, 0 };

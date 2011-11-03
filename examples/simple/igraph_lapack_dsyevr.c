@@ -69,7 +69,7 @@ int main() {
   int il, iu;
   igraph_real_t vl, vu;
   
-  igraph_rng_seed(&igraph_rng_default, 42);
+  igraph_rng_seed(igraph_rng_default(), 42);
   
   igraph_matrix_init(&A, DIM, DIM);
   igraph_matrix_init(&vectors, 0, 0);
@@ -80,7 +80,7 @@ int main() {
   for (i=0; i<DIM; i++) {
     for (j=i; j<DIM; j++) {
       MATRIX(A, i, j) = MATRIX(A, j, i) = 
-	igraph_rng_get_integer(&igraph_rng_default, 1, 10);
+	igraph_rng_get_integer(igraph_rng_default(), 1, 10);
     }
   }
   

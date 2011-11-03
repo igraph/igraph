@@ -30,22 +30,22 @@ static logical c_true = TRUE_;
     doublereal d__1, d__2, d__3, d__4, d__5, d__6;
 
     /* Local variables */
-    static doublereal d__[4]	/* was [2][2] */;
-    static integer i__, j, k;
-    static doublereal v[4]	/* was [2][2] */, z__;
-    static integer j1, j2, n1, n2;
-    static doublereal si, xj, sr, rec, eps, tjj, tmp;
+    doublereal d__[4]	/* was [2][2] */;
+    integer i__, j, k;
+    doublereal v[4]	/* was [2][2] */, z__;
+    integer j1, j2, n1, n2;
+    doublereal si, xj, sr, rec, eps, tjj, tmp;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static integer ierr;
-    static doublereal smin, xmax;
+    integer ierr;
+    doublereal smin, xmax;
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
     extern doublereal igraphdasum_(integer *, doublereal *, integer *);
     extern /* Subroutine */ int igraphdaxpy_(integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *);
-    static integer jnext;
-    static doublereal sminw, xnorm;
+    integer jnext;
+    doublereal sminw, xnorm;
     extern /* Subroutine */ int igraphdlaln2_(logical *, integer *, integer *, 
 	    doublereal *, doublereal *, doublereal *, integer *, doublereal *,
 	     doublereal *, doublereal *, integer *, doublereal *, doublereal *
@@ -53,18 +53,18 @@ static logical c_true = TRUE_;
     extern doublereal igraphdlamch_(char *), igraphdlange_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *);
     extern integer igraphidamax_(integer *, doublereal *, integer *);
-    static doublereal scaloc;
+    doublereal scaloc;
     extern /* Subroutine */ int igraphdladiv_(doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *);
-    static doublereal bignum;
-    static logical notran;
-    static doublereal smlnum;
+    doublereal bignum;
+    logical notran;
+    doublereal smlnum;
 
 
-/*  -- LAPACK auxiliary routine (version 3.2) --   
+/*  -- LAPACK auxiliary routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -88,7 +88,7 @@ static logical c_true = TRUE_;
                        [              .     ]   
                        [                 w  ]   
 
-    op(A) = A or A', A' denotes the conjugate transpose of   
+    op(A) = A or A**T, A**T denotes the transpose of   
     matrix A.   
 
     On input, X = [ c ].  On output, X = [ p ].   
@@ -103,7 +103,7 @@ static logical c_true = TRUE_;
     LTRAN   (input) LOGICAL   
             On entry, LTRAN specifies the option of conjugate transpose:   
                = .FALSE.,    op(T+i*B) = T+i*B,   
-               = .TRUE.,     op(T+i*B) = (T+i*B)'.   
+               = .TRUE.,     op(T+i*B) = (T+i*B)**T.   
 
     LREAL   (input) LOGICAL   
             On entry, LREAL specifies the input matrix structure:   
@@ -358,7 +358,7 @@ L30:
 
 	} else {
 
-/*           Solve T'*p = scale*c */
+/*           Solve T**T*p = scale*c */
 
 	    jnext = 1;
 	    i__1 = *n;
@@ -654,7 +654,7 @@ L70:
 
 	} else {
 
-/*           Solve (T + iB)'*(p+iq) = c+id */
+/*           Solve (T + iB)**T*(p+iq) = c+id */
 
 	    jnext = 1;
 	    i__1 = *n;

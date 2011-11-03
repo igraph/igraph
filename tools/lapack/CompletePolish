@@ -12,7 +12,7 @@ mkdir temp
 for file do	
        base=`echo $file | sed -e 's/\.f//g'`
    # run_stripper
-       f2c < ${base}.f | ${trans_dir}/lenscrub > ${base}.c
+       f2c -a < ${base}.f | ${trans_dir}/lenscrub > ${base}.c
    # run_macro (better vector and array indexing; from NAG)
 #   	${trans_dir}/substitute_locals.exe < ${base}.c > ${base}.u
 #  	${trans_dir}/test_tool.exe ${base}.u > ${base}.c

@@ -27,10 +27,10 @@ static doublereal c_b16 = 0.;
     integer a_dim1, a_offset, w_dim1, w_offset, i__1, i__2, i__3;
 
     /* Local variables */
-    static integer i__, iw;
+    integer i__, iw;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static doublereal alpha;
+    doublereal alpha;
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
     extern logical igraphlsame_(char *, char *);
@@ -43,10 +43,10 @@ static doublereal c_b16 = 0.;
 	     doublereal *);
 
 
-/*  -- LAPACK auxiliary routine (version 3.2) --   
+/*  -- LAPACK auxiliary routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -54,7 +54,7 @@ static doublereal c_b16 = 0.;
 
     DLATRD reduces NB rows and columns of a real symmetric matrix A to   
     symmetric tridiagonal form by an orthogonal similarity   
-    transformation Q' * A * Q, and returns the matrices V and W which are   
+    transformation Q**T * A * Q, and returns the matrices V and W which are   
     needed to apply the transformation to the unreduced part of A.   
 
     If UPLO = 'U', DLATRD reduces the last NB rows and columns of a   
@@ -131,7 +131,7 @@ static doublereal c_b16 = 0.;
 
     Each H(i) has the form   
 
-       H(i) = I - tau * v * v'   
+       H(i) = I - tau * v * v**T   
 
     where tau is a real scalar, and v is a real vector with   
     v(i:n) = 0 and v(i-1) = 1; v(1:i-1) is stored on exit in A(1:i-1,i),   
@@ -144,7 +144,7 @@ static doublereal c_b16 = 0.;
 
     Each H(i) has the form   
 
-       H(i) = I - tau * v * v'   
+       H(i) = I - tau * v * v**T   
 
     where tau is a real scalar, and v is a real vector with   
     v(1:i) = 0 and v(i+1) = 1; v(i+1:n) is stored on exit in A(i+1:n,i),   
@@ -153,7 +153,7 @@ static doublereal c_b16 = 0.;
     The elements of the vectors v together form the n-by-nb matrix V   
     which is needed, with W, to apply the transformation to the unreduced   
     part of the matrix, using a symmetric rank-2k update of the form:   
-    A := A - V*W' - W*V'.   
+    A := A - V*W**T - W*V**T.   
 
     The contents of A on exit are illustrated by the following examples   
     with n = 5 and nb = 2:   

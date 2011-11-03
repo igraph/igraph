@@ -127,13 +127,13 @@ static doublereal c_b20 = 0.;
     doublereal d__1, d__2;
 
     /* Local variables */
-    static integer i__;
-    static real t0, t1;
-    static doublereal vl[1], temp;
+    integer i__;
+    real t0, t1;
+    doublereal vl[1], temp;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
-    static integer iconj;
+    integer iconj;
     extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *), igraphdmout_(integer *, 
@@ -144,16 +144,16 @@ static doublereal c_b20 = 0.;
     extern /* Subroutine */ int igraphdlaqrb_(logical *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    doublereal *, integer *);
-    static integer mneigh;
+    integer mneigh=0;
     extern /* Subroutine */ int igraphsecond_(real *), igraphdlacpy_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *);
-    static integer logfil, ndigit;
-    static logical select[1];
-    static real tneigh;
+    integer logfil=0, ndigit;
+    logical select[1];
+    real tneigh;
     extern /* Subroutine */ int igraphdtrevc_(char *, char *, logical *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *, integer *, integer *, doublereal *, integer *);
-    static integer msglvl;
+    integer msglvl;
 
 
 /*     %----------------------------------------------------%   

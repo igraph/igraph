@@ -24,21 +24,21 @@ static integer c__1 = 1;
     integer a_dim1, a_offset, c_dim1, c_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i__, i1, i2, i3, ic, jc, mi, ni, nq;
-    static doublereal aii;
-    static logical left;
+    integer i__, i1, i2, i3, ic, jc, mi, ni, nq;
+    doublereal aii;
+    logical left;
     extern /* Subroutine */ int igraphdlarf_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *);
     extern logical igraphlsame_(char *, char *);
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
-    static logical notran;
+    logical notran;
 
 
-/*  -- LAPACK routine (version 3.2) --   
+/*  -- LAPACK routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -48,11 +48,11 @@ static integer c__1 = 1;
 
           Q * C  if SIDE = 'L' and TRANS = 'N', or   
 
-          Q'* C  if SIDE = 'L' and TRANS = 'T', or   
+          Q**T* C  if SIDE = 'L' and TRANS = 'T', or   
 
           C * Q  if SIDE = 'R' and TRANS = 'N', or   
 
-          C * Q' if SIDE = 'R' and TRANS = 'T',   
+          C * Q**T if SIDE = 'R' and TRANS = 'T',   
 
     where Q is a real orthogonal matrix defined as the product of k   
     elementary reflectors   
@@ -66,12 +66,12 @@ static integer c__1 = 1;
     =========   
 
     SIDE    (input) CHARACTER*1   
-            = 'L': apply Q or Q' from the Left   
-            = 'R': apply Q or Q' from the Right   
+            = 'L': apply Q or Q**T from the Left   
+            = 'R': apply Q or Q**T from the Right   
 
     TRANS   (input) CHARACTER*1   
             = 'N': apply Q  (No transpose)   
-            = 'T': apply Q' (Transpose)   
+            = 'T': apply Q**T (Transpose)   
 
     M       (input) INTEGER   
             The number of rows of the matrix C. M >= 0.   
@@ -102,7 +102,7 @@ static integer c__1 = 1;
 
     C       (input/output) DOUBLE PRECISION array, dimension (LDC,N)   
             On entry, the m by n matrix C.   
-            On exit, C is overwritten by Q*C or Q'*C or C*Q' or C*Q.   
+            On exit, C is overwritten by Q*C or Q**T*C or C*Q**T or C*Q.   
 
     LDC     (input) INTEGER   
             The leading dimension of the array C. LDC >= max(1,M).   

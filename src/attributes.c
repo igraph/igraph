@@ -28,6 +28,8 @@
 #include <string.h>
 #include <stdarg.h>
 
+IGRAPH_THREAD_LOCAL igraph_attribute_table_t *igraph_i_attribute_table=0;
+
 int igraph_i_attribute_init(igraph_t *graph, void *attr) {
   graph->attr=0;
   if (igraph_i_attribute_table) {
@@ -218,8 +220,6 @@ int igraph_i_attribute_get_string_edge_attr(const igraph_t *graph,
   }
 }
 
-igraph_attribute_table_t *igraph_i_attribute_table=0;
-
 /**
  * \function igraph_i_set_attribute_table
  * \brief Attach an attribute table.
@@ -234,9 +234,9 @@ igraph_attribute_table_t *igraph_i_attribute_table=0;
  */
   
 igraph_attribute_table_t *
-igraph_i_set_attribute_table(igraph_attribute_table_t * table) {
+igraph_i_set_attribute_table(const igraph_attribute_table_t * table) {
   igraph_attribute_table_t *old=igraph_i_attribute_table;
-  igraph_i_attribute_table=table;
+  igraph_i_attribute_table=(igraph_attribute_table_t*) table;
   return old;
 }
 

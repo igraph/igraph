@@ -21,7 +21,7 @@ doublereal igraphdlapy2_(doublereal *x, doublereal *y)
     double sqrt(doublereal);
 
     /* Local variables */
-    static doublereal w, z__, xabs, yabs;
+    doublereal w, z__, xabs, yabs;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) --   

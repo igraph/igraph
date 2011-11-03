@@ -19,11 +19,11 @@
     integer a_dim1, a_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i__, j, ix, jx, kx, info;
-    static doublereal temp;
+    integer i__, j, ix, jx, kx, info;
+    doublereal temp;
     extern logical igraphlsame_(char *, char *);
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
-    static logical nounit;
+    logical nounit;
 
 
 /*  Purpose   
@@ -31,7 +31,7 @@
 
     DTRMV  performs one of the matrix-vector operations   
 
-       x := A*x,   or   x := A'*x,   
+       x := A*x,   or   x := A**T*x,   
 
     where x is an n element vector and  A is an n by n unit, or non-unit,   
     upper or lower triangular matrix.   
@@ -55,9 +55,9 @@
 
                 TRANS = 'N' or 'n'   x := A*x.   
 
-                TRANS = 'T' or 't'   x := A'*x.   
+                TRANS = 'T' or 't'   x := A**T*x.   
 
-                TRANS = 'C' or 'c'   x := A'*x.   
+                TRANS = 'C' or 'c'   x := A**T*x.   
 
              Unchanged on exit.   
 
@@ -107,8 +107,11 @@
              X. INCX must not be zero.   
              Unchanged on exit.   
 
+    Further Details   
+    ===============   
 
     Level 2 Blas routine.   
+    The vector and matrix arguments are not referenced when N = 0, or M = 0   
 
     -- Written on 22-October-1986.   
        Jack Dongarra, Argonne National Lab.   
@@ -116,6 +119,7 @@
        Sven Hammarling, Nag Central Office.   
        Richard Hanson, Sandia National Labs.   
 
+    =====================================================================   
 
 
        Test the input parameters.   
@@ -250,7 +254,7 @@
 	}
     } else {
 
-/*        Form  x := A'*x. */
+/*        Form  x := A**T*x. */
 
 	if (igraphlsame_(uplo, "U")) {
 	    if (*incx == 1) {

@@ -26,7 +26,7 @@
 #define NODES 1000
 #define CLIQUE_SIZE 10
 #define NO_CLIQUES 10
-#define INT(a) (igraph_rng_get_integer(&igraph_rng_default, 0, (a)))
+#define INT(a) (igraph_rng_get_integer(igraph_rng_default(), 0, (a)))
 
 int permutation(igraph_vector_t *vec) {
   int i, r, tmp;
@@ -56,7 +56,7 @@ int main() {
   igraph_vector_ptr_t cliques;
   int i;
 
-  igraph_rng_seed(&igraph_rng_default, 42);
+  igraph_rng_seed(igraph_rng_default(), 42);
   
   /* Create a graph that has a random component, plus a number of 
      relatively small cliques */

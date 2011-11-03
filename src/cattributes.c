@@ -1978,7 +1978,7 @@ int igraph_i_cattribute_get_string_edge_attr(const igraph_t *graph,
 
 /* -------------------------------------- */
 
-igraph_attribute_table_t igraph_cattribute_table={
+const igraph_attribute_table_t igraph_cattribute_table={
   &igraph_i_cattribute_init, &igraph_i_cattribute_destroy,
   &igraph_i_cattribute_copy, &igraph_i_cattribute_add_vertices,
   &igraph_i_cattribute_permute_vertices, 

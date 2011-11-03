@@ -26,7 +26,7 @@
 #define DIM1 10
 #define DIM2 5
 
-#define INT(a) (igraph_rng_get_integer(&igraph_rng_default, 0, (a)))
+#define INT(a) (igraph_rng_get_integer(igraph_rng_default(), 0, (a)))
 
 int main() {
   igraph_matrix_t mat;
@@ -34,7 +34,7 @@ int main() {
   int i;
   igraph_real_t m1, m2;
   
-  igraph_rng_seed(&igraph_rng_default, 42);
+  igraph_rng_seed(igraph_rng_default(), 42);
 
   igraph_sparsemat_init(&spmat, DIM1, DIM2, 20);
   igraph_sparsemat_entry(&spmat, 1, 2, -1.0);

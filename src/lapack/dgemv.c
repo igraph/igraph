@@ -20,9 +20,9 @@
     integer a_dim1, a_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i__, j, ix, iy, jx, jy, kx, ky, info;
-    static doublereal temp;
-    static integer lenx, leny;
+    integer i__, j, ix, iy, jx, jy, kx, ky, info;
+    doublereal temp;
+    integer lenx, leny;
     extern logical igraphlsame_(char *, char *);
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
 
@@ -32,7 +32,7 @@
 
     DGEMV  performs one of the matrix-vector operations   
 
-       y := alpha*A*x + beta*y,   or   y := alpha*A'*x + beta*y,   
+       y := alpha*A*x + beta*y,   or   y := alpha*A**T*x + beta*y,   
 
     where alpha and beta are scalars, x and y are vectors and A is an   
     m by n matrix.   
@@ -46,9 +46,9 @@
 
                 TRANS = 'N' or 'n'   y := alpha*A*x + beta*y.   
 
-                TRANS = 'T' or 't'   y := alpha*A'*x + beta*y.   
+                TRANS = 'T' or 't'   y := alpha*A**T*x + beta*y.   
 
-                TRANS = 'C' or 'c'   y := alpha*A'*x + beta*y.   
+                TRANS = 'C' or 'c'   y := alpha*A**T*x + beta*y.   
 
              Unchanged on exit.   
 
@@ -108,8 +108,11 @@
              Y. INCY must not be zero.   
              Unchanged on exit.   
 
+    Further Details   
+    ===============   
 
     Level 2 Blas routine.   
+    The vector and matrix arguments are not referenced when N = 0, or M = 0   
 
     -- Written on 22-October-1986.   
        Jack Dongarra, Argonne National Lab.   
@@ -117,6 +120,7 @@
        Sven Hammarling, Nag Central Office.   
        Richard Hanson, Sandia National Labs.   
 
+    =====================================================================   
 
 
        Test the input parameters.   
@@ -256,7 +260,7 @@
 	}
     } else {
 
-/*        Form  y := alpha*A'*x + y. */
+/*        Form  y := alpha*A**T*x + y. */
 
 	jy = ky;
 	if (*incx == 1) {

@@ -59,14 +59,16 @@
 #include <cmath>
 #include <algorithm>
 
-int Probabilities::length = 0;
-Communities* Probabilities::C = 0;
-float* Probabilities::tmp_vector1 = 0;
-float* Probabilities::tmp_vector2 = 0;
-int* Probabilities::id = 0;
-int* Probabilities::vertices1 = 0;
-int* Probabilities::vertices2 = 0;
-int Probabilities::current_id = 0;
+#include "config.h"
+
+IGRAPH_THREAD_LOCAL int Probabilities::length = 0;
+IGRAPH_THREAD_LOCAL Communities* Probabilities::C = 0;
+IGRAPH_THREAD_LOCAL float* Probabilities::tmp_vector1 = 0;
+IGRAPH_THREAD_LOCAL float* Probabilities::tmp_vector2 = 0;
+IGRAPH_THREAD_LOCAL int* Probabilities::id = 0;
+IGRAPH_THREAD_LOCAL int* Probabilities::vertices1 = 0;
+IGRAPH_THREAD_LOCAL int* Probabilities::vertices2 = 0;
+IGRAPH_THREAD_LOCAL int Probabilities::current_id = 0;
 
 
 Neighbor::Neighbor() {

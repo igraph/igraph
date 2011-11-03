@@ -24,7 +24,7 @@ static integer c__1 = 1;
     doublereal d__1;
 
     /* Local variables */
-    static integer i__, j, l;
+    integer i__, j, l;
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *), igraphdlarf_(char *, integer *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *), igraphxerbla_(char *, integer *, ftnlen);

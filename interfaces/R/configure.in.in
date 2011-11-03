@@ -86,6 +86,8 @@ GLPK_LIBS=""
 AC_SUBST(HAVE_GLPK)
 AC_SUBST(GLPK_LIBS)
 
+AC_DEFINE(IGRAPH_THREAD_LOCAL, [], [We don't care about thread-local storage in R])
+
 AC_CONFIG_FILES([src/Makevars])
 
 AC_OUTPUT

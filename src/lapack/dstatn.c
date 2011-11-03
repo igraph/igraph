@@ -31,12 +31,12 @@
 
    Subroutine */ int igraphdstatn_(void)
 {
-    static integer nbx, nopx;
-    static real trvec, tmvbx, tnaup2, tgetv0, tneigh;
-    static integer nitref;
-    static real tnaupd, titref, tnaitr, tngets, tnapps, tnconv;
-    static integer nrorth, nrstrt;
-    static real tmvopx;
+    integer nbx, nopx;
+    real trvec, tmvbx, tnaup2, tgetv0, tneigh;
+    integer nitref;
+    real tnaupd, titref, tnaitr, tngets, tnapps, tnconv;
+    integer nrorth, nrstrt;
+    real tmvopx;
 
 
 /*     %--------------------------------%   

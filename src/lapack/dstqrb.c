@@ -133,37 +133,37 @@ static doublereal c_b31 = 1.;
     double sqrt(doublereal), d_sign(doublereal *, doublereal *);
 
     /* Local variables */
-    static doublereal b, c__, f, g;
-    static integer i__, j, k, l, m;
-    static doublereal p, r__, s;
-    static integer l1, ii, mm, lm1, mm1, nm1;
-    static doublereal rt1, rt2, eps;
-    static integer lsv;
-    static doublereal tst, eps2;
-    static integer lend, jtot;
+    doublereal b, c__, f, g;
+    integer i__, j, k, l, m;
+    doublereal p, r__, s;
+    integer l1, ii, mm, lm1, mm1, nm1;
+    doublereal rt1, rt2, eps;
+    integer lsv;
+    doublereal tst, eps2;
+    integer lend, jtot;
     extern /* Subroutine */ int igraphdlae2_(doublereal *, doublereal *, doublereal 
 	    *, doublereal *, doublereal *), igraphdlasr_(char *, char *, char *, 
 	    integer *, integer *, doublereal *, doublereal *, doublereal *, 
 	    integer *);
-    static doublereal anorm;
+    doublereal anorm;
     extern /* Subroutine */ int igraphdlaev2_(doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *);
-    static integer lendm1, lendp1;
+    integer lendm1, lendp1;
     extern doublereal igraphdlapy2_(doublereal *, doublereal *), igraphdlamch_(char *);
-    static integer iscale;
+    integer iscale;
     extern /* Subroutine */ int igraphdlascl_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
 	    integer *, integer *);
-    static doublereal safmin;
+    doublereal safmin;
     extern /* Subroutine */ int igraphdlartg_(doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *);
-    static doublereal safmax;
+    doublereal safmax;
     extern doublereal igraphdlanst_(char *, integer *, doublereal *, doublereal *);
     extern /* Subroutine */ int igraphdlasrt_(char *, integer *, doublereal *, 
 	    integer *);
-    static integer lendsv, nmaxit, icompz;
-    static doublereal ssfmax, ssfmin;
+    integer lendsv, nmaxit, icompz;
+    doublereal ssfmax, ssfmin;
 
 
 /*     %------------------%   

@@ -14,9 +14,9 @@
 
 /* Subroutine */ int igraphsecond_(real *t)
 {
-    static real t1;
+    real t1;
     extern doublereal etime_(real *);
-    static real tarray[2];
+    real tarray[2];
 
 
 

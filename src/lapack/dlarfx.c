@@ -23,19 +23,19 @@ static integer c__1 = 1;
     integer c_dim1, c_offset, i__1;
 
     /* Local variables */
-    static integer j;
-    static doublereal t1, t2, t3, t4, t5, t6, t7, t8, t9, v1, v2, v3, v4, v5, 
-	    v6, v7, v8, v9, t10, v10, sum;
+    integer j;
+    doublereal t1, t2, t3, t4, t5, t6, t7, t8, t9, v1, v2, v3, v4, v5, v6, v7,
+	     v8, v9, t10, v10, sum;
     extern /* Subroutine */ int igraphdlarf_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *);
     extern logical igraphlsame_(char *, char *);
 
 
-/*  -- LAPACK auxiliary routine (version 3.2) --   
+/*  -- LAPACK auxiliary routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -45,7 +45,7 @@ static integer c__1 = 1;
     matrix C, from either the left or the right. H is represented in the   
     form   
 
-          H = I - tau * v * v'   
+          H = I - tau * v * v**T   
 
     where tau is a real scalar and v is a real vector.   
 

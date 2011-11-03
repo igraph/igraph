@@ -74,7 +74,7 @@ int main() {
   igraph_t g;
   igraph_vector_t weights;
 
-  igraph_rng_seed(&igraph_rng_default, 42);
+  igraph_rng_seed(igraph_rng_default(), 42);
 
   /* Two triangles connected by one edge */
   printf("# Two triangles connected by one edge\n");

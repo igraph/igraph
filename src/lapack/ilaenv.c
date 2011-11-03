@@ -31,14 +31,14 @@ integer igraphilaenv_(integer *ispec, char *name__, char *opts, integer *n1,
     integer s_cmp(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer i__;
-    static char c1[1], c2[2], c3[3], c4[2];
-    static integer ic, nb, iz, nx;
-    static logical cname;
-    static integer nbmin;
-    static logical sname;
+    integer i__;
+    char c1[1], c2[2], c3[3], c4[2];
+    integer ic, nb, iz, nx;
+    logical cname;
+    integer nbmin;
+    logical sname;
     extern integer igraphieeeck_(integer *, real *, real *);
-    static char subnam[6];
+    char subnam[6];
     extern integer igraphiparmq_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *);
 

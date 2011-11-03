@@ -156,7 +156,7 @@ static doublereal c_b20 = -1.;
 {
     /* Initialized data */
 
-    static logical first = TRUE_;
+    IGRAPH_F77_SAVE logical first = TRUE_;
 
     /* System generated locals */
     integer h_dim1, h_offset, q_dim1, q_offset, v_dim1, v_offset, i__1, i__2, 
@@ -164,13 +164,13 @@ static doublereal c_b20 = -1.;
     doublereal d__1, d__2;
 
     /* Local variables */
-    static doublereal c__, f, g;
-    static integer i__, j;
-    static doublereal r__, s, a1, a2, a3, a4;
-    static real t0, t1;
-    static integer jj;
-    static doublereal big;
-    static integer iend, itop;
+    doublereal c__, f, g;
+    integer i__, j;
+    doublereal r__, s, a1, a2, a3, a4;
+    real t0, t1;
+    integer jj;
+    doublereal big;
+    integer iend, itop;
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *), igraphdgemv_(char *, integer *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
@@ -185,10 +185,10 @@ static doublereal c_b20 = -1.;
 	    integer *, doublereal *, integer *, doublereal *, integer *), igraphdlartg_(doublereal *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *), igraphdlaset_(char *, integer *, integer *,
 	     doublereal *, doublereal *, doublereal *, integer *);
-    static doublereal epsmch;
-    static integer logfil, ndigit, msapps, msglvl, istart;
-    static real tsapps;
-    static integer kplusp;
+    IGRAPH_F77_SAVE doublereal epsmch;
+    integer logfil=0, ndigit, msapps=0, msglvl, istart;
+    real tsapps;
+    integer kplusp;
 
 
 /*     %----------------------------------------------------%   

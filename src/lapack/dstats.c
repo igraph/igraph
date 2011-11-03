@@ -21,14 +21,14 @@
        %---------------------------------------------%   
    Subroutine */ int igraphdstats_(void)
 {
-    static integer nbx, nopx;
-    static real trvec, tmvbx, tgetv0, tsaup2;
-    static integer nitref;
-    static real titref, tseigt, tsaupd, tsaitr, tsgets, tsapps;
-    static integer nrorth;
-    static real tsconv;
-    static integer nrstrt;
-    static real tmvopx;
+    integer nbx, nopx;
+    real trvec, tmvbx, tgetv0, tsaup2;
+    integer nitref;
+    real titref, tseigt, tsaupd, tsaitr, tsgets, tsapps;
+    integer nrorth;
+    real tsconv;
+    integer nrstrt;
+    real tmvopx;
 
 /*     %--------------------------------%   
        | See stat.doc for documentation |   

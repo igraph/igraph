@@ -25,6 +25,7 @@
 #define IGRAPH_INTERRUPT_H
 
 #include "igraph_error.h"
+#include "config.h"
 
 #undef __BEGIN_DECLS
 #undef __END_DECLS
@@ -117,7 +118,8 @@ __BEGIN_DECLS
 
 typedef int igraph_interruption_handler_t (void* data);
 
-extern igraph_interruption_handler_t *igraph_i_interruption_handler;
+extern IGRAPH_THREAD_LOCAL igraph_interruption_handler_t 
+  *igraph_i_interruption_handler;
 
 /**
  * \define IGRAPH_ALLOW_INTERRUPTION

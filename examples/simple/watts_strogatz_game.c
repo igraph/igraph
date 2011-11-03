@@ -46,8 +46,8 @@ igraph_bool_t has_multiple(const igraph_t *graph) {
   } while (0)
 
 #define SEED() do {							\
-    seed=igraph_rng_get_integer(&igraph_rng_default, 1, 10000);		\
-    igraph_rng_seed(&igraph_rng_default, seed);				\
+    seed=igraph_rng_get_integer(igraph_rng_default(), 1, 10000);		\
+    igraph_rng_seed(igraph_rng_default(), seed);				\
   } while (0)
 
 int main() {
@@ -56,7 +56,7 @@ int main() {
   igraph_bool_t sim, seen_loops, seen_multiple;
   int i, seed=1305473657;
 
-  igraph_rng_seed(&igraph_rng_default, seed);
+  igraph_rng_seed(igraph_rng_default(), seed);
   
   /* No loops, no multiple edges */
   for (i=0; i<N; i++) {

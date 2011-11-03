@@ -36,40 +36,40 @@ static integer c__0 = 0;
     double log(doublereal);
 
     /* Local variables */
-    static integer i__, j, ib, ie, je, nb;
-    static doublereal gl;
-    static integer im, in;
-    static doublereal gu;
-    static integer iw, jee;
-    static doublereal eps;
-    static integer nwl;
-    static doublereal wlu, wul;
-    static integer nwu;
-    static doublereal tmp1, tmp2;
-    static integer iend, jblk, ioff, iout, itmp1, itmp2, jdisc;
+    integer i__, j, ib, ie, je, nb;
+    doublereal gl;
+    integer im, in;
+    doublereal gu;
+    integer iw, jee;
+    doublereal eps;
+    integer nwl;
+    doublereal wlu, wul;
+    integer nwu;
+    doublereal tmp1, tmp2;
+    integer iend, jblk, ioff, iout, itmp1, itmp2, jdisc;
     extern logical igraphlsame_(char *, char *);
-    static integer iinfo;
-    static doublereal atoli;
-    static integer iwoff, itmax;
-    static doublereal wkill, rtoli, uflow, tnorm;
+    integer iinfo;
+    doublereal atoli;
+    integer iwoff, itmax;
+    doublereal wkill, rtoli, uflow, tnorm;
     extern doublereal igraphdlamch_(char *);
-    static integer ibegin;
+    integer ibegin;
     extern /* Subroutine */ int igraphdlaebz_(integer *, integer *, integer *, 
 	    integer *, integer *, integer *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, integer *,
 	     doublereal *, doublereal *, integer *, integer *, doublereal *, 
 	    integer *, integer *);
-    static integer irange, idiscl, idumma[1];
+    integer irange, idiscl, idumma[1];
     extern integer igraphilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);
-    static integer idiscu;
-    static logical ncnvrg, toofew;
+    integer idiscu;
+    logical ncnvrg, toofew;
 
 
-/*  -- LAPACK auxiliary routine (version 3.2.1)                        --   
+/*  -- LAPACK auxiliary routine (version 3.3.0)                        --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-    -- April 2009                                                      --   
+       November 2010   
 
 
     Purpose   
@@ -94,14 +94,14 @@ static integer c__0 = 0;
     Arguments   
     =========   
 
-    RANGE   (input) CHARACTER   
+    RANGE   (input) CHARACTER*1   
             = 'A': ("All")   all eigenvalues will be found.   
             = 'V': ("Value") all eigenvalues in the half-open interval   
                              (VL, VU] will be found.   
             = 'I': ("Index") the IL-th through IU-th eigenvalues (of the   
                              entire matrix) will be found.   
 
-    ORDER   (input) CHARACTER   
+    ORDER   (input) CHARACTER*1   
             = 'B': ("By Block") the eigenvalues will be grouped by   
                                 split-off block (see IBLOCK, ISPLIT) and   
                                 ordered from smallest to largest within   

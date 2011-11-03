@@ -35,35 +35,35 @@ static logical c_true = TRUE_;
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer i__, j, k;
-    static doublereal x[4]	/* was [2][2] */;
-    static integer j1, j2, n2, ii, ki, ip, is;
-    static doublereal wi, wr, rec, ulp, beta, emax;
-    static logical pair;
+    integer i__, j, k;
+    doublereal x[4]	/* was [2][2] */;
+    integer j1, j2, n2, ii, ki, ip, is;
+    doublereal wi, wr, rec, ulp, beta, emax;
+    logical pair;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static logical allv;
-    static integer ierr;
-    static doublereal unfl, ovfl, smin;
-    static logical over;
-    static doublereal vmax;
-    static integer jnxt;
+    logical allv;
+    integer ierr;
+    doublereal unfl, ovfl, smin;
+    logical over;
+    doublereal vmax;
+    integer jnxt;
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
-    static doublereal scale;
+    doublereal scale;
     extern logical igraphlsame_(char *, char *);
     extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *);
-    static doublereal remax;
+    doublereal remax;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static logical leftv, bothv;
+    logical leftv, bothv;
     extern /* Subroutine */ int igraphdaxpy_(integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *);
-    static doublereal vcrit;
-    static logical somev;
-    static doublereal xnorm;
+    doublereal vcrit;
+    logical somev;
+    doublereal xnorm;
     extern /* Subroutine */ int igraphdlaln2_(logical *, integer *, integer *, 
 	    doublereal *, doublereal *, doublereal *, integer *, doublereal *,
 	     doublereal *, doublereal *, integer *, doublereal *, doublereal *
@@ -72,15 +72,15 @@ static logical c_true = TRUE_;
     extern doublereal igraphdlamch_(char *);
     extern integer igraphidamax_(integer *, doublereal *, integer *);
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
-    static doublereal bignum;
-    static logical rightv;
-    static doublereal smlnum;
+    doublereal bignum;
+    logical rightv;
+    doublereal smlnum;
 
 
-/*  -- LAPACK routine (version 3.2) --   
+/*  -- LAPACK routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -94,9 +94,9 @@ static logical c_true = TRUE_;
     The right eigenvector x and the left eigenvector y of T corresponding   
     to an eigenvalue w are defined by:   
 
-       T*x = w*x,     (y**H)*T = w*(y**H)   
+       T*x = w*x,     (y**T)*T = w*(y**T)   
 
-    where y**H denotes the conjugate transpose of y.   
+    where y**T denotes the transpose of y.   
     The eigenvalues are not input to this routine, but are read directly   
     from the diagonal blocks of T.   
 
@@ -798,7 +798,7 @@ L150:
 		}
 
 /*              Solve the quasi-triangular system:   
-                   (T(KI+1:N,KI+1:N) - WR)'*X = SCALE*WORK */
+                   (T(KI+1:N,KI+1:N) - WR)**T*X = SCALE*WORK */
 
 		vmax = 1.;
 		vcrit = bignum;
@@ -838,7 +838,7 @@ L150:
 			work[j + *n] -= igraphddot_(&i__3, &t[ki + 1 + j * t_dim1], 
 				&c__1, &work[ki + 1 + *n], &c__1);
 
-/*                    Solve (T(J,J)-WR)'*X = WORK */
+/*                    Solve (T(J,J)-WR)**T*X = WORK */
 
 			igraphdlaln2_(&c_false, &c__1, &c__1, &smin, &c_b22, &t[j + 
 				j * t_dim1], ldt, &c_b22, &c_b22, &work[j + *
@@ -884,8 +884,8 @@ L150:
 				 t_dim1], &c__1, &work[ki + 1 + *n], &c__1);
 
 /*                    Solve   
-                        [T(J,J)-WR   T(J,J+1)     ]'* X = SCALE*( WORK1 )   
-                        [T(J+1,J)    T(J+1,J+1)-WR]             ( WORK2 ) */
+                        [T(J,J)-WR   T(J,J+1)     ]**T * X = SCALE*( WORK1 )   
+                        [T(J+1,J)    T(J+1,J+1)-WR]                ( WORK2 ) */
 
 			igraphdlaln2_(&c_true, &c__2, &c__1, &smin, &c_b22, &t[j + 
 				j * t_dim1], ldt, &c_b22, &c_b22, &work[j + *
@@ -953,7 +953,7 @@ L170:
 /*              Complex left eigenvector.   
 
                  Initial solve:   
-                   ((T(KI,KI)    T(KI,KI+1) )' - (WR - I* WI))*X = 0.   
+                   ((T(KI,KI)    T(KI,KI+1) )**T - (WR - I* WI))*X = 0.   
                    ((T(KI+1,KI) T(KI+1,KI+1))                ) */
 
 		if ((d__1 = t[ki + (ki + 1) * t_dim1], abs(d__1)) >= (d__2 = 
@@ -1085,8 +1085,8 @@ L170:
 				 t_dim1], &c__1, &work[ki + 2 + n2], &c__1);
 
 /*                    Solve 2-by-2 complex linear equation   
-                        ([T(j,j)   T(j,j+1)  ]'-(wr-i*wi)*I)*X = SCALE*B   
-                        ([T(j+1,j) T(j+1,j+1)]             ) */
+                        ([T(j,j)   T(j,j+1)  ]**T-(wr-i*wi)*I)*X = SCALE*B   
+                        ([T(j+1,j) T(j+1,j+1)]               ) */
 
 			d__1 = -wi;
 			igraphdlaln2_(&c_true, &c__2, &c__2, &smin, &c_b22, &t[j + 

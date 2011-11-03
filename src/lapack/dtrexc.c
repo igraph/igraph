@@ -25,13 +25,13 @@ static integer c__2 = 2;
     integer q_dim1, q_offset, t_dim1, t_offset, i__1;
 
     /* Local variables */
-    static integer nbf, nbl, here;
+    integer nbf, nbl, here;
     extern logical igraphlsame_(char *, char *);
-    static logical wantq;
+    logical wantq;
     extern /* Subroutine */ int igraphdlaexc_(logical *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, integer *, integer *, integer 
 	    *, doublereal *, integer *), igraphxerbla_(char *, integer *, ftnlen);
-    static integer nbnext;
+    integer nbnext;
 
 
 /*  -- LAPACK routine (version 3.2) --   

@@ -31,20 +31,19 @@ static logical c_true = TRUE_;
     doublereal d__1, d__2;
 
     /* Local variables */
-    static integer j, k, l;
-    static doublereal x[4]	/* was [2][2] */;
-    static integer k1, k2, l1, l2;
-    static doublereal a11, db, da11, vec[4]	/* was [2][2] */, dum[1], eps,
-	     sgn;
+    integer j, k, l;
+    doublereal x[4]	/* was [2][2] */;
+    integer k1, k2, l1, l2;
+    doublereal a11, db, da11, vec[4]	/* was [2][2] */, dum[1], eps, sgn;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static integer ierr;
-    static doublereal smin, suml, sumr;
+    integer ierr;
+    doublereal smin, suml, sumr;
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
     extern logical igraphlsame_(char *, char *);
-    static integer knext, lnext;
-    static doublereal xnorm;
+    integer knext, lnext;
+    doublereal xnorm;
     extern /* Subroutine */ int igraphdlaln2_(logical *, integer *, integer *, 
 	    doublereal *, doublereal *, doublereal *, integer *, doublereal *,
 	     doublereal *, doublereal *, integer *, doublereal *, doublereal *
@@ -55,17 +54,17 @@ static logical c_true = TRUE_;
 	    integer *), igraphdlabad_(doublereal *, doublereal *);
     extern doublereal igraphdlamch_(char *), igraphdlange_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *);
-    static doublereal scaloc;
+    doublereal scaloc;
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
-    static doublereal bignum;
-    static logical notrna, notrnb;
-    static doublereal smlnum;
+    doublereal bignum;
+    logical notrna, notrnb;
+    doublereal smlnum;
 
 
-/*  -- LAPACK routine (version 3.2) --   
+/*  -- LAPACK routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -485,17 +484,17 @@ L60:
 
     } else if (! notrna && notrnb) {
 
-/*        Solve    A' *X + ISGN*X*B = scale*C.   
+/*        Solve    A**T *X + ISGN*X*B = scale*C.   
 
           The (K,L)th block of X is determined starting from   
           upper-left corner column by column by   
 
-            A(K,K)'*X(K,L) + ISGN*X(K,L)*B(L,L) = C(K,L) - R(K,L)   
+            A(K,K)**T*X(K,L) + ISGN*X(K,L)*B(L,L) = C(K,L) - R(K,L)   
 
           Where   
-                     K-1                        L-1   
-            R(K,L) = SUM [A(I,K)'*X(I,L)] +ISGN*SUM [X(K,J)*B(J,L)]   
-                     I=1                        J=1   
+                     K-1                          L-1   
+            R(K,L) = SUM [A(I,K)**T*X(I,L)] +ISGN*SUM [X(K,J)*B(J,L)]   
+                     I=1                          J=1   
 
           Start column loop (index = L)   
           L1 (L2): column index of the first (last) row of X(K,L) */
@@ -720,17 +719,17 @@ L120:
 
     } else if (! notrna && ! notrnb) {
 
-/*        Solve    A'*X + ISGN*X*B' = scale*C.   
+/*        Solve    A**T*X + ISGN*X*B**T = scale*C.   
 
           The (K,L)th block of X is determined starting from   
           top-right corner column by column by   
 
-             A(K,K)'*X(K,L) + ISGN*X(K,L)*B(L,L)' = C(K,L) - R(K,L)   
+             A(K,K)**T*X(K,L) + ISGN*X(K,L)*B(L,L)**T = C(K,L) - R(K,L)   
 
           Where   
-                       K-1                          N   
-              R(K,L) = SUM [A(I,K)'*X(I,L)] + ISGN*SUM [X(K,J)*B(L,J)'].   
-                       I=1                        J=L+1   
+                       K-1                            N   
+              R(K,L) = SUM [A(I,K)**T*X(I,L)] + ISGN*SUM [X(K,J)*B(L,J)**T].   
+                       I=1                          J=L+1   
 
           Start column loop (index = L)   
           L1 (L2): column index of the first (last) row of X(K,L) */
@@ -990,16 +989,16 @@ L180:
 
     } else if (notrna && ! notrnb) {
 
-/*        Solve    A*X + ISGN*X*B' = scale*C.   
+/*        Solve    A*X + ISGN*X*B**T = scale*C.   
 
           The (K,L)th block of X is determined starting from   
           bottom-right corner column by column by   
 
-              A(K,K)*X(K,L) + ISGN*X(K,L)*B(L,L)' = C(K,L) - R(K,L)   
+              A(K,K)*X(K,L) + ISGN*X(K,L)*B(L,L)**T = C(K,L) - R(K,L)   
 
           Where   
                         M                          N   
-              R(K,L) = SUM [A(K,I)*X(I,L)] + ISGN*SUM [X(K,J)*B(L,J)'].   
+              R(K,L) = SUM [A(K,I)*X(I,L)] + ISGN*SUM [X(K,J)*B(L,J)**T].   
                       I=K+1                      J=L+1   
 
           Start column loop (index = L)   

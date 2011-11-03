@@ -20,8 +20,8 @@
     doublereal d__1;
 
     /* Local variables */
-    static integer ix;
-    static doublereal absxi;
+    integer ix;
+    doublereal absxi;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) --   

@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#define R_INTEGER(a,b) (igraph_rng_get_integer(&igraph_rng_default, (a), (b)))
+#define R_INTEGER(a,b) (igraph_rng_get_integer(igraph_rng_default(), (a), (b)))
 
 /* test parameters structure */
 typedef struct {
@@ -220,7 +220,7 @@ int retain_strategy_test() {
   /* random vertex */
   min = 0;
   max = 5;
-  igraph_rng_seed(&igraph_rng_default, time(0));
+  igraph_rng_seed(igraph_rng_default(), time(0));
   v = R_INTEGER(min, max);  /* min <= v <= max */
   /* Ensure that it is possible for v to retain its current strategy. We */
   /* will try to do this at most ntry times. As there are at most 6 vertices */

@@ -62,7 +62,7 @@ known() {
 
 getdeps() {
     name=$1;
-    f2c ${name}.f >/dev/null 2>/dev/null && 
+    f2c -a ${name}.f >/dev/null 2>/dev/null && 
     gcc -c ${name}.c >/dev/null &&
     nm ${name}.o | grep " U " | awk ' { print $2 }' | 
     sed 's/_$//g' | sed 's/^_//g'
@@ -175,12 +175,16 @@ for name in ${arpack[@]}; do
 done >> ${arpackinc}
 /bin/echo >> ${arpackinc}
 
+## This is a patch to make ARPACK thread-safe
+
+cd /tmp/${destdir}
+patch -p2 < ${origdir}/mt.patch
+
 ## We are done
 
 echo "Sources are ready, to update your tree please run:
 
-  bzr rm ${origdir}/../src/lapack
-  mv /tmp/${destdir} ${origdir}/../../src/lapack
+  cp /tmp/${destdir}/* ${origdir}/../../src/lapack/
   bzr add ${origdir}/../../src/lapack
 
 "

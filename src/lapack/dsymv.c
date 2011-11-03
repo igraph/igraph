@@ -20,8 +20,8 @@
     integer a_dim1, a_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i__, j, ix, iy, jx, jy, kx, ky, info;
-    static doublereal temp1, temp2;
+    integer i__, j, ix, iy, jx, jy, kx, ky, info;
+    doublereal temp1, temp2;
     extern logical igraphlsame_(char *, char *);
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
 
@@ -105,8 +105,11 @@
              Y. INCY must not be zero.   
              Unchanged on exit.   
 
+    Further Details   
+    ===============   
 
     Level 2 Blas routine.   
+    The vector and matrix arguments are not referenced when N = 0, or M = 0   
 
     -- Written on 22-October-1986.   
        Jack Dongarra, Argonne National Lab.   
@@ -114,6 +117,7 @@
        Sven Hammarling, Nag Central Office.   
        Richard Hanson, Sandia National Labs.   
 
+    =====================================================================   
 
 
        Test the input parameters.   

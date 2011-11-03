@@ -25,15 +25,15 @@
     double log(doublereal);
 
     /* Local variables */
-    static integer i__, j, k, p;
-    static doublereal s;
-    static integer i1, i2, ii;
-    static doublereal fac, mid;
-    static integer cnt;
-    static doublereal tmp, left;
-    static integer iter, nint, prev, next, savi1;
-    static doublereal right, width, dplus;
-    static integer olnint, maxitr;
+    integer i__, j, k, p;
+    doublereal s;
+    integer i1, i2, ii;
+    doublereal fac, mid;
+    integer cnt;
+    doublereal tmp, left;
+    integer iter, nint, prev, next, savi1;
+    doublereal right, width, dplus;
+    integer olnint, maxitr;
 
 
 /*  -- LAPACK auxiliary routine (version 3.2.2) --   

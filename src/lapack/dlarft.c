@@ -26,21 +26,21 @@ static doublereal c_b10 = 0.;
     doublereal d__1;
 
     /* Local variables */
-    static integer i__, j, prevlastv;
-    static doublereal vii;
+    integer i__, j, prevlastv;
+    doublereal vii;
     extern logical igraphlsame_(char *, char *);
     extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *);
-    static integer lastv;
+    integer lastv;
     extern /* Subroutine */ int igraphdtrmv_(char *, char *, char *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *);
 
 
-/*  -- LAPACK auxiliary routine (version 3.2) --   
+/*  -- LAPACK auxiliary routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -56,12 +56,12 @@ static doublereal c_b10 = 0.;
     If STOREV = 'C', the vector which defines the elementary reflector   
     H(i) is stored in the i-th column of the array V, and   
 
-       H  =  I - V * T * V'   
+       H  =  I - V * T * V**T   
 
     If STOREV = 'R', the vector which defines the elementary reflector   
     H(i) is stored in the i-th row of the array V, and   
 
-       H  =  I - V' * T * V   
+       H  =  I - V**T * T * V   
 
     Arguments   
     =========   
@@ -188,7 +188,7 @@ L15:
                    END DO */
 		    j = min(lastv,prevlastv);
 
-/*                 T(1:i-1,i) := - tau(i) * V(i:j,1:i-1)' * V(i:j,i) */
+/*                 T(1:i-1,i) := - tau(i) * V(i:j,1:i-1)**T * V(i:j,i) */
 
 		    i__2 = j - i__ + 1;
 		    i__3 = i__ - 1;
@@ -214,7 +214,7 @@ L17:
                    END DO */
 		    j = min(lastv,prevlastv);
 
-/*                 T(1:i-1,i) := - tau(i) * V(1:i-1,i:j) * V(i,i:j)' */
+/*                 T(1:i-1,i) := - tau(i) * V(1:i-1,i:j) * V(i,i:j)**T */
 
 		    i__2 = i__ - 1;
 		    i__3 = j - i__ + 1;
@@ -277,7 +277,7 @@ L35:
 			j = max(lastv,prevlastv);
 
 /*                    T(i+1:k,i) :=   
-                              - tau(i) * V(j:n-k+i,i+1:k)' * V(j:n-k+i,i) */
+                              - tau(i) * V(j:n-k+i,i+1:k)**T * V(j:n-k+i,i) */
 
 			i__1 = *n - *k + i__ - j + 1;
 			i__2 = *k - i__;
@@ -307,7 +307,7 @@ L37:
 			j = max(lastv,prevlastv);
 
 /*                    T(i+1:k,i) :=   
-                              - tau(i) * V(i+1:k,j:n-k+i) * V(i,j:n-k+i)' */
+                              - tau(i) * V(i+1:k,j:n-k+i) * V(i,j:n-k+i)**T */
 
 			i__1 = *k - i__;
 			i__2 = *n - *k + i__ - j + 1;

@@ -87,11 +87,11 @@ unsigned long int igraph_rng_get_int31(igraph_rng_t *rng);
 
 /* --------------------------------- */
 
-extern igraph_rng_type_t igraph_rngtype_glibc2;
-extern igraph_rng_type_t igraph_rngtype_rand;
-extern igraph_rng_type_t igraph_rngtype_mt19937;
-extern igraph_rng_t igraph_rng_default;
+extern const igraph_rng_type_t igraph_rngtype_glibc2;
+extern const igraph_rng_type_t igraph_rngtype_rand;
+extern const igraph_rng_type_t igraph_rngtype_mt19937;
 
+igraph_rng_t *igraph_rng_default();
 void igraph_rng_set_default(igraph_rng_t *rng);
 
 /* --------------------------------- */
@@ -105,21 +105,21 @@ void PutRNGstate(void);
 
 #else 
 
-#define RNG_BEGIN()      if (igraph_rng_default.def==1) { \
-  igraph_rng_seed(&igraph_rng_default, time(0)); \
-  igraph_rng_default.def=2; \
+#define RNG_BEGIN()      if (igraph_rng_default()->def==1) {	\
+  igraph_rng_seed(igraph_rng_default(), time(0));		\
+  igraph_rng_default()->def=2;					\
   }
 #define RNG_END()		/* do nothing */
 
 #endif
 
-#define RNG_INTEGER(l,h) (igraph_rng_get_integer(&igraph_rng_default,(l),(h)))
-#define RNG_NORMAL(m,s)  (igraph_rng_get_normal(&igraph_rng_default,(m),(s)))
-#define RNG_UNIF(l,h)    (igraph_rng_get_unif(&igraph_rng_default,(l),(h)))
-#define RNG_UNIF01()     (igraph_rng_get_unif01(&igraph_rng_default))
-#define RNG_GEOM(p)      (igraph_rng_get_geom(&igraph_rng_default,(p)))
-#define RNG_BINOM(n,p)   (igraph_rng_get_binom(&igraph_rng_default,(n),(p)))
-#define RNG_INT31()      (igraph_rng_get_int31(&igraph_rng_default))
+#define RNG_INTEGER(l,h) (igraph_rng_get_integer(igraph_rng_default(),(l),(h)))
+#define RNG_NORMAL(m,s)  (igraph_rng_get_normal(igraph_rng_default(),(m),(s)))
+#define RNG_UNIF(l,h)    (igraph_rng_get_unif(igraph_rng_default(),(l),(h)))
+#define RNG_UNIF01()     (igraph_rng_get_unif01(igraph_rng_default()))
+#define RNG_GEOM(p)      (igraph_rng_get_geom(igraph_rng_default(),(p)))
+#define RNG_BINOM(n,p)   (igraph_rng_get_binom(igraph_rng_default(),(n),(p)))
+#define RNG_INT31()      (igraph_rng_get_int31(igraph_rng_default()))
 
 __END_DECLS
 

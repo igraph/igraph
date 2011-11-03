@@ -168,7 +168,7 @@ static doublereal c_b43 = -1.;
 {
     /* Initialized data */
 
-    static logical first = TRUE_;
+    IGRAPH_F77_SAVE logical first = TRUE_;
 
     /* System generated locals */
     integer h_dim1, h_offset, v_dim1, v_offset, q_dim1, q_offset, i__1, i__2, 
@@ -176,19 +176,21 @@ static doublereal c_b43 = -1.;
     doublereal d__1, d__2;
 
     /* Local variables */
-    static doublereal c__, f, g;
-    static integer i__, j;
-    static doublereal r__, s, t, u[3];
-    static real t0, t1;
-    static doublereal h11, h12, h21, h22, h32;
-    static integer jj, ir, nr;
-    static doublereal tau, ulp, tst1;
-    static integer iend;
-    static doublereal unfl, ovfl;
+    doublereal c__, f, g;
+    integer i__, j;
+    doublereal r__, s, t, u[3];
+    real t0, t1;
+    doublereal h11, h12, h21, h22, h32;
+    integer jj, ir, nr;
+    doublereal tau;
+    IGRAPH_F77_SAVE doublereal ulp;
+    doublereal tst1;
+    integer iend;
+    IGRAPH_F77_SAVE doublereal unfl, ovfl;
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *), igraphdlarf_(char *, integer *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *);
-    static logical cconj;
+    logical cconj;
     extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *), igraphdcopy_(integer *, 
@@ -203,7 +205,7 @@ static doublereal c_b43 = -1.;
     extern doublereal igraphdlamch_(char *);
     extern /* Subroutine */ int igraphdlarfg_(integer *, doublereal *, doublereal *,
 	     integer *, doublereal *);
-    static doublereal sigmai;
+    doublereal sigmai;
     extern doublereal igraphdlanhs_(char *, integer *, doublereal *, integer *, 
 	    doublereal *);
     extern /* Subroutine */ int igraphsecond_(real *), igraphdlacpy_(char *, integer *, 
@@ -211,13 +213,13 @@ static doublereal c_b43 = -1.;
 	    doublereal *, doublereal *, integer *), igraphdlartg_(
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *);
-    static integer logfil, ndigit;
-    static doublereal sigmar;
-    static integer mnapps, msglvl;
-    static real tnapps;
-    static integer istart;
-    static doublereal smlnum;
-    static integer kplusp;
+    integer logfil=0, ndigit;
+    doublereal sigmar;
+    integer mnapps=0, msglvl;
+    real tnapps;
+    integer istart;
+    IGRAPH_F77_SAVE doublereal smlnum;
+    integer kplusp;
 
 
 /*     %----------------------------------------------------%   

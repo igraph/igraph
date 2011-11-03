@@ -34,47 +34,47 @@ static integer c__0 = 0;
     double sqrt(doublereal), log(doublereal);
 
     /* Local variables */
-    static integer j, ib, jb, ie, je, nb;
-    static doublereal gl;
-    static integer im, in;
-    static doublereal gu;
-    static integer iw;
-    static doublereal wl, wu;
-    static integer nwl;
-    static doublereal ulp, wlu, wul;
-    static integer nwu;
-    static doublereal tmp1, tmp2;
-    static integer iend, ioff, iout, itmp1, jdisc;
+    integer j, ib, jb, ie, je, nb;
+    doublereal gl;
+    integer im, in;
+    doublereal gu;
+    integer iw;
+    doublereal wl, wu;
+    integer nwl;
+    doublereal ulp, wlu, wul;
+    integer nwu;
+    doublereal tmp1, tmp2;
+    integer iend, ioff, iout, itmp1, jdisc;
     extern logical igraphlsame_(char *, char *);
-    static integer iinfo;
-    static doublereal atoli;
-    static integer iwoff;
-    static doublereal bnorm;
-    static integer itmax;
-    static doublereal wkill, rtoli, tnorm;
+    integer iinfo;
+    doublereal atoli;
+    integer iwoff;
+    doublereal bnorm;
+    integer itmax;
+    doublereal wkill, rtoli, tnorm;
     extern doublereal igraphdlamch_(char *);
-    static integer ibegin;
+    integer ibegin;
     extern /* Subroutine */ int igraphdlaebz_(integer *, integer *, integer *, 
 	    integer *, integer *, integer *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, integer *,
 	     doublereal *, doublereal *, integer *, integer *, doublereal *, 
 	    integer *, integer *);
-    static integer irange, idiscl;
-    static doublereal safemn;
-    static integer idumma[1];
+    integer irange, idiscl;
+    doublereal safemn;
+    integer idumma[1];
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
     extern integer igraphilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);
-    static integer idiscu, iorder;
-    static logical ncnvrg;
-    static doublereal pivmin;
-    static logical toofew;
+    integer idiscu, iorder;
+    logical ncnvrg;
+    doublereal pivmin;
+    logical toofew;
 
 
-/*  -- LAPACK routine (version 3.2) --   
+/*  -- LAPACK routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
        8-18-00:  Increase FUDGE factor for T3E (eca)   
 
 
@@ -343,7 +343,6 @@ static integer c__0 = 0;
     work[*n] = 0.;
     pivmin = 1.;
 
-/* DIR$ NOVECTOR */
     i__1 = *n;
     for (j = 2; j <= i__1; ++j) {
 /* Computing 2nd power */

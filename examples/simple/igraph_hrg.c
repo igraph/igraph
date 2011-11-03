@@ -32,7 +32,7 @@ int main() {
   int i, j;
   igraph_vector_t neis;
 
-  igraph_rng_seed(&igraph_rng_default, 42);
+  igraph_rng_seed(igraph_rng_default(), 42);
 
   // We need attributes
   igraph_i_set_attribute_table(&igraph_cattribute_table);

@@ -28,44 +28,44 @@ static doublereal c_b25 = -1.;
 	    work_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i__, j;
+    integer i__, j;
     extern /* Subroutine */ int igraphdgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
     extern logical igraphlsame_(char *, char *);
-    static integer lastc;
+    integer lastc;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), igraphdtrmm_(char *, char *, char *, char *, 
 	    integer *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static integer lastv;
+    integer lastv;
     extern integer igraphiladlc_(integer *, integer *, doublereal *, integer *), 
 	    igraphiladlr_(integer *, integer *, doublereal *, integer *);
-    static char transt[1];
+    char transt[1];
 
 
-/*  -- LAPACK auxiliary routine (version 3.2) --   
+/*  -- LAPACK auxiliary routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
     =======   
 
-    DLARFB applies a real block reflector H or its transpose H' to a   
+    DLARFB applies a real block reflector H or its transpose H**T to a   
     real m by n matrix C, from either the left or the right.   
 
     Arguments   
     =========   
 
     SIDE    (input) CHARACTER*1   
-            = 'L': apply H or H' from the Left   
-            = 'R': apply H or H' from the Right   
+            = 'L': apply H or H**T from the Left   
+            = 'R': apply H or H**T from the Right   
 
     TRANS   (input) CHARACTER*1   
             = 'N': apply H (No transpose)   
-            = 'T': apply H' (Transpose)   
+            = 'T': apply H**T (Transpose)   
 
     DIRECT  (input) CHARACTER*1   
             Indicates how H is formed from a product of elementary   
@@ -93,7 +93,7 @@ static doublereal c_b25 = -1.;
                                   (LDV,K) if STOREV = 'C'   
                                   (LDV,M) if STOREV = 'R' and SIDE = 'L'   
                                   (LDV,N) if STOREV = 'R' and SIDE = 'R'   
-            The matrix V. See further details.   
+            The matrix V. See Further Details.   
 
     LDV     (input) INTEGER   
             The leading dimension of the array V.   
@@ -110,10 +110,10 @@ static doublereal c_b25 = -1.;
 
     C       (input/output) DOUBLE PRECISION array, dimension (LDC,N)   
             On entry, the m by n matrix C.   
-            On exit, C is overwritten by H*C or H'*C or C*H or C*H'.   
+            On exit, C is overwritten by H*C or H**T*C or C*H or C*H**T.   
 
     LDC     (input) INTEGER   
-            The leading dimension of the array C. LDA >= max(1,M).   
+            The leading dimension of the array C. LDC >= max(1,M).   
 
     WORK    (workspace) DOUBLE PRECISION array, dimension (LDWORK,K)   
 
@@ -121,6 +121,31 @@ static doublereal c_b25 = -1.;
             The leading dimension of the array WORK.   
             If SIDE = 'L', LDWORK >= max(1,N);   
             if SIDE = 'R', LDWORK >= max(1,M).   
+
+    Further Details   
+    ===============   
+
+    The shape of the matrix V and the storage of the vectors which define   
+    the H(i) is best illustrated by the following example with n = 5 and   
+    k = 3. The elements equal to 1 are not stored; the corresponding   
+    array elements are modified but restored on exit. The rest of the   
+    array is not used.   
+
+    DIRECT = 'F' and STOREV = 'C':         DIRECT = 'F' and STOREV = 'R':   
+
+                 V = (  1       )                 V = (  1 v1 v1 v1 v1 )   
+                     ( v1  1    )                     (     1 v2 v2 v2 )   
+                     ( v1 v2  1 )                     (        1 v3 v3 )   
+                     ( v1 v2 v3 )   
+                     ( v1 v2 v3 )   
+
+    DIRECT = 'B' and STOREV = 'C':         DIRECT = 'B' and STOREV = 'R':   
+
+                 V = ( v1 v2 v3 )                 V = ( v1 v1  1       )   
+                     ( v1 v2 v3 )                     ( v2 v2 v2  1    )   
+                     (  1 v2 v3 )                     ( v3 v3 v3 v3  1 )   
+                     (     1 v3 )   
+                     (        1 )   
 
     =====================================================================   
 
@@ -162,17 +187,17 @@ static doublereal c_b25 = -1.;
 
 	    if (igraphlsame_(side, "L")) {
 
-/*              Form  H * C  or  H' * C  where  C = ( C1 )   
-                                                    ( C2 )   
+/*              Form  H * C  or  H**T * C  where  C = ( C1 )   
+                                                      ( C2 )   
 
    Computing MAX */
 		i__1 = *k, i__2 = igraphiladlr_(m, k, &v[v_offset], ldv);
 		lastv = max(i__1,i__2);
 		lastc = igraphiladlc_(&lastv, n, &c__[c_offset], ldc);
 
-/*              W := C' * V  =  (C1'*V1 + C2'*V2)  (stored in WORK)   
+/*              W := C**T * V  =  (C1**T * V1 + C2**T * V2)  (stored in WORK)   
 
-                W := C1' */
+                W := C1**T */
 
 		i__1 = *k;
 		for (j = 1; j <= i__1; ++j) {
@@ -187,7 +212,7 @@ static doublereal c_b25 = -1.;
 			c_b14, &v[v_offset], ldv, &work[work_offset], ldwork);
 		if (lastv > *k) {
 
-/*                 W := W + C2'*V2 */
+/*                 W := W + C2**T *V2 */
 
 		    i__1 = lastv - *k;
 		    igraphdgemm_("Transpose", "No transpose", &lastc, k, &i__1, &
@@ -195,16 +220,16 @@ static doublereal c_b25 = -1.;
 			    v_dim1], ldv, &c_b14, &work[work_offset], ldwork);
 		}
 
-/*              W := W * T'  or  W * T */
+/*              W := W * T**T  or  W * T */
 
 		igraphdtrmm_("Right", "Upper", transt, "Non-unit", &lastc, k, &
 			c_b14, &t[t_offset], ldt, &work[work_offset], ldwork);
 
-/*              C := C - V * W' */
+/*              C := C - V * W**T */
 
 		if (lastv > *k) {
 
-/*                 C2 := C2 - V2 * W' */
+/*                 C2 := C2 - V2 * W**T */
 
 		    i__1 = lastv - *k;
 		    igraphdgemm_("No transpose", "Transpose", &i__1, &lastc, k, &
@@ -213,12 +238,12 @@ static doublereal c_b25 = -1.;
 			    c_dim1], ldc);
 		}
 
-/*              W := W * V1' */
+/*              W := W * V1**T */
 
 		igraphdtrmm_("Right", "Lower", "Transpose", "Unit", &lastc, k, &
 			c_b14, &v[v_offset], ldv, &work[work_offset], ldwork);
 
-/*              C1 := C1 - W' */
+/*              C1 := C1 - W**T */
 
 		i__1 = *k;
 		for (j = 1; j <= i__1; ++j) {
@@ -232,7 +257,7 @@ static doublereal c_b25 = -1.;
 
 	    } else if (igraphlsame_(side, "R")) {
 
-/*              Form  C * H  or  C * H'  where  C = ( C1  C2 )   
+/*              Form  C * H  or  C * H**T  where  C = ( C1  C2 )   
 
    Computing MAX */
 		i__1 = *k, i__2 = igraphiladlr_(n, k, &v[v_offset], ldv);
@@ -265,16 +290,16 @@ static doublereal c_b25 = -1.;
 			    ldwork);
 		}
 
-/*              W := W * T  or  W * T' */
+/*              W := W * T  or  W * T**T */
 
 		igraphdtrmm_("Right", "Upper", trans, "Non-unit", &lastc, k, &c_b14,
 			 &t[t_offset], ldt, &work[work_offset], ldwork);
 
-/*              C := C - W * V' */
+/*              C := C - W * V**T */
 
 		if (lastv > *k) {
 
-/*                 C2 := C2 - W * V2' */
+/*                 C2 := C2 - W * V2**T */
 
 		    i__1 = lastv - *k;
 		    igraphdgemm_("No transpose", "Transpose", &lastc, &i__1, k, &
@@ -283,7 +308,7 @@ static doublereal c_b25 = -1.;
 			     ldc);
 		}
 
-/*              W := W * V1' */
+/*              W := W * V1**T */
 
 		igraphdtrmm_("Right", "Lower", "Transpose", "Unit", &lastc, k, &
 			c_b14, &v[v_offset], ldv, &work[work_offset], ldwork);
@@ -309,17 +334,17 @@ static doublereal c_b25 = -1.;
 
 	    if (igraphlsame_(side, "L")) {
 
-/*              Form  H * C  or  H' * C  where  C = ( C1 )   
-                                                    ( C2 )   
+/*              Form  H * C  or  H**T * C  where  C = ( C1 )   
+                                                      ( C2 )   
 
    Computing MAX */
 		i__1 = *k, i__2 = igraphiladlr_(m, k, &v[v_offset], ldv);
 		lastv = max(i__1,i__2);
 		lastc = igraphiladlc_(&lastv, n, &c__[c_offset], ldc);
 
-/*              W := C' * V  =  (C1'*V1 + C2'*V2)  (stored in WORK)   
+/*              W := C**T * V  =  (C1**T * V1 + C2**T * V2)  (stored in WORK)   
 
-                W := C2' */
+                W := C2**T */
 
 		i__1 = *k;
 		for (j = 1; j <= i__1; ++j) {
@@ -335,7 +360,7 @@ static doublereal c_b25 = -1.;
 			work_offset], ldwork);
 		if (lastv > *k) {
 
-/*                 W := W + C1'*V1 */
+/*                 W := W + C1**T*V1 */
 
 		    i__1 = lastv - *k;
 		    igraphdgemm_("Transpose", "No transpose", &lastc, k, &i__1, &
@@ -343,16 +368,16 @@ static doublereal c_b25 = -1.;
 			    c_b14, &work[work_offset], ldwork);
 		}
 
-/*              W := W * T'  or  W * T */
+/*              W := W * T**T  or  W * T */
 
 		igraphdtrmm_("Right", "Lower", transt, "Non-unit", &lastc, k, &
 			c_b14, &t[t_offset], ldt, &work[work_offset], ldwork);
 
-/*              C := C - V * W' */
+/*              C := C - V * W**T */
 
 		if (lastv > *k) {
 
-/*                 C1 := C1 - V1 * W' */
+/*                 C1 := C1 - V1 * W**T */
 
 		    i__1 = lastv - *k;
 		    igraphdgemm_("No transpose", "Transpose", &i__1, &lastc, k, &
@@ -360,13 +385,13 @@ static doublereal c_b25 = -1.;
 			    ldwork, &c_b14, &c__[c_offset], ldc);
 		}
 
-/*              W := W * V2' */
+/*              W := W * V2**T */
 
 		igraphdtrmm_("Right", "Upper", "Transpose", "Unit", &lastc, k, &
 			c_b14, &v[lastv - *k + 1 + v_dim1], ldv, &work[
 			work_offset], ldwork);
 
-/*              C2 := C2 - W' */
+/*              C2 := C2 - W**T */
 
 		i__1 = *k;
 		for (j = 1; j <= i__1; ++j) {
@@ -381,7 +406,7 @@ static doublereal c_b25 = -1.;
 
 	    } else if (igraphlsame_(side, "R")) {
 
-/*              Form  C * H  or  C * H'  where  C = ( C1  C2 )   
+/*              Form  C * H  or  C * H**T  where  C = ( C1  C2 )   
 
    Computing MAX */
 		i__1 = *k, i__2 = igraphiladlr_(n, k, &v[v_offset], ldv);
@@ -414,16 +439,16 @@ static doublereal c_b25 = -1.;
 			    c_b14, &work[work_offset], ldwork);
 		}
 
-/*              W := W * T  or  W * T' */
+/*              W := W * T  or  W * T**T */
 
 		igraphdtrmm_("Right", "Lower", trans, "Non-unit", &lastc, k, &c_b14,
 			 &t[t_offset], ldt, &work[work_offset], ldwork);
 
-/*              C := C - W * V' */
+/*              C := C - W * V**T */
 
 		if (lastv > *k) {
 
-/*                 C1 := C1 - W * V1' */
+/*                 C1 := C1 - W * V1**T */
 
 		    i__1 = lastv - *k;
 		    igraphdgemm_("No transpose", "Transpose", &lastc, &i__1, k, &
@@ -431,7 +456,7 @@ static doublereal c_b25 = -1.;
 			    ldv, &c_b14, &c__[c_offset], ldc);
 		}
 
-/*              W := W * V2' */
+/*              W := W * V2**T */
 
 		igraphdtrmm_("Right", "Upper", "Transpose", "Unit", &lastc, k, &
 			c_b14, &v[lastv - *k + 1 + v_dim1], ldv, &work[
@@ -461,17 +486,17 @@ static doublereal c_b25 = -1.;
 
 	    if (igraphlsame_(side, "L")) {
 
-/*              Form  H * C  or  H' * C  where  C = ( C1 )   
-                                                    ( C2 )   
+/*              Form  H * C  or  H**T * C  where  C = ( C1 )   
+                                                      ( C2 )   
 
    Computing MAX */
 		i__1 = *k, i__2 = igraphiladlc_(k, m, &v[v_offset], ldv);
 		lastv = max(i__1,i__2);
 		lastc = igraphiladlc_(&lastv, n, &c__[c_offset], ldc);
 
-/*              W := C' * V'  =  (C1'*V1' + C2'*V2') (stored in WORK)   
+/*              W := C**T * V**T  =  (C1**T * V1**T + C2**T * V2**T) (stored in WORK)   
 
-                W := C1' */
+                W := C1**T */
 
 		i__1 = *k;
 		for (j = 1; j <= i__1; ++j) {
@@ -480,13 +505,13 @@ static doublereal c_b25 = -1.;
 /* L130: */
 		}
 
-/*              W := W * V1' */
+/*              W := W * V1**T */
 
 		igraphdtrmm_("Right", "Upper", "Transpose", "Unit", &lastc, k, &
 			c_b14, &v[v_offset], ldv, &work[work_offset], ldwork);
 		if (lastv > *k) {
 
-/*                 W := W + C2'*V2' */
+/*                 W := W + C2**T*V2**T */
 
 		    i__1 = lastv - *k;
 		    igraphdgemm_("Transpose", "Transpose", &lastc, k, &i__1, &c_b14,
@@ -494,16 +519,16 @@ static doublereal c_b25 = -1.;
 			    + 1], ldv, &c_b14, &work[work_offset], ldwork);
 		}
 
-/*              W := W * T'  or  W * T */
+/*              W := W * T**T  or  W * T */
 
 		igraphdtrmm_("Right", "Upper", transt, "Non-unit", &lastc, k, &
 			c_b14, &t[t_offset], ldt, &work[work_offset], ldwork);
 
-/*              C := C - V' * W' */
+/*              C := C - V**T * W**T */
 
 		if (lastv > *k) {
 
-/*                 C2 := C2 - V2' * W' */
+/*                 C2 := C2 - V2**T * W**T */
 
 		    i__1 = lastv - *k;
 		    igraphdgemm_("Transpose", "Transpose", &i__1, &lastc, k, &c_b25,
@@ -517,7 +542,7 @@ static doublereal c_b25 = -1.;
 		igraphdtrmm_("Right", "Upper", "No transpose", "Unit", &lastc, k, &
 			c_b14, &v[v_offset], ldv, &work[work_offset], ldwork);
 
-/*              C1 := C1 - W' */
+/*              C1 := C1 - W**T */
 
 		i__1 = *k;
 		for (j = 1; j <= i__1; ++j) {
@@ -531,14 +556,14 @@ static doublereal c_b25 = -1.;
 
 	    } else if (igraphlsame_(side, "R")) {
 
-/*              Form  C * H  or  C * H'  where  C = ( C1  C2 )   
+/*              Form  C * H  or  C * H**T  where  C = ( C1  C2 )   
 
    Computing MAX */
 		i__1 = *k, i__2 = igraphiladlc_(k, n, &v[v_offset], ldv);
 		lastv = max(i__1,i__2);
 		lastc = igraphiladlr_(m, &lastv, &c__[c_offset], ldc);
 
-/*              W := C * V'  =  (C1*V1' + C2*V2')  (stored in WORK)   
+/*              W := C * V**T  =  (C1*V1**T + C2*V2**T)  (stored in WORK)   
 
                 W := C1 */
 
@@ -549,13 +574,13 @@ static doublereal c_b25 = -1.;
 /* L160: */
 		}
 
-/*              W := W * V1' */
+/*              W := W * V1**T */
 
 		igraphdtrmm_("Right", "Upper", "Transpose", "Unit", &lastc, k, &
 			c_b14, &v[v_offset], ldv, &work[work_offset], ldwork);
 		if (lastv > *k) {
 
-/*                 W := W + C2 * V2' */
+/*                 W := W + C2 * V2**T */
 
 		    i__1 = lastv - *k;
 		    igraphdgemm_("No transpose", "Transpose", &lastc, k, &i__1, &
@@ -564,7 +589,7 @@ static doublereal c_b25 = -1.;
 			     ldwork);
 		}
 
-/*              W := W * T  or  W * T' */
+/*              W := W * T  or  W * T**T */
 
 		igraphdtrmm_("Right", "Upper", trans, "Non-unit", &lastc, k, &c_b14,
 			 &t[t_offset], ldt, &work[work_offset], ldwork);
@@ -608,17 +633,17 @@ static doublereal c_b25 = -1.;
 
 	    if (igraphlsame_(side, "L")) {
 
-/*              Form  H * C  or  H' * C  where  C = ( C1 )   
-                                                    ( C2 )   
+/*              Form  H * C  or  H**T * C  where  C = ( C1 )   
+                                                      ( C2 )   
 
    Computing MAX */
 		i__1 = *k, i__2 = igraphiladlc_(k, m, &v[v_offset], ldv);
 		lastv = max(i__1,i__2);
 		lastc = igraphiladlc_(&lastv, n, &c__[c_offset], ldc);
 
-/*              W := C' * V'  =  (C1'*V1' + C2'*V2') (stored in WORK)   
+/*              W := C**T * V**T  =  (C1**T * V1**T + C2**T * V2**T) (stored in WORK)   
 
-                W := C2' */
+                W := C2**T */
 
 		i__1 = *k;
 		for (j = 1; j <= i__1; ++j) {
@@ -627,14 +652,14 @@ static doublereal c_b25 = -1.;
 /* L190: */
 		}
 
-/*              W := W * V2' */
+/*              W := W * V2**T */
 
 		igraphdtrmm_("Right", "Lower", "Transpose", "Unit", &lastc, k, &
 			c_b14, &v[(lastv - *k + 1) * v_dim1 + 1], ldv, &work[
 			work_offset], ldwork);
 		if (lastv > *k) {
 
-/*                 W := W + C1'*V1' */
+/*                 W := W + C1**T * V1**T */
 
 		    i__1 = lastv - *k;
 		    igraphdgemm_("Transpose", "Transpose", &lastc, k, &i__1, &c_b14,
@@ -642,16 +667,16 @@ static doublereal c_b25 = -1.;
 			    work[work_offset], ldwork);
 		}
 
-/*              W := W * T'  or  W * T */
+/*              W := W * T**T  or  W * T */
 
 		igraphdtrmm_("Right", "Lower", transt, "Non-unit", &lastc, k, &
 			c_b14, &t[t_offset], ldt, &work[work_offset], ldwork);
 
-/*              C := C - V' * W' */
+/*              C := C - V**T * W**T */
 
 		if (lastv > *k) {
 
-/*                 C1 := C1 - V1' * W' */
+/*                 C1 := C1 - V1**T * W**T */
 
 		    i__1 = lastv - *k;
 		    igraphdgemm_("Transpose", "Transpose", &i__1, &lastc, k, &c_b25,
@@ -665,7 +690,7 @@ static doublereal c_b25 = -1.;
 			c_b14, &v[(lastv - *k + 1) * v_dim1 + 1], ldv, &work[
 			work_offset], ldwork);
 
-/*              C2 := C2 - W' */
+/*              C2 := C2 - W**T */
 
 		i__1 = *k;
 		for (j = 1; j <= i__1; ++j) {
@@ -680,14 +705,14 @@ static doublereal c_b25 = -1.;
 
 	    } else if (igraphlsame_(side, "R")) {
 
-/*              Form  C * H  or  C * H'  where  C = ( C1  C2 )   
+/*              Form  C * H  or  C * H**T  where  C = ( C1  C2 )   
 
    Computing MAX */
 		i__1 = *k, i__2 = igraphiladlc_(k, n, &v[v_offset], ldv);
 		lastv = max(i__1,i__2);
 		lastc = igraphiladlr_(m, &lastv, &c__[c_offset], ldc);
 
-/*              W := C * V'  =  (C1*V1' + C2*V2')  (stored in WORK)   
+/*              W := C * V**T  =  (C1*V1**T + C2*V2**T)  (stored in WORK)   
 
                 W := C2 */
 
@@ -698,14 +723,14 @@ static doublereal c_b25 = -1.;
 /* L220: */
 		}
 
-/*              W := W * V2' */
+/*              W := W * V2**T */
 
 		igraphdtrmm_("Right", "Lower", "Transpose", "Unit", &lastc, k, &
 			c_b14, &v[(lastv - *k + 1) * v_dim1 + 1], ldv, &work[
 			work_offset], ldwork);
 		if (lastv > *k) {
 
-/*                 W := W + C1 * V1' */
+/*                 W := W + C1 * V1**T */
 
 		    i__1 = lastv - *k;
 		    igraphdgemm_("No transpose", "Transpose", &lastc, k, &i__1, &
@@ -713,7 +738,7 @@ static doublereal c_b25 = -1.;
 			    c_b14, &work[work_offset], ldwork);
 		}
 
-/*              W := W * T  or  W * T' */
+/*              W := W * T  or  W * T**T */
 
 		igraphdtrmm_("Right", "Lower", trans, "Non-unit", &lastc, k, &c_b14,
 			 &t[t_offset], ldt, &work[work_offset], ldwork);

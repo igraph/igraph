@@ -27,8 +27,8 @@ static integer c__1 = 1;
     doublereal d__1;
 
     /* Local variables */
-    static integer i__;
-    static logical applyleft;
+    integer i__;
+    logical applyleft;
     extern /* Subroutine */ int igraphdger_(integer *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
@@ -36,15 +36,15 @@ static integer c__1 = 1;
     extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *);
-    static integer lastc, lastv;
+    integer lastc, lastv;
     extern integer igraphiladlc_(integer *, integer *, doublereal *, integer *), 
 	    igraphiladlr_(integer *, integer *, doublereal *, integer *);
 
 
-/*  -- LAPACK auxiliary routine (version 3.2) --   
+/*  -- LAPACK auxiliary routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -53,7 +53,7 @@ static integer c__1 = 1;
     DLARF applies a real elementary reflector H to a real m by n matrix   
     C, from either the left or the right. H is represented in the form   
 
-          H = I - tau * v * v'   
+          H = I - tau * v * v**T   
 
     where tau is a real scalar and v is a real vector.   
 
@@ -144,12 +144,12 @@ static integer c__1 = 1;
 
 	if (lastv > 0) {
 
-/*           w(1:lastc,1) := C(1:lastv,1:lastc)' * v(1:lastv,1) */
+/*           w(1:lastc,1) := C(1:lastv,1:lastc)**T * v(1:lastv,1) */
 
 	    igraphdgemv_("Transpose", &lastv, &lastc, &c_b4, &c__[c_offset], ldc, &
 		    v[1], incv, &c_b5, &work[1], &c__1);
 
-/*           C(1:lastv,1:lastc) := C(...) - v(1:lastv,1) * w(1:lastc,1)' */
+/*           C(1:lastv,1:lastc) := C(...) - v(1:lastv,1) * w(1:lastc,1)**T */
 
 	    d__1 = -(*tau);
 	    igraphdger_(&lastv, &lastc, &d__1, &v[1], incv, &work[1], &c__1, &c__[
@@ -166,7 +166,7 @@ static integer c__1 = 1;
 	    igraphdgemv_("No transpose", &lastc, &lastv, &c_b4, &c__[c_offset], ldc,
 		     &v[1], incv, &c_b5, &work[1], &c__1);
 
-/*           C(1:lastc,1:lastv) := C(...) - w(1:lastc,1) * v(1:lastv,1)' */
+/*           C(1:lastc,1:lastv) := C(...) - w(1:lastc,1) * v(1:lastv,1)**T */
 
 	    d__1 = -(*tau);
 	    igraphdger_(&lastc, &lastv, &d__1, &work[1], &c__1, &v[1], incv, &c__[

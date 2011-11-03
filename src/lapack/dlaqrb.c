@@ -134,20 +134,19 @@ static integer c__1 = 1;
     doublereal d__1, d__2;
 
     /* Local variables */
-    static integer i__, j, k, l, m;
-    static doublereal s, v[3];
-    static integer i1, i2;
-    static doublereal t1, t2, t3, v1, v2, v3, h00, h10, h11, h12, h21, h22, 
-	    h33, h44;
-    static integer nh;
-    static doublereal cs;
-    static integer nr;
-    static doublereal sn, h33s, h44s;
-    static integer itn, its;
-    static doublereal ulp, sum, tst1, h43h34, unfl, ovfl;
+    integer i__, j, k, l, m;
+    doublereal s, v[3];
+    integer i1, i2;
+    doublereal t1, t2, t3, v1, v2, v3, h00, h10, h11, h12, h21, h22, h33, h44;
+    integer nh;
+    doublereal cs;
+    integer nr;
+    doublereal sn, h33s, h44s;
+    integer itn, its;
+    doublereal ulp, sum, tst1, h43h34, unfl, ovfl;
     extern /* Subroutine */ int igraphdrot_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *);
-    static doublereal work[1];
+    doublereal work[1];
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), igraphdlanv2_(doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
@@ -158,7 +157,7 @@ static integer c__1 = 1;
 	     integer *, doublereal *);
     extern doublereal igraphdlanhs_(char *, integer *, doublereal *, integer *, 
 	    doublereal *);
-    static doublereal smlnum;
+    doublereal smlnum;
 
 
 /*     %------------------%   

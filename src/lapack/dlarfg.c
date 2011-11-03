@@ -23,20 +23,20 @@
     double d_sign(doublereal *, doublereal *);
 
     /* Local variables */
-    static integer j, knt;
-    static doublereal beta;
+    integer j, knt;
+    doublereal beta;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
-    static doublereal xnorm;
+    doublereal xnorm;
     extern doublereal igraphdlapy2_(doublereal *, doublereal *), igraphdlamch_(char *);
-    static doublereal safmin, rsafmn;
+    doublereal safmin, rsafmn;
 
 
-/*  -- LAPACK auxiliary routine (version 3.2) --   
+/*  -- LAPACK auxiliary routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -45,13 +45,13 @@
     DLARFG generates a real elementary reflector H of order n, such   
     that   
 
-          H * ( alpha ) = ( beta ),   H' * H = I.   
+          H * ( alpha ) = ( beta ),   H**T * H = I.   
               (   x   )   (   0  )   
 
     where alpha and beta are scalars, and x is an (n-1)-element real   
     vector. H is represented in the form   
 
-          H = I - tau * ( 1 ) * ( 1 v' ) ,   
+          H = I - tau * ( 1 ) * ( 1 v**T ) ,   
                         ( v )   
 
     where tau is a real scalar and v is a real (n-1)-element   

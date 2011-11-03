@@ -33,12 +33,12 @@ static integer c__65 = 65;
        Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
 
     /* Local variables */
-    static integer i__;
-    static doublereal t[4160]	/* was [65][64] */;
-    static integer i1, i2, i3, ib, nb, mi, ni, nq, nw, iws;
-    static logical left;
+    integer i__;
+    doublereal t[4160]	/* was [65][64] */;
+    integer i1, i2, i3, ib, nb, mi, ni, nq, nw, iws;
+    logical left;
     extern logical igraphlsame_(char *, char *);
-    static integer nbmin, iinfo;
+    integer nbmin, iinfo;
     extern /* Subroutine */ int igraphdorm2l_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *), igraphdlarfb_(char 
@@ -48,15 +48,15 @@ static integer c__65 = 65;
 	    *, integer *, doublereal *, doublereal *, integer *), igraphxerbla_(char *, integer *, ftnlen);
     extern integer igraphilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);
-    static logical notran;
-    static integer ldwork, lwkopt;
-    static logical lquery;
+    logical notran;
+    integer ldwork, lwkopt;
+    logical lquery;
 
 
-/*  -- LAPACK routine (version 3.2) --   
+/*  -- LAPACK routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -286,17 +286,17 @@ static integer c__65 = 65;
 		    , lda, &tau[i__], t, &c__65);
 	    if (left) {
 
-/*              H or H' is applied to C(1:m-k+i+ib-1,1:n) */
+/*              H or H**T is applied to C(1:m-k+i+ib-1,1:n) */
 
 		mi = *m - *k + i__ + ib - 1;
 	    } else {
 
-/*              H or H' is applied to C(1:m,1:n-k+i+ib-1) */
+/*              H or H**T is applied to C(1:m,1:n-k+i+ib-1) */
 
 		ni = *n - *k + i__ + ib - 1;
 	    }
 
-/*           Apply H or H' */
+/*           Apply H or H**T */
 
 	    igraphdlarfb_(side, trans, "Backward", "Columnwise", &mi, &ni, &ib, &a[
 		    i__ * a_dim1 + 1], lda, t, &c__65, &c__[c_offset], ldc, &
