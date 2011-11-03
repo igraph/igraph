@@ -9758,17 +9758,18 @@ PyObject *igraphmodule_Graph_community_fastgreedy(igraphmodule_GraphObject * sel
 PyObject *igraphmodule_Graph_community_infomap(igraphmodule_GraphObject * self,
   PyObject * args, PyObject * kwds)
 {
-  static char *kwlist[] = { "e_weights", "v_weights", "nb_trials", NULL };
+  static char *kwlist[] = { "edge_weights", "vertex_weights", "trials", NULL };
   PyObject *e_weights = Py_None, *v_weights = Py_None;
   unsigned int nb_trials = 10;
-  igraph_vector_t *e_ws = NULL, *v_ws = NULL;
+  igraph_vector_t *e_ws = 0, *v_ws = 0;
   
   igraph_vector_t membership;
   PyObject *res = Py_False;
   igraph_real_t codelength;
   
   
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOI", kwlist, &e_weights, &v_weights, &nb_trials)) {
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOI", kwlist, &e_weights,
+        &v_weights, &nb_trials)) {
     return NULL;
   }
 
@@ -9777,11 +9778,13 @@ PyObject *igraphmodule_Graph_community_infomap(igraphmodule_GraphObject * self,
     return NULL;
   }
 
-  if (igraphmodule_attrib_to_vector_t(e_weights, self, &e_ws, ATTRIBUTE_TYPE_EDGE)){
+  if (igraphmodule_attrib_to_vector_t(e_weights, self, &e_ws, ATTRIBUTE_TYPE_EDGE)) {
+    igraph_vector_destroy(&membership);
     return NULL;
   }
   
   if (igraphmodule_attrib_to_vector_t(v_weights, self, &v_ws, ATTRIBUTE_TYPE_VERTEX)){
+    igraph_vector_destroy(&membership);
     if (e_ws) {
       igraph_vector_destroy(e_ws);
       free(e_ws);
@@ -9795,6 +9798,14 @@ PyObject *igraphmodule_Graph_community_infomap(igraphmodule_GraphObject * self,
                               /*out*/ &membership, &codelength)) {
 	igraphmodule_handle_igraph_error();
 	igraph_vector_destroy(&membership);
+    if (e_ws) {
+      igraph_vector_destroy(e_ws);
+      free(e_ws);
+    }
+    if (v_ws) {
+      igraph_vector_destroy(v_ws);
+      free(v_ws);
+    }
     return NULL;
   }
   
@@ -11806,12 +11817,12 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    (PyCFunction) igraphmodule_Graph_transitivity_undirected,
    METH_VARARGS | METH_KEYWORDS,
    "transitivity_undirected(mode=\"nan\")\n\n"
-   "Calculates the global transitivity (clustering coefficient) of the\n\n"
+   "Calculates the global transitivity (clustering coefficient) of the\n"
    "graph.\n\n"
    "The transitivity measures the probability that two neighbors of a\n"
    "vertex are connected. More precisely, this is the ratio of the\n"
    "triangles and connected triplets in the graph. The result is a\n"
-   "single read number. Directed graphs are considered as undirected\n"
+   "single real number. Directed graphs are considered as undirected\n"
    "ones.\n\n"
    "Note that this measure is different from the local transitivity\n"
    "measure (see L{transitivity_local_undirected()}) as it calculates\n"
@@ -13338,26 +13349,25 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"community_infomap",
    (PyCFunction) igraphmodule_Graph_community_infomap,
    METH_VARARGS | METH_KEYWORDS,
-   "community_infomap(e_weights=None, v_weights=None, nb_trials=10)\n\n"
+   "community_infomap(edge_weights=None, vertex_weights=None, trials=10)\n\n"
    "Finds the community structure of the network according to the Infomap\n"
    "method of Martin Rosvall and Carl T. Bergstrom.\n\n"
-   " See :\n"
-   " [1] Visualization of the math and the map generator: http://www.mapequation.org\n"
-   " [2] The original paper: M. Rosvall and C. T. Bergstrom, Maps of\n"
-   " information flow reveal community structure in complex networks, PNAS\n"
-   " 105, 1118 (2008) [http://dx.doi.org/10.1073/pnas.0706851105 ,\n"
-   " http://arxiv.org/abs/0707.0609]\n"
-   " [3] A more detailed paper: M. Rosvall, D. Axelsson, and C. T. Bergstrom,\n"
-   " The map equation, Eur. Phys. J. Special Topics 178, 13 (2009).\n"
-   " [http://dx.doi.org/10.1140/epjst/e2010-01179-1 ,\n"
-   " http://arxiv.org/abs/0906.1405]\n\n"
-   "@param e_weights: name of an edge attribute or a list containing\n"
+   "See U{http://www.mapequation.org} for a visualization of the algorithm\n"
+   "or one of the references provided below.\n\n"
+   "@param edge_weights: name of an edge attribute or a list containing\n"
    "  edge weights.\n"
-   "@param v_weights: name of an vertex attribute or a list containing\n"
+   "@param vertex_weights: name of an vertex attribute or a list containing\n"
    "  vertex weights.\n"
-   "@param nb_trials: the number of attempts to partition the network.\n"
+   "@param trials: the number of attempts to partition the network.\n"
    "@return: the calculated membership vector and the corresponding\n"
    "  codelength in a tuple.\n"
+   "\n"
+   "@newfield ref: Reference\n"
+   "@ref: M. Rosvall and C. T. Bergstrom: I{Maps of information flow reveal\n"
+   "  community structure in complex networks}. PNAS 105, 1118 (2008).\n"
+   "  U{http://arxiv.org/abs/0707.0609}\n"
+   "@ref: M. Rosvall, D. Axelsson and C. T. Bergstrom: I{The map equation}.\n"
+   "  Eur Phys J Special Topics 178, 13 (2009). U{http://arxiv.org/abs/0906.1405}\n"
   },
   {"community_label_propagation",
    (PyCFunction) igraphmodule_Graph_community_label_propagation,

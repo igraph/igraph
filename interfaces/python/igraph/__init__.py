@@ -772,31 +772,32 @@ class Graph(GraphBase):
         return VertexDendrogram(self, merges, optimal_count,
                 modularity_params=dict(weights=weights))
 
-    def community_infomap(self, e_weights=None, v_weights=None, nb_trials=10):
+    def community_infomap(self, edge_weights=None, vertex_weights=None, trials=10):
         """Finds the community structure of the network according to the Infomap
         method of Martin Rosvall and Carl T. Bergstrom.
         
-        @param e_weights: name of an edge attribute or a list containing
+        @param edge_weights: name of an edge attribute or a list containing
           edge weights.
-        @param v_weights: name of an vertex attribute or a list containing
+        @param vertex_weights: name of an vertex attribute or a list containing
           vertex weights.
-        @param nb_trials: the number of attempts to partition the network.
+        @param trials: the number of attempts to partition the network.
         @return: an appropriate L{VertexClustering} object.
         
         @newfield ref: Reference
         @ref: M. Rosvall and C. T. Bergstrom: Maps of information flow reveal
           community structure in complex networks, PNAS 105, 1118 (2008).
-          U{http://dx.doi.org/10.1073/pnas.0706851105}.
+          U{http://dx.doi.org/10.1073/pnas.0706851105},
+          U{http://arxiv.org/abs/0707.0609}.
         @ref: M. Rosvall, D. Axelsson, and C. T. Bergstrom: The map equation,
           Eur. Phys. J. Special Topics 178, 13 (2009).
           U{http://dx.doi.org/10.1140/epjst/e2010-01179-1},
           U{http://arxiv.org/abs/0906.1405}.
         """
-        membership, codelenght = \
-              GraphBase.community_infomap(self, e_weights, v_weights, nb_trials)
+        membership, codelength = \
+              GraphBase.community_infomap(self, edge_weights, vertex_weights, trials)
         return VertexClustering(self, membership, \
-                                 params={"codelenght":codelenght}, \
-                                 modularity_params={"weights":e_weights} )
+                                params={"codelength": codelength}, \
+                                modularity_params={"weights": edge_weights} )
 
     def community_leading_eigenvector_naive(self, clusters = None, \
             return_merges = False):

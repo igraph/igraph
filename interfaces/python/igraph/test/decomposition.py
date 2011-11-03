@@ -172,6 +172,10 @@ class CommunityTests(unittest.TestCase):
         self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1])
         self.assertAlmostEqual(cl.q, 0.4523, places=3)
 
+    def testInfomap(self):
+        g = Graph.Famous("zachary")
+        cl = g.community_infomap()
+
     def testLabelPropagation(self):
         # Nothing to test there really, since the algorithm
         # is pretty nondeterministic. We just do a quick smoke
