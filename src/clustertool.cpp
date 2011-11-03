@@ -536,7 +536,7 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
   unsigned long changes, runs;
   igraph_bool_t use_weights=0;
   bool zeroT;
-  double kT, acc, prob;
+  double kT, acc;
   ClusterList<NNode*> *cl_cur;
   network *net;
   PottsModelN *pm;
@@ -592,9 +592,6 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
 	
   bool directed = igraph_is_directed(graph);
   
-  prob=2.0*net->sum_weights/double(net->node_list->Size())
-    /double(net->node_list->Size()-1);
-
   pm=new PottsModelN(net,(unsigned int)spins, directed);
 
   /* initialize the random number generator */

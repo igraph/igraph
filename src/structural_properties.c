@@ -5713,7 +5713,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
 
     for (i = 1; i < n; i++) {
       long int m, path_count;
-      igraph_vector_t *parent_path, *res_end;
+      igraph_vector_t *parent_path;
 
       node = VECTOR(order)[i];
 
@@ -5729,7 +5729,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
       /* first, we update the paths_index */
       path_count = igraph_vector_ptr_size(res);
       VECTOR(*paths_index)[node] = path_count+1;
-      res_end = (igraph_vector_t*)&(VECTOR(*res)[path_count]);
+      /* res_end = (igraph_vector_t*)&(VECTOR(*res)[path_count]); */
 
       /* now, take the parent vertices */
       parent_vec = (igraph_vector_t*)VECTOR(parents)[node];

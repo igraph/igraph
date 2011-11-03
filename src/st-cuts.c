@@ -695,7 +695,6 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
   long int root;
   igraph_vector_t M;
   igraph_vector_bool_t GammaS;
-  long int GammaS_len;
   igraph_vector_t Nuv;
   igraph_vector_t Isv_min;
   igraph_vector_t GammaS_vec;
@@ -777,7 +776,6 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
       IGRAPH_CHECK(igraph_vector_push_back(&GammaS_vec, i));
     }
   }
-  GammaS_len=igraph_vector_size(&GammaS_vec);
 
   nomin=igraph_vector_size(&M);
   for (i=0; i<nomin; i++) {
@@ -1159,7 +1157,6 @@ int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
   igraph_vector_t Sbar_map, Sbar_invmap;
   igraph_vector_t keep;
   igraph_t Sbar;
-  long int root;
   igraph_vector_t M;
   long int nomin;
 
@@ -1189,8 +1186,6 @@ int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
 					   /* invmap= */ &Sbar_invmap));  
   IGRAPH_FINALLY(igraph_destroy, &Sbar);
   
-  root=VECTOR(Sbar_map)[target]-1;
-
   /* ------------------------------------------------------------- */
   /* Identify the set M of minimal elements that are active */
   IGRAPH_VECTOR_INIT_FINALLY(&M, 0);

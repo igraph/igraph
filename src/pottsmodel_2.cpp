@@ -1173,15 +1173,17 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 			       double kT, double gamma)
 {
   NNode *n_cur, *n_cur2;
+  /*
   double a1,a2,a3,p,p1,p2;
   long n,N,lin,lout;
+  */
   DLList_Iter<NNode*> iter, iter2;
   HugeArray<int> inner_links;
   HugeArray<int> outer_links;
   HugeArray<int> nodes;
   
   //den Header schreiben
-  p=2.0*double(num_of_links)/double(num_of_nodes)/double(num_of_nodes-1);
+//   p=2.0*double(num_of_links)/double(num_of_nodes)/double(num_of_nodes-1);
 //   fprintf(file,"      Nodes=\t%lu\n",num_of_nodes);
 //   fprintf(file,"      Links=\t%lu\n",num_of_links);
 //   fprintf(file,"          q=\t%d\n",q);
@@ -1226,6 +1228,7 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 	  {
 	    inner_links[spin]/=2;
 	    //    fprintf(file,"Cluster\tNodes\tInnerLinks\tOuterLinks\tp_in\tp_out\n");
+        /*
 	    N=num_of_nodes;
 	    n=nodes[spin];
 	    lin=inner_links[spin];
@@ -1235,13 +1238,19 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 	    else a2=(n*(n-1)*0.5    )*log((double)n*(n-1)*0.5    )-(n*(n-1)*0.5    )-
 		   (n*(n-1)*0.5-lin)*log((double)n*(n-1)*0.5-lin)+(n*(n-1)*0.5-lin)-
 		   lin*log((double)lin            )+lin;
-	    
+        */
+
+        /*
 	    if ((lout==n*(N-n)) || n==N) a3=0.0;
 	    else a3=(n*(N-n)     )*log((double)n*(N-n)     )-(n*(N-n))-
 		   (n*(N-n)-lout)*log((double)n*(N-n)-lout)+(n*(N-n)-lout)-
 		   lout*log((double)lout        )+lout;
+        */
+
+        /*
 	    p1=(lin+lout)*log((double)p);
 	    p2=(0.5*n*(n-1)-lin + n*(N-n)-lout)*log((double)1.0-p);
+        */
 	    //       fprintf(file,"%d\t%d\t%d\t%d\t%f\t%f\t%f\n",spin,nodes[spin], inner_links[spin], outer_links[spin], p_in, p_out,log_num_exp);
 	    IGRAPH_CHECK(igraph_vector_push_back(csize, nodes[spin]));
 	  }
@@ -2048,9 +2057,12 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
 	}
 	
 
+    /*
 	DLList_Iter<NNode*> iter;
 	NNode *n_cur=iter.First(net->node_list);		
 	n_cur = iter.First(net->node_list);
+    */
+
 	//And now assign each node to its new community
 	q = num_clusters;	
 	for (unsigned int i = 0; i < num_nodes; i++)

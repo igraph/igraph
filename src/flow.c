@@ -1294,19 +1294,15 @@ int igraph_i_mincut_directed(const igraph_t *graph,
   igraph_vector_t mypartition, mypartition2, mycut;
   igraph_vector_t *ppartition=0, *ppartition2=0, *pcut=0;
   igraph_vector_t bestpartition, bestpartition2, bestcut;
-  igraph_vector_t *pbestpartition=0, *pbestpartition2=0, *pbestcut=0;
 
   if (partition) {
     IGRAPH_VECTOR_INIT_FINALLY(&bestpartition, 0);
-    pbestpartition=&bestpartition;
   }
   if (partition2) {
     IGRAPH_VECTOR_INIT_FINALLY(&bestpartition2, 0);
-    pbestpartition2=&bestpartition2;
   }
   if (cut) {
     IGRAPH_VECTOR_INIT_FINALLY(&bestcut, 0);
-    pbestcut=&bestcut;
   }
   
   if (partition) {

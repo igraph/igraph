@@ -1659,7 +1659,6 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   igraph_stack_t stack=IGRAPH_STACK_NULL;
   long int source;
   long int j, k, nneis;
-  igraph_integer_t modein;
   igraph_vector_t *neis;
   igraph_vector_t v_tmpres, *tmpres=&v_tmpres;
   igraph_vit_t vit;
@@ -1686,7 +1685,6 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
 
   directed=directed && igraph_is_directed(graph);
   if (directed) {
-    modein=IGRAPH_IN;
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist_out, IGRAPH_OUT));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist_out);
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist_in, IGRAPH_IN));
@@ -1694,7 +1692,6 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
     adjlist_out_p=&adjlist_out;
     adjlist_in_p=&adjlist_in;
   } else {
-    modein=IGRAPH_ALL;
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist_out, IGRAPH_ALL));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist_out);
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist_in, IGRAPH_ALL));
@@ -2126,7 +2123,6 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
   igraph_vector_t *neip;
   long int neino;
   long int i;
-  igraph_integer_t modein;
 
   if (weights) { 
     return igraph_edge_betweenness_estimate_weighted(graph, result, 
@@ -2135,7 +2131,6 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
 
   directed=directed && igraph_is_directed(graph);
   if (directed) {
-    modein=IGRAPH_IN;
     IGRAPH_CHECK(igraph_inclist_init(graph, &elist_out, IGRAPH_OUT));
     IGRAPH_FINALLY(igraph_inclist_destroy, &elist_out);
     IGRAPH_CHECK(igraph_inclist_init(graph, &elist_in, IGRAPH_IN));
@@ -2143,7 +2138,6 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
     elist_out_p=&elist_out;
     elist_in_p=&elist_in;
   } else {
-    modein=IGRAPH_ALL;
     IGRAPH_CHECK(igraph_inclist_init(graph,&elist_out, IGRAPH_ALL));
     IGRAPH_FINALLY(igraph_inclist_destroy, &elist_out);
     elist_out_p=elist_in_p=&elist_out;

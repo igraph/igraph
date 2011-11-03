@@ -379,7 +379,6 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
   igraph_inclist_t *elist_out_p, *elist_in_p;
   igraph_vector_t *neip;
   long int neino;
-  igraph_integer_t modein;
   igraph_vector_t eb;
   long int maxedge, pos;
   igraph_integer_t from, to;
@@ -398,7 +397,6 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 
   directed=directed && igraph_is_directed(graph);
   if (directed) {
-    modein=IGRAPH_IN;
     IGRAPH_CHECK(igraph_inclist_init(graph, &elist_out, IGRAPH_OUT));
     IGRAPH_FINALLY(igraph_inclist_destroy, &elist_out);
     IGRAPH_CHECK(igraph_inclist_init(graph, &elist_in, IGRAPH_IN));
@@ -406,7 +404,6 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
     elist_out_p=&elist_out;
     elist_in_p=&elist_in;
   } else {
-    modein=IGRAPH_ALL;
     IGRAPH_CHECK(igraph_inclist_init(graph, &elist_out, IGRAPH_ALL));
     IGRAPH_FINALLY(igraph_inclist_destroy, &elist_out);
     elist_out_p=elist_in_p=&elist_out;
