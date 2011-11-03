@@ -1621,12 +1621,12 @@ double igraph_rpois(igraph_rng_t *rng, double mu)
     };
 
     /* These are static --- persistent between calls for same mu : */
-    static int l, m;
+    static IGRAPH_THREAD_LOCAL int l, m;
 
-    static double b1, b2, c, c0, c1, c2, c3;
-    static double pp[36], p0, p, q, s, d, omega;
-    static double big_l;/* integer "w/o overflow" */
-    static double muprev = 0., muprev2 = 0.;/*, muold	 = 0.*/
+    static IGRAPH_THREAD_LOCAL double b1, b2, c, c0, c1, c2, c3;
+    static IGRAPH_THREAD_LOCAL double pp[36], p0, p, q, s, d, omega;
+    static IGRAPH_THREAD_LOCAL double big_l;/* integer "w/o overflow" */
+    static IGRAPH_THREAD_LOCAL double muprev = 0., muprev2 = 0.;/*, muold	 = 0.*/
 
     /* Local Vars  [initialize some for -Wall]: */
     double del, difmuk= 0., E= 0., fk= 0., fx, fy, g, px, py, t, u= 0., v, x;
@@ -1817,12 +1817,12 @@ double igraph_rbinom(igraph_rng_t *rng, double nin, double pp)
 {
     /* FIXME: These should become THREAD_specific globals : */
 
-    static double c, fm, npq, p1, p2, p3, p4, qn;
-    static double xl, xll, xlr, xm, xr;
+    static IGRAPH_THREAD_LOCAL double c, fm, npq, p1, p2, p3, p4, qn;
+    static IGRAPH_THREAD_LOCAL double xl, xll, xlr, xm, xr;
 
-    static double psave = -1.0;
-    static int nsave = -1;
-    static int m;
+    static IGRAPH_THREAD_LOCAL double psave = -1.0;
+    static IGRAPH_THREAD_LOCAL int nsave = -1;
+    static IGRAPH_THREAD_LOCAL int m;
 
     double f, f1, f2, u, v, w, w2, x, x1, x2, z, z2;
     double p, q, np, g, r, al, alv, amaxp, ffm, ynorm;

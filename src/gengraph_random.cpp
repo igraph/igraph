@@ -21,7 +21,7 @@
 #define RNG_C
 
 #ifdef RCSID
-static char rcsid[] = "$Id: random.cpp,v 1.15 2003/05/14 03:04:45 wilder Exp wilder $";
+static const char rcsid[] = "$Id: random.cpp,v 1.15 2003/05/14 03:04:45 wilder Exp wilder $";
 #endif
 
 //________________________________________________________________________

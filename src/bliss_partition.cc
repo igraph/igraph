@@ -462,7 +462,7 @@ Cell *Partition::sort_and_split_cell1(Cell *cell)
 /*
  * Tables and a subroutine for distribution count sorting
  */
-static unsigned int count[256] = {
+static IGRAPH_THREAD_LOCAL unsigned int count[256] = {
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -472,7 +472,7 @@ static unsigned int count[256] = {
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 };
-static unsigned int start[256];
+static IGRAPH_THREAD_LOCAL unsigned int start[256];
 
 /*
  * Build start array so that start[0] = 0 and start[i+1] = start[i] + count[i]

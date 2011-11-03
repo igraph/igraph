@@ -55,7 +55,7 @@ void igraph_blas_dgemv(igraph_bool_t transpose, igraph_real_t alpha,
         igraph_real_t beta, igraph_vector_t* y) {
   char trans = transpose ? 'T' : 'N';
   int m, n;
-  static int inc = 1;
+  int inc = 1;
 
   m = igraph_matrix_nrow(a);
   n = igraph_matrix_ncol(a);
@@ -94,7 +94,7 @@ void igraph_blas_dgemv_array(igraph_bool_t transpose, igraph_real_t alpha,
         igraph_real_t beta, igraph_real_t* y) {
   char trans = transpose ? 'T' : 'N';
   int m, n;
-  static int inc = 1;
+  int inc = 1;
 
   m = igraph_matrix_nrow(a);
   n = igraph_matrix_ncol(a);

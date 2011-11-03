@@ -34,10 +34,10 @@ namespace gengraph {
 int parse_options(int &argc, char** &argv);
 
 // options
-static bool MONITOR_TIME = false;
-static int  SHUFFLE_TYPE = FINAL_HEURISTICS;
-static bool RAW_DEGREES  = false;
-static FILE *Fdeg = stdin;
+static const bool MONITOR_TIME = false;
+static const int  SHUFFLE_TYPE = FINAL_HEURISTICS;
+static const bool RAW_DEGREES  = false;
+static const FILE *Fdeg = stdin;
 
 //_________________________________________________________________________
 // int main(int argc, char** argv) {
@@ -83,47 +83,47 @@ static FILE *Fdeg = stdin;
 
 //_________________________________________________________________________
 int parse_options(int &argc, char** &argv) {
-  bool HELP = false;
-  int argc0 = argc;
-  argc = 1;
-  for(int a=1; a<argc0; a++) {
-    if(strcmp(argv[a],"-v")==0) SET_VERBOSE(VERBOSE_SOME);
-    else if(strcmp(argv[a],"-vv")==0) SET_VERBOSE(VERBOSE_LOTS);
-    else if(strcmp(argv[a],"-s")==0) my_srandom(0);
-    else if(strcmp(argv[a],"-?")==0 || strcmp(argv[1],"--help")==0 || strcmp(argv[1],"/?")==0) HELP = true;
-    else if(strcmp(argv[a],"-t")==0) MONITOR_TIME = true;
-    else if(strcmp(argv[a],"-g")==0) SHUFFLE_TYPE = GKAN_HEURISTICS;
-    else if(strcmp(argv[a],"-b")==0) SHUFFLE_TYPE = BRUTE_FORCE_HEURISTICS;
-    else if(strcmp(argv[a],"-f")==0) SHUFFLE_TYPE = FAB_HEURISTICS;
-    else if(strcmp(argv[a],"-o")==0) SHUFFLE_TYPE = OPTIMAL_HEURISTICS;
-    else if(strcmp(argv[a],"-raw")==0) RAW_DEGREES=true;
-    else // No option present
-      argv[argc++] = argv[a];
-  }
-  if(!HELP && argc==2) {
-    Fdeg = fopen(argv[1],"r");
-    if(Fdeg==NULL) {
-      fprintf(stderr,"Error : couldn't open file \"%s\" for reading\n",argv[1]);
-      return -1;
-    }
-    argv[1]=argv[0];
-    argv++;
-    argc--;
-  }
-  if(HELP || argc!=1) {
-    fprintf(stderr,"Usage : %s [options] [file containing degree distribution]\n",argv[0]);
-    fprintf(stderr," -> %s returns a graph in its standard output\n",argv[0]);
-    fprintf(stderr,"    If no file is given, %s reads its standard input\n",argv[0]);
-    fprintf(stderr,"    [-v] and [-vv] options causes extra verbose.\n");
-    fprintf(stderr,"    [-g] option uses the Gkantsidis heuristics.\n");
-    fprintf(stderr,"    [-b] option uses the Brute Force heuristics.\n");
-    fprintf(stderr,"    [-f] option uses the Modified Gkantsidis heuristics.\n");
-    fprintf(stderr,"    [-o] option uses the Optimal Gkantsidis heuristics.\n");
-    fprintf(stderr,"    [-t] option monitors computation time\n");
-    fprintf(stderr,"    [-s] does a srandom(0) to get a constant random graph\n");
-    fprintf(stderr,"    [-raw] is to take raw degree sequences as input\n");
-    return -1;
-  }
+  // bool HELP = false;
+  // int argc0 = argc;
+  // argc = 1;
+  // for(int a=1; a<argc0; a++) {
+  //   if(strcmp(argv[a],"-v")==0) SET_VERBOSE(VERBOSE_SOME);
+  //   else if(strcmp(argv[a],"-vv")==0) SET_VERBOSE(VERBOSE_LOTS);
+  //   else if(strcmp(argv[a],"-s")==0) my_srandom(0);
+  //   else if(strcmp(argv[a],"-?")==0 || strcmp(argv[1],"--help")==0 || strcmp(argv[1],"/?")==0) HELP = true;
+  //   else if(strcmp(argv[a],"-t")==0) MONITOR_TIME = true;
+  //   else if(strcmp(argv[a],"-g")==0) SHUFFLE_TYPE = GKAN_HEURISTICS;
+  //   else if(strcmp(argv[a],"-b")==0) SHUFFLE_TYPE = BRUTE_FORCE_HEURISTICS;
+  //   else if(strcmp(argv[a],"-f")==0) SHUFFLE_TYPE = FAB_HEURISTICS;
+  //   else if(strcmp(argv[a],"-o")==0) SHUFFLE_TYPE = OPTIMAL_HEURISTICS;
+  //   else if(strcmp(argv[a],"-raw")==0) RAW_DEGREES=true;
+  //   else // No option present
+  //     argv[argc++] = argv[a];
+  // }
+  // if(!HELP && argc==2) {
+  //   Fdeg = fopen(argv[1],"r");
+  //   if(Fdeg==NULL) {
+  //     fprintf(stderr,"Error : couldn't open file \"%s\" for reading\n",argv[1]);
+  //     return -1;
+  //   }
+  //   argv[1]=argv[0];
+  //   argv++;
+  //   argc--;
+  // }
+  // if(HELP || argc!=1) {
+  //   fprintf(stderr,"Usage : %s [options] [file containing degree distribution]\n",argv[0]);
+  //   fprintf(stderr," -> %s returns a graph in its standard output\n",argv[0]);
+  //   fprintf(stderr,"    If no file is given, %s reads its standard input\n",argv[0]);
+  //   fprintf(stderr,"    [-v] and [-vv] options causes extra verbose.\n");
+  //   fprintf(stderr,"    [-g] option uses the Gkantsidis heuristics.\n");
+  //   fprintf(stderr,"    [-b] option uses the Brute Force heuristics.\n");
+  //   fprintf(stderr,"    [-f] option uses the Modified Gkantsidis heuristics.\n");
+  //   fprintf(stderr,"    [-o] option uses the Optimal Gkantsidis heuristics.\n");
+  //   fprintf(stderr,"    [-t] option monitors computation time\n");
+  //   fprintf(stderr,"    [-s] does a srandom(0) to get a constant random graph\n");
+  //   fprintf(stderr,"    [-raw] is to take raw degree sequences as input\n");
+  //   return -1;
+  // }
   return 0;
 }
 

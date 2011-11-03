@@ -1007,7 +1007,7 @@ igraph_real_t igraph_i_gml_toreal(igraph_gml_tree_t *node, long int pos) {
 const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, long int pos) {
   
   int type=igraph_gml_tree_type(node, pos);
-  static char tmp[256];
+  char tmp[256];
   const char *p=tmp;
   long int i;
   igraph_real_t d;
@@ -2281,7 +2281,7 @@ int igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
 }
 
 int igraph_i_gml_convert_to_key(const char *orig, char **key) {
-  static int no=1;
+  int no=1;
   char strno[50];
   long int i, len=strlen(orig), newlen=0, plen=0;
   igraph_bool_t pref=0;  

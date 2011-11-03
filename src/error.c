@@ -30,7 +30,7 @@
 
 static IGRAPH_THREAD_LOCAL igraph_error_handler_t *igraph_i_error_handler=0;
 
-static char *igraph_i_error_strings[]=
+static const char *igraph_i_error_strings[]=
   { /*  0 */ "No error",
     /*  1 */ "Failed",
     /*  2 */ "Out of memory",
