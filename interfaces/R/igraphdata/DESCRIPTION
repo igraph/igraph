@@ -4,7 +4,7 @@ Date: 2010-10-12
 Title: A collection of network data sets for the igraph package
 Author: Gabor Csardi <csardi.gabor@gmail.com>
 Maintainer: Gabor Csardi <csardi.gabor@gmail.com>
-Depends: igraph (>= 0.6)
+Depends: igraph
 Description: A small collection of various network data sets, 
   to use with the igraph package.
 License: GPL (>= 2) + file LICENSE
