@@ -1,3 +1,4 @@
+import random
 import unittest
 import math
 
@@ -175,6 +176,16 @@ class CommunityTests(unittest.TestCase):
     def testInfomap(self):
         g = Graph.Famous("zachary")
         cl = g.community_infomap()
+        self.assertAlmostEqual(cl.codelength, 4.60605, places=3)
+        self.assertAlmostEqual(cl.q, 0.40203, places=3)
+        self.failUnless(cl.membership == [1,1,1,1,2,2,2,1,0,1,2,1,1,1,0,0,2,1,0,1,0,1] + [0]*12)
+
+        # Smoke testing with vertex and edge weights
+        v_weights = [random.randint(1, 5) for _ in xrange(g.vcount())]
+        e_weights = [random.randint(1, 5) for _ in xrange(g.ecount())]
+        cl = g.community_infomap(edge_weights=e_weights)
+        cl = g.community_infomap(vertex_weights=v_weights)
+        cl = g.community_infomap(edge_weights=e_weights, vertex_weights=v_weights)
 
     def testLabelPropagation(self):
         # Nothing to test there really, since the algorithm

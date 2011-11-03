@@ -781,7 +781,9 @@ class Graph(GraphBase):
         @param vertex_weights: name of an vertex attribute or a list containing
           vertex weights.
         @param trials: the number of attempts to partition the network.
-        @return: an appropriate L{VertexClustering} object.
+        @return: an appropriate L{VertexClustering} object with an extra attribute
+          called C{codelength} that stores the code length determined by the
+          algorithm.
         
         @newfield ref: Reference
         @ref: M. Rosvall and C. T. Bergstrom: Maps of information flow reveal
