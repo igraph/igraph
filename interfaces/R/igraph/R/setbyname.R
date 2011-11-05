@@ -31,7 +31,7 @@
 safer.merge = function(
         x, y, by = intersect(names(x), names(y)),
         by.x = by, by.y = by, all = FALSE, all.x = all, all.y = all,
-        sort = TRUE, suffixes = c(".x",".y"), incomparables = NULL, 
+        suffixes = c(".x",".y"), incomparables = NULL, 
         indicate.origin=FALSE, allow.duplicates=FALSE, 
         allow.duplicates.x=allow.duplicates, allow.duplicates.y=allow.duplicates, 
         ...)
@@ -55,23 +55,9 @@ safer.merge = function(
         y$was.in=TRUE
     }
     
-    if ( !sort )
-    {
-        x$.safer.merge.x.order = sequence(nrow(x))
-        y$.safer.merge.y.order = sequence(nrow(y))
-    }
-    
     result = merge(x, y, by=by, 
         by.x=by.x, by.y=by.y, all=all, all.x=all.x, all.y=all.y,
-        sort=sort, suffixes=suffixes, incomparables=incomparables, ...)
-    
-    if ( !sort )
-    {
-        result = st.sort(result, .safer.merge.x.order, .safer.merge.y.order)
-        result = st.drop(result, .safer.merge.x.order, .safer.merge.y.order)
-    }
-      
-    
+        sort=TRUE, suffixes=suffixes, incomparables=incomparables, ...)
     
     if ( indicate.origin )
     {
