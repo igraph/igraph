@@ -1223,8 +1223,11 @@ void FUNCTION(igraph_vector,remove_section)(TYPE(igraph_vector) *v,
 					    long int from, long int to) {
   assert(v != NULL);
   assert(v->stor_begin != NULL);
-  memmove(v->stor_begin+from, v->stor_begin+to,
-	  sizeof(BASE)*(v->end-v->stor_begin-to));
+  /* Not removing from the end? */
+  if (to < FUNCTION(igraph_vector,size)(v)) {
+    memmove(v->stor_begin+from, v->stor_begin+to,
+	    sizeof(BASE)*(v->end-v->stor_begin-to));
+  }
   v->end -= (to-from);
 }
 
