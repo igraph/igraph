@@ -13,6 +13,7 @@
 \alias{modularity.communities}
 \alias{as.dendrogram.communities}
 \alias{showtrace}
+\alias{code.length}
 \concept{Community structure}
 \title{Functions to deal with the result of network community detection}
 \description{igraph community detection functions return their results
@@ -35,6 +36,8 @@ cutat(communities, no, steps)
    use.modularity=FALSE, \dots)
 
 showtrace(communities)
+
+code.length(communities)
 
 \method{plot}{communities}(x, y,
    colbar=rainbow(length(x)),
@@ -148,6 +151,10 @@ showtrace(communities)
   (\code{\link{leading.eigenvector.community}}), and returns a character
   vector that gives the steps performed by the algorithm while finding
   the communities.
+
+  \code{code.length} is defined for the InfoMAP method
+  (\code{\link{infomap.community}} and returns the code length of the
+  partition.
   
   It is possibly to call the \code{plot} function on \code{communities}
   objects. This will plot the graph (and uses \code{\link{plot.igraph}}
@@ -184,6 +191,9 @@ showtrace(communities)
   object.
 
   \code{showtrace} returns a character vector.
+
+  \code{code.length} returns a numeric scalar for communities found with
+  the InfoMAP method and \code{NULL} for other methods.
   
   \code{plot} for \code{communities} objects returns \code{NULL},
   invisibly.
