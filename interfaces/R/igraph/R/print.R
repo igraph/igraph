@@ -141,7 +141,7 @@
     el <- get.edgelist(x, names=names)
   } else {
     omitted.edges <- ec-mp
-    el <- get.edges(x, seq_length(mp))
+    el <- get.edges(x, seq_len(mp))
     if (names) { el[] <- V(x)$name[el] }
   }
   ename <- if ("name" %in% list.edge.attributes(x)) {
