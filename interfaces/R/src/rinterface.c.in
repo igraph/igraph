@@ -8487,10 +8487,10 @@ SEXP R_igraph_revolver_p_p(SEXP graph, SEXP pniter, SEXP pvtime, SEXP petime,
 SEXP R_igraph_simple_interconnected_islands_game(SEXP islands_n, SEXP islands_size, SEXP islands_pin, SEXP n_inter) {
   
   igraph_t g;
-  igraph_integer_t a=REAL(islands_n)[0];
-  igraph_integer_t b=REAL(islands_size)[0];
+  igraph_integer_t a=INTEGER(islands_n)[0];
+  igraph_integer_t b=INTEGER(islands_size)[0];
   igraph_real_t c=REAL(islands_pin)[0];
-  igraph_integer_t d=REAL(n_inter)[0];
+  igraph_integer_t d=INTEGER(n_inter)[0];
   SEXP result;
   
   igraph_simple_interconnected_islands_game(&g, a, b, c, d);
