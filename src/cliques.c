@@ -952,6 +952,7 @@ int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func
   igraph_i_maximal_cliques_stack_frame frame, *new_frame_ptr;
   igraph_vector_t clique, new_cand, new_fini, cn, best_cand_nbrs, best_fini_cand_nbrs;
   igraph_bool_t cont = 1;
+  int assret;
 
   if (igraph_is_directed(graph))
     IGRAPH_WARNING("directionality of edges is ignored for directed graphs");
@@ -1032,11 +1033,11 @@ int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func
     IGRAPH_CHECK(igraph_vector_push_back(&clique, i));
 
     /* Remove the node from the candidate list */
-    assert(igraph_vector_binsearch(&frame.cand, i, &j));
+    assret=igraph_vector_binsearch(&frame.cand, i, &j); assert(assret);
     igraph_vector_remove(&frame.cand, j);
 
     /* Add the node to the finished list */
-    assert(!igraph_vector_binsearch(&frame.fini, i, &j));
+    assret = !igraph_vector_binsearch(&frame.fini, i, &j); assert(assret);
     IGRAPH_CHECK(igraph_vector_insert(&frame.fini, j, i));
 
     /* Create new_cand and new_fini */
