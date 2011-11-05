@@ -278,7 +278,7 @@ igraph_simple_interconnected_islands_game:
 
 igraph_static_fitness_game:
         PARAMS: OUT GRAPH graph, INTEGER no_of_edges, VECTOR fitness_out, \
-                VECTOR_OR_0 fitness_in, BOOLEAN loops=False, \
+                VECTOR_OR_0 fitness_in=NULL, BOOLEAN loops=False, \
                 BOOLEAN multiple=False
         NAME-R: static.fitness.game
         FLAGS: PROGRESS
