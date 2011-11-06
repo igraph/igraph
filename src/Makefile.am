@@ -253,6 +253,11 @@ libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(F2C_LIB) $(BLAS_LIB) \
 				 $(LAPACK_LIB) $(ARPACK_LIB) $(GLPK_LIB)
 
+if INTERNAL_GLPK
+  libigraph_la_CFLAGS   += -I$(top_srcdir)/optional/glpk
+  libigraph_la_CXXFLAGS += -I$(top_srcdir)/optional/glpk
+endif
+
 includedir = $(prefix)/include/igraph
 include_HEADERS = $(HEADERS_PUBLIC)
 
