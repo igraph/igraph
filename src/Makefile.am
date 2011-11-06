@@ -160,7 +160,7 @@ HEADERS_PRIVATE = atlas-edges.h \
 		hrg_dendro.h hrg_graph.h hrg_rbtree.h hrg_splittree_eq.h \
 		hrg_graph_simp.h foreign-gml-header.h \
 		foreign-ncol-header.h foreign-lgl-header.h \
-		foreign-pajek-header.h igraph_interrupt.h
+		foreign-pajek-header.h igraph_interrupt_internal.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
@@ -194,7 +194,8 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_separators.h  ../include/igraph_cohesive_blocks.h \
 		../include/igraph_lapack.h	../include/igraph_complex.h   \
 		../include/igraph_eigen.h	../include/igraph_statusbar.h \
-		../include/igraph_hrg.h         ../include/igraph_microscopic_update.h
+		../include/igraph_hrg.h         ../include/igraph_microscopic_update.h \
+		../include/igraph_interrupt.h
 
 libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     basic_query.c games.c cocitation.c iterators.c \

@@ -86,5 +86,6 @@
 #include "igraph_eigen.h"
 #include "igraph_hrg.h"
 #include "igraph_threading.h"
+#include "igraph_interrupt.h"
 
 #endif

@@ -22,7 +22,7 @@
 */
 
 #include "igraph_nongraph.h"
-#include "igraph_interrupt.h"
+#include "igraph_interrupt_internal.h"
 #include "memory.h"
 #include "config.h"
 

@@ -25,7 +25,6 @@
 #define IGRAPH_INTERRUPT_H
 
 #include "igraph_error.h"
-#include "config.h"
 
 #undef __BEGIN_DECLS
 #undef __END_DECLS
@@ -117,30 +116,6 @@ __BEGIN_DECLS
  */
 
 typedef int igraph_interruption_handler_t (void* data);
-
-extern IGRAPH_THREAD_LOCAL igraph_interruption_handler_t 
-  *igraph_i_interruption_handler;
-
-/**
- * \define IGRAPH_ALLOW_INTERRUPTION
- * \brief 
- * 
- * This macro should be called when interruption is allowed.  It calls
- * \ref igraph_allow_interruption() with the proper parameters and if that returns
- * anything but \c IGRAPH_SUCCESS then
- * the macro returns the "calling" function as well, with the proper
- * error code (\c IGRAPH_INTERRUPTED).
- */
-
-#define IGRAPH_ALLOW_INTERRUPTION() \
-       do { \
-       if (igraph_i_interruption_handler) { if (igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) return IGRAPH_INTERRUPTED; \
-       } } while (0)
-
-#define IGRAPH_ALLOW_INTERRUPTION_NORETURN() \
-       do { \
-       if (igraph_i_interruption_handler) { igraph_allow_interruption(NULL); } \
-       } while (0)
 
 /**
  * \function igraph_allow_interruption

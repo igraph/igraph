@@ -29,7 +29,7 @@
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
 #include "igraph_progress.h"
-#include "igraph_interrupt.h"
+#include "igraph_interrupt_internal.h"
 #include "igraph_paths.h"
 #include "igraph_structural.h"
 #include "igraph_visitor.h"

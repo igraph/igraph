@@ -63,7 +63,7 @@
 
 #include "igraph_community.h"
 #include "igraph_interface.h"
-#include "igraph_interrupt.h"
+#include "igraph_interrupt_internal.h"
 
 using namespace std;
 

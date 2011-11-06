@@ -36,7 +36,7 @@
 #include "igraph_math.h"
 #include "igraph_dqueue.h"
 #include "igraph_visitor.h"
-#include "igraph_interrupt.h"
+#include "igraph_interrupt_internal.h"
 #include "igraph_topology.h"
 
 #include <limits.h>

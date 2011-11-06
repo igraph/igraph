@@ -30,7 +30,7 @@
 #include "igraph_components.h"
 #include "igraph_dqueue.h"
 #include "igraph_constructors.h"
-#include "igraph_interrupt.h"
+#include "igraph_interrupt_internal.h"
 #include "igraph_statusbar.h"
 
 void igraph_i_cohesive_blocks_free(igraph_vector_ptr_t *ptr) {

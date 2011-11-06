@@ -27,7 +27,7 @@
 #ifdef HAVE_GLPK
 
 #include "igraph_error.h"
-#include "igraph_interrupt.h"
+#include "igraph_interrupt_internal.h"
 #include <glpk.h>
 #include <memory.h>
 #include <stdio.h>

@@ -46,7 +46,7 @@ using namespace std;
 #include "igraph_random.h"
 #include "igraph_interface.h"
 #include "igraph_progress.h"
-#include "igraph_interrupt.h"
+#include "igraph_interrupt_internal.h"
 #ifdef MUSE_MPI
   #include <mpi.h>
 #endif

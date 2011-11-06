@@ -60,7 +60,7 @@
 #include "igraph_math.h"
 #include "igraph_interface.h"
 #include "igraph_components.h"
-#include "igraph_interrupt.h"
+#include "igraph_interrupt_internal.h"
 
 int igraph_i_community_spinglass_orig(const igraph_t *graph,
 				      const igraph_vector_t *weights,

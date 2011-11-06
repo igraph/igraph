@@ -80,7 +80,7 @@
  */
 
 #include "igraph_types.h"
-#include "igraph_interrupt.h"
+#include "igraph_interrupt_internal.h"
 
 #include <float.h>
 #include <math.h>

@@ -25,7 +25,7 @@
 #include "igraph_stack.h"
 #include "igraph_datatype.h"
 #include "igraph_iterators.h"
-#include "igraph_interrupt.h"
+#include "igraph_interrupt_internal.h"
 #include "igraph_vector.h"
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"

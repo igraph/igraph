@@ -26,7 +26,7 @@
 #include "igraph_games.h"
 #include "igraph_random.h"
 #include "igraph_memory.h"
-#include "igraph_interrupt.h"
+#include "igraph_interrupt_internal.h"
 #include "igraph_attributes.h"
 #include "igraph_constructors.h"
 #include "igraph_nongraph.h"

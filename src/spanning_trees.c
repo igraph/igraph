@@ -25,7 +25,7 @@
 #include "igraph_structural.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
-#include "igraph_interrupt.h"
+#include "igraph_interrupt_internal.h"
 #include "igraph_memory.h"
 #include "igraph_progress.h"
 #include "igraph_types_internal.h"

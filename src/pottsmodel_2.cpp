@@ -52,7 +52,7 @@
 using namespace std;
 
 #include "igraph_random.h"
-#include "igraph_interrupt.h"
+#include "igraph_interrupt_internal.h"
 #include "config.h"
 
 //#################################################################################################

@@ -63,7 +63,7 @@ PyObject* igraph_rng_Python_set_generator(PyObject* self, PyObject* object) {
   if (object == Py_None) {
     /* Reverting to the default igraph random number generator instead
      * of the Python-based one */
-    igraph_rng_set_default(&igraph_rng_default);
+    igraph_rng_set_default(igraph_rng_default());
     Py_RETURN_NONE;
   }
 
