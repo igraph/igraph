@@ -92,10 +92,10 @@ static integer c_n1 = -1;
     static logical lquery, wantvr, wntsnn, wntsnv;
 
 
-/*  -- LAPACK driver routine (version 3.2) --   
+/*  -- LAPACK driver routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -114,8 +114,8 @@ static integer c_n1 = -1;
                      A * v(j) = lambda(j) * v(j)   
     where lambda(j) is its eigenvalue.   
     The left eigenvector u(j) of A satisfies   
-                  u(j)**H * A = lambda(j) * u(j)**H   
-    where u(j)**H denotes the conjugate transpose of u(j).   
+                  u(j)**T * A = lambda(j) * u(j)**T   
+    where u(j)**T denotes the transpose of u(j).   
 
     The computed eigenvectors are normalized to have Euclidean norm   
     equal to 1 and largest component real.   

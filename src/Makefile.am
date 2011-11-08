@@ -233,7 +233,8 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     lapack.c complex.c eigen.c \
 			     igraph_hrg_types.cc igraph_hrg.cc \
 			     scg.c scg_approximate_methods.c scg_exact_scg.c \
-			     scg_kmeans.c scg_utils.c scg_optimal_method.c
+			     scg_kmeans.c scg_utils.c scg_optimal_method.c \
+			     fortran_intrinsics.c
 
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include -Wall

@@ -46,10 +46,10 @@ static doublereal c_b23 = 1.;
     static logical lquery;
 
 
-/*  -- LAPACK routine (version 3.2) --   
+/*  -- LAPACK routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -130,7 +130,7 @@ static doublereal c_b23 = 1.;
 
     Each H(i) has the form   
 
-       H(i) = I - tau * v * v'   
+       H(i) = I - tau * v * v**T   
 
     where tau is a real scalar, and v is a real vector with   
     v(i+1:n) = 0 and v(i) = 1; v(1:i-1) is stored on exit in   
@@ -143,7 +143,7 @@ static doublereal c_b23 = 1.;
 
     Each H(i) has the form   
 
-       H(i) = I - tau * v * v'   
+       H(i) = I - tau * v * v**T   
 
     where tau is a real scalar, and v is a real vector with   
     v(1:i) = 0 and v(i+1) = 1; v(i+2:n) is stored on exit in A(i+2:n,i),   
@@ -275,7 +275,7 @@ static doublereal c_b23 = 1.;
 		    work[1], &ldwork);
 
 /*           Update the unreduced submatrix A(1:i-1,1:i-1), using an   
-             update of the form:  A := A - V*W' - W*V' */
+             update of the form:  A := A - V*W**T - W*V**T */
 
 	    i__3 = i__ - 1;
 	    igraphdsyr2k_(uplo, "No transpose", &i__3, &nb, &c_b22, &a[i__ * a_dim1 
@@ -313,7 +313,7 @@ static doublereal c_b23 = 1.;
 		    tau[i__], &work[1], &ldwork);
 
 /*           Update the unreduced submatrix A(i+ib:n,i+ib:n), using   
-             an update of the form:  A := A - V*W' - W*V' */
+             an update of the form:  A := A - V*W**T - W*V**T */
 
 	    i__3 = *n - i__ - nb + 1;
 	    igraphdsyr2k_(uplo, "No transpose", &i__3, &nb, &c_b22, &a[i__ + nb + 

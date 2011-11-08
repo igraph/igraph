@@ -32,10 +32,10 @@ static integer c__1 = 1;
     extern logical igraphlsame_(char *, char *);
 
 
-/*  -- LAPACK auxiliary routine (version 3.2) --   
+/*  -- LAPACK auxiliary routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -45,7 +45,7 @@ static integer c__1 = 1;
     matrix C, from either the left or the right. H is represented in the   
     form   
 
-          H = I - tau * v * v'   
+          H = I - tau * v * v**T   
 
     where tau is a real scalar and v is a real vector.   
 

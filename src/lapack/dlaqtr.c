@@ -61,10 +61,10 @@ static logical c_true = TRUE_;
     static doublereal smlnum;
 
 
-/*  -- LAPACK auxiliary routine (version 3.2) --   
+/*  -- LAPACK auxiliary routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -88,7 +88,7 @@ static logical c_true = TRUE_;
                        [              .     ]   
                        [                 w  ]   
 
-    op(A) = A or A', A' denotes the conjugate transpose of   
+    op(A) = A or A**T, A**T denotes the transpose of   
     matrix A.   
 
     On input, X = [ c ].  On output, X = [ p ].   
@@ -103,7 +103,7 @@ static logical c_true = TRUE_;
     LTRAN   (input) LOGICAL   
             On entry, LTRAN specifies the option of conjugate transpose:   
                = .FALSE.,    op(T+i*B) = T+i*B,   
-               = .TRUE.,     op(T+i*B) = (T+i*B)'.   
+               = .TRUE.,     op(T+i*B) = (T+i*B)**T.   
 
     LREAL   (input) LOGICAL   
             On entry, LREAL specifies the input matrix structure:   
@@ -358,7 +358,7 @@ L30:
 
 	} else {
 
-/*           Solve T'*p = scale*c */
+/*           Solve T**T*p = scale*c */
 
 	    jnext = 1;
 	    i__1 = *n;
@@ -654,7 +654,7 @@ L70:
 
 	} else {
 
-/*           Solve (T + iB)'*(p+iq) = c+id */
+/*           Solve (T + iB)**T*(p+iq) = c+id */
 
 	    jnext = 1;
 	    i__1 = *n;

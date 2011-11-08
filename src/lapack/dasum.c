@@ -27,11 +27,16 @@ doublereal igraphdasum_(integer *n, doublereal *dx, integer *incx)
 /*  Purpose   
     =======   
 
-       takes the sum of the absolute values.   
+       DASUM takes the sum of the absolute values.   
+
+    Further Details   
+    ===============   
+
        jack dongarra, linpack, 3/11/78.   
        modified 3/93 to return if incx .le. 0.   
        modified 12/3/93, array(1) declarations changed to array(*)   
 
+    =====================================================================   
 
        Parameter adjustments */
     --dx;
@@ -43,50 +48,41 @@ doublereal igraphdasum_(integer *n, doublereal *dx, integer *incx)
 	return ret_val;
     }
     if (*incx == 1) {
-	goto L20;
-    }
-
-/*        code for increment not equal to 1 */
-
-    nincx = *n * *incx;
-    i__1 = nincx;
-    i__2 = *incx;
-    for (i__ = 1; i__2 < 0 ? i__ >= i__1 : i__ <= i__1; i__ += i__2) {
-	dtemp += (d__1 = dx[i__], abs(d__1));
-/* L10: */
-    }
-    ret_val = dtemp;
-    return ret_val;
-
 /*        code for increment equal to 1   
 
 
           clean-up loop */
 
-L20:
-    m = *n % 6;
-    if (m == 0) {
-	goto L40;
+	m = *n % 6;
+	if (m != 0) {
+	    i__1 = m;
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		dtemp += (d__1 = dx[i__], abs(d__1));
+	    }
+	    if (*n < 6) {
+		ret_val = dtemp;
+		return ret_val;
+	    }
+	}
+	mp1 = m + 1;
+	i__1 = *n;
+	for (i__ = mp1; i__ <= i__1; i__ += 6) {
+	    dtemp = dtemp + (d__1 = dx[i__], abs(d__1)) + (d__2 = dx[i__ + 1],
+		     abs(d__2)) + (d__3 = dx[i__ + 2], abs(d__3)) + (d__4 = 
+		    dx[i__ + 3], abs(d__4)) + (d__5 = dx[i__ + 4], abs(d__5)) 
+		    + (d__6 = dx[i__ + 5], abs(d__6));
+	}
+    } else {
+
+/*        code for increment not equal to 1 */
+
+	nincx = *n * *incx;
+	i__1 = nincx;
+	i__2 = *incx;
+	for (i__ = 1; i__2 < 0 ? i__ >= i__1 : i__ <= i__1; i__ += i__2) {
+	    dtemp += (d__1 = dx[i__], abs(d__1));
+	}
     }
-    i__2 = m;
-    for (i__ = 1; i__ <= i__2; ++i__) {
-	dtemp += (d__1 = dx[i__], abs(d__1));
-/* L30: */
-    }
-    if (*n < 6) {
-	goto L60;
-    }
-L40:
-    mp1 = m + 1;
-    i__2 = *n;
-    for (i__ = mp1; i__ <= i__2; i__ += 6) {
-	dtemp = dtemp + (d__1 = dx[i__], abs(d__1)) + (d__2 = dx[i__ + 1], 
-		abs(d__2)) + (d__3 = dx[i__ + 2], abs(d__3)) + (d__4 = dx[i__ 
-		+ 3], abs(d__4)) + (d__5 = dx[i__ + 4], abs(d__5)) + (d__6 = 
-		dx[i__ + 5], abs(d__6));
-/* L50: */
-    }
-L60:
     ret_val = dtemp;
     return ret_val;
 } /* igraphdasum_ */

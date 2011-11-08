@@ -56,7 +56,7 @@ static doublereal c_b26 = 1.;
     static logical lquery;
 
 
-/*  -- LAPACK routine (version 3.2.1)                                  --   
+/*  -- LAPACK routine (version 3.3.1)                                  --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
     -- April 2009                                                      --   
@@ -66,7 +66,7 @@ static doublereal c_b26 = 1.;
     =======   
 
     DGEHRD reduces a real general matrix A to upper Hessenberg form H by   
-    an orthogonal similarity transformation:  Q' * A * Q = H .   
+    an orthogonal similarity transformation:  Q**T * A * Q = H .   
 
     Arguments   
     =========   
@@ -125,7 +125,7 @@ static doublereal c_b26 = 1.;
 
     Each H(i) has the form   
 
-       H(i) = I - tau * v * v'   
+       H(i) = I - tau * v * v**T   
 
     where tau is a real scalar, and v is a real vector with   
     v(1:i) = 0, v(i+1) = 1 and v(ihi+1:n) = 0; v(i+2:ihi) is stored on   
@@ -273,14 +273,14 @@ static doublereal c_b26 = 1.;
 	    ib = min(i__3,i__4);
 
 /*           Reduce columns i:i+ib-1 to Hessenberg form, returning the   
-             matrices V and T of the block reflector H = I - V*T*V'   
+             matrices V and T of the block reflector H = I - V*T*V**T   
              which performs the reduction, and also the matrix Y = A*V*T */
 
 	    igraphdlahr2_(ihi, &i__, &ib, &a[i__ * a_dim1 + 1], lda, &tau[i__], t, &
 		    c__65, &work[1], &ldwork);
 
 /*           Apply the block reflector H to A(1:ihi,i+ib:ihi) from the   
-             right, computing  A := A - Y * V'. V(i+ib,ib-1) must be set   
+             right, computing  A := A - Y * V**T. V(i+ib,ib-1) must be set   
              to 1 */
 
 	    ei = a[i__ + ib + (i__ + ib - 1) * a_dim1];

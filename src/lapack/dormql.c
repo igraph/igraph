@@ -53,10 +53,10 @@ static integer c__65 = 65;
     static logical lquery;
 
 
-/*  -- LAPACK routine (version 3.2) --   
+/*  -- LAPACK routine (version 3.3.1) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+    -- April 2011                                                      --   
 
 
     Purpose   
@@ -286,17 +286,17 @@ static integer c__65 = 65;
 		    , lda, &tau[i__], t, &c__65);
 	    if (left) {
 
-/*              H or H' is applied to C(1:m-k+i+ib-1,1:n) */
+/*              H or H**T is applied to C(1:m-k+i+ib-1,1:n) */
 
 		mi = *m - *k + i__ + ib - 1;
 	    } else {
 
-/*              H or H' is applied to C(1:m,1:n-k+i+ib-1) */
+/*              H or H**T is applied to C(1:m,1:n-k+i+ib-1) */
 
 		ni = *n - *k + i__ + ib - 1;
 	    }
 
-/*           Apply H or H' */
+/*           Apply H or H**T */
 
 	    igraphdlarfb_(side, trans, "Backward", "Columnwise", &mi, &ni, &ib, &a[
 		    i__ * a_dim1 + 1], lda, t, &c__65, &c__[c_offset], ldc, &

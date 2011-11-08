@@ -40,7 +40,7 @@
     where  alpha  is a scalar,  B  is an m by n matrix,  A  is a unit, or   
     non-unit,  upper or lower triangular matrix  and  op( A )  is one  of   
 
-       op( A ) = A   or   op( A ) = A'.   
+       op( A ) = A   or   op( A ) = A**T.   
 
     Arguments   
     ==========   
@@ -71,9 +71,9 @@
 
                 TRANSA = 'N' or 'n'   op( A ) = A.   
 
-                TRANSA = 'T' or 't'   op( A ) = A'.   
+                TRANSA = 'T' or 't'   op( A ) = A**T.   
 
-                TRANSA = 'C' or 'c'   op( A ) = A'.   
+                TRANSA = 'C' or 'c'   op( A ) = A**T.   
 
              Unchanged on exit.   
 
@@ -136,6 +136,8 @@
              max( 1, m ).   
              Unchanged on exit.   
 
+    Further Details   
+    ===============   
 
     Level 3 Blas routine.   
 
@@ -145,6 +147,7 @@
        Jeremy Du Croz, Numerical Algorithms Group Ltd.   
        Sven Hammarling, Numerical Algorithms Group Ltd.   
 
+    =====================================================================   
 
 
        Test the input parameters.   
@@ -266,7 +269,7 @@
 	    }
 	} else {
 
-/*           Form  B := alpha*A'*B. */
+/*           Form  B := alpha*A**T*B. */
 
 	    if (upper) {
 		i__1 = *n;
@@ -368,7 +371,7 @@
 	    }
 	} else {
 
-/*           Form  B := alpha*B*A'. */
+/*           Form  B := alpha*B*A**T. */
 
 	    if (upper) {
 		i__1 = *n;

@@ -78,30 +78,6 @@ diff -ru lapack-3.2.2/SRC/dlarft.f lapack-3.2.2-new/SRC/dlarft.f
                       J = MAX( LASTV, PREVLASTV )
  *
  *                    T(i+1:k,i) :=
-diff -ru lapack-3.2.2/SRC/iladlr.f lapack-3.2.2-new/SRC/iladlr.f
---- lapack-3.2.2/SRC/iladlr.f	2010-06-23 19:25:30.000000000 +0200
-+++ lapack-3.2.2-new/SRC/iladlr.f	2010-10-06 21:54:13.000000000 +0200
-@@ -54,10 +54,16 @@
-       ELSE
- *     Scan up each column tracking the last zero row seen.
-          ILADLR = 0
--         DO J = 1, N
--            DO I = M, 1, -1
--               IF( A(I, J).NE.ZERO ) EXIT
--            END DO
-+         DO J = 1, N            
-+*           DO I = M, 1, -1
-+*              IF( A(I, J).NE.ZERO ) EXIT
-+*           END DO
-+            I = M
-+ 10         IF (A(I, J) .NE. ZERO) GOTO 20
-+            IF (M .EQ. 1) GOTO 20
-+            M = M - 1
-+            GOTO 10
-+ 20         CONTINUE
-             ILADLR = MAX( ILADLR, I )
-          END DO
-       END IF
 diff -ru lapack-3.2.2/SRC/xerbla.f lapack-3.2.2-new/SRC/xerbla.f
 --- lapack-3.2.2/SRC/xerbla.f	2009-04-16 20:10:16.000000000 +0200
 +++ lapack-3.2.2-new/SRC/xerbla.f	2010-10-08 17:53:21.000000000 +0200
@@ -114,3 +90,67 @@ diff -ru lapack-3.2.2/SRC/xerbla.f lapack-3.2.2-new/SRC/xerbla.f
  *     ..
  *     .. Executable Statements ..
  *
+diff -ru lapack-3.3.1/INSTALL/dlamch.f lapack-3.3.1-new/INSTALL/dlamch.f
+--- lapack-3.3.1/INSTALL/dlamch.f	2011-04-26 12:41:18.000000000 -0400
++++ lapack-3.3.1-new/INSTALL/dlamch.f	2011-04-26 12:41:22.000000000 -0400
+@@ -60,8 +60,8 @@
+       EXTERNAL           LSAME
+ *     ..
+ *     .. Intrinsic Functions ..
+-      EXTERNAL           DIGITS, EPSILON, HUGE, MAXEXPONENT,
+-     $                   MINEXPONENT, RADIX, TINY
++      EXTERNAL           DIGITSDBL, EPSILONDBL, HUGEDBL, MAXEXPONENTDBL,
++     $                   MINEXPONENTDBL, RADIXDBL, TINYDBL
+ *     ..
+ *     .. Executable Statements ..
+ *
+@@ -71,16 +71,16 @@
+       RND = ONE
+ *
+       IF( ONE.EQ.RND ) THEN
+-         EPS = EPSILON(ZERO) * 0.5
++         EPS = EPSILONDBL(ZERO) * 0.5
+       ELSE
+-         EPS = EPSILON(ZERO)
++         EPS = EPSILONDBL(ZERO)
+       END IF
+ *
+       IF( LSAME( CMACH, 'E' ) ) THEN
+          RMACH = EPS
+       ELSE IF( LSAME( CMACH, 'S' ) ) THEN
+-         SFMIN = TINY(ZERO)
+-         SMALL = ONE / HUGE(ZERO)
++         SFMIN = TINYDBL(ZERO)
++         SMALL = ONE / HUGEDBL(ZERO)
+          IF( SMALL.GE.SFMIN ) THEN
+ *
+ *           Use SMALL plus a bit, to avoid the possibility of rounding
+@@ -90,21 +90,21 @@
+          END IF
+          RMACH = SFMIN
+       ELSE IF( LSAME( CMACH, 'B' ) ) THEN
+-         RMACH = RADIX(ZERO)
++         RMACH = RADIXDBL(ZERO)
+       ELSE IF( LSAME( CMACH, 'P' ) ) THEN
+-         RMACH = EPS * RADIX(ZERO)
++         RMACH = EPS * RADIXDBL(ZERO)
+       ELSE IF( LSAME( CMACH, 'N' ) ) THEN
+-         RMACH = DIGITS(ZERO)
++         RMACH = DIGITSDBL(ZERO)
+       ELSE IF( LSAME( CMACH, 'R' ) ) THEN
+          RMACH = RND
+       ELSE IF( LSAME( CMACH, 'M' ) ) THEN
+-         RMACH = MINEXPONENT(ZERO)
++         RMACH = MINEXPONENTDBL(ZERO)
+       ELSE IF( LSAME( CMACH, 'U' ) ) THEN
+-         RMACH = tiny(zero)
++         RMACH = TINYDBL(zero)
+       ELSE IF( LSAME( CMACH, 'L' ) ) THEN
+-         RMACH = MAXEXPONENT(ZERO)
++         RMACH = MAXEXPONENTDBL(ZERO)
+       ELSE IF( LSAME( CMACH, 'O' ) ) THEN
+-         RMACH = HUGE(ZERO)
++         RMACH = HUGEDBL(ZERO)
+       ELSE
+          RMACH = ZERO
+       END IF

@@ -70,10 +70,10 @@ static integer c__2 = 2;
     static doublereal smlnum;
 
 
-/*  -- LAPACK auxiliary routine (version 3.2) --   
+/*  -- LAPACK auxiliary routine (version 3.3.0) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+       November 2010   
 
 
        This auxiliary subroutine called by DLAQR0 performs a   
@@ -564,43 +564,46 @@ static integer c__2 = 2;
 /*           ==== Special case: 2-by-2 reflection (if needed) ==== */
 
 	    k = krcol + (m22 - 1) * 3;
-	    if (bmp22 && v[m22 * v_dim1 + 1] != 0.) {
+	    if (bmp22) {
+		if (v[m22 * v_dim1 + 1] != 0.) {
 /* Computing MIN */
-		i__7 = *kbot, i__4 = k + 3;
-		i__5 = min(i__7,i__4);
-		for (j = jtop; j <= i__5; ++j) {
-		    refsum = v[m22 * v_dim1 + 1] * (h__[j + (k + 1) * h_dim1] 
-			    + v[m22 * v_dim1 + 2] * h__[j + (k + 2) * h_dim1])
-			    ;
-		    h__[j + (k + 1) * h_dim1] -= refsum;
-		    h__[j + (k + 2) * h_dim1] -= refsum * v[m22 * v_dim1 + 2];
+		    i__7 = *kbot, i__4 = k + 3;
+		    i__5 = min(i__7,i__4);
+		    for (j = jtop; j <= i__5; ++j) {
+			refsum = v[m22 * v_dim1 + 1] * (h__[j + (k + 1) * 
+				h_dim1] + v[m22 * v_dim1 + 2] * h__[j + (k + 
+				2) * h_dim1]);
+			h__[j + (k + 1) * h_dim1] -= refsum;
+			h__[j + (k + 2) * h_dim1] -= refsum * v[m22 * v_dim1 
+				+ 2];
 /* L100: */
-		}
-
-		if (accum) {
-		    kms = k - incol;
-/* Computing MAX */
-		    i__5 = 1, i__7 = *ktop - incol;
-		    i__4 = kdu;
-		    for (j = max(i__5,i__7); j <= i__4; ++j) {
-			refsum = v[m22 * v_dim1 + 1] * (u[j + (kms + 1) * 
-				u_dim1] + v[m22 * v_dim1 + 2] * u[j + (kms + 
-				2) * u_dim1]);
-			u[j + (kms + 1) * u_dim1] -= refsum;
-			u[j + (kms + 2) * u_dim1] -= refsum * v[m22 * v_dim1 
-				+ 2];
-/* L110: */
 		    }
-		} else if (*wantz) {
-		    i__4 = *ihiz;
-		    for (j = *iloz; j <= i__4; ++j) {
-			refsum = v[m22 * v_dim1 + 1] * (z__[j + (k + 1) * 
-				z_dim1] + v[m22 * v_dim1 + 2] * z__[j + (k + 
-				2) * z_dim1]);
-			z__[j + (k + 1) * z_dim1] -= refsum;
-			z__[j + (k + 2) * z_dim1] -= refsum * v[m22 * v_dim1 
-				+ 2];
+
+		    if (accum) {
+			kms = k - incol;
+/* Computing MAX */
+			i__5 = 1, i__7 = *ktop - incol;
+			i__4 = kdu;
+			for (j = max(i__5,i__7); j <= i__4; ++j) {
+			    refsum = v[m22 * v_dim1 + 1] * (u[j + (kms + 1) * 
+				    u_dim1] + v[m22 * v_dim1 + 2] * u[j + (
+				    kms + 2) * u_dim1]);
+			    u[j + (kms + 1) * u_dim1] -= refsum;
+			    u[j + (kms + 2) * u_dim1] -= refsum * v[m22 * 
+				    v_dim1 + 2];
+/* L110: */
+			}
+		    } else if (*wantz) {
+			i__4 = *ihiz;
+			for (j = *iloz; j <= i__4; ++j) {
+			    refsum = v[m22 * v_dim1 + 1] * (z__[j + (k + 1) * 
+				    z_dim1] + v[m22 * v_dim1 + 2] * z__[j + (
+				    k + 2) * z_dim1]);
+			    z__[j + (k + 1) * z_dim1] -= refsum;
+			    z__[j + (k + 2) * z_dim1] -= refsum * v[m22 * 
+				    v_dim1 + 2];
 /* L120: */
+			}
 		    }
 		}
 	    }
@@ -838,7 +841,7 @@ static integer c__2 = 2;
 		    igraphdlacpy_("ALL", &knz, &jlen, &h__[incol + 1 + j2 + jcol * 
 			    h_dim1], ldh, &wh[kzs + 1 + wh_dim1], ldwh);
 
-/*                 ==== Multiply by U21' ==== */
+/*                 ==== Multiply by U21**T ==== */
 
 		    igraphdlaset_("ALL", &kzs, &jlen, &c_b7, &c_b7, &wh[wh_offset], 
 			    ldwh);
@@ -846,7 +849,7 @@ static integer c__2 = 2;
 			    + (kzs + 1) * u_dim1], ldu, &wh[kzs + 1 + wh_dim1]
 			    , ldwh);
 
-/*                 ==== Multiply top of H by U11' ==== */
+/*                 ==== Multiply top of H by U11**T ==== */
 
 		    igraphdgemm_("C", "N", &i2, &jlen, &j2, &c_b8, &u[u_offset], 
 			    ldu, &h__[incol + 1 + jcol * h_dim1], ldh, &c_b8, 
@@ -857,7 +860,7 @@ static integer c__2 = 2;
 		    igraphdlacpy_("ALL", &j2, &jlen, &h__[incol + 1 + jcol * h_dim1]
 			    , ldh, &wh[i2 + 1 + wh_dim1], ldwh);
 
-/*                 ==== Multiply by U21' ==== */
+/*                 ==== Multiply by U21**T ==== */
 
 		    igraphdtrmm_("L", "L", "C", "N", &j2, &jlen, &c_b8, &u[(i2 + 1) 
 			    * u_dim1 + 1], ldu, &wh[i2 + 1 + wh_dim1], ldwh);
