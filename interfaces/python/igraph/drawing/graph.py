@@ -676,7 +676,11 @@ class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
         cy = self.service
 
         # Check the version number. Anything older than 1.3 is bad.
-        if tuple(map(int, cy.version().split(".")[:2])) < (1, 3):
+        version = cy.version()
+        if " " in version:
+            version = version.split(" ")[0]
+        version = tuple(map(int, version.split(".")[:2]))
+        if version < (1, 3):
             raise NotImplementedError("CytoscapeGraphDrawer requires "
                                       "Cytoscape-RPC 1.3 or newer")
 
