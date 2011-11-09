@@ -179,7 +179,7 @@ html/stamp: igraph-docs.xml $(DOCFIX2) gtk-doc.xsl
 
 igraph.info: igraph-docs.xml $(DOCFIX2) igraph.info.diff
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
-	cat tutorial.xml | sed '/<link/{N;s/<link\n*[^>]*>//g}' | \
+	cat tutorial.xml | sed '/<link/{N;s/<link\n*[^>]*>//g;}' | \
 	  sed 's/<\/link>//g' >tutorial-info.xml \
 	&& sed 's/tutorial\.xml/tutorial-info.xml/' igraph-docs.xml > igraph-docs-info.xml \
 	&& xmllint --xinclude -o igraph-docs-info2.xml igraph-docs-info.xml \
