@@ -470,7 +470,7 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
  * The computed eigenvectors are normalized to have Euclidean norm   
  * equal to 1 and largest component real.   
  * 
- * \param A Matrix. On entry it contains the N-by-N input matrix.
+ * \param A matrix. On entry it contains the N-by-N input matrix.
  * \param valuesreal Pointer to an initialized vector, or a null
  *        pointer. If not a null pointer, then the real parts of the
  *        eigenvalues are stored here. The vector will be resized as
@@ -500,7 +500,7 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
  *        compute all the eigenvalues, and no eigenvectors have been
  *        computed; element i+1:N of \p valuesreal and \p valuesimag
  *        contain eigenvalues which have converged. This case only
- *        generated an igraph error, if \p info was non-zero on entry.
+ *        generates an igraph error, if \p info was non-zero on entry.
  * \return Error code.
  * 
  * Time complexity: TODO.
@@ -662,7 +662,7 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
  *   (j+1)-th eigenvalues form a complex conjugate pair, then the j-th
  *   and (j+1)-th columns contain their corresponding eigenvectors.
  * \param vectorsright An initialized matrix or a NULL pointer. If not
- *   a null pointer, then the left eigenvectors are stored here. The
+ *   a null pointer, then the right eigenvectors are stored here. The
  *   format is the same, as for the \p vectorsleft argument.
  * \param ilo 
  * \param ihi \p ilo and \p ihi are integer values determined when A was   
