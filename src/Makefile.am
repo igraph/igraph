@@ -195,7 +195,7 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_lapack.h	../include/igraph_complex.h   \
 		../include/igraph_eigen.h	../include/igraph_statusbar.h \
 		../include/igraph_hrg.h         ../include/igraph_microscopic_update.h \
-		../include/igraph_interrupt.h
+		../include/igraph_interrupt.h   ../include/igraph_threading.h
 
 libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     basic_query.c games.c cocitation.c iterators.c \
