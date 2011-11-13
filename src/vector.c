@@ -265,17 +265,17 @@ int igraph_vector_complex_print(const igraph_vector_complex_t *v) {
   if (n!=0) {
     igraph_complex_t z=VECTOR(*v)[0];
     if (IGRAPH_IMAG(z) > 0) { 
-      printf("%g+%g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
+      printf("%g+%gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
     } else {
-      printf("%g-%g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
+      printf("%g-%gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
     }
   }
   for (i=1; i<n; i++) {
     igraph_complex_t z=VECTOR(*v)[i];
     if (IGRAPH_IMAG(z) > 0) { 
-      printf(" %g+%g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
+      printf(" %g+%gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
     } else {
-      printf(" %g-%g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
+      printf(" %g-%gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
     }
   }
   printf("\n");
