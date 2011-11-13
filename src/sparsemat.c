@@ -551,7 +551,7 @@ int igraph_sparsemat_compress(const igraph_sparsemat_t *A,
  * \function igraph_sparsemat_transpose
  * Transpose a sparse matrix
  * 
- * \param A The input matrix, it must be in column-compressed format.
+ * \param A The input matrix, column-compressed or triple format.
  * \param res Pointer to an uninitialized sparse matrix, the result is
  *    stored here.
  * \param values If this is non-zero, the matrix transpose is
@@ -566,10 +566,19 @@ int igraph_sparsemat_transpose(const igraph_sparsemat_t *A,
 			       igraph_sparsemat_t *res, 
 			       int values) {
 
-  if (! (res->cs=cs_transpose(A->cs, values)) ) {
-    IGRAPH_ERROR("Cannot transpose sparse matrix", IGRAPH_FAILURE);
+  if (A->cs->nz < 0) {
+    /* column-compressed */
+    if (! (res->cs=cs_transpose(A->cs, values)) ) {
+      IGRAPH_ERROR("Cannot transpose sparse matrix", IGRAPH_FAILURE);
+    }
+  } else {
+    /* triplets */
+    int *tmp;
+    IGRAPH_CHECK(igraph_sparsemat_copy(res, A));
+    tmp = res->cs->p;
+    res->cs->p = res->cs->i;
+    res->cs->i = tmp;
   }
-  
   return 0;
 }
 
