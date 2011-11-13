@@ -51,6 +51,10 @@
  *        \cli IGRAPH_GET_ADJACENCY_BOTH 
  *          the whole matrix is used, a symmetric matrix is returned.
  *        \endclist
+ * \param type eids Logical, if true, then the edges ids plus one 
+ *        are stored in the adjacency matrix, instead of the number of 
+ *        edges between the two vertices. (The plus one is needed, since
+ *        edge ids start from zero, and zero means no edge in this case.)
  * \return Error code:
  *        \c IGRAPH_EINVAL invalid type argument.
  *
