@@ -133,6 +133,9 @@ int FUNCTION(igraph_vector,mul)(TYPE(igraph_vector) *v1,
 				const TYPE(igraph_vector) *v2);
 int FUNCTION(igraph_vector,div)(TYPE(igraph_vector) *v1, 
 				const TYPE(igraph_vector) *v2);
+#ifndef NOABS
+int FUNCTION(igraph_vector,abs)(TYPE(igraph_vector) *v);
+#endif
 
 /*------------------------------*/
 /* Finding minimum and maximum  */

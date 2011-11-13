@@ -136,3 +136,7 @@
 #ifdef DIV
 #undef DIV
 #endif
+
+#ifdef NOABS
+#undef NOABS
+#endif
