@@ -76,13 +76,74 @@ int test_graph_from_leda_tutorial() {
   return 0;
 }
 
+int test_weighted_graph_from_mit_notes() {
+  /* Test graph from the following lecture notes:
+   * http://math.mit.edu/~goemans/18433S07/matching-notes.pdf
+   */
+  igraph_t graph;
+  igraph_vector_bool_t types;
+  igraph_vector_long_t matching;
+  igraph_vector_t weights;
+  igraph_integer_t matching_size;
+  igraph_real_t matching_weight;
+  igraph_bool_t is_matching;
+  igraph_real_t weight_array[] = { 2, 7, 2, 3,
+      1, 3, 9, 3, 3,
+      1, 3, 3, 1, 2,
+      4, 1, 2,
+      3 };
+  int i;
+
+  igraph_small(&graph, 0, 0,
+      0, 6, 0, 7, 0, 8, 0, 9,
+      1, 5, 1, 6, 1, 7, 1, 8, 1, 9,
+      2, 5, 2, 6, 2, 7, 2, 8, 2, 9,
+      3, 5, 3, 7, 3, 9,
+      4, 7, -1);
+  igraph_vector_bool_init(&types, 10);
+  for (i = 0; i < 10; i++)
+    VECTOR(types)[i] = (i >= 5);
+  igraph_vector_long_init(&matching, 0);
+  igraph_vector_init_copy(&weights, weight_array,
+      sizeof(weight_array) / sizeof(weight_array[0]));
+
+  igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
+      &matching_weight, &matching, &weights);
+  if (matching_size != 4) {
+    printf("matching_size is %ld, expected: 4\n", (long)matching_size);
+    return 1;
+  }
+  if (matching_weight != 19) {
+    printf("matching_weight is %ld, expected: 19\n", (long)matching_weight);
+    return 2;
+  }
+  igraph_is_maximal_matching(&graph, &types, &matching, &is_matching);
+  if (!is_matching) {
+    printf("not a matching: ");
+    igraph_vector_long_print(&matching);
+    return 3;
+  }
+  
+  igraph_vector_destroy(&weights);
+  igraph_vector_long_destroy(&matching);
+  igraph_vector_bool_destroy(&types);
+  igraph_destroy(&graph);
+
+  return 0;
+}
+
 int main() {
+  /*
   if (test_graph_from_leda_tutorial())
     return 1;
+  */
+
+  if (test_weighted_graph_from_mit_notes())
+    return 2;
 
   if (!IGRAPH_FINALLY_STACK_EMPTY) {
     printf("Finally stack still has %d elements.\n", IGRAPH_FINALLY_STACK_SIZE());
-    return 2;
+    return 3;
   }
 
   return 0;
