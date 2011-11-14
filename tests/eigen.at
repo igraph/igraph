@@ -39,6 +39,12 @@ AT_COMPILE_CHECK([simple/igraph_eigen_matrix2.c],
 		 [simple/igraph_eigen_matrix2.out])
 AT_CLEANUP
 
+AT_SETUP([General matrix, LAPACK, LI, SI (igraph_eigen_matrix):])
+AT_KEYWORDS([eigenvalue lapack LAPACK])
+AT_COMPILE_CHECK([simple/igraph_eigen_matrix4.c],
+		 [simple/igraph_eigen_matrix4.out])
+AT_CLEANUP
+
 AT_SETUP([General matrix, LAPACK, SELECT (igraph_eigen_matrix):])
 AT_KEYWORDS([eigenvalue lapack LAPACK])
 AT_COMPILE_CHECK([simple/igraph_eigen_matrix3.c],
