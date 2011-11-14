@@ -30,23 +30,24 @@
  */
 
 #include "scg_headers.h"
+#include <math.h>
 
 int igraph_i_exact_coarse_graining(const REAL *v, UINT *gr, const UINT n)
 {
 	UINT i,gr_nb;
 	INDVAL *w = (INDVAL*) CALLOC(n, sizeof(INDVAL));
-	
+
 	for(i=0; i<n; i++){
 		w[i].val = v[i];
 		w[i].ind = i;
 	}
 
 	qsort(w, n, sizeof(INDVAL), igraph_i_compare_ind_val);
-	
+
 	gr_nb = 0;
 	gr[w[0].ind] = gr_nb;
 	for(i=1; i<n; i++){
-		if(w[i].val != w[i-1].val)gr_nb++;
+	  if( fabs(w[i].val - w[i-1].val) > 1e-14 ) gr_nb++;
 			gr[w[i].ind] = gr_nb;
 	}
 	FREE(w);

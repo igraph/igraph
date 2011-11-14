@@ -58,7 +58,12 @@ INT igraph_i_intervals_plus_kmeans(const REAL *v, UINT *gr, const UINT n,
 
 	igraph_i_free_real_vector(centers);
 
-	return converge;
+	if (!converge) { 
+	  IGRAPH_ERROR("SCG intervals plus k-means did not converge", 
+		       IGRAPH_FAILURE);
+	} 
+	
+	return 0;
 }
 										
 int igraph_i_intervals_method(const REAL *v, UINT *gr, const UINT n, const UINT n_interv)

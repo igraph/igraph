@@ -80,6 +80,7 @@
 #include "igraph_interface.h"
 #include "igraph_structural.h"
 #include "igraph_constructors.h"
+#include "igraph_conversion.h"
 
 #include "scg_headers.h"
 
@@ -103,11 +104,11 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
     IGRAPH_ERROR("Invalid length for interval specification", IGRAPH_EINVAL);
   }
 
-  if (!intervals_vector) {
+  if (!intervals_vector && algorithm != IGRAPH_SCG_EXACT) {
     if (intervals <= 1 || intervals >= no_of_nodes) {
       IGRAPH_ERROR("Invalid interval specification", IGRAPH_EINVAL);
     }
-  } else {
+  } else if (algorithm != IGRAPH_SCG_EXACT) {
     igraph_real_t min, max;
     igraph_vector_minmax(intervals_vector, &min, &max);
     if (min <= 1 || max >= no_of_nodes) {
@@ -599,89 +600,881 @@ int igraph_scg_norm_eps(const igraph_matrix_t *V,
   return 0;
 }
 
-int igraph_scg(const igraph_t *graph,
-	       const igraph_vector_t *ev,
-	       igraph_integer_t intervals, 
-	       const igraph_vector_t *intervals_vector,
-	       igraph_scg_matrix_t matrix_type,
-	       igraph_scg_algorithm_t algorithm,
-	       igraph_scg_norm_t norm, 
-	       igraph_scg_direction_t direction,
-	       const igraph_matrix_t *evec,
-	       const igraph_matrix_complex_t *evec_cplx,
-	       const igraph_vector_t *given_p,
-	       const igraph_vector_t *given_groups,
-	       igraph_bool_t use_arpack,
-	       igraph_integer_t maxiter,
-	       igraph_t *scg_graph,
-	       igraph_matrix_t *scg_matrix,
-	       igraph_sparsemat_t *scg_sparsemat,
-	       igraph_matrix_t *L,
-	       igraph_matrix_t *R,
-	       igraph_sparsemat_t *Lsparse,
-	       igraph_sparsemat_t *Rsparse,
-	       igraph_vector_t *eigenvalues,
-	       igraph_vector_complex_t *eigenvalues_cplx,
-	       igraph_matrix_t *eigenvectors,
-	       igraph_matrix_complex_t *eigenvectors_cplx,
-	       igraph_vector_t *groups,
-	       igraph_vector_t *p) { 
-
+int igraph_get_stochastic(const igraph_t *graph, 
+			  igraph_matrix_t *matrix,
+			  igraph_scg_norm_t norm) {
+  
   int no_of_nodes=igraph_vcount(graph);
-  igraph_sparsemat_t sparsemat;
-  igraph_vector_t sum;
+  igraph_real_t sum;
+  int i, j;
+  
+  IGRAPH_CHECK(igraph_get_adjacency(graph, matrix, 
+				    IGRAPH_GET_ADJACENCY_BOTH, /*eids=*/ 0));
+  
+  switch (norm) {
+  case IGRAPH_SCG_NORM_ROW:
+    for (i=0; i<no_of_nodes; i++) {
+      sum=0.0; 
+      for (j=0; j<no_of_nodes; j++) { 
+	sum += MATRIX(*matrix, i, j);
+      }
+      for (j=0; j<no_of_nodes; j++) {
+	MATRIX(*matrix, i, j) /= sum;
+      }
+    }
+    break;
+  case IGRAPH_SCG_NORM_COL:
+    for (i=0; i<no_of_nodes; i++) {
+      sum=0.0; 
+      for (j=0; j<no_of_nodes; j++) { 
+	sum += MATRIX(*matrix, j, i);
+      }
+      for (j=0; j<no_of_nodes; j++) {
+	MATRIX(*matrix, j, i) /= sum;
+      }
+    }
+    break;
+  }
 
+  return 0;
+}
+
+int igraph_get_stochastic_sparsemat(const igraph_t *graph, 
+				    igraph_sparsemat_t *sparsemat,
+				    igraph_scg_norm_t norm) {
+
+  igraph_vector_t sum;
+  int no_of_nodes=igraph_vcount(graph);
+  int i;
+
+  IGRAPH_CHECK(igraph_get_sparsemat(graph, sparsemat));
+  IGRAPH_VECTOR_INIT_FINALLY(&sum, no_of_nodes);
+
+  switch (norm) {       
+  case IGRAPH_SCG_NORM_ROW:
+    IGRAPH_CHECK(igraph_sparsemat_rowsums(sparsemat, &sum));
+    for (i=0; i<no_of_nodes; i++) {
+      if (VECTOR(sum)[i] == 0.0) {
+	IGRAPH_ERROR("Zero out-degree vertices not allowed", 
+		     IGRAPH_EINVAL);
+      }
+      VECTOR(sum)[i] = 1.0 / VECTOR(sum)[i];
+    }
+    IGRAPH_CHECK(igraph_sparsemat_scale_rows(sparsemat, &sum));
+    break;
+  case IGRAPH_SCG_NORM_COL:
+    IGRAPH_CHECK(igraph_sparsemat_colsums(sparsemat, &sum));
+    for (i=0; i<no_of_nodes; i++) {
+      if (VECTOR(sum)[i] == 0.0) {
+	IGRAPH_ERROR("Zero out-degree vertices not allowed", 
+		     IGRAPH_EINVAL);
+      }
+      VECTOR(sum)[i] = 1.0 / VECTOR(sum)[i];
+    }
+    IGRAPH_CHECK(igraph_sparsemat_scale_cols(sparsemat, &sum));
+    break;
+  }
+
+  igraph_vector_destroy(&sum);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
+
+int igraph_i_scg_get_matrix(const igraph_t *graph,
+			    igraph_sparsemat_t *sparsemat,
+			    igraph_scg_matrix_t matrix_type,
+			    igraph_scg_norm_t norm) {
   switch (matrix_type) {
     
   case IGRAPH_SCG_SYMMETRIC:
-    IGRAPH_CHECK(igraph_get_sparsemat(graph, &sparsemat));
+    IGRAPH_CHECK(igraph_get_sparsemat(graph, sparsemat));
     break;
 
   case IGRAPH_SCG_LAPLACIAN:
     /* TODO: normalized */
-    IGRAPH_CHECK(igraph_laplacian(graph, /*res=*/ 0, &sparsemat, 
+    IGRAPH_CHECK(igraph_laplacian(graph, /*res=*/ 0, sparsemat, 
 				  /*normalized=*/ 1, /*weights=*/ 0));
     break;
 
   case IGRAPH_SCG_STOCHASTIC:
-    IGRAPH_CHECK(igraph_get_sparsemat(graph, &sparsemat));
-    IGRAPH_VECTOR_INIT_FINALLY(&sum, no_of_nodes);
-
-    switch (norm) {       
-    case IGRAPH_SCG_NORM_ROW:
-      IGRAPH_CHECK(igraph_sparsemat_rowsums(&sparsemat, &sum));
-      if (igraph_vector_min(&sum) == 0) {
-	IGRAPH_ERROR("Zero out-degree vertices not allowed", IGRAPH_EINVAL);
-      }
-      IGRAPH_CHECK(igraph_sparsemat_scale_rows(&sparsemat, &sum));
-      break;
-    case IGRAPH_SCG_NORM_COL:
-      IGRAPH_CHECK(igraph_sparsemat_colsums(&sparsemat, &sum));
-      if (igraph_vector_min(&sum) == 0) {
-	IGRAPH_ERROR("Zero in-degree vertices not allowed", IGRAPH_EINVAL);
-      }
-      IGRAPH_CHECK(igraph_sparsemat_scale_cols(&sparsemat, &sum));
-      break;
-    }
+    IGRAPH_CHECK(igraph_get_stochastic_sparsemat(graph, sparsemat, norm));
     break;
+  }
 
-    igraph_vector_destroy(&sum);
+  return 0;
+}
+
+int igraph_i_scg_get_result(const igraph_matrix_t *matrix,
+			    const igraph_sparsemat_t *sparsemat,
+			    const igraph_sparsemat_t *Lsparse,
+			    const igraph_sparsemat_t *Rsparse_t,
+			    igraph_t *scg_graph,
+			    igraph_matrix_t *scg_matrix,
+			    igraph_sparsemat_t *scg_sparsemat, 
+			    igraph_bool_t directed) {
+
+  /* We need to calculate either scg_matrix (if input is dense), or
+     scg_sparsemat (if input is sparse). For the latter we might need
+     to temporarily use another matrix. */
+  
+  
+  if (matrix) {
+    igraph_matrix_t *my_scg_matrix=scg_matrix, v_scg_matrix;
+    igraph_matrix_t tmp;
+    igraph_sparsemat_t *myLsparse=(igraph_sparsemat_t *) Lsparse, v_Lsparse;
+
+    if (!scg_matrix) {
+      my_scg_matrix=&v_scg_matrix;
+      IGRAPH_CHECK(igraph_matrix_init(my_scg_matrix, 0, 0));
+      IGRAPH_FINALLY(igraph_matrix_destroy, my_scg_matrix);
+    }
+
+    if (!igraph_sparsemat_is_cc(Lsparse)) {
+      myLsparse=&v_Lsparse;
+      IGRAPH_CHECK(igraph_sparsemat_compress(Lsparse, myLsparse));
+      IGRAPH_FINALLY(igraph_sparsemat_destroy, myLsparse);
+    }
+
+    IGRAPH_CHECK(igraph_matrix_init(&tmp, 0, 0));
+    IGRAPH_FINALLY(igraph_matrix_destroy, &tmp);
+    IGRAPH_CHECK(igraph_sparsemat_dense_multiply(matrix, Rsparse_t, &tmp));
+    IGRAPH_CHECK(igraph_sparsemat_multiply_by_dense(myLsparse, &tmp, 
+						    my_scg_matrix));
+    igraph_matrix_destroy(&tmp);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    if (scg_sparsemat) {
+      IGRAPH_CHECK(igraph_matrix_as_sparsemat(scg_sparsemat, my_scg_matrix,
+					      /* tol= */ 0));
+      IGRAPH_FINALLY(igraph_sparsemat_destroy, scg_sparsemat);
+    }
+
+    if (scg_graph) {
+      IGRAPH_CHECK(igraph_adjacency(scg_graph, my_scg_matrix, 
+				    directed ? IGRAPH_ADJ_DIRECTED : 
+				    IGRAPH_ADJ_UNDIRECTED));
+    }
+
+    if (scg_sparsemat) { IGRAPH_FINALLY_CLEAN(1); }
+
+    if (!igraph_sparsemat_is_cc(Lsparse)) {
+      igraph_sparsemat_destroy(myLsparse);
+      IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    if (!scg_matrix) {
+      igraph_matrix_destroy(my_scg_matrix);
+      IGRAPH_FINALLY_CLEAN(1);
+    }
+
+  } else { /* sparsemat */
+    igraph_sparsemat_t *my_scg_sparsemat=scg_sparsemat, v_scg_sparsemat;
+    igraph_sparsemat_t tmp, *mysparsemat=(igraph_sparsemat_t *) sparsemat,
+      v_sparsemat, *myLsparse=(igraph_sparsemat_t *) Lsparse, v_Lsparse;
+    if (!scg_sparsemat) {
+      my_scg_sparsemat=&v_scg_sparsemat;
+    }
+    if (!igraph_sparsemat_is_cc(sparsemat)) {
+      mysparsemat=&v_sparsemat;
+      IGRAPH_CHECK(igraph_sparsemat_compress(sparsemat, mysparsemat));
+      IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparsemat);
+    }
+    if (!igraph_sparsemat_is_cc(Lsparse)) {
+      myLsparse=&v_Lsparse;
+      IGRAPH_CHECK(igraph_sparsemat_compress(Lsparse, myLsparse));
+      IGRAPH_FINALLY(igraph_sparsemat_destroy, myLsparse);
+    }
+    IGRAPH_CHECK(igraph_sparsemat_multiply(mysparsemat, Rsparse_t, 
+					   &tmp));
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmp);
+    IGRAPH_CHECK(igraph_sparsemat_multiply(myLsparse, &tmp,
+					   my_scg_sparsemat));
+    igraph_sparsemat_destroy(&tmp);
+    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, my_scg_sparsemat);
+
+    if (scg_matrix) {
+      IGRAPH_CHECK(igraph_sparsemat_as_matrix(scg_matrix, my_scg_sparsemat));
+    }
+    if (scg_graph) {
+      IGRAPH_CHECK(igraph_sparsemat(scg_graph, my_scg_sparsemat, directed));
+    }
+
+    IGRAPH_FINALLY_CLEAN(1); 	/* (my_)scg_sparsemat */
+    if (!scg_sparsemat) {
+      igraph_sparsemat_destroy(my_scg_sparsemat);
+    }
+    if (!igraph_sparsemat_is_cc(Lsparse)) {
+      igraph_sparsemat_destroy(myLsparse);
+      IGRAPH_FINALLY_CLEAN(1);
+    }
+    if (!igraph_sparsemat_is_cc(sparsemat)) {
+      igraph_sparsemat_destroy(mysparsemat);
+      IGRAPH_FINALLY_CLEAN(1);
+    }
+  }
+
+  return 0;
+}
+
+int igraph_i_scg_common_checks(const igraph_t *graph, 
+			       const igraph_matrix_t *matrix,
+			       const igraph_sparsemat_t *sparsemat,
+			       const igraph_vector_t *ev,
+			       igraph_integer_t intervals,
+			       const igraph_vector_t *intervals_vector,
+			       const igraph_matrix_t *evec,
+			       const igraph_matrix_complex_t *evec_cmplx,
+			       const igraph_vector_t *groups,
+			       const igraph_t *scg_graph,
+			       const igraph_matrix_t *scg_matrix,
+			       const igraph_sparsemat_t *scg_sparsemat,
+			       const igraph_vector_t *p,
+			       igraph_real_t *evmin, igraph_real_t *evmax) {
+
+  int no_of_nodes=-1;
+  igraph_real_t min, max;
+  int no_of_ev=igraph_vector_size(ev);
+
+  if ( (graph?1:0) + (matrix?1:0) + (sparsemat?1:0) != 1 ) {
+    IGRAPH_ERROR("Give exactly one of `graph', `matrix' and `sparsemat'",
+		 IGRAPH_EINVAL);
+  }
+  
+  if (graph) { 
+    no_of_nodes = igraph_vcount(graph);
+  } else if (matrix) {
+    no_of_nodes = igraph_matrix_nrow(matrix);
+  } else if (sparsemat) {
+    no_of_nodes = igraph_sparsemat_nrow(sparsemat);
+  }
+  
+  if ((matrix && igraph_matrix_ncol(matrix) != no_of_nodes) ||
+      (sparsemat && igraph_sparsemat_ncol(sparsemat) != no_of_nodes)) {
+    IGRAPH_ERROR("Matrix must be square", IGRAPH_NONSQUARE);
+  }
+
+  igraph_vector_minmax(ev, evmin, evmax);
+  if (*evmin < 0 || *evmax >= no_of_nodes) {
+    IGRAPH_ERROR("Invalid eigenvectors given", IGRAPH_EINVAL);
+  }
+
+  if (!intervals_vector && (intervals <= 1 || intervals >= no_of_nodes)) {
+    IGRAPH_ERROR("Invalid interval specification", IGRAPH_EINVAL);
+  }
+  
+  if (intervals_vector) { 
+    if (igraph_vector_size(intervals_vector) != no_of_ev) {
+      IGRAPH_ERROR("Invalid length for interval specification", 
+		   IGRAPH_EINVAL);
+    }
+    igraph_vector_minmax(intervals_vector, &min, &max);
+    if (min <= 1 || max >= no_of_nodes) { 
+      IGRAPH_ERROR("Invalid interval specification", IGRAPH_EINVAL);
+    }
+  }
+
+  if (evec && igraph_matrix_size(evec) != 0 && 
+      (igraph_matrix_ncol(evec) != no_of_ev ||
+       igraph_matrix_nrow(evec) != no_of_nodes)) {
+    IGRAPH_ERROR("Invalid eigenvector matrix size", IGRAPH_EINVAL);
+  }
+
+  if (evec_cmplx && igraph_matrix_complex_size(evec_cmplx) != 0 &&
+      (igraph_matrix_complex_ncol(evec_cmplx) != no_of_ev || 
+       igraph_matrix_complex_nrow(evec_cmplx) != no_of_nodes)) {
+    IGRAPH_ERROR("Invalid eigenvector matrix size", IGRAPH_EINVAL);
+  }
+
+  if (groups && igraph_vector_size(groups) != 0 && 
+      igraph_vector_size(groups) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid `groups' vector size", IGRAPH_EINVAL);
+  }
+
+  if ( (scg_graph!=0) + (scg_matrix!=0) + (scg_sparsemat!=0) == 0 ) {
+    IGRAPH_ERROR("No output is requested, please give at least one of "
+		 "`scg_graph', `scg_matrix' and `scg_sparsemat'", 
+		 IGRAPH_EINVAL);
+  }
+
+  if (p && igraph_vector_size(p) != 0 &&
+      igraph_vector_size(p) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid `p' vector size", IGRAPH_EINVAL);
+  }
+
+  return 0;
+}
+			       
+
+int igraph_scg_adjacency(const igraph_t *graph,
+			 const igraph_matrix_t *matrix,
+			 const igraph_sparsemat_t *sparsemat,
+			 const igraph_vector_t *ev,
+			 igraph_integer_t intervals,
+			 const igraph_vector_t *intervals_vector,
+			 igraph_scg_algorithm_t algorithm,
+			 igraph_vector_t *eval,
+			 igraph_matrix_t *evec,
+			 igraph_vector_t *groups,
+			 igraph_bool_t use_arpack,
+			 igraph_integer_t maxiter,
+			 igraph_t *scg_graph,
+			 igraph_matrix_t *scg_matrix,
+			 igraph_sparsemat_t *scg_sparsemat,
+			 igraph_matrix_t *L,
+			 igraph_matrix_t *R,
+			 igraph_sparsemat_t *Lsparse,
+			 igraph_sparsemat_t *Rsparse) {
+
+  igraph_sparsemat_t *mysparsemat=(igraph_sparsemat_t*) sparsemat, 
+    real_sparsemat;  
+  int no_of_ev=igraph_vector_size(ev);
+  /* eigenvectors are calculated and returned */
+  igraph_bool_t do_evec= evec && igraph_matrix_size(evec)==0;
+  /* groups are calculated */
+  igraph_bool_t do_groups= !groups || igraph_vector_size(groups)==0;
+  /* eigenvectors are not returned but must be calculated for groups */
+  igraph_bool_t tmp_evec= !do_evec && do_groups;
+  /* need temporary vector for groups */
+  igraph_bool_t tmp_groups= !groups;
+  igraph_matrix_t myevec;
+  igraph_vector_t mygroups;
+  igraph_bool_t tmp_lsparse=!Lsparse, tmp_rsparse=!Rsparse;
+  igraph_sparsemat_t myLsparse, myRsparse, tmpsparse, Rsparse_t;
+  int no_of_nodes;
+  igraph_real_t evmin, evmax;
+  
+  /* --------------------------------------------------------------------*/
+  /* Argument checks */
+
+  IGRAPH_CHECK(igraph_i_scg_common_checks(graph, matrix, sparsemat,
+					  ev, intervals, intervals_vector,
+					  evec, 0, groups, scg_graph, 
+					  scg_matrix, scg_sparsemat, 
+					  /*p=*/ 0, &evmin, &evmax));
+
+  if (graph) { 
+    no_of_nodes=igraph_vcount(graph); 
+  } else if (matrix) {
+    no_of_nodes=igraph_matrix_nrow(matrix);
+  } else {
+    no_of_nodes=igraph_sparsemat_nrow(sparsemat);
+  }
+
+  /* -------------------------------------------------------------------- */
+  /* Convert graph, if needed */
+
+  if (graph) {
+    mysparsemat=&real_sparsemat;
+    IGRAPH_CHECK(igraph_i_scg_get_matrix(graph, mysparsemat,
+					 IGRAPH_SCG_SYMMETRIC, 
+					 IGRAPH_SCG_NORM_ROW));
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparsemat);
+  }   
+
+  /* -------------------------------------------------------------------- */
+  /* Compute eigenpairs, if needed */
+  if (tmp_evec) {
+    evec=&myevec;
+    IGRAPH_MATRIX_INIT_FINALLY(evec, no_of_nodes, no_of_ev);
+  }
+
+  if (do_evec || tmp_evec) {
+    igraph_arpack_options_t options;
+    igraph_eigen_which_t which;
+    igraph_matrix_t tmp;
+    igraph_vector_t tmpev;
+    int i;
+    
+    which.pos = IGRAPH_EIGEN_SELECT;
+    which.il = no_of_nodes-evmax+1;
+    which.iu = no_of_nodes-evmin+1;
+
+    IGRAPH_CHECK(igraph_matrix_init(&tmp, no_of_nodes, 
+				    which.iu-which.il+1));
+    IGRAPH_FINALLY(igraph_matrix_destroy, &tmp);
+    IGRAPH_CHECK(igraph_eigen_matrix_symmetric(matrix, mysparsemat,
+					       /* fun= */ 0,
+					       /* extra= */ 0, 
+					       /* algorithm= */ 
+					       use_arpack ? 
+					       IGRAPH_EIGEN_ARPACK : 
+					       IGRAPH_EIGEN_LAPACK, &which, 
+					       &options, /* values= */ 0, 
+					       &tmp));
+    IGRAPH_VECTOR_INIT_FINALLY(&tmpev, no_of_ev);
+    for (i=0; i<no_of_ev; i++) {
+      VECTOR(tmpev)[i] = evmax - VECTOR(*ev)[i];
+    }
+    IGRAPH_CHECK(igraph_matrix_select_cols(&tmp, evec, &tmpev));
+    igraph_vector_destroy(&tmpev);
+    igraph_matrix_destroy(&tmp);
+    IGRAPH_FINALLY_CLEAN(2);
+  }
+
+  /* -------------------------------------------------------------------- */
+  /* Work out groups, if needed */
+  if (tmp_groups) {
+    groups=&mygroups;
+    IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t*)groups, no_of_nodes);
+  }
+  if (do_groups) {
+    IGRAPH_CHECK(igraph_scg_grouping(evec, (igraph_vector_t*)groups, 
+				     intervals, intervals_vector, 
+				     IGRAPH_SCG_SYMMETRIC, algorithm, 
+				     /*p=*/ 0, maxiter));
+  }
+  
+  /* -------------------------------------------------------------------- */
+  /* Perform coarse graining */
+  if (tmp_lsparse) {
+    Lsparse=&myLsparse;
+  }
+  if (tmp_rsparse) {
+    Rsparse=&myRsparse;
+  }
+  IGRAPH_CHECK(igraph_scg_semiprojectors(groups, IGRAPH_SCG_SYMMETRIC,
+					 L, R, Lsparse, Rsparse, /*p=*/ 0,
+					 IGRAPH_SCG_NORM_ROW));
+  if (tmp_groups) {
+    igraph_vector_destroy((igraph_vector_t*) groups);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  if (tmp_evec) {
+    igraph_matrix_destroy(evec);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, Rsparse);
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, Lsparse);
+
+  /* -------------------------------------------------------------------- */
+  /* Compute coarse grained matrix/graph/sparse matrix */
+  IGRAPH_CHECK(igraph_sparsemat_compress(Rsparse, &tmpsparse));
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmpsparse);
+  IGRAPH_CHECK(igraph_sparsemat_transpose(&tmpsparse, &Rsparse_t,
+					  /*values=*/ 1));
+  igraph_sparsemat_destroy(&tmpsparse);
+  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &Rsparse_t);  
+
+  IGRAPH_CHECK(igraph_i_scg_get_result(matrix, mysparsemat,
+				       Lsparse, &Rsparse_t,
+				       scg_graph, scg_matrix, 
+				       scg_sparsemat, /*directed=*/ 0));
+
+  /* -------------------------------------------------------------------- */
+  /* Clean up */
+
+  igraph_sparsemat_destroy(&Rsparse_t);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  if (graph) {
+    igraph_sparsemat_destroy(mysparsemat);
     IGRAPH_FINALLY_CLEAN(1);
   }
 
-  IGRAPH_FINALLY(igraph_sparsemat_destroy, &sparsemat);
-    
-  IGRAPH_CHECK(igraph_scg_matrix(/* matrix= */ 0, &sparsemat, ev, 
-				 intervals, intervals_vector, matrix_type, 
-				 algorithm, norm, direction, evec, evec_cplx,
-				 given_p, given_groups, use_arpack, maxiter, 
-				 scg_graph, scg_matrix, scg_sparsemat, 
-				 L, R, Lsparse, Rsparse, eigenvalues,
-				 eigenvalues_cplx, eigenvectors, 
-				 eigenvectors_cplx, groups, p));
+  return 0;
+}
+
+int igraph_scg_stochastic(const igraph_t *graph,
+			  const igraph_matrix_t *matrix,
+			  const igraph_sparsemat_t *sparsemat,
+			  const igraph_vector_t *ev,
+			  igraph_integer_t intervals,
+			  const igraph_vector_t *intervals_vector,
+			  igraph_scg_algorithm_t algorithm,
+			  igraph_scg_norm_t norm,
+			  igraph_vector_complex_t *eval,
+			  igraph_matrix_complex_t *evec,
+			  igraph_vector_t *groups,
+			  igraph_vector_t *p,
+			  igraph_bool_t use_arpack,
+			  igraph_integer_t maxiter,
+			  igraph_t *scg_graph,
+			  igraph_matrix_t *scg_matrix,
+			  igraph_sparsemat_t *scg_sparsemat,
+			  igraph_matrix_t *L,
+			  igraph_matrix_t *R,
+			  igraph_sparsemat_t *Lsparse,
+			  igraph_sparsemat_t *Rsparse) {
+
+  igraph_sparsemat_t *mysparsemat=(igraph_sparsemat_t*) sparsemat, 
+    real_sparsemat;
+  int no_of_nodes;
+  igraph_real_t evmin, evmax;
+  igraph_arpack_options_t options;
+  igraph_eigen_which_t which;
+  /* eigenvectors are calculated and returned */
+  igraph_bool_t do_evec= evec && igraph_matrix_complex_size(evec)==0;
+  /* groups are calculated */
+  igraph_bool_t do_groups= !groups || igraph_vector_size(groups)==0;
+  igraph_bool_t tmp_groups= !groups;
+  /* eigenvectors are not returned but must be calculated for groups */
+  igraph_bool_t tmp_evec= !do_evec && do_groups;
+  igraph_matrix_complex_t myevec;
+  igraph_vector_t mygroups;
+  igraph_bool_t do_p= p && igraph_vector_size(p)==0;
+  igraph_vector_t *myp=(igraph_vector_t *) p;
+  int no_of_ev=igraph_vector_size(ev);
+  igraph_bool_t tmp_lsparse=!Lsparse, tmp_rsparse=!Rsparse;
+  igraph_sparsemat_t myLsparse, myRsparse, tmpsparse, Rsparse_t;
+
+  /* --------------------------------------------------------------------*/
+  /* Argument checks */
+
+  IGRAPH_CHECK(igraph_i_scg_common_checks(graph, matrix, sparsemat,
+					  ev, intervals, intervals_vector,
+					  0, evec, groups, scg_graph, 
+					  scg_matrix, scg_sparsemat, p,
+					  &evmin, &evmax));
   
-  igraph_sparsemat_destroy(&sparsemat);
+  if (graph) { 
+    no_of_nodes=igraph_vcount(graph); 
+  } else if (matrix) {
+    no_of_nodes=igraph_matrix_nrow(matrix);
+  } else {
+    no_of_nodes=igraph_sparsemat_nrow(sparsemat);
+  }
+
+  /* -------------------------------------------------------------------- */
+  /* Convert graph, if needed */
+
+  if (graph) {
+    mysparsemat=&real_sparsemat;
+    IGRAPH_CHECK(igraph_i_scg_get_matrix(graph, mysparsemat,
+					 IGRAPH_SCG_STOCHASTIC,
+					 IGRAPH_SCG_NORM_ROW));
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparsemat);
+  }   
+
+  /* -------------------------------------------------------------------- */
+  /* Compute eigenpairs, if needed */
+
+  if (tmp_evec) {
+    evec=&myevec;
+    IGRAPH_CHECK(igraph_matrix_complex_init(evec, no_of_nodes, no_of_ev));
+    IGRAPH_FINALLY(igraph_matrix_complex_destroy, evec);
+  }
+
+  if (do_evec || tmp_evec) {
+    igraph_matrix_complex_t tmp;
+    igraph_vector_t tmpev;
+    int i;
+
+    which.pos = IGRAPH_EIGEN_SELECT;
+    which.il = no_of_nodes-evmax+1;
+    which.iu = no_of_nodes-evmin+1;
+
+    IGRAPH_CHECK(igraph_matrix_complex_init(&tmp, no_of_nodes, 
+					    which.iu-which.il+1));
+    IGRAPH_FINALLY(igraph_matrix_complex_destroy, &tmp);
+    IGRAPH_CHECK(igraph_eigen_matrix(matrix, mysparsemat, /*fun=*/ 0,
+				     /*extra=*/ 0, use_arpack ? 
+				     IGRAPH_EIGEN_ARPACK : 
+				     IGRAPH_EIGEN_LAPACK, &which, &options, 
+				     /*values=*/ 0, &tmp));
+    
+    IGRAPH_VECTOR_INIT_FINALLY(&tmpev, no_of_ev);
+    for (i=0; i<no_of_ev; i++) {
+      VECTOR(tmpev)[i] = evmax - VECTOR(*ev)[i];
+    }
+    IGRAPH_CHECK(igraph_matrix_complex_select_cols(&tmp, evec, &tmpev));
+    igraph_vector_destroy(&tmpev);
+    igraph_matrix_complex_destroy(&tmp);
+    IGRAPH_FINALLY_CLEAN(2);
+  }
+
+  /* Compute p if not supplied */
+  if (do_p) {
+    igraph_eigen_which_t w;
+    igraph_matrix_complex_t tmp;
+    igraph_arpack_options_t o;
+    igraph_matrix_t trans, *mytrans=&trans;
+    igraph_sparsemat_t sparse_trans, *mysparse_trans=&sparse_trans;
+    int i;
+    igraph_arpack_options_init(&o);
+    IGRAPH_CHECK(igraph_matrix_complex_init(&tmp, 0, 0));
+    IGRAPH_FINALLY(igraph_matrix_complex_destroy, &tmp);
+    w.pos=IGRAPH_EIGEN_LR;
+    w.howmany=1;
+
+    if (matrix) { 
+      IGRAPH_CHECK(igraph_matrix_copy(&trans, matrix));
+      IGRAPH_FINALLY(igraph_matrix_destroy, &trans);
+      IGRAPH_CHECK(igraph_matrix_transpose(&trans));
+      mysparse_trans=0;
+    } else { 
+      IGRAPH_CHECK(igraph_sparsemat_transpose(mysparsemat, &sparse_trans, 
+					      /*values=*/ 1));
+      IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparse_trans);
+      mytrans=0;
+    }
+
+    IGRAPH_CHECK(igraph_eigen_matrix(mytrans, mysparse_trans, /*fun=*/ 0, 
+				     /*extra=*/ 0, /*algorith=*/ 
+				     use_arpack ? 
+				     IGRAPH_EIGEN_ARPACK : 
+				     IGRAPH_EIGEN_LAPACK, &w, &o, 
+				     /*values=*/ 0, &tmp));
+
+    if (matrix) {
+      igraph_matrix_destroy(mytrans);
+      IGRAPH_FINALLY_CLEAN(1);
+    } else {
+      igraph_sparsemat_destroy(mysparse_trans);
+      IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    IGRAPH_CHECK(igraph_vector_resize(myp, no_of_nodes));
+    for (i=0; i<no_of_nodes; i++) {
+      VECTOR(*myp)[i] = fabs(IGRAPH_REAL(MATRIX(tmp, i, 0)));
+    }
+    igraph_matrix_complex_destroy(&tmp);
+    IGRAPH_FINALLY_CLEAN(1);
+  }    
+
+  /* -------------------------------------------------------------------- */
+  /* Work out groups, if needed */
+  /* TODO: use complex part as well */
+  if (tmp_groups) {
+    groups=&mygroups;
+    IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t*)groups, no_of_nodes);
+  }
+  if (do_groups) {
+    igraph_matrix_t tmp;
+    IGRAPH_MATRIX_INIT_FINALLY(&tmp, 0, 0);
+    IGRAPH_CHECK(igraph_matrix_complex_real(evec, &tmp));
+    IGRAPH_CHECK(igraph_scg_grouping(&tmp, (igraph_vector_t*)groups, 
+				     intervals, intervals_vector, 
+				     IGRAPH_SCG_STOCHASTIC, algorithm, 
+				     myp, maxiter));
+    igraph_matrix_destroy(&tmp);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  /* -------------------------------------------------------------------- */
+  /* Perform coarse graining */
+  if (tmp_lsparse) {
+    Lsparse=&myLsparse;
+  }
+  if (tmp_rsparse) {
+    Rsparse=&myRsparse;
+  }
+  IGRAPH_CHECK(igraph_scg_semiprojectors(groups, IGRAPH_SCG_STOCHASTIC,
+					 L, R, Lsparse, Rsparse, myp, norm));
+  if (tmp_groups) {
+    igraph_vector_destroy((igraph_vector_t*) groups);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  if (tmp_evec) {
+    igraph_matrix_complex_destroy(evec);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, Rsparse);
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, Lsparse);
+
+  /* -------------------------------------------------------------------- */
+  /* Compute coarse grained matrix/graph/sparse matrix */
+  IGRAPH_CHECK(igraph_sparsemat_compress(Rsparse, &tmpsparse));
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmpsparse);
+  IGRAPH_CHECK(igraph_sparsemat_transpose(&tmpsparse, &Rsparse_t,
+					  /*values=*/ 1));
+  igraph_sparsemat_destroy(&tmpsparse);
   IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &Rsparse_t);  
+
+  IGRAPH_CHECK(igraph_i_scg_get_result(matrix, mysparsemat,
+				       Lsparse, &Rsparse_t,
+				       scg_graph, scg_matrix, 
+				       scg_sparsemat, /*directed=*/ 0));
+
+  /* -------------------------------------------------------------------- */
+  /* Clean up */
+
+  igraph_sparsemat_destroy(&Rsparse_t);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  if (graph) {
+    igraph_sparsemat_destroy(mysparsemat);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  return 0;
+}
+
+int igraph_scg_laplacian(const igraph_t *graph,
+			 const igraph_matrix_t *matrix,
+			 const igraph_sparsemat_t *sparsemat,
+			 const igraph_vector_t *ev,
+			 igraph_integer_t intervals,
+			 const igraph_vector_t *intervals_vector,
+			 igraph_scg_algorithm_t algorithm,
+			 igraph_scg_norm_t norm,
+			 igraph_scg_direction_t direction,
+			 igraph_vector_complex_t *eval,
+			 igraph_matrix_complex_t *evec,
+			 igraph_vector_t *groups,
+			 igraph_bool_t use_arpack,
+			 igraph_integer_t maxiter,
+			 igraph_t *scg_graph,
+			 igraph_matrix_t *scg_matrix,
+			 igraph_sparsemat_t *scg_sparsemat,
+			 igraph_matrix_t *L,
+			 igraph_matrix_t *R,
+			 igraph_sparsemat_t *Lsparse,
+			 igraph_sparsemat_t *Rsparse) {
+
+  igraph_sparsemat_t *mysparsemat=(igraph_sparsemat_t*) sparsemat, 
+    real_sparsemat;
+  int no_of_nodes;
+  igraph_real_t evmin, evmax;
+  igraph_arpack_options_t options;
+  igraph_eigen_which_t which;
+  /* eigenvectors are calculated and returned */
+  igraph_bool_t do_evec= evec && igraph_matrix_complex_size(evec)==0;
+  /* groups are calculated */
+  igraph_bool_t do_groups= !groups || igraph_vector_size(groups)==0;
+  igraph_bool_t tmp_groups= !groups;
+  /* eigenvectors are not returned but must be calculated for groups */
+  igraph_bool_t tmp_evec= !do_evec && do_groups;
+  igraph_matrix_complex_t myevec;
+  igraph_vector_t mygroups;
+  int no_of_ev=igraph_vector_size(ev);
+  igraph_bool_t tmp_lsparse=!Lsparse, tmp_rsparse=!Rsparse;
+  igraph_sparsemat_t myLsparse, myRsparse, tmpsparse, Rsparse_t;
+
+  /* --------------------------------------------------------------------*/
+  /* Argument checks */
+
+  IGRAPH_CHECK(igraph_i_scg_common_checks(graph, matrix, sparsemat,
+					  ev, intervals, intervals_vector,
+					  0, evec, groups, scg_graph, 
+					  scg_matrix, scg_sparsemat, /*p=*/ 0,
+					  &evmin, &evmax));
+  
+  if (graph) { 
+    no_of_nodes=igraph_vcount(graph); 
+  } else if (matrix) {
+    no_of_nodes=igraph_matrix_nrow(matrix);
+  } else {
+    no_of_nodes=igraph_sparsemat_nrow(sparsemat);
+  }
+
+  /* -------------------------------------------------------------------- */
+  /* Convert graph, if needed */
+
+  if (graph) {
+    mysparsemat=&real_sparsemat;
+    IGRAPH_CHECK(igraph_i_scg_get_matrix(graph, mysparsemat,
+					 IGRAPH_SCG_LAPLACIAN, 
+					 IGRAPH_SCG_NORM_ROW));
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparsemat);
+  }   
+
+  /* -------------------------------------------------------------------- */
+  /* Compute eigenpairs, if needed */
+
+  if (tmp_evec) {
+    evec=&myevec;
+    IGRAPH_CHECK(igraph_matrix_complex_init(evec, no_of_nodes, no_of_ev));
+    IGRAPH_FINALLY(igraph_matrix_complex_destroy, evec);
+  }
+
+  if (do_evec || tmp_evec) {
+    igraph_matrix_complex_t tmp;
+    igraph_vector_t tmpev;
+    int i;
+
+    which.pos = IGRAPH_EIGEN_SELECT;
+    which.il = no_of_nodes-evmax+1;
+    which.iu = no_of_nodes-evmin+1;
+
+    IGRAPH_CHECK(igraph_matrix_complex_init(&tmp, no_of_nodes, 
+					    which.iu-which.il+1));
+    IGRAPH_FINALLY(igraph_matrix_complex_destroy, &tmp);
+    IGRAPH_CHECK(igraph_eigen_matrix(matrix, sparsemat, /*fun=*/ 0,
+				     /*extra=*/ 0, use_arpack ? 
+				     IGRAPH_EIGEN_ARPACK : 
+				     IGRAPH_EIGEN_LAPACK, &which, &options, 
+				     /*values=*/ 0, &tmp));
+    
+    IGRAPH_VECTOR_INIT_FINALLY(&tmpev, no_of_ev);
+    for (i=0; i<no_of_ev; i++) {
+      VECTOR(tmpev)[i] = evmax - VECTOR(*ev)[i];
+    }
+    IGRAPH_CHECK(igraph_matrix_complex_select_cols(&tmp, evec, &tmpev));
+    igraph_vector_destroy(&tmpev);
+    igraph_matrix_complex_destroy(&tmp);
+    IGRAPH_FINALLY_CLEAN(2);
+  }
+
+  /* -------------------------------------------------------------------- */
+  /* Work out groups, if needed */
+  /* TODO: use complex part as well */
+  if (tmp_groups) {
+    groups=&mygroups;
+    IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t*)groups, no_of_nodes);
+  }
+  if (do_groups) {
+    igraph_matrix_t tmp;
+    IGRAPH_MATRIX_INIT_FINALLY(&tmp, 0, 0);
+    IGRAPH_CHECK(igraph_matrix_complex_real(evec, &tmp));
+    IGRAPH_CHECK(igraph_scg_grouping(&tmp, (igraph_vector_t*)groups, 
+				     intervals, intervals_vector, 
+				     IGRAPH_SCG_LAPLACIAN, algorithm, 
+				     /*p=*/ 0, maxiter));
+    igraph_matrix_destroy(&tmp);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  /* -------------------------------------------------------------------- */
+  /* Perform coarse graining */
+  if (tmp_lsparse) {
+    Lsparse=&myLsparse;
+  }
+  if (tmp_rsparse) {
+    Rsparse=&myRsparse;
+  }
+  IGRAPH_CHECK(igraph_scg_semiprojectors(groups, IGRAPH_SCG_LAPLACIAN,
+					 L, R, Lsparse, Rsparse, /*p=*/ 0, 
+					 norm));
+  if (tmp_groups) {
+    igraph_vector_destroy((igraph_vector_t*) groups);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  if (tmp_evec) {
+    igraph_matrix_complex_destroy(evec);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, Rsparse);
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, Lsparse);
+
+  /* -------------------------------------------------------------------- */
+  /* Compute coarse grained matrix/graph/sparse matrix */
+  IGRAPH_CHECK(igraph_sparsemat_compress(Rsparse, &tmpsparse));
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmpsparse);
+  IGRAPH_CHECK(igraph_sparsemat_transpose(&tmpsparse, &Rsparse_t,
+					  /*values=*/ 1));
+  igraph_sparsemat_destroy(&tmpsparse);
+  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &Rsparse_t);  
+
+  IGRAPH_CHECK(igraph_i_scg_get_result(matrix, mysparsemat,
+				       Lsparse, &Rsparse_t,
+				       scg_graph, scg_matrix, 
+				       scg_sparsemat, /*directed=*/ 0));
+
+  /* -------------------------------------------------------------------- */
+  /* Clean up */
+
+  igraph_sparsemat_destroy(&Rsparse_t);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  if (graph) {
+    igraph_sparsemat_destroy(mysparsemat);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
 
   return 0;
 }
