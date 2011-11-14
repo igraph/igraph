@@ -2265,13 +2265,13 @@ int igraph_i_sparsemat_scale_rows_cc(igraph_sparsemat_t *A,
 
 int igraph_i_sparsemat_scale_rows_triplet(igraph_sparsemat_t *A,
 					  const igraph_vector_t *fact) {
-  int *i=A->cs->p;
+  int *i=A->cs->i;
   igraph_real_t *x=A->cs->x;
   int no_of_edges=A->cs->nz;
   int e;
 
-  for (; e<no_of_edges; e++) {
-    int f=VECTOR(*fact)[*i];
+  for (e=0; e<no_of_edges; e++, x++, i++) {
+    igraph_real_t f=VECTOR(*fact)[*i];
     (*x) *= f;
   }
 
@@ -2297,13 +2297,13 @@ int igraph_i_sparsemat_scale_cols_cc(igraph_sparsemat_t *A,
 
 int igraph_i_sparsemat_scale_cols_triplet(igraph_sparsemat_t *A,
 					  const igraph_vector_t *fact) {
-  int *j=A->cs->i;
+  int *j=A->cs->p;
   igraph_real_t *x=A->cs->x;
   int no_of_edges=A->cs->nz;
   int e;
 
-  for (; e<no_of_edges; e++) {
-    int f=VECTOR(*fact)[*j];
+  for (e=0; e<no_of_edges; e++, x++, j++) {
+    igraph_real_t f=VECTOR(*fact)[*j];
     (*x) *= f;
   }
 
