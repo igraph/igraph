@@ -22,6 +22,7 @@
 */
 
 #include "igraph_eigen.h"
+#include "igraph_qsort.h"
 #include <string.h>
 #include <math.h>
 
@@ -461,6 +462,480 @@ int igraph_i_eigen_matrix_symmetric_arpack(const igraph_matrix_t *A,
 
   return 0;
 }
+
+/* Get the eigenvalues and the eigenvectors from the compressed 
+   form. Order them according to the ordering criteria.
+   Comparison functions for the reordering first */
+
+typedef int (*igraph_i_eigen_matrix_lapack_cmp_t)(void*, const void*, 
+						  const void *);
+
+typedef struct igraph_i_eml_cmp_lm_t {
+  const igraph_vector_t *mag, *real, *imag;
+} igraph_i_eml_cmp_lm_t;
+
+/* TODO: these should be defined in some header */
+
+#define EPS        (1e-15)
+#define LESS(a,b)  ((a) < (b)-EPS)
+#define MORE(a,b)  ((a) > (b)+EPS)
+#define ZERO(a)    ((a) > -EPS && (a) < EPS)
+#define NONZERO(a) ((a) < -EPS || (a) > EPS)
+
+int igraph_i_eigen_matrix_lapack_cmp_lm(void *extra, const void *a,
+					const void *b) {
+  igraph_i_eml_cmp_lm_t *myextra=(igraph_i_eml_cmp_lm_t *) extra;
+  int *aa=(int*) a, *bb=(int*) b;
+  igraph_real_t a_m=VECTOR(*myextra->mag)[*aa];
+  igraph_real_t b_m=VECTOR(*myextra->mag)[*bb];
+
+  if (LESS(a_m, b_m)) {
+    return 1;
+  } else if (MORE(a_m, b_m)) {
+    return -1;
+  } else {
+    igraph_real_t a_r=VECTOR(*myextra->real)[*aa];
+    igraph_real_t a_i=VECTOR(*myextra->imag)[*aa];
+    igraph_real_t b_r=VECTOR(*myextra->real)[*bb];
+    igraph_real_t b_i=VECTOR(*myextra->imag)[*bb];
+    if (ZERO(a_i)    && NONZERO(b_i))  { return -1; }
+    if (NONZERO(a_i) && ZERO(b_i))     { return  1; }
+    if (MORE(a_r, b_r)) { return -1; }
+    if (LESS(a_r, b_r)) { return  1; }
+    if (MORE(a_i, b_r)) { return -1; }
+    if (LESS(a_i, b_i)) { return  1; }
+  }
+  return 0;
+}
+
+#undef EPS
+#undef LESS
+#undef MORE
+#undef ZERO
+#undef NONZERO
+
+#define INITMAG()							\
+  do {									\
+    int i;								\
+    IGRAPH_VECTOR_INIT_FINALLY(&mag, nev);				\
+    hasmag=1;								\
+    for (i=0; i<nev; i++) {						\
+      VECTOR(mag)[i] = VECTOR(*real)[i] * VECTOR(*real)[i] +		\
+	VECTOR(*imag)[i] * VECTOR(*imag)[i];				\
+    }									\
+  } while (0)
+
+int igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t *real,
+					 const igraph_vector_t *imag,
+					 const igraph_matrix_t *compressed,
+					 const igraph_eigen_which_t *which,
+					 igraph_vector_complex_t *values,
+					 igraph_matrix_complex_t *vectors) {
+  igraph_vector_int_t idx;
+  igraph_vector_t mag;
+  igraph_bool_t hasmag=0;
+  int nev=igraph_vector_size(real);
+  int howmany=0;
+  int i;  
+  igraph_i_eigen_matrix_lapack_cmp_t cmpfunc;
+  igraph_i_eml_cmp_lm_t lmextra = { &mag, real, imag };
+  void *extra=0;
+  
+  IGRAPH_CHECK(igraph_vector_int_init(&idx, nev));
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &idx);
+
+  switch (which->pos) { 
+  case IGRAPH_EIGEN_LM:
+    INITMAG();
+    cmpfunc=igraph_i_eigen_matrix_lapack_cmp_lm;
+    extra=(void*) &lmextra;
+    howmany=which->howmany;
+    break;
+  case IGRAPH_EIGEN_ALL:
+    INITMAG();
+    cmpfunc=igraph_i_eigen_matrix_lapack_cmp_lm;
+    extra=(void*) &lmextra;
+    howmany=nev;
+    break;
+  case IGRAPH_EIGEN_INTERVAL:
+  case IGRAPH_EIGEN_BE:
+  case IGRAPH_EIGEN_SM:
+  case IGRAPH_EIGEN_LA:
+  case IGRAPH_EIGEN_SA:
+  case IGRAPH_EIGEN_LR:
+  case IGRAPH_EIGEN_SR:
+  case IGRAPH_EIGEN_LI:
+  case IGRAPH_EIGEN_SI:
+  case IGRAPH_EIGEN_SELECT:
+    IGRAPH_ERROR("Unimplemented eigenvalue ordering", IGRAPH_UNIMPLEMENTED);
+    break;
+  }
+  
+  for (i=0; i<nev; i++) {
+    VECTOR(idx)[i] = i;
+  }
+
+  igraph_qsort_r(VECTOR(idx), nev, sizeof(VECTOR(idx)[0]), extra, cmpfunc);
+
+  if (hasmag) {
+    igraph_vector_destroy(&mag);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  if (values) {
+    IGRAPH_CHECK(igraph_vector_complex_resize(values, howmany));
+    for (i=0; i<howmany; i++) {
+      int x=VECTOR(idx)[i];
+      VECTOR(*values)[i] = igraph_complex(VECTOR(*real)[x], 
+					  VECTOR(*imag)[x]);
+    }
+  }
+
+  if (vectors) {
+    int n=igraph_matrix_nrow(compressed);
+    IGRAPH_CHECK(igraph_matrix_complex_resize(vectors, n, howmany));
+    for (i=0; i<howmany; i++) {
+      int j, x=VECTOR(idx)[i];
+      if (VECTOR(*imag)[x] == 0) { 
+	/* real eigenvalue */
+	for (j=0; j<n; j++) {
+	  MATRIX(*vectors, j, i) = igraph_complex(MATRIX(*compressed, j, x),
+						  0.0);
+	}
+      } else {
+	/* complex eigenvalue */
+	int neg=1, co=0;
+	if (VECTOR(*imag)[x] < 0) { neg=-11; co=1; }
+	for (j=0; j<n; j++) {
+	  MATRIX(*vectors, j, i) = 
+	    igraph_complex(MATRIX(*compressed, j, x-co),
+			   neg * MATRIX(*compressed, j, x+1-co));
+	}
+      }
+    }
+  }
+
+  igraph_vector_int_destroy(&idx);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
+int igraph_i_eigen_matrix_lapack_lm(const igraph_matrix_t *A,
+				    const igraph_eigen_which_t *which,
+				    igraph_vector_complex_t *values,
+				    igraph_matrix_complex_t *vectors) {
+  igraph_vector_t valuesreal, valuesimag;
+  igraph_matrix_t vectorsright, *myvectors= vectors ? &vectorsright : 0;
+  int i, n=igraph_matrix_nrow(A);
+  int info=1;
+  igraph_vector_t mag;
+
+  /* TODO: order according to magnitude, and then real part */
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&valuesreal, n);
+  IGRAPH_VECTOR_INIT_FINALLY(&valuesimag, n);
+  if (vectors) { IGRAPH_MATRIX_INIT_FINALLY(&vectorsright, n, n); }
+  IGRAPH_CHECK(igraph_lapack_dgeev(A, &valuesreal, &valuesimag, 
+				   /*vectorsleft=*/ 0, myvectors, &info));
+  IGRAPH_VECTOR_INIT_FINALLY(&mag, n);
+  for (i=0; i<n; i++) {
+    VECTOR(mag)[i] = VECTOR(valuesreal)[i] * VECTOR(valuesreal)[i] +
+      VECTOR(valuesimag)[i] * VECTOR(valuesimag)[i];
+  }
+
+  IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_reorder(&valuesreal, &valuesimag, 
+						    myvectors, which, values,
+						    vectors));
+  
+  igraph_vector_destroy(&mag);
+  igraph_vector_destroy(&valuesimag);
+  igraph_vector_destroy(&valuesreal);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  return 0;
+}
+
+int igraph_i_eigen_matrix_lapack_sm(const igraph_matrix_t *A,
+				    const igraph_eigen_which_t *which,
+				    igraph_vector_complex_t *values,
+				    igraph_matrix_complex_t *vectors) {
+  IGRAPH_ERROR("Non-symmetric SM LAPACK eigenvalues", IGRAPH_UNIMPLEMENTED);
+  return 0;
+}
+
+int igraph_i_eigen_matrix_lapack_lr(const igraph_matrix_t *A,
+				    const igraph_eigen_which_t *which,
+				    igraph_vector_complex_t *values,
+				    igraph_matrix_complex_t *vectors) {
+  /* TODO: this is VERY suboptimal */
+  
+  /* We calculate all eigenvectors and eigenvalues and pick the
+     eigenvalue with the highest real part. */
+  igraph_vector_t valuesreal, valuesimag;
+  igraph_matrix_t vectorsright;
+  int info=0;
+  int i, j, idx=0, n=igraph_matrix_nrow(A);
+
+  /* TODO */
+  if (which->howmany != 1) { 
+    IGRAPH_ERROR("Multiple eigenvalues/vectors are not implemented yet", 
+		 IGRAPH_UNIMPLEMENTED);
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&valuesreal, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&valuesimag, 0);
+  if (vectors) { IGRAPH_MATRIX_INIT_FINALLY(&vectorsright, 0, 0); }
+
+  IGRAPH_CHECK(igraph_lapack_dgeev(A, &valuesreal, &valuesimag, 
+				   /*vectorsleft=*/ 0, 
+				   vectors ? &vectorsright : 0, &info));
+
+  /* Look for the largest real parts, TODO */
+  if (values || vectors) {
+    for (i=1; i<n; i++) { 
+      if (VECTOR(valuesreal)[i] > VECTOR(valuesreal)[idx]) { 
+	idx=i;
+      }
+    }
+  }
+
+  if (values) { 
+    IGRAPH_CHECK(igraph_vector_complex_resize(values, which->howmany));
+    for (i=0; i<which->howmany; i++) {
+      /* TODO */
+      VECTOR(*values)[i]=igraph_complex(VECTOR(valuesreal)[idx],
+					VECTOR(valuesimag)[idx]);
+    }
+  }
+
+  if (vectors) {
+    IGRAPH_CHECK(igraph_matrix_complex_resize(vectors, n, which->howmany));
+    for (i=0; i<which->howmany; i++) {
+      for (j=0; j<n; j++) {
+	/* TODO */
+	if (VECTOR(valuesimag)[idx]==0) { 
+	  MATRIX(*vectors, j, i) = 
+	    igraph_complex(MATRIX(vectorsright, j, idx), 0);
+	} else {
+	  MATRIX(*vectors, j, i) = 
+	    igraph_complex(MATRIX(vectorsright, j, idx), 
+			   MATRIX(vectorsright, j, idx+1));
+	}
+      }
+    }
+  }
+
+  if (vectors) {  
+    igraph_matrix_destroy(&vectorsright);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  igraph_vector_destroy(&valuesreal);
+  igraph_vector_destroy(&valuesimag);
+  IGRAPH_FINALLY_CLEAN(2);
+  
+  return 0;
+}
+
+
+int igraph_i_eigen_matrix_lapack_sr(const igraph_matrix_t *A,
+				    const igraph_eigen_which_t *which,
+				    igraph_vector_complex_t *values,
+				    igraph_matrix_complex_t *vectors) {
+  IGRAPH_ERROR("Non-symmetric SR LAPACK eigenvalues", IGRAPH_UNIMPLEMENTED);
+  return 0;
+}
+
+int igraph_i_eigen_matrix_lapack_li(const igraph_matrix_t *A,
+				    const igraph_eigen_which_t *which,
+				    igraph_vector_complex_t *values,
+				    igraph_matrix_complex_t *vectors) {
+  IGRAPH_ERROR("Non-symmetric LI LAPACK eigenvalues", IGRAPH_UNIMPLEMENTED);
+  return 0;
+}
+
+int igraph_i_eigen_matrix_lapack_si(const igraph_matrix_t *A,
+				    const igraph_eigen_which_t *which,
+				    igraph_vector_complex_t *values,
+				    igraph_matrix_complex_t *vectors) {
+  IGRAPH_ERROR("Non-symmetric SI LAPACK eigenvalues", IGRAPH_UNIMPLEMENTED);
+  return 0;
+}
+
+int igraph_i_eigen_matrix_lapack_select(const igraph_matrix_t *A,
+					const igraph_eigen_which_t *which,
+					igraph_vector_complex_t *values,
+					igraph_matrix_complex_t *vectors) {
+
+  igraph_vector_t valuesreal, valuesimag;
+  igraph_matrix_t vectorsright, *myvectors= vectors ? &vectorsright : 0;
+  int i, n=igraph_matrix_nrow(A);
+  int info=1;
+  igraph_vector_t mag;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&valuesreal, n);
+  IGRAPH_VECTOR_INIT_FINALLY(&valuesimag, n);
+  if (vectors) { IGRAPH_MATRIX_INIT_FINALLY(&vectorsright, n, n); }
+  IGRAPH_CHECK(igraph_lapack_dgeev(A, &valuesreal, &valuesimag, 
+				   /*vectorsleft=*/ 0, myvectors, &info));
+  IGRAPH_VECTOR_INIT_FINALLY(&mag, n);
+  for (i=0; i<n; i++) {
+    VECTOR(mag)[i] = VECTOR(valuesreal)[i] + VECTOR(valuesreal)[i] +
+      VECTOR(valuesimag)[i] * VECTOR(valuesimag)[i];
+  }
+  
+  if (values) {
+    for (i=0; i<n; i++) {
+      IGRAPH_REAL(VECTOR(*values)[i]) = VECTOR(valuesreal)[i];
+      IGRAPH_IMAG(VECTOR(*values)[i]) = VECTOR(valuesimag)[i];
+    }
+  }
+
+  /* TODO: store vectors */
+
+  if (vectors) { 
+    igraph_matrix_destroy(&vectorsright);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  igraph_vector_destroy(&mag);
+  igraph_vector_destroy(&valuesimag);
+  igraph_vector_destroy(&valuesreal);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  return 0;
+}
+
+int igraph_i_eigen_matrix_lapack_all(const igraph_matrix_t *A,
+				     const igraph_eigen_which_t *which,
+				     igraph_vector_complex_t *values,
+				     igraph_matrix_complex_t *vectors) {
+
+  igraph_vector_t valuesreal, valuesimag;
+  igraph_matrix_t vectorsright;
+  igraph_matrix_t *myvectors = vectors ? &vectorsright : 0;
+  int info=1;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&valuesreal, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&valuesimag, 0);
+  if (vectors) { IGRAPH_MATRIX_INIT_FINALLY(&vectorsright, 0, 0); }
+  IGRAPH_CHECK(igraph_lapack_dgeev(A, &valuesreal, &valuesimag, 
+				   /*vectorsleft=*/ 0, myvectors, &info));
+
+  IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_reorder(&valuesreal, 
+						    &valuesimag, 
+						    myvectors, which, values,
+						    vectors));
+ 
+  if (vectors) { 
+    igraph_matrix_destroy(&vectorsright);
+    IGRAPH_FINALLY_CLEAN(1);
+  } 
+  igraph_vector_destroy(&valuesimag);
+  igraph_vector_destroy(&valuesreal);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return 0;
+}
+
+int igraph_i_eigen_matrix_lapack(const igraph_matrix_t *A,
+				 const igraph_sparsemat_t *sA,
+				 const igraph_arpack_function_t *fun,
+				 int n, void *extra, 
+				 const igraph_eigen_which_t *which,
+				 igraph_vector_complex_t *values,
+				 igraph_matrix_complex_t *vectors) {
+  
+  const igraph_matrix_t *myA=A;
+  igraph_matrix_t mA;
+  
+  /* We need to create a dense square matrix first */
+  
+  if (A) {
+    n=igraph_matrix_nrow(A);
+  } else if (sA) {
+    n=igraph_sparsemat_nrow(sA);
+    IGRAPH_CHECK(igraph_matrix_init(&mA, 0, 0));
+    IGRAPH_FINALLY(igraph_matrix_destroy, &mA);
+    IGRAPH_CHECK(igraph_sparsemat_as_matrix(&mA, sA));
+    myA=&mA;
+  } else if (fun) {
+    IGRAPH_CHECK(igraph_i_eigen_arpackfun_to_mat(fun, n, extra, &mA));
+    IGRAPH_FINALLY(igraph_matrix_destroy, &mA);
+  }
+
+  switch (which->pos) {
+  case IGRAPH_EIGEN_LM:
+    IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_lm(myA, which, 
+						 values, vectors));
+    break;
+  case IGRAPH_EIGEN_SM:
+    IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_sm(myA, which, 
+						 values, vectors));
+    break;
+  case IGRAPH_EIGEN_LR:
+    IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_lr(myA, which, 
+						 values, vectors));
+    break;
+  case IGRAPH_EIGEN_SR:
+    IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_sr(myA, which, 
+						 values, vectors));
+    break;
+  case IGRAPH_EIGEN_LI:
+    IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_li(myA, which, 
+						 values, vectors));
+    break;
+  case IGRAPH_EIGEN_SI:
+    IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_si(myA, which, 
+						 values, vectors));
+    break;
+  case IGRAPH_EIGEN_SELECT:
+    IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_select(myA, which, 
+						     values, vectors));
+    break;
+  case IGRAPH_EIGEN_ALL:
+    IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_all(myA, which,
+						  values,
+						  vectors));
+    break;
+  default:
+    /* This cannot happen */
+    break;
+  }
+  
+  if (!A) { 
+    igraph_matrix_destroy(&mA);
+    IGRAPH_FINALLY_CLEAN(1);
+  }  
+  
+  return 0;
+}
+
+int igraph_i_eigen_checks(const igraph_matrix_t *A, 
+			  const igraph_sparsemat_t *sA,
+			  const igraph_arpack_function_t *fun, 
+			  int *no_of_nodes) {
+  
+  if ( (A?1:0)+(sA?1:0)+(fun?1:0) != 1) {
+    IGRAPH_ERROR("Exactly one of 'A', 'sA' and 'fun' must be given", 
+		 IGRAPH_EINVAL);
+  }
+
+  if (A) {
+    *no_of_nodes=igraph_matrix_nrow(A);
+    if (*no_of_nodes != igraph_matrix_ncol(A)) {
+      IGRAPH_ERROR("Invalid matrix", IGRAPH_NONSQUARE);
+    }
+  } else if (sA) {
+    *no_of_nodes=igraph_sparsemat_nrow(sA);
+    if (*no_of_nodes != igraph_sparsemat_nrow(sA)) {
+      IGRAPH_ERROR("Invalid matrix", IGRAPH_NONSQUARE);
+    }
+  }
+  
+  return 0;
+}
 					   
 /** 
  * \function igraph_eigen_matrix_symmetric
@@ -480,10 +955,7 @@ int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
 
   int n;
 
-  if ( (A?1:0)+(sA?1:0)+(fun?1:0) != 1) {
-    IGRAPH_ERROR("Exactly one of 'A', 'sA' and 'fun' must be given", 
-		 IGRAPH_EINVAL);
-  }
+  IGRAPH_CHECK(igraph_i_eigen_checks(A, sA, fun, &n));
   
   if (which->pos != IGRAPH_EIGEN_LM && 
       which->pos != IGRAPH_EIGEN_SM && 
@@ -496,18 +968,6 @@ int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
     IGRAPH_ERROR("Invalid 'pos' position in 'which'", IGRAPH_EINVAL);
   }
 
-  if (A) {
-    n=igraph_matrix_nrow(A);
-    if (n != igraph_matrix_ncol(A)) {
-      IGRAPH_ERROR("Invalid matrix", IGRAPH_NONSQUARE);
-    }
-  } else if (sA) {
-    n=igraph_sparsemat_nrow(sA);
-    if (n != igraph_sparsemat_nrow(sA)) {
-      IGRAPH_ERROR("Invalid matrix", IGRAPH_NONSQUARE);
-    }
-  }
-  
   switch (algorithm) {
   case IGRAPH_EIGEN_AUTO:
     IGRAPH_ERROR("'AUTO' algorithm not implemented yet", 
@@ -562,9 +1022,58 @@ int igraph_eigen_matrix(const igraph_matrix_t *A,
 			igraph_arpack_options_t *options,
 			igraph_vector_complex_t *values,
 			igraph_matrix_complex_t *vectors) {
+
+  int n;
+
+  IGRAPH_CHECK(igraph_i_eigen_checks(A, sA, fun, &n));
   
-  IGRAPH_ERROR("'igraph_eigen_matrix'", IGRAPH_UNIMPLEMENTED);
-  /* TODO */
+  if (which->pos != IGRAPH_EIGEN_LM && 
+      which->pos != IGRAPH_EIGEN_SM && 
+      which->pos != IGRAPH_EIGEN_LR && 
+      which->pos != IGRAPH_EIGEN_SR && 
+      which->pos != IGRAPH_EIGEN_LI && 
+      which->pos != IGRAPH_EIGEN_SI &&
+      which->pos != IGRAPH_EIGEN_SELECT &&
+      which->pos != IGRAPH_EIGEN_ALL) {
+    IGRAPH_ERROR("Invalid 'pos' position in 'which'", IGRAPH_EINVAL);
+  }
+
+  switch (algorithm) {
+  case IGRAPH_EIGEN_AUTO:
+    IGRAPH_ERROR("'AUTO' algorithm not implemented yet", 
+		 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  case IGRAPH_EIGEN_LAPACK:
+    n = fun ? options->n : 0;
+    IGRAPH_CHECK(igraph_i_eigen_matrix_lapack(A, sA, fun, n, extra, which,
+					      values, vectors));
+    /* TODO */
+    break;
+  case IGRAPH_EIGEN_ARPACK:
+    IGRAPH_ERROR("'ARPACK' algorithm not implemented yet", 
+		 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  case IGRAPH_EIGEN_COMP_AUTO:
+    IGRAPH_ERROR("'COMP_AUTO' algorithm not implemented yet", 
+		 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  case IGRAPH_EIGEN_COMP_LAPACK:
+    IGRAPH_ERROR("'COMP_LAPACK' algorithm not implemented yet", 
+		 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  case IGRAPH_EIGEN_COMP_ARPACK:
+    IGRAPH_ERROR("'COMP_ARPACK' algorithm not implemented yet", 
+		 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  default:
+    IGRAPH_ERROR("Unknown `algorithm'", IGRAPH_EINVAL);
+  }
+
   return 0;
 }
 
