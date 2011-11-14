@@ -853,3 +853,72 @@ int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
 
   return 0;
 }
+
+int igraph_lapack_dgehrd(const igraph_matrix_t *A, 
+			 int ilo, int ihi, 
+			 igraph_matrix_t *result) {
+  
+  int n=igraph_matrix_nrow(A);
+  int lda=n;
+  int lwork=-1;
+  igraph_vector_t work;
+  igraph_real_t optwork;
+  igraph_vector_t tau;
+  igraph_matrix_t Acopy;
+  int info=0;
+  int i;
+  
+  if (igraph_matrix_ncol(A) != n) { 
+    IGRAPH_ERROR("Hessenberg reduction failed", IGRAPH_NONSQUARE);
+  }
+
+  if (ilo < 1 || ihi > n || ilo > ihi) { 
+    IGRAPH_ERROR("Invalid `ilo' and/or `ihi'", IGRAPH_EINVAL);
+  }
+
+  if (n <= 1) { 
+    IGRAPH_CHECK(igraph_matrix_update(result, A));
+    return 0;
+  }  
+
+  IGRAPH_CHECK(igraph_matrix_copy(&Acopy, A));
+  IGRAPH_FINALLY(igraph_matrix_destroy, &Acopy);
+  IGRAPH_VECTOR_INIT_FINALLY(&tau, n-1);
+
+  igraphdgehrd_(&n, &ilo, &ihi, &MATRIX(Acopy, 0, 0), &lda, VECTOR(tau),
+		&optwork, &lwork, &info);
+
+  if (info != 0) { 
+    IGRAPH_ERROR("Internal Hessenberg transformation error", 
+		 IGRAPH_EINTERNAL);
+  }
+  
+  lwork=optwork;
+  IGRAPH_VECTOR_INIT_FINALLY(&work, lwork);
+
+  igraphdgehrd_(&n, &ilo, &ihi, &MATRIX(Acopy, 0, 0), &lda, VECTOR(tau),
+		VECTOR(work), &lwork, &info);
+
+  if (info != 0) { 
+    IGRAPH_ERROR("Internal Hessenberg transformation error", 
+		 IGRAPH_EINTERNAL);
+  }
+
+  igraph_vector_destroy(&work);
+  igraph_vector_destroy(&tau);
+  IGRAPH_FINALLY_CLEAN(2);
+  
+  IGRAPH_CHECK(igraph_matrix_update(result, &Acopy));
+
+  igraph_matrix_destroy(&Acopy);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  for (i=0; i<n-2; i++) {
+    int j;
+    for (j=i+2; j<n; j++) {
+      MATRIX(*result, j, i) = 0.0;
+    }
+  }
+  
+  return 0;
+}

@@ -48,6 +48,12 @@ AT_COMPILE_CHECK([simple/igraph_lapack_dgesv.c],
 		 [simple/igraph_lapack_dgesv.out])
 AT_CLEANUP
 
+AT_SETUP([Upper Hessenberg transformation (igraph_lapack_dgehrd):])
+AT_KEYWORDS([lapack dgehrd Hessenberg])
+AT_COMPILE_CHECK([simple/igraph_lapack_dgehrd.c],
+		 [simple/igraph_lapack_dgehrd.out])
+AT_CLEANUP
+
 AT_SETUP([Eigenvector centrality (igraph_eigenvector_centrality):])
 AT_KEYWORDS([eigenvector centrality arpack ARPACK])
 AT_COMPILE_CHECK([simple/eigenvector_centrality.c],

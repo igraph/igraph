@@ -108,6 +108,10 @@ int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
 			 igraph_vector_t *rconde,
 			 igraph_vector_t *rcondv,
 			 int *info);
+
+int igraph_lapack_dgehrd(const igraph_matrix_t *A, 
+			 int ilo, int ihi,
+			 igraph_matrix_t *result);
 			
 __END_DECLS
 
