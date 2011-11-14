@@ -470,9 +470,9 @@ int igraph_i_eigen_matrix_symmetric_arpack(const igraph_matrix_t *A,
 typedef int (*igraph_i_eigen_matrix_lapack_cmp_t)(void*, const void*, 
 						  const void *);
 
-typedef struct igraph_i_eml_cmp_lm_t {
+typedef struct igraph_i_eml_cmp_t {
   const igraph_vector_t *mag, *real, *imag;
-} igraph_i_eml_cmp_lm_t;
+} igraph_i_eml_cmp_t;
 
 /* TODO: these should be defined in some header */
 
@@ -482,9 +482,15 @@ typedef struct igraph_i_eml_cmp_lm_t {
 #define ZERO(a)    ((a) > -EPS && (a) < EPS)
 #define NONZERO(a) ((a) < -EPS || (a) > EPS)
 
+/* Largest magnitude. Ordering is according to 
+   1 Larger magnitude
+   2 Real eigenvalues before complex ones
+   3 Larger real part
+   4 Larger imaginary part */
+
 int igraph_i_eigen_matrix_lapack_cmp_lm(void *extra, const void *a,
 					const void *b) {
-  igraph_i_eml_cmp_lm_t *myextra=(igraph_i_eml_cmp_lm_t *) extra;
+  igraph_i_eml_cmp_t *myextra=(igraph_i_eml_cmp_t *) extra;
   int *aa=(int*) a, *bb=(int*) b;
   igraph_real_t a_m=VECTOR(*myextra->mag)[*aa];
   igraph_real_t b_m=VECTOR(*myextra->mag)[*bb];
@@ -505,6 +511,99 @@ int igraph_i_eigen_matrix_lapack_cmp_lm(void *extra, const void *a,
     if (MORE(a_i, b_r)) { return -1; }
     if (LESS(a_i, b_i)) { return  1; }
   }
+  return 0;
+}
+
+/* Smallest marginude. Ordering is according to
+   1 Magnitude (smaller first)
+   2 Complex eigenvalues before real ones
+   3 Smaller real part
+   4 Smaller imaginary part
+   This ensures that lm has exactly the opposite order to sm */
+
+int igraph_i_eigen_matrix_lapack_cmp_sm(void *extra, const void *a,
+					const void *b) {
+  igraph_i_eml_cmp_t *myextra=(igraph_i_eml_cmp_t *) extra;
+  int *aa=(int*) a, *bb=(int*) b;
+  igraph_real_t a_m=VECTOR(*myextra->mag)[*aa];
+  igraph_real_t b_m=VECTOR(*myextra->mag)[*bb];
+
+  if (MORE(a_m, b_m)) {
+    return 1;
+  } else if (LESS(a_m, b_m)) {
+    return -1;
+  } else {
+    igraph_real_t a_r=VECTOR(*myextra->real)[*aa];
+    igraph_real_t a_i=VECTOR(*myextra->imag)[*aa];
+    igraph_real_t b_r=VECTOR(*myextra->real)[*bb];
+    igraph_real_t b_i=VECTOR(*myextra->imag)[*bb];
+    if (NONZERO(a_i) && ZERO(b_i))    { return -1; }
+    if (ZERO(a_i)    && NONZERO(b_i)) { return  1; }
+    if (LESS(a_r, b_r)) { return -1; }
+    if (MORE(a_r, b_r)) { return  1; }
+    if (LESS(a_i, b_r)) { return -1; }
+    if (MORE(a_i, b_i)) { return  1; }
+  }
+  return 0;
+}  
+
+/* Largest real part. Ordering is according to 
+   1 Larger real part
+   2 Real eigenvalues come before complex ones
+   3 Larger complex part */ 
+
+int igraph_i_eigen_matrix_lapack_cmp_lr(void *extra, const void *a,
+					const void *b) {
+
+  igraph_i_eml_cmp_t *myextra=(igraph_i_eml_cmp_t *) extra;
+  int *aa=(int*) a, *bb=(int*) b;
+  igraph_real_t a_r=VECTOR(*myextra->real)[*aa];
+  igraph_real_t b_r=VECTOR(*myextra->real)[*bb];
+  
+  if (MORE(a_r, b_r)) {
+    return -1;
+  } else if (LESS(a_r, b_r)) {
+    return 1;
+  } else {
+    igraph_real_t a_i=VECTOR(*myextra->imag)[*aa];
+    igraph_real_t b_i=VECTOR(*myextra->imag)[*bb];
+    if (ZERO(a_i) && NONZERO(b_i)) { return -1; }
+    if (NONZERO(a_i) && ZERO(b_i)) { return  1; }
+    if (MORE(a_i, b_i)) { return -1; }
+    if (LESS(a_i, b_i)) { return  1; }    
+  }
+  
+  return 0;
+}
+
+/* Largest real part. Ordering is according to 
+   1 Smaller real part
+   2 Complex eigenvalues come before real ones
+   3 Smaller complex part 
+   This is opposite to LR
+*/ 
+
+int igraph_i_eigen_matrix_lapack_cmp_sr(void *extra, const void *a,
+					const void *b) {
+
+  igraph_i_eml_cmp_t *myextra=(igraph_i_eml_cmp_t *) extra;
+  int *aa=(int*) a, *bb=(int*) b;
+  igraph_real_t a_r=VECTOR(*myextra->real)[*aa];
+  igraph_real_t b_r=VECTOR(*myextra->real)[*bb];
+  
+  if (LESS(a_r, b_r)) {
+    return -1;
+  } else if (MORE(a_r, b_r)) {
+    return 1;
+  } else {
+    igraph_real_t a_i=VECTOR(*myextra->imag)[*aa];
+    igraph_real_t b_i=VECTOR(*myextra->imag)[*bb];
+    if (NONZERO(a_i) && ZERO(b_i)) { return -1; }
+    if (ZERO(a_i) && NONZERO(b_i)) { return  1; }
+    if (LESS(a_i, b_i)) { return -1; }
+    if (MORE(a_i, b_i)) { return  1; }    
+  }
+
   return 0;
 }
 
@@ -535,11 +634,11 @@ int igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t *real,
   igraph_vector_t mag;
   igraph_bool_t hasmag=0;
   int nev=igraph_vector_size(real);
-  int howmany=0;
+  int howmany=0, start=0;
   int i;  
-  igraph_i_eigen_matrix_lapack_cmp_t cmpfunc;
-  igraph_i_eml_cmp_lm_t lmextra = { &mag, real, imag };
-  void *extra=0;
+  igraph_i_eigen_matrix_lapack_cmp_t cmpfunc=0;
+  igraph_i_eml_cmp_t vextra = { &mag, real, imag };
+  void *extra=&vextra;
   
   IGRAPH_CHECK(igraph_vector_int_init(&idx, nev));
   IGRAPH_FINALLY(igraph_vector_int_destroy, &idx);
@@ -548,25 +647,38 @@ int igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t *real,
   case IGRAPH_EIGEN_LM:
     INITMAG();
     cmpfunc=igraph_i_eigen_matrix_lapack_cmp_lm;
-    extra=(void*) &lmextra;
     howmany=which->howmany;
     break;
   case IGRAPH_EIGEN_ALL:
     INITMAG();
     cmpfunc=igraph_i_eigen_matrix_lapack_cmp_lm;
-    extra=(void*) &lmextra;
     howmany=nev;
     break;
-  case IGRAPH_EIGEN_INTERVAL:
-  case IGRAPH_EIGEN_BE:
   case IGRAPH_EIGEN_SM:
+    INITMAG();
+    cmpfunc=igraph_i_eigen_matrix_lapack_cmp_sm;
+    howmany=which->howmany;
+    break;
+  case IGRAPH_EIGEN_LR:
+    cmpfunc=igraph_i_eigen_matrix_lapack_cmp_lr;
+    howmany=which->howmany;
+    break;
+  case IGRAPH_EIGEN_SR:
+    cmpfunc=igraph_i_eigen_matrix_lapack_cmp_sr;
+    howmany=which->howmany;
+    break;
+  case IGRAPH_EIGEN_SELECT:
+    INITMAG();
+    cmpfunc=igraph_i_eigen_matrix_lapack_cmp_lm;
+    start=which->il;
+    howmany=which->iu - which->il + 1;
+    break;
   case IGRAPH_EIGEN_LA:
   case IGRAPH_EIGEN_SA:
-  case IGRAPH_EIGEN_LR:
-  case IGRAPH_EIGEN_SR:
+  case IGRAPH_EIGEN_INTERVAL:
+  case IGRAPH_EIGEN_BE:
   case IGRAPH_EIGEN_LI:
   case IGRAPH_EIGEN_SI:
-  case IGRAPH_EIGEN_SELECT:
     IGRAPH_ERROR("Unimplemented eigenvalue ordering", IGRAPH_UNIMPLEMENTED);
     break;
   }
@@ -585,7 +697,7 @@ int igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t *real,
   if (values) {
     IGRAPH_CHECK(igraph_vector_complex_resize(values, howmany));
     for (i=0; i<howmany; i++) {
-      int x=VECTOR(idx)[i];
+      int x=VECTOR(idx)[start+i];
       VECTOR(*values)[i] = igraph_complex(VECTOR(*real)[x], 
 					  VECTOR(*imag)[x]);
     }
@@ -595,7 +707,7 @@ int igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t *real,
     int n=igraph_matrix_nrow(compressed);
     IGRAPH_CHECK(igraph_matrix_complex_resize(vectors, n, howmany));
     for (i=0; i<howmany; i++) {
-      int j, x=VECTOR(idx)[i];
+      int j, x=VECTOR(idx)[start+i];
       if (VECTOR(*imag)[x] == 0) { 
 	/* real eigenvalue */
 	for (j=0; j<n; j++) {
@@ -627,31 +739,27 @@ int igraph_i_eigen_matrix_lapack_lm(const igraph_matrix_t *A,
 				    igraph_matrix_complex_t *vectors) {
   igraph_vector_t valuesreal, valuesimag;
   igraph_matrix_t vectorsright, *myvectors= vectors ? &vectorsright : 0;
-  int i, n=igraph_matrix_nrow(A);
+  int n=igraph_matrix_nrow(A);
   int info=1;
-  igraph_vector_t mag;
 
-  /* TODO: order according to magnitude, and then real part */
-  
   IGRAPH_VECTOR_INIT_FINALLY(&valuesreal, n);
   IGRAPH_VECTOR_INIT_FINALLY(&valuesimag, n);
   if (vectors) { IGRAPH_MATRIX_INIT_FINALLY(&vectorsright, n, n); }
   IGRAPH_CHECK(igraph_lapack_dgeev(A, &valuesreal, &valuesimag, 
 				   /*vectorsleft=*/ 0, myvectors, &info));
-  IGRAPH_VECTOR_INIT_FINALLY(&mag, n);
-  for (i=0; i<n; i++) {
-    VECTOR(mag)[i] = VECTOR(valuesreal)[i] * VECTOR(valuesreal)[i] +
-      VECTOR(valuesimag)[i] * VECTOR(valuesimag)[i];
-  }
 
   IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_reorder(&valuesreal, &valuesimag, 
 						    myvectors, which, values,
 						    vectors));
   
-  igraph_vector_destroy(&mag);
+  if (vectors) { 
+    igraph_matrix_destroy(&vectorsright);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
   igraph_vector_destroy(&valuesimag);
   igraph_vector_destroy(&valuesreal);
-  IGRAPH_FINALLY_CLEAN(3);
+  IGRAPH_FINALLY_CLEAN(2);
 
   return 0;
 }
@@ -660,7 +768,31 @@ int igraph_i_eigen_matrix_lapack_sm(const igraph_matrix_t *A,
 				    const igraph_eigen_which_t *which,
 				    igraph_vector_complex_t *values,
 				    igraph_matrix_complex_t *vectors) {
-  IGRAPH_ERROR("Non-symmetric SM LAPACK eigenvalues", IGRAPH_UNIMPLEMENTED);
+  igraph_vector_t valuesreal, valuesimag;
+  igraph_matrix_t vectorsright, *myvectors= vectors ? &vectorsright : 0;
+  int n=igraph_matrix_nrow(A);
+  int info=1;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&valuesreal, n);
+  IGRAPH_VECTOR_INIT_FINALLY(&valuesimag, n);
+  if (vectors) { IGRAPH_MATRIX_INIT_FINALLY(&vectorsright, n, n); }
+  IGRAPH_CHECK(igraph_lapack_dgeev(A, &valuesreal, &valuesimag, 
+				   /*vectorsleft=*/ 0, myvectors, &info));
+
+  IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_reorder(&valuesreal, 
+						    &valuesimag, 
+						    myvectors, which, values,
+						    vectors));
+  
+  if (vectors) { 
+    igraph_matrix_destroy(&vectorsright);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  igraph_vector_destroy(&valuesimag);
+  igraph_vector_destroy(&valuesreal);
+  IGRAPH_FINALLY_CLEAN(2);
+
   return 0;
 }
 
@@ -668,69 +800,27 @@ int igraph_i_eigen_matrix_lapack_lr(const igraph_matrix_t *A,
 				    const igraph_eigen_which_t *which,
 				    igraph_vector_complex_t *values,
 				    igraph_matrix_complex_t *vectors) {
-  /* TODO: this is VERY suboptimal */
   
   /* We calculate all eigenvectors and eigenvalues and pick the
-     eigenvalue with the highest real part. */
+     eigenvalue(s) with the highest real part. */
   igraph_vector_t valuesreal, valuesimag;
-  igraph_matrix_t vectorsright;
+  igraph_matrix_t vectorsright, *myvectors=vectors ? &vectorsright : 0;
   int info=0;
-  int i, j, idx=0, n=igraph_matrix_nrow(A);
-
-  /* TODO */
-  if (which->howmany != 1) { 
-    IGRAPH_ERROR("Multiple eigenvalues/vectors are not implemented yet", 
-		 IGRAPH_UNIMPLEMENTED);
-  }
 
   IGRAPH_VECTOR_INIT_FINALLY(&valuesreal, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&valuesimag, 0);
   if (vectors) { IGRAPH_MATRIX_INIT_FINALLY(&vectorsright, 0, 0); }
 
   IGRAPH_CHECK(igraph_lapack_dgeev(A, &valuesreal, &valuesimag, 
-				   /*vectorsleft=*/ 0, 
-				   vectors ? &vectorsright : 0, &info));
-
-  /* Look for the largest real parts, TODO */
-  if (values || vectors) {
-    for (i=1; i<n; i++) { 
-      if (VECTOR(valuesreal)[i] > VECTOR(valuesreal)[idx]) { 
-	idx=i;
-      }
-    }
-  }
-
-  if (values) { 
-    IGRAPH_CHECK(igraph_vector_complex_resize(values, which->howmany));
-    for (i=0; i<which->howmany; i++) {
-      /* TODO */
-      VECTOR(*values)[i]=igraph_complex(VECTOR(valuesreal)[idx],
-					VECTOR(valuesimag)[idx]);
-    }
-  }
-
-  if (vectors) {
-    IGRAPH_CHECK(igraph_matrix_complex_resize(vectors, n, which->howmany));
-    for (i=0; i<which->howmany; i++) {
-      for (j=0; j<n; j++) {
-	/* TODO */
-	if (VECTOR(valuesimag)[idx]==0) { 
-	  MATRIX(*vectors, j, i) = 
-	    igraph_complex(MATRIX(vectorsright, j, idx), 0);
-	} else {
-	  MATRIX(*vectors, j, i) = 
-	    igraph_complex(MATRIX(vectorsright, j, idx), 
-			   MATRIX(vectorsright, j, idx+1));
-	}
-      }
-    }
-  }
-
-  if (vectors) {  
+				   /*vectorsleft=*/ 0, myvectors, &info));
+  
+  IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_reorder(&valuesreal, &valuesimag,
+						    myvectors, which, values,
+						    vectors));
+  if (vectors) { 
     igraph_matrix_destroy(&vectorsright);
     IGRAPH_FINALLY_CLEAN(1);
   }
-
   igraph_vector_destroy(&valuesreal);
   igraph_vector_destroy(&valuesimag);
   IGRAPH_FINALLY_CLEAN(2);
@@ -743,7 +833,28 @@ int igraph_i_eigen_matrix_lapack_sr(const igraph_matrix_t *A,
 				    const igraph_eigen_which_t *which,
 				    igraph_vector_complex_t *values,
 				    igraph_matrix_complex_t *vectors) {
-  IGRAPH_ERROR("Non-symmetric SR LAPACK eigenvalues", IGRAPH_UNIMPLEMENTED);
+  igraph_vector_t valuesreal, valuesimag;
+  igraph_matrix_t vectorsright, *myvectors=vectors ? &vectorsright : 0;
+  int info=0;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&valuesreal, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&valuesimag, 0);
+  if (vectors) { IGRAPH_MATRIX_INIT_FINALLY(&vectorsright, 0, 0); }
+
+  IGRAPH_CHECK(igraph_lapack_dgeev(A, &valuesreal, &valuesimag, 
+				   /*vectorsleft=*/ 0, myvectors, &info));
+  
+  IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_reorder(&valuesreal, &valuesimag,
+						    myvectors, which, values,
+						    vectors));
+  if (vectors) { 
+    igraph_matrix_destroy(&vectorsright);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  igraph_vector_destroy(&valuesreal);
+  igraph_vector_destroy(&valuesimag);
+  IGRAPH_FINALLY_CLEAN(2);
+  
   return 0;
 }
 
@@ -770,39 +881,27 @@ int igraph_i_eigen_matrix_lapack_select(const igraph_matrix_t *A,
 
   igraph_vector_t valuesreal, valuesimag;
   igraph_matrix_t vectorsright, *myvectors= vectors ? &vectorsright : 0;
-  int i, n=igraph_matrix_nrow(A);
   int info=1;
-  igraph_vector_t mag;
+  int n=igraph_matrix_nrow(A);
 
   IGRAPH_VECTOR_INIT_FINALLY(&valuesreal, n);
   IGRAPH_VECTOR_INIT_FINALLY(&valuesimag, n);
   if (vectors) { IGRAPH_MATRIX_INIT_FINALLY(&vectorsright, n, n); }
   IGRAPH_CHECK(igraph_lapack_dgeev(A, &valuesreal, &valuesimag, 
 				   /*vectorsleft=*/ 0, myvectors, &info));
-  IGRAPH_VECTOR_INIT_FINALLY(&mag, n);
-  for (i=0; i<n; i++) {
-    VECTOR(mag)[i] = VECTOR(valuesreal)[i] + VECTOR(valuesreal)[i] +
-      VECTOR(valuesimag)[i] * VECTOR(valuesimag)[i];
-  }
-  
-  if (values) {
-    for (i=0; i<n; i++) {
-      IGRAPH_REAL(VECTOR(*values)[i]) = VECTOR(valuesreal)[i];
-      IGRAPH_IMAG(VECTOR(*values)[i]) = VECTOR(valuesimag)[i];
-    }
-  }
 
-  /* TODO: store vectors */
+  IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_reorder(&valuesreal, &valuesimag,
+						    myvectors, which, values,
+						    vectors));  
 
   if (vectors) { 
     igraph_matrix_destroy(&vectorsright);
     IGRAPH_FINALLY_CLEAN(1);
   }
-
-  igraph_vector_destroy(&mag);
+  
   igraph_vector_destroy(&valuesimag);
   igraph_vector_destroy(&valuesreal);
-  IGRAPH_FINALLY_CLEAN(3);
+  IGRAPH_FINALLY_CLEAN(2);
 
   return 0;
 }
