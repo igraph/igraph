@@ -735,7 +735,7 @@ int igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t *real,
   case IGRAPH_EIGEN_SELECT:
     INITMAG();
     cmpfunc=igraph_i_eigen_matrix_lapack_cmp_lm;
-    start=which->il;
+    start=which->il-1;
     howmany=which->iu - which->il + 1;
     break;
   case IGRAPH_EIGEN_LI:
@@ -787,7 +787,7 @@ int igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t *real,
       } else {
 	/* complex eigenvalue */
 	int neg=1, co=0;
-	if (VECTOR(*imag)[x] < 0) { neg=-11; co=1; }
+	if (VECTOR(*imag)[x] < 0) { neg=-1; co=1; }
 	for (j=0; j<n; j++) {
 	  MATRIX(*vectors, j, i) = 
 	    igraph_complex(MATRIX(*compressed, j, x-co),
