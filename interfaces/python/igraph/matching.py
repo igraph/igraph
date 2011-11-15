@@ -43,6 +43,9 @@ class Matching(object):
         self._num_matched = 0
         self._types = None
 
+        if isinstance(types, basestring):
+            types = graph.vs[types]
+
         self.types = types
         self.matching = matching
 

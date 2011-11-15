@@ -152,7 +152,6 @@ int test_weighted_graph_generated() {
 
   /* Case 1 */
 
-  /*
   igraph_small(&graph, 0, 0, 0, 8, 2, 7, 3, 7, 3, 8, 4, 5, 4, 9, -1);
   igraph_vector_init_copy(&weights, weight_array_1,
       sizeof(weight_array_1) / sizeof(weight_array_1[0]));
@@ -164,7 +163,6 @@ int test_weighted_graph_generated() {
   }
   igraph_vector_destroy(&weights);
   igraph_destroy(&graph);
-  */
 
   /* Case 2 */
 
@@ -233,15 +231,11 @@ int test_weighted_graph_from_file(const char* fname, int type1_count, long exp_w
 int main() {
   igraph_i_set_attribute_table(&igraph_cattribute_table);
 
-  /*
   if (test_graph_from_leda_tutorial())
     return 1;
-  */
 
-  /*
   if (test_weighted_graph_from_mit_notes())
     return 2;
-  */
 
   if (test_weighted_graph_generated())
     return 3;

@@ -1345,7 +1345,7 @@ class Graph(GraphBase):
         extd_graph.es["_original_eid"] = extd_to_orig_eids
         return Layout(layout), extd_graph
 
-    def maximum_bipartite_matching(self, types, weights=None):
+    def maximum_bipartite_matching(self, types="type", weights=None):
         """Finds a maximum matching in a bipartite graph.
         
         A maximum matching is a set of edges such that each vertex is incident on
@@ -1355,6 +1355,8 @@ class Graph(GraphBase):
         @param types: vertex types in a list or the name of a vertex attribute
           holding vertex types. Types should be denoted by zeros and ones (or
           C{False} and C{True}) for the two sides of the bipartite graph.
+          If omitted, it defaults to C{type}, which is the default vertex type
+          attribute for bipartite graphs.
         @param weights: edge weights to be used. Can be a sequence or iterable or
           even an edge attribute name.
         @return: an instance of L{Matching}."""
