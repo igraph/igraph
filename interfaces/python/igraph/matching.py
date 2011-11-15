@@ -63,6 +63,17 @@ class Matching(object):
         else:
             return "Graph matching (%d matched vertex pairs)" % len(self)
 
+    def edges(self):
+        """Returns an edge sequence that contains the edges in the matching.
+
+        If there are multiple edges between a pair of matched vertices, only one
+        of them will be returned.
+        """
+        get_eid = self._graph.get_eid
+        eidxs = [get_eid(u, v, directed=False) \
+                for u, v in enumerate(self._matching) if v != -1 and u <= v]
+        return self._graph.es[eidxs]
+
     @property
     def graph(self):
         """Returns the graph corresponding to the matching."""

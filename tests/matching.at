@@ -23,5 +23,7 @@ AT_BANNER([[Maximum matchings]])
 
 AT_SETUP([Maximum bipartite matching (igraph_maximum_bipartite_matching): ])
 AT_KEYWORDS([bipartite matching])
-AT_COMPILE_CHECK([simple/igraph_maximum_bipartite_matching.c])
+AT_COMPILE_CHECK([simple/igraph_maximum_bipartite_matching.c],
+    [simple/igraph_maximum_bipartite_matching.out],
+    [simple/wbipmatch*.ncol])
 AT_CLEANUP

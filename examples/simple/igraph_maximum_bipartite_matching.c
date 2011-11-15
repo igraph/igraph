@@ -132,18 +132,123 @@ int test_weighted_graph_from_mit_notes() {
   return 0;
 }
 
+int test_weighted_graph_generated() {
+  /* Several randomly generated small test graphs */
+  igraph_t graph;
+  igraph_vector_bool_t types;
+  igraph_vector_long_t matching;
+  igraph_vector_t weights;
+  igraph_integer_t matching_size;
+  igraph_real_t matching_weight;
+  igraph_bool_t is_matching;
+  igraph_real_t weight_array_1[] = { 8, 5, 9, 18, 20, 13 };
+  igraph_real_t weight_array_2[] = { 20, 4, 20, 3, 13, 1 };
+  int i;
+
+  igraph_vector_bool_init(&types, 10);
+  for (i = 0; i < 10; i++)
+    VECTOR(types)[i] = (i >= 5);
+  igraph_vector_long_init(&matching, 0);
+
+  /* Case 1 */
+
+  /*
+  igraph_small(&graph, 0, 0, 0, 8, 2, 7, 3, 7, 3, 8, 4, 5, 4, 9, -1);
+  igraph_vector_init_copy(&weights, weight_array_1,
+      sizeof(weight_array_1) / sizeof(weight_array_1[0]));
+  igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
+      &matching_weight, &matching, &weights);
+  if (matching_weight != 43) {
+    printf("matching_weight is %ld, expected: 43\n", (long)matching_weight);
+    return 2;
+  }
+  igraph_vector_destroy(&weights);
+  igraph_destroy(&graph);
+  */
+
+  /* Case 2 */
+
+  igraph_small(&graph, 0, 0, 0, 5, 0, 6, 1, 7, 2, 5, 3, 5, 3, 9, -1);
+  igraph_vector_init_copy(&weights, weight_array_2,
+      sizeof(weight_array_2) / sizeof(weight_array_2[0]));
+  igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
+      &matching_weight, &matching, &weights);
+  if (matching_weight != 41) {
+    printf("matching_weight is %ld, expected: 41\n", (long)matching_weight);
+    return 2;
+  }
+  igraph_vector_destroy(&weights);
+  igraph_destroy(&graph);
+
+  igraph_vector_long_destroy(&matching);
+  igraph_vector_bool_destroy(&types);
+
+  return 0;
+}
+
+int test_weighted_graph_from_file(const char* fname, int type1_count, long exp_weight) {
+  igraph_t graph;
+  igraph_vector_bool_t types;
+  igraph_vector_long_t matching;
+  igraph_vector_t weights;
+  igraph_real_t matching_weight;
+  FILE* f;
+  int i, n;
+
+  f = fopen(fname, "r");
+  if (!f) {
+    fprintf(stderr, "No such file: %s\n", fname);
+    return 1;
+  }
+  igraph_read_graph_ncol(&graph, f, 0, 1, 1, 0);
+  fclose(f);
+
+  n = igraph_vcount(&graph);
+  igraph_vector_bool_init(&types, n);
+  for (i = 0; i < n; i++) {
+    VECTOR(types)[i] = (i >= type1_count);
+  }
+
+  igraph_vector_long_init(&matching, 0);
+
+  igraph_vector_init(&weights, 0);
+  EANV(&graph, "weight", &weights);
+  igraph_maximum_bipartite_matching(&graph, &types, 0, &matching_weight,
+      &matching, &weights);
+  igraph_vector_destroy(&weights);
+
+  igraph_vector_long_print(&matching);
+  if (matching_weight != exp_weight) {
+    printf("matching_weight is %ld, expected: %ld\n", (long)matching_weight,
+        (long)exp_weight);
+    return 2;
+  }
+
+  igraph_vector_destroy(&weights);
+  igraph_vector_long_destroy(&matching);
+  igraph_vector_bool_destroy(&types);
+  igraph_destroy(&graph);
+}
+
 int main() {
+  igraph_i_set_attribute_table(&igraph_cattribute_table);
+
   /*
   if (test_graph_from_leda_tutorial())
     return 1;
   */
 
+  /*
   if (test_weighted_graph_from_mit_notes())
     return 2;
+  */
+
+  if (test_weighted_graph_generated())
+    return 3;
 
   if (!IGRAPH_FINALLY_STACK_EMPTY) {
     printf("Finally stack still has %d elements.\n", IGRAPH_FINALLY_STACK_SIZE());
-    return 3;
+    return 4;
   }
 
   return 0;
