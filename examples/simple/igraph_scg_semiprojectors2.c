@@ -67,6 +67,11 @@ int main() {
   /* `p' is always the eigenvector corresponding to the 1-eigenvalue */
   igraph_matrix_get_col(&V, &p, 0);
 
+  igraph_eigen_matrix(/*matrix=*/ 0, &stochastic, /*fun=*/ 0, 
+		      /*extra=*/ 0, /*algorithm=*/ IGRAPH_EIGEN_LAPACK,
+		      &which, /*options=*/ 0, /*values=*/ 0, &V2);
+  igraph_matrix_complex_real(&V2, &V);
+
 #define SEMI()								\
   do {									\
     igraph_scg_semiprojectors(&groups, IGRAPH_SCG_STOCHASTIC, &L, &R,	\

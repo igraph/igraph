@@ -59,6 +59,11 @@ int main() {
   igraph_matrix_get_col(&V, &p, 0);
   igraph_vector_print(&p);
 
+  igraph_eigen_matrix(/*matrix=*/ 0, &stochastic, /*fun=*/ 0,
+		      /*extra=*/ 0, /*algorithm=*/ IGRAPH_EIGEN_LAPACK,
+		      &which, /*options=*/ 0, /*values=*/ 0, &V2);
+  igraph_matrix_complex_real(&V2, &V);
+
   /* ------------ */
   
   igraph_scg_grouping(&V, &groups, /*intervals=*/ 3, 
