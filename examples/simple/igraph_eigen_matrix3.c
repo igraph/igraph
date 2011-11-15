@@ -68,12 +68,12 @@ int main() {
     int j;
     igraph_real_t d=
       igraph_complex_abs(igraph_complex_sub(VECTOR(values)[i], 
-					    VECTOR(values2)[i+skip]));
+					    VECTOR(values2)[i+skip-1]));
     if (d > 1e-15) { DUMP(); return 2; }
     for (j=0; j<nodes; j++) {
       igraph_real_t d=
 	igraph_complex_abs(igraph_complex_sub(MATRIX(vectors, j, i), 
-					      MATRIX(vectors2, j, i+skip)));
+					      MATRIX(vectors2, j, i+skip-1)));
       if (d > 1e-15) { DUMP(); return 3; }
     }
   }
