@@ -716,7 +716,7 @@ int igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t *real,
     break;
   case IGRAPH_EIGEN_ALL:
     INITMAG();
-    cmpfunc=igraph_i_eigen_matrix_lapack_cmp_lm;
+    cmpfunc=igraph_i_eigen_matrix_lapack_cmp_sm;
     howmany=nev;
     break;
   case IGRAPH_EIGEN_SM:
@@ -734,7 +734,7 @@ int igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t *real,
     break;
   case IGRAPH_EIGEN_SELECT:
     INITMAG();
-    cmpfunc=igraph_i_eigen_matrix_lapack_cmp_lm;
+    cmpfunc=igraph_i_eigen_matrix_lapack_cmp_sm;
     start=which->il-1;
     howmany=which->iu - which->il + 1;
     break;
