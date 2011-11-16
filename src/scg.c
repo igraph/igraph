@@ -639,15 +639,12 @@ int igraph_get_stochastic(const igraph_t *graph,
   return 0;
 }
 
-int igraph_get_stochastic_sparsemat(const igraph_t *graph, 
-				    igraph_sparsemat_t *sparsemat,
-				    igraph_scg_norm_t norm) {
-
+int igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat, 
+				 igraph_scg_norm_t norm) {
   igraph_vector_t sum;
-  int no_of_nodes=igraph_vcount(graph);
+  int no_of_nodes=igraph_sparsemat_nrow(sparsemat);
   int i;
-
-  IGRAPH_CHECK(igraph_get_sparsemat(graph, sparsemat));
+  
   IGRAPH_VECTOR_INIT_FINALLY(&sum, no_of_nodes);
 
   switch (norm) {       
@@ -676,6 +673,18 @@ int igraph_get_stochastic_sparsemat(const igraph_t *graph,
   }
 
   igraph_vector_destroy(&sum);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
+
+int igraph_get_stochastic_sparsemat(const igraph_t *graph, 
+				    igraph_sparsemat_t *sparsemat,
+				    igraph_scg_norm_t norm) {
+
+  IGRAPH_CHECK(igraph_get_sparsemat(graph, sparsemat));
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, sparsemat);
+  IGRAPH_CHECK(igraph_i_normalize_sparsemat(sparsemat, norm));
   IGRAPH_FINALLY_CLEAN(1);
   
   return 0;
@@ -801,7 +810,12 @@ int igraph_i_sparsemat_laplacian(const igraph_sparsemat_t *sparse,
 int igraph_i_sparsemat_stochastic(const igraph_sparsemat_t *sparse,
 				  igraph_sparsemat_t *mysparse,
 				  igraph_scg_norm_t norm) {
-  /* TODO */
+  
+  IGRAPH_CHECK(igraph_sparsemat_copy(mysparse, sparse));
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparse);
+  IGRAPH_CHECK(igraph_i_normalize_sparsemat(mysparse, norm));
+  IGRAPH_FINALLY_CLEAN(1);
+  
   return 0;
 }
 
