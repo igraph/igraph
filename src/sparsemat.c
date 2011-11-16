@@ -28,6 +28,8 @@
 #include "igraph_interface.h"
 #include "igraph_constructors.h"
 #include "igraph_memory.h"
+#include "igraph_vector_ptr.h"
+#include "igraph_attributes.h"
 
 #include <string.h>
 
@@ -1083,6 +1085,108 @@ int igraph_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
   } else {
     return(igraph_i_sparsemat_triplet(graph, A, directed));
   }
+}
+
+int igraph_i_weighted_sparsemat_cc(const igraph_sparsemat_t *A, 
+				   igraph_bool_t directed, const char *attr, 
+				   igraph_bool_t loops, 
+				   igraph_vector_t *edges,
+				   igraph_vector_t *weights) {
+
+  long int no_of_edges=A->cs->p[A->cs->n];
+  int *p=A->cs->p;
+  int *i=A->cs->i;
+  igraph_real_t *x=A->cs->x;
+  long int from=0;  
+  long int to=0;
+  long int e=0, w=0;
+
+  igraph_vector_resize(edges, no_of_edges*2);
+  igraph_vector_resize(weights, no_of_edges);
+
+  while (*p < no_of_edges) {
+    while (to < *(p+1)) {
+      if ( (loops || from != *i) && (directed || from >= *i) && *x != 0) {
+	VECTOR(*edges)[e++] = from;
+	VECTOR(*edges)[e++] = (*i);
+	VECTOR(*weights)[w++] = (*x);
+      }
+      to++;
+      i++;
+      x++;
+    }
+    from++;
+    p++;
+  }
+
+  igraph_vector_resize(edges, e);
+  igraph_vector_resize(weights, w);
+  
+  return 0;
+}
+
+int igraph_i_weighted_sparsemat_triplet(const igraph_sparsemat_t *A, 
+					igraph_bool_t directed,
+					const char *attr, 
+					igraph_bool_t loops, 
+					igraph_vector_t *edges,
+					igraph_vector_t *weights) {
+
+  /* TODO */
+  IGRAPH_ERROR("Triplet matrices are not implemented", 
+	       IGRAPH_UNIMPLEMENTED);
+  return 0;
+}
+
+int igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A, 
+			      igraph_bool_t directed, const char *attr, 
+			      igraph_bool_t loops) {
+
+  igraph_vector_t edges, weights;
+  int pot_edges= A->cs->nz < 0 ? A->cs->p[A->cs->n] : A->cs->nz;
+  const char* default_attr = "weight";
+  igraph_vector_ptr_t attr_vec;
+  igraph_attribute_record_t attr_rec;
+  long int no_of_nodes=A->cs->m;
+
+  if (no_of_nodes != A->cs->n) {
+    IGRAPH_ERROR("Cannot create graph object", IGRAPH_NONSQUARE);
+  }
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, pot_edges*2);
+  IGRAPH_VECTOR_INIT_FINALLY(&weights, pot_edges);
+  IGRAPH_VECTOR_PTR_INIT_FINALLY(&attr_vec, 1);
+
+  if (A->cs->nz < 0) {
+    IGRAPH_CHECK(igraph_i_weighted_sparsemat_cc(A, directed, attr, loops, 
+					       &edges, &weights));
+  } else {
+    IGRAPH_CHECK(igraph_i_weighted_sparsemat_triplet(A, directed, attr, 
+						     loops, &edges, 
+						     &weights));
+  }
+
+  /* Prepare attribute record */
+  attr_rec.name = attr ? attr : default_attr;
+  attr_rec.type = IGRAPH_ATTRIBUTE_NUMERIC;
+  attr_rec.value = &weights;
+  VECTOR(attr_vec)[0] = &attr_rec;
+
+  /* Create graph */
+  IGRAPH_CHECK(igraph_empty(graph, no_of_nodes, directed));
+  IGRAPH_FINALLY(igraph_destroy, graph);
+  if (igraph_vector_size(&edges)>0) {
+    IGRAPH_CHECK(igraph_add_edges(graph, &edges, &attr_vec));
+  }
+  IGRAPH_FINALLY_CLEAN(1);
+
+  /* Cleanup */
+  igraph_vector_destroy(&edges);
+  igraph_vector_destroy(&weights);
+  igraph_vector_ptr_destroy(&attr_vec);
+  IGRAPH_FINALLY_CLEAN(3);
+  
+  return 0;
 }
 
 /**

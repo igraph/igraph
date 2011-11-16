@@ -135,6 +135,10 @@ int igraph_sparsemat_diag(igraph_sparsemat_t *A, int nzmax,
 int igraph_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
 		     igraph_bool_t directed);
 
+int igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A, 
+			      igraph_bool_t directed, const char *attr, 
+			      igraph_bool_t loops);
+
 int igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *res);
 
 int igraph_matrix_as_sparsemat(igraph_sparsemat_t *res,
