@@ -50,6 +50,11 @@ typedef struct {
 typedef enum { IGRAPH_SPARSEMAT_TRIPLET, 
 	       IGRAPH_SPARSEMAT_CC        } igraph_sparsemat_type_t;
 
+typedef struct {
+  igraph_sparsemat_t *mat;
+  int pos;  
+} igraph_sparsemat_iterator_t;
+
 int igraph_sparsemat_init(igraph_sparsemat_t *A, int rows, int cols, int nzmax);
 int igraph_sparsemat_copy(igraph_sparsemat_t *to, 
 			  const igraph_sparsemat_t *from);
@@ -237,5 +242,21 @@ int igraph_i_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n,
 
 int igraph_sparsemat_sort(const igraph_sparsemat_t *A, 
 			  igraph_sparsemat_t *sorted);
+
+int igraph_sparsemat_nzmax(const igraph_sparsemat_t *A);
+
+int igraph_sparsemat_neg(igraph_sparsemat_t *A);
+
+int igraph_sparsemat_iterator_init(igraph_sparsemat_iterator_t *it,
+				   igraph_sparsemat_t *sparsemat);
+int igraph_sparsemat_iterator_reset(igraph_sparsemat_iterator_t *it);
+igraph_bool_t 
+igraph_sparsemat_iterator_end(const igraph_sparsemat_iterator_t *it);
+int igraph_sparsemat_iterator_row(const igraph_sparsemat_iterator_t *it);
+int igraph_sparsemat_iterator_col(const igraph_sparsemat_iterator_t *it);
+int igraph_sparsemat_iterator_idx(const igraph_sparsemat_iterator_t *it);
+igraph_real_t 
+igraph_sparsemat_iterator_get(const igraph_sparsemat_iterator_t *it);
+int igraph_sparsemat_iterator_next(igraph_sparsemat_iterator_t *it);
 
 #endif
