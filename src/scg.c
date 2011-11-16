@@ -81,6 +81,7 @@
 #include "igraph_structural.h"
 #include "igraph_constructors.h"
 #include "igraph_conversion.h"
+#include "igraph_memory.h"
 
 #include "scg_headers.h"
 
@@ -144,7 +145,9 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
     break;
   case IGRAPH_SCG_INTERV_KM:
     for (i=0; i<nev; i++) {
-      IGRAPH_CHECK(igraph_i_intervals_plus_kmeans(&MATRIX(*V, 0, i),
+      igraph_vector_t tmpv;
+      igraph_vector_view(&tmpv, &MATRIX(*V, 0, i), no_of_nodes);
+      IGRAPH_CHECK(igraph_i_intervals_plus_kmeans(&tmpv,
 						  &MATRIX(gr_mat, 0, i),
 						  no_of_nodes, INVEC(i),
 						  maxiter));
@@ -152,7 +155,9 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
     break;
   case IGRAPH_SCG_INTERV:
     for (i=0; i<nev; i++) {
-      IGRAPH_CHECK(igraph_i_intervals_method(&MATRIX(*V, 0, i),
+      igraph_vector_t tmpv;
+      igraph_vector_view(&tmpv, &MATRIX(*V, 0, i), no_of_nodes);
+      IGRAPH_CHECK(igraph_i_intervals_method(&tmpv,
 					     &MATRIX(gr_mat, 0, i),
 					     no_of_nodes, INVEC(i)));
     }
@@ -173,7 +178,10 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
       VECTOR(*groups)[i] = MATRIX(gr_mat, i, 0);
     }
   } else {
-    GROUPS *g = (GROUPS*)CALLOC(no_of_nodes, sizeof(GROUPS));
+    igraph_i_scg_groups_t *g = igraph_Calloc(no_of_nodes, 
+					     igraph_i_scg_groups_t);
+    int gr_nb=0;
+
     IGRAPH_CHECK(igraph_matrix_int_transpose(&gr_mat));
     for(i=0; i<no_of_nodes; i++){
       g[i].ind = i;
@@ -181,14 +189,14 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
       g[i].gr = &MATRIX(gr_mat, 0, i);
     }
 		
-    qsort(g, no_of_nodes, sizeof(GROUPS), igraph_i_compare_groups);
-    UINT gr_nb = FIRST_GROUP_NB;
+    qsort(g, no_of_nodes, sizeof(igraph_i_scg_groups_t), 
+	  igraph_i_compare_groups);
     VECTOR(*groups)[g[0].ind] = gr_nb;
     for(i=1; i<no_of_nodes; i++){
       if(igraph_i_compare_groups(&g[i], &g[i-1]) != 0) gr_nb++;
       VECTOR(*groups)[g[i].ind] = gr_nb;
     }
-    FREE(g);
+    igraph_Free(g);
   }
 
   igraph_matrix_int_destroy(&gr_mat);

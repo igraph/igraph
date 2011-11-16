@@ -29,20 +29,22 @@
  *	  See also Section 5.4.1 (last paragraph) of the above reference.
  */
 
+#include "igraph_memory.h"
 #include "scg_headers.h"
 #include <math.h>
 
-int igraph_i_exact_coarse_graining(const REAL *v, UINT *gr, const UINT n)
+int igraph_i_exact_coarse_graining(const igraph_real_t *v, 
+				   int *gr, const int n)
 {
-	UINT i,gr_nb;
-	INDVAL *w = (INDVAL*) CALLOC(n, sizeof(INDVAL));
+	int i,gr_nb;
+	igraph_i_scg_indval_t *w = igraph_Calloc(n, igraph_i_scg_indval_t);
 
 	for(i=0; i<n; i++){
 		w[i].val = v[i];
 		w[i].ind = i;
 	}
 
-	qsort(w, n, sizeof(INDVAL), igraph_i_compare_ind_val);
+	qsort(w, n, sizeof(igraph_i_scg_indval_t), igraph_i_compare_ind_val);
 
 	gr_nb = 0;
 	gr[w[0].ind] = gr_nb;
@@ -50,7 +52,7 @@ int igraph_i_exact_coarse_graining(const REAL *v, UINT *gr, const UINT n)
 	  if( fabs(w[i].val - w[i-1].val) > 1e-14 ) gr_nb++;
 			gr[w[i].ind] = gr_nb;
 	}
-	FREE(w);
+	igraph_Free(w);
 	return 0;
 }
 		

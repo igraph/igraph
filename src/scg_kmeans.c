@@ -30,55 +30,64 @@
  *	  Labels are positive consecutive integers starting from 0.
  *	  See also Section 5.3.3 of the above reference.
  */
+
+#include "igraph_memory.h"
  
 #include "scg_headers.h"
 
-INT igraph_i_kmeans_Lloyd(const REAL *x, const UINT n, const UINT p, REAL *cen,
-						const UINT k, INT *cl, const UINT maxiter)
-{
-    UINT iter, i, j, c, it, inew = 0;
-    REAL best, dd, tmp;
-    UINT updated;
-	UINT *nc = igraph_i_uint_vector(k);
+int igraph_i_kmeans_Lloyd(const igraph_vector_t *x, int n, int p, 
+			  igraph_vector_t *cen, int k, int *cl, int maxiter) {
 
-    for(i = 0; i < n; i++) cl[i] = -1;
-    for(iter = 0; iter < maxiter; iter++) {
-		updated = 0;
-		for(i = 0; i < n; i++) {
-	//find nearest centre for each point
-			best = LDBL_MAX;
-			for(j = 0; j < k; j++) {
-				dd = 0.0;
-				for(c = 0; c < p; c++) {
-					tmp = x[i+n*c] - cen[j+k*c];
-					dd += tmp * tmp;
-				}
-				if(dd < best) {
-					best = dd;
-					inew = j+1;
-				}
-			}
-			if(cl[i] != inew) {
-				updated = 1;
-				cl[i] = inew;
-			}
-		}
-		if(!updated) break;
-	//update each centre
-		for(j = 0; j < k*p; j++) cen[j] = 0.0;
-		for(j = 0; j < k; j++) nc[j] = 0;
-		for(i = 0; i < n; i++) {
-			it = cl[i] - 1;
-			nc[it]++;
-			for(c = 0; c < p; c++) cen[it+c*k] += x[i+c*n];
-			}
-		for(j = 0; j < k*p; j++) cen[j] /= nc[j % k];
+  int iter, i, j, c, it, inew = 0;
+  igraph_real_t best, dd, tmp;
+  int updated;
+  igraph_vector_int_t nc;
+  
+  IGRAPH_CHECK(igraph_vector_int_init(&nc, k));
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &nc);
+  
+  for (i = 0; i < n; i++) { cl[i] = -1; }
+  for (iter = 0; iter < maxiter; iter++) {
+    updated = 0;
+    for (i = 0; i < n; i++) {
+      //find nearest centre for each point
+      best = IGRAPH_INFINITY;
+      for (j = 0; j < k; j++) {
+	dd = 0.0;
+	for (c = 0; c < p; c++) {
+	  tmp = VECTOR(*x)[i+n*c] - VECTOR(*cen)[j+k*c];
+	  dd += tmp * tmp;
 	}
-	igraph_i_free_uint_vector(nc);
-	//returns 1 if converged else -1
-	if(iter<maxiter-1)
-		return 1;
-	else
-		return -1;
+	if (dd < best) {
+	  best = dd;
+	  inew = j+1;
+	}
+      }
+      if (cl[i] != inew) {
+	updated = 1;
+	cl[i] = inew;
+      }
+    }
+    if (!updated) { break; }
+
+    //update each centre
+    for (j = 0; j < k*p; j++) { VECTOR(*cen)[j] = 0.0; }
+    for (j = 0; j < k; j++) { VECTOR(nc)[j] = 0; }
+    for (i = 0; i < n; i++) {
+      it = cl[i] - 1;
+      VECTOR(nc)[it]++;
+      for (c = 0; c < p; c++) { VECTOR(*cen)[it+c*k] += VECTOR(*x)[i+c*n]; }
+    }
+    for (j = 0; j < k*p; j++) { VECTOR(*cen)[j] /= VECTOR(nc)[j % k]; }
+  }
+  igraph_vector_int_destroy(&nc);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  /* convervenge check */
+  if (iter >= maxiter-1) { 
+    IGRAPH_ERROR("Lloyd k-means did not converge", IGRAPH_FAILURE);
+  }
+
+  return 0;
 }
 

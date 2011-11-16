@@ -1,3 +1,26 @@
+/* -*- mode: C -*-  */
+/* 
+   IGraph library.
+   Copyright (C) 2011  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard st, Cambridge, MA, 02138 USA
+   
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+   02110-1301 USA
+
+*/
+
 /*
  *  SCGlib : A C library for the spectral coarse graining of matrices
  *	as described in the paper: Shrinking Matrices while preserving their
@@ -35,79 +58,72 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h> //for LDBL_MAX in kmeans.c
-#define CALLOC calloc
-#define FREE free
-#define INT int
-#define UINT int
-#define REAL double
-#define FIRST_GROUP_NB 0
 
-struct ind_val{
-	UINT ind;
-	REAL val;
-};
-#define INDVAL struct ind_val
+#include "igraph_types.h"
+#include "igraph_vector.h"
+
+typedef struct ind_val {
+  int ind;
+  igraph_real_t val;
+} igraph_i_scg_indval_t;
+
 int igraph_i_compare_ind_val(const void *a, const void *b);
 
-struct groups{
-	UINT ind;
-	UINT n;
-	UINT* gr;
-};
-#define GROUPS struct groups
+typedef struct groups{
+  int ind;
+  int n;
+  int* gr;
+} igraph_i_scg_groups_t;
 
 /*-------------------------------------------------
 ------------DEFINED IN scg_approximate_methods.c---
 ---------------------------------------------------*/	
-int igraph_i_breaks_computation(const REAL *v,const UINT n, REAL *breaks,
-				 const UINT nb,const UINT method);
-INT igraph_i_intervals_plus_kmeans(const REAL *v, UINT *gr, const UINT n,
-				   const UINT n_interv, const UINT maxiter);						
-int igraph_i_intervals_method(const REAL *v, UINT *gr, const UINT n, const UINT n_interv);
+
+int igraph_i_breaks_computation(const igraph_vector_t *v, int n,
+				igraph_vector_t *breaks, int nb, 
+				int method);
+int igraph_i_intervals_plus_kmeans(const igraph_vector_t *v, int *gr, 
+				   int n, int n_interv, 
+				   int maxiter);
+int igraph_i_intervals_method(const igraph_vector_t *v, int *gr, 
+			      int n, int n_interv);
+
 /*-------------------------------------------------
 ------------DEFINED IN scg_optimal_method.c--------
 ---------------------------------------------------*/	
-void igraph_i_cost_matrix(REAL *Cv, const INDVAL *vs, const UINT n, const UINT matrix, const REAL *ps);
-REAL igraph_i_optimal_partition(const REAL *v, UINT *gr,const UINT n,
-						const UINT nt,const UINT matrix, const REAL *p);
+
+int igraph_i_cost_matrix(igraph_real_t *Cv, const igraph_i_scg_indval_t *vs, 
+			  int n, int matrix, const igraph_vector_t *ps);
+igraph_real_t igraph_i_optimal_partition(const igraph_real_t *v, 
+					 int *gr, int n, int nt,
+					 int matrix, const igraph_real_t *p);
 
 /*-------------------------------------------------
 ------------DEFINED IN scg_kmeans.c----------------
 ---------------------------------------------------*/
-INT igraph_i_kmeans_Lloyd(const REAL *x, const UINT n, const UINT p, REAL *cen,
-						const UINT k, INT *cl, const UINT maxiter);					
+
+int igraph_i_kmeans_Lloyd(const igraph_vector_t *x, int n,
+			  int p, igraph_vector_t *centers,
+			  int k, int *cl, int maxiter);
+
 /*-------------------------------------------------
 ------------DEFINED IN scg_exact_scg.c-------------
 ---------------------------------------------------*/
-int igraph_i_exact_coarse_graining(const REAL *v, UINT *gr, const UINT n);				
+
+int igraph_i_exact_coarse_graining(const igraph_real_t *v, int *gr, 
+				   int n);
+
 /*-------------------------------------------------
 ------------DEFINED IN scg_utils.c-----------------
 ---------------------------------------------------*/	
+
 int igraph_i_compare_groups(const void *a,const void *b);
 int igraph_i_compare_real(const void *a, const void *b);
 int igraph_i_compare_int(const void *a, const void *b);
 
-REAL *igraph_i_real_sym_matrix(const UINT size);
+igraph_real_t *igraph_i_real_sym_matrix(int size);
 #define igraph_i_real_sym_mat_get(S,i,j) S[i+j*(j+1)/2]
 #define igraph_i_real_sym_mat_set(S,i,j,val) S[i+j*(j+1)/2] = val
-#define igraph_i_free_real_sym_matrix(S) FREE(S)
-
-REAL **igraph_i_real_matrix(const UINT nrow, const UINT ncol);
-void igraph_i_free_real_matrix(REAL **M,const UINT nrow);
-
-UINT **igraph_i_uint_matrix(const UINT nrow, const UINT ncol);
-void igraph_i_free_uint_matrix(UINT **M, const UINT nrow);
-
-REAL *igraph_i_real_vector(const UINT n);
-REAL igraph_i_min_real_vector(const REAL *v, const UINT n);
-REAL igraph_i_max_real_vector(const REAL *v, const UINT n);
-//for unity
-#define igraph_i_free_real_vector(v) FREE(v)
-
-UINT *igraph_i_uint_vector(const UINT n);
-UINT igraph_i_min_uint_vector(const UINT *v, const UINT n);
-UINT igraph_i_max_uint_vector(const UINT *v, const UINT n);
-//for unity
-#define igraph_i_free_uint_vector(v) FREE(v)
+#define igraph_i_free_real_sym_matrix(S) igraph_Free(S)
 
 #endif
