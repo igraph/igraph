@@ -1247,6 +1247,7 @@ int igraph_scg_stochastic(const igraph_t *graph,
 			  igraph_sparsemat_t *Lsparse,
 			  igraph_sparsemat_t *Rsparse) {
 
+  igraph_matrix_t *mymatrix=(igraph_matrix_t*) matrix, real_matrix;
   igraph_sparsemat_t *mysparsemat=(igraph_sparsemat_t*) sparsemat, 
     real_sparsemat;
   int no_of_nodes;
@@ -1292,7 +1293,15 @@ int igraph_scg_stochastic(const igraph_t *graph,
     mysparsemat=&real_sparsemat;
     IGRAPH_CHECK(igraph_get_stochastic_sparsemat(graph, mysparsemat, norm));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparsemat);
-  }   
+  } else if (matrix) {
+    mymatrix=&real_matrix;
+    IGRAPH_CHECK(igraph_i_matrix_stochastic(matrix, mymatrix, norm));
+    IGRAPH_FINALLY(igraph_matrix_destroy, mymatrix);
+  } else { /* sparsemat */
+    mysparsemat=&real_sparsemat;
+    IGRAPH_CHECK(igraph_i_sparsemat_stochastic(sparsemat, mysparsemat, norm));
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparsemat);
+  }
 
   /* -------------------------------------------------------------------- */
   /* Compute eigenpairs, if needed */
@@ -1315,7 +1324,7 @@ int igraph_scg_stochastic(const igraph_t *graph,
     IGRAPH_CHECK(igraph_matrix_complex_init(&tmp, no_of_nodes, 
 					    which.iu-which.il+1));
     IGRAPH_FINALLY(igraph_matrix_complex_destroy, &tmp);
-    IGRAPH_CHECK(igraph_eigen_matrix(matrix, mysparsemat, /*fun=*/ 0,
+    IGRAPH_CHECK(igraph_eigen_matrix(mymatrix, mysparsemat, /*fun=*/ 0,
 				     /*extra=*/ 0, use_arpack ? 
 				     IGRAPH_EIGEN_ARPACK : 
 				     IGRAPH_EIGEN_LAPACK, &which, &options, 
@@ -1345,8 +1354,8 @@ int igraph_scg_stochastic(const igraph_t *graph,
     w.pos=IGRAPH_EIGEN_LR;
     w.howmany=1;
 
-    if (matrix) { 
-      IGRAPH_CHECK(igraph_matrix_copy(&trans, matrix));
+    if (mymatrix) { 
+      IGRAPH_CHECK(igraph_matrix_copy(&trans, mymatrix));
       IGRAPH_FINALLY(igraph_matrix_destroy, &trans);
       IGRAPH_CHECK(igraph_matrix_transpose(&trans));
       mysparse_trans=0;
@@ -1364,7 +1373,7 @@ int igraph_scg_stochastic(const igraph_t *graph,
 				     IGRAPH_EIGEN_LAPACK, &w, &o, 
 				     /*values=*/ 0, &tmp));
 
-    if (matrix) {
+    if (mymatrix) {
       igraph_matrix_destroy(mytrans);
       IGRAPH_FINALLY_CLEAN(1);
     } else {
@@ -1431,7 +1440,7 @@ int igraph_scg_stochastic(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_sparsemat_destroy, &Rsparse_t);  
 
   IGRAPH_CHECK(igraph_i_scg_get_result(IGRAPH_SCG_STOCHASTIC,
-				       matrix, mysparsemat,
+				       mymatrix, mysparsemat,
 				       Lsparse, &Rsparse_t,
 				       scg_graph, scg_matrix, 
 				       scg_sparsemat, /*directed=*/ 0));
@@ -1443,6 +1452,12 @@ int igraph_scg_stochastic(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(1);
 
   if (graph) {
+    igraph_sparsemat_destroy(mysparsemat);
+    IGRAPH_FINALLY_CLEAN(1);
+  } else if (matrix) { 
+    igraph_matrix_destroy(mymatrix);
+    IGRAPH_FINALLY_CLEAN(1);
+  } else {
     igraph_sparsemat_destroy(mysparsemat);
     IGRAPH_FINALLY_CLEAN(1);
   }
