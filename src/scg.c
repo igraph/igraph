@@ -1630,6 +1630,12 @@ int igraph_scg_laplacian(const igraph_t *graph,
   if (graph) {
     igraph_sparsemat_destroy(mysparsemat);
     IGRAPH_FINALLY_CLEAN(1);
+  } else if (matrix) {
+    igraph_matrix_destroy(mymatrix);
+    IGRAPH_FINALLY_CLEAN(1);
+  } else {
+    igraph_sparsemat_destroy(&mysparsemat);
+    IGRAPH_FINALLY_CLEAN(1);
   }
 
   return 0;
