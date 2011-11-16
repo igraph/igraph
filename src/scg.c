@@ -279,44 +279,10 @@ int igraph_i_scg_semiprojectors_lap(const igraph_vector_t *groups,
     VECTOR(tab)[ (int) VECTOR(*groups)[i] ] += 1;
   }
   for (i=0; i<no_of_groups; i++) {
-    VECTOR(tab)[i] = sqrt(VECTOR(tab)[i]);
+    VECTOR(tab)[i] = VECTOR(tab)[i];
   }
 
   if (norm == IGRAPH_SCG_NORM_ROW) {
-    if (L) {
-      IGRAPH_CHECK(igraph_matrix_resize(L, no_of_groups, no_of_nodes));
-      igraph_matrix_null(L);
-      for (i=0; i<no_of_nodes; i++) {
-	int g=VECTOR(*groups)[i];
-	MATRIX(*L, g, i) = 1.0;
-      }
-    }
-    if (R) {
-      IGRAPH_CHECK(igraph_matrix_resize(R, no_of_groups, no_of_nodes));
-      igraph_matrix_null(R);
-      for (i=0; i<no_of_nodes; i++) {
-	int g=VECTOR(*groups)[i];
-	MATRIX(*R, g, i) = 1.0 / VECTOR(tab)[g];
-      }
-    }
-    if (Lsparse) {
-      IGRAPH_CHECK(igraph_sparsemat_init(Lsparse, no_of_groups, no_of_nodes,
-					 /* nzmax= */ no_of_nodes));
-      for (i=0; i<no_of_nodes; i++) {
-	int g=VECTOR(*groups)[i];
-	IGRAPH_CHECK(igraph_sparsemat_entry(Lsparse, g, i, 1.0));
-      }
-    }
-    if (Rsparse) {
-      IGRAPH_CHECK(igraph_sparsemat_init(Rsparse, no_of_groups, no_of_nodes,
-					   /* nzmax= */ no_of_nodes));
-      for (i=0; i<no_of_nodes; i++) {
-	int g=VECTOR(*groups)[i];
-	IGRAPH_CHECK(igraph_sparsemat_entry(Rsparse, g, i, 
-					    1.0 / VECTOR(tab)[g]));
-      }
-    }
-  } else {
     if (L) {
       IGRAPH_CHECK(igraph_matrix_resize(L, no_of_groups, no_of_nodes));
       igraph_matrix_null(L);
@@ -344,10 +310,44 @@ int igraph_i_scg_semiprojectors_lap(const igraph_vector_t *groups,
     }
     if (Rsparse) {
       IGRAPH_CHECK(igraph_sparsemat_init(Rsparse, no_of_groups, no_of_nodes,
-					 /* nzmax= */ no_of_nodes));
+					   /* nzmax= */ no_of_nodes));
       for (i=0; i<no_of_nodes; i++) {
 	int g=VECTOR(*groups)[i];
 	IGRAPH_CHECK(igraph_sparsemat_entry(Rsparse, g, i, 1.0));
+      }
+    }
+  } else {
+    if (L) {
+      IGRAPH_CHECK(igraph_matrix_resize(L, no_of_groups, no_of_nodes));
+      igraph_matrix_null(L);
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	MATRIX(*L, g, i) = 1.0;
+      }
+    }
+    if (R) {
+      IGRAPH_CHECK(igraph_matrix_resize(R, no_of_groups, no_of_nodes));
+      igraph_matrix_null(R);
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	MATRIX(*R, g, i) = 1.0 / VECTOR(tab)[g];
+      }
+    }
+    if (Lsparse) {
+      IGRAPH_CHECK(igraph_sparsemat_init(Lsparse, no_of_groups, no_of_nodes,
+					 /* nzmax= */ no_of_nodes));
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	IGRAPH_CHECK(igraph_sparsemat_entry(Lsparse, g, i, 1.0));
+      }
+    }
+    if (Rsparse) {
+      IGRAPH_CHECK(igraph_sparsemat_init(Rsparse, no_of_groups, no_of_nodes,
+					 /* nzmax= */ no_of_nodes));
+      for (i=0; i<no_of_nodes; i++) {
+	int g=VECTOR(*groups)[i];
+	IGRAPH_CHECK(igraph_sparsemat_entry(Rsparse, g, i, 
+					    1.0 / VECTOR(tab)[g]));
       }
     }
     
@@ -681,31 +681,132 @@ int igraph_get_stochastic_sparsemat(const igraph_t *graph,
   return 0;
 }
 
-int igraph_i_scg_get_matrix(const igraph_t *graph,
-			    igraph_sparsemat_t *sparsemat,
-			    igraph_scg_matrix_t matrix_type,
-			    igraph_scg_norm_t norm) {
-  switch (matrix_type) {
-    
-  case IGRAPH_SCG_SYMMETRIC:
-    IGRAPH_CHECK(igraph_get_sparsemat(graph, sparsemat));
-    break;
+int igraph_i_matrix_laplacian(const igraph_matrix_t *matrix, 
+			      igraph_matrix_t *mymatrix, 
+			      igraph_scg_norm_t norm) {
 
-  case IGRAPH_SCG_LAPLACIAN:
-    /* TODO: normalized */
-    IGRAPH_CHECK(igraph_laplacian(graph, /*res=*/ 0, sparsemat, 
-				  /*normalized=*/ 1, /*weights=*/ 0));
-    break;
+  igraph_vector_t degree;
+  int i, j, n=igraph_matrix_nrow(matrix);
+  IGRAPH_CHECK(igraph_matrix_resize(mymatrix, n, n));
 
-  case IGRAPH_SCG_STOCHASTIC:
-    IGRAPH_CHECK(igraph_get_stochastic_sparsemat(graph, sparsemat, norm));
-    break;
+  if (norm==IGRAPH_SCG_NORM_ROW) { 
+    IGRAPH_CHECK(igraph_matrix_rowsum(matrix, &degree));
+  } else {
+    IGRAPH_CHECK(igraph_matrix_colsum(matrix, &degree));
   }
+  for (i=0; i<n; i++) {
+    VECTOR(degree)[i] -= MATRIX(*matrix, i, i);
+  }
+
+  for (i=0; i<n; i++) {
+    for (j=0; j<n; j++) {
+      MATRIX(*mymatrix, i, j) = - MATRIX(*matrix, i, j);
+    }
+    MATRIX(*mymatrix, i, i) = VECTOR(degree)[i];
+  }
+  
+  igraph_vector_destroy(&degree);
+  IGRAPH_FINALLY_CLEAN(1);
 
   return 0;
 }
 
-int igraph_i_scg_get_result(const igraph_matrix_t *matrix,
+int igraph_i_matrix_stochastic(const igraph_matrix_t *matrix, 
+			       igraph_matrix_t *mymatrix, 
+			       igraph_scg_norm_t norm) {
+
+  int i, j, n=igraph_matrix_nrow(matrix);
+  IGRAPH_CHECK(igraph_matrix_copy(mymatrix, matrix));
+
+  if (norm==IGRAPH_SCG_NORM_ROW){
+    for (i=0; i<n; i++) {
+      igraph_real_t sum=0.0;
+      for (j=0; j<n; j++) {
+	sum += MATRIX(*matrix, i, j);
+      }
+      if (sum == 0) { IGRAPH_WARNING("Zero degree vertices"); }
+      for (j=0; j<n; j++) {
+	MATRIX(*mymatrix, i, j) = MATRIX(*matrix, i, j) / sum;
+      }
+    }
+  } else {
+    for (i=0; i<n; i++) {
+      igraph_real_t sum=0.0;
+      for (j=0; j<n; j++) {
+	sum += MATRIX(*matrix, j, i);
+      }
+      if (sum == 0) { IGRAPH_WARNING("Zero degree vertices"); }
+      for (j=0; j<n; j++) {
+	MATRIX(*mymatrix, j, i) = MATRIX(*matrix, j, i) / sum;
+      }
+    }    
+  }	
+
+  return 0;
+}
+
+int igraph_i_sparsemat_laplacian(const igraph_sparsemat_t *sparse,
+				 igraph_sparsemat_t *mysparse,
+				 igraph_scg_norm_t norm) {
+
+  igraph_vector_t degree;
+  int i, n=igraph_sparsemat_nrow(sparse);
+  int nzmax=igraph_sparsemat_nzmax(sparse);
+  igraph_sparsemat_iterator_t it;
+
+  IGRAPH_CHECK(igraph_sparsemat_init(mysparse, n, n, nzmax+n));
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparse);
+  igraph_sparsemat_iterator_init(&it, (igraph_sparsemat_t *) sparse);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&degree, n);  
+  for (igraph_sparsemat_iterator_reset(&it); 
+       !igraph_sparsemat_iterator_end(&it);
+       igraph_sparsemat_iterator_next(&it)) {
+    int row=igraph_sparsemat_iterator_row(&it);
+    int col=igraph_sparsemat_iterator_col(&it);
+    if (row != col) { 
+      igraph_real_t val=igraph_sparsemat_iterator_get(&it);
+      if (norm == IGRAPH_SCG_NORM_ROW) { 
+	VECTOR(degree)[row] += val;
+      } else {
+	VECTOR(degree)[col] += val;
+      }
+    }
+  }
+
+  /* Diagonal */
+  for (i=0; i<n; i++) {
+    igraph_real_t t=VECTOR(degree)[i] > 0 ? 1 : 0;
+    igraph_sparsemat_entry(mysparse, i, i, t);
+  }
+
+  /* And the rest, filter out diagonal elements */
+  for (igraph_sparsemat_iterator_reset(&it); 
+       !igraph_sparsemat_iterator_end(&it);
+       igraph_sparsemat_iterator_next(&it)) {
+    int row=igraph_sparsemat_iterator_row(&it);
+    int col=igraph_sparsemat_iterator_col(&it);
+    if (row != col) { 
+      igraph_real_t val=igraph_sparsemat_iterator_get(&it);
+      igraph_sparsemat_entry(mysparse, row, col, -val);
+    }
+  }
+
+  igraph_vector_destroy(&degree);
+  IGRAPH_FINALLY_CLEAN(2); 	/* + mysparse */
+  
+  return 0;
+}
+
+int igraph_i_sparsemat_stochastic(const igraph_sparsemat_t *sparse,
+				  igraph_sparsemat_t *mysparse,
+				  igraph_scg_norm_t norm) {
+  /* TODO */
+  return 0;
+}
+
+int igraph_i_scg_get_result(igraph_scg_matrix_t type,
+			    const igraph_matrix_t *matrix,
 			    const igraph_sparsemat_t *sparsemat,
 			    const igraph_sparsemat_t *Lsparse,
 			    const igraph_sparsemat_t *Rsparse_t,
@@ -751,9 +852,30 @@ int igraph_i_scg_get_result(const igraph_matrix_t *matrix,
     }
 
     if (scg_graph) {
-      IGRAPH_CHECK(igraph_adjacency(scg_graph, my_scg_matrix, 
-				    directed ? IGRAPH_ADJ_DIRECTED : 
-				    IGRAPH_ADJ_UNDIRECTED));
+      /* TODO: no loops for stochastic matrices */
+      if (type != IGRAPH_SCG_LAPLACIAN) {
+	IGRAPH_CHECK(igraph_weighted_adjacency(scg_graph, my_scg_matrix, 
+					       directed ? 
+					       IGRAPH_ADJ_DIRECTED : 
+					       IGRAPH_ADJ_UNDIRECTED, 
+					       "weight"));
+      } else {
+	int i, j, n=igraph_matrix_nrow(my_scg_matrix);
+	igraph_matrix_t tmp;
+	IGRAPH_MATRIX_INIT_FINALLY(&tmp, n, n);
+	for (i=0; i<n; i++) {
+	  for (j=0; j<n; j++) {
+	    MATRIX(tmp, i, j) = -MATRIX(*my_scg_matrix, i, j);
+	  }
+	  MATRIX(tmp, i, i) = 0;
+	}
+	IGRAPH_CHECK(igraph_weighted_adjacency(scg_graph, &tmp, directed ?
+					       IGRAPH_ADJ_DIRECTED :
+					       IGRAPH_ADJ_UNDIRECTED, 
+					       "weight"));
+	igraph_matrix_destroy(&tmp);
+	IGRAPH_FINALLY_CLEAN(1);
+      }
     }
 
     if (scg_sparsemat) { IGRAPH_FINALLY_CLEAN(1); }
@@ -798,7 +920,20 @@ int igraph_i_scg_get_result(const igraph_matrix_t *matrix,
       IGRAPH_CHECK(igraph_sparsemat_as_matrix(scg_matrix, my_scg_sparsemat));
     }
     if (scg_graph) {
-      IGRAPH_CHECK(igraph_sparsemat(scg_graph, my_scg_sparsemat, directed));
+      if (type != IGRAPH_SCG_LAPLACIAN) {
+	IGRAPH_CHECK(igraph_weighted_sparsemat(scg_graph, my_scg_sparsemat,
+					       directed, "weight",
+					       /*loops=*/ 1));
+      } else {
+	igraph_sparsemat_t tmp;
+	IGRAPH_CHECK(igraph_sparsemat_copy(&tmp, my_scg_sparsemat));
+	IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmp);
+	IGRAPH_CHECK(igraph_sparsemat_neg(&tmp));
+	IGRAPH_CHECK(igraph_weighted_sparsemat(scg_graph, &tmp, directed, 
+					       "weight", /*loops=*/ 0));
+	igraph_sparsemat_destroy(&tmp);
+	IGRAPH_FINALLY_CLEAN(1);
+      }
     }
 
     IGRAPH_FINALLY_CLEAN(1); 	/* (my_)scg_sparsemat */
@@ -967,9 +1102,7 @@ int igraph_scg_adjacency(const igraph_t *graph,
 
   if (graph) {
     mysparsemat=&real_sparsemat;
-    IGRAPH_CHECK(igraph_i_scg_get_matrix(graph, mysparsemat,
-					 IGRAPH_SCG_SYMMETRIC, 
-					 IGRAPH_SCG_NORM_ROW));
+    IGRAPH_CHECK(igraph_get_sparsemat(graph, mysparsemat));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparsemat);
   }   
 
@@ -1058,7 +1191,8 @@ int igraph_scg_adjacency(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(1);
   IGRAPH_FINALLY(igraph_sparsemat_destroy, &Rsparse_t);  
 
-  IGRAPH_CHECK(igraph_i_scg_get_result(matrix, mysparsemat,
+  IGRAPH_CHECK(igraph_i_scg_get_result(IGRAPH_SCG_SYMMETRIC,
+				       matrix, mysparsemat,
 				       Lsparse, &Rsparse_t,
 				       scg_graph, scg_matrix, 
 				       scg_sparsemat, /*directed=*/ 0));
@@ -1142,9 +1276,7 @@ int igraph_scg_stochastic(const igraph_t *graph,
 
   if (graph) {
     mysparsemat=&real_sparsemat;
-    IGRAPH_CHECK(igraph_i_scg_get_matrix(graph, mysparsemat,
-					 IGRAPH_SCG_STOCHASTIC,
-					 IGRAPH_SCG_NORM_ROW));
+    IGRAPH_CHECK(igraph_get_stochastic_sparsemat(graph, mysparsemat, norm));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparsemat);
   }   
 
@@ -1284,7 +1416,8 @@ int igraph_scg_stochastic(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(1);
   IGRAPH_FINALLY(igraph_sparsemat_destroy, &Rsparse_t);  
 
-  IGRAPH_CHECK(igraph_i_scg_get_result(matrix, mysparsemat,
+  IGRAPH_CHECK(igraph_i_scg_get_result(IGRAPH_SCG_STOCHASTIC,
+				       matrix, mysparsemat,
 				       Lsparse, &Rsparse_t,
 				       scg_graph, scg_matrix, 
 				       scg_sparsemat, /*directed=*/ 0));
@@ -1325,6 +1458,7 @@ int igraph_scg_laplacian(const igraph_t *graph,
 			 igraph_sparsemat_t *Lsparse,
 			 igraph_sparsemat_t *Rsparse) {
 
+  igraph_matrix_t *mymatrix=(igraph_matrix_t*) matrix, real_matrix;
   igraph_sparsemat_t *mysparsemat=(igraph_sparsemat_t*) sparsemat, 
     real_sparsemat;
   int no_of_nodes;
@@ -1362,15 +1496,22 @@ int igraph_scg_laplacian(const igraph_t *graph,
   }
 
   /* -------------------------------------------------------------------- */
-  /* Convert graph, if needed */
+  /* Convert graph, if needed, get Laplacian matrix */
 
   if (graph) {
     mysparsemat=&real_sparsemat;
-    IGRAPH_CHECK(igraph_i_scg_get_matrix(graph, mysparsemat,
-					 IGRAPH_SCG_LAPLACIAN, 
-					 IGRAPH_SCG_NORM_ROW));
+    IGRAPH_CHECK(igraph_laplacian(graph, 0, mysparsemat, /*normalized=*/ 0, 
+				  /*weights=*/ 0));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparsemat);
-  }   
+  } else if (matrix) { 
+    mymatrix=&real_matrix;
+    IGRAPH_CHECK(igraph_i_matrix_laplacian(matrix, mymatrix, norm));
+    IGRAPH_FINALLY(igraph_matrix_destroy, mymatrix);
+  } else { /* sparsemat */
+    mysparsemat=&real_sparsemat;
+    IGRAPH_CHECK(igraph_i_sparsemat_laplacian(sparsemat, mysparsemat, norm));
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparsemat);
+  }
 
   /* -------------------------------------------------------------------- */
   /* Compute eigenpairs, if needed */
@@ -1393,7 +1534,7 @@ int igraph_scg_laplacian(const igraph_t *graph,
     IGRAPH_CHECK(igraph_matrix_complex_init(&tmp, no_of_nodes, 
 					    which.iu-which.il+1));
     IGRAPH_FINALLY(igraph_matrix_complex_destroy, &tmp);
-    IGRAPH_CHECK(igraph_eigen_matrix(matrix, sparsemat, /*fun=*/ 0,
+    IGRAPH_CHECK(igraph_eigen_matrix(mymatrix, mysparsemat, /*fun=*/ 0,
 				     /*extra=*/ 0, use_arpack ? 
 				     IGRAPH_EIGEN_ARPACK : 
 				     IGRAPH_EIGEN_LAPACK, &which, &options, 
@@ -1460,10 +1601,11 @@ int igraph_scg_laplacian(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(1);
   IGRAPH_FINALLY(igraph_sparsemat_destroy, &Rsparse_t);  
 
-  IGRAPH_CHECK(igraph_i_scg_get_result(matrix, mysparsemat,
+  IGRAPH_CHECK(igraph_i_scg_get_result(IGRAPH_SCG_LAPLACIAN,
+				       mymatrix, mysparsemat,
 				       Lsparse, &Rsparse_t,
 				       scg_graph, scg_matrix, 
-				       scg_sparsemat, /*directed=*/ 0));
+				       scg_sparsemat, /*directed=*/ 1));
 
   /* -------------------------------------------------------------------- */
   /* Clean up */
