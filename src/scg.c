@@ -698,6 +698,8 @@ int igraph_i_matrix_laplacian(const igraph_matrix_t *matrix,
   int i, j, n=igraph_matrix_nrow(matrix);
   IGRAPH_CHECK(igraph_matrix_resize(mymatrix, n, n));
 
+  IGRAPH_VECTOR_INIT_FINALLY(&degree, n);  
+
   if (norm==IGRAPH_SCG_NORM_ROW) { 
     IGRAPH_CHECK(igraph_matrix_rowsum(matrix, &degree));
   } else {
@@ -889,8 +891,10 @@ int igraph_i_scg_get_result(igraph_scg_matrix_t type,
 	igraph_matrix_destroy(&tmp);
 	IGRAPH_FINALLY_CLEAN(1);
       }
+      IGRAPH_FINALLY(igraph_destroy, scg_graph);
     }
 
+    if (scg_graph)     { IGRAPH_FINALLY_CLEAN(1); }
     if (scg_sparsemat) { IGRAPH_FINALLY_CLEAN(1); }
 
     if (!igraph_sparsemat_is_cc(Lsparse)) {
@@ -947,12 +951,14 @@ int igraph_i_scg_get_result(igraph_scg_matrix_t type,
 	igraph_sparsemat_destroy(&tmp);
 	IGRAPH_FINALLY_CLEAN(1);
       }
+      IGRAPH_FINALLY(igraph_destroy, scg_graph);
     }
 
-    IGRAPH_FINALLY_CLEAN(1); 	/* (my_)scg_sparsemat */
+    if (scg_graph) { IGRAPH_FINALLY_CLEAN(1); }
     if (!scg_sparsemat) {
       igraph_sparsemat_destroy(my_scg_sparsemat);
     }
+    IGRAPH_FINALLY_CLEAN(1);	/* my_scg_sparsemat */
     if (!igraph_sparsemat_is_cc(Lsparse)) {
       igraph_sparsemat_destroy(myLsparse);
       IGRAPH_FINALLY_CLEAN(1);
@@ -1191,8 +1197,8 @@ int igraph_scg_adjacency(const igraph_t *graph,
     igraph_matrix_destroy(evec);
     IGRAPH_FINALLY_CLEAN(1);
   }
-  IGRAPH_FINALLY(igraph_sparsemat_destroy, Rsparse);
-  IGRAPH_FINALLY(igraph_sparsemat_destroy, Lsparse);
+  if (Rsparse) { IGRAPH_FINALLY(igraph_sparsemat_destroy, Rsparse); }
+  if (Lsparse) { IGRAPH_FINALLY(igraph_sparsemat_destroy, Lsparse); }
 
   /* -------------------------------------------------------------------- */
   /* Compute coarse grained matrix/graph/sparse matrix */
@@ -1212,9 +1218,11 @@ int igraph_scg_adjacency(const igraph_t *graph,
 
   /* -------------------------------------------------------------------- */
   /* Clean up */
-
+  
   igraph_sparsemat_destroy(&Rsparse_t);
   IGRAPH_FINALLY_CLEAN(1);
+  if (Lsparse) { IGRAPH_FINALLY_CLEAN(1); }
+  if (Rsparse) { IGRAPH_FINALLY_CLEAN(1); }
 
   if (graph) {
     igraph_sparsemat_destroy(mysparsemat);
@@ -1373,7 +1381,7 @@ int igraph_scg_stochastic(const igraph_t *graph,
 				     /*values=*/ 0, &tmp));
 
     if (mymatrix) {
-      igraph_matrix_destroy(mytrans);
+      igraph_matrix_destroy(&trans);
       IGRAPH_FINALLY_CLEAN(1);
     } else {
       igraph_sparsemat_destroy(mysparse_trans);
@@ -1425,8 +1433,8 @@ int igraph_scg_stochastic(const igraph_t *graph,
     igraph_matrix_complex_destroy(evec);
     IGRAPH_FINALLY_CLEAN(1);
   }
-  IGRAPH_FINALLY(igraph_sparsemat_destroy, Rsparse);
-  IGRAPH_FINALLY(igraph_sparsemat_destroy, Lsparse);
+  if (Rsparse) { IGRAPH_FINALLY(igraph_sparsemat_destroy, Rsparse); }
+  if (Lsparse) { IGRAPH_FINALLY(igraph_sparsemat_destroy, Lsparse); }
 
   /* -------------------------------------------------------------------- */
   /* Compute coarse grained matrix/graph/sparse matrix */
@@ -1449,6 +1457,8 @@ int igraph_scg_stochastic(const igraph_t *graph,
 
   igraph_sparsemat_destroy(&Rsparse_t);
   IGRAPH_FINALLY_CLEAN(1);
+  if (Lsparse) { IGRAPH_FINALLY_CLEAN(1); }
+  if (Rsparse) { IGRAPH_FINALLY_CLEAN(1); }  
 
   if (graph) {
     igraph_sparsemat_destroy(mysparsemat);
@@ -1616,8 +1626,8 @@ int igraph_scg_laplacian(const igraph_t *graph,
     igraph_matrix_complex_destroy(evec);
     IGRAPH_FINALLY_CLEAN(1);
   }
-  IGRAPH_FINALLY(igraph_sparsemat_destroy, Rsparse);
-  IGRAPH_FINALLY(igraph_sparsemat_destroy, Lsparse);
+  if (Rsparse) { IGRAPH_FINALLY(igraph_sparsemat_destroy, Rsparse); }
+  if (Lsparse) { IGRAPH_FINALLY(igraph_sparsemat_destroy, Lsparse); }
 
   /* -------------------------------------------------------------------- */
   /* Compute coarse grained matrix/graph/sparse matrix */
@@ -1640,6 +1650,8 @@ int igraph_scg_laplacian(const igraph_t *graph,
 
   igraph_sparsemat_destroy(&Rsparse_t);
   IGRAPH_FINALLY_CLEAN(1);
+  if (Lsparse) { IGRAPH_FINALLY_CLEAN(1); }
+  if (Rsparse) { IGRAPH_FINALLY_CLEAN(1); }  
 
   if (graph) {
     igraph_sparsemat_destroy(mysparsemat);
