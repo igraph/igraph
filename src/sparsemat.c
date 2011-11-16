@@ -993,7 +993,7 @@ int igraph_i_sparsemat_cc(igraph_t *graph, const igraph_sparsemat_t *A,
 
   igraph_vector_t edges;
   long int no_of_nodes=A->cs->m;
-  long int no_of_edges=A->cs->nzmax;
+  long int no_of_edges=A->cs->p[A->cs->n];
   int *p=A->cs->p;
   int *i=A->cs->i;
   long int from=0;
