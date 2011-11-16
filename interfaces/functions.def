@@ -94,7 +94,8 @@ igraph_adjacency:
 
 igraph_weighted_adjacency:
         PARAMS: OUT GRAPH graph, MATRIX adjmatrix, \
-                ADJACENCYMODE mode=DIRECTED, CSTRING attr="weight"
+                ADJACENCYMODE mode=DIRECTED, CSTRING attr="weight", \
+                BOOLEAN loops
         IGNORE: RR, RC, RNamespace
 
 igraph_star:

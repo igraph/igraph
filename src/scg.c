@@ -866,13 +866,12 @@ int igraph_i_scg_get_result(igraph_scg_matrix_t type,
     }
 
     if (scg_graph) {
-      /* TODO: no loops for stochastic matrices */
       if (type != IGRAPH_SCG_LAPLACIAN) {
 	IGRAPH_CHECK(igraph_weighted_adjacency(scg_graph, my_scg_matrix, 
 					       directed ? 
 					       IGRAPH_ADJ_DIRECTED : 
 					       IGRAPH_ADJ_UNDIRECTED, 
-					       "weight"));
+					       "weight", /*loops=*/ 1));
       } else {
 	int i, j, n=igraph_matrix_nrow(my_scg_matrix);
 	igraph_matrix_t tmp;
@@ -886,7 +885,7 @@ int igraph_i_scg_get_result(igraph_scg_matrix_t type,
 	IGRAPH_CHECK(igraph_weighted_adjacency(scg_graph, &tmp, directed ?
 					       IGRAPH_ADJ_DIRECTED :
 					       IGRAPH_ADJ_UNDIRECTED, 
-					       "weight"));
+					       "weight", /*loops=*/ 0));
 	igraph_matrix_destroy(&tmp);
 	IGRAPH_FINALLY_CLEAN(1);
       }

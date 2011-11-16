@@ -56,7 +56,7 @@ int main() {
      [ 2 0 0 1 ]
      [ 0 0 1 0 ]
      [ 0 1 0 0 ] */
-  igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_DIRECTED, 0);
+  igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_DIRECTED, 0, /*loops=*/ 1);
   print(&g);
   igraph_destroy(&g);
 
@@ -64,7 +64,7 @@ int main() {
      [ - 0 0 1 ]
      [ - - 1 0 ]
      [ - - - 0 ] */
-  igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_UPPER, 0);
+  igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_UPPER, 0, /*loops=*/ 1);
   print(&g);
   igraph_destroy(&g);
 
@@ -72,7 +72,7 @@ int main() {
      [ 2 0 - - ]
      [ 0 0 1 - ]
      [ 0 1 0 0 ] */
-  igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_LOWER, 0);
+  igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_LOWER, 0, /*loops=*/ 1);
   print(&g);
   igraph_destroy(&g);
 
@@ -80,7 +80,7 @@ int main() {
      [ 1 0 0 1 ]
      [ 0 0 1 0 ]
      [ 0 1 0 0 ] */
-  igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_MIN, 0);
+  igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_MIN, 0, /*loops=*/ 1);
   print(&g);
   igraph_destroy(&g);
 
@@ -88,7 +88,7 @@ int main() {
      [ 2 0 0 1 ]
      [ 2 0 1 0 ]
      [ 0 1 0 0 ] */
-  igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_MAX, 0);
+  igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_MAX, 0, /*loops=*/ 1);
   print(&g);
   igraph_destroy(&g);
 
@@ -96,7 +96,7 @@ int main() {
      [ 3 0 0 2 ]
      [ 2 0 1 0 ]
      [ 0 2 0 0 ] */
-  igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_PLUS, 0);
+  igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_PLUS, 0, /*loops=*/ 1);
   print(&g);
   igraph_destroy(&g);
 
