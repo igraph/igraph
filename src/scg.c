@@ -140,7 +140,7 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
 					      &MATRIX(gr_mat, 0, i), 
 					      no_of_nodes, INVEC(i),
 					      matrix_type, 
-					      p ? VECTOR(*p) : 0));
+					      p ? VECTOR(*p) : 0, 0));
     }
     break;
   case IGRAPH_SCG_INTERV_KM:

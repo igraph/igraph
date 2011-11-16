@@ -34,26 +34,33 @@
 #include <math.h>
 
 int igraph_i_exact_coarse_graining(const igraph_real_t *v, 
-				   int *gr, const int n)
-{
-	int i,gr_nb;
-	igraph_i_scg_indval_t *w = igraph_Calloc(n, igraph_i_scg_indval_t);
+				   int *gr, const int n) {
+  int i, gr_nb;
+  igraph_i_scg_indval_t *w = igraph_Calloc(n, igraph_i_scg_indval_t);
 
-	for(i=0; i<n; i++){
-		w[i].val = v[i];
-		w[i].ind = i;
-	}
+  if (!w) { 
+    IGRAPH_ERROR("SCG error", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, w);
 
-	qsort(w, n, sizeof(igraph_i_scg_indval_t), igraph_i_compare_ind_val);
+  for(i=0; i<n; i++){
+    w[i].val = v[i];
+    w[i].ind = i;
+  }
 
-	gr_nb = 0;
-	gr[w[0].ind] = gr_nb;
-	for(i=1; i<n; i++){
-	  if( fabs(w[i].val - w[i-1].val) > 1e-14 ) gr_nb++;
-			gr[w[i].ind] = gr_nb;
-	}
-	igraph_Free(w);
-	return 0;
+  qsort(w, n, sizeof(igraph_i_scg_indval_t), igraph_i_compare_ind_val);
+  
+  gr_nb = 0;
+  gr[w[0].ind] = gr_nb;
+  for (i=1; i<n; i++) {
+    if ( fabs(w[i].val - w[i-1].val) > 1e-14 ) { gr_nb++; }
+    gr[w[i].ind] = gr_nb;
+  }
+
+  igraph_Free(w);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
 }
 		
 

@@ -50,7 +50,7 @@ int igraph_i_kmeans_Lloyd(const igraph_vector_t *x, int n, int p,
   for (iter = 0; iter < maxiter; iter++) {
     updated = 0;
     for (i = 0; i < n; i++) {
-      //find nearest centre for each point
+      /* find nearest centre for each point */
       best = IGRAPH_INFINITY;
       for (j = 0; j < k; j++) {
 	dd = 0.0;
@@ -70,7 +70,7 @@ int igraph_i_kmeans_Lloyd(const igraph_vector_t *x, int n, int p,
     }
     if (!updated) { break; }
 
-    //update each centre
+    /* update each centre */
     for (j = 0; j < k*p; j++) { VECTOR(*cen)[j] = 0.0; }
     for (j = 0; j < k; j++) { VECTOR(nc)[j] = 0; }
     for (i = 0; i < n; i++) {

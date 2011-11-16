@@ -47,7 +47,7 @@ int igraph_i_compare_ind_val(const void *a, const void *b) {
 }
 
 /*to be used with qsort and struct groups*/  
-int igraph_i_compare_groups(const void *a,const void *b) {
+int igraph_i_compare_groups(const void *a, const void *b) {
   igraph_i_scg_groups_t *arg1 = (igraph_i_scg_groups_t *) a;
   igraph_i_scg_groups_t *arg2 = (igraph_i_scg_groups_t *) b;
   int i;
@@ -59,8 +59,7 @@ int igraph_i_compare_groups(const void *a,const void *b) {
 }
 
 /*to be used with qsort and real_vectors */  
-int igraph_i_compare_real(const void *a, const void *b)
-{
+int igraph_i_compare_real(const void *a, const void *b) {
   igraph_real_t arg1 = * (igraph_real_t *) a;
   igraph_real_t arg2 = * (igraph_real_t *) b;
   

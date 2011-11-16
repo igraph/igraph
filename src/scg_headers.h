@@ -57,7 +57,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <float.h> //for LDBL_MAX in kmeans.c
 
 #include "igraph_types.h"
 #include "igraph_vector.h"
@@ -94,9 +93,9 @@ int igraph_i_intervals_method(const igraph_vector_t *v, int *gr,
 
 int igraph_i_cost_matrix(igraph_real_t *Cv, const igraph_i_scg_indval_t *vs, 
 			  int n, int matrix, const igraph_vector_t *ps);
-igraph_real_t igraph_i_optimal_partition(const igraph_real_t *v, 
-					 int *gr, int n, int nt,
-					 int matrix, const igraph_real_t *p);
+int igraph_i_optimal_partition(const igraph_real_t *v, int *gr, int n, int nt,
+			       int matrix, const igraph_real_t *p, 
+			       igraph_real_t *value);
 
 /*-------------------------------------------------
 ------------DEFINED IN scg_kmeans.c----------------
