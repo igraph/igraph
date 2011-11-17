@@ -2367,8 +2367,21 @@ int R_SEXP_to_vector_complex(SEXP pv, igraph_vector_complex_t *v) {
   return 0;
 }
 
+int R_SEXP_to_vector_complex_copy(SEXP pv, igraph_vector_complex_t *v) {
+  igraph_vector_complex_init_copy(v, COMPLEX(pv), GET_LENGTH(pv));
+  return 0;
+}
+
 int R_SEXP_to_matrix_complex(SEXP pakl, igraph_matrix_complex_t *akl) {
   R_SEXP_to_vector_complex(pakl, &akl->data);
+  akl->nrow=INTEGER(GET_DIM(pakl))[0];
+  akl->ncol=INTEGER(GET_DIM(pakl))[1];
+  return 0;
+}
+
+int R_SEXP_to_matrix_complex_copy(SEXP pakl, igraph_matrix_complex_t *akl) {
+  igraph_vector_complex_init_copy(&akl->data, COMPLEX(pakl),
+				  GET_LENGTH(pakl));
   akl->nrow=INTEGER(GET_DIM(pakl))[0];
   akl->ncol=INTEGER(GET_DIM(pakl))[1];
   return 0;
@@ -3452,16 +3465,17 @@ SEXP R_igraph_graph_adjacency(SEXP adjmatrix, SEXP pmode) {
 }
 
 SEXP R_igraph_weighted_adjacency(SEXP adjmatrix, SEXP pmode,
-				 SEXP pattr) {
+				 SEXP pattr, SEXP ploops) {
   
   igraph_t g;
   igraph_matrix_t adjm;
   igraph_integer_t mode=REAL(pmode)[0];
+  igraph_bool_t loops=LOGICAL(ploops)[0];
   SEXP result;
   const char *attr=CHAR(STRING_ELT(pattr, 0));
   
   R_SEXP_to_matrix(adjmatrix, &adjm);
-  igraph_weighted_adjacency(&g, &adjm, mode, attr);
+  igraph_weighted_adjacency(&g, &adjm, mode, attr, loops);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   

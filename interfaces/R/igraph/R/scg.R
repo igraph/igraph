@@ -75,94 +75,100 @@ scg.semiProjectors <- function(groups,
   res
 }
 
-scg <- function(graph, ev, groups,
+scg <- function(X, ev, intervals, groups=NULL, 
                 matrix.type=c("symmetric", "laplacian", "stochastic"),
-                algorithm=c("optimum", "interv_km", "interv", "exact_scg"),
-                norm=c("row", "col"), direction=c("default", "left", "right"),
-                evec=NULL, evec.cplx=NULL, given.p=NULL, given.groups=NULL,
-                use.arpack=FALSE, maxiter=300) {
+                algorithm=c("optimum", "interv_km", "interv",
+                  "exact_scg"), norm=c("row", "col"),
+                direction=c("default", "left", "right"),
+                evec=NULL, p=NULL, use.arpack=FALSE, maxiter=300)
+  UseMethod("scg")
 
-  ## Argument checks
-  if (!is.igraph(graph)) { stop("Not a graph object") }
-  ev <- as.numeric(ev)
-  groups <- as.numeric(groups)-1
-  matrix.type <- switch(igraph.match.arg(matrix.type), "symmetric"=1, 
-                        "laplacian"=2, "stochastic"=3)
-  algorithm <- switch(igraph.match.arg(algorithm), "optimum"=1,
-                      "interv_km"=2, "interv"=3, "exact_scg"=4)
-  norm <- switch(igraph.match.arg(norm), "row"=1, "col"=2)
-  direction <- switch(igraph.match.arg(direction), "default"=1, "left"=2,
-                      "right"=3)
-  if (!is.null(given.p)) given.p <- as.numeric(given.p)
-  if (!is.null(given.groups)) given.groups <- as.numeric(given.groups)
-  use.arpack <- as.logical(use.arpack)
-  maxiter <- as.integer(maxiter)
-
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  ## Function call
-  res <- .Call("R_igraph_scg", graph, ev, as.integer(groups[1]),
-               if (length(groups)==1) NULL else groups,
-               matrix.type, algorithm, norm, direction, evec, evec.cplx,
-               given.p, given.groups, use.arpack, maxiter,
-               PACKAGE="igraph")
-
-  if (!is.null(res$scg_sparsemat)) {
-    res$scg_sparsemat <- igraph.i.spMatrix(res$scg_sparsemat)
-  }
-  if (!is.null(res$Lsparse)) {
-    res$Lsparse <- igraph.i.spMatrix(res$Lsparse)
-  }
-  if (!is.null(res$Rsparse)) {
-    res$Rsparse <- igraph.i.spMatrix(res$Rsparse)
-  }
-  res
-}
-
-scg.matrix <- function(matrix, ev, groups,
+scg.igraph <- function(X, ev, intervals, groups=NULL,
                        matrix.type=c("symmetric", "laplacian", "stochastic"),
                        algorithm=c("optimum", "interv_km", "interv",
                          "exact_scg"), norm=c("row", "col"),
-                       direction=c("default", "left", "right"), evec,
-                       evec.cplx, given.p, given.groups, use.arpack=FALSE,
-                       maxiter=300) {
-
-  if (inherits(matrix, "Matrix")) {
-    sparsemat <- matrix
-    matrix <- NULL
-  } else {
-    sparsemat <- NULL
-  }
+                       direction=c("default", "left", "right"),
+                       evec=NULL, p=NULL, use.arpack=FALSE, maxiter=300) {
   
+  myscg(graph=X, matrix=NULL, sparsemat=NULL, ev=ev, intervals=intervals,
+        groups=groups, matrix.type=matrix.type, algorithm=algorithm,
+        norm=norm, direction=direction, evec=evec, p=p,
+        use.arpack=use.arpack, maxiter=maxiter)
+}
+
+scg.matrix <- function(X, ev, intervals, groups=NULL,
+                       matrix.type=c("symmetric", "laplacian", "stochastic"),
+                       algorithm=c("optimum", "interv_km", "interv",
+                         "exact_scg"), norm=c("row", "col"),
+                       direction=c("default", "left", "right"),
+                       evec=NULL, p=NULL, use.arpack=FALSE, maxiter=300) {
+  
+  myscg(graph=NULL, matrix=X, sparsemat=NULL, ev=ev, intervals=intervals,
+        groups=groups, matrix.type=matrix.type, algorithm=algorithm,
+        norm=norm, direction=direction, evec=evec, p=p, 
+        use.arpack=use.arpack, maxiter=maxiter)
+}
+
+scg.Matrix <- function(X, ev, intervals, groups=NULL,
+                       matrix.type=c("symmetric", "laplacian", "stochastic"),
+                       algorithm=c("optimum", "interv_km", "interv",
+                         "exact_scg"), norm=c("row", "col"),
+                       direction=c("default", "left", "right"),
+                       evec=NULL, p=NULL, use.arpack=FALSE, maxiter=300) {
+
+  myscg(graph=NULL, matrix=NULL, sparsemat=X, ev=ev, intervals=intervals,
+        groups=groups, matrix.type=matrix.type, algorithm=algorithm,
+        norm=norm, direction=direction, evec=evec, p=p, use.arpack=use.arpack,
+        maxiter=maxiter)
+}
+
+myscg <- function(graph, matrix, sparsemat, ev, intervals, groups=NULL,
+                  matrix.type=c("symmetric", "laplacian", "stochastic"),
+                  algorithm=c("optimum", "interv_km", "interv",
+                    "exact_scg"), norm=c("row", "col"),
+                  direction=c("default", "left", "right"),
+                  evec=NULL, p=NULL, use.arpack=FALSE, maxiter=300) {
+
   ## Argument checks
-  if (!is.null(matrix)) {
-    matrix <- structure(as.numeric(matrix), dim=dim(matrix))
-  }
-  if (!is.null(sparsemat)) { 
-    sparsemat <- as(sparsemat, "dgCMatrix") 
-  }
-  ev <- as.numeric(ev)
-  groups <- as.numeric(groups)-1
-  matrix.type <- switch(igraph.match.arg(matrix.type), "symmetric"=1, 
-                        "laplacian"=2, "stochastic"=3)
+  if (!is.null(graph))  { stopifnot(is.igraph(graph)) }
+  if (!is.null(matrix)) { stopifnot(is.matrix(matrix)) }
+  if (!is.null(sparsemat)) { stopifnot(inherits(sparsemat, "Matrix")) }
+
+  if (!is.null(sparsemat)) { sparsemat <- as(sparsemat, "dgCMatrix") }
+  ev <- as.numeric(as.integer(ev))
+  intervals <- as.numeric(as.integer(intervals))
+  if (!is.null(groups)) groups <- as.numeric(groups)
+  matrix.type <- igraph.match.arg(matrix.type)
   algorithm <- switch(igraph.match.arg(algorithm), "optimum"=1, "interv_km"=2,
                       "interv"=3, "exact_scg"=4)
-  norm <- switch(igraph.match.arg(norm), "row"=1, "col"=2)
-  direction <- switch(igraph.match.arg(direction), "default"=1, "left"=2,
-                      "right"=3)
-  if (!is.null(given.p)) given.p <- as.numeric(given.p)
-  if (!is.null(given.groups)) given.groups <- as.numeric(given.groups)
+  if (!is.null(evec))   { storage.mode(evec)   <- "double" }
+  if (!is.null(groups)) { storage.mode(groups) <- "double" }
   use.arpack <- as.logical(use.arpack)
   maxiter <- as.integer(maxiter)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  ## Function call
-  res <- .Call("R_igraph_scg_matrix", matrix, sparsemat, ev,
-               as.integer(groups[1]),
-               if (length(groups)==1) NULL else groups,
-               matrix.type, algorithm, norm, direction, evec, evec.cplx,
-               given.p, given.groups, use.arpack, maxiter,
-               PACKAGE="igraph")
-  
+  if (matrix.type=="symmetric") {
+    res <- .Call("R_igraph_scg_adjacency", graph, matrix, sparsemat, ev,
+                 intervals=0L, intervals, algorithm, eval=NULL, evec, groups,
+                 use.arpack, maxiter,
+                 PACKAGE="igraph")
+  } else if (matrix.type=="laplacian") {
+    norm <- switch(igraph.match.arg(norm), "row"=1, "col"=2)
+    direction <- switch(igraph.match.arg(direction), "default"=1, "left"=2,
+                        "right"=3)
+    res <- .Call("R_igraph_scg_laplacian", graph, matrix, sparsemat, ev,
+                 intervals=0L, intervals, algorithm, norm, direction,
+                 eval=NULL, evec, groups, use.arpack, maxiter,
+                 PACKAGE="igraph")
+  } else if (matrix.type=="stochastic") {
+    norm <- switch(igraph.match.arg(norm), "row"=1, "col"=2)
+    if (!is.null(p)) { storage.mode(p)      <- "double" }
+    res <- .Call("R_igraph_scg_stochastic", graph, matrix, sparsemat, ev,
+                 intervals=0L, intervals, algorithm, norm,
+                 eval=NULL, evec, groups, p, use.arpack, maxiter,
+                 PACKAGE="igraph")    
+  }
+
   if (!is.null(res$scg_sparsemat)) {
     res$scg_sparsemat <- igraph.i.spMatrix(res$scg_sparsemat)
   }
@@ -172,6 +178,6 @@ scg.matrix <- function(matrix, ev, groups,
   if (!is.null(res$Rsparse)) {
     res$Rsparse <- igraph.i.spMatrix(res$Rsparse)
   }
+
   res
 }
-

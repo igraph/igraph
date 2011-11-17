@@ -134,6 +134,7 @@ int main() {
   igraph_sparsemat_destroy(&Lsparse);
   igraph_sparsemat_destroy(&Rsparse);
 
+  igraph_vector_destroy(&groups);
   igraph_matrix_destroy(&input_matrix);
   igraph_matrix_destroy(&scg_matrix);
   igraph_matrix_destroy(&L);
