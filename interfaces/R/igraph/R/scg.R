@@ -141,19 +141,20 @@ myscg <- function(graph, matrix, sparsemat, ev, intervals, groups=NULL,
   matrix.type <- igraph.match.arg(matrix.type)
   algorithm <- switch(igraph.match.arg(algorithm), "optimum"=1, "interv_km"=2,
                       "interv"=3, "exact_scg"=4)
-  if (!is.null(evec))   { storage.mode(evec)   <- "double" }
   if (!is.null(groups)) { storage.mode(groups) <- "double" }
   use.arpack <- as.logical(use.arpack)
   maxiter <- as.integer(maxiter)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   if (matrix.type=="symmetric") {
+    if (!is.null(evec)) { storage.mode(evec)   <- "double" }
     res <- .Call("R_igraph_scg_adjacency", graph, matrix, sparsemat, ev,
                  intervals=0L, intervals, algorithm, eval=NULL, evec, groups,
                  use.arpack, maxiter,
                  PACKAGE="igraph")
   } else if (matrix.type=="laplacian") {
     norm <- switch(igraph.match.arg(norm), "row"=1, "col"=2)
+    if (!is.null(evec)) { storage.mode(evec)   <- "complex" }
     direction <- switch(igraph.match.arg(direction), "default"=1, "left"=2,
                         "right"=3)
     res <- .Call("R_igraph_scg_laplacian", graph, matrix, sparsemat, ev,
@@ -162,6 +163,7 @@ myscg <- function(graph, matrix, sparsemat, ev, intervals, groups=NULL,
                  PACKAGE="igraph")
   } else if (matrix.type=="stochastic") {
     norm <- switch(igraph.match.arg(norm), "row"=1, "col"=2)
+    if (!is.null(evec)) { storage.mode(evec)   <- "complex" }
     if (!is.null(p)) { storage.mode(p)      <- "double" }
     res <- .Call("R_igraph_scg_stochastic", graph, matrix, sparsemat, ev,
                  intervals=0L, intervals, algorithm, norm,
