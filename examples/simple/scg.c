@@ -34,6 +34,8 @@ int main() {
   igraph_sparsemat_t Lsparse, Rsparse;
   igraph_matrix_t input_matrix;
   igraph_vector_t groups;
+  igraph_vector_t eval;
+  igraph_matrix_t evec;
   
   igraph_tree(&g, 10, /* children= */ 3, IGRAPH_TREE_UNDIRECTED);
   
@@ -42,16 +44,20 @@ int main() {
   igraph_matrix_init(&R, 0, 0);
   igraph_matrix_init(&scg_matrix, 0, 0);
   igraph_vector_init(&groups, 0);
+  igraph_vector_init(&eval, 0);
+  igraph_matrix_init(&evec, 0, 0);
 
-#define CALLSYM(algo)							\
-  igraph_scg_adjacency(&g, /*matrix=*/ 0, /*sparsemat=*/ 0, &ev,	\
-		       /* intervals= */ 3, /* intervals_vector= */ 0,	\
-		       /* algorithm= */ algo,				\
-		       /* eval= */ 0, /* evec= */ 0,			\
-		       /* groups= */ &groups, /* use_arpack= */ 0,	\
-		       /* maxiter= */ 0, &scg_graph, &scg_matrix,	\
-		       &scg_sparsemat, &L, &R,				\
-		       &Lsparse, &Rsparse)
+#define CALLSYM(algo) do {						\
+    igraph_vector_clear(&eval);						\
+    igraph_matrix_resize(&evec, 0, 0);					\
+    igraph_scg_adjacency(&g, /*matrix=*/ 0, /*sparsemat=*/ 0, &ev,	\
+			 /* intervals= */ 3, /* intervals_vector= */ 0,	\
+			 /* algorithm= */ algo, &eval, &evec,		\
+			 /* groups= */ &groups, /* use_arpack= */ 0,	\
+			 /* maxiter= */ 0, &scg_graph, &scg_matrix,	\
+			 &scg_sparsemat, &L, &R,			\
+			 &Lsparse, &Rsparse); } while(0)
+
   
 #define PRINTRES()						\
   do {								\
@@ -59,6 +65,9 @@ int main() {
     igraph_write_graph_edgelist(&scg_graph, stdout);		\
     printf("---\n");						\
     igraph_vector_print(&groups);				\
+    printf("---\n");						\
+    igraph_vector_print(&eval);					\
+    igraph_matrix_print(&evec);					\
     printf("---\n");						\
     igraph_sparsemat_print(&scg_sparsemat, stdout);		\
     printf("---\n");						\
@@ -93,16 +102,17 @@ int main() {
   igraph_sparsemat_destroy(&Lsparse);
   igraph_sparsemat_destroy(&Rsparse);
 
-#define CALLSYM2(algo)							\
-  igraph_scg_adjacency(/* graph=*/ 0, &input_matrix, /*sparsemat=*/ 0,	\
-		       &ev, /* intervals= */ 3,				\
-		       /* intervals_vector= */ 0,			\
-		       /* algorithm= */ algo,				\
-		       /* eval= */ 0, /* evec= */ 0,			\
-		       /* groups= */ &groups, /* use_arpack= */ 0,	\
-		       /* maxiter= */ 0, &scg_graph, &scg_matrix,	\
-		       &scg_sparsemat, &L, &R,				\
-		       &Lsparse, &Rsparse)
+#define CALLSYM2(algo) do {						\
+    igraph_vector_clear(&eval);						\
+    igraph_matrix_resize(&evec, 0, 0);					\
+    igraph_scg_adjacency(/* graph=*/ 0, &input_matrix, /*sparsemat=*/ 0, \
+			 &ev, /* intervals= */ 3,			\
+			 /* intervals_vector= */ 0,			\
+			 /* algorithm= */ algo, &eval, &evec,		\
+			 /* groups= */ &groups, /* use_arpack= */ 0,	\
+			 /* maxiter= */ 0, &scg_graph, &scg_matrix,	\
+			 &scg_sparsemat, &L, &R,			\
+			 &Lsparse, &Rsparse); } while (0)
 
   igraph_matrix_init(&input_matrix, 0, 0);
   igraph_get_adjacency(&g, &input_matrix, IGRAPH_GET_ADJACENCY_BOTH, 
@@ -134,6 +144,8 @@ int main() {
   igraph_sparsemat_destroy(&Lsparse);
   igraph_sparsemat_destroy(&Rsparse);
 
+  igraph_matrix_destroy(&evec);
+  igraph_vector_destroy(&eval);
   igraph_vector_destroy(&groups);
   igraph_matrix_destroy(&input_matrix);
   igraph_matrix_destroy(&scg_matrix);

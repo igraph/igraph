@@ -1145,12 +1145,14 @@ int igraph_scg_adjacency(const igraph_t *graph,
     igraph_eigen_which_t which;
     igraph_matrix_t tmp;
     igraph_vector_t tmpev;
+    igraph_vector_t tmpeval;
     int i;
     
     which.pos = IGRAPH_EIGEN_SELECT;
     which.il = no_of_nodes-evmax+1;
     which.iu = no_of_nodes-evmin+1;
 
+    if (eval) { IGRAPH_VECTOR_INIT_FINALLY(&tmpeval, 0); }
     IGRAPH_CHECK(igraph_matrix_init(&tmp, no_of_nodes, 
 				    which.iu-which.il+1));
     IGRAPH_FINALLY(igraph_matrix_destroy, &tmp);
@@ -1161,16 +1163,21 @@ int igraph_scg_adjacency(const igraph_t *graph,
 					       use_arpack ? 
 					       IGRAPH_EIGEN_ARPACK : 
 					       IGRAPH_EIGEN_LAPACK, &which, 
-					       &options, /* values= */ 0, 
+					       &options, eval ? &tmpeval : 0,
 					       &tmp));
     IGRAPH_VECTOR_INIT_FINALLY(&tmpev, no_of_ev);
     for (i=0; i<no_of_ev; i++) {
       VECTOR(tmpev)[i] = evmax - VECTOR(*ev)[i];
     }
+    if (eval) { IGRAPH_CHECK(igraph_vector_index(&tmpeval, eval, &tmpev)); }
     IGRAPH_CHECK(igraph_matrix_select_cols(&tmp, evec, &tmpev));
     igraph_vector_destroy(&tmpev);
     igraph_matrix_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(2);
+    if (eval) { 
+      igraph_vector_destroy(&tmpeval);
+      IGRAPH_FINALLY_CLEAN(1);
+    }
   }
 
   /* -------------------------------------------------------------------- */
@@ -1330,12 +1337,17 @@ int igraph_scg_stochastic(const igraph_t *graph,
   if (do_evec || tmp_evec) {
     igraph_matrix_complex_t tmp;
     igraph_vector_t tmpev;
+    igraph_vector_complex_t tmpeval;
     int i;
 
     which.pos = IGRAPH_EIGEN_SELECT;
     which.il = no_of_nodes-evmax+1;
     which.iu = no_of_nodes-evmin+1;
 
+    if (eval) { 
+      IGRAPH_CHECK(igraph_vector_complex_init(&tmpeval, 0));
+      IGRAPH_FINALLY(igraph_vector_complex_destroy, &tmpeval);
+    }
     IGRAPH_CHECK(igraph_matrix_complex_init(&tmp, no_of_nodes, 
 					    which.iu-which.il+1));
     IGRAPH_FINALLY(igraph_matrix_complex_destroy, &tmp);
@@ -1343,16 +1355,23 @@ int igraph_scg_stochastic(const igraph_t *graph,
 				     /*extra=*/ 0, use_arpack ? 
 				     IGRAPH_EIGEN_ARPACK : 
 				     IGRAPH_EIGEN_LAPACK, &which, &options, 
-				     /*values=*/ 0, &tmp));
+				     eval ? &tmpeval: 0, &tmp));
     
     IGRAPH_VECTOR_INIT_FINALLY(&tmpev, no_of_ev);
     for (i=0; i<no_of_ev; i++) {
       VECTOR(tmpev)[i] = evmax - VECTOR(*ev)[i];
     }
+    if (eval) { 
+      IGRAPH_CHECK(igraph_vector_complex_index(&tmpeval, eval, &tmpev)); 
+    }
     IGRAPH_CHECK(igraph_matrix_complex_select_cols(&tmp, evec, &tmpev));
     igraph_vector_destroy(&tmpev);
     igraph_matrix_complex_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(2);
+    if (eval) { 
+      igraph_vector_complex_destroy(&tmpeval);
+      IGRAPH_FINALLY_CLEAN(1);
+    }
   }
 
   /* Compute p if not supplied */
@@ -1571,12 +1590,17 @@ int igraph_scg_laplacian(const igraph_t *graph,
   if (do_evec || tmp_evec) {
     igraph_matrix_complex_t tmp;
     igraph_vector_t tmpev;
+    igraph_vector_complex_t tmpeval;
     int i;
 
     which.pos = IGRAPH_EIGEN_SELECT;
     which.il = no_of_nodes-evmax+1;
     which.iu = no_of_nodes-evmin+1;
 
+    if (eval) { 
+      IGRAPH_CHECK(igraph_vector_complex_init(&tmpeval, 0));
+      IGRAPH_FINALLY(igraph_vector_complex_destroy, &tmpeval);
+    }
     IGRAPH_CHECK(igraph_matrix_complex_init(&tmp, no_of_nodes, 
 					    which.iu-which.il+1));
     IGRAPH_FINALLY(igraph_matrix_complex_destroy, &tmp);
@@ -1584,16 +1608,23 @@ int igraph_scg_laplacian(const igraph_t *graph,
 				     /*extra=*/ 0, use_arpack ? 
 				     IGRAPH_EIGEN_ARPACK : 
 				     IGRAPH_EIGEN_LAPACK, &which, &options, 
-				     /*values=*/ 0, &tmp));
+				     eval ? &tmpeval : 0, &tmp));
     
     IGRAPH_VECTOR_INIT_FINALLY(&tmpev, no_of_ev);
     for (i=0; i<no_of_ev; i++) {
       VECTOR(tmpev)[i] = evmax - VECTOR(*ev)[i];
     }
+    if (eval) { 
+      IGRAPH_CHECK(igraph_vector_complex_index(&tmpeval, eval, &tmpev)); 
+    }
     IGRAPH_CHECK(igraph_matrix_complex_select_cols(&tmp, evec, &tmpev));
     igraph_vector_destroy(&tmpev);
     igraph_matrix_complex_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(2);
+    if (eval) { 
+      igraph_vector_complex_destroy(&tmpeval);
+      IGRAPH_FINALLY_CLEAN(1);
+    }
   }
 
   /* -------------------------------------------------------------------- */
