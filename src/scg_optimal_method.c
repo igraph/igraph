@@ -129,6 +129,8 @@ int igraph_i_optimal_partition(const igraph_real_t *v, int *gr, int n,
       }
     }
   igraph_i_free_real_sym_matrix(Cv);
+  IGRAPH_FINALLY_CLEAN(1);
+
   /*--------------------------------------------------
     -------Back-tracks through Q to work out the groups-
     --------------------------------------------------*/
