@@ -1107,8 +1107,8 @@ int igraph_i_weighted_sparsemat_cc(const igraph_sparsemat_t *A,
   while (*p < no_of_edges) {
     while (to < *(p+1)) {
       if ( (loops || from != *i) && (directed || from >= *i) && *x != 0) {
-	VECTOR(*edges)[e++] = from;
 	VECTOR(*edges)[e++] = (*i);
+	VECTOR(*edges)[e++] = from;
 	VECTOR(*weights)[w++] = (*x);
       }
       to++;
