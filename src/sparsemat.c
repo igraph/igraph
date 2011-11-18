@@ -2359,19 +2359,11 @@ int igraph_sparsemat_getelements(const igraph_sparsemat_t *A,
   return 0;
 }
 
-int igraph_i_sparsemat_scale_rows_cc(igraph_sparsemat_t *A,
-				     const igraph_vector_t *fact) {
-
-  IGRAPH_ERROR("Cannot scale rows of a cc matrix", 
-	       IGRAPH_UNIMPLEMENTED);
-  return 0;
-}
-
-int igraph_i_sparsemat_scale_rows_triplet(igraph_sparsemat_t *A,
-					  const igraph_vector_t *fact) {
+int igraph_sparsemat_scale_rows(igraph_sparsemat_t *A,
+				const igraph_vector_t *fact) {
   int *i=A->cs->i;
   igraph_real_t *x=A->cs->x;
-  int no_of_edges=A->cs->nz;
+  int no_of_edges=A->cs->nz < 0 ? A->cs->p[A->cs->n] : A->cs->nz;
   int e;
 
   for (e=0; e<no_of_edges; e++, x++, i++) {
@@ -2382,20 +2374,21 @@ int igraph_i_sparsemat_scale_rows_triplet(igraph_sparsemat_t *A,
   return 0;
 }
 
-int igraph_sparsemat_scale_rows(igraph_sparsemat_t *A,
-				const igraph_vector_t *fact) {
-  if (A->cs->nz < 0) { 
-    return igraph_i_sparsemat_scale_rows_cc(A, fact);
-  } else {
-    return igraph_i_sparsemat_scale_rows_triplet(A, fact);
-  }
-}
-
 int igraph_i_sparsemat_scale_cols_cc(igraph_sparsemat_t *A,
 				     const igraph_vector_t *fact) {
+  int *i=A->cs->i;
+  igraph_real_t *x=A->cs->x;
+  int no_of_edges=A->cs->p[A->cs->n];
+  int e;
+  int c=0;			/* actual column */
+  
+  for (e=0; e<no_of_edges; e++, x++, i++) {
+    igraph_real_t f;
+    while (c < A->cs->n && A->cs->p[c+1] == e) { c++; }
+    f=VECTOR(*fact)[c];
+    (*x) *= f;
+  }
 
-  IGRAPH_ERROR("Cannot scale rows of a cc matrix", 
-	       IGRAPH_UNIMPLEMENTED);
   return 0;
 }
 
@@ -2417,9 +2410,9 @@ int igraph_i_sparsemat_scale_cols_triplet(igraph_sparsemat_t *A,
 int igraph_sparsemat_scale_cols(igraph_sparsemat_t *A,
 				const igraph_vector_t *fact) {
   if (A->cs->nz < 0) {
-    return igraph_i_sparsemat_scale_rows_cc(A, fact);
+    return igraph_i_sparsemat_scale_cols_cc(A, fact);
   } else {
-    return igraph_i_sparsemat_scale_rows_triplet(A, fact);
+    return igraph_i_sparsemat_scale_cols_triplet(A, fact);
   }
 }
 
