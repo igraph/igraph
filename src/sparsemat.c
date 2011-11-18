@@ -584,6 +584,57 @@ int igraph_sparsemat_transpose(const igraph_sparsemat_t *A,
   return 0;
 }
 
+igraph_bool_t 
+igraph_i_sparsemat_is_symmetric_cc(const igraph_sparsemat_t *A) {
+  igraph_sparsemat_t t, tt;
+  igraph_bool_t res;
+  int nz;
+
+  IGRAPH_CHECK(igraph_sparsemat_transpose(A, &t, /*values=*/ 1));
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &t);
+  IGRAPH_CHECK(igraph_sparsemat_dupl(&t));
+  IGRAPH_CHECK(igraph_sparsemat_transpose(&t, &tt, /*values=*/ 1));
+  igraph_sparsemat_destroy(&t);
+  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &tt);
+  IGRAPH_CHECK(igraph_sparsemat_transpose(&tt, &t, /*values=*/ 1));
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &t);
+
+  nz=t.cs->p[t.cs->n];
+  res = memcmp(t.cs->i, tt.cs->i, sizeof(int) * nz) == 0;
+  res = res && memcmp(t.cs->p, tt.cs->p, sizeof(int) * (t.cs->n+1)) == 0;
+  res = res && memcmp(t.cs->x, tt.cs->x, sizeof(igraph_real_t) * nz)==0;
+
+  igraph_sparsemat_destroy(&t);
+  igraph_sparsemat_destroy(&tt);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return res;
+}
+
+igraph_bool_t 
+igraph_i_sparsemat_is_symmetric_triplet(const igraph_sparsemat_t *A) {
+  igraph_sparsemat_t tmp;
+  igraph_bool_t res;
+  IGRAPH_CHECK(igraph_sparsemat_compress(A, &tmp));
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmp);
+  res=igraph_i_sparsemat_is_symmetric_cc(&tmp);
+  igraph_sparsemat_destroy(&tmp);
+  IGRAPH_FINALLY_CLEAN(1);
+  return res;
+}
+
+igraph_bool_t igraph_sparsemat_is_symmetric(const igraph_sparsemat_t *A) {
+
+  if (A->cs->m != A->cs->n) { return 0; }
+
+  if (A->cs->nz < 0) {
+    return igraph_i_sparsemat_is_symmetric_cc(A);
+  } else {
+    return igraph_i_sparsemat_is_symmetric_triplet(A);
+  }
+}
+
 /**
  * \function igraph_sparsemat_dupl
  * Remove duplicate elements from a sparse matrix
