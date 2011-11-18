@@ -7375,7 +7375,7 @@ SEXP R_igraph_scg_stochastic(SEXP graph, SEXP matrix, SEXP sparsmat, SEXP ev,
   igraph_vector_t c_ev;
   igraph_vector_t c_intervals_vector;
   igraph_integer_t c_algorithm=REAL(algorithm)[0];
-  igraph_integer_t c_norm;
+  igraph_integer_t c_norm=REAL(norm)[0];
   igraph_vector_complex_t c_eval;
   igraph_matrix_complex_t c_evec;
   igraph_vector_t c_groups;
