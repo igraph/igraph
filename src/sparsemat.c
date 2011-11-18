@@ -2489,6 +2489,7 @@ int igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
 int igraph_i_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n, 
 			    int *p, int *i, double *x, int nz) {
 
+  A->cs = cs_calloc(1, sizeof(cs_di));
   A->cs->nzmax = nzmax;
   A->cs->m = m;
   A->cs->n = n;
@@ -2533,9 +2534,6 @@ int igraph_sparsemat_getelements_sorted(const igraph_sparsemat_t *A,
 }
 
 int igraph_sparsemat_nzmax(const igraph_sparsemat_t *A) {
-  if (A->cs->nz < 0) {
-    IGRAPH_ERROR("A triplet matrix is required", IGRAPH_EINVAL);
-  }
   return A->cs->nzmax;
 }
 
@@ -2553,18 +2551,18 @@ int igraph_sparsemat_neg(igraph_sparsemat_t *A) {
 int igraph_sparsemat_iterator_init(igraph_sparsemat_iterator_t *it,
 				   igraph_sparsemat_t *sparsemat) {
 
-  if (!igraph_sparsemat_is_triplet(sparsemat)) {
-    IGRAPH_ERROR("Iterators are only implemented for triplet matrices",
-		 IGRAPH_UNIMPLEMENTED);
-  }
   it->mat=sparsemat;
-  it->pos=0;
-  
+  igraph_sparsemat_iterator_reset(it);
   return 0;
 }
 
 int igraph_sparsemat_iterator_reset(igraph_sparsemat_iterator_t *it) {
-  it->pos = 0;
+  it->pos=0;
+  if (!igraph_sparsemat_is_triplet(it->mat)) {
+    it->col=0;
+    while (it->col < it->mat->cs->n && 
+	   it->mat->cs->p[it->col] == 0) { it->col ++; }
+  }
   return 0;
 }
 
@@ -2583,8 +2581,7 @@ int igraph_sparsemat_iterator_col(const igraph_sparsemat_iterator_t *it) {
   if (igraph_sparsemat_is_triplet(it->mat)) {
     return it->mat->cs->p[it->pos];
   } else {
-    /* TODO */
-    return -1;
+    return it->col;
   }
 }
 
@@ -2595,6 +2592,10 @@ igraph_sparsemat_iterator_get(const igraph_sparsemat_iterator_t *it) {
 
 int igraph_sparsemat_iterator_next(igraph_sparsemat_iterator_t *it) {
   it->pos += 1;
+  while (it->col < it->mat->cs->n && 
+	 it->mat->cs->p[it->col+1] == it->pos) {
+    it->col++;
+  }
   return it->pos;
 }
 

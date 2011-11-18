@@ -52,7 +52,8 @@ typedef enum { IGRAPH_SPARSEMAT_TRIPLET,
 
 typedef struct {
   igraph_sparsemat_t *mat;
-  int pos;  
+  int pos;
+  int col;
 } igraph_sparsemat_iterator_t;
 
 int igraph_sparsemat_init(igraph_sparsemat_t *A, int rows, int cols, int nzmax);
