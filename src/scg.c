@@ -1319,12 +1319,10 @@ int igraph_scg_stochastic(const igraph_t *graph,
     mymatrix=&real_matrix;
     IGRAPH_CHECK(igraph_i_matrix_stochastic(matrix, mymatrix, norm));
     IGRAPH_FINALLY(igraph_matrix_destroy, mymatrix);
-    igraph_matrix_print(mymatrix);
   } else { /* sparsemat */
     mysparsemat=&real_sparsemat;
     IGRAPH_CHECK(igraph_i_sparsemat_stochastic(sparsemat, mysparsemat, norm));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparsemat);
-    igraph_sparsemat_print(mysparsemat, stdout);
   }
 
   /* -------------------------------------------------------------------- */
