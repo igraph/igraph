@@ -1105,6 +1105,7 @@ int igraph_scg_adjacency(const igraph_t *graph,
   igraph_sparsemat_t myLsparse, myRsparse, tmpsparse, Rsparse_t;
   int no_of_nodes;
   igraph_real_t evmin, evmax;
+  igraph_bool_t directed;
   
   /* --------------------------------------------------------------------*/
   /* Argument checks */
@@ -1117,10 +1118,13 @@ int igraph_scg_adjacency(const igraph_t *graph,
 
   if (graph) { 
     no_of_nodes=igraph_vcount(graph); 
+    directed=igraph_is_directed(graph);
   } else if (matrix) {
     no_of_nodes=igraph_matrix_nrow(matrix);
+    directed=!igraph_matrix_is_symmetric(matrix);
   } else {
     no_of_nodes=igraph_sparsemat_nrow(sparsemat);
+    directed=!igraph_sparsemat_is_symmetric(sparsemat);
   }
 
   /* -------------------------------------------------------------------- */
@@ -1228,7 +1232,7 @@ int igraph_scg_adjacency(const igraph_t *graph,
 				       matrix, mysparsemat,
 				       Lsparse, &Rsparse_t,
 				       scg_graph, scg_matrix, 
-				       scg_sparsemat, /*directed=*/ 0));
+				       scg_sparsemat, directed));
 
   /* -------------------------------------------------------------------- */
   /* Clean up */
