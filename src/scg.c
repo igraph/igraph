@@ -1285,8 +1285,8 @@ int igraph_scg_stochastic(const igraph_t *graph,
   igraph_bool_t tmp_evec= !do_evec && do_groups;
   igraph_matrix_complex_t myevec;
   igraph_vector_t mygroups;
-  igraph_bool_t do_p= p && igraph_vector_size(p)==0;
-  igraph_vector_t *myp=(igraph_vector_t *) p;
+  igraph_bool_t do_p= !p || igraph_vector_size(p)==0;
+  igraph_vector_t *myp=(igraph_vector_t *) p, real_p;
   int no_of_ev=igraph_vector_size(ev);
   igraph_bool_t tmp_lsparse=!Lsparse, tmp_rsparse=!Rsparse;
   igraph_sparsemat_t myLsparse, myRsparse, tmpsparse, Rsparse_t;
@@ -1383,6 +1383,12 @@ int igraph_scg_stochastic(const igraph_t *graph,
     igraph_sparsemat_t sparse_trans, *mysparse_trans=&sparse_trans;
     int i;
     igraph_arpack_options_init(&o);
+    if (!p) { 
+      IGRAPH_VECTOR_INIT_FINALLY(&real_p, no_of_nodes);
+      myp=&real_p;
+    } else { 
+      IGRAPH_CHECK(igraph_vector_resize(p, no_of_nodes));
+    }
     IGRAPH_CHECK(igraph_matrix_complex_init(&tmp, 0, 0));
     IGRAPH_FINALLY(igraph_matrix_complex_destroy, &tmp);
     w.pos=IGRAPH_EIGEN_LR;
@@ -1415,7 +1421,6 @@ int igraph_scg_stochastic(const igraph_t *graph,
       IGRAPH_FINALLY_CLEAN(1);
     }
 
-    IGRAPH_CHECK(igraph_vector_resize(myp, no_of_nodes));
     for (i=0; i<no_of_nodes; i++) {
       VECTOR(*myp)[i] = fabs(IGRAPH_REAL(MATRIX(tmp, i, 0)));
     }
@@ -1454,6 +1459,10 @@ int igraph_scg_stochastic(const igraph_t *graph,
 					 L, R, Lsparse, Rsparse, myp, norm));
   if (tmp_groups) {
     igraph_vector_destroy((igraph_vector_t*) groups);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  if (!p && do_p) { 
+    igraph_vector_destroy(myp);
     IGRAPH_FINALLY_CLEAN(1);
   }
   if (tmp_evec) {
