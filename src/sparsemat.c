@@ -2554,7 +2554,7 @@ int igraph_sparsemat_iterator_reset(igraph_sparsemat_iterator_t *it) {
   if (!igraph_sparsemat_is_triplet(it->mat)) {
     it->col=0;
     while (it->col < it->mat->cs->n && 
-	   it->mat->cs->p[it->col] == 0) { it->col ++; }
+	   it->mat->cs->p[it->col+1] == it->pos) { it->col ++; }
   }
   return 0;
 }
