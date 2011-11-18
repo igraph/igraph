@@ -1485,7 +1485,7 @@ int igraph_scg_stochastic(const igraph_t *graph,
 				       mymatrix, mysparsemat,
 				       Lsparse, &Rsparse_t,
 				       scg_graph, scg_matrix, 
-				       scg_sparsemat, /*directed=*/ 0));
+				       scg_sparsemat, /*directed=*/ 1));
 
   /* -------------------------------------------------------------------- */
   /* Clean up */
