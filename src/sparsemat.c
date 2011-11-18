@@ -571,7 +571,7 @@ int igraph_sparsemat_transpose(const igraph_sparsemat_t *A,
   if (A->cs->nz < 0) {
     /* column-compressed */
     if (! (res->cs=cs_transpose(A->cs, values)) ) {
-      IGRAPH_ERROR("Cannot transpose sparse matrix", IGRAPH_FAILURE);
+      IGRAPH_ERROR("Cannot transpose sparse matrix", IGRAPH_FAILURE); 
     }
   } else {
     /* triplets */
