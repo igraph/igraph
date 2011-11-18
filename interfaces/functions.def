@@ -1570,7 +1570,7 @@ igraph_scg_adjacency:
                 OUT SPARSEMAT_OR_0 scg_sparsemat, OUT MATRIX_OR_0 L, \
                 OUT MATRIX_OR_0 R, OUT SPARSEMAT_OR_0 Lsparse, \
                 OUT SPARSEMAT_OR_0 Rsparse
-        IGNORE: RR, RNamespace
+        IGNORE: RR, RC, RNamespace
 
 igraph_scg_stochastic:
         PARAMS: GRAPH_OR_0 graph, MATRIX_OR_0 matrix, \
@@ -1584,7 +1584,7 @@ igraph_scg_stochastic:
                 OUT SPARSEMAT_OR_0 scg_sparsemat, OUT MATRIX_OR_0 L, \
                 OUT MATRIX_OR_0 R, OUT SPARSEMAT_OR_0 Lsparse, \
                 OUT SPARSEMAT_OR_0 Rsparse
-        IGNORE: RR, RNamespace
+        IGNORE: RR, RC, RNamespace
 
 igraph_scg_laplacian:
         PARAMS: GRAPH_OR_0 graph, MATRIX_OR_0 matrix, \
@@ -1598,7 +1598,7 @@ igraph_scg_laplacian:
                 OUT SPARSEMAT_OR_0 scg_sparsemat, OUT MATRIX_OR_0 L, \
                 OUT MATRIX_OR_0 R, OUT SPARSEMAT_OR_0 Lsparse, \
                 OUT SPARSEMAT_OR_0 Rsparse
-        IGNORE: RR, RNamespace
+        IGNORE: RR, RC, RNamespace
 
 
 #######################################
