@@ -795,8 +795,7 @@ int igraph_i_sparsemat_laplacian(const igraph_sparsemat_t *sparse,
 
   /* Diagonal */
   for (i=0; i<n; i++) {
-    igraph_real_t t=VECTOR(degree)[i] > 0 ? 1 : 0;
-    igraph_sparsemat_entry(mysparse, i, i, t);
+    igraph_sparsemat_entry(mysparse, i, i, VECTOR(degree)[i]);
   }
 
   /* And the rest, filter out diagonal elements */
