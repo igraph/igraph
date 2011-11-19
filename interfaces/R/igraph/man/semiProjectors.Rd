@@ -27,18 +27,25 @@ scgSemiProjectors(groups, mtype = c("symmetric", "laplacian",
 }
 \details{
   The three types of semi-projectors are defined as follows.
-  Let \eqn{\gamma(j)} label the group of vertex \eqn{j} in a partition of
-  all the vertices.
+  Let \eqn{\gamma(j)}{gamma(j)} label the group of vertex \eqn{j} in a
+  partition of all the vertices.
  
-  The symmetric semi-projectors are defined as \deqn{L_{\alpha
-      j}=R_{\alpha j}=\frac{1}{\sqrt{|\alpha|}}\delta_{\alpha\gamma(j)},} 
-  the (row) Laplacian semi-projectors as \deqn{L_{\alpha
-      j}=\frac{1}{|\alpha|}\delta_{\alpha\gamma(j)}\,\,\,\,
-    \textrm{and}\,\,\,\, R_{\alpha j}=\delta_{\alpha\gamma(j)},} and
-  the (row) stochastic semi-projectors as \deqn{L_{\alpha
-      j}=\frac{p_{1}(j)}{\sum_{k\in\gamma(j)}p_{1}(k)}\delta_{\alpha\gamma(j)}\,\,\,\,
-    \textrm{and}\,\,\,\, R_{\alpha j}=\delta_{\alpha\gamma(j)},} where
-  \eqn{p_1} is the (left) eigenvector associated with the
+  The symmetric semi-projectors are defined as
+  \deqn{L_{\alpha j}=R_{\alpha j}=
+    \frac{1}{\sqrt{|\alpha|}}\delta_{\alpha\gamma(j)},}{%
+    L[alpha,j] = R[alpha,j] = 1/sqrt(|alpha|) delta[alpha,gamma(j)],}
+  the (row) Laplacian semi-projectors as
+  \deqn{L_{\alpha j}=\frac{1}{|\alpha|}\delta_{\alpha\gamma(j)}\,\,\,\,
+    \textrm{and}\,\,\,\, R_{\alpha j}=\delta_{\alpha\gamma(j)},}{%
+    L[alpha,j] = 1/|alpha| delta[alpha,gamma(j)] and
+    R[alpha,j] = delta[alpha,gamma(j)],}
+  and the (row) stochastic semi-projectors as
+  \deqn{L_{\alpha j}=\frac{p_{1}(j)}{\sum_{k\in\gamma(j)}p_{1}(k)}\,\,\,\,
+      \textrm{and}\,\,\,\, R_{\alpha j}=\delta_{\alpha\gamma(j)\delta_{\alpha\gamma(j)}},}{%
+      L[alpha,j] = p[1][j] / sum(p[1][k]; k in gamma(j))
+      delta[alpha,gamma(j)] and 
+      R[alpha,j] = delta[alpha,gamma(j)],}
+  where \eqn{p_1}{p[1]} is the (left) eigenvector associated with the
   one-eigenvalue of the stochastic matrix. \eqn{L} and \eqn{R} are
   defined in a symmetric way when \code{norm = col}. All these
   semi-projectors verify various properties described in the
@@ -46,7 +53,7 @@ scgSemiProjectors(groups, mtype = c("symmetric", "laplacian",
 }
 \value{
  \item{L}{The semi-projector \eqn{L}.}
- \item{R}{The semi-projector \eqn{R.}}
+ \item{R}{The semi-projector \eqn{R}.}
 }
 \references{
   D. Morton de Lachapelle, D. Gfeller, and P. De Los Rios, Shrinking

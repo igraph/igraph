@@ -25,13 +25,13 @@ scgNormEps(V, groups, mtype = c("symmetric", "laplacian",
     stochastic matrix sum to one; otherwise it is the columns.}
 }
 \details{
- \code{scgNormEps} computes \eqn{\Vert v_i-Pv_i\Vert}, where \eqn{v_i}
-  is the \eqn{i}th eigenvector in \code{V} and \eqn{P} is the projector
-  corresponding to the \code{mtype} argument.
+ \code{scgNormEps} computes \eqn{\Vert v_i-Pv_i\Vert}{|v[i]-Pv[i]|},
+   where \eqn{v_i}{v[i]} is the \eqn{i}th eigenvector in \code{V} and
+   \eqn{P} is the projector corresponding to the \code{mtype} argument.
 }
 \value{
   \code{normEps} returns with a numeric vector whose \eqn{i}th component is 
-  \eqn{\Vert v_i-Pv_i\Vert} (see Details).
+  \eqn{\Vert v_i-Pv_i\Vert}{|v[i]-Pv[i]|} (see Details).
 }
 \references{
   D. Morton de Lachapelle, D. Gfeller, and P. De Los Rios, Shrinking

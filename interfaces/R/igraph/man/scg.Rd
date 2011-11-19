@@ -89,10 +89,11 @@ scg(X, ev, nt, groups = NULL, mtype = c("symmetric", "laplacian",
   
   The algorithm \dQuote{optimum} solves exactly the SCG problem for each
   eigenvector in \code{V}. The running time of this algorithm is
-  \eqn{O(\code{nt[i]} \cdot \code{nrow(V)}^2)} when
-  \code{mtype} is \dQuote{symmetric} or \dQuote{laplacian} and
-  \eqn{O(\code{nrow(V)}^3)} when \code{mtype} = \dQuote{stochastic}. In
-  all these cases, the memory usage is \eqn{O(\code{nrow(V)}^2)}.
+  \eqn{O(\max nt \cdot m^2)}{O(max(nt) m^2)} for the symmetric and
+  laplacian matrix problems (i.e. when \code{mtype} is
+  \dQuote{symmetric} or \dQuote{laplacian}. It is \eqn{O(m^3)} for the
+  stochastic problem. Here \eqn{m} is the number of rows in \code{V}.
+  In all three cases, the memory usage is \eqn{O(m^2)}.
 
   The algorithms \dQuote{interv} and \dQuote{interv\_km} solve
   approximately the SCG problem by performing a (for now) constant
