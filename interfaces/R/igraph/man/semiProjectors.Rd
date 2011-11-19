@@ -1,23 +1,23 @@
-\name{scg.semiProjectors}
-\alias{scg.semiProjectors}
+\name{scgSemiProjectors}
+\alias{scgSemiProjectors}
 \title{Semi-Projectors}
 \description{
   A function to compute the \eqn{L} and \eqn{R} semi-projectors for a
   given partition of the vertices.
 }
 \usage{
-semiProjectors(groups, matrix = c("symmetric", "laplacian",
-                "stochastic"), p = NULL, norm = c("row", "col"),
-              sparse = getIgraphOpt("sparsematrices"))
+scgSemiProjectors(groups, mtype = c("symmetric", "laplacian",
+                    "stochastic"), p = NULL, norm = c("row", "col"),
+                  sparse = getIgraphOpt("sparsematrices"))
 }
 \arguments{
   \item{groups}{A vector of \code{nrow(X)} or \code{vcount(X)} integers
     giving the group label of every vertex in the partition.}
-  \item{matrix}{The type of semi-projectors. For now \dQuote{symmetric},
+  \item{mtype}{The type of semi-projectors. For now \dQuote{symmetric},
     \dQuote{laplacian} and \dQuote{stochastic} are available.}
   \item{p}{A probability vector of length \code{length(gr)}. \code{p} is
     the stationary probability distribution of a Markov chain when
-    \code{matrix} = \dQuote{stochastic}. This parameter is ignored in
+    \code{mtype} = \dQuote{stochastic}. This parameter is ignored in
     all other cases.} 
   \item{norm}{Either \dQuote{row} or \dQuote{col}. If set to
     \dQuote{row} the rows of the Laplacian matrix sum up to zero 
@@ -58,14 +58,14 @@ semiProjectors(groups, matrix = c("symmetric", "laplacian",
 \author{David Morton de Lachapelle \email{david.morton@epfl.ch},
   \email{david.mortondelachapelle@swissquote.ch}} 
 \seealso{\link{SCG} for a detailed introduction. \code{\link{scg}},
-  \code{\link{normEps}}, \code{\link{grouping}}}
+  \code{\link{scgNormEps}}, \code{\link{scgGrouping}}}
 \examples{
 # compute the semi-projectors and projector for the partition
 # provided by a community detection method
 g <- barabasi.game(20, m=1.5)
 eb <- edge.betweenness.community(g)
 memb <- community.to.membership(g, eb$merges, steps=15)$membership
-lr <- scg.semiProjectors(memb)
+lr <- scgSemiProjectors(memb)
 #In the symmetric case L = R
 tcrossprod(lr$R)  # same as lr$R %*% t(lr$R)
 P <- crossprod(lr$R)  # same as t(lr$R) %*% lr$R
@@ -74,7 +74,7 @@ isSymmetric(P)
 sum( (P \%*\% P-P)^2 )
 
 ## use L and R to coarse-grain the graph Laplacian
-lr <- scg.semiProjectors(memb, matrix="laplacian")
+lr <- scgSemiProjectors(memb, mtype="laplacian")
 L <- graph.laplacian(g)
 Lt <- lr$L \%*\% L \%*\% t(lr$R)
 ## or better lr$L \%*\% tcrossprod(L,lr$R)

@@ -89,10 +89,10 @@
 
 int igraph_scg_grouping(const igraph_matrix_t *V, 
 			igraph_vector_t *groups,
-			igraph_integer_t intervals,
-			const igraph_vector_t *intervals_vector,
-			igraph_scg_matrix_t matrix_type,
-			igraph_scg_algorithm_t algorithm,
+			igraph_integer_t nt,
+			const igraph_vector_t *nt_vec,
+			igraph_scg_matrix_t mtype,
+			igraph_scg_algorithm_t algo,
 			const igraph_vector_t *p,
 			igraph_integer_t maxiter) {
 
@@ -101,23 +101,23 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
   igraph_matrix_int_t gr_mat;
   int i;
 
-  if (intervals_vector && igraph_vector_size(intervals_vector) != nev) {
+  if (nt_vec && igraph_vector_size(nt_vec) != nev) {
     IGRAPH_ERROR("Invalid length for interval specification", IGRAPH_EINVAL);
   }
 
-  if (!intervals_vector && algorithm != IGRAPH_SCG_EXACT) {
-    if (intervals <= 1 || intervals >= no_of_nodes) {
+  if (!nt_vec && algo != IGRAPH_SCG_EXACT) {
+    if (nt <= 1 || nt >= no_of_nodes) {
       IGRAPH_ERROR("Invalid interval specification", IGRAPH_EINVAL);
     }
-  } else if (algorithm != IGRAPH_SCG_EXACT) {
+  } else if (algo != IGRAPH_SCG_EXACT) {
     igraph_real_t min, max;
-    igraph_vector_minmax(intervals_vector, &min, &max);
+    igraph_vector_minmax(nt_vec, &min, &max);
     if (min <= 1 || max >= no_of_nodes) {
       IGRAPH_ERROR("Invalid interval specification", IGRAPH_EINVAL);
     }
   }
 
-  if (matrix_type == IGRAPH_SCG_STOCHASTIC && !p) {
+  if (mtype == IGRAPH_SCG_STOCHASTIC && !p) {
     IGRAPH_ERROR("`p' must be given for the stochastic matrix case", 
 		 IGRAPH_EINVAL);
   }
@@ -128,18 +128,18 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
 
   IGRAPH_CHECK(igraph_vector_resize(groups, no_of_nodes));
 
-#define INVEC(i) (intervals_vector ? VECTOR(*intervals_vector)[i] : intervals)
+#define INVEC(i) (nt_vec ? VECTOR(*nt_vec)[i] : nt)
 
   IGRAPH_CHECK(igraph_matrix_int_init(&gr_mat, no_of_nodes, nev));
   IGRAPH_FINALLY(igraph_matrix_int_destroy, &gr_mat);
 
-  switch (algorithm) {
+  switch (algo) {
   case IGRAPH_SCG_OPTIMUM:
     for (i=0; i<nev; i++) {
       IGRAPH_CHECK(igraph_i_optimal_partition(&MATRIX(*V, 0, i), 
 					      &MATRIX(gr_mat, 0, i), 
 					      no_of_nodes, INVEC(i),
-					      matrix_type, 
+					      mtype, 
 					      p ? VECTOR(*p) : 0, 0));
     }
     break;
@@ -470,7 +470,7 @@ int igraph_i_scg_semiprojectors_sto(const igraph_vector_t *groups,
 }
 
 int igraph_scg_semiprojectors(const igraph_vector_t *groups,
-			      igraph_scg_matrix_t matrix_type,
+			      igraph_scg_matrix_t mtype,
 			      igraph_matrix_t *L,
 			      igraph_matrix_t *R,
 			      igraph_sparsemat_t *Lsparse,
@@ -489,7 +489,7 @@ int igraph_scg_semiprojectors(const igraph_vector_t *groups,
     IGRAPH_ERROR("Invalid membership vector", IGRAPH_EINVAL);
   }
 
-  if (matrix_type == IGRAPH_SCG_STOCHASTIC && !p) {
+  if (mtype == IGRAPH_SCG_STOCHASTIC && !p) {
     IGRAPH_ERROR("`p' must be given for the stochastic matrix case", 
 		 IGRAPH_EINVAL);
   }
@@ -499,7 +499,7 @@ int igraph_scg_semiprojectors(const igraph_vector_t *groups,
 		 IGRAPH_EINVAL);
   }
 
-  switch (matrix_type) {
+  switch (mtype) {
   case IGRAPH_SCG_SYMMETRIC:
     IGRAPH_CHECK(igraph_i_scg_semiprojectors_sym(groups, L, R, Lsparse, 
 						 Rsparse, no_of_groups,
@@ -525,7 +525,7 @@ int igraph_scg_semiprojectors(const igraph_vector_t *groups,
 int igraph_scg_norm_eps(const igraph_matrix_t *V,
 			const igraph_vector_t *groups,
 			igraph_vector_t *eps,
-			igraph_scg_matrix_t matrix_type,
+			igraph_scg_matrix_t mtype,
 			const igraph_vector_t *p,
 			igraph_scg_norm_t norm) {
 
@@ -549,7 +549,7 @@ int igraph_scg_norm_eps(const igraph_matrix_t *V,
     IGRAPH_ERROR("Invalid membership vector", IGRAPH_EINVAL);
   }
 
-  if (matrix_type == IGRAPH_SCG_STOCHASTIC && !p) {
+  if (mtype == IGRAPH_SCG_STOCHASTIC && !p) {
     IGRAPH_ERROR("`p' must be given for the stochastic matrix case", 
 		 IGRAPH_EINVAL);
   }
@@ -566,7 +566,7 @@ int igraph_scg_norm_eps(const igraph_matrix_t *V,
 				     no_of_nodes));
   IGRAPH_FINALLY(igraph_sparsemat_destroy, &Rsparse);
   
-  IGRAPH_CHECK(igraph_scg_semiprojectors(groups, matrix_type, /* L= */ 0, 
+  IGRAPH_CHECK(igraph_scg_semiprojectors(groups, mtype, /* L= */ 0, 
 					 /* R= */ 0, &Lsparse, &Rsparse, p,
 					 norm));
 
@@ -983,10 +983,10 @@ int igraph_i_scg_common_checks(const igraph_t *graph,
 			       const igraph_matrix_t *matrix,
 			       const igraph_sparsemat_t *sparsemat,
 			       const igraph_vector_t *ev,
-			       igraph_integer_t intervals,
-			       const igraph_vector_t *intervals_vector,
-			       const igraph_matrix_t *evec,
-			       const igraph_matrix_complex_t *evec_cmplx,
+			       igraph_integer_t nt,
+			       const igraph_vector_t *nt_vec,
+			       const igraph_matrix_t *vectors,
+			       const igraph_matrix_complex_t *vectors_cmplx,
 			       const igraph_vector_t *groups,
 			       const igraph_t *scg_graph,
 			       const igraph_matrix_t *scg_matrix,
@@ -1021,30 +1021,30 @@ int igraph_i_scg_common_checks(const igraph_t *graph,
     IGRAPH_ERROR("Invalid eigenvectors given", IGRAPH_EINVAL);
   }
 
-  if (!intervals_vector && (intervals <= 1 || intervals >= no_of_nodes)) {
+  if (!nt_vec && (nt <= 1 || nt >= no_of_nodes)) {
     IGRAPH_ERROR("Invalid interval specification", IGRAPH_EINVAL);
   }
   
-  if (intervals_vector) { 
-    if (igraph_vector_size(intervals_vector) != no_of_ev) {
+  if (nt_vec) { 
+    if (igraph_vector_size(nt_vec) != no_of_ev) {
       IGRAPH_ERROR("Invalid length for interval specification", 
 		   IGRAPH_EINVAL);
     }
-    igraph_vector_minmax(intervals_vector, &min, &max);
+    igraph_vector_minmax(nt_vec, &min, &max);
     if (min <= 1 || max >= no_of_nodes) { 
       IGRAPH_ERROR("Invalid interval specification", IGRAPH_EINVAL);
     }
   }
 
-  if (evec && igraph_matrix_size(evec) != 0 && 
-      (igraph_matrix_ncol(evec) != no_of_ev ||
-       igraph_matrix_nrow(evec) != no_of_nodes)) {
+  if (vectors && igraph_matrix_size(vectors) != 0 && 
+      (igraph_matrix_ncol(vectors) != no_of_ev ||
+       igraph_matrix_nrow(vectors) != no_of_nodes)) {
     IGRAPH_ERROR("Invalid eigenvector matrix size", IGRAPH_EINVAL);
   }
 
-  if (evec_cmplx && igraph_matrix_complex_size(evec_cmplx) != 0 &&
-      (igraph_matrix_complex_ncol(evec_cmplx) != no_of_ev || 
-       igraph_matrix_complex_nrow(evec_cmplx) != no_of_nodes)) {
+  if (vectors_cmplx && igraph_matrix_complex_size(vectors_cmplx) != 0 &&
+      (igraph_matrix_complex_ncol(vectors_cmplx) != no_of_ev || 
+       igraph_matrix_complex_nrow(vectors_cmplx) != no_of_nodes)) {
     IGRAPH_ERROR("Invalid eigenvector matrix size", IGRAPH_EINVAL);
   }
 
@@ -1072,11 +1072,11 @@ int igraph_scg_adjacency(const igraph_t *graph,
 			 const igraph_matrix_t *matrix,
 			 const igraph_sparsemat_t *sparsemat,
 			 const igraph_vector_t *ev,
-			 igraph_integer_t intervals,
-			 const igraph_vector_t *intervals_vector,
-			 igraph_scg_algorithm_t algorithm,
-			 igraph_vector_t *eval,
-			 igraph_matrix_t *evec,
+			 igraph_integer_t nt,
+			 const igraph_vector_t *nt_vec,
+			 igraph_scg_algorithm_t algo,
+			 igraph_vector_t *values,
+			 igraph_matrix_t *vectors,
 			 igraph_vector_t *groups,
 			 igraph_bool_t use_arpack,
 			 igraph_integer_t maxiter,
@@ -1092,14 +1092,14 @@ int igraph_scg_adjacency(const igraph_t *graph,
     real_sparsemat;  
   int no_of_ev=igraph_vector_size(ev);
   /* eigenvectors are calculated and returned */
-  igraph_bool_t do_evec= evec && igraph_matrix_size(evec)==0;
+  igraph_bool_t do_vectors= vectors && igraph_matrix_size(vectors)==0;
   /* groups are calculated */
   igraph_bool_t do_groups= !groups || igraph_vector_size(groups)==0;
   /* eigenvectors are not returned but must be calculated for groups */
-  igraph_bool_t tmp_evec= !do_evec && do_groups;
+  igraph_bool_t tmp_vectors= !do_vectors && do_groups;
   /* need temporary vector for groups */
   igraph_bool_t tmp_groups= !groups;
-  igraph_matrix_t myevec;
+  igraph_matrix_t myvectors;
   igraph_vector_t mygroups;
   igraph_bool_t tmp_lsparse=!Lsparse, tmp_rsparse=!Rsparse;
   igraph_sparsemat_t myLsparse, myRsparse, tmpsparse, Rsparse_t;
@@ -1111,8 +1111,8 @@ int igraph_scg_adjacency(const igraph_t *graph,
   /* Argument checks */
 
   IGRAPH_CHECK(igraph_i_scg_common_checks(graph, matrix, sparsemat,
-					  ev, intervals, intervals_vector,
-					  evec, 0, groups, scg_graph, 
+					  ev, nt, nt_vec,
+					  vectors, 0, groups, scg_graph, 
 					  scg_matrix, scg_sparsemat, 
 					  /*p=*/ 0, &evmin, &evmax));
 
@@ -1138,12 +1138,12 @@ int igraph_scg_adjacency(const igraph_t *graph,
 
   /* -------------------------------------------------------------------- */
   /* Compute eigenpairs, if needed */
-  if (tmp_evec) {
-    evec=&myevec;
-    IGRAPH_MATRIX_INIT_FINALLY(evec, no_of_nodes, no_of_ev);
+  if (tmp_vectors) {
+    vectors=&myvectors;
+    IGRAPH_MATRIX_INIT_FINALLY(vectors, no_of_nodes, no_of_ev);
   }
 
-  if (do_evec || tmp_evec) {
+  if (do_vectors || tmp_vectors) {
     igraph_arpack_options_t options;
     igraph_eigen_which_t which;
     igraph_matrix_t tmp;
@@ -1155,7 +1155,7 @@ int igraph_scg_adjacency(const igraph_t *graph,
     which.il = no_of_nodes-evmax+1;
     which.iu = no_of_nodes-evmin+1;
 
-    if (eval) { IGRAPH_VECTOR_INIT_FINALLY(&tmpeval, 0); }
+    if (values) { IGRAPH_VECTOR_INIT_FINALLY(&tmpeval, 0); }
     IGRAPH_CHECK(igraph_matrix_init(&tmp, no_of_nodes, 
 				    which.iu-which.il+1));
     IGRAPH_FINALLY(igraph_matrix_destroy, &tmp);
@@ -1166,18 +1166,18 @@ int igraph_scg_adjacency(const igraph_t *graph,
 					       use_arpack ? 
 					       IGRAPH_EIGEN_ARPACK : 
 					       IGRAPH_EIGEN_LAPACK, &which, 
-					       &options, eval ? &tmpeval : 0,
+					       &options, values ? &tmpeval : 0,
 					       &tmp));
     IGRAPH_VECTOR_INIT_FINALLY(&tmpev, no_of_ev);
     for (i=0; i<no_of_ev; i++) {
       VECTOR(tmpev)[i] = evmax - VECTOR(*ev)[i];
     }
-    if (eval) { IGRAPH_CHECK(igraph_vector_index(&tmpeval, eval, &tmpev)); }
-    IGRAPH_CHECK(igraph_matrix_select_cols(&tmp, evec, &tmpev));
+    if (values) { IGRAPH_CHECK(igraph_vector_index(&tmpeval, values, &tmpev)); }
+    IGRAPH_CHECK(igraph_matrix_select_cols(&tmp, vectors, &tmpev));
     igraph_vector_destroy(&tmpev);
     igraph_matrix_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(2);
-    if (eval) { 
+    if (values) { 
       igraph_vector_destroy(&tmpeval);
       IGRAPH_FINALLY_CLEAN(1);
     }
@@ -1190,9 +1190,9 @@ int igraph_scg_adjacency(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t*)groups, no_of_nodes);
   }
   if (do_groups) {
-    IGRAPH_CHECK(igraph_scg_grouping(evec, (igraph_vector_t*)groups, 
-				     intervals, intervals_vector, 
-				     IGRAPH_SCG_SYMMETRIC, algorithm, 
+    IGRAPH_CHECK(igraph_scg_grouping(vectors, (igraph_vector_t*)groups, 
+				     nt, nt_vec, 
+				     IGRAPH_SCG_SYMMETRIC, algo, 
 				     /*p=*/ 0, maxiter));
   }
   
@@ -1211,8 +1211,8 @@ int igraph_scg_adjacency(const igraph_t *graph,
     igraph_vector_destroy((igraph_vector_t*) groups);
     IGRAPH_FINALLY_CLEAN(1);
   }
-  if (tmp_evec) {
-    igraph_matrix_destroy(evec);
+  if (tmp_vectors) {
+    igraph_matrix_destroy(vectors);
     IGRAPH_FINALLY_CLEAN(1);
   }
   if (Rsparse) { IGRAPH_FINALLY(igraph_sparsemat_destroy, Rsparse); }
@@ -1254,12 +1254,12 @@ int igraph_scg_stochastic(const igraph_t *graph,
 			  const igraph_matrix_t *matrix,
 			  const igraph_sparsemat_t *sparsemat,
 			  const igraph_vector_t *ev,
-			  igraph_integer_t intervals,
-			  const igraph_vector_t *intervals_vector,
-			  igraph_scg_algorithm_t algorithm,
+			  igraph_integer_t nt,
+			  const igraph_vector_t *nt_vec,
+			  igraph_scg_algorithm_t algo,
 			  igraph_scg_norm_t norm,
-			  igraph_vector_complex_t *eval,
-			  igraph_matrix_complex_t *evec,
+			  igraph_vector_complex_t *values,
+			  igraph_matrix_complex_t *vectors,
 			  igraph_vector_t *groups,
 			  igraph_vector_t *p,
 			  igraph_bool_t use_arpack,
@@ -1280,13 +1280,13 @@ int igraph_scg_stochastic(const igraph_t *graph,
   igraph_arpack_options_t options;
   igraph_eigen_which_t which;
   /* eigenvectors are calculated and returned */
-  igraph_bool_t do_evec= evec && igraph_matrix_complex_size(evec)==0;
+  igraph_bool_t do_vectors= vectors && igraph_matrix_complex_size(vectors)==0;
   /* groups are calculated */
   igraph_bool_t do_groups= !groups || igraph_vector_size(groups)==0;
   igraph_bool_t tmp_groups= !groups;
   /* eigenvectors are not returned but must be calculated for groups */
-  igraph_bool_t tmp_evec= !do_evec && do_groups;
-  igraph_matrix_complex_t myevec;
+  igraph_bool_t tmp_vectors= !do_vectors && do_groups;
+  igraph_matrix_complex_t myvectors;
   igraph_vector_t mygroups;
   igraph_bool_t do_p= !p || igraph_vector_size(p)==0;
   igraph_vector_t *myp=(igraph_vector_t *) p, real_p;
@@ -1298,8 +1298,8 @@ int igraph_scg_stochastic(const igraph_t *graph,
   /* Argument checks */
 
   IGRAPH_CHECK(igraph_i_scg_common_checks(graph, matrix, sparsemat,
-					  ev, intervals, intervals_vector,
-					  0, evec, groups, scg_graph, 
+					  ev, nt, nt_vec,
+					  0, vectors, groups, scg_graph, 
 					  scg_matrix, scg_sparsemat, p,
 					  &evmin, &evmax));
   
@@ -1331,13 +1331,13 @@ int igraph_scg_stochastic(const igraph_t *graph,
   /* -------------------------------------------------------------------- */
   /* Compute eigenpairs, if needed */
 
-  if (tmp_evec) {
-    evec=&myevec;
-    IGRAPH_CHECK(igraph_matrix_complex_init(evec, no_of_nodes, no_of_ev));
-    IGRAPH_FINALLY(igraph_matrix_complex_destroy, evec);
+  if (tmp_vectors) {
+    vectors=&myvectors;
+    IGRAPH_CHECK(igraph_matrix_complex_init(vectors, no_of_nodes, no_of_ev));
+    IGRAPH_FINALLY(igraph_matrix_complex_destroy, vectors);
   }
 
-  if (do_evec || tmp_evec) {
+  if (do_vectors || tmp_vectors) {
     igraph_matrix_complex_t tmp;
     igraph_vector_t tmpev;
     igraph_vector_complex_t tmpeval;
@@ -1347,7 +1347,7 @@ int igraph_scg_stochastic(const igraph_t *graph,
     which.il = no_of_nodes-evmax+1;
     which.iu = no_of_nodes-evmin+1;
 
-    if (eval) { 
+    if (values) { 
       IGRAPH_CHECK(igraph_vector_complex_init(&tmpeval, 0));
       IGRAPH_FINALLY(igraph_vector_complex_destroy, &tmpeval);
     }
@@ -1358,20 +1358,20 @@ int igraph_scg_stochastic(const igraph_t *graph,
 				     /*extra=*/ 0, use_arpack ? 
 				     IGRAPH_EIGEN_ARPACK : 
 				     IGRAPH_EIGEN_LAPACK, &which, &options, 
-				     eval ? &tmpeval: 0, &tmp));
+				     values ? &tmpeval: 0, &tmp));
     
     IGRAPH_VECTOR_INIT_FINALLY(&tmpev, no_of_ev);
     for (i=0; i<no_of_ev; i++) {
       VECTOR(tmpev)[i] = evmax - VECTOR(*ev)[i];
     }
-    if (eval) { 
-      IGRAPH_CHECK(igraph_vector_complex_index(&tmpeval, eval, &tmpev)); 
+    if (values) { 
+      IGRAPH_CHECK(igraph_vector_complex_index(&tmpeval, values, &tmpev)); 
     }
-    IGRAPH_CHECK(igraph_matrix_complex_select_cols(&tmp, evec, &tmpev));
+    IGRAPH_CHECK(igraph_matrix_complex_select_cols(&tmp, vectors, &tmpev));
     igraph_vector_destroy(&tmpev);
     igraph_matrix_complex_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(2);
-    if (eval) { 
+    if (values) { 
       igraph_vector_complex_destroy(&tmpeval);
       IGRAPH_FINALLY_CLEAN(1);
     }
@@ -1441,10 +1441,10 @@ int igraph_scg_stochastic(const igraph_t *graph,
   if (do_groups) {
     igraph_matrix_t tmp;
     IGRAPH_MATRIX_INIT_FINALLY(&tmp, 0, 0);
-    IGRAPH_CHECK(igraph_matrix_complex_real(evec, &tmp));
+    IGRAPH_CHECK(igraph_matrix_complex_real(vectors, &tmp));
     IGRAPH_CHECK(igraph_scg_grouping(&tmp, (igraph_vector_t*)groups, 
-				     intervals, intervals_vector, 
-				     IGRAPH_SCG_STOCHASTIC, algorithm, 
+				     nt, nt_vec, 
+				     IGRAPH_SCG_STOCHASTIC, algo, 
 				     myp, maxiter));
     igraph_matrix_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(1);
@@ -1468,8 +1468,8 @@ int igraph_scg_stochastic(const igraph_t *graph,
     igraph_vector_destroy(myp);
     IGRAPH_FINALLY_CLEAN(1);
   }
-  if (tmp_evec) {
-    igraph_matrix_complex_destroy(evec);
+  if (tmp_vectors) {
+    igraph_matrix_complex_destroy(vectors);
     IGRAPH_FINALLY_CLEAN(1);
   }
   if (Rsparse) { IGRAPH_FINALLY(igraph_sparsemat_destroy, Rsparse); }
@@ -1517,13 +1517,13 @@ int igraph_scg_laplacian(const igraph_t *graph,
 			 const igraph_matrix_t *matrix,
 			 const igraph_sparsemat_t *sparsemat,
 			 const igraph_vector_t *ev,
-			 igraph_integer_t intervals,
-			 const igraph_vector_t *intervals_vector,
-			 igraph_scg_algorithm_t algorithm,
+			 igraph_integer_t nt,
+			 const igraph_vector_t *nt_vec,
+			 igraph_scg_algorithm_t algo,
 			 igraph_scg_norm_t norm,
 			 igraph_scg_direction_t direction,
-			 igraph_vector_complex_t *eval,
-			 igraph_matrix_complex_t *evec,
+			 igraph_vector_complex_t *values,
+			 igraph_matrix_complex_t *vectors,
 			 igraph_vector_t *groups,
 			 igraph_bool_t use_arpack,
 			 igraph_integer_t maxiter,
@@ -1543,13 +1543,13 @@ int igraph_scg_laplacian(const igraph_t *graph,
   igraph_arpack_options_t options;
   igraph_eigen_which_t which;
   /* eigenvectors are calculated and returned */
-  igraph_bool_t do_evec= evec && igraph_matrix_complex_size(evec)==0;
+  igraph_bool_t do_vectors= vectors && igraph_matrix_complex_size(vectors)==0;
   /* groups are calculated */
   igraph_bool_t do_groups= !groups || igraph_vector_size(groups)==0;
   igraph_bool_t tmp_groups= !groups;
   /* eigenvectors are not returned but must be calculated for groups */
-  igraph_bool_t tmp_evec= !do_evec && do_groups;
-  igraph_matrix_complex_t myevec;
+  igraph_bool_t tmp_vectors= !do_vectors && do_groups;
+  igraph_matrix_complex_t myvectors;
   igraph_vector_t mygroups;
   int no_of_ev=igraph_vector_size(ev);
   igraph_bool_t tmp_lsparse=!Lsparse, tmp_rsparse=!Rsparse;
@@ -1559,8 +1559,8 @@ int igraph_scg_laplacian(const igraph_t *graph,
   /* Argument checks */
 
   IGRAPH_CHECK(igraph_i_scg_common_checks(graph, matrix, sparsemat,
-					  ev, intervals, intervals_vector,
-					  0, evec, groups, scg_graph, 
+					  ev, nt, nt_vec,
+					  0, vectors, groups, scg_graph, 
 					  scg_matrix, scg_sparsemat, /*p=*/ 0,
 					  &evmin, &evmax));
   
@@ -1593,13 +1593,13 @@ int igraph_scg_laplacian(const igraph_t *graph,
   /* -------------------------------------------------------------------- */
   /* Compute eigenpairs, if needed */
 
-  if (tmp_evec) {
-    evec=&myevec;
-    IGRAPH_CHECK(igraph_matrix_complex_init(evec, no_of_nodes, no_of_ev));
-    IGRAPH_FINALLY(igraph_matrix_complex_destroy, evec);
+  if (tmp_vectors) {
+    vectors=&myvectors;
+    IGRAPH_CHECK(igraph_matrix_complex_init(vectors, no_of_nodes, no_of_ev));
+    IGRAPH_FINALLY(igraph_matrix_complex_destroy, vectors);
   }
 
-  if (do_evec || tmp_evec) {
+  if (do_vectors || tmp_vectors) {
     igraph_matrix_complex_t tmp;
     igraph_vector_t tmpev;
     igraph_vector_complex_t tmpeval;
@@ -1609,7 +1609,7 @@ int igraph_scg_laplacian(const igraph_t *graph,
     which.il = no_of_nodes-evmax+1;
     which.iu = no_of_nodes-evmin+1;
 
-    if (eval) { 
+    if (values) { 
       IGRAPH_CHECK(igraph_vector_complex_init(&tmpeval, 0));
       IGRAPH_FINALLY(igraph_vector_complex_destroy, &tmpeval);
     }
@@ -1620,20 +1620,20 @@ int igraph_scg_laplacian(const igraph_t *graph,
 				     /*extra=*/ 0, use_arpack ? 
 				     IGRAPH_EIGEN_ARPACK : 
 				     IGRAPH_EIGEN_LAPACK, &which, &options, 
-				     eval ? &tmpeval : 0, &tmp));
+				     values ? &tmpeval : 0, &tmp));
     
     IGRAPH_VECTOR_INIT_FINALLY(&tmpev, no_of_ev);
     for (i=0; i<no_of_ev; i++) {
       VECTOR(tmpev)[i] = evmax - VECTOR(*ev)[i];
     }
-    if (eval) { 
-      IGRAPH_CHECK(igraph_vector_complex_index(&tmpeval, eval, &tmpev)); 
+    if (values) { 
+      IGRAPH_CHECK(igraph_vector_complex_index(&tmpeval, values, &tmpev)); 
     }
-    IGRAPH_CHECK(igraph_matrix_complex_select_cols(&tmp, evec, &tmpev));
+    IGRAPH_CHECK(igraph_matrix_complex_select_cols(&tmp, vectors, &tmpev));
     igraph_vector_destroy(&tmpev);
     igraph_matrix_complex_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(2);
-    if (eval) { 
+    if (values) { 
       igraph_vector_complex_destroy(&tmpeval);
       IGRAPH_FINALLY_CLEAN(1);
     }
@@ -1649,10 +1649,10 @@ int igraph_scg_laplacian(const igraph_t *graph,
   if (do_groups) {
     igraph_matrix_t tmp;
     IGRAPH_MATRIX_INIT_FINALLY(&tmp, 0, 0);
-    IGRAPH_CHECK(igraph_matrix_complex_real(evec, &tmp));
+    IGRAPH_CHECK(igraph_matrix_complex_real(vectors, &tmp));
     IGRAPH_CHECK(igraph_scg_grouping(&tmp, (igraph_vector_t*)groups, 
-				     intervals, intervals_vector, 
-				     IGRAPH_SCG_LAPLACIAN, algorithm, 
+				     nt, nt_vec, 
+				     IGRAPH_SCG_LAPLACIAN, algo, 
 				     /*p=*/ 0, maxiter));
     igraph_matrix_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(1);
@@ -1673,8 +1673,8 @@ int igraph_scg_laplacian(const igraph_t *graph,
     igraph_vector_destroy((igraph_vector_t*) groups);
     IGRAPH_FINALLY_CLEAN(1);
   }
-  if (tmp_evec) {
-    igraph_matrix_complex_destroy(evec);
+  if (tmp_vectors) {
+    igraph_matrix_complex_destroy(vectors);
     IGRAPH_FINALLY_CLEAN(1);
   }
   if (Rsparse) { IGRAPH_FINALLY(igraph_sparsemat_destroy, Rsparse); }

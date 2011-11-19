@@ -1,12 +1,12 @@
 \name{scgExtra}
-\alias{scg.normEps}
+\alias{scgNormEps}
 \title{SCG Extra Functions}
 \description{
   Some useful functions to perform general actions in Spectral Coarse
   Graining (SCG).
 }
 \usage{
-scg.normEps(V, groups, matrix = c("symmetric", "laplacian",
+scgNormEps(V, groups, mtype = c("symmetric", "laplacian",
           "stochastic"), p = NULL, norm = c("row", "col"))
 }
 \arguments{
@@ -14,20 +14,20 @@ scg.normEps(V, groups, matrix = c("symmetric", "laplacian",
     The vectors are to be stored column-wise in \code{V}).}
   \item{groups}{A vector of \code{nrow(V)} integers labeling 
     each group vertex in the partition.}
-  \item{matrix}{The type of semi-projector used for the SCG. For 
+  \item{mtype}{The type of semi-projector used for the SCG. For 
     now \dQuote{symmetric}, \dQuote{laplacian} and \dQuote{stochastic}
     are available.} 
   \item{p}{A probability vector of length \code{nrow(V)}.
     \code{p} is the stationary probability distribution of a Markov chain 
-    when \code{matrix} = \dQuote{stochastic}. This parameter is ignored otherwise.}
+    when \code{mtype} = \dQuote{stochastic}. This parameter is ignored otherwise.}
   \item{norm}{Either \dQuote{row} or \dQuote{col}. If set to \dQuote{row} 
     the rows of the Laplacian matrix sum to zero and the rows of the 
     stochastic matrix sum to one; otherwise it is the columns.}
 }
 \details{
- \code{scg.normEps} computes \eqn{\Vert v_i-Pv_i\Vert}, where \eqn{v_i}
+ \code{scgNormEps} computes \eqn{\Vert v_i-Pv_i\Vert}, where \eqn{v_i}
   is the \eqn{i}th eigenvector in \code{V} and \eqn{P} is the projector
-  corresponding to the \code{matrix} argument.
+  corresponding to the \code{mtype} argument.
 }
 \value{
   \code{normEps} returns with a numeric vector whose \eqn{i}th component is 
@@ -47,6 +47,6 @@ scg.normEps(V, groups, matrix = c("symmetric", "laplacian",
 v <- rexp(20)
 km <- kmeans(v,5)
 sum(km$withinss)
-normEps(v,km$cluster)^2
+scgNormEps(v,km$cluster)^2
 }
 \keyword{graphs}

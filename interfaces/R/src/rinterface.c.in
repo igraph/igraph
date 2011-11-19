@@ -7275,8 +7275,8 @@ SEXP R_igraph_scg_adjacency(SEXP graph, SEXP matrix, SEXP sparsmat, SEXP ev,
   if (!isNull(sparsmat)) { igraph_free(c_sparsmat.cs); }
 
                                         /* Convert output */
-  PROTECT(result=NEW_LIST(7));
-  PROTECT(names=NEW_CHARACTER(7));
+  PROTECT(result=NEW_LIST(6));
+  PROTECT(names=NEW_CHARACTER(6));
 
   if (do_eval) { 
     PROTECT(eval=R_igraph_vector_to_SEXP(&c_eval));
@@ -7338,23 +7338,22 @@ SEXP R_igraph_scg_adjacency(SEXP graph, SEXP matrix, SEXP sparsmat, SEXP ev,
     PROTECT(Rsparse=R_NilValue);
   }
 
-  SET_VECTOR_ELT(result, 0, eval);
-  SET_VECTOR_ELT(result, 1, evec);
-  SET_VECTOR_ELT(result, 2, groups);
-  SET_VECTOR_ELT(result, 3, scg_graph);
-  if (do_scg_matrix) { SET_VECTOR_ELT(result, 4, scg_matrix); }
-  if (do_scg_sparsemat) { SET_VECTOR_ELT(result, 4, scg_sparsemat); }
-  if (do_L) { SET_VECTOR_ELT(result, 5, L); }
-  if (do_Lsparse) { SET_VECTOR_ELT(result, 5, Lsparse); }
-  if (do_R) { SET_VECTOR_ELT(result, 6, R); }
-  if (do_Rsparse) { SET_VECTOR_ELT(result, 6, Rsparse); }
-  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("eval"));
-  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("evec"));
-  SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("groups"));
-  SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("scg_graph"));
-  SET_STRING_ELT(names, 4, CREATE_STRING_VECTOR("scg_matrix"));
-  SET_STRING_ELT(names, 5, CREATE_STRING_VECTOR("L"));
-  SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("R"));
+  if (do_scg_graph) { SET_VECTOR_ELT(result, 0, scg_graph); }
+  if (do_scg_matrix) { SET_VECTOR_ELT(result, 0, scg_matrix); }
+  if (do_scg_sparsemat) { SET_VECTOR_ELT(result, 0, scg_sparsemat); }
+  SET_VECTOR_ELT(result, 1, groups);
+  if (do_L) { SET_VECTOR_ELT(result, 2, L); }
+  if (do_Lsparse) { SET_VECTOR_ELT(result, 2, Lsparse); }
+  if (do_R) { SET_VECTOR_ELT(result, 3, R); }
+  if (do_Rsparse) { SET_VECTOR_ELT(result, 3, Rsparse); }
+  SET_VECTOR_ELT(result, 4, eval);
+  SET_VECTOR_ELT(result, 5, evec);
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("Xt"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("groups"));
+  SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("L"));
+  SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("R"));
+  SET_STRING_ELT(names, 4, CREATE_STRING_VECTOR("values"));
+  SET_STRING_ELT(names, 5, CREATE_STRING_VECTOR("vectors"));
   SET_NAMES(result, names);
   UNPROTECT(11);
 
@@ -7468,8 +7467,8 @@ SEXP R_igraph_scg_stochastic(SEXP graph, SEXP matrix, SEXP sparsmat, SEXP ev,
   if (!isNull(sparsmat)) { igraph_free(c_sparsmat.cs); }
 
                                         /* Convert output */
-  PROTECT(result=NEW_LIST(8));
-  PROTECT(names=NEW_CHARACTER(8));
+  PROTECT(result=NEW_LIST(7));
+  PROTECT(names=NEW_CHARACTER(7));
 
   if (do_eval) { 
     PROTECT(eval=R_igraph_vector_complex_to_SEXP(&c_eval));
@@ -7538,26 +7537,24 @@ SEXP R_igraph_scg_stochastic(SEXP graph, SEXP matrix, SEXP sparsmat, SEXP ev,
     PROTECT(Rsparse=R_NilValue);
   }
 
-  SET_VECTOR_ELT(result, 0, eval);
-  SET_VECTOR_ELT(result, 1, evec);
-  SET_VECTOR_ELT(result, 2, groups);
-  SET_VECTOR_ELT(result, 3, scg_graph);
-  if (do_scg_matrix) { SET_VECTOR_ELT(result, 4, scg_matrix); }
-  if (do_scg_sparsemat) { SET_VECTOR_ELT(result, 4, scg_sparsemat); }
-  if (do_L) { SET_VECTOR_ELT(result, 5, L); }
-  if (do_Lsparse) { SET_VECTOR_ELT(result, 5, Lsparse); }
-  if (do_R) { SET_VECTOR_ELT(result, 6, R); }
-  if (do_Rsparse) { SET_VECTOR_ELT(result, 6, Rsparse); }
-  if (do_p) { SET_VECTOR_ELT(result, 7, p); }
-  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("eval"));
-  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("evec"));
-  SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("groups"));
-  SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("scg_graph"));
-  SET_STRING_ELT(names, 4, CREATE_STRING_VECTOR("scg_matrix"));
-  SET_STRING_ELT(names, 5, CREATE_STRING_VECTOR("L"));
-  SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("R"));
-  SET_STRING_ELT(names, 7, CREATE_STRING_VECTOR("p"));
-  SET_NAMES(result, names);
+  if (do_scg_graph) { SET_VECTOR_ELT(result, 0, scg_graph); }
+  if (do_scg_matrix) { SET_VECTOR_ELT(result, 0, scg_matrix); }
+  if (do_scg_sparsemat) { SET_VECTOR_ELT(result, 0, scg_sparsemat); }
+  SET_VECTOR_ELT(result, 1, groups);
+  if (do_L) { SET_VECTOR_ELT(result, 2, L); }
+  if (do_Lsparse) { SET_VECTOR_ELT(result, 2, Lsparse); }
+  if (do_R) { SET_VECTOR_ELT(result, 3, R); }
+  if (do_Rsparse) { SET_VECTOR_ELT(result, 3, Rsparse); }
+  SET_VECTOR_ELT(result, 4, eval);
+  SET_VECTOR_ELT(result, 5, evec);
+  if (do_p) { SET_VECTOR_ELT(result, 6, p); }
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("Xt"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("groups"));
+  SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("L"));
+  SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("R"));
+  SET_STRING_ELT(names, 4, CREATE_STRING_VECTOR("values"));
+  SET_STRING_ELT(names, 5, CREATE_STRING_VECTOR("vectors"));
+  SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("p"));
   UNPROTECT(12);
 
   UNPROTECT(1);
@@ -7662,8 +7659,8 @@ SEXP R_igraph_scg_laplacian(SEXP graph, SEXP matrix, SEXP sparsmat, SEXP ev,
   if (!isNull(sparsmat)) { igraph_free(c_sparsmat.cs); }
 
                                         /* Convert output */
-  PROTECT(result=NEW_LIST(7));
-  PROTECT(names=NEW_CHARACTER(7));
+  PROTECT(result=NEW_LIST(6));
+  PROTECT(names=NEW_CHARACTER(6));
 
   if (do_eval) { 
     PROTECT(eval=R_igraph_vector_complex_to_SEXP(&c_eval));
@@ -7725,24 +7722,22 @@ SEXP R_igraph_scg_laplacian(SEXP graph, SEXP matrix, SEXP sparsmat, SEXP ev,
     PROTECT(Rsparse=R_NilValue);
   }
 
-  SET_VECTOR_ELT(result, 0, eval);
-  SET_VECTOR_ELT(result, 1, evec);
-  SET_VECTOR_ELT(result, 2, groups);
-  SET_VECTOR_ELT(result, 3, scg_graph);
-  if (do_scg_matrix) { SET_VECTOR_ELT(result, 4, scg_matrix); }
-  if (do_scg_sparsemat) { SET_VECTOR_ELT(result, 4, scg_sparsemat); }
-  if (do_L) { SET_VECTOR_ELT(result, 5, L); }
-  if (do_Lsparse) { SET_VECTOR_ELT(result, 5, Lsparse); }
-  if (do_R) { SET_VECTOR_ELT(result, 6, R); }
-  if (do_Rsparse) { SET_VECTOR_ELT(result, 6, Rsparse); }
-  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("eval"));
-  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("evec"));
-  SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("groups"));
-  SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("scg_graph"));
-  SET_STRING_ELT(names, 4, CREATE_STRING_VECTOR("scg_matrix"));
-  SET_STRING_ELT(names, 5, CREATE_STRING_VECTOR("L"));
-  SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("R"));
-  SET_NAMES(result, names);
+  if (do_scg_graph) { SET_VECTOR_ELT(result, 0, scg_graph); }
+  if (do_scg_matrix) { SET_VECTOR_ELT(result, 0, scg_matrix); }
+  if (do_scg_sparsemat) { SET_VECTOR_ELT(result, 0, scg_sparsemat); }
+  SET_VECTOR_ELT(result, 1, groups);
+  if (do_L) { SET_VECTOR_ELT(result, 2, L); }
+  if (do_Lsparse) { SET_VECTOR_ELT(result, 2, Lsparse); }
+  if (do_R) { SET_VECTOR_ELT(result, 3, R); }
+  if (do_Rsparse) { SET_VECTOR_ELT(result, 3, Rsparse); }
+  SET_VECTOR_ELT(result, 4, eval);
+  SET_VECTOR_ELT(result, 5, evec);
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("Xt"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("groups"));
+  SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("L"));
+  SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("R"));
+  SET_STRING_ELT(names, 4, CREATE_STRING_VECTOR("values"));
+  SET_STRING_ELT(names, 5, CREATE_STRING_VECTOR("vectors"));
   UNPROTECT(11);
 
   UNPROTECT(1);

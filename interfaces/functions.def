@@ -1538,33 +1538,33 @@ igraph_automorphisms:
 #######################################
 
 igraph_scg_grouping:
-        PARAMS: MATRIX V, OUT VECTORM1 groups, INTEGER intervals, \
-                VECTOR_OR_0 intervals_vector, SCGMAT matrix_type=Default, \
-                SCGALGO algorithm=Default, VECTOR_OR_0 p=NULL, \
+        PARAMS: MATRIX V, OUT VECTORM1 groups, INTEGER nt, \
+                VECTOR_OR_0 nt_vec, SCGMAT mtype=Default, \
+                SCGALGO algo=Default, VECTOR_OR_0 p=NULL, \
 		INTEGER maxiter=100
-        NAME-R: scg.grouping
+        NAME-R: scgGrouping
         IGNORE: RR
 
 igraph_scg_semiprojectors:
-        PARAMS: VECTORM1 groups, SCGMAT matrix_type=Default, \
+        PARAMS: VECTORM1 groups, SCGMAT mtype=Default, \
                 OUT MATRIX_OR_0 L, OUT MATRIX_OR_0 R, \
                 OUT SPARSEMAT_OR_0 Lsparse, OUT SPARSEMAT_OR_0 Rsparse, \
                 VECTOR_OR_0 p=NULL, SCGNORM norm=Default
-        NAME-R: scg.semiProjectors
+        NAME-R: scgSemiProjectors
         IGNORE: RR, RC
 
 igraph_scg_norm_eps:
         PARAMS: MATRIX V, VECTORM1 groups, OUT VECTOR eps, \
-                SCGMAT matrix_type=Default, VECTOR_OR_0 p=NULL, \
+                SCGMAT mtype=Default, VECTOR_OR_0 p=NULL, \
                 SCGNORM norm=Default
-        NAME-R: scg.normEps
+        NAME-R: scgNormEps
 
 igraph_scg_adjacency:
         PARAMS: GRAPH_OR_0 graph, MATRIX_OR_0 matrix, \
-                SPARSEMAT_OR_0 sparsmat, VECTOR ev, \
-                INTEGER intervals, VECTOR_OR_0 intervals_vector, \
-                SCGALGO algorithm, INOUT VECTOR_OR_0 eval, \
-                INOUT MATRIX_OR_0 evec, INOUT VECTORM1_OR_0 groups, \
+                SPARSEMAT_OR_0 sparsemat, VECTOR ev, \
+                INTEGER nt, VECTOR_OR_0 ntvec, \
+                SCGALGO algo, INOUT VECTOR_OR_0 values, \
+                INOUT MATRIX_OR_0 vectors, INOUT VECTORM1_OR_0 groups, \
                 BOOLEAN use_arpack=False, INTEGER maxiter, \
                 OUT GRAPH_OR_0 scg_graph, OUT MATRIX_OR_0 scg_matrix, \
                 OUT SPARSEMAT_OR_0 scg_sparsemat, OUT MATRIX_OR_0 L, \
@@ -1574,10 +1574,10 @@ igraph_scg_adjacency:
 
 igraph_scg_stochastic:
         PARAMS: GRAPH_OR_0 graph, MATRIX_OR_0 matrix, \
-                SPARSEMAT_OR_0 sparsmat, VECTOR ev, \
-                INTEGER intervals, VECTOR_OR_0 intervals_vector, \
-                SCGALGO algorithm, SCGNORM norm=Default, \
-                INOUT CVECTOR_OR_0 eval, INOUT CMATRIX_OR_0 evec, \
+                SPARSEMAT_OR_0 sparsemat, VECTOR ev, \
+                INTEGER nt, VECTOR_OR_0 nt_vec, \
+                SCGALGO algo, SCGNORM norm=Default, \
+                INOUT CVECTOR_OR_0 values, INOUT CMATRIX_OR_0 vectors, \
                 INOUT VECTORM1_OR_0 groups, INOUT VECTOR_OR_0 p, \
                 BOOLEAN use_arpack=False, INTEGER maxiter, \
                 OUT GRAPH_OR_0 scg_graph, OUT MATRIX_OR_0 scg_matrix, \
@@ -1588,11 +1588,11 @@ igraph_scg_stochastic:
 
 igraph_scg_laplacian:
         PARAMS: GRAPH_OR_0 graph, MATRIX_OR_0 matrix, \
-                SPARSEMAT_OR_0 sparsmat, VECTOR ev, \
-                INTEGER intervals, VECTOR_OR_0 intervals_vector, \
-                SCGALGO algorithm, SCGNORM norm=Default, \
-                SCGDIR direction=Default, INOUT CVECTOR_OR_0 eval, \
-                INOUT CMATRIX_OR_0 evec, INOUT VECTORM1_OR_0 groups, \
+                SPARSEMAT_OR_0 sparsemat, VECTOR ev, \
+                INTEGER nt, VECTOR_OR_0 nt_vec, \
+                SCGALGO algo, SCGNORM norm=Default, \
+                SCGDIR direction=Default, INOUT CVECTOR_OR_0 values, \
+                INOUT CMATRIX_OR_0 vectors, INOUT VECTORM1_OR_0 groups, \
                 BOOLEAN use_arpack=False, INTEGER maxiter, \
                 OUT GRAPH_OR_0 scg_graph, OUT MATRIX_OR_0 scg_matrix, \
                 OUT SPARSEMAT_OR_0 scg_sparsemat, OUT MATRIX_OR_0 L, \

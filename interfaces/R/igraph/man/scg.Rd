@@ -8,7 +8,7 @@
   reference below.
 }
 \usage{
-scg(X, ev, nt, groups = NULL, matrix = c("symmetric", "laplacian",
+scg(X, ev, nt, groups = NULL, mtype = c("symmetric", "laplacian",
       "stochastic"), algo = c("optimum", "interv_km", "interv",
       "exact_scg"), norm = c("row", "col"), direction = c("default",
       "left", "right"), evec = NULL, p = NULL, use.arpack = FALSE,
@@ -36,7 +36,7 @@ scg(X, ev, nt, groups = NULL, matrix = c("symmetric", "laplacian",
   \item{groups}{A vector of \code{nrow(X)} or \code{vcount(X)} integers
     labeling each group vertex in the partition. If this parameter is
     supplied most part of the function is bypassed.}
-  \item{matrix}{Character scalar. The type of semi-projector to be
+  \item{mtype}{Character scalar. The type of semi-projector to be
     used for the SCG. For now \dQuote{symmetric}, \dQuote{laplacian} and
     \dQuote{stochastic} are available.}
   \item{algo}{Character scalar. The algorithm used to solve the SCG
@@ -58,7 +58,7 @@ scg(X, ev, nt, groups = NULL, matrix = c("symmetric", "laplacian",
     indexes in \code{ev} as no cross-check will be done.}
   \item{p}{A probability vector of length \code{nrow(X)} (or
     \code{vcount(X)}). \code{p} is the stationary probability
-    distribution of a Markov chain when \code{matrix} =
+    distribution of a Markov chain when \code{mtype} =
     \dQuote{stochastic}. This parameter is ignored in all other cases.}
  \item{use.arpack}{Logical scalar. When set to \code{TRUE} uses the
    function \code{arpack} of the \pkg{igraph} package to compute
@@ -90,8 +90,8 @@ scg(X, ev, nt, groups = NULL, matrix = c("symmetric", "laplacian",
   The algorithm \dQuote{optimum} solves exactly the SCG problem for each
   eigenvector in \code{V}. The running time of this algorithm is
   \eqn{O(\code{nt[i]} \cdot \code{nrow(V)}^2)} when
-  \code{matrix} is \dQuote{symmetric} or \dQuote{laplacian} and
-  \eqn{O(\code{nrow(V)}^3)} when \code{matrix} = \dQuote{stochastic}. In
+  \code{mtype} is \dQuote{symmetric} or \dQuote{laplacian} and
+  \eqn{O(\code{nrow(V)}^3)} when \code{mtype} = \dQuote{stochastic}. In
   all these cases, the memory usage is \eqn{O(\code{nrow(V)}^2)}.
 
   The algorithms \dQuote{interv} and \dQuote{interv\_km} solve
@@ -114,18 +114,17 @@ scg(X, ev, nt, groups = NULL, matrix = c("symmetric", "laplacian",
   essentially have linear running time and memory load.
 }
 \value{
-  \item{scg_graph}{The coarse-grained graph, if it was requested, or
-    \code{NULL} otherwise.}
-  \item{scg_matrix}{The coarse-grained matrix, if it was requested, or
-    \code{NULL} otherwise.}
+  \item{Xt}{The coarse-grained graph, or matrix, possibly a sparse matrix.}
   \item{groups}{A vector of \code{nrow(X)} or \code{vcount(X)} integers
     giving the group label of each object (vertex) in the partition.}
   \item{L}{The semi-projector \eqn{L} if \code{semproj = TRUE}.}
   \item{R}{The semi-projector \eqn{R} if \code{semproj = TRUE}.}
-  \item{eval}{The computed eigenvalues if \code{epairs = TRUE}.}
-  \item{evec}{The computed or supplied eigenvectors if \code{epairs = TRUE}.}
-  \item{p}{The stationary probability vector if \code{matrix =
-      stochastic} and \code{stat.prob = TRUE}.}
+  \item{values}{The computed eigenvalues if \code{epairs = TRUE}.}
+  \item{vectors}{The computed or supplied eigenvectors if \code{epairs =
+      TRUE}.}
+  \item{p}{The stationary probability vector if \code{mtype =
+      stochastic} and \code{stat.prob = TRUE}. For other matrix types
+    this is missing.}
 }
 \references{
 D. Morton de Lachapelle, D. Gfeller, and P. De Los Rios, Shrinking
@@ -137,8 +136,8 @@ D. Morton de Lachapelle, D. Gfeller, and P. De Los Rios, Shrinking
 \author{David Morton de Lachapelle \email{david.morton@epfl.ch},
   \email{david.mortondelachapelle@swissquote.ch}} 
 \seealso{\link{SCG} for an introduction.
-  \code{\link{scg.normEps}}, \code{\link{scg.grouping}} and
-  \code{\link{scg.semiProjectors}}.}
+  \code{\link{scgNormEps}}, \code{\link{scgGrouping}} and
+  \code{\link{scgSemiProjectors}}.}
 \examples{
 # SCG of a toy network
 g <- graph.full(5) \%du\% graph.full(5) \%du\% graph.full(5)

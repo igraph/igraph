@@ -119,10 +119,10 @@
   \code{\link{stochasticMatrix}} to compute a matrix \eqn{M}. (2) Work
   out some prescribed eigenpairs of \eqn{M} e.g. by 
   means of \code{eigen} or \code{arpack}. (3) Invoke one the four
-  algorithms of the function \code{\link{scg.grouping}} to get a
+  algorithms of the function \code{\link{scgGrouping}} to get a
   partition that will preserve the eigenpairs in the coarse-grained
   matrix. (4) Compute the semi-projectors \eqn{L} and \eqn{R} using
-  \code{\link{scg.semiProjectors}} and from there the coarse-grained
+  \code{\link{scgSemiProjectors}} and from there the coarse-grained
   matrix \eqn{\widetilde{M}=LMR^*}. If necessary, construct a
   coarse-grained graph from \eqn{\widetilde{M}} (e.g. as in [1]). 
 }

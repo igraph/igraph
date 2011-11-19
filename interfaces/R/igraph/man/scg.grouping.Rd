@@ -1,12 +1,12 @@
-\name{scg.grouping}
-\alias{scg.grouping}
+\name{scgGrouping}
+\alias{scgGrouping}
 \title{SCG Problem Solver}
 \description{
   This function solves the Spectral Coarse Graining (SCG) problem;
   either exactly, or approximately but faster.
 }
 \usage{
-grouping(V, nt, matrix = c("symmetric", "laplacian",
+scgGrouping(V, nt, mtype = c("symmetric", "laplacian",
           "stochastic"), algo = c("optimum", "interv_km",
           "interv","exact_scg"), p = NULL, maxiter = 100)
 }
@@ -23,15 +23,16 @@ grouping(V, nt, matrix = c("symmetric", "laplacian",
     intervals is used for each eigenvector if \code{nt} is a single
     integer. When \code{algo} = \dQuote{exact\_cg} this parameter is
     ignored, but a value between 2 and vcount(X) (or nrow(X)) must be
-    provided TODO: improve this.} \item{matrix}{The type of
-    semi-projectors used in the SCG. For now \dQuote{symmetric},
-    \dQuote{laplacian} and \dQuote{stochastic} are available.} 
+    provided TODO: improve this.}
+  \item{mtype}{The type of semi-projectors used in the SCG. For now
+    \dQuote{symmetric}, \dQuote{laplacian} and \dQuote{stochastic} are
+    available.}
   \item{algo}{The algorithm used to solve the SCG problem. Possible
     values are \dQuote{optimum}, \dQuote{interv\_km}, \dQuote{interv}
     and \dQuote{exact\_scg}.} 
   \item{p}{A probability vector of length equal to
     \code{nrow(V)}. \code{p} is the stationary probability distribution
-    of a Markov chain when \code{matrix} = \dQuote{stochastic}. This
+    of a Markov chain when \code{mtype} = \dQuote{stochastic}. This
     parameter is ignored in all other cases.} \item{maxiter}{A positive
     integer giving the maximum number of iterations of the k-means
     algorithm when \code{algo} = \dQuote{interv\_km}. This parameter is
@@ -40,9 +41,9 @@ grouping(V, nt, matrix = c("symmetric", "laplacian",
 \details{
   The algorithm \dQuote{optimum} solves exactly the SCG problem for each
   eigenvector in \code{V}. The running time of this algorithm is
-  \eqn{O(\code{nt[i]} \cdot \code{nrow(V)}^2)} when \code{matrix} is
+  \eqn{O(\code{nt[i]} \cdot \code{nrow(V)}^2)} when \code{mtype} is
   \dQuote{symmetric} or \dQuote{laplacian} and \eqn{O(\code{nrow(V)}^3)}
-  when \code{matrix} = \dQuote{stochastic}. In all these cases, the
+  when \code{mtype} = \dQuote{stochastic}. In all these cases, the
   memory usage is \eqn{O(\code{nrow(V)}^2)}. 
 
   The algorithms \dQuote{interv} and \dQuote{interv\_km} solve
@@ -78,7 +79,7 @@ D. Morton de Lachapelle, D. Gfeller, and P. De Los Rios, Shrinking
 \author{David Morton de Lachapelle \email{david.morton@epfl.ch},
   \email{david.mortondelachapelle@swissquote.ch}} 
 \seealso{\link{SCG} for a detailed introduction. \code{\link{scg}},
-  \code{\link{scg.normEps}}}
+  \code{\link{scgNormEps}}}
 \examples{
 # eigenvectors of a random symmetric matrix
 M <- matrix(rexp(10^6), 10^3, 10^3)
@@ -86,7 +87,7 @@ M <- (M + t(M))/2
 V <- eigen(M, symmetric=TRUE)$vectors[,c(1,2)]
 
 # displays size of the groups in the final partition
-gr <- scg.grouping(V, nt=c(2,3))
+gr <- scgGrouping(V, nt=c(2,3))
 col <- rainbow(max(gr))
 plot(table(gr), col=col, main="Group size", xlab="group", ylab="size")
 
@@ -109,7 +110,7 @@ par(op)
 ### comparing optimal and k-means solutions
 ### in the one-dimensional case.
 x <- rexp(2000, 2)
-gr.true <- scg.grouping(x, 100)
+gr.true <- scgGrouping(x, 100)
 gr.km <- kmeans(x, 100, 100, 300)$cluster
 normEps(x,gr.true)
 normEps(x,gr.km)
