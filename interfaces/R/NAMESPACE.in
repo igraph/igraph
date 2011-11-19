@@ -1,5 +1,4 @@
 
-import(Matrix)
 importFrom(stats, as.dendrogram)
 
 # The igraph interface
