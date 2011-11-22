@@ -202,9 +202,9 @@ myscg <- function(graph, matrix, sparsemat, ev, nt, groups=NULL,
                  PACKAGE="igraph")    
   }
 
-  if (!is.null(res$scg_matrix) &&
-      class(res$scg_matrix) == "igraph.tmp.sparse") {
-    res$scg_matrix <- igraph.i.spMatrix(res$scg_matrix)
+  if (!is.null(res$Xt) &&
+      class(res$Xt) == "igraph.tmp.sparse") {
+    res$Xt <- igraph.i.spMatrix(res$Xt)
   }
   if (!is.null(res$L) && class(res$L) == "igraph.tmp.sparse") {
     res$L <- igraph.i.spMatrix(res$L)
