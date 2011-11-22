@@ -28,7 +28,7 @@ scgGrouping <- function(V, nt,
                            "exact_scg"),
                          p=NULL, maxiter=100) {
 
-  V <- structure(as.double(V), dim=dim(V))
+  V <- as.matrix(structure(as.double(V), dim=dim(V)))
   groups <- as.numeric(nt)
 
   mtype <- switch(igraph.match.arg(mtype), "symmetric"=1, 
