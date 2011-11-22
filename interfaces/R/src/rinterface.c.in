@@ -7555,6 +7555,7 @@ SEXP R_igraph_scg_stochastic(SEXP graph, SEXP matrix, SEXP sparsmat, SEXP ev,
   SET_STRING_ELT(names, 4, CREATE_STRING_VECTOR("values"));
   SET_STRING_ELT(names, 5, CREATE_STRING_VECTOR("vectors"));
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("p"));
+  SET_NAMES(result, names);
   UNPROTECT(12);
 
   UNPROTECT(1);
@@ -7738,6 +7739,7 @@ SEXP R_igraph_scg_laplacian(SEXP graph, SEXP matrix, SEXP sparsmat, SEXP ev,
   SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("R"));
   SET_STRING_ELT(names, 4, CREATE_STRING_VECTOR("values"));
   SET_STRING_ELT(names, 5, CREATE_STRING_VECTOR("vectors"));
+  SET_NAMES(result, names);
   UNPROTECT(11);
 
   UNPROTECT(1);
