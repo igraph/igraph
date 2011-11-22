@@ -42,7 +42,7 @@ VECTOR_BOOL_OR_0:
     INCONV: if (!is.null(%I%)) %I% <- as.logical(%I%)
 
 MATRIX:
-    INCONV: %I% <- structure(as.double(%I%), dim=dim(%I%))
+    INCONV: %I% <- as.matrix(structure(as.double(%I%), dim=dim(%I%)))
 
 MATRIX_OR_0:
     INVONV: if (!is.null(%I%)) %I% <- structure(as.double(%I%), dim=dim(%I%))
@@ -264,12 +264,12 @@ CVECTOR:
     INCONV: %I% <- as.complex(%I%)
 
 CMATRIX:
-    INCONV: %I% <- structure(as.complex(%I%), dim=dim(%I%))
+    INCONV: %I% <- as.matrix(structure(as.complex(%I%), dim=dim(%I%)))
 
 CVECTOR_OR_0:
     if (!is.null(%I%)) { INCONV: %I% <- as.complex(%I%) }
 
 CMATRIX_OR_0:
     if (!is.null(%I%)) { \
-       INCONV: %I% <- structure(as.complex(%I%), dim=dim(%I%)) \
+       INCONV: %I% <- as.matrix(structure(as.complex(%I%), dim=dim(%I%))) \
     }
