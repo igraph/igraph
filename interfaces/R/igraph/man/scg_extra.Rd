@@ -47,6 +47,6 @@ scgNormEps(V, groups, mtype = c("symmetric", "laplacian",
 v <- rexp(20)
 km <- kmeans(v,5)
 sum(km$withinss)
-scgNormEps(v,km$cluster)^2
+scgNormEps(cbind(v), km$cluster)^2
 }
 \keyword{graphs}

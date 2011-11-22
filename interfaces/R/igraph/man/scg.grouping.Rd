@@ -111,9 +111,9 @@ par(op)
 ### comparing optimal and k-means solutions
 ### in the one-dimensional case.
 x <- rexp(2000, 2)
-gr.true <- scgGrouping(x, 100)
+gr.true <- scgGrouping(cbind(x), 100)
 gr.km <- kmeans(x, 100, 100, 300)$cluster
-normEps(x,gr.true)
-normEps(x,gr.km)
+scgNormEps(cbind(x), gr.true)
+scgNormEps(cbind(x), gr.km)
 }
 \keyword{graphs}

@@ -71,7 +71,7 @@ scgSemiProjectors(groups, mtype = c("symmetric", "laplacian",
 # provided by a community detection method
 g <- barabasi.game(20, m=1.5)
 eb <- edge.betweenness.community(g)
-memb <- community.to.membership(g, eb$merges, steps=15)$membership
+memb <- membership(eb)
 lr <- scgSemiProjectors(memb)
 #In the symmetric case L = R
 tcrossprod(lr$R)  # same as lr$R %*% t(lr$R)
