@@ -101,8 +101,13 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
   igraph_matrix_int_t gr_mat;
   int i;
 
-  if (nt_vec && igraph_vector_size(nt_vec) != nev) {
+  if (nt_vec && igraph_vector_size(nt_vec) != 1 && 
+      igraph_vector_size(nt_vec) != nev) {
     IGRAPH_ERROR("Invalid length for interval specification", IGRAPH_EINVAL);
+  }
+  if (igraph_vector_size(nt_vec) == 1) {
+    nt=VECTOR(*nt_vec)[0];
+    nt_vec=0;
   }
 
   if (!nt_vec && algo != IGRAPH_SCG_EXACT) {
@@ -1026,7 +1031,8 @@ int igraph_i_scg_common_checks(const igraph_t *graph,
   }
   
   if (nt_vec) { 
-    if (igraph_vector_size(nt_vec) != no_of_ev) {
+    if (igraph_vector_size(nt_vec) != 1 && 
+	igraph_vector_size(nt_vec) != no_of_ev) {
       IGRAPH_ERROR("Invalid length for interval specification", 
 		   IGRAPH_EINVAL);
     }
