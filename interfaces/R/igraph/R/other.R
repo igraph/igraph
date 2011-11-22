@@ -57,6 +57,7 @@ igraph.match.arg <- function(arg, choices, several.ok=FALSE) {
 }
 
 igraph.i.spMatrix <- function(M) {
+  require(Matrix)
   if (M$type == "triplet") {
     spMatrix(nrow=M$dim[1], ncol=M$dim[2], i=M$i+1L, j=M$p+1L, x=M$x)
   } else {
