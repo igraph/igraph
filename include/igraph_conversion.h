@@ -39,6 +39,7 @@
 #include "igraph_datatype.h"
 #include "igraph_spmatrix.h"
 #include "igraph_matrix.h"
+#include "igraph_sparsemat.h"
 #include "igraph_attributes.h"
 
 __BEGIN_DECLS
@@ -51,6 +52,15 @@ int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
 			 igraph_get_adjacency_t type, igraph_bool_t eids);
 int igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
 			        igraph_get_adjacency_t type);
+
+int igraph_get_stochastic(const igraph_t *graph, 
+			  igraph_matrix_t *matrix,
+			  igraph_bool_t column_wise);
+
+int igraph_get_stochastic_sparsemat(const igraph_t *graph, 
+				    igraph_sparsemat_t *sparsemat,
+				    igraph_bool_t column_wise);
+
 int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool_t bycol);
 
 int igraph_to_directed(igraph_t *graph, 

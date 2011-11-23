@@ -613,96 +613,6 @@ int igraph_scg_norm_eps(const igraph_matrix_t *V,
   return 0;
 }
 
-int igraph_get_stochastic(const igraph_t *graph, 
-			  igraph_matrix_t *matrix,
-			  igraph_scg_norm_t norm) {
-  
-  int no_of_nodes=igraph_vcount(graph);
-  igraph_real_t sum;
-  int i, j;
-  
-  IGRAPH_CHECK(igraph_get_adjacency(graph, matrix, 
-				    IGRAPH_GET_ADJACENCY_BOTH, /*eids=*/ 0));
-  
-  switch (norm) {
-  case IGRAPH_SCG_NORM_ROW:
-    for (i=0; i<no_of_nodes; i++) {
-      sum=0.0; 
-      for (j=0; j<no_of_nodes; j++) { 
-	sum += MATRIX(*matrix, i, j);
-      }
-      for (j=0; j<no_of_nodes; j++) {
-	MATRIX(*matrix, i, j) /= sum;
-      }
-    }
-    break;
-  case IGRAPH_SCG_NORM_COL:
-    for (i=0; i<no_of_nodes; i++) {
-      sum=0.0; 
-      for (j=0; j<no_of_nodes; j++) { 
-	sum += MATRIX(*matrix, j, i);
-      }
-      for (j=0; j<no_of_nodes; j++) {
-	MATRIX(*matrix, j, i) /= sum;
-      }
-    }
-    break;
-  }
-
-  return 0;
-}
-
-int igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat, 
-				 igraph_scg_norm_t norm) {
-  igraph_vector_t sum;
-  int no_of_nodes=igraph_sparsemat_nrow(sparsemat);
-  int i;
-  
-  IGRAPH_VECTOR_INIT_FINALLY(&sum, no_of_nodes);
-
-  switch (norm) {       
-  case IGRAPH_SCG_NORM_ROW:
-    IGRAPH_CHECK(igraph_sparsemat_rowsums(sparsemat, &sum));
-    for (i=0; i<no_of_nodes; i++) {
-      if (VECTOR(sum)[i] == 0.0) {
-	IGRAPH_ERROR("Zero out-degree vertices not allowed", 
-		     IGRAPH_EINVAL);
-      }
-      VECTOR(sum)[i] = 1.0 / VECTOR(sum)[i];
-    }
-    IGRAPH_CHECK(igraph_sparsemat_scale_rows(sparsemat, &sum));
-    break;
-  case IGRAPH_SCG_NORM_COL:
-    IGRAPH_CHECK(igraph_sparsemat_colsums(sparsemat, &sum));
-    for (i=0; i<no_of_nodes; i++) {
-      if (VECTOR(sum)[i] == 0.0) {
-	IGRAPH_ERROR("Zero out-degree vertices not allowed", 
-		     IGRAPH_EINVAL);
-      }
-      VECTOR(sum)[i] = 1.0 / VECTOR(sum)[i];
-    }
-    IGRAPH_CHECK(igraph_sparsemat_scale_cols(sparsemat, &sum));
-    break;
-  }
-
-  igraph_vector_destroy(&sum);
-  IGRAPH_FINALLY_CLEAN(1);
-  
-  return 0;
-}
-
-int igraph_get_stochastic_sparsemat(const igraph_t *graph, 
-				    igraph_sparsemat_t *sparsemat,
-				    igraph_scg_norm_t norm) {
-
-  IGRAPH_CHECK(igraph_get_sparsemat(graph, sparsemat));
-  IGRAPH_FINALLY(igraph_sparsemat_destroy, sparsemat);
-  IGRAPH_CHECK(igraph_i_normalize_sparsemat(sparsemat, norm));
-  IGRAPH_FINALLY_CLEAN(1);
-  
-  return 0;
-}
-
 int igraph_i_matrix_laplacian(const igraph_matrix_t *matrix, 
 			      igraph_matrix_t *mymatrix, 
 			      igraph_scg_norm_t norm) {
@@ -731,40 +641,6 @@ int igraph_i_matrix_laplacian(const igraph_matrix_t *matrix,
   
   igraph_vector_destroy(&degree);
   IGRAPH_FINALLY_CLEAN(1);
-
-  return 0;
-}
-
-int igraph_i_matrix_stochastic(const igraph_matrix_t *matrix, 
-			       igraph_matrix_t *mymatrix, 
-			       igraph_scg_norm_t norm) {
-
-  int i, j, n=igraph_matrix_nrow(matrix);
-  IGRAPH_CHECK(igraph_matrix_copy(mymatrix, matrix));
-
-  if (norm==IGRAPH_SCG_NORM_ROW){
-    for (i=0; i<n; i++) {
-      igraph_real_t sum=0.0;
-      for (j=0; j<n; j++) {
-	sum += MATRIX(*matrix, i, j);
-      }
-      if (sum == 0) { IGRAPH_WARNING("Zero degree vertices"); }
-      for (j=0; j<n; j++) {
-	MATRIX(*mymatrix, i, j) = MATRIX(*matrix, i, j) / sum;
-      }
-    }
-  } else {
-    for (i=0; i<n; i++) {
-      igraph_real_t sum=0.0;
-      for (j=0; j<n; j++) {
-	sum += MATRIX(*matrix, j, i);
-      }
-      if (sum == 0) { IGRAPH_WARNING("Zero degree vertices"); }
-      for (j=0; j<n; j++) {
-	MATRIX(*mymatrix, j, i) = MATRIX(*matrix, j, i) / sum;
-      }
-    }    
-  }	
 
   return 0;
 }
@@ -820,6 +696,43 @@ int igraph_i_sparsemat_laplacian(const igraph_sparsemat_t *sparse,
   
   return 0;
 }
+
+int igraph_i_matrix_stochastic(const igraph_matrix_t *matrix, 
+			       igraph_matrix_t *mymatrix, 
+			       igraph_scg_norm_t norm) {
+
+  int i, j, n=igraph_matrix_nrow(matrix);
+  IGRAPH_CHECK(igraph_matrix_copy(mymatrix, matrix));
+
+  if (norm==IGRAPH_SCG_NORM_ROW){
+    for (i=0; i<n; i++) {
+      igraph_real_t sum=0.0;
+      for (j=0; j<n; j++) {
+	sum += MATRIX(*matrix, i, j);
+      }
+      if (sum == 0) { IGRAPH_WARNING("Zero degree vertices"); }
+      for (j=0; j<n; j++) {
+	MATRIX(*mymatrix, i, j) = MATRIX(*matrix, i, j) / sum;
+      }
+    }
+  } else {
+    for (i=0; i<n; i++) {
+      igraph_real_t sum=0.0;
+      for (j=0; j<n; j++) {
+	sum += MATRIX(*matrix, j, i);
+      }
+      if (sum == 0) { IGRAPH_WARNING("Zero degree vertices"); }
+      for (j=0; j<n; j++) {
+	MATRIX(*mymatrix, j, i) = MATRIX(*matrix, j, i) / sum;
+      }
+    }    
+  }	
+
+  return 0;
+}
+
+int igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat, 
+				 igraph_bool_t column_wise);
 
 int igraph_i_sparsemat_stochastic(const igraph_sparsemat_t *sparse,
 				  igraph_sparsemat_t *mysparse,
@@ -1322,7 +1235,8 @@ int igraph_scg_stochastic(const igraph_t *graph,
 
   if (graph) {
     mysparsemat=&real_sparsemat;
-    IGRAPH_CHECK(igraph_get_stochastic_sparsemat(graph, mysparsemat, norm));
+    IGRAPH_CHECK(igraph_get_stochastic_sparsemat(graph, mysparsemat, 
+						 norm==IGRAPH_SCG_NORM_COL));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparsemat);
   } else if (matrix) {
     mymatrix=&real_matrix;
@@ -1592,7 +1506,8 @@ int igraph_scg_laplacian(const igraph_t *graph,
     IGRAPH_CHECK(igraph_i_matrix_laplacian(matrix, mymatrix, norm));
   } else { /* sparsemat */
     mysparsemat=&real_sparsemat;
-    IGRAPH_CHECK(igraph_i_sparsemat_laplacian(sparsemat, mysparsemat, norm));
+    IGRAPH_CHECK(igraph_i_sparsemat_laplacian(sparsemat, mysparsemat, 
+					    norm==IGRAPH_SCG_NORM_COL));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparsemat);
   }
 

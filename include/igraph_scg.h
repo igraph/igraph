@@ -43,14 +43,6 @@ typedef enum { IGRAPH_SCG_DIRECTION_DEFAULT=1,
 	       IGRAPH_SCG_DIRECTION_LEFT=2,
 	       IGRAPH_SCG_DIRECTION_RIGHT=3 } igraph_scg_direction_t;
 
-int igraph_get_stochastic(const igraph_t *graph, 
-			  igraph_matrix_t *matrix,
-			  igraph_scg_norm_t norm);
-
-int igraph_get_stochastic_sparsemat(const igraph_t *graph, 
-				    igraph_sparsemat_t *sparsemat,
-				    igraph_scg_norm_t norm);
-
 int igraph_scg_grouping(const igraph_matrix_t *V, 
 			igraph_vector_t *groups,
 			igraph_integer_t nt,
