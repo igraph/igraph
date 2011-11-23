@@ -105,7 +105,7 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
       igraph_vector_size(nt_vec) != nev) {
     IGRAPH_ERROR("Invalid length for interval specification", IGRAPH_EINVAL);
   }
-  if (igraph_vector_size(nt_vec) == 1) {
+  if (nt_vec && igraph_vector_size(nt_vec) == 1) {
     nt=VECTOR(*nt_vec)[0];
     nt_vec=0;
   }
