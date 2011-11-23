@@ -61,7 +61,7 @@ scg(X, ev, nt, groups = NULL, mtype = c("symmetric", "laplacian",
     distribution of a Markov chain when \code{mtype} =
     \dQuote{stochastic}. This parameter is ignored in all other cases.}
  \item{use.arpack}{Logical scalar. When set to \code{TRUE} uses the
-   function \code{arpack} of the \pkg{igraph} package to compute
+   function \code{\link{arpack}} to compute
    eigenpairs. This parameter should be set to \code{TRUE} if one deals
    with large (over a few thousands) AND sparse graphs or matrices. This
    argument is not implemented currently and LAPACK is used for solving

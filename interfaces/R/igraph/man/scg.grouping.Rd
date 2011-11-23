@@ -22,8 +22,7 @@ scgGrouping(V, nt, mtype = c("symmetric", "laplacian",
     partition each eigenvector. The same partition size or number of
     intervals is used for each eigenvector if \code{nt} is a single
     integer. When \code{algo} = \dQuote{exact\_cg} this parameter is
-    ignored, but a value between 2 and vcount(X) (or nrow(X)) must be
-    provided TODO: improve this.}
+    ignored.}
   \item{mtype}{The type of semi-projectors used in the SCG. For now
     \dQuote{symmetric}, \dQuote{laplacian} and \dQuote{stochastic} are
     available.}
@@ -33,7 +32,8 @@ scgGrouping(V, nt, mtype = c("symmetric", "laplacian",
   \item{p}{A probability vector of length equal to
     \code{nrow(V)}. \code{p} is the stationary probability distribution
     of a Markov chain when \code{mtype} = \dQuote{stochastic}. This
-    parameter is ignored in all other cases.} \item{maxiter}{A positive
+    parameter is ignored in all other cases.}
+  \item{maxiter}{A positive
     integer giving the maximum number of iterations of the k-means
     algorithm when \code{algo} = \dQuote{interv\_km}. This parameter is
     ignored in all other cases.} 

@@ -1,13 +1,13 @@
 \name{Spectral coarse graining}
 \alias{SCG}
 \concept{Spectral coarse graining}
-\title{The Spectral Coarse Graining Package}
+\title{Spectral Coarse Graining}
 \description{
-  A package to perform the Spectral Coarse Graining (SCG) of matrices
+  Functions to perform the Spectral Coarse Graining (SCG) of matrices
   and graphs.
 }
 \section{Introduction}{
-  The SCG package provides a framework, called Spectral Coarse Graining
+  The SCG functions provide a framework, called Spectral Coarse Graining
   (SCG), for reducing large graphs while preserving their
   \emph{spectral-related features}, that is features closely related
   with the eigenvalues and eigenvectors of a graph matrix (which for now
@@ -25,7 +25,7 @@
   \emph{exact SCG}, where the matrix to be coarse-grained is the
   covariance matrix of some data set. 
 
-  The SCG package should be of interest to practitioners of various
+  SCG should be of interest to practitioners of various
   fields dealing with problems where matrix eigenpairs play an important
   role, as for instance is the case of dynamical processes on networks.
 }
@@ -40,7 +40,7 @@
   \eqn{L,R \in \mathbf{C}^{\tilde n \times n}}{L,R in C[n'xn]} are such
   that \eqn{LR^*=I_{\tilde n}}{LR*=I[n']} (\eqn{R^*}{R*} denotes the
   conjugate transpose of \eqn{R}). Under these assumptions, it can be
-  sown that \eqn{P=R^*L}{P=R*L} is an \eqn{\tilde n}{n'}-rank projector
+  shown that \eqn{P=R^*L}{P=R*L} is an \eqn{\tilde n}{n'}-rank projector
   and that, if \eqn{(\lambda, v)}{(lambda, v)} is a (right) 
   eigenpair of \eqn{M} (i.e. \eqn{Mv=\lambda v}{Mv=lambda v}) and
   \eqn{P} is orthogonal, there exists an eigenvalue \eqn{\tilde
@@ -93,7 +93,7 @@
   \eqn{\widetilde M}{M'} is symmetric or stochastic as well. This
   \emph{structural constraint} has led to the construction of particular
   semi-projectors for symmetric [1], stochastic [3] and Laplacian [2]
-  matrices, that are made available in the package.
+  matrices, that are made available.
 
   In short, the coarse graining of matrices and graphs involves: 
   \enumerate{
@@ -114,7 +114,7 @@
   }
 }
 \section{Functions for performing SCG}{
-  The main function of the SCG package is the \dQuote{all-in-one}
+  The main function is the \dQuote{all-in-one}
   \code{\link{scg}}. This function handles all the steps involved in the
   Spectral Coarse Graining (SCG) of some particular matrices and graphs
   as described above and in reference [1]. In more details,
