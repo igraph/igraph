@@ -642,11 +642,11 @@ alpha.centrality.sparse <- function(graph, nodes=V(graph), alpha=1,
   }
   
   el <- get.edgelist(graph, names=FALSE)
-  M <- spMatrix(vc, vc, i=el[,2], j=el[,1], x=weights)
+  M <- sparseMatrix(dims=c(vc, vc), i=el[,2], j=el[,1], x=weights)
   M <- as(M, "dgCMatrix")
   
   ## Create an identity matrix
-  M2 <- spMatrix(vc, vc, i=1:vc, j=1:vc, x=rep(1, vc))
+  M2 <- sparseMatrix(dims=c(vc, vc), i=1:vc, j=1:vc, x=rep(1, vc))
   M2 <- as(M2, "dgCMatrix")
 
   ## exo
