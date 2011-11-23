@@ -11,13 +11,25 @@ stochasticMatrix <- function(graph, norm = c("row", "col"), ...) {
   if (any(graph < 0)) { stop("'graph' must have non-negative entries") }
 
   if(norm == "row") {
-    y <- rowSums(graph)
+    if (inherits(graph, "Matrix")) {
+      y <- Matrix::rowSums(graph)
+    } else {
+      y <- rowSums(graph)
+    }
     if(any(y == 0)) { stop("zero out-degree in 'graph' not allowed") }
     return( graph/y )
   } else {
-    y <- colSums(graph)
+    if (inherits(graph, "Matrix")) {
+      y <- Matrix::colSums(graph)
+    } else {
+      y <- colSums(graph)
+    }
     if (any(y == 0)) { stop("zero in-degree in 'graph not allowed'") }
-    return( t(t(graph) / y) )
+    if (inherits(graph, "Matrix")) {
+      return( Matrix::t(Matrix::t(graph) / y) )
+    } else {
+      return( t(t(graph) / y) )
+    }
   }
 }
 
