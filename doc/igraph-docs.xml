@@ -76,8 +76,6 @@
 
   <xi:include href="structural.xml"/>
 
-  <xi:include href="hrg.xml"/>
-
   <xi:include href="visitors.xml"/>
 
   <xi:include href="cliques.xml"/>
@@ -95,6 +93,8 @@
   <xi:include href="separators.xml"/>
 
   <xi:include href="community.xml"/>
+
+  <xi:include href="scg.xml"/>
 
   <xi:include href="operators.xml"/>
   

@@ -87,6 +87,265 @@
 
 #include "math.h"
 
+/**
+ * \section about_scg
+ * 
+ * <para>
+ * The SCG functions provide a framework, called Spectral Coarse Graining
+ * (SCG), for reducing large graphs while preserving their
+ * <emphasis>spectral-related features</emphasis>, that is features
+ * closely related with the eigenvalues and eigenvectors of a graph
+ * matrix (which for now can be the adjacency, the stochastic, or the
+ * Laplacian matrix).
+ * </para>
+ * 
+ * <para>
+ * Common examples of such features comprise the first-passage-time of
+ * random walkers on Markovian graphs, thermodynamic properties of
+ * lattice models in statistical physics (e.g. Ising model), and the
+ * epidemic threshold of epidemic network models (SIR and SIS models).
+ * </para>
+ * 
+ * <para>
+ * SCG differs from traditional clustering schemes by producing a
+ * <emphasis>coarse-grained graph</emphasis> (not just a partition of
+ * the vertices), representative of the original one. As shown in [1],
+ * Principal Component Analysis can be viewed as a particular SCG,
+ * called <emphasis>exact SCG</emphasis>, where the matrix to be
+ * coarse-grained is the covariance matrix of some data set. 
+ * </para>
+ * 
+ * <para>
+ * SCG should be of interest to practitioners of various
+ * fields dealing with problems where matrix eigenpairs play an important
+ * role, as for instance is the case of dynamical processes on networks.
+ * </para>
+ *
+ * <section><title>SCG in brief</title>
+ * <para>
+ * The main idea of SCG is to operate on a matrix a shrinkage operation
+ * specifically designed to preserve some of the matrix eigenpairs while
+ * not altering other important matrix features (such as its structure). 
+ * Mathematically, this idea was expressed as follows. Consider a
+ * (complex) n x n matrix M and form the product
+ * <blockquote><para><phrase role="math">
+ *   M'=LMR*,
+ * </phrase></para></blockquote>
+ * where n' &lt; n and L, R are from C[n'xn]} and are such
+ * that LR*=I[n'] (R* denotes the conjugate transpose of R). Under
+ * these assumptions, it can be shown that P=R*L is an n'-rank
+ * projector and that, if (lambda, v) is a (right) 
+ * eigenpair of M (i.e. Mv=lambda v} and P is orthogonal, there exists
+ * an eigenvalue lambda' of M' such that 
+ * <blockquote><para><phrase role="math">
+ *   |lambda-lambda'| &lt;= const ||e[P](v)|| 
+ *   [1+O(||e[P](v)||<superscript>2</superscript>)],
+ * </phrase></para></blockquote>
+ * where ||e[P](v)||=||v-Pv||. Hence, if P (or equivalently
+ * L, R) is chosen so as to make ||e[P](v)|| as small as possible, one
+ * can preserve to any desired level the original eigenvalue
+ * lambda in the coarse-grained matrix M';
+ * under extra assumptions on M, this result can be generalized to
+ * eigenvectors [1]. This leads to the following generic definition of a
+ * SCG problem.
+ * </para>
+ * 
+ * <para>
+ * Given M (C[nxn]) and (lambda, v), a (right) eigenpair of M to be
+ * preserved by the coarse graining, the problem is to find a projector
+ * P' solving
+ * <blockquote><para><phrase role="math">
+ *   min(||e[P](v)||, p in Omega),
+ * </phrase></para></blockquote>
+ * where Omega is a set of projectors in C[nxn] described by some 
+ * ad hoc constraints c[1], ..., c[r]
+ * (e.g. c[1]: P in R[nxn], c[2]: P=t(P), c[3]: P[i,j] >= 0}, etc).
+ * </para>
+ * 
+ * <para>
+ * Choosing pertinent constraints to solve the SCG problem is of great
+ * importance in applications. For instance, in the absence of
+ * constraints the SCG problem is solved trivially by
+ * P'=vv* (v is assumed normalized). We have designed a particular
+ * constraint, called <emphasis>homogeneous mixing</emphasis>, which
+ * ensures that vertices belonging to the same group are merged
+ * consistently from a physical point of view (see [1] for
+ * details). Under this constraint the SCG problem reduces to finding
+ * the partition of 1, ..., n (labeling the original vertices)
+ * minimizing 
+ * <blockquote><para><phrase role="math">
+ *   ||e[P](v)||<superscript>2</superscript> =
+ *   sum([v(i)-(Pv)(i)]<superscript>2</superscript>; 
+ *   alpha=1,...,n', i in alpha),
+ * </phrase></para></blockquote>
+ * where alpha denotes a group (i.e. a block) in a partition of
+ * {1, ..., n}, and |alpha| is the number of elements in alpha.
+ * </para>
+ * 
+ * <para>
+ * If M is symmetric or stochastic, for instance, then it may be
+ * desirable (or mandatory) to choose L, R so that M' is symmetric or
+ * stochastic as well. This <emphasis>structural constraint</emphasis>
+ * has led to the construction of particular semi-projectors for
+ * symmetric [1], stochastic [3] and Laplacian [2] matrices, that are
+ * made available.
+ * </para>
+ * 
+ * <para>
+ * In short, the coarse graining of matrices and graphs involves: 
+ * \olist
+ *   \oli Retrieving a matrix or a graph matrix M from the
+ *     problem. 
+ *   \oli Computing the eigenpairs of M to be preserved in the
+ *     coarse-grained graph or matrix. 
+ *   \oli Setting some problem-specific constraints (e.g. dimension of
+ *     the coarse-grained object). 
+ *   \oli Solving the constrained SCG problem, that is finding P'.
+ *   \oli Computing from P' two semi-projectors L' and R'
+ *     (e.g. following the method proposed in [1]). 
+ *   \oli Working out the product M'=L'MR'* and, if needed, defining
+ *     from M' a coarse-grained graph. 
+ * \endolist
+ * </para>
+ * </section>
+ * 
+ * <section><title>Functions for performing SCG</title>
+ * <para>
+ * The main functions are \ref igraph_scg_adjacency(), \ref
+ * igraph_scg_laplacian() and \ref igraph_scg_stochastic().
+ * These functions handle all the steps involved in the
+ * Spectral Coarse Graining (SCG) of some particular matrices and graphs
+ * as described above and in reference [1]. In more details,
+ * they compute some prescribed eigenpairs of a matrix or a
+ * graph matrix, (for now adjacency, Laplacian and stochastic matrices are
+ * available), work out an optimal partition to preserve the eigenpairs,
+ * and finally output a coarse-grained matrix or graph along with other
+ * useful information. 
+ * </para>
+ * 
+ * <para>
+ * These steps can also be carried out independently: (1) Use
+ * \ref igraph_get_adjacency(), \ref igraph_get_sparsemat(), 
+ * \ref igraph_laplacian(), \ref igraph_get_stochastic() or \ref
+ * igraph_get_stochastic_sparsemat() to compute a matrix M. 
+ * (2) Work out some prescribed eigenpairs of M e.g. by 
+ * means of \ref igraph_arpack_rssolve() or \ref
+ * igraph_arpack_rnsolve(). (3) Invoke one the four
+ * algorithms of the function \ref igraph_scg_grouping() to get a
+ * partition that will preserve the eigenpairs in the coarse-grained
+ * matrix. (4) Compute the semi-projectors L and R using
+ * \ref igraph_scg_semiprojectors() and from there the coarse-grained
+ * matrix M'=LMR*. If necessary, construct a coarse-grained graph from
+ * M' (e.g. as in [1]).
+ * </para>
+ * </section>
+ * 
+ * <section><title>References</title>
+ * <para>
+ * [1] D. Morton de Lachapelle, D. Gfeller, and P. De Los Rios,
+ * Shrinking Matrices while Preserving their Eigenpairs with Application
+ * to the Spectral Coarse Graining of Graphs. Submitted to 
+ * <emphasis>SIAM Journal on Matrix Analysis and
+ * Applications</emphasis>, 2008.
+ * http://people.epfl.ch/david.morton
+ * </para>
+ * <para>
+ * [2] D. Gfeller, and P. De Los Rios, Spectral Coarse Graining and
+ * Synchronization in Oscillator Networks. 
+ * <emphasis>Physical Review Letters</emphasis>, 
+ * <emphasis role="strong">100</emphasis>(17), 2008. 
+ * http://arxiv.org/abs/0708.2055
+ * </para>
+ * <para>
+ * [3] D. Gfeller, and P. De Los Rios, Spectral Coarse Graining of Complex
+ * Networks, <emphasis>Physical Review Letters</emphasis>,
+ * <emphasis role="strong">99</emphasis>(3), 2007.
+ * http://arxiv.org/abs/0706.0812
+ * </para>
+ * </section>
+ */
+
+/**
+ * \function igraph_scg_grouping
+ * \brief SCG problem solver
+ * 
+ * This function solves the Spectral Coarse Graining (SCG) problem;
+ * either exactly, or approximately but faster.
+ * 
+ * </para><para>
+ * The algorithm \c IGRAPH_SCG_OPTIMUM solves exactly the SCG problem
+ * for each eigenvector in \p V. The running time of this algorithm is
+ * O(max(nt) m^2) for the symmetric and laplacian matrix problems
+ * It is O(m^3) for the stochastic problem. Here m is the number
+ * of rows in \p V. In all three cases, the memory usage is O(m^2).
+ * 
+ * </para><para>
+ * The algorithms \c IGRAPH_SCG_INTERV and \c IGRAPH_SCG_INTERV_KM solve
+ * approximately the SCG problem by performing a (for now) constant
+ * binning of the components of the eigenvectors, that is \p nt 
+ * <code>VECTOR(nt_vec)[i]</code>) constant-size bins are used to
+ * partition <code>V[,i]</code>. When \p algo is \c
+ * IGRAPH_SCG_INTERV_KM, the (Lloyd) k-means algorithm is
+ * run on each partition obtained by \c IGRAPH_SCG_INTERV to improve
+ * accuracy. 
+ * 
+ * </para><para>
+ * Once a minimizing partition (either exact or approximate) has been
+ * found for each eigenvector, the final grouping is worked out as
+ * follows: two vertices are grouped together in the final partition if
+ * they are grouped together in each minimizing partition. In general the
+ * size of the final partition is not known in advance when the number
+ * of columns in \p V is larger than one.
+ * 
+ * </para><para>
+ * Finally, the algorithm \c IGRAPH_SCG_EXACT groups the vertices with
+ * equal components in each eigenvector. The last three algorithms
+ * essentially have linear running time and memory load.
+ * 
+ * \param V The matrix of eigenvectors to be preserved by coarse
+ *    graining, each column is an eigenvector.
+ * \param groups Pointer to an initialized vector, the result of the
+ *    SCG is stored here.
+ * \param nt Positive integer. When \p algo is \c IGRAPH_SCG_OPTIMUM,
+ *    it gives the number of groups to partition each eigenvector
+ *    separately. When \p algo is \c IGRAPH_SCG_INTERV or \c
+ *    IGRAPH_SCG_INTERV_KM, it gives the number of intervals to
+ *    partition each eigenvector. This is ignored when \p algo is \c
+ *    IGRAPH_SCG_EXACT.
+ * \param nt_vec A numeric vector of length one or the length must
+ *    match the number of eigenvectors given in \p V, or a \c NULL
+ *    pointer. If not \c NULL, then this argument gives the number of
+ *    groups or intervals, and \p nt is ignored. Different number of
+ *    groups or intervals can be specified for each eigenvector.
+ * \param mtype The type of semi-projectors used in the SCG. Possible
+ *    values are \c IGRAPH_SCG_SYMMETRIC, \c IGRAPH_SCG_STOCHASTIC and
+ *    \c IGRAPH_SCG_LAPLACIAN.
+ * \param algo The algorithm to solve the SCG problem. Possible
+ *    values: \c IGRAPH_SCG_OPTIMUM, \c IGRAPH_SCG_INTERV_KM, \c
+ *    IGRAPH_SCG_INTERV and \c IGRAPH_SCG_EXACT. Please see the
+ *    details about them above.
+ * \param p A probability vector, or \c NULL. This argument must be
+ *    given if \p mtype is \c IGRAPH_SCG_STOCHASTIC, but it is ignored
+ *    otherwise. For the stochastic case it gives the stationary
+ *    probability distribution of a Markov chain, the one specified by
+ *    the graph/matrix under study.
+ * \param maxiter A positive integer giving the number of iterations
+ *    of the k-means algorithm when \p algo is \c
+ *    IGRAPH_SCG_INTERV_KM. It is ignored in other cases. A reasonable
+ *    (initial) value for this argument is 100.
+ * \return Error code.
+ * 
+ * Time complexity: see description above.
+ * 
+ * \sa \ref igraph_scg_adjacency(), \ref igraph_scg_laplacian(), \ref
+ * igraph_scg_stochastic().
+ * 
+ * \example examples/simple/igraph_scg_grouping.c
+ * \example examples/simple/igraph_scg_grouping2.c
+ * \example examples/simple/igraph_scg_grouping3.c
+ * \example examples/simple/igraph_scg_grouping4.c
+ */
+
 int igraph_scg_grouping(const igraph_matrix_t *V, 
 			igraph_vector_t *groups,
 			igraph_integer_t nt,
@@ -474,6 +733,77 @@ int igraph_i_scg_semiprojectors_sto(const igraph_vector_t *groups,
   return 0;
 }
 
+/**
+ * \function igraph_scg_semiprojectors
+ * \brief Compute SCG semi-projectors for a given partition
+ * 
+ * The three types of semi-projectors are defined as follows.
+ * Let gamma(j) label the group of vertex j in a partition of all the
+ * vertices.
+ *
+ * </para><para>
+ * The symmetric semi-projectors are defined as
+ * <blockquote><para><phrase role="math">
+ *   L[alpha,j] = R[alpha,j] = 1/sqrt(|alpha|) delta[alpha,gamma(j)],
+ * </phrase></para></blockquote>
+ * the (row) Laplacian semi-projectors as
+ * <blockquote><para><phrase role="math">
+ *   L[alpha,j] = 1/|alpha| delta[alpha,gamma(j)]
+ * </phrase></para></blockquote>
+ * and
+ * <blockquote><para><phrase role="math">
+ *   R[alpha,j] = delta[alpha,gamma(j)],
+ * </phrase></para></blockquote>
+ * and the (row) stochastic semi-projectors as
+ * <blockquote><para><phrase role="math">
+ *     L[alpha,j] = p[1][j] / sum(p[1][k]; k in gamma(j))
+ *     delta[alpha,gamma(j)]
+ * </phrase></para></blockquote>
+ * and
+ * <blockquote><para><phrase role="math">
+ *     R[alpha,j] = delta[alpha,gamma(j)],
+ * </phrase></para></blockquote>
+ * where p[1] is the (left) eigenvector associated with the
+ * one-eigenvalue of the stochastic matrix. L and R are
+ * defined in a symmetric way when \p norm is \c
+ * IGRAPH_SCG_NORM_COL. All these semi-projectors verify various
+ * properties described in the reference.
+ * \param groups A vector of integers, giving the group label of every
+ *    vertex in the partition. Group labels should start at zero and
+ *    should be sequential.
+ * \param mtype The type of semi-projectors. For now \c
+ *    IGRAPH_SCG_SYMMETRIC, \c IGRAPH_SCG_STOCHASTIC and \c
+ *    IGRAP_SCG_LAPLACIAN are supported.
+ * \param L If not a \c NULL pointer, then it must be a pointer to
+ *    an initialized matrix. The left semi-projector is stored here.
+ * \param R If not a \c NULL pointer, then it must be a pointer to
+ *    an initialized matrix. The right semi-projector is stored here.
+ * \param Lsparse If not a \c NULL pointer, then it must be a pointer
+ *    to an uninitialized sparse matrix. The left semi-projector is
+ *    stored here.
+ * \param Rsparse If not a \c NULL pointer, then it must be a pointer
+ *    to an uninitialized sparse matrix. The right semi-projector is
+ *    stored here.
+ * \param p \c NULL, or a probability vector of the same length as \p
+ *    groups. \p p is the stationary probability distribution of a
+ *    Markov chain when \p mtype is \c IGRAPH_SCG_STOCHASTIC. This
+ *    argument is ignored in all other cases.
+ * \param norm Either \c IGRAPH_SCG_NORM_ROW or \c IGRAPH_SCG_NORM_COL. 
+ *    Specifies whether the rows or the columns of the Laplacian
+ *    matrix sum up to zero, or whether the rows or the columns of the
+ *    stochastic matrix sum up to one.
+ * \return Error code.
+ * 
+ * Time complexity: TODO.
+ * 
+ * \sa \ref igraph_scg_adjacency(), \ref igraph_scg_stochastic() and
+ * \ref igraph_scg_laplacian(), \ref igraph_scg_grouping().
+ * 
+ * \example examples/simple/igraph_scg_semiprojectors.c
+ * \example examples/simple/igraph_scg_semiprojectors2.c
+ * \example examples/simple/igraph_scg_semiprojectors3.c
+ */
+
 int igraph_scg_semiprojectors(const igraph_vector_t *groups,
 			      igraph_scg_matrix_t mtype,
 			      igraph_matrix_t *L,
@@ -526,6 +856,39 @@ int igraph_scg_semiprojectors(const igraph_vector_t *groups,
   
   return 0;
 }
+
+/**
+ * \function igraph_scg_norm_eps
+ * Calculate SCG residuals
+ * 
+ * Computes |v[i]-Pv[i]|, where v[i] is the i-th eigenvector in \p V
+ * and P is the projector corresponding to the \p mtype argument.
+ * 
+ * \param V The matrix of eigenvectors to be preserved by coarse
+ *    graining, each column is an eigenvector.
+ * \param groups A vector of integers, giving the group label of every
+ *    vertex in the partition. Group labels should start at zero and
+ *    should be sequential.
+ * \param eps Pointer to a real value, the result is stored here.
+ * \param mtype The type of semi-projectors. For now \c
+ *    IGRAPH_SCG_SYMMETRIC, \c IGRAPH_SCG_STOCHASTIC and \c
+ *    IGRAP_SCG_LAPLACIAN are supported.
+ * \param p \c NULL, or a probability vector of the same length as \p
+ *    groups. \p p is the stationary probability distribution of a
+ *    Markov chain when \p mtype is \c IGRAPH_SCG_STOCHASTIC. This
+ *    argument is ignored in all other cases.
+ * \param norm Either \c IGRAPH_SCG_NORM_ROW or \c IGRAPH_SCG_NORM_COL. 
+ *    Specifies whether the rows or the columns of the Laplacian
+ *    matrix sum up to zero, or whether the rows or the columns of the
+ *    stochastic matrix sum up to one.
+ * \return Error code.
+ * 
+ * Time complexity: TODO.
+ * 
+ * \sa \ref igraph_scg_adjacency(), \ref igraph_scg_stochastic() and
+ * \ref igraph_scg_laplacian(), \ref igraph_scg_grouping(), \ref
+ * igraph_scg_semiprojectors().
+ */
 
 int igraph_scg_norm_eps(const igraph_matrix_t *V,
 			const igraph_vector_t *groups,
@@ -666,7 +1029,7 @@ int igraph_i_sparsemat_laplacian(const igraph_sparsemat_t *sparse,
     int col=igraph_sparsemat_iterator_col(&it);
     if (row != col) { 
       igraph_real_t val=igraph_sparsemat_iterator_get(&it);
-      if (norm == IGRAPH_SCG_NORM_ROW) { 
+      if (norm == IGRAPH_SCG_NORM_ROW) {
 	VECTOR(degree)[row] += val;
       } else {
 	VECTOR(degree)[col] += val;
@@ -985,7 +1348,84 @@ int igraph_i_scg_common_checks(const igraph_t *graph,
 
   return 0;
 }
-			       
+
+/**
+ * \function igraph_scg_adjacency
+ * Spectral coarse graining, symmetric case.
+ * 
+ * This function handles all the steps involved in the Spectral Coarse
+ * Graining (SCG) of some matrices and graphs as described in the
+ * reference below.
+ * 
+ * \param graph The input graph. Exactly one of \p graph, \p matrix
+ *    and \p sparsemat must be given, the other two must be \c NULL
+ *    pointers.
+ * \param matrix The input matrix. Exactly one of \p graph, \p matrix
+ *    and \p sparsemat must be given, the other two must be \c NULL
+ *    pointers.
+ * \param sparsemat The input sparse matrix. Exactly one of \p graph,
+ *    \p matrix and \p sparsemat must be given, the other two must be
+ *    \c NULL pointers.
+ * \param ev A vector of positive integers giving the indexes of the
+ *   eigenpairs to be preserved. 1 designates the eigenvalue with
+ *    largest algebraic value, 2 the one with second largest algebraic
+ *    value, etc.
+ * \param nt Positive integer. When \p algo is \c IGRAPH_SCG_OPTIMUM,
+ *    it gives the number of groups to partition each eigenvector
+ *    separately. When \p algo is \c IGRAPH_SCG_INTERV or \c
+ *    IGRAPH_SCG_INTERV_KM, it gives the number of intervals to
+ *    partition each eigenvector. This is ignored when \p algo is \c
+ *    IGRAPH_SCG_EXACT.
+ * \param nt_vec A numeric vector of length one or the length must
+ *    match the number of eigenvectors given in \p V, or a \c NULL
+ *    pointer. If not \c NULL, then this argument gives the number of
+ *    groups or intervals, and \p nt is ignored. Different number of
+ *    groups or intervals can be specified for each eigenvector.
+ * \param algo The algorithm to solve the SCG problem. Possible
+ *    values: \c IGRAPH_SCG_OPTIMUM, \c IGRAPH_SCG_INTERV_KM, \c
+ *    IGRAPH_SCG_INTERV and \c IGRAPH_SCG_EXACT. Please see the
+ *    details about them above.
+ * \param values If this is not \c NULL and the eigenvectors are
+ *    re-calculated, then the eigenvalues are stored here.
+ * \param vectors If this is not \c NULL, and not a zero-length
+ *    matrix, then it is interpreted as the eigenvectors to use for
+ *    the coarse-graining. Otherwise the eigenvectors are
+ *    re-calculated, and they are stored here. (If this is not \c NULL.)
+ * \param groups If this is not \c NULL, and not a zero-length vector,
+ *    then it is interpreted as the vector of group labels. (Group
+ *    labels are integers from zero and are sequential.) Otherwise
+ *    group labels are re-calculated and stored here, if this argument
+ *    is not a null pointer.
+ * \param use_arpack Whether to use ARPACK for solving the
+ *    eigenproblem. Currently ARPACK is not implemented.
+ * \param maxiter A positive integer giving the number of iterations
+ *    of the k-means algorithm when \p algo is \c
+ *    IGRAPH_SCG_INTERV_KM. It is ignored in other cases. A reasonable
+ *    (initial) value for this argument is 100.
+ * \param scg_graph If not a \c NULL pointer, then the coarse-grained
+ *    graph is returned here.
+ * \param scg_matrix If not a \c NULL pointer, then it must be an
+ *    initialied matrix, and the coarse-grained matrix is returned
+ *    here.
+ * \param scg_sparsemat If not a \c NULL pointer, then the coarse
+ *    grained matrix is returned here, in sparse matrix form.
+ * \param L If not a \c NULL pointer, then it must be an initialized
+ *    matrix and the left semi-projector is returned here.
+ * \param R If not a \c NULL pointer, then it must be an initialized
+ *    matrix and the right semi-projector is returned here.
+ * \param Lsparse If not a \c NULL pointer, then the left
+ *    semi-projector is returned here.
+ * \param Rsparse If not a \c NULL pointer, then the right
+ *    semi-projector is returned here.
+ * \return Error code.
+ *
+ * Time complexity: TODO.
+ * 
+ * \sa \ref igraph_scg_grouping(), \ref igraph_scg_semiprojectors(), 
+ * \ref igraph_scg_stochastic() and \ref igraph_scg_laplacian().
+ * 
+ * \example examples/simple/scg.c
+ */
 
 int igraph_scg_adjacency(const igraph_t *graph,
 			 const igraph_matrix_t *matrix,
@@ -1168,6 +1608,93 @@ int igraph_scg_adjacency(const igraph_t *graph,
 
   return 0;
 }
+
+/**
+ * \function igraph_scg_stochastic
+ * Spectral coarse graining, stochastic case.
+ *
+ * This function handles all the steps involved in the Spectral Coarse
+ * Graining (SCG) of some matrices and graphs as described in the
+ * reference below.
+ * 
+ * \param graph The input graph. Exactly one of \p graph, \p matrix
+ *    and \p sparsemat must be given, the other two must be \c NULL
+ *    pointers.
+ * \param matrix The input matrix. Exactly one of \p graph, \p matrix
+ *    and \p sparsemat must be given, the other two must be \c NULL
+ *    pointers.
+ * \param sparsemat The input sparse matrix. Exactly one of \p graph,
+ *    \p matrix and \p sparsemat must be given, the other two must be
+ *    \c NULL pointers.
+ * \param ev A vector of positive integers giving the indexes of the
+ *   eigenpairs to be preserved. 1 designates the eigenvalue with
+ *    largest magnitude, 2 the one with second largest magnitude, etc.
+ * \param nt Positive integer. When \p algo is \c IGRAPH_SCG_OPTIMUM,
+ *    it gives the number of groups to partition each eigenvector
+ *    separately. When \p algo is \c IGRAPH_SCG_INTERV or \c
+ *    IGRAPH_SCG_INTERV_KM, it gives the number of intervals to
+ *    partition each eigenvector. This is ignored when \p algo is \c
+ *    IGRAPH_SCG_EXACT.
+ * \param nt_vec A numeric vector of length one or the length must
+ *    match the number of eigenvectors given in \p V, or a \c NULL
+ *    pointer. If not \c NULL, then this argument gives the number of
+ *    groups or intervals, and \p nt is ignored. Different number of
+ *    groups or intervals can be specified for each eigenvector.
+ * \param algo The algorithm to solve the SCG problem. Possible
+ *    values: \c IGRAPH_SCG_OPTIMUM, \c IGRAPH_SCG_INTERV_KM, \c
+ *    IGRAPH_SCG_INTERV and \c IGRAPH_SCG_EXACT. Please see the
+ *    details about them above.
+ * \param norm Either \c IGRAPH_SCG_NORM_ROW or \c IGRAPH_SCG_NORM_COL. 
+ *    Specifies whether the rows or the columns of the
+ *    stochastic matrix sum up to one.
+ * \param values If this is not \c NULL and the eigenvectors are
+ *    re-calculated, then the eigenvalues are stored here.
+ * \param vectors If this is not \c NULL, and not a zero-length
+ *    matrix, then it is interpreted as the eigenvectors to use for
+ *    the coarse-graining. Otherwise the eigenvectors are
+ *    re-calculated, and they are stored here. (If this is not \c NULL.)
+ * \param groups If this is not \c NULL, and not a zero-length vector,
+ *    then it is interpreted as the vector of group labels. (Group
+ *    labels are integers from zero and are sequential.) Otherwise
+ *    group labels are re-calculated and stored here, if this argument
+ *    is not a null pointer.
+ * \param p If this is not \c NULL, and not zero length, then it is
+ *    interpreted as the stationary probability distribution of the
+ *    Markov chain corresponding to the input matrix/graph. Its length
+ *    must match the number of  vertices in the input graph (or number
+ *    of rows in the input matrix). If not given, then the stationary
+ *    distribution is calculated and stored here. (Unless this
+ *    argument is a \c NULL pointer, in which case it is not stored.)
+ * \param use_arpack Whether to use ARPACK for solving the
+ *    eigenproblem. Currently ARPACK is not implemented.
+ * \param maxiter A positive integer giving the number of iterations
+ *    of the k-means algorithm when \p algo is \c
+ *    IGRAPH_SCG_INTERV_KM. It is ignored in other cases. A reasonable
+ *    (initial) value for this argument is 100.
+ * \param scg_graph If not a \c NULL pointer, then the coarse-grained
+ *    graph is returned here.
+ * \param scg_matrix If not a \c NULL pointer, then it must be an
+ *    initialied matrix, and the coarse-grained matrix is returned
+ *    here.
+ * \param scg_sparsemat If not a \c NULL pointer, then the coarse
+ *    grained matrix is returned here, in sparse matrix form.
+ * \param L If not a \c NULL pointer, then it must be an initialized
+ *    matrix and the left semi-projector is returned here.
+ * \param R If not a \c NULL pointer, then it must be an initialized
+ *    matrix and the right semi-projector is returned here.
+ * \param Lsparse If not a \c NULL pointer, then the left
+ *    semi-projector is returned here.
+ * \param Rsparse If not a \c NULL pointer, then the right
+ *    semi-projector is returned here.
+ * \return Error code.
+ *
+ * Time complexity: TODO.
+ * 
+ * \sa \ref igraph_scg_grouping(), \ref igraph_scg_semiprojectors(), 
+ * \ref igraph_scg_adjacency() and \ref igraph_scg_laplacian().
+ * 
+ * \example examples/simple/scg2.c
+ */
 
 int igraph_scg_stochastic(const igraph_t *graph,
 			  const igraph_matrix_t *matrix,
@@ -1432,6 +1959,90 @@ int igraph_scg_stochastic(const igraph_t *graph,
 
   return 0;
 }
+
+/**
+ * \function igraph_scg_laplacian
+ * Spectral coarse graining, laplacian matrix.
+ * This function handles all the steps involved in the Spectral Coarse
+ * Graining (SCG) of some matrices and graphs as described in the
+ * reference below.
+ * 
+ * \param graph The input graph. Exactly one of \p graph, \p matrix
+ *    and \p sparsemat must be given, the other two must be \c NULL
+ *    pointers.
+ * \param matrix The input matrix. Exactly one of \p graph, \p matrix
+ *    and \p sparsemat must be given, the other two must be \c NULL
+ *    pointers.
+ * \param sparsemat The input sparse matrix. Exactly one of \p graph,
+ *    \p matrix and \p sparsemat must be given, the other two must be
+ *    \c NULL pointers.
+ * \param ev A vector of positive integers giving the indexes of the
+ *   eigenpairs to be preserved. 1 designates the eigenvalue with
+ *    largest magnitude, 2 the one with second largest magnitude, etc.
+ * \param nt Positive integer. When \p algo is \c IGRAPH_SCG_OPTIMUM,
+ *    it gives the number of groups to partition each eigenvector
+ *    separately. When \p algo is \c IGRAPH_SCG_INTERV or \c
+ *    IGRAPH_SCG_INTERV_KM, it gives the number of intervals to
+ *    partition each eigenvector. This is ignored when \p algo is \c
+ *    IGRAPH_SCG_EXACT.
+ * \param nt_vec A numeric vector of length one or the length must
+ *    match the number of eigenvectors given in \p V, or a \c NULL
+ *    pointer. If not \c NULL, then this argument gives the number of
+ *    groups or intervals, and \p nt is ignored. Different number of
+ *    groups or intervals can be specified for each eigenvector.
+ * \param algo The algorithm to solve the SCG problem. Possible
+ *    values: \c IGRAPH_SCG_OPTIMUM, \c IGRAPH_SCG_INTERV_KM, \c
+ *    IGRAPH_SCG_INTERV and \c IGRAPH_SCG_EXACT. Please see the
+ *    details about them above.
+ * \param norm Either \c IGRAPH_SCG_NORM_ROW or \c IGRAPH_SCG_NORM_COL. 
+ *    Specifies whether the rows or the columns of the Laplacian
+ *    matrix sum up to zero.
+ * \param direction Whether to work with left or right eigenvectors.
+ *    Possible values: \c IGRAPH_SCG_DIRECTION_DEFAULT, \c
+ *    IGRAPH_SCG_DIRECTION_LEFT, \c IGRAPH_SCG_DIRECTION_RIGHT. This
+ *    argument is currently ignored and right eigenvectors are always
+ *    used.
+ * \param values If this is not \c NULL and the eigenvectors are
+ *    re-calculated, then the eigenvalues are stored here.
+ * \param vectors If this is not \c NULL, and not a zero-length
+ *    matrix, then it is interpreted as the eigenvectors to use for
+ *    the coarse-graining. Otherwise the eigenvectors are
+ *    re-calculated, and they are stored here. (If this is not \c NULL.)
+ * \param groups If this is not \c NULL, and not a zero-length vector,
+ *    then it is interpreted as the vector of group labels. (Group
+ *    labels are integers from zero and are sequential.) Otherwise
+ *    group labels are re-calculated and stored here, if this argument
+ *    is not a null pointer.
+ * \param use_arpack Whether to use ARPACK for solving the
+ *    eigenproblem. Currently ARPACK is not implemented.
+ * \param maxiter A positive integer giving the number of iterations
+ *    of the k-means algorithm when \p algo is \c
+ *    IGRAPH_SCG_INTERV_KM. It is ignored in other cases. A reasonable
+ *    (initial) value for this argument is 100.
+ * \param scg_graph If not a \c NULL pointer, then the coarse-grained
+ *    graph is returned here.
+ * \param scg_matrix If not a \c NULL pointer, then it must be an
+ *    initialied matrix, and the coarse-grained matrix is returned
+ *    here.
+ * \param scg_sparsemat If not a \c NULL pointer, then the coarse
+ *    grained matrix is returned here, in sparse matrix form.
+ * \param L If not a \c NULL pointer, then it must be an initialized
+ *    matrix and the left semi-projector is returned here.
+ * \param R If not a \c NULL pointer, then it must be an initialized
+ *    matrix and the right semi-projector is returned here.
+ * \param Lsparse If not a \c NULL pointer, then the left
+ *    semi-projector is returned here.
+ * \param Rsparse If not a \c NULL pointer, then the right
+ *    semi-projector is returned here.
+ * \return Error code.
+ *
+ * Time complexity: TODO.
+ * 
+ * \sa \ref igraph_scg_grouping(), \ref igraph_scg_semiprojectors(), 
+ * \ref igraph_scg_stochastic() and \ref igraph_scg_adjacency().
+ * 
+ * \example examples/simple/scg3.c
+ */
 
 int igraph_scg_laplacian(const igraph_t *graph,
 			 const igraph_matrix_t *matrix,
