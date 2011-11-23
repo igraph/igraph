@@ -37,7 +37,7 @@ int main() {
   igraph_tree(&tree, nodes, /* children= */ 3, IGRAPH_TREE_UNDIRECTED);
   
   igraph_matrix_init(&sto, nodes, nodes);
-  igraph_get_stochastic(&tree, &sto, IGRAPH_SCG_NORM_ROW);
+  igraph_get_stochastic(&tree, &sto, /*column_wise=*/ 0);
   igraph_matrix_transpose(&sto);
   
   igraph_matrix_init(&hess, nodes, nodes);

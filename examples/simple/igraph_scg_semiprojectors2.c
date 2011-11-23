@@ -53,7 +53,7 @@ int main() {
   
   igraph_rng_seed(&igraph_rng_default, 42);
 
-  igraph_get_stochastic_sparsemat(&g, &stochastic, IGRAPH_SCG_NORM_ROW);
+  igraph_get_stochastic_sparsemat(&g, &stochastic, /*column-wise=*/ 0);
   igraph_sparsemat_transpose(&stochastic, &stochasticT, /*values=*/ 1);
 
   which.pos=IGRAPH_EIGEN_LR;
