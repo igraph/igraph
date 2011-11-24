@@ -171,4 +171,8 @@ int igraphdgeevx_(char *balanc, char *jobvl, char *jobvr, char *sense,
 		  igraph_real_t *rconde, igraph_real_t *rcondv, 
 		  igraph_real_t *work, int *lwork, int *iwork, int *info);
 
+int igraphdgehrd_(int *n, int *ilo, int *ihi, igraph_real_t *A, int *lda,
+		  igraph_real_t *tau, igraph_real_t *work, int *lwork,
+		  int *info);
+
 #endif

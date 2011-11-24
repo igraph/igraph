@@ -47,6 +47,8 @@
 #include "igraph_strvector.h"
 #include "igraph_vector_ptr.h"
 #include "igraph_spmatrix.h"
+#include "igraph_sparsemat.h"
+#include "igraph_qsort.h"
 
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
@@ -87,5 +89,6 @@
 #include "igraph_hrg.h"
 #include "igraph_threading.h"
 #include "igraph_interrupt.h"
+#include "igraph_scg.h"
 
 #endif

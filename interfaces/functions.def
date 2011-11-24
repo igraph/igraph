@@ -94,7 +94,8 @@ igraph_adjacency:
 
 igraph_weighted_adjacency:
         PARAMS: OUT GRAPH graph, MATRIX adjmatrix, \
-                ADJACENCYMODE mode=DIRECTED, CSTRING attr="weight"
+                ADJACENCYMODE mode=DIRECTED, CSTRING attr="weight", \
+                BOOLEAN loops
         IGNORE: RR, RC, RNamespace
 
 igraph_star:
@@ -228,9 +229,10 @@ igraph_grg_game:
         IGNORE: RR, RC, RNamespace
 
 igraph_preference_game:
-        PARAMS: OUT GRAPH graph, INTEGER nodes, INTEGER types, VECTOR type_dist, \
-                MATRIX pref_matrix, OUT VECTOR node_type_vec, BOOLEAN directed=False, \
-                BOOLEAN loops=False
+        PARAMS: OUT GRAPH graph, INTEGER nodes, INTEGER types, \
+                VECTOR type_dist, BOOLEAN fixed_sizes=False, \
+                MATRIX pref_matrix, OUT VECTOR node_type_vec, \
+                BOOLEAN directed=False, BOOLEAN loops=False
         IGNORE: RR, RC, RNamespace
 
 igraph_asymmetric_preference_game:
@@ -811,9 +813,11 @@ igraph_is_bipartite:
 #######################################
 
 igraph_laplacian:
-        PARAMS: GRAPH graph, OUT MATRIX res, BOOLEAN normalized=False, \
+        PARAMS: GRAPH graph, OUT MATRIX_OR_0 res, \
+                OUT SPARSEMAT_OR_0 sparseres, BOOLEAN normalized=False, \
                 EDGEWEIGHTS weights=NULL
         DEPS: weights ON graph
+        IGNORE: RR, RC
 
 #######################################
 # Components
@@ -1573,6 +1577,74 @@ igraph_isomorphic_bliss:
 
 igraph_automorphisms:
         PARAMS: GRAPH graph, BLISSSH sh="fm", OUT BLISSINFO info
+
+#######################################
+# SCG
+#######################################
+
+igraph_scg_grouping:
+        PARAMS: MATRIX V, OUT VECTORM1 groups, INTEGER nt, \
+                VECTOR_OR_0 nt_vec, SCGMAT mtype=Default, \
+                SCGALGO algo=Default, VECTOR_OR_0 p=NULL, \
+		INTEGER maxiter=100
+        NAME-R: scgGrouping
+        IGNORE: RR
+
+igraph_scg_semiprojectors:
+        PARAMS: VECTORM1 groups, SCGMAT mtype=Default, \
+                OUT MATRIX_OR_0 L, OUT MATRIX_OR_0 R, \
+                OUT SPARSEMAT_OR_0 Lsparse, OUT SPARSEMAT_OR_0 Rsparse, \
+                VECTOR_OR_0 p=NULL, SCGNORM norm=Default
+        NAME-R: scgSemiProjectors
+        IGNORE: RR, RC
+
+igraph_scg_norm_eps:
+        PARAMS: MATRIX V, VECTORM1 groups, OUT VECTOR eps, \
+                SCGMAT mtype=Default, VECTOR_OR_0 p=NULL, \
+                SCGNORM norm=Default
+        NAME-R: scgNormEps
+
+igraph_scg_adjacency:
+        PARAMS: GRAPH_OR_0 graph, MATRIX_OR_0 matrix, \
+                SPARSEMAT_OR_0 sparsemat, VECTOR ev, \
+                INTEGER nt, VECTOR_OR_0 ntvec, \
+                SCGALGO algo, INOUT VECTOR_OR_0 values, \
+                INOUT MATRIX_OR_0 vectors, INOUT VECTORM1_OR_0 groups, \
+                BOOLEAN use_arpack=False, INTEGER maxiter, \
+                OUT GRAPH_OR_0 scg_graph, OUT MATRIX_OR_0 scg_matrix, \
+                OUT SPARSEMAT_OR_0 scg_sparsemat, OUT MATRIX_OR_0 L, \
+                OUT MATRIX_OR_0 R, OUT SPARSEMAT_OR_0 Lsparse, \
+                OUT SPARSEMAT_OR_0 Rsparse
+        IGNORE: RR, RC, RNamespace
+
+igraph_scg_stochastic:
+        PARAMS: GRAPH_OR_0 graph, MATRIX_OR_0 matrix, \
+                SPARSEMAT_OR_0 sparsemat, VECTOR ev, \
+                INTEGER nt, VECTOR_OR_0 nt_vec, \
+                SCGALGO algo, SCGNORM norm=Default, \
+                INOUT CVECTOR_OR_0 values, INOUT CMATRIX_OR_0 vectors, \
+                INOUT VECTORM1_OR_0 groups, INOUT VECTOR_OR_0 p, \
+                BOOLEAN use_arpack=False, INTEGER maxiter, \
+                OUT GRAPH_OR_0 scg_graph, OUT MATRIX_OR_0 scg_matrix, \
+                OUT SPARSEMAT_OR_0 scg_sparsemat, OUT MATRIX_OR_0 L, \
+                OUT MATRIX_OR_0 R, OUT SPARSEMAT_OR_0 Lsparse, \
+                OUT SPARSEMAT_OR_0 Rsparse
+        IGNORE: RR, RC, RNamespace
+
+igraph_scg_laplacian:
+        PARAMS: GRAPH_OR_0 graph, MATRIX_OR_0 matrix, \
+                SPARSEMAT_OR_0 sparsemat, VECTOR ev, \
+                INTEGER nt, VECTOR_OR_0 nt_vec, \
+                SCGALGO algo, SCGNORM norm=Default, \
+                SCGDIR direction=Default, INOUT CVECTOR_OR_0 values, \
+                INOUT CMATRIX_OR_0 vectors, INOUT VECTORM1_OR_0 groups, \
+                BOOLEAN use_arpack=False, INTEGER maxiter, \
+                OUT GRAPH_OR_0 scg_graph, OUT MATRIX_OR_0 scg_matrix, \
+                OUT SPARSEMAT_OR_0 scg_sparsemat, OUT MATRIX_OR_0 L, \
+                OUT MATRIX_OR_0 R, OUT SPARSEMAT_OR_0 Lsparse, \
+                OUT SPARSEMAT_OR_0 Rsparse
+        IGNORE: RR, RC, RNamespace
+
 
 #######################################
 # Other, not graph related

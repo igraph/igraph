@@ -160,7 +160,8 @@ HEADERS_PRIVATE = atlas-edges.h \
 		hrg_dendro.h hrg_graph.h hrg_rbtree.h hrg_splittree_eq.h \
 		hrg_graph_simp.h foreign-gml-header.h \
 		foreign-ncol-header.h foreign-lgl-header.h \
-		foreign-pajek-header.h igraph_interrupt_internal.h
+		foreign-pajek-header.h igraph_interrupt_internal.h \
+		scg_headers.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
@@ -195,7 +196,8 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_lapack.h	../include/igraph_complex.h   \
 		../include/igraph_eigen.h	../include/igraph_statusbar.h \
 		../include/igraph_hrg.h         ../include/igraph_microscopic_update.h \
-		../include/igraph_interrupt.h   ../include/igraph_threading.h
+		../include/igraph_interrupt.h   ../include/igraph_threading.h \
+		../include/igraph_scg.h		../include/igraph_qsort.h
 
 libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     basic_query.c games.c cocitation.c iterators.c \
@@ -246,7 +248,10 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     lapack.c complex.c eigen.c feedback_arc_set.c \
 			     sugiyama.c glpk_support.c \
 				 igraph_hrg_types.cc igraph_hrg.cc \
-			     distances.c fortran_intrinsics.c
+			     distances.c fortran_intrinsics.c \
+			     scg.c scg_approximate_methods.c scg_exact_scg.c \
+			     scg_kmeans.c scg_utils.c scg_optimal_method.c \
+			     qsort.c qsort_r.c
 
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)

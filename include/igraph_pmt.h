@@ -89,6 +89,7 @@
 #define ONE {{1.0,0.0}}
 #define MULTIPLICITY 2
 #define NOTORDERED 1
+#define NOABS 1
 #define SUM(a,b,c) ((a) = igraph_complex_add((b),(c)))
 #define DIFF(a,b,c) ((a) = igraph_complex_sub((b),(c)))
 #define PROD(a,b,c) ((a) = igraph_complex_mul((b),(c)))

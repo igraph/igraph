@@ -46,7 +46,9 @@ int main() {
   }
   igraph_sparsemat_copy(&spmat2, &spmat);
   
+  igraph_matrix_init(&mat, 0, 0);
   igraph_sparsemat_as_matrix(&mat, &spmat);
+  igraph_matrix_init(&mat2, 0, 0);
   igraph_sparsemat_as_matrix(&mat2, &spmat2);
   if (!igraph_matrix_is_equal(&mat, &mat2)) { return 1;}
   
@@ -57,6 +59,7 @@ int main() {
   igraph_sparsemat_destroy(&spmat);
   igraph_sparsemat_copy(&spmat, &spmat2);
   
+  igraph_matrix_init(&mat2, 0, 0);
   igraph_sparsemat_as_matrix(&mat2, &spmat);
   if (!igraph_matrix_is_equal(&mat, &mat2)) { return 2; }
 
@@ -73,6 +76,7 @@ int main() {
   }
   igraph_sparsemat_compress(&spmat, &spmat2);
 
+  igraph_matrix_init(&mat, 0, 0);
   igraph_sparsemat_as_matrix(&mat, &spmat);
   igraph_vector_init(&sums1, 0);
   igraph_vector_init(&sums2, 0);
@@ -105,6 +109,7 @@ int main() {
   }
   igraph_sparsemat_compress(&spmat, &spmat2);
 
+  igraph_matrix_init(&mat, 0, 0);
   igraph_sparsemat_as_matrix(&mat, &spmat2);
 
   nz1=igraph_sparsemat_count_nonzero(&spmat2);
@@ -137,7 +142,9 @@ int main() {
 
   igraph_sparsemat_scale(&spmat, 2.0);
   igraph_sparsemat_scale(&spmat2, 2.0);
+  igraph_matrix_init(&mat, 0, 0);
   igraph_sparsemat_as_matrix(&mat, &spmat);
+  igraph_matrix_init(&mat2, 0, 0);
   igraph_sparsemat_as_matrix(&mat2, &spmat2);
   igraph_matrix_scale(&mat, 1.0/2.0);
   igraph_matrix_scale(&mat2, 1.0/2.0);
@@ -162,7 +169,9 @@ int main() {
   igraph_sparsemat_add_rows(&spmat2, 3);
   igraph_sparsemat_add_cols(&spmat2, 2);
   
+  igraph_matrix_init(&mat, 0, 0);
   igraph_sparsemat_as_matrix(&mat, &spmat);
+  igraph_matrix_init(&mat2, 0, 0);
   igraph_sparsemat_as_matrix(&mat2, &spmat2);
   if (!igraph_matrix_is_equal(&mat, &mat2)) { return 10; }
 

@@ -644,11 +644,11 @@ alpha.centrality.sparse <- function(graph, nodes=V(graph), alpha=1,
   }
   
   el <- get.edgelist(graph, names=FALSE)
-  M <- spMatrix(vc, vc, i=el[,2], j=el[,1], x=weights)
+  M <- sparseMatrix(dims=c(vc, vc), i=el[,2], j=el[,1], x=weights)
   M <- as(M, "dgCMatrix")
   
   ## Create an identity matrix
-  M2 <- spMatrix(vc, vc, i=1:vc, j=1:vc, x=rep(1, vc))
+  M2 <- sparseMatrix(dims=c(vc, vc), i=1:vc, j=1:vc, x=rep(1, vc))
   M2 <- as(M2, "dgCMatrix")
 
   ## exo
@@ -965,3 +965,29 @@ closeness <- function(graph, vids=V(graph),
   if (!normalized) { res <- res / (vcount(graph)-1) }
   res
 }
+
+graph.laplacian <- function(graph, normalized=FALSE, weights=NULL,
+                            sparse=getIgraphOpt("sparsematrices")) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  normalized <- as.logical(normalized)
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
+    weights <- E(graph)$weight 
+  } 
+  if (!is.null(weights) && any(!is.na(weights))) { 
+    weights <- as.numeric(weights) 
+  } else { 
+    weights <- NULL 
+  }
+  sparse <- as.logical(sparse)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_laplacian", graph, normalized, weights, sparse,
+               PACKAGE="igraph")
+  if (sparse) {
+    res <- igraph.i.spMatrix(res)
+  }
+  res
+}
+

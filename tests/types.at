@@ -158,6 +158,16 @@ AT_KEYWORDS([sparse matrix igraph_sparsemat_t])
 AT_COMPILE_CHECK([simple/igraph_sparsemat8.c])
 AT_CLEANUP
 
+AT_SETUP([Sparse matrix, multiplications with dense (igraph_sparsemat_t): ])
+AT_KEYWORDS([sparse matrix igraph_sparsemat_t sparse-dense dense-sparse])
+AT_COMPILE_CHECK([simple/igraph_sparsemat9.c])
+AT_CLEANUP
+
+AT_SETUP([Sparse matrix, is symmetric? (igraph_sparsemat_t): ])
+AT_KEYWORDS([sparse matrix igraph_sparsemat_t symmetric is_symmetric])
+AT_COMPILE_CHECK([simple/igraph_sparsemat_is_symmetric.c])
+AT_CLEANUP
+
 AT_SETUP([Another sparse matrix (igraph_spmatrix_t): ])
 AT_KEYWORDS([sparse matrix igraph_spmatrix_t])
 AT_COMPILE_CHECK([simple/spmatrix.c], [simple/spmatrix.out])

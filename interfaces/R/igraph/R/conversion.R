@@ -105,21 +105,21 @@ get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
   }
 
   if (is.directed(graph)) {
-    res <- spMatrix(vc, vc, i=el[,1], j=el[,2], x=value)
+    res <- sparseMatrix(dims=c(vc, vc), i=el[,1], j=el[,2], x=value)
   } else {
     if (type=="upper") {
       ## upper
-      res <- spMatrix(vc, vc, i=pmin(el[,1],el[,2]),
-                      j=pmax(el[,1],el[,2]), x=value)
+      res <- sparseMatrix(dims=c(vc, vc), i=pmin(el[,1],el[,2]),
+                          j=pmax(el[,1],el[,2]), x=value)
     } else if (type=="lower") {
       ## lower
-      res <- spMatrix(vc, vc, i=pmax(el[,1],el[,2]),
-                      j=pmin(el[,1],el[,2]), x=value)
+      res <- sparseMatrix(dims=c(vc, vc), i=pmax(el[,1],el[,2]),
+                          j=pmin(el[,1],el[,2]), x=value)
     } else if (type=="both") {
       ## both
-      res <- spMatrix(vc, vc, i=pmin(el[,1],el[,2]),
-                      j=pmax(el[,1],el[,2]), x=value)
-      res <- forceSymmetric(res)
+      res <- sparseMatrix(dims=c(vc, vc), i=pmin(el[,1],el[,2]),
+                          j=pmax(el[,1],el[,2]), x=value, symmetric=TRUE)
+      res <- as(res, "dgCMatrix")
     }
   }
 

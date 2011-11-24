@@ -470,7 +470,7 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
  * The computed eigenvectors are normalized to have Euclidean norm   
  * equal to 1 and largest component real.   
  * 
- * \param A Matrix. On entry it contains the N-by-N input matrix.
+ * \param A matrix. On entry it contains the N-by-N input matrix.
  * \param valuesreal Pointer to an initialized vector, or a null
  *        pointer. If not a null pointer, then the real parts of the
  *        eigenvalues are stored here. The vector will be resized as
@@ -500,7 +500,7 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
  *        compute all the eigenvalues, and no eigenvectors have been
  *        computed; element i+1:N of \p valuesreal and \p valuesimag
  *        contain eigenvalues which have converged. This case only
- *        generated an igraph error, if \p info was non-zero on entry.
+ *        generates an igraph error, if \p info was non-zero on entry.
  * \return Error code.
  * 
  * Time complexity: TODO.
@@ -662,7 +662,7 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
  *   (j+1)-th eigenvalues form a complex conjugate pair, then the j-th
  *   and (j+1)-th columns contain their corresponding eigenvectors.
  * \param vectorsright An initialized matrix or a NULL pointer. If not
- *   a null pointer, then the left eigenvectors are stored here. The
+ *   a null pointer, then the right eigenvectors are stored here. The
  *   format is the same, as for the \p vectorsleft argument.
  * \param ilo 
  * \param ihi \p ilo and \p ihi are integer values determined when A was   
@@ -851,5 +851,74 @@ int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
   igraph_matrix_destroy(&Acopy);
   IGRAPH_FINALLY_CLEAN(3);
 
+  return 0;
+}
+
+int igraph_lapack_dgehrd(const igraph_matrix_t *A, 
+			 int ilo, int ihi, 
+			 igraph_matrix_t *result) {
+  
+  int n=igraph_matrix_nrow(A);
+  int lda=n;
+  int lwork=-1;
+  igraph_vector_t work;
+  igraph_real_t optwork;
+  igraph_vector_t tau;
+  igraph_matrix_t Acopy;
+  int info=0;
+  int i;
+  
+  if (igraph_matrix_ncol(A) != n) { 
+    IGRAPH_ERROR("Hessenberg reduction failed", IGRAPH_NONSQUARE);
+  }
+
+  if (ilo < 1 || ihi > n || ilo > ihi) { 
+    IGRAPH_ERROR("Invalid `ilo' and/or `ihi'", IGRAPH_EINVAL);
+  }
+
+  if (n <= 1) { 
+    IGRAPH_CHECK(igraph_matrix_update(result, A));
+    return 0;
+  }  
+
+  IGRAPH_CHECK(igraph_matrix_copy(&Acopy, A));
+  IGRAPH_FINALLY(igraph_matrix_destroy, &Acopy);
+  IGRAPH_VECTOR_INIT_FINALLY(&tau, n-1);
+
+  igraphdgehrd_(&n, &ilo, &ihi, &MATRIX(Acopy, 0, 0), &lda, VECTOR(tau),
+		&optwork, &lwork, &info);
+
+  if (info != 0) { 
+    IGRAPH_ERROR("Internal Hessenberg transformation error", 
+		 IGRAPH_EINTERNAL);
+  }
+  
+  lwork=optwork;
+  IGRAPH_VECTOR_INIT_FINALLY(&work, lwork);
+
+  igraphdgehrd_(&n, &ilo, &ihi, &MATRIX(Acopy, 0, 0), &lda, VECTOR(tau),
+		VECTOR(work), &lwork, &info);
+
+  if (info != 0) { 
+    IGRAPH_ERROR("Internal Hessenberg transformation error", 
+		 IGRAPH_EINTERNAL);
+  }
+
+  igraph_vector_destroy(&work);
+  igraph_vector_destroy(&tau);
+  IGRAPH_FINALLY_CLEAN(2);
+  
+  IGRAPH_CHECK(igraph_matrix_update(result, &Acopy));
+
+  igraph_matrix_destroy(&Acopy);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  for (i=0; i<n-2; i++) {
+    int j;
+    for (j=i+2; j<n; j++) {
+      MATRIX(*result, j, i) = 0.0;
+    }
+  }
+  
   return 0;
 }

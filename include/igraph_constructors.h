@@ -52,7 +52,8 @@ int igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
 int igraph_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
 		     igraph_adjacency_t mode);
 int igraph_weighted_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
-		              igraph_adjacency_t mode, const char* attr);
+		              igraph_adjacency_t mode, const char* attr, 
+			      igraph_bool_t loops);
 int igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode, 
 		igraph_integer_t center);
 int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector, igraph_integer_t nei, 

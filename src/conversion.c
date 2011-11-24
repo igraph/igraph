@@ -27,6 +27,7 @@
 #include "igraph_attributes.h"
 #include "igraph_constructors.h"
 #include "igraph_types_internal.h"
+#include "igraph_sparsemat.h"
 #include "config.h"
 
 /**
@@ -51,6 +52,10 @@
  *        \cli IGRAPH_GET_ADJACENCY_BOTH 
  *          the whole matrix is used, a symmetric matrix is returned.
  *        \endclist
+ * \param type eids Logical, if true, then the edges ids plus one 
+ *        are stored in the adjacency matrix, instead of the number of 
+ *        edges between the two vertices. (The plus one is needed, since
+ *        edge ids start from zero, and zero means no edge in this case.)
  * \return Error code:
  *        \c IGRAPH_EINVAL invalid type argument.
  *
@@ -699,5 +704,129 @@ int igraph_to_undirected(igraph_t *graph,
     }
   }
 
+  return 0;
+}
+
+/**
+ * \function igraph_get_stochastic
+ * Stochastic adjacency matrix of a graph
+ * 
+ * Stochastic matrix of a graph. The stochastic matrix of a graph is
+ * its adjacency matrix, normalized row-wise or column-wise, such that
+ * the sum of each row (or column) is one. 
+ * \param graph The input graph. 
+ * \param sparsemat Pointer to an initialized matrix, the
+ *    result is stored here.
+ * \param column_wise Whether to normalize column-wise. For undirected
+ *    graphs this argument does not have any effect.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V||V|), quadratic in the number of vertices.
+ * 
+ * \sa igraph_get_stochastic_sparsemat(), the sparse version of this
+ * function.
+ */
+
+int igraph_get_stochastic(const igraph_t *graph, 
+			  igraph_matrix_t *matrix,
+			  igraph_bool_t column_wise) {
+  
+  int no_of_nodes=igraph_vcount(graph);
+  igraph_real_t sum;
+  int i, j;
+  
+  IGRAPH_CHECK(igraph_get_adjacency(graph, matrix, 
+				    IGRAPH_GET_ADJACENCY_BOTH, /*eids=*/ 0));
+  
+  if (!column_wise) {
+    for (i=0; i<no_of_nodes; i++) {
+      sum=0.0; 
+      for (j=0; j<no_of_nodes; j++) { 
+	sum += MATRIX(*matrix, i, j);
+      }
+      for (j=0; j<no_of_nodes; j++) {
+	MATRIX(*matrix, i, j) /= sum;
+      }
+    }
+  } else {
+    for (i=0; i<no_of_nodes; i++) {
+      sum=0.0; 
+      for (j=0; j<no_of_nodes; j++) { 
+	sum += MATRIX(*matrix, j, i);
+      }
+      for (j=0; j<no_of_nodes; j++) {
+	MATRIX(*matrix, j, i) /= sum;
+      }
+    }
+  }
+
+  return 0;
+}
+
+int igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat, 
+				 igraph_bool_t column_wise) {
+  igraph_vector_t sum;
+  int no_of_nodes=igraph_sparsemat_nrow(sparsemat);
+  int i;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&sum, no_of_nodes);
+
+  if (!column_wise) {
+    IGRAPH_CHECK(igraph_sparsemat_rowsums(sparsemat, &sum));
+    for (i=0; i<no_of_nodes; i++) {
+      if (VECTOR(sum)[i] == 0.0) {
+	IGRAPH_ERROR("Zero out-degree vertices not allowed", 
+		     IGRAPH_EINVAL);
+      }
+      VECTOR(sum)[i] = 1.0 / VECTOR(sum)[i];
+    }
+    IGRAPH_CHECK(igraph_sparsemat_scale_rows(sparsemat, &sum));
+  } else {
+    IGRAPH_CHECK(igraph_sparsemat_colsums(sparsemat, &sum));
+    for (i=0; i<no_of_nodes; i++) {
+      if (VECTOR(sum)[i] == 0.0) {
+	IGRAPH_ERROR("Zero out-degree vertices not allowed", 
+		     IGRAPH_EINVAL);
+      }
+      VECTOR(sum)[i] = 1.0 / VECTOR(sum)[i];
+    }
+    IGRAPH_CHECK(igraph_sparsemat_scale_cols(sparsemat, &sum));
+  }
+
+  igraph_vector_destroy(&sum);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
+
+/**
+ * \function igraph_get_stochastic_sparsemat
+ * \brief Stochastic adjacency matrix of a graph
+ * 
+ * Stochastic matrix of a graph. The stochastic matrix of a graph is
+ * its adjacency matrix, normalized row-wise or column-wise, such that
+ * the sum of each row (or column) is one. 
+ * \param graph The input graph. 
+ * \param sparsemat Pointer to an uninitialized sparse matrix, the
+ *    result is stored here.
+ * \param column_wise Whether to normalize column-wise. For undirected
+ *    graphs this argument does not have any effect.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and
+ * edges.
+ * 
+ * \sa igraph_get_stochastic(), the dense version of this function.
+ */
+
+int igraph_get_stochastic_sparsemat(const igraph_t *graph, 
+				    igraph_sparsemat_t *sparsemat,
+				    igraph_bool_t column_wise) {
+  
+  IGRAPH_CHECK(igraph_get_sparsemat(graph, sparsemat));
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, sparsemat);
+  IGRAPH_CHECK(igraph_i_normalize_sparsemat(sparsemat, column_wise));
+  IGRAPH_FINALLY_CLEAN(1);
+  
   return 0;
 }

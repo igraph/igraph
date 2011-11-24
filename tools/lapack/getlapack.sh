@@ -184,7 +184,8 @@ patch -p2 < ${origdir}/mt.patch
 
 echo "Sources are ready, to update your tree please run:
 
-  cp /tmp/${destdir}/* ${origdir}/../../src/lapack/
+  bzr rm ${origdir}/../../src/lapack
+  mv /tmp/${destdir} ${origdir}/../../src/lapack
   bzr add ${origdir}/../../src/lapack
 
 "
