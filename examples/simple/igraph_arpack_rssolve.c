@@ -98,6 +98,9 @@ int main() {
   /* print_vector(&values, stdout); */
   /* print_matrix(&vectors, stdout); */
 
+  igraph_matrix_destroy(&vectors);
+  igraph_vector_destroy(&values);
+
   igraph_adjlist_destroy(&adjlist);
   igraph_destroy(&g);
 
