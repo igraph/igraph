@@ -58,6 +58,8 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
 				       igraph_real_t area, igraph_real_t coolexp, 
 				       igraph_real_t repulserad, igraph_bool_t use_seed,
 				       const igraph_vector_t *weight,
+				       const igraph_vector_t *minx,
+				       const igraph_vector_t *maxx,
 				       const igraph_vector_t *miny,
 				       const igraph_vector_t *maxy);
 int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph, 

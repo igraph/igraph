@@ -91,6 +91,12 @@ layout.fruchterman.reingold <- function(graph, ..., dim=2,
   if (!is.null(params$start)) {
     params$start <- structure(as.numeric(params$start), dim=dim(params$start))
   }
+  if (!is.null(params$minx)) {
+    params$minx <- as.double(params$minx)
+  }
+  if (!is.null(params$maxx)) {
+    params$maxx <- as.double(params$maxx)
+  }
   if (!is.null(params$miny)) {
     params$miny <- as.double(params$miny)
   }
@@ -103,7 +109,7 @@ layout.fruchterman.reingold <- function(graph, ..., dim=2,
         as.double(params$niter), as.double(params$maxdelta),
         as.double(params$area), as.double(params$coolexp),
         as.double(params$repulserad), params$weights, params$start,
-        params$miny, params$maxy,
+        params$minx, params$maxx, params$miny, params$maxy,
         PACKAGE="igraph")
 }
 

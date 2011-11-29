@@ -106,6 +106,15 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
     \item{weights}{A vector giving edge weights or \code{NULL}. If not
       \code{NULL} then the attraction along the edges will be multiplied
       by the given edge weights (\code{NULL}).}
+    \item{minx}{If not \code{NULL}, then it must be a numeric vector
+      that gives lower boundaries for the \sQuote{x} coordinates of the
+      vertices. The length of the vector must match the number of
+      vertices in the graph.}
+    \item{maxx}{Similar to \code{minx}, but gives the upper boundaries.}
+    \item{miny}{Similar to \code{minx}, but gives the lower boundaries
+      of the \sQuote{y} coordinates.}
+    \item{maxy}{Similar to \code{minx}, but gives the upper boundaries
+      of the \sQuote{y} coordinates.}    
   }
   This function was ported from the SNA package.
 
@@ -272,5 +281,22 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
 g <- graph.ring(10)
 layout.random(g)
 layout.kamada.kawai(g)
+
+# Fixing ego
+g <- ba.game(20, m=2)
+minC <- rep(-Inf, vcount(g))
+maxC <- rep(Inf, vcount(g))
+minC[1] <- maxC[1] <- 0
+co <- layout.fruchterman.reingold(g, minx=minC, maxx=maxC,
+                                  miny=minC, maxy=maxC)
+co[1,]
+\dontrun{
+plot(g, layout=co, vertex.size=30, edge.arrow.size=0.2,
+     vertex.label=c("ego", rep("", vcount(g)-1)), rescale=FALSE,
+     xlim=range(co[,1]), ylim=range(co[,2]), vertex.label.dist=4,
+     vertex.label.color="red")
+axis(1)
+axis(2)
+}
 }
 \keyword{graphs}

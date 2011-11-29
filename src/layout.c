@@ -407,6 +407,8 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
 				       igraph_real_t area, igraph_real_t coolexp, 
 				       igraph_real_t repulserad, igraph_bool_t use_seed,
 				       const igraph_vector_t *weight, 
+				       const igraph_vector_t *minx,
+				       const igraph_vector_t *maxx,
 				       const igraph_vector_t *miny,
 				       const igraph_vector_t *maxy) {
   igraph_real_t frk,t,ded,xd,yd;
@@ -422,6 +424,12 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
     IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
   }
 
+  if (minx && igraph_vector_size(minx) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid minx vector length", IGRAPH_EINVAL);
+  }
+  if (maxx && igraph_vector_size(maxx) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid maxx vector length", IGRAPH_EINVAL);
+  }
   if (miny && igraph_vector_size(miny) != no_of_nodes) {
     IGRAPH_ERROR("Invalid miny vector length", IGRAPH_EINVAL);
   }
@@ -502,6 +510,11 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
       }
       MATRIX(*res, j, 0)+=MATRIX(dxdy, j, 0); /* Update positions */
       MATRIX(*res, j, 1)+=MATRIX(dxdy, j, 1);
+      if (minx && MATRIX(*res, j, 0) < VECTOR(*minx)[j]) {
+        MATRIX(*res, j, 0) = VECTOR(*minx)[j];
+      } else if (maxx && MATRIX(*res, j, 0) > VECTOR(*maxx)[j]) {
+        MATRIX(*res, j, 0) = VECTOR(*maxx)[j];
+      }
       if (miny && MATRIX(*res, j, 1) < VECTOR(*miny)[j]) {
         MATRIX(*res, j, 1) = VECTOR(*miny)[j];
       } else if (maxy && MATRIX(*res, j, 1) > VECTOR(*maxy)[j]) {
