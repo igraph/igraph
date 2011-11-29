@@ -104,7 +104,14 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 					  igraph_real_t volume, igraph_real_t coolexp,
 					  igraph_real_t repulserad,
 					  igraph_bool_t use_seed,
-					  const igraph_vector_t *weight);
+					  const igraph_vector_t *weight, 
+					  const igraph_vector_t *minx,
+					  const igraph_vector_t *maxx,
+					  const igraph_vector_t *miny,
+					  const igraph_vector_t *maxy,
+					  const igraph_vector_t *minz,
+					  const igraph_vector_t *maxz);
+
 int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
 				  igraph_integer_t niter, igraph_real_t sigma, 
 				  igraph_real_t initemp, igraph_real_t coolexp, 

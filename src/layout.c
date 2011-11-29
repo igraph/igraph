@@ -390,6 +390,11 @@ int igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
  * \param weight Pointer to a vector containing edge weights, 
  *        the attraction along the edges will be multiplied by these. 
  *        It will be ignored if it is a null-pointer.
+ * \param minx Pointer to a vector, or a \c NULL pointer. If not a 
+ *        \c NULL pointer then the vector gives the minimum
+ *        \quote x \endquote coordinate for every vertex.
+ * \param maxx Same as \p minx, but the maximum \quote x \endquote 
+ *        coordinates.
  * \param miny Pointer to a vector, or a \c NULL pointer. If not a 
  *        \c NULL pointer then the vector gives the minimum
  *        \quote y \endquote coordinate for every vertex.
@@ -430,11 +435,17 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
   if (maxx && igraph_vector_size(maxx) != no_of_nodes) {
     IGRAPH_ERROR("Invalid maxx vector length", IGRAPH_EINVAL);
   }
+  if (minx && maxx && !igraph_vector_all_le(minx, maxx)) {
+    IGRAPH_ERROR("minx must not be greater than maxx", IGRAPH_EINVAL);
+  }
   if (miny && igraph_vector_size(miny) != no_of_nodes) {
     IGRAPH_ERROR("Invalid miny vector length", IGRAPH_EINVAL);
   }
   if (maxy && igraph_vector_size(maxy) != no_of_nodes) {
     IGRAPH_ERROR("Invalid maxy vector length", IGRAPH_EINVAL);
+  }
+  if (miny && maxy && !igraph_vector_all_le(miny, maxy)) {
+    IGRAPH_ERROR("miny must not be greater than maxy", IGRAPH_EINVAL);
   }
   
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
@@ -564,6 +575,21 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
  * \param weight Pointer to a vector containing edge weights, 
  *        the attraction along the edges will be multiplied by these. 
  *        It will be ignored if it is a null-pointer.
+ * \param minx Pointer to a vector, or a \c NULL pointer. If not a 
+ *        \c NULL pointer then the vector gives the minimum
+ *        \quote x \endquote coordinate for every vertex.
+ * \param maxx Same as \p minx, but the maximum \quote x \endquote 
+ *        coordinates.
+ * \param miny Pointer to a vector, or a \c NULL pointer. If not a 
+ *        \c NULL pointer then the vector gives the minimum
+ *        \quote y \endquote coordinate for every vertex.
+ * \param maxy Same as \p miny, but the maximum \quote y \endquote 
+ *        coordinates.
+ * \param minz Pointer to a vector, or a \c NULL pointer. If not a 
+ *        \c NULL pointer then the vector gives the minimum
+ *        \quote z \endquote coordinate for every vertex.
+ * \param maxz Same as \p minz, but the maximum \quote z \endquote 
+ *        coordinates.
  * \return Error code.
  *
  * Added in version 0.2.</para><para>
@@ -580,7 +606,13 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 					  igraph_real_t volume, igraph_real_t coolexp,
 					  igraph_real_t repulserad,
 					  igraph_bool_t use_seed,
-					  const igraph_vector_t *weight) {
+					  const igraph_vector_t *weight, 
+					  const igraph_vector_t *minx,
+					  const igraph_vector_t *maxx,
+					  const igraph_vector_t *miny,
+					  const igraph_vector_t *maxy,
+					  const igraph_vector_t *minz,
+					  const igraph_vector_t *maxz) {
   
   igraph_real_t frk, t, ded, xd, yd, zd;
   igraph_matrix_t dxdydz;
@@ -593,6 +625,34 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 
   if (weight && igraph_vector_size(weight) != igraph_ecount(graph)) {
     IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+  }
+
+  if (minx && igraph_vector_size(minx) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid minx vector length", IGRAPH_EINVAL);
+  }
+  if (maxx && igraph_vector_size(maxx) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid maxx vector length", IGRAPH_EINVAL);
+  }
+  if (minx && maxx && !igraph_vector_all_le(minx, maxx)) {
+    IGRAPH_ERROR("minx must not be greater than maxx", IGRAPH_EINVAL);
+  }
+  if (miny && igraph_vector_size(miny) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid miny vector length", IGRAPH_EINVAL);
+  }
+  if (maxy && igraph_vector_size(maxy) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid maxy vector length", IGRAPH_EINVAL);
+  }
+  if (miny && maxy && !igraph_vector_all_le(miny, maxy)) {
+    IGRAPH_ERROR("miny must not be greater than maxy", IGRAPH_EINVAL);
+  }
+  if (minz && igraph_vector_size(minz) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid minz vector length", IGRAPH_EINVAL);
+  }
+  if (maxz && igraph_vector_size(maxz) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid maxz vector length", IGRAPH_EINVAL);
+  }
+  if (minz && maxz && !igraph_vector_all_le(minz, maxz)) {
+    IGRAPH_ERROR("minz must not be greater than maxz", IGRAPH_EINVAL);
   }
   
   IGRAPH_CHECK(igraph_matrix_init(&dxdydz, no_of_nodes, 3));
@@ -684,6 +744,21 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
       MATRIX(*res, j, 0)+=MATRIX(dxdydz, j, 0);          /*Update positions*/
       MATRIX(*res, j, 1)+=MATRIX(dxdydz, j, 1);
       MATRIX(*res, j, 2)+=MATRIX(dxdydz, j, 2);
+      if (minx && MATRIX(*res, j, 0) < VECTOR(*minx)[j]) {
+        MATRIX(*res, j, 0) = VECTOR(*minx)[j];
+      } else if (maxx && MATRIX(*res, j, 0) > VECTOR(*maxx)[j]) {
+        MATRIX(*res, j, 0) = VECTOR(*maxx)[j];
+      }
+      if (miny && MATRIX(*res, j, 1) < VECTOR(*miny)[j]) {
+        MATRIX(*res, j, 1) = VECTOR(*miny)[j];
+      } else if (maxy && MATRIX(*res, j, 1) > VECTOR(*maxy)[j]) {
+        MATRIX(*res, j, 1) = VECTOR(*maxy)[j];
+      }
+      if (minz && MATRIX(*res, j, 2) < VECTOR(*minz)[j]) {
+        MATRIX(*res, j, 2) = VECTOR(*minz)[j];
+      } else if (maxz && MATRIX(*res, j, 2) > VECTOR(*maxz)[j]) {
+        MATRIX(*res, j, 2) = VECTOR(*maxz)[j];
+      }
     }
   }
 

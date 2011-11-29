@@ -103,6 +103,12 @@ layout.fruchterman.reingold <- function(graph, ..., dim=2,
   if (!is.null(params$maxy)) {
     params$maxy <- as.double(params$maxy)
   }
+  if (!is.null(params$minz)) {
+    params$minz <- as.double(params$minz)
+  }
+  if (!is.null(params$maxz)) {
+    params$maxz <- as.double(params$maxz)
+  }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call(fn, graph,
@@ -110,6 +116,7 @@ layout.fruchterman.reingold <- function(graph, ..., dim=2,
         as.double(params$area), as.double(params$coolexp),
         as.double(params$repulserad), params$weights, params$start,
         params$minx, params$maxx, params$miny, params$maxy,
+        params$minz, params$maxz,
         PACKAGE="igraph")
 }
 

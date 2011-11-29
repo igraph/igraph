@@ -115,6 +115,12 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
       of the \sQuote{y} coordinates.}
     \item{maxy}{Similar to \code{minx}, but gives the upper boundaries
       of the \sQuote{y} coordinates.}    
+    \item{minz}{Similar to \code{minx}, but gives the lower boundaries
+      of the \sQuote{z} coordinates, if the \code{dim} argument is
+      3. Otherwise it is ignored.}
+    \item{maxz}{Similar to \code{minx}, but gives the upper boundaries
+      of the \sQuote{z} coordinates, if the \code{dim} argument is
+      3. Otherwise it is ignored.}    
   }
   This function was ported from the SNA package.
 
@@ -290,8 +296,7 @@ minC[1] <- maxC[1] <- 0
 co <- layout.fruchterman.reingold(g, minx=minC, maxx=maxC,
                                   miny=minC, maxy=maxC)
 co[1,]
-\dontrun{
-plot(g, layout=co, vertex.size=30, edge.arrow.size=0.2,
+\dontrun{plot(g, layout=co, vertex.size=30, edge.arrow.size=0.2,
      vertex.label=c("ego", rep("", vcount(g)-1)), rescale=FALSE,
      xlim=range(co[,1]), ylim=range(co[,2]), vertex.label.dist=4,
      vertex.label.color="red")

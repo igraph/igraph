@@ -968,9 +968,12 @@ igraph_layout_sphere:
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_fruchterman_reingold_3d:
-        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=500, REAL maxdelta=VCOUNT(graph), \
-                REAL volume=VCOUNT(graph)^2, REAL coolexp=1.5, REAL repulserad=VCOUNT(graph)^3, NULL use_seed, \
-                VECTOR_OR_0 weight
+        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=500, \
+                REAL maxdelta=VCOUNT(graph), REAL volume=VCOUNT(graph)^2, \
+                REAL coolexp=1.5, REAL repulserad=VCOUNT(graph)^3, \
+                NULL use_seed, VECTOR_OR_0 weight, VECTOR_OR_0 minx, \
+                VECTOR_OR_0 maxx, VECTOR_OR_0 miny, VECTOR_OR_0 maxy, \
+                VECTOR_OR_0 minz, VECTOR_OR_0 maxz
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_kamada_kawai_3d:
