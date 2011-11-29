@@ -134,6 +134,21 @@ int FUNCTION(igraph_matrix,which_minmax)(const TYPE(igraph_matrix) *m,
 					 long int *imin, long int *jmin,
 					 long int *imax, long int *jmax);
 
+/*------------------------------*/
+/* Comparison                   */
+/*------------------------------*/
+
+igraph_bool_t FUNCTION(igraph_matrix,all_e)(const TYPE(igraph_matrix) *lhs, 
+					    const TYPE(igraph_matrix) *rhs);
+igraph_bool_t FUNCTION(igraph_matrix,all_l)(const TYPE(igraph_matrix) *lhs, 
+					    const TYPE(igraph_matrix) *rhs);
+igraph_bool_t FUNCTION(igraph_matrix,all_g)(const TYPE(igraph_matrix) *lhs, 
+					    const TYPE(igraph_matrix) *rhs);
+igraph_bool_t FUNCTION(igraph_matrix,all_le)(const TYPE(igraph_matrix) *lhs, 
+					     const TYPE(igraph_matrix) *rhs);
+igraph_bool_t FUNCTION(igraph_matrix,all_ge)(const TYPE(igraph_matrix) *lhs, 
+					     const TYPE(igraph_matrix) *rhs);
+
 /*-------------------*/
 /* Matrix properties */
 /*-------------------*/

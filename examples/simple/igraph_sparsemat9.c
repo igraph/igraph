@@ -65,8 +65,8 @@ int main() {
   igraph_matrix_init(&A3, 0, 0);
   igraph_sparsemat_multiply_by_dense(&sB, &C, &A3);
   
-  if (!igraph_matrix_is_equal(&A1, &A2) ||
-      !igraph_matrix_is_equal(&A2, &A3)) {
+  if (!igraph_matrix_all_e(&A1, &A2) ||
+      !igraph_matrix_all_e(&A2, &A3)) {
     return 1;
   }
 

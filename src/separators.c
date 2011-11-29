@@ -313,7 +313,7 @@ igraph_bool_t igraph_i_separators_newsep(const igraph_vector_ptr_t *comps,
   
   for (co=0; co<nocomps; co++) {
     igraph_vector_t *act=VECTOR(*comps)[co];
-    if (igraph_vector_is_equal(act, newc)) return 0;
+    if (igraph_vector_all_e(act, newc)) return 0;
   }
 
   /* If not found, then it is new */
@@ -557,7 +557,7 @@ int igraph_i_minimum_size_separators_append(igraph_vector_ptr_t *old,
     long int j;
     for (j=0; j<olen; j++) {
       igraph_vector_t *oldvec=VECTOR(*old)[j];
-      if (igraph_vector_is_equal(oldvec, newvec)) { break; }
+      if (igraph_vector_all_e(oldvec, newvec)) { break; }
     }
     if (j==olen) {
       IGRAPH_CHECK(igraph_vector_ptr_push_back(old, newvec));

@@ -154,11 +154,11 @@ int main() {
 			      /* weights=   */ &weights, 
 			      /* nobigint=  */ 0);
 
-  if (!igraph_vector_is_equal(&bet, &bet2)) {
+  if (!igraph_vector_all_e(&bet, &bet2)) {
     return 1;
   }
 
-/*   if (!igraph_vector_is_equal(&bbet, &bbet2)) { */
+/*   if (!igraph_vector_all_e(&bbet, &bbet2)) { */
 /*     return 2; */
 /*   } */
 
@@ -189,7 +189,7 @@ int main() {
   igraph_vector_view(&bet2, nontriv_res, 
 		     sizeof(nontriv_res)/sizeof(igraph_real_t));
 
-  if (!igraph_vector_is_equal(&bet, &bet2)) {
+  if (!igraph_vector_all_e(&bet, &bet2)) {
     return 2;
   }
 

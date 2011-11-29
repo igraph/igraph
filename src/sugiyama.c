@@ -751,7 +751,7 @@ static int igraph_i_layout_sugiyama_order_nodes_horizontally(const igraph_t* gra
         VECTOR(barycenters)[i] = nei;
         MATRIX(*layout, nei, 0) = i;
       }
-      if (!igraph_vector_is_equal(layer_members, &barycenters)) {
+      if (!igraph_vector_all_e(layer_members, &barycenters)) {
         IGRAPH_CHECK(igraph_vector_update(layer_members, &barycenters));
 #ifdef SUGIYAMA_DEBUG
         printf("New vertex order: "); igraph_vector_print(layer_members);
@@ -784,7 +784,7 @@ static int igraph_i_layout_sugiyama_order_nodes_horizontally(const igraph_t* gra
         VECTOR(barycenters)[i] = nei;
         MATRIX(*layout, nei, 0) = i;
       }
-      if (!igraph_vector_is_equal(layer_members, &barycenters)) {
+      if (!igraph_vector_all_e(layer_members, &barycenters)) {
         IGRAPH_CHECK(igraph_vector_update(layer_members, &barycenters));
 #ifdef SUGIYAMA_DEBUG
         printf("New vertex order: "); igraph_vector_print(layer_members);

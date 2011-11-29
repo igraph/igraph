@@ -51,7 +51,7 @@ int main() {
   igraph_lapack_dgesv(&A, /*ipiv=*/ 0, &RHS, &info);
 
   if (info != 0) { return 1;}
-  if (!igraph_matrix_is_equal(&B, &RHS)) { return 2; }
+  if (!igraph_matrix_all_e(&B, &RHS)) { return 2; }
   
   igraph_matrix_destroy(&A);
   igraph_matrix_destroy(&B);

@@ -43,7 +43,7 @@ int main() {
   igraph_get_edgelist(&g, &v2, 0);
   igraph_vector_sort(&v1);
   igraph_vector_sort(&v2);
-  if (!igraph_vector_is_equal(&v1, &v2)) {
+  if (!igraph_vector_all_e(&v1, &v2)) {
     return 2;
   }
   igraph_destroy(&g);
@@ -56,7 +56,7 @@ int main() {
   igraph_get_edgelist(&g, &v2, 0);
   igraph_vector_sort(&v1);
   igraph_vector_sort(&v2);
-  if (!igraph_vector_is_equal(&v1, &v2)) {
+  if (!igraph_vector_all_e(&v1, &v2)) {
     return 3;
   }
   igraph_destroy(&g);

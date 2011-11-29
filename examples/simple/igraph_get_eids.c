@@ -181,7 +181,7 @@ int check_multi() {
   }
   igraph_vector_init(&eids2, 0);
   igraph_get_eids_multi(&g, &eids2, &vec, 0, /*directed=*/ 1, /*error=*/ 1);
-  if (!igraph_vector_is_equal(&eids, &eids2)) {
+  if (!igraph_vector_all_e(&eids, &eids2)) {
     return 3;
   }
 
@@ -192,7 +192,7 @@ int check_multi() {
     VECTOR(vec)[2*i+1] = IGRAPH_FROM(&g, VECTOR(eids)[i]);
   }
   igraph_get_eids_multi(&g, &eids2, &vec, 0, /*directed=*/ 0, /*error=*/ 1);
-  if (!igraph_vector_is_equal(&eids, &eids2)) {
+  if (!igraph_vector_all_e(&eids, &eids2)) {
     return 4;
   }
 

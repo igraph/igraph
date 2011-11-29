@@ -1392,21 +1392,20 @@ igraph_bool_t FUNCTION(igraph_vector,any_smaller)(const TYPE(igraph_vector) *v,
 
 /**
  * \ingroup vector
- * \function igraph_vector_is_equal
- * \brief Decides whether two vectors contain exactly the same elements
- * (in the same order).
+ * \function igraph_vector_all_e
+ * \brief Are all elements equal?
  * 
  * \param lhs The first vector.
  * \param rhs The second vector.
- * \return Positive integer if the two vectors are equal element by
- * element or zero if they are not.
+ * \return Positive integer (=true) if the elements in the \p lhs are all 
+ *    equal to the corresponding elements in \p rhs. Returns \c 0
+ *    (=false) if the lengths of the vectors don't match.
  * 
- * Time complexity: O(n), the length
- * of the vectors.
+ * Time complexity: O(n), the length of the vectors.
  */
 
-igraph_bool_t FUNCTION(igraph_vector,is_equal)(const TYPE(igraph_vector) *lhs, 
-					       const TYPE(igraph_vector) *rhs) {
+igraph_bool_t FUNCTION(igraph_vector,all_e)(const TYPE(igraph_vector) *lhs, 
+					    const TYPE(igraph_vector) *rhs) {
   long int i, s;
   assert(lhs != 0);
   assert(rhs != 0);
@@ -1431,6 +1430,169 @@ igraph_bool_t FUNCTION(igraph_vector,is_equal)(const TYPE(igraph_vector) *lhs,
     return 1;
   }
 }
+
+igraph_bool_t 
+FUNCTION(igraph_vector,is_equal)(const TYPE(igraph_vector) *lhs, 
+				 const TYPE(igraph_vector) *rhs) {
+  return FUNCTION(igraph_vector,all_e)(lhs, rhs);
+}
+
+#ifndef NOTORDERED
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_all_l
+ * \brief Are all elements less?
+ * 
+ * \param lhs The first vector.
+ * \param rhs The second vector.
+ * \return Positive integer (=true) if the elements in the \p lhs are all 
+ *    less than the corresponding elements in \p rhs. Returns \c 0
+ *    (=false) if the lengths of the vectors don't match.
+ * 
+ * Time complexity: O(n), the length of the vectors.
+ */
+
+igraph_bool_t FUNCTION(igraph_vector,all_l)(const TYPE(igraph_vector) *lhs, 
+					    const TYPE(igraph_vector) *rhs) {
+  long int i, s;
+  assert(lhs != 0);
+  assert(rhs != 0);
+  assert(lhs->stor_begin != 0);
+  assert(rhs->stor_begin != 0);
+  
+  s=FUNCTION(igraph_vector,size)(lhs);
+  if (s != FUNCTION(igraph_vector,size)(rhs)) {
+    return 0;
+  } else {
+    for (i=0; i<s; i++) {
+      BASE l=VECTOR(*lhs)[i];
+      BASE r=VECTOR(*rhs)[i];
+      if (l>=r) {
+	return 0;
+      }
+    }
+    return 1;
+  }  
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_all_g
+ * \brief Are all elements greater?
+ * 
+ * \param lhs The first vector.
+ * \param rhs The second vector.
+ * \return Positive integer (=true) if the elements in the \p lhs are all 
+ *    greater than the corresponding elements in \p rhs. Returns \c 0
+ *    (=false) if the lengths of the vectors don't match.
+ * 
+ * Time complexity: O(n), the length of the vectors.
+ */
+
+igraph_bool_t FUNCTION(igraph_vector,all_g)(const TYPE(igraph_vector) *lhs, 
+					    const TYPE(igraph_vector) *rhs) {
+
+  long int i, s;
+  assert(lhs != 0);
+  assert(rhs != 0);
+  assert(lhs->stor_begin != 0);
+  assert(rhs->stor_begin != 0);
+  
+  s=FUNCTION(igraph_vector,size)(lhs);
+  if (s != FUNCTION(igraph_vector,size)(rhs)) {
+    return 0;
+  } else {
+    for (i=0; i<s; i++) {
+      BASE l=VECTOR(*lhs)[i];
+      BASE r=VECTOR(*rhs)[i];
+      if (l<=r) {
+	return 0;
+      }
+    }
+    return 1;
+  }  
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_all_le
+ * \brief Are all elements less or equal?
+ * 
+ * \param lhs The first vector.
+ * \param rhs The second vector.
+ * \return Positive integer (=true) if the elements in the \p lhs are all 
+ *    less than or equal to the corresponding elements in \p
+ *    rhs. Returns \c 0 (=false) if the lengths of the vectors don't
+ *    match.
+ * 
+ * Time complexity: O(n), the length of the vectors.
+ */
+
+igraph_bool_t 
+FUNCTION(igraph_vector,all_le)(const TYPE(igraph_vector) *lhs, 
+			       const TYPE(igraph_vector) *rhs) {
+  long int i, s;
+  assert(lhs != 0);
+  assert(rhs != 0);
+  assert(lhs->stor_begin != 0);
+  assert(rhs->stor_begin != 0);
+  
+  s=FUNCTION(igraph_vector,size)(lhs);
+  if (s != FUNCTION(igraph_vector,size)(rhs)) {
+    return 0;
+  } else {
+    for (i=0; i<s; i++) {
+      BASE l=VECTOR(*lhs)[i];
+      BASE r=VECTOR(*rhs)[i];
+      if (l>r) {
+	return 0;
+      }
+    }
+    return 1;
+  }  
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_all_ge
+ * \brief Are all elements greater or equal?
+ * 
+ * \param lhs The first vector.
+ * \param rhs The second vector.
+ * \return Positive integer (=true) if the elements in the \p lhs are all 
+ *    greater than or equal to the corresponding elements in \p
+ *    rhs. Returns \c 0 (=false) if the lengths of the vectors don't
+ *    match.
+ * 
+ * Time complexity: O(n), the length of the vectors.
+ */
+
+igraph_bool_t 
+FUNCTION(igraph_vector,all_ge)(const TYPE(igraph_vector) *lhs, 
+			       const TYPE(igraph_vector) *rhs) {
+  long int i, s;
+  assert(lhs != 0);
+  assert(rhs != 0);
+  assert(lhs->stor_begin != 0);
+  assert(rhs->stor_begin != 0);
+  
+  s=FUNCTION(igraph_vector,size)(lhs);
+  if (s != FUNCTION(igraph_vector,size)(rhs)) {
+    return 0;
+  } else {
+    for (i=0; i<s; i++) {
+      BASE l=VECTOR(*lhs)[i];
+      BASE r=VECTOR(*rhs)[i];
+      if (l<r) {
+	return 0;
+      }
+    }
+    return 1;
+  }  
+}
+
+#endif
 
 igraph_bool_t FUNCTION(igraph_i_vector,binsearch_slice)(const TYPE(igraph_vector) *v,
                                                         BASE what, long int *pos,

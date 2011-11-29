@@ -141,6 +141,21 @@ int FUNCTION(igraph_vector,abs)(TYPE(igraph_vector) *v);
 #endif
 
 /*------------------------------*/
+/* Comparison                   */
+/*------------------------------*/
+
+igraph_bool_t FUNCTION(igraph_vector,all_e)(const TYPE(igraph_vector) *lhs, 
+					    const TYPE(igraph_vector) *rhs);
+igraph_bool_t FUNCTION(igraph_vector,all_l)(const TYPE(igraph_vector) *lhs, 
+					    const TYPE(igraph_vector) *rhs);
+igraph_bool_t FUNCTION(igraph_vector,all_g)(const TYPE(igraph_vector) *lhs, 
+					    const TYPE(igraph_vector) *rhs);
+igraph_bool_t FUNCTION(igraph_vector,all_le)(const TYPE(igraph_vector) *lhs, 
+					     const TYPE(igraph_vector) *rhs);
+igraph_bool_t FUNCTION(igraph_vector,all_ge)(const TYPE(igraph_vector) *lhs, 
+					     const TYPE(igraph_vector) *rhs);
+
+/*------------------------------*/
 /* Finding minimum and maximum  */
 /*------------------------------*/
 
@@ -167,7 +182,7 @@ igraph_bool_t FUNCTION(igraph_vector,isininterval)(const TYPE(igraph_vector) *v,
 igraph_bool_t FUNCTION(igraph_vector,any_smaller)(const TYPE(igraph_vector) *v, 
 						  BASE limit);
 igraph_bool_t FUNCTION(igraph_vector,is_equal)(const TYPE(igraph_vector) *lhs, 
-					       const TYPE(igraph_vector) *rhs);
+                                              const TYPE(igraph_vector) *rhs);
 BASE FUNCTION(igraph_vector,maxdifference)(const TYPE(igraph_vector) *m1,
 					   const TYPE(igraph_vector) *m2);
 

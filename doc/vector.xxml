@@ -60,6 +60,14 @@
 <!-- doxrox-include igraph_vector_div -->
 </section>
 
+<section><title>Vector comparisons</title>
+<!-- doxrox-include igraph_vector_all_e -->
+<!-- doxrox-include igraph_vector_all_l -->
+<!-- doxrox-include igraph_vector_all_g -->
+<!-- doxrox-include igraph_vector_all_le -->
+<!-- doxrox-include igraph_vector_all_ge -->
+</section>
+
 <section><title>Finding minimum and maximum</title>
 <!-- doxrox-include igraph_vector_min -->
 <!-- doxrox-include igraph_vector_max -->
@@ -75,7 +83,6 @@
 <!-- doxrox-include igraph_vector_sum -->
 <!-- doxrox-include igraph_vector_prod -->
 <!-- doxrox-include igraph_vector_isininterval -->
-<!-- doxrox-include igraph_vector_is_equal -->
 <!-- doxrox-include igraph_vector_maxdifference -->
 </section>
 

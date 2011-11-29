@@ -156,7 +156,7 @@ igraph_real_t igraph_i_revolver_ml_D_f(const igraph_vector_t *par,
 
   igraph_i_revolver_ml_D_data_t *data=extra;
   
-  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+  if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_D_eval(par, data);
   }
 
@@ -173,7 +173,7 @@ void igraph_i_revolver_ml_D_df(const igraph_vector_t *par,
 
   igraph_i_revolver_ml_D_data_t *data=extra;
 
-  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+  if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_D_eval(par, data);
   }
 
@@ -505,7 +505,7 @@ igraph_real_t igraph_i_revolver_ml_DE_f(const igraph_vector_t *par,
   igraph_i_revolver_ml_DE_data_t *data=extra;
   long int i;
   
-  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+  if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_DE_eval(par, data);
   }
 
@@ -529,7 +529,7 @@ void igraph_i_revolver_ml_DE_df(const igraph_vector_t *par,
   igraph_i_revolver_ml_DE_data_t *data=extra;
   long int i;
   
-  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+  if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_DE_eval(par, data);
   }
   
@@ -857,7 +857,7 @@ igraph_real_t igraph_i_revolver_ml_AD_f(const igraph_vector_t *par,
   igraph_i_revolver_ml_AD_data_t *data=extra;
   long int i;
   
-  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+  if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_AD_eval(par, data);
   }
 
@@ -881,7 +881,7 @@ void igraph_i_revolver_ml_AD_df(const igraph_vector_t *par,
   igraph_i_revolver_ml_AD_data_t *data=extra;
   long int i;
   
-  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+  if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_AD_eval(par, data);
   }
   
@@ -1299,7 +1299,7 @@ igraph_real_t igraph_i_revolver_ml_ADE_f(const igraph_vector_t *par,
   igraph_i_revolver_ml_ADE_data_t *data=extra;
   long int i;
   
-  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+  if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_ADE_eval(par, data);
   }
 
@@ -1323,7 +1323,7 @@ void igraph_i_revolver_ml_ADE_df(const igraph_vector_t *par,
   igraph_i_revolver_ml_ADE_data_t *data=extra;
   long int i;
   
-  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+  if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_ADE_eval(par, data);
   }
   

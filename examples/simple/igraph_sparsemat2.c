@@ -199,7 +199,7 @@ int main() {
   igraph_vector_null(&y);
   igraph_sparsemat_gaxpy(&B, &w, &y);
   
-  if (!igraph_vector_is_equal(&x, &y)) { return 1; }
+  if (!igraph_vector_all_e(&x, &y)) { return 1; }
 
   igraph_vector_destroy(&x);
   igraph_vector_destroy(&y);

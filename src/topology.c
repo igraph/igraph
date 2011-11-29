@@ -1120,7 +1120,7 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
     IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp2);
     igraph_vector_int_sort(&tmp1);
     igraph_vector_int_sort(&tmp2);
-    ret= !igraph_vector_int_is_equal(&tmp1, &tmp2);
+    ret= !igraph_vector_int_all_e(&tmp1, &tmp2);
     igraph_vector_int_destroy(&tmp1);
     igraph_vector_int_destroy(&tmp2);
     IGRAPH_FINALLY_CLEAN(2);
@@ -1137,7 +1137,7 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
     IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp2);
     igraph_vector_int_sort(&tmp1);
     igraph_vector_int_sort(&tmp2);
-    ret= !igraph_vector_int_is_equal(&tmp1, &tmp2);
+    ret= !igraph_vector_int_all_e(&tmp1, &tmp2);
     igraph_vector_int_destroy(&tmp1);
     igraph_vector_int_destroy(&tmp2);
     IGRAPH_FINALLY_CLEAN(2);

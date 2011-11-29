@@ -214,7 +214,7 @@ int main() {
   }
   igraph_vector_destroy(&v);
 
-  /* igraph_vector_is_equal */
+  /* igraph_vector_all_e */
 
   /* igraph_vector_binsearch */
   igraph_vector_init_seq(&v, 0, 9);

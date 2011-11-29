@@ -39,7 +39,7 @@ int main() {
 
   igraph_vector_init(&v2, 0);
   igraph_get_edgelist(&g2, &v2, 0);
-  if (!igraph_vector_is_equal(&v1, &v2)) {
+  if (!igraph_vector_all_e(&v1, &v2)) {
     return 1;
   }
 
