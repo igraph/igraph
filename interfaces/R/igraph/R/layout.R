@@ -186,7 +186,24 @@ layout.kamada.kawai<-function(graph, ..., dim=2,
   if (!is.null(params$start)) {
     params$start <- structure(as.numeric(params$start), dim=dim(params$start))
   }
-
+  if (!is.null(params$minx)) {
+    params$minx <- as.double(params$minx)
+  }
+  if (!is.null(params$maxx)) {
+    params$maxx <- as.double(params$maxx)
+  }
+  if (!is.null(params$miny)) {
+    params$miny <- as.double(params$miny)
+  }
+  if (!is.null(params$maxy)) {
+    params$maxy <- as.double(params$maxy)
+  }
+  if (!is.null(params$minz)) {
+    params$minz <- as.double(params$minz)
+  }
+  if (!is.null(params$maxz)) {
+    params$maxz <- as.double(params$maxz)
+  }
   if (params$fixz && dim==2) {
     warning("`fixz' works for 3D only, ignored.")
   }
@@ -196,6 +213,8 @@ layout.kamada.kawai<-function(graph, ..., dim=2,
         as.double(params$niter), as.double(params$initemp),
         as.double(params$coolexp), as.double(params$kkconst),
         as.double(params$sigma), params$start, as.logical(params$fixz),
+        params$minx, params$maxx, params$miny, params$maxy,
+        params$minz, params$maxz,
         PACKAGE="igraph")
 }
 

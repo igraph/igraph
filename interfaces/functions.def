@@ -941,8 +941,11 @@ igraph_layout_grid_fruchterman_reingold:
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_kamada_kawai:
-        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=1000, REAL sigma=VCOUNT(graph)/4, \
-                REAL initemp=10, REAL coolexp=0.99, REAL kkconst=VCOUNT(graph)^2
+        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=1000, \
+                REAL sigma=VCOUNT(graph)/4, REAL initemp=10, \
+                REAL coolexp=0.99, REAL kkconst=VCOUNT(graph)^2, \
+                VECTOR_OR_0 minx, VECTOR_OR_0 maxx, VECTOR_OR_0 miny, \
+                VECTOR_OR_0 maxy
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_lgl:
@@ -977,9 +980,12 @@ igraph_layout_fruchterman_reingold_3d:
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_kamada_kawai_3d:
-        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=1000, REAL sigma=VCOUNT(graph)/4, \
-                REAL initemp=10, REAL coolexp=0.99, REAL kkconst=VCOUNT(graph)^2 \
-                BOOLEAN fixz
+        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=1000, \
+                REAL sigma=VCOUNT(graph)/4, REAL initemp=10, \
+                REAL coolexp=0.99, REAL kkconst=VCOUNT(graph)^2, \
+                BOOLEAN fixz, VECTOR_OR_0 minx, VECTOR_OR_0 maxx, \
+                VECTOR_OR_0 miny, VECTOR_OR_0 maxy, VECTOR_OR_0 minz, \
+                VECTOR_OR_0 maxz
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_graphopt:

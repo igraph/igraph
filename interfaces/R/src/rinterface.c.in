@@ -3170,7 +3170,9 @@ SEXP R_igraph_recent_degree_game(SEXP pn, SEXP ppower, SEXP pwindow,
   
 SEXP R_igraph_layout_kamada_kawai(SEXP graph, SEXP pniter, SEXP pinitemp, 
 				  SEXP pcoolexp, SEXP pkkconst, SEXP psigma, 
-				  SEXP start, SEXP pfixz) {
+				  SEXP start, SEXP pfixz, SEXP pminx, 
+				  SEXP pmaxx, SEXP pminy, SEXP pmaxy, 
+				  SEXP pminz, SEXP pmaxz) {
   
   igraph_t g;
   igraph_integer_t niter=REAL(pniter)[0];
@@ -3178,6 +3180,8 @@ SEXP R_igraph_layout_kamada_kawai(SEXP graph, SEXP pniter, SEXP pinitemp,
   igraph_real_t coolexp=REAL(pcoolexp)[0];
   igraph_real_t kkconst=REAL(pkkconst)[0];
   igraph_real_t sigma=REAL(psigma)[0];
+  igraph_vector_t minx, maxx, *ppminx=0, *ppmaxx=0;
+  igraph_vector_t miny, maxy, *ppminy=0, *ppmaxy=0;
   igraph_matrix_t res;
   SEXP result;
   
@@ -3187,8 +3191,13 @@ SEXP R_igraph_layout_kamada_kawai(SEXP graph, SEXP pniter, SEXP pinitemp,
   } else {
     R_SEXP_to_igraph_matrix_copy(start, &res);
   }
+  if (!isNull(pminx)) { ppminx=&minx; R_SEXP_to_vector(pminx, &minx); }
+  if (!isNull(pmaxx)) { ppmaxx=&maxx; R_SEXP_to_vector(pmaxx, &maxx); }  
+  if (!isNull(pminy)) { ppminy=&miny; R_SEXP_to_vector(pminy, &miny); }
+  if (!isNull(pmaxy)) { ppmaxy=&maxy; R_SEXP_to_vector(pmaxy, &maxy); }  
   igraph_layout_kamada_kawai(&g, &res, niter, sigma, 
-			     initemp, coolexp, kkconst, !isNull(start));
+			     initemp, coolexp, kkconst, !isNull(start), 
+			     ppminx, ppmaxx, ppminy, ppmaxy);
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   
@@ -3198,7 +3207,9 @@ SEXP R_igraph_layout_kamada_kawai(SEXP graph, SEXP pniter, SEXP pinitemp,
 
 SEXP R_igraph_layout_kamada_kawai_3d(SEXP graph, SEXP pniter, SEXP pinitemp,
 				     SEXP pcoolexp, SEXP pkkconst, 
-				     SEXP psigma, SEXP start, SEXP pfixz) {
+				     SEXP psigma, SEXP start, SEXP pfixz, 
+				     SEXP pminx, SEXP pmaxx, SEXP pminy, 
+				     SEXP pmaxy, SEXP pminz, SEXP pmaxz) {
   igraph_t g;
   igraph_integer_t niter=REAL(pniter)[0];
   igraph_real_t initemp=REAL(pinitemp)[0];
@@ -3206,6 +3217,9 @@ SEXP R_igraph_layout_kamada_kawai_3d(SEXP graph, SEXP pniter, SEXP pinitemp,
   igraph_real_t kkconst=REAL(pkkconst)[0];
   igraph_real_t sigma=REAL(psigma)[0];
   igraph_bool_t fixz=LOGICAL(pfixz)[0];
+  igraph_vector_t minx, maxx, *ppminx=0, *ppmaxx=0;
+  igraph_vector_t miny, maxy, *ppminy=0, *ppmaxy=0;
+  igraph_vector_t minz, maxz, *ppminz=0, *ppmaxz=0;
   igraph_matrix_t res;
   SEXP result;
   
@@ -3215,8 +3229,16 @@ SEXP R_igraph_layout_kamada_kawai_3d(SEXP graph, SEXP pniter, SEXP pinitemp,
   } else {
     R_SEXP_to_igraph_matrix_copy(start, &res);
   }
+  if (!isNull(pminx)) { ppminx=&minx; R_SEXP_to_vector(pminx, &minx); }
+  if (!isNull(pmaxx)) { ppmaxx=&maxx; R_SEXP_to_vector(pmaxx, &maxx); }  
+  if (!isNull(pminy)) { ppminy=&miny; R_SEXP_to_vector(pminy, &miny); }
+  if (!isNull(pmaxy)) { ppmaxy=&maxy; R_SEXP_to_vector(pmaxy, &maxy); }  
+  if (!isNull(pminz)) { ppminz=&minz; R_SEXP_to_vector(pminz, &minz); }
+  if (!isNull(pmaxz)) { ppmaxz=&maxz; R_SEXP_to_vector(pmaxz, &maxz); }  
   igraph_layout_kamada_kawai_3d(&g, &res, niter, sigma, 
-				initemp, coolexp, kkconst, !isNull(start), fixz);
+				initemp, coolexp, kkconst, !isNull(start), 
+				fixz, ppminx, ppmaxx, ppminy, ppmaxy, 
+				ppminz, ppmaxz);
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   

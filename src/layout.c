@@ -798,6 +798,16 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
  * \param use_seed Boolean, whether to use the values supplied in the
  *        \p res argument as the initial configuration. If zero then a
  *        random initial configuration is used.
+ * \param minx Pointer to a vector, or a \c NULL pointer. If not a 
+ *        \c NULL pointer then the vector gives the minimum
+ *        \quote x \endquote coordinate for every vertex.
+ * \param maxx Same as \p minx, but the maximum \quote x \endquote 
+ *        coordinates.
+ * \param miny Pointer to a vector, or a \c NULL pointer. If not a 
+ *        \c NULL pointer then the vector gives the minimum
+ *        \quote y \endquote coordinate for every vertex.
+ * \param maxy Same as \p miny, but the maximum \quote y \endquote 
+ *        coordinates.
  * \return Error code.
  * 
  * Time complexity: O(|V|^2) for each
@@ -808,15 +818,49 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
 			       igraph_integer_t niter, igraph_real_t sigma, 
 			       igraph_real_t initemp, igraph_real_t coolexp,
-			       igraph_real_t kkconst, igraph_bool_t use_seed) {
+			       igraph_real_t kkconst, igraph_bool_t use_seed,
+			       const igraph_vector_t *minx,
+			       const igraph_vector_t *maxx,
+			       const igraph_vector_t *miny,
+			       const igraph_vector_t *maxy) {
 
   igraph_real_t temp, candx, candy, dx, dy;
   igraph_real_t dpot, odis, ndis, osqd, nsqd;
-  long int n,i,j,k;
+  long int n=igraph_vcount(graph);
+  int i,j,k;
   igraph_matrix_t elen;
 
-  /* Define various things */
-  n=igraph_vcount(graph);
+  if (minx && igraph_vector_size(minx) != n) {
+    IGRAPH_ERROR("Invalid minx vector length", IGRAPH_EINVAL);
+  }
+  if (maxx && igraph_vector_size(maxx) != n) {
+    IGRAPH_ERROR("Invalid maxx vector length", IGRAPH_EINVAL);
+  }
+  if (minx && maxx && !igraph_vector_all_le(minx, maxx)) {
+    IGRAPH_ERROR("minx must not be greater than maxx", IGRAPH_EINVAL);
+  }
+  if (miny && igraph_vector_size(miny) != n) {
+    IGRAPH_ERROR("Invalid miny vector length", IGRAPH_EINVAL);
+  }
+  if (maxy && igraph_vector_size(maxy) != n) {
+    IGRAPH_ERROR("Invalid maxy vector length", IGRAPH_EINVAL);
+  }
+  if (miny && maxy && !igraph_vector_all_le(miny, maxy)) {
+    IGRAPH_ERROR("miny must not be greater than maxy", IGRAPH_EINVAL);
+  }
+
+#define CHECK_BOUNDS(x) do {						\
+    if (minx && MATRIX(*res, (x), 0) < VECTOR(*minx)[(x)]) {		\
+      MATRIX(*res, (x), 0) = VECTOR(*minx)[(x)];			\
+    } else if (maxx && MATRIX(*res, (x), 0) > VECTOR(*maxx)[(x)]) {	\
+      MATRIX(*res, (x), 0) = VECTOR(*maxx)[(x)];			\
+    }									\
+    if (miny && MATRIX(*res, (x), 1) < VECTOR(*miny)[(x)]) {		\
+      MATRIX(*res, (x), 1) = VECTOR(*miny)[(x)];			\
+    } else if (maxy && MATRIX(*res, (x), 1) > VECTOR(*maxy)[(x)]) {	\
+      MATRIX(*res, (x), 1) = VECTOR(*maxy)[(x)];			\
+    }									\
+  } while (0)    
 
   /* Calculate elen, initial x & y */
 
@@ -851,6 +895,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
       MATRIX(*res, i, 0) = RNG_NORMAL(0, n/4.0);
       MATRIX(*res, i, 1) = RNG_NORMAL(0, n/4.0);
     }
+    CHECK_BOUNDS(i);
   }
   
   /*Perform the annealing loop*/
@@ -886,6 +931,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
       if(log(RNG_UNIF(0.0,1.0))<dpot/temp){
         MATRIX(*res, j, 0)=candx;
         MATRIX(*res, j, 1)=candy;
+	CHECK_BOUNDS(j);
       }
     }
     /*Cool the system*/
@@ -897,6 +943,8 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
   RNG_END();
   igraph_matrix_destroy(&elen);
   IGRAPH_FINALLY_CLEAN(1);
+
+#undef CHECK_BOUNDS
 
   return 0;
 }
@@ -941,12 +989,65 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
 				  igraph_integer_t niter, igraph_real_t sigma, 
 				  igraph_real_t initemp, igraph_real_t coolexp, 
 				  igraph_real_t kkconst, igraph_bool_t use_seed,
-				  igraph_bool_t fixz) {
+				  igraph_bool_t fixz,
+				  const igraph_vector_t *minx,
+				  const igraph_vector_t *maxx,
+				  const igraph_vector_t *miny,
+				  const igraph_vector_t *maxy,
+				  const igraph_vector_t *minz,
+				  const igraph_vector_t *maxz) {
+
   igraph_real_t temp, candx, candy, candz;
   igraph_real_t dpot, odis, ndis, osqd, nsqd;
   long int i,j,k;
   long int no_of_nodes=igraph_vcount(graph);
   igraph_matrix_t elen;
+
+  if (minx && igraph_vector_size(minx) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid minx vector length", IGRAPH_EINVAL);
+  }
+  if (maxx && igraph_vector_size(maxx) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid maxx vector length", IGRAPH_EINVAL);
+  }
+  if (minx && maxx && !igraph_vector_all_le(minx, maxx)) {
+    IGRAPH_ERROR("minx must not be greater than maxx", IGRAPH_EINVAL);
+  }
+  if (miny && igraph_vector_size(miny) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid miny vector length", IGRAPH_EINVAL);
+  }
+  if (maxy && igraph_vector_size(maxy) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid maxy vector length", IGRAPH_EINVAL);
+  }
+  if (miny && maxy && !igraph_vector_all_le(miny, maxy)) {
+    IGRAPH_ERROR("miny must not be greater than maxy", IGRAPH_EINVAL);
+  }
+  if (minz && igraph_vector_size(minz) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid minz vector length", IGRAPH_EINVAL);
+  }
+  if (maxz && igraph_vector_size(maxz) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid maxz vector length", IGRAPH_EINVAL);
+  }
+  if (minz && maxz && !igraph_vector_all_le(minz, maxz)) {
+    IGRAPH_ERROR("minz must not be greater than maxz", IGRAPH_EINVAL);
+  }
+
+#define CHECK_BOUNDS(x) do {						\
+    if (minx && MATRIX(*res, (x), 0) < VECTOR(*minx)[(x)]) {		\
+      MATRIX(*res, (x), 0) = VECTOR(*minx)[(x)];			\
+    } else if (maxx && MATRIX(*res, (x), 0) > VECTOR(*maxx)[(x)]) {	\
+      MATRIX(*res, (x), 0) = VECTOR(*maxx)[(x)];			\
+    }									\
+    if (miny && MATRIX(*res, (x), 1) < VECTOR(*miny)[(x)]) {		\
+      MATRIX(*res, (x), 1) = VECTOR(*miny)[(x)];			\
+    } else if (maxy && MATRIX(*res, (x), 1) > VECTOR(*maxy)[(x)]) {	\
+      MATRIX(*res, (x), 1) = VECTOR(*maxy)[(x)];			\
+    }									\
+    if (minz && MATRIX(*res, (x), 2) < VECTOR(*minz)[(x)]) {		\
+      MATRIX(*res, (x), 2) = VECTOR(*minz)[(x)];			\
+    } else if (maxz && MATRIX(*res, (x), 2) > VECTOR(*maxz)[(x)]) {	\
+      MATRIX(*res, (x), 2) = VECTOR(*maxz)[(x)];			\
+    }									\
+  } while (0)    
   
   RNG_BEGIN();
   
@@ -979,6 +1080,7 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
       MATRIX(*res, i, 0) = RNG_NORMAL(0, no_of_nodes/4.0);
       MATRIX(*res, i, 1) = RNG_NORMAL(0, no_of_nodes/4.0);
       MATRIX(*res, i, 2) = RNG_NORMAL(0, no_of_nodes/4.0);
+      CHECK_BOUNDS(i);
     }
   }
 
@@ -1017,6 +1119,7 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
         MATRIX(*res, j, 0)=candx;
         MATRIX(*res, j, 1)=candy;
         if (!fixz) { MATRIX(*res, j, 2)=candz; }
+	CHECK_BOUNDS(j);
       }
     }
     /*Cool the system*/
@@ -1028,6 +1131,8 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
   RNG_END();
   igraph_matrix_destroy(&elen);
   IGRAPH_FINALLY_CLEAN(1);
+
+#undef CHECK_BOUNDS
 
   return 0;
 }
