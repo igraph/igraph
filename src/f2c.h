@@ -7,6 +7,10 @@
 #ifndef F2C_INCLUDE
 #define F2C_INCLUDE
 
+#include "igraph_blas_internal.h"
+#include "igraph_lapack_internal.h"
+#include "igraph_arpack_internal.h"
+
 typedef int integer;
 typedef unsigned int uinteger;
 typedef char *address;
