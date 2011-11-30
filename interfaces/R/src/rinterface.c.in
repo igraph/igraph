@@ -76,8 +76,9 @@ SEXP R_igraph_i_lang7(SEXP s, SEXP t, SEXP u, SEXP v, SEXP w, SEXP x, SEXP y)
 {
     PROTECT(s);
     PROTECT(t);
-    s = LCONS(s, LCONS(t, list5(u, v, w, x, y)));
-    UNPROTECT(2);
+    PROTECT(u);
+    s = LCONS(s, LCONS(t, LCONS(u, list4(v, w, x, y))));
+    UNPROTECT(3);
     return s;
 }
 
