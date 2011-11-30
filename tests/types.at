@@ -123,7 +123,7 @@ AT_CLEANUP
 AT_SETUP([Sparse matrix, multiplications (igraph_sparsemat_t): ])
 AT_KEYWORDS([sparse matrix igraph_sparsemat_t])
 AT_COMPILE_CHECK([simple/igraph_sparsemat2.c], [simple/igraph_sparsemat2.out],
-                 [], [INTERNAL])
+                 [], [INTERNAL], [-lblas])
 AT_CLEANUP
 
 AT_SETUP([Sparse matrix, indexing (igraph_sparsemat_t): ])
