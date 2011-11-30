@@ -3013,7 +3013,8 @@ PyObject *igraphmodule_Graph_Weighted_Adjacency(PyTypeObject * type,
     return NULL;
   }
 
-  if (igraph_weighted_adjacency(&g, &m, mode, attr ? attr : "weight")) {
+  if (igraph_weighted_adjacency(&g, &m, mode, attr ? attr : "weight", 
+				/*TODO loops=*/ 1)) {
     igraphmodule_handle_igraph_error();
     if (attr != 0)
       free(attr);
@@ -5792,10 +5793,12 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *
 
   if (dim == 2)
     ret = igraph_layout_kamada_kawai
-      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, use_seed);
+      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, use_seed,
+       /*bounds*/ 0,0, 0,0);
   else
     ret = igraph_layout_kamada_kawai_3d
-      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, use_seed, 0);
+      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, use_seed, 0,
+       /*bounds*/ 0,0, 0,0, 0,0);
 
   if (ret) {
     igraph_matrix_destroy(&m);
@@ -5847,7 +5850,8 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai_3d(igraphmodule_GraphObject *
   }
 
   if (igraph_layout_kamada_kawai_3d
-      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, use_seed, 0)) {
+      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, use_seed, 0, 
+       /*bounds*/ 0,0, 0,0, 0,0)) {
     igraph_matrix_destroy(&m);
     igraphmodule_handle_igraph_error();
     return NULL;
@@ -6030,10 +6034,11 @@ PyObject
   if (dim == 2)
     ret = igraph_layout_fruchterman_reingold
         (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, use_seed,
-        weights, miny, maxy);
+	 weights, 0, 0, miny, maxy);
   else
     ret = igraph_layout_fruchterman_reingold_3d
-      (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, use_seed, weights);
+      (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, use_seed, 
+       weights, 0,0, 0,0, 0,0);
 
   if (ret) {
     igraph_matrix_destroy(&m);
@@ -6617,7 +6622,8 @@ PyObject *igraphmodule_Graph_laplacian(igraphmodule_GraphObject * self,
     return NULL;
   }
 
-  if (igraph_laplacian(&self->g, &m, PyObject_IsTrue(normalized), weights)) {
+  if (igraph_laplacian(&self->g, &m, /*sparseres=*/ 0, 
+		       PyObject_IsTrue(normalized), weights)) {
     igraphmodule_handle_igraph_error();
     if (weights) { igraph_vector_destroy(weights); free(weights); }
     igraph_matrix_destroy(&m);
