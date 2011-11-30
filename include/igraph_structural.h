@@ -131,6 +131,9 @@ int igraph_transitive_closure_dag(const igraph_t *graph,
 int igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *result,
         const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
 
+int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
+		     igraph_vector_t *res);
+
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
 /* -------------------------------------------------- */

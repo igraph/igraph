@@ -161,6 +161,7 @@
 <section><title>Other Operations</title>
 <!-- doxrox-include igraph_density -->
 <!-- doxrox-include igraph_reciprocity -->
+<!-- doxrox-include igraph_diversity -->
 <!-- doxrox-include igraph_is_mutual -->
 <!-- doxrox-include igraph_avg_nearest_neighbor_degree -->
 <!-- doxrox-include igraph_get_adjacency -->

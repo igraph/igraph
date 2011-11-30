@@ -743,6 +743,10 @@ igraph_radius:
         PARAMS: GRAPH graph, OUT REALPTR radius, NEIMODE mode=ALL
         NAME-R: radius
 
+igraph_diversity:
+        PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VECTOR res
+        DEPS: weights ON graph
+
 #######################################
 # Visitors
 #######################################

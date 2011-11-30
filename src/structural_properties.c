@@ -7085,3 +7085,67 @@ int igraph_transitive_closure_dag(const igraph_t *graph,
 
   return 0;
 }
+
+/**
+ * \function igraph_diversity
+ * Structural diversity index of the vertices
+ * 
+ * This measure was defined in Nathan Eagle, Michael Macy and Rob
+ * Claxton: Network Diversity and Economic Development, Science 328,
+ * 1029--1031, 2010. 
+ * 
+ * </para><para>
+ * It is simply the (normalized) Shannon entropy of the
+ * incident edges' weights. D(i)=H(i)/log(k[i]), and 
+ * H(i) = -sum(p[i,j] log(p[i,j]), j=1..k[i]), 
+ * where p[i,j]=w[i,j]/sum(w[i,l], l=1..k[i]),  k[i] is the (total)
+ * degree of vertex i, and w[i,j] is the weight of the edge(s) between
+ * vertex i and j. 
+ * \param The input graph, edge directions are ignored.
+ * \param weights The edge weights, in the order of the edge ids, must
+ *    have appropriate length.
+ * \param res An initialized vector, the results are stored here.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), linear.
+ * 
+ */
+
+int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
+		     igraph_vector_t *res) {
+
+  int no_of_nodes=igraph_vcount(graph);
+  int no_of_edges=igraph_ecount(graph);
+  igraph_vector_t incident;
+  int i;
+
+  if (!weights) { 
+    IGRAPH_ERROR("Edge weigths must be given", IGRAPH_EINVAL);
+  }
+
+  if (igraph_vector_size(weights) != no_of_edges) {
+    IGRAPH_ERROR("Invalid edge weight vector length", IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&incident, 10);
+  
+  IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
+  
+  for (i=0; i<no_of_nodes; i++) {
+    int j, k;
+    igraph_real_t s=0.0, ent=0.0;
+    IGRAPH_CHECK(igraph_incident(graph, &incident, i, /*mode=*/ IGRAPH_ALL));
+    for (j=0, k=igraph_vector_size(&incident); j<k; j++) {
+      int o=VECTOR(incident)[j];
+      igraph_real_t w=VECTOR(*weights)[o];
+      s += w;
+      ent += (w * log(w));
+    }
+    VECTOR(*res)[i] = (log(s) - ent / s) / log(k);
+  }
+  
+  igraph_vector_destroy(&incident);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
