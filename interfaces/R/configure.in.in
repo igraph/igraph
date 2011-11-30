@@ -81,7 +81,7 @@ AC_SUBST(GMP_LIBS)
 
 glpk_support=yes
 AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
-HAVE_GLPK=0
+HAVE_GLPK=1
 GLPK_LIBS=""
 AC_SUBST(HAVE_GLPK)
 AC_SUBST(GLPK_LIBS)
