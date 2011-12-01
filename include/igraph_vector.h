@@ -90,6 +90,10 @@ __BEGIN_DECLS
 int igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to);
 int igraph_vector_round(const igraph_vector_t *from, igraph_vector_long_t *to);
 
+igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
+				  const igraph_vector_t *rhs,
+				  igraph_real_t tol);
+
 /* These are for internal use only */
 int igraph_vector_order(const igraph_vector_t* v, const igraph_vector_t *v2,
 			igraph_vector_t* res, igraph_real_t maxval);

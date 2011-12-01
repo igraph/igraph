@@ -25,6 +25,7 @@
 #include "igraph_types_internal.h"
 #include "igraph_complex.h"
 #include "config.h"
+#include <float.h>
 
 #define BASE_IGRAPH_REAL
 #include "igraph_pmt.h"
@@ -360,4 +361,29 @@ int igraph_vector_complex_create_polar(igraph_vector_complex_t *v,
   }
 
   return 0;
+}
+
+igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
+				  const igraph_vector_t *rhs,
+				  igraph_real_t tol) {
+  long int i, s;
+  assert(lhs != 0);
+  assert(rhs != 0);
+  assert(lhs->stor_begin != 0);
+  assert(rhs->stor_begin != 0);
+
+  s=igraph_vector_size(lhs);
+  if (s != igraph_vector_size(rhs)) {
+    return 0;
+  } else {
+    if (tol==0) { tol=DBL_EPSILON; }
+    for (i=0; i<s; i++) {
+      igraph_real_t l=VECTOR(*lhs)[i];
+      igraph_real_t r=VECTOR(*rhs)[i];
+      if (l < r-tol || l > r+tol) {
+	return 0;
+      }
+    }
+    return 1;
+  }  
 }

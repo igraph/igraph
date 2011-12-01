@@ -140,3 +140,9 @@ int igraph_matrix_complex_create_polar(igraph_matrix_complex_t *v,
 						  &theta->data));
   return 0;
 }
+
+igraph_bool_t igraph_matrix_e_tol(const igraph_matrix_t *lhs,
+				  const igraph_matrix_t *rhs,
+				  igraph_real_t tol) {
+  return igraph_vector_e_tol(&lhs->data, &rhs->data, tol);
+}
