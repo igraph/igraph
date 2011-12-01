@@ -75,7 +75,7 @@ int test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
   igraph_matrix_init(&m2, 0, 0);
   igraph_sparsemat_as_matrix(&m2, &sm);
   igraph_sparsemat_destroy(&sm);
-  if (!igraph_matrix_all_e(&m, &m2)) { 
+  if (!igraph_matrix_all_e_tol(&m, &m2, 0)) { 
     return 41;
   }
   igraph_matrix_destroy(&m2);
@@ -95,7 +95,7 @@ int test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
   igraph_matrix_init(&m2, 0, 0);
   igraph_sparsemat_as_matrix(&m2, &sm);
   igraph_sparsemat_destroy(&sm);
-  if (!igraph_matrix_all_e(&m, &m2)) { 
+  if (!igraph_matrix_all_e_tol(&m, &m2, 0)) { 
     return 42;
   }
   igraph_matrix_destroy(&m2);
@@ -115,7 +115,7 @@ int test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
   igraph_matrix_init(&m2, 0, 0);
   igraph_sparsemat_as_matrix(&m2, &sm);
   igraph_sparsemat_destroy(&sm);
-  if (!igraph_matrix_all_e(&m, &m2)) { 
+  if (!igraph_matrix_all_e_tol(&m, &m2, 0)) { 
     return 43;
   }
   igraph_matrix_destroy(&m2);
@@ -150,7 +150,7 @@ int test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
   igraph_matrix_init(&m2, 0, 0);
   igraph_sparsemat_as_matrix(&m2, &sm);
   igraph_sparsemat_destroy(&sm);
-  if (!igraph_matrix_all_e(&m, &m2)) { 
+  if (!igraph_matrix_all_e_tol(&m, &m2, 0)) { 
     return 44;
   }
   igraph_matrix_destroy(&m2);
@@ -169,7 +169,7 @@ int test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
   igraph_matrix_init(&m2, 0, 0);
   igraph_sparsemat_as_matrix(&m2, &sm);
   igraph_sparsemat_destroy(&sm);
-  if (!igraph_matrix_all_e(&m, &m2)) { 
+  if (!igraph_matrix_all_e_tol(&m, &m2, 0)) { 
     return 45;
   }
   igraph_matrix_destroy(&m2);
@@ -188,7 +188,7 @@ int test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
   igraph_matrix_init(&m2, 0, 0);
   igraph_sparsemat_as_matrix(&m2, &sm);
   igraph_sparsemat_destroy(&sm);
-  if (!igraph_matrix_all_e(&m, &m2)) { 
+  if (!igraph_matrix_all_e_tol(&m, &m2, 0)) { 
     return 46;
   }
   igraph_matrix_destroy(&m2);
