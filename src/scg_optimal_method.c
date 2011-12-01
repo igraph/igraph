@@ -70,7 +70,10 @@ int igraph_i_optimal_partition(const igraph_real_t *v, int *gr, int n,
   qsort(vs, n, sizeof(igraph_i_scg_indval_t), igraph_i_compare_ind_val);
   
   non_ties = 1;
-  for (i=1; i<n; i++) { if (vs[i].val != vs[i-1].val) non_ties++; }
+  for (i=1; i<n; i++) {
+    if (vs[i].val < vs[i-1].val - 1e-14 ||
+	vs[i].val > vs[i-1].val + 1e-14) { non_ties++; }
+  }
   
   if (nt >= non_ties) {
     IGRAPH_ERROR("`Invalid number of intervals, should be smaller than "
