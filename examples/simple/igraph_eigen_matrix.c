@@ -59,7 +59,7 @@ int main() {
 		      /*options=*/ 0, &values, &vectors);
 
   if (IGRAPH_REAL(MATRIX(vectors, 0, 0)) < 0) { 
-    igraph_matrix_complex_scale(&vectors, igraph_complex(-1.0, 0.0 ));
+    igraph_matrix_complex_scale(&vectors, igraph_complex(-1.0, -0.0 ));
   }
 
   igraph_vector_complex_print(&values);
