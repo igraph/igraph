@@ -25,6 +25,7 @@
 #include "igraph_qsort.h"
 #include <string.h>
 #include <math.h>
+#include <float.h>
 
 int igraph_i_eigen_arpackfun_to_mat(igraph_arpack_function_t *fun,
 				    int n, void *extra, 
@@ -482,7 +483,7 @@ typedef struct igraph_i_eml_cmp_t {
 
 /* TODO: these should be defined in some header */
 
-#define EPS        (1e-15)
+#define EPS        (DBL_EPSILON*100)
 #define LESS(a,b)  ((a) < (b)-EPS)
 #define MORE(a,b)  ((a) > (b)+EPS)
 #define ZERO(a)    ((a) > -EPS && (a) < EPS)
@@ -514,7 +515,7 @@ int igraph_i_eigen_matrix_lapack_cmp_lm(void *extra, const void *a,
     if (NONZERO(a_i) && ZERO(b_i))     { return  1; }
     if (MORE(a_r, b_r)) { return -1; }
     if (LESS(a_r, b_r)) { return  1; }
-    if (MORE(a_i, b_r)) { return -1; }
+    if (MORE(a_i, b_i)) { return -1; }
     if (LESS(a_i, b_i)) { return  1; }
   }
   return 0;
@@ -547,7 +548,7 @@ int igraph_i_eigen_matrix_lapack_cmp_sm(void *extra, const void *a,
     if (ZERO(a_i)    && NONZERO(b_i)) { return  1; }
     if (LESS(a_r, b_r)) { return -1; }
     if (MORE(a_r, b_r)) { return  1; }
-    if (LESS(a_i, b_r)) { return -1; }
+    if (LESS(a_i, b_i)) { return -1; }
     if (MORE(a_i, b_i)) { return  1; }
   }
   return 0;
