@@ -98,9 +98,9 @@ __BEGIN_DECLS
  */
 #define MATRIX(m,i,j) ((m).data.stor_begin[(m).nrow*(j)+(i)])
 
-igraph_bool_t igraph_matrix_e_tol(const igraph_matrix_t *lhs,
-				  const igraph_matrix_t *rhs,
-				  igraph_real_t tol);
+igraph_bool_t igraph_matrix_all_e_tol(const igraph_matrix_t *lhs,
+				      const igraph_matrix_t *rhs,
+				      igraph_real_t tol);
 
 __END_DECLS
 
