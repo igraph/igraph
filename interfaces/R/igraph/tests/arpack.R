@@ -1,5 +1,6 @@
 
 library(igraph)
+library(Matrix, warn.conflicts=FALSE)
 
 ####
 
