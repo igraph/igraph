@@ -2984,13 +2984,15 @@ PyObject *igraphmodule_Graph_Weighted_Adjacency(PyTypeObject * type,
   igraph_t g;
   igraph_matrix_t m;
   PyObject *matrix, *mode_o = Py_None, *attr_o = Py_None, *s = 0;
+  PyObject *loops = Py_True;
   char* attr = 0;
   igraph_adjacency_t mode = IGRAPH_ADJ_DIRECTED;
 
-  static char *kwlist[] = { "matrix", "mode", "attr", NULL };
+  static char *kwlist[] = { "matrix", "mode", "attr", "loops", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|OO", kwlist,
-                                   &PyList_Type, &matrix, &mode_o, &attr_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|OOO", kwlist,
+                                   &PyList_Type, &matrix, &mode_o, &attr_o,
+                                   &loops))
     return NULL;
 
   if (igraphmodule_PyObject_to_adjacency_t(mode_o, &mode))
@@ -3013,8 +3015,8 @@ PyObject *igraphmodule_Graph_Weighted_Adjacency(PyTypeObject * type,
     return NULL;
   }
 
-  if (igraph_weighted_adjacency(&g, &m, mode, attr ? attr : "weight", 
-				/*TODO loops=*/ 1)) {
+  if (igraph_weighted_adjacency(&g, &m, mode, attr ? attr : "weight",
+        PyObject_IsTrue(loops))) {
     igraphmodule_handle_igraph_error();
     if (attr != 0)
       free(attr);
@@ -5757,13 +5759,29 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *
                                                  PyObject * kwds)
 {
   static char *kwlist[] =
-    { "maxiter", "sigma", "initemp", "coolexp", "kkconst", "seed", "dim", NULL };
+    { "maxiter", "sigma", "initemp", "coolexp", "kkconst", "seed", "minx", "maxx",
+      "miny", "maxy", "minz", "maxz", "dim", NULL };
   igraph_matrix_t m;
   igraph_bool_t use_seed=0;
   int ret;
   long niter = 1000, dim = 2;
   double sigma, initemp, coolexp, kkconst;
   PyObject *result, *seed_o=Py_None;
+  PyObject *minx_o=Py_None, *maxx_o=Py_None;
+  PyObject *miny_o=Py_None, *maxy_o=Py_None;
+  PyObject *minz_o=Py_None, *maxz_o=Py_None;
+  igraph_vector_t *minx=0, *maxx=0;
+  igraph_vector_t *miny=0, *maxy=0;
+  igraph_vector_t *minz=0, *maxz=0;
+
+#define DESTROY_VECTORS { \
+  if (minx)    { igraph_vector_destroy(minx); free(minx); } \
+  if (maxx)    { igraph_vector_destroy(maxx); free(maxx); } \
+  if (miny)    { igraph_vector_destroy(miny); free(miny); } \
+  if (maxy)    { igraph_vector_destroy(maxy); free(maxy); } \
+  if (minz)    { igraph_vector_destroy(minz); free(minz); } \
+  if (maxz)    { igraph_vector_destroy(maxz); free(maxz); } \
+}
 
   sigma = igraph_vcount(&self->g);
   kkconst = sigma * sigma;
@@ -5771,9 +5789,12 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *
   initemp = 10.0;
   coolexp = 0.99;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lddddOl", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lddddOOOOOOOl", kwlist,
                                    &niter, &sigma, &initemp, &coolexp,
-                                   &kkconst, &seed_o, &dim))
+                                   &kkconst, &seed_o,
+                                   &minx_o, &maxx_o,
+                                   &miny_o, &maxy_o,
+                                   &minz_o, &maxz_o, &dim))
     return NULL;
 
   if (dim != 2 && dim != 3) {
@@ -5791,67 +5812,59 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *
 	if (igraphmodule_PyList_to_matrix_t(seed_o, &m)) return NULL;
   }
 
-  if (dim == 2)
-    ret = igraph_layout_kamada_kawai
-      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, use_seed,
-       /*bounds*/ 0,0, 0,0);
-  else
-    ret = igraph_layout_kamada_kawai_3d
-      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, use_seed, 0,
-       /*bounds*/ 0,0, 0,0, 0,0);
-
-  if (ret) {
+  /* Convert minimum and maximum x-y-z values */
+  if (igraphmodule_attrib_to_vector_t(minx_o, self, &minx, ATTRIBUTE_TYPE_EDGE)) {
     igraph_matrix_destroy(&m);
+    DESTROY_VECTORS;
     igraphmodule_handle_igraph_error();
     return NULL;
   }
-
-  result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
-  igraph_matrix_destroy(&m);
-  return (PyObject *) result;
-}
-
-/** \ingroup python_interface_graph
- * \brief Places the vertices on a plane according to the Kamada-Kawai algorithm in 3D.
- * \return the calculated coordinates as a Python list of lists
- * \sa igraph_layout_kamada_kawai_3d
- */
-PyObject *igraphmodule_Graph_layout_kamada_kawai_3d(igraphmodule_GraphObject *
-                                                    self, PyObject * args,
-                                                    PyObject * kwds)
-{
-  static char *kwlist[] =
-    { "maxiter", "sigma", "initemp", "coolexp", "kkconst", "seed", NULL };
-  igraph_matrix_t m;
-  igraph_bool_t use_seed = 0;
-  long niter = 1000;
-  double sigma, initemp, coolexp, kkconst;
-  PyObject *result, *seed_o = Py_None;
-
-  sigma = igraph_vcount(&self->g);
-  kkconst = sigma * sigma;
-  sigma = sigma / 4.0;
-  initemp = 10.0;
-  coolexp = 0.99;
-
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lddddO", kwlist,
-                                   &niter, &sigma, &initemp, &coolexp,
-                                   &kkconst, &seed_o))
+  if (igraphmodule_attrib_to_vector_t(maxx_o, self, &maxx, ATTRIBUTE_TYPE_EDGE)) {
+    igraph_matrix_destroy(&m);
+    DESTROY_VECTORS;
+    igraphmodule_handle_igraph_error();
     return NULL;
-
-  if (seed_o == 0 || seed_o == Py_None) {
-    if (igraph_matrix_init(&m, 1, 1)) {
+  }
+  if (igraphmodule_attrib_to_vector_t(miny_o, self, &miny, ATTRIBUTE_TYPE_EDGE)) {
+    igraph_matrix_destroy(&m);
+    DESTROY_VECTORS;
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+  if (igraphmodule_attrib_to_vector_t(maxy_o, self, &maxy, ATTRIBUTE_TYPE_EDGE)) {
+    igraph_matrix_destroy(&m);
+    DESTROY_VECTORS;
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+  if (dim > 2) {
+    if (igraphmodule_attrib_to_vector_t(minz_o, self, &minz, ATTRIBUTE_TYPE_EDGE)) {
+      igraph_matrix_destroy(&m);
+      DESTROY_VECTORS;
       igraphmodule_handle_igraph_error();
       return NULL;
     }
-  } else {
-    use_seed=1;
-	if (igraphmodule_PyList_to_matrix_t(seed_o, &m)) return NULL;
+    if (igraphmodule_attrib_to_vector_t(maxz_o, self, &maxz, ATTRIBUTE_TYPE_EDGE)) {
+      igraph_matrix_destroy(&m);
+      DESTROY_VECTORS;
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
   }
+  if (dim == 2)
+    ret = igraph_layout_kamada_kawai
+      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, use_seed,
+       /*bounds*/ minx, maxx, miny, maxy);
+  else
+    ret = igraph_layout_kamada_kawai_3d
+      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, use_seed, 0,
+       /*bounds*/ minx, maxx, miny, maxy, minz, maxz);
 
-  if (igraph_layout_kamada_kawai_3d
-      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, use_seed, 0, 
-       /*bounds*/ 0,0, 0,0, 0,0)) {
+  DESTROY_VECTORS;
+
+#undef DESTROY_VECTORS
+
+  if (ret) {
     igraph_matrix_destroy(&m);
     igraphmodule_handle_igraph_error();
     return NULL;
@@ -5966,24 +5979,42 @@ PyObject
 {
   static char *kwlist[] =
     { "weights", "maxiter", "maxdelta", "area", "coolexp", "repulserad",
-      "miny", "maxy", "seed", "dim", NULL };
+      "seed", "minx", "maxx", "miny", "maxy", "minz", "maxz", "dim", NULL };
   igraph_matrix_t m;
   igraph_bool_t use_seed=0;
-  igraph_vector_t *weights=0, *miny=0, *maxy=0;
+  igraph_vector_t *weights=0;
+  igraph_vector_t *minx=0, *maxx=0;
+  igraph_vector_t *miny=0, *maxy=0;
+  igraph_vector_t *minz=0, *maxz=0;
   int ret;
   long niter = 500, dim = 2;
   double maxdelta, area, coolexp, repulserad;
   PyObject *result;
-  PyObject *wobj=Py_None, *miny_o=Py_None, *maxy_o=Py_None, *seed_o=Py_None;
+  PyObject *wobj=Py_None, *seed_o=Py_None;
+  PyObject *minx_o=Py_None, *maxx_o=Py_None;
+  PyObject *miny_o=Py_None, *maxy_o=Py_None;
+  PyObject *minz_o=Py_None, *maxz_o=Py_None;
+
+#define DESTROY_VECTORS { \
+  if (weights) { igraph_vector_destroy(weights); free(weights); } \
+  if (minx)    { igraph_vector_destroy(minx); free(minx); } \
+  if (maxx)    { igraph_vector_destroy(maxx); free(maxx); } \
+  if (miny)    { igraph_vector_destroy(miny); free(miny); } \
+  if (maxy)    { igraph_vector_destroy(maxy); free(maxy); } \
+  if (minz)    { igraph_vector_destroy(minz); free(minz); } \
+  if (maxz)    { igraph_vector_destroy(maxz); free(maxz); } \
+}
 
   maxdelta = igraph_vcount(&self->g);
   coolexp = 1.5;
   repulserad = -1;
   area = -1;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OlddddOOOl", kwlist, &wobj,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OlddddOOOOOOOl", kwlist, &wobj,
                                    &niter, &maxdelta, &area, &coolexp,
-                                   &repulserad, &miny_o, &maxy_o, &seed_o, &dim))
+                                   &repulserad, &seed_o, &minx_o, &maxx_o,
+                                   &miny_o, &maxy_o, &minz_o, &maxz_o,
+                                   &dim))
     return NULL;
 
   if (area <= 0) {
@@ -6016,42 +6047,65 @@ PyObject
     igraphmodule_handle_igraph_error();
     return NULL;
   }
-  /* Convert minimum and maximum y values */
+  /* Convert minimum and maximum x-y-z values */
+  if (igraphmodule_attrib_to_vector_t(minx_o, self, &minx, ATTRIBUTE_TYPE_EDGE)) {
+    igraph_matrix_destroy(&m);
+    DESTROY_VECTORS;
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+  if (igraphmodule_attrib_to_vector_t(maxx_o, self, &maxx, ATTRIBUTE_TYPE_EDGE)) {
+    igraph_matrix_destroy(&m);
+    DESTROY_VECTORS;
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
   if (igraphmodule_attrib_to_vector_t(miny_o, self, &miny, ATTRIBUTE_TYPE_EDGE)) {
     igraph_matrix_destroy(&m);
-    if (weights) { igraph_vector_destroy(weights); free(weights); }
+    DESTROY_VECTORS;
     igraphmodule_handle_igraph_error();
     return NULL;
   }
   if (igraphmodule_attrib_to_vector_t(maxy_o, self, &maxy, ATTRIBUTE_TYPE_EDGE)) {
     igraph_matrix_destroy(&m);
-    if (weights) { igraph_vector_destroy(weights); free(weights); }
-    if (miny) { igraph_vector_destroy(miny); free(miny); }
+    DESTROY_VECTORS;
     igraphmodule_handle_igraph_error();
     return NULL;
+  }
+  if (dim > 2) {
+    if (igraphmodule_attrib_to_vector_t(minz_o, self, &minz, ATTRIBUTE_TYPE_EDGE)) {
+      igraph_matrix_destroy(&m);
+      DESTROY_VECTORS;
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+    if (igraphmodule_attrib_to_vector_t(maxz_o, self, &maxz, ATTRIBUTE_TYPE_EDGE)) {
+      igraph_matrix_destroy(&m);
+      DESTROY_VECTORS;
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
   }
 
   if (dim == 2)
     ret = igraph_layout_fruchterman_reingold
         (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, use_seed,
-	 weights, 0, 0, miny, maxy);
+	 weights, minx, maxx, miny, maxy);
   else
     ret = igraph_layout_fruchterman_reingold_3d
       (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, use_seed, 
-       weights, 0,0, 0,0, 0,0);
+       weights, minx, maxx, miny, maxy, minz, maxz);
+
+  DESTROY_VECTORS;
 
   if (ret) {
     igraph_matrix_destroy(&m);
-    if (weights) { igraph_vector_destroy(weights); free(weights); }
-    if (miny) { igraph_vector_destroy(miny); free(miny); }
-    if (maxy) { igraph_vector_destroy(maxy); free(maxy); }
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
-  if (miny) { igraph_vector_destroy(miny); free(miny); }
-  if (maxy) { igraph_vector_destroy(maxy); free(maxy); }
-  if (weights) { igraph_vector_destroy(weights); free(weights); }
+#undef DESTROY_VECTORS
+
   result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
   igraph_matrix_destroy(&m);
 
@@ -10914,7 +10968,10 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "\n"
    "  These values can also be given as strings without the C{ADJ} prefix.\n"
    "@param attr: the name of the edge attribute that stores the edge\n"
-   "  weights."},
+   "  weights.\n"
+   "@param loops: whether to include loop edges. When C{False}, the diagonal\n"
+   "  of the adjacency matrix will be ignored.\n"
+  },
 
   /////////////////////////////////////
   // STRUCTURAL PROPERTIES OF GRAPHS //
@@ -12163,11 +12220,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@return: the calculated layout."
   },
 
-  // interface to igraph_layout_kamada_kawai
+  /* interface to igraph_layout_kamada_kawai */
   {"layout_kamada_kawai",
    (PyCFunction) igraphmodule_Graph_layout_kamada_kawai,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_kamada_kawai(maxiter=1000, sigma=None, initemp=10, coolexp=0.99, kkconst=None, seed=None, dim=2)\n\n"
+   "layout_kamada_kawai(maxiter=1000, sigma=None, initemp=10, coolexp=0.99,\n"
+   "  kkconst=None, seed=None, minx=None, maxx=None, miny=None, maxy=None, \n"
+   "  minz=None, maxz=None, dim=2)\n\n"
    "Places the vertices on a plane according to the Kamada-Kawai algorithm.\n\n"
    "This is a force directed layout, see Kamada, T. and Kawai, S.:\n"
    "An Algorithm for Drawing General Undirected Graphs.\n"
@@ -12179,6 +12238,16 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param coolexp: cooling exponent of the simulated annealing.\n"
    "@param kkconst: the Kamada-Kawai vertex attraction constant.\n"
    "  C{None} means the square of the number of vertices.\n"
+   "@param minx: if not C{None}, it must be a vector with exactly as many\n"
+   "  elements as there are vertices in the graph. Each element is a\n"
+   "  minimum constraint on the X value of the vertex in the layout.\n"
+   "@param maxx: similar to I{minx}, but with maximum constraints\n"
+   "@param miny: similar to I{minx}, but with the Y coordinates\n"
+   "@param maxy: similar to I{maxx}, but with the Y coordinates\n"
+   "@param minz: similar to I{minx}, but with the Z coordinates. Use only\n"
+   "  for 3D layouts (C{dim}=3).\n"
+   "@param maxz: similar to I{maxx}, but with the Z coordinates. Use only\n"
+   "  for 3D layouts (C{dim}=3).\n"
    "@param seed: if C{None}, uses a random starting layout for the\n"
    "  algorithm. If a matrix (list of lists), uses the given matrix\n"
    "  as the starting position.\n"
@@ -12251,7 +12320,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"layout_fruchterman_reingold",
    (PyCFunction) igraphmodule_Graph_layout_fruchterman_reingold,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_fruchterman_reingold(weights=None, maxiter=500, maxdelta=None, area=None, coolexp=1.5, repulserad=None, miny=None, maxy=None, seed=None, dim=2)\n\n"
+   "layout_fruchterman_reingold(weights=None, maxiter=500, maxdelta=None, area=None,\n"
+   "  coolexp=1.5, repulserad=None, seed=None, minx=None, maxx=None, miny=None, \n"
+   "  maxy=None, minz=None, maxz=None, dim=2)\n\n"
    "Places the vertices on a 2D plane or in the 3D space according to the\n"
    "Fruchterman-Reingold algorithm.\n\n"
    "This is a force directed layout, see Fruchterman, T. M. J. and Reingold, E. M.:\n"
@@ -12271,12 +12342,16 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param repulserad: determines the radius at which vertex-vertex\n"
    "  repulsion cancels out attraction of adjacent vertices.\n"
    "  The default is the number of vertices^3.\n"
-   "@param miny: if not C{None}, it must be a vector with exactly as many\n"
+   "@param minx: if not C{None}, it must be a vector with exactly as many\n"
    "  elements as there are vertices in the graph. Each element is a\n"
-   "  minimum constraint on the Y value of the vertex in the layout.\n"
-   "  Used only in the 2D case.\n"
-   "@param maxy: similar to I{miny}, but with maximum constraints\n"
-   "  Used only in the 2D case.\n"
+   "  minimum constraint on the X value of the vertex in the layout.\n"
+   "@param maxx: similar to I{minx}, but with maximum constraints\n"
+   "@param miny: similar to I{minx}, but with the Y coordinates\n"
+   "@param maxy: similar to I{maxx}, but with the Y coordinates\n"
+   "@param minz: similar to I{minx}, but with the Z coordinates. Use only\n"
+   "  for 3D layouts (C{dim}=3).\n"
+   "@param maxz: similar to I{maxx}, but with the Z coordinates. Use only\n"
+   "  for 3D layouts (C{dim}=3).\n"
    "@param seed: if C{None}, uses a random starting layout for the\n"
    "  algorithm. If a matrix (list of lists), uses the given matrix\n"
    "  as the starting position.\n"
