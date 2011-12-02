@@ -145,6 +145,6 @@ igraph_$(VERSION).tar.gz: $(RFILES) $(SRCFILES)
 
 tests:
 	cd igraph/tests && echo "tools:::.runPackageTestsR()" | \
-	R_LIBS=~/.R/library/ R --no-save && echo
+	R --no-save && echo
 
 .PHONY: tests
