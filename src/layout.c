@@ -477,10 +477,17 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
         xd=MATRIX(*res, j, 0)-MATRIX(*res, k, 0);
         yd=MATRIX(*res, j, 1)-MATRIX(*res, k, 1);
         ded=sqrt(xd*xd+yd*yd);  /* Get dyadic euclidean distance */
-        xd/=ded;                /* Rescale differences to length 1 */
-        yd/=ded;
-        /* Calculate repulsive "force" */
-        rf=frk*frk*(1.0/ded-ded*ded/repulserad);
+        if (ded != 0) {
+          xd/=ded;                      /*Rescale differences to length 1*/
+          yd/=ded;
+          /*Calculate repulsive "force"*/
+          rf=frk*frk*(1.0/ded-ded*ded/repulserad);
+	      } else {
+          /* ded is exactly zero. Use some small random displacement. */
+          xd=RNG_NORMAL(0,0.1);
+          yd=RNG_NORMAL(0,0.1);
+          rf=RNG_NORMAL(0,0.1);
+        }
         MATRIX(dxdy, j, 0)+=xd*rf; /* Add to the position change vector */
         MATRIX(dxdy, k, 0)-=xd*rf;
         MATRIX(dxdy, j, 1)+=yd*rf;
@@ -499,10 +506,14 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
       yd=MATRIX(*res, j, 1)-MATRIX(*res, k, 1);
       ded=sqrt(xd*xd+yd*yd);  /* Get dyadic euclidean distance */
       if (ded != 0) {
-	xd/=ded;                /* Rescale differences to length 1 */
-	yd/=ded;
+        xd/=ded;                /* Rescale differences to length 1 */
+        yd/=ded;
+        af=ded*ded/frk*w;
+      } else {
+        xd=RNG_NORMAL(0,0.1);
+        yd=RNG_NORMAL(0,0.1);
+        af=RNG_NORMAL(0,0.1);
       }
-      af=ded*ded/frk*w;
       MATRIX(dxdy, j, 0)-=xd*af; /* Add to the position change vector */
       MATRIX(dxdy, k, 0)+=xd*af;
       MATRIX(dxdy, j, 1)-=yd*af;
@@ -688,12 +699,18 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
         zd=MATRIX(*res, j, 2)-MATRIX(*res, k, 2);
         ded=sqrt(xd*xd+yd*yd+zd*zd);  /*Get dyadic euclidean distance*/
         if (ded != 0) {
-	  xd/=ded;                      /*Rescale differences to length 1*/
-	  yd/=ded;
-	  zd/=ded;
-	}
-        /*Calculate repulsive "force"*/
-        rf=frk*frk*(1.0/ded-ded*ded/repulserad);
+          xd/=ded;                      /*Rescale differences to length 1*/
+          yd/=ded;
+          zd/=ded;
+          /*Calculate repulsive "force"*/
+          rf=frk*frk*(1.0/ded-ded*ded/repulserad);
+	      } else {
+          /* ded is exactly zero. Use some small random displacement. */
+          xd=RNG_NORMAL(0,0.1);
+          yd=RNG_NORMAL(0,0.1);
+          zd=RNG_NORMAL(0,0.1);
+          rf=RNG_NORMAL(0,0.1);
+        }
         MATRIX(dxdydz, j, 0)+=xd*rf;     /*Add to the position change vector*/
         MATRIX(dxdydz, k, 0)-=xd*rf;
         MATRIX(dxdydz, j, 1)+=yd*rf;
