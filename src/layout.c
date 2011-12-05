@@ -911,8 +911,8 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
     for (i=0; i<n; i++) {
       MATRIX(*res, i, 0) = RNG_NORMAL(0, n/4.0);
       MATRIX(*res, i, 1) = RNG_NORMAL(0, n/4.0);
+      CHECK_BOUNDS(i);
     }
-    CHECK_BOUNDS(i);
   }
   
   /*Perform the annealing loop*/
