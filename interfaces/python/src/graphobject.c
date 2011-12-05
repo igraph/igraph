@@ -10949,7 +10949,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_weighted_adjacency */
   {"Weighted_Adjacency", (PyCFunction) igraphmodule_Graph_Weighted_Adjacency,
    METH_CLASS | METH_VARARGS | METH_KEYWORDS,
-   "Weighted_Adjacency(matrix, mode=ADJ_DIRECTED, attr=\"weight\")\n\n"
+   "Weighted_Adjacency(matrix, mode=ADJ_DIRECTED, attr=\"weight\", loops=True)\n\n"
    "Generates a graph from its adjacency matrix.\n\n"
    "@param matrix: the adjacency matrix\n"
    "@param mode: the mode to be used. Possible values are:\n"
@@ -11720,7 +11720,6 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"reciprocity", (PyCFunction) igraphmodule_Graph_reciprocity,
    METH_VARARGS | METH_KEYWORDS,
    "reciprocity(ignore_loops=True, mode=\"default\")\n\n"
-   "@return: the reciprocity of the graph.\n\n"
    "Reciprocity defines the proportion of mutual connections in a\n"
    "directed graph. It is most commonly defined as the probability\n"
    "that the opposite counterpart of a directed edge is also included\n"

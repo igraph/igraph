@@ -487,10 +487,16 @@ GRAPH_PROXY_METHOD_PP(successors, "successors", _convert_to_vertex_list);
 
 #define GRAPH_PROXY_METHOD_SPEC(FUNC, METHODNAME) \
   {METHODNAME, (PyCFunction)igraphmodule_Vertex_##FUNC, METH_VARARGS | METH_KEYWORDS, \
-    "Proxy method to L{Graph." METHODNAME "()\n\n"              \
+    "Proxy method to L{Graph." METHODNAME "()}\n\n"              \
     "This method calls the " METHODNAME " method of the L{Graph} class " \
     "with this vertex as the first argument, and returns the result.\n\n"\
     "@see: Graph." METHODNAME "() for details."}
+#define GRAPH_PROXY_METHOD_SPEC_2(FUNC, METHODNAME, METHODNAME_IN_GRAPH) \
+  {METHODNAME, (PyCFunction)igraphmodule_Vertex_##FUNC, METH_VARARGS | METH_KEYWORDS, \
+    "Proxy method to L{Graph." METHODNAME_IN_GRAPH "()}\n\n"              \
+    "This method calls the " METHODNAME_IN_GRAPH " method of the L{Graph} class " \
+    "with this vertex as the first argument, and returns the result.\n\n"\
+    "@see: Graph." METHODNAME_IN_GRAPH "() for details."}
 
 /**
  * \ingroup python_interface_vertex
@@ -521,7 +527,7 @@ PyMethodDef igraphmodule_Vertex_methods[] = {
   GRAPH_PROXY_METHOD_SPEC(closeness, "closeness"),
   GRAPH_PROXY_METHOD_SPEC(constraint, "constraint"),
   GRAPH_PROXY_METHOD_SPEC(degree, "degree"),
-  GRAPH_PROXY_METHOD_SPEC(delete, "delete"),
+  GRAPH_PROXY_METHOD_SPEC_2(delete, "delete", "delete_vertices"),
   GRAPH_PROXY_METHOD_SPEC(eccentricity, "eccentricity"),
   GRAPH_PROXY_METHOD_SPEC(get_shortest_paths, "get_shortest_paths"),
   GRAPH_PROXY_METHOD_SPEC(indegree, "indegree"),
@@ -539,6 +545,7 @@ PyMethodDef igraphmodule_Vertex_methods[] = {
 };
 
 #undef GRAPH_PROXY_METHOD_SPEC
+#undef GRAPH_PROXY_METHOD_SPEC_2
 
 /** \ingroup python_interface_vertex
  * This structure is the collection of functions necessary to implement

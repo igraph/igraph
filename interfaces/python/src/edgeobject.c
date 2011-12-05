@@ -378,10 +378,16 @@ GRAPH_PROXY_METHOD(is_mutual, "is_mutual");
 
 #define GRAPH_PROXY_METHOD_SPEC(FUNC, METHODNAME) \
   {METHODNAME, (PyCFunction)igraphmodule_Edge_##FUNC, METH_VARARGS | METH_KEYWORDS, \
-    "Proxy method to L{Graph." METHODNAME "()\n\n"              \
+    "Proxy method to L{Graph." METHODNAME "()}\n\n"              \
     "This method calls the " METHODNAME " method of the L{Graph} class " \
     "with this edge as the first argument, and returns the result.\n\n"\
     "@see: Graph." METHODNAME "() for details."}
+#define GRAPH_PROXY_METHOD_SPEC_2(FUNC, METHODNAME, METHODNAME_IN_GRAPH) \
+  {METHODNAME, (PyCFunction)igraphmodule_Edge_##FUNC, METH_VARARGS | METH_KEYWORDS, \
+    "Proxy method to L{Graph." METHODNAME_IN_GRAPH "()}\n\n"              \
+    "This method calls the " METHODNAME_IN_GRAPH " method of the L{Graph} class " \
+    "with this edge as the first argument, and returns the result.\n\n"\
+    "@see: Graph." METHODNAME_IN_GRAPH "() for details."}
 
 /**
  * \ingroup python_interface_edge
@@ -409,12 +415,15 @@ PyMethodDef igraphmodule_Edge_methods[] = {
     "dictionaries."
   },
   GRAPH_PROXY_METHOD_SPEC(count_multiple, "count_multiple"),
-  GRAPH_PROXY_METHOD_SPEC(delete, "delete"),
+  GRAPH_PROXY_METHOD_SPEC_2(delete, "delete", "delete_edges"),
   GRAPH_PROXY_METHOD_SPEC(is_loop, "is_loop"),
   GRAPH_PROXY_METHOD_SPEC(is_multiple, "is_multiple"),
   GRAPH_PROXY_METHOD_SPEC(is_mutual, "is_mutual"),
   {NULL}
 };
+
+#undef GRAPH_PROXY_METHOD_SPEC
+#undef GRAPH_PROXY_METHOD_SPEC_2
 
 /**
  * \ingroup python_interface_edge
