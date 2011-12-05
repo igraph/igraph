@@ -4634,8 +4634,32 @@ PyObject *igraphmodule_Graph_rewire(igraphmodule_GraphObject * self,
     return NULL;
   }
 
-  Py_INCREF(self);
-  return (PyObject *) self;
+  Py_RETURN_NONE;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Rewires the edges of a graph wth constant probability
+ * \return the rewired graph
+ * \sa igraph_rewire_edges
+ */
+PyObject *igraphmodule_Graph_rewire_edges(igraphmodule_GraphObject * self,
+                                          PyObject * args, PyObject * kwds)
+{
+  static char *kwlist[] = { "prob", "loops", "multiple", NULL };
+  double prob;
+  PyObject *loops_o = Py_False, *multiple_o = Py_False;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "d|OO", kwlist,
+        &prob, &loops_o, &multiple_o))
+    return NULL;
+
+  if (igraph_rewire_edges(&self->g, prob, PyObject_IsTrue(loops_o),
+        PyObject_IsTrue(multiple_o))) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  Py_RETURN_NONE;
 }
 
 /** \ingroup python_interface_graph
@@ -11740,7 +11764,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@return: the reciprocity of the graph\n"
   },
 
-  // interface to igraph_rewire
+  /* interface to igraph_rewire */
   {"rewire", (PyCFunction) igraphmodule_Graph_rewire,
    METH_VARARGS | METH_KEYWORDS,
    "rewire(n=1000, mode=REWIRING_SIMPLE)\n\n"
@@ -11750,7 +11774,22 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "use the L{copy} method before.\n\n"
    "@param n: the number of rewiring trials.\n"
    "@param mode: the rewiring algorithm to use. As for now, only\n"
-   "  C{REWIRING_SIMPLE} is supported.\n" "@return: the modified graph.\n"},
+   "  C{REWIRING_SIMPLE} is supported.\n"},
+
+  /* interface to igraph_rewire_edges */
+  {"rewire_edges", (PyCFunction) igraphmodule_Graph_rewire_edges,
+   METH_VARARGS | METH_KEYWORDS,
+   "rewire_edges(prob, loops=False, multiple=False)\n\n"
+   "Rewires the edges of a graph with constant probability.\n\n"
+   "Each endpoint of each edge of the graph will be rewired with a constant\n"
+   "probability, given in the first argument.\n\n"
+   "Please note that the rewiring is done \"in-place\", so the original\n"
+   "graph will be modified. If you want to preserve the original graph,\n"
+   "use the L{copy} method before.\n\n"
+   "@param prob: rewiring probability\n"
+   "@param loops: whether the algorithm is allowed to create loop edges\n"
+   "@param multiple: whether the algorithm is allowed to create multiple\n"
+   "  edges.\n"},
 
   /* interface to igraph_shortest_paths */
   {"shortest_paths", (PyCFunction) igraphmodule_Graph_shortest_paths,
