@@ -7105,6 +7105,8 @@ int igraph_transitive_closure_dag(const igraph_t *graph,
  * \param weights The edge weights, in the order of the edge ids, must
  *    have appropriate length.
  * \param res An initialized vector, the results are stored here.
+ * \param vids Vector with the vertex ids for which to calculate the
+ *    measure.
  * \return Error code.
  * 
  * Time complexity: O(|V|+|E|), linear.
@@ -7112,15 +7114,17 @@ int igraph_transitive_closure_dag(const igraph_t *graph,
  */
 
 int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
-		     igraph_vector_t *res) {
+		     igraph_vector_t *res, const igraph_vs_t vids) {
 
   int no_of_nodes=igraph_vcount(graph);
   int no_of_edges=igraph_ecount(graph);
   igraph_vector_t incident;
-  int i;
+  igraph_vit_t vit;
+  igraph_real_t s, ent, w;
+  int i, j, k;
 
   if (!weights) { 
-    IGRAPH_ERROR("Edge weigths must be given", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Edge weights must be given", IGRAPH_EINVAL);
   }
 
   if (igraph_vector_size(weights) != no_of_edges) {
@@ -7128,20 +7132,39 @@ int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
   }
   
   IGRAPH_VECTOR_INIT_FINALLY(&incident, 10);
-  
-  IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
-  
-  for (i=0; i<no_of_nodes; i++) {
-    int j, k;
-    igraph_real_t s=0.0, ent=0.0;
-    IGRAPH_CHECK(igraph_incident(graph, &incident, i, /*mode=*/ IGRAPH_ALL));
-    for (j=0, k=igraph_vector_size(&incident); j<k; j++) {
-      int o=VECTOR(incident)[j];
-      igraph_real_t w=VECTOR(*weights)[o];
-      s += w;
-      ent += (w * log(w));
+
+  if (igraph_vs_is_all(&vids)) {
+    IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
+    for (i=0; i<no_of_nodes; i++) {
+      s = ent = 0.0;
+      IGRAPH_CHECK(igraph_incident(graph, &incident, i, /*mode=*/ IGRAPH_ALL));
+      for (j=0, k=igraph_vector_size(&incident); j<k; j++) {
+        w = VECTOR(*weights)[(long int)VECTOR(incident)[j]];
+        s += w;
+        ent += (w * log(w));
+      }
+      VECTOR(*res)[i] = (log(s) - ent / s) / log(k);
     }
-    VECTOR(*res)[i] = (log(s) - ent / s) / log(k);
+  } else {
+    IGRAPH_CHECK(igraph_vector_resize(res, 0));
+    IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+
+    for (IGRAPH_VIT_RESET(vit), i=0; 
+         !IGRAPH_VIT_END(vit); 
+         IGRAPH_VIT_NEXT(vit), i++) {
+      s = ent = 0.0;
+      IGRAPH_CHECK(igraph_incident(graph, &incident, i, /*mode=*/ IGRAPH_ALL));
+      for (j=0, k=igraph_vector_size(&incident); j<k; j++) {
+        w = VECTOR(*weights)[(long int)VECTOR(incident)[j]];
+        s += w;
+        ent += (w * log(w));
+      }
+      IGRAPH_CHECK(igraph_vector_push_back(res, (log(s) - ent / s) / log(k)));
+    }
+
+    igraph_vit_destroy(&vit);
+    IGRAPH_FINALLY_CLEAN(1);
   }
   
   igraph_vector_destroy(&incident);

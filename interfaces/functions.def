@@ -744,8 +744,9 @@ igraph_radius:
         NAME-R: radius
 
 igraph_diversity:
-        PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VECTOR res
-        DEPS: weights ON graph
+        PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VECTOR res, \
+                VERTEXSET vids=ALL
+        DEPS: weights ON graph, vids ON graph
 
 #######################################
 # Visitors
