@@ -3375,7 +3375,7 @@ def _add_proxy_methods():
     decorated_methods = {}
     decorated_methods[VertexSeq] = \
         ["degree", "betweenness", "bibcoupling", "closeness", "cocitation",
-        "constraint", "eccentricity", "get_shortest_paths", "maxdegree",
+        "constraint", "diversity", "eccentricity", "get_shortest_paths", "maxdegree",
         "pagerank", "personalized_pagerank", "shortest_paths", "similarity_dice",
         "similarity_jaccard", "subgraph", "indegree", "outdegree", "isoclass",
         "delete_vertices", "is_separator", "is_minimal_separator"]

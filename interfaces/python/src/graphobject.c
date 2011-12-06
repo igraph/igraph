@@ -495,7 +495,7 @@ PyObject *igraphmodule_Graph_delete_edges(igraphmodule_GraphObject * self,
 }
 
 /**********************************************************************
- * Structural properties                                              *
+ * tructural properties                                              *
  **********************************************************************/
 
 /** \ingroup python_interface_graph
@@ -550,6 +550,63 @@ PyObject *igraphmodule_Graph_degree(igraphmodule_GraphObject * self,
     list = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
   else
     list = PyInt_FromLong(VECTOR(result)[0]);
+
+  igraph_vector_destroy(&result);
+  igraph_vs_destroy(&vs);
+
+  return list;
+}
+
+/**
+ * \ingroup python_interface_graph
+ * \brief Structural diversity index of some vertices in an \c igraph.Graph
+ * \sa igraph_diversity
+ */
+PyObject *igraphmodule_Graph_diversity(igraphmodule_GraphObject * self,
+                                       PyObject * args, PyObject * kwds) {
+  PyObject *list = Py_None;
+  PyObject *weights_o = Py_None;
+  igraph_vector_t result, *weights = 0;
+  igraph_vs_t vs;
+  igraph_bool_t return_single = 0;
+
+  static char *kwlist[] = { "vertices", "weights", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist,
+                                   &list, &weights_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vs_t(list, &vs, &self->g, &return_single, 0)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_vector_init(&result, 0)) {
+    igraph_vs_destroy(&vs);
+    return NULL;
+  }
+
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    igraph_vs_destroy(&vs);
+    igraph_vector_destroy(&result);
+    return NULL;
+  }
+
+  if (igraph_diversity(&self->g, weights, &result, vs)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vs_destroy(&vs);
+    igraph_vector_destroy(&result);
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
+    return NULL;
+  }
+
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
+
+  if (!return_single)
+    list = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_FLOAT);
+  else
+    list = PyFloat_FromDouble(VECTOR(result)[0]);
 
   igraph_vector_destroy(&result);
   igraph_vs_destroy(&vs);
@@ -10331,7 +10388,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param es: the list of edges to be removed. Edges are identifed by\n"
    "  edge IDs. L{EdgeSeq} objects are also accepted here.\n"},
 
-  // interface to igraph_degree
+  /* interface to igraph_degree */
   {"degree", (PyCFunction) igraphmodule_Graph_degree,
    METH_VARARGS | METH_KEYWORDS,
    "degree(vertices, mode=ALL, loops=True)\n\n"
@@ -11326,6 +11383,26 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@return: a triplet containing the two vertex IDs and their distance.\n"
    "  The IDs are C{None} if the graph is unconnected and C{unconn}\n"
    "  is C{False}."},
+
+  /* interface to igraph_diversity */
+  {"diversity", (PyCFunction) igraphmodule_Graph_diversity,
+   METH_VARARGS | METH_KEYWORDS,
+   "diversity(vertices=None, weights=None)\n\n"
+   "Calculates the structural diversity index of the vertices.\n\n"
+   "The structural diversity index of a vertex is simply the (normalized)\n"
+   "Shannon entropy of the weights of the edges incident on the vertex.\n\n"
+   "The measure is defined for undirected graphs only; edge directions are\n"
+   "ignored.\n\n"
+   "@param vertices: the vertices for which the diversity indices must\n"
+   "  be returned. If C{None}, uses all of the vertices in the graph.\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name.\n"
+   "@return: the calculated diversity indices in a list, or a single number if\n"
+   "  a single vertex was supplied.\n"
+   "@newfield ref: Reference\n"
+   "@ref: Eagle N, Macy M and Claxton R: Network diversity and economic\n"
+   "  development, Science 328, 1029--1031, 2010."
+  },
 
   /* interface to igraph_eccentricity */
   {"eccentricity", (PyCFunction) igraphmodule_Graph_eccentricity,
