@@ -1920,6 +1920,8 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
   IGRAPH_FINALLY_CLEAN(1);   /* removing igraph_vector_ptr_destroy_all */
   IGRAPH_FINALLY(igraph_i_preference_game_free_vids_by_type, &vids_by_type);
 
+  RNG_BEGIN();
+    
   if (!fixed_sizes) {
 
     igraph_vector_t cumdist;
@@ -1934,8 +1936,6 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
     }
     maxcum=igraph_vector_tail(&cumdist);
 
-    RNG_BEGIN();
-    
     for (i=0; i<nodes; i++) {
       long int type1;
       igraph_real_t uni1=RNG_UNIF(0, maxcum);
