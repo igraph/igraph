@@ -5,8 +5,8 @@
 # Usage: ./mkdoc.sh [--sync] [directory]
 
 SCRIPTS_FOLDER=`dirname $0`
-ROOT_FOLDER=`readlink -m ${SCRIPTS_FOLDER}/..`
-DOC_API_FOLDER=`readlink -m ${ROOT_FOLDER}/doc/api`
+ROOT_FOLDER=`readlink -f ${SCRIPTS_FOLDER}/..`
+DOC_API_FOLDER=${ROOT_FOLDER}/doc/api
 
 cd ${ROOT_FOLDER}
 mkdir -p ${DOC_API_FOLDER}/pdf
