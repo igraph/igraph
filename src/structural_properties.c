@@ -7153,8 +7153,9 @@ int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
     for (IGRAPH_VIT_RESET(vit), i=0; 
          !IGRAPH_VIT_END(vit); 
          IGRAPH_VIT_NEXT(vit), i++) {
+      long int v=IGRAPH_VIT_GET(vit);
       s = ent = 0.0;
-      IGRAPH_CHECK(igraph_incident(graph, &incident, i, /*mode=*/ IGRAPH_ALL));
+      IGRAPH_CHECK(igraph_incident(graph, &incident, v, /*mode=*/ IGRAPH_ALL));
       for (j=0, k=igraph_vector_size(&incident); j<k; j++) {
         w = VECTOR(*weights)[(long int)VECTOR(incident)[j]];
         s += w;
