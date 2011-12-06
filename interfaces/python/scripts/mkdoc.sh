@@ -5,7 +5,9 @@
 # Usage: ./mkdoc.sh [--sync] [directory]
 
 SCRIPTS_FOLDER=`dirname $0`
-ROOT_FOLDER=`readlink -f ${SCRIPTS_FOLDER}/..`
+
+cd ${SCRIPTS_FOLDER}/..
+ROOT_FOLDER=`pwd`
 DOC_API_FOLDER=${ROOT_FOLDER}/doc/api
 
 cd ${ROOT_FOLDER}
