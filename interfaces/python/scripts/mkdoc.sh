@@ -14,9 +14,10 @@ cd ${ROOT_FOLDER}
 mkdir -p ${DOC_API_FOLDER}/pdf
 mkdir -p ${DOC_API_FOLDER}/html
 
-EPYDOC=`which epydoc`
-if [ x$EPYDOC = x ]; then
-  echo "epydoc not found, exiting..."
+EPYDOC="${ROOT_FOLDER}/scripts/epydoc-patched"
+python -m epydoc.__init__
+if [ $? -gt 0 ]; then
+  echo "Epydoc not installed, exiting..."
   exit 1
 fi
 
@@ -37,19 +38,19 @@ echo "Removing existing documentation..."
 rm -rf html
 
 echo "Generating HTML documentation..."
-epydoc --html -o ${DOC_API_FOLDER}/html -v \
-       --name="IGraph library" \
-	   --url="http://igraph.sourceforge.net" \
-	   --no-private \
-	   --exclude=igraph.test \
-	   $PACKAGES
+${EPYDOC} --html -o ${DOC_API_FOLDER}/html -v \
+          --name="IGraph library" \
+	      --url="http://igraph.sourceforge.net" \
+	      --no-private \
+	      --exclude=igraph.test \
+	      $PACKAGES
 
 PDF=0
 which latex >/dev/null && PDF=1
 
 if [ $PDF -eq 1 ]; then
   echo "Generating PDF documentation..."
-  epydoc --pdf -o ${DOC_API_FOLDER}/pdf --exclude=igraph.test --inheritance=listed -v --name="IGraph library" --url="http://igraph.sourceforge.net" $PACKAGES
+  ${EPYDOC} --pdf -o ${DOC_API_FOLDER}/pdf --exclude=igraph.test --inheritance=listed -v --name="IGraph library" --url="http://igraph.sourceforge.net" $PACKAGES
 
 fi
 
