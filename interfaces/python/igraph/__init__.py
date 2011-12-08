@@ -753,7 +753,7 @@ class Graph(GraphBase):
         if weights is None:
             return GraphBase.transitivity_avglocal_undirected(self, mode)
 
-        xs = self.transitivity_local_undirected(mode, weights=weights)
+        xs = self.transitivity_local_undirected(mode=mode, weights=weights)
         return sum(xs) / float(len(xs))
 
     def triad_census(self, *args, **kwds):
