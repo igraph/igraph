@@ -67,6 +67,24 @@ class SimplePropertiesTests(unittest.TestCase):
         self.failUnless(self.tree.transitivity_undirected() == 0.0)
         self.failUnless(self.g.transitivity_undirected() == 0.75)
 
+    def testLocalTransitivity(self):
+        self.failUnless(self.gfull.transitivity_local_undirected() ==
+                [1.0] * self.gfull.vcount())
+        self.failUnless(self.tree.transitivity_local_undirected(mode="zero") ==
+                [0.0] * self.tree.vcount())
+
+        l = self.g.transitivity_local_undirected(mode="zero")
+        self.assertAlmostEqual(l[0], 2/3., places=4)
+        self.assertAlmostEqual(l[1], 2/3., places=4)
+        self.assertEquals(l[2], 1)
+        self.assertEquals(l[3], 1)
+
+        g = Graph.Full(4) + 1 + [(0, 4)]
+        g.es["weight"] = [1, 1, 1, 1, 1, 1, 5]
+        self.assertAlmostEqual(
+                g.transitivity_local_undirected(0, weights="weight"),
+                0.25, places=4)
+
     def testAvgLocalTransitivity(self):
         self.failUnless(self.gfull.transitivity_avglocal_undirected() == 1.0)
         self.failUnless(self.tree.transitivity_avglocal_undirected() == 0.0)

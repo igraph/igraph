@@ -718,6 +718,44 @@ class Graph(GraphBase):
             return self.subgraph_edges(result, delete_vertices=False)
         return result
 
+    def transitivity_avglocal_undirected(self, mode="nan", weights=None):
+        """Calculates the average of the vertex transitivities of the graph.
+
+        In the unweighted case, the transitivity measures the probability that
+        two neighbors of a vertex are connected. In case of the average local
+        transitivity, this probability is calculated for each vertex and then
+        the average is taken. Vertices with less than two neighbors require
+        special treatment, they will either be left out from the calculation
+        or they will be considered as having zero transitivity, depending on
+        the I{mode} parameter. The calculation is slightly more involved for
+        weighted graphs; in this case, weights are taken into account according
+        to the formula of Barrat et al (see the references).
+
+        Note that this measure is different from the global transitivity
+        measure (see L{transitivity_undirected()}) as it simply takes the
+        average local transitivity across the whole network.
+
+        @param mode: defines how to treat vertices with degree less than two.
+          If C{TRANSITIVITY_ZERO} or C{"zero"}, these vertices will have zero
+          transitivity. If C{TRANSITIVITY_NAN} or C{"nan"}, these vertices
+          will be excluded from the average.
+        @param weights: edge weights to be used. Can be a sequence or iterable
+          or even an edge attribute name.
+        
+        @see: L{transitivity_undirected()}, L{transitivity_local_undirected()}
+        @newfield ref: Reference
+        @ref: Watts DJ and Strogatz S: I{Collective dynamics of small-world
+          networks}. Nature 393(6884):440-442, 1998.
+        @ref: Barrat A, Barthelemy M, Pastor-Satorras R and Vespignani A:
+          I{The architecture of complex weighted networks}. PNAS 101, 3747 (2004).
+          U{http://arxiv.org/abs/cond-mat/0311416.
+        """
+        if weights is None:
+            return GraphBase.transitivity_avglocal_undirected(self, mode)
+
+        xs = self.transitivity_local_undirected(mode, weights=weights)
+        return sum(xs) / float(len(xs))
+
     def triad_census(self, *args, **kwds):
         """triad_census()
 

@@ -5261,14 +5261,17 @@ PyObject
                                                     self, PyObject * args,
                                                     PyObject * kwds)
 {
-  static char *kwlist[] = { "vertices", "mode", NULL };
+  static char *kwlist[] = { "vertices", "mode", "weights", NULL };
   PyObject *vobj = NULL, *mode_o = Py_None, *list = NULL;
+  PyObject *weights_o = Py_None;
   igraph_vector_t result;
+  igraph_vector_t *weights = 0;
   igraph_bool_t return_single = 0;
   igraph_vs_t vs;
   igraph_transitivity_mode_t mode = IGRAPH_TRANSITIVITY_NAN;
+  int retval;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist, &vobj, &mode_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist, &vobj, &mode_o, &weights_o))
     return NULL;
 
   if (igraphmodule_PyObject_to_transitivity_mode_t(mode_o, &mode))
@@ -5284,9 +5287,26 @@ PyObject
     return igraphmodule_handle_igraph_error();
   }
 
-  if (igraph_transitivity_local_undirected(&self->g, &result, vs, mode)) {
-    igraphmodule_handle_igraph_error();
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE)) {
     igraph_vs_destroy(&vs);
+    igraph_vector_destroy(&result);
+    return NULL;
+  }
+
+  if (weights == 0) {
+    retval = igraph_transitivity_local_undirected(&self->g, &result, vs, mode);
+  } else {
+    retval = igraph_transitivity_barrat(&self->g, &result, vs, weights, mode);
+  }
+
+  igraph_vs_destroy(&vs);
+  if (weights) {
+    igraph_vector_destroy(weights); free(weights);
+  }
+
+  if (retval) {
+    igraphmodule_handle_igraph_error();
     igraph_vector_destroy(&result);
     return NULL;
   }
@@ -5296,7 +5316,6 @@ PyObject
   else
     list = PyFloat_FromDouble(VECTOR(result)[0]);
 
-  igraph_vs_destroy(&vs);
   igraph_vector_destroy(&result);
 
   return list;
@@ -12015,11 +12034,12 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  Applications}. Cambridge: Cambridge University Press, 1994."
   },
 
-  // interface to igraph_transitivity_local_undirected
+  /* interface to igraph_transitivity_local_undirected and
+   * igraph_transitivity_barrat */
   {"transitivity_local_undirected",
    (PyCFunction) igraphmodule_Graph_transitivity_local_undirected,
    METH_VARARGS | METH_KEYWORDS,
-   "transitivity_local_undirected(vertices=None, mode=\"nan\")\n\n"
+   "transitivity_local_undirected(vertices=None, mode=\"nan\", weights=None)\n\n"
    "Calculates the local transitivity (clustering coefficient) of the\n"
    "given vertices in the graph.\n\n"
    "The transitivity measures the probability that two neighbors of a\n"
@@ -12028,17 +12048,25 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Note that this measure is different from the global transitivity\n"
    "measure (see L{transitivity_undirected()}) as it calculates\n"
    "a transitivity value for each vertex individually.\n\n"
+   "The traditional local transitivity measure applies for unweighted graphs\n"
+   "only. When the C{weights} argument is given, this function calculates\n"
+   "the weighted local transitivity proposed by Barrat et al (see references).\n\n"
    "@param vertices: a list containing the vertex IDs which should be\n"
    "  included in the result. C{None} means all of the vertices.\n"
    "@param mode: defines how to treat vertices with degree less than two.\n"
    "  If C{TRANSITIVITT_ZERO} or C{\"zero\"}, these vertices will have\n"
    "  zero transitivity. If C{TRANSITIVITY_NAN} or C{\"nan\"}, these\n"
    "  vertices will have C{NaN} (not a number) as their transitivity.\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name.\n"
    "@return: the transitivities for the given vertices in a list\n"
    "@see: L{transitivity_undirected()}, L{transitivity_avglocal_undirected()}\n"
    "@newfield ref: Reference\n"
-   "@ref: D. J. Watts and S. Strogatz: I{Collective dynamics of small-world\n"
-   "  networks}. Nature 393(6884):440-442, 1998."
+   "@ref: Watts DJ and Strogatz S: I{Collective dynamics of small-world\n"
+   "  networks}. Nature 393(6884):440-442, 1998.\n"
+   "@ref: Barrat A, Barthelemy M, Pastor-Satorras R and Vespignani A:\n"
+   "  I{The architecture of complex weighted networks}. PNAS 101, 3747 (2004).\n"
+   "  U{http://arxiv.org/abs/cond-mat/0311416}."
   },
 
   /* interface to igraph_transitivity_avglocal_undirected */
