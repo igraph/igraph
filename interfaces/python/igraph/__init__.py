@@ -748,7 +748,7 @@ class Graph(GraphBase):
           networks}. Nature 393(6884):440-442, 1998.
         @ref: Barrat A, Barthelemy M, Pastor-Satorras R and Vespignani A:
           I{The architecture of complex weighted networks}. PNAS 101, 3747 (2004).
-          U{http://arxiv.org/abs/cond-mat/0311416.
+          U{http://arxiv.org/abs/cond-mat/0311416}.
         """
         if weights is None:
             return GraphBase.transitivity_avglocal_undirected(self, mode)
