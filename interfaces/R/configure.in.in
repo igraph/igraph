@@ -2,6 +2,7 @@ AC_INIT(igraph, @VERSION@, csardi@rmki.kfki.hu)
 AC_CONFIG_SRCDIR(src/rinterface.c)
 AC_CONFIG_HEADERS(src/config.h)
 
+AC_LANG(C)
 AC_PROG_CC
 
 # Tricky check for C++ compiler, because Autoconf has a weird bug:
@@ -62,6 +63,7 @@ if test $graphml_support = yes; then
 fi
 AC_SUBST(HAVE_LIBXML)
 
+AC_LANG_PUSH([C++])
 HAVE_GMP=0
 GMP_LIBS=""
 gmp_support=no
@@ -78,6 +80,7 @@ if test "x$enable_gmp" != "xno"; then
 fi
 AC_SUBST(HAVE_GMP)
 AC_SUBST(GMP_LIBS)
+AC_LANG_POP([C++])
 
 glpk_support=yes
 AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
