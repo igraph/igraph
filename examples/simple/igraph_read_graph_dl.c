@@ -54,5 +54,8 @@ int main() {
     igraph_destroy(&g);
   }
 
+  if (IGRAPH_FINALLY_STACK_SIZE() != 0)
+    return 1;
+
   return 0;
 }

@@ -2856,7 +2856,7 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
   /* Weights */
   if (igraph_vector_size(&context.weights) != 0) {
     IGRAPH_CHECK(igraph_vector_ptr_init(&weight, 1));
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &name);
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &weight);
     pweight=&weight;
     weightrec.name=weightstr;
     weightrec.type=IGRAPH_ATTRIBUTE_NUMERIC;
@@ -2876,6 +2876,9 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
     igraph_vector_ptr_destroy(pname);
     IGRAPH_FINALLY_CLEAN(1);
   }
+
+  /* don't destroy the graph itself but pop it from the finally stack */
+  IGRAPH_FINALLY_CLEAN(1);
 
   igraph_trie_destroy(&context.trie);
   igraph_strvector_destroy(&context.labels);
