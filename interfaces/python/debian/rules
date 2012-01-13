@@ -44,7 +44,7 @@ build-stamp:
 clean:
 	dh_testdir
 	dh_testroot
-	rm -rf build/lib/html/
+	rm -rf doc/api/html/
 	for python in $(PYVERS); do \
 	  python=$$(echo $$python | sed "s/$(PYDEF)/python/"); \
 	  $$python setup.py clean; \
@@ -63,7 +63,7 @@ install: build
 	  python=$$(echo $$python | sed "s/$(PYDEF)/python/"); \
 	  $$python setup.py install --root=$(CURDIR)/debian/python-igraph --install-layout=deb; \
 	done
-	dh_installdocs -ppython-igraph-doc build/lib/html/*
+	dh_installdocs -ppython-igraph-doc doc/api/html/*
 
 # Build architecture-independent files here.
 binary-indep: build install
