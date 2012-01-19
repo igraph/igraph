@@ -1795,7 +1795,7 @@ int igraph_get_isomorphisms_vf2(const igraph_t *graph1,
 int igraph_subisomorphic(const igraph_t *graph1, const igraph_t *graph2,
 			 igraph_bool_t *iso) {
 
-  return igraph_subisomorphic_vf2(graph1, graph2, 0, 0, 0, 0, iso, 0, 0);
+  return igraph_subisomorphic_vf2(graph1, graph2, 0, 0, 0, 0, iso, 0, 0, 0, 0, 0);
 }
 
 /**
@@ -1835,6 +1835,10 @@ int igraph_subisomorphic(const igraph_t *graph1, const igraph_t *graph2,
  *   isomorphism is found. If the function returns with a non-zero value
  *   then the search is continued, otherwise it stops and the function
  *   returns. 
+ * \param node_compat_fn A pointer to a function of type \ref 
+ *   igraph_isocompat_t. This function will be called by the algorithm to
+ *   determine whether two nodes are compatible.
+ * \param edge_compat_fn TODO
  * \param arg Extra argument to supply to the callback \p function.
  * \return Error code.
  * 
@@ -1850,6 +1854,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
 				      igraph_vector_t *map12,
 				      igraph_vector_t *map21,
 				      igraph_isohandler_t *function,
+				      igraph_isocompat_t *node_compat_fn,
+				      igraph_isocompat_t *edge_compat_fn,
 				      void *arg) {
   
   long int no_of_nodes1=igraph_vcount(graph1), 
