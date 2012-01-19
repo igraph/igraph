@@ -1795,7 +1795,7 @@ int igraph_get_isomorphisms_vf2(const igraph_t *graph1,
 int igraph_subisomorphic(const igraph_t *graph1, const igraph_t *graph2,
 			 igraph_bool_t *iso) {
 
-  return igraph_subisomorphic_vf2(graph1, graph2, 0, 0, 0, 0, iso, 0, 0, 0, 0, 0);
+  return igraph_subisomorphic_vf2(graph1, graph2, 0, 0, 0, 0, iso, 0, 0);
 }
 
 /**

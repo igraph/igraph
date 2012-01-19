@@ -80,7 +80,7 @@ typedef igraph_bool_t igraph_isocompat_t(const igraph_t *graph1,
 					 const igraph_t *graph2,
 					 const igraph_integer_t g1_num,
 					 const igraph_integer_t g2_num,
-					 void *arg)
+					 void *arg);
 
 int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2, 
 			  const igraph_vector_int_t *vertex_color1,
