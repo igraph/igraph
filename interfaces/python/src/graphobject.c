@@ -366,6 +366,91 @@ PyObject *igraphmodule_Graph_is_directed(igraphmodule_GraphObject * self)
   Py_RETURN_FALSE;
 }
 
+/**
+ * \ingroup python_interface_graph
+ * \brief Checks whether a matching is valid in the context of an \c igraph.Graph
+ * object.
+ * \sa igraph_is_matching
+ */
+PyObject *igraphmodule_Graph_is_matching(igraphmodule_GraphObject* self,
+    PyObject* args, PyObject* kwds) {
+  static char* kwlist[] = { "matching", "types", NULL };
+  PyObject *matching_o, *types_o = Py_None;
+  igraph_vector_long_t* matching = 0;
+  igraph_vector_bool_t* types = 0;
+  igraph_bool_t result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &matching_o,
+        &types_o))
+    return NULL;
+
+  if (igraphmodule_attrib_to_vector_long_t(matching_o, self, &matching,
+        ATTRIBUTE_TYPE_VERTEX))
+	return NULL;
+
+  if (igraphmodule_attrib_to_vector_bool_t(types_o, self, &types, ATTRIBUTE_TYPE_VERTEX)) {
+    if (matching != 0) { igraph_vector_long_destroy(matching); free(matching); }
+	return NULL;
+  }
+
+  if (igraph_is_matching(&self->g, types, matching, &result)) {
+    if (matching != 0) { igraph_vector_long_destroy(matching); free(matching); }
+    if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (matching != 0) { igraph_vector_long_destroy(matching); free(matching); }
+  if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+
+  if (result)
+    Py_RETURN_TRUE;
+  Py_RETURN_FALSE;
+}
+
+/**
+ * \ingroup python_interface_graph
+ * \brief Checks whether a matching is valid and maximal in the context of an
+ *        \c igraph.Graph object.
+ * \sa igraph_is_maximal_matching
+ */
+PyObject *igraphmodule_Graph_is_maximal_matching(igraphmodule_GraphObject* self,
+    PyObject* args, PyObject* kwds) {
+  static char* kwlist[] = { "matching", "types", NULL };
+  PyObject *matching_o, *types_o = Py_None;
+  igraph_vector_long_t* matching = 0;
+  igraph_vector_bool_t* types = 0;
+  igraph_bool_t result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &matching_o,
+        &types_o))
+    return NULL;
+
+  if (igraphmodule_attrib_to_vector_long_t(matching_o, self, &matching,
+        ATTRIBUTE_TYPE_VERTEX))
+	return NULL;
+
+  if (igraphmodule_attrib_to_vector_bool_t(types_o, self, &types, ATTRIBUTE_TYPE_VERTEX)) {
+    if (matching != 0) { igraph_vector_long_destroy(matching); free(matching); }
+	return NULL;
+  }
+
+  if (igraph_is_maximal_matching(&self->g, types, matching, &result)) {
+    if (matching != 0) { igraph_vector_long_destroy(matching); free(matching); }
+    if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (matching != 0) { igraph_vector_long_destroy(matching); free(matching); }
+  if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+
+  if (result)
+    Py_RETURN_TRUE;
+  Py_RETURN_FALSE;
+}
+
+
 /** \ingroup python_interface_graph
  * \brief Checks whether an \c igraph.Graph object is simple.
  * \return \c True if the graph is simple, \c False otherwise.
@@ -2784,6 +2869,115 @@ PyObject *igraphmodule_Graph_Star(PyTypeObject * type,
 
   CREATE_GRAPH_FROM_TYPE(self, g, type);
 
+  return (PyObject *) self;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Generates a non-growing random graph with edge probabilities
+ *        proportional to node fitnesses.
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_static_fitness_game
+ */
+PyObject *igraphmodule_Graph_Static_Fitness(PyTypeObject *type,
+    PyObject* args, PyObject* kwds) {
+  igraphmodule_GraphObject *self;
+  igraph_t g;
+  long int m;
+  PyObject *fitness_out_o = Py_None, *fitness_in_o = Py_None;
+  PyObject *fitness_o = Py_None;
+  PyObject *multiple = Py_False, *loops = Py_False;
+  igraph_vector_t fitness_out, fitness_in;
+
+  static char *kwlist[] = { "m", "fitness_out", "fitness_in",
+    "loops", "multiple", "fitness", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|OOOOO", kwlist,
+                                   &m, &fitness_out_o, &fitness_in_o,
+                                   &loops, &multiple, &fitness_o))
+    return NULL;
+
+  /* This trickery allows us to use "fitness" or "fitness_out" as
+   * keyword argument, with "fitness_out" taking precedence over
+   * "fitness" */
+  if (fitness_out_o == Py_None)
+    fitness_out_o = fitness_o;
+  if (fitness_out_o == Py_None) {
+    PyErr_SetString(PyExc_TypeError,
+        "Required argument 'fitness_out' (pos 2) not found");
+    return NULL;
+  }
+
+  if (igraphmodule_PyObject_to_vector_t(fitness_out_o, &fitness_out, 1, 0))
+    return NULL;
+
+  if (fitness_in_o != Py_None) {
+    if (igraphmodule_PyObject_to_vector_t(fitness_in_o, &fitness_in, 1, 0)) {
+      igraph_vector_destroy(&fitness_out);
+      return NULL;
+    }
+  }
+
+  if (igraph_static_fitness_game(&g, m, &fitness_out,
+        fitness_in_o == Py_None ? 0 : &fitness_in,
+        PyObject_IsTrue(loops), PyObject_IsTrue(multiple))) {
+    igraph_vector_destroy(&fitness_out);
+    if (fitness_in_o != Py_None)
+      igraph_vector_destroy(&fitness_in);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  igraph_vector_destroy(&fitness_out);
+  if (fitness_in_o != Py_None)
+    igraph_vector_destroy(&fitness_in);
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+  return (PyObject *) self;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Generates a non-growing random graph with prescribed power-law
+ *        degree distributions.
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_static_power_law_game
+ */
+PyObject *igraphmodule_Graph_Static_Power_Law(PyTypeObject *type,
+    PyObject* args, PyObject* kwds) {
+  igraphmodule_GraphObject *self;
+  igraph_t g;
+  long int n, m;
+  float exponent_out = -1.0, exponent_in = -1.0, exponent = -1.0;
+  PyObject *multiple = Py_False, *loops = Py_False;
+  PyObject *finite_size_correction = Py_True;
+
+  static char *kwlist[] = { "n", "m", "exponent_out", "exponent_in",
+    "loops", "multiple", "finite_size_correction", "exponent", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|ffOOOf", kwlist,
+                                   &n, &m, &exponent_out, &exponent_in,
+                                   &loops, &multiple, &finite_size_correction,
+                                   &exponent))
+    return NULL;
+
+  /* This trickery allows us to use "exponent" or "exponent_out" as
+   * keyword argument, with "exponent_out" taking precedence over
+   * "exponent" */
+  if (exponent_out == -1.0)
+    exponent_out = exponent;
+  if (exponent_out == -1.0) {
+    PyErr_SetString(PyExc_TypeError,
+        "Required argument 'exponent_out' (pos 3) not found");
+    return NULL;
+  }
+
+  if (igraph_static_power_law_game(&g, n, m, exponent_out,
+        exponent_in, PyObject_IsTrue(loops), PyObject_IsTrue(multiple),
+        PyObject_IsTrue(finite_size_correction))) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
   return (PyObject *) self;
 }
 
@@ -10629,6 +10823,62 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param mutual: whether to create mutual edges in a directed ring.\n"
    "@param circular: whether to create a closed ring.\n"},
 
+  /* interface to igraph_static_fitness_game */
+  {"Static_Fitness", (PyCFunction) igraphmodule_Graph_Static_Fitness,
+   METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+   "Static_Fitness(m, fitness_out, fitness_in=None, loops=False, multiple=False)\n\n"
+   "Generates a non-growing graph with edge probabilities proportional to node\n"
+   "fitnesses.\n\n"
+   "The algorithm randomly selects vertex pairs and connects them until the given\n"
+   "number of edges are created. Each vertex is selected with a probability\n"
+   "proportional to its fitness; for directed graphs, a vertex is selected as a\n"
+   "source proportional to its out-fitness and as a target proportional to its\n"
+   "in-fitness.\n\n"
+   "@param m: the number of edges in the graph\n"
+   "@param fitness_out: a numeric vector with non-negative entries, one for each\n"
+   "  vertex. These values represent the fitness scores (out-fitness scores for\n"
+   "  directed graphs). I{fitness} is an alias of this keyword argument.\n"
+   "@param fitness_in: a numeric vector with non-negative entries, one for each\n"
+   "  vertex. These values represent the in-fitness scores for directed graphs.\n"
+   "  For undirected graphs, this argument must be C{None}.\n"
+   "@param loops: whether loop edges are allowed.\n"
+   "@param multiple: whether multiple edges are allowed.\n"
+   "@return: a directed or undirected graph with the prescribed power-law\n"
+   "  degree distributions.\n"
+  },
+
+  /* interface to igraph_static_power_law_game */
+  {"Static_Power_Law", (PyCFunction) igraphmodule_Graph_Static_Power_Law,
+   METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+   "Static_Power_Law(n, m, exponent_out, exponent_in=-1, loops=False,\n"
+   "    multiple=False, finite_size_correction=True)\n\n"
+   "Generates a non-growing graph with prescribed power-law degree distributions.\n\n"
+   "@param n: the number of vertices in the graph\n"
+   "@param m: the number of edges in the graph\n"
+   "@param exponent_out: the exponent of the out-degree distribution, which\n"
+   "  must be between 2 and infinity (inclusive). When I{exponent_in} is\n"
+   "  not given or negative, the graph will be undirected and this parameter\n"
+   "  specifies the degree distribution. I{exponent} is an alias to this\n"
+   "  keyword argument.\n"
+   "@param exponent_in: the exponent of the in-degree distribution, which\n"
+   "  must be between 2 and infinity (inclusive) It can also be negative, in\n"
+   "  which case an undirected graph will be generated.\n"
+   "@param loops: whether loop edges are allowed.\n"
+   "@param multiple: whether multiple edges are allowed.\n"
+   "@param finite_size_correction: whether to apply a finite-size correction\n"
+   "  to the generated fitness values for exponents less than 3. See the\n"
+   "  paper of Cho et al for more details.\n"
+   "@return: a directed or undirected graph with the prescribed power-law\n"
+   "  degree distributions.\n"
+   "\n"
+   "@newfield ref: Reference\n"
+   "@ref: Goh K-I, Kahng B, Kim D: Universal behaviour of load distribution\n"
+   "  in scale-free networks. Phys Rev Lett 87(27):278701, 2001.\n"
+   "@ref: Cho YS, Kim JS, Park J, Kahng B, Kim D: Percolation transitions in\n"
+   "  scale-free networks under the Achlioptas process. Phys Rev Lett\n"
+   "  103:135702, 2009.\n"
+  },
+
   // interface to igraph_tree
   {"Tree", (PyCFunction) igraphmodule_Graph_Tree,
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
@@ -13333,21 +13583,22 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /*************/
   /* MATCHINGS */
   /*************/
-  {"maximum_bipartite_matching", (PyCFunction)igraphmodule_Graph_maximum_bipartite_matching,
+  {"_is_matching", (PyCFunction)igraphmodule_Graph_is_matching,
    METH_VARARGS | METH_KEYWORDS,
-   "maximum_bipartite_matching(types, weights=None)\n\n"
-   "Finds a maximum matching in a bipartite graph.\n\n"
-   "A maximum matching is a set of edges such that each vertex is incident on at\n"
-   "most one matched edge and the number (or weight) of such edges in the set is\n"
-   "as large as possible.\n\n"
-   "@param types: vertex types in a list or the name of a vertex attribute\n"
-   "  holding vertex types. Types should be denoted by zeros and ones for the\n"
-   "  two sides of the bipartite graph.\n"
-   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
-   "  even an edge attribute name.\n"
-   "@return: a list where element M{i} contains the index of the vertex that is\n"
-   "  matched with vertex M{i}. If vertex M{i} is unmatched, the corresponding\n"
-   "  element in the list is -1.\n"
+   "_is_matching(matching, types=None)\n\n"
+   "Internal function, undocumented.\n\n"
+  },
+  {"_is_maximal_matching", (PyCFunction)igraphmodule_Graph_is_maximal_matching,
+   METH_VARARGS | METH_KEYWORDS,
+   "_is_maximal_matching(matching, types=None)\n\n"
+   "Internal function, undocumented.\n\n"
+   "Use L{Matching.is_maximal} instead.\n"
+  },
+  {"_maximum_bipartite_matching", (PyCFunction)igraphmodule_Graph_maximum_bipartite_matching,
+   METH_VARARGS | METH_KEYWORDS,
+   "_maximum_bipartite_matching(types, weights=None)\n\n"
+   "Internal function, undocumented.\n\n"
+   "@see: L{Graph.maximum_bipartite_matching}\n"
   },
 
   /**********************/

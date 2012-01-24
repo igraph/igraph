@@ -21,6 +21,11 @@
 
 AT_BANNER([[Structural properties]])
 
+AT_SETUP([Two vertices connected by an edge:])
+AT_KEYWORDS([igraph_are_connected])
+AT_COMPILE_CHECK([simple/igraph_are_connected.c])
+AT_CLEANUP
+
 AT_SETUP([Diameter of a graph (igraph_diameter):])
 AT_KEYWORDS([igraph_diameter])
 AT_COMPILE_CHECK([simple/igraph_diameter.c], [simple/igraph_diameter.out])

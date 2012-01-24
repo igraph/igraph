@@ -49,7 +49,7 @@ static char *igraph_i_error_strings[]=
     /* 15 */ "Matrix-vector product failed",
     /* 16 */ "N must be positive", 
     /* 17 */ "NEV must be positive",
-    /* 18 */ "NCV must be bigger",
+    /* 18 */ "NCV must be greater than NEV and less than or equal to N",
     /* 19 */ "Maximum number of iterations should be positive",
     /* 20 */ "Invalid WHICH parameter",
     /* 21 */ "Invalid BMAT parameter",

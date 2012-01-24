@@ -120,7 +120,7 @@ int igraph_i_eccentricity(const igraph_t *graph,
  * 
  * </para><para>
  * This implementation ignores vertex pairs that are in different
- * components. Isolate vertices have eccentricity zero.
+ * components. Isolated vertices have eccentricity zero.
  * 
  * \param graph The input graph, it can be directed or undirected.
  * \param res Pointer to an initialized vector, the result is stored

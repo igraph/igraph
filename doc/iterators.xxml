@@ -25,9 +25,11 @@
 </section>
 
 <section><title>Generic vertex selector operations</title>
+<!-- doxrox-include igraph_vs_copy -->
 <!-- doxrox-include igraph_vs_destroy -->
 <!-- doxrox-include igraph_vs_is_all -->
 <!-- doxrox-include igraph_vs_size -->
+<!-- doxrox-include igraph_vs_type -->
 </section>
 
 <section><title>Immediate vertex selectors</title>
@@ -59,6 +61,7 @@
 <!-- doxrox-include igraph_es_seq -->
 <!-- doxrox-include igraph_es_pairs -->
 <!-- doxrox-include igraph_es_pairs_small -->
+<!-- doxrox-include igraph_es_vector_copy -->
 </section>
 
 <section><title>Immediate edge selectors</title>
@@ -70,8 +73,11 @@
 </section>
 
 <section><title>Generic edge selector operations</title>
+<!-- doxrox-include igraph_es_copy -->
 <!-- doxrox-include igraph_es_destroy -->
 <!-- doxrox-include igraph_es_is_all -->
+<!-- doxrox-include igraph_es_size -->
+<!-- doxrox-include igraph_es_type -->
 </section>
 
 <section><title>Edge iterators</title>

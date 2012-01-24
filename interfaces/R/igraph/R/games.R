@@ -335,3 +335,17 @@ citing.cited.type.game <- function(n, edges=1, types=rep(0, n),
   res
 }
 
+
+simple.interconnected.islands.game <- function(islands.n, islands.size, islands.pin, n.inter) {
+  
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  .Call(	"R_igraph_simple_interconnected_islands_game", 
+		as.numeric(islands.n), 
+		as.numeric(islands.size),
+        	as.numeric(islands.pin), 
+		as.numeric(n.inter),
+        	PACKAGE="igraph")
+}
+
+

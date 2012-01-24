@@ -99,7 +99,7 @@ igraphmodule_EdgeSeq_copy(igraphmodule_EdgeSeqObject* o) {
 
 
 /**
- * \ingroup python_interface_vertexseq
+ * \ingroup python_interface_edgeseq
  * \brief Initialize a new edge sequence object for a given graph
  * \return the initialized PyObject
  */
@@ -733,7 +733,7 @@ PyObject* igraphmodule_EdgeSeq_select(igraphmodule_EdgeSeqObject *self, PyObject
           long idx = PyInt_AsLong(item2);
           Py_DECREF(item2);
           if (idx >= m || idx < 0) {
-            PyErr_SetString(PyExc_ValueError, "vertex index out of range");
+            PyErr_SetString(PyExc_ValueError, "edge index out of range");
             Py_DECREF(result);
             Py_DECREF(iter);
             igraph_vector_destroy(&v);

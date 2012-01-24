@@ -48,6 +48,9 @@ __BEGIN_DECLS
 int igraph_is_matching(const igraph_t* graph,
     const igraph_vector_bool_t* types, const igraph_vector_long_t* matching,
     igraph_bool_t* result);
+int igraph_is_maximal_matching(const igraph_t* graph,
+    const igraph_vector_bool_t* types, const igraph_vector_long_t* matching,
+    igraph_bool_t* result);
 
 int igraph_maximum_bipartite_matching(const igraph_t* graph,
     const igraph_vector_bool_t* types, igraph_integer_t* matching_size,

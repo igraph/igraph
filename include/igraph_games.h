@@ -162,6 +162,24 @@ int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
 			    igraph_real_t fw_prob, igraph_real_t bw_factor,
 			    igraph_integer_t ambs, igraph_bool_t directed);
 
+
+int igraph_simple_interconnected_islands_game(
+				igraph_t *graph, 
+				igraph_integer_t islands_n, 
+				igraph_integer_t islands_size,
+				igraph_real_t islands_pin, 
+				igraph_integer_t n_inter);
+
+int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
+                igraph_vector_t* fitness_out, igraph_vector_t* fitness_in,
+                igraph_bool_t loops, igraph_bool_t multiple);
+
+int igraph_static_power_law_game(igraph_t *graph,
+    igraph_integer_t no_of_nodes, igraph_integer_t no_of_edges,
+    igraph_real_t exponent_out, igraph_real_t exponent_in,
+    igraph_bool_t loops, igraph_bool_t multiple,
+    igraph_bool_t finite_size_correction);
+
 __END_DECLS
 
 #endif

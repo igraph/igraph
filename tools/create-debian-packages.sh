@@ -80,7 +80,7 @@ function create_igraph_debian_pkg {
     cat debian/changelog.in | sed -e "s/@VERSION@/@VERSION@-$2/g" >debian/changelog.in.new
     mv debian/changelog.in.new debian/changelog.in
   fi
-  debian/prepare
+  # debian/prepare
   cat debian/changelog | sed -e "s/unstable/${SERIES}/g" >debian/changelog.new
   mv debian/changelog.new debian/changelog
   debuild -b ${SIGN_OPTIONS}

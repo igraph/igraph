@@ -1,4 +1,5 @@
 /* -*- mode: C -*-  */
+/* vim:set sw=2 ts=2 sts=2 et: */
 /* 
    IGraph library.
    Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
@@ -254,6 +255,317 @@ void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s) {
 }
 
 /**
+ * "Solver" for 1x1 eigenvalue problems since ARPACK sometimes blows up with
+ * these.
+ */
+int igraph_i_arpack_rssolve_1x1(igraph_arpack_function_t *fun, void *extra,
+        igraph_arpack_options_t* options,
+        igraph_vector_t* values, igraph_matrix_t* vectors) {
+  igraph_real_t a, b;
+  int nev = options->nev;
+
+  if (nev <= 0) {
+    IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_NEVNPOS);
+  }
+
+  /* Probe the value in the matrix */
+  a = 1;
+  if (fun(&b, &a, 1, extra)) {
+	  IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
+		     IGRAPH_ARPACK_PROD);
+  }
+
+  if (values != 0) {
+    IGRAPH_CHECK(igraph_vector_resize(values, 1));
+    VECTOR(*values)[0] = b;
+  }
+
+  if (vectors != 0) {
+    IGRAPH_CHECK(igraph_matrix_resize(vectors, 1, 1));
+    MATRIX(*vectors, 0, 0) = 1;
+  }
+
+  return IGRAPH_SUCCESS;
+}
+
+/**
+ * "Solver" for 1x1 eigenvalue problems since ARPACK sometimes blows up with
+ * these.
+ */
+int igraph_i_arpack_rnsolve_1x1(igraph_arpack_function_t *fun, void *extra,
+        igraph_arpack_options_t* options,
+        igraph_matrix_t* values, igraph_matrix_t* vectors) {
+  igraph_real_t a, b;
+  int nev = options->nev;
+
+  if (nev <= 0) {
+    IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_NEVNPOS);
+  }
+
+  /* Probe the value in the matrix */
+  a = 1;
+  if (fun(&b, &a, 1, extra)) {
+	  IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
+		     IGRAPH_ARPACK_PROD);
+  }
+
+  if (values != 0) {
+    IGRAPH_CHECK(igraph_matrix_resize(values, 1, 2));
+    MATRIX(*values, 0, 0) = b; MATRIX(*values, 0, 1) = 0;
+  }
+
+  if (vectors != 0) {
+    IGRAPH_CHECK(igraph_matrix_resize(vectors, 1, 1));
+    MATRIX(*vectors, 0, 0) = 1;
+  }
+
+  return IGRAPH_SUCCESS;
+}
+
+/**
+ * "Solver" for 2x2 nonsymmetric eigenvalue problems since ARPACK sometimes
+ * blows up with these.
+ */
+int igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun, void *extra,
+        igraph_arpack_options_t* options, igraph_matrix_t* values,
+        igraph_matrix_t* vectors) {
+  igraph_real_t vec[2], mat[4];
+  igraph_real_t a, b, c, d;
+  igraph_real_t trace, det, tsq4_minus_d;
+  igraph_complex_t eval1, eval2;
+  igraph_complex_t evec1[2], evec2[2];
+  igraph_bool_t swap_evals = 0;
+  igraph_bool_t complex_evals = 0;
+  int nev = options->nev;
+
+  if (nev <= 0) {
+    IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_NEVNPOS);
+  }
+  if (nev > 2)
+    nev = 2;
+
+  /* Probe the values in the matrix */
+  vec[0] = 1; vec[1] = 0;
+  if (fun(mat, vec, 2, extra)) {
+	  IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
+		     IGRAPH_ARPACK_PROD);
+  }
+  vec[0] = 0; vec[1] = 1;
+  if (fun(mat+2, vec, 2, extra)) {
+	  IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
+		     IGRAPH_ARPACK_PROD);
+  }
+  a = mat[0]; b = mat[2]; c = mat[1]; d = mat[3];
+
+  /* Get the trace and the determinant */
+  trace = a+d;
+  det = a*d - b*c;
+  tsq4_minus_d = trace*trace / 4 - det;
+
+  /* Calculate the eigenvalues */
+  complex_evals = tsq4_minus_d < 0;
+  eval1 = igraph_complex_sqrt_real(tsq4_minus_d);
+  if (complex_evals) {
+    eval2 = igraph_complex_mul_real(eval1, -1);
+  } else {
+    /* to avoid having -0 in the imaginary part */
+    eval2 = igraph_complex(-IGRAPH_REAL(eval1), 0);
+  }
+  eval1 = igraph_complex_add_real(eval1, trace/2);
+  eval2 = igraph_complex_add_real(eval2, trace/2);
+
+  if (c != 0) {
+    evec1[0] = igraph_complex_sub_real(eval1, d);
+    evec1[1] = igraph_complex(c, 0);
+    evec2[0] = igraph_complex_sub_real(eval2, d);
+    evec2[1] = igraph_complex(c, 0);
+  } else if (b != 0) {
+    evec1[0] = igraph_complex(b, 0);
+    evec1[1] = igraph_complex_sub_real(eval1, a);
+    evec2[0] = igraph_complex(b, 0);
+    evec2[1] = igraph_complex_sub_real(eval2, a);
+  } else {
+    evec1[0] = igraph_complex(1, 0);
+    evec1[1] = igraph_complex(0, 0);
+    evec2[0] = igraph_complex(0, 0);
+    evec2[1] = igraph_complex(1, 0);
+  }
+
+  /* Sometimes we have to swap eval1 with eval2 and evec1 with eval2;
+   * determine whether we have to do it now */
+  if (options->which[0] == 'S') {
+    if (options->which[1] == 'M') {
+      /* eval1 must be the one with the smallest magnitude */
+      swap_evals = (igraph_complex_mod(eval1) > igraph_complex_mod(eval2));
+    } else if (options->which[1] == 'R') {
+      /* eval1 must be the one with the smallest real part */
+      swap_evals = (IGRAPH_REAL(eval1) > IGRAPH_REAL(eval2));
+    } else if (options->which[1] == 'I') {
+      /* eval1 must be the one with the smallest imaginary part */
+      swap_evals = (IGRAPH_IMAG(eval1) > IGRAPH_IMAG(eval2));
+    } else {
+      IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
+    }
+  } else if (options->which[0] == 'L') {
+    if (options->which[1] == 'M') {
+      /* eval1 must be the one with the largest magnitude */
+      swap_evals = (igraph_complex_mod(eval1) < igraph_complex_mod(eval2));
+    } else if (options->which[1] == 'R') {
+      /* eval1 must be the one with the largest real part */
+      swap_evals = (IGRAPH_REAL(eval1) < IGRAPH_REAL(eval2));
+    } else if (options->which[1] == 'I') {
+      /* eval1 must be the one with the largest imaginary part */
+      swap_evals = (IGRAPH_IMAG(eval1) < IGRAPH_IMAG(eval2));
+    } else {
+      IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
+    }
+  } else if (options->which[0] == 'X' && options->which[1] == 'X') {
+    /* No preference on the ordering of eigenvectors */
+  } else {
+    fprintf(stderr, "%c%c\n", options->which[0], options->which[1]);
+    IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
+  }
+
+  if (swap_evals) {
+    igraph_complex_t dummy;
+    dummy = eval1; eval1 = eval2; eval2 = dummy;
+    dummy = evec1[0]; evec1[0] = evec2[0]; evec2[0] = dummy;
+    dummy = evec1[1]; evec1[1] = evec2[1]; evec2[1] = dummy;
+  }
+
+  if (complex_evals) {
+    /* The eigenvalues are conjugate pairs, so we store only the
+     * one with positive imaginary part */
+    if (IGRAPH_IMAG(eval1) < 0) {
+      eval1 = eval2;
+      evec1[0] = evec2[0]; evec1[1] = evec2[1];
+    }
+  }
+
+  if (values != 0) {
+    IGRAPH_CHECK(igraph_matrix_resize(values, nev, 2));
+    MATRIX(*values, 0, 0) = IGRAPH_REAL(eval1);
+    MATRIX(*values, 0, 1) = IGRAPH_IMAG(eval1);
+    if (nev > 1) {
+      MATRIX(*values, 1, 0) = IGRAPH_REAL(eval2);
+      MATRIX(*values, 1, 1) = IGRAPH_IMAG(eval2);
+    }
+  }
+
+  if (vectors != 0) {
+    if (complex_evals) {
+      IGRAPH_CHECK(igraph_matrix_resize(vectors, 2, 2));
+      MATRIX(*vectors, 0, 0) = IGRAPH_REAL(evec1[0]);
+      MATRIX(*vectors, 1, 0) = IGRAPH_REAL(evec1[1]);
+      MATRIX(*vectors, 0, 1) = IGRAPH_IMAG(evec1[0]);
+      MATRIX(*vectors, 1, 1) = IGRAPH_IMAG(evec1[1]);
+    } else {
+      IGRAPH_CHECK(igraph_matrix_resize(vectors, 2, nev));
+      MATRIX(*vectors, 0, 0) = IGRAPH_REAL(evec1[0]);
+      MATRIX(*vectors, 1, 0) = IGRAPH_REAL(evec1[1]);
+      if (nev > 1) {
+        MATRIX(*vectors, 0, 1) = IGRAPH_REAL(evec2[0]);
+        MATRIX(*vectors, 1, 1) = IGRAPH_REAL(evec2[1]);
+      }
+    }
+  }
+
+  return IGRAPH_SUCCESS;
+}
+
+/**
+ * "Solver" for symmetric 2x2 eigenvalue problems since ARPACK sometimes blows
+ * up with these.
+ */
+int igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun, void *extra,
+        igraph_arpack_options_t* options, igraph_vector_t* values,
+        igraph_matrix_t* vectors) {
+  igraph_real_t vec[2], mat[4];
+  igraph_real_t a, b, c, d;
+  igraph_real_t trace, det, tsq4_minus_d;
+  igraph_real_t eval1, eval2;
+  int nev = options->nev;
+
+  if (nev <= 0) {
+    IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_NEVNPOS);
+  }
+  if (nev > 2)
+    nev = 2;
+
+  /* Probe the values in the matrix */
+  vec[0] = 1; vec[1] = 0;
+  if (fun(mat, vec, 2, extra)) {
+	  IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
+		     IGRAPH_ARPACK_PROD);
+  }
+  vec[0] = 0; vec[1] = 1;
+  if (fun(mat+2, vec, 2, extra)) {
+	  IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
+		     IGRAPH_ARPACK_PROD);
+  }
+  a = mat[0]; b = mat[2]; c = mat[1]; d = mat[3];
+
+  /* Get the trace and the determinant */
+  trace = a+d;
+  det = a*d - b*c;
+  tsq4_minus_d = trace*trace / 4 - det;
+
+  if (tsq4_minus_d >= 0) {
+    /* Both eigenvalues are real */
+    eval1 = trace/2 + sqrt(tsq4_minus_d);
+    eval2 = trace/2 - sqrt(tsq4_minus_d);
+    if (c != 0) {
+      mat[0] = eval1-d; mat[2] = eval2-d;
+      mat[1] = c;       mat[3] = c;
+    } else if (b != 0) {
+      mat[0] = b;       mat[2] = b;
+      mat[1] = eval1-a; mat[3] = eval2-a;
+    } else {
+      mat[0] = 1; mat[2] = 0;
+      mat[1] = 0; mat[3] = 1;
+    }
+  } else {
+    /* Both eigenvalues are complex. Should not happen with symmetric
+     * matrices. */
+    IGRAPH_ERROR("ARPACK error, 2x2 matrix is not symmetric", IGRAPH_EINVAL);
+  }
+
+  /* eval1 is always the larger eigenvalue. If we want the smaller
+   * one, we have to swap eval1 with eval2 and also the columns of mat */
+  if (options->which[0] == 'S') {
+    trace = eval1; eval1 = eval2; eval2 = trace;
+    trace = mat[0]; mat[0] = mat[2]; mat[2] = trace;
+    trace = mat[1]; mat[1] = mat[3]; mat[3] = trace;
+  } else if (options->which[0] == 'L' || options->which[0] == 'B') {
+    /* Nothing to do here */
+  } else if (options->which[0] == 'X' && options->which[1] == 'X') {
+    /* No preference on the ordering of eigenvectors */
+  } else {
+    IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
+  }
+
+  if (values != 0) {
+    IGRAPH_CHECK(igraph_vector_resize(values, nev));
+    VECTOR(*values)[0] = eval1;
+    if (nev > 1) {
+      VECTOR(*values)[1] = eval2;
+    }
+  }
+
+  if (vectors != 0) {
+    IGRAPH_CHECK(igraph_matrix_resize(vectors, 2, nev));
+    MATRIX(*vectors, 0, 0) = mat[0];
+    MATRIX(*vectors, 1, 0) = mat[1];
+    if (nev > 1) {
+      MATRIX(*vectors, 0, 1) = mat[2];
+      MATRIX(*vectors, 1, 1) = mat[3];
+    }
+  }
+
+  return IGRAPH_SUCCESS;
+}
+
+/**
  * \function igraph_arpack_rssolve
  * \brief ARPACK solver for symmetric matrices
  *
@@ -299,6 +611,13 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   igraph_real_t origtol=options->tol;
 
   igraph_vector_t order;
+
+  /* Special case for 1x1 and 2x2 matrices */
+  if (options->n == 1) {
+    return igraph_i_arpack_rssolve_1x1(fun, extra, options, values, vectors);
+  } else if (options->n == 2) {
+    return igraph_i_arpack_rssolve_2x2(fun, extra, options, values, vectors);
+  }
 
   /* Brush up options if needed */
   if (options->ldv == 0) { options->ldv=options->n; }
@@ -373,7 +692,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
       igraph_real_t *from=workd+options->ipntr[0]-1;
       igraph_real_t *to=workd+options->ipntr[1]-1;
       if (fun(to, from, options->n, extra) != 0) {
-	IGRAPH_ERROR("Arpack error while evaluating matrix-vector product",
+	IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
 		     IGRAPH_ARPACK_PROD);
       }
       
@@ -480,6 +799,10 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
  * Please always consider calling \ref igraph_arpack_rssolve() if your
  * matrix is symmetric, it is much faster.
  * \ref igraph_arpack_rnsolve() for non-symmetric matrices.
+ * </para><para>
+ * Note that ARPACK is not called for 2x2 matrices as an exact algebraic
+ * solution exists in these cases.
+ *
  * \param fun Pointer to an \ref igraph_arpack_function_t object,
  *     the function that performs the matrix-vector multiplication.
  * \param extra An extra argument to be passed to \c fun.
@@ -523,7 +846,14 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   char origwhich[2]={ options->which[0], options->which[1] };
   igraph_real_t origtol=options->tol;
   int d_size;
-  
+
+  /* Special case for 1x1 and 2x2 matrices */
+  if (options->n == 1) {
+    return igraph_i_arpack_rnsolve_1x1(fun, extra, options, values, vectors);
+  } else if (options->n == 2) {
+    return igraph_i_arpack_rnsolve_2x2(fun, extra, options, values, vectors);
+  }
+
   /* Brush up options if needed */
   if (options->ldv == 0) { options->ldv=options->n; }
   if (options->ncv == 0) { options->ncv=options->nev * 2 + 1; }
@@ -606,7 +936,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
       igraph_real_t *from=workd+options->ipntr[0]-1;
       igraph_real_t *to=workd+options->ipntr[1]-1;
       if (fun(to, from, options->n, extra) != 0) {
-	IGRAPH_ERROR("Arpack error while evaluating matrix-vector product",
+	IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
 		     IGRAPH_ARPACK_PROD);
       }
       
