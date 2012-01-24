@@ -1,3 +1,4 @@
+/* -*- mode: C -*-  */
 /* vim:set ts=2 sts=2 sw=2 et: */
 /* 
    IGraph library.
@@ -42,13 +43,13 @@ static void debug(const char* fmt, ...) {
   va_list args;
   va_start(args, fmt);
 #ifdef MATCHING_DEBUG
-  vfprintf(stdout, fmt, args);
+  vfprintf(stderr, fmt, args);
 #endif
   va_end(args);
 }
 #else
 #  ifdef MATCHING_DEBUG
-#    define debug(...) fprintf(stdout, __VA_ARGS__)
+#    define debug(...) fprintf(stderr, __VA_ARGS__)
 #  else
 #    define debug(...) 
 #  endif
@@ -365,17 +366,6 @@ int igraph_i_maximum_bipartite_matching_unweighted(const igraph_t* graph,
   /* (4) Set the initial labeling -- lines 1 and 2 in the tech report */
   IGRAPH_CHECK(igraph_i_maximum_bipartite_matching_unweighted_relabel(
       graph, types, &labels, &match, smaller_set));
-
-  for (i = 0; i < no_of_nodes; i++) {
-    if (VECTOR(*types)[i] == smaller_set) {
-      VECTOR(labels)[i] = 1;
-    } else {
-      VECTOR(labels)[i] = 0;
-    }
-  }
-
-  /* Smaller set now has label 1, larger set has label 0. The tech report
-   * calls the smaller set "columns" and the larger set "rows". */
 
   /* (5) Fill the push queue with the unmatched nodes from the smaller set. */
   for (i = 0; i < no_of_nodes; i++) {
@@ -936,12 +926,7 @@ int igraph_i_maximum_bipartite_matching_weighted(const igraph_t* graph,
     IGRAPH_CHECK(igraph_vector_long_update(matching, &match));
   }
   if (matching_size != 0) {
-		for (i = 0; i < no_of_nodes; i++) {
-			if (VECTOR(match)[i] != -1) {
-				(*matching_size)++;
-			}
-		}
-		*matching_size /= 2;
+    *matching_size = msize;
   }
   if (matching_weight != 0) {
 		*matching_weight = 0;
