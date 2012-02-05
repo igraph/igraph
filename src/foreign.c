@@ -2540,9 +2540,7 @@ int igraph_i_dot_escape(const char *orig, char **result) {
 	  else { need_quote=1; newlen++; }
 	} else if (orig[i] == '_') {
 	  is_number=0; newlen++;
-	} else if (orig[i] == '\\') {
-	  need_quote=1; is_number=0; newlen+=2; /* will be escaped */
-	} else if (orig[i] == '"') {
+	} else if (orig[i] == '\\' || orig[i] == '"' || orig[i] == '\n') {
 	  need_quote=1; is_number=0; newlen+=2; /* will be escaped */
 	} else if (isalpha(orig[i])) {
 	  is_number=0; newlen++;
@@ -2562,7 +2560,14 @@ int igraph_i_dot_escape(const char *orig, char **result) {
 	(*result)[newlen+1]='"';
 	(*result)[newlen+2]='\0';
 	for (i=0, j=1; i<len; i++) {
-	  if (orig[i] == '\\' || orig[i] == '"') (*result)[j++] = '\\';
+	  if (orig[i] == '\n') {
+		(*result)[j++] = '\\';
+		(*result)[j++] = 'n';
+		continue;
+	  }
+	  if (orig[i] == '\\' || orig[i] == '"') {
+		(*result)[j++] = '\\';
+	  }
 	  (*result)[j++] = orig[i];
 	}
   }
