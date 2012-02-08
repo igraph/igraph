@@ -185,7 +185,7 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
   vc <- nrow(adjmatrix)
 
   ## to remove non-redundancies that can persist in a dgtMatrix
-  if(is(adjmatrix, "dgTMatrix")) {
+  if(inherits(adjmatrix, "dgTMatrix")) {
     adjmatrix = as(adjmatrix, "CsparseMatrix")
   }
   
@@ -309,7 +309,7 @@ graph.adjacency <- function(adjmatrix, mode=c("directed", "undirected", "max",
                             weighted=NULL, diag=TRUE,
                             add.colnames=NULL, add.rownames=NA) {
 
-  if (is(adjmatrix, "Matrix")) {
+  if (inherits(adjmatrix, "Matrix")) {
     res <- graph.adjacency.sparse(adjmatrix, mode=mode, weighted=weighted, diag=diag)
   } else {
     res <- graph.adjacency.dense(adjmatrix, mode=mode, weighted=weighted, diag=diag)
@@ -773,7 +773,7 @@ graph.incidence <- function(incidence, directed=FALSE,
   mode <- switch(igraph.match.arg(mode), "out"=1, "in"=2, "all"=3, "total"=3)
   multiple <- as.logical(multiple)
 
-  if (is(incidence, "Matrix")) {
+  if (inherits(incidence, "Matrix")) {
     res <- graph.incidence.sparse(incidence, directed=directed,
                                   mode=mode, multiple=multiple,
                                   weighted=weighted)

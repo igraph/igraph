@@ -207,7 +207,7 @@ igraph.from.graphNEL <- function(graphNEL, name=TRUE, weight=TRUE,
 
   require(graph)
 
-  if (!is(graphNEL, "graphNEL")) {
+  if (!inherits(graphNEL, "graphNEL")) {
     stop("Not a graphNEL graph")
   }
   
