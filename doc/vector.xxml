@@ -80,6 +80,7 @@
 <section><title>Vector properties</title>
 <!-- doxrox-include igraph_vector_empty -->
 <!-- doxrox-include igraph_vector_size -->
+<!-- doxrox-include igraph_vector_capacity -->
 <!-- doxrox-include igraph_vector_sum -->
 <!-- doxrox-include igraph_vector_prod -->
 <!-- doxrox-include igraph_vector_isininterval -->
@@ -97,6 +98,7 @@
 <!-- doxrox-include igraph_vector_clear -->
 <!-- doxrox-include igraph_vector_reserve -->
 <!-- doxrox-include igraph_vector_resize -->
+<!-- doxrox-include igraph_vector_resize_min -->
 <!-- doxrox-include igraph_vector_push_back -->
 <!-- doxrox-include igraph_vector_pop_back -->
 <!-- doxrox-include igraph_vector_insert -->

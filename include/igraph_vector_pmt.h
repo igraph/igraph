@@ -53,6 +53,8 @@ int FUNCTION(igraph_vector,copy)(TYPE(igraph_vector) *to,
 				 const TYPE(igraph_vector) *from);
 void FUNCTION(igraph_vector,destroy)(TYPE(igraph_vector)* v);
 
+long int FUNCTION(igraph_vector,capacity)(const TYPE(igraph_vector)*v);
+
 /*--------------------*/
 /* Accessing elements */
 /*--------------------*/
@@ -205,6 +207,7 @@ igraph_bool_t FUNCTION(igraph_vector,binsearch2)(const TYPE(igraph_vector) *v,
 
 void FUNCTION(igraph_vector,clear)(TYPE(igraph_vector)* v);
 int FUNCTION(igraph_vector,resize)(TYPE(igraph_vector)* v, long int newsize);
+int FUNCTION(igraph_vector,resize_min)(TYPE(igraph_vector)*v);
 int FUNCTION(igraph_vector,reserve)(TYPE(igraph_vector)* v, long int size);
 int FUNCTION(igraph_vector,push_back)(TYPE(igraph_vector)* v, BASE e);
 BASE FUNCTION(igraph_vector,pop_back)(TYPE(igraph_vector)* v);

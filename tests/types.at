@@ -31,6 +31,11 @@ AT_KEYWORDS([vector vector_t])
 AT_COMPILE_CHECK([simple/vector2.c], [simple/vector2.out])
 AT_CLEANUP
 
+AT_SETUP([Vector (even more) (vector_t): ])
+AT_KEYWORDS([vector vector_t])
+AT_COMPILE_CHECK([simple/vector3.c])
+AT_CLEANUP
+
 AT_SETUP([Matrix (matrix_t): ])
 AT_KEYWORDS([matrix matrix_t])
 AT_COMPILE_CHECK([simple/matrix.c], [simple/matrix.out])
@@ -39,6 +44,11 @@ AT_CLEANUP
 AT_SETUP([Matrix (more) (matrix_t): ])
 AT_KEYWORDS([matrix matrix_t])
 AT_COMPILE_CHECK([simple/matrix2.c], [simple/matrix2.out])
+AT_CLEANUP
+
+AT_SETUP([Matrix (even more) (matrix_t): ])
+AT_KEYWORDS([matrix matrix_t])
+AT_COMPILE_CHECK([simple/matrix3.c])
 AT_CLEANUP
 
 AT_SETUP([Double ended queue (dqueue_t): ])

@@ -35,6 +35,7 @@ int FUNCTION(igraph_matrix,init)(TYPE(igraph_matrix) *m,
 int FUNCTION(igraph_matrix,copy)(TYPE(igraph_matrix) *to, 
 				 const TYPE(igraph_matrix) *from);
 void FUNCTION(igraph_matrix,destroy)(TYPE(igraph_matrix) *m);
+long int FUNCTION(igraph_matrix,capacity)(const TYPE(igraph_matrix) *m);
 
 /*--------------------*/
 /* Accessing elements */
@@ -187,6 +188,7 @@ igraph_bool_t FUNCTION(igraph_matrix,search)(const TYPE(igraph_matrix) *m,
 
 int FUNCTION(igraph_matrix,resize)(TYPE(igraph_matrix) *m, 
 				   long int nrow, long int ncol);
+int FUNCTION(igraph_matrix,resize_min)(TYPE(igraph_matrix) *m);
 int FUNCTION(igraph_matrix,add_cols)(TYPE(igraph_matrix) *m, long int n);
 int FUNCTION(igraph_matrix,add_rows)(TYPE(igraph_matrix) *m, long int n);
 int FUNCTION(igraph_matrix,remove_col)(TYPE(igraph_matrix) *m, long int col);

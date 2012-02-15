@@ -91,6 +91,29 @@ void FUNCTION(igraph_matrix,destroy)(TYPE(igraph_matrix) *m) {
 }
 
 /**
+ * \ingroup matrix
+ * \function igraph_matrix_capacity
+ * \brief Returns the number of elements allocated for a matrix.
+ * 
+ * Note that this might be different from the size of the matrix (as 
+ * queried by \ref igraph_matrix_size(), and specifies how many elements 
+ * the matrix can hold, without reallocation.
+ * \param v Pointer to the (previously initialized) matrix object
+ *          to query.
+ * \return The allocated capacity.
+ * 
+ * \sa \ref igraph_matrix_size(), \ref igraph_matrix_nrow(),
+ * \ref igraph_matrix_ncol(). 
+ * 
+ * Time complexity: O(1).
+ */
+
+long int FUNCTION(igraph_matrix,capacity)(const TYPE(igraph_matrix) *m) {
+  return FUNCTION(igraph_vector,capacity)(&m->data);
+}
+
+
+/**
  * \section igraph_matrix_accessing_elements Accessing elements of a matrix
  */
 
@@ -122,6 +145,42 @@ int FUNCTION(igraph_matrix,resize)(TYPE(igraph_matrix) *m, long int nrow, long i
   m->ncol=ncol;
   return 0;
 }
+
+/**
+ * \ingroup matrix
+ * \function igraph_matrix_resize_min
+ * \brief Deallocates unused memory for a matrix.
+ * 
+ * </para><para>
+ * Note that this function might fail if there is not enough memory
+ * available. 
+ * 
+ * </para><para>
+ * Also note, that this function leaves the matrix intact, i.e. 
+ * it does not destroy any of the elements. However, usually it involves 
+ * copying the matrix in memory.
+ * \param m Pointer to an initialized matrix.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_matrix_resize().
+ * 
+ * Time complexity: operating system dependent.
+ */
+
+int FUNCTION(igraph_matrix,resize_min)(TYPE(igraph_matrix) *m) {
+  TYPE(igraph_vector) tmp;
+  long int size=FUNCTION(igraph_matrix,size)(m);
+  long int capacity=FUNCTION(igraph_matrix,capacity)(m);
+  if (size == capacity) { return 0; }
+  
+  IGRAPH_CHECK(FUNCTION(igraph_vector,init)(&tmp, size));
+  FUNCTION(igraph_vector,update)(&tmp, &m->data);
+  FUNCTION(igraph_vector,destroy)(&m->data);
+  m->data = tmp;
+  
+  return 0;
+}
+
 
 /**
  * \ingroup matrix

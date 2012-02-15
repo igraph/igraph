@@ -379,6 +379,27 @@ void FUNCTION(igraph_vector,destroy)   (TYPE(igraph_vector)* v) {
 
 /**
  * \ingroup vector
+ * \function igraph_vector_capacity
+ * \brief Returns the allocated capacity of the vector
+ * 
+ * Note that this might be different from the size of the vector (as 
+ * queried by \ref igraph_vector_size(), and specifies how many elements 
+ * the vector can hold, without reallocation.
+ * \param v Pointer to the (previously initialized) vector object
+ *          to query.
+ * \return The allocated capacity.
+ * 
+ * \sa \ref igraph_vector_size().
+ * 
+ * Time complexity: O(1).
+ */
+
+long int FUNCTION(igraph_vector,capacity)(const TYPE(igraph_vector)*v) {
+  return v->stor_end - v->stor_begin;
+}
+
+/**
+ * \ingroup vector
  * \function igraph_vector_reserve
  * \brief Reserves memory for a vector.
  * 
@@ -837,7 +858,8 @@ long int FUNCTION(igraph_vector,qsort_ind)(TYPE(igraph_vector) *v,
  *         memory. Note that this function \em never returns an error
  *         if the vector is made smaller.
  * \sa \ref igraph_vector_reserve() for allocating memory for future
- * extensions of a vector.
+ * extensions of a vector. \ref igraph_vector_resize_min() for 
+ * deallocating the unnneded memory for a vector.
  * 
  * Time complexity: O(1) if the new
  * size is smaller, operating system dependent if it is larger. In the
@@ -851,6 +873,39 @@ int FUNCTION(igraph_vector,resize)(TYPE(igraph_vector)* v, long int newsize) {
   assert(v->stor_begin != NULL);
   IGRAPH_CHECK(FUNCTION(igraph_vector,reserve)(v, newsize));
   v->end = v->stor_begin+newsize;
+  return 0;
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_resize_min
+ * \brief Deallocate the unused memory of a vector.
+ * 
+ * </para><para>
+ * Note that this function involves additional memory allocation and 
+ * may result an out-of-memory error.
+ * \param v Pointer to an initialized vector.
+ * \return Error code.
+ *
+ * \sa \ref igraph_vector_resize(), \ref igraph_vector_reserve().
+ * 
+ * Time complexity: operating system dependent. 
+ */
+
+int FUNCTION(igraph_vector,resize_min)(TYPE(igraph_vector)*v) {
+  long int size;
+  BASE *tmp;
+  if (v->stor_end == v->end) { return 0; }
+  
+  size = v->end - v->stor_begin;
+  tmp=igraph_Realloc(v->stor_begin, size, BASE);
+  if (tmp==0) {
+    IGRAPH_ERROR("cannot resize vector", IGRAPH_ENOMEM);
+  } else {
+    v->stor_begin = tmp;
+    v->stor_end = v->end = v->stor_begin + size;
+  }
+  
   return 0;
 }
 
