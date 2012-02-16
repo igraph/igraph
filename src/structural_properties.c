@@ -4696,6 +4696,10 @@ int igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegraph) {
  * is the same as the source of the second vertex's corresponding edge.
  * 
  * </para><para>
+ * Edge <em>i</em> in the original graph will correspond to vertex <em>i</em>
+ * in the line graph.
+ *
+ * </para><para>
  * The first version of this function was contributed by Vincent Matossian, 
  * thanks.
  * \param graph The input graph, may be directed or undirected.
