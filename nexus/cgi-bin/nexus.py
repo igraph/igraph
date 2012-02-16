@@ -207,6 +207,8 @@ def check_admin(redirect=True):
     if web.ctx.environ['REMOTE_ADDR']=='127.0.0.1':
         return True
     else:
+        if redirect:
+            return web.seeother("/")
         return False
 
 add_form=web.form.Form(
