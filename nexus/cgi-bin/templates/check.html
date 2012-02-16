@@ -1,6 +1,6 @@
 $def with (id, ds, checkres)
 
-<h2>Checking dataset '$:{link_to_dataset(ds)}'</h2>
+<h2>Checking dataset '$:{link_to_dataset(getbase(), ds)}'</h2>
 
 $for format, result in checkres.items():
   <h3>$format</h3>

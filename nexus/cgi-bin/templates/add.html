@@ -65,10 +65,10 @@ $else:
 
 $if post and edit:
   <p>Thank you for the update. You can look at this dataset
-  $:link_to_dataset_id(id, "here").</p>
+  $:link_to_dataset_id(getbase(), id, "here").</p>
 $elif post:
   <p>Thank you for the addition. You can look at this dataset
-  $:link_to_dataset_id(id, "here").</p>
+  $:link_to_dataset_id(getbase(), id, "here").</p>
 $else:
   <p>
     <form action="" method="post" class="donateform" name="form">

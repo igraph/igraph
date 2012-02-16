@@ -6,7 +6,7 @@ $for e in entries:
   <div class="title"><h3>$e.title
       $if openid.status():
         <span class="edit">
-	  <a href="/web/editblog/$e.id">[edit]</a>
+	  <a href="$:getbase()/web/editblog/$e.id">[edit]</a>
 	</span>
   </h3></div>
   <div class="blogentry">

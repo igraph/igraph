@@ -7,10 +7,10 @@ $else:
 
 $if post and edit:
   <p>Licence was updated. You can look at it 
-    $:link_to_licence(id, 'here').</p>
+    $:link_to_licence(getbase(), id, 'here').</p>
 $elif post:
   <p>Licence was added. You can look at it 
-    $:link_to_licence(id, 'here').</p>
+    $:link_to_licence(getbase(), id, 'here').</p>
 $else:
   <p>
     <form action="" method="post" class="donateform" name="form">

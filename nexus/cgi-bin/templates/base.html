@@ -6,9 +6,10 @@ $def with (page)
         <title>$page.title</title>
     $else:
         <title>Nexus</title>
-    <link rel="stylesheet" href="/static/general.css" type="text/css"/>
+    <link rel="stylesheet" href="$:getbase()/static/general.css" 
+	  type="text/css"/>
     <link rel="icon" type="image/png" 
-	  href="/static/nexus_logo_black_small.png" />
+	  href="$:getbase()/static/nexus_logo_black_small.png" />
 </head>
 <body class="home">
   <div id="wrapper" class="hfeed">
@@ -17,7 +18,7 @@ $def with (page)
 	<div id="branding" role="banner">
 	  <h1 id="site-title">
 	    <span>	      
-	      <a href="/" title="Nexus" rel="home">Nexus</a>
+	      <a href="$:getbase()/" title="Nexus" rel="home">Nexus</a>
 	    </span>
 	  </h1>
 	  <div id="site-description">THE NETWORK REPOSITORY</div>
@@ -31,35 +32,41 @@ $def with (page)
 	  </div>
 	  <div class="menu"><ul>
 	      <!-- <li class="page_item"> -->
-	      <!-- 	<a href="/web/search" title="Search">Search</a> -->
+	      <!-- 	<a href="$:getbase()/web/search" title="Search">Search</a> -->
 	      <!-- </li> -->
 	      <li class="page_item">
-		<a href="/api/dataset_info" title="Browse data sets">
-		  Browse
+		<a href="$:getbase()/api/dataset_info" 
+		   title="Browse data sets">Browse
 		</a>
 	      </li>
 	      <!-- <li class="page_item"> -->
-	      <!-- 	<a href="/advanced" title="Advanced search"> -->
+	      <!-- 	<a href="$:getbase()/advanced" title="Advanced search"> -->
 	      <!-- 	Advanced search</a> -->
 	      <!-- </li> -->
 	      <li class="page_item">
-		<a href="/web/donate" title="Help Nexus">Donate data</a>
+		<a href="$:getbase()/web/donate" title="Help Nexus">
+		  Donate data</a>
 	      </li>
 	      <li class="page_item">
-	      	<a href="/web/blog" title="What are we working on?">Blog</a>
+	      	<a href="$:getbase()/web/blog" 
+		   title="What are we working on?">Blog</a>
 	      </li>
 	      <!-- <li class="page_item"> -->
-	      <!-- 	<a href="/about" title="What is Nexus?">About</a> -->
+	      <!-- 	<a href="$:getbase()/about" title="What is Nexus?">About</a> -->
 	      <!-- </li> -->
 	      <li class="page_item">
-		<a href="/web/docs" title="The Nexus API">Documentation</a>
+		<a href="$:getbase()/web/docs" title="The Nexus API">
+		  Documentation</a>
 	      </li>
 	      <li class="page_item">
-		<a href="/web/feedback" title="Write to us">Feedback</a>
+		<a href="$:getbase()/web/feedback" title="Write to us">
+		  Feedback</a>
 	      </li>
 	      $if check_admin(redirect=False):
 	        <li class="page_item">
-		  <a href="/web/admin" title="Make changes">Admin</a>
+		  <a href="$:getbase()/web/admin" title="Make changes">
+		    Admin
+		  </a>
 		</li>
 	  </ul></div>	 
 	</div><!-- #access -->
@@ -88,8 +95,8 @@ $def with (page)
 	</div>
       <div id="secondary" class="widget-area" role="complementary">
 	<div class="feed">
-	  <a href="/api/dataset_info?format=atom">
-	    <img src="/static/images/feed-icon-14x14.png" />
+	  <a href="$:getbase()/api/dataset_info?format=atom">
+	    <img src="$:getbase()/static/images/feed-icon-14x14.png" />
 	  </a>
 	</div>
 	<div class="title">
@@ -107,7 +114,7 @@ $def with (page)
     <div id="footer" role="contentinfo">
       <div id="colophon">
 	<div id="site-info">
-	  <a href="/" title="Nexus" rel="home">
+	  <a href="$:getbase()/" title="Nexus" rel="home">
 	    &copy; 2011 The Nexus team
 	  </a>
 	</div><!-- #site-info -->

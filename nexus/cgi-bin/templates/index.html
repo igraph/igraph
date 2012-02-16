@@ -6,7 +6,7 @@ $if searchvalue is not None:
 $if feed:
   <div class="feed">
     <a href="$feed">
-      <img src="/static/images/feed-icon-28x28.png" />
+      <img src="$:getbase()/static/images/feed-icon-28x28.png" />
     </a>
   </div>
 
@@ -23,7 +23,7 @@ $else:
   <ul class="datasets">
   $for ds in datasets:
     <li>
-      <h4>$:link_to_dataset(ds, caption=u"\u25b6 %s [%s]" % (ds.name, ds.sid))
+      <h4>$:link_to_dataset(getbase(), ds, caption=u"\u25b6 %s [%s]" % (ds.name, ds.sid))
       </h4>
       <p class="datasettags">
 	$ds.date,
@@ -40,7 +40,7 @@ $else:
 	  $ds.mine-$ds.maxe 
 	edges.
 	Tags:
-	$:", ".join(link_to_tag(tag) for tag in tags[ds.id])
+	$:", ".join(link_to_tag(getbase(), tag) for tag in tags[ds.id])
       </p>
       <div class="datasetdescription">
 	$:mymarkdown(ds.shortdescription)

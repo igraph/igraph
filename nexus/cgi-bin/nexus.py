@@ -160,6 +160,13 @@ def make_link(keys, **extra):
     args=[ '%s=%s' % ex(k,v) for k, v in keys.items() if v is not None ]
     return "?" + "&".join(args)
 
+def getbase():
+    servername = web.ctx.environ['SERVER_NAME']
+    if servername == 'secure1298.hostgator.com':
+        return '/~csardi/nexus'
+    else:
+        return ''
+
 ## TODO: what if there are too many pages. Currently not a problem,
 ## only if we'll have hundreds of data sets.
 def prevnexttable(nohits, start, end, limit, user_input):
@@ -277,7 +284,8 @@ tempglob = { 'dataformats': model.get_format_extensions(),
              'add_net_form': add_net_form,
              'add_meta_form': add_meta_form,
              'check_admin': check_admin,
-             'makelinks': makelinks }
+             'makelinks': makelinks,
+             'getbase': getbase }
 
 for name in url_helper.__all__:
     tempglob[name] = getattr(url_helper, name)
@@ -421,7 +429,7 @@ class Index:
             tags[i] = list(model.get_tags(i))
 
         if format=='html':
-            feed='/api/dataset_info?format=atom'
+            feed=getbase() + '/api/dataset_info?format=atom'
             return render.index(datasets, tags, "All data sets", feed,
                                 co, int(user_input.offset)+1, 
                                 int(user_input.offset)+len(datasets), 
@@ -546,7 +554,8 @@ class Index:
         tagname=(" " + user_input.operator + " ").join(tagname)
 
         if format=='html':
-            feed='/api/dataset_info?format=atom&tag=%s&operator=%s' % \
+            feed=getbase() + \
+                '/api/dataset_info?format=atom&tag=%s&operator=%s' % \
                 (user_input.tag, user_input.operator)
             return render.index(datasets, tags, 
                                 "Data sets tagged %s" % tagname, feed,
@@ -1234,10 +1243,11 @@ class Check:
             web.header('Content-type','text/html')
             web.header('Transfer-Encoding','chunked')
             yield ('<html><head><title>Checking datasets...</title>' +
-                   '<link rel="stylesheet" href="/static/general.css" \
-                          type="text/css"/>' + 
-                   '<link rel="icon" type="image/png" \
-	                  href="/static/nexus_logo_black_small.png" />' +
+                   '<link rel="stylesheet" href="' + getbase() + \
+                       '/static/general.css"' + \
+                       'type="text/css"/>' + 
+                   '<link rel="icon" type="image/png" href="' + \
+                       getbase() + '/static/nexus_logo_black_small.png" />' +
                    '</head><body>')
             for id in ids:
                 ds=list(model.get_dataset(id.id))[0]
@@ -1608,7 +1618,7 @@ class Search:
         title="Nexus search results for '%s'" % user_input.q
         if user_input.format=='html':
             title="Nexus search results for '<code>%s</code>'" % user_input.q
-            feed='/api/search?q=%s&format=atom' % user_input.q
+            feed=getbase() + '/api/search?q=%s&format=atom' % user_input.q
             return render.index(ds, tags, title, feed,
                                 co, int(user_input.offset)+1, 
                                 int(user_input.offset)+len(ds),

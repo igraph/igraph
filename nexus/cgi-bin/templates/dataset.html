@@ -3,10 +3,10 @@ $def with (ds, tags, meta, formats, papers, networks=[])
 <div class="title"><h2>$ds.name [$ds.sid]
 $if check_admin(redirect=False):
     <span class="edit">
-      <a href="/web/edit/$ds.id">[edit]</a>
-      <a href="/web/check/$ds.id">[check]</a>
-      <a href="/web/delete/$ds.id">[delete]</a>
-      <a href="/web/recreate/$ds.id">[recreate]</a>
+      <a href="$:getbase()/web/edit/$ds.id">[edit]</a>
+      <a href="$:getbase()/web/check/$ds.id">[check]</a>
+      <a href="$:getbase()/web/delete/$ds.id">[delete]</a>
+      <a href="$:getbase()/web/recreate/$ds.id">[recreate]</a>
     </span>
 </h2></div>
 
@@ -25,7 +25,7 @@ $if check_admin(redirect=False):
     $ds.mine-$ds.maxe 
   edges.
   Tags:
-  $:", ".join(link_to_tag(tag) for tag in tags)
+  $:", ".join(link_to_tag(getbase(), tag) for tag in tags)
 <p class="datasetdate2">$ds.date</p>
 
 <p>$ds.shortdescription</p>
@@ -36,15 +36,15 @@ $for k,f in dataformats.items():
   <li>
   <span style="width:35px;float:left;">
     $if k in formats.keys():
-      <a href="/api/dataset?id=${ds.id}&format=$k">
-      <img src="/static/images/formats/${k}.png" 
+      <a href="$:getbase()/api/dataset?id=${ds.id}&format=$k">
+      <img src="$:getbase()/static/images/formats/${k}.png" 
 	   style="display:block;height:20px;margin-left:auto;margin-right:auto;" 
 	   alt="" title="Download in $k format" /></a>
   </span>
   $if k in formats.keys():
-    <a href="/api/dataset?id=${ds.id}&format=$k">${k} format</a> &ndash; 
-    $formats[k].shortdesc,
-    <a href="/api/format?dataformat=$k&format=html">more...</a>
+    <a href="$:getbase()/api/dataset?id=${ds.id}&format=$k">${k} format</a> 
+    &ndash; $formats[k].shortdesc,
+    <a href="$:getbase()/api/format?dataformat=$k&format=html">more...</a>
   </li>
   
 </ul>

@@ -14,11 +14,11 @@ $if not edit and not added:
 
 $if edit and added:
   <p>Thank you for your edit, you can look at this blog entry
-    <a href="/web/blog?id=$id&admin=true">here</a>.
+    <a href="$:getbase()/web/blog?id=$id&admin=true">here</a>.
   </p>
 
 $if not edit and added:
   <p>Thank you for your blog entry, you can look at it 
-    <a href="/web/blog?id=$id&admin=true">here</a>.
+    <a href="$:getbase()/web/blog?id=$id&admin=true">here</a>.
   </p>
 
