@@ -30,7 +30,7 @@ par(mar=c(0,0,0,0), bg=rgb(0.9,0.9,0.9))
 plot(g, vertex.color="black", vertex.label.color="white", vertex.label=NA)
 dev.off()
 
-system("convert -resize 16x16 nexus_logo_black_small.pdf  nexus_logo_black_small.png")
-
-
-
+png("nexus_logo_black_small.png", width=160, height=160)
+par(mar=c(0,0,0,0), bg="transparent")
+plot(g, vertex.color="black", vertex.label.color="white", vertex.label=NA)
+dev.off()
