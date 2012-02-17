@@ -506,13 +506,14 @@ class Index:
             web.header('Content-Type', 'application/rss+xml')
             return render_plain.rss_index(datasets, tags, 
                                           "All data sets", 
-                                          date, web.ctx.homedomain, '')
+                                          date, web.ctx.homedomain, getbase())
         elif format=='atom':
             date=datetime.today().strftime("%a, %d %b %Y %H:%M:%S +0200")
             web.header('Content-Type', 'application/atom+xml')
             return render_plain.atom_index(datasets, tags, 
                                            "All data sets", 
-                                           date, web.ctx.homedomain, '')
+                                           date, web.ctx.homedomain, 
+                                           getbase())
 
     def format_text(self, dataset, tags, meta, formats, papers):
 

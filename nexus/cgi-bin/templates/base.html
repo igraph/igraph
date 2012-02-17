@@ -97,7 +97,8 @@ $def with (page)
 	    <div class="title">
 	      <h2>Search Nexus</h2>
 	    </div>
-	    <form action="/api/search" method="get" id="searchform">
+	    <form action="$:getbase()/api/search" method="get"
+		  id="searchform">
 	      <input type="text" name="q" size="31" 
 		     $if page.has_key('searchvalue'):
 		       value="$page['searchvalue']"
