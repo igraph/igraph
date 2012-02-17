@@ -21,6 +21,8 @@ import re
 import tempfile
 import gzip
 import shutil
+import hashlib
+import sqlite3
 
 from datetime import datetime
 from functools import wraps
@@ -28,6 +30,9 @@ from itertools import izip, chain
 from operator import attrgetter
 from recaptcha.client import captcha
 from textwrap import dedent
+
+httpsserver = 'secure1298.hostgator.com'
+httpshome = '/~csardi/nexus'
 
 web.config.debug = False
 web.config.smtp_server = '173.192.111.8'
@@ -66,7 +71,10 @@ urls = (
     '/web/recreateall/(.+)',               'RecreateAll',
     '/web/recreate/(\d+)',                 'Recreate',
     '/web/search',                         'Searchpage',
-    '.*',                                  'NotFound'
+    '/web/login',                          'Login',
+    '/web/logout',                         'Logout',
+    '/error/(\d+)',                        'Error',
+    '.*',                                  'Error'
     )
 
 # reCAPTCHA keys
@@ -162,8 +170,8 @@ def make_link(keys, **extra):
 
 def getbase():
     servername = web.ctx.environ['SERVER_NAME']
-    if servername == 'secure1298.hostgator.com':
-        return '/~csardi/nexus'
+    if servername == httpsserver:
+        return httpshome
     else:
         return ''
 
@@ -210,13 +218,55 @@ def prevnexttable(nohits, start, end, limit, user_input):
 def makelinks(text):
     return re.sub(r'(http://[^ \n\t]+)', r'<a href="\1">\1</a>', text)
 
+def redirect_to(location):
+    headers = { 
+        'Content-Type': 'text/html',
+        'Location': location
+        }
+    raise web.HTTPError("303 See Other", headers, "")
+    
+def errorpage():
+    error_url = web.ctx.protocol + '://' + web.ctx.host + \
+        getbase() + '/error/404'
+    redirect_to(error_url)
+
+def redirect_to_main():
+    redirect_to(web.ctx.protocol + '://' + web.ctx.host + getbase())
+
 def check_admin(redirect=True):
-    if web.ctx.environ['REMOTE_ADDR']=='127.0.0.1':
-        return True
-    else:
+    '''Check if the current user is authenticated and admin.
+    If a redirect is requested, then we redirect to a 404 page.'''
+
+    safe = check_safe(redirect=redirect)
+    if not safe:
         if redirect:
-            return web.seeother("/")
+            errorpage()
+        else:
+            return False
+    else:
+        if session.loggedin and session.admin:
+            return True
+        else:
+            if redirect:
+                errorpage()
+            else:
+                return False
+
+def check_loggedin():
+    if not check_safe(redirect=False):
         return False
+    return session.loggedin
+
+def check_safe(redirect=True):
+    '''Check whether we are on HTTPS or connecting locally.
+    If a redirect is requested, then we redirect to a 404 page.'''
+
+    good = web.ctx.protocol == "https" or \
+        web.ctx.environ['REMOTE_ADDR'] == '127.0.0.1'
+    if not good and redirect:
+        errorpage()
+
+    return good
 
 add_form=web.form.Form(
     web.form.Textbox("sid", description="Id:", id="focused", size=formwidth),
@@ -285,20 +335,15 @@ tempglob = { 'dataformats': model.get_format_extensions(),
              'add_meta_form': add_meta_form,
              'check_admin': check_admin,
              'makelinks': makelinks,
-             'getbase': getbase }
+             'getbase': getbase,
+             'check_safe': check_safe,
+             'check_loggedin': check_loggedin }
 
 for name in url_helper.__all__:
     tempglob[name] = getattr(url_helper, name)
 
 render = web.template.render('templates', base='base', globals=tempglob)
 render_plain = web.template.render('templates', globals=tempglob)
-
-class NotFound:
-    """Handler class for URLs that do not encode a known resource."""
-
-    def GET(self):
-        """Responds with a HTTP error 404 for GET requests."""
-        return web.notfound()
 
 class Donate:
     """Handler class for the "Donate data" page."""
@@ -694,7 +739,7 @@ URL: %s""" % (format.name, format.shortdesc,
         if dataformat:
             data=[d for d in model.get_format(dataformat)]
             if not data:
-                return web.notfound
+                return web.notfound()
         else:
             data=[d for d in model.list_data_formats()]
 
@@ -985,6 +1030,7 @@ class EditLicence:
 
 class Admin:
     def GET(self):
+        check_admin()
         return render.admin()
 
 def run_r(cmd):
@@ -1237,7 +1283,8 @@ class Check:
         return checkres
 
     def GET(self, id=None):
-        
+        check_admin()
+
         if id is None:
             ids=model.get_dataset_ids()
             web.header('Content-type','text/html')
@@ -1261,6 +1308,7 @@ class Check:
 class CheckAll:
 
     def GET(self):
+        check_admin()
         return render.checkall()
 
 class Licence:
@@ -1517,6 +1565,7 @@ class Recreate(RecreateBase):
 class RecreateAll(RecreateBase):
     
     def GET(self, format):
+        check_admin()
         web.header('Content-type','text/html')
         web.header('Transfer-Encoding','chunked')
         if format[0]!='!':
@@ -1661,7 +1710,71 @@ class Searchpage:
     def GET(self):
         pass
 
+class Login:
+    """Login form"""
+    
+    login_form = web.form.Form(
+        web.form.Textbox("user", description="Username"),
+        web.form.Password("passw", description="Password"),
+        web.form.Button("Login")
+        )
+
+    def GET(self):
+        check_safe()
+        form=self.login_form()
+        return render.login(form)
+    
+    def POST(self):
+        check_safe()
+        form=self.login_form()
+        if not form.validates():
+            # TODO
+            pass
+
+        user_input=web.input()
+        authdb=sqlite3.connect("../db/users.db")
+        pwdhash=hashlib.md5(user_input.passw).hexdigest()
+        cur=authdb.execute('''select * from users where 
+                              username=? and password=?''', 
+                           (user_input.user, pwdhash))
+        check=cur.fetchone()
+        if check is not None:
+            session.loggedin = True
+            session.username = user_input.user
+            session.admin = check[2] == 1
+            print(session)
+            redirect_to_main()
+        else:
+            return render.login(form)
+
+class Logout:
+    
+    def GET(self):
+        session.kill()
+        redirect_to_main()
+
+class Error:
+    """HTTP errors"""
+    
+    def GET(self, code=404):
+        return render.error(code)
+
 app = web.application(urls, globals())
+
+web.config.session_parameters['cookie_name'] = 'nexus_igraph_org'
+web.config.session_parameters['cookie_domain'] = None
+web.config.session_parameters['timeout'] = 20*86400,
+web.config.session_parameters['ignore_expiry'] = False
+web.config.session_parameters['ignore_change_ip'] = True
+web.config.session_parameters['secret_key'] = '2bdbc71869ec0f268d6be1e'
+web.config.session_parameters['expired_message'] = 'Session expired'
+
+session_db = web.database(dbn="sqlite", db="../db/users.db")
+store = web.session.DBStore(session_db, 'session')
+session = web.session.Session(app, store, 
+                              initializer={'loggedin': False, 
+                                           'username': None,
+                                           'admin': False })
 
 if __name__ == '__main__':
     try:

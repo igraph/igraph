@@ -62,10 +62,22 @@ $def with (page)
 		<a href="$:getbase()/web/feedback" title="Write to us">
 		  Feedback</a>
 	      </li>
+	      $if check_safe(redirect=False) and not check_loggedin():
+	        <li class="page_item">
+		  <a href="$:getbase()/web/login" title="Login">
+		    Login
+		  </a>
+		</li>
 	      $if check_admin(redirect=False):
 	        <li class="page_item">
-		  <a href="$:getbase()/web/admin" title="Make changes">
+		  <a href="$:getbase()/web/admin" title="Admin">
 		    Admin
+		  </a>
+		</li>
+	      $if check_safe(redirect=False) and check_loggedin():
+	        <li class="page_item">
+		  <a href="$:getbase()/web/logout" title="Logout">
+		    Logout
 		  </a>
 		</li>
 	  </ul></div>	 
@@ -115,7 +127,7 @@ $def with (page)
       <div id="colophon">
 	<div id="site-info">
 	  <a href="$:getbase()/" title="Nexus" rel="home">
-	    &copy; 2011 The Nexus team
+	    &copy; 2011-2012 The Nexus team
 	  </a>
 	</div><!-- #site-info -->
       </div><!-- #colophon -->
