@@ -70,6 +70,7 @@ urls = (
     '/web/feedback',                       'Feedback',
     '/web/recreateall/(.+)',               'RecreateAll',
     '/web/recreate/(\d+)',                 'Recreate',
+    '/web/updatefilesize',                 'UpdateFilesize',
     '/web/search',                         'Searchpage',
     '/web/login',                          'Login',
     '/web/logout',                         'Logout',
@@ -156,8 +157,15 @@ def get_available_formats(id, sid=None):
         else:
             ff=os.path.join(datadir, id, filename + "-" + sid + 
                             formatrec.extension)
-        return os.path.isfile(ff) 
-    return dict( (f.name, f) for f in allf if fileexists(f, fname, sid) )
+        if os.path.isfile(ff):
+            return os.path.getsize(ff)
+        else:
+            return 0
+    tests=[ (f, fileexists(f, fname, sid)) for f in allf ]
+    tests=[ f for f in tests if f[1] ]
+    for i in enumerate(tests):
+        tests[i[0]][0].size=tests[i[0]][1]
+    return dict( (f[0].name, f[0]) for f in tests)
 
 def make_link(keys, **extra):
     def ex(k,v):
@@ -268,6 +276,16 @@ def check_safe(redirect=True):
 
     return good
 
+def pretty_size(bytes):
+    if bytes < 10**3:
+        return str(bytes) + ' bytes'
+    elif bytes < 10**6:
+        return str(round(bytes/(10**3.0),1)) + ' Kbytes'
+    elif bytes < 10**9:
+        return str(round(bytes/(10**6.0),1)) + ' Mbytes'
+    else:
+        return str(round(bytes/(10**9.0),1)) + ' Gbytes'
+
 add_form=web.form.Form(
     web.form.Textbox("sid", description="Id:", id="focused", size=formwidth),
     web.form.Textbox("name", description="Name:", size=formwidth),
@@ -337,7 +355,8 @@ tempglob = { 'dataformats': model.get_format_extensions(),
              'makelinks': makelinks,
              'getbase': getbase,
              'check_safe': check_safe,
-             'check_loggedin': check_loggedin }
+             'check_loggedin': check_loggedin,
+             'pretty_size': pretty_size }
 
 for name in url_helper.__all__:
     tempglob[name] = getattr(url_helper, name)
@@ -548,7 +567,8 @@ class Index:
                  vertedges, tags, dataset.date[0:10],
                  dataset.licence_name, dataset.licence_url,
                  dataset.shortdescription.replace("\n", "\n  ").strip(),
-                 desc, ";".join(n for n,v in formats.items()),
+                 desc, ";".join(n+'('+str(v.size)+')' 
+                                for n,v in formats.items()),
                  papers)
         meta="\n".join(format_attr(m) for m in meta)
         if meta != "": meta = "\n" + meta
@@ -742,7 +762,7 @@ URL: %s""" % (format.name, format.shortdesc,
             if not data:
                 return web.notfound()
         else:
-            data=[d for d in model.list_data_formats()]
+            data=[d for d in model.get_formats()]
 
         if format=='html':
             return render.format(data)
@@ -1596,6 +1616,29 @@ class RecreateAll(RecreateBase):
             funcs[format](str(id.id))
             ds=list(model.get_dataset(id.id))[0]
             yield render_plain.recreate(id.id, "'" + ds.name + "'")
+
+def update_filesize(id):
+    formats=model.get_formats()
+    basename=model.get_dataset_filename(id)
+    for f in formats:
+        ext=f.extension
+        filename=os.path.join(datadir, str(id), basename + ext)
+        try:
+            size=os.path.getsize(filename)
+            model.update_filesize(id, f.name, size)
+        except:
+            pass
+    return True
+
+
+class UpdateFilesize:    
+
+    def GET(self, which=None):
+        check_admin()
+        ids=model.get_dataset_ids()
+        st=[ str(id.id) + ' ' + str(update_filesize(id.id)) + '\n' 
+             for id in ids ]
+        return render.common('File sizes updated.\n' + str(st))
 
 def flatten(iterables):
     return (elem for iterable in iterables for elem in iterable)

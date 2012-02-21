@@ -147,7 +147,7 @@ def datatags():
                        ORDER BY count DESC;''')
 
 def get_formats():
-    return db.select('format')
+    return list(db.select('format'))
 
 def get_papers(id):
     return db.query('''SELECT c.citation citation
@@ -189,9 +189,6 @@ def new_dataset_tag(dataset, tag):
 
 def delete_tags(id):
     db.delete('dataset_tag', where='dataset=%s' % websafe(id))    
-
-def list_data_formats():
-    return db.select('format')
 
 def new_licence(**args):
     return db.insert('licence', seqname="id", **args)
@@ -392,3 +389,16 @@ def get_networks(id):
     res=db.select('network', where='dataset=%s' % websafe(str(id)), 
                   order='id')
     return list(res)
+
+def get_sids():
+    res=db.select('dataset', what='id,sid')
+    return list(res)
+
+def update_filesize(id, format, size):
+    try:
+        db.insert('filesize', dataset=int(id), format=websafe(format), 
+                  size=int(size))
+    except:
+        db.update('filesize', where='dataset=%s AND format="%s"' %
+                  (int(id), websafe(format)), size=size)
+    return True

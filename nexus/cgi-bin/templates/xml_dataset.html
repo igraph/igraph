@@ -42,6 +42,6 @@ $def with (ds, tags, meta, formats, papers, networks)
   </papers>
   <formats>
     $for f,fv in formats.items():
-    <format>$f</format>
+    <format><name>$f</name><size>$fv.size</size></format>
   </formats>
 </dataset>

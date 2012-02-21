@@ -84,6 +84,16 @@ CREATE TABLE metadata (
        PRIMARY KEY(dataset, network, type, name),
        FOREIGN KEY(dataset, network) REFERENCES network(dataset, network)
 );
+
+CREATE TABLE filesize (
+       dataset INTEGER,
+       format VARCHAR(20),
+       size INTEGER,
+       PRIMARY KEY(dataset, format),
+       FOREIGN KEY(dataset) REFERENCES dataset(id),
+       FOREIGN KEY(format) REFERENCES format(name)
+);
+
 CREATE TABLE user (
        name TEXT,
        openid TEXT,
@@ -91,6 +101,7 @@ CREATE TABLE user (
        PRIMARY KEY(openid),
        UNIQUE(name)
 );
+
 CREATE TABLE blog (
        id INTEGER,
        date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

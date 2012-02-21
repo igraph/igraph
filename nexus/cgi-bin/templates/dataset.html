@@ -43,7 +43,7 @@ $for k,f in dataformats.items():
   </span>
   $if k in formats.keys():
     <a href="$:getbase()/api/dataset?id=${ds.id}&format=$k">${k} format</a> 
-    &ndash; $formats[k].shortdesc,
+    ($pretty_size(formats[k].size)) &ndash; $formats[k].shortdesc,
     <a href="$:getbase()/api/format?dataformat=$k&format=html">more...</a>
   </li>
   

@@ -77,9 +77,17 @@
 
   <xsd:complexType name="formatsType">
     <xsd:sequence>
-      <xsd:element name="format" type="xsd:string" minOccurs="0"
-		   maxOccurs="unbounded" />
+      <xsd:element name="format" type="formatType" minOccurs="0"
+	maxOccurs="unbounded" />
     </xsd:sequence>
   </xsd:complexType>  
+
+  <xsd:complexType name="formatType">
+    <xsd:sequence>
+      <xsd:element name="name" type="xsd:string" minOccurs="0"
+		   maxOccurs="unbounded" />
+      <xsd:element name="size" type="xsd:nonNegativeInteger" />
+    </xsd:sequence>
+  </xsd:complexType>
 
 </xsd:schema>
