@@ -579,6 +579,9 @@ class Index:
         if not re.match('^[0-9]+$', id):
             id=model.get_id_from_sid(id)
 
+        if id is None:
+            return web.notfound()
+
         format=user_input.format
         dataset=[d for d in model.get_dataset(id)][0]
         if not dataset:
@@ -718,6 +721,9 @@ class Dataset:
                 id=model.get_id_from_sid(sid[0])
                 subid=model.get_netid_from_netsid(sid[1])
 
+        if id is None:
+            return web.notfound()
+
         datafile=model.get_dataset_filename(id)
 
         if not datafile:
@@ -737,7 +743,7 @@ class Dataset:
             return data
         except Exception, x:
 #            print str(x)
-            return web.internalerror()
+            return web.notfound()
 
 class Format:
 
