@@ -1,0 +1,20 @@
+$def with (licences)
+
+<h2>Licence(s)</h2>
+
+$if licences:
+  $for lic in licences:
+    <div class="title"><h3>$lic.name
+	$if openid.status():
+	  <span class="edit">
+	    <a href="$:getbase()/web/editlicence/$lic.id">[edit]</a>
+	  </span>
+    </h3></div>
+    <div class="licence">
+      <p>$lic.text</p>
+      $if lic.fulltext:
+        <h4>Full text</h4>
+        <p>$lic.fulltext</p>
+      $if lic.link:
+        <p><a href="$lic.link">$lic.link</a></p>
+    </div>

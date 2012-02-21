@@ -41,6 +41,7 @@ from igraph.drawing.colors import *
 from igraph.datatypes import *
 from igraph.formula import *
 from igraph.layout import *
+from igraph.nexus import *
 from igraph.statistics import *
 from igraph.summary import *
 from igraph.utils import *
@@ -1637,6 +1638,27 @@ class Graph(GraphBase):
                 result = pickle.load(gzip.GzipFile(mode="rb", fileobj=fname))
         else:
             result = pickle.load(gzip.open(fname, "rb"))
+        return result
+
+    @classmethod
+    def Read_Picklez(klass, fname, *args, **kwds):
+        """Reads a graph from compressed Python pickled format, uncompressing
+        it on-the-fly.
+
+        @param fname: the name of the file or a stream to read from.
+        @return: the created graph object.
+        """
+        import cPickle as pickle
+        if hasattr(fname, "read"):
+            # Probably a file or a file-like object
+            if isinstance(fname, gzip.GzipFile):
+                result = pickle.load(fname)
+            else:
+                result = pickle.load(gzip.GzipFile(mode="rb", fileobj=fname))
+        else:
+            result = pickle.load(gzip.open(fname, "rb"))
+        if not isinstance(result, klass):
+            raise TypeError("unpickled object is not a %s" % klass.__name__)
         return result
 
     # pylint: disable-msg=C0301,C0323

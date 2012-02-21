@@ -27,7 +27,8 @@
                     "vertex.attr.comb"=list(name="concat", "ignore"),
                     "edge.attr.comb"=list(weight="sum", name="concat",
                       "ignore"),
-                     "sparsematrices"=TRUE
+                     "sparsematrices"=TRUE,
+                     "nexus.url"="http://nexus.igraph.org"
                     )
 
 igraph.pars.set.verbose <- function(verbose) {

@@ -1,0 +1,30 @@
+$def with (datasets, tags, length, count, offset, limit, title, networks)
+<?xml version="1.0"?>
+<datasets>
+  <size>$length</size>
+  <totalsize>$count</totalsize>
+  <offset>$offset</offset>
+  <limit>$limit</limit>
+$for ds in datasets:
+  <dataset>
+    <id>$ds.id</id>
+    <sid>$ds.sid</sid>
+    <name>$ds.name</name>
+    <description>$ds.shortdescription</description>
+    <networks>
+      $for net in networks[ds.id]:
+        <network>
+	  <id>$net.id</id>
+          <sid>$net.sid</sid>
+          <vertices>$net.vertices</vertices>
+          <edges>$net.edges</edges>
+	  <description>$net.description</description>
+	</network>
+    </networks>
+    <tags>
+    $for t in tags[ds.id]:
+      <tag>$t.tag</tag>
+    </tags>
+    <date>${ds.date[0:10]}</date>
+  </dataset>
+</datasets>

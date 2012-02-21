@@ -1,6 +1,7 @@
 """Utility functions that cannot be categorised anywhere else"""
 
 from contextlib import contextmanager
+from collections import Mapping, MutableMapping
 from itertools import chain
 
 import os
@@ -8,7 +9,7 @@ import tempfile
 
 __license__ = "GPL"
 
-__all__ = ["rescale", "safemin", "safemax"]
+__all__ = ["multidict", "rescale", "safemin", "safemax"]
 __docformat__ = "restructuredtext en"
 
 @contextmanager
@@ -170,6 +171,133 @@ def consecutive_pairs(iterable, circular=False):
             yield item, first
         except UnboundLocalError:
             yield first, first
+
+class multidict(MutableMapping):
+    """A dictionary-like object that is customized to deal with multiple
+    values for the same key.
+
+    Each value in this dictionary will be a list. Methods which emulate
+    the methods of a standard Python `dict` object will return or manipulate
+    the first items of the lists only. Special methods are provided to
+    deal with keys having multiple values.
+    """
+
+    def __init__(self, *args, **kwds):
+        self._dict = {}
+        if len(args) > 1:
+            raise ValueError("%r expected at most 1 argument, got %d" % \
+                    (self.__class__.__name__, len(args)))
+        if args:
+            args = args[0]
+            self.update(args)
+        self.update(kwds)
+
+    def __contains__(self, key):
+        """Returns whether there are any items associated to the given `key`."""
+        try:
+            return len(self._dict[key]) > 0
+        except KeyError:
+            return False
+
+    def __delitem__(self, key):
+        """Removes all the items associated to the given `key`."""
+        del self._dict[key]
+
+    def __getitem__(self, key):
+        """Returns an arbitrary item associated to the given key. Raises ``KeyError``
+        if no such key exists.
+
+        Example:
+
+            >>> d = multidict([("spam", "eggs"), ("spam", "bacon")])
+            >>> d["spam"]
+            'eggs'
+        """
+        try:
+            return self._dict[key][0]
+        except IndexError:
+            raise KeyError(key)
+
+    def __iter__(self):
+        """Iterates over the keys of the multidict."""
+        return iter(self._dict)
+
+    def __len__(self):
+        """Returns the number of distinct keys in this multidict."""
+        return len(self._dict)
+
+    def __setitem__(self, key, value):
+        """Sets the item associated to the given `key`. Any values associated to the
+        key will be erased and replaced by `value`.
+        
+        Example:
+
+           >>> d = multidict([("spam", "eggs"), ("spam", "bacon")])
+           >>> d["spam"] = "ham"
+           >>> d["spam"]
+           'ham'
+        """
+        self._dict[key] = [value]
+
+    def add(self, key, value):
+        """Adds `value` to the list of items associated to `key`.
+
+        Example:
+
+            >>> d = multidict()
+            >>> d.add("spam", "ham")
+            >>> d["spam"]
+            'ham'
+            >>> d.add("spam", "eggs")
+            >>> d.getlist("spam")
+            ['ham', 'eggs']
+        """
+        try:
+            self._dict[key].append(value)
+        except KeyError:
+            self._dict[key] = [value]
+
+    def clear(self):
+        """Removes all the items from the multidict."""
+        self._dict.clear()
+
+    def get(self, key, default=None):
+        """Returns an arbitrary item associated to the given `key`. If `key`
+        does not exist or has zero associated items, `default` will be
+        returned."""
+        try:
+            items = self._dict[key]
+            return items[0]
+        except (KeyError, IndexError):
+            return default
+
+    def getlist(self, key):
+        """Returns the list of values for the given `key`. An empty list will
+        be returned if there is no such key."""
+        try:
+            return self._dict[key]
+        except KeyError:
+            return []
+
+    def iterlists(self):
+        """Iterates over ``(key, values)`` pairs where `values` is the list
+        of values associated with `key`."""
+        return self._dict.iteritems()
+
+    def lists(self):
+        """Returns a list of ``(key, values)`` pairs where `values` is the list
+        of values associated with `key`."""
+        return self._dict.items()
+
+    def update(self, arg, **kwds):
+        if hasattr(arg, "keys") and callable(arg.keys):
+            for key in arg.keys():
+                self.add(key, arg[key])
+        else:
+            for key, value in arg:
+                self.add(key, value)
+        for key, value in kwds.iteritems():
+            self.add(key, value)
 
 def safemax(iterable, default=0):
     """Safer variant of C{max()} that returns a default value if the iterable

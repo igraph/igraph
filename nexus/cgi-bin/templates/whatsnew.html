@@ -1,0 +1,8 @@
+$def with (what)
+
+<ul class="whatsnew">
+$for t in what:
+  <li><h4>$:link_to_dataset(getbase(), t)</h4>
+    <p class="wndate">$t.date</p>
+    $:mymarkdown(t.shortdescription, 2)</li>
+</ul>

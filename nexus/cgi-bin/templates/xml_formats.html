@@ -1,0 +1,11 @@
+$def with (formats)
+<?xml version="1.0"?>
+<dataformats>
+$for ds in formats:
+  <dataformat>
+    <name>$ds.name</name>
+    <shortdescription>$ds.shortdesc</shortdescription>
+    <description>$ds.description</description>
+    <url>$ds.link</url>
+  </dataformat>
+</dataformats>
