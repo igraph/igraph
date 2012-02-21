@@ -1,0 +1,99 @@
+$def with (form, post, edit, id, netforms=[], metaforms=[])
+
+<script type="text/javascript">
+
+  function addOneNet(no) {
+      html='$:add_net_form("XXX").render().replace("\n", " ")';
+      html=html.replace(/XXX/g, no);
+      return html;
+  }
+  
+  function delNet(no) {
+      div=document.getElementById("net" + no);
+      removeElement(div);
+      return false;
+  }
+
+  function addNet() {
+      if (typeof addNet.netno == 'undefined') {
+	  addNet.netno = 0;
+      }
+      addNet.netno += 1;
+      netdiv=document.getElementById("networks");
+      newtab=document.createElement('div');
+      newtab.id = 'net' + addNet.netno;
+      newtab.innerHTML = addOneNet(addNet.netno);
+      netdiv.appendChild(newtab);
+      return false;
+  }
+
+  function addOneMeta(no) {
+      html='$:add_meta_form("XXX").render().replace("\n", " ")';
+      html=html.replace(/XXX/g, no);
+      return html;
+  }
+  
+  function delMeta(no) {
+      div=document.getElementById("meta" + no);
+      removeElement(div);
+      return false;
+  }
+
+  function addMeta() {
+      if (typeof addMeta.metano == 'undefined') {
+	  addMeta.metano = 0;
+      }
+      addMeta.metano += 1;
+      metadiv=document.getElementById("meta");
+      newtab=document.createElement('div');
+      newtab.id = 'meta' + addMeta.metano;
+      newtab.innerHTML = addOneMeta(addMeta.metano);
+      metadiv.appendChild(newtab);
+      return false;
+  }
+
+  function removeElement(node) {
+      node.parentNode.removeChild(node);
+  }
+
+</script>
+
+$if edit:
+  <h2>Editing a dataset</h2>
+$else:
+  <h2>Add new dataset</h2>
+
+$if post and edit:
+  <p>Thank you for the update. You can look at this dataset
+  $:link_to_dataset_id(getbase(), id, "here").</p>
+$elif post:
+  <p>Thank you for the addition. You can look at this dataset
+  $:link_to_dataset_id(getbase(), id, "here").</p>
+$else:
+  <p>
+    <form action="" method="post" class="donateform" name="form">
+      <h4>Data set properties</h4>
+      $:form.render()
+      <hr/>
+      <h4>Networks</h4>
+      <div id="networks">
+	$for f in netforms:
+          $:f.render()
+      </div>
+      <p><button id="addnet" onClick="addNet(); return false;">
+	  Add network</button></p>
+      <hr/>
+      <h4>Attributes</h4>
+      <div id="meta">
+      $for f in metaforms:
+        $:f.render()
+      </div>
+      <p><button id="addmeta" onClick="addMeta(); return false;">
+	  Add attribute</button></p>
+      <hr/>
+      <button id="Add">Add/update data set</button>
+    </form>
+    <script type="text/javascript">
+      document.form.focused.focus();
+    </script>
+  </p>

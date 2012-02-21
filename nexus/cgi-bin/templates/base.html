@@ -1,0 +1,139 @@
+$def with (page)
+
+<html>
+<head>
+    $if page.has_key('title'):
+        <title>$page.title</title>
+    $else:
+        <title>Nexus</title>
+    <link rel="stylesheet" href="$:getbase()/static/general.css" 
+	  type="text/css"/>
+    <link rel="icon" type="image/png" 
+	  href="$:getbase()/static/nexus_logo_black_small.png" />
+</head>
+<body class="home">
+  <div id="wrapper" class="hfeed">
+    <div id="header">
+      <div id="masthead">
+	<div id="branding" role="banner">
+	  <h1 id="site-title">
+	    <span>	      
+	      <a href="$:getbase()/" title="Nexus" rel="home">Nexus</a>
+	    </span>
+	  </h1>
+	  <div id="site-description">THE NETWORK REPOSITORY</div>
+	  <div id="site-motto">$:get_motto()</div>
+	</div><!-- #branding -->
+	<div id="access" role="navigation">
+	  <div class="skip-link screen-reader-text">
+	    <a href="#content" title="Skip to content">
+	      Skip to content
+	    </a>
+	  </div>
+	  <div class="menu"><ul>
+	      <!-- <li class="page_item"> -->
+	      <!-- 	<a href="$:getbase()/web/search" title="Search">Search</a> -->
+	      <!-- </li> -->
+	      <li class="page_item">
+		<a href="$:getbase()/api/dataset_info" 
+		   title="Browse data sets">Browse
+		</a>
+	      </li>
+	      <!-- <li class="page_item"> -->
+	      <!-- 	<a href="$:getbase()/advanced" title="Advanced search"> -->
+	      <!-- 	Advanced search</a> -->
+	      <!-- </li> -->
+	      <li class="page_item">
+		<a href="$:getbase()/web/donate" title="Help Nexus">
+		  Donate data</a>
+	      </li>
+	      <li class="page_item">
+	      	<a href="$:getbase()/web/blog" 
+		   title="What are we working on?">Blog</a>
+	      </li>
+	      <!-- <li class="page_item"> -->
+	      <!-- 	<a href="$:getbase()/about" title="What is Nexus?">About</a> -->
+	      <!-- </li> -->
+	      <li class="page_item">
+		<a href="$:getbase()/web/docs" title="The Nexus API">
+		  Documentation</a>
+	      </li>
+	      <li class="page_item">
+		<a href="$:getbase()/web/feedback" title="Write to us">
+		  Feedback</a>
+	      </li>
+	      $if check_safe(redirect=False) and not check_loggedin():
+	        <li class="page_item">
+		  <a href="$:getbase()/web/login" title="Login">
+		    Login
+		  </a>
+		</li>
+	      $if check_admin(redirect=False):
+	        <li class="page_item">
+		  <a href="$:getbase()/web/admin" title="Admin">
+		    Admin
+		  </a>
+		</li>
+	      $if check_safe(redirect=False) and check_loggedin():
+	        <li class="page_item">
+		  <a href="$:getbase()/web/logout" title="Logout">
+		    Logout
+		  </a>
+		</li>
+	  </ul></div>	 
+	</div><!-- #access -->
+      </div><!-- #masthead -->
+    </div><!-- #header -->
+    
+    <div id="main">
+      <div id="container">
+	<div id="content" role="main">
+	  <div id="post-34" class="post-34 page type-page hentry">
+		$:page
+	    </div><!-- entry-content -->
+	  </div><!-- post-34 -->
+	</div><!-- content -->
+	<div class="search" id="search">
+	    <div class="title">
+	      <h2>Search Nexus</h2>
+	    </div>
+	    <form action="$:getbase()/api/search" method="get"
+		  id="searchform">
+	      <input type="text" name="q" size="31" 
+		     $if page.has_key('searchvalue'):
+		       value="$page['searchvalue']"
+		     />
+	      <button id="Go">Go</button>
+	    </form>
+	</div>
+      <div id="secondary" class="widget-area" role="complementary">
+	<div class="feed">
+	  <a href="$:getbase()/api/dataset_info?format=atom">
+	    <img src="$:getbase()/static/images/feed-icon-14x14.png" />
+	  </a>
+	</div>
+	<div class="title">
+	  <h2> What's new? </h2>
+	</div>
+	<div class="whatsnew">
+	  $:get_whatsnew()
+	</div>
+      </div><!-- #secondary .widget-area -->
+      <div id="tertiary" class="widget-area" role="complementary">
+	<h2> Data tags </h2>
+	$:get_datatags()
+      </div>
+    </div><!-- main -->
+    <div id="footer" role="contentinfo">
+      <div id="colophon">
+	<div id="site-info">
+	  <a href="$:getbase()/" title="Nexus" rel="home">
+	    &copy; 2011-2012 The Nexus team
+	  </a>
+	</div><!-- #site-info -->
+      </div><!-- #colophon -->
+    </div><!-- #footer -->
+  </div><!-- wrapper -->
+
+</body>
+</html>

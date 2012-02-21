@@ -1,0 +1,13 @@
+$def with (formats)
+
+$if formats:
+  $for data in formats:
+    <h2>$data.name data format</h2>
+    <p>$data.shortdesc</p>
+    <h3>Description</h3>
+    <p>$data.description</p>
+    <h3>More information</h3>
+    <p><a href="$data.link">$data.link</a></p>
+$else:
+  <p>Unknown data format.</p>
+

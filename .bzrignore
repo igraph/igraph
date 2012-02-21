@@ -448,3 +448,8 @@ interfaces/R/igraph/tests/walktrap.community.Rout
 interfaces/R/igraph/tests/watts.strogatz.game.Rout
 interfaces/R/igraph/tests/startup.Rs
 examples/simple/igraph_community_infomap.c.xml
+nexus/cgi-bin/.openid_secret_key
+nexus/sessions/*
+nexus/config/emailpass
+nexus/config/Rscript
+nexus/data/*

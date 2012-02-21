@@ -1,0 +1,24 @@
+$def with (form, id, added, edit)
+
+$if edit and not added:
+  <h3>Editing blog entry</h3>
+  <form action="" method="post" class="donateform" name="form">
+    $:form.render()
+  </form>
+
+$if not edit and not added:
+  <h3>Add new blog entry</h3>
+  <form action="" method="post" class="donateform" name="form">
+    $:form.render()
+  </form>
+
+$if edit and added:
+  <p>Thank you for your edit, you can look at this blog entry
+    <a href="$:getbase()/web/blog?id=$id&admin=true">here</a>.
+  </p>
+
+$if not edit and added:
+  <p>Thank you for your blog entry, you can look at it 
+    <a href="$:getbase()/web/blog?id=$id&admin=true">here</a>.
+  </p>
+

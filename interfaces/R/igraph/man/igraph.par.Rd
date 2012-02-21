@@ -45,12 +45,17 @@ igraph.par(parid, parvalue = NULL)
       attributes if the graph is modified. The default value is
       \code{list(weight="sum", name="concat", "ignore")}. See
       \code{\link{attribute.combination}} for details on this.}
+    \item{nexus.url}{The base URL of the default Nexus server. See
+      \code{\link{nexus}} for details.}
     \item{print.edge.attributes:}{Logical constant, whether to print edge
       attributes when printing graphs. Defaults to \code{FALSE}.}
     \item{print.graph.attributes:}{Logical constant, whether to print
       graph attributes when printing graphs. Defaults to \code{FALSE}.}
     \item{print.vertex.attriubutes:}{Logical constant, whether to print
       vertex attributes when printing graphs. Defaults to \code{FALSE}.}
+    \item{sparsematrices}{Whether to use the \code{Matrix} package for
+      (sparse) matrices. It is recommended, if the user works with
+      larger graphs.}
     \item{verbose:}{Logical constant, whether igraph functions should
       talk more than minimal. Eg. if \code{TRUE} thne some functions
       will use progress bars while computing. Defaults to \code{FALSE}.}
@@ -58,9 +63,6 @@ igraph.par(parid, parvalue = NULL)
       attributes if the graph is modified. The default value is
       \code{list(name="concat", "ignore")} See
       \code{\link{attribute.combination}} for details on this.}
-    \item{sparsematrices}{Whether to use the \code{Matrix} package for
-      (sparse) matrices. It is recommended, if the user works with
-      larger graphs.}
   }
 }
 \value{

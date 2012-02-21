@@ -1,0 +1,20 @@
+$def with (licences)
+<?xml version="1.0"?>
+<licences>
+$for lic in licences:
+  <licence>
+    <id>$lic.id</id>
+    <name>$lic.name</name>
+    <shortdescription>
+      $lic.text
+    </shortdescription>
+    <url>
+      $lic.link
+    </url>
+  $if lic.fulltext:
+    <text>
+      $lic.fulltext
+    </text>
+  </licence>
+</licences>
+
