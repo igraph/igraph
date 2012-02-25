@@ -507,8 +507,6 @@ graph.data.frame <- function(d, directed=TRUE, vertices=NULL) {
       stop("Some vertex names in edge list are not listed in vertex data frame")
     }
   }
-  ids <- seq(along=names)
-  names(ids) <- names
     
   # create graph
   g <- graph.empty(n=0, directed=directed)
@@ -528,12 +526,12 @@ graph.data.frame <- function(d, directed=TRUE, vertices=NULL) {
   }
 
   # add vertices
-  g <- add.vertices(g, length(ids), attr=attrs)
+  g <- add.vertices(g, length(names), attr=attrs)
     
   # create edge list
   from <- as.character(d[,1])
   to <- as.character(d[,2])
-  edges <- t(matrix(c(ids[from], ids[to]), nc=2))
+  edges <- rbind(match(from, names), match(to,names))
   
   # edge attributes
   attrs <- list()
