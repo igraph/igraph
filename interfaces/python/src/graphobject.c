@@ -4402,6 +4402,59 @@ PyObject *igraphmodule_Graph_linegraph(igraphmodule_GraphObject * self) {
 
 /**
  * \ingroup python_interface_graph
+ * \brief Returns the k-neighborhood of some vertices in the
+ *   graph.
+ * \sa igraph_neighborhood
+ */
+PyObject *igraphmodule_Graph_neighborhood(igraphmodule_GraphObject *self,
+    PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = { "vertices", "order", "mode", NULL };
+  PyObject *vobj = Py_None;
+  PyObject *mode_o = 0;
+  PyObject *result;
+  long int order = 1;
+  igraph_neimode_t mode = IGRAPH_ALL;
+  igraph_bool_t return_single = 0;
+  igraph_vs_t vs;
+  igraph_vector_ptr_t res;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OlO", kwlist,
+        &vobj, &order, &mode_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &self->g, &return_single, 0)) {
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (igraph_vector_ptr_init(&res, 0)) {
+    igraph_vs_destroy(&vs);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (igraph_neighborhood(&self->g, &res, vs, order, mode)) {
+    igraph_vs_destroy(&vs);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  igraph_vs_destroy(&vs);
+
+  if (!return_single)
+    result = igraphmodule_vector_ptr_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
+  else
+    result = igraphmodule_vector_t_to_PyList((igraph_vector_t*)&VECTOR(res)[0],
+        IGRAPHMODULE_TYPE_INT);
+
+  IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&res, igraph_vector_destroy);
+  igraph_vector_ptr_destroy_all(&res);
+
+  return result;
+}
+
+/**
+ * \ingroup python_interface_graph
  * \brief Returns the size of the k-neighborhood of some vertices in the
  *   graph.
  * \sa igraph_neighborhood_size
@@ -5488,6 +5541,39 @@ PyObject *igraphmodule_Graph_dyad_census(igraphmodule_GraphObject *self) {
   return list;
 }
 
+typedef struct {
+  PyObject* func;
+  PyObject* graph;
+} igraphmodule_i_Graph_motifs_randesu_callback_data_t;
+
+igraph_bool_t igraphmodule_i_Graph_motifs_randesu_callback(const igraph_t *graph,
+    igraph_vector_t *vids, int isoclass, void* extra) {
+  igraphmodule_i_Graph_motifs_randesu_callback_data_t* data =
+    (igraphmodule_i_Graph_motifs_randesu_callback_data_t*)extra;
+  PyObject* vector;
+  PyObject* result;
+  igraph_bool_t retval;
+
+  vector = igraphmodule_vector_t_to_PyList(vids, IGRAPHMODULE_TYPE_INT);
+  if (vector == NULL) {
+    /* Error in conversion, return 1 */
+    return 1;
+  }
+
+  result = PyObject_CallFunction(data->func, "OOi", data->graph, vector, isoclass);
+  Py_DECREF(vector);
+
+  if (result == NULL) {
+    /* Error in callback, return 1 */
+    return 1;
+  }
+
+  retval = PyObject_IsTrue(result);
+  Py_DECREF(result);
+
+  return retval;
+}
+
 /** \ingroup python_interface_graph
  * \brief Counts the motifs of the graph sorted by isomorphism classes 
  * \return the number of motifs found for each isomorphism class
@@ -5498,40 +5584,61 @@ PyObject *igraphmodule_Graph_motifs_randesu(igraphmodule_GraphObject *self,
   igraph_vector_t result, cut_prob;
   long size=3;
   PyObject* cut_prob_list=Py_None;
+  PyObject* callback=Py_None;
   PyObject *list;
-  static char* kwlist[] = {"size", "cut_prob", NULL};
+  static char* kwlist[] = {"size", "cut_prob", "callback", NULL};
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lO", kwlist, &size, &cut_prob_list))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lOO", kwlist, &size,
+        &cut_prob_list, &callback))
     return NULL;
 
-  if (igraph_vector_init(&result, 1)) {
-    return igraphmodule_handle_igraph_error();
-  }
   if (cut_prob_list == Py_None) {
     if (igraph_vector_init(&cut_prob, size)) {
       return igraphmodule_handle_igraph_error();
     }
     igraph_vector_fill(&cut_prob, 0);
   } else {
-    if (igraphmodule_PyObject_float_to_vector_t(cut_prob_list, &cut_prob)) {
+    if (igraphmodule_PyObject_float_to_vector_t(cut_prob_list, &cut_prob))
+      return NULL;
+  }
+
+  if (callback == Py_None) {
+    if (igraph_vector_init(&result, 1)) {
+      igraph_vector_destroy(&cut_prob);
+      return igraphmodule_handle_igraph_error();
+    }
+    if (igraph_motifs_randesu(&self->g, &result, size, &cut_prob)) {
+      igraphmodule_handle_igraph_error();
       igraph_vector_destroy(&result);
+      igraph_vector_destroy(&cut_prob);
       return NULL;
     }
-  }
-  if (igraph_motifs_randesu(&self->g, &result, size, &cut_prob)) {
-    igraphmodule_handle_igraph_error();
-    igraph_vector_destroy(&result);
     igraph_vector_destroy(&cut_prob);
+
+    list = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
+    igraph_vector_destroy(&result);
+
+    return list;
+  } else if (PyCallable_Check(callback)) {
+    igraphmodule_i_Graph_motifs_randesu_callback_data_t data;
+    data.graph = (PyObject*)self;
+    data.func = callback;
+    if (igraph_motifs_randesu_callback(&self->g, size, &cut_prob,
+          igraphmodule_i_Graph_motifs_randesu_callback, &data)) {
+      igraphmodule_handle_igraph_error();
+      igraph_vector_destroy(&cut_prob);
+      return NULL;
+    }
+    igraph_vector_destroy(&cut_prob);
+    /* Don't let exceptions from the callback function go unnoticed */
+    if (PyErr_Occurred())
+      return NULL;
+    Py_RETURN_NONE;
+  } else {
+    PyErr_SetString(PyExc_TypeError, "callback must be callable or None");
     return NULL;
   }
-  igraph_vector_destroy(&cut_prob);
-
-  list = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
-  igraph_vector_destroy(&result);
-
-  return list;
 }
-
 
 /** \ingroup python_interface_graph
  * \brief Counts the total number of motifs of the graph
@@ -11714,6 +11821,27 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  them).\n"
    "@param loops: whether self-loops should be counted.\n"},
 
+  /* interface to igraph_neighborhood */
+  {"neighborhood", (PyCFunction) igraphmodule_Graph_neighborhood,
+   METH_VARARGS | METH_KEYWORDS,
+   "neighborhood(vertices=None, order=1, mode=ALL)\n\n"
+   "For each vertex specified by I{vertices}, returns the\n"
+   "vertices reachable from that vertex in at most I{order} steps.\n\n"
+   "@param vertices: a single vertex ID or a list of vertex IDs, or\n"
+   "  C{None} meaning all the vertices in the graph.\n"
+   "@param mode: specifies how to take into account the direction of\n"
+   "  the edges if a directed graph is analyzed. C{\"out\"} means that\n"
+   "  only the outgoing edges are followed, so all vertices reachable\n"
+   "  from the source vertex in at most I{order} steps are counted.\n"
+   "  C{\"in\"} means that only the incoming edges are followed (in\n"
+   "  reverse direction of course), so all vertices from which the source\n"
+   "  vertex is reachable in at most I{order} steps are counted. C{\"all\"}\n"
+   "  treats directed edges as undirected.\n"
+   "@return: a single list specifying the neighborhood if I{vertices}\n"
+   "  was an integer specifying a single vertex index, or a list of lists\n"
+   "  if I{vertices} was a list or C{None}.\n"
+  },
+
   /* interface to igraph_neighborhood_size */
   {"neighborhood_size", (PyCFunction) igraphmodule_Graph_neighborhood_size,
    METH_VARARGS | METH_KEYWORDS,
@@ -12235,7 +12363,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /******************/
   {"motifs_randesu", (PyCFunction) igraphmodule_Graph_motifs_randesu,
    METH_VARARGS | METH_KEYWORDS,
-   "motifs_randesu(size=3, cut_prob=None)\n\n"
+   "motifs_randesu(size=3, cut_prob=None, callback=None)\n\n"
    "Counts the number of motifs in the graph\n\n"
    "Motifs are small subgraphs of a given structure in a graph. It is\n"
    "argued that the motif profile (ie. the number of different motifs in\n"
@@ -12256,6 +12384,11 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param cut_prob: the cut probabilities for different levels of the search\n"
    "  tree. This must be a list of length I{size} or C{None} to find all\n"
    "  motifs.\n"
+   "@param callback: C{None} or a callable that will be called for every motif\n"
+   "  found in the graph. The callable must accept three parameters: the graph\n"
+   "  itself, the list of vertices in the motif and the isomorphy class of the\n"
+   "  motif (see L{Graph.isoclass()}).\n"
+   "@return: the list of motifs if I{callback} is C{None}, or C{None} otherwise\n"
    "@see: Graph.motifs_randesu_no()\n"
   },
   {"motifs_randesu_no", (PyCFunction) igraphmodule_Graph_motifs_randesu_no,

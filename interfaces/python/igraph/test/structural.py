@@ -318,6 +318,23 @@ class CentralityTests(unittest.TestCase):
         self.assertEquals(g.coreness("A"), [3,3,3,3,1,1,1,1])
 
 
+class NeighborhoodTests(unittest.TestCase):
+    def testNeighborhood(self):
+        g = Graph.Ring(10, circular=False)
+        self.failUnless(map(sorted, g.neighborhood()) == \
+                [[0,1], [0,1,2], [1,2,3], [2,3,4], [3,4,5], [4,5,6], \
+                    [5,6,7], [6,7,8], [7,8,9], [8,9]])
+        self.failUnless(map(sorted, g.neighborhood(order=3)) == \
+                [[0,1,2,3], [0,1,2,3,4], [0,1,2,3,4,5], [0,1,2,3,4,5,6], \
+                    [1,2,3,4,5,6,7], [2,3,4,5,6,7,8], [3,4,5,6,7,8,9], \
+                    [4,5,6,7,8,9], [5,6,7,8,9], [6,7,8,9]])
+
+    def testNeighborhoodSize(self):
+        g = Graph.Ring(10, circular=False)
+        self.failUnless(g.neighborhood_size() == [2,3,3,3,3,3,3,3,3,2])
+        self.failUnless(g.neighborhood_size(order=3) == [4,5,6,7,7,7,7,6,5,4])
+
+
 class MiscTests(unittest.TestCase):
     def testConstraint(self):
         g = Graph(4, [(0, 1), (0, 2), (1, 2), (0, 3), (1, 3)])
@@ -456,6 +473,7 @@ def suite():
     local_transitivity_suite = unittest.makeSuite(LocalTransitivityTests)
     biconnected_suite = unittest.makeSuite(BiconnectedComponentTests)
     centrality_suite = unittest.makeSuite(CentralityTests)
+    neighborhood_suite = unittest.makeSuite(NeighborhoodTests)
     path_suite = unittest.makeSuite(PathTests)
     misc_suite = unittest.makeSuite(MiscTests)
     return unittest.TestSuite([simple_suite,
@@ -463,6 +481,7 @@ def suite():
                                local_transitivity_suite,
                                biconnected_suite,
                                centrality_suite,
+                               neighborhood_suite,
                                path_suite,
                                misc_suite])
 

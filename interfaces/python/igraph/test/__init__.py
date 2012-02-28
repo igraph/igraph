@@ -44,5 +44,5 @@ def run_tests(verbosity=1):
 run_tests.__test__ = False
 
 if __name__ == "__main__":
-    run_tests()
+    run_tests(255)
 
