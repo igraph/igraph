@@ -12387,7 +12387,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param callback: C{None} or a callable that will be called for every motif\n"
    "  found in the graph. The callable must accept three parameters: the graph\n"
    "  itself, the list of vertices in the motif and the isomorphy class of the\n"
-   "  motif (see L{Graph.isoclass()}).\n"
+   "  motif (see L{Graph.isoclass()}). The search will stop when the callback\n"
+   "  returns an object with a non-zero truth value or raises an exception.\n"
    "@return: the list of motifs if I{callback} is C{None}, or C{None} otherwise\n"
    "@see: Graph.motifs_randesu_no()\n"
   },
