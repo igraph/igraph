@@ -1112,7 +1112,7 @@ int igraph_edges(const igraph_t *graph, igraph_es_t eids,
  * \param directed Logical constant, whether to search for directed
  *        edges in a directed graph. Ignored for undirected graphs.
  * \param error Logical scalar, whether to report an error if the edge 
- *        was not found. If it is false, then -1 is reported.
+ *        was not found. If it is false, then -1 will be assigned to \p eid.
  * \return Error code. 
  * \sa \ref igraph_edge() for the opposite operation.
  * 
