@@ -364,7 +364,7 @@ void Greedy::apply(bool sort) {
   //nodeInMode[id_in_mod_tbl] = id_when_no_empty_node
   
   // Calculate outflow of links to different modules
-  map<int,double> outFlowNtoM[Nmod];
+  vector<map<int,double> > outFlowNtoM(Nmod);
   map<int,double>::iterator it_M;
   
   for (int i=0;i<Nnode;i++) {
@@ -391,8 +391,7 @@ void Greedy::apply(bool sort) {
   
   // Create outLinks at new level
   for (int i=0;i<Nmod;i++) {
-    for (it_M = outFlowNtoM[i].begin(); 
-	 it_M != outFlowNtoM[i].end(); it_M++) {
+    for (it_M = outFlowNtoM[i].begin(); it_M != outFlowNtoM[i].end(); it_M++) {
       if (it_M->first != i) {
 	node_tmp[i]->outLinks.push_back(make_pair(it_M->first,it_M->second));
       }
@@ -400,7 +399,7 @@ void Greedy::apply(bool sort) {
   }
 
   // Calculate inflow of links from different modules
-  map<int,double> inFlowNtoM[Nmod];
+  vector<map<int,double> > inFlowNtoM(Nmod);
   
   for (int i=0;i<Nnode;i++) {
     int i_M = nodeInMod[node_index[i]];
