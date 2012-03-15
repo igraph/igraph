@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Tamas Nepusz <ntamas@gmail.com>
 Build-Depends: debhelper (>= 7), libtool, libxml2-dev, libgmp3-dev, libarpack2-dev,
  libblas-dev, liblapack-dev, libglpk-dev, automake, flex, bison,
- source-highlight, docbook2x
+ source-highlight, docbook2x, libxml2-utils
 Standards-Version: 3.8.3
 Homepage: http://igraph.sourceforge.net
 
