@@ -49,7 +49,7 @@ graph.cohesion(graph, checks=TRUE)
   is a set of directed paths between them whose vertices do not contain common
   vertices (apart from \code{source} and \code{target}). The maximum number of
   vertex disjoint paths between two vertices is the same as their vertex
-  connectivity. 
+  connectivity in most cases (if the two vertices are not connected by an edge).
 
   The cohesion of a graph (as defined by White and Harary, see
   references), is the vertex connectivity of the graph. This is
