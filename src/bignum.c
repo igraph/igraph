@@ -22,6 +22,7 @@
 #include <math.h>
 #include "bignum.h"
 #include "config.h"
+#include "math.h"
 
 #ifndef	ASM_X86
 #ifdef	X86

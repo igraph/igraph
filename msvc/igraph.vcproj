@@ -834,7 +834,7 @@
 				RelativePath=".\src\drl_Node.h">
 			</File>
 			<File
-				elativePath=".\src\drl_Node_3d.h">
+				RelativePath=".\src\drl_Node_3d.h">
 			</File>
 			<File
 				RelativePath=".\src\drl_parse.h">

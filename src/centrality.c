@@ -52,11 +52,12 @@ igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector) {
    * negate the eigenvector.
    */
   long int i, n = igraph_vector_size(vector);
+  igraph_real_t mi, ma;
 
   if (n == 0)
     return 0;
 
-  igraph_real_t mi = VECTOR(*vector)[0], ma = VECTOR(*vector)[0];
+  mi = ma = VECTOR(*vector)[0];
   for (i = 1; i < n; i++) {
     if (VECTOR(*vector)[i] < mi)
       mi = VECTOR(*vector)[i];
