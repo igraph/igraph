@@ -27,20 +27,22 @@ int main() {
 
   const int nodes=10;
   igraph_t g;
-  igraph_matrix_t V;
+  igraph_matrix_t V, V3;
   igraph_matrix_complex_t V2;
   igraph_sparsemat_t stochastic, stochasticT;
   igraph_vector_t groups;
   igraph_eigen_which_t which;
-  igraph_vector_t p;
+  igraph_vector_t p, selcol;
 
   igraph_tree(&g, nodes, /* children= */ 3, IGRAPH_TREE_UNDIRECTED);
 
   igraph_sparsemat_init(&stochastic, nodes, nodes, igraph_ecount(&g)*2);
   igraph_matrix_complex_init(&V2, 0, 0);
   igraph_matrix_init(&V, 0, 0);
+  igraph_matrix_init(&V3, 0, 0);
   igraph_vector_init(&groups, 0);
   igraph_vector_init(&p, 0);
+  igraph_vector_init(&selcol, 1);  
   
   igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -51,7 +53,7 @@ int main() {
   which.howmany=1;
 
   igraph_eigen_matrix(/*matrix=*/ 0, &stochasticT, /*fun=*/ 0, 
-		      /*extra=*/ 0, /*algorithm=*/ IGRAPH_EIGEN_LAPACK,
+		      /*extra=*/ 0, /*1algorithm=*/ IGRAPH_EIGEN_LAPACK,
 		      &which, /*options=*/ 0, /*values=*/ 0, &V2);
   igraph_matrix_complex_real(&V2, &V);
 
@@ -59,10 +61,13 @@ int main() {
   igraph_matrix_get_col(&V, &p, 0);
   igraph_vector_print(&p);
 
+  which.howmany=3;
   igraph_eigen_matrix(/*matrix=*/ 0, &stochastic, /*fun=*/ 0,
 		      /*extra=*/ 0, /*algorithm=*/ IGRAPH_EIGEN_LAPACK,
 		      &which, /*options=*/ 0, /*values=*/ 0, &V2);
-  igraph_matrix_complex_real(&V2, &V);
+  igraph_matrix_complex_real(&V2, &V3);
+  VECTOR(selcol)[0]=2;
+  igraph_matrix_select_cols(&V3, &V, &selcol);
 
   /* ------------ */
   
@@ -95,8 +100,10 @@ int main() {
   /* ------------ */  
 
   igraph_vector_destroy(&p);
+  igraph_vector_destroy(&selcol);
   igraph_vector_destroy(&groups);
   igraph_matrix_destroy(&V);
+  igraph_matrix_destroy(&V3);
   igraph_matrix_complex_destroy(&V2);
   igraph_sparsemat_destroy(&stochasticT);
   igraph_sparsemat_destroy(&stochastic);
