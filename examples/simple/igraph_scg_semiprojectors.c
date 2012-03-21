@@ -49,7 +49,8 @@ int main() {
   igraph_eigen_matrix_symmetric(&adj, /*sparsemat=*/ 0, /*fun=*/ 0, 
 				/*extra=*/ 0, 
 				/*algorithm=*/ IGRAPH_EIGEN_LAPACK,
-				&which, /*options=*/ 0, /*values=*/ 0, &V);
+				&which, /*options=*/ 0, /*storage=*/ 0, 
+				/*values=*/ 0, &V);
 
 #define SEMI()								\
   do {									\

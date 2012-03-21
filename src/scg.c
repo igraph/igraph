@@ -1525,7 +1525,8 @@ int igraph_scg_adjacency(const igraph_t *graph,
 					       use_arpack ? 
 					       IGRAPH_EIGEN_ARPACK : 
 					       IGRAPH_EIGEN_LAPACK, &which, 
-					       &options, values ? &tmpeval : 0,
+					       &options, /*storage=*/ 0,
+					       values ? &tmpeval : 0,
 					       &tmp));
     IGRAPH_VECTOR_INIT_FINALLY(&tmpev, no_of_ev);
     for (i=0; i<no_of_ev; i++) {
@@ -1805,6 +1806,7 @@ int igraph_scg_stochastic(const igraph_t *graph,
 				     /*extra=*/ 0, use_arpack ? 
 				     IGRAPH_EIGEN_ARPACK : 
 				     IGRAPH_EIGEN_LAPACK, &which, &options, 
+				     /*storage=*/ 0, 
 				     values ? &tmpeval: 0, &tmp));
     
     IGRAPH_VECTOR_INIT_FINALLY(&tmpev, no_of_ev);
@@ -1861,7 +1863,7 @@ int igraph_scg_stochastic(const igraph_t *graph,
 				     use_arpack ? 
 				     IGRAPH_EIGEN_ARPACK : 
 				     IGRAPH_EIGEN_LAPACK, &w, &o, 
-				     /*values=*/ 0, &tmp));
+				     /*storage=*/ 0, /*values=*/ 0, &tmp));
 
     if (mymatrix) {
       igraph_matrix_destroy(&trans);
@@ -2152,6 +2154,7 @@ int igraph_scg_laplacian(const igraph_t *graph,
 				     /*extra=*/ 0, use_arpack ? 
 				     IGRAPH_EIGEN_ARPACK : 
 				     IGRAPH_EIGEN_LAPACK, &which, &options, 
+				     /*storage=*/ 0,
 				     values ? &tmpeval : 0, &tmp));
     
     IGRAPH_VECTOR_INIT_FINALLY(&tmpev, no_of_ev);

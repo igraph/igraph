@@ -436,6 +436,7 @@ int igraph_i_eigen_matrix_symmetric_arpack(const igraph_matrix_t *A,
 			   int n, void *extra,
 			   const igraph_eigen_which_t *which, 
 			   igraph_arpack_options_t *options,
+			   igraph_arpack_storage_t *storage,
 			   igraph_vector_t *values, 
 			   igraph_matrix_t *vectors) {
   
@@ -1006,6 +1007,7 @@ int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
 				  igraph_eigen_algorithm_t algorithm,
 				  const igraph_eigen_which_t *which,
 				  igraph_arpack_options_t *options,
+				  igraph_arpack_storage_t *storage,
 				  igraph_vector_t *values, 
 				  igraph_matrix_t *vectors) {
 
@@ -1040,6 +1042,7 @@ int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
     n = fun ? options->n : 0;
     IGRAPH_CHECK(igraph_i_eigen_matrix_symmetric_arpack(A, sA, fun, n, extra,
 							which, options, 
+							storage,
 							values, vectors));
     break;
   case IGRAPH_EIGEN_COMP_AUTO:
@@ -1076,6 +1079,7 @@ int igraph_eigen_matrix(const igraph_matrix_t *A,
 			igraph_eigen_algorithm_t algorithm,
 			const igraph_eigen_which_t *which,
 			igraph_arpack_options_t *options,
+			igraph_arpack_storage_t *storage,
 			igraph_vector_complex_t *values,
 			igraph_matrix_complex_t *vectors) {
 
@@ -1142,6 +1146,7 @@ int igraph_eigen_adjacency(const igraph_t *graph,
 			   igraph_eigen_algorithm_t algorithm,
 			   const igraph_eigen_which_t *which,
 			   igraph_arpack_options_t *options,
+			   igraph_arpack_storage_t *storage,
 			   igraph_vector_t *values,
 			   igraph_matrix_t *vectors,
 			   igraph_vector_complex_t *cmplxvalues,
@@ -1161,6 +1166,7 @@ int igraph_eigen_laplacian(const igraph_t *graph,
 			   igraph_eigen_algorithm_t algorithm,
 			   const igraph_eigen_which_t *which,
 			   igraph_arpack_options_t *options,
+			   igraph_arpack_storage_t *storage,
 			   igraph_vector_t *values,
 			   igraph_matrix_t *vectors,
 			   igraph_vector_complex_t *cmplxvalues,

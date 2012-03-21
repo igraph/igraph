@@ -61,7 +61,8 @@ int main() {
 
   igraph_eigen_matrix(/*matrix=*/ 0, &stochasticT, /*fun=*/ 0, 
 		      /*extra=*/ 0, /*algorithm=*/ IGRAPH_EIGEN_LAPACK,
-		      &which, /*options=*/ 0, /*values=*/ 0, &V2);
+		      &which, /*options=*/ 0, /*storage=*/ 0, 
+		      /*values=*/ 0, &V2);
   igraph_matrix_complex_real(&V2, &V);
   /* `p' is always the eigenvector corresponding to the 1-eigenvalue */
   igraph_matrix_get_col(&V, &p, 0);
@@ -69,7 +70,8 @@ int main() {
   which.howmany=3;
   igraph_eigen_matrix(/*matrix=*/ 0, &stochastic, /*fun=*/ 0, 
 		      /*extra=*/ 0, /*algorithm=*/ IGRAPH_EIGEN_LAPACK,
-		      &which, /*options=*/ 0, /*values=*/ 0, &V2);
+		      &which, /*options=*/ 0, /*storage=*/ 0, 
+		      /*values=*/ 0, &V2);
   igraph_matrix_complex_real(&V2, &V3);
   VECTOR(selcol)[0]=2;
   igraph_matrix_select_cols(&V3, &V, &selcol);

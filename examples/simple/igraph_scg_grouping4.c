@@ -50,7 +50,8 @@ int main() {
 
   igraph_eigen_matrix(/*matrix=*/ 0, &laplacian, /*fun=*/ 0,
 		      /*extra=*/ 0, /*algorithm=*/ IGRAPH_EIGEN_LAPACK,
-		      &which, /*options=*/ 0, /*values=*/ 0, &V2);
+		      &which, /*options=*/ 0, /*storage=*/ 0, 
+		      /*values=*/ 0, &V2);
   igraph_matrix_complex_real(&V2, &V);
 
   /* ------------ */

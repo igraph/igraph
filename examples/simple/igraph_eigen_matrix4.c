@@ -52,7 +52,7 @@ int main() {
   which.howmany=nodes;
   igraph_eigen_matrix(&mat2, /*sparsemat=*/ 0, /*fun=*/ 0, /*extra=*/ 0,
 		      IGRAPH_EIGEN_LAPACK, &which, /*options=*/ 0, 
-		      &values, &vectors);
+		      /*storage=*/ 0, &values, &vectors);
   
   igraph_vector_complex_init(&values2, 0);
   igraph_matrix_complex_init(&vectors2, 0, 0);
@@ -60,7 +60,7 @@ int main() {
   which.howmany=nodes;
   igraph_eigen_matrix(&mat2, /*sparsemat=*/ 0, /*fun=*/ 0, /*extra=*/ 0,
 		      IGRAPH_EIGEN_LAPACK, &which, /*options=*/ 0, 
-		      &values2, &vectors2);
+		      /*storage=*/ 0, &values2, &vectors2);
 
   igraph_vector_complex_print(&values);
   igraph_vector_complex_print(&values2);
