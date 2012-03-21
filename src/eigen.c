@@ -986,7 +986,7 @@ int igraph_i_eigen_checks(const igraph_matrix_t *A,
     }
   } else if (sA) {
     *no_of_nodes=igraph_sparsemat_nrow(sA);
-    if (*no_of_nodes != igraph_sparsemat_nrow(sA)) {
+    if (*no_of_nodes != igraph_sparsemat_ncol(sA)) {
       IGRAPH_ERROR("Invalid matrix", IGRAPH_NONSQUARE);
     }
   }
