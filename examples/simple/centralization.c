@@ -64,20 +64,6 @@ int main() {
     return 3;
   }
 
-  igraph_arpack_options_init(&arpack_options);
-  igraph_centralization_eigenvector_centrality(&g, /*vector=*/ 0, 
-					       /*value=*/ 0, 
-					       /*directed=*/ 1,
-					       /*scale=*/ 1,
-					       &arpack_options, &cent,
-					       /*theoretical_max=*/ 0,
-					       /*normalization=*/ 1);
-  
-  if (!ALMOST_EQUALS(cent, 1.0)) {
-    fprintf(stderr, "in-star, eigenvector centrality: %g\n", cent);
-    return 14;
-  }
-
   igraph_destroy(&g);
   
   /****************************/
@@ -154,6 +140,7 @@ int main() {
   igraph_small(&g, /*n=*/ 10, /*directed=*/ 0, 
 	       0,1, -1);
   
+  igraph_arpack_options_init(&arpack_options);
   igraph_centralization_eigenvector_centrality(&g, /*vector=*/ 0,
 					       /*value=*/ 0, 
 					       /*directed=*/ 1,
