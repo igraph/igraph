@@ -7050,7 +7050,7 @@ SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps,
     }
   }
   IGRAPH_FINALLY(igraph_vector_destroy, &c_membership);
-  c_steps=REAL(steps)[0];
+  c_steps=INTEGER(steps)[0];
   R_SEXP_to_igraph_arpack_options(options, &c_options);
   if (0 != igraph_vector_init(&c_eigenvalues, 0)) {
   igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM);

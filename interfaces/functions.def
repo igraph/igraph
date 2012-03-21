@@ -1126,7 +1126,7 @@ igraph_community_leading_eigenvector:
                 OUT VECTOR_OR_0 eigenvalues, \
                 OUT VECTOR_OR_0 eigenvectors, \
                 OUT VECTOR_OR_0 history, \
-                LEVCFUNC callback
+                LEVCFUNC callback, EXTRA callback_extra
         DEFAULT-R: options=igraph.arpack.default
         CLASS-R: igraph.eigenc
         NAME-R: leading.eigenvector.community
