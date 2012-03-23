@@ -57,7 +57,7 @@ int main() {
   which.pos=IGRAPH_EIGEN_LM;
   which.howmany=1;
 
-  igraph_eigen_matrix(/*matrix=*/ 0, &laplacian, /*fun=*/ 0, 
+  igraph_eigen_matrix(/*matrix=*/ 0, &laplacian, /*fun=*/ 0, 10,
 		      /*extra=*/ 0, /*algorithm=*/ IGRAPH_EIGEN_LAPACK,
 		      &which, /*options=*/ 0, /*storage=*/ 0, 
 		      /*values=*/ 0, &V2);

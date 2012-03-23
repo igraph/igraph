@@ -52,17 +52,17 @@ int main() {
 
   igraph_vector_complex_init(&values, 0);
   igraph_matrix_complex_init(&vectors, 0, 0);
-  igraph_eigen_matrix(&mat2, /*sparsemat=*/ 0, /*fun=*/ 0, /*extra=*/ 0,
-		      IGRAPH_EIGEN_LAPACK, &which, /*options=*/ 0, 
-		      /*storage=*/ 0, &values, &vectors);
+  igraph_eigen_matrix(&mat2, /*sparsemat=*/ 0, /*fun=*/ 0, nodes, 
+		      /*extra=*/ 0, IGRAPH_EIGEN_LAPACK, &which, 
+		      /*options=*/ 0, /*storage=*/ 0, &values, &vectors);
   
   which.pos=IGRAPH_EIGEN_ALL;
 
   igraph_vector_complex_init(&values2, 0);
   igraph_matrix_complex_init(&vectors2, 0, 0);
-  igraph_eigen_matrix(&mat2, /*sparsemat=*/ 0, /*fun=*/ 0, /*extra=*/ 0,
-		      IGRAPH_EIGEN_LAPACK, &which, /*options=*/ 0, 
-		      /*storage=*/ 0, &values2, &vectors2);
+  igraph_eigen_matrix(&mat2, /*sparsemat=*/ 0, /*fun=*/ 0, nodes, 
+		      /*extra=*/ 0, IGRAPH_EIGEN_LAPACK, &which,
+		      /*options=*/ 0, /*storage=*/ 0, &values2, &vectors2);
   
   for (i=0; i<nodes-skip*2+1; i++) {
     int j;

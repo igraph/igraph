@@ -55,7 +55,7 @@ int main() {
   igraph_matrix_complex_init(&vectors, 0, 0);
 
   igraph_eigen_matrix(/*matrix=*/ 0, /*sparsemat=*/ &mat, /*fun=*/ 0, 
-		      /*extra=*/ 0, IGRAPH_EIGEN_LAPACK, &which, 
+		      nodes, /*extra=*/ 0, IGRAPH_EIGEN_LAPACK, &which, 
 		      /*options=*/ 0, /*storage=*/ 0, &values, &vectors);
 
   if (IGRAPH_REAL(MATRIX(vectors, 0, 0)) < 0) { 
@@ -81,17 +81,17 @@ int main() {
   
   which.pos=IGRAPH_EIGEN_LM;
   which.howmany=nodes;
-  igraph_eigen_matrix(&mat2, /*sparsemat=*/ 0, /*fun=*/ 0, /*extra=*/ 0, 
-		      IGRAPH_EIGEN_LAPACK, &which, /*options=*/ 0, 
-		      /*storage=*/ 0, &values, &vectors);
+  igraph_eigen_matrix(&mat2, /*sparsemat=*/ 0, /*fun=*/ 0, nodes, 
+		      /*extra=*/ 0, IGRAPH_EIGEN_LAPACK, &which, 
+		      /*options=*/ 0, /*storage=*/ 0, &values, &vectors);
   
   which.pos=IGRAPH_EIGEN_SM;
   which.howmany=nodes;
   igraph_vector_complex_init(&values2, 0);
   igraph_matrix_complex_init(&vectors2, 0, 0);
-  igraph_eigen_matrix(&mat2, /*sparsemat=*/ 0, /*fun=*/ 0, /*extra=*/ 0,
-		      IGRAPH_EIGEN_LAPACK, &which, /*options=*/ 0, 
-		      /*storage=*/ 0, &values2, &vectors2);
+  igraph_eigen_matrix(&mat2, /*sparsemat=*/ 0, /*fun=*/ 0, nodes, 
+		      /*extra=*/ 0, IGRAPH_EIGEN_LAPACK, &which, 
+		      /*options=*/ 0, /*storage=*/ 0, &values2, &vectors2);
 
 #define DUMP() do {				\
     igraph_vector_complex_print(&values);	\

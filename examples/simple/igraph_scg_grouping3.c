@@ -52,7 +52,7 @@ int main() {
   which.pos=IGRAPH_EIGEN_LR;
   which.howmany=1;
 
-  igraph_eigen_matrix(/*matrix=*/ 0, &stochasticT, /*fun=*/ 0, 
+  igraph_eigen_matrix(/*matrix=*/ 0, &stochasticT, /*fun=*/ 0, nodes,
 		      /*extra=*/ 0, /*1algorithm=*/ IGRAPH_EIGEN_LAPACK,
 		      &which, /*options=*/ 0, /*storage=*/ 0, 
 		      /*values=*/ 0, &V2);
@@ -63,7 +63,7 @@ int main() {
   igraph_vector_print(&p);
 
   which.howmany=3;
-  igraph_eigen_matrix(/*matrix=*/ 0, &stochastic, /*fun=*/ 0,
+  igraph_eigen_matrix(/*matrix=*/ 0, &stochastic, /*fun=*/ 0, nodes,
 		      /*extra=*/ 0, /*algorithm=*/ IGRAPH_EIGEN_LAPACK,
 		      &which, /*options=*/ 0, /*storage=*/ 0, 
 		      /*values=*/ 0, &V2);

@@ -1519,7 +1519,7 @@ int igraph_scg_adjacency(const igraph_t *graph,
 				    which.iu-which.il+1));
     IGRAPH_FINALLY(igraph_matrix_destroy, &tmp);
     IGRAPH_CHECK(igraph_eigen_matrix_symmetric(matrix, mysparsemat,
-					       /* fun= */ 0,
+					       /* fun= */ 0, no_of_nodes,
 					       /* extra= */ 0, 
 					       /* algorithm= */ 
 					       use_arpack ? 
@@ -1803,7 +1803,7 @@ int igraph_scg_stochastic(const igraph_t *graph,
 					    which.iu-which.il+1));
     IGRAPH_FINALLY(igraph_matrix_complex_destroy, &tmp);
     IGRAPH_CHECK(igraph_eigen_matrix(mymatrix, mysparsemat, /*fun=*/ 0,
-				     /*extra=*/ 0, use_arpack ? 
+				     no_of_nodes, /*extra=*/ 0, use_arpack ? 
 				     IGRAPH_EIGEN_ARPACK : 
 				     IGRAPH_EIGEN_LAPACK, &which, &options, 
 				     /*storage=*/ 0, 
@@ -1859,7 +1859,7 @@ int igraph_scg_stochastic(const igraph_t *graph,
     }
 
     IGRAPH_CHECK(igraph_eigen_matrix(mytrans, mysparse_trans, /*fun=*/ 0, 
-				     /*extra=*/ 0, /*algorith=*/ 
+				     no_of_nodes, /*extra=*/ 0, /*algorith=*/ 
 				     use_arpack ? 
 				     IGRAPH_EIGEN_ARPACK : 
 				     IGRAPH_EIGEN_LAPACK, &w, &o, 
@@ -2151,7 +2151,7 @@ int igraph_scg_laplacian(const igraph_t *graph,
 					    which.iu-which.il+1));
     IGRAPH_FINALLY(igraph_matrix_complex_destroy, &tmp);
     IGRAPH_CHECK(igraph_eigen_matrix(mymatrix, mysparsemat, /*fun=*/ 0,
-				     /*extra=*/ 0, use_arpack ? 
+				     no_of_nodes, /*extra=*/ 0, use_arpack ? 
 				     IGRAPH_EIGEN_ARPACK : 
 				     IGRAPH_EIGEN_LAPACK, &which, &options, 
 				     /*storage=*/ 0,

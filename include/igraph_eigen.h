@@ -72,7 +72,7 @@ typedef struct igraph_eigen_which_t {
 
 int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
 				  const igraph_sparsemat_t *sA,
-				  igraph_arpack_function_t *fun, 
+				  igraph_arpack_function_t *fun, int n,
 				  void *extra,
 				  igraph_eigen_algorithm_t algorithm,
 				  const igraph_eigen_which_t *which,
@@ -83,7 +83,7 @@ int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
 
 int igraph_eigen_matrix(const igraph_matrix_t *A,
 			const igraph_sparsemat_t *sA,
-			igraph_arpack_function_t *fun,
+			igraph_arpack_function_t *fun, int n,
 			void *extra,
 			igraph_eigen_algorithm_t algorithm,
 			const igraph_eigen_which_t *which,

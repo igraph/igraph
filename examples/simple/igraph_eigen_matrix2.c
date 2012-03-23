@@ -53,9 +53,9 @@ int main() {
   which.pos=IGRAPH_EIGEN_LR;
   which.howmany=1;
   
-  igraph_eigen_matrix(&mat2, /*sparsemat=*/ 0, /*fun=*/ 0, /*extra=*/ 0, 
-		      IGRAPH_EIGEN_LAPACK, &which, /*options=*/ 0, 
-		      /*storage=*/ 0, &values, &vectors);
+  igraph_eigen_matrix(&mat2, /*sparsemat=*/ 0, /*fun=*/ 0, nodes, 
+		      /*extra=*/ 0, IGRAPH_EIGEN_LAPACK, &which,
+		      /*options=*/ 0, /*storage=*/ 0, &values, &vectors);
   
   igraph_vector_complex_print(&values);
   igraph_matrix_complex_print(&vectors);  
@@ -69,17 +69,17 @@ int main() {
   igraph_matrix_complex_init(&vectors, 0, 0);
   which.pos=IGRAPH_EIGEN_LR;
   which.howmany=nodes;
-  igraph_eigen_matrix(&mat2, /*sparsemat=*/ 0, /*fun=*/ 0, /*extra=*/ 0,
-		      IGRAPH_EIGEN_LAPACK, &which, /*options=*/ 0, 
-		      /*storage=*/ 0, &values, &vectors);
+  igraph_eigen_matrix(&mat2, /*sparsemat=*/ 0, /*fun=*/ 0, nodes, 
+		      /*extra=*/ 0, IGRAPH_EIGEN_LAPACK, &which, 
+		      /*options=*/ 0, /*storage=*/ 0, &values, &vectors);
   
   igraph_vector_complex_init(&values2, 0);
   igraph_matrix_complex_init(&vectors2, 0, 0);
   which.pos=IGRAPH_EIGEN_SR;
   which.howmany=nodes;
-  igraph_eigen_matrix(&mat2, /*sparsemat=*/ 0, /*fun=*/ 0, /*extra=*/ 0,
-		      IGRAPH_EIGEN_LAPACK, &which, /*options=*/ 0, 
-		      /*storage=*/ 0, &values2, &vectors2);
+  igraph_eigen_matrix(&mat2, /*sparsemat=*/ 0, /*fun=*/ 0, nodes, 
+		      /*extra=*/ 0, IGRAPH_EIGEN_LAPACK, &which, 
+		      /*options=*/ 0, /*storage=*/ 0, &values2, &vectors2);
 
   for (i=0; i<nodes; i++) { 
     int j;

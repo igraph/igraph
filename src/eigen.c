@@ -971,9 +971,7 @@ int igraph_i_eigen_matrix_lapack(const igraph_matrix_t *A,
 
 int igraph_i_eigen_checks(const igraph_matrix_t *A, 
 			  const igraph_sparsemat_t *sA,
-			  igraph_arpack_function_t *fun, 
-			  int *no_of_nodes,
-			  const igraph_arpack_options_t *options) {
+			  igraph_arpack_function_t *fun, int n) {
   
   if ( (A?1:0)+(sA?1:0)+(fun?1:0) != 1) {
     IGRAPH_ERROR("Exactly one of 'A', 'sA' and 'fun' must be given", 
@@ -981,22 +979,15 @@ int igraph_i_eigen_checks(const igraph_matrix_t *A,
   }
 
   if (A) {
-    *no_of_nodes=igraph_matrix_nrow(A);
-    if (*no_of_nodes != igraph_matrix_ncol(A)) {
+    if (n != igraph_matrix_ncol(A) || n != igraph_matrix_nrow(A)) {
       IGRAPH_ERROR("Invalid matrix", IGRAPH_NONSQUARE);
     }
   } else if (sA) {
-    *no_of_nodes=igraph_sparsemat_nrow(sA);
-    if (*no_of_nodes != igraph_sparsemat_ncol(sA)) {
+    if (n != igraph_sparsemat_ncol(sA) || n != igraph_sparsemat_nrow(sA)) {
       IGRAPH_ERROR("Invalid matrix", IGRAPH_NONSQUARE);
     }
-  } else { /* fun, need options */
-    if (!options) {
-      IGRAPH_ERROR("`options' must be given for ARPACK", IGRAPH_EINVAL);
-    }
-    *no_of_nodes=options->n;
   }
-  
+
   return 0;
 }
 					   
@@ -1008,7 +999,7 @@ int igraph_i_eigen_checks(const igraph_matrix_t *A,
 
 int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
 				  const igraph_sparsemat_t *sA,
-				  igraph_arpack_function_t *fun, 
+				  igraph_arpack_function_t *fun, int n,
 				  void *extra,
 				  igraph_eigen_algorithm_t algorithm,
 				  const igraph_eigen_which_t *which,
@@ -1017,9 +1008,7 @@ int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
 				  igraph_vector_t *values, 
 				  igraph_matrix_t *vectors) {
 
-  int n;
-
-  IGRAPH_CHECK(igraph_i_eigen_checks(A, sA, fun, &n, options));
+  IGRAPH_CHECK(igraph_i_eigen_checks(A, sA, fun, n));
   
   if (which->pos != IGRAPH_EIGEN_LM && 
       which->pos != IGRAPH_EIGEN_SM && 
@@ -1078,7 +1067,7 @@ int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
 
 int igraph_eigen_matrix(const igraph_matrix_t *A,
 			const igraph_sparsemat_t *sA,
-			igraph_arpack_function_t *fun,
+			igraph_arpack_function_t *fun, int n,
 			void *extra,
 			igraph_eigen_algorithm_t algorithm,
 			const igraph_eigen_which_t *which,
@@ -1087,9 +1076,7 @@ int igraph_eigen_matrix(const igraph_matrix_t *A,
 			igraph_vector_complex_t *values,
 			igraph_matrix_complex_t *vectors) {
 
-  int n;
-
-  IGRAPH_CHECK(igraph_i_eigen_checks(A, sA, fun, &n, options));
+  IGRAPH_CHECK(igraph_i_eigen_checks(A, sA, fun, n));
   
   if (which->pos != IGRAPH_EIGEN_LM && 
       which->pos != IGRAPH_EIGEN_SM && 

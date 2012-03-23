@@ -46,13 +46,13 @@ int main() {
   igraph_matrix_complex_init(&evec1, 0, 0);
   igraph_vector_complex_init(&eval1, 0);
   which.pos = IGRAPH_EIGEN_ALL;
-  igraph_eigen_matrix(&sto, 0, 0, 0, IGRAPH_EIGEN_LAPACK, &which, 0, 0,
+  igraph_eigen_matrix(&sto, 0, 0, nodes, 0, IGRAPH_EIGEN_LAPACK, &which, 0, 0,
 		      &eval1, &evec1);
 
   igraph_matrix_complex_init(&evec2, 0, 0);
   igraph_vector_complex_init(&eval2, 0);
-  igraph_eigen_matrix(&hess, 0, 0, 0, IGRAPH_EIGEN_LAPACK, &which, 0, 0,
-		      &eval2, &evec2);
+  igraph_eigen_matrix(&hess, 0, 0, nodes, 0, IGRAPH_EIGEN_LAPACK, &which, 0, 
+		      0, &eval2, &evec2);
 
   for (i=0; i<nodes; i++) { 
     igraph_real_t d=igraph_complex_abs(igraph_complex_sub(VECTOR(eval1)[i],

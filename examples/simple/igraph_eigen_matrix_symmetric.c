@@ -85,14 +85,14 @@ int main() {
 
   which.pos=IGRAPH_EIGEN_LM;
   which.howmany=5;
-  igraph_eigen_matrix_symmetric(&A, /*sA=*/ 0, /*fun=*/ 0, /*extra=*/ 0,
+  igraph_eigen_matrix_symmetric(&A, /*sA=*/ 0, /*fun=*/ 0, DIM, /*extra=*/ 0,
 				IGRAPH_EIGEN_LAPACK, &which, /*options=*/ 0,
 				/*storage=*/ 0, &values, &vectors);
   igraph_vector_print(&values);
   check_ev(&A, &values, &vectors);
 
   which.howmany=8;
-  igraph_eigen_matrix_symmetric(&A, /*sA=*/ 0, /*fun=*/ 0, /*extra=*/ 0,
+  igraph_eigen_matrix_symmetric(&A, /*sA=*/ 0, /*fun=*/ 0, DIM, /*extra=*/ 0,
 				IGRAPH_EIGEN_LAPACK, &which, /*options=*/ 0,
 				/*storage=*/ 0, &values, &vectors);
   igraph_vector_print(&values);
@@ -100,7 +100,7 @@ int main() {
 
   which.pos=IGRAPH_EIGEN_BE;
   which.howmany=5;
-  igraph_eigen_matrix_symmetric(&A, /*sA=*/ 0, /*fun=*/ 0, /*extra=*/ 0,
+  igraph_eigen_matrix_symmetric(&A, /*sA=*/ 0, /*fun=*/ 0, DIM, /*extra=*/ 0,
 				IGRAPH_EIGEN_LAPACK, &which, /*options=*/ 0,
 				/*storage=*/ 0, &values, &vectors);
   igraph_vector_print(&values);
@@ -108,7 +108,7 @@ int main() {
 
   which.pos=IGRAPH_EIGEN_SM;
   which.howmany=5;
-  igraph_eigen_matrix_symmetric(&A, /*sA=*/ 0, /*fun=*/ 0, /*extra=*/ 0,
+  igraph_eigen_matrix_symmetric(&A, /*sA=*/ 0, /*fun=*/ 0, DIM, /*extra=*/ 0,
 				IGRAPH_EIGEN_LAPACK, &which, /*options=*/ 0,
 				/*storage=*/ 0, &values, &vectors);
   igraph_vector_print(&values);

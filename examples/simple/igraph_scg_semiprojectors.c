@@ -46,8 +46,8 @@ int main() {
 
   which.pos=IGRAPH_EIGEN_LM;
   which.howmany=1;
-  igraph_eigen_matrix_symmetric(&adj, /*sparsemat=*/ 0, /*fun=*/ 0, 
-				/*extra=*/ 0, 
+  igraph_eigen_matrix_symmetric(&adj, /*sparsemat=*/ 0, /*fun=*/ 0,
+				igraph_vcount(&g), /*extra=*/ 0, 
 				/*algorithm=*/ IGRAPH_EIGEN_LAPACK,
 				&which, /*options=*/ 0, /*storage=*/ 0, 
 				/*values=*/ 0, &V);
