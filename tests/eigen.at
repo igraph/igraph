@@ -27,6 +27,12 @@ AT_COMPILE_CHECK([simple/igraph_eigen_matrix_symmetric.c],
 		 [simple/igraph_eigen_matrix_symmetric.out])
 AT_CLEANUP
 
+AT_SETUP([Symmetric matrix, ARPACK (igraph_eigen_matrix_symmetric):])
+AT_KEYWORDS([eigenvalue lapack LAPACK])
+AT_COMPILE_CHECK([simple/igraph_eigen_matrix_symmetric_arpack.c],
+		 [simple/igraph_eigen_matrix_symmetric_arpack.out])
+AT_CLEANUP
+
 AT_SETUP([General matrix, LAPACK, LM, SM (igraph_eigen_matrix):])
 AT_KEYWORDS([eigenvalue lapack LAPACK])
 AT_COMPILE_CHECK([simple/igraph_eigen_matrix.c],
@@ -50,3 +56,4 @@ AT_KEYWORDS([eigenvalue lapack LAPACK])
 AT_COMPILE_CHECK([simple/igraph_eigen_matrix3.c],
 		 [simple/igraph_eigen_matrix3.out])
 AT_CLEANUP
+

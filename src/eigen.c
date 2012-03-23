@@ -23,6 +23,7 @@
 
 #include "igraph_eigen.h"
 #include "igraph_qsort.h"
+#include "igraph_blas.h"
 #include <string.h>
 #include <math.h>
 #include <float.h>
@@ -430,6 +431,102 @@ int igraph_i_eigen_matrix_symmetric_lapack(const igraph_matrix_t *A,
   return 0;
 }
 
+typedef struct igraph_i_eigen_matrix_sym_arpack_data_t {
+  const igraph_matrix_t *A;
+  const igraph_sparsemat_t *sA;
+} igraph_i_eigen_matrix_sym_arpack_data_t;
+
+int igraph_i_eigen_matrix_sym_arpack_cb(igraph_real_t *to, 
+					const igraph_real_t *from,
+					int n, void *extra) {
+  
+  igraph_i_eigen_matrix_sym_arpack_data_t *data=
+    (igraph_i_eigen_matrix_sym_arpack_data_t *) extra;
+
+  if (data->A) {
+    igraph_blas_dgemv_array(/*transpose=*/ 0, /*alpha=*/ 1.0,
+			    data->A, from, /*beta=*/ 0.0, to);
+  } else { /* data->sA */
+    igraph_vector_t vto, vfrom;
+    igraph_vector_view(&vto, to, n);
+    igraph_vector_view(&vfrom, to, n);
+    igraph_vector_null(&vto);
+    igraph_sparsemat_gaxpy(data->sA, &vfrom, &vto);
+  }
+  return 0;
+}
+
+int igraph_i_eigen_matrix_symmetric_arpack_be(const igraph_matrix_t *A, 
+			   const igraph_sparsemat_t *sA, 
+			   igraph_arpack_function_t *fun, 
+			   int n, void *extra,
+			   const igraph_eigen_which_t *which, 
+			   igraph_arpack_options_t *options,
+			   igraph_arpack_storage_t *storage,
+			   igraph_vector_t *values, 
+			   igraph_matrix_t *vectors) {
+  
+  igraph_vector_t tmpvalues, tmpvalues2;
+  igraph_matrix_t tmpvectors, tmpvectors2;
+  igraph_i_eigen_matrix_sym_arpack_data_t myextra = { A, sA };  
+  int low=floor(which->howmany/2.0), high=ceil(which->howmany/2.0);
+  int l1, l2, w;
+
+  if (low + high >= n) {
+    IGRAPH_ERROR("Requested too many eigenvalues/vectors", IGRAPH_EINVAL);
+  }
+
+  if (!fun) { 
+    fun=igraph_i_eigen_matrix_sym_arpack_cb;
+    extra=(void*) &myextra;
+  }
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&tmpvalues, high);
+  IGRAPH_MATRIX_INIT_FINALLY(&tmpvectors, n, high);
+  IGRAPH_VECTOR_INIT_FINALLY(&tmpvalues2, low);
+  IGRAPH_MATRIX_INIT_FINALLY(&tmpvectors2, n, low);
+
+  options->n=n;
+  options->nev=high;
+  options->ncv= 2*options->nev < n ? 2*options->nev : n;
+  options->which[0]='L'; options->which[1]='A';
+  
+  IGRAPH_CHECK(igraph_arpack_rssolve(fun, extra, options, storage, 
+				     &tmpvalues, &tmpvectors));
+
+  options->nev=low;
+  options->ncv= 2*options->nev < n ? 2*options->nev : n;
+  options->which[0]='S'; options->which[1]='A';
+
+  IGRAPH_CHECK(igraph_arpack_rssolve(fun, extra, options, storage,
+				     &tmpvalues2, &tmpvectors2));
+
+  IGRAPH_CHECK(igraph_vector_resize(values, low+high));
+  IGRAPH_CHECK(igraph_matrix_resize(vectors, n, low+high));
+  
+  l1=0; l2=0; w=0;
+  while (w < which->howmany) {
+    VECTOR(*values)[w] = VECTOR(tmpvalues)[l1];
+    memcpy(&MATRIX(*vectors, 0, w), &MATRIX(tmpvectors, 0, l1), 
+	   n * sizeof(igraph_real_t));
+    w++; l1++;
+    if (w < which->howmany) {
+      VECTOR(*values)[w] = VECTOR(tmpvalues2)[l2];
+      memcpy(&MATRIX(*vectors, 0, w), &MATRIX(tmpvectors2, 0, l2), 
+	     n * sizeof(igraph_real_t));
+      w++; l2++;
+    }
+  }
+
+  igraph_matrix_destroy(&tmpvectors2);
+  igraph_vector_destroy(&tmpvalues2);
+  igraph_matrix_destroy(&tmpvectors);
+  igraph_vector_destroy(&tmpvalues);
+  IGRAPH_FINALLY_CLEAN(4);
+    
+  return 0;
+}
+
 int igraph_i_eigen_matrix_symmetric_arpack(const igraph_matrix_t *A, 
 			   const igraph_sparsemat_t *sA, 
 			   igraph_arpack_function_t *fun, 
@@ -444,31 +541,67 @@ int igraph_i_eigen_matrix_symmetric_arpack(const igraph_matrix_t *A,
      This can be done in any format, so everything is fine, 
      we don't have to convert. */
 
-  IGRAPH_ERROR("ARPACK solver not implemented yet", IGRAPH_UNIMPLEMENTED);
+  igraph_i_eigen_matrix_sym_arpack_data_t myextra = { A, sA };
 
-  switch (which->pos) {
-  case IGRAPH_EIGEN_LM:
-  case IGRAPH_EIGEN_SM:
-  case IGRAPH_EIGEN_LA:
-  case IGRAPH_EIGEN_SA:
-  case IGRAPH_EIGEN_BE:
-    /* TODO */
-    break;
-  case IGRAPH_EIGEN_ALL:
-    /* TODO */
-    break;
-  case IGRAPH_EIGEN_INTERVAL:
-    /* TODO */
-    break;
-  case IGRAPH_EIGEN_SELECT:
-    /* TODO */
-    break;
-  default:
-    /* This cannot happen */
-    break;
+  if (!options) { 
+    IGRAPH_ERROR("`options' must be given for ARPACK algorithm",
+		 IGRAPH_EINVAL);
   }
 
-  return 0;
+  if (which->pos == IGRAPH_EIGEN_BE) {
+    return igraph_i_eigen_matrix_symmetric_arpack_be(A, sA, fun, n, extra,
+						     which, options, storage,
+						     values, vectors);
+  } else {
+
+    switch (which->pos) {
+    case IGRAPH_EIGEN_LM:
+      options->which[0]='L'; options->which[1]='M';
+      options->nev=which->howmany;
+      break;
+    case IGRAPH_EIGEN_SM:
+      options->which[0]='S'; options->which[1]='M';
+      options->nev=which->howmany;
+      break;
+    case IGRAPH_EIGEN_LA:
+      options->which[0]='L'; options->which[1]='A';
+      options->nev=which->howmany;
+      break;
+    case IGRAPH_EIGEN_SA:
+      options->which[0]='S'; options->which[1]='A';
+      options->nev=which->howmany;
+      break;
+    case IGRAPH_EIGEN_ALL:
+      options->which[0]='L'; options->which[1]='M';
+      options->nev=n;
+      break;
+    case IGRAPH_EIGEN_INTERVAL:
+      IGRAPH_ERROR("Interval of eigenvectors with ARPACK", 
+		   IGRAPH_UNIMPLEMENTED);
+      /* TODO */
+      break;
+    case IGRAPH_EIGEN_SELECT:
+      IGRAPH_ERROR("Selected eigenvalues with ARPACK",
+		   IGRAPH_UNIMPLEMENTED);
+      /* TODO */
+      break;
+    default:
+      /* This cannot happen */
+      break;
+    }
+
+    options->n=n;
+    options->ncv= 2*options->nev < n ? 2*options->nev : n;
+    
+    if (!fun) { 
+      fun=igraph_i_eigen_matrix_sym_arpack_cb;
+      extra=(void*) &myextra;
+    }
+    
+    IGRAPH_CHECK(igraph_arpack_rssolve(fun, extra, options, storage, 
+				       values, vectors));
+    return 0;
+  }
 }
 
 /* Get the eigenvalues and the eigenvectors from the compressed 
