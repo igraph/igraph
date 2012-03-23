@@ -621,10 +621,6 @@ igraph_arpack_rnsolve:
         DEFAULT-R: options=igraph.arpack.default
         IGNORE: RR, RC, RNamespace
 
-igraph_arpack_unpack_complex:
-        PARAMS: INOUT MATRIX vectors, INOUT MATRIX values, REAL nev
-        NAME-R: arpack.unpack.complex
-
 igraph_unfold_tree:
         PARAMS: GRAPH graph, OUT GRAPH tree, NEIMODE mode=ALL, VECTOR roots,\
                 OUT VECTORM1_OR_0 vertex_index
