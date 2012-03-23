@@ -275,6 +275,8 @@ int igraph_i_arpack_rssolve_1x1(igraph_arpack_function_t *fun, void *extra,
 		     IGRAPH_ARPACK_PROD);
   }
 
+  options->nconv=nev;
+
   if (values != 0) {
     IGRAPH_CHECK(igraph_vector_resize(values, 1));
     VECTOR(*values)[0] = b;
@@ -308,6 +310,8 @@ int igraph_i_arpack_rnsolve_1x1(igraph_arpack_function_t *fun, void *extra,
 	  IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
 		     IGRAPH_ARPACK_PROD);
   }
+
+  options->nconv=nev;
 
   if (values != 0) {
     IGRAPH_CHECK(igraph_matrix_resize(values, 1, 2));
@@ -426,6 +430,8 @@ int igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun, void *extra,
     IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
   }
 
+  options->nconv=nev;
+
   if (swap_evals) {
     igraph_complex_t dummy;
     dummy = eval1; eval1 = eval2; eval2 = dummy;
@@ -543,6 +549,8 @@ int igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun, void *extra,
   } else {
     IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
   }
+
+  options->nconv=nev;
 
   if (values != 0) {
     IGRAPH_CHECK(igraph_vector_resize(values, nev));
