@@ -1156,9 +1156,16 @@ int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
 
   switch (algorithm) {
   case IGRAPH_EIGEN_AUTO:
-    IGRAPH_ERROR("'AUTO' algorithm not implemented yet", 
-		 IGRAPH_UNIMPLEMENTED);
-    /* TODO */
+    if (which->howmany==n || n < 100) {
+      IGRAPH_CHECK(igraph_i_eigen_matrix_symmetric_lapack(A, sA, fun, n,
+							  extra, which, 
+							  values, vectors));
+    } else {
+      IGRAPH_CHECK(igraph_i_eigen_matrix_symmetric_arpack(A, sA, fun, n, 
+							  extra, which, 
+							  options, storage,
+							  values, vectors));
+    }
     break;
   case IGRAPH_EIGEN_LAPACK:
     IGRAPH_CHECK(igraph_i_eigen_matrix_symmetric_lapack(A, sA, fun, n ,extra,
@@ -1170,21 +1177,6 @@ int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
 							which, options, 
 							storage,
 							values, vectors));
-    break;
-  case IGRAPH_EIGEN_COMP_AUTO:
-    IGRAPH_ERROR("'COMP_AUTO' algorithm not implemented yet", 
-		 IGRAPH_UNIMPLEMENTED);
-    /* TODO */
-    break;
-  case IGRAPH_EIGEN_COMP_LAPACK:
-    IGRAPH_ERROR("'COMP_LAPACK' algorithm not implemented yet", 
-		 IGRAPH_UNIMPLEMENTED);
-    /* TODO */
-    break;
-  case IGRAPH_EIGEN_COMP_ARPACK:
-    IGRAPH_ERROR("'COMP_ARPACK' algorithm not implemented yet", 
-		 IGRAPH_UNIMPLEMENTED);
-    /* TODO */
     break;
   default:
     IGRAPH_ERROR("Unknown 'algorithm'", IGRAPH_EINVAL);
