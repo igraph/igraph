@@ -730,6 +730,11 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   options->numopb=options->iparam[9];
   options->numreo=options->iparam[10];
 
+  if (options->nconv < options->nev) {
+    IGRAPH_WARNING("Not enough eigenvalues/vectors in symmetric ARPACK "
+		   "solver");
+  }
+
   if (values) {
     IGRAPH_CHECK(igraph_vector_resize(values, options->nev));
     memcpy(VECTOR(*values), d, sizeof(igraph_real_t) * options->nev);
@@ -936,6 +941,11 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   options->numop=options->iparam[8];
   options->numopb=options->iparam[9];
   options->numreo=options->iparam[10];
+
+  if (options->nconv < options->nev) {
+    IGRAPH_WARNING("Not enough eigenvalues/vectors in ARPACK "
+		   "solver");
+  }
 
   if (values) {
     IGRAPH_CHECK(igraph_matrix_resize(values, options->nev+1, 2));
