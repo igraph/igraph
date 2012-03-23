@@ -319,8 +319,8 @@ int igraph_i_arpack_rnsolve_1x1(igraph_arpack_function_t *fun, void *extra,
   }
 
   if (vectors != 0) {
-    IGRAPH_CHECK(igraph_matrix_resize(vectors, 1, 1));
-    MATRIX(*vectors, 0, 0) = 1;
+    IGRAPH_CHECK(igraph_matrix_resize(vectors, 1, 2));
+    MATRIX(*vectors, 0, 0) = 1; MATRIX(*vectors, 0, 1) = 0;
   }
 
   return IGRAPH_SUCCESS;
