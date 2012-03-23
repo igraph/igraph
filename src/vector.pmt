@@ -1155,6 +1155,21 @@ BASE FUNCTION(igraph_vector,sum)(const TYPE(igraph_vector) *v) {
   return res;
 }
 
+igraph_real_t FUNCTION(igraph_vector,sumsq)(const TYPE(igraph_vector) *v) {
+  igraph_real_t res=0.0;
+  BASE *p;
+  assert(v != NULL);
+  assert(v->stor_begin != NULL);
+  for (p=v->stor_begin; p<v->end; p++) {
+#ifdef SQ
+    res += SQ(*p);
+#else
+    res += (*p) * (*p);
+#endif
+  }
+  return res;
+}
+  
 /**
  * \ingroup vector
  * \function igraph_vector_prod

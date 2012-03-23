@@ -117,6 +117,10 @@
 #undef SUM
 #endif
 
+#ifdef SQ
+#undef SQ
+#endif
+
 #ifdef PROD
 #undef PROD
 #endif

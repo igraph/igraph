@@ -95,6 +95,7 @@
 #define PROD(a,b,c) ((a) = igraph_complex_mul((b),(c)))
 #define DIV(a,b,c) ((a) = igraph_complex_div((b),(c)))
 #define EQ(a,b) IGRAPH_COMPLEX_EQ((a),(b))
+#define SQ(a) IGRAPH_REAL(igraph_complex_mul((a),(a)))
 
 #else
 #error unknown BASE_ directive

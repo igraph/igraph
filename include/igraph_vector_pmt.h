@@ -178,6 +178,7 @@ igraph_bool_t FUNCTION(igraph_vector,empty)     (const TYPE(igraph_vector)* v);
 long int FUNCTION(igraph_vector,size)      (const TYPE(igraph_vector)* v);
 igraph_bool_t FUNCTION(igraph_vector,isnull)(const TYPE(igraph_vector) *v);
 BASE FUNCTION(igraph_vector,sum)(const TYPE(igraph_vector) *v);
+igraph_real_t FUNCTION(igraph_vector,sumsq)(const TYPE(igraph_vector) *v);
 BASE FUNCTION(igraph_vector,prod)(const TYPE(igraph_vector) *v);
 igraph_bool_t FUNCTION(igraph_vector,isininterval)(const TYPE(igraph_vector) *v, 
 						   BASE low, BASE high);
