@@ -577,6 +577,90 @@ int igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun, void *extra,
   return IGRAPH_SUCCESS;
 }
 
+int igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
+			 const igraph_arpack_options_t *options, 
+			 igraph_real_t *d, const igraph_real_t *v) {
+
+  igraph_vector_t order;
+  char sort[2];
+  int apply=1;
+  int n=options->n;
+  int nconv=options->nconv;
+  int nev=options->nev;
+
+#define which(a,b) (options->which[0]==a && options->which[1]==b)
+
+  if (which('L','A')) {
+    sort[0]='S'; sort[1]='A';
+  } else if (which('S','A')) {
+    sort[0]='L'; sort[1]='A';
+  } else if (which('L','M')) {
+    sort[0]='S'; sort[1]='M';
+  } else if (which('S','M')) {
+    sort[0]='L'; sort[1]='M';
+  } else if (which('B','E')) {
+    sort[0]='L'; sort[1]='A';
+  }
+
+  IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, nconv-1));
+  IGRAPH_FINALLY(igraph_vector_destroy, &order);
+  igraphdsortr_(sort, &apply, &nconv, d, VECTOR(order));
+
+  /* BE is special */
+  if (which('B','E')) {
+    int w=0, l1=0, l2=nev-1;
+    igraph_vector_t order2, d2;
+    IGRAPH_VECTOR_INIT_FINALLY(&order2, nev);
+    IGRAPH_VECTOR_INIT_FINALLY(&d2, nev);
+    while (l1 <= l2) {
+      VECTOR(order2)[w] = VECTOR(order)[l1]; 
+      VECTOR(d2)[w]=d[l1]; 
+      w++; l1++;
+      if (l1 <= l2) {
+	VECTOR(order2)[w] = VECTOR(order)[l2]; 
+	VECTOR(d2)[w]=d[l2]; 
+	w++; l2--;
+      }
+    }
+    igraph_vector_update(&order, &order2);
+    igraph_vector_copy_to(&d2, d);
+    igraph_vector_destroy(&order2);
+    igraph_vector_destroy(&d2);
+    IGRAPH_FINALLY_CLEAN(2);  
+  }
+
+#undef which
+
+  /* Copy values */
+  if (values) { 
+    IGRAPH_CHECK(igraph_vector_resize(values, nconv));
+    memcpy(VECTOR(*values), d, sizeof(igraph_real_t) * nconv);
+  }
+
+  /* Reorder vectors */
+  if (vectors) {
+    IGRAPH_CHECK(igraph_matrix_resize(vectors, n, nconv));
+    memcpy(&MATRIX(*vectors, 0, 0), v, sizeof(igraph_real_t) * n * nconv);
+  }
+  
+  igraph_vector_destroy(&order);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  /* See if we still some extra ones */
+  if (nconv > nev) {
+    if (values) { igraph_vector_resize(values, nev); }
+    if (vectors) { igraph_matrix_resize(vectors, n, nev); }
+  }
+  
+  return 0;
+}
+
+int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
+			 const igraph_arpack_options_t *options) {
+  /* TODO */
+  return 0;
+}
+
 /**
  * \function igraph_arpack_rssolve
  * \brief ARPACK solver for symmetric matrices
@@ -739,17 +823,10 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 		   "solver");
   }
 
-  if (values) {
-    IGRAPH_CHECK(igraph_vector_resize(values, options->nev));
-    memcpy(VECTOR(*values), d, sizeof(igraph_real_t) * options->nev);
+  if (values || vectors) { 
+    IGRAPH_CHECK(igraph_arpack_rssort(values, vectors, options, d, v));
   }
-
-  if (vectors) {
-    IGRAPH_CHECK(igraph_matrix_resize(vectors, options->n, options->nev));
-    memcpy(&MATRIX(*vectors, 0, 0), v, 
-	   sizeof(igraph_real_t) * options->n * options->nev);
-  }
-
+  
   options->ldv=origldv;
   options->lworkl=origlworkl;
   options->which[0] = origwhich[0]; options->which[1] = origwhich[1];
@@ -987,3 +1064,4 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   }
   return 0;
 }
+
