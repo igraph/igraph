@@ -729,6 +729,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 #define which(a,b) (options->which[0]==a && options->which[1]==b)
 
   if (values || vectors) {
+
     int apply=1;
     char sort[2];
     if (which('L','A')) {
@@ -740,11 +741,35 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     } else if (which('S','M')) {
       sort[0]='L'; sort[1]='M';
     } else if (which('B','E')) {
-      sort[0]='S'; sort[1]='M';
+      sort[0]='L'; sort[1]='A';
     }
     IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, options->nev-1));
     IGRAPH_FINALLY(igraph_vector_destroy, &order);
     igraphdsortr_(sort, &apply, &options->nev, d, VECTOR(order));
+
+    /* For the 'BE' case we need to reorder, the built-in sort 
+       does not support the 'BE' order */
+    if (which('B','E')) {
+      int w=0, l1=0, l2=options->nev-1;
+      igraph_vector_t order2, d2;
+      IGRAPH_VECTOR_INIT_FINALLY(&order2, options->nev);
+      IGRAPH_VECTOR_INIT_FINALLY(&d2, options->nev);
+      while (l1 <= l2) {
+	VECTOR(order2)[w] = VECTOR(order)[l1]; 
+	VECTOR(d2)[w]=d[l1]; 
+	w++; l1++;
+	if (l1 <= l2) {
+	  VECTOR(order2)[w] = VECTOR(order)[l2]; 
+	  VECTOR(d2)[w]=d[l2]; 
+	  w++; l2--;
+	}
+      }
+      igraph_vector_update(&order, &order2);
+      igraph_vector_copy_to(&d2, d);
+      igraph_vector_destroy(&order2);
+      igraph_vector_destroy(&d2);
+      IGRAPH_FINALLY_CLEAN(2);
+    }
   }
 
 #undef which
@@ -758,12 +783,13 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   }
 
   if (vectors) {
-    int i, j, ptr=0;
+    int i, j;
     IGRAPH_CHECK(igraph_matrix_resize(vectors, options->n, options->nev));
     for (j=0; j<options->nev; j++) {
       long int idx=VECTOR(order)[j];
+      igraph_real_t *ptr=v + options->n * idx;
       for (i=0; i<options->n; i++) {
-	MATRIX(*vectors, i, idx) = v[ptr++];
+	MATRIX(*vectors, i, j) = *ptr++;
       }
     }
   }
