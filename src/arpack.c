@@ -397,37 +397,39 @@ int igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun, void *extra,
 
   /* Sometimes we have to swap eval1 with eval2 and evec1 with eval2;
    * determine whether we have to do it now */
-  if (options->which[0] == 'S') {
-    if (options->which[1] == 'M') {
-      /* eval1 must be the one with the smallest magnitude */
-      swap_evals = (igraph_complex_mod(eval1) > igraph_complex_mod(eval2));
-    } else if (options->which[1] == 'R') {
-      /* eval1 must be the one with the smallest real part */
-      swap_evals = (IGRAPH_REAL(eval1) > IGRAPH_REAL(eval2));
-    } else if (options->which[1] == 'I') {
-      /* eval1 must be the one with the smallest imaginary part */
-      swap_evals = (IGRAPH_IMAG(eval1) > IGRAPH_IMAG(eval2));
+  if (nev==1) {
+    if (options->which[0] == 'S') {
+      if (options->which[1] == 'M') {
+	/* eval1 must be the one with the smallest magnitude */
+	swap_evals = (igraph_complex_mod(eval1) > igraph_complex_mod(eval2));
+      } else if (options->which[1] == 'R') {
+	/* eval1 must be the one with the smallest real part */
+	swap_evals = (IGRAPH_REAL(eval1) > IGRAPH_REAL(eval2));
+      } else if (options->which[1] == 'I') {
+	/* eval1 must be the one with the smallest imaginary part */
+	swap_evals = (IGRAPH_IMAG(eval1) > IGRAPH_IMAG(eval2));
+      } else {
+	IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
+      }
+    } else if (options->which[0] == 'L') {
+      if (options->which[1] == 'M') {
+	/* eval1 must be the one with the largest magnitude */
+	swap_evals = (igraph_complex_mod(eval1) < igraph_complex_mod(eval2));
+      } else if (options->which[1] == 'R') {
+	/* eval1 must be the one with the largest real part */
+	swap_evals = (IGRAPH_REAL(eval1) < IGRAPH_REAL(eval2));
+      } else if (options->which[1] == 'I') {
+	/* eval1 must be the one with the largest imaginary part */
+	swap_evals = (IGRAPH_IMAG(eval1) < IGRAPH_IMAG(eval2));
+      } else {
+	IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
+      }
+    } else if (options->which[0] == 'X' && options->which[1] == 'X') {
+      /* No preference on the ordering of eigenvectors */
     } else {
+      fprintf(stderr, "%c%c\n", options->which[0], options->which[1]);
       IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
     }
-  } else if (options->which[0] == 'L') {
-    if (options->which[1] == 'M') {
-      /* eval1 must be the one with the largest magnitude */
-      swap_evals = (igraph_complex_mod(eval1) < igraph_complex_mod(eval2));
-    } else if (options->which[1] == 'R') {
-      /* eval1 must be the one with the largest real part */
-      swap_evals = (IGRAPH_REAL(eval1) < IGRAPH_REAL(eval2));
-    } else if (options->which[1] == 'I') {
-      /* eval1 must be the one with the largest imaginary part */
-      swap_evals = (IGRAPH_IMAG(eval1) < IGRAPH_IMAG(eval2));
-    } else {
-      IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
-    }
-  } else if (options->which[0] == 'X' && options->which[1] == 'X') {
-    /* No preference on the ordering of eigenvectors */
-  } else {
-    fprintf(stderr, "%c%c\n", options->which[0], options->which[1]);
-    IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
   }
 
   options->nconv=nev;
@@ -538,16 +540,18 @@ int igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun, void *extra,
 
   /* eval1 is always the larger eigenvalue. If we want the smaller
    * one, we have to swap eval1 with eval2 and also the columns of mat */
-  if (options->which[0] == 'S') {
-    trace = eval1; eval1 = eval2; eval2 = trace;
-    trace = mat[0]; mat[0] = mat[2]; mat[2] = trace;
-    trace = mat[1]; mat[1] = mat[3]; mat[3] = trace;
-  } else if (options->which[0] == 'L' || options->which[0] == 'B') {
-    /* Nothing to do here */
-  } else if (options->which[0] == 'X' && options->which[1] == 'X') {
-    /* No preference on the ordering of eigenvectors */
-  } else {
-    IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
+  if (nev==1) {
+    if (options->which[0] == 'S') {
+      trace = eval1; eval1 = eval2; eval2 = trace;
+      trace = mat[0]; mat[0] = mat[2]; mat[2] = trace;
+      trace = mat[1]; mat[1] = mat[3]; mat[3] = trace;
+    } else if (options->which[0] == 'L' || options->which[0] == 'B') {
+      /* Nothing to do here */
+    } else if (options->which[0] == 'X' && options->which[1] == 'X') {
+      /* No preference on the ordering of eigenvectors */
+    } else {
+      IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
+    }
   }
 
   options->nconv=nev;
