@@ -38,6 +38,7 @@
 #define igraphdstats_	dstats_
 #define igraphdsesrt_	dsesrt_
 #define igraphdsortr_	dsortr_
+#define igraphdsortc_   dsortc_
 #define igraphdgetv0_	dgetv0_
 #define igraphdsaitr_	dsaitr_
 #define igraphdsapps_	dsapps_
@@ -159,4 +160,7 @@ int igraphdneupd_(int *rvec, char *howmny, int *select,
 
 int igraphdsortr_(char *which, int *apply, int* n, igraph_real_t *x1,
 		  igraph_real_t *x2);
+
+int igraphdsortc_(char *which, int *apply, int* n, igraph_real_t *xreal,
+		  igraph_real_t *ximag, igraph_real_t *y);
 #endif

@@ -319,8 +319,8 @@ int igraph_i_arpack_rnsolve_1x1(igraph_arpack_function_t *fun, void *extra,
   }
 
   if (vectors != 0) {
-    IGRAPH_CHECK(igraph_matrix_resize(vectors, 1, 2));
-    MATRIX(*vectors, 0, 0) = 1; MATRIX(*vectors, 0, 1) = 0;
+    IGRAPH_CHECK(igraph_matrix_resize(vectors, 1, 1));
+    MATRIX(*vectors, 0, 0) = 1; 
   }
 
   return IGRAPH_SUCCESS;
@@ -397,39 +397,37 @@ int igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun, void *extra,
 
   /* Sometimes we have to swap eval1 with eval2 and evec1 with eval2;
    * determine whether we have to do it now */
-  if (nev==1) {
-    if (options->which[0] == 'S') {
-      if (options->which[1] == 'M') {
-	/* eval1 must be the one with the smallest magnitude */
-	swap_evals = (igraph_complex_mod(eval1) > igraph_complex_mod(eval2));
-      } else if (options->which[1] == 'R') {
-	/* eval1 must be the one with the smallest real part */
-	swap_evals = (IGRAPH_REAL(eval1) > IGRAPH_REAL(eval2));
-      } else if (options->which[1] == 'I') {
-	/* eval1 must be the one with the smallest imaginary part */
-	swap_evals = (IGRAPH_IMAG(eval1) > IGRAPH_IMAG(eval2));
-      } else {
-	IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
-      }
-    } else if (options->which[0] == 'L') {
-      if (options->which[1] == 'M') {
-	/* eval1 must be the one with the largest magnitude */
-	swap_evals = (igraph_complex_mod(eval1) < igraph_complex_mod(eval2));
-      } else if (options->which[1] == 'R') {
-	/* eval1 must be the one with the largest real part */
-	swap_evals = (IGRAPH_REAL(eval1) < IGRAPH_REAL(eval2));
-      } else if (options->which[1] == 'I') {
-	/* eval1 must be the one with the largest imaginary part */
-	swap_evals = (IGRAPH_IMAG(eval1) < IGRAPH_IMAG(eval2));
-      } else {
-	IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
-      }
-    } else if (options->which[0] == 'X' && options->which[1] == 'X') {
-      /* No preference on the ordering of eigenvectors */
+  if (options->which[0] == 'S') {
+    if (options->which[1] == 'M') {
+      /* eval1 must be the one with the smallest magnitude */
+      swap_evals = (igraph_complex_mod(eval1) > igraph_complex_mod(eval2));
+    } else if (options->which[1] == 'R') {
+      /* eval1 must be the one with the smallest real part */
+      swap_evals = (IGRAPH_REAL(eval1) > IGRAPH_REAL(eval2));
+    } else if (options->which[1] == 'I') {
+      /* eval1 must be the one with the smallest imaginary part */
+      swap_evals = (IGRAPH_IMAG(eval1) > IGRAPH_IMAG(eval2));
     } else {
-      fprintf(stderr, "%c%c\n", options->which[0], options->which[1]);
       IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
     }
+  } else if (options->which[0] == 'L') {
+    if (options->which[1] == 'M') {
+      /* eval1 must be the one with the largest magnitude */
+      swap_evals = (igraph_complex_mod(eval1) < igraph_complex_mod(eval2));
+    } else if (options->which[1] == 'R') {
+      /* eval1 must be the one with the largest real part */
+      swap_evals = (IGRAPH_REAL(eval1) < IGRAPH_REAL(eval2));
+    } else if (options->which[1] == 'I') {
+      /* eval1 must be the one with the largest imaginary part */
+      swap_evals = (IGRAPH_IMAG(eval1) < IGRAPH_IMAG(eval2));
+    } else {
+      IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
+    }
+  } else if (options->which[0] == 'X' && options->which[1] == 'X') {
+    /* No preference on the ordering of eigenvectors */
+  } else {
+    fprintf(stderr, "%c%c\n", options->which[0], options->which[1]);
+    IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
   }
 
   options->nconv=nev;
@@ -540,18 +538,16 @@ int igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun, void *extra,
 
   /* eval1 is always the larger eigenvalue. If we want the smaller
    * one, we have to swap eval1 with eval2 and also the columns of mat */
-  if (nev==1) {
-    if (options->which[0] == 'S') {
-      trace = eval1; eval1 = eval2; eval2 = trace;
-      trace = mat[0]; mat[0] = mat[2]; mat[2] = trace;
-      trace = mat[1]; mat[1] = mat[3]; mat[3] = trace;
-    } else if (options->which[0] == 'L' || options->which[0] == 'B') {
-      /* Nothing to do here */
-    } else if (options->which[0] == 'X' && options->which[1] == 'X') {
-      /* No preference on the ordering of eigenvectors */
-    } else {
-      IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
-    }
+  if (options->which[0] == 'S') {
+    trace = eval1; eval1 = eval2; eval2 = trace;
+    trace = mat[0]; mat[0] = mat[2]; mat[2] = trace;
+    trace = mat[1]; mat[1] = mat[3]; mat[3] = trace;
+  } else if (options->which[0] == 'L' || options->which[0] == 'B') {
+    /* Nothing to do here */
+  } else if (options->which[0] == 'X' && options->which[1] == 'X') {
+    /* No preference on the ordering of eigenvectors */
+  } else {
+    IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
   }
 
   options->nconv=nev;
@@ -587,6 +583,7 @@ int igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
   int n=options->n;
   int nconv=options->nconv;
   int nev=options->nev;
+  int nans= nconv < nev ? nconv : nev;
 
 #define which(a,b) (options->which[0]==a && options->which[1]==b)
 
@@ -633,31 +630,81 @@ int igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
 
   /* Copy values */
   if (values) { 
-    IGRAPH_CHECK(igraph_vector_resize(values, nconv));
-    memcpy(VECTOR(*values), d, sizeof(igraph_real_t) * nconv);
+    IGRAPH_CHECK(igraph_vector_resize(values, nans));
+    memcpy(VECTOR(*values), d, sizeof(igraph_real_t) * nans);
   }
 
   /* Reorder vectors */
   if (vectors) {
-    IGRAPH_CHECK(igraph_matrix_resize(vectors, n, nconv));
-    memcpy(&MATRIX(*vectors, 0, 0), v, sizeof(igraph_real_t) * n * nconv);
+    int i;
+    IGRAPH_CHECK(igraph_matrix_resize(vectors, n, nans));
+    for (i=0; i<nans; i++) { 
+      int idx=VECTOR(order)[i];
+      const igraph_real_t *ptr=v + n * idx;
+      memcpy(&MATRIX(*vectors, 0, i), ptr, sizeof(igraph_real_t) * n);
+    }
   }
   
   igraph_vector_destroy(&order);
   IGRAPH_FINALLY_CLEAN(1);
 
-  /* See if we still some extra ones */
-  if (nconv > nev) {
-    if (values) { igraph_vector_resize(values, nev); }
-    if (vectors) { igraph_matrix_resize(vectors, n, nev); }
-  }
-  
   return 0;
 }
 
 int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
-			 const igraph_arpack_options_t *options) {
-  /* TODO */
+			 const igraph_arpack_options_t *options, 
+			 igraph_real_t *dr, igraph_real_t *di, 
+			 igraph_real_t *v) {
+
+  igraph_vector_t order;
+  char sort[2];
+  int apply=1;
+  int n=options->n;
+  int nconv=options->nconv;
+  int nev=options->nev;
+  int nans=nconv < nev ? nconv : nev;
+
+#define which(a,b) (options->which[0]==a && options->which[1]==b)
+
+  if (which('L','M')) {
+    sort[0]='S'; sort[1]='M';
+  } else if (which('S', 'M')) {
+    sort[0]='L'; sort[1]='M';
+  } else if (which('L', 'R')) {
+    sort[0]='S'; sort[1]='R';
+  } else if (which('S', 'R')) {
+    sort[0]='L'; sort[1]='R';
+  } else if (which('L', 'I')) {
+    sort[0]='S'; sort[1]='I';
+  } else if (which('S', 'I')) {
+    sort[0]='L'; sort[1]='I';
+  }
+
+#undef which
+  
+  IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, nconv-1));
+  IGRAPH_FINALLY(igraph_vector_destroy, &order);
+  igraphdsortc_(sort, &apply, &nconv, dr, di, VECTOR(order));
+
+  if (values) {
+    IGRAPH_CHECK(igraph_matrix_resize(values, nans, 2));
+    memcpy(&MATRIX(*values, 0, 0), dr, sizeof(igraph_real_t) * nans);
+    memcpy(&MATRIX(*values, 0, 1), di, sizeof(igraph_real_t) * nans);
+  }
+
+  if (vectors) {
+    int i, nc=0, nr=0, ncol;
+    for (i=0; i<nans; i++) {
+      if (di[i] == 0) { nr++; } else { nc++; }
+    }
+    ncol=(nc/2)*2 + (nc%2)*2 + nr;
+    IGRAPH_CHECK(igraph_matrix_resize(vectors, n, ncol));
+    memcpy(&MATRIX(*vectors, 0, 0), v, sizeof(igraph_real_t) * n * ncol);
+  }
+
+  igraph_vector_destroy(&order);
+  IGRAPH_FINALLY_CLEAN(1);
+
   return 0;
 }
 
@@ -1028,19 +1075,9 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 		   "solver");
   }
 
-  if (values) {
-    IGRAPH_CHECK(igraph_matrix_resize(values, options->nev+1, 2));
-    memcpy(&MATRIX(*values, 0, 0), dr,
-	   sizeof(igraph_real_t) * (options->nev+1));
-    memcpy(&MATRIX(*values, 0, 1), di,
-	   sizeof(igraph_real_t) * (options->nev+1));
-  }
-
-  if (vectors) {
-    IGRAPH_CHECK(igraph_matrix_resize(vectors, options->n,
-				      options->nev+1));
-    memcpy(&MATRIX(*vectors, 0, 0), v, 
-	   sizeof(igraph_real_t) * (options->nev+1) * options->n);
+  if (values || vectors) { 
+    IGRAPH_CHECK(igraph_arpack_rnsort(values, vectors, options,
+				      dr, di, v));
   }
 
   options->ldv=origldv;
