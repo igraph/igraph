@@ -1,6 +1,6 @@
 
-R version 2.12.1 (2010-12-16)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.14.1 (2011-12-22)
+Copyright (C) 2011 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
@@ -28,13 +28,13 @@ Type 'q()' to quit R.
 > mno1 <- graph.motifs.no(b, cut.prob=c(0, 0, 1/3))
 > mno2 <- graph.motifs.no(b, cut.prob=c(0, 1/3, 0))
 > c(mno0/mno, mno1/mno, mno2/mno)
-[1] 0.6611758 0.6659452 0.6685962
+[1] 0.6611737 0.6659431 0.6685952
 > 
 > mno3 <- graph.motifs.no(b, cut.prob=c(0, 1/3, 1/3))
 > mno4 <- graph.motifs.no(b, cut.prob=c(1/3, 0, 1/3))
 > mno5 <- graph.motifs.no(b, cut.prob=c(1/3, 1/3, 0))
 > c(mno3/mno, mno4/mno, mno5/mno)
-[1] 0.4456483 0.4458046 0.4478757
+[1] 0.4456462 0.4458035 0.4478736
 > 
 > ######################
 > 
