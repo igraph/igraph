@@ -1,6 +1,6 @@
 
-R version 2.12.0 (2010-10-15)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.14.1 (2011-12-22)
+Copyright (C) 2011 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
@@ -39,12 +39,12 @@ Community sizes
 10  6  5 12  1 
 > d <- as.dendrogram(ebc)
 > d
-'dendrogram' with 2 branches and 25 members total, at height 33 
+'dendrogram' with 2 branches and 34 members total, at height 33 
 > d[[1]]
-'dendrogram' with 2 branches and 11 members total, at height 30 
+'dendrogram' with 2 branches and 15 members total, at height 31 
 > d[[2]]
-'dendrogram' with 2 branches and 14 members total, at height 31 
+'dendrogram' with 2 branches and 19 members total, at height 32 
 > m2 <- cutat(ebc, no=3)
 > abs(modularity(g, m2) - ebc$modularity[length(ebc$modularity)-2]) < 1e-14
-[1] FALSE
+[1] TRUE
 > 
