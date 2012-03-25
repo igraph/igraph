@@ -59,3 +59,10 @@ AT_KEYWORDS([eigenvector centrality arpack ARPACK])
 AT_COMPILE_CHECK([simple/eigenvector_centrality.c],
                  [simple/eigenvector_centrality.out])
 AT_CLEANUP
+
+AT_SETUP([Non-symmetric ARPACK solver (igraph_arpack_rnsolve):])
+AT_KEYWORDS([ARPACK eigenvalue eigenvector eigen eigenproblem 
+             non-symmetric])
+AT_COMPILE_CHECK([simple/igraph_arpack_rnsolve.c],
+		 [simple/igraph_arpack_rnsolve.out])
+AT_CLEANUP

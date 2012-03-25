@@ -693,13 +693,27 @@ int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
   }
 
   if (vectors) {
-    int i, nc=0, nr=0, ncol;
+    int i, nc=0, nr=0, ncol, wh=0, vx=0;
     for (i=0; i<nans; i++) {
       if (di[i] == 0) { nr++; } else { nc++; }
     }
     ncol=(nc/2)*2 + (nc%2)*2 + nr;
     IGRAPH_CHECK(igraph_matrix_resize(vectors, n, ncol));
-    memcpy(&MATRIX(*vectors, 0, 0), v, sizeof(igraph_real_t) * n * ncol);
+    for (i=0; i<nans; i++) {
+      int idx=VECTOR(order)[i];
+      igraph_real_t *ptr=v + n * idx;
+      if (di[i]==0) {
+	memcpy(&MATRIX(*vectors, 0, vx), ptr, sizeof(igraph_real_t) * n);
+	vx++;
+      } else if (wh==0) {
+	if (di[i] < 0) { ptr -= n; }
+	memcpy(&MATRIX(*vectors, 0, vx), ptr, sizeof(igraph_real_t) * n * 2);
+	wh=1-wh;
+	vx+=2;
+      } else {
+	wh=1-wh;
+      }
+    }
   }
 
   igraph_vector_destroy(&order);
