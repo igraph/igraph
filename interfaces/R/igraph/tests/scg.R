@@ -2,62 +2,57 @@
 library(igraph)
 
 tree <- graph.tree(10, 3, "undirected")
-treeM <- get.adjacency(tree)
+treeM <- get.adjacency(tree, sparse=TRUE)
 treeM2 <- get.adjacency(tree, sparse=FALSE)
 
-g <- scg(tree, ev=1, nt=3, mtype="laplacian")
-M <- scg(treeM, ev=1, nt=3, mtype="laplacian")
-M2 <- scg(treeM2, ev=1, nt=3, mtype="laplacian")
-graph.laplacian(g$Xt)
-M$Xt
-M2$Xt
+args <- list(ev=1, nt=3, mtype="symmetric", algo="exact_scg",
+             semproj=TRUE, epairs=TRUE)
+do.call(scg, c(list(tree), args))
+do.call(scg, c(list(treeM), args))
+do.call(scg, c(list(treeM2), args))
 
-g <- scg(tree, ev=1, nt=3, mtype="symmetric")
-M <- scg(treeM, ev=1, nt=3, mtype="symmetric")
-M2 <- scg(treeM2, ev=1, nt=3, mtype="symmetric")
-get.adjacency(g$Xt, attr="weight")
-M$Xt
-M2$Xt
+args[["ev"]] <- 3
+do.call(scg, c(list(tree), args))
+do.call(scg, c(list(treeM), args))
+do.call(scg, c(list(treeM2), args))
 
-g <- scg(tree, ev=1, nt=3, mtype="stochastic")
-M <- scg(treeM, ev=1, nt=3, mtype="stochastic")
-M2 <- scg(treeM2, ev=1, nt=3, mtype="stochastic")
-get.adjacency(g$Xt, attr="weight")
-M$Xt
-M2$Xt
+args[["ev"]] <- c(1,3)
+do.call(scg, c(list(tree), args))
+do.call(scg, c(list(treeM), args))
+do.call(scg, c(list(treeM2), args))
 
+###############################
 
-############
+args <- list(ev=1, nt=2, mtype="stochastic", algo="exact_scg",
+             semproj=TRUE, epairs=TRUE, stat.prob=TRUE)
+do.call(scg, c(list(tree), args))
+do.call(scg, c(list(treeM), args))
+do.call(scg, c(list(treeM2), args))
 
-library(igraph)
+args[["ev"]] <- 3
+do.call(scg, c(list(tree), args))
+do.call(scg, c(list(treeM), args))
+do.call(scg, c(list(treeM2), args))
 
-dirtree <- graph.tree(10, 3, "out")
-dirtreeM <- get.adjacency(dirtree)
-dirtreeM2 <- get.adjacency(dirtree, sparse=FALSE)
+args[["ev"]] <- c(1,3)
+do.call(scg, c(list(tree), args))
+do.call(scg, c(list(treeM), args))
+do.call(scg, c(list(treeM2), args))
 
-g <- scg(dirtree, ev=3, nt=2, mtype="laplacian")
-M <- scg(dirtreeM, ev=3, nt=2, mtype="laplacian")
-M2 <- scg(dirtreeM2, ev=3, nt=2, mtype="laplacian")
-graph.laplacian(g$Xt)
-M$Xt
-M2$Xt
+###############################
 
-g <- scg(dirtree, ev=3, nt=2, mtype="symmetric")
-M <- scg(dirtreeM, ev=3, nt=2, mtype="symmetric")
-M2 <- scg(dirtreeM2, ev=3, nt=2, mtype="symmetric")
-get.adjacency(g$Xt, attr="weight")
-M$Xt
-M2$Xt
+args <- list(ev=1, nt=2, mtype="laplacian", algo="exact_scg",
+             semproj=TRUE, epairs=TRUE)
+do.call(scg, c(list(tree), args))
+do.call(scg, c(list(treeM), args))
+do.call(scg, c(list(treeM2), args))
 
-dirtree2 <- graph.tree(10, 3, "in") %u% graph.tree(10, 3, "out")
-dirtree2 <- delete.edges(dirtree2, E(dirtree2)[1 %->% 2])
-dirtree2M <- get.adjacency(dirtree2)
-dirtree2M2 <- get.adjacency(dirtree2, sparse=FALSE)
+args[["ev"]] <- 3
+do.call(scg, c(list(tree), args))
+do.call(scg, c(list(treeM), args))
+do.call(scg, c(list(treeM2), args))
 
-g <- scg(dirtree2, ev=3, nt=2, mtype="stochastic")
-M <- scg(dirtree2M, ev=3, nt=2, mtype="stochastic")
-M2 <- scg(dirtree2M2, ev=3, nt=2, mtype="stochastic")
-get.adjacency(g$Xt, attr="weight")
-M$Xt
-M2$Xt
-
+args[["ev"]] <- c(1,3)
+do.call(scg, c(list(tree), args))
+do.call(scg, c(list(treeM), args))
+do.call(scg, c(list(treeM2), args))
