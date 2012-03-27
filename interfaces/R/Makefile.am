@@ -5,7 +5,7 @@ RFILES = $(wildcard igraph/R/*.R) $(wildcard igraph/man/*.Rd) \
 	igraph/src/config.h igraph/src/config.h.in igraph/src/Makevars.in \
 	igraph/src/Makevars.win igraph/DESCRIPTION \
 	igraph/NAMESPACE igraph/R/auto.R igraph/src/rinterface.c \
-	igraph/configure
+	igraph/configure igraph/configure.in
 
 igraph/src/config.h: src/config.h
 	cp $< $@
@@ -18,6 +18,8 @@ igraph/src/Makevars.win: src/Makevars.win
 igraph/DESCRIPTION: DESCRIPTION
 	cp $< $@
 igraph/configure: configure
+	cp $< $@
+igraph/configure.in: configure.in
 	cp $< $@
 
 

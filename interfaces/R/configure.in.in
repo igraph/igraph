@@ -2,6 +2,18 @@ AC_INIT(igraph, @VERSION@, csardi@rmki.kfki.hu)
 AC_CONFIG_SRCDIR(src/rinterface.c)
 AC_CONFIG_HEADERS(src/config.h)
 
+: ${R_HOME=`R RHOME`}
+if test -z "${R_HOME}"; then
+   echo "could not determine R_HOME"
+   exit 1
+fi
+CC=`"${R_HOME}/bin/R" CMD config CC`
+CXX=`"${R_HOME}/bin/R" CMD config CXX`
+CFLAGS=`"${R_HOME}/bin/R" CMD config CFLAGS`
+CXXFLAGS=`"${R_HOME}/bin/R" CMD config CXXFLAGS`
+CPPFLAGS=`"${R_HOME}/bin/R" CMD config CPPFLAGS`
+
+AC_LANG(C)
 AC_PROG_CC
 
 # Tricky check for C++ compiler, because Autoconf has a weird bug:
@@ -79,6 +91,7 @@ if test $graphml_support = yes; then
 fi
 AC_SUBST(HAVE_LIBXML)
 
+AC_LANG_PUSH([C++])
 HAVE_GMP=0
 GMP_LIBS=""
 gmp_support=no
@@ -95,6 +108,7 @@ if test "x$enable_gmp" != "xno"; then
 fi
 AC_SUBST(HAVE_GMP)
 AC_SUBST(GMP_LIBS)
+AC_LANG_POP([C++])
 
 AC_CONFIG_FILES([R/config.R src/Makevars])
 
