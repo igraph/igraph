@@ -143,7 +143,7 @@ D. Morton de Lachapelle, D. Gfeller, and P. De Los Rios, Shrinking
 # SCG of a toy network
 g <- graph.full(5) \%du\% graph.full(5) \%du\% graph.full(5)
 g <- add.edges(g, c(1,6, 1,11, 6, 11))
-cg <- scg(g, 1, 3)
+cg <- scg(g, 1, 3, algo="exact_scg")
 
 #plot the result
 layout <- layout.kamada.kawai(g)
@@ -185,19 +185,23 @@ print(res)
 com <- scg(graph.laplacian(immuno), ev=n-c(1,2), nt=2)$groups
 col <- rainbow(max(com))
 layout <- layout.auto(immuno)
+\dontrun{
 plot(immuno, layout=layout, vertex.size=3, vertex.color=col[com],
                 vertex.label=NA)
+}
 
 ## display the coarse-grained graph
 gt <- simplify(as.undirected(gt))
 layout.cg <- layout.kamada.kawai(gt)
 com.cg <- scg(graph.laplacian(gt), nt-c(1,2), 2)$groups
 vsize <- sqrt(as.vector(table(cg$groups)))
+\dontrun{
 op <- par(mfrow=c(1,2))
 plot(immuno, layout=layout, vertex.size=3, vertex.color=col[com],
                 vertex.label=NA)
 plot(gt, layout=layout.cg, vertex.size=15*vsize/max(vsize), 
                 vertex.color=col[com.cg],vertex.label=NA)
 par(op)
+}
 }
 \keyword{graphs}
