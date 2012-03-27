@@ -4236,7 +4236,6 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
   }
 
   VECTOR(dists)[(long int)from] = 1.0;	/* zero distance */
-  if (is_target[(long int)from]) to_reach--;
   parents[(long int)from] = from+1;
   igraph_indheap_push_with_index(&Q, from, 0);
     

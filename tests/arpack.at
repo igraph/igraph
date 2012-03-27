@@ -26,3 +26,9 @@ AT_KEYWORDS([eigenvector centrality arpack ARPACK])
 AT_COMPILE_CHECK([simple/eigenvector_centrality.c],
                  [simple/eigenvector_centrality.out])
 AT_CLEANUP
+
+AT_SETUP([Symmetric ARPACK solver (igraph_arpack_rssolve):])
+AT_KEYWORDS([ARPACK symmetric])
+AT_COMPILE_CHECK([simple/igraph_arpack_rssolve.c],
+		 [simple/igraph_arpack_rssolve.out])
+AT_CLEANUP

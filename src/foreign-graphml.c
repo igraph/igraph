@@ -527,6 +527,11 @@ void igraph_i_graphml_add_attribute_key(const xmlChar** attrs,
     }
   }
 
+  /* in case of a missing attr.name attribute, use the id as the attribute name */
+  if (rec->record.name == 0) {
+    rec->record.name=strdup(rec->id);
+  }
+
   if (trie == 0 && state->successful) {
     igraph_error("Cannot parse GraphML file, missing 'for' attribute", __FILE__, __LINE__, IGRAPH_PARSEERROR);
     igraph_i_graphml_sax_handler_error(state, "Cannot parse GraphML file, missing 'for' attribute");
@@ -967,6 +972,13 @@ int igraph_i_xml_escape(char* src, char** dest) {
  * in igraph: it can read GraphML files without nested graphs and hyperedges.
  * Attributes of the graph are loaded only if an attribute interface
  * is attached, ie. if you use igraph from R or Python.
+ *
+ * </para><para>
+ * Graph attribute names are taken from the \c attr.name attributes of the
+ * \c key tags in the GraphML file. Since \c attr.name is not mandatory,
+ * igraph will fall back to the \c id attribute of the \c key tag if
+ * \c attr.name is missing.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param instream A stream, it should be readable.
  * \param index If the GraphML file contains more than one graph, the one
