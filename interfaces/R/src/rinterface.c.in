@@ -925,18 +925,17 @@ int R_igraph_progress_handler(const char *message, igraph_real_t percent,
   if (percent == 0) {
     int i, l=strlen(message);
     last=0;
-    fprintf(stderr, 
-	    "                    : --------------------------------------------------|\r");
+    REprintf("                    : --------------------------------------------------|\r");
     for (i=0; i<l && i<20; i++) {
-      fputc(message[i], stderr);
+      REprintf("%c", message[i]);
     }
     for (; i<20; i++) {
-      fputc(' ', stderr);
+      REprintf(" ");
     }
-    fputc(':', stderr); fputc(' ', stderr);
+    REprintf(": ");
   } 
   while (last < percent) {
-    fputc('*', stderr);
+    REprintf("*");
     last+=2;
   }
   return 0;
@@ -977,7 +976,7 @@ static R_INLINE void R_igraph_after2(SEXP verbose) {
   igraph_i_set_attribute_table(R_igraph_attribute_oldtable);
   if (LOGICAL(verbose)[0]) {
     igraph_set_progress_handler(R_igraph_oldprogress);
-    fputc('\n', stderr);
+    REprintf("\n");
   }
 }
 
