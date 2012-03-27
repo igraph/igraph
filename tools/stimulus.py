@@ -457,7 +457,7 @@ class RRCodeGenerator(CodeGenerator):
                     call=""
             return call
               
-        out.write("  on.exit( .Call(\"R_igraph_finalizer\", PACKAGE=\"igraph\") )\n")
+        out.write("  on.exit( .Call(\"R_igraph_finalizer\", PACKAGE=\"igraph0\") )\n")
         out.write("  # Function call\n")
         out.write("  res <- .Call(\"R_" + function + "\", ")
         call=[ do_par(n) for n,p in params.items() if p['mode'] in ['IN', 'INOUT'] ]
@@ -465,7 +465,7 @@ class RRCodeGenerator(CodeGenerator):
         if 'PROGRESS' in self.func[function]['FLAGS']:
             call.append('as.logical(verbose)')
         out.write(", ".join(call))
-        out.write(",\n        PACKAGE=\"igraph\")\n")
+        out.write(",\n        PACKAGE=\"igraph0\")\n")
 
         ## Set the class if requested
         if 'CLASS-R' in self.func[function].keys():

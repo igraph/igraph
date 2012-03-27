@@ -31,9 +31,9 @@ get.adjacency.dense <- function(graph, type=c("both", "upper", "lower"),
   type <- switch(type, "upper"=0, "lower"=1, "both"=2)
   
   if (is.null(attr)) {    
-    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
     res <- .Call("R_igraph_get_adjacency", graph, as.numeric(type),
-                 PACKAGE="igraph")
+                 PACKAGE="igraph0")
     if (binary) {
       res <- ifelse(res >= 1, 1, 0)
     }
@@ -153,9 +153,9 @@ get.edgelist <- function(graph, names=TRUE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   res <- matrix(.Call("R_igraph_get_edgelist", graph, TRUE,
-                      PACKAGE="igraph"), nc=2)
+                      PACKAGE="igraph0"), nc=2)
   if (names && "name" %in% list.vertex.attributes(graph)) {
     res <- matrix(V(graph)$name[ res+1 ], nc=2)
   }
@@ -171,9 +171,9 @@ as.directed <- function(graph, mode=c("mutual", "arbitrary")) {
   mode <- igraph.match.arg(mode)
   mode <- switch(mode, "arbitrary"=0, "mutual"=1)
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_to_directed", graph, as.numeric(mode),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 as.undirected <- function(graph, mode=c("collapse", "each")) {
@@ -184,9 +184,9 @@ as.undirected <- function(graph, mode=c("collapse", "each")) {
   mode <- igraph.match.arg(mode)
   mode <- switch(mode, "each"=0, "collapse"=1)
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_to_undirected", graph, as.numeric(mode),
-        PACKAGE="igraph")  
+        PACKAGE="igraph0")  
 }
 
 get.adjlist <- function(graph, mode=c("all", "out", "in", "total")) {
@@ -196,9 +196,9 @@ get.adjlist <- function(graph, mode=c("all", "out", "in", "total")) {
 
   mode <- igraph.match.arg(mode)
   mode <- as.numeric(switch(mode, "out"=1, "in"=2, "all"=3, "total"=3))
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_get_adjlist", graph, mode,
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 get.adjedgelist <- function(graph, mode=c("all", "out", "in", "total")) {
@@ -208,9 +208,9 @@ get.adjedgelist <- function(graph, mode=c("all", "out", "in", "total")) {
 
   mode <- igraph.match.arg(mode)
   mode <- as.numeric(switch(mode, "out"=1, "in"=2, "all"=3, "total"=3))
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_get_adjedgelist", graph, mode,
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 igraph.from.graphNEL <- function(graphNEL, name=TRUE, weight=TRUE,
@@ -344,10 +344,10 @@ igraph.to.graphNEL <- function(graph) {
 get.incidence.dense <- function(graph, types, names, attr) {
 
   if (is.null(attr)) {
-    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
     ## Function call
     res <- .Call("R_igraph_get_incidence", graph, types,
-                 PACKAGE="igraph")
+                 PACKAGE="igraph0")
 
     if (names && "name" %in% list.vertex.attributes(graph)) {
       rownames(res$res) <- V(graph)$name[ res$row_ids+1 ]

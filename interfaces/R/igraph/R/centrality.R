@@ -36,9 +36,9 @@ arpack <- function(func, extra=NULL, sym=FALSE, options=igraph.arpack.default,
     warning("Symmetric matrix, setting `complex' to FALSE")
   }
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   res <- .Call("R_igraph_arpack", func, extra, options, env, sym,
-               PACKAGE="igraph")
+               PACKAGE="igraph0")
 
   if (complex) {
     rew <- arpack.unpack.complex(res$vectors, res$values, res$options$nev)

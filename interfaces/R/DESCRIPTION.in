@@ -1,6 +1,6 @@
-Package: igraph
-Version: @VERSION@-3
-Date: Oct 18 , 2011
+Package: igraph0
+Version: @VERSION@
+Date: Mar 27 , 2012
 Title:  Network analysis and visualization
 Author: Gabor Csardi <csardi.gabor@gmail.com>
 Maintainer: Gabor Csardi <csardi.gabor@gmail.com>
