@@ -650,15 +650,15 @@ L10:
 	}
 /* ** */
 /* Comment out this if block if EMIN is ok */
-	if (iwarn) {
-	    first = TRUE_;
-	    printf("\n\n WARNING. The value EMIN may be incorrect:- ");
-	    printf("EMIN = %8li\n",lemin);
-	    printf("If, after inspection, the value EMIN looks acceptable");
-            printf("please comment out \n the IF block as marked within the"); 
-            printf("code of routine DLAMC2, \n otherwise supply EMIN"); 
-            printf("explicitly.\n");
-	}
+	/* if (iwarn) { */
+	/*     first = TRUE_; */
+	/*     printf("\n\n WARNING. The value EMIN may be incorrect:- "); */
+	/*     printf("EMIN = %8li\n",lemin); */
+	/*     printf("If, after inspection, the value EMIN looks acceptable"); */
+        /*     printf("please comment out \n the IF block as marked within the");  */
+        /*     printf("code of routine DLAMC2, \n otherwise supply EMIN");  */
+        /*     printf("explicitly.\n"); */
+	/* } */
 /* ** */
 
 /*        Assume IEEE arithmetic if we found denormalised  numbers above, */

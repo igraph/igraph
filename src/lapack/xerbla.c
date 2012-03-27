@@ -14,6 +14,7 @@
 #include "arpack_internal.h"
 #include "f2c.h"
 #include <stdio.h>
+#include "igraph.h"
 
 /* Table of constant values */
 
@@ -54,8 +55,9 @@
 
 /*     .. Executable Statements .. */
 
-    printf("** On entry to %6s, parameter number %2i had an illegal value\n",
-		srname, (int)*info);
+  IGRAPH_ERROR("Internal BLAS/LAPACK/ARPACK error", IGRAPH_EINTERNAL);
+    /* printf("** On entry to %6s, parameter number %2i had an illegal value\n", */
+    /* 		srname, (int)*info); */
 
 /*     End of XERBLA */
 
