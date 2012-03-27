@@ -6,7 +6,7 @@
   Calculates a measure of diversity for all vertices.
 }
 \usage{
-graph.diversity(graph, weights = NULL)
+graph.diversity(graph, weights = NULL, vids = V(graph))
 }
 \arguments{
   \item{graph}{The input graph. Edge directions are ignored.}
@@ -14,6 +14,7 @@ graph.diversity(graph, weights = NULL)
     the computation. If \code{NULL}, then the \sQuote{weight} attibute
     is used. Note that this measure is not defined for unweighted
     graphs.}
+  \item{vids}{The vertex ids for which to calculate the measure.}
 }
 \details{
   The diversity of a vertex is defined as the (scaled) Shannon entropy
