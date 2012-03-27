@@ -1,5 +1,5 @@
 
-R version 2.14.0 (2011-10-31)
+R version 2.14.1 (2011-12-22)
 Copyright (C) 2011 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
@@ -46,6 +46,112 @@ Loading required package: lattice
 [1] TRUE
 > max(abs(correctSign(r1$vectors) - correctSign(r2$vectors[,1]))) < 1e-14
 [1] TRUE
+> 
+> ####
+> # Complex case
+> 
+> A <- structure(c(-6, -6, 7, 6, 1, -9, -3, 2, -9, -7, 0, 1, -7, 8, 
++ -7, 10, 0, 0, 1, 1, 10, 0, 8, -4, -4, -5, 8, 9, -6, 9, 3, 8, 
++ 6, -1, 9, -9, -6, -3, -1, -7, 8, -4, -4, 10, 0, 5, -2, 0, 7, 
++ 10, 1, 4, -8, 3, 5, 3, -7, -9, 10, -1, -4, -7, -1, 7, 5, -5, 
++ 1, -4, 9, -2, 10, 1, -7, 7, 6, 7, -3, 0, 9, -5, -8, 1, -3, -3, 
++ -8, -7, -8, 10, 8, 7, 0, 6, -7, -8, 10, 10, 1, 0, -2, 6), .Dim = c(10L, 
++ 10L))
+> 
+> f <- function(x, extra=NULL) A %*% x
+> res <- arpack(f, options=list(n=10, nev=3, ncv=7, sym=FALSE))
+> res$values
+[1]  22.04831+ 0.00000i -21.32812+ 0.00000i  -3.00735+19.29572i
+> (res$values[1] * res$vectors[,1]) / (A %*% res$vectors[,1])
+      [,1]
+ [1,] 1+0i
+ [2,] 1+0i
+ [3,] 1+0i
+ [4,] 1+0i
+ [5,] 1+0i
+ [6,] 1+0i
+ [7,] 1+0i
+ [8,] 1+0i
+ [9,] 1+0i
+[10,] 1+0i
+> (res$values[2] * res$vectors[,2]) / (A %*% res$vectors[,2])
+      [,1]
+ [1,] 1+0i
+ [2,] 1+0i
+ [3,] 1+0i
+ [4,] 1+0i
+ [5,] 1+0i
+ [6,] 1+0i
+ [7,] 1+0i
+ [8,] 1+0i
+ [9,] 1+0i
+[10,] 1+0i
+> abs((res$values[3] * res$vectors[,3]) / (A %*% res$vectors[,3]))
+      [,1]
+ [1,]    1
+ [2,]    1
+ [3,]    1
+ [4,]    1
+ [5,]    1
+ [6,]    1
+ [7,]    1
+ [8,]    1
+ [9,]    1
+[10,]    1
+> 
+> f <- function(x, extra=NULL) A %*% x
+> res <- arpack(f, options=list(n=10, nev=4, ncv=9, sym=FALSE))
+> res$values
+[1]  22.04831+ 0.00000i -21.32812+ 0.00000i  -3.00735+19.29572i
+[4]  -3.00735-19.29572i
+> (res$values[1] * res$vectors[,1]) / (A %*% res$vectors[,1])
+      [,1]
+ [1,] 1+0i
+ [2,] 1+0i
+ [3,] 1+0i
+ [4,] 1+0i
+ [5,] 1+0i
+ [6,] 1+0i
+ [7,] 1+0i
+ [8,] 1+0i
+ [9,] 1+0i
+[10,] 1+0i
+> (res$values[2] * res$vectors[,2]) / (A %*% res$vectors[,2])
+      [,1]
+ [1,] 1+0i
+ [2,] 1+0i
+ [3,] 1+0i
+ [4,] 1+0i
+ [5,] 1+0i
+ [6,] 1+0i
+ [7,] 1+0i
+ [8,] 1+0i
+ [9,] 1+0i
+[10,] 1+0i
+> abs((res$values[3] * res$vectors[,3]) / (A %*% res$vectors[,3]))
+      [,1]
+ [1,]    1
+ [2,]    1
+ [3,]    1
+ [4,]    1
+ [5,]    1
+ [6,]    1
+ [7,]    1
+ [8,]    1
+ [9,]    1
+[10,]    1
+> abs((res$values[4] * res$vectors[,4]) / (A %*% res$vectors[,4]))
+      [,1]
+ [1,]    1
+ [2,]    1
+ [3,]    1
+ [4,]    1
+ [5,]    1
+ [6,]    1
+ [7,]    1
+ [8,]    1
+ [9,]    1
+[10,]    1
 > 
 > ####
 > 
