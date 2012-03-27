@@ -21,7 +21,7 @@
 ###################################################################
 
 .onLoad <- function(libname, pkgname) {
-  library.dynam("igraph", pkgname, libname, local=FALSE);
+  library.dynam("igraph0", pkgname, libname, local=FALSE);
 
   ########################
   # Set default parameters
@@ -38,9 +38,9 @@
 }
 
 .onUnload <- function(libpath) {
-  library.dynam.unload("igraph", libpath)
+  library.dynam.unload("igraph0", libpath)
 }
 
 .Last.lib <- function(libpath) {
-  igraph::.onUnload(libpath)
+  igraph0::.onUnload(libpath)
 }

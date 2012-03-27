@@ -29,9 +29,9 @@ graph.disjoint.union <- function(...) {
     stop("Not a graph object")
   }
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_disjoint_union", graphs,
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 "%du%" <- function(x,y) {
@@ -47,9 +47,9 @@ graph.union <- function(...) {
     stop("Not a graph object")
   }
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_union", graphs,
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 "%u%" <- function(x,y) {
@@ -65,9 +65,9 @@ graph.intersection <- function(...) {
     stop("Not a graph object")
   }
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_intersection", graphs,
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 "%s%" <- function(x,y) {
@@ -80,9 +80,9 @@ graph.difference <- function(big, small) {
     stop("argument is not a graph")
   }
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_difference", big, small,
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
     
 "%m%" <- function(x,y) {
@@ -94,9 +94,9 @@ graph.complementer <- function(graph, loops=FALSE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_complementer", graph, as.logical(loops),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 graph.compose <- function(g1, g2) {
@@ -104,9 +104,9 @@ graph.compose <- function(g1, g2) {
   if (!is.igraph(g1) || !is.igraph(g2)) {
     stop("Not a graph object")
   }
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_compose", g1, g2,
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 "%c%" <- function(x,y) {

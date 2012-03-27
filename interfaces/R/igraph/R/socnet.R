@@ -1922,11 +1922,11 @@ tkigraph <- function() {
   tcl("global", "tkigraph_help_root", "tkigraph_help_history",
       "tkigraph_help_history_pos", "browser_button", "browser_url")  
   tcl("set", "tkigraph_help_root",
-      system.file("tkigraph_help", package="igraph"))
+      system.file("tkigraph_help", package="igraph0"))
   tcl("set", "browser_button", browser.button)
   
-  tcl("source", system.file("html_library.tcl", package="igraph"))
-  tcl("source", system.file("my_html_library.tcl", package="igraph"))
+  tcl("source", system.file("html_library.tcl", package="igraph0"))
+  tcl("source", system.file("my_html_library.tcl", package="igraph0"))
   tcl("HMinit_win", txt)
   tcl("start_history", txt)
   tcl("render", txt, "index.html")
@@ -1935,7 +1935,7 @@ tkigraph <- function() {
 }
 
 .tkigraph.help.external <- function(page="index.html") {
-  f <- system.file("tkigraph_help/index.html", package="igraph")
+  f <- system.file("tkigraph_help/index.html", package="igraph0")
   browseURL(f)
 }
 
@@ -1943,13 +1943,13 @@ tkigraph <- function() {
   dialog <- tktoplevel()
   tktitle(dialog) <- "About tkigraph"
   image <-tkimage.create("photo", "img", format="gif",
-                         file=system.file("igraph.gif", package="igraph"))
+                         file=system.file("igraph.gif", package="igraph0"))
   logo <- tklabel(dialog, relief="flat", padx=10, pady=10, image=image)
   label <- tklabel(dialog, padx=30, pady=10,
                    text=paste(sep="", "tkigraph (c) 2009 Gabor Csardi\n",
                      "igraph (c) 2003-2009 Gabor Csardi and Tamas Nepusz\n\n",
                      "This is igraph version ",
-                     packageDescription("igraph")$Version, " and\n",
+                     packageDescription("igraph0")$Version, " and\n",
                      R.version$version.string))
   close <- tkbutton(dialog, text="Close", command=function() {
     tkdestroy(dialog); return()

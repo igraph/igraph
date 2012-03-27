@@ -32,9 +32,9 @@ cliques <- function(graph, min=NULL, max=NULL) {
     max <- 0
   }
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_cliques", graph, as.numeric(min), as.numeric(max),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 largest.cliques <- function(graph) {
@@ -42,9 +42,9 @@ largest.cliques <- function(graph) {
     stop("Not a graph object")
   }
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_largest_cliques", graph,
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 maximal.cliques <- function(graph) {
@@ -52,9 +52,9 @@ maximal.cliques <- function(graph) {
     stop("Not a graph object");
   }
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_maximal_cliques", graph,
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 clique.number <- function(graph) {
@@ -62,9 +62,9 @@ clique.number <- function(graph) {
     stop("Not a graph object");
   }
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_clique_number", graph,
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 independent.vertex.sets <- function(graph, min=NULL, max=NULL) {
@@ -80,10 +80,10 @@ independent.vertex.sets <- function(graph, min=NULL, max=NULL) {
     max <- 0
   }
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_independent_vertex_sets", graph, as.numeric(min),
         as.numeric(max),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 largest.independent.vertex.sets <- function(graph) {
@@ -91,9 +91,9 @@ largest.independent.vertex.sets <- function(graph) {
     stop("Not a graph object");
   }
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_largest_independent_vertex_sets", graph,
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 maximal.independent.vertex.sets <- function(graph) {
@@ -101,9 +101,9 @@ maximal.independent.vertex.sets <- function(graph) {
     stop("Not a graph object");
   }
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_maximal_independent_vertex_sets", graph,
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 independence.number <- function(graph) {
@@ -111,7 +111,7 @@ independence.number <- function(graph) {
     stop("Not a graph object");
   }
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_independence_number", graph,
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }

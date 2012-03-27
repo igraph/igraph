@@ -1,5 +1,5 @@
 
-all: igraph_$(VERSION).tar.gz
+all: igraph0_$(VERSION).tar.gz
 
 RFILES = $(wildcard igraph/R/*.R) $(wildcard igraph/man/*.Rd) \
 	igraph/src/config.h igraph/src/config.h.in igraph/src/Makevars.in \
@@ -96,7 +96,7 @@ igraph/src/%.c: $(top_srcdir)/src/blas/%.c
 igraph/src/%.c: $(top_srcdir)/src/f2c/%.c
 	cp $(top_srcdir)/src/f2c/$(@F) igraph/src/$(@F)
 
-igraph_$(VERSION).tar.gz: $(RFILES) $(SRCFILES)
+igraph0_$(VERSION).tar.gz: $(RFILES) $(SRCFILES)
 	rm -f igraph/R/config.R
 	rm -f igraph/src/config.h
 	touch igraph/src/config.h

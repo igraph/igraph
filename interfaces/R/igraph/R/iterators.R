@@ -58,15 +58,15 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
       res <- 0:(ec-1)
     }
   } else if (!is.null(P)) {
-    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
     res <- .Call("R_igraph_es_pairs", graph, as.numeric(P),
                  as.logical(directed),
-                 PACKAGE="igraph")
+                 PACKAGE="igraph0")
   } else {
-    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
     res <- .Call("R_igraph_es_path", graph, as.numeric(path),
                  as.logical(directed),
-                 PACKAGE="igraph")
+                 PACKAGE="igraph0")
   }
     
   class(res) <- "igraph.es"
@@ -101,10 +101,10 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
       if (is.logical(v)) {
         v <- which(v)
       }
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
       tmp <- .Call("R_igraph_vs_nei", graph, x, as.igraph.vs(graph, v),
                    as.numeric(mode),
-                   PACKAGE="igraph")
+                   PACKAGE="igraph0")
       tmp[as.numeric(x)+1]
     }
     innei <- function(v, mode=c("in", "all", "out", "total")) {
@@ -119,9 +119,9 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
       if (is.logical(e)) {
         e <- which(e)
       }
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
       tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(e), as.numeric(3),
-                   PACKAGE="igraph")
+                   PACKAGE="igraph0")
       tmp[as.numeric(x)+1]
     }
     from <- function(e) {
@@ -129,9 +129,9 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
       if (is.logical(e)) {
         e <- which(e)
       }
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
       tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(e), as.numeric(1),
-                   PACKAGE="igraph")
+                   PACKAGE="igraph0")
       tmp[as.numeric(x)+1]
     }
     to <- function(e) {
@@ -139,9 +139,9 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
       if (is.logical(e)) {
         e <- which(e)
       }
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
       tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(e), as.numeric(2),
-                   PACKAGE="igraph")
+                   PACKAGE="igraph0")
       tmp[as.numeric(x)+1]
     }
     i <- eval(i, envir=c(graph[[9]][[3]], nei=nei, innei=innei,
@@ -181,23 +181,23 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
     i <- substitute(i)
     adj <- function(v) {
       ## TRUE iff the edge is adjacent to at least one vertex in v
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
       tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v), as.numeric(3),
-                   PACKAGE="igraph")
+                   PACKAGE="igraph0")
       tmp[ as.numeric(x)+1 ]
     }
     from <- function(v) {
       ## TRUE iff the edge originates from at least one vertex in v
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
       tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v), as.numeric(1),
-                   PACKAGE="igraph")
+                   PACKAGE="igraph0")
       tmp[ as.numeric(x)+1 ]      
     }
     to <- function(v) {
       ## TRUE iff the edge points to at least one vertex in v
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
       tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v), as.numeric(2),
-                   PACKAGE="igraph")
+                   PACKAGE="igraph0")
       tmp[ as.numeric(x)+1 ]
     }
     i <- eval(i, envir=c(graph[[9]][[4]],

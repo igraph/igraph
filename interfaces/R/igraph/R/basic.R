@@ -29,9 +29,9 @@ is.directed <- function(graph) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_is_directed", graph,
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 get.edge <- function(graph, id) {
@@ -47,9 +47,9 @@ get.edge <- function(graph, id) {
     stop("No such edge")
   }
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_get_edge", graph, as.numeric(id),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 

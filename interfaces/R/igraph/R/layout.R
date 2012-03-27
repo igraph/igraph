@@ -29,13 +29,13 @@ layout.random <- function(graph, params, dim=2) {
     stop("Not a graph object")
   }
   if (dim==2) {
-    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
     .Call("R_igraph_layout_random", graph,
-          PACKAGE="igraph")
+          PACKAGE="igraph0")
   } else if (dim==3) {
-    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
     .Call("R_igraph_layout_random_3d", graph,
-          PACKAGE="igraph")
+          PACKAGE="igraph0")
   } else {
     stop("Invalid `dim' value");
   }
@@ -45,18 +45,18 @@ layout.circle <- function(graph, params) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_layout_circle", graph,
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 layout.sphere <- function(graph, params) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_layout_sphere", graph,
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 layout.fruchterman.reingold <- function(graph, ..., dim=2,
@@ -93,13 +93,13 @@ layout.fruchterman.reingold <- function(graph, ..., dim=2,
     params$start <- structure(as.numeric(params$start), dim=dim(params$start))
   }
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call(fn, graph,
         as.double(params$niter), as.double(params$maxdelta),
         as.double(params$area), as.double(params$coolexp),
         as.double(params$repulserad), params$weights, params$start,
         as.logical(verbose),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 layout.fruchterman.reingold.grid <- function(graph, ...,
@@ -124,14 +124,14 @@ layout.fruchterman.reingold.grid <- function(graph, ...,
     params$start <- structure(as.numeric(params$start), dim=dim(params$start))
   }
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_layout_fruchterman_reingold_grid", graph,
         as.double(params$niter), as.double(params$maxdelta),
         as.double(params$area), as.double(params$coolexp),
         as.double(params$repulserad), as.double(params$cellsize),
         params$start,
         as.logical(verbose),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
   
 
@@ -164,12 +164,12 @@ layout.kamada.kawai<-function(graph, ..., dim=2, verbose=igraph.par("verbose"),
   if (!is.null(params$start)) {
     params$start <- structure(as.numeric(params$start), dim=dim(params$start))
   }
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call(fn, graph,
         as.double(params$niter), as.double(params$initemp),
         as.double(params$coolexp), as.double(params$kkconst),
         as.double(params$sigma), params$start, as.logical(verbose),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 layout.graphopt <- function(graph, ..., verbose=igraph.par("verbose"),
@@ -193,13 +193,13 @@ layout.graphopt <- function(graph, ..., verbose=igraph.par("verbose"),
     params$start <- structure(as.numeric(params$start), dim=dim(params$start))
   }
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_layout_graphopt", graph,
         as.double(params$niter), as.double(params$charge),
         as.double(params$mass), as.double(params$spring.length),
         as.double(params$spring.constant), params$max.sa.movement,
         params$start, as.logical(verbose),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 layout.lgl <- function(graph, ..., params=list()) {
@@ -221,12 +221,12 @@ layout.lgl <- function(graph, ..., params=list()) {
                                      (sqrt(sqrt(params$area))) }
   if (is.null(params$root))      { params$root       <- -1   }
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_layout_lgl", graph, as.double(params$maxiter),
         as.double(params$maxdelta), as.double(params$area),
         as.double(params$coolexp), as.double(params$repulserad),
         as.double(params$cellsize), as.double(params$root),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 layout.reingold.tilford <- function(graph, ..., params=list()) {
@@ -241,10 +241,10 @@ layout.reingold.tilford <- function(graph, ..., params=list()) {
   if (is.null(params$root))          { params$root       <- 0     }
   if (is.null(params$circular))      { params$circular   <- FALSE }
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_layout_reingold_tilford", graph, as.double(params$root),
         as.logical(params$circular),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 layout.merge <- function(graphs, layouts, method="dla",
@@ -254,11 +254,11 @@ layout.merge <- function(graphs, layouts, method="dla",
     stop("Not a graph object")
   }
   if (method == "dla") {
-    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
     res <- .Call("R_igraph_layout_merge_dla",
                  graphs,
                  layouts, as.logical(verbose),
-                 PACKAGE="igraph")
+                 PACKAGE="igraph0")
   } else {
     stop("Invalid `method'.")
   }
@@ -547,13 +547,13 @@ layout.drl <- function(graph, use.seed = FALSE,
     if (!is.null(fixed)) {
       fixed <- as.logical(fixed)
     }
-    on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
+    on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph0"))
     if (dim==2) {
       res <- .Call("R_igraph_layout_drl", graph, seed, use.seed, options, 
-                   weights, fixed, PACKAGE = "igraph")
+                   weights, fixed, PACKAGE = "igraph0")
     } else {
       res <- .Call("R_igraph_layout_drl_3d", graph, seed, use.seed, options, 
-                   weights, fixed, PACKAGE = "igraph")
+                   weights, fixed, PACKAGE = "igraph0")
     }      
     res
 }

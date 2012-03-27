@@ -36,18 +36,18 @@ minimum.spanning.tree <- function(graph, weights=NULL,
   }
   
   if (algorithm=="unweighted") {
-    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
     .Call("R_igraph_minimum_spanning_tree_unweighted", graph,
-          PACKAGE="igraph")
+          PACKAGE="igraph0")
   } else if (algorithm=="prim") {
     if (is.null(weights) && ! "weight" %in% list.edge.attributes(graph)) {
       stop("edges weights must be supplied for Prim's algorithm")
     } else if (is.null(weights)) {
       weights <- E(graph)$weight
     }
-    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
     .Call("R_igraph_minimum_spanning_tree_prim", graph, as.numeric(weights),
-          PACKAGE="igraph")    
+          PACKAGE="igraph0")    
   } else {
     stop("Invalid algorithm")
   }

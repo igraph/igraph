@@ -39,10 +39,10 @@ diameter <- function(graph, directed=TRUE, unconnected=TRUE, weights=NULL) {
     weights <- NULL
   }
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_diameter", graph, as.logical(directed),
         as.logical(unconnected), weights,
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 get.diameter <- function(graph, directed=TRUE, unconnected=TRUE,
@@ -61,10 +61,10 @@ get.diameter <- function(graph, directed=TRUE, unconnected=TRUE,
     weights <- NULL
   }
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_get_diameter", graph, as.logical(directed),
         as.logical(unconnected), weights,
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 farthest.nodes <- function(graph, directed=TRUE, unconnected=TRUE,
@@ -83,10 +83,10 @@ farthest.nodes <- function(graph, directed=TRUE, unconnected=TRUE,
     weights <- NULL
   }
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_farthest_points", graph, as.logical(directed),
         as.logical(unconnected), weights,
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }       
 
 average.path.length <- function(graph, directed=TRUE, unconnected=TRUE) {
@@ -94,10 +94,10 @@ average.path.length <- function(graph, directed=TRUE, unconnected=TRUE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_average_path_length", graph, as.logical(directed),
         as.logical(unconnected),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 degree <- function(graph, v=V(graph),
@@ -109,9 +109,9 @@ degree <- function(graph, v=V(graph),
   mode <- igraph.match.arg(mode)
   mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_degree", graph, as.igraph.vs(graph, v), as.numeric(mode),
-        as.logical(loops), PACKAGE="igraph")
+        as.logical(loops), PACKAGE="igraph0")
 }
   
 degree.distribution <- function(graph, cumulative=FALSE, ...) {
@@ -138,9 +138,9 @@ closeness <- function(graph, v=V(graph), mode=c("all", "out", "in")) {
   mode <- igraph.match.arg(mode)
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_closeness", graph, as.igraph.vs(graph, v), as.numeric(mode),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 shortest.paths <- function(graph, v=V(graph), mode=c("all", "out", "in"),
@@ -174,10 +174,10 @@ shortest.paths <- function(graph, v=V(graph), mode=c("all", "out", "in"),
     warning("Unweighted algorithm chosen, weights ignored")
   }
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_shortest_paths", graph, as.igraph.vs(graph, v),
         as.numeric(mode), weights, as.numeric(algorithm),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 get.shortest.paths <- function(graph, from, to=V(graph),
@@ -203,10 +203,10 @@ get.shortest.paths <- function(graph, from, to=V(graph),
   }
   
   to <- as.igraph.vs(graph, to)
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_get_shortest_paths", graph,
         as.igraph.vs(graph, from), to, as.numeric(mode), as.numeric(length(to)),
-        weights, PACKAGE="igraph")
+        weights, PACKAGE="igraph0")
 }
 
 get.all.shortest.paths <- function(graph, from,
@@ -219,10 +219,10 @@ get.all.shortest.paths <- function(graph, from,
   mode <- igraph.match.arg(mode)
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_get_all_shortest_paths", graph,
         as.numeric(from), as.igraph.vs(graph, to), as.numeric(mode),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 subcomponent <- function(graph, v, mode=c("all", "out", "in")) {
@@ -233,9 +233,9 @@ subcomponent <- function(graph, v, mode=c("all", "out", "in")) {
   mode <- igraph.match.arg(mode)
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_subcomponent", graph, as.igraph.vs(graph, v), as.numeric(mode),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 subgraph <- function(graph, v) {
@@ -243,9 +243,9 @@ subgraph <- function(graph, v) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_subgraph", graph, as.igraph.vs(graph, v),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 simplify <- function(graph, remove.multiple=TRUE,
@@ -254,9 +254,9 @@ simplify <- function(graph, remove.multiple=TRUE,
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_simplify", graph, as.logical(remove.multiple),
-        as.logical(remove.loops), PACKAGE="igraph")
+        as.logical(remove.loops), PACKAGE="igraph0")
 
 ##   res <- graph
 ##   vc <- vcount(res)
@@ -291,10 +291,10 @@ betweenness <- function(graph, v=V(graph), directed=TRUE, verbose=igraph.par("ve
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_betweenness", graph, as.igraph.vs(graph, v),
         as.logical(directed), as.logical(verbose),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 edge.betweenness <- function(graph, e=E(graph), directed=TRUE) {
@@ -306,9 +306,9 @@ edge.betweenness <- function(graph, e=E(graph), directed=TRUE) {
   if (any( e<0 | e >=ecount(graph))) {
     stop("Invalid edge id")
   }
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_edge_betweenness", graph, as.logical(directed),
-        PACKAGE="igraph")[ as.numeric(e)+1 ]  
+        PACKAGE="igraph0")[ as.numeric(e)+1 ]  
 }
 
 transitivity <- function(graph, type=c("undirected", "global", "globalundirected",
@@ -324,22 +324,22 @@ transitivity <- function(graph, type=c("undirected", "global", "globalundirected
                  "localundirected"=1, "local"=1, "average"=2,
                  "localaverage"=2, "localaverageundirected"=2)
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   if (type==0) {
     .Call("R_igraph_transitivity_undirected", graph,
-          PACKAGE="igraph")
+          PACKAGE="igraph0")
   } else if (type==1) {
     if (is.null(vids)) {
       .Call("R_igraph_transitivity_local_undirected_all", graph,
-            PACKAGE="igraph")
+            PACKAGE="igraph0")
     } else {
       vids <- as.igraph.vs(graph, vids)
       .Call("R_igraph_transitivity_local_undirected", graph, vids,
-            PACKAGE="igraph")
+            PACKAGE="igraph0")
     }
   } else if (type==2) {
     .Call("R_igraph_transitivity_avglocal_undirected", graph,
-          PACKAGE="igraph")
+          PACKAGE="igraph0")
   }
 }
 
@@ -349,9 +349,9 @@ graph.laplacian <- function(graph, normalized=FALSE) {
     stop("Not a graph object")
   }
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_laplacian", graph, as.logical(normalized),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
   
 ## OLD implementation
@@ -467,10 +467,10 @@ constraint <- function(graph, nodes=V(graph), weights=NULL) {
     }
   }
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_constraint", graph, as.igraph.vs(graph, nodes),
         as.numeric(weights),        
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 reciprocity <- function(graph, ignore.loops=TRUE) {
@@ -479,9 +479,9 @@ reciprocity <- function(graph, ignore.loops=TRUE) {
     stop("Not a graph object")
   }
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_reciprocity", graph, as.logical(ignore.loops),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 rewire <- function(graph, mode="simple", niter=100) {
@@ -493,9 +493,9 @@ rewire <- function(graph, mode="simple", niter=100) {
   mode <- igraph.match.arg(mode)
   mode <- switch(mode, "simple"=0)
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_rewire", graph, as.numeric(niter), as.numeric(mode),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 bonpow <- function(graph, nodes=V(graph),
@@ -569,9 +569,9 @@ graph.density <- function(graph, loops=FALSE) {
     stop("Not a graph object")
   }  
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_density", graph, as.logical(loops),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 neighborhood.size <- function(graph, order, nodes=V(graph),
@@ -583,10 +583,10 @@ neighborhood.size <- function(graph, order, nodes=V(graph),
   mode <- igraph.match.arg(mode)
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_neighborhood_size", graph, 
         as.igraph.vs(graph, nodes), as.numeric(order), as.numeric(mode),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 neighborhood <- function(graph, order, nodes=V(graph), mode=c("all", "out", "in")) {
@@ -597,10 +597,10 @@ neighborhood <- function(graph, order, nodes=V(graph), mode=c("all", "out", "in"
   mode <- igraph.match.arg(mode)
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_neighborhood", graph, 
         as.igraph.vs(graph, nodes), as.numeric(order), as.numeric(mode),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 graph.neighborhood <- function(graph, order, nodes=V(graph),
@@ -612,10 +612,10 @@ graph.neighborhood <- function(graph, order, nodes=V(graph),
   mode <- igraph.match.arg(mode)
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_neighborhood_graphs", graph, 
         as.igraph.vs(graph, nodes), as.numeric(order), as.numeric(mode),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 graph.coreness <- function(graph, mode=c("all", "out", "in")) {
@@ -626,9 +626,9 @@ graph.coreness <- function(graph, mode=c("all", "out", "in")) {
   mode <- igraph.match.arg(mode)
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_coreness", graph, as.numeric(mode),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 topological.sort <- function(graph, mode=c("out", "all", "in")) {
@@ -639,9 +639,9 @@ topological.sort <- function(graph, mode=c("out", "all", "in")) {
   mode <- igraph.match.arg(mode)
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_topological_sorting", graph, as.numeric(mode),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 girth <- function(graph, circle=TRUE) {
@@ -649,9 +649,9 @@ girth <- function(graph, circle=TRUE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_girth", graph, as.logical(circle),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 is.loop <- function(graph, eids=E(graph)) {
@@ -659,9 +659,9 @@ is.loop <- function(graph, eids=E(graph)) {
   if (!is.igraph(graph)) {
     stop("Not a graph object");
   }
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_is_loop", graph, as.igraph.es(eids),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 is.multiple <- function(graph, eids=E(graph)) {
@@ -669,9 +669,9 @@ is.multiple <- function(graph, eids=E(graph)) {
   if (!is.igraph(graph)) {
     stop("Not a graph object");
   }
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_is_multiple", graph, as.igraph.es(eids),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
 
 count.multiple <- function(graph, eids=E(graph)) {
@@ -679,7 +679,7 @@ count.multiple <- function(graph, eids=E(graph)) {
   if (!is.igraph(graph)) {
     stop("Not a graph object");
   }
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   .Call("R_igraph_count_multiple", graph, as.igraph.es(eids),
-        PACKAGE="igraph")
+        PACKAGE="igraph0")
 }
