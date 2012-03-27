@@ -146,7 +146,8 @@ degree_sequence(int _n, double exp, int degmin, int degmax, double z) {
     // Binomial distribution
     if(z<0) {
       // fprintf(stderr,"Fatal error in degree_sequence Ctor: positive average degree must be specified\n");
-      exit(-1);
+      igraph_error("Non-negative average degree in gengraph", 
+		   __FILE__, __LINE__, IGRAPH_EINVAL);
     }
     if(degmax<0) degmax=n-1;
     total = int(floor(double(n)*z+0.5));

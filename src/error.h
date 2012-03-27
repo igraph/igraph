@@ -314,6 +314,7 @@ igraph_set_error_handler(igraph_error_handler_t* new_handler);
  * \enumval IGRAPH_ARPACK_UNKNOWN Unkown ARPACK error.
  * \enumval IGRAPH_ENEGLOOP Negative loop detected while calculating shortest paths.
  * \enumval IGRAPH_EINTERNAL Internal error, likely a bug in igraph.
+ * \enumval IGRAPH_EDRL Internal error in the DrL layout engine.
  */
 
 typedef enum {
@@ -354,7 +355,8 @@ typedef enum {
   IGRAPH_ARPACK_LAPACK    = 35,
   IGRAPH_ARPACK_UNKNOWN   = 36,
   IGRAPH_ENEGLOOP         = 37,
-  IGRAPH_EINTERNAL        = 38
+  IGRAPH_EINTERNAL        = 38,
+  IGRAPH_EDRL             = 39
 } igraph_error_type_t;
 
 /**

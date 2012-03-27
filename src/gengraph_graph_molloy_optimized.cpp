@@ -64,54 +64,54 @@ graph_molloy_opt::graph_molloy_opt(degree_sequence &degs) {
   alloc(degs);
 }
 
-graph_molloy_opt::graph_molloy_opt(FILE *f) { 
-  char *buff = new char[FBUFF_SIZE];
-  // How many vertices ?
-  // if(VERBOSE()) fprintf(stderr,"Read file: #vertices=");
-  int i;
-  int n=0;
-  while(fgets(buff,FBUFF_SIZE,f)) if(sscanf(buff,"%d",&i)==1 && i>n) n=i;
-  n++;
-  // degrees ?
-  // if(VERBOSE()) fprintf(stderr,"%d, #edges=",n);
-  int *degs = new int[n];
-  for(i=0; i<n; i++) degs[i]=0;
-  rewind(f);
-  while(fgets(buff,FBUFF_SIZE,f)) {
-    int d = 0;
-    if(sscanf(buff,"%d",&i)==1) {
-      char *b = buff;
-      while(skip_int(b)) d++;
-      degs[i]=d;
-    }
-  }
-  // allocate memory
-  degree_sequence dd(n,degs);
-  a = dd.sum();
-  // if(VERBOSE()) fprintf(stderr,"%d\nAllocating memory...",a);
-  alloc(dd);
-  // add edges
-  // if(VERBOSE()) fprintf(stderr,"done\nCreating edges...");
-  rewind(f);
-  int line=0;
-  int j;
-  while(fgets(buff,FBUFF_SIZE,f)) {
-    line++;
-    if(sscanf(buff,"%d",&i)==1) {
-      char *b = buff;
-      while(skip_int(b)) {
-        if(sscanf(b,"%d",&j)!=1) {
-          // fprintf(stderr,"\nParse error at line %d, col %d : integer expected\n",line,int(b-buff));
-          exit(6);
-        }
-        *(neigh[i]++) = j;
-      }
-    }
-  }
-  delete[] buff;
-  compute_neigh();
-  // if(VERBOSE()) fprintf(stderr,"done\n");
-}
+// graph_molloy_opt::graph_molloy_opt(FILE *f) { 
+//   char *buff = new char[FBUFF_SIZE];
+//   // How many vertices ?
+//   // if(VERBOSE()) fprintf(stderr,"Read file: #vertices=");
+//   int i;
+//   int n=0;
+//   while(fgets(buff,FBUFF_SIZE,f)) if(sscanf(buff,"%d",&i)==1 && i>n) n=i;
+//   n++;
+//   // degrees ?
+//   // if(VERBOSE()) fprintf(stderr,"%d, #edges=",n);
+//   int *degs = new int[n];
+//   for(i=0; i<n; i++) degs[i]=0;
+//   rewind(f);
+//   while(fgets(buff,FBUFF_SIZE,f)) {
+//     int d = 0;
+//     if(sscanf(buff,"%d",&i)==1) {
+//       char *b = buff;
+//       while(skip_int(b)) d++;
+//       degs[i]=d;
+//     }
+//   }
+//   // allocate memory
+//   degree_sequence dd(n,degs);
+//   a = dd.sum();
+//   // if(VERBOSE()) fprintf(stderr,"%d\nAllocating memory...",a);
+//   alloc(dd);
+//   // add edges
+//   // if(VERBOSE()) fprintf(stderr,"done\nCreating edges...");
+//   rewind(f);
+//   int line=0;
+//   int j;
+//   while(fgets(buff,FBUFF_SIZE,f)) {
+//     line++;
+//     if(sscanf(buff,"%d",&i)==1) {
+//       char *b = buff;
+//       while(skip_int(b)) {
+//         if(sscanf(b,"%d",&j)!=1) {
+//           // fprintf(stderr,"\nParse error at line %d, col %d : integer expected\n",line,int(b-buff));
+//           exit(6);
+//         }
+//         *(neigh[i]++) = j;
+//       }
+//     }
+//   }
+//   delete[] buff;
+//   compute_neigh();
+//   // if(VERBOSE()) fprintf(stderr,"done\n");
+// }
 
 graph_molloy_opt::graph_molloy_opt(int *svg) {
   // Read n
@@ -879,7 +879,7 @@ int graph_molloy_opt::breadth_path_search(int src, int *buff, double *paths, uns
       }
       else if(d==nd) if((paths[w]+=p)==numeric_limits<double>::infinity()) {
         // fprintf(stderr,"Fatal error : too many (>MAX_DOUBLE) possible paths in graph\n");
-        exit(-1);
+	  IGRAPH_ERROR("Too many paths in gengraph, overflow", IGRAPH_ENOMEM);
       }
     }
   }

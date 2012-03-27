@@ -13,8 +13,8 @@ using namespace std;
 
 namespace drl {
 
-void parse::print_syntax( const char *error_string )
-{
+// void parse::print_syntax( const char *error_string )
+// {
   // cout << endl << "Error: " << error_string << endl;
   // cout << endl << "Layout" << endl
   // 	   <<     "------" << endl
@@ -48,126 +48,126 @@ void parse::print_syntax( const char *error_string )
   // 	   << "\t-i {int>=0} intermediate output interval (default 0: no output)" << endl
   // 	   << "\t-e output .iedges file (same prefix as .coord file)" << endl << endl;
  
-  #ifdef MUSE_MPI
-    MPI_Abort ( MPI_COMM_WORLD, 1 );
-  #else
-    exit (1);
-  #endif
-}
+//   #ifdef MUSE_MPI
+//     MPI_Abort ( MPI_COMM_WORLD, 1 );
+//   #else
+//     exit (1);
+//   #endif
+// }
 
-parse::parse ( int argc, char** argv)
-{
-  map<string,string> m;
+// parse::parse ( int argc, char** argv)
+// {
+//   map<string,string> m;
 
-  // make sure there is at least one argument  
-  if ( argc < 2)
-	print_syntax ( "not enough arguments!" );
+//   // make sure there is at least one argument  
+//   if ( argc < 2)
+// 	print_syntax ( "not enough arguments!" );
   
-  // make sure coord_file ends in ".coord"
-  parms_file = real_file = sim_file = coord_file = argv[argc-1];
-  parms_file = parms_file + ".parms";
-  real_file = real_file + ".real";
-  sim_file = sim_file + ".int";
-  coord_file = coord_file + ".icoord";
+//   // make sure coord_file ends in ".coord"
+//   parms_file = real_file = sim_file = coord_file = argv[argc-1];
+//   parms_file = parms_file + ".parms";
+//   real_file = real_file + ".real";
+//   sim_file = sim_file + ".int";
+//   coord_file = coord_file + ".icoord";
   
-  char error_string[200];
-  sprintf ( error_string, "%s %d %s", "root file name cannot be longer than", MAX_FILE_NAME-7,
-				   "characters.");
-  if ( coord_file.length() > MAX_FILE_NAME )
-	print_syntax ( error_string );
+//   char error_string[200];
+//   sprintf ( error_string, "%s %d %s", "root file name cannot be longer than", MAX_FILE_NAME-7,
+// 				   "characters.");
+//   if ( coord_file.length() > MAX_FILE_NAME )
+// 	print_syntax ( error_string );
 	
-  // echo sim_file and coord_file
-  // cout << "Using " << sim_file << " for .int file, and " << coord_file << " for .icoord file." << endl;
+//   // echo sim_file and coord_file
+//   // cout << "Using " << sim_file << " for .int file, and " << coord_file << " for .icoord file." << endl;
   
-  // set defaults
-  rand_seed = 0;
-  //edge_cut = 32.0/39.0; // (old default)
-  edge_cut = 32.0/40.0;
-  int_out = 0;
-  edges_out = 0;
-  parms_in = 0;
-  real_in = -1.0;
+//   // set defaults
+//   rand_seed = 0;
+//   //edge_cut = 32.0/39.0; // (old default)
+//   edge_cut = 32.0/40.0;
+//   int_out = 0;
+//   edges_out = 0;
+//   parms_in = 0;
+//   real_in = -1.0;
 
-  // now check for optional arguments
-  string arg;
-  for( int i = 1; i<argc-1; i++ )
-  {
-	arg = argv[i];
+//   // now check for optional arguments
+//   string arg;
+//   for( int i = 1; i<argc-1; i++ )
+//   {
+// 	arg = argv[i];
 
-	// check for random seed
-    if ( arg == "-s" )
-	{
-		i++;
-		if ( i >= (argc-1) )
-			print_syntax ( "-s flag has no argument." );
-		else
-		{
-			rand_seed = atoi ( argv[i] );
-			if ( rand_seed < 0 )
-				print_syntax ( "random seed must be >= 0." );
-		}
-	}
-	// check for edge cutting
-	else if ( arg == "-c" )
-	{
-		i++;
-		if ( i >= (argc-1) )
-			print_syntax ( "-c flag has no argument." );
-		else
-		{
-			edge_cut = atof ( argv[i] );
-			if ( (edge_cut < 0) || (edge_cut > 1) )
-				print_syntax ( "edge cut must be between 0 and 1." );
-		}
-	}		
-	// check for intermediate output
-	else if ( arg == "-i" )
-	{
-		i++;
-		if ( i >= (argc-1) )
-			print_syntax ( "-i flag has no argument." );
-		else
-		{
-			int_out = atoi ( argv[i] );
-			if ( int_out < 0 )
-				print_syntax ( "intermediate output must be >= 0." );
-		}
-	}
-	// check for .real input
-	else if ( arg == "-r" )
-	{
-		i++;
-		if ( i >= (argc-1) )
-			print_syntax ( "-r flag has no argument." );
-		else
-		{
-			real_in = atof ( argv[i] );
-			if ( (real_in < 0) || (real_in > 1) )
-				print_syntax ( "real iteration fraction must be from 0 to 1." );
-		}
-	}
-	else if ( arg == "-e" )
-		edges_out = 1;
-	else if ( arg == "-p" )
-		parms_in = 1;
-	else
-		print_syntax ( "unrecongized option!" );
-  }
+// 	// check for random seed
+//     if ( arg == "-s" )
+// 	{
+// 		i++;
+// 		if ( i >= (argc-1) )
+// 			print_syntax ( "-s flag has no argument." );
+// 		else
+// 		{
+// 			rand_seed = atoi ( argv[i] );
+// 			if ( rand_seed < 0 )
+// 				print_syntax ( "random seed must be >= 0." );
+// 		}
+// 	}
+// 	// check for edge cutting
+// 	else if ( arg == "-c" )
+// 	{
+// 		i++;
+// 		if ( i >= (argc-1) )
+// 			print_syntax ( "-c flag has no argument." );
+// 		else
+// 		{
+// 			edge_cut = atof ( argv[i] );
+// 			if ( (edge_cut < 0) || (edge_cut > 1) )
+// 				print_syntax ( "edge cut must be between 0 and 1." );
+// 		}
+// 	}		
+// 	// check for intermediate output
+// 	else if ( arg == "-i" )
+// 	{
+// 		i++;
+// 		if ( i >= (argc-1) )
+// 			print_syntax ( "-i flag has no argument." );
+// 		else
+// 		{
+// 			int_out = atoi ( argv[i] );
+// 			if ( int_out < 0 )
+// 				print_syntax ( "intermediate output must be >= 0." );
+// 		}
+// 	}
+// 	// check for .real input
+// 	else if ( arg == "-r" )
+// 	{
+// 		i++;
+// 		if ( i >= (argc-1) )
+// 			print_syntax ( "-r flag has no argument." );
+// 		else
+// 		{
+// 			real_in = atof ( argv[i] );
+// 			if ( (real_in < 0) || (real_in > 1) )
+// 				print_syntax ( "real iteration fraction must be from 0 to 1." );
+// 		}
+// 	}
+// 	else if ( arg == "-e" )
+// 		edges_out = 1;
+// 	else if ( arg == "-p" )
+// 		parms_in = 1;
+// 	else
+// 		print_syntax ( "unrecongized option!" );
+//   }
   
-  // if ( parms_in )
-  //   cout << "Using " << parms_file << " for .parms file." << endl;
+//   // if ( parms_in )
+//   //   cout << "Using " << parms_file << " for .parms file." << endl;
 	
-  // if ( real_in >= 0 )
-  //   cout << "Using " << real_file << " for .real file." << endl;
+//   // if ( real_in >= 0 )
+//   //   cout << "Using " << real_file << " for .real file." << endl;
 	
-  // echo arguments input or default
-  // cout << "Using random seed = " << rand_seed << endl
-  //      << "      edge_cutting = " << edge_cut << endl
-  //      << "      intermediate output = " << int_out << endl
-  //      << "      output .iedges file = " << edges_out << endl;
-  // if ( real_in >= 0 )
-  // 	cout << "      holding .real fixed until iterations = " << real_in << endl;
+//   // echo arguments input or default
+//   // cout << "Using random seed = " << rand_seed << endl
+//   //      << "      edge_cutting = " << edge_cut << endl
+//   //      << "      intermediate output = " << int_out << endl
+//   //      << "      output .iedges file = " << edges_out << endl;
+//   // if ( real_in >= 0 )
+//   // 	cout << "      holding .real fixed until iterations = " << real_in << endl;
 
-}
+// }
 
 } // namespace drl

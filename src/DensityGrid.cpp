@@ -11,6 +11,7 @@ using namespace std;
 
 #include "drl_Node.h"
 #include "DensityGrid.h"
+#include "igraph.h"
 
 #define GET_BIN(y, x) (Bins[y*GRID_SIZE+x])
 
@@ -49,7 +50,8 @@ void DensityGrid::Init()
 	  #ifdef MUSE_MPI
         MPI_Abort ( MPI_COMM_WORLD, 1 );
 	  #else
-	    exit (1);
+	igraph_error("DrL is out of memory", __FILE__, __LINE__,
+		     IGRAPH_ENOMEM);
 	  #endif
     }
 	
@@ -192,7 +194,8 @@ void DensityGrid::Add(Node &N)
       #ifdef MUSE_MPI
  	    MPI_Abort ( MPI_COMM_WORLD, 1 );
 	  #else
-	    exit (1);
+	    igraph_error("Exceeded density grid in DrL", __FILE__, 
+			 __LINE__, IGRAPH_EDRL);
 	  #endif
     }    
 
