@@ -139,7 +139,7 @@ int igraph_automorphisms(const igraph_t *graph,
 }
 
 bool bliss_verbose = false;
-FILE *bliss_verbstr = stdout;
+// FILE *bliss_verbstr = stdout;
 
 namespace igraph {
 

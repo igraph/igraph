@@ -67,13 +67,13 @@ graph_molloy_opt::graph_molloy_opt(degree_sequence &degs) {
 graph_molloy_opt::graph_molloy_opt(FILE *f) { 
   char *buff = new char[FBUFF_SIZE];
   // How many vertices ?
-  if(VERBOSE()) fprintf(stderr,"Read file: #vertices=");
+  // if(VERBOSE()) fprintf(stderr,"Read file: #vertices=");
   int i;
   int n=0;
   while(fgets(buff,FBUFF_SIZE,f)) if(sscanf(buff,"%d",&i)==1 && i>n) n=i;
   n++;
   // degrees ?
-  if(VERBOSE()) fprintf(stderr,"%d, #edges=",n);
+  // if(VERBOSE()) fprintf(stderr,"%d, #edges=",n);
   int *degs = new int[n];
   for(i=0; i<n; i++) degs[i]=0;
   rewind(f);
@@ -88,10 +88,10 @@ graph_molloy_opt::graph_molloy_opt(FILE *f) {
   // allocate memory
   degree_sequence dd(n,degs);
   a = dd.sum();
-  if(VERBOSE()) fprintf(stderr,"%d\nAllocating memory...",a);
+  // if(VERBOSE()) fprintf(stderr,"%d\nAllocating memory...",a);
   alloc(dd);
   // add edges
-  if(VERBOSE()) fprintf(stderr,"done\nCreating edges...");
+  // if(VERBOSE()) fprintf(stderr,"done\nCreating edges...");
   rewind(f);
   int line=0;
   int j;
@@ -101,7 +101,7 @@ graph_molloy_opt::graph_molloy_opt(FILE *f) {
       char *b = buff;
       while(skip_int(b)) {
         if(sscanf(b,"%d",&j)!=1) {
-          fprintf(stderr,"\nParse error at line %d, col %d : integer expected\n",line,int(b-buff));
+          // fprintf(stderr,"\nParse error at line %d, col %d : integer expected\n",line,int(b-buff));
           exit(6);
         }
         *(neigh[i]++) = j;
@@ -110,7 +110,7 @@ graph_molloy_opt::graph_molloy_opt(FILE *f) {
   }
   delete[] buff;
   compute_neigh();
-  if(VERBOSE()) fprintf(stderr,"done\n");
+  // if(VERBOSE()) fprintf(stderr,"done\n");
 }
 
 graph_molloy_opt::graph_molloy_opt(int *svg) {
@@ -345,8 +345,8 @@ bool graph_molloy_opt::havelhakimi() {
     }
     if(dv != 0) { // We couldn't bind entirely v
       if(VERBOSE()) {
-        fprintf(stderr,"Error in graph_molloy_opt::havelhakimi() :\n");
-        fprintf(stderr,"Couldn't bind vertex %d entirely (%d edges remaining)\n",v,dv);
+        // fprintf(stderr,"Error in graph_molloy_opt::havelhakimi() :\n");
+        // fprintf(stderr,"Couldn't bind vertex %d entirely (%d edges remaining)\n",v,dv);
       }
       delete[] nb;
       delete[] sorted;
@@ -388,7 +388,7 @@ bool graph_molloy_opt::is_connected() {
 bool graph_molloy_opt::make_connected() {
   //assert(verify());
   if(a/2 < n-1) {
-    fprintf(stderr,"\ngraph::make_connected() failed : #edges < #vertices-1\n");
+    // fprintf(stderr,"\ngraph::make_connected() failed : #edges < #vertices-1\n");
     return false;
   }
   int i;
@@ -419,7 +419,7 @@ bool graph_molloy_opt::make_connected() {
   for(int v0=0; v0<n; v0++) if(dist[v0]==NOT_VISITED) {
     // is v0 an isolated vertex?
     if(deg[v0]==0) {
-      if(VERBOSE()) fprintf(stderr,"graph_molloy_opt::make_connected() returned FALSE : vertex %d has degree 0\n",v0);
+      // if(VERBOSE()) fprintf(stderr,"graph_molloy_opt::make_connected() returned FALSE : vertex %d has degree 0\n",v0);
       delete[] dist;
       delete[] buff;
       return false;
@@ -878,7 +878,7 @@ int graph_molloy_opt::breadth_path_search(int src, int *buff, double *paths, uns
         if(++nb_visited==n) last_dist=nd;
       }
       else if(d==nd) if((paths[w]+=p)==numeric_limits<double>::infinity()) {
-        fprintf(stderr,"Fatal error : too many (>MAX_DOUBLE) possible paths in graph\n");
+        // fprintf(stderr,"Fatal error : too many (>MAX_DOUBLE) possible paths in graph\n");
         exit(-1);
       }
     }
@@ -973,7 +973,7 @@ void graph_molloy_opt::explore_rsp(double *target, int nb_vertices, int *buff, d
 
 double *graph_molloy_opt::vertex_betweenness(int mode, bool trivial_paths) {
   char MODES[3] = {'U','A','R'};
-  if(VERBOSE()) fprintf(stderr,"Computing vertex betweenness %cSP...",MODES[mode]);
+  // if(VERBOSE()) fprintf(stderr,"Computing vertex betweenness %cSP...",MODES[mode]);
   
   // breadth-first search vertex fifo
   int *buff = new int[n];
@@ -997,7 +997,7 @@ double *graph_molloy_opt::vertex_betweenness(int mode, bool trivial_paths) {
     // Verbose
     if(VERBOSE()==VERBOSE_LOTS && v0>(progress*n) / progress_steps) {
       progress++;
-      fprintf(stderr,"\rComputing vertex betweenness %cSP : %3f%%",MODES[mode], 100.0*double(progress)/double(progress_steps));
+      // fprintf(stderr,"\rComputing vertex betweenness %cSP : %3f%%",MODES[mode], 100.0*double(progress)/double(progress_steps));
     }
     // Breadth-first search
     int nb_vertices = breadth_path_search(v0, buff, paths, dist);
@@ -1012,7 +1012,8 @@ double *graph_molloy_opt::vertex_betweenness(int mode, bool trivial_paths) {
       case MODE_RSP:
         explore_rsp(target, nb_vertices, buff, paths, dist); break;
       default:
-        fprintf(stderr,"Warning : graph_molloy_opt::vertex_betweenness() called with Invalid Mode\n");
+        // fprintf(stderr,"Warning : graph_molloy_opt::vertex_betweenness() called with Invalid Mode\n");
+	break;
     }
     // add targets[vertices in component] to global betweenness and reset targets[]
     if(nb_vertices==n) {
@@ -1039,7 +1040,7 @@ double *graph_molloy_opt::vertex_betweenness(int mode, bool trivial_paths) {
   delete[] dist;
   delete[] buff;
   delete[] paths;
-  if(VERBOSE()) fprintf(stderr,"Done\n");
+  // if(VERBOSE()) fprintf(stderr,"Done\n");
   return b;
 }
 
@@ -1047,8 +1048,8 @@ double graph_molloy_opt::traceroute_sample(int mode, int nb_src, int *src, int n
   // verify & verbose
   assert(verify());
   char MODES[3] = {'U','A','R'};
-  if(VERBOSE()==VERBOSE_LOTS)
-    fprintf(stderr,"traceroute %cSP on G(N=%d,M=%d) with %d src and %d dst...",MODES[mode],nbvertices_real(),nbarcs(),nb_src,nb_dst);
+  // if(VERBOSE()==VERBOSE_LOTS)
+  //   fprintf(stderr,"traceroute %cSP on G(N=%d,M=%d) with %d src and %d dst...",MODES[mode],nbvertices_real(),nbarcs(),nb_src,nb_dst);
 
   // create dst[] buffer if necessary
   bool newdist = dst==NULL;
@@ -1117,7 +1118,8 @@ double graph_molloy_opt::traceroute_sample(int mode, int nb_src, int *src, int n
       case MODE_RSP:
         explore_rsp(target, nb_vertices, buff, paths, dist, newdeg, edge_redudancy); break;
       default:
-        fprintf(stderr,"Warning : graph_molloy_opt::traceroute_sample() called with Invalid Mode\n");
+        // fprintf(stderr,"Warning : graph_molloy_opt::traceroute_sample() called with Invalid Mode\n");
+	break;
     }
     // add target[] to redudancy[] if needed
     if(redudancy!=NULL) for(i=1; i<nb_vertices; i++) redudancy[buff[i]]+=(target[buff[i]]);
@@ -1134,11 +1136,11 @@ double graph_molloy_opt::traceroute_sample(int mode, int nb_src, int *src, int n
   delete[] newdeg;
   delete[] target;
   if(newdist) delete[] dst;
-  if(VERBOSE()) {
-    if(VERBOSE()==VERBOSE_LOTS) fprintf(stderr,"discovered %d vertices and %d edges\n",nbvertices_real(),nbarcs());
-    if(src_0)  fprintf(stderr,"Warning : %d sources had degree 0\n",src_0);
-    if(nopath) fprintf(stderr,"Warning : %d (src,dst) pairs had no possible path\n",nopath);
-  }
+  // if(VERBOSE()) {
+  //   if(VERBOSE()==VERBOSE_LOTS) fprintf(stderr,"discovered %d vertices and %d edges\n",nbvertices_real(),nbarcs());
+  //   if(src_0)  fprintf(stderr,"Warning : %d sources had degree 0\n",src_0);
+  //   if(nopath) fprintf(stderr,"Warning : %d (src,dst) pairs had no possible path\n",nopath);
+  // }
   return total_dist/double(nb_paths);
 }  
 
@@ -1173,7 +1175,7 @@ double graph_molloy_opt::path_sampling(int *nb_dst, int *dst, double* redudancie
   int i;
   int next_step = n+1;
   if(VERBOSE()) {
-    fprintf(stderr,"Sampling paths");
+    // fprintf(stderr,"Sampling paths");
     next_step = 0;
   }
   // breadth-first search buffers buff[] and dist[]
@@ -1201,8 +1203,8 @@ double graph_molloy_opt::path_sampling(int *nb_dst, int *dst, double* redudancie
     if(deg[s]==0) src_0++; else {
       if(s>next_step) {
         next_step = s+(n/1000)+1;
-        fprintf(stderr,"\rSampling paths : ");
-        print_percent(double(s)/double(n));
+        // fprintf(stderr,"\rSampling paths : ");
+        // print_percent(double(s)/double(n));
       }
       int v;
       // breadth-first search
@@ -1231,7 +1233,7 @@ double graph_molloy_opt::path_sampling(int *nb_dst, int *dst, double* redudancie
       if(NOMEM) pick_random_src(double(t_index),NULL,dst);
       while(t_index--) if(dist[v = *(dst++)]==0) nopath++; else {
 #ifdef _DEBUG
-        if(VERBOSE()==VERBOSE_LOTS) fprintf(stderr,"Sampling path %d -> %d\n",s,v);
+        // if(VERBOSE()==VERBOSE_LOTS) fprintf(stderr,"Sampling path %d -> %d\n",s,v);
 #endif //_DEBUG
         nb_paths++;
         // while we haven't reached the source..
@@ -1273,11 +1275,11 @@ double graph_molloy_opt::path_sampling(int *nb_dst, int *dst, double* redudancie
   delete[] dist;
   delete[] nb_pos;
   if(NOMEM) delete[] dst;
-  if(VERBOSE()) {
-    fprintf(stderr,"\rSampling paths :  Done   \n");
-    if(src_0)  fprintf(stderr,"Warning : %d sources had degree 0\n",src_0);
-    if(nopath) fprintf(stderr,"Warning : %d (src,dst) pairs had no possible path\n",nopath);
-  }
+  // if(VERBOSE()) {
+  //   fprintf(stderr,"\rSampling paths :  Done   \n");
+  //   if(src_0)  fprintf(stderr,"Warning : %d sources had degree 0\n",src_0);
+  //   if(nopath) fprintf(stderr,"Warning : %d (src,dst) pairs had no possible path\n",nopath);
+  // }
   double tdist = double(total_dist64);
   if(total_dist64>0) tdist *= 4294967296.0;
   tdist += double(total_dist);
@@ -1291,14 +1293,14 @@ int *graph_molloy_opt::vertices_real(int &nb_v) {
     for(yo=deg; yo!=deg+n; ) if(*(yo++)>0) nb_v++;
   }
   if(nb_v==0) {
-    if(VERBOSE()) fprintf(stderr,"Waring: graph is empty\n");
+    // if(VERBOSE()) fprintf(stderr,"Waring: graph is empty\n");
     return NULL;
   }
   int *buff=new int[nb_v];
   yo=buff;
   for(int i=0; i<n; i++) if(deg[i]>0) *(yo++)=i;
   if(yo!=buff+nb_v){
-    fprintf(stderr,"Warning: wrong #vertices in graph_molloy_opt::vertices_real(%d)\n",nb_v);
+    // fprintf(stderr,"Warning: wrong #vertices in graph_molloy_opt::vertices_real(%d)\n",nb_v);
     delete[] buff;
     return NULL;
   }
@@ -1313,7 +1315,7 @@ int *graph_molloy_opt::pick_random_vertices(int &k, int *output, int nb_v, int *
     CREATED_AMONG=true;
   }
   if(k>nb_v) {
-    fprintf(stderr,"Warning : tried to pick %d among %d vertices. Picked only %d\n",k,nb_v,nb_v);
+    // fprintf(stderr,"Warning : tried to pick %d among %d vertices. Picked only %d\n",k,nb_v,nb_v);
     k = nb_v;
   }
   if(k>0) {
@@ -1380,7 +1382,7 @@ int graph_molloy_opt::try_disconnect(int K, int max_tries) {
   bool yo = true;
   while(yo && tries<max_tries) {
     if(tries==next_step) {
-      fprintf(stderr,"\rTrying to disconnect the graph... %d edges swaps done so far",tries);
+      // fprintf(stderr,"\rTrying to disconnect the graph... %d edges swaps done so far",tries);
       next_step += 100;
     }
     int v1 = pick_random_vertex();
@@ -1481,7 +1483,8 @@ double graph_molloy_opt::rho(int mode, int nb_src, int *src, int nb_dst, int *ds
       case MODE_RSP:
         explore_rsp(target, nb_vertices, buff, paths, dist); break;
       default:
-        fprintf(stderr,"Warning : graph_molloy_opt::rho() called with Invalid Mode\n");
+        // fprintf(stderr,"Warning : graph_molloy_opt::rho() called with Invalid Mode\n");
+	break;
     }
     // remove destinations that weren't discovered by a path coming through
     for(i=0; i<nb_dst; i++) {
@@ -1511,11 +1514,11 @@ double graph_molloy_opt::rho(int mode, int nb_src, int *src, int nb_dst, int *ds
     sum_nij += d*d;
   }
   delete[] times_seen;
-  if(VERBOSE()) {
-    fprintf(stderr,"done\n");
-    if(src_0)  fprintf(stderr,"Warning : %d sources had degree 0\n",src_0);
-    if(nopath) fprintf(stderr,"Warning : %d (src,dst) pairs had no possible path\n",nopath);
-  }
+  // if(VERBOSE()) {
+  //   fprintf(stderr,"done\n");
+  //   if(src_0)  fprintf(stderr,"Warning : %d sources had degree 0\n",src_0);
+  //   if(nopath) fprintf(stderr,"Warning : %d (src,dst) pairs had no possible path\n",nopath);
+  // }
   return (sum_nij-sum_ni)*double(n)*double(nb_src)/(sum_ni*sum_ni*double(nb_src-1));
 }
 
@@ -1542,9 +1545,9 @@ int graph_molloy_opt::cycles(int v) {
 return v;
 }
 
-void graph_molloy_opt::remove_vertex(int v) {
-  fprintf(stderr,"Warning : graph_molloy_opt::remove_vertex(%d) called",v);
-}
+// void graph_molloy_opt::remove_vertex(int v) {
+//   fprintf(stderr,"Warning : graph_molloy_opt::remove_vertex(%d) called",v);
+// }
 
 bool graph_molloy_opt::verify(int mode) {
   int i,j,k;

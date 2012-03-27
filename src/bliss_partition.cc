@@ -138,24 +138,24 @@ void Partition::consistency_check()
   const bool do_print = false;
   if(do_print)
     {
-      fprintf(stderr, "\nRef stack: ");
+      // fprintf(stderr, "\nRef stack: ");
       for(unsigned int j = 0; j < refinement_stack.size(); j++)
 	{
 	  const RefInfo i = refinement_stack.element_at(j);
-	  fprintf(stderr, "f%u,%d,%d ",
-	      i.split_cell_first,
-		  i.prev_nonsingleton_first,
-		  i.next_nonsingleton_first);
+	  // fprintf(stderr, "f%u,%d,%d ",
+	  //     i.split_cell_first,
+	  // 	  i.prev_nonsingleton_first,
+	  // 	  i.next_nonsingleton_first);
 	}
-      fprintf(stderr, "\n");
+      // fprintf(stderr, "\n");
       for(const Cell *cell = first_nonsingleton_cell; cell;
 	  cell = cell->next_nonsingleton)
 	{
-	  fprintf(stderr, "%u:%u->", cell->first, cell->length);
+	  // fprintf(stderr, "%u:%u->", cell->first, cell->length);
 	  if(cell->next_nonsingleton)
 	    assert(cell->first < cell->next_nonsingleton->first);
 	}
-      fprintf(stderr, "\n");
+      // fprintf(stderr, "\n");
     }
   const Cell *next_nonsingleton = first_nonsingleton_cell;
   const Cell *prev_nonsingleton = 0;
@@ -166,8 +166,8 @@ void Partition::consistency_check()
       assert(!cell->next || cell->next->prev_next_ptr == &(cell->next));
       if(cell->length > 1)
 	{
-	  if(do_print)
-	    fprintf(stderr, "%u:%u=>", cell->first, cell->length);
+	  // if(do_print)
+	  //   fprintf(stderr, "%u:%u=>", cell->first, cell->length);
 	  assert(cell == next_nonsingleton); 
 	  assert(cell->prev_nonsingleton == prev_nonsingleton);
 	  next_nonsingleton = cell->next_nonsingleton;
@@ -183,8 +183,8 @@ void Partition::consistency_check()
 	}
     }
   assert(next_nonsingleton == 0);
-  if(do_print)
-    fprintf(stderr, "\n");
+  // if(do_print)
+  //   fprintf(stderr, "\n");
 #endif
 }
 
@@ -591,10 +591,10 @@ Cell *Partition::sort_and_split_cell255(Cell * const cell,
 #if defined(VERBOSEDEBUG)
   {
     const unsigned int *ep = elements + cell->first;
-    fprintf(stderr, "\n");
-    for(unsigned int i = cell->length; i > 0; i--, ep++)
-      fprintf(stderr, "%u ", invariant_values[*ep]);
-    fprintf(stderr, "\n");
+    // fprintf(stderr, "\n");
+    // for(unsigned int i = cell->length; i > 0; i--, ep++)
+    //   fprintf(stderr, "%u ", invariant_values[*ep]);
+    // fprintf(stderr, "\n");
   }
 #endif
 

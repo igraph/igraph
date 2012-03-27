@@ -185,13 +185,13 @@ graph::graph(const igraph_t *igraph,
 void graph::scan_int ( char *filename )
 {
 
-  cout << "Proc. " << myid << " scanning .int file ..." << endl;
+  // cout << "Proc. " << myid << " scanning .int file ..." << endl;
   
   // Open (sim) File
   ifstream fp ( filename );
   if ( !fp )
   {
-	cout << "Error: could not open " << filename << ".  Program terminated." << endl;
+	// cout << "Error: could not open " << filename << ".  Program terminated." << endl;
 	#ifdef MUSE_MPI
 	  MPI_Abort ( MPI_COMM_WORLD, 1 );
 	#else
@@ -210,7 +210,7 @@ void graph::scan_int ( char *filename )
 	  // ignore negative weights!
 	  if ( edge_weight <= 0 )
 	  {
-	     cout << "Error: found negative edge weight in " << filename << ".  Program stopped." << endl;
+	     // cout << "Error: found negative edge weight in " << filename << ".  Program stopped." << endl;
 		 #ifdef MUSE_MPI
 	       MPI_Abort ( MPI_COMM_WORLD, 1 );
 	     #else
@@ -229,7 +229,7 @@ void graph::scan_int ( char *filename )
 
   if ( id_catalog.size() == 0 )
   {
-    cout << "Error: Proc. " << myid << ": " << filename << " is empty.  Program terminated." << endl;
+    // cout << "Error: Proc. " << myid << ": " << filename << " is empty.  Program terminated." << endl;
 	#ifdef MUSE_MPI
 	  MPI_Abort ( MPI_COMM_WORLD, 1 );
 	#else
@@ -410,13 +410,13 @@ void graph::init_parms(const igraph_layout_drl_options_t *options) {
 
 void graph::read_real ( char *real_file )
 {
-  cout << "Processor " << myid << " reading .real file ..." << endl;
+  // cout << "Processor " << myid << " reading .real file ..." << endl;
   
   // read in .real file and mark as fixed
   ifstream real_in ( real_file );
   if ( !real_in )
   {
-    cout << "Error: proc. " << myid << " could not open .real file." << endl;
+    // cout << "Error: proc. " << myid << " could not open .real file." << endl;
     #ifdef MUSE_MPI
 	  MPI_Abort ( MPI_COMM_WORLD, 1 );
 	#else
@@ -481,7 +481,7 @@ void graph::read_int ( char *file_name )
 	int_file.open ( file_name );
 	if ( !int_file )
 	{
-		cout << "Error (worker process " << myid << "): could not open .int file." << endl;
+		// cout << "Error (worker process " << myid << "): could not open .int file." << endl;
 		#ifdef MUSE_MPI
 		  MPI_Abort ( MPI_COMM_WORLD, 1 );
 		#else
@@ -489,7 +489,7 @@ void graph::read_int ( char *file_name )
 		#endif
 	}
 	
-	cout << "Processor " << myid << " reading .int file ..." << endl;
+	// cout << "Processor " << myid << " reading .int file ..." << endl;
 	
 	int node_1, node_2;
 	float weight;
@@ -1114,7 +1114,7 @@ void graph::write_coord( const char *file_name )
   ofstream coordOUT( file_name );
   if ( !coordOUT )
   {
-	cout << "Could not open " << file_name << ".  Program terminated." << endl;
+	// cout << "Could not open " << file_name << ".  Program terminated." << endl;
 	#ifdef MUSE_MPI
 	  MPI_Abort ( MPI_COMM_WORLD, 1 );
 	#else
@@ -1122,7 +1122,7 @@ void graph::write_coord( const char *file_name )
 	#endif
   }
   
-  cout << "Writing out solution to " << file_name << " ..." << endl;
+  // cout << "Writing out solution to " << file_name << " ..." << endl;
   
   for (unsigned int i = 0; i < positions.size(); i++) {
     coordOUT << positions[i].id << "\t" << positions[i].x << "\t" << positions[i].y <<endl;

@@ -40,7 +40,7 @@ void degree_sequence::make_even(int mini, int maxi) {
     else if(deg[i]<maxi) { deg[i]++; total++; break; }
   }
   if(i==n) {
-    fprintf(stderr,"Warning: degree_sequence::make_even() forced one degree to go over degmax\n");
+    // fprintf(stderr,"Warning: degree_sequence::make_even() forced one degree to go over degmax\n");
     deg[0]++;
     total++;
   }
@@ -122,8 +122,8 @@ degree_sequence::degree_sequence(FILE *f, bool DISTRIB) {
       if( cc != c) {  syntax++; first_syntax = line; }
     }
     if(VERBOSE()) {
-      if(ignored > 0) fprintf(stderr,"Ignored %d lines (first was line #%d)\n", ignored, first_ignored);
-      if(syntax > 0) fprintf(stderr,"Found %d probable syntax errors (first was line #%d)\n", syntax, first_syntax);
+      // if(ignored > 0) fprintf(stderr,"Ignored %d lines (first was line #%d)\n", ignored, first_ignored);
+      // if(syntax > 0) fprintf(stderr,"Found %d probable syntax errors (first was line #%d)\n", syntax, first_syntax);
     }
     deg = new int[n];
     int *yo = deg;
@@ -132,8 +132,8 @@ degree_sequence::degree_sequence(FILE *f, bool DISTRIB) {
       for(int k = *(it_n++); k--; *yo++ = *it);
   }
   if(VERBOSE()) {
-    if(total % 2 != 0) fprintf(stderr,"Warning: degree sequence is odd\n");
-    fprintf(stderr,"Degree sequence created. N=%d, 2M=%d\n", n, total);
+    // if(total % 2 != 0) fprintf(stderr,"Warning: degree sequence is odd\n");
+    // fprintf(stderr,"Degree sequence created. N=%d, 2M=%d\n", n, total);
   }
 } 
      
@@ -145,7 +145,7 @@ degree_sequence(int _n, double exp, int degmin, int degmax, double z) {
   if(exp==0.0) {
     // Binomial distribution
     if(z<0) {
-      fprintf(stderr,"Fatal error in degree_sequence Ctor: positive average degree must be specified\n");
+      // fprintf(stderr,"Fatal error in degree_sequence Ctor: positive average degree must be specified\n");
       exit(-1);
     }
     if(degmax<0) degmax=n-1;
@@ -161,34 +161,34 @@ degree_sequence(int _n, double exp, int degmin, int degmax, double z) {
   }
   else {
     // Power-law distribution
-    if(VERBOSE()) fprintf(stderr,"Creating powerlaw sampler...");
+    // if(VERBOSE()) fprintf(stderr,"Creating powerlaw sampler...");
     powerlaw pw(exp, degmin, degmax);
     if(z==-1.0) {
       pw.init();
-      if(VERBOSE()) fprintf(stderr,"done. Mean=%f\n", pw.mean());
+      // if(VERBOSE()) fprintf(stderr,"done. Mean=%f\n", pw.mean());
     }
     else {
       double offset = pw.init_to_mean(z);
-      if(VERBOSE())
-	fprintf(stderr,"done. Offset=%f, Mean=%f\n", offset, pw.mean());
+      // if(VERBOSE())
+      // fprintf(stderr,"done. Offset=%f, Mean=%f\n", offset, pw.mean());
     }
 
     deg = new int[n];
     total = 0;
     int i;
 
-    if(VERBOSE()) fprintf(stderr,"Sampling %d random numbers...",n);
+    // if(VERBOSE()) fprintf(stderr,"Sampling %d random numbers...",n);
     for(i=0; i<n; i++) {
       deg[i] = pw.sample();
       total+= deg[i];
     }
     
-    if(VERBOSE()) fprintf(stderr,"done\nSimple statistics on degrees...");
+    // if(VERBOSE()) fprintf(stderr,"done\nSimple statistics on degrees...");
     int wanted_total = int(floor(z*n+0.5));
     sort();
-    if(VERBOSE()) fprintf(stderr,"done : Max=%d, Total=%d.\n",deg[0],total);
+    // if(VERBOSE()) fprintf(stderr,"done : Max=%d, Total=%d.\n",deg[0],total);
     if(z!=-1.0)  {
-      if(VERBOSE()) fprintf(stderr,"Adjusting total to %d...",wanted_total);
+      // if(VERBOSE()) fprintf(stderr,"Adjusting total to %d...",wanted_total);
       int iterations = 0;
   
       while(total!=wanted_total) {
@@ -209,8 +209,8 @@ degree_sequence(int _n, double exp, int degmin, int degmax, double z) {
         iterations += n-1-i;
       }
       if(VERBOSE()) {
-        fprintf(stderr,"done(%d iterations).",iterations);
-        fprintf(stderr,"  Now, degmax = %d\n",dmax());
+        // fprintf(stderr,"done(%d iterations).",iterations);
+        // fprintf(stderr,"  Now, degmax = %d\n",dmax());
       }
     }
     
@@ -218,25 +218,25 @@ degree_sequence(int _n, double exp, int degmin, int degmax, double z) {
   }
 }
     
-void degree_sequence::print() {
-  for(int i=0; i<n; i++) printf("%d\n",deg[i]);
-}
+// void degree_sequence::print() {
+//   for(int i=0; i<n; i++) printf("%d\n",deg[i]);
+// }
 
-void degree_sequence::print_cumul() {
-  if(n==0) return;
-  int dmax = deg[0];
-  int dmin = deg[0];
-  int i;
-  for(i=1; i<n; i++) if(dmax<deg[i]) dmax=deg[i];
-  for(i=1; i<n; i++) if(dmin>deg[i]) dmin=deg[i];
-  int *dd = new int[dmax-dmin+1];
-  for(i=dmin; i<=dmax; i++) dd[i-dmin]=0;
-  if(VERBOSE()) fprintf(stderr,"Computing cumulative distribution...");
-  for(i=0; i<n; i++) dd[deg[i]-dmin]++;
-  if(VERBOSE()) fprintf(stderr,"done\n");
-  for(i=dmin; i<=dmax; i++) if(dd[i-dmin]>0) printf("%d %d\n",i,dd[i-dmin]);
-  delete[] dd;
-}
+// void degree_sequence::print_cumul() {
+//   if(n==0) return;
+//   int dmax = deg[0];
+//   int dmin = deg[0];
+//   int i;
+//   for(i=1; i<n; i++) if(dmax<deg[i]) dmax=deg[i];
+//   for(i=1; i<n; i++) if(dmin>deg[i]) dmin=deg[i];
+//   int *dd = new int[dmax-dmin+1];
+//   for(i=dmin; i<=dmax; i++) dd[i-dmin]=0;
+//   // if(VERBOSE()) fprintf(stderr,"Computing cumulative distribution...");
+//   for(i=0; i<n; i++) dd[deg[i]-dmin]++;
+//   // if(VERBOSE()) fprintf(stderr,"done\n");
+//   for(i=dmin; i<=dmax; i++) if(dd[i-dmin]>0) printf("%d %d\n",i,dd[i-dmin]);
+//   delete[] dd;
+// }
 
 bool degree_sequence::havelhakimi() {
 

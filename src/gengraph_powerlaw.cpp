@@ -24,12 +24,12 @@ powerlaw::powerlaw(double _alpha, int _mini, int _maxi) {
   alpha = _alpha;
   mini = _mini;
   maxi = _maxi;
-  if(alpha<=2.0 && maxi<0)
-    fprintf(stderr,"\nWarning : powerlaw exponent %f should be > 2 when no Maximum is specified\n",alpha);
-  if(alpha<=1.0 && maxi>=0)
-    fprintf(stderr,"\nWarning : powerlaw exponent %f should be > 1\n",alpha);
-  if(maxi>=0 && mini>maxi)
-    fprintf(stderr,"\nWarning : powerlaw max %d should be greater than min %d\n",maxi,mini);
+  // if(alpha<=2.0 && maxi<0)
+  //   fprintf(stderr,"\nWarning : powerlaw exponent %f should be > 2 when no Maximum is specified\n",alpha);
+  // if(alpha<=1.0 && maxi>=0)
+  //   fprintf(stderr,"\nWarning : powerlaw exponent %f should be > 1\n",alpha);
+  // if(maxi>=0 && mini>maxi)
+  //   fprintf(stderr,"\nWarning : powerlaw max %d should be greater than min %d\n",maxi,mini);
   table = new int[POWERLAW_TABLE];
   tabulated = 0;
   dt = NULL;
@@ -180,8 +180,8 @@ void powerlaw::adjust_offset_mean(double _mean, double err, double factor) {
 
 double powerlaw::init_to_mean(double _mean) {
   if(maxi>=0 && _mean >= 0.5*double((mini+maxi))) {
-    fprintf(stderr,"\nFatal error in powerlaw::init_to_mean(%f) :\n",_mean);
-    fprintf(stderr,"Mean must be in ]min, (min+max)/2[ = ]%d, %d[\n",mini,(mini+maxi)/2);
+    // fprintf(stderr,"\nFatal error in powerlaw::init_to_mean(%f) :\n",_mean);
+    // fprintf(stderr,"Mean must be in ]min, (min+max)/2[ = ]%d, %d[\n",mini,(mini+maxi)/2);
     return(-1.0);
   }
   init_to_offset(_mean-double(mini), 100);

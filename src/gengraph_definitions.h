@@ -111,13 +111,13 @@ inline int* fast_search(int *m, const int size, const int a) {
 }
 
 // Lovely percentage print
-inline void print_percent(double yo, FILE *f = stderr) {
-  int arf = int(100.0*yo);
-  if(double(arf)>100.0*yo) arf--;
-  if(arf<100) fprintf(f," ");
-  if(arf<10) fprintf(f," ");
-  fprintf(f,"%d.%d%%",arf,int(1000.0*yo-double(10*arf)));
-}
+/* inline void print_percent(double yo, FILE *f = stderr) { */
+/*   int arf = int(100.0*yo); */
+/*   if(double(arf)>100.0*yo) arf--; */
+/*   if(arf<100) fprintf(f," "); */
+/*   if(arf<10) fprintf(f," "); */
+/*   fprintf(f,"%d.%d%%",arf,int(1000.0*yo-double(10*arf))); */
+/* } */
 
 // Skips non-numerical chars, then numerical chars, then non-numerical chars.
 inline char skip_int(char* &c) {

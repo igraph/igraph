@@ -73,7 +73,7 @@ igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
   f = fminfn(b, 0, ex);
   if (!IGRAPH_FINITE(f))
     IGRAPH_ERROR("initial value in 'BFGS' is not finite", IGRAPH_DIVERGED);
-  if (trace) printf("initial  value %f \n", f);
+  /* if (trace) printf("initial  value %f \n", f); */
   *Fmin = f;
   funcount = gradcount = 1;
   fmingr(b, 0, &g, ex);
@@ -174,17 +174,17 @@ igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
       else ilast = gradcount;
       /* Resets unless has just been reset */
     }
-    if (trace && (iter % nREPORT == 0))
-      printf("iter%4d value %f\n", iter, f);
+    /* if (trace && (iter % nREPORT == 0)) */
+    /*   printf("iter%4d value %f\n", iter, f); */
     if (iter >= maxit) break;
     if (gradcount - ilast > 2 * n)
       ilast = gradcount;	/* periodic restart */
   } while (count != n || ilast != gradcount);
-  if (trace) {
-    printf("final  value %f \n", *Fmin);
-    if (iter < maxit) printf("converged\n");
-    else printf("stopped after %i iterations\n", iter);
-  }
+  /* if (trace) { */
+  /*   printf("final  value %f \n", *Fmin); */
+  /*   if (iter < maxit) printf("converged\n"); */
+  /*   else printf("stopped after %i iterations\n", iter); */
+  /* } */
   *fncount = funcount;
   *grcount = gradcount;
   

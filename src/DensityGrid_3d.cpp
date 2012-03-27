@@ -45,7 +45,7 @@ void DensityGrid::Init()
     }
   catch (bad_alloc errora)
     {
-      cout << "Error: Out of memory! Program stopped." << endl;
+      // cout << "Error: Out of memory! Program stopped." << endl;
 	  #ifdef MUSE_MPI
         MPI_Abort ( MPI_COMM_WORLD, 1 );
 	  #else
@@ -204,8 +204,8 @@ void DensityGrid::Add(Node &N)
        (y_grid >= GRID_SIZE) || (y_grid < 0) ||
        (z_grid >= GRID_SIZE) || (z_grid < 0) )
     {
-      cout << endl << "Error: Exceeded density grid with x_grid = " << x_grid 
-	       << " and y_grid = " << y_grid << ".  Program stopped." << endl;
+      // cout << endl << "Error: Exceeded density grid with x_grid = " << x_grid 
+      // 	       << " and y_grid = " << y_grid << ".  Program stopped." << endl;
       #ifdef MUSE_MPI
  	    MPI_Abort ( MPI_COMM_WORLD, 1 );
 	  #else

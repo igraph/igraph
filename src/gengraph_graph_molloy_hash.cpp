@@ -37,9 +37,9 @@ void graph_molloy_hash::init() {
   
 //_________________________________________________________________________
 graph_molloy_hash::graph_molloy_hash(degree_sequence &degs) {
-  if(VERBOSE()) fprintf(stderr,"Allocating memory for graph...");
+  // if(VERBOSE()) fprintf(stderr,"Allocating memory for graph...");
   int s = alloc(degs);
-  if(VERBOSE()) fprintf(stderr,"%d bytes allocated successfully\n",s);
+  // if(VERBOSE()) fprintf(stderr,"%d bytes allocated successfully\n",s);
 }
 
 //_________________________________________________________________________
@@ -210,7 +210,7 @@ int graph_molloy_hash::random_edge_swap(int K, int *Kbuff, bool *visited) {
 //_________________________________________________________________________
 unsigned long graph_molloy_hash::shuffle(unsigned long times, 
 					 unsigned long maxtimes, int type) {
-  if(VERBOSE()) fprintf(stderr,"Shuffle : 0%%");
+  // if(VERBOSE()) fprintf(stderr,"Shuffle : 0%%");
   assert(verify());
   // counters
   unsigned long nb_swaps = 0;
@@ -255,7 +255,7 @@ unsigned long graph_molloy_hash::shuffle(unsigned long times,
       if(VERBOSE()>=VERBOSE_LOTS && nb_swaps+swaps>next) {
         next = (nb_swaps+swaps)+max((unsigned long)(100),(unsigned long)(times/1000));
         int progress = int(double(nb_swaps+swaps) * 1001.0 / double(times));
-        fprintf(stderr,"\rShuffle : %d.%d%%",progress/10,progress%10);
+        // fprintf(stderr,"\rShuffle : %d.%d%%",progress/10,progress%10);
       }
     }
     // test connectivity
@@ -296,7 +296,7 @@ unsigned long graph_molloy_hash::shuffle(unsigned long times,
         K*=2; delete[] Kbuff; Kbuff = new int[int(K)+1];
 	break;
       default:
-        fprintf(stderr,"Error in graph_molloy_hash::shuffle() : Unknown heuristics type\n");
+        // fprintf(stderr,"Error in graph_molloy_hash::shuffle() : Unknown heuristics type\n");
         return 0;
     }
   }
@@ -309,15 +309,15 @@ unsigned long graph_molloy_hash::shuffle(unsigned long times,
   }
   
   // Status report
-  if(VERBOSE()) fprintf(stderr,"\n");
-  if(VERBOSE()) {
-    fprintf(stderr,"*** Shuffle Monitor ***\n");
-    fprintf(stderr," - Average cost : %f / validated edge swap\n",double(cost)/double(nb_swaps));
-    fprintf(stderr," - Connectivity tests : %d (%d successes, %d failures)\n",successes+failures, successes, failures);
-    fprintf(stderr," - Average window : %d\n",int(avg_T/double(successes+failures)));
-    if(type==FINAL_HEURISTICS || type==BRUTE_FORCE_HEURISTICS)
-      fprintf(stderr," - Average isolation test width : %f\n",avg_K/double(successes+failures));
-  }
+  // if(VERBOSE()) fprintf(stderr,"\n");
+  // if(VERBOSE()) {
+  //   fprintf(stderr,"*** Shuffle Monitor ***\n");
+  //   fprintf(stderr," - Average cost : %f / validated edge swap\n",double(cost)/double(nb_swaps));
+  //   fprintf(stderr," - Connectivity tests : %d (%d successes, %d failures)\n",successes+failures, successes, failures);
+  //   fprintf(stderr," - Average window : %d\n",int(avg_T/double(successes+failures)));
+  //   if(type==FINAL_HEURISTICS || type==BRUTE_FORCE_HEURISTICS)
+  //     fprintf(stderr," - Average isolation test width : %f\n",avg_K/double(successes+failures));
+  // }
   return nb_swaps;
 }
 
@@ -436,29 +436,29 @@ int graph_molloy_hash::optimal_window() {
       min_cost = c;
       optimal_T = Tmax;
     }
-    if(VERBOSE()>=VERBOSE_LOTS)
-      fprintf(stderr,"\rTmax = %d [%f]", Tmax, min_cost);
+    // if(VERBOSE()>=VERBOSE_LOTS)
+    //   fprintf(stderr,"\rTmax = %d [%f]", Tmax, min_cost);
   }
   // on cree Tmin
   int Tmin = int(0.5*double(a)/(min_cost-1.0));
-  if(VERBOSE()>=VERBOSE_LOTS)
-    fprintf(stderr,"\rOptimal T is in [%d, %d]\n", Tmin, Tmax);
+  // if(VERBOSE()>=VERBOSE_LOTS)
+  //   fprintf(stderr,"\rOptimal T is in [%d, %d]\n", Tmin, Tmax);
   // on cherche autour
   double span = 2.0;
   int try_again = 4;
   while(span>1.05 && optimal_T <= 5*a) {
-    if(VERBOSE()>=VERBOSE_LOTS)
-      fprintf(stderr,"\rBest T [cost]: %d [%f]",optimal_T,min_cost);
+    // if(VERBOSE()>=VERBOSE_LOTS)
+    //   fprintf(stderr,"\rBest T [cost]: %d [%f]",optimal_T,min_cost);
     int T_low  = int(double(optimal_T)/span);
     int T_high = int(double(optimal_T)*span);
     double c_low  = average_cost(T_low , back, min_cost);
     double c_high = average_cost(T_high, back, min_cost);
     if(c_low<min_cost && c_high<min_cost) {
       if(try_again--) continue;
-      if(VERBOSE()>=VERBOSE_LOTS) {
-	fprintf(stderr,"Warning: when looking for optimal T,\n");
-        fprintf(stderr,"Low: %d [%f]  Middle: %d [%f]  High: %d [%f]\n", T_low, c_low, optimal_T, min_cost, T_high, c_high);
-      }
+      // if(VERBOSE()>=VERBOSE_LOTS) {
+      // 	fprintf(stderr,"Warning: when looking for optimal T,\n");
+      //   fprintf(stderr,"Low: %d [%f]  Middle: %d [%f]  High: %d [%f]\n", T_low, c_low, optimal_T, min_cost, T_high, c_high);
+      // }
       delete[] back;
       return optimal_T;
     }
@@ -466,7 +466,7 @@ int graph_molloy_hash::optimal_window() {
     else if(c_high<min_cost) { optimal_T = T_high; min_cost = c_high; };
     span = pow(span,0.618);
   }  
-  if(VERBOSE()>=VERBOSE_LOTS) fprintf(stderr,"\n");
+  // if(VERBOSE()>=VERBOSE_LOTS) fprintf(stderr,"\n");
   delete[] back;
   return optimal_T;
 }
@@ -478,9 +478,9 @@ double graph_molloy_hash::eval_K(int quality) {
   for(int i=quality; i--; ) {
     int int_K = int(floor(K+0.5));
     if(try_shuffle(a/(int_K+1),int_K)) {
-      K*=0.8; fprintf(stderr,"+"); }
+      K*=0.8; /*fprintf(stderr,"+");*/ }
     else {
-      K*=1.25; fprintf(stderr,"-"); }
+      K*=1.25; ;/*fprintf(stderr,"-");*/ }
     if(i<quality/2) avg_K *= K;
   }
   return pow(avg_K,1.0/double(quality/2));
@@ -597,8 +597,8 @@ int graph_molloy_hash::depth_search(bool *visited, int *buff, int v0) {
 
 //_________________________________________________________________________
 bool graph_molloy_hash::verify() {
-  fprintf(stderr,"Warning: graph_molloy_hash::verify() called..\n");
-  fprintf(stderr,"   try to convert graph into graph_molloy_opt() instead\n");
+  // fprintf(stderr,"Warning: graph_molloy_hash::verify() called..\n");
+  // fprintf(stderr,"   try to convert graph into graph_molloy_opt() instead\n");
   return true;
 }
 

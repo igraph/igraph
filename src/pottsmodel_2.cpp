@@ -1125,12 +1125,12 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
   //write the node in the community to a file
   //###################
   // TODO return this instead of writing it
-//   fprintf(file,"Number_of_nodes:\t%d\n",community->Size());
-//   fprintf(file,"Inner_Links:\t%f\n",inner_links);
-//   fprintf(file,"Outer_Links:\t%f\n",Ks-2*inner_links);
-//   fprintf(file,"Cohesion:\t%f\n",inner_links-gamma/total_degree_sum*Ks*Ks*0.5);
-//   fprintf(file,"Adhesion:\t%f\n",outer_links-gamma/total_degree_sum*Ks*Kr);
-//   fprintf(file,"\n");
+  /* fprintf(file,"Number_of_nodes:\t%d\n",community->Size()); */
+  /* fprintf(file,"Inner_Links:\t%f\n",inner_links); */
+  /* fprintf(file,"Outer_Links:\t%f\n",Ks-2*inner_links); */
+  /* fprintf(file,"Cohesion:\t%f\n",inner_links-gamma/total_degree_sum*Ks*Ks*0.5); */
+  /* fprintf(file,"Adhesion:\t%f\n",outer_links-gamma/total_degree_sum*Ks*Kr); */
+  /* fprintf(file,"\n"); */
   if (cohesion) {
     *cohesion=inner_links-gamma/total_degree_sum*Ks*Ks*0.5;
   } 
@@ -1180,13 +1180,13 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
   
   //den Header schreiben
   p=2.0*double(num_of_links)/double(num_of_nodes)/double(num_of_nodes-1);
-//   fprintf(file,"      Nodes=\t%lu\n",num_of_nodes);
-//   fprintf(file,"      Links=\t%lu\n",num_of_links);
-//   fprintf(file,"          q=\t%d\n",q);
-//   fprintf(file,"          p=\t%f\n",p);
-//   fprintf(file," Modularity=\t%f\n",calculate_Q());
-//   fprintf(file,"Temperature=\t%f\n", kT);
-//   fprintf(file,"Cluster\tNodes\tInnerLinks\tOuterLinks\tp_in\tp_out\t<Ln(#comm.)>\n");
+  /* fprintf(file,"      Nodes=\t%lu\n",num_of_nodes); */
+  /* fprintf(file,"      Links=\t%lu\n",num_of_links); */
+  /* fprintf(file,"          q=\t%d\n",q); */
+  /* fprintf(file,"          p=\t%f\n",p); */
+  /* fprintf(file," Modularity=\t%f\n",calculate_Q()); */
+  /* fprintf(file,"Temperature=\t%f\n", kT); */
+  /* fprintf(file,"Cluster\tNodes\tInnerLinks\tOuterLinks\tp_in\tp_out\t<Ln(#comm.)>\n"); */
   
   if (modularity)  { *modularity=calculate_genQ(gamma); }
   if (temperature) { *temperature=kT; }
@@ -1291,7 +1291,7 @@ long PottsModel::WriteSoftClusters(char *filename, double threshold)
   
   file=fopen(filename,"w");
   if (!file) {
-    printf("Could not open %s for writing.\n",filename);
+    /* printf("Could not open %s for writing.\n",filename); */
     return -1;
   }
 
@@ -1375,9 +1375,9 @@ double PottsModel::GammaSweep(double gamma_start, double gamma_stop, double prob
           //initialize_lookup(kT,kmax,net->node_list->Size());
           if (!non_parallel) HeatBathParallelLookup(gamma,prob, kT,25);
           else HeatBathLookup(gamma,prob, kT,25);
-          printf("kT=%f acceptance=%f\n", kT, acceptance);
+          /* printf("kT=%f acceptance=%f\n", kT, acceptance); */
     }
-    printf("Starting with gamma=%f\n", gamma);
+    /* printf("Starting with gamma=%f\n", gamma); */
     kT_start=kT;
     
     for (int i=0; i<repetitions; i++)
@@ -1392,14 +1392,14 @@ double PottsModel::GammaSweep(double gamma_start, double gamma_stop, double prob
           //initialize_lookup(kT,kmax,net->node_list->Size());
           if (!non_parallel) {
 	    changes=HeatBathParallelLookup(gamma, prob, kT, 50);
-              printf("kT: %f   \t Changes %li\n",kT, changes);
+              /* printf("kT: %f   \t Changes %li\n",kT, changes); */
           } else {
 	    acc=HeatBathLookup(gamma, prob, kT, 50);
              if (acc>(1.0-1.0/double(q))*0.01) changes=1; else changes=0;
-             printf("kT: %f   Acceptance: %f\n",kT, acc);
+             /* printf("kT: %f   Acceptance: %f\n",kT, acc); */
           }
       }
-      printf("Finisched with acceptance: %1.6f bei kT=%2.4f und gamma=%2.4f\n",acceptance,kT, gamma);
+      /* printf("Finisched with acceptance: %1.6f bei kT=%2.4f und gamma=%2.4f\n",acceptance,kT, gamma); */
 //      fprintf(file,"%f\t%f\n",gamma_,acceptance);
 //      fprintf(file2,"%f\t%f\n",gamma_,kT);
    //   fprintf(file3,"%f\t%d\n",gamma_,count_clusters(5));
@@ -1455,7 +1455,7 @@ double PottsModel::GammaSweepZeroTemp(double gamma_start, double gamma_stop, dou
     assign_initial_conf(-1);
     initialize_Qmatrix();
     gamma=gamma_start+stepsize*n;
-    printf("Starting with gamma=%f\n", gamma);
+    /* printf("Starting with gamma=%f\n", gamma); */
     for (int i=0; i<repetitions; i++)
     {
       changes=1;
@@ -1467,15 +1467,15 @@ double PottsModel::GammaSweepZeroTemp(double gamma_start, double gamma_stop, dou
           //initialize_lookup(kT,kmax,net->node_list->Size());
           if (!non_parallel) {
 	    changes=HeatBathParallelLookupZeroTemp(gamma, prob, 1);
-              printf("Changes %li\n", changes);
+              /* printf("Changes %li\n", changes); */
           } else {
             acc=HeatBathLookupZeroTemp(gamma, prob, 1);
             if (acc>(1.0-1.0/double(q))*0.01) changes=1; else changes=0;
-            printf("Acceptance: %f\n", acc);
+            /* printf("Acceptance: %f\n", acc); */
           }
           runs++;
       }
-      printf("Finisched with Modularity: %1.6f bei Gamma=%1.6f\n",calculate_Q(), gamma);
+      /* printf("Finisched with Modularity: %1.6f bei Gamma=%1.6f\n",calculate_Q(), gamma); */
 //      fprintf(file,"%f\t%f\n",gamma_,acceptance);
 //      fprintf(file2,"%f\t%f\n",gamma_,kT);
    //   fprintf(file3,"%f\t%d\n",gamma_,count_clusters(5));
@@ -1516,12 +1516,12 @@ long PottsModel::WriteCorrelationMatrix(char *filename)
   sprintf(filename2,"%s.mat",filename);
   file=fopen(filename,"w");
   if (!file) {
-    printf("Could not open %s for writing.\n",filename);
+    /* printf("Could not open %s for writing.\n",filename); */
     return -1;
   }
   file2=fopen(filename2,"w");
   if (!file2) {
-    printf("Could not open %s for writing.\n",filename2);
+    /* printf("Could not open %s for writing.\n",filename2); */
     return -1;
   }
   //write the header in one line

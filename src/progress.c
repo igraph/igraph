@@ -34,12 +34,14 @@ int igraph_progress(const char *message, igraph_real_t percent, void *data) {
   return IGRAPH_SUCCESS;
 }
 
+#ifndef USING_R
 int igraph_progress_handler_stderr(const char *message, igraph_real_t percent,
 				  void* data) {
   fputs(message, stderr);
   fprintf(stderr, "%.1f percent ready\n", (double)percent);
   return 0;
 }
+#endif
 
 igraph_progress_handler_t *
 igraph_set_progress_handler(igraph_progress_handler_t new_handler) {
