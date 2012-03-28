@@ -147,7 +147,7 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
   \code{to}, \code{\%--\%}, \code{\%->\%} and \code{\%<-\%}.
 
   \code{adj} takes a vertex sequence as an argument and returns
-  \code{NULL} for edges which have an adjacent vertex in it.
+  \code{TRUE} for edges which have an adjacent vertex in it.
 
   \code{from} and \code{to} are similar to \code{adj}, but only vertices
   at the source (\code{from}) or target (\code{to}) of the edge.
