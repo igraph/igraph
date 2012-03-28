@@ -25,6 +25,7 @@
 #include "convert.h"
 #include "error.h"
 #include "indexing.h"
+#include "platform.h"
 #include "py2compat.h"
 #include "pyhelpers.h"
 
@@ -216,7 +217,7 @@ static PyObject* igraphmodule_i_Graph_adjmatrix_get_index_row(igraph_t* graph,
  * to delete the edge the value is being assigned to in the adjacency matrix
  * assignment syntax.
  */
-static inline igraph_bool_t deleting_edge(PyObject* value) {
+static INLINE igraph_bool_t deleting_edge(PyObject* value) {
   return value == Py_None || value == Py_False ||
       (PyInt_Check(value) && PyInt_AsLong(value) == 0);
 }

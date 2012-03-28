@@ -21,6 +21,8 @@
 
 */
 
+#include "config.h"
+
 #include "cs/cs.h"
 
 #include "igraph_sparsemat.h"
