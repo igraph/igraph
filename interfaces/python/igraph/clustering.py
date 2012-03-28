@@ -223,6 +223,9 @@ class VertexClustering(Clustering):
       exists a L{VertexClustering} that references the L{Graph}.
     """
 
+    # Allow None to be passed to __plot__ as the "palette" keyword argument
+    _default_palette = None
+
     def __init__(self, graph, membership = None, modularity = None, \
                  params = None, modularity_params = None):
         """Creates a clustering object for a given graph.
@@ -418,7 +421,8 @@ class VertexClustering(Clustering):
         bounding box.
 
         This is done by calling L{Graph.__plot__()} with the same arguments, but
-        coloring the graph vertices according to the current clustering.
+        coloring the graph vertices according to the current clustering (unless
+        overridden by the C{vertex_color} argument explicitly).
 
         This method understands all the positional and keyword arguments that
         are understood by L{Graph.__plot__()}, only the differences will be
@@ -459,24 +463,15 @@ class VertexClustering(Clustering):
           - C{palette}: the palette used to resolve numeric color indices to RGBA
             values. By default, this is an instance of L{ClusterColoringPalette}.
 
-          - C{vertex_color}: this keyword argument is not allowed as it would override
-            the coloring.
-
         @see: L{Graph.__plot__()} for more supported keyword arguments.
         """
-        if "vertex_color" in kwds:
-            raise ValueError("you are not allowed to define vertex colors "+
-                             "when plotting a clustering")
-
         if "edge_color" not in kwds and "color" not in self.graph.edge_attributes():
             # Set up a default edge coloring based on internal vs external edges
             colors = ["grey20", "grey80"]
             kwds["edge_color"] = [colors[is_crossing]
                                   for is_crossing in self.crossing()]
 
-        if "palette" in kwds:
-            palette = kwds["palette"]
-        else:
+        if palette is None:
             palette = ClusterColoringPalette(len(self))
 
         if "mark_groups" not in kwds:
@@ -488,7 +483,9 @@ class VertexClustering(Clustering):
             kwds["mark_groups"] = _handle_mark_groups_arg_for_clustering(
                     kwds["mark_groups"], self)
 
-        kwds["vertex_color"] = self.membership
+        if "vertex_color" not in kwds:
+            kwds["vertex_color"] = self.membership
+
         return self._graph.__plot__(context, bbox, palette, *args, **kwds)
 
     def _formatted_cluster_iterator(self):
