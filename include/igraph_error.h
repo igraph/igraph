@@ -432,10 +432,30 @@ typedef enum {
  *   error.
  * \param igraph_errno The \a igraph error code.
  * \return the error code (if it returns)
+ * 
+ * \sa igraph_errorf().
  */
 
 int igraph_error(const char *reason, const char *file, int line,
 		 int igraph_errno);
+
+/**
+ * \function igraph_errorf
+ * \brief Trigger an error, printf-like version.
+ * 
+ * \param reason Textual description of the error, interpreted as 
+ *               a printf format string.
+ * \param file The source file in which the error was noticed.
+ * \param line The line in the source file which triggered the error.
+ * \param igraph_errno The \a igraph error code.
+ * \param ... Additional parameters, the values to substitute into the
+ *            format string.
+ * 
+ * \sa igraph_error().
+ */
+
+int igraph_errorf(const char *reason, const char *file, int line, 
+		  int igraph_errno, ...);
 
 /**
  * \function igraph_strerror

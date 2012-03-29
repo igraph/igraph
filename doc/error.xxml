@@ -37,6 +37,7 @@
 <!-- doxrox-include error_handling_internals -->
 <!-- doxrox-include IGRAPH_ERROR -->
 <!-- doxrox-include igraph_error -->
+<!-- doxrox-include igraph_errorf -->
 <!-- doxrox-include IGRAPH_CHECK -->
 </section>
 

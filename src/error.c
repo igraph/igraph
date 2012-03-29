@@ -27,8 +27,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdarg.h>
 
 static IGRAPH_THREAD_LOCAL igraph_error_handler_t *igraph_i_error_handler=0;
+static IGRAPH_THREAD_LOCAL char igraph_i_errormsg_buffer[500];
 
 static const char *igraph_i_error_strings[]=
   { /*  0 */ "No error",
@@ -103,6 +105,15 @@ int igraph_error(const char *reason, const char *file, int line,
     igraph_error_handler_abort(reason, file, line, igraph_errno);
   }
   return igraph_errno;
+}
+
+int igraph_errorf(const char *reason, const char *file, int line, 
+		  int igraph_errno, ...) {
+  va_list ap;
+  va_start(ap, igraph_errno);
+  vsnprintf(igraph_i_errormsg_buffer, 
+	    sizeof(igraph_i_errormsg_buffer) / sizeof(char), reason, ap);
+  return igraph_error(igraph_i_errormsg_buffer, file, line, igraph_errno);
 }
 
 void igraph_error_handler_abort (const char *reason, const char *file,
