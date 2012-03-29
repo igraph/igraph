@@ -329,6 +329,8 @@ igraph_set_error_handler(igraph_error_handler_t* new_handler);
  * \enumval IGRAPH_EATTRCOMBINE Unimplemented attribute combination 
  *   method for the given attribute type.
  * \enumval IGRAPH_ELAPACK A LAPACK call resulted an error.
+ * \enumval IGRAPH_EDRL Internal error in the DrL layout generator.
+ * \enumval IGRAPH_EOVERFLOW Integer or double overflow.
  */
 
 typedef enum {
@@ -384,7 +386,9 @@ typedef enum {
   IGRAPH_GLP_ESTOP        = 50,
   IGRAPH_EATTRIBUTES      = 51,
   IGRAPH_EATTRCOMBINE     = 52,
-  IGRAPH_ELAPACK          = 53
+  IGRAPH_ELAPACK          = 53,
+  IGRAPH_EDRL             = 54,
+  IGRAPH_EOVERFLOW        = 55
 } igraph_error_type_t;
 
 /**
