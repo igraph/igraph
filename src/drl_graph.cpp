@@ -56,78 +56,78 @@ namespace drl {
 // constructor -- initializes the schedule variables (as in 
 // graph constructor)
 
-graph::graph ( int proc_id, int tot_procs, char *int_file )
-{
+// graph::graph ( int proc_id, int tot_procs, char *int_file )
+// {
 		  
-		  // MPI parameters
-		  myid = proc_id;
-		  num_procs = tot_procs;
+// 		  // MPI parameters
+// 		  myid = proc_id;
+// 		  num_procs = tot_procs;
 
-		  // initial annealing parameters
-		  STAGE = 0;
-		  iterations = 0;
-		  temperature = 2000;
-		  attraction = 10;
-		  damping_mult = 1.0;
-		  min_edges = 20;
-		  first_add = fine_first_add = true;
-		  fineDensity = false;
+// 		  // initial annealing parameters
+// 		  STAGE = 0;
+// 		  iterations = 0;
+// 		  temperature = 2000;
+// 		  attraction = 10;
+// 		  damping_mult = 1.0;
+// 		  min_edges = 20;
+// 		  first_add = fine_first_add = true;
+// 		  fineDensity = false;
 
-		  // Brian's original Vx schedule
-		  liquid.iterations = 200;
-		  liquid.temperature = 2000;
-		  liquid.attraction = 2;
-		  liquid.damping_mult = 1.0;
-		  liquid.time_elapsed = 0;
+// 		  // Brian's original Vx schedule
+// 		  liquid.iterations = 200;
+// 		  liquid.temperature = 2000;
+// 		  liquid.attraction = 2;
+// 		  liquid.damping_mult = 1.0;
+// 		  liquid.time_elapsed = 0;
 
-		  expansion.iterations = 200;
-		  expansion.temperature = 2000;
-		  expansion.attraction = 10;
-		  expansion.damping_mult = 1.0;
-		  expansion.time_elapsed = 0;
+// 		  expansion.iterations = 200;
+// 		  expansion.temperature = 2000;
+// 		  expansion.attraction = 10;
+// 		  expansion.damping_mult = 1.0;
+// 		  expansion.time_elapsed = 0;
 
-		  cooldown.iterations = 200;
-		  cooldown.temperature = 2000;
-		  cooldown.attraction = 1;
-		  cooldown.damping_mult = .1;
-		  cooldown.time_elapsed = 0;
+// 		  cooldown.iterations = 200;
+// 		  cooldown.temperature = 2000;
+// 		  cooldown.attraction = 1;
+// 		  cooldown.damping_mult = .1;
+// 		  cooldown.time_elapsed = 0;
 
-		  crunch.iterations = 50;
-		  crunch.temperature = 250;
-		  crunch.attraction = 1;
-		  crunch. damping_mult = .25;
-		  crunch.time_elapsed = 0;
+// 		  crunch.iterations = 50;
+// 		  crunch.temperature = 250;
+// 		  crunch.attraction = 1;
+// 		  crunch. damping_mult = .25;
+// 		  crunch.time_elapsed = 0;
 
-		  simmer.iterations = 100;
-		  simmer.temperature = 250;
-		  simmer.attraction = .5;
-		  simmer.damping_mult = 0.0;
-		  simmer.time_elapsed = 0;
+// 		  simmer.iterations = 100;
+// 		  simmer.temperature = 250;
+// 		  simmer.attraction = .5;
+// 		  simmer.damping_mult = 0.0;
+// 		  simmer.time_elapsed = 0;
 
-		  // scan .int file for node info
-		  scan_int ( int_file );
+// 		  // scan .int file for node info
+// 		  scan_int ( int_file );
 		  
-		  // populate node positions and ids
-		  positions.reserve ( num_nodes );
-		  map < int, int >::iterator cat_iter;
-		  for ( cat_iter = id_catalog.begin();
-			    cat_iter != id_catalog.end();
-				cat_iter++ )
-			positions.push_back ( Node( cat_iter->first ) );
+// 		  // populate node positions and ids
+// 		  positions.reserve ( num_nodes );
+// 		  map < int, int >::iterator cat_iter;
+// 		  for ( cat_iter = id_catalog.begin();
+// 			    cat_iter != id_catalog.end();
+// 				cat_iter++ )
+// 			positions.push_back ( Node( cat_iter->first ) );
 		  
-		  /*
-		  // output positions .ids for debugging
-		  for ( int id = 0; id < num_nodes; id++ )
-			cout << positions[id].id << endl;
-		  */
+// 		  /*
+// 		  // output positions .ids for debugging
+// 		  for ( int id = 0; id < num_nodes; id++ )
+// 			cout << positions[id].id << endl;
+// 		  */
 		  
-		  // read .int file for graph info
-		  read_int ( int_file );
+// 		  // read .int file for graph info
+// 		  read_int ( int_file );
 		  
-		  // initialize density server
-		  density_server.Init();
+// 		  // initialize density server
+// 		  density_server.Init();
 		  
-}
+// }
 
 graph::graph(const igraph_t *igraph, 
 	     const igraph_layout_drl_options_t *options,
@@ -217,78 +217,78 @@ graph::graph(const igraph_t *igraph,
 // corresponding graph globals are populated: num_nodes, id_catalog,
 // and highest_sim.
 
-void graph::scan_int ( char *filename )
-{
+// void graph::scan_int ( char *filename )
+// {
 
-  cout << "Proc. " << myid << " scanning .int file ..." << endl;
+//   cout << "Proc. " << myid << " scanning .int file ..." << endl;
   
-  // Open (sim) File
-  ifstream fp ( filename );
-  if ( !fp )
-  {
-	cout << "Error: could not open " << filename << ".  Program terminated." << endl;
-	#ifdef MUSE_MPI
-	  MPI_Abort ( MPI_COMM_WORLD, 1 );
-	#else
-	  exit (1);
-    #endif
-  }	
+//   // Open (sim) File
+//   ifstream fp ( filename );
+//   if ( !fp )
+//   {
+// 	cout << "Error: could not open " << filename << ".  Program terminated." << endl;
+// 	#ifdef MUSE_MPI
+// 	  MPI_Abort ( MPI_COMM_WORLD, 1 );
+// 	#else
+// 	  exit (1);
+//     #endif
+//   }	
   
-  // Read file, parse, and add into data structure
-  int id1, id2;
-  float edge_weight;
-  highest_sim = -1.0;
-  while ( !fp.eof () )
-	{
-	  fp >> id1 >> id2 >> edge_weight;
+//   // Read file, parse, and add into data structure
+//   int id1, id2;
+//   float edge_weight;
+//   highest_sim = -1.0;
+//   while ( !fp.eof () )
+// 	{
+// 	  fp >> id1 >> id2 >> edge_weight;
 	  
-	  // ignore negative weights!
-	  if ( edge_weight <= 0 )
-	  {
-	     cout << "Error: found negative edge weight in " << filename << ".  Program stopped." << endl;
-		 #ifdef MUSE_MPI
-	       MPI_Abort ( MPI_COMM_WORLD, 1 );
-	     #else
-	       exit (1);
-         #endif
-	   }
+// 	  // ignore negative weights!
+// 	  if ( edge_weight <= 0 )
+// 	  {
+// 	     cout << "Error: found negative edge weight in " << filename << ".  Program stopped." << endl;
+// 		 #ifdef MUSE_MPI
+// 	       MPI_Abort ( MPI_COMM_WORLD, 1 );
+// 	     #else
+// 	       exit (1);
+//          #endif
+// 	   }
 
-	   if ( highest_sim < edge_weight )
-	      highest_sim = edge_weight;
+// 	   if ( highest_sim < edge_weight )
+// 	      highest_sim = edge_weight;
 	
-	   id_catalog[id1] = 1;
-	   id_catalog[id2] = 1;
-	}
+// 	   id_catalog[id1] = 1;
+// 	   id_catalog[id2] = 1;
+// 	}
 
-  fp.close();
+//   fp.close();
 
-  if ( id_catalog.size() == 0 )
-  {
-    cout << "Error: Proc. " << myid << ": " << filename << " is empty.  Program terminated." << endl;
-	#ifdef MUSE_MPI
-	  MPI_Abort ( MPI_COMM_WORLD, 1 );
-	#else
-	  exit (1);
-	#endif
-  }
+//   if ( id_catalog.size() == 0 )
+//   {
+//     cout << "Error: Proc. " << myid << ": " << filename << " is empty.  Program terminated." << endl;
+// 	#ifdef MUSE_MPI
+// 	  MPI_Abort ( MPI_COMM_WORLD, 1 );
+// 	#else
+// 	  exit (1);
+// 	#endif
+//   }
   
-  // label nodes with sequential integers starting at 0
-  map< int, int>::iterator cat_iter;
-  int id_label;
-  for ( cat_iter = id_catalog.begin(), id_label = 0;
-	    cat_iter != id_catalog.end(); cat_iter++, id_label++ )
-    cat_iter->second = id_label;
+//   // label nodes with sequential integers starting at 0
+//   map< int, int>::iterator cat_iter;
+//   int id_label;
+//   for ( cat_iter = id_catalog.begin(), id_label = 0;
+// 	    cat_iter != id_catalog.end(); cat_iter++, id_label++ )
+//     cat_iter->second = id_label;
 
-  /*
-  // output id_catalog for debugging:
-  for ( cat_iter = id_catalog.begin();
-		cat_iter != id_catalog.end();
-		cat_iter++ )
-	cout << cat_iter->first << "\t" << cat_iter->second << endl;
-  */
+//   /*
+//   // output id_catalog for debugging:
+//   for ( cat_iter = id_catalog.begin();
+// 		cat_iter != id_catalog.end();
+// 		cat_iter++ )
+// 	cout << cat_iter->first << "\t" << cat_iter->second << endl;
+//   */
   
-  num_nodes = id_catalog.size();  
-}
+//   num_nodes = id_catalog.size();  
+// }
 
 // read in .parms file, if present
 
@@ -443,50 +443,50 @@ void graph::init_parms(const igraph_layout_drl_options_t *options) {
 // coordinates.  If a node is missing coordinates the coordinates
 // are computed 
 
-void graph::read_real ( char *real_file )
-{
-  cout << "Processor " << myid << " reading .real file ..." << endl;
+// void graph::read_real ( char *real_file )
+// {
+//   cout << "Processor " << myid << " reading .real file ..." << endl;
   
-  // read in .real file and mark as fixed
-  ifstream real_in ( real_file );
-  if ( !real_in )
-  {
-    cout << "Error: proc. " << myid << " could not open .real file." << endl;
-    #ifdef MUSE_MPI
-	  MPI_Abort ( MPI_COMM_WORLD, 1 );
-	#else
-	  exit (1);
-	#endif
-  }
+//   // read in .real file and mark as fixed
+//   ifstream real_in ( real_file );
+//   if ( !real_in )
+//   {
+//     cout << "Error: proc. " << myid << " could not open .real file." << endl;
+//     #ifdef MUSE_MPI
+// 	  MPI_Abort ( MPI_COMM_WORLD, 1 );
+// 	#else
+// 	  exit (1);
+// 	#endif
+//   }
   
-  int real_id;
-  float real_x, real_y;
-  while ( !real_in.eof () )
-  {
-    real_id = -1;
-    real_in >> real_id >> real_x >> real_y;
-	if ( real_id >= 0 )
-	{
-	  positions[id_catalog[real_id]].x = real_x;
-	  positions[id_catalog[real_id]].y = real_y;
-	  positions[id_catalog[real_id]].fixed = true;
+//   int real_id;
+//   float real_x, real_y;
+//   while ( !real_in.eof () )
+//   {
+//     real_id = -1;
+//     real_in >> real_id >> real_x >> real_y;
+// 	if ( real_id >= 0 )
+// 	{
+// 	  positions[id_catalog[real_id]].x = real_x;
+// 	  positions[id_catalog[real_id]].y = real_y;
+// 	  positions[id_catalog[real_id]].fixed = true;
 	  
-	  /*
-	  // output positions read (for debugging)
-      cout << id_catalog[real_id] << " (" << positions[id_catalog[real_id]].x
-		   << ", " << positions[id_catalog[real_id]].y << ") " 
-		   << positions[id_catalog[real_id]].fixed << endl;
-	  */
+// 	  /*
+// 	  // output positions read (for debugging)
+//       cout << id_catalog[real_id] << " (" << positions[id_catalog[real_id]].x
+// 		   << ", " << positions[id_catalog[real_id]].y << ") " 
+// 		   << positions[id_catalog[real_id]].fixed << endl;
+// 	  */
 	  
-	  // add node to density grid
-	  if ( real_iterations > 0 )
-	    density_server.Add ( positions[id_catalog[real_id]], fineDensity );
-	}
+// 	  // add node to density grid
+// 	  if ( real_iterations > 0 )
+// 	    density_server.Add ( positions[id_catalog[real_id]], fineDensity );
+// 	}
 		 
-  }
+//   }
   
-  real_in.close();
-}
+//   real_in.close();
+// }
 
 int graph::read_real ( const igraph_matrix_t *real_mat, 
 		       const igraph_vector_bool_t *fixed) {
@@ -508,63 +508,63 @@ int graph::read_real ( const igraph_matrix_t *real_mat,
 // file produced by convert_sim and gathers the nodes and their
 // neighbors in the range start_ind to end_ind.
 
-void graph::read_int ( char *file_name )
-{
+// void graph::read_int ( char *file_name )
+// {
 
-	ifstream int_file;
+// 	ifstream int_file;
 	
-	int_file.open ( file_name );
-	if ( !int_file )
-	{
-		cout << "Error (worker process " << myid << "): could not open .int file." << endl;
-		#ifdef MUSE_MPI
-		  MPI_Abort ( MPI_COMM_WORLD, 1 );
-		#else
-		  exit (1);
-		#endif
-	}
+// 	int_file.open ( file_name );
+// 	if ( !int_file )
+// 	{
+// 		cout << "Error (worker process " << myid << "): could not open .int file." << endl;
+// 		#ifdef MUSE_MPI
+// 		  MPI_Abort ( MPI_COMM_WORLD, 1 );
+// 		#else
+// 		  exit (1);
+// 		#endif
+// 	}
 	
-	cout << "Processor " << myid << " reading .int file ..." << endl;
+// 	cout << "Processor " << myid << " reading .int file ..." << endl;
 	
-	int node_1, node_2;
-	float weight;
+// 	int node_1, node_2;
+// 	float weight;
 	
-    while ( !int_file.eof() )
-	{
-		weight = 0;		// all weights should be >= 0
-		int_file >> node_1 >> node_2 >> weight;
-		if ( weight )		// otherwise we are at end of file
-								// or it is a self-connected node
-		{
-			    // normalization from original vxord
-			    weight /= highest_sim;
-				weight = weight*fabs(weight);
+//     while ( !int_file.eof() )
+// 	{
+// 		weight = 0;		// all weights should be >= 0
+// 		int_file >> node_1 >> node_2 >> weight;
+// 		if ( weight )		// otherwise we are at end of file
+// 								// or it is a self-connected node
+// 		{
+// 			    // normalization from original vxord
+// 			    weight /= highest_sim;
+// 				weight = weight*fabs(weight);
 				
-				// initialize graph
-				if ( ( node_1 % num_procs ) == myid )
-					(neighbors[id_catalog[node_1]])[id_catalog[node_2]] = weight;
-				if ( ( node_2 % num_procs ) == myid )
-					(neighbors[id_catalog[node_2]])[id_catalog[node_1]] = weight;
-		}
-	}
-	int_file.close();
+// 				// initialize graph
+// 				if ( ( node_1 % num_procs ) == myid )
+// 					(neighbors[id_catalog[node_1]])[id_catalog[node_2]] = weight;
+// 				if ( ( node_2 % num_procs ) == myid )
+// 					(neighbors[id_catalog[node_2]])[id_catalog[node_1]] = weight;
+// 		}
+// 	}
+// 	int_file.close();
 	
-	/*
-	// the following code outputs the contents of the neighbors structure
-	// (to be used for debugging)
+// 	/*
+// 	// the following code outputs the contents of the neighbors structure
+// 	// (to be used for debugging)
 	
-	map<int, map<int,float> >::iterator i;
-	map<int,float>::iterator j;
+// 	map<int, map<int,float> >::iterator i;
+// 	map<int,float>::iterator j;
 	
-	for ( i = neighbors.begin(); i != neighbors.end(); i++ ) {
-	  cout << myid << ": " << i->first << " ";
-		for (j = (i->second).begin(); j != (i->second).end(); j++ )
-			cout << j->first << " (" << j->second << ") ";
-		cout << endl;
-		}
-	*/
+// 	for ( i = neighbors.begin(); i != neighbors.end(); i++ ) {
+// 	  cout << myid << ": " << i->first << " ";
+// 		for (j = (i->second).begin(); j != (i->second).end(); j++ )
+// 			cout << j->first << " (" << j->second << ") ";
+// 		cout << endl;
+// 		}
+// 	*/
 	
-}
+// }
 
 /*********************************************
  * Function: ReCompute				         *
@@ -1143,28 +1143,28 @@ void graph::Solve_Analytic( int node_ind, float &pos_x, float &pos_y )
 
 // write_coord writes out the coordinate file of the final solutions
 
-void graph::write_coord( const char *file_name )
-{
+// void graph::write_coord( const char *file_name )
+// {
 
-  ofstream coordOUT( file_name );
-  if ( !coordOUT )
-  {
-	cout << "Could not open " << file_name << ".  Program terminated." << endl;
-	#ifdef MUSE_MPI
-	  MPI_Abort ( MPI_COMM_WORLD, 1 );
-	#else
-	  exit (1);
-	#endif
-  }
+//   ofstream coordOUT( file_name );
+//   if ( !coordOUT )
+//   {
+// 	cout << "Could not open " << file_name << ".  Program terminated." << endl;
+// 	#ifdef MUSE_MPI
+// 	  MPI_Abort ( MPI_COMM_WORLD, 1 );
+// 	#else
+// 	  exit (1);
+// 	#endif
+//   }
   
-  cout << "Writing out solution to " << file_name << " ..." << endl;
+//   cout << "Writing out solution to " << file_name << " ..." << endl;
   
-  for (unsigned int i = 0; i < positions.size(); i++) {
-    coordOUT << positions[i].id << "\t" << positions[i].x << "\t" << positions[i].y <<endl;
-  }
-  coordOUT.close();
+//   for (unsigned int i = 0; i < positions.size(); i++) {
+//     coordOUT << positions[i].id << "\t" << positions[i].x << "\t" << positions[i].y <<endl;
+//   }
+//   coordOUT.close();
   
-}
+// }
 
 // write_sim -- outputs .edges file, takes as input .coord filename,
 // with .coord extension
@@ -1243,26 +1243,26 @@ float graph::get_tot_energy ( )
 // output (int_out is set to 0 if not proc. 0).  int_out is the parameter
 // passed by the user, and coord_file is the .coord file.
 
-void graph::draw_graph ( int int_out, char *coord_file )
-{
+// void graph::draw_graph ( int int_out, char *coord_file )
+// {
 	
-	// layout graph (with possible intermediate output)
-	int count_iter = 0, count_file = 1;
-	char int_coord_file [MAX_FILE_NAME + MAX_INT_LENGTH];
-	while ( ReCompute( ) )
-		if ( (int_out > 0) && (count_iter == int_out) )
-		{
-			// output intermediate solution
-			sprintf ( int_coord_file, "%s.%d", coord_file, count_file );
-			write_coord ( int_coord_file );
+// 	// layout graph (with possible intermediate output)
+// 	int count_iter = 0, count_file = 1;
+// 	char int_coord_file [MAX_FILE_NAME + MAX_INT_LENGTH];
+// 	while ( ReCompute( ) )
+// 		if ( (int_out > 0) && (count_iter == int_out) )
+// 		{
+// 			// output intermediate solution
+// 			sprintf ( int_coord_file, "%s.%d", coord_file, count_file );
+// 			write_coord ( int_coord_file );
 			
-			count_iter = 0;
-			count_file++;
-		}
-		else
-			count_iter++;
+// 			count_iter = 0;
+// 			count_file++;
+// 		}
+// 		else
+// 			count_iter++;
 	
-}
+// }
 
 int graph::draw_graph(igraph_matrix_t *res) {
   int count_iter=0;
