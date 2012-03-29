@@ -47,7 +47,7 @@ establishment.game(nodes, types, k = 1, type.dist = rep(1, types),
 % \seealso{}
 \examples{
 # two types of vertices, they like only themselves
-g1 <- callaway.traits.game(1000, 2, pref.matrix=matrix( c(1,0,0,1), nc=2))
-g2 <- establishment.game(1000, 2, k=2, pref.matrix=matrix( c(1,0,0,1), nc=2))
+g1 <- callaway.traits.game(1000, 2, pref.matrix=matrix( c(1,0,0,1), ncol=2))
+g2 <- establishment.game(1000, 2, k=2, pref.matrix=matrix( c(1,0,0,1), ncol=2))
 }
 \keyword{graphs}

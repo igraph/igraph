@@ -14,7 +14,7 @@
 }
 \usage{
 layout.drl (graph, use.seed = FALSE, seed = matrix(runif(vcount(graph) * 
-    2), nc = 2), options = igraph.drl.default, weights = E(graph)$weight, 
+    2), ncol = 2), options = igraph.drl.default, weights = E(graph)$weight, 
     fixed = NULL, dim = 2) 
 }
 \arguments{

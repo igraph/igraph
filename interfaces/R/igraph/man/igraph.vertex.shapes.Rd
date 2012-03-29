@@ -70,7 +70,7 @@
 \seealso{ \code{\link{igraph.plotting}}, \code{\link{plot.igraph}} }
 \examples{
 \dontrun{
-g <- graph.ring(10, dir=TRUE, mut=TRUE)
+g <- graph.ring(10, directed=TRUE, mut=TRUE)
 plot(g, vertex.shape="rectangle", layout=layout.circle)
 }
 }

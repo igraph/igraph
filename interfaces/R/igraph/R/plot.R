@@ -163,7 +163,7 @@ plot.igraph <- function(x,
       rad <- angle
       center <- c(cx,cy)
       cp <- matrix( c(x0,y0, x0+.4,y0+.2, x0+.4,y0-.2, x0,y0),
-                   nc=2, byrow=TRUE)
+                   ncol=2, byrow=TRUE)
       phi <- atan2(cp[,2]-center[2], cp[,1]-center[1])
       r <- sqrt((cp[,1]-center[1])**2 + (cp[,2]-center[2])**2)
       

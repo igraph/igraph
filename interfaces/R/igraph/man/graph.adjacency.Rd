@@ -113,10 +113,10 @@ graph.adjacency(adjmatrix, mode=c("directed", "undirected", "max",
   other ways to create graphs.
 }
 \examples{
-adjm <- matrix(sample(0:1, 100, replace=TRUE, prob=c(0.9,0.1)), nc=10)
+adjm <- matrix(sample(0:1, 100, replace=TRUE, prob=c(0.9,0.1)), ncol=10)
 g1 <- graph.adjacency( adjm )
 adjm <- matrix(sample(0:5, 100, replace=TRUE,
-                      prob=c(0.9,0.02,0.02,0.02,0.02,0.02)), nc=10)
+                      prob=c(0.9,0.02,0.02,0.02,0.02,0.02)), ncol=10)
 g2 <- graph.adjacency(adjm, weighted=TRUE)
 E(g2)$weight
 

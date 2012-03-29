@@ -144,5 +144,5 @@ get.edges <- function(graph, es) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph0") )
   res <- .Call("R_igraph_edges", graph, as.igraph.es(es),
                PACKAGE="igraph0")
-  matrix(res, nc=2, byrow=TRUE)
+  matrix(res, ncol=2, byrow=TRUE)
 }

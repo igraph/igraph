@@ -576,7 +576,7 @@ graph.data.frame <- function(d, directed=TRUE, vertices=NULL) {
   # create edge list
   from <- as.character(d[,1])
   to <- as.character(d[,2])
-  edges <- t(matrix(c(ids[from], ids[to]), nc=2))
+  edges <- t(matrix(c(ids[from], ids[to]), ncol=2))
   
   # edge attributes
   attrs <- list()

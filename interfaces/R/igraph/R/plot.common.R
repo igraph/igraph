@@ -117,7 +117,7 @@ i.get.layout <- function(graph, layout, layout.par) {
   } else if (is.character(layout) && length(layout)==1 &&
              substr(layout, 1, 2)=="a:") {
     layout <- matrix(unlist(get.vertex.attribute(graph, substring(layout,3))),
-                     nr=vcount(graph), byrow=TRUE)[,1:2]
+                     nrow=vcount(graph), byrow=TRUE)[,1:2]
   }  
 
   layout

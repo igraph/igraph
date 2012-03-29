@@ -50,7 +50,7 @@ all(count.multiple(simplify(g)) == 1)
 
 # Direction of the edge is important
 is.multiple(graph( c(0,1, 1,0) ))
-is.multiple(graph( c(0,1, 1,0), dir=FALSE ))
+is.multiple(graph( c(0,1, 1,0), directed=FALSE ))
 
 # Remove multiple edges but keep multiplicity
 g <- barabasi.game(10, m=3)

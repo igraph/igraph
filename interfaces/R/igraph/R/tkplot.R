@@ -206,7 +206,7 @@ tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
          function(deg) {
            tkadd(rotate.menu, "command",
                  label=paste(deg, "degree"), command=function() {
-                   tkplot.rotate(tkp.id, deg=deg)
+                   tkplot.rotate(tkp.id, degree=deg)
                  })
          })
   export.menu <- tkmenu(main.menu)
@@ -900,7 +900,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
     xx <- from.c[1] + cos(loop.angle/180*pi)*vertex.size
     yy <- from.c[2] + sin(loop.angle/180*pi)*vertex.size
     cc <- matrix(c(xx,yy, xx+20,yy-10, xx+30,yy, xx+20,yy+10, xx,yy),
-                 nc=2, byrow=TRUE)
+                 ncol=2, byrow=TRUE)
 
     phi <- atan2(cc[,2]-yy, cc[,1]-xx)
     r <- sqrt((cc[,1]-xx)**2 + (cc[,2]-yy)**2)

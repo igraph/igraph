@@ -32,8 +32,8 @@ graph.full.bipartite (n1, n2, directed = FALSE, mode = c("all", "out", "in"))
 \seealso{\code{\link{graph.full}} for creating one-mode full graphs}
 \examples{
 g <- graph.full.bipartite(2, 3)
-g2 <- graph.full.bipartite(2, 3, dir=TRUE)
-g3 <- graph.full.bipartite(2, 3, dir=TRUE, mode="in")
-g4 <- graph.full.bipartite(2, 3, dir=TRUE, mode="all")
+g2 <- graph.full.bipartite(2, 3, directed=TRUE)
+g3 <- graph.full.bipartite(2, 3, directed=TRUE, mode="in")
+g4 <- graph.full.bipartite(2, 3, directed=TRUE, mode="all")
 }
 \keyword{graphs}

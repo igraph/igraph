@@ -41,7 +41,7 @@ graph.adjlist(adjlist, directed = TRUE, duplicate = TRUE)
 \seealso{ \code{\link{get.edgelist}} }
 \examples{
 ## Directed
-g <- graph.ring(10, dir=TRUE)
+g <- graph.ring(10, directed=TRUE)
 al <- get.adjlist(g, mode="out")
 g2 <- graph.adjlist(al)
 graph.isomorphic(g, g2)
@@ -49,10 +49,10 @@ graph.isomorphic(g, g2)
 ## Undirected
 g <- graph.ring(10)
 al <- get.adjlist(g)
-g2 <- graph.adjlist(al, dir=FALSE)
+g2 <- graph.adjlist(al, directed=FALSE)
 graph.isomorphic(g, g2)
 ecount(g2)
-g3 <- graph.adjlist(al, dir=FALSE, duplicate=FALSE)
+g3 <- graph.adjlist(al, directed=FALSE, duplicate=FALSE)
 ecount(g3)
 is.multiple(g3)
 }

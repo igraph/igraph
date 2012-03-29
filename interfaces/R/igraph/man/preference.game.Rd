@@ -44,11 +44,11 @@ asymmetric.preference.game(nodes, types,
 \author{Tamas Nepusz \email{ntamas@rmki.kfki.hu} and Gabor Csardi
   \email{csardi@rmki.kfki.hu} for the R interface} 
 \examples{
-pf <- matrix( c(1, 0, 0, 1), nr=2)
+pf <- matrix( c(1, 0, 0, 1), nrow=2)
 g <- preference.game(20, 2, pref.matrix=pf)
 \dontrun{tkplot(g, layout=layout.fruchterman.reingold)}
 
-pf <- matrix( c(0, 1, 0, 0), nr=2)
+pf <- matrix( c(0, 1, 0, 0), nrow=2)
 g <- asymmetric.preference.game(20, 2, pref.matrix=pf)
 \dontrun{tkplot(g, layout=layout.circle)}
 }

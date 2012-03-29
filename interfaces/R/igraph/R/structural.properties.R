@@ -278,7 +278,7 @@ simplify <- function(graph, remove.multiple=TRUE,
 ##       l <- sum(neis==i)
 ##       if (l>2) { dup <- c(dup, rep(i, l/4)) }
 ##       remove <- c(remove, as.numeric(t(matrix(c(rep(i,length(dup)),
-##                                                 dup), nc=2))))
+##                                                 dup), ncol=2))))
 ##     }
 ##     res <- delete.edges(res, remove)  
 ##   }  
@@ -534,7 +534,7 @@ alpha.centrality <- function(graph, nodes=V(graph), alpha=1,
   }
 
   exo <- rep(exo, length=vcount(graph))
-  exo <- matrix(exo, nc=1)
+  exo <- matrix(exo, ncol=1)
 
   if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
     ## weights == NULL and there is a "weight" edge attribute

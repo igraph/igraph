@@ -524,7 +524,7 @@ piecewise.layout <- function(graph, layout=layout.kamada.kawai, ...) {
 }
 
 layout.drl <- function(graph, use.seed = FALSE,
-                       seed=matrix(runif(vcount(graph)*2), nc=2),
+                       seed=matrix(runif(vcount(graph)*2), ncol=2),
                        options=igraph.drl.default,
                        weights=E(graph)$weight,
                        fixed=NULL,

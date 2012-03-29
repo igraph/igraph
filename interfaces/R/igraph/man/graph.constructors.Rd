@@ -170,8 +170,8 @@ g9 <- graph.tree(10, 2)
 g10 <- graph.full(5, loops=TRUE)
 g11 <- graph.full.citation(10)
 g12 <- graph.atlas(sample(0:1252, 1))
-el <- matrix( c("foo", "bar", "bar", "foobar"), nc=2, byrow=TRUE)
+el <- matrix( c("foo", "bar", "bar", "foobar"), ncol=2, byrow=TRUE)
 g13 <- graph.edgelist(el)
-g15 <- graph.extended.chordal.ring(15, matrix(c(3,12,4,7,8,11), nr=2))
+g15 <- graph.extended.chordal.ring(15, matrix(c(3,12,4,7,8,11), nrow=2))
 }
 \keyword{graphs}

@@ -50,7 +50,7 @@ triad.census(graph)
 \seealso{\code{\link{dyad.census}} for classifying binary relationships,
   \code{\link{graph.motifs}} for the underlying implementation.}
 \examples{
-g <- erdos.renyi.game(15, 45, type="gnm", dir=TRUE)
+g <- erdos.renyi.game(15, 45, type="gnm", directed=TRUE)
 triad.census(g)
 }
 \keyword{graphs}

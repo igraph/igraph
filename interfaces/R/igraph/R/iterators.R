@@ -339,7 +339,7 @@ print.igraph.es <- function(x, ...) {
   x <- as.numeric(x)
   el <- get.edges(graph, x)
   if ("name" %in% list.vertex.attributes(graph)) {
-    el <- matrix(V(graph)$name[el+1], nc=2)
+    el <- matrix(V(graph)$name[el+1], ncol=2)
   }
   tab <- data.frame(e=paste(sep="", "[", x, "]"), row.names="e")
   if (is.numeric(el)) { w <- nchar(max(el)) } else { w <- max(nchar(el)) }
