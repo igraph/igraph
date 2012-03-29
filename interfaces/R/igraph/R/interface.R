@@ -141,8 +141,12 @@ incident <- function(graph, v, mode=c("all", "out", "in", "total")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  mode <- igraph.match.arg(mode)
-  mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
+  if (is.directed(graph)) {
+    mode <- igraph.match.arg(mode)
+    mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
+  } else {
+    mode=1
+  }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_incident", graph, as.igraph.vs(graph, v)-1,
                as.numeric(mode),
