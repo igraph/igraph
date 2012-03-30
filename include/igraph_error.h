@@ -24,6 +24,8 @@
 #ifndef IGRAPH_ERROR_H
 #define IGRAPH_ERROR_H
 
+#include <stdarg.h>
+
 #undef __BEGIN_DECLS
 #undef __END_DECLS
 #ifdef __cplusplus
@@ -456,6 +458,9 @@ int igraph_error(const char *reason, const char *file, int line,
 
 int igraph_errorf(const char *reason, const char *file, int line, 
 		  int igraph_errno, ...);
+
+int igraph_errorvf(const char *reason, const char *file, int line,
+		   int igraph_errno, va_list ap);
 
 /**
  * \function igraph_strerror

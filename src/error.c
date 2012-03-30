@@ -101,8 +101,10 @@ int igraph_error(const char *reason, const char *file, int line,
 
   if (igraph_i_error_handler) {
     igraph_i_error_handler(reason, file, line, igraph_errno);
+#ifndef USING_R
   }  else {
     igraph_error_handler_abort(reason, file, line, igraph_errno);
+#endif
   }
   return igraph_errno;
 }
@@ -116,12 +118,21 @@ int igraph_errorf(const char *reason, const char *file, int line,
   return igraph_error(igraph_i_errormsg_buffer, file, line, igraph_errno);
 }
 
+int igraph_errorvf(const char *reason, const char *file, int line,
+		   int igraph_errno, va_list ap) {
+  vsnprintf(igraph_i_errormsg_buffer, 
+	    sizeof(igraph_i_errormsg_buffer) / sizeof(char), reason, ap);
+  return igraph_error(igraph_i_errormsg_buffer, file, line, igraph_errno);
+}
+
+#ifndef USING_R
 void igraph_error_handler_abort (const char *reason, const char *file,
 				 int line, int igraph_errno) {
   fprintf(stderr, "Error at %s:%i :%s, %s\n", file, line, reason,
 	  igraph_strerror(igraph_errno));
   abort();
 }
+#endif
 
 void igraph_error_handler_ignore (const char *reason, const char *file,
 				  int line, int igraph_errno) {
