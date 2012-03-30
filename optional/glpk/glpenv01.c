@@ -23,6 +23,7 @@
 ***********************************************************************/
 
 #include "glpapi.h"
+#include "igraph_error.h"
 
 /***********************************************************************
 *  NAME
@@ -126,19 +127,15 @@ ENV *get_env_ptr(void)
       {  /* not initialized yet; perform initialization */
          if (glp_init_env() != 0)
          {  /* initialization failed; display an error message */
-            fprintf(stderr, "GLPK initialization failed\n");
-            fflush(stderr);
-            /* and abnormally terminate the program */
-            abort();
+	   IGRAPH_ERROR("GLPK initialization failed", IGRAPH_EGLP);
          }
          /* initialization successful; retrieve the pointer */
          env = tls_get_ptr();
       }
       /* check if the environment block is valid */
       if (env->magic != ENV_MAGIC)
-      {  fprintf(stderr, "Invalid GLPK environment\n");
-         fflush(stderr);
-         abort();
+      {  
+	IGRAPH_ERROR("Invalid GLPK environment", IGRAPH_EGLP);
       }
       return env;
 }
@@ -200,9 +197,8 @@ int glp_free_env(void)
       if (env == NULL) return 1;
       /* check if the environment block is valid */
       if (env->magic != ENV_MAGIC)
-      {  fprintf(stderr, "Invalid GLPK environment\n");
-         fflush(stderr);
-         abort();
+      {  
+	 IGRAPH_ERROR("Invalid GLPK environment", IGRAPH_EGLP);
       }
       /* close handles to shared libraries */
       if (env->h_odbc != NULL)
