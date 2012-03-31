@@ -31,6 +31,7 @@
 
 static IGRAPH_THREAD_LOCAL igraph_error_handler_t *igraph_i_error_handler=0;
 static IGRAPH_THREAD_LOCAL char igraph_i_errormsg_buffer[500];
+static IGRAPH_THREAD_LOCAL char igraph_i_warningmsg_buffer[500];
 
 static const char *igraph_i_error_strings[]=
   { /*  0 */ "No error",
@@ -212,6 +213,16 @@ int igraph_warning(const char *reason, const char *file, int line,
     igraph_warning_handler_print(reason, file, line, igraph_errno);
   }
   return igraph_errno;
+}
+
+int igraph_warningf(const char *reason, const char *file, int line, 
+		    int igraph_errno, ...) {
+  va_list ap;
+  va_start(ap, igraph_errno);
+  vsnprintf(igraph_i_warningmsg_buffer, 
+	    sizeof(igraph_i_warningmsg_buffer) / sizeof(char), reason, ap);
+  return igraph_warning(igraph_i_warningmsg_buffer, file, line, 
+			igraph_errno);
 }
 
 igraph_warning_handler_t *
