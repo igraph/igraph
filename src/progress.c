@@ -25,6 +25,7 @@
 #include "config.h"
 
 static IGRAPH_THREAD_LOCAL igraph_progress_handler_t *igraph_i_progress_handler=0;
+static IGRAPH_THREAD_LOCAL char igraph_i_progressmsg_buffer[1000];
 
 int igraph_progress(const char *message, igraph_real_t percent, void *data) {
   if (igraph_i_progress_handler) {
@@ -32,6 +33,15 @@ int igraph_progress(const char *message, igraph_real_t percent, void *data) {
       return IGRAPH_INTERRUPTED;
   }
   return IGRAPH_SUCCESS;
+}
+
+int igraph_progressf(const char *message, igraph_real_t percent, void *data, 
+		     ...) {
+  va_list ap;
+  va_start(ap, data);
+  vsnprintf(igraph_i_progressmsg_buffer, 
+	    sizeof(igraph_i_progressmsg_buffer) / sizeof(char), message, ap);
+  return igraph_progress(igraph_i_progressmsg_buffer, percent, data);
 }
 
 int igraph_progress_handler_stderr(const char *message, igraph_real_t percent,
