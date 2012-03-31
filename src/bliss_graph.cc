@@ -1473,122 +1473,122 @@ void Graph::change_label(const unsigned int vertex,
  *
  *-------------------------------------------------------------------------*/
 
-Graph *Graph::read_dimacs(FILE *fp)
-{
-  Graph *g = 0;
-  unsigned int nof_vertices, nof_edges;
-  unsigned int line_num = 1;
-  int c;
+// Graph *Graph::read_dimacs(FILE *fp)
+// {
+//   Graph *g = 0;
+//   unsigned int nof_vertices, nof_edges;
+//   unsigned int line_num = 1;
+//   int c;
   
-  /* read comments and problem line*/
-  while(1) {
-    c = getc(fp);
-    if(c == 'c') {
-      while((c = getc(fp)) != '\n') {
-        if(c == EOF) {
-          fprintf(stderr, "error in line %u: not in DIMACS format\n",
-                  line_num);
-          goto error_exit;
-        }
-      }
-      line_num++;
-      continue;
-    }
-    if(c == 'p') {
-      if(fscanf(fp, " edge %u %u\n", &nof_vertices, &nof_edges) != 2) {
-        fprintf(stderr, "error in line %u: not in DIMACS format\n",
-                line_num);
-        goto error_exit; }
-      line_num++;
-      break;
-    }
-    fprintf(stderr, "error in line %u: not in DIMACS format\n", line_num);
-    goto error_exit;
-  }
+//   /* read comments and problem line*/
+//   while(1) {
+//     c = getc(fp);
+//     if(c == 'c') {
+//       while((c = getc(fp)) != '\n') {
+//         if(c == EOF) {
+//           fprintf(stderr, "error in line %u: not in DIMACS format\n",
+//                   line_num);
+//           goto error_exit;
+//         }
+//       }
+//       line_num++;
+//       continue;
+//     }
+//     if(c == 'p') {
+//       if(fscanf(fp, " edge %u %u\n", &nof_vertices, &nof_edges) != 2) {
+//         fprintf(stderr, "error in line %u: not in DIMACS format\n",
+//                 line_num);
+//         goto error_exit; }
+//       line_num++;
+//       break;
+//     }
+//     fprintf(stderr, "error in line %u: not in DIMACS format\n", line_num);
+//     goto error_exit;
+//   }
   
-  if(nof_vertices <= 0) {
-    fprintf(stderr, "error: no vertices\n");
-    goto error_exit;
-  }
-#if 0
-  if(nof_edges <= 0) {
-    fprintf(stderr, "error: no edges\n");
-    goto error_exit;
-  }
-#endif
-  if(bliss_verbose) {
-    fprintf(bliss_verbstr, "Instance has %d vertices and %d edges\n",
-            nof_vertices, nof_edges);
-    fflush(bliss_verbstr);
-  }
+//   if(nof_vertices <= 0) {
+//     fprintf(stderr, "error: no vertices\n");
+//     goto error_exit;
+//   }
+// #if 0
+//   if(nof_edges <= 0) {
+//     fprintf(stderr, "error: no edges\n");
+//     goto error_exit;
+//   }
+// #endif
+//   if(bliss_verbose) {
+//     fprintf(bliss_verbstr, "Instance has %d vertices and %d edges\n",
+//             nof_vertices, nof_edges);
+//     fflush(bliss_verbstr);
+//   }
 
-  g = new Graph(nof_vertices);
+//   g = new Graph(nof_vertices);
 
-  //
-  // Read vertex labels
-  //
-  if(bliss_verbose) {
-    fprintf(bliss_verbstr, "Reading vertex labels...\n");
-    fflush(bliss_verbstr); }
-  while(1) {
-    c = getc(fp);
-    if(c != 'n') {
-      ungetc(c, fp);
-      break;
-    }
-    ungetc(c, fp);
-    unsigned int vertex, label;
-    if(fscanf(fp, "n %u %u\n", &vertex, &label) != 2) {
-      fprintf(stderr, "error in line %u: not in DIMACS format\n",
-	      line_num);
-      goto error_exit;
-    }
-    if(vertex > nof_vertices) {
-      fprintf(stderr, "error in line %u: not in DIMACS format\n",
-	      line_num);
-      goto error_exit;
-    }
-    line_num++;
-    g->change_label(vertex - 1, label);
-  }
-  if(bliss_verbose) {
-    fprintf(bliss_verbstr, "Done\n");
-    fflush(bliss_verbstr); }
+//   //
+//   // Read vertex labels
+//   //
+//   if(bliss_verbose) {
+//     fprintf(bliss_verbstr, "Reading vertex labels...\n");
+//     fflush(bliss_verbstr); }
+//   while(1) {
+//     c = getc(fp);
+//     if(c != 'n') {
+//       ungetc(c, fp);
+//       break;
+//     }
+//     ungetc(c, fp);
+//     unsigned int vertex, label;
+//     if(fscanf(fp, "n %u %u\n", &vertex, &label) != 2) {
+//       fprintf(stderr, "error in line %u: not in DIMACS format\n",
+// 	      line_num);
+//       goto error_exit;
+//     }
+//     if(vertex > nof_vertices) {
+//       fprintf(stderr, "error in line %u: not in DIMACS format\n",
+// 	      line_num);
+//       goto error_exit;
+//     }
+//     line_num++;
+//     g->change_label(vertex - 1, label);
+//   }
+//   if(bliss_verbose) {
+//     fprintf(bliss_verbstr, "Done\n");
+//     fflush(bliss_verbstr); }
 
-  //
-  // Read edges
-  //
-  if(bliss_verbose) {
-    fprintf(bliss_verbstr, "Reading edges...\n");
-    fflush(bliss_verbstr); }
-  for(unsigned i = 0; i < nof_edges; i++) {
-    unsigned int from, to;
-    if(fscanf(fp, "e %u %u\n", &from, &to) != 2) {
-      fprintf(stderr, "error in line %u: not in DIMACS format\n",
-	      line_num);
-      goto error_exit;
-    }
-    if(from > nof_vertices || to > nof_vertices) {
-      fprintf(stderr, "error in line %u: not in DIMACS format\n",
-	      line_num);
-      goto error_exit;
-    }
-    line_num++;
-    g->add_edge(from - 1, to - 1);
-  }
-  if(bliss_verbose) {
-    fprintf(bliss_verbstr, "Done\n");
-    fflush(bliss_verbstr);
-  }
+//   //
+//   // Read edges
+//   //
+//   if(bliss_verbose) {
+//     fprintf(bliss_verbstr, "Reading edges...\n");
+//     fflush(bliss_verbstr); }
+//   for(unsigned i = 0; i < nof_edges; i++) {
+//     unsigned int from, to;
+//     if(fscanf(fp, "e %u %u\n", &from, &to) != 2) {
+//       fprintf(stderr, "error in line %u: not in DIMACS format\n",
+// 	      line_num);
+//       goto error_exit;
+//     }
+//     if(from > nof_vertices || to > nof_vertices) {
+//       fprintf(stderr, "error in line %u: not in DIMACS format\n",
+// 	      line_num);
+//       goto error_exit;
+//     }
+//     line_num++;
+//     g->add_edge(from - 1, to - 1);
+//   }
+//   if(bliss_verbose) {
+//     fprintf(bliss_verbstr, "Done\n");
+//     fflush(bliss_verbstr);
+//   }
 
-  return g;
+//   return g;
 
- error_exit:
-  if(g)
-    delete g;
-  return 0;
+//  error_exit:
+//   if(g)
+//     delete g;
+//   return 0;
 
-}
+// }
 
 Graph *Graph::from_igraph(const igraph_t *graph) {
   

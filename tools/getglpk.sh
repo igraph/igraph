@@ -37,6 +37,7 @@ for i in $SRC3; do /bin/echo -n "$i " >>$INC; done
 # instead.
 
 patch -p1 -d ../optional/glpk <<-EOF
+diff -ru glpk.old/glpenv01.c glpk/glpenv01.c
 --- glpk.old/glpenv01.c	2012-03-30 11:30:58.000000000 -0400
 +++ glpk/glpenv01.c	2012-03-30 12:03:54.000000000 -0400
 @@ -23,6 +23,7 @@
@@ -82,13 +83,14 @@ patch -p1 -d ../optional/glpk <<-EOF
        }
        /* close handles to shared libraries */
        if (env->h_odbc != NULL)
+diff -ru glpk.old/glpenv04.c glpk/glpenv04.c
 --- glpk.old/glpenv04.c	2012-03-30 11:30:58.000000000 -0400
-+++ glpk/glpenv04.c	2012-03-30 11:48:28.000000000 -0400
++++ glpk/glpenv04.c	2012-03-30 11:56:41.000000000 -0400
 @@ -23,6 +23,7 @@
  ***********************************************************************/
  
  #include "glpapi.h"
-+#include "../../include/igraph_error.h"
++#include "igraph_error.h"
  
  /***********************************************************************
  *  NAME
@@ -107,4 +109,29 @@ patch -p1 -d ../optional/glpk <<-EOF
 +      igraph_errorvf(fmt, env->err_file, env->err_line, IGRAPH_EGLP, arg);
        /* no return */
  }
+ 
+diff -ru glpk.old/glpenv07.c glpk/glpenv07.c
+--- glpk.old/glpenv07.c	2012-03-30 11:30:58.000000000 -0400
++++ glpk/glpenv07.c	2012-03-31 08:56:02.000000000 -0400
+@@ -413,13 +413,13 @@
+ 
+ static void *c_fopen(const char *fname, const char *mode)
+ {     FILE *fh;
+-      if (strcmp(fname, "/dev/stdin") == 0)
+-         fh = stdin;
+-      else if (strcmp(fname, "/dev/stdout") == 0)
+-         fh = stdout;
+-      else if (strcmp(fname, "/dev/stderr") == 0)
+-         fh = stderr;
+-      else
++      /* if (strcmp(fname, "/dev/stdin") == 0) */
++      /*    fh = stdin; */
++      /* else if (strcmp(fname, "/dev/stdout") == 0) */
++      /*    fh = stdout; */
++      /* else if (strcmp(fname, "/dev/stderr") == 0) */
++      /*    fh = stderr; */
++      /* else */
+          fh = fopen(fname, mode);
+       if (fh == NULL)
+          lib_err_msg(strerror(errno));
 EOF

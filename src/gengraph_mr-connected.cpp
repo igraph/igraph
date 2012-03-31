@@ -82,7 +82,7 @@ static const FILE *Fdeg = stdin;
 // }
 
 //_________________________________________________________________________
-int parse_options(int &argc, char** &argv) {
+// int parse_options(int &argc, char** &argv) {
   // bool HELP = false;
   // int argc0 = argc;
   // argc = 1;
@@ -124,8 +124,8 @@ int parse_options(int &argc, char** &argv) {
   //   fprintf(stderr,"    [-raw] is to take raw degree sequences as input\n");
   //   return -1;
   // }
-  return 0;
-}
+//   return 0;
+// }
 
 
 } // namespace gengraph

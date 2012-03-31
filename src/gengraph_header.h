@@ -74,13 +74,13 @@ inline void _hash_find_call() { _hash_find_c++; }
 inline void _hash_rand_iter() { _hash_rand_i++; }
 inline void _hash_rand_call() { _hash_rand_c++; }
 inline void _hash_expand_call() { _hash_expand++; }
-void _hash_prof() {
-  fprintf(stderr,"HASH_ADD : %lu / %lu\n", _hash_add_c , _hash_add_i);
-  fprintf(stderr,"HASH_PUT : %lu / %lu\n", _hash_put_c , _hash_put_i);
-  fprintf(stderr,"HASH_FIND: %lu / %lu\n", _hash_find_c, _hash_find_i);
-  fprintf(stderr,"HASH_RM  : %lu / %lu\n", _hash_rm_c  , _hash_rm_i);
-  fprintf(stderr,"HASH_RAND: %lu / %lu\n", _hash_rand_c, _hash_rand_i);
-  fprintf(stderr,"HASH_EXPAND : %lu calls\n", _hash_expand);
-}
+// void _hash_prof() {
+//   fprintf(stderr,"HASH_ADD : %lu / %lu\n", _hash_add_c , _hash_add_i);
+//   fprintf(stderr,"HASH_PUT : %lu / %lu\n", _hash_put_c , _hash_put_i);
+//   fprintf(stderr,"HASH_FIND: %lu / %lu\n", _hash_find_c, _hash_find_i);
+//   fprintf(stderr,"HASH_RM  : %lu / %lu\n", _hash_rm_c  , _hash_rm_i);
+//   fprintf(stderr,"HASH_RAND: %lu / %lu\n", _hash_rand_c, _hash_rand_i);
+//   fprintf(stderr,"HASH_EXPAND : %lu calls\n", _hash_expand);
+// }
 
 } // namespace gengraph

@@ -46,10 +46,12 @@ int igraph_statusf(const char *message, void *data, ...) {
   return igraph_status(buffer, data);
 }
 
+#ifndef USING_R
 int igraph_status_handler_stderr(const char *message, void *data) {
   fputs(message, stderr);
   return 0;
 }
+#endif
 
 igraph_status_handler_t *
 igraph_set_status_handler(igraph_status_handler_t new_handler) {
