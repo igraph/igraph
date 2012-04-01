@@ -83,6 +83,25 @@ diff -ru glpk.old/glpenv01.c glpk/glpenv01.c
        }
        /* close handles to shared libraries */
        if (env->h_odbc != NULL)
+diff -ru glpk.old/glpenv03.c glpk/glpenv03.c
+--- glpk.old/glpenv03.c	2012-03-30 11:30:58.000000000 -0400
++++ glpk/glpenv03.c	2012-04-01 00:04:36.000000000 -0400
+@@ -61,6 +61,7 @@
+ *  its parameters specified by the list arg and writes the formatted
+ *  output to the terminal. */
+ 
++#ifndef USING_R
+ void glp_vprintf(const char *fmt, va_list arg)
+ {     ENV *env = get_env_ptr();
+       /* if terminal output is disabled, do nothing */
+@@ -82,6 +83,7 @@
+       }
+ skip: return;
+ }
++#endif
+ 
+ /***********************************************************************
+ *  NAME
 diff -ru glpk.old/glpenv04.c glpk/glpenv04.c
 --- glpk.old/glpenv04.c	2012-03-30 11:30:58.000000000 -0400
 +++ glpk/glpenv04.c	2012-03-30 11:56:41.000000000 -0400
@@ -112,7 +131,7 @@ diff -ru glpk.old/glpenv04.c glpk/glpenv04.c
  
 diff -ru glpk.old/glpenv07.c glpk/glpenv07.c
 --- glpk.old/glpenv07.c	2012-03-30 11:30:58.000000000 -0400
-+++ glpk/glpenv07.c	2012-03-31 08:56:02.000000000 -0400
++++ glpk/glpenv07.c	2012-03-31 13:21:03.000000000 -0400
 @@ -413,13 +413,13 @@
  
  static void *c_fopen(const char *fname, const char *mode)
@@ -151,4 +170,76 @@ diff -ru glpk.old/glpenv07.c glpk/glpenv07.c
           ret = fclose(fh);
        if (ret != 0)
        {  lib_err_msg(strerror(errno));
+diff -ru glpk.old/glpgmp.c glpk/glpgmp.c
+--- glpk.old/glpgmp.c	2012-03-30 11:30:58.000000000 -0400
++++ glpk/glpgmp.c	2012-04-01 00:05:13.000000000 -0400
+@@ -860,7 +860,7 @@
+          d[j] = (unsigned char)r->val;
+       }
+       /* output the integer to the stream */
+-      if (fp == NULL) fp = stdout;
++      /* if (fp == NULL) fp = stdout; */
+       if (mpz_sgn(x) < 0)
+          fputc('-', fp), nwr++;
+       for (j = n-1; j >= 0; j--)
+@@ -1091,7 +1091,7 @@
+       int nwr;
+       if (!(2 <= base && base <= 36))
+          xfault("mpq_out_str: base = %d; invalid base\n", base);
+-      if (fp == NULL) fp = stdout;
++      /* if (fp == NULL) fp = stdout; */
+       nwr = mpz_out_str(fp, base, &x->p);
+       if (x->q.val == 1 && x->q.ptr == NULL)
+          ;
+diff -ru glpk.old/glpmpl04.c glpk/glpmpl04.c
+--- glpk.old/glpmpl04.c	2012-03-30 11:30:58.000000000 -0400
++++ glpk/glpmpl04.c	2012-04-01 00:07:09.000000000 -0400
+@@ -341,11 +341,11 @@
+ 
+ void open_output(MPL *mpl, char *file)
+ {     xassert(mpl->out_fp == NULL);
+-      if (file == NULL)
+-      {  file = "<stdout>";
+-         mpl->out_fp = (void *)stdout;
+-      }
+-      else
++      /* if (file == NULL) */
++      /* {  file = "<stdout>"; */
++      /*    mpl->out_fp = (void *)stdout; */
++      /* } */
++      /* else */
+       {  mpl->out_fp = xfopen(file, "w");
+          if (mpl->out_fp == NULL)
+             error(mpl, "unable to create %s - %s", file, xerrmsg());
+@@ -362,9 +362,9 @@
+ 
+ void write_char(MPL *mpl, int c)
+ {     xassert(mpl->out_fp != NULL);
+-      if (mpl->out_fp == (void *)stdout)
+-         xprintf("%c", c);
+-      else
++      /* if (mpl->out_fp == (void *)stdout) */
++      /*    xprintf("%c", c); */
++      /* else */
+          xfprintf(mpl->out_fp, "%c", c);
+       return;
+ }
+@@ -393,7 +393,7 @@
+ 
+ void flush_output(MPL *mpl)
+ {     xassert(mpl->out_fp != NULL);
+-      if (mpl->out_fp != (void *)stdout)
++      /* if (mpl->out_fp != (void *)stdout) */
+       {  xfflush(mpl->out_fp);
+          if (xferror(mpl->out_fp))
+             error(mpl, "write error on %s - %s", mpl->out_file,
+@@ -1410,7 +1410,7 @@
+       if (mpl->row != NULL) xfree(mpl->row);
+       if (mpl->col != NULL) xfree(mpl->col);
+       if (mpl->in_fp != NULL) xfclose(mpl->in_fp);
+-      if (mpl->out_fp != NULL && mpl->out_fp != (void *)stdout)
++      if (mpl->out_fp != NULL /* && mpl->out_fp != (void *)stdout */)
+          xfclose(mpl->out_fp);
+       if (mpl->out_file != NULL) xfree(mpl->out_file);
+       if (mpl->prt_fp != NULL) xfclose(mpl->prt_fp);
 EOF

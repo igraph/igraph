@@ -1776,7 +1776,6 @@ int igraph_scg_stochastic(const igraph_t *graph,
     mysparsemat=&real_sparsemat;
     IGRAPH_CHECK(igraph_i_sparsemat_stochastic(sparsemat, mysparsemat, norm));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparsemat);
-    igraph_sparsemat_print(mysparsemat, stdout);
   }
 
   /* -------------------------------------------------------------------- */

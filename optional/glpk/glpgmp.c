@@ -860,7 +860,7 @@ int mpz_out_str(void *_fp, int base, mpz_t x)
          d[j] = (unsigned char)r->val;
       }
       /* output the integer to the stream */
-      if (fp == NULL) fp = stdout;
+      /* if (fp == NULL) fp = stdout; */
       if (mpz_sgn(x) < 0)
          fputc('-', fp), nwr++;
       for (j = n-1; j >= 0; j--)
@@ -1091,7 +1091,7 @@ int mpq_out_str(void *_fp, int base, mpq_t x)
       int nwr;
       if (!(2 <= base && base <= 36))
          xfault("mpq_out_str: base = %d; invalid base\n", base);
-      if (fp == NULL) fp = stdout;
+      /* if (fp == NULL) fp = stdout; */
       nwr = mpz_out_str(fp, base, &x->p);
       if (x->q.val == 1 && x->q.ptr == NULL)
          ;

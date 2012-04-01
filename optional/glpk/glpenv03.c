@@ -61,6 +61,7 @@ void glp_printf(const char *fmt, ...)
 *  its parameters specified by the list arg and writes the formatted
 *  output to the terminal. */
 
+#ifndef USING_R
 void glp_vprintf(const char *fmt, va_list arg)
 {     ENV *env = get_env_ptr();
       /* if terminal output is disabled, do nothing */
@@ -82,6 +83,7 @@ void glp_vprintf(const char *fmt, va_list arg)
       }
 skip: return;
 }
+#endif
 
 /***********************************************************************
 *  NAME

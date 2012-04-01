@@ -950,6 +950,7 @@ void igraph_spmatrix_iter_destroy(igraph_spmatrix_iter_t *mit) {
   /* Nothing to do at the moment */
 }
 
+#ifndef USING_R
 /**
  * \function igraph_spmatrix_print
  * \brief Prints a sparse matrix.
@@ -964,6 +965,7 @@ void igraph_spmatrix_iter_destroy(igraph_spmatrix_iter_t *mit) {
 int igraph_spmatrix_print(const igraph_spmatrix_t* matrix) {
 	return igraph_spmatrix_fprint(matrix, stdout);
 }
+#endif
 
 /**
  * \function igraph_spmatrix_fprint

@@ -88,10 +88,12 @@ void igraph_marked_queue_pop_back_batch(igraph_marked_queue_t *q) {
   }
 }
 
+#ifndef USING_R
 int igraph_marked_queue_print(const igraph_marked_queue_t *q) {
   IGRAPH_CHECK(igraph_dqueue_print(&q->Q));
   return 0;
 }
+#endif
 
 int igraph_marked_queue_fprint(const igraph_marked_queue_t *q, FILE *file) {
   IGRAPH_CHECK(igraph_dqueue_fprint(&q->Q, file));

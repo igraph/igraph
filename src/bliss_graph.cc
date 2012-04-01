@@ -32,9 +32,10 @@ Copyright (C) 2003-2006 Tommi Junttila
 #include "igraph_datatype.h"
 #include "igraph_interface.h"
 #include "igraph_topology.h"
+#include "igraph_statusbar.h"
 
 extern bool bliss_verbose;
-extern FILE *bliss_verbstr;
+// extern FILE *bliss_verbstr;
 
 namespace igraph {
 
@@ -498,7 +499,7 @@ void AbstractGraph::search(const bool canonical, Stats &stats)
 {
   const unsigned int N = get_nof_vertices();
 
-  const bool write_automorphisms = 0;
+  // const bool write_automorphisms = 0;
 
   unsigned int all_same_level = UINT_MAX;
 
@@ -572,11 +573,9 @@ void AbstractGraph::search(const bool canonical, Stats &stats)
 #endif
 
   t1.stop();
-  if(bliss_verbose) {
-    fprintf(bliss_verbstr, "Initial partition computed in %.2fs\n",
-	    t1.get_duration());
-    fflush(bliss_verbstr);
-  }
+  
+  igraph_statusf("Initial partition computed in %.2fs", 0,
+		 t1.get_duration());
   
   /*
    * Allocate space for the labelings
@@ -800,15 +799,12 @@ void AbstractGraph::search(const bool canonical, Stats &stats)
 	     */
 	    if(index == cell->length && all_same_level == p.level+1)
 	      all_same_level = p.level;
-	    if (bliss_verbose) {
-	      fprintf(stdout,
-		      "Level %u: orbits=%u, index=%u/%u, all_same_level=%u\n",
-		      p.level,
-		      first_path_orbits.nof_orbits(),
-		      index, cell->length,
-		      all_same_level);
-	      fflush(stdout);
-	    }
+	    igraph_statusf("Level %u: orbits=%u, index=%u/%u, "
+			   "all_same_level=%u", 0, 
+			   p.level,
+			   first_path_orbits.nof_orbits(),
+			   index, cell->length,
+			   all_same_level);
 	  }
 	  /* Backtrack to the previous level */
 	  p.level--;
@@ -1187,11 +1183,11 @@ void AbstractGraph::search(const bool canonical, Stats &stats)
 	  p.level = backjumping_level;
 	  search_stack.resize(p.level + 1);
 	  
-	  if(write_automorphisms)
-	    {
-	      print_permutation(stdout, first_path_automorphism);
-	      fprintf(stdout, "\n");
-	    }
+	  // if(write_automorphisms)
+	  //   {
+	  //     print_permutation(stdout, first_path_automorphism);
+	  //     fprintf(stdout, "\n");
+	  //   }
 	  stats.nof_generators++;
 	  continue;
 	}
@@ -1290,11 +1286,11 @@ void AbstractGraph::search(const bool canonical, Stats &stats)
 	update_orbit_information(first_path_orbits, best_path_automorphism);
 	if(nof_old_orbits != first_path_orbits.nof_orbits())
 	  {
-	    if(write_automorphisms)
-	      {
-		print_permutation(stdout, best_path_automorphism);
-		fprintf(stdout, "\n");
-	      }
+	    // if(write_automorphisms)
+	    //   {
+	    // 	print_permutation(stdout, best_path_automorphism);
+	    // 	fprintf(stdout, "\n");
+	    //   }
 	    stats.nof_generators++;
 	  }
 	  
