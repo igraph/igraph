@@ -64,22 +64,22 @@ void glp_printf(const char *fmt, ...)
 void glp_vprintf(const char *fmt, va_list arg)
 {     ENV *env = get_env_ptr();
       /* if terminal output is disabled, do nothing */
-      if (!env->term_out) goto skip;
-      /* format the output */
-      vsprintf(env->term_buf, fmt, arg);
-      /* pass the output to the user-defined routine */
-      if (env->term_hook != NULL)
-      {  if (env->term_hook(env->term_info, env->term_buf) != 0)
-            goto skip;
-      }
-      /* send the output to the terminal */
-      fputs(env->term_buf, stdout);
-      fflush(stdout);
-      /* copy the output to the text file */
-      if (env->tee_file != NULL)
-      {  fputs(env->term_buf, env->tee_file);
-         fflush(env->tee_file);
-      }
+      /* if (!env->term_out) goto skip; */
+      /* /\* format the output *\/ */
+      /* vsprintf(env->term_buf, fmt, arg); */
+      /* /\* pass the output to the user-defined routine *\/ */
+      /* if (env->term_hook != NULL) */
+      /* {  if (env->term_hook(env->term_info, env->term_buf) != 0) */
+      /*       goto skip; */
+      /* } */
+      /* /\* send the output to the terminal *\/ */
+      /* fputs(env->term_buf, stdout); */
+      /* fflush(stdout); */
+      /* /\* copy the output to the text file *\/ */
+      /* if (env->tee_file != NULL) */
+      /* {  fputs(env->term_buf, env->tee_file); */
+      /*    fflush(env->tee_file); */
+      /* } */
 skip: return;
 }
 
