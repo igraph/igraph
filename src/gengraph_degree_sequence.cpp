@@ -239,9 +239,9 @@ degree_sequence(int _n, double exp, int degmin, int degmax, double z) {
   }
 }
     
-void degree_sequence::print() {
-  for(int i=0; i<n; i++) printf("%d\n",deg[i]);
-}
+// void degree_sequence::print() {
+//   for(int i=0; i<n; i++) printf("%d\n",deg[i]);
+// }
 
 // void degree_sequence::print_cumul() {
 //   if(n==0) return;

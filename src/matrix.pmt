@@ -1552,6 +1552,7 @@ int FUNCTION(igraph_matrix,select_cols)(const TYPE(igraph_matrix) *m,
 
 #ifdef OUT_FORMAT
 
+#ifndef USING_R
 int FUNCTION(igraph_matrix,print)(const TYPE(igraph_matrix) *m) {
 
   long int nr=FUNCTION(igraph_matrix,nrow)(m);
@@ -1567,6 +1568,7 @@ int FUNCTION(igraph_matrix,print)(const TYPE(igraph_matrix) *m) {
   
   return 0;
 }
+#endif
 
 int FUNCTION(igraph_matrix,fprint)(const TYPE(igraph_matrix) *m,
 				   FILE *file) {
