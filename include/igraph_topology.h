@@ -73,6 +73,8 @@ int igraph_subisomorphic(const igraph_t *graph1, const igraph_t *graph2,
  *   igraph_isomorphic_function_vf2() when it was called.
  * \return Boolean, whether to continue with the isomorphism search.
  */
+
+
 typedef igraph_bool_t igraph_isohandler_t(const igraph_vector_t *map12, 
 					  const igraph_vector_t *map21, void *arg);
 
@@ -82,6 +84,22 @@ typedef igraph_bool_t igraph_isocompat_t(const igraph_t *graph1,
 					 const igraph_integer_t g2_num,
 					 void *arg);
 
+/**
+ * \struct igraph_isomorphic_function_vf2_args_t 
+ * Information about a BLISS run
+ * Parameter bundle to be used for different subfunctions of vf2 algorithms.
+ * 
+ * \member isohandler_fn_arg Argument passed through to isohandler_fn
+ * \member node_compat_fn_arg Argument passed through to node_compat_fn
+ * \member edge_compat_fn_arg Argument passed through to edge_compat_fn
+ */
+
+typedef struct{
+	void *isohandler_fn_arg;
+	void *node_compat_fn_arg;
+	void *edge_compat_fn_arg;
+} igraph_isomorphic_function_vf2_args_t;
+
 int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2, 
 			  const igraph_vector_int_t *vertex_color1,
 			  const igraph_vector_int_t *vertex_color2,
@@ -89,28 +107,39 @@ int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
 			  const igraph_vector_int_t *edge_color2,
 			  igraph_bool_t *iso,
 			  igraph_vector_t *map12, 
-			  igraph_vector_t *map21);
+			  igraph_vector_t *map21,
+			  igraph_isocompat_t *node_compat_fn,
+			  igraph_isocompat_t *edge_compat_fn,
+			  igraph_isomorphic_function_vf2_args_t *args);
 int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph2,
 				   const igraph_vector_int_t *vertex_color1,
 				   const igraph_vector_int_t *vertex_color2,
 				   const igraph_vector_int_t *edge_color1,
 				   const igraph_vector_int_t *edge_color2,
 				   igraph_vector_t *map12, igraph_vector_t *map21,
-				   igraph_isohandler_t *function,
-				   void *arg);
+				   igraph_isohandler_t *isohandler_fn,
+				   igraph_isocompat_t *node_compat_fn,
+				   igraph_isocompat_t *edge_compat_fn,
+				   igraph_isomorphic_function_vf2_args_t *args);
 int igraph_count_isomorphisms_vf2(const igraph_t *graph1, const igraph_t *graph2, 
 				  const igraph_vector_int_t *vertex_color1,
 				  const igraph_vector_int_t *vertex_color2,
 				  const igraph_vector_int_t *edge_color1,
 				  const igraph_vector_int_t *edge_color2,
-				  igraph_integer_t *count);
+				  igraph_integer_t *count,
+				  igraph_isocompat_t *node_compat_fn,
+				  igraph_isocompat_t *edge_compat_fn,
+				  igraph_isomorphic_function_vf2_args_t *args);
 int igraph_get_isomorphisms_vf2(const igraph_t *graph1,
 				const igraph_t *graph2,
 				const igraph_vector_int_t *vertex_color1,
 				const igraph_vector_int_t *vertex_color2,
 				const igraph_vector_int_t *edge_color1,
 				const igraph_vector_int_t *edge_color2,
-				igraph_vector_ptr_t *maps);
+				igraph_vector_ptr_t *maps,
+				igraph_isocompat_t *node_compat_fn,
+				igraph_isocompat_t *edge_compat_fn,
+				igraph_isomorphic_function_vf2_args_t *args);
 
 int igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2, 
 			     const igraph_vector_int_t *vertex_color1,
@@ -122,7 +151,7 @@ int igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
 			     igraph_vector_t *map21,
 			     igraph_isocompat_t *node_compat_fn,
 			     igraph_isocompat_t *edge_compat_fn,
-			     void *arg);
+				 igraph_isomorphic_function_vf2_args_t *args);
 int igraph_subisomorphic_function_vf2(const igraph_t *graph1, 
 				      const igraph_t *graph2,
 				      const igraph_vector_int_t *vertex_color1,
@@ -131,10 +160,10 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
 				      const igraph_vector_int_t *edge_color2,
 				      igraph_vector_t *map12,
 				      igraph_vector_t *map21,
-				      igraph_isohandler_t *function,
+				      igraph_isohandler_t *isohandler_fn,
 				      igraph_isocompat_t *node_compat_fn,
 				      igraph_isocompat_t *edge_compat_fn,
-				      void *arg);
+					  igraph_isomorphic_function_vf2_args_t *args);
 int igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const igraph_t *graph2, 
 				     const igraph_vector_int_t *vertex_color1,
 				     const igraph_vector_int_t *vertex_color2,
@@ -143,7 +172,7 @@ int igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const igraph_t *gra
 				     igraph_integer_t *count,
 				     igraph_isocompat_t *node_compat_fn,
 				     igraph_isocompat_t *edge_compat_fn,
-				     void *arg);
+					 igraph_isomorphic_function_vf2_args_t *args);
 int igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
 				   const igraph_t *graph2,
 				   const igraph_vector_int_t *vertex_color1,
@@ -153,7 +182,7 @@ int igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
 				   igraph_vector_ptr_t *maps,
 				   igraph_isocompat_t *node_compat_fn,
 				   igraph_isocompat_t *edge_compat_fn,
-				   void *arg);
+				   igraph_isomorphic_function_vf2_args_t *args);
 
 /* BLISS family */
 /**
