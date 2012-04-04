@@ -1664,8 +1664,12 @@ int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
 
   igraph_isomorphic_function_vf2_args_t newargs;
   newargs.isohandler_fn_arg = iso;
-  newargs.node_compat_fn_arg = args->node_compat_fn_arg;
-  newargs.edge_compat_fn_arg = args->edge_compat_fn_arg;
+  newargs.node_compat_fn_arg = 0;
+  newargs.edge_compat_fn_arg = 0;
+  if (args) {
+  	newargs.node_compat_fn_arg = args->node_compat_fn_arg;
+  	newargs.edge_compat_fn_arg = args->edge_compat_fn_arg;
+  }
   *iso=0;
   IGRAPH_CHECK(igraph_isomorphic_function_vf2(graph1, graph2, 
 					      vertex_color1, vertex_color2,
@@ -1738,8 +1742,12 @@ int igraph_count_isomorphisms_vf2(const igraph_t *graph1, const igraph_t *graph2
   
   igraph_isomorphic_function_vf2_args_t newargs;
   newargs.isohandler_fn_arg = count;
-  newargs.node_compat_fn_arg = args->node_compat_fn_arg;
-  newargs.edge_compat_fn_arg = args->edge_compat_fn_arg;
+  newargs.node_compat_fn_arg = 0;
+  newargs.edge_compat_fn_arg = 0;
+  if (args) {
+  	newargs.node_compat_fn_arg = args->node_compat_fn_arg;
+  	newargs.edge_compat_fn_arg = args->edge_compat_fn_arg;
+  }
   *count=0;
   IGRAPH_CHECK(igraph_isomorphic_function_vf2(graph1, graph2, 
 					      vertex_color1, vertex_color2, 
@@ -1839,8 +1847,12 @@ int igraph_get_isomorphisms_vf2(const igraph_t *graph1,
   
   igraph_isomorphic_function_vf2_args_t newargs;
   newargs.isohandler_fn_arg = maps;
-  newargs.node_compat_fn_arg = args->node_compat_fn_arg;
-  newargs.edge_compat_fn_arg = args->edge_compat_fn_arg;
+  newargs.node_compat_fn_arg = 0;
+  newargs.edge_compat_fn_arg = 0;
+  if (args) {
+  	newargs.node_compat_fn_arg = args->node_compat_fn_arg;
+  	newargs.edge_compat_fn_arg = args->edge_compat_fn_arg;
+  }
 
   igraph_vector_ptr_clear(maps);
   IGRAPH_FINALLY(igraph_i_get_isomorphisms_free, maps);
@@ -2467,8 +2479,13 @@ int igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
 
   igraph_isomorphic_function_vf2_args_t newargs;
   newargs.isohandler_fn_arg = iso;
-  newargs.node_compat_fn_arg = args->node_compat_fn_arg;
-  newargs.edge_compat_fn_arg = args->edge_compat_fn_arg;
+  newargs.node_compat_fn_arg = 0;
+  newargs.edge_compat_fn_arg = 0;
+  if (args) {
+  	newargs.node_compat_fn_arg = args->node_compat_fn_arg;
+  	newargs.edge_compat_fn_arg = args->edge_compat_fn_arg;
+  }
+
   *iso=0;
   IGRAPH_CHECK(igraph_subisomorphic_function_vf2(graph1, graph2, 
 						 vertex_color1, vertex_color2,
@@ -2544,8 +2561,13 @@ int igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const igraph_t *gra
   
   igraph_isomorphic_function_vf2_args_t newargs;
   newargs.isohandler_fn_arg = count;
-  newargs.node_compat_fn_arg = args->node_compat_fn_arg;
-  newargs.edge_compat_fn_arg = args->edge_compat_fn_arg;
+  newargs.node_compat_fn_arg = 0;
+  newargs.edge_compat_fn_arg = 0;
+  if (args) {
+  	newargs.node_compat_fn_arg = args->node_compat_fn_arg;
+  	newargs.edge_compat_fn_arg = args->edge_compat_fn_arg;
+  }
+
   *count=0;
   IGRAPH_CHECK(igraph_subisomorphic_function_vf2(graph1, graph2, 
 						 vertex_color1, vertex_color2, 
@@ -2645,8 +2667,12 @@ int igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
   
   igraph_isomorphic_function_vf2_args_t newargs;
   newargs.isohandler_fn_arg = maps;
-  newargs.node_compat_fn_arg = args->node_compat_fn_arg;
-  newargs.edge_compat_fn_arg = args->edge_compat_fn_arg;
+  newargs.node_compat_fn_arg = 0;
+  newargs.edge_compat_fn_arg = 0;
+  if (args) {
+  	newargs.node_compat_fn_arg = args->node_compat_fn_arg;
+  	newargs.edge_compat_fn_arg = args->edge_compat_fn_arg;
+  }
 
   igraph_vector_ptr_clear(maps);
   IGRAPH_FINALLY(igraph_i_get_subisomorphisms_free, maps);
