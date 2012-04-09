@@ -208,7 +208,7 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
   
   options->n = igraph_vcount(graph);
   options->nev = 1;
-  options->ncv = 3;
+  options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
   options->which[0]='L'; options->which[1]='A';
   options->start=1;		/* no random start vector */
 
@@ -355,7 +355,7 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
   options->n=igraph_vcount(graph);
   options->start=1;
   options->nev=1;
-  options->ncv=options->n < 4 ? 3 : 4;
+  options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rnsolve */
   /* LM mode is not OK here because +1 and -1 can be eigenvalues at the
    * same time, e.g.: a -> b -> a, c -> a */
   options->which[0]='L' ; options->which[1]='R';
@@ -693,7 +693,7 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
   extra2.graph=graph; extra2.weights=weights;
 
   options->nev = 1;
-  options->ncv = 3;
+  options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
   options->which[0]='L'; options->which[1]='M';
 
   if (weights == 0) {
@@ -1210,7 +1210,7 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
 
   options->n = no_of_nodes;
   options->nev = 1;
-  options->ncv = 3;
+  options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rnsolve */
   options->which[0]='L'; options->which[1]='M';
   options->start = 1;		/* no random start vector */
 

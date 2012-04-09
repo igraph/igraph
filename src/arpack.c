@@ -144,7 +144,7 @@ void igraph_arpack_options_init(igraph_arpack_options_t *o) {
   o->which[0]='X'; o->which[1]='X';
   o->nev=1;
   o->tol=0;
-  o->ncv=3;
+  o->ncv=0;         /* 0 means "automatic" */
   o->ldv=o->n;			/* will be updated to (real) n */
   o->ishift=1;
   o->mxiter=3000;
@@ -763,7 +763,8 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   int rvec= vectors || storage ? 1 : 0;	/* calculate eigenvectors? */
   char *all="All";
 
-  int origldv=options->ldv, origlworkl=options->lworkl;
+  int origldv=options->ldv, origlworkl=options->lworkl,
+    orignev=options->nev, origncv=options->ncv;
   char origwhich[2]={ options->which[0], options->which[1] };
   igraph_real_t origtol=options->tol;
 
@@ -776,6 +777,16 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 
   /* Brush up options if needed */
   if (options->ldv == 0) { options->ldv=options->n; }
+  if (options->ncv == 0) {
+    /* This is similar to how Octave determines the value of ncv */
+    options->ncv=options->nev * 2 + 1;
+    if (options->ncv < 20) {
+      options->ncv = 20;
+    }
+    if (options->ncv > options->n-1) {
+      options->ncv = options->n-1;
+    }
+  }
   if (options->lworkl == 0) { options->lworkl=options->ncv*(options->ncv+8); }
   if (options->which[0] == 'X') { options->which[0]='L'; options->which[1]='M'; }
   
@@ -829,6 +840,9 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   options->iparam[6]=options->mode;
   options->info=options->start;
   if (options->start) {
+    if (igraph_matrix_nrow(vectors) != options->n || igraph_matrix_ncol(vectors) != 1) {
+      IGRAPH_ERROR("Invalid starting vector size", IGRAPH_EINVAL);
+    }
     for (i=0; i<options->n; i++) {
       resid[i]=MATRIX(*vectors, i, 0);
     }
@@ -843,7 +857,6 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     		  workd, workl, &options->lworkl, &options->info);
 
     if (ido==-1 || ido==1) {
-
       igraph_real_t *from=workd+options->ipntr[0]-1;
       igraph_real_t *to=workd+options->ipntr[1]-1;
       if (fun(to, from, options->n, extra) != 0) {
@@ -860,6 +873,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dsaupd(options->info));
   }
   
+  options->ierr=0;
   igraphdseupd_(&rvec, all, select, d, v, &options->ldv,
   		&options->sigma, options->bmat, &options->n,
   		options->which, &options->nev, &options->tol,
@@ -889,9 +903,11 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   }
   
   options->ldv=origldv;
+  options->ncv=origncv;
   options->lworkl=origlworkl;
   options->which[0] = origwhich[0]; options->which[1] = origwhich[1];
   options->tol=origtol;
+  options->nev=orignev;
     
   /* Clean up if needed */
   if (free_them) {
@@ -971,7 +987,16 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
   /* Brush up options if needed */
   if (options->ldv == 0) { options->ldv=options->n; }
-  if (options->ncv == 0) { options->ncv=options->nev * 2 + 1; }
+  if (options->ncv == 0) {
+    /* This is similar to how Octave determines the value of ncv */
+    options->ncv=options->nev * 2 + 1;
+    if (options->ncv < 20) {
+      options->ncv = 20;
+    }
+    if (options->ncv > options->n-1) {
+      options->ncv = options->n-1;
+    }
+  }
   if (options->lworkl == 0) { options->lworkl=3*options->ncv*(options->ncv+2); }
   if (options->which[0] == 'X') { options->which[0]='L'; options->which[1]='M'; }
   
@@ -1029,8 +1054,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   options->iparam[6]=options->mode;
   options->info=options->start;
   if (options->start) {
-    if (igraph_matrix_nrow(vectors) != options->n ||
-	igraph_matrix_ncol(vectors) != 1) {
+    if (igraph_matrix_nrow(vectors) != options->n || igraph_matrix_ncol(vectors) != 1) {
       IGRAPH_ERROR("Invalid starting vector size", IGRAPH_EINVAL);
     }
     for (i=0; i<options->n; i++) {
@@ -1040,7 +1064,6 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   
   /* Ok, we have everything */
   while (1) {
-    
     igraphdnaupd_(&ido, options->bmat, &options->n, options->which,
     		  &options->nev, &options->tol,
     		  resid, &options->ncv, v, &options->ldv,

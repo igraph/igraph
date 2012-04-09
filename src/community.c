@@ -1308,13 +1308,14 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
-  options->ncv=4;
-  options->start=0;
+  options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
+  options->start = 0;
   options->which[0]='L'; options->which[1]='A';
-  if (options->ncv>no_of_nodes) { options->ncv=no_of_nodes; }
 
   /* Memory for ARPACK */
-  IGRAPH_CHECK(igraph_arpack_storage_init(&storage, no_of_nodes, options->ncv, 
+  /* We are allocating memory for 20 eigenvectors since options->ncv won't be
+   * larger than 20 when using the automatic mode in igraph_arpack_rssolve */
+  IGRAPH_CHECK(igraph_arpack_storage_init(&storage, no_of_nodes, 20, 
 					  no_of_nodes, 1));
   IGRAPH_FINALLY(igraph_arpack_storage_destroy, &storage);
   extra.idx=&idx;
@@ -1356,7 +1357,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     options->n=size-1;
     options->info=0;
     options->nev=1;
-    options->ncv= size-1 < 4 ? size-1 : 4;
+    options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
     extra.comm=comm;
     
     /* Call ARPACK solver */
@@ -1374,7 +1375,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     options->n=size;
     options->info=0;
     options->nev=1;
-    options->ncv= size < 4 ? size : 4;
+    options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
     IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_community_leading_eigenvector,
 				       &extra, options, &storage,
 				       /*values=*/ 0, /*vectors=*/ 0));

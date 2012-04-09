@@ -2877,7 +2877,7 @@ int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
   options->ishift = 1;
   options->n = no_of_nodes;
   options->nev = nev;
-  options->ncv = 2 * nev + 1;
+  options->ncv = 0;        /* 0 means "automatic" in igraph_arpack_rssolve */
   options->which[0] = 'L'; options->which[1] = 'A';
   options->start = 0;
 

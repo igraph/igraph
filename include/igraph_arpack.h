@@ -150,7 +150,9 @@ __BEGIN_DECLS
  *    of the Ritz value is considered acceptable if its error is less
  *    than \c tol times its estimated value. If this is set to zero
  *    then machine precision is used.
- * \member ncv Number of Lanczos vectors to be generated.
+ * \member ncv Number of Lanczos vectors to be generated. Setting this
+ *    to zero means that \ref igraph_arpack_rssolve and \ref igraph_arpack_rnsolve
+ *    will determine a suitable value for \c ncv automatically.
  * \member ldv Numberic scalar. It should be set to
  *    zero in the current igraph implementation.
  * \member ishift Either zero or one. If zero then the shifts are
@@ -201,7 +203,7 @@ __BEGIN_DECLS
  *           \cli 3
  *                No shifts could be applied during a cycle of the
  *         Implicitly restarted Arnoldi iteration. One possibility
- *         is to increase the size of \ ncv relative to \c
+ *         is to increase the size of \c ncv relative to \c
  *           nev. \endclist
  *    ARPACK can return other error flags as well, but these are
  *    converted to igraph errors, see \ref igraph_error_type_t.
