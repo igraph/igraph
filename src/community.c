@@ -1314,7 +1314,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 
   /* Memory for ARPACK */
   /* We are allocating memory for 20 eigenvectors since options->ncv won't be
-   * larger than 20 when using the automatic mode in igraph_arpack_rssolve */
+   * larger than 20 when using automatic mode in igraph_arpack_rssolve */
   IGRAPH_CHECK(igraph_arpack_storage_init(&storage, no_of_nodes, 20, 
 					  no_of_nodes, 1));
   IGRAPH_FINALLY(igraph_arpack_storage_destroy, &storage);

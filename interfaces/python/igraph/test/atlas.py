@@ -6,15 +6,20 @@ from igraph import *
 class TestBase(unittest.TestCase):
     def testPageRank(self):
         for idx, g in enumerate(self.__class__.graphs):
-            pr = g.pagerank()
+            try:
+                pr = g.pagerank()
+            except Exception, ex:
+                self.assertTrue(False, msg="PageRank calculation threw exception for graph #%d: %s" % (idx, ex))
+                raise
+
             if g.vcount() == 0:
                 self.assertEquals([], pr)
                 continue
 
             self.assertAlmostEquals(1.0, sum(pr), places=5, \
-                    msg="PageRank sum is not 1.0 for graph #%d" % idx)
+                    msg="PageRank sum is not 1.0 for graph #%d (%r)" % (idx, pr))
             self.assertTrue(min(pr) >= 0, \
-                    msg="Minimum PageRank is less than 0 for graph #%d" % idx)
+                    msg="Minimum PageRank is less than 0 for graph #%d (%r)" % (idx, pr))
 
     def testEigenvectorCentrality(self):
         for idx, g in enumerate(self.__class__.graphs):
@@ -37,7 +42,8 @@ class TestBase(unittest.TestCase):
                 continue
 
             self.assertAlmostEquals(max(ec), 1, places=7, \
-                    msg="Maximum eigenvector centrality is not 1 for graph #%d" % idx)
+                    msg="Maximum eigenvector centrality is %r (not 1) for graph #%d (%r)" % \
+                    (max(ec), idx, ec))
             self.assertTrue(min(ec) >= 0, \
                     msg="Minimum eigenvector centrality is less than 0 for graph #%d" % idx)
 

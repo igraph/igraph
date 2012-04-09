@@ -893,12 +893,13 @@ int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
   if (reset) {
     /* Running personalized PageRank */
     for (i=0; i<n; i++) {
-	  to[i] += sumfrom * VECTOR(*reset)[i];
-	}
+      to[i] += sumfrom * VECTOR(*reset)[i];
+    }
   } else {
     /* Traditional PageRank with uniform reset vector */
+    sumfrom /= n;
     for (i=0; i<n; i++) {
-	to[i] += sumfrom / n;
+      to[i] += sumfrom;
     }
   }
 
@@ -949,8 +950,9 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
     }
   } else {
     /* Traditional PageRank with uniform reset vector */
+    sumfrom /= n;
     for (i=0; i<n; i++) {
-      to[i] += sumfrom / n;
+      to[i] += sumfrom;
     }
   }
 

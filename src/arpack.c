@@ -723,6 +723,35 @@ int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
 }
 
 /**
+ * \function igraph_i_arpack_auto_ncv
+ * \brief Tries to set up the value of \c ncv in an \c igraph_arpack_options_t
+ *        automagically.
+ */
+void igraph_i_arpack_auto_ncv(igraph_arpack_options_t* options) {
+  /* This is similar to how Octave determines the value of ncv, with some
+   * modifications. */
+	int min_ncv = options->nev * 2 + 1;
+
+	/* Use twice the number of desired eigenvectors plus one by default */
+  options->ncv = min_ncv;
+	/* ...but use at least 20 Lanczos vectors... */
+  if (options->ncv < 20) {
+    options->ncv = 20;
+  }
+	/* ...but having ncv close to n leads to some problems with small graphs
+	 * (example: PageRank of "A <--> C, D <--> E, B"), so we don't let it
+	 * to be larger than n / 2...
+	 */
+  if (options->ncv > options->n / 2) {
+    options->ncv = options->n / 2;
+  }
+	/* ...but we need at least min_ncv. */
+	if (options->ncv < min_ncv) {
+		options->ncv = min_ncv;
+	}
+}
+
+/**
  * \function igraph_arpack_rssolve
  * \brief ARPACK solver for symmetric matrices
  *
@@ -778,14 +807,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   /* Brush up options if needed */
   if (options->ldv == 0) { options->ldv=options->n; }
   if (options->ncv == 0) {
-    /* This is similar to how Octave determines the value of ncv */
-    options->ncv=options->nev * 2 + 1;
-    if (options->ncv < 20) {
-      options->ncv = 20;
-    }
-    if (options->ncv > options->n-1) {
-      options->ncv = options->n-1;
-    }
+		igraph_i_arpack_auto_ncv(options);
   }
   if (options->lworkl == 0) { options->lworkl=options->ncv*(options->ncv+8); }
   if (options->which[0] == 'X') { options->which[0]='L'; options->which[1]='M'; }
@@ -988,14 +1010,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   /* Brush up options if needed */
   if (options->ldv == 0) { options->ldv=options->n; }
   if (options->ncv == 0) {
-    /* This is similar to how Octave determines the value of ncv */
-    options->ncv=options->nev * 2 + 1;
-    if (options->ncv < 20) {
-      options->ncv = 20;
-    }
-    if (options->ncv > options->n-1) {
-      options->ncv = options->n-1;
-    }
+		igraph_i_arpack_auto_ncv(options);
   }
   if (options->lworkl == 0) { options->lworkl=3*options->ncv*(options->ncv+2); }
   if (options->which[0] == 'X') { options->which[0]='L'; options->which[1]='M'; }
