@@ -1022,6 +1022,14 @@ igraph_layout_merge_dla:
         PARAMS: GRAPHLIST graphs, MATRIXLIST coords, OUT MATRIX res
         IGNORE: RR, RC, RNamespace
 
+igraph_layout_sugiyama:
+        PARAMS: GRAPH graph, OUT MATRIX res, OUT GRAPH_OR_0 extd_graph, \
+                OUT VECTOR_OR_0 extd_to_orig_eids, VECTOR_OR_0 layers=NULL, \
+                REAL hgap=1, REAL vgap=1, INTEGER maxiter=100, \
+                EDGEWEIGHTS weights=NULL
+        DEPS: weights ON graph
+        NAME-R: layout.sugiyama
+
 #######################################
 # Cocitation and other similarity measures
 #######################################

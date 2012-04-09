@@ -643,44 +643,6 @@ c
       call igraphsecond (t1)
       tnaupd = t1 - t0
 c
-      if (msglvl .gt. 0) then
-c
-c        %--------------------------------------------------------%
-c        | Version Number & Version Date are defined in version.h |
-c        %--------------------------------------------------------%
-c
-         write (6,1000)
-         write (6,1100) mxiter, nopx, nbx, nrorth, nitref, nrstrt,
-     &                  tmvopx, tmvbx, tnaupd, tnaup2, tnaitr, titref,
-     &                  tgetv0, tneigh, tngets, tnapps, tnconv, trvec
- 1000    format (//,
-     &      5x, '=============================================',/
-     &      5x, '= Nonsymmetric implicit Arnoldi update code =',/
-     &      5x, '= Version Number: ', ' 2.4', 21x, ' =',/
-     &      5x, '= Version Date:   ', ' 07/31/96', 16x,   ' =',/
-     &      5x, '=============================================',/
-     &      5x, '= Summary of timing statistics              =',/
-     &      5x, '=============================================',//)
- 1100    format (
-     &      5x, 'Total number update iterations             = ', i5,/
-     &      5x, 'Total number of OP*x operations            = ', i5,/
-     &      5x, 'Total number of B*x operations             = ', i5,/
-     &      5x, 'Total number of reorthogonalization steps  = ', i5,/
-     &      5x, 'Total number of iterative refinement steps = ', i5,/
-     &      5x, 'Total number of restart steps              = ', i5,/
-     &      5x, 'Total time in user OP*x operation          = ', f12.6,/
-     &      5x, 'Total time in user B*x operation           = ', f12.6,/
-     &      5x, 'Total time in Arnoldi update routine       = ', f12.6,/
-     &      5x, 'Total time in naup2 routine                = ', f12.6,/
-     &      5x, 'Total time in basic Arnoldi iteration loop = ', f12.6,/
-     &      5x, 'Total time in reorthogonalization phase    = ', f12.6,/
-     &      5x, 'Total time in (re)start vector generation  = ', f12.6,/
-     &      5x, 'Total time in Hessenberg eig. subproblem   = ', f12.6,/
-     &      5x, 'Total time in getting the shifts           = ', f12.6,/
-     &      5x, 'Total time in applying the shifts          = ', f12.6,/
-     &      5x, 'Total time in convergence testing          = ', f12.6,/
-     &      5x, 'Total time in computing final Ritz vectors = ', f12.6/)
-      end if
 c
  9000 continue
 c

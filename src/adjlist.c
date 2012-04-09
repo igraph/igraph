@@ -342,6 +342,7 @@ int igraph_adjlist_remove_duplicate(const igraph_t *graph,
   return 0;
 }
 
+#ifndef USING_R
 int igraph_adjlist_print(const igraph_adjlist_t *al, FILE *outfile) {
   long int i;
   long int n=al->length;
@@ -351,6 +352,7 @@ int igraph_adjlist_print(const igraph_adjlist_t *al, FILE *outfile) {
   }
   return 0;
 }
+#endif
 
 int igraph_adjedgelist_remove_duplicate(const igraph_t *graph, 
 					igraph_inclist_t *al) {
@@ -359,11 +361,13 @@ int igraph_adjedgelist_remove_duplicate(const igraph_t *graph,
     return igraph_inclist_remove_duplicate(graph, al);
 }
 
+#ifndef USING_R
 int igraph_adjedgelist_print(const igraph_inclist_t *al, FILE *outfile) {
     IGRAPH_WARNING("igraph_adjedgelist_print() is deprecated, use "
                    "igraph_inclist_print() instead");
     return igraph_inclist_print(al, outfile);
 }
+#endif
 
 /**
  * \function igraph_adjedgelist_init
@@ -421,6 +425,7 @@ int igraph_inclist_remove_duplicate(const igraph_t *graph,
   return 0;
 }
 
+#ifndef USING_R
 int igraph_inclist_print(const igraph_inclist_t *al, FILE *outfile) {
   long int i;
   long int n=al->length;
@@ -430,6 +435,7 @@ int igraph_inclist_print(const igraph_inclist_t *al, FILE *outfile) {
   }
   return 0;
 }
+#endif
 
 /**
  * \function igraph_inclist_init

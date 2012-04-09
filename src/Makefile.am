@@ -103,6 +103,7 @@ include ../optional/glpk/glpk.inc
 if INTERNAL_GLPK
   libglpk_la_SOURCES = 	$(GLPK)
   libglpk_la_CFLAGS = -I$(top_srcdir)/optional/glpk
+  libglpk_la_CPPFLAGS = -I$(top_srcdir)/include
   GLPK_LIB = libglpk.la
 endif
 

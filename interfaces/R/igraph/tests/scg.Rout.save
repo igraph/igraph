@@ -1,6 +1,6 @@
 
-R version 2.14.1 (2011-12-22)
-Copyright (C) 2011 The R Foundation for Statistical Computing
+R version 2.14.2 (2012-02-29)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
@@ -566,34 +566,6 @@ $p
  [8] 0.1443376 0.1443376 0.1443376
 
 > do.call(scg, c(list(treeM), args))
-col 0: locations 0 to 2
-1 : 0.25
-2 : 0.25
-3 : 1
-col 1: locations 3 to 6
-0 : 0.333333
-4 : 1
-5 : 1
-6 : 1
-col 2: locations 7 to 10
-0 : 0.333333
-7 : 1
-8 : 1
-9 : 1
-col 3: locations 11 to 11
-0 : 0.333333
-col 4: locations 12 to 12
-1 : 0.25
-col 5: locations 13 to 13
-1 : 0.25
-col 6: locations 14 to 14
-1 : 0.25
-col 7: locations 15 to 15
-2 : 0.25
-col 8: locations 16 to 16
-2 : 0.25
-col 9: locations 17 to 17
-2 : 0.25
 $Xt
 1 x 1 sparse Matrix of class "dgCMatrix"
       
@@ -635,16 +607,6 @@ $p
  [8] 0.1443376 0.1443376 0.1443376
 
 > do.call(scg, c(list(treeM2), args))
-0 0.333333 0.333333 0.333333 0 0 0 0 0 0
-0.25 0 0 0 0.25 0.25 0.25 0 0 0
-0.25 0 0 0 0 0 0 0.25 0.25 0.25
-1 0 0 0 0 0 0 0 0 0
-0 1 0 0 0 0 0 0 0 0
-0 1 0 0 0 0 0 0 0 0
-0 1 0 0 0 0 0 0 0 0
-0 0 1 0 0 0 0 0 0 0
-0 0 1 0 0 0 0 0 0 0
-0 0 1 0 0 0 0 0 0 0
 $Xt
 1 x 1 sparse Matrix of class "dgCMatrix"
       
@@ -736,34 +698,6 @@ $p
  [8] 0.1443376 0.1443376 0.1443376
 
 > do.call(scg, c(list(treeM), args))
-col 0: locations 0 to 2
-1 : 0.25
-2 : 0.25
-3 : 1
-col 1: locations 3 to 6
-0 : 0.333333
-4 : 1
-5 : 1
-6 : 1
-col 2: locations 7 to 10
-0 : 0.333333
-7 : 1
-8 : 1
-9 : 1
-col 3: locations 11 to 11
-0 : 0.333333
-col 4: locations 12 to 12
-1 : 0.25
-col 5: locations 13 to 13
-1 : 0.25
-col 6: locations 14 to 14
-1 : 0.25
-col 7: locations 15 to 15
-2 : 0.25
-col 8: locations 16 to 16
-2 : 0.25
-col 9: locations 17 to 17
-2 : 0.25
 $Xt
 5 x 5 sparse Matrix of class "dgCMatrix"
                              
@@ -815,16 +749,6 @@ $p
  [8] 0.1443376 0.1443376 0.1443376
 
 > do.call(scg, c(list(treeM2), args))
-0 0.333333 0.333333 0.333333 0 0 0 0 0 0
-0.25 0 0 0 0.25 0.25 0.25 0 0 0
-0.25 0 0 0 0 0 0 0.25 0.25 0.25
-1 0 0 0 0 0 0 0 0 0
-0 1 0 0 0 0 0 0 0 0
-0 1 0 0 0 0 0 0 0 0
-0 1 0 0 0 0 0 0 0 0
-0 0 1 0 0 0 0 0 0 0
-0 0 1 0 0 0 0 0 0 0
-0 0 1 0 0 0 0 0 0 0
 $Xt
 5 x 5 sparse Matrix of class "dgCMatrix"
                              
@@ -926,34 +850,6 @@ $p
  [8] 0.1443376 0.1443376 0.1443376
 
 > do.call(scg, c(list(treeM), args))
-col 0: locations 0 to 2
-1 : 0.25
-2 : 0.25
-3 : 1
-col 1: locations 3 to 6
-0 : 0.333333
-4 : 1
-5 : 1
-6 : 1
-col 2: locations 7 to 10
-0 : 0.333333
-7 : 1
-8 : 1
-9 : 1
-col 3: locations 11 to 11
-0 : 0.333333
-col 4: locations 12 to 12
-1 : 0.25
-col 5: locations 13 to 13
-1 : 0.25
-col 6: locations 14 to 14
-1 : 0.25
-col 7: locations 15 to 15
-2 : 0.25
-col 8: locations 16 to 16
-2 : 0.25
-col 9: locations 17 to 17
-2 : 0.25
 $Xt
 5 x 5 sparse Matrix of class "dgCMatrix"
                              
@@ -1005,16 +901,6 @@ $p
  [8] 0.1443376 0.1443376 0.1443376
 
 > do.call(scg, c(list(treeM2), args))
-0 0.333333 0.333333 0.333333 0 0 0 0 0 0
-0.25 0 0 0 0.25 0.25 0.25 0 0 0
-0.25 0 0 0 0 0 0 0.25 0.25 0.25
-1 0 0 0 0 0 0 0 0 0
-0 1 0 0 0 0 0 0 0 0
-0 1 0 0 0 0 0 0 0 0
-0 1 0 0 0 0 0 0 0 0
-0 0 1 0 0 0 0 0 0 0
-0 0 1 0 0 0 0 0 0 0
-0 0 1 0 0 0 0 0 0 0
 $Xt
 5 x 5 sparse Matrix of class "dgCMatrix"
                              

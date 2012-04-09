@@ -60,6 +60,8 @@ long int igraph_estack_size(const igraph_estack_t *s) {
   return igraph_stack_long_size(&s->stack);
 }
 
+#ifndef USING_R
 int igraph_estack_print(const igraph_estack_t *s) {
   return igraph_stack_long_print(&s->stack);
 }
+#endif

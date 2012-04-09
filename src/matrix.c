@@ -60,6 +60,7 @@
 #include "igraph_pmt_off.h"
 #undef BASE_COMPLEX
 
+#ifndef USING_R
 int igraph_matrix_complex_print(const igraph_matrix_complex_t *m) {
 
   long int nr=igraph_matrix_complex_nrow(m);
@@ -76,6 +77,7 @@ int igraph_matrix_complex_print(const igraph_matrix_complex_t *m) {
   
   return 0;
 }
+#endif
 
 int igraph_matrix_complex_fprint(const igraph_matrix_complex_t *m, 
 				 FILE *file) {
@@ -86,7 +88,7 @@ int igraph_matrix_complex_fprint(const igraph_matrix_complex_t *m,
   for (i=0; i<nr; i++) {
     for (j=0; j<nc; j++) {
       igraph_complex_t z=MATRIX(*m, i, j);
-      if (j!=0) { putchar(' '); }
+      if (j!=0) { fputc(' ', file); }
       fprintf(file, "%g%+gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
     }
     fprintf(file, "\n");

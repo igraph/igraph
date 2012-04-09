@@ -1301,62 +1301,62 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 //################################################################################################
 // Does not work at the moment !!!
 //################################################################################################
-long PottsModel::WriteSoftClusters(char *filename, double threshold)
-{
-  FILE *file;
-  NNode *n_cur, *n_cur2;
-  DLList_Iter<NNode*> iter, iter2;
-  DL_Indexed_List<ClusterList<NNode*>*> *cl_list, *old_clusterlist;
-  ClusterList<NNode*> *cl_cur;
+// long PottsModel::WriteSoftClusters(char *filename, double threshold)
+// {
+//   FILE *file;
+//   NNode *n_cur, *n_cur2;
+//   DLList_Iter<NNode*> iter, iter2;
+//   DL_Indexed_List<ClusterList<NNode*>*> *cl_list, *old_clusterlist;
+//   ClusterList<NNode*> *cl_cur;
   
-  double max;
+//   double max;
   
-  file=fopen(filename,"w");
-  if (!file) {
-    printf("Could not open %s for writing.\n",filename);
-    return -1;
-  }
+//   file=fopen(filename,"w");
+//   if (!file) {
+//     printf("Could not open %s for writing.\n",filename);
+//     return -1;
+//   }
 
-  max=correlation[0]->Get(0);
-  //printf("max=%f\n",max);
-  cl_list=new DL_Indexed_List<ClusterList<NNode*>*>();
+//   max=correlation[0]->Get(0);
+//   //printf("max=%f\n",max);
+//   cl_list=new DL_Indexed_List<ClusterList<NNode*>*>();
   
-  n_cur=iter.First(net->node_list);
-  while (!iter.End())
-  {
-    cl_cur=new ClusterList<NNode*>();
-    cl_list->Push(cl_cur);
-    n_cur2=iter2.First(net->node_list);
-    while (!iter2.End())
-    {
-      if (double(correlation[n_cur->Get_Index()]->Get(n_cur2->Get_Index()))/max>threshold)
-        cl_cur->Push(n_cur2);
-      n_cur2=iter2.Next();
-    }
-    n_cur=iter.Next();
-  }
-  old_clusterlist=net->cluster_list;
-  net->cluster_list=cl_list;
-  clear_all_markers(net);
-  //printf("Es gibt %d Cluster\n",cl_list->Size());
-  reduce_cliques2(net, false, 15);
-  //printf("Davon bleiben %d Cluster uebrig\n",cl_list->Size());
-  clear_all_markers(net);
-  while (net->cluster_list->Size()){
-    cl_cur=net->cluster_list->Pop();
-    while (cl_cur->Size())
-    {
-      n_cur=cl_cur->Pop();
-      fprintf(file,"%s\n",n_cur->Get_Name());
-      //printf("%s\n",n_cur->Get_Name());
-    }
-    fprintf(file,"\n");
-  }
-  net->cluster_list=old_clusterlist;
-  fclose(file);
+//   n_cur=iter.First(net->node_list);
+//   while (!iter.End())
+//   {
+//     cl_cur=new ClusterList<NNode*>();
+//     cl_list->Push(cl_cur);
+//     n_cur2=iter2.First(net->node_list);
+//     while (!iter2.End())
+//     {
+//       if (double(correlation[n_cur->Get_Index()]->Get(n_cur2->Get_Index()))/max>threshold)
+//         cl_cur->Push(n_cur2);
+//       n_cur2=iter2.Next();
+//     }
+//     n_cur=iter.Next();
+//   }
+//   old_clusterlist=net->cluster_list;
+//   net->cluster_list=cl_list;
+//   clear_all_markers(net);
+//   //printf("Es gibt %d Cluster\n",cl_list->Size());
+//   reduce_cliques2(net, false, 15);
+//   //printf("Davon bleiben %d Cluster uebrig\n",cl_list->Size());
+//   clear_all_markers(net);
+//   while (net->cluster_list->Size()){
+//     cl_cur=net->cluster_list->Pop();
+//     while (cl_cur->Size())
+//     {
+//       n_cur=cl_cur->Pop();
+//       fprintf(file,"%s\n",n_cur->Get_Name());
+//       //printf("%s\n",n_cur->Get_Name());
+//     }
+//     fprintf(file,"\n");
+//   }
+//   net->cluster_list=old_clusterlist;
+//   fclose(file);
 
-  return 1;
-}
+//   return 1;
+// }
 //#############################################################################
 // Performs a gamma sweep
 //#############################################################################
@@ -1397,9 +1397,9 @@ double PottsModel::GammaSweep(double gamma_start, double gamma_stop, double prob
           //initialize_lookup(kT,kmax,net->node_list->Size());
           if (!non_parallel) HeatBathParallelLookup(gamma,prob, kT,25);
           else HeatBathLookup(gamma,prob, kT,25);
-          printf("kT=%f acceptance=%f\n", kT, acceptance);
+          // printf("kT=%f acceptance=%f\n", kT, acceptance);
     }
-    printf("Starting with gamma=%f\n", gamma);
+    // printf("Starting with gamma=%f\n", gamma);
     kT_start=kT;
     
     for (int i=0; i<repetitions; i++)
@@ -1414,14 +1414,14 @@ double PottsModel::GammaSweep(double gamma_start, double gamma_stop, double prob
           //initialize_lookup(kT,kmax,net->node_list->Size());
           if (!non_parallel) {
 	    changes=HeatBathParallelLookup(gamma, prob, kT, 50);
-              printf("kT: %f   \t Changes %li\n",kT, changes);
+              // printf("kT: %f   \t Changes %li\n",kT, changes);
           } else {
 	    acc=HeatBathLookup(gamma, prob, kT, 50);
              if (acc>(1.0-1.0/double(q))*0.01) changes=1; else changes=0;
-             printf("kT: %f   Acceptance: %f\n",kT, acc);
+             // printf("kT: %f   Acceptance: %f\n",kT, acc);
           }
       }
-      printf("Finisched with acceptance: %1.6f bei kT=%2.4f und gamma=%2.4f\n",acceptance,kT, gamma);
+      // printf("Finisched with acceptance: %1.6f bei kT=%2.4f und gamma=%2.4f\n",acceptance,kT, gamma);
 //      fprintf(file,"%f\t%f\n",gamma_,acceptance);
 //      fprintf(file2,"%f\t%f\n",gamma_,kT);
    //   fprintf(file3,"%f\t%d\n",gamma_,count_clusters(5));
@@ -1477,7 +1477,7 @@ double PottsModel::GammaSweepZeroTemp(double gamma_start, double gamma_stop, dou
     assign_initial_conf(-1);
     initialize_Qmatrix();
     gamma=gamma_start+stepsize*n;
-    printf("Starting with gamma=%f\n", gamma);
+    // printf("Starting with gamma=%f\n", gamma);
     for (int i=0; i<repetitions; i++)
     {
       changes=1;
@@ -1489,15 +1489,15 @@ double PottsModel::GammaSweepZeroTemp(double gamma_start, double gamma_stop, dou
           //initialize_lookup(kT,kmax,net->node_list->Size());
           if (!non_parallel) {
 	    changes=HeatBathParallelLookupZeroTemp(gamma, prob, 1);
-              printf("Changes %li\n", changes);
+              // printf("Changes %li\n", changes);
           } else {
             acc=HeatBathLookupZeroTemp(gamma, prob, 1);
             if (acc>(1.0-1.0/double(q))*0.01) changes=1; else changes=0;
-            printf("Acceptance: %f\n", acc);
+            // printf("Acceptance: %f\n", acc);
           }
           runs++;
       }
-      printf("Finisched with Modularity: %1.6f bei Gamma=%1.6f\n",calculate_Q(), gamma);
+      // printf("Finisched with Modularity: %1.6f bei Gamma=%1.6f\n",calculate_Q(), gamma);
 //      fprintf(file,"%f\t%f\n",gamma_,acceptance);
 //      fprintf(file2,"%f\t%f\n",gamma_,kT);
    //   fprintf(file3,"%f\t%d\n",gamma_,count_clusters(5));
@@ -1528,56 +1528,56 @@ double PottsModel::GammaSweepZeroTemp(double gamma_start, double gamma_stop, dou
 // This function writes the Correlation Matrix that results from a 
 // Gamma-Sweep, this matrix is used to make ps files of it.
 // ######################################################################
-long PottsModel::WriteCorrelationMatrix(char *filename)
-{
-  FILE *file, *file2;
-  char filename2[255];
-  NNode *n_cur, *n_cur2;
-  DLList_Iter<NNode*> iter, iter2;
+// long PottsModel::WriteCorrelationMatrix(char *filename)
+// {
+//   FILE *file, *file2;
+//   char filename2[255];
+//   NNode *n_cur, *n_cur2;
+//   DLList_Iter<NNode*> iter, iter2;
 
-  sprintf(filename2,"%s.mat",filename);
-  file=fopen(filename,"w");
-  if (!file) {
-    printf("Could not open %s for writing.\n",filename);
-    return -1;
-  }
-  file2=fopen(filename2,"w");
-  if (!file2) {
-    printf("Could not open %s for writing.\n",filename2);
-    return -1;
-  }
-  //write the header in one line
-  n_cur=iter.First(net->node_list);
-  while (!iter.End())
-  {  
-      fprintf(file, "\t%s",n_cur->Get_Name());
-      n_cur=iter.Next();
-  }    
-  fprintf(file, "\n");
+//   sprintf(filename2,"%s.mat",filename);
+//   file=fopen(filename,"w");
+//   if (!file) {
+//     printf("Could not open %s for writing.\n",filename);
+//     return -1;
+//   }
+//   file2=fopen(filename2,"w");
+//   if (!file2) {
+//     printf("Could not open %s for writing.\n",filename2);
+//     return -1;
+//   }
+//   //write the header in one line
+//   n_cur=iter.First(net->node_list);
+//   while (!iter.End())
+//   {  
+//       fprintf(file, "\t%s",n_cur->Get_Name());
+//       n_cur=iter.Next();
+//   }    
+//   fprintf(file, "\n");
 
-  //fprintf(file, "%d\t%d\n",net->node_list->Size(),net->node_list->Size());
+//   //fprintf(file, "%d\t%d\n",net->node_list->Size(),net->node_list->Size());
 
-  long r=0,c=0;
-  n_cur=iter.First(net->node_list);
-  while (!iter.End())
-  {
-    fprintf(file, "%s",n_cur->Get_Name());
-    r++;
-    n_cur2=iter2.First(net->node_list);
-    while (!iter2.End())
-    {
-      c++;
-      fprintf(file,"\t%f",correlation[n_cur->Get_Index()]->Get(n_cur2->Get_Index()));
-      fprintf(file2,"%li\t%li\t%f\n",r,c,correlation[n_cur->Get_Index()]->Get(n_cur2->Get_Index()));
-      n_cur2=iter2.Next();
-    }
-    fprintf(file,"\n");
-    n_cur=iter.Next();
-  }
-  fclose(file);
-  fclose(file2);
-  return 1;
-}
+//   long r=0,c=0;
+//   n_cur=iter.First(net->node_list);
+//   while (!iter.End())
+//   {
+//     fprintf(file, "%s",n_cur->Get_Name());
+//     r++;
+//     n_cur2=iter2.First(net->node_list);
+//     while (!iter2.End())
+//     {
+//       c++;
+//       fprintf(file,"\t%f",correlation[n_cur->Get_Index()]->Get(n_cur2->Get_Index()));
+//       fprintf(file2,"%li\t%li\t%f\n",r,c,correlation[n_cur->Get_Index()]->Get(n_cur2->Get_Index()));
+//       n_cur2=iter2.Next();
+//     }
+//     fprintf(file,"\n");
+//     n_cur=iter.Next();
+//   }
+//   fclose(file);
+//   fclose(file2);
+//   return 1;
+// }
 //##############################################################################
 
 //#################################################################################################

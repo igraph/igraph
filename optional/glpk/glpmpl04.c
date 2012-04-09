@@ -341,11 +341,11 @@ void close_input(MPL *mpl)
 
 void open_output(MPL *mpl, char *file)
 {     xassert(mpl->out_fp == NULL);
-      if (file == NULL)
-      {  file = "<stdout>";
-         mpl->out_fp = (void *)stdout;
-      }
-      else
+      /* if (file == NULL) */
+      /* {  file = "<stdout>"; */
+      /*    mpl->out_fp = (void *)stdout; */
+      /* } */
+      /* else */
       {  mpl->out_fp = xfopen(file, "w");
          if (mpl->out_fp == NULL)
             error(mpl, "unable to create %s - %s", file, xerrmsg());
@@ -362,9 +362,9 @@ void open_output(MPL *mpl, char *file)
 
 void write_char(MPL *mpl, int c)
 {     xassert(mpl->out_fp != NULL);
-      if (mpl->out_fp == (void *)stdout)
-         xprintf("%c", c);
-      else
+      /* if (mpl->out_fp == (void *)stdout) */
+      /*    xprintf("%c", c); */
+      /* else */
          xfprintf(mpl->out_fp, "%c", c);
       return;
 }
@@ -393,7 +393,7 @@ void write_text(MPL *mpl, char *fmt, ...)
 
 void flush_output(MPL *mpl)
 {     xassert(mpl->out_fp != NULL);
-      if (mpl->out_fp != (void *)stdout)
+      /* if (mpl->out_fp != (void *)stdout) */
       {  xfflush(mpl->out_fp);
          if (xferror(mpl->out_fp))
             error(mpl, "write error on %s - %s", mpl->out_file,
@@ -1410,7 +1410,7 @@ void mpl_terminate(MPL *mpl)
       if (mpl->row != NULL) xfree(mpl->row);
       if (mpl->col != NULL) xfree(mpl->col);
       if (mpl->in_fp != NULL) xfclose(mpl->in_fp);
-      if (mpl->out_fp != NULL && mpl->out_fp != (void *)stdout)
+      if (mpl->out_fp != NULL /* && mpl->out_fp != (void *)stdout */)
          xfclose(mpl->out_fp);
       if (mpl->out_file != NULL) xfree(mpl->out_file);
       if (mpl->prt_fp != NULL) xfclose(mpl->prt_fp);

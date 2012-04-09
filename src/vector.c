@@ -261,6 +261,7 @@ int igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
   return 0;
 }
 
+#ifndef USING_R
 int igraph_vector_complex_print(const igraph_vector_complex_t *v) {
   long int i, n=igraph_vector_complex_size(v);
   if (n!=0) {
@@ -274,6 +275,7 @@ int igraph_vector_complex_print(const igraph_vector_complex_t *v) {
   printf("\n");
   return 0;
 }
+#endif
 
 int igraph_vector_complex_fprint(const igraph_vector_complex_t *v, 
 				 FILE *file) {

@@ -24,6 +24,8 @@
 #ifndef IGRAPH_ERROR_H
 #define IGRAPH_ERROR_H
 
+#include <stdarg.h>
+
 #undef __BEGIN_DECLS
 #undef __END_DECLS
 #ifdef __cplusplus
@@ -329,6 +331,9 @@ igraph_set_error_handler(igraph_error_handler_t* new_handler);
  * \enumval IGRAPH_EATTRCOMBINE Unimplemented attribute combination 
  *   method for the given attribute type.
  * \enumval IGRAPH_ELAPACK A LAPACK call resulted an error.
+ * \enumval IGRAPH_EDRL Internal error in the DrL layout generator.
+ * \enumval IGRAPH_EOVERFLOW Integer or double overflow.
+ * \enumval IGRAPH_EGLP Internal GLPK error.
  */
 
 typedef enum {
@@ -384,7 +389,10 @@ typedef enum {
   IGRAPH_GLP_ESTOP        = 50,
   IGRAPH_EATTRIBUTES      = 51,
   IGRAPH_EATTRCOMBINE     = 52,
-  IGRAPH_ELAPACK          = 53
+  IGRAPH_ELAPACK          = 53,
+  IGRAPH_EDRL             = 54,
+  IGRAPH_EOVERFLOW        = 55,
+  IGRAPH_EGLP             = 56
 } igraph_error_type_t;
 
 /**
@@ -428,10 +436,33 @@ typedef enum {
  *   error.
  * \param igraph_errno The \a igraph error code.
  * \return the error code (if it returns)
+ * 
+ * \sa igraph_errorf().
  */
 
 int igraph_error(const char *reason, const char *file, int line,
 		 int igraph_errno);
+
+/**
+ * \function igraph_errorf
+ * \brief Trigger an error, printf-like version.
+ * 
+ * \param reason Textual description of the error, interpreted as 
+ *               a printf format string.
+ * \param file The source file in which the error was noticed.
+ * \param line The line in the source file which triggered the error.
+ * \param igraph_errno The \a igraph error code.
+ * \param ... Additional parameters, the values to substitute into the
+ *            format string.
+ * 
+ * \sa igraph_error().
+ */
+
+int igraph_errorf(const char *reason, const char *file, int line, 
+		  int igraph_errno, ...);
+
+int igraph_errorvf(const char *reason, const char *file, int line,
+		   int igraph_errno, va_list ap);
 
 /**
  * \function igraph_strerror
@@ -583,6 +614,9 @@ extern igraph_warning_handler_t igraph_warning_handler_print;
 
 int igraph_warning(const char *reason, const char *file, int line,
 		   int igraph_errno);
+
+int igraph_warningf(const char *reason, const char *file, int line, 
+		    int igraph_errno, ...);
 
 #define IGRAPH_WARNING(reason) \
        do { \

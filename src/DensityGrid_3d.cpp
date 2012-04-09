@@ -43,6 +43,7 @@ using namespace std;
 
 #include "drl_Node_3d.h"
 #include "DensityGrid_3d.h"
+#include "igraph_error.h"
 
 #define GET_BIN(z, y, x) (Bins[(z*GRID_SIZE+y)*GRID_SIZE+x])
 
@@ -77,11 +78,12 @@ void DensityGrid::Init()
     }
   catch (bad_alloc errora)
     {
-      cout << "Error: Out of memory! Program stopped." << endl;
+      // cout << "Error: Out of memory! Program stopped." << endl;
 	  #ifdef MUSE_MPI
         MPI_Abort ( MPI_COMM_WORLD, 1 );
 	  #else
-	    exit (1);
+	    igraph_error("DrL is out of memory", __FILE__, __LINE__,
+			 IGRAPH_ENOMEM);
 	  #endif
     }
 	
@@ -236,12 +238,13 @@ void DensityGrid::Add(Node &N)
        (y_grid >= GRID_SIZE) || (y_grid < 0) ||
        (z_grid >= GRID_SIZE) || (z_grid < 0) )
     {
-      cout << endl << "Error: Exceeded density grid with x_grid = " << x_grid 
-	       << " and y_grid = " << y_grid << ".  Program stopped." << endl;
+      // cout << endl << "Error: Exceeded density grid with x_grid = " << x_grid 
+      // 	       << " and y_grid = " << y_grid << ".  Program stopped." << endl;
       #ifdef MUSE_MPI
  	    MPI_Abort ( MPI_COMM_WORLD, 1 );
 	  #else
-	    exit (1);
+	    igraph_error("Exceeded density grid in DrL", __FILE__, 
+			 __LINE__, IGRAPH_EDRL);
 	  #endif
     }    
 

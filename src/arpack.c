@@ -426,7 +426,7 @@ int igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun, void *extra,
   } else if (options->which[0] == 'X' && options->which[1] == 'X') {
     /* No preference on the ordering of eigenvectors */
   } else {
-    fprintf(stderr, "%c%c\n", options->which[0], options->which[1]);
+    /* fprintf(stderr, "%c%c\n", options->which[0], options->which[1]); */
     IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
   }
 

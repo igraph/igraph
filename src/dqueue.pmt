@@ -330,9 +330,11 @@ int FUNCTION(igraph_dqueue,push) (TYPE(igraph_dqueue)* q, BASE elem) {
 
 #if defined (OUT_FORMAT)
 
+#ifndef USING_R
 int FUNCTION(igraph_dqueue,print)(const TYPE(igraph_dqueue)* q) {
   return FUNCTION(igraph_dqueue,fprint)(q, stdout);
 }
+#endif
 
 int FUNCTION(igraph_dqueue,fprint)(const TYPE(igraph_dqueue)* q, FILE *file) {
   if (q->end != NULL) {

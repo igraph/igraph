@@ -56,6 +56,13 @@ static void debug(const char* fmt, ...) {
 #  endif
 #endif
 
+/* MSVC uses __forceinline instead of inline */
+#ifdef _MSC_VER
+#  define INLINE __forceinline
+#else
+#  define INLINE inline
+#endif
+
 /*
  * Implementation of the Sugiyama layout algorithm as described in:
  *
@@ -219,7 +226,7 @@ static int igraph_i_layout_sugiyama_place_nodes_horizontally(const igraph_t* gra
 /**
  * Calculated the median of four numbers (not necessarily sorted).
  */
-static inline igraph_real_t igraph_i_median_4(igraph_real_t x1,
+static INLINE igraph_real_t igraph_i_median_4(igraph_real_t x1,
     igraph_real_t x2, igraph_real_t x3, igraph_real_t x4) {
   igraph_real_t arr[4] = { x1, x2, x3, x4 };
   igraph_vector_t vec;
@@ -963,7 +970,7 @@ static int igraph_i_layout_sugiyama_place_nodes_horizontally(const igraph_t* gra
   {
     igraph_real_t width, min_width, mins[4], maxs[4], diff;
     /* Find the alignment with the minimum width */
-    min_width = INFINITY; j = 0;
+    min_width = IGRAPH_INFINITY; j = 0;
     for (i = 0; i < 4; i++) {
       mins[i] = igraph_vector_min(&xs[i]);
       maxs[i] = igraph_vector_max(&xs[i]);
@@ -1051,7 +1058,7 @@ static int igraph_i_layout_sugiyama_vertical_alignment(const igraph_t* graph,
     igraph_vector_t *layer = igraph_i_layering_get(layering, i);
 
     /* r = 0 in the paper, but C arrays are indexed from 0 */
-    r = align_right ? INFINITY : -1;
+    r = align_right ? IGRAPH_INFINITY : -1;
 
     /* If align_right is 1, we have to process the layer in reverse order */
     j       = align_right ? (igraph_vector_size(layer)-1) : 0;
@@ -1167,7 +1174,7 @@ static int igraph_i_layout_sugiyama_horizontal_compaction(const igraph_t* graph,
   for (i = 0; i < no_of_nodes; i++) {
     VECTOR(sinks)[i] = i;
   }
-  igraph_vector_fill(&shifts, INFINITY);
+  igraph_vector_fill(&shifts, IGRAPH_INFINITY);
   igraph_vector_fill(xs, -1);
 
   /* Calculate the coordinates of the vertices relative to their sinks
@@ -1195,7 +1202,7 @@ static int igraph_i_layout_sugiyama_horizontal_compaction(const igraph_t* graph,
     long int root = VECTOR(*roots)[i];
     VECTOR(*xs)[i] = VECTOR(old_xs)[root];
     shift = VECTOR(shifts)[(long int)VECTOR(sinks)[root]];
-    if (shift < INFINITY)
+    if (shift < IGRAPH_INFINITY)
       VECTOR(*xs)[i] += shift;
   }
 

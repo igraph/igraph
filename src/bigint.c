@@ -262,9 +262,11 @@ int igraph_biguint_div(igraph_biguint_t *q, igraph_biguint_t *r,
   return 0;
 }
 
+#ifndef USING_R
 int igraph_biguint_print(igraph_biguint_t *b) {
   return igraph_biguint_fprint(b, stdout);
 }
+#endif
 
 int igraph_biguint_fprint(igraph_biguint_t *b, FILE *file) {
 

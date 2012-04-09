@@ -27,8 +27,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdarg.h>
 
 static IGRAPH_THREAD_LOCAL igraph_error_handler_t *igraph_i_error_handler=0;
+static IGRAPH_THREAD_LOCAL char igraph_i_errormsg_buffer[500];
+static IGRAPH_THREAD_LOCAL char igraph_i_warningmsg_buffer[500];
 
 static const char *igraph_i_error_strings[]=
   { /*  0 */ "No error",
@@ -99,30 +102,52 @@ int igraph_error(const char *reason, const char *file, int line,
 
   if (igraph_i_error_handler) {
     igraph_i_error_handler(reason, file, line, igraph_errno);
+#ifndef USING_R
   }  else {
     igraph_error_handler_abort(reason, file, line, igraph_errno);
+#endif
   }
   return igraph_errno;
 }
 
+int igraph_errorf(const char *reason, const char *file, int line, 
+		  int igraph_errno, ...) {
+  va_list ap;
+  va_start(ap, igraph_errno);
+  vsnprintf(igraph_i_errormsg_buffer, 
+	    sizeof(igraph_i_errormsg_buffer) / sizeof(char), reason, ap);
+  return igraph_error(igraph_i_errormsg_buffer, file, line, igraph_errno);
+}
+
+int igraph_errorvf(const char *reason, const char *file, int line,
+		   int igraph_errno, va_list ap) {
+  vsnprintf(igraph_i_errormsg_buffer, 
+	    sizeof(igraph_i_errormsg_buffer) / sizeof(char), reason, ap);
+  return igraph_error(igraph_i_errormsg_buffer, file, line, igraph_errno);
+}
+
+#ifndef USING_R
 void igraph_error_handler_abort (const char *reason, const char *file,
 				 int line, int igraph_errno) {
   fprintf(stderr, "Error at %s:%i :%s, %s\n", file, line, reason,
 	  igraph_strerror(igraph_errno));
   abort();
 }
+#endif
 
 void igraph_error_handler_ignore (const char *reason, const char *file,
 				  int line, int igraph_errno) {
   IGRAPH_FINALLY_FREE();
 }
 
+#ifndef USING_R
 void igraph_error_handler_printignore (const char *reason, const char *file,
 				       int line, int igraph_errno) {
   IGRAPH_FINALLY_FREE();
   fprintf(stderr, "Error at %s:%i :%s, %s\n", file, line, reason,
 	  igraph_strerror(igraph_errno));
 }
+#endif
 
 igraph_error_handler_t *
 igraph_set_error_handler (igraph_error_handler_t * new_handler)
@@ -151,7 +176,7 @@ void IGRAPH_FINALLY_REAL(void (*func)(void*), void* ptr) {
 void IGRAPH_FINALLY_CLEAN(int minus) { 
   igraph_i_finally_stack[0].all -= minus;
   if (igraph_i_finally_stack[0].all < 0) {
-    fprintf(stderr, "corrupt finally stack, popping %d elements when only %d left\n", minus, igraph_i_finally_stack[0].all+minus);
+    /* fprintf(stderr, "corrupt finally stack, popping %d elements when only %d left\n", minus, igraph_i_finally_stack[0].all+minus); */
     igraph_i_finally_stack[0].all = 0;
   }
   /* printf("<-- Finally stack contains now %d elements\n", igraph_i_finally_stack[0].all); */
@@ -176,20 +201,34 @@ void igraph_warning_handler_ignore (const char *reason, const char *file,
 				   int line, int igraph_errno) {
 }
 
+#ifndef USING_R
 void igraph_warning_handler_print (const char *reason, const char *file,
 				   int line, int igraph_errno) {
   fprintf(stderr, "Warning: %s in file %s, line %i\n", reason, file, line);
 }
+#endif
 
 int igraph_warning(const char *reason, const char *file, int line,
 		   int igraph_errno) {
 
   if (igraph_i_warning_handler) {
     igraph_i_warning_handler(reason, file, line, igraph_errno);
+#ifndef USING_R
   }  else {
     igraph_warning_handler_print(reason, file, line, igraph_errno);
+#endif
   }
   return igraph_errno;
+}
+
+int igraph_warningf(const char *reason, const char *file, int line, 
+		    int igraph_errno, ...) {
+  va_list ap;
+  va_start(ap, igraph_errno);
+  vsnprintf(igraph_i_warningmsg_buffer, 
+	    sizeof(igraph_i_warningmsg_buffer) / sizeof(char), reason, ap);
+  return igraph_warning(igraph_i_warningmsg_buffer, file, line, 
+			igraph_errno);
 }
 
 igraph_warning_handler_t *
