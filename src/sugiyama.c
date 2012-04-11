@@ -260,6 +260,11 @@ static INLINE igraph_real_t igraph_i_median_4(igraph_real_t x1,
  * edges spanning more than one layer. The resulting layout assigns coordinates
  * not only to the nodes of the original graph but also to the dummy nodes.
  * The layout algorithm will also return the extended graph with the dummy nodes.
+ * An edge in the original graph may either be mapped to a single edge in the
+ * extended graph or a <em>path</em> that starts and ends in the original
+ * source and target vertex and passes through multiple dummy vertices. In
+ * such cases, the user may also request the mapping of the edges of the extended
+ * graph back to the edges of the original graph.
  *
  * </para><para>
  * For more details, see K. Sugiyama, S. Tagawa and M. Toda, "Methods for Visual
@@ -279,6 +284,10 @@ static INLINE igraph_real_t igraph_i_median_4(igraph_real_t x1,
  *                       to lower layers, spans exactly one layer and the first
  *                       |V| vertices coincide with the vertices of the
  *                       original graph.
+ * \param extd_to_orig_eids Pointer to a vector or \c NULL. If not \c NULL, the
+ *                          mapping from the edge IDs of the extended graph back
+ *                          to the edge IDs of the original graph will be stored
+ *                          here.
  * \param layers  The layer index for each vertex or \c NULL if the layers should
  *                be determined automatically by igraph.
  * \param hgap  The preferred minimum horizontal gap between vertices in the same
