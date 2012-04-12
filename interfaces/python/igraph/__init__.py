@@ -803,11 +803,16 @@ class Graph(GraphBase):
           in very large networks. Phys Rev E 70, 066111 (2004).
         """
         merges, qs = GraphBase.community_fastgreedy(self, weights)
+
+        # qs may be shorter than |V|-1 if we are left with a few separated
+        # communities in the end; take this into account
+        diff = self.vcount() - len(qs)
         qs.reverse()
         if qs:
-            optimal_count = qs.index(max(qs)) + 1
+            optimal_count = qs.index(max(qs)) + diff + 1
         else:
-            optimal_count = 1
+            optimal_count = diff
+
         return VertexDendrogram(self, merges, optimal_count,
                 modularity_params=dict(weights=weights))
 

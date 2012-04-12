@@ -539,7 +539,10 @@ class Dendrogram(object):
         @param merges: the merge history either in matrix or tuple format"""
         self._merges = [tuple(pair) for pair in merges]
         self._nmerges = len(self._merges)
-        self._nitems = max(self._merges[-1])-self._nmerges+2
+        if self._nmerges:
+            self._nitems = max(self._merges[-1])-self._nmerges+2
+        else:
+            self._nitems = 0
         self._names = None
 
     @staticmethod
