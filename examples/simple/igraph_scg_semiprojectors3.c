@@ -38,6 +38,7 @@ int main() {
   igraph_matrix_init(&L, 0, 0);
   igraph_matrix_init(&R, 0, 0);
   igraph_matrix_init(&V, 0, 0);
+  igraph_matrix_complex_init(&V2, 0, 0);
   igraph_vector_init(&groups, 0);
     
   igraph_rng_seed(igraph_rng_default(), 42);
@@ -45,9 +46,6 @@ int main() {
   igraph_tree(&g, 10, /* children= */ 3, IGRAPH_TREE_UNDIRECTED);
   
   igraph_sparsemat_init(&laplacian, nodes, nodes, igraph_ecount(&g)*2);
-  igraph_matrix_complex_init(&V2, 0, 0);
-  igraph_matrix_init(&V, 0, 0);
-  igraph_vector_init(&groups, 0);
   
   igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -113,9 +111,11 @@ int main() {
 
   /* -------------- */
 
-  igraph_vector_destroy(&groups);
+  igraph_matrix_destroy(&L);
+  igraph_matrix_destroy(&R);
   igraph_matrix_destroy(&V);
   igraph_matrix_complex_destroy(&V2);
+  igraph_vector_destroy(&groups);
   igraph_sparsemat_destroy(&laplacian);
   igraph_destroy(&g);
   

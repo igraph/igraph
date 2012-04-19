@@ -72,7 +72,8 @@ int main() {
 		      IGRAPH_SCG_OPTIMUM, /*p=*/ 0, /*maxiter=*/ 100);
   
   igraph_vector_print(&groups);
-  
+
+  igraph_vector_destroy(&ivec);
   igraph_vector_destroy(&groups);
   igraph_vector_destroy(&lambda);
   igraph_matrix_destroy(&V);

@@ -159,6 +159,7 @@ int main() {
   VECTOR(weights)[6] = 3; VECTOR(weights)[7] = 4; VECTOR(weights)[8] = 4;
   igraph_pagerank(&g, &res, 0, igraph_vss_all(), 1, 0.85, &weights, &arpack_options);
   print_vector(&res, stdout);
+  igraph_vector_destroy(&weights);
   igraph_destroy(&g);
 
   igraph_vector_destroy(&res);

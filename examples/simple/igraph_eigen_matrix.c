@@ -118,5 +118,7 @@ int main() {
   igraph_vector_complex_destroy(&values2);
   igraph_matrix_complex_destroy(&vectors2);
 
+  igraph_matrix_destroy(&mat2);
+
   return 0;
 }

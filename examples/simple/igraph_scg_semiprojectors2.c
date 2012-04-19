@@ -129,6 +129,8 @@ int main() {
   igraph_vector_destroy(&p);
   igraph_vector_destroy(&selcol);
   igraph_vector_destroy(&groups);
+  igraph_matrix_destroy(&L);
+  igraph_matrix_destroy(&R);
   igraph_matrix_destroy(&V);
   igraph_matrix_destroy(&V3);
   igraph_matrix_complex_destroy(&V2);
