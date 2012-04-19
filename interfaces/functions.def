@@ -1092,7 +1092,8 @@ igraph_community_edge_betweenness:
         PARAMS: GRAPH graph, OUT VECTOR result, OUT VECTOR edge_betweenness, \
                 OUT MATRIX merges, OUT VECTOR bridges, \
                 OUT VECTOR_OR_0 modularity, OUT VECTOR_OR_0 membership, \
-                BOOLEAN directed=True
+                BOOLEAN directed=True, EDGEWEIGHTS weights=NULL
+        DEPS: weights ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_community_eb_get_merges:

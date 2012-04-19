@@ -1009,7 +1009,8 @@ class Graph(GraphBase):
                 GraphBase.community_optimal_modularity(self, *args, **kwds)
         return VertexClustering(self, membership, modularity)
 
-    def community_edge_betweenness(self, clusters = None, directed = True):
+    def community_edge_betweenness(self, clusters=None, directed=True,
+            weights=None):
         """Community structure based on the betweenness of the edges in the
         network.
 
@@ -1027,17 +1028,20 @@ class Graph(GraphBase):
           is cut at the level which maximizes the modularity.
         @param directed: whether the directionality of the edges should be
           taken into account or not.
+        @param weights: name of an edge attribute or a list containing
+          edge weights.
         @return: a L{VertexDendrogram} object, initally cut at the maximum
-          modularity.
+          modularity or at the desired number of clusters.
         """
-        merges, qs = GraphBase.community_edge_betweenness(self, directed)
+        merges, qs = GraphBase.community_edge_betweenness(self, directed, weights)
         qs.reverse()
         if clusters is None:
             if qs:
                 clusters = qs.index(max(qs))+1
             else:
                 clusters = 1
-        return VertexDendrogram(self, merges, clusters)
+        return VertexDendrogram(self, merges, clusters,
+                modularity_params=dict(weights=weights))
 
     def community_spinglass(self, *args, **kwds):
         """community_spinglass(weights=None, spins=25, parupdate=False,

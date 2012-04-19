@@ -23,8 +23,7 @@
 
 #include <igraph.h>
 
-int main() {
-  
+void test_unweighted() {
   igraph_t g;
   igraph_vector_t edges, eb;
   long int i;
@@ -55,7 +54,8 @@ int main() {
   igraph_community_edge_betweenness(&g, &edges, &eb, 0 /*merges */,
 				    0 /*bridges */, /*modularity=*/ 0,
 				    /*membership=*/ 0,
-				    IGRAPH_UNDIRECTED);
+				    IGRAPH_UNDIRECTED,
+				    /*weights=*/ 0);
   
   no_of_edges=igraph_ecount(&g);
   for (i=0; i<no_of_edges; i++) {
@@ -72,7 +72,8 @@ int main() {
   igraph_community_edge_betweenness(&g, 0, &eb, 0 /*merges */,
 				    0 /*bridges */, /*modularity=*/ 0,
 				    /*membership=*/ 0,
-				    IGRAPH_UNDIRECTED);
+				    IGRAPH_UNDIRECTED,
+				    /*weights=*/ 0);
   for (i=0; i<no_of_edges; i++) {
     printf("%.2f ", VECTOR(eb)[i]);
   }
@@ -81,6 +82,57 @@ int main() {
   igraph_vector_destroy(&eb);
   igraph_vector_destroy(&edges);
   igraph_destroy(&g);
+}
+
+void test_weighted() {
+  igraph_t g;
+  igraph_vector_t edges, eb, weights;
+  long int i;
+  long int no_of_edges;
+  igraph_real_t weights_array[] = { 4, 1, 3, 2, 5, 8, 6, 7 };
+
+  /* Small graph as follows: A--B--C--A, A--D--E--A, B--D, C--E */
+  igraph_small(&g, 0, IGRAPH_UNDIRECTED, 
+      0, 1, 0, 2, 0, 3, 0, 4, 1, 2, 1, 3, 2, 4, 3, 4, -1);
+  igraph_vector_view(&weights, weights_array, igraph_ecount(&g));
+
+  igraph_vector_init(&edges, 0);
+  igraph_vector_init(&eb, 0);
+  igraph_community_edge_betweenness(&g, &edges, &eb, 0 /*merges */,
+				    0 /*bridges */, /*modularity=*/ 0,
+				    /*membership=*/ 0,
+				    IGRAPH_UNDIRECTED,
+				    &weights);
   
+  no_of_edges=igraph_ecount(&g);
+  for (i=0; i<no_of_edges; i++) {
+    printf("%li ", (long int)VECTOR(edges)[i]);
+  }
+  printf("\n");
+  
+  for (i=0; i<no_of_edges; i++) {
+    printf("%.2f ", VECTOR(eb)[i]);
+  }
+  printf("\n");
+
+  /* Try it once again without storage space for edges */
+  igraph_community_edge_betweenness(&g, 0, &eb, 0 /*merges */,
+				    0 /*bridges */, /*modularity=*/ 0,
+				    /*membership=*/ 0,
+				    IGRAPH_UNDIRECTED,
+				    &weights);
+  for (i=0; i<no_of_edges; i++) {
+    printf("%.2f ", VECTOR(eb)[i]);
+  }
+  printf("\n");
+
+  igraph_vector_destroy(&eb);
+  igraph_vector_destroy(&edges);
+  igraph_destroy(&g);
+}
+
+int main() {
+  test_unweighted();
+  test_weighted();
   return 0;
 }

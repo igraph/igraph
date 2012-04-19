@@ -87,6 +87,7 @@ typedef struct igraph_inclist_t {
 int igraph_inclist_init(const igraph_t *graph, 
 			    igraph_inclist_t *il, 
 			    igraph_neimode_t mode);
+int igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n);
 void igraph_inclist_destroy(igraph_inclist_t *il);
 int igraph_inclist_remove_duplicate(const igraph_t *graph,
 					igraph_inclist_t *il);

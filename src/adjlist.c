@@ -475,11 +475,44 @@ int igraph_inclist_init(const igraph_t *graph,
     IGRAPH_ERROR("Cannot create incidence list view", IGRAPH_ENOMEM);
   }
 
-  IGRAPH_FINALLY(igraph_adjlist_destroy, il);  
+  IGRAPH_FINALLY(igraph_inclist_destroy, il);  
   for (i=0; i<il->length; i++) {
     IGRAPH_ALLOW_INTERRUPTION();
     IGRAPH_CHECK(igraph_vector_init(&il->incs[i], 0));
     IGRAPH_CHECK(igraph_incident(graph, &il->incs[i], i, mode));
+  }
+  
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
+/**
+ * \function igraph_inclist_init_empty
+ * \brief Initialize an incidence list corresponding to an empty graph.
+ * 
+ * This function essentially creates a list of empty vectors that may
+ * be treated as an incidence list for a graph with a given number of
+ * vertices.
+ *
+ * \param il Pointer to an uninitialized incidence list.
+ * \param n  The number of vertices in the incidence list.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|), linear in the number of vertices.
+ */
+
+int igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n) {
+  long int i;
+
+  il->length=n;
+  il->incs=igraph_Calloc(il->length, igraph_vector_t);
+  if (il->incs == 0) {
+    IGRAPH_ERROR("Cannot create incidence list view", IGRAPH_ENOMEM);
+  }
+
+  IGRAPH_FINALLY(igraph_inclist_destroy, il);  
+  for (i=0; i<n; i++) {
+    IGRAPH_CHECK(igraph_vector_init(&il->incs[i], 0));
   }
   
   IGRAPH_FINALLY_CLEAN(1);

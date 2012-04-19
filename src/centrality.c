@@ -1429,7 +1429,7 @@ int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
 				     nobigint);
 }
 
-int igraph_betweenness_estimate_weighted(const igraph_t *graph, 
+int igraph_i_betweenness_estimate_weighted(const igraph_t *graph, 
 					 igraph_vector_t *res, 
 					 const igraph_vs_t vids, 
 					 igraph_bool_t directed,
@@ -1461,7 +1461,7 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
   IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode));  
   IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
-  IGRAPH_CHECK(igraph_adjlist_init(graph, &fathers, omode));
+  IGRAPH_CHECK(igraph_adjlist_init_empty(&fathers, no_of_nodes));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &fathers);
 
   IGRAPH_CHECK(igraph_stack_init(&S, no_of_nodes));
@@ -1478,10 +1478,6 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(tmpres, no_of_nodes);
   }
 
-  for (j=0; j<no_of_nodes; j++) {
-    igraph_vector_clear(igraph_adjlist_get(&fathers, j));
-  }
-  
   for (source=0; source<no_of_nodes; source++) {
     IGRAPH_PROGRESS("Betweenness centrality: ", 100.0*source/no_of_nodes, 0);
     IGRAPH_ALLOW_INTERRUPTION();
@@ -1672,7 +1668,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   igraph_biguint_t D, R, T;
 
   if (weights) { 
-    return igraph_betweenness_estimate_weighted(graph, res, vids, directed,
+    return igraph_i_betweenness_estimate_weighted(graph, res, vids, directed,
 						cutoff, weights, nobigint);
   }
 
@@ -1879,7 +1875,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   return 0;
 }
 
-int igraph_edge_betweenness_estimate_weighted(const igraph_t *graph, 
+int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph, 
 					      igraph_vector_t *result,
 					      igraph_bool_t directed, 
 					      igraph_real_t cutoff,
@@ -1890,7 +1886,6 @@ int igraph_edge_betweenness_estimate_weighted(const igraph_t *graph,
   igraph_inclist_t inclist;
   igraph_inclist_t fathers;
   igraph_integer_t mode= directed ? IGRAPH_OUT : IGRAPH_ALL;
-  igraph_integer_t omode= directed ? IGRAPH_IN : IGRAPH_ALL;
   igraph_vector_t distance, tmpscore;
   igraph_vector_long_t nrgeo;
   long int source, j;
@@ -1905,7 +1900,7 @@ int igraph_edge_betweenness_estimate_weighted(const igraph_t *graph,
   
   IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode));
   IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
-  IGRAPH_CHECK(igraph_inclist_init(graph, &fathers, omode));
+  IGRAPH_CHECK(igraph_inclist_init_empty(&fathers, no_of_nodes));
   IGRAPH_FINALLY(igraph_inclist_destroy, &fathers);
 
   IGRAPH_VECTOR_INIT_FINALLY(&distance, no_of_nodes);
@@ -2003,7 +1998,7 @@ int igraph_edge_betweenness_estimate_weighted(const igraph_t *graph,
       VECTOR(tmpscore)[w]=0;
       VECTOR(distance)[w]=0;
       VECTOR(nrgeo)[w]=0;
-      igraph_vector_clear(igraph_inclist_get(&fathers, w));
+      igraph_vector_clear(fatv);
     }
     
   } /* source < no_of_nodes */
@@ -2128,7 +2123,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
   long int i;
 
   if (weights) { 
-    return igraph_edge_betweenness_estimate_weighted(graph, result, 
+    return igraph_i_edge_betweenness_estimate_weighted(graph, result, 
 						     directed, cutoff, weights);
   }
 
@@ -2331,7 +2326,7 @@ int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
   return igraph_closeness_estimate(graph, res, vids, mode, -1, weights);
 }
 
-int igraph_closeness_estimate_weighted(const igraph_t *graph, 
+int igraph_i_closeness_estimate_weighted(const igraph_t *graph, 
 				       igraph_vector_t *res, 
 				       const igraph_vs_t vids, 
 				       igraph_neimode_t mode,
@@ -2516,7 +2511,7 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
   igraph_vit_t vit;
 
   if (weights) { 
-    return igraph_closeness_estimate_weighted(graph, res, vids, mode, cutoff,
+    return igraph_i_closeness_estimate_weighted(graph, res, vids, mode, cutoff,
 					      weights);
   }
 

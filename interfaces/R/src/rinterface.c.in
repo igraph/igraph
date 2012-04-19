@@ -6132,7 +6132,7 @@ SEXP R_igraph_community_edge_betweenness(SEXP graph, SEXP pdirected,
   }
   igraph_community_edge_betweenness(&g, &res, ppeb, ppmerges, ppbridges, 
 				    ppmodularity, ppmembership,
-				    directed);
+				    directed, 0);
   
   PROTECT(result=NEW_LIST(6));
   SET_VECTOR_ELT(result, 0, R_igraph_vector_to_SEXP(&res));

@@ -176,6 +176,18 @@ class CommunityTests(unittest.TestCase):
         cl = g.community_fastgreedy().as_clustering()
         self.assertEquals(cl.membership, range(g.vcount()))
 
+    def testEdgeBetweenness(self):
+        # Full graph, no weights
+        g = Graph.Full(5)
+        cl = g.community_edge_betweenness().as_clustering()
+        self.assertEquals(cl.membership, [0]*5)
+
+        # Full graph with weights
+        g.es["weight"] = 1
+        g[0,1] = g[1,2] = g[2,0] = g[3,4] = 10
+        cl = g.community_edge_betweenness(weights="weight").as_clustering()
+        self.assertEquals(cl.membership, [0,0,0,1,1])
+        self.assertAlmostEqual(cl.q, 0.2750, places=3)
 
     def testEigenvector(self):
         g = Graph.Full(5) + Graph.Full(5)
