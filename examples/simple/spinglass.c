@@ -67,9 +67,13 @@ int main() {
 /*   printf("\n"); */
 
   if (igraph_vector_size(&csize) != 2) {
+    igraph_vector_destroy(&membership);
+    igraph_vector_destroy(&csize);  
     return 77;
   }
   if (VECTOR(csize)[0] != 5) {
+    igraph_vector_destroy(&membership);
+    igraph_vector_destroy(&csize);  
     return 77;
   }
 

@@ -158,6 +158,14 @@ void *thread_function(void *arg) {
     VECTOR(*result)[i] = v[i];
   }
 
+  free(v);
+  free(workl);
+  free(workd);
+  free(d);
+  free(resid);
+  free(ax);
+  free(select);
+
   return 0;
 }
 

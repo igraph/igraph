@@ -60,8 +60,8 @@ int main() {
     if (d > 1e-14) { printf("Difference: %g\n", d); return 1; }
   }
   
-  igraph_matrix_complex_destroy(&evec1);
-  igraph_vector_complex_destroy(&eval1);
+  igraph_matrix_complex_destroy(&evec2);
+  igraph_vector_complex_destroy(&eval2);
 
   igraph_matrix_complex_destroy(&evec1);
   igraph_vector_complex_destroy(&eval1);
