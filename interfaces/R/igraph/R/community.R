@@ -398,7 +398,8 @@ walktrap.community <- function(graph, weights=E(graph)$weight, steps=4,
   res
 }
 
-edge.betweenness.community <- function(graph, directed=TRUE,
+edge.betweenness.community <- function(graph, weights=E(graph)$weight,
+                                       directed=TRUE,
                                        edge.betweenness=TRUE,
                                        merges=TRUE, bridges=TRUE,
                                        labels=TRUE, modularity=TRUE,
@@ -407,8 +408,13 @@ edge.betweenness.community <- function(graph, directed=TRUE,
     stop("Not a graph object!")
   }
 
+  if (!is.null(weights)) {
+    weights <- as.numeric(weights)
+  }
+
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  res <- .Call("R_igraph_community_edge_betweenness", graph, as.logical(directed),
+  res <- .Call("R_igraph_community_edge_betweenness", graph, weights,
+               as.logical(directed),
                as.logical(edge.betweenness),
                as.logical(merges), as.logical(bridges),
                as.logical(modularity), as.logical(membership),

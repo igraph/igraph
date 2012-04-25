@@ -6095,10 +6095,12 @@ SEXP R_igraph_topological_sorting(SEXP graph, SEXP pneimode) {
   return result;
 }
 
-SEXP R_igraph_community_edge_betweenness(SEXP graph, SEXP pdirected, 
+SEXP R_igraph_community_edge_betweenness(SEXP graph, SEXP pweights,
+					 SEXP pdirected, 
 					 SEXP peb, SEXP pmerges, SEXP pbridges,
 					 SEXP pmodularity, SEXP pmembership) {
   igraph_t g;
+  igraph_vector_t weights, *ppweights=0;
   igraph_vector_t res;
   igraph_vector_t eb, *ppeb=0;
   igraph_matrix_t merges, *ppmerges=0;
@@ -6109,6 +6111,10 @@ SEXP R_igraph_community_edge_betweenness(SEXP graph, SEXP pdirected,
   SEXP result, names;
   
   R_SEXP_to_igraph(graph, &g);
+  if (!isNull(pweights)) {
+    ppweights=&weights;
+    R_SEXP_to_vector(pweights, ppweights);
+  }        
   igraph_vector_init(&res, 0);
   if (LOGICAL(peb)[0]) {
     ppeb=&eb;
@@ -6132,7 +6138,7 @@ SEXP R_igraph_community_edge_betweenness(SEXP graph, SEXP pdirected,
   }
   igraph_community_edge_betweenness(&g, &res, ppeb, ppmerges, ppbridges, 
 				    ppmodularity, ppmembership,
-				    directed, 0);
+				    directed, ppweights);
   
   PROTECT(result=NEW_LIST(6));
   SET_VECTOR_ELT(result, 0, R_igraph_vector_to_SEXP(&res));
@@ -6160,20 +6166,25 @@ SEXP R_igraph_community_edge_betweenness(SEXP graph, SEXP pdirected,
   return result;
 }
 
-SEXP R_igraph_community_eb_get_merges(SEXP graph, 
+SEXP R_igraph_community_eb_get_merges(SEXP graph, SEXP pweights,
 				      SEXP pedges) {
   
   igraph_t g;
+  igraph_vector_t weights, *ppweights=0;
   igraph_vector_t edges;
   igraph_vector_t bridges;
   igraph_matrix_t res;
   SEXP result, names;
   
   R_SEXP_to_igraph(graph, &g);
+  if (!isNull(pweights)) {
+    ppweights=&weights;
+    R_SEXP_to_vector(pweights, ppweights);
+  }        
   R_SEXP_to_vector(pedges, &edges);
   igraph_matrix_init(&res, 0, 0);
   igraph_vector_init(&bridges, 0);
-  igraph_community_eb_get_merges(&g, &edges, &res, &bridges, 
+  igraph_community_eb_get_merges(&g, &edges, &weights, &res, &bridges, 
 				 /*modularity=*/ 0, /*membership=*/ 0);
   PROTECT(result=NEW_LIST(2));
   SET_VECTOR_ELT(result, 0, R_igraph_matrix_to_SEXP(&res));

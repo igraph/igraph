@@ -1097,9 +1097,9 @@ igraph_community_edge_betweenness:
         IGNORE: RR, RC, RNamespace
 
 igraph_community_eb_get_merges:
-        PARAMS: GRAPH graph, VECTOR edges, OUT MATRIX merges, \
-                OUT VECTOR bridges, OUT VECTOR_OR_0 modularity, \
-                OUT VECTOR_OR_0 membership
+        PARAMS: GRAPH graph, VECTOR edges, EDGEWEIGHTS weights=NULL, \
+                OUT MATRIX merges, OUT VECTOR bridges, \
+                OUT VECTOR_OR_0 modularity, OUT VECTOR_OR_0 membership
         IGNORE: RR, RC, RNamespace
 
 igraph_community_fastgreedy:
