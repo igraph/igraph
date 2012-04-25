@@ -60,7 +60,7 @@ layout.sugiyama (graph, layers = NULL, hgap = 1, vgap = 1, maxiter = 100,
   Cybernetics 11(2):109-125, 1981.
 }
 \author{
-  Tamas Nepusz \email{ntamas@gmail.com}}
+  Tamas Nepusz \email{ntamas@gmail.com}
 }
 \examples{
 # TODO
