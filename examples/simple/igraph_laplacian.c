@@ -63,6 +63,7 @@ int test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
   igraph_sparsemat_t sm;
   igraph_vector_t vec, *weights = 0;
   igraph_matrix_init(&m, 1, 1);
+  igraph_sparsemat_init(&sm, 0, 0, 0);
 
   if (w) {
     weights = (igraph_vector_t*)calloc(1, sizeof(igraph_vector_t));
@@ -74,7 +75,6 @@ int test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
   igraph_laplacian(&g, &m, &sm, 0, weights);
   igraph_matrix_init(&m2, 0, 0);
   igraph_sparsemat_as_matrix(&m2, &sm);
-  igraph_sparsemat_destroy(&sm);
   if (!igraph_matrix_all_e_tol(&m, &m2, 0)) { 
     return 41;
   }
@@ -94,7 +94,6 @@ int test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
   igraph_laplacian(&g, &m, &sm, 0, weights);
   igraph_matrix_init(&m2, 0, 0);
   igraph_sparsemat_as_matrix(&m2, &sm);
-  igraph_sparsemat_destroy(&sm);
   if (!igraph_matrix_all_e_tol(&m, &m2, 0)) { 
     return 42;
   }
@@ -114,7 +113,6 @@ int test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
   igraph_laplacian(&g, &m, &sm, 0, weights);
   igraph_matrix_init(&m2, 0, 0);
   igraph_sparsemat_as_matrix(&m2, &sm);
-  igraph_sparsemat_destroy(&sm);
   if (!igraph_matrix_all_e_tol(&m, &m2, 0)) { 
     return 43;
   }
@@ -136,8 +134,9 @@ int test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
   igraph_matrix_t m, m2;
   igraph_sparsemat_t sm;
   igraph_vector_t vec, *weights = 0;
-  igraph_matrix_init(&m, 1, 1);
   igraph_bool_t ok = 1;
+  igraph_matrix_init(&m, 1, 1);
+  igraph_sparsemat_init(&sm, 0, 0, 0);
 
   if (w) {
     weights = (igraph_vector_t*)calloc(1, sizeof(igraph_vector_t));
@@ -149,7 +148,6 @@ int test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
   igraph_laplacian(&g, &m, &sm, 1, weights);
   igraph_matrix_init(&m2, 0, 0);
   igraph_sparsemat_as_matrix(&m2, &sm);
-  igraph_sparsemat_destroy(&sm);
   if (!igraph_matrix_all_e_tol(&m, &m2, 0)) { 
     return 44;
   }
@@ -168,7 +166,6 @@ int test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
   igraph_laplacian(&g, &m, &sm, 1, weights);
   igraph_matrix_init(&m2, 0, 0);
   igraph_sparsemat_as_matrix(&m2, &sm);
-  igraph_sparsemat_destroy(&sm);
   if (!igraph_matrix_all_e_tol(&m, &m2, 0)) { 
     return 45;
   }
@@ -187,7 +184,6 @@ int test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
   igraph_laplacian(&g, &m, &sm, 1, weights);
   igraph_matrix_init(&m2, 0, 0);
   igraph_sparsemat_as_matrix(&m2, &sm);
-  igraph_sparsemat_destroy(&sm);
   if (!igraph_matrix_all_e_tol(&m, &m2, 0)) { 
     return 46;
   }

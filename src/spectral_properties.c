@@ -246,8 +246,13 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
  * </para><para>
  * The first version of this function was written by Vincent Matossian.
  * \param graph Pointer to the graph to convert.
- * \param res Pointer to an initialized matrix object, it will be
- *        resized if needed.
+ * \param res Pointer to an initialized matrix object, the result is 
+ *        stored here. It will be resized if needed. 
+ *        If it is a null pointer, then it is ignored. 
+ *        At least one of \p res and \p sparseres must be a non-null pointer.
+ * \param sparseres Pointer to an initialized sparse matrix object, the 
+ *        result is stored here, if it is not a null pointer. 
+ *        At least one of \p res and \p sparseres must be a non-null pointer.
  * \param normalized Whether to create a normalized Laplacian matrix.
  * \param weights An optional vector containing edge weights, to calculate 
  *        the weighted Laplacian matrix. Set it to a null pointer to 
@@ -292,7 +297,8 @@ int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
   if (sparseres) {
     int nz=directed ? no_of_edges + no_of_nodes : 
       no_of_edges * 2 + no_of_nodes;
-    igraph_sparsemat_init(sparseres, no_of_nodes, no_of_nodes, nz);
+    IGRAPH_CHECK(igraph_sparsemat_resize(sparseres, no_of_nodes, 
+					 no_of_nodes, nz));
   }
   IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(0), &edgeit));
   IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);

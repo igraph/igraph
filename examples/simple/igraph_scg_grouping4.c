@@ -42,6 +42,7 @@ int main() {
   
   igraph_rng_seed(igraph_rng_default(), 42);
 
+  igraph_sparsemat_init(&laplacian, 0, 0, 0);
   igraph_laplacian(&g, /*res=*/ 0, /*sparseres=*/ &laplacian, 
 		   /*normalized=*/ 0, /*weights=*/ 0);
 

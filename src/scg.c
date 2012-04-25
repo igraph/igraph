@@ -2111,9 +2111,10 @@ int igraph_scg_laplacian(const igraph_t *graph,
 
   if (graph) {
     mysparsemat=&real_sparsemat;
+    IGRAPH_CHECK(igraph_sparsemat_init(mysparsemat, 0, 0, 0));
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparsemat);
     IGRAPH_CHECK(igraph_laplacian(graph, 0, mysparsemat, /*normalized=*/ 0, 
 				  /*weights=*/ 0));
-    IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparsemat);
   } else if (matrix) { 
     mymatrix=&real_matrix;
     IGRAPH_MATRIX_INIT_FINALLY(mymatrix, no_of_nodes, no_of_nodes);
