@@ -713,7 +713,11 @@ extern PyObject* igraphmodule_arpack_options_default;
   PyIGraph_API[PyIGraph_ToCGraph_NUM]   = (void *)PyIGraph_ToCGraph;
 
   /* Create a CObject containing the API pointer array's address */
-  c_api_object = PyCObject_FromVoidPtr((void*)PyIGraph_API, NULL);
+#ifdef IGRAPH_PYTHON3
+  c_api_object = PyCapsule_New((void*)PyIGraph_API, "igraph._igraph._C_API", 0);
+#else
+  c_api_object = PyCObject_FromVoidPtr((void*)PyIGraph_API, 0);
+#endif
   if (c_api_object != 0) {
     PyModule_AddObject(m, "_C_API", c_api_object);
   }
