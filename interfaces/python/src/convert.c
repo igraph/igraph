@@ -2133,7 +2133,9 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
     Py_ssize_t no_of_vertices = igraph_vcount(graph);
     Py_ssize_t start, stop, step, slicelength, i;
 
-    if (PySlice_GetIndicesEx((PySliceObject*)o, no_of_vertices,
+    /* Casting to void* because Python 2.x expects PySliceObject*
+     * but Python 3.x expects PyObject* */
+    if (PySlice_GetIndicesEx((void*)o, no_of_vertices,
           &start, &stop, &step, &slicelength))
       return 1;
 

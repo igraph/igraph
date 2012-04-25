@@ -1570,9 +1570,9 @@ def compare_communities(comm1, comm2, method="vi", remove_none=False):
     @ref: Hubert L and Arabie P: Comparing partitions. Journal of
           Classification 2:193-218, 1985.
     """
-    import _igraph
+    import igraph._igraph
     vec1, vec2 = _prepare_community_comparison(comm1, comm2, remove_none)
-    return _igraph._compare_communities(vec1, vec2, method)
+    return igraph._igraph._compare_communities(vec1, vec2, method)
 
 
 def split_join_distance(comm1, comm2, remove_none=False):
@@ -1625,8 +1625,8 @@ def split_join_distance(comm1, comm2, remove_none=False):
       not interested in the individual projection distances but only the
       sum of them.
     """
-    import _igraph
+    import igraph._igraph
     vec1, vec2 = _prepare_community_comparison(comm1, comm2, remove_none)
-    return _igraph._split_join_distance(vec1, vec2)
+    return igraph._igraph._split_join_distance(vec1, vec2)
 
 

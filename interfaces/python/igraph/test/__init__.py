@@ -35,10 +35,10 @@ def run_tests(verbosity=1):
     try:
         # Support for testoob to have nice colored output
         import testoob
-        testoob.main(suite())
+        runner = testoob.main
     except ImportError:
-        runner = unittest.TextTestRunner(verbosity=verbosity)
-        runner.run(suite())
+        runner = unittest.TextTestRunner(verbosity=verbosity).run
+    runner(suite())
 
 # Make nosetest skip run_tests
 run_tests.__test__ = False

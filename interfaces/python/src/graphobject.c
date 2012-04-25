@@ -10756,7 +10756,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
 
   // interface to igraph_atlas
   {"Atlas", (PyCFunction) igraphmodule_Graph_Atlas,
-   METH_CLASS | METH_KEYWORDS,
+   METH_VARARGS | METH_CLASS | METH_KEYWORDS,
    "Atlas(idx)\n\n"
    "Generates a graph from the Graph Atlas.\n\n"
    "@param idx: The index of the graph to be generated.\n"

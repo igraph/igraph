@@ -23,6 +23,9 @@
 
 */
 
+#ifndef PY_IGRAPH_PY2COMPAT_H
+#define PY_IGRAPH_PY2COMPAT_H
+
 #include <Python.h>
 
 #if PY_MAJOR_VERSION >= 3
@@ -71,6 +74,8 @@ int PyString_IsEqualToUTF8String(PyObject* py_string,
 
 #ifndef PyVarObject_HEAD_INIT
 #  define PyVarObject_HEAD_INIT(type, size) PyObject_HEAD_INIT(type) size,
+#endif
+
 #endif
 
 char* PyString_CopyAsString(PyObject* string);
