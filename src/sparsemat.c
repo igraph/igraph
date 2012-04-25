@@ -2361,16 +2361,26 @@ int igraph_sparsemat_add_cols(igraph_sparsemat_t *A, long int n) {
  * \function igraph_sparsemat_resize
  * Resize a sparse matrix
  * 
- * This function is currently not implemented.
+ * This function resizes a sparse matrix. The resized sparse matrix 
+ * will be empty.
+ * 
+ * \param A The initialized sparse matrix to resize.
+ * \param nrow The new number of rows.
+ * \param ncol The new number of columns.
+ * \param nzmax The new maximum number of elements.
+ * \return Error code.
+ * 
+ * Time complexity: O(nzmax), the maximum number of non-zero elements.
  */
 
 int igraph_sparsemat_resize(igraph_sparsemat_t *A, long int nrow, 
 			    long int ncol, int nzmax) {
 
   if (A->cs->nz < 0) {
-    IGRAPH_ERROR("Resizing column-compressed sparse matrices "
-		 "not implemented yet", IGRAPH_UNIMPLEMENTED);
-    /* TODO */
+    igraph_sparsemat_t tmp;
+    IGRAPH_CHECK(igraph_sparsemat_init(&tmp, nrow, ncol, nzmax));
+    igraph_sparsemat_destroy(A);
+    *A = tmp;
   } else {
     IGRAPH_CHECK(igraph_sparsemat_realloc(A, nzmax));
     A->cs->m = nrow;
