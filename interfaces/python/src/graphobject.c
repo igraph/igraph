@@ -10398,6 +10398,14 @@ PyObject *igraphmodule_Graph_community_walktrap(igraphmodule_GraphObject * self,
 /** \defgroup python_interface_internal Internal functions
  * \ingroup python_interface */
 
+#ifdef IGRAPH_PYTHON3
+PyObject *igraphmodule_Graph___graph_as_capsule__(igraphmodule_GraphObject *
+                                                  self, PyObject * args,
+                                                  PyObject * kwds)
+{
+  return PyCapsule_New((void *)&self->g, 0, 0);
+}
+#else
 /** \ingroup python_interface_internal
  * \brief Returns the encapsulated igraph graph as a PyCObject
  * \return a new PyCObject
@@ -10406,17 +10414,9 @@ PyObject *igraphmodule_Graph___graph_as_cobject__(igraphmodule_GraphObject *
                                                   self, PyObject * args,
                                                   PyObject * kwds)
 {
-  /*
-     char *kwlist[] = {"ref", NULL};
-     PyObject *incref=Py_True;
-
-     if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &incref)) return NULL;
-     if (PyObject_IsTrue(incref)) Py_INCREF(self);
-   */
-
-  return PyCObject_FromVoidPtr((void *)&self->g, NULL);
+  return PyCObject_FromVoidPtr((void *)&self->g, 0);
 }
-
+#endif
 
 /** \ingroup python_interface_internal
  * \brief Registers a destructor to be called when the object is destroyed
@@ -13932,16 +13932,30 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /**********************/
   /* INTERNAL FUNCTIONS */
   /**********************/
+#ifdef IGRAPH_PYTHON3
+  {"__graph_as_capsule",
+   (PyCFunction) igraphmodule_Graph___graph_as_capsule__,
+   METH_VARARGS | METH_KEYWORDS,
+   "__graph_as_capsule()\n\n"
+   "Returns the igraph graph encapsulated by the Python object as\n"
+   "a PyCapsule\n\n."
+   "A PyCapsule is practically a regular C pointer, wrapped in a\n"
+   "Python object. This function should not be used directly by igraph\n"
+   "users, it is useful only in the case when the underlying igraph object\n"
+   "must be passed to other C code through Python.\n\n"},
+#else
   {"__graph_as_cobject",
    (PyCFunction) igraphmodule_Graph___graph_as_cobject__,
    METH_VARARGS | METH_KEYWORDS,
    "__graph_as_cobject()\n\n"
    "Returns the igraph graph encapsulated by the Python object as\n"
    "a PyCObject\n\n."
-   "A PyCObject is practically a regular C pointer. This function\n"
-   "should not be used directly by igraph users, it is useful only\n"
-   "in the case when the underlying igraph object must be passed to\n"
-   "another C code through Python.\n\n"},
+   "A PyCObject is practically a regular C pointer, wrapped in a\n"
+   "Python object. This function should not be used directly by igraph\n"
+   "users, it is useful only in the case when the underlying igraph object\n"
+   "must be passed to other C code through Python.\n\n"},
+#endif
+
   {"__register_destructor",
    (PyCFunction) igraphmodule_Graph___register_destructor__,
    METH_VARARGS | METH_KEYWORDS,
