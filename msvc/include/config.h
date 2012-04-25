@@ -108,7 +108,7 @@
 
 /* Define to 1 if you want to use thread-local storage for global igraph
    structures */
-#define HAVE_TLS 1
+/* #undef HAVE_TLS */
 
 /* Define to 1 if you have the <unistd.h> header file. */
 /* #undef HAVE_UNISTD_H */
@@ -117,10 +117,10 @@
 #define HAVE__STRDUP 1
 
 /* Keyword for thread local storage, or just static if not available */
-#define IGRAPH_F77_SAVE static __declspec( thread )
+#define IGRAPH_F77_SAVE static
 
 /* Keyword for thread local storage, or empty if not available */
-#define IGRAPH_THREAD_LOCAL __declspec( thread )
+#define IGRAPH_THREAD_LOCAL
 
 /* Define to 1 if you use the internal ARPACK library */
 #define INTERNAL_ARPACK 1
