@@ -33,6 +33,7 @@
 #include "igraph_interrupt_internal.h"
 #include "igraph_components.h"
 #include "igraph_dqueue.h"
+#include "igraph_progress.h"
 #include "igraph_stack.h"
 #include "igraph_spmatrix.h"
 #include "igraph_statusbar.h"
@@ -381,7 +382,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   double *distance, *tmpscore;
-  long int *nrgeo;
+  unsigned long long int *nrgeo;
   long int source, i, e;
   
   igraph_inclist_t elist_out, elist_in, fathers;
@@ -393,6 +394,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
   igraph_integer_t from, to;
   igraph_bool_t result_owned = 0;
   igraph_stack_t stack=IGRAPH_STACK_NULL;
+  igraph_real_t steps, steps_done;
 
   char *passive;
 
@@ -430,7 +432,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
     IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, distance);
-  nrgeo=igraph_Calloc(no_of_nodes, long int);
+  nrgeo=igraph_Calloc(no_of_nodes, unsigned long long int);
   if (nrgeo==0) {
     IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
   }
@@ -445,7 +447,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
   } else {
     if (igraph_vector_min(weights) <= 0) {
-      IGRAPH_ERROR("all weights must be strictly positive", IGRAPH_EINVAL);
+      IGRAPH_ERROR("weights must be strictly positive", IGRAPH_EINVAL);
     }
     IGRAPH_CHECK(igraph_2wheap_init(&heap, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &heap);
@@ -470,8 +472,19 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
   }
   IGRAPH_FINALLY(igraph_free, passive);
 
-  for (e=0; e<no_of_edges; e++) {
-    
+  /* Estimate the number of steps to be taken.
+   * It is assumed that one iteration is O(|E||V|), but |V| is constant
+   * anyway, so we will have approximately |E|^2 / 2 steps, and one
+   * iteration of the outer loop advances the step counter by the number
+   * of remaining edges at that iteration.
+   */
+  steps = no_of_edges / 2.0 * (no_of_edges+1);
+  steps_done = 0;
+
+  for (e=0; e<no_of_edges; steps_done += no_of_edges-e, e++) {
+    IGRAPH_PROGRESS("Edge betweenness community detection: ",
+        100.0*steps_done/steps, NULL);
+
     igraph_vector_null(&eb);
 
     if (weights == 0) {
@@ -484,7 +497,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
         IGRAPH_ALLOW_INTERRUPTION();
 
         memset(distance, 0, no_of_nodes*sizeof(double));
-        memset(nrgeo, 0, no_of_nodes*sizeof(long int));
+        memset(nrgeo, 0, no_of_nodes*sizeof(unsigned long long int));
         memset(tmpscore, 0, no_of_nodes*sizeof(double));
         igraph_stack_clear(&stack); /* it should be empty anyway... */
         
@@ -552,7 +565,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
         IGRAPH_ALLOW_INTERRUPTION();
 
         memset(distance, 0, no_of_nodes*sizeof(double));
-        memset(nrgeo, 0, no_of_nodes*sizeof(long int));
+        memset(nrgeo, 0, no_of_nodes*sizeof(unsigned long long int));
         memset(tmpscore, 0, no_of_nodes*sizeof(double));
 
         igraph_2wheap_push_with_index(&heap, source, 0);
@@ -645,6 +658,8 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
     VECTOR(*neip)[pos]=VECTOR(*neip)[neino-1];
     igraph_vector_pop_back(neip);
   }
+
+  IGRAPH_PROGRESS("Edge betweenness community detection: ", 100.0, NULL);
 
   igraph_free(passive);
   igraph_vector_destroy(&eb);
