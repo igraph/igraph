@@ -4444,7 +4444,7 @@ PyObject *igraphmodule_Graph_neighborhood(igraphmodule_GraphObject *self,
   if (!return_single)
     result = igraphmodule_vector_ptr_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
   else
-    result = igraphmodule_vector_t_to_PyList((igraph_vector_t*)&VECTOR(res)[0],
+    result = igraphmodule_vector_t_to_PyList((igraph_vector_t*)VECTOR(res)[0],
         IGRAPHMODULE_TYPE_INT);
 
   IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&res, igraph_vector_destroy);
