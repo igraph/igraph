@@ -376,7 +376,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 				      igraph_vector_t *modularity,
 				      igraph_vector_t *membership,
 				      igraph_bool_t directed,
-                                      const igraph_vector_t *weights) {
+				      const igraph_vector_t *weights) {
   
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
@@ -444,6 +444,9 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
   if (weights == 0) {
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
   } else {
+    if (igraph_vector_min(weights) <= 0) {
+      IGRAPH_ERROR("all weights must be strictly positive", IGRAPH_EINVAL);
+    }
     IGRAPH_CHECK(igraph_2wheap_init(&heap, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &heap);
     IGRAPH_CHECK(igraph_inclist_init_empty(&fathers, no_of_nodes));
