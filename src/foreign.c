@@ -1917,6 +1917,49 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
 #define E_COLOR            22
 #define E_LAST             23
 
+int igraph_i_pajek_escape(char* src, char** dest) {
+  long int destlen=0;
+  igraph_bool_t need_escape=0;
+
+  char *s, *d;
+  for (s=src; *s; s++, destlen++) {
+    if (*s == '\\') {
+      need_escape = 1;
+      destlen++;
+    } else if (*s == '"') {
+      need_escape = 1;
+      destlen++;
+    } else if (!isalnum(*s)) {
+      need_escape = 1;
+    }
+  }
+
+  if (!need_escape) {
+    *dest=strdup(src);
+    return IGRAPH_SUCCESS;
+  }
+
+  *dest=igraph_Calloc(destlen+3, char);
+  if (!*dest)
+    IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM);
+
+  d=*dest;
+  *d='"'; d++;
+
+  for (s=src; *s; s++, d++) {
+    switch (*s) {
+    case '\\':
+    case '"':
+      *d = '\\'; d++;
+    default:
+      *d = *s;
+    }
+  }
+  *d='"'; d++; *d=0;
+
+  return 0;
+}
+
 /**
  * \function igraph_write_graph_pajek
  * \brief Writes a graph to a file in Pajek format.
@@ -2001,6 +2044,8 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
   igraph_vector_t ex_stra;
   igraph_vector_t vx_numa;
   igraph_vector_t vx_stra;
+  
+  char *s, *escaped;
 
   IGRAPH_VECTOR_INIT_FINALLY(&numv, 1);
   IGRAPH_STRVECTOR_INIT_FINALLY(&strv, 1);
@@ -2061,11 +2106,12 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
 						   igraph_vss_1(i), &numv);
 	fprintf(outstream, " \"%g\"", VECTOR(numv)[0]);
       } else if (vtypes[V_ID] == IGRAPH_ATTRIBUTE_STRING) {
-	char *s;
 	igraph_i_attribute_get_string_vertex_attr(graph, vnames[V_ID],
 						  igraph_vss_1(i), &strv);
 	igraph_strvector_get(&strv, 0, &s);
-	fprintf(outstream, " \"%s\"", s);
+	IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
+	fprintf(outstream, " %s", escaped);
+	igraph_Free(escaped);
       } else {
 	fprintf(outstream, " \"%li\"", i+1);
       }
@@ -2088,11 +2134,12 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
       
       /* shape */
       if (vtypes[V_SHAPE] == IGRAPH_ATTRIBUTE_STRING) {
-	char *s;
 	igraph_i_attribute_get_string_vertex_attr(graph, vnames[V_SHAPE],
 						  igraph_vss_1(i), &strv);
 	igraph_strvector_get(&strv, 0, &s);
-	fprintf(outstream, " %s", s);
+	IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
+	fprintf(outstream, " %s", escaped);
+	igraph_Free(escaped);
       }
       
       /* numeric parameters */
@@ -2106,11 +2153,12 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
       /* string parameters */
       for (j=0; j<igraph_vector_size(&vx_stra); j++) {
 	int idx=VECTOR(vx_stra)[j];
-	char *s;
 	igraph_i_attribute_get_string_vertex_attr(graph, vstrnames[idx],
 						  igraph_vss_1(i), &strv);
 	igraph_strvector_get(&strv, 0, &s);
-	fprintf(outstream, " %s %s", vstrnames2[idx], s);
+	IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
+	fprintf(outstream, " %s %s", vstrnames2[idx], escaped);
+	igraph_Free(escaped);
       }      
       
       /* trailing newline */
@@ -2187,11 +2235,12 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
     /* string parameters */
     for (j=0; j<igraph_vector_size(&ex_stra); j++) {
       int idx=VECTOR(ex_stra)[j];
-      char *s;
       igraph_i_attribute_get_string_edge_attr(graph, estrnames[idx],
 					      igraph_ess_1(edge), &strv);
       igraph_strvector_get(&strv, 0, &s);
-      fprintf(outstream, " %s %s", estrnames2[idx], s);
+      IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
+      fprintf(outstream, " %s %s", estrnames2[idx], escaped);
+      igraph_Free(escaped);
     }
 
     /* trailing newline */
