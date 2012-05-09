@@ -30,7 +30,7 @@ layout.reingold.tilford(graph, \dots, params)
 layout.fruchterman.reingold.grid(graph, \dots, params)
 layout.lgl(graph, \dots, params)
 layout.graphopt(graph, ..., params=list())
-layout.mds(graph, d=shortest.paths(graph), ...)
+layout.mds(graph, dist=NULL, dim=2, options=igraph.arpack.default, ...)
 layout.svd(graph, d=shortest.paths(graph), ...)
 layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
       zmin = NULL, zmax = NULL)
@@ -45,7 +45,16 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
     notation to the \code{params} argument. For \code{layout.auto} these
     extra parameters are simply passed to the real layout function, if
     one is called.}
-  \item{d}{The matrix used for multidimansional scaling. By default it
+  \item{dist}{The distance matrix for the multidimensional scaling.
+    If \code{NULL} (the default), then the unweighted shortest path
+    matrix is used.}
+  \item{dim}{Integer scalar, the dimension of the space in which the
+    graph will be embedded. Note that if the graph is unconnected, then
+    this must the 2. (The reason for this is that
+    \code{\link{layout.merge}} does not support other dimensions.)}
+  \item{options}{A named list, to override some ARPACK options. See
+    \code{\link{arpack}} for details.}
+  \item{d}{The matrix used for singulat value decomposition. By default it
     is the distance matrix of the graph.}
   \item{layout}{A matrix with two or three columns, the layout to
     normalize.}
@@ -264,8 +273,7 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
   
   \code{layout.mds} uses metric multidimensional scaling for generating
   the coordinates. This function does not have the usual \code{params}
-  argument. It can just take a single argument, the distance matrix used
-  for multidimensional scaling. This function generates the layout
+  argument. This function generates the layout
   separately for each graph component and then merges them via
   \code{\link{layout.merge}}. \code{layout.mds} is an \emph{experimental}
   function currently.

@@ -206,8 +206,7 @@ export(cliques, largest.cliques, maximal.cliques, clique.number,
 # cohesive blocking, this is what remains from the old implementation
 
 S3method(layout.svd, igraph)
-S3method(layout.mds, igraph)
-export(layout.mds, layout.svd)
+export(layout.svd)
 
 # cohesive blocking, new style 
 

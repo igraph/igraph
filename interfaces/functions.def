@@ -1030,6 +1030,11 @@ igraph_layout_sugiyama:
         DEPS: weights ON graph
         NAME-R: layout.sugiyama
 
+igraph_layout_mds:
+        PARAMS: GRAPH graph, OUT MATRIX res, MATRIX_OR_0 dist=NULL, \
+                INTEGER dim=2, INOUT ARPACKOPT options=igraph.arpack.default
+        NAME-R: layout.mds
+
 #######################################
 # Cocitation and other similarity measures
 #######################################

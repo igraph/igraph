@@ -487,44 +487,6 @@ layout.norm <- function(layout, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL,
   (v-vr[1]) * fac + min
 }
 
-layout.mds <- function(graph, d=shortest.paths(graph), ...)
-  UseMethod("layout.mds", graph)
-
-layout.mds.igraph <- function(graph, d=shortest.paths(graph), ...){
-    
-    if (!is.igraph(graph)) {
-      stop("Not a graph object")
-    }
-
-    clust <- clusters(graph)
-    llist <- list()
-    llen <- numeric()
-    glist <- list()
-    for(i in 1:length(clust$csize)){
-        ind <- clust$membership==i
-        
-        if(length(which(ind))>=3){
-            llist[i+1] <- list(cmdscale(d[ind, ind]))
-        }else if(length(which(ind))==2){
-            llist[i+1] <- list(d[ind, ind])
-        } else {
-            llist[i+1] <- list(matrix(c(0, 0), nrow=1))
-        }
-        
-        llen[i+1] <- length(which(ind))
-        
-        glist[i+1] <- list(induced.subgraph(graph, V(graph)[ind]))
-    }
-    
-    ## merge them all:
-    lmerged <- layout.merge(glist, llist)
-    
-    ## now reorder these rows to reflect original graph:
-    l <- matrix(rep(NA, 2*vcount(graph)), ncol=2)
-    l[order(clust$membership), ] <- lmerged
-    return(l)
-}
-
 layout.svd <- function(graph, d=shortest.paths(graph), ...)
   UseMethod("layout.svd", graph)
 
