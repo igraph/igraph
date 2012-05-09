@@ -40,6 +40,16 @@ http://vlado.fmf.uni-lj.si/pub/networks/data/bio/foodweb/foodweb.htm
 Please see the manual page of the data set for the publications 
 that you should cite, if you use some of this data.
 
+immuno
+------
+
+The data was collected by David Gfeller. Please cite his PhD thesis if 
+you use this data set:
+
+D. Gfeller, Simplifying complex networks: from a clustering to a
+coarse graining strategy, \emph{PhD Thesis EPFL}, no 3888, 2007.
+http://library.epfl.ch/theses/?nr=3888
+
 karate
 ------
 
