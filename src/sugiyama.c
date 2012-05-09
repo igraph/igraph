@@ -261,7 +261,7 @@ static INLINE igraph_real_t igraph_i_median_4(igraph_real_t x1,
  * not only to the nodes of the original graph but also to the dummy nodes.
  * The layout algorithm will also return the extended graph with the dummy nodes.
  * An edge in the original graph may either be mapped to a single edge in the
- * extended graph or a <em>path</em> that starts and ends in the original
+ * extended graph or a \em path that starts and ends in the original
  * source and target vertex and passes through multiple dummy vertices. In
  * such cases, the user may also request the mapping of the edges of the extended
  * graph back to the edges of the original graph.
