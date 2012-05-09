@@ -35,7 +35,7 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
     or the path are directed or not.} 
 }
 \details{
-  It is often needed to perform an operation on a subset of vertices of
+  One often needs to perform an operation on a subset of vertices of
   edges in a graph.
 
   A vertex sequence is simply a vector containing vertex ids, but it has
@@ -116,7 +116,8 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
   There are some special functions which are only defined in the
   indexing expressions of vertex and edge sequences. For vertex
   sequences these are: \code{nei}, \code{inc}, \code{from} and
-  \code{to}, \code{innei} and \code{outnei}.
+  \code{to}, \code{innei} and \code{outnei}. (The \code{adj} special
+  function is an alias for \code{inc}, for compatibility reasons.)
 
   \code{nei} has a mandatory and an optional argument, the first is
   another vertex sequence, the second is a mode argument similar to that
@@ -168,6 +169,16 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
   
   See also the examples below.  
 }
+\note{
+  A note about the performance of the \code{V} and \code{E} functions,
+  and the selection of edges and vertices. Since all selectors
+  are evaluated as logical vectors on all vertices/edges, their
+  performance is bad on large graphs. (Time complexity is proportional
+  to the total number of vertices/edges.) We suggest using the
+  \code{\link{neighbors}}, \code{\link{incident}} functions and
+  simple R vector operations for manipulating vertex/edge sequences
+  in large graphs.
+}
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 % \seealso{}
@@ -210,5 +221,10 @@ E(g) [ 1:3 \%<-\% 2:6 ]
 g <- barabasi.game(100, directed=FALSE)
 d <- get.diameter(g)
 E(g, path=d)
+
+# performance for large graphs is bad
+largeg <- graph.lattice(c(1000, 100))
+system.time(E(largeg)[inc(1)])
+system.time(incident(largeg, 1))
 }
 \keyword{graphs}
