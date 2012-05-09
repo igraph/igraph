@@ -2377,7 +2377,8 @@ int R_SEXP_to_vector_complex(SEXP pv, igraph_vector_complex_t *v) {
 }
 
 int R_SEXP_to_vector_complex_copy(SEXP pv, igraph_vector_complex_t *v) {
-  igraph_vector_complex_init_copy(v, COMPLEX(pv), GET_LENGTH(pv));
+  igraph_vector_complex_init_copy(v, (igraph_complex_t*) COMPLEX(pv), 
+				  GET_LENGTH(pv));
   return 0;
 }
 
@@ -2389,7 +2390,8 @@ int R_SEXP_to_matrix_complex(SEXP pakl, igraph_matrix_complex_t *akl) {
 }
 
 int R_SEXP_to_matrix_complex_copy(SEXP pakl, igraph_matrix_complex_t *akl) {
-  igraph_vector_complex_init_copy(&akl->data, COMPLEX(pakl),
+  igraph_vector_complex_init_copy(&akl->data, 
+				  (igraph_complex_t*) COMPLEX(pakl),
 				  GET_LENGTH(pakl));
   akl->nrow=INTEGER(GET_DIM(pakl))[0];
   akl->ncol=INTEGER(GET_DIM(pakl))[1];
