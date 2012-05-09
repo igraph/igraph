@@ -45,7 +45,7 @@ MATRIX:
     INCONV: %I% <- as.matrix(structure(as.double(%I%), dim=dim(%I%)))
 
 MATRIX_OR_0:
-    INVONV: if (!is.null(%I%)) %I% <- structure(as.double(%I%), dim=dim(%I%))
+    INCONV: if (!is.null(%I%)) %I% <- structure(as.double(%I%), dim=dim(%I%))
 
 ARRAY3:
     INCONV: %I% <- structure(as.double(%I%), dim=dim(%I%))
