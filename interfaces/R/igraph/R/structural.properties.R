@@ -589,7 +589,7 @@ alpha.centrality.dense <- function(graph, nodes=V(graph), alpha=1,
   }
 
   exo <- rep(exo, length=vcount(graph))
-  exo <- matrix(exo, nc=1)
+  exo <- matrix(exo, ncol=1)
 
   if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
     ## weights == NULL and there is a "weight" edge attribute

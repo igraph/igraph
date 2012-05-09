@@ -14,7 +14,7 @@ cited.type.game(n, edges=1, types=rep(0, n),
      pref=rep(1, length(types)),
      directed=TRUE, attr=TRUE)
 citing.cited.type.game(n, edges=1, types=rep(0, n),
-    pref=matrix(1, nr=length(types), nc=length(types)),
+    pref=matrix(1, nrow=length(types), ncol=length(types)),
     directed=TRUE, attr=TRUE)
 }
 \arguments{

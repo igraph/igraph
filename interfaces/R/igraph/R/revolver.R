@@ -59,7 +59,7 @@ revolver.error.d <- function(graph, kernel) {
 
 revolver.ad <- function(graph, niter=5, agebins=max(vcount(graph)/7100, 10),
                        sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE, error=TRUE,
-                       debug=matrix(nc=2, nr=0)) {
+                       debug=matrix(ncol=2, nrow=0)) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -87,7 +87,7 @@ revolver.error.ad <- function(graph, kernel) {
 
 revolver.ade <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
                         sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                        error=TRUE, debug=matrix(nc=2, nr=0)) {
+                        error=TRUE, debug=matrix(ncol=2, nrow=0)) {
                         
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
@@ -270,7 +270,7 @@ revolver.error.r <- function(graph, kernel, window) {
 
 revolver.ar <- function(graph, window, niter=5, agebins=max(vcount(graph)/7100, 10),
                        sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE, error=TRUE,
-                       debug=matrix(nc=2, nr=0)) {
+                       debug=matrix(ncol=2, nrow=0)) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -324,7 +324,7 @@ revolver.error.di <- function(graph, kernel, cats) {
 
 revolver.adi <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
                         sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                        error=TRUE, debug=matrix(nc=2, nr=0)) {
+                        error=TRUE, debug=matrix(ncol=2, nrow=0)) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
@@ -408,7 +408,7 @@ revolver.error.ir <- function(graph, kernel, cats, window) {
 revolver.air <- function(graph, cats, window,
                         niter=5, agebins=max(vcount(graph)/7100, 10),
                         sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                        error=TRUE, debug=matrix(nc=2, nr=0)) {
+                        error=TRUE, debug=matrix(ncol=2, nrow=0)) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
@@ -438,7 +438,7 @@ revolver.error.air <- function(graph, kernel, cats, window) {
 
 revolver.d.d <- function(graph, vtime=V(graph)$time, etime=E(graph)$time, niter=5,
                          sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                         error=TRUE, debug=matrix(nc=2, nr=0)) {
+                         error=TRUE, debug=matrix(ncol=2, nrow=0)) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
@@ -463,7 +463,7 @@ revolver.d.d <- function(graph, vtime=V(graph)$time, etime=E(graph)$time, niter=
 revolver.p.p <- function(graph, events=get.graph.attribute(graph, "events"),
                          vtime=V(graph)$time, etime=E(graph)$time,
                          niter=5, sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                         error=TRUE, debug=matrix(nc=2, nr=0)) {
+                         error=TRUE, debug=matrix(ncol=2, nrow=0)) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object!")

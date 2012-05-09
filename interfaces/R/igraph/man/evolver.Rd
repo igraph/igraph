@@ -69,10 +69,10 @@ revolver.d (graph, niter=5, sd=FALSE, norm=FALSE,
            cites=FALSE, expected=FALSE, error=TRUE, debug=numeric())
 revolver.ad (graph, niter=5, agebins=max(vcount(graph)/7100, 10),
             sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE, error=TRUE,
-            debug=matrix(nc=2, nr=0))
+            debug=matrix(ncol=2, nrow=0))
 revolver.ade (graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
              sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-             error=TRUE, debug=matrix(nc=2, nr=0))
+             error=TRUE, debug=matrix(ncol=2, nrow=0))
 revolver.e (graph, cats, niter=5, st=FALSE,
            sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
            error=TRUE, debug=numeric())
@@ -92,13 +92,13 @@ revolver.r (graph, window, niter=5, sd=FALSE, norm=FALSE,
            cites=FALSE, expected=FALSE, error=TRUE, debug=numeric())
 revolver.ar (graph, window, niter=5, agebins=max(vcount(graph)/7100, 10),
             sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE, error=TRUE,
-            debug=matrix(nc=2, nr=0))
+            debug=matrix(ncol=2, nrow=0))
 revolver.di (graph, cats, niter=5,
             sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
             error=TRUE, debug=numeric())
 revolver.adi (graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
              sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-             error=TRUE, debug=matrix(nc=2, nr=0))
+             error=TRUE, debug=matrix(ncol=2, nrow=0))
 revolver.il (graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
             sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
             error=TRUE, debug=numeric())
@@ -108,14 +108,14 @@ revolver.ir (graph, cats, window, niter=5,
 revolver.air (graph, cats, window,
              niter=5, agebins=max(vcount(graph)/7100, 10),
              sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-             error=TRUE, debug=matrix(nc=2, nr=0))
+             error=TRUE, debug=matrix(ncol=2, nrow=0))
 revolver.d.d (graph, vtime = V(graph)$time, etime = E(graph)$time, niter = 5, 
              sd = FALSE, norm = FALSE, cites = FALSE, expected = FALSE, 
-             error = TRUE, debug = matrix(nc = 2, nr = 0))
+             error = TRUE, debug = matrix(ncol = 2, nrow = 0))
 revolver.p.p (graph, events = get.graph.attribute(graph, "events"), 
              vtime = V(graph)$time, etime = E(graph)$time, niter = 5, sd = FALSE, 
              norm = FALSE, cites = FALSE, expected = FALSE, error = TRUE, 
-             debug = matrix(nc = 2, nr = 0)) 
+             debug = matrix(ncol = 2, nrow = 0)) 
 revolver.error.d (graph, kernel)
 revolver.error.ad (graph, kernel)
 revolver.error.ade (graph, kernel, cats)

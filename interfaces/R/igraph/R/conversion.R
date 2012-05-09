@@ -39,7 +39,7 @@ get.adjacency.dense <- function(graph, type=c("both", "upper", "lower"),
     if (! attr %in% list.edge.attributes(graph)) {
       stop("no such edge attribute")
     }
-    res <- matrix(0, nr=vcount(graph), nc=vcount(graph))
+    res <- matrix(0, nrow=vcount(graph), ncol=vcount(graph))
     if (is.directed(graph)) {
       for (i in seq(length=ecount(graph))) {
         e <- get.edge(graph, i)
@@ -150,10 +150,10 @@ get.edgelist <- function(graph, names=TRUE) {
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- matrix(.Call("R_igraph_get_edgelist", graph, TRUE,
-                      PACKAGE="igraph"), nc=2)
+                      PACKAGE="igraph"), ncol=2)
   res <- res+1
   if (names && "name" %in% list.vertex.attributes(graph)) {
-    res <- matrix(V(graph)$name[ res ], nc=2)
+    res <- matrix(V(graph)$name[ res ], ncol=2)
   }
 
   res

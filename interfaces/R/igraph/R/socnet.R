@@ -450,7 +450,7 @@ tkigraph <- function() {
   for (i in seq(.tkigraph.graphs)) {
     .tkigraph.add.graph(.tkigraph.graphs[[i]])
   }
-  if (".tkigraph.graphs" %in% ls(all=TRUE)) {
+  if (".tkigraph.graphs" %in% ls(all.names=TRUE)) {
     rm(.tkigraph.graphs)
   }
 }
@@ -1525,7 +1525,7 @@ tkigraph <- function() {
   read <- .tkigraph.dialogbox(TITLE="Draw all motifs",
                               size=list(name="Size", type="numeric",
                                 default=3, min=3, max=4),
-                              dir=list(name="Directed", type="boolean",
+                              directed=list(name="Directed", type="boolean",
                                 default="FALSE"))
 
   if (read$size < 3 || read$size > 4) {
@@ -1534,9 +1534,9 @@ tkigraph <- function() {
   }
 
   if (read$size == 3) {
-    co <- matrix( c(1,1, 0,0, 2,0), nc=2, byrow=TRUE)
+    co <- matrix( c(1,1, 0,0, 2,0), ncol=2, byrow=TRUE)
   } else {
-    co <- matrix( c(0,1, 1,1, 0,0, 1,0), nc=2, byrow=TRUE)
+    co <- matrix( c(0,1, 1,1, 0,0, 1,0), ncol=2, byrow=TRUE)
   }
 
   if (read$size == 3 && read$dir) {
@@ -1555,10 +1555,10 @@ tkigraph <- function() {
   }
   names <- as.character(seq(no))
   x11()
-  layout( matrix(1:(rows*cols), nr=rows, byrow=TRUE) )
+  layout( matrix(1:(rows*cols), nrow=rows, byrow=TRUE) )
   layout.show(rows*cols)
   for (i in seq(no)) {
-    g <- graph.isocreate(read$size, i, dir=read$dir)
+    g <- graph.isocreate(read$size, i, directed=read$dir)
     par(mai=c(0,0,0,0), mar=c(0,0,0,0))
     par(cex=2)
     plot(g, layout=co, vertex.color="red", vertex.label=NA, frame=TRUE,
@@ -1591,9 +1591,9 @@ tkigraph <- function() {
   barplot(motifs)
 
   if (read$size == 3) {
-    co <- matrix( c(1,1, 0,0, 2,0), nc=2, byrow=TRUE)
+    co <- matrix( c(1,1, 0,0, 2,0), ncol=2, byrow=TRUE)
   } else {
-    co <- matrix( c(0,1, 1,1, 0,0, 1,0), nc=2, byrow=TRUE)
+    co <- matrix( c(0,1, 1,1, 0,0, 1,0), ncol=2, byrow=TRUE)
   }
 
   if (read$size == 3 && is.directed(graphs[[gnos]])) {
@@ -1612,10 +1612,10 @@ tkigraph <- function() {
   }
   names <- as.character(seq(no))
   x11()
-  layout( matrix(1:(rows*cols), nr=rows, byrow=TRUE) )
+  layout( matrix(1:(rows*cols), nrow=rows, byrow=TRUE) )
   layout.show(rows*cols)
   for (i in seq(no)) {
-    g <- graph.isocreate(read$size, i, dir=is.directed(graphs[[gnos]]))
+    g <- graph.isocreate(read$size, i, directed=is.directed(graphs[[gnos]]))
     par(mai=c(0,0,0,0), mar=c(0,0,0,0))
     par(cex=2)
     plot(g, layout=co, vertex.color="red", vertex.label=NA, frame=TRUE,
@@ -2382,6 +2382,6 @@ matrix( c(0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
           0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,0,0,
           0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,1,
           0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,
-          0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1,0), nr=23, nc=23)
+          0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1,0), nrow=23, ncol=23)
 
 
