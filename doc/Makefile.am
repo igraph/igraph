@@ -128,8 +128,8 @@ motifs.xml: motifs.xxml $(INCLUDEDIR)/igraph_motifs.h $(SRCDIR)/motifs.c
 operators.xml: operators.xxml $(SRCDIR)/operators.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/operators.c
 
-flows.xml: flows.xxml $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c
+flows.xml: flows.xxml $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c $(SRCDIR)/cohesive_blocks.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c $(SRCDIR)/cohesive_blocks.c
 
 community.xml: community.xxml $(SRCDIR)/community.c $(SRCDIR)/clustertool.cpp $(SRCDIR)/walktrap.cpp $(SRCDIR)/fast_community.c $(SRCDIR)/optimal_modularity.c $(INCLUDEDIR)/igraph_community.h $(SRCDIR)/infomap.cc
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/community.c $(SRCDIR)/clustertool.cpp $(SRCDIR)/walktrap.cpp $(SRCDIR)/fast_community.c $(SRCDIR)/optimal_modularity.c $(INCLUDEDIR)/igraph_community.h $(SRCDIR)/infomap.cc

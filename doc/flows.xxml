@@ -39,4 +39,8 @@
 <!-- doxrox-include igraph_cohesion -->
 </section>
 
+<section><title>Cohesive Blocks</title>
+<!-- doxrox-include igraph_cohesive_blocks -->
+</section>
+
 </chapter>

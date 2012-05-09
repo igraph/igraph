@@ -158,12 +158,40 @@ igraph_bool_t igraph_i_cb_isin(const igraph_vector_t *needle,
  * \function igraph_cohesive_blocks
  * Identifies the hierarchical cohesive block structure of a graph
  * 
- * TODO
- * \param graph
- * \param blocks
- * \param cohesion
- * \param parent
- * \param block_tree
+ * Cohesive blocking is a method of determining hierarchical subsets of
+ * graph vertices based on their structural cohesion (or vertex
+ * connectivity). For a given graph G, a subset of its vertices
+ * S is said to be maximally k-cohesive if there is
+ * no superset of S with vertex connectivity greater than or equal to k.
+ * Cohesive blocking is a process through which, given a
+ * k-cohesive set of vertices, maximally l-cohesive subsets are
+ * recursively identified with l>k. Thus a hiearchy of vertex subsets
+ * is found, whith the entire graph G at its root. See the following 
+ * reference for details: J. Moody and D. R. White. Structural
+ * cohesion and embeddedness: A hierarchical concept of social
+ * groups. American Sociological Review, 68(1):103--127, Feb 2003. 
+ *
+ * </para><para>This function implements cohesive blocking and
+ * calculates the complete cohesive block hierarchy of a graph.
+ *
+ * \param graph The input graph. It must be undirected and simple. See 
+ *    \ref igraph_is_simple().
+ * \param blocks If not a null pointer, then it must be an initialized 
+ *    vector of pointers and the cohesive blocks are stored here. 
+ *    Each block is encoded with a numeric vector, that contains the 
+ *    vertex ids of the block.
+ * \param cohesion If not a null pointer, then it must be an initialized 
+ *    vector and the cohesion of the blocks is stored here, in the same 
+ *    order as the blocks in the \p blocks pointer vector.
+ * \param parent If not a null pointer, then it must be an initialized 
+ *    vector and the block hierarchy is stored here. For each block, the 
+ *    id (i.e. the position in the \p blocks pointer vector) of its 
+ *    parent block is stored. For the top block in the hierarchy, 
+ *    -1 is stored.
+ * \param block_tree If not a null pointer, then it must be a pointer 
+ *    to an uninitialized graph, and the block hierarchy is stored 
+ *    here as an igraph graph. The vertex ids correspond to the order 
+ *    of the blocks in the \p blocks vector.
  * \return Error code.
  * 
  * Time complexity: TODO.
