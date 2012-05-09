@@ -1,5 +1,5 @@
 
-R version 2.14.2 (2012-02-29)
+R version 2.15.0 (2012-03-30)
 Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
@@ -23,13 +23,6 @@ Type 'q()' to quit R.
 > treeM <- get.adjacency(tree, sparse=TRUE)
 Loading required package: Matrix
 Loading required package: lattice
-
-Attaching package: 'Matrix'
-
-The following object(s) are masked from 'package:base':
-
-    det
-
 > treeM2 <- get.adjacency(tree, sparse=FALSE)
 > 
 > args <- list(ev=1, nt=3, mtype="symmetric", algo="exact_scg",
@@ -1351,3 +1344,6 @@ $vectors
 [10,] -0.1258150+0i -0.1458723+0i
 
 > 
+> proc.time()
+   user  system elapsed 
+  3.200   0.109   3.295 

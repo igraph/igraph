@@ -1,6 +1,6 @@
 
-R version 2.12.0 (2010-10-15)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
@@ -30,13 +30,6 @@ Type 'q()' to quit R.
 > A <- get.adjacency(g, sparse=TRUE)
 Loading required package: Matrix
 Loading required package: lattice
-
-Attaching package: 'Matrix'
-
-The following object(s) are masked from 'package:base':
-
-    det
-
 > g2 <- graph.adjacency(A, mode="undirected")
 > graph.isomorphic(g, g2)
 [1] TRUE
@@ -57,3 +50,6 @@ The following object(s) are masked from 'package:base':
 [1] TRUE
 > 
 > 
+> proc.time()
+   user  system elapsed 
+  2.767   0.094   2.848 

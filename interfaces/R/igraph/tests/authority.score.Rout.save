@@ -1,6 +1,6 @@
 
-R version 2.12.0 (2010-10-15)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
@@ -81,13 +81,6 @@ Type 'q()' to quit R.
 + }
 Loading required package: Matrix
 Loading required package: lattice
-
-Attaching package: 'Matrix'
-
-The following object(s) are masked from 'package:base':
-
-    det
-
 > 
 > for (i in 1:1000) {
 +   G <- erdos.renyi.game(10, sample(1:20, 1), type="gnm")
@@ -99,3 +92,6 @@ The following object(s) are masked from 'package:base':
 +   }
 + }
 > 
+> proc.time()
+   user  system elapsed 
+ 12.043   0.244  12.284 
