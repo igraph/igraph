@@ -92,7 +92,7 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
 /* 					  igraph_matrix_t *adhesion, */
 /* 					  igraph_matrix_t *normalised_adhesion, */
 /* 					  igraph_real_t *polarization, */
-					  igraph_real_t lambda);
+					  igraph_real_t gamma_minus);
 
 /**
  * \function igraph_community_spinglass
@@ -165,11 +165,12 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
  *     implementation, this is faster, \c IGRAPH_SPINCOMM_INP_NEG selects
  *     a new implementation by Vincent Traag that allows negative edge
  *     weights.
- * \param lambda Real number. Parameter for the \c
+ * \param gamma_minus Real number. Parameter for the \c
  *     IGRAPH_SPINCOMM_IMP_NEG implementation. This
  *     specifies the balance between the importance of present and
  *     non-present negative weighted edges in a community. Smaller values of 
- *     lambda, leads to communities with lesser negative intra-connectivity.
+ *     \p gamma_minus lead to communities with lesser 
+ *     negative intra-connectivity.
  *     If this argument is set to zero, the algorithm reduces to a graph
  *     coloring algorithm, using the number of spins as the number of
  *     colors. 
@@ -201,7 +202,7 @@ int igraph_community_spinglass(const igraph_t *graph,
 /* 			       igraph_matrix_t *adhesion, */
 /* 			       igraph_matrix_t *normalised_adhesion, */
 /* 			       igraph_real_t *polarization, */
-			       igraph_real_t lambda) {
+			       igraph_real_t gamma_minus) {
   
   switch (implementation) {
   case IGRAPH_SPINCOMM_IMP_ORIG:
@@ -219,7 +220,7 @@ int igraph_community_spinglass(const igraph_t *graph,
 						 update_rule, gamma, 
 /* 						 adhesion, normalised_adhesion, */
 /* 						 polarization, */
-						 lambda);
+						 gamma_minus);
     break;
   default:
     IGRAPH_ERROR("Unknown `implementation' in spinglass community finding",
@@ -531,7 +532,7 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
 /* 					  igraph_matrix_t *adhesion, */
 /* 					  igraph_matrix_t *normalised_adhesion, */
 /* 					  igraph_real_t *polarization, */
-					  igraph_real_t lambda) {
+					  igraph_real_t gamma_minus) {
 
   unsigned long changes, runs;
   igraph_bool_t use_weights=0;
@@ -600,7 +601,7 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
   if ((stoptemp==0.0) && (starttemp==0.0)) zeroT=true; else zeroT=false;
 
   //Begin at a high enough temperature
-  kT=pm->FindStartTemp(gamma, lambda, starttemp);
+  kT=pm->FindStartTemp(gamma, gamma_minus, starttemp);
 
   /* assign random initial configuration */
   pm->assign_initial_conf(true);
@@ -615,7 +616,7 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
 		
 		runs++;
 		kT = kT*coolfact; 
-		acc=pm->HeatBathLookup(gamma, lambda, kT, 50);
+		acc=pm->HeatBathLookup(gamma, gamma_minus, kT, 50);
 		if (acc<(1.0-1.0/double(spins))*0.001)
 			changes=0; 
 		else 
@@ -630,7 +631,7 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
   IGRAPH_MATRIX_INIT_FINALLY(&normalized_adhesion, 0, 0);
   pm->WriteClusters(modularity, temperature, csize, membership, 
 		    &adhesion, &normalized_adhesion, &polarization, 
-		    kT, d_p, d_n, gamma, lambda);
+		    kT, d_p, d_n, gamma, gamma_minus);
   igraph_matrix_destroy(&normalized_adhesion);
   igraph_matrix_destroy(&adhesion);
   IGRAPH_FINALLY_CLEAN(2);

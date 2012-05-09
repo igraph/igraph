@@ -1073,7 +1073,7 @@ igraph_community_spinglass:
                 OUT REALPTR temperature, OUT VECTOR membership, OUT VECTOR csize, \
                 INTEGER spins=25, BOOLEAN parupdate=False, REAL starttemp=1, REAL stoptemp=0.01, \
                 REAL coolfact=0.99, SPINCOMMUPDATE update_rule=CONFIG, REAL gamma=1.0, \
-                REAL lambda=0, REAL d_p=0, REAL d_n=0
+                REAL gamma_minus=0, REAL d_p=0, REAL d_n=0
         IGNORE: RR, RC, RNamespace
 
 igraph_community_spinglass_single:

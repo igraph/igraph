@@ -324,7 +324,7 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
                                 stop.temp=0.01, cool.fact=0.99,
                                 update.rule=c("config", "random", "simple"),
                                 gamma=1.0, implementation=c("orig", "neg"),
-                                lambda=1.0) {
+                                gamma.minus=1.0) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -351,7 +351,7 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
                  as.numeric(start.temp),
                  as.numeric(stop.temp), as.numeric(cool.fact),
                  as.numeric(update.rule), as.numeric(gamma),
-                 as.numeric(implementation), as.numeric(lambda),
+                 as.numeric(implementation), as.numeric(gamma.minus),
                  PACKAGE="igraph")
     res$algorithm  <- "spinglass"
     res$vcount     <- vcount(graph)

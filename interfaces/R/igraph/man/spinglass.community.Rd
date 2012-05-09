@@ -11,7 +11,7 @@ spinglass.community(graph, weights=NULL, vertex=NULL, spins=25,
                     parupdate=FALSE, start.temp=1, stop.temp=0.01,
                     cool.fact=0.99, update.rule=c("config", "random",
                     "simple"), gamma=1, implementation=c("orig", "neg"),
-                    lambda=1)
+                    gamma.minus=1)
 }
 \arguments{
   \item{graph}{The input graph, can be directed but the direction of the
@@ -63,14 +63,14 @@ spinglass.community(graph, weights=NULL, vertex=NULL, spins=25,
     faster original implementation is the default. The other
     implementation, that takes into account negative weights, can be
     chosen by supplying \sQuote{neg} here.}
-  \item{lambda}{Real constant, the lambda argument of the algorithm. This
-    specifies the balance between the importance of present and
-    non-present negative weighted edges in a community. Smaller values of 
-    lambda, leads to communities with lesser negative intra-connectivity.
-    If this argument is set to zero, the algorithm reduces to a graph
-    coloring algorithm, using the number of spins as the number of
-    colors. This argument is ignored if the \sQuote{orig} implementation
-    is chosen.}
+  \item{gamma.minus}{Real constant, the gamma.minus parameter of
+    the algorithm. This specifies the balance between the importance of
+    present and non-present negative weighted edges in a
+    community. Smaller values of gamma.minus, leads to communities with
+    lesser negative intra-connectivity. If this argument is set to zero,
+    the algorithm reduces to a graph coloring algorithm, using the
+    number of spins as the number of colors. This argument is ignored if
+    the \sQuote{orig} implementation is chosen.}
 }
 \details{
   This function tries to find communities in a graph. A community is a
