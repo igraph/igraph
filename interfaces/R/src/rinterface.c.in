@@ -7252,6 +7252,12 @@ SEXP R_igraph_laplacian(SEXP graph, SEXP normalized, SEXP weights,
     } 
     IGRAPH_FINALLY(igraph_matrix_destroy, &c_res); 
   }
+  if (c_sparse) {
+    if (0 != igraph_sparsemat_init(&c_sparseres, 0, 0, 0)) {
+      igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, &c_sparseres);
+  }
   c_normalized=LOGICAL(normalized)[0];
   if (!isNull(weights)) { R_SEXP_to_vector(weights, &c_weights); }
                                         /* Call igraph */
@@ -7267,6 +7273,7 @@ SEXP R_igraph_laplacian(SEXP graph, SEXP normalized, SEXP weights,
   } else {
     PROTECT(result=R_igraph_sparsemat_to_SEXP(&c_sparseres));
     igraph_sparsemat_destroy(&c_sparseres);
+    IGRAPH_FINALLY_CLEAN(1);
   }
 
   UNPROTECT(1);
@@ -7350,6 +7357,10 @@ SEXP R_igraph_scg_adjacency(SEXP graph, SEXP matrix, SEXP sparsmat, SEXP ev,
   if (do_scg_matrix) { igraph_matrix_init(&c_scg_matrix, 0, 0); }
   if (do_L) { igraph_matrix_init(&c_L, 0, 0); }
   if (do_R) { igraph_matrix_init(&c_R, 0, 0); }
+
+  if (do_scg_sparsemat) { igraph_sparsemat_init(&c_scg_sparsemat, 0, 0, 0); }
+  if (do_Lsparse) { igraph_sparsemat_init(&c_Lsparse, 0, 0, 0); }
+  if (do_Rsparse) { igrpah_sparsemat_init(&c_Rsparse, 0, 0, 0); }
 
                                         /* Call igraph */
   c_result=igraph_scg_adjacency((isNull(graph) ? 0 : &c_graph), 
