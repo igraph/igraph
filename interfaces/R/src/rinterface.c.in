@@ -7360,7 +7360,7 @@ SEXP R_igraph_scg_adjacency(SEXP graph, SEXP matrix, SEXP sparsmat, SEXP ev,
 
   if (do_scg_sparsemat) { igraph_sparsemat_init(&c_scg_sparsemat, 0, 0, 0); }
   if (do_Lsparse) { igraph_sparsemat_init(&c_Lsparse, 0, 0, 0); }
-  if (do_Rsparse) { igrpah_sparsemat_init(&c_Rsparse, 0, 0, 0); }
+  if (do_Rsparse) { igraph_sparsemat_init(&c_Rsparse, 0, 0, 0); }
 
                                         /* Call igraph */
   c_result=igraph_scg_adjacency((isNull(graph) ? 0 : &c_graph), 
