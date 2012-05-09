@@ -115,7 +115,7 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
   
   There are some special functions which are only defined in the
   indexing expressions of vertex and edge sequences. For vertex
-  sequences these are: \code{nei}, \code{adj}, \code{from} and
+  sequences these are: \code{nei}, \code{inc}, \code{from} and
   \code{to}, \code{innei} and \code{outnei}.
 
   \code{nei} has a mandatory and an optional argument, the first is
@@ -136,20 +136,20 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
   shorthand for the \sQuote{outgoing} neighbors
   (\code{nei(v,mode="out")}).
 
-  \code{adj} takes an edge sequence as an argument and returns
-  \code{TRUE} for vertices which have at least one adjacent edge in it.
+  \code{inc} takes an edge sequence as an argument and returns
+  \code{TRUE} for vertices which have at least one incident edge in it.
 
-  \code{from} and \code{to} are similar to \code{adj} but only edges
+  \code{from} and \code{to} are similar to \code{inc} but only edges
   originated at (\code{from}) or pointing to (\code{to}) are taken into
   account.
 
-  For edge sequences the special functions are: \code{adj}, \code{from},
+  For edge sequences the special functions are: \code{inc}, \code{from},
   \code{to}, \code{\%--\%}, \code{\%->\%} and \code{\%<-\%}.
 
-  \code{adj} takes a vertex sequence as an argument and returns
-  \code{TRUE} for edges which have an adjacent vertex in it.
+  \code{inc} takes a vertex sequence as an argument and returns
+  \code{TRUE} for edges which have an incident vertex in it.
 
-  \code{from} and \code{to} are similar to \code{adj}, but only vertices
+  \code{from} and \code{to} are similar to \code{inc}, but only vertices
   at the source (\code{from}) or target (\code{to}) of the edge.
 
   The \code{\%--\%} operator selects edges connecting two vertex

@@ -105,8 +105,8 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
     outnei <- function(v, mode=c("out", "all", "in", "total")) {
       nei(v, mode)
     }
-    adj <- function(e) {
-      ## TRUE iff the vertex (in the vs) is adjacent
+    inc <- adj <- function(e) {
+      ## TRUE iff the vertex (in the vs) is incident
       ## to at least one edge in e
       if (is.logical(e)) {
         e <- which(e)
@@ -140,7 +140,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
       tmp[as.numeric(x)]
     }
     i <- eval(i, envir=c(unclass(graph)[[9]][[3]], nei=nei, innei=innei,
-                   outnei=outnei, adj=adj, from=from, to=to),
+                   outnei=outnei, adj=adj, inc=inc, from=from, to=to),
               enclos=parent.frame())
     if (is.numeric(i) || is.integer(i)) {
       i <- as.numeric(i)
@@ -177,8 +177,8 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
     # language expression, we also do attribute based indexing
     graph <- get("graph", attr(x, "env"))
     i <- substitute(i)
-    adj <- function(v) {
-      ## TRUE iff the edge is adjacent to at least one vertex in v
+    inc <- adj <- function(v) {
+      ## TRUE iff the edge is incident to at least one vertex in v
       on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
       tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v)-1,
                    as.numeric(3),
@@ -202,7 +202,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
       tmp[ as.numeric(x) ]
     }
     i <- eval(i, envir=c(unclass(graph)[[9]][[4]],
-                   adj=adj, from=from, to=to,
+                   inc=inc, adj=adj, from=from, to=to,
                    .igraph.from=list(unclass(graph)[[3]][ as.numeric(x) ]),
                    .igraph.to=list(unclass(graph)[[4]][as.numeric(x)]),
                    .igraph.graph=list(graph),
