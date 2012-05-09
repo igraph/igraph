@@ -30,7 +30,7 @@ layout.reingold.tilford(graph, \dots, params)
 layout.fruchterman.reingold.grid(graph, \dots, params)
 layout.lgl(graph, \dots, params)
 layout.graphopt(graph, ..., params=list())
-layout.mds(graph, dist=NULL, dim=2, options=igraph.arpack.default, ...)
+layout.mds(graph, dist=NULL, dim=2, options=igraph.arpack.default)
 layout.svd(graph, d=shortest.paths(graph), ...)
 layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
       zmin = NULL, zmax = NULL)
@@ -40,7 +40,12 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
   \item{params}{The list of function dependent parameters.}
   \item{dim}{Numeric constant, either 2 or 3. Some functions are able
     to generate 2d and 3d layouts as well, supply this argument to
-    change the default behavior.}
+    change the default behavior.
+
+    \code{layout.mds} supports dimensions up to the number of nodes
+    minus one, but only if the graph is connected; for undirected
+    graphs, the only possible values is 2. This is because
+    \code{layout.merge} only works in 2D.}
   \item{\dots}{Function dependent parameters, this is an alternative
     notation to the \code{params} argument. For \code{layout.auto} these
     extra parameters are simply passed to the real layout function, if
@@ -48,10 +53,6 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
   \item{dist}{The distance matrix for the multidimensional scaling.
     If \code{NULL} (the default), then the unweighted shortest path
     matrix is used.}
-  \item{dim}{Integer scalar, the dimension of the space in which the
-    graph will be embedded. Note that if the graph is unconnected, then
-    this must the 2. (The reason for this is that
-    \code{\link{layout.merge}} does not support other dimensions.)}
   \item{options}{A named list, to override some ARPACK options. See
     \code{\link{arpack}} for details.}
   \item{d}{The matrix used for singulat value decomposition. By default it
