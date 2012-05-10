@@ -137,12 +137,12 @@ plot(lay2$extd_graph, layout=lay2$res, vertex.label.cex=0.5,
 
 ## Use edge types
 E(DC)$lty <- 1
-E(DC)["BCDC++" %->% "StrongDC++"]$lty <- 2
-E(DC)["FreeDC++" %->% "EiskaltDC++"]$lty <- 2
-E(DC)["ApexDC++" %->% "FlylinkDC++ ver <= 4xx"]$lty <- 2
-E(DC)["ApexDC++" %->% "DiCe!++"]$lty <- 2
-E(DC)["StrongDC++ SQLite" %->% "FlylinkDC++ ver >= 5xx"]$lty <- 2
-E(DC)["GreylinkDC++" %->% "AvaLink"]$lty <- 2
+E(DC)["BCDC++" \%->\% "StrongDC++"]$lty <- 2
+E(DC)["FreeDC++" \%->\% "EiskaltDC++"]$lty <- 2
+E(DC)["ApexDC++" \%->\% "FlylinkDC++ ver <= 4xx"]$lty <- 2
+E(DC)["ApexDC++" \%->\% "DiCe!++"]$lty <- 2
+E(DC)["StrongDC++ SQLite" \%->\% "FlylinkDC++ ver >= 5xx"]$lty <- 2
+E(DC)["GreylinkDC++" \%->\% "AvaLink"]$lty <- 2
 
 plot(lay2$extd_graph, layout=lay2$res, vertex.label.cex=0.5,
      edge.arrow.size=.5, vertex.color="white",
