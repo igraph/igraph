@@ -13,8 +13,9 @@ layout.sugiyama (graph, layers = NULL, hgap = 1, vgap = 1, maxiter = 100,
 \arguments{
   \item{graph}{The input graph.}
   \item{layers}{A numeric vector or \code{NULL}. If not \code{NULL},
-    then it should specify the layer index of the vertices. If
-    \code{NULL}, then igraph calculates the layers automatically.}
+    then it should specify the layer index of the vertices. Layers are
+    numbered from one. If \code{NULL}, then igraph calculates the layers
+    automatically.}
   \item{hgap}{Real scalar, the minimum horizontal gap between vertices
     in the same layer.}
   \item{vgap}{Real scalar, the distance between layers.}
@@ -52,7 +53,8 @@ layout.sugiyama (graph, layers = NULL, hgap = 1, vgap = 1, maxiter = 100,
     the dummy vertices. Use the top rows as coordinates for the original
     vertices.}
   \item{extd_graph}{The original graph, extended with dummy vertices.}
-  \item{extd_to_orig_eids}{TODO}
+  \item{extd_to_orig_eids}{Mapping from the edges of the extended graph
+    to the edges of the original graph.}
 }
 \references{
   K. Sugiyama, S. Tagawa and M. Toda, "Methods for Visual Understanding
@@ -63,6 +65,93 @@ layout.sugiyama (graph, layers = NULL, hgap = 1, vgap = 1, maxiter = 100,
   Tamas Nepusz \email{ntamas@gmail.com}
 }
 \examples{
-# TODO
+## Data taken from http://tehnick-8.narod.ru/dc_clients/
+DC <- graph.formula("DC++" -+
+                "LinuxDC++":"BCDC++":"EiskaltDC++":"StrongDC++":"DiCe!++",
+                "LinuxDC++" -+ "FreeDC++", "BCDC++" -+ "StrongDC++",
+                "FreeDC++" -+ "BMDC++":"EiskaltDC++",
+                "StrongDC++" -+ "AirDC++":"zK++":"ApexDC++":"TkDC++",
+                "StrongDC++" -+ "StrongDC++ SQLite":"RSX++",
+                "ApexDC++" -+ "FlylinkDC++ ver <= 4xx",
+                "ApexDC++" -+ "ApexDC++ Speed-Mod":"DiCe!++",
+                "StrongDC++ SQLite" -+ "FlylinkDC++ ver >= 5xx",
+                "ApexDC++ Speed-Mod" -+ "FlylinkDC++ ver <= 4xx",
+                "ApexDC++ Speed-Mod" -+ "GreylinkDC++",
+                "FlylinkDC++ ver <= 4xx" -+ "FlylinkDC++ ver >= 5xx",
+                "FlylinkDC++ ver <= 4xx" -+ AvaLink,
+                "GreylinkDC++" -+ AvaLink:"RayLinkDC++":"SparkDC++":PeLink)
+
+## Layers, as on the plot
+layers <- list(c("DC++"),
+               c("LinuxDC++", "BCDC++"),
+               c("FreeDC++", "StrongDC++"),
+               c("BMDC++", "EiskaltDC++", "AirDC++", "zK++", "ApexDC++",
+                 "TkDC++", "RSX++"),
+               c("StrongDC++ SQLite", "ApexDC++ Speed-Mod", "DiCe!++"),
+               c("FlylinkDC++ ver <= 4xx", "GreylinkDC++"),
+               c("FlylinkDC++ ver >= 5xx", "AvaLink", "RayLinkDC++",
+                 "SparkDC++", "PeLink"))
+
+## Check that we have all nodes
+all(sort(unlist(layers)) == sort(V(DC)$name))
+
+## Create a similar layout using the predefined layers
+lay1 <- layout.sugiyama(DC, layers=apply(sapply(layers,
+                        function(x) V(DC)$name \%in\% x), 1, which))
+
+## Flip vertically
+lay1$res[,2] <- max(lay1$res[,2]) - lay1$res[,2] + 1
+
+## Simple plot, not vey nice
+labels <- lapply(V(DC)$name, function(x)
+          paste(strwrap(x, 12), collapse="\n"))
+par(mar=rep(.1, 4))
+plot(DC, layout=lay1$res[1:vcount(DC),], vertex.label=labels,
+     edge.arrow.size=.5, vertex.color="white",
+     vertex.shape="rectangle", vertex.label.cex=0.5,
+     vertex.size=20, vertex.size2=10)
+
+## Sugiyama plot
+origvert <- c(rep(TRUE, vcount(DC)), rep(FALSE, nrow(lay1$res)-vcount(DC)))
+realedge <- get.edgelist(lay1$extd_graph)[,2] <= vcount(DC)
+plot(lay1$extd_graph, layout=lay1$res, vertex.label.cex=0.5,
+     edge.arrow.size=.5, vertex.color="white",
+     vertex.size=ifelse(origvert, 20, 0),
+     vertex.size2=ifelse(origvert, 10, 0),
+     vertex.shape=ifelse(origvert, "rectangle", "none"),
+     vertex.label=ifelse(origvert, labels, ""),
+     edge.arrow.mode=ifelse(realedge, 2, 0))
+
+## The same with automatic layer calculation
+lay2 <- layout.sugiyama(DC)
+lay2$res[,2] <- max(lay2$res[,2]) - lay2$res[,2] + 1
+origvert <- c(rep(TRUE, vcount(DC)), rep(FALSE, nrow(lay2$res)-vcount(DC)))
+realedge <- get.edgelist(lay2$extd_graph)[,2] <= vcount(DC)
+plot(lay2$extd_graph, layout=lay2$res, vertex.label.cex=0.5,
+     edge.arrow.size=.5, vertex.color="white",
+     vertex.size=ifelse(origvert, 20, 0),
+     vertex.size2=ifelse(origvert, 10, 0),
+     vertex.shape=ifelse(origvert, "rectangle", "none"),
+     vertex.label=ifelse(origvert, labels, ""),
+     edge.arrow.mode=ifelse(realedge, 2, 0))
+
+## Use edge types
+E(DC)$lty <- 1
+E(DC)["BCDC++" %->% "StrongDC++"]$lty <- 2
+E(DC)["FreeDC++" %->% "EiskaltDC++"]$lty <- 2
+E(DC)["ApexDC++" %->% "FlylinkDC++ ver <= 4xx"]$lty <- 2
+E(DC)["ApexDC++" %->% "DiCe!++"]$lty <- 2
+E(DC)["StrongDC++ SQLite" %->% "FlylinkDC++ ver >= 5xx"]$lty <- 2
+E(DC)["GreylinkDC++" %->% "AvaLink"]$lty <- 2
+
+plot(lay2$extd_graph, layout=lay2$res, vertex.label.cex=0.5,
+     edge.arrow.size=.5, vertex.color="white",
+     vertex.size=ifelse(origvert, 20, 0),
+     vertex.size2=ifelse(origvert, 10, 0),
+     vertex.shape=ifelse(origvert, "rectangle", "none"),
+     vertex.label=ifelse(origvert, labels, ""),
+     edge.arrow.mode=ifelse(realedge, 2, 0),
+     edge.lty=E(DC)$lty[lay2$extd_to_orig_eids])
+
 }
 \keyword{graphs}
