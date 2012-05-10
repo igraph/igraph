@@ -153,5 +153,58 @@ plot(lay2$extd_graph, layout=lay2$res, vertex.label.cex=0.5,
      edge.arrow.mode=ifelse(realedge, 2, 0),
      edge.lty=E(DC)$lty[lay2$extd_to_orig_eids])
 
+## Another example, from the following paper:
+## Markus Eiglsperger, Martin Siebenhaller, Michael Kaufmann:
+## An Efficient Implementation of Sugiyama’s Algorithm for
+## Layered Graph Drawing
+
+ex <- graph.formula( 0 -+ 29: 6: 5:20: 4,
+                     1 -+ 12,
+                     2 -+ 23: 8,
+                     3 -+  4,
+                     4,
+                     5 -+  2:10:14:26: 4: 3,
+                     6 -+  9:29:25:21:13,
+                     7,
+                     8 -+ 20:16,
+                     9 -+ 28: 4,
+                    10 -+ 27,
+                    11 -+  9:16,
+                    12 -+  9:19,
+                    13 -+ 20,
+                    14 -+ 10,
+                    15 -+ 16:27,
+                    16 -+ 27,
+                    17 -+  3,
+                    18 -+ 13,
+                    19 -+  9,
+                    20 -+  4,
+                    21 -+ 22,
+                    22 -+  8: 9,
+                    23 -+  9:24,
+                    24 -+ 12:15:28,
+                    25 -+ 11,
+                    26 -+ 18,
+                    27 -+ 13:19,
+                    28 -+  7,
+                    29 -+ 25                    )
+
+layers <- list( 0, c(5, 17), c(2, 14, 26, 3), c(23, 10, 18), c(1, 24),
+                12, 6, c(29,21), c(25,22), c(11,8,15), 16, 27, c(13,19),
+                c(9, 20), c(4, 28), 7 )
+
+layex <- layout.sugiyama(ex, layers=apply(sapply(layers,
+                        function(x) V(ex)$name \%in\% as.character(x)),
+                        1, which))
+layex$res[,2] <- max(layex$res[,2]) - layex$res[,2] + 1
+
+origvert <- c(rep(TRUE, vcount(ex)), rep(FALSE, nrow(layex$res)-vcount(ex)))
+realedge <- get.edgelist(layex$extd_graph)[,2] <= vcount(ex)
+plot(layex$extd_graph, layout=layex$res, vertex.label.cex=0.5,
+     edge.arrow.size=.5, 
+     vertex.size=ifelse(origvert, 5, 0),
+     vertex.shape=ifelse(origvert, "square", "none"),
+     vertex.label=ifelse(origvert, V(ex)$name, ""),
+     edge.arrow.mode=ifelse(realedge, 2, 0))
 }
 \keyword{graphs}
