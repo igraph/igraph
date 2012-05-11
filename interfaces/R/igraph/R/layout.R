@@ -745,3 +745,109 @@ layout.auto <- function(graph, dim=2, ...) {
   }
   
 }
+
+layout.sugiyama <- function(graph, layers=NULL, hgap=1, vgap=1,
+                            maxiter=100, weights=NULL,
+                            attributes=c("default", "all", "none")) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (!is.null(layers)) layers <- as.numeric(layers)-1
+  hgap <- as.numeric(hgap)
+  vgap <- as.numeric(vgap)
+  maxiter <- as.integer(maxiter)
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
+    weights <- E(graph)$weight 
+  } 
+  if (!is.null(weights) && any(!is.na(weights))) { 
+    weights <- as.numeric(weights) 
+  } else { 
+    weights <- NULL 
+  }
+  attributes <- igraph.match.arg(attributes)
+  
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_layout_sugiyama", graph, layers, hgap,
+               vgap, maxiter, weights, PACKAGE="igraph")
+
+  # Flip the y coordinates, more natural this way
+  res$res[,2] <- max(res$res[,2]) - res$res[,2] + 1
+
+  # Separate real and dummy vertices
+  vc <- vcount(graph)
+  res$layout <- res$res[seq_len(vc),]
+  if (nrow(res$res)==vc) {
+    res$layout.dummy <- matrix(nrow=0, ncol=2)
+  } else {
+    res$layout.dummy <- res$res[(vc+1):nrow(res$res),]
+  }
+  
+  # Add some attributes to the extended graph
+  E(res$extd_graph)$orig <- res$extd_to_orig_eids
+  res$extd_to_orig_eids <- NULL
+
+  res$extd_graph <- set.vertex.attribute(res$extd_graph, "dummy",
+                                         value=c(rep(FALSE, vc),
+                                           rep(TRUE, nrow(res$res)-vc)))
+
+  res$extd_graph$layout <- rbind(res$layout, res$layout.dummy)
+
+  if (attributes=="default" || attributes=="all") {
+    if ("size" %in% list.vertex.attributes(graph)) {
+      V(res$extd_graph)$size <- 0
+      V(res$extd_graph)$size[ !V(res$extd_graph)$dummy ] <- V(graph)$size
+    }
+    if ("size2" %in% list.vertex.attributes(graph)) {
+      V(res$extd_graph)$size2 <- 0
+      V(res$extd_graph)$size2[ !V(res$extd_graph)$dummy ] <- V(graph)$size2
+    }
+    if ("shape" %in% list.vertex.attributes(graph)) {
+      V(res$extd_graph)$shape <- "none"
+      V(res$extd_graph)$shape[ !V(res$extd_graph)$dummy ] <- V(graph)$shape
+    }
+    if ("label" %in% list.vertex.attributes(graph)) {
+      V(res$extd_graph)$label <- ""
+      V(res$extd_graph)$label[ !V(res$extd_graph)$dummy ] <- V(graph)$label
+    }
+    if ("color" %in% list.vertex.attributes(graph)) {
+      V(res$extd_graph)$color <- head(V(graph)$color, 1)
+      V(res$extd_graph)$color[ !V(res$extd_graph)$dummy ] <- V(graph)$color
+    }
+    eetar <- get.edgelist(res$extd_graph, names=FALSE)[,2]
+    E(res$extd_graph)$arrow.mode <- 0
+    if ("arrow.mode" %in% list.edge.attributes(graph)) {
+      E(res$extd_graph)$arrow.mode[ eetar <= vc ] <- E(graph)$arrow.mode
+    } else {
+      E(res$extd_graph)$arrow.mode[ eetar <= vc ] <- is.directed(graph) * 2
+    }
+    if ("arrow.size" %in% list.edge.attributes(graph)) {
+      E(res$extd_graph)$arrow.size <- 0
+      E(res$extd_graph)$arrow.size[ eetar <= vc ] <- E(graph)$arrow.size
+    }
+  }
+
+  if (attributes=="all") {
+    gatt <- setdiff(list.graph.attributes(graph), "layout")
+    vatt <- setdiff(list.vertex.attributes(graph),
+                    c("size", "size2", "shape", "label", "color"))
+    eatt <- setdiff(list.edge.attributes(graph),
+                    c("arrow.mode", "arrow.size"))
+    for (ga in gatt) {
+      res$extd_graph <- set.graph.attribute(res$extd_graph, ga,
+                                            get.graph.attribute(graph, ga))
+    }
+    for (va in vatt) {
+      notdummy <- which(!V(res$extd_graph)$dummy)
+      res$extd_graph <- set.vertex.attribute(res$extd_graph, va,
+                                             notdummy,
+                                             get.vertex.attribute(graph, va))
+    }
+    for (ea in eatt) {
+      eanew <- get.edge.attribute(graph, ea)[E(res$extd_graph)$orig]
+      res$extd_graph <- set.edge.attribute(res$extd_graph, ea, value=eanew)
+    }
+  }
+  
+  res$res <- NULL
+  res
+}

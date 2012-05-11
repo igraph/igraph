@@ -8,7 +8,7 @@
 }
 \usage{
 layout.sugiyama (graph, layers = NULL, hgap = 1, vgap = 1, maxiter = 100, 
-    weights = NULL) 
+    weights = NULL, attributes = c("default", "all", "none")) 
 }
 \arguments{
   \item{graph}{The input graph.}
@@ -25,6 +25,12 @@ layout.sugiyama (graph, layers = NULL, hgap = 1, vgap = 1, maxiter = 100,
   \item{weights}{Optional edge weight vector. If \code{NULL}, then the
     'weight' edge attribute is used, if there is one. Supply \code{NA}
     here and igraph ignores the edge weights.}
+  \item{attributes}{Which graph/vertex/edge attributes to keep in the
+    extended graph. \sQuote{default} keeps the \sQuote{size},
+    \sQuote{size2}, \sQuote{shape}, \sQuote{label} and \sQuote{color}
+    vertex attributes and the \sQuote{arrow.mode} and
+    \sQuote{arrow.size} edge attributes. \sQuote{all} keep all graph,
+    vertex and edge attributes, \sQuote{none} keeps none of them.}
 }
 \details{
   This layout algorithm is designed for directed acyclic graphs where each
@@ -49,12 +55,15 @@ layout.sugiyama (graph, layers = NULL, hgap = 1, vgap = 1, maxiter = 100,
 }
 \value{
   A list with the components:
-  \item{res}{The layout, a two-column matrix, including coordinates for
-    the dummy vertices. Use the top rows as coordinates for the original
+  \item{layout}{The layout, a two-column matrix, for the original graph
     vertices.}
-  \item{extd_graph}{The original graph, extended with dummy vertices.}
-  \item{extd_to_orig_eids}{Mapping from the edges of the extended graph
-    to the edges of the original graph.}
+  \item{layout.dummy}{The layout for the dummy vertices, a two column
+    matrix.}
+  \item{extd_graph}{The original graph, extended with dummy vertices.
+    The \sQuote{dummy} vertex attribute is set on this graph, 
+    it is a logical attributes, and it tells you whether the vertex is a
+    dummy vertex. The \sQuote{layout} graph attribute is also set, and
+    it is the layout matrix for all (original and dummy) vertices.}
 }
 \references{
   K. Sugiyama, S. Tagawa and M. Toda, "Methods for Visual Understanding
@@ -81,6 +90,15 @@ DC <- graph.formula("DC++" -+
                 "FlylinkDC++ ver <= 4xx" -+ AvaLink,
                 "GreylinkDC++" -+ AvaLink:"RayLinkDC++":"SparkDC++":PeLink)
 
+## Use edge types
+E(DC)$lty <- 1
+E(DC)["BCDC++" \%->\% "StrongDC++"]$lty <- 2
+E(DC)["FreeDC++" \%->\% "EiskaltDC++"]$lty <- 2
+E(DC)["ApexDC++" \%->\% "FlylinkDC++ ver <= 4xx"]$lty <- 2
+E(DC)["ApexDC++" \%->\% "DiCe!++"]$lty <- 2
+E(DC)["StrongDC++ SQLite" \%->\% "FlylinkDC++ ver >= 5xx"]$lty <- 2
+E(DC)["GreylinkDC++" \%->\% "AvaLink"]$lty <- 2
+
 ## Layers, as on the plot
 layers <- list(c("DC++"),
                c("LinuxDC++", "BCDC++"),
@@ -95,68 +113,36 @@ layers <- list(c("DC++"),
 ## Check that we have all nodes
 all(sort(unlist(layers)) == sort(V(DC)$name))
 
+## Add some graphical parameters
+V(DC)$color <- "white"
+V(DC)$shape <- "rectangle"
+V(DC)$size <- 20
+V(DC)$size2 <- 10
+V(DC)$label <- lapply(V(DC)$name, function(x)
+                      paste(strwrap(x, 12), collapse="\n"))
+E(DC)$arrow.size <- 0.5
+
 ## Create a similar layout using the predefined layers
 lay1 <- layout.sugiyama(DC, layers=apply(sapply(layers,
                         function(x) V(DC)$name \%in\% x), 1, which))
 
-## Flip vertically
-lay1$res[,2] <- max(lay1$res[,2]) - lay1$res[,2] + 1
-
-## Simple plot, not vey nice
-labels <- lapply(V(DC)$name, function(x)
-          paste(strwrap(x, 12), collapse="\n"))
+## Simple plot, not very nice
 par(mar=rep(.1, 4))
-plot(DC, layout=lay1$res[1:vcount(DC),], vertex.label=labels,
-     edge.arrow.size=.5, vertex.color="white",
-     vertex.shape="rectangle", vertex.label.cex=0.5,
-     vertex.size=20, vertex.size2=10)
+plot(DC, layout=lay1$layout, vertex.label.cex=0.5)
 
 ## Sugiyama plot
-origvert <- c(rep(TRUE, vcount(DC)), rep(FALSE, nrow(lay1$res)-vcount(DC)))
-realedge <- get.edgelist(lay1$extd_graph)[,2] <= vcount(DC)
-plot(lay1$extd_graph, layout=lay1$res, vertex.label.cex=0.5,
-     edge.arrow.size=.5, vertex.color="white",
-     vertex.size=ifelse(origvert, 20, 0),
-     vertex.size2=ifelse(origvert, 10, 0),
-     vertex.shape=ifelse(origvert, "rectangle", "none"),
-     vertex.label=ifelse(origvert, labels, ""),
-     edge.arrow.mode=ifelse(realedge, 2, 0))
+plot(lay1$extd_graph, vertex.label.cex=0.5)
 
 ## The same with automatic layer calculation
-lay2 <- layout.sugiyama(DC)
-lay2$res[,2] <- max(lay2$res[,2]) - lay2$res[,2] + 1
-origvert <- c(rep(TRUE, vcount(DC)), rep(FALSE, nrow(lay2$res)-vcount(DC)))
-realedge <- get.edgelist(lay2$extd_graph)[,2] <= vcount(DC)
-plot(lay2$extd_graph, layout=lay2$res, vertex.label.cex=0.5,
-     edge.arrow.size=.5, vertex.color="white",
-     vertex.size=ifelse(origvert, 20, 0),
-     vertex.size2=ifelse(origvert, 10, 0),
-     vertex.shape=ifelse(origvert, "rectangle", "none"),
-     vertex.label=ifelse(origvert, labels, ""),
-     edge.arrow.mode=ifelse(realedge, 2, 0))
-
-## Use edge types
-E(DC)$lty <- 1
-E(DC)["BCDC++" \%->\% "StrongDC++"]$lty <- 2
-E(DC)["FreeDC++" \%->\% "EiskaltDC++"]$lty <- 2
-E(DC)["ApexDC++" \%->\% "FlylinkDC++ ver <= 4xx"]$lty <- 2
-E(DC)["ApexDC++" \%->\% "DiCe!++"]$lty <- 2
-E(DC)["StrongDC++ SQLite" \%->\% "FlylinkDC++ ver >= 5xx"]$lty <- 2
-E(DC)["GreylinkDC++" \%->\% "AvaLink"]$lty <- 2
-
-plot(lay2$extd_graph, layout=lay2$res, vertex.label.cex=0.5,
-     edge.arrow.size=.5, vertex.color="white",
-     vertex.size=ifelse(origvert, 20, 0),
-     vertex.size2=ifelse(origvert, 10, 0),
-     vertex.shape=ifelse(origvert, "rectangle", "none"),
-     vertex.label=ifelse(origvert, labels, ""),
-     edge.arrow.mode=ifelse(realedge, 2, 0),
-     edge.lty=E(DC)$lty[lay2$extd_to_orig_eids])
+## Keep vertex/edge attributes in the extended graph
+lay2 <- layout.sugiyama(DC, attributes="all")
+plot(lay2$extd_graph, vertex.label.cex=0.5)
 
 ## Another example, from the following paper:
 ## Markus Eiglsperger, Martin Siebenhaller, Michael Kaufmann:
-## An Efficient Implementation of Sugiyama’s Algorithm for
-## Layered Graph Drawing
+## An Efficient Implementation of Sugiyama's Algorithm for
+## Layered Graph Drawing, Journal of Graph Algorithms and
+## Applications 9, 305--325 (2005).
 
 ex <- graph.formula( 0 -+ 29: 6: 5:20: 4,
                      1 -+ 12,
@@ -196,11 +182,10 @@ layers <- list( 0, c(5, 17), c(2, 14, 26, 3), c(23, 10, 18), c(1, 24),
 layex <- layout.sugiyama(ex, layers=apply(sapply(layers,
                         function(x) V(ex)$name \%in\% as.character(x)),
                         1, which))
-layex$res[,2] <- max(layex$res[,2]) - layex$res[,2] + 1
 
-origvert <- c(rep(TRUE, vcount(ex)), rep(FALSE, nrow(layex$res)-vcount(ex)))
+origvert <- c(rep(TRUE, vcount(ex)), rep(FALSE, nrow(layex$layout.dummy)))
 realedge <- get.edgelist(layex$extd_graph)[,2] <= vcount(ex)
-plot(layex$extd_graph, layout=layex$res, vertex.label.cex=0.5,
+plot(layex$extd_graph, vertex.label.cex=0.5,
      edge.arrow.size=.5, 
      vertex.size=ifelse(origvert, 5, 0),
      vertex.shape=ifelse(origvert, "square", "none"),

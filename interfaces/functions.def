@@ -1030,6 +1030,7 @@ igraph_layout_sugiyama:
                 EDGEWEIGHTS weights=NULL
         DEPS: weights ON graph
         NAME-R: layout.sugiyama
+        IGNORE: RR
 
 igraph_layout_mds:
         PARAMS: GRAPH graph, OUT MATRIX res, MATRIX_OR_0 dist=NULL, \
