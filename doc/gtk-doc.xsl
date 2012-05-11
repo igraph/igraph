@@ -22,7 +22,7 @@
   <xsl:param name="chunker.output.encoding" select="'US-ASCII'"/>
   <xsl:param name="chunker.output.indent" select="'yes'"/>
   <xsl:param name="chunk.fast" select="1"/> 
-  <xsl:param name="chunk.section.depth" select="2"/> 
+  <xsl:param name="chunk.section.depth" select="1"/> 
   <xsl:param name="chunk.first.sections" select="1"/> 
   <xsl:param name="chapter.autolabel" select="1"/>
   <xsl:param name="section.autolabel" select="1"/>
