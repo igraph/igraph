@@ -109,6 +109,7 @@
   <chapter>
     <title>Advenced igraph programming</title>
     <xi:include href="threading.xml" />
+    <xi:include href="progress.xml" />
   </chapter>
 
   <xi:include href="nongraph.xml"/>  

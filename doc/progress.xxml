@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<section id="igraph-Progress">
+<title>Progress handlers</title>
+
+<section>
+<!-- doxrox-include about_progress_handlers -->
+</section>
+
+<section><title>Setting up progress handlers</title>
+<!-- doxrox-include igraph_progress_handler_t -->
+<!-- doxrox-include igraph_set_progress_handler -->
+<!-- doxrox-include igraph_progress_handler_stderr -->
+</section>
+
+<section><title>Invoking the progress handler</title>
+<!-- doxrox-include IGRAPH_PROGRESS -->
+<!-- doxrox-include igraph_progress -->
+<!-- doxrox-include igraph_progressf -->
+</section>
+
+<section>
+<!-- doxrox-include writing_progress_handlers -->
+</section>
+
+<section>
+<!-- doxrox-include igraph_functions_with_progress -->
+</section>
+
+<section>
+<!-- doxrox-include progress_and_threads -->
+</section>
+
+</section>
