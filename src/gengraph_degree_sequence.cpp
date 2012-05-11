@@ -26,10 +26,10 @@
 
 #include "igraph_statusbar.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <assert.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
+#include <cassert>
 #include <vector>
 
 // using namespace __gnu_cxx;

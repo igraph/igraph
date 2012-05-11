@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "gengraph_box_list.h"
-#include <assert.h>
+#include <cassert>
 
 namespace gengraph {
 

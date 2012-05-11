@@ -19,10 +19,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "gengraph_definitions.h"
-#include <assert.h>
+#include <cassert>
 #include <cstdlib>
-#include <stdio.h>
-#include <math.h>
+#include <cstdio>
+#include <cmath>
 
 #include "gengraph_qsort.h"
 #include "gengraph_hash.h"

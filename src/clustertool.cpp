@@ -46,9 +46,9 @@
 #endif
 
 #include <iostream>
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
+#include <cstdlib>
+#include <cstdio>
+#include <ctime>
 
 #include "NetDataTypes.h"
 #include "NetRoutines.h"

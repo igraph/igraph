@@ -28,7 +28,7 @@
 #include <vector>
 #include <map>
 #include <utility>
-#include <limits.h>
+#include <climits>
 
 #include "igraph_random.h"
 

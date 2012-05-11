@@ -27,9 +27,9 @@
 #endif
 
 #include "gengraph_powerlaw.h"
-#include <stdio.h>
-#include <math.h>
-#include <assert.h>
+#include <cstdio>
+#include <cmath>
+#include <cassert>
 
 #include "igraph_error.h"
 

@@ -29,7 +29,7 @@
    homePage: http://www.irit.fr/~Emmanuel.Navarro/
 */
 
-#include <math.h>
+#include <cmath>
 #include "igraph_interface.h"
 #include "igraph_community.h"
 #include "igraph_interrupt_internal.h"

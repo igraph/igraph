@@ -19,9 +19,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "gengraph_definitions.h"
-#include <assert.h>
-#include <stdio.h>
-#include <math.h>
+#include <cassert>
+#include <cstdio>
+#include <cmath>
 #include <limits>
 
 #include "gengraph_qsort.h"
