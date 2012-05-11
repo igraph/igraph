@@ -170,7 +170,7 @@ get.edges <- function(graph, es) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_edges", graph, as.igraph.es(graph, es)-1,
                PACKAGE="igraph")
-  matrix(res, nc=2, byrow=TRUE)+1
+  matrix(res, ncol=2, byrow=TRUE)+1
 }
 
 get.edge.ids <- function(graph, vp, directed=TRUE, error=FALSE, multi=FALSE) {
