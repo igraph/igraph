@@ -91,6 +91,20 @@ void test_weighted() {
   long int no_of_edges;
   igraph_real_t weights_array[] = { 4, 1, 3, 2, 5, 8, 6, 7 };
 
+  igraph_real_t edges_array1[] = { 2, 3, 0, 1, 4, 7, 5, 6 };
+  igraph_real_t edges_array2[] = { 2, 3, 6, 5, 0, 1, 4, 7 };
+  igraph_real_t eb_array1[] = { 4, 5, 3+1/3.0, 4, 2.5, 4, 1, 1 };
+  igraph_real_t eb_array2[] = { 4, 5, 3+1/3.0, 6, 1.5, 2, 1, 1 };
+  
+  igraph_vector_t edges_sol1, edges_sol2, eb_sol1, eb_sol2;
+
+  igraph_vector_view(&edges_sol1, edges_array1, 
+		     sizeof(edges_array1)/sizeof(double));
+  igraph_vector_view(&edges_sol2, edges_array2, 
+		     sizeof(edges_array2)/sizeof(double));
+  igraph_vector_view(&eb_sol1, eb_array1, sizeof(eb_array1)/sizeof(double));
+  igraph_vector_view(&eb_sol2, eb_array2, sizeof(eb_array2)/sizeof(double));
+
   /* Small graph as follows: A--B--C--A, A--D--E--A, B--D, C--E */
   igraph_small(&g, 0, IGRAPH_UNDIRECTED, 
       0, 1, 0, 2, 0, 3, 0, 4, 1, 2, 1, 3, 2, 4, 3, 4, -1);
@@ -104,16 +118,16 @@ void test_weighted() {
 				    IGRAPH_UNDIRECTED,
 				    &weights);
   
-  no_of_edges=igraph_ecount(&g);
-  for (i=0; i<no_of_edges; i++) {
-    printf("%li ", (long int)VECTOR(edges)[i]);
+  if (!igraph_vector_all_e(&edges_sol1, &edges) && 
+      !igraph_vector_all_e(&edges_sol2, &edges)) {
+    printf("Error.\n");
+    exit(2);
   }
-  printf("\n");
-  
-  for (i=0; i<no_of_edges; i++) {
-    printf("%.2f ", VECTOR(eb)[i]);
+  if (!igraph_vector_all_e(&eb_sol1, &eb) && 
+      !igraph_vector_all_e(&eb_sol2, &eb)) {
+    printf("Error.\n");
+    exit(2);
   }
-  printf("\n");
 
   /* Try it once again without storage space for edges */
   igraph_community_edge_betweenness(&g, 0, &eb, 0 /*merges */,
@@ -121,10 +135,12 @@ void test_weighted() {
 				    /*membership=*/ 0,
 				    IGRAPH_UNDIRECTED,
 				    &weights);
-  for (i=0; i<no_of_edges; i++) {
-    printf("%.2f ", VECTOR(eb)[i]);
+
+  if (!igraph_vector_all_e(&eb_sol1, &eb) && 
+      !igraph_vector_all_e(&eb_sol2, &eb)) {
+    printf("Error.\n");
+    exit(2);
   }
-  printf("\n");
 
   igraph_vector_destroy(&eb);
   igraph_vector_destroy(&edges);
