@@ -604,7 +604,53 @@ int IGRAPH_FINALLY_STACK_SIZE(void);
                  } } while (0)
 
 
+/**
+ * \section about_igraph_warnings Warning messages
+ * 
+ * <para>
+ * Igraph also supports warning messages in addition to error 
+ * messages. Warning messages typically do not terminate the 
+ * program, but they are usually crucial to the user.
+ * </para>
+ * 
+ * <para>
+ * Igraph warning are handled similarly to errors. There is a 
+ * separate warning handler function that is called whenever
+ * an igraph function triggers a warning. This handler can be 
+ * set by the \ref igraph_set_warning_handler() function. There are 
+ * two predefined simple warning handlers, 
+ * \ref igraph_warning_handler_ignore() and 
+ * \ref igraph_warning_handler_print(), the latter being the default.
+ * </para>
+ * 
+ * <para>
+ * To trigger a warning, igraph functions typically use the 
+ * \ref IGRAPH_WARNING() macro, the \ref igraph_warning() function, 
+ * or if more flexibility is needed, \ref igraph_warningf().
+ * </para>
+ */
+
+/**
+ * \typedef igraph_warning_handler_t
+ * Type of igraph warning handler functions
+ * 
+ * Currently it is defined to have the same type as 
+ * \ref igraph_error_handler_t, although the last (error code)
+ * argument is not used.
+ */
+
 typedef igraph_error_handler_t igraph_warning_handler_t;
+
+/**
+ * \function igraph_set_warning_handler
+ * Install a warning handler
+ * 
+ * Install the supplied warning handler function.
+ * \param new_handler The new warning handler function to install.
+ *        Supply a null pointer here to uninstall the current 
+ *        warning handler, without installing a new one.
+ * \return The current warning handler function.
+ */
 
 igraph_warning_handler_t*
 igraph_set_warning_handler(igraph_warning_handler_t* new_handler);
@@ -612,11 +658,54 @@ igraph_set_warning_handler(igraph_warning_handler_t* new_handler);
 extern igraph_warning_handler_t igraph_warning_handler_ignore;
 extern igraph_warning_handler_t igraph_warning_handler_print;
 
+/**
+ * \function igraph_warning
+ * Trigger a warning
+ * 
+ * Call this function if you want to trigger a warning from within 
+ * a function that uses igraph.
+ * \param reason Textual description of the warning.
+ * \param file The source file in which the warning was noticed.
+ * \param line The number of line in the source file which triggered the
+ *         warning.
+ * \param igraph_errno Warnings could have potentially error codes as well, 
+ *        but this is currently not used in igraph.
+ * \return The supplied error code.
+ */
+
 int igraph_warning(const char *reason, const char *file, int line,
 		   int igraph_errno);
 
+/**
+ * \function igraph_warningf
+ * Trigger a warning, more flexible printf-like syntax
+ * 
+ * This function is similar to \ref igraph_warning(), but
+ * uses a printf-like syntax. It substitutes the additional arguments 
+ * into the \p reason template string and calls \ref igraph_warning().
+ * \param reason Textual description of the warning, a template string
+ *        with the same syntax as the standard printf C library function.
+ * \param file The source file in which the warning was noticed.
+ * \param line The number of line in the source file which triggered the
+ *         warning.
+ * \param igraph_errno Warnings could have potentially error codes as well, 
+ *        but this is currently not used in igraph.
+ * \param ... The additional arguments to be substituted into the 
+ *        template string.
+ * \return The supplied error code.
+ */
+
 int igraph_warningf(const char *reason, const char *file, int line, 
 		    int igraph_errno, ...);
+
+/**
+ * \define IGRAPH_WARNING
+ * Trigger a warning.
+ * 
+ * This is the usual way of triggering a warning from an igraph
+ * function. It calls \ref igraph_warning().
+ * \param reason The warning message.
+ */
 
 #define IGRAPH_WARNING(reason) \
        do { \

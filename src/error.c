@@ -197,11 +197,39 @@ int IGRAPH_FINALLY_STACK_SIZE(void) {
 
 static IGRAPH_THREAD_LOCAL igraph_warning_handler_t *igraph_i_warning_handler=0;
 
+/**
+ * \function igraph_warning_handler_ignore
+ * Ignore all warnings
+ *
+ * This warning handler function simply ignores all warnings.
+ * \param reason Textual description of the warning.
+ * \param file The source file in which the warning was noticed.
+ * \param line The number of line in the source file which triggered the
+ *         warning..
+ * \param igraph_errno Warnings could have potentially error codes as well, 
+ *        but this is currently not used in igraph.
+ */
+
 void igraph_warning_handler_ignore (const char *reason, const char *file,
 				   int line, int igraph_errno) {
 }
 
 #ifndef USING_R
+
+/**
+ * \function igraph_warning_handler_print
+ * Print all warning to the standard error
+ *
+ * This warning handler function simply prints all warnings to the 
+ * standard error.
+ * \param reason Textual description of the warning.
+ * \param file The source file in which the warning was noticed.
+ * \param line The number of line in the source file which triggered the
+ *         warning..
+ * \param igraph_errno Warnings could have potentially error codes as well, 
+ *        but this is currently not used in igraph.
+ */
+
 void igraph_warning_handler_print (const char *reason, const char *file,
 				   int line, int igraph_errno) {
   fprintf(stderr, "Warning: %s in file %s, line %i\n", reason, file, line);

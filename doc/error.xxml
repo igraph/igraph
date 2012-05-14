@@ -25,6 +25,17 @@
 <!-- doxrox-include igraph_strerror -->
 </section>
 
+<section id="igraph-warnings">
+<!-- doxrox-include about_igraph_warnings -->
+<!-- doxrox-include igraph_warning_handler_t -->
+<!-- doxrox-include igraph_set_warning_handler -->
+<!-- doxrox-include IGRAPH_WARNING -->
+<!-- doxrox-include igraph_warning -->
+<!-- doxrox-include igraph_warningf -->
+<!-- doxrox-include igraph_warning_handler_ignore -->
+<!-- doxrox-include igraph_warning_handler_print -->
+</section>
+
 <section id="igraph-erroradvancedtopics">
 <title>Advanced topics</title>
 
