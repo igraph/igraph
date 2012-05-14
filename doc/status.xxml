@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<section id="igraph-Status">
+<title>Status handlers</title>
+
+<section>
+<!-- doxrox-include about_status_handlers -->
+</section>
+
+<section><title>Setting up status handlers</title>
+<!-- doxrox-include igraph_status_handler_t -->
+<!-- doxrox-include igraph_set_status_handler -->
+<!-- doxrox-include igraph_status_handler_stderr -->
+</section>
+
+<section><title>Invoking the status handler</title>
+<!-- doxrox-include IGRAPH_STATUS -->
+<!-- doxrox-include IGRAPH_STATUSF -->
+<!-- doxrox-include igraph_status -->
+<!-- doxrox-include igraph_statusf -->
+</section>
+
+</section>
