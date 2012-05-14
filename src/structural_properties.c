@@ -6485,6 +6485,13 @@ int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
   long int maxdeg;
   igraph_vector_t deghist;
   igraph_real_t mynan=IGRAPH_NAN;
+  igraph_bool_t simple;
+
+  IGRAPH_CHECK(igraph_is_simple(graph, &simple));
+  if (!simple) {
+    IGRAPH_ERROR("Average nearest neighbor degree Works only with "
+		 "simple graphs", IGRAPH_EINVAL);
+  }
 
   if (weights) { 
     return igraph_i_avg_nearest_neighbor_degree_weighted(graph, vids, knn, knnk,
