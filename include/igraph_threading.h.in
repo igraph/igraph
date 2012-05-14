@@ -36,6 +36,13 @@
 
 __BEGIN_DECLS
 
+/** 
+ * \define IGRAPH_THREAD_SAFE
+ * 
+ * Macro that is defined to be 1 if the current build of the 
+ * igraph library is thread-safe, and 0 if it is not.
+ */
+
 #define IGRAPH_THREAD_SAFE @HAVE_TLS@
 
 __END_DECLS
