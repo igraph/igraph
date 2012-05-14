@@ -239,6 +239,9 @@ else
 fi
 
 if test "$internal_arpack" = "no"; then
+  if test "$tls_support" = "yes"; then
+    AC_MSG_ERROR([Thread-local storage only supported with internal ARPACK library])
+  fi
   AC_CHECK_LIB([arpack], [dsaupd_], [],
      AC_CHECK_LIB([arpack], [dsaupd], [],
         AC_CHECK_LIB([arpack], [DSAUPD_], [],
