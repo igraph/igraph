@@ -122,6 +122,7 @@ igraph_full:
 
 igraph_full_citation:
         PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=True
+        GATTR-R: name IS Full citation graph
 
 igraph_atlas:
         PARAMS: OUT GRAPH graph, INT number=0
@@ -154,6 +155,7 @@ igraph_famous:
 igraph_lcf_vector:
         PARAMS: OUT GRAPH graph, INTEGER n, VECTOR shifts, INTEGER repeats=1
         NAME-R: graph.lcf
+        GATTR-R: name IS LCF graph
 
 igraph_adjlist:
         PARAMS: OUT GRAPH graph, ADJLIST adjlist, NEIMODE mode=OUT, \
@@ -270,12 +272,14 @@ igraph_forest_fire_game:
         PARAMS: OUT GRAPH graph, INTEGER nodes, REAL fw_prob, REAL bw_factor=1, \
                 INTEGER ambs=1, BOOLEAN directed=True
         NAME-R: forest.fire.game
+        GATTR-R: name IS Forest fire model
         FLAGS: PROGRESS
 
 igraph_simple_interconnected_islands_game:
         PARAMS: OUT GRAPH graph, INTEGER islands_n, INTEGER islands_size, \
                 REAL islands_pin, INTEGER n_inter
         NAME-R: interconnected.islands.game
+        GATTR-R: name IS Interconnected islands model
         IGNORE: RC
 
 igraph_static_fitness_game:
@@ -283,6 +287,7 @@ igraph_static_fitness_game:
                 VECTOR_OR_0 fitness_in=NULL, BOOLEAN loops=False, \
                 BOOLEAN multiple=False
         NAME-R: static.fitness.game
+        GATTR-R: name IS Static fitness model
         FLAGS: PROGRESS
 
 igraph_static_power_law_game:
@@ -291,6 +296,7 @@ igraph_static_power_law_game:
                 BOOLEAN loops=False, BOOLEAN multiple=False, \
 		BOOLEAN finite_size_correction=True
         NAME-R: static.power.law.game
+        GATTR-R: name IS Static power law model
         FLAGS: PROGRESS
                 
 #######################################
@@ -1186,6 +1192,7 @@ igraph_hrg_fit:
 igraph_hrg_game:
         PARAMS: OUT GRAPH graph, HRG hrg
         NAME-R: hrg.game
+        GATTR-R: name IS Hierarchical random graph model
 
 igraph_hrg_dendrogram:
         PARAMS: OUT GRAPH graph, HRG hrg
