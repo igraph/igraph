@@ -44,6 +44,9 @@ igraph.par(parid, parvalue = NULL)
     \item{add.params}{Logical scalar, whether to add model
       parameter to the graphs that are created by the various
       graph constructors. By default it is \code{TRUE}.}
+    \item{add.vertex.names}{Logical scalar, whether to add
+      vertex names to node level indices, like degree, betweenness
+      scores, etc. By default it is \code{TRUE}.}
     \item{edge.attr.comb}{Specifies what to do with the edge
       attributes if the graph is modified. The default value is
       \code{list(weight="sum", name="concat", "ignore")}. See

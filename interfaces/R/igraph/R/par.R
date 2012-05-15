@@ -29,7 +29,8 @@
                       "ignore"),
                      "sparsematrices"=TRUE,
                      "nexus.url"="http://nexus.igraph.org",
-                     "add.params"=TRUE
+                     "add.params"=TRUE,
+                     "add.vertex.names"=TRUE
                     )
 
 igraph.pars.set.verbose <- function(verbose) {

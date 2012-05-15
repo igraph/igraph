@@ -121,7 +121,7 @@ path.length.hist (graph, directed = TRUE)
   appears twice in the histogram.
 }
 \value{
-  For \code{shortest.paths} a numeric matrix with \code{vcount(graph)}
+  For \code{shortest.paths} a numeric matrix with \code{length(to)}
   columns and \code{length(v)} rows. The shortest path length from a vertex to
   itself is always zero. For unreachable vertices \code{Inf} is included.
 
