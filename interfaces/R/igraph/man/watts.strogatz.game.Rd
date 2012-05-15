@@ -6,7 +6,8 @@
 \description{Generate a graph according to the Watts-Strogatz network
   model.}
 \usage{
-watts.strogatz.game(dim, size, nei, p, loops=FALSE, multiple=FALSE)
+watts.strogatz.game(dim, size, nei, p, loops = FALSE, multiple = FALSE,
+                    add.params = getIgraphOpt("add.params"))
 }
 \arguments{
   \item{dim}{Integer constant, the dimension of the starting lattice.}
@@ -20,6 +21,9 @@ watts.strogatz.game(dim, size, nei, p, loops=FALSE, multiple=FALSE)
     generated graph.}
   \item{multiple}{Logical scalar, whether multiple edges are allowed
     int the generated graph.}
+  \item{add.params}{Logical scalar, whether to add model parameters
+    \sQuote{dim}, \sQuote{size}, \sQuote{nei}, \sQuote{p},
+    \sQuote{loops}, \sQuote{multiple} as a graph attributes.}
 }
 \details{
   First a lattice is created with the given \code{dim}, \code{size} and

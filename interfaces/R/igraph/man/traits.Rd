@@ -7,9 +7,11 @@
 }
 \usage{
 callaway.traits.game (nodes, types, edge.per.step = 1, type.dist = rep(1, 
-    types), pref.matrix = matrix(1, types, types), directed = FALSE) 
+    types), pref.matrix = matrix(1, types, types), directed = FALSE,
+    add.params = getIgraphOpt("add.params")) 
 establishment.game(nodes, types, k = 1, type.dist = rep(1, types),
-    pref.matrix = matrix(1, types, types), directed = FALSE) 
+    pref.matrix = matrix(1, types, types), directed = FALSE,
+    add.params = getIgraphOpt("add.params")) 
 }
 \arguments{
   \item{nodes}{The number of vertices in the graph.}
@@ -23,6 +25,10 @@ establishment.game(nodes, types, k = 1, type.dist = rep(1, types),
   \item{directed}{Logical constant, whether to generate directed
     graphs.}
   \item{k}{The number of trials per time step, see details below.}
+  \item{add.params}{Logical scalar, whether to add model parameters
+    (\sQuote{types}, \sQuote{edge.per.step}, \sQuote{k},
+    \sQuote{type.dist}, \sQuote{pref.matrix}) as graph attributes to the
+    graph.}
 }
 \details{
   For \code{callaway.traits.game} the simulation goes like this: in each

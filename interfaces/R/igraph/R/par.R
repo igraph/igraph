@@ -28,7 +28,8 @@
                     "edge.attr.comb"=list(weight="sum", name="concat",
                       "ignore"),
                      "sparsematrices"=TRUE,
-                     "nexus.url"="http://nexus.igraph.org"
+                     "nexus.url"="http://nexus.igraph.org",
+                     "add.params"=TRUE
                     )
 
 igraph.pars.set.verbose <- function(verbose) {

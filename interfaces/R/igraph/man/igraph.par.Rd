@@ -41,25 +41,28 @@ igraph.par(parid, parvalue = NULL)
   
   The currently used parameters in alphabetical order:
   \describe{
-    \item{edge.attr.comb:}{Specifies what to do with the edge
+    \item{add.params}{Logical scalar, whether to add model
+      parameter to the graphs that are created by the various
+      graph constructors. By default it is \code{TRUE}.}
+    \item{edge.attr.comb}{Specifies what to do with the edge
       attributes if the graph is modified. The default value is
       \code{list(weight="sum", name="concat", "ignore")}. See
       \code{\link{attribute.combination}} for details on this.}
     \item{nexus.url}{The base URL of the default Nexus server. See
       \code{\link{nexus}} for details.}
-    \item{print.edge.attributes:}{Logical constant, whether to print edge
+    \item{print.edge.attributes}{Logical constant, whether to print edge
       attributes when printing graphs. Defaults to \code{FALSE}.}
-    \item{print.graph.attributes:}{Logical constant, whether to print
+    \item{print.graph.attributes}{Logical constant, whether to print
       graph attributes when printing graphs. Defaults to \code{FALSE}.}
-    \item{print.vertex.attriubutes:}{Logical constant, whether to print
+    \item{print.vertex.attributes}{Logical constant, whether to print
       vertex attributes when printing graphs. Defaults to \code{FALSE}.}
     \item{sparsematrices}{Whether to use the \code{Matrix} package for
       (sparse) matrices. It is recommended, if the user works with
       larger graphs.}
-    \item{verbose:}{Logical constant, whether igraph functions should
+    \item{verbose}{Logical constant, whether igraph functions should
       talk more than minimal. Eg. if \code{TRUE} thne some functions
       will use progress bars while computing. Defaults to \code{FALSE}.}
-    \item{vertex.attr.comb:}{Specifies what to do with the vertex
+    \item{vertex.attr.comb}{Specifies what to do with the vertex
       attributes if the graph is modified. The default value is
       \code{list(name="concat", "ignore")} See
       \code{\link{attribute.combination}} for details on this.}

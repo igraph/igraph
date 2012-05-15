@@ -5,7 +5,8 @@
 \description{Generate a random graph based on the distance of random
   point on a unit square}
 \usage{
-grg.game(nodes, radius, torus=FALSE, coords=FALSE)
+grg.game(nodes, radius, torus = FALSE, coords = FALSE,
+         add.params = getIgraphOpt("add.params"))
 }
 \arguments{
   \item{nodes}{The number of vertices in the graph.}
@@ -16,6 +17,9 @@ grg.game(nodes, radius, torus=FALSE, coords=FALSE)
   \item{coords}{Logical scalar, whether to add the positions of the
     vertices as vertex attributes called \sQuote{\code{x}} and
     \sQuote{\code{y}}.}
+  \item{add.params}{Logical scalar, whether to add the model parameters
+    \sQuote{radius} and \sQuote{torus} to the graph as graph
+    attributes.}
 }
 \details{
   First a number of points are dropped on a unit square, these points

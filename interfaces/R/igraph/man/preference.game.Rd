@@ -5,10 +5,12 @@
 \description{Generation of random graphs based on different vertex types.}
 \usage{
 preference.game(nodes, types, type.dist=rep(1, types), fixed.sizes=FALSE,
-    pref.matrix=matrix(1, types, types), directed=FALSE, loops=FALSE) 
+    pref.matrix=matrix(1, types, types), directed=FALSE, loops=FALSE,
+    add.params=getIgraphOpt("add.params")) 
 asymmetric.preference.game(nodes, types,
     type.dist.matrix=matrix(1,types,types),
-    pref.matrix = matrix(1, types, types), loops=FALSE) 
+    pref.matrix = matrix(1, types, types), loops=FALSE,
+    add.params=getIgraphOpt("add.params")) 
 }
 \arguments{
   \item{nodes}{The number of vertices in the graphs.}
@@ -27,6 +29,10 @@ asymmetric.preference.game(nodes, types,
   \item{directed}{Logical constant, whether to create a directed graph.}
   \item{loops}{Logical constant, whether self-loops are allowed in the
     graph.}
+  \item{add.params}{Logical scalar, whether to add model parameters
+    (\sQuote{types}, \sQuote{type.dist}, \sQuote{fixed.sizes},
+    \sQuote{pref.matrix}, \sQuote{loops}, \sQuote{type.dist.matrix}) as
+    graph attributes to the graph.}
 }
 \details{
   Both models generate random graphs with given vertex types. For
