@@ -1,6 +1,6 @@
 
-R version 2.12.0 (2010-10-15)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
@@ -23,9 +23,13 @@ Type 'q()' to quit R.
 > g2 <- graph.de.bruijn(2,2)
 > g3 <- line.graph(g)
 > g3
-IGRAPH D--- 4 8 -- 
+IGRAPH D--- 4 8 -- Line graph
++ attr: name (g/c)
 + edges:
 [1] 1->1 3->1 1->2 3->2 2->3 4->3 2->4 4->4
 > graph.isomorphic(g2, g3)
 [1] TRUE
 > 
+> proc.time()
+   user  system elapsed 
+  0.345   0.050   0.395 
