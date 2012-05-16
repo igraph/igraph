@@ -1881,7 +1881,8 @@ class Graph(GraphBase):
         @return: the format of the file as a string.
         """
         import os.path
-        if isinstance(filename, file):
+        if hasattr(filename, "name") and hasattr(filename, "read"):
+            # It is most likely a file
             try:
                 filename=filename.name
             except:

@@ -383,7 +383,7 @@ class Configuration(object):
           be overwritten.
         """
         stream = stream or get_user_config_file()
-        if not isinstance(stream, file):
+        if not hasattr(stream, "write") or not hasattr(stream, "close"):
             stream = open(stream, "w")
             file_was_open = True
         self._config.write(stream)
