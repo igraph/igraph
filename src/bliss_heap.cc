@@ -17,9 +17,9 @@ Copyright (C) 2003-2006 Tommi Junttila
 
 /* FSF address fixed in the above notice on 1 Oct 2009 by Tamas Nepusz */
 
-#include <cstdlib>
-#include <cstdio>
-#include <climits>
+#include <stdlib.h>
+#include <stdio.h>
+#include <limits.h>
 #include "bliss_defs.hh"
 #include "bliss_heap.hh"
 

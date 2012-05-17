@@ -21,7 +21,7 @@
 #define BLISS_DEFS_HH
 
 #include "config.h"
-#include <cassert>
+#include <assert.h>
 
 /* Define this if you have gmp and want to have exact group sizes.
  * Remember to include -lgmp in LIB in Makefile. */

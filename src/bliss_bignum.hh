@@ -20,9 +20,9 @@
 #ifndef BLISS_BIGNUM_HH
 #define BLISS_BIGNUM_HH
 
-#include <cstdlib>
-#include <cstdio>
-#include <cmath>
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
 
 #include "bliss_defs.hh"
 #include "igraph_math.h"

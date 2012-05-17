@@ -21,7 +21,7 @@ Copyright (C) 2003-2006 Tommi Junttila
 #define BLISS_KQUEUE_HH
 
 #include "bliss_defs.hh"
-#include <cstdlib>		// malloc
+#include <stdlib.h>		// malloc
 
 namespace igraph {
 
