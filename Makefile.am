@@ -2,7 +2,6 @@
 
 SUBDIRS=src tests interfaces
 DOC_FILES = 	$(top_builddir)/doc/book/Makefile.in \
-	$(top_builddir)/doc/igraph.info \
 	$(top_srcdir)/doc/Makefile.in \
 	$(top_srcdir)/doc/igraph.3
 
