@@ -324,7 +324,7 @@ void Greedy::apply(bool sort) {
     for (int i=0; i<Nnode; i++) {
       if (mod_members[i] > 0) {
 	Nmod++;
-	Msize.insert(make_pair(mod_size[i],i));
+	Msize.insert(pair<const double, int>(mod_size[i],i));
       }
     }
     for (multimap<double,int>::reverse_iterator it = Msize.rbegin(); 
