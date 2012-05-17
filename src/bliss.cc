@@ -25,7 +25,7 @@
 #include "igraph_types.h"
 #include "igraph_topology.h"
 
-#include <cstring>
+#include <string.h>
 
 using namespace igraph;
 

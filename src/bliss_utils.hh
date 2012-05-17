@@ -20,7 +20,7 @@ Copyright (C) 2003-2006 Tommi Junttila
 #ifndef BLISS_UTILS_HH
 #define BLISS_UTILS_HH
 
-#include <cstdio>
+#include <stdio.h>
 
 namespace igraph {
 

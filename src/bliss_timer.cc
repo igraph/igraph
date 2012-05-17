@@ -21,7 +21,7 @@ Copyright (C) 2003-2006 Tommi Junttila
 #ifdef HAVE_TIMES_H
 #include <sys/times.h>
 #else
-#include <ctime>
+#include <time.h>
 #endif
 #include "bliss_timer.hh"
 
