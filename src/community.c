@@ -2257,14 +2257,7 @@ int igraph_i_multilevel_community_links(const igraph_t *graph,
   return 0;
 }
 
-/* Returns gain of modularity if vertex is added into community */
-#ifdef _MSC_VER
-#  define INLINE __forceinline
-#else
-#  define INLINE inline
-#endif
-
-INLINE igraph_real_t igraph_i_multilevel_community_modularity_gain(
+igraph_real_t igraph_i_multilevel_community_modularity_gain(
   const igraph_i_multilevel_community_list *communities,
   igraph_integer_t community, igraph_integer_t vertex,
   igraph_real_t weight_all, igraph_real_t weight_inside) {
