@@ -459,6 +459,16 @@ class RRCodeGenerator(CodeGenerator):
         out.write(", ".join(call))
         out.write(",\n        PACKAGE=\"igraph\")\n")
 
+        ## Some graph attributes to add
+        if 'GATTR-R' in self.func[function].keys():
+            gattrs=self.func[function]['GATTR-R'].split(',')
+            gattrs=[ ga.split(' IS ', 1) for ga in gattrs ]
+            sstr="  res <- set.graph.attribute(res, '%s', '%s')\n"
+            for ga in gattrs:
+                aname=ga[0].strip()
+                aval=ga[1].strip().replace("'", "\\'")
+                out.write(sstr % (aname, aval))
+
         ## Set the class if requested
         if 'CLASS-R' in self.func[function].keys():
             myclass=self.func[function]['CLASS-R']
