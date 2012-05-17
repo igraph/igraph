@@ -1,6 +1,6 @@
 
-R version 2.12.0 (2010-10-15)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
@@ -20,7 +20,8 @@ Type 'q()' to quit R.
 > library(igraph)
 > 
 > graph.kautz(2,3)
-IGRAPH D--- 24 48 -- 
+IGRAPH D--- 24 48 -- Kautz graph 2-3
++ attr: name (g/c)
 + edges:
  [1]  1-> 9  1->10  2->11  2->12  3->13  3->14  4->15  4->16  5->17  5->18
 [11]  6->19  6->20  7->21  7->22  8->23  8->24  9-> 1  9-> 2 10-> 3 10-> 4
@@ -29,3 +30,6 @@ IGRAPH D--- 24 48 --
 [41] 21-> 9 21->10 22->11 22->12 23->13 23->14 24->15 24->16
 > 
 > 
+> proc.time()
+   user  system elapsed 
+  0.340   0.045   0.400 
