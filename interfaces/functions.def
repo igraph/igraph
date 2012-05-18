@@ -346,9 +346,9 @@ igraph_closeness:
         IGNORE: RR
 
 igraph_closeness_estimate:
-        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
+        PARAMS: GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL, \
                 NEIMODE mode=OUT, REAL cutoff, EDGEWEIGHTS weights=NULL
-        DEPS: vids ON graph, weights ON graph
+        DEPS: vids ON graph, weights ON graph, res ON graph vids
         NAME-R: closeness.estimate
 
 igraph_shortest_paths:
@@ -413,10 +413,10 @@ igraph_betweenness:
         FLAGS: PROGRESS
 
 igraph_betweenness_estimate:
-        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
+        PARAMS: GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL, \
                 BOOLEAN directed=True, REAL cutoff, EDGEWEIGHTS weights=NULL, \
                 BOOLEAN nobigint=True
-        DEPS: vids ON graph, weights ON graph
+        DEPS: vids ON graph, weights ON graph, res ON graph vids
         NAME-R: betweenness.estimate
         FLAGS: PROGRESS
 
@@ -435,28 +435,29 @@ igraph_edge_betweenness_estimate:
         IGNORE: RR
 
 igraph_pagerank_old:
-        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, BOOLEAN directed=True, \
-                INTEGER niter=1000, REAL eps=0.001, REAL damping=0.85, BOOLEAN old=False
-        DEPS: vids ON graph
+        PARAMS: GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL, \
+                BOOLEAN directed=True, INTEGER niter=1000, REAL eps=0.001, \
+                REAL damping=0.85, BOOLEAN old=False
+        DEPS: vids ON graph, res ON graph vids
         NAME-R: page.rank.old
 
 igraph_pagerank:
-        PARAMS: GRAPH graph, OUT VECTOR vector, OUT REALPTR value, \
-                VERTEXSET vids=ALL, BOOLEAN directed=True, REAL damping=0.85, \
-                EDGEWEIGHTS weights=NULL, \
+        PARAMS: GRAPH graph, OUT VERTEXINDEX vector, OUT REALPTR value, \
+                VERTEXSET vids=ALL, BOOLEAN directed=True, \
+                REAL damping=0.85, EDGEWEIGHTS weights=NULL, \
                 INOUT ARPACKOPT options=igraph.arpack.default
-        DEPS: vids ON graph, weights ON graph
+        DEPS: vids ON graph, weights ON graph, vector ON graph vids
         DEFAULT-R: options=igraph.arpack.default
         NAME-R: page.rank
         IGNORE: RR, RC, RNamespace
 
 igraph_personalized_pagerank:
-        PARAMS: GRAPH graph, OUT VECTOR vector, OUT REALPTR value, \
-                VERTEXSET vids=ALL, BOOLEAN directed=True, REAL damping=0.85, \
-                VECTOR_OR_0 personalized=NULL, \
+        PARAMS: GRAPH graph, OUT VERTEXINDEX vector, OUT REALPTR value, \
+                VERTEXSET vids=ALL, BOOLEAN directed=True, \
+                REAL damping=0.85, VECTOR_OR_0 personalized=NULL, \
                 EDGEWEIGHTS weights=NULL, \
                 INOUT ARPACKOPT options=igraph.arpack.default
-        DEPS: vids ON graph, weights ON graph
+        DEPS: vids ON graph, weights ON graph, vector ON graph vids
         DEFAULT-R: options=igraph.arpack.default
         NAME-R: page.rank
 
@@ -590,27 +591,28 @@ igraph_add_edge:
         IGNORE: RR, RC, RNamespace
 
 igraph_eigenvector_centrality:
-        PARAMS: GRAPH graph, OUT VECTOR vector, OUT REALPTR value, \
-                BOOLEAN directed=False, BOOLEAN scale=True, EDGEWEIGHTS weights=NULL, \
+        PARAMS: GRAPH graph, OUT VERTEXINDEX vector, OUT REALPTR value, \
+                BOOLEAN directed=False, BOOLEAN scale=True, \
+                EDGEWEIGHTS weights=NULL, \
                 INOUT ARPACKOPT options=igraph.arpack.default
-        DEPS: weights ON graph
+        DEPS: weights ON graph, vector ON graph
         DEFAULT-R: options=igraph.arpack.default
         NAME-R: evcent
 
 igraph_hub_score:
-        PARAMS: GRAPH graph, OUT VECTOR vector, OUT REALPTR value, \
+        PARAMS: GRAPH graph, OUT VERTEXINDEX vector, OUT REALPTR value, \
                 BOOLEAN scale=True, EDGEWEIGHTS weights=NULL, \
                 INOUT ARPACKOPT options=igraph.arpack.default
         DEFAULT-R: options=igraph.arpack.default
-        DEPS: weights ON graph
+        DEPS: weights ON graph, vector ON graph
         NAME-R: hub.score
 
 igraph_authority_score:
-        PARAMS: GRAPH graph, OUT VECTOR vector, OUT REALPTR value, \
+        PARAMS: GRAPH graph, OUT VERTEXINDEX vector, OUT REALPTR value, \
                 BOOLEAN scale=True, EDGEWEIGHTS weights=NULL, \
                 INOUT ARPACKOPT options=igraph.arpack.default
         DEFAULT-R: options=igraph.arpack.default
-        DEPS: weights ON graph
+        DEPS: weights ON graph, vector ON graph
         NAME-R: authority.score
 
 igraph_arpack_rssolve:
@@ -654,7 +656,7 @@ igraph_is_chordal:
         IGNORE: RR, RC
 
 igraph_avg_nearest_neighbor_degree:
-        PARAMS: GRAPH graph, VERTEXSET vids=ALL, OUT VECTOR_OR_0 knn, \
+        PARAMS: GRAPH graph, VERTEXSET vids=ALL, OUT VERTEXINDEX_OR_0 knn, \
                 OUT VECTOR_OR_0 knnk, EDGEWEIGHTS weights=NULL
         DEPS: vids ON graph, weights ON graph
         NAME-R: graph.knn

@@ -439,7 +439,7 @@ class RRCodeGenerator(CodeGenerator):
         ## completely ignored, so giving an empty CALL field is
         ## different than not giving it at all.
 
-        ## The tail of the function is also written and we're ready.
+        ## Function call
         def do_par(pname):
             t=self.types[params[pname]['type']]
             call=pname.replace("_", ".")
@@ -458,6 +458,52 @@ class RRCodeGenerator(CodeGenerator):
         call=[ c for c in call if c != "" ]
         out.write(", ".join(call))
         out.write(",\n        PACKAGE=\"igraph\")\n")
+
+        ## Output conversions
+        def do_opar(pname, realname=None, iprefix=""):
+            if realname is None: realname=pname
+            t=self.types[params[pname]['type']]
+            mode=params[pname]['mode']
+            if 'OUTCONV' in t and mode in t['OUTCONV']:
+                outconv="  " + t['OUTCONV'][mode]
+            else:
+                outconv=""
+            outconv=outconv.replace("%I%", iprefix+realname)
+
+            if pname in self.deps.keys():
+                deps = self.deps[pname]
+                for i in range(len(deps)):
+                    outconv=outconv.replace("%I"+str(i+1)+"%", deps[i])
+            return re.sub("%I[0-9]+%", "", outconv)
+
+        retpars=[ n for n,p in params.items() if p['mode'] in 
+                  ['OUT', 'INOUT'] ]
+
+        if len(retpars) <= 1:
+            outconv=[ do_opar(n, "res") for n in params.keys() ]
+        else:
+            outconv=[ do_opar(n, iprefix="res$") for n in params.keys() ]
+
+        outconv=[ o for o in outconv if o != "" ]
+
+        if len(retpars)==0:
+            # returning the return value of the function
+            rt=self.types[self.func[function]['RETURN']]
+            if 'OUTCONV' in rt:
+                retconv="  " + rt['OUTCONV']['OUT']
+            else:
+                retconv=""
+            retconv=retconv.replace("%I%", "res")
+            # TODO: %I1% etc, is not handled here!
+            ret="\n".join(outconv) + "\n" + retconv + "\n"
+        elif len(retpars)==1:
+            # returning a single output value
+            ret="\n".join(outconv) + "\n"
+        else:
+            # returning a list of output values
+            None
+            ret="\n".join(outconv) + "\n"
+        out.write(ret)
 
         ## Some graph attributes to add
         if 'GATTR-R' in self.func[function].keys():

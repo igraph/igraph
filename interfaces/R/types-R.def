@@ -20,6 +20,18 @@ BOOLEAN:
 VECTOR:
     INCONV: %I% <- as.numeric(%I%)
 
+VERTEXINDEX:
+    OUTCONV: 
+        OUT:  if (getIgraphOpt("add.vertex.names") && is.named(%I1%)) { \
+                names(%I%) <- get.vertex.attribute(%I1%, "name", %I2%) \
+              }
+
+VERTEXINDEX_OR_0:
+    OUTCONV: 
+        OUT:  if (getIgraphOpt("add.vertex.names") && is.named(%I1%)) { \
+                names(%I%) <- get.vertex.attribute(%I1%, "name", %I2%) \
+              }
+
 VECTOR_LONG:
     INCONV: %I% <- as.integer(%I%)
 
@@ -95,15 +107,18 @@ INT:
     INCONV: %I% <- as.integer(%I%)
 
 VERTEXSET:
-    INCONV: %I% <- as.igraph.vs(%I1%, %I%)-1
+    INCONV: %I% <- as.igraph.vs(%I1%, %I%)
+    CALL: %I%-1
     DEFAULT:
        ALL: V(%I1%)
 
 VERTEX:
-    INCONV: %I% <- as.igraph.vs(%I1%, %I%)-1
+    INCONV: %I% <- as.igraph.vs(%I1%, %I%)
+    CALL: %I%-1
 
 EDGESET:
-    INCONV: %I% <- as.igraph.es(%I1%, %I%)-1
+    INCONV: %I% <- as.igraph.es(%I1%, %I%)
+    CALL: %I%-1
     DEFAULT:
        ALL: E(%I1%)
 
