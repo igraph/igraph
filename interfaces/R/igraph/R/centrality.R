@@ -69,6 +69,10 @@ subgraph.centrality <- function(graph, diag=FALSE) {
   A <- get.adjacency(graph)
   if (!diag) { diag(A) <- 0 }
   eig <- eigen(A)
-  eig$vectors^2 %*% exp(eig$values)
+  res <- as.vector(eig$vectors^2 %*% exp(eig$values))
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) { 
+    names(res) <- get.vertex.attribute(graph, "name") 
+  }
+  res
 }
 

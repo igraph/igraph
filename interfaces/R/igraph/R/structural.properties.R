@@ -591,13 +591,17 @@ bonpow <- function(graph, nodes=V(graph),
                    rescale=FALSE, tol=1e-7, sparse=TRUE){
 
   nodes <- as.igraph.vs(graph, nodes)
-  if (sparse) {
-    if (require(Matrix)) {
-      return(bonpow.sparse(graph, nodes, loops, exponent, rescale, tol))
-    }
-  } 
+  if (sparse && require(Matrix)) {
+    res <- bonpow.sparse(graph, nodes, loops, exponent, rescale, tol)
+  }  else {
+    res <- bonpow.dense(graph, nodes, loops, exponent, rescale, tol)
+  }
 
-  bonpow.dense(graph, nodes, loops, exponent, rescale, tol)
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    names(res) <- get.vertex.attribute(graph, "name", nodes)
+  }
+  
+  res
 }
 
 alpha.centrality.dense <- function(graph, nodes=V(graph), alpha=1,
@@ -685,13 +689,17 @@ alpha.centrality <- function(graph, nodes=V(graph), alpha=1,
                              tol=1e-7, sparse=TRUE) {
 
   nodes <- as.igraph.vs(graph, nodes)
-  if (sparse) {
-    if (require(Matrix)) {
-      return(alpha.centrality.sparse(graph, nodes, alpha, loops,
-                                     exo, weights, tol))
-    }
-  } 
-  alpha.centrality.dense(graph, nodes, alpha, loops, exo, weights, tol)  
+  if (sparse && require(Matrix)) {
+    res <- alpha.centrality.sparse(graph, nodes, alpha, loops,
+                                   exo, weights, tol)
+  } else {
+    res <- alpha.centrality.dense(graph, nodes, alpha, loops,
+                                  exo, weights, tol)
+  }
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    names(res) <- get.vertex.attribute(graph, "name", nodes)
+  }
+  res
 }
 
 
@@ -764,8 +772,12 @@ graph.coreness <- function(graph, mode=c("all", "out", "in")) {
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_coreness", graph, as.numeric(mode),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_coreness", graph, as.numeric(mode),
+               PACKAGE="igraph")
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    names(res) <- get.vertex.attribute(graph, "name")
+  }
+  res
 }
 
 topological.sort <- function(graph, mode=c("out", "all", "in")) {

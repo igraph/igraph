@@ -658,13 +658,13 @@ igraph_is_chordal:
 igraph_avg_nearest_neighbor_degree:
         PARAMS: GRAPH graph, VERTEXSET vids=ALL, OUT VERTEXINDEX_OR_0 knn, \
                 OUT VECTOR_OR_0 knnk, EDGEWEIGHTS weights=NULL
-        DEPS: vids ON graph, weights ON graph
+        DEPS: vids ON graph, weights ON graph, knn ON graph vids
         NAME-R: graph.knn
 
 igraph_strength:
-        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
+        PARAMS: GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL, \
                 NEIMODE mode=ALL, BOOLEAN loops=True, EDGEWEIGHTS weights=NULL
-        DEPS: vids ON graph, weights ON graph
+        DEPS: vids ON graph, weights ON graph, res ON graph vids
 
 igraph_centralization:
         PARAMS: VECTOR scores, REAL theoretical_max=0, BOOLEAN normalized=True
@@ -742,9 +742,9 @@ igraph_contract_vertices:
         NAME-R: contract.vertices
 
 igraph_eccentricity:
-        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
+        PARAMS: GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL, \
                 NEIMODE mode=ALL
-        DEPS: vids ON graph
+        DEPS: vids ON graph, res ON graph vids
         NAME-R: eccentricity
 
 igraph_radius:
@@ -752,9 +752,9 @@ igraph_radius:
         NAME-R: radius
 
 igraph_diversity:
-        PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VECTOR res, \
+        PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VERTEXINDEX res, \
                 VERTEXSET vids=ALL
-        DEPS: weights ON graph, vids ON graph
+        DEPS: weights ON graph, vids ON graph, res ON graph vids
 
 #######################################
 # Visitors

@@ -25,16 +25,28 @@ cocitation <- function(graph, v=V(graph)) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  v <- as.igraph.vs(graph, v)
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_cocitation", graph, as.igraph.vs(graph, v)-1,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_cocitation", graph, v-1,
+               PACKAGE="igraph")
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    rownames(res) <- get.vertex.attribute(graph, "name", v)
+    colnames(res) <- get.vertex.attribute(graph, "name")
+  }
+  res
 }
 
 bibcoupling <- function(graph, v=V(graph)) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  v <- as.igraph.vs(graph, v)
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_bibcoupling", graph, as.igraph.vs(graph, v)-1,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_bibcoupling", graph, v-1,
+               PACKAGE="igraph")
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    rownames(res) <- get.vertex.attribute(graph, "name", v)
+    colnames(res) <- get.vertex.attribute(graph, "name")
+  }
+  res
 }
