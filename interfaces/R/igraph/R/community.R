@@ -26,14 +26,18 @@
 
 membership <- function(communities) {
   if (!is.null(communities$membership)) {
-    return(communities$membership)
+    res <- communities$membership
   } else if (!is.null(communities$merges) &&
              !is.null(communities$modularity)) {
-    return(community.to.membership2(communities$merges, communities$vcount,
-                                    which.max(communities$modularity)))
+    res <- community.to.membership2(communities$merges, communities$vcount,
+                                    which.max(communities$modularity))
   } else {
     stop("Cannot calculate community membership")
   }
+  if (!is.null(communities$names)) {
+    names(res) <- communities$names
+  }
+  res
 }
 
 print.communities <- function(x, ...) {
@@ -174,8 +178,9 @@ as.dendrogram.communities <- function(object, hang=-1,
 
   storage.mode(object$merges) <- "integer"
   
-  if (is.null(object$labels))
-    object$labels <- 1:(nrow(object$merges)+1)
+  if (is.null(object$names)) {
+    object$names <- 1:(nrow(object$merges)+1)
+  }
   z <- list()
   if (!use.modularity || is.null(object$modularity)) {
     object$height <- 1:nrow(object$merges)
@@ -198,7 +203,7 @@ as.dendrogram.communities <- function(object, hang=-1,
       zk <- as.list(x)
       attr(zk, "members") <- two
       attr(zk, "midpoint") <- 0.5 # mean( c(0,1) )
-      objlabels <- object$labels[x]
+      objlabels <- object$names[x]
       attr(zk[[1]], "label") <- objlabels[1]
       attr(zk[[2]], "label") <- objlabels[2]
       attr(zk[[1]], "members") <- attr(zk[[2]], "members") <- one
@@ -218,7 +223,7 @@ as.dendrogram.communities <- function(object, hang=-1,
         (.memberDend(zk[[1]]) + attr(z[[X[1 + isL]]], "midpoint"))/2
       attr(zk[[2 - isL]], "members") <- one
       attr(zk[[2 - isL]], "height") <- h0
-      attr(zk[[2 - isL]], "label") <- object$labels[x[2 - isL]]
+      attr(zk[[2 - isL]], "label") <- object$names[x[2 - isL]]
       attr(zk[[2 - isL]], "leaf") <- TRUE
       }
     else {                        # two nodes
@@ -356,6 +361,9 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
     res$algorithm  <- "spinglass"
     res$vcount     <- vcount(graph)
     res$membership <- res$membership + 1
+    if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+      res$names <- get.vertex.attribute(graph, "name")
+    }
     class(res) <- "communities"
   } else {
     res <- .Call("R_igraph_spinglass_my_community", graph, weights,
@@ -368,7 +376,7 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
 }
 
 walktrap.community <- function(graph, weights=E(graph)$weight, steps=4,
-                               merges=TRUE, modularity=TRUE, labels=TRUE,
+                               merges=TRUE, modularity=TRUE,
                                membership=TRUE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
@@ -386,8 +394,8 @@ walktrap.community <- function(graph, weights=E(graph)$weight, steps=4,
   res <- .Call("R_igraph_walktrap_community", graph, weights, as.numeric(steps),
         as.logical(merges), as.logical(modularity), as.logical(membership),
         PACKAGE="igraph")
-  if (labels && "name" %in% list.vertex.attributes(graph)) {
-    res$labels <- V(graph)$name
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    res$names <- V(graph)$name
   }
 
   res$vcount <- vcount(graph)
@@ -402,7 +410,7 @@ edge.betweenness.community <- function(graph, weights=E(graph)$weight,
                                        directed=TRUE,
                                        edge.betweenness=TRUE,
                                        merges=TRUE, bridges=TRUE,
-                                       labels=TRUE, modularity=TRUE,
+                                       modularity=TRUE,
                                        membership=TRUE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
@@ -419,8 +427,8 @@ edge.betweenness.community <- function(graph, weights=E(graph)$weight,
                as.logical(merges), as.logical(bridges),
                as.logical(modularity), as.logical(membership),
                PACKAGE="igraph")
-  if (labels && "name" %in% list.vertex.attributes(graph)) {
-    res$labels <- V(graph)$name
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    res$names <- V(graph)$name
   }
   res$vcount <- vcount(graph)
   res$algorithm <- "edge betweenness"
@@ -456,6 +464,9 @@ fastgreedy.community <- function(graph, merges=TRUE, modularity=TRUE,
   res <- .Call("R_igraph_community_fastgreedy", graph, as.logical(merges),
                as.logical(modularity), as.logical(membership), weights,
                PACKAGE="igraph")
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    res$names <- V(graph)$name
+  }
   res$algorithm <- "fast greedy"
   res$vcount <- vcount(graph)
   res$membership <- res$membership + 1
@@ -504,6 +515,9 @@ leading.eigenvector.community <- function(graph, steps=-1, start=NULL,
                options, start, callback, extra, env,
                environment(igraph.i.levc.arp),
                PACKAGE="igraph")
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    res$names <- V(graph)$name
+  }
   res$algorithm <- "leading eigenvector"
   res$vcount <- vcount(graph)
   res$membership <- res$membership + 1
@@ -513,7 +527,8 @@ leading.eigenvector.community <- function(graph, steps=-1, start=NULL,
   res
 }
 
-label.propagation.community <- function(graph, weights=NULL, initial=NULL, fixed=NULL) {
+label.propagation.community <- function(graph, weights=NULL, initial=NULL,
+                                        fixed=NULL) {
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
   if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
@@ -531,6 +546,9 @@ label.propagation.community <- function(graph, weights=NULL, initial=NULL, fixed
   # Function call
   res <- .Call("R_igraph_community_label_propagation", graph, weights, initial, fixed,
         PACKAGE="igraph")
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    res$names <- V(graph)$name
+  }
   res$vcount <- vcount(graph)
   res$algorithm <- "label propagation"
   res$membership <- res$membership + 1
@@ -554,6 +572,9 @@ multilevel.community <- function(graph, weights=NULL) {
   # Function call
   res <- .Call("R_igraph_community_multilevel", graph, weights,
         PACKAGE="igraph")
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    res$names <- V(graph)$name
+  }
   res$vcount <- vcount(graph)
   res$algorithm <- "multi level"
   res$membership <- res$membership + 1
@@ -570,6 +591,9 @@ optimal.community <- function(graph) {
   # Function call
   res <- .Call("R_igraph_community_optimal_modularity", graph,
                getIgraphOpt("verbose"), PACKAGE="igraph")
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    res$names <- V(graph)$name
+  }
   res$vcount <- vcount(graph)
   res$algorithm <- "optimal"
   res$membership <- res$membership + 1
@@ -606,6 +630,9 @@ infomap.community <- function(graph, e.weights=NULL, v.weights=NULL,
                v.weights, nb.trials,
                PACKAGE="igraph")
 
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    res$names <- V(graph)$name
+  }
   res$vcount <- vcount(graph)
   res$algorithm <- "infomap"
   res$membership <- res$membership + 1
