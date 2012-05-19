@@ -273,6 +273,7 @@ igraph_forest_fire_game:
                 INTEGER ambs=1, BOOLEAN directed=True
         NAME-R: forest.fire.game
         GATTR-R: name IS Forest fire model
+        GATTR-PARAM-R: fw_prob, bw_factor, ambs
         FLAGS: PROGRESS
 
 igraph_simple_interconnected_islands_game:
@@ -280,6 +281,7 @@ igraph_simple_interconnected_islands_game:
                 REAL islands_pin, INTEGER n_inter
         NAME-R: interconnected.islands.game
         GATTR-R: name IS Interconnected islands model
+        GATTR-PARAM-R: islands_n, islands_size, islands_pin, n_inter
         IGNORE: RC
 
 igraph_static_fitness_game:
@@ -288,6 +290,7 @@ igraph_static_fitness_game:
                 BOOLEAN multiple=False
         NAME-R: static.fitness.game
         GATTR-R: name IS Static fitness model
+        GATTR-PARAM-R: loops, multiple
         FLAGS: PROGRESS
 
 igraph_static_power_law_game:
@@ -297,6 +300,8 @@ igraph_static_power_law_game:
 		BOOLEAN finite_size_correction=True
         NAME-R: static.power.law.game
         GATTR-R: name IS Static power law model
+        GATTR-PARAM-R: exponent_out, exponent_in, loops, multiple, \
+                       finite_size_correction
         FLAGS: PROGRESS
                 
 #######################################

@@ -25,7 +25,7 @@ Type 'q()' to quit R.
 > E(g)$name <- letters[1:ecount(g)]
 > delete.edges(g, c("b", "d", "e"))
 IGRAPH U--- 10 7 -- Ring graph
-+ attr: name (g/c), name (e/c)
++ attr: name (g/c), mutual (g/x), circular (g/x), name (e/c)
 + edges and their attributes:
         edge
 ['a']  1-- 2
@@ -41,7 +41,7 @@ IGRAPH U--- 10 7 -- Ring graph
 > V(g)$name <- letters[1:vcount(g)]
 > delete.edges(g, c("a|b", "f|g", "c|b"))
 IGRAPH UN-- 10 7 -- Ring graph
-+ attr: name (g/c), name (v/c)
++ attr: name (g/c), mutual (g/x), circular (g/x), name (v/c)
 + edges (vertex names):
 [1] c--d d--e e--f g--h h--i i--j a--j
 > 
@@ -49,7 +49,7 @@ IGRAPH UN-- 10 7 -- Ring graph
 > g <- graph.ring(10)
 > delete.edges(g, c("1|2", "8|7", "1|10"))
 IGRAPH U--- 10 7 -- Ring graph
-+ attr: name (g/c)
++ attr: name (g/c), mutual (g/x), circular (g/x)
 + edges:
 [1] 2-- 3 3-- 4 4-- 5 5-- 6 6-- 7 8-- 9 9--10
 > 
@@ -59,7 +59,8 @@ IGRAPH U--- 10 7 -- Ring graph
 > E(g)$name <- LETTERS[1:ecount(g)]
 > delete.edges(g, c("a|b", "F", "j|i"))
 IGRAPH UN-- 10 7 -- Ring graph
-+ attr: name (g/c), name (v/c), name (e/c)
++ attr: name (g/c), mutual (g/x), circular (g/x), name (v/c), name
+  (e/c)
 + edges (vertex names) and their attributes:
       edge
 ['B'] b--c
@@ -72,4 +73,4 @@ IGRAPH UN-- 10 7 -- Ring graph
 > 
 > proc.time()
    user  system elapsed 
-  0.363   0.048   0.423 
+  0.360   0.045   0.392 

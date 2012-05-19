@@ -515,6 +515,14 @@ class RRCodeGenerator(CodeGenerator):
                 aval=ga[1].strip().replace("'", "\\'")
                 out.write(sstr % (aname, aval))
 
+        ## Add some parameters as graph attributes
+        if 'GATTR-PARAM-R' in self.func[function].keys():
+            pars=self.func[function]['GATTR-PARAM-R'].split(',')
+            pars=[ p.strip().replace("_", ".") for p in pars ]
+            sstr="  res <- set.graph.attribute(res, '%s', %s)\n"
+            for p in pars:
+                out.write(sstr % (p, p))
+
         ## Set the class if requested
         if 'CLASS-R' in self.func[function].keys():
             myclass=self.func[function]['CLASS-R']

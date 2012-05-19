@@ -15,8 +15,7 @@
 aging.prefatt.game (n, pa.exp, aging.exp, m = NULL, aging.bin = 300,
      out.dist = NULL, out.seq = NULL, out.pref = FALSE,
      directed = TRUE, zero.deg.appeal = 1, zero.age.appeal = 0,
-     deg.coef = 1, age.coef = 1, time.window = NULL,
-     add.params = getIgraphOpt("add.params"))
+     deg.coef = 1, age.coef = 1, time.window = NULL)
 }
 \arguments{
   \item{n}{The number of vertices in the graph.}
@@ -53,12 +52,6 @@ aging.prefatt.game (n, pa.exp, aging.exp, m = NULL, aging.bin = 300,
   \item{time.window}{Integer constant, if NULL only adjacent added in
     the last \code{time.windows} time steps are counted as a basis of
     the preferential attachment. See also details below.}
-  \item{add.params}{Logical scalar, whether to add the model parameters
-    as graph attributes (\sQuote{pa.exp}, \sQuote{aging.exp},
-    \sQuote{m}, \sQuote{aging.bin}, \sQuote{out.pref},
-    \sQuote{zero.deg.appeal}, \sQuote{zero.age.appeal},
-    \sQuote{deg.coef}, \sQuote{age.coef}, \sQuote{time.window}) to the
-    graph.}
 }
 \details{
   This is a discrete time step model of a growing graph. We start with a

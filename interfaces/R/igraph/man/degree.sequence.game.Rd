@@ -7,8 +7,7 @@
   degrees. This is exactly what \code{degree.sequence.game} does.}
 \usage{
 degree.sequence.game(out.deg, in.deg = numeric(0),
-     method = c("simple", "vl"), add.params =
-     getIgraphOpt("add.params"), \dots) 
+     method = c("simple", "vl"), \dots)
 }
 \arguments{
   \item{out.deg}{Numeric vector, the sequence of degrees (for undirected
@@ -18,8 +17,6 @@ degree.sequence.game(out.deg, in.deg = numeric(0),
   \item{in.deg}{For directed graph, the in-degree sequence.}
   \item{method}{Character, the method for generating the graph. Right
     now the \dQuote{simple} and \dQuote{vl} methods are implemented.}
-  \item{add.params}{Logical scalar, whether to add the generation method 
-    as a graph attribute to the graph created.}
   \item{\dots}{Additional arguments, these are used as graph
     attributes.}
 }

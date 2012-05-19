@@ -22,20 +22,20 @@ Type 'q()' to quit R.
 > g <- graph.ring(5)
 > summary(g)
 IGRAPH U--- 5 5 -- Ring graph
-attr: name (g/c)
+attr: name (g/c), mutual (g/x), circular (g/x)
 > g
 IGRAPH U--- 5 5 -- Ring graph
-+ attr: name (g/c)
++ attr: name (g/c), mutual (g/x), circular (g/x)
 + edges:
 [1] 1--2 2--3 3--4 4--5 1--5
 > 
 > V(g)$name <- letters[1:vcount(g)]
 > summary(g)
 IGRAPH UN-- 5 5 -- Ring graph
-attr: name (g/c), name (v/c)
+attr: name (g/c), mutual (g/x), circular (g/x), name (v/c)
 > g
 IGRAPH UN-- 5 5 -- Ring graph
-+ attr: name (g/c), name (v/c)
++ attr: name (g/c), mutual (g/x), circular (g/x), name (v/c)
 + edges (vertex names):
 [1] a--b b--c c--d d--e a--e
 > 
@@ -43,20 +43,24 @@ IGRAPH UN-- 5 5 -- Ring graph
 > E(g)$weight <- runif(ecount(g))
 > summary(g)
 IGRAPH UNW- 5 5 -- Ring graph
-attr: name (g/c), name (v/c), weight (e/n)
+attr: name (g/c), mutual (g/x), circular (g/x), name (v/c), weight
+  (e/n)
 > g
 IGRAPH UNW- 5 5 -- Ring graph
-+ attr: name (g/c), name (v/c), weight (e/n)
++ attr: name (g/c), mutual (g/x), circular (g/x), name (v/c), weight
+  (e/n)
 + edges (vertex names):
 [1] a--b b--c c--d d--e a--e
 > 
 > g$name <- "A ring"
 > summary(g)
 IGRAPH UNW- 5 5 -- A ring
-attr: name (g/c), name (v/c), weight (e/n)
+attr: name (g/c), mutual (g/x), circular (g/x), name (v/c), weight
+  (e/n)
 > print(g, v=T)
 IGRAPH UNW- 5 5 -- A ring
-+ attr: name (g/c), name (v/c), weight (e/n)
++ attr: name (g/c), mutual (g/x), circular (g/x), name (v/c), weight
+  (e/n)
 + vertex attributes:
     name
 [1]    a
@@ -68,7 +72,8 @@ IGRAPH UNW- 5 5 -- A ring
 [1] a--b b--c c--d d--e a--e
 > print(g, e=T)
 IGRAPH UNW- 5 5 -- A ring
-+ attr: name (g/c), name (v/c), weight (e/n)
++ attr: name (g/c), mutual (g/x), circular (g/x), name (v/c), weight
+  (e/n)
 + edges (vertex names) and their attributes:
     edge    weight
 [1] a--b 0.9148060
@@ -117,7 +122,7 @@ IGRAPH U--- 20 160 -- Erdos renyi (gnp) graph
 > 
 > graph.star(100)
 IGRAPH D--- 100 99 -- In-star
-+ attr: name (g/c)
++ attr: name (g/c), mode (g/c), center (g/n)
 + edges:
  [1]   2->1   3->1   4->1   5->1   6->1   7->1   8->1   9->1  10->1  11->1
 [11]  12->1  13->1  14->1  15->1  16->1  17->1  18->1  19->1  20->1  21->1
@@ -132,7 +137,7 @@ IGRAPH D--- 100 99 -- In-star
 > 
 > graph.star(100, mode="out")
 IGRAPH D--- 100 99 -- Out-star
-+ attr: name (g/c)
++ attr: name (g/c), mode (g/c), center (g/n)
 + edges:
  [1] 1->  2 1->  3 1->  4 1->  5 1->  6 1->  7 1->  8 1->  9 1-> 10 1-> 11
 [11] 1-> 12 1-> 13 1-> 14 1-> 15 1-> 16 1-> 17 1-> 18 1-> 19 1-> 20 1-> 21
@@ -296,4 +301,4 @@ J -- I
 > 
 > proc.time()
    user  system elapsed 
-  0.451   0.049   0.511 
+  0.644   0.065   0.738 

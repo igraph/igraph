@@ -24,8 +24,7 @@ ba.game <- function(n, power=1, m=NULL, out.dist=NULL, out.seq=NULL,
                     out.pref=FALSE, zero.appeal=1,
                     directed=TRUE, algorithm=c("psumtree",
                                      "psumtree-multiple", "bag"),
-                    start.graph=NULL,
-                    add.params=getIgraphOpt("add.params")) {
+                    start.graph=NULL) {
 
   if (!is.null(start.graph) && !is.igraph(start.graph)) {
     stop("`start.graph' not an `igraph' object")
@@ -77,8 +76,8 @@ ba.game <- function(n, power=1, m=NULL, out.dist=NULL, out.seq=NULL,
   res <- .Call("R_igraph_barabasi_game", n, power, m, out.seq, out.pref,
                zero.appeal, directed, algorithm1, start.graph,
                PACKAGE="igraph")
-
-  if (add.params) {
+  
+  if (getIgraphOpt("add.params")) {
     res$name <- "Barabasi graph"
     res$power <- power
     res$m <- m
@@ -92,8 +91,7 @@ ba.game <- function(n, power=1, m=NULL, out.dist=NULL, out.seq=NULL,
 barabasi.game <- ba.game
 
 erdos.renyi.game <- function(n, p.or.m, type=c("gnp", "gnm"),
-                             directed=FALSE, loops=FALSE,
-                             add.params=getIgraphOpt("add.params"), ...) {
+                             directed=FALSE, loops=FALSE, ...) {
   
   type <- igraph.match.arg(type)
   type1 <- switch(type, "gnp"=0, "gnm"=1)
@@ -103,7 +101,7 @@ erdos.renyi.game <- function(n, p.or.m, type=c("gnp", "gnm"),
                as.numeric(p.or.m), as.logical(directed), as.logical(loops),
                PACKAGE="igraph")
 
-  if (add.params) {
+  if (getIgraphOpt("add.params")) {
     res$name <- sprintf("Erdos renyi (%s) graph", type)
     res$type <- type
     res$loops <- loops
@@ -117,7 +115,6 @@ random.graph.game <- erdos.renyi.game
 
 degree.sequence.game <- function(out.deg, in.deg=numeric(0),
                                  method=c("simple", "vl"),
-                                 add.params=getIgraphOpt("add.params"),
                                  ...) {
 
   method <- igraph.match.arg(method)
@@ -127,20 +124,19 @@ degree.sequence.game <- function(out.deg, in.deg=numeric(0),
   res <- .Call("R_igraph_degree_sequence_game", as.numeric(out.deg),
                as.numeric(in.deg), as.numeric(method1),
                PACKAGE="igraph")
-  if (add.params) {
+  if (getIgraphOpt("add.params")) {
     res$name <- "Degree sequence random graph"
     res$method <- method
   }
   res
 }
 
-growing.random.game <- function(n, m=1, directed=TRUE, citation=FALSE,
-                                add.params=getIgraphOpt("add.params")) {
+growing.random.game <- function(n, m=1, directed=TRUE, citation=FALSE) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_growing_random_game", as.numeric(n), as.numeric(m),
                as.logical(directed), as.logical(citation),
                PACKAGE="igraph")
-  if (add.params) {
+  if (getIgraphOpt("add.params")) {
     res$name <- "Growing random graph"
     res$m <- m
     res$citation <- citation
@@ -153,8 +149,7 @@ aging.prefatt.game <- function(n, pa.exp, aging.exp, m=NULL, aging.bin=300,
                                out.pref=FALSE, directed=TRUE,
                                zero.deg.appeal=1, zero.age.appeal=0,
                                deg.coef=1, age.coef=1,
-                               time.window=NULL,
-                               add.params=getIgraphOpt("add.params")) {
+                               time.window=NULL) {
   # Checks
   if (! is.null(out.seq) && (!is.null(m) || !is.null(out.dist))) {
     warning("if `out.seq' is given `m' and `out.dist' should be NULL")
@@ -224,7 +219,7 @@ aging.prefatt.game <- function(n, pa.exp, aging.exp, m=NULL, aging.bin=300,
           time.window,
           PACKAGE="igraph")
   }
-  if (add.params) {
+  if (getIgraphOpt("add.params")) {
     res$name <- "Aging Barabasi graph"
     res$pa.exp <- pa.exp
     res$aging.exp <- aging.exp
@@ -245,8 +240,7 @@ aging.barabasi.game <- aging.ba.game <- aging.prefatt.game
 callaway.traits.game <- function(nodes, types, edge.per.step=1,
                                  type.dist=rep(1, types),
                                  pref.matrix=matrix(1, types, types),
-                                 directed=FALSE,
-                                 add.params=getIgraphOpt("add.params")) {
+                                 directed=FALSE) {
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_callaway_traits_game", as.double(nodes),
@@ -255,7 +249,7 @@ callaway.traits.game <- function(nodes, types, edge.per.step=1,
                                             types),
                as.logical(directed),
                PACKAGE="igraph")
-  if (add.params) {
+  if (getIgraphOpt("add.params")) {
     res$name <- "Trait-based Callaway graph"
     res$types <- types
     res$edge.per.step <- edge.per.step
@@ -267,15 +261,15 @@ callaway.traits.game <- function(nodes, types, edge.per.step=1,
 
 establishment.game <- function(nodes, types, k=1, type.dist=rep(1, types),
                                pref.matrix=matrix(1, types, types),
-                               directed=FALSE,
-                               add.params=getIgraphOpt("add.params")) {
+                               directed=FALSE) {
+
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_establishment_game", as.double(nodes),
                as.double(types), as.double(k), as.double(type.dist),
                matrix(as.double(pref.matrix), types, types),
                as.logical(directed),
                PACKAGE="igraph")
-  if (add.params) {
+  if (getIgraphOpt("add.params")) {
     res$name <- "Trait-based growing graph"
     res$types <- types
     res$k <- k
@@ -285,8 +279,7 @@ establishment.game <- function(nodes, types, k=1, type.dist=rep(1, types),
   res
 }
 
-grg.game <- function(nodes, radius, torus=FALSE, coords=FALSE,
-                     add.params=getIgraphOpt("add.params")) {
+grg.game <- function(nodes, radius, torus=FALSE, coords=FALSE) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_grg_game", as.double(nodes), as.double(radius),
                as.logical(torus), as.logical(coords),
@@ -295,7 +288,7 @@ grg.game <- function(nodes, radius, torus=FALSE, coords=FALSE,
     V(res[[1]])$x <- res[[2]]
     V(res[[1]])$y <- res[[3]]
   }
-  if (add.params) {
+  if (getIgraphOpt("add.params")) {
     res[[1]]$name <- "Geometric random graph"
     res[[1]]$radius <- radius
     res[[1]]$torus <- torus
@@ -306,8 +299,7 @@ grg.game <- function(nodes, radius, torus=FALSE, coords=FALSE,
 preference.game <- function(nodes, types, type.dist=rep(1, types),
                             fixed.sizes=FALSE,
                             pref.matrix=matrix(1, types, types),
-                            directed=FALSE, loops=FALSE,
-                            add.params=getIgraphOpt("add.params")) {
+                            directed=FALSE, loops=FALSE) {
 
   if (nrow(pref.matrix) != types || ncol(pref.matrix) != types) {
     stop("Invalid size for preference matrix")
@@ -321,7 +313,7 @@ preference.game <- function(nodes, types, type.dist=rep(1, types),
                as.logical(directed), as.logical(loops),
                PACKAGE="igraph")
   V(res[[1]])$type <- res[[2]]+1
-  if (add.params) {
+  if (getIgraphOpt("add.params")) {
     res[[1]]$name <- "Preference random graph"
     res[[1]]$types <- types
     res[[1]]$type.dist <- type.dist
@@ -335,8 +327,7 @@ preference.game <- function(nodes, types, type.dist=rep(1, types),
 asymmetric.preference.game <- function(nodes, types,
                                   type.dist.matrix=matrix(1, types,types),
                                   pref.matrix=matrix(1, types, types),
-                                  loops=FALSE,
-                                  add.params=getIgraphOpt("add.params")) {
+                                  loops=FALSE) {
   
   if (nrow(pref.matrix) != types || ncol(pref.matrix) != types) {
     stop("Invalid size for preference matrix")
@@ -352,7 +343,7 @@ asymmetric.preference.game <- function(nodes, types,
                matrix(as.double(pref.matrix), types, types),
                as.logical(loops),
                PACKAGE="igraph")
-  if (add.params) {
+  if (getIgraphOpt("add.params")) {
     res$name <- "Asymmetric preference random graph"
     res$types <- types
     res$type.dist.matrix <- type.dist.matrix
@@ -385,15 +376,14 @@ rewire.edges <- function(graph, prob, loops=FALSE, multiple=FALSE) {
 }
 
 watts.strogatz.game <- function(dim, size, nei, p, loops=FALSE,
-                                multiple=FALSE,
-                                add.params=getIgraphOpt("add.params")) {
+                                multiple=FALSE) {
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_watts_strogatz_game", as.numeric(dim),
                as.numeric(size), as.numeric(nei), as.numeric(p),
                as.logical(loops), as.logical(multiple),
                PACKAGE="igraph")
-  if (add.params) {
+  if (getIgraphOpt("add.params")) {
     res$name <- "Watts-Strogatz random graph"
     res$dim <- dim
     res$size <- size
@@ -408,9 +398,16 @@ watts.strogatz.game <- function(dim, size, nei, p, loops=FALSE,
 lastcit.game <- function(n, edges=1, agebins=n/7100, pref=(1:(agebins+1))^-3,
                          directed=TRUE) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_lastcit_game", as.numeric(n), as.numeric(edges), as.numeric(agebins),
-        as.numeric(pref), as.logical(directed),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_lastcit_game", as.numeric(n), as.numeric(edges),
+               as.numeric(agebins),
+               as.numeric(pref), as.logical(directed),
+               PACKAGE="igraph")
+  if (getIgraphOpt("add.params")) {
+    res$name <- "Random citation graph based on last citation"
+    res$edges <- edges
+    res$agebins <- agebins
+  }
+  res
 }
 
 cited.type.game <- function(n, edges=1, types=rep(0, n),
@@ -422,6 +419,10 @@ cited.type.game <- function(n, edges=1, types=rep(0, n),
                PACKAGE="igraph")
   if (attr) {
     V(res)$type <- types
+  }
+  if (getIgraphOpt("add.params")) {
+    res$name <- "Random citation graph (cited type)"
+    res$edges <- edges
   }
   res
 }
@@ -438,6 +439,10 @@ citing.cited.type.game <- function(n, edges=1, types=rep(0, n),
                PACKAGE="igraph")
   if (attr) {
     V(res)$type <- types
+  }
+  if (getIgraphOpt("add.params")) {
+    res$name <- "Random citation graph (citing & cited type)"
+    res$edges <- edges
   }
   res
 }

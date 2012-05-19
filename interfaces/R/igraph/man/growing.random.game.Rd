@@ -5,8 +5,7 @@
 \description{This function creates a random graph by simulating its
   stochastic evolution.}
 \usage{
-growing.random.game(n, m = 1, directed = TRUE, citation = FALSE,
-                    add.params = getIgraphOpt("add.params"))
+growing.random.game(n, m = 1, directed = TRUE, citation = FALSE)
 }
 \arguments{
   \item{n}{Numeric constant, number of vertices in the graph.}
@@ -15,9 +14,6 @@ growing.random.game(n, m = 1, directed = TRUE, citation = FALSE,
   \item{citation}{Logical. If \code{TRUE} a citation graph is created,
     ie. in each time step the added edges are originating from the new
     vertex. }
-  \item{add.params}{Logical scalar, whether to add model parameters
-    \sQuote{m} and \sQuote{citation} as graph attributes to the graph
-    created.}
 }
 \details{
   This is discrete time step model, in each time step a new vertex is

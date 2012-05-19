@@ -8,8 +8,7 @@
   with the same constant probability. }
 \usage{
 erdos.renyi.game(n, p.or.m, type=c("gnp", "gnm"),
-                 directed = FALSE, loops = FALSE,
-                 add.params = getIgraphOpt("add.params"), \dots)
+                 directed = FALSE, loops = FALSE, \dots)
 }
 \arguments{
   \item{n}{The number of vertices in the graph.}
@@ -21,9 +20,6 @@ erdos.renyi.game(n, p.or.m, type=c("gnp", "gnm"),
   \item{directed}{Logical, whether the graph will be directed, defaults
     to FALSE.}
   \item{loops}{Logical, whether to add loop edges, defaults to FALSE.}
-  \item{add.params}{Logical scalar, whether to add model parameters
-    (\sQuote{p} or \sQuote{m}, \sQuote{type}, \sQuote{loops}),
-    as graph attributes to the graph created.}
   \item{\dots}{Additional arguments, ignored.}
 }
 \details{

@@ -11,7 +11,7 @@
 barabasi.game(n, power = 1, m = NULL, out.dist = NULL, out.seq = NULL, 
     out.pref = FALSE, zero.appeal = 1, directed = TRUE,
     algorithm = c("psumtree", "psumtree-multiple", "bag"),
-    start.graph = NULL, add.params = getIgraphOpt("add.params")) 
+    start.graph = NULL)
 }
 \arguments{
   \item{n}{Number of vertices.}
@@ -55,9 +55,6 @@ barabasi.game(n, power = 1, m = NULL, out.dist = NULL, out.seq = NULL,
     a graph is supplied here and the \code{out.seq} argument is not
     \code{NULL}, then it should contain the out degrees of the new
     vertices only, not the ones in the \code{start.graph}.}
-  \item{add.params}{Logical scalar, whether to add model parameters
-    (\sQuote{power}, \sQuote{m}, \sQuote{zero.appeal},
-    \sQuote{algorithm}) to the graph as graph attributes.}
 }
 \details{
   This is a simple stochastic algorithm to generate a graph. It is a
