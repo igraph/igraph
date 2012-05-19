@@ -22,7 +22,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <cmath>
+#include <math.h>
 #include "bliss_defs.hh"
 #include "igraph_math.h"
 
