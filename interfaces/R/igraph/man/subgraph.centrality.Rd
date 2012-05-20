@@ -33,7 +33,7 @@ subgraph.centrality (graph, diag=FALSE)
   Ernesto Estrada, Juan A. Rodriguez-Velazquez: Subgraph centrality in
   Complex Networks. \emph{Physical Review E} 71, 056103 (2005).
 }
-\author{Gabor Csardi \email{Gabor.Csardi@unil.ch} based on the Matlab
+\author{Gabor Csardi \email{csardi.gabor@gmail.com} based on the Matlab
   code by Ernesto Estrada}
 \seealso{\code{\link{evcent}}, \code{\link{page.rank}}}
 \examples{

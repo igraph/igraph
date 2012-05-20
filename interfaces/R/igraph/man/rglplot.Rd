@@ -21,7 +21,7 @@ rglplot(x, \dots)
 }
 \value{\code{NULL}, invisibly.}
 % \references{}
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{ \code{\link{igraph.plotting}},
   \code{\link{plot.igraph}} for the 2D version,
   \code{\link{tkplot}} for interactive graph drawing in 2D.}

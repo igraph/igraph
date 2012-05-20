@@ -29,7 +29,7 @@ grg.game(nodes, radius, torus = FALSE, coords = FALSE)
   attributes \sQuote{\code{x}} and \sQuote{\code{y}}.
 }
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}, first version was
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}, first version was
   written by Keith Briggs \email{keith.briggs@bt.com}}
 \seealso{\code{\link{random.graph.game}}}
 \examples{

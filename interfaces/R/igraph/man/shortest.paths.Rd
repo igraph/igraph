@@ -159,7 +159,7 @@ path.length.hist (graph, directed = TRUE)
 }
 \references{ West, D.B. (1996). \emph{Introduction to Graph Theory.} Upper
   Saddle River, N.J.: Prentice Hall. }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 %\seealso{}
 \examples{
 g <- graph.ring(10)

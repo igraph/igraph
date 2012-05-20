@@ -36,7 +36,7 @@ bibcoupling(graph, v=V(graph))
   coupling for vertices \code{v[i]} and \code{j}.
 }
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 % \seealso{}
 \examples{
 g <- graph.ring(10)

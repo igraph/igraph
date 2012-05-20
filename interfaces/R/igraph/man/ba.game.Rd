@@ -99,7 +99,7 @@ barabasi.game(n, power = 1, m = NULL, out.dist = NULL, out.seq = NULL,
 \value{A graph object.}
 \references{  Barabasi, A.-L. and Albert R. 1999. Emergence of scaling
   in random networks \emph{Science}, 286 509--512.}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{random.graph.game}}}
 \examples{
 g <- barabasi.game(10000)

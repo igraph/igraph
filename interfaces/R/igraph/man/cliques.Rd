@@ -51,7 +51,7 @@ clique.number(graph)
 }
 %\references{TODO}
 \author{Tamas Nepusz \email{ntamas@rmki.kfki.hu} and Gabor Csardi
-  \email{csardi@rmki.kfki.hu} for the R interface and the manual page. }
+  \email{csardi.gabor@gmail.com} for the R interface and the manual page. }
 \seealso{\code{\link{independent.vertex.sets}}}
 \examples{
 # this usually contains cliques of size six

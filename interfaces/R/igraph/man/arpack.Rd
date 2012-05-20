@@ -220,7 +220,7 @@ arpack.unpack.complex(vectors, values, nev)
   pp 575-595, (1987).
 }
 \author{Rich Lehoucq, Kristi Maschhoff, Danny Sorensen, Chao Yang for
-  ARPACK, Gabor Csardi \email{csardi@rmki.kfki.hu} for the R interface.}
+  ARPACK, Gabor Csardi \email{csardi.gabor@gmail.com} for the R interface.}
 \seealso{\code{\link{evcent}}, \code{\link{page.rank}},
   \code{\link{hub.score}}, \code{\link{leading.eigenvector.community}}
   are some of the functions in igraph which use ARPACK. The ARPACK

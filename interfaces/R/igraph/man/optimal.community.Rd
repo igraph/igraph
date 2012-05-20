@@ -38,7 +38,7 @@ optimal.community(graph)
   \emph{IEEE Transactions on Knowledge and Data Engineering}
   20(2):172-188, 2008.
 }
-\author{Gabor Csardi \email{Gabor.Csardi@unil.ch}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{ \code{\link{communities}} for the documentation of the result,
   \code{\link{modularity}}. See also \code{\link{fastgreedy.community}} 
   for a fast greedy optimizer.

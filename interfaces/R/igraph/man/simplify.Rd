@@ -36,7 +36,7 @@ is.simple(graph)
 }
 \value{A new graph object with the edges deleted. }
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{is.loop}}, \code{\link{is.multiple}} and
   \code{\link{count.multiple}}, \code{\link{delete.edges}},
   \code{\link{delete.vertices}}}

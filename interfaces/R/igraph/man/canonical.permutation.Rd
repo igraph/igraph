@@ -63,7 +63,7 @@ canonical.permutation(graph, sh="fm")
     Fourth Workshop on Analytic Algorithms and Combinatorics.} 2007.
 }
 \author{Tommi Junttila for BLISS, Gabor Csardi
-  \email{csardi@rmki.kfki.hu} for the igraph and R interfaces.}
+  \email{csardi.gabor@gmail.com} for the igraph and R interfaces.}
 \seealso{\code{\link{permute.vertices}} to apply a permutation to a
   graph, \code{\link{graph.isomorphic}} for deciding graph isomorphism,
   possibly based on canonical labels.}

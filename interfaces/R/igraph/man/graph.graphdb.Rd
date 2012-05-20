@@ -60,7 +60,7 @@ graph.graphdb (url = NULL, prefix = "iso", type = "r001", nodes = NULL,
   isomorphism algorithms, \emph{Pattern Recognition Letters},
   Volume 24, Issue 8 (May 2003)
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{read.graph}}, \code{\link{graph.isomorphic.vf2}}}
 \examples{
 \dontrun{

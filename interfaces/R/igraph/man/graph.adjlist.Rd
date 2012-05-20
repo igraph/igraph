@@ -40,7 +40,7 @@ graph.adjlist(adjlist, mode = c("out", "in", "all", "total"),
   An igraph graph object.
 }
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{ \code{\link{get.edgelist}} }
 \examples{
 ## Directed

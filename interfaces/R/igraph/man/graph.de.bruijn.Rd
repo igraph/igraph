@@ -27,7 +27,7 @@ graph.de.bruijn(m,n)
  eg. Wikipedia for details.   
 }
 \value{A graph object.}
-\author{Gabor Csardi <csardi@rmki.kfki.hu>}
+\author{Gabor Csardi <csardi.gabor@gmail.com>}
 \seealso{\code{\link{graph.kautz}}, \code{\link{line.graph}}}
 \examples{
 # de Bruijn graphs can be created recursively by line graphs as well 

@@ -35,7 +35,7 @@ constraint(graph, nodes=V(graph), weights=NULL)
 }
 \value{A numeric vector of constraint scores}
 \author{Jeroen Bruggeman \email{j.p.bruggeman@uva.nl} and Gabor Csardi
-  \email{csardi@rmki.kfki.hu}
+  \email{csardi.gabor@gmail.com}
 }
 \references{Burt, R.S. (2004). Structural holes and good ideas. \emph{American
     Journal of Sociology} 110, 349-399.

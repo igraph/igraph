@@ -62,7 +62,7 @@ graph.adhesion(graph, checks=TRUE)
 \references{Douglas R. White and Frank Harary: The cohesiveness of
   blocks in social networks: node connectivity and conditional
   density, TODO: citation}
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{graph.maxflow}}, \code{\link{vertex.connectivity}},
   \code{\link{vertex.disjoint.paths}}, \code{\link{graph.cohesion}}}
 \examples{

@@ -47,7 +47,7 @@ count.multiple(graph, eids=E(graph))
   vector. \code{count.multiple} returns a numeric vector.
 }
 %\references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{simplify}} to eliminate loop and multiple edges.}
 \examples{
 # Loops

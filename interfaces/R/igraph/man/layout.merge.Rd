@@ -42,7 +42,7 @@ piecewise.layout(graph, layout=layout.kamada.kawai, \dots)
   vertices in the graphs.
 }
 % \references
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{plot.igraph}}, \code{\link{tkplot}},
   \code{\link{layout}}, \code{\link{graph.disjoint.union}}
 }

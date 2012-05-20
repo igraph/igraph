@@ -108,7 +108,7 @@ graph.adjacency(adjmatrix, mode=c("directed", "undirected", "max",
 \value{
   An igraph graph object.
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\link{graph} and \code{\link{graph.formula}} for
   other ways to create graphs.
 }

@@ -123,7 +123,7 @@ spinglass.community(graph, weights=NULL, vertex=NULL, spins=25,
   
 }
 \author{Jorg Reichardt \email{lastname@physik.uni-wuerzburg.de} for the
-  original code and Gabor Csardi \email{csardi@rmki.kfki.hu} for the
+  original code and Gabor Csardi \email{csardi.gabor@gmail.com} for the
   igraph glue code.
   
   Changes to the original function for including the

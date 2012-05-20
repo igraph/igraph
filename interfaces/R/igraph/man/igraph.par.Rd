@@ -84,7 +84,7 @@ igraph.par(parid, parvalue = NULL)
   parameter is returned invisibly.
 }
 % \references{}
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{igraph.options} is similar to \code{\link{options}} and
   \code{getIgraphOpt} is similar to \code{\link{getOption}}.}
 \examples{

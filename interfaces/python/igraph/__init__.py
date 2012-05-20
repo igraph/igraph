@@ -8,7 +8,7 @@ IGraph library.
 from __future__ import with_statement
 
 __license__ = """
-Copyright (C) 2006-2009  Gabor Csardi <csardi@rmki.kfki.hu>,
+Copyright (C) 2006-2009  Gabor Csardi <csardi.gabor@gmail.com>,
 Tamas Nepusz <ntamas@rmki.kfki.hu>
 
 MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary

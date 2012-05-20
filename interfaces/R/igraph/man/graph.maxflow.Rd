@@ -100,7 +100,7 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL,
   M. Stoer and F. Wagner: A simple min-cut algorithm, \emph{Journal of
   the ACM}, 44 585-591, 1997.
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{shortest.paths}}, \code{\link{edge.connectivity}},
   \code{\link{vertex.connectivity}}}
 \examples{

@@ -1,4 +1,4 @@
-AC_INIT(igraph, @VERSION@, csardi@rmki.kfki.hu)
+AC_INIT(igraph, @VERSION@, csardi.gabor@gmail.com)
 AC_CONFIG_SRCDIR(src/rinterface.c)
 AC_CONFIG_HEADERS(src/config.h)
 

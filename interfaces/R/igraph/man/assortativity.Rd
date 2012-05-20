@@ -94,7 +94,7 @@ assortativity.degree (graph, directed = TRUE)
  \url{http://arxiv.org/abs/cond-mat/0205405/}
 }
 \author{
-  Gabor Csardi \email{Gabor.Csardi@unil.ch}
+  Gabor Csardi \email{csardi.gabor@gmail.com}
 }
 % \seealso{}
 \examples{

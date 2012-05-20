@@ -58,7 +58,7 @@ independence.number(graph)
 }
 \author{Tamas Nepusz \email{ntamas@rmki.kfki.hu} ported it from the Very
   Nauty Graph Library by Keith Briggs \email{google@for.it} and Gabor Csardi
-  \email{csardi@rmki.kfki.hu} wrote the R interface and this manual page. }
+  \email{csardi.gabor@gmail.com} wrote the R interface and this manual page. }
 \seealso{\code{\link{cliques}}}
 \examples{
 # A quite dense graph

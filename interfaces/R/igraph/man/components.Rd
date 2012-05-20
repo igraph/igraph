@@ -22,7 +22,7 @@ subcomponent(graph, v, mode = c("all", "out", "in"))
 \value{Numeric vector, the ids of the vertices in the same component as
   \code{v}.} 
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{clusters}}}
 \examples{
 g <- erdos.renyi.game(100, 1/200)

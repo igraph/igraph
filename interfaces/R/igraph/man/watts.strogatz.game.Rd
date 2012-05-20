@@ -34,7 +34,7 @@ watts.strogatz.game(dim, size, nei, p, loops = FALSE, multiple = FALSE)
   Duncan J Watts and Steven H Strogatz: Collective dynamics of
   \sQuote{small world} networks, Nature 393, 440-442, 1998.
 }
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{graph.lattice}}, \code{\link{rewire.edges}}}
 \examples{
 g <- watts.strogatz.game(1, 100, 5, 0.05)

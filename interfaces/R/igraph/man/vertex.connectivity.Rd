@@ -66,7 +66,7 @@ graph.cohesion(graph, checks=TRUE)
 \references{White, Douglas R and Frank Harary 2001. The Cohesiveness of
   Blocks In Social Networks: Node Connectivity and Conditional Density.
   \emph{Sociological Methodology} 31 (1) : 305-359.}
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{graph.maxflow}}, \code{\link{edge.connectivity}},
   \code{\link{edge.disjoint.paths}}, \code{\link{graph.adhesion}}}
 \examples{

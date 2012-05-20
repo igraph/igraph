@@ -43,7 +43,7 @@ fastgreedy.community(graph, merges=TRUE, modularity=TRUE,
   large networks, http://www.arxiv.org/abs/cond-mat/0408187
 }
 \author{Tamas Nepusz \email{ntamas@rmki.kfki.hu} and Gabor Csardi
-  \email{csardi@rmki.kfki.hu} for the R interface.
+  \email{csardi.gabor@gmail.com} for the R interface.
 }
 \seealso{
   \code{\link{communities}} for extracting the results.

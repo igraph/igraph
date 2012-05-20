@@ -86,7 +86,7 @@ edge.betweenness.estimate(graph, e=E(graph),
   Ulrik Brandes, A Faster Algorithm for Betweenness Centrality. \emph{Journal
   of Mathematical Sociology} 25(2):163-177, 2001. 
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{closeness}}, \code{\link{degree}}}
 \examples{
 g <- random.graph.game(10, 3/10)

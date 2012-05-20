@@ -24,7 +24,7 @@ permute.vertices(graph, permutation)
 }
 \value{A new graph object.}
 %\references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{canonical.permutation}}}
 \examples{
 # Random permutation of a random graph

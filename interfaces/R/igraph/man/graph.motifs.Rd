@@ -45,7 +45,7 @@ graph.motifs.est(graph, size = 3, cut.prob = rep(0, size), sample.size =
   constant.
 }
 % \references{}
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{graph.isoclass}}}
 \examples{
 g <- barabasi.game(100)

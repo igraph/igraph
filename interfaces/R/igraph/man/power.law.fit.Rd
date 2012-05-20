@@ -30,7 +30,7 @@ power.law.fit(x, xmin = NULL, start = 2, \dots)
   \code{\link[stats4]{mle-class}} for details.}
 \references{Power laws, Pareto distributions and Zipf's law,
   M. E. J. Newman, \emph{Contemporary Physics}, in press.}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link[stats4]{mle}}}
 \examples{
 # This should approximately yield the correct exponent 3

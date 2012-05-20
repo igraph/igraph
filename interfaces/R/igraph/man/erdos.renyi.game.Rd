@@ -37,7 +37,7 @@ erdos.renyi.game(n, p.or.m, type=c("gnp", "gnm"),
 \references{ Erdos, P. and Renyi, A., On random graphs, \emph{Publicationes
   Mathematicae} 6, 290--297 (1959).
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{barabasi.game}}}
 \examples{
 g <- erdos.renyi.game(1000, 1/1000)

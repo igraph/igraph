@@ -237,7 +237,7 @@ revolver.probs.ADE.dpareto (graph, par, cats, gcats, agebins)
   A named list.
 }
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 % seealso{}
 % \examples{}
 \keyword{graphs}

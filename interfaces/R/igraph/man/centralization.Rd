@@ -137,7 +137,7 @@ centralization.evcent.tmax (graph = NULL, nodes = 0,
   Wasserman, S., and Faust, K.  (1994).  \emph{Social Network Analysis:
   Methods and Applications.}  Cambridge University Press.
 }
-\author{Gabor Csardi \email{Gabor.Csardi@unil.ch}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 %\seealso{}
 \examples{
 # A BA graph is quite centralized

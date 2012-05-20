@@ -37,7 +37,7 @@ bipartite.mapping(graph)
 }
 % e
 % \references{}
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu} }
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
 % \seealso{}
 \examples{
 ## A ring has just one loop, so it is fine

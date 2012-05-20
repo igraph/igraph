@@ -43,7 +43,7 @@ walktrap.community(graph, weights = E(graph)$weight, steps = 4, merges =
   http://arxiv.org/abs/physics/0512106
 }
 \author{Pascal Pons \email{google@for.it} and Gabor Csardi
-  \email{csardi@rmki.kfki.hu} for the R and igraph interface}
+  \email{csardi.gabor@gmail.com} for the R and igraph interface}
 \seealso{
   See \code{\link{communities}} on getting the actual membership vector,
   merge matrix, modularity score, etc.

@@ -26,7 +26,7 @@ is.mutual(graph, es = E(graph))
   A logical vector of the same length as the number of edges supplied.
 }
 %\references{}
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{ \code{\link{reciprocity}}, \code{\link{dyad.census}} if you
   just want some statistics about mutual edges.}
 \examples{

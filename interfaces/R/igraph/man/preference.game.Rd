@@ -46,7 +46,7 @@ asymmetric.preference.game(nodes, types,
 \value{An igraph graph.}
 %\references{}
 \author{Tamas Nepusz \email{ntamas@rmki.kfki.hu} and Gabor Csardi
-  \email{csardi@rmki.kfki.hu} for the R interface} 
+  \email{csardi.gabor@gmail.com} for the R interface} 
 \examples{
 pf <- matrix( c(1, 0, 0, 1), nr=2)
 g <- preference.game(20, 2, pref.matrix=pf)

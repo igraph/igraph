@@ -26,6 +26,7 @@
     \item{pie.lty}{The line type of the border of the slices.}
   }
 }
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
 \seealso{ \code{\link{igraph.plotting}}, \code{\link{plot.igraph}} }
 \examples{
 g <- graph.ring(10)

@@ -1,7 +1,7 @@
 """Objects related to graph clustering"""
 
 __license__ = """
-Copyright (C) 2006-2007  Gabor Csardi <csardi@rmki.kfki.hu>,
+Copyright (C) 2006-2007  Gabor Csardi <csardi.gabor@gmail.com>,
 Tamas Nepusz <ntamas@rmki.kfki.hu>
 
 MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary

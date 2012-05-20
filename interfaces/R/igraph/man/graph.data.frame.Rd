@@ -51,7 +51,7 @@ graph.data.frame(d, directed=TRUE, vertices=NULL)
 \value{
   An igraph graph object.
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{ \code{\link{graph.constructors}} and
   \code{\link{graph.formula}} for other ways to create graphs,
   \code{\link{read.table}} to read in tables from files.}

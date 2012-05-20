@@ -305,7 +305,7 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
   Reingold, E and Tilford, J (1981). Tidier drawing of trees.
   \emph{IEEE Trans. on Softw. Eng.}, SE-7(2):223--228.
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{layout.drl}}, \code{\link{plot.igraph}}, \code{\link{tkplot}}}
 \examples{
 g <- graph.ring(10)

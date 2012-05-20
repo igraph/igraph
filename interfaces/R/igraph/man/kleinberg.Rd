@@ -46,7 +46,7 @@ hub.score (graph, scale = TRUE, weights=NULL, options = igraph.arpack.default)
   1998. Extended version in \emph{Journal of the ACM} 46(1999). Also
   appears as IBM Research Report RJ 10076, May 1997.
 }
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu} }
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
 \seealso{\code{\link{evcent}} for eigenvector centrality,
   \code{\link{page.rank}} for the Page Rank scores. \code{\link{arpack}}
   for the underlining machinery of the computation.

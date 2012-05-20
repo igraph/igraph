@@ -43,7 +43,7 @@ establishment.game(nodes, types, k = 1, type.dist = rep(1, types),
   A new graph object.
 }
 % \references{}
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
 % \seealso{}
 \examples{
 # two types of vertices, they like only themselves

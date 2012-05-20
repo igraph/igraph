@@ -1,6 +1,6 @@
 /* 
    IGraph library.
-   Copyright (C) 2011  Gabor Csardi <csardi@rmki.kfki.hu>
+   Copyright (C) 2011-2012  Gabor Csardi <csardi@rmki.kfki.hu>
    334 Harvard street, Cambridge MA, 02139 USA
    
    This program is free software; you can redistribute it and/or modify

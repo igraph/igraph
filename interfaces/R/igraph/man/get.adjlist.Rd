@@ -31,7 +31,7 @@ get.adjedgelist(graph, mode = c("all", "out", "in", "total"))
   A list of numeric vectors.
 }
 %\references{}
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{get.edgelist}}, \code{\link{get.adjacency}}}
 \examples{
 g <- graph.ring(10)

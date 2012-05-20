@@ -32,7 +32,7 @@ graph.coreness(graph, mode=c("all", "out", "in"))
   Seidman S. B. (1983) Network structure and minimum degree, \emph{Social
     Networks}, 5, 269--287.
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{degree}}}
 \examples{
 g <- graph.ring(10)

@@ -110,7 +110,7 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
   invisibly. 
 }
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{plot.igraph}}, \code{\link{layout}}}
 \examples{
 g <- graph.ring(10)

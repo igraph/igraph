@@ -393,7 +393,7 @@
     }
   }
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{ \code{\link{plot.igraph}}, \code{\link{tkplot}},
   \code{\link{rglplot}}, \code{\link{igraph.options}}}
 \examples{

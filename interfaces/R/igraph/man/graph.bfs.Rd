@@ -86,7 +86,7 @@ graph.bfs (graph, root, neimode = c("out", "in", "all", "total"),
   not requested.
 }
 % \references{}
-\author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
 \seealso{ \code{\link{graph.dfs}} for depth-first search.}
 \examples{
 ## Two rings

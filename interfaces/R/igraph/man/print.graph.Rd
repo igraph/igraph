@@ -34,7 +34,7 @@
 }
 \value{All these functions return the graph invisibly.}
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 %\seealso{}
 \examples{
 g <- graph.ring(10)

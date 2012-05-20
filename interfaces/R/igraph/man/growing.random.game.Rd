@@ -26,7 +26,7 @@ growing.random.game(n, m = 1, directed = TRUE, citation = FALSE)
   A new graph object.
 }
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{barabasi.game}}, \code{\link{erdos.renyi.game}}}
 \examples{
 g <- growing.random.game(500, citation=FALSE)

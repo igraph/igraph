@@ -52,7 +52,7 @@ is.chordal(graph, alpha = NULL, alpham1 = NULL, fillin = FALSE,
   linear-time algorithms to test chordality of graphs, test acyclicity
   of hypergraphs, and selectively reduce acyclic hypergraphs.
   \emph{SIAM Journal of Computation} 13, 566--579.}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{ \code{\link{maximum.cardinality.search}} }
 \examples{
 ## The examples from the Tarjan-Yannakakis paper

@@ -60,7 +60,7 @@ get.edgelist(graph, names=TRUE)
   A \code{ecount(graph)} by 2 numeric matrix for \code{get.edgelist}.
 }
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{graph.adjacency}}, \code{\link{read.graph}}}
 \examples{
 g <- erdos.renyi.game(10, 2/10)

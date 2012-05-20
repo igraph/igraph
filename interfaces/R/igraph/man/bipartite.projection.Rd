@@ -48,7 +48,7 @@ bipartite.projection (graph, types = NULL, multiplicity = TRUE,
   A list of two undirected graphs. See details above.
 }
 % \references{}
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu} }
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
 % \seealso{}
 \examples{
 ## Projection of a full bipartite graph is a full graph

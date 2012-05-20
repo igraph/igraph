@@ -87,7 +87,7 @@ layout.drl (graph, use.seed = FALSE, seed = matrix(runif(vcount(graph) *
   \url{http://www.cs.sandia.gov/~smartin/software.html}
 }
 \author{Shawn Martin \email{google@for.it} and Gabor Csardi
-  \email{csardi@rmki.kfki.hu} for the R/igraph interface and the three
+  \email{csardi.gabor@gmail.com} for the R/igraph interface and the three
     dimensional version.}
 \seealso{\code{\link{layout}} for other layout generators.}
 \examples{

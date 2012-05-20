@@ -34,7 +34,7 @@ citing.cited.type.game(n, edges=1, types=rep(0, n),
 %\details{}
 \value{A new graph.}
 %\references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 %\seealso{}
 %\examples{}
 \keyword{graphs}

@@ -74,7 +74,7 @@ x \%u\% y
 A new graph object.
 }
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 % \seealso{}
 \examples{
 g1 <- graph.ring(10)

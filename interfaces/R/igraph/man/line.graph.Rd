@@ -25,7 +25,7 @@ line.graph(graph)
   A new graph object.
 }
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}, the first version of the C
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}, the first version of the C
   code was written by Vincent Matossian.}
 % \seealso{}
 \examples{

@@ -180,7 +180,7 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
   in large graphs.
 }
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 % \seealso{}
 \examples{
 # mean degree of vertices in the largest cluster in a random graph

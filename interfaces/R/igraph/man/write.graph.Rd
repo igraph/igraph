@@ -173,7 +173,7 @@ write.graph(graph, file, format=c("edgelist", "pajek", "ncol",
 \references{Adai AT, Date SV, Wieland S, Marcotte EM. LGL: creating a
   map of protein function with an algorithm for visualizing very large
   biological networks. \emph{J Mol Biol.} 2004 Jun 25;340(1):179-90.}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{ \code{\link{read.graph}} }
 \examples{
 g <- graph.ring(10)

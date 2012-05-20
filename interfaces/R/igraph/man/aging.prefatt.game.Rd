@@ -106,7 +106,7 @@ aging.prefatt.game (n, pa.exp, aging.exp, m = NULL, aging.bin = 300,
 }
 \value{A new graph.}
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{barabasi.game}}, \code{\link{erdos.renyi.game}}}
 \examples{
 # The maximum degree for graph with different aging exponents

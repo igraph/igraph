@@ -64,7 +64,7 @@ Measures. \emph{American Journal of Sociology}, 92, 1170-1182.
 Katz, L.  (1953).  A New Status Index Derived from Sociometric
 Analysis.  \emph{Psychometrika}, 18, 39-43. 
  }
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu} and Carter T. Butts
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com} and Carter T. Butts
 \email{buttsc@uci.edu} for the manual page} 
 \section{WARNING }{\code{evcent} will not symmetrize your data before
 extracting eigenvectors; don't send this routine asymmetric matrices

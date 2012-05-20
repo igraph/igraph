@@ -76,7 +76,7 @@ edge.betweenness.community (graph, weights = E(graph)$weight,
   object, please see the \code{\link{communities}} manual page for
   details.
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{ \code{\link{edge.betweenness}} for the definition and
   calculation of the edge betweenness,
   \code{\link{walktrap.community}}, \code{\link{fastgreedy.community}},
