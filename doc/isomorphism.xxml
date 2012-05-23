@@ -28,6 +28,7 @@
 <!-- doxrox-include igraph_count_isomorphisms_vf2 -->
 <!-- doxrox-include igraph_get_isomorphisms_vf2 -->
 <!-- doxrox-include igraph_isohandler_t -->
+<!-- doxrox-include igraph_isocompat_t -->
 <!-- doxrox-include igraph_isomorphic_function_vf2 -->
 <!-- doxrox-include igraph_subisomorphic_vf2 -->
 <!-- doxrox-include igraph_count_subisomorphisms_vf2 -->

@@ -7898,7 +7898,7 @@ PyObject *igraphmodule_Graph_isomorphic_vf2(igraphmodule_GraphObject * self,
   }
 
   if (igraph_isomorphic_vf2(&self->g, &other->g, color1, color2, edge_color1, edge_color2,
-        &result, map12, map21)) {
+        &result, map12, map21, 0, 0, 0)) {
     igraphmodule_handle_igraph_error();
     if (color1) { igraph_vector_int_destroy(color1); free(color1); }
     if (color2) { igraph_vector_int_destroy(color2); free(color2); }
@@ -7987,7 +7987,7 @@ PyObject *igraphmodule_Graph_count_isomorphisms_vf2(igraphmodule_GraphObject *se
   }
 
   if (igraph_count_isomorphisms_vf2(&self->g, &other->g,
-        color1, color2, edge_color1, edge_color2, &result)) {
+        color1, color2, edge_color1, edge_color2, &result, 0, 0, 0)) {
     if (color1) { igraph_vector_int_destroy(color1); free(color1); }
     if (color2) { igraph_vector_int_destroy(color2); free(color2); }
     if (edge_color1) { igraph_vector_int_destroy(edge_color1); free(edge_color1); }
@@ -8060,7 +8060,7 @@ PyObject *igraphmodule_Graph_get_isomorphisms_vf2(igraphmodule_GraphObject *self
   }
 
   if (igraph_get_isomorphisms_vf2(&self->g, &other->g,
-        color1, color2, edge_color1, edge_color2, &result)) {
+        color1, color2, edge_color1, edge_color2, &result, 0, 0, 0)) {
     igraphmodule_handle_igraph_error();
     if (color1) { igraph_vector_int_destroy(color1); free(color1); }
     if (color2) { igraph_vector_int_destroy(color2); free(color2); }
@@ -8142,7 +8142,7 @@ PyObject *igraphmodule_Graph_subisomorphic_vf2(igraphmodule_GraphObject * self,
   }
 
   if (igraph_subisomorphic_vf2(&self->g, &other->g, color1, color2, edge_color1, edge_color2,
-        &result, map12, map21)) {
+        &result, map12, map21, 0, 0, 0)) {
     igraphmodule_handle_igraph_error();
     if (color1) { igraph_vector_int_destroy(color1); free(color1); }
     if (color2) { igraph_vector_int_destroy(color2); free(color2); }
@@ -8231,7 +8231,7 @@ PyObject *igraphmodule_Graph_count_subisomorphisms_vf2(igraphmodule_GraphObject 
   }
 
   if (igraph_count_subisomorphisms_vf2(&self->g, &other->g, color1, color2,
-        edge_color1, edge_color2, &result)) {
+        edge_color1, edge_color2, &result, 0, 0, 0)) {
     igraphmodule_handle_igraph_error();
     if (color1) { igraph_vector_int_destroy(color1); free(color1); }
     if (color2) { igraph_vector_int_destroy(color2); free(color2); }
@@ -8301,7 +8301,7 @@ PyObject *igraphmodule_Graph_get_subisomorphisms_vf2(igraphmodule_GraphObject *s
   }
 
   if (igraph_get_subisomorphisms_vf2(&self->g, &other->g, color1, color2,
-        edge_color1, edge_color2, &result)) {
+        edge_color1, edge_color2, &result, 0, 0, 0)) {
     igraphmodule_handle_igraph_error();
     if (color1) { igraph_vector_int_destroy(color1); free(color1); }
     if (color2) { igraph_vector_int_destroy(color2); free(color2); }

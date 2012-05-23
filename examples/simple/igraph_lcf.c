@@ -34,7 +34,7 @@ int main() {
   igraph_isomorphic_vf2(&g, &g2, 
 			/*vertex.color1=*/ 0, /*vertex.color2=*/ 0, 
 			/*edge.color1=*/ 0, /*edge.color2=*/ 0,
-			&iso, 0, 0);
+			&iso, 0, 0, 0, 0, 0);
   if (!iso) {
     printf("OOOPS!\n");
     return 1;

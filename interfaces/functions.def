@@ -772,7 +772,7 @@ igraph_bfs:
                 OUT VECTOR_OR_0 order, OUT VECTOR_OR_0 rank, \
                 OUT VECTOR_OR_0 father, \
                 OUT VECTOR_OR_0 pred, OUT VECTOR_OR_0 succ, \
-                OUT VECTOR_OR_0 dist, BFS_FUNC callback, EXTRA extra=NULL
+                OUT VECTOR_OR_0 dist, BFS_FUNC callback, NULL extra
         IGNORE: RR, RC
 
 igraph_dfs:
@@ -780,7 +780,7 @@ igraph_dfs:
                 BOOLEAN unreachable, \
                 OUT VECTOR_OR_0 order, OUT VECTOR_OR_0 order_out, \
                 OUT VECTOR_OR_0 dist, DFS_FUNC in_callback, \
-                DFS_FUNC out_callback, EXTRA extra=NULL
+                DFS_FUNC out_callback, NULL extra
         IGNORE: RR, RC
 
 #######################################
@@ -1560,7 +1560,9 @@ igraph_isomorphic_vf2:
                 VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2, \
                 EDGE_COLOR edge_color1, EDGE_COLOR edge_color2, \
                 OUT BOOLEANPTR iso, \
-                OUT VECTORM1_OR_0 map12, OUT VECTORM1_OR_0 map21
+                OUT VECTORM1_OR_0 map12, OUT VECTORM1_OR_0 map21, \
+                NULL node_compat_fn, NULL edge_compat_fn, \
+                NULL extra
         DEPS: vertex_color1 ON graph1, vertex_color2 ON graph2, \
               edge_color1 ON graph1, edge_color2 ON graph2
 
@@ -1568,7 +1570,8 @@ igraph_count_isomorphisms_vf2:
         PARAMS: GRAPH graph1, GRAPH graph2, \
                 VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2, \
                 EDGE_COLOR edge_color1, EDGE_COLOR edge_color2, \
-                OUT INTEGERPTR count
+                OUT INTEGERPTR count, NULL node_compat_fn, \
+                NULL edge_compat_fn, NULL extra
         DEPS: vertex_color1 ON graph1, vertex_color2 ON graph2, \
               edge_color1 ON graph1, edge_color2 ON graph2
 
@@ -1576,7 +1579,8 @@ igraph_get_isomorphisms_vf2:
         PARAMS: GRAPH graph1, GRAPH graph2, \
                 VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2, \
                 EDGE_COLOR edge_color1, EDGE_COLOR edge_color2, \
-                OUT VECTORLIST maps
+                OUT VECTORLIST maps, NULL node_compat_fn, \
+                NULL edge_compat_fn, NULL extra
         DEPS: vertex_color1 ON graph1, vertex_color2 ON graph2, \
               edge_color1 ON graph1, edge_color2 ON graph2
 
@@ -1585,7 +1589,9 @@ igraph_subisomorphic_vf2:
                 VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2, \
                 EDGE_COLOR edge_color1, EDGE_COLOR edge_color2, \
                 OUT BOOLEANPTR iso, \
-                OUT VECTORM1_OR_0 map12, OUT VECTORM1_OR_0 map21
+                OUT VECTORM1_OR_0 map12, OUT VECTORM1_OR_0 map21, \
+                NULL node_compat_fn, NULL edge_compat_fn, \
+                NULL extra
         DEPS: vertex_color1 ON graph1, vertex_color2 ON graph2, \
               edge_color1 ON graph1, edge_color2 ON graph2
 
@@ -1593,7 +1599,8 @@ igraph_count_subisomorphisms_vf2:
         PARAMS: GRAPH graph1, GRAPH graph2, \
                 VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2, \
                 EDGE_COLOR edge_color1, EDGE_COLOR edge_color2, \
-                OUT INTEGERPTR count
+                OUT INTEGERPTR count, NULL node_compat_fn, \
+                NULL edge_compat_fn, NULL extra
         DEPS: vertex_color1 ON graph1, vertex_color2 ON graph2, \
               edge_color1 ON graph1, edge_color2 ON graph2
 
@@ -1601,7 +1608,8 @@ igraph_get_subisomorphisms_vf2:
         PARAMS: GRAPH graph1, GRAPH graph2, \
                 VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2, \
                 EDGE_COLOR edge_color1, EDGE_COLOR edge_color2, \
-                OUT VECTORLIST maps
+                OUT VECTORLIST maps, NULL node_compat_fn, \
+                NULL edge_compat_fn, NULL extra
         DEPS: vertex_color1 ON graph1, vertex_color2 ON graph2, \
               edge_color1 ON graph1, edge_color2 ON graph2
 

@@ -30,3 +30,8 @@ AT_SETUP([The VF2 isomorphism algorithm])
 AT_KEYWORDS([isomorph isomorphic VF2])
 AT_COMPILE_CHECK([simple/igraph_isomorphic_vf2.c])
 AT_CLEANUP
+
+AT_SETUP([VF algorithm with compatibility functions])
+AT_KEYWORDS([isomorph isomorphic VF2 compatibility])
+AT_COMPILE_CHECK([simple/VF2-compat.c])
+AT_CLEANUP
