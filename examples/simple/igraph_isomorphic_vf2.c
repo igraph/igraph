@@ -61,7 +61,7 @@ int main() {
   }
 
   /* Without colors, number of isomorphisms */
-  igraph_count_isomorphisms_vf2(&ring1, &ring2, 0, 0, 0, 0, &count);
+  igraph_count_isomorphisms_vf2(&ring1, &ring2, 0, 0, 0, 0, &count, 0, 0, 0);
   if (count != 200) {
     fprintf(stderr, "Count without colors failed, expected %li, got %li.\n",
 	    (long int) 200, (long int) count);
@@ -71,7 +71,7 @@ int main() {
   /* Everything has the same colors */
   igraph_vector_int_init(&color1, igraph_vcount(&ring1));
   igraph_vector_int_init(&color2, igraph_vcount(&ring2));
-  igraph_isomorphic_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &iso, 0, 0);
+  igraph_isomorphic_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &iso, 0, 0, 0, 0, 0);
   if (!iso) {
     fprintf(stderr, "Single color failed.\n");
     return 3;
@@ -82,7 +82,7 @@ int main() {
     VECTOR(color1)[i]   = VECTOR(color2)[i] = 0;
     VECTOR(color1)[i+1] = VECTOR(color2)[i] = 1;
   }
-  igraph_count_isomorphisms_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &count);
+  igraph_count_isomorphisms_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &count, 0, 0, 0);
   if (count != 100) {
     fprintf(stderr, "Count with two colors failed, expected %li, got %li.\n",
 	    (long int) 100, (long int) count);
@@ -93,7 +93,7 @@ int main() {
   for (i=0; i<igraph_vector_int_size(&color1); i++) {
     VECTOR(color1)[i]   = VECTOR(color2)[i] = i;
   }
-  igraph_count_isomorphisms_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &count);
+  igraph_count_isomorphisms_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &count, 0, 0, 0);
   if (count != 1) {
     fprintf(stderr, "Count with separate colors failed, expected %li, got %li.\n",
 	    (long int) 1, (long int) count);
@@ -104,7 +104,7 @@ int main() {
   igraph_vector_int_fill(&color1, 0);
   igraph_vector_int_fill(&color2, 0); 
   VECTOR(color1)[0]=1;
-  igraph_isomorphic_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &iso, 0, 0);
+  igraph_isomorphic_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &iso, 0, 0, 0, 0, 0);
   if (iso) {
     fprintf(stderr, "Negative test failed.\n");
     return 6;
@@ -115,7 +115,7 @@ int main() {
   igraph_vector_int_fill(&color2, 0); 
   VECTOR(color1)[0]=1;  VECTOR(color1)[1]=1;
   VECTOR(color2)[0]=1;  VECTOR(color2)[2]=1;
-  igraph_isomorphic_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &iso, 0, 0);
+  igraph_isomorphic_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &iso, 0, 0, 0, 0, 0);
   if (iso) {
     fprintf(stderr, "Second negative test failed.\n");
     return 7;
@@ -139,7 +139,7 @@ int main() {
   igraph_vector_int_init(&color1, igraph_vcount(&ring1));
   igraph_vector_int_init(&color2, igraph_vcount(&ring2));
   igraph_count_subisomorphisms_vf2(&ring1, &ring2, &color1, &color2, 0, 0, 
-				   &count);
+				   &count, 0, 0, 0);
   if (count != 42) {
     fprintf(stderr, "Count with one color failed, expected %li, got %li.\n",
 	    (long int) 42, (long int) count);
@@ -156,7 +156,7 @@ int main() {
     VECTOR(color2)[i+1] = 1;
   }
   igraph_count_subisomorphisms_vf2(&ring1, &ring2, &color1, &color2, 0, 0, 
-				   &count);
+				   &count, 0, 0, 0);
   if (count != 21) {
     fprintf(stderr, "Count with two colors failed, expected %li, got %li.\n",
 	    (long int) 21, (long int) count);
@@ -182,7 +182,7 @@ int main() {
   /* Everything has the same color */
   igraph_vector_int_init(&color1, igraph_ecount(&ring1));
   igraph_vector_int_init(&color2, igraph_ecount(&ring2));
-  igraph_isomorphic_vf2(&ring1, &ring2, 0, 0, &color1, &color2, &iso, 0, 0);
+  igraph_isomorphic_vf2(&ring1, &ring2, 0, 0, &color1, &color2, &iso, 0, 0, 0, 0, 0);
   if (!iso) {
     fprintf(stderr, "Single edge-color failed.\n");
     return 41;
@@ -193,7 +193,7 @@ int main() {
     VECTOR(color1)[i]   = VECTOR(color2)[i] = 0;
     VECTOR(color1)[i+1] = VECTOR(color2)[i] = 1;
   }
-  igraph_count_isomorphisms_vf2(&ring1, &ring2, 0, 0, &color1, &color2, &count);
+  igraph_count_isomorphisms_vf2(&ring1, &ring2, 0, 0, &color1, &color2, &count, 0, 0, 0);
   if (count != 100) {
     fprintf(stderr, "Count with two edge colors failed, expected %li, got %li.\n",
 	    (long int) 100, (long int) count);
@@ -204,7 +204,7 @@ int main() {
   for (i=0; i<igraph_vector_int_size(&color1); i++) {
     VECTOR(color1)[i]   = VECTOR(color2)[i] = i;
   }
-  igraph_count_isomorphisms_vf2(&ring1, &ring2, 0, 0, &color1, &color2, &count);
+  igraph_count_isomorphisms_vf2(&ring1, &ring2, 0, 0, &color1, &color2, &count, 0, 0, 0);
   if (count != 1) {
     fprintf(stderr, "Count with separate edge colors failed, expected %li, got %li.\n",
 	    (long int) 1, (long int) count);
@@ -215,7 +215,7 @@ int main() {
   igraph_vector_int_fill(&color1, 0);
   igraph_vector_int_fill(&color2, 0); 
   VECTOR(color1)[0]=1;
-  igraph_isomorphic_vf2(&ring1, &ring2, 0, 0, &color1, &color2, &iso, 0, 0);
+  igraph_isomorphic_vf2(&ring1, &ring2, 0, 0, &color1, &color2, &iso, 0, 0, 0, 0, 0);
   if (iso) {
     fprintf(stderr, "Negative edge test failed.\n");
     return 44;
@@ -226,7 +226,7 @@ int main() {
   igraph_vector_int_fill(&color2, 0); 
   VECTOR(color1)[0]=1;  VECTOR(color1)[1]=1;
   VECTOR(color2)[0]=1;  VECTOR(color2)[2]=1;
-  igraph_isomorphic_vf2(&ring1, &ring2, 0, 0, &color1, &color2, &iso, 0, 0);
+  igraph_isomorphic_vf2(&ring1, &ring2, 0, 0, &color1, &color2, &iso, 0, 0, 0, 0, 0);
   if (iso) {
     fprintf(stderr, "Second negative edge test failed.\n");
     return 45;
@@ -249,7 +249,7 @@ int main() {
   igraph_vector_int_init(&color1, igraph_ecount(&ring1));
   igraph_vector_int_init(&color2, igraph_ecount(&ring2));
   igraph_count_subisomorphisms_vf2(&ring1, &ring2, 0, 0, &color1, &color2,
-				   &count);
+				   &count, 0, 0, 0);
   if (count != 42) {
     fprintf(stderr, "Count with one edge color failed, expected %li, got %li.\n",
 	    (long int) 42, (long int) count);
@@ -266,7 +266,7 @@ int main() {
     VECTOR(color2)[i+1] = 1;
   }
   igraph_count_subisomorphisms_vf2(&ring1, &ring2, 0, 0, &color1, &color2,
-				   &count);
+				   &count, 0, 0, 0);
   if (count != 22) {
     fprintf(stderr, "Count with two edge colors failed, expected %li, got %li.\n",
 	    (long int) 22, (long int) count);
