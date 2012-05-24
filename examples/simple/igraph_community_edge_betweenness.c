@@ -23,6 +23,11 @@
 
 #include <igraph.h>
 
+int igraph_vector_between(const igraph_vector_t* v, const igraph_vector_t* lo,
+		const igraph_vector_t* hi) {
+	return igraph_vector_all_le(lo, v) && igraph_vector_all_ge(hi, v);
+}
+
 void test_unweighted() {
   igraph_t g;
   igraph_vector_t edges, eb;
@@ -84,6 +89,8 @@ void test_unweighted() {
   igraph_destroy(&g);
 }
 
+#define EPS 1e-4
+
 void test_weighted() {
   igraph_t g;
   igraph_vector_t edges, eb, weights;
@@ -93,17 +100,21 @@ void test_weighted() {
 
   igraph_real_t edges_array1[] = { 2, 3, 0, 1, 4, 7, 5, 6 };
   igraph_real_t edges_array2[] = { 2, 3, 6, 5, 0, 1, 4, 7 };
-  igraph_real_t eb_array1[] = { 4, 5, 3+1/3.0, 4, 2.5, 4, 1, 1 };
-  igraph_real_t eb_array2[] = { 4, 5, 3+1/3.0, 6, 1.5, 2, 1, 1 };
-  
-  igraph_vector_t edges_sol1, edges_sol2, eb_sol1, eb_sol2;
+  igraph_real_t eb_array1_lo[] = { 4, 5, 3+1/3.0-EPS, 4, 2.5, 4, 1, 1 };
+  igraph_real_t eb_array1_hi[] = { 4, 5, 3+1/3.0+EPS, 4, 2.5, 4, 1, 1 };
+  igraph_real_t eb_array2_lo[] = { 4, 5, 3+1/3.0-EPS, 6, 1.5, 2, 1, 1 };
+  igraph_real_t eb_array2_hi[] = { 4, 5, 3+1/3.0+EPS, 6, 1.5, 2, 1, 1 };
+
+  igraph_vector_t edges_sol1, edges_sol2, eb_sol1_lo, eb_sol1_hi, eb_sol2_lo, eb_sol2_hi;
 
   igraph_vector_view(&edges_sol1, edges_array1, 
 		     sizeof(edges_array1)/sizeof(double));
   igraph_vector_view(&edges_sol2, edges_array2, 
 		     sizeof(edges_array2)/sizeof(double));
-  igraph_vector_view(&eb_sol1, eb_array1, sizeof(eb_array1)/sizeof(double));
-  igraph_vector_view(&eb_sol2, eb_array2, sizeof(eb_array2)/sizeof(double));
+  igraph_vector_view(&eb_sol1_lo, eb_array1_lo, sizeof(eb_array1_lo)/sizeof(double));
+  igraph_vector_view(&eb_sol2_lo, eb_array2_lo, sizeof(eb_array2_lo)/sizeof(double));
+  igraph_vector_view(&eb_sol1_hi, eb_array1_hi, sizeof(eb_array1_hi)/sizeof(double));
+  igraph_vector_view(&eb_sol2_hi, eb_array2_hi, sizeof(eb_array2_hi)/sizeof(double));
 
   /* Small graph as follows: A--B--C--A, A--D--E--A, B--D, C--E */
   igraph_small(&g, 0, IGRAPH_UNDIRECTED, 
@@ -120,12 +131,14 @@ void test_weighted() {
   
   if (!igraph_vector_all_e(&edges_sol1, &edges) && 
       !igraph_vector_all_e(&edges_sol2, &edges)) {
-    printf("Error.\n");
+    printf("Error, edges vector was: \n");
+	igraph_vector_print(&edges);
     exit(2);
   }
-  if (!igraph_vector_all_e(&eb_sol1, &eb) && 
-      !igraph_vector_all_e(&eb_sol2, &eb)) {
-    printf("Error.\n");
+  if (!igraph_vector_between(&eb, &eb_sol1_lo, &eb_sol1_hi) &&
+      !igraph_vector_between(&eb, &eb_sol2_lo, &eb_sol2_hi)) {
+    printf("Error, eb vector was: \n");
+	igraph_vector_print(&eb);
     exit(2);
   }
 
@@ -136,9 +149,10 @@ void test_weighted() {
 				    IGRAPH_UNDIRECTED,
 				    &weights);
 
-  if (!igraph_vector_all_e(&eb_sol1, &eb) && 
-      !igraph_vector_all_e(&eb_sol2, &eb)) {
-    printf("Error.\n");
+  if (!igraph_vector_between(&eb, &eb_sol1_lo, &eb_sol1_hi) &&
+      !igraph_vector_between(&eb, &eb_sol2_lo, &eb_sol2_hi)) {
+    printf("Error, eb vector was: \n");
+	igraph_vector_print(&eb);
     exit(2);
   }
 
