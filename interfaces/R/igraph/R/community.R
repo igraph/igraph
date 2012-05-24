@@ -176,27 +176,40 @@ as.dendrogram.communities <- function(object, hang=-1,
     r
   }
 
-  storage.mode(object$merges) <- "integer"
+  merges <- object$merges
+
+  ## If multiple components, then we merge them in arbitrary order
+  ## but only if not dealing with leading eigenvector community
+  ## structure, because for that the dendrogram is different
+  if (nrow(merges) < object$vcount-1 &&
+      object$algorithm != "leading eigenvector") {
+    miss <- seq_len(object$vcount + nrow(merges))[-as.vector(merges)]
+    miss <- c(miss, seq_len(length(miss)-2) + object$vcount+nrow(merges))
+    miss <- matrix(miss, byrow=TRUE, ncol=2)
+    merges <- rbind(merges, miss)
+  }
+  
+  storage.mode(merges) <- "integer"
   
   if (is.null(object$names)) {
-    object$names <- 1:(nrow(object$merges)+1)
+    object$names <- 1:(nrow(merges)+1)
   }
   z <- list()
   if (!use.modularity || is.null(object$modularity)) {
-    object$height <- 1:nrow(object$merges)
+    object$height <- 1:nrow(merges)
   } else {
     object$height <- object$modularity[-1]
     object$height <- cumsum(object$height - min(object$height))
   }
   nMerge <- length(oHgt <- object$height)
-  if (nMerge != nrow(object$merges))
+  if (nMerge != nrow(merges))
     stop("'merge' and 'height' do not fit!")
   hMax <- oHgt[nMerge]
   one <- 1L
   two <- 2L
-  leafs <- nrow(object$merges)+1
+  leafs <- nrow(merges)+1
   for (k in 1:nMerge) {
-    x <- object$merges[k, ]# no sort() anymore!
+    x <- merges[k, ]# no sort() anymore!
     if (any(neg <- x < leafs+1))
       h0 <- if (hang < 0) 0 else max(0, oHgt[k] - hang * hMax)
     if (all(neg)) {                  # two leaves
