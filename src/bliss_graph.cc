@@ -17,9 +17,11 @@ Copyright (C) 2003-2006 Tommi Junttila
 
 /* FSF address fixed in the above notice on 1 Oct 2009 by Tamas Nepusz */
 
-#include <stdio.h>
-#include <assert.h>
-#include <ctype.h>
+using namespace std;
+
+#include <cstdio>
+#include <cassert>
+#include <cctype>
 #include <set>
 #include <list>
 #include <algorithm>
@@ -27,7 +29,7 @@ Copyright (C) 2003-2006 Tommi Junttila
 #include "bliss_timer.hh"
 #include "bliss_graph.hh"
 #include "bliss_partition.hh"
-#include <limits.h>		// INT_MAX, etc
+#include <climits>		// INT_MAX, etc
 
 extern bool bliss_verbose;
 // extern FILE *bliss_verbstr;

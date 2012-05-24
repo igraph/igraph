@@ -20,8 +20,10 @@ Copyright (C) 2003-2006 Tommi Junttila
 #ifndef BLISS_KSTACK_H
 #define BLISS_KSTACK_H
 
+using namespace std;
+
 #include "bliss_defs.hh"
-#include <stdlib.h>		// malloc
+#include <cstdlib>		// malloc
 
 namespace igraph {
 

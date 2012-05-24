@@ -20,6 +20,8 @@ Copyright (C) 2003-2006 Tommi Junttila
 #ifndef BLISS_EQREFHASH_HH
 #define BLISS_EQREFHASH_HH
 
+using namespace std;
+
 #include <vector>
 
 #define EqrefHash BuzzHash
