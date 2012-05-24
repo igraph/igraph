@@ -20,10 +20,12 @@
 #ifndef BLISS_BIGNUM_HH
 #define BLISS_BIGNUM_HH
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
+using namespace std;
 
+#include <cstdlib>
+#include <cstdio>
+#include <cmath>
+#include <sstream>
 #include "bliss_defs.hh"
 #include "igraph_math.h"
 
@@ -77,12 +79,14 @@ public:
   void multiply(const int n) {v *= (long double)n; }
   int print(FILE *fp) {return fprintf(fp, "%Lg", v); }
   int tostring(char **str) {
-    int size=static_cast<int>( (logbl(fabsl(v))/log(10.0))+4 );
+    int size=static_cast<int>( (log(abs(v))/log(10.0))+4 );
     *str=igraph_Calloc(size, char );
     if (! *str) {
       IGRAPH_ERROR("Cannot convert big number to string", IGRAPH_ENOMEM);
     }
-    snprintf(*str, size, "%.0Lf", v);
+    stringstream ss;
+    ss << v;
+    strncpy(*str, ss.str().c_str(), size);
     return 0;
   }
 };

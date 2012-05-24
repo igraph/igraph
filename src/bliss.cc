@@ -17,6 +17,8 @@
 
 /* FSF address fixed in the above notice on 1 Oct 2009 by Tamas Nepusz */
 
+using namespace std;
+
 #include "bliss_timer.hh"
 #include "bliss_graph.hh"
 #include "bliss_kqueue.hh"
