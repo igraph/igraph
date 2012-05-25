@@ -79,12 +79,14 @@ export(edge.betweenness.community,
 
 export(membership, modularity, sizes, algorithm, is.hierarchical, merges,
        cutat, communities, crossing, plot.communities, compare,
-       compare.communities, showtrace, code.length)
+       compare.communities, showtrace, code.length, asPhylo)
 
 S3method("print", communities)
 S3method("modularity", communities)
 S3method("length", communities)
 S3method("as.dendrogram", communities)
+S3method("as.hclust", communities)
+S3method("asPhylo", communities)
 S3method("modularity", igraph)
 S3method("compare", communities)
 S3method("compare", numeric)

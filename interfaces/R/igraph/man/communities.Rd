@@ -12,6 +12,9 @@
 \alias{length.communities}
 \alias{modularity.communities}
 \alias{as.dendrogram.communities}
+\alias{as.hclust.communities}
+\alias{asPhylo}
+\alias{asPhylo.communities}
 \alias{showtrace}
 \alias{code.length}
 \concept{Community structure}
@@ -34,7 +37,8 @@ merges(communities)
 cutat(communities, no, steps)
 \method{as.dendrogram}{communities}(object, hang=-1,
    use.modularity=FALSE, \dots)
-
+\method{as.hclust}{communities}(object, use.modularity=FALSE, \dots)
+\method{asPhylo}{communitues}(x, \dots)
 showtrace(communities)
 
 code.length(communities)
@@ -146,6 +150,12 @@ code.length(communities)
   gives an error message to others. See \code{\link[stats]{dendrogram}}
   for details.
 
+  \code{as.hclust} is similar to \code{as.dendrogram}, but converts a
+  hierarchical community structure to a \code{hclust} object.
+
+  \code{asPhylo} converts a hierarchical community structure to
+  a \code{phylo} object, you will need the \code{ape} package for this.
+  
   \code{showtrace} works (currently) only for communities found by the
   leading eigenvector method
   (\code{\link{leading.eigenvector.community}}), and returns a character

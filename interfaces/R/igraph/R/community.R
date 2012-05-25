@@ -256,6 +256,77 @@ as.dendrogram.communities <- function(object, hang=-1,
   z
 }
 
+as.hclust.communities <- function(object, use.modularity=FALSE, ...) {
+  as.hclust(as.dendrogram(object, use.modularity=use.modularity, ...))
+}
+
+asPhylo <- function(x, ...)
+  UseMethod("asPhylo")
+
+asPhylo.communities <- function(x, use.modularity=FALSE, ...) {
+
+  if (!is.hierarchical(x)) {
+    stop("Not a hierarchical community structure")
+  }
+
+  require(ape, quietly = TRUE)
+  
+  merges <- x$merges
+
+  ## If multiple components, then we merge them in arbitrary order
+  ## but only if not dealing with leading eigenvector community
+  ## structure, because for that the dendrogram is different
+  if (nrow(merges) < x$vcount-1 &&
+      x$algorithm != "leading eigenvector") {
+    miss <- seq_len(x$vcount + nrow(merges))[-as.vector(merges)]
+    miss <- c(miss, seq_len(length(miss)-2) + x$vcount+nrow(merges))
+    miss <- matrix(miss, byrow=TRUE, ncol=2)
+    merges <- rbind(merges, miss)
+  }
+
+  if (!use.modularity || is.null(x$modularity)) {
+    height <- 1:nrow(merges)
+  } else {
+    height <- x$modularity[-1]
+    height <- cumsum(height - min(height))
+  }
+
+  if (is.null(x$names)) {
+    labels <- 1:(nrow(merges)+1)
+  } else {
+    labels <- x$names
+  }
+
+  N <- nrow(merges)
+  edge <- matrix(0L, 2*N, 2)
+  edge.length <- numeric(2*N)
+  node <- integer(N)
+  node[N] <- N + 2L
+  cur.nod <- N + 3L
+  j <- 1L
+  for (i in N:1) {
+    edge[j:(j+1), 1] <- node[i]
+    for (l in 1:2) {
+      k <- j + l -1L
+      y <- merges[i, l]
+      if (y > N+1) {
+        edge[k, 2] <- node[y-N-1] <- cur.nod
+        cur.nod <- cur.nod + 1L
+        edge.length[k] <- height[i] - height[y-N-1]
+      } else {
+        edge[k, 2] <- y
+        edge.length[k] <- height[i]
+      }
+    }
+    j <- j + 2L    
+  }
+
+  obj <- list(edge=edge, edge.length=edge.length/2, tip.label=labels,
+              Nnode=N)
+  class(obj) <- "phylo"
+  reorder(obj)
+}
+
 cutat <- function(communities, no, steps) {
 
   if (!inherits(communities, "communities")) {
