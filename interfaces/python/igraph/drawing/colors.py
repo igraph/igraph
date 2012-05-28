@@ -32,6 +32,7 @@ __all__ = ["Palette", "GradientPalette", "AdvancedGradientPalette", \
     "RainbowPalette", "PrecalculatedPalette", "ClusterColoringPalette", \
     "color_name_to_rgb", "color_name_to_rgba", \
     "hsv_to_rgb", "hsva_to_rgba", "hsl_to_rgb", "hsla_to_rgba", \
+    "rgb_to_hsv", "rgba_to_hsva", "rgb_to_hsl", "rgba_to_hsla", \
     "palettes", "known_colors"]
 
 class Palette(object):
@@ -615,6 +616,82 @@ def hsv_to_rgb(h, s, v):
     """
     return hsva_to_rgba(h, s, v)[:3]
 
+def rgba_to_hsla(r, g, b, alpha=1.0):
+    """Converts a color given by its RGBA coordinates to HSLA coordinates
+    (hue, saturation, lightness, alpha).
+
+    Each of the RGBA coordinates must be in the range [0, 1].
+    """
+    alpha = float(alpha)
+    rgb_min, rgb_max = float(min(r, g, b)), float(max(r, g, b))
+
+    if rgb_min == rgb_max:
+        return 0.0, 0.0, rgb_min, alpha
+
+    lightness = (rgb_min + rgb_max) / 2.0
+    d = rgb_max - rgb_min
+    if lightness > 0.5:
+        sat = d / (2 - rgb_max - rgb_min)
+    else:
+        sat = d / (rgb_max + rgb_min)
+
+    d *= 6.0
+    if rgb_max == r:
+        hue = (g - b) / d
+        if g < b:
+            hue += 1
+    elif rgb_max == g:
+        hue = 1/3.0 + (b - r) / d
+    else:
+        hue = 2/3.0 + (r - g) / d
+    return hue, sat, lightness, alpha
+
+def rgba_to_hsva(r, g, b, alpha=1.0):
+    """Converts a color given by its RGBA coordinates to HSVA coordinates
+    (hue, saturation, value, alpha).
+
+    Each of the RGBA coordinates must be in the range [0, 1].
+    """
+    # This is based on the formulae found at:
+    # http://en.literateprograms.org/RGB_to_HSV_color_space_conversion_(C)
+    rgb_min, rgb_max = float(min(r, g, b)), float(max(r, g, b))
+    alpha = float(alpha)
+    value = float(rgb_max)
+    if value <= 0:
+        return 0.0, 0.0, 0.0, alpha
+    sat = 1.0 - rgb_min / value
+    if sat <= 0:
+        return 0.0, 0.0, value, alpha
+    d = rgb_max - rgb_min
+    r = (r - rgb_min) / d
+    g = (g - rgb_min) / d
+    b = (b - rgb_min) / d
+    rgb_max = max(r, g, b)
+    if rgb_max == r:
+        hue = 0.0 + (g - b) / 6.0
+        if hue < 0:
+            hue += 1
+    elif rgb_max == g:
+        hue = 1/3.0 + (b - r) / 6.0
+    else:
+        hue = 2/3.0 + (r - g) / 6.0
+    return hue, sat, value, alpha
+
+def rgb_to_hsl(r, g, b):
+    """Converts a color given by its RGB coordinates to HSL coordinates
+    (hue, saturation, lightness).
+
+    Each of the RGB coordinates must be in the range [0, 1].
+    """
+    return rgba_to_hsla(r, g, b)[:3]
+
+def rgb_to_hsv(r, g, b):
+    """Converts a color given by its RGB coordinates to HSV coordinates
+    (hue, saturation, value).
+
+    Each of the RGB coordinates must be in the range [0, 1].
+    """
+    return rgba_to_hsva(r, g, b)[:3]
 
 def lighten(color, ratio=0.5):
     """Creates a lighter version of a color given by an RGB triplet.
