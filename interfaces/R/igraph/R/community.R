@@ -265,14 +265,15 @@ as.dendrogram.communities <- function(object, hang=-1, use.modularity=FALSE,
   z
 }
 
-as.hclust.communities <- function(object, use.modularity=FALSE, ...) {
-  as.hclust(as.dendrogram(object, use.modularity=use.modularity, ...))
+as.hclust.communities <- function(object, hang=-1, use.modularity=FALSE,
+                                  ...) {
+  as.hclust(as.dendrogram(object, hang=hang, use.modularity=use.modularity))
 }
 
 asPhylo <- function(x, ...)
   UseMethod("asPhylo")
 
-asPhylo.communities <- function(x, use.modularity=FALSE, ...) {
+asPhylo.communities <- function(x, use.modularity=FALSE) {
 
   if (!is.hierarchical(x, full=TRUE)) {
     stop("Not a fully hierarchical community structure")
