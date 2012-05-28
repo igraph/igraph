@@ -103,7 +103,7 @@ version=`head -1 configure.in | cut -f2 -d, | tr -d ' '`
 
 ## autotools
 ./bootstrap.sh || exit 3
-./configure --disable-shell || exit 6
+./configure || exit 6
 
 ## compile
 make || exit 7

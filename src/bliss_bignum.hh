@@ -25,6 +25,7 @@ using namespace std;
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
+#include <cstring>      /* strncpy */
 #include <sstream>
 #include "bliss_defs.hh"
 #include "igraph_math.h"
