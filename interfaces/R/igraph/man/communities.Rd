@@ -236,9 +236,7 @@ karate <- graph.famous("Zachary")
 wc <- walktrap.community(karate)
 modularity(wc)
 membership(wc)
-\dontrun{
 plot(wc, karate)
-}
 }
 \keyword{graphs}
 
