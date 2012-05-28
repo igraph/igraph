@@ -147,12 +147,14 @@ code.length <- function(communities) {
   communities$codelength
 }
 
-is.hierarchical <- function(communities) {
-  if (algorithm(communities) %in% c("walktrap", "edge betweenness", "fast greedy", "leading eigenvector")) {
+is.hierarchical <- function(communities, full=FALSE) {
+  alg <- algorithm(communities)
+  if (alg %in% c("walktrap", "edge betweenness","fast greedy") ||
+      (alg == "leading eigenvector" && !full)) {
     TRUE
-  } else if (algorithm(communities) %in% c("spinglass",
-                                 "label propagation", "multi level",
-                                 "optimal")) {
+  } else if (alg %in% c("spinglass", "label propagation", "multi level",
+                        "optimal") ||
+             (alg == "leading eigenvector" && full)) {
     FALSE
   } else {
     stop("Unknown community detection algorithm")
@@ -161,10 +163,10 @@ is.hierarchical <- function(communities) {
 
 # The following functions were adapted from the stats R package
 
-as.dendrogram.communities <- function(object, hang=-1,
-                                      use.modularity=FALSE, ...) {
-  if (!is.hierarchical(object)) {
-    stop("Not a hierarchical community structure")
+as.dendrogram.communities <- function(object, hang=-1, use.modularity=FALSE,
+                                      ...) {
+  if (!is.hierarchical(object, full=TRUE)) {
+    stop("Not a fully hierarchical community structure")
   }
 
   .memberDend <- function(x) {
@@ -265,8 +267,8 @@ asPhylo <- function(x, ...)
 
 asPhylo.communities <- function(x, use.modularity=FALSE, ...) {
 
-  if (!is.hierarchical(x)) {
-    stop("Not a hierarchical community structure")
+  if (!is.hierarchical(x, full=TRUE)) {
+    stop("Not a fully hierarchical community structure")
   }
 
   require(ape, quietly = TRUE)
@@ -332,8 +334,8 @@ cutat <- function(communities, no, steps) {
   if (!inherits(communities, "communities")) {
     stop("Not a community structure")
   }
-  if (!is.hierarchical(communities)) {
-    stop("Not a hierarchical communitity structure")
+  if (!is.hierarchical(communities, full=TRUE)) {
+    stop("Not a fully hierarchical communitity structure")
   }
 
   if ((!missing(no) && !missing(steps)) ||

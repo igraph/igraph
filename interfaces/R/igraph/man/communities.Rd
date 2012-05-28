@@ -32,7 +32,7 @@ membership(communities)
 algorithm(communities)
 crossing(communities, graph)
 
-is.hierarchical(communities)
+is.hierarchical(communities, full = FALSE)
 merges(communities)
 cutat(communities, no, steps)
 \method{as.dendrogram}{communities}(object, hang=-1,
@@ -53,7 +53,13 @@ code.length(communities)
 \arguments{
   \item{communities,x,object}{A \code{communities} object, the result of
     an igraph community detection function.}
-  \item{graph}{An igraph graph object, corresponding to \code{communities}.}
+  \item{graph}{An igraph graph object, corresponding to
+    \code{communities}.}
+  \item{full}{Logical scalar, if \code{TRUE}, then
+    \code{is.hierarchical} only returns \code{TRUE} for fully
+   hierarchical algorithms. The \sQuote{leading eigenvector} algorithm
+   is hierarchical, it gives a hierarchy of groups, but not a full
+   dendrogram with all vertices, so it is not fully hierarchical.}
   \item{y}{An igraph graph object, corresponding to the communities in
     \code{x}.}
   \item{no}{Integer scalar, the desired number of communities. If too
