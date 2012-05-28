@@ -161,6 +161,23 @@ is.hierarchical <- function(communities, full=FALSE) {
   }
 }
 
+complete.dend <- function(comm, use.modularity) {
+  merges <- comm$merges
+  if (nrow(merges) < comm$vcount-1) {
+    if (use.modularity) {
+      stop(paste("`use.modularity' requires a full dendrogram,",
+                 "i.e. a connected graph"))
+    }
+    miss <- seq_len(comm$vcount + nrow(merges))[-as.vector(merges)]
+    miss <- c(miss, seq_len(length(miss)-2) + comm$vcount+nrow(merges))
+    miss <- matrix(miss, byrow=TRUE, ncol=2)
+    merges <- rbind(merges, miss)
+  }
+  storage.mode(merges) <- "integer"
+
+  merges
+}
+
 # The following functions were adapted from the stats R package
 
 as.dendrogram.communities <- function(object, hang=-1, use.modularity=FALSE,
@@ -178,18 +195,8 @@ as.dendrogram.communities <- function(object, hang=-1, use.modularity=FALSE,
     r
   }
 
-  merges <- object$merges
-
   ## If multiple components, then we merge them in arbitrary order
-  ## but only if not dealing with leading eigenvector community
-  ## structure, because for that the dendrogram is different
-  if (nrow(merges) < object$vcount-1 &&
-      object$algorithm != "leading eigenvector") {
-    miss <- seq_len(object$vcount + nrow(merges))[-as.vector(merges)]
-    miss <- c(miss, seq_len(length(miss)-2) + object$vcount+nrow(merges))
-    miss <- matrix(miss, byrow=TRUE, ncol=2)
-    merges <- rbind(merges, miss)
-  }
+  merges <- complete.dend(object, use.modularity)
   
   storage.mode(merges) <- "integer"
   
@@ -273,18 +280,8 @@ asPhylo.communities <- function(x, use.modularity=FALSE, ...) {
 
   require(ape, quietly = TRUE)
   
-  merges <- x$merges
-
   ## If multiple components, then we merge them in arbitrary order
-  ## but only if not dealing with leading eigenvector community
-  ## structure, because for that the dendrogram is different
-  if (nrow(merges) < x$vcount-1 &&
-      x$algorithm != "leading eigenvector") {
-    miss <- seq_len(x$vcount + nrow(merges))[-as.vector(merges)]
-    miss <- c(miss, seq_len(length(miss)-2) + x$vcount+nrow(merges))
-    miss <- matrix(miss, byrow=TRUE, ncol=2)
-    merges <- rbind(merges, miss)
-  }
+  merges <- complete.dend(x, use.modularity)
 
   if (!use.modularity || is.null(x$modularity)) {
     height <- 1:nrow(merges)
