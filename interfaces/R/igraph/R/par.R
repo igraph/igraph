@@ -30,7 +30,8 @@
                      "sparsematrices"=TRUE,
                      "nexus.url"="http://nexus.igraph.org",
                      "add.params"=TRUE,
-                     "add.vertex.names"=TRUE
+                     "add.vertex.names"=TRUE,
+                     "dend.plot.type"="auto"
                     )
 
 igraph.pars.set.verbose <- function(verbose) {

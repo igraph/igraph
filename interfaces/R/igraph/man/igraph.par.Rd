@@ -47,6 +47,11 @@ igraph.par(parid, parvalue = NULL)
     \item{add.vertex.names}{Logical scalar, whether to add
       vertex names to node level indices, like degree, betweenness
       scores, etc. By default it is \code{TRUE}.}
+    \item{dend.plot.type}{The plotting function to use when plotting
+      community structure dendrograms via
+      \code{\link{dendPlot}}}. Possible values are \sQuote{auto} (the
+      default), \sQuote{phylo}, \sQuote{hclust} and
+      \sQuote{dendrogram}. See \code{\link{dendPlot}} for details.
     \item{edge.attr.comb}{Specifies what to do with the edge
       attributes if the graph is modified. The default value is
       \code{list(weight="sum", name="concat", "ignore")}. See

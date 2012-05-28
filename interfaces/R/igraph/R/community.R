@@ -739,6 +739,90 @@ plot.communities <- function(x, y,
        ...)  
 }
 
+dendPlot <- function(communities, mode=getIgraphOpt("dend.plot.type"), ...,
+                     use.modularity=FALSE)
+  UseMethod("dendPlot")
+
+dendPlot.communities <- function(communities, 
+                                 mode=getIgraphOpt("dend.plot.type"), ...,
+                                 use.modularity=FALSE) {  
+  mode <- igraph.match.arg(mode, c("auto", "phylo", "hclust", "dendrogram"))
+
+  if (mode=="auto") {
+    value <- tryCatch(suppressWarnings(library("ape", character.only=TRUE,
+                                               logical.return=TRUE,
+                                               warn.conflicts=FALSE,
+                                               quietly=TRUE,
+                                               pos="package:base")),
+                      error=function(e) e)
+    mode <- if (value) "phylo" else "hclust"
+  }
+  
+  if (mode=="hclust") {
+    dendPlotHclust(communities, use.modularity=use.modularity, ...)
+  } else if (mode=="dendrogram") {
+    dendPlotDendrogram(communities, use.modularity=use.modularity, ...)
+  } else if (mode=="phylo") {
+    dendPlotPhylo(communities, use.modularity=use.modularity, ...)
+  }
+}
+
+dendPlotHclust <- function(communities, rect=length(communities),
+                           colbar=rainbow(rect), hang=-1, ann=FALSE,
+                           main="", sub="", xlab="", ylab="", ...,
+                           use.modularity=FALSE) {
+  hc <- as.hclust(communities, hang=hang, use.modularity=use.modularity)
+  ret <- plot(hc, hang=hang, ann=ann, main=main, sub=sub, xlab=xlab,
+              ylab=ylab, ...)
+  if (rect > 0) {
+    rect.hclust(hc, k=rect, border=colbar)
+  }
+  invisible(ret)
+}
+
+dendPlotDendrogram <- function(communities, hang=-1, ...,
+                               use.modularity=FALSE) {
+  plot(as.dendrogram(communities, hang=hang, use.modularity=use.modularity),
+       ...)
+}
+
+dendPlotPhylo <- function(communities, colbar=rainbow(length(communities)),
+                          col=colbar[membership(communities)],
+                          mark.groups=communities(communities),
+                          use.modularity=FALSE, 
+                          edge.color="#AAAAAAFF",
+                          edge.lty=c(1,2), ...) {
+  
+  phy <- asPhylo(communities, use.modularity=use.modularity)
+
+  getedges <- function(tip) {
+    repeat {      
+      ee <- which(! phy$edge[,1] %in% tip & phy$edge[,2] %in% tip)
+      if (length(ee)<=1) { break }
+      tip <- c(tip, unique(phy$edge[ee,1]))
+    }
+    ed <- which(phy$edge[,1] %in% tip & phy$edge[,2] %in% tip)
+    eds <- phy$edge[ed, 1]
+    good <- which(phy$edge[ed,1] %in% which(tabulate(eds) != 1))
+    ed[good]
+  }
+  gredges <- lapply(mark.groups, getedges)
+
+  if (length(mark.groups) > 0) {
+    ecol <- rep(edge.color, nrow(phy$edge))
+    for (gr in seq_along(gredges)) {
+      ecol[gredges[[gr]]] <- colbar[gr]
+    }
+  } else {
+    ecol <- edge.color
+  }
+  
+  elty <- rep(edge.lty[2], nrow(phy$edge))
+  elty[ unlist(gredges) ] <- edge.lty[1]
+  
+  plot(phy, edge.color=ecol, edge.lty=elty, tip.color=col, ...)
+}
+
 compare <- function(comm1, comm2, method=c("vi", "nmi",
                                        "split.join", "rand",
                                        "adjusted.rand"))
