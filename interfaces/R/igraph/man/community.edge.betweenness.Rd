@@ -9,8 +9,7 @@
 \usage{
 edge.betweenness.community (graph, weights = E(graph)$weight,
     directed = TRUE, edge.betweenness = TRUE, merges = TRUE,
-    bridges = TRUE, labels = TRUE, modularity = TRUE,
-    membership = TRUE)
+    bridges = TRUE, modularity = TRUE, membership = TRUE)
 }
 \arguments{
   \item{graph}{The graph to analyze.}
@@ -39,10 +38,6 @@ edge.betweenness.community (graph, weights = E(graph)$weight,
   }
   \item{bridges}{Logical constant, whether to return a list the edge
     removals which actually splitted a component of the graph.}
-  \item{labels}{Logical constant, whether to contain the labels of the
-    vertices in the result. More precisely, if the graph has a vertex
-    attribute valled \code{name}, it will be part of the result
-    object.}
   \item{modularity}{Logical constant, whether to calculate the
     maximum modularity score, considering all possibly community
     structures along the edge-betweenness based edge removals.}
