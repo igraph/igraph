@@ -37,8 +37,9 @@ merges(communities)
 cutat(communities, no, steps)
 \method{as.dendrogram}{communities}(object, hang=-1,
    use.modularity=FALSE, \dots)
-\method{as.hclust}{communities}(object, use.modularity=FALSE, \dots)
-\method{asPhylo}{communitues}(x)
+\method{as.hclust}{communities}(x, hang = -1,
+   use.modularity = FALSE, \dots)
+\method{asPhylo}{communities}(x, use.modularity=FALSE)
 showtrace(communities)
 
 code.length(communities)
