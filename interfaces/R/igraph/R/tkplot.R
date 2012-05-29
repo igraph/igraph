@@ -1450,7 +1450,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
     }
     
     newfont <- tkfont.create(family=tkfamily, slant=slant, weight=weight,
-                             size=12*cex)
+                             size=as.integer(12*cex))
     as.character(newfont)
   }
 }
