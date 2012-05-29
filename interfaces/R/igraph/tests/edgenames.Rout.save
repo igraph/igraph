@@ -17,7 +17,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > 
-> library(igraph)
+> library(igraph) ; igraph.options(print.full=TRUE)
 > 
 > ## named edges
 > igraph.options(print.edge.attributes = TRUE)
@@ -73,4 +73,4 @@ IGRAPH UN-- 10 7 -- Ring graph
 > 
 > proc.time()
    user  system elapsed 
-  0.360   0.045   0.392 
+  0.307   0.039   0.351 

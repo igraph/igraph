@@ -17,7 +17,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > 
-> library(igraph)
+> library(igraph) ; igraph.options(print.full=TRUE)
 > 
 > g <- graph.ring(10)
 > V(g)$name <- letters[1:10]
@@ -71,4 +71,4 @@ IGRAPH UN-- 10 6 -- Ring graph
 > 
 > proc.time()
    user  system elapsed 
-  0.303   0.041   0.331 
+  0.305   0.039   0.395 

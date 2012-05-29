@@ -1,5 +1,5 @@
 
-library(igraph)
+library(igraph) ; igraph.options(print.full=TRUE)
 
 tree <- graph.tree(10, 3, "undirected")
 treeM <- get.adjacency(tree, sparse=TRUE)

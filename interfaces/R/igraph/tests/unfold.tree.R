@@ -1,5 +1,5 @@
 
-library(igraph)
+library(igraph) ; igraph.options(print.full=TRUE)
 
 g <- graph.tree(7, 2)
 g <- add.edges(g, c(2,7, 1,4))

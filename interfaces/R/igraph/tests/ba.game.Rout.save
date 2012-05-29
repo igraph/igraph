@@ -19,7 +19,7 @@ Type 'q()' to quit R.
 > 
 > # sink("ba.game.Rout.save")
 > 
-> library(igraph)
+> library(igraph) ; igraph.options(print.full=TRUE)
 > 
 > g <- ba.game(100, m=2)
 > ecount(g)
@@ -121,4 +121,4 @@ IGRAPH D--- 10 9 -- Barabasi graph
 > 
 > proc.time()
    user  system elapsed 
-  0.324   0.045   0.353 
+  0.313   0.041   0.366 

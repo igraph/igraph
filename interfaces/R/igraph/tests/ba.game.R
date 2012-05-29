@@ -1,7 +1,7 @@
 
 # sink("ba.game.Rout.save")
 
-library(igraph)
+library(igraph) ; igraph.options(print.full=TRUE)
 
 g <- ba.game(100, m=2)
 ecount(g)

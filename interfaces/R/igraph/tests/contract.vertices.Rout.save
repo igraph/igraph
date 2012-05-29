@@ -17,7 +17,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > 
-> library(igraph)
+> library(igraph) ; igraph.options(print.full=TRUE)
 > 
 > set.seed(42)
 > 
@@ -68,4 +68,4 @@ IGRAPH UNW- 5 10 -- Ring
 > 
 > proc.time()
    user  system elapsed 
-  0.297   0.042   0.324 
+  0.296   0.039   0.344 

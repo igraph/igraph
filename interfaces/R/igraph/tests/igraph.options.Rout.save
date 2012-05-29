@@ -17,7 +17,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > 
-> library(igraph)
+> library(igraph) ; igraph.options(print.full=TRUE)
 > 
 > g <- graph.ring(5)
 > V(g)$name <- letters[1:5]
@@ -83,4 +83,4 @@ IGRAPH UNW- 5 5 -- A small ring
 > 
 > proc.time()
    user  system elapsed 
-  0.320   0.043   0.349 
+  0.311   0.039   0.360 

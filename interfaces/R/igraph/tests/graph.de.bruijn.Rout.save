@@ -17,7 +17,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > 
-> library(igraph)
+> library(igraph) ; igraph.options(print.full=TRUE)
 > 
 > g <- graph.de.bruijn(2,1)
 > g2 <- graph.de.bruijn(2,2)
@@ -32,4 +32,4 @@ IGRAPH D--- 4 8 -- Line graph
 > 
 > proc.time()
    user  system elapsed 
-  0.345   0.050   0.395 
+  0.293   0.037   0.339 

@@ -17,7 +17,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > 
-> library(igraph)
+> library(igraph) ; igraph.options(print.full=TRUE)
 > 
 > tree <- graph.tree(10, 3, "undirected")
 > treeM <- get.adjacency(tree, sparse=TRUE)
@@ -1346,4 +1346,4 @@ $vectors
 > 
 > proc.time()
    user  system elapsed 
-  3.200   0.109   3.295 
+  3.208   0.104   3.300 

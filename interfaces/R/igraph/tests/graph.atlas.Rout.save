@@ -17,7 +17,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > 
-> library(igraph)
+> library(igraph) ; igraph.options(print.full=TRUE)
 > 
 > graph.atlas(124)
 IGRAPH U--- 6 7 -- Graph from the Atlas #124
@@ -33,4 +33,4 @@ IGRAPH U--- 7 5 -- Graph from the Atlas #234
 > 
 > proc.time()
    user  system elapsed 
-  0.319   0.043   0.348 
+  0.290   0.038   0.331 

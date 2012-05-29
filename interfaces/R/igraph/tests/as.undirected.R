@@ -1,5 +1,5 @@
 
-library(igraph)
+library(igraph) ; igraph.options(print.full=TRUE)
 
 set.seed(42)
 g <- graph.formula(A+-+B, A--+C, C+-+D)

@@ -1,5 +1,5 @@
 
-library(igraph)
+library(igraph) ; igraph.options(print.full=TRUE)
 
 g <- erdos.renyi.game(100, 2/100)
 g2 <- as.directed(g, mode="mutual")

@@ -17,7 +17,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > 
-> library(igraph)
+> library(igraph) ; igraph.options(print.full=TRUE)
 > 
 > g <- graph.ring(5)
 > summary(g)
@@ -301,4 +301,4 @@ J -- I
 > 
 > proc.time()
    user  system elapsed 
-  0.644   0.065   0.738 
+   0.39    0.04    0.44 

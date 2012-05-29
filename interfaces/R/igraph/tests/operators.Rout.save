@@ -17,7 +17,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > 
-> library(igraph)
+> library(igraph) ; igraph.options(print.full=TRUE)
 > 
 > g1 <- graph.ring(10)
 > g2 <- graph.star(11, center=11, mode="undirected")
@@ -86,4 +86,4 @@ IGRAPH U--- 11 60 --
 > 
 > proc.time()
    user  system elapsed 
-  0.302   0.042   0.329 
+  0.323   0.041   0.394 
