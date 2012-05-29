@@ -1446,7 +1446,10 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
     idx <- substr(col,1,1)=="#" & nchar(col)==9
     col[idx] <- substr(col[idx],1,7)
   }
-  
+
+  ## replace NA's with ""
+  col[is.na(col)] <- ""
+
   col
 }
 
