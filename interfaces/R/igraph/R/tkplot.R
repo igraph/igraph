@@ -87,7 +87,11 @@ tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
   tkpack(canvas, fill="both", expand=1)
 
   # Create parameters
-  params <- list(vertex.color=vertex.color, vertex.size=vertex.size,
+  vertex.params <- sdf(vertex.color=vertex.color,
+                       vertex.size=vertex.size,
+                       NROW=vcount(graph))
+                       
+  params <- list(vertex.params=vertex.params,
                  edge.color=edge.color, label.color=label.color,
                  labels.state=1, edge.width=edge.width,
                  padding=margin*300+max(vertex.size)+5,
@@ -112,9 +116,7 @@ tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
           vids <- .tkplot.get.selected.vertices(tkp.id)
           if (length(vids)==0) return(FALSE)
           
-          initialcolor <- ifelse(length(tkp$params$vertex.color)>1,
-                                 tkp$params$vertex.color[vids[1]],
-                                 tkp$params$vertex.color)
+          initialcolor <- tkp$params$vertex.params[vids[1], "vertex.color"]
           color <- .tkplot.select.color(initialcolor)
           if (color=="") return(FALSE) # Cancel
           
@@ -126,9 +128,7 @@ tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
           vids <- .tkplot.get.selected.vertices(tkp.id)
           if (length(vids)==0) return(FALSE)
 
-          initialsize <- ifelse(length(tkp$params$vertex.size)>1,
-                                tkp$params$vertex.size[vids[1]],
-                                tkp$params$vertex.size)
+          initialsize <- tkp$params$vertex.params[1, "vertex.size"]
           size <- .tkplot.select.number("Vertex size", initialsize, 1, 20)
           if (is.na(size)) return(FALSE)
 
@@ -344,7 +344,7 @@ tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
   # We don't need these any more, they are stored in the environment
   rm(tkp, params, layout, vertex.color, edge.color, top, canvas,
      main.menu, layout.menu, view.menu, export.menu, label.font, label.degree,
-     vertex.frame.color)
+     vertex.frame.color, vertex.params)
   
   tkp.id
 }
@@ -664,12 +664,8 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
 # Creates a new vertex tk object
 .tkplot.create.vertex <- function(tkp.id, id, label, x=0, y=0) {
   tkp <- .tkplot.get(tkp.id)
-  vertex.size <- ifelse(length(tkp$params$vertex.size)>1,
-                        tkp$params$vertex.size[id],
-                        tkp$params$vertex.size)
-  vertex.color <- ifelse(length(tkp$params$vertex.color)>1,
-                         tkp$params$vertex.color[id],
-                         tkp$params$vertex.color)
+  vertex.size <- tkp$params$vertex.params[id, "vertex.size"]
+  vertex.color <- tkp$params$vertex.params[id, "vertex.color"]
   vertex.frame.color <- ifelse(length(tkp$params$vertex.frame.color)>1,
                                tkp$params$vertex.frame.color[id],
                                tkp$params$vertex.frame.color)
@@ -720,9 +716,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
 
 .tkplot.update.label <- function(tkp.id, id, x, y) {
   tkp <- .tkplot.get(tkp.id)
-  vertex.size <- ifelse(length(tkp$params$vertex.size)>1,
-                        tkp$params$vertex.size[id],
-                        tkp$params$vertex.size)
+  vertex.size <- tkp$params$vertex.params[id, "vertex.size"]
   label.degree <- ifelse(length(tkp$params$label.degree)>1,
                          tkp$params$label.degree[id],
                          tkp$params$label.degree)
@@ -737,9 +731,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
 
 .tkplot.update.vertex <- function(tkp.id, id, x, y) {
   tkp <- .tkplot.get(tkp.id)
-  vertex.size <- ifelse(length(tkp$params$vertex.size)>1,
-                        tkp$params$vertex.size[id],
-                        tkp$params$vertex.size)
+  vertex.size <- tkp$params$vertex.params[id, "vertex.size"]
   # Vertex
   tkcoords(tkp$canvas, paste("vertex&&v-", id, sep=""),
            x-vertex.size, y-vertex.size,
@@ -869,12 +861,8 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   if (from != to) {
     phi <- atan2(to.c[2]-from.c[2], to.c[1]-from.c[1])
     r <- sqrt( (to.c[1]-from.c[1])^2 + (to.c[2]-from.c[2])^2 )
-    vertex.size <- ifelse(length(tkp$params$vertex.size)>1,
-                          tkp$params$vertex.size[to],
-                          tkp$params$vertex.size)
-    vertex.size2 <- ifelse(length(tkp$params$vertex.size)>1,
-                           tkp$params$vertex.size[from],
-                           tkp$params$vertex.size)
+    vertex.size <- tkp$params$vertex.params[to, "vertex.size"]
+    vertex.size2 <- tkp$params$vertex.params[from, "vertex.size"]
     curved <- tkp$params$curved[[edgeid]]
     to.c[1] <- from.c[1] + (r-vertex.size)*cos(phi)
     to.c[2] <- from.c[2] + (r-vertex.size)*sin(phi)
@@ -892,9 +880,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
                to.c[1], to.c[2])
     }
   } else {
-    vertex.size <- ifelse(length(tkp$params$vertex.size)>1,
-                          tkp$params$vertex.size[to],
-                          tkp$params$vertex.size)
+    vertex.size <- tkp$params$vertex.params[to, "vertex.size"]
     loop.angle <- ifelse(length(tkp$param$loop.angle)>1,
                          tkp$params$loop.angle[edgeid],
                          tkp$params$loop.angle)
@@ -952,24 +938,9 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
 
 .tkplot.update.vertex.color <- function(tkp.id, vids, newcolor) {
   tkp <- .tkplot.get(tkp.id)
-  colors <- tkp$params$vertex.color
-  if (length(colors)==1 && length(vids)==vcount(tkp$graph)) {
-    ## Uniform color -> uniform color
-    .tkplot.set(tkp.id, "params$vertex.color", newcolor)
-  } else if (length(colors)==1) {
-    ## Uniform color -> nonuniform color
-    colors <- rep(colors, vcount(tkp$graph))
-    colors[vids] <- newcolor
-    .tkplot.set(tkp.id, "params$vertex.color", colors)
-  } else if (length(vids)==vcount(tkp$graph)) {
-    ## Non-uniform -> uniform
-    .tkplot.set(tkp.id, "params$vertex.color", newcolor)
-  } else {
-    ## Non-uniform -> non-uniform
-    colors[vids] <- newcolor
-    .tkplot.set(tkp.id, "params$vertex.color", colors)
-  }
-
+  vparams <- tkp$params$vertex.params
+  vparams[vids, "vertex.color"] <- newcolor
+  .tkplot.set(tkp.id, "params$vertex.params", vparams)
   tkitemconfigure(tkp$canvas, "selected&&vertex", "-fill", newcolor)
 }
 
@@ -1022,24 +993,9 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
 
 .tkplot.update.vertex.size <- function(tkp.id, vids, newsize) {
   tkp <- .tkplot.get(tkp.id)
-  sizes <- tkp$params$vertex.size
-  if (length(sizes)==1 && length(vids)==vcount(tkp$graph)) {
-    ## Uniform -> uniform
-    .tkplot.set(tkp.id, "params$vertex.size", newsize)
-  } else if (length(sizes)==1) {
-    ## Uniform size -> nonuniform size
-    sizes <- rep(sizes, vcount(tkp$graph))
-    sizes[vids] <- newsize
-    .tkplot.set(tkp.id, "params$vertex.size", sizes)
-  } else if (length(vids)==vcount(tkp$graph)) {
-    ## Non-uniform -> uniform
-    .tkplot.set(tkp.id, "params$vertex.size", newsize)
-  } else {
-    ## Non-uniform -> non-uniform
-    sizes[vids] <- newsize
-    .tkplot.set(tkp.id, "params$vertex.size", sizes)
-  }
-
+  vparams <- tkp$params$vertex.params
+  vparams[vids, "vertex.size"] <- newsize
+  .tkplot.set(tkp.id, "params$vertex.params", vparams)
   sapply(vids, function(id) {
     .tkplot.update.vertex(tkp.id, id, tkp$coords[id,1], tkp$coords[id,2])
   })
