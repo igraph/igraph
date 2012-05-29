@@ -60,6 +60,9 @@ igraph.par(parid, parvalue = NULL)
       \code{\link{nexus}} for details.}
     \item{print.edge.attributes}{Logical constant, whether to print edge
       attributes when printing graphs. Defaults to \code{FALSE}.}
+    \item{print.full}{Logical scalar, whether \code{\link{print.igraph}}
+      should show the graph structure as well, or only a summary of the
+      graph.}
     \item{print.graph.attributes}{Logical constant, whether to print
       graph attributes when printing graphs. Defaults to \code{FALSE}.}
     \item{print.vertex.attributes}{Logical constant, whether to print
