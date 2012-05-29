@@ -300,8 +300,17 @@ plot.igraph <- function(x,
     (vertex.size+6*8*log10(nchar(labels)+1))/200
   y <- layout[,2]+label.dist*sin(-label.degree)*
     (vertex.size+6*8*log10(nchar(labels)+1))/200
-  text(x, y, labels=labels, col=label.color, family=label.family, font=label.font,
-       cex=label.cex)
+  if (length(label.family)==1) {
+    text(x, y, labels=labels, col=label.color, family=label.family,
+         font=label.font, cex=label.cex)
+  } else {
+    if1 <- function(vect, idx) if (length(vect)==1) vect else vect[idx]
+    sapply(seq_len(vcount(graph)), function(v) {
+      text(x[v], y[v], labels=if1(labels, v), col=if1(label.color, v),
+           family=if1(label.family, v), font=if1(label.font, v),
+           cex=if1(label.cex, v))
+    })
+  }
   rm(x, y)
   invisible(NULL)
 }
