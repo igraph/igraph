@@ -89,13 +89,14 @@ tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
   # Create parameters
   vertex.params <- sdf(vertex.color=vertex.color,
                        vertex.size=vertex.size,
+                       label.font=label.font,
                        NROW=vcount(graph))
                        
   params <- list(vertex.params=vertex.params,
                  edge.color=edge.color, label.color=label.color,
                  labels.state=1, edge.width=edge.width,
                  padding=margin*300+max(vertex.size)+5,
-                 grid=0, label.font=label.font, label.degree=label.degree,
+                 grid=0, label.degree=label.degree,
                  label.dist=label.dist, edge.labels=edge.labels,
                  vertex.frame.color=vertex.frame.color,
                  loop.angle=loop.angle, edge.lty=edge.lty, arrow.mode=arrow.mode,
@@ -695,7 +696,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
     litem <- tkcreate(tkp$canvas, "text", label.x, label.y,
                       text=as.character(label), state="normal",
                       fill=label.color, activefill=afill,
-                      font=tkp$params$label.font)
+                      font=tkp$params$vertex.params[id, "label.font"])
     tkaddtag(tkp$canvas, "label", "withtag", litem)
     tkaddtag(tkp$canvas, paste("v-", id, sep=""), "withtag", litem)
   }
@@ -1420,6 +1421,11 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
     family <- as.character(family)
     cex <- as.numeric(cex)    
 
+    ## multiple sizes
+    if (length(cex) > 1) {
+      return(sapply(cex, .tkplot.convert.font, font=font, family=family))
+    }
+    
     ## set slant & weight
     if (font==2) {
       slant <- "roman"
