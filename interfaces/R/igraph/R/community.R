@@ -265,12 +265,12 @@ as.dendrogram.communities <- function(object, hang=-1, use.modularity=FALSE,
   z
 }
 
-as.hclust.communities <- function(object, hang=-1, use.modularity=FALSE,
+as.hclust.communities <- function(x, hang=-1, use.modularity=FALSE,
                                   ...) {
-  as.hclust(as.dendrogram(object, hang=hang, use.modularity=use.modularity))
+  as.hclust(as.dendrogram(x, hang=hang, use.modularity=use.modularity))
 }
 
-asPhylo <- function(x, ...)
+asPhylo <- function(x, use.modularity=FALSE)
   UseMethod("asPhylo")
 
 asPhylo.communities <- function(x, use.modularity=FALSE) {
