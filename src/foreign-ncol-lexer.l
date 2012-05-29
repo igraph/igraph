@@ -45,6 +45,7 @@
 */
 
 #include "config.h"
+#include "error.h"
 #include <stdlib.h>
 #include "foreign-ncol-parser.h"
 extern long int igraph_ncol_mylineno;
@@ -52,6 +53,15 @@ int igraph_i_ncol_eof;
 void igraph_i_ncol_reset_scanner() {
   YY_FLUSH_BUFFER;
 }
+/* We assume that 'file' is 'stderr' here. */
+#define fprintf(file, msg, ...) \
+  igraph_warningf(msg, __FILE__, __LINE__, 0, __VA_ARGS__)
+#ifdef stdout 
+#  undef stdout
+#endif
+#define stdout 0
+#define exit(code) igraph_error("Fatal error in NCOL parser", __FILE__, \
+				__LINE__, IGRAPH_PARSEERROR);
 %}
 
 %option noyywrap
