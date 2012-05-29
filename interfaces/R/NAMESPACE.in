@@ -51,8 +51,10 @@ S3method(print, igraph.es)
 # basic functions, printing
 
 export(is.igraph, is.named, is.weighted, is.bipartite,
-       are.connected, print.igraph, summary.igraph, is.directed,
-       get.edge)
+       are.connected, print.igraph, str.igraph, summary.igraph,
+       is.directed, get.edge)
+
+S3method("str", "igraph")
 
 # structure generators
 

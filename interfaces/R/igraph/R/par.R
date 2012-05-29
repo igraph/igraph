@@ -31,7 +31,8 @@
                      "nexus.url"="http://nexus.igraph.org",
                      "add.params"=TRUE,
                      "add.vertex.names"=TRUE,
-                     "dend.plot.type"="auto"
+                     "dend.plot.type"="auto",
+                     "print.full"=FALSE
                     )
 
 igraph.pars.set.verbose <- function(verbose) {
