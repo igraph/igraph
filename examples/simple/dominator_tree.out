@@ -24,7 +24,7 @@
 10 7
 11 0
 12 4
--1 0 0 0 0 nan nan nan 0 3 3 0 0 10 0 4 nan nan nan nan
+-1 0 0 0 0 NAN NAN NAN 0 3 3 0 0 10 0 4 NAN NAN NAN NAN
 5 6 7 16 17 18 19
 0 1
 0 2
@@ -38,7 +38,7 @@
 3 10
 4 15
 10 13
-9 0 3 1 1 1 9 nan nan -1
+9 0 3 1 1 1 9 NAN NAN -1
 7 8
 0 9
 1 0
