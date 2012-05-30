@@ -31,7 +31,7 @@
 #if defined(BASE_IGRAPH_REAL)
 #define BASE igraph_real_t
 #define SHORT
-#define OUT_FORMAT "%g"
+#define OUT_FORMAT "%G"
 #define ZERO 0.0
 #define ONE 1.0
 #define MULTIPLICITY 1
