@@ -30,7 +30,7 @@ int print_matrix(const igraph_matrix_t *m) {
   for (i=0; i<nrow; i++) {
     printf("%li:", i);
     for (j=0; j<ncol; j++) {
-      printf(" %3g", MATRIX(*m, i, j));
+      printf(" %3.0F", MATRIX(*m, i, j));
     }
     printf("\n");
   }
