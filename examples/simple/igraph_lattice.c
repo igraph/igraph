@@ -28,52 +28,56 @@ typedef struct {
   int m;
   int nei;
   igraph_bool_t directed, mutual, circular;
-  igraph_real_t dimedges[];
+  igraph_real_t *dimedges;
 } lat_test_t;
 
-/*------------------------d--m--ne-di-mu-ci-dimedges------------------------*/
-lat_test_t lat_u_0    = { 0, 0, 1, 0, 0, 0, { } };
-lat_test_t lat_u_01   = { 1, 0, 1, 0, 0, 0, { 0 } };
-lat_test_t lat_u_02   = { 2, 0, 1, 0, 0, 0, { 0, 1 } };
-lat_test_t lat_u_03   = { 2, 0, 1, 0, 0, 0, { 1, 0 } };
+#define LAT_TEST(id, d, m, ne, di, mu, ci, ...) \
+  igraph_real_t lat_ ## id ## _edges[] = { __VA_ARGS__ } ; \
+  lat_test_t lat_ ## id = { d, m, ne, di, mu, ci, lat_ ## id ## _edges }
 
-lat_test_t lat_d_0    = { 0, 0, 1, 1, 0, 0, { } };
-lat_test_t lat_d_01   = { 1, 0, 1, 1, 0, 0, { 0 } };
-lat_test_t lat_d_02   = { 2, 0, 1, 1, 0, 0, { 0, 1 } };
-lat_test_t lat_d_03   = { 2, 0, 1, 1, 0, 0, { 1, 0 } };
+/*----------------d--m--ne-di-mu-ci-dimedges------------------------*/
+LAT_TEST(u_0,     0, 0, 1, 0, 0, 0,  -1 );
+LAT_TEST(u_01,    1, 0, 1, 0, 0, 0,  0 );
+LAT_TEST(u_02,    2, 0, 1, 0, 0, 0,  0, 1 );
+LAT_TEST(u_03,    2, 0, 1, 0, 0, 0,  1, 0 );
 
-lat_test_t lat_u_1    = { 1, 0, 1, 0, 0, 0, { 1 } };
-lat_test_t lat_u_1x1  = { 2, 0, 1, 0, 0, 0, { 1, 1 } };
-lat_test_t lat_u_2    = { 1, 1, 1, 0, 0, 0, { 2, 0,1 } };
-lat_test_t lat_u_2x1  = { 2, 1, 1, 0, 0, 0, { 2,1, 0,1 } };
-lat_test_t lat_u_2x2  = { 2, 4, 1, 0, 0, 0, { 2,2, 0,1, 0,2, 1,3, 2,3 } };
+LAT_TEST(d_0,     0, 0, 1, 1, 0, 0,  -1 );
+LAT_TEST(d_01,    1, 0, 1, 1, 0, 0,  0 );
+LAT_TEST(d_02,    2, 0, 1, 1, 0, 0,  0, 1 );
+LAT_TEST(d_03,    2, 0, 1, 1, 0, 0,  1, 0 );
 
-lat_test_t lat_uc_1   = { 1, 0, 1, 0, 0, 1, { 1 } };
-lat_test_t lat_uc_1x1 = { 2, 0, 1, 0, 0, 1, { 1, 1 } };
-lat_test_t lat_uc_2   = { 1, 1, 1, 0, 0, 1, { 2, 0,1 } };
-lat_test_t lat_uc_2x1 = { 2, 1, 1, 0, 0, 1, { 2,1, 0,1 } };
-lat_test_t lat_uc_2x2 = { 2, 4, 1, 0, 0, 1, { 2,2, 0,1, 0,2, 1,3, 2,3 } };
+LAT_TEST(u_1,     1, 0, 1, 0, 0, 0,  1 );
+LAT_TEST(u_1x1,   2, 0, 1, 0, 0, 0,  1, 1 );
+LAT_TEST(u_2,     1, 1, 1, 0, 0, 0,  2, 0,1 );
+LAT_TEST(u_2x1,   2, 1, 1, 0, 0, 0,  2,1, 0,1 );
+LAT_TEST(u_2x2,   2, 4, 1, 0, 0, 0,  2,2, 0,1, 0,2, 1,3, 2,3 );
 
-lat_test_t lat_dc_1   = { 1, 0, 1, 1, 0, 1, { 1 } };
-lat_test_t lat_dc_1x1 = { 2, 0, 1, 1, 0, 1, { 1, 1 } };
-lat_test_t lat_dc_2   = { 1, 2, 1, 1, 0, 1, { 2, 0,1, 1,0 } };
-lat_test_t lat_dc_2x1 = { 2, 2, 1, 1, 0, 1, { 2,1, 0,1, 1,0 } };
-lat_test_t lat_dc_2x2 = { 2, 8, 1, 1, 0, 1, { 2,2, 0,1, 0,2, 1,3, 2,3, 
-					      1,0, 2,0, 3,1, 3,2, } };
+LAT_TEST(uc_1,    1, 0, 1, 0, 0, 1,  1 );
+LAT_TEST(uc_1x1,  2, 0, 1, 0, 0, 1,  1, 1 );
+LAT_TEST(uc_2,    1, 1, 1, 0, 0, 1,  2, 0,1 );
+LAT_TEST(uc_2x1,  2, 1, 1, 0, 0, 1,  2,1, 0,1 );
+LAT_TEST(uc_2x2,  2, 4, 1, 0, 0, 1,  2,2, 0,1, 0,2, 1,3, 2,3 );
 
-lat_test_t lat_d_1    = { 1, 0, 1, 1, 0, 0, { 1 } };
-lat_test_t lat_d_1x1  = { 2, 0, 1, 1, 0, 0, { 1, 1 } };
-lat_test_t lat_d_2    = { 1, 1, 1, 1, 0, 0, { 2, 0,1 } };
-lat_test_t lat_d_2x1  = { 2, 1, 1, 1, 0, 0, { 2,1, 0,1 } };
-lat_test_t lat_d_2x2  = { 2, 4, 1, 1, 0, 0, { 2,2, 0,1, 0,2, 1,3, 2,3 } };
+LAT_TEST(dc_1,    1, 0, 1, 1, 0, 1,  1 );
+LAT_TEST(dc_1x1,  2, 0, 1, 1, 0, 1,  1, 1 );
+LAT_TEST(dc_2,    1, 2, 1, 1, 0, 1,  2, 0,1, 1,0 );
+LAT_TEST(dc_2x1,  2, 2, 1, 1, 0, 1,  2,1, 0,1, 1,0 );
+LAT_TEST(dc_2x2,  2, 8, 1, 1, 0, 1,  2,2, 0,1, 0,2, 1,3, 2,3, 
+	                             1,0, 2,0, 3,1, 3,2, );
 
-lat_test_t lat_dmc_1  = { 1, 0, 1, 1, 0, 1, { 1 } };
-lat_test_t lat_dmc_1x1= { 2, 0, 1, 1, 0, 1, { 1, 1 } };
-lat_test_t lat_dmc_2  = { 1, 2, 1, 1, 0, 1, { 2, 0,1, 1,0 } };
-lat_test_t lat_dmc_2x1= { 2, 2, 1, 1, 0, 1, { 2,1, 0,1, 1,0 } };
-lat_test_t lat_dmc_2x2= { 2, 4, 1, 1, 0, 1, { 2,2, 0,1, 0,2, 1,3, 2,3, 
-					      1,0, 3,2, } };
-/*------------------------d--m--ne-di-mu-ci-dimedges------------------------*/
+LAT_TEST(d_1,     1, 0, 1, 1, 0, 0,  1 );
+LAT_TEST(d_1x1,   2, 0, 1, 1, 0, 0,  1, 1 );
+LAT_TEST(d_2,     1, 1, 1, 1, 0, 0,  2, 0,1 );
+LAT_TEST(d_2x1,   2, 1, 1, 1, 0, 0,  2,1, 0,1 );
+LAT_TEST(d_2x2,   2, 4, 1, 1, 0, 0,  2,2, 0,1, 0,2, 1,3, 2,3 );
+
+LAT_TEST(dmc_1,   1, 0, 1, 1, 0, 1,  1 );
+LAT_TEST(dmc_1x1, 2, 0, 1, 1, 0, 1,  1, 1 );
+LAT_TEST(dmc_2,   1, 2, 1, 1, 0, 1,  2, 0,1, 1,0 );
+LAT_TEST(dmc_2x1, 2, 2, 1, 1, 0, 1,  2,1, 0,1, 1,0 );
+LAT_TEST(dmc_2x2, 2, 4, 1, 1, 0, 1,  2,2, 0,1, 0,2, 1,3, 2,3, 
+				     1,0, 3,2, );
+/*----------------d--m--ne-di-mu-ci-dimedges------------------------*/
 
 /* TODO: add more */
 

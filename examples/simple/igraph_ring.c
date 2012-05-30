@@ -28,52 +28,56 @@
 typedef struct {
   int n, m;
   igraph_bool_t directed, mutual, circular;
-  igraph_real_t edges[];
+  igraph_real_t *edges;
 } ring_test_t;
 
-/*-------------------------n--m--di-mu-ci-edges----------------------------*/
-ring_test_t ring_uc_6  = { 6, 6, 0, 0, 1, { 0,1, 1,2, 2,3, 3,4, 4,5, 5,0 } };
-ring_test_t ring_uc_0  = { 0, 0, 0, 0, 1, { } };
-ring_test_t ring_uc_1  = { 1, 0, 0, 0, 1, { } };
-ring_test_t ring_uc_2  = { 2, 1, 0, 0, 1, { 0,1 } };
+#define RING_TEST(id, n, m, di, mu, ci, ...) \
+  igraph_real_t ring_ ## id ## _edges[] = { __VA_ARGS__ };		\
+  ring_test_t ring_ ## id = { n, m, di, mu, ci, ring_ ## id ## _edges }
 
-ring_test_t ring_u_6   = { 6, 5, 0, 0, 0, { 0,1, 1,2, 2,3, 3,4, 4,5 } };
-ring_test_t ring_u_0   = { 0, 0, 0, 0, 0, { } };
-ring_test_t ring_u_1   = { 1 ,0, 0, 0, 0, { } };
-ring_test_t ring_u_2   = { 2, 1, 0, 0, 0, { 0,1 } };
+/*---------------n--m--di-mu-ci--edges-------------------------------------*/
+RING_TEST(uc_6,  6, 6, 0, 0, 1,  0,1, 1,2, 2,3, 3,4, 4,5, 5,0 );
+RING_TEST(uc_0,  0, 0, 0, 0, 1,  -1 );
+RING_TEST(uc_1,  1, 0, 0, 0, 1,  -1 );
+RING_TEST(uc_2,  2, 1, 0, 0, 1,  0,1 );
 
-ring_test_t ring_umc_6 = { 6, 6, 0, 1, 1, { 0,1, 1,2, 2,3, 3,4, 4,5, 5,0 } };
-ring_test_t ring_umc_0 = { 0, 0, 0, 1, 1, { } };
-ring_test_t ring_umc_1 = { 1, 0, 0, 1, 1, { } };
-ring_test_t ring_umc_2 = { 2, 1, 0, 1, 1, { 0,1 } };
+RING_TEST(u_6,   6, 5, 0, 0, 0,  0,1, 1,2, 2,3, 3,4, 4,5 );
+RING_TEST(u_0,   0, 0, 0, 0, 0,  -1 );
+RING_TEST(u_1,   1, 0, 0, 0, 0,  -1 );
+RING_TEST(u_2,   2, 1, 0, 0, 0,  0,1 );
 
-ring_test_t ring_um_6  = { 6, 5, 0, 1, 0, { 0,1, 1,2, 2,3, 3,4, 4,5 } };
-ring_test_t ring_um_0  = { 0, 0, 0, 1, 0, { } };
-ring_test_t ring_um_1  = { 1 ,0, 0, 1, 0, { } };
-ring_test_t ring_um_2  = { 2, 1, 0, 1, 0, { 0,1 } };
+RING_TEST(umc_6, 6, 6, 0, 1, 1,  0,1, 1,2, 2,3, 3,4, 4,5, 5,0 );
+RING_TEST(umc_0, 0, 0, 0, 1, 1,  -1 );
+RING_TEST(umc_1, 1, 0, 0, 1, 1,  -1 );
+RING_TEST(umc_2, 2, 1, 0, 1, 1,  0,1 );
 
-ring_test_t ring_dc_6  = { 6, 6, 1, 0, 1, { 0,1, 1,2, 2,3, 3,4, 4,5, 5,0 } };
-ring_test_t ring_dc_0  = { 0, 0, 1, 0, 1, { } };
-ring_test_t ring_dc_1  = { 1, 0, 1, 0, 1, { } };
-ring_test_t ring_dc_2  = { 2, 2, 1, 0, 1, { 0,1, 1,0 } };
+RING_TEST(um_6,  6, 5, 0, 1, 0,  0,1, 1,2, 2,3, 3,4, 4,5 );
+RING_TEST(um_0,  0, 0, 0, 1, 0,  -1 );
+RING_TEST(um_1,  1, 0, 0, 1, 0,  -1 );
+RING_TEST(um_2,  2, 1, 0, 1, 0,  0,1 );
 
-ring_test_t ring_d_6   = { 6, 5, 1, 0, 1, { 0,1, 1,2, 2,3, 3,4, 4,5 } };
-ring_test_t ring_d_0   = { 0, 0, 1, 0, 1, { } };
-ring_test_t ring_d_1   = { 1, 0, 1, 0, 1, { } };
-ring_test_t ring_d_2   = { 2, 1, 1, 0, 1, { 0,1 } };
+RING_TEST(dc_6,  6, 6, 1, 0, 1,  0,1, 1,2, 2,3, 3,4, 4,5, 5,0 );
+RING_TEST(dc_0,  0, 0, 1, 0, 1,  -1 );
+RING_TEST(dc_1,  1, 0, 1, 0, 1,  -1 );
+RING_TEST(dc_2,  2, 2, 1, 0, 1,  0,1, 1,0 );
 
-ring_test_t ring_dmc_6 = { 6,12, 1, 1, 1, { 0,1, 1,2, 2,3, 3,4, 4,5, 5,0,
-                                  1,0, 2,1, 3,2, 4,3, 5,4, 0,5 } };
-ring_test_t ring_dmc_0 = { 0, 0, 1, 1, 1, { } };
-ring_test_t ring_dmc_1 = { 1, 0, 1, 1, 1, { } };
-ring_test_t ring_dmc_2 = { 2, 2, 1, 1, 1, { 0,1, 1,0 } };
+RING_TEST(d_6,   6, 5, 1, 0, 1,  0,1, 1,2, 2,3, 3,4, 4,5 );
+RING_TEST(d_0,   0, 0, 1, 0, 1,  -1 );
+RING_TEST(d_1,   1, 0, 1, 0, 1,  -1 );
+RING_TEST(d_2,   2, 1, 1, 0, 1,  0,1 );
 
-ring_test_t ring_dm_6  = { 6,10, 1, 1, 0, { 0,1, 1,2, 2,3, 3,4, 4,5,
-                                  1,0, 2,1, 3,2, 4,3, 5,4 } };
-ring_test_t ring_dm_0  = { 0, 0, 1, 1, 0, { } };
-ring_test_t ring_dm_1  = { 1, 0, 1, 1, 0, { } };
-ring_test_t ring_dm_2  = { 2, 2, 1, 1, 0, { 0,1, 1,0 } };
-/*-------------------------n--m--di-mu-ci-edges-----------------------------*/
+RING_TEST(dmc_6,  6,12, 1, 1, 1, 0,1, 1,2, 2,3, 3,4, 4,5, 5,0,
+                                 1,0, 2,1, 3,2, 4,3, 5,4, 0,5 );
+RING_TEST(dmc_0,  0, 0, 1, 1, 1, );
+RING_TEST(dmc_1,  1, 0, 1, 1, 1, );
+RING_TEST(dmc_2,  2, 2, 1, 1, 1, 0,1, 1,0 );
+
+RING_TEST(dm_6,  6,10, 1, 1, 0,  0,1, 1,2, 2,3, 3,4, 4,5,
+                                 1,0, 2,1, 3,2, 4,3, 5,4 );
+RING_TEST(dm_0,  0, 0, 1, 1, 0,  -1 );
+RING_TEST(dm_1,  1, 0, 1, 1, 0,  -1 );
+RING_TEST(dm_2,  2, 2, 1, 1, 0,  0,1, 1,0 );
+/*---------------n--m--di-mu-ci--edges-------------------------------------*/
 
 ring_test_t *all_checks[] = { /*  1 */ &ring_uc_6,   /*  2 */ &ring_uc_0,
 			      /*  3 */ &ring_uc_1,   /*  4 */ &ring_uc_2,
@@ -133,8 +137,8 @@ int check_ring(const ring_test_t *test) {
   igraph_ring(&graph, test->n, test->directed, test->mutual, test->circular);
 
   /* Check its properties */
-  if (ret=check_ring_properties(&graph, test->directed, test->mutual, 
-				test->circular)) { return ret;}
+  if ((ret=check_ring_properties(&graph, test->directed, test->mutual, 
+				 test->circular))) { return ret;}
 
   /* Check that it is isomorphic to the stored graph */
   igraph_vector_view(&otheredges, test->edges, test->m * 2);
