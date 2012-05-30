@@ -22,6 +22,7 @@
 */
 
 #include <igraph.h>
+#include <math.h>
 
 int main() {
   
@@ -55,7 +56,7 @@ int main() {
   igraph_reciprocity(&g, &res, 0, IGRAPH_RECIPROCITY_DEFAULT);
   igraph_destroy(&g);
   
-  if (res != 2.0/3.0) {
+  if (fabs(res - 2.0/3.0) > 1e-15) {
     fprintf(stderr, "%f != %f\n", res, 2.0/3.0);
     return 3;
   }
