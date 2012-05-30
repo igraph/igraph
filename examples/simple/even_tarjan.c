@@ -22,11 +22,12 @@
 */
 
 #include <igraph.h>
+#include <limits.h>
 
 int main() {
 
   igraph_t g, gbar;
-  igraph_integer_t k1, k2 = (igraph_integer_t) IGRAPH_INFINITY;
+  igraph_integer_t k1, k2 = (igraph_integer_t) INT_MAX;
   igraph_real_t tmpk;
   long int i, j, n;
 
