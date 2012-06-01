@@ -763,13 +763,19 @@ void igraph_i_arpack_auto_ncv(igraph_arpack_options_t* options) {
  * \param options An \ref igraph_arpack_options_t object.
  * \param storage An \ref igraph_arpack_storage_t object, or a null
  *     pointer. In the latter case memory allocation and deallocation
- *     is performed automatically.
+ *     is performed automatically. Either this or the \p vectors argument 
+ *     must be non-null if the ARPACK iteration is started from a 
+ *     given starting vector. If both are given \p vectors take 
+ *     precedence.
  * \param values If not a null pointer, then it should be a pointer to an
  *     initialized vector. The eigenvalues will be stored here. The
  *     vector will be resized as needed.
  * \param vectors If not a null pointer, then it must be a pointer to
  *     an initialized matrix. The eigenvectors will be stored in the
  *     columns of the matrix. The matrix will be resized as needed.
+ *     Either this or the \p vectors argument must be non-null if the
+ *     ARPACK iteration is started from a given starting vector. If
+ *     both are given \p vectors take precedence.
  * \return Error code.
  *
  * Time complexity: depends on the matrix-vector
@@ -862,11 +868,17 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   options->iparam[6]=options->mode;
   options->info=options->start;
   if (options->start) {
-    if (igraph_matrix_nrow(vectors) != options->n || igraph_matrix_ncol(vectors) != 1) {
+    if (!storage && !vectors) {
+      IGRAPH_ERROR("Starting vector not given", IGRAPH_EINVAL);
+    }
+    if (vectors && (igraph_matrix_nrow(vectors) != options->n || 
+		    igraph_matrix_ncol(vectors) != 1)) {
       IGRAPH_ERROR("Invalid starting vector size", IGRAPH_EINVAL);
     }
-    for (i=0; i<options->n; i++) {
-      resid[i]=MATRIX(*vectors, i, 0);
+    if (vectors) {
+      for (i=0; i<options->n; i++) {
+	resid[i]=MATRIX(*vectors, i, 0);
+      }
     }
   }
 
