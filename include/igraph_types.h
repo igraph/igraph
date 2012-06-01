@@ -49,6 +49,9 @@ typedef int    igraph_integer_t;
 typedef double igraph_real_t;
 typedef int    igraph_bool_t;
 
+int igraph_real_printf(igraph_real_t val);
+int igraph_real_fprintf(FILE *file, igraph_real_t val);
+
 /* igraph_i_fdiv is needed here instead of in igraph_math.h because
  * some constants use it */
 double igraph_i_fdiv(const double a, const double b);
