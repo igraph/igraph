@@ -1207,6 +1207,12 @@ void igraph_i_levc_free(igraph_vector_ptr_t *ptr) {
   }
 }
 
+void igraph_i_error_handler_none(const char *reason, const char *file,
+				 int line, int igraph_errno) {
+  /* do nothing */
+}
+
+
 /**
  * \ingroup communities
  * \function igraph_community_leading_eigenvector
@@ -1486,28 +1492,76 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     options->n=size-1;
     options->info=0;
     options->nev=1;
+    options->ldv=0;
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
+    options->nconv = 0;
     extra.comm=comm;
+
+    /* We try calling the solver twice, once from a random starting
+       point, onece from a fixed one. This is because for some hard
+       cases it tends to fail. We need to suppress error handling for
+       the first call. */
+    {
+      int i;
+      igraph_error_handler_t *errh=
+	igraph_set_error_handler(igraph_i_error_handler_none);
+      igraph_arpack_rssolve(igraph_i_community_leading_eigenvector2,
+			    &extra, options, &storage,
+			    /*values=*/ 0, /*vectors=*/ 0);
+      igraph_set_error_handler(errh);
+      if (options->nconv < 1) {
+	/* Call again, from a fixed starting point */
+	options->start=1;
+	options->info=0;
+	options->ncv=0;
+	for (i=0; i < options->n ; i++) {
+	  storage.resid[i] = 1;
+	}
+	IGRAPH_CHECK(igraph_arpack_rssolve(
+				     igraph_i_community_leading_eigenvector2,
+				     &extra, options, &storage,
+				     /*values=*/ 0, /*vectors=*/ 0));
+	options->start=0;	
+      }
+    }
     
-    /* Call ARPACK solver */
-    IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_community_leading_eigenvector2,
-				       &extra, options, &storage,
-				       /*values=*/ 0, /*vectors=*/ 0));
     if (options->nconv < 1) {
       IGRAPH_ERROR("ARPACK did not converge", IGRAPH_ARPACK_FAILED);
     }
 
     tmpev=storage.d[0];
 
-    /* Now we do the original eigenproblem */
+    /* Now we do the original eigenproblem, again, twice if needed */
 
     options->n=size;
     options->info=0;
     options->nev=1;
+    options->ldv=0;
+    options->nconv=0;
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
-    IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_community_leading_eigenvector,
-				       &extra, options, &storage,
-				       /*values=*/ 0, /*vectors=*/ 0));
+    
+    {
+      int i;
+      igraph_error_handler_t *errh=
+	igraph_set_error_handler(igraph_i_error_handler_none);
+      igraph_arpack_rssolve(igraph_i_community_leading_eigenvector,
+			    &extra, options, &storage,
+			    /*values=*/ 0, /*vectors=*/ 0);
+      igraph_set_error_handler(errh);
+      if (options->nconv < 1) {
+	/* Call again from a fixed starting point */
+	options->start=1;
+	options->info=0;
+	options->ncv=0;
+	for (i=0; i < options->n; i++) { storage.resid[i] = 1; }
+	IGRAPH_CHECK(igraph_arpack_rssolve(
+				igraph_i_community_leading_eigenvector,
+				&extra, options, &storage, 
+				/*values=*/ 0, /*vectors=*/ 0));
+	options->start=0;
+      }
+    }
+
     if (options->nconv < 1) {
       IGRAPH_ERROR("ARPACK did not converge", IGRAPH_ARPACK_FAILED);
     }
