@@ -66,6 +66,11 @@ double igraph_i_fdiv(const double a, const double b);
 int igraph_finite(double x);
 #define IGRAPH_FINITE(x) igraph_finite(x)
 
+int igraph_is_nan(double x);
+int igraph_is_inf(double x);
+int igraph_is_posinf(double x);
+int igraph_is_neginf(double x);
+
 #if defined(NAN)
 #  define IGRAPH_NAN NAN
 #elif defined(INFINITY)

@@ -248,3 +248,19 @@ int igraph_i_snprintf(char *buffer, size_t count, const char *format, ...) {
 }
 
 #endif
+
+int igraph_is_nan(double x) {
+  return isnan(x);
+}
+
+int igraph_is_inf(double x) {
+  return isinf(x) != 0;
+}
+
+int igraph_is_posinf(double x) {
+  return isinf(x) == 1;
+}
+
+int igraph_is_neginf(double x) {
+  return isinf(x) == -1;
+}
