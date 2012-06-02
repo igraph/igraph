@@ -2565,10 +2565,18 @@ int FUNCTION(igraph_vector,difference_sorted)(const TYPE(igraph_vector) *v1,
 int FUNCTION(igraph_vector,print)(const TYPE(igraph_vector) *v) {
   long int i, n=FUNCTION(igraph_vector,size)(v);
   if (n!=0) {
+#ifdef PRINTFUNC
+    PRINTFUNC(VECTOR(*v)[0]);
+#else
     printf(OUT_FORMAT, VECTOR(*v)[0]);
+#endif
   }
   for (i=1; i<n; i++) {
+#ifdef PRINTFUNC
+    putchar(' '); PRINTFUNC(VECTOR(*v)[i]);
+#else
     printf(" " OUT_FORMAT, VECTOR(*v)[i]);
+#endif
   }
   printf("\n");
   return 0;
@@ -2578,10 +2586,18 @@ int FUNCTION(igraph_vector,print)(const TYPE(igraph_vector) *v) {
 int FUNCTION(igraph_vector,fprint)(const TYPE(igraph_vector) *v, FILE *file) {
   long int i, n=FUNCTION(igraph_vector,size)(v);
   if (n!=0) {
+#ifdef FPRINTFUNC
+    FPRINTFUNC(file, VECTOR(*v)[0]);
+#else
     fprintf(file, OUT_FORMAT, VECTOR(*v)[0]);
+#endif
   }
   for (i=1; i<n; i++) {
+#ifdef FPRINTFUNC
+    fputc(' ', file); FPRINTFUNC(file, VECTOR(*v)[i]);
+#else
     fprintf(file, " " OUT_FORMAT, VECTOR(*v)[i]);
+#endif
   }
   fprintf(file, "\n");
   return 0;

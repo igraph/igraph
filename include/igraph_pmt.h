@@ -32,6 +32,8 @@
 #define BASE igraph_real_t
 #define SHORT
 #define OUT_FORMAT "%G"
+#define PRINTFUNC(val) igraph_real_printf(val)
+#define FPRINTFUNC(file, val) igraph_real_fprintf(file, val)
 #define ZERO 0.0
 #define ONE 1.0
 #define MULTIPLICITY 1

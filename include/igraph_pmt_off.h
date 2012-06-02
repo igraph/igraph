@@ -144,3 +144,11 @@
 #ifdef NOABS
 #undef NOABS
 #endif
+
+#ifdef PRINTFUNC
+#undef PRINTFUNC
+#endif
+
+#ifdef FPRINTFUNC
+#undef PRINTFUNC
+#endif
