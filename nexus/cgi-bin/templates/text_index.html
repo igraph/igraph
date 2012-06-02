@@ -1,0 +1,12 @@
+$def with (datasets, tags, length, count, offset, limit, title, networks)
+size: $length
+totalsize: $count
+offset: $offset
+limit: $limit
+$for ds in datasets:
+  id: $ds.id
+  sid: $ds.sid
+  name: $:ds.name
+  networks: $:{" ".join("%s/%s" % (n.id,n.sid) for n in networks[ds.id])}
+  vertices/edges: $:{" ".join("%s/%s" % (n.vertices,n.edges) for n in networks[ds.id])}
+  tags: $tags[ds.id]

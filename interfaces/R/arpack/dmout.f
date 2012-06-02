@@ -48,120 +48,120 @@
 *     ...
 *     ... FIRST EXECUTABLE STATEMENT
 *
-      LLL = MIN( LEN( IFMT ), 80 )
-      DO 10 I = 1, LLL
-         LINE( I: I ) = '-'
-   10 CONTINUE
-*
-      DO 20 I = LLL + 1, 80
-         LINE( I: I ) = ' '
-   20 CONTINUE
-*
-      WRITE( LOUT, FMT = 9999 )IFMT, LINE( 1: LLL )
- 9999 FORMAT( / 1X, A, / 1X, A )
-*
-      IF( M.LE.0 .OR. N.LE.0 .OR. LDA.LE.0 )
-     $   RETURN
-      NDIGIT = IDIGIT
-      IF( IDIGIT.EQ.0 )
-     $   NDIGIT = 4
-*
-*=======================================================================
-*             CODE FOR OUTPUT USING 72 COLUMNS FORMAT
-*=======================================================================
-*
-      IF( IDIGIT.LT.0 ) THEN
-         NDIGIT = -IDIGIT
-         IF( NDIGIT.LE.4 ) THEN
-            DO 40 K1 = 1, N, 5
-               K2 = MIN0( N, K1+4 )
-               WRITE( LOUT, FMT = 9998 )( ICOL, I, I = K1, K2 )
-               DO 30 I = 1, M
-                  WRITE( LOUT, FMT = 9994 )I, ( A( I, J ), J = K1, K2 )
-   30          CONTINUE
-   40       CONTINUE
-*
-         ELSE IF( NDIGIT.LE.6 ) THEN
-            DO 60 K1 = 1, N, 4
-               K2 = MIN0( N, K1+3 )
-               WRITE( LOUT, FMT = 9997 )( ICOL, I, I = K1, K2 )
-               DO 50 I = 1, M
-                  WRITE( LOUT, FMT = 9993 )I, ( A( I, J ), J = K1, K2 )
-   50          CONTINUE
-   60       CONTINUE
-*
-         ELSE IF( NDIGIT.LE.10 ) THEN
-            DO 80 K1 = 1, N, 3
-               K2 = MIN0( N, K1+2 )
-               WRITE( LOUT, FMT = 9996 )( ICOL, I, I = K1, K2 )
-               DO 70 I = 1, M
-                  WRITE( LOUT, FMT = 9992 )I, ( A( I, J ), J = K1, K2 )
-   70          CONTINUE
-   80       CONTINUE
-*
-         ELSE
-            DO 100 K1 = 1, N, 2
-               K2 = MIN0( N, K1+1 )
-               WRITE( LOUT, FMT = 9995 )( ICOL, I, I = K1, K2 )
-               DO 90 I = 1, M
-                  WRITE( LOUT, FMT = 9991 )I, ( A( I, J ), J = K1, K2 )
-   90          CONTINUE
-  100       CONTINUE
-         END IF
-*
-*=======================================================================
-*             CODE FOR OUTPUT USING 132 COLUMNS FORMAT
-*=======================================================================
-*
-      ELSE
-         IF( NDIGIT.LE.4 ) THEN
-            DO 120 K1 = 1, N, 10
-               K2 = MIN0( N, K1+9 )
-               WRITE( LOUT, FMT = 9998 )( ICOL, I, I = K1, K2 )
-               DO 110 I = 1, M
-                  WRITE( LOUT, FMT = 9994 )I, ( A( I, J ), J = K1, K2 )
-  110          CONTINUE
-  120       CONTINUE
-*
-         ELSE IF( NDIGIT.LE.6 ) THEN
-            DO 140 K1 = 1, N, 8
-               K2 = MIN0( N, K1+7 )
-               WRITE( LOUT, FMT = 9997 )( ICOL, I, I = K1, K2 )
-               DO 130 I = 1, M
-                  WRITE( LOUT, FMT = 9993 )I, ( A( I, J ), J = K1, K2 )
-  130          CONTINUE
-  140       CONTINUE
-*
-         ELSE IF( NDIGIT.LE.10 ) THEN
-            DO 160 K1 = 1, N, 6
-               K2 = MIN0( N, K1+5 )
-               WRITE( LOUT, FMT = 9996 )( ICOL, I, I = K1, K2 )
-               DO 150 I = 1, M
-                  WRITE( LOUT, FMT = 9992 )I, ( A( I, J ), J = K1, K2 )
-  150          CONTINUE
-  160       CONTINUE
-*
-         ELSE
-            DO 180 K1 = 1, N, 5
-               K2 = MIN0( N, K1+4 )
-               WRITE( LOUT, FMT = 9995 )( ICOL, I, I = K1, K2 )
-               DO 170 I = 1, M
-                  WRITE( LOUT, FMT = 9991 )I, ( A( I, J ), J = K1, K2 )
-  170          CONTINUE
-  180       CONTINUE
-         END IF
-      END IF
-      WRITE( LOUT, FMT = 9990 )
-*
- 9998 FORMAT( 10X, 10( 4X, 3A1, I4, 1X ) )
- 9997 FORMAT( 10X, 8( 5X, 3A1, I4, 2X ) )
- 9996 FORMAT( 10X, 6( 7X, 3A1, I4, 4X ) )
- 9995 FORMAT( 10X, 5( 9X, 3A1, I4, 6X ) )
- 9994 FORMAT( 1X, ' Row', I4, ':', 1X, 1P, 10D12.3 )
- 9993 FORMAT( 1X, ' Row', I4, ':', 1X, 1P, 8D14.5 )
- 9992 FORMAT( 1X, ' Row', I4, ':', 1X, 1P, 6D18.9 )
- 9991 FORMAT( 1X, ' Row', I4, ':', 1X, 1P, 5D22.13 )
- 9990 FORMAT( 1X, ' ' )
+c$$$      LLL = MIN( LEN( IFMT ), 80 )
+c$$$      DO 10 I = 1, LLL
+c$$$         LINE( I: I ) = '-'
+c$$$   10 CONTINUE
+c$$$*
+c$$$      DO 20 I = LLL + 1, 80
+c$$$         LINE( I: I ) = ' '
+c$$$   20 CONTINUE
+c$$$*
+c$$$      WRITE( LOUT, FMT = 9999 )IFMT, LINE( 1: LLL )
+c$$$ 9999 FORMAT( / 1X, A, / 1X, A )
+c$$$*
+c$$$      IF( M.LE.0 .OR. N.LE.0 .OR. LDA.LE.0 )
+c$$$     $   RETURN
+c$$$      NDIGIT = IDIGIT
+c$$$      IF( IDIGIT.EQ.0 )
+c$$$     $   NDIGIT = 4
+c$$$*
+c$$$*=======================================================================
+c$$$*             CODE FOR OUTPUT USING 72 COLUMNS FORMAT
+c$$$*=======================================================================
+c$$$*
+c$$$      IF( IDIGIT.LT.0 ) THEN
+c$$$         NDIGIT = -IDIGIT
+c$$$         IF( NDIGIT.LE.4 ) THEN
+c$$$            DO 40 K1 = 1, N, 5
+c$$$               K2 = MIN0( N, K1+4 )
+c$$$               WRITE( LOUT, FMT = 9998 )( ICOL, I, I = K1, K2 )
+c$$$               DO 30 I = 1, M
+c$$$                  WRITE( LOUT, FMT = 9994 )I, ( A( I, J ), J = K1, K2 )
+c$$$   30          CONTINUE
+c$$$   40       CONTINUE
+c$$$*
+c$$$         ELSE IF( NDIGIT.LE.6 ) THEN
+c$$$            DO 60 K1 = 1, N, 4
+c$$$               K2 = MIN0( N, K1+3 )
+c$$$               WRITE( LOUT, FMT = 9997 )( ICOL, I, I = K1, K2 )
+c$$$               DO 50 I = 1, M
+c$$$                  WRITE( LOUT, FMT = 9993 )I, ( A( I, J ), J = K1, K2 )
+c$$$   50          CONTINUE
+c$$$   60       CONTINUE
+c$$$*
+c$$$         ELSE IF( NDIGIT.LE.10 ) THEN
+c$$$            DO 80 K1 = 1, N, 3
+c$$$               K2 = MIN0( N, K1+2 )
+c$$$               WRITE( LOUT, FMT = 9996 )( ICOL, I, I = K1, K2 )
+c$$$               DO 70 I = 1, M
+c$$$                  WRITE( LOUT, FMT = 9992 )I, ( A( I, J ), J = K1, K2 )
+c$$$   70          CONTINUE
+c$$$   80       CONTINUE
+c$$$*
+c$$$         ELSE
+c$$$            DO 100 K1 = 1, N, 2
+c$$$               K2 = MIN0( N, K1+1 )
+c$$$               WRITE( LOUT, FMT = 9995 )( ICOL, I, I = K1, K2 )
+c$$$               DO 90 I = 1, M
+c$$$                  WRITE( LOUT, FMT = 9991 )I, ( A( I, J ), J = K1, K2 )
+c$$$   90          CONTINUE
+c$$$  100       CONTINUE
+c$$$         END IF
+c$$$*
+c$$$*=======================================================================
+c$$$*             CODE FOR OUTPUT USING 132 COLUMNS FORMAT
+c$$$*=======================================================================
+c$$$*
+c$$$      ELSE
+c$$$         IF( NDIGIT.LE.4 ) THEN
+c$$$            DO 120 K1 = 1, N, 10
+c$$$               K2 = MIN0( N, K1+9 )
+c$$$               WRITE( LOUT, FMT = 9998 )( ICOL, I, I = K1, K2 )
+c$$$               DO 110 I = 1, M
+c$$$                  WRITE( LOUT, FMT = 9994 )I, ( A( I, J ), J = K1, K2 )
+c$$$  110          CONTINUE
+c$$$  120       CONTINUE
+c$$$*
+c$$$         ELSE IF( NDIGIT.LE.6 ) THEN
+c$$$            DO 140 K1 = 1, N, 8
+c$$$               K2 = MIN0( N, K1+7 )
+c$$$               WRITE( LOUT, FMT = 9997 )( ICOL, I, I = K1, K2 )
+c$$$               DO 130 I = 1, M
+c$$$                  WRITE( LOUT, FMT = 9993 )I, ( A( I, J ), J = K1, K2 )
+c$$$  130          CONTINUE
+c$$$  140       CONTINUE
+c$$$*
+c$$$         ELSE IF( NDIGIT.LE.10 ) THEN
+c$$$            DO 160 K1 = 1, N, 6
+c$$$               K2 = MIN0( N, K1+5 )
+c$$$               WRITE( LOUT, FMT = 9996 )( ICOL, I, I = K1, K2 )
+c$$$               DO 150 I = 1, M
+c$$$                  WRITE( LOUT, FMT = 9992 )I, ( A( I, J ), J = K1, K2 )
+c$$$  150          CONTINUE
+c$$$  160       CONTINUE
+c$$$*
+c$$$         ELSE
+c$$$            DO 180 K1 = 1, N, 5
+c$$$               K2 = MIN0( N, K1+4 )
+c$$$               WRITE( LOUT, FMT = 9995 )( ICOL, I, I = K1, K2 )
+c$$$               DO 170 I = 1, M
+c$$$                  WRITE( LOUT, FMT = 9991 )I, ( A( I, J ), J = K1, K2 )
+c$$$  170          CONTINUE
+c$$$  180       CONTINUE
+c$$$         END IF
+c$$$      END IF
+c$$$      WRITE( LOUT, FMT = 9990 )
+c$$$*
+c$$$ 9998 FORMAT( 10X, 10( 4X, 3A1, I4, 1X ) )
+c$$$ 9997 FORMAT( 10X, 8( 5X, 3A1, I4, 2X ) )
+c$$$ 9996 FORMAT( 10X, 6( 7X, 3A1, I4, 4X ) )
+c$$$ 9995 FORMAT( 10X, 5( 9X, 3A1, I4, 6X ) )
+c$$$ 9994 FORMAT( 1X, ' Row', I4, ':', 1X, 1P, 10D12.3 )
+c$$$ 9993 FORMAT( 1X, ' Row', I4, ':', 1X, 1P, 8D14.5 )
+c$$$ 9992 FORMAT( 1X, ' Row', I4, ':', 1X, 1P, 6D18.9 )
+c$$$ 9991 FORMAT( 1X, ' Row', I4, ':', 1X, 1P, 5D22.13 )
+c$$$ 9990 FORMAT( 1X, ' ' )
 *
       RETURN
       END

@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2003, 2004, 2005  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -375,6 +375,27 @@ void FUNCTION(igraph_vector,destroy)   (TYPE(igraph_vector)* v) {
     igraph_Free(v->stor_begin);
     v->stor_begin = NULL;
   }
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_capacity
+ * \brief Returns the allocated capacity of the vector
+ * 
+ * Note that this might be different from the size of the vector (as 
+ * queried by \ref igraph_vector_size(), and specifies how many elements 
+ * the vector can hold, without reallocation.
+ * \param v Pointer to the (previously initialized) vector object
+ *          to query.
+ * \return The allocated capacity.
+ * 
+ * \sa \ref igraph_vector_size().
+ * 
+ * Time complexity: O(1).
+ */
+
+long int FUNCTION(igraph_vector,capacity)(const TYPE(igraph_vector)*v) {
+  return v->stor_end - v->stor_begin;
 }
 
 /**
@@ -837,7 +858,8 @@ long int FUNCTION(igraph_vector,qsort_ind)(TYPE(igraph_vector) *v,
  *         memory. Note that this function \em never returns an error
  *         if the vector is made smaller.
  * \sa \ref igraph_vector_reserve() for allocating memory for future
- * extensions of a vector.
+ * extensions of a vector. \ref igraph_vector_resize_min() for 
+ * deallocating the unnneded memory for a vector.
  * 
  * Time complexity: O(1) if the new
  * size is smaller, operating system dependent if it is larger. In the
@@ -851,6 +873,39 @@ int FUNCTION(igraph_vector,resize)(TYPE(igraph_vector)* v, long int newsize) {
   assert(v->stor_begin != NULL);
   IGRAPH_CHECK(FUNCTION(igraph_vector,reserve)(v, newsize));
   v->end = v->stor_begin+newsize;
+  return 0;
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_resize_min
+ * \brief Deallocate the unused memory of a vector.
+ * 
+ * </para><para>
+ * Note that this function involves additional memory allocation and 
+ * may result an out-of-memory error.
+ * \param v Pointer to an initialized vector.
+ * \return Error code.
+ *
+ * \sa \ref igraph_vector_resize(), \ref igraph_vector_reserve().
+ * 
+ * Time complexity: operating system dependent. 
+ */
+
+int FUNCTION(igraph_vector,resize_min)(TYPE(igraph_vector)*v) {
+  long int size;
+  BASE *tmp;
+  if (v->stor_end == v->end) { return 0; }
+  
+  size = v->end - v->stor_begin;
+  tmp=igraph_Realloc(v->stor_begin, size, BASE);
+  if (tmp==0) {
+    IGRAPH_ERROR("cannot resize vector", IGRAPH_ENOMEM);
+  } else {
+    v->stor_begin = tmp;
+    v->stor_end = v->end = v->stor_begin + size;
+  }
+  
   return 0;
 }
 
@@ -1100,6 +1155,21 @@ BASE FUNCTION(igraph_vector,sum)(const TYPE(igraph_vector) *v) {
   return res;
 }
 
+igraph_real_t FUNCTION(igraph_vector,sumsq)(const TYPE(igraph_vector) *v) {
+  igraph_real_t res=0.0;
+  BASE *p;
+  assert(v != NULL);
+  assert(v->stor_begin != NULL);
+  for (p=v->stor_begin; p<v->end; p++) {
+#ifdef SQ
+    res += SQ(*p);
+#else
+    res += (*p) * (*p);
+#endif
+  }
+  return res;
+}
+  
 /**
  * \ingroup vector
  * \function igraph_vector_prod
@@ -1392,21 +1462,20 @@ igraph_bool_t FUNCTION(igraph_vector,any_smaller)(const TYPE(igraph_vector) *v,
 
 /**
  * \ingroup vector
- * \function igraph_vector_is_equal
- * \brief Decides whether two vectors contain exactly the same elements
- * (in the same order).
+ * \function igraph_vector_all_e
+ * \brief Are all elements equal?
  * 
  * \param lhs The first vector.
  * \param rhs The second vector.
- * \return Positive integer if the two vectors are equal element by
- * element or zero if they are not.
+ * \return Positive integer (=true) if the elements in the \p lhs are all 
+ *    equal to the corresponding elements in \p rhs. Returns \c 0
+ *    (=false) if the lengths of the vectors don't match.
  * 
- * Time complexity: O(n), the length
- * of the vectors.
+ * Time complexity: O(n), the length of the vectors.
  */
 
-igraph_bool_t FUNCTION(igraph_vector,is_equal)(const TYPE(igraph_vector) *lhs, 
-					       const TYPE(igraph_vector) *rhs) {
+igraph_bool_t FUNCTION(igraph_vector,all_e)(const TYPE(igraph_vector) *lhs, 
+					    const TYPE(igraph_vector) *rhs) {
   long int i, s;
   assert(lhs != 0);
   assert(rhs != 0);
@@ -1431,6 +1500,169 @@ igraph_bool_t FUNCTION(igraph_vector,is_equal)(const TYPE(igraph_vector) *lhs,
     return 1;
   }
 }
+
+igraph_bool_t 
+FUNCTION(igraph_vector,is_equal)(const TYPE(igraph_vector) *lhs, 
+				 const TYPE(igraph_vector) *rhs) {
+  return FUNCTION(igraph_vector,all_e)(lhs, rhs);
+}
+
+#ifndef NOTORDERED
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_all_l
+ * \brief Are all elements less?
+ * 
+ * \param lhs The first vector.
+ * \param rhs The second vector.
+ * \return Positive integer (=true) if the elements in the \p lhs are all 
+ *    less than the corresponding elements in \p rhs. Returns \c 0
+ *    (=false) if the lengths of the vectors don't match.
+ * 
+ * Time complexity: O(n), the length of the vectors.
+ */
+
+igraph_bool_t FUNCTION(igraph_vector,all_l)(const TYPE(igraph_vector) *lhs, 
+					    const TYPE(igraph_vector) *rhs) {
+  long int i, s;
+  assert(lhs != 0);
+  assert(rhs != 0);
+  assert(lhs->stor_begin != 0);
+  assert(rhs->stor_begin != 0);
+  
+  s=FUNCTION(igraph_vector,size)(lhs);
+  if (s != FUNCTION(igraph_vector,size)(rhs)) {
+    return 0;
+  } else {
+    for (i=0; i<s; i++) {
+      BASE l=VECTOR(*lhs)[i];
+      BASE r=VECTOR(*rhs)[i];
+      if (l>=r) {
+	return 0;
+      }
+    }
+    return 1;
+  }  
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_all_g
+ * \brief Are all elements greater?
+ * 
+ * \param lhs The first vector.
+ * \param rhs The second vector.
+ * \return Positive integer (=true) if the elements in the \p lhs are all 
+ *    greater than the corresponding elements in \p rhs. Returns \c 0
+ *    (=false) if the lengths of the vectors don't match.
+ * 
+ * Time complexity: O(n), the length of the vectors.
+ */
+
+igraph_bool_t FUNCTION(igraph_vector,all_g)(const TYPE(igraph_vector) *lhs, 
+					    const TYPE(igraph_vector) *rhs) {
+
+  long int i, s;
+  assert(lhs != 0);
+  assert(rhs != 0);
+  assert(lhs->stor_begin != 0);
+  assert(rhs->stor_begin != 0);
+  
+  s=FUNCTION(igraph_vector,size)(lhs);
+  if (s != FUNCTION(igraph_vector,size)(rhs)) {
+    return 0;
+  } else {
+    for (i=0; i<s; i++) {
+      BASE l=VECTOR(*lhs)[i];
+      BASE r=VECTOR(*rhs)[i];
+      if (l<=r) {
+	return 0;
+      }
+    }
+    return 1;
+  }  
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_all_le
+ * \brief Are all elements less or equal?
+ * 
+ * \param lhs The first vector.
+ * \param rhs The second vector.
+ * \return Positive integer (=true) if the elements in the \p lhs are all 
+ *    less than or equal to the corresponding elements in \p
+ *    rhs. Returns \c 0 (=false) if the lengths of the vectors don't
+ *    match.
+ * 
+ * Time complexity: O(n), the length of the vectors.
+ */
+
+igraph_bool_t 
+FUNCTION(igraph_vector,all_le)(const TYPE(igraph_vector) *lhs, 
+			       const TYPE(igraph_vector) *rhs) {
+  long int i, s;
+  assert(lhs != 0);
+  assert(rhs != 0);
+  assert(lhs->stor_begin != 0);
+  assert(rhs->stor_begin != 0);
+  
+  s=FUNCTION(igraph_vector,size)(lhs);
+  if (s != FUNCTION(igraph_vector,size)(rhs)) {
+    return 0;
+  } else {
+    for (i=0; i<s; i++) {
+      BASE l=VECTOR(*lhs)[i];
+      BASE r=VECTOR(*rhs)[i];
+      if (l>r) {
+	return 0;
+      }
+    }
+    return 1;
+  }  
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_all_ge
+ * \brief Are all elements greater or equal?
+ * 
+ * \param lhs The first vector.
+ * \param rhs The second vector.
+ * \return Positive integer (=true) if the elements in the \p lhs are all 
+ *    greater than or equal to the corresponding elements in \p
+ *    rhs. Returns \c 0 (=false) if the lengths of the vectors don't
+ *    match.
+ * 
+ * Time complexity: O(n), the length of the vectors.
+ */
+
+igraph_bool_t 
+FUNCTION(igraph_vector,all_ge)(const TYPE(igraph_vector) *lhs, 
+			       const TYPE(igraph_vector) *rhs) {
+  long int i, s;
+  assert(lhs != 0);
+  assert(rhs != 0);
+  assert(lhs->stor_begin != 0);
+  assert(rhs->stor_begin != 0);
+  
+  s=FUNCTION(igraph_vector,size)(lhs);
+  if (s != FUNCTION(igraph_vector,size)(rhs)) {
+    return 0;
+  } else {
+    for (i=0; i<s; i++) {
+      BASE l=VECTOR(*lhs)[i];
+      BASE r=VECTOR(*rhs)[i];
+      if (l<r) {
+	return 0;
+      }
+    }
+    return 1;
+  }  
+}
+
+#endif
 
 igraph_bool_t FUNCTION(igraph_i_vector,binsearch_slice)(const TYPE(igraph_vector) *v,
                                                         BASE what, long int *pos,
@@ -2052,6 +2284,19 @@ int FUNCTION(igraph_vector,div)(TYPE(igraph_vector) *v1,
   return 0;
 }
 
+#ifndef NOABS
+
+int FUNCTION(igraph_vector,abs)(TYPE(igraph_vector) *v) {
+  long int i, n=FUNCTION(igraph_vector,size)(v);
+  for (i=0; i<n; i++) {
+    VECTOR(*v)[i]= VECTOR(*v)[i] >= 0 ? VECTOR(*v)[i] : -VECTOR(*v)[i];
+  }
+  
+  return 0;
+}
+
+#endif
+
 #ifndef NOTORDERED
 
 /**
@@ -2316,25 +2561,43 @@ int FUNCTION(igraph_vector,difference_sorted)(const TYPE(igraph_vector) *v1,
 
 #if defined(OUT_FORMAT)
 
+#ifndef USING_R
 int FUNCTION(igraph_vector,print)(const TYPE(igraph_vector) *v) {
   long int i, n=FUNCTION(igraph_vector,size)(v);
   if (n!=0) {
+#ifdef PRINTFUNC
+    PRINTFUNC(VECTOR(*v)[0]);
+#else
     printf(OUT_FORMAT, VECTOR(*v)[0]);
+#endif
   }
   for (i=1; i<n; i++) {
+#ifdef PRINTFUNC
+    putchar(' '); PRINTFUNC(VECTOR(*v)[i]);
+#else
     printf(" " OUT_FORMAT, VECTOR(*v)[i]);
+#endif
   }
   printf("\n");
   return 0;
 }
+#endif
 
 int FUNCTION(igraph_vector,fprint)(const TYPE(igraph_vector) *v, FILE *file) {
   long int i, n=FUNCTION(igraph_vector,size)(v);
   if (n!=0) {
+#ifdef FPRINTFUNC
+    FPRINTFUNC(file, VECTOR(*v)[0]);
+#else
     fprintf(file, OUT_FORMAT, VECTOR(*v)[0]);
+#endif
   }
   for (i=1; i<n; i++) {
+#ifdef FPRINTFUNC
+    fputc(' ', file); FPRINTFUNC(file, VECTOR(*v)[i]);
+#else
     fprintf(file, " " OUT_FORMAT, VECTOR(*v)[i]);
+#endif
   }
   fprintf(file, "\n");
   return 0;

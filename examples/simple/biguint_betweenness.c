@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2009  Gabor Csardi <Gabor.Csardi@unil.ch>
-   UNIL DGM, Rue de Bugnon 27, CH-1005 Lausanne, Switzerland
+   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -154,11 +154,11 @@ int main() {
 			      /* weights=   */ &weights, 
 			      /* nobigint=  */ 0);
 
-  if (!igraph_vector_is_equal(&bet, &bet2)) {
+  if (!igraph_vector_all_e(&bet, &bet2)) {
     return 1;
   }
 
-/*   if (!igraph_vector_is_equal(&bbet, &bbet2)) { */
+/*   if (!igraph_vector_all_e(&bbet, &bbet2)) { */
 /*     return 2; */
 /*   } */
 
@@ -189,7 +189,7 @@ int main() {
   igraph_vector_view(&bet2, nontriv_res, 
 		     sizeof(nontriv_res)/sizeof(igraph_real_t));
 
-  if (!igraph_vector_is_equal(&bet, &bet2)) {
+  if (!igraph_vector_all_e(&bet, &bet2)) {
     return 2;
   }
 

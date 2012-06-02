@@ -1,9 +1,9 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
-   
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -150,7 +150,9 @@ __BEGIN_DECLS
  *    of the Ritz value is considered acceptable if its error is less
  *    than \c tol times its estimated value. If this is set to zero
  *    then machine precision is used.
- * \member ncv Number of Lanczos vectors to be generated.
+ * \member ncv Number of Lanczos vectors to be generated. Setting this
+ *    to zero means that \ref igraph_arpack_rssolve and \ref igraph_arpack_rnsolve
+ *    will determine a suitable value for \c ncv automatically.
  * \member ldv Numberic scalar. It should be set to
  *    zero in the current igraph implementation.
  * \member ishift Either zero or one. If zero then the shifts are
@@ -201,7 +203,7 @@ __BEGIN_DECLS
  *           \cli 3
  *                No shifts could be applied during a cycle of the
  *         Implicitly restarted Arnoldi iteration. One possibility
- *         is to increase the size of \ ncv relative to \c
+ *         is to increase the size of \c ncv relative to \c
  *           nev. \endclist
  *    ARPACK can return other error flags as well, but these are
  *    converted to igraph errors, see \ref igraph_error_type_t.

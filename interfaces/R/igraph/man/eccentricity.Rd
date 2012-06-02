@@ -39,7 +39,7 @@ radius(graph, mode=c("all", "out", "in", "total"))
 \references{
   Harary, F. Graph Theory. Reading, MA: Addison-Wesley, p. 35, 1994.
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{shortest.paths}} for general shortest path
   calculations.}
 \examples{

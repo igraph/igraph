@@ -41,26 +41,42 @@ igraph.par(parid, parvalue = NULL)
   
   The currently used parameters in alphabetical order:
   \describe{
-    \item{edge.attr.comb:}{Specifies what to do with the edge
+    \item{add.params}{Logical scalar, whether to add model
+      parameter to the graphs that are created by the various
+      graph constructors. By default it is \code{TRUE}.}
+    \item{add.vertex.names}{Logical scalar, whether to add
+      vertex names to node level indices, like degree, betweenness
+      scores, etc. By default it is \code{TRUE}.}
+    \item{dend.plot.type}{The plotting function to use when plotting
+      community structure dendrograms via
+      \code{\link{dendPlot}}}. Possible values are \sQuote{auto} (the
+      default), \sQuote{phylo}, \sQuote{hclust} and
+      \sQuote{dendrogram}. See \code{\link{dendPlot}} for details.
+    \item{edge.attr.comb}{Specifies what to do with the edge
       attributes if the graph is modified. The default value is
       \code{list(weight="sum", name="concat", "ignore")}. See
       \code{\link{attribute.combination}} for details on this.}
-    \item{print.edge.attributes:}{Logical constant, whether to print edge
+    \item{nexus.url}{The base URL of the default Nexus server. See
+      \code{\link{nexus}} for details.}
+    \item{print.edge.attributes}{Logical constant, whether to print edge
       attributes when printing graphs. Defaults to \code{FALSE}.}
-    \item{print.graph.attributes:}{Logical constant, whether to print
+    \item{print.full}{Logical scalar, whether \code{\link{print.igraph}}
+      should show the graph structure as well, or only a summary of the
+      graph.}
+    \item{print.graph.attributes}{Logical constant, whether to print
       graph attributes when printing graphs. Defaults to \code{FALSE}.}
-    \item{print.vertex.attriubutes:}{Logical constant, whether to print
+    \item{print.vertex.attributes}{Logical constant, whether to print
       vertex attributes when printing graphs. Defaults to \code{FALSE}.}
-    \item{verbose:}{Logical constant, whether igraph functions should
-      talk more than minimal. Eg. if \code{TRUE} thne some functions
-      will use progress bars while computing. Defaults to \code{FALSE}.}
-    \item{vertex.attr.comb:}{Specifies what to do with the vertex
-      attributes if the graph is modified. The default value is
-      \code{list(name="concat", "ignore")} See
-      \code{\link{attribute.combination}} for details on this.}
     \item{sparsematrices}{Whether to use the \code{Matrix} package for
       (sparse) matrices. It is recommended, if the user works with
       larger graphs.}
+    \item{verbose}{Logical constant, whether igraph functions should
+      talk more than minimal. Eg. if \code{TRUE} thne some functions
+      will use progress bars while computing. Defaults to \code{FALSE}.}
+    \item{vertex.attr.comb}{Specifies what to do with the vertex
+      attributes if the graph is modified. The default value is
+      \code{list(name="concat", "ignore")} See
+      \code{\link{attribute.combination}} for details on this.}
   }
 }
 \value{
@@ -76,7 +92,7 @@ igraph.par(parid, parvalue = NULL)
   parameter is returned invisibly.
 }
 % \references{}
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{igraph.options} is similar to \code{\link{options}} and
   \code{getIgraphOpt} is similar to \code{\link{getOption}}.}
 \examples{

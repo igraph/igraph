@@ -39,7 +39,7 @@ graph.knn(graph, vids=V(graph), weights=NULL)
   Vespignani: The architecture of complex weighted networks,
   Proc. Natl. Acad. Sci. USA 101, 3747 (2004)
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \examples{
 # Some trivial ones
 g <- graph.ring(10)

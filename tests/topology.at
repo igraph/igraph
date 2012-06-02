@@ -1,8 +1,8 @@
 # Check graph topology related functions
 
 # Test suite for the IGraph library.
-# Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
-# MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+# Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
+# 334 Harvard street, Cambridge, MA 02139 USA
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,4 +29,9 @@ AT_CLEANUP
 AT_SETUP([The VF2 isomorphism algorithm])
 AT_KEYWORDS([isomorph isomorphic VF2])
 AT_COMPILE_CHECK([simple/igraph_isomorphic_vf2.c])
+AT_CLEANUP
+
+AT_SETUP([VF algorithm with compatibility functions])
+AT_KEYWORDS([isomorph isomorphic VF2 compatibility])
+AT_COMPILE_CHECK([simple/VF2-compat.c])
 AT_CLEANUP

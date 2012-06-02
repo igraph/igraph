@@ -12,6 +12,9 @@
 \alias{length.communities}
 \alias{modularity.communities}
 \alias{as.dendrogram.communities}
+\alias{as.hclust.communities}
+\alias{asPhylo}
+\alias{asPhylo.communities}
 \alias{showtrace}
 \alias{code.length}
 \concept{Community structure}
@@ -29,12 +32,14 @@ membership(communities)
 algorithm(communities)
 crossing(communities, graph)
 
-is.hierarchical(communities)
+is.hierarchical(communities, full = FALSE)
 merges(communities)
 cutat(communities, no, steps)
 \method{as.dendrogram}{communities}(object, hang=-1,
    use.modularity=FALSE, \dots)
-
+\method{as.hclust}{communities}(x, hang = -1,
+   use.modularity = FALSE, \dots)
+\method{asPhylo}{communities}(x, use.modularity=FALSE)
 showtrace(communities)
 
 code.length(communities)
@@ -49,7 +54,13 @@ code.length(communities)
 \arguments{
   \item{communities,x,object}{A \code{communities} object, the result of
     an igraph community detection function.}
-  \item{graph}{An igraph graph object, corresponding to \code{communities}.}
+  \item{graph}{An igraph graph object, corresponding to
+    \code{communities}.}
+  \item{full}{Logical scalar, if \code{TRUE}, then
+    \code{is.hierarchical} only returns \code{TRUE} for fully
+   hierarchical algorithms. The \sQuote{leading eigenvector} algorithm
+   is hierarchical, it gives a hierarchy of groups, but not a full
+   dendrogram with all vertices, so it is not fully hierarchical.}
   \item{y}{An igraph graph object, corresponding to the communities in
     \code{x}.}
   \item{no}{Integer scalar, the desired number of communities. If too
@@ -146,6 +157,12 @@ code.length(communities)
   gives an error message to others. See \code{\link[stats]{dendrogram}}
   for details.
 
+  \code{as.hclust} is similar to \code{as.dendrogram}, but converts a
+  hierarchical community structure to a \code{hclust} object.
+
+  \code{asPhylo} converts a hierarchical community structure to
+  a \code{phylo} object, you will need the \code{ape} package for this.
+  
   \code{showtrace} works (currently) only for communities found by the
   leading eigenvector method
   (\code{\link{leading.eigenvector.community}}), and returns a character
@@ -201,7 +218,10 @@ code.length(communities)
 % \references{}
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{
-  \code{\link{compare.communities}} for comparing two community
+  See \code{\link{dendPlot}} for plotting community structure
+  dendrograms.
+  
+  See \code{\link{compare.communities}} for comparing two community
   structures on the same graph.
   
   The different methods for finding communities, they all return a
@@ -220,9 +240,7 @@ karate <- graph.famous("Zachary")
 wc <- walktrap.community(karate)
 modularity(wc)
 membership(wc)
-\dontrun{
 plot(wc, karate)
-}
 }
 \keyword{graphs}
 

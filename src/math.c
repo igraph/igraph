@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -248,3 +248,19 @@ int igraph_i_snprintf(char *buffer, size_t count, const char *format, ...) {
 }
 
 #endif
+
+int igraph_is_nan(double x) {
+  return isnan(x);
+}
+
+int igraph_is_inf(double x) {
+  return isinf(x) != 0;
+}
+
+int igraph_is_posinf(double x) {
+  return isinf(x) == 1;
+}
+
+int igraph_is_neginf(double x) {
+  return isinf(x) == -1;
+}

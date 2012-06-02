@@ -1,8 +1,7 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2006-2012  Tamas Nepusz <ntamas@gmail.com>
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -35,16 +34,17 @@ typedef struct
 {
   PyObject_HEAD
   igraphmodule_GraphObject* gref;
-  long idx;
+  igraph_integer_t idx;
 } igraphmodule_VertexObject;
 
 int igraphmodule_Vertex_clear(igraphmodule_VertexObject *self);
 void igraphmodule_Vertex_dealloc(igraphmodule_VertexObject* self);
 
-PyObject* igraphmodule_Vertex_New(igraphmodule_GraphObject *gref, long idx);
+PyObject* igraphmodule_Vertex_New(igraphmodule_GraphObject *gref, igraph_integer_t idx);
 PyObject* igraphmodule_Vertex_repr(igraphmodule_VertexObject *self);
 PyObject* igraphmodule_Vertex_attributes(igraphmodule_VertexObject* self);
 PyObject* igraphmodule_Vertex_attribute_names(igraphmodule_VertexObject* self);
+igraph_integer_t igraphmodule_Vertex_get_index_igraph_integer(igraphmodule_VertexObject* self);
 long igraphmodule_Vertex_get_index_long(igraphmodule_VertexObject* self);
 PyObject* igraphmodule_Vertex_update_attributes(PyObject* self, PyObject* args,
     PyObject* kwds);

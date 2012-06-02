@@ -332,7 +332,7 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 }
 \value{A graph object.}
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{ \code{\link{write.graph}} }
 % \examples{}
 \keyword{graphs}

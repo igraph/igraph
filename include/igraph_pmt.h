@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,7 +31,9 @@
 #if defined(BASE_IGRAPH_REAL)
 #define BASE igraph_real_t
 #define SHORT
-#define OUT_FORMAT "%g"
+#define OUT_FORMAT "%G"
+#define PRINTFUNC(val) igraph_real_printf(val)
+#define FPRINTFUNC(file, val) igraph_real_fprintf(file, val)
 #define ZERO 0.0
 #define ONE 1.0
 #define MULTIPLICITY 1
@@ -89,11 +91,13 @@
 #define ONE {{1.0,0.0}}
 #define MULTIPLICITY 2
 #define NOTORDERED 1
+#define NOABS 1
 #define SUM(a,b,c) ((a) = igraph_complex_add((b),(c)))
 #define DIFF(a,b,c) ((a) = igraph_complex_sub((b),(c)))
 #define PROD(a,b,c) ((a) = igraph_complex_mul((b),(c)))
 #define DIV(a,b,c) ((a) = igraph_complex_div((b),(c)))
 #define EQ(a,b) IGRAPH_COMPLEX_EQ((a),(b))
+#define SQ(a) IGRAPH_REAL(igraph_complex_mul((a),(a)))
 
 #else
 #error unknown BASE_ directive

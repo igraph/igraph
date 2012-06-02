@@ -1,5 +1,5 @@
-\name{all.st.cuts}
-\alias{all.st.cuts}
+\name{stCuts}
+\alias{stCuts}
 \concept{Edge cuts}
 \concept{(s,t)-cuts}
 \title{List all (s,t)-cuts of a graph}
@@ -7,7 +7,7 @@
   List all (s,t)-cuts in a directed graph.
 }
 \usage{
-all.st.cuts(graph, source, target)
+stCuts(graph, source, target)
 }
 \arguments{
   \item{graph}{The input graph. It must be directed.}
@@ -18,7 +18,7 @@ all.st.cuts(graph, source, target)
   Given a \eqn{G} directed graph and two, different and non-ajacent
   vertices, \eqn{s} and \eqn{t}, an \eqn{(s,t)}-cut is a set of edges,
   such that after removing these edges from \eqn{G} there is no directed
-  path from \eqn{s} to \eqn{t}.  
+  path from \eqn{s} to \eqn{t}.
 }
 \value{
   A list with entries:
@@ -36,16 +36,16 @@ all.st.cuts(graph, source, target)
 }
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{
-  \code{\link{all.st.mincuts}} to list all minimum cuts.
+  \code{\link{stMincuts}} to list all minimum cuts.
 }
 \examples{
 # A very simple graph
 g <- graph.formula(a -+ b -+ c -+ d -+ e)
-all.st.cuts(g, source="a", target="e")
+stCuts(g, source="a", target="e")
 
 # A somewhat more difficult graph
 g2 <- graph.formula(s --+ a:b, a:b --+ t,
                    a --+ 1:2:3, 1:2:3 --+ b)
-all.st.cuts(g2, source="s", target="t")
+stCuts(g2, source="s", target="t")
 }
 \keyword{graphs}

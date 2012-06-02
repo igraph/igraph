@@ -49,7 +49,7 @@ closeness.estimate(graph, vids=V(graph), mode = c("out", "in", "all",
   \code{v}.} 
 \references{ Freeman, L.C. (1979). Centrality in Social Networks I:
   Conceptual Clarification. \emph{Social Networks}, 1, 215-239. }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{betweenness}}, \code{\link{degree}}}
 \examples{
 g <- graph.ring(10)

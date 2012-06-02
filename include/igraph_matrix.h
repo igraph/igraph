@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2009  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -48,6 +48,12 @@ __BEGIN_DECLS
 #include "igraph_pmt_off.h"
 #undef BASE_IGRAPH_REAL
 
+#define BASE_INT
+#include "igraph_pmt.h"
+#include "igraph_matrix_pmt.h"
+#include "igraph_pmt_off.h"
+#undef BASE_INT
+
 #define BASE_LONG
 #include "igraph_pmt.h"
 #include "igraph_matrix_pmt.h"
@@ -91,6 +97,10 @@ __BEGIN_DECLS
  * Time complexity: O(1).
  */
 #define MATRIX(m,i,j) ((m).data.stor_begin[(m).nrow*(j)+(i)])
+
+igraph_bool_t igraph_matrix_all_e_tol(const igraph_matrix_t *lhs,
+				      const igraph_matrix_t *rhs,
+				      igraph_real_t tol);
 
 __END_DECLS
 

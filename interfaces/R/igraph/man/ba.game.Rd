@@ -11,7 +11,7 @@
 barabasi.game(n, power = 1, m = NULL, out.dist = NULL, out.seq = NULL, 
     out.pref = FALSE, zero.appeal = 1, directed = TRUE,
     algorithm = c("psumtree", "psumtree-multiple", "bag"),
-    start.graph=NULL) 
+    start.graph = NULL)
 }
 \arguments{
   \item{n}{Number of vertices.}
@@ -54,7 +54,7 @@ barabasi.game(n, power = 1, m = NULL, out.dist = NULL, out.seq = NULL,
     attachment algorithm. The graph should have at least one vertex. If
     a graph is supplied here and the \code{out.seq} argument is not
     \code{NULL}, then it should contain the out degrees of the new
-    vertices only, not the ones in the \code{start.graph}.} 
+    vertices only, not the ones in the \code{start.graph}.}
 }
 \details{
   This is a simple stochastic algorithm to generate a graph. It is a
@@ -99,7 +99,7 @@ barabasi.game(n, power = 1, m = NULL, out.dist = NULL, out.seq = NULL,
 \value{A graph object.}
 \references{  Barabasi, A.-L. and Albert R. 1999. Emergence of scaling
   in random networks \emph{Science}, 286 509--512.}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{random.graph.game}}}
 \examples{
 g <- barabasi.game(10000)

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<section>
+<title>Using igraph in multi-threaded programs</title>
+<para>
+  The igraph library is considered thread-safe on platforms that 
+  support thread-local storage. This currently includes Linux and MS
+  Windows operating systems, but not Mac OSX. The best way to check 
+  whether an igraph build is thread-safe is checking the 
+  <link linkend="IGRAPH_THREAD_SAFE">
+    <function>IGRAPH_THREAD_SAFE</function>
+  </link> macro.
+</para>
+
+<!-- doxrox-include IGRAPH_THREAD_SAFE -->
+
+<section><title>Thread-safe ARPACK library</title>
+<para>
+Note that igraph is only thread-safe if it was built with the internal
+ARPACK library, i.e. the one that comes with igraph. The standard
+ARPACK library is not thread-safe.
+</para>
+</section>
+
+</section>
+

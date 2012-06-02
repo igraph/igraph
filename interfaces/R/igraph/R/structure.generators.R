@@ -1,7 +1,7 @@
 
 #   IGraph R package
-#   Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
-#   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+#   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
+#   334 Harvard street, Cambridge, MA 02139 USA
 #   
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -130,8 +130,6 @@ graph.adjacency.dense <- function(adjmatrix, mode=c("directed", "undirected", "m
                  "min"=4,
                  "plus"=5)
   
-  if (!diag) { diag(adjmatrix) <- 0 }
-  
   if (!is.null(weighted)) {
     if (is.logical(weighted) && weighted) {
       weighted <- "weight"
@@ -146,7 +144,7 @@ graph.adjacency.dense <- function(adjmatrix, mode=c("directed", "undirected", "m
 
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     res <- .Call("R_igraph_weighted_adjacency", adjmatrix,
-                 as.numeric(mode), "weight",
+                 as.numeric(mode), "weight", diag,
                  PACKAGE="igraph")
   } else {
     
@@ -187,7 +185,7 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
   vc <- nrow(adjmatrix)
 
   ## to remove non-redundancies that can persist in a dgtMatrix
-  if(is(adjmatrix, "dgTMatrix")) {
+  if(inherits(adjmatrix, "dgTMatrix")) {
     adjmatrix = as(adjmatrix, "CsparseMatrix")
   }
   
@@ -311,7 +309,7 @@ graph.adjacency <- function(adjmatrix, mode=c("directed", "undirected", "max",
                             weighted=NULL, diag=TRUE,
                             add.colnames=NULL, add.rownames=NA) {
 
-  if (is(adjmatrix, "Matrix")) {
+  if (inherits(adjmatrix, "Matrix")) {
     res <- graph.adjacency.sparse(adjmatrix, mode=mode, weighted=weighted, diag=diag)
   } else {
     res <- graph.adjacency.dense(adjmatrix, mode=mode, weighted=weighted, diag=diag)
@@ -365,19 +363,30 @@ graph.star <- function(n, mode=c("in", "out", "mutual", "undirected"),
                        center=1 ) {
 
   mode <- igraph.match.arg(mode)
-  mode <- switch(mode, "out"=0, "in"=1, "undirected"=2, "mutual"=3)
+  mode1 <- switch(mode, "out"=0, "in"=1, "undirected"=2, "mutual"=3)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_star", as.numeric(n), as.numeric(mode),
-        as.numeric(center)-1,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_star", as.numeric(n), as.numeric(mode1),
+               as.numeric(center)-1,
+               PACKAGE="igraph")
+  if (getIgraphOpt("add.params")) {
+    res$name <- switch(mode, "in"="In-star", "out"="Out-star", "Star")
+    res$mode <- mode
+    res$center <- center
+  }
+  res
 }
 
 graph.full <- function(n, directed=FALSE, loops=FALSE) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_full", as.numeric(n), as.logical(directed),
-        as.logical(loops),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_full", as.numeric(n), as.logical(directed),
+               as.logical(loops),
+               PACKAGE="igraph")
+  if (getIgraphOpt("add.params")) {
+    res$name <- "Full graph"
+    res$loops <- loops
+  }
+  res
 }
 
 ###################################################################
@@ -435,17 +444,31 @@ graph.lattice <- function(dimvector=NULL,length=NULL, dim=NULL, nei=1,
   }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_lattice", as.numeric(dimvector), as.numeric(nei),
-        as.logical(directed), as.logical(mutual),
-        as.logical(circular),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_lattice", as.numeric(dimvector), as.numeric(nei),
+               as.logical(directed), as.logical(mutual),
+               as.logical(circular),
+               PACKAGE="igraph")
+  if (getIgraphOpt("add.params")) {
+    res$name <- "Lattice graph"
+    res$dimvector <- dimvector
+    res$nei <- nei
+    res$mutual <- mutual
+    res$circular <- circular
+  }
+  res
 }
 
 graph.ring <- function(n, directed=FALSE, mutual=FALSE, circular=TRUE) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_ring", as.numeric(n), as.logical(directed),
-        as.logical(mutual), as.logical(circular),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_ring", as.numeric(n), as.logical(directed),
+               as.logical(mutual), as.logical(circular),
+               PACKAGE="igraph")
+  if (getIgraphOpt("add.params")) {
+    res$name <- "Ring graph"
+    res$mutual <- mutual
+    res$circular <- circular
+  }
+  res
 }
 
 ###################################################################
@@ -455,12 +478,18 @@ graph.ring <- function(n, directed=FALSE, mutual=FALSE, circular=TRUE) {
 graph.tree <- function(n, children=2, mode=c("out", "in", "undirected")) {
 
   mode <- igraph.match.arg(mode)
-  mode <- switch(mode, "out"=0, "in"=1, "undirected"=2);
+  mode1 <- switch(mode, "out"=0, "in"=1, "undirected"=2);
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_tree", as.numeric(n), as.numeric(children),
-        as.numeric(mode),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_tree", as.numeric(n), as.numeric(children),
+               as.numeric(mode1),
+               PACKAGE="igraph")
+  if (getIgraphOpt("add.params")) {
+    res$name <- "Tree"
+    res$children <- children
+    res$mode <- mode
+  }
+  res
 }
 
 ###################################################################
@@ -470,8 +499,13 @@ graph.tree <- function(n, children=2, mode=c("out", "in", "undirected")) {
 graph.atlas <- function(n) {
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_atlas", as.numeric(n),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_atlas", as.numeric(n),
+               PACKAGE="igraph")
+  if (getIgraphOpt("add.params")) {
+    res$name <- sprintf("Graph from the Atlas #%i", n)
+    res$n <- n
+  }
+  res
 }
 
 ###################################################################
@@ -509,8 +543,6 @@ graph.data.frame <- function(d, directed=TRUE, vertices=NULL) {
       stop("Some vertex names in edge list are not listed in vertex data frame")
     }
   }
-  ids <- seq(along=names)
-  names(ids) <- names
     
   # create graph
   g <- graph.empty(n=0, directed=directed)
@@ -530,12 +562,12 @@ graph.data.frame <- function(d, directed=TRUE, vertices=NULL) {
   }
 
   # add vertices
-  g <- add.vertices(g, length(ids), attr=attrs)
+  g <- add.vertices(g, length(names), attr=attrs)
     
   # create edge list
   from <- as.character(d[,1])
   to <- as.character(d[,2])
-  edges <- t(matrix(c(ids[from], ids[to]), nc=2))
+  edges <- rbind(match(from, names), match(to,names))
   
   # edge attributes
   attrs <- list()
@@ -583,9 +615,14 @@ graph.edgelist <- function(el, directed=TRUE) {
 graph.extended.chordal.ring <- function(n, w) {
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_extended_chordal_ring", as.numeric(n),
-        as.matrix(w),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_extended_chordal_ring", as.numeric(n),
+               as.matrix(w),
+               PACKAGE="igraph")
+  if (getIgraphOpt("add.params")) {  
+    res$name <- "Extended chordal ring"
+    res$w <- w
+  }
+  res
 }
 
 line.graph <- function(graph) {
@@ -595,30 +632,50 @@ line.graph <- function(graph) {
   }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_line_graph", graph,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_line_graph", graph,
+               PACKAGE="igraph")
+  if (getIgraphOpt("add.params")) {
+    res$name <- "Line graph"
+  }
+  res
 }
   
   
 graph.de.bruijn <- function(m, n) {
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_de_bruijn", as.numeric(m), as.numeric(n),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_de_bruijn", as.numeric(m), as.numeric(n),
+               PACKAGE="igraph")
+  if (getIgraphOpt("add.params")) {
+    res$name <- sprintf("De-Bruijn graph %i-%i", m, n)
+    res$m <- m
+    res$n <- n
+  }
+  res
 }
 
 graph.kautz <- function(m, n) {
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_kautz", as.numeric(m), as.numeric(n),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_kautz", as.numeric(m), as.numeric(n),
+               PACKAGE="igraph")
+  if (getIgraphOpt("add.params")) {
+    res$name <- sprintf("Kautz graph %i-%i", m, n)
+    res$m <- m
+    res$n <- n
+  }
+  res
 }
 
 graph.famous <- function(name) {
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_famous", as.character(name),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_famous", as.character(name),
+               PACKAGE="igraph")
+  if (getIgraphOpt("add.params")) {
+    res$name <- name
+  }
+  res
 }
 
 graph.full.bipartite <- function(n1, n2, directed=FALSE,
@@ -627,11 +684,17 @@ graph.full.bipartite <- function(n1, n2, directed=FALSE,
   n1 <- as.integer(n1)
   n2 <- as.integer(n2)
   directed <- as.logical(directed)
-  mode <- switch(igraph.match.arg(mode), "out"=1, "in"=2, "all"=3, "total"=3)  
+  mode1 <- switch(igraph.match.arg(mode), "out"=1, "in"=2, "all"=3, "total"=3)  
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  res <- .Call("R_igraph_full_bipartite", n1, n2, as.logical(directed), mode,
+  res <- .Call("R_igraph_full_bipartite", n1, n2, as.logical(directed), mode1,
                PACKAGE="igraph")
+  if (getIgraphOpt("add.params")) {
+    res$graph$name <- "Full bipartite graph"
+    res$n1 <- n1
+    res$n2 <- n2
+    res$mode <- mode
+  }
   set.vertex.attribute(res$graph, "type", value=res$types)
 }
 
@@ -775,7 +838,7 @@ graph.incidence <- function(incidence, directed=FALSE,
   mode <- switch(igraph.match.arg(mode), "out"=1, "in"=2, "all"=3, "total"=3)
   multiple <- as.logical(multiple)
 
-  if (is(incidence, "Matrix")) {
+  if (inherits(incidence, "Matrix")) {
     res <- graph.incidence.sparse(incidence, directed=directed,
                                   mode=mode, multiple=multiple,
                                   weighted=weighted)

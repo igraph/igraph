@@ -24,7 +24,7 @@ graph.kautz(m,n)
   for details.
 }
 \value{A graph object.}
-\author{Gabor Csardi <csardi@rmki.kfki.hu>, the first version in R was
+\author{Gabor Csardi <csardi.gabor@gmail.com>, the first version in R was
   written by Vincent Matossian.}
 \seealso{\code{\link{graph.de.bruijn}}, \code{\link{line.graph}}}
 \examples{

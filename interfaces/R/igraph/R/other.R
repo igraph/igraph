@@ -1,7 +1,7 @@
 
 #   IGraph R package
-#   Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
-#   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+#   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
+#   334 Harvard street, Cambridge, MA 02139 USA
 #   
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -56,3 +56,12 @@ igraph.match.arg <- function(arg, choices, several.ok=FALSE) {
   match.arg(arg=arg, choices=choices, several.ok=several.ok)
 }
 
+igraph.i.spMatrix <- function(M) {
+  require(Matrix)
+  if (M$type == "triplet") {
+    sparseMatrix(dims=M$dim, i=M$i+1L, j=M$p+1L, x=M$x)
+  } else {
+    new("dgCMatrix", Dim=M$dim, Dimnames=list(NULL, NULL),
+        factors=list(), i=M$i, p=M$p, x=M$x)
+  }
+}

@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2009  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard st, Cambridge MA, 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -196,9 +196,10 @@ int main() {
   igraph_vector_init(&x, NROW);
   igraph_vector_init(&y, NROW);
   my_gaxpy(&M, &v, &x);
+  igraph_vector_null(&y);
   igraph_sparsemat_gaxpy(&B, &w, &y);
   
-  if (!igraph_vector_is_equal(&x, &y)) { return 1; }
+  if (!igraph_vector_all_e(&x, &y)) { return 1; }
 
   igraph_vector_destroy(&x);
   igraph_vector_destroy(&y);

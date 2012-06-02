@@ -113,7 +113,7 @@ community.le.to.membership(merges, steps, membership)
   MEJ Newman: Finding community structure using the eigenvectors of
   matrices, Physical Review E 74 036104, 2006.
 } 
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{modularity}}, \code{\link{walktrap.community}},
   \code{\link{edge.betweenness.community}},
   \code{\link{fastgreedy.community}},

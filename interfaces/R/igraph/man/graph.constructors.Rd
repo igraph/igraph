@@ -154,7 +154,7 @@ graph.extended.chordal.ring(n, w)
 }
 \value{Every function documented here returns a \code{graph} object.}
 %\references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{graph.adjacency}} to create graphs from adjacency
   matrices, \code{\link{graph.formula}} for a handy way to create small
   graphs, \code{\link{graph.data.frame}} for an easy way to create

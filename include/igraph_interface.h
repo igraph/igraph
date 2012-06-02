@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2009  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -85,9 +85,10 @@ int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids, igraph_integer
 int igraph_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t vid,
 		    igraph_neimode_t mode);
 
-#define IGRAPH_FROM(g,e) (VECTOR((g)->from)[(long int)(e)])
-#define IGRAPH_TO(g,e)   (VECTOR((g)->to)  [(long int)(e)])
-#define IGRAPH_OTHER(g,e,v) (IGRAPH_TO(g,(e))==(v) ? IGRAPH_FROM((g),(e)) : IGRAPH_TO((g),(e)))
+#define IGRAPH_FROM(g,e) ((igraph_integer_t)(VECTOR((g)->from)[(long int)(e)]))
+#define IGRAPH_TO(g,e)   ((igraph_integer_t)(VECTOR((g)->to)  [(long int)(e)]))
+#define IGRAPH_OTHER(g,e,v) \
+    ((igraph_integer_t)(IGRAPH_TO(g,(e))==(v) ? IGRAPH_FROM((g),(e)) : IGRAPH_TO((g),(e))))
 
 __END_DECLS
 

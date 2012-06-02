@@ -114,4 +114,4 @@
   See especially the documentation section. Join the igraph-help mailing
   list if you have questions or comments.
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}

@@ -2,8 +2,8 @@
 /* vim:set ts=2 sts=2 sw=2 et: */
 /* 
    IGraph library.
-   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@
 #include "igraph_interface.h"
 #include "igraph_progress.h"
 #include "igraph_interrupt_internal.h"
+#include "igraph_topology.h"
 #include "igraph_types_internal.h"
 #include "igraph_stack.h"
 #include "igraph_dqueue.h"
@@ -52,11 +53,12 @@ igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector) {
    * negate the eigenvector.
    */
   long int i, n = igraph_vector_size(vector);
+  igraph_real_t mi, ma;
 
   if (n == 0)
     return 0;
 
-  igraph_real_t mi = VECTOR(*vector)[0], ma = VECTOR(*vector)[0];
+  mi = ma = VECTOR(*vector)[0];
   for (i = 1; i < n; i++) {
     if (VECTOR(*vector)[i] < mi)
       mi = VECTOR(*vector)[i];
@@ -207,7 +209,7 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
   
   options->n = igraph_vcount(graph);
   options->nev = 1;
-  options->ncv = 3;
+  options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
   options->which[0]='L'; options->which[1]='A';
   options->start=1;		/* no random start vector */
 
@@ -310,6 +312,7 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
   igraph_matrix_t values;
   igraph_matrix_t vectors;
   igraph_vector_t indegree;
+  igraph_bool_t dag;
   long int i;
 
   if (igraph_ecount(graph) == 0) {
@@ -320,7 +323,21 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
       igraph_vector_resize(vector, igraph_vcount(graph));
       igraph_vector_fill(vector, 1);
     }
-	return IGRAPH_SUCCESS;
+    return IGRAPH_SUCCESS;
+  }
+
+  /* Quick check: if the graph is a DAG, all the eigenvector centralities are
+   * zeros, and so is the eigenvalue */
+  IGRAPH_CHECK(igraph_is_dag(graph, &dag));
+  if (dag) {
+    /* special case: graph is a DAG */
+    if (value)
+      *value = 0;
+    if (vector) {
+      igraph_vector_resize(vector, igraph_vcount(graph));
+      igraph_vector_fill(vector, 0);
+    }
+    return IGRAPH_SUCCESS;
   }
 
   if (weights) {
@@ -354,7 +371,7 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
   options->n=igraph_vcount(graph);
   options->start=1;
   options->nev=1;
-  options->ncv=options->n < 4 ? 3 : 4;
+  options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rnsolve */
   /* LM mode is not OK here because +1 and -1 can be eigenvalues at the
    * same time, e.g.: a -> b -> a, c -> a */
   options->which[0]='L' ; options->which[1]='R';
@@ -692,7 +709,7 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
   extra2.graph=graph; extra2.weights=weights;
 
   options->nev = 1;
-  options->ncv = 3;
+  options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
   options->which[0]='L'; options->which[1]='M';
 
   if (weights == 0) {
@@ -892,12 +909,13 @@ int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
   if (reset) {
     /* Running personalized PageRank */
     for (i=0; i<n; i++) {
-	  to[i] += sumfrom * VECTOR(*reset)[i];
-	}
+      to[i] += sumfrom * VECTOR(*reset)[i];
+    }
   } else {
     /* Traditional PageRank with uniform reset vector */
+    sumfrom /= n;
     for (i=0; i<n; i++) {
-	to[i] += sumfrom / n;
+      to[i] += sumfrom;
     }
   }
 
@@ -948,8 +966,9 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
     }
   } else {
     /* Traditional PageRank with uniform reset vector */
+    sumfrom /= n;
     for (i=0; i<n; i++) {
-      to[i] += sumfrom / n;
+      to[i] += sumfrom;
     }
   }
 
@@ -1209,7 +1228,7 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
 
   options->n = no_of_nodes;
   options->nev = 1;
-  options->ncv = 3;
+  options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rnsolve */
   options->which[0]='L'; options->which[1]='M';
   options->start = 1;		/* no random start vector */
 
@@ -1426,7 +1445,7 @@ int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
 				     nobigint);
 }
 
-int igraph_betweenness_estimate_weighted(const igraph_t *graph, 
+int igraph_i_betweenness_estimate_weighted(const igraph_t *graph, 
 					 igraph_vector_t *res, 
 					 const igraph_vs_t vids, 
 					 igraph_bool_t directed,
@@ -1442,7 +1461,6 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
   long int source, j;
   igraph_stack_t S;
   igraph_integer_t mode= directed ? IGRAPH_OUT : IGRAPH_ALL;
-  igraph_integer_t omode= directed ? IGRAPH_IN : IGRAPH_ALL;
   igraph_vector_t dist, nrgeo, tmpscore;
   igraph_vector_t v_tmpres, *tmpres=&v_tmpres;
   igraph_vit_t vit;
@@ -1458,7 +1476,7 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
   IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode));  
   IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
-  IGRAPH_CHECK(igraph_adjlist_init(graph, &fathers, omode));
+  IGRAPH_CHECK(igraph_adjlist_init_empty(&fathers, no_of_nodes));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &fathers);
 
   IGRAPH_CHECK(igraph_stack_init(&S, no_of_nodes));
@@ -1475,10 +1493,6 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(tmpres, no_of_nodes);
   }
 
-  for (j=0; j<no_of_nodes; j++) {
-    igraph_vector_clear(igraph_adjlist_get(&fathers, j));
-  }
-  
   for (source=0; source<no_of_nodes; source++) {
     IGRAPH_PROGRESS("Betweenness centrality: ", 100.0*source/no_of_nodes, 0);
     IGRAPH_ALLOW_INTERRUPTION();
@@ -1669,7 +1683,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   igraph_biguint_t D, R, T;
 
   if (weights) { 
-    return igraph_betweenness_estimate_weighted(graph, res, vids, directed,
+    return igraph_i_betweenness_estimate_weighted(graph, res, vids, directed,
 						cutoff, weights, nobigint);
   }
 
@@ -1876,7 +1890,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   return 0;
 }
 
-int igraph_edge_betweenness_estimate_weighted(const igraph_t *graph, 
+int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph, 
 					      igraph_vector_t *result,
 					      igraph_bool_t directed, 
 					      igraph_real_t cutoff,
@@ -1887,7 +1901,6 @@ int igraph_edge_betweenness_estimate_weighted(const igraph_t *graph,
   igraph_inclist_t inclist;
   igraph_inclist_t fathers;
   igraph_integer_t mode= directed ? IGRAPH_OUT : IGRAPH_ALL;
-  igraph_integer_t omode= directed ? IGRAPH_IN : IGRAPH_ALL;
   igraph_vector_t distance, tmpscore;
   igraph_vector_long_t nrgeo;
   long int source, j;
@@ -1902,7 +1915,7 @@ int igraph_edge_betweenness_estimate_weighted(const igraph_t *graph,
   
   IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode));
   IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
-  IGRAPH_CHECK(igraph_inclist_init(graph, &fathers, omode));
+  IGRAPH_CHECK(igraph_inclist_init_empty(&fathers, no_of_nodes));
   IGRAPH_FINALLY(igraph_inclist_destroy, &fathers);
 
   IGRAPH_VECTOR_INIT_FINALLY(&distance, no_of_nodes);
@@ -2000,7 +2013,7 @@ int igraph_edge_betweenness_estimate_weighted(const igraph_t *graph,
       VECTOR(tmpscore)[w]=0;
       VECTOR(distance)[w]=0;
       VECTOR(nrgeo)[w]=0;
-      igraph_vector_clear(igraph_inclist_get(&fathers, w));
+      igraph_vector_clear(fatv);
     }
     
   } /* source < no_of_nodes */
@@ -2125,7 +2138,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
   long int i;
 
   if (weights) { 
-    return igraph_edge_betweenness_estimate_weighted(graph, result, 
+    return igraph_i_edge_betweenness_estimate_weighted(graph, result, 
 						     directed, cutoff, weights);
   }
 
@@ -2328,7 +2341,7 @@ int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
   return igraph_closeness_estimate(graph, res, vids, mode, -1, weights);
 }
 
-int igraph_closeness_estimate_weighted(const igraph_t *graph, 
+int igraph_i_closeness_estimate_weighted(const igraph_t *graph, 
 				       igraph_vector_t *res, 
 				       const igraph_vs_t vids, 
 				       igraph_neimode_t mode,
@@ -2513,7 +2526,7 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
   igraph_vit_t vit;
 
   if (weights) { 
-    return igraph_closeness_estimate_weighted(graph, res, vids, mode, cutoff,
+    return igraph_i_closeness_estimate_weighted(graph, res, vids, mode, cutoff,
 					      weights);
   }
 

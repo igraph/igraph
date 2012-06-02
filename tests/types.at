@@ -1,8 +1,8 @@
 # Check the utility types (vector_t, etc.)
 
 # Test suite for the IGraph library.
-# Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
-# MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+# Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
+# 334 Harvard street, Cambridge, MA 02139 USA
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,6 +31,11 @@ AT_KEYWORDS([vector vector_t])
 AT_COMPILE_CHECK([simple/vector2.c], [simple/vector2.out])
 AT_CLEANUP
 
+AT_SETUP([Vector (even more) (vector_t): ])
+AT_KEYWORDS([vector vector_t])
+AT_COMPILE_CHECK([simple/vector3.c])
+AT_CLEANUP
+
 AT_SETUP([Matrix (matrix_t): ])
 AT_KEYWORDS([matrix matrix_t])
 AT_COMPILE_CHECK([simple/matrix.c], [simple/matrix.out])
@@ -39,6 +44,11 @@ AT_CLEANUP
 AT_SETUP([Matrix (more) (matrix_t): ])
 AT_KEYWORDS([matrix matrix_t])
 AT_COMPILE_CHECK([simple/matrix2.c], [simple/matrix2.out])
+AT_CLEANUP
+
+AT_SETUP([Matrix (even more) (matrix_t): ])
+AT_KEYWORDS([matrix matrix_t])
+AT_COMPILE_CHECK([simple/matrix3.c])
 AT_CLEANUP
 
 AT_SETUP([Double ended queue (dqueue_t): ])
@@ -123,7 +133,7 @@ AT_CLEANUP
 AT_SETUP([Sparse matrix, multiplications (igraph_sparsemat_t): ])
 AT_KEYWORDS([sparse matrix igraph_sparsemat_t])
 AT_COMPILE_CHECK([simple/igraph_sparsemat2.c], [simple/igraph_sparsemat2.out],
-                 [], [INTERNAL])
+                 [], [INTERNAL], [-lblas])
 AT_CLEANUP
 
 AT_SETUP([Sparse matrix, indexing (igraph_sparsemat_t): ])
@@ -156,6 +166,16 @@ AT_CLEANUP
 AT_SETUP([Sparse matrix, other operations (igraph_sparsemat_t): ])
 AT_KEYWORDS([sparse matrix igraph_sparsemat_t])
 AT_COMPILE_CHECK([simple/igraph_sparsemat8.c])
+AT_CLEANUP
+
+AT_SETUP([Sparse matrix, multiplications with dense (igraph_sparsemat_t): ])
+AT_KEYWORDS([sparse matrix igraph_sparsemat_t sparse-dense dense-sparse])
+AT_COMPILE_CHECK([simple/igraph_sparsemat9.c])
+AT_CLEANUP
+
+AT_SETUP([Sparse matrix, is symmetric? (igraph_sparsemat_t): ])
+AT_KEYWORDS([sparse matrix igraph_sparsemat_t symmetric is_symmetric])
+AT_COMPILE_CHECK([simple/igraph_sparsemat_is_symmetric.c])
 AT_CLEANUP
 
 AT_SETUP([Another sparse matrix (igraph_spmatrix_t): ])

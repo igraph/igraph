@@ -37,7 +37,7 @@ girth(graph, circle=TRUE)
   \emph{Proceedings of the ninth annual ACM symposium on Theory of 
     computing}, 1-10, 1977
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \examples{
 # No circle in a tree
 g <- graph.tree(1000, 3)

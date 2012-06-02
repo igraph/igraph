@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard st, Cambridge MA, 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -84,6 +84,17 @@ int main(int argc, char **argv) {
   SETEASV(&g, "weight", &strvalues);
   igraph_write_graph_leda(&g, stdout, 0, "weight");
   igraph_strvector_destroy(&strvalues);
+  printf("===\n");
+  igraph_destroy(&g);
+
+  /* Saving undirected graph with edge attributes and large weights */
+  igraph_ring(&g, 5, /* directed = */ 0,
+                     /* mutual   = */ 0,
+                     /* circular = */ 1);
+  igraph_vector_init_seq(&values, 123456789, 123456793);
+  SETEANV(&g, "weight", &values);
+  igraph_write_graph_leda(&g, stdout, 0, "weight");
+  igraph_vector_destroy(&values);
   printf("===\n");
   igraph_destroy(&g);
 

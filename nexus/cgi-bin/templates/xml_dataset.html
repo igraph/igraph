@@ -1,0 +1,47 @@
+$def with (ds, tags, meta, formats, papers, networks)
+<?xml version="1.0"?>
+<dataset>
+  <id>$ds.id</id>
+  <sid>$ds.sid</sid>
+  <name>$ds.name</name>
+  <shortdescription>
+    $ds.shortdescription
+  </shortdescription>
+  <description>$ds.description</description>
+  <networks>
+    $for net in networks:
+      <network>
+	<id>$net.id</id>
+	<sid>$net.sid</sid>
+	<vertices>$net.vertices</vertices>
+	<edges>$net.edges</edges>
+	<description>$net.description</description>
+      </network>
+  </networks>
+  <tags>
+    $for t in tags:
+      <tag>$t.tag</tag>
+  </tags>
+  <attributes>
+    $for m in meta:
+      <attribute>
+	<name>$m.name</name>
+	<type>$m.type</type>
+	<datatype>$m.datatype</datatype>
+	<description>
+	  $m.description
+	</description>
+      </attribute>
+  </attributes>
+  <date>${ds.date[0:10]}</date>
+  <licence>$ds.licence</licence>
+  <licenceurl>$ds.licence_url</licenceurl>
+  <papers>
+    $for p in papers:
+      <paper>$p.citation</paper>
+  </papers>
+  <formats>
+    $for f,fv in formats.items():
+    <format><name>$f</name><size>$fv.size</size></format>
+  </formats>
+</dataset>

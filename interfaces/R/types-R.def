@@ -20,6 +20,18 @@ BOOLEAN:
 VECTOR:
     INCONV: %I% <- as.numeric(%I%)
 
+VERTEXINDEX:
+    OUTCONV: 
+        OUT:  if (getIgraphOpt("add.vertex.names") && is.named(%I1%)) { \
+                names(%I%) <- get.vertex.attribute(%I1%, "name", %I2%) \
+              }
+
+VERTEXINDEX_OR_0:
+    OUTCONV: 
+        OUT:  if (getIgraphOpt("add.vertex.names") && is.named(%I1%)) { \
+                names(%I%) <- get.vertex.attribute(%I1%, "name", %I2%) \
+              }
+
 VECTOR_LONG:
     INCONV: %I% <- as.integer(%I%)
 
@@ -42,10 +54,10 @@ VECTOR_BOOL_OR_0:
     INCONV: if (!is.null(%I%)) %I% <- as.logical(%I%)
 
 MATRIX:
-    INCONV: %I% <- structure(as.double(%I%), dim=dim(%I%))
+    INCONV: %I% <- as.matrix(structure(as.double(%I%), dim=dim(%I%)))
 
 MATRIX_OR_0:
-    INVONV: if (!is.null(%I%)) %I% <- structure(as.double(%I%), dim=dim(%I%))
+    INCONV: if (!is.null(%I%)) %I% <- structure(as.double(%I%), dim=dim(%I%))
 
 ARRAY3:
     INCONV: %I% <- structure(as.double(%I%), dim=dim(%I%))
@@ -95,15 +107,18 @@ INT:
     INCONV: %I% <- as.integer(%I%)
 
 VERTEXSET:
-    INCONV: %I% <- as.igraph.vs(%I1%, %I%)-1
+    INCONV: %I% <- as.igraph.vs(%I1%, %I%)
+    CALL: %I%-1
     DEFAULT:
        ALL: V(%I1%)
 
 VERTEX:
-    INCONV: %I% <- as.igraph.vs(%I1%, %I%)-1
+    INCONV: %I% <- as.igraph.vs(%I1%, %I%)
+    CALL: %I%-1
 
 EDGESET:
-    INCONV: %I% <- as.igraph.es(%I1%, %I%)-1
+    INCONV: %I% <- as.igraph.es(%I1%, %I%)
+    CALL: %I%-1
     DEFAULT:
        ALL: E(%I1%)
 
@@ -244,3 +259,47 @@ RECIP:
     INCONV: %I% <- switch(igraph.match.arg(%I%), 'default'=0, 'ratio'=1)
     DEFAULT:
        Default: c('default', 'ratio')
+
+SCGMAT:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "symmetric"=1, \
+                          "laplacian"=2, "stochastic"=3)
+    DEFAULT:
+      Default: c("symmetric", "laplacian", "stochastic")
+
+SCGALGO:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "optimum"=1, "interv_km"=2, \
+                          "interv"=3, "exact_scg"=4)
+    DEFAULT:
+      Default: c("optimum", "interv_km", "interv", "exact_scg")
+
+SCGNORM:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "row"=1, "col"=2)
+    DEFAULT:
+      Default: c("row", "col")
+
+SCGDIR:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "default"=1, "left"=2, "right"=3)
+    DEFAULT: 
+      Default: c("default", "left", "right")
+
+SPARSEMAT:
+    INCONV: require(Matrix); %I% <- as(%I%, "dgCMatrix")
+
+SPARSEMAT_OR_0:
+    INCONV: if (!is.null(%I%)) { \
+               require(Matrix); %I% <- as(%I%, "dgCMatrix") \
+            }
+
+CVECTOR:
+    INCONV: %I% <- as.complex(%I%)
+
+CMATRIX:
+    INCONV: %I% <- as.matrix(structure(as.complex(%I%), dim=dim(%I%)))
+
+CVECTOR_OR_0:
+    if (!is.null(%I%)) { INCONV: %I% <- as.complex(%I%) }
+
+CMATRIX_OR_0:
+    if (!is.null(%I%)) { \
+       INCONV: %I% <- as.matrix(structure(as.complex(%I%), dim=dim(%I%))) \
+    }

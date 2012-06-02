@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2008  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2008-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ int print_matrix(const igraph_matrix_t *m) {
   for (i=0; i<nrow; i++) {
     printf("%li:", i);
     for (j=0; j<ncol; j++) {
-      printf(" %3g", MATRIX(*m, i, j));
+      printf(" %3.0F", MATRIX(*m, i, j));
     }
     printf("\n");
   }

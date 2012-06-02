@@ -21,7 +21,7 @@ rewire.edges(graph, prob, loops=FALSE, multiple=FALSE)
 }
 \value{A new graph object.}
 %\references{}
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
 %\seealso{}
 \examples{
 # Some random shortcuts shorten the distances on a lattice

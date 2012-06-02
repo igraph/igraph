@@ -5,10 +5,10 @@
 \description{Generation of random graphs based on different vertex types.}
 \usage{
 preference.game(nodes, types, type.dist=rep(1, types), fixed.sizes=FALSE,
-    pref.matrix=matrix(1, types, types), directed=FALSE, loops=FALSE) 
+    pref.matrix=matrix(1, types, types), directed=FALSE, loops=FALSE)
 asymmetric.preference.game(nodes, types,
     type.dist.matrix=matrix(1,types,types),
-    pref.matrix = matrix(1, types, types), loops=FALSE) 
+    pref.matrix = matrix(1, types, types), loops=FALSE)
 }
 \arguments{
   \item{nodes}{The number of vertices in the graphs.}
@@ -46,7 +46,7 @@ asymmetric.preference.game(nodes, types,
 \value{An igraph graph.}
 %\references{}
 \author{Tamas Nepusz \email{ntamas@rmki.kfki.hu} and Gabor Csardi
-  \email{csardi@rmki.kfki.hu} for the R interface} 
+  \email{csardi.gabor@gmail.com} for the R interface} 
 \examples{
 pf <- matrix( c(1, 0, 0, 1), nr=2)
 g <- preference.game(20, 2, pref.matrix=pf)

@@ -3,8 +3,7 @@
 
 /* 
    IGraph library.
-   Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2006-2012  Tamas Nepusz <ntamas@gmail.com>
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,6 +23,7 @@
 */
 
 #include "attributes.h"
+#include "convert.h"
 #include "error.h"
 #include "graphobject.h"
 #include "py2compat.h"
@@ -48,7 +48,7 @@ PyTypeObject igraphmodule_VertexType;
  * changes, your existing vertex objects will point to elsewhere
  * (or they might even get invalidated).
  */
-PyObject* igraphmodule_Vertex_New(igraphmodule_GraphObject *gref, long idx) {
+PyObject* igraphmodule_Vertex_New(igraphmodule_GraphObject *gref, igraph_integer_t idx) {
   igraphmodule_VertexObject* self;
   self=PyObject_New(igraphmodule_VertexObject, &igraphmodule_VertexType);
   if (self) {
@@ -104,7 +104,7 @@ PyObject* igraphmodule_Vertex_repr(igraphmodule_VertexObject *self) {
 
 #ifdef IGRAPH_PYTHON3
   s = PyUnicode_FromFormat("igraph.Vertex(%R, %ld, %R)",
-      (PyObject*)self->gref, self->idx, attrs);
+      (PyObject*)self->gref, (long int)self->idx, attrs);
   Py_DECREF(attrs);
 #else
   grepr=PyObject_Repr((PyObject*)self->gref);
@@ -116,7 +116,7 @@ PyObject* igraphmodule_Vertex_repr(igraphmodule_VertexObject *self) {
     return NULL;
   }
   s=PyString_FromFormat("igraph.Vertex(%s,%ld,%s)", PyString_AsString(grepr),
-    self->idx, PyString_AsString(drepr));
+    (long int)self->idx, PyString_AsString(drepr));
   Py_DECREF(grepr);
   Py_DECREF(drepr);
 #endif
@@ -126,7 +126,7 @@ PyObject* igraphmodule_Vertex_repr(igraphmodule_VertexObject *self) {
 /** \ingroup python_interface_vertex
  * \brief Returns the number of vertex attributes
  */
-int igraphmodule_Vertex_attribute_count(igraphmodule_VertexObject* self) {
+Py_ssize_t igraphmodule_Vertex_attribute_count(igraphmodule_VertexObject* self) {
   igraphmodule_GraphObject *o = self->gref;
   
   if (!o) return 0;
@@ -383,7 +383,15 @@ int igraphmodule_Vertex_set_attribute(igraphmodule_VertexObject* self, PyObject*
  * Returns the vertex index
  */
 PyObject* igraphmodule_Vertex_get_index(igraphmodule_VertexObject* self, void* closure) {
-  return PyInt_FromLong((long)self->idx);
+  return PyInt_FromLong((long int)self->idx);
+}
+
+/**
+ * \ingroup python_interface_vertex
+ * Returns the vertex index as an igraph_integer_t
+ */
+igraph_integer_t igraphmodule_Vertex_get_index_igraph_integer(igraphmodule_VertexObject* self) {
+  return self->idx;
 }
 
 /**
@@ -415,17 +423,26 @@ static PyObject* _identity(igraphmodule_VertexObject* vertex, PyObject* obj) {
 static PyObject* _convert_to_vertex_list(igraphmodule_VertexObject* vertex, PyObject* obj) {
   Py_ssize_t i, n;
 
-  if (!PyList_Check(obj))
+  if (!PyList_Check(obj)) {
     PyErr_SetString(PyExc_TypeError, "_convert_to_vertex_list expected list of integers");
+    return NULL;
+  }
 
   n = PyList_Size(obj);
   for (i = 0; i < n; i++) {
     PyObject* idx = PyList_GET_ITEM(obj, i);
     PyObject* v;
+    int idx_int;
 
-    if (!PyInt_Check(idx))
+    if (!PyInt_Check(idx)) {
       PyErr_SetString(PyExc_TypeError, "_convert_to_vertex_list expected list of integers");
-    v = igraphmodule_Vertex_New(vertex->gref, PyInt_AsLong(idx));
+      return NULL;
+    }
+
+    if (PyInt_AsInt(idx, &idx_int))
+      return NULL;
+
+    v = igraphmodule_Vertex_New(vertex->gref, idx_int);
     PyList_SetItem(obj, i, v);   /* reference to v stolen, reference to idx discarded */
   }
 
@@ -469,6 +486,7 @@ GRAPH_PROXY_METHOD(closeness, "closeness");
 GRAPH_PROXY_METHOD(constraint, "constraint");
 GRAPH_PROXY_METHOD(degree, "degree");
 GRAPH_PROXY_METHOD(delete, "delete_vertices");
+GRAPH_PROXY_METHOD(diversity, "diversity");
 GRAPH_PROXY_METHOD(eccentricity, "eccentricity");
 GRAPH_PROXY_METHOD(get_shortest_paths, "get_shortest_paths");
 GRAPH_PROXY_METHOD(indegree, "indegree");
@@ -487,10 +505,16 @@ GRAPH_PROXY_METHOD_PP(successors, "successors", _convert_to_vertex_list);
 
 #define GRAPH_PROXY_METHOD_SPEC(FUNC, METHODNAME) \
   {METHODNAME, (PyCFunction)igraphmodule_Vertex_##FUNC, METH_VARARGS | METH_KEYWORDS, \
-    "Proxy method to L{Graph." METHODNAME "()\n\n"              \
+    "Proxy method to L{Graph." METHODNAME "()}\n\n"              \
     "This method calls the " METHODNAME " method of the L{Graph} class " \
     "with this vertex as the first argument, and returns the result.\n\n"\
     "@see: Graph." METHODNAME "() for details."}
+#define GRAPH_PROXY_METHOD_SPEC_2(FUNC, METHODNAME, METHODNAME_IN_GRAPH) \
+  {METHODNAME, (PyCFunction)igraphmodule_Vertex_##FUNC, METH_VARARGS | METH_KEYWORDS, \
+    "Proxy method to L{Graph." METHODNAME_IN_GRAPH "()}\n\n"              \
+    "This method calls the " METHODNAME_IN_GRAPH " method of the L{Graph} class " \
+    "with this vertex as the first argument, and returns the result.\n\n"\
+    "@see: Graph." METHODNAME_IN_GRAPH "() for details."}
 
 /**
  * \ingroup python_interface_vertex
@@ -521,7 +545,8 @@ PyMethodDef igraphmodule_Vertex_methods[] = {
   GRAPH_PROXY_METHOD_SPEC(closeness, "closeness"),
   GRAPH_PROXY_METHOD_SPEC(constraint, "constraint"),
   GRAPH_PROXY_METHOD_SPEC(degree, "degree"),
-  GRAPH_PROXY_METHOD_SPEC(delete, "delete"),
+  GRAPH_PROXY_METHOD_SPEC_2(delete, "delete", "delete_vertices"),
+  GRAPH_PROXY_METHOD_SPEC(diversity, "diversity"),
   GRAPH_PROXY_METHOD_SPEC(eccentricity, "eccentricity"),
   GRAPH_PROXY_METHOD_SPEC(get_shortest_paths, "get_shortest_paths"),
   GRAPH_PROXY_METHOD_SPEC(indegree, "indegree"),
@@ -539,6 +564,7 @@ PyMethodDef igraphmodule_Vertex_methods[] = {
 };
 
 #undef GRAPH_PROXY_METHOD_SPEC
+#undef GRAPH_PROXY_METHOD_SPEC_2
 
 /** \ingroup python_interface_vertex
  * This structure is the collection of functions necessary to implement

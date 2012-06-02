@@ -3,8 +3,7 @@
 
 /* 
    IGraph library.
-   Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2006-2012  Tamas Nepusz <ntamas@gmail.com>
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -118,12 +117,12 @@ int igraphmodule_EdgeSeq_init(igraphmodule_EdgeSeqObject *self,
     igraph_es_all(&es, IGRAPH_EDGEORDER_ID);
   } else if (PyInt_Check(esobj)) {
     /* We selected a single edge */
-    long idx = PyInt_AsLong(esobj);
+    long int idx = PyInt_AsLong(esobj);
     if (idx < 0 || idx >= igraph_ecount(&((igraphmodule_GraphObject*)g)->g)) {
       PyErr_SetString(PyExc_ValueError, "edge index out of range");
       return -1;
     }
-    igraph_es_1(&es, idx);
+    igraph_es_1(&es, (igraph_integer_t)idx);
   } else {
 	/* We selected multiple edges */
     igraph_vector_t v;
@@ -190,28 +189,30 @@ int igraphmodule_EdgeSeq_sq_length(igraphmodule_EdgeSeqObject* self) {
 PyObject* igraphmodule_EdgeSeq_sq_item(igraphmodule_EdgeSeqObject* self,
                        Py_ssize_t i) {
   igraph_t *g;
-  long idx = -1;
+  igraph_integer_t idx = -1;
   
   if (!self->gref) return NULL;
   g=&GET_GRAPH(self);
   switch (igraph_es_type(&self->es)) {
     case IGRAPH_ES_ALL:
-      if (i >= 0 && i < (long)igraph_ecount(g)) idx = i;
+      if (i >= 0 && i < igraph_ecount(g))
+        idx = (igraph_integer_t)i;
       break;
 
     case IGRAPH_ES_VECTOR:
     case IGRAPH_ES_VECTORPTR:
       if (i >= 0 && i < igraph_vector_size(self->es.data.vecptr))
-        idx = (long)VECTOR(*self->es.data.vecptr)[i];
+        idx = (igraph_integer_t)VECTOR(*self->es.data.vecptr)[i];
       break;
 
     case IGRAPH_ES_1:
-      if (i == 0) idx = (long)self->es.data.eid;
+      if (i == 0)
+        idx = self->es.data.eid;
       break;
 
     case IGRAPH_ES_SEQ:
       if (i >= 0 && i < self->es.data.seq.to - self->es.data.seq.from)
-        idx = (long)(self->es.data.seq.from + i);
+        idx = self->es.data.seq.from + (igraph_integer_t)i;
       break;
 
     /* TODO: IGRAPH_ES_PAIRS, IGRAPH_ES_ADJ, IGRAPH_ES_PATH,
@@ -231,20 +232,6 @@ PyObject* igraphmodule_EdgeSeq_sq_item(igraphmodule_EdgeSeqObject* self,
  */
 PyObject* igraphmodule_EdgeSeq_attribute_names(igraphmodule_EdgeSeqObject* self) {
   return igraphmodule_Graph_edge_attributes(self->gref);
-}
-
-/** \ingroup python_interface_edgeseq
- * \brief Returns the count of attribute names
- */
-PyObject* igraphmodule_EdgeSeq_attribute_count(igraphmodule_EdgeSeqObject* self) {
-  PyObject *list;
-  long int size;
-
-  list=igraphmodule_Graph_edge_attributes(self->gref);
-  size=PySequence_Size(list);
-  Py_DECREF(list);
-
-  return Py_BuildValue("i", size);
 }
 
 /** \ingroup python_interface_edgeseq
@@ -696,7 +683,9 @@ PyObject* igraphmodule_EdgeSeq_select(igraphmodule_EdgeSeqObject *self, PyObject
         PyObject* range;
         igraph_bool_t ok;
 
-        ok = (PySlice_GetIndicesEx((PySliceObject*)item, igraph_vector_size(&v2),
+        /* Casting to void* because Python 2.x expects PySliceObject*
+         * but Python 3.x expects PyObject* */
+        ok = (PySlice_GetIndicesEx((void*)item, igraph_vector_size(&v2),
               &start, &stop, &step, &sl) == 0);
         if (ok) {
           range = PyObject_CallFunction((PyObject*)&PyRange_Type, "lll", start, stop, step);

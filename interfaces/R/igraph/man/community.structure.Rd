@@ -27,7 +27,7 @@ community.to.membership(graph, merges, steps, membership=TRUE, csize=TRUE)
   \item{csize}{A numeric vector giving the sizes of the communities.}
 }
 %\references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{
   \code{\link{walktrap.community}},
   \code{\link{edge.betweenness.community}},

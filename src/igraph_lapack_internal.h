@@ -2,8 +2,8 @@
 /* vim:set ts=2 sw=2 sts=2 et: */
 /* 
    IGraph library.
-   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -170,5 +170,9 @@ int igraphdgeevx_(char *balanc, char *jobvl, char *jobvr, char *sense,
 		  igraph_real_t *scale, igraph_real_t *abnrm, 
 		  igraph_real_t *rconde, igraph_real_t *rcondv, 
 		  igraph_real_t *work, int *lwork, int *iwork, int *info);
+
+int igraphdgehrd_(int *n, int *ilo, int *ihi, igraph_real_t *A, int *lda,
+		  igraph_real_t *tau, igraph_real_t *work, int *lwork,
+		  int *info);
 
 #endif

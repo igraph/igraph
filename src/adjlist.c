@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2003, 2004, 2005  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -342,6 +342,7 @@ int igraph_adjlist_remove_duplicate(const igraph_t *graph,
   return 0;
 }
 
+#ifndef USING_R
 int igraph_adjlist_print(const igraph_adjlist_t *al, FILE *outfile) {
   long int i;
   long int n=al->length;
@@ -351,6 +352,7 @@ int igraph_adjlist_print(const igraph_adjlist_t *al, FILE *outfile) {
   }
   return 0;
 }
+#endif
 
 int igraph_adjedgelist_remove_duplicate(const igraph_t *graph, 
 					igraph_inclist_t *al) {
@@ -359,11 +361,13 @@ int igraph_adjedgelist_remove_duplicate(const igraph_t *graph,
     return igraph_inclist_remove_duplicate(graph, al);
 }
 
+#ifndef USING_R
 int igraph_adjedgelist_print(const igraph_inclist_t *al, FILE *outfile) {
     IGRAPH_WARNING("igraph_adjedgelist_print() is deprecated, use "
                    "igraph_inclist_print() instead");
     return igraph_inclist_print(al, outfile);
 }
+#endif
 
 /**
  * \function igraph_adjedgelist_init
@@ -421,6 +425,7 @@ int igraph_inclist_remove_duplicate(const igraph_t *graph,
   return 0;
 }
 
+#ifndef USING_R
 int igraph_inclist_print(const igraph_inclist_t *al, FILE *outfile) {
   long int i;
   long int n=al->length;
@@ -430,6 +435,7 @@ int igraph_inclist_print(const igraph_inclist_t *al, FILE *outfile) {
   }
   return 0;
 }
+#endif
 
 /**
  * \function igraph_inclist_init
@@ -469,11 +475,44 @@ int igraph_inclist_init(const igraph_t *graph,
     IGRAPH_ERROR("Cannot create incidence list view", IGRAPH_ENOMEM);
   }
 
-  IGRAPH_FINALLY(igraph_adjlist_destroy, il);  
+  IGRAPH_FINALLY(igraph_inclist_destroy, il);  
   for (i=0; i<il->length; i++) {
     IGRAPH_ALLOW_INTERRUPTION();
     IGRAPH_CHECK(igraph_vector_init(&il->incs[i], 0));
     IGRAPH_CHECK(igraph_incident(graph, &il->incs[i], i, mode));
+  }
+  
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
+/**
+ * \function igraph_inclist_init_empty
+ * \brief Initialize an incidence list corresponding to an empty graph.
+ * 
+ * This function essentially creates a list of empty vectors that may
+ * be treated as an incidence list for a graph with a given number of
+ * vertices.
+ *
+ * \param il Pointer to an uninitialized incidence list.
+ * \param n  The number of vertices in the incidence list.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|), linear in the number of vertices.
+ */
+
+int igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n) {
+  long int i;
+
+  il->length=n;
+  il->incs=igraph_Calloc(il->length, igraph_vector_t);
+  if (il->incs == 0) {
+    IGRAPH_ERROR("Cannot create incidence list view", IGRAPH_ENOMEM);
+  }
+
+  IGRAPH_FINALLY(igraph_inclist_destroy, il);  
+  for (i=0; i<n; i++) {
+    IGRAPH_CHECK(igraph_vector_init(&il->incs[i], 0));
   }
   
   IGRAPH_FINALLY_CLEAN(1);

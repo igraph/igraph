@@ -17,7 +17,9 @@ Copyright (C) 2003-2006 Tommi Junttila
 
 /* FSF address fixed in the above notice on 1 Oct 2009 by Tamas Nepusz */
 
-#include <assert.h>
+using namespace std;
+
+#include <cassert>
 #include "bliss_utils.hh"
 
 namespace igraph {

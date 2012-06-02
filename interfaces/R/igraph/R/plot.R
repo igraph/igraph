@@ -1,8 +1,8 @@
 
 #   IGraph R package
-#   Copyright (C) 2003, 2004, 2005  Gabor Csardi <csardi@rmki.kfki.hu>
-#   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
-#   
+#   Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
+#   334 Harvard street, Cambridge, MA 02139 USA
+
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
 #   the Free Software Foundation; either version 2 of the License, or
@@ -194,7 +194,7 @@ plot.igraph <- function(x,
       rad <- angle
       center <- c(cx,cy)
       cp <- matrix( c(x0,y0, x0+.4,y0+.2, x0+.4,y0-.2, x0,y0),
-                   nc=2, byrow=TRUE)
+                   ncol=2, byrow=TRUE)
       phi <- atan2(cp[,2]-center[2], cp[,1]-center[1])
       r <- sqrt((cp[,1]-center[1])**2 + (cp[,2]-center[2])**2)
       
@@ -300,8 +300,17 @@ plot.igraph <- function(x,
     (vertex.size+6*8*log10(nchar(labels)+1))/200
   y <- layout[,2]+label.dist*sin(-label.degree)*
     (vertex.size+6*8*log10(nchar(labels)+1))/200
-  text(x, y, labels=labels, col=label.color, family=label.family, font=label.font,
-       cex=label.cex)
+  if (length(label.family)==1) {
+    text(x, y, labels=labels, col=label.color, family=label.family,
+         font=label.font, cex=label.cex)
+  } else {
+    if1 <- function(vect, idx) if (length(vect)==1) vect else vect[idx]
+    sapply(seq_len(vcount(graph)), function(v) {
+      text(x[v], y[v], labels=if1(labels, v), col=if1(label.color, v),
+           family=if1(label.family, v), font=if1(label.font, v),
+           cex=if1(label.cex, v))
+    })
+  }
   rm(x, y)
   invisible(NULL)
 }

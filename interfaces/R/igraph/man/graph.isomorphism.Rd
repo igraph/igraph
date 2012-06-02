@@ -212,7 +212,7 @@ graph.isocreate(size, number, directed=TRUE)
   \emph{Proc. of the 3rd IAPR TC-15 Workshop on Graphbased
     Representations in Pattern Recognition}, 149--159, 2001.
 }
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{graph.motifs}}}
 \examples{
 # create some non-isomorphic graphs

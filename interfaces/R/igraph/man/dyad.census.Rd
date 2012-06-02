@@ -26,7 +26,7 @@ dyad.census(graph)
   and Applications.} Cambridge: Cambridge University Press. 1994.
 }
 \author{
-  Gabor Csardi \email{csardi@rmki.kfki.hu}
+  Gabor Csardi \email{csardi.gabor@gmail.com}
 }
 \seealso{
   \code{\link{triad.census}} for the same classification, but with triples.

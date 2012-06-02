@@ -2,7 +2,6 @@
 
 SUBDIRS=src tests interfaces
 DOC_FILES = 	$(top_builddir)/doc/book/Makefile.in \
-	$(top_builddir)/doc/igraph.info \
 	$(top_srcdir)/doc/Makefile.in \
 	$(top_srcdir)/doc/igraph.3
 
@@ -60,8 +59,9 @@ test: all
 msvc: all
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc
+	mkdir $(top_builddir)/igraph-$(VERSION)-msvc/include
 	cp -r $(top_srcdir)/src $(top_builddir)/igraph-$(VERSION)-msvc/
-	cp -r $(top_srcdir)/include $(top_builddir)/igraph-$(VERSION)-msvc
+	cp -r $(top_srcdir)/include/*.h $(top_builddir)/igraph-$(VERSION)-msvc/include
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp -r $(top_builddir)/include $(top_builddir)/src $(top_builddir)/igraph-$(VERSION)-msvc; fi
 	cp -r $(top_srcdir)/msvc/include $(top_builddir)/igraph-$(VERSION)-msvc/winclude
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/{.deps,.libs}

@@ -1,5 +1,5 @@
 
-library(igraph)
+library(igraph) ; igraph.options(print.full=TRUE)
 
 g <- graph.formula(R-+A:B:C, A-+D, B-+A:D:E, C-+F:G, D-+L,
                    E-+H, F-+I, G-+I:J, H-+E:K, I-+K, J-+I,

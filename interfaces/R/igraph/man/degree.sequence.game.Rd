@@ -7,7 +7,7 @@
   degrees. This is exactly what \code{degree.sequence.game} does.}
 \usage{
 degree.sequence.game(out.deg, in.deg = numeric(0),
-     method = c("simple", "vl"), \dots) 
+     method = c("simple", "vl"), \dots)
 }
 \arguments{
   \item{out.deg}{Numeric vector, the sequence of degrees (for undirected
@@ -44,7 +44,7 @@ degree.sequence.game(out.deg, in.deg = numeric(0),
 }
 \value{The new graph object.}
 %\references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{erdos.renyi.game}}, \code{\link{barabasi.game}},
   \code{\link{simplify}} to get rid of the multiple and/or loops edges.}
 \examples{

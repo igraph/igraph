@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2010  Gabor Csardi <csardi.gabor@gmail.com>
-   Rue de l'Industrie 5, Lausanne 1005, Switzerland
+   Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard st, Cambridge MA, 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -133,6 +133,7 @@ igraph_bool_t check_ev(const igraph_matrix_t *A,
     
     if (igraph_vector_maxdifference(&AV_real, &lv_real) > tol ||
 	igraph_vector_maxdifference(&AV_imag, &lv_imag) > tol) {
+      printf("ERROR:\n");
       igraph_vector_print(&AV_real); igraph_vector_print(&AV_imag);
       igraph_vector_print(&lv_real); igraph_vector_print(&lv_imag);      
       return 1;
@@ -170,20 +171,59 @@ int main() {
     }
   }
   
-  igraph_lapack_dgeev(&A, &values_real, &values_imag, 
-		      &vectors_left, &vectors_right, &info);
+  igraph_lapack_dgeev(&A, &values_real, &values_imag,
+  		      &vectors_left, &vectors_right, &info);
+
+  if (check_ev(&A, &values_real, &values_imag,
+  	       &vectors_left, &vectors_right, /*tol=*/ 1e-8)) {
+    return 1;
+  }
+
+  /* ------------------------------------------------------- */
+
+  /* igraph_matrix_resize(&A, 10, 10); */
+  /* igraph_matrix_null(&A); */
+  /* for (i=0; i<10; i++) { MATRIX(A, i, i) = 1.0; }  */
+  /* MATRIX(A,0,1) = 1.0; */
+
+  /* igraph_lapack_dgeev(&A, &values_real, &values_imag,  */
+  /* 		      &vectors_left, &vectors_right, &info);   */
+
+  /* if (check_ev(&A, &values_real, &values_imag, */
+  /* 	       &vectors_left, &vectors_right, /\*tol=*\/ 1e-8)) { */
+  /*   return 2; */
+  /* } */
+
+  /* ------------------------------------------------------- */
+    
+  igraph_matrix_resize(&A, 10, 10);
+  igraph_matrix_null(&A);
+  MATRIX(A,0,1) = MATRIX(A,0,2) = MATRIX(A,0,3) = 1/3.0;
+  MATRIX(A,1,0) = MATRIX(A,1,4) = MATRIX(A,1,5) = MATRIX(A,1,6) = 1/4.0;
+  MATRIX(A,2,0) = MATRIX(A,2,7) = MATRIX(A,2,8) = MATRIX(A,2,9) = 1/4.0;
+  MATRIX(A,3,0) = 1.0;
+  MATRIX(A,4,1) = 1.0;
+  MATRIX(A,5,1) = 1.0;
+  MATRIX(A,6,1) = 1.0;
+  MATRIX(A,7,2) = 1.0;
+  MATRIX(A,8,2) = 1.0;
+  MATRIX(A,9,2) = 1.0;
+
+  info=0;
+  igraph_lapack_dgeev(&A, &values_real, &values_imag,
+  		      &vectors_left, &vectors_right, &info);
 
   /* igraph_matrix_print(&A); */
+  /* printf("---\n"); */
   /* igraph_vector_print(&values_real); */
   /* igraph_vector_print(&values_imag); */
   /* igraph_matrix_print(&vectors_left); */
-  /* igraph_matrix_print(&vectors_right); */
 
-  if (check_ev(&A, &values_real, &values_imag, 
-	       &vectors_left, &vectors_right, /*tol=*/ 1e-8)) {
-    return 1;
+  if (check_ev(&A, &values_real, &values_imag,
+  	       &vectors_left, &vectors_right, /*tol=*/ 1e-8)) {
+    return 3;
   }
-    
+
   igraph_vector_destroy(&values_imag);
   igraph_vector_destroy(&values_real);
   igraph_matrix_destroy(&vectors_right);

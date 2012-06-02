@@ -8,7 +8,7 @@ IGraph library.
 from __future__ import with_statement
 
 __license__ = """
-Copyright (C) 2006-2009  Gabor Csardi <csardi@rmki.kfki.hu>,
+Copyright (C) 2006-2009  Gabor Csardi <csardi.gabor@gmail.com>,
 Tamas Nepusz <ntamas@rmki.kfki.hu>
 
 MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
@@ -42,6 +42,7 @@ from igraph.datatypes import *
 from igraph.formula import *
 from igraph.layout import *
 from igraph.matching import *
+from igraph.nexus import *
 from igraph.statistics import *
 from igraph.summary import *
 from igraph.utils import *
@@ -719,6 +720,44 @@ class Graph(GraphBase):
             return self.subgraph_edges(result, delete_vertices=False)
         return result
 
+    def transitivity_avglocal_undirected(self, mode="nan", weights=None):
+        """Calculates the average of the vertex transitivities of the graph.
+
+        In the unweighted case, the transitivity measures the probability that
+        two neighbors of a vertex are connected. In case of the average local
+        transitivity, this probability is calculated for each vertex and then
+        the average is taken. Vertices with less than two neighbors require
+        special treatment, they will either be left out from the calculation
+        or they will be considered as having zero transitivity, depending on
+        the I{mode} parameter. The calculation is slightly more involved for
+        weighted graphs; in this case, weights are taken into account according
+        to the formula of Barrat et al (see the references).
+
+        Note that this measure is different from the global transitivity
+        measure (see L{transitivity_undirected()}) as it simply takes the
+        average local transitivity across the whole network.
+
+        @param mode: defines how to treat vertices with degree less than two.
+          If C{TRANSITIVITY_ZERO} or C{"zero"}, these vertices will have zero
+          transitivity. If C{TRANSITIVITY_NAN} or C{"nan"}, these vertices
+          will be excluded from the average.
+        @param weights: edge weights to be used. Can be a sequence or iterable
+          or even an edge attribute name.
+        
+        @see: L{transitivity_undirected()}, L{transitivity_local_undirected()}
+        @newfield ref: Reference
+        @ref: Watts DJ and Strogatz S: I{Collective dynamics of small-world
+          networks}. Nature 393(6884):440-442, 1998.
+        @ref: Barrat A, Barthelemy M, Pastor-Satorras R and Vespignani A:
+          I{The architecture of complex weighted networks}. PNAS 101, 3747 (2004).
+          U{http://arxiv.org/abs/cond-mat/0311416}.
+        """
+        if weights is None:
+            return GraphBase.transitivity_avglocal_undirected(self, mode)
+
+        xs = self.transitivity_local_undirected(mode=mode, weights=weights)
+        return sum(xs) / float(len(xs))
+
     def triad_census(self, *args, **kwds):
         """triad_census()
 
@@ -734,16 +773,22 @@ class Graph(GraphBase):
         return TriadCensus(GraphBase.triad_census(self, *args, **kwds))
 
     # Automorphisms
-    def count_automorphisms_vf2(self, color=None):
+    def count_automorphisms_vf2(self, color=None, edge_color=None,
+            node_compat_fn=None, edge_compat_fn=None):
         """Returns the number of automorphisms of the graph"""
-        return self.count_isomorphisms_vf2(self, color1=color, color2=color)
+        return self.count_isomorphisms_vf2(self, color1=color, color2=color,
+                edge_color1=edge_color, edge_color2=edge_color,
+                node_compat_fn=None, edge_compat_fn=None)
 
-    def get_automorphisms_vf2(self, color=None):
+    def get_automorphisms_vf2(self, color=None, edge_color=None,
+            node_compat_fn=None, edge_compat_fn=None):
         """Returns all automorphisms of the graph
         
         @return: a list of lists, each item containing a possible mapping
           of the graph vertices to itself according to the automorphism"""
-        return self.get_isomorphisms_vf2(self, color1=color, color2=color)
+        return self.get_isomorphisms_vf2(self, color1=color, color2=color,
+                edge_color1=edge_color, edge_color2=edge_color,
+                node_compat_fn=None, edge_compat_fn=None)
 
     # Various clustering algorithms -- mostly wrappers around GraphBase
     def community_fastgreedy(self, weights=None):
@@ -765,11 +810,16 @@ class Graph(GraphBase):
           in very large networks. Phys Rev E 70, 066111 (2004).
         """
         merges, qs = GraphBase.community_fastgreedy(self, weights)
+
+        # qs may be shorter than |V|-1 if we are left with a few separated
+        # communities in the end; take this into account
+        diff = self.vcount() - len(qs)
         qs.reverse()
         if qs:
-            optimal_count = qs.index(max(qs)) + 1
+            optimal_count = qs.index(max(qs)) + diff + 1
         else:
-            optimal_count = 1
+            optimal_count = diff
+
         return VertexDendrogram(self, merges, optimal_count,
                 modularity_params=dict(weights=weights))
 
@@ -966,7 +1016,8 @@ class Graph(GraphBase):
                 GraphBase.community_optimal_modularity(self, *args, **kwds)
         return VertexClustering(self, membership, modularity)
 
-    def community_edge_betweenness(self, clusters = None, directed = True):
+    def community_edge_betweenness(self, clusters=None, directed=True,
+            weights=None):
         """Community structure based on the betweenness of the edges in the
         network.
 
@@ -984,17 +1035,20 @@ class Graph(GraphBase):
           is cut at the level which maximizes the modularity.
         @param directed: whether the directionality of the edges should be
           taken into account or not.
+        @param weights: name of an edge attribute or a list containing
+          edge weights.
         @return: a L{VertexDendrogram} object, initally cut at the maximum
-          modularity.
+          modularity or at the desired number of clusters.
         """
-        merges, qs = GraphBase.community_edge_betweenness(self, directed)
+        merges, qs = GraphBase.community_edge_betweenness(self, directed, weights)
         qs.reverse()
         if clusters is None:
             if qs:
                 clusters = qs.index(max(qs))+1
             else:
                 clusters = 1
-        return VertexDendrogram(self, merges, clusters)
+        return VertexDendrogram(self, merges, clusters,
+                modularity_params=dict(weights=weights))
 
     def community_spinglass(self, *args, **kwds):
         """community_spinglass(weights=None, spins=25, parupdate=False,
@@ -1621,6 +1675,27 @@ class Graph(GraphBase):
             result = pickle.load(gzip.open(fname, "rb"))
         return result
 
+    @classmethod
+    def Read_Picklez(klass, fname, *args, **kwds):
+        """Reads a graph from compressed Python pickled format, uncompressing
+        it on-the-fly.
+
+        @param fname: the name of the file or a stream to read from.
+        @return: the created graph object.
+        """
+        import cPickle as pickle
+        if hasattr(fname, "read"):
+            # Probably a file or a file-like object
+            if isinstance(fname, gzip.GzipFile):
+                result = pickle.load(fname)
+            else:
+                result = pickle.load(gzip.GzipFile(mode="rb", fileobj=fname))
+        else:
+            result = pickle.load(gzip.open(fname, "rb"))
+        if not isinstance(result, klass):
+            raise TypeError("unpickled object is not a %s" % klass.__name__)
+        return result
+
     # pylint: disable-msg=C0301,C0323
     # C0301: line too long.
     # C0323: operator not followed by a space - well, print >>f looks OK
@@ -1832,7 +1907,8 @@ class Graph(GraphBase):
         @return: the format of the file as a string.
         """
         import os.path
-        if isinstance(filename, file):
+        if hasattr(filename, "name") and hasattr(filename, "read"):
+            # It is most likely a file
             try:
                 filename=filename.name
             except:
@@ -3395,7 +3471,7 @@ def _add_proxy_methods():
     decorated_methods = {}
     decorated_methods[VertexSeq] = \
         ["degree", "betweenness", "bibcoupling", "closeness", "cocitation",
-        "constraint", "eccentricity", "get_shortest_paths", "maxdegree",
+        "constraint", "diversity", "eccentricity", "get_shortest_paths", "maxdegree",
         "pagerank", "personalized_pagerank", "shortest_paths", "similarity_dice",
         "similarity_jaccard", "subgraph", "indegree", "outdegree", "isoclass",
         "delete_vertices", "is_separator", "is_minimal_separator"]

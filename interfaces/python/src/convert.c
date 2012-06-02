@@ -1,8 +1,7 @@
 /* vim:set ts=2 sw=2 sts=2 et: */
 /* 
    IGraph library.
-   Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2006-2012  Tamas Nepusz <ntamas@gmail.com>
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -366,10 +365,23 @@ int igraphmodule_PyObject_to_fas_algorithm_t(PyObject *o,
 int igraphmodule_PyObject_to_reciprocity_t(PyObject *o, igraph_reciprocity_t *result) {
   static igraphmodule_enum_translation_table_entry_t reciprocity_tt[] = {
     {"default", IGRAPH_RECIPROCITY_DEFAULT},
-    {"ratio", IGRAPH_RECIPROCITY_RATIO}
+    {"ratio", IGRAPH_RECIPROCITY_RATIO},
+    {0,0}
   };
 
   return igraphmodule_PyObject_to_enum(o, reciprocity_tt, (int*)result);
+}
+
+/**
+ * \brief Converts a Python object to an igraph \c igraph_rewiring_t
+ */
+int igraphmodule_PyObject_to_rewiring_t(PyObject *o, igraph_rewiring_t *result) {
+  static igraphmodule_enum_translation_table_entry_t rewiring_tt[] = {
+    {"simple", IGRAPH_REWIRING_SIMPLE},
+    {0,0}
+  };
+
+  return igraphmodule_PyObject_to_enum(o, rewiring_tt, (int*)result);
 }
 
 /**
@@ -377,8 +389,9 @@ int igraphmodule_PyObject_to_reciprocity_t(PyObject *o, igraph_reciprocity_t *re
  */
 int igraphmodule_PyObject_to_spinglass_implementation_t(PyObject *o, igraph_spinglass_implementation_t *result) {
   static igraphmodule_enum_translation_table_entry_t spinglass_implementation_tt[] = {
-        {"original", IGRAPH_SPINCOMM_IMP_ORIG},
-        {"negative", IGRAPH_SPINCOMM_IMP_NEG}
+    {"original", IGRAPH_SPINCOMM_IMP_ORIG},
+    {"negative", IGRAPH_SPINCOMM_IMP_NEG},
+    {0,0}
   };
 
   return igraphmodule_PyObject_to_enum(o, spinglass_implementation_tt, (int*)result);
@@ -389,8 +402,9 @@ int igraphmodule_PyObject_to_spinglass_implementation_t(PyObject *o, igraph_spin
  */
 int igraphmodule_PyObject_to_spincomm_update_t(PyObject *o, igraph_spincomm_update_t *result) {
   static igraphmodule_enum_translation_table_entry_t spincomm_update_tt[] = {
-        {"simple", IGRAPH_SPINCOMM_UPDATE_SIMPLE},
-        {"config", IGRAPH_SPINCOMM_UPDATE_CONFIG}
+    {"simple", IGRAPH_SPINCOMM_UPDATE_SIMPLE},
+    {"config", IGRAPH_SPINCOMM_UPDATE_CONFIG},
+    {0,0}
   };
 
   return igraphmodule_PyObject_to_enum(o, spincomm_update_tt, (int*)result);
@@ -526,36 +540,43 @@ int igraphmodule_PyObject_to_igraph_t(PyObject *o, igraph_t **result) {
  * \return 0 if everything was OK, 1 otherwise
  */
 int igraphmodule_PyObject_to_integer_t(PyObject *object, igraph_integer_t *v) {
+  int retval, num;
+
   if (object == NULL) {
   } else if (PyLong_Check(object)) {
-    double d = PyLong_AsDouble(object);
-    *v=d;
+    retval = PyLong_AsInt(object, &num);
+    if (retval)
+      return retval;
+    *v = num;
     return 0;
 #ifdef IGRAPH_PYTHON3
   } else if (PyNumber_Check(object)) {
-    PyObject *i = PyNumber_Long(object);
-    long l;
+    PyObject *i = PyNumber_Int(object);
     if (i == NULL)
       return 1;
-    l = PyLong_AsLong(i);
-    if (PyErr_Occurred())
-      return 1;
+    retval = PyInt_AsInt(i, &num);
     Py_DECREF(i);
-    *v = l;
+    if (retval)
+      return retval;
+    *v = num;
     return 0;
   }
 #else
   } else if (PyInt_Check(object)) {
-    long l = PyInt_AS_LONG((PyIntObject*)object);
-    *v=l;
+    retval = PyInt_AsInt(object, &num);
+    if (retval)
+      return retval;
+    *v = num;
     return 0;
   } else if (PyNumber_Check(object)) {
     PyObject *i = PyNumber_Int(object);
-    long l;
-    if (i == NULL) return 1;
-    l = PyInt_AS_LONG((PyIntObject*)i);
+    if (i == NULL)
+      return 1;
+    retval = PyInt_AsInt(i, &num);
     Py_DECREF(i);
-    *v = l;
+    if (retval)
+      return retval;
+    *v = num;
     return 0;
   }
 #endif
@@ -615,8 +636,9 @@ int igraphmodule_PyObject_to_real_t(PyObject *object, igraph_real_t *v) {
  */
 int igraphmodule_PyObject_to_vector_t(PyObject *list, igraph_vector_t *v, igraph_bool_t need_non_negative, igraph_bool_t pairs) {
   PyObject *item, *i1, *i2;
-  int i, j, k, ok;
-  long idx=0, idx2=0;
+  Py_ssize_t i, j, k;
+  int ok;
+  long int idx=0, idx2=0;
 
   if (PyBaseString_Check(list)) {
     /* It is highly unlikely that a string (although it is a sequence) will
@@ -836,7 +858,8 @@ int igraphmodule_PyObject_to_vector_t(PyObject *list, igraph_vector_t *v, igraph
 int igraphmodule_PyObject_float_to_vector_t(PyObject *list, igraph_vector_t *v) {
   PyObject *item;
   igraph_real_t value=0;
-  int i, j, k, ok;
+  Py_ssize_t i, j, k;
+  int ok;
 
   if (PyBaseString_Check(list)) {
     /* It is highly unlikely that a string (although it is a sequence) will
@@ -945,7 +968,8 @@ int igraphmodule_PyObject_float_to_vector_t(PyObject *list, igraph_vector_t *v) 
 int igraphmodule_PyObject_to_vector_int_t(PyObject *list, igraph_vector_int_t *v) {
   PyObject *item;
   int value=0;
-  int i, j, k, ok;
+  Py_ssize_t i, j, k;
+  int ok, retval;
 
   if (PyBaseString_Check(list)) {
     /* It is highly unlikely that a string (although it is a sequence) will
@@ -1015,8 +1039,9 @@ int igraphmodule_PyObject_to_vector_int_t(PyObject *list, igraph_vector_int_t *v
           PyErr_SetString(PyExc_TypeError, "can't convert sequence element to int");
           ok=0;
         } else {
-          // TODO: proper overflow check
-          value=(long)PyInt_AsLong(item2);
+          retval = PyInt_AsInt(item2, &value);
+          if (retval)
+            ok = 0;
           Py_DECREF(item2);
         }
       }
@@ -1055,7 +1080,8 @@ int igraphmodule_PyObject_to_vector_int_t(PyObject *list, igraph_vector_int_t *v
 int igraphmodule_PyObject_to_vector_long_t(PyObject *list, igraph_vector_long_t *v) {
   PyObject *item;
   long value=0;
-  int i, j, k, ok;
+  Py_ssize_t i, j, k;
+  int ok;
 
   if (PyBaseString_Check(list)) {
     /* It is highly unlikely that a string (although it is a sequence) will
@@ -1160,7 +1186,7 @@ int igraphmodule_PyObject_to_vector_long_t(PyObject *list, igraph_vector_long_t 
 int igraphmodule_PyObject_to_vector_bool_t(PyObject *list,
     igraph_vector_bool_t *v) {
   PyObject *item;
-  int i, j;
+  Py_ssize_t i, j;
 
   if (PyBaseString_Check(list)) {
     /* It is highly unlikely that a string (although it is a sequence) will
@@ -1220,12 +1246,13 @@ int igraphmodule_PyObject_to_vector_bool_t(PyObject *list,
  * \return the Python boolean list as a \c PyObject*, or \c NULL if an
  * error occurred
  */
-PyObject* igraphmodule_vector_bool_t_to_PyList(igraph_vector_bool_t *v) {
+PyObject* igraphmodule_vector_bool_t_to_PyList(const igraph_vector_bool_t *v) {
   PyObject *list, *item;
-  int n, i;
+  Py_ssize_t n, i;
    
   n=igraph_vector_bool_size(v);
-  if (n<0) return igraphmodule_handle_igraph_error();
+  if (n<0)
+    return igraphmodule_handle_igraph_error();
 
   list=PyList_New(n);
   for (i=0; i<n; i++) {
@@ -1244,10 +1271,10 @@ PyObject* igraphmodule_vector_bool_t_to_PyList(igraph_vector_bool_t *v) {
  * \param v the \c igraph_vector_t containing the vector to be converted
  * \return the Python integer list as a \c PyObject*, or \c NULL if an error occurred
  */
-PyObject* igraphmodule_vector_t_to_PyList(igraph_vector_t *v,
+PyObject* igraphmodule_vector_t_to_PyList(const igraph_vector_t *v,
     igraphmodule_conv_t type) {
   PyObject *list, *item;
-  int n, i;
+  Py_ssize_t n, i;
    
   n=igraph_vector_size(v);
   if (n<0) return igraphmodule_handle_igraph_error();
@@ -1282,9 +1309,9 @@ PyObject* igraphmodule_vector_t_to_PyList(igraph_vector_t *v,
  * \param v the \c igraph_vector_long_t containing the vector to be converted
  * \return the Python integer list as a \c PyObject*, or \c NULL if an error occurred
  */
-PyObject* igraphmodule_vector_long_t_to_PyList(igraph_vector_long_t *v) {
+PyObject* igraphmodule_vector_long_t_to_PyList(const igraph_vector_long_t *v) {
   PyObject *list, *item;
-  int n, i;
+  Py_ssize_t n, i;
    
   n = igraph_vector_long_size(v);
   if (n<0)
@@ -1310,9 +1337,9 @@ PyObject* igraphmodule_vector_long_t_to_PyList(igraph_vector_long_t *v) {
  * \param v the \c igraph_vector_t containing the vector to be converted
  * \return the Python integer tuple as a \c PyObject*, or \c NULL if an error occurred
  */
-PyObject* igraphmodule_vector_t_to_PyTuple(igraph_vector_t *v) {
+PyObject* igraphmodule_vector_t_to_PyTuple(const igraph_vector_t *v) {
   PyObject* tuple;
-  int n, i;
+  Py_ssize_t n, i;
   
   n=igraph_vector_size(v);
   if (n<0) return igraphmodule_handle_igraph_error();
@@ -1337,7 +1364,7 @@ PyObject* igraphmodule_vector_t_to_PyTuple(igraph_vector_t *v) {
  * \param v the \c igraph_vector_t containing the vector to be converted
  * \return the Python integer pair list as a \c PyObject*, or \c NULL if an error occurred
  */
-PyObject* igraphmodule_vector_t_to_PyList_pairs(igraph_vector_t *v) {
+PyObject* igraphmodule_vector_t_to_PyList_pairs(const igraph_vector_t *v) {
    PyObject *list, *pair;
    long n, i, j;
    
@@ -1381,7 +1408,7 @@ int igraphmodule_PyObject_to_edgelist(PyObject *list, igraph_vector_t *v,
     igraph_t *graph) {
   PyObject *item, *i1, *i2, *it;
   int ok;
-  long int idx1=0, idx2=0;
+  igraph_integer_t idx1=0, idx2=0;
 
   if (PyBaseString_Check(list)) {
     /* It is highly unlikely that a string (although it is a sequence) will
@@ -1592,7 +1619,7 @@ int igraphmodule_attrib_to_vector_int_t(PyObject *o, igraphmodule_GraphObject *s
       return 1;
     }
     for (i=0; i<n; i++)
-      VECTOR(*result)[i] = VECTOR(*dummy)[i];
+      VECTOR(*result)[i] = (int)VECTOR(*dummy)[i];
     igraph_vector_destroy(dummy); free(dummy);
     *vptr = result;
   } else if (PySequence_Check(o)) {
@@ -1661,7 +1688,7 @@ int igraphmodule_attrib_to_vector_long_t(PyObject *o, igraphmodule_GraphObject *
       return 1;
     }
     for (i=0; i<n; i++)
-      VECTOR(*result)[i] = VECTOR(*dummy)[i];
+      VECTOR(*result)[i] = (long int)VECTOR(*dummy)[i];
     igraph_vector_destroy(dummy); free(dummy);
     *vptr = result;
   } else if (PySequence_Check(o)) {
@@ -1767,8 +1794,8 @@ int igraphmodule_attrib_to_vector_bool_t(PyObject *o, igraphmodule_GraphObject *
  * \param v2 the \c igraph_vector_t containing the 2nd vector to be converted
  * \return the Python integer pair list as a \c PyObject*, or \c NULL if an error occurred
  */
-PyObject* igraphmodule_vector_t_pair_to_PyList(igraph_vector_t *v1,
-                           igraph_vector_t *v2) {
+PyObject* igraphmodule_vector_t_pair_to_PyList(const igraph_vector_t *v1,
+    const igraph_vector_t *v2) {
    PyObject *list, *pair;
    long n, i;
    
@@ -1802,14 +1829,15 @@ PyObject* igraphmodule_vector_t_pair_to_PyList(igraph_vector_t *v1,
  *        returns an integer matrix, else returns a float matrix.
  * \return the Python list of lists as a \c PyObject*, or \c NULL if an error occurred
  */
-PyObject* igraphmodule_matrix_t_to_PyList(igraph_matrix_t *m,
-                         igraphmodule_conv_t type) {
+PyObject* igraphmodule_matrix_t_to_PyList(const igraph_matrix_t *m,
+    igraphmodule_conv_t type) {
    PyObject *list, *row, *item;
-   int nr, nc, i, j;
+   Py_ssize_t nr, nc, i, j;
    
-   
-   nr=igraph_matrix_nrow(m); nc=igraph_matrix_ncol(m);
-   if (nr<0 || nc<0) return igraphmodule_handle_igraph_error();
+   nr = igraph_matrix_nrow(m);
+   nc = igraph_matrix_ncol(m);
+   if (nr<0 || nc<0)
+     return igraphmodule_handle_igraph_error();
 
    // create a new Python list
    list=PyList_New(nr);
@@ -1853,13 +1881,14 @@ PyObject* igraphmodule_matrix_t_to_PyList(igraph_matrix_t *m,
  * \param v the \c igraph_vector_ptr_t containing the vector to be converted
  * \return the Python list as a \c PyObject*, or \c NULL if an error occurred
  */
-PyObject* igraphmodule_vector_ptr_t_to_PyList(igraph_vector_ptr_t *v,
+PyObject* igraphmodule_vector_ptr_t_to_PyList(const igraph_vector_ptr_t *v,
     igraphmodule_conv_t type) {
   PyObject *list, *item;
-  int n, i;
+  Py_ssize_t n, i;
    
   n=igraph_vector_ptr_size(v);
-  if (n<0) return igraphmodule_handle_igraph_error();
+  if (n<0)
+    return igraphmodule_handle_igraph_error();
 
   list=PyList_New(n);
   for (i=0; i<n; i++) {
@@ -1883,7 +1912,7 @@ PyObject* igraphmodule_vector_ptr_t_to_PyList(igraph_vector_ptr_t *v,
  * \return 0 if everything was OK, 1 otherwise. Sets appropriate exceptions.
  */
 int igraphmodule_PyList_to_matrix_t(PyObject* o, igraph_matrix_t *m) {
-  int nr, nc, n, i, j;
+  Py_ssize_t nr, nc, n, i, j;
   PyObject *row, *item;
   int was_warned=0;
 
@@ -1940,11 +1969,12 @@ int igraphmodule_PyList_to_matrix_t(PyObject* o, igraph_matrix_t *m) {
  */
 PyObject* igraphmodule_strvector_t_to_PyList(igraph_strvector_t *v) {
   PyObject* list;
-  int n, i;
+  Py_ssize_t n, i;
   char* ptr;
   
   n=igraph_strvector_size(v);
-  if (n<0) return igraphmodule_handle_igraph_error();
+  if (n<0)
+    return igraphmodule_handle_igraph_error();
   
   // create a new Python list
   list=PyList_New(n);
@@ -1973,7 +2003,7 @@ PyObject* igraphmodule_strvector_t_to_PyList(igraph_strvector_t *v) {
  * \return 0 if everything was OK, 1 otherwise
  */
 int igraphmodule_PyList_to_strvector_t(PyObject* v, igraph_strvector_t *result) {
-  int n, i;
+  Py_ssize_t n, i;
   PyObject *o;
   
   if (!PyList_Check(v)) {
@@ -2070,15 +2100,21 @@ int igraphmodule_append_PyIter_to_vector_ptr_t(PyObject *it, igraph_vector_ptr_t
  *               if we don't need name lookups.
  * \return 0 if everything was OK, 1 otherwise
  */
-int igraphmodule_PyObject_to_vid(PyObject *o, long int *vid, igraph_t *graph) {
+int igraphmodule_PyObject_to_vid(PyObject *o, igraph_integer_t *vid, igraph_t *graph) {
+  int retval, tmp;
+
   if (o == Py_None || o == 0) {
     *vid = 0;
   } else if (PyInt_Check(o)) {
     /* Single vertex ID */
-    *vid = PyInt_AsLong(o);
+    if (PyInt_AsInt(o, &tmp))
+      return 1;
+    *vid = tmp;
   } else if (PyLong_Check(o)) {
     /* Single vertex ID */
-    *vid = PyLong_AsLong(o);
+    if (PyLong_AsInt(o, &tmp))
+      return 1;
+    *vid = tmp;
   } else if (graph != 0 && PyBaseString_Check(o)) {
     /* Single vertex ID from vertex name */
     if (igraphmodule_get_vertex_id_by_name(graph, o, vid))
@@ -2086,16 +2122,26 @@ int igraphmodule_PyObject_to_vid(PyObject *o, long int *vid, igraph_t *graph) {
   } else if (PyObject_IsInstance(o, (PyObject*)&igraphmodule_VertexType)) {
     /* Single vertex ID from Vertex object */
     igraphmodule_VertexObject *vo = (igraphmodule_VertexObject*)o;
-    *vid = igraphmodule_Vertex_get_index_long(vo);
+    *vid = igraphmodule_Vertex_get_index_igraph_integer(vo);
   } else if (PyIndex_Check(o)) {
     /* Other numeric type that can be converted to an index */
     PyObject* num = PyNumber_Index(o);
     if (num) {
-      if (PyInt_Check(num))
-        *vid = PyInt_AsLong(num);
-      else if (PyLong_Check(num))
-        *vid = PyLong_AsLong(num);
-      else {
+      if (PyInt_Check(num)) {
+        retval = PyInt_AsInt(num, &tmp);
+        if (retval) {
+          Py_DECREF(num);
+          return 1;
+        }
+        *vid = tmp;
+      } else if (PyLong_Check(num)) {
+        retval = PyLong_AsInt(num, &tmp);
+        if (retval) {
+          Py_DECREF(num);
+          return 1;
+        }
+        *vid = tmp;
+      } else {
         PyErr_SetString(PyExc_TypeError, "PyNumber_Index returned invalid type");
         Py_DECREF(num);
         return 1;
@@ -2133,7 +2179,7 @@ int igraphmodule_PyObject_to_vid(PyObject *o, long int *vid, igraph_t *graph) {
  */
 int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
     igraph_t *graph, igraph_bool_t *return_single, igraph_integer_t *single_vid) {
-  long int vid;
+  igraph_integer_t vid;
   igraph_vector_t vector;
 
   if (o == 0 || o == Py_None) {
@@ -2161,7 +2207,9 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
     Py_ssize_t no_of_vertices = igraph_vcount(graph);
     Py_ssize_t start, stop, step, slicelength, i;
 
-    if (PySlice_GetIndicesEx((PySliceObject*)o, no_of_vertices,
+    /* Casting to void* because Python 2.x expects PySliceObject*
+     * but Python 3.x expects PyObject* */
+    if (PySlice_GetIndicesEx((void*)o, no_of_vertices,
           &start, &stop, &step, &slicelength))
       return 1;
 
@@ -2215,7 +2263,7 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
     IGRAPH_CHECK(igraph_vector_reserve(&vector, 20));
 
     while ((item = PyIter_Next(iterator))) {
-      long int vid=-1;
+      igraph_integer_t vid=-1;
 
       if (igraphmodule_PyObject_to_vid(item, &vid, graph))
         break;
@@ -2271,11 +2319,11 @@ int igraphmodule_PyObject_to_es_t(PyObject *o, igraph_es_t *es,
     igraph_es_all(es, IGRAPH_EDGEORDER_ID);
   } else if (PyInt_Check(o)) {
     /* Returns an edge sequence for a single edge ID */
-    igraph_es_1(es, PyInt_AsLong(o));
+    igraph_es_1(es, (igraph_integer_t)PyInt_AsLong(o));
     if (return_single) *return_single=1;
   } else if (PyLong_Check(o)) {
     /* Returns an edge sequence for a single edge ID */
-    igraph_es_1(es, PyLong_AsLong(o));
+    igraph_es_1(es, (igraph_integer_t)PyLong_AsLong(o));
     if (return_single) *return_single=1;
   } else if (PyObject_IsInstance(o, (PyObject*)&igraphmodule_EdgeSeqType)) {
     igraphmodule_EdgeSeqObject *eso = (igraphmodule_EdgeSeqObject*)o;
@@ -2285,8 +2333,9 @@ int igraphmodule_PyObject_to_es_t(PyObject *o, igraph_es_t *es,
     }
   } else if (PyObject_IsInstance(o, (PyObject*)&igraphmodule_EdgeType)) {
     igraphmodule_EdgeObject *eo = (igraphmodule_EdgeObject*)o;
-    igraph_es_1(es, igraphmodule_Edge_get_index_long(eo));
-    if (return_single) *return_single=1;
+    igraph_es_1(es, igraphmodule_Edge_get_index_igraph_integer(eo));
+    if (return_single)
+      *return_single=1;
   } else {
     /* Returns an edge sequence with the IDs returned by the iterator */
     PyObject *iterator = PyObject_GetIter(o);

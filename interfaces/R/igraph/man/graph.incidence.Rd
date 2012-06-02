@@ -61,7 +61,7 @@ graph.incidence(incidence, directed = FALSE, mode = c("all", "out",
   vertex attribute \code{type}. 
 }
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{graph.bipartite}} for another way to create
   bipartite graphs}
 \examples{

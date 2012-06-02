@@ -1,6 +1,6 @@
 
-R version 2.12.0 (2010-10-15)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
@@ -17,7 +17,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > 
-> library(igraph)
+> library(igraph) ; igraph.options(print.full=TRUE)
 > 
 > set.seed(42)
 > g <- graph.formula(A+-+B, A--+C, C+-+D)
@@ -77,3 +77,6 @@ IGRAPH UNW- 4 2 -- Tiny graph
 [2] C--D 1.037131
 > 
 > 
+> proc.time()
+   user  system elapsed 
+  0.323   0.039   0.373 

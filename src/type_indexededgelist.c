@@ -1,9 +1,9 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
-   
+   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -1112,7 +1112,7 @@ int igraph_edges(const igraph_t *graph, igraph_es_t eids,
  * \param directed Logical constant, whether to search for directed
  *        edges in a directed graph. Ignored for undirected graphs.
  * \param error Logical scalar, whether to report an error if the edge 
- *        was not found. If it is false, then -1 is reported.
+ *        was not found. If it is false, then -1 will be assigned to \p eid.
  * \return Error code. 
  * \sa \ref igraph_edge() for the opposite operation.
  * 

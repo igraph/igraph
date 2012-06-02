@@ -54,7 +54,7 @@ as.undirected(graph, mode = c("collapse", "each", "mutual"),
   A new graph object.
 }
 %\references{}
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{simplify}} for removing multiple and/or loop edges
   from a graph.}
 \examples{

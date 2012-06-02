@@ -14,7 +14,7 @@ RFILES = $(wildcard igraph/R/*.R) $(wildcard igraph/man/*.Rd) \
 	igraph/src/config.h igraph/src/config.h.in igraph/src/Makevars.in \
 	igraph/src/Makevars.win igraph/DESCRIPTION \
 	igraph/NAMESPACE igraph/R/auto.R igraph/src/rinterface.c \
-	igraph/configure igraph/src/rinterface.h arpack/stamp
+	igraph/configure igraph/configure.in igraph/src/rinterface.h arpack/stamp
 
 igraph/src/config.h: src/config.h
 	cp $< $@
@@ -27,6 +27,8 @@ igraph/src/Makevars.win: src/Makevars.win
 igraph/DESCRIPTION: DESCRIPTION
 	cp $< $@
 igraph/configure: configure
+	cp $< $@
+igraph/configure.in: configure.in
 	cp $< $@
 igraph/src/rinterface.h: src/rinterface.h
 	cp $< $@
@@ -145,6 +147,6 @@ igraph_$(VERSION).tar.gz: $(RFILES) $(SRCFILES)
 
 tests:
 	cd igraph/tests && echo "tools:::.runPackageTestsR()" | \
-	R_LIBS=~/.R/library/ R --no-save && echo
+	R --no-save && echo
 
 .PHONY: tests

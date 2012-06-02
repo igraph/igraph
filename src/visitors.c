@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph R package.
-   Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@
  *        are considered in the order they appear. If a root vertex
  *        was already found while searching from another one, then no
  *        search is conducted from it.
- * \param mode For directed graphs is defines which edges to follow.
+ * \param mode For directed graphs, it defines which edges to follow.
  *        \c IGRAPH_OUT means following the direction of the edges,
  *        \c IGRAPH_IN means the opposite, and 
  *        \c IGRAPH_ALL ignores the direction of the edges.
@@ -77,7 +77,7 @@
  *        was visited after the current one is stored here. If there
  *        is no such vertex (the current one is the last in a search
  *        tree), then -1 is stored.
- * \param dist If not null pointer, then the distance from the root of
+ * \param dist If not a null pointer, then the distance from the root of
  *        the current search tree is stored here.
  * \param callback If not null, then it should be a pointer to a
  *        function of type \ref igraph_bfshandler_t. This function
@@ -356,7 +356,7 @@ int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
  * vertex ids.
  * \param graph The input graph.
  * \param root The id of the root vertex.
- * \param mode For directed graphs is defines which edges to follow.
+ * \param mode For directed graphs, it defines which edges to follow.
  *        \c IGRAPH_OUT means following the direction of the edges,
  *        \c IGRAPH_IN means the opposite, and 
  *        \c IGRAPH_ALL ignores the direction of the edges.
@@ -372,7 +372,7 @@ int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
  *        their subtree.
  * \param father If not a null pointer, then the id of the father of
  *        each vertex is stored here.
- * \param dist If not null pointer, then the distance from the root of
+ * \param dist If not a null pointer, then the distance from the root of
  *        the current search tree is stored here.
  * \param in_callback If not null, then it should be a pointer to a
  *        function of type \ref igraph_dfshandler_t. This function

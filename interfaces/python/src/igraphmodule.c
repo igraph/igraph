@@ -1,8 +1,7 @@
 /* vim:set ts=2 sw=2 sts=2 et: */
 /* 
    IGraph library.
-   Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2006-2012  Tamas Nepusz <ntamas@gmail.com>
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -349,11 +348,12 @@ PyObject* igraphmodule_community_to_membership(PyObject *self,
   }
 
   if (PyObject_IsTrue(return_csize)) {
-	igraph_vector_init(&csize, 0);
-	csize_p = &csize;
+    igraph_vector_init(&csize, 0);
+    csize_p = &csize;
   }
 
-  if (igraph_community_to_membership(&merges, nodes, steps, &result, csize_p)) {
+  if (igraph_community_to_membership(&merges, (igraph_integer_t)nodes,
+        (igraph_integer_t)steps, &result, csize_p)) {
     igraphmodule_handle_igraph_error();
     igraph_vector_destroy(&result);
     if (csize_p) igraph_vector_destroy(csize_p);
@@ -713,7 +713,11 @@ extern PyObject* igraphmodule_arpack_options_default;
   PyIGraph_API[PyIGraph_ToCGraph_NUM]   = (void *)PyIGraph_ToCGraph;
 
   /* Create a CObject containing the API pointer array's address */
-  c_api_object = PyCObject_FromVoidPtr((void*)PyIGraph_API, NULL);
+#ifdef IGRAPH_PYTHON3
+  c_api_object = PyCapsule_New((void*)PyIGraph_API, "igraph._igraph._C_API", 0);
+#else
+  c_api_object = PyCObject_FromVoidPtr((void*)PyIGraph_API, 0);
+#endif
   if (c_api_object != 0) {
     PyModule_AddObject(m, "_C_API", c_api_object);
   }

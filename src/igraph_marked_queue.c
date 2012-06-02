@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2010  Gabor Csardi <csardi.gabor@gmail.com>
-   Rue de l'Industrie 5, Lausanne 1005, Switzerland
+   Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -88,10 +88,12 @@ void igraph_marked_queue_pop_back_batch(igraph_marked_queue_t *q) {
   }
 }
 
+#ifndef USING_R
 int igraph_marked_queue_print(const igraph_marked_queue_t *q) {
   IGRAPH_CHECK(igraph_dqueue_print(&q->Q));
   return 0;
 }
+#endif
 
 int igraph_marked_queue_fprint(const igraph_marked_queue_t *q, FILE *file) {
   IGRAPH_CHECK(igraph_dqueue_fprint(&q->Q, file));

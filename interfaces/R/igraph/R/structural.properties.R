@@ -1,7 +1,7 @@
 
 #   IGraph R package
-#   Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
-#   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+#   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
+#   334 Harvard street, Cambridge, MA 02139 USA
 #   
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -110,13 +110,17 @@ degree <- function(graph, v=V(graph),
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  v <- as.igraph.vs(graph, v)
   mode <- igraph.match.arg(mode)
   mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  res <- .Call("R_igraph_degree", graph, as.igraph.vs(graph, v)-1,
+  res <- .Call("R_igraph_degree", graph, v-1,
                as.numeric(mode), as.logical(loops), PACKAGE="igraph")
   if (normalized) { res <- res / (vcount(graph)-1) }
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    names(res) <- V(graph)$name[v]
+  }
   res
 }
   
@@ -145,6 +149,8 @@ shortest.paths <- function(graph, v=V(graph), to=V(graph),
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  v <- as.igraph.vs(graph, v)
+  to <- as.igraph.vs(graph, to)
   mode <- igraph.match.arg(mode)
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)  
   algorithm <- igraph.match.arg(algorithm)
@@ -169,9 +175,14 @@ shortest.paths <- function(graph, v=V(graph), to=V(graph),
   }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_shortest_paths", graph, as.igraph.vs(graph, v)-1,
-        as.igraph.vs(graph, to)-1, as.numeric(mode), weights, as.numeric(algorithm),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_shortest_paths", graph, v-1, to-1,
+               as.numeric(mode), weights, as.numeric(algorithm),
+               PACKAGE="igraph")
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    rownames(res) <- V(graph)$name[v]
+    colnames(res) <- V(graph)$name[to]
+  }
+  res
 }
 
 get.shortest.paths <- function(graph, from, to=V(graph),
@@ -281,6 +292,7 @@ betweenness <- function(graph, v=V(graph), directed=TRUE, weights=NULL,
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  v <- as.igraph.vs(graph, v)
   if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
     weights <- E(graph)$weight
   }
@@ -290,12 +302,15 @@ betweenness <- function(graph, v=V(graph), directed=TRUE, weights=NULL,
     weights <- NULL
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  res <- .Call("R_igraph_betweenness", graph, as.igraph.vs(graph, v)-1,
+  res <- .Call("R_igraph_betweenness", graph, v-1,
                as.logical(directed), weights, as.logical(nobigint),
                PACKAGE="igraph")
   if (normalized) {
     vc <- vcount(graph)
     res <- 2*res / ( vc*vc-3*vc+2)
+  }
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    names(res) <- V(graph)$name[v]
   }
   res
 }
@@ -473,7 +488,8 @@ constraint <- function(graph, nodes=V(graph), weights=NULL) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-
+  nodes <- as.igraph.vs(graph, nodes)
+  
   if (is.null(weights)) {
     if ("weight" %in% list.edge.attributes(graph)) {
       weights <- E(graph)$weight
@@ -481,9 +497,12 @@ constraint <- function(graph, nodes=V(graph), weights=NULL) {
   }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_constraint", graph, as.igraph.vs(graph, nodes)-1,
-        as.numeric(weights),        
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_constraint", graph, nodes-1, as.numeric(weights),
+               PACKAGE="igraph")
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    names(res) <- V(graph)$name[nodes]
+  }
+  res
 }
 
 reciprocity <- function(graph, ignore.loops=TRUE,
@@ -572,13 +591,17 @@ bonpow <- function(graph, nodes=V(graph),
                    rescale=FALSE, tol=1e-7, sparse=TRUE){
 
   nodes <- as.igraph.vs(graph, nodes)
-  if (sparse) {
-    if (require(Matrix)) {
-      return(bonpow.sparse(graph, nodes, loops, exponent, rescale, tol))
-    }
-  } 
+  if (sparse && require(Matrix)) {
+    res <- bonpow.sparse(graph, nodes, loops, exponent, rescale, tol)
+  }  else {
+    res <- bonpow.dense(graph, nodes, loops, exponent, rescale, tol)
+  }
 
-  bonpow.dense(graph, nodes, loops, exponent, rescale, tol)
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    names(res) <- get.vertex.attribute(graph, "name", nodes)
+  }
+  
+  res
 }
 
 alpha.centrality.dense <- function(graph, nodes=V(graph), alpha=1,
@@ -589,7 +612,7 @@ alpha.centrality.dense <- function(graph, nodes=V(graph), alpha=1,
   }
 
   exo <- rep(exo, length=vcount(graph))
-  exo <- matrix(exo, nc=1)
+  exo <- matrix(exo, ncol=1)
 
   if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
     ## weights == NULL and there is a "weight" edge attribute
@@ -644,11 +667,11 @@ alpha.centrality.sparse <- function(graph, nodes=V(graph), alpha=1,
   }
   
   el <- get.edgelist(graph, names=FALSE)
-  M <- spMatrix(vc, vc, i=el[,2], j=el[,1], x=weights)
+  M <- sparseMatrix(dims=c(vc, vc), i=el[,2], j=el[,1], x=weights)
   M <- as(M, "dgCMatrix")
   
   ## Create an identity matrix
-  M2 <- spMatrix(vc, vc, i=1:vc, j=1:vc, x=rep(1, vc))
+  M2 <- sparseMatrix(dims=c(vc, vc), i=1:vc, j=1:vc, x=rep(1, vc))
   M2 <- as(M2, "dgCMatrix")
 
   ## exo
@@ -666,13 +689,17 @@ alpha.centrality <- function(graph, nodes=V(graph), alpha=1,
                              tol=1e-7, sparse=TRUE) {
 
   nodes <- as.igraph.vs(graph, nodes)
-  if (sparse) {
-    if (require(Matrix)) {
-      return(alpha.centrality.sparse(graph, nodes, alpha, loops,
-                                     exo, weights, tol))
-    }
-  } 
-  alpha.centrality.dense(graph, nodes, alpha, loops, exo, weights, tol)  
+  if (sparse && require(Matrix)) {
+    res <- alpha.centrality.sparse(graph, nodes, alpha, loops,
+                                   exo, weights, tol)
+  } else {
+    res <- alpha.centrality.dense(graph, nodes, alpha, loops,
+                                  exo, weights, tol)
+  }
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    names(res) <- get.vertex.attribute(graph, "name", nodes)
+  }
+  res
 }
 
 
@@ -745,8 +772,12 @@ graph.coreness <- function(graph, mode=c("all", "out", "in")) {
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_coreness", graph, as.numeric(mode),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_coreness", graph, as.numeric(mode),
+               PACKAGE="igraph")
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    names(res) <- get.vertex.attribute(graph, "name")
+  }
+  res
 }
 
 topological.sort <- function(graph, mode=c("out", "all", "in")) {
@@ -947,7 +978,7 @@ closeness <- function(graph, vids=V(graph),
                       normalized=FALSE) {
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
-  vids <- as.igraph.vs(graph, vids)-1
+  vids <- as.igraph.vs(graph, vids)
   mode <- switch(igraph.match.arg(mode), "out"=1, "in"=2, "all"=3, "total"=3)
   if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
   weights <- E(graph)$weight 
@@ -960,8 +991,40 @@ closeness <- function(graph, vids=V(graph),
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
-  res <- .Call("R_igraph_closeness", graph, vids, mode, weights,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_closeness", graph, vids-1, mode, weights,
+               PACKAGE="igraph")
   if (!normalized) { res <- res / (vcount(graph)-1) }
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    names(res) <- V(graph)$name[vids]
+  }
   res
 }
+
+graph.laplacian <- function(graph, normalized=FALSE, weights=NULL,
+                            sparse=getIgraphOpt("sparsematrices")) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  normalized <- as.logical(normalized)
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
+    weights <- E(graph)$weight 
+  } 
+  if (!is.null(weights) && any(!is.na(weights))) { 
+    weights <- as.numeric(weights) 
+  } else { 
+    weights <- NULL 
+  }
+  sparse <- as.logical(sparse)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_laplacian", graph, normalized, weights, sparse,
+               PACKAGE="igraph")
+  if (sparse) {
+    res <- igraph.i.spMatrix(res)
+  }
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    rownames(res) <- colnames(res) <- V(graph)$name
+  }
+  res
+}
+

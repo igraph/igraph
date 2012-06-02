@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2008  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2008-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard st, Cambridge MA, 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -181,7 +181,7 @@ int check_multi() {
   }
   igraph_vector_init(&eids2, 0);
   igraph_get_eids_multi(&g, &eids2, &vec, 0, /*directed=*/ 1, /*error=*/ 1);
-  if (!igraph_vector_is_equal(&eids, &eids2)) {
+  if (!igraph_vector_all_e(&eids, &eids2)) {
     return 3;
   }
 
@@ -192,7 +192,7 @@ int check_multi() {
     VECTOR(vec)[2*i+1] = IGRAPH_FROM(&g, VECTOR(eids)[i]);
   }
   igraph_get_eids_multi(&g, &eids2, &vec, 0, /*directed=*/ 0, /*error=*/ 1);
-  if (!igraph_vector_is_equal(&eids, &eids2)) {
+  if (!igraph_vector_all_e(&eids, &eids2)) {
     return 4;
   }
 

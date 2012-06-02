@@ -2,8 +2,8 @@
 /* vim:set sw=2 ts=2 sts=2 et: */
 /* 
    IGraph library.
-   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -144,7 +144,7 @@ void igraph_arpack_options_init(igraph_arpack_options_t *o) {
   o->which[0]='X'; o->which[1]='X';
   o->nev=1;
   o->tol=0;
-  o->ncv=3;
+  o->ncv=0;         /* 0 means "automatic" */
   o->ldv=o->n;			/* will be updated to (real) n */
   o->ishift=1;
   o->mxiter=3000;
@@ -275,6 +275,8 @@ int igraph_i_arpack_rssolve_1x1(igraph_arpack_function_t *fun, void *extra,
 		     IGRAPH_ARPACK_PROD);
   }
 
+  options->nconv=nev;
+
   if (values != 0) {
     IGRAPH_CHECK(igraph_vector_resize(values, 1));
     VECTOR(*values)[0] = b;
@@ -309,6 +311,8 @@ int igraph_i_arpack_rnsolve_1x1(igraph_arpack_function_t *fun, void *extra,
 		     IGRAPH_ARPACK_PROD);
   }
 
+  options->nconv=nev;
+
   if (values != 0) {
     IGRAPH_CHECK(igraph_matrix_resize(values, 1, 2));
     MATRIX(*values, 0, 0) = b; MATRIX(*values, 0, 1) = 0;
@@ -316,7 +320,7 @@ int igraph_i_arpack_rnsolve_1x1(igraph_arpack_function_t *fun, void *extra,
 
   if (vectors != 0) {
     IGRAPH_CHECK(igraph_matrix_resize(vectors, 1, 1));
-    MATRIX(*vectors, 0, 0) = 1;
+    MATRIX(*vectors, 0, 0) = 1; 
   }
 
   return IGRAPH_SUCCESS;
@@ -422,9 +426,11 @@ int igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun, void *extra,
   } else if (options->which[0] == 'X' && options->which[1] == 'X') {
     /* No preference on the ordering of eigenvectors */
   } else {
-    fprintf(stderr, "%c%c\n", options->which[0], options->which[1]);
+    /* fprintf(stderr, "%c%c\n", options->which[0], options->which[1]); */
     IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
   }
+
+  options->nconv=nev;
 
   if (swap_evals) {
     igraph_complex_t dummy;
@@ -544,6 +550,8 @@ int igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun, void *extra,
     IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
   }
 
+  options->nconv=nev;
+
   if (values != 0) {
     IGRAPH_CHECK(igraph_vector_resize(values, nev));
     VECTOR(*values)[0] = eval1;
@@ -565,6 +573,184 @@ int igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun, void *extra,
   return IGRAPH_SUCCESS;
 }
 
+int igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
+			 const igraph_arpack_options_t *options, 
+			 igraph_real_t *d, const igraph_real_t *v) {
+
+  igraph_vector_t order;
+  char sort[2];
+  int apply=1;
+  int n=options->n;
+  int nconv=options->nconv;
+  int nev=options->nev;
+  int nans= nconv < nev ? nconv : nev;
+
+#define which(a,b) (options->which[0]==a && options->which[1]==b)
+
+  if (which('L','A')) {
+    sort[0]='S'; sort[1]='A';
+  } else if (which('S','A')) {
+    sort[0]='L'; sort[1]='A';
+  } else if (which('L','M')) {
+    sort[0]='S'; sort[1]='M';
+  } else if (which('S','M')) {
+    sort[0]='L'; sort[1]='M';
+  } else if (which('B','E')) {
+    sort[0]='L'; sort[1]='A';
+  }
+
+  IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, nconv-1));
+  IGRAPH_FINALLY(igraph_vector_destroy, &order);
+  igraphdsortr_(sort, &apply, &nconv, d, VECTOR(order));
+
+  /* BE is special */
+  if (which('B','E')) {
+    int w=0, l1=0, l2=nev-1;
+    igraph_vector_t order2, d2;
+    IGRAPH_VECTOR_INIT_FINALLY(&order2, nev);
+    IGRAPH_VECTOR_INIT_FINALLY(&d2, nev);
+    while (l1 <= l2) {
+      VECTOR(order2)[w] = VECTOR(order)[l1]; 
+      VECTOR(d2)[w]=d[l1]; 
+      w++; l1++;
+      if (l1 <= l2) {
+	VECTOR(order2)[w] = VECTOR(order)[l2]; 
+	VECTOR(d2)[w]=d[l2]; 
+	w++; l2--;
+      }
+    }
+    igraph_vector_update(&order, &order2);
+    igraph_vector_copy_to(&d2, d);
+    igraph_vector_destroy(&order2);
+    igraph_vector_destroy(&d2);
+    IGRAPH_FINALLY_CLEAN(2);  
+  }
+
+#undef which
+
+  /* Copy values */
+  if (values) { 
+    IGRAPH_CHECK(igraph_vector_resize(values, nans));
+    memcpy(VECTOR(*values), d, sizeof(igraph_real_t) * nans);
+  }
+
+  /* Reorder vectors */
+  if (vectors) {
+    int i;
+    IGRAPH_CHECK(igraph_matrix_resize(vectors, n, nans));
+    for (i=0; i<nans; i++) { 
+      int idx=VECTOR(order)[i];
+      const igraph_real_t *ptr=v + n * idx;
+      memcpy(&MATRIX(*vectors, 0, i), ptr, sizeof(igraph_real_t) * n);
+    }
+  }
+  
+  igraph_vector_destroy(&order);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
+int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
+			 const igraph_arpack_options_t *options, 
+			 igraph_real_t *dr, igraph_real_t *di, 
+			 igraph_real_t *v) {
+
+  igraph_vector_t order;
+  char sort[2];
+  int apply=1;
+  int n=options->n;
+  int nconv=options->nconv;
+  int nev=options->nev;
+  int nans=nconv < nev ? nconv : nev;
+
+#define which(a,b) (options->which[0]==a && options->which[1]==b)
+
+  if (which('L','M')) {
+    sort[0]='S'; sort[1]='M';
+  } else if (which('S', 'M')) {
+    sort[0]='L'; sort[1]='M';
+  } else if (which('L', 'R')) {
+    sort[0]='S'; sort[1]='R';
+  } else if (which('S', 'R')) {
+    sort[0]='L'; sort[1]='R';
+  } else if (which('L', 'I')) {
+    sort[0]='S'; sort[1]='I';
+  } else if (which('S', 'I')) {
+    sort[0]='L'; sort[1]='I';
+  }
+
+#undef which
+  
+  IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, nconv-1));
+  IGRAPH_FINALLY(igraph_vector_destroy, &order);
+  igraphdsortc_(sort, &apply, &nconv, dr, di, VECTOR(order));
+
+  if (values) {
+    IGRAPH_CHECK(igraph_matrix_resize(values, nans, 2));
+    memcpy(&MATRIX(*values, 0, 0), dr, sizeof(igraph_real_t) * nans);
+    memcpy(&MATRIX(*values, 0, 1), di, sizeof(igraph_real_t) * nans);
+  }
+
+  if (vectors) {
+    int i, nc=0, nr=0, ncol, wh=0, vx=0;
+    for (i=0; i<nans; i++) {
+      if (di[i] == 0) { nr++; } else { nc++; }
+    }
+    ncol=(nc/2)*2 + (nc%2)*2 + nr;
+    IGRAPH_CHECK(igraph_matrix_resize(vectors, n, ncol));
+    for (i=0; i<nans; i++) {
+      int idx=VECTOR(order)[i];
+      igraph_real_t *ptr=v + n * idx;
+      if (di[i]==0) {
+	memcpy(&MATRIX(*vectors, 0, vx), ptr, sizeof(igraph_real_t) * n);
+	vx++;
+      } else if (wh==0) {
+	if (di[i] < 0) { ptr -= n; }
+	memcpy(&MATRIX(*vectors, 0, vx), ptr, sizeof(igraph_real_t) * n * 2);
+	wh=1-wh;
+	vx+=2;
+      } else {
+	wh=1-wh;
+      }
+    }
+  }
+
+  igraph_vector_destroy(&order);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
+/**
+ * \function igraph_i_arpack_auto_ncv
+ * \brief Tries to set up the value of \c ncv in an \c igraph_arpack_options_t
+ *        automagically.
+ */
+void igraph_i_arpack_auto_ncv(igraph_arpack_options_t* options) {
+  /* This is similar to how Octave determines the value of ncv, with some
+   * modifications. */
+	int min_ncv = options->nev * 2 + 1;
+
+	/* Use twice the number of desired eigenvectors plus one by default */
+  options->ncv = min_ncv;
+	/* ...but use at least 20 Lanczos vectors... */
+  if (options->ncv < 20) {
+    options->ncv = 20;
+  }
+	/* ...but having ncv close to n leads to some problems with small graphs
+	 * (example: PageRank of "A <--> C, D <--> E, B"), so we don't let it
+	 * to be larger than n / 2...
+	 */
+  if (options->ncv > options->n / 2) {
+    options->ncv = options->n / 2;
+  }
+	/* ...but we need at least min_ncv. */
+	if (options->ncv < min_ncv) {
+		options->ncv = min_ncv;
+	}
+}
+
 /**
  * \function igraph_arpack_rssolve
  * \brief ARPACK solver for symmetric matrices
@@ -577,13 +763,19 @@ int igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun, void *extra,
  * \param options An \ref igraph_arpack_options_t object.
  * \param storage An \ref igraph_arpack_storage_t object, or a null
  *     pointer. In the latter case memory allocation and deallocation
- *     is performed automatically.
+ *     is performed automatically. Either this or the \p vectors argument 
+ *     must be non-null if the ARPACK iteration is started from a 
+ *     given starting vector. If both are given \p vectors take 
+ *     precedence.
  * \param values If not a null pointer, then it should be a pointer to an
  *     initialized vector. The eigenvalues will be stored here. The
  *     vector will be resized as needed.
  * \param vectors If not a null pointer, then it must be a pointer to
  *     an initialized matrix. The eigenvectors will be stored in the
  *     columns of the matrix. The matrix will be resized as needed.
+ *     Either this or the \p vectors argument must be non-null if the
+ *     ARPACK iteration is started from a given starting vector. If
+ *     both are given \p vectors take precedence.
  * \return Error code.
  *
  * Time complexity: depends on the matrix-vector
@@ -606,11 +798,10 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   int rvec= vectors || storage ? 1 : 0;	/* calculate eigenvectors? */
   char *all="All";
 
-  int origldv=options->ldv, origlworkl=options->lworkl;
+  int origldv=options->ldv, origlworkl=options->lworkl,
+    orignev=options->nev, origncv=options->ncv;
   char origwhich[2]={ options->which[0], options->which[1] };
   igraph_real_t origtol=options->tol;
-
-  igraph_vector_t order;
 
   /* Special case for 1x1 and 2x2 matrices */
   if (options->n == 1) {
@@ -621,6 +812,9 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 
   /* Brush up options if needed */
   if (options->ldv == 0) { options->ldv=options->n; }
+  if (options->ncv == 0) {
+		igraph_i_arpack_auto_ncv(options);
+  }
   if (options->lworkl == 0) { options->lworkl=options->ncv*(options->ncv+8); }
   if (options->which[0] == 'X') { options->which[0]='L'; options->which[1]='M'; }
   
@@ -674,8 +868,17 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   options->iparam[6]=options->mode;
   options->info=options->start;
   if (options->start) {
-    for (i=0; i<options->n; i++) {
-      resid[i]=MATRIX(*vectors, i, 0);
+    if (!storage && !vectors) {
+      IGRAPH_ERROR("Starting vector not given", IGRAPH_EINVAL);
+    }
+    if (vectors && (igraph_matrix_nrow(vectors) != options->n || 
+		    igraph_matrix_ncol(vectors) != 1)) {
+      IGRAPH_ERROR("Invalid starting vector size", IGRAPH_EINVAL);
+    }
+    if (vectors) {
+      for (i=0; i<options->n; i++) {
+	resid[i]=MATRIX(*vectors, i, 0);
+      }
     }
   }
 
@@ -688,7 +891,6 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     		  workd, workl, &options->lworkl, &options->info);
 
     if (ido==-1 || ido==1) {
-
       igraph_real_t *from=workd+options->ipntr[0]-1;
       igraph_real_t *to=workd+options->ipntr[1]-1;
       if (fun(to, from, options->n, extra) != 0) {
@@ -705,6 +907,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dsaupd(options->info));
   }
   
+  options->ierr=0;
   igraphdseupd_(&rvec, all, select, d, v, &options->ldv,
   		&options->sigma, options->bmat, &options->n,
   		options->which, &options->nev, &options->tol,
@@ -724,59 +927,21 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   options->numopb=options->iparam[9];
   options->numreo=options->iparam[10];
 
-  /* Sort the eigenvalues/vectors */
-
-#define which(a,b) (options->which[0]==a && options->which[1]==b)
-
-  if (values || vectors) {
-    int apply=1;
-    char sort[2];
-    if (which('L','A')) {
-      sort[0]='S'; sort[1]='A';
-    } else if (which('S','A')) {
-      sort[0]='L'; sort[1]='A';
-    } else if (which('L','M')) {
-      sort[0]='S'; sort[1]='M';
-    } else if (which('S','M')) {
-      sort[0]='L'; sort[1]='M';
-    } else if (which('B','E')) {
-      sort[0]='S'; sort[1]='M';
-    }
-    IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, options->nev-1));
-    IGRAPH_FINALLY(igraph_vector_destroy, &order);
-    igraphdsortr_(sort, &apply, &options->nev, d, VECTOR(order));
+  if (options->nconv < options->nev) {
+    IGRAPH_WARNING("Not enough eigenvalues/vectors in symmetric ARPACK "
+		   "solver");
   }
 
-#undef which
-
-  if (values) {
-    int i;
-    IGRAPH_CHECK(igraph_vector_resize(values, options->nev));
-    for (i=0; i<options->nev; i++) {
-      VECTOR(*values)[i] = d[i];
-    }
+  if (values || vectors) { 
+    IGRAPH_CHECK(igraph_arpack_rssort(values, vectors, options, d, v));
   }
-
-  if (vectors) {
-    int i, j, ptr=0;
-    IGRAPH_CHECK(igraph_matrix_resize(vectors, options->n, options->nev));
-    for (j=0; j<options->nev; j++) {
-      long int idx=VECTOR(order)[j];
-      for (i=0; i<options->n; i++) {
-	MATRIX(*vectors, i, idx) = v[ptr++];
-      }
-    }
-  }
-
-  if (values || vectors) {
-    igraph_vector_destroy(&order);
-    IGRAPH_FINALLY_CLEAN(1);
-  }
-
+  
   options->ldv=origldv;
+  options->ncv=origncv;
   options->lworkl=origlworkl;
   options->which[0] = origwhich[0]; options->which[1] = origwhich[1];
   options->tol=origtol;
+  options->nev=orignev;
     
   /* Clean up if needed */
   if (free_them) {
@@ -856,7 +1021,9 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
   /* Brush up options if needed */
   if (options->ldv == 0) { options->ldv=options->n; }
-  if (options->ncv == 0) { options->ncv=options->nev * 2 + 1; }
+  if (options->ncv == 0) {
+		igraph_i_arpack_auto_ncv(options);
+  }
   if (options->lworkl == 0) { options->lworkl=3*options->ncv*(options->ncv+2); }
   if (options->which[0] == 'X') { options->which[0]='L'; options->which[1]='M'; }
   
@@ -914,8 +1081,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   options->iparam[6]=options->mode;
   options->info=options->start;
   if (options->start) {
-    if (igraph_matrix_nrow(vectors) != options->n ||
-	igraph_matrix_ncol(vectors) != 1) {
+    if (igraph_matrix_nrow(vectors) != options->n || igraph_matrix_ncol(vectors) != 1) {
       IGRAPH_ERROR("Invalid starting vector size", IGRAPH_EINVAL);
     }
     for (i=0; i<options->n; i++) {
@@ -925,7 +1091,6 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   
   /* Ok, we have everything */
   while (1) {
-    
     igraphdnaupd_(&ido, options->bmat, &options->n, options->which,
     		  &options->nev, &options->tol,
     		  resid, &options->ncv, v, &options->ldv,
@@ -969,23 +1134,14 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   options->numopb=options->iparam[9];
   options->numreo=options->iparam[10];
 
-  if (values) {
-    int i;
-    IGRAPH_CHECK(igraph_matrix_resize(values, options->nconv, 2));
-    for (i=0; i<options->nconv; i++) {
-      MATRIX(*values, i, 0) = dr[i];
-      MATRIX(*values, i, 1) = di[i];
-    }
+  if (options->nconv < options->nev) {
+    IGRAPH_WARNING("Not enough eigenvalues/vectors in ARPACK "
+		   "solver");
   }
 
-  if (vectors) {
-    int i, j, ptr=0;
-    IGRAPH_CHECK(igraph_matrix_resize(vectors, options->n, options->nconv));
-    for (j=0; j<options->nconv; j++) {
-      for (i=0; i<options->n; i++) {
-	MATRIX(*vectors, i, j) = v[ptr++];
-      }
-    }
+  if (values || vectors) { 
+    IGRAPH_CHECK(igraph_arpack_rnsort(values, vectors, options,
+				      dr, di, v));
   }
 
   options->ldv=origldv;
@@ -1046,7 +1202,7 @@ int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *valu
 
   long int nodes=igraph_matrix_nrow(vectors);
   long int no_evs=igraph_matrix_nrow(values);
-  long int i, j, k;
+  long int i, j, k, wh;
   size_t colsize=nodes * sizeof(igraph_real_t);
 
   /* Error checks */
@@ -1064,13 +1220,13 @@ int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *valu
   }
   
   /* Calculate where to start copying */
-  for (i=0, j=0; i<nev; i++) {
+  for (i=0, j=0, wh=0; i<nev; i++) {
     if (MATRIX(*values,i,1) == 0) { /* TODO: == 0.0 ???? */
       /* real */
       j++;
     } else {
       /* complex */
-      if (MATRIX(*values,i,1) > 0) { j+=2; }
+      if (wh==0) { j+=2; wh=1-wh; }
     }
   }
   j--;
@@ -1100,17 +1256,16 @@ int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *valu
 	memcpy( &MATRIX(*vectors,0,k), &MATRIX(*vectors,0,j), colsize);
 	memcpy( &MATRIX(*vectors,0,k-1), &MATRIX(*vectors,0,j-1), colsize);
       }
-
-      /* if negative Im part, then we need the conjugate */
-      if (MATRIX(*values,i,1) < 0) {
-	long int l;
-	for (l=0; l<nodes; l++) {
-	  MATRIX(*vectors,l,k) = - MATRIX(*vectors,l,k);
-	}
-      } else {
+      if (i>1 && MATRIX(*values,i,1) != -MATRIX(*values,i-1,1)) {
+	/* The next one is not a conjugate of this one */
 	j-=2;
+      } else {
+	/* Conjugate */
+	int l;
+	for (l=0; l<nodes; l++) {
+	  MATRIX(*vectors,l,k) = - MATRIX(*vectors,l,k);	 
+	}
       }
-	      
       k-=2;
     }
   }

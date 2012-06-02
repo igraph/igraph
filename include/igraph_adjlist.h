@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2009  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -87,6 +87,7 @@ typedef struct igraph_inclist_t {
 int igraph_inclist_init(const igraph_t *graph, 
 			    igraph_inclist_t *il, 
 			    igraph_neimode_t mode);
+int igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n);
 void igraph_inclist_destroy(igraph_inclist_t *il);
 int igraph_inclist_remove_duplicate(const igraph_t *graph,
 					igraph_inclist_t *il);

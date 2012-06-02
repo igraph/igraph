@@ -34,7 +34,7 @@ sizes (2)+(3). This measure is calculated if \code{mode} is
 \value{A numeric scalar between zero and one.}
 % \references{}
 \author{Tamas Nepusz \email{ntamas@rmki.kfki.hu} and
-  Gabor Csardi \email{csardi@rmki.kfki.hu}}
+  Gabor Csardi \email{csardi.gabor@gmail.com}}
 % \seealso{}
 \examples{
 g <- random.graph.game(20, 5/20, directed=TRUE)

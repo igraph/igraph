@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2003, 2004, 2005  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -260,6 +260,7 @@ BASE FUNCTION(igraph_stack,top)        (const TYPE(igraph_stack)* s) {
 }
 
 #if defined (OUT_FORMAT)
+#ifndef USING_R
 
 int FUNCTION(igraph_stack,print)(const TYPE(igraph_stack) *s) {
   long int i, n=FUNCTION(igraph_stack,size)(s);
@@ -272,6 +273,7 @@ int FUNCTION(igraph_stack,print)(const TYPE(igraph_stack) *s) {
   printf("\n");
   return 0;
 }
+#endif
 
 int FUNCTION(igraph_stack,fprint)(const TYPE(igraph_stack) *s, FILE *file) {
   long int i, n=FUNCTION(igraph_stack,size)(s);

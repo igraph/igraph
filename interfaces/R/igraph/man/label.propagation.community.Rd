@@ -54,7 +54,7 @@ label.propagation.community (graph, weights = NULL,
 }
 \author{
   Tamas Nepusz \email{ntamas@rmki.kfki.hu} for the C implementation,
-  Gabor Csardi \email{Gabor.Csardi@unil.ch} for this manual page.
+  Gabor Csardi \email{csardi.gabor@gmail.com} for this manual page.
 }
 \seealso{
   \code{\link{communities}} for extracting the actual results.

@@ -1,6 +1,6 @@
 
-R version 2.12.0 (2010-10-15)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.14.1 (2011-12-22)
+Copyright (C) 2011 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
@@ -20,7 +20,7 @@ Type 'q()' to quit R.
 > library(igraph)
 > 
 > g <- graph.formula( a -+ b -+ c -+ d -+ e )
-> all.st.cuts(g, source="a", target="e")
+> stCuts(g, source="a", target="e")
 $cuts
 $cuts[[1]]
 [1] 1
@@ -51,7 +51,7 @@ $partition1s[[4]]
 
 > 
 > g2 <- graph.formula( s -+ a:b -+ t, a -+ 1:2:3 -+ b )
-> all.st.cuts(g2, source="s", target="t")
+> stCuts(g2, source="s", target="t")
 $cuts
 $cuts[[1]]
 [1] 1 2
@@ -124,7 +124,7 @@ $partition1s[[11]]
 
 > 
 > g3 <- graph.formula( s -+ a:b -+ t, a -+ 1:2:3:4:5 -+ b )
-> all.st.mincuts(g2, source="s", target="t")
+> stMincuts(g2, source="s", target="t")
 $value
 [1] 2
 

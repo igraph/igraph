@@ -2,8 +2,8 @@
 /* vim:set ts=2 sts=2 sw=2 et: */
 /* 
    IGraph library.
-   Copyright (C) 2011  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2011  Gabor Csardi <csardi.gabor@gmail.com>
+   Rue de l'Industrie 5, Lausanne 1005, Switzerland
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

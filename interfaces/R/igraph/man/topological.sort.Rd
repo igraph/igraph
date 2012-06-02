@@ -30,7 +30,7 @@ topological.sort(graph, mode=c("out", "all", "in"))
 %\references{
 %}
 \author{Tamas Nepusz \email{ntamas@rmki.kfki.hu} and Gabor Csardi
-  \email{csardi@rmki.kfki.hu} for the R interface} 
+  \email{csardi.gabor@gmail.com} for the R interface} 
 %\seealso{}
 \examples{
 g <- barabasi.game(100)

@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2010  Gabor Csardi <csardi.gabor@gmail.com>
-   Rue de l'Industrie 5, 1005 Lausanne, Switzerland
+   Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard st, Cambridge MA, 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -46,9 +46,11 @@ int main() {
   }
   igraph_sparsemat_copy(&spmat2, &spmat);
   
+  igraph_matrix_init(&mat, 0, 0);
   igraph_sparsemat_as_matrix(&mat, &spmat);
+  igraph_matrix_init(&mat2, 0, 0);
   igraph_sparsemat_as_matrix(&mat2, &spmat2);
-  if (!igraph_matrix_is_equal(&mat, &mat2)) { return 1;}
+  if (!igraph_matrix_all_e(&mat, &mat2)) { return 1;}
   
   igraph_matrix_destroy(&mat2);
   igraph_sparsemat_destroy(&spmat2);
@@ -57,8 +59,9 @@ int main() {
   igraph_sparsemat_destroy(&spmat);
   igraph_sparsemat_copy(&spmat, &spmat2);
   
+  igraph_matrix_init(&mat2, 0, 0);
   igraph_sparsemat_as_matrix(&mat2, &spmat);
-  if (!igraph_matrix_is_equal(&mat, &mat2)) { return 2; }
+  if (!igraph_matrix_all_e(&mat, &mat2)) { return 2; }
 
   igraph_sparsemat_destroy(&spmat);
   igraph_sparsemat_destroy(&spmat2);
@@ -73,20 +76,21 @@ int main() {
   }
   igraph_sparsemat_compress(&spmat, &spmat2);
 
+  igraph_matrix_init(&mat, 0, 0);
   igraph_sparsemat_as_matrix(&mat, &spmat);
   igraph_vector_init(&sums1, 0);
   igraph_vector_init(&sums2, 0);
   igraph_sparsemat_colsums(&spmat, &sums1);
   igraph_matrix_colsum(&mat, &sums2);
-  if (!igraph_vector_is_equal(&sums1, &sums2)) { return 3; }
+  if (!igraph_vector_all_e(&sums1, &sums2)) { return 3; }
   igraph_sparsemat_colsums(&spmat2, &sums1);
-  if (!igraph_vector_is_equal(&sums1, &sums2)) { return 4; }
+  if (!igraph_vector_all_e(&sums1, &sums2)) { return 4; }
   
   igraph_sparsemat_rowsums(&spmat, &sums1);
   igraph_matrix_rowsum(&mat, &sums2);
-  if (!igraph_vector_is_equal(&sums1, &sums2)) { return 5; }
+  if (!igraph_vector_all_e(&sums1, &sums2)) { return 5; }
   igraph_sparsemat_rowsums(&spmat2, &sums1);
-  if (!igraph_vector_is_equal(&sums1, &sums2)) { return 6; }
+  if (!igraph_vector_all_e(&sums1, &sums2)) { return 6; }
   
   igraph_matrix_destroy(&mat);
   igraph_sparsemat_destroy(&spmat);
@@ -105,6 +109,7 @@ int main() {
   }
   igraph_sparsemat_compress(&spmat, &spmat2);
 
+  igraph_matrix_init(&mat, 0, 0);
   igraph_sparsemat_as_matrix(&mat, &spmat2);
 
   nz1=igraph_sparsemat_count_nonzero(&spmat2);
@@ -137,11 +142,13 @@ int main() {
 
   igraph_sparsemat_scale(&spmat, 2.0);
   igraph_sparsemat_scale(&spmat2, 2.0);
+  igraph_matrix_init(&mat, 0, 0);
   igraph_sparsemat_as_matrix(&mat, &spmat);
+  igraph_matrix_init(&mat2, 0, 0);
   igraph_sparsemat_as_matrix(&mat2, &spmat2);
   igraph_matrix_scale(&mat, 1.0/2.0);
   igraph_matrix_scale(&mat2, 1.0/2.0);
-  if (!igraph_matrix_is_equal(&mat, &mat2)) { return 9; }
+  if (!igraph_matrix_all_e(&mat, &mat2)) { return 9; }
 
   igraph_matrix_destroy(&mat);
   igraph_matrix_destroy(&mat2);
@@ -162,9 +169,11 @@ int main() {
   igraph_sparsemat_add_rows(&spmat2, 3);
   igraph_sparsemat_add_cols(&spmat2, 2);
   
+  igraph_matrix_init(&mat, 0, 0);
   igraph_sparsemat_as_matrix(&mat, &spmat);
+  igraph_matrix_init(&mat2, 0, 0);
   igraph_sparsemat_as_matrix(&mat2, &spmat2);
-  if (!igraph_matrix_is_equal(&mat, &mat2)) { return 10; }
+  if (!igraph_matrix_all_e(&mat, &mat2)) { return 10; }
 
   igraph_matrix_destroy(&mat);
   igraph_matrix_destroy(&mat2);

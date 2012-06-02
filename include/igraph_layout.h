@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2009  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -58,6 +58,8 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
 				       igraph_real_t area, igraph_real_t coolexp, 
 				       igraph_real_t repulserad, igraph_bool_t use_seed,
 				       const igraph_vector_t *weight,
+				       const igraph_vector_t *minx,
+				       const igraph_vector_t *maxx,
 				       const igraph_vector_t *miny,
 				       const igraph_vector_t *maxy);
 int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph, 
@@ -70,7 +72,11 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
 int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
 			       igraph_integer_t niter, igraph_real_t sigma, 
 			       igraph_real_t initemp, igraph_real_t coolexp,
-			       igraph_real_t kkconst, igraph_bool_t use_seed);
+			       igraph_real_t kkconst, igraph_bool_t use_seed,
+			       const igraph_vector_t *minx,
+			       const igraph_vector_t *maxx,
+			       const igraph_vector_t *miny,
+			       const igraph_vector_t *maxy);
 int igraph_layout_springs(const igraph_t *graph, igraph_matrix_t *res,
 			  igraph_real_t mass, igraph_real_t equil, igraph_real_t k,
 			  igraph_real_t repeqdis, igraph_real_t kfr, igraph_bool_t repulse);
@@ -102,12 +108,25 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 					  igraph_real_t volume, igraph_real_t coolexp,
 					  igraph_real_t repulserad,
 					  igraph_bool_t use_seed,
-					  const igraph_vector_t *weight);
+					  const igraph_vector_t *weight, 
+					  const igraph_vector_t *minx,
+					  const igraph_vector_t *maxx,
+					  const igraph_vector_t *miny,
+					  const igraph_vector_t *maxy,
+					  const igraph_vector_t *minz,
+					  const igraph_vector_t *maxz);
+
 int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
 				  igraph_integer_t niter, igraph_real_t sigma, 
 				  igraph_real_t initemp, igraph_real_t coolexp, 
 				  igraph_real_t kkconst, igraph_bool_t use_seed,
-				  igraph_bool_t fixz);
+				  igraph_bool_t fixz, 
+				  const igraph_vector_t *minx,
+				  const igraph_vector_t *maxx,
+				  const igraph_vector_t *miny,
+				  const igraph_vector_t *maxy,
+				  const igraph_vector_t *minz,
+				  const igraph_vector_t *maxz);
 
 int igraph_layout_graphopt(const igraph_t *graph, 
 			   igraph_matrix_t *res, igraph_integer_t niter,

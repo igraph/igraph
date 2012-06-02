@@ -1,5 +1,5 @@
 
-library(igraph)
+library(igraph) ; igraph.options(print.full=TRUE)
 
 actors <- data.frame(name=c("Alice", "Bob", "Cecil", "David",
                        "Esmeralda"),

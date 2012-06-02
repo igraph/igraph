@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -49,7 +49,8 @@ int print_attributes(const igraph_t *g) {
   for (i=0; i<igraph_strvector_size(&gnames); i++) {
     printf("%s=", STR(gnames, i));
     if (VECTOR(gtypes)[i]==IGRAPH_ATTRIBUTE_NUMERIC) {
-      printf("%g ", GAN(g, STR(gnames,i)));
+      igraph_real_printf(GAN(g, STR(gnames,i)));
+      putchar(' ');
     } else {
       printf("\"%s\" ", GAS(g, STR(gnames,i)));
     }
@@ -62,7 +63,8 @@ int print_attributes(const igraph_t *g) {
     for (j=0; j<igraph_strvector_size(&vnames); j++) {
       printf("%s=", STR(vnames, j));
       if (VECTOR(vtypes)[j]==IGRAPH_ATTRIBUTE_NUMERIC) {
-	printf("%g ", VAN(g, STR(vnames,j), i));
+	igraph_real_printf(VAN(g, STR(vnames,j), i));
+	putchar(' ');
       } else {
 	printf("\"%s\" ", VAS(g, STR(vnames,j), i));
       }
@@ -76,7 +78,8 @@ int print_attributes(const igraph_t *g) {
     for (j=0; j<igraph_strvector_size(&enames); j++) {
       printf("%s=", STR(enames, j));
       if (VECTOR(etypes)[j]==IGRAPH_ATTRIBUTE_NUMERIC) {
-	printf("%g ", EAN(g, STR(enames, j), i));
+	igraph_real_printf(EAN(g, STR(enames, j), i));
+	putchar(' ');
       } else {
 	printf("\"%s\" ", EAS(g, STR(enames, j), i));
       }

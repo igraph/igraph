@@ -1,5 +1,5 @@
 
-library(igraph)
+library(igraph) ; igraph.options(print.full=TRUE)
 
 g <- graph.empty(10)
 g2 <- add.edges(g, c(1,2, 2,3, 3,4, 1,6, 1,7, 9,10) )

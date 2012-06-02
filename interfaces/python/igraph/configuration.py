@@ -7,7 +7,7 @@ as well as saving them to and retrieving them from disk.
 """
 
 __license__ = """
-Copyright (C) 2006-2007  Gabor Csardi <csardi@rmki.kfki.hu>,
+Copyright (C) 2006-2007  Gabor Csardi <csardi.gabor@gmail.com>,
 Tamas Nepusz <ntamas@rmki.kfki.hu>
 
 MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
@@ -141,6 +141,16 @@ class Configuration(object):
         - B{wrap_labels}: whether to try to wrap the labels of the
           vertices automatically if they don't fit within the vertex.
           Default: C{False}.
+
+    Remote repository settings
+    --------------------------
+
+    These settings specify how igraph should access remote graph repositories.
+    Currently only the Nexus repository is supported. All these settings are
+    stored in section C{remote}.
+
+        - B{nexus.url}: the root URL of the Nexus repository. Default:
+          C{http://nexus.igraph.org}.
     """
 
     # pylint: disable-msg=R0903
@@ -213,7 +223,7 @@ class Configuration(object):
         }
     }
 
-    _sections = ("general", "apps", "plotting", )
+    _sections = ("general", "apps", "plotting", "remote")
     _definitions = {
         "general.shells": { "default": "IPythonShell,ClassicPythonShell" },
         "general.verbose": { "default": True, "type": "boolean" },
@@ -223,7 +233,9 @@ class Configuration(object):
         "plotting.layout": { "default": "auto" },
         "plotting.mark_groups": { "default": False, "type": "boolean" },
         "plotting.palette": { "default": "gray" },
-        "plotting.wrap_labels": { "default": False, "type": "boolean" }
+        "plotting.wrap_labels": { "default": False, "type": "boolean" },
+
+        "remote.nexus.url": { "default": "http://nexus.igraph.org" }
     }
 
     # The singleton instance we are using throughout other modules
@@ -371,7 +383,7 @@ class Configuration(object):
           be overwritten.
         """
         stream = stream or get_user_config_file()
-        if not isinstance(stream, file):
+        if not hasattr(stream, "write") or not hasattr(stream, "close"):
             stream = open(stream, "w")
             file_was_open = True
         self._config.write(stream)

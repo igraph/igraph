@@ -1,7 +1,7 @@
 
 #   IGraph R package
-#   Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
-#   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+#   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
+#   334 Harvard street, Cambridge, MA 02139 USA
 #   
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -41,7 +41,8 @@ arpack <- function(func, extra=NULL, sym=FALSE, options=igraph.arpack.default,
                PACKAGE="igraph")
 
   if (complex) {
-    rew <- arpack.unpack.complex(res$vectors, res$values, res$options$nconv)
+    rew <- arpack.unpack.complex(res$vectors, res$values,
+                                 min(res$options$nev, res$options$nconv))
     res$vectors <- rew$vectors
     res$values <- rew$values
 
@@ -68,6 +69,10 @@ subgraph.centrality <- function(graph, diag=FALSE) {
   A <- get.adjacency(graph)
   if (!diag) { diag(A) <- 0 }
   eig <- eigen(A)
-  eig$vectors^2 %*% exp(eig$values)
+  res <- as.vector(eig$vectors^2 %*% exp(eig$values))
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) { 
+    names(res) <- get.vertex.attribute(graph, "name") 
+  }
+  res
 }
 

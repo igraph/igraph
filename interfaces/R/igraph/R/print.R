@@ -1,7 +1,7 @@
 
 #   IGraph R package
-#   Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
-#   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+#   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
+#   334 Harvard street, Cambridge, MA 02139 USA
 #   
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -241,7 +241,11 @@
   cat(alstr, sep="\n")
 }
 
-print.igraph <- function(x,
+str.igraph <- function(object, ...) {
+  print.igraph(object, full=TRUE, ...)
+}
+
+print.igraph <- function(x, full=getIgraphOpt("print.full"),
                 graph.attributes=getIgraphOpt("print.graph.attributes"),
                 vertex.attributes=getIgraphOpt("print.vertex.attributes"),
                 edge.attributes=getIgraphOpt("print.edge.attributes"),
@@ -252,18 +256,20 @@ print.igraph <- function(x,
   }
 
   .print.header(x)
-  if (graph.attributes)  .print.graph.attributes(x)
-  if (vertex.attributes) .print.vertex.attributes(x)
-  if (ecount(x)==0) {
-    ## Do nothing
-  } else if (edge.attributes && length(list.edge.attributes(x)) !=0 ) {
-    .print.edges.edgelist(x, names)
-  } else if (median(degree(x, mode="out")) < 3) {
-    .print.edges.compressed(x, names)
-  } else if (is.named(x)) {
-    .print.edges.adjlist.named(x)
-  } else {
-    .print.edges.adjlist(x)
+  if (full) { 
+    if (graph.attributes)  .print.graph.attributes(x)
+    if (vertex.attributes) .print.vertex.attributes(x)
+    if (ecount(x)==0) {
+      ## Do nothing
+    } else if (edge.attributes && length(list.edge.attributes(x)) !=0 ) {
+      .print.edges.edgelist(x, names)
+    } else if (median(degree(x, mode="out")) < 3) {
+      .print.edges.compressed(x, names)
+    } else if (is.named(x)) {
+      .print.edges.adjlist.named(x)
+    } else {
+      .print.edges.adjlist(x)
+    }
   }
   
   invisible(x)

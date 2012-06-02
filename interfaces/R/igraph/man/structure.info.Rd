@@ -73,7 +73,7 @@ get.edges(graph, es)
   \code{get.edges} returns a two-column matrix.
 }
 %\references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{graph}}}
 \examples{
 g <- graph.ring(10)

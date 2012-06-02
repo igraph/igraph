@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2010  Gabor Csardi <csardi.gabor@gmail.com>
-   Rue de l'Industrie 5, Lausanne 1005, Switzerland
+   Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard st, Cambridge MA, 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -85,32 +85,32 @@ int main() {
 
   which.pos=IGRAPH_EIGEN_LM;
   which.howmany=5;
-  igraph_eigen_matrix_symmetric(&A, /*sA=*/ 0, /*fun=*/ 0, /*extra=*/ 0,
+  igraph_eigen_matrix_symmetric(&A, /*sA=*/ 0, /*fun=*/ 0, DIM, /*extra=*/ 0,
 				IGRAPH_EIGEN_LAPACK, &which, /*options=*/ 0,
-				&values, &vectors);
+				/*storage=*/ 0, &values, &vectors);
   igraph_vector_print(&values);
   check_ev(&A, &values, &vectors);
 
   which.howmany=8;
-  igraph_eigen_matrix_symmetric(&A, /*sA=*/ 0, /*fun=*/ 0, /*extra=*/ 0,
+  igraph_eigen_matrix_symmetric(&A, /*sA=*/ 0, /*fun=*/ 0, DIM, /*extra=*/ 0,
 				IGRAPH_EIGEN_LAPACK, &which, /*options=*/ 0,
-				&values, &vectors);
+				/*storage=*/ 0, &values, &vectors);
   igraph_vector_print(&values);
   check_ev(&A, &values, &vectors);
 
   which.pos=IGRAPH_EIGEN_BE;
   which.howmany=5;
-  igraph_eigen_matrix_symmetric(&A, /*sA=*/ 0, /*fun=*/ 0, /*extra=*/ 0,
+  igraph_eigen_matrix_symmetric(&A, /*sA=*/ 0, /*fun=*/ 0, DIM, /*extra=*/ 0,
 				IGRAPH_EIGEN_LAPACK, &which, /*options=*/ 0,
-				&values, &vectors);
+				/*storage=*/ 0, &values, &vectors);
   igraph_vector_print(&values);
   check_ev(&A, &values, &vectors);
 
   which.pos=IGRAPH_EIGEN_SM;
   which.howmany=5;
-  igraph_eigen_matrix_symmetric(&A, /*sA=*/ 0, /*fun=*/ 0, /*extra=*/ 0,
+  igraph_eigen_matrix_symmetric(&A, /*sA=*/ 0, /*fun=*/ 0, DIM, /*extra=*/ 0,
 				IGRAPH_EIGEN_LAPACK, &which, /*options=*/ 0,
-				&values, &vectors);
+				/*storage=*/ 0, &values, &vectors);
   igraph_vector_print(&values);
   check_ev(&A, &values, &vectors);
   

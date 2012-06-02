@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2010  Gabor Csardi <csardi.gabor@gmail.com>
-   Rue de l'Industrie 5, 1005 Lausanne, Switzerland
+   Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard st, Cambridge MA, 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@ int main() {
   igraph_sparsemat_entry(&spmat, 3, 2, 10.0);
   
   igraph_sparsemat_compress(&spmat, &spmat2);
+  igraph_matrix_init(&mat, 0, 0);
   igraph_sparsemat_as_matrix(&mat, &spmat2);
   m1=igraph_sparsemat_min(&spmat2);
   m2=igraph_matrix_min(&mat);

@@ -46,7 +46,7 @@ graph.automorphisms(graph, sh="fm")
     Fourth Workshop on Analytic Algorithms and Combinatorics.} 2007.
 }
 \author{ Tommi Juntilla \email{google@for.it} for BLISS and Gabor Csardi
-  \email{csardi@rmki.kfki.hu} for the igraph glue code and this manual
+  \email{csardi.gabor@gmail.com} for the igraph glue code and this manual
   page.} 
 \seealso{\code{\link{canonical.permutation}}, \code{\link{permute.vertices}}}
 \examples{

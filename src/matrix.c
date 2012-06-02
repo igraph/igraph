@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,6 +30,12 @@
 #include "igraph_pmt_off.h"
 #undef BASE_IGRAPH_REAL
 
+#define BASE_INT
+#include "igraph_pmt.h"
+#include "matrix.pmt"
+#include "igraph_pmt_off.h"
+#undef BASE_INT
+
 #define BASE_LONG
 #include "igraph_pmt.h"
 #include "matrix.pmt"
@@ -54,6 +60,7 @@
 #include "igraph_pmt_off.h"
 #undef BASE_COMPLEX
 
+#ifndef USING_R
 int igraph_matrix_complex_print(const igraph_matrix_complex_t *m) {
 
   long int nr=igraph_matrix_complex_nrow(m);
@@ -63,17 +70,14 @@ int igraph_matrix_complex_print(const igraph_matrix_complex_t *m) {
     for (j=0; j<nc; j++) {
       igraph_complex_t z=MATRIX(*m, i, j);
       if (j!=0) { putchar(' '); }
-      if (IGRAPH_IMAG(z) < 0) {
-	printf("%g-%gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-      } else {
-	printf("%g+%gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-      }
+      printf("%g%+gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
     }
     printf("\n");
   }
   
   return 0;
 }
+#endif
 
 int igraph_matrix_complex_fprint(const igraph_matrix_complex_t *m, 
 				 FILE *file) {
@@ -84,12 +88,8 @@ int igraph_matrix_complex_fprint(const igraph_matrix_complex_t *m,
   for (i=0; i<nr; i++) {
     for (j=0; j<nc; j++) {
       igraph_complex_t z=MATRIX(*m, i, j);
-      if (j!=0) { putchar(' '); }
-      if (IGRAPH_IMAG(z) < 0) {
-	fprintf(file, "%g-%gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-      } else {
-	fprintf(file, "%g+%gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-      }
+      if (j!=0) { fputc(' ', file); }
+      fprintf(file, "%g%+gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
     }
     fprintf(file, "\n");
   }
@@ -99,12 +99,18 @@ int igraph_matrix_complex_fprint(const igraph_matrix_complex_t *m,
 
 int igraph_matrix_complex_real(const igraph_matrix_complex_t *v, 
 			       igraph_matrix_t *real) {
+  int nrow=igraph_matrix_complex_nrow(v);
+  int ncol=igraph_matrix_complex_ncol(v);
+  IGRAPH_CHECK(igraph_matrix_resize(real, nrow, ncol));
   IGRAPH_CHECK(igraph_vector_complex_real(&v->data, &real->data));
   return 0;
 }
 
 int igraph_matrix_complex_imag(const igraph_matrix_complex_t *v, 
 			       igraph_matrix_t *imag) {
+  int nrow=igraph_matrix_complex_nrow(v);
+  int ncol=igraph_matrix_complex_ncol(v);
+  IGRAPH_CHECK(igraph_matrix_resize(imag, nrow, ncol));
   IGRAPH_CHECK(igraph_vector_complex_imag(&v->data, &imag->data));
   return 0;
 }
@@ -112,6 +118,10 @@ int igraph_matrix_complex_imag(const igraph_matrix_complex_t *v,
 int igraph_matrix_complex_realimag(const igraph_matrix_complex_t *v, 
 				   igraph_matrix_t *real, 
 				   igraph_matrix_t *imag) {
+  int nrow=igraph_matrix_complex_nrow(v);
+  int ncol=igraph_matrix_complex_ncol(v);
+  IGRAPH_CHECK(igraph_matrix_resize(real, nrow, ncol));
+  IGRAPH_CHECK(igraph_matrix_resize(imag, nrow, ncol));
   IGRAPH_CHECK(igraph_vector_complex_realimag(&v->data, &real->data, 
 					      &imag->data));
   return 0;
@@ -131,4 +141,10 @@ int igraph_matrix_complex_create_polar(igraph_matrix_complex_t *v,
   IGRAPH_CHECK(igraph_vector_complex_create_polar(&v->data, &r->data,
 						  &theta->data));
   return 0;
+}
+
+igraph_bool_t igraph_matrix_all_e_tol(const igraph_matrix_t *lhs,
+				      const igraph_matrix_t *rhs,
+				      igraph_real_t tol) {
+  return igraph_vector_e_tol(&lhs->data, &rhs->data, tol);
 }

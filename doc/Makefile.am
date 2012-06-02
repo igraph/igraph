@@ -12,7 +12,8 @@ DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      operators.xml flows.xml community.xml cliques.xml \
 	      sparsematrix.xml stack.xml dqueue.xml heap.xml strvector.xml \
 	      adjlist.xml arpack.xml bipartite.xml visitors.xml random.xml \
-	      separators.xml memory.xml sparsemat.xml hrg.xml spatialgames.xml
+	      separators.xml memory.xml sparsemat.xml hrg.xml \
+	      scg.xml spatialgames.xml threading.xml progress.xml status.xml
 
 DOCFIX = fdl.xml gpl.xml installation.xml introduction.xml \
 	 tutorial.xml licenses.xml pmt.xml
@@ -50,8 +51,8 @@ vector.xml: vector.xxml $(INCLUDEDIR)/igraph_vector_pmt.h $(SRCDIR)/vector.pmt $
 	$(SRCDIR)/vector.pmt $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.c \
 	$(INCLUDEDIR)/igraph_vector_ptr.h
 
-error.xml: error.xxml $(INCLUDEDIR)/igraph_error.h
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_error.h
+error.xml: error.xxml $(INCLUDEDIR)/igraph_error.h $(SRCDIR)/error.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_error.h $(SRCDIR)/error.c
 
 matrix.xml: matrix.xxml $(INCLUDEDIR)/igraph_matrix.h $(SRCDIR)/matrix.pmt
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_matrix.h $(SRCDIR)/matrix.pmt
@@ -64,6 +65,9 @@ sparsemat.xml: sparsemat.xxml $(SRCDIR)/sparsemat.c
 
 hrg.xml: hrg.xxml $(SRCDIR)/igraph_hrg.cc $(INCLUDEDIR)/igraph_hrg.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/igraph_hrg.cc $(INCLUDEDIR)/igraph_hrg.h
+
+scg.xml: scg.xxml $(SRCDIR)/scg.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/scg.c
 
 basicigraph.xml: basicigraph.xxml $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c
@@ -126,8 +130,8 @@ motifs.xml: motifs.xxml $(INCLUDEDIR)/igraph_motifs.h $(SRCDIR)/motifs.c
 operators.xml: operators.xxml $(SRCDIR)/operators.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/operators.c
 
-flows.xml: flows.xxml $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c
+flows.xml: flows.xxml $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c $(SRCDIR)/cohesive_blocks.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c $(SRCDIR)/cohesive_blocks.c
 
 community.xml: community.xxml $(SRCDIR)/community.c $(SRCDIR)/clustertool.cpp $(SRCDIR)/walktrap.cpp $(SRCDIR)/fast_community.c $(SRCDIR)/optimal_modularity.c $(INCLUDEDIR)/igraph_community.h $(SRCDIR)/infomap.cc
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/community.c $(SRCDIR)/clustertool.cpp $(SRCDIR)/walktrap.cpp $(SRCDIR)/fast_community.c $(SRCDIR)/optimal_modularity.c $(INCLUDEDIR)/igraph_community.h $(SRCDIR)/infomap.cc
@@ -173,6 +177,15 @@ spatialgames.xml: spatialgames.xxml \
 		   $(SRCDIR)/microscopic_update.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ \
 	$(SRCDIR)/microscopic_update.c
+
+threading.xml: threading.xxml $(INCLUDEDIR)/igraph_threading.h
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_threading.h
+
+progress.xml: progress.xxml $(INCLUDEDIR)/igraph_progress.h $(SRCDIR)/progress.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_progress.h $(SRCDIR)/progress.c
+
+status.xml: status.xxml $(INCLUDEDIR)/igraph_statusbar.h $(SRCDIR)/statusbar.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_statusbar.h $(SRCDIR)/statusbar.c
 
 html/stamp: igraph-docs.xml $(DOCFIX2) gtk-doc.xsl
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \

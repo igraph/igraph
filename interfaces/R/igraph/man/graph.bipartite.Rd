@@ -45,7 +45,7 @@ is.bipartite(graph)
   \code{is.bipartite} returns a logical scalar.
 }
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{graph}} to create one-mode networks}
 \examples{
 g <- graph.bipartite( rep(0:1,length=10), c(1:10))

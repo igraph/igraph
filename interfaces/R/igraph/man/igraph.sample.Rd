@@ -20,7 +20,7 @@ igraph.sample(low, high, length)
 \references{Jeffrey Scott Vitter: An Efficient Algorithm for Sequential
   Random Sampling, \emph{ACM Transactions on Mathematical Software}, 13/1,
   58--67.}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \examples{
 rs <- igraph.sample(1, 100000000, 10)
 rs

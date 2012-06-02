@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2009  Gabor Csardi <Gabor.Csardi@unil.ch>
-   UNIL DGM, Rue de Bugnon 27, CH-1005 Lausanne, Switzerland
+   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -262,9 +262,11 @@ int igraph_biguint_div(igraph_biguint_t *q, igraph_biguint_t *r,
   return 0;
 }
 
+#ifndef USING_R
 int igraph_biguint_print(igraph_biguint_t *b) {
   return igraph_biguint_fprint(b, stdout);
 }
+#endif
 
 int igraph_biguint_fprint(igraph_biguint_t *b, FILE *file) {
 

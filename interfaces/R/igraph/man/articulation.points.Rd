@@ -21,7 +21,7 @@ articulation.points(graph)
 \value{A numeric vector giving the vertex ids of the articulation points
   of the input graph.}
 %\references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{biconnected.components}}, \code{\link{clusters}},
   \code{\link{is.connected}}, \code{\link{vertex.connectivity}}}
 \examples{

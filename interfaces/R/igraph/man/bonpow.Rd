@@ -82,7 +82,7 @@ a non-ad hoc basis.
   \emph{American Journal of Sociology}, 92, 1170-1182. 
  }
 \author{ Carter T. Butts \email{buttsc@uci.edu}, ported to igraph by
-  Gabor Csardi \email{csardi@rmki.kfki.hu}}
+  Gabor Csardi \email{csardi.gabor@gmail.com}}
 \section{Warning }{Singular adjacency matrices cause no end of headaches
   for this algorithm; thus, the routine may fail in certain cases.  This
   will be fixed when I get a better algorithm.  \code{bonpow} will not

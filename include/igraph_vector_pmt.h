@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -52,6 +52,8 @@ int FUNCTION(igraph_vector,init_seq)(TYPE(igraph_vector)*v, BASE from, BASE to);
 int FUNCTION(igraph_vector,copy)(TYPE(igraph_vector) *to, 
 				 const TYPE(igraph_vector) *from);
 void FUNCTION(igraph_vector,destroy)(TYPE(igraph_vector)* v);
+
+long int FUNCTION(igraph_vector,capacity)(const TYPE(igraph_vector)*v);
 
 /*--------------------*/
 /* Accessing elements */
@@ -136,6 +138,25 @@ int FUNCTION(igraph_vector,div)(TYPE(igraph_vector) *v1,
 int FUNCTION(igraph_vector,cumsum)(TYPE(igraph_vector) *to,
                 const TYPE(igraph_vector) *from);
 
+#ifndef NOABS
+int FUNCTION(igraph_vector,abs)(TYPE(igraph_vector) *v);
+#endif
+
+/*------------------------------*/
+/* Comparison                   */
+/*------------------------------*/
+
+igraph_bool_t FUNCTION(igraph_vector,all_e)(const TYPE(igraph_vector) *lhs, 
+					    const TYPE(igraph_vector) *rhs);
+igraph_bool_t FUNCTION(igraph_vector,all_l)(const TYPE(igraph_vector) *lhs, 
+					    const TYPE(igraph_vector) *rhs);
+igraph_bool_t FUNCTION(igraph_vector,all_g)(const TYPE(igraph_vector) *lhs, 
+					    const TYPE(igraph_vector) *rhs);
+igraph_bool_t FUNCTION(igraph_vector,all_le)(const TYPE(igraph_vector) *lhs, 
+					     const TYPE(igraph_vector) *rhs);
+igraph_bool_t FUNCTION(igraph_vector,all_ge)(const TYPE(igraph_vector) *lhs, 
+					     const TYPE(igraph_vector) *rhs);
+
 /*------------------------------*/
 /* Finding minimum and maximum  */
 /*------------------------------*/
@@ -157,13 +178,14 @@ igraph_bool_t FUNCTION(igraph_vector,empty)     (const TYPE(igraph_vector)* v);
 long int FUNCTION(igraph_vector,size)      (const TYPE(igraph_vector)* v);
 igraph_bool_t FUNCTION(igraph_vector,isnull)(const TYPE(igraph_vector) *v);
 BASE FUNCTION(igraph_vector,sum)(const TYPE(igraph_vector) *v);
+igraph_real_t FUNCTION(igraph_vector,sumsq)(const TYPE(igraph_vector) *v);
 BASE FUNCTION(igraph_vector,prod)(const TYPE(igraph_vector) *v);
 igraph_bool_t FUNCTION(igraph_vector,isininterval)(const TYPE(igraph_vector) *v, 
 						   BASE low, BASE high);
 igraph_bool_t FUNCTION(igraph_vector,any_smaller)(const TYPE(igraph_vector) *v, 
 						  BASE limit);
 igraph_bool_t FUNCTION(igraph_vector,is_equal)(const TYPE(igraph_vector) *lhs, 
-					       const TYPE(igraph_vector) *rhs);
+                                              const TYPE(igraph_vector) *rhs);
 BASE FUNCTION(igraph_vector,maxdifference)(const TYPE(igraph_vector) *m1,
 					   const TYPE(igraph_vector) *m2);
 
@@ -186,6 +208,7 @@ igraph_bool_t FUNCTION(igraph_vector,binsearch2)(const TYPE(igraph_vector) *v,
 
 void FUNCTION(igraph_vector,clear)(TYPE(igraph_vector)* v);
 int FUNCTION(igraph_vector,resize)(TYPE(igraph_vector)* v, long int newsize);
+int FUNCTION(igraph_vector,resize_min)(TYPE(igraph_vector)*v);
 int FUNCTION(igraph_vector,reserve)(TYPE(igraph_vector)* v, long int size);
 int FUNCTION(igraph_vector,push_back)(TYPE(igraph_vector)* v, BASE e);
 BASE FUNCTION(igraph_vector,pop_back)(TYPE(igraph_vector)* v);

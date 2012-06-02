@@ -36,7 +36,7 @@ biconnected.components(graph)
     \code{\link{articulation.points}}.}
 }
 %\references
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{articulation.points}}, \code{\link{clusters}},
   \code{\link{is.connected}}, \code{\link{vertex.connectivity}}}
 \examples{

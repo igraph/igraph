@@ -9,7 +9,7 @@
 }
 \usage{
 walktrap.community(graph, weights = E(graph)$weight, steps = 4, merges =
-          TRUE, modularity = TRUE, labels = TRUE, membership = TRUE)
+          TRUE, modularity = TRUE, membership = TRUE)
 }
 \arguments{
   \item{graph}{The input graph, edge directions are ignored in directed
@@ -21,9 +21,6 @@ walktrap.community(graph, weights = E(graph)$weight, steps = 4, merges =
   \item{modularity}{Logical scalar, whether to include the vector of the
     modularity scores in the result. If the \code{membership} argument
     is true, then it will be always calculated.}
-  \item{labels}{Logical scalar, if \code{TRUE} and the graph has a
-    vertex attribute called \code{name} then it will be included in the
-    result, in the list member called \code{labels}.}
   \item{membership}{Logical scalar, whether to calculate the membership
     vector for the split corresponding to the highest modularity value.}
 }
@@ -43,7 +40,7 @@ walktrap.community(graph, weights = E(graph)$weight, steps = 4, merges =
   http://arxiv.org/abs/physics/0512106
 }
 \author{Pascal Pons \email{google@for.it} and Gabor Csardi
-  \email{csardi@rmki.kfki.hu} for the R and igraph interface}
+  \email{csardi.gabor@gmail.com} for the R and igraph interface}
 \seealso{
   See \code{\link{communities}} on getting the actual membership vector,
   merge matrix, modularity score, etc.

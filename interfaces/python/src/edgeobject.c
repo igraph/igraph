@@ -3,8 +3,7 @@
 
 /* 
    IGraph library.
-   Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2006-2012  Tamas Nepusz <ntamas@gmail.com>
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -49,7 +48,7 @@ PyTypeObject igraphmodule_EdgeType;
  * changes, your existing edge objects will point to elsewhere
  * (or they might even get invalidated).
  */
-PyObject* igraphmodule_Edge_New(igraphmodule_GraphObject *gref, long idx) {
+PyObject* igraphmodule_Edge_New(igraphmodule_GraphObject *gref, igraph_integer_t idx) {
   igraphmodule_EdgeObject* self;
   self=PyObject_New(igraphmodule_EdgeObject, &igraphmodule_EdgeType);
   if (self) {
@@ -105,7 +104,7 @@ PyObject* igraphmodule_Edge_repr(igraphmodule_EdgeObject *self) {
 
 #ifdef IGRAPH_PYTHON3
   s = PyUnicode_FromFormat("igraph.Edge(%R, %ld, %R)",
-      (PyObject*)self->gref, self->idx, attrs);
+      (PyObject*)self->gref, (long int)self->idx, attrs);
   Py_DECREF(attrs);
 #else
   grepr=PyObject_Repr((PyObject*)self->gref);
@@ -117,7 +116,7 @@ PyObject* igraphmodule_Edge_repr(igraphmodule_EdgeObject *self) {
     return NULL;
   }
   s=PyString_FromFormat("igraph.Edge(%s, %ld, %s)", PyString_AsString(grepr),
-    self->idx, PyString_AsString(drepr));
+    (long int)self->idx, PyString_AsString(drepr));
   Py_DECREF(grepr);
   Py_DECREF(drepr);
 #endif
@@ -127,7 +126,7 @@ PyObject* igraphmodule_Edge_repr(igraphmodule_EdgeObject *self) {
 /** \ingroup python_interface_edge
  * \brief Returns the number of edge attributes
  */
-int igraphmodule_Edge_attribute_count(igraphmodule_EdgeObject* self) {
+Py_ssize_t igraphmodule_Edge_attribute_count(igraphmodule_EdgeObject* self) {
   igraphmodule_GraphObject *o = self->gref;
   
   if (!o) return 0;
@@ -300,7 +299,7 @@ PyObject* igraphmodule_Edge_get_from(igraphmodule_EdgeObject* self, void* closur
   if (igraph_edge(&o->g, self->idx, &from, &to)) {
     igraphmodule_handle_igraph_error(); return NULL;
   }
-  return PyInt_FromLong((long)from);
+  return PyInt_FromLong((long int)from);
 }
 
 /**
@@ -322,7 +321,15 @@ PyObject* igraphmodule_Edge_get_to(igraphmodule_EdgeObject* self, void* closure)
  * Returns the edge index
  */
 PyObject* igraphmodule_Edge_get_index(igraphmodule_EdgeObject* self, void* closure) {
-  return PyInt_FromLong((long)self->idx);
+  return PyInt_FromLong((long int)self->idx);
+}
+
+/**
+ * \ingroup python_interface_edge
+ * Returns the edge index as an igraph_integer_t
+ */
+igraph_integer_t igraphmodule_Edge_get_index_igraph_integer(igraphmodule_EdgeObject* self) {
+  return self->idx;
 }
 
 /**
@@ -378,10 +385,16 @@ GRAPH_PROXY_METHOD(is_mutual, "is_mutual");
 
 #define GRAPH_PROXY_METHOD_SPEC(FUNC, METHODNAME) \
   {METHODNAME, (PyCFunction)igraphmodule_Edge_##FUNC, METH_VARARGS | METH_KEYWORDS, \
-    "Proxy method to L{Graph." METHODNAME "()\n\n"              \
+    "Proxy method to L{Graph." METHODNAME "()}\n\n"              \
     "This method calls the " METHODNAME " method of the L{Graph} class " \
     "with this edge as the first argument, and returns the result.\n\n"\
     "@see: Graph." METHODNAME "() for details."}
+#define GRAPH_PROXY_METHOD_SPEC_2(FUNC, METHODNAME, METHODNAME_IN_GRAPH) \
+  {METHODNAME, (PyCFunction)igraphmodule_Edge_##FUNC, METH_VARARGS | METH_KEYWORDS, \
+    "Proxy method to L{Graph." METHODNAME_IN_GRAPH "()}\n\n"              \
+    "This method calls the " METHODNAME_IN_GRAPH " method of the L{Graph} class " \
+    "with this edge as the first argument, and returns the result.\n\n"\
+    "@see: Graph." METHODNAME_IN_GRAPH "() for details."}
 
 /**
  * \ingroup python_interface_edge
@@ -409,12 +422,15 @@ PyMethodDef igraphmodule_Edge_methods[] = {
     "dictionaries."
   },
   GRAPH_PROXY_METHOD_SPEC(count_multiple, "count_multiple"),
-  GRAPH_PROXY_METHOD_SPEC(delete, "delete"),
+  GRAPH_PROXY_METHOD_SPEC_2(delete, "delete", "delete_edges"),
   GRAPH_PROXY_METHOD_SPEC(is_loop, "is_loop"),
   GRAPH_PROXY_METHOD_SPEC(is_multiple, "is_multiple"),
   GRAPH_PROXY_METHOD_SPEC(is_mutual, "is_mutual"),
   {NULL}
 };
+
+#undef GRAPH_PROXY_METHOD_SPEC
+#undef GRAPH_PROXY_METHOD_SPEC_2
 
 /**
  * \ingroup python_interface_edge

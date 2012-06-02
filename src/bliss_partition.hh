@@ -20,6 +20,8 @@ Copyright (C) 2003-2006 Tommi Junttila
 #ifndef BLISS_PARTITION_HH
 #define BLISS_PARTITION_HH
 
+using namespace std;
+
 namespace igraph {
 
 class Cell;
@@ -27,8 +29,8 @@ class Partition;
 
 }
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include "bliss_kstack.hh"
 #include "bliss_kqueue.hh"
 #include "bliss_heap.hh"

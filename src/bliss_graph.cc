@@ -17,9 +17,11 @@ Copyright (C) 2003-2006 Tommi Junttila
 
 /* FSF address fixed in the above notice on 1 Oct 2009 by Tamas Nepusz */
 
-#include <stdio.h>
-#include <assert.h>
-#include <ctype.h>
+using namespace std;
+
+#include <cstdio>
+#include <cassert>
+#include <cctype>
 #include <set>
 #include <list>
 #include <algorithm>
@@ -27,14 +29,15 @@ Copyright (C) 2003-2006 Tommi Junttila
 #include "bliss_timer.hh"
 #include "bliss_graph.hh"
 #include "bliss_partition.hh"
-#include <limits.h>		// INT_MAX, etc
+#include <climits>		// INT_MAX, etc
 
 #include "igraph_datatype.h"
 #include "igraph_interface.h"
 #include "igraph_topology.h"
+#include "igraph_statusbar.h"
 
 extern bool bliss_verbose;
-extern FILE *bliss_verbstr;
+// extern FILE *bliss_verbstr;
 
 namespace igraph {
 
@@ -498,7 +501,7 @@ void AbstractGraph::search(const bool canonical, Stats &stats)
 {
   const unsigned int N = get_nof_vertices();
 
-  const bool write_automorphisms = 0;
+  // const bool write_automorphisms = 0;
 
   unsigned int all_same_level = UINT_MAX;
 
@@ -572,11 +575,9 @@ void AbstractGraph::search(const bool canonical, Stats &stats)
 #endif
 
   t1.stop();
-  if(bliss_verbose) {
-    fprintf(bliss_verbstr, "Initial partition computed in %.2fs\n",
-	    t1.get_duration());
-    fflush(bliss_verbstr);
-  }
+  
+  igraph_statusf("Initial partition computed in %.2fs", 0,
+		 t1.get_duration());
   
   /*
    * Allocate space for the labelings
@@ -800,15 +801,12 @@ void AbstractGraph::search(const bool canonical, Stats &stats)
 	     */
 	    if(index == cell->length && all_same_level == p.level+1)
 	      all_same_level = p.level;
-	    if (bliss_verbose) {
-	      fprintf(stdout,
-		      "Level %u: orbits=%u, index=%u/%u, all_same_level=%u\n",
-		      p.level,
-		      first_path_orbits.nof_orbits(),
-		      index, cell->length,
-		      all_same_level);
-	      fflush(stdout);
-	    }
+	    igraph_statusf("Level %u: orbits=%u, index=%u/%u, "
+			   "all_same_level=%u", 0, 
+			   p.level,
+			   first_path_orbits.nof_orbits(),
+			   index, cell->length,
+			   all_same_level);
 	  }
 	  /* Backtrack to the previous level */
 	  p.level--;
@@ -1187,11 +1185,11 @@ void AbstractGraph::search(const bool canonical, Stats &stats)
 	  p.level = backjumping_level;
 	  search_stack.resize(p.level + 1);
 	  
-	  if(write_automorphisms)
-	    {
-	      print_permutation(stdout, first_path_automorphism);
-	      fprintf(stdout, "\n");
-	    }
+	  // if(write_automorphisms)
+	  //   {
+	  //     print_permutation(stdout, first_path_automorphism);
+	  //     fprintf(stdout, "\n");
+	  //   }
 	  stats.nof_generators++;
 	  continue;
 	}
@@ -1290,11 +1288,11 @@ void AbstractGraph::search(const bool canonical, Stats &stats)
 	update_orbit_information(first_path_orbits, best_path_automorphism);
 	if(nof_old_orbits != first_path_orbits.nof_orbits())
 	  {
-	    if(write_automorphisms)
-	      {
-		print_permutation(stdout, best_path_automorphism);
-		fprintf(stdout, "\n");
-	      }
+	    // if(write_automorphisms)
+	    //   {
+	    // 	print_permutation(stdout, best_path_automorphism);
+	    // 	fprintf(stdout, "\n");
+	    //   }
 	    stats.nof_generators++;
 	  }
 	  
@@ -1473,122 +1471,122 @@ void Graph::change_label(const unsigned int vertex,
  *
  *-------------------------------------------------------------------------*/
 
-Graph *Graph::read_dimacs(FILE *fp)
-{
-  Graph *g = 0;
-  unsigned int nof_vertices, nof_edges;
-  unsigned int line_num = 1;
-  int c;
+// Graph *Graph::read_dimacs(FILE *fp)
+// {
+//   Graph *g = 0;
+//   unsigned int nof_vertices, nof_edges;
+//   unsigned int line_num = 1;
+//   int c;
   
-  /* read comments and problem line*/
-  while(1) {
-    c = getc(fp);
-    if(c == 'c') {
-      while((c = getc(fp)) != '\n') {
-        if(c == EOF) {
-          fprintf(stderr, "error in line %u: not in DIMACS format\n",
-                  line_num);
-          goto error_exit;
-        }
-      }
-      line_num++;
-      continue;
-    }
-    if(c == 'p') {
-      if(fscanf(fp, " edge %u %u\n", &nof_vertices, &nof_edges) != 2) {
-        fprintf(stderr, "error in line %u: not in DIMACS format\n",
-                line_num);
-        goto error_exit; }
-      line_num++;
-      break;
-    }
-    fprintf(stderr, "error in line %u: not in DIMACS format\n", line_num);
-    goto error_exit;
-  }
+//   /* read comments and problem line*/
+//   while(1) {
+//     c = getc(fp);
+//     if(c == 'c') {
+//       while((c = getc(fp)) != '\n') {
+//         if(c == EOF) {
+//           fprintf(stderr, "error in line %u: not in DIMACS format\n",
+//                   line_num);
+//           goto error_exit;
+//         }
+//       }
+//       line_num++;
+//       continue;
+//     }
+//     if(c == 'p') {
+//       if(fscanf(fp, " edge %u %u\n", &nof_vertices, &nof_edges) != 2) {
+//         fprintf(stderr, "error in line %u: not in DIMACS format\n",
+//                 line_num);
+//         goto error_exit; }
+//       line_num++;
+//       break;
+//     }
+//     fprintf(stderr, "error in line %u: not in DIMACS format\n", line_num);
+//     goto error_exit;
+//   }
   
-  if(nof_vertices <= 0) {
-    fprintf(stderr, "error: no vertices\n");
-    goto error_exit;
-  }
-#if 0
-  if(nof_edges <= 0) {
-    fprintf(stderr, "error: no edges\n");
-    goto error_exit;
-  }
-#endif
-  if(bliss_verbose) {
-    fprintf(bliss_verbstr, "Instance has %d vertices and %d edges\n",
-            nof_vertices, nof_edges);
-    fflush(bliss_verbstr);
-  }
+//   if(nof_vertices <= 0) {
+//     fprintf(stderr, "error: no vertices\n");
+//     goto error_exit;
+//   }
+// #if 0
+//   if(nof_edges <= 0) {
+//     fprintf(stderr, "error: no edges\n");
+//     goto error_exit;
+//   }
+// #endif
+//   if(bliss_verbose) {
+//     fprintf(bliss_verbstr, "Instance has %d vertices and %d edges\n",
+//             nof_vertices, nof_edges);
+//     fflush(bliss_verbstr);
+//   }
 
-  g = new Graph(nof_vertices);
+//   g = new Graph(nof_vertices);
 
-  //
-  // Read vertex labels
-  //
-  if(bliss_verbose) {
-    fprintf(bliss_verbstr, "Reading vertex labels...\n");
-    fflush(bliss_verbstr); }
-  while(1) {
-    c = getc(fp);
-    if(c != 'n') {
-      ungetc(c, fp);
-      break;
-    }
-    ungetc(c, fp);
-    unsigned int vertex, label;
-    if(fscanf(fp, "n %u %u\n", &vertex, &label) != 2) {
-      fprintf(stderr, "error in line %u: not in DIMACS format\n",
-	      line_num);
-      goto error_exit;
-    }
-    if(vertex > nof_vertices) {
-      fprintf(stderr, "error in line %u: not in DIMACS format\n",
-	      line_num);
-      goto error_exit;
-    }
-    line_num++;
-    g->change_label(vertex - 1, label);
-  }
-  if(bliss_verbose) {
-    fprintf(bliss_verbstr, "Done\n");
-    fflush(bliss_verbstr); }
+//   //
+//   // Read vertex labels
+//   //
+//   if(bliss_verbose) {
+//     fprintf(bliss_verbstr, "Reading vertex labels...\n");
+//     fflush(bliss_verbstr); }
+//   while(1) {
+//     c = getc(fp);
+//     if(c != 'n') {
+//       ungetc(c, fp);
+//       break;
+//     }
+//     ungetc(c, fp);
+//     unsigned int vertex, label;
+//     if(fscanf(fp, "n %u %u\n", &vertex, &label) != 2) {
+//       fprintf(stderr, "error in line %u: not in DIMACS format\n",
+// 	      line_num);
+//       goto error_exit;
+//     }
+//     if(vertex > nof_vertices) {
+//       fprintf(stderr, "error in line %u: not in DIMACS format\n",
+// 	      line_num);
+//       goto error_exit;
+//     }
+//     line_num++;
+//     g->change_label(vertex - 1, label);
+//   }
+//   if(bliss_verbose) {
+//     fprintf(bliss_verbstr, "Done\n");
+//     fflush(bliss_verbstr); }
 
-  //
-  // Read edges
-  //
-  if(bliss_verbose) {
-    fprintf(bliss_verbstr, "Reading edges...\n");
-    fflush(bliss_verbstr); }
-  for(unsigned i = 0; i < nof_edges; i++) {
-    unsigned int from, to;
-    if(fscanf(fp, "e %u %u\n", &from, &to) != 2) {
-      fprintf(stderr, "error in line %u: not in DIMACS format\n",
-	      line_num);
-      goto error_exit;
-    }
-    if(from > nof_vertices || to > nof_vertices) {
-      fprintf(stderr, "error in line %u: not in DIMACS format\n",
-	      line_num);
-      goto error_exit;
-    }
-    line_num++;
-    g->add_edge(from - 1, to - 1);
-  }
-  if(bliss_verbose) {
-    fprintf(bliss_verbstr, "Done\n");
-    fflush(bliss_verbstr);
-  }
+//   //
+//   // Read edges
+//   //
+//   if(bliss_verbose) {
+//     fprintf(bliss_verbstr, "Reading edges...\n");
+//     fflush(bliss_verbstr); }
+//   for(unsigned i = 0; i < nof_edges; i++) {
+//     unsigned int from, to;
+//     if(fscanf(fp, "e %u %u\n", &from, &to) != 2) {
+//       fprintf(stderr, "error in line %u: not in DIMACS format\n",
+// 	      line_num);
+//       goto error_exit;
+//     }
+//     if(from > nof_vertices || to > nof_vertices) {
+//       fprintf(stderr, "error in line %u: not in DIMACS format\n",
+// 	      line_num);
+//       goto error_exit;
+//     }
+//     line_num++;
+//     g->add_edge(from - 1, to - 1);
+//   }
+//   if(bliss_verbose) {
+//     fprintf(bliss_verbstr, "Done\n");
+//     fflush(bliss_verbstr);
+//   }
 
-  return g;
+//   return g;
 
- error_exit:
-  if(g)
-    delete g;
-  return 0;
+//  error_exit:
+//   if(g)
+//     delete g;
+//   return 0;
 
-}
+// }
 
 Graph *Graph::from_igraph(const igraph_t *graph) {
   

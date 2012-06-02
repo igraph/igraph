@@ -61,7 +61,7 @@ forest.fire.game (nodes, fw.prob, bw.factor = 1, ambs = 1, directed = TRUE)
     conference on Knowledge discovery in data mining}, 177--187, 2005.
 }
 \author{
-  Gabor Csardi \email{csardi@rmki.kfki.hu}
+  Gabor Csardi \email{csardi.gabor@gmail.com}
 }
 \seealso{
   \code{\link{barabasi.game}} for the basic preferential attachment

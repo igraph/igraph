@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2009  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -89,6 +89,10 @@ __BEGIN_DECLS
 
 int igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to);
 int igraph_vector_round(const igraph_vector_t *from, igraph_vector_long_t *to);
+
+igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
+				  const igraph_vector_t *rhs,
+				  igraph_real_t tol);
 
 /* These are for internal use only */
 int igraph_vector_order(const igraph_vector_t* v, const igraph_vector_t *v2,

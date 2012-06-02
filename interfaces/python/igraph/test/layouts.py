@@ -168,6 +168,23 @@ class LayoutAlgorithmTests(unittest.TestCase):
         self.failUnless(isinstance(lo, Layout))
         lo = g.layout("fr", miny=range(100), maxy=range(100))
         self.failUnless(isinstance(lo, Layout))
+        lo = g.layout("fr", miny=[2]*100, maxy=[3]*100, minx=[4]*100, maxx=[6]*100)
+        self.failUnless(isinstance(lo, Layout))
+        bbox = lo.bounding_box()
+        self.failUnless(bbox.top >= 2)
+        self.failUnless(bbox.bottom <= 3)
+        self.failUnless(bbox.left >= 4)
+        self.failUnless(bbox.right >= 6)
+
+    def testKamadaKawai(self):
+        g = Graph.Barabasi(100)
+        lo = g.layout("kk", miny=[2]*100, maxy=[3]*100, minx=[4]*100, maxx=[6]*100)
+        self.failUnless(isinstance(lo, Layout))
+        bbox = lo.bounding_box()
+        self.failUnless(bbox.top >= 2)
+        self.failUnless(bbox.bottom <= 3)
+        self.failUnless(bbox.left >= 4)
+        self.failUnless(bbox.right >= 6)
 
     def testMDS(self):
         g = Graph.Tree(10, 2)

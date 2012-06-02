@@ -20,7 +20,7 @@ running.mean(v, binwidth)
   A numeric vector of length \code{length(v)-binwidth+1}
 }
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 % \seealso{}
 \examples{
 running.mean(1:100, 10)

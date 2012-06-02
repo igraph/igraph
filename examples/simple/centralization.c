@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2009  Gabor Csardi <Gabor.Csardi@unil.ch>
-   UNIL DGM, Rue de Bugnon 27, CH-1005 Lausanne, Switzerland
+   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -62,20 +62,6 @@ int main() {
   if (!ALMOST_EQUALS(cent, 1.0)) {
     fprintf(stderr, "in-star, closeness: %g\n", cent);
     return 3;
-  }
-
-  igraph_arpack_options_init(&arpack_options);
-  igraph_centralization_eigenvector_centrality(&g, /*vector=*/ 0, 
-					       /*value=*/ 0, 
-					       /*directed=*/ 1,
-					       /*scale=*/ 1,
-					       &arpack_options, &cent,
-					       /*theoretical_max=*/ 0,
-					       /*normalization=*/ 1);
-  
-  if (!ALMOST_EQUALS(cent, 1.0)) {
-    fprintf(stderr, "in-star, eigenvector centrality: %g\n", cent);
-    return 14;
   }
 
   igraph_destroy(&g);
@@ -154,6 +140,7 @@ int main() {
   igraph_small(&g, /*n=*/ 10, /*directed=*/ 0, 
 	       0,1, -1);
   
+  igraph_arpack_options_init(&arpack_options);
   igraph_centralization_eigenvector_centrality(&g, /*vector=*/ 0,
 					       /*value=*/ 0, 
 					       /*directed=*/ 1,

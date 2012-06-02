@@ -392,7 +392,6 @@ class IPythonShell(Shell, ConsoleProgressBarMixin):
         # work there (e.g., set(g.degree(x) for x in [1,2,3])) where g comes
         # from an external context
         import sys
-        sys.argv.append("-nosep")
 
         from IPython import __version__ as ipython_version
         self.ipython_version = ipython_version
@@ -401,11 +400,13 @@ class IPythonShell(Shell, ConsoleProgressBarMixin):
             # IPython >= 0.11 supports this
             from IPython.frontend.terminal.ipapp import TerminalIPythonApp
             self._shell = TerminalIPythonApp.instance()
+            sys.argv.append("--nosep")
         except ImportError:
             # IPython 0.10 and earlier
             import IPython.Shell
             self._shell = IPython.Shell.start()
             self._shell.IP.runsource("from igraph import *")
+            sys.argv.append("-nosep")
 
     def __call__(self):
         """Starts the embedded shell."""

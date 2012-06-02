@@ -11,7 +11,7 @@ to read it at least once if you are new to |igraph|. I assume that you have alre
 |igraph|; if you did not, see :ref:`installing-igraph` first. Familiarity with the Python
 language is also assumed; if this is the first time you are trying to use Python, there are
 many good Python tutorials on the Internet to get you started. Mark Pilgrim's
-`Dive Into Python <http://www.diveintopython.org>`_ is one that I personally suggest.
+`Dive Into Python <http://www.diveintopython.net>`_ is one that I personally suggest.
 If this is the first time you ever try to use a programming language,
 `A Byte of Python <http://swaroopch.com/notes/Python>`_ is even better. If
 you already have a stable programming background in other languages and you just want a

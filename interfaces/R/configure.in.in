@@ -1,8 +1,25 @@
-AC_INIT(igraph, @VERSION@, csardi@rmki.kfki.hu)
+AC_INIT(igraph, @VERSION@, csardi.gabor@gmail.com)
 AC_CONFIG_SRCDIR(src/rinterface.c)
 AC_CONFIG_HEADERS(src/config.h)
 
+: ${R_HOME=`R RHOME`}
+if test -z "${R_HOME}"; then
+   echo "could not determine R_HOME"
+   exit 1
+fi
+CC=`"${R_HOME}/bin/R" CMD config CC`
+CXX=`"${R_HOME}/bin/R" CMD config CXX`
+FC=`"${R_HOME}/bin/R" CMD config FC`
+CFLAGS=`"${R_HOME}/bin/R" CMD config CFLAGS`
+CXXFLAGS=`"${R_HOME}/bin/R" CMD config CXXFLAGS`
+CPPFLAGS=`"${R_HOME}/bin/R" CMD config CPPFLAGS`
+FCFLAGS=`"${R_HOME}/bin/R" CMD config FCFLAGS`
+FLIBS=`"${R_HOME}/bin/R" CMD config FLIBS`
+
+AC_LANG(C)
 AC_PROG_CC
+
+AC_PROG_FC
 
 # Tricky check for C++ compiler, because Autoconf has a weird bug:
 # http://lists.gnu.org/archive/html/autoconf/2006-03/msg00067.html
@@ -62,6 +79,7 @@ if test $graphml_support = yes; then
 fi
 AC_SUBST(HAVE_LIBXML)
 
+AC_LANG_PUSH([C++])
 HAVE_GMP=0
 GMP_LIBS=""
 gmp_support=no
@@ -78,10 +96,11 @@ if test "x$enable_gmp" != "xno"; then
 fi
 AC_SUBST(HAVE_GMP)
 AC_SUBST(GMP_LIBS)
+AC_LANG_POP([C++])
 
 glpk_support=yes
 AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
-HAVE_GLPK=0
+HAVE_GLPK=1
 GLPK_LIBS=""
 AC_SUBST(HAVE_GLPK)
 AC_SUBST(GLPK_LIBS)

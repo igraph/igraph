@@ -2,8 +2,8 @@
 /* vim:set ts=2 sts=2 sw=2 et: */
 /* 
    IGraph library.
-   Copyright (C) 2007-2011  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -54,6 +54,13 @@ static void debug(const char* fmt, ...) {
 #  else
 #    define debug(...) 
 #  endif
+#endif
+
+/* MSVC uses __forceinline instead of inline */
+#ifdef _MSC_VER
+#  define INLINE __forceinline
+#else
+#  define INLINE inline
 #endif
 
 /*
@@ -219,7 +226,7 @@ static int igraph_i_layout_sugiyama_place_nodes_horizontally(const igraph_t* gra
 /**
  * Calculated the median of four numbers (not necessarily sorted).
  */
-static inline igraph_real_t igraph_i_median_4(igraph_real_t x1,
+static INLINE igraph_real_t igraph_i_median_4(igraph_real_t x1,
     igraph_real_t x2, igraph_real_t x3, igraph_real_t x4) {
   igraph_real_t arr[4] = { x1, x2, x3, x4 };
   igraph_vector_t vec;
@@ -253,6 +260,11 @@ static inline igraph_real_t igraph_i_median_4(igraph_real_t x1,
  * edges spanning more than one layer. The resulting layout assigns coordinates
  * not only to the nodes of the original graph but also to the dummy nodes.
  * The layout algorithm will also return the extended graph with the dummy nodes.
+ * An edge in the original graph may either be mapped to a single edge in the
+ * extended graph or a \em path that starts and ends in the original
+ * source and target vertex and passes through multiple dummy vertices. In
+ * such cases, the user may also request the mapping of the edges of the extended
+ * graph back to the edges of the original graph.
  *
  * </para><para>
  * For more details, see K. Sugiyama, S. Tagawa and M. Toda, "Methods for Visual
@@ -272,6 +284,10 @@ static inline igraph_real_t igraph_i_median_4(igraph_real_t x1,
  *                       to lower layers, spans exactly one layer and the first
  *                       |V| vertices coincide with the vertices of the
  *                       original graph.
+ * \param extd_to_orig_eids Pointer to a vector or \c NULL. If not \c NULL, the
+ *                          mapping from the edge IDs of the extended graph back
+ *                          to the edge IDs of the original graph will be stored
+ *                          here.
  * \param layers  The layer index for each vertex or \c NULL if the layers should
  *                be determined automatically by igraph.
  * \param hgap  The preferred minimum horizontal gap between vertices in the same
@@ -751,7 +767,7 @@ static int igraph_i_layout_sugiyama_order_nodes_horizontally(const igraph_t* gra
         VECTOR(barycenters)[i] = nei;
         MATRIX(*layout, nei, 0) = i;
       }
-      if (!igraph_vector_is_equal(layer_members, &barycenters)) {
+      if (!igraph_vector_all_e(layer_members, &barycenters)) {
         IGRAPH_CHECK(igraph_vector_update(layer_members, &barycenters));
 #ifdef SUGIYAMA_DEBUG
         printf("New vertex order: "); igraph_vector_print(layer_members);
@@ -784,7 +800,7 @@ static int igraph_i_layout_sugiyama_order_nodes_horizontally(const igraph_t* gra
         VECTOR(barycenters)[i] = nei;
         MATRIX(*layout, nei, 0) = i;
       }
-      if (!igraph_vector_is_equal(layer_members, &barycenters)) {
+      if (!igraph_vector_all_e(layer_members, &barycenters)) {
         IGRAPH_CHECK(igraph_vector_update(layer_members, &barycenters));
 #ifdef SUGIYAMA_DEBUG
         printf("New vertex order: "); igraph_vector_print(layer_members);
@@ -963,7 +979,7 @@ static int igraph_i_layout_sugiyama_place_nodes_horizontally(const igraph_t* gra
   {
     igraph_real_t width, min_width, mins[4], maxs[4], diff;
     /* Find the alignment with the minimum width */
-    min_width = INFINITY; j = 0;
+    min_width = IGRAPH_INFINITY; j = 0;
     for (i = 0; i < 4; i++) {
       mins[i] = igraph_vector_min(&xs[i]);
       maxs[i] = igraph_vector_max(&xs[i]);
@@ -1051,7 +1067,7 @@ static int igraph_i_layout_sugiyama_vertical_alignment(const igraph_t* graph,
     igraph_vector_t *layer = igraph_i_layering_get(layering, i);
 
     /* r = 0 in the paper, but C arrays are indexed from 0 */
-    r = align_right ? INFINITY : -1;
+    r = align_right ? IGRAPH_INFINITY : -1;
 
     /* If align_right is 1, we have to process the layer in reverse order */
     j       = align_right ? (igraph_vector_size(layer)-1) : 0;
@@ -1167,7 +1183,7 @@ static int igraph_i_layout_sugiyama_horizontal_compaction(const igraph_t* graph,
   for (i = 0; i < no_of_nodes; i++) {
     VECTOR(sinks)[i] = i;
   }
-  igraph_vector_fill(&shifts, INFINITY);
+  igraph_vector_fill(&shifts, IGRAPH_INFINITY);
   igraph_vector_fill(xs, -1);
 
   /* Calculate the coordinates of the vertices relative to their sinks
@@ -1195,7 +1211,7 @@ static int igraph_i_layout_sugiyama_horizontal_compaction(const igraph_t* graph,
     long int root = VECTOR(*roots)[i];
     VECTOR(*xs)[i] = VECTOR(old_xs)[root];
     shift = VECTOR(shifts)[(long int)VECTOR(sinks)[root]];
-    if (shift < INFINITY)
+    if (shift < IGRAPH_INFINITY)
       VECTOR(*xs)[i] += shift;
   }
 

@@ -120,7 +120,7 @@ remove.edge.attribute(graph, name)
   the attributes present.
 }
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{print.igraph}} can print attributes. See
   \code{\link{attribute.combination}} for details on how igraph combines
   attributes if several vertices or edges are mapped into one.}

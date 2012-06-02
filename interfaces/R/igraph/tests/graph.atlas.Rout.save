@@ -1,6 +1,6 @@
 
-R version 2.12.0 (2010-10-15)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
@@ -17,15 +17,20 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > 
-> library(igraph)
+> library(igraph) ; igraph.options(print.full=TRUE)
 > 
 > graph.atlas(124)
-IGRAPH U--- 6 7 -- 
+IGRAPH U--- 6 7 -- Graph from the Atlas #124
++ attr: name (g/c), n (g/n)
 + edges:
 [1] 1--2 2--3 3--4 4--5 1--5 1--3 2--6
 > graph.atlas(234)
-IGRAPH U--- 7 5 -- 
+IGRAPH U--- 7 5 -- Graph from the Atlas #234
++ attr: name (g/c), n (g/n)
 + edges:
 [1] 2--6 1--6 3--6 4--6 5--6
 > 
 > 
+> proc.time()
+   user  system elapsed 
+  0.290   0.038   0.331 

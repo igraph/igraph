@@ -115,10 +115,16 @@
       named color and RGB colors. Note that \code{\link{tkplot}} ignores
       the fourth byte (alpha channel) in the RGB color specification.
 
+      If you don't want (some) vertices to have any color, supply
+      \code{NA} as the color name.
+      
       The default value is \dQuote{\code{SkyBlue2}}.
     }
     \item{frame.color}{The color of the frame of the vertices, the same
       formats are allowed as for the fill color.
+
+      If you don't want vertices to have a frame, supply \code{NA} as
+      the color name.
 
       By default it is \dQuote{black}.
     }
@@ -393,7 +399,7 @@
     }
   }
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{ \code{\link{plot.igraph}}, \code{\link{tkplot}},
   \code{\link{rglplot}}, \code{\link{igraph.options}}}
 \examples{

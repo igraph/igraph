@@ -2,8 +2,8 @@
 /* vim:set ts=8 sw=2 sts=2 et: */
 /* 
    IGraph R library.
-   Copyright (C) 2003, 2004  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -1920,6 +1920,8 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
   IGRAPH_FINALLY_CLEAN(1);   /* removing igraph_vector_ptr_destroy_all */
   IGRAPH_FINALLY(igraph_i_preference_game_free_vids_by_type, &vids_by_type);
 
+  RNG_BEGIN();
+    
   if (!fixed_sizes) {
 
     igraph_vector_t cumdist;
@@ -1934,8 +1936,6 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
     }
     maxcum=igraph_vector_tail(&cumdist);
 
-    RNG_BEGIN();
-    
     for (i=0; i<nodes; i++) {
       long int type1;
       igraph_real_t uni1=RNG_UNIF(0, maxcum);

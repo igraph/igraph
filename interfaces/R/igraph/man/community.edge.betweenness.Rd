@@ -7,12 +7,15 @@
 \description{Many networks consist of modules which are densely
   connected themselves but sparsely connected to other modules.}
 \usage{
-edge.betweenness.community (graph, directed = TRUE,
-    edge.betweenness = TRUE, merges = TRUE, bridges = TRUE,
-    labels = TRUE, modularity = TRUE, membership = TRUE)
+edge.betweenness.community (graph, weights = E(graph)$weight,
+    directed = TRUE, edge.betweenness = TRUE, merges = TRUE,
+    bridges = TRUE, modularity = TRUE, membership = TRUE)
 }
 \arguments{
   \item{graph}{The graph to analyze.}
+  \item{weights}{The edge weights. Supply \code{NULL} to omit edge
+    weights. By default the \sQuote{\code{weight}} edge attribute is
+    used, if it is present.}
   \item{directed}{Logical constant, whether to calculate directed edge
     betweenness for directed graphs. It is ignored for undirected
     graphs.}
@@ -35,10 +38,6 @@ edge.betweenness.community (graph, directed = TRUE,
   }
   \item{bridges}{Logical constant, whether to return a list the edge
     removals which actually splitted a component of the graph.}
-  \item{labels}{Logical constant, whether to contain the labels of the
-    vertices in the result. More precisely, if the graph has a vertex
-    attribute valled \code{name}, it will be part of the result
-    object.}
   \item{modularity}{Logical constant, whether to calculate the
     maximum modularity score, considering all possibly community
     structures along the edge-betweenness based edge removals.}
@@ -72,7 +71,7 @@ edge.betweenness.community (graph, directed = TRUE,
   object, please see the \code{\link{communities}} manual page for
   details.
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{ \code{\link{edge.betweenness}} for the definition and
   calculation of the edge betweenness,
   \code{\link{walktrap.community}}, \code{\link{fastgreedy.community}},

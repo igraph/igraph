@@ -1,6 +1,6 @@
 
-R version 2.12.0 (2010-10-15)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
@@ -17,7 +17,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > 
-> library(igraph)
+> library(igraph) ; igraph.options(print.full=TRUE)
 > 
 > g <- erdos.renyi.game(100, 2/100)
 > g2 <- as.directed(g, mode="mutual")
@@ -89,3 +89,6 @@ IGRAPH DNW- 5 3 -- Small graph
 [3] B->C 0.2861395
 > 
 > 
+> proc.time()
+   user  system elapsed 
+  0.326   0.039   0.424 

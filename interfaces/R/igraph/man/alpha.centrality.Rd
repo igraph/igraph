@@ -57,7 +57,7 @@ alpha.centrality(graph, nodes=V(graph), alpha=1, loops=FALSE,
   centrality for asymmetric relations'' \emph{Social Networks}, 23,
   191-201.
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}.}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \section{Warning}{Singular adjacency matrices cause problems for this
   algorithm, the routine may fail is certain cases.}
 \seealso{\code{\link{evcent}} and \code{\link{bonpow}}}

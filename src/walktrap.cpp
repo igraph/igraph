@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -62,6 +62,7 @@
 #include <fstream>
 
 #include "igraph_community.h"
+#include "igraph_components.h"
 #include "igraph_interface.h"
 #include "igraph_interrupt_internal.h"
 
@@ -93,14 +94,14 @@ using namespace std;
  * \param merges Pointer to a matrix, the merges performed by the
  *     algorithm will be stored here (if not NULL). Each merge is a
  *     row in a two-column matrix and contains the ids of the merged
- *     clusters. Clusters are numbered from zero and cluster number 
+ *     clusters. Clusters are numbered from zero and cluster numbers 
  *     smaller than the number of nodes in the network belong to the
  *     individual vertices as singleton clusters. In each step a new
  *     cluster is created from two other clusters and its id will be 
  *     one larger than the largest cluster id so far. This means that 
  *     before the first merge we have \c n clusters (the number of
  *     vertices in the graph) numbered from zero to \c n-1. The first
- *     merge created cluster \c n, the second cluster \c n+1, etc.
+ *     merge creates cluster \c n, the second cluster \c n+1, etc.
  * \param modularity Pointer to a vector. If not NULL then the
  *     modularity score of the current clustering is stored here after
  *     each merge operation. 
@@ -140,7 +141,10 @@ int igraph_community_walktrap(const igraph_t *graph,
       IGRAPH_ERROR("isolated vertex found in graph", IGRAPH_EINVAL);
   
   if (merges) {
-    IGRAPH_CHECK(igraph_matrix_resize(merges, no_of_nodes-1, 2));
+    igraph_integer_t no;
+    IGRAPH_CHECK(igraph_clusters(graph, /*membership=*/ 0, /*csize=*/ 0, 
+				 &no, IGRAPH_WEAK));
+    IGRAPH_CHECK(igraph_matrix_resize(merges, no_of_nodes-no, 2));
   }
   if (modularity) {
     IGRAPH_CHECK(igraph_vector_resize(modularity, no_of_nodes));

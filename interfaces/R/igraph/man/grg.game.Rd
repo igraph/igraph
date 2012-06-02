@@ -5,7 +5,7 @@
 \description{Generate a random graph based on the distance of random
   point on a unit square}
 \usage{
-grg.game(nodes, radius, torus=FALSE, coords=FALSE)
+grg.game(nodes, radius, torus = FALSE, coords = FALSE)
 }
 \arguments{
   \item{nodes}{The number of vertices in the graph.}
@@ -29,7 +29,7 @@ grg.game(nodes, radius, torus=FALSE, coords=FALSE)
   attributes \sQuote{\code{x}} and \sQuote{\code{y}}.
 }
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}, first version was
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}, first version was
   written by Keith Briggs \email{keith.briggs@bt.com}}
 \seealso{\code{\link{random.graph.game}}}
 \examples{

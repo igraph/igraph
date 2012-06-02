@@ -1,6 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
+   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    Copyright (C) 2006 Elliot Paquette <Elliot.Paquette05@kzoo.edu>
    Kalamazoo College, 1200 Academy st, Kalamazoo, MI
 

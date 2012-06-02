@@ -30,7 +30,7 @@ layout.reingold.tilford(graph, \dots, params)
 layout.fruchterman.reingold.grid(graph, \dots, params)
 layout.lgl(graph, \dots, params)
 layout.graphopt(graph, ..., params=list())
-layout.mds(graph, d=shortest.paths(graph), ...)
+layout.mds(graph, dist=NULL, dim=2, options=igraph.arpack.default)
 layout.svd(graph, d=shortest.paths(graph), ...)
 layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
       zmin = NULL, zmax = NULL)
@@ -40,12 +40,22 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
   \item{params}{The list of function dependent parameters.}
   \item{dim}{Numeric constant, either 2 or 3. Some functions are able
     to generate 2d and 3d layouts as well, supply this argument to
-    change the default behavior.}
+    change the default behavior.
+
+    \code{layout.mds} supports dimensions up to the number of nodes
+    minus one, but only if the graph is connected; for undirected
+    graphs, the only possible values is 2. This is because
+    \code{layout.merge} only works in 2D.}
   \item{\dots}{Function dependent parameters, this is an alternative
     notation to the \code{params} argument. For \code{layout.auto} these
     extra parameters are simply passed to the real layout function, if
     one is called.}
-  \item{d}{The matrix used for multidimansional scaling. By default it
+  \item{dist}{The distance matrix for the multidimensional scaling.
+    If \code{NULL} (the default), then the unweighted shortest path
+    matrix is used.}
+  \item{options}{A named list, to override some ARPACK options. See
+    \code{\link{arpack}} for details.}
+  \item{d}{The matrix used for singulat value decomposition. By default it
     is the distance matrix of the graph.}
   \item{layout}{A matrix with two or three columns, the layout to
     normalize.}
@@ -106,6 +116,21 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
     \item{weights}{A vector giving edge weights or \code{NULL}. If not
       \code{NULL} then the attraction along the edges will be multiplied
       by the given edge weights (\code{NULL}).}
+    \item{minx}{If not \code{NULL}, then it must be a numeric vector
+      that gives lower boundaries for the \sQuote{x} coordinates of the
+      vertices. The length of the vector must match the number of
+      vertices in the graph.}
+    \item{maxx}{Similar to \code{minx}, but gives the upper boundaries.}
+    \item{miny}{Similar to \code{minx}, but gives the lower boundaries
+      of the \sQuote{y} coordinates.}
+    \item{maxy}{Similar to \code{minx}, but gives the upper boundaries
+      of the \sQuote{y} coordinates.}    
+    \item{minz}{Similar to \code{minx}, but gives the lower boundaries
+      of the \sQuote{z} coordinates, if the \code{dim} argument is
+      3. Otherwise it is ignored.}
+    \item{maxz}{Similar to \code{minx}, but gives the upper boundaries
+      of the \sQuote{z} coordinates, if the \code{dim} argument is
+      3. Otherwise it is ignored.}    
   }
   This function was ported from the SNA package.
 
@@ -119,6 +144,21 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
     \item{coolexp}{The cooling exponent (0.99).}
     \item{kkconst}{Sets the Kamada-Kawai vertex attraction
       constant (vcount(graph)**2).}
+    \item{minx}{If not \code{NULL}, then it must be a numeric vector
+      that gives lower boundaries for the \sQuote{x} coordinates of the
+      vertices. The length of the vector must match the number of
+      vertices in the graph.}
+    \item{maxx}{Similar to \code{minx}, but gives the upper boundaries.}
+    \item{miny}{Similar to \code{minx}, but gives the lower boundaries
+      of the \sQuote{y} coordinates.}
+    \item{maxy}{Similar to \code{minx}, but gives the upper boundaries
+      of the \sQuote{y} coordinates.}    
+    \item{minz}{Similar to \code{minx}, but gives the lower boundaries
+      of the \sQuote{z} coordinates, if the \code{dim} argument is
+      3. Otherwise it is ignored.}
+    \item{maxz}{Similar to \code{minx}, but gives the upper boundaries
+      of the \sQuote{z} coordinates, if the \code{dim} argument is
+      3. Otherwise it is ignored.}    
   }
   This function performs very well for connected graphs, but it gives
   poor results for unconnected ones.
@@ -234,8 +274,7 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
   
   \code{layout.mds} uses metric multidimensional scaling for generating
   the coordinates. This function does not have the usual \code{params}
-  argument. It can just take a single argument, the distance matrix used
-  for multidimensional scaling. This function generates the layout
+  argument. This function generates the layout
   separately for each graph component and then merges them via
   \code{\link{layout.merge}}. \code{layout.mds} is an \emph{experimental}
   function currently.
@@ -266,11 +305,27 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
   Reingold, E and Tilford, J (1981). Tidier drawing of trees.
   \emph{IEEE Trans. on Softw. Eng.}, SE-7(2):223--228.
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{layout.drl}}, \code{\link{plot.igraph}}, \code{\link{tkplot}}}
 \examples{
 g <- graph.ring(10)
 layout.random(g)
 layout.kamada.kawai(g)
+
+# Fixing ego
+g <- ba.game(20, m=2)
+minC <- rep(-Inf, vcount(g))
+maxC <- rep(Inf, vcount(g))
+minC[1] <- maxC[1] <- 0
+co <- layout.fruchterman.reingold(g, minx=minC, maxx=maxC,
+                                  miny=minC, maxy=maxC)
+co[1,]
+\dontrun{plot(g, layout=co, vertex.size=30, edge.arrow.size=0.2,
+     vertex.label=c("ego", rep("", vcount(g)-1)), rescale=FALSE,
+     xlim=range(co[,1]), ylim=range(co[,2]), vertex.label.dist=1,
+     vertex.label.color="red")
+axis(1)
+axis(2)
+}
 }
 \keyword{graphs}

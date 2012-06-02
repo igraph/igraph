@@ -259,7 +259,8 @@ class Plot(object):
             ctx.fill()
 
         for obj, bbox, palette, opacity, args, kwds in self._objects:
-            palette = palette or self._palette
+            if palette is None:
+                palette = getattr(obj, "_default_palette", self._palette)
             plotter = getattr(obj, "__plot__", None)
             if plotter is None:
                 warn("%s does not support plotting" % obj)

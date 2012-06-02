@@ -1,5 +1,5 @@
-\name{all.st.mincuts}
-\alias{all.st.mincuts}
+\name{stMincuts}
+\alias{stMincuts}
 \concept{Edge cuts}
 \concept{(s,t)-cuts}
 \concept{Minimum cuts}
@@ -10,7 +10,7 @@
   \eqn{s} and \eqn{t}.
 }
 \usage{
-all.st.mincuts(graph, source, target, capacity = NULL)
+stMincuts(graph, source, target, capacity = NULL)
 }
 \arguments{
   \item{graph}{The input graph. It must be directed.}
@@ -52,12 +52,12 @@ all.st.mincuts(graph, source, target, capacity = NULL)
 }
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{
-  \code{\link{all.st.cuts}}, \code{\link{minimum.size.separators}}
+  \code{\link{stCuts}}, \code{\link{minimum.size.separators}}
 }
 \examples{
 # A difficult graph, from the Provan-Shier paper
 g <- graph.formula(s --+ a:b, a:b --+ t,
                    a --+ 1:2:3:4:5, 1:2:3:4:5 --+ b)
-all.st.mincuts(g, source="s", target="t")
+stMincuts(g, source="s", target="t")
 }
 \keyword{graphs}

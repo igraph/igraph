@@ -22,7 +22,7 @@ igraphdemo(which)
 }
 \value{Returns \code{NULL}, invisibly.}
 %\references{}
-\author{Gabor Csardi \email{Gabor.Csardi@unil.ch}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{demo}}}
 \examples{
 igraphdemo()

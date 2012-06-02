@@ -42,7 +42,7 @@
   MEJ Newman and M Girvan: Finding and evaluating community
   structure in networks. Physical Review E 69 026113, 2004.
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{
   \code{\link{walktrap.community}},
   \code{\link{edge.betweenness.community}},

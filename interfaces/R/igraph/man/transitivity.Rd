@@ -97,7 +97,7 @@ transitivity(graph, type=c("undirected", "global", "globalundirected",
   Vespignani: The architecture of complex weighted networks,
   Proc. Natl. Acad. Sci. USA 101, 3747 (2004)
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 % \seealso{}
 \examples{
 g <- graph.ring(10)

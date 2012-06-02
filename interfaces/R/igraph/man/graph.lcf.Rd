@@ -18,7 +18,7 @@ graph.lcf(n, shifts, repeats)
 }
 %\details{}
 \value{A graph object.}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{ \code{\link{graph}} can create arbitrary graphs, see also the other
   functions on the its manual page for creating special graphs.
 }

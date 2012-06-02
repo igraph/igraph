@@ -1,6 +1,6 @@
 
-R version 2.12.0 (2010-10-15)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
@@ -17,15 +17,15 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > 
-> library(igraph)
+> library(igraph) ; igraph.options(print.full=TRUE)
 > 
 > ## named edges
 > igraph.options(print.edge.attributes = TRUE)
 > g <- graph.ring(10)
 > E(g)$name <- letters[1:ecount(g)]
 > delete.edges(g, c("b", "d", "e"))
-IGRAPH U--- 10 7 -- 
-+ attr: name (e/c)
+IGRAPH U--- 10 7 -- Ring graph
++ attr: name (g/c), mutual (g/x), circular (g/x), name (e/c)
 + edges and their attributes:
         edge
 ['a']  1-- 2
@@ -40,15 +40,16 @@ IGRAPH U--- 10 7 --
 > g <- graph.ring(10)
 > V(g)$name <- letters[1:vcount(g)]
 > delete.edges(g, c("a|b", "f|g", "c|b"))
-IGRAPH UN-- 10 7 -- 
-+ attr: name (v/c)
+IGRAPH UN-- 10 7 -- Ring graph
++ attr: name (g/c), mutual (g/x), circular (g/x), name (v/c)
 + edges (vertex names):
 [1] c--d d--e e--f g--h h--i i--j a--j
 > 
 > ## no names at all, but select edges based on vertices
 > g <- graph.ring(10)
 > delete.edges(g, c("1|2", "8|7", "1|10"))
-IGRAPH U--- 10 7 -- 
+IGRAPH U--- 10 7 -- Ring graph
++ attr: name (g/c), mutual (g/x), circular (g/x)
 + edges:
 [1] 2-- 3 3-- 4 4-- 5 5-- 6 6-- 7 8-- 9 9--10
 > 
@@ -57,8 +58,9 @@ IGRAPH U--- 10 7 --
 > V(g)$name <- letters[1:vcount(g)]
 > E(g)$name <- LETTERS[1:ecount(g)]
 > delete.edges(g, c("a|b", "F", "j|i"))
-IGRAPH UN-- 10 7 -- 
-+ attr: name (v/c), name (e/c)
+IGRAPH UN-- 10 7 -- Ring graph
++ attr: name (g/c), mutual (g/x), circular (g/x), name (v/c), name
+  (e/c)
 + edges (vertex names) and their attributes:
       edge
 ['B'] b--c
@@ -69,3 +71,6 @@ IGRAPH UN-- 10 7 --
 ['H'] h--i
 ['J'] a--j
 > 
+> proc.time()
+   user  system elapsed 
+  0.307   0.039   0.351 

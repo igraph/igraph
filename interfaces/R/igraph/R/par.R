@@ -1,7 +1,7 @@
 
 #   IGraph R package
-#   Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
-#   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+#   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
+#   334 Harvard street, Cambridge, MA 02139 USA
 #   
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -27,7 +27,12 @@
                     "vertex.attr.comb"=list(name="concat", "ignore"),
                     "edge.attr.comb"=list(weight="sum", name="concat",
                       "ignore"),
-                     "sparsematrices"=TRUE
+                     "sparsematrices"=TRUE,
+                     "nexus.url"="http://nexus.igraph.org",
+                     "add.params"=TRUE,
+                     "add.vertex.names"=TRUE,
+                     "dend.plot.type"="auto",
+                     "print.full"=FALSE
                     )
 
 igraph.pars.set.verbose <- function(verbose) {

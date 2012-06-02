@@ -1,7 +1,7 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2011  Gabor Csardi <csardi.gabor@gmail.com>
+   Copyright (C) 2011-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge MA, 02139 USA
    
    This program is free software; you can redistribute it and/or modify
@@ -157,6 +157,14 @@ void *thread_function(void *arg) {
   for (i=0; i<options.n; i++) {
     VECTOR(*result)[i] = v[i];
   }
+
+  free(v);
+  free(workl);
+  free(workd);
+  free(d);
+  free(resid);
+  free(ax);
+  free(select);
 
   return 0;
 }

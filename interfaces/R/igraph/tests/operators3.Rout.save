@@ -1,6 +1,6 @@
 
-R version 2.12.0 (2010-10-15)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
@@ -17,7 +17,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > 
-> library(igraph)
+> library(igraph) ; igraph.options(print.full=TRUE)
 > 
 > g <- graph.ring(10)
 > V(g)$name <- letters[1:10]
@@ -25,22 +25,25 @@ Type 'q()' to quit R.
 > 
 > g <- g - c("a", "b")
 > g
-IGRAPH UN-- 8 7 -- 
-+ attr: name (v/c), name (e/c)
+IGRAPH UN-- 8 7 -- Ring graph
++ attr: name (g/c), mutual (g/x), circular (g/x), name (v/c), name
+  (e/c)
 + edges (vertex names):
 [1] c--d d--e e--f f--g g--h h--i i--j
 > 
 > g <- g - edge("e|f")
 > g
-IGRAPH UN-- 8 6 -- 
-+ attr: name (v/c), name (e/c)
+IGRAPH UN-- 8 6 -- Ring graph
++ attr: name (g/c), mutual (g/x), circular (g/x), name (v/c), name
+  (e/c)
 + edges (vertex names):
 [1] c--d d--e f--g g--h h--i i--j
 > 
 > g <- g - edge("H")
 > g
-IGRAPH UN-- 8 5 -- 
-+ attr: name (v/c), name (e/c)
+IGRAPH UN-- 8 5 -- Ring graph
++ attr: name (g/c), mutual (g/x), circular (g/x), name (v/c), name
+  (e/c)
 + edges (vertex names):
 [1] c--d d--e f--g g--h i--j
 > 
@@ -49,20 +52,23 @@ IGRAPH UN-- 8 5 --
 > 
 > g <- g - path("a", "b", "c", "d")
 > g
-IGRAPH UN-- 10 7 -- 
-+ attr: name (v/c)
+IGRAPH UN-- 10 7 -- Ring graph
++ attr: name (g/c), mutual (g/x), circular (g/x), name (v/c)
 + edges (vertex names):
 [1] d--e e--f f--g g--h h--i i--j a--j
 > 
 > g - V(g)[c('d', 'g')]
-IGRAPH UN-- 8 4 -- 
-+ attr: name (v/c)
+IGRAPH UN-- 8 4 -- Ring graph
++ attr: name (g/c), mutual (g/x), circular (g/x), name (v/c)
 + edges (vertex names):
 [1] e--f h--i i--j a--j
 > 
 > g - E(g)['f' %--% 'g']
-IGRAPH UN-- 10 6 -- 
-+ attr: name (v/c)
+IGRAPH UN-- 10 6 -- Ring graph
++ attr: name (g/c), mutual (g/x), circular (g/x), name (v/c)
 + edges (vertex names):
 [1] d--e e--f g--h h--i i--j a--j
 > 
+> proc.time()
+   user  system elapsed 
+  0.305   0.039   0.395 

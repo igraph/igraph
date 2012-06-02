@@ -1,5 +1,5 @@
 
-library(igraph)
+library(igraph) ; igraph.options(print.full=TRUE)
 
 g <- graph.ring(5)
 summary(g)

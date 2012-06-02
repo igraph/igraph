@@ -1,7 +1,7 @@
 
 #   IGraph R package
-#   Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
-#   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+#   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
+#   334 Harvard street, Cambridge, MA 02139 USA
 #   
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ get.adjacency.dense <- function(graph, type=c("both", "upper", "lower"),
     if (! attr %in% list.edge.attributes(graph)) {
       stop("no such edge attribute")
     }
-    res <- matrix(0, nr=vcount(graph), nc=vcount(graph))
+    res <- matrix(0, nrow=vcount(graph), ncol=vcount(graph))
     if (is.directed(graph)) {
       for (i in seq(length=ecount(graph))) {
         e <- get.edge(graph, i)
@@ -105,21 +105,21 @@ get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
   }
 
   if (is.directed(graph)) {
-    res <- spMatrix(vc, vc, i=el[,1], j=el[,2], x=value)
+    res <- sparseMatrix(dims=c(vc, vc), i=el[,1], j=el[,2], x=value)
   } else {
     if (type=="upper") {
       ## upper
-      res <- spMatrix(vc, vc, i=pmin(el[,1],el[,2]),
-                      j=pmax(el[,1],el[,2]), x=value)
+      res <- sparseMatrix(dims=c(vc, vc), i=pmin(el[,1],el[,2]),
+                          j=pmax(el[,1],el[,2]), x=value)
     } else if (type=="lower") {
       ## lower
-      res <- spMatrix(vc, vc, i=pmax(el[,1],el[,2]),
-                      j=pmin(el[,1],el[,2]), x=value)
+      res <- sparseMatrix(dims=c(vc, vc), i=pmax(el[,1],el[,2]),
+                          j=pmin(el[,1],el[,2]), x=value)
     } else if (type=="both") {
       ## both
-      res <- spMatrix(vc, vc, i=pmin(el[,1],el[,2]),
-                      j=pmax(el[,1],el[,2]), x=value)
-      res <- forceSymmetric(res)
+      res <- sparseMatrix(dims=c(vc, vc), i=pmin(el[,1],el[,2]),
+                          j=pmax(el[,1],el[,2]), x=value, symmetric=TRUE)
+      res <- as(res, "dgCMatrix")
     }
   }
 
@@ -150,10 +150,10 @@ get.edgelist <- function(graph, names=TRUE) {
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- matrix(.Call("R_igraph_get_edgelist", graph, TRUE,
-                      PACKAGE="igraph"), nc=2)
+                      PACKAGE="igraph"), ncol=2)
   res <- res+1
   if (names && "name" %in% list.vertex.attributes(graph)) {
-    res <- matrix(V(graph)$name[ res ], nc=2)
+    res <- matrix(V(graph)$name[ res ], ncol=2)
   }
 
   res
@@ -207,7 +207,7 @@ igraph.from.graphNEL <- function(graphNEL, name=TRUE, weight=TRUE,
 
   require(graph)
 
-  if (!is(graphNEL, "graphNEL")) {
+  if (!inherits(graphNEL, "graphNEL")) {
     stop("Not a graphNEL graph")
   }
   

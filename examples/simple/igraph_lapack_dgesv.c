@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2010  Gabor Csardi <csardi.gabor@gmail.com>
-   Rue de l'Industrie 5, Lausanne 1005, Switzerland
+   Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard st, Cambridge MA, 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ int main() {
   igraph_lapack_dgesv(&A, /*ipiv=*/ 0, &RHS, &info);
 
   if (info != 0) { return 1;}
-  if (!igraph_matrix_is_equal(&B, &RHS)) { return 2; }
+  if (!igraph_matrix_all_e(&B, &RHS)) { return 2; }
   
   igraph_matrix_destroy(&A);
   igraph_matrix_destroy(&B);

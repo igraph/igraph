@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -156,7 +156,7 @@ igraph_real_t igraph_i_revolver_ml_D_f(const igraph_vector_t *par,
 
   igraph_i_revolver_ml_D_data_t *data=extra;
   
-  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+  if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_D_eval(par, data);
   }
 
@@ -173,7 +173,7 @@ void igraph_i_revolver_ml_D_df(const igraph_vector_t *par,
 
   igraph_i_revolver_ml_D_data_t *data=extra;
 
-  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+  if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_D_eval(par, data);
   }
 
@@ -503,9 +503,8 @@ igraph_real_t igraph_i_revolver_ml_DE_f(const igraph_vector_t *par,
 					void *extra) {
 
   igraph_i_revolver_ml_DE_data_t *data=extra;
-  long int i;
   
-  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+  if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_DE_eval(par, data);
   }
 
@@ -513,12 +512,12 @@ igraph_real_t igraph_i_revolver_ml_DE_f(const igraph_vector_t *par,
     IGRAPH_WARNING("Target function evaluated to non-finite value.");
   }
   
-  printf("eval (");
-  for (i=0; i<igraph_vector_size(par); i++) {
-    printf("%f ", VECTOR(*par)[i]);
-  }
-  printf(" ): ");
-  printf("%g\n", data->lastf);
+  /* printf("eval ("); */
+  /* for (i=0; i<igraph_vector_size(par); i++) { */
+  /*   printf("%f ", VECTOR(*par)[i]); */
+  /* } */
+  /* printf(" ): "); */
+  /* printf("%g\n", data->lastf); */
   return data->lastf;
 }
 
@@ -527,22 +526,21 @@ void igraph_i_revolver_ml_DE_df(const igraph_vector_t *par,
 				igraph_vector_t *res, void *extra) {
 
   igraph_i_revolver_ml_DE_data_t *data=extra;
-  long int i;
   
-  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+  if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_DE_eval(par, data);
   }
   
   igraph_vector_update(res, &data->lastgrad);
-  printf("derivative (");
-  for (i=0; i<igraph_vector_size(par); i++) {
-    printf("%f ", VECTOR(*par)[i]);
-  }
-  printf(" ): ");
-  for (i=0; i<igraph_vector_size(res); i++) {
-    printf("%f ", VECTOR(*res)[i]);
-  }
-  printf("\n");
+  /* printf("derivative ("); */
+  /* for (i=0; i<igraph_vector_size(par); i++) { */
+  /*   printf("%f ", VECTOR(*par)[i]); */
+  /* } */
+  /* printf(" ): "); */
+  /* for (i=0; i<igraph_vector_size(res); i++) { */
+  /*   printf("%f ", VECTOR(*res)[i]); */
+  /* } */
+  /* printf("\n"); */
 }
 
 void igraph_i_revolver_ml_DE_free(igraph_vector_ptr_t *ptr) {
@@ -855,9 +853,8 @@ igraph_real_t igraph_i_revolver_ml_AD_f(const igraph_vector_t *par,
 					void *extra) {
 
   igraph_i_revolver_ml_AD_data_t *data=extra;
-  long int i;
   
-  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+  if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_AD_eval(par, data);
   }
 
@@ -865,12 +862,12 @@ igraph_real_t igraph_i_revolver_ml_AD_f(const igraph_vector_t *par,
     IGRAPH_WARNING("Target function evaluated to non-finite value.");
   }
   
-  printf("eval (");
-  for (i=0; i<igraph_vector_size(par); i++) {
-    printf("%f ", VECTOR(*par)[i]);
-  }
-  printf(" ): ");
-  printf("%g\n", data->lastf);
+  /* printf("eval ("); */
+  /* for (i=0; i<igraph_vector_size(par); i++) { */
+  /*   printf("%f ", VECTOR(*par)[i]); */
+  /* } */
+  /* printf(" ): "); */
+  /* printf("%g\n", data->lastf); */
   return data->lastf;
 }
 
@@ -879,22 +876,21 @@ void igraph_i_revolver_ml_AD_df(const igraph_vector_t *par,
 				igraph_vector_t *res, void *extra) {
 
   igraph_i_revolver_ml_AD_data_t *data=extra;
-  long int i;
   
-  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+  if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_AD_eval(par, data);
   }
   
   igraph_vector_update(res, &data->lastgrad);
-  printf("derivative (");
-  for (i=0; i<igraph_vector_size(par); i++) {
-    printf("%f ", VECTOR(*par)[i]);
-  }
-  printf(" ): ");
-  for (i=0; i<igraph_vector_size(res); i++) {
-    printf("%f ", VECTOR(*res)[i]);
-  }
-  printf("\n");
+  /* printf("derivative ("); */
+  /* for (i=0; i<igraph_vector_size(par); i++) { */
+  /*   printf("%f ", VECTOR(*par)[i]); */
+  /* } */
+  /* printf(" ): "); */
+  /* for (i=0; i<igraph_vector_size(res); i++) { */
+  /*   printf("%f ", VECTOR(*res)[i]); */
+  /* } */
+  /* printf("\n"); */
 }
 
 void igraph_i_revolver_ml_AD_free(igraph_vector_ptr_t *ptr) {
@@ -1297,9 +1293,8 @@ igraph_real_t igraph_i_revolver_ml_ADE_f(const igraph_vector_t *par,
 					 void *extra) {
 
   igraph_i_revolver_ml_ADE_data_t *data=extra;
-  long int i;
   
-  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+  if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_ADE_eval(par, data);
   }
 
@@ -1307,12 +1302,12 @@ igraph_real_t igraph_i_revolver_ml_ADE_f(const igraph_vector_t *par,
     IGRAPH_WARNING("Target function evaluated to non-finite value.");
   }
   
-  printf("eval (");
-  for (i=0; i<igraph_vector_size(par); i++) {
-    printf("%f ", VECTOR(*par)[i]);
-  }
-  printf(" ): ");
-  printf("%g\n", data->lastf);
+  /* printf("eval ("); */
+  /* for (i=0; i<igraph_vector_size(par); i++) { */
+  /*   printf("%f ", VECTOR(*par)[i]); */
+  /* } */
+  /* printf(" ): "); */
+  /* printf("%g\n", data->lastf); */
   return data->lastf;
 }
 
@@ -1321,22 +1316,21 @@ void igraph_i_revolver_ml_ADE_df(const igraph_vector_t *par,
 				 igraph_vector_t *res, void *extra) {
 
   igraph_i_revolver_ml_ADE_data_t *data=extra;
-  long int i;
   
-  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+  if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_ADE_eval(par, data);
   }
   
   igraph_vector_update(res, &data->lastgrad);
-  printf("derivative (");
-  for (i=0; i<igraph_vector_size(par); i++) {
-    printf("%f ", VECTOR(*par)[i]);
-  }
-  printf(" ): ");
-  for (i=0; i<igraph_vector_size(res); i++) {
-    printf("%f ", VECTOR(*res)[i]);
-  }
-  printf("\n");
+  /* printf("derivative ("); */
+  /* for (i=0; i<igraph_vector_size(par); i++) { */
+  /*   printf("%f ", VECTOR(*par)[i]); */
+  /* } */
+  /* printf(" ): "); */
+  /* for (i=0; i<igraph_vector_size(res); i++) { */
+  /*   printf("%f ", VECTOR(*res)[i]); */
+  /* } */
+  /* printf("\n"); */
 }
 
 void igraph_i_revolver_ml_ADE_free(igraph_vector_ptr_t *ptr) {

@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard st, Cambridge MA, 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -59,9 +59,11 @@ igraph_bool_t check_laplacian(igraph_t* graph, igraph_matrix_t* matrix, igraph_v
 
 int test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
   igraph_t g;
-  igraph_matrix_t m;
+  igraph_matrix_t m, m2;
+  igraph_sparsemat_t sm;
   igraph_vector_t vec, *weights = 0;
   igraph_matrix_init(&m, 1, 1);
+  igraph_sparsemat_init(&sm, 0, 0, 0);
 
   if (w) {
     weights = (igraph_vector_t*)calloc(1, sizeof(igraph_vector_t));
@@ -70,7 +72,13 @@ int test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
 
   /* No loop or multiple edges */
   igraph_ring(&g, 5, dir, 0, 1);
-  igraph_laplacian(&g, &m, 0, weights);
+  igraph_laplacian(&g, &m, &sm, 0, weights);
+  igraph_matrix_init(&m2, 0, 0);
+  igraph_sparsemat_as_matrix(&m2, &sm);
+  if (!igraph_matrix_all_e_tol(&m, &m2, 0)) { 
+    return 41;
+  }
+  igraph_matrix_destroy(&m2);
   igraph_matrix_print(&m);
   printf("===\n");
 
@@ -83,7 +91,13 @@ int test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
     igraph_vector_push_back(weights, 2);
   }
 
-  igraph_laplacian(&g, &m, 0, weights);
+  igraph_laplacian(&g, &m, &sm, 0, weights);
+  igraph_matrix_init(&m2, 0, 0);
+  igraph_sparsemat_as_matrix(&m2, &sm);
+  if (!igraph_matrix_all_e_tol(&m, &m2, 0)) { 
+    return 42;
+  }
+  igraph_matrix_destroy(&m2);
   igraph_matrix_print(&m);
   printf("===\n");
 
@@ -96,7 +110,13 @@ int test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
     igraph_vector_push_back(weights, 3);
   }
 
-  igraph_laplacian(&g, &m, 0, weights);
+  igraph_laplacian(&g, &m, &sm, 0, weights);
+  igraph_matrix_init(&m2, 0, 0);
+  igraph_sparsemat_as_matrix(&m2, &sm);
+  if (!igraph_matrix_all_e_tol(&m, &m2, 0)) { 
+    return 43;
+  }
+  igraph_matrix_destroy(&m2);
   igraph_matrix_print(&m);
 
   igraph_destroy(&g);
@@ -111,10 +131,12 @@ int test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
 
 int test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
   igraph_t g;
-  igraph_matrix_t m;
+  igraph_matrix_t m, m2;
+  igraph_sparsemat_t sm;
   igraph_vector_t vec, *weights = 0;
-  igraph_matrix_init(&m, 1, 1);
   igraph_bool_t ok = 1;
+  igraph_matrix_init(&m, 1, 1);
+  igraph_sparsemat_init(&sm, 0, 0, 0);
 
   if (w) {
     weights = (igraph_vector_t*)calloc(1, sizeof(igraph_vector_t));
@@ -123,7 +145,13 @@ int test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
 
   /* Undirected graph, no loop or multiple edges */
   igraph_ring(&g, 5, dir, 0, 1);
-  igraph_laplacian(&g, &m, 1, weights);
+  igraph_laplacian(&g, &m, &sm, 1, weights);
+  igraph_matrix_init(&m2, 0, 0);
+  igraph_sparsemat_as_matrix(&m2, &sm);
+  if (!igraph_matrix_all_e_tol(&m, &m2, 0)) { 
+    return 44;
+  }
+  igraph_matrix_destroy(&m2);
   ok = ok && check_laplacian(&g, &m, weights);
 
   /* Add some loop edges */
@@ -135,7 +163,13 @@ int test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
     igraph_vector_push_back(weights, 2);
   }
 
-  igraph_laplacian(&g, &m, 1, weights);
+  igraph_laplacian(&g, &m, &sm, 1, weights);
+  igraph_matrix_init(&m2, 0, 0);
+  igraph_sparsemat_as_matrix(&m2, &sm);
+  if (!igraph_matrix_all_e_tol(&m, &m2, 0)) { 
+    return 45;
+  }
+  igraph_matrix_destroy(&m2);
   ok = ok && check_laplacian(&g, &m, weights);
 
   /* Duplicate some edges */
@@ -147,7 +181,13 @@ int test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
     igraph_vector_push_back(weights, 3);
   }
 
-  igraph_laplacian(&g, &m, 1, weights);
+  igraph_laplacian(&g, &m, &sm, 1, weights);
+  igraph_matrix_init(&m2, 0, 0);
+  igraph_sparsemat_as_matrix(&m2, &sm);
+  if (!igraph_matrix_all_e_tol(&m, &m2, 0)) { 
+    return 46;
+  }
+  igraph_matrix_destroy(&m2);
   ok = ok && check_laplacian(&g, &m, weights);
 
   igraph_destroy(&g);

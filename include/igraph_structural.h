@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2009  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@
 #include "igraph_datatype.h"
 #include "igraph_iterators.h"
 #include "igraph_attributes.h"
+#include "igraph_sparsemat.h"
 
 __BEGIN_DECLS
 
@@ -130,11 +131,15 @@ int igraph_transitive_closure_dag(const igraph_t *graph,
 int igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *result,
         const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
 
+int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
+		     igraph_vector_t *res, const igraph_vs_t vs);
+
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
 /* -------------------------------------------------- */
 
 int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
+		     igraph_sparsemat_t *sparseres,
 		     igraph_bool_t normalized, 
 		     const igraph_vector_t *weights);
 

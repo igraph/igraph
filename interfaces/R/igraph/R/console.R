@@ -1,7 +1,7 @@
 
 #   IGraph R package
-#   Copyright (C) 2010  Gabor Csardi <csardi.gabor@gmail.com>
-#   Rue de l'Industrie 5, Lausanne 1005, Switzerland
+#   Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
+#   334 Harvard street, Cambridge, MA 02139 USA
 #   
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@
     close(pb);
     pb <- NULL
   }
-  assign(".igraph.pb", pb, env=asNamespace("igraph"))
+  assign(".igraph.pb", pb, envir=asNamespace("igraph"))
   0L
 }
 
@@ -78,7 +78,7 @@
     close(pb);
     pb <- NULL
   }
-  assign(".igraph.pb", pb, env=asNamespace("igraph"))
+  assign(".igraph.pb", pb, envir=asNamespace("igraph"))
   0L
 }
 
@@ -98,7 +98,7 @@
   tcl("update", "idletasks")
   
   ## Done
-  assign(".igraph.pb", pb, env=asNamespace("igraph"))  
+  assign(".igraph.pb", pb, envir=asNamespace("igraph"))  
   if (startmess) .igraph.progress.tkconsole.message("Console started.\n")
   0L
 }
@@ -148,7 +148,7 @@
     if (!is.na(oldverb) && getIgraphOpt("verbose") == "tkconsole") {
       igraph.options(verbose=oldverb)
     }
-    assign(".igraph.pb", NULL, env=asNamespace("igraph"))
+    assign(".igraph.pb", NULL, envir=asNamespace("igraph"))
   })
   
   res <- list(top=console, txt=txt, pb=pbar$pb, oldverb=oldverb)
@@ -161,7 +161,7 @@
   if (is.null(txt)) {
     if (start) {
       pb <- .igraph.progress.tkconsole.create(NA)
-      assign(".igraph.pb", pb, env=asNamespace("igraph"))
+      assign(".igraph.pb", pb, envir=asNamespace("igraph"))
       txt <- pb$txt
     } else { 
       return()
@@ -220,7 +220,7 @@ igraph.console <- function() {
   oldverb <- getIgraphOpt("verbose")
   igraph.options(verbose="tkconsole")
   pb <- .igraph.progress.tkconsole.create(oldverb)
-  assign(".igraph.pb", pb, env=asNamespace("igraph"))  
+  assign(".igraph.pb", pb, envir=asNamespace("igraph"))  
   .igraph.progress.tkconsole.message("Console started.\n")
   invisible()
 }

@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include "igraph_types_internal.h"
 #include "igraph_complex.h"
 #include "config.h"
+#include <float.h>
 
 #define BASE_IGRAPH_REAL
 #include "igraph_pmt.h"
@@ -260,46 +261,32 @@ int igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
   return 0;
 }
 
+#ifndef USING_R
 int igraph_vector_complex_print(const igraph_vector_complex_t *v) {
   long int i, n=igraph_vector_complex_size(v);
   if (n!=0) {
     igraph_complex_t z=VECTOR(*v)[0];
-    if (IGRAPH_IMAG(z) > 0) { 
-      printf("%g+%g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-    } else {
-      printf("%g-%g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-    }
+    printf("%g%+gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
   }
   for (i=1; i<n; i++) {
     igraph_complex_t z=VECTOR(*v)[i];
-    if (IGRAPH_IMAG(z) > 0) { 
-      printf(" %g+%g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-    } else {
-      printf(" %g-%g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-    }
+    printf(" %g%+gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
   }
   printf("\n");
   return 0;
 }
+#endif
 
 int igraph_vector_complex_fprint(const igraph_vector_complex_t *v, 
 				 FILE *file) {
   long int i, n=igraph_vector_complex_size(v);
   if (n!=0) {
     igraph_complex_t z=VECTOR(*v)[0];
-    if (IGRAPH_IMAG(z) > 0) { 
-      fprintf(file, "%g+%g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-    } else {
-      fprintf(file, "%g-%g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-    }
+    fprintf(file, "%g%+g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
   }
   for (i=1; i<n; i++) {
     igraph_complex_t z=VECTOR(*v)[i];
-    if (IGRAPH_IMAG(z) > 0) { 
-      fprintf(file, " %g+%g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-    } else {
-      fprintf(file, " %g-%g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-    }
+    fprintf(file, " %g%+g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
   }
   fprintf(file, "\n");
   return 0;
@@ -376,4 +363,29 @@ int igraph_vector_complex_create_polar(igraph_vector_complex_t *v,
   }
 
   return 0;
+}
+
+igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
+				  const igraph_vector_t *rhs,
+				  igraph_real_t tol) {
+  long int i, s;
+  assert(lhs != 0);
+  assert(rhs != 0);
+  assert(lhs->stor_begin != 0);
+  assert(rhs->stor_begin != 0);
+
+  s=igraph_vector_size(lhs);
+  if (s != igraph_vector_size(rhs)) {
+    return 0;
+  } else {
+    if (tol==0) { tol=DBL_EPSILON; }
+    for (i=0; i<s; i++) {
+      igraph_real_t l=VECTOR(*lhs)[i];
+      igraph_real_t r=VECTOR(*rhs)[i];
+      if (l < r-tol || l > r+tol) {
+	return 0;
+      }
+    }
+    return 1;
+  }  
 }

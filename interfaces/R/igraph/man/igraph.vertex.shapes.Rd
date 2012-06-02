@@ -66,7 +66,7 @@
   In \sQuote{plotting} mode the return value of the shape function is
   not used.
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{ \code{\link{igraph.plotting}}, \code{\link{plot.igraph}} }
 \examples{
 \dontrun{

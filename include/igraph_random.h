@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2003, 2004, 2005  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ typedef struct igraph_rng_type_t {
   igraph_real_t (*get_norm)(void *state);
   igraph_real_t (*get_geom)(void *state, igraph_real_t p);
   igraph_real_t (*get_binom)(void *state, long int n, igraph_real_t p);
+  igraph_real_t (*get_exp)(void *state, igraph_real_t rate);
 } igraph_rng_type_t;
 
 typedef struct igraph_rng_t {
@@ -83,7 +84,9 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng);
 igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p);
 igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n, 
 				   igraph_real_t p);
+igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
 unsigned long int igraph_rng_get_int31(igraph_rng_t *rng);
+igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
 
 /* --------------------------------- */
 

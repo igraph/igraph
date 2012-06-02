@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ int FUNCTION(igraph_matrix,init)(TYPE(igraph_matrix) *m,
 int FUNCTION(igraph_matrix,copy)(TYPE(igraph_matrix) *to, 
 				 const TYPE(igraph_matrix) *from);
 void FUNCTION(igraph_matrix,destroy)(TYPE(igraph_matrix) *m);
+long int FUNCTION(igraph_matrix,capacity)(const TYPE(igraph_matrix) *m);
 
 /*--------------------*/
 /* Accessing elements */
@@ -134,6 +135,21 @@ int FUNCTION(igraph_matrix,which_minmax)(const TYPE(igraph_matrix) *m,
 					 long int *imin, long int *jmin,
 					 long int *imax, long int *jmax);
 
+/*------------------------------*/
+/* Comparison                   */
+/*------------------------------*/
+
+igraph_bool_t FUNCTION(igraph_matrix,all_e)(const TYPE(igraph_matrix) *lhs, 
+					    const TYPE(igraph_matrix) *rhs);
+igraph_bool_t FUNCTION(igraph_matrix,all_l)(const TYPE(igraph_matrix) *lhs, 
+					    const TYPE(igraph_matrix) *rhs);
+igraph_bool_t FUNCTION(igraph_matrix,all_g)(const TYPE(igraph_matrix) *lhs, 
+					    const TYPE(igraph_matrix) *rhs);
+igraph_bool_t FUNCTION(igraph_matrix,all_le)(const TYPE(igraph_matrix) *lhs, 
+					     const TYPE(igraph_matrix) *rhs);
+igraph_bool_t FUNCTION(igraph_matrix,all_ge)(const TYPE(igraph_matrix) *lhs, 
+					     const TYPE(igraph_matrix) *rhs);
+
 /*-------------------*/
 /* Matrix properties */
 /*-------------------*/
@@ -172,6 +188,7 @@ igraph_bool_t FUNCTION(igraph_matrix,search)(const TYPE(igraph_matrix) *m,
 
 int FUNCTION(igraph_matrix,resize)(TYPE(igraph_matrix) *m, 
 				   long int nrow, long int ncol);
+int FUNCTION(igraph_matrix,resize_min)(TYPE(igraph_matrix) *m);
 int FUNCTION(igraph_matrix,add_cols)(TYPE(igraph_matrix) *m, long int n);
 int FUNCTION(igraph_matrix,add_rows)(TYPE(igraph_matrix) *m, long int n);
 int FUNCTION(igraph_matrix,remove_col)(TYPE(igraph_matrix) *m, long int col);

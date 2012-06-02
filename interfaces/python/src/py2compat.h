@@ -3,8 +3,7 @@
 
 /* 
    IGraph library.
-   Copyright (C) 2006-2010  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2006-2012  Tamas Nepusz <ntamas@gmail.com>
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,6 +21,9 @@
    02110-1301 USA
 
 */
+
+#ifndef PY_IGRAPH_PY2COMPAT_H
+#define PY_IGRAPH_PY2COMPAT_H
 
 #include <Python.h>
 
@@ -71,6 +73,8 @@ int PyString_IsEqualToUTF8String(PyObject* py_string,
 
 #ifndef PyVarObject_HEAD_INIT
 #  define PyVarObject_HEAD_INIT(type, size) PyObject_HEAD_INIT(type) size,
+#endif
+
 #endif
 
 char* PyString_CopyAsString(PyObject* string);

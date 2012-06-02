@@ -2,8 +2,8 @@
 /* vim:set ts=2 sts=2 sw=2 et: */
 /* 
    IGraph library.
-   Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -4696,6 +4696,10 @@ int igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegraph) {
  * is the same as the source of the second vertex's corresponding edge.
  * 
  * </para><para>
+ * Edge \em i  in the original graph will correspond to vertex \em i
+ * in the line graph.
+ *
+ * </para><para>
  * The first version of this function was contributed by Vincent Matossian, 
  * thanks.
  * \param graph The input graph, may be directed or undirected.
@@ -6481,6 +6485,13 @@ int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
   long int maxdeg;
   igraph_vector_t deghist;
   igraph_real_t mynan=IGRAPH_NAN;
+  igraph_bool_t simple;
+
+  IGRAPH_CHECK(igraph_is_simple(graph, &simple));
+  if (!simple) {
+    IGRAPH_ERROR("Average nearest neighbor degree Works only with "
+		 "simple graphs", IGRAPH_EINVAL);
+  }
 
   if (weights) { 
     return igraph_i_avg_nearest_neighbor_degree_weighted(graph, vids, knn, knnk,
@@ -7083,5 +7094,93 @@ int igraph_transitive_closure_dag(const igraph_t *graph,
   igraph_vector_destroy(&new_edges);
   IGRAPH_FINALLY_CLEAN(1);
 
+  return 0;
+}
+
+/**
+ * \function igraph_diversity
+ * Structural diversity index of the vertices
+ * 
+ * This measure was defined in Nathan Eagle, Michael Macy and Rob
+ * Claxton: Network Diversity and Economic Development, Science 328,
+ * 1029--1031, 2010. 
+ * 
+ * </para><para>
+ * It is simply the (normalized) Shannon entropy of the
+ * incident edges' weights. D(i)=H(i)/log(k[i]), and 
+ * H(i) = -sum(p[i,j] log(p[i,j]), j=1..k[i]), 
+ * where p[i,j]=w[i,j]/sum(w[i,l], l=1..k[i]),  k[i] is the (total)
+ * degree of vertex i, and w[i,j] is the weight of the edge(s) between
+ * vertex i and j. 
+ * \param The input graph, edge directions are ignored.
+ * \param weights The edge weights, in the order of the edge ids, must
+ *    have appropriate length.
+ * \param res An initialized vector, the results are stored here.
+ * \param vids Vector with the vertex ids for which to calculate the
+ *    measure.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), linear.
+ * 
+ */
+
+int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
+		     igraph_vector_t *res, const igraph_vs_t vids) {
+
+  int no_of_nodes=igraph_vcount(graph);
+  int no_of_edges=igraph_ecount(graph);
+  igraph_vector_t incident;
+  igraph_vit_t vit;
+  igraph_real_t s, ent, w;
+  int i, j, k;
+
+  if (!weights) { 
+    IGRAPH_ERROR("Edge weights must be given", IGRAPH_EINVAL);
+  }
+
+  if (igraph_vector_size(weights) != no_of_edges) {
+    IGRAPH_ERROR("Invalid edge weight vector length", IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&incident, 10);
+
+  if (igraph_vs_is_all(&vids)) {
+    IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
+    for (i=0; i<no_of_nodes; i++) {
+      s = ent = 0.0;
+      IGRAPH_CHECK(igraph_incident(graph, &incident, i, /*mode=*/ IGRAPH_ALL));
+      for (j=0, k=igraph_vector_size(&incident); j<k; j++) {
+        w = VECTOR(*weights)[(long int)VECTOR(incident)[j]];
+        s += w;
+        ent += (w * log(w));
+      }
+      VECTOR(*res)[i] = (log(s) - ent / s) / log(k);
+    }
+  } else {
+    IGRAPH_CHECK(igraph_vector_resize(res, 0));
+    IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+
+    for (IGRAPH_VIT_RESET(vit), i=0; 
+         !IGRAPH_VIT_END(vit); 
+         IGRAPH_VIT_NEXT(vit), i++) {
+      long int v=IGRAPH_VIT_GET(vit);
+      s = ent = 0.0;
+      IGRAPH_CHECK(igraph_incident(graph, &incident, v, /*mode=*/ IGRAPH_ALL));
+      for (j=0, k=igraph_vector_size(&incident); j<k; j++) {
+        w = VECTOR(*weights)[(long int)VECTOR(incident)[j]];
+        s += w;
+        ent += (w * log(w));
+      }
+      IGRAPH_CHECK(igraph_vector_push_back(res, (log(s) - ent / s) / log(k)));
+    }
+
+    igraph_vit_destroy(&vit);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  igraph_vector_destroy(&incident);
+  IGRAPH_FINALLY_CLEAN(1);
+  
   return 0;
 }

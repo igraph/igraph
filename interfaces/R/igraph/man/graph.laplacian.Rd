@@ -4,7 +4,8 @@
 \title{Graph Laplacian}
 \description{The Laplacian of a graph.}
 \usage{
-graph.laplacian(graph, normalized=FALSE, weights=NULL)
+graph.laplacian(graph, normalized=FALSE, weights=NULL,
+   sparse=getIgraphOpt("sparsematrices"))
 }
 \arguments{
   \item{graph}{The input graph.}
@@ -15,6 +16,8 @@ graph.laplacian(graph, normalized=FALSE, weights=NULL)
     attribute called \code{weight}, then it will be used
     automatically. Set this to \code{NA} if you want the unweighted
     Laplacian on a graph that has a \code{weight} edge attribute.}
+  \item{sparse}{Logical scalar, whether to return the result as a sparse
+    matrix. The \code{Matrix} package is required for sparse matrices.}
 }
 \details{
   The Laplacian Matrix of a graph is a symmetric matrix having
@@ -35,11 +38,12 @@ graph.laplacian(graph, normalized=FALSE, weights=NULL)
 }
 \value{A numeric matrix.}
 % \references{}
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
 % \seealso{}
 \examples{
 g <- graph.ring(10)
 graph.laplacian(g)
 graph.laplacian(g, norm=TRUE)
+graph.laplacian(g, norm=TRUE, sparse=FALSE)
 }
 \keyword{graphs}

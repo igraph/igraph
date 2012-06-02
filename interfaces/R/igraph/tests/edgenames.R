@@ -1,5 +1,5 @@
 
-library(igraph)
+library(igraph) ; igraph.options(print.full=TRUE)
 
 ## named edges
 igraph.options(print.edge.attributes = TRUE)

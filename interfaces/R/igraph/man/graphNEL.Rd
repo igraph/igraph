@@ -49,7 +49,7 @@ igraph.to.graphNEL(graph)
   \code{igraph.to.graphNEL} returns a graphNEL graph object.
 }
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{ \code{\link{get.adjacency}}, \code{\link{graph.adjacency}},
   \code{\link{get.adjlist}} and \code{\link{graph.adjlist}}.
 }

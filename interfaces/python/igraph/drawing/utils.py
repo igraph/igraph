@@ -213,6 +213,23 @@ class Rectangle(object):
         return self._left > other._right or self._right < other._left \
                 or self._top > other._bottom or self._bottom < other._top
 
+    def isempty(self):
+        """Returns ``True`` if the rectangle is empty (i.e. it has zero
+        width and height).
+
+        Example::
+
+            >>> r1 = Rectangle(10, 10, 30, 30)
+            >>> r2 = Rectangle(70, 70, 90, 90)
+            >>> r1.isempty()
+            False
+            >>> r2.isempty()
+            False
+            >>> r1.intersection(r2).isempty()
+            True
+        """
+        return self._left != self._right or self._top != self._bottom
+
     def intersection(self, other):
         """Returns the intersection of this rectangle with another.
         
@@ -314,11 +331,8 @@ class Rectangle(object):
     def __ne__(self, other):
         return self.coords != other.coords
 
-    def __nonzero__(self):
-        """Returns ``True`` if the rectangle has non-zero width or
-        height, ``False`` otherwise."""
-        return self._left != self._right or self._top != self._bottom
-    __bool__ = __nonzero__
+    __nonzero__ = isempty
+    __bool__ = isempty
 
     def __hash__(self):
         return hash(self.coords)

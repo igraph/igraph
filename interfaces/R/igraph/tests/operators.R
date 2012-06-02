@@ -1,5 +1,5 @@
 
-library(igraph)
+library(igraph) ; igraph.options(print.full=TRUE)
 
 g1 <- graph.ring(10)
 g2 <- graph.star(11, center=11, mode="undirected")

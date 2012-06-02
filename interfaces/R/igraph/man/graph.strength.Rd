@@ -28,7 +28,7 @@ graph.strength (graph, vids = V(graph), mode = c("all", "out", "in", "total"),
   Vespignani: The architecture of complex weighted networks,
   Proc. Natl. Acad. Sci. USA 101, 3747 (2004)
 }
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu} }
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
 \seealso{\code{\link{degree}} for the unweighted version.}
 \examples{
 g <- graph.star(10)

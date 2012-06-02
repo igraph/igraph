@@ -20,8 +20,10 @@
 #ifndef BLISS_DEFS_HH
 #define BLISS_DEFS_HH
 
+using namespace std;
+
 #include "config.h"
-#include <assert.h>
+#include <cassert>
 
 /* Define this if you have gmp and want to have exact group sizes.
  * Remember to include -lgmp in LIB in Makefile. */

@@ -322,7 +322,7 @@ delete.vertices(graph, v)
 \value{For the indexing operators see the description above. The other
   functions return a new graph.}
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 % \seealso{}
 \examples{
 # 10 vertices named a,b,c,... and no edges

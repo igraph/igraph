@@ -4,9 +4,20 @@
 #
 # Usage: ./mkdoc.sh [--sync] [directory]
 
-EPYDOC=`which epydoc`
-if [ x$EPYDOC = x ]; then
-  echo "epydoc not found, exiting..."
+SCRIPTS_FOLDER=`dirname $0`
+
+cd ${SCRIPTS_FOLDER}/..
+ROOT_FOLDER=`pwd`
+DOC_API_FOLDER=${ROOT_FOLDER}/doc/api
+
+cd ${ROOT_FOLDER}
+mkdir -p ${DOC_API_FOLDER}/pdf
+mkdir -p ${DOC_API_FOLDER}/html
+
+EPYDOC="${ROOT_FOLDER}/scripts/epydoc-patched"
+python -m epydoc.__init__
+if [ $? -gt 0 ]; then
+  echo "Epydoc not installed, exiting..."
   exit 1
 fi
 
@@ -27,28 +38,27 @@ echo "Removing existing documentation..."
 rm -rf html
 
 echo "Generating HTML documentation..."
-epydoc --html -o html -v \
-       --name="IGraph library" \
-	   --url="http://igraph.sourceforge.net" \
-	   --no-private \
-	   --exclude=igraph.test \
-	   $PACKAGES
+${EPYDOC} --html -o ${DOC_API_FOLDER}/html -v \
+          --name="IGraph library" \
+	      --url="http://igraph.sourceforge.net" \
+	      --no-private \
+	      --exclude=igraph.test \
+	      $PACKAGES
 
 PDF=0
 which latex >/dev/null && PDF=1
 
 if [ $PDF -eq 1 ]; then
   echo "Generating PDF documentation..."
-  epydoc --pdf -o pdf --exclude=igraph.test --inheritance=listed -v --name="IGraph library" --url="http://igraph.sourceforge.net" $PACKAGES
+  ${EPYDOC} --pdf -o ${DOC_API_FOLDER}/pdf --exclude=igraph.test --inheritance=listed -v --name="IGraph library" --url="http://igraph.sourceforge.net" $PACKAGES
 
-  echo "Moving PDF documentation to the HTML subdirectory..."
-  mv pdf/api.pdf html/igraph.pdf
-  rm -rf pdf
 fi
 
 if [ $SYNC -eq 1 ]; then
   echo "Syncing documentation to web"
-  rsync --delete -avz html/ ntamas,igraph@web.sourceforge.net:/home/groups/i/ig/igraph/htdocs/doc/python/
+  cp ${DOC_API_FOLDER}/pdf/igraph.pdf ${DOC_API_FOLDER}/html
+  rsync --delete -avz ${DOC_API_FOLDER}/html/ ntamas,igraph@web.sourceforge.net:/home/groups/i/ig/igraph/htdocs/doc/python/
+  rm ${DOC_API_FOLDER}/html/igraph.pdf
 fi
 
 cd "$PWD"

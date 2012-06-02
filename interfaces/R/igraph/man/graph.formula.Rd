@@ -93,7 +93,7 @@ graph.formula(..., simplify = TRUE)
   A new graph object.
 }
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{graph}} for more general graph creation methods.}
 \examples{
 # A simple undirected graph

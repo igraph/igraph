@@ -1,6 +1,6 @@
 
-R version 2.12.0 (2010-10-15)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
@@ -19,7 +19,7 @@ Type 'q()' to quit R.
 > 
 > # sink("ba.game.Rout.save")
 > 
-> library(igraph)
+> library(igraph) ; igraph.options(print.full=TRUE)
 > 
 > g <- ba.game(100, m=2)
 > ecount(g)
@@ -56,14 +56,18 @@ Type 'q()' to quit R.
 > 
 > g6 <- ba.game(10, m=1, algorithm="bag", start.graph=graph.star(10))
 > g6
-IGRAPH D--- 10 9 -- 
+IGRAPH D--- 10 9 -- Barabasi graph
++ attr: name (g/c), power (g/n), m (g/n), zero.appeal (g/n), algorithm
+  (g/c)
 + edges:
 [1]  2->1  3->1  4->1  5->1  6->1  7->1  8->1  9->1 10->1
 > 
 > g7 <- ba.game(10, m=3, algorithm="psumtree-multiple",
 +               start.graph=graph.empty(5))
 > g7
-IGRAPH D--- 10 15 -- 
+IGRAPH D--- 10 15 -- Barabasi graph
++ attr: name (g/c), power (g/n), m (g/n), zero.appeal (g/n), algorithm
+  (g/c)
 + edges:
  [1]  6->4  6->1  6->2  7->4  7->3  7->4  8->4  8->2  8->7  9->2  9->7  9->2
 [13] 10->2 10->2 10->2
@@ -71,7 +75,9 @@ IGRAPH D--- 10 15 --
 > g8 <- ba.game(10, m=3, algorithm="psumtree-multiple",
 +               start.graph=graph.star(5))
 > g8
-IGRAPH D--- 10 19 -- 
+IGRAPH D--- 10 19 -- Barabasi graph
++ attr: name (g/c), power (g/n), m (g/n), zero.appeal (g/n), algorithm
+  (g/c)
 + edges:
  [1]  2->1  3->1  4->1  5->1  6->1  6->1  6->1  7->1  7->1  7->4  8->1  8->6
 [13]  8->5  9->1  9->1  9->1 10->1 10->1 10->1
@@ -79,29 +85,40 @@ IGRAPH D--- 10 19 --
 > g9 <- ba.game(10, m=3, algorithm="psumtree-multiple",
 +               start.graph=graph.star(10))
 > g9
-IGRAPH D--- 10 9 -- 
+IGRAPH D--- 10 9 -- Barabasi graph
++ attr: name (g/c), power (g/n), m (g/n), zero.appeal (g/n), algorithm
+  (g/c)
 + edges:
 [1]  2->1  3->1  4->1  5->1  6->1  7->1  8->1  9->1 10->1
 > 
 > g10 <- ba.game(10, m=3, start.graph=graph.empty(5))
 > g10
-IGRAPH D--- 10 15 -- 
+IGRAPH D--- 10 15 -- Barabasi graph
++ attr: name (g/c), power (g/n), m (g/n), zero.appeal (g/n), algorithm
+  (g/c)
 + edges:
  [1]  6->4  6->1  6->2  7->6  7->4  7->2  8->4  8->2  8->6  9->2  9->4  9->6
 [13] 10->4 10->2 10->7
 > 
 > g11 <- ba.game(10, m=3, start.graph=graph.star(5))
 > g11
-IGRAPH D--- 10 19 -- 
+IGRAPH D--- 10 19 -- Barabasi graph
++ attr: name (g/c), power (g/n), m (g/n), zero.appeal (g/n), algorithm
+  (g/c)
 + edges:
  [1]  2->1  3->1  4->1  5->1  6->1  6->3  6->5  7->2  7->1  7->5  8->2  8->5
 [13]  8->1  9->5  9->6  9->1 10->1 10->2 10->5
 > 
 > g12 <- ba.game(10, m=3, start.graph=graph.star(10))
 > g12
-IGRAPH D--- 10 9 -- 
+IGRAPH D--- 10 9 -- Barabasi graph
++ attr: name (g/c), power (g/n), m (g/n), zero.appeal (g/n), algorithm
+  (g/c)
 + edges:
 [1]  2->1  3->1  4->1  5->1  6->1  7->1  8->1  9->1 10->1
 > 
 > # sink(NULL)
 > 
+> proc.time()
+   user  system elapsed 
+  0.313   0.041   0.366 

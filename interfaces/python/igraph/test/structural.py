@@ -67,6 +67,24 @@ class SimplePropertiesTests(unittest.TestCase):
         self.failUnless(self.tree.transitivity_undirected() == 0.0)
         self.failUnless(self.g.transitivity_undirected() == 0.75)
 
+    def testLocalTransitivity(self):
+        self.failUnless(self.gfull.transitivity_local_undirected() ==
+                [1.0] * self.gfull.vcount())
+        self.failUnless(self.tree.transitivity_local_undirected(mode="zero") ==
+                [0.0] * self.tree.vcount())
+
+        l = self.g.transitivity_local_undirected(mode="zero")
+        self.assertAlmostEqual(l[0], 2/3., places=4)
+        self.assertAlmostEqual(l[1], 2/3., places=4)
+        self.assertEquals(l[2], 1)
+        self.assertEquals(l[3], 1)
+
+        g = Graph.Full(4) + 1 + [(0, 4)]
+        g.es["weight"] = [1, 1, 1, 1, 1, 1, 5]
+        self.assertAlmostEqual(
+                g.transitivity_local_undirected(0, weights="weight"),
+                0.25, places=4)
+
     def testAvgLocalTransitivity(self):
         self.failUnless(self.gfull.transitivity_avglocal_undirected() == 1.0)
         self.failUnless(self.tree.transitivity_avglocal_undirected() == 0.0)
@@ -97,12 +115,19 @@ class DegreeTests(unittest.TestCase):
         self.failUnless(knn == [9.] * 10)
         self.assertAlmostEquals(knnk[8], 9.0, places=6)
 
-        knn, knnk = self.g.knn()
-        diff = max(abs(a-b) for a, b in zip(knn, [17/5., 3, 4, 4]))
+        # knn works for simple graphs only -- self.g is not simple
+        self.assertRaises(InternalError, self.g.knn)
+
+        # Okay, simplify it and then go on
+        g = self.g.copy()
+        g.simplify()
+
+        knn, knnk = g.knn()
+        diff = max(abs(a-b) for a, b in zip(knn, [7/3., 7/3., 3, 3]))
         self.assertAlmostEquals(diff, 0., places=6)
-        self.assertAlmostEquals(knnk[1], 4, places=6)
-        self.assertAlmostEquals(knnk[2], 3, places=6)
-        self.assertAlmostEquals(knnk[4], 17/5., places=6)
+        self.assertEquals(len(knnk), 3)
+        self.assertAlmostEquals(knnk[1], 3, places=6)
+        self.assertAlmostEquals(knnk[2], 7/3., places=6)
 
     def testDegree(self):
         self.failUnless(self.gfull.degree() == [9] * 10)
@@ -300,6 +325,23 @@ class CentralityTests(unittest.TestCase):
         self.assertEquals(g.coreness("A"), [3,3,3,3,1,1,1,1])
 
 
+class NeighborhoodTests(unittest.TestCase):
+    def testNeighborhood(self):
+        g = Graph.Ring(10, circular=False)
+        self.failUnless(map(sorted, g.neighborhood()) == \
+                [[0,1], [0,1,2], [1,2,3], [2,3,4], [3,4,5], [4,5,6], \
+                    [5,6,7], [6,7,8], [7,8,9], [8,9]])
+        self.failUnless(map(sorted, g.neighborhood(order=3)) == \
+                [[0,1,2,3], [0,1,2,3,4], [0,1,2,3,4,5], [0,1,2,3,4,5,6], \
+                    [1,2,3,4,5,6,7], [2,3,4,5,6,7,8], [3,4,5,6,7,8,9], \
+                    [4,5,6,7,8,9], [5,6,7,8,9], [6,7,8,9]])
+
+    def testNeighborhoodSize(self):
+        g = Graph.Ring(10, circular=False)
+        self.failUnless(g.neighborhood_size() == [2,3,3,3,3,3,3,3,3,2])
+        self.failUnless(g.neighborhood_size(order=3) == [4,5,6,7,7,7,7,6,5,4])
+
+
 class MiscTests(unittest.TestCase):
     def testConstraint(self):
         g = Graph(4, [(0, 1), (0, 2), (1, 2), (0, 3), (1, 3)])
@@ -438,6 +480,7 @@ def suite():
     local_transitivity_suite = unittest.makeSuite(LocalTransitivityTests)
     biconnected_suite = unittest.makeSuite(BiconnectedComponentTests)
     centrality_suite = unittest.makeSuite(CentralityTests)
+    neighborhood_suite = unittest.makeSuite(NeighborhoodTests)
     path_suite = unittest.makeSuite(PathTests)
     misc_suite = unittest.makeSuite(MiscTests)
     return unittest.TestSuite([simple_suite,
@@ -445,6 +488,7 @@ def suite():
                                local_transitivity_suite,
                                biconnected_suite,
                                centrality_suite,
+                               neighborhood_suite,
                                path_suite,
                                misc_suite])
 

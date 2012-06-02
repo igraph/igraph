@@ -47,7 +47,7 @@ subgraph(graph, v)
   major version of igraph.
 }
 \value{A new graph object.}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 % \seealso
 \examples{
 g <- graph.ring(10)

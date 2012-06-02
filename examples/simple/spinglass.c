@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard st, Cambridge MA, 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ int main() {
 			     IGRAPH_SPINCOMM_UPDATE_CONFIG,
 			     1.0, /* gamma */
 			     IGRAPH_SPINCOMM_IMP_ORIG,
-			     0);
+			     /*gamma-=*/ 0);
 
 /*   printf("Modularity:  %f\n", modularity); */
 /*   printf("Temperature: %f\n", temperature); */
@@ -67,9 +67,13 @@ int main() {
 /*   printf("\n"); */
 
   if (igraph_vector_size(&csize) != 2) {
+    igraph_vector_destroy(&membership);
+    igraph_vector_destroy(&csize);  
     return 77;
   }
   if (VECTOR(csize)[0] != 5) {
+    igraph_vector_destroy(&membership);
+    igraph_vector_destroy(&csize);  
     return 77;
   }
 

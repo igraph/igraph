@@ -39,7 +39,7 @@ farthest.nodes (graph, directed = TRUE, unconnected = TRUE, weights = NULL)
   \code{farthest.nodes}.
 }
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{shortest.paths}}}
 \examples{
 g <- graph.ring(10)

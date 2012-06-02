@@ -63,7 +63,7 @@ if INTERNAL_F2C
   libf2c_la_SOURCES = f2c.h f2c/fio.h f2c/fmt.h f2c/sysdep1.h\
 					  f2c/sysdep1.h0 f2c/lio.h f2c/fp.h f2c/signal1.h\
 					  f2c/signal1.h0 $(F2C)
-  libf2c_la_CFLAGS = -DSkip_f2c_Undefs -I. $(WARNING_CFLAGS)
+  libf2c_la_CFLAGS = -DSkip_f2c_Undefs -I. -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
   f2c/arith.h: f2c/arithchk.c
 	$(CC) $(CFLAGS) -DNO_FPINIT f2c/arithchk.c -lm -o f2c/arith || \
 	$(CC) -DNO_LONG_LONG $(CFLAGS) -DNO_FPINIT f2c/arithchk.c \
@@ -80,21 +80,21 @@ endif
 
 if INTERNAL_BLAS
   libblas_la_SOURCES = f2c.h $(BLAS)
-  libblas_la_CFLAGS = -I. $(WARNING_CFLAGS)
+  libblas_la_CFLAGS = -I. -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
   BLAS_LIB = libblas.la
 endif
 
 if INTERNAL_LAPACK
   liblapack_la_SOURCES = f2c.h $(LAPACK)
-  liblapack_la_CFLAGS = -I. $(WARNING_CFLAGS)
+  liblapack_la_CFLAGS = -I. -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
   libdlamch_la_SOURCES = lapack/dlamch.c
-  libdlamch_la_CFLAGS = $(FLOATSTORE) -I. $(WARNING_CFLAGS)
+  libdlamch_la_CFLAGS = $(FLOATSTORE) -I. -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
   LAPACK_LIB = liblapack.la libdlamch.la
 endif
 
 if INTERNAL_ARPACK
   libarpack_la_SOURCES = f2c.h $(ARPACK)
-  libarpack_la_CFLAGS = -I. $(WARNING_CFLAGS)
+  libarpack_la_CFLAGS = -I. -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
   ARPACK_LIB = libarpack.la
 endif
 
@@ -103,6 +103,7 @@ include ../optional/glpk/glpk.inc
 if INTERNAL_GLPK
   libglpk_la_SOURCES = 	$(GLPK)
   libglpk_la_CFLAGS = -I$(top_srcdir)/optional/glpk
+  libglpk_la_CPPFLAGS = -I$(top_srcdir)/include
   GLPK_LIB = libglpk.la
 endif
 
@@ -160,7 +161,8 @@ HEADERS_PRIVATE = atlas-edges.h \
 		hrg_dendro.h hrg_graph.h hrg_rbtree.h hrg_splittree_eq.h \
 		hrg_graph_simp.h foreign-gml-header.h \
 		foreign-ncol-header.h foreign-lgl-header.h \
-		foreign-pajek-header.h igraph_interrupt_internal.h
+		foreign-pajek-header.h igraph_interrupt_internal.h \
+		scg_headers.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
@@ -196,6 +198,7 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_eigen.h	../include/igraph_statusbar.h \
 		../include/igraph_hrg.h         ../include/igraph_microscopic_update.h \
 		../include/igraph_interrupt.h   ../include/igraph_threading.h \
+		../include/igraph_scg.h		../include/igraph_qsort.h \
 		../include/igraph_matching.h
 
 libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
@@ -247,7 +250,10 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     lapack.c complex.c eigen.c feedback_arc_set.c \
 			     sugiyama.c glpk_support.c \
 				 igraph_hrg_types.cc igraph_hrg.cc \
-			     distances.c fortran_intrinsics.c matching.c
+			     distances.c fortran_intrinsics.c matching.c \
+			     scg.c scg_approximate_methods.c scg_exact_scg.c \
+			     scg_kmeans.c scg_utils.c scg_optimal_method.c \
+			     qsort.c qsort_r.c types.c
 
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)

@@ -1,8 +1,8 @@
 # Community structure
 
 # Test suite for the IGraph library.
-# Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
-# MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+# Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
+# 334 Harvard street, Cambridge, MA 02139 USA
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -48,6 +48,12 @@ AT_KEYWORDS([community structure leading eigenvector Newman])
 AT_COMPILE_CHECK([simple/igraph_community_leading_eigenvector.c],
                  [simple/igraph_community_leading_eigenvector.out])
 AT_CLEANUP
+
+AT_SETUP([Leading eigenvector bug #1002140 test (igraph_community_leading_eigenvector) :])
+AT_KEYWORDS([community structure leading eigenvector Newman])
+AT_COMPILE_CHECK([simple/levc-stress.c], [], [simple/input.dl])
+AT_CLEANUP
+
 
 AT_SETUP([Label propagation algorithm (igraph_community_label_propagation) :])
 AT_KEYWORDS([community structure label propagation Raghavan Albert Kumara])

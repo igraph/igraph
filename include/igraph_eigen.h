@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2010  Gabor Csardi <csardi.gabor@gmail.com>
-   Rue de l'Industrie 5, Lausanne 1005, Switzerland
+   Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -72,21 +72,23 @@ typedef struct igraph_eigen_which_t {
 
 int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
 				  const igraph_sparsemat_t *sA,
-				  igraph_arpack_function_t *fun, 
+				  igraph_arpack_function_t *fun, int n,
 				  void *extra,
 				  igraph_eigen_algorithm_t algorithm,
 				  const igraph_eigen_which_t *which,
 				  igraph_arpack_options_t *options,
+				  igraph_arpack_storage_t *storage,
 				  igraph_vector_t *values, 
 				  igraph_matrix_t *vectors);
 
 int igraph_eigen_matrix(const igraph_matrix_t *A,
 			const igraph_sparsemat_t *sA,
-			igraph_arpack_function_t *fun,
+			igraph_arpack_function_t *fun, int n,
 			void *extra,
 			igraph_eigen_algorithm_t algorithm,
 			const igraph_eigen_which_t *which,
 			igraph_arpack_options_t *options,
+			igraph_arpack_storage_t *storage,
 			igraph_vector_complex_t *values,
 			igraph_matrix_complex_t *vectors);
 
@@ -94,6 +96,7 @@ int igraph_eigen_adjacency(const igraph_t *graph,
 			   igraph_eigen_algorithm_t algorithm,
 			   const igraph_eigen_which_t *which,
 			   igraph_arpack_options_t *options,
+			   igraph_arpack_storage_t *storage,
 			   igraph_vector_t *values,
 			   igraph_matrix_t *vectors,
 			   igraph_vector_complex_t *cmplxvalues,
@@ -103,6 +106,7 @@ int igraph_eigen_laplacian(const igraph_t *graph,
 			   igraph_eigen_algorithm_t algorithm,
 			   const igraph_eigen_which_t *which,
 			   igraph_arpack_options_t *options,
+			   igraph_arpack_storage_t *storage,
 			   igraph_vector_t *values,
 			   igraph_matrix_t *vectors,
 			   igraph_vector_complex_t *cmplxvalues,

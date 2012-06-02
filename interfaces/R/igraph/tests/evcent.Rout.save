@@ -1,6 +1,6 @@
 
-R version 2.12.0 (2010-10-15)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
@@ -31,7 +31,10 @@ Type 'q()' to quit R.
 +                       Jane     - Ike)
 > kite <- simplify(kite)
 > round(evcent(kite)$vector, 3)
- [1] 0.732 0.732 0.594 1.000 0.827 0.594 0.827 0.407 0.100 0.023
+   Andre  Beverly    Carol    Diane Fernando       Ed    Garth  Heather 
+   0.732    0.732    0.594    1.000    0.827    0.594    0.827    0.407 
+     Ike     Jane 
+   0.100    0.023 
 > 
 > ## Eigenvector-centrality, small stress-test
 > 
@@ -57,3 +60,6 @@ Type 'q()' to quit R.
 + }
 > 
 > 
+> proc.time()
+   user  system elapsed 
+  1.333   0.144   1.462 

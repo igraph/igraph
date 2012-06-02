@@ -72,7 +72,7 @@ graph.dfs (graph, root, neimode = c("out", "in", "all", "total"),
   \code{FALSE}, i.e. if their calculation is not requested.  
 }
 % \references{}
-\author{Gabor Csardi \email{Gabor.Csardi@unil.ch} }
+\author{Gabor Csardi \email{csardi.gabor@gmail.com} }
 \seealso{ \code{\link{graph.bfs}} for breadth-first search.}
 \examples{
 ## A graph with two separate trees

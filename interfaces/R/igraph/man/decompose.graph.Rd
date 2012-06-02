@@ -27,7 +27,7 @@ decompose.graph(graph, mode = c("weak", "strong"),
   A list of graph objects.
 }
 %\references{}
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{is.connected}} to decide whether a graph is
   connected, \code{\link{clusters}} to calculate the connected
   components of a graph.}

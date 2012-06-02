@@ -64,7 +64,7 @@ cluster.distribution(graph, cumulative = FALSE, mul.size = FALSE, \dots)
   this is always zero.
 }
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{subcomponent}}}
 \examples{
 g <- erdos.renyi.game(20, 1/20)

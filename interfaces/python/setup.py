@@ -1,8 +1,14 @@
 #!/usr/bin/env python
 try:
     from setuptools import setup
+    build_py = None
 except ImportError:
     from distutils.core import setup
+    try:
+        from distutils.command.build_py import build_py_2to3 as build_py
+    except ImportError:
+        from distutils.command.build_py import build_py
+
 from distutils.core import Extension
 from distutils.file_util import copy_file
 from distutils.util import get_platform
@@ -143,6 +149,9 @@ if "macosx" in plat and "bdist_mpkg" in argv:
     ]
 
 if version_info > (3, 0):
-    options["use_2to3"] = True
+    if build_py is None:
+        options["use_2to3"] = True
+    else:
+        options["cmdclass"] = { "build_py": build_py }
 
 setup(**options)

@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@
 #define igraphdstats_	dstats_
 #define igraphdsesrt_	dsesrt_
 #define igraphdsortr_	dsortr_
+#define igraphdsortc_   dsortc_
 #define igraphdgetv0_	dgetv0_
 #define igraphdsaitr_	dsaitr_
 #define igraphdsapps_	dsapps_
@@ -159,4 +160,7 @@ int igraphdneupd_(int *rvec, char *howmny, int *select,
 
 int igraphdsortr_(char *which, int *apply, int* n, igraph_real_t *x1,
 		  igraph_real_t *x2);
+
+int igraphdsortc_(char *which, int *apply, int* n, igraph_real_t *xreal,
+		  igraph_real_t *ximag, igraph_real_t *y);
 #endif

@@ -2,8 +2,8 @@
 /* vim:set ts=2 sw=2 sts=2 et: */
 /* 
    IGraph library.
-   Copyright (C) 2011  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2011-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -324,7 +324,7 @@ void Greedy::apply(bool sort) {
     for (int i=0; i<Nnode; i++) {
       if (mod_members[i] > 0) {
 	Nmod++;
-	Msize.insert(make_pair(mod_size[i],i));
+	Msize.insert(pair<const double, int>(mod_size[i],i));
       }
     }
     for (multimap<double,int>::reverse_iterator it = Msize.rbegin(); 
@@ -364,7 +364,7 @@ void Greedy::apply(bool sort) {
   //nodeInMode[id_in_mod_tbl] = id_when_no_empty_node
   
   // Calculate outflow of links to different modules
-  map<int,double> outFlowNtoM[Nmod];
+  vector<map<int,double> > outFlowNtoM(Nmod);
   map<int,double>::iterator it_M;
   
   for (int i=0;i<Nnode;i++) {
@@ -391,8 +391,7 @@ void Greedy::apply(bool sort) {
   
   // Create outLinks at new level
   for (int i=0;i<Nmod;i++) {
-    for (it_M = outFlowNtoM[i].begin(); 
-	 it_M != outFlowNtoM[i].end(); it_M++) {
+    for (it_M = outFlowNtoM[i].begin(); it_M != outFlowNtoM[i].end(); it_M++) {
       if (it_M->first != i) {
 	node_tmp[i]->outLinks.push_back(make_pair(it_M->first,it_M->second));
       }
@@ -400,7 +399,7 @@ void Greedy::apply(bool sort) {
   }
 
   // Calculate inflow of links from different modules
-  map<int,double> inFlowNtoM[Nmod];
+  vector<map<int,double> > inFlowNtoM(Nmod);
   
   for (int i=0;i<Nnode;i++) {
     int i_M = nodeInMod[node_index[i]];

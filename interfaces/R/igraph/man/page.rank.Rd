@@ -96,7 +96,7 @@ page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000,
   Brisbane, Australia, April 1998.  
 }
 \author{Tamas Nepusz \email{ntamas@rmki.kfki.hu} and
-  Gabor Csardi \email{csardi@rmki.kfki.hu}}
+  Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{Other centrality scores: \code{\link{closeness}},
   \code{\link{betweenness}}, \code{\link{degree}}}
 \examples{

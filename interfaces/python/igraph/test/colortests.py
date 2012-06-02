@@ -22,7 +22,7 @@ class ColorTests(unittest.TestCase):
                 (0, 0.5, 0, 120, 0.5, 0.25, 1, 1, 0.75),
                 (0.5, 1, 1, 180, 1, 0.75, 0.5, 1, 1),
                 (0.5, 0.5, 1, 240, 1, 0.75, 0.5, 1, 1),
-                (0.75, 0.25, 0.75, 300, 0.75, 0.5, 0.667, 0.5, 0.25),
+                (0.75, 0.25, 0.75, 300, 0.75, 0.5, 0.666666667, 0.5, 0.25),
                 (0.211, 0.149, 0.597, 248.3, 0.597, 0.373, 0.750, 0.601, 1),
                 (0.495, 0.493, 0.721, 240.5, 0.721, 0.607, 0.316, 0.290, 0.75),
         ]
@@ -49,6 +49,18 @@ class ColorTests(unittest.TestCase):
 
     def testHSLAtoRGBA(self):
         self._testGeneric(hsla_to_rgba, "h s_hsl l alpha".split())
+
+    def testRGBtoHSL(self):
+        self._testGeneric(rgb_to_hsl, "r g b".split(), "h s_hsl l".split())
+
+    def testRGBAtoHSLA(self):
+        self._testGeneric(rgba_to_hsla, "r g b alpha".split(), "h s_hsl l alpha".split())
+
+    def testRGBtoHSV(self):
+        self._testGeneric(rgb_to_hsv, "r g b".split(), "h s_hsv v".split())
+
+    def testRGBAtoHSVA(self):
+        self._testGeneric(rgba_to_hsva, "r g b alpha".split(), "h s_hsv v alpha".split())
 
 
 class PaletteTests(unittest.TestCase):

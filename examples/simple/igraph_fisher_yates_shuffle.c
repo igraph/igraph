@@ -91,7 +91,7 @@ int main() {
   /* must have same elements */
   igraph_vector_sort(&u);
   igraph_vector_sort(&v);
-  if (!igraph_vector_is_equal(&u, &v)) {
+  if (!igraph_vector_all_e(&u, &v)) {
     return 5;
   }
   igraph_vector_destroy(&u);

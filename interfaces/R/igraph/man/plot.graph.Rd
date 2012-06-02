@@ -56,7 +56,7 @@
   \code{plot} to plot the graph to any R device.}
 \value{Returns \code{NULL}, invisibly.}
 % \references{}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{layout}} for different layouts,
   \code{\link{igraph.plotting}} for the detailed description of the
   plotting parameters and \code{\link{tkplot}} and \code{\link{rglplot}}

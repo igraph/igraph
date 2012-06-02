@@ -1,8 +1,7 @@
 /* vim:set ts=2 sw=2 sts=2 et: */
 /* 
    IGraph library.
-   Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2006-2012  Tamas Nepusz <ntamas@gmail.com>
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -108,9 +107,10 @@ void igraphmodule_index_vertex_names(igraph_t *graph, igraph_bool_t force) {
   igraphmodule_i_attribute_struct_index_vertex_names(ATTR_STRUCT(graph), force);
 }
 
-int igraphmodule_get_vertex_id_by_name(igraph_t *graph, PyObject* o, long int* vid) {
+int igraphmodule_get_vertex_id_by_name(igraph_t *graph, PyObject* o, igraph_integer_t* vid) {
   igraphmodule_i_attribute_struct* attrs = ATTR_STRUCT(graph);
   PyObject* o_vid = NULL;
+  int tmp;
 
   if (graph) {
     attrs = ATTR_STRUCT(graph);
@@ -138,8 +138,11 @@ int igraphmodule_get_vertex_id_by_name(igraph_t *graph, PyObject* o, long int* v
     PyErr_SetString(PyExc_ValueError, "non-numeric vertex ID assigned to vertex name. This is most likely a bug.");
     return 1;
   }
-
-  *vid = PyInt_AsLong(o_vid);
+  
+  if (PyInt_AsInt(o_vid, &tmp))
+    return 1;
+  
+  *vid = tmp;
 
   return 0;
 }
@@ -541,7 +544,7 @@ static int igraphmodule_i_attribute_permute_vertices(const igraph_t *graph,
   while (PyDict_Next(dict, &pos, &key, &value)) {
     newlist=PyList_New(n);
     for (i=0; i<n; i++) {
-      o=PyList_GetItem(value, VECTOR(*idx)[i]);
+      o = PyList_GetItem(value, (Py_ssize_t)VECTOR(*idx)[i]);
       if (!o) {
         PyErr_Clear();
         return 1;
@@ -753,7 +756,7 @@ static int igraphmodule_i_attribute_permute_edges(const igraph_t *graph,
   while (PyDict_Next(dict, &pos, &key, &value)) {
     newlist=PyList_New(n);
     for (i=0; i<n; i++) {
-      o=PyList_GetItem(value, VECTOR(*idx)[i]);
+      o=PyList_GetItem(value, (Py_ssize_t)VECTOR(*idx)[i]);
       if (!o) {
         PyErr_Clear();
         return 1;
@@ -1119,7 +1122,7 @@ static int igraphmodule_i_attribute_combine_dicts(PyObject *dict,
   PyObject *key, *value;
   Py_ssize_t pos;
   igraph_attribute_combination_record_t* todo;
-  int i, n;
+  Py_ssize_t i, n;
   if (!PyDict_Check(dict) || !PyDict_Check(newdict)) return 1;
 
   /* Allocate memory for the attribute_combination_records */
@@ -1289,6 +1292,7 @@ static int igraphmodule_i_attribute_get_info(const igraph_t *graph,
 					     igraph_vector_t *etypes) {
   igraph_strvector_t *names[3] = { gnames, vnames, enames };
   igraph_vector_t *types[3] = { gtypes, vtypes, etypes };
+  int retval;
   long int i, j, k, l, m;
   
   for (i=0; i<3; i++) {
@@ -1302,8 +1306,9 @@ static int igraphmodule_i_attribute_get_info(const igraph_t *graph,
     if (!keys) IGRAPH_ERROR("Internal error in PyDict_Keys", IGRAPH_FAILURE);
  
     if (n) {
-      j=igraphmodule_PyList_to_strvector_t(keys, n);
-      if (j) return j;
+      retval = igraphmodule_PyList_to_strvector_t(keys, n);
+      if (retval)
+        return retval;
     }
     if (t) {
       k=PyList_Size(keys);
@@ -1520,8 +1525,7 @@ int igraphmodule_i_get_numeric_vertex_attr(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vit_destroy, &it);
     IGRAPH_CHECK(igraph_vector_resize(value, IGRAPH_VIT_SIZE(it)));
     while (!IGRAPH_VIT_END(it)) {
-      long int v=IGRAPH_VIT_GET(it);
-      o = PyList_GetItem(list, v);
+      o = PyList_GetItem(list, (Py_ssize_t)IGRAPH_VIT_GET(it));
       if (o != Py_None) {
         result = PyNumber_Float(o);
         VECTOR(*value)[i] = PyFloat_AsDouble(result);
@@ -1562,7 +1566,7 @@ int igraphmodule_i_get_string_vertex_attr(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vit_destroy, &it);
     IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_VIT_SIZE(it)));
     while (!IGRAPH_VIT_END(it)) {
-      long int v=IGRAPH_VIT_GET(it);
+      int v=(int)IGRAPH_VIT_GET(it);
       char* str;
 
       result = PyList_GetItem(list, v);
@@ -1615,8 +1619,7 @@ int igraphmodule_i_get_numeric_edge_attr(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_eit_destroy, &it);
     IGRAPH_CHECK(igraph_vector_resize(value, IGRAPH_EIT_SIZE(it)));
     while (!IGRAPH_EIT_END(it)) {
-      long int v=IGRAPH_EIT_GET(it);
-      o = PyList_GetItem(list, v);
+      o = PyList_GetItem(list, (Py_ssize_t)IGRAPH_EIT_GET(it));
       if (o != Py_None) {
         result = PyNumber_Float(o);
         VECTOR(*value)[i] = PyFloat_AsDouble(result);
@@ -1656,10 +1659,9 @@ int igraphmodule_i_get_string_edge_attr(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_eit_destroy, &it);
     IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_EIT_SIZE(it)));
     while (!IGRAPH_EIT_END(it)) {
-      long int v=IGRAPH_EIT_GET(it);
       char* str;
 
-      result = PyList_GetItem(list, v);
+      result = PyList_GetItem(list, (Py_ssize_t)IGRAPH_EIT_GET(it));
       if (result == 0)
         IGRAPH_ERROR("null element in PyList", IGRAPH_EINVAL);
 

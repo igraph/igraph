@@ -13,14 +13,10 @@
     <title>&igraph; Reference Manual</title>
     <authorgroup>
       <author><firstname>Gábor</firstname><surname>Csárdi</surname>
-      <affiliation><orgname>Department of Biophysics, Research
-      Institute for Nuclear and Particle Physics of the Hungarian
-      Academy of Sciences</orgname>
-      <address>29-33 Konkoly-Thege Miklós road, Budapest H-1121, Hungary</address>
+      <affiliation><orgname>Department of Statistics, Harvard University
+      </orgname>
+      <address>1 Oxford street, Cambridge, MA, 02138 USA</address>
       </affiliation>
-      <affiliation><orgname>Center for Complex Systems Studies,
-      Kalamazoo College</orgname>
-      <address>1200 Academy st, Kalamazoo, 49006, MI, USA</address></affiliation>
       </author>
       <author><firstname>Tamás</firstname><surname>Nepusz</surname>
       <affiliation><orgname>Department of Biophysics, Research
@@ -32,7 +28,8 @@
     </authorgroup>
 
     <legalnotice><para>
-      Copyright (C)  2005, 2006  Gábor Csárdi and Tamás Nepusz.
+      Copyright (C)  2005, 2006, 2007, 2008, 2009, 2010, 2011, 
+      2012 Gábor Csárdi and Tamás Nepusz.
       Permission is granted to copy, distribute and/or modify this document
       under the terms of the GNU Free Documentation License, Version 1.2
       or any later version published by the Free Software Foundation;
@@ -80,8 +77,6 @@
 
   <xi:include href="structural.xml"/>
 
-  <xi:include href="hrg.xml"/>
-
   <xi:include href="visitors.xml"/>
 
   <xi:include href="cliques.xml"/>
@@ -100,11 +95,20 @@
 
   <xi:include href="community.xml"/>
 
+  <xi:include href="scg.xml"/>
+
   <xi:include href="operators.xml"/>
   
   <xi:include href="arpack.xml"/>
   
   <xi:include href="bipartite.xml"/>
+
+  <chapter>
+    <title>Advenced igraph programming</title>
+    <xi:include href="threading.xml" />
+    <xi:include href="progress.xml" />
+    <xi:include href="status.xml" />
+  </chapter>
 
   <xi:include href="nongraph.xml"/>  
 

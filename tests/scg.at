@@ -1,0 +1,79 @@
+# Spectral coarse graining
+
+# Test suite for the IGraph library.
+# Copyright (C) 2011-2012  Gabor Csardi <csardi.gabor@gmail.com>
+# 334 Harvard street, Cambridge, MA 02139 USA
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+# 02110-1301 USA
+
+AT_BANNER([[Spectral coarse graining]])
+
+AT_SETUP([Solving the SCG problem (igraph_scg_grouping) :])
+AT_KEYWORDS([SCG spectral coarse graining grouping])
+AT_COMPILE_CHECK([simple/igraph_scg_grouping.c], 
+		 [simple/igraph_scg_grouping.out])
+AT_CLEANUP
+
+AT_SETUP([Solving the SCG problem, adjacency matrix (igraph_scg_grouping) :])
+AT_KEYWORDS([SCG spectral coarse graining grouping adjacency])
+AT_COMPILE_CHECK([simple/igraph_scg_grouping2.c], 
+		 [simple/igraph_scg_grouping2.out])
+AT_CLEANUP
+
+AT_SETUP([Solving the SCG problem, stochastic matrix (igraph_scg_grouping) :])
+AT_KEYWORDS([SCG spectral coarse graining grouping stochastic])
+AT_COMPILE_CHECK([simple/igraph_scg_grouping3.c], 
+		 [simple/igraph_scg_grouping3.out])
+AT_CLEANUP
+
+AT_SETUP([Solving the SCG problem, laplacian matrix (igraph_scg_grouping) :])
+AT_KEYWORDS([SCG spectral coarse graining grouping laplacian])
+AT_COMPILE_CHECK([simple/igraph_scg_grouping4.c], 
+		 [simple/igraph_scg_grouping4.out])
+AT_CLEANUP
+
+AT_SETUP([SCG semi-projectors, symmetric (igraph_scg_semiprojectors) :])
+AT_KEYWORDS([SCG spectral coarse graining semi-projectors adjancency])
+AT_COMPILE_CHECK([simple/igraph_scg_semiprojectors.c],
+		 [simple/igraph_scg_semiprojectors.out])
+AT_CLEANUP
+
+AT_SETUP([SCG semi-projectors, stochastic (igraph_scg_semiprojectors) :])
+AT_KEYWORDS([SCG spectral coarse graining semi-projectors stochastic])
+AT_COMPILE_CHECK([simple/igraph_scg_semiprojectors2.c],
+		 [simple/igraph_scg_semiprojectors2.out])
+AT_CLEANUP
+
+AT_SETUP([SCG semi-projectors, laplacian (igraph_scg_semiprojectors) :])
+AT_KEYWORDS([SCG spectral coarse graining semi-projectors laplacian])
+AT_COMPILE_CHECK([simple/igraph_scg_semiprojectors3.c],
+		 [simple/igraph_scg_semiprojectors3.out])
+AT_CLEANUP
+
+AT_SETUP([SCG of a graph, adjacency matrix (igraph_scg) :])
+AT_KEYWORDS([SCG spectral coarse graining])
+AT_COMPILE_CHECK([simple/scg.c], [simple/scg.out])
+AT_CLEANUP
+
+AT_SETUP([SCG of a graph, stochastic matrix (igraph_scg) :])
+AT_KEYWORDS([SCG spectral coarse graining])
+AT_COMPILE_CHECK([simple/scg2.c], [simple/scg2.out])
+AT_CLEANUP
+
+AT_SETUP([SCG of a graph, laplacian matrix (igraph_scg) :])
+AT_KEYWORDS([SCG spectral coarse graining])
+AT_COMPILE_CHECK([simple/scg3.c], [simple/scg3.out])
+AT_CLEANUP

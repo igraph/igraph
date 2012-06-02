@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2003, 2004, 2005  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -47,6 +47,8 @@
 #include "igraph_strvector.h"
 #include "igraph_vector_ptr.h"
 #include "igraph_spmatrix.h"
+#include "igraph_sparsemat.h"
+#include "igraph_qsort.h"
 
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
@@ -87,6 +89,7 @@
 #include "igraph_hrg.h"
 #include "igraph_threading.h"
 #include "igraph_interrupt.h"
+#include "igraph_scg.h"
 #include "igraph_matching.h"
 
 #endif

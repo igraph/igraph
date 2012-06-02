@@ -1,0 +1,53 @@
+$def with (datasets, tags, title, feed, nohits, start, end, limit, user_input, searchvalue)
+
+$if searchvalue is not None:
+  $var searchvalue: $searchvalue
+
+$if feed:
+  <div class="feed">
+    <a href="$feed">
+      <img src="$:getbase()/static/images/feed-icon-28x28.png" />
+    </a>
+  </div>
+
+<div class="title">
+<h3>$:title</h3>
+</div>
+
+<div style="clear:left"></div>
+
+$if len(datasets)==0:
+  <p>No data sets found.</p>
+$else:
+  <p>Results $start - $end out of $nohits.</p>
+  <ul class="datasets">
+  $for ds in datasets:
+    <li>
+      <h4>$:link_to_dataset(getbase(), ds, caption=u"\u25b6 %s [%s]" % (ds.name, ds.sid))
+      </h4>
+      <p class="datasettags">
+	$ds.date,
+	$if ds.nnets > 1:
+	  $ds.nnets networks,
+	$if ds.minv==ds.maxv:
+	  $ds.minv
+	$else:
+	  $ds.minv-$ds.maxv
+	vertices, 
+	$if ds.mine==ds.maxe:
+	  $ds.mine
+	$else:
+	  $ds.mine-$ds.maxe 
+	edges.
+	Tags:
+	$:", ".join(link_to_tag(getbase(), tag) for tag in tags[ds.id])
+      </p>
+      <div class="datasetdescription">
+	$:mymarkdown(ds.shortdescription)
+      </div>
+    </li>
+  </ul>
+
+  <div class="prevnexttable">
+    $:prevnexttable(nohits, start, end, limit, user_input)
+  </div>

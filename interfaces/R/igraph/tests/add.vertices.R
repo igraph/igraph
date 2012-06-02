@@ -1,5 +1,5 @@
 
-library(igraph)
+library(igraph) ; igraph.options(print.full=TRUE)
 
 g <- graph.formula(A-B-C-D-E)
 g2 <- add.vertices(g, 4)

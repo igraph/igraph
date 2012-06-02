@@ -7,9 +7,9 @@
 }
 \usage{
 callaway.traits.game (nodes, types, edge.per.step = 1, type.dist = rep(1, 
-    types), pref.matrix = matrix(1, types, types), directed = FALSE) 
+    types), pref.matrix = matrix(1, types, types), directed = FALSE)
 establishment.game(nodes, types, k = 1, type.dist = rep(1, types),
-    pref.matrix = matrix(1, types, types), directed = FALSE) 
+    pref.matrix = matrix(1, types, types), directed = FALSE)
 }
 \arguments{
   \item{nodes}{The number of vertices in the graph.}
@@ -43,7 +43,7 @@ establishment.game(nodes, types, k = 1, type.dist = rep(1, types),
   A new graph object.
 }
 % \references{}
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
 % \seealso{}
 \examples{
 # two types of vertices, they like only themselves

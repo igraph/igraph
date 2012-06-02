@@ -55,7 +55,7 @@ connect.neighborhood(graph, order, mode=c("all", "out", "in", "total"))
 
   \code{connect.neighborhood} returns with a new graph object.
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}, the first version was
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}, the first version was
   done by Vincent Matossian}
 \examples{
 g <- graph.ring(10)

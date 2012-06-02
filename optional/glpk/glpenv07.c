@@ -413,13 +413,13 @@ int xfclose(XFILE *fp)
 
 static void *c_fopen(const char *fname, const char *mode)
 {     FILE *fh;
-      if (strcmp(fname, "/dev/stdin") == 0)
-         fh = stdin;
-      else if (strcmp(fname, "/dev/stdout") == 0)
-         fh = stdout;
-      else if (strcmp(fname, "/dev/stderr") == 0)
-         fh = stderr;
-      else
+      /* if (strcmp(fname, "/dev/stdin") == 0) */
+      /*    fh = stdin; */
+      /* else if (strcmp(fname, "/dev/stdout") == 0) */
+      /*    fh = stdout; */
+      /* else if (strcmp(fname, "/dev/stderr") == 0) */
+      /*    fh = stderr; */
+      /* else */
          fh = fopen(fname, mode);
       if (fh == NULL)
          lib_err_msg(strerror(errno));
@@ -484,11 +484,11 @@ static int c_fflush(void *_fh)
 static int c_fclose(void *_fh)
 {     FILE *fh = _fh;
       int ret;
-      if (fh == stdin)
-         ret = 0;
-      else if (fh == stdout || fh == stderr)
-         fflush(fh), ret = 0;
-      else
+      /* if (fh == stdin) */
+      /*    ret = 0; */
+      /* else if (fh == stdout || fh == stderr) */
+      /*    fflush(fh), ret = 0; */
+      /* else */
          ret = fclose(fh);
       if (ret != 0)
       {  lib_err_msg(strerror(errno));

@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2010  Gabor Csardi <csardi.gabor@gmail.com>
-   Rue de l'Industrie 5, Lausanne 1005, Switzerland
+   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -60,6 +60,8 @@ long int igraph_estack_size(const igraph_estack_t *s) {
   return igraph_stack_long_size(&s->stack);
 }
 
+#ifndef USING_R
 int igraph_estack_print(const igraph_estack_t *s) {
   return igraph_stack_long_print(&s->stack);
 }
+#endif

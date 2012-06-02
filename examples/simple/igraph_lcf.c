@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard st, Cambridge MA, 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ int main() {
   igraph_isomorphic_vf2(&g, &g2, 
 			/*vertex.color1=*/ 0, /*vertex.color2=*/ 0, 
 			/*edge.color1=*/ 0, /*edge.color2=*/ 0,
-			&iso, 0, 0);
+			&iso, 0, 0, 0, 0, 0);
   if (!iso) {
     printf("OOOPS!\n");
     return 1;

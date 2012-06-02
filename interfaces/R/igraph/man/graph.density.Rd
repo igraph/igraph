@@ -27,7 +27,7 @@ graph.density(graph, loops=FALSE)
   Wasserman, S., and Faust, K.  (1994).  Social Network Analysis:
   Methods and Applications.  Cambridge: Cambridge University Press.
 }
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{vcount}}, \code{\link{ecount}},
   \code{\link{simplify}} to get rid of the multiple and/or loop edges.}
 \examples{

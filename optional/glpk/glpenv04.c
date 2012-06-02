@@ -23,6 +23,7 @@
 ***********************************************************************/
 
 #include "glpapi.h"
+#include "igraph_error.h"
 
 /***********************************************************************
 *  NAME
@@ -44,14 +45,7 @@ static void error(const char *fmt, ...)
       va_list arg;
       env->term_out = GLP_ON;
       va_start(arg, fmt);
-      xvprintf(fmt, arg);
-      va_end(arg);
-      xprintf("Error detected in file %s at line %d\n", env->err_file,
-         env->err_line);
-      if (env->err_hook != NULL)
-         env->err_hook(env->err_info);
-      abort();
-      exit(EXIT_FAILURE);
+      igraph_errorvf(fmt, env->err_file, env->err_line, IGRAPH_EGLP, arg);
       /* no return */
 }
 

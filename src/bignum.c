@@ -22,6 +22,8 @@
 #include <math.h>
 #include "bignum.h"
 #include "config.h"
+#include "math.h"
+#include "igraph_error.h"
 
 #ifndef	ASM_X86
 #ifdef	X86
@@ -1046,10 +1048,10 @@ limb_t bn_div_hdig(limb_t q[], limb_t u[], limb_t v, count_t nlimb)
 	limb_t mask = DIGMSB;
 	limb_t r = 0;
 	if (v > HALFMASK) {
-		fprintf(stderr, "bn_div_hdig called with v:%x\n", v);
-		exit(1);
+	        igraph_errorf("bn_div_hdig called with v:%x", __FILE__,
+			      __LINE__, v);
 	}
-
+	
 	if (0 == nlimb)
 		return 0;
 	if (0 == v)
@@ -1117,8 +1119,8 @@ limb_t bn_mod_hdig(limb_t u[], limb_t v, count_t nlimb)
 		return 0;	/* Divide by zero error */
 
 	if (v > HALFMASK) {
-		fprintf(stderr, "bn_mod_hdig called with v:%x\n", v);
-		exit(1);
+	        igraph_errorf("bn_mod_hdig called with v:%x", __FILE__,
+			      __LINE__, v);
 	}
 
 	/* Work from left to right */
@@ -1313,8 +1315,8 @@ limb_t bn_shl(limb_t a[], limb_t b[], count_t x, count_t nlimb)
 
 	/* check shift amount */
 	if (x >= LIMBBITS) {
-		fprintf(stderr, "bn_shl() called with x >= %d\n", LIMBBITS);
-		exit(1);
+	        igraph_errorf("bn_shl() called with x >= %d", __FILE__,
+			      __LINE__, LIMBBITS);
 		return 0;
 	}
 
@@ -1360,8 +1362,8 @@ limb_t bn_shr(limb_t a[], limb_t b[], count_t x, count_t nlimb)
 
 	/* check shift amount */
 	if (x >= LIMBBITS) {
-		fprintf(stderr, "bn_shr() called with x >= %d\n", LIMBBITS);
-		exit(1);
+	        igraph_errorf("bn_shr() called with x >= %d", __FILE__,
+			      __LINE__, LIMBBITS);
 	}
 
 	y = LIMBBITS - x;

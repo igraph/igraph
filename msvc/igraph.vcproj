@@ -21,7 +21,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include"
-				PreprocessorDefinitions="Win32;WIN32;_WINDOWS;_USRDLL;IGRAPH_EXPORTS;USE_CLOCK"
+				PreprocessorDefinitions="Win32;WIN32;_WINDOWS;_USRDLL;NCOMPLEX;IGRAPH_EXPORTS;USE_CLOCK"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -60,7 +60,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include"
-				PreprocessorDefinitions="Win32;WIN32;_DEBUG;_WINDOWS;_USRDLL;IGRAPH_EXPORTS;USE_CLOCK"
+				PreprocessorDefinitions="Win32;WIN32;_DEBUG;_WINDOWS;_USRDLL;NCOMPLEX;IGRAPH_EXPORTS;USE_CLOCK"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -196,6 +196,174 @@
 			</File>
 			<File
 				RelativePath=".\src\cores.c">
+			</File>
+			<File
+				RelativePath=".\src\f2c\close.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_add.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_amd.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_chol.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_cholsol.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_compress.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_counts.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_cumsum.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_dfs.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_dmperm.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_droptol.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_dropzeros.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_dupl.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_entry.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_ereach.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_etree.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_fkeep.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_gaxpy.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_happly.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_house.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_ipvec.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_leaf.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_load.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_lsolve.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_ltsolve.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_lu.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_lusol.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_malloc.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_maxtrans.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_multiply.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_norm.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_permute.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_pinv.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_post.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_print.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_pvec.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_qr.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_qrsol.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_randperm.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_reach.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_scatter.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_scc.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_schol.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_spsolve.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_sqr.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_symperm.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_tdfs.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_transpose.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_updown.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_usolve.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_util.c">
+			</File>
+			<File
+				RelativePath=".\src\cs\cs_utsolve.c">
+			</File>
+			<File
+				RelativePath=".\src\f2c\ctype.c">
+			</File>
+			<File
+				RelativePath=".\src\distances.c">
+			</File>
+			<File
+				RelativePath=".\src\feedback_arc_set.c">
+			</File>
+			<File
+				RelativePath=".\src\fortran_intrinsics.c">
 			</File>
 			<File
 				RelativePath=".\src\f2c\d_lg10.c">
@@ -450,6 +618,12 @@
 				RelativePath=".\src\eigen.c">
 			</File>
 			<File
+				RelativePath=".\src\f2c\endfile.c">
+			</File>
+			<File
+				RelativePath=".\src\f2c\err.c">
+			</File>
+			<File
 				RelativePath=".\src\error.c">
 			</File>
 			<File
@@ -463,6 +637,12 @@
 			</File>
 			<File
 				RelativePath=".\src\flow.c">
+			</File>
+			<File
+				RelativePath=".\src\f2c\fmt.c">
+			</File>
+			<File
+				RelativePath=".\src\f2c\fmtlib.c">
 			</File>
 			<File
 				RelativePath=".\src\foreign-dl-lexer.c">
@@ -537,6 +717,9 @@
 				RelativePath=".\src\f2c\i_dnnt.c">
 			</File>
 			<File
+				RelativePath=".\src\f2c\i_len.c">
+			</File>
+			<File
 				RelativePath=".\src\lapack\idamax.c">
 			</File>
 			<File
@@ -588,6 +771,18 @@
 				RelativePath=".\src\lapack\iladlr.c">
 			</File>
 			<File
+				RelativePath=".\src\infomap.cc">
+			</File>
+			<File
+				RelativePath=".\src\infomap_FlowGraph.cc">
+			</File>
+			<File
+				RelativePath=".\src\infomap_Greedy.cc">
+			</File>
+			<File
+				RelativePath=".\src\infomap_Node.cc">
+			</File>
+			<File
 				RelativePath=".\src\interrupt.c">
 			</File>
 			<File
@@ -627,6 +822,9 @@
 				RelativePath=".\src\NetRoutines.cpp">
 			</File>
 			<File
+				RelativePath=".\src\f2c\open.c">
+			</File>
+			<File
 				RelativePath=".\src\operators.c">
 			</File>
 			<File
@@ -660,16 +858,28 @@
 				RelativePath=".\src\revolver_ml_cit.c">
 			</File>
 			<File
+				RelativePath=".\src\f2c\rewind.c">
+			</File>
+			<File
 				RelativePath=".\src\f2c\s_cmp.c">
 			</File>
 			<File
 				RelativePath=".\src\f2c\s_copy.c">
 			</File>
 			<File
+				RelativePath=".\src\f2c\s_stop.c">
+			</File>
+			<File
 				RelativePath=".\src\lapack\second.c">
 			</File>
 			<File
 				RelativePath=".\src\separators.c">
+			</File>
+			<File
+				RelativePath=".\src\f2c\sfe.c">
+			</File>
+			<File
+				RelativePath=".\src\f2c\sig_die.c">
 			</File>
 			<File
 				RelativePath=".\src\statusbar.c">
@@ -681,10 +891,16 @@
 				RelativePath=".\src\spectral_properties.c">
 			</File>
 			<File
+				RelativePath=".\src\sparsemat.c">
+			</File>
+			<File
 				RelativePath=".\src\spmatrix.c">
 			</File>
 			<File
 				RelativePath=".\src\st-cuts.c">
+			</File>
+			<File
+				RelativePath=".\src\sugiyama.c">
 			</File>
 			<File
 				RelativePath=".\src\structural_properties.c">
@@ -697,6 +913,9 @@
 			</File>
 			<File
 				RelativePath=".\src\type_indexededgelist.c">
+			</File>
+			<File
+				RelativePath=".\src\f2c\util.c">
 			</File>
 			<File
 				RelativePath=".\src\vector.c">
@@ -721,6 +940,15 @@
 			</File>
 			<File
 				RelativePath=".\src\walktrap_heap.cpp">
+			</File>
+			<File
+				RelativePath=".\src\f2c\wref.c">
+			</File>
+			<File
+				RelativePath=".\src\f2c\wrtfmt.c">
+			</File>
+			<File
+				RelativePath=".\src\f2c\wsfe.c">
 			</File>
 			<File
 				RelativePath=".\src\lapack\xerbla.c">
@@ -834,7 +1062,7 @@
 				RelativePath=".\src\drl_Node.h">
 			</File>
 			<File
-				elativePath=".\src\drl_Node_3d.h">
+				RelativePath=".\src\drl_Node_3d.h">
 			</File>
 			<File
 				RelativePath=".\src\drl_parse.h">
@@ -935,6 +1163,15 @@
 			</File>
 			<File
 				RelativePath=".\src\igraph_pmt_off.h">
+			</File>
+			<File
+				RelativePath=".\src\infomap_FlowGraph.h">
+			</File>
+			<File
+				RelativePath=".\src\infomap_Greedy.h">
+			</File>
+			<File
+				RelativePath=".\src\infomap_Node.h">
 			</File>
 			<File
 				RelativePath=".\src\interrupt.h">

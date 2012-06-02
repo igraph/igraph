@@ -39,7 +39,7 @@ get.incidence(graph, types=NULL, attr=NULL, names=TRUE, sparse=FALSE)
   A sparse or dense matrix.
 }
 % \references{}
-\author{ Gabor Csardi \email{csardi@rmki.kfki.hu} }
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
 \seealso{\code{\link{graph.incidence}} for the opposite operation.}
 \examples{
 g <- graph.bipartite( c(0,1,0,1,0,0), c(1,2,2,3,3,4) )

@@ -1,8 +1,8 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard st, Cambridge MA, 02139 USA
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -159,6 +159,7 @@ int main() {
   VECTOR(weights)[6] = 3; VECTOR(weights)[7] = 4; VECTOR(weights)[8] = 4;
   igraph_pagerank(&g, &res, 0, igraph_vss_all(), 1, 0.85, &weights, &arpack_options);
   print_vector(&res, stdout);
+  igraph_vector_destroy(&weights);
   igraph_destroy(&g);
 
   igraph_vector_destroy(&res);

@@ -38,7 +38,7 @@ minimum.spanning.tree(graph, weights=NULL, algorithm=NULL, \dots)
 }
 \references{ Prim, R.C. 1957. Shortest connection networks and some
   generalizations \emph{Bell System Technical Journal}, 37 1389--1401.}
-\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{clusters}}}
 \examples{
 g <- erdos.renyi.game(100, 3/100)

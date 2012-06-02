@@ -64,6 +64,14 @@
 <!-- doxrox-include igraph_matrix_transpose -->
 </section>
 
+<section><title>Matrix comparisons</title>
+<!-- doxrox-include igraph_matrix_all_e -->
+<!-- doxrox-include igraph_matrix_all_l -->
+<!-- doxrox-include igraph_matrix_all_g -->
+<!-- doxrox-include igraph_matrix_all_le -->
+<!-- doxrox-include igraph_matrix_all_ge -->
+</section>
+
 <section>
 <title>Combining matrices</title>
 <!-- doxrox-include igraph_matrix_rbind -->
@@ -85,10 +93,10 @@
 <!-- doxrox-include igraph_matrix_empty -->
 <!-- doxrox-include igraph_matrix_isnull -->
 <!-- doxrox-include igraph_matrix_size -->
+<!-- doxrox-include igraph_matrix_capacity -->
 <!-- doxrox-include igraph_matrix_nrow -->
 <!-- doxrox-include igraph_matrix_ncol -->
 <!-- doxrox-include igraph_matrix_is_symmetric -->
-<!-- doxrox-include igraph_matrix_is_equal -->
 <!-- doxrox-include igraph_matrix_maxdifference -->
 </section>
 
@@ -100,6 +108,7 @@
 <section>
 <title>Resizing operations</title>
 <!-- doxrox-include igraph_matrix_resize -->
+<!-- doxrox-include igraph_matrix_resize_min -->
 <!-- doxrox-include igraph_matrix_add_rows -->
 <!-- doxrox-include igraph_matrix_add_cols -->
 <!-- doxrox-include igraph_matrix_remove_row -->

@@ -1,7 +1,7 @@
 
 #   IGraph R package
-#   Copyright (C) 2003, 2004, 2005  Gabor Csardi <csardi@rmki.kfki.hu>
-#   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+#   Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
+#   334 Harvard street, Cambridge, MA 02139 USA
 #   
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -91,11 +91,23 @@ layout.fruchterman.reingold <- function(graph, ..., dim=2,
   if (!is.null(params$start)) {
     params$start <- structure(as.numeric(params$start), dim=dim(params$start))
   }
+  if (!is.null(params$minx)) {
+    params$minx <- as.double(params$minx)
+  }
+  if (!is.null(params$maxx)) {
+    params$maxx <- as.double(params$maxx)
+  }
   if (!is.null(params$miny)) {
     params$miny <- as.double(params$miny)
   }
   if (!is.null(params$maxy)) {
     params$maxy <- as.double(params$maxy)
+  }
+  if (!is.null(params$minz)) {
+    params$minz <- as.double(params$minz)
+  }
+  if (!is.null(params$maxz)) {
+    params$maxz <- as.double(params$maxz)
   }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
@@ -103,7 +115,8 @@ layout.fruchterman.reingold <- function(graph, ..., dim=2,
         as.double(params$niter), as.double(params$maxdelta),
         as.double(params$area), as.double(params$coolexp),
         as.double(params$repulserad), params$weights, params$start,
-        params$miny, params$maxy,
+        params$minx, params$maxx, params$miny, params$maxy,
+        params$minz, params$maxz,
         PACKAGE="igraph")
 }
 
@@ -173,7 +186,24 @@ layout.kamada.kawai<-function(graph, ..., dim=2,
   if (!is.null(params$start)) {
     params$start <- structure(as.numeric(params$start), dim=dim(params$start))
   }
-
+  if (!is.null(params$minx)) {
+    params$minx <- as.double(params$minx)
+  }
+  if (!is.null(params$maxx)) {
+    params$maxx <- as.double(params$maxx)
+  }
+  if (!is.null(params$miny)) {
+    params$miny <- as.double(params$miny)
+  }
+  if (!is.null(params$maxy)) {
+    params$maxy <- as.double(params$maxy)
+  }
+  if (!is.null(params$minz)) {
+    params$minz <- as.double(params$minz)
+  }
+  if (!is.null(params$maxz)) {
+    params$maxz <- as.double(params$maxz)
+  }
   if (params$fixz && dim==2) {
     warning("`fixz' works for 3D only, ignored.")
   }
@@ -183,6 +213,8 @@ layout.kamada.kawai<-function(graph, ..., dim=2,
         as.double(params$niter), as.double(params$initemp),
         as.double(params$coolexp), as.double(params$kkconst),
         as.double(params$sigma), params$start, as.logical(params$fixz),
+        params$minx, params$maxx, params$miny, params$maxy,
+        params$minz, params$maxz,
         PACKAGE="igraph")
 }
 
@@ -455,44 +487,6 @@ layout.norm <- function(layout, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL,
   (v-vr[1]) * fac + min
 }
 
-layout.mds <- function(graph, d=shortest.paths(graph), ...)
-  UseMethod("layout.mds", graph)
-
-layout.mds.igraph <- function(graph, d=shortest.paths(graph), ...){
-    
-    if (!is.igraph(graph)) {
-      stop("Not a graph object")
-    }
-
-    clust <- clusters(graph)
-    llist <- list()
-    llen <- numeric()
-    glist <- list()
-    for(i in 1:length(clust$csize)){
-        ind <- clust$membership==i
-        
-        if(length(which(ind))>=3){
-            llist[i+1] <- list(cmdscale(d[ind, ind]))
-        }else if(length(which(ind))==2){
-            llist[i+1] <- list(d[ind, ind])
-        } else {
-            llist[i+1] <- list(matrix(c(0, 0), nrow=1))
-        }
-        
-        llen[i+1] <- length(which(ind))
-        
-        glist[i+1] <- list(induced.subgraph(graph, V(graph)[ind]))
-    }
-    
-    ## merge them all:
-    lmerged <- layout.merge(glist, llist)
-    
-    ## now reorder these rows to reflect original graph:
-    l <- matrix(rep(NA, 2*vcount(graph)), ncol=2)
-    l[order(clust$membership), ] <- lmerged
-    return(l)
-}
-
 layout.svd <- function(graph, d=shortest.paths(graph), ...)
   UseMethod("layout.svd", graph)
 
@@ -550,7 +544,7 @@ piecewise.layout <- function(graph, layout=layout.kamada.kawai, ...) {
 }
 
 layout.drl <- function(graph, use.seed = FALSE,
-                       seed=matrix(runif(vcount(graph)*2), nc=2),
+                       seed=matrix(runif(vcount(graph)*2), ncol=2),
                        options=igraph.drl.default,
                        weights=E(graph)$weight,
                        fixed=NULL,
@@ -750,4 +744,110 @@ layout.auto <- function(graph, dim=2, ...) {
     layout.drl(graph, dim=dim, ...)
   }
   
+}
+
+layout.sugiyama <- function(graph, layers=NULL, hgap=1, vgap=1,
+                            maxiter=100, weights=NULL,
+                            attributes=c("default", "all", "none")) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (!is.null(layers)) layers <- as.numeric(layers)-1
+  hgap <- as.numeric(hgap)
+  vgap <- as.numeric(vgap)
+  maxiter <- as.integer(maxiter)
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
+    weights <- E(graph)$weight 
+  } 
+  if (!is.null(weights) && any(!is.na(weights))) { 
+    weights <- as.numeric(weights) 
+  } else { 
+    weights <- NULL 
+  }
+  attributes <- igraph.match.arg(attributes)
+  
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_layout_sugiyama", graph, layers, hgap,
+               vgap, maxiter, weights, PACKAGE="igraph")
+
+  # Flip the y coordinates, more natural this way
+  res$res[,2] <- max(res$res[,2]) - res$res[,2] + 1
+
+  # Separate real and dummy vertices
+  vc <- vcount(graph)
+  res$layout <- res$res[seq_len(vc),]
+  if (nrow(res$res)==vc) {
+    res$layout.dummy <- matrix(nrow=0, ncol=2)
+  } else {
+    res$layout.dummy <- res$res[(vc+1):nrow(res$res),]
+  }
+  
+  # Add some attributes to the extended graph
+  E(res$extd_graph)$orig <- res$extd_to_orig_eids
+  res$extd_to_orig_eids <- NULL
+
+  res$extd_graph <- set.vertex.attribute(res$extd_graph, "dummy",
+                                         value=c(rep(FALSE, vc),
+                                           rep(TRUE, nrow(res$res)-vc)))
+
+  res$extd_graph$layout <- rbind(res$layout, res$layout.dummy)
+
+  if (attributes=="default" || attributes=="all") {
+    if ("size" %in% list.vertex.attributes(graph)) {
+      V(res$extd_graph)$size <- 0
+      V(res$extd_graph)$size[ !V(res$extd_graph)$dummy ] <- V(graph)$size
+    }
+    if ("size2" %in% list.vertex.attributes(graph)) {
+      V(res$extd_graph)$size2 <- 0
+      V(res$extd_graph)$size2[ !V(res$extd_graph)$dummy ] <- V(graph)$size2
+    }
+    if ("shape" %in% list.vertex.attributes(graph)) {
+      V(res$extd_graph)$shape <- "none"
+      V(res$extd_graph)$shape[ !V(res$extd_graph)$dummy ] <- V(graph)$shape
+    }
+    if ("label" %in% list.vertex.attributes(graph)) {
+      V(res$extd_graph)$label <- ""
+      V(res$extd_graph)$label[ !V(res$extd_graph)$dummy ] <- V(graph)$label
+    }
+    if ("color" %in% list.vertex.attributes(graph)) {
+      V(res$extd_graph)$color <- head(V(graph)$color, 1)
+      V(res$extd_graph)$color[ !V(res$extd_graph)$dummy ] <- V(graph)$color
+    }
+    eetar <- get.edgelist(res$extd_graph, names=FALSE)[,2]
+    E(res$extd_graph)$arrow.mode <- 0
+    if ("arrow.mode" %in% list.edge.attributes(graph)) {
+      E(res$extd_graph)$arrow.mode[ eetar <= vc ] <- E(graph)$arrow.mode
+    } else {
+      E(res$extd_graph)$arrow.mode[ eetar <= vc ] <- is.directed(graph) * 2
+    }
+    if ("arrow.size" %in% list.edge.attributes(graph)) {
+      E(res$extd_graph)$arrow.size <- 0
+      E(res$extd_graph)$arrow.size[ eetar <= vc ] <- E(graph)$arrow.size
+    }
+  }
+
+  if (attributes=="all") {
+    gatt <- setdiff(list.graph.attributes(graph), "layout")
+    vatt <- setdiff(list.vertex.attributes(graph),
+                    c("size", "size2", "shape", "label", "color"))
+    eatt <- setdiff(list.edge.attributes(graph),
+                    c("arrow.mode", "arrow.size"))
+    for (ga in gatt) {
+      res$extd_graph <- set.graph.attribute(res$extd_graph, ga,
+                                            get.graph.attribute(graph, ga))
+    }
+    for (va in vatt) {
+      notdummy <- which(!V(res$extd_graph)$dummy)
+      res$extd_graph <- set.vertex.attribute(res$extd_graph, va,
+                                             notdummy,
+                                             get.vertex.attribute(graph, va))
+    }
+    for (ea in eatt) {
+      eanew <- get.edge.attribute(graph, ea)[E(res$extd_graph)$orig]
+      res$extd_graph <- set.edge.attribute(res$extd_graph, ea, value=eanew)
+    }
+  }
+  
+  res$res <- NULL
+  res
 }

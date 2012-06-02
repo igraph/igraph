@@ -17,6 +17,8 @@
 
 /* FSF address fixed in the above notice on 1 Oct 2009 by Tamas Nepusz */
 
+using namespace std;
+
 #include "bliss_timer.hh"
 #include "bliss_graph.hh"
 #include "bliss_kqueue.hh"
@@ -25,7 +27,7 @@
 #include "igraph_types.h"
 #include "igraph_topology.h"
 
-#include <cstring>
+#include <string.h>
 
 using namespace igraph;
 
@@ -140,7 +142,7 @@ int igraph_automorphisms(const igraph_t *graph,
 }
 
 bool bliss_verbose = false;
-FILE *bliss_verbstr = stdout;
+// FILE *bliss_verbstr = stdout;
 
 namespace igraph {
 
