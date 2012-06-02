@@ -423,8 +423,10 @@ static PyObject* _identity(igraphmodule_VertexObject* vertex, PyObject* obj) {
 static PyObject* _convert_to_vertex_list(igraphmodule_VertexObject* vertex, PyObject* obj) {
   Py_ssize_t i, n;
 
-  if (!PyList_Check(obj))
+  if (!PyList_Check(obj)) {
     PyErr_SetString(PyExc_TypeError, "_convert_to_vertex_list expected list of integers");
+    return NULL;
+  }
 
   n = PyList_Size(obj);
   for (i = 0; i < n; i++) {
@@ -432,10 +434,12 @@ static PyObject* _convert_to_vertex_list(igraphmodule_VertexObject* vertex, PyOb
     PyObject* v;
     int idx_int;
 
-    if (!PyInt_Check(idx))
+    if (!PyInt_Check(idx)) {
       PyErr_SetString(PyExc_TypeError, "_convert_to_vertex_list expected list of integers");
+      return NULL;
+    }
 
-    if (!PyInt_AsInt(idx, &idx_int))
+    if (PyInt_AsInt(idx, &idx_int))
       return NULL;
 
     v = igraphmodule_Vertex_New(vertex->gref, idx_int);
