@@ -214,8 +214,8 @@ typedef struct igraph_vit_t {
  * Time complexity: O(1).
  */
 #define IGRAPH_VIT_GET(vit)  \
-  (((vit).type == IGRAPH_VIT_SEQ) ? (vit).pos : \
-  VECTOR(*(vit).vec)[(vit).pos])
+  ((igraph_integer_t)(((vit).type == IGRAPH_VIT_SEQ) ? (vit).pos : \
+  VECTOR(*(vit).vec)[(vit).pos]))
 
 int igraph_vit_create(const igraph_t *graph, 
 		      igraph_vs_t vs, igraph_vit_t *vit);
@@ -396,8 +396,8 @@ typedef struct igraph_eit_t {
  * Time complexity: O(1).
  */
 #define IGRAPH_EIT_GET(eit)  \
-  (((eit).type == IGRAPH_EIT_SEQ) ? (eit).pos : \
-  VECTOR(*(eit).vec)[(eit).pos])
+  (igraph_integer_t)((((eit).type == IGRAPH_EIT_SEQ) ? (eit).pos : \
+  VECTOR(*(eit).vec)[(eit).pos]))
 
 int igraph_eit_create(const igraph_t *graph, 
 		      igraph_es_t es, igraph_eit_t *eit);

@@ -85,9 +85,10 @@ int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids, igraph_integer
 int igraph_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t vid,
 		    igraph_neimode_t mode);
 
-#define IGRAPH_FROM(g,e) (VECTOR((g)->from)[(long int)(e)])
-#define IGRAPH_TO(g,e)   (VECTOR((g)->to)  [(long int)(e)])
-#define IGRAPH_OTHER(g,e,v) (IGRAPH_TO(g,(e))==(v) ? IGRAPH_FROM((g),(e)) : IGRAPH_TO((g),(e)))
+#define IGRAPH_FROM(g,e) ((igraph_integer_t)(VECTOR((g)->from)[(long int)(e)]))
+#define IGRAPH_TO(g,e)   ((igraph_integer_t)(VECTOR((g)->to)  [(long int)(e)]))
+#define IGRAPH_OTHER(g,e,v) \
+    ((igraph_integer_t)(IGRAPH_TO(g,(e))==(v) ? IGRAPH_FROM((g),(e)) : IGRAPH_TO((g),(e))))
 
 __END_DECLS
 
