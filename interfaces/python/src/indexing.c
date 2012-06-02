@@ -135,9 +135,11 @@ static PyObject* igraphmodule_i_Graph_adjmatrix_get_index_row(igraph_t* graph,
     igraph_integer_t from, igraph_vs_t* to, igraph_neimode_t neimode,
     PyObject* values) {
   igraph_vector_t eids;
+  igraph_integer_t eid;
   igraph_vit_t vit;
   PyObject *result = 0, *item;
-  long int i, n, eid, v;
+  long int i, n;
+  igraph_integer_t v;
 
   if (igraph_vs_is_all(to)) {
     /* Simple case: all edges */
@@ -153,7 +155,7 @@ static PyObject* igraphmodule_i_Graph_adjmatrix_get_index_row(igraph_t* graph,
     }
 
     for (i = 0; i < n; i++) {
-      eid = VECTOR(eids)[i];
+      eid = (igraph_integer_t)VECTOR(eids)[i];
       v = IGRAPH_OTHER(graph, eid, from);
       if (values)
         item = PyList_GetItem(values, eid);

@@ -115,12 +115,19 @@ class DegreeTests(unittest.TestCase):
         self.failUnless(knn == [9.] * 10)
         self.assertAlmostEquals(knnk[8], 9.0, places=6)
 
-        knn, knnk = self.g.knn()
-        diff = max(abs(a-b) for a, b in zip(knn, [17/5., 3, 4, 4]))
+        # knn works for simple graphs only -- self.g is not simple
+        self.assertRaises(InternalError, self.g.knn)
+
+        # Okay, simplify it and then go on
+        g = self.g.copy()
+        g.simplify()
+
+        knn, knnk = g.knn()
+        diff = max(abs(a-b) for a, b in zip(knn, [7/3., 7/3., 3, 3]))
         self.assertAlmostEquals(diff, 0., places=6)
-        self.assertAlmostEquals(knnk[1], 4, places=6)
-        self.assertAlmostEquals(knnk[2], 3, places=6)
-        self.assertAlmostEquals(knnk[4], 17/5., places=6)
+        self.assertEquals(len(knnk), 3)
+        self.assertAlmostEquals(knnk[1], 3, places=6)
+        self.assertAlmostEquals(knnk[2], 7/3., places=6)
 
     def testDegree(self):
         self.failUnless(self.gfull.degree() == [9] * 10)

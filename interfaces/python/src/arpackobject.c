@@ -1,4 +1,4 @@
-/* -*- mode: C -*-  */
+/* vim:set ts=4 sw=2 sts=2 et:  */
 /* 
    IGraph library.
    Copyright (C) 2007-2012  Tamas Nepusz <ntamas@gmail.com>
@@ -129,7 +129,8 @@ int igraphmodule_ARPACKOptions_setattr(
       strcmp(attrname, "mxiter") == 0) {
     if (PyInt_Check(value)) {
       long int n=PyInt_AsLong(value);
-      if (n>0) self->params.mxiter=n;
+      if (n>0)
+          self->params.mxiter=(igraph_integer_t)n;
       else {
         PyErr_SetString(PyExc_ValueError, "maxiter must be positive");
         return -1;

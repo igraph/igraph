@@ -116,12 +116,12 @@ int igraphmodule_VertexSeq_init(igraphmodule_VertexSeqObject *self,
     igraph_vs_all(&vs);
   } else if (PyInt_Check(vsobj)) {
     /* We selected a single vertex */
-    long idx = PyInt_AsLong(vsobj);
+    long int idx = PyInt_AsLong(vsobj);
     if (idx < 0 || idx >= igraph_vcount(&((igraphmodule_GraphObject*)g)->g)) {
       PyErr_SetString(PyExc_ValueError, "vertex index out of range");
       return -1;
     }
-    igraph_vs_1(&vs, idx);
+    igraph_vs_1(&vs, (igraph_integer_t)idx);
   } else {
     igraph_vector_t v;
     igraph_integer_t n = igraph_vcount(&((igraphmodule_GraphObject*)g)->g);
@@ -186,25 +186,27 @@ int igraphmodule_VertexSeq_sq_length(igraphmodule_VertexSeqObject* self) {
 PyObject* igraphmodule_VertexSeq_sq_item(igraphmodule_VertexSeqObject* self,
                      Py_ssize_t i) {
   igraph_t *g;
-  long idx = -1;
+  igraph_integer_t idx = -1;
 
   if (!self->gref) return NULL;
   g=&GET_GRAPH(self);
   switch (igraph_vs_type(&self->vs)) {
     case IGRAPH_VS_ALL:
-      if (i >= 0 && i < (long)igraph_vcount(g)) idx = i;
+      if (i >= 0 && i < igraph_vcount(g))
+        idx = (igraph_integer_t)i;
       break;
     case IGRAPH_VS_VECTOR:
     case IGRAPH_VS_VECTORPTR:
       if (i >= 0 && i < igraph_vector_size(self->vs.data.vecptr))
-        idx = (long)VECTOR(*self->vs.data.vecptr)[i];
+        idx = (igraph_integer_t)VECTOR(*self->vs.data.vecptr)[i];
       break;
     case IGRAPH_VS_1:
-      if (i == 0) idx = (long)self->vs.data.vid;
+      if (i == 0)
+        idx = self->vs.data.vid;
       break;
     case IGRAPH_VS_SEQ:
       if (i >= 0 && i < self->vs.data.seq.to - self->vs.data.seq.from)
-        idx = (long)(self->vs.data.seq.from + i);
+        idx = self->vs.data.seq.from + (igraph_integer_t)i;
       break;
     /* TODO: IGRAPH_VS_ADJ, IGRAPH_VS_NONADJ - someday :) They are unused
        yet in the Python interface */
@@ -223,20 +225,6 @@ PyObject* igraphmodule_VertexSeq_sq_item(igraphmodule_VertexSeqObject* self,
  */
 PyObject* igraphmodule_VertexSeq_attribute_names(igraphmodule_VertexSeqObject* self) {
   return igraphmodule_Graph_vertex_attributes(self->gref);
-}
-
-/** \ingroup python_interface_vertexseq
- * \brief Returns the count of attribute names
- */
-PyObject* igraphmodule_VertexSeq_attribute_count(igraphmodule_VertexSeqObject* self) {
-  PyObject *list;
-  long int size;
-  
-  list=igraphmodule_Graph_vertex_attributes(self->gref);
-  size=PySequence_Size(list);
-  Py_DECREF(list);
-
-  return Py_BuildValue("i", size);
 }
 
 /** \ingroup python_interface_vertexseq
@@ -500,7 +488,8 @@ PyObject* igraphmodule_VertexSeq_set_attribute_values(igraphmodule_VertexSeqObje
  */
 PyObject* igraphmodule_VertexSeq_find(igraphmodule_VertexSeqObject *self, PyObject *args) {
   PyObject *item;
-  long int i, n;
+  igraph_integer_t i;
+  Py_ssize_t n;
   igraph_vit_t vit;
 
   if (!PyArg_ParseTuple(args, "O", &item))

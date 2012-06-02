@@ -48,7 +48,7 @@ PyTypeObject igraphmodule_EdgeType;
  * changes, your existing edge objects will point to elsewhere
  * (or they might even get invalidated).
  */
-PyObject* igraphmodule_Edge_New(igraphmodule_GraphObject *gref, long idx) {
+PyObject* igraphmodule_Edge_New(igraphmodule_GraphObject *gref, igraph_integer_t idx) {
   igraphmodule_EdgeObject* self;
   self=PyObject_New(igraphmodule_EdgeObject, &igraphmodule_EdgeType);
   if (self) {
@@ -104,7 +104,7 @@ PyObject* igraphmodule_Edge_repr(igraphmodule_EdgeObject *self) {
 
 #ifdef IGRAPH_PYTHON3
   s = PyUnicode_FromFormat("igraph.Edge(%R, %ld, %R)",
-      (PyObject*)self->gref, self->idx, attrs);
+      (PyObject*)self->gref, (long int)self->idx, attrs);
   Py_DECREF(attrs);
 #else
   grepr=PyObject_Repr((PyObject*)self->gref);
@@ -116,7 +116,7 @@ PyObject* igraphmodule_Edge_repr(igraphmodule_EdgeObject *self) {
     return NULL;
   }
   s=PyString_FromFormat("igraph.Edge(%s, %ld, %s)", PyString_AsString(grepr),
-    self->idx, PyString_AsString(drepr));
+    (long int)self->idx, PyString_AsString(drepr));
   Py_DECREF(grepr);
   Py_DECREF(drepr);
 #endif
@@ -126,7 +126,7 @@ PyObject* igraphmodule_Edge_repr(igraphmodule_EdgeObject *self) {
 /** \ingroup python_interface_edge
  * \brief Returns the number of edge attributes
  */
-int igraphmodule_Edge_attribute_count(igraphmodule_EdgeObject* self) {
+Py_ssize_t igraphmodule_Edge_attribute_count(igraphmodule_EdgeObject* self) {
   igraphmodule_GraphObject *o = self->gref;
   
   if (!o) return 0;
@@ -299,7 +299,7 @@ PyObject* igraphmodule_Edge_get_from(igraphmodule_EdgeObject* self, void* closur
   if (igraph_edge(&o->g, self->idx, &from, &to)) {
     igraphmodule_handle_igraph_error(); return NULL;
   }
-  return PyInt_FromLong((long)from);
+  return PyInt_FromLong((long int)from);
 }
 
 /**
@@ -321,7 +321,15 @@ PyObject* igraphmodule_Edge_get_to(igraphmodule_EdgeObject* self, void* closure)
  * Returns the edge index
  */
 PyObject* igraphmodule_Edge_get_index(igraphmodule_EdgeObject* self, void* closure) {
-  return PyInt_FromLong((long)self->idx);
+  return PyInt_FromLong((long int)self->idx);
+}
+
+/**
+ * \ingroup python_interface_edge
+ * Returns the edge index as an igraph_integer_t
+ */
+igraph_integer_t igraphmodule_Edge_get_index_igraph_integer(igraphmodule_EdgeObject* self) {
+  return self->idx;
 }
 
 /**

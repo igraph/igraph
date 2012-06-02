@@ -159,9 +159,9 @@ PyObject* igraphmodule_BFSIter_iter(igraphmodule_BFSIterObject* self) {
 
 PyObject* igraphmodule_BFSIter_iternext(igraphmodule_BFSIterObject* self) {
   if (!igraph_dqueue_empty(&self->queue)) {
-    long int vid = igraph_dqueue_pop(&self->queue);
-    long int dist = igraph_dqueue_pop(&self->queue);
-    long int parent = igraph_dqueue_pop(&self->queue);
+    igraph_integer_t vid = (igraph_integer_t)igraph_dqueue_pop(&self->queue);
+    igraph_integer_t dist = (igraph_integer_t)igraph_dqueue_pop(&self->queue);
+    igraph_integer_t parent = (igraph_integer_t)igraph_dqueue_pop(&self->queue);
     long int i;
     
     if (igraph_neighbors(self->graph, &self->neis, vid, self->mode)) {
@@ -170,7 +170,7 @@ PyObject* igraphmodule_BFSIter_iternext(igraphmodule_BFSIterObject* self) {
     }
 	
     for (i=0; i<igraph_vector_size(&self->neis); i++) {
-      long int neighbor=VECTOR(self->neis)[i];
+      igraph_integer_t neighbor = (igraph_integer_t)VECTOR(self->neis)[i];
       if (self->visited[neighbor]==0) {
 	self->visited[neighbor]=1;
 	if (igraph_dqueue_push(&self->queue, neighbor) ||
@@ -183,23 +183,22 @@ PyObject* igraphmodule_BFSIter_iternext(igraphmodule_BFSIterObject* self) {
     }
 
     if (self->advanced) {
-      PyObject *vertexobj, *parentobj, *result;
-      vertexobj = igraphmodule_Vertex_New(self->gref, (long)vid);
-      if (!vertexobj) return NULL;
-      if (parent>=0) {
-	parentobj = igraphmodule_Vertex_New(self->gref, (long)parent);
-	if (!parentobj) return NULL;
+      PyObject *vertexobj, *parentobj;
+      vertexobj = igraphmodule_Vertex_New(self->gref, vid);
+      if (!vertexobj)
+        return NULL;
+      if (parent >= 0) {
+        parentobj = igraphmodule_Vertex_New(self->gref, parent);
+        if (!parentobj)
+            return NULL;
       } else {
-	Py_INCREF(Py_None);
-	parentobj=Py_None;
+        Py_INCREF(Py_None);
+        parentobj=Py_None;
       }
-      result=PyTuple_New(3);
-      PyTuple_SetItem(result, 0, vertexobj);
-      PyTuple_SetItem(result, 1, PyInt_FromLong(dist));
-      PyTuple_SetItem(result, 2, parentobj);
-      return result;
-    } else
-      return igraphmodule_Vertex_New(self->gref, (long)vid);
+      return Py_BuildValue("NlN", vertexobj, (long int)dist, parentobj);
+    } else {
+      return igraphmodule_Vertex_New(self->gref, vid);
+    }
   } else {
     return NULL;
   }

@@ -348,11 +348,12 @@ PyObject* igraphmodule_community_to_membership(PyObject *self,
   }
 
   if (PyObject_IsTrue(return_csize)) {
-	igraph_vector_init(&csize, 0);
-	csize_p = &csize;
+    igraph_vector_init(&csize, 0);
+    csize_p = &csize;
   }
 
-  if (igraph_community_to_membership(&merges, nodes, steps, &result, csize_p)) {
+  if (igraph_community_to_membership(&merges, (igraph_integer_t)nodes,
+        (igraph_integer_t)steps, &result, csize_p)) {
     igraphmodule_handle_igraph_error();
     igraph_vector_destroy(&result);
     if (csize_p) igraph_vector_destroy(csize_p);

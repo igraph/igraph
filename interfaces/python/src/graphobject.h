@@ -171,7 +171,7 @@ PyObject* igraphmodule_Graph_subisomorphic(igraphmodule_GraphObject* self, PyObj
 PyObject* igraphmodule_Graph_count_subisomorphisms(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
 PyObject* igraphmodule_Graph_get_subisomorphisms(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
 
-int igraphmodule_Graph_attribute_count(igraphmodule_GraphObject* self);
+Py_ssize_t igraphmodule_Graph_attribute_count(igraphmodule_GraphObject* self);
 PyObject* igraphmodule_Graph_get_attribute(igraphmodule_GraphObject* self, PyObject* s);
 int igraphmodule_Graph_set_attribute(igraphmodule_GraphObject* self, PyObject* k, PyObject* v);
 PyObject* igraphmodule_Graph_attributes(igraphmodule_GraphObject* self);
