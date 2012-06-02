@@ -503,7 +503,6 @@ igraph_real_t igraph_i_revolver_ml_DE_f(const igraph_vector_t *par,
 					void *extra) {
 
   igraph_i_revolver_ml_DE_data_t *data=extra;
-  long int i;
   
   if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_DE_eval(par, data);
@@ -527,7 +526,6 @@ void igraph_i_revolver_ml_DE_df(const igraph_vector_t *par,
 				igraph_vector_t *res, void *extra) {
 
   igraph_i_revolver_ml_DE_data_t *data=extra;
-  long int i;
   
   if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_DE_eval(par, data);
@@ -855,7 +853,6 @@ igraph_real_t igraph_i_revolver_ml_AD_f(const igraph_vector_t *par,
 					void *extra) {
 
   igraph_i_revolver_ml_AD_data_t *data=extra;
-  long int i;
   
   if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_AD_eval(par, data);
@@ -879,7 +876,6 @@ void igraph_i_revolver_ml_AD_df(const igraph_vector_t *par,
 				igraph_vector_t *res, void *extra) {
 
   igraph_i_revolver_ml_AD_data_t *data=extra;
-  long int i;
   
   if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_AD_eval(par, data);
@@ -1297,7 +1293,6 @@ igraph_real_t igraph_i_revolver_ml_ADE_f(const igraph_vector_t *par,
 					 void *extra) {
 
   igraph_i_revolver_ml_ADE_data_t *data=extra;
-  long int i;
   
   if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_ADE_eval(par, data);
@@ -1321,7 +1316,6 @@ void igraph_i_revolver_ml_ADE_df(const igraph_vector_t *par,
 				 igraph_vector_t *res, void *extra) {
 
   igraph_i_revolver_ml_ADE_data_t *data=extra;
-  long int i;
   
   if (!igraph_vector_all_e(par, &data->lastparam)) {
     igraph_i_revolver_ml_ADE_eval(par, data);
