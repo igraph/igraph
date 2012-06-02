@@ -33,6 +33,7 @@
 #include "igraph_interface.h"
 #include "igraph_progress.h"
 #include "igraph_interrupt_internal.h"
+#include "igraph_topology.h"
 #include "igraph_types_internal.h"
 #include "igraph_stack.h"
 #include "igraph_dqueue.h"
@@ -311,6 +312,7 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
   igraph_matrix_t values;
   igraph_matrix_t vectors;
   igraph_vector_t indegree;
+  igraph_bool_t dag;
   long int i;
 
   if (igraph_ecount(graph) == 0) {
@@ -321,7 +323,21 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
       igraph_vector_resize(vector, igraph_vcount(graph));
       igraph_vector_fill(vector, 1);
     }
-	return IGRAPH_SUCCESS;
+    return IGRAPH_SUCCESS;
+  }
+
+  /* Quick check: if the graph is a DAG, all the eigenvector centralities are
+   * zeros, and so is the eigenvalue */
+  IGRAPH_CHECK(igraph_is_dag(graph, &dag));
+  if (dag) {
+    /* special case: graph is a DAG */
+    if (value)
+      *value = 0;
+    if (vector) {
+      igraph_vector_resize(vector, igraph_vcount(graph));
+      igraph_vector_fill(vector, 0);
+    }
+    return IGRAPH_SUCCESS;
   }
 
   if (weights) {
@@ -1445,7 +1461,6 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
   long int source, j;
   igraph_stack_t S;
   igraph_integer_t mode= directed ? IGRAPH_OUT : IGRAPH_ALL;
-  igraph_integer_t omode= directed ? IGRAPH_IN : IGRAPH_ALL;
   igraph_vector_t dist, nrgeo, tmpscore;
   igraph_vector_t v_tmpres, *tmpres=&v_tmpres;
   igraph_vit_t vit;
