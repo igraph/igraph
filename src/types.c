@@ -22,6 +22,18 @@
 */
 
 #include "igraph_types.h"
+#include <float.h>
+
+#ifdef DBL_DIG
+/* Use DBL_DIG to determine the maximum precision used for %g */
+#  define STRINGIFY_HELPER(x) #x
+#  define STRINGIFY(x) STRINGIFY_HELPER(x)
+#  define IGRAPH_REAL_PRINTF_PRECISE_FORMAT "%." STRINGIFY(DBL_DIG) "g"
+#else
+/* Assume a precision of 10 digits for %g */
+#  define IGRAPH_REAL_PRINTF_PRECISE_FORMAT "%.10g"
+#endif
+
 
 int igraph_real_printf(igraph_real_t val) {
   if (igraph_finite(val)) {
@@ -56,3 +68,72 @@ int igraph_real_fprintf(FILE *file, igraph_real_t val) {
     return fprintf(file, "%g", val);
   }
 }
+
+int igraph_real_snprintf(char* str, size_t size, igraph_real_t val) {
+  if (igraph_finite(val)) {
+    return snprintf(str, size, "%g", val);
+  } else if (igraph_is_nan(val)) {
+    return snprintf(str, size, "NaN");
+  } else if (igraph_is_inf(val)) {
+    if (val < 0) {
+      return snprintf(str, size, "-Inf");
+    } else {
+      return snprintf(str, size, "Inf");
+    }
+  } else {
+    /* fallback */
+    return snprintf(str, size, "%g", val);
+  }
+}
+
+int igraph_real_printf_precise(igraph_real_t val) {
+  if (igraph_finite(val)) {
+    return printf(IGRAPH_REAL_PRINTF_PRECISE_FORMAT, val);
+  } else if (igraph_is_nan(val)) {
+    return printf("NaN");
+  } else if (igraph_is_inf(val)) {
+    if (val < 0) {
+      return printf("-Inf");
+    } else {
+      return printf("Inf");
+    }
+  } else {
+    /* fallback */
+    return printf(IGRAPH_REAL_PRINTF_PRECISE_FORMAT, val);
+  }
+}
+
+int igraph_real_fprintf_precise(FILE *file, igraph_real_t val) {
+  if (igraph_finite(val)) {
+    return fprintf(file, IGRAPH_REAL_PRINTF_PRECISE_FORMAT, val);
+  } else if (igraph_is_nan(val)) {
+    return fprintf(file, "NaN");
+  } else if (igraph_is_inf(val)) {
+    if (val < 0) {
+      return fprintf(file, "-Inf");
+    } else {
+      return fprintf(file, "Inf");
+    }
+  } else {
+    /* fallback */
+    return fprintf(file, IGRAPH_REAL_PRINTF_PRECISE_FORMAT, val);
+  }
+}
+
+int igraph_real_snprintf_precise(char* str, size_t size, igraph_real_t val) {
+  if (igraph_finite(val)) {
+    return snprintf(str, size, IGRAPH_REAL_PRINTF_PRECISE_FORMAT, val);
+  } else if (igraph_is_nan(val)) {
+    return snprintf(str, size, "NaN");
+  } else if (igraph_is_inf(val)) {
+    if (val < 0) {
+      return snprintf(str, size, "-Inf");
+    } else {
+      return snprintf(str, size, "Inf");
+    }
+  } else {
+    /* fallback */
+    return snprintf(str, size, IGRAPH_REAL_PRINTF_PRECISE_FORMAT, val);
+  }
+}
+

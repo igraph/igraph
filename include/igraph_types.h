@@ -49,8 +49,17 @@ typedef int    igraph_integer_t;
 typedef double igraph_real_t;
 typedef int    igraph_bool_t;
 
+/* Replacements for printf that print doubles in the same way on all platforms
+ * (even for NaN and infinities) */
 int igraph_real_printf(igraph_real_t val);
 int igraph_real_fprintf(FILE *file, igraph_real_t val);
+int igraph_real_snprintf(char* str, size_t size, igraph_real_t val);
+
+/* Replacements for printf that print doubles in the same way on all platforms
+ * (even for NaN and infinities) with the largest possible precision */
+int igraph_real_printf_precise(igraph_real_t val);
+int igraph_real_fprintf_precise(FILE *file, igraph_real_t val);
+int igraph_real_snprintf_precise(char* str, size_t size, igraph_real_t val);
 
 /* igraph_i_fdiv is needed here instead of in igraph_math.h because
  * some constants use it */

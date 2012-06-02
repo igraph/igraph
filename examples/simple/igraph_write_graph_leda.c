@@ -87,5 +87,16 @@ int main(int argc, char **argv) {
   printf("===\n");
   igraph_destroy(&g);
 
+  /* Saving undirected graph with edge attributes and large weights */
+  igraph_ring(&g, 5, /* directed = */ 0,
+                     /* mutual   = */ 0,
+                     /* circular = */ 1);
+  igraph_vector_init_seq(&values, 123456789, 123456793);
+  SETEANV(&g, "weight", &values);
+  igraph_write_graph_leda(&g, stdout, 0, "weight");
+  igraph_vector_destroy(&values);
+  printf("===\n");
+  igraph_destroy(&g);
+
   return 0;
 }
