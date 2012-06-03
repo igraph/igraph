@@ -259,6 +259,14 @@ int igraph_i_maximum_bipartite_matching_weighted(const igraph_t* graph,
  * \param weights A null pointer (=no edge weights), or a vector giving the
  *                weights of the edges. Note that the algorithm is stable
  *                only for integer weights.
+ * \param eps A small real number used in equality tests in the weighted
+ *            bipartite matching algorithm. Two real numbers are considered
+ *            equal in the algorithm if their difference is smaller than
+ *            \c eps. This is required to avoid the accumulation of numerical
+ *            errors. It is advised to pass a value derived from the
+ *            \c DBL_EPSILON constant in \c float.h here. If you are
+ *            running the algorithm with no \c weights vector, this argument
+ *            is ignored.
  * \return Error code.
  *
  * Time complexity: O(sqrt(|V|) |E|) for unweighted graphs (according to the
@@ -269,7 +277,7 @@ int igraph_i_maximum_bipartite_matching_weighted(const igraph_t* graph,
 int igraph_maximum_bipartite_matching(const igraph_t* graph,
     const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
     igraph_real_t* matching_weight, igraph_vector_long_t* matching,
-    const igraph_vector_t* weights) {
+    const igraph_vector_t* weights, igraph_real_t eps) {
 
   /* Sanity checks */
   if (igraph_vector_bool_size(types) < igraph_vcount(graph)) {
@@ -287,9 +295,8 @@ int igraph_maximum_bipartite_matching(const igraph_t* graph,
     }
     return IGRAPH_SUCCESS;
   } else {
-    /* TODO: set eps properly */
     return igraph_i_maximum_bipartite_matching_weighted(graph, types,
-        matching_size, matching_weight, matching, weights, 0);
+        matching_size, matching_weight, matching, weights, eps);
   }
 }
 
@@ -608,7 +615,7 @@ int igraph_i_maximum_bipartite_matching_weighted(const igraph_t* graph,
    *     will be calculated (only on the subset of tight edges) */
   IGRAPH_CHECK(igraph_create(&newgraph, &vec1, no_of_nodes, 0));
   IGRAPH_FINALLY(igraph_destroy, &newgraph);
-  IGRAPH_CHECK(igraph_maximum_bipartite_matching(&newgraph, types, &msize, 0, &match, 0));
+  IGRAPH_CHECK(igraph_maximum_bipartite_matching(&newgraph, types, &msize, 0, &match, 0, 0));
   igraph_destroy(&newgraph);
   IGRAPH_FINALLY_CLEAN(1);
 

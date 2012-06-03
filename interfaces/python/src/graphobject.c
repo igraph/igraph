@@ -34,6 +34,7 @@
 #include "py2compat.h"
 #include "pyhelpers.h"
 #include "vertexseqobject.h"
+#include <float.h>
 
 PyTypeObject igraphmodule_GraphType;
 
@@ -9887,15 +9888,19 @@ PyObject *igraphmodule_Graph_largest_cliques(igraphmodule_GraphObject * self)
  */
 PyObject *igraphmodule_Graph_maximum_bipartite_matching(igraphmodule_GraphObject* self,
     PyObject* args, PyObject* kwds) {
-  static char* kwlist[] = { "types", "weights", NULL };
+  static char* kwlist[] = { "types", "weights", "eps", NULL };
   PyObject *types_o = Py_None, *weights_o = Py_None, *result_o;
   igraph_vector_bool_t* types = 0;
   igraph_vector_t* weights = 0;
   igraph_vector_long_t result;
+  double eps = -1;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &types_o,
-        &weights_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|Od", kwlist, &types_o,
+        &weights_o, &eps))
     return NULL;
+
+  if (eps < 0)
+    eps = DBL_EPSILON * 1000;
 
   if (igraphmodule_attrib_to_vector_bool_t(types_o, self, &types, ATTRIBUTE_TYPE_VERTEX))
 	return NULL;
@@ -9912,7 +9917,7 @@ PyObject *igraphmodule_Graph_maximum_bipartite_matching(igraphmodule_GraphObject
     return NULL;
   }
 
-  if (igraph_maximum_bipartite_matching(&self->g, types, 0, 0, &result, weights)) {
+  if (igraph_maximum_bipartite_matching(&self->g, types, 0, 0, &result, weights, eps)) {
     if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
     if (weights != 0) { igraph_vector_destroy(weights); free(weights); }
     igraph_vector_long_destroy(&result);

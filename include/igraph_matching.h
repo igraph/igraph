@@ -55,7 +55,7 @@ int igraph_is_maximal_matching(const igraph_t* graph,
 int igraph_maximum_bipartite_matching(const igraph_t* graph,
     const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
     igraph_real_t* matching_weight, igraph_vector_long_t* matching,
-    const igraph_vector_t* weights);
+    const igraph_vector_t* weights, igraph_real_t eps);
 
 int igraph_maximum_matching(const igraph_t* graph, igraph_integer_t* matching_size,
     igraph_real_t* matching_weight, igraph_vector_long_t* matching,

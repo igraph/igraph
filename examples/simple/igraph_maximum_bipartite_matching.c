@@ -53,7 +53,7 @@ int test_graph_from_leda_tutorial() {
   igraph_vector_long_init(&matching, 0);
 
   igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
-      &matching_weight, &matching, 0);
+      &matching_weight, &matching, 0, 0);
   if (matching_size != 6) {
     printf("matching_size is %ld, expected: 6\n", (long)matching_size);
     return 1;
@@ -108,7 +108,7 @@ int test_weighted_graph_from_mit_notes() {
       sizeof(weight_array) / sizeof(weight_array[0]));
 
   igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
-      &matching_weight, &matching, &weights);
+      &matching_weight, &matching, &weights, 0);
   if (matching_size != 4) {
     printf("matching_size is %ld, expected: 4\n", (long)matching_size);
     return 1;
@@ -156,7 +156,7 @@ int test_weighted_graph_generated() {
   igraph_vector_init_copy(&weights, weight_array_1,
       sizeof(weight_array_1) / sizeof(weight_array_1[0]));
   igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
-      &matching_weight, &matching, &weights);
+      &matching_weight, &matching, &weights, 0);
   if (matching_weight != 43) {
     printf("matching_weight is %ld, expected: 43\n", (long)matching_weight);
     return 2;
@@ -170,7 +170,7 @@ int test_weighted_graph_generated() {
   igraph_vector_init_copy(&weights, weight_array_2,
       sizeof(weight_array_2) / sizeof(weight_array_2[0]));
   igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
-      &matching_weight, &matching, &weights);
+      &matching_weight, &matching, &weights, 0);
   if (matching_weight != 41) {
     printf("matching_weight is %ld, expected: 41\n", (long)matching_weight);
     return 2;
@@ -212,7 +212,7 @@ int test_weighted_graph_from_file(const char* fname, int type1_count, long exp_w
   igraph_vector_init(&weights, 0);
   EANV(&graph, "weight", &weights);
   igraph_maximum_bipartite_matching(&graph, &types, 0, &matching_weight,
-      &matching, &weights);
+      &matching, &weights, 0);
   igraph_vector_destroy(&weights);
 
   igraph_vector_long_print(&matching);

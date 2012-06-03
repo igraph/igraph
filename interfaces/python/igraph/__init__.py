@@ -1399,7 +1399,7 @@ class Graph(GraphBase):
         extd_graph.es["_original_eid"] = extd_to_orig_eids
         return Layout(layout), extd_graph
 
-    def maximum_bipartite_matching(self, types="type", weights=None):
+    def maximum_bipartite_matching(self, types="type", weights=None, eps=None):
         """Finds a maximum matching in a bipartite graph.
         
         A maximum matching is a set of edges such that each vertex is incident on
@@ -1413,8 +1413,17 @@ class Graph(GraphBase):
           attribute for bipartite graphs.
         @param weights: edge weights to be used. Can be a sequence or iterable or
           even an edge attribute name.
+        @param eps: a small real number used in equality tests in the weighted
+          bipartite matching algorithm. Two real numbers are considered equal in
+          the algorithm if their difference is smaller than this value. This
+          is required to avoid the accumulation of numerical errors. If you
+          pass C{None} here, igraph will try to determine an appropriate value
+          automatically.
         @return: an instance of L{Matching}."""
-        matches = GraphBase._maximum_bipartite_matching(self, types, weights)
+        if eps is None:
+            eps = -1
+
+        matches = GraphBase._maximum_bipartite_matching(self, types, weights, eps)
         return Matching(self, matches, types=types)
 
     #############################################
@@ -3409,7 +3418,6 @@ class EdgeSeq(_igraph.EdgeSeq):
                 filtered_idxs=[i for i, v in enumerate(values) \
                                if func(v, value)]
 
-            print filtered_idxs
             es = es.select(filtered_idxs)
 
         return es

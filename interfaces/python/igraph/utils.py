@@ -9,7 +9,8 @@ import tempfile
 
 __license__ = "GPL"
 
-__all__ = ["multidict", "rescale", "safemin", "safemax"]
+__all__ = ["dbl_epsilon", "multidict", "named_temporary_file", "rescale", \
+        "safemin", "safemax"]
 __docformat__ = "restructuredtext en"
 
 @contextmanager
@@ -341,3 +342,11 @@ def safemin(iterable, default=0):
         return default
     else:
         return min(chain([first], it))
+
+def dbl_epsilon():
+    """Approximates the machine epsilon value for doubles."""
+    epsilon = 1.0
+    while 1.0 + epsilon / 2.0 != 1.0:
+        epsilon /= 2
+    return epsilon
+dbl_epsilon = dbl_epsilon()
