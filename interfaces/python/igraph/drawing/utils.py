@@ -228,7 +228,7 @@ class Rectangle(object):
             >>> r1.intersection(r2).isempty()
             True
         """
-        return self._left != self._right or self._top != self._bottom
+        return self._left == self._right and self._top == self._bottom
 
     def intersection(self, other):
         """Returns the intersection of this rectangle with another.
@@ -331,8 +331,11 @@ class Rectangle(object):
     def __ne__(self, other):
         return self.coords != other.coords
 
-    __nonzero__ = isempty
-    __bool__ = isempty
+    def __bool__(self):
+        return self._left != self._right or self._top != self._bottom
+
+    def __nonzero__(self):
+        return self._left != self._right or self._top != self._bottom
 
     def __hash__(self):
         return hash(self.coords)

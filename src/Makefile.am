@@ -198,7 +198,8 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_eigen.h	../include/igraph_statusbar.h \
 		../include/igraph_hrg.h         ../include/igraph_microscopic_update.h \
 		../include/igraph_interrupt.h   ../include/igraph_threading.h \
-		../include/igraph_scg.h		../include/igraph_qsort.h
+		../include/igraph_scg.h		../include/igraph_qsort.h \
+		../include/igraph_matching.h
 
 libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     basic_query.c games.c cocitation.c iterators.c \
@@ -249,7 +250,7 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     lapack.c complex.c eigen.c feedback_arc_set.c \
 			     sugiyama.c glpk_support.c \
 				 igraph_hrg_types.cc igraph_hrg.cc \
-			     distances.c fortran_intrinsics.c \
+			     distances.c fortran_intrinsics.c matching.c \
 			     scg.c scg_approximate_methods.c scg_exact_scg.c \
 			     scg_kmeans.c scg_utils.c scg_optimal_method.c \
 			     qsort.c qsort_r.c types.c

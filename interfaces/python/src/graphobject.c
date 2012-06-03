@@ -359,6 +359,91 @@ PyObject *igraphmodule_Graph_is_directed(igraphmodule_GraphObject * self)
   Py_RETURN_FALSE;
 }
 
+/**
+ * \ingroup python_interface_graph
+ * \brief Checks whether a matching is valid in the context of an \c igraph.Graph
+ * object.
+ * \sa igraph_is_matching
+ */
+PyObject *igraphmodule_Graph_is_matching(igraphmodule_GraphObject* self,
+    PyObject* args, PyObject* kwds) {
+  static char* kwlist[] = { "matching", "types", NULL };
+  PyObject *matching_o, *types_o = Py_None;
+  igraph_vector_long_t* matching = 0;
+  igraph_vector_bool_t* types = 0;
+  igraph_bool_t result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &matching_o,
+        &types_o))
+    return NULL;
+
+  if (igraphmodule_attrib_to_vector_long_t(matching_o, self, &matching,
+        ATTRIBUTE_TYPE_VERTEX))
+	return NULL;
+
+  if (igraphmodule_attrib_to_vector_bool_t(types_o, self, &types, ATTRIBUTE_TYPE_VERTEX)) {
+    if (matching != 0) { igraph_vector_long_destroy(matching); free(matching); }
+	return NULL;
+  }
+
+  if (igraph_is_matching(&self->g, types, matching, &result)) {
+    if (matching != 0) { igraph_vector_long_destroy(matching); free(matching); }
+    if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (matching != 0) { igraph_vector_long_destroy(matching); free(matching); }
+  if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+
+  if (result)
+    Py_RETURN_TRUE;
+  Py_RETURN_FALSE;
+}
+
+/**
+ * \ingroup python_interface_graph
+ * \brief Checks whether a matching is valid and maximal in the context of an
+ *        \c igraph.Graph object.
+ * \sa igraph_is_maximal_matching
+ */
+PyObject *igraphmodule_Graph_is_maximal_matching(igraphmodule_GraphObject* self,
+    PyObject* args, PyObject* kwds) {
+  static char* kwlist[] = { "matching", "types", NULL };
+  PyObject *matching_o, *types_o = Py_None;
+  igraph_vector_long_t* matching = 0;
+  igraph_vector_bool_t* types = 0;
+  igraph_bool_t result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &matching_o,
+        &types_o))
+    return NULL;
+
+  if (igraphmodule_attrib_to_vector_long_t(matching_o, self, &matching,
+        ATTRIBUTE_TYPE_VERTEX))
+	return NULL;
+
+  if (igraphmodule_attrib_to_vector_bool_t(types_o, self, &types, ATTRIBUTE_TYPE_VERTEX)) {
+    if (matching != 0) { igraph_vector_long_destroy(matching); free(matching); }
+	return NULL;
+  }
+
+  if (igraph_is_maximal_matching(&self->g, types, matching, &result)) {
+    if (matching != 0) { igraph_vector_long_destroy(matching); free(matching); }
+    if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (matching != 0) { igraph_vector_long_destroy(matching); free(matching); }
+  if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+
+  if (result)
+    Py_RETURN_TRUE;
+  Py_RETURN_FALSE;
+}
+
+
 /** \ingroup python_interface_graph
  * \brief Checks whether an \c igraph.Graph object is simple.
  * \return \c True if the graph is simple, \c False otherwise.
@@ -9798,6 +9883,53 @@ PyObject *igraphmodule_Graph_largest_cliques(igraphmodule_GraphObject * self)
 }
 
 /** \ingroup python_interface_graph
+ * \brief Finds a maximum matching in a bipartite graph
+ */
+PyObject *igraphmodule_Graph_maximum_bipartite_matching(igraphmodule_GraphObject* self,
+    PyObject* args, PyObject* kwds) {
+  static char* kwlist[] = { "types", "weights", NULL };
+  PyObject *types_o = Py_None, *weights_o = Py_None, *result_o;
+  igraph_vector_bool_t* types = 0;
+  igraph_vector_t* weights = 0;
+  igraph_vector_long_t result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &types_o,
+        &weights_o))
+    return NULL;
+
+  if (igraphmodule_attrib_to_vector_bool_t(types_o, self, &types, ATTRIBUTE_TYPE_VERTEX))
+	return NULL;
+
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights, ATTRIBUTE_TYPE_EDGE)) {
+    if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+	return NULL;
+  }
+
+  if (igraph_vector_long_init(&result, 0)) {
+    if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+    if (weights != 0) { igraph_vector_destroy(weights); free(weights); }
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_maximum_bipartite_matching(&self->g, types, 0, 0, &result, weights)) {
+    if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+    if (weights != 0) { igraph_vector_destroy(weights); free(weights); }
+    igraph_vector_long_destroy(&result);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+  if (weights != 0) { igraph_vector_destroy(weights); free(weights); }
+
+  result_o = igraphmodule_vector_long_t_to_PyList(&result);
+  igraph_vector_long_destroy(&result);
+
+  return result_o;
+}
+
+/** \ingroup python_interface_graph
  * \brief Find all maximal cliques in a graph
  */
 PyObject *igraphmodule_Graph_maximal_cliques(igraphmodule_GraphObject * self,
@@ -14134,6 +14266,27 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@ref: Pascal Pons, Matthieu Latapy: Computing communities in large networks\n"
    "  using random walks, U{http://arxiv.org/abs/physics/0512106}.\n"
    "@see: modularity()\n"
+  },
+
+  /*************/
+  /* MATCHINGS */
+  /*************/
+  {"_is_matching", (PyCFunction)igraphmodule_Graph_is_matching,
+   METH_VARARGS | METH_KEYWORDS,
+   "_is_matching(matching, types=None)\n\n"
+   "Internal function, undocumented.\n\n"
+  },
+  {"_is_maximal_matching", (PyCFunction)igraphmodule_Graph_is_maximal_matching,
+   METH_VARARGS | METH_KEYWORDS,
+   "_is_maximal_matching(matching, types=None)\n\n"
+   "Internal function, undocumented.\n\n"
+   "Use L{Matching.is_maximal} instead.\n"
+  },
+  {"_maximum_bipartite_matching", (PyCFunction)igraphmodule_Graph_maximum_bipartite_matching,
+   METH_VARARGS | METH_KEYWORDS,
+   "_maximum_bipartite_matching(types, weights=None)\n\n"
+   "Internal function, undocumented.\n\n"
+   "@see: L{Graph.maximum_bipartite_matching}\n"
   },
 
   /**********************/

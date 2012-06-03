@@ -90,5 +90,6 @@
 #include "igraph_threading.h"
 #include "igraph_interrupt.h"
 #include "igraph_scg.h"
+#include "igraph_matching.h"
 
 #endif

@@ -51,7 +51,8 @@ def rescale(values, out_range = (0., 1.), in_range = None, clamp = False,
     and the rescaling will take place on the results instead. This can be used,
     for instance, to transform the logarithm of the original values instead of
     the actual values. A typical use-case is to map a range of values to color
-    identifiers on a logarithmic scale.
+    identifiers on a logarithmic scale. Scaling also applies to the `in_range`
+    parameter if present.
 
     Examples:
         
@@ -68,7 +69,7 @@ def rescale(values, out_range = (0., 1.), in_range = None, clamp = False,
         >>> from math import log10
         >>> rescale([1, 10, 100, 1000, 10000], (0, 8), scale=log10)
         [0.0, 2.0, 4.0, 6.0, 8.0]
-        >>> rescale([1, 10, 100, 1000, 10000], (0, 4), (1, 3), scale=log10)
+        >>> rescale([1, 10, 100, 1000, 10000], (0, 4), (10, 1000), scale=log10)
         [-2.0, 0.0, 2.0, 4.0, 6.0]
     """
     if scale is not None:

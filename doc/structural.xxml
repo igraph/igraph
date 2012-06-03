@@ -150,6 +150,12 @@
 <!-- doxrox-include igraph_is_chordal -->
 </section>
 
+<section><title>Matchings</title>
+<!-- doxrox-include igraph_is_matching -->
+<!-- doxrox-include igraph_is_maximal_matching -->
+<!-- doxrox-include igraph_maximum_bipartite_matching -->
+</section>
+
 <section><title>Line graphs</title>
 <!-- doxrox-include igraph_linegraph -->
 </section>

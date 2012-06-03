@@ -22,7 +22,8 @@ TESTSUITE_AT = \
 	visitors.at layout.at motifs.at topology.at foreign.at operators.at \
 	other.at foreign.at conversion.at flow.at community.at eigen.at \
 	cliques.at attributes.at arpack.at bipartite.at centralization.at \
-	version.at separators.at hrg.at microscopic.at mt.at random.at scg.at
+	version.at separators.at hrg.at microscopic.at mt.at random.at scg.at \
+	matching.at
 
 TESTSUITE = testsuite
 
