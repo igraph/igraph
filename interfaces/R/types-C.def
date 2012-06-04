@@ -53,6 +53,13 @@ INTEGERPTR:
     OUT: PROTECT(%I%=NEW_INTEGER(1)); \
          INTEGER(%I%)[0]=%C%;
 
+INTEGERPTR_OR_0:
+  CTYPE: igraph_integer_t
+  CALL: &%C%
+  OUTCONV:
+    OUT: PROTECT(%I%=NEW_INTEGER(1)); \
+         INTEGER(%I%)[0]=%C%;
+
 INT:
   CTYPE: int
   INCONV:
@@ -70,6 +77,17 @@ REAL:
          REAL(%I%)[0]=%C%;
 
 REALPTR:
+  CTYPE: igraph_real_t
+  CALL: &%C%
+  INCONV:
+    INOUT: %C%=REAL(%I%)[0];
+  OUTCONV:
+    OUT: PROTECT(%I%=NEW_NUMERIC(1)); \
+         REAL(%I%)[0]=%C%;
+    INOUT: PROTECT(%I%=NEW_NUMERIC(1)); \
+         REAL(%I%)[0]=%C%;
+
+REALPTR_OR_0:
   CTYPE: igraph_real_t
   CALL: &%C%
   INCONV:
@@ -214,7 +232,31 @@ VECTOR_LONG:
   CTYPE: igraph_vector_long_t
   CALL: &%C%
   INCONV:
-    IN: R_SEXP_to_vector_long(%I%, &%C%);
+    IN: R_SEXP_to_vector_long_copy(%I%, &%C%);
+    OUT: if (0 != igraph_vector_long_init(&%C%, 0)) { \
+             igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(igraph_vector_long_destroy, &%C%);
+  OUTCONV:
+    IN: igraph_vector_long_destroy(&%C%);
+    OUT: PROTECT(%I%=R_igraph_vector_long_to_SEXP(&%C%)); \
+         igraph_vector_long_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
+VECTOR_LONG_M1:
+  CTYPE: igraph_vector_long_t
+  CALL: &%C%
+  INCONV:
+    IN: R_SEXP_to_vector_long_copy(%I%, &%C%);
+    OUT: if (0 != igraph_vector_long_init(&%C%, 0)) { \
+             igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(igraph_vector_long_destroy, &%C%);
+  OUTCONV:
+    IN: igraph_vector_long_destroy(&%C%);
+    OUT: PROTECT(%I%=R_igraph_vector_long_to_SEXPp1(&%C%)); \
+         igraph_vector_long_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
 
 VECTORLIST:
   CTYPE: igraph_vector_ptr_t
@@ -622,6 +664,12 @@ STRVECTOR:
 # Vertex types in a bipartite graph
 
 BIPARTITE_TYPES:
+  CTYPE: igraph_vector_bool_t
+  CALL: (isNull(%I%) ? 0 : &%C%)
+  INCONV:
+    IN: if (!isNull(%I%)) { R_SEXP_to_vector_bool(%I%, &%C%); }
+
+BIPARTITE_TYPES_OR_0:
   CTYPE: igraph_vector_bool_t
   CALL: (isNull(%I%) ? 0 : &%C%)
   INCONV:

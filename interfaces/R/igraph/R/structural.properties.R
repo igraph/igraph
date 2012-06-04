@@ -1028,3 +1028,76 @@ graph.laplacian <- function(graph, normalized=FALSE, weights=NULL,
   res
 }
 
+is.matching <- function(graph, matching, types=NULL) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (is.null(types) && "type" %in% list.vertex.attributes(graph)) { 
+    types <- V(graph)$type 
+  } 
+  if (!is.null(types)) { 
+    types <- as.logical(types) 
+  }
+  matching <- as.igraph.vs(graph, matching, na.ok=TRUE)-1
+  matching[ is.na(matching) ] <- -1
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_is_matching", graph, types, matching,
+        PACKAGE="igraph")
+
+  res
+}
+
+is.maximal.matching <- function(graph, matching, types=NULL) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (is.null(types) && "type" %in% list.vertex.attributes(graph)) { 
+    types <- V(graph)$type 
+  } 
+  if (!is.null(types)) { 
+    types <- as.logical(types) 
+  }
+  matching <- as.igraph.vs(graph, matching, na.ok=TRUE)-1
+  matching[ is.na(matching) ] <- -1
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_is_maximal_matching", graph, types, matching,
+        PACKAGE="igraph")
+
+  res
+}
+
+maximum.bipartite.matching <- function(graph, types=NULL, weights=NULL,
+                                       eps=.Machine$double.eps) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (is.null(types) && "type" %in% list.vertex.attributes(graph)) { 
+    types <- V(graph)$type 
+  } 
+  if (!is.null(types)) { 
+    types <- as.logical(types) 
+  }
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
+    weights <- E(graph)$weight 
+  } 
+  if (!is.null(weights) && any(!is.na(weights))) { 
+    weights <- as.numeric(weights) 
+  } else { 
+    weights <- NULL 
+  }
+  eps <- as.numeric(eps)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_maximum_bipartite_matching", graph, types, weights,
+               eps,
+               PACKAGE="igraph")
+
+  res$matching[ res$matching==0 ] <- NA
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    res$matching <- V(graph)$name[res$matching]
+    names(res$matching) <- V(graph)$name
+  }
+  res
+}
