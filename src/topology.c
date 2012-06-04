@@ -1154,10 +1154,10 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
   if (map12) {
     core_1=map12;
     IGRAPH_CHECK(igraph_vector_resize(core_1, no_of_nodes));
-    igraph_vector_null(core_1);
   } else {
     IGRAPH_VECTOR_INIT_FINALLY(core_1, no_of_nodes);
   }
+  igraph_vector_fill(core_1, -1);
   if (map21) {
     core_2=map21;
     IGRAPH_CHECK(igraph_vector_resize(core_2, no_of_nodes));
@@ -1165,6 +1165,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
   } else {
     IGRAPH_VECTOR_INIT_FINALLY(core_2, no_of_nodes);
   }
+  igraph_vector_fill(core_2, -1);
+  
   IGRAPH_VECTOR_INIT_FINALLY(&in_1, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&in_2, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&out_1, no_of_nodes);
@@ -1217,7 +1219,7 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
       } else {
 	i=0;
 	while (cand2<0 && i<no_of_nodes) {
-	  if (VECTOR(out_2)[i]>0 && VECTOR(*core_2)[i]==0) {
+	  if (VECTOR(out_2)[i]>0 && VECTOR(*core_2)[i] < 0) {
 	    cand2=i;
 	  }
 	  i++;
@@ -1226,7 +1228,7 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
       /* search for cand1 now, it should be bigger than last1 */
       i=last1+1;
       while (cand1<0 && i<no_of_nodes) {
-	if (VECTOR(out_1)[i]>0 && VECTOR(*core_1)[i]==0) {
+	if (VECTOR(out_1)[i]>0 && VECTOR(*core_1)[i] < 0) {
 	  cand1=i;
 	}
 	i++;
@@ -1239,7 +1241,7 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
       } else {
 	i=0;
 	while (cand2<0 && i<no_of_nodes) {
-	  if (VECTOR(in_2)[i]>0 && VECTOR(*core_2)[i]==0) {
+	  if (VECTOR(in_2)[i]>0 && VECTOR(*core_2)[i] < 0) {
 	    cand2=i;
 	  }
 	  i++;
@@ -1248,7 +1250,7 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
       /* search for cand1 now, should be bigger than last1 */
       i=last1+1;
       while (cand1<0 && i<no_of_nodes) {
-	if (VECTOR(in_1)[i]>0 && VECTOR(*core_1)[i]==0) {
+	if (VECTOR(in_1)[i]>0 && VECTOR(*core_1)[i] < 0) {
 	  cand1=i;
 	}
 	i++;
@@ -1261,7 +1263,7 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
       } else {
 	i=0;
 	while (cand2<0 && i<no_of_nodes) {
-	  if (VECTOR(*core_2)[i]==0) { 
+	  if (VECTOR(*core_2)[i] < 0) { 
 	    cand2=i;
 	  }
 	  i++;
@@ -1270,7 +1272,7 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
       /* search for cand1, should be bigger than last1 */
       i=last1+1;
       while (cand1<0 && i<no_of_nodes) {
-	if (VECTOR(*core_1)[i]==0) {
+	if (VECTOR(*core_1)[i] < 0) {
 	  cand1=i;
 	}
 	i++;
@@ -1285,8 +1287,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
 	last2=igraph_stack_pop(&path);
 	last1=igraph_stack_pop(&path);
 	matched_nodes -= 1;
-	VECTOR(*core_1)[last1]=0;
-	VECTOR(*core_2)[last2]=0;
+	VECTOR(*core_1)[last1]=-1;
+	VECTOR(*core_2)[last2]=-1;
 	
 	if (VECTOR(in_1)[last1] != 0) {
 	  in_1_size += 1;
@@ -1361,8 +1363,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
 
       for (i=0; !end && i<igraph_vector_size(inneis_1); i++) {
 	long int node=VECTOR(*inneis_1)[i];
-	if (VECTOR(*core_1)[node]!=0) {
-	  long int node2=VECTOR(*core_1)[node]-1;
+	if (VECTOR(*core_1)[node]>=0) {
+	  long int node2=VECTOR(*core_1)[node];
 	  /* check if there is a node2->cand2 edge */
 	  if (!igraph_vector_binsearch2(inneis_2, node2)) {
 	    end=1;
@@ -1392,8 +1394,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
       }
       for (i=0; !end && i<igraph_vector_size(outneis_1); i++) {
 	long int node=VECTOR(*outneis_1)[i];
-	if (VECTOR(*core_1)[node]!=0) {
-	  long int node2=VECTOR(*core_1)[node]-1;
+	if (VECTOR(*core_1)[node]>=0) {
+	  long int node2=VECTOR(*core_1)[node];
 	  /* check if there is a cand2->node2 edge */
 	  if (!igraph_vector_binsearch2(outneis_2, node2)) {
 	    end=1;
@@ -1423,8 +1425,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
       }      
       for (i=0; !end && i<igraph_vector_size(inneis_2); i++) {
 	long int node=VECTOR(*inneis_2)[i];
-	if (VECTOR(*core_2)[node]!=0) {
-	  long int node2=VECTOR(*core_2)[node]-1;
+	if (VECTOR(*core_2)[node]>=0) {
+	  long int node2=VECTOR(*core_2)[node];
 	  /* check if there is a node2->cand1 edge */
 	  if (!igraph_vector_binsearch2(inneis_1, node2)) {
 	    end=1;
@@ -1454,8 +1456,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
       }      
       for (i=0; !end && i<igraph_vector_size(outneis_2); i++) {
 	long int node=VECTOR(*outneis_2)[i];
-	if (VECTOR(*core_2)[node] != 0) {
-	  long int node2=VECTOR(*core_2)[node]-1;
+	if (VECTOR(*core_2)[node] >= 0) {
+	  long int node2=VECTOR(*core_2)[node];
 	  /* check if there is a cand1->node2 edge */
 	  if (!igraph_vector_binsearch2(outneis_1, node2)) {
 	    end=1;
@@ -1490,8 +1492,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
 	IGRAPH_CHECK(igraph_stack_push(&path, cand1));
 	IGRAPH_CHECK(igraph_stack_push(&path, cand2));
 	matched_nodes += 1;
-	VECTOR(*core_1)[cand1]=cand2+1;
-	VECTOR(*core_2)[cand2]=cand1+1;
+	VECTOR(*core_1)[cand1]=cand2;
+	VECTOR(*core_2)[cand2]=cand1;
 	
 	/* update in_*, out_* */
 	if (VECTOR(in_1)[cand1] != 0) {
@@ -1510,7 +1512,7 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
 	inneis_1=igraph_lazy_adjlist_get(&inadj1, cand1);
 	for (i=0; i<igraph_vector_size(inneis_1); i++) {
 	  long int node=VECTOR(*inneis_1)[i];
-	  if (VECTOR(in_1)[node]==0 && VECTOR(*core_1)[node]==0) {
+	  if (VECTOR(in_1)[node]==0 && VECTOR(*core_1)[node] < 0) {
 	    VECTOR(in_1)[node]=depth;
 	    in_1_size += 1;
 	  }
@@ -1518,7 +1520,7 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
 	outneis_1=igraph_lazy_adjlist_get(&outadj1, cand1);
 	for (i=0; i<igraph_vector_size(outneis_1); i++) {
 	  long int node=VECTOR(*outneis_1)[i];
-	  if (VECTOR(out_1)[node]==0 && VECTOR(*core_1)[node]==0) {
+	  if (VECTOR(out_1)[node]==0 && VECTOR(*core_1)[node] < 0) {
 	    VECTOR(out_1)[node]=depth;
 	    out_1_size += 1;
 	  }
@@ -1526,7 +1528,7 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
 	inneis_2=igraph_lazy_adjlist_get(&inadj2, cand2);
 	for (i=0; i<igraph_vector_size(inneis_2); i++) {
 	  long int node=VECTOR(*inneis_2)[i];
-	  if (VECTOR(in_2)[node]==0 && VECTOR(*core_2)[node]==0) {
+	  if (VECTOR(in_2)[node]==0 && VECTOR(*core_2)[node] < 0) {
 	    VECTOR(in_2)[node]=depth;
 	    in_2_size += 1;
 	  }
@@ -1534,7 +1536,7 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
 	outneis_2=igraph_lazy_adjlist_get(&outadj2, cand2);
 	for (i=0; i<igraph_vector_size(outneis_2); i++) {
 	  long int node=VECTOR(*outneis_2)[i];
-	  if (VECTOR(out_2)[node]==0 && VECTOR(*core_2)[node]==0) {
+	  if (VECTOR(out_2)[node]==0 && VECTOR(*core_2)[node] < 0) {
 	    VECTOR(out_2)[node]=depth;
 	    out_2_size += 1;
 	  }
@@ -1571,14 +1573,10 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
   if (!map21) {
     igraph_vector_destroy(core_2);
     IGRAPH_FINALLY_CLEAN(1);
-  } else {
-    igraph_vector_add_constant(core_2, -1);
-  }
+  } 
   if (!map12) { 
     igraph_vector_destroy(core_1);
     IGRAPH_FINALLY_CLEAN(1);
-  } else {
-    igraph_vector_add_constant(core_1, -1);
   }
 
   return 0;
@@ -1792,7 +1790,6 @@ igraph_bool_t igraph_i_get_isomorphisms_vf2(const igraph_vector_t *map12,
   }
   IGRAPH_FINALLY(igraph_free, newvector);
   IGRAPH_CHECK(igraph_vector_copy(newvector, map21));
-  igraph_vector_add_constant(newvector, -1);
   IGRAPH_FINALLY(igraph_vector_destroy, newvector);
   IGRAPH_CHECK(igraph_vector_ptr_push_back(ptrvector, newvector));
   IGRAPH_FINALLY_CLEAN(2);
@@ -2024,17 +2021,17 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
   if (map12) {
     core_1=map12;
     IGRAPH_CHECK(igraph_vector_resize(core_1, no_of_nodes1));
-    igraph_vector_null(core_1);
   } else {
     IGRAPH_VECTOR_INIT_FINALLY(core_1, no_of_nodes1);
   }
+  igraph_vector_fill(core_1, -1);
   if (map21) {
     core_2=map21;
     IGRAPH_CHECK(igraph_vector_resize(core_2, no_of_nodes2));
-    igraph_vector_null(core_2);
   } else {
     IGRAPH_VECTOR_INIT_FINALLY(core_2, no_of_nodes2);
   }
+  igraph_vector_fill(core_2, -1);
   IGRAPH_VECTOR_INIT_FINALLY(&in_1, no_of_nodes1);
   IGRAPH_VECTOR_INIT_FINALLY(&in_2, no_of_nodes2);
   IGRAPH_VECTOR_INIT_FINALLY(&out_1, no_of_nodes1);
@@ -2087,7 +2084,7 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
       } else {
 	i=0;
 	while (cand2<0 && i<no_of_nodes2) {
-	  if (VECTOR(out_2)[i]>0 && VECTOR(*core_2)[i]==0) {
+	  if (VECTOR(out_2)[i]>0 && VECTOR(*core_2)[i] < 0) {
 	    cand2=i;
 	  }
 	  i++;
@@ -2096,7 +2093,7 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
       /* search for cand1 now, it should be bigger than last1 */
       i=last1+1;
       while (cand1<0 && i<no_of_nodes1) {
-	if (VECTOR(out_1)[i]>0 && VECTOR(*core_1)[i]==0) {
+	if (VECTOR(out_1)[i]>0 && VECTOR(*core_1)[i] < 0) {
 	  cand1=i;
 	}
 	i++;
@@ -2109,7 +2106,7 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
       } else {
 	i=0;
 	while (cand2<0 && i<no_of_nodes2) {
-	  if (VECTOR(in_2)[i]>0 && VECTOR(*core_2)[i]==0) {
+	  if (VECTOR(in_2)[i]>0 && VECTOR(*core_2)[i] < 0) {
 	    cand2=i;
 	  }
 	  i++;
@@ -2118,7 +2115,7 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
       /* search for cand1 now, should be bigger than last1 */
       i=last1+1;
       while (cand1<0 && i<no_of_nodes1) {
-	if (VECTOR(in_1)[i]>0 && VECTOR(*core_1)[i]==0) {
+	if (VECTOR(in_1)[i]>0 && VECTOR(*core_1)[i] < 0) {
 	  cand1=i;
 	}
 	i++;
@@ -2131,7 +2128,7 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
       } else {
 	i=0;
 	while (cand2<0 && i<no_of_nodes2) {
-	  if (VECTOR(*core_2)[i]==0) { 
+	  if (VECTOR(*core_2)[i] < 0) { 
 	    cand2=i;
 	  }
 	  i++;
@@ -2140,7 +2137,7 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
       /* search for cand1, should be bigger than last1 */
       i=last1+1;
       while (cand1<0 && i<no_of_nodes1) {
-	if (VECTOR(*core_1)[i]==0) {
+	if (VECTOR(*core_1)[i] < 0) {
 	  cand1=i;
 	}
 	i++;
@@ -2155,8 +2152,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
 	last2=igraph_stack_pop(&path);
 	last1=igraph_stack_pop(&path);
 	matched_nodes -= 1;
-	VECTOR(*core_1)[last1]=0;
-	VECTOR(*core_2)[last2]=0;
+	VECTOR(*core_1)[last1]=-1;
+	VECTOR(*core_2)[last2]=-1;
 
 	if (VECTOR(in_1)[last1] != 0) {
 	  in_1_size += 1;
@@ -2231,7 +2228,7 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
 
       for (i=0; !end && i<igraph_vector_size(inneis_1); i++) {
 	long int node=VECTOR(*inneis_1)[i];
-	if (VECTOR(*core_1)[node]==0) {
+	if (VECTOR(*core_1)[node] < 0) {
 	  if (VECTOR(in_1)[node] != 0) {
 	    xin1++;
 	  }
@@ -2242,7 +2239,7 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
       }
       for (i=0; !end && i<igraph_vector_size(outneis_1); i++) {
 	long int node=VECTOR(*outneis_1)[i];
-	if (VECTOR(*core_1)[node]==0) {
+	if (VECTOR(*core_1)[node] < 0) {
 	  if (VECTOR(in_1)[node] != 0) {
 	    xin1++;
 	  }
@@ -2253,8 +2250,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
       }      
       for (i=0; !end && i<igraph_vector_size(inneis_2); i++) {
 	long int node=VECTOR(*inneis_2)[i];
-	if (VECTOR(*core_2)[node]!=0) {
-	  long int node2=VECTOR(*core_2)[node]-1;
+	if (VECTOR(*core_2)[node] >= 0) {
+	  long int node2=VECTOR(*core_2)[node];
 	  /* check if there is a node2->cand1 edge */
 	  if (!igraph_vector_binsearch2(inneis_1, node2)) {
 	    end=1;
@@ -2284,8 +2281,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
       }      
       for (i=0; !end && i<igraph_vector_size(outneis_2); i++) {
 	long int node=VECTOR(*outneis_2)[i];
-	if (VECTOR(*core_2)[node] != 0) {
-	  long int node2=VECTOR(*core_2)[node]-1;
+	if (VECTOR(*core_2)[node] >= 0) {
+	  long int node2=VECTOR(*core_2)[node];
 	  /* check if there is a cand1->node2 edge */
 	  if (!igraph_vector_binsearch2(outneis_1, node2)) {
 	    end=1;
@@ -2320,8 +2317,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
 	IGRAPH_CHECK(igraph_stack_push(&path, cand1));
 	IGRAPH_CHECK(igraph_stack_push(&path, cand2));
 	matched_nodes += 1;
-	VECTOR(*core_1)[cand1]=cand2+1;
-	VECTOR(*core_2)[cand2]=cand1+1;
+	VECTOR(*core_1)[cand1]=cand2;
+	VECTOR(*core_2)[cand2]=cand1;
 	
 	/* update in_*, out_* */
 	if (VECTOR(in_1)[cand1] != 0) {
@@ -2340,7 +2337,7 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
 	inneis_1=igraph_lazy_adjlist_get(&inadj1, cand1);
 	for (i=0; i<igraph_vector_size(inneis_1); i++) {
 	  long int node=VECTOR(*inneis_1)[i];
-	  if (VECTOR(in_1)[node]==0 && VECTOR(*core_1)[node]==0) {
+	  if (VECTOR(in_1)[node]==0 && VECTOR(*core_1)[node] < 0) {
 	    VECTOR(in_1)[node]=depth;
 	    in_1_size += 1;
 	  }
@@ -2348,7 +2345,7 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
 	outneis_1=igraph_lazy_adjlist_get(&outadj1, cand1);
 	for (i=0; i<igraph_vector_size(outneis_1); i++) {
 	  long int node=VECTOR(*outneis_1)[i];
-	  if (VECTOR(out_1)[node]==0 && VECTOR(*core_1)[node]==0) {
+	  if (VECTOR(out_1)[node]==0 && VECTOR(*core_1)[node] < 0) {
 	    VECTOR(out_1)[node]=depth;
 	    out_1_size += 1;
 	  }
@@ -2356,7 +2353,7 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
 	inneis_2=igraph_lazy_adjlist_get(&inadj2, cand2);
 	for (i=0; i<igraph_vector_size(inneis_2); i++) {
 	  long int node=VECTOR(*inneis_2)[i];
-	  if (VECTOR(in_2)[node]==0 && VECTOR(*core_2)[node]==0) {
+	  if (VECTOR(in_2)[node]==0 && VECTOR(*core_2)[node] < 0) {
 	    VECTOR(in_2)[node]=depth;
 	    in_2_size += 1;
 	  }
@@ -2364,7 +2361,7 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
 	outneis_2=igraph_lazy_adjlist_get(&outadj2, cand2);
 	for (i=0; i<igraph_vector_size(outneis_2); i++) {
 	  long int node=VECTOR(*outneis_2)[i];
-	  if (VECTOR(out_2)[node]==0 && VECTOR(*core_2)[node]==0) {
+	  if (VECTOR(out_2)[node]==0 && VECTOR(*core_2)[node] < 0) {
 	    VECTOR(out_2)[node]=depth;
 	    out_2_size += 1;
 	  }
@@ -2401,14 +2398,10 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
   if (!map21) { 
     igraph_vector_destroy(core_2);
     IGRAPH_FINALLY_CLEAN(1);
-  } else {
-    igraph_vector_add_constant(core_2, -1);
   }    
   if (!map12) {
     igraph_vector_destroy(core_1);
     IGRAPH_FINALLY_CLEAN(1);
-  } else {
-    igraph_vector_add_constant(core_1, -1);
   }
 
   return 0;
@@ -2591,7 +2584,6 @@ igraph_bool_t igraph_i_get_subisomorphisms_vf2(const igraph_vector_t *map12,
   }
   IGRAPH_FINALLY(igraph_free, newvector);
   IGRAPH_CHECK(igraph_vector_copy(newvector, map21));
-  igraph_vector_add_constant(newvector, -1);
   IGRAPH_FINALLY(igraph_vector_destroy, newvector);
   IGRAPH_CHECK(igraph_vector_ptr_push_back(vector, newvector));
   IGRAPH_FINALLY_CLEAN(2);
