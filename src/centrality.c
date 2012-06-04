@@ -479,7 +479,29 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
  * network. It assigns relative scores to all nodes in the network based
  * on the principle that connections to high-scoring nodes contribute
  * more to the score of the node in question than equal connections to
- * low-scoring nodes.
+ * low-scoring nodes. In practice, this is determined by calculating the
+ * eigenvector corresponding to the largest positive eigenvalue of the
+ * adjacency matrix. The centrality scores returned by igraph are always
+ * normalized such that the largest eigenvector centrality score is one
+ * (with one exception, see below).
+ *
+ * </para><para>
+ * Since the eigenvector centrality scores of nodes in different components
+ * do not affect each other, it may be beneficial for large graphs to
+ * decompose it first into weakly connected components and calculate the
+ * centrality scores individually for each component.
+ *
+ * </para><para>
+ * Also note that the adjacency matrix of a directed acyclic graph or the
+ * adjacency matrix of an empty graph does not possess positive eigenvalues,
+ * therefore the eigenvector centrality is not defined for these graphs.
+ * igraph will return an eigenvalue of zero in such cases. The eigenvector
+ * centralities will all be equal for an empty graph and will all be zeros
+ * for a directed acyclic graph. Such pathological cases can be detected
+ * by asking igraph to calculate the eigenvalue as well (using the \p value
+ * parameter, see below) and checking whether the eigenvalue is very close
+ * to zero.
+ *
  * \param graph The input graph. It might be directed.
  * \param vector Pointer to an initialized vector, it will be resized
  *     as needed. The result of the computation is stored here. It can
@@ -501,8 +523,7 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
  *    calculated based on the degree of the vertices.
  * \return Error code.
  * 
- * Time complexity: depends on the input graph, usually it is O(|V|),
- * the number of vertices.
+ * Time complexity: depends on the input graph, usually it is O(|V|+|E|).
  * 
  * \sa \ref igraph_pagerank and \ref igraph_personalized_pagerank for 
  *   modifications of eigenvector centrality.
