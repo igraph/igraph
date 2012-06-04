@@ -23,7 +23,7 @@ class MatchingTests(unittest.TestCase):
                 "type")
 
     def testIsMaximal(self):
-        self.failUnless(self.matching.is_maximal())
+        self.assertTrue(self.matching.is_maximal())
         self.matching.matching[0] = -1
         self.matching.matching[12] = -1
         self.failIf(self.matching.is_maximal())
@@ -36,7 +36,7 @@ class MatchingTests(unittest.TestCase):
                 self.failIf(self.matching.is_matched(i))
                 self.assertEquals(self.matching.match_of(i), None)
             else:
-                self.failUnless(self.matching.is_matched(i))
+                self.assertTrue(self.matching.is_matched(i))
                 self.assertEquals(self.matching.match_of(i), mate)
                 self.assertEquals(self.matching.match_of(
                     leda_graph.vs[i], leda_graph.vs[mate]))
@@ -47,12 +47,12 @@ class MaximumBipartiteMatchingTests(unittest.TestCase):
         # Specifying the "type" attribute explicitly
         matching = leda_graph.maximum_bipartite_matching("type")
         self.assertEquals(len(matching), 6)
-        self.failUnless(matching.is_maximal())
+        self.assertTrue(matching.is_maximal())
 
         # Using the default attribute
         matching = leda_graph.maximum_bipartite_matching()
         self.assertEquals(len(matching), 6)
-        self.failUnless(matching.is_maximal())
+        self.assertTrue(matching.is_maximal())
 
     def testBipartiteMatchingErrors(self):
         # Type vector too short

@@ -1,5 +1,6 @@
 from __future__ import division
 
+import warnings
 import unittest
 from igraph import *
 
@@ -22,36 +23,44 @@ class TestBase(unittest.TestCase):
                     msg="Minimum PageRank is less than 0 for graph #%d (%r)" % (idx, pr))
 
     def testEigenvectorCentrality(self):
-        for idx, g in enumerate(self.__class__.graphs):
-            try:
-                ec, eval = g.evcent(return_eigenvalue=True)
-            except Exception, ex:
-                self.assertTrue(False, msg="Eigenvector centrality threw exception for graph #%d: %s" % (idx, ex))
-                raise
+        # Temporarily turn off the warning handler because g.evcent() will print
+        # a warning for DAGs
+        warnings.simplefilter("ignore")
 
-            if g.vcount() == 0:
-                self.assertEquals([], ec)
-                continue
+        try:
+            for idx, g in enumerate(self.__class__.graphs):
+                try:
+                    ec, eval = g.evcent(return_eigenvalue=True)
+                except Exception, ex:
+                    self.assertTrue(False, msg="Eigenvector centrality threw exception for graph #%d: %s" % (idx, ex))
+                    raise
 
-            n = g.vcount()
-            if abs(eval) < 1e-4:
-                self.assertTrue(min(ec) >= -1e-10,
-                        msg="Minimum eigenvector centrality is smaller than 0 for graph #%d" % idx)
-                self.assertTrue(max(ec) <= 1,
-                        msg="Maximum eigenvector centrality is greater than 1 for graph #%d" % idx)
-                continue
+                if g.vcount() == 0:
+                    self.assertEquals([], ec)
+                    continue
 
-            self.assertAlmostEquals(max(ec), 1, places=7, \
-                    msg="Maximum eigenvector centrality is %r (not 1) for graph #%d (%r)" % \
-                    (max(ec), idx, ec))
-            self.assertTrue(min(ec) >= 0, \
-                    msg="Minimum eigenvector centrality is less than 0 for graph #%d" % idx)
+                n = g.vcount()
+                if abs(eval) < 1e-4:
+                    self.assertTrue(min(ec) >= -1e-10,
+                            msg="Minimum eigenvector centrality is smaller than 0 for graph #%d" % idx)
+                    self.assertTrue(max(ec) <= 1,
+                            msg="Maximum eigenvector centrality is greater than 1 for graph #%d" % idx)
+                    continue
 
-            ec2 = [sum(ec[u.index] for u in v.predecessors()) for v in g.vs]
-            for i in xrange(n):
-                self.assertAlmostEquals(ec[i] * eval, ec2[i], places=7, \
-                        msg="Eigenvector centrality in graph #%d seems to be invalid "\
-                        "for vertex %d" % (idx, i))
+                self.assertAlmostEquals(max(ec), 1, places=7, \
+                        msg="Maximum eigenvector centrality is %r (not 1) for graph #%d (%r)" % \
+                        (max(ec), idx, ec))
+                self.assertTrue(min(ec) >= 0, \
+                        msg="Minimum eigenvector centrality is less than 0 for graph #%d" % idx)
+
+                ec2 = [sum(ec[u.index] for u in v.predecessors()) for v in g.vs]
+                for i in xrange(n):
+                    self.assertAlmostEquals(ec[i] * eval, ec2[i], places=7, \
+                            msg="Eigenvector centrality in graph #%d seems to be invalid "\
+                            "for vertex %d" % (idx, i))
+        finally:
+            # Reset the warning handler
+            warnings.resetwarnings()
 
     def testHubScore(self):
         for idx, g in enumerate(self.__class__.graphs):
