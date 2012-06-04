@@ -1495,6 +1495,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     options->ldv=0;
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
     options->nconv = 0;
+    options->lworkl = 0;		/* we surely have enough space */
     extra.comm=comm;
 
     /* We try calling the solver twice, once from a random starting
@@ -1514,6 +1515,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 	options->start=1;
 	options->info=0;
 	options->ncv=0;
+	options->lworkl = 0;	/* we surely have enough space */
 	for (i=0; i < options->n ; i++) {
 	  storage.resid[i] = 1;
 	}
@@ -1538,6 +1540,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     options->nev=1;
     options->ldv=0;
     options->nconv=0;
+    options->lworkl = 0;	/* we surely have enough space */
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
     
     {
@@ -1553,6 +1556,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 	options->start=1;
 	options->info=0;
 	options->ncv=0;
+	options->lworkl = 0;	/* we surely have enough space */
 	for (i=0; i < options->n; i++) { storage.resid[i] = 1; }
 	IGRAPH_CHECK(igraph_arpack_rssolve(
 				igraph_i_community_leading_eigenvector,
