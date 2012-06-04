@@ -270,7 +270,7 @@ int main() {
   if (count != 22) {
     fprintf(stderr, "Count with two edge colors failed, expected %li, got %li.\n",
 	    (long int) 22, (long int) count);
-    return 32;
+    return 52;
   }
 
   igraph_vector_int_destroy(&color1);
