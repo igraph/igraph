@@ -68,6 +68,7 @@ int R_SEXP_to_igraph_es(SEXP rit, igraph_t *graph, igraph_es_t *it);
 int R_SEXP_to_igraph_adjlist(SEXP vectorlist, igraph_adjlist_t *ptr);
 int R_SEXP_to_vector_bool(SEXP sv, igraph_vector_bool_t *v);
 int R_SEXP_to_vector_int(SEXP sv, igraph_vector_int_t *v);
+int R_SEXP_to_vector_long_copy(SEXP sv, igraph_vector_long_t *v);
 int R_SEXP_to_hrg(SEXP shrg, igraph_hrg_t *hrg);
 int R_SEXP_to_hrg_copy(SEXP shrg, igraph_hrg_t *hrg);
 int R_SEXP_to_sparsemat(SEXP pakl, igraph_sparsemat_t *akl);
@@ -1917,16 +1918,28 @@ SEXP R_igraph_vector_bool_to_SEXP(igraph_vector_bool_t *v) {
 
 SEXP R_igraph_vector_long_to_SEXP(igraph_vector_long_t *v) {
   SEXP result;
-  long int n=igraph_vector_long_size(v);
+  long int i, n=igraph_vector_long_size(v);
+  double *rr;
   
-  PROTECT(result=NEW_INTEGER(n));
-  if (sizeof(long)==sizeof(INTEGER(result)[0])) {
-    igraph_vector_long_copy_to(v, (long int*) INTEGER(result));
-  } else {
-    long int i;
-    for (i=0; i<n; i++) {
-      INTEGER(result)[i] = VECTOR(*v)[i];
-    }
+  PROTECT(result=NEW_NUMERIC(n));
+  rr=REAL(result);
+  for (i=0; i<n; i++) {
+    rr[i] = VECTOR(*v)[i];
+  }
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_vector_long_to_SEXPp1(igraph_vector_long_t *v) {
+  SEXP result;
+  long int i, n=igraph_vector_long_size(v);
+  double *rr;
+  
+  PROTECT(result=NEW_NUMERIC(n));
+  rr=REAL(result);
+  for (i=0; i<n; i++) {
+    rr[i] = VECTOR(*v)[i]+1;
   }
   
   UNPROTECT(1);
@@ -2351,6 +2364,16 @@ int R_SEXP_to_vector_int(SEXP sv, igraph_vector_int_t *v) {
   v->stor_end=v->stor_begin+GET_LENGTH(sv);
   v->end=v->stor_end;
   return 0;
+}
+
+int R_SEXP_to_vector_long_copy(SEXP sv, igraph_vector_long_t *v) {
+  long int i, n=GET_LENGTH(sv);
+  double *svv=REAL(sv);
+  igraph_vector_long_init(v, n);
+  for (i=0; i<n; i++) {
+    VECTOR(*v)[i] = svv[i];
+  }
+  return 0;  
 }
 
 int R_SEXP_to_matrix(SEXP pakl, igraph_matrix_t *akl) {

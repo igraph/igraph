@@ -1702,6 +1702,34 @@ igraph_scg_laplacian:
 
 
 #######################################
+# Matching
+#######################################
+
+igraph_is_matching:
+       PARAMS: GRAPH graph, BIPARTITE_TYPES_OR_0 types=NULL, \
+               VECTOR_LONG_M1 matching, OUT BOOLEANPTR res
+       DEPS: types ON graph, matching ON graph
+       NAME-R: is.matching
+       IGNORE: RR
+
+igraph_is_maximal_matching:
+       PARAMS: GRAPH graph, BIPARTITE_TYPES_OR_0 types=NULL, \
+               VECTOR_LONG_M1 matching, OUT BOOLEANPTR res
+       DEPS: types ON graph
+       NAME-R: is.maximal.matching
+       IGNORE: RR
+
+igraph_maximum_bipartite_matching:
+       PARAMS: GRAPH graph, BIPARTITE_TYPES_OR_0 types=NULL, \
+               OUT INTEGERPTR_OR_0 matching_size, \
+               OUT REALPTR_OR_0 matching_weight, \
+               OUT VECTOR_LONG_M1 matching, \
+               EDGEWEIGHTS weights=NULL, REAL eps=.Machine$double.eps
+       DEPS: types ON graph, weights ON graph
+       NAME-R: maximum.bipartite.matching
+       IGNORE: RR
+
+#######################################
 # Other, not graph related
 #######################################
 

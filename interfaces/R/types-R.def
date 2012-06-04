@@ -33,7 +33,7 @@ VERTEXINDEX_OR_0:
               }
 
 VECTOR_LONG:
-    INCONV: %I% <- as.integer(%I%)
+    INCONV: %I% <- as.numeric(%I%)
 
 VECTORM1:
     INCONV: %I% <- as.numeric(%I%)-1
@@ -45,7 +45,10 @@ VECTORM1_OR_0:
     INCONV: if (!is.null(%I%)) %I% <- as.numeric(%I%)-1
 
 VECTOR_LONG_OR_0:
-    INCONV: if (!is.null(%I%)) %I% <- as.integer(%I%)
+    INCONV: if (!is.null(%I%)) %I% <- as.numeric(%I%)
+
+VECTOR_LONG_M1:
+    INCONV: %I% <- as.numeric(%I%)-1
 
 VECTOR_BOOL:
     INCONV: %I% <- as.logical(%I%)
@@ -95,11 +98,19 @@ INTEGERPTR:
     INCONV:
        INOUT: %I% <- as.integer(%I%)
 
+INTEGERPTR_OR_0:
+    INCONV:
+       INOUT: %I% <- as.integer(%I%)
+
 BOOLEANPTR:
 
 BOOLEANPTR_OR_0:    
 
 REALPTR:
+    INCONV:
+       INOUT: %I% <- as.numeric(%I%)
+
+REALPTR_OR_0:
     INCONV:
        INOUT: %I% <- as.numeric(%I%)
 
@@ -161,6 +172,14 @@ BIPARTITE_TYPES:
                %I% <- as.logical(%I%) \
             } else { \
                stop("Not a bipartite graph, supply `types' argument") \
+            }
+
+BIPARTITE_TYPES_OR_0:
+    INCONV: if (is.null(%I%) && "type" %in% list.vertex.attributes(%I1%)) { \
+               %I% <- V(%I1%)$type \
+	    } \
+            if (!is.null(%I%)) { \
+               %I% <- as.logical(%I%) \
             }
 
 VERTEX_COLOR:
