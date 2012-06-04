@@ -331,6 +331,8 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
   IGRAPH_CHECK(igraph_is_dag(graph, &dag));
   if (dag) {
     /* special case: graph is a DAG */
+    IGRAPH_WARNING("graph is directed and acyclic; eigenvector centralities "
+        "will be zeros");
     if (value)
       *value = 0;
     if (vector) {
