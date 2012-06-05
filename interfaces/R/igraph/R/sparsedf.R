@@ -58,8 +58,8 @@ sdf <- function(..., row.names = NULL, NROW = NULL) {
   cols
 }
 
-as.data.frame.igraphSDF <- function(sdf) {
-  as.data.frame(lapply(sdf, rep, length.out=attr(sdf, "NROW")))
+as.data.frame.igraphSDF <- function(x, row.names, optional, ...) {
+  as.data.frame(lapply(x, rep, length.out=attr(x, "NROW")))
 }
 
 `[.igraphSDF` <- function(x, i, j, ..., drop=TRUE) {
