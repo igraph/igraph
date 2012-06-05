@@ -33,6 +33,28 @@
 
 /**
  * \ingroup nongraph
+ * \function igraph_is_thread_safe
+ * \brief Returns whether igraph was compiled in thread-safe mode.
+ *
+ * </para><para>
+ * Use this function to decide whether igraph was compiled in thread-safe
+ * mode. A thread-safe igraph variant is safe to be used from multiple
+ * threads simultaneously.
+ *
+ * \return logical true value if igraph is thread-safe, false otherwise
+ *
+ * Time complexity: O(1)
+ */
+igraph_bool_t igraph_is_thread_safe() {
+#if HAVE_TLS
+	return 1;
+#else
+	return 0;
+#endif
+}
+
+/**
+ * \ingroup nongraph
  * \function igraph_running_mean
  * \brief Calculates the running mean of a vector.
  * 
