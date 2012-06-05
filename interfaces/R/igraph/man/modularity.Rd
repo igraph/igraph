@@ -54,7 +54,7 @@
 g <- graph.full(5) \%du\% graph.full(5) \%du\% graph.full(5)
 g <- add.edges(g, c(1,6, 1,11, 6, 11))
 wtc <- walktrap.community(g)
-memb <- community.to.membership(g, wtc$merges, steps=12)
-modularity(g, memb$membership)
+modularity(wtc)
+modularity(g, membership(wtc))
 }
 \keyword{graphs}
