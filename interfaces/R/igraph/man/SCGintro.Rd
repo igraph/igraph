@@ -126,7 +126,7 @@
  
   These steps can also be carried out independently: (1) Use
   \code{\link{get.adjacency}}, \code{\link{graph.laplacian}} or
-  \code{\link{stochasticMatrix}} to compute a matrix \eqn{M}. (2) Work
+  \code{\link{get.stochastic}} to compute a matrix \eqn{M}. (2) Work
   out some prescribed eigenpairs of \eqn{M} e.g. by 
   means of \code{eigen} or \code{arpack}. (3) Invoke one the four
   algorithms of the function \code{\link{scgGrouping}} to get a

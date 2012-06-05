@@ -20,39 +20,38 @@
 #
 ###################################################################
 
-stochasticMatrix <- function(graph, norm = c("row", "col"), ...) {
-
+get.stochastic <- function(graph, column.wise=FALSE,
+                           sparse=getIgraphOpt("sparsematrices")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-
-  norm <- igraph.match.arg(norm)
-  
-  graph <- get.adjacency(graph, ...)
-  if (any(graph < 0)) { stop("'graph' must have non-negative entries") }
-
-  if(norm == "row") {
-    if (inherits(graph, "Matrix")) {
-      y <- Matrix::rowSums(graph)
-    } else {
-      y <- rowSums(graph)
-    }
-    if(any(y == 0)) { stop("zero out-degree in 'graph' not allowed") }
-    return( graph/y )
-  } else {
-    if (inherits(graph, "Matrix")) {
-      y <- Matrix::colSums(graph)
-    } else {
-      y <- colSums(graph)
-    }
-    if (any(y == 0)) { stop("zero in-degree in 'graph not allowed'") }
-    if (inherits(graph, "Matrix")) {
-      return( Matrix::t(Matrix::t(graph) / y) )
-    } else {
-      return( t(t(graph) / y) )
-    }
+ 
+  column.wise <- as.logical(column.wise)
+  if (length(column.wise) != 1) {
+    stop("`column.wise' must be a logical scalar")
   }
-}
+
+  sparse <- as.logical(sparse)
+  if (length(sparse) != 1) {
+    stop("`sparse' must be a logical scalar")
+  }
+
+  on.exit(.Call("R_igraph_finalizer", PACKAGE="igraph"))
+  if (sparse) {
+    res <- .Call("R_igraph_get_stochastic_sparsemat", graph, column.wise,
+                 PACKAGE="igraph")
+    res <- igraph.i.spMatrix(res)
+  } else {
+    res <- .Call("R_igraph_get_stochastic", graph, column.wise,
+                 PACKAGE="igraph")
+  }
+
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    rownames(res) <- colnames(res) <- V(graph)$name
+  }
+
+  res
+} 
 
 scgGrouping <- function(V, nt,
                          mtype=c("symmetric", "laplacian",

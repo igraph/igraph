@@ -239,7 +239,7 @@ S3method(print, igraphHRGConsensus)
 
 # SCG
 
-export(stochasticMatrix, scg, scg)
+export(scg)
 S3method(scg, "igraph")
 S3method(scg, "matrix")
 S3method(scg, "Matrix")

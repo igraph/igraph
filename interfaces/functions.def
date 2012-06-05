@@ -1254,6 +1254,16 @@ igraph_to_undirected:
                 EDGE_ATTRIBUTE_COMBINATION edge_attr_comb=Default
         NAME-R: as.undirected
 
+igraph_get_stochastic:
+        PARAMS: GRAPH graph, OUT MATRIX res, BOOLEAN column_wise=False
+        NAME-R: get.stochastic
+        IGNORE: RR
+
+igraph_get_stochastic_sparsemat:
+        PARAMS: GRAPH graph, OUT SPARSEMAT sparsemat, \
+                BOOLEAN column_wise=False
+        IGNORE: RR, RNamespace
+
 #######################################
 # Read and write foreign formats
 #######################################
