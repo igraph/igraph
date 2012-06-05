@@ -28,5 +28,6 @@ AT_CLEANUP
 
 AT_SETUP([Thread-safe ARPACK:])
 AT_KEYWORDS([thread-safe ARPACK])
-AT_COMPILE_CHECK([simple/tls2.c], [simple/tls2.out], [], [], [-lpthread])
+AT_COMPILE_CHECK([simple/tls2.c], [simple/tls2.out], [], [internal], 
+                 [-lpthread])
 AT_CLEANUP

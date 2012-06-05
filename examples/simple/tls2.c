@@ -26,6 +26,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#include "igraph_arpack_internal.h"
+
 /* Test whether ARPACK is thread-safe. We will create two threads, 
    each calling a different ARPACK eigensolver. We will make sure that
    the ARPACK calls from the two threads overlap */
