@@ -206,9 +206,9 @@ class GraphSummary(object):
         result = ["IGRAPH %(directed)s%(named)s%(weighted)s%(typed)s "\
                   "%(vcount)d %(ecount)d -- %(name)s" % params]
 
-        attrs = ["%s (g)" % (name, ) for name in graph.attributes()]
-        attrs.extend("%s (v)" % (name, ) for name in graph.vertex_attributes())
-        attrs.extend("%s (e)" % (name, ) for name in graph.edge_attributes())
+        attrs = ["%s (g)" % (name, ) for name in sorted(graph.attributes())]
+        attrs.extend("%s (v)" % (name, ) for name in sorted(graph.vertex_attributes()))
+        attrs.extend("%s (e)" % (name, ) for name in sorted(graph.edge_attributes()))
         if attrs:
             result.append("+ attr: %s" % ", ".join(attrs))
             if self.wrapper is not None:
