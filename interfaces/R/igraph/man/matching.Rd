@@ -11,8 +11,8 @@
   vertices. A matching is maximal if it is not a proper subset of any
   other matching.}
 \usage{
-is.matching(graph, types = NULL, matching)
-is.maximal.matching(graph, types = NULL, matching)
+is.matching(graph, matching, types = NULL)
+is.maximal.matching(graph, matching, types = NULL)
 maximum.bipartite.matching(graph, types = NULL, weights = NULL,
        eps = .Machine$double.eps)
 }
