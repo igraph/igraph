@@ -7,9 +7,8 @@
 <chapter id="igraph-Nongraph">
 <title>Not Graph Related Functions </title>
 
-<section><title>Information about igraph itself</title>
+<section><title>Igraph version number</title>
 <!-- doxrox-include igraph_version -->
-<!-- doxrox-include igraph_is_thread_safe -->
 </section>
 
 <section><title>Running Mean of a Time Series</title>
