@@ -24,6 +24,7 @@
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "igraph_random.h"
+#include "igraph_qsort.h"
 
 #include <assert.h>
 #include <string.h> 		/* memcpy & co. */
@@ -759,7 +760,7 @@ int FUNCTION(igraph_vector,sort_cmp)(const void *a, const void *b) {
 void FUNCTION(igraph_vector,sort)(TYPE(igraph_vector) *v) {
   assert(v != NULL);
   assert(v->stor_begin != NULL);
-  qsort(v->stor_begin, FUNCTION(igraph_vector,size)(v), 
+  igraph_qsort(v->stor_begin, FUNCTION(igraph_vector,size)(v), 
     sizeof(BASE), FUNCTION(igraph_vector,sort_cmp));
 }
 
@@ -828,9 +829,9 @@ long int FUNCTION(igraph_vector,qsort_ind)(TYPE(igraph_vector) *v,
   }
   first = vind[0];
   if (descending)
-    qsort(vind, n, sizeof(BASE**), FUNCTION(igraph_vector,i_qsort_ind_cmp_desc));
+    igraph_qsort(vind, n, sizeof(BASE**), FUNCTION(igraph_vector,i_qsort_ind_cmp_desc));
   else
-    qsort(vind, n, sizeof(BASE**), FUNCTION(igraph_vector,i_qsort_ind_cmp_asc));
+    igraph_qsort(vind, n, sizeof(BASE**), FUNCTION(igraph_vector,i_qsort_ind_cmp_asc));
   for(i=0; i<n; i++) {
     VECTOR(*inds)[i] = vind[i]-first;
   }
