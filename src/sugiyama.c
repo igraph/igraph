@@ -35,6 +35,8 @@
 #include "igraph_structural.h"
 #include "igraph_types.h"
 
+#include <limits.h>
+
 /* #define SUGIYAMA_DEBUG */
 
 #ifdef _MSC_VER
@@ -1067,7 +1069,7 @@ static int igraph_i_layout_sugiyama_vertical_alignment(const igraph_t* graph,
     igraph_vector_t *layer = igraph_i_layering_get(layering, i);
 
     /* r = 0 in the paper, but C arrays are indexed from 0 */
-    r = align_right ? IGRAPH_INFINITY : -1;
+    r = align_right ? LONG_MAX : -1;
 
     /* If align_right is 1, we have to process the layer in reverse order */
     j       = align_right ? (igraph_vector_size(layer)-1) : 0;
