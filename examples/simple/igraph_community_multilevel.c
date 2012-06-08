@@ -100,5 +100,9 @@ int main() {
   igraph_vector_destroy(&edges);
   igraph_matrix_destroy(&memberships);
 
+#ifdef __APPLE__
   return 0;
+#else
+  return 77;
+#endif
 }

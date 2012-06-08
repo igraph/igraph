@@ -73,5 +73,9 @@ int main() {
   igraph_vector_destroy(&weights);
   igraph_destroy(&karate);
 
+#ifdef __APPLE__
   return 0;
+#else
+  return 77;
+#endif
 }

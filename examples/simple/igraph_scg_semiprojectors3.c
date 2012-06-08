@@ -119,6 +119,10 @@ int main() {
   igraph_sparsemat_destroy(&laplacian);
   igraph_destroy(&g);
   
+#ifdef __APPLE__
   return 0;
+#else
+  return 77;
+#endif
 }
     
