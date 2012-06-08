@@ -570,9 +570,9 @@ tkigraph <- function() {
   }
   graph <- get("graphs", .tkigraph.env)[[gnos]]
   if ("weight" %in% list.graph.attributes(graph)) {
-    tab <- get.adjacency(graph, attr="weight", names=FALSE)
+    tab <- get.adjacency(graph, attr="weight", names=FALSE, sparse=FALSE)
   } else {
-    tab <- get.adjacency(graph, names=FALSE)
+    tab <- get.adjacency(graph, names=FALSE, sparse=FALSE)
   }
   filename <- tkgetSaveFile(initialfile="graph.adj",
                             defaultextension="adj",
@@ -828,7 +828,7 @@ tkigraph <- function() {
   }
     
   if (!read$interactive) {
-    fun <- function(...) { x11() ; plot.igraph(...) }
+    fun <- function(...) { dev.new() ; plot.igraph(...) }
   } else {
     fun <- tkplot
   }
@@ -959,9 +959,9 @@ tkigraph <- function() {
                               mode=list(name="Mode", type="listbox",
                                 values=c("Directed (out)", "Directed (in)",
                                   "Undirected"), default="2"))
-  read$mode <- c("out", "in", "undirected")[read$mode]
+  read$mode <- c("out", "in", "undirected")[read$mode+1]
   g <- graph.tree(n=read$n, children=read$b, mode=read$mode)
-  lay <- layout.reingold.tilford(g, root=0, mode="all")
+  lay <- layout.reingold.tilford(g, root=1, mode="all")
   g <- set.graph.attribute(g, "layout", lay)
   g <- set.graph.attribute(g, "name", "Regular tree")
   .tkigraph.add.graph(g)
@@ -1005,7 +1005,7 @@ tkigraph <- function() {
                               mode=list(name="Mode", type="listbox",
                                 values=c("Directed (out)", "Directed (in)",
                                   "Undirected"), default="2"))
-  read$mode <- c("out", "in", "undirected")[read$mode]
+  read$mode <- c("out", "in", "undirected")[read$mode+1]
   g <- graph.star(read$n, mode=read$mode)
   g <- set.graph.attribute(g, "name", "Star graph")
   .tkigraph.add.graph(g)
@@ -1155,11 +1155,11 @@ tkigraph <- function() {
       log <- ""
       if (read$logx) { log <- paste(sep="", log, "x") }
       if (read$logy) { log <- paste(sep="", log, "y") }
-      x11()
+      dev.new()
       plot(0:max(value[,2]), h, xlab="Degree", ylab="Relative frequency",
            type="b", main="Degree distribution", log=log)
     } else {
-      x11()
+      dev.new()
       hist(value[,2], main="Degree distribution", xlab="Degree")
     }
   }
@@ -1185,7 +1185,7 @@ tkigraph <- function() {
                                 values=c("Out", "In", "Total")))
   mode <- c("out", "in", "all")[read$type+1]
   deg <- degree(graphs[[gnos]], mode=mode)
-  x11()
+  dev.new()
   h <- hist(deg, -1:max(deg), plot=FALSE)$density
   plot(0:max(deg), h, xlab="Degree", ylab="Relative frequency",
        type="b", main="Degree distribution", log="xy")
@@ -1349,7 +1349,7 @@ tkigraph <- function() {
   dim(value) <- NULL
   value <- data.frame( V(graph)$name, value)
   colnames(value) <- c("Vertex", "Distance")
-  mv <- paste("Mean distance:", round(mean(value),2))
+  mv <- paste("Mean distance:", round(mean(value[,2]),2))
   .tkigraph.showData(value,
                      title=paste("Distance from vertex", read$v, "in graph #",
                        gnos), showmean=mv)
@@ -1459,12 +1459,12 @@ tkigraph <- function() {
       log <- ""
       if (read$logx) { log <- paste(sep="", log, "x") }
       if (read$logy) { log <- paste(sep="", log, "y") }
-      x11()
+      dev.new()
       plot(1:max(value[,2]), h, xlab="Component size",
            ylab="Relative frequency",
            type="b", main="Component size distribution", log=log)
     } else {
-      x11()
+      dev.new()
       hist(value[,2], main="Component size distribution", xlab="Degree")
     }
   }
@@ -1575,16 +1575,16 @@ tkigraph <- function() {
     cols <- 3
   }
   names <- as.character(seq(no))
-  x11()
+  dev.new()
   layout( matrix(1:(rows*cols), nrow=rows, byrow=TRUE) )
   layout.show(rows*cols)
   for (i in seq(no)) {
-    g <- graph.isocreate(read$size, i, directed=read$dir)
+    g <- graph.isocreate(read$size, i-1, directed=read$dir)
     par(mai=c(0,0,0,0), mar=c(0,0,0,0))
     par(cex=2)
     plot(g, layout=co, vertex.color="red", vertex.label=NA, frame=TRUE,
-         edge.color="black", margin=0.1)
-    text(0,0, names[i], col="blue")
+         edge.color="black", margin=0.1, edge.arrow.size=.5)
+    text(0,0, names[i], col="blue", cex=.5)
   }
   
 }
@@ -1608,9 +1608,6 @@ tkigraph <- function() {
   graphs <- get("graphs", .tkigraph.env)
   motifs <- graph.motifs(graphs[[gnos]], size=read$size)
 
-  x11()
-  barplot(motifs)
-
   if (read$size == 3) {
     co <- matrix( c(1,1, 0,0, 2,0), ncol=2, byrow=TRUE)
   } else {
@@ -1631,12 +1628,17 @@ tkigraph <- function() {
     rows <- 4
     cols <- 3
   }
+
+  dev.new()
+  barplot(motifs, names.arg=seq(no))
+  
   names <- as.character(seq(no))
-  x11()
+  dev.new()
   layout( matrix(1:(rows*cols), nrow=rows, byrow=TRUE) )
   layout.show(rows*cols)
   for (i in seq(no)) {
-    g <- graph.isocreate(read$size, i, directed=is.directed(graphs[[gnos]]))
+    g <- graph.isocreate(read$size, i-1,
+                         directed=is.directed(graphs[[gnos]]))
     par(mai=c(0,0,0,0), mar=c(0,0,0,0))
     par(cex=2)
     plot(g, layout=co, vertex.color="red", vertex.label=NA, frame=TRUE,
@@ -1861,7 +1863,6 @@ tkigraph <- function() {
   tkinsert(txt, "end", paste("  Outer links:", comm$outer.links, "\n"))
 
   tkinsert(txt, "end", "\nThe community:\n")
-  .tkigraph.ttt <- NULL
   con <- textConnection(".tkigraph.ttt", open="w")
   cat(sort(comm$community), file=con, fill=TRUE, sep=", ")
   close(con)
@@ -2031,7 +2032,6 @@ tkigraph <- function() {
         stop("rownumbers argument must be TRUE, FALSE or have length nrow(dataframe)")
     oldwidth <- unlist(options("width"))
     options(width = 10000)
-    .tkigraph.ttt <- NULL
     conn <- textConnection(".tkigraph.ttt", open="w")
     sink(conn)
     options(max.print=10000000)
