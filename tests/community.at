@@ -75,6 +75,5 @@ AT_CLEANUP
 AT_SETUP([Infomap community structure (igraph_community_infomap) :])
 AT_KEYWORDS([community structure infomap Rosvall Bergstrom])
 AT_COMPILE_CHECK([simple/igraph_community_infomap.c],
-                 [simple/igraph_community_infomap.out],
-                 [simple/wikti_en_V_syn.elist])
+                 [simple/igraph_community_infomap.out])
 AT_CLEANUP

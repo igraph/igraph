@@ -240,15 +240,6 @@ int main() {
   igraph_vector_destroy(&weights);
   igraph_destroy(&g);
   
-   /* Two triangles connected by one edge */
-  printf("# Wiktionary english verbs (synonymy 2008)\n");
-  FILE *wikt = fopen("wikti_en_V_syn.elist", "r");
-  igraph_read_graph_edgelist(&g, wikt, 0, 0);
-  fclose(wikt);
-  gsumary(&g);
-  infomap_test(&g);
-  igraph_destroy(&g);
-  
   return 0;
 }
 
