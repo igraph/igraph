@@ -77,7 +77,7 @@ class IsomorphismTests(unittest.TestCase):
         maps[:] = []
         g3 = Graph.Full(4)
         g3.vs["color"] = [0,1,1,0]
-        g3.isomorphic_vf2(g3, callback=callback, color="color")
+        g3.isomorphic_vf2(callback=callback, color1="color", color2="color")
         expected_maps = [[0,1,2,3], [0,2,1,3], [3,1,2,0], [3,2,1,0]]
         self.failUnless(sorted(maps) == expected_maps)
 
