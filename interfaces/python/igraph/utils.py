@@ -18,7 +18,7 @@ def named_temporary_file(*args, **kwds):
     """Context manager that creates a named temporary file and
     returns its name.
 
-    All parameters are passed on to `tempfile.mkstemp`, see
+    All parameters are passed on to ``tempfile.mkstemp``, see
     its documentation for more info.
     """
     handle, tmpfile = tempfile.mkstemp(*args, **kwds)
