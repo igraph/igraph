@@ -1085,6 +1085,40 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
     IGRAPH_ERROR("Invalid capacity vector size", IGRAPH_EINVAL);
   }
 
+  /* Check if the graph is connected at all */
+  {
+    igraph_vector_t memb, csize;
+    igraph_integer_t no;
+    IGRAPH_VECTOR_INIT_FINALLY(&memb, 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&csize, 0);
+    IGRAPH_CHECK(igraph_clusters(graph, &memb, &csize, &no,
+				 /*mode=*/ IGRAPH_WEAK));
+    if (no != 1) {
+      if (res) { *res = 0;                 }
+      if (cut) { igraph_vector_clear(cut); }
+      if (partition) {
+	int j=0;
+	IGRAPH_CHECK(igraph_vector_resize(partition, VECTOR(csize)[0]));
+	for (i=0; i<no_of_nodes; i++) {
+	  if (VECTOR(memb)[i] == 0) { VECTOR(*partition)[j++] = i; }
+	}
+      }
+      if (partition2) {
+	int j=0;
+	IGRAPH_CHECK(igraph_vector_resize(partition2, 
+					  no_of_nodes-VECTOR(csize)[0]));
+	for (i=0; i<no_of_nodes; i++) {
+	  if (VECTOR(memb)[i] != 0) { VECTOR(*partition2)[j++] = i; }
+	}
+      }
+    }
+    igraph_vector_destroy(&csize);
+    igraph_vector_destroy(&memb);
+    IGRAPH_FINALLY_CLEAN(2);
+    
+    if (no != 1) { return 0; }
+  }
+
   if (calc_cut) {
     IGRAPH_VECTOR_INIT_FINALLY(&mergehist, 0);
     IGRAPH_CHECK(igraph_vector_reserve(&mergehist, no_of_nodes*2));
