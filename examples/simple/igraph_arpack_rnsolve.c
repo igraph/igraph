@@ -66,6 +66,11 @@ int main() {
   igraph_arpack_rnsolve(cb2, /*extra=*/ &data, &options, /*storage=*/ 0, 
 			&values, &vectors);
 
+  if (MATRIX(values, 2, 1) > 0) {
+    MATRIX(values, 2, 1) = -MATRIX(values, 2, 1);
+    MATRIX(values, 3, 1) = -MATRIX(values, 3, 1);    
+  }
+
   igraph_matrix_print(&values);
   printf("---\n");
   igraph_matrix_print(&vectors);
@@ -78,6 +83,10 @@ int main() {
 
   igraph_arpack_rnsolve(cb2, /*extra=*/ &data, &options, /*storage=*/ 0, 
 			&values, &vectors);
+
+  if (MATRIX(values, 2, 1) > 0) {
+    MATRIX(values, 2, 1) = -MATRIX(values, 2, 1);
+  }
 
   igraph_matrix_print(&values);
   printf("---\n");
