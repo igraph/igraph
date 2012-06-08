@@ -601,7 +601,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
 
 .tkplot.new <- function(tkp) {
   id <- get(".next", .tkplot.env)
-  assign(".next", id, .tkplot.env)
+  assign(".next", id+1, .tkplot.env)
   assign("tmp", tkp, .tkplot.env)
   cmd <- paste("tkp.", id, "<- tmp", sep="")
   eval(parse(text=cmd), .tkplot.env)
