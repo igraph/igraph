@@ -130,7 +130,11 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
       3. Otherwise it is ignored.}
     \item{maxz}{Similar to \code{minx}, but gives the upper boundaries
       of the \sQuote{z} coordinates, if the \code{dim} argument is
-      3. Otherwise it is ignored.}    
+      3. Otherwise it is ignored.}
+    \item{start}{If given, then it should be a matrix with two columns
+      and one line for each vertex. This matrix will be used as starting
+      positions for the algorithm. If not given, then a random starting
+      matrix is used.}
   }
   This function was ported from the SNA package.
 
@@ -158,7 +162,11 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
       3. Otherwise it is ignored.}
     \item{maxz}{Similar to \code{minx}, but gives the upper boundaries
       of the \sQuote{z} coordinates, if the \code{dim} argument is
-      3. Otherwise it is ignored.}    
+      3. Otherwise it is ignored.}
+    \item{start}{If given, then it should be a matrix with two columns
+      and one line for each vertex. This matrix will be used as starting
+      positions for the algorithm. If not given, then a random starting
+      matrix is used.}
   }
   This function performs very well for connected graphs, but it gives
   poor results for unconnected ones.
@@ -210,6 +218,10 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
       the repulsion forces between vertices only vertices in the same or
       neighboring grid cells are taken into account (the fourth root of
       the number of \code{area}.}
+    \item{start}{If given, then it should be a matrix with two columns
+      and one line for each vertex. This matrix will be used as starting
+      positions for the algorithm. If not given, then a random starting
+      matrix is used.}
   }
   
   \code{layout.lgl} is for large connected graphs, it is similar to the
