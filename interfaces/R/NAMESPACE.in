@@ -236,6 +236,10 @@ export(tkigraph,igraphdemo)
 
 S3method(print, igraphHRG)
 S3method(print, igraphHRGConsensus)
+S3method("as.dendrogram", igraphHRG)
+S3method("as.hclust", igraphHRG)
+S3method("asPhylo", igraphHRG)
+S3method("dendPlot", igraphHRG)
 
 # SCG
 
