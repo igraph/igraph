@@ -270,7 +270,7 @@ as.hclust.communities <- function(x, hang=-1, use.modularity=FALSE,
   as.hclust(as.dendrogram(x, hang=hang, use.modularity=use.modularity))
 }
 
-asPhylo <- function(x, use.modularity=FALSE)
+asPhylo <- function(x, ...)
   UseMethod("asPhylo")
 
 asPhylo.communities <- function(x, use.modularity=FALSE) {
@@ -739,11 +739,10 @@ plot.communities <- function(x, y,
        ...)  
 }
 
-dendPlot <- function(communities, mode=getIgraphOpt("dend.plot.type"), ...,
-                     use.modularity=FALSE)
+dendPlot <- function(x, mode=getIgraphOpt("dend.plot.type"), ...)
   UseMethod("dendPlot")
 
-dendPlot.communities <- function(communities, 
+dendPlot.communities <- function(x, 
                                  mode=getIgraphOpt("dend.plot.type"), ...,
                                  use.modularity=FALSE) {  
   mode <- igraph.match.arg(mode, c("auto", "phylo", "hclust", "dendrogram"))
@@ -759,11 +758,11 @@ dendPlot.communities <- function(communities,
   }
   
   if (mode=="hclust") {
-    dendPlotHclust(communities, use.modularity=use.modularity, ...)
+    dendPlotHclust(x, use.modularity=use.modularity, ...)
   } else if (mode=="dendrogram") {
-    dendPlotDendrogram(communities, use.modularity=use.modularity, ...)
+    dendPlotDendrogram(x, use.modularity=use.modularity, ...)
   } else if (mode=="phylo") {
-    dendPlotPhylo(communities, use.modularity=use.modularity, ...)
+    dendPlotPhylo(x, use.modularity=use.modularity, ...)
   }
 }
 
