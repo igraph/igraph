@@ -20,6 +20,31 @@
 #
 ###################################################################
 
+hrg.fit <- function(graph, hrg=NULL, start=FALSE, steps=0) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (is.null(hrg)) { 
+    hrg <- list(left=c(), right=c(), prob=c(), edges=c(), 
+                vertices=c()) 
+  } 
+  hrg <- lapply(hrg[c("left","right","prob","edges","vertices")], 
+                as.numeric)
+  start <- as.logical(start)
+  steps <- as.integer(steps)
+  
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_hrg_fit", graph, hrg, start, steps,
+               PACKAGE="igraph")
+  
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    res$names <- V(graph)$name
+  }
+
+  class(res) <- "igraphHRG"
+  res
+}
+
 hrg.consensus <- function(graph, hrg=NULL, start=FALSE, num.samples=10000) {
   
   # Argument checks
@@ -325,7 +350,8 @@ print1.igraphHRG <- function(x, level=3, ...) {
   cs <- cs[1] * 3
   vw <- nchar(as.character(length(x$left)+1))
   sp <- paste(collapse="", rep(" ", cs+pw+2+2))
-
+  nn <- if (is.null(x$names)) seq_len(length(x$left)+1) else x$names
+  
   ## Function to collect all individual vertex children
   .children <- function(b) {
     res <- c()
@@ -362,7 +388,7 @@ print1.igraphHRG <- function(x, level=3, ...) {
     if (!gor && x$right[b] < 0) {
       ch1 <- c(ch1, paste(sep="", "g", -x$right[b]))
     }
-    ch2 <- character()
+    ch2 <- numeric()
     if (!gol) {
       if (x$left[b]  <  0) { ch2 <- c(ch2, .children(-x$left[b])) }
       if (x$left[b]  >= 0) { ch2 <- c(ch2, x$left[b] + 1) }
@@ -373,6 +399,7 @@ print1.igraphHRG <- function(x, level=3, ...) {
     }
 
     ## print this line
+    ch2 <- as.character(nn[ch2])
     lf <- gsub(" ", "x", format(ch2, width=vw), fixed=TRUE)
     lf <- paste(collapse=" ", lf)
     lf <- strwrap(lf, width=getOption("width") - cs - pw - 3 - 2)
@@ -402,16 +429,17 @@ print2.igraphHRG <- function(x, ...) {
   bw <- ceiling(log10(length(x$left)+1))+1
   p <- format(x$prob, digits=1)
   pw <- 4 + max(nchar(p))
+  nn <- if (is.null(x$names)) seq_len(length(x$left)+1) else x$names
   op <- sapply(seq_along(x$left), function(i) {
     lc <- if (x$left[i] < 0) {
       paste(sep="", "g", -x$left[i])
     } else {
-      x$left[i]+1
+      nn[x$left[i]+1]
     }
     rc <- if (x$right[i] < 0) {
       paste(sep="", "g", -x$right[i])
     } else {
-      x$right[i]+1
+      nn[x$right[i]+1]
     }
     paste(sep="", format(paste(sep="", "g", i), width=bw),
           format(paste(sep="", " p=", p[i]), width=pw),
