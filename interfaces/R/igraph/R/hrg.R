@@ -93,6 +93,24 @@ hrg.predict <- function(graph, hrg=NULL, start=FALSE, num.samples=10000,
   res
 }
 
+as.igraph <- function(x, ...)
+  UseMethod("as.igraph")
+
+as.igraph.igraphHRG <- function(x, ...) {
+  ovc <- length(x$left)+1L
+  ivc <- ovc-1L
+  ll <- ifelse(x$left  < 0, -x$left  + ovc, x$left  + 1)
+  rr <- ifelse(x$right < 0, -x$right + ovc, x$right + 1)
+  edges <- c(rbind(seq_len(ivc)+ovc, ll), rbind(seq_len(ivc)+ovc, rr))
+  res <- graph(edges)
+  
+  V(res)$name <- c(if (!is.null(x$names)) x$names else as.character(1:ovc),
+                   paste0("g", 1:ivc))
+  V(res)$prob <- c(rep(NA, ovc), x$prob)
+  res$name <- "Fitted HRG"
+  res
+}
+
 buildMerges <- function(object) {
 
   ## Build a merge matrix. This is done by a post-order
@@ -144,7 +162,7 @@ as.dendrogram.igraphHRG <- function(object, hang=0.01, ...) {
   
   oHgt <- 1:nrow(merges)
   hMax <- oHgt[length(oHgt)]
-  mynames <- 1:(nMerge+1)
+  mynames <- if (is.null(object$names)) 1:(nMerge+1) else object$names
   z <- list()
   
   for (k in 1:nMerge) {
@@ -221,7 +239,7 @@ as.hclust.igraphHRG <- function(x, ...) {
                     PACKAGE="stats")
                     
 
-  mynames <- 1:n
+  mynames <- if (is.null(x$names)) 1:n else x$names
   res <- list(merge=merge, height=1:nrow(merge), order=hcass$order,
               labels=mynames, method=NA_character_,
               dist.method=NA_character_)
@@ -231,44 +249,18 @@ as.hclust.igraphHRG <- function(x, ...) {
 
 asPhylo.igraphHRG <- function(x, ...) {
   require(ape, quietly=TRUE)
-  merge3 <- buildMerges(x)
 
-  ## recode group ids
-  map <- order(-merge3[,3])  
-  merges <- merge3[,1:2]
-  gs <- which(merges < 0)
-  merges[ gs] <- map[ -merges[gs] ]
-  merges[-gs] <- -merges[-gs]-1
+  ovc <- length(x$left)+1L
+  ivc <- ovc-1L
+  ll <- ifelse(x$left  < 0, -x$left  + ovc, x$left  + 1)
+  rr <- ifelse(x$right < 0, -x$right + ovc, x$right + 1)
+  edge <- matrix(rbind(seq_len(ivc)+ovc, ll, seq_len(ivc)+ovc, rr),
+                 ncol=2, byrow=TRUE)
 
-  N <- nrow(merges)
-  height <- 1:N
-  labels <- 1:(N+1)
-
-  edge <- matrix(0L, 2 * N, 2)
-  edge.length <- numeric(2 * N)
-  node <- integer(N)
-  node[N] <- N + 2L
-  cur.nod <- N + 3L
-  j <- 1L
-  for (i in N:1) {
-    edge[j:(j + 1), 1] <- node[i]
-    for (l in 1:2) {
-      k <- j + l - 1L
-      y <- merges[i, l]
-      if (y > 0) {
-        edge[k, 2] <- node[y] <- cur.nod
-        cur.nod <- cur.nod + 1L
-        edge.length[k] <- height[i] - height[y]
-      } else {
-        edge[k, 2] <- -y
-        edge.length[k] <- height[i]
-      }
-    }
-    j <- j + 2L
-  }
-
+  edge.length <- rep(0.5, nrow(edge))
+  labels <- if (is.null(x$names)) 1:ovc else x$names
   obj <- list(edge=edge, edge.length=edge.length/2, tip.label=labels,
-              Nnode=N)
+              Nnode=ivc)
   class(obj) <- "phylo"
   reorder(obj)
 }
@@ -310,9 +302,14 @@ hrgPlotDendrogram <- function(x, ...) {
   plot(as.dendrogram(x), ...)
 }
 
-hrgPlotPhylo <- function(x, edge.color="#AAAAAAFF", edge.lty=c(1,2), ...) {
+hrgPlotPhylo <- function(x, colbar=rainbow(11, start=.7, end=.1),
+                         use.edge.length=FALSE, edge.color=NULL, ...) {
+  vc <- length(x$left)+1
   phy <- asPhylo(x)
-  plot(phy, edge.color=edge.color, edge.lty=edge.lty[2], ...)
+  br <- seq(0,1,length=length(colbar)) ; br[1] <- -1
+  cc <- as.integer(cut(x$prob[phy$edge[,1] - vc], breaks=br))
+  if (is.null(edge.color)) { edge.color <- colbar[cc] }
+  plot(phy, edge.color=edge.color, use.edge.length=use.edge.length, ...)
 }
 
 print.igraphHRG <- function(x, type=c("auto", "tree", "plain"),
