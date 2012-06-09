@@ -1195,6 +1195,7 @@ igraph_hrg_fit:
                 INT steps=0
         NAME-R: hrg.fit
         CLASS-R: igraphHRG
+        IGNORE: RR
 
 igraph_hrg_game:
         PARAMS: OUT GRAPH graph, HRG hrg
