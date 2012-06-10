@@ -273,7 +273,7 @@ as.hclust.communities <- function(x, hang=-1, use.modularity=FALSE,
 asPhylo <- function(x, ...)
   UseMethod("asPhylo")
 
-asPhylo.communities <- function(x, use.modularity=FALSE) {
+asPhylo.communities <- function(x, use.modularity=FALSE, ...) {
 
   if (!is.hierarchical(x, full=TRUE)) {
     stop("Not a fully hierarchical community structure")

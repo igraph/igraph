@@ -39,7 +39,7 @@ cutat(communities, no, steps)
    use.modularity=FALSE, \dots)
 \method{as.hclust}{communities}(x, hang = -1,
    use.modularity = FALSE, \dots)
-\method{asPhylo}{communities}(x, use.modularity=FALSE)
+\method{asPhylo}{communities}(x, use.modularity=FALSE, \dots)
 showtrace(communities)
 
 code.length(communities)
