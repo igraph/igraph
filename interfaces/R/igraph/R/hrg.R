@@ -66,6 +66,12 @@ hrg.consensus <- function(graph, hrg=NULL, start=FALSE, num.samples=10000) {
               hrg=res$hrg)
   class(res$consensus) <- "igraphHRGConsensus"
   class(res$hrg) <- "igraphHRG"
+
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    res$hrg$names <- V(graph)$name
+    res$consensus$names <- V(graph)$name
+  }
+  
   res
 }
 
@@ -303,7 +309,7 @@ hrgPlotDendrogram <- function(x, ...) {
 }
 
 hrgPlotPhylo <- function(x, colbar=rainbow(11, start=.7, end=.1),
-                         use.edge.length=FALSE, edge.color=NULL, ...) {
+                         edge.color=NULL, use.edge.length=FALSE, ...) {
   vc <- length(x$left)+1
   phy <- asPhylo(x)
   br <- seq(0,1,length=length(colbar)) ; br[1] <- -1
@@ -452,7 +458,8 @@ print2.igraphHRG <- function(x, ...) {
 print.igraphHRGConsensus <- function(x, ...) {
   cat("HRG consensus tree:\n")
   n <- length(x$parents) - length(x$weights)
-  id <- c(seq_len(n), paste(sep="", "g", seq_along(x$weights)))
+  mn <- if (is.null(x$names)) seq_len(n) else x$names
+  id <- c(mn, paste(sep="", "g", seq_along(x$weights)))
   ch <- tapply(id, x$parents, c)[-1]   # first is zero
   bw <- nchar(as.character(length(x$weights)))
   vw <- max(nchar(id))
