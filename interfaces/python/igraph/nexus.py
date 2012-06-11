@@ -7,9 +7,11 @@ __all__ = ["Nexus"]
 
 from cStringIO import StringIO
 from gzip import GzipFile
+from itertools import izip
 from textwrap import TextWrapper
 from urllib import urlencode
 from urlparse import urlparse, urlunparse
+from textwrap import TextWrapper
 
 from igraph.compat import property
 from igraph.configuration import Configuration
@@ -204,6 +206,8 @@ class NexusConnection(object):
         key, value = None, []
         for line in response:
             line = line.rstrip()
+            if not line:
+                continue
             if key is not None and line[0] in ' \t':
                 # Line continuation
                 line = line.lstrip()
@@ -245,8 +249,8 @@ class NexusConnection(object):
 class NexusDatasetInfo(object):
     """Information about a dataset in the Nexus repository."""
 
-    def __init__(self, id=None, sid=None, name=None, vertices=None,
-            edges=None, tags=None, attributes=None, rest=None):
+    def __init__(self, id=None, sid=None, name=None, networks=None,
+            vertices=None, edges=None, tags=None, attributes=None, rest=None):
         self._conn = None
         self.id = id
         self.sid = sid
@@ -255,22 +259,64 @@ class NexusDatasetInfo(object):
         self.edges = edges
         self.tags = tags
         self.attributes = attributes
+        if networks is None:
+            self.networks = []
+        elif not isinstance(networks, (str, unicode)):
+            self.networks = list(networks)
+        else:
+            self.networks = [networks]
         if rest:
             self.rest = multidict(rest)
         else:
             self.rest = None
 
+    @property
+    def vertices_edges(self):
+        if self.vertices is None or self.edges is None:
+            return ""
+        elif isinstance(self.vertices, (list, tuple)) and isinstance(self.edges, (list, tuple)):
+            return " ".join("%s/%s" % (v,e) for v, e in izip(self.vertices, self.edges))
+        else:
+            return "%s/%s" % (self.vertices, self.edges)
+
+    @vertices_edges.setter
+    def vertices_edges(self, value):
+        if value is None:
+            self.vertices, self.edges = None, None
+            return
+
+        value = value.strip().split(" ")
+        if len(value) == 0:
+            self.vertices, self.edges = None, None
+        elif len(value) == 1:
+            self.vertices, self.edges = map(int, value[0].split("/"))
+        else:
+            self.vertices = []
+            self.edges = []
+            for ve in value:
+                v, e = ve.split("/", 1)
+                self.vertices.append(int(v))
+                self.edges.append(int(e))
+
     def __repr__(self):
-        params = "(id=%(id)r, sid=%(sid)r, name=%(name)r, vertices=%(vertices)r, "\
-                 "edges=%(edges)r, tags=%(tags)r, attributes=%(attributes)r, "\
-                 "rest=%(rest)r)" % self.__dict__
+        params = "(id=%(id)r, sid=%(sid)r, name=%(name)r, networks=%(networks)r, "\
+                "vertices=%(vertices)r, edges=%(edges)r, tags=%(tags)r, "\
+                "attributes=%(attributes)r, rest=%(rest)r)" % self.__dict__
         return "%s%s" % (self.__class__.__name__, params)
 
     def __str__(self):
-        lines = ["[Nexus dataset #%s, %s/%s, %s]" % (self.id, self.vertices, self.edges,
-            self.name)]
+        if self.networks and len(self.networks) > 1:
+            lines = ["Nexus dataset '%s' (#%s) with %d networks" % \
+                    (self.sid, self.id, len(self.networks))]
+        else:
+            lines = ["Nexus dataset '%(sid)s' (#%(id)s)" % self.__dict__]
+
+        lines.append("vertices/edges: %s" % self.vertices_edges)
+
+        if self.name:
+            lines.append("name: %s" % self.name)
         if self.tags:
-            lines.append("Tags: %s" % "; ".join(self.tags))
+            lines.append("tags: %s" % "; ".join(self.tags))
 
         if self.rest:
             wrapper = TextWrapper(width=76, subsequent_indent='  ')
@@ -305,14 +351,16 @@ class NexusDatasetInfo(object):
         self.edges = params.get("edges")
         self.tags = params.get("tags")
 
-        keys_to_ignore = set("id sid name vertices edges tags".split())
+        networks = params.get("networks")
+        if networks:
+            self.networks = networks.split()
+
+        keys_to_ignore = set("id sid name vertices edges tags networks".split())
 
         if self.vertices is None and self.edges is None:
             # Try "vertices/edges"
-            s = params.get("vertices/edges")
+            self.vertices_edges = params.get("vertices/edges")
             keys_to_ignore.add("vertices/edges")
-            if s and "/" in s:
-                self.vertices, self.edges = s.split("/", 1)
 
         if self.rest is None:
             self.rest = multidict()
@@ -322,9 +370,9 @@ class NexusDatasetInfo(object):
 
         if self.id:
             self.id = int(self.id)
-        if self.vertices:
+        if self.vertices and not isinstance(self.vertices, (list, tuple)):
             self.vertices = int(self.vertices)
-        if self.edges:
+        if self.edges and not isinstance(self.edges, (list, tuple)):
             self.edges = int(self.edges)
         if self.tags is not None:
             self.tags = self.tags.split(";")
@@ -420,6 +468,8 @@ class NexusDatasetInfoList(object):
                 current_dataset.vertices = int(value)
             elif key == "edges":
                 current_dataset.edges = int(value)
+            elif key == "vertices/edges":
+                current_dataset.vertices_edges = value
             elif key == "tags":
                 current_dataset.tags = value.split(";")
 
@@ -443,5 +493,17 @@ class NexusDatasetInfoList(object):
         if self._length is None:
             self._fetch_results(0)
         return self._length
+
+    def __str__(self):
+        """Converts the Nexus result list into a nice human-readable format."""
+        max_index_length = len(str(len(self))) + 2
+        indent = "\n" + " " * (max_index_length+1)
+
+        result = []
+        for index, item in enumerate(self):
+            formatted_item = ("[%d]" % index).rjust(max_index_length) + " " + \
+                str(item).replace("\n", indent)
+            result.append(formatted_item)
+        return "\n".join(result)
 
 Nexus = NexusConnection()
