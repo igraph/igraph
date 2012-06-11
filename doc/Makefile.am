@@ -214,7 +214,7 @@ igraph-docs.dvi: igraph-docs.xml $(DOCFIX2)
 	&& $(REMOVEEXAMPLES) igraph-docs2.xml igraph-docs3.xml \
 	&& sed '/<book/q' igraph-docs2.xml | grep -v '<book' >igraph-docs4.xml\
 	&& cat igraph-docs3.xml >> igraph-docs4.xml \
-	&& env < /dev/null hash_extra=65000 docbook2dvi igraph-docs4.xml \
+	&& env < /dev/null hash_extra=650000 docbook2dvi igraph-docs4.xml \
 	&& mv igraph-docs4.dvi igraph-docs.dvi
 
 igraph-docs.ps: igraph-docs.xml $(DOCFIX2)
@@ -232,7 +232,7 @@ igraph-docs.pdf: igraph-docs.xml $(DOCFIX2)
 	&& $(REMOVEEXAMPLES) igraph-docs2.xml igraph-docs3.xml \
 	&& sed '/<book/q' igraph-docs2.xml | grep -v '<book' >igraph-docs4.xml\
 	&& cat igraph-docs3.xml >> igraph-docs4.xml \
-	&& env < /dev/null hash_extra=65000 docbook2pdf igraph-docs4.xml \
+	&& env < /dev/null hash_extra=650000 docbook2pdf igraph-docs4.xml \
 	&& mv igraph-docs4.pdf igraph-docs.pdf
 
 CLEANFILES=$(DOCINCLUDES) html/*.html html/stamp \
