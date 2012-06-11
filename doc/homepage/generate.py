@@ -45,7 +45,7 @@ def process_newsfile(fname):
     news = "<p>" + news + "</p>"
     
     # Replace URLs
-    reg = re.compile(r"(?P<url>http://[^\n ]+)")
+    reg = re.compile(r"(?P<url>https?://[^\n ]+)")
     news = reg.sub("<a href=\"\g<url>\">\g<url></a>", news)
     
     # Add subheadings in <h4> tags
