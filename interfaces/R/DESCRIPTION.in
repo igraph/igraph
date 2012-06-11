@@ -1,12 +1,15 @@
 Package: igraph0
-Version: @VERSION@-1
-Date: Mar 27 , 2012
-Title:  Network analysis and visualization
+Version: @VERSION@-2
+Date: Jun 11 , 2012
+Title:  Network analysis and visualization, old, deprecated package.
 Author: Gabor Csardi <csardi.gabor@gmail.com>
 Maintainer: Gabor Csardi <csardi.gabor@gmail.com>
-Description: Routines for simple graphs and network analysis. igraph can
-  handle large graphs very well and provides functions for generating random
-  and regular graphs, graph visualization, centrality indices and much more.
+Description: Network analysis package, old, deprecated version.
+  'igraph0' is the old version of the igraph package, kept alive 
+  temporarily, for compatibility reasons. In this package, vertices
+  and edges are indexed from zero, whereas in 'igraph', starting from
+  version 0.6, they are indexed from one. Please do not use this 
+  package for new projects.
 Depends: stats
 Suggests: stats4, rgl, tcltk, RSQLite, digest, graph, Matrix
 License: GPL (>= 2)
