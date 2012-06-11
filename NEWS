@@ -2,11 +2,12 @@
 igraph 0.6
 ==========
 
-Released xxx xxx, 2012
+Released June 11, 2012
 
 See also the release notes at 
 http://igraph.sf.net/relnotes-0.6.html
 
+=====================
 R: Major new features
 =====================
 
@@ -38,6 +39,7 @@ R: Major new features
   informative way. The output of summary() was also updated
   accordingly.
 
+=====================
 R: Other new features
 =====================
 
@@ -54,11 +56,12 @@ R: Other new features
   getIgraphOpt().
 - Igraph functions can now print status messages.
 
+===========================
 R: New or updated functions
-========================
+===========================
 
-R: Community detection
-----------------------
+Community detection
+-------------------
 - The multi-level modularity optimization community structure detection 
   algorithm by Blondel et al. was added, see multilevel.community().
 - Distance between two community structures: compare.communities().
@@ -69,15 +72,15 @@ R: Community detection
 - Added the InfoMAP community finding method, thanks to Emmanuel
   Navarro for the code. See infomap.community().
 
-R: Shortest paths
------------------
+Shortest paths
+--------------
 - Eccentricity (eccentricity()), and radius (radius()) calculations.
 - Shortest path calculations with get.shortest.paths() can now 
   return the edges along the shortest paths.
 - get.all.shortest.paths() now supports edge weights.
 
-R: Centrality
--------------
+Centrality
+----------
 - Centralization scores for degree, closeness, betweenness and 
   eigenvector centrality. See centralization.scores().
 - Personalized Page-Rank scores, see page.rank().
@@ -92,22 +95,22 @@ R: Centrality
 - Betweenness calculation can now use arbitrarily large integers,
   this is required for some lattice-like graphs to avoid overflow.
 
-R: Input/output and file formats
---------------------------------
+Input/output and file formats
+-----------------------------
 - Support the DL file format in graph.read(). See 
   http://www.analytictech.com/networks/dataentry.htm.
 - Support writing the LEDA file format in write.graph().
 
-R: Plotting and layouts
------------------------
+Plotting and layouts
+--------------------
 - Star layout: layout.star().
 - Layout based on multidimensional scaling, layout.mds().
 - New layouts layout.grid() and layout.grid.3d().
 - Sugiyama layout algorithm for layered directed acyclic graphs, 
   layout.sugiyama().
 
-R: graph generators
--------------------
+Graph generators
+----------------
 - New graph generators: static.fitness.game(), static.power.law.game().
 - barabasi.game() was rewritten and it supports three algorithms now,
   the default algorithm does not generate multiple or loop edges.
@@ -115,8 +118,8 @@ R: graph generators
 - The Watts-Strogatz graph generator, igraph_watts_strogatz() can 
   now create graphs without loop edges.
 
-R: Others
----------
+Others
+------
 - Added the Spectral Coarse Graining algorithm, see scg(). 
 - The cohesive.blocks() function was rewritten in C, it is much faster
   now. It has a nicer API, too. See demo("cohesive").
@@ -149,18 +152,22 @@ R: Others
 - Convex hull computation, convex.hull().
 - Contract vertices, contract.vertices().
 
+===========================
 New in the Python interface
 ===========================
 
 TODO
 
+=====================================
 Major changes in the Python interface
 =====================================
 
 TODO
 
+==================
 New in the C layer
 ==================
+
 - Maximum cardinality search: igraph_maximum_cardinality_search() and 
   chordality test: igraph_is_chordal().
 - Support the DL file format, igraph_read_graph_dl(). See 
@@ -223,8 +230,10 @@ New in the C layer
 - Added a function to calculate a diversity score for the vertices,
   igraph_diversity().
 
+============================
 Major changes in the C layer
 ============================
+
 - Authority (igraph_authority_score()) and hub (igraph_hub_score()) scores 
   support edge weights now.
 - Graph Laplacian calculation (igraph_laplacian()) supports edge 
@@ -440,7 +449,7 @@ igraph 0.5.1
 Released July 14, 2008
 
 See also the release notes at 
-http://cneurocvs.rmki.kfki.hu/igraph/relnotes-0.5.1.html
+http://igraph.sf.net/relnotes-0.5.1.html
 
 New in the R interface
 ----------------------
@@ -655,7 +664,7 @@ igraph 0.5
 
 Released February 14, 2008
 
-See also the release notes at http://cneurocvs.rmki.kfki.hu/igraph/relnotes-0.5.html
+See also the release notes at http://igraph.sf.net/relnotes-0.5.html
 
 New in the R interface
 ----------------------

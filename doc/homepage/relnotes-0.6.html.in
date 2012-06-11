@@ -1,0 +1,46 @@
+<h2>igraph 0.6 Release Notes</h2>
+
+<p class="news">
+igraph 0.6 is a major new release of igraph. It contains many new
+features and major changes, a lot of bug fixes and improvements. 
+As always, we are grateful to the people who sent comments, bug 
+reports, questions, and specially to people who contributed code.
+</p>
+
+<p class="news">
+See below a list of major changes, with links to the relevant sections
+of the documentation. See the <a href="news.html">news page</a> for a
+(more) complete list of changes. 
+</p>
+
+<h3><img src="images/icon_r.png" />Numbering from 1 in R</h3>
+
+<p class="news">
+The biggest change in the R interface is that starting from this version
+vertices and edges are numbered from one. This change might be
+painful for many people, because it makes already existing code
+incompatible with igraph 0.6. To make the switch easier, there is now an
+<a href="http://cran.r-project.org/web/packages/igraph0/index.html">
+igraph0</a> package on CRAN; igraph0 uses 0-based vertex and
+edge ids, and it can be used to run old code. Note, however, that
+igraph0 will not be developed in the future. Please use the 
+<a href="http://cran.r-project.org/web/packages/igraph/index.html">
+igraph</a> package for current and future work.
+</p>
+
+<p class="news">
+(Also note that in Python and C vertices and edges are still numbered
+from zero, as these languages traditionally use zero-based indexing.)
+</p>
+
+<h3><img src="images/icon_python.png" />...</h3>
+
+<p class="news">
+
+</p>
+
+<h3><img src="images/icon_r.png" />Easier manipulation of graphs</h3>
+
+<p class="news">
+
+</p>
