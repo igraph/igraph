@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 """Summary representation of a graph."""
 
+from igraph.vendor import vendor_import
 from igraph.statistics import median
+from itertools import islice
 from math import ceil
 from textwrap import TextWrapper
 
 __all__ = ["GraphSummary"]
+
+texttable = vendor_import("texttable")
 
 class FakeWrapper(object):
     """Object whose interface is compatible with C{textwrap.TextWrapper}
@@ -59,9 +63,11 @@ class GraphSummary(object):
 
     def __init__(self, graph, verbosity=0, width=78,
             edge_list_format="auto",
+            max_rows=99999,
             print_graph_attributes=True,
             print_vertex_attributes=True,
-            print_edge_attributes=True):
+            print_edge_attributes=True,
+            full=False):
         """Constructs a summary representation of a graph.
 
         @param verbosity: the verbosity of the summary. If zero, only
@@ -69,6 +75,8 @@ class GraphSummary(object):
           and the list of edges will both be returned.
         @param width: the maximal width of each line in the summary.
           C{None} means that no limit will be enforced.
+        @param max_rows: the maximal number of rows to print in a single
+          table (e.g., vertex attribute table or edge attribute table)
         @param edge_list_format: format of the edge list in the summary.
           Supported formats are: C{compressed}, C{adjlist}, C{edgelist},
           C{auto}, which selects automatically from the other three based
@@ -79,9 +87,18 @@ class GraphSummary(object):
           if there are any.
         @param print_edge_attributes: whether to print edge attributes
           if there are any.
+        @param full: False has no effect; True turns on the attribute
+          printing for graph, vertex and edge attributes with verbosity 1.
         """
+        if full:
+            print_graph_attributes = True
+            print_vertex_attributes = True
+            print_edge_attributes = True
+            verbosity = max(verbosity, 1)
+
         self._graph = graph
         self.edge_list_format = edge_list_format.lower()
+        self.max_rows = int(max_rows)
         self.print_graph_attributes = print_graph_attributes
         self.print_vertex_attributes = print_vertex_attributes
         self.print_edge_attributes = print_edge_attributes
@@ -157,10 +174,16 @@ class GraphSummary(object):
     def _construct_edgelist_edgelist(self):
         """Constructs the part in the summary that prints the edge list in a
         full edge list format."""
-        result = [self._edges_header]
-        arrow = self._arrow_format
+        attrs = sorted(self._graph.edge_attributes())
 
-        # TODO
+        table = self._new_table(headers=["", "edge"] + attrs)
+        table.add_rows(islice(self._edge_attribute_iterator(attrs), 0, self.max_rows),
+                header=False)
+        table.set_cols_align(["l", "l"] + self._infer_column_alignment(edge_attrs=attrs))
+
+        result = [self._edges_header]
+        result.extend(table.draw().split("\n"))
+
         return result
 
     def _construct_graph_attributes(self):
@@ -178,14 +201,18 @@ class GraphSummary(object):
 
     def _construct_vertex_attributes(self):
         """Constructs the part in the summary that lists the vertex attributes."""
-        attrs = set(self._graph.vertex_attributes())
-        attrs.discard("name")
-        if not attrs:
+        attrs = sorted(self._graph.vertex_attributes())
+        if not attrs or (len(attrs) == 1 and "name" in attrs):
             return []
 
-        result = ["+ vertex attributes:"]
+        table = self._new_table(headers=[""] + attrs)
+        table.add_rows(islice(self._vertex_attribute_iterator(attrs), 0, self.max_rows),
+                header=False)
+        table.set_cols_align(["l"] + self._infer_column_alignment(vertex_attrs=attrs))
 
-        # TODO
+        result = ["+ vertex attributes:"]
+        result.extend(table.draw().split("\n"))
+
         return result
 
     def _construct_header(self):
@@ -218,24 +245,90 @@ class GraphSummary(object):
 
         return result
 
+    def _edge_attribute_iterator(self, attribute_order):
+        """Returns an iterator that yields the rows of the edge attribute table
+        in the summary. `attribute_order` must be a list containing the names of
+        the attributes to be presented in this table."""
+        arrow = self._arrow_format
+
+        if self._graph.is_named():
+            edges = ", ".join(arrow % (names[edge.source], names[edge.target])
+                for edge in self._graph.es)
+        else:
+            edges = " ".join(arrow % edge.tuple for edge in self._graph.es)
+
+        if self._graph.is_named():
+            names = self._graph.vs["name"]
+            for edge in self._graph.es:
+                formatted_edge = arrow % (names[edge.source], names[edge.target])
+                yield ["[%d]" % edge.index, formatted_edge] + \
+                        [edge[attr] for attr in attribute_order]
+        else:
+            for edge in self._graph.es:
+                formatted_edge = arrow % edge.tuple
+                yield ["[%d]" % edge.index, formatted_edge] + \
+                        [edge[attr] for attr in attribute_order]
+
+    def _infer_column_alignment(self, vertex_attrs=None, edge_attrs=None):
+        """Infers the preferred alignment for the given vertex and edge attributes
+        in the tables by peeking into the attribute values of the first 100 vertices
+        or edges. Numeric attributes will be aligned right, everything else will be
+        aligned left."""
+        values = []
+        if vertex_attrs is not None:
+            vs = self._graph.vs[:100]
+            values.extend(vs[attr] for attr in vertex_attrs)
+        if edge_attrs is not None:
+            es = self._graph.es[:100]
+            values.extend(es[attr] for attr in edge_attrs)
+
+        result = []
+        for vs in values:
+            is_numeric = True
+            try:
+                [float(x) for x in vs]
+            except ValueError:
+                is_numeric = False
+            if is_numeric:
+                result.append("r")
+            else:
+                result.append("l")
+
+        return result
+
+    def _new_table(self, headers=None):
+        """Constructs a new table to pretty-print vertex and edge attributes"""
+        table = texttable.Texttable(max_width=0)
+        table.set_deco(0)
+        if headers is not None:
+            table.header(headers)
+        return table
+
+    def _vertex_attribute_iterator(self, attribute_order):
+        """Returns an iterator that yields the rows of the vertex attribute table
+        in the summary. `attribute_order` must be a list containing the names of
+        the attributes to be presented in this table."""
+        for vertex in self._graph.vs:
+            yield ["[%d]" % vertex.index] + [vertex[attr] for attr in attribute_order]
+
     def __str__(self):
         """Returns the summary representation as a string."""
         output = self._construct_header()
-        if self.verbosity <= 0:
-            return "\n".join(output)
 
         if self.print_graph_attributes:
             output.extend(self._construct_graph_attributes())
         if self.print_vertex_attributes:
             output.extend(self._construct_vertex_attributes())
 
+        if self.verbosity <= 0:
+            return "\n".join(output)
+
         if self._graph.ecount() > 0:
             # Add the edge list
             if self.edge_list_format == "auto":
-                # Select the appropriate edge list format
-                # if (self.print_edge_attributes and self._graph.edge_attributes()):
-                #     format = "edgelist"
-                if median(self._graph.degree(mode="out")) < 3:
+                if (self.print_edge_attributes and self._graph.edge_attributes()):
+                    format = "edgelist"
+                elif median(self._graph.degree(mode="out")) < 3:
                     format = "compressed"
                 else:
                     format = "adjlist"

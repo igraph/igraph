@@ -2767,11 +2767,20 @@ class Graph(GraphBase):
         """Returns a string representation of the graph.
 
         Behind the scenes, this method constructs a L{GraphSummary}
-        instance and invokes its C{__str__} method with maximum verbosity.
+        instance and invokes its C{__str__} method with a verbosity of 1
+        and attribute printing turned off.
+
         See the documentation of L{GraphSummary} for more details about the
         output.
         """
-        return self.summary(verbosity=1, width=78)
+        params = dict(
+                verbosity=1,
+                width=78,
+                print_graph_attributes=False,
+                print_vertex_attributes=False,
+                print_edge_attributes=False
+        )
+        return self.summary(**params)
 
     def summary(self, verbosity=0, width=None, *args, **kwds):
         """Returns the summary of the graph.
