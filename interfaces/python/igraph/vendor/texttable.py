@@ -104,11 +104,6 @@ except ImportError:
     sys.stderr.write("Can't import textwrap module!\n")
     raise
 
-try:
-    True, False
-except NameError:
-    (True, False) = (1, 0)
-
 def len(iterable):
     """Redefining len here so it will be able to work with non-ASCII characters
     """
