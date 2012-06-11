@@ -95,6 +95,8 @@
 
   <xi:include href="community.xml"/>
 
+  <xi:include href="hrg.xml"/>
+
   <xi:include href="scg.xml"/>
 
   <xi:include href="operators.xml"/>
