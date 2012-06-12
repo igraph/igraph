@@ -7392,8 +7392,7 @@ PyObject *igraphmodule_Graph_write_dimacs(igraphmodule_GraphObject * self,
   long source = 0, target = 0;
   PyObject *capacity_obj = Py_None, *fname = NULL;
   igraphmodule_filehandle_t fobj;
-  igraph_vector_t capacity;
-  igraph_bool_t capacity_obj_created = 0;
+  igraph_vector_t* capacity = 0;
 
   static char *kwlist[] = {
     "f", "source", "target", "capacity", NULL
@@ -7406,34 +7405,34 @@ PyObject *igraphmodule_Graph_write_dimacs(igraphmodule_GraphObject * self,
   if (igraphmodule_filehandle_init(&fobj, fname, "w"))
     return NULL;
 
-  if (igraphmodule_PyObject_to_attribute_values(capacity_obj,
-                                                &capacity,
-                                                self, ATTRHASH_IDX_EDGE,
-                                                1.0)) {
-    igraphmodule_filehandle_destroy(&fobj);
-    return igraphmodule_handle_igraph_error();
-  }
-
   if (capacity_obj == Py_None) {
-    capacity_obj_created = 1;
     capacity_obj = PyString_FromString("capacity");
+  } else {
+    Py_INCREF(capacity_obj);
   }
 
-  if (igraph_write_graph_dimacs(&self->g, igraphmodule_filehandle_get(&fobj),
-        source, target, &capacity)) {
-    igraphmodule_handle_igraph_error();
-    igraph_vector_destroy(&capacity);
+  if (igraphmodule_attrib_to_vector_t(capacity_obj, self, &capacity, ATTRIBUTE_TYPE_EDGE)) {
     igraphmodule_filehandle_destroy(&fobj);
-    if (capacity_obj_created) {
-      Py_DECREF(capacity_obj);
-    }
+    Py_DECREF(capacity_obj);
     return NULL;
   }
-  igraph_vector_destroy(&capacity);
-  igraphmodule_filehandle_destroy(&fobj);
-  if (capacity_obj_created) {
-    Py_DECREF(capacity_obj);
+
+  Py_DECREF(capacity_obj);
+
+  if (igraph_write_graph_dimacs(&self->g, igraphmodule_filehandle_get(&fobj),
+        source, target, capacity)) {
+    igraphmodule_handle_igraph_error();
+    if (capacity) {
+      igraph_vector_destroy(capacity);
+    }
+    igraphmodule_filehandle_destroy(&fobj);
+    return NULL;
   }
+
+  if (capacity) {
+    igraph_vector_destroy(capacity);
+  }
+  igraphmodule_filehandle_destroy(&fobj);
 
   Py_RETURN_NONE;
 }

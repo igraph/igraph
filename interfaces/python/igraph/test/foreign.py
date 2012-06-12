@@ -9,12 +9,12 @@ from contextlib import contextmanager
 from textwrap import dedent
 
 @contextmanager
-def temporary_file(content, mode="wt"):
+def temporary_file(content, mode="wb"):
     tmpf, tmpfname = tempfile.mkstemp()
     os.close(tmpf)
     tmpf = open(tmpfname, mode)
-    if isinstance(content, basestring):
-        print >>tmpf, dedent(content)
+    if isinstance(content, unicode):
+        tmpf.write(dedent(content).encode("utf8"))
     else:
         tmpf.write(content)
     tmpf.close()
@@ -24,7 +24,7 @@ def temporary_file(content, mode="wt"):
 
 class ForeignTests(unittest.TestCase):
     def testDIMACS(self):
-        with temporary_file("""\
+        with temporary_file(u"""\
         c
         c        This is a simple example file to demonstrate the
         c     DIMACS input file format for minimum-cost flow problems.
@@ -52,7 +52,7 @@ class ForeignTests(unittest.TestCase):
 
 
     def testDL(self):
-        with temporary_file("""\
+        with temporary_file(u"""\
         dl n=5
         format = fullmatrix
         labels embedded
@@ -62,7 +62,8 @@ class ForeignTests(unittest.TestCase):
         david 1 0 0 0 1
         Lin 1 0 0 1 0
         Pat 1 0 1 0 1
-        russ 0 1 0 1 0""") as tmpfname:
+        russ 0 1 0 1 0
+        """) as tmpfname:
             g = Graph.Read_DL(tmpfname)
             self.failUnless(isinstance(g, Graph))
             self.failUnless(g.vcount() == 5 and g.ecount() == 12)
@@ -71,7 +72,7 @@ class ForeignTests(unittest.TestCase):
                     [(0,1),(0,2),(0,3),(1,0),(1,4),(2,0),(2,3),(3,0),\
                      (3,2),(3,4),(4,1),(4,3)])
 
-        with temporary_file("""\
+        with temporary_file(u"""\
         dl n=5
         format = fullmatrix
         labels:
@@ -83,7 +84,8 @@ class ForeignTests(unittest.TestCase):
         1 0 0 0 1
         1 0 0 1 0
         1 0 1 0 1
-        0 1 0 1 0""") as tmpfname:
+        0 1 0 1 0
+        """) as tmpfname:
             g = Graph.Read_DL(tmpfname)
             self.failUnless(isinstance(g, Graph))
             self.failUnless(g.vcount() == 5 and g.ecount() == 12)
@@ -92,7 +94,7 @@ class ForeignTests(unittest.TestCase):
                     [(0,1),(0,2),(0,3),(1,0),(1,4),(2,0),(2,3),(3,0),\
                      (3,2),(3,4),(4,1),(4,3)])
         
-        with temporary_file("""\
+        with temporary_file(u"""\
         DL n=5
         format = edgelist1
         labels:
@@ -103,7 +105,8 @@ class ForeignTests(unittest.TestCase):
         george jim 3
         sally jim 4
         billy george 5
-        jane jim 6""") as tmpfname:
+        jane jim 6
+        """) as tmpfname:
             g = Graph.Read_DL(tmpfname, False)
             self.failUnless(isinstance(g, Graph))
             self.failUnless(g.vcount() == 5 and g.ecount() == 5)
@@ -135,7 +138,7 @@ class ForeignTests(unittest.TestCase):
         self.failUnless(g.es["weight"] == [1, 2, 0, 3, 0])
 
     def testNCOL(self):
-        with temporary_file("""\
+        with temporary_file(u"""\
         eggs spam 1
         ham eggs 2
         ham bacon
@@ -143,7 +146,7 @@ class ForeignTests(unittest.TestCase):
         spam spam""") as tmpfname:
             self._testNCOLOrLGL(func=Graph.Read_Ncol, fname=tmpfname)
 
-        with temporary_file("""\
+        with temporary_file(u"""\
         eggs spam
         ham eggs
         ham bacon
@@ -154,7 +157,7 @@ class ForeignTests(unittest.TestCase):
                 "weight" not in g.edge_attributes())
 
     def testLGL(self):
-        with temporary_file("""\
+        with temporary_file(u"""\
         # eggs
         spam 1
         # ham
@@ -166,7 +169,7 @@ class ForeignTests(unittest.TestCase):
         spam""") as tmpfname:
             self._testNCOLOrLGL(func=Graph.Read_Lgl, fname=tmpfname)
 
-        with temporary_file("""\
+        with temporary_file(u"""\
         # eggs
         spam
         # ham
@@ -182,7 +185,7 @@ class ForeignTests(unittest.TestCase):
 
 
     def testAdjacency(self):
-        with temporary_file("""\
+        with temporary_file(u"""\
         # Test comment line
         0 1 1 0 0 0
         1 0 1 0 0 0

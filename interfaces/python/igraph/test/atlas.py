@@ -14,10 +14,10 @@ class TestBase(unittest.TestCase):
                 raise
 
             if g.vcount() == 0:
-                self.assertEquals([], pr)
+                self.assertEqual([], pr)
                 continue
 
-            self.assertAlmostEquals(1.0, sum(pr), places=5, \
+            self.assertAlmostEqual(1.0, sum(pr), places=5, \
                     msg="PageRank sum is not 1.0 for graph #%d (%r)" % (idx, pr))
             self.assertTrue(min(pr) >= 0, \
                     msg="Minimum PageRank is less than 0 for graph #%d (%r)" % (idx, pr))
@@ -36,7 +36,7 @@ class TestBase(unittest.TestCase):
                     raise
 
                 if g.vcount() == 0:
-                    self.assertEquals([], ec)
+                    self.assertEqual([], ec)
                     continue
 
                 if not g.is_connected():
@@ -51,7 +51,7 @@ class TestBase(unittest.TestCase):
                             msg="Maximum eigenvector centrality is greater than 1 for graph #%d" % idx)
                     continue
 
-                self.assertAlmostEquals(max(ec), 1, places=7, \
+                self.assertAlmostEqual(max(ec), 1, places=7, \
                         msg="Maximum eigenvector centrality is %r (not 1) for graph #%d (%r)" % \
                         (max(ec), idx, ec))
                 self.assertTrue(min(ec) >= 0, \
@@ -59,7 +59,7 @@ class TestBase(unittest.TestCase):
 
                 ec2 = [sum(ec[u.index] for u in v.predecessors()) for v in g.vs]
                 for i in xrange(n):
-                    self.assertAlmostEquals(ec[i] * eval, ec2[i], places=7, \
+                    self.assertAlmostEqual(ec[i] * eval, ec2[i], places=7, \
                             msg="Eigenvector centrality in graph #%d seems to be invalid "\
                             "for vertex %d" % (idx, i))
         finally:
@@ -70,10 +70,10 @@ class TestBase(unittest.TestCase):
         for idx, g in enumerate(self.__class__.graphs):
             sc = g.hub_score()
             if g.vcount() == 0:
-                self.assertEquals([], sc)
+                self.assertEqual([], sc)
                 continue
 
-            self.assertAlmostEquals(max(sc), 1, places=7, \
+            self.assertAlmostEqual(max(sc), 1, places=7, \
                     msg="Maximum authority score is not 1 for graph #%d" % idx)
             self.assertTrue(min(sc) >= 0, \
                     msg="Minimum hub score is less than 0 for graph #%d" % idx)
@@ -82,10 +82,10 @@ class TestBase(unittest.TestCase):
         for idx, g in enumerate(self.__class__.graphs):
             sc = g.authority_score()
             if g.vcount() == 0:
-                self.assertEquals([], sc)
+                self.assertEqual([], sc)
                 continue
 
-            self.assertAlmostEquals(max(sc), 1, places=7, \
+            self.assertAlmostEqual(max(sc), 1, places=7, \
                     msg="Maximum authority score is not 1 for graph #%d" % idx)
             self.assertTrue(min(sc) >= 0, \
                     msg="Minimum authority score is less than 0 for graph #%d" % idx)

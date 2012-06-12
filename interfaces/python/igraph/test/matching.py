@@ -30,15 +30,15 @@ class MatchingTests(unittest.TestCase):
 
     def testMatchingRetrieval(self):
         m = [12, 10, 8, 13, -1, 14, 9, -1, 2, 6, 1, -1, 0, 3, 5]
-        self.assertEquals(self.matching.matching, m)
+        self.assertEqual(self.matching.matching, m)
         for i, mate in enumerate(m):
             if mate == -1:
                 self.failIf(self.matching.is_matched(i))
-                self.assertEquals(self.matching.match_of(i), None)
+                self.assertEqual(self.matching.match_of(i), None)
             else:
                 self.assertTrue(self.matching.is_matched(i))
-                self.assertEquals(self.matching.match_of(i), mate)
-                self.assertEquals(self.matching.match_of(
+                self.assertEqual(self.matching.match_of(i), mate)
+                self.assertEqual(self.matching.match_of(
                     leda_graph.vs[i], leda_graph.vs[mate]))
 
 
@@ -46,12 +46,12 @@ class MaximumBipartiteMatchingTests(unittest.TestCase):
     def testBipartiteMatchingSimple(self):
         # Specifying the "type" attribute explicitly
         matching = leda_graph.maximum_bipartite_matching("type")
-        self.assertEquals(len(matching), 6)
+        self.assertEqual(len(matching), 6)
         self.assertTrue(matching.is_maximal())
 
         # Using the default attribute
         matching = leda_graph.maximum_bipartite_matching()
-        self.assertEquals(len(matching), 6)
+        self.assertEqual(len(matching), 6)
         self.assertTrue(matching.is_maximal())
 
     def testBipartiteMatchingErrors(self):
