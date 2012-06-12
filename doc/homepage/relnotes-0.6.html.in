@@ -9,8 +9,27 @@ reports, questions, and specially to people who contributed code.
 
 <p class="news">
 See below a list of major changes, with links to the relevant sections
-of the documentation. See the <a href="news.html">news page</a> for a
-(more) complete list of changes. 
+of the documentation. New features in R (look for the
+<img src="images/icon_r.png"/> logo), 
+<img src="images/icon_python.png"/> Python, and
+<img src="images/icon_c.png"/> C are all listed here.
+</p>
+
+<p class="news">
+See the <a href="news.html">news page</a> for a (more) complete list
+of changes.
+</p>
+
+<h3><img src="images/icon_r.png" />
+  <img src="images/icon_python.png" />
+  The Nexus repository</h3>
+
+<p class="news">
+igraph supports the <a href="http://nexus.igraph.org">Nexus network
+    repository</a> from R and from Python. Nexus is an online database
+of network data sets. You can search Nexus and download network from
+it directly from R and Python. See the <a href="doc-0.6/R/nexus.html">R
+    manual</a> or the <a href="TODO">Python manual</a> for details.
 </p>
 
 <h3><img src="images/icon_r.png" />Numbering from 1 in R</h3>
@@ -33,14 +52,170 @@ igraph</a> package for current and future work.
 from zero, as these languages traditionally use zero-based indexing.)
 </p>
 
-<h3><img src="images/icon_python.png" />...</h3>
+<h3><img src="images/icon_c.png"/>
+  <img src="images/icon_r.png"/>
+  <img src="images/icon_python.png"/>Community detection improvements</h3>
 
 <p class="news">
+The multi-level modularity optimization algorithm by Blondel et
+al. was added. See
+the <a href="doc-0.6/html/ch22s06.html#igraph_community_multilevel">C
+    Reference manual</a>, the 
+<a href="doc-0.6/R/multilevel.community.html">R documentation</a>, or
+the <a href="TODO">Python manual</a>.
+</p>
 
+<p class="news">
+Hierarchical random graphs and community finding, based on the code
+from Aaron Clauset. In <a href="doc-0.6/html/igraph-HRG.html">C</a>,
+<a href="doc-0.6/R/hrg.html">R</a> and <a href="TODO">Python</a>.
+</p>
+
+<p class="news">
+We support now the InfoMAP community finding method, thanks to
+Emmanuel Navarro for the code. In
+<a href="doc-0.6/html/ch22s08.html#igraph_community_infomap">C</a>,
+<a href="doc-0.6/R/infomap.community.html">R</a> and
+<a href="TODO">Python</a>.
+</p>
+
+<p class="news">
+We have added some functions to compare various community structures.
+See the <a href="doc-0.6/html/">C
+    Reference manual</a>, the 
+<a href="doc-0.6/R/.html">R documentation</a>, or
+the <a href="TODO">Python manual</a>.
+</p>
+
+<p class="news">
+Igraph now implements the Spectral Coarse Graining method, by David
+Morton, our implementation is based on his code. In
+<a href="doc-0.6/html/ch22s01.html#igraph_compare_communities">C</a>, 
+<a href="doc-0.6/R/compare.communities.html">R</a> and
+<a href="TODO">Python</a>.
+</p>
+
+<p class="news">
+The cohesive block finding functions were rewritten from scratch in
+C. They are much faster now, and they have a nicer API, too. See
+the <a href="doc-0.6/html/ch20s06.html#igraph_cohesive_blocks">C
+    Reference manual</a>, the 
+<a href="doc-0.6/R/cohesive.blocks.html">R documentation</a>, or
+the <a href="TODO">Python manual</a>.
+</p>
+
+<p class="news">
+In R, all community detection functions return a
+'<code>communities</code>' object now. We have defined various
+operations for these objects, see the
+<a href="doc-0.6/R/communities.html">R manual</a> for more.
+</p>
+
+<h3><img src="images/icon_c.png"/>
+  <img src="images/icon_r.png"/>
+  <img src="images/icon_python.png"/>Centrality-related functions</h3>
+
+<p class="news">
+Centralization scores for degree, closeness, betweenness and 
+eigenvector centrality. See
+the <a href="doc-0.6/html/ch13s07.html">C
+    Reference manual</a>, the 
+<a href="doc-0.6/R/centralization.html">R documentation</a>, or
+the <a href="TODO">Python manual</a>.
+</p>
+
+<p class="news">
+Personalized PageRank scores. See
+the <a href="doc-0.6/html/ch13s05.html#igraph_personalized_pagerank">C
+    Reference manual</a>, the 
+<a href="doc-0.6/R/page.rank.html">R documentation</a>, or
+the <a href="TODO">Python manual</a>.
+</p>
+
+<p class="news">
+Authority and hub scores, betweenness and closeness
+calculations all support edge weights now. See
+the <a href="doc-0.6/html/ch13s05.html">C
+    Reference manual</a>, the 
+<a href="doc-0.6/R/00Index.html">R documentation</a>, or
+the <a href="TODO">Python manual</a>.
+</p>
+
+<h3><img src="images/icon_c.png"/>
+  <img src="images/icon_r.png"/>
+  <img src="images/icon_python.png"/>Sugiyama layout</h3>
+
+<p class="news">
+Igraph now implements the Sugiyama layout algorith for layered
+directed acyclic graphs. See
+the <a href="doc-0.6/html/ch18s01.html#igraph_layout_sugiyama">C
+    Reference manual</a>, the 
+<a href="doc-0.6/R/layout.sugiyama.html">R documentation</a>, or
+the <a href="TODO">Python manual</a>.
+</p>
+
+<h3><img src="images/icon_r.png" />Hiding the graph structure by
+  default</h3>
+
+<p class="news">
+In R, if you type in the name of an igraph object, the edges of the 
+graph are not dumped to the screen any more, only a short summary of
+the graph is printed:
+<pre>
+      > karate
+      IGRAPH UNW- 34 78 -- Zachary's karate club network
+      + attr: name (g/c), Citation (g/c), Author (g/c), Faction (v/n), name (v/c), weight (e/n)
+</pre> 
+
+<p class="news">
+To see the graph structure, you can use the '<code>str()</code>' function.
+See more in the <a href="doc-0.6/R/print.igraph.html">R
+    documentation</a>.
 </p>
 
 <h3><img src="images/icon_r.png" />Easier manipulation of graphs</h3>
 
 <p class="news">
-
+In R, there are now new and easier ways to add new vertices/edges to a
+graph, or remove existing ones. See the details in the 
+<a href="doc-0.6/R/graph.structure.html">R documentation</a>.
 </p>
+
+<h3><img src="images/icon_r.png" />The '<code>igraphdata</code>' package</h3>
+
+<p class="news">
+The new R package 
+<a href="http://cran.r-project.org/web/packages/igraphdata/index.html">
+igraphdata</a> contains some example graph data sets.
+</p>
+
+<h3><img src="images/icon_r.png"/>Mark groups of vertices in R plots</h3>
+
+<p class="news">
+In R you can mark vertex groups on graph plots, using shaded
+areas. Communities and cohesive blocks are plotted using technique by
+default. See the '<code>mark.groups</code>' argument of
+the <a href="doc-0.6/R/plot.igraph.html">'<code>plot.igraph()</code>'</a>
+function. 
+</p>
+
+<h3><img src="images/icon_r.png"/>igraph demos in the R package</h3>
+
+<p class="news">
+We have included some demos in the igraph R package, to get a list of
+the demos, type this at your R prompt:
+<pre>
+      > demo(package="igraph")
+</pre>
+</p>
+
+<h3><img src="images/icon_r.png"/>Better handling of attributes in R</h3>
+
+<p class="news">
+In R, many igraph functions keep the vertex, edge and graph attributes
+now, when one manipulates the graph. The attributes can also be
+combined using a flexible API. See
+the <a href="doc-0.6/R/attribute.combination.html">R manual</a> for
+more.
+</p>
+

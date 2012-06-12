@@ -66,22 +66,6 @@
   </ul>
 </li>
 
-<li class="download download-ruby">
-  <span class="name">Ruby gem</span>
-  <span class="comment">&mdash; Interface to the Ruby language, developed by 
-   <a href="http://web.kuicr.kyoto-u.ac.jp/~alexg/" 
-      onClick="javascript:urchinTracker ('/outgoing/alex'); "> 
-      Dr. Alex Gutteridge</a>. 
-  </span>
-  <ul class="download-links">
-    <li class="download-external">
-       <a href="http://rubyforge.org/projects/igraph" 
-          onClick="javascript:urchinTracker ('/outgoing/rubyforge'); "> 
- 	 External homepage</a>
-    </li>
-  </ul>
-</li>
-
 <li class="download download-c">
   <span class="name">C library</span>
   <span class="comment">&mdash; This is what you need if you intend to use

@@ -19,11 +19,9 @@ R: Major new features
   for '[' the graph behaves as an adjacency matrix, for '[[' is 
   is treated as an adjacency list. It is also much simpler to
   manipulate the graph structure, i.e. add/remove edges and vertices, 
-  with some new operators. See more at ?graph.structure and 
-  in the release notes, at http://igraph.sf.net/relnotes-0.6.html.
+  with some new operators. See more at ?graph.structure.
 - In all functions that take a vector or list of vertices or edges, 
-  vertex/edge names can be given instead of the numeric ids. See 
-  more in the release notes at http://igraph.sf.net/relnotes-0.6.html.
+  vertex/edge names can be given instead of the numeric ids.
 - New package 'igraphdata', contains a number of data sets that can
   be used directly in igraph.
 - Igraph now supports loading graphs from the Nexus online data
