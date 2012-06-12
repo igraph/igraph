@@ -37,15 +37,19 @@
   module</span>
   <ul class="download-links">
     <li class="download-external">
+	  <a href="http://hal.elte.hu/~nepusz/development/igraph/tutorial/tutorial.html"
+		  onClick="javascript:urchinTracker ('/docs/pythontutorial'); ">
+         Tutorial &mdash; Read online</a>
+    </li>
+    <li class="download-external">
        <a href="doc/python/index.html"
           onClick="javascript:urchinTracker ('/docs/pythonhtml'); "> 
-      <a href="doc/python/index.html">
-         Browse online</a>
+         Reference manual &mdash; Browse online</a>
     </li>
     <li class="download-pdf">
        <a href="doc/python/igraph.pdf" 
           onClick="javascript:urchinTracker ('/docs/pythonpdf'); "> 
-      <a href="doc/python/igraph.pdf">PDF file</a>
+         Reference manual &mdash; PDF file</a>
     </li>
   </ul>
   <div class="comment">Documentation for the Python interface
