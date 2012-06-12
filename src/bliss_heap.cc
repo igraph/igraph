@@ -17,13 +17,13 @@ Copyright (C) 2003-2006 Tommi Junttila
 
 /* FSF address fixed in the above notice on 1 Oct 2009 by Tamas Nepusz */
 
-using namespace std;
-
 #include <cstdlib>
 #include <cstdio>
 #include <climits>
 #include "bliss_defs.hh"
 #include "bliss_heap.hh"
+
+using namespace std;
 
 namespace igraph {
 

@@ -17,8 +17,6 @@ Copyright (C) 2003-2006 Tommi Junttila
 
 /* FSF address fixed in the above notice on 1 Oct 2009 by Tamas Nepusz */
 
-using namespace std;
-
 #include <cstdio>
 #include <cassert>
 #include <cctype>
@@ -35,6 +33,8 @@ using namespace std;
 #include "igraph_interface.h"
 #include "igraph_topology.h"
 #include "igraph_statusbar.h"
+
+using namespace std;
 
 extern bool bliss_verbose;
 // extern FILE *bliss_verbstr;

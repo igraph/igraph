@@ -20,8 +20,6 @@
 #ifndef BLISS_BIGNUM_HH
 #define BLISS_BIGNUM_HH
 
-using namespace std;
-
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
@@ -85,7 +83,7 @@ public:
     if (! *str) {
       IGRAPH_ERROR("Cannot convert big number to string", IGRAPH_ENOMEM);
     }
-    stringstream ss;
+    std::stringstream ss;
     ss << v;
     strncpy(*str, ss.str().c_str(), size);
     return 0;

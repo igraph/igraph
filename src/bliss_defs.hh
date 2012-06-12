@@ -20,8 +20,6 @@
 #ifndef BLISS_DEFS_HH
 #define BLISS_DEFS_HH
 
-using namespace std;
-
 #include "config.h"
 #include <cassert>
 

@@ -20,8 +20,6 @@ Copyright (C) 2003-2006 Tommi Junttila
 #ifndef BLISS_KQUEUE_HH
 #define BLISS_KQUEUE_HH
 
-using namespace std;
-
 #include "bliss_defs.hh"
 #include <cstdlib>		// malloc
 

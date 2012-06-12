@@ -20,8 +20,6 @@ Copyright (C) 2003-2006 Tommi Junttila
 #ifndef BLISS_PARTITION_HH
 #define BLISS_PARTITION_HH
 
-using namespace std;
-
 namespace igraph {
 
 class Cell;

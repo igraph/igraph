@@ -20,8 +20,6 @@ Copyright (C) 2003-2006 Tommi Junttila
 #ifndef BLISS_GRAPH_HH
 #define BLISS_GRAPH_HH
 
-using namespace std;
-
 namespace igraph {
   class AbstractGraph;
 }
