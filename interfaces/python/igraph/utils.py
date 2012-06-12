@@ -301,13 +301,13 @@ class multidict(MutableMapping):
             return []
 
     def iterlists(self):
-        """Iterates over ``(key, values)`` pairs where `values` is the list
-        of values associated with `key`."""
+        """Iterates over ``(key, values)`` pairs where ``values`` is the list
+        of values associated with ``key``."""
         return self._dict.iteritems()
 
     def lists(self):
-        """Returns a list of ``(key, values)`` pairs where `values` is the list
-        of values associated with `key`."""
+        """Returns a list of ``(key, values)`` pairs where ``values`` is the list
+        of values associated with ``key``."""
         return self._dict.items()
 
     def update(self, arg, **kwds):

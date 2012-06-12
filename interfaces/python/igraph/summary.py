@@ -85,9 +85,9 @@ class GraphSummary(object):
     def __init__(self, graph, verbosity=0, width=78,
             edge_list_format="auto",
             max_rows=99999,
-            print_graph_attributes=True,
-            print_vertex_attributes=True,
-            print_edge_attributes=True,
+            print_graph_attributes=False,
+            print_vertex_attributes=False,
+            print_edge_attributes=False,
             full=False):
         """Constructs a summary representation of a graph.
 

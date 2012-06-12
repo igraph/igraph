@@ -150,7 +150,7 @@ class NexusConnection(object):
           can be used to find datasets that contain any of the given words
           (instead of all of them). Exact phrases must be enclosed in
           quotes in the search string. See the Nexus webpage for more
-          information at L{http://nexus.igraph.org/web/docs#searching}.
+          information at U{http://nexus.igraph.org/web/docs#searching}.
         @param order: the order of entries; it must be one of C{"date"},
           C{"name"} or C{"popularity"}.
         @return: a L{NexusDatasetInfoList} object, which basically acts like a

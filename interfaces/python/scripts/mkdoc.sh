@@ -22,6 +22,7 @@ if [ $? -gt 0 ]; then
 fi
 
 PACKAGES="igraph igraph.statistics igraph.app igraph.app.shell"
+EXCLUDE="igraph.test igraph.vendor.texttable"
 
 PWD=`pwd`
 
@@ -43,6 +44,7 @@ ${EPYDOC} --html -o ${DOC_API_FOLDER}/html -v \
 	      --url="http://igraph.sourceforge.net" \
 	      --no-private \
 	      --exclude=igraph.test \
+	      --exclude=igraph.vendor \
 	      $PACKAGES
 
 PDF=0
@@ -50,8 +52,14 @@ which latex >/dev/null && PDF=1
 
 if [ $PDF -eq 1 ]; then
   echo "Generating PDF documentation..."
-  ${EPYDOC} --pdf -o ${DOC_API_FOLDER}/pdf --exclude=igraph.test --inheritance=listed -v --name="IGraph library" --url="http://igraph.sourceforge.net" $PACKAGES
-
+  ${EPYDOC} --pdf -o ${DOC_API_FOLDER}/pdf -v \
+	  --name="IGraph library" \
+	  --url="http://igraph.sourceforge.net" \
+	  --inheritance=listed \
+	  --no-private \
+	  --exclude=igraph.test \
+	  --exclude=igraph.vendor \
+	  $PACKAGES
 fi
 
 if [ $SYNC -eq 1 ]; then
