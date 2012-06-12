@@ -75,24 +75,25 @@ from Aaron Clauset. In <a href="doc-0.6/html/igraph-HRG.html">C</a>,
 We support now the InfoMAP community finding method, thanks to
 Emmanuel Navarro for the code. In
 <a href="doc-0.6/html/ch22s08.html#igraph_community_infomap">C</a>,
-<a href="doc-0.6/R/infomap.community.html">R</a> and
+<a href="doc-0.6/R/infomap.html">R</a> and
 <a href="TODO">Python</a>.
 </p>
 
 <p class="news">
 We have added some functions to compare various community structures.
-See the <a href="doc-0.6/html/">C
-    Reference manual</a>, the 
-<a href="doc-0.6/R/.html">R documentation</a>, or
-the <a href="TODO">Python manual</a>.
+In
+<a href="doc-0.6/html/ch22s01.html#igraph_compare_communities">C</a>, 
+<a href="doc-0.6/R/compare.communities.html">R</a> and
+<a href="TODO">Python</a>.
 </p>
 
 <p class="news">
 Igraph now implements the Spectral Coarse Graining method, by David
-Morton, our implementation is based on his code. In
-<a href="doc-0.6/html/ch22s01.html#igraph_compare_communities">C</a>, 
-<a href="doc-0.6/R/compare.communities.html">R</a> and
-<a href="TODO">Python</a>.
+Morton, our implementation is based on his code. See the 
+<a href="doc-0.6/html/igraph-SCG.html">C
+    Reference manual</a>, the 
+<a href="doc-0.6/R/scg.html">R documentation</a>, or
+the <a href="TODO">Python manual</a>.
 </p>
 
 <p class="news">
@@ -169,7 +170,7 @@ the graph is printed:
 
 <p class="news">
 To see the graph structure, you can use the '<code>str()</code>' function.
-See more in the <a href="doc-0.6/R/print.igraph.html">R
+See more in the <a href="doc-0.6/R/print.graph.html">R
     documentation</a>.
 </p>
 
@@ -195,7 +196,7 @@ igraphdata</a> contains some example graph data sets.
 In R you can mark vertex groups on graph plots, using shaded
 areas. Communities and cohesive blocks are plotted using technique by
 default. See the '<code>mark.groups</code>' argument of
-the <a href="doc-0.6/R/plot.igraph.html">'<code>plot.igraph()</code>'</a>
+the <a href="doc-0.6/R/plot.graph.html">'<code>plot.igraph()</code>'</a>
 function. 
 </p>
 
@@ -206,16 +207,25 @@ We have included some demos in the igraph R package, to get a list of
 the demos, type this at your R prompt:
 <pre>
       > demo(package="igraph")
+      Demos in package ‘igraph’:
+
+      centrality              Classic and other vertex centrality indices
+      cohesive                Cohesive blocking, the Moody & White method
+      community               Community structure detection
+      crashR                  A crash-course into R
+      smallworld              Small-world networks
 </pre>
 </p>
 
-<h3><img src="images/icon_r.png"/>Better handling of attributes in R</h3>
+<h3><img src="images/icon_r.png"/>
+  <img src="images/icon_python.png"/>
+  Better handling of attributes in R and Python</h3>
 
 <p class="news">
 In R, many igraph functions keep the vertex, edge and graph attributes
 now, when one manipulates the graph. The attributes can also be
 combined using a flexible API. See
-the <a href="doc-0.6/R/attribute.combination.html">R manual</a> for
-more.
+the <a href="doc-0.6/R/attribute.combination.html">R manual</a> and the 
+<a href="doc-0.6/Python/TODO">Python manual</a> for more.
 </p>
 
