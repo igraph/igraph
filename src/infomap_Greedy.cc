@@ -23,6 +23,7 @@
 */
 
 #include "infomap_Greedy.h"
+#include <iterator>
 #define plogp( x ) ( (x) > 0.0 ? (x)*log(x) : 0.0 )
 
 Greedy::Greedy(FlowGraph * fgraph){
