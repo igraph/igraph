@@ -1,7 +1,29 @@
+# vim:ts=4:sw=4:sts=4:et
+# -*- coding: utf-8 -*-
 """Classes representing matchings on graphs."""
 
 from igraph.clustering import VertexClustering
 from igraph._igraph import Vertex
+
+__license__ = """
+Copyright (C) 2006-2012  Tamas Nepusz <ntamas@gmail.com>
+Pázmány Péter sétány 1/a, 1117 Budapest, Hungary
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+02110-1301 USA
+"""
 
 class Matching(object):
     """A matching of vertices in a graph.
