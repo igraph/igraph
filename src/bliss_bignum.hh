@@ -21,9 +21,7 @@
 #define BLISS_BIGNUM_HH
 
 #include <cstdlib>
-#include <cstdio>
 #include <cmath>
-#include <cstring>      /* strncpy */
 #include <sstream>
 #include "bliss_defs.hh"
 #include "igraph_math.h"
@@ -52,15 +50,7 @@ public:
   ~BigNum() {mpz_clear(v); }
   void assign(const int n) {mpz_set_si(v, n); }
   void multiply(const int n) {mpz_mul_si(v, v, n); }
-  int print(FILE *fp) {return mpz_out_str(fp, 10, v); }
-  int tostring(char **str) { 
-    *str=igraph_Calloc(mpz_sizeinbase(v, 10)+2, char);
-    if (! *str) { 
-      IGRAPH_ERROR("Cannot convert big number to string", IGRAPH_ENOMEM);
-    }
-    mpz_get_str(*str, 10, v);
-    return 0;
-  }
+  int tostring(char **str); 
 };
 
 }
@@ -76,24 +66,11 @@ public:
   BigNum(): v(0.0) {}
   void assign(const int n) {v = (long double)n; }
   void multiply(const int n) {v *= (long double)n; }
-  int print(FILE *fp) {return fprintf(fp, "%Lg", v); }
-  int tostring(char **str) {
-    int size=static_cast<int>( (log(abs(v))/log(10.0))+4 );
-    *str=igraph_Calloc(size, char );
-    if (! *str) {
-      IGRAPH_ERROR("Cannot convert big number to string", IGRAPH_ENOMEM);
-    }
-    std::stringstream ss;
-    ss << v;
-    strncpy(*str, ss.str().c_str(), size);
-    return 0;
-  }
+  int tostring(char **str); 
 };
 
 }
 
 #endif
-
-
 
 #endif
