@@ -7423,14 +7423,14 @@ PyObject *igraphmodule_Graph_write_dimacs(igraphmodule_GraphObject * self,
         source, target, capacity)) {
     igraphmodule_handle_igraph_error();
     if (capacity) {
-      igraph_vector_destroy(capacity);
+      igraph_vector_destroy(capacity); free(capacity);
     }
     igraphmodule_filehandle_destroy(&fobj);
     return NULL;
   }
 
   if (capacity) {
-    igraph_vector_destroy(capacity);
+    igraph_vector_destroy(capacity); free(capacity);
   }
   igraphmodule_filehandle_destroy(&fobj);
 
