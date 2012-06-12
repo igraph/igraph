@@ -24,6 +24,10 @@
 #include "igraph_types.h"
 #include <float.h>
 
+#ifdef _MSC_VER
+#  define snprintf _snprintf
+#endif
+
 #ifdef DBL_DIG
 /* Use DBL_DIG to determine the maximum precision used for %g */
 #  define STRINGIFY_HELPER(x) #x

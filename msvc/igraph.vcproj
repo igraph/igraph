@@ -804,6 +804,9 @@
 				RelativePath=".\src\math.c">
 			</File>
 			<File
+				RelativePath=".\src\matching.c">
+			</File>
+			<File
 				RelativePath=".\src\matrix.c">
 			</File>
 			<File
@@ -844,6 +847,12 @@
 			</File>
 			<File
 				RelativePath=".\src\progress.c">
+			</File>
+			<File
+				RelativePath=".\src\qsort.c">
+			</File>
+			<File
+				RelativePath=".\src\qsort_r.c">
 			</File>
 			<File
 				RelativePath=".\src\random.c">
@@ -913,6 +922,9 @@
 			</File>
 			<File
 				RelativePath=".\src\type_indexededgelist.c">
+			</File>
+			<File
+				RelativePath=".\src\types.c">
 			</File>
 			<File
 				RelativePath=".\src\f2c\util.c">
