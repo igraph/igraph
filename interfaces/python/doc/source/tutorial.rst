@@ -26,8 +26,8 @@ Starting |igraph|
 ordinary Python module at the Python prompt::
 
   $ python
-  Python 2.5.1 (r251:54863, Apr 15 2008, 22:57:26)
-  [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
+  Python 2.7.1 (r271:86832, Jun 16 2011, 16:59:05)
+  [GCC 4.2.1 (Based on Apple Inc. build 5658) (LLVM build 2335.15.00)] on darwin
   Type "help", "copyright", "credits" or "license" for more information.
   >>> import igraph
 
@@ -59,7 +59,7 @@ When you start the script, you will see something like this::
 
   $ igraph
   No configuration file, using defaults
-  igraph 0.6 running inside Python 2.5.1 (r251:54863, Apr 15 2008, 22:57:26)
+  igraph 0.6 running inside Python 2.7.1 (r271:86832, Jun 16 2011, 16:59:05)
   Type "copyright", "credits" or "license" for more information.
   >>>
 
@@ -92,33 +92,33 @@ Creating a graph from scratch
 Assuming that you have started |igraph| successfully, it is time to create your first
 |igraph| graph. This is pretty simple:
 
->>> g = Graph(1)
+>>> g = Graph()
 
-The above statement created an undirected graph with a single vertex and assigned it to
-the variable `g`. To confirm that it's really an |igraph| graph, we can
+The above statement created an undirected graph with no vertices or edges and assigned it
+to the variable `g`. To confirm that it's really an |igraph| graph, we can
 print it:
 
 >>> g
 <igraph.Graph object at 0x4c87a0>
 
-This tells us that `g` is an instance of |igraph|'s :class:`Graph` class and that it is currently
-living at the memory address ``0x4c87a0`` (the exact output will almost surely be different
-for your platform). To obtain a more user-friendly output, we can try to print the graph
-using Python's :keyword:`print` statement:
+This tells us that `g` is an instance of |igraph|'s :class:`Graph` class and
+that it is currently living at the memory address ``0x4c87a0`` (the exact
+output will almost surely be different for your platform). To obtain a more
+user-friendly output, we can try to print the graph using Python's
+:keyword:`print` statement:
 
 >>> print(g)
-Undirected graph (|V| = 1, |E| = 0)
+IGRAPH U--- 0 0 --
+
+TODO: explain it
 
 This is not too exciting so far; a graph with a single vertex and no edges is not really useful
 for us. Let's add some vertices first!
 
->>> g.add_vertices(2)
-<igraph.Graph object at 0x4c87a0>
+>>> g.add_vertices(3)
 
 :meth:`Graph.add_vertices` (i.e., the :meth:`~Graph.add_vertices` method of the :class:`Graph`
-class) adds the given number of vertices to the graph and returns the graph itself (hence the
-output; you can see that the memory address of the :class:`Graph` object that was returned
-is exactly the same).
+class) adds the given number of vertices to the graph.
 
 Now our graph has three vertices but no edges, so let's add some edges as well! You can
 add edges by calling :meth:`Graph.add_edges` - but in order to add edges, you have to refer to
@@ -130,7 +130,6 @@ third vertices of the graph. Passing this list to :meth:`Graph.add_edges` adds t
 to your graph:
 
 >>> g.add_edges([(0,1), (1,2)])
-<igraph.Graph object at 0x4c87a0>
 
 :meth:`~Graph.add_edges` is clever enough to figure out what you want to do in most of the
 cases: if you supply a single pair of integers, it will automatically assume that you want
@@ -151,50 +150,44 @@ occurred. The exact filename and line number may not be too informative to you,
 but it is invaluable for |igraph| developers if you think you found an error in
 |igraph| and you want to report it.
 
-You may be wondering why it is useful to return the graph itself when adding
-vertices or edges. The reason is that you can conveniently chain your calls to
-:meth:`~Graph.add_vertices` and :meth:`~Graph.add_edges`. Let us go on with our
-graph ``g`` and add some more vertices and edges to it:
+Let us go on with our graph ``g`` and add some more vertices and edges to it:
 
->>> g.add_edges((2,0)).add_vertices(3).add_edges([(2,3),(3,4),(4,5),(5,3)])
-<igraph.Graph object at 0x4c87a0>
+>>> g.add_edges((2,0))
+>>> g.add_vertices(3)
+>>> g.add_edges([(2,3),(3,4),(4,5),(5,3)])
 >>> print g
-Undirected graph (|V| = 6, |E| = 7)
+IGRAPH U---- 6 7 --
++ edges:
+0--1 1--2 0--2 2--3 3--4 4--5 3--5
 
-Now, this is better. We have an undirected graph with six vertices and seven edges.
-Edges also have IDs, similarly to vertices; they also start from zero and edges that
-were added later have higher IDs than edges that were added earlier. Vertex and
-edge IDs are always *continuous*, and a direct consequence of this fact is that
-if you happen to delete an edge, chances are that some (or all) of the edges will
-be renumbered. Moreover, if you delete a vertex, even the vertex IDs will change.
-Edges can be deleted by :meth:`~Graph.delete_edges` and it requires a list of edge IDs
-to be deleted (or a single edge ID). Vertices can be deleted by :meth:`~Graph.delete_vertices`
-and you may have already guessed that it requires a list of vertex IDs to be deleted
-(or a single vertex ID). If you do not know the ID of an edge you wish to delete,
-but you know the IDs of the vertices at its two endpoints, you can use :meth:`~Graph.get_eid`
-to get the edge ID. Remember, all these are *methods* of the :class:`Graph` class and
-you must call them on the appropriate :class:`Graph` instance!
+Now, this is better. We have an undirected graph with six vertices and seven
+edges, and you can also see the list of edges in |igraph|'s output.  Edges also
+have IDs, similarly to vertices; they also start from zero and edges that were
+added later have higher IDs than edges that were added earlier. Vertex and edge
+IDs are always *continuous*, and a direct consequence of this fact is that if
+you happen to delete an edge, chances are that some (or all) of the edges will
+be renumbered. Moreover, if you delete a vertex, even the vertex IDs will
+change.  Edges can be deleted by :meth:`~Graph.delete_edges` and it requires a
+list of edge IDs to be deleted (or a single edge ID). Vertices can be deleted
+by :meth:`~Graph.delete_vertices` and you may have already guessed that it
+requires a list of vertex IDs to be deleted (or a single vertex ID). If you do
+not know the ID of an edge you wish to delete, but you know the IDs of the
+vertices at its two endpoints, you can use :meth:`~Graph.get_eid` to get the
+edge ID. Remember, all these are *methods* of the :class:`Graph` class and you
+must call them on the appropriate :class:`Graph` instance!
 
 >>> g.get_eid(2,3)
 3
 >>> g.delete_edges(3)
-<igraph.Graph object at 0x4c87a0>
 >>> summary(g)
-6 vertices, 6 edges, undirected
-Number of components: 2
-Diameter: 1
-Density: 0.4000
-Average path length: 1.0000
+IGRAPH U--- 6 6 --
 
 :meth:`summary` is a new command that you haven't seen before; it is a member of |igraph|'s
-own namespace and it can be used to get an overview of a given graph object. It lists the
-number of vertices and edges, checks whether the graph is directed, counts the connected components,
-calculates the graph diameter, the edge density and the average path lengths. All of these
-informations can be calculated separately by the appropriate methods of :class:`Graph` of course;
-we will talk about these later in the reference manual. In general, :meth:`summary` is primarily
-meant for smaller graph objects as calculating some of these properties on a really large graph
-would take a lot of time.
-
+own namespace and it can be used to get an overview of a given graph object. Its output
+is similar to the output of ``print`` but it does not print the edge list to avoid
+cluttering up the display for large graphs. In general, you should use :meth:`summary`
+instead of ``print`` when working interactively with large graphs because printing the
+edge list of a graph with millions of vertices and edges could take quite a lot of time.
 
 Generating graphs
 =================
@@ -211,11 +204,7 @@ deterministic and a stochastic generator instead:
 
 >>> g = Graph.Tree(127, 2)
 >>> summary(g)
-127 vertices, 126 edges, undirected
-Number of components: 1
-Diameter: 12
-Density: 0.0157
-Average path length: 8.3510
+IGRAPH U--- 127 126 --
 
 :meth:`Graph.Tree` generates a regular tree graph. The one that we generated has 127
 vertices and each vertex (apart from the leaves) has two children (and of course one
@@ -239,11 +228,10 @@ Let's do the same with a stochastic generator!
 
 >>> g = Graph.GRG(100, 0.2)
 >>> summary(g)
-100 vertices, 524 edges, undirected
-Number of components: 1
-Diameter: 9
-Density: 0.1059
-Average path length: 3.7701
+IGRAPH U---- 100 516 --
++ attr: x (v), y (v)
+
+TODO: discuss what the ``+ attr`` line means.
 
 :meth:`Graph.GRG` generates a geometric random graph: *n* points are chosen randomly and
 uniformly inside the unit square and pairs of points closer to each other than a predefined
@@ -320,11 +308,12 @@ or a single edge of the graph. :class:`Vertex` and :class:`Edge` objects can als
 as dictionaries to alter the attributes of that single vertex or edge:
 
 >>> g.es[0]
-igraph.Edge(<igraph.Graph object at 0x4c87a0>,0,{'formal': False})
+igraph.Edge(<igraph.Graph object at 0x4c87a0>,0,{'is_formal': False})
 >>> g.es[0].attributes()
-{'formal': False}
+{'is_formal': False}
 >>> g.es[0]["is_formal"] = True
-igraph.Edge(<igraph.Graph object at 0x4c87a0>,0,{'formal': True})
+>>> g.es[0]
+igraph.Edge(<igraph.Graph object at 0x4c87a0>,0,{'is_formal': True})
 
 The above snippet illustrates that indexing an :class:`EdgeSeq` object returns
 :class:`Edge` objects; the representation above shows the graph the object belongs to,
@@ -362,7 +351,6 @@ Finally, it should be mentioned that attributes can be deleted by the Python key
 Traceback (most recent call last):
   File "<stdin>", line 25, in <module>
 KeyError: 'Attribute does not exist'
-
 
 Structural properties of graphs
 ===============================
@@ -424,10 +412,25 @@ with some Python magic:
 >>> [g.es[idx].tuple for idx, eb in enumerate(ebs) if eb == max_eb]
 [(0, 1), (0, 2)]
 
+Most structural properties can also be retrieved for a subset of vertices or edges
+or for a single vertex or edge by calling the appropriate method on the
+:class:`VertexSeq`, :class:`EdgeSeq`, :class:`Vertex` or :class:`Edge` object of
+interest:
+
+>>> g.vs.degree()
+[3, 1, 4, 3, 2, 3, 2]
+>>> g.es.edge_betweenness()
+[6.0, 6.0, 4.0, 2.0, 4.0, 3.0, 4.0, 3.0. 4.0]
+>>> g.vs[2].degree()
+4
+
 .. _querying_vertices_and_edges:
 
 Querying vertices and edges based on attributes
 ===============================================
+
+Selecting vertices and edges
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Imagine that in a given social network, you would like to find out who has the largest
 degree or betweenness centrality. You can do that with the tools presented so far and
@@ -550,11 +553,93 @@ find vertices with degree larger than 2:
 
 >>> g.vs(_degree_gt=2)
 
-There are two special structural properties for selecting edges: using ``_source``
-or ``_from`` in the keyword argument list of :meth:`EdgeSeq.select` filters based on
-the source vertices of the edges, while ``_target_`` or ``_to`` filters based on
-the target vertices.
+There are also a few special structural properties for selecting edges:
 
+- Using ``_source`` or ``_from`` in the keyword argument list of :meth:`EdgeSeq.select`
+  filters based on the source vertices of the edges. E.g., to select all the edges
+  originating from Claire (who has vertex index 2):
+
+  >>> g.es.select(_source=2)
+  
+- Using ``_target`` or ``_to`` filters based on the target vertices. This is different
+  from ``_source`` and ``_from`` if the graph is directed.
+
+- ``_within`` takes a :class:`VertexSeq` object or a list or set of vertex indices
+  and selects all the edges that originate and terminate in the given vertex
+  set. For instance, the following expression selects all the edges between
+  Claire (vertex index 2), Dennis (vertex index 3) and Esther (vertex index 4):
+
+  >>> g.es.select(_within=[2,3,4])
+
+  We could also have used a :class:`VertexSeq` object:
+
+  >>> g.es.select(_within=g.vs[2:5])
+
+- ``_between`` takes a tuple consisting of two :class:`VertexSeq` objects or lists
+  containing vertex indices or :class:`Vertex` objects and selects all the edges that
+  originate in one of the sets and terminate in the other. E.g., to select all the
+  edges that connect men to women:
+
+  >>> men = g.vs.select(gender="m")
+  >>> women = g.vs.select(gender="f")
+  >>> g.es.select(_between=(men, women))
+
+Finding a single vertex or edge with some properties
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In many cases we are looking for a single vertex or edge of a graph with some properties,
+and either we do not care which one of the matches is returned if there are multiple
+matches, or we know in advance that there will be only one match. A typical example is
+looking up vertices by their names in the ``name`` property. :class:`VertexSeq` and
+:class:`EdgeSeq` objects provide the :meth:`~VertexSeq.find` method for such use-cases.
+:meth:`~VertexSeq.find` works similarly to :meth:`~VertexSeq.select`, but it returns
+only the first match if there are multiple matches, and throws an exception if no
+match is found. For instance, to look up the vertex corresponding to Claire, one can
+do this:
+
+>>> claire = g.vs.find(name="Claire")
+>>> type(claire)
+igraph.Vertex
+>>> claire.index
+2
+
+Looking up an unknown name will yield an exception:
+
+>>> g.vs.find(name="Joe")
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+ValueError: no such vertex
+
+Looking up vertices by names
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Looking up vertices by names is a very common operation, and it is usually much easier
+to remember the names of the vertices in a graph than their IDs. To this end, |igraph|
+treats the ``name`` attribute of vertices specially; they are indexed such that vertices
+can be looked up by their names in amortized constant time. To make things even easier,
+|igraph| accepts vertex names (almost) anywhere where it expects vertex IDs, and also
+accepts collections (list, tuples etc) of vertex names anywhere where it expects lists
+of vertex IDs or :class:`VertexSeq` instances. E.g, you can simply look up the degree
+(number of connections) of Dennis as follows:
+
+>>> g.degree("Dennis")
+3
+
+or, alternatively:
+
+>>> g.vs.find("Dennis").degree()
+3
+
+The mapping between vertex names and IDs is maintained transparently by |igraph| in
+the background; whenever the graph changes, |igraph| also updates the internal mapping.
+However, uniqueness of vertex names is *not* enforced; you can easily create a graph
+where two vertices have the same name, but |igraph| will return only one of them when
+you look them up by names, the other one will be available only by its index.
+
+Treating a graph as an adjacency matrix
+=======================================
+
+TODO
 
 Layouts and plotting
 ====================
@@ -743,6 +828,10 @@ Attribute name  Keyword argument       Purpose
 --------------- ---------------------- ------------------------------------------
 ``label_size``  ``vertex_label_size``  Font size of the vertex label
 --------------- ---------------------- ------------------------------------------
+``order``       ``vertex_order``       Drawing order of the vertices. Vertices
+                                       with a smaller order parameter will be
+                                       drawn first.
+--------------- ---------------------- ------------------------------------------
 ``shape``       ``vertex_shape``       Shape of the vertex. Known shapes are:
                                        ``rectangle``, ``circle``, ``hidden``,
                                        ``triangle-up``, ``triangle-down``.
@@ -761,6 +850,17 @@ Attribute name  Keyword argument       Purpose
 =============== ====================== ==========================================
 ``color``       ``edge_color``         Color of the edge
 --------------- ---------------------- ------------------------------------------
+``curved``      ``edge_curved``        The curvature of the edge. Positive values
+                                       correspond to edges curved in CCW
+                                       direction, negative numbers correspond to
+                                       edges curved in clockwise (CW) direction.
+                                       Zero represents straight edges. ``True``
+                                       is interpreted as 0.5, ``False`` is
+                                       interpreted as zero. This is useful to
+                                       make multiple edges visible. See also the
+                                       ``autocurve`` keyword argument to
+                                       :func:`plot`.
+--------------- ---------------------- ------------------------------------------
 ``arrow_size``  ``edge_arrow_size``    Size (length) of the arrowhead on the edge
                                        if the graph is directed, relative to 15
                                        pixels.
@@ -771,6 +871,35 @@ Attribute name  Keyword argument       Purpose
 ``width``       ``edge_width``         Width of the edge in pixels
 =============== ====================== ==========================================
 
+
+Generic keyword arguments of ``plot()``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+These settings can be specified as keyword arguments to the ``plot()`` function
+to control the overall appearance of the plot.
+
+================ ================================================================
+Keyword argument Purpose
+================ ================================================================
+``autocurve``    Whether to determine the curvature of the edges automatically in
+                 graphs with multiple edges. The default is ``True`` for graphs
+                 with less than 10.000 edges and ``False`` otherwise.
+---------------- ----------------------------------------------------------------
+``bbox``         The bounding box of the plot. This must be a tuple containing
+                 the desired width and height of the plot. The default plot is
+                 600 pixels wide and 600 pixels high.
+---------------- ----------------------------------------------------------------
+``layout``       The layout to be used. It can be an instance of :class:`Layout`,
+                 a list of tuples containing X-Y coordinates, or the name of a
+                 layout algorithm. The default is ``auto``, which selects a
+                 layout algorithm automatically based on the size and
+                 connectedness of the graph.
+---------------- ----------------------------------------------------------------
+``margin``       The top, right, bottom and left margins of the plot in pixels.
+                 This argument must be a list or tuple and its elements will be
+                 re-used if you specify a list or tuple with less than four
+                 elements.
+================ ================================================================
 
 Specifying colors in plots
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -866,11 +995,8 @@ appropriate path to the downloaded file):
 
 >>> karate = Graph.Read_Pajek("karate.net")
 >>> summary(karate)
-34 vertices, 78 edges, undirected
-Number of components: 1
-Diameter: 5
-Density: 0.1390
-Average path length: 2.4100
+IGRAPH UNW- 34 78 -- Zachary's karate club network
++ attr: Author (g), Citation (g), name (g), Faction (v), id (v), name (v), weight (e)
 
 If you want to convert the very same graph into GraphML, you can do it with the
 GraphML writer method from the table above:

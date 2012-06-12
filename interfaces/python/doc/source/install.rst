@@ -38,8 +38,8 @@ Installation from a binary package
 There is a Windows installer for |igraph|'s Python interface on the
 `Python Package Index <http://pypi.python.org/pypi/python-igraph>`_.
 Download the one that is suitable for your Python version (currently
-there are binary packages for Python 2.4 and Python 2.5, though it
-might change in the future). To test the installed package, launch
+there are binary packages for Python 2.6, Python 2.7 and Python 3.2,
+though it might change in the future). To test the installed package, launch
 your favourite Python IDE and type the following:
 
   >>> import igraph.test
@@ -62,7 +62,7 @@ its Python bindings is as follows:
 1. Get the latest PyCairo for Windows installer from
    http://ftp.gnome.org/pub/gnome/binaries/win32/pycairo/1.8. Make sure you
    grab the one that matches your Python version. At the time of writing,
-   the above folder contained installers for Python 2.6 only. You may
+   the above folder contained installers for Python 2.6 and 2.7 only. You may
    also try and go one level up, then down then 1.4 subfolder -- these are
    older versions, but they work with Python 2.5 and Python 2.6 as well.
 
@@ -111,8 +111,8 @@ Having done that, you can launch Python again and check if it worked:
 
 There is a Mac OS X installer for |igraph|'s Python interface on the
 `Python Package Index <http://pypi.python.org/pypi/python-igraph>`_
-which works for Intel-based Macs running OS X Leopard. The default
-Python version in Leopard is Python 2.5, so the package is compiled
+which works for Intel-based Macs running OS X Lion. The default
+Python version in Leopard is Python 2.7, so the package is compiled
 for this specific version. PowerPC users should compile the package
 themselves (see `Compiling igraph from source`_). To test the
 installed package, launch your favourite Python IDE or the default
