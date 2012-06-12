@@ -29,7 +29,7 @@ topological.sort(graph, mode=c("out", "all", "in"))
 }
 %\references{
 %}
-\author{Tamas Nepusz \email{ntamas@rmki.kfki.hu} and Gabor Csardi
+\author{Tamas Nepusz \email{ntamas@gmail.com} and Gabor Csardi
   \email{csardi.gabor@gmail.com} for the R interface} 
 %\seealso{}
 \examples{

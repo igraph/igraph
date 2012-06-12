@@ -53,7 +53,7 @@ label.propagation.community (graph, weights = NULL,
   76, 036106. (2007)
 }
 \author{
-  Tamas Nepusz \email{ntamas@rmki.kfki.hu} for the C implementation,
+  Tamas Nepusz \email{ntamas@gmail.com} for the C implementation,
   Gabor Csardi \email{csardi.gabor@gmail.com} for this manual page.
 }
 \seealso{

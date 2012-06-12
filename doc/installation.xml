@@ -8,13 +8,12 @@
 <title>Installation</title>
 
 <para>
-First download the latest version of <command>igraph</command> from
-<ulink url="http://cneurocvs.rmki.kfki.hu/igraph"><command>igraph</command>
-homepage</ulink> or from 
+First download the latest version of the <command>igraph</command> C
+library from
 <ulink
-    url="http://sourceforge.net/project/showfiles.php?group_id=160289">SourceForge</ulink>, and uncompress it to a temporary directory:
+    url="https://sourceforge.net/projects/igraph/files/">SourceForge</ulink>,
+and uncompress it to a temporary directory:
 <programlisting>
-$ wget http://cneurocvs.rmki.kfki.hu/igraph/download/igraph-0.2.tar.gz
 $ tar xzf igraph-0.2.tar.gz 
 $ cd igraph-0.2
 </programlisting>

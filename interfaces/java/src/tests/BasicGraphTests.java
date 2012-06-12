@@ -1,7 +1,7 @@
 /* 
    IGraph library Java interface.
-   Copyright (C) 2007  Tamas Nepusz <ntamas@rmki.kfki.hu>
-   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   Copyright (C) 2006-2012  Tamas Nepusz <ntamas@gmail.com>
+   Pázmány Péter sétány 1/a, 1117 Budapest, Hungary
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

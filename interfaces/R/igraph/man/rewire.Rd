@@ -21,7 +21,7 @@ distribution.
 }
 \value{A new graph object.}
 % \references{}
-\author{Tamas Nepusz \email{ntamas@rmki.kfki.hu} and
+\author{Tamas Nepusz \email{ntamas@gmail.com} and
   Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{degree.sequence.game}}}
 \examples{

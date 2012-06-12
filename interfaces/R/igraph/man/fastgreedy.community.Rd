@@ -42,7 +42,7 @@ fastgreedy.community(graph, merges=TRUE, modularity=TRUE,
   A Clauset, MEJ Newman, C Moore: Finding community structure in very
   large networks, http://www.arxiv.org/abs/cond-mat/0408187
 }
-\author{Tamas Nepusz \email{ntamas@rmki.kfki.hu} and Gabor Csardi
+\author{Tamas Nepusz \email{ntamas@gmail.com} and Gabor Csardi
   \email{csardi.gabor@gmail.com} for the R interface.
 }
 \seealso{

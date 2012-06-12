@@ -95,7 +95,7 @@ page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000,
   Web Search Engine. Proceedings of the 7th World-Wide Web Conference,
   Brisbane, Australia, April 1998.  
 }
-\author{Tamas Nepusz \email{ntamas@rmki.kfki.hu} and
+\author{Tamas Nepusz \email{ntamas@gmail.com} and
   Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{Other centrality scores: \code{\link{closeness}},
   \code{\link{betweenness}}, \code{\link{degree}}}
