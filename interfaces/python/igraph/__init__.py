@@ -3,13 +3,14 @@
 """
 IGraph library.
 
-@undocumented: igraph.formula, igraph.test
+@undocumented: deprecated, _graphmethod, _add_proxy_methods, _layout_method_wrapper,
+               _3d_version_for
 """
 
 from __future__ import with_statement
 
-__license__ = """
-Copyright (C) 2006-2012  Tamas Nepusz <ntamas@gmail.com>
+__license__ = u"""
+Copyright (C) 2006-2012  Tamás Nepusz <ntamas@gmail.com>
 Pázmány Péter sétány 1/a, 1117 Budapest, Hungary
 
 This program is free software; you can redistribute it and/or modify
@@ -76,6 +77,51 @@ class Graph(GraphBase):
     accepts three dictionaries corresponding to the graph, vertex and edge
     attributes while the constructor of L{GraphBase} does not. This extension
     was needed to make L{Graph} serializable through the C{pickle} module.
+    L{Graph} also overrides some functions from L{GraphBase} to provide a
+    more convenient interface; e.g., layout functions return a L{Layout}
+    instance from L{Graph} instead of a list of coordinate pairs.
+
+    Graphs can also be indexed by strings or pairs of vertex indices or vertex
+    names.  When a graph is indexed by a string, the operation translates to
+    the retrieval, creation, modification or deletion of a graph attribute:
+
+      >>> g = Graph.Full(3)
+      >>> g["name"] = "Triangle graph"
+      >>> g["name"]
+      'Triangle graph'
+      >>> del g["name"]
+
+    When a graph is indexed by a pair of vertex indices or names, the graph
+    itself is treated as an adjacency matrix and the corresponding cell of
+    the matrix is returned:
+
+      >>> g = Graph.Full(3)
+      >>> g.vs["name"] = ["A", "B", C"]
+      >>> g[1, 2]
+      1
+      >>> g["A", "B"]
+      1
+      >>> g["A", "B"] = 0
+      >>> g.ecount()
+      2
+    
+    Assigning values different from zero or one to the adjacency matrix will
+    be translated to one, unless the graph is weighted, in which case the
+    numbers will be treated as weights:
+
+      >>> g.is_weighted()
+      False
+      >>> g["A", "B"] = 2
+      >>> g["A", "B"]
+      1
+      >>> g.es["weight"] = 1.0
+      >>> g.is_weighted()
+      True
+      >>> g["A", "B"] = 2
+      >>> g["A", "B"]
+      2.0
+      >>> g.es["weight"]
+      [1.0, 1.0, 2]
     """
 
     # Some useful aliases

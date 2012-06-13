@@ -77,7 +77,7 @@
  	 HTML bundle</a> 
     </li>
     <li class="download-info">
-       <a href="doc/igraph-docs.info"
+       <a href="doc/igraph.info"
           onClick="javascript:urchinTracker ('/docs/info'); "> 
  	 GNU info document</a>
     </li>
@@ -92,17 +92,6 @@
     onClick="javascript:urchinTracker ('/launchpad'); ">
   Launchpad</a>.</div>
   </div>
-</li>
-
-<li class="download download-doc">
-  <span class="name">Network analysis with igraph</span>
-  <span class="comment">&mdash; tutorial, under development!</span>
-  <ul class="download-links">
-    <li class="download-external">
-      <a href="/igraphbook">Browse online</a>
-    </li>
-  </ul>
-  
 </li>
 
 <li class="download download-wiki">

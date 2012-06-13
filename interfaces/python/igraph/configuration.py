@@ -8,8 +8,8 @@ This module provides the framework for altering and querying igraph parameters
 as well as saving them to and retrieving them from disk.
 """
 
-__license__ = """
-Copyright (C) 2006-2012  Tamas Nepusz <ntamas@gmail.com>
+__license__ = """\
+Copyright (C) 2006-2012  Tamás Nepusz <ntamas@gmail.com>
 Pázmány Péter sétány 1/a, 1117 Budapest, Hungary
 
 This program is free software; you can redistribute it and/or modify
@@ -58,8 +58,8 @@ def get_platform_image_viewer():
 class Configuration(object):
     """Class representing igraph configuration details.
     
-    General things
-    ==============
+    General ideas
+    =============
 
     The configuration of igraph is stored in the form of name-value pairs.
     This object provides an interface to the configuration data using the
@@ -151,6 +151,8 @@ class Configuration(object):
 
         - B{nexus.url}: the root URL of the Nexus repository. Default:
           C{http://nexus.igraph.org}.
+
+    @undocumented: _item_to_section_key, _types, _sections, _definitions, _instance
     """
 
     # pylint: disable-msg=R0903

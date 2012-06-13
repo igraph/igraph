@@ -10,13 +10,16 @@ resolver class that determines the appropriate shape drawer class
 given the short name.
 
 Classes that are derived from L{ShapeDrawer} in this module are
-automatically registered by L{ShapeDrawerDirectory}.
+automatically registered by L{ShapeDrawerDirectory}. If you
+implement a custom shape drawer, you must register it in
+L{ShapeDrawerDirectory} manually if you wish to refer to it by a
+name in the C{shape} attribute of vertices.
 """
 
 __all__ = ["ShapeDrawerDirectory"]
 
-__license__ = """
-Copyright (C) 2006-2012  Tamas Nepusz <ntamas@gmail.com>
+__license__ = u"""\
+Copyright (C) 2006-2012  Tamás Nepusz <ntamas@gmail.com>
 Pázmány Péter sétány 1/a, 1117 Budapest, Hungary
 
 This program is free software; you can redistribute it and/or modify

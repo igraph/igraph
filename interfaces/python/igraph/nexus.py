@@ -3,7 +3,13 @@
 """Interface to the Nexus online graph repository.
 
 The classes in this file facilitate access to the Nexus online graph
-repository at U{http://nexus.igraph.org}."""
+repository at U{http://nexus.igraph.org}.
+
+The main entry point of this package is the C{Nexus} variable, which is
+an instance of L{NexusConnection}. Use L{NexusConnection.get} to get a particular
+network from Nexus, L{NexusConnection.list} to list networks having a given set of
+tags, L{NexusConnection.search} to search in the dataset descriptions, or
+L{NexusConnection.info} to show the info sheet of a dataset."""
 
 from cStringIO import StringIO
 from gzip import GzipFile
@@ -20,10 +26,10 @@ from igraph.utils import multidict
 import re
 import urllib2
 
-__all__ = ["Nexus"]
+__all__ = ["Nexus", "NexusConnection"]
 
-__license__ = """
-Copyright (C) 2006-2012  Tamas Nepusz <ntamas@gmail.com>
+__license__ = u"""\
+Copyright (C) 2006-2012  Tamás Nepusz <ntamas@gmail.com>
 Pázmány Péter sétány 1/a, 1117 Budapest, Hungary
 
 This program is free software; you can redistribute it and/or modify
@@ -43,7 +49,27 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 """
 
 class NexusConnection(object):
-    """Connection to a remote Nexus server."""
+    """Connection to a remote Nexus server.
+
+    In most cases, you will not have to instantiate this object, just use
+    the global L{Nexus} variable which is an instance of L{NexusConnection}
+    and connects to the Nexus repository at U{http://nexus.igraph.org}.
+
+    Example:
+
+      >>> print Nexus.info("karate")
+      Nexus dataset 'karate' (#1)
+      vertices/edges: 34/78
+      name: Zachary's karate club
+      tags: social network; undirected; weighted
+      [...]
+      >>> karate = Nexus.get("karate")
+      >>> summary(karate)
+      IGRAPH UNW- 34 78 -- Zachary's karate club network
+      + attr: Author (g), Citation (g), name (g), Faction (v), id (v), name (v), weight (e)
+
+    @undocumented: _get_response, _parse_dataset_id, _parse_text_response,
+      _ensure_uncompressed"""
 
     def __init__(self, nexus_url=None):
         """Constructs a connection to a remote Nexus server.
@@ -269,7 +295,9 @@ class NexusConnection(object):
 
 
 class NexusDatasetInfo(object):
-    """Information about a dataset in the Nexus repository."""
+    """Information about a dataset in the Nexus repository.
+    
+    @undocumented: _update_from_multidict, vertices_edges"""
 
     def __init__(self, id=None, sid=None, name=None, networks=None,
             vertices=None, edges=None, tags=None, attributes=None, rest=None):

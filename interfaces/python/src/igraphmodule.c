@@ -449,11 +449,11 @@ static PyMethodDef igraphmodule_methods[] =
 {
   {"community_to_membership", (PyCFunction)igraphmodule_community_to_membership,
     METH_VARARGS | METH_KEYWORDS,
-    "community_to_membership(merges, nodes, steps, return_csize=False)\n\n"
+    "community_to_membership(merges, nodes, steps, return_csize=False)\n\n@undocumented"
   },
   {"_compare_communities", (PyCFunction)igraphmodule_compare_communities,
     METH_VARARGS | METH_KEYWORDS,
-    "_compare_communities(comm1, comm2, method=\"vi\")\n\n"
+    "_compare_communities(comm1, comm2, method=\"vi\")\n\n@undocumented"
   },
   {"convex_hull", (PyCFunction)igraphmodule_convex_hull,
     METH_VARARGS | METH_KEYWORDS,
@@ -502,7 +502,7 @@ static PyMethodDef igraphmodule_methods[] =
   },
   {"_split_join_distance", (PyCFunction)igraphmodule_split_join_distance,
     METH_VARARGS | METH_KEYWORDS,
-    "_split_join_distance(comm1, comm2)\n\n"
+    "_split_join_distance(comm1, comm2)\n\n@undocumented"
   },
   {NULL, NULL, 0, NULL}
 };
