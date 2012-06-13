@@ -29,7 +29,7 @@ igraph supports the <a href="http://nexus.igraph.org">Nexus network
     repository</a> from R and from Python. Nexus is an online database
 of network data sets. You can search Nexus and download network from
 it directly from R and Python. See the <a href="doc-0.6/R/nexus.html">R
-    manual</a> or the <a href="TODO">Python manual</a> for details.
+    manual</a> or the <a href="doc-0.6/python/igraph.nexus.NexusConnection-class.html">Python documentation</a> for details.
 </p>
 
 <h3><img src="images/icon_r.png" />Numbering from 1 in R</h3>
@@ -52,6 +52,15 @@ igraph</a> package for current and future work.
 from zero, as these languages traditionally use zero-based indexing.)
 </p>
 
+<h3><img src="images/icon_python.png" />Support for Python 3.x</h3>
+
+<p class="news">
+The Python interface of igraph now supports Python 3. The current release was
+tested with Python 3.2 on Windows, Linux and Mac OS X. Please report any bugs
+you encounter when using igraph in Python 3.x through the
+<a href="bugs.html">usual channels</a>.
+</p>
+
 <h3><img src="images/icon_c.png"/>
   <img src="images/icon_r.png"/>
   <img src="images/icon_python.png"/>Community detection improvements</h3>
@@ -62,13 +71,13 @@ al. was added. See
 the <a href="doc-0.6/html/ch22s06.html#igraph_community_multilevel">C
     Reference manual</a>, the 
 <a href="doc-0.6/R/multilevel.community.html">R documentation</a>, or
-the <a href="TODO">Python manual</a>.
+the <a href="doc-0.6/python/igraph.Graph-class.html#community_multilevel">Python documentation</a>.
 </p>
 
 <p class="news">
 Hierarchical random graphs and community finding, based on the code
 from Aaron Clauset. In <a href="doc-0.6/html/igraph-HRG.html">C</a>,
-<a href="doc-0.6/R/hrg.html">R</a> and <a href="TODO">Python</a>.
+and <a href="doc-0.6/R/hrg.html">R</a>.
 </p>
 
 <p class="news">
@@ -76,24 +85,32 @@ We support now the InfoMAP community finding method, thanks to
 Emmanuel Navarro for the code. In
 <a href="doc-0.6/html/ch22s08.html#igraph_community_infomap">C</a>,
 <a href="doc-0.6/R/infomap.html">R</a> and
-<a href="TODO">Python</a>.
+<a href="doc-0.6/python/igraph.Graph-class.html#community_infomap">Python</a>.
+</p>
+
+<p class="news">
+The edge betweenness community detection method of Newman and Girvan now also
+works on weighted graphs. See
+the <a href="doc-0.6/html/ch22s06.html#igraph_community_edge_betweenness">C
+    Reference manual</a>, the 
+<a href="doc-0.6/R/edge.betweenness.community.html">R documentation</a>, or
+the <a href="doc-0.6/python/igraph.Graph-class.html#community_edge_betweenness">Python documentation</a>.
 </p>
 
 <p class="news">
 We have added some functions to compare various community structures.
-In
-<a href="doc-0.6/html/ch22s01.html#igraph_compare_communities">C</a>, 
-<a href="doc-0.6/R/compare.communities.html">R</a> and
-<a href="TODO">Python</a>.
+See the <a href="doc-0.6/html/">C
+    Reference manual</a>, the 
+<a href="doc-0.6/R/.html">R documentation</a>, or
+the <a href="doc-0.6/python/igraph.clustering-module.html#compare_communities">Python documentation</a>.
 </p>
 
 <p class="news">
 Igraph now implements the Spectral Coarse Graining method, by David
 Morton, our implementation is based on his code. See the 
 <a href="doc-0.6/html/igraph-SCG.html">C
-    Reference manual</a>, the 
-<a href="doc-0.6/R/scg.html">R documentation</a>, or
-the <a href="TODO">Python manual</a>.
+    Reference manual</a> or the 
+<a href="doc-0.6/R/scg.html">R documentation</a>.
 </p>
 
 <p class="news">
@@ -102,7 +119,7 @@ C. They are much faster now, and they have a nicer API, too. See
 the <a href="doc-0.6/html/ch20s06.html#igraph_cohesive_blocks">C
     Reference manual</a>, the 
 <a href="doc-0.6/R/cohesive.blocks.html">R documentation</a>, or
-the <a href="TODO">Python manual</a>.
+the <a href="doc-0.6/python/igraph.Graph-class.html#cohesive_blocks">Python documentation</a>.
 </p>
 
 <p class="news">
@@ -120,9 +137,8 @@ operations for these objects, see the
 Centralization scores for degree, closeness, betweenness and 
 eigenvector centrality. See
 the <a href="doc-0.6/html/ch13s07.html">C
-    Reference manual</a>, the 
-<a href="doc-0.6/R/centralization.html">R documentation</a>, or
-the <a href="TODO">Python manual</a>.
+    Reference manual</a> or the 
+<a href="doc-0.6/R/centralization.html">R documentation</a>.
 </p>
 
 <p class="news">
@@ -130,7 +146,7 @@ Personalized PageRank scores. See
 the <a href="doc-0.6/html/ch13s05.html#igraph_personalized_pagerank">C
     Reference manual</a>, the 
 <a href="doc-0.6/R/page.rank.html">R documentation</a>, or
-the <a href="TODO">Python manual</a>.
+the <a href="doc-0.6/python/igraph.GraphBase-class.html#personalized_pagerank">Python documentation</a>.
 </p>
 
 <p class="news">
@@ -139,7 +155,7 @@ calculations all support edge weights now. See
 the <a href="doc-0.6/html/ch13s05.html">C
     Reference manual</a>, the 
 <a href="doc-0.6/R/00Index.html">R documentation</a>, or
-the <a href="TODO">Python manual</a>.
+the <a href="doc-0.6/python/igraph.Graph-class.html">Python documentation</a>.
 </p>
 
 <h3><img src="images/icon_c.png"/>
@@ -147,12 +163,26 @@ the <a href="TODO">Python manual</a>.
   <img src="images/icon_python.png"/>Sugiyama layout</h3>
 
 <p class="news">
-Igraph now implements the Sugiyama layout algorith for layered
+Igraph now implements the Sugiyama layout algorithm for layered
 directed acyclic graphs. See
 the <a href="doc-0.6/html/ch18s01.html#igraph_layout_sugiyama">C
     Reference manual</a>, the 
 <a href="doc-0.6/R/layout.sugiyama.html">R documentation</a>, or
-the <a href="TODO">Python manual</a>.
+the <a href="doc-0.6/python/igraph.Graph-class.html#layout_sugiyama">Python documentation</a>.
+</p>
+
+<h3><img src="images/icon_c.png"/>
+  <img src="images/icon_r.png"/>
+  <img src="images/icon_python.png"/>Maximum matchings in bipartite graphs</h3>
+
+<p class="news">
+Igraph now implements the push-relabel algorithm and the Kuhn-Munkres algorithm
+(also known as the Hungarian method) to find maximum matchings in unweighted and
+weighted bipartite graphs. See
+the <a href="TODO">
+    Reference manual</a>, the 
+<a href="TODO">R documentation</a>, or
+the <a href="doc-0.6/python/igraph.Graph-class.html#bipartite_matching">Python documentation</a>.
 </p>
 
 <h3><img src="images/icon_r.png" />Hiding the graph structure by
@@ -174,13 +204,55 @@ See more in the <a href="doc-0.6/R/print.graph.html">R
     documentation</a>.
 </p>
 
-<h3><img src="images/icon_r.png" />Easier manipulation of graphs</h3>
+<h3><img src="images/icon_python.png" />Named graph vertices</h3>
+
+<p class="news">
+The Python interface now treats the '<code>name</code>' attributes in a special way.
+The values of the attribute are indexed in the background, allowing the retrieval of
+a vertex with a given name in amortized constant time. Furthermore, most of the
+graph query methods accept vertex names as well as vertex indices.
+See the <a href="doc-0.6/python/igraph.VertexSeq-class.html#find">Python documentation</a>
+for more information.
+</p>
+
+<h3><img src="images/icon_python.png" />Pretty-printed graph summaries</h3>
+
+<p class="news">
+The same graph summary format used by R is now also adopted by Python.
+Printing a graph with the <code>print</code> statement now prints the
+summary and the edge list in a concise format:
+<pre>
+	>>> print karate
+	IGRAPH UNW- 34 78 -- Zachary's karate club network
+	+ attr: Author (g), Citation (g), name (g), Faction (v), id (v), name(v),
+	  weight (e)
+	+ edges (vertex names):
+	    Mr Hi -- Actor 2, Actor 3, Actor 4, Actor 5, ...
+	  Actor 2 -- Mr Hi, Actor 3, Actor 4, ...
+	...
+</pre>
+
+<p class="news"> Printing a graph with the <code>summary()</code> function (in
+the igraph namespace) prints the short summary only, without the edge list:</p>
+<pre>
+    >>> summary(karate)
+	IGRAPH UNW- 34 78 -- Zachary's karate club network
+	+ attr: Author (g), Citation (g), name (g), Faction (v), id (v), name(v),
+	  weight (e)
+</pre>
+
+<p class="news">Printing a graph with <code>summary(graph, full=True)</code> prints
+the summary, the edge list, the vertex and the edge attributes as well.</p>
+
+<h3><img src="images/icon_r.png" /><img src="images/icon_python.png" />Easier manipulation of graphs</h3>
 
 <p class="news">
 In R, there are now new and easier ways to add new vertices/edges to a
 graph, or remove existing ones. See the details in the 
-<a href="doc-0.6/R/graph.structure.html">R documentation</a>.
-</p>
+<a href="doc-0.6/R/graph.structure.html">R documentation</a>. In Python,
+you can treat the graph as a virtual adjacency matrix. See the details in
+the <a href="doc-0.6/python/igraph.Graph-class.html">Python
+	documentation</a>.</p>
 
 <h3><img src="images/icon_r.png" />The '<code>igraphdata</code>' package</h3>
 
@@ -190,15 +262,32 @@ The new R package
 igraphdata</a> contains some example graph data sets.
 </p>
 
-<h3><img src="images/icon_r.png"/>Mark groups of vertices in R plots</h3>
+<h3><img src="images/icon_r.png"/><img src="images/icon_python.png"/>Mark groups of vertices in R and Python plots</h3>
 
 <p class="news">
-In R you can mark vertex groups on graph plots, using shaded
+In R and Python, you can mark vertex groups on graph plots, using shaded
 areas. Communities and cohesive blocks are plotted using technique by
 default. See the '<code>mark.groups</code>' argument of
 the <a href="doc-0.6/R/plot.graph.html">'<code>plot.igraph()</code>'</a>
-function. 
+function in R and the '<code>mark_groups</code>' argument of the
+<a href="doc-0.6/python/igraph.Graph-class.html#__plot__"><code>Graph.__plot__</code></a>
+function in Python.
 </p>
+
+<h3><img src="images/icon_python.png"/>Refactored graph drawers in the Python interface</h3>
+
+<p class="news">
+Graphs in the Python interface are plotted by graph drawer classes now instead
+of a monolithic plotting function. This allows one to replace the
+<a href="doc-0.6/python/igraph.drawing.graph.DefaultGraphDrawer-class.html">default
+	graph drawer</a> with custom graph drawers; for instance, a drawer that
+sends an igraph graph to an
+<a href="doc-0.6/python/igraph.drawing.graph.UbiGraphDrawer-class.html">UbiGraph display</a>
+or to
+<a href="doc-0.6/python/igraph.drawing.graph.CytoscapeGraphDrawer-class.html">Cytoscape</a>.
+The default graph drawer also allows the partial customization of the plot with
+pluggable <a href="doc-0.6/python/igraph.drawing.shapes-module.html">vertex shapes</a>
+and <a href="doc-0.6/python/igraph.drawing.edge-module.html">edge drawers</a>.</p>
 
 <h3><img src="images/icon_r.png"/>igraph demos in the R package</h3>
 
@@ -222,10 +311,11 @@ the demos, type this at your R prompt:
   Better handling of attributes in R and Python</h3>
 
 <p class="news">
-In R, many igraph functions keep the vertex, edge and graph attributes
+In R and Python, many igraph functions keep the vertex, edge and graph attributes
 now, when one manipulates the graph. The attributes can also be
 combined using a flexible API. See
 the <a href="doc-0.6/R/attribute.combination.html">R manual</a> and the 
-<a href="doc-0.6/Python/TODO">Python manual</a> for more.
+'<code>combine_edges</code>' and '<code>combine_attrs</code>' arguments
+of many graph methods in the <a href="doc-0.6/python/igraph.Graph-class.html">Python documentation</a> for more.
 </p>
 

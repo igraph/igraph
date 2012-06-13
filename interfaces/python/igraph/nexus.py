@@ -50,7 +50,24 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 
 class NexusConnection(object):
     """Connection to a remote Nexus server.
-    
+
+    In most cases, you will not have to instantiate this object, just use
+    the global L{Nexus} variable which is an instance of L{NexusConnection}
+    and connects to the Nexus repository at U{http://nexus.igraph.org}.
+
+    Example:
+
+      >>> print Nexus.info("karate")
+      Nexus dataset 'karate' (#1)
+      vertices/edges: 34/78
+      name: Zachary's karate club
+      tags: social network; undirected; weighted
+      [...]
+      >>> karate = Nexus.get("karate")
+      >>> summary(karate)
+      IGRAPH UNW- 34 78 -- Zachary's karate club network
+      + attr: Author (g), Citation (g), name (g), Faction (v), id (v), name (v), weight (e)
+
     @undocumented: _get_response, _parse_dataset_id, _parse_text_response,
       _ensure_uncompressed"""
 
