@@ -109,7 +109,14 @@ more.
 
 <a name="dev"></a><h3>Obtaining the development version</h3>
 
-<p>You can get the latest development version of igraph (including the
-C core and the wrappers for R and Python)
+<p>You can download nightly builds from the development version of igraph 
+from the 
+<a href="https://code.google.com/p/igraph/downloads/list"> google
+  code website</a>. You can find the C library, R source  
+packages and Python source packages here.
+</p>
+
+<p>Alternatively you can get the (absolute latest) development version
+  of igraph (including the C core and the wrappers for R and Python)
   from <a href="https://launchpad.net/igraph">Launchpad</a>.
 </p>

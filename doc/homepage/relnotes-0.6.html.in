@@ -188,7 +188,7 @@ the <a href="doc-0.6/python/igraph.Graph-class.html#layout_sugiyama">Python docu
 Igraph now implements the push-relabel algorithm and the Kuhn-Munkres algorithm
 (also known as the Hungarian method) to find maximum matchings in unweighted and
 weighted bipartite graphs. See
-the <a href="doc-0.6/html/ch13s18.html">
+the <a href="doc-0.6/html/ch13s18.html">C
     Reference manual</a>, the 
 <a href="doc-0.6/R/matching.html">R documentation</a>, or
 the <a href="doc-0.6/python/igraph.Graph-class.html#maximum_bipartite_matching">Python documentation</a>.
