@@ -10,6 +10,17 @@ if test x$NJOB = x; then
     NJOB=$NCPU
 fi
 
+# GCC Version to use goes here.
+GCC_VERSION="4.2"
+GCC_VERSION_PATCHLEVEL="4.2.1"
+
+# Whether to build PPC binaries as well
+BUILD_PPC=0
+
+# Mac OS X SDK versions for 32-bit and 64-bit builds go here
+SDK_VERSION_32="10.6"
+SDK_VERSION_64="10.6"
+
 # Generic configure flags you always want go here.
 CONFIG_GENERIC="--disable-gmp"
 
@@ -20,80 +31,80 @@ CFLAGS="-O3"
 CONFIG_PPC="--build=`uname -p`-apple-darwin --host=powerpc-apple-darwin"
 
 # PowerPC 32-bit compiler flags
-CC_PPC="gcc-4.0 -arch ppc"
-CXX_PPC="g++-4.0 -arch ppc"
+CC_PPC="gcc-${GCC_VERSION} -arch ppc"
+CXX_PPC="g++-${GCC_VERSION} -arch ppc"
 CFLAGS_PPC="-mmacosx-version-min=10.4"
 CPPFLAGS_PPC="-DMAC_OS_X_VERSION_MIN_REQUIRED=1040 \
--F/Developer/SDKs/MacOSX10.4u.sdk/System/Library/Frameworks \
--I/Developer/SDKs/MacOSX10.4u.sdk/usr/lib/gcc/powerpc-apple-darwin10/4.0.1/include \
--isystem /Developer/SDKs/MacOSX10.4u.sdk/usr/include"
+-F/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/System/Library/Frameworks \
+-I/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/usr/lib/gcc/powerpc-apple-darwin10/${GCC_VERSION_PATCHLEVEL}/include \
+-isystem /Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/usr/include"
 
 # PowerPC 32-bit linker flags
 LFLAGS_PPC="-arch ppc -Wl,-headerpad_max_install_names -mmacosx-version-min=10.4 \
--F/Developer/SDKs/MacOSX10.4u.sdk/System/Library/Frameworks \
--L/Developer/SDKs/MacOSX10.4u.sdk/usr/lib/gcc/powerpc-apple-darwin10/4.0.1 \
--Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk"
+-F/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/System/Library/Frameworks \
+-L/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/usr/lib/gcc/powerpc-apple-darwin10/${GCC_VERSION_PATCHLEVEL} \
+-Wl,-syslibroot,/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk"
 
-# PowerPC 64-bit configure flags (10.5 runtime compatibility)
+# PowerPC 64-bit configure flags (${SDK_VERSION_64} runtime compatibility)
 CONFIG_PPC64="--build=`uname -p`-apple-darwin --host=powerpc-apple-darwin"
 
 # PowerPC 64-bit compiler flags
-CC_PPC64="gcc-4.0 -arch ppc64"
-CXX_PPC64="g++-4.0 -arch ppc64"
-CFLAGS_PPC64="-mmacosx-version-min=10.5"
+CC_PPC64="gcc-${GCC_VERSION} -arch ppc64"
+CXX_PPC64="g++-${GCC_VERSION} -arch ppc64"
+CFLAGS_PPC64="-mmacosx-version-min=${SDK_VERSION_64}"
 CPPFLAGS_PPC64="-DMAC_OS_X_VERSION_MIN_REQUIRED=1050 \
--F/Developer/SDKs/MacOSX10.5.sdk/System/Library/Frameworks \
--I/Developer/SDKs/MacOSX10.5.sdk/usr/lib/gcc/powerpc-apple-darwin10/4.0.1/include \
--isystem /Developer/SDKs/MacOSX10.5.sdk/usr/include"
+-F/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/System/Library/Frameworks \
+-I/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/lib/gcc/powerpc-apple-darwin10/${GCC_VERSION_PATCHLEVEL}/include \
+-isystem /Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/include"
 
 # PowerPC 64-bit linker flags
-LFLAGS_PPC64="-arch ppc64 -Wl,-headerpad_max_install_names -mmacosx-version-min=10.5 \
--F/Developer/SDKs/MacOSX10.5.sdk/System/Library/Frameworks \
--L/Developer/SDKs/MacOSX10.5.sdk/usr/lib/gcc/powerpc-apple-darwin10/4.0.1/ppc64 \
--Wl,-syslibroot,/Developer/SDKs/MacOSX10.5.sdk"
+LFLAGS_PPC64="-arch ppc64 -Wl,-headerpad_max_install_names -mmacosx-version-min=${SDK_VERSION_64} \
+-F/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/System/Library/Frameworks \
+-L/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/lib/gcc/powerpc-apple-darwin10/${GCC_VERSION_PATCHLEVEL}/ppc64 \
+-Wl,-syslibroot,/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk"
 
-# Intel 32-bit configure flags (10.5 runtime compatibility)
+# Intel 32-bit configure flags (${SDK_VERSION_64} runtime compatibility)
 CONFIG_X86="--build=`uname -p`-apple-darwin --host=i386-apple-darwin"
 
 # They changed this to "darwin10" in Xcode 3.2 (Snow Leopard).
-GCCUSRPATH_X86="/Developer/SDKs/MacOSX10.5.sdk/usr/lib/gcc/i686-apple-darwin10/4.0.1"
+GCCUSRPATH_X86="/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/lib/gcc/i686-apple-darwin10/${GCC_VERSION_PATCHLEVEL}"
 if [ ! -d "$GCCUSRPATH_X86" ]; then
     echo "Couldn't find any GCC usr path for x86"
     exit 1
 fi
 
 # Intel 32-bit compiler flags
-CC_X86="gcc-4.0 -arch i386"
-CXX_X86="g++-4.0 -arch i386"
+CC_X86="gcc-${GCC_VERSION} -arch i386"
+CXX_X86="g++-${GCC_VERSION} -arch i386"
 CFLAGS_X86="-mmacosx-version-min=10.4"
 CPPFLAGS_X86="-DMAC_OS_X_VERSION_MIN_REQUIRED=1040 \
--F/Developer/SDKs/MacOSX10.4u.sdk/System/Library/Frameworks \
+-F/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/System/Library/Frameworks \
 -I$GCCUSRPATH_X86/include \
--isystem /Developer/SDKs/MacOSX10.4u.sdk/usr/include"
+-isystem /Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/usr/include"
 
 # Intel 32-bit linker flags
 LFLAGS_X86="-arch i386 -Wl,-headerpad_max_install_names -mmacosx-version-min=10.4 \
--F/Developer/SDKs/MacOSX10.4u.sdk/System/Library/Frameworks \
+-F/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/System/Library/Frameworks \
 -L$GCCUSRPATH_X86 \
--Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk"
+-Wl,-syslibroot,/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk"
 
-# Intel 64-bit configure flags (10.5 runtime compatibility)
+# Intel 64-bit configure flags (${SDK_VERSION_64} runtime compatibility)
 CONFIG_X64="--build=`uname -p`-apple-darwin --host=i386-apple-darwin"
 
 # Intel 64-bit compiler flags
-CC_X64="gcc-4.0 -arch x86_64"
-CXX_X64="g++-4.0 -arch x86_64"
-CFLAGS_X64="-mmacosx-version-min=10.5"
+CC_X64="gcc-${GCC_VERSION} -arch x86_64"
+CXX_X64="g++-${GCC_VERSION} -arch x86_64"
+CFLAGS_X64="-mmacosx-version-min=${SDK_VERSION_64}"
 CPPFLAGS_X64="-DMAC_OS_X_VERSION_MIN_REQUIRED=1050 \
--F/Developer/SDKs/MacOSX10.5.sdk/System/Library/Frameworks \
--I/Developer/SDKs/MacOSX10.5.sdk/usr/lib/gcc/i686-apple-darwin10/4.0.1/include \
--isystem /Developer/SDKs/MacOSX10.5.sdk/usr/include"
+-F/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/System/Library/Frameworks \
+-I/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/lib/gcc/i686-apple-darwin10/${GCC_VERSION_PATCHLEVEL}/include \
+-isystem /Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/include"
 
 # Intel 64-bit linker flags
-LFLAGS_X64="-arch x86_64 -Wl,-headerpad_max_install_names -mmacosx-version-min=10.5 \
--F/Developer/SDKs/MacOSX10.5.sdk/System/Library/Frameworks \
--L/Developer/SDKs/MacOSX10.5.sdk/usr/lib/gcc/i686-apple-darwin10/4.0.1/x86_64 \
--Wl,-syslibroot,/Developer/SDKs/MacOSX10.5.sdk"
+LFLAGS_X64="-arch x86_64 -Wl,-headerpad_max_install_names -mmacosx-version-min=${SDK_VERSION_64} \
+-F/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/System/Library/Frameworks \
+-L/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/lib/gcc/i686-apple-darwin10/${GCC_VERSION_PATCHLEVEL}/x86_64 \
+-Wl,-syslibroot,/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk"
 
 #
 # Find the configure script
@@ -116,19 +127,23 @@ else
 fi
 case $phase in
     all)
-        configure_ppc="yes"
-        configure_ppc64="yes"
-        configure_x86="yes"
-        configure_x64="yes"
-        make_ppc="yes"
-        make_ppc64="yes"
+		if [ $BUILD_PPC = 1 ]; then
+			configure_ppc="yes"
+			configure_ppc64="yes"
+			make_ppc="yes"
+			make_ppc64="yes"
+		fi
+		configure_x86="yes"
+		configure_x64="yes"
         make_x86="yes"
         make_x64="yes"
         merge="yes"
         ;;
     configure)
-        configure_ppc="yes"
-        configure_ppc64="yes"
+		if [ $BUILD_PPC = 1 ]; then
+			configure_ppc="yes"
+			configure_ppc64="yes"
+		fi
         configure_x86="yes"
         configure_x64="yes"
         ;;
@@ -145,8 +160,10 @@ case $phase in
         configure_x64="yes"
         ;;
     make)
-        make_ppc="yes"
-        make_ppc64="yes"
+		if [ $BUILD_PPC = 1 ]; then
+			make_ppc="yes"
+			make_ppc64="yes"
+		fi
         make_x86="yes"
         make_x64="yes"
         merge="yes"
