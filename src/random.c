@@ -932,7 +932,7 @@ static double rint (double x)
 #endif
 
 #ifndef HAVE_RINTF
-static float rintf (float x)
+float rintf (float x)
 {
    return ( (x<(float)0.) ? -(float)floor(-x+.5) : (float)floor(x+.5) );
 }
