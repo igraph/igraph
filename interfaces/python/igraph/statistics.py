@@ -4,7 +4,7 @@
 Statistics related stuff in igraph
 """
 
-__license__ = """
+__license__ = u"""\
 Copyright (C) 2006-2012  Tamas Nepusz <ntamas@gmail.com>
 Pázmány Péter sétány 1/a, 1117 Budapest, Hungary
 

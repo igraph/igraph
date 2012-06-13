@@ -12,8 +12,8 @@ import tempfile
 __all__ = ["dbl_epsilon", "multidict", "named_temporary_file", "rescale", \
         "safemin", "safemax"]
 __docformat__ = "restructuredtext en"
-__license__ = """
-Copyright (C) 2006-2012  Tamas Nepusz <ntamas@gmail.com>
+__license__ = u"""\
+Copyright (C) 2006-2012  Tamás Nepusz <ntamas@gmail.com>
 Pázmány Péter sétány 1/a, 1117 Budapest, Hungary
 
 This program is free software; you can redistribute it and/or modify
@@ -321,7 +321,7 @@ class multidict(MutableMapping):
             self.add(key, value)
 
 def safemax(iterable, default=0):
-    """Safer variant of C{max()} that returns a default value if the iterable
+    """Safer variant of ``max()`` that returns a default value if the iterable
     is empty.
     
     Example:
@@ -342,7 +342,7 @@ def safemax(iterable, default=0):
         return max(chain([first], it))
 
 def safemin(iterable, default=0):
-    """Safer variant of C{min()} that returns a default value if the iterable
+    """Safer variant of ``min()`` that returns a default value if the iterable
     is empty.
     
     Example:
@@ -368,4 +368,5 @@ def dbl_epsilon():
     while 1.0 + epsilon / 2.0 != 1.0:
         epsilon /= 2
     return epsilon
+
 dbl_epsilon = dbl_epsilon()

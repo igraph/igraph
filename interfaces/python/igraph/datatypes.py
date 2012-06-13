@@ -4,8 +4,8 @@
 
 from itertools import islice
 
-__license__ = """
-Copyright (C) 2006-2012  Tamas Nepusz <ntamas@gmail.com>
+__license__ = """\
+Copyright (C) 2006-2012  Tamás Nepusz <ntamas@gmail.com>
 Pázmány Péter sétány 1/a, 1117 Budapest, Hungary
 
 This program is free software; you can redistribute it and/or modify
@@ -545,6 +545,8 @@ class DyadCensus(tuple):
       (179, 1609, 3162) [179, 1609, 3162]
       >>> print sorted(dc.as_dict().items())   #doctest:+ELLIPSIS
       [('asymmetric', ...), ('mutual', ...), ('null', ...)]
+
+    @undocumented: _remap
     """
     _remap = {"mutual": 0, "mut": 0, "sym": 0, "symm": 0,
         "asy": 1, "asym": 1, "asymm": 1, "asymmetric": 1, "null": 2}

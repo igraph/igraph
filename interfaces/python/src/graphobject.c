@@ -14539,6 +14539,9 @@ PyTypeObject igraphmodule_GraphType = {
   Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_GC,  /* tp_flags */
   "Low-level representation of a graph.\n\n"
   "Don't use it directly, use L{igraph.Graph} instead.\n\n"
+  "@undocumented: _Bipartite, _Full_Bipartite, _GRG, _Incidence, _is_matching,\n"
+  "  _is_maximal_matching, _layout_sugiyama, _maximum_bipartite_matching,\n"
+  "  _spanning_tree\n"
   "@deffield ref: Reference",  /* tp_doc */
   (traverseproc) igraphmodule_Graph_traverse, /* tp_traverse */
   (inquiry) igraphmodule_Graph_clear, /* tp_clear */

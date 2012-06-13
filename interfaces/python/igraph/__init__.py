@@ -3,13 +3,14 @@
 """
 IGraph library.
 
-@undocumented: igraph.formula, igraph.test
+@undocumented: deprecated, _graphmethod, _add_proxy_methods, _layout_method_wrapper,
+               _3d_version_for
 """
 
 from __future__ import with_statement
 
-__license__ = """
-Copyright (C) 2006-2012  Tamas Nepusz <ntamas@gmail.com>
+__license__ = u"""
+Copyright (C) 2006-2012  Tamás Nepusz <ntamas@gmail.com>
 Pázmány Péter sétány 1/a, 1117 Budapest, Hungary
 
 This program is free software; you can redistribute it and/or modify

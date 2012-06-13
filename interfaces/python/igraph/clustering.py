@@ -1,9 +1,11 @@
 # vim:ts=4:sw=4:sts=4:et
 # -*- coding: utf-8 -*-
-"""Objects related to graph clustering"""
+"""Classes related to graph clustering.
 
-__license__ = """
-Copyright (C) 2006-2012  Tamas Nepusz <ntamas@gmail.com>
+@undocumented: _handle_mark_groups_arg_for_clustering, _prepare_community_comparison"""
+
+__license__ = u"""
+Copyright (C) 2006-2012  Tamás Nepusz <ntamas@gmail.com>
 Pázmány Péter sétány 1/a, 1117 Budapest, Hungary
 
 This program is free software; you can redistribute it and/or modify
@@ -75,6 +77,7 @@ class Clustering(object):
       >>> print cluster_list
       [[0, 1, 2, 3], [4, 5, 6], [7, 8, 9, 10]]
 
+    @undocumented: _formatted_cluster_iterator
     """
 
     def __init__(self, membership, params = None):
@@ -221,6 +224,8 @@ class VertexClustering(Clustering):
     @note: since this class is linked to a L{Graph}, destroying the graph by the
       C{del} operator does not free the memory occupied by the graph if there
       exists a L{VertexClustering} that references the L{Graph}.
+
+    @undocumented: _formatted_cluster_iterator
     """
 
     # Allow None to be passed to __plot__ as the "palette" keyword argument
@@ -531,6 +536,8 @@ class Dendrogram(object):
       3 -+   |
          |   |
       4 -+---+---
+
+    @undocumented: _item_box_size, _plot_item, _traverse_inorder
     """
 
     def __init__(self, merges):
@@ -1059,6 +1066,8 @@ class Cover(object):
       >>> cover = Cover(clustering)
       >>> list(clustering) == list(cover)
       True
+
+    @undocumented: _formatted_cluster_iterator
     """
 
     def __init__(self, clusters, n=0):
@@ -1186,6 +1195,8 @@ class VertexCover(Cover):
     @note: since this class is linked to a L{Graph}, destroying the graph by the
       C{del} operator does not free the memory occupied by the graph if there
       exists a L{VertexCover} that references the L{Graph}.
+
+    @undocumented: _formatted_cluster_iterator
     """
 
     def __init__(self, graph, clusters = None):
@@ -1207,8 +1218,7 @@ class VertexCover(Cover):
 
     def crossing(self):
         """Returns a boolean vector where element M{i} is C{True} iff edge
-        M{i} lies between clusters (i.e. there is no cluster where the two
-        endpoints appear together), C{False} otherwise."""
+        M{i} lies between clusters, C{False} otherwise."""
         membership = [frozenset(cluster) for cluster in self.membership]
         return [membership[v1].isdisjoint(membership[v2]) \
                 for v1, v2 in self.graph.get_edgelist()]

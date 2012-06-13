@@ -9,6 +9,7 @@ SCRIPTS_FOLDER=`dirname $0`
 cd ${SCRIPTS_FOLDER}/..
 ROOT_FOLDER=`pwd`
 DOC_API_FOLDER=${ROOT_FOLDER}/doc/api
+CONFIG=${ROOT_FOLDER}/scripts/epydoc.cfg
 
 cd ${ROOT_FOLDER}
 mkdir -p ${DOC_API_FOLDER}/pdf
@@ -20,9 +21,6 @@ if [ $? -gt 0 ]; then
   echo "Epydoc not installed, exiting..."
   exit 1
 fi
-
-PACKAGES="igraph igraph.statistics igraph.app igraph.app.shell"
-EXCLUDE="igraph.test igraph.vendor.texttable"
 
 PWD=`pwd`
 
@@ -39,27 +37,14 @@ echo "Removing existing documentation..."
 rm -rf html
 
 echo "Generating HTML documentation..."
-${EPYDOC} --html -o ${DOC_API_FOLDER}/html -v \
-          --name="IGraph library" \
-	      --url="http://igraph.sourceforge.net" \
-	      --no-private \
-	      --exclude=igraph.test \
-	      --exclude=igraph.vendor \
-	      $PACKAGES
+${EPYDOC} --html -v -o ${DOC_API_FOLDER}/html --config ${CONFIG}
 
 PDF=0
 which latex >/dev/null && PDF=1
 
 if [ $PDF -eq 1 ]; then
   echo "Generating PDF documentation..."
-  ${EPYDOC} --pdf -o ${DOC_API_FOLDER}/pdf -v \
-	  --name="IGraph library" \
-	  --url="http://igraph.sourceforge.net" \
-	  --inheritance=listed \
-	  --no-private \
-	  --exclude=igraph.test \
-	  --exclude=igraph.vendor \
-	  $PACKAGES
+${EPYDOC} --pdf -v -o ${DOC_API_FOLDER}/html --config ${CONFIG}
 fi
 
 if [ $SYNC -eq 1 ]; then
