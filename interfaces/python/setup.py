@@ -73,7 +73,7 @@ if exit_code>0:
     print("variables in setup.py or include_dirs and library_dirs in ")
     print("setup.cfg to point to the correct directories and libraries")
     print("where the C core of igraph is installed")
-    print()
+    print("")
     
 include_dirs.extend(detect_igraph_include_dirs())
 library_dirs.extend(detect_igraph_library_dirs())

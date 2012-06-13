@@ -44,7 +44,7 @@ which latex >/dev/null && PDF=1
 
 if [ $PDF -eq 1 ]; then
   echo "Generating PDF documentation..."
-${EPYDOC} --pdf -v -o ${DOC_API_FOLDER}/html --config ${CONFIG}
+${EPYDOC} --pdf -v -o ${DOC_API_FOLDER}/pdf --config ${CONFIG}
 fi
 
 if [ $SYNC -eq 1 ]; then
