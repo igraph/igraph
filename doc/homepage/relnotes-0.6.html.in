@@ -66,6 +66,15 @@ you encounter when using igraph in Python 3.x through the
   <img src="images/icon_python.png"/>Community detection improvements</h3>
 
 <p class="news">
+Community structure detection via exact modularity optimization. As
+modularity optimization in an NP-complete problem, this works only for
+small graphs. 
+<a href="doc-0.6/html/ch22s01.html#igraph_community_optimal_modularity">C manual</a>, 
+<a href="doc-0.6/R/optimal.community.html">R manual</a>,
+<a href="doc-0.6/python/igraph.Graph-class.html#community_optimal_modularity">Python manual</a>.
+</p>
+
+<p class="news">
 The multi-level modularity optimization algorithm by Blondel et
 al. was added. See
 the <a href="doc-0.6/html/ch22s06.html#igraph_community_multilevel">C
@@ -91,17 +100,17 @@ Emmanuel Navarro for the code. In
 <p class="news">
 The edge betweenness community detection method of Newman and Girvan now also
 works on weighted graphs. See
-the <a href="doc-0.6/html/ch22s06.html#igraph_community_edge_betweenness">C
+the <a href="doc-0.6/html/ch22s05.html">C
     Reference manual</a>, the 
-<a href="doc-0.6/R/edge.betweenness.community.html">R documentation</a>, or
+<a href="doc-0.6/R/community.edge.betweenness.html">R documentation</a>, or
 the <a href="doc-0.6/python/igraph.Graph-class.html#community_edge_betweenness">Python documentation</a>.
 </p>
 
 <p class="news">
 We have added some functions to compare various community structures.
-See the <a href="doc-0.6/html/">C
+See the <a href="doc-0.6/html/ch22s01.html#igraph_compare_communities">C
     Reference manual</a>, the 
-<a href="doc-0.6/R/.html">R documentation</a>, or
+<a href="doc-0.6/R/compare.communities.html">R documentation</a>, or
 the <a href="doc-0.6/python/igraph.clustering-module.html#compare_communities">Python documentation</a>.
 </p>
 
@@ -179,10 +188,10 @@ the <a href="doc-0.6/python/igraph.Graph-class.html#layout_sugiyama">Python docu
 Igraph now implements the push-relabel algorithm and the Kuhn-Munkres algorithm
 (also known as the Hungarian method) to find maximum matchings in unweighted and
 weighted bipartite graphs. See
-the <a href="TODO">
+the <a href="doc-0.6/html/ch13s18.html">
     Reference manual</a>, the 
-<a href="TODO">R documentation</a>, or
-the <a href="doc-0.6/python/igraph.Graph-class.html#bipartite_matching">Python documentation</a>.
+<a href="doc-0.6/R/matching.html">R documentation</a>, or
+the <a href="doc-0.6/python/igraph.Graph-class.html#maximum_bipartite_matching">Python documentation</a>.
 </p>
 
 <h3><img src="images/icon_r.png" />Hiding the graph structure by
