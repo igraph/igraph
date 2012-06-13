@@ -30,14 +30,42 @@
 \details{
   \code{summary.igraph} prints the number of vertices, edges and whether the
   graph is directed.
+
   \code{str.igraph} prints the same information, and also lists
   the edges, and optionally graph, vertex and/or edge attributes.
+
   \code{print.igraph} behaves either as \code{summary.igraph} or
   \code{str.igraph} depending on the \code{full} argument. See also the
   \sQuote{print.full} igraph option and \code{\link{getIgraphOpt}}.
+
+  The graph summary printed by \code{summary.igraph} (and
+  \code{print.igraph} and \code{str.igraph}) consists one or more
+  lines. The first line contains the basic properties of the graph, and
+  the rest contains its attributes. Here is an example, a small star
+  graph with weighed directed edges and named vertices: \preformatted{    IGRAPH DNW- 10 9 -- In-star
+    + attr: name (g/c), mode (g/c), center (g/n), name (v/c),
+      weight (e/n) }
+  The first line always starts with \code{IGRAPH}, showing you that the
+  object is an igraph graph. Then a four letter long code string is
+  printed. The first letter distinguishes between directed
+  (\sQuote{\code{D}}) and undirected (\sQuote{\code{U}}) graphs. The
+  second letter is \sQuote{\code{N}} for named graphs, i.e. graphs with
+  the \code{name} vertex attribute set. The third letter is
+  \sQuote{\code{W}} for weighted graphs, i.e. graphs with the
+  \code{weight} edge attribute set. The fourth letter is
+  \sQuote{\code{B}} for bipartite graphs, i.e. for graphs with the
+  \code{type} vertex attribute set.
+
+  Then, after two dashes, the name of the graph is printed, if it has
+  one, i.e. if the \code{name} graph attribute is set.
+
+  From the second line, the attributes of the graph are listed,
+  separated by a comma. After the attribute names, the kind of the
+  attribute -- graph, vertex or edge -- is denoted, and the type of the
+  attribute as well, character, numeric, or other (\sQuote{\code{x}}).  
   
-  As of igraph 0.4 \code{print.igraph} uses the \code{max.print} option,
-  see \code{\link[base]{options}} for details.
+  As of igraph 0.4 \code{str.igraph} (and \code{print.igraph}) uses the
+  \code{max.print} option, see \code{\link[base]{options}} for details.
 }
 \value{All these functions return the graph invisibly.}
 % \references{}

@@ -11,6 +11,40 @@
   with millions of vertices and edges, 3) allowing rapid prototyping via
   high level languages like R.
 }
+\section{Igraph graphs}{
+  Igraph graphs have a class \sQuote{\code{igraph}}. They are printed to
+  the screen in a special format, here is an example, a ring graph
+  created using \code{\link{graph.ring}}: \preformatted{    IGRAPH U--- 10 10 -- Ring graph
+    + attr: name (g/c), mutual (g/x), circular (g/x)  }
+  The \sQuote{\code{IGRAPH}} denotes that this is an igraph graph. Then
+  come four bits that denote the kind of the graph: the first is
+  \sQuote{\code{U}} for undirected and \sQuote{\code{D}} for directed
+  graphs. The second is \sQuote{\code{N}} for named graph (i.e. if the
+  graph has the \sQuote{\code{name}} vertex attribute set). The third is
+  \sQuote{\code{W}} for weighted graphs (i.e. if the
+  \sQuote{\code{weight}} edge attribute is set). The fourth is
+  \sQuote{\code{B}} for bipartite graphs (i.e. if the
+  \sQuote{\code{type}} vertex attribute is set).
+
+  Then comes two numbers, the number of vertices and the number of edges
+  in the graph, and after a double dash, the name of the graph (the
+  \sQuote{\code{name}} graph attribute) is printed if present. The
+  second line is optional and it contains all the attributes of the
+  graph. This graph has a \sQuote{\code{name}} graph attribute, of type
+  character, and two other graph attributes called
+  \sQuote{\code{mutual}} and \sQuote{\code{circular}}, of a complex
+  type. A complex type is simply anything that is not numeric or
+  character. See the documentation of \code{\link{print.igraph}} for
+  details.
+
+  If you want to see the edges of the graph as well, then use the
+  \code{\link{str.igraph}} function, it is of course enough to type
+  \code{str} instead of \code{str.igraph}: \preformatted{    > str(g)
+    IGRAPH U--- 10 10 -- Ring graph
+    + attr: name (g/c), mutual (g/x), circular (g/x)
+    + edges:
+     [1] 1-- 2 2-- 3 3-- 4 4-- 5 5-- 6 6-- 7 7-- 8 8-- 9 9--10 1--10 }
+}
 \section{Creating graphs}{
   There are many functions in igraph for creating graphs, both
   deterministic and stochastic; stochastic graph constructors are called
