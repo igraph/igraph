@@ -135,7 +135,8 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
  *     result might small.
  * \param parupdate A logical constant, whether to update all spins in
  *     parallel. The default for this argument was \c FALSE (ie. 0) in
- *     the original code.
+ *     the original code. It is not implemented in the \c
+ *     IGRAPH_SPINCOMM_INP_NEG implementation.
  * \param starttemp Real number, the temperature at the start. The
  *     value of this argument was 1.0 in the original code.
  * \param stoptemp Real number, the algorithm stops at this
@@ -545,6 +546,11 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
   igraph_real_t d_p;
 
   /* Check arguments */
+
+  if (parupdate) {
+    IGRAPH_ERROR("Parallel spin update not implemented with "
+		 "negative gamma", IGRAPH_UNIMPLEMENTED);
+  }
 
   if (spins < 2 || spins > 500) {
     IGRAPH_ERROR("Invalid number of spins", IGRAPH_EINVAL);
