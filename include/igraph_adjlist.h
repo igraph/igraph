@@ -58,7 +58,8 @@ void igraph_adjlist_sort(igraph_adjlist_t *al);
 int igraph_adjlist_simplify(igraph_adjlist_t *al);
 int igraph_adjlist_remove_duplicate(const igraph_t *graph, 
 				    igraph_adjlist_t *al);
-int igraph_adjlist_print(const igraph_adjlist_t *al, FILE *outfile);
+int igraph_adjlist_print(const igraph_adjlist_t *al);
+int igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile);
 /* igraph_vector_t *igraph_adjlist_get(const igraph_adjlist_t *al,  */
 /* 			       igraph_integer_t no); */
 /**
@@ -91,7 +92,8 @@ int igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n);
 void igraph_inclist_destroy(igraph_inclist_t *il);
 int igraph_inclist_remove_duplicate(const igraph_t *graph,
 					igraph_inclist_t *il);
-int igraph_inclist_print(const igraph_inclist_t *il, FILE *outfile);
+int igraph_inclist_print(const igraph_inclist_t *il);
+int igraph_inclist_fprint(const igraph_inclist_t *il, FILE *outfile);
 
 /**
  * \define igraph_inclist_get
