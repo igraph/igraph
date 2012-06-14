@@ -118,6 +118,8 @@ AC_ARG_ENABLE(graphml,
               [graphml_support=$enableval], [graphml_support=yes])
 
 HAVE_LIBXML=0
+XML2_LIBS=
+XML2_CFLAGS=
 if test $graphml_support = yes; then
   AC_PATH_PROG([XML2CONFIG], [xml2-config], [none])
   if test "$XML2CONFIG" = "none"; then
@@ -139,17 +141,21 @@ if test $graphml_support = yes; then
       AC_DEFINE([HAVE_LIBXML], [1], [Define to 1 if you have the libxml2 libraries installed])
 	  CFLAGS="${OLDCFLAGS} ${XML2_CFLAGS}"
       CPPFLAGS="${OLDCFLAGS} ${XML2_CFLAGS}"
-      AC_SUBST(XML2_LIBS)
-      AC_SUBST(XML2_CFLAGS)
     ], [
       graphml_support=no
       CFLAGS=${OLDCFLAGS}
 	  CPPFLAGS=${OLDCPPFLAGS}
+	  XML2_LIBS=
+	  XML2_CFLAGS=
     ])
   ], [
     graphml_support=no
+    XML2_LIBS=
+    XML2_CFLAGS=
   ])
 fi
+AC_SUBST(XML2_LIBS)
+AC_SUBST(XML2_CFLAGS)
 
 AC_LANG_PUSH([C++])
 gmp_support=no
