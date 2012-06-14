@@ -154,13 +154,125 @@ Others
 New in the Python interface
 ===========================
 
-TODO
+General updates
+---------------
+- Python 3.x is now supported by the Python interface.
+- Graphs can now be treated as adjacency matrices by indexing the
+  graph object using a pair of vertex ids or vertex names.
+- Methods accepting a vertex id or a list of vertex ids should now
+  also accept vertex names instead. Names should be given in the
+  'name' vertex attribute.
+- Igraph now supports loading graphs from the Nexus online data
+  repository, see Nexus.get(), Nexus.info(), Nexus.list() and 
+  Nexus.search().
 
-=====================================
-Major changes in the Python interface
-=====================================
+Community detection
+-------------------
+- The multi-level modularity optimization community structure detection 
+  algorithm by Blondel et al. was added, see Graph.community_multilevel().
+- Distance between two community structures: compare_communities().
+- Community structure via exact modularity optimization,
+  Graph.community_optimal_modularity().
+- Added the InfoMAP community finding method, thanks to Emmanuel
+  Navarro for the code. See Graph.community_infomap().
+- Edge betweenness community detection now supports weighted graphs;
+  see Graph.community_edge_betweenness().
 
-TODO
+Shortest paths
+--------------
+- Eccentricity (Graph.eccentricity()), and radius (Graph.radius())
+  calculations.
+- Shortest path calculations with Graph.get_shortest_paths() can now 
+  return the vertex or edge ids along the shortest paths.
+- Graph.get_all_shortest_paths() now supports edge weights.
+- Neighborhood of a vertex can now be retrieved with Graph.neighborhood()
+
+Centrality
+----------
+- Personalized Page-Rank scores, see Graph.pagerank().
+- Authority (Graph.authority_score()) and hub (Graph.hub_score()) scores support 
+  edge weights now.
+- Support edge weights in betweenness and closeness calculations.
+- Eigenvector centrality calculation, Graph.evcent() now works for 
+  directed graphs.
+- Betweenness calculation can now use arbitrarily large integers,
+  this is required for some lattice-like graphs to avoid overflow.
+
+Input/output and file formats
+-----------------------------
+- Support the DL file format in Graph.read(). See 
+  http://www.analytictech.com/networks/dataentry.htm.
+- Support writing the LEDA file format in Graph.write().
+
+Plotting and layouts
+--------------------
+- Star layout: Graph.layout_star().
+- Layout based on multidimensional scaling, Graph.layout_mds()
+- Grid layouts: Graph.layout_grid(), Graph.layout_grid_3d()
+- Sugiyama layout algorithm for layered directed acyclic graphs:
+  Graph.layout_sugiyama().
+- It is possible to mark vertex groups on plots using the 'mark_groups'
+  keyword argument of 'Graph.__plot__()'. Communities and cohesive blocks are
+  plotted using this by default. Note that the same keyword argument is
+  also accepted by 'plot()' of course.
+- Redesigned graph plotting framework: graph drawers are now derived
+  from AbstractGraphDrawer. The framework allows the implementation of
+  custom graph drawers such as UbiGraphDrawer or CytoscapeDrawer.
+  Edges are drawn by edge drawer classes (derived from AbstractEdgeDrawer),
+  custom vertex shapes are now possible by ShapeDrawers.
+- Multiple edges are now drawn curved to make them visible. See
+  the 'autocurve' and 'edge_curved' keyword arguments of
+  'Graph.__plot__()'. Note that these are also accepted by 'plot()' of
+  course.
+- Better label placement algorithm supports multi-line labels and the
+  specification of the distance and angle of the label relative to the
+  center of the node.
+- Added rescale() function to rescale a list of numeric values to a
+  different range, suitable for plotting.
+
+Graph generators
+----------------
+- New graph generators: Graph.Static_Fitness(), Graph.Static_Power_Law().
+- Graph.Barabasi() was rewritten and it supports three algorithms now,
+  the default algorithm does not generate multiple or loop edges.
+  The graph generation process can now start from a supplied graph.
+- The Watts-Strogatz graph generator, Graph.Watts_Strogatz() can 
+  now create graphs without loop edges.
+
+Others
+------
+- Vertex and edge attributes are handled much better now. They 
+  are kept whenever possible, and can be combined via the
+  'combine_edges' and 'combine_attrs' keyword arguments of
+  Graph.simplify(), Graph.contract_vertices() and Graph.to_undirected().
+- Graphs are now printed in a more concise and informative way.
+  'print()' prints a short information header and the edge list,
+  while 'summary()' prints the heder only. 'summary()' also
+  understands keyword arguments that control which parts of the
+  output should be added; see the GraphSummary class.
+- Motif search can now call a callback function for every motif found,
+  see Graph.motifs_randesu()
+- Transitivity calculations now support weights,
+  see Graph.transitivity_local_undirected()
+- Added cohesive block calculation, see Graph.cohesive_blocks()
+- Added feedback arc sets, see Graph.feedback_arc_set()
+- It is now possible to ask for the Jaccard or Dice similarities of
+  pairs of vertices only, see Graph.similarity_jaccard_pairs()
+  and similar functions.
+- Support vertex and edge coloring in the VF2 (sub)graph isomorphism 
+  functions (Graph.isomorphic_vf2(), Graph.count_isomorphisms.vf2(), 
+  Graph.get_isomorphisms_vf2(), Graph.subisomorphic_vf2(), 
+  Graph.count_subisomorphisms_vf2(), Graph.get_subisomorphisms_vf2()).
+- Assortativity coefficient, Graph.assortativity(),
+  Graph.assortativity_nominal() and Graph.assortativity_degree().
+- Function to calculate a non-induced subraph: Graph.subgraph_edges().
+- Graph.has_multiple() to decide whether a graph has multiple edges.
+- Added a function to calculate a diversity score for the vertices,
+  Graph.diversity().
+- Graph Laplacian calculation (graph.laplacian()) supports edge 
+  weights now.
+- Graph.bipartite_projection() calculates multiplicity of edges.
+- Vertex contraction, Graph.contract_vertices().
 
 ==================
 New in the C layer
