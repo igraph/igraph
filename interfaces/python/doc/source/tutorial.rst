@@ -960,6 +960,8 @@ Adjacency matrix ``adjacency`` :meth:`Graph.Read_Adjacency` :meth:`Graph.write_a
 ---------------- ------------- ---------------------------- -----------------------------
 DIMACS           ``dimacs``    :meth:`Graph.Read_DIMACS`    :meth:`Graph.write_dimacs`
 ---------------- ------------- ---------------------------- -----------------------------
+DL               ``dl``        :meth:`Graph.Read_DL`        not supported yet
+---------------- ------------- ---------------------------- -----------------------------
 Edge list        ``edgelist``, :meth:`Graph.Read_Edgelist`  :meth:`Graph.write_edgelist`
                  ``edges``,
                  ``edge``
@@ -972,6 +974,8 @@ GML              ``gml``       :meth:`Graph.Read_GML`       :meth:`Graph.write_g
 GraphML          ``graphml``   :meth:`Graph.Read_GraphML`   :meth:`Graph.write_graphml`
 ---------------- ------------- ---------------------------- -----------------------------
 Gzipped GraphML  ``graphmlz``  :meth:`Graph.Read_GraphMLz`  :meth:`Graph.write_graphmlz`
+---------------- ------------- ---------------------------- -----------------------------
+LEDA             ``leda``      not supported yet            :meth:`Graph.write_leda`
 ---------------- ------------- ---------------------------- -----------------------------
 Labeled edgelist ``ncol``      :meth:`Graph.Read_Ncol`      :meth:`Graph.write_ncol`
 (a.k.a. `NCOL`_)

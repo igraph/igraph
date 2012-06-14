@@ -10856,7 +10856,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"is_directed", (PyCFunction) igraphmodule_Graph_is_directed,
    METH_NOARGS,
    "is_directed()\n\n"
-   "Checks whether the graph is directed."
+   "Checks whether the graph is directed.\n"
    "@return: C{True} if it is directed, C{False} otherwise.\n"
    "@rtype: boolean"},
 
@@ -11617,7 +11617,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@newfield ref: Reference\n"
    "@ref: Newman MEJ: Mixing patterns in networks, Phys Rev E 67:026126, 2003.\n"
    "@ref: Newman MEJ: Assortative mixing in networks, Phys Rev Lett 89:208701,\n"
-   "  2002."
+   "  2002.\n"
    "@see: L{assortativity_degree()} when the types are the vertex degrees\n"
   },
 
@@ -12052,13 +12052,16 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"get_all_shortest_paths",
    (PyCFunction) igraphmodule_Graph_get_all_shortest_paths,
    METH_VARARGS | METH_KEYWORDS,
-   "get_all_shortest_paths(v, to=None, mode=OUT)\n\n"
+   "get_all_shortest_paths(v, to=None, weights=None, mode=OUT)\n\n"
    "Calculates all of the shortest paths from/to a given node in a graph.\n\n"
    "@param v: the source/destination for the calculated paths\n"
    "@param to: a vertex selector describing the destination/source for\n"
    "  the calculated paths. This can be a single vertex ID, a list of\n"
    "  vertex IDs, a single vertex name, a list of vertex names or a\n"
    "  L{VertexSeq} object. C{None} means all the vertices.\n"
+   "@param weights: edge weights in a list or the name of an edge attribute\n"
+   "  holding edge weights. If C{None}, all edges are assumed to have\n"
+   "  equal weight.\n"
    "@param mode: the directionality of the paths. L{IN} means to calculate\n"
    "  incoming paths, L{OUT} means to calculate outgoing paths,\n"
    "  L{ALL} means to calculate both ones.\n"
@@ -12323,7 +12326,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  edge directions, C{IN} considers paths that follow the opposite\n"
    "  edge directions, C{ALL} ignores edge directions. The argument is\n"
    "  ignored for undirected graphs.\n"
-   "@return: the radius"
+   "@return: the radius\n"
    "@see: L{Graph.eccentricity()}"
   },
 
