@@ -480,7 +480,8 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
   if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m<0) {
     IGRAPH_ERROR("Invalid out degree", IGRAPH_EINVAL);
   }
-  if (outseq && igraph_vector_min(outseq) < 0) {
+  if (outseq && igraph_vector_size(outseq) != 0 && 
+      igraph_vector_min(outseq) < 0) {
     IGRAPH_ERROR("Negative out degree in sequence", IGRAPH_EINVAL);
   }
   if (A <= 0) {
