@@ -63,10 +63,6 @@ int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
   long int i,j,k;
   long int bagsize, start_nodes, start_edges, new_edges, no_of_edges;
   
-  if (outseq && igraph_vector_size(outseq)==0) {
-    outseq=0;
-  }
-
   start_nodes= start_from ? igraph_vcount(start_from) : 1;
   start_edges= start_from ? igraph_ecount(start_from) : 0;
   if (outseq) { 
@@ -170,10 +166,6 @@ int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
   igraph_vector_t degree;
   long int start_nodes, start_edges, new_edges, no_of_edges;
 
-  if (outseq && igraph_vector_size(outseq)==0) {
-    outseq=0;
-  }
-
   start_nodes= start_from ? igraph_vcount(start_from) : 1;
   start_edges= start_from ? igraph_ecount(start_from) : 0;
   if (outseq) { 
@@ -275,10 +267,6 @@ int igraph_i_barabasi_game_psumtree(igraph_t *graph,
   long int edgeptr=0;
   igraph_vector_t degree;
   long int start_nodes, start_edges, new_edges, no_of_edges;
-
-  if (outseq && igraph_vector_size(outseq) == 0) {
-    outseq=0;
-  }
 
   start_nodes= start_from ? igraph_vcount(start_from) : 1;
   start_edges= start_from ? igraph_ecount(start_from) : 0;
@@ -457,7 +445,13 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
 
   long int start_nodes= start_from ? igraph_vcount(start_from) : 0;
   long int newn= start_from ? n-start_nodes : n;
-  
+
+  if (outseq) {
+    if (igraph_vector_size(outseq) == 0) {
+      outseq = 0;
+    }
+  }
+
   /* Check arguments */
 
   if (algo != IGRAPH_BARABASI_BAG && 
@@ -473,16 +467,18 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
   if (start_from && start_nodes==0) {
     IGRAPH_ERROR("Cannot start from an empty graph", IGRAPH_EINVAL);
   }
-  if (outseq != 0 && igraph_vector_size(outseq) != 0 && 
-      igraph_vector_size(outseq) != newn) {
-    IGRAPH_ERROR("Invalid out degree sequence length", IGRAPH_EINVAL);
+  if (outseq != 0) {
+      if (igraph_vector_size(outseq) != newn) {
+	IGRAPH_ERROR("Invalid out degree sequence length", IGRAPH_EINVAL);
+    }
   }
-  if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m<0) {
+  if (!outseq && m<0) {
     IGRAPH_ERROR("Invalid out degree", IGRAPH_EINVAL);
   }
-  if (outseq && igraph_vector_size(outseq) != 0 && 
-      igraph_vector_min(outseq) < 0) {
-    IGRAPH_ERROR("Negative out degree in sequence", IGRAPH_EINVAL);
+  if (outseq) { 
+    if (igraph_vector_min(outseq) < 0) {
+      IGRAPH_ERROR("Negative out degree in sequence", IGRAPH_EINVAL);
+    }
   }
   if (A <= 0) {
     IGRAPH_ERROR("Constant attractiveness (A) must be positive",
