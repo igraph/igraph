@@ -142,6 +142,7 @@ igraph_$(VERSION).tar.gz: $(RFILES) $(SRCFILES)
 	echo $(top_scrdir)
 	rm -f igraph/R/config.R
 	rm -f igraph/src/config.h
+	rm -rf igraph/a.out*
 	touch igraph/src/config.h
 	R CMD build igraph
 
