@@ -13,17 +13,17 @@
         please try this before downloading from here.</span><br/>
     </li>
     <li class="download-windows">
-       <a href="http://switch.dl.sourceforge.net/sourceforge/igraph/igraph_${VERSION}.zip"
+       <a href="http://sourceforge.net/projects/igraph/files/R%20Windows%20binary%20package/${VERSION}/igraph_${VERSION}-1.zip/download"
           onClick="javascript:urchinTracker ('/downloads/rwindowsbinary'); ">
           Windows binary</a> 
     </li>
     <li class="download-osx">
-       <a href="http://switch.dl.sourceforge.net/sourceforge/igraph/igraph_${VERSION}.tgz"
+       <a href="http://sourceforge.net/projects/igraph/files/R%20MacOSX%20binary%20package/${VERSION}/igraph_${VERSION}-1.tgz/download"
           onClick="javascript:urchinTracker ('/downloads/rosxbinary'); "> 
           Mac OSX universal binary</a>
     </li>
     <li class="download-source">
-       <a href="http://switch.dl.sourceforge.net/sourceforge/igraph/igraph_${VERSION}.tar.gz"
+       <a href="http://sourceforge.net/projects/igraph/files/R%20source%20package/${VERSION}/igraph_${VERSION}-1.tar.gz/download"
        onClick="javascript:urchinTracker ('/downloads/rsource'); "> 
         Source package (for Linux and similar)</a>
     </li>
@@ -73,8 +73,11 @@
   <ul class="download-links">
     <li class="download-source">
        <a onClick="javascript:urchinTracker ('/downloads/library'); " 
- 	 href="http://switch.dl.sourceforge.net/sourceforge/igraph/igraph-${VERSION}.tar.gz">Source code</a>
+ 	 href="http://sourceforge.net/projects/igraph/files/C%20library/${VERSION}/igraph-${VERSION}.tar.gz/download">Source code</a>
     </li>
+    <li class="download-source">
+      <a onClick="javascript:urchinTracker ('/downloads/msvc'); "
+	 href="http://sourceforge.net/projects/igraph/files/Visual%20studio/${VERSION}/igraph-${VERSION}-msvc.tar.gz/download">Source code for Microsoft Visual Studio</a>
   </ul>
 </li>
 
@@ -85,7 +88,7 @@
   <ul class="download-links">
     <li class="download-external">
        <a onClick="javascript:urchinTracker ('/downloads/sourceforge'); " 
- 	 href="https://sourceforge.net/project/showfiles.php?group_id=160289">Go to SourceForge</a>
+ 	 href="https://sourceforge.net/projects/igraph/files/">Go to SourceForge</a>
     </li>
   </ul>
 </li>
