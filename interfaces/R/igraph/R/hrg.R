@@ -111,7 +111,7 @@ as.igraph.igraphHRG <- function(x, ...) {
   res <- graph(edges)
   
   V(res)$name <- c(if (!is.null(x$names)) x$names else as.character(1:ovc),
-                   paste0("g", 1:ivc))
+                   paste(sep="", "g", 1:ivc))
   V(res)$prob <- c(rep(NA, ovc), x$prob)
   res$name <- "Fitted HRG"
   res
@@ -187,7 +187,7 @@ as.dendrogram.igraphHRG <- function(object, hang=0.01, ...) {
       attr(zk[[1]], "height") <- attr(zk[[2]], "height") <- h0
       attr(zk[[1]], "leaf") <- attr(zk[[2]], "leaf") <- TRUE
     } else if (any(neg)) {              # one leaf, one node
-      X <- paste0("g", -x)
+      X <- paste(sep="", "g", -x)
       isL <- x[1] >= 0
       zk <- if (isL) list(x[1]+1, z[[X[2]]]) else list(z[[X[1]]], x[2]+1)
       attr(zk, "members") <- attr(z[[X[1+isL]]], "members") + 1L
@@ -198,7 +198,7 @@ as.dendrogram.igraphHRG <- function(object, hang=0.01, ...) {
       attr(zk[[2 - isL]], "label") <- mynames[x[2 - isL]+1]
       attr(zk[[2 - isL]], "leaf") <- TRUE
     } else {                            #two nodes
-      X <- paste0("g", -x)
+      X <- paste(sep="", "g", -x)
       zk <- list(z[[X[1]]], z[[X[2]]])
       attr(zk, "members") <- attr(z[[X[1]]], "members") +
         attr(z[[X[2]]], "members")
@@ -207,7 +207,7 @@ as.dendrogram.igraphHRG <- function(object, hang=0.01, ...) {
                                attr(z[[X[2]]], "midpoint"))/2
     }
     attr(zk, "height") <- oHgt[k]
-    z[[k <- paste0("g", -merges[k,3])]] <- zk
+    z[[k <- paste(sep="", "g", -merges[k,3])]] <- zk
   }
   z <- z[[k]]
   class(z) <- "dendrogram"
