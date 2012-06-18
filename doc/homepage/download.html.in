@@ -36,22 +36,29 @@
   igraph as a Python extension module</span>
   <ul class="download-links">
     <li class="download-windows">
+       <a href="http://pypi.python.org/packages/3.2/p/python-igraph/python-igraph-${VERSION}.win32-py3.2.msi" 
+          onClick="javascript:urchinTracker ('/downloads/pywin27'); "> 
+          Windows installer for Python 3.2</a> 
+    </li>
+    <li class="download-windows">
        <a href="http://pypi.python.org/packages/2.7/p/python-igraph/python-igraph-${VERSION}.win32-py2.7.msi" 
           onClick="javascript:urchinTracker ('/downloads/pywin27'); "> 
           Windows installer for Python 2.7</a> 
+    </li>
+    <li class="download-windows">
        <a href="http://pypi.python.org/packages/2.6/p/python-igraph/python-igraph-${VERSION}.win32-py2.6.msi" 
           onClick="javascript:urchinTracker ('/downloads/pywin26'); "> 
           Windows installer for Python 2.6</a> 
     </li>
     <li class="download-osx">
-       <a href="http://pypi.python.org/packages/2.6/p/python-igraph/python_igraph-${VERSION}-py2.6-macosx10.6.dmg" 
-          onClick="javascript:urchinTracker ('/downloads/py26macosx106'); "> 
-          OS X Snow Leopard installer (Python 2.6)</a> 
+       <a href="http://pypi.python.org/packages/2.7/p/python-igraph/python_igraph-${VERSION}-py2.7-macosx10.7.dmg" 
+          onClick="javascript:urchinTracker ('/downloads/py27macosx107'); "> 
+          OS X Lion installer (Python 2.7)</a> 
     </li>
     <li class="download-osx">
-       <a href="http://pypi.python.org/packages/2.5/p/python-igraph/python_igraph-${VERSION}-py2.5-macosx10.6.dmg" 
-          onClick="javascript:urchinTracker ('/downloads/py25macosx106'); "> 
-          OS X Snow Leopard installer (Python 2.5)</a> 
+       <a href="http://pypi.python.org/packages/2.6/p/python-igraph/python_igraph-${VERSION}-py2.6-macosx10.7.dmg" 
+          onClick="javascript:urchinTracker ('/downloads/py26macosx107'); "> 
+          OS X Lion installer (Python 2.6)</a> 
     </li>
     <li class="download-source">
        <a href="http://pypi.python.org/packages/source/p/python-igraph/python-igraph-${VERSION}.tar.gz"
