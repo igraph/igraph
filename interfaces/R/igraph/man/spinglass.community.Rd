@@ -32,7 +32,8 @@ spinglass.community(graph, weights=NULL, vertex=NULL, spins=25,
   \item{parupdate}{Logical constant, whether to update the spins of the
     vertices in parallel (synchronously) or not. This argument is
     ignored if the second form of the function is used (ie. the
-    \sQuote{\code{vertex}} argument is present). }
+    \sQuote{\code{vertex}} argument is present). It is also not
+    implemented in the \dQuote{neg} implementation.}
   \item{start.temp}{Real constant, the start temperature.
     This argument is ignored if the second form of the
     function is used (ie. the \sQuote{\code{vertex}} argument is
