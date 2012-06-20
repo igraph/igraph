@@ -1,6 +1,6 @@
 Package: igraph
-Version: @VERSION@-1
-Date: Jun 11, 2012
+Version: @VERSION@-2
+Date: Jun 20, 2012
 Title:  Network analysis and visualization
 Author: Gabor Csardi <csardi.gabor@gmail.com>
 Maintainer: Gabor Csardi <csardi.gabor@gmail.com>
@@ -8,6 +8,7 @@ Description: Routines for simple graphs and network analysis. igraph can
   handle large graphs very well and provides functions for generating random
   and regular graphs, graph visualization, centrality indices and much more.
 Depends: stats
+Imports: Matrix
 Suggests: igraphdata, stats4, rgl, tcltk, graph, Matrix, ape
 License: GPL (>= 2)
 URL: http://igraph.sourceforge.net
