@@ -219,9 +219,10 @@ void igraph_i_fastgreedy_community_list_dump_heap(
   for (i=0; i<list->no_of_communities; i++) {
 	debug("(%ld, %p, %p)", i, list->heap[i],
 	  list->heap[i]->maxdq);
-    if (list->heap[i]->maxdq)
+	if (list->heap[i]->maxdq) {
 	  debug(" (%ld, %ld, %.7f)", list->heap[i]->maxdq->first,
-	    list->heap[i]->maxdq->second, *list->heap[i]->maxdq->dq);
+		list->heap[i]->maxdq->second, *list->heap[i]->maxdq->dq);
+	}
 	debug("\n");
   }
   debug("Heap index:\n");
