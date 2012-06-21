@@ -775,25 +775,25 @@ int igraph_biconnected_components(const igraph_t *graph,
 	      }
 	      if (component_edges) {
 		igraph_vector_t *nodes=VECTOR(*mycomponents)[comps-1];
-		igraph_vector_t *v=igraph_Calloc(1, igraph_vector_t);
-		long int i, no_vert=igraph_vector_size(nodes);
-		if (!v) { IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM); }
-		IGRAPH_CHECK(igraph_vector_init(v, 0));
-		IGRAPH_FINALLY(igraph_vector_destroy, v);
-		for (i=0; i<no_vert; i++) {
-		  long int vert=VECTOR(*nodes)[i];
+		igraph_vector_t *vv=igraph_Calloc(1, igraph_vector_t);
+		long int ii, no_vert=igraph_vector_size(nodes);
+		if (!vv) { IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM); }
+		IGRAPH_CHECK(igraph_vector_init(vv, 0));
+		IGRAPH_FINALLY(igraph_vector_destroy, vv);
+		for (ii=0; ii<no_vert; ii++) {
+		  long int vert=VECTOR(*nodes)[ii];
 		  igraph_vector_t *edges=igraph_inclist_get(&inclist, 
 								vert);
-		  long int j, n=igraph_vector_size(edges);
-		  for (j=0; j<n; j++) {
+		  long int j, nn=igraph_vector_size(edges);
+		  for (j=0; j<nn; j++) {
 		    long int e=VECTOR(*edges)[j];
 		    long int nei=IGRAPH_OTHER(graph, e, vert);
 		    if (VECTOR(vertex_added)[nei] == comps && nei<vert) {
-		      IGRAPH_CHECK(igraph_vector_push_back(v, e));
+		      IGRAPH_CHECK(igraph_vector_push_back(vv, e));
 		    }
 		  }
 		}
-		IGRAPH_CHECK(igraph_vector_ptr_push_back(component_edges, v));
+		IGRAPH_CHECK(igraph_vector_ptr_push_back(component_edges, vv));
 		IGRAPH_FINALLY_CLEAN(1);
 	      }
 	    } /* record component if requested */

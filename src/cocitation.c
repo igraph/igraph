@@ -249,14 +249,18 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
 }
 
 int igraph_i_neisets_intersect(const igraph_vector_t *v1,
+			       const igraph_vector_t *v2, long int *len_union,
+			       long int *len_intersection);
+
+int igraph_i_neisets_intersect(const igraph_vector_t *v1,
   const igraph_vector_t *v2, long int *len_union,
   long int *len_intersection) {
   /* ASSERT: v1 and v2 are sorted */
-  long int i, j, i0, j0;
-  i0 = igraph_vector_size(v1); j0 = igraph_vector_size(v2);
-  *len_union = i0+j0; *len_intersection = 0;
+  long int i, j, i0, jj0;
+  i0 = igraph_vector_size(v1); jj0 = igraph_vector_size(v2);
+  *len_union = i0+jj0; *len_intersection = 0;
   i = 0; j = 0;
-  while (i < i0 && j < j0) {
+  while (i < i0 && j < jj0) {
     if (VECTOR(*v1)[i] == VECTOR(*v2)[j]) {
       (*len_intersection)++; (*len_union)--;
       i++; j++;

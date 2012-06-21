@@ -1482,7 +1482,7 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
   long int i, j, idx=0;
   igraph_vector_t edges;
   igraph_vector_long_t digits, table;
-  igraph_vector_long_t index, index2;
+  igraph_vector_long_t index1, index2;
   long int actb=0;
   long int actvalue=0;
   
@@ -1514,8 +1514,8 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
 
   IGRAPH_CHECK(igraph_vector_long_init(&digits, n+1));
   IGRAPH_FINALLY(igraph_vector_long_destroy, &digits);
-  IGRAPH_CHECK(igraph_vector_long_init(&index, pow(m+1, n+1)));
-  IGRAPH_FINALLY(igraph_vector_long_destroy, &index);
+  IGRAPH_CHECK(igraph_vector_long_init(&index1, pow(m+1, n+1)));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &index1);
   IGRAPH_CHECK(igraph_vector_long_init(&index2, no_of_nodes));
   IGRAPH_FINALLY(igraph_vector_long_destroy, &index2);  
 
@@ -1533,7 +1533,7 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
     actb=n;
 
     /* ok, we have a valid string now */
-    VECTOR(index)[actvalue]=idx+1;
+    VECTOR(index1)[actvalue]=idx+1;
     VECTOR(index2)[idx]=actvalue;
     idx++;
     
@@ -1569,7 +1569,7 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
       long int tovalue, to;
       if (j==lastdigit) { continue; }
       tovalue=basis+j;
-      to=VECTOR(index)[tovalue]-1;
+      to=VECTOR(index1)[tovalue]-1;
       if (to<0) { continue; }
       igraph_vector_push_back(&edges, i);
       igraph_vector_push_back(&edges, to);
@@ -1577,7 +1577,7 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
   }
 
   igraph_vector_long_destroy(&index2);
-  igraph_vector_long_destroy(&index);
+  igraph_vector_long_destroy(&index1);
   igraph_vector_long_destroy(&digits);
   igraph_vector_long_destroy(&table);
   IGRAPH_FINALLY_CLEAN(4);

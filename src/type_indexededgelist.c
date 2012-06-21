@@ -626,26 +626,26 @@ int igraph_delete_vertices_idx(igraph_t *graph, const igraph_vs_t vertices,
   IGRAPH_FINALLY(igraph_destroy, &newgraph);
 
   if (newgraph.attr) {
-    igraph_vector_t idx;
-    IGRAPH_VECTOR_INIT_FINALLY(&idx, remaining_vertices);
+    igraph_vector_t iidx;
+    IGRAPH_VECTOR_INIT_FINALLY(&iidx, remaining_vertices);
     for (i=0; i<no_of_nodes; i++) {
-      long int j=VECTOR(*my_vertex_recoding)[i];
-      if (j != 0) {
-	VECTOR(idx)[ j-1 ] = i;
+      long int jj=VECTOR(*my_vertex_recoding)[i];
+      if (jj != 0) {
+	VECTOR(iidx)[ jj-1 ] = i;
       }
     }
     IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph,
 						     &newgraph,
-						     &idx));
-    IGRAPH_CHECK(igraph_vector_resize(&idx, remaining_edges));
+						     &iidx));
+    IGRAPH_CHECK(igraph_vector_resize(&iidx, remaining_edges));
     for (i=0; i<no_of_edges; i++) {
-      long int j=VECTOR(edge_recoding)[i];
-      if (j != 0) {
-	VECTOR(idx)[ j-1 ] = i;
+      long int jj=VECTOR(edge_recoding)[i];
+      if (jj != 0) {
+	VECTOR(iidx)[ jj-1 ] = i;
       }
     }
-    IGRAPH_CHECK(igraph_i_attribute_permute_edges(graph, &newgraph, &idx));
-    igraph_vector_destroy(&idx);
+    IGRAPH_CHECK(igraph_i_attribute_permute_edges(graph, &newgraph, &iidx));
+    igraph_vector_destroy(&iidx);
     IGRAPH_FINALLY_CLEAN(1);
   }
 	       
@@ -658,7 +658,6 @@ int igraph_delete_vertices_idx(igraph_t *graph, const igraph_vs_t vertices,
 
   /* TODO: this is duplicate */
   if (invidx) {
-    long int i;
     IGRAPH_CHECK(igraph_vector_resize(invidx, remaining_vertices));
     for (i=0; i<no_of_nodes; i++) {
       long int newid=VECTOR(*my_vertex_recoding)[i];
@@ -786,11 +785,11 @@ int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_intege
   } else {
     /* both in- and out- neighbors in a directed graph,
        we need to merge the two 'vectors' */
-    long int j1=VECTOR(graph->os)[node+1];
+    long int jj1=VECTOR(graph->os)[node+1];
     long int j2=VECTOR(graph->is)[node+1];
     long int i1=VECTOR(graph->os)[node];
     long int i2=VECTOR(graph->is)[node];
-    while (i1 < j1 && i2 < j2) {
+    while (i1 < jj1 && i2 < j2) {
       long int n1=VECTOR(graph->to)[ (long int)VECTOR(graph->oi)[i1] ];
       long int n2=VECTOR(graph->from)[ (long int)VECTOR(graph->ii)[i2] ];
       if (n1<n2) {
@@ -806,7 +805,7 @@ int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_intege
 	i2++;
       }
     }
-    while (i1 < j1) {
+    while (i1 < jj1) {
       long int n1=VECTOR(graph->to)[ (long int)VECTOR(graph->oi)[i1] ];
       VECTOR(*neis)[idx++]=n1;
       i1++;
@@ -826,10 +825,10 @@ int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_intege
  * 
  */
 
-int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el, igraph_vector_t *index, 
+int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el, igraph_vector_t *iindex, 
 			  igraph_integer_t nodes) {
   
-# define EDGE(i) (VECTOR(*el)[ (long int) VECTOR(*index)[(i)] ])
+# define EDGE(i) (VECTOR(*el)[ (long int) VECTOR(*iindex)[(i)] ])
   
   long int no_of_nodes;
   long int no_of_edges;
@@ -1059,11 +1058,11 @@ int igraph_edges(const igraph_t *graph, igraph_es_t eids,
 /* This is an unsafe macro. Only supply variable names, i.e. no
    expressions as parameters, otherwise nasty things can happen */
 
-#define BINSEARCH(start,end,value,index,edgelist,N,pos)     \
+#define BINSEARCH(start,end,value,iindex,edgelist,N,pos)     \
   do {                                                      \
   while ((start) < (end)) {                                 \
     long int mid=(start)+((end)-(start))/2;                 \
-    long int e=VECTOR((index))[mid];                        \
+    long int e=VECTOR((iindex))[mid];                        \
     if (VECTOR((edgelist))[e] < (value)) {                  \
       (start)=mid+1;                                        \
     } else {                                                \
@@ -1071,7 +1070,7 @@ int igraph_edges(const igraph_t *graph, igraph_es_t eids,
     }                                                       \
   }                                                         \
   if ((start)<(N)) {                                        \
-    long int e=VECTOR((index))[(start)];                    \
+    long int e=VECTOR((iindex))[(start)];                    \
     if (VECTOR((edgelist))[e] == (value)) {                 \
       *(pos)=e;                                             \
     }                                                       \
@@ -1356,11 +1355,11 @@ int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
 #undef FIND_DIRECTED_EDGE
 #undef FIND_UNDIRECTED_EDGE
 
-#define BINSEARCH(start,end,value,index,edgelist,N,pos,seen)    \
+#define BINSEARCH(start,end,value,iindex,edgelist,N,pos,seen)    \
   do {                                                      \
   while ((start) < (end)) {                                 \
     long int mid=(start)+((end)-(start))/2;                 \
-    long int e=VECTOR((index))[mid];                        \
+    long int e=VECTOR((iindex))[mid];                        \
     if (VECTOR((edgelist))[e] < (value)) {                  \
       (start)=mid+1;                                        \
     } else {                                                \
@@ -1368,10 +1367,10 @@ int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
     }                                                       \
   }                                                         \
   if ((start)<(N)) {                                        \
-    long int e=VECTOR((index))[(start)];                    \
+    long int e=VECTOR((iindex))[(start)];                    \
     while ((start)<(N) && seen[e] && VECTOR(edgelist)[e] == (value)) {	\
       (start)++;					    \
-      e=VECTOR(index)[(start)];                             \
+      e=VECTOR(iindex)[(start)];                             \
     }				                            \
     if ((start)<(N) && !(seen[e]) && VECTOR(edgelist)[e] == (value)) {	\
       *(pos)=e;	                                            \

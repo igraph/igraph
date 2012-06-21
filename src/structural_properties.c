@@ -462,7 +462,7 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
   long int i, j;
   igraph_vit_t fromvit, tovit;
   igraph_real_t my_infinity=IGRAPH_INFINITY;
-  igraph_vector_t index;
+  igraph_vector_t indexv;
 
   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
       mode != IGRAPH_ALL) {
@@ -486,17 +486,17 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
   if ( (all_to=igraph_vs_is_all(&to)) ) {
     no_of_to=no_of_nodes;
   } else {
-    IGRAPH_VECTOR_INIT_FINALLY(&index, no_of_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&indexv, no_of_nodes);
     IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
     IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
     no_of_to=IGRAPH_VIT_SIZE(tovit);
     for (i=0; !IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit)) {
       long int v=IGRAPH_VIT_GET(tovit);
-      if (VECTOR(index)[v]) {
+      if (VECTOR(indexv)[v]) {
 	IGRAPH_ERROR("Duplicate vertices in `to', this is not allowed", 
 		     IGRAPH_EINVAL);
       }
-      VECTOR(index)[v] = ++i;
+      VECTOR(indexv)[v] = ++i;
     }
   }
 
@@ -520,8 +520,8 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
       if (all_to) {
 	MATRIX(*res, i, act)=actdist;
       } else {
-	if (VECTOR(index)[act]) {
-	  MATRIX(*res, i, (long int)(VECTOR(index)[act]-1)) = actdist;
+	if (VECTOR(indexv)[act]) {
+	  MATRIX(*res, i, (long int)(VECTOR(indexv)[act]-1)) = actdist;
 	  reached++;
 	  if (reached==no_of_to) {
 	    igraph_dqueue_clear(&q);
@@ -544,7 +544,7 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
   /* Clean */
   if (!all_to) {
     igraph_vit_destroy(&tovit);
-    igraph_vector_destroy(&index);
+    igraph_vector_destroy(&indexv);
     IGRAPH_FINALLY_CLEAN(2);
   }
 
@@ -2395,7 +2395,7 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
   long int maxdegree=0;
   long int i, j, k, nn;
   igraph_lazy_adjlist_t adjlist;
-  igraph_vector_t index, avids, rank, order, triangles, degree;
+  igraph_vector_t indexv, avids, rank, order, triangles, degree;
   long int *neis;
 
   IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
@@ -2406,25 +2406,25 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
 					  IGRAPH_SIMPLIFY));
   IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
 
-  IGRAPH_VECTOR_INIT_FINALLY(&index, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&indexv, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&avids, 0);
   IGRAPH_CHECK(igraph_vector_reserve(&avids, nodes_to_calc));
   k=0;
   for (i=0; i<nodes_to_calc; IGRAPH_VIT_NEXT(vit), i++) {
     long int v=IGRAPH_VIT_GET(vit);
-    igraph_vector_t *neis;
+    igraph_vector_t *neis2;
     long int neilen;
-    if (VECTOR(index)[v]==0) {
-      VECTOR(index)[v]=k+1; k++;
+    if (VECTOR(indexv)[v]==0) {
+      VECTOR(indexv)[v]=k+1; k++;
       IGRAPH_CHECK(igraph_vector_push_back(&avids, v));
     } 
     
-    neis=igraph_lazy_adjlist_get(&adjlist, v);
-    neilen=igraph_vector_size(neis);
+    neis2=igraph_lazy_adjlist_get(&adjlist, v);
+    neilen=igraph_vector_size(neis2);
     for (j=0; j<neilen; j++) {
-      long int nei=VECTOR(*neis)[j];
-      if (VECTOR(index)[nei]==0) {
-	VECTOR(index)[nei]=k+1; k++;
+      long int nei=VECTOR(*neis2)[j];
+      if (VECTOR(indexv)[nei]==0) {
+	VECTOR(indexv)[nei]=k+1; k++;
 	IGRAPH_CHECK(igraph_vector_push_back(&avids, nei));
       }
     }
@@ -2436,10 +2436,10 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
   IGRAPH_VECTOR_INIT_FINALLY(&degree, affected_nodes);
   for (i=0; i<affected_nodes; i++) {
     long int v=VECTOR(avids)[i];
-    igraph_vector_t *neis;
+    igraph_vector_t *neis2;
     long int deg;
-    neis=igraph_lazy_adjlist_get(&adjlist, v);
-    VECTOR(degree)[i]=deg=igraph_vector_size(neis);
+    neis2=igraph_lazy_adjlist_get(&adjlist, v);
+    VECTOR(degree)[i]=deg=igraph_vector_size(neis2);
     if (deg > maxdegree) { maxdegree = deg; }
   }
   igraph_vector_order1(&degree, &order, maxdegree+1);
@@ -2461,11 +2461,11 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
     long int node=VECTOR(avids) [ (long int) VECTOR(order)[nn] ];
     igraph_vector_t *neis1, *neis2;
     long int neilen1, neilen2;
-    long int nodeindex=VECTOR(index)[node];
+    long int nodeindex=VECTOR(indexv)[node];
     long int noderank=VECTOR(rank) [nodeindex-1];
     
-/*     fprintf(stderr, "node %li (index %li, rank %li)\n", node, */
-/* 	    (long int)VECTOR(index)[node]-1, noderank); */
+/*     fprintf(stderr, "node %li (indexv %li, rank %li)\n", node, */
+/* 	    (long int)VECTOR(indexv)[node]-1, noderank); */
     
     IGRAPH_ALLOW_INTERRUPTION();
     
@@ -2477,17 +2477,17 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
     }
     for (i=0; i<neilen1; i++) {
       long int nei=VECTOR(*neis1)[i];
-      long int neiindex=VECTOR(index)[nei];
+      long int neiindex=VECTOR(indexv)[nei];
       long int neirank=VECTOR(rank)[neiindex-1];
 
-/*       fprintf(stderr, "  nei %li (index %li, rank %li)\n", nei, */
+/*       fprintf(stderr, "  nei %li (indexv %li, rank %li)\n", nei, */
 /* 	      neiindex, neirank); */
       if (neirank > noderank) {
 	neis2=igraph_lazy_adjlist_get(&adjlist, nei);
 	neilen2=igraph_vector_size(neis2);
 	for (j=0; j<neilen2; j++) {	  
 	  long int nei2=VECTOR(*neis2)[j];
-	  long int nei2index=VECTOR(index)[nei2];
+	  long int nei2index=VECTOR(indexv)[nei2];
 	  long int nei2rank=VECTOR(rank)[nei2index-1];
 /* 	  fprintf(stderr, "    triple %li %li %li\n", node, nei, nei2); */
 	  if (nei2rank < neirank) {
@@ -2510,9 +2510,9 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
   IGRAPH_VIT_RESET(vit);
   for (i=0; i<nodes_to_calc; i++, IGRAPH_VIT_NEXT(vit)) {
     long int node=IGRAPH_VIT_GET(vit);
-    long int idx=VECTOR(index)[node]-1;
-    igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, node);
-    long int deg=igraph_vector_size(neis);
+    long int idx=VECTOR(indexv)[node]-1;
+    igraph_vector_t *neis2=igraph_lazy_adjlist_get(&adjlist, node);
+    long int deg=igraph_vector_size(neis2);
     igraph_real_t triples=(double) deg * (deg-1) / 2;
     if (mode == IGRAPH_TRANSITIVITY_ZERO && triples == 0)
       VECTOR(*res)[i] = 0.0;
@@ -2526,7 +2526,7 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
   igraph_vector_destroy(&rank);
   igraph_vector_destroy(&order);
   igraph_vector_destroy(&avids);
-  igraph_vector_destroy(&index);
+  igraph_vector_destroy(&indexv);
   igraph_lazy_adjlist_destroy(&adjlist);
   igraph_vit_destroy(&vit);
   IGRAPH_FINALLY_CLEAN(8);
@@ -3036,7 +3036,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
   igraph_vector_null(res);
   
   for (nn=no_of_nodes-1; nn>=0; nn--) {
-    long int adjlen1, adjlen2, i;
+    long int adjlen1, adjlen2;
     igraph_real_t triples;
     long int node=VECTOR(order)[nn];
     
@@ -4987,7 +4987,7 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
   long int i,j;
   igraph_real_t my_infinity=IGRAPH_INFINITY;
   igraph_bool_t all_to;
-  igraph_vector_t index;
+  igraph_vector_t indexv;
 
   if (!weights) {
     return igraph_shortest_paths(graph, res, from, to, mode);
@@ -5012,17 +5012,17 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
   if ( (all_to=igraph_vs_is_all(&to)) ) {
     no_of_to=no_of_nodes;
   } else {
-    IGRAPH_VECTOR_INIT_FINALLY(&index, no_of_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&indexv, no_of_nodes);
     IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
     IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
     no_of_to=IGRAPH_VIT_SIZE(tovit);
     for (i=0; !IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit)) {
       long int v=IGRAPH_VIT_GET(tovit);
-      if (VECTOR(index)[v]) {
+      if (VECTOR(indexv)[v]) {
 	IGRAPH_ERROR("Duplicate vertices in `to', this is not allowed", 
 		     IGRAPH_EINVAL);
       }
-      VECTOR(index)[v] = ++i;
+      VECTOR(indexv)[v] = ++i;
     }
   }
 
@@ -5047,8 +5047,8 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
       if (all_to) {
 	MATRIX(*res, i, minnei)=mindist-1.0;
       } else {
-	if (VECTOR(index)[minnei]) {
-	  MATRIX(*res, i, (long int)(VECTOR(index)[minnei]-1)) = mindist-1.0;
+	if (VECTOR(indexv)[minnei]) {
+	  MATRIX(*res, i, (long int)(VECTOR(indexv)[minnei]-1)) = mindist-1.0;
 	  reached++;
 	  if (reached==no_of_to) {
 	    igraph_2wheap_clear(&Q);
@@ -5062,17 +5062,17 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
       nlen=igraph_vector_size(neis);
       for (j=0; j<nlen; j++) {
 	long int edge=VECTOR(*neis)[j];
-	long int to=IGRAPH_OTHER(graph, edge, minnei);
+	long int tto=IGRAPH_OTHER(graph, edge, minnei);
 	igraph_real_t altdist=mindist + VECTOR(*weights)[edge];
-	igraph_bool_t active=igraph_2wheap_has_active(&Q, to);
-	igraph_bool_t has=igraph_2wheap_has_elem(&Q, to);
-	igraph_real_t curdist= active ? -igraph_2wheap_get(&Q, to) : 0.0;
+	igraph_bool_t active=igraph_2wheap_has_active(&Q, tto);
+	igraph_bool_t has=igraph_2wheap_has_elem(&Q, tto);
+	igraph_real_t curdist= active ? -igraph_2wheap_get(&Q, tto) : 0.0;
 	if (!has) {
 	  /* This is the first non-infinite distance */
-	  IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
+	  IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
 	} else if (altdist < curdist) {
 	  /* This is a shorter path */
-	  IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
+	  IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
 	}
       }
       
@@ -5082,7 +5082,7 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
 
   if (!all_to) {
     igraph_vit_destroy(&tovit);
-    igraph_vector_destroy(&index);
+    igraph_vector_destroy(&indexv);
     IGRAPH_FINALLY_CLEAN(2);
   }  
   
@@ -5261,19 +5261,19 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     nlen=igraph_vector_size(neis);
     for (i=0; i<nlen; i++) {
       long int edge=VECTOR(*neis)[i];
-      long int to=IGRAPH_OTHER(graph, edge, minnei);
+      long int tto=IGRAPH_OTHER(graph, edge, minnei);
       igraph_real_t altdist=mindist + VECTOR(*weights)[edge];
-      igraph_real_t curdist=VECTOR(dists)[to];
+      igraph_real_t curdist=VECTOR(dists)[tto];
       if (curdist==0) {
         /* This is the first non-infinite distance */
-        VECTOR(dists)[to] = altdist+1.0;
-        parents[to] = edge+1;
-        IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
+        VECTOR(dists)[tto] = altdist+1.0;
+        parents[tto] = edge+1;
+        IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
       } else if (altdist < curdist-1) {
 	      /* This is a shorter path */
-        VECTOR(dists)[to] = altdist+1.0;
-        parents[to] = edge+1;
-        IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
+        VECTOR(dists)[tto] = altdist+1.0;
+        parents[tto] = edge+1;
+        IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
       }
     }
   } /* !igraph_2wheap_empty(&Q) */
@@ -5592,28 +5592,28 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     nlen=igraph_vector_size(neis);
     for (i=0; i<nlen; i++) {
       long int edge=VECTOR(*neis)[i];
-      long int to=IGRAPH_OTHER(graph, edge, minnei);
+      long int tto=IGRAPH_OTHER(graph, edge, minnei);
       igraph_real_t altdist=mindist + VECTOR(*weights)[edge];
-      igraph_real_t curdist=VECTOR(dists)[to];
+      igraph_real_t curdist=VECTOR(dists)[tto];
       igraph_vector_t *parent_vec;
 
       if (curdist==0) {
         /* This is the first non-infinite distance */
-        VECTOR(dists)[to] = altdist+1.0;
-        parent_vec = (igraph_vector_t*)VECTOR(parents)[to];
+        VECTOR(dists)[tto] = altdist+1.0;
+        parent_vec = (igraph_vector_t*)VECTOR(parents)[tto];
         IGRAPH_CHECK(igraph_vector_push_back(parent_vec, minnei));
-        IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
+        IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
       } else if (altdist == curdist-1) {
 	      /* This is an alternative path with exactly the same length */
-        parent_vec = (igraph_vector_t*)VECTOR(parents)[to];
+        parent_vec = (igraph_vector_t*)VECTOR(parents)[tto];
         IGRAPH_CHECK(igraph_vector_push_back(parent_vec, minnei));
       } else if (altdist < curdist-1) {
 	      /* This is a shorter path */
-        VECTOR(dists)[to] = altdist+1.0;
-        parent_vec = (igraph_vector_t*)VECTOR(parents)[to];
+        VECTOR(dists)[tto] = altdist+1.0;
+        parent_vec = (igraph_vector_t*)VECTOR(parents)[tto];
         igraph_vector_clear(parent_vec);
         IGRAPH_CHECK(igraph_vector_push_back(parent_vec, minnei));
-        IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
+        IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
       }
     }
   } /* !igraph_2wheap_empty(&Q) */
@@ -6117,9 +6117,9 @@ int igraph_shortest_paths_johnson(const igraph_t *graph,
   
   igraph_vector_resize(&newweights, no_of_edges);
   for (i=0; i<no_of_edges; i++) {
-    long int from=IGRAPH_FROM(graph, i);
-    long int to=IGRAPH_TO(graph, i);
-    VECTOR(newweights)[i] += MATRIX(bfres, 0, from) - MATRIX(bfres, 0, to);
+    long int ffrom=IGRAPH_FROM(graph, i);
+    long int tto=IGRAPH_TO(graph, i);
+    VECTOR(newweights)[i] += MATRIX(bfres, 0, ffrom) - MATRIX(bfres, 0, tto);
   }
   
   /* Run Dijkstra's algorithm on the new weights */
@@ -6792,20 +6792,20 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
       nlen=igraph_vector_size(neis);
       for (j=0; j<nlen; j++) {
 	long int edge=VECTOR(*neis)[j];
-	long int to=IGRAPH_OTHER(graph, edge, minnei);
+	long int tto=IGRAPH_OTHER(graph, edge, minnei);
 	igraph_real_t altdist=mindist + VECTOR(*weights)[edge];
-	igraph_real_t curdist= (VECTOR(already_added)[to]==source+1) ? 
-	  VECTOR(dist)[to] : 0;
+	igraph_real_t curdist= (VECTOR(already_added)[tto]==source+1) ? 
+	  VECTOR(dist)[tto] : 0;
 	
 	if (curdist==0) {
 	  /* First non-finite distance */
-	  VECTOR(already_added)[to] = source+1;
-	  VECTOR(dist)[to] = altdist+1.0;
-	  IGRAPH_CHECK(igraph_indheap_push_with_index(&Q, to, -altdist));
+	  VECTOR(already_added)[tto] = source+1;
+	  VECTOR(dist)[tto] = altdist+1.0;
+	  IGRAPH_CHECK(igraph_indheap_push_with_index(&Q, tto, -altdist));
 	} else if (altdist < curdist-1) {
 	  /* A shorter path */
-	  VECTOR(dist)[to] = altdist+1.0;
-	  IGRAPH_CHECK(igraph_indheap_modify(&Q, to, -altdist));
+	  VECTOR(dist)[tto] = altdist+1.0;
+	  IGRAPH_CHECK(igraph_indheap_modify(&Q, tto, -altdist));
 	}
       }
       

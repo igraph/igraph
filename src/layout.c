@@ -1374,7 +1374,7 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
     
     maxchange=epsilon+1;
     while (it < maxit && maxchange > epsilon) {
-      long int j;
+      long int jj;
       igraph_real_t t=maxdelta*pow((maxit-it)/(double)maxit, coolexp);
       long int vid, nei;
 
@@ -1388,11 +1388,11 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
       maxchange=0;
       
       /* attractive "forces" along the edges */
-      for (j=0; j<igraph_vector_size(&edges); j++) {
+      for (jj=0; jj<igraph_vector_size(&edges); jj++) {
 	igraph_integer_t from, to;
 	igraph_real_t xd, yd, dist, force;
 	IGRAPH_ALLOW_INTERRUPTION();
-	igraph_edge(graph, VECTOR(edges)[j], &from, &to);
+	igraph_edge(graph, VECTOR(edges)[jj], &from, &to);
 	xd=MATRIX(*res, (long int)from, 0)-MATRIX(*res, (long int)to, 0);
 	yd=MATRIX(*res, (long int)from, 1)-MATRIX(*res, (long int)to, 1);
 	dist=sqrt(xd*xd+yd*yd);
@@ -1432,16 +1432,16 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 /* 	     (long int) VECTOR(layers)[actlayer+1], pairs); */
       
       /* apply the changes */
-      for (j=0; j<VECTOR(layers)[actlayer+1]; j++) {
-	long int vid=VECTOR(vids)[j];
-	igraph_real_t fx=VECTOR(forcex)[vid];
-	igraph_real_t fy=VECTOR(forcey)[vid];
+      for (jj=0; jj<VECTOR(layers)[actlayer+1]; jj++) {
+	long int vvid=VECTOR(vids)[jj];
+	igraph_real_t fx=VECTOR(forcex)[vvid];
+	igraph_real_t fy=VECTOR(forcey)[vvid];
 	igraph_real_t ded=sqrt(fx*fx+fy*fy);
 	if (ded > t) {
 	  ded=t/ded;
 	  fx*=ded; fy *=ded;
 	}
-	igraph_2dgrid_move(&grid, vid, fx, fy);
+	igraph_2dgrid_move(&grid, vvid, fx, fy);
 	if (fx > maxchange) { maxchange=fx; }
 	if (fy > maxchange) { maxchange=fy; }
       }
@@ -1608,15 +1608,15 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
 
     /* update */
     for (j=0; j<no_of_nodes; j++) {
-      long int vid=j;
-      igraph_real_t fx=VECTOR(forcex)[vid];
-      igraph_real_t fy=VECTOR(forcey)[vid];
+      long int vvid=j;
+      igraph_real_t fx=VECTOR(forcex)[vvid];
+      igraph_real_t fy=VECTOR(forcey)[vvid];
       igraph_real_t ded=sqrt(fx*fx+fy*fy);
       if (ded > t) {
 	ded=t/ded;
 	fx*=ded; fy *=ded;
       }
-      igraph_2dgrid_move(&grid, vid, fx, fy);
+      igraph_2dgrid_move(&grid, vvid, fx, fy);
     }
     it++;
     
@@ -2579,11 +2579,11 @@ int igraph_layout_graphopt(const igraph_t *graph, igraph_matrix_t *res,
       
     // Apply force from springs
     for (edge = 0; edge < no_of_edges; edge++) {
-      long int this_node=IGRAPH_FROM(graph, edge);
-      long int other_node=IGRAPH_TO(graph, edge);
+      long int tthis_node=IGRAPH_FROM(graph, edge);
+      long int oother_node=IGRAPH_TO(graph, edge);
       // Apply spring force on both nodes
       igraph_i_apply_spring_force(res, &pending_forces_x, &pending_forces_y,
-				  other_node, this_node, my_spring_length, 
+				  oother_node, tthis_node, my_spring_length, 
 				  spring_constant);
     }
   

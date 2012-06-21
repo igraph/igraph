@@ -127,16 +127,16 @@ int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
   /* The first node(s) in the bag */
   if (start_from) {
     igraph_vector_t deg;
-    long int i, j, sn=igraph_vcount(start_from);
-    igraph_neimode_t m= outpref ? IGRAPH_ALL : IGRAPH_IN;
+    long int ii, jj, sn=igraph_vcount(start_from);
+    igraph_neimode_t mm= outpref ? IGRAPH_ALL : IGRAPH_IN;
 
     IGRAPH_VECTOR_INIT_FINALLY(&deg, sn);
-    IGRAPH_CHECK(igraph_degree(start_from, &deg, igraph_vss_all(), m, 
+    IGRAPH_CHECK(igraph_degree(start_from, &deg, igraph_vss_all(), mm, 
 			       IGRAPH_LOOPS));
-    for (i=0; i<sn; i++) {
-      long int d=VECTOR(deg)[i];
-      for (j=0; j<=d; j++) {
-	bag[bagp++] = i;
+    for (ii=0; ii<sn; ii++) {
+      long int d=VECTOR(deg)[ii];
+      for (jj=0; jj<=d; jj++) {
+	bag[bagp++] = ii;
       }
     }
 
@@ -229,13 +229,13 @@ int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
   
   /* first node(s) */
   if (start_from) {    
-    long int i, sn=igraph_vcount(start_from);
-    igraph_neimode_t m=outpref ? IGRAPH_ALL : IGRAPH_IN;
-    IGRAPH_CHECK(igraph_degree(start_from, &degree, igraph_vss_all(), m,
+    long int ii, sn=igraph_vcount(start_from);
+    igraph_neimode_t mm=outpref ? IGRAPH_ALL : IGRAPH_IN;
+    IGRAPH_CHECK(igraph_degree(start_from, &degree, igraph_vss_all(), mm,
 			       IGRAPH_LOOPS));
     IGRAPH_CHECK(igraph_vector_resize(&degree,  no_of_nodes));
-    for (i=0; i<sn; i++) {
-      igraph_psumtree_update(&sumtree, i, pow(VECTOR(degree)[i], power)+A);
+    for (ii=0; ii<sn; i++) {
+      igraph_psumtree_update(&sumtree, ii, pow(VECTOR(degree)[ii], power)+A);
     }
   } else {    
     igraph_psumtree_update(&sumtree, 0, A);
@@ -265,9 +265,9 @@ int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
     }
     /* update probabilities */
     for (j=0; j<no_of_neighbors; j++) {
-      long int n=VECTOR(edges)[edgeptr-2*j-1];
-      igraph_psumtree_update(&sumtree, n, 
-			     pow(VECTOR(degree)[n], power)+A);
+      long int nn=VECTOR(edges)[edgeptr-2*j-1];
+      igraph_psumtree_update(&sumtree, nn, 
+			     pow(VECTOR(degree)[nn], power)+A);
     }
     if (outpref) {
       VECTOR(degree)[i] += no_of_neighbors;
@@ -338,13 +338,13 @@ int igraph_i_barabasi_game_psumtree(igraph_t *graph,
   
   /* first node(s) */
   if (start_from) {    
-    long int i, sn=igraph_vcount(start_from);
-    igraph_neimode_t m=outpref ? IGRAPH_ALL : IGRAPH_IN;
-    IGRAPH_CHECK(igraph_degree(start_from, &degree, igraph_vss_all(), m,
+    long int ii, sn=igraph_vcount(start_from);
+    igraph_neimode_t mm=outpref ? IGRAPH_ALL : IGRAPH_IN;
+    IGRAPH_CHECK(igraph_degree(start_from, &degree, igraph_vss_all(), mm,
 			       IGRAPH_LOOPS));
     IGRAPH_CHECK(igraph_vector_resize(&degree,  no_of_nodes));
-    for (i=0; i<sn; i++) {
-      igraph_psumtree_update(&sumtree, i, pow(VECTOR(degree)[i], power)+A);
+    for (ii=0; ii<sn; ii++) {
+      igraph_psumtree_update(&sumtree, ii, pow(VECTOR(degree)[ii], power)+A);
     }
   } else {    
     igraph_psumtree_update(&sumtree, 0, A);
@@ -384,9 +384,9 @@ int igraph_i_barabasi_game_psumtree(igraph_t *graph,
       }
       /* update probabilities */
       for (j=0; j<no_of_neighbors; j++) {
-	long int n=VECTOR(edges)[edgeptr-2*j-1];
-	igraph_psumtree_update(&sumtree, n, 
-			       pow(VECTOR(degree)[n], power)+A);
+	long int nn=VECTOR(edges)[edgeptr-2*j-1];
+	igraph_psumtree_update(&sumtree, nn, 
+			       pow(VECTOR(degree)[nn], power)+A);
       }
     }
     if (outpref) {
@@ -1349,9 +1349,9 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
 
     /* update probabilities */
     for (j=0; j<no_of_neighbors; j++) {
-      long int n=VECTOR(edges)[edgeptr-2*j-1];
-      igraph_psumtree_update(&sumtree, n,
-			     pow(VECTOR(degree)[n], power)+zero_appeal);
+      long int nn=VECTOR(edges)[edgeptr-2*j-1];
+      igraph_psumtree_update(&sumtree, nn,
+			     pow(VECTOR(degree)[nn], power)+zero_appeal);
     }
     if (outpref) {
       VECTOR(degree)[i] += no_of_neighbors;
@@ -1770,12 +1770,12 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
 
   if (!torus) {
     for (i=0; i<nodes; i++) {
-      igraph_real_t x1=VECTOR(*xx)[i];
-      igraph_real_t y1=VECTOR(*yy)[i];
+      igraph_real_t xx1=VECTOR(*xx)[i];
+      igraph_real_t yy1=VECTOR(*yy)[i];
       long int j=i+1;
       igraph_real_t dx, dy;
-      while ( j<nodes && (dx=VECTOR(*xx)[j] - x1) < radius) {
-	dy=VECTOR(*yy)[j]-y1;
+      while ( j<nodes && (dx=VECTOR(*xx)[j] - xx1) < radius) {
+	dy=VECTOR(*yy)[j]-yy1;
 	if (dx*dx+dy*dy < r2) {
 	  IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
 	  IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
@@ -1785,12 +1785,12 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
     }
   } else { 
     for (i=0; i<nodes; i++) {
-      igraph_real_t x1=VECTOR(*xx)[i];
-      igraph_real_t y1=VECTOR(*yy)[i];
+      igraph_real_t xx1=VECTOR(*xx)[i];
+      igraph_real_t yy1=VECTOR(*yy)[i];
       long int j=i+1;
       igraph_real_t dx, dy;
-      while ( j<nodes && (dx=VECTOR(*xx)[j] - x1) < radius) {
-	dy=fabs(VECTOR(*yy)[j]-y1);
+      while ( j<nodes && (dx=VECTOR(*xx)[j] - xx1) < radius) {
+	dy=fabs(VECTOR(*yy)[j]-yy1);
 	if (dx > 0.5) {
 	  dx=1-dx;
 	}
@@ -1805,9 +1805,9 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
       }
       if (j==nodes) {
 	j=0;      
-	while (j<i && (dx=1-x1+VECTOR(*xx)[j]) < radius && 
-	       x1-VECTOR(*xx)[j]>=radius) {
-	  dy=fabs(VECTOR(*yy)[j]-y1);
+	while (j<i && (dx=1-xx1+VECTOR(*xx)[j]) < radius && 
+	       xx1-VECTOR(*xx)[j]>=radius) {
+	  dy=fabs(VECTOR(*yy)[j]-yy1);
 	  if (dy > 0.5) {
 	    dy=1-dy;
 	  }
@@ -2262,7 +2262,7 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
   IGRAPH_VECTOR_INIT_FINALLY(&intersect, 0);
   for (i=0; i<types; i++) {
     for (j=0; j<types; j++) {
-      long int k, l, c;
+      long int kk, l, c;
       igraph_real_t p, last;
       igraph_vector_t *v1, *v2;
       long int v1_size, v2_size;
@@ -2296,9 +2296,9 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
       IGRAPH_CHECK(igraph_vector_reserve(&edges, igraph_vector_size(&edges)+l*2));
 
       if (!loops && c>0) {
-          for (k=0; k<l; k++) {
-            long int to=floor(VECTOR(s)[k]/v1_size);
-            long int from=VECTOR(s)[k]-((igraph_real_t)to)*v1_size;
+          for (kk=0; kk<l; kk++) {
+            long int to=floor(VECTOR(s)[kk]/v1_size);
+            long int from=VECTOR(s)[kk]-((igraph_real_t)to)*v1_size;
             if (VECTOR(*v1)[from] == VECTOR(*v2)[to]) {
               /* remap loop edges */
               to = v2_size-1;
@@ -2314,9 +2314,9 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
             igraph_vector_push_back(&edges, VECTOR(*v2)[to]);
           }
       } else {
-        for (k=0; k<l; k++) {
-          long int to=floor(VECTOR(s)[k]/v1_size);
-          long int from=VECTOR(s)[k]-((igraph_real_t)to)*v1_size;
+        for (kk=0; kk<l; kk++) {
+          long int to=floor(VECTOR(s)[kk]/v1_size);
+          long int from=VECTOR(s)[kk]-((igraph_real_t)to)*v1_size;
           igraph_vector_push_back(&edges, VECTOR(*v1)[from]);
           igraph_vector_push_back(&edges, VECTOR(*v2)[to]);
         }
@@ -3057,7 +3057,7 @@ int igraph_simple_interconnected_islands_game(
     int startIsland = 0;
     int endIsland = 0;
     int i, j, is;
-    double rand, last;
+    double myrand, last;
 
     if (islands_n<0) {
         IGRAPH_ERROR("Invalid number of islands", IGRAPH_EINVAL);
@@ -3105,9 +3105,9 @@ int igraph_simple_interconnected_islands_game(
         // debug&tests : printf("last=%f \n", last);
         while (last < maxpossibleedgesPerIsland) { // maxedgesPerIsland
             IGRAPH_CHECK(igraph_vector_push_back(&s, last));
-            rand = RNG_GEOM(islands_pin);
-            last += rand; //RNG_GEOM(islands_pin);
-            //printf("rand=%f , last=%f \n", rand, last);
+            myrand = RNG_GEOM(islands_pin);
+            last += myrand; //RNG_GEOM(islands_pin);
+            //printf("myrand=%f , last=%f \n", myrand, last);
             last += 1;
         }
 
