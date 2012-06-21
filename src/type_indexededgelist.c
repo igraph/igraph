@@ -1164,6 +1164,14 @@ int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
 
 int igraph_get_eids_pairs(const igraph_t *graph, igraph_vector_t *eids,
 			  const igraph_vector_t *pairs, 
+			  igraph_bool_t directed, igraph_bool_t error);
+
+int igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids,
+			 const igraph_vector_t *path, 
+			 igraph_bool_t directed, igraph_bool_t error);
+
+int igraph_get_eids_pairs(const igraph_t *graph, igraph_vector_t *eids,
+			  const igraph_vector_t *pairs, 
 			  igraph_bool_t directed, igraph_bool_t error) {
   long int n=igraph_vector_size(pairs);
   long int no_of_nodes=igraph_vcount(graph);
@@ -1392,6 +1400,14 @@ int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
     FIND_DIRECTED_EDGE(graph,xfrom1,xto1,eid,seen);		    \
   } while (0)
 
+
+int igraph_get_eids_multipairs(const igraph_t *graph, igraph_vector_t *eids,
+			       const igraph_vector_t *pairs, 
+			       igraph_bool_t directed, igraph_bool_t error);
+
+int igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t *eids,
+			      const igraph_vector_t *path, 
+			      igraph_bool_t directed, igraph_bool_t error);
 
 int igraph_get_eids_multipairs(const igraph_t *graph, igraph_vector_t *eids,
 			       const igraph_vector_t *pairs, 

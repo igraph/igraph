@@ -1561,12 +1561,22 @@ int igraph_i_es_multipairs_size(const igraph_t *graph,
 /**************************************************/
 
 int igraph_i_eit_create_allfromto(const igraph_t *graph,
-				  igraph_es_t es, igraph_eit_t *eit, 
+				  igraph_eit_t *eit, 
+				  igraph_neimode_t mode);
+int igraph_i_eit_pairs(const igraph_t *graph, 
+		       igraph_es_t es, igraph_eit_t *eit);
+int igraph_i_eit_multipairs(const igraph_t *graph,
+			    igraph_es_t es, igraph_eit_t *eit);
+int igraph_i_eit_path(const igraph_t *graph, 
+		      igraph_es_t es, igraph_eit_t *eit);
+
+int igraph_i_eit_create_allfromto(const igraph_t *graph,
+				  igraph_eit_t *eit, 
 				  igraph_neimode_t mode) {
   igraph_vector_t *vec;
   long int no_of_nodes=igraph_vcount(graph);
   long int i;
-  
+
   vec=igraph_Calloc(1, igraph_vector_t);
   if (vec==0) {
     IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_ENOMEM);

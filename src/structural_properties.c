@@ -838,6 +838,8 @@ int igraph_get_shortest_path(const igraph_t *graph,
   return 0;  
 }
 
+void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v);
+
 void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v) {
   long int i;
   for (i=0; i<igraph_vector_ptr_size(v); i++) {
@@ -1547,6 +1549,16 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
   return 0;
 }
 
+int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
+				      const igraph_vs_t vids, 
+				      igraph_vector_t *map,
+				      igraph_vector_t *invmap);
+
+int igraph_i_subgraph_create_from_scratch(const igraph_t *graph, 
+					  igraph_t *res,
+					  const igraph_vs_t vids,
+					  igraph_vector_t *map,
+					  igraph_vector_t *invmap);
 
 /**
  * Subgraph creation, old version: it copies the graph and then deletes
@@ -2008,6 +2020,8 @@ int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
   IGRAPH_FINALLY_CLEAN(3);
   return 0;
 }
+
+void igraph_i_simplify_free(igraph_vector_ptr_t *p);
 
 void igraph_i_simplify_free(igraph_vector_ptr_t *p) {
   long int i, n=igraph_vector_ptr_size(p);
@@ -2863,6 +2877,18 @@ int igraph_transitivity_undirected(const igraph_t *graph,
   
   return 0;
 }
+
+int igraph_transitivity_barrat1(const igraph_t *graph,
+				igraph_vector_t *res,
+				const igraph_vs_t vids,
+				const igraph_vector_t *weights,
+				igraph_transitivity_mode_t mode);
+
+int igraph_transitivity_barrat4(const igraph_t *graph,
+				igraph_vector_t *res,
+				const igraph_vs_t vids,
+				const igraph_vector_t *weights,
+				igraph_transitivity_mode_t mode);
 
 int igraph_transitivity_barrat1(const igraph_t *graph,
 				igraph_vector_t *res,
@@ -4588,6 +4614,10 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
   return 0;
 }
 
+int igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph);
+
+int igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegraph);
+
 /* Note to self: tried using adjacency lists instead of igraph_incident queries,
  * with minimal performance improvements on a graph with 70K vertices and 360K
  * edges. (1.09s instead of 1.10s). I think it's not worth the fuss. */
@@ -5383,6 +5413,8 @@ int igraph_get_shortest_path_dijkstra(const igraph_t *graph,
   
   return 0;
 }
+
+int igraph_i_vector_tail_cmp(const void* path1, const void* path2);
 
 /* Compares two paths based on their last elements. Required by
  * igraph_get_all_shortest_paths_dijkstra to put the final result
@@ -6337,6 +6369,12 @@ int igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es)
 
   return 0;
 }
+
+int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
+					    igraph_vs_t vids,
+					    igraph_vector_t *knn,
+					    igraph_vector_t *knnk, 
+					    const igraph_vector_t *weights);
 
 int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
 						  igraph_vs_t vids,

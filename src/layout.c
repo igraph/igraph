@@ -44,10 +44,6 @@
 #include <math.h>
 #include "igraph_math.h"
 
-int igraph_i_layout_sphere_2d(igraph_matrix_t *coords, igraph_real_t *x, igraph_real_t *y,
-			      igraph_real_t *r);
-int igraph_i_layout_sphere_3d(igraph_matrix_t *coords, igraph_real_t *x, igraph_real_t *y,
-			      igraph_real_t *z, igraph_real_t *r);
 
 /**
  * \section about_layouts
@@ -1166,6 +1162,8 @@ int igraph_layout_springs(const igraph_t *graph, igraph_matrix_t *res,
   return 0;
 }
 
+void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y);
+
 void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y) {
   igraph_real_t len=sqrt((*x)*(*x) + (*y)*(*y));
   if (len != 0) {
@@ -1653,6 +1651,10 @@ int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilfor
                                                  igraph_matrix_t *res, long int node,
 												 long int vcount, igraph_real_t xpos);
 
+int igraph_i_layout_reingold_tilford(const igraph_t *graph, 
+				     igraph_matrix_t *res, 
+				     igraph_neimode_t mode, 
+				     long int root);
 int igraph_i_layout_reingold_tilford(const igraph_t *graph, 
 				     igraph_matrix_t *res, igraph_neimode_t mode, 
 				     long int root) {
@@ -2198,6 +2200,46 @@ int igraph_layout_reingold_tilford_circular(const igraph_t *graph,
 
 #define COULOMBS_CONSTANT 8987500000.0
 
+
+igraph_real_t igraph_i_distance_between(const igraph_matrix_t *c, long int a, 
+					long int b);
+
+int igraph_i_determine_electric_axal_forces(const igraph_matrix_t *pos,
+					    igraph_real_t *x,
+					    igraph_real_t *y,
+					    igraph_real_t directed_force,
+					    igraph_real_t distance,
+					    long int other_node,
+					    long int this_node);
+
+int igraph_i_apply_electrical_force(const igraph_matrix_t *pos,
+				    igraph_vector_t *pending_forces_x,
+				    igraph_vector_t *pending_forces_y,
+				    long int other_node, long int this_node,
+				    igraph_real_t node_charge, 
+				    igraph_real_t distance);
+
+int igraph_i_determine_spring_axal_forces(const igraph_matrix_t *pos,
+					  igraph_real_t *x, igraph_real_t *y,
+					  igraph_real_t directed_force,
+					  igraph_real_t distance,
+					  int spring_length,
+					  long int other_node, 
+					  long int this_node);
+
+int igraph_i_apply_spring_force(const igraph_matrix_t *pos, 
+				igraph_vector_t *pending_forces_x,
+				igraph_vector_t *pending_forces_y,
+				long int other_node,
+				long int this_node, int spring_length,
+				igraph_real_t spring_constant);
+
+int igraph_i_move_nodes(igraph_matrix_t *pos, 
+			const igraph_vector_t *pending_forces_x, 
+			const igraph_vector_t *pending_forces_y,
+			igraph_real_t node_mass,
+			igraph_real_t max_sa_movement);
+
 igraph_real_t igraph_i_distance_between(const igraph_matrix_t *c, long int a, 
 					long int b) {
   igraph_real_t diffx=MATRIX(*c, a, 0)-MATRIX(*c, b, 0);
@@ -2563,6 +2605,12 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
 			      igraph_real_t cx, igraph_real_t cy, igraph_real_t startr, 
 			      igraph_real_t killr);
 
+int igraph_i_layout_sphere_2d(igraph_matrix_t *coords, igraph_real_t *x, 
+			      igraph_real_t *y, igraph_real_t *r);
+int igraph_i_layout_sphere_3d(igraph_matrix_t *coords, igraph_real_t *x,
+			      igraph_real_t *y, igraph_real_t *z,
+			      igraph_real_t *r);
+
 /**
  * \function igraph_layout_merge_dla
  * \brief Merge multiple layouts by using a DLA algorithm
@@ -2822,6 +2870,12 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
   return 0;
 }
 
+int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
+			     int n, void *extra);
+
+int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
+                               igraph_matrix_t *dist, long int dim,
+                               igraph_arpack_options_t *options);
 
 int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
     int n, void *extra) {

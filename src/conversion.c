@@ -764,6 +764,10 @@ int igraph_get_stochastic(const igraph_t *graph,
 }
 
 int igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat, 
+				 igraph_bool_t column_wise);
+
+
+int igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat, 
 				 igraph_bool_t column_wise) {
   igraph_vector_t sum;
   int no_of_nodes=igraph_sparsemat_nrow(sparsemat);

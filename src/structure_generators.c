@@ -98,6 +98,17 @@ int igraph_create(igraph_t *graph, const igraph_vector_t *edges,
   return 0;
 }
 
+int igraph_i_adjacency_directed(igraph_matrix_t *adjmatrix, 
+				igraph_vector_t *edges);
+int igraph_i_adjacency_max(igraph_matrix_t *adjmatrix, 
+			   igraph_vector_t *edges);
+int igraph_i_adjacency_upper(igraph_matrix_t *adjmatrix, 
+			     igraph_vector_t *edges);
+int igraph_i_adjacency_lower(igraph_matrix_t *adjmatrix, 
+			     igraph_vector_t *edges);
+int igraph_i_adjacency_min(igraph_matrix_t *adjmatrix, 
+			   igraph_vector_t *edges);
+
 int igraph_i_adjacency_directed(igraph_matrix_t *adjmatrix, igraph_vector_t *edges) {
   
   long int no_of_nodes=igraph_matrix_nrow(adjmatrix);
@@ -293,6 +304,31 @@ int igraph_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
   
   return 0;
 }
+
+int igraph_i_weighted_adjacency_directed(const igraph_matrix_t *adjmatrix,
+					 igraph_vector_t *edges, 
+					 igraph_vector_t *weights, 
+					 igraph_bool_t loops);
+int igraph_i_weighted_adjacency_plus(const igraph_matrix_t *adjmatrix,
+				     igraph_vector_t *edges,
+				     igraph_vector_t *weights, 
+				     igraph_bool_t loops);
+int igraph_i_weighted_adjacency_max(const igraph_matrix_t *adjmatrix,
+				    igraph_vector_t *edges, 
+				    igraph_vector_t *weights, 
+				    igraph_bool_t loops);
+int igraph_i_weighted_adjacency_upper(const igraph_matrix_t *adjmatrix,
+				      igraph_vector_t *edges, 
+				      igraph_vector_t *weights,
+				      igraph_bool_t loops);
+int igraph_i_weighted_adjacency_lower(const igraph_matrix_t *adjmatrix,
+				      igraph_vector_t *edges, 
+				      igraph_vector_t *weights, 
+				      igraph_bool_t loops);
+int igraph_i_weighted_adjacency_min(const igraph_matrix_t *adjmatrix,
+				    igraph_vector_t *edges,
+				    igraph_vector_t *weights, 
+				    igraph_bool_t loops);
 
 int igraph_i_weighted_adjacency_directed(const igraph_matrix_t *adjmatrix,
 					 igraph_vector_t *edges, 
@@ -1892,6 +1928,8 @@ const igraph_real_t igraph_i_famous_zachary[] = {
   28,31,28,33,29,32,29,33,30,32,30,33,31,32,31,33,
   32,33
 };
+
+int igraph_i_famous(igraph_t *graph, const igraph_real_t *data);
 
 int igraph_i_famous(igraph_t *graph, const igraph_real_t *data) {
   long int no_of_nodes=data[0];

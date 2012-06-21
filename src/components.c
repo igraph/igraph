@@ -550,6 +550,8 @@ int igraph_articulation_points(const igraph_t *graph,
   return igraph_biconnected_components(graph, &no, 0, 0, 0, res);
 }
 
+void igraph_i_free_vectorlist(igraph_vector_ptr_t *list);
+
 void igraph_i_free_vectorlist(igraph_vector_ptr_t *list) {
   long int i, n=igraph_vector_ptr_size(list);
   for (i=0; i<n; i++) {

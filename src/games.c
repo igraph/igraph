@@ -40,12 +40,46 @@
 
 #include <math.h>
 
+typedef struct {
+  long int no;
+  igraph_psumtree_t *sumtrees;
+} igraph_i_citing_cited_type_game_struct_t;
+
+void igraph_i_citing_cited_type_game_free (
+			     igraph_i_citing_cited_type_game_struct_t *s);
 /**
  * \section about_games
  * 
  * <para>Games are randomized graph generators. Randomization means that
  * they generate a different graph every time you call them. </para>
  */
+
+int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n, 
+			       igraph_integer_t m, 
+			       const igraph_vector_t *outseq, 
+			       igraph_bool_t outpref, 
+			       igraph_bool_t directed, 
+			       const igraph_t *start_from);
+
+int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph, 
+					     igraph_integer_t n,
+					     igraph_real_t power,
+					     igraph_integer_t m,
+					     const igraph_vector_t *outseq,
+					     igraph_bool_t outpref,
+					     igraph_real_t A,
+					     igraph_bool_t directed, 
+					     const igraph_t *start_from);
+
+int igraph_i_barabasi_game_psumtree(igraph_t *graph, 
+				    igraph_integer_t n,
+				    igraph_real_t power,
+				    igraph_integer_t m,
+				    const igraph_vector_t *outseq,
+				    igraph_bool_t outpref,
+				    igraph_real_t A,
+				    igraph_bool_t directed,
+				    const igraph_t *start_from);
 
 int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n, 
 			       igraph_integer_t m, 
@@ -763,6 +797,10 @@ int igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
   
   return retval;
 }
+
+int igraph_degree_sequence_game_simple(igraph_t *graph, 
+				       const igraph_vector_t *out_seq, 
+				       const igraph_vector_t *in_seq);
 
 int igraph_degree_sequence_game_simple(igraph_t *graph, 
 				       const igraph_vector_t *out_seq, 
@@ -1800,6 +1838,8 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
 }
 
 
+void igraph_i_preference_game_free_vids_by_type(igraph_vector_ptr_t *vecs);
+
 void igraph_i_preference_game_free_vids_by_type(igraph_vector_ptr_t *vecs) {
   int i=0, n;
   igraph_vector_t *v;
@@ -2309,6 +2349,10 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+int igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_real_t prob,
+				      igraph_bool_t loops, 
+				      igraph_vector_t *edges);
 
 int igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_real_t prob,
 				      igraph_bool_t loops, 
@@ -2860,12 +2904,6 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 
   return 0;
 }
-
-
-typedef struct {
-  long int no;
-  igraph_psumtree_t *sumtrees;
-} igraph_i_citing_cited_type_game_struct_t;
 
 void igraph_i_citing_cited_type_game_free(igraph_i_citing_cited_type_game_struct_t *s) {
   long int i;
