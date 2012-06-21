@@ -467,11 +467,10 @@ int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
   /* Edge attributes, we need an index that gives the ids of the 
      original edges for every new edge. 
   */
-  if (graph->attr) {
-    long int i, j=0;
+  if (graph->attr) {    
     igraph_vector_t idx;
     IGRAPH_VECTOR_INIT_FINALLY(&idx, remaining_edges);
-    for (i=0; i<no_of_edges; i++) {
+    for (i=0, j=0; i<no_of_edges; i++) {
       if (mark[i] == 0) {
 	VECTOR(idx)[j++] = i;
       }

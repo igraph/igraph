@@ -1922,7 +1922,6 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
   long int real_root;
   igraph_t extended;
   const igraph_t *pextended=graph;
-  igraph_vector_t newedges;
   igraph_vector_t myroots;
   const igraph_vector_t *proots=roots;
   igraph_neimode_t mode2;
@@ -2069,6 +2068,7 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
       IGRAPH_ERROR("invalid vertex id", IGRAPH_EINVVID);
     }
   } else {
+    igraph_vector_t newedges;
     long int no_of_newedges=igraph_vector_size(proots);
     long int i;
     real_root=no_of_nodes;
