@@ -58,7 +58,9 @@ xmlEntity blankEntityStruct = {
   0,
   0,
   0,
-  0
+  0,
+  0,
+  1
 };
 
 xmlEntityPtr blankEntity = &blankEntityStruct;
@@ -931,6 +933,7 @@ static xmlSAXHandler igraph_i_graphml_sax_handler={
     igraph_i_graphml_sax_handler_error,
     igraph_i_graphml_sax_handler_error,
     igraph_i_graphml_sax_handler_error,
+    NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL
 };
 
 #endif
