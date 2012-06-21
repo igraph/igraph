@@ -1382,23 +1382,6 @@ void FUNCTION(igraph_vector,permdelete)(TYPE(igraph_vector) *v,
   v->end -= nremove;
 }
 
-/**
- * \ingroup vector
- * \function igraph_vector_remove_negidx
- * \brief Remove elements of a vector (for internal use).
- */
-
-void FUNCTION(igraph_vector,remove_negidx)(TYPE(igraph_vector) *v, 
-					   const igraph_vector_t *neg, long int nremove) {
-  long int i, idx=0;
-  assert(v != NULL);
-  assert(v->stor_begin != NULL);
-  for (i=0; i<FUNCTION(igraph_vector,size)(v); i++) {
-    VECTOR(*v)[idx++] = VECTOR(*v)[i];
-  }
-  v->end -= nremove;
-}
-
 #ifndef NOTORDERED
 
 /**
