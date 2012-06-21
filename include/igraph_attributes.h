@@ -289,14 +289,14 @@ igraph_bool_t igraph_has_attribute_table(void);
 #define IGRAPH_I_ATTRIBUTE_DESTROY(graph) \
         do {if ((graph)->attr) igraph_i_attribute_destroy(graph);} while(0)
 #define IGRAPH_I_ATTRIBUTE_COPY(to,from,ga,va,ea) do { \
-        int igraph_i_ret=0; \
+        int igraph_i_ret2=0; \
         if ((from)->attr) { \
-          IGRAPH_CHECK(igraph_i_ret=igraph_i_attribute_copy((to),(from),(ga),(va),(ea))); \
+          IGRAPH_CHECK(igraph_i_ret2=igraph_i_attribute_copy((to),(from),(ga),(va),(ea))); \
         } else { \
 	  (to)->attr = 0; \
 	} \
-        if (igraph_i_ret != 0) { \
-          IGRAPH_ERROR("", igraph_i_ret); \
+        if (igraph_i_ret2 != 0) { \
+          IGRAPH_ERROR("", igraph_i_ret2); \
         } \
    } while(0)        
 
