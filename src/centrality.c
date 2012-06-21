@@ -1487,7 +1487,9 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
   igraph_vector_t dist, nrgeo, tmpscore;
   igraph_vector_t v_tmpres, *tmpres=&v_tmpres;
   igraph_vit_t vit;
-  
+
+  IGRAPH_UNUSED(nobigint);
+
   if (igraph_vector_size(weights) != no_of_edges) {
     IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
   }

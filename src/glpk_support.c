@@ -26,6 +26,7 @@
 
 #ifdef HAVE_GLPK
 
+#include "igraph_types.h"
 #include "igraph_error.h"
 #include "igraph_interrupt_internal.h"
 #include <glpk.h>
@@ -33,6 +34,8 @@
 #include <stdio.h>
 
 void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info) {
+  IGRAPH_UNUSED(tree);
+  IGRAPH_UNUSED(info);
   IGRAPH_ALLOW_INTERRUPTION_NORETURN();
 }
 

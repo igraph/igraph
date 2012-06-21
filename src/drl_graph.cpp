@@ -381,6 +381,7 @@ void graph::read_parms ( char *parms_file )
 
 void graph::init_parms ( int rand_seed, float edge_cut, float real_parm )
 {
+        IGRAPH_UNUSED(rand_seed);
 
 	// first we translate edge_cut the former tcl sliding scale
 	//CUT_END = cut_length_end = 39000.0 * (1.0 - edge_cut) + 1000.0;

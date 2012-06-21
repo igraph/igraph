@@ -1209,6 +1209,10 @@ void igraph_i_levc_free(igraph_vector_ptr_t *ptr) {
 
 void igraph_i_error_handler_none(const char *reason, const char *file,
 				 int line, int igraph_errno) {
+  IGRAPH_UNUSED(reason);
+  IGRAPH_UNUSED(file);
+  IGRAPH_UNUSED(line);
+  IGRAPH_UNUSED(igraph_errno);  
   /* do nothing */
 }
 
@@ -2319,6 +2323,7 @@ igraph_real_t igraph_i_multilevel_community_modularity_gain(
   const igraph_i_multilevel_community_list *communities,
   igraph_integer_t community, igraph_integer_t vertex,
   igraph_real_t weight_all, igraph_real_t weight_inside) {
+  IGRAPH_UNUSED(vertex);
   return weight_inside -
       communities->item[(long int)community].weight_all*weight_all/communities->weight_sum;
 }

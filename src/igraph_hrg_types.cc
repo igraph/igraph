@@ -2057,6 +2057,8 @@ bool dendro::sampleSplitLikelihoods(int &sample_num) {
   // child. When tabulating the frequency of splits, one of these
   // needs to be excluded.
 
+  IGRAPH_UNUSED(sample_num);
+
   string* array;
   int     k;
   double  tot;

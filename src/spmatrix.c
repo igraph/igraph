@@ -947,6 +947,7 @@ igraph_bool_t igraph_spmatrix_iter_end(igraph_spmatrix_iter_t *mit) {
  * Time complexity: O(1).
  */
 void igraph_spmatrix_iter_destroy(igraph_spmatrix_iter_t *mit) {
+  IGRAPH_UNUSED(mit);
   /* Nothing to do at the moment */
 }
 

@@ -58,6 +58,7 @@ typedef struct igraph_i_cattributes_t {
 
 int igraph_i_cattribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
   igraph_i_cattributes_t *nattr=igraph_Calloc(1, igraph_i_cattributes_t);
+  IGRAPH_UNUSED(attr);
   if (!nattr) {
     IGRAPH_ERROR("Can't init attributes", IGRAPH_ENOMEM);
   }

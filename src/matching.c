@@ -964,6 +964,11 @@ int igraph_i_maximum_bipartite_matching_weighted(const igraph_t* graph,
 int igraph_maximum_matching(const igraph_t* graph, igraph_integer_t* matching_size,
     igraph_real_t* matching_weight, igraph_vector_long_t* matching,
     const igraph_vector_t* weights) {
+  IGRAPH_UNUSED(graph);
+  IGRAPH_UNUSED(matching_size);
+  IGRAPH_UNUSED(matching_weight);
+  IGRAPH_UNUSED(matching);
+  IGRAPH_UNUSED(weights);
   IGRAPH_ERROR("maximum matching on general graphs not implemented yet",
       IGRAPH_UNIMPLEMENTED);
 }

@@ -1610,6 +1610,7 @@ igraph_bool_t igraph_i_isomorphic_vf2(igraph_vector_t *map12,
 				      void *arg) {
   igraph_i_iso_cb_data_t *data = arg;
   igraph_bool_t *iso = data->arg;
+  IGRAPH_UNUSED(map12); IGRAPH_UNUSED(map21);
   *iso = 1;
   return 0;			/* don't need to continue */
 }
@@ -1703,6 +1704,7 @@ igraph_bool_t igraph_i_count_isomorphisms_vf2(const igraph_vector_t *map12,
 					      void *arg) {
   igraph_i_iso_cb_data_t *data = arg;
   igraph_integer_t *count = data->arg;
+  IGRAPH_UNUSED(map12); IGRAPH_UNUSED(map21);
   *count += 1;
   return 1;			/* always continue */
 }
@@ -1784,6 +1786,7 @@ igraph_bool_t igraph_i_get_isomorphisms_vf2(const igraph_vector_t *map12,
   igraph_i_iso_cb_data_t *data=arg;
   igraph_vector_ptr_t *ptrvector=data->arg;
   igraph_vector_t *newvector=igraph_Calloc(1, igraph_vector_t);
+  IGRAPH_UNUSED(map12);
   if (!newvector) { 
     igraph_error("Out of memory", __FILE__, __LINE__, IGRAPH_ENOMEM);
     return 0;			/* stop right here */
@@ -2412,6 +2415,7 @@ igraph_bool_t igraph_i_subisomorphic_vf2(const igraph_vector_t *map12,
 					 void *arg) {
   igraph_i_iso_cb_data_t *data = arg;
   igraph_bool_t *iso = data->arg;
+  IGRAPH_UNUSED(map12); IGRAPH_UNUSED(map21);
   *iso=1;
   return 0; /* stop */
 }
@@ -2494,6 +2498,7 @@ igraph_bool_t igraph_i_count_subisomorphisms_vf2(const igraph_vector_t *map12,
 						 void *arg) {
   igraph_i_iso_cb_data_t *data = arg;
   igraph_integer_t *count = data->arg;
+  IGRAPH_UNUSED(map12); IGRAPH_UNUSED(map21);
   *count += 1;
   return 1;			/* always continue */
 }
@@ -2578,6 +2583,7 @@ igraph_bool_t igraph_i_get_subisomorphisms_vf2(const igraph_vector_t *map12,
   igraph_i_iso_cb_data_t *data = arg;
   igraph_vector_ptr_t *vector = data->arg;
   igraph_vector_t *newvector=igraph_Calloc(1, igraph_vector_t);
+  IGRAPH_UNUSED(map12);
   if (!newvector) { 
     igraph_error("Out of memory", __FILE__, __LINE__, IGRAPH_ENOMEM);
     return 0;			/* stop right here */

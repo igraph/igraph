@@ -23,6 +23,7 @@
 
 #include "config.h"
 #include "igraph_error.h"
+#include "igraph_types.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -137,6 +138,11 @@ void igraph_error_handler_abort (const char *reason, const char *file,
 
 void igraph_error_handler_ignore (const char *reason, const char *file,
 				  int line, int igraph_errno) {
+  IGRAPH_UNUSED(reason); 
+  IGRAPH_UNUSED(file); 
+  IGRAPH_UNUSED(line);
+  IGRAPH_UNUSED(igraph_errno);
+
   IGRAPH_FINALLY_FREE();
 }
 
@@ -212,6 +218,10 @@ static IGRAPH_THREAD_LOCAL igraph_warning_handler_t *igraph_i_warning_handler=0;
 
 void igraph_warning_handler_ignore (const char *reason, const char *file,
 				   int line, int igraph_errno) {
+  IGRAPH_UNUSED(reason); 
+  IGRAPH_UNUSED(file); 
+  IGRAPH_UNUSED(line);
+  IGRAPH_UNUSED(igraph_errno);
 }
 
 #ifndef USING_R
@@ -232,6 +242,7 @@ void igraph_warning_handler_ignore (const char *reason, const char *file,
 
 void igraph_warning_handler_print (const char *reason, const char *file,
 				   int line, int igraph_errno) {
+  IGRAPH_UNUSED(igraph_errno);
   fprintf(stderr, "Warning: %s in file %s, line %i\n", reason, file, line);
 }
 #endif

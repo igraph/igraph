@@ -195,6 +195,7 @@ void igraph_i_graphml_sax_handler_error(void *state0, const char* msg, ...) {
 xmlEntityPtr igraph_i_graphml_sax_handler_get_entity(void *state0,
 						     const xmlChar* name) {
   xmlEntityPtr predef = xmlGetPredefinedEntity(name);
+  IGRAPH_UNUSED(state0);
   if (predef != NULL) return predef;
   IGRAPH_WARNING("unknown XML entity found\n");
   return blankEntity;
@@ -854,7 +855,9 @@ void igraph_i_graphml_sax_handler_end_element(void *state0,
 						const xmlChar* name) {
   struct igraph_i_graphml_parser_state *state=
     (struct igraph_i_graphml_parser_state*)state0;
-  
+
+  IGRAPH_UNUSED(name);
+
   switch (state->st) {
   case INSIDE_GRAPHML:
     state->st=FINISH;

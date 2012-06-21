@@ -45,6 +45,9 @@ __BEGIN_DECLS
 #include <math.h>
 #include <stdio.h>
 
+/* This is to eliminate gcc warnings about unused parameters */
+#define IGRAPH_UNUSED(x) (void)(x)
+
 typedef int    igraph_integer_t;
 typedef double igraph_real_t;
 typedef int    igraph_bool_t;

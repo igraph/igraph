@@ -33,6 +33,9 @@ int igraph_gml_tree_init_integer(igraph_gml_tree_t *t,
 				 igraph_integer_t value) {
 
   igraph_integer_t *p;
+
+  IGRAPH_UNUSED(namelen);
+
   IGRAPH_VECTOR_PTR_INIT_FINALLY(&t->names, 1);
   IGRAPH_CHECK(igraph_vector_char_init(&t->types, 1));
   IGRAPH_FINALLY(igraph_vector_char_destroy, &t->types);
@@ -61,6 +64,9 @@ int igraph_gml_tree_init_real(igraph_gml_tree_t *t,
 			      igraph_real_t value) {
 
   igraph_real_t *p;
+
+  IGRAPH_UNUSED(namelen);
+
   IGRAPH_VECTOR_PTR_INIT_FINALLY(&t->names, 1);
   IGRAPH_CHECK(igraph_vector_char_init(&t->types, 1));
   IGRAPH_FINALLY(igraph_vector_char_destroy, &t->types);
@@ -87,6 +93,10 @@ int igraph_gml_tree_init_real(igraph_gml_tree_t *t,
 int igraph_gml_tree_init_string(igraph_gml_tree_t *t,
 				const char *name, int namelen,
 				const char *value, int valuelen) {
+
+  IGRAPH_UNUSED(namelen);
+  IGRAPH_UNUSED(valuelen);
+
   IGRAPH_VECTOR_PTR_INIT_FINALLY(&t->names, 1);
   IGRAPH_CHECK(igraph_vector_char_init(&t->types, 1));
   IGRAPH_FINALLY(igraph_vector_char_destroy, &t->types);
@@ -108,6 +118,9 @@ int igraph_gml_tree_init_string(igraph_gml_tree_t *t,
 int igraph_gml_tree_init_tree(igraph_gml_tree_t *t,
 			      const char *name, int namelen,
 			      igraph_gml_tree_t *value) {
+
+  IGRAPH_UNUSED(namelen);
+
   IGRAPH_VECTOR_PTR_INIT_FINALLY(&t->names, 1);
   IGRAPH_CHECK(igraph_vector_char_init(&t->types, 1));
   IGRAPH_FINALLY(igraph_vector_char_destroy, &t->types);

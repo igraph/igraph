@@ -589,6 +589,8 @@ igraph_bool_t igraph_i_all_st_cuts_minimal_dfs_incb(const igraph_t *graph,
   const igraph_vector_t *map=data->map;
   long int realvid=VECTOR(*map)[(long int)vid];
 
+  IGRAPH_UNUSED(graph); IGRAPH_UNUSED(dist);
+
   if (VECTOR(*GammaX)[(long int)realvid]) {
     if (!igraph_stack_empty(stack)) {
       long int top=igraph_stack_top(stack);
@@ -608,6 +610,8 @@ igraph_bool_t igraph_i_all_st_cuts_minimal_dfs_otcb(const igraph_t *graph,
   igraph_stack_t *stack=data->stack;
   const igraph_vector_t *map=data->map;
   long int realvid=VECTOR(*map)[(long int)vid];
+
+  IGRAPH_UNUSED(graph); IGRAPH_UNUSED(dist);
 
   if (!igraph_stack_empty(stack) && 
       igraph_stack_top(stack) == realvid) {
@@ -630,6 +634,8 @@ int igraph_i_all_st_cuts_minimal(const igraph_t *graph,
   igraph_vector_bool_t nomark;
   igraph_i_all_st_cuts_minimal_dfs_data_t data;
   long int i;
+
+  IGRAPH_UNUSED(X);
   
   IGRAPH_CHECK(igraph_stack_init(&stack, 10));
   IGRAPH_FINALLY(igraph_stack_destroy, &stack);
@@ -699,6 +705,8 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
   igraph_vector_t Isv_min;
   igraph_vector_t GammaS_vec;
   long int Sbar_size;
+
+  IGRAPH_UNUSED(arg);
 
   /* We need to create the graph induced by Sbar */
   IGRAPH_VECTOR_INIT_FINALLY(&Sbar_map, 0);
@@ -1159,6 +1167,8 @@ int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
   igraph_t Sbar;
   igraph_vector_t M;
   long int nomin;
+
+  IGRAPH_UNUSED(source); IGRAPH_UNUSED(target);
 
   if (igraph_marked_queue_size(S) == no_of_nodes) {
     igraph_vector_clear(Isv);

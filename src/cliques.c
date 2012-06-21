@@ -724,6 +724,7 @@ int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no) {
 int igraph_i_maximal_cliques_store_max_size(const igraph_vector_t* clique, void* data,
     igraph_bool_t* cont) {
   igraph_integer_t* result = (igraph_integer_t*)data;
+  IGRAPH_UNUSED(cont);
   if (*result < igraph_vector_size(clique))
     *result = igraph_vector_size(clique);
   return IGRAPH_SUCCESS;
@@ -733,6 +734,7 @@ int igraph_i_maximal_cliques_store(const igraph_vector_t* clique, void* data, ig
   igraph_vector_ptr_t* result = (igraph_vector_ptr_t*)data;
   igraph_vector_t* vec;
 
+  IGRAPH_UNUSED(cont);
   vec = igraph_Calloc(1, igraph_vector_t);
   if (vec == 0)
     IGRAPH_ERROR("cannot allocate memory for storing next clique", IGRAPH_ENOMEM);
@@ -748,6 +750,7 @@ int igraph_i_maximal_cliques_store_size_check(const igraph_vector_t* clique, voi
   igraph_vector_t* vec;
   igraph_integer_t size = igraph_vector_size(clique);
 
+  IGRAPH_UNUSED(cont);
   if (size < data->min_size || size > data->max_size)
     return IGRAPH_SUCCESS;
 
@@ -766,6 +769,7 @@ int igraph_i_largest_cliques_store(const igraph_vector_t* clique, void* data, ig
   igraph_vector_t* vec;
   long int i, n;
 
+  IGRAPH_UNUSED(cont);
   /* Is the current clique at least as large as the others that we have found? */
   if (!igraph_vector_ptr_empty(result)) {
     n = igraph_vector_size(clique);

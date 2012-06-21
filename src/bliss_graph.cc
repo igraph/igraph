@@ -262,6 +262,7 @@ void AbstractGraph::reset_permutation(unsigned int *perm)
 
 bool AbstractGraph::is_automorphism(unsigned int * const perm)
 {
+  IGRAPH_UNUSED(perm);
   assert(should_not_happen);
   return false;
 }
@@ -2226,6 +2227,7 @@ Cell *Graph::find_next_cell_to_be_splitted(Cell *cell)
 /* First nonsingleton cell */
 Cell *Graph::sh_first(Cell *cell)
 {
+  IGRAPH_UNUSED(cell);
   return p.first_nonsingleton_cell;
 }
 

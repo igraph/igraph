@@ -36,10 +36,16 @@ class RNG
 {
 public:
   RNG() { }
-  RNG(ulong z_, ulong w_, ulong jsr_, ulong jcong_ ) { };
+  RNG(ulong z_, ulong w_, ulong jsr_, ulong jcong_ ) { 
+    IGRAPH_UNUSED(z_); IGRAPH_UNUSED(w_); IGRAPH_UNUSED(jsr_); 
+    IGRAPH_UNUSED(jcong_);
+  };
   ~RNG() { }
 
-  void init(ulong z_, ulong w_, ulong jsr_, ulong jcong_ ) { }
+  void init(ulong z_, ulong w_, ulong jsr_, ulong jcong_ ) {
+    IGRAPH_UNUSED(z_); IGRAPH_UNUSED(w_); IGRAPH_UNUSED(jsr_); 
+    IGRAPH_UNUSED(jcong_);    
+  }
   long rand_int31() { return RNG_INT31(); }
   double rand_halfopen01()   // (0,1]
   { return RNG_UNIF01(); }

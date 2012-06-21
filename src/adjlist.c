@@ -325,6 +325,7 @@ int igraph_adjlist_remove_duplicate(const igraph_t *graph,
 				    igraph_adjlist_t *al) {
   long int i;
   long int n=al->length;
+  IGRAPH_UNUSED(graph);
   for (i=0; i<n; i++) {
     igraph_vector_t *v=&al->adjs[i];
     long int j, p=1, l=igraph_vector_size(v);

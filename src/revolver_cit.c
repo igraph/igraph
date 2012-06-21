@@ -135,6 +135,9 @@ int igraph_revolver_mes_d(const igraph_t *graph,
   long int node;
   long int i;
   long int edges=0;
+
+  IGRAPH_UNUSED(debug);
+  IGRAPH_UNUSED(debugres);
   
   IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&ntk, classes);
@@ -394,6 +397,8 @@ int igraph_revolver_error_d(const igraph_t *graph,
   long int i;
 
   igraph_real_t rlogprob, rlognull, *mylogprob=logprob, *mylognull=lognull;
+
+  IGRAPH_UNUSED(maxind);
   
   IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
@@ -565,6 +570,9 @@ int igraph_revolver_mes_ad(const igraph_t *graph,
 
   long int node, i, j, k;
   long int edges=0;
+
+  IGRAPH_UNUSED(debug);
+  IGRAPH_UNUSED(debugres);
 
   IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
   IGRAPH_MATRIX_INIT_FINALLY(&ntkl, maxind+1, agebins+1);
@@ -884,6 +892,8 @@ int igraph_revolver_error_ad(const igraph_t *graph,
 
   igraph_real_t rlogprob, rlognull, *mylogprob=logprob, *mylognull=lognull;
   
+  IGRAPH_UNUSED(pmaxind);
+
   IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
 						    
@@ -1065,6 +1075,9 @@ int igraph_revolver_mes_ade(const igraph_t *graph,
   
   long int node, j, i, k;
   long int edges=0;
+
+  IGRAPH_UNUSED(debug);
+  IGRAPH_UNUSED(debugres);
   
   IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
   IGRAPH_ARRAY3_INIT_FINALLY(&ntkl, nocats, maxind+1, agebins+1);

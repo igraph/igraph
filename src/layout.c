@@ -1157,6 +1157,11 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
 int igraph_layout_springs(const igraph_t *graph, igraph_matrix_t *res,
 			  igraph_real_t mass, igraph_real_t equil, igraph_real_t k,
 			  igraph_real_t repeqdis, igraph_real_t kfr, igraph_bool_t repulse) {
+
+  IGRAPH_UNUSED(graph); IGRAPH_UNUSED(res); IGRAPH_UNUSED(mass);
+  IGRAPH_UNUSED(equil); IGRAPH_UNUSED(k); IGRAPH_UNUSED(repeqdis);
+  IGRAPH_UNUSED(kfr); IGRAPH_UNUSED(repulse);
+  IGRAPH_ERROR("Springs layout not implemented", IGRAPH_UNIMPLEMENTED);
   /* TODO */
   return 0;
 }
@@ -2597,6 +2602,9 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
   igraph_real_t area=0;
   igraph_real_t maxr=0;
   long int respos;
+
+  /* Graphs are currently not used, only the coordinates */
+  IGRAPH_UNUSED(thegraphs);
   
   IGRAPH_VECTOR_INIT_FINALLY(&sizes, graphs);
   IGRAPH_VECTOR_INIT_FINALLY(&x, graphs);
@@ -2778,6 +2786,9 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
   igraph_real_t angle, len;
   long int steps=0;
 
+  /* The graph is not used, only its coordinates */
+  IGRAPH_UNUSED(actg);
+
   RNG_BEGIN();
 
   while (sp < 0) {
@@ -2815,6 +2826,7 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
 int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
     int n, void *extra) {
   igraph_matrix_t* matrix = (igraph_matrix_t*)extra;
+  IGRAPH_UNUSED(n);
   igraph_blas_dgemv_array(0, 1, matrix, from, 0, to);
   return 0;
 }
