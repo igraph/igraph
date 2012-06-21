@@ -316,7 +316,6 @@ void AbstractGraph::long_prune_init()
 void AbstractGraph::long_prune_swap(const unsigned int i, const unsigned int j)
 {
   assert(long_prune_begin <= long_prune_end);
-  assert(long_prune_end - long_prune_end <= long_prune_max_stored_autss);
   assert(i >= long_prune_begin);
   assert(i < long_prune_end);
   assert(j >= long_prune_begin);
@@ -334,7 +333,6 @@ void AbstractGraph::long_prune_swap(const unsigned int i, const unsigned int j)
 std::vector<bool> &AbstractGraph::long_prune_get_fixed(const unsigned int index)
 {
   assert(long_prune_begin <= long_prune_end);
-  assert(long_prune_end - long_prune_end <= long_prune_max_stored_autss);
   assert(index >= long_prune_begin);
   assert(index < long_prune_end);
   return *long_prune_fixed[index % long_prune_max_stored_autss];
@@ -343,7 +341,6 @@ std::vector<bool> &AbstractGraph::long_prune_get_fixed(const unsigned int index)
 std::vector<bool> &AbstractGraph::long_prune_get_mcrs(const unsigned int index)
 {
   assert(long_prune_begin <= long_prune_end);
-  assert(long_prune_end - long_prune_end <= long_prune_max_stored_autss);
   assert(index >= long_prune_begin);
   assert(index < long_prune_end);
   return *long_prune_mcrs[index % long_prune_max_stored_autss];
@@ -365,7 +362,6 @@ void AbstractGraph::long_prune_add_automorphism(const unsigned int *aut)
 
   DEBUG_ASSERT(long_prune_fixed.size() == long_prune_mcrs.size());
   assert(long_prune_begin <= long_prune_end);
-  assert(long_prune_end - long_prune_end <= long_prune_max_stored_autss);
   if(long_prune_end - long_prune_begin == long_prune_max_stored_autss)
     {
       long_prune_begin++;

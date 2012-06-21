@@ -685,7 +685,7 @@ L_DATA DL_Indexed_List<L_DATA>::Pop(void)
 template <class L_DATA>
 L_DATA DL_Indexed_List<L_DATA>::Get(unsigned long pos)
 {
-  if ((pos<0)||(pos>(this->number_of_items-1))) return(0);
+  if (pos > this->number_of_items - 1) return(0);
   return(array[pos]->item);
 }
 

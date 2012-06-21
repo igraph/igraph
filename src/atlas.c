@@ -65,7 +65,7 @@ int igraph_atlas(igraph_t *graph, int number) {
   const igraph_vector_t v=IGRAPH_VECTOR_NULL;
 
   if (number < 0 ||
-      number >= sizeof(igraph_i_atlas_edges_pos)/sizeof(long int)) {
+      number >= (int) (sizeof(igraph_i_atlas_edges_pos)/sizeof(long int))) {
     IGRAPH_ERROR("No such graph in atlas", IGRAPH_EINVAL);
   }
 
