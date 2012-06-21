@@ -346,7 +346,7 @@ void cumul_sort(int *q, int n) {
 
   // counts #q[i] with given q
   int *nb = new int[qmax-qmin+1];
-  for(int *onk=nb+(qmax-qmin+1); onk!=nb; *(--onk)=0);
+  for(int *onk=nb+(qmax-qmin+1); onk!=nb; *(--onk)=0) { }
   for(i=0; i<n; i++) nb[q[i]-qmin]++;
 
   // counts cumulative distribution
