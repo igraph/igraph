@@ -59,8 +59,7 @@ int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
 
 int igraph_community_optimal_modularity(const igraph_t *graph,
 					igraph_real_t *modularity,
-					igraph_vector_t *membership,
-					igraph_bool_t verbose);
+					igraph_vector_t *membership);
 
 int igraph_community_spinglass(const igraph_t *graph,
 			       const igraph_vector_t *weights,

@@ -74,8 +74,8 @@
 
 int igraph_community_optimal_modularity(const igraph_t *graph,
 					igraph_real_t *modularity,
-					igraph_vector_t *membership,
-					igraph_bool_t verbose) {
+					igraph_vector_t *membership) {
+
 #ifndef HAVE_GLPK
   IGRAPH_ERROR("GLPK is not available", 
 	       IGRAPH_UNIMPLEMENTED);    
