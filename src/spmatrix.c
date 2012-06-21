@@ -137,8 +137,8 @@ igraph_real_t igraph_spmatrix_e(const igraph_spmatrix_t *m,
   long int start, end;
  
   assert(m != NULL);
-  start=(long)igraph_vector_e(&m->cidx, col);
-  end=(long)igraph_vector_e(&m->cidx, col+1)-1;
+  start = (long) VECTOR(m->cidx)[col];
+  end = (long) VECTOR(m->cidx)[col+1]-1;
 
   if (end<start) return 0; 
   /* Elements residing in column col are between m->data[start] and
@@ -180,10 +180,10 @@ igraph_real_t igraph_spmatrix_e(const igraph_spmatrix_t *m,
 int igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int col,
             igraph_real_t value) {
   long int start, end;
- 
+
   assert(m != NULL);
-  start=(long)igraph_vector_e(&m->cidx, col);
-  end=(long)igraph_vector_e(&m->cidx, col+1)-1;
+  start = (long) VECTOR(m->cidx)[col];
+  end = (long) VECTOR(m->cidx)[col+1]-1;
 
   if (end<start) {
     /* First element in the column */
@@ -271,8 +271,8 @@ int igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long int col,
   long int start, end;
  
   assert(m != NULL);
-  start=(long)igraph_vector_e(&m->cidx, col);
-  end=(long)igraph_vector_e(&m->cidx, col+1)-1;
+  start = (long) VECTOR(m->cidx)[col];
+  end = (long) VECTOR(m->cidx)[col+1]-1;
 
   if (end<start) {
     /* First element in the column */

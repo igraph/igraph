@@ -1886,7 +1886,7 @@ int igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
     else {
       igraph_integer_t num_vs;
       IGRAPH_CHECK(igraph_vs_size(graph, &vids, &num_vs));
-      ratio = num_vs / ((double)igraph_vcount(graph));
+      ratio = (igraph_real_t) num_vs / igraph_vcount(graph);
     }
 
     if (ratio > 0.5)
@@ -2610,7 +2610,7 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
   igraph_vector_t rank;
   igraph_vector_t degree;
   
-  if (!igraph_vs_is_all((igraph_vs_t*)&vids)) {
+  if (!igraph_vs_is_all(&vids)) {
     IGRAPH_ERROR("Internal error, wrong transitivity function called", 
 		 IGRAPH_EINVAL);
   }
@@ -2732,7 +2732,7 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
 					 igraph_vector_t *res,
 					 const igraph_vs_t vids,
 					 igraph_transitivity_mode_t mode) {
-  if (igraph_vs_is_all((igraph_vs_t*)&vids)) {
+  if (igraph_vs_is_all(&vids)) {
     return igraph_transitivity_local_undirected4(graph, res, vids, mode);
   } else {
     igraph_vit_t vit;
@@ -3137,7 +3137,7 @@ int igraph_transitivity_barrat(const igraph_t *graph,
 			       const igraph_vs_t vids,
 			       const igraph_vector_t *weights,
 				   igraph_transitivity_mode_t mode) {
-  if (igraph_vs_is_all((igraph_vs_t*)&vids)) {
+  if (igraph_vs_is_all(&vids)) {
     return igraph_transitivity_barrat4(graph, res, vids, weights, mode);
   } else {
     return igraph_transitivity_barrat1(graph, res, vids, weights, mode);
@@ -3247,12 +3247,12 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 
   if (mode==IGRAPH_RECIPROCITY_DEFAULT) {
     if (ignore_loops) {
-      *res= rec/((igraph_real_t)igraph_ecount(graph)-loops);
+      *res= (igraph_real_t) rec/(igraph_ecount(graph)-loops);
     } else {
-      *res= rec/((igraph_real_t)igraph_ecount(graph));
+      *res= (igraph_real_t) rec/(igraph_ecount(graph));
     }
   } else if (mode==IGRAPH_RECIPROCITY_RATIO) {
-    *res= rec/((igraph_real_t)rec+nonrec);
+    *res= (igraph_real_t) rec/(rec+nonrec);
   }
   
   igraph_vector_destroy(&inneis);
@@ -4078,7 +4078,7 @@ int igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
 
   /* Take all nodes with no incoming vertices and remove them */
   while (!igraph_dqueue_empty(&sources)) {
-    node=(long)igraph_dqueue_pop(&sources);
+    igraph_real_t tmp=igraph_dqueue_pop(&sources); node=(long) tmp;
     /* Add the node to the result vector */
     igraph_vector_push_back(res, node);
     /* Exclude the node from further source searches */
@@ -4149,7 +4149,7 @@ int igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
 
   /* Take all nodes with no incoming edges and remove them */
   while (!igraph_dqueue_empty(&sources)) {
-    node=(long)igraph_dqueue_pop(&sources);
+    igraph_real_t tmp=igraph_dqueue_pop(&sources); node=(long) tmp;
     /* Exclude the node from further source searches */
     VECTOR(degrees)[node]=-1;
     vertices_left--;
@@ -5422,8 +5422,8 @@ int igraph_i_vector_tail_cmp(const void* path1, const void* path2);
  * objects and that they are not empty
  */
 int igraph_i_vector_tail_cmp(const void* path1, const void* path2) {
-  return igraph_vector_tail(*(igraph_vector_t**)path1) -
-         igraph_vector_tail(*(igraph_vector_t**)path2);
+  return igraph_vector_tail(*(const igraph_vector_t**)path1) -
+         igraph_vector_tail(*(const igraph_vector_t**)path2);
 }
 
 /**
@@ -5699,9 +5699,8 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
 
       while (!igraph_stack_empty(&stack)) {
         /* For each parent of node i, get its parents */
-        parent_vec = (igraph_vector_t*)VECTOR(parents)[
-          (long int)igraph_stack_pop(&stack)
-        ];
+	igraph_real_t el=igraph_stack_pop(&stack);
+        parent_vec = (igraph_vector_t*)VECTOR(parents)[(long int) el];
         i = igraph_vector_size(parent_vec);
 
         for (j = 0; j < i; j++) {
@@ -5811,8 +5810,10 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     n = igraph_vector_ptr_size(res);
     j = 0;
     for (i = 0; i < n; i++) {
+      igraph_real_t tmp;
       path = (igraph_vector_t*)VECTOR(*res)[i];
-      if (is_target[(long int)igraph_vector_tail(path)] == 1) {
+      tmp=igraph_vector_tail(path);
+      if (is_target[(long int)tmp] == 1) {
         /* we need this path, keep it */
         VECTOR(*res)[j] = path;
         j++;
