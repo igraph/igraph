@@ -50,8 +50,7 @@
 
 int igraph_i_read_network(const igraph_t *graph,
 			  const igraph_vector_t *weights,
-			  network *net, float limit,
-			  igraph_bool_t use_weights,
+			  network *net, igraph_bool_t use_weights,
 			  unsigned int states);
 
 void reduce_cliques(DLList<ClusterList<NNode*>*>*, FILE *file);

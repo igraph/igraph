@@ -760,7 +760,7 @@ int rankCandidatesByProbability(simpleGraph *sg, dendro *d,
   return 0;
 }
 
-int recordPredictions(dendro *d, pblock *br_list, igraph_vector_t *edges, 
+int recordPredictions(pblock *br_list, igraph_vector_t *edges, 
 		      igraph_vector_t *prob, int mk) {
     
   IGRAPH_CHECK(igraph_vector_resize(edges, mk*2));
@@ -838,7 +838,7 @@ int igraph_hrg_predict(const igraph_t *graph,
 
   IGRAPH_CHECK(MCMCEquilibrium_Sample(d, num_samples));
   IGRAPH_CHECK(rankCandidatesByProbability(sg, d, br_list, mk));
-  IGRAPH_CHECK(recordPredictions(d, br_list, edges, prob, mk));
+  IGRAPH_CHECK(recordPredictions(br_list, edges, prob, mk));
 
   delete d;
   delete sg;

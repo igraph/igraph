@@ -78,7 +78,7 @@ int igraph_i_intervals_plus_kmeans(const igraph_vector_t *v, int *gr,
   
   IGRAPH_VECTOR_INIT_FINALLY(&centers, n_interv);
 
-  igraph_i_breaks_computation(v, n, &centers, n_interv, 2);
+  igraph_i_breaks_computation(v, &centers, n_interv, 2);
   IGRAPH_CHECK(igraph_i_kmeans_Lloyd(v, n, 1, &centers, n_interv, gr,
 				     maxiter));
 	
@@ -100,7 +100,7 @@ int igraph_i_intervals_method(const igraph_vector_t *v, int *gr, int n,
 			
   IGRAPH_VECTOR_INIT_FINALLY(&breaks, n_interv+1);
   
-  IGRAPH_CHECK(igraph_i_breaks_computation(v, n, &breaks, n_interv+1, 1));
+  IGRAPH_CHECK(igraph_i_breaks_computation(v, &breaks, n_interv+1, 1));
 
   for (i = 0; i < n; i++) {
     lo = 0;
@@ -128,7 +128,7 @@ int igraph_i_intervals_method(const igraph_vector_t *v, int *gr, int n,
   return 0;
 }
 
-int igraph_i_breaks_computation(const igraph_vector_t *v, int n, 
+int igraph_i_breaks_computation(const igraph_vector_t *v,
 				igraph_vector_t *breaks,
 				int nb, int method) {
   int i;

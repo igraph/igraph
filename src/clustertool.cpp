@@ -293,7 +293,7 @@ int igraph_i_community_spinglass_orig(const igraph_t *graph,
 
   /* Transform the igraph_t */
   IGRAPH_CHECK(igraph_i_read_network(graph, weights,
-				     net, 0.0, use_weights, 0));
+				     net, use_weights, 0));
 
   prob=2.0*net->sum_weights/double(net->node_list->Size())
     /double(net->node_list->Size()-1);
@@ -479,7 +479,7 @@ int igraph_community_spinglass_single(const igraph_t *graph,
 
   /* Transform the igraph_t */
   IGRAPH_CHECK(igraph_i_read_network(graph, weights,
-				     net, 0.0, use_weights, 0));
+				     net, use_weights, 0));
 
   prob=2.0*net->sum_weights/double(net->node_list->Size())
     /double(net->node_list->Size()-1);
@@ -595,7 +595,7 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
 
   /* Transform the igraph_t */
   IGRAPH_CHECK(igraph_i_read_network(graph, weights,
-				     net, 0.0, use_weights, 0));
+				     net, use_weights, 0));
 	
   bool directed = igraph_is_directed(graph);
   

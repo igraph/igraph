@@ -314,7 +314,6 @@ int igraph_i_eigen_matrix_symmetric_lapack_be(const igraph_matrix_t *A,
 }
 
 int igraph_i_eigen_matrix_symmetric_lapack_all(const igraph_matrix_t *A,
-			      const igraph_eigen_which_t *which,
 			      igraph_vector_t *values,
 			      igraph_matrix_t *vectors) {
 
@@ -404,7 +403,7 @@ int igraph_i_eigen_matrix_symmetric_lapack(const igraph_matrix_t *A,
 							   values, vectors));
     break;
   case IGRAPH_EIGEN_ALL:
-    IGRAPH_CHECK(igraph_i_eigen_matrix_symmetric_lapack_all(myA, which,
+    IGRAPH_CHECK(igraph_i_eigen_matrix_symmetric_lapack_all(myA,
 							    values,
 							    vectors));
     break;

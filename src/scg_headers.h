@@ -78,7 +78,7 @@ typedef struct groups{
 ------------DEFINED IN scg_approximate_methods.c---
 ---------------------------------------------------*/	
 
-int igraph_i_breaks_computation(const igraph_vector_t *v, int n,
+int igraph_i_breaks_computation(const igraph_vector_t *v,
 				igraph_vector_t *breaks, int nb, 
 				int method);
 int igraph_i_intervals_plus_kmeans(const igraph_vector_t *v, int *gr, 

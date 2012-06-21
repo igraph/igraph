@@ -1777,10 +1777,10 @@ int igraph_eit_create(const igraph_t *graph,
     eit->end=igraph_ecount(graph);
     break;
   case IGRAPH_ES_ALLFROM:
-    IGRAPH_CHECK(igraph_i_eit_create_allfromto(graph, es, eit, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_i_eit_create_allfromto(graph, eit, IGRAPH_OUT));
     break;
   case IGRAPH_ES_ALLTO:
-    IGRAPH_CHECK(igraph_i_eit_create_allfromto(graph, es, eit, IGRAPH_IN));
+    IGRAPH_CHECK(igraph_i_eit_create_allfromto(graph, eit, IGRAPH_IN));
     break;
   case IGRAPH_ES_INCIDENT:
     eit->type=IGRAPH_EIT_VECTOR;

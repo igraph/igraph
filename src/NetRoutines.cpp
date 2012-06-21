@@ -52,8 +52,7 @@
 
 int igraph_i_read_network(const igraph_t *graph, 
 			  const igraph_vector_t *weights,
-			  network *net, float limit,
-			  igraph_bool_t use_weights, 
+			  network *net, igraph_bool_t use_weights, 
 			  unsigned int states) {
   
   double av_k=0.0, sum_weight=0.0, min_weight=1e60, max_weight=-1e60;
