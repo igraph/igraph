@@ -125,7 +125,7 @@ double igraph_log1p(double x)
      *			    significant figures required  30.93
      *				 decimal places required  32.01
      */
-    const static double alnrcs[43] = {
+    static const double alnrcs[43] = {
 	+.10378693562743769800686267719098e+1,
 	-.13364301504908918098766041553133e+0,
 	+.19408249135520563357926199374750e-1,

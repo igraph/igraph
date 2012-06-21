@@ -896,7 +896,7 @@ igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate) {
 #ifndef HAVE_EXPM1
 #ifndef USING_R			/* R provides a replacement */
 /* expm1 replacement */
-static double expm1 (double x)
+double expm1 (double x)
 {
     if (fabs(x) < M_LN2)
     {
@@ -924,7 +924,7 @@ static double expm1 (double x)
 #ifndef HAVE_RINT
 #ifndef USING_R			/* R provides a replacement */
 /* rint replacement */
-static double rint (double x)
+double rint (double x)
 {
    return ( (x<0.) ? -floor(-x+.5) : floor(x+.5) );
 }

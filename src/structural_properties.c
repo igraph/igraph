@@ -39,6 +39,8 @@
 #include "igraph_types_internal.h"
 #include "igraph_dqueue.h"
 #include "igraph_attributes.h"
+#include "igraph_neighborhood.h"
+#include "igraph_topology.h"
 #include "config.h"
 
 #include <assert.h>
