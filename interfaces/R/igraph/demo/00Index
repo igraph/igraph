@@ -3,3 +3,4 @@ centrality	Classic and other vertex centrality indices
 community	Community structure detection
 smallworld	Small-world networks
 cohesive	Cohesive blocking, the Moody & White method
+hrg             Hierarchical random graphs
