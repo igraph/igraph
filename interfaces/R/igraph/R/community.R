@@ -674,7 +674,7 @@ optimal.community <- function(graph) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
   res <- .Call("R_igraph_community_optimal_modularity", graph,
-               getIgraphOpt("verbose"), PACKAGE="igraph")
+               PACKAGE="igraph")
   if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
     res$names <- V(graph)$name
   }
