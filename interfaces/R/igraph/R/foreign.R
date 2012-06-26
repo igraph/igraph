@@ -298,13 +298,13 @@ read.graph.graphml <- function(file, index=0, ...) {
         PACKAGE="igraph")
 }
 
-write.graph.graphml <- function(graph, file, ...) {
+write.graph.graphml <- function(graph, file, prefixAttr=TRUE, ...) {
 
   if (length(list(...))>0) {
     stop("Unknown arguments to write.graph (GraphML format)")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_write_graph_graphml", graph, file,
+  .Call("R_igraph_write_graph_graphml", graph, file, as.logical(prefixAttr),
         PACKAGE="igraph")
 }
 

@@ -4963,10 +4963,11 @@ SEXP R_igraph_read_graph_graphml(SEXP pvfile, SEXP pindex) {
   return result;
 }
 
-SEXP R_igraph_write_graph_graphml(SEXP graph, SEXP file) {
+SEXP R_igraph_write_graph_graphml(SEXP graph, SEXP file, SEXP pprefixattr) {
   
   igraph_t g;
   FILE *stream;
+  igraph_bool_t prefixattr=LOGICAL(pprefixattr)[0];
 #if HAVE_OPEN_MEMSTREAM == 1
   char *bp;
   size_t size;
@@ -4981,7 +4982,7 @@ SEXP R_igraph_write_graph_graphml(SEXP graph, SEXP file) {
 #endif
   if (stream==0) { igraph_error("Cannot write GraphML file", __FILE__, 
 				__LINE__, IGRAPH_EFILE); }
-  igraph_write_graph_graphml(&g, stream);
+  igraph_write_graph_graphml(&g, stream, prefixattr);
   fclose(stream);
 #if HAVE_OPEN_MEMSTREAM == 1
   PROTECT(result=allocVector(RAWSXP, size));

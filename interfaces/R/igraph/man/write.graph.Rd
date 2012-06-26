@@ -34,8 +34,12 @@ write.graph(graph, file, format=c("edgelist", "pajek", "ncol",
 \section{GraphML format}{
   The GraphML format is a flexible XML based format. See
   \code{\link{read.graph}} for GraphML details. Vertex and edge
-  attributes are also written to the file. This format has no additional
-  arguments.
+  attributes are also written to the file. Additional argument:
+  \describe{
+    \item{prefixAttr}{Logical scalar, whether you want to add a prefix
+      to the graph, vertex and edge attribute names, to ensure their
+      uniqueness. Defaults to \code{TRUE}.}
+  }
 }
 \section{Dot format}{
   The dot format is used by the popular GraphViz program. Vertex and

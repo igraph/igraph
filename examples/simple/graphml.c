@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
   ofile=fopen("test2.gxl", "w");
   /* If we can't create the test file, just skip the test */
   if (ofile) {
-    if (result=igraph_write_graph_graphml(&g, ofile)) {
+    if (result=igraph_write_graph_graphml(&g, ofile, /*prefixattr=*/ 1)) {
       return 1;
     }
     fclose(ofile);

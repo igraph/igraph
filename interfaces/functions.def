@@ -1179,8 +1179,7 @@ igraph_community_multilevel:
 
 igraph_community_optimal_modularity:
         PARAMS: GRAPH graph, OUT REALPTR modularity, \
-                OUT VECTOR_OR_0 membership, \
-                BOOLEAN verbose
+                OUT VECTOR_OR_0 membership
         NAME-R: optimal.community
         IGNORE: RR
 
@@ -1326,7 +1325,7 @@ igraph_write_graph_leda:
         IGNORE: RR, RC, RNamespace
 
 igraph_write_graph_graphml:
-        PARAMS: GRAPH graph, OUTFILE outstream
+        PARAMS: GRAPH graph, OUTFILE outstream, BOOLEAN prefixattr=True
         IGNORE: RR, RC, RNamespace
 
 igraph_write_graph_pajek:

@@ -7673,7 +7673,8 @@ PyObject *igraphmodule_Graph_write_graphml(igraphmodule_GraphObject * self,
   if (igraphmodule_filehandle_init(&fobj, fname, "w"))
     return NULL;
 
-  if (igraph_write_graph_graphml(&self->g, igraphmodule_filehandle_get(&fobj))) {
+  if (igraph_write_graph_graphml(&self->g, igraphmodule_filehandle_get(&fobj),
+				 /*prefixattr=*/ 1)) {
     igraphmodule_handle_igraph_error();
     igraphmodule_filehandle_destroy(&fobj);
     return NULL;

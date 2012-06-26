@@ -55,7 +55,7 @@ int main() {
 			       IGRAPH_NO_MORE_ATTRIBUTES);
   igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
   igraph_attribute_combination_destroy(&comb);
-  igraph_write_graph_graphml(&g2, stdout);
+  igraph_write_graph_graphml(&g2, stdout, /*prefixattr=*/ 1);
   igraph_destroy(&g2);
   /* ****************************************************** */
 
@@ -66,7 +66,7 @@ int main() {
 			       IGRAPH_NO_MORE_ATTRIBUTES);
   igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
   igraph_attribute_combination_destroy(&comb);
-  igraph_write_graph_graphml(&g2, stdout);
+  igraph_write_graph_graphml(&g2, stdout, /*prefixattr=*/ 1);
   igraph_destroy(&g2);
   /* ****************************************************** */
 
@@ -78,7 +78,7 @@ int main() {
 			       IGRAPH_NO_MORE_ATTRIBUTES);
   igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
   igraph_attribute_combination_destroy(&comb);
-  igraph_write_graph_graphml(&g2, stdout);
+  igraph_write_graph_graphml(&g2, stdout, /*prefixattr=*/ 1);
   igraph_destroy(&g2);
   /* ****************************************************** */
   
