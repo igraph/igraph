@@ -96,7 +96,7 @@ class Graph(GraphBase):
     the matrix is returned:
 
       >>> g = Graph.Full(3)
-      >>> g.vs["name"] = ["A", "B", C"]
+      >>> g.vs["name"] = ["A", "B", "C"]
       >>> g[1, 2]
       1
       >>> g["A", "B"]
