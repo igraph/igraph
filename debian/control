@@ -2,10 +2,10 @@ Source: igraph
 Section: libs
 Priority: optional
 Maintainer: Tamas Nepusz <ntamas@gmail.com>
-Build-Depends: debhelper (>= 7), libtool, libxml2-dev, libgmp3-dev, libarpack2-dev,
+Build-Depends: debhelper (>= 7.0.50~), libtool, libxml2-dev, libgmp3-dev, libarpack2-dev,
  libblas-dev, liblapack-dev, libglpk-dev, automake, flex, bison,
  source-highlight, docbook2x, libxml2-utils, python (>= 2.5)
-Standards-Version: 3.8.3
+Standards-Version: 3.9.3
 Homepage: http://igraph.sourceforge.net
 
 Package: libigraph
@@ -17,6 +17,7 @@ Description: Transitional dummy package for libigraph0
 
 Package: libigraph-dev
 Architecture: all
+Section: libdevel
 Depends: libigraph0-dev, ${misc:Depends}
 Description: Transitional dummy package for libigraph0-dev
  This is a dummy package to ease the transition from libigraph-dev to
@@ -28,7 +29,7 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Replaces: libigraph (<< 0.5.3-1)
 Conflicts: libigraph (<< 0.5.3-1)
 Provides: libigraph
-Description: A library for creating and manipulating graphs
+Description: Library for creating and manipulating graphs
  igraph is a library for creating and manipulating graphs.
  It is intended to be as powerful (ie. fast) as possible to enable the
  analysis of large graphs.
@@ -39,7 +40,7 @@ Package: libigraph0-dev
 Architecture: any
 Section: libdevel
 Depends: libigraph0 (= ${binary:Version}), ${misc:Depends}
-Description: A library for creating and manipulating graphs - development files
+Description: Library for creating and manipulating graphs - development files
  igraph is a library for creating and manipulating graphs.
  It is intended to be as powerful (ie. fast) as possible to enable the
  analysis of large graphs.

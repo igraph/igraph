@@ -1,5 +1,4 @@
 usr/include/igraph/*.h
 usr/lib/libigraph.so
 usr/lib/libigraph.a
-usr/lib/libigraph.la
 usr/lib/pkgconfig/igraph.pc

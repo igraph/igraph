@@ -1,103 +1,44 @@
 #!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
 
 # Uncomment this to turn on verbose mode.
-export DH_VERBOSE=1
+# export DH_VERBOSE=1
 
-# This is to mark that the public modules installed differ between
-# Python version and they can't be shared
-export DH_PYCENTRAL=nomove
+PYTHON2=$(shell pyversions -vr)
+PYTHON3=$(shell py3versions -vr)
 
-# These are used for cross-compiling and for saving the configure script
-# from having to guess our platform (since we know it already)
-DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
-DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+%:
+	dh $@ --with python2,python3
 
-ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
-	CFLAGS += -O0
-else
-	CFLAGS += -O2
-endif
-ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
-	INSTALL_PROGRAM += -s
-endif
+# Disabled for the time being
+# ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+# test-python%:
+# 	python$* setup.py test -vv
+# 
+# override_dh_auto_test: $(PYTHON2:%=test-python%) $(PYTHON3:%=test-python%)
+# endif
 
-# Get Python version information
-PYDEF=$(shell pyversions -d)
-PYVERS=$(shell pyversions -r)
+build-python%:
+	python$* setup.py build
 
-configure: configure-stamp
-configure-stamp:
-	dh_testdir
-	touch configure-stamp
+override_dh_auto_build: $(PYTHON3:%=build-python%)
+	dh_auto_build
+	chmod a+x scripts/epydoc-patched
+	scripts/mkdoc.sh $(CURDIR)/build/lib.linux-*2.7
 
-build: configure-stamp build-stamp
-build-stamp:
-	dh_testdir
-	set -e; \
-	for python in $(PYVERS); do \
-	  python=$$(echo $$python | sed "s/$(PYDEF)/python/"); \
-	  $$python setup.py build --build-platlib=$(CURDIR)/build/lib; \
-	done
-	scripts/mkdoc.sh build/lib
-	touch build-stamp
+install-python%:
+	python$* setup.py install --root=$(CURDIR)/debian/tmp --install-layout=deb
 
-clean:
-	dh_testdir
-	dh_testroot
-	rm -rf doc/api/html/
-	for python in $(PYVERS); do \
-	  python=$$(echo $$python | sed "s/$(PYDEF)/python/"); \
-	  $$python setup.py clean; \
-	done
-	rm -f build-stamp configure-stamp
+override_dh_auto_install: $(PYTHON3:%=install-python%)
+	dh_auto_install
+
+override_dh_auto_clean:
+	dh_auto_clean
 	rm -rf build
-	dh_clean
+	rm -rf *.egg-info
 
-install: build
-	dh_testdir
-	dh_testroot
-	dh_prep
-	dh_installdirs
-	set -e; \
-	for python in $(PYVERS); do \
-	  python=$$(echo $$python | sed "s/$(PYDEF)/python/"); \
-	  $$python setup.py install --root=$(CURDIR)/debian/python-igraph --install-layout=deb; \
-	done
-	dh_installdocs -ppython-igraph-doc doc/api/html/*
-
-# Build architecture-independent files here.
-binary-indep: build install
-# We have nothing to do by default.
-
-# Build architecture-dependent files here.
-binary-arch: build install
-	dh_testdir
-	dh_testroot
-#	dh_installdebconf	
-	dh_installdocs
-	dh_installexamples
-#	dh_installmenu
-#	dh_installlogrotate
-#	dh_installemacsen
-#	dh_installpam
-#	dh_installmime
-#	dh_installinit
-#	dh_installcron
-	dh_installman
-	dh_installinfo
-#	dh_installchangelogs ChangeLog
-	dh_link
-	dh_strip
-	dh_compress
-	dh_fixperms
-	dh_makeshlibs
-	dh_shlibdeps
-#	dh_python
-	dh_pycentral
-	dh_gencontrol
-	dh_installdeb
-	dh_md5sums
-	dh_builddeb
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install configure

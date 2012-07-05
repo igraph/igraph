@@ -1,0 +1,50 @@
+Description: Added missing epydoc scripts
+ Added missing epydoc scripts that are not provided by upstream but are
+ needed to build the documentation.
+Author: Tamas Nepusz <ntamas@gmail.com>
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: <vendor|upstream|other>, <url of original patch>
+Bug: <url in upstream bugtracker>
+Bug-Debian: http://bugs.debian.org/<bugnumber>
+Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
+Forwarded: <no|not-needed|url proving that it has been forwarded>
+Reviewed-By: <name and email of someone who approved the patch>
+Last-Update: <YYYY-MM-DD>
+
+--- /dev/null
++++ python-igraph-0.6/scripts/epydoc.cfg
+@@ -0,0 +1,7 @@
++[epydoc]
++
++name: igraph library
++url: http://igraph.sourceforge.net
++
++modules: igraph, igraph.app, igraph.app.shell, igraph.statistics
++exclude: igraph.formula, igraph.test, igraph.vendor
+--- /dev/null
++++ python-igraph-0.6/scripts/epydoc-patched
+@@ -0,0 +1,18 @@
++#!/usr/bin/env python
++"""Patched version of Epydoc that does not blow up with `docutils`
++newer than 0.6 when reST is used as a markup language"""
++
++from epydoc.cli import cli
++from epydoc.markup.restructuredtext import parse_docstring
++
++# Check whether Epydoc needs patching
++doc = parse_docstring("aaa", [])
++try:
++	doc.summary()
++except AttributeError:
++	# Monkey-patching docutils so that Text nodes have a "data" property,
++	# which is always empty
++	from docutils.nodes import Text
++	Text.data=""
++
++cli()
+\ No newline at end of file

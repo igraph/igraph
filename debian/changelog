@@ -1,8 +1,25 @@
+igraph (0.6-3) unstable; urgency=low
+
+  * Fixing build problems with dh --with python2.
+
+ -- Tamas Nepusz <ntamas@gmail.com>  Tue, 26 Jun 2012 19:17:00 +0200
+
+igraph (0.6-2) unstable; urgency=low
+
+  * Removed a few unnecessary files from the generated packages.
+  * info document is not created any more.
+  * Using dh instead of the old rules file.
+
+ -- Tamas Nepusz <ntamas@gmail.com>  Tue, 26 Jun 2012 17:34:00 +0200
+
+igraph (0.6-1) unstable; urgency=low
+
+  * Added Debian revision; minor packaging fixes to make Lintian happy.
+
+ -- Tamas Nepusz <ntamas@gmail.com>  Tue, 26 Jun 2012 13:17:00 +0200
+
 igraph (0.6) unstable; urgency=low
 
   * Initial release.
 
-  * Debian changelog files are maintained by hand from now no, no
-    debian/prepare script anymore.
-
- -- Tamas Nepusz <ntamas@gmail.com>  Wed, 18 May 2011 12:11:00 +0200
+ -- Tamas Nepusz <ntamas@gmail.com>  Wed, 17 Jun 2012 12:11:00 +0200

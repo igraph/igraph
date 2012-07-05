@@ -2,11 +2,12 @@ include setup.cfg
 include src/*.h
 include MANIFEST.in
 include COPYING
-include debian/changelog.in
-include debian/control.in
-include debian/copyright.in
+include debian/changelog
 include debian/compat
+include debian/control
+include debian/copyright
+include debian/pycompat
 include debian/rules
-include debian/prepare
+include debian/source/format
 include scripts/mkdoc.sh
 include test/*.py

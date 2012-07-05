@@ -1,0 +1,29 @@
+Description: Fixes the location of the generated PDF documentation.
+ PDF documentation should be generated in doc/api/pdf, but scripts/mkdoc.sh
+ generates it in doc/api/html. This patch fixes the issue.
+Author: Tamas Nepusz <ntamas@gmail.com>
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: <vendor|upstream|other>, <url of original patch>
+Bug: <url in upstream bugtracker>
+Bug-Debian: http://bugs.debian.org/<bugnumber>
+Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
+Forwarded: <no|not-needed|url proving that it has been forwarded>
+Reviewed-By: <name and email of someone who approved the patch>
+Last-Update: <YYYY-MM-DD>
+
+--- python-igraph-0.6.orig/scripts/mkdoc.sh
++++ python-igraph-0.6/scripts/mkdoc.sh
+@@ -44,7 +44,7 @@ which latex >/dev/null && PDF=1
+ 
+ if [ $PDF -eq 1 ]; then
+   echo "Generating PDF documentation..."
+-${EPYDOC} --pdf -v -o ${DOC_API_FOLDER}/html --config ${CONFIG}
++${EPYDOC} --pdf -v -o ${DOC_API_FOLDER}/pdf --config ${CONFIG}
+ fi
+ 
+ if [ $SYNC -eq 1 ]; then
