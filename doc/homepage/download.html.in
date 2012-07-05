@@ -37,7 +37,7 @@
   <ul class="download-links">
     <li class="download-windows">
        <a href="http://pypi.python.org/packages/3.2/p/python-igraph/python-igraph-${VERSION}.win32-py3.2.msi" 
-          onClick="javascript:urchinTracker ('/downloads/pywin27'); "> 
+          onClick="javascript:urchinTracker ('/downloads/pywin32'); "> 
           Windows installer for Python 3.2</a> 
     </li>
     <li class="download-windows">
