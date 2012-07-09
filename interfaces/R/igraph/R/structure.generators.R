@@ -142,6 +142,8 @@ graph.adjacency.dense <- function(adjmatrix, mode=c("directed", "undirected", "m
       stop("not a square matrix")
     }
 
+    mode(adjmatrix) <- "numeric"
+    
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     res <- .Call("R_igraph_weighted_adjacency", adjmatrix,
                  as.numeric(mode), "weight", diag,
