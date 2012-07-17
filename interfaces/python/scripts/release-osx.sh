@@ -58,11 +58,12 @@ if [ ! -f ${FATLIB} ]; then
 fi
 
 # Ensure that we are really linking to a fat binary and that it refers
-# to libxml2
+# to libxml2 and libz
 check_universal ${FATLIB}
 LIBS=$(get_dependent_libraries ${FATLIB})
 check_library_paths ${FATLIB} "${LIBS}"
 check_mandatory_library_linkage ${FATLIB} "${LIBS}" /usr/lib/libxml2.2.dylib
+check_mandatory_library_linkage ${FATLIB} "${LIBS}" /usr/lib/libz.1.dylib
 
 # Clean up the previous build directory
 rm -rf build/
