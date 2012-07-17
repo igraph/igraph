@@ -66,18 +66,22 @@ include_dirs=[]
 library_dirs=[]
 libraries=[]
 
-line, exit_code = get_output("pkg-config igraph")
-if exit_code>0:
-    print("Using default include and library paths for compilation")
-    print("If the compilation fails, please edit the LIBIGRAPH_FALLBACK_*")
-    print("variables in setup.py or include_dirs and library_dirs in ")
-    print("setup.cfg to point to the correct directories and libraries")
-    print("where the C core of igraph is installed")
-    print("")
-    
-include_dirs.extend(detect_igraph_include_dirs())
-library_dirs.extend(detect_igraph_library_dirs())
-libraries.extend(detect_igraph_libraries())
+if "--no-pkg-config" in argv:
+    argv.remove("--no-pkg-config")
+    libraries.append("igraph")
+else:
+    line, exit_code = get_output("pkg-config igraph")
+    if exit_code>0:
+        print("Using default include and library paths for compilation")
+        print("If the compilation fails, please edit the LIBIGRAPH_FALLBACK_*")
+        print("variables in setup.py or include_dirs and library_dirs in ")
+        print("setup.cfg to point to the correct directories and libraries")
+        print("where the C core of igraph is installed")
+        print("")
+
+    include_dirs.extend(detect_igraph_include_dirs())
+    library_dirs.extend(detect_igraph_library_dirs())
+    libraries.extend(detect_igraph_libraries())
 
 print("Include path: %s" % " ".join(include_dirs))
 print("Library path: %s" % " ".join(library_dirs))
