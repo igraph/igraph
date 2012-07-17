@@ -2801,35 +2801,38 @@ int igraph_centralization_degree_tmax(const igraph_t *graph,
 				      igraph_real_t *res) {
 
   igraph_bool_t directed=mode != IGRAPH_ALL;
+  igraph_real_t real_nodes;
 
   if (graph) {
     directed=igraph_is_directed(graph);
     nodes=igraph_vcount(graph);
   }
 
+  real_nodes = nodes;    /* implicit cast to igraph_real_t */
+
   if (directed) {
     switch (mode) {
     case IGRAPH_IN:
     case IGRAPH_OUT:
       if (!loops) {
-	*res = (nodes-1) * (nodes-1);
+	*res = (real_nodes-1) * (real_nodes-1);
       } else {
-	*res = (nodes-1) * nodes;
+	*res = (real_nodes-1) * real_nodes;
       }
       break;
     case IGRAPH_ALL:
       if (!loops) {
-	*res = 2 * (nodes-1) * (nodes-2);
+	*res = 2 * (real_nodes-1) * (real_nodes-2);
       } else {
-	*res = 2 * (nodes-1) * (nodes-1);
+	*res = 2 * (real_nodes-1) * (real_nodes-1);
       }
       break;
     }
   } else {
     if (!loops) {
-      *res = (nodes-1) * (nodes-2);
+      *res = (real_nodes-1) * (real_nodes-2);
     } else {
-      *res = (nodes-1) * nodes;
+      *res = (real_nodes-1) * real_nodes;
     }
   }
 
@@ -2948,15 +2951,19 @@ int igraph_centralization_betweenness_tmax(const igraph_t *graph,
 					   igraph_integer_t nodes,
 					   igraph_bool_t directed,
 					   igraph_real_t *res) {
+  igraph_real_t real_nodes;
+
   if (graph) { 
     directed=directed && igraph_is_directed(graph); 
     nodes=igraph_vcount(graph);
   }
-  
+
+  real_nodes = nodes;    /* implicit cast to igraph_real_t */
+
   if (directed) {
-    *res = (nodes-1) * (nodes-1) * (nodes-2);
+    *res = (real_nodes-1) * (real_nodes-1) * (real_nodes-2);
   } else {
-    *res = (nodes-1) * (nodes-1) * (nodes-2) / 2.0;
+    *res = (real_nodes-1) * (real_nodes-1) * (real_nodes-2) / 2.0;
   }
   
   return 0;
@@ -3073,15 +3080,19 @@ int igraph_centralization_closeness_tmax(const igraph_t *graph,
 					 igraph_integer_t nodes,
 					 igraph_neimode_t mode,
 					 igraph_real_t *res) {
+  igraph_real_t real_nodes;
+
   if (graph) {
     nodes=igraph_vcount(graph); 
     if (!igraph_is_directed(graph)) { mode=IGRAPH_ALL; }
   }
-  
+
+  real_nodes = nodes;    /* implicit cast to igraph_real_t */
+
   if (mode != IGRAPH_ALL) {
-    *res = (nodes-1) * (1.0-1.0/nodes);
+    *res = (real_nodes-1) * (1.0-1.0/real_nodes);
   } else {
-    *res = (nodes-1) * (nodes-2) / (2.0*nodes-3);
+    *res = (real_nodes-1) * (real_nodes-2) / (2.0*real_nodes-3);
   }
   
   return 0;
