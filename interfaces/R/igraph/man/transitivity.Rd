@@ -109,14 +109,17 @@ transitivity(g2)   # this is about 10/1000
 gw <- graph.formula(A-B:C:D:E, B-C:D, C-D)
 E(gw)$weight <- 1
 E(gw)[ V(gw)[name == "A"] \%--\% V(gw)[name == "E" ] ]$weight <- 5
-transitivity(gw, vids=V(gw)[name=="A"], type="weighted")
+transitivity(gw, vids="A", type="local")
+transitivity(gw, vids="A", type="weighted")
 
 # Weighted reduces to "local" if weights are the same
 gw2 <- erdos.renyi.game(1000, 10/1000)
 E(gw2)$weight <- 1
-all(transitivity(gw2, type="local") == transitivity(gw2, type="weighted"))
-all( transitivity(gw2, vids=2:vcount(g)-1, type="local") ==
-     transitivity(gw2, vids=2:vcount(g)-1, type="weighted") )
+t1 <- transitivity(gw2, vids=V(gw2), type="local")
+t2 <- transitivity(gw2, vids=V(gw2), type="weighted")
+
+all(
+    transitivity(gw2, vids=V(gw2), type="weighted"))
 }
 \keyword{graphs}
 
