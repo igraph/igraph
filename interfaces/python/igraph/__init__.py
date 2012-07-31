@@ -2737,6 +2737,11 @@ class Graph(GraphBase):
             B components), by CSS-style string specifications (C{#rrggbb})
             or by integer color indices of the specified palette.
 
+          - C{vertex_frame_color}: color of the frame (i.e. stroke) of the
+            vertices. The corresponding vertex attribute is C{frame_color},
+            the default is black. See C{vertex_color} for the possible ways
+            of specifying a color.
+
           - C{vertex_shape}: shape of the vertices. Alternatively it can
             be specified by the C{shape} vertex attribute. Possibilities
             are: C{square}, {circle}, {triangle}, {triangle-down} or

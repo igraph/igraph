@@ -191,6 +191,7 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
             """Collects some visual properties of a vertex for drawing"""
             _kwds_prefix = "vertex_"
             color = ("red", palette.get)
+            frame_color = ("black", palette.get)
             label = None
             label_angle = -pi/2
             label_dist  = 0.0
@@ -321,7 +322,7 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
                     coords[0], coords[1], vertex.size)
             context.set_source_rgba(*vertex.color)
             context.fill_preserve()
-            context.set_source_rgb(0., 0., 0.)
+            context.set_source_rgba(*vertex.frame_color)
             context.stroke()
 
         # Draw the vertex labels
