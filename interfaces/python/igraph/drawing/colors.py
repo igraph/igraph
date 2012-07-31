@@ -64,7 +64,7 @@ class Palette(object):
         """Returns the given color from the palette.
 
         Values are cached: if the specific value given has already been
-        looked upon, its value will be returned from the cache instead of
+        looked up, its value will be returned from the cache instead of
         calculating it again. Use L{Palette.clear_cache} to clear the cache
         if necessary.
 
