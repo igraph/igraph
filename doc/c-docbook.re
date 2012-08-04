@@ -240,7 +240,7 @@ REPLACE ----- an enumeration typedef ------------------------------------------
 (?P<after>.*?)                    # tail of the comment
  \*\/\s*                          # closing the comment
 (?P<def>typedef\s*enum\s*\{       # typedef enum
- .*\}\s*\w+\s*;)                  # rest of the definition
+ [^\}]*\}\s*\w+\s*;)                  # rest of the definition
 .*\Z
 
 WITH --------------------------------------------------------------------------
