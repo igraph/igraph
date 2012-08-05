@@ -493,6 +493,7 @@ int igraph_all_minimal_st_separators(const igraph_t *graph,
     /* Store the corresponding separators, N(C) for each component C */
     IGRAPH_CHECK(igraph_i_separators_store(separators, &adjlist, &components, 
 					   &leaveout, &mark, &sorter));
+
   }
 
   /* ---------------------------------------------------------------
@@ -502,10 +503,11 @@ int igraph_all_minimal_st_separators(const igraph_t *graph,
   
   while (try_next < igraph_vector_ptr_size(separators)) {
     igraph_vector_t *basis=VECTOR(*separators)[try_next];
-    long int x, basislen=igraph_vector_size(basis);
-    for (x=0; x<basislen; x++) {
+    long int b, basislen=igraph_vector_size(basis);
+    for (b=0; b<basislen; b++) {
 
       /* Remove N(x) U basis */
+      long int x=VECTOR(*basis)[b];
       igraph_vector_t *neis=igraph_adjlist_get(&adjlist, x);
       long int i, n=igraph_vector_size(neis);
       for (i=0; i<basislen; i++) {
@@ -520,7 +522,7 @@ int igraph_all_minimal_st_separators(const igraph_t *graph,
       /* Find the components */
       IGRAPH_CHECK(igraph_i_clusters_leaveout(&adjlist, &components, 
 					      &leaveout, &mark, &Q));
-      
+
       /* Store the corresponding separators, N(C) for each component C */
       IGRAPH_CHECK(igraph_i_separators_store(separators, &adjlist, 
 					     &components, &leaveout, &mark, 

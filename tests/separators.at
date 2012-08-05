@@ -36,6 +36,11 @@ AT_KEYWORDS([minimal separator])
 AT_COMPILE_CHECK([simple/igraph_minimal_separators.c])
 AT_CLEANUP
 
+AT_SETUP([Minimal separators, bug 1033045 (igraph_all_minimal_st_separators): ])
+AT_KEYWORDS([minimal separator])
+AT_COMPILE_CHECK([simple/bug-1033045.c], [simple/bug-1033045.out])
+AT_CLEANUP
+
 AT_SETUP([Minimum size separators (igraph_minimum_size_separators): ])
 AT_KEYWORDS([minimum size separators])
 AT_COMPILE_CHECK([simple/igraph_minimum_size_separators.c],
