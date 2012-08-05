@@ -1,0 +1,30 @@
+
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> g <- graph.formula(a -- 1:3 -- 5 -- 2:4 -- b, 1 -- 2, 3 -- 4)
+> stsep <- minimal.st.separators(g)
+> sapply(stsep, is.minimal.separator, graph=g)
+[1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  0.288   0.039   0.314 
