@@ -1,0 +1,31 @@
+
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> g <- graph.full(3)
+> path <- graph.ring(3, circular=F)
+> V(g)$color <- c(1,1,2)
+> V(path)$color <- c(1,2,1)
+> graph.count.subisomorphisms.vf2(g, path)
+[1] 2
+> 
+> proc.time()
+   user  system elapsed 
+  0.282   0.039   0.308 

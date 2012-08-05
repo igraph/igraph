@@ -191,7 +191,7 @@ VERTEX_COLOR:
                } \
             } \
             if (!is.null(%I%)) { \
-               %I% <- as.integer(%I%)-1 \
+               %I% <- as.integer(%I%)-1L \
             }
 
 EDGE_COLOR:
@@ -203,7 +203,7 @@ EDGE_COLOR:
                } \
             } \
             if (!is.null(%I%)) { \
-               %I% <- as.integer(%I%)-1 \
+               %I% <- as.integer(%I%)-1L \
             }
 
 NULL:
