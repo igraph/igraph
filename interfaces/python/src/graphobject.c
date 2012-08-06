@@ -6977,15 +6977,6 @@ PyObject *igraphmodule_Graph_to_undirected(igraphmodule_GraphObject * self,
   igraph_attribute_combination_t comb;
   static char *kwlist[] = { "mode", "combine_edges", NULL };
 
-  if (kwds && PyDict_GetItemString(kwds, "mode") && PyDict_GetItemString(kwds, "collapse"))
-    PyErr_SetString(PyExc_ValueError, "cannot specify mode=... and collapse=... at the same time");
-
-  if (kwds && PyDict_GetItemString(kwds, "collapse")) {
-    mode_o = PyDict_GetItemString(kwds, "collapse");
-    PY_IGRAPH_DEPRECATED("The collapse=... keyword argument of Graph.to_undirected() is deprecated, please use mode=... instead. This warning will be removed from igraph 0.7.");
-    PyDict_DelItemString(kwds, "collapse");
-  }
-
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist, &mode_o, &comb_o))
     return NULL;
 

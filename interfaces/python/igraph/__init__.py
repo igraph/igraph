@@ -225,20 +225,8 @@ class Graph(GraphBase):
 
         @param es: the list of edges to be added. Every edge is represented
           with a tuple containing the vertex IDs or names of the two
-          endpoints. Vertices are enumerated from zero. It is allowed to
-          use a single tuple containing two vertex IDs here instead of a
-          list, but this is deprecated from igraph 0.6 and will be removed
-          from 0.7.
-
-        @deprecated: this method will not accept a single pair of vertex IDs
-          as an argument from igraph 0.7. Use L{add_edge()} instead to add
-          a single edge.
+          endpoints. Vertices are enumerated from zero.
         """
-        if isinstance(es, tuple) and len(es) == 2:
-            deprecated("Graph.add_edges() will not accept a single integer pair "
-                    "from igraph 0.7. Use Graph.add_edge() instead.")
-
-            return GraphBase.add_edges(self, [es])
         return GraphBase.add_edges(self, es)
 
     def add_vertex(self, name=None, **kwds):
@@ -2314,7 +2302,7 @@ class Graph(GraphBase):
         return result
 
     @classmethod
-    def GRG(klass, n, radius, torus=False, return_coordinates=False):
+    def GRG(klass, n, radius, torus=False):
         """GRG(n, radius, torus=False, return_coordinates=False)
 
         Generates a random geometric graph.
@@ -2328,18 +2316,10 @@ class Graph(GraphBase):
         @param radius: The given radius
         @param torus: This should be C{True} if we want to use a torus instead of a
           square.
-        @param return_coordinates: whether the X and Y coordinates of the
-          vertices should be returned. If C{True}, a list for each dimension
-          will be returned along with the graph, packed in a tuple. This keyword
-          argument is deprecated and will be removed in igraph 0.7.
         """
         result, xs, ys = klass._GRG(n, radius, torus)
         result.vs["x"] = xs
         result.vs["y"] = ys
-        if return_coordinates:
-            deprecated("The return_coordinates=... keyword argument of Graph.GRG() is "
-                       "deprecated. It will be removed in igraph 0.7.")
-            return result, xs, ys
         return result
 
     @classmethod
