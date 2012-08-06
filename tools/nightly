@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /bin/bash
 #
 # Nightly build script for igraph branches.
 # 
@@ -46,6 +46,12 @@ shift $(($OPTIND-1))
 if [ $# -eq 0 ]; then
     usage
     exit 1
+fi
+
+## in testing mode, there is no need for GC_USERNAME or GC_PASSWORD
+if [ x$upload = xno ]; then
+	GC_USERNAME=dummy
+	GC_PASSWORD=dummy
 fi
 
 ## check required environment variables
@@ -150,12 +156,15 @@ if [ $build_r = 1 ]; then
 	## Make sure that interfaces/R/configure also exists
 	autoconf && autoheader
 
+	## Extract the version number of the R interface
+	RVERSION=`cat DESCRIPTION | grep "Version: " | cut -d ' ' -f 2-`
+
 	## Start compilation
 	make
 	# R_LIBS=~/.R/library R CMD check igraph_$version.tar.gz
 	RPACKAGE="igraph_nightly_$version-$revision-`date +'%Y%m%d'`.tar.gz"
 	rm -f $RPACKAGE
-	mv igraph_$version.tar.gz $RPACKAGE
+	mv igraph_$RVERSION.tar.gz $RPACKAGE
 
 	## sign and upload R package
 	#rm -rf $RPACKAGE.sig
