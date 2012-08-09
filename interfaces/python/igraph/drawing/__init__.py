@@ -60,9 +60,11 @@ class Plot(object):
       - C{cairo.ImageSurface} -- memory buffer surface. Can be written to a
         C{PNG} image file.
 
-      - C{cairo.PdfSurface} -- PDF document surface.
+      - C{cairo.PDFSurface} -- PDF document surface.
 
-      - C{cairo.PsSurface} -- PostScript document surface.
+      - C{cairo.PSSurface} -- PostScript document surface.
+
+      - C{cairo.SVGSurface} -- SVG (Scalable Vector Graphics) document surface.
 
       - C{cairo.Win32Surface} -- Microsoft Windows screen rendering.
 
@@ -151,7 +153,7 @@ class Plot(object):
             if ext == ".pdf":
                 self._surface = cairo.PDFSurface(target, self.bbox.width, \
                                                  self.bbox.height)
-            elif ext == ".ps":
+            elif ext == ".ps" or ext == ".eps":
                 self._surface = cairo.PSSurface(target, self.bbox.width, \
                                                 self.bbox.height)
             elif ext == ".png":
