@@ -38,6 +38,7 @@
 #include "igraph_spmatrix.h"
 #include "igraph_statusbar.h"
 #include "igraph_types_internal.h"
+#include "igraph_conversion.h"
 #include "config.h"
 
 #include <string.h>
@@ -929,6 +930,53 @@ int igraph_modularity(const igraph_t *graph,
   igraph_vector_destroy(&e);
   igraph_vector_destroy(&a);
   IGRAPH_FINALLY_CLEAN(2);
+  
+  return 0;
+}
+
+/** 
+ * \function igraph_modularity_matrix
+ */
+
+int igraph_modularity_matrix(const igraph_t *graph, 
+			     const igraph_vector_t *membership,
+			     igraph_matrix_t *modmat, 
+			     const igraph_vector_t *weights) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);  
+  igraph_real_t sw= weights ? igraph_vector_sum(weights) : no_of_edges;
+  igraph_vector_t deg;
+  long int i, j;
+
+  if (igraph_vector_size(membership) != igraph_vcount(graph)) {
+    IGRAPH_ERROR("Cannot calculate modularity matrix, invalid "
+		 "membership vector length", IGRAPH_EINVAL);
+  }
+  
+  if (weights && igraph_vector_size(weights) != no_of_edges) {
+    IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&deg, no_of_nodes);
+  if (!weights) {
+    IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_ALL, 
+			       IGRAPH_LOOPS));
+  } else {
+    IGRAPH_CHECK(igraph_strength(graph, &deg, igraph_vss_all(), IGRAPH_ALL, 
+				 IGRAPH_LOOPS, weights));
+  }
+  IGRAPH_CHECK(igraph_get_adjacency(graph, modmat, IGRAPH_GET_ADJACENCY_BOTH, 
+				    /*eids=*/ 0));
+
+  for (i=0; i<no_of_nodes; i++) {
+    for (j=0; j<no_of_nodes; j++) {
+      MATRIX(*modmat, i, j) -= VECTOR(deg)[i] * VECTOR(deg)[j] / 2.0 / sw;
+    }
+  }
+  
+  igraph_vector_destroy(&deg);
+  IGRAPH_FINALLY_CLEAN(1);
   
   return 0;
 }

@@ -145,6 +145,11 @@ int igraph_modularity(const igraph_t *graph,
 		      igraph_real_t *modularity,
               const igraph_vector_t *weights);
 
+int igraph_modularity_matrix(const igraph_t *graph, 
+			     const igraph_vector_t *membership,
+			     igraph_matrix_t *modmat, 
+			     const igraph_vector_t *weights);
+
 int igraph_reindex_membership(igraph_vector_t *membership,
                               igraph_vector_t *new_to_old);
 

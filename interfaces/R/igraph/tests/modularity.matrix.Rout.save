@@ -1,0 +1,41 @@
+
+R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> options(width=60)
+> 
+> kar <- graph.famous("zachary")
+> 
+> fc <- fastgreedy.community(kar)
+> 
+> modularity(kar, membership(fc))
+[1] 0.3806706
+> modularity(kar, membership(fc), weights=rep(1, ecount(kar)))
+[1] 0.3806706
+> 
+> B1 <- mod.matrix(kar, membership(fc))
+> B2 <- mod.matrix(kar, membership(fc), weights=rep(1, ecount(kar)))
+> 
+> max(abs(B1 - B2))
+[1] 0
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  0.297   0.041   0.323 

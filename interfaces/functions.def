@@ -1142,6 +1142,12 @@ igraph_modularity:
         NAME-R: modularity.igraph
         IGNORE: RNamespace, RR
 
+igraph_modularity_matrix:
+        PARAMS: GRAPH graph, VECTORM1 membership, OUT MATRIX modmat, \
+                EDGEWEIGHTS weights=NULL
+        DEPS: weights ON graph
+        NAME-R: mod.matrix        
+
 igraph_reindex_membership:
         PARAMS: INOUT VECTOR membership, OUT VECTOR_OR_0 new_to_old
         NAME-R: reindex.membership
