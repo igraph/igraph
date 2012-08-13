@@ -11,16 +11,16 @@
 9 10
 10 1
 *Vertices 10
-1 A
-2 B
-3 C
-4 D
-5 E
-6 F
-7 G
-8 H
-9 I
-10 J
+1 "A"
+2 "B"
+3 "C"
+4 "D"
+5 "E"
+6 "F"
+7 "G"
+8 "H"
+9 "I"
+10 "J"
 *Arcs
 1 2
 2 3
@@ -33,15 +33,15 @@
 9 10
 10 1
 *Vertices 10
-1 A square
-2 B square
-3 C square
-4 D square
+1 A "square"
+2 B "square"
+3 C "square"
+4 D "square"
 5 E "escaping spaces"
-6 F square
-7 G square
+6 F "square"
+7 G "square"
 8 H "escaping \\backslashes\\"
-9 I square
+9 I "square"
 10 J "escaping \"quotes\""
 *Arcs
 1 2
