@@ -1154,7 +1154,8 @@ igraph_reindex_membership:
         IGNORE: RNamespace
 
 igraph_community_leading_eigenvector:
-        PARAMS: GRAPH graph, OUT MATRIX merges, OUT VECTOR membership, \
+        PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
+                OUT MATRIX merges, OUT VECTOR membership, \
                 INTEGER steps=-1, \
                 INOUT ARPACKOPT options=igraph.arpack.default, \
                 OUT REALPTR modularity, BOOLEAN start=False, \

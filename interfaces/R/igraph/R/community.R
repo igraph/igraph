@@ -582,7 +582,8 @@ igraph.i.levc.arp <- function(externalP, externalE) {
   f
 }
 
-leading.eigenvector.community <- function(graph, steps=-1, start=NULL,
+leading.eigenvector.community <- function(graph, steps=-1, weights=NULL,
+                                          start=NULL,
                                           options=igraph.arpack.default,
                                           callback=NULL, extra=NULL,
                                           env=parent.frame()){
@@ -590,13 +591,21 @@ leading.eigenvector.community <- function(graph, steps=-1, start=NULL,
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
   steps <- as.integer(steps)
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
+    weights <- E(graph)$weight 
+  } 
+  if (!is.null(weights) && any(!is.na(weights))) { 
+    weights <- as.numeric(weights) 
+  } else { 
+    weights <- NULL 
+  }
   if (!is.null(start)) { start <- as.numeric(start)-1 }
   options.tmp <- igraph.arpack.default; options.tmp[ names(options) ] <- options ; options <- options.tmp
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
   res <- .Call("R_igraph_community_leading_eigenvector", graph, steps,
-               options, start, callback, extra, env,
+               weights, options, start, callback, extra, env,
                environment(igraph.i.levc.arp),
                PACKAGE="igraph")
   if (getIgraphOpt("add.vertex.names") && is.named(graph)) {

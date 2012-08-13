@@ -63,3 +63,16 @@ for (i in 1:100) {
     break
   }
 }
+
+## Weighted
+
+g <- graph.famous("Zachary")
+lc1 <- leading.eigenvector.community(g)
+lc2 <- leading.eigenvector.community(g, weights=rep(1, ecount(g)))
+
+all(membership(lc1) == membership(lc2))
+lc1$eigenvalues
+lc2$eigenvalues
+
+lc3 <- leading.eigenvector.community(g, weights=rep(1:4, length=ecount(g)))
+membership(lc3)

@@ -1,6 +1,6 @@
 
-R version 2.12.0 (2010-10-15)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
@@ -93,3 +93,23 @@ Community sizes
 +   }
 + }
 > 
+> ## Weighted
+> 
+> g <- graph.famous("Zachary")
+> lc1 <- leading.eigenvector.community(g)
+> lc2 <- leading.eigenvector.community(g, weights=rep(1, ecount(g)))
+> 
+> all(membership(lc1) == membership(lc2))
+[1] TRUE
+> lc1$eigenvalues
+[1] 4.9770802 1.1785377 0.0000000 0.0601905 0.8594147 0.0000000 0.0000000
+> lc2$eigenvalues
+[1] 4.9770802 1.1785377 0.0000000 0.0601905 0.8594147 0.0000000 0.0000000
+> 
+> lc3 <- leading.eigenvector.community(g, weights=rep(1:4, length=ecount(g)))
+> membership(lc3)
+ [1] 1 1 1 1 3 3 3 1 2 2 3 4 1 1 2 2 3 1 2 1 2 1 2 5 5 5 2 5 2 2 2 5 2 2
+> 
+> proc.time()
+   user  system elapsed 
+  1.257   0.800   2.044 

@@ -1,7 +1,7 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   Copyright (C) 2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
    
    This program is free software; you can redistribute it and/or modify
@@ -55,6 +55,7 @@ int main() {
   igraph_vector_t x;
   igraph_real_t val;
   igraph_arpack_options_t options;
+  igraph_vector_t weights;
   
   /* Zachary Karate club */
   igraph_small(&g, 0, IGRAPH_UNDIRECTED, 
@@ -80,8 +81,10 @@ int main() {
   igraph_vector_init(&membership, 0);
   igraph_vector_init(&x, 0);
   igraph_arpack_options_init(&options);
+  igraph_vector_init(&weights, igraph_ecount(&g));
+  igraph_vector_fill(&weights, 1);
 
-  igraph_community_leading_eigenvector(&g, /*weights=*/ 0, &merges, 
+  igraph_community_leading_eigenvector(&g, &weights, &merges, 
 				       &membership, 1, 
 				       &options, /*modularity=*/ 0, 
 				       /*start=*/ 0, /*eigenvalues=*/ 0, 
@@ -95,7 +98,7 @@ int main() {
   printf("\n");
 
   /* Make all the steps */
-  igraph_community_leading_eigenvector(&g, /*weights=*/ 0, &merges, 
+  igraph_community_leading_eigenvector(&g, &weights, &merges, 
 				       &membership, igraph_vcount(&g),
 				       &options, /*modularity=*/ 0, 
 				       /*start=*/ 0, /*eigenvalues=*/ 0,
@@ -106,10 +109,11 @@ int main() {
   print_matrix(&merges);
   print_vector(&membership);
 
+  igraph_vector_destroy(&weights);
   igraph_vector_destroy(&x);
   igraph_vector_destroy(&membership);
   igraph_matrix_destroy(&merges);
   igraph_destroy(&g);
   
   return 0;
-}
+}  

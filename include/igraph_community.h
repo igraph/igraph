@@ -197,6 +197,7 @@ typedef int igraph_community_leading_eigenvector_callback_t(
         void *extra);
 
 int igraph_community_leading_eigenvector(const igraph_t *graph,
+	const igraph_vector_t *weights,
 	igraph_matrix_t *merges,
 	igraph_vector_t *membership,
 	igraph_integer_t steps,

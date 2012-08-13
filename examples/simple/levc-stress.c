@@ -48,8 +48,8 @@ int main() {
     igraph_vector_init(&history, 0);
     igraph_arpack_options_init(&options);
 
-    igraph_community_leading_eigenvector(&g, &merges, &membership,
-					 igraph_vcount(&g), 
+    igraph_community_leading_eigenvector(&g, /*weights=*/ 0, &merges, 
+					 &membership, igraph_vcount(&g), 
 					 &options, &modularity,
 					 /*start=*/ 0, /*eigenvalues=*/ 0, 
 					 /*eigenvectors=*/ 0, &history,

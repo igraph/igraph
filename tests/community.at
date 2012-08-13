@@ -49,6 +49,12 @@ AT_COMPILE_CHECK([simple/igraph_community_leading_eigenvector.c],
                  [simple/igraph_community_leading_eigenvector.out])
 AT_CLEANUP
 
+AT_SETUP([Weighted leading eigenvector community structure (igraph_community_leading_eigenvector) :])
+AT_KEYWORDS([community structure leading eigenvector Newman weighted])
+AT_COMPILE_CHECK([simple/igraph_community_leading_eigenvector2.c],
+                 [simple/igraph_community_leading_eigenvector2.out])
+AT_CLEANUP
+
 AT_SETUP([Leading eigenvector bug #1002140 test (igraph_community_leading_eigenvector) :])
 AT_KEYWORDS([community structure leading eigenvector Newman])
 AT_COMPILE_CHECK([simple/levc-stress.c], [], [simple/input.dl])

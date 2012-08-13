@@ -7045,6 +7045,7 @@ int R_igraph_i_levc_callback(const igraph_vector_t *membership,
 }
 
 SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps, 
+					    SEXP weights,
 					    SEXP options, SEXP pstart, 
 					    SEXP callback, 
 					    SEXP callback_extra,
@@ -7055,6 +7056,7 @@ SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps,
   igraph_matrix_t c_merges;
   igraph_vector_t c_membership;
   igraph_integer_t c_steps;
+  igraph_vector_t v_weights, *pweights=0;
   igraph_bool_t c_start=!isNull(pstart);
   igraph_arpack_options_t c_options;
   igraph_real_t c_modularity;
@@ -7075,6 +7077,9 @@ SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps,
 
                                         /* Convert input */
   R_SEXP_to_igraph(graph, &c_graph);
+  if (!isNull(weights)) { 
+    pweights=&v_weights; R_SEXP_to_vector(weights, &v_weights);
+  }
   if (0 != igraph_matrix_init(&c_merges, 0, 0)) { 
   igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
   } 
@@ -7099,7 +7104,8 @@ SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP steps,
   igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM);
   }
                                         /* Call igraph */
-  c_result=igraph_community_leading_eigenvector(&c_graph, &c_merges, 
+  c_result=igraph_community_leading_eigenvector(&c_graph, pweights, 
+						&c_merges, 
 						&c_membership, c_steps, 
 						&c_options, &c_modularity, 
 						c_start, &c_eigenvalues,
