@@ -1924,6 +1924,7 @@ int igraph_i_pajek_escape(char* src, char** dest) {
   long int destlen=0;
   igraph_bool_t need_escape=0;
 
+  /* Determine whether the string contains characters to be escaped */
   char *s, *d;
   for (s=src; *s; s++, destlen++) {
     if (*s == '\\') {
@@ -1938,7 +1939,20 @@ int igraph_i_pajek_escape(char* src, char** dest) {
   }
 
   if (!need_escape) {
-    *dest=strdup(src);
+    /* At this point, we know that the string does not contain any chars
+     * that would warrant escaping. Therefore, we simply quote it and
+     * return the quoted string. This is necessary because Pajek uses some
+     * reserved words in its format (like 'c' standing for color) and they
+     * have to be quoted as well.
+     */
+    *dest=igraph_Calloc(destlen+3, char);
+    if (!*dest)
+      IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM);
+
+    d = *dest;
+    strcpy(d+1, src);
+    d[0] = d[destlen+1] = '"';
+    d[destlen+2] = 0;
     return IGRAPH_SUCCESS;
   }
 
@@ -1960,7 +1974,7 @@ int igraph_i_pajek_escape(char* src, char** dest) {
   }
   *d='"'; d++; *d=0;
 
-  return 0;
+  return IGRAPH_SUCCESS;
 }
 
 /**
