@@ -38,6 +38,7 @@
 typedef struct {
     PyObject* object;
     FILE* fp;
+	unsigned short int owner;
 } igraphmodule_filehandle_t;
 
 
