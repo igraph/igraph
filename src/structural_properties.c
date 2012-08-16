@@ -4944,8 +4944,7 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
        maximum heap and we need a minimum heap.
      - we don't use IGRAPH_INFINITY in the res matrix during the
        computation, as IGRAPH_FINITE() might involve a function call 
-       and we want to spare that. So we store distance+1.0 instead of 
-       distance in the res matrix, and zero denotes infinity.
+       and we want to spare that. -1 will denote infinity instead.
   */
   
   long int no_of_nodes=igraph_vcount(graph);
@@ -5192,6 +5191,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
   IGRAPH_VECTOR_INIT_FINALLY(&dists, no_of_nodes);
+  igraph_vector_fill(&dists, -1.0);
 
   parents = igraph_Calloc(no_of_nodes, long int);
   if (parents == 0) IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM);
@@ -5210,7 +5210,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     }
   }
 
-  VECTOR(dists)[(long int)from] = 1.0;	/* zero distance */
+  VECTOR(dists)[(long int)from] = 0.0;	/* zero distance */
   parents[(long int)from] = 0;
   igraph_2wheap_push_with_index(&Q, from, 0);
     
@@ -5234,14 +5234,14 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
       long int to=IGRAPH_OTHER(graph, edge, minnei);
       igraph_real_t altdist=mindist + VECTOR(*weights)[edge];
       igraph_real_t curdist=VECTOR(dists)[to];
-      if (curdist==0) {
-        /* This is the first non-infinite distance */
-        VECTOR(dists)[to] = altdist+1.0;
+      if (curdist < 0) {
+        /* This is the first finite distance */
+        VECTOR(dists)[to] = altdist;
         parents[to] = edge+1;
         IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
-      } else if (altdist < curdist-1) {
+      } else if (altdist < curdist) {
 	      /* This is a shorter path */
-        VECTOR(dists)[to] = altdist+1.0;
+        VECTOR(dists)[to] = altdist;
         parents[to] = edge+1;
         IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
       }
@@ -5500,6 +5500,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
 
   /* distance of each vertex from the root */
   IGRAPH_VECTOR_INIT_FINALLY(&dists, no_of_nodes);
+  igraph_vector_fill(&dists, -1.0);
 
   /* order lists the order of vertices in which they were found during
    * the traversal */
@@ -5532,7 +5533,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
   igraph_vit_destroy(&vit);
   IGRAPH_FINALLY_CLEAN(1);
 
-  VECTOR(dists)[(long int)from] = 1.0;	/* zero distance */
+  VECTOR(dists)[(long int)from] = 0.0;	/* zero distance */
   igraph_2wheap_push_with_index(&Q, from, 0);
     
   while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
@@ -5565,19 +5566,19 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
       igraph_real_t curdist=VECTOR(dists)[to];
       igraph_vector_t *parent_vec;
 
-      if (curdist==0) {
-        /* This is the first non-infinite distance */
-        VECTOR(dists)[to] = altdist+1.0;
+      if (curdist< 0) {
+        /* This is the first finite distance */
+        VECTOR(dists)[to] = altdist;
         parent_vec = (igraph_vector_t*)VECTOR(parents)[to];
         IGRAPH_CHECK(igraph_vector_push_back(parent_vec, minnei));
         IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
-      } else if (altdist == curdist-1) {
-	      /* This is an alternative path with exactly the same length */
+      } else if (altdist == curdist) {
+        /* This is an alternative path with exactly the same length */
         parent_vec = (igraph_vector_t*)VECTOR(parents)[to];
         IGRAPH_CHECK(igraph_vector_push_back(parent_vec, minnei));
-      } else if (altdist < curdist-1) {
-	      /* This is a shorter path */
-        VECTOR(dists)[to] = altdist+1.0;
+      } else if (altdist < curdist) {
+	/* This is a shorter path */
+        VECTOR(dists)[to] = altdist;
         parent_vec = (igraph_vector_t*)VECTOR(parents)[to];
         igraph_vector_clear(parent_vec);
         IGRAPH_CHECK(igraph_vector_push_back(parent_vec, minnei));
