@@ -909,12 +909,6 @@ bool igraph_i_lad_checkLAD(int u, int v, Tdomain* D, Tgraph* Gp, Tgraph* Gt){
 /* Coming from main.c                                      */
 /* ---------------------------------------------------------*/
 
-// Global variables
-int nbNodes = 1;      // number of nodes in the search tree
-int nbFail = 0;       // number of failed nodes in the search tree
-int nbSol = 0;        // number of solutions found
-struct rusage ru;     // reusable structure to get CPU time usage
-
 bool igraph_i_lad_filter(bool induced, Tdomain* D, Tgraph* Gp, Tgraph* Gt){
 	// filter domains of all vertices in D->toFilter wrt LAD and ensure GAC(allDiff)
 	// return false if some domain becomes empty; true otherwise
@@ -942,7 +936,7 @@ bool igraph_i_lad_filter(bool induced, Tdomain* D, Tgraph* Gp, Tgraph* Gt){
 
 
 
-int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced, int verbose, Tdomain* D, Tgraph* Gp, Tgraph* Gt, int *invalid, igraph_bool_t *iso, igraph_vector_t *map, igraph_vector_ptr_t *maps){
+int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced, int verbose, Tdomain* D, Tgraph* Gp, Tgraph* Gt, int *invalid, igraph_bool_t *iso, igraph_vector_t *map, igraph_vector_ptr_t *maps, int *nbNodes, int *nbFail, int *nbSol, struct rusage *ru){
 	// if firstSol then search for the first solution; otherwise search for all solutions
 	// if induced then search for induced subgraphs; otherwise search for partial subgraphs
 	// return false if CPU time limit exceeded before the search is completed
@@ -952,10 +946,10 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced, int verbose, 
 	int nbVal[Gp->nbVertices];
 	int globalMatching[Gp->nbVertices];
 	
-	nbNodes++;
+	(*nbNodes)++;
 
-	getrusage(RUSAGE_SELF, &ru);
-	if (ru.ru_utime.tv_sec >= timeLimit) {
+	getrusage(RUSAGE_SELF, ru);
+	if (ru->ru_utime.tv_sec >= timeLimit) {
 		// CPU time limit exceeded
 	  IGRAPH_ERROR("LAD CPU time exceeded", IGRAPH_CPUTIME);
 	}
@@ -963,7 +957,7 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced, int verbose, 
 	if (!igraph_i_lad_filter(induced,D,Gp,Gt)){ 
 		// filtering has detected an inconsistency
 		if (verbose == 2) printf("Filtering has detected an inconsistency\n");
-		nbFail++;
+		(*nbFail)++;
 		igraph_i_lad_resetToFilter(D,Gp->nbVertices);
 		*invalid=0;
 		return 0;
@@ -982,7 +976,7 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced, int verbose, 
 	if (minDom==-1){ 
 	  // All vertices are matched => Solution found
 	  if (iso) { *iso = 1; }
-	  nbSol++;
+	  (*nbSol)++;
 	  if (map && igraph_vector_size(map)==0) {
 	    IGRAPH_CHECK(igraph_vector_resize(map, Gp->nbVertices));
 	    for (u=0; u<Gp->nbVertices; u++) {
@@ -1002,7 +996,7 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced, int verbose, 
 	    IGRAPH_FINALLY_CLEAN(2);
 	  }
 	  if (verbose >= 1){
-	    printf("Solution %d: ",nbSol);
+	    printf("Solution %d: ", *nbSol);
 	    for (u=0; u<Gp->nbVertices; u++) printf("%d=%d ",u,D->val[D->firstVal[u]]);
 	    printf("\n");
 	  }
@@ -1016,17 +1010,17 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced, int verbose, 
 	for (i=0; i<D->nbVal[minDom]; i++) val[i]=D->val[D->firstVal[minDom]+i];
 	
 	// branch on minDom=v, for every target node v in D(u)
-	for(i=0; ((i<nbVal[minDom]) && ((firstSol==0)||(nbSol==0))); i++){
+	for(i=0; ((i<nbVal[minDom]) && ((firstSol==0)||(*nbSol==0))); i++){
 		v = val[i]; 
 		if (verbose == 2) printf("Branch on %d=%d\n",minDom,v);
 		if ((!igraph_i_lad_removeAllValuesButOne(minDom,v,D,Gp,Gt)) || (!igraph_i_lad_matchVertex(minDom,induced,D,Gp,Gt))){
 			if (verbose == 2) printf("Inconsistency detected while matching %d to %d\n",minDom,v);
-			nbFail++; 
-			nbNodes++;
+			(*nbFail)++; 
+			(*nbNodes)++;
 			igraph_i_lad_resetToFilter(D,Gp->nbVertices);
 		} else {
 		  int invalid;
-		  IGRAPH_CHECK(igraph_i_lad_solve(timeLimit,firstSol,induced,verbose,D,Gp,Gt,&invalid,iso,map,maps));
+		  IGRAPH_CHECK(igraph_i_lad_solve(timeLimit,firstSol,induced,verbose,D,Gp,Gt,&invalid,iso,map,maps,nbNodes,nbFail,nbSol,ru));
 		}
 		// restore domain sizes and global all different matching
 		if (verbose == 2) printf("End of branch %d=%d\n",minDom,v);
@@ -1053,6 +1047,14 @@ int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
   Tdomain D;
   int invalidDomain;
   int u, nbToMatch = 0, *toMatch;
+  /* Number of nodes in the search tree */
+  int nbNodes=0;
+  /* number of failed nodes in the search tree */
+  int nbFail=0;
+  /* number of solutions found */
+  int nbSol=0;
+  /* reusable structure to get CPU time usage */
+  struct rusage ru;
 
   if (!iso && !map && !maps) {
     IGRAPH_ERROR("Please give least one of `iso', `map' or `maps'", 
@@ -1099,7 +1101,8 @@ int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
   if (invalidDomain) { return 0; }
 	
   IGRAPH_CHECK(igraph_i_lad_solve(time_limit, firstSol, induced, verbose, &D, 
-				  &Gp, &Gt, &invalidDomain, iso, map, maps));
+				  &Gp, &Gt, &invalidDomain, iso, map, maps, 
+				  &nbNodes, &nbFail, &nbSol, &ru));
   
   return 0;
 }
