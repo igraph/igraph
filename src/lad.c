@@ -1041,65 +1041,6 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced, int verbose, 
 	return 0;
 }
 
-
-void igraph_i_lad_usage(int status){
-	// print usage notice and exit with status code status
-	printf("Usage:\n");
-	printf("  -p FILE  Input pattern graph (mandatory)\n");
-	printf("  -t FILE  Input target graph (mandatory)\n\n"); 
-	printf("  -d FILE  Input domain\n"); 
-	printf("  -l INT   Set CPU time limit in seconds (default: 60)\n");
-	printf("  -f       Stop at first solution\n");
-	printf("  -i       Search for an induced subgraph (default: partial subgraph)\n");
-	printf("  -v       Print solutions (default: only number of solutions)\n");
-	printf("  -vv      Be verbose\n");
-	printf("  -h       Print this help message\n");
-	exit(status);
-}
-
-void igraph_i_lad_parse(int* timeLimit, bool* firstSol, bool* i, int* verbose, bool* initialDomains,  char* fileNameGp, char* fileNameGt, char* fileNameD, char* argv[], int argc){
-	// get parameter values
-	// return false if an error occurs; true otherwise
-	char ch;
-	extern char* optarg;
-	while ( (ch = getopt(argc, argv, "hik:p:t:a:fl:vd:"))!=-1 ) {
-		switch(ch) {
-			case 'v': (*verbose)++; break;
-			case 'f': *firstSol=true; break;
-			case 'l': *timeLimit=atoi(optarg); break;
-			case 'i': *i=true; break;
-			case 'p': strncpy(fileNameGp, optarg, 254); break;
-			case 't': strncpy(fileNameGt, optarg, 254); break;
-			case 'd': *initialDomains=1; strncpy(fileNameD, optarg, 254); break;
-			case 'h': igraph_i_lad_usage(0);
-			default:
-				printf("Unknown option: %c.\n", ch);
-				igraph_i_lad_usage(2);
-		}
-	}
-	if (fileNameGp[0] == 0){
-		printf("Error: no pattern graph given.\n");
-		igraph_i_lad_usage(2);
-	}
-	if (fileNameGt[0] == 0){
-		printf("Error: no target graph given.\n");
-		return igraph_i_lad_usage(2);
-	}
-}
-
-int igraph_i_lad_printStats(bool timeout){
-  // print statistics line and return exit status depending on timeout
-  getrusage(RUSAGE_SELF, &ru);
-  if (timeout)
-    printf("CPU time exceeded");
-  else
-    printf("Run completed");
-  printf(": %d solutions; %d fail nodes; %d nodes; %d.%06d seconds\n",
-	 nbSol, nbFail, nbNodes,
-	 (int) ru.ru_utime.tv_sec, (int) ru.ru_utime.tv_usec);
-  return timeout;
-}
-
 int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
 			     igraph_bool_t *iso, igraph_vector_t *map, 
 			     igraph_vector_ptr_t *maps, 
