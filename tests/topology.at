@@ -35,3 +35,9 @@ AT_SETUP([VF algorithm with compatibility functions])
 AT_KEYWORDS([isomorph isomorphic VF2 compatibility])
 AT_COMPILE_CHECK([simple/VF2-compat.c])
 AT_CLEANUP
+
+AT_SETUP([LAD subgraph isomorphism algorithm])
+AT_KEYWORDS([isomorph isomorphic subgraph isomorphism LAD])
+AT_COMPILE_CHECK([simple/igraph_subisomorphic_lad.c],
+		 [simple/igraph_subisomorphic_lad.out])
+AT_CLEANUP

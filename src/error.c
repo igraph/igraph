@@ -94,7 +94,8 @@ static const char *igraph_i_error_strings[]=
     /* 53 */ "LAPACK call resulted an error",
     /* 54 */ "Internal DrL error",
     /* 55 */ "Integer or double overflow",
-    /* 56 */ "Internal GPLK error"
+    /* 56 */ "Internal GPLK error",
+    /* 57 */ "CPU time exceeded"
 };
 
 const char* igraph_strerror(const int igraph_errno) {
