@@ -413,8 +413,9 @@ bool igraph_i_lad_compare(int size_mu, int* mu, int size_mv, int* mv) {
   return true;
 }
 
-int igraph_i_lad_initDomains(bool initialDomains, char* domainsFile, 
-			     Tdomain* D, Tgraph* Gp, Tgraph* Gt, int *empty) {
+int igraph_i_lad_initDomains(bool initialDomains, 
+			     igraph_vector_ptr_t *domains, Tdomain* D,
+			     Tgraph* Gp, Tgraph* Gt, int *empty) {
   /* for every pattern node u, initialize D(u) with every vertex v 
      such that for every neighbor u' of u there exists a different 
      neighbor v' of v such that degree(u) <= degree(v)
@@ -424,7 +425,6 @@ int igraph_i_lad_initDomains(bool initialDomains, char* domainsFile,
   int val[Gp->nbVertices*Gt->nbVertices];
   bool dom[Gt->nbVertices];
   int matchingSize, u, v, i, j;
-  FILE* fd=0;
 	
   D->globalMatchingP = (int*)malloc(sizeof(int)*Gp->nbVertices);
   memset(D->globalMatchingP, -1, sizeof(int)*Gp->nbVertices);
@@ -438,24 +438,15 @@ int igraph_i_lad_initDomains(bool initialDomains, char* domainsFile,
   D->toFilter = (int*)malloc(sizeof(int)*Gp->nbVertices);  
   D->valSize = 0;
   matchingSize = 0;
-  if ((initialDomains) && (fd=fopen(domainsFile, "r"))==NULL) {
-    printf("ERROR: Cannot open ascii input file %s", domainsFile); 
-    exit(1);	
-  }
 	
   for (u=0; u<Gp->nbVertices; u++) {
     if (initialDomains) { 
       /* read the list of target vertices which are compatible with u */
+      igraph_vector_t *vec=VECTOR(*domains)[u];
+      i=igraph_vector_size(vec);
       memset(dom, false, sizeof(bool)*Gt->nbVertices);
-      if ((fscanf(fd, "%d", &i)) != 1) {
-	printf("ERROR while reading input file %s", domainsFile); 
-	exit(1);
-      }
       for (j=0; j<i; j++) {
-	if ((fscanf(fd, "%d", &v)) != 1) {
-	  printf("ERROR while reading input file %s", domainsFile); 
-	  exit(1);	
-	} 
+	int v=VECTOR(*vec)[j];
 	dom[v] = true;
       }
     }
@@ -1155,12 +1146,13 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
 }
 
 int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target, 
+			     igraph_vector_ptr_t *domains,
 			     igraph_bool_t *iso, igraph_vector_t *map, 
 			     igraph_vector_ptr_t *maps, 
 			     igraph_bool_t induced, int time_limit) {
 
   bool firstSol = maps == 0;
-  bool initialDomains = false; 	/* TODO: add domains, possibly colors */
+  bool initialDomains = domains != 0;
   Tgraph Gp, Gt;
   Tdomain D;
   int invalidDomain;
@@ -1183,15 +1175,15 @@ int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
     
   igraph_i_lad_createGraph(pattern, &Gp);
   igraph_i_lad_createGraph(target, &Gt);
-
+  
   if (iso)  { *iso = 0; }
   if (map)  { igraph_vector_clear(map); } 
   if (maps) { igraph_vector_ptr_clear(maps); }
 
   if (Gp.nbVertices > Gt.nbVertices) {return 0; }
   
-  IGRAPH_CHECK(igraph_i_lad_initDomains(initialDomains, 0, &D, &Gp, &Gt, 
-					&invalidDomain));
+  IGRAPH_CHECK(igraph_i_lad_initDomains(initialDomains, domains, &D, &Gp, 
+					&Gt, &invalidDomain));
   if (invalidDomain) { return 0; }
   
   IGRAPH_CHECK(igraph_i_lad_updateMatching(Gp.nbVertices, Gt.nbVertices, 

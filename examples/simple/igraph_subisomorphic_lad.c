@@ -29,6 +29,13 @@ int main() {
   igraph_vector_t map;
   igraph_vector_ptr_t maps;
   int i, n;
+  int domainsvec[] = { 0, 2, 8, -1,
+		       4, 5, 6, 7, -1, 
+		       1, 3, 5, 6, 7, 8, -1,
+		       0, 2, 8, -1,
+		       1, 3, 7, 8, -1, -2 };
+  igraph_vector_ptr_t domains;
+  igraph_vector_t *v=0;
 
   igraph_small(&target, 9, IGRAPH_UNDIRECTED, 
 	       0,1,0,4,0,6,
@@ -55,8 +62,8 @@ int main() {
   igraph_vector_init(&map, 0);
   igraph_vector_ptr_init(&maps, 0);
   
-  igraph_subisomorphic_lad(&pattern, &target, &iso, &map, &maps, 
-			   /*induced=*/ 0, /*time_limit=*/ 0);
+  igraph_subisomorphic_lad(&pattern, &target, /*domains=*/ 0, &iso, &map, 
+			   &maps, /*induced=*/ 0, /*time_limit=*/ 0);
 
   if (!iso) { return 1; }
   igraph_vector_print(&map);
@@ -70,8 +77,8 @@ int main() {
  
   printf("---------\n");
 
-  igraph_subisomorphic_lad(&pattern, &target, &iso, &map, &maps,
-			   /*induced=*/ 1, /*time_limit=*/ 0);
+  igraph_subisomorphic_lad(&pattern, &target, /*domains=*/ 0, &iso, &map, 
+			   &maps, /*induced=*/ 1, /*time_limit=*/ 0);
 
   if (!iso) { return 2; }
   igraph_vector_print(&map);
@@ -83,6 +90,45 @@ int main() {
     igraph_free(v);
   }
 
+  printf("---------\n");
+
+  igraph_vector_ptr_init(&domains, 0);
+  i=0; while (1) { 
+    if (domainsvec[i] == -2) { 
+      break; 
+    } else if (domainsvec[i] == -1) {
+      igraph_vector_ptr_push_back(&domains, v);
+      v=0;
+    } else {
+      if (!v) { 
+	v=(igraph_vector_t *) malloc(sizeof(igraph_vector_t));
+	igraph_vector_init(v, 0);
+      }
+      igraph_vector_push_back(v, domainsvec[i]);
+    }
+    i++;
+  }
+
+  igraph_subisomorphic_lad(&pattern, &target, &domains, &iso, &map, &maps,
+			   /*induced=*/ 0, /*time_limit=*/ 0);
+  
+  if (!iso) { return 3; }
+  igraph_vector_print(&map);
+  n=igraph_vector_ptr_size(&maps);
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v=VECTOR(maps)[i];
+    igraph_vector_print(v);
+    igraph_vector_destroy(v);
+    igraph_free(v);
+  }
+
+  n=igraph_vector_ptr_size(&domains);
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v=VECTOR(domains)[i];
+    igraph_vector_destroy(v);
+    free(v);
+  }
+  
   igraph_vector_destroy(&map);
   igraph_vector_ptr_destroy(&maps);
 
