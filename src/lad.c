@@ -1145,6 +1145,51 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
   return 0;
 }
 
+/**
+ * \function igraph_subisomorphic_lad
+ * Check subgraph isomorphism with the LAD algorithm
+ *
+ * Check whether \p pattern is isomorphic to a subgraph os \p target.
+ * The original LAD implementation by Christine Solnon was used as the 
+ * basis of this code. 
+ * 
+ * </para><para>
+ * See more about at http://liris.cnrs.fr/csolnon/LAD.html and in
+ * Christine Solnon: AllDifferent-based Filtering for Subgraph
+ * Isomorphism. Artificial Intelligence, 174(12-13):850-864, August
+ * 2010, Elsevier
+ * 
+ * \param pattern The smaller graph, it can be directed or undirected.
+ * \param target The bigger graph, it can be directed or undirected. 
+ * \param domains A pointer vector, or a null pointer. If a pointer
+ *    vector, then it must contain pointers to \c igraph_vector_t
+ *    objects and the length of the vector must match the number of
+ *    vertices in the \p pattern graph. For each vertex, the ids of
+ *    the compatible vertices in the target graph are listed.
+ * \param iso Pointer to a boolean, or a null pointer. If not a null
+ *    pointer, then the boolean is set to TRUE (1) if a subgraph
+ *    isomorphism is found, and to FALSE (0) otherwise.
+ * \param map Pointer to a vector or a null pointer. If not a null
+ *    pointer and a subgraph isomorphism is found, the matching
+ *    vertices from the target graph are listed here, for each vertex
+ *    (in vertex id order) from the pattern graph.
+ * \param maps Pointer vector or a null pointer. If not a null
+ *    pointer, then all subgraph isomorphisms are stored in the
+ *    pointer vector, in \c igraph_vector_t objects.
+ * \param induced Boolean, whether to search for induced matching
+ *    subgraphs.
+ * \param time_limit Processor time limit in seconds. Supply zero
+ *    here for no limit. If the time limit is over, then the function
+ *    signals an error.
+ * \return Error code
+ * 
+ * \sa \ref igraph_subisomorphic_vf2() for the VF2 algorithm.
+ * 
+ * Time complexity: exponential.
+ * 
+ * \example examples/simple/igraph_subisomorphic_lad.c
+ */
+
 int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target, 
 			     igraph_vector_ptr_t *domains,
 			     igraph_bool_t *iso, igraph_vector_t *map, 
