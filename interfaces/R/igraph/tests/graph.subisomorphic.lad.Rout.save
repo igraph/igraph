@@ -1,0 +1,136 @@
+
+R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> pattern <- graph.formula(1:2:3:4:5,
++                          1 - 2:5, 2 - 1:5:3, 3 - 2:4, 4 - 3:5, 5 - 4:2:1)
+> target <- graph.formula(1:2:3:4:5:6:7:8:9,
++                         1 - 2:5:7, 2 - 1:5:3, 3 - 2:4, 4 - 3:5:6:8:9,
++                         5 - 1:2:4:6:7, 6 - 7:5:4:9, 7 - 1:5:6,
++                         8 - 4:9, 9 - 6:4:8)
+> domains <- list(`1` = c(1,3,9), `2` = c(5,6,7,8), `3` = c(2,4,6,7,8,9),
++                 `4` = c(1,3,9), `5` = c(2,4,8,9))
+> graph.subisomorphic.lad(pattern, target, all.maps=TRUE)
+$iso
+[1] TRUE
+
+$map
+[1] 2 1 7 6 5
+
+$maps
+$maps[[1]]
+[1] 2 1 7 6 5
+
+$maps[[2]]
+[1] 1 2 3 4 5
+
+$maps[[3]]
+[1] 6 4 3 2 5
+
+$maps[[4]]
+[1] 8 4 5 6 9
+
+$maps[[5]]
+[1] 5 4 8 9 6
+
+$maps[[6]]
+[1] 9 4 5 7 6
+
+$maps[[7]]
+[1] 1 5 4 6 7
+
+$maps[[8]]
+[1] 1 5 4 3 2
+
+$maps[[9]]
+[1] 4 5 1 7 6
+
+$maps[[10]]
+[1] 7 5 4 9 6
+
+$maps[[11]]
+[1] 6 5 2 3 4
+
+$maps[[12]]
+[1] 6 5 2 1 7
+
+$maps[[13]]
+[1] 2 5 6 7 1
+
+$maps[[14]]
+[1] 9 6 7 5 4
+
+$maps[[15]]
+[1] 5 6 9 8 4
+
+$maps[[16]]
+[1] 4 6 7 1 5
+
+$maps[[17]]
+[1] 7 6 9 4 5
+
+$maps[[18]]
+[1] 1 7 6 4 5
+
+$maps[[19]]
+[1] 6 7 1 2 5
+
+$maps[[20]]
+[1] 8 9 6 5 4
+
+
+> graph.subisomorphic.lad(pattern, target, induced=TRUE, all.maps=TRUE)
+$iso
+[1] TRUE
+
+$map
+[1] 1 2 3 4 5
+
+$maps
+$maps[[1]]
+[1] 1 2 3 4 5
+
+$maps[[2]]
+[1] 6 4 3 2 5
+
+$maps[[3]]
+[1] 6 5 2 3 4
+
+$maps[[4]]
+[1] 1 5 4 3 2
+
+
+> graph.subisomorphic.lad(pattern, target, domains=domains, all.maps=TRUE)
+$iso
+[1] TRUE
+
+$map
+[1] 1 5 4 3 2
+
+$maps
+$maps[[1]]
+[1] 1 5 4 3 2
+
+
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  0.331   0.044   0.412 
