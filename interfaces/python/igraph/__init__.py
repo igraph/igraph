@@ -2148,7 +2148,8 @@ class Graph(GraphBase):
         """
         def create_list_from_indices(l, n):
             result = [None] * n
-            for i, v in l: result[i] = v
+            for i, v in l:
+                result[i] = v
             return result
 
         # Construct the vertices
@@ -2221,6 +2222,95 @@ class Graph(GraphBase):
 
             # Create the graph
             return klass(n, edge_list, directed, {}, vertex_attrs, edge_attrs)
+
+    #####################################################
+    # Constructor for tuple-like representation of graphs
+
+    @classmethod
+    def TupleList(klass, edges, directed=False, \
+            vertex_name_attr="name", edge_attrs=None, weights=False):
+        """Constructs a graph from a list-of-tuples representation.
+
+        This representation assumes that the edges of the graph are encoded
+        in a list of tuples (or lists). Each item in the list must have at least
+        two elements, which specify the source and the target vertices of the edge.
+        The remaining elements (if any) specify the edge attributes of that edge,
+        where the names of the edge attributes originate from the C{edge_attrs}
+        list. The names of the vertices will be stored in the vertex attribute
+        given by C{vertex_name_attr}.
+
+        The default parameters of this function are suitable for creating
+        unweighted graphs from lists where each item contains the source vertex
+        and the target vertex. If you have a weighted graph, you can use items
+        where the third item contains the weight of the edge by setting
+        C{edge_attrs} to C{"weight"} or C{["weight"]}. If you have even more
+        edge attributes, add them to the end of each item in the C{edges}
+        list and also specify the corresponding edge attribute names in
+        C{edge_attrs} as a list.
+
+        @param edges: the data source for the edges. This must be a list
+          where each item is a tuple (or list) containing at least two
+          items: the name of the source and the target vertex. Note that
+          names will be assigned to the C{name} vertex attribute (or another
+          vertex attribute if C{vertex_name_attr} is specified), even if
+          all the vertex names in the list are in fact numbers.
+        @param directed: whether the constructed graph will be directed
+        @param vertex_name_attr: the name of the vertex attribute that will
+          contain the vertex names.
+        @param edge_attrs: the names of the edge attributes that are filled
+          with the extra items in the edge list (starting from index 2, since
+          the first two items are the source and target vertices). C{None}
+          means that only the source and target vertices will be extracted
+          from each item. If you pass a string here, it will be wrapped in
+          a list for convenience.
+        @param weights: alternative way to specify that the graph is
+          weighted. If you set C{weights} to C{true} and C{edge_attrs} is
+          not given, it will be assumed that C{edge_attrs} is C{["weight"]}
+          and igraph will parse the third element from each item into an
+          edge weight. If you set C{weights} to a string, it will be assumed
+          that C{edge_attrs} contains that string only, and igraph will
+          store the edge weights in that attribute.
+        @return: the graph that was constructed
+        """
+        if edge_attrs is None:
+            if not weights:
+                edge_attrs = ()
+            else:
+                if not isinstance(weights, basestring):
+                    weights = "weight"
+                edge_attrs = [weights]
+        else:
+            if weights:
+                raise ValueError("`weights` must be False if `edge_attrs` is "
+                        "not None")
+
+        if isinstance(edge_attrs, basestring):
+            edge_attrs = [edge_attrs]
+
+        # Set up a vertex ID generator
+        idgen = UniqueIdGenerator()
+
+        # Construct the edges and the edge attributes
+        edge_list = []
+        edge_attributes = {}
+        for name in edge_attrs:
+            edge_attributes[name] = []
+
+        for item in edges:
+            edge_list.append((idgen[item[0]], idgen[item[1]]))
+            for index, name in enumerate(edge_attrs, 2):
+                try:
+                    edge_attributes[name].append(item[index])
+                except IndexError:
+                    edge_attributes[name].append(None)
+
+        # Set up the "name" vertex attribute
+        vertex_attributes = {}
+        vertex_attributes[vertex_name_attr] = idgen.values()
+        n = len(idgen)
+
+        # Construct the graph
+        return klass(n, edge_list, directed, {}, vertex_attributes, edge_attributes)
 
     #################################
     # Constructor for graph formulae

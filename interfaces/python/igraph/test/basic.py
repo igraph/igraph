@@ -259,11 +259,69 @@ class GraphDictListTests(unittest.TestCase):
         self.failUnless(g.es["advice"] == [4, 5, 5, 4, 2])
 
 
+class GraphTupleListTests(unittest.TestCase):
+    def setUp(self):
+        self.edges = [ \
+                ("Alice", "Bob", 4, 4),
+                ("Cecil", "Bob", 5, 5),
+                ("Cecil", "Alice", 5, 5),
+                ("David", "Alice", 2, 4),
+                ("David", "Bob", 1, 2)
+        ]
+
+    def testGraphFromTupleList(self):
+        g = Graph.TupleList(self.edges)
+        self.checkIfOK(g, "name", ())
+
+    def testGraphFromTupleListWithEdgeAttributes(self):
+        g = Graph.TupleList(self.edges, edge_attrs=("friendship", "advice"))
+        self.checkIfOK(g, "name", ("friendship", "advice"))
+        g = Graph.TupleList(self.edges, edge_attrs=("friendship", ))
+        self.checkIfOK(g, "name", ("friendship", ))
+        g = Graph.TupleList(self.edges, edge_attrs="friendship")
+        self.checkIfOK(g, "name", ("friendship", ))
+
+    def testGraphFromTupleListWithDifferentNameAttribute(self):
+        g = Graph.TupleList(self.edges, vertex_name_attr="spam")
+        self.checkIfOK(g, "spam", ())
+
+    def testGraphFromTupleListWithWeights(self):
+        g = Graph.TupleList(self.edges, weights=True)
+        self.checkIfOK(g, "name", ("weight", ))
+        g = Graph.TupleList(self.edges, weights="friendship")
+        self.checkIfOK(g, "name", ("friendship", ))
+        g = Graph.TupleList(self.edges, weights=False)
+        self.checkIfOK(g, "name", ())
+        self.assertRaises(ValueError, Graph.TupleList,
+                [self.edges], weights=True, edge_attrs="friendship")
+
+    def testNoneForMissingAttributes(self):
+        g = Graph.TupleList(self.edges, edge_attrs=("friendship", "advice", "spam"))
+        self.checkIfOK(g, "name", ("friendship", "advice", "spam"))
+
+    def checkIfOK(self, g, name_attr, edge_attrs):
+        self.failUnless(g.vcount() == 4 and g.ecount() == 5 and g.is_directed() == False)
+        self.failUnless(g.get_edgelist() == [(0, 1), (1, 2), (0, 2), (0, 3), (1, 3)])
+        self.failUnless(g.attributes() == [])
+        self.failUnless(g.vertex_attributes() == [name_attr])
+        self.failUnless(g.vs[name_attr] == ["Alice", "Bob", "Cecil", "David"])
+        if edge_attrs:
+            self.failUnless(sorted(g.edge_attributes()) == sorted(edge_attrs))
+            self.failUnless(g.es[edge_attrs[0]] == [4, 5, 5, 2, 1])
+            if len(edge_attrs) > 1:
+                self.failUnless(g.es[edge_attrs[1]] == [4, 5, 5, 4, 2])
+            if len(edge_attrs) > 2:
+                self.failUnless(g.es[edge_attrs[2]] == [None] * 5)
+        else:
+            self.failUnless(g.edge_attributes() == [])
+
 def suite():
     basic_suite = unittest.makeSuite(BasicTests)
     datatype_suite = unittest.makeSuite(DatatypeTests)
     graph_dict_list_suite = unittest.makeSuite(GraphDictListTests)
-    return unittest.TestSuite([basic_suite, datatype_suite, graph_dict_list_suite])
+    graph_tuple_list_suite = unittest.makeSuite(GraphTupleListTests)
+    return unittest.TestSuite([basic_suite, datatype_suite, graph_dict_list_suite,
+        graph_tuple_list_suite])
 
 def test():
     runner = unittest.TextTestRunner()
