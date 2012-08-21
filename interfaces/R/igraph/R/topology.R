@@ -64,9 +64,17 @@ graph.subisomorphic.lad <- function(pattern, target, domains=NULL,
 
   if (map) {
     res$map <- res$map + 1
+    if (getIgraphOpt("add.vertex.names") && is.named(target)) {
+      names(res$map) <- V(target)$name[res$map]
+    }
   }
   if (all.maps) {
     res$maps <- lapply(res$maps, function(x) x + 1)
+    if (getIgraphOpt("add.vertex.names") && is.named(target)) {
+      for (i in seq_along(res$maps)) {
+        names(res$maps[[i]]) <- V(target)$name[ res$maps[[i]] ]
+      }
+    }
   }
   res
 }
