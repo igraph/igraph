@@ -20,6 +20,132 @@
 #
 ###################################################################
 
+graph.get.isomorphisms.vf2 <- function(graph1, graph2, vertex.color1,
+                                       vertex.color2, edge.color1,
+                                       edge.color2) {
+  # Argument checks
+  if (!is.igraph(graph1)) { stop("Not a graph object") }
+  if (!is.igraph(graph2)) { stop("Not a graph object") }
+  if (missing(vertex.color1)) { 
+    if ("color" %in% list.vertex.attributes(graph1)) { 
+      vertex.color1 <- V(graph1)$color 
+    } else { 
+      vertex.color1 <- NULL 
+    } 
+  } 
+  if (!is.null(vertex.color1)) { 
+    vertex.color1 <- as.integer(vertex.color1)-1L 
+  }
+  if (missing(vertex.color2)) { 
+    if ("color" %in% list.vertex.attributes(graph2)) { 
+      vertex.color2 <- V(graph2)$color 
+    } else { 
+      vertex.color2 <- NULL 
+    } 
+  } 
+  if (!is.null(vertex.color2)) { 
+    vertex.color2 <- as.integer(vertex.color2)-1L 
+  }
+  if (missing(edge.color1)) { 
+    if ("color" %in% list.edge.attributes(graph1)) { 
+      edge.color1 <- E(graph1)$color 
+    } else { 
+      edge.color1 <- NULL 
+    } 
+  } 
+  if (!is.null(edge.color1)) { 
+    edge.color1 <- as.integer(edge.color1)-1L 
+  }
+  if (missing(edge.color2)) { 
+    if ("color" %in% list.edge.attributes(graph2)) { 
+      edge.color2 <- E(graph2)$color 
+    } else { 
+      edge.color2 <- NULL 
+    } 
+  } 
+  if (!is.null(edge.color2)) { 
+    edge.color2 <- as.integer(edge.color2)-1L 
+  }
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_get_isomorphisms_vf2", graph1, graph2, vertex.color1,
+               vertex.color2, edge.color1, edge.color2,
+               PACKAGE="igraph")
+  
+  res <- lapply(res, "+", 1)
+
+  if (getIgraphOpt("add.vertex.names") && is.named(graph2)) {
+    for (i in seq_along(res)) {
+      names(res[[i]]) <- V(graph2)$name[ res[[i]] ]
+    }
+  }
+  res
+}
+
+graph.get.subisomorphisms.vf2 <- function(graph1, graph2, vertex.color1,
+                                          vertex.color2, edge.color1,
+                                          edge.color2) {
+  # Argument checks
+  if (!is.igraph(graph1)) { stop("Not a graph object") }
+  if (!is.igraph(graph2)) { stop("Not a graph object") }
+  if (missing(vertex.color1)) { 
+    if ("color" %in% list.vertex.attributes(graph1)) { 
+      vertex.color1 <- V(graph1)$color 
+    } else { 
+      vertex.color1 <- NULL 
+    } 
+  } 
+  if (!is.null(vertex.color1)) { 
+    vertex.color1 <- as.integer(vertex.color1)-1L 
+  }
+  if (missing(vertex.color2)) { 
+    if ("color" %in% list.vertex.attributes(graph2)) { 
+      vertex.color2 <- V(graph2)$color 
+    } else { 
+      vertex.color2 <- NULL 
+    } 
+  } 
+  if (!is.null(vertex.color2)) { 
+    vertex.color2 <- as.integer(vertex.color2)-1L 
+  }
+  if (missing(edge.color1)) { 
+    if ("color" %in% list.edge.attributes(graph1)) { 
+      edge.color1 <- E(graph1)$color 
+    } else { 
+      edge.color1 <- NULL 
+    } 
+  } 
+  if (!is.null(edge.color1)) { 
+    edge.color1 <- as.integer(edge.color1)-1L 
+  }
+  if (missing(edge.color2)) { 
+    if ("color" %in% list.edge.attributes(graph2)) { 
+      edge.color2 <- E(graph2)$color 
+    } else { 
+      edge.color2 <- NULL 
+    } 
+  } 
+  if (!is.null(edge.color2)) { 
+    edge.color2 <- as.integer(edge.color2)-1L 
+  }
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_get_subisomorphisms_vf2", graph1, graph2,
+               vertex.color1, vertex.color2, edge.color1, edge.color2,
+               PACKAGE="igraph")
+
+  res <- lapply(res, "+", 1)
+
+  if (getIgraphOpt("add.vertex.names") && is.named(graph2)) {
+    for (i in seq_along(res)) {
+      names(res[[i]]) <- V(graph2)$name[ res[[i]] ]
+    }
+  }
+  res
+}
+
 graph.isoclass.subgraph <- function(graph, vids) {
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }

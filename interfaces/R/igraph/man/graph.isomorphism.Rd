@@ -237,10 +237,14 @@ g2 <- graph.ring(10)
 graph.isomorphic.vf2(g1, g2)
 
 V(g1)$color <- rep(1:2, length=vcount(g1))
-V(g2)$color <- rep(1:2, length=vcount(g2))
+V(g2)$color <- rep(2:1, length=vcount(g2))
 graph.count.isomorphisms.vf2(g1, g2)
 graph.count.isomorphisms.vf2(g1, g2, vertex.color1=NULL,
     vertex.color2=NULL)
+
+V(g1)$name <- letters[1:vcount(g1)]
+V(g2)$name <- LETTERS[1:vcount(g2)]
+graph.get.isomorphisms.vf2(g1, g2)
 
 V(g1)$color <- 1
 V(g2)$color <- 2
