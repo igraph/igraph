@@ -78,8 +78,12 @@ graph.isocreate(size, number, directed=TRUE)
     \code{\link{canonical.permutation}} for possible values.}
   \item{vids}{Numeric vector, the vertex ids of vertices to form the
     induced subgraph for determining the isomorphism class.}
-  \item{pattern}{The smaller graph, it might be directed or undirected.}
-  \item{target}{The bigger graph, it might be directed or undirected.}
+  \item{pattern}{The smaller graph, it might be directed or
+    undirected. Undirected graphs are treated as directed graphs with
+    mutual edges.}
+  \item{target}{The bigger graph, it might be directed or
+    undirected. Undirected graphs are treated as directed graphs with
+    mutual edges.}
   \item{domains}{If not \code{NULL}, then it specifies matching
     restrictions. It must be a list of \code{target} vertex sets, given
     as numeric vertex ids or symbolic vertex names. The length of the
@@ -301,5 +305,12 @@ domains <- list(`1` = c(1,3,9), `2` = c(5,6,7,8), `3` = c(2,4,6,7,8,9),
 graph.subisomorphic.lad(pattern, target, all.maps=TRUE)
 graph.subisomorphic.lad(pattern, target, induced=TRUE, all.maps=TRUE)
 graph.subisomorphic.lad(pattern, target, domains=domains, all.maps=TRUE)
+
+# Directed LAD example
+pattern <- graph.formula(1:2:3, 1 -+ 2:3)
+uring <- graph.ring(10)
+dring <- graph.ring(10, directed=TRUE)
+graph.subisomorphic.lad(pattern, uring)
+graph.subisomorphic.lad(pattern, dring)
 }
 \keyword{graphs}
