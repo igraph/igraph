@@ -12,7 +12,7 @@ rglplot(x, \dots)
 \arguments{
   \item{x}{The graph to plot.}
   \item{\dots}{Additional arguments, see \code{\link{igraph.plotting}}
-    fo the details}
+    for the details}
 }
 \details{
   Note that \code{rglplot} is considered to be highly experimental. It

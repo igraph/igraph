@@ -47,7 +47,8 @@
     around the marked vertex groups. It is in the same units as the vertex
     sizes. If a vector is given, then different values are used for the
     different vertex groups.} 
-  \item{\dots}{Additional arguments, passed to \code{\link{plot}}.}
+  \item{\dots}{Additional plotting parameters. See
+    \link{igraph.plotting} for the complete list.}
 }
 \details{
   One convenient way to plot graphs is to plot with \code{\link{tkplot}}
