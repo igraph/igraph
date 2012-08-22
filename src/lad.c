@@ -80,8 +80,6 @@ int igraph_i_lad_createGraph(const igraph_t *igraph, Tgraph* graph) {
   IGRAPH_VECTOR_INIT_FINALLY(&graph->nbSucc, no_of_nodes);
   IGRAPH_CHECK(igraph_degree(igraph, &graph->nbSucc, igraph_vss_all(), 
 			     IGRAPH_OUT, IGRAPH_LOOPS));
-  IGRAPH_CHECK(igraph_adjlist_init(igraph, &graph->succ, IGRAPH_OUT));
-  IGRAPH_FINALLY(igraph_adjlist_destroy, &graph->succ);
   
   graph->nbVertices = no_of_nodes;
 
