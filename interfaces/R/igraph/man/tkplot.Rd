@@ -41,7 +41,8 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
   \item{norm}{Logical, should we norm the coordinates.}
   \item{degree}{The degree to rotate the plot.}
   \item{rad}{The degree to rotate the plot, in radian.}
-  \item{\dots}{Not used right now.}
+  \item{\dots}{Additional plotting parameters. See
+    \link{igraph.plotting} for the complete list.}
 }
 \details{
   \code{tkplot} is an interactive graph drawing facility. It is not very
