@@ -55,6 +55,7 @@
 #include "igraph_vector_ptr.h"
 #include "igraph_memory.h"
 #include "igraph_matrix.h"
+#include "igraph_interrupt_internal.h"
 
 /* define boolean type as char */
 #define true 1
@@ -1208,6 +1209,7 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
 	
   /* branch on minDom=v, for every target node v in D(u) */
   for(i=0; ((i<nbVal[minDom]) && ((firstSol==0)||(*nbSol==0))); i++) {
+    IGRAPH_ALLOW_INTERRUPTION();
     v = val[i]; 
     if ((!igraph_i_lad_removeAllValuesButOne(minDom, v, D, Gp, Gt)) || 
 	(!igraph_i_lad_matchVertex(minDom, induced, D, Gp, Gt))) {
