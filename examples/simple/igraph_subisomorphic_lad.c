@@ -129,6 +129,7 @@ int main() {
     free(v);
   }
   
+  igraph_vector_ptr_destroy(&domains);
   igraph_vector_destroy(&map);
   igraph_vector_ptr_destroy(&maps);
 
