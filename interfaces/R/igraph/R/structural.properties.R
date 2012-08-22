@@ -359,6 +359,7 @@ transitivity <- function(graph, type=c("undirected", "global", "globalundirected
     .Call("R_igraph_transitivity_avglocal_undirected", graph, isolates,
           PACKAGE="igraph")
   } else if (type==3) {
+    if (is.null(vids)) { vids <- V(graph) }
     vids <- as.igraph.vs(graph, vids)-1
     if (is.null(weights)) {
       .Call("R_igraph_transitivity_local_undirected", graph, vids,
