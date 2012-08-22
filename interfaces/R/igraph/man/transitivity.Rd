@@ -115,11 +115,10 @@ transitivity(gw, vids="A", type="weighted")
 # Weighted reduces to "local" if weights are the same
 gw2 <- erdos.renyi.game(1000, 10/1000)
 E(gw2)$weight <- 1
-t1 <- transitivity(gw2, vids=V(gw2), type="local")
-t2 <- transitivity(gw2, vids=V(gw2), type="weighted")
-
-all(
-    transitivity(gw2, vids=V(gw2), type="weighted"))
+t1 <- transitivity(gw2, type="local")
+t2 <- transitivity(gw2, type="weighted")
+all(is.na(t1) == is.na(t2))
+all(na.omit(t1 == t2))
 }
 \keyword{graphs}
 
