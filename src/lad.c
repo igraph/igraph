@@ -1313,11 +1313,11 @@ int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
   if (map)  { igraph_vector_clear(map); } 
   if (maps) { igraph_vector_ptr_clear(maps); }
 
-  if (Gp.nbVertices > Gt.nbVertices) { goto exit; }
+  if (Gp.nbVertices > Gt.nbVertices) { goto exit3; }
   
   IGRAPH_CHECK(igraph_i_lad_initDomains(initialDomains, domains, &D, &Gp, 
 					&Gt, &invalidDomain));
-  if (invalidDomain) { goto exit; }
+  if (invalidDomain) { goto exit2; }
   
   IGRAPH_CHECK(igraph_i_lad_updateMatching(Gp.nbVertices, Gt.nbVertices, 
 					   &D.nbVal, &D.firstVal, &D.val, 
@@ -1349,7 +1349,13 @@ int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
 				  &Gp, &Gt, &invalidDomain, iso, map, maps, 
 				  &nbNodes, &nbFail, &nbSol, &ru));
 
-  exit:
+ exit:
+  
+  igraph_vector_int_destroy(&D.val);
+  igraph_vector_int_destroy(&D.matching);
+  IGRAPH_FINALLY_CLEAN(2);
+
+ exit2:
   
   igraph_vector_int_destroy(&D.globalMatchingP);
   igraph_vector_int_destroy(&D.globalMatchingT);
@@ -1359,9 +1365,9 @@ int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
   igraph_matrix_int_destroy(&D.firstMatch);
   igraph_vector_char_destroy(&D.markedToFilter);
   igraph_vector_int_destroy(&D.toFilter);
-  igraph_vector_int_destroy(&D.val);
-  igraph_vector_int_destroy(&D.matching);
-  IGRAPH_FINALLY_CLEAN(10);
+  IGRAPH_FINALLY_CLEAN(8);
+
+ exit3:
 
   igraph_matrix_char_destroy(&Gt.isEdge);
   igraph_adjlist_destroy(&Gt.succ);
@@ -1370,6 +1376,6 @@ int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
   igraph_adjlist_destroy(&Gp.succ);
   igraph_vector_destroy(&Gp.nbSucc);
   IGRAPH_FINALLY_CLEAN(6);
-  
+
   return 0;
 }
