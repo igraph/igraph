@@ -1652,6 +1652,12 @@ igraph_isomorphic_bliss:
 igraph_automorphisms:
         PARAMS: GRAPH graph, BLISSSH sh="fm", OUT BLISSINFO info
 
+igraph_subisomorphic_lad:
+        PARAMS: GRAPH pattern, GRAPH target, VERTEXSETLIST_OR_0 domains, \
+                OUT BOOLEANPTR_OR_0 iso, OUT VECTOR_OR_0 map, \
+                OUT VECTORLIST_OR_0 maps, BOOLEAN induced, INT time_limit
+        IGNORE: RR, RC
+
 #######################################
 # SCG
 #######################################

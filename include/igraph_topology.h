@@ -59,6 +59,13 @@ int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
 int igraph_subisomorphic(const igraph_t *graph1, const igraph_t *graph2,
 			 igraph_bool_t *iso);
 
+/* LAD */
+int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
+			     igraph_vector_ptr_t *domains,
+			     igraph_bool_t *iso, igraph_vector_t *map, 
+			     igraph_vector_ptr_t *maps, 
+			     igraph_bool_t induced, int time_limit);
+
 /* VF2 family*/
 /** 
  * \typedef igraph_isohandler_t

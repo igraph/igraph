@@ -11,6 +11,7 @@
 \alias{graph.isomorphic.34}
 \alias{graph.isomorphic.bliss}
 \alias{graph.subisomorphic.vf2}
+\alias{graph.subisomorphic.lad}
 \concept{Graph isomorphism}
 \concept{Subgraph isomorphism}
 \concept{VF2 algorithm}
@@ -40,6 +41,10 @@ graph.count.subisomorphisms.vf2(graph1, graph2,
 graph.get.subisomorphisms.vf2(graph1, graph2,
      vertex.color1, vertex.color2,
      edge.color1, edge.color2)
+
+graph.subisomorphic.lad (pattern, target, domains = NULL, 
+                         induced = FALSE, map = TRUE, all.maps = FALSE,
+                         time.limit = Inf)
 
 graph.isoclass(graph)
 graph.isoclass.subgraph(graph, vids)
@@ -73,6 +78,26 @@ graph.isocreate(size, number, directed=TRUE)
     \code{\link{canonical.permutation}} for possible values.}
   \item{vids}{Numeric vector, the vertex ids of vertices to form the
     induced subgraph for determining the isomorphism class.}
+  \item{pattern}{The smaller graph, it might be directed or
+    undirected. Undirected graphs are treated as directed graphs with
+    mutual edges.}
+  \item{target}{The bigger graph, it might be directed or
+    undirected. Undirected graphs are treated as directed graphs with
+    mutual edges.}
+  \item{domains}{If not \code{NULL}, then it specifies matching
+    restrictions. It must be a list of \code{target} vertex sets, given
+    as numeric vertex ids or symbolic vertex names. The length of the
+    list must be \code{vcount(pattern)} and for each vertex in
+    \code{pattern} it gives the allowed matching vertices in
+    \code{target}.}
+  \item{induced}{Logical scalar, whether to search for an induced
+    subgraph. It is \code{FALSE} by default.}
+  \item{map}{Logical scalar, whether to return a mapping between
+    \code{pattern} and \code{target}. Defaults to \code{TRUE}.}
+  \item{all.maps}{Logical scalar, whether to return all mappings between
+    \code{pattern} and \code{target}. Defaults to \code{FALSE}.}
+  \item{time.limit}{The processor time limit for the computation, in
+    seconds. It defaults to \code{Inf}, which means no limit. }
 }
 \details{
   \code{graph.isomorphic} decides whether two graphs are isomorphic.
@@ -121,6 +146,13 @@ graph.isocreate(size, number, directed=TRUE)
   \code{graph.get.subisomorphisms.vf2} calculates all isomorphic
   mappings between \code{graph2} and the subgraphs of \code{graph1}. It
   uses the VF2 algorithm.
+
+  \code{graph.subisomorphic.lad} checks whether \code{pattern} is
+  isomorphic to a subgraph or induced subgraph of \code{target}. It can
+  also optionally return a mapping, or all possible mappings between the
+  two graphs. Its \code{domains} argument allows for a flexible way to
+  restrict the matching to a subset of allowed vertices, individually
+  for each vertex in \code{pattern}.
   
   \code{graph.isoclass} returns the isomorphism class of a graph, a
   non-negative integer number. Graphs (with the same number of vertices)
@@ -195,6 +227,19 @@ graph.isocreate(size, number, directed=TRUE)
   \code{graph.get.subisomorphisms.vf2} returns a list of numeric
   vectors, each numeric vector is an isomorphic mapping from
   \code{graph2} to a subgraph of \code{graph1}.
+
+  \code{graph.subisomorphic.lad} return a named list with three entries:
+  \item{iso}{Logical scalar, whether the algorithm found a subgraph (or
+    induced subgraph is the \code{induced} argument in \code{TRUE}) in
+    \code{target} that is isomorphic to \code{pattern}.}
+  \item{map}{If a mapping is requested via the \code{map} argument, then
+    a numeric vector of vertex ids from \code{target}, the matching
+    vertices for each \code{pattern} vertex in \code{pattern} vertex id
+    order. Otherwise \code{NULL}.}
+  \item{maps}{If all mappings are requested via the \code{all.maps}
+    argument, then all possible mappings from \code{pattern} to
+    \code{target}, in a list of vectors, where each vector is in the
+    same format as \code{map} just above.}
   
   \code{graph.isoclass} and \code{graph.isoclass.subgraph} return a
   non-negative integer number. 
@@ -252,5 +297,24 @@ graph.isomorphic.vf2(g1, g2)
 graph.isomorphic.vf2(g2, g2, vertex.color1=NULL,
     vertex.color2=NULL)
 
+# The LAD example
+pattern <- graph.formula(1:2:3:4:5,
+                         1 - 2:5, 2 - 1:5:3, 3 - 2:4, 4 - 3:5, 5 - 4:2:1)
+target <- graph.formula(1:2:3:4:5:6:7:8:9,
+                        1 - 2:5:7, 2 - 1:5:3, 3 - 2:4, 4 - 3:5:6:8:9,
+                        5 - 1:2:4:6:7, 6 - 7:5:4:9, 7 - 1:5:6,
+                        8 - 4:9, 9 - 6:4:8)
+domains <- list(`1` = c(1,3,9), `2` = c(5,6,7,8), `3` = c(2,4,6,7,8,9),
+                `4` = c(1,3,9), `5` = c(2,4,8,9))
+graph.subisomorphic.lad(pattern, target, all.maps=TRUE)
+graph.subisomorphic.lad(pattern, target, induced=TRUE, all.maps=TRUE)
+graph.subisomorphic.lad(pattern, target, domains=domains, all.maps=TRUE)
+
+# Directed LAD example
+pattern <- graph.formula(1:2:3, 1 -+ 2:3)
+uring <- graph.ring(10)
+dring <- graph.ring(10, directed=TRUE)
+graph.subisomorphic.lad(pattern, uring)
+graph.subisomorphic.lad(pattern, dring)
 }
 \keyword{graphs}

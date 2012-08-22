@@ -253,7 +253,7 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     distances.c fortran_intrinsics.c matching.c \
 			     scg.c scg_approximate_methods.c scg_exact_scg.c \
 			     scg_kmeans.c scg_utils.c scg_optimal_method.c \
-			     qsort.c qsort_r.c types.c
+			     qsort.c qsort_r.c types.c lad.c
 
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
