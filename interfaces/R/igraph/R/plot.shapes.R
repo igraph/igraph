@@ -631,7 +631,7 @@ mypie <- function(x, y, values, radius, edges=200, col=NULL, angle=45,
 
     for (i in seq_len(nrow(coords))) {
       pie <- if(length(vertex.pie)==1) {
-        vertex.pie
+        vertex.pie[[1]]
       } else {
         vertex.pie[[i]]
       }
