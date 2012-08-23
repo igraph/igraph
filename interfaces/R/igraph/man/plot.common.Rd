@@ -451,6 +451,27 @@ plot(g, vertex.shape=shapes, vertex.label=shapes, vertex.label.dist=1,
 # add new vertex shape, plot nothing with no clipping
 add.vertex.shape("nil")
 plot(g, vertex.shape="nil")
+
+# triangle vertex shape
+mytriangle <- function(coords, v=NULL, params) {
+  vertex.color <- params("vertex", "color")
+  if (length(vertex.color) != 1 && !is.null(v)) {
+    vertex.color <- vertex.color[v]
+  }
+  vertex.size        <- 1/200 * params("vertex", "size")
+  if (length(vertex.size) != 1 && !is.null(v)) {
+    vertex.size <- vertex.size[v]
+  }
+
+  symbols(x=coords[,1], y=coords[,2], bg=vertex.color,
+          stars=cbind(vertex.size, vertex.size, vertex.size),
+          add=TRUE, inches=FALSE)
+}
+# clips as a circle
+add.vertex.shape("triangle", clip=vertex.shapes("circle")$clip,
+                 plot=mytriangle)
+plot(g, vertex.shape="triangle", vertex.color=rainbow(vcount(g)),
+     vertex.size=seq(10,20,length=vcount(g)))
 }
 }
 \keyword{graphs}
