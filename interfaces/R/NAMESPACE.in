@@ -136,7 +136,8 @@ export(subgraph, degree, degree.distribution, diameter,
 export(plot.igraph, tkplot, tkplot.close, tkplot.off, tkplot.fit.to.screen,
        tkplot.reshape, tkplot.export.postscript, tkplot.getcoords,
        tkplot.center, tkplot.rotate, rglplot.igraph, rglplot,
-       autocurve.edges)
+       autocurve.edges, vertex.shapes, add.vertex.shape,
+       igraph.shape.noclip, igraph.shape.noplot)
 
 S3method(rglplot, igraph)
 

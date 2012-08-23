@@ -436,7 +436,21 @@ plot(g, vertex.label.dist=1.5)
 igraph.options(plot.layout=layout.reingold.tilford)
 plot(graph.tree(20, 2))
 plot(graph.tree(50, 3), vertex.size=3, vertex.label=NA)
-tkplot(graph.tree(50, 2, mode="undirected"), vertex.size=10, vertex.color="green")
+tkplot(graph.tree(50, 2, mode="undirected"), vertex.size=10,
+vertex.color="green")
+
+# vertex shapes example
+shapes <- vertex.shapes()
+g <- graph.ring(length(shapes))
+set.seed(42)
+plot(g, vertex.shape=shapes, vertex.label=shapes, vertex.label.dist=1,
+     vertex.size=15, vertex.size2=10,
+     vertex.pie=lapply(shapes, function(x) if (x=="pie") 2:6 else 0),
+     vertex.pie.color=list(heat.colors(5)))
+
+# add new vertex shape, plot nothing with no clipping
+add.vertex.shape("nil")
+plot(g, vertex.shape="nil")
 }
 }
 \keyword{graphs}

@@ -155,7 +155,7 @@ i.get.arrow.mode <- function(graph, arrow.mode=NULL) {
 
 igraph.check.shapes <- function(x) {
   xx <- unique(x)
-  bad.shapes <- ! xx %in% names(.igraph.shapes)
+  bad.shapes <- ! xx %in% ls(.igraph.shapes)
   if (any(bad.shapes)) {
     bs <- paste(xx[bad.shapes], collapse=", ")
     stop("Bad vertex shape(s): ", bs, ".")
