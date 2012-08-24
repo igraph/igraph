@@ -37,7 +37,7 @@
 ##              the last two columns are for the other end points
 ##              (targets if the graph is directed).
 ##    el        The edge list itself, with vertex ids.
-##    params    All plotting parameters, in a named list.
+##    params    A function object to query plotting parameters.
 ##    end       Which end points to calculate. "both" means both,
 ##              "from" means the first end point, "to" the second.
 ## The clipping function must return the new version of "coords",
@@ -51,7 +51,7 @@
 ##    coords    Two column matrix, the coordinates for the vertices to draw.
 ##    v         The vertex ids of the vertices to draw. If NULL, then all
 ##              vertices are drawn.
-##    params    All plotting parameters in a named list.
+##    params    A function object to query plotting parameters.
 ## 
 ## vertex.shapes()         - lists all vertex shapes
 ## vertex.shapes(shape)    - returns the clipping and plotting functions
@@ -85,7 +85,15 @@ vertex.shapes <- function(shape=NULL) {
 
 igraph.shape.noclip <- function(coords, el, params,
                                 end=c("both", "from", "to")) {
-  coords
+  end <- igraph.match.arg(end)
+
+  if (end=="both") {
+    coords
+  } else if (end=="from") {
+    coords[,1:2,drop=FALSE]
+  } else {
+    coords[,3:4,drop=FALSE]
+  }
 }
 
 igraph.shape.noplot <- function(coords, v=NULL, params) {
