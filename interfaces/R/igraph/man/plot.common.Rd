@@ -41,7 +41,7 @@
   \code{\link{plot.igraph}}, \code{\link{tkplot}} or
   \code{\link{rglplot}}. Parameters for vertices start with prefix
   \sQuote{\code{vertex.}}, parameters for edges have prefix
-  \sQuote{\code{edge.}}, and global parameters have now prefix. Eg. the
+  \sQuote{\code{edge.}}, and global parameters have no prefix. Eg. the
   color of the vertices can be given via argument \code{vertex.color},
   whereas \code{edge.color} sets the color of the edges. \code{layout}
   gives the layout of the graphs.
@@ -438,40 +438,6 @@ plot(graph.tree(20, 2))
 plot(graph.tree(50, 3), vertex.size=3, vertex.label=NA)
 tkplot(graph.tree(50, 2, mode="undirected"), vertex.size=10,
 vertex.color="green")
-
-# vertex shapes example
-shapes <- vertex.shapes()
-g <- graph.ring(length(shapes))
-set.seed(42)
-plot(g, vertex.shape=shapes, vertex.label=shapes, vertex.label.dist=1,
-     vertex.size=15, vertex.size2=10,
-     vertex.pie=lapply(shapes, function(x) if (x=="pie") 2:6 else 0),
-     vertex.pie.color=list(heat.colors(5)))
-
-# add new vertex shape, plot nothing with no clipping
-add.vertex.shape("nil")
-plot(g, vertex.shape="nil")
-
-# triangle vertex shape
-mytriangle <- function(coords, v=NULL, params) {
-  vertex.color <- params("vertex", "color")
-  if (length(vertex.color) != 1 && !is.null(v)) {
-    vertex.color <- vertex.color[v]
-  }
-  vertex.size        <- 1/200 * params("vertex", "size")
-  if (length(vertex.size) != 1 && !is.null(v)) {
-    vertex.size <- vertex.size[v]
-  }
-
-  symbols(x=coords[,1], y=coords[,2], bg=vertex.color,
-          stars=cbind(vertex.size, vertex.size, vertex.size),
-          add=TRUE, inches=FALSE)
-}
-# clips as a circle
-add.vertex.shape("triangle", clip=vertex.shapes("circle")$clip,
-                 plot=mytriangle)
-plot(g, vertex.shape="triangle", vertex.color=rainbow(vcount(g)),
-     vertex.size=seq(10,20,length=vcount(g)))
 }
 }
 \keyword{graphs}
