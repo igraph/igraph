@@ -64,7 +64,7 @@
 ##
 ## Examples:
 ## add.vertex.shapes("image", clip=image.clip, plot=image.plot,
-##                   parameters=c("filename"))
+##                   parameters=list(filename=NA))
 ##
 ## add.vertex.shapes("triangle", clip=vertex.shapes("circle")$clip,
 ##                   plot=triangle.plot)
@@ -102,15 +102,17 @@ igraph.shape.noplot <- function(coords, v=NULL, params) {
 
 add.vertex.shape <- function(shape, clip=igraph.shape.noclip,
                              plot=igraph.shape.noplot,
-                             parameters=character()) {
+                             parameters=list()) {
 
   ## TODO
   ## checkScalarString(shape)
   ## checkFunction(clip)
   ## checkFunction(plot)
-  ## checkCharacter(parameters)
+  ## checkList(parameters, named=TRUE)
 
   assign(shape, value=list(clip=clip, plot=plot), envir=.igraph.shapes)
+  names(parameters) <- paste("vertex.", sep="", names(parameters))
+  do.call(igraph.options, parameters)
 
   invisible(TRUE)
 }
