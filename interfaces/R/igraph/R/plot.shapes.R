@@ -111,9 +111,7 @@ add.vertex.shape <- function(shape, clip=igraph.shape.noclip,
   ## checkList(parameters, named=TRUE)
 
   assign(shape, value=list(clip=clip, plot=plot), envir=.igraph.shapes)
-  names(parameters) <- paste("vertex.", sep="", names(parameters))
   do.call(igraph.options, parameters)
-
   invisible(TRUE)
 }
 
