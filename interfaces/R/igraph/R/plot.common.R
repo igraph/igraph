@@ -42,17 +42,23 @@ i.parse.plot.params <- function(graph, params) {
 
   ## check that names are present
 
-  mis <- ! names(p[["vertex"]]) %in% names(i.default.values$vertex) 
+  mis <- ! names(p[["vertex"]]) %in% names(i.default.values$vertex) &
+         ! paste("vertex.", sep="", names(p[["vertex"]])) %in%
+           names(igraph.options())
   if (any(mis)) {
     stop("Unknown vertex parameters: ",
          paste(sep=", ", collapse=", ", names(p[["vertex"]])[mis]))
   }
-  mis <- ! names(p[["edge"]]) %in% names(i.default.values$edge) 
+  mis <- ! names(p[["edge"]]) %in% names(i.default.values$edge) &
+         ! paste("edge.", sep="", names(p[["edge"]])) %in%
+           names(igraph.options())
   if (any(mis)) {
     stop("Unknown edge parameters: ",
          paste(sep=", ", collapse=", ", names(p[["edge"]])[mis]))
   }
-  mis <- ! names(p[["plot"]]) %in% names(i.default.values$plot) 
+  mis <- ! names(p[["plot"]]) %in% names(i.default.values$plot) &
+         ! paste("plot.", sep="", names(p[["plot"]])) %in%
+           names(igraph.options())
   if (any(mis)) {
     stop("Unknown plot parameters: ",
          paste(sep=", ", collapse=", ", names(p[["plot"]]) [ mis ]))
