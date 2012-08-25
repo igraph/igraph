@@ -22,10 +22,11 @@ igraph.shape.noplot (coords, v = NULL, params)
     vertex shapes are returned.} 
   \item{clip}{An R function object, the clipping function.}
   \item{plot}{An R function object, the plotting function.}
-  \item{parameters}{Character vector, additional graph/vertex/edge
+  \item{parameters}{Character vector, additional plot/vertex/edge
     parameters. Vertex parameters should have a prefix
     \sQuote{\code{vertex.}}, edge parameters a prefix
-    \sQuote{\code{edge.}}.}
+    \sQuote{\code{edge.}}. Other general plotting parameters should have
+    a prefix \sQuote{\code{plot.}}.}
   \item{coords,el,params,end,v}{See parameters of the clipping/plotting
     functions below.} 
 }
