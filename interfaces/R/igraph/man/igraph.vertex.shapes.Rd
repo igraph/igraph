@@ -164,22 +164,25 @@ mystar <- function(coords, v=NULL, params) {
     vertex.size <- vertex.size[v]
   }
   norays <- params("vertex", "norays")
-  if (length(norays) != 1 && !is.null(norays)) {
+  if (length(norays) != 1 && !is.null(v)) {
     norays <- norays[v]
   }
 
   mapply(coords[,1], coords[,2], vertex.color, vertex.size, norays,
          FUN=function(x, y, bg, size, nor) {
            symbols(x=x, y=y, bg=bg,
-                   stars=matrix(c(size,size/2), nrow=1, ncol=norays*2),
+                   stars=matrix(c(size,size/2), nrow=1, ncol=nor*2),
                    add=TRUE, inches=FALSE)
          })
 }
 # no clipping, edges will be below the vertices anyway
 add.vertex.shape("star", clip=igraph.shape.noclip,
-                 plot=mystar, parameters=list(norays=5))
+                 plot=mystar, parameters=list(vertex.norays=5))
 plot(g, vertex.shape="star", vertex.color=rainbow(vcount(g)),
      vertex.size=seq(10,20,length=vcount(g)))
+plot(g, vertex.shape="star", vertex.color=rainbow(vcount(g)),
+     vertex.size=seq(10,20,length=vcount(g)),
+     vertex.norays=rep(4:8, length=vcount(g)))
 }
 \keyword{graphs}
 
