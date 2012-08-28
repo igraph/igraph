@@ -54,11 +54,8 @@ int igraphmodule_filehandle_init(igraphmodule_filehandle_t* handle,
 #endif
         if (handle->object == 0)
             return 1;
-
-		handle->owner = 1;
     } else {
         handle->object = object;
-		handle->owner = 0;
         Py_INCREF(handle->object);
     }
 
@@ -96,16 +93,13 @@ int igraphmodule_filehandle_init(igraphmodule_filehandle_t* handle,
  * \brief Destroys the file handle object.
  */
 void igraphmodule_filehandle_destroy(igraphmodule_filehandle_t* handle) {
-    Py_XDECREF(handle->object);
-
-	if (handle->owner) {
-		fclose(handle->fp);
-	} else {
+	if (handle->fp != 0) {
 		fflush(handle->fp);
 	}
-
-    handle->object = 0;
     handle->fp = 0;
+
+    Py_XDECREF(handle->object);
+    handle->object = 0;
 }
 
 /**
