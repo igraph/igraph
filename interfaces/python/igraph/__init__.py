@@ -935,8 +935,10 @@ class Graph(GraphBase):
             return VertexDendrogram(self, merges, safemax(cl)+1)
 
 
-    def community_leading_eigenvector(self, clusters=None):
-        """community_leading_eigenvector(clusters=None)
+    def community_leading_eigenvector(self, clusters=None, weights=None, \
+            arpack_options=None):
+        """community_leading_eigenvector(clusters=None, weights=None,
+          arpack_options=None)
         
         Newman's leading eigenvector method for detecting community structure.
         This is the proper implementation of the recursive, divisive algorithm:
@@ -948,14 +950,24 @@ class Graph(GraphBase):
           algorithm won't split a community further if the signs of the leading
           eigenvector are all the same, so the actual number of discovered
           communities can be less than the desired one.
-        @return: an appropriate L{VertexDendrogram} object.
+        @param weights: name of an edge attribute or a list containing
+          edge weights.
+        @param arpack_options: an L{ARPACKOptions} object used to fine-tune
+          the ARPACK eigenvector calculation. If omitted, the module-level
+          variable called C{arpack_options} is used.
+        @return: an appropriate L{VertexClustering} object.
         
         @newfield ref: Reference
         @ref: MEJ Newman: Finding community structure in networks using the
         eigenvectors of matrices, arXiv:physics/0605087"""
         if clusters is None:
             clusters = -1
-        membership, _, q = GraphBase.community_leading_eigenvector(self, clusters)
+
+        kwds = dict(weights=weights)
+        if arpack_options is not None:
+            kwds["arpack_options"] = arpack_options
+
+        membership, _, q = GraphBase.community_leading_eigenvector(self, clusters, **kwds)
         return VertexClustering(self, membership, modularity = q)
 
 

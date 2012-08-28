@@ -10297,37 +10297,55 @@ PyObject *igraphmodule_Graph_community_edge_betweenness(igraphmodule_GraphObject
  * Newman's leading eigenvector method, precise implementation
  */
 PyObject *igraphmodule_Graph_community_leading_eigenvector(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
-  static char *kwlist[] = { "n", "arpack_options", NULL };
+  static char *kwlist[] = { "n", "weights", "arpack_options", NULL };
   long int n=-1;
-  PyObject *cl, *res, *merges;
+  PyObject *cl, *res, *merges, *weights_obj = Py_None;
   igraph_vector_t members;
+  igraph_vector_t *weights = 0;
   igraph_matrix_t m;
   igraph_real_t q;
   igraphmodule_ARPACKOptionsObject *arpack_options;
   PyObject *arpack_options_o = igraphmodule_arpack_options_default;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lO!", kwlist,
-    &n, &igraphmodule_ARPACKOptionsType, &arpack_options_o)) {
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lOO!", kwlist, &n, &weights_obj,
+        &igraphmodule_ARPACKOptionsType, &arpack_options_o)) {
     return NULL;
   }
 
   if (igraph_vector_init(&members, 0))
     return igraphmodule_handle_igraph_error();
 
-  if (igraph_matrix_init(&m, 0, 0))
-    return igraphmodule_handle_igraph_error();
+  if (igraph_matrix_init(&m, 0, 0)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&members);
+    return 0;
+  }
 
   if (n<0)
     n = igraph_vcount(&self->g);
   else
     n -= 1;
 
+  if (igraphmodule_attrib_to_vector_t(weights_obj, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    igraph_matrix_destroy(&m);
+    igraph_vector_destroy(&members);
+    return NULL;
+  }
+
   arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
-  if (igraph_community_leading_eigenvector(&self->g, 0, &m, &members, (igraph_integer_t) n,
+  if (igraph_community_leading_eigenvector(&self->g, weights, &m, &members, (igraph_integer_t) n,
       igraphmodule_ARPACKOptions_get(arpack_options), &q, 0, 0, 0, 0, 0, 0)){
     igraph_matrix_destroy(&m);
     igraph_vector_destroy(&members);
+    if (weights != 0) {
+      igraph_vector_destroy(&weights); free(weights);
+    }
     return igraphmodule_handle_igraph_error();
+  }
+
+  if (weights != 0) {
+    igraph_vector_destroy(&weights); free(weights);
   }
 
   cl = igraphmodule_vector_t_to_PyList(&members, IGRAPHMODULE_TYPE_INT);
@@ -14226,7 +14244,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   },
   {"community_leading_eigenvector", (PyCFunction) igraphmodule_Graph_community_leading_eigenvector,
    METH_VARARGS | METH_KEYWORDS,
-   "community_leading_eigenvector(n=-1)\n\n"
+   "community_leading_eigenvector(n=-1, arpack_options=None, weights=None)\n\n"
    "A proper implementation of Newman's eigenvector community structure\n"
    "detection. Each split is done by maximizing the modularity regarding\n"
    "the original network. See the reference for details.\n\n"
@@ -14236,6 +14254,11 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  tries to do as many splits as possible. Note that the algorithm\n"
    "  won't split a community further if the signs of the leading eigenvector\n"
    "  are all the same.\n"
+   "@param arpack_options: an L{ARPACKOptions} object used to fine-tune\n"
+   "  the ARPACK eigenvector calculation. If omitted, the module-level\n"
+   "  variable called C{arpack_options} is used.\n"
+   "@param weights: name of an edge attribute or a list containing\n"
+   "  edge weights\n"
    "@return: a tuple where the first element is the membership vector of the\n"
    "  clustering and the second element is the merge matrix.\n\n"
    "@newfield ref: Reference\n"
