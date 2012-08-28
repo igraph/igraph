@@ -8301,9 +8301,7 @@ PyObject *igraphmodule_Graph_get_isomorphisms_vf2(igraphmodule_GraphObject *self
 
 /** \ingroup python_interface_graph
  * \brief Determines whether a subgraph of the graph is isomorphic to another graph
- *
- * The actual code is almost the same as igraphmodule_Graph_isomorphic. Make sure
- * you correct bugs in both interfaces if applicable!
+ *        using the VF2 algorithm.
  *
  * \sa igraph_subisomorphic_vf2
  */
@@ -8631,6 +8629,130 @@ PyObject *igraphmodule_Graph_get_subisomorphisms_vf2(igraphmodule_GraphObject *s
   return res;
 }
 
+/** \ingroup python_interface_graph
+ * \brief Determines whether a subgraph of the graph is isomorphic to another graph
+ *        using the LAD algorithm.
+ *
+ * \sa igraph_subisomorphic_lad
+ */
+PyObject *igraphmodule_Graph_subisomorphic_lad(igraphmodule_GraphObject * self,
+                                        PyObject * args, PyObject * kwds)
+{
+  igraph_bool_t result = 0;
+  PyObject *o, *return_mapping=Py_False, *domains_o=Py_None, *induced=Py_False;
+  float time_limit = 0;
+  igraphmodule_GraphObject *other;
+  igraph_vector_ptr_t domains;
+  igraph_vector_ptr_t* p_domains = 0;
+  igraph_vector_t mapping, *map=0;
+
+  static char *kwlist[] = { "pattern", "domains", "induced", "time_limit",
+      "return_mapping", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|OOfO", kwlist,
+        &igraphmodule_GraphType, &o, &domains_o, &induced,
+        &time_limit, &return_mapping))
+    return NULL;
+
+  other=(igraphmodule_GraphObject*)o;
+
+  if (domains_o != Py_None) {
+    if (igraphmodule_PyObject_to_vector_ptr_t(domains_o, &domains, 1))
+      return NULL;
+
+    p_domains = &domains;
+  }
+
+  if (PyObject_IsTrue(return_mapping)) {
+	if (igraph_vector_init(&mapping, 0)) {
+      if (p_domains)
+        igraph_vector_ptr_destroy_all(p_domains);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+	map = &mapping;
+  }
+
+  if (igraph_subisomorphic_lad(&other->g, &self->g, p_domains, &result,
+        map, 0, PyObject_IsTrue(induced), (int)time_limit)) {
+    if (p_domains)
+      igraph_vector_ptr_destroy_all(p_domains);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (p_domains)
+    igraph_vector_ptr_destroy_all(p_domains);
+
+  if (!map) {
+    if (result)
+      Py_RETURN_TRUE;
+    Py_RETURN_FALSE;
+  } else {
+	PyObject *m = igraphmodule_vector_t_to_PyList(map, IGRAPHMODULE_TYPE_INT);
+    igraph_vector_destroy(map);
+	if (!m)
+	  return NULL;
+	return Py_BuildValue("ON", result ? Py_True : Py_False, m);
+  }
+}
+
+/** \ingroup python_interface_graph
+ * \brief Finds all the subisomorphisms of a graph to another graph using the LAD
+ *        algorithm
+ *
+ * \sa igraph_subisomorphic_lad
+ */
+PyObject *igraphmodule_Graph_get_subisomorphisms_lad(
+    igraphmodule_GraphObject * self, PyObject * args, PyObject * kwds)
+{
+  PyObject *o, *domains_o=Py_None, *induced=Py_False, *result;
+  float time_limit = 0;
+  igraphmodule_GraphObject *other;
+  igraph_vector_ptr_t domains;
+  igraph_vector_ptr_t* p_domains = 0;
+  igraph_vector_ptr_t mappings;
+
+  static char *kwlist[] = { "pattern", "domains", "induced", "time_limit", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|OOf", kwlist,
+        &igraphmodule_GraphType, &o, &domains_o, &induced, &time_limit))
+    return NULL;
+
+  other=(igraphmodule_GraphObject*)o;
+
+  if (domains_o != Py_None) {
+    if (igraphmodule_PyObject_to_vector_ptr_t(domains_o, &domains, 1))
+      return NULL;
+
+    p_domains = &domains;
+  }
+
+  if (igraph_vector_ptr_init(&mappings, 0)) {
+    igraphmodule_handle_igraph_error();
+    if (p_domains)
+      igraph_vector_ptr_destroy_all(p_domains);
+    return NULL;
+  }
+
+  if (igraph_subisomorphic_lad(&other->g, &self->g, p_domains, 0, 0, &mappings,
+        PyObject_IsTrue(induced), (int)time_limit)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_ptr_destroy_all(&mappings);
+    if (p_domains)
+      igraph_vector_ptr_destroy_all(p_domains);
+    return NULL;
+  }
+
+  if (p_domains)
+    igraph_vector_ptr_destroy_all(p_domains);
+
+  result = igraphmodule_vector_ptr_t_to_PyList(&mappings, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_ptr_destroy_all(&mappings);
+
+  return result;
+}
+
 /**********************************************************************
  * Graph attribute handling                                           *
  **********************************************************************/
@@ -8788,7 +8910,7 @@ PyObject *igraphmodule_Graph_disjoint_union(igraphmodule_GraphObject * self,
       igraph_vector_ptr_destroy(&gs);
       return igraphmodule_handle_igraph_error();
     }
-    if (igraphmodule_append_PyIter_to_vector_ptr_t(it, &gs)) {
+    if (igraphmodule_append_PyIter_of_graphs_to_vector_ptr_t(it, &gs)) {
       igraph_vector_ptr_destroy(&gs);
       Py_DECREF(it);
       return NULL;
@@ -8849,7 +8971,7 @@ PyObject *igraphmodule_Graph_union(igraphmodule_GraphObject * self,
       igraph_vector_ptr_destroy(&gs);
       return igraphmodule_handle_igraph_error();
     }
-    if (igraphmodule_append_PyIter_to_vector_ptr_t(it, &gs)) {
+    if (igraphmodule_append_PyIter_of_graphs_to_vector_ptr_t(it, &gs)) {
       Py_DECREF(it);
       igraph_vector_ptr_destroy(&gs);
       return NULL;
@@ -8911,7 +9033,7 @@ PyObject *igraphmodule_Graph_intersection(igraphmodule_GraphObject * self,
       igraph_vector_ptr_destroy(&gs);
       return igraphmodule_handle_igraph_error();
     }
-    if (igraphmodule_append_PyIter_to_vector_ptr_t(it, &gs)) {
+    if (igraphmodule_append_PyIter_of_graphs_to_vector_ptr_t(it, &gs)) {
       Py_DECREF(it);
       igraph_vector_ptr_destroy(&gs);
       return NULL;
@@ -13816,6 +13938,54 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  criteria that are too complicated to be represented by edge color\n"
    "  vectors (i.e. the C{edge_color1} and C{edge_color2} parameters). C{None}\n"
    "  means that every edge is compatible with every other node.\n"
+   "@return: a list of lists, each item of the list containing the mapping\n"
+   "  from vertices of the second graph to the vertices of the first one\n"},
+
+  {"subisomorphic_lad", (PyCFunction) igraphmodule_Graph_subisomorphic_lad,
+   METH_VARARGS | METH_KEYWORDS,
+   "subisomorphic_lad(other, domains=None, induced=False, time_limit=0, \n"
+   "  return_mapping=False)\n\n"
+   "Checks whether a subgraph of the graph is isomorphic to another graph.\n\n"
+   "The optional C{domains} argument may be used to restrict vertices that\n"
+   "may match each other. You can also specify whether you are interested\n"
+   "in induced subgraphs only or not.\n\n"
+   "@param other: the pattern graph we are looking for in the graph.\n"
+   "@param domains: a list of lists, one sublist belonging to each vertex in\n"
+   "  the template graph. Sublist M{i} contains the indices of the vertices in\n"
+   "  the original graph that may match vertex M{i} in the template graph.\n"
+   "  C{None} means that every vertex may match every other vertex.\n"
+   "@param induced: whether to consider induced subgraphs only.\n"
+   "@param time_limit: an optimal time limit in seconds. Only the integral\n"
+   "  part of this number is taken into account. If the time limit is\n"
+   "  exceeded, the method will throw an exception.\n"
+   "@param return_mapping: when C{True}, the function will return a tuple,\n"
+   "  where the first element is a boolean denoting whether a subisomorphism\n"
+   "  has been found or not, and the second element describes the mapping\n"
+   "  of the vertices from the template graph to the original graph. When\n"
+   "  C{False}, only the boolean is returned.\n"
+   "@return: if no mapping is calculated, the result is C{True} if the graph\n"
+   "  contains a subgraph that is isomorphic to the given template, C{False}\n"
+   "  otherwise. If the mapping is calculated, the result is a tuple, the first\n"
+   "  element being the above mentioned boolean, and the second element being\n"
+   "  the mapping from the target to the original graph.\n"}, 
+
+  {"get_subisomorphisms_lad", (PyCFunction) igraphmodule_Graph_get_subisomorphisms_lad,
+   METH_VARARGS | METH_KEYWORDS,
+   "get_subisomorphisms_lad(other, domains=None, induced=False, time_limit=0)\n\n"
+   "Returns all subisomorphisms between the graph and another one using the LAD\n"
+   "algorithm.\n\n"
+   "The optional C{domains} argument may be used to restrict vertices that\n"
+   "may match each other. You can also specify whether you are interested\n"
+   "in induced subgraphs only or not.\n\n"
+   "@param other: the pattern graph we are looking for in the graph.\n"
+   "@param domains: a list of lists, one sublist belonging to each vertex in\n"
+   "  the template graph. Sublist M{i} contains the indices of the vertices in\n"
+   "  the original graph that may match vertex M{i} in the template graph.\n"
+   "  C{None} means that every vertex may match every other vertex.\n"
+   "@param induced: whether to consider induced subgraphs only.\n"
+   "@param time_limit: an optimal time limit in seconds. Only the integral\n"
+   "  part of this number is taken into account. If the time limit is\n"
+   "  exceeded, the method will throw an exception.\n"
    "@return: a list of lists, each item of the list containing the mapping\n"
    "  from vertices of the second graph to the vertices of the first one\n"},
 

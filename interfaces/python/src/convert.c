@@ -1962,6 +1962,75 @@ int igraphmodule_PyList_to_matrix_t(PyObject* o, igraph_matrix_t *m) {
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts a Python list of lists to an \c igraph_vector_ptr_t
+ *        containing \c igraph_vector_t items.
+ * 
+ * The returned vector will have an item destructor that destroys the
+ * contained vectors, so it is important to call \c igraph_vector_ptr_destroy_all
+ * on it instead of \c igraph_vector_ptr_destroy when the vector is no longer
+ * needed.
+ *
+ * \param o the Python object representing the list of lists
+ * \param m the address of an uninitialized \c igraph_vector_ptr_t
+ * \return 0 if everything was OK, 1 otherwise. Sets appropriate exceptions.
+ */
+int igraphmodule_PyObject_to_vector_ptr_t(PyObject* list, igraph_vector_ptr_t* vec,
+    igraph_bool_t need_non_negative) {
+  PyObject *it, *item;
+  igraph_vector_t *subvec;
+
+  if (PyString_Check(list)) {
+    PyErr_SetString(PyExc_TypeError, "expected iterable (but not string)");
+    return 1;
+  }
+
+  it = PyObject_GetIter(list);
+  if (!it) {
+    return 1;
+  }
+
+  if (igraph_vector_ptr_init(vec, 0)) {
+    igraphmodule_handle_igraph_error();
+    Py_DECREF(it);
+    return 1;
+  }
+
+  IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(vec, igraph_vector_destroy);
+  while ((item = PyIter_Next(it)) != 0) {
+    subvec = igraph_Calloc(1, igraph_vector_t);
+    if (subvec == 0) {
+      Py_DECREF(item);
+      Py_DECREF(it);
+      PyErr_NoMemory();
+      return 1;
+    }
+
+    if (igraphmodule_PyObject_to_vector_t(item, subvec, need_non_negative, 0)) {
+      Py_DECREF(item);
+      Py_DECREF(it);
+      igraph_vector_destroy(subvec);
+      igraph_vector_ptr_destroy_all(vec);
+      return 1;
+    }
+
+    Py_DECREF(item);
+
+    if (igraph_vector_ptr_push_back(vec, subvec)) {
+      Py_DECREF(it);
+      igraph_vector_destroy(subvec);
+      igraph_vector_ptr_destroy_all(vec);
+      return 1;
+    }
+    
+    /* ownership of 'subvec' taken by 'vec' here */
+  }
+
+  Py_DECREF(it);
+  return 0;
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts an \c igraph_strvector_t to a Python string list
  * 
  * \param v the \c igraph_strvector_t containing the vector to be converted
@@ -2073,7 +2142,8 @@ int igraphmodule_PyList_to_strvector_t(PyObject* v, igraph_strvector_t *result) 
  * \param v the \c igraph_vector_ptr_t which will contain the result
  * \return 0 if everything was OK, 1 otherwise
  */
-int igraphmodule_append_PyIter_to_vector_ptr_t(PyObject *it, igraph_vector_ptr_t *v) {
+int igraphmodule_append_PyIter_of_graphs_to_vector_ptr_t(PyObject *it,
+    igraph_vector_ptr_t *v) {
   PyObject *t;
   
   while ((t=PyIter_Next(it))) {
