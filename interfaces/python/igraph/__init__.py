@@ -960,7 +960,7 @@ class Graph(GraphBase):
           algorithm won't split a community further if the signs of the leading
           eigenvector are all the same, so the actual number of discovered
           communities can be less than the desired one.
-        @return: an appropriate L{VertexDendrogram} object.
+        @return: an appropriate L{VertexClustering} object.
         
         @newfield ref: Reference
         @ref: MEJ Newman: Finding community structure in networks using the
