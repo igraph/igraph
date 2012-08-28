@@ -10323,7 +10323,7 @@ PyObject *igraphmodule_Graph_community_leading_eigenvector(igraphmodule_GraphObj
     n -= 1;
 
   arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
-  if (igraph_community_leading_eigenvector(&self->g, &m, &members, (igraph_integer_t) n,
+  if (igraph_community_leading_eigenvector(&self->g, 0, &m, &members, (igraph_integer_t) n,
       igraphmodule_ARPACKOptions_get(arpack_options), &q, 0, 0, 0, 0, 0, 0)){
     igraph_matrix_destroy(&m);
     igraph_vector_destroy(&members);
