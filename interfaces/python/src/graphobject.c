@@ -6660,7 +6660,7 @@ PyObject *igraphmodule_Graph_layout_reingold_tilford_circular(
   igraph_vector_t roots, *roots_p = 0;
   igraph_vector_t rootlevels, *rootlevels_p = 0;
   PyObject *roots_o=Py_None, *rootlevels_o=Py_None, *mode_o=Py_None;
-  igraph_neimode_t mode = IGRAPH_ALL;
+  igraph_neimode_t mode = IGRAPH_OUT;
   PyObject *result;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist,
@@ -11066,10 +11066,10 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_incident */
   {"incident", (PyCFunction) igraphmodule_Graph_incident,
    METH_VARARGS | METH_KEYWORDS,
-   "incident(vertex, type=OUT)\n\n"
+   "incident(vertex, mode=OUT)\n\n"
    "Returns the edges a given vertex is incident on.\n\n"
    "@param vertex: a vertex ID\n"
-   "@param type: whether to return only predecessors (L{OUT}),\n"
+   "@param mode: whether to return only predecessors (L{OUT}),\n"
    "  successors (L{IN}) or both (L{ALL}). Ignored for undirected\n"
    "  graphs."},
 
@@ -13154,7 +13154,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"layout_reingold_tilford_circular",
    (PyCFunction) igraphmodule_Graph_layout_reingold_tilford_circular,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_reingold_tilford_circular(mode=\"all\", root=None, rootlevel=None)\n"
+   "layout_reingold_tilford_circular(mode=\"out\", root=None, rootlevel=None)\n"
    "Circular Reingold-Tilford layout for trees.\n\n"
    "This layout is similar to the Reingold-Tilford layout, but the vertices\n"
    "are placed in a circular way, with the root vertex in the center.\n\n"
