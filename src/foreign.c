@@ -464,6 +464,12 @@ void igraph_pajek_yyset_in  (FILE * in_str, void* yyscanner );
  * <command>igraph</command> does not support some Pajek features, like 
  * multigraphs.
  * 
+ * </para><para>
+ * Starting from version 0.6.1 igraph reads bipartite (two-mode) 
+ * graphs from Pajek files and add the \c type vertex attribute for them.
+ * Warnings are given for invalid edges, i.e. edges connecting
+ * vertices of the same type.
+ * 
  * </para><para> 
  * The list of the current limitations:
  * \olist
@@ -476,8 +482,6 @@ void igraph_pajek_yyset_in  (FILE * in_str, void* yyscanner );
  * \oli Graphs with both directed and non-directed edges are not
  * supported, are they cannot be represented in
  * <command>igraph</command>.
- * \oli Bipartite or affiliation networks are not supported. They can
- * be imported but the vertex type information is omitted.
  * \oli Only Pajek networks are supported, permutations, hierarchies,
  * clusters and vectors are not.
  * \oli Graphs with multiple edge sets are not supported.
@@ -579,7 +583,9 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 
   if (context.vcount < 0)
     IGRAPH_ERROR("invalid vertex count in Pajek file", IGRAPH_EINVAL);
-
+  if (context.vcount2 < 0) 
+    IGRAPH_ERROR("invalid 2-mode vertex count in Pajek file", IGRAPH_EINVAL);
+  
   for (i=0; i<igraph_vector_ptr_size(&eattrs); i++) {
     igraph_attribute_record_t *rec=VECTOR(eattrs)[i];
     if (rec->type==IGRAPH_ATTRIBUTE_NUMERIC) {

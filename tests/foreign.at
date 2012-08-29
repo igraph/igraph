@@ -43,6 +43,12 @@ AT_KEYWORDS([igraph_read_graph_pajek pajek foreign])
 AT_COMPILE_CHECK([simple/pajek.c], [], [simple/pajek{5,6}.net])
 AT_CLEANUP
 
+AT_SETUP([Pajek, bipartite (igraph_read_graph_pajek):])
+AT_KEYWORDS([igraph_read_graph_pajek pajek foreign bipartite])
+AT_COMPILE_CHECK([simple/pajek2.c], [simple/pajek2.out], 
+		 [simple/bipartite.net])
+AT_CLEANUP
+
 AT_SETUP([Reading an LGL file (igraph_read_graph_lgl):])
 AT_KEYWORDS([igraph_read_graph_lgl LGL foreign])
 AT_COMPILE_CHECK([simple/igraph_read_graph_lgl.c],

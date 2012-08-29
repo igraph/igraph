@@ -94,6 +94,9 @@ int igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
 					igraph_integer_t vid,
 					const char *str);
 
+int igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *context);
+int igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *context);
+
 extern igraph_real_t igraph_pajek_get_number(const char *str, long int len);
 extern long int igraph_i_pajek_actvertex;
 extern long int igraph_i_pajek_actedge;
@@ -184,14 +187,22 @@ extern long int igraph_i_pajek_actedge;
 
 %%
 
-input: nethead vertices edgeblock;
+input: nethead vertices edgeblock {
+  if (context->vcount2 > 0) { igraph_i_pajek_check_bipartite(context); }
+ };
 
 nethead: /* empty */ | NETWORKLINE words NEWLINE;
 
 vertices: verticeshead NEWLINE vertdefs;
 
-verticeshead: VERTICESLINE longint {
+verticeshead: VERTICESLINE longint { 
+  context->vcount=$2; 
+  context->vcount2=0;
+            } 
+            | VERTICESLINE longint longint { 
   context->vcount=$2;
+  context->vcount2=$3;
+  igraph_i_pajek_add_bipartite_type(context);
 };
 
 vertdefs: /* empty */  | vertdefs vertexline;
@@ -669,4 +680,58 @@ int igraph_i_pajek_add_numeric_edge_attribute(const char *name,
 					 context->actedge,
 					 name, context->actedge-1,
 					 value);
+}
+
+int igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *context) {
+  
+  const char *attrname="type";
+  igraph_trie_t *names=context->vertex_attribute_names;
+  igraph_vector_ptr_t *attrs=context->vertex_attributes;
+  int i, n=context->vcount, n1=context->vcount2;
+  long int attrid, attrsize=igraph_trie_size(names);
+  igraph_attribute_record_t *rec;  
+  igraph_vector_t *na;
+
+  if (n1 > n) { 
+    IGRAPH_ERROR("Invalid number of vertices in bipartite Pajek file", 
+		 IGRAPH_PARSEERROR);
+  }
+
+  igraph_trie_get(names, attrname, &attrid);
+  if (attrid != attrsize) { 
+    IGRAPH_ERROR("Duplicate 'type' attribute in Pajek file, "
+		 "this should not happen", IGRAPH_EINTERNAL);
+  }
+  
+  /* add a new attribute */
+  rec=igraph_Calloc(1, igraph_attribute_record_t);
+  na=igraph_Calloc(1, igraph_vector_t);
+  igraph_vector_init(na, n);
+  rec->name=strdup(attrname);
+  rec->type=IGRAPH_ATTRIBUTE_NUMERIC;
+  rec->value=na;
+  igraph_vector_ptr_push_back(attrs, rec);
+
+  for (i=0; i<n1; i++) { 
+    VECTOR(*na)[i] = 0;
+  }
+  for (i=n1; i<n; i++) { 
+    VECTOR(*na)[i] = 1;
+  }
+
+  return 0;
+}
+
+int igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *context) {
+  const igraph_vector_t *edges=context->vector;
+  int i, n1=context->vcount2;
+  int ne=igraph_vector_size(edges);
+  
+  for (i=0; i<ne; i+=2) {
+    int v1=VECTOR(*edges)[i];
+    int v2=VECTOR(*edges)[i+1];
+    if ( (v1 < n1 && v2 < n1) || (v1 > n1 && v2 > n1) ) {
+      IGRAPH_WARNING("Invalid edge in bipartite graph");
+    }
+  }
 }

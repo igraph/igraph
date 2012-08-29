@@ -29,7 +29,7 @@ typedef struct {
   char errmsg[300];
   igraph_vector_t *vector;
   igraph_bool_t directed;
-  int vcount;
+  int vcount, vcount2;
   int actfrom;
   int actto;
   int mode; /* 0: general, 1: vertex, 2: edge */
