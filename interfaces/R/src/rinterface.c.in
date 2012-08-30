@@ -2664,6 +2664,12 @@ SEXP R_igraph_bliss_info_to_SEXP(igraph_bliss_info_t *info) {
 
 /*******************************************************************/
 
+SEXP R_igraph_mybracket2(SEXP graph, SEXP pidx1, SEXP pidx2) {
+  int idx1=INTEGER(pidx1)[0]-1;
+  int idx2=INTEGER(pidx2)[0]-1;  
+  return VECTOR_ELT(VECTOR_ELT(graph, idx1), idx2);
+}
+
 SEXP R_igraph_add_edges(SEXP graph, SEXP edges) {
   
   igraph_vector_t v;			/* do NOT destroy! */
