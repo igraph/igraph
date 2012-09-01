@@ -2699,10 +2699,75 @@ SEXP R_igraph_bliss_info_to_SEXP(igraph_bliss_info_t *info) {
 
 /*******************************************************************/
 
+SEXP R_igraph_named(SEXP attr) {
+  int named=NAMED(attr);
+  printf("%i\n", named);
+  return R_NilValue;
+}
+
+SEXP R_igraph_mybracket(SEXP graph, SEXP pidx) {
+  int idx=INTEGER(pidx)[0]-1;
+  return VECTOR_ELT(graph, idx);
+}
+
 SEXP R_igraph_mybracket2(SEXP graph, SEXP pidx1, SEXP pidx2) {
   int idx1=INTEGER(pidx1)[0]-1;
   int idx2=INTEGER(pidx2)[0]-1;  
   return VECTOR_ELT(VECTOR_ELT(graph, idx1), idx2);
+}
+
+SEXP R_igraph_mybracket2_set(SEXP graph, SEXP pidx1, SEXP pidx2,
+			     SEXP value) {
+  int named=NAMED(graph);
+  int idx1=INTEGER(pidx1)[0]-1;
+  int idx2=INTEGER(pidx2)[0]-1;
+
+  if (named > 1) {
+    igraph_error("mybracket error", __FILE__, __LINE__, IGRAPH_EINTERNAL);
+  }
+  
+  SET_VECTOR_ELT(VECTOR_ELT(graph, idx1), idx2, value);
+  
+  return R_NilValue;
+}
+
+SEXP R_igraph_mybracket3_set(SEXP graph, SEXP pidx1, SEXP pidx2, 
+			     SEXP pname, SEXP value) {
+  int named=NAMED(graph);
+  int idx1=INTEGER(pidx1)[0]-1;
+  int idx2=INTEGER(pidx2)[0]-1;
+  const char *name=CHAR(STRING_ELT(pname, 0));
+  SEXP attrs=VECTOR_ELT(VECTOR_ELT(graph, idx1), idx2);
+  SEXP names=getAttrib(attrs, R_NamesSymbol);
+  int i, n=length(attrs);
+
+  if (named > 1) { 
+    igraph_error("mybracket error", __FILE__, __LINE__, IGRAPH_EINTERNAL);
+  }
+  
+  for (i=0; i<n; i++) {
+    if (strcmp(CHAR(STRING_ELT(names, i)), name) == 0) { break; }    
+  }
+  if (i==n) {
+    /* New attribute, append it */
+    SEXP newattrs, newnames;
+    PROTECT(newattrs=NEW_LIST(n+1));
+    PROTECT(newnames=NEW_CHARACTER(n+1));
+    for (i=0; i<n; i++) {
+      SET_VECTOR_ELT(newattrs, i, VECTOR_ELT(attrs, i));
+      SET_STRING_ELT(newnames, i, STRING_ELT(names, i));
+    }
+    SET_VECTOR_ELT(newattrs, i, value);
+    SET_STRING_ELT(newnames, i, mkChar(name));
+    SET_NAMES(newattrs, newnames);
+    SET_VECTOR_ELT(VECTOR_ELT(graph, idx1), idx2, newattrs);
+    UNPROTECT(2);
+  } else {
+    /* Existing attribute, just set it */
+    SET_VECTOR_ELT(attrs, i, value);
+  }
+  
+  return R_NilValue;
 }
 
 SEXP R_igraph_add_edges(SEXP graph, SEXP edges) {
