@@ -48,14 +48,17 @@ add.edges <- function(graph, edges, ..., attr=list()) {
     idx <- numeric()
   }
 
-  oclass <- class(graph)
-  graph <- unclass(graph)
-  for (i in seq(attrs)) {
-    graph[[9]][[4]][[nam[i]]][idx] <- attrs[[nam[i]]]
-  }  
-  class(graph) <- oclass
+  eattrs <- .Call("R_igraph_mybracket2", graph, 9L, 4L, PACKAGE="igraph")
+  for (i in seq(attrs)) { eattrs[[nam[i]]][idx] <- attrs[[nam[i]]] }
+
+  ## Trick to make R copy the graph
+  newgraph <- graph
+  attr(newgraph, "foo") <- NULL
+
+  ## !!! Modifies the graph in place
+  .Call("R_igraph_mybracket2_set", newgraph, 9L, 4L, eattrs, PACKAGE="igraph")
   
-  graph
+  newgraph
 }
 
 add.vertices <- function(graph, nv, ..., attr=list()) {
@@ -82,14 +85,17 @@ add.vertices <- function(graph, nv, ..., attr=list()) {
     idx <- numeric()
   }
 
-  oclass <- class(graph)
-  graph <- unclass(graph)
-  for (i in seq(attrs)) {
-    graph[[9]][[3]][[nam[i]]][idx] <- attrs[[nam[i]]]
-  }
-  class(graph) <- oclass
-                  
-  graph
+  vattrs <- .Call("R_igraph_mybracket2", graph, 9L, 3L, PACKAGE="igraph")
+  for (i in seq(attrs)) { vattrs[[nam[i]]][idx] <- attrs[[nam[i]]] }
+
+  ## Trick to make R copy the graph
+  newgraph <- graph
+  attr(newgraph, "foo") <- NULL
+
+  ## !!! Modifies the graph in place
+  .Call("R_igraph_mybracket2_set", newgraph, 9L, 3L, vattrs, PACKAGE="igraph")
+  
+  newgraph
 }
 
 delete.edges <- function(graph, edges) {
