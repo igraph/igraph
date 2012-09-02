@@ -734,4 +734,6 @@ int igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *context) {
       IGRAPH_WARNING("Invalid edge in bipartite graph");
     }
   }
+  
+  return 0;
 }
