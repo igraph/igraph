@@ -47,7 +47,8 @@
       ""
     } else {
       type <- sapply(names, function(x) mode(fun(object, x)))
-      type <- sapply(type, switch, "numeric"="n", "character"="c", "x")
+      type <- sapply(type, switch, "numeric"="n", "character"="c",
+                     "logical"="l", "x")
       paste(sep="", names, " (", code, "/", type, ")")
     }
   }
@@ -298,7 +299,8 @@ summary.igraph <- function(object, ...) {
       ""
     } else {
       type <- sapply(names, function(x) mode(fun(object, x)))
-      type <- sapply(type, switch, "numeric"="n", "character"="c", "x")
+      type <- sapply(type, switch, "numeric"="n", "character"="c",
+                     "logical"="l", "x")
       paste(sep="", names, " (", code, "/", type, ")")
     }
   }
