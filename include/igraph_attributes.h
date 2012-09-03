@@ -98,6 +98,7 @@ __BEGIN_DECLS
  * igraph_attribute_table_t.
  * \enumval IGRAPH_ATTRIBUTE_DEFAULT Currently not used for anything.
  * \enumval IGRAPH_ATTRIBUTE_NUMERIC Numeric attribute.
+ * \enumval IGRAPH_ATTRIBUTE_BOOLEAN Logical values, true or false.
  * \enumval IGRAPH_ATTRIBUTE_STRING Attribute that can be converted to
  *   a string.
  * \enumval IGRAPH_ATTRIBUTE_R_OBJECT An R object. This is usually
@@ -107,7 +108,8 @@ __BEGIN_DECLS
  * 
  */
 typedef enum { IGRAPH_ATTRIBUTE_DEFAULT=0,
-	       IGRAPH_ATTRIBUTE_NUMERIC=1, 
+	       IGRAPH_ATTRIBUTE_NUMERIC=1,
+	       IGRAPH_ATTRIBUTE_BOOLEAN=5,
 	       IGRAPH_ATTRIBUTE_STRING=2,
 	       IGRAPH_ATTRIBUTE_R_OBJECT=3, 
 	       IGRAPH_ATTRIBUTE_PY_OBJECT=4 } igraph_attribute_type_t;
@@ -217,14 +219,21 @@ int igraph_attribute_combination_query(const igraph_attribute_combination_t *com
  * \member get_string_graph_attr Query a string graph attribute. The 
  *    value should be placed as the first element of the \p value
  *    string vector.
+ * \member get_bool_graph_attr Query a boolean graph attribute. The 
+ *    value should be placed as the first element of the \p value
+ *    boolean vector.
  * \member get_numeric_vertex_attr Query a numeric vertex attribute,
  *    for the vertices included in \p vs.
  * \member get_string_vertex_attr Query a string vertex attribute, 
  *    for the vertices included in \p vs.
+ * \member get_bool_vertex_attr Query a boolean vertex attribute, 
+ *    for the vertices included in \p vs.
  * \member get_numeric_edge_attr Query a numeric edge attribute, for
  *    the edges included in \p es.
  * \member get_string_edge_attr Query a string edge attribute, for the 
- *    edge included in \p es.
+ *    edges included in \p es.
+ * \member get_bool_edge_attr Query a boolean edge attribute, for the 
+ *    edges included in \p es.
  *
  * Note that the <function>get_*_*_attr</function> are allowed to
  * convert the attributes to numeric or string. E.g. if a vertex attribute
@@ -267,18 +276,26 @@ typedef struct igraph_attribute_table_t {
 				igraph_vector_t *value);
   int (*get_string_graph_attr)(const igraph_t *graph, const char *name,
 			       igraph_strvector_t *value);
+  int (*get_bool_graph_attr)(const igraph_t *igraph, const char *name, 
+			     igraph_vector_bool_t *value);
   int (*get_numeric_vertex_attr)(const igraph_t *graph, const char *name,
 				 igraph_vs_t vs,
 				 igraph_vector_t *value);
   int (*get_string_vertex_attr)(const igraph_t *graph, const char *name,
 				igraph_vs_t vs,
 				igraph_strvector_t *value);
+  int (*get_bool_vertex_attr)(const igraph_t *graph, const char *name,
+			      igraph_vs_t vs,
+			      igraph_vector_bool_t *value);
   int (*get_numeric_edge_attr)(const igraph_t *graph, const char *name,
 			       igraph_es_t es,
 			       igraph_vector_t *value);
   int (*get_string_edge_attr)(const igraph_t *graph, const char *name,
 			      igraph_es_t es,
 			      igraph_strvector_t *value);
+  int (*get_bool_edge_attr)(const igraph_t *graph, const char *name,
+			    igraph_es_t es,
+			    igraph_vector_bool_t *value);
 } igraph_attribute_table_t;
 
 igraph_attribute_table_t *
@@ -359,6 +376,17 @@ int igraph_i_attribute_get_string_edge_attr(const igraph_t *graph,
 					    const char *name,
 					    igraph_es_t es,
 					    igraph_strvector_t *value);
+int igraph_i_attribute_get_bool_graph_attr(const igraph_t *graph,
+					   const char *name,
+					   igraph_vector_bool_t *value);
+int igraph_i_attribute_get_bool_vertex_attr(const igraph_t *graph, 
+					    const char *name,
+					    igraph_vs_t vs,
+					    igraph_vector_bool_t *value);
+int igraph_i_attribute_get_bool_edge_attr(const igraph_t *graph,
+					  const char *name,
+					  igraph_es_t es,
+					  igraph_vector_bool_t *value);
 
 /* Experimental attribute handler in C */
 
