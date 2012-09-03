@@ -71,6 +71,7 @@ int R_igraph_SEXP_to_0orvectorlist(SEXP vectorlist,
 				   igraph_vector_ptr_t *ptr);
 int R_igraph_SEXP_to_vectorlist(SEXP vectorlist, igraph_vector_ptr_t *ptr);
 int R_SEXP_to_vector_bool(SEXP sv, igraph_vector_bool_t *v);
+int R_SEXP_to_vector_bool_copy(SEXP sv, igraph_vector_bool_t *v);
 int R_SEXP_to_vector_int(SEXP sv, igraph_vector_int_t *v);
 int R_SEXP_to_vector_long_copy(SEXP sv, igraph_vector_long_t *v);
 int R_SEXP_to_hrg(SEXP shrg, igraph_hrg_t *hrg);
@@ -162,6 +163,7 @@ int R_igraph_attribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
   for (i=0; i<attrno; i++) {
     igraph_attribute_record_t *rec=VECTOR(*attr)[i];
     igraph_vector_t *vec;
+    igraph_vector_bool_t *log;
     igraph_strvector_t *strvec;
     SET_STRING_ELT(names, i, mkChar(rec->name));
     SET_VECTOR_ELT(gal, i, R_NilValue);
@@ -171,6 +173,13 @@ int R_igraph_attribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
       if (igraph_vector_size(vec) > 0) {
 	SET_VECTOR_ELT(gal, i, NEW_NUMERIC(1));
 	REAL(VECTOR_ELT(gal, i))[0]=VECTOR(*vec)[0];
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_BOOLEAN:
+      log=(igraph_vector_bool_t*) rec->value;
+      if (igraph_vector_bool_size(log) > 0) {
+	SET_VECTOR_ELT(gal, i, NEW_LOGICAL(1));
+	LOGICAL(VECTOR_ELT(gal, i))[0]=VECTOR(*log)[0];
       }
       break;
     case IGRAPH_ATTRIBUTE_STRING:
@@ -329,6 +338,12 @@ int R_igraph_attribute_add_vertices(igraph_t *graph, long int nv,
 	}
 	PROTECT(app=NEW_NUMERIC(nv));
 	igraph_vector_copy_to(tmprec->value, REAL(app));
+	break;
+      case IGRAPH_ATTRIBUTE_BOOLEAN:
+	if (nv != igraph_vector_bool_size(tmprec->value)) {
+	  IGRAPH_ERROR("Invalid attribute length", IGRAPH_EINVAL);
+	}
+	PROTECT(app=R_igraph_vector_bool_to_SEXP(tmprec->value));
 	break;
       case IGRAPH_ATTRIBUTE_STRING:
 	if (nv != igraph_strvector_size(tmprec->value)) {
@@ -622,6 +637,12 @@ int R_igraph_attribute_add_edges(igraph_t *graph,
 	PROTECT(app=NEW_NUMERIC(ne));
 	igraph_vector_copy_to(tmprec->value, REAL(app));
 	break;
+      case IGRAPH_ATTRIBUTE_BOOLEAN:
+	if (ne != igraph_vector_bool_size(tmprec->value)) {
+	  IGRAPH_ERROR("Invalid attribute length", IGRAPH_EINVAL);
+	}
+	PROTECT(app=R_igraph_vector_bool_to_SEXP(tmprec->value));
+	break;
       case IGRAPH_ATTRIBUTE_STRING:
 	if (ne != igraph_strvector_size(tmprec->value)) {
 	  IGRAPH_ERROR("Invalid attribute length", IGRAPH_EINVAL);
@@ -823,6 +844,8 @@ int R_igraph_attribute_get_info(const igraph_t *graph,
 	SEXP a=VECTOR_ELT(al, j);
 	if (TYPEOF(a)==REALSXP || TYPEOF(a)==INTSXP) {
 	  VECTOR(*t)[j]=IGRAPH_ATTRIBUTE_NUMERIC;
+	} else if (IS_LOGICAL(a)) {
+	  VECTOR(*t)[j]=IGRAPH_ATTRIBUTE_BOOLEAN;
 	} else if (IS_CHARACTER(a)) {
 	  VECTOR(*t)[j]=IGRAPH_ATTRIBUTE_STRING;
 	} else {
@@ -885,6 +908,8 @@ int R_igraph_attribute_gettype(const igraph_t *graph,
   res=R_igraph_getListElement(VECTOR_ELT(graph->attr, attrnum), name);
   if (IS_NUMERIC(res) || IS_INTEGER(res)) {
     *type=IGRAPH_ATTRIBUTE_NUMERIC;
+  } else if (IS_LOGICAL(res)) {
+    *type=IGRAPH_ATTRIBUTE_BOOLEAN;
   } else if (IS_CHARACTER(res)) {
     *type=IGRAPH_ATTRIBUTE_STRING;
   } else {
@@ -907,6 +932,26 @@ int R_igraph_attribute_get_numeric_graph_attr(const igraph_t *graph,
   
   IGRAPH_CHECK(igraph_vector_resize(value, 1));
   VECTOR(*value)[0]=REAL(ga)[0];
+
+  UNPROTECT(1);
+
+  return 0;
+}
+
+int R_igraph_attribute_get_bool_graph_attr(const igraph_t *graph,
+					   const char *name, 
+					   igraph_vector_bool_t *value) {
+  SEXP gal=VECTOR_ELT(graph->attr, 1);
+  SEXP ga=R_igraph_getListElement(gal, name);
+  
+  if (ga == R_NilValue) {
+    IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+  }
+
+  PROTECT(ga=AS_LOGICAL(ga));
+  
+  IGRAPH_CHECK(igraph_vector_bool_resize(value, 1));
+  VECTOR(*value)[0]=LOGICAL(ga)[0];
 
   UNPROTECT(1);
 
@@ -958,6 +1003,44 @@ int R_igraph_attribute_get_numeric_vertex_attr(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vit_create(graph, vs, &it));
     IGRAPH_FINALLY(igraph_vit_destroy, &it);
     IGRAPH_CHECK(igraph_vector_resize(value, IGRAPH_VIT_SIZE(it)));
+    while (!IGRAPH_VIT_END(it)) {
+      long int v=IGRAPH_VIT_GET(it);
+      VECTOR(*value)[i]=REAL(va)[v];
+      IGRAPH_VIT_NEXT(it);
+      i++;
+    }
+    igraph_vit_destroy(&it);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  UNPROTECT(1);
+  return 0;
+}
+
+int R_igraph_attribute_get_bool_vertex_attr(const igraph_t *graph, 
+					    const char *name,
+					    igraph_vs_t vs,
+					    igraph_vector_bool_t *value) {
+  /* TODO: serialization */
+  SEXP val=VECTOR_ELT(graph->attr, 2);
+  SEXP va=R_igraph_getListElement(val, name);
+  igraph_vector_bool_t newvalue;
+
+  if (va == R_NilValue) {
+    IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+  }
+  PROTECT(va=AS_LOGICAL(va));
+
+  if (igraph_vs_is_all(&vs)) {
+    R_SEXP_to_vector_bool_copy(va, &newvalue);
+    igraph_vector_bool_destroy(value);
+    *value=newvalue;
+  } else {
+    igraph_vit_t it;
+    long int i=0;
+    IGRAPH_CHECK(igraph_vit_create(graph, vs, &it));
+    IGRAPH_FINALLY(igraph_vit_destroy, &it);
+    IGRAPH_CHECK(igraph_vector_bool_resize(value, IGRAPH_VIT_SIZE(it)));
     while (!IGRAPH_VIT_END(it)) {
       long int v=IGRAPH_VIT_GET(it);
       VECTOR(*value)[i]=REAL(va)[v];
@@ -1035,6 +1118,44 @@ int R_igraph_attribute_get_numeric_edge_attr(const igraph_t *graph,
     IGRAPH_CHECK(igraph_eit_create(graph, es, &it));
     IGRAPH_FINALLY(igraph_eit_destroy, &it);
     IGRAPH_CHECK(igraph_vector_resize(value, IGRAPH_EIT_SIZE(it)));
+    while (!IGRAPH_EIT_END(it)) {
+      long int e=IGRAPH_EIT_GET(it);
+      VECTOR(*value)[i]=REAL(ea)[e];
+      IGRAPH_EIT_NEXT(it);
+      i++;
+    }
+    igraph_eit_destroy(&it);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  UNPROTECT(1);
+  return 0;
+}
+
+int R_igraph_attribute_get_bool_edge_attr(const igraph_t *graph,
+					  const char *name,
+					  igraph_es_t es,
+					  igraph_vector_bool_t *value) {
+  /* TODO: serialization */
+  SEXP eal=VECTOR_ELT(graph->attr, 3);
+  SEXP ea=R_igraph_getListElement(eal, name);
+  igraph_vector_bool_t newvalue;
+
+  if (ea == R_NilValue) {
+    IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+  }
+  PROTECT(ea=AS_LOGICAL(ea));
+  
+  if (igraph_es_is_all(&es)) {    
+    R_SEXP_to_vector_bool_copy(ea, &newvalue);
+    igraph_vector_bool_destroy(value);
+    *value=newvalue;
+  } else {
+    igraph_eit_t it;
+    long int i=0;
+    IGRAPH_CHECK(igraph_eit_create(graph, es, &it));
+    IGRAPH_FINALLY(igraph_eit_destroy, &it);
+    IGRAPH_CHECK(igraph_vector_bool_resize(value, IGRAPH_EIT_SIZE(it)));
     while (!IGRAPH_EIT_END(it)) {
       long int e=IGRAPH_EIT_GET(it);
       VECTOR(*value)[i]=REAL(ea)[e];
@@ -1760,11 +1881,14 @@ igraph_attribute_table_t R_igraph_attribute_table={
   &R_igraph_attribute_get_info,
   &R_igraph_attribute_has_attr, &R_igraph_attribute_gettype,
   &R_igraph_attribute_get_numeric_graph_attr,
-  &R_igraph_attribute_get_string_graph_attr,
+  &R_igraph_attribute_get_string_graph_attr,  
+  &R_igraph_attribute_get_bool_graph_attr,  
   &R_igraph_attribute_get_numeric_vertex_attr,
   &R_igraph_attribute_get_string_vertex_attr,
+  &R_igraph_attribute_get_bool_vertex_attr,
   &R_igraph_attribute_get_numeric_edge_attr,
-  &R_igraph_attribute_get_string_edge_attr
+  &R_igraph_attribute_get_string_edge_attr,
+  &R_igraph_attribute_get_bool_edge_attr
 };
 
 igraph_attribute_table_t *R_igraph_attribute_oldtable;
@@ -2399,6 +2523,16 @@ int R_SEXP_to_vector_bool(SEXP sv, igraph_vector_bool_t *v) {
   v->stor_end=v->stor_begin+GET_LENGTH(sv);
   v->end=v->stor_end;
   return 0;
+}
+
+int R_SEXP_to_vector_bool_copy(SEXP sv, igraph_vector_bool_t *v) {
+  long int i, n=GET_LENGTH(sv);
+  int *svv=LOGICAL(sv);
+  igraph_vector_bool_init(v, n);
+  for (i=0; i<n; i++) {
+    VECTOR(*v)[i] = svv[i];
+  }
+  return 0;  
 }
 
 int R_SEXP_to_vector_int(SEXP sv, igraph_vector_int_t *v) {
