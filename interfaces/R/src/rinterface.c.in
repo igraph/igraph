@@ -36,24 +36,24 @@
 int igraph_free(void *p);
 
 SEXP R_igraph_vector_to_SEXP(const igraph_vector_t *v);
-SEXP R_igraph_vector_bool_to_SEXP(igraph_vector_bool_t *v);
-SEXP R_igraph_vector_long_to_SEXP(igraph_vector_long_t *v);
-SEXP R_igraph_vector_complex_to_SEXP(igraph_vector_complex_t* v);
-SEXP R_igraph_0orvector_to_SEXP(igraph_vector_t *v);
-SEXP R_igraph_0orvector_bool_to_SEXP(igraph_vector_bool_t *v);
-SEXP R_igraph_0orvector_long_to_SEXP(igraph_vector_long_t *v);
-SEXP R_igraph_0orvector_complex_to_SEXP(igraph_vector_complex_t *v);
-SEXP R_igraph_matrix_to_SEXP(igraph_matrix_t *m);
-SEXP R_igraph_matrix_complex_to_SEXP(igraph_matrix_complex_t *m);
-SEXP R_igraph_0ormatrix_complex_to_SEXP(igraph_matrix_complex_t *m);
+SEXP R_igraph_vector_bool_to_SEXP(const igraph_vector_bool_t *v);
+SEXP R_igraph_vector_long_to_SEXP(const igraph_vector_long_t *v);
+SEXP R_igraph_vector_complex_to_SEXP(const igraph_vector_complex_t* v);
+SEXP R_igraph_0orvector_to_SEXP(const igraph_vector_t *v);
+SEXP R_igraph_0orvector_bool_to_SEXP(const igraph_vector_bool_t *v);
+SEXP R_igraph_0orvector_long_to_SEXP(const igraph_vector_long_t *v);
+SEXP R_igraph_0orvector_complex_to_SEXP(const igraph_vector_complex_t *v);
+SEXP R_igraph_matrix_to_SEXP(const igraph_matrix_t *m);
+SEXP R_igraph_matrix_complex_to_SEXP(const igraph_matrix_complex_t *m);
+SEXP R_igraph_0ormatrix_complex_to_SEXP(const igraph_matrix_complex_t *m);
 SEXP R_igraph_strvector_to_SEXP(const igraph_strvector_t *m);
-SEXP R_igraph_to_SEXP(igraph_t *graph);
+SEXP R_igraph_to_SEXP(const igraph_t *graph);
 SEXP R_igraph_vectorlist_to_SEXP(const igraph_vector_ptr_t *ptr);
 SEXP R_igraph_0orvectorlist_to_SEXP(const igraph_vector_ptr_t *ptr);
 void R_igraph_vectorlist_destroy(igraph_vector_ptr_t *ptr);
 SEXP R_igraph_hrg_to_SEXP(const igraph_hrg_t *hrg);
-SEXP R_igraph_sparsemat_to_SEXP(igraph_sparsemat_t *sp);
-SEXP R_igraph_0orsparsemat_to_SEXP(igraph_sparsemat_t *sp);
+SEXP R_igraph_sparsemat_to_SEXP(const igraph_sparsemat_t *sp);
+SEXP R_igraph_0orsparsemat_to_SEXP(const igraph_sparsemat_t *sp);
 
 int R_igraph_SEXP_to_strvector(SEXP rval, igraph_strvector_t *sv);
 int R_igraph_SEXP_to_strvector_copy(SEXP rval, igraph_strvector_t *sv);
@@ -1880,7 +1880,7 @@ SEXP R_igraph_vector_to_SEXPp1(const igraph_vector_t *v) {
   return result;
 }  
 
-SEXP R_igraph_0orvector_to_SEXP(igraph_vector_t *v) {
+SEXP R_igraph_0orvector_to_SEXP(const igraph_vector_t *v) {
   SEXP result;
   if (v) {
     PROTECT(result=R_igraph_vector_to_SEXP(v));
@@ -1891,7 +1891,7 @@ SEXP R_igraph_0orvector_to_SEXP(igraph_vector_t *v) {
   return result;
 }
 
-SEXP R_igraph_0orvector_to_SEXPp1(igraph_vector_t *v) {
+SEXP R_igraph_0orvector_to_SEXPp1(const igraph_vector_t *v) {
   SEXP result;
   if (v) {
     PROTECT(result=R_igraph_vector_to_SEXPp1(v));
@@ -1902,7 +1902,7 @@ SEXP R_igraph_0orvector_to_SEXPp1(igraph_vector_t *v) {
   return result;
 }
 
-SEXP R_igraph_vector_bool_to_SEXP(igraph_vector_bool_t *v) {
+SEXP R_igraph_vector_bool_to_SEXP(const igraph_vector_bool_t *v) {
   SEXP result;
   long int n=igraph_vector_bool_size(v);
   
@@ -1920,7 +1920,7 @@ SEXP R_igraph_vector_bool_to_SEXP(igraph_vector_bool_t *v) {
   return result;
 }
 
-SEXP R_igraph_vector_long_to_SEXP(igraph_vector_long_t *v) {
+SEXP R_igraph_vector_long_to_SEXP(const igraph_vector_long_t *v) {
   SEXP result;
   long int i, n=igraph_vector_long_size(v);
   double *rr;
@@ -1935,7 +1935,7 @@ SEXP R_igraph_vector_long_to_SEXP(igraph_vector_long_t *v) {
   return result;
 }
 
-SEXP R_igraph_vector_long_to_SEXPp1(igraph_vector_long_t *v) {
+SEXP R_igraph_vector_long_to_SEXPp1(const igraph_vector_long_t *v) {
   SEXP result;
   long int i, n=igraph_vector_long_size(v);
   double *rr;
@@ -1950,7 +1950,7 @@ SEXP R_igraph_vector_long_to_SEXPp1(igraph_vector_long_t *v) {
   return result;
 }
 
-SEXP R_igraph_0orvector_bool_to_SEXP(igraph_vector_bool_t *v) {
+SEXP R_igraph_0orvector_bool_to_SEXP(const igraph_vector_bool_t *v) {
   SEXP result;
   if (v) {
     PROTECT(result=R_igraph_vector_bool_to_SEXP(v));
@@ -1961,7 +1961,7 @@ SEXP R_igraph_0orvector_bool_to_SEXP(igraph_vector_bool_t *v) {
   return result;
 }
 
-SEXP R_igraph_0orvector_long_to_SEXP(igraph_vector_long_t *v) {
+SEXP R_igraph_0orvector_long_to_SEXP(const igraph_vector_long_t *v) {
   SEXP result;
   if (v) {
     PROTECT(result=R_igraph_vector_long_to_SEXP(v));
@@ -1972,7 +1972,7 @@ SEXP R_igraph_0orvector_long_to_SEXP(igraph_vector_long_t *v) {
   return result;
 }
 
-SEXP R_igraph_vector_complex_to_SEXP(igraph_vector_complex_t* v) {
+SEXP R_igraph_vector_complex_to_SEXP(const igraph_vector_complex_t* v) {
   long int n=igraph_vector_complex_size(v);
   SEXP result;
   PROTECT(result=NEW_COMPLEX(n));
@@ -1981,7 +1981,7 @@ SEXP R_igraph_vector_complex_to_SEXP(igraph_vector_complex_t* v) {
   return result;
 }
 
-SEXP R_igraph_0orvector_complex_to_SEXP(igraph_vector_complex_t *v) {
+SEXP R_igraph_0orvector_complex_to_SEXP(const igraph_vector_complex_t *v) {
   SEXP result;
   if (v) {
     PROTECT(result=R_igraph_vector_complex_to_SEXP(v));
@@ -1992,7 +1992,7 @@ SEXP R_igraph_0orvector_complex_to_SEXP(igraph_vector_complex_t *v) {
   return result;
 }
 
-SEXP R_igraph_matrix_to_SEXP(igraph_matrix_t *m) {
+SEXP R_igraph_matrix_to_SEXP(const igraph_matrix_t *m) {
 
   SEXP result, dim; 
   
@@ -2007,7 +2007,7 @@ SEXP R_igraph_matrix_to_SEXP(igraph_matrix_t *m) {
   return result;
 }
 
-SEXP R_igraph_0ormatrix_to_SEXP(igraph_matrix_t *m) {
+SEXP R_igraph_0ormatrix_to_SEXP(const igraph_matrix_t *m) {
   SEXP result;
   if (m) {
     PROTECT(result=R_igraph_matrix_to_SEXP(m));
@@ -2018,7 +2018,7 @@ SEXP R_igraph_0ormatrix_to_SEXP(igraph_matrix_t *m) {
   return result;
 }
 
-SEXP R_igraph_matrix_complex_to_SEXP(igraph_matrix_complex_t *m) {
+SEXP R_igraph_matrix_complex_to_SEXP(const igraph_matrix_complex_t *m) {
   SEXP result, dim;
   PROTECT(result=NEW_COMPLEX(igraph_matrix_complex_size(m)));
   igraph_matrix_complex_copy_to(m, (igraph_complex_t*) COMPLEX(result));
@@ -2030,7 +2030,7 @@ SEXP R_igraph_matrix_complex_to_SEXP(igraph_matrix_complex_t *m) {
   return result;
 }
 
-SEXP R_igraph_0ormatrix_complex_to_SEXP(igraph_matrix_complex_t *m) {
+SEXP R_igraph_0ormatrix_complex_to_SEXP(const igraph_matrix_complex_t *m) {
   SEXP result;
   if (m) {
     PROTECT(result=R_igraph_matrix_complex_to_SEXP(m));
@@ -2041,7 +2041,7 @@ SEXP R_igraph_0ormatrix_complex_to_SEXP(igraph_matrix_complex_t *m) {
   return result;
 }
 
-SEXP R_igraph_array3_to_SEXP(igraph_array3_t *a) {
+SEXP R_igraph_array3_to_SEXP(const igraph_array3_t *a) {
   SEXP result, dim;
   
   PROTECT(result=NEW_NUMERIC(igraph_array3_size(a)));
@@ -2056,7 +2056,7 @@ SEXP R_igraph_array3_to_SEXP(igraph_array3_t *a) {
   return result;
 }
 
-SEXP R_igraph_0orarray3_to_SEXP(igraph_array3_t *a) {
+SEXP R_igraph_0orarray3_to_SEXP(const igraph_array3_t *a) {
   SEXP result;
   if (a) {
     PROTECT(result=R_igraph_array3_to_SEXP(a));
@@ -2084,7 +2084,7 @@ SEXP R_igraph_strvector_to_SEXP(const igraph_strvector_t *m) {
   return result;
 }
 
-SEXP R_igraph_to_SEXP(igraph_t *graph) {
+SEXP R_igraph_to_SEXP(const igraph_t *graph) {
   
   SEXP result;
   long int no_of_nodes=igraph_vcount(graph);
@@ -2237,7 +2237,7 @@ int R_SEXP_to_sparsemat(SEXP pakl, igraph_sparsemat_t *akl) {
   return 0;
 }
 
-SEXP R_igraph_sparsemat_to_SEXP_triplet(igraph_sparsemat_t *sp) {
+SEXP R_igraph_sparsemat_to_SEXP_triplet(const igraph_sparsemat_t *sp) {
   SEXP res, names;
   int nz=igraph_sparsemat_nonzero_storage(sp);
 
@@ -2271,7 +2271,7 @@ SEXP R_igraph_sparsemat_to_SEXP_triplet(igraph_sparsemat_t *sp) {
   return res;
 }
 
-SEXP R_igraph_sparsemat_to_SEXP_cc(igraph_sparsemat_t *sp) {
+SEXP R_igraph_sparsemat_to_SEXP_cc(const igraph_sparsemat_t *sp) {
   SEXP res, names;
   int nz=igraph_sparsemat_nonzero_storage(sp);
   int m=igraph_sparsemat_nrow(sp);
@@ -2307,7 +2307,7 @@ SEXP R_igraph_sparsemat_to_SEXP_cc(igraph_sparsemat_t *sp) {
   return res;
 }
 
-SEXP R_igraph_sparsemat_to_SEXP(igraph_sparsemat_t *sp) {
+SEXP R_igraph_sparsemat_to_SEXP(const igraph_sparsemat_t *sp) {
   if (igraph_sparsemat_is_triplet(sp)) {
     return R_igraph_sparsemat_to_SEXP_triplet(sp);
   } else {
@@ -2315,7 +2315,7 @@ SEXP R_igraph_sparsemat_to_SEXP(igraph_sparsemat_t *sp) {
   }
 }
 
-SEXP R_igraph_0orsparsemat_to_SEXP(igraph_sparsemat_t *sp) {
+SEXP R_igraph_0orsparsemat_to_SEXP(const igraph_sparsemat_t *sp) {
   if (!sp) {
     return R_NilValue;
   } else {
@@ -2611,7 +2611,7 @@ int R_SEXP_to_igraph_arpack_options(SEXP in, igraph_arpack_options_t *opt) {
   return 0;
 }
 
-SEXP R_igraph_arpack_options_to_SEXP(igraph_arpack_options_t *opt) {
+SEXP R_igraph_arpack_options_to_SEXP(const igraph_arpack_options_t *opt) {
   SEXP result, names;
   char bmat[2], which[3];
 
@@ -2668,7 +2668,7 @@ SEXP R_igraph_arpack_options_to_SEXP(igraph_arpack_options_t *opt) {
   return result;  
 }
 
-SEXP R_igraph_bliss_info_to_SEXP(igraph_bliss_info_t *info) {
+SEXP R_igraph_bliss_info_to_SEXP(const igraph_bliss_info_t *info) {
   SEXP result, names;
   
   PROTECT(result=NEW_LIST(6));
