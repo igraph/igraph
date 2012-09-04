@@ -10461,13 +10461,13 @@ PyObject *igraphmodule_Graph_community_leading_eigenvector(igraphmodule_GraphObj
     igraph_matrix_destroy(&m);
     igraph_vector_destroy(&members);
     if (weights != 0) {
-      igraph_vector_destroy(&weights); free(weights);
+      igraph_vector_destroy(weights); free(weights);
     }
     return igraphmodule_handle_igraph_error();
   }
 
   if (weights != 0) {
-    igraph_vector_destroy(&weights); free(weights);
+    igraph_vector_destroy(weights); free(weights);
   }
 
   cl = igraphmodule_vector_t_to_PyList(&members, IGRAPHMODULE_TYPE_INT);
