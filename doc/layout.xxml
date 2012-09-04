@@ -14,6 +14,7 @@
 <!-- doxrox-include igraph_layout_star -->
 <!-- doxrox-include igraph_layout_grid -->
 <!-- doxrox-include igraph_layout_graphopt -->
+<!-- doxrox-include igraph_layout_bipartite -->
 <section><title>The DrL layout generator</title>
 <!-- doxrox-include about_drl -->
 <!-- doxrox-include igraph_layout_drl_options_t -->

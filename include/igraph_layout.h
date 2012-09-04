@@ -140,6 +140,11 @@ int igraph_layout_mds(const igraph_t *graph, igraph_matrix_t *res,
                       const igraph_matrix_t *dist, long int dim,
                       igraph_arpack_options_t *options);
 
+int igraph_layout_bipartite(const igraph_t *graph, 
+			    const igraph_vector_bool_t *types,
+			    igraph_matrix_t *res, igraph_real_t hgap, 
+			    igraph_real_t vgap, long int maxiter);
+
 /** 
  * \struct igraph_layout_drl_options_t
  * Parameters for the DrL layout generator

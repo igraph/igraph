@@ -1050,6 +1050,12 @@ igraph_layout_mds:
                 INTEGER dim=2, INOUT ARPACKOPT options=igraph.arpack.default
         NAME-R: layout.mds
 
+igraph_layout_bipartite:
+        PARAMS: GRAPH graph, BIPARTITE_TYPES types=NULL, OUT MATRIX res, \
+                REAL hgap=1, REAL vgap=1, INTEGER maxiter=100
+        DEPS: types ON graph
+        NAME-R: layout.bipartite
+
 #######################################
 # Cocitation and other similarity measures
 #######################################
