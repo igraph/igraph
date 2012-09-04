@@ -1994,6 +1994,16 @@ int igraph_i_pajek_escape(char* src, char** dest) {
  * corresponding vertex and edge attributes are listed at \ref
  * igraph_read_graph_pajek(), eg. the `\c color' vertex attributes
  * determines the color (`\c c' in Pajek) parameter.
+ * 
+ * </para><para>
+ * As of version 0.6.1 igraph writes bipartite graphs into Pajek files
+ * correctly, i.e. they will be also bipartite when read into Pajek. 
+ * As Pajek is less flexible for bipartite graphs (the numeric ids of 
+ * the vertices must be sorted according to vertex type), igraph might 
+ * need to reorder the vertices when writing a bipartite Pajek file. 
+ * This effectively means that numeric vertex ids usually change when
+ * a bipartite graph is written to a Pajek file, and then read back
+ * into igraph.
  * \param graph The graph object to write.
  * \param outstream The file to write to. It should be opened and
  * writable. Make sure that you open the file in binary format if you use MS Windows,
@@ -2069,6 +2079,11 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
   igraph_vector_t vx_stra;
   
   char *s, *escaped;
+  
+  igraph_bool_t bipartite=0;
+  igraph_vector_int_t bip_index, bip_index2;
+  igraph_vector_bool_t bvec;
+  long int notop=0, nobottom=0;
 
   IGRAPH_VECTOR_INIT_FINALLY(&numv, 1);
   IGRAPH_STRVECTOR_INIT_FINALLY(&strv, 1);
@@ -2078,9 +2093,59 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
   IGRAPH_VECTOR_INIT_FINALLY(&vx_numa, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&vx_stra, 0);
 
+  /* Check if graph is bipartite */
+  if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX, "type")) {
+    igraph_attribute_type_t type_type;
+    igraph_i_attribute_gettype(graph, &type_type, IGRAPH_ATTRIBUTE_VERTEX,
+			       "type");
+    if (type_type == IGRAPH_ATTRIBUTE_BOOLEAN) {
+      int bptr=0, tptr=0;
+      bipartite = 1; write_vertex_attrs = 1;
+      /* Count top and bottom vertices, we go over them twice, 
+	 because we want to keep their original order */
+      IGRAPH_CHECK(igraph_vector_int_init(&bip_index, no_of_nodes));
+      IGRAPH_FINALLY(igraph_vector_int_destroy, &bip_index);
+      IGRAPH_CHECK(igraph_vector_int_init(&bip_index2, no_of_nodes));
+      IGRAPH_FINALLY(igraph_vector_int_destroy, &bip_index2);
+      IGRAPH_CHECK(igraph_vector_bool_init(&bvec, 1));
+      IGRAPH_FINALLY(igraph_vector_bool_destroy, &bvec);
+      for (i=0; i<no_of_nodes; i++) {
+	IGRAPH_CHECK(igraph_i_attribute_get_bool_vertex_attr(graph, 
+				     "type", igraph_vss_1(i), &bvec));
+	if (VECTOR(bvec)[0]) { 
+	  notop++; 
+	} else {
+	  nobottom++;
+	}
+      }
+      for (i=0, bptr=0, tptr=nobottom; i<no_of_nodes; i++) {
+	IGRAPH_CHECK(igraph_i_attribute_get_bool_vertex_attr(graph, 
+					     "type", igraph_vss_1(i), &bvec));
+	if (VECTOR(bvec)[0]) { 
+	  VECTOR(bip_index)[tptr] = i;
+	  VECTOR(bip_index2)[i] = tptr;
+	  tptr++;
+	} else {
+	  VECTOR(bip_index)[bptr] = i;
+	  VECTOR(bip_index2)[i] = bptr;
+	  bptr++;
+	}
+      }
+      igraph_vector_bool_destroy(&bvec);
+      IGRAPH_FINALLY_CLEAN(1);
+    }
+  }
+
   /* Write header */
-  if (fprintf(outstream, "*Vertices %li%s", no_of_nodes, newline) < 0) {
-    IGRAPH_ERROR("Cannot write pajek file", IGRAPH_EFILE);
+  if (bipartite) {
+    if (fprintf(outstream, "*Vertices %li %li%s", no_of_nodes, nobottom, 
+		newline) < 0) {
+      IGRAPH_ERROR("Cannot write pajek file", IGRAPH_EFILE);
+    }
+  } else {
+    if (fprintf(outstream, "*Vertices %li%s", no_of_nodes, newline) < 0) {
+      IGRAPH_ERROR("Cannot write pajek file", IGRAPH_EFILE);
+    }
   }
 
   /* Check the vertex attributes */
@@ -2121,40 +2186,41 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
   /* Write vertices */
   if (write_vertex_attrs) {
     for (i=0; i<no_of_nodes; i++) {
-
+      long int id=bipartite ? VECTOR(bip_index)[i] : i;
+      
       /* vertex id */
       fprintf(outstream, "%li", i+1);
       if (vtypes[V_ID] == IGRAPH_ATTRIBUTE_NUMERIC) {
 	igraph_i_attribute_get_numeric_vertex_attr(graph, vnames[V_ID], 
-						   igraph_vss_1(i), &numv);
+						   igraph_vss_1(id), &numv);
 	fputc('"', outstream);
 	igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
 	fputc('"', outstream);
       } else if (vtypes[V_ID] == IGRAPH_ATTRIBUTE_STRING) {
 	igraph_i_attribute_get_string_vertex_attr(graph, vnames[V_ID],
-						  igraph_vss_1(i), &strv);
+						  igraph_vss_1(id), &strv);
 	igraph_strvector_get(&strv, 0, &s);
 	IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
 	fprintf(outstream, " %s", escaped);
 	igraph_Free(escaped);
       } else {
-	fprintf(outstream, " \"%li\"", i+1);
+	fprintf(outstream, " \"%li\"", id+1);
       }
       
       /* coordinates */
       if (vtypes[V_X] == IGRAPH_ATTRIBUTE_NUMERIC &&
 	  vtypes[V_Y] == IGRAPH_ATTRIBUTE_NUMERIC) {
 	igraph_i_attribute_get_numeric_vertex_attr(graph, vnames[V_X], 
-						   igraph_vss_1(i), &numv);
+						   igraph_vss_1(id), &numv);
 	fputc(' ', outstream);
 	igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
 	igraph_i_attribute_get_numeric_vertex_attr(graph, vnames[V_Y], 
-						   igraph_vss_1(i), &numv);
+						   igraph_vss_1(id), &numv);
 	fputc(' ', outstream);
 	igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
 	if (vtypes[V_Z] == IGRAPH_ATTRIBUTE_NUMERIC) {
 	  igraph_i_attribute_get_numeric_vertex_attr(graph, vnames[V_Z], 
-						     igraph_vss_1(i), &numv);
+						     igraph_vss_1(id), &numv);
 	  fputc(' ', outstream);
 	  igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
 	}
@@ -2163,7 +2229,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
       /* shape */
       if (vtypes[V_SHAPE] == IGRAPH_ATTRIBUTE_STRING) {
 	igraph_i_attribute_get_string_vertex_attr(graph, vnames[V_SHAPE],
-						  igraph_vss_1(i), &strv);
+						  igraph_vss_1(id), &strv);
 	igraph_strvector_get(&strv, 0, &s);
 	IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
 	fprintf(outstream, " %s", escaped);
@@ -2174,7 +2240,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
       for (j=0; j<igraph_vector_size(&vx_numa); j++) {
 	int idx=VECTOR(vx_numa)[j];
 	igraph_i_attribute_get_numeric_vertex_attr(graph, vnumnames[idx],
-						   igraph_vss_1(i), &numv);
+						   igraph_vss_1(id), &numv);
 	fprintf(outstream, " %s ", vnumnames2[idx]);
 	igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
       }
@@ -2183,7 +2249,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
       for (j=0; j<igraph_vector_size(&vx_stra); j++) {
 	int idx=VECTOR(vx_stra)[j];
 	igraph_i_attribute_get_string_vertex_attr(graph, vstrnames[idx],
-						  igraph_vss_1(i), &strv);
+						  igraph_vss_1(id), &strv);
 	igraph_strvector_get(&strv, 0, &s);
 	IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
 	fprintf(outstream, " %s %s", vstrnames2[idx], escaped);
@@ -2244,6 +2310,10 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
     long int edge=IGRAPH_EIT_GET(eit);
     igraph_integer_t from, to;
     igraph_edge(graph, edge, &from,  &to);
+    if (bipartite) { 
+      from=VECTOR(bip_index2)[from];
+      to  =VECTOR(bip_index2)[to];
+    }
     fprintf(outstream, "%li %li", (long int) from+1, (long int) to+1);
     
     /* Weights */
@@ -2280,13 +2350,21 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
 
   igraph_eit_destroy(&eit);
   igraph_es_destroy(&es);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  if (bipartite) {
+    igraph_vector_int_destroy(&bip_index2);
+    igraph_vector_int_destroy(&bip_index);
+    IGRAPH_FINALLY_CLEAN(2);
+  }
+
   igraph_vector_destroy(&ex_numa);
   igraph_vector_destroy(&ex_stra);
   igraph_vector_destroy(&vx_numa);
   igraph_vector_destroy(&vx_stra);
   igraph_strvector_destroy(&strv);
   igraph_vector_destroy(&numv);
-  IGRAPH_FINALLY_CLEAN(8);
+  IGRAPH_FINALLY_CLEAN(6);
   return 0;
 }
 
