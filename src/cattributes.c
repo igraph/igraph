@@ -1917,7 +1917,7 @@ int igraph_i_cattribute_get_bool_vertex_attr(const igraph_t *graph,
     igraph_vit_destroy(&it);
     IGRAPH_FINALLY_CLEAN(1);
   }
-  
+
   return 0;
 }
 
@@ -2706,8 +2706,8 @@ int igraph_cattribute_GAB_set(igraph_t *graph, const char *name,
       IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, (char*)rec->name);
-    rec->type=IGRAPH_ATTRIBUTE_NUMERIC;
-    log=igraph_Calloc(1, igraph_vector_t);
+    rec->type=IGRAPH_ATTRIBUTE_BOOLEAN;
+    log=igraph_Calloc(1, igraph_vector_bool_t);
     if (!log) { 
       IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM);
     }
@@ -2891,7 +2891,7 @@ int igraph_cattribute_VAB_set(igraph_t *graph, const char *name,
       IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, (char*)rec->name);
-    rec->type=IGRAPH_ATTRIBUTE_NUMERIC;
+    rec->type=IGRAPH_ATTRIBUTE_BOOLEAN;
     log=igraph_Calloc(1, igraph_vector_bool_t);
     if (!log) {
       IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
@@ -3081,7 +3081,7 @@ int igraph_cattribute_EAB_set(igraph_t *graph, const char *name,
       IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, (char*)rec->name);
-    rec->type=IGRAPH_ATTRIBUTE_NUMERIC;
+    rec->type=IGRAPH_ATTRIBUTE_BOOLEAN;
     log=igraph_Calloc(1, igraph_vector_bool_t);
     if (!log) {
       IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
@@ -3272,7 +3272,7 @@ int igraph_cattribute_VAB_setv(igraph_t *graph, const char *name,
       IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, rec);
-    rec->type=IGRAPH_ATTRIBUTE_NUMERIC;
+    rec->type=IGRAPH_ATTRIBUTE_BOOLEAN;
     rec->name=strdup(name);
     if (!rec->name) {
       IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
@@ -3471,7 +3471,7 @@ int igraph_cattribute_EAB_setv(igraph_t *graph, const char *name,
       IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, rec);
-    rec->type=IGRAPH_ATTRIBUTE_NUMERIC;
+    rec->type=IGRAPH_ATTRIBUTE_BOOLEAN;
     rec->name=strdup(name);
     if (!rec->name) {
       IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
