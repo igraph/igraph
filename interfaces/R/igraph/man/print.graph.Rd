@@ -61,10 +61,13 @@
 
   From the second line, the attributes of the graph are listed,
   separated by a comma. After the attribute names, the kind of the
-  attribute -- graph, vertex or edge -- is denoted, and the type of the
-  attribute as well, character, numeric, or other (\sQuote{\code{x}}).  
+  attribute -- graph (\sQuote{\code{g}}), vertex (\sQuote{\code{v}}) or
+  edge (\sQuote{\code{e}}) -- is denoted, and the type of the 
+  attribute as well, character (\sQuote{\code{c}}), numeric
+  (\sQuote{\code{n}}), logical (\sQuote{\code{l}}), or
+  other (\sQuote{\code{x}}).  
   
-  As of igraph 0.4 \code{str.igraph} (and \code{print.igraph}) uses the
+  As of igraph 0.4 \code{str.igraph} and \code{print.igraph} use the
   \code{max.print} option, see \code{\link[base]{options}} for details.
 }
 \value{All these functions return the graph invisibly.}
