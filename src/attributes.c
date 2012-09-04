@@ -220,6 +220,38 @@ int igraph_i_attribute_get_string_edge_attr(const igraph_t *graph,
   }
 }
 
+int igraph_i_attribute_get_bool_graph_attr(const igraph_t *graph,
+					   const char *name,
+					   igraph_vector_bool_t *value) {
+  if (igraph_i_attribute_table) {
+    return igraph_i_attribute_table->get_bool_graph_attr(graph, name, value);
+  } else {
+    return 0;
+  }
+}
+
+int igraph_i_attribute_get_bool_vertex_attr(const igraph_t *graph, 
+					    const char *name,
+					    igraph_vs_t vs,
+					    igraph_vector_bool_t *value) {
+  if (igraph_i_attribute_table) {
+    return igraph_i_attribute_table->get_bool_vertex_attr(graph, name, vs, value);
+  } else {
+    return 0;
+  }
+}
+
+int igraph_i_attribute_get_bool_edge_attr(const igraph_t *graph,
+					  const char *name,
+					  igraph_es_t es,
+					  igraph_vector_bool_t *value) {
+  if (igraph_i_attribute_table) {
+    return igraph_i_attribute_table->get_bool_edge_attr(graph, name, es, value);
+  } else {
+    return 0;
+  }
+}
+
 /**
  * \function igraph_i_set_attribute_table
  * \brief Attach an attribute table.
