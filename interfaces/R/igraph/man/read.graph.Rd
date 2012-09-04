@@ -64,12 +64,14 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 	  supported as igraph cannot handle them.
 	\item Graphs containing both directed and undirected edges are
 	  not supported as igraph cannot represent them.
-	\item Bipartite (also called affiliation) networks are not
-	  supported. The surrent igraph version imports the network
-	  structure correctly but vertex type information is omitted.
 	\item Graph with multiple edge sets are not supported.
       }
 
+      From version 0.6.1 igraph supports reading bipartite (two-mode)
+      graphs from Pajek files and adds the \code{type} vertex
+      attribute. A warning is given if invalid edges (edges connecting
+      vertices of the same type) are present in the file.
+      
       Vertex and edge attributes defined in the Pajek file will be also
       read and assigned to the graph object to be created. These are
       mainly parameters for graph visualization, but not exclusively,
@@ -94,6 +96,7 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 	rotation \tab The rotation of the vertex (\code{phi} in Pajek). \cr
 	radius \tab Radius, for some vertex shapes (\code{r} in Pajek). \cr
 	diamondratio \tab For the diamond shape (\code{q} in Pajek). \cr
+	type \tab vertex types in bipartite (two-mode) graphs. \cr
       }
 
       These igraph attributes are only created if there is at least one vertex

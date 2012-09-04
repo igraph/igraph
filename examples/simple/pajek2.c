@@ -1,7 +1,7 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   Copyright (C) 2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
    
    This program is free software; you can redistribute it and/or modify
@@ -26,22 +26,24 @@
 int main() {
   igraph_t g;
   FILE *ifile;
-  
-  ifile=fopen("pajek5.net", "r");
-  if (!ifile) { return 1; }
-  igraph_read_graph_pajek(&g, ifile);
-  fclose(ifile);
-  if (igraph_vcount(&g) != 10 || igraph_ecount(&g) != 9 ||
-      igraph_is_directed(&g)) { return 2; }
-  igraph_destroy(&g);
+  int i, n;
 
-  ifile=fopen("pajek6.net", "r");
-  if (!ifile) { return 3; }
+  /* turn on attribute handling */
+  igraph_i_set_attribute_table(&igraph_cattribute_table);  
+
+  ifile=fopen("bipartite.net", "r");
+  if (!ifile) { return 5; }
   igraph_read_graph_pajek(&g, ifile);
   fclose(ifile);
-  if (igraph_vcount(&g) != 10 || igraph_ecount(&g) != 9 ||
-      !igraph_is_directed(&g)) { return 4; }
-  igraph_destroy(&g);
+  if (igraph_vcount(&g) != 13 || igraph_ecount(&g) != 11 ||
+      igraph_is_directed(&g)) { return 6; }
+
+  for (i=0, n=igraph_vcount(&g); i<n; i++) {
+    printf("%i ", (int) VAN(&g, "type", i));
+  }
+
+  igraph_destroy(&g);  
+
 
   return 0;
 }

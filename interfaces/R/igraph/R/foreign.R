@@ -226,8 +226,14 @@ read.graph.pajek <- function(file, ...) {
     stop("Unknown arguments to read.graph (Pajek format)")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_read_graph_pajek", file,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_read_graph_pajek", file,
+               PACKAGE="igraph")
+  if ("type" %in% list.vertex.attributes(res)) {
+    type <- as.logical(V(res)$type)
+    res <- remove.vertex.attribute(res, "type")
+    res <- set.vertex.attribute(res, "type", value=type)
+  }
+  res
 }
 
 write.graph.pajek <- function(graph, file, ...) {
