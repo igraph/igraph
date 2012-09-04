@@ -211,6 +211,21 @@ class LayoutAlgorithmTests(unittest.TestCase):
         lo = g.layout("rt", root=[0, 100], rootlevel = [2, 10])
         self.assertEqual(lo[100][1]-lo[0][1], 8)
 
+    def testBipartite(self):
+        g = Graph.Full_Bipartite(3, 2)
+
+        lo = g.layout("bipartite")
+        ys = [coord[1] for coord in lo]
+        self.assertEqual([1, 1, 1, 0, 0], ys)
+
+        lo = g.layout("bipartite", vgap=3)
+        ys = [coord[1] for coord in lo]
+        self.assertEqual([3, 3, 3, 0, 0], ys)
+
+        lo = g.layout("bipartite", hgap=5)
+        self.assertEqual(set([0, 5, 10]), set(coord[0] for coord in lo if coord[1] == 1))
+        self.assertEqual(set([2.5, 7.5]), set(coord[0] for coord in lo if coord[1] == 0))
+
 
 def suite():
     layout_suite = unittest.makeSuite(LayoutTests)

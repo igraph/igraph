@@ -6784,6 +6784,60 @@ PyObject *igraphmodule_Graph_layout_sugiyama(
   return (PyObject *) result;
 }
 
+/** \ingroup python_interface_graph
+ * \brief Places the vertices of a bipartite graph according to a simple two-layer
+ * Sugiyama layout.
+ * \return the calculated coordinates as a Python list of lists
+ * \sa igraph_layout_bipartite
+ */
+PyObject *igraphmodule_Graph_layout_bipartite(
+  igraphmodule_GraphObject * self, PyObject * args, PyObject * kwds)
+{
+  static char *kwlist[] = { "types", "hgap", "vgap", "maxiter", NULL };
+  igraph_matrix_t m;
+  igraph_vector_bool_t *types = 0;
+  double hgap = 1, vgap = 1;
+  long int maxiter = 100;
+  PyObject *types_o = Py_None;
+  PyObject *result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|Oddl", kwlist,
+    &types_o, &hgap, &vgap, &maxiter))
+    return NULL;
+
+  if (igraph_matrix_init(&m, 1, 1)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (types_o == Py_None) {
+    types_o = PyString_FromString("type");
+  } else {
+    Py_INCREF(types_o);
+  }
+
+  if (igraphmodule_attrib_to_vector_bool_t(types_o, self, &types,
+	  ATTRIBUTE_TYPE_VERTEX)) {
+    igraph_matrix_destroy(&m);
+    Py_DECREF(types_o);
+    return NULL;
+  }
+  Py_DECREF(types_o);
+
+  if (igraph_layout_bipartite(&self->g, types, &m, hgap, vgap, maxiter)) {
+    if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+    igraph_matrix_destroy(&m);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (types != 0) { igraph_vector_bool_destroy(types); free(types); }
+
+  result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
+  igraph_matrix_destroy(&m);
+  return (PyObject *) result;
+}
+
 /**********************************************************************
  * Conversion between various graph representations                   *
  **********************************************************************/
@@ -12949,6 +13003,26 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /********************/
   /* LAYOUT FUNCTIONS */
   /********************/
+
+  /* interface to igraph_layout_bipartite */
+  {"layout_bipartite",
+   (PyCFunction) igraphmodule_Graph_layout_bipartite,
+   METH_VARARGS | METH_KEYWORDS,
+   "layout_bipartite(types=\"type\", hgap=1, vgap=1, maxiter=100)\n\n"
+   "Place the vertices of a bipartite graph in two layers.\n\n"
+   "The layout is created by placing the vertices in two rows, according\n"
+   "to their types. The positions of the vertices within the rows are\n"
+   "then optimized to minimize the number of edge crossings using the\n"
+   "heuristic used by the Sugiyama layout algorithm.\n\n"
+   "@param types: an igraph vector containing the vertex types, or an\n"
+   "  attribute name. Anything that evalulates to C{False} corresponds to\n"
+   "  vertices of the first kind, everything else to the second kind.\n"
+   "@param hgap: minimum horizontal gap between vertices in the same layer.\n"
+   "@param vgap: vertical gap between the two layers.\n"
+   "@param maxiter: maximum number of iterations to take in the crossing\n"
+   "  reduction step. Increase this if you feel that you are getting too many\n"
+   "  edge crossings.\n"
+   "@return: the calculated layout."},
 
   /* interface to igraph_layout_circle */
   {"layout_circle", (PyCFunction) igraphmodule_Graph_layout_circle,

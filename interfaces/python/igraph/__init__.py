@@ -1245,6 +1245,8 @@ class Graph(GraphBase):
           - C{auto}, C{automatic}: automatic layout
             (see L{Graph.layout_auto})
 
+          - C{bipartite}: bipartite layout (see L{Graph.layout_bipartite})
+
           - C{circle}, C{circular}: circular layout
             (see L{Graph.layout_circle})
 
@@ -2962,6 +2964,7 @@ class Graph(GraphBase):
     _layout_mapping = {
         "auto": "layout_auto",
         "automatic": "layout_auto",
+        "bipartite": "layout_bipartite",
         "circle": "layout_circle",
         "circular": "layout_circle",
         "drl": "layout_drl",
