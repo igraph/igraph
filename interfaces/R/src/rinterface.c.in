@@ -1043,7 +1043,7 @@ int R_igraph_attribute_get_bool_vertex_attr(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_bool_resize(value, IGRAPH_VIT_SIZE(it)));
     while (!IGRAPH_VIT_END(it)) {
       long int v=IGRAPH_VIT_GET(it);
-      VECTOR(*value)[i]=REAL(va)[v];
+      VECTOR(*value)[i]=LOGICAL(va)[v];
       IGRAPH_VIT_NEXT(it);
       i++;
     }
@@ -1158,7 +1158,7 @@ int R_igraph_attribute_get_bool_edge_attr(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_bool_resize(value, IGRAPH_EIT_SIZE(it)));
     while (!IGRAPH_EIT_END(it)) {
       long int e=IGRAPH_EIT_GET(it);
-      VECTOR(*value)[i]=REAL(ea)[e];
+      VECTOR(*value)[i]=LOGICAL(ea)[e];
       IGRAPH_EIT_NEXT(it);
       i++;
     }
