@@ -6741,7 +6741,7 @@ PyObject *igraphmodule_Graph_layout_sugiyama(
   }
 
   if (igraphmodule_attrib_to_vector_t(layers_o, self, &layers,
-	  ATTRIBUTE_TYPE_EDGE)) {
+	  ATTRIBUTE_TYPE_VERTEX)) {
     igraph_vector_destroy(&extd_to_orig_eids);
     igraph_matrix_destroy(&m);
     return NULL;
