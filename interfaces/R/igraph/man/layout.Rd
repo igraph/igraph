@@ -10,7 +10,6 @@
 \alias{layout.spring}
 \alias{layout.reingold.tilford}
 \alias{layout.lgl}
-\alias{layout.mds}
 \alias{layout.svd}
 \alias{layout.graphopt}
 \alias{layout.norm}
@@ -30,7 +29,6 @@ layout.reingold.tilford(graph, \dots, params)
 layout.fruchterman.reingold.grid(graph, \dots, params)
 layout.lgl(graph, \dots, params)
 layout.graphopt(graph, ..., params=list())
-layout.mds(graph, dist=NULL, dim=2, options=igraph.arpack.default)
 layout.svd(graph, d=shortest.paths(graph), ...)
 layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
       zmin = NULL, zmax = NULL)
@@ -40,22 +38,12 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
   \item{params}{The list of function dependent parameters.}
   \item{dim}{Numeric constant, either 2 or 3. Some functions are able
     to generate 2d and 3d layouts as well, supply this argument to
-    change the default behavior.
-
-    \code{layout.mds} supports dimensions up to the number of nodes
-    minus one, but only if the graph is connected; for undirected
-    graphs, the only possible values is 2. This is because
-    \code{layout.merge} only works in 2D.}
+    change the default behavior.}
   \item{\dots}{Function dependent parameters, this is an alternative
     notation to the \code{params} argument. For \code{layout.auto} these
     extra parameters are simply passed to the real layout function, if
     one is called.}
-  \item{dist}{The distance matrix for the multidimensional scaling.
-    If \code{NULL} (the default), then the unweighted shortest path
-    matrix is used.}
-  \item{options}{A named list, to override some ARPACK options. See
-    \code{\link{arpack}} for details.}
-  \item{d}{The matrix used for singulat value decomposition. By default it
+  \item{d}{The matrix used for singular value decomposition. By default it
     is the distance matrix of the graph.}
   \item{layout}{A matrix with two or three columns, the layout to
     normalize.}
@@ -284,13 +272,6 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
       matrix is used.}
   }
   
-  \code{layout.mds} uses metric multidimensional scaling for generating
-  the coordinates. This function does not have the usual \code{params}
-  argument. This function generates the layout
-  separately for each graph component and then merges them via
-  \code{\link{layout.merge}}. \code{layout.mds} is an \emph{experimental}
-  function currently.
-
   \code{layout.svd} is a currently \emph{experimental} layout function based on
   singular value decomposition. It does not have the usual \code{params}
   argument, but take a single argument, the distance matrix of the
