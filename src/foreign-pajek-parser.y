@@ -476,12 +476,16 @@ adjmatrixline: adjmatrixnumbers NEWLINE { context->actfrom++; context->actto=0; 
 
 adjmatrixnumbers: /* empty */ | adjmatrixentry adjmatrixnumbers;
 
-adjmatrixentry: longint {
-  if ($1>0) {
+adjmatrixentry: number {
+  if ($1 != 0) {
     if (context->vcount2==0) {
+      context->actedge++;
+      igraph_i_pajek_add_numeric_edge_attribute("weight", $1, context);    
       igraph_vector_push_back(context->vector, context->actfrom);
       igraph_vector_push_back(context->vector, context->actto);
     } else if (context->vcount2 + context->actto < context->vcount) {
+      context->actedge++;
+      igraph_i_pajek_add_numeric_edge_attribute("weight", $1, context);    
       igraph_vector_push_back(context->vector, context->actfrom);
       igraph_vector_push_back(context->vector, 
 			      context->vcount2+context->actto);
