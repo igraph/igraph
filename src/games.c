@@ -234,7 +234,7 @@ int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
     IGRAPH_CHECK(igraph_degree(start_from, &degree, igraph_vss_all(), mm,
 			       IGRAPH_LOOPS));
     IGRAPH_CHECK(igraph_vector_resize(&degree,  no_of_nodes));
-    for (ii=0; ii<sn; i++) {
+    for (ii=0; ii<sn; ii++) {
       igraph_psumtree_update(&sumtree, ii, pow(VECTOR(degree)[ii], power)+A);
     }
   } else {    
