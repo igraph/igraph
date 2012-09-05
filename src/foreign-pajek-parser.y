@@ -465,7 +465,10 @@ edgelistto: longint {
 
 adjmatrix: matrixline NEWLINE adjmatrixlines;
 
-matrixline: MATRIXLINE { context->actfrom=0; context->actto=0; };
+matrixline: MATRIXLINE { context->actfrom=0; 
+                         context->actto=0; 
+                         if (context->vcount2==0) { context->directed=1; }
+                       };
 
 adjmatrixlines: /* empty */ | adjmatrixlines adjmatrixline;
 
