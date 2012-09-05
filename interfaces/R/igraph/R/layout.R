@@ -851,3 +851,27 @@ layout.sugiyama <- function(graph, layers=NULL, hgap=1, vgap=1,
   res$res <- NULL
   res
 }
+
+layout.mds <- function(graph, dist=NULL, dim=2,
+                       options=igraph.arpack.default,
+                       returnParams=FALSE) {
+  
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (!is.null(dist)) dist <- structure(as.double(dist), dim=dim(dist))
+  dim <- as.integer(dim)
+  options.tmp <- igraph.arpack.default
+  options.tmp[ names(options) ] <- options
+  options <- options.tmp
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_layout_mds", graph, dist, dim, options,
+        PACKAGE="igraph")
+
+  if (!returnParams) {
+    res$res
+  } else {
+    res
+  }
+}

@@ -1048,6 +1048,7 @@ igraph_layout_sugiyama:
 igraph_layout_mds:
         PARAMS: GRAPH graph, OUT MATRIX res, MATRIX_OR_0 dist=NULL, \
                 INTEGER dim=2, INOUT ARPACKOPT options=igraph.arpack.default
+        IGNORE: RR
         NAME-R: layout.mds
 
 #######################################
