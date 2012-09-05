@@ -58,6 +58,21 @@ int print_attributes(const igraph_t *g) {
     printf("\n");
   }
 
+  for (i=0; i<igraph_ecount(g); i++) {
+    long int j;
+    printf("Edge %li (%i-%i): ", i, (int)IGRAPH_FROM(g,i), (int)IGRAPH_TO(g,i));
+    for (j=0; j<igraph_strvector_size(&enames); j++) {
+      printf("%s=", STR(enames, j));
+      if (VECTOR(etypes)[j]==IGRAPH_ATTRIBUTE_NUMERIC) {
+	igraph_real_printf(EAN(g, STR(enames, j), i));
+	putchar(' ');
+      } else {
+	printf("\"%s\" ", EAS(g, STR(enames, j), i));
+      }
+    }
+    printf("\n");
+  }
+
   igraph_strvector_destroy(&enames);
   igraph_strvector_destroy(&vnames);
   igraph_strvector_destroy(&gnames);
@@ -75,7 +90,23 @@ int main() {
   /* turn on attribute handling */
   igraph_i_set_attribute_table(&igraph_cattribute_table);
 
+  /* first file, without marginals */
+
   input=fopen("pajek_bip.net", "r");
+  if (input==0) { return 1;}
+
+  igraph_read_graph_pajek(&graph, input);
+  fclose(input);
+
+  print_attributes(&graph);
+
+  igraph_destroy(&graph);
+
+  /* second file, with marginals */
+  
+  printf("---\n");
+
+  input=fopen("pajek_bip2.net", "r");
   if (input==0) { return 1;}
 
   igraph_read_graph_pajek(&graph, input);

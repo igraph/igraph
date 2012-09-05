@@ -52,7 +52,7 @@ AT_CLEANUP
 AT_SETUP([Pajek, bipartite incidence matrix (igraph_read_graph_pajek):])
 AT_KEYWORDS([igraph_read_graph_pajek pajek foreign bipartite incidence])
 AT_COMPILE_CHECK([simple/pajek_bipartite2.c], [simple/pajek_bipartite2.out], 
-	         [simple/pajek_bip.net])
+	         [simple/pajek_{bip,bip2}.net])
 AT_CLEANUP
 
 AT_SETUP([Pajek, writing bipartite graph (igraph_write_graph_pajek):])
