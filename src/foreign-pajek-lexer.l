@@ -78,6 +78,7 @@ word [^ \t\r\n]
 [ \t]*          { }
 %[^\n]*\n[\r]*  { }
 %[^\n]*\r[\n]*  { }
+\*[Nn][eE][Tt]                         { return NETWORKLINE; }
 \*[Nn][Ee][Tt][Ww][Oo][Rr][Kk]         { return NETWORKLINE; }
 \*[Vv][Ee][Rr][Tt][Ii][Cc][Ee][Ss]     { return VERTICESLINE; }
 \*[Aa][Rr][Cc][Ss]                     { return ARCSLINE; }
