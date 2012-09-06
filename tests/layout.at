@@ -62,3 +62,8 @@ AT_KEYWORDS([layout merge dla])
 AT_COMPILE_CHECK([simple/igraph_layout_merge2.c], 
 		 [simple/igraph_layout_merge2.out])
 AT_CLEANUP
+
+AT_SETUP([Merging layouts 3 (igraph_i_layout_merge):])
+AT_KEYWORDS([layout merge dla])
+AT_COMPILE_CHECK([simple/igraph_layout_merge3.c])
+AT_CLEANUP
