@@ -730,25 +730,29 @@ int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
 void igraph_i_arpack_auto_ncv(igraph_arpack_options_t* options) {
   /* This is similar to how Octave determines the value of ncv, with some
    * modifications. */
-	int min_ncv = options->nev * 2 + 1;
+  int min_ncv = options->nev * 2 + 1;
 
-	/* Use twice the number of desired eigenvectors plus one by default */
+  /* Use twice the number of desired eigenvectors plus one by default */
   options->ncv = min_ncv;
-	/* ...but use at least 20 Lanczos vectors... */
+  /* ...but use at least 20 Lanczos vectors... */
   if (options->ncv < 20) {
     options->ncv = 20;
   }
-	/* ...but having ncv close to n leads to some problems with small graphs
-	 * (example: PageRank of "A <--> C, D <--> E, B"), so we don't let it
-	 * to be larger than n / 2...
-	 */
+  /* ...but having ncv close to n leads to some problems with small graphs
+   * (example: PageRank of "A <--> C, D <--> E, B"), so we don't let it
+   * to be larger than n / 2...
+   */
   if (options->ncv > options->n / 2) {
     options->ncv = options->n / 2;
   }
-	/* ...but we need at least min_ncv. */
-	if (options->ncv < min_ncv) {
-		options->ncv = min_ncv;
-	}
+  /* ...but we need at least min_ncv. */
+  if (options->ncv < min_ncv) {
+    options->ncv = min_ncv;
+  }
+  /* ...but at most n-1 */
+  if (options->ncv > options->n) {
+    options->ncv = options->n;
+  }
 }
 
 /**
