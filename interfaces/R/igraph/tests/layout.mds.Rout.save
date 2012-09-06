@@ -1,0 +1,74 @@
+
+R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> ## A tree
+> 
+> g <- graph.tree(10, 2, "undirected")
+> 
+> mymds <- function(g) { 
++   sp <- shortest.paths(g)
++   sp <- sp * sp
++   sp <- sp - rowMeans(sp) - rep(rowMeans(sp), each=nrow(sp)) + mean(sp)
++   sp <- sp / -2
++   ei <- eigen(sp)
++   va <- sqrt(abs(ei$values[1:2]))
++   ei$vectors[,1:2] * rep(va, each=nrow(sp))
++ }
+> 
+> all(abs(mymds(g) - layout.mds(g)) < 1e-10)
+[1] TRUE
+> 
+> ## plot(g, layout=ll)
+> 
+> ## A graph with multiple components
+> 
+> set.seed(42)
+> g <- graph.ring(10) + graph.ring(3)
+> layout.mds(g)
+            [,1]       [,2]
+ [1,]  0.3471515  4.0208613
+ [2,] -2.0825516  3.4569957
+ [3,] -3.7167907  1.5726752
+ [4,] -3.9313421 -0.9123538
+ [5,] -2.6442545 -3.0488946
+ [6,] -0.3471515 -4.0208613
+ [7,]  2.0825516 -3.4569957
+ [8,]  3.7167907 -1.5726752
+ [9,]  3.9313421  0.9123538
+[10,]  2.6442545  3.0488946
+[11,] -5.3125527 -5.2388619
+[12,] -8.6330617 -5.7353967
+[13,] -7.4028189 -2.6114842
+>     
+> ## Small stress test
+> 
+> for (i in 1:10) {
++   cat(".")
++   g <- erdos.renyi.game(100, 2/100)
++   l <- layout.mds(g)
++ }
+..........> cat("\n")
+
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  2.106   0.045   2.138 

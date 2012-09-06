@@ -1,0 +1,78 @@
+
+R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> set.seed(42)
+> 
+> g <- list(graph.ring(10), graph.ring(5))
+> l <- lapply(g, layout.mds)
+> l
+[[1]]
+            [,1]       [,2]
+ [1,] -1.5557755 -1.6779841
+ [2,] -0.2723545 -2.2719795
+ [3,]  1.1150967 -1.9981560
+ [4,]  2.0766188 -0.9611048
+ [5,]  2.2449431  0.4430558
+ [6,]  1.5557755  1.6779841
+ [7,]  0.2723545  2.2719795
+ [8,] -1.1150967  1.9981560
+ [9,] -2.0766188  0.9611048
+[10,] -2.2449431 -0.4430558
+
+[[2]]
+           [,1]        [,2]
+[1,] -0.4178872 -0.99809352
+[2,]  0.8201091 -0.70586221
+[3,]  0.9247425  0.56184668
+[4,] -0.2485868  1.05310256
+[5,] -1.0783776  0.08900649
+
+> 
+> layout.merge(g, l)
+            [,1]      [,2]
+ [1,] -2.7391227 -2.954285
+ [2,] -0.4795116 -4.000083
+ [3,]  1.9632567 -3.517985
+ [4,]  3.6561276 -1.692136
+ [5,]  3.9524820  0.780051
+ [6,]  2.7391227  2.954285
+ [7,]  0.4795116  4.000083
+ [8,] -1.9632567  3.517985
+ [9,] -3.6561276  1.692136
+[10,] -3.9524820 -0.780051
+[11,]  6.9992775 -7.187556
+[12,]  9.8869218 -6.505923
+[13,] 10.1309808 -3.548973
+[14,]  7.3941731 -2.403112
+[15,]  5.4586741 -4.651880
+> 
+> ##########
+> # Stress test
+> 
+> for (i in 1:100) {
++   g <- erdos.renyi.game(100, 2/100)
++   l <- layout.mds(g)
++ }
+> 
+> 
+> proc.time()
+   user  system elapsed 
+ 15.626   0.076  15.699 
