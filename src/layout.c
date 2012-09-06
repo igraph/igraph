@@ -2909,7 +2909,7 @@ int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
     IGRAPH_CHECK(igraph_matrix_resize(res, 2, dim));
     igraph_matrix_fill(res, 0);
     for (j = 0; j < dim; j++)
-      MATRIX(*res, 1, dim) = 1;
+      MATRIX(*res, 1, j) = 1;
     return IGRAPH_SUCCESS;
   }
 
