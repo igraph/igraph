@@ -7,8 +7,7 @@
   vertices of a graph.
 }
 \usage{
-layout.mds(graph, dist=NULL, dim=2, options=igraph.arpack.default,
-           returnParams=FALSE)
+layout.mds(graph, dist=NULL, dim=2, options=igraph.arpack.default)
 }
 \arguments{
   \item{graph}{The input graph.}
@@ -19,11 +18,8 @@ layout.mds(graph, dist=NULL, dim=2, options=igraph.arpack.default,
     nodes minus one, but only if the graph is connected; for unconnected
     graphs, the only possible values is 2. This is because
     \code{layout.merge} only works in 2D.}
-  \item{options}{A named list, to override some ARPACK options. See
-    \code{\link{arpack}} for details.}
-  \item{returnParams}{Logical scalar. Whether to return ARPACK
-    parameters from the fitting, or just the layout coordinates in a
-    matrix. By default only the matrix is returned.}
+  \item{options}{This is currently ignored, as ARPACK is not used
+    any more for solving the eigenproblem}
 }
 \details{
   \code{layout.mds} uses metric multidimensional scaling for generating
@@ -39,12 +35,7 @@ layout.mds(graph, dist=NULL, dim=2, options=igraph.arpack.default,
   and then merges them via \code{\link{layout.merge}}.
 }
 \value{
-  Depending on the value of the \code{returnParams}, this function
-  returns either a numeric matrix with \code{dim} columns, or a list
-  with two entries:
-  \item{res}{The layout matrix.}
-  \item{options}{The parameters from the ARPACK run. See
-  \code{\link{arpack}} for details.}
+  A numeric matrix with \code{dim} columns.
 }
 \references{
   Cox, T. F. and Cox, M. A. A. (2001) \emph{Multidimensional Scaling}.

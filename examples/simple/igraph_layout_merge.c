@@ -41,7 +41,7 @@ int main() {
   igraph_vector_t x, y, r;
   long int i;
 
-  srand(time(0));
+  igraph_rng_seed(igraph_rng_default(), 42);
   
   igraph_vector_init(&x, nodes);
   igraph_vector_init(&y, nodes);
