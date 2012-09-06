@@ -2713,7 +2713,7 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
 			      igraph_vector_e_ptr(&x, actg),
 			      igraph_vector_e_ptr(&y, actg), 
 			      VECTOR(r)[actg], 0, 0,
-			      maxx-maxr, maxx-maxr+5);
+			      maxx, maxx+5);
     
     /* 3. place sphere */
     igraph_i_layout_merge_place_sphere(&grid, VECTOR(x)[actg], VECTOR(y)[actg],
