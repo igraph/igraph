@@ -40,6 +40,7 @@
 #include "igraph_arpack.h"
 #include "igraph_blas.h"
 #include "igraph_centrality.h"
+#include "igraph_eigen.h"
 #include "config.h"
 #include <math.h>
 #include "igraph_math.h"
@@ -2888,14 +2889,15 @@ int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
 /* MDS layout for a connected graph, with no error checking on the
  * input parameters. The distance matrix will be modified in-place. */
 int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
-                               igraph_matrix_t *dist, long int dim,
-                               igraph_arpack_options_t *options) {
+                               igraph_matrix_t *dist, long int dim) {
+
   long int no_of_nodes=igraph_vcount(graph);
   long int nev = dim;
   igraph_matrix_t vectors;
   igraph_vector_t values, row_means;
   igraph_real_t grand_mean;
   long int i, j;
+  igraph_eigen_which_t which;
 
   /* Handle the trivial cases */
   if (no_of_nodes == 1) {
@@ -2938,24 +2940,21 @@ int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
   igraph_vector_destroy(&row_means);
   IGRAPH_FINALLY_CLEAN(1);
 
-  /* Calculate the top `dim` eigenvectors */
-  options->mode = 1;
-  options->ishift = 1;
-  options->n = no_of_nodes;
-  options->nev = nev;
-  options->ncv = 0;        /* 0 means "automatic" in igraph_arpack_rssolve */
-  options->which[0] = 'L'; options->which[1] = 'A';
-  options->start = 0;
-
-  IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_layout_mds_step,
-        dist, options, 0, &values, &vectors));
+  /* Calculate the top `dim` eigenvectors. */
+  which.pos = IGRAPH_EIGEN_LA;
+  which.howmany = nev;
+  IGRAPH_CHECK(igraph_eigen_matrix_symmetric(/*A=*/ 0, /*sA=*/ 0, 
+			       /*fun=*/ igraph_i_layout_mds_step,
+			       /*n=*/ no_of_nodes, /*extra=*/ dist, 
+			       /*algorithm=*/ IGRAPH_EIGEN_LAPACK,
+			       &which, /*options=*/ 0, /*storage=*/ 0,
+			       &values, &vectors));
 
   /* Calculate and normalize the final coordinates */
   for (j = 0; j < nev; j++) {
     VECTOR(values)[j] = sqrt(abs((double)VECTOR(values)[j]));
   }
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, dim));
-  igraph_matrix_fill(res, 0);
   for (i = 0; i < no_of_nodes; i++) {
     for (j = 0; j < nev; j++) {
       MATRIX(*res, i, j) = VECTOR(values)[j] * MATRIX(vectors, i, j);
@@ -3003,8 +3002,8 @@ int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
  *        used as distances.
  * \param dim The number of dimensions in the embedding space. For
  *        2D layouts, supply 2 here.
- * \param options Options to ARPACK for eigenvector calculations. See
- *        \ref igraph_arpack_options_t.
+ * \param options This argument is currently ignored, it was used for 
+ *        ARPACK, but LAPACK is used now for calculating the eigenvectors.
  * \return Error code.
  * 
  * Added in version 0.6.
@@ -3052,7 +3051,7 @@ int igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
   IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));
   if (conn) {
     /* Yes, it is, just do the MDS */
-    IGRAPH_CHECK(igraph_i_layout_mds_single(graph, res, &m, dim, options));
+    IGRAPH_CHECK(igraph_i_layout_mds_single(graph, res, &m, dim));
   } else {
     /* The graph is not connected, lay out the components one by one */
     igraph_vector_ptr_t layouts;
@@ -3099,7 +3098,7 @@ int igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
       IGRAPH_CHECK(igraph_matrix_init(layout, 0, 0));
       IGRAPH_FINALLY(igraph_matrix_destroy, layout);
       /* Lay out the subgraph */
-      IGRAPH_CHECK(igraph_i_layout_mds_single(&subgraph, layout, &dist_submatrix, dim, options));
+      IGRAPH_CHECK(igraph_i_layout_mds_single(&subgraph, layout, &dist_submatrix, dim));
       /* Store the layout */
       IGRAPH_CHECK(igraph_vector_ptr_push_back(&layouts, layout));
       IGRAPH_FINALLY_CLEAN(2);  /* ownership of layout taken by layouts */
