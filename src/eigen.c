@@ -380,6 +380,7 @@ int igraph_i_eigen_matrix_symmetric_lapack(const igraph_matrix_t *A,
   } else if (fun) {
     IGRAPH_CHECK(igraph_i_eigen_arpackfun_to_mat(fun, n, extra, &mA));
     IGRAPH_FINALLY(igraph_matrix_destroy, &mA);
+    myA=&mA;
   }
   
   switch (which->pos) {
