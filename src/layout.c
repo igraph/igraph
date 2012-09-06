@@ -2662,6 +2662,8 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
   IGRAPH_VECTOR_INIT_FINALLY(&nx, graphs);
   IGRAPH_VECTOR_INIT_FINALLY(&ny, graphs);
   IGRAPH_VECTOR_INIT_FINALLY(&nr, graphs);
+
+  RNG_BEGIN();
   
   for (i=0; i<igraph_vector_ptr_size(coords); i++) {
     igraph_matrix_t *mat=VECTOR(*coords)[i];
@@ -2741,6 +2743,8 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
       ++respos;
     }
   }
+
+  RNG_END();
  
   igraph_i_layout_mergegrid_destroy(&grid);
   igraph_vector_destroy(&sizes);
@@ -2838,8 +2842,6 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
   /* The graph is not used, only its coordinates */
   IGRAPH_UNUSED(actg);
 
-  RNG_BEGIN();
-
   while (sp < 0) {
     /* start particle */
     do {
@@ -2864,8 +2866,6 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
       }
     }
   }
-
-  RNG_END();
 
 /*   fprintf(stderr, "%li ", steps); */
   return 0;
@@ -3019,6 +3019,8 @@ int igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
   igraph_matrix_t m;
   igraph_bool_t conn;
 
+  RNG_BEGIN();
+
   /* Check the distance matrix */
   if (dist && (igraph_matrix_nrow(dist) != no_of_nodes ||
       igraph_matrix_ncol(dist) != no_of_nodes)) {
@@ -3124,6 +3126,8 @@ int igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
     igraph_vector_destroy(&comp);
     IGRAPH_FINALLY_CLEAN(5);
   }
+
+  RNG_END();
 
   igraph_matrix_destroy(&m);
   IGRAPH_FINALLY_CLEAN(1);
