@@ -2952,7 +2952,7 @@ int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
 
   /* Calculate and normalize the final coordinates */
   for (j = 0; j < nev; j++) {
-    VECTOR(values)[j] = sqrt(abs((double)VECTOR(values)[j]));
+    VECTOR(values)[j] = sqrt(fabs(VECTOR(values)[j]));
   }
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, dim));
   for (i = 0; i < no_of_nodes; i++) {
