@@ -2528,6 +2528,7 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
   igraph_vector_t gtypes, vtypes, etypes;
   igraph_vector_t numv;
   igraph_strvector_t strv;
+  igraph_vector_bool_t boolv;
   long int i;
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
@@ -2556,6 +2557,7 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
 
   IGRAPH_VECTOR_INIT_FINALLY(&numv, 1);
   IGRAPH_STRVECTOR_INIT_FINALLY(&strv, 1);
+  IGRAPH_VECTOR_BOOL_INIT_FINALLY(&boolv, 1);
 
   /* Check whether there is an 'id' node attribute if the supplied is 0 */
   if (!id) {
@@ -2589,17 +2591,19 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
       CHECK(fprintf(outstream, "  %s ", newname));
       CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));
       CHECK(fputc('\n', outstream));
-      igraph_Free(newname);
     } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
       char *s;
       IGRAPH_CHECK(igraph_i_attribute_get_string_graph_attr(graph, name, &strv));
       igraph_strvector_get(&strv, 0, &s);
       CHECK(fprintf(outstream, "  %s \"%s\"\n", newname, s));
-      igraph_Free(newname);
+    } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
+      IGRAPH_CHECK(igraph_i_attribute_get_bool_graph_attr(graph, name, &boolv));
+      CHECK(fprintf(outstream, "  %s %d\n", newname, VECTOR(boolv)[0] ? 1 : 0));
+      IGRAPH_WARNING("A boolean graph attribute was converted to numeric");
     } else {
-      igraph_Free(newname);
-      IGRAPH_WARNING("A non-numeric, non-string graph attribute ignored");
+      IGRAPH_WARNING("A non-numeric, non-string, non-boolean graph attribute ignored");
     }
+    igraph_Free(newname);
   } 
   
   /* Now come the vertices */
@@ -2629,6 +2633,14 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
 							       &strv));
 	igraph_strvector_get(&strv, 0, &s);
 	CHECK(fprintf(outstream, "    %s \"%s\"\n", newname, s));
+      } else if (type==IGRAPH_ATTRIBUTE_BOOLEAN) {
+	IGRAPH_CHECK(igraph_i_attribute_get_bool_vertex_attr(graph, name,
+							     igraph_vss_1(i),
+							     &boolv));
+	CHECK(fprintf(outstream, "    %s %d\n", newname, VECTOR(boolv)[0] ? 1 : 0));
+	IGRAPH_WARNING("A boolean vertex attribute was converted to numeric");
+      } else {
+	IGRAPH_WARNING("A non-numeric, non-string, non-boolean edge attribute was ignored");
       }
       igraph_Free(newname);
     }
@@ -2668,6 +2680,14 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
 							     &strv));
 	igraph_strvector_get(&strv, 0, &s);
 	CHECK(fprintf(outstream, "    %s \"%s\"\n", newname, s));
+      } else if (type==IGRAPH_ATTRIBUTE_BOOLEAN) {
+	IGRAPH_CHECK(igraph_i_attribute_get_bool_edge_attr(graph, name,
+							   igraph_ess_1(i),
+							   &boolv));
+	CHECK(fprintf(outstream, "    %s %d\n", newname, VECTOR(boolv)[0] ? 1 : 0));
+	IGRAPH_WARNING("A boolean edge attribute was converted to numeric");
+      } else {
+	IGRAPH_WARNING("A non-numeric, non-string, non-boolean edge attribute was ignored");
       }
       igraph_Free(newname);
     }
@@ -2681,6 +2701,7 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     IGRAPH_FINALLY_CLEAN(1);
   }
 
+  igraph_vector_bool_destroy(&boolv);
   igraph_strvector_destroy(&strv);
   igraph_vector_destroy(&numv);
   igraph_vector_destroy(&etypes);
@@ -2689,7 +2710,7 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
   igraph_strvector_destroy(&enames);
   igraph_strvector_destroy(&vnames);
   igraph_strvector_destroy(&gnames);
-  IGRAPH_FINALLY_CLEAN(8);
+  IGRAPH_FINALLY_CLEAN(9);
   
   return 0;
 }
@@ -2773,6 +2794,7 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
   igraph_vector_t gtypes, vtypes, etypes;
   igraph_vector_t numv;
   igraph_strvector_t strv;
+  igraph_vector_bool_t boolv;
 
   IGRAPH_STRVECTOR_INIT_FINALLY(&gnames, 0);
   IGRAPH_STRVECTOR_INIT_FINALLY(&vnames, 0);
@@ -2787,6 +2809,7 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
 
   IGRAPH_VECTOR_INIT_FINALLY(&numv, 1);
   IGRAPH_STRVECTOR_INIT_FINALLY(&strv, 1);
+  IGRAPH_VECTOR_BOOL_INIT_FINALLY(&boolv, 1);
 
   CHECK(fprintf(outstream, "/* Created by igraph %s */\n",
 	PACKAGE_VERSION));
@@ -2815,18 +2838,21 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
 		  CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));
 		  CHECK(fputc('\n', outstream));
 		}
-		igraph_Free(newname);
 	  } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
 		char *s, *news;
 		IGRAPH_CHECK(igraph_i_attribute_get_string_graph_attr(graph, name, &strv));
 		igraph_strvector_get(&strv, 0, &s);
 		IGRAPH_CHECK(igraph_i_dot_escape(s, &news));
 		CHECK(fprintf(outstream, "    %s=%s\n", newname, news));
-		igraph_Free(newname);
 		igraph_Free(news);
+	  } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
+		IGRAPH_CHECK(igraph_i_attribute_get_bool_graph_attr(graph, name, &boolv));
+		CHECK(fprintf(outstream, "    %s=%d\n", newname, VECTOR(boolv)[0] ? 1 : 0));
+		IGRAPH_WARNING("A boolean graph attribute was converted to numeric");
 	  } else {
-		IGRAPH_WARNING("A non-numeric, non-string graph attribute ignored");
+		IGRAPH_WARNING("A non-numeric, non-string, non-boolean graph attribute ignored");
 	  }
+	  igraph_Free(newname);
 	}
 	CHECK(fprintf(outstream, "  ];\n"));
   }
@@ -2849,18 +2875,21 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
 						  VECTOR(numv)[0]));
 			CHECK(fputc('\n', outstream));
 		  }
-		  igraph_Free(newname);
 		} else if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_STRING) {
 		  char *s, *news;
 		  IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, name, igraph_vss_1(i), &strv));
 		  igraph_strvector_get(&strv, 0, &s);
 		  IGRAPH_CHECK(igraph_i_dot_escape(s, &news));
 		  CHECK(fprintf(outstream, "    %s=%s\n", newname, news));
-		  igraph_Free(newname);
 		  igraph_Free(news);
+                } else if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_BOOLEAN) {
+		  IGRAPH_CHECK(igraph_i_attribute_get_bool_vertex_attr(graph, name, igraph_vss_1(i), &boolv));
+		  CHECK(fprintf(outstream, "    %s=%d\n", newname, VECTOR(boolv)[0] ? 1 : 0));
+		  IGRAPH_WARNING("A boolean vertex attribute was converted to numeric");
 		} else {
-		  IGRAPH_WARNING("A non-numeric, non-string graph attribute ignored");
+		  IGRAPH_WARNING("A non-numeric, non-string, non-boolean vertex attribute was ignored");
 		}
+		igraph_Free(newname);
 	  }
 	  CHECK(fprintf(outstream, "  ];\n"));
 	}
@@ -2898,6 +2927,10 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
 		  CHECK(fprintf(outstream, "    %s=%s\n", newname, news));
 		  igraph_Free(newname);
 		  igraph_Free(news);
+                } else if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_BOOLEAN) {
+		  IGRAPH_CHECK(igraph_i_attribute_get_bool_edge_attr(graph, name, igraph_ess_1(i), &boolv));
+		  CHECK(fprintf(outstream, "    %s=%d\n", newname, VECTOR(boolv)[0] ? 1 : 0));
+		  IGRAPH_WARNING("A boolean edge attribute was converted to numeric");
 		} else {
 		  IGRAPH_WARNING("A non-numeric, non-string graph attribute ignored");
 		}
@@ -2913,6 +2946,7 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
   }
   CHECK(fprintf(outstream, "}\n"));
   
+  igraph_vector_bool_destroy(&boolv);
   igraph_strvector_destroy(&strv);
   igraph_vector_destroy(&numv);
   igraph_vector_destroy(&etypes);
@@ -2921,7 +2955,7 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
   igraph_strvector_destroy(&enames);
   igraph_strvector_destroy(&vnames);
   igraph_strvector_destroy(&gnames);
-  IGRAPH_FINALLY_CLEAN(8);
+  IGRAPH_FINALLY_CLEAN(9);
   
   return 0;
 }

@@ -32,15 +32,6 @@ typedef struct TYPE(igraph_vector) {
   BASE* end;
 } TYPE(igraph_vector);
 
-#ifndef IGRAPH_VECTOR_NULL
-#define IGRAPH_VECTOR_NULL { 0,0,0 }
-#endif
-#ifndef IGRAPH_VECTOR_INIT_FINALLY
-#define IGRAPH_VECTOR_INIT_FINALLY(v, size) \
-  do { IGRAPH_CHECK(igraph_vector_init(v, size)); \
-  IGRAPH_FINALLY(igraph_vector_destroy, v); } while (0)
-#endif
-
 /*--------------------*/
 /* Allocation         */
 /*--------------------*/

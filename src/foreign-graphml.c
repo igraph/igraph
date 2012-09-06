@@ -98,6 +98,23 @@ struct igraph_i_graphml_parser_state {
   char *data_char;
 };
 
+igraph_bool_t igraph_i_graphml_parse_boolean(const char* char_data) {
+  int value;
+  if (char_data == 0)
+    return 0;
+  if (!strcasecmp("true", char_data))
+    return 1;
+  if (!strcasecmp("yes", char_data))
+    return 1;
+  if (!strcasecmp("false", char_data))
+    return 0;
+  if (!strcasecmp("no", char_data))
+    return 0;
+  if (sscanf(char_data, "%d", &value) == 0)
+    return 0;
+  return value != 0 && value == value;
+}
+
 void igraph_i_graphml_destroy_state(struct igraph_i_graphml_parser_state* state) {
   long int i;
 
@@ -128,6 +145,11 @@ void igraph_i_graphml_destroy_state(struct igraph_i_graphml_parser_state* state)
 	igraph_strvector_destroy((igraph_strvector_t*)rec->record.value);
 	igraph_Free(rec->record.value);
       }
+    } else if (rec->record.type==IGRAPH_ATTRIBUTE_BOOLEAN) {
+      if (rec->record.value != 0) {
+	igraph_vector_bool_destroy((igraph_vector_bool_t*)rec->record.value);
+	igraph_Free(rec->record.value);
+      }
     }
     if (rec->id != 0) igraph_Free(rec->id);
     if (rec->record.name != 0) igraph_Free(rec->record.name);
@@ -146,6 +168,11 @@ void igraph_i_graphml_destroy_state(struct igraph_i_graphml_parser_state* state)
 	igraph_strvector_destroy((igraph_strvector_t*)rec->record.value);
 	igraph_Free(rec->record.value);
       }
+    } else if (rec->record.type==IGRAPH_ATTRIBUTE_BOOLEAN) {
+      if (rec->record.value != 0) {
+	igraph_vector_bool_destroy((igraph_vector_bool_t*)rec->record.value);
+	igraph_Free(rec->record.value);
+      }
     }
     if (rec->id != 0) igraph_Free(rec->id);
     if (rec->record.name != 0) igraph_Free(rec->record.name);
@@ -162,6 +189,11 @@ void igraph_i_graphml_destroy_state(struct igraph_i_graphml_parser_state* state)
     } else if (rec->record.type==IGRAPH_ATTRIBUTE_STRING) {
       if (rec->record.value != 0) {
 	igraph_strvector_destroy((igraph_strvector_t*)rec->record.value);
+	igraph_Free(rec->record.value);
+      }
+    } else if (rec->record.type==IGRAPH_ATTRIBUTE_BOOLEAN) {
+      if (rec->record.value != 0) {
+	igraph_vector_bool_destroy((igraph_vector_bool_t*)rec->record.value);
 	igraph_Free(rec->record.value);
       }
     }
@@ -361,6 +393,14 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
 	for (l=origsize; l<nodes; l++) {
 	  igraph_strvector_set(strvec, l, "");
 	}
+      } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
+	igraph_vector_bool_t *boolvec=(igraph_vector_bool_t*)rec->value;
+	long int origsize=igraph_vector_bool_size(boolvec);
+	long int nodes=igraph_trie_size(&state->node_trie);
+	igraph_vector_bool_resize(boolvec, nodes);
+	for (l=origsize; l<nodes; l++) {
+	  VECTOR(*boolvec)[l]=0;
+	}
       }
       VECTOR(vattr)[i]=rec;
     }
@@ -401,6 +441,14 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
 	for (l=origsize; l<edges; l++) {
 	  igraph_strvector_set(strvec, l, "");
 	}
+      } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
+	igraph_vector_bool_t *boolvec=(igraph_vector_bool_t*)rec->value;
+	long int origsize=igraph_vector_bool_size(boolvec);
+	long int edges=igraph_vector_size(&state->edgelist)/2;
+	igraph_vector_bool_resize(boolvec, edges);
+	for (l=origsize; l<edges; l++) {
+	  VECTOR(*boolvec)[l]=0;
+	}
       }
       VECTOR(eattr)[i]=rec;
     }
@@ -440,6 +488,13 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
 	igraph_strvector_resize(strvec, 1);
 	for (l=origsize; l<1; l++) {
 	  igraph_strvector_set(strvec, l, "");
+	}
+      } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
+	igraph_vector_bool_t *boolvec=(igraph_vector_bool_t*)rec->value;
+	long int origsize=igraph_vector_bool_size(boolvec);
+	igraph_vector_bool_resize(boolvec, 1);
+	for (l=origsize; l<1; l++) {
+	  VECTOR(*boolvec)[l]=0;
 	}
       }
       VECTOR(gattr)[i]=rec;
@@ -491,7 +546,7 @@ void igraph_i_graphml_add_attribute_key(const xmlChar** attrs,
     } else if (xmlStrEqual(*it, toXmlChar("attr.type"))) {
       if (xmlStrEqual(*(it+1), (xmlChar*)"boolean")) { 
 	rec->type=I_GRAPHML_BOOLEAN;
-	rec->record.type=IGRAPH_ATTRIBUTE_NUMERIC;	    
+	rec->record.type=IGRAPH_ATTRIBUTE_BOOLEAN;	    
       } else if (xmlStrEqual(*(it+1), toXmlChar("string"))) {
 	rec->type=I_GRAPHML_STRING;
 	rec->record.type=IGRAPH_ATTRIBUTE_STRING;
@@ -562,7 +617,19 @@ void igraph_i_graphml_add_attribute_key(const xmlChar** attrs,
   /* create the attribute values */
   switch (rec->record.type) {
     igraph_vector_t *vec;
+    igraph_vector_bool_t *boolvec;
     igraph_strvector_t *strvec;
+  case IGRAPH_ATTRIBUTE_BOOLEAN:
+    boolvec=igraph_Calloc(1, igraph_vector_bool_t);
+    if (boolvec==0) {
+      igraph_error("Cannot parse GraphML file", __FILE__, __LINE__,
+		   IGRAPH_ENOMEM);
+      igraph_i_graphml_sax_handler_error(state, "Cannot parse GraphML file");
+      return;
+    }
+    rec->record.value=boolvec;
+    igraph_vector_bool_init(boolvec, 0);    
+    break;
   case IGRAPH_ATTRIBUTE_NUMERIC:
     vec=igraph_Calloc(1, igraph_vector_t);
     if (vec==0) {
@@ -677,10 +744,27 @@ void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parser_state
   rec=&graphmlrec->record;
 
   switch (rec->type) {
+    igraph_vector_bool_t *boolvec;
     igraph_vector_t *vec;
     igraph_strvector_t *strvec;
     igraph_real_t num;
     long int s, i;
+  case IGRAPH_ATTRIBUTE_BOOLEAN:
+    boolvec=(igraph_vector_bool_t *)rec->value;
+    s=igraph_vector_bool_size(boolvec);
+    if (id >= s) {
+      ret=igraph_vector_bool_resize(boolvec, id+1);
+      if (ret) {
+	igraph_error("Cannot parse GraphML file", __FILE__, __LINE__, ret);
+        igraph_i_graphml_sax_handler_error(state, "Cannot parse GraphML file");
+        return;
+      }
+      for (i=s; i<id; i++) {
+	VECTOR(*boolvec)[i]=0;
+      }
+    }
+    VECTOR(*boolvec)[id] = igraph_i_graphml_parse_boolean(state->data_char);
+    break;
   case IGRAPH_ATTRIBUTE_NUMERIC:
     vec=(igraph_vector_t *)rec->value;
     s=igraph_vector_size(vec);
@@ -1094,6 +1178,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
   long int i;
   igraph_vector_t numv;
   igraph_strvector_t strv;
+  igraph_vector_bool_t boolv;
   const char *gprefix= prefixattr ? "g_" : "";
   const char *vprefix= prefixattr ? "v_" : "";
   const char *eprefix= prefixattr ? "e_" : "";
@@ -1115,7 +1200,8 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
 
   IGRAPH_VECTOR_INIT_FINALLY(&numv, 1);
   IGRAPH_STRVECTOR_INIT_FINALLY(&strv, 1);
-  
+  IGRAPH_VECTOR_BOOL_INIT_FINALLY(&boolv, 1);
+
   IGRAPH_STRVECTOR_INIT_FINALLY(&gnames, 0);
   IGRAPH_STRVECTOR_INIT_FINALLY(&vnames, 0);
   IGRAPH_STRVECTOR_INIT_FINALLY(&enames, 0);
@@ -1138,6 +1224,9 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
     } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
       ret=fprintf(outstream, "  <key id=\"%s%s\" for=\"graph\" attr.name=\"%s\" attr.type=\"double\"/>\n", gprefix, name_escaped, name_escaped);
       if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);            
+    } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
+      ret=fprintf(outstream, "  <key id=\"%s%s\" for=\"graph\" attr.name=\"%s\" attr.type=\"bool\"/>\n", gprefix, name_escaped, name_escaped);
+      if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);            
     }
     igraph_Free(name_escaped);
   }
@@ -1153,6 +1242,9 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
     } else if (VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
       ret=fprintf(outstream, "  <key id=\"%s%s\" for=\"node\" attr.name=\"%s\" attr.type=\"double\"/>\n", vprefix, name_escaped, name_escaped);
       if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);            
+    } else if (VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
+      ret=fprintf(outstream, "  <key id=\"%s%s\" for=\"node\" attr.name=\"%s\" attr.type=\"boolean\"/>\n", vprefix, name_escaped, name_escaped);
+      if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);            
     }
     igraph_Free(name_escaped);
   }
@@ -1167,6 +1259,9 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
       if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
     } else if (VECTOR(etypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
       ret=fprintf(outstream, "  <key id=\"%s%s\" for=\"edge\" attr.name=\"%s\" attr.type=\"double\"/>\n", eprefix, name_escaped, name_escaped);
+      if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+    } else if (VECTOR(etypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
+      ret=fprintf(outstream, "  <key id=\"%s%s\" for=\"edge\" attr.name=\"%s\" attr.type=\"boolean\"/>\n", eprefix, name_escaped, name_escaped);
       if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
     }
     igraph_Free(name_escaped);
@@ -1203,6 +1298,14 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
       igraph_Free(s_escaped);
       if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
       ret=fprintf(outstream, "</data>\n");
+      if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+    } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
+      igraph_strvector_get(&gnames, i, &name);
+      IGRAPH_CHECK(igraph_i_attribute_get_bool_graph_attr(graph, name, &boolv));
+      IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
+      ret=fprintf(outstream, "    <data key=\"%s%s\">%s</data>\n",
+                  gprefix, name_escaped, VECTOR(boolv)[0] ? "true" : "false");
+      igraph_Free(name_escaped);
       if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
     }
   }
@@ -1242,6 +1345,15 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
         igraph_Free(s_escaped);
         if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
         ret=fprintf(outstream, "</data>\n");
+        if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+      } else if (VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
+        igraph_strvector_get(&vnames, i, &name);
+        IGRAPH_CHECK(igraph_i_attribute_get_bool_vertex_attr(graph, name,
+                     igraph_vss_1(l), &boolv));
+        IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
+        ret=fprintf(outstream, "      <data key=\"%s%s\">%s</data>\n",
+                    vprefix, name_escaped, VECTOR(boolv)[0] ? "true" : "false");
+        igraph_Free(name_escaped);
         if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
       }
     }
@@ -1290,6 +1402,15 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
         if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
         ret=fprintf(outstream, "</data>\n");
         if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+      } else if (VECTOR(etypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
+        igraph_strvector_get(&enames, i, &name);
+        IGRAPH_CHECK(igraph_i_attribute_get_bool_edge_attr(graph, name,
+                     igraph_ess_1(edge), &boolv));
+        IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
+        ret=fprintf(outstream, "      <data key=\"%s%s\">%s</data>\n",
+                    eprefix, name_escaped, VECTOR(boolv)[0] ? "true" : "false");
+        igraph_Free(name_escaped);
+        if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
       }
     }
 
@@ -1313,7 +1434,8 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
   igraph_vector_destroy(&etypes);
   igraph_vector_destroy(&numv);
   igraph_strvector_destroy(&strv);
-  IGRAPH_FINALLY_CLEAN(8);
+  igraph_vector_bool_destroy(&boolv);
+  IGRAPH_FINALLY_CLEAN(9);
 
   return 0;
 }

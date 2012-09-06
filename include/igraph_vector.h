@@ -87,6 +87,29 @@ __BEGIN_DECLS
 #include "igraph_pmt_off.h"
 #undef BASE_COMPLEX
 
+/* -------------------------------------------------- */
+/* Helper macros                                      */
+/* -------------------------------------------------- */
+
+#ifndef IGRAPH_VECTOR_NULL
+#define IGRAPH_VECTOR_NULL { 0,0,0 }
+#endif
+
+#ifndef IGRAPH_VECTOR_INIT_FINALLY
+#define IGRAPH_VECTOR_INIT_FINALLY(v, size) \
+  do { IGRAPH_CHECK(igraph_vector_init(v, size)); \
+  IGRAPH_FINALLY(igraph_vector_destroy, v); } while (0)
+#endif
+#ifndef IGRAPH_VECTOR_BOOL_INIT_FINALLY
+#define IGRAPH_VECTOR_BOOL_INIT_FINALLY(v, size) \
+  do { IGRAPH_CHECK(igraph_vector_bool_init(v, size)); \
+  IGRAPH_FINALLY(igraph_vector_bool_destroy, v); } while (0)
+#endif
+
+/* -------------------------------------------------- */
+/* Type-specific vector functions                     */
+/* -------------------------------------------------- */
+
 int igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to);
 int igraph_vector_round(const igraph_vector_t *from, igraph_vector_long_t *to);
 
