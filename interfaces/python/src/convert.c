@@ -1743,30 +1743,96 @@ int igraphmodule_attrib_to_vector_bool_t(PyObject *o, igraphmodule_GraphObject *
   *vptr = 0;
   if (attr_type != ATTRIBUTE_TYPE_EDGE && attr_type != ATTRIBUTE_TYPE_VERTEX)
     return 1;
-  if (o == Py_None) return 0;
+
+  if (o == Py_None)
+    return 0;
+
   if (PyString_Check(o)) {
-    igraph_vector_t *dummy = 0;
     long int i, n;
 
-    if (igraphmodule_attrib_to_vector_t(o, self, &dummy, attr_type))
-      return 1;
+    /* First, check if the attribute is a "real" boolean */
+    igraph_attribute_type_t at;
+    igraph_attribute_elemtype_t et;
+    char *name = PyString_CopyAsString(o);
 
-    if (dummy == 0)
-      return 0;
+    if (attr_type == ATTRIBUTE_TYPE_VERTEX) {
+      et = IGRAPH_ATTRIBUTE_VERTEX;
+      n = igraph_vcount(&self->g);
+    } else {
+      et = IGRAPH_ATTRIBUTE_EDGE;
+      n = igraph_ecount(&self->g);
+    }
 
-    n = igraph_vector_size(dummy);
-
-    result = (igraph_vector_bool_t*)calloc(1, sizeof(igraph_vector_bool_t));
-    igraph_vector_bool_init(result, n);
-    if (result==0) {
-      igraph_vector_destroy(dummy); free(dummy);
-      PyErr_NoMemory();
+    if (igraphmodule_i_attribute_get_type(&self->g, &at, et, name)) {
+      /* exception was set by igraphmodule_i_attribute_get_type */
+      free(name);
       return 1;
     }
-    for (i=0; i<n; i++)
-      VECTOR(*result)[i] = (VECTOR(*dummy)[i] != 0);
-    igraph_vector_destroy(dummy); free(dummy);
-    *vptr = result;
+
+    if (at == IGRAPH_ATTRIBUTE_BOOLEAN) {
+      /* The attribute is a real Boolean attribute. Allocate the target
+       * vector */
+      result = (igraph_vector_bool_t*)calloc(1, sizeof(igraph_vector_bool_t));
+      if (result==0) {
+        PyErr_NoMemory();
+        free(name);
+        return 1;
+      }
+      igraph_vector_bool_init(result, n);
+      if (attr_type == ATTRIBUTE_TYPE_VERTEX) {
+        if (igraphmodule_i_get_boolean_vertex_attr(&self->g, name,
+            igraph_vss_all(), result)) {
+          /* exception has already been set, so return */
+          igraph_vector_bool_destroy(result);
+          free(name);
+          free(result);
+          return 1;
+        }
+      } else {
+        if (igraphmodule_i_get_boolean_edge_attr(&self->g, name,
+            igraph_ess_all(IGRAPH_EDGEORDER_ID), result)) {
+          /* exception has already been set, so return */
+          igraph_vector_bool_destroy(result);
+          free(name);
+          free(result);
+          return 1;
+        }
+      }
+      free(name);
+      *vptr = result;
+    } else if (at == IGRAPH_ATTRIBUTE_NUMERIC) {
+      /* The attribute is a numeric attribute, so we fall back to
+       * attrib_to_vector_t and then convert the result */
+      igraph_vector_t *dummy = 0;
+      free(name);
+      if (igraphmodule_attrib_to_vector_t(o, self, &dummy, attr_type)) {
+        return 1;
+      }
+      if (dummy == 0) {
+        return 0;
+      }
+
+      n = igraph_vector_size(dummy);
+      result = (igraph_vector_bool_t*)calloc(1, sizeof(igraph_vector_bool_t));
+      igraph_vector_bool_init(result, n);
+      if (result==0) {
+        igraph_vector_destroy(dummy); free(dummy);
+        PyErr_NoMemory();
+        return 1;
+      }
+      for (i=0; i<n; i++) {
+        VECTOR(*result)[i] = (VECTOR(*dummy)[i] != 0 &&
+            VECTOR(*dummy)[i] == VECTOR(*dummy)[i]);
+      }
+      igraph_vector_destroy(dummy); free(dummy);
+      *vptr = result;
+    } else {
+      /* The attribute is not numeric and not Boolean. Throw an exception. */
+      PyErr_SetString(PyExc_ValueError, "attribute values must be Boolean or numeric");
+      free(name);
+      return 1;
+    }
+
   } else if (PySequence_Check(o)) {
     result = (igraph_vector_bool_t*)calloc(1, sizeof(igraph_vector_bool_t));
     if (result==0) {
