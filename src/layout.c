@@ -2896,7 +2896,7 @@ int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
   igraph_matrix_t vectors;
   igraph_vector_t values, row_means;
   igraph_real_t grand_mean;
-  long int i, j;
+  long int i, j, k;
   igraph_eigen_which_t which;
 
   /* Handle the trivial cases */
@@ -2956,8 +2956,8 @@ int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
   }
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, dim));
   for (i = 0; i < no_of_nodes; i++) {
-    for (j = 0; j < nev; j++) {
-      MATRIX(*res, i, j) = VECTOR(values)[j] * MATRIX(vectors, i, j);
+    for (j = 0, k=nev-1; j < nev; j++, k--) {
+      MATRIX(*res, i, k) = VECTOR(values)[j] * MATRIX(vectors, i, j);
     }
   }
 
