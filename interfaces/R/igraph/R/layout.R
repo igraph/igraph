@@ -394,7 +394,7 @@ layout.spring<-function(graph, ..., params=list()) {
   tempa <- sample((0:(vc-1))/vc) #Set initial positions randomly on the circle
   x <- vc/(2*pi)*sin(2*pi*tempa)
   y <- vc/(2*pi)*cos(2*pi*tempa)
-  ds <- symmetrize.mat(get.adjacency(graph))#Symmetrize/dichotomize the graph
+  ds <- symmetrize.mat(get.adjacency(graph, sparse=FALSE))#Symmetrize/dichotomize the graph
   kfr <- params$kfr                     #Set initial friction level
   niter <- 1                            #Set the iteration counter
   #Simulate, with increasing friction, until motion stops    
