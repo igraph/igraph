@@ -244,6 +244,7 @@ layout.graphopt <- function(graph, ...,
         as.double(params$niter), as.double(params$charge),
         as.double(params$mass), as.double(params$spring.length),
         as.double(params$spring.constant), params$max.sa.movement,
+        params$start,
         PACKAGE="igraph")
 }
 
