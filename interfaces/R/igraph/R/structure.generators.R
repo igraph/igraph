@@ -770,7 +770,7 @@ graph.incidence.sparse <- function(incidence, directed, mode, multiple,
 
 graph.incidence.dense <- function(incidence, directed, mode, multiple,
                                   weighted) {
-  
+
   if (!is.null(weighted)) {
     if (is.logical(weighted) && weighted) {
       weighted <- "weight"
@@ -845,6 +845,7 @@ graph.incidence <- function(incidence, directed=FALSE,
                                   mode=mode, multiple=multiple,
                                   weighted=weighted)
   } else {
+    incidence <- as.matrix(incidence)
     res <- graph.incidence.dense(incidence, directed=directed, mode=mode,
                                  multiple=multiple, weighted=weighted)
   }
