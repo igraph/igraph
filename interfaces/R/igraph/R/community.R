@@ -569,8 +569,8 @@ community.to.membership <- function(graph, merges, steps, membership=TRUE,
   merges <- structure(as.numeric(merges), dim=dim(merges))
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_community_to_membership", graph, merges, as.numeric(steps),
-        as.logical(membership), as.logical(csize),
+  .Call("R_igraph_community_to_membership", graph, merges-1,
+        as.numeric(steps), as.logical(membership), as.logical(csize),
         PACKAGE="igraph")
 }
 
