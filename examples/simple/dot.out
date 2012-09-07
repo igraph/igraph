@@ -78,7 +78,7 @@ undirected
 31 33
 32 33
 -----------------
-/* Created by igraph 0.6 */
+/* Created by igraph 0.6.1 */
 graph {
   0;
   1;
