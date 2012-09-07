@@ -507,16 +507,16 @@ layout.svd.igraph <- function(graph, d=shortest.paths(graph), ...) {
             thisl <- svd(d[ind, ind], 2)[[2]]
             thisl[, 1] <- thisl[, 1]/dist(range(thisl[, 1]))
             thisl[, 2] <- thisl[, 2]/dist(range(thisl[, 2]))
-            llist[i+1] <- list(thisl)
+            llist[[i]] <- thisl
         }else if(length(which(ind))==2){
-            llist[i+1] <- list(d[ind, ind])
+            llist[[i]] <- d[ind, ind]
         } else {
-            llist[i+1] <- list(matrix(c(0, 0), nrow=1))
+            llist[[i]] <- matrix(c(0, 0), nrow=1)
         }
         
-        llen[i+1] <- length(which(ind))
+        llen[i] <- length(which(ind))
         
-        glist[i+1] <- list(induced.subgraph(graph, V(graph)[ind]))
+        glist[[i]] <- induced.subgraph(graph, V(graph)[ind])
     }
     
     ## merge them all:
