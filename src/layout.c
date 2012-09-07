@@ -2875,8 +2875,7 @@ int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
 			     int n, void *extra);
 
 int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
-                               igraph_matrix_t *dist, long int dim,
-                               igraph_arpack_options_t *options);
+                               igraph_matrix_t *dist, long int dim);
 
 int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
     int n, void *extra) {
