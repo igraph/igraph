@@ -2666,7 +2666,6 @@ SEXP R_igraph_bliss_info_to_SEXP(igraph_bliss_info_t *info) {
 
 SEXP R_igraph_named(SEXP attr) {
   int named=NAMED(attr);
-  printf("%i\n", named);
   return R_NilValue;
 }
 
