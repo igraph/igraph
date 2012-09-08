@@ -100,7 +100,7 @@ S3method("compare", default)
 
 export(get.adjacency, get.edgelist, as.directed, as.undirected,
        get.adjlist, get.adjedgelist, igraph.from.graphNEL, 
-       igraph.to.graphNEL)
+       igraph.to.graphNEL, get.data.frame)
 
 # fitting, other
 
