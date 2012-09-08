@@ -457,3 +457,31 @@ get.incidence <- function(graph, types=NULL, attr=NULL,
   }
 }
 
+get.data.frame <- function(x, what=c("edges", "vertices", "both")) {
+
+  if (!is.igraph(x)) { stop("Not a graph object") }
+  what <- igraph.match.arg(what)
+
+  if (what %in% c("vertices", "both")) {
+    ver <- .Call("R_igraph_mybracket2", x, 9L, 3L, PACKAGE="igraph")
+    class(ver) <- "data.frame"
+    rn <- if (is.named(x)) { V(x)$name } else { seq_len(vcount(x)) }
+    rownames(ver) <- rn
+  }
+
+  if (what %in% c("edges", "both")) {
+    el <- get.edgelist(x)
+    edg <- c(list(from=el[,1]), list(to=el[,2]),
+             .Call("R_igraph_mybracket2", x, 9L, 4L, PACKAGE="igraph"))
+    class(edg) <- "data.frame"
+    rownames(edg) <- seq_len(ecount(x))
+  }
+  
+  if (what=="both") {
+    list(vertices=ver, edges=edg)
+  } else if (what=="vertices") {
+    ver
+  } else {
+    edg
+  }
+}
