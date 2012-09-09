@@ -216,7 +216,7 @@ get.shortest.paths <- function(graph, from, to=V(graph),
                as.igraph.vs(graph, from)-1, to, as.numeric(mode), as.numeric(length(to)),
                weights, as.numeric(output), PACKAGE="igraph")
 
-  if (output!="both") {
+  if (output !=2 ) {
     res <- lapply(res, function(x) x+1)
   } else {
     res <- list(vpath=lapply(res$vpath, function(x) x+1),
