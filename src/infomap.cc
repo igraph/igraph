@@ -290,7 +290,7 @@ int igraph_community_infomap(const igraph_t * graph,
     IGRAPH_FINALLY(delete_FlowGraph, cpy_fgraph);
     
     //partition the network
-    infomap_partition(cpy_fgraph, false);
+    IGRAPH_CHECK(infomap_partition(cpy_fgraph, false));
     
     // if better than the better...
     if (cpy_fgraph->codeLength < shortestCodeLength) {
