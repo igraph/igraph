@@ -28,7 +28,9 @@
 #include <string.h>
 #include <stdarg.h>
 
-IGRAPH_THREAD_LOCAL igraph_attribute_table_t *igraph_i_attribute_table=0;
+/* Should you ever want to have a thread-local attribute handler table, prepend
+ * IGRAPH_THREAD_LOCAL to the following declaration */
+igraph_attribute_table_t *igraph_i_attribute_table=0;
 
 int igraph_i_attribute_init(igraph_t *graph, void *attr) {
   graph->attr=0;
@@ -257,6 +259,10 @@ int igraph_i_attribute_get_bool_edge_attr(const igraph_t *graph,
  * \brief Attach an attribute table.
  * 
  * This function attaches attribute handling code to the igraph library.
+ * Note that the attribute handler table is \em not thread-local even if
+ * igraph is compiled in thread-local mode. In the vast majority of cases,
+ * this is not a significant restriction.
+ *
  * \param table Pointer to an \ref igraph_attribute_table_t object
  *    containing the functions for attribute manipulation. Supply \c
  *    NULL here if you don't want attributes.
