@@ -25,8 +25,8 @@ plot.igraph <- function(x,
                        axes=FALSE, xlab="", ylab="", add=FALSE,
                        xlim=c(-1,1), ylim=c(-1,1), main="", sub="",
                        mark.groups=list(), mark.shape=1/2,
-                       mark.border=NA,
                        mark.col=rainbow(length(mark.groups), alpha=0.3),
+                       mark.border=rainbow(length(mark.groups), alpha=1),
                        mark.expand=15,
                        ...) {
 
