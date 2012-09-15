@@ -4,17 +4,14 @@
 #include <iostream>
 
 
-RayTracer::RayTracer() : mBackgroundColor(1,1,1), mAmbientColor(0,0,0), mEyePoint(0,0,0), mSpecularColor(1,1,1)
+RayTracer::RayTracer() : mBackgroundColor(0,0,0,0), mAmbientColor(0,0,0), mEyePoint(0,0,0), mSpecularColor(1,1,1)
 {
 	// begin settings
 	mAmbientIntensity = .7;
 	mRecursionLimit = 700;
 	mAntiAliasDetail = 1;
-	mWidth = 400;
-	mHeight = 400;
 	// end settings
 
-	mOutputFilename = "t.ppm";
 	mRecursions = 0;
 
 	mpShapes = new ShapeList;
@@ -31,25 +28,24 @@ RayTracer::~RayTracer()
 
 }
 
-void RayTracer::RayTrace()
+void RayTracer::RayTrace(Image &result)
 {
+        int mWidth=result.width;
+	int mHeight=result.height;
 	Ray eye_ray(mEyePoint,Vector(0,0,1));
 	Color draw_color;
 	double i_inc, j_inc, anti_alias_i_inc, anti_alias_j_inc; // amount to increment the ray in each direction
 	double i, j, anti_alias_i, anti_alias_j; // the i and j values of the ray
 	int pixel_x, pixel_y, anti_alias_pixel_x, anti_alias_pixel_y; // the pixels being drawn
 
-	double average_red_byte, average_green_byte, average_blue_byte;
+	double average_red_byte, average_green_byte, average_blue_byte, average_trans_byte;
 	int anti_alias_count; // the number of anti aliases (used in averaging)
+	int idx=0;
 
 	i_inc = 2.0/(double)mWidth;
 	j_inc = 2.0/(double)mHeight;
 	anti_alias_i_inc = 1.0/(double)mAntiAliasDetail;
 	anti_alias_j_inc = 1.0/(double)mAntiAliasDetail;
-
-	ofstream ppm_file(mOutputFilename.c_str(),ios::binary);
-	unsigned char new_line= 0x0a;
-	ppm_file << "P6 " << mWidth << " " << mHeight << " 255" << new_line;
 
 	pixel_y = 0;
 	j = 1.0;
@@ -64,6 +60,7 @@ void RayTracer::RayTrace()
  			average_red_byte = 0;
 			average_green_byte = 0;
 			average_blue_byte = 0;
+			average_trans_byte = 0;
 			anti_alias_count = 0;
 			for (; anti_alias_pixel_y < mAntiAliasDetail; anti_alias_j += anti_alias_j_inc, anti_alias_pixel_y++)
 			{
@@ -79,10 +76,15 @@ void RayTracer::RayTrace()
 					average_red_byte = average_red_byte + ((double)draw_color.RedByte() - average_red_byte)/(double)anti_alias_count;
 					average_green_byte = average_green_byte + ((double)draw_color.GreenByte() - average_green_byte)/(double)anti_alias_count;
 					average_blue_byte = average_blue_byte + ((double)draw_color.BlueByte() - average_blue_byte)/(double)anti_alias_count;
+					average_trans_byte = average_trans_byte + ((double)draw_color.TransparentByte() - average_trans_byte)/(double)anti_alias_count;
 				}
 			}
-
-			ppm_file << (unsigned char)average_red_byte << (unsigned char)average_green_byte << (unsigned char)average_blue_byte;
+			
+			result.red  [idx] = average_red_byte/255;
+			result.green[idx] = average_green_byte/255;
+			result.blue [idx] = average_blue_byte/255;
+			result.trans[idx] = average_trans_byte/255;
+			idx++;
 		}
 	}
 }
@@ -247,9 +249,4 @@ void RayTracer::AmbientColor(const Color& rAmbientColor)
 void RayTracer::AmbientIntensity(double vAmbientIntensity)
 {
 	mAmbientIntensity = unit_limiter(vAmbientIntensity);
-}
-
-void RayTracer::OutputFilename(const string& rOutputFilename)
-{
-	mOutputFilename = rOutputFilename;
 }

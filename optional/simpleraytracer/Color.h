@@ -8,7 +8,8 @@ class Color
 {
 public:
 	Color();
-	Color(double vRed, double vGreen, double vBlue);
+	Color(double vRed, double vGreen, double vBlue, 
+	      double vTransparent=1.0);
 	~Color();
 	
 	Color operator* (double vRhs) const; // returns multiplication of a scalar with a vector
@@ -20,13 +21,16 @@ public:
 	double Green() const;
 	void Blue(double vBlue);
 	double Blue() const;
+	void Transparent(double vTransparent);
+	double Transparent() const;
 
 	unsigned char RedByte() const;
 	unsigned char GreenByte() const;
 	unsigned char BlueByte() const;
+	unsigned char TransparentByte() const;
 private:
 	unsigned char ByteValue(double vZeroToOne) const;
-	double mRed, mGreen, mBlue;
+	double mRed, mGreen, mBlue, mTransparent;
 };
 
 #endif

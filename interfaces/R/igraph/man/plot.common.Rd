@@ -132,8 +132,8 @@
       \dQuote{\code{circle}}, \dQuote{\code{square}},
       \dQuote{\code{csquare}}, \dQuote{\code{rectangle}},
       \dQuote{\code{crectangle}}, \dQuote{\code{vrectangle}},
-      \dQuote{\code{\link[=vertex.shape.pie]{pie}}} and
-      \dQuote{\code{none}} are supported,
+      \dQuote{\code{\link[vertex.shape.pie]{pie}}},
+      \sQuote{\code{sphere}}, and \dQuote{\code{none}} are supported,
       and only by the \code{\link{plot.igraph}}
       command. \dQuote{\code{none}} does not draw the vertices at all,
       although vertex label are plotted (if given). See
@@ -141,6 +141,14 @@
       shapes and \code{\link{vertex.shape.pie}} for using pie charts as
       vertices.
 
+      The \dQuote{\code{sphere}} vertex shape plots vertices as 3D
+      ray-traced spheres, in the given color and size. This produces a
+      raster image and it is only supported with some graphics
+      devices. On some devices raster transparency is not supported and
+      the spheres do not have a transparent background. See
+      \code{\link{dev.capabilities}} and the \sQuote{\code{rasterImage}}
+      capability to check that your device is supported.
+      
       By default vertices are drawn as circles.
     }
     \item{label}{The vertex labels. They will be converted to

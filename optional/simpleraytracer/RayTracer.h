@@ -11,6 +11,13 @@
 #include "Color.h"
 #include "Light.h"
 
+class Image
+{
+ public: 
+  int width, height;
+  double *red, *green, *blue, *trans;
+};
+
 class RayTracer
 {
 
@@ -18,7 +25,7 @@ public:
 	RayTracer();
 	~RayTracer();
 
-	void RayTrace();
+	void RayTrace(Image &result);
 
 	void AddShape(Shape* pShape);
 	void AddLight(Light* pLight);
@@ -27,8 +34,6 @@ public:
 	void EyePoint(const Point& rEyePoint);
 	void AmbientColor(const Color& rAmbient);
 	void AmbientIntensity(double vAmbientIntensity);
-
-	void OutputFilename(const string& rOutputFilename);
 
 private:
 	
@@ -43,16 +48,12 @@ private:
 	Color mSpecularColor;
 	double mAmbientIntensity;	
 
-	string mOutputFilename;
-
 	ShapeList* mpShapes;
 	LightList* mpLights;
 
 	int mRecursions;
 	int mRecursionLimit;
 	int mAntiAliasDetail;
-	int mWidth;
-	int mHeight;
 };
 
 #endif

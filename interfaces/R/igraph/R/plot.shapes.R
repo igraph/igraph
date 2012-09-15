@@ -667,6 +667,40 @@ mypie <- function(x, y, values, radius, edges=200, col=NULL, angle=45,
   }
 }
 
+.igraph.shape.sphere.clip <- .igraph.shape.circle.clip
+
+.igraph.shape.sphere.plot <- function(coords, v=NULL, params) {
+
+  getparam <- function(pname) {
+    p <- params("vertex", pname)
+    if (length(p) != 1 && !is.null(v)) {
+      p <- p[v]
+    }
+    p
+  }
+  vertex.color       <- getparam("color")
+  vertex.size        <- rep(1/200 * getparam("size"), length=nrow(coords))
+
+  ## Need to create a separate image for every different vertex color
+  allcols <- unique(vertex.color)
+  images <- lapply(allcols, function(col) {
+    img <- .Call("R_igraph_getsphere", pos=c(0.0,0.0,10.0), radius=7.0,
+                 color=col2rgb(col)/255, bgcolor=c(0,0,0),
+                 lightpos=list(c(-2,2,2)), lightcolor=list(c(1,1,1)),
+                 width=100L, height=100L,
+                 PACKAGE="igraph")
+    as.raster(img)
+  })
+  whichImage <- match(vertex.color, allcols)  
+  
+  for (i in seq_len(nrow(coords))) {
+    vsp2 <- vertex.size[i]
+    rasterImage(images[[ whichImage[i] ]],
+                coords[i,1]-vsp2, coords[i,2]-vsp2,
+                coords[i,1]+vsp2, coords[i,2]+vsp2)
+  }
+}
+
 .igraph.shapes <- new.env()
 .igraph.shapes[["circle"]] <- list(clip=.igraph.shape.circle.clip,
                                    plot=.igraph.shape.circle.plot)
@@ -684,4 +718,6 @@ mypie <- function(x, y, values, radius, edges=200, col=NULL, angle=45,
                                  plot=.igraph.shape.none.plot)
 .igraph.shapes[["pie"]] <- list(clip=.igraph.shape.pie.clip,
                                 plot=.igraph.shape.pie.plot)
+.igraph.shapes[["sphere"]] <- list(clip=.igraph.shape.sphere.clip,
+                                   plot=.igraph.shape.sphere.plot)
 
