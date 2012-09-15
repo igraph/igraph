@@ -32,9 +32,11 @@ graph.motifs <- function(graph, size=3, cut.prob=rep(0, size)) {
   }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_motifs_randesu", graph, as.integer(size),
-        as.numeric(cut.prob),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_motifs_randesu", graph, as.integer(size),
+               as.numeric(cut.prob),
+               PACKAGE="igraph")
+  res[is.nan(res)] <- NA
+  res
 }
 
 graph.motifs.no <- function(graph, size=3, cut.prob=rep(0, size)) {

@@ -24,10 +24,14 @@
 #include <igraph.h>
 
 void print_vector(igraph_vector_t *v) {
-  long int i;
-  igraph_real_t sum=igraph_vector_sum(v);
-  for (i=0; i<igraph_vector_size(v); i++) {
-    printf("%2.2f ", VECTOR(*v)[i]/sum);
+  long int i, n=igraph_vector_size(v); 
+  igraph_real_t sum=0.0;
+  for (i=0; i<n; i++) {
+    if (!igraph_is_nan(VECTOR(*v)[i])) { sum += VECTOR(*v)[i]; }
+  }
+  for (i=0; i<n; i++) {
+    igraph_real_printf(VECTOR(*v)[i]/sum);
+    printf(" ");
   }
   printf("\n");
 }
