@@ -92,6 +92,10 @@ SRCFILES_ORIGPLACE13 =  $(wildcard $(top_srcdir)/optional/glpk/colamd/*.c)
 
 SRCFILES_ORIGPLACE14 =  $(wildcard $(top_srcdir)/optional/glpk/colamd/*.h)
 
+SRCFILES_ORIGPLACE15 =  $(wildcard $(top_srcdir)/optional/simpleraytracer/*.cpp)
+
+SRCFILES_ORIGPLACE16 =  $(wildcard $(top_srcdir)/optional/simpleraytracer/*.h)
+
 SRCFILES = $(patsubst $(top_srcdir)/src/%,igraph/src/%,$(SRCFILES_ORIGPLACE)) \
 	$(patsubst $(top_srcdir)/include/%,igraph/src/%,$(SRCFILES_ORIGPLACE6)) \
 	$(patsubst $(top_srcdir)/src/cs/%,igraph/src/%,$(SRCFILES_ORIGPLACE7)) \
@@ -101,7 +105,9 @@ SRCFILES = $(patsubst $(top_srcdir)/src/%,igraph/src/%,$(SRCFILES_ORIGPLACE)) \
 	$(patsubst $(top_srcdir)/optional/glpk/amd/%,igraph/src/%,$(SRCFILES_ORIGPLACE11)) \
 	$(patsubst $(top_srcdir)/optional/glpk/amd/%,igraph/src/glpk/amd/%,$(SRCFILES_ORIGPLACE12)) \
 	$(patsubst $(top_srcdir)/optional/glpk/colamd/%,igraph/src/%,$(SRCFILES_ORIGPLACE13)) \
-	$(patsubst $(top_srcdir)/optional/glpk/colamd/%,igraph/src/glpk/colamd/%,$(SRCFILES_ORIGPLACE14))
+	$(patsubst $(top_srcdir)/optional/glpk/colamd/%,igraph/src/glpk/colamd/%,$(SRCFILES_ORIGPLACE14)) \
+	$(patsubst $(top_srcdir)/optional/simpleraytracer/%,igraph/src/%,$(SRCFILES_ORIGPLACE15)) \
+	$(patsubst $(top_srcdir)/optional/simpleraytracer/%,igraph/src/%,$(SRCFILES_ORIGPLACE16))
 
 igraph/src/cs/%.h: $(top_srcdir)/src/cs/%.h
 	cp $(top_srcdir)/src/cs/$(@F) igraph/src/cs/$(@F)
@@ -134,6 +140,11 @@ igraph/src/%.c: $(top_srcdir)/optional/glpk/colamd/%.c
 	cp $(top_srcdir)/optional/glpk/colamd/$(@F) igraph/src/$(@F)
 igraph/src/%.c: $(top_srcdir)/optional/glpk/%.c
 	cp $(top_srcdir)/optional/glpk/$(@F) igraph/src/$(@F)
+
+igraph/src/%.cpp: $(top_srcdir)/optional/simpleraytracer/%.cpp
+	cp $(top_srcdir)/optional/simpleraytracer/$(@F) igraph/src/$(@F)
+igraph/src/%.h: $(top_srcdir)/optional/simpleraytracer/%.h
+	cp $(top_srcdir)/optional/simpleraytracer/$(@F) igraph/src/$(@F)
 
 igraph/src/%.h: $(top_srcdir)/include/%.h
 	cp $(top_srcdir)/include/$(@F) $@
