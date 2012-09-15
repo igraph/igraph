@@ -63,16 +63,16 @@ igraph_bool_t igraph_i_motifs_randesu_update_hist(const igraph_t *graph,
  * \brief Count the number of motifs in a graph
  * 
  * </para><para>
- * Motifs are small subgraphs of a given structure in a graph. It is
- * argued that the motif profile (ie. the number of different motifs
- * in the graph) is characteristic for different types of networks and
- * network function is related to the motifs in the graph. 
+ * Motifs are small connected subgraphs of a given structure in a
+ * graph. It is argued that the motif profile (ie. the number of
+ * different motifs in the graph) is characteristic for different
+ * types of networks and network function is related to the motifs in
+ * the graph.
  * 
  * </para><para>
  * This function is able to find the different motifs of size three
  * and four (ie. the number of different subgraphs with three and four
- * vertices) in the network. (This limitation is the result of the
- * lack of code to decide graph isomorphism for larger graphs.)
+ * vertices) in the network.
  * 
  * </para><para>
  * In a big network the total number of motifs can be very large, so
@@ -95,6 +95,9 @@ igraph_bool_t igraph_i_motifs_randesu_update_hist(const igraph_t *graph,
  * \param hist The result of the computation, it gives the number of
  *        motifs found for each isomorphism class. See
  *        \ref igraph_isoclass() for help about isomorphism classes.
+ *        Note that this function does \em not count isomorphism
+ *        classes that are not connected and will report NaN (more
+ *        precisely \c IGRAPH_NAN) for them.
  * \param size The size of the motifs to search for. Only three and
  *        four are implemented currently. The limitation is not in the
  *        motif finding code, but the graph isomorphism code.
@@ -133,6 +136,26 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
 
   IGRAPH_CHECK(igraph_motifs_randesu_callback(graph, size, cut_prob,
 	&igraph_i_motifs_randesu_update_hist, hist));
+
+  if (size == 3) {
+    if (igraph_is_directed(graph)) {
+      VECTOR(*hist)[0] = VECTOR(*hist)[1] = VECTOR(*hist)[3] = IGRAPH_NAN;
+    } else {
+      VECTOR(*hist)[0] = VECTOR(*hist)[1] = IGRAPH_NAN;
+    }
+  } else if (size == 4) {
+    if (igraph_is_directed(graph)) {
+      int not_connected[] = { 0, 1, 2, 4, 5, 6, 9, 10, 11, 15, 22, 23, 27,
+			      28, 33, 34, 39, 62, 120 };
+      int i, n=sizeof(not_connected) / sizeof(int);
+      for (i=0; i<n; i++) {
+	VECTOR(*hist)[not_connected[i]] = IGRAPH_NAN;
+      }
+    } else {
+      VECTOR(*hist)[0] = VECTOR(*hist)[1] = VECTOR(*hist)[2] = 
+      VECTOR(*hist)[3] = VECTOR(*hist)[5] = IGRAPH_NAN;
+    }
+  }
 
   return IGRAPH_SUCCESS;
 }

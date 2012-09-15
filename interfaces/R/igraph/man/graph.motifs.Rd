@@ -4,8 +4,9 @@
 \alias{graph.motifs.est}
 \concept{Graph motif}
 \title{Graph motifs}
-\description{Graph motifs are small subgraphs with a well-defined
-  strucure. These functions search a graph for various motifs.}
+\description{Graph motifs are small connected subgraphs with a
+  well-defined structure. These functions search a graph for various
+  motifs.}
 \usage{
 graph.motifs(graph, size = 3, cut.prob = rep(0, size)) 
 graph.motifs.no(graph, size = 3, cut.prob = rep(0, size)) 
@@ -39,7 +40,10 @@ graph.motifs.est(graph, size = 3, cut.prob = rep(0, size), sample.size =
   given size in a graph based on a sample. 
 }
 \value{
-  \code{graph.motifs} returns a numeric vector.
+  \code{graph.motifs} returns a numeric vector, the number of occurences
+  of each motif in the graph. The motifs are ordered by their
+  isomorphism classes. Note that for unconnected subgraphs, which are
+  not considered to be motifs, the result will be \code{NA}.
 
   \code{graph.motifs.no} and \code{graph.motifs.est} return a numeric
   constant.
