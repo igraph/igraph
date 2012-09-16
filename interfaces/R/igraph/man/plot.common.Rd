@@ -41,7 +41,7 @@
   \code{\link{plot.igraph}}, \code{\link{tkplot}} or
   \code{\link{rglplot}}. Parameters for vertices start with prefix
   \sQuote{\code{vertex.}}, parameters for edges have prefix
-  \sQuote{\code{edge.}}, and global parameters have now prefix. Eg. the
+  \sQuote{\code{edge.}}, and global parameters have no prefix. Eg. the
   color of the vertices can be given via argument \code{vertex.color},
   whereas \code{edge.color} sets the color of the edges. \code{layout}
   gives the layout of the graphs.
@@ -132,8 +132,8 @@
       \dQuote{\code{circle}}, \dQuote{\code{square}},
       \dQuote{\code{csquare}}, \dQuote{\code{rectangle}},
       \dQuote{\code{crectangle}}, \dQuote{\code{vrectangle}},
-      \dQuote{\code{\link[=vertex.shape.pie]{pie}}} and
-      \dQuote{\code{none}} are supported,
+      \dQuote{\code{\link[vertex.shape.pie]{pie}}},
+      \sQuote{\code{sphere}}, and \dQuote{\code{none}} are supported,
       and only by the \code{\link{plot.igraph}}
       command. \dQuote{\code{none}} does not draw the vertices at all,
       although vertex label are plotted (if given). See
@@ -141,6 +141,14 @@
       shapes and \code{\link{vertex.shape.pie}} for using pie charts as
       vertices.
 
+      The \dQuote{\code{sphere}} vertex shape plots vertices as 3D
+      ray-traced spheres, in the given color and size. This produces a
+      raster image and it is only supported with some graphics
+      devices. On some devices raster transparency is not supported and
+      the spheres do not have a transparent background. See
+      \code{\link{dev.capabilities}} and the \sQuote{\code{rasterImage}}
+      capability to check that your device is supported.
+      
       By default vertices are drawn as circles.
     }
     \item{label}{The vertex labels. They will be converted to
@@ -436,7 +444,8 @@ plot(g, vertex.label.dist=1.5)
 igraph.options(plot.layout=layout.reingold.tilford)
 plot(graph.tree(20, 2))
 plot(graph.tree(50, 3), vertex.size=3, vertex.label=NA)
-tkplot(graph.tree(50, 2, mode="undirected"), vertex.size=10, vertex.color="green")
+tkplot(graph.tree(50, 2, mode="undirected"), vertex.size=10,
+vertex.color="green")
 }
 }
 \keyword{graphs}
