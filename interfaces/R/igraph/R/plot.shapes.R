@@ -701,6 +701,29 @@ mypie <- function(x, y, values, radius, edges=200, col=NULL, angle=45,
   }
 }
 
+.igraph.shape.raster.clip <- .igraph.shape.rectangle.clip
+
+.igraph.shape.raster.plot <- function(coords, v=NULL, params) {
+
+  getparam <- function(pname) {
+    p <- params("vertex", pname)
+    if (is.list(p) && length(p) != 1 && !is.null(v)) {
+      p <- p[v]
+    }
+    p
+  }
+
+  size   <- rep(1/200 * getparam("size"), length=nrow(coords))
+  size2  <- rep(1/200 * getparam("size2"), length=nrow(coords))
+  raster <- getparam("raster")
+
+  for (i in seq_len(nrow(coords))) {
+    ras <- if (!is.list(raster) || length(raster)==1) raster else raster[[i]]
+    rasterImage(ras, coords[i,1]-size[i], coords[i,2]-size2[i],
+                coords[i,1]+size[i], coords[i,2]+size2[i])
+  }
+}
+
 .igraph.shapes <- new.env()
 .igraph.shapes[["circle"]] <- list(clip=.igraph.shape.circle.clip,
                                    plot=.igraph.shape.circle.plot)
@@ -720,4 +743,5 @@ mypie <- function(x, y, values, radius, edges=200, col=NULL, angle=45,
                                 plot=.igraph.shape.pie.plot)
 .igraph.shapes[["sphere"]] <- list(clip=.igraph.shape.sphere.clip,
                                    plot=.igraph.shape.sphere.plot)
-
+.igraph.shapes[["raster"]] <- list(clip=.igraph.shape.raster.clip,
+                                   plot=.igraph.shape.raster.plot)
