@@ -2997,6 +2997,7 @@ int igraph_i_split_join_distance(const igraph_vector_t *v1,
  *
  * \param  comm1   the membership vector of the first community structure
  * \param  comm2   the membership vector of the second community structure
+ * \param  result  the result is stored here.
  * \param  method  the comparison method to use. \c IGRAPH_COMMCMP_VI
  *                 selects the variation of information (VI) metric of
  *                 Meila (2003), \c IGRAPH_COMMCMP_NMI selects the
