@@ -25,8 +25,8 @@ plot.igraph <- function(x,
                        axes=FALSE, xlab="", ylab="", add=FALSE,
                        xlim=c(-1,1), ylim=c(-1,1), main="", sub="",
                        mark.groups=list(), mark.shape=1/2,
-                       mark.border=NA,
                        mark.col=rainbow(length(mark.groups), alpha=0.3),
+                       mark.border=rainbow(length(mark.groups), alpha=1),
                        mark.expand=15,
                        ...) {
 
@@ -130,21 +130,21 @@ plot.igraph <- function(x,
   edge.coords[,4] <- layout[,2][ el[,2] ]
   if ( length(unique(shape)) == 1) {
     ## same vertex shape for all vertices
-    ec <- .igraph.shapes[[ shape[1] ]](edge.coords, el, mode="clip",
-                                       params=params, end="both")
+    ec <- .igraph.shapes[[ shape[1] ]]$clip(edge.coords, el,
+                                            params=params, end="both")
   } else {
     ## different vertex shapes, do it by "endpoint"
     shape <- rep(shape, length=vcount(graph))
     ec <- edge.coords
     ec[,1:2] <- t(sapply(seq(length=nrow(el)), function(x) {
-      .igraph.shapes[[ shape[el[x,1]] ]](edge.coords[x,,drop=FALSE],
-                                           el[x,,drop=FALSE],
-                                           mode="clip", params=params, end="from")
+      .igraph.shapes[[ shape[el[x,1]] ]]$clip(edge.coords[x,,drop=FALSE],
+                                              el[x,,drop=FALSE],
+                                              params=params, end="from")
     }))
     ec[,3:4] <- t(sapply(seq(length=nrow(el)), function(x) {
-      .igraph.shapes[[ shape[el[x,2]] ]](edge.coords[x,,drop=FALSE],
-                                           el[x,,drop=FALSE],
-                                           mode="clip", params=params, end="to")
+      .igraph.shapes[[ shape[el[x,2]] ]]$clip(edge.coords[x,,drop=FALSE],
+                                              el[x,,drop=FALSE],
+                                              params=params, end="to")
     }))
   }
   
@@ -285,11 +285,11 @@ plot.igraph <- function(x,
   ################################################################
   # add the vertices
   if (length(unique(shape)) == 1) {
-    .igraph.shapes[[ shape[1] ]](layout, mode="plot", params=params)
+    .igraph.shapes[[ shape[1] ]]$plot(layout, params=params)
   } else {
     sapply(seq(length=vcount(graph)), function(x) {
-      .igraph.shapes[[ shape[x] ]](layout[x,,drop=FALSE], v=x,
-                                   mode="plot", params=params)
+      .igraph.shapes[[ shape[x] ]]$plot(layout[x,,drop=FALSE], v=x,
+                                        params=params)
     })
   }
       
