@@ -3221,8 +3221,8 @@ int igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
 }
 
 /**
- * Implementation of the variation of information metric (VI) of
- * Meila et al. This function assumes that the community membership
+ * Implementation of the normalized mutual information (NMI) measure of
+ * Danon et al. This function assumes that the community membership
  * vectors have already been normalized using igraph_reindex_communities().
  *
  * </para><para>
@@ -3247,8 +3247,8 @@ int igraph_i_compare_communities_nmi(const igraph_vector_t *v1, const igraph_vec
 }
 
 /**
- * Implementation of the normalized mutual information (NMI) measure of
- * Danon et al. This function assumes that the community membership
+ * Implementation of the variation of information metric (VI) of
+ * Meila et al. This function assumes that the community membership
  * vectors have already been normalized using igraph_reindex_communities().
  *
  * </para><para>
