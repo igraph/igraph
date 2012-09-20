@@ -1,5 +1,8 @@
 # vim:ts=4:sw=4:sts=4:et
 # -*- coding: utf-8 -*-
+
+from __future__ import division
+
 """
 Shape drawing classes for igraph
 
@@ -38,7 +41,7 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 
-from math import atan2, cos, pi, sin
+from math import atan2, copysign, cos, pi, sin
 import sys
 
 from igraph.drawing.baseclasses import AbstractCairoDrawer
@@ -110,7 +113,7 @@ class RectangleDrawer(ShapeDrawer):
         or filling it.
         @see: ShapeDrawer.draw_path"""
         height = height or width
-        ctx.rectangle(center_x - width/2., center_y - height/2.,
+        ctx.rectangle(center_x - width/2, center_y - height/2,
                 width, height)
 
     # pylint: disable-msg=C0103, R0911
@@ -131,37 +134,37 @@ class RectangleDrawer(ShapeDrawer):
 
         if delta_y > 0 and delta_x <= delta_y and delta_x >= -delta_y:
             # this is the top edge
-            ry = center_y - height/2.
-            ratio = (height/2.) / delta_y
+            ry = center_y - height/2
+            ratio = (height/2) / delta_y
             return center_x-ratio*delta_x, ry
 
         if delta_y < 0 and delta_x <= -delta_y and delta_x >= delta_y:
             # this is the bottom edge
-            ry = center_y + height/2.
-            ratio = (height/2.) / -delta_y
+            ry = center_y + height/2
+            ratio = (height/2) / -delta_y
             return center_x-ratio*delta_x, ry
 
         if delta_x > 0 and delta_y <= delta_x and delta_y >= -delta_x:
             # this is the left edge
-            rx = center_x - width/2.
-            ratio = (width/2.) / delta_x
+            rx = center_x - width/2
+            ratio = (width/2) / delta_x
             return rx, center_y-ratio*delta_y
 
         if delta_x < 0 and delta_y <= -delta_x and delta_y >= delta_x:
             # this is the right edge
-            rx = center_x + width/2.
-            ratio = (width/2.) / -delta_x
+            rx = center_x + width/2
+            ratio = (width/2) / -delta_x
             return rx, center_y-ratio*delta_y
 
         if delta_x == 0:
             if delta_y > 0:
-                return center_x, center_y - height/2.
-            return center_x, center_y + height/2.
+                return center_x, center_y - height/2
+            return center_x, center_y + height/2
 
         if delta_y == 0:
             if delta_x > 0:
-                return center_x - width/2., center_y
-            return center_x + width/2., center_y
+                return center_x - width/2, center_y
+            return center_x + width/2, center_y
 
 
 class CircleDrawer(ShapeDrawer):
@@ -176,7 +179,7 @@ class CircleDrawer(ShapeDrawer):
         Height is ignored, it is the width that determines the diameter of the circle.
 
         @see: ShapeDrawer.draw_path"""
-        ctx.arc(center_x, center_y, width/2., 0, 2*pi)
+        ctx.arc(center_x, center_y, width/2, 0, 2*pi)
 
     @staticmethod
     def intersection_point(center_x, center_y, source_x, source_y, \
@@ -188,8 +191,8 @@ class CircleDrawer(ShapeDrawer):
         @see: ShapeDrawer.intersection_point"""
         height = height or width
         angle = atan2(center_y-source_y, center_x-source_x)
-        return center_x-width/2. * cos(angle), \
-               center_y-height/2.* sin(angle)
+        return center_x-width/2 * cos(angle), \
+               center_y-height/2* sin(angle)
 
 
 class UpTriangleDrawer(ShapeDrawer):
@@ -203,9 +206,9 @@ class UpTriangleDrawer(ShapeDrawer):
         
         @see: ShapeDrawer.draw_path"""
         height = height or width
-        ctx.move_to(center_x-width/2., center_y+height/2.)
-        ctx.line_to(center_x, center_y-height/2.)
-        ctx.line_to(center_x+width/2., center_y+height/2.)
+        ctx.move_to(center_x-width/2, center_y+height/2)
+        ctx.line_to(center_x, center_y-height/2)
+        ctx.line_to(center_x+width/2, center_y+height/2)
         ctx.close_path()
 
     @staticmethod
@@ -231,9 +234,9 @@ class DownTriangleDrawer(ShapeDrawer):
         
         @see: ShapeDrawer.draw_path"""
         height = height or width
-        ctx.move_to(center_x-width/2., center_y-height/2.)
-        ctx.line_to(center_x, center_y+height/2.)
-        ctx.line_to(center_x+width/2., center_y-height/2.)
+        ctx.move_to(center_x-width/2, center_y-height/2)
+        ctx.line_to(center_x, center_y+height/2)
+        ctx.line_to(center_x+width/2, center_y-height/2)
         ctx.close_path()
 
     @staticmethod
@@ -259,10 +262,10 @@ class DiamondDrawer(ShapeDrawer):
         
         @see: ShapeDrawer.draw_path"""
         height = height or width
-        ctx.move_to(center_x-width/2., center_y)
-        ctx.line_to(center_x, center_y+height/2.)
-        ctx.line_to(center_x+width/2., center_y)
-        ctx.line_to(center_x, center_y-height/2.)
+        ctx.move_to(center_x-width/2, center_y)
+        ctx.line_to(center_x, center_y+height/2)
+        ctx.line_to(center_x+width/2, center_y)
+        ctx.line_to(center_x, center_y-height/2)
         ctx.close_path()
 
     @staticmethod
@@ -273,9 +276,25 @@ class DiamondDrawer(ShapeDrawer):
         (center_x, center_y).
 
         @see: ShapeDrawer.intersection_point"""
-        # TODO: finish it properly
         height = height or width
-        return center_x, center_y
+
+        if height == 0 and width == 0:
+            return center_x, center_y
+
+        delta_x, delta_y = source_x - center_x, source_y - center_y
+
+        # Treat edge case when delta_x = 0
+        if delta_x == 0:
+            if delta_y == 0:
+                return center_x, center_y
+            else:
+                return center_x, center_y + copysign(height / 2, delta_y)
+
+        width = copysign(width, delta_x)
+        height = copysign(height, delta_y)
+
+        f = height / (height + width * delta_y / delta_x)
+        return center_x + f * width / 2, center_y + (1-f) * height / 2
 
 #####################################################################
 
@@ -355,8 +374,8 @@ class PolygonDrawer(AbstractCairoDrawer):
         for idx, (v, w) in enumerate(consecutive_pairs(points, True)):
             radius = corner_radii[idx]
             ctx.line_to(*v.towards(u, radius))
-            aux1 = v.towards(u, radius / 2.)
-            aux2 = v.towards(w, radius / 2.)
+            aux1 = v.towards(u, radius / 2)
+            aux2 = v.towards(w, radius / 2)
             ctx.curve_to(aux1.x, aux1.y, aux2.x, aux2.y,
                          *v.towards(w, corner_radii[idx]))
             u = v
