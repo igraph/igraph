@@ -678,7 +678,7 @@ mypie <- function(x, y, values, radius, edges=200, col=NULL, angle=45,
     }
     p
   }
-  vertex.color       <- getparam("color")
+  vertex.color       <- rep(getparam("color"), length=nrow(coords))
   vertex.size        <- rep(1/200 * getparam("size"), length=nrow(coords))
 
   ## Need to create a separate image for every different vertex color
