@@ -16,18 +16,23 @@ except ImportError:
     pass
 
 from igraph.drawing.colors import clamp
+from igraph.drawing.metamagic import AttributeCollectorBase
 from math import atan2, cos, pi, sin
 
 class AbstractEdgeDrawer(object):
     """Abstract edge drawer object from which all concrete edge drawer
     implementations are derived."""
 
-    def __init__(self, context):
+    def __init__(self, context, palette):
         """Constructs the edge drawer.
 
         @param context: a Cairo context on which the edges will be drawn.
+        @param palette: the palette that can be used to map integer
+                        color indices to colors when drawing edges
         """
         self.context = context
+        self.palette = palette
+        self.VisualEdgeBuilder = self._construct_visual_edge_builder()
 
     @staticmethod
     def _curvature_to_float(value):
@@ -38,6 +43,20 @@ class AbstractEdgeDrawer(object):
         if value is True:
             return 0.5
         return float(value)
+
+    def _construct_visual_edge_builder(self):
+        """Construct the visual edge builder that will collect the visual
+        attributes of an edge when it is being drawn."""
+        class VisualEdgeBuilder(AttributeCollectorBase):
+            """Builder that collects some visual properties of an edge for
+            drawing"""
+            _kwds_prefix = "edge_"
+            arrow_size  = 1.0
+            arrow_width = 1.0
+            color       = ("#444", self.palette.get)
+            curved      = (0.0, self._curvature_to_float)
+            width       = 1.0
+        return VisualEdgeBuilder
 
     def draw_directed_edge(self, edge, src_vertex, dest_vertex):
         """Draws a directed edge.

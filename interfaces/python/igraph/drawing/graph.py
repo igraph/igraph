@@ -25,10 +25,10 @@ from igraph.drawing.baseclasses import AbstractDrawer, AbstractCairoDrawer, \
 from igraph.drawing.colors import color_to_html_format, color_name_to_rgb
 from igraph.drawing.edge import ArrowEdgeDrawer
 from igraph.drawing.text import TextDrawer
-from igraph.drawing.metamagic import AttributeCollectorBase, \
-                                     AttributeSpecification
-from igraph.drawing.shapes import ShapeDrawerDirectory, PolygonDrawer
+from igraph.drawing.metamagic import AttributeCollectorBase
+from igraph.drawing.shapes import PolygonDrawer
 from igraph.drawing.utils import Point
+from igraph.drawing.vertex import DefaultVertexDrawer
 from igraph.layout import Layout
 
 __all__ = ["DefaultGraphDrawer", "UbiGraphDrawer", "CytoscapeGraphDrawer"]
@@ -122,6 +122,7 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
     this drawer."""
 
     def __init__(self, context, bbox, \
+                 vertex_drawer_factory = DefaultVertexDrawer,
                  edge_drawer_factory = ArrowEdgeDrawer,
                  label_drawer_factory = TextDrawer):
         """Constructs the graph drawer and associates it to the given
@@ -132,18 +133,30 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
                         Can be anything accepted by the constructor
                         of L{BoundingBox} (i.e., a 2-tuple, a 4-tuple
                         or a L{BoundingBox} object).
+        @param vertex_drawer_factory: a factory method that returns an
+                        L{AbstractCairoVertexDrawer} instance bound to a
+                        given Cairo context. The factory method must take
+                        three parameters: the Cairo context, the bounding
+                        box of the drawing area and the palette to be
+                        used for drawing colored vertices. The default
+                        vertex drawer is L{DefaultVertexDrawer}.
         @param edge_drawer_factory: a factory method that returns an
                         L{AbstractEdgeDrawer} instance bound to a
-                        given Cairo context. You can use any of the
-                        actual L{AbstractEdgeDrawer} implementations
-                        here to control the style of edges drawn by
-                        igraph. The default edge drawer is
+                        given Cairo context. The factory method must take
+                        two parameters: the Cairo context and the palette
+                        to be used for drawing colored edges. You can use
+                        any of the actual L{AbstractEdgeDrawer}
+                        implementations here to control the style of
+                        edges drawn by igraph. The default edge drawer is
                         L{ArrowEdgeDrawer}.
         @param label_drawer_factory: a factory method that returns a
                         L{TextDrawer} instance bound to a given Cairo
-                        context. The default label drawer is L{TextDrawer}.
+                        context. The method must take one parameter: the
+                        Cairo context. The default label drawer is
+                        L{TextDrawer}.
         """
         AbstractCairoGraphDrawer.__init__(self, context, bbox)
+        self.vertex_drawer_factory = vertex_drawer_factory
         self.edge_drawer_factory = edge_drawer_factory
         self.label_drawer_factory = label_drawer_factory
 
@@ -186,32 +199,14 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
             default = float(default)
             kwds["edge_curved"] = autocurve(graph, attribute=None, default=default)
 
-        # Construct the visual vertex/edge builders
-        class VisualVertexBuilder(AttributeCollectorBase):
-            """Collects some visual properties of a vertex for drawing"""
-            _kwds_prefix = "vertex_"
-            color = ("red", palette.get)
-            frame_color = ("black", palette.get)
-            label = None
-            label_angle = -pi/2
-            label_dist  = 0.0
-            label_color = ("black", palette.get)
-            label_size  = 14.0
-            position = dict(func=layout.__getitem__)
-            shape = ("circle", ShapeDrawerDirectory.resolve_default)
-            size  = 20.0
+        # Construct the vertex and edge drawers
+        vertex_drawer = self.vertex_drawer_factory(context, bbox, palette, layout)
+        edge_drawer = self.edge_drawer_factory(context, palette)
 
-        class VisualEdgeBuilder(AttributeCollectorBase):
-            """Collects some visual properties of an edge for drawing"""
-            _kwds_prefix = "edge_"
-            arrow_size  = 1.0
-            arrow_width = 1.0
-            color       = ("#444", palette.get)
-            curved      = (0.0, ArrowEdgeDrawer._curvature_to_float)
-            width       = 1.0
-
-        vertex_builder = VisualVertexBuilder(graph.vs, kwds)
-        edge_builder = VisualEdgeBuilder(graph.es, kwds)
+        # Construct the visual vertex/edge builders based on the specifications
+        # provided by the vertex_drawer and the edge_drawer
+        vertex_builder = vertex_drawer.VisualVertexBuilder(graph.vs, kwds)
+        edge_builder = edge_drawer.VisualEdgeBuilder(graph.es, kwds)
 
         # Draw the highlighted groups (if any)
         if "mark_groups" in kwds:
@@ -274,7 +269,6 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
                 context.stroke()
 
         # Draw the edges
-        edge_drawer = self.edge_drawer_factory(context)
         if directed:
             drawer_method = edge_drawer.draw_directed_edge
         else:
@@ -307,23 +301,20 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
             # Default vertex order
             vertex_order = None
 
+        vs = graph.vs
         if vertex_order is None:
             # Default vertex order
-            vertex_coord_iter = izip(vertex_builder, layout)
+            vertex_coord_iter = izip(vs, vertex_builder, layout)
         else:
             # Specified vertex order
-            vertex_coord_iter = ((vertex_builder[i], layout[i])
+            vertex_coord_iter = ((vs[i], vertex_builder[i], layout[i])
                     for i in vertex_order)
 
         # Draw the vertices
+        drawer_method = vertex_drawer.draw
         context.set_line_width(1)
-        for vertex, coords in vertex_coord_iter:
-            vertex.shape.draw_path(context, \
-                    coords[0], coords[1], vertex.size)
-            context.set_source_rgba(*vertex.color)
-            context.fill_preserve()
-            context.set_source_rgba(*vertex.frame_color)
-            context.stroke()
+        for vertex, visual_vertex, coords in vertex_coord_iter:
+            drawer_method(visual_vertex, vertex, coords)
 
         # Draw the vertex labels
         context.select_font_face("sans-serif", cairo.FONT_SLANT_NORMAL, \
