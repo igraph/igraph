@@ -7154,7 +7154,7 @@ int igraph_transitive_closure_dag(const igraph_t *graph,
  * where p[i,j]=w[i,j]/sum(w[i,l], l=1..k[i]),  k[i] is the (total)
  * degree of vertex i, and w[i,j] is the weight of the edge(s) between
  * vertex i and j. 
- * \param The input graph, edge directions are ignored.
+ * \param graph The input graph, edge directions are ignored.
  * \param weights The edge weights, in the order of the edge ids, must
  *    have appropriate length.
  * \param res An initialized vector, the results are stored here.
