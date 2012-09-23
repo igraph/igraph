@@ -46,7 +46,7 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <sys/time.h>
-#include <sys/resource.h>
+#include <time.h>
 #include <limits.h>
 
 #include "igraph_interface.h"
@@ -1135,7 +1135,7 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
 		       int *invalid, igraph_bool_t *iso, 
 		       igraph_vector_t *map, igraph_vector_ptr_t *maps, 
 		       int *nbNodes, int *nbFail, int *nbSol, 
-		       struct rusage *ru) {
+		       clock_t *begin) {
   /* if firstSol then search for the first solution; otherwise search
      for all solutions if induced then search for induced subgraphs;
      otherwise search for partial subgraphs 
@@ -1145,11 +1145,11 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
   int u, v, minDom, i; 
   int nbVal[Gp->nbVertices];
   int globalMatching[Gp->nbVertices];
-	
+  clock_t end=clock();
+
   (*nbNodes)++;
 
-  getrusage(RUSAGE_SELF, ru);
-  if (ru->ru_utime.tv_sec >= timeLimit) {
+  if ( (double)(end - *begin) / CLOCKS_PER_SEC >= timeLimit) {
     /* CPU time limit exceeded */
     IGRAPH_ERROR("LAD CPU time exceeded", IGRAPH_CPUTIME);
   }
@@ -1220,7 +1220,7 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
       int invalid;
       IGRAPH_CHECK(igraph_i_lad_solve(timeLimit, firstSol, induced,
 				      D, Gp, Gt, &invalid, iso, map, maps, 
-				      nbNodes, nbFail, nbSol, ru));
+				      nbNodes, nbFail, nbSol, begin));
     }
     /* restore domain sizes and global all different matching */
     igraph_vector_int_fill(&D->globalMatchingT, -1);
@@ -1299,7 +1299,7 @@ int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
   /* number of solutions found */
   int nbSol=0;
   /* reusable structure to get CPU time usage */
-  struct rusage ru;
+  clock_t begin=clock();
 
   if (!iso && !map && !maps) {
     IGRAPH_ERROR("Please give least one of `iso', `map' or `maps'", 
@@ -1349,7 +1349,7 @@ int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
 	
   IGRAPH_CHECK(igraph_i_lad_solve(time_limit, firstSol, induced, &D, 
 				  &Gp, &Gt, &invalidDomain, iso, map, maps, 
-				  &nbNodes, &nbFail, &nbSol, &ru));
+				  &nbNodes, &nbFail, &nbSol, &begin));
 
  exit:
   
