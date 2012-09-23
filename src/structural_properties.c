@@ -101,7 +101,7 @@ int igraph_diameter(const igraph_t *graph, igraph_integer_t *pres,
 
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
   igraph_vector_t *neis;
-  igraph_integer_t dirmode;
+  igraph_neimode_t dirmode;
   igraph_adjlist_t allneis;
   
   if (directed) { dirmode=IGRAPH_OUT; } else { dirmode=IGRAPH_ALL; }
@@ -227,7 +227,7 @@ int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
 
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
   igraph_vector_t *neis;
-  igraph_integer_t dirmode;
+  igraph_neimode_t dirmode;
   igraph_adjlist_t allneis;
 
   *res=0;  
@@ -323,7 +323,7 @@ int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
   
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
   igraph_vector_t *neis;
-  igraph_integer_t dirmode;
+  igraph_neimode_t dirmode;
   igraph_adjlist_t allneis;
   igraph_real_t unconn = 0;
   long int ressize;
@@ -1295,7 +1295,7 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
   long int i, j, n, nodes_to_calc;
   igraph_real_t *prvec, *prvec_new, *prvec_aux, *prvec_scaled;
   igraph_vector_t *neis, outdegree;
-  igraph_integer_t dirmode;
+  igraph_neimode_t dirmode;
   igraph_adjlist_t allneis;
   igraph_real_t maxdiff=eps;
   igraph_vit_t vit;
@@ -6742,7 +6742,7 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
   igraph_inclist_t inclist;
   igraph_vector_long_t already_added;
   long int source;
-  igraph_integer_t dirmode = directed ? IGRAPH_OUT : IGRAPH_ALL;
+  igraph_neimode_t dirmode = directed ? IGRAPH_OUT : IGRAPH_ALL;
 
   long int from=-1, to=-1;
   igraph_real_t res=0;
