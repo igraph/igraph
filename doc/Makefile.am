@@ -4,6 +4,7 @@ DOXROX=$(top_srcdir)/doc/doxrox.py
 REGEX=$(top_srcdir)/doc/c-docbook.re
 SRCDIR=$(top_srcdir)/src
 INCLUDEDIR=$(top_srcdir)/include
+BUILD_INCLUDEDIR=$(top_builddir)/include
 REMOVEEXAMPLES=$(top_srcdir)/tools/removeexamples.py
 
 DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
@@ -178,8 +179,8 @@ spatialgames.xml: spatialgames.xxml \
 	$(DOXROX) -t $< -e $(REGEX) -o $@ \
 	$(SRCDIR)/microscopic_update.c
 
-threading.xml: threading.xxml $(INCLUDEDIR)/igraph_threading.h
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_threading.h
+threading.xml: threading.xxml $(BUILD_INCLUDEDIR)/igraph_threading.h
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(BUILD_INCLUDEDIR)/igraph_threading.h
 
 progress.xml: progress.xxml $(INCLUDEDIR)/igraph_progress.h $(SRCDIR)/progress.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_progress.h $(SRCDIR)/progress.c
