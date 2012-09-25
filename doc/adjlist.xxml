@@ -15,6 +15,7 @@
 <!-- doxrox-include igraph_adjlist_init_complementer -->
 <!-- doxrox-include igraph_adjlist_destroy -->
 <!-- doxrox-include igraph_adjlist_get -->
+<!-- doxrox-include igraph_adjlist_clear -->
 <!-- doxrox-include igraph_adjlist_sort -->
 <!-- doxrox-include igraph_adjlist_simplify -->
 </section>
@@ -23,18 +24,21 @@
 <!-- doxrox-include igraph_inclist_init -->
 <!-- doxrox-include igraph_inclist_destroy -->
 <!-- doxrox-include igraph_inclist_get -->
+<!-- doxrox-include igraph_inclist_clear -->
 </section>
 
 <section><title>Lazy adjacency list for vertices</title>
 <!-- doxrox-include igraph_lazy_adjlist_init -->
 <!-- doxrox-include igraph_lazy_adjlist_destroy -->
 <!-- doxrox-include igraph_lazy_adjlist_get -->
+<!-- doxrox-include igraph_lazy_adjlist_clear -->
 </section>
 
 <section><title>Lazy incidence list for edges</title>
 <!-- doxrox-include igraph_lazy_inclist_init -->
 <!-- doxrox-include igraph_lazy_inclist_destroy -->
 <!-- doxrox-include igraph_lazy_inclist_get -->
+<!-- doxrox-include igraph_lazy_inclist_clear -->
 </section>
 
 <section><title>Deprecated functions</title>

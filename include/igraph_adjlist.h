@@ -54,6 +54,7 @@ int igraph_adjlist_init_complementer(const igraph_t *graph,
 				     igraph_neimode_t mode,
 				     igraph_bool_t loops);
 void igraph_adjlist_destroy(igraph_adjlist_t *al);
+void igraph_adjlist_clear(igraph_adjlist_t *al);
 void igraph_adjlist_sort(igraph_adjlist_t *al);
 int igraph_adjlist_simplify(igraph_adjlist_t *al);
 int igraph_adjlist_remove_duplicate(const igraph_t *graph, 
@@ -90,6 +91,7 @@ int igraph_inclist_init(const igraph_t *graph,
 			    igraph_neimode_t mode);
 int igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n);
 void igraph_inclist_destroy(igraph_inclist_t *il);
+void igraph_inclist_clear(igraph_inclist_t *il);
 int igraph_inclist_remove_duplicate(const igraph_t *graph,
 					igraph_inclist_t *il);
 int igraph_inclist_print(const igraph_inclist_t *il);
@@ -123,6 +125,7 @@ int igraph_lazy_adjlist_init(const igraph_t *graph,
 			       igraph_neimode_t mode,
 			       igraph_lazy_adlist_simplify_t simplify);
 void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al);
+void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al);
 /* igraph_vector_t *igraph_lazy_adjlist_get(igraph_lazy_adjlist_t *al, */
 /* 					   igraph_integer_t no); */
 /**
@@ -158,6 +161,7 @@ int igraph_lazy_inclist_init(const igraph_t *graph,
 				   igraph_lazy_inclist_t *il,
 				   igraph_neimode_t mode);
 void igraph_lazy_inclist_destroy(igraph_lazy_inclist_t *il);
+void igraph_lazy_inclist_clear(igraph_lazy_inclist_t *il);
 
 /**
  * \define igraph_lazy_inclist_get

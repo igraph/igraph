@@ -52,6 +52,11 @@
 <!-- doxrox-include igraph_articulation_points -->
 </section>
 
+<section><title>Degree Sequences</title>
+<!-- doxrox-include igraph_is_degree_sequence -->
+<!-- doxrox-include igraph_is_graphical_degree_sequence -->
+</section>
+
 <section><title>Centrality Measures</title>
 <!-- doxrox-include igraph_closeness -->
 <!-- doxrox-include igraph_betweenness -->

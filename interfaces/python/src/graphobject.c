@@ -1943,6 +1943,7 @@ PyObject *igraphmodule_Graph_Degree_Sequence(PyTypeObject * type,
   igraph_t g;
   igraph_vector_t outseq, inseq;
   igraph_degseq_t meth = IGRAPH_DEGSEQ_SIMPLE;
+  igraph_bool_t has_inseq = 0;
   PyObject *outdeg = NULL, *indeg = NULL, *method = NULL;
 
   static char *kwlist[] = { "out", "in", "method", NULL };
@@ -1960,19 +1961,20 @@ PyObject *igraphmodule_Graph_Degree_Sequence(PyTypeObject * type,
       igraph_vector_destroy(&outseq);
       return NULL;
     }
-  } else {
-    igraph_vector_init(&inseq, 0);
+    has_inseq=1;
   }
 
-  if (igraph_degree_sequence_game(&g, &outseq, &inseq, meth)) {
+  if (igraph_degree_sequence_game(&g, &outseq, has_inseq ? &inseq : 0, meth)) {
     igraphmodule_handle_igraph_error();
     igraph_vector_destroy(&outseq);
-    igraph_vector_destroy(&inseq);
+    if (has_inseq)
+      igraph_vector_destroy(&inseq);
     return NULL;
   }
 
   igraph_vector_destroy(&outseq);
-  igraph_vector_destroy(&inseq);
+  if (has_inseq)
+    igraph_vector_destroy(&inseq);
 
   CREATE_GRAPH_FROM_TYPE(self, g, type);
 
@@ -11686,16 +11688,25 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "    - C{\"simple\"} -- simple generator that sometimes generates\n"
    "      loop edges and multiple edges. The generated graph is not\n"
    "      guaranteed to be connected.\n"
+   "    - C{\"no_multiple\"} -- similar to C{\"simple\"} but avoids the\n"
+   "      generation of multiple and loop edges at the expense of increased\n"
+   "      time complexity. The method will re-start the generation every time\n"
+   "      it gets stuck in a configuration where it is not possible to insert\n"
+   "      any more edges without creating loops or multiple edges, and there\n"
+   "      is no upper bound on the number of iterations, but it will succeed\n"
+   "      eventually if the input degree sequence is graphical and throw an\n"
+   "      exception if the input degree sequence is not graphical.\n"
    "    - C{\"vl\"} -- a more sophisticated generator that can sample\n"
    "      undirected, connected simple graphs uniformly. It uses\n"
    "      Monte-Carlo methods to randomize the graphs.\n"
    "      This generator should be favoured if undirected and connected\n"
-   "      graphs are to be generated. igraph uses the original\n"
-   "      implementation of Fabien Viger; see the following URL and\n"
-   "      the paper cited on it for the details of the algorithm:\n"
-   "      U{http://www-rp.lip6.fr/~latapy/FV/generation.html}.\n"},
+   "      graphs are to be generated and execution time is not a concern.\n"
+   "      igraph uses the original implementation of Fabien Viger; see the\n"
+   "      following URL and the paper cited on it for the details of the\n"
+   "      algorithm: U{http://www-rp.lip6.fr/~latapy/FV/generation.html}.\n"
+  },
 
-  // interface to igraph_isoclass_create
+  /* interface to igraph_isoclass_create */
   {"Isoclass", (PyCFunction) igraphmodule_Graph_Isoclass,
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
    "Isoclass(n, class, directed=False)\n\n"

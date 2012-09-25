@@ -412,6 +412,86 @@ PyObject* igraphmodule_compare_communities(PyObject *self,
 }
 
 
+PyObject* igraphmodule_is_degree_sequence(PyObject *self,
+  PyObject *args, PyObject *kwds) {
+  static char* kwlist[] = { "out_deg", "in_deg", NULL };
+  PyObject *out_deg_o = 0, *in_deg_o = 0;
+  igraph_vector_t out_deg, in_deg;
+  igraph_bool_t is_directed, result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist,
+      &out_deg_o, &in_deg_o))
+    return NULL;
+
+  is_directed = (in_deg_o != 0 && in_deg_o != Py_None);
+
+  if (igraphmodule_PyObject_to_vector_t(out_deg_o, &out_deg, 0, 0))
+    return NULL;
+
+  if (is_directed && igraphmodule_PyObject_to_vector_t(in_deg_o, &in_deg, 0, 0)) {
+    igraph_vector_destroy(&out_deg);
+    return NULL;
+  }
+
+  if (igraph_is_degree_sequence(&out_deg, is_directed ? &in_deg : 0, &result)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&out_deg);
+    if (is_directed)
+      igraph_vector_destroy(&in_deg);
+    return NULL;
+  }
+
+  igraph_vector_destroy(&out_deg);
+  if (is_directed)
+    igraph_vector_destroy(&in_deg);
+
+  if (result)
+    Py_RETURN_TRUE;
+  else
+    Py_RETURN_FALSE;
+}
+
+
+PyObject* igraphmodule_is_graphical_degree_sequence(PyObject *self,
+  PyObject *args, PyObject *kwds) {
+  static char* kwlist[] = { "out_deg", "in_deg", NULL };
+  PyObject *out_deg_o = 0, *in_deg_o = 0;
+  igraph_vector_t out_deg, in_deg;
+  igraph_bool_t is_directed, result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist,
+      &out_deg_o, &in_deg_o))
+    return NULL;
+
+  is_directed = (in_deg_o != 0 && in_deg_o != Py_None);
+
+  if (igraphmodule_PyObject_to_vector_t(out_deg_o, &out_deg, 0, 0))
+    return NULL;
+
+  if (is_directed && igraphmodule_PyObject_to_vector_t(in_deg_o, &in_deg, 0, 0)) {
+    igraph_vector_destroy(&out_deg);
+    return NULL;
+  }
+
+  if (igraph_is_graphical_degree_sequence(&out_deg, is_directed ? &in_deg : 0, &result)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&out_deg);
+    if (is_directed)
+      igraph_vector_destroy(&in_deg);
+    return NULL;
+  }
+
+  igraph_vector_destroy(&out_deg);
+  if (is_directed)
+    igraph_vector_destroy(&in_deg);
+
+  if (result)
+    Py_RETURN_TRUE;
+  else
+    Py_RETURN_FALSE;
+}
+
+
 PyObject* igraphmodule_split_join_distance(PyObject *self,
   PyObject *args, PyObject *kwds) {
   static char* kwlist[] = { "comm1", "comm2", NULL };
@@ -466,6 +546,42 @@ static PyMethodDef igraphmodule_methods[] =
     "@return: either the hull's corner coordinates or the point\n"
     "  indices corresponding to them, depending on the C{coords}\n"
     "  parameter."
+  },
+  {"is_degree_sequence", (PyCFunction)igraphmodule_is_degree_sequence,
+    METH_VARARGS | METH_KEYWORDS,
+    "is_degree_sequence(out_deg, in_deg=None)\n\n"
+    "Returns whether a list of degrees can be a degree sequence of some graph.\n\n"
+    "Note that it is not required for the graph to be simple; in other words,\n"
+    "this function may return C{True} for degree sequences that can be realized\n"
+    "using one or more multiple or loop edges only.\n\n"
+    "In particular, this function checks whether\n\n"
+    "  - all the degrees are non-negative\n"
+    "  - for undirected graphs, the sum of degrees are even\n"
+    "  - for directed graphs, the two degree sequences are of the same length and\n"
+    "    equal sums\n\n"
+    "@param out_deg: the list of degrees. For directed graphs, this list must\n"
+    "  contain the out-degrees of the vertices.\n"
+    "@param in_deg: the list of in-degrees for directed graphs. This parameter\n"
+    "  must be C{None} for undirected graphs.\n"
+    "@return: C{True} if there exists some graph that can realize the given degree\n"
+    "  sequence, C{False} otherwise."
+    "@see: L{is_graphical_degree_sequence()} if you do not want to allow multiple\n"
+    "  or loop edges.\n"
+  },
+  {"is_graphical_degree_sequence", (PyCFunction)igraphmodule_is_graphical_degree_sequence,
+    METH_VARARGS | METH_KEYWORDS,
+    "is_graphical_degree_sequence(out_deg, in_deg=None)\n\n"
+    "Returns whether a list of degrees can be a degree sequence of some simple graph.\n\n"
+    "Note that it is required for the graph to be simple; in other words,\n"
+    "this function will return C{False} for degree sequences that cannot be realized\n"
+    "without using one or more multiple or loop edges.\n\n"
+    "@param out_deg: the list of degrees. For directed graphs, this list must\n"
+    "  contain the out-degrees of the vertices.\n"
+    "@param in_deg: the list of in-degrees for directed graphs. This parameter\n"
+    "  must be C{None} for undirected graphs.\n"
+    "@return: C{True} if there exists some simple graph that can realize the given\n"
+    "  degree sequence, C{False} otherwise.\n"
+    "@see: L{is_degree_sequence()} if you want to allow multiple or loop edges.\n"
   },
   {"set_progress_handler", igraphmodule_set_progress_handler, METH_O,
       "set_progress_handler(handler)\n\n"

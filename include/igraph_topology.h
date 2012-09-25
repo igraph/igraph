@@ -41,9 +41,24 @@
 
 __BEGIN_DECLS
 
+/* -------------------------------------------------- */
+/* Degree sequences                                   */
+/* -------------------------------------------------- */
+
+int igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
+        const igraph_vector_t *in_degrees, igraph_bool_t *res);
+int igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
+        const igraph_vector_t *in_degrees, igraph_bool_t *res);
+
+/* -------------------------------------------------- */
+/* Directed acyclic graphs                            */
+/* -------------------------------------------------- */
+
 int igraph_topological_sorting(const igraph_t *graph, igraph_vector_t *res,
 			       igraph_neimode_t mode);
 int igraph_is_dag(const igraph_t *graph, igraph_bool_t *res);
+int igraph_transitive_closure_dag(const igraph_t *graph,
+				  igraph_t *closure);
 
 /* -------------------------------------------------- */
 /* Graph isomorphisms                                 */

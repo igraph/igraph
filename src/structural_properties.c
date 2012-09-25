@@ -41,6 +41,7 @@
 #include "igraph_attributes.h"
 #include "igraph_neighborhood.h"
 #include "igraph_topology.h"
+#include "igraph_qsort.h"
 #include "config.h"
 
 #include <assert.h>
@@ -7226,3 +7227,293 @@ int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
   
   return 0;
 }
+
+#define SUCCEED {   \
+  if (res) {        \
+    *res = 1;       \
+    return IGRAPH_SUCCESS; \
+  }                 \
+}
+
+#define FAIL {   \
+  if (res) {     \
+    *res = 0;    \
+    return IGRAPH_SUCCESS; \
+  }              \
+}
+
+/**
+ * \function igraph_is_degree_sequence
+ * Determines whether a degree sequence is valid.
+ *
+ * A sequence of n integers is a valid degree sequence if there exists some
+ * graph where the degree of the i-th vertex is equal to the i-th element of the
+ * sequence. Note that the graph may contain multiple or loop edges; if you are
+ * interested in whether the degrees of some \em simple graph may realize the
+ * given sequence, use \ref igraph_is_graphical_degree_sequence.
+ *
+ * </para><para>
+ * In particular, the function checks whether all the degrees are non-negative.
+ * For undirected graphs, it also checks whether the sum of degrees is even.
+ * For directed graphs, the function checks whether the lengths of the two
+ * degree vectors are equal and whether their sums are also equal. These are
+ * known sufficient and necessary conditions for a degree sequence to be
+ * valid.
+ *
+ * \param out_degrees  an integer vector specifying the degree sequence for
+ *     undirected graphs or the out-degree sequence for directed graphs.
+ * \param in_degrees   an integer vector specifying the in-degrees of the
+ *     vertices for directed graphs. For undirected graphs, this must be null.
+ * \param res  pointer to a boolean variable, the result will be stored here
+ * \return Error code.
+ * 
+ * Time complexity: O(n), where n is the length of the degree sequence.
+ */
+int igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
+    const igraph_vector_t *in_degrees, igraph_bool_t *res) {
+  /* degrees must be non-negative */
+  if (igraph_vector_any_smaller(out_degrees, 0))
+    FAIL;
+  if (in_degrees && igraph_vector_any_smaller(in_degrees, 0))
+    FAIL;
+
+  if (in_degrees == 0) {
+    /* sum of degrees must be even */
+    if (((long int)igraph_vector_sum(out_degrees) % 2) != 0)
+      FAIL;
+  } else {
+    /* length of the two degree vectors must be equal */
+    if (igraph_vector_size(out_degrees) != igraph_vector_size(in_degrees))
+      FAIL;
+    /* sum of in-degrees must be equal to sum of out-degrees */
+    if (igraph_vector_sum(out_degrees) != igraph_vector_sum(in_degrees))
+      FAIL;
+  }
+
+  SUCCEED;
+  return 0;
+}
+
+int igraph_i_is_graphical_degree_sequence_undirected(
+    const igraph_vector_t *degrees, igraph_bool_t *res);
+int igraph_i_is_graphical_degree_sequence_directed(
+    const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees,
+    igraph_bool_t *res);
+
+/**
+ * \function igraph_is_graphical_degree_sequence
+ * Determines whether a sequence of integers can be a degree sequence of some
+ * undirected simple graph.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Hakimi SL: On the realizability of a set of integers as degrees of the
+ * vertices of a simple graph. J SIAM Appl Math 10:496-506, 1962.
+ *
+ * </para><para>
+ * PL Erdős, I Miklós and Z Toroczkai: A simple Havel-Hakimi type algorithm
+ * to realize graphical degree sequences of directed graphs. The Electronic
+ * Journal of Combinatorics 17(1):R66, 2010.
+ *
+ * \param out_degrees  an integer vector specifying the degree sequence for
+ *     undirected graphs or the out-degree sequence for directed graphs.
+ * \param in_degrees   an integer vector specifying the in-degrees of the
+ *     vertices for directed graphs. For undirected graphs, this must be null.
+ * \param res  pointer to a boolean variable, the result will be stored here
+ * \return Error code.
+ * 
+ * Time complexity: O(n^2 log n) where n is the length of the degree sequence.
+ */
+int igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
+    const igraph_vector_t *in_degrees, igraph_bool_t *res) {
+  IGRAPH_CHECK(igraph_is_degree_sequence(out_degrees, in_degrees, res));
+  if (!*res)
+    FAIL;
+
+  if (igraph_vector_size(out_degrees) == 0)
+    SUCCEED;
+
+  if (in_degrees == 0) {
+    return igraph_i_is_graphical_degree_sequence_undirected(out_degrees, res);
+  } else {
+    return igraph_i_is_graphical_degree_sequence_directed(out_degrees, in_degrees, res);
+  }
+}
+
+int igraph_i_is_graphical_degree_sequence_undirected(
+    const igraph_vector_t *degrees, igraph_bool_t *res) {
+  igraph_vector_t work;
+  igraph_integer_t degree;
+  long int i, vcount;
+
+  IGRAPH_CHECK(igraph_vector_copy(&work, degrees));
+  IGRAPH_FINALLY(igraph_vector_destroy, &work);
+
+  vcount = igraph_vector_size(&work);
+  *res = 0;
+  while (vcount) {
+    /* RFE: theoretically, a counting sort would be only O(n) here and not
+     * O(n log n) since the degrees are bounded from above by n. I am not sure
+     * whether it's worth the fuss, though, sort() in the C library is highly
+     * optimized */
+    igraph_vector_sort(&work);
+    if (VECTOR(work)[0] < 0)
+      break;
+
+    degree = igraph_vector_pop_back(&work);
+    vcount--;
+
+    if (degree == 0) {
+      *res = 1;
+      break;
+    }
+
+    if (degree > vcount)
+      break;
+
+    for (i = vcount-degree; i < vcount; i++) {
+      VECTOR(work)[i]--;
+    }
+  }
+
+  igraph_vector_destroy(&work);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
+typedef struct {
+	igraph_vector_t* first;
+	igraph_vector_t* second;
+} igraph_i_qsort_dual_vector_cmp_data_t;
+
+int igraph_i_qsort_dual_vector_cmp_asc(void* data, const void *p1, const void *p2) {
+	igraph_i_qsort_dual_vector_cmp_data_t* sort_data =
+		(igraph_i_qsort_dual_vector_cmp_data_t*)data;
+	long int index1 = *((long int*)p1);
+	long int index2 = *((long int*)p2);
+	if (VECTOR(*sort_data->first)[index1] < VECTOR(*sort_data->first)[index2])
+		return -1;
+	if (VECTOR(*sort_data->first)[index1] > VECTOR(*sort_data->first)[index2])
+		return 1;
+	if (VECTOR(*sort_data->second)[index1] < VECTOR(*sort_data->second)[index2])
+		return -1;
+	if (VECTOR(*sort_data->second)[index1] > VECTOR(*sort_data->second)[index2])
+		return 1;
+	return 0;
+}
+
+int igraph_i_is_graphical_degree_sequence_directed(
+    const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees,
+    igraph_bool_t *res) {
+  igraph_vector_t work_in;
+	igraph_vector_t work_out;
+	igraph_vector_long_t out_vertices;
+	igraph_vector_long_t index_array;
+	long int i, vcount, u, v, degree;
+	long int index_array_unused_prefix_length, nonzero_indegree_count;
+	igraph_i_qsort_dual_vector_cmp_data_t sort_data;
+
+  IGRAPH_CHECK(igraph_vector_copy(&work_in, in_degrees));
+  IGRAPH_FINALLY(igraph_vector_destroy, &work_in);
+  IGRAPH_CHECK(igraph_vector_copy(&work_out, out_degrees));
+  IGRAPH_FINALLY(igraph_vector_destroy, &work_in);
+	IGRAPH_CHECK(igraph_vector_long_init(&out_vertices, 0));
+	IGRAPH_FINALLY(igraph_vector_long_destroy, &out_vertices);
+	
+  vcount = igraph_vector_size(&work_out);
+	IGRAPH_CHECK(igraph_vector_long_reserve(&out_vertices, vcount));
+
+	IGRAPH_CHECK(igraph_vector_long_init(&index_array, vcount));
+	IGRAPH_FINALLY(igraph_vector_long_destroy, &index_array);
+
+	/* Set up the auxiliary struct for sorting */
+  sort_data.first  = &work_in;
+  sort_data.second = &work_out;
+
+	/* Fill the index array. This will contain the indices of the "active" vertices,
+	 * i.e. those that have a non-zero in- or out-degree */
+	nonzero_indegree_count = 0;
+	for (i = 0; i < vcount; i++) {
+		if (VECTOR(work_in)[i] > 0) {
+			VECTOR(index_array)[i] = i;
+			nonzero_indegree_count++;
+		}
+		if (VECTOR(work_out)[i] > 0) {
+			IGRAPH_CHECK(igraph_vector_long_push_back(&out_vertices, i));
+		}
+	}
+
+  *res = 0;
+	index_array_unused_prefix_length = 0;
+  while (!igraph_vector_long_empty(&out_vertices)) {
+		/* Find a vertex with non-zero out-degree. */
+		u = igraph_vector_long_pop_back(&out_vertices);
+		/*
+		printf("Using vertex %ld\n", (long int)u);
+		printf("  Degree vectors:\n  ");
+		igraph_vector_print(&work_out); printf("  ");
+		igraph_vector_print(&work_in);
+		*/
+
+		/* Remember the degree of u and clear the degree itself */
+		degree = VECTOR(work_out)[u];
+		VECTOR(work_out)[u] = 0;
+		/* printf("  Out-degree: %ld\n", (long int)degree); */
+
+		/* Is the degree larger than the number of vertices with nonzero in-degree?
+		 * (Make sure that u is excluded from the vertices with nonzero in-degree).
+		 */
+		if (degree > nonzero_indegree_count - (VECTOR(work_in)[u] > 0 ? 1 : 0))
+			break;
+
+		/* Find the prefix of index_array that consists solely of vertices with
+		 * zero indegree. We don't need to sort these */
+		while (index_array_unused_prefix_length < vcount &&
+				VECTOR(work_in)[VECTOR(index_array)[index_array_unused_prefix_length]] == 0) {
+			index_array_unused_prefix_length++;
+			nonzero_indegree_count--;
+		}
+
+		/* Sort work_in first and then sort work_out for equal indegrees only. This
+		 * is done by sorting an index vector first; indexing work_out and work_in by
+		 * the sorted index vector would then give the sorted order of these vectors. */
+		igraph_qsort_r(VECTOR(index_array) + index_array_unused_prefix_length,
+				nonzero_indegree_count, sizeof(long int), &sort_data,
+				igraph_i_qsort_dual_vector_cmp_asc);
+		/* printf("  Sorted index array:\n  ");
+		igraph_vector_long_print(&index_array); */
+
+		/* Create edges from u to the vertices with the largest in-degrees */
+		i = vcount;
+		while (degree > 0) {
+			v = VECTOR(index_array)[--i];
+			if (u == v) {
+				/* Avoid creating a loop edge */
+				continue;
+			}
+      VECTOR(work_in)[v]--;
+		  /* printf("  Created edge from %ld to %ld, in-degree is now %ld\n", 
+					(long int)u, (long int)v, (long int)VECTOR(work_in)[v]); */
+			degree--;
+    }
+	}
+
+	if (igraph_vector_long_empty(&out_vertices)) {
+		/* No more vertices with non-zero outdegree, so we were successful */
+		*res = 1;
+	}
+
+	igraph_vector_long_destroy(&index_array);
+	igraph_vector_long_destroy(&out_vertices);
+  igraph_vector_destroy(&work_out);
+  igraph_vector_destroy(&work_in);
+  IGRAPH_FINALLY_CLEAN(4);
+
+	return IGRAPH_SUCCESS;
+}
+
+#undef SUCCEED
+#undef FAIL

@@ -762,6 +762,20 @@ igraph_diversity:
         DEPS: weights ON graph, vids ON graph, res ON graph vids
 
 #######################################
+# Degree sequences     
+#######################################
+
+igraph_is_degree_sequence:
+        PARAMS: VECTOR out_deg, VECTOR in_deg, OUT BOOLEANPTR res
+        NAME-R: is.degree.sequence
+        IGNORE: RR, RC, RNamespace
+
+igraph_is_graphical_degree_sequence:
+        PARAMS: VECTOR out_deg, VECTOR in_deg, OUT BOOLEANPTR res
+        NAME-R: is.graphical.degree.sequence
+        IGNORE: RR, RC, RNamespace
+
+#######################################
 # Visitors
 #######################################
 

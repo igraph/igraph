@@ -315,13 +315,54 @@ class GraphTupleListTests(unittest.TestCase):
         else:
             self.failUnless(g.edge_attributes() == [])
 
+
+class DegreeSequenceTests(unittest.TestCase):
+    def testIsDegreeSequence(self):
+        self.assertTrue(is_degree_sequence([]))
+        self.assertTrue(is_degree_sequence([], []))
+        self.assertTrue(is_degree_sequence([0]))
+        self.assertTrue(is_degree_sequence([0], [0]))
+        self.assertFalse(is_degree_sequence([1]))
+        self.assertTrue(is_degree_sequence([1], [1]))
+        self.assertTrue(is_degree_sequence([2]))
+        self.assertFalse(is_degree_sequence([2, 1, 1, 1]))
+        self.assertTrue(is_degree_sequence([2, 1, 1, 1], [1, 1, 1, 2]))
+        self.assertFalse(is_degree_sequence([2, 1, -2]))
+        self.assertFalse(is_degree_sequence([2, 1, 1, 1], [1, 1, 1, -2]))
+        self.assertTrue(is_degree_sequence([3, 3, 3, 3, 3, 3, 3, 3, 3, 3]))
+        self.assertTrue(is_degree_sequence([3, 3, 3, 3, 3, 3, 3, 3, 3, 3], None))
+        self.assertFalse(is_degree_sequence([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]))
+        self.assertTrue(is_degree_sequence([3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+            [4, 3, 2, 3, 4, 4, 2, 2, 4, 2]))
+
+    def testIsGraphicalSequence(self):
+        self.assertTrue(is_graphical_degree_sequence([]))
+        self.assertTrue(is_graphical_degree_sequence([], []))
+        self.assertTrue(is_graphical_degree_sequence([0]))
+        self.assertTrue(is_graphical_degree_sequence([0], [0]))
+        self.assertFalse(is_graphical_degree_sequence([1]))
+        self.assertTrue(is_graphical_degree_sequence([1], [1]))
+        self.assertFalse(is_graphical_degree_sequence([2]))
+        self.assertFalse(is_graphical_degree_sequence([2, 1, 1, 1]))
+        self.assertTrue(is_graphical_degree_sequence([2, 1, 1, 1], [1, 1, 1, 2]))
+        self.assertFalse(is_graphical_degree_sequence([2, 1, -2]))
+        self.assertFalse(is_graphical_degree_sequence([2, 1, 1, 1], [1, 1, 1, -2]))
+        self.assertTrue(is_graphical_degree_sequence([3, 3, 3, 3, 3, 3, 3, 3, 3, 3]))
+        self.assertTrue(is_graphical_degree_sequence([3, 3, 3, 3, 3, 3, 3, 3, 3, 3], None))
+        self.assertFalse(is_graphical_degree_sequence([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]))
+        self.assertTrue(is_graphical_degree_sequence([3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+            [4, 3, 2, 3, 4, 4, 2, 2, 4, 2]))
+        self.assertTrue(is_graphical_degree_sequence([3, 3, 3, 3, 4]))
+
+
 def suite():
     basic_suite = unittest.makeSuite(BasicTests)
     datatype_suite = unittest.makeSuite(DatatypeTests)
     graph_dict_list_suite = unittest.makeSuite(GraphDictListTests)
     graph_tuple_list_suite = unittest.makeSuite(GraphTupleListTests)
+    degree_sequence_suite = unittest.makeSuite(DegreeSequenceTests)
     return unittest.TestSuite([basic_suite, datatype_suite, graph_dict_list_suite,
-        graph_tuple_list_suite])
+        graph_tuple_list_suite, degree_sequence_suite])
 
 def test():
     runner = unittest.TextTestRunner()
