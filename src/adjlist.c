@@ -248,6 +248,21 @@ void igraph_adjlist_destroy(igraph_adjlist_t *al) {
 }
 
 /**
+ * \function igraph_adjlist_clear
+ * Removes all edges from an adjacency list.
+ *
+ * \param al The adjacency list.
+ * Time complexity: depends on memory management, typically O(n), where n is
+ * the total number of elements in the adjacency list.
+ */
+void igraph_adjlist_clear(igraph_adjlist_t *al) {
+  long int i;
+  for (i=0; i<al->length; i++) {
+    igraph_vector_clear(&al->adjs[i]);
+  }
+}
+
+/**
  * \function igraph_adjlist_size
  * Number of vertices in an adjacency list.
  * 
@@ -539,6 +554,21 @@ void igraph_inclist_destroy(igraph_inclist_t *il) {
 }
 
 /**
+ * \function igraph_inclist_clear
+ * Removes all edges from an incidence list.
+ *
+ * \param il The incidence list.
+ * Time complexity: depends on memory management, typically O(n), where n is
+ * the total number of elements in the incidence list.
+ */
+void igraph_inclist_clear(igraph_inclist_t *il) {
+  long int i;
+  for (i=0; i<il->length; i++) {
+    igraph_vector_clear(&il->incs[i]);
+  }
+}
+
+/**
  * \function igraph_lazy_adjlist_init
  * Constructor
  *
@@ -595,6 +625,19 @@ int igraph_lazy_adjlist_init(const igraph_t *graph,
  */
 
 void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al) {
+  igraph_lazy_adjlist_clear(al);
+  igraph_Free(al->adjs);
+}
+
+/**
+ * \function igraph_lazy_adjlist_clear
+ * Removes all edges from a lazy adjacency list.
+ *
+ * \param al The lazy adjacency list.
+ * Time complexity: depends on memory management, typically O(n), where n is
+ * the total number of elements in the adjacency list.
+ */
+void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al) {
   long int i, n=al->length;
   for (i=0; i<n; i++) {
     if (al->adjs[i] != 0) {
@@ -602,7 +645,6 @@ void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al) {
       igraph_Free(al->adjs[i]);
     }
   }
-  igraph_Free(al->adjs);
 }
 
 igraph_vector_t *igraph_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
@@ -737,6 +779,19 @@ int igraph_lazy_inclist_init(const igraph_t *graph,
  */
 
 void igraph_lazy_inclist_destroy(igraph_lazy_inclist_t *il) {
+  igraph_lazy_inclist_clear(il);
+  igraph_Free(il->incs);
+}
+
+/**
+ * \function igraph_lazy_inclist_clear
+ * Removes all edges from a lazy incidence list.
+ *
+ * \param il The lazy incidence list.
+ * Time complexity: depends on memory management, typically O(n), where n is
+ * the total number of elements in the incidence list.
+ */
+void igraph_lazy_inclist_clear(igraph_lazy_inclist_t *il) {
   long int i, n=il->length;
   for (i=0; i<n; i++) {
     if (il->incs[i] != 0) {
@@ -744,7 +799,6 @@ void igraph_lazy_inclist_destroy(igraph_lazy_inclist_t *il) {
       igraph_Free(il->incs[i]);
     }
   }
-  igraph_Free(il->incs);
 }
 
 igraph_vector_t *igraph_lazy_inclist_get_real(igraph_lazy_inclist_t *il,

@@ -35,3 +35,9 @@ AT_SETUP([VF algorithm with compatibility functions])
 AT_KEYWORDS([isomorph isomorphic VF2 compatibility])
 AT_COMPILE_CHECK([simple/VF2-compat.c])
 AT_CLEANUP
+
+AT_SETUP([Graphical degree sequences])
+AT_KEYWORDS([degree sequence graphical])
+AT_COMPILE_CHECK([simple/igraph_is_degree_sequence.c])
+AT_CLEANUP
+
