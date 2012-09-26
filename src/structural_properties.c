@@ -6726,6 +6726,7 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
   IGRAPH_CHECK(igraph_vector_long_init(&already_added, no_of_nodes));
   IGRAPH_FINALLY(igraph_vector_long_destroy, &already_added);
   IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
+  igraph_vector_fill(&dist, -1);
   IGRAPH_CHECK(igraph_indheap_init(&Q, no_of_nodes));
   IGRAPH_FINALLY(igraph_indheap_destroy, &Q);
   IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, dirmode));
@@ -6738,7 +6739,7 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
 
     igraph_indheap_push_with_index(&Q, source, -0);
     VECTOR(already_added)[source] = source+1;
-    VECTOR(dist)[source] = 1.0;
+    VECTOR(dist)[source] = 0.0;
     nodes_reached = 0.0;
 
     while (!igraph_indheap_empty(&Q)) {
@@ -6759,16 +6760,16 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
 	long int to=IGRAPH_OTHER(graph, edge, minnei);
 	igraph_real_t altdist=mindist + VECTOR(*weights)[edge];
 	igraph_real_t curdist= (VECTOR(already_added)[to]==source+1) ? 
-	  VECTOR(dist)[to] : 0;
+	  VECTOR(dist)[to] : -1;
 	
-	if (curdist==0) {
-	  /* First non-finite distance */
+	if (curdist < 0) {
+	  /* First finite distance */
 	  VECTOR(already_added)[to] = source+1;
-	  VECTOR(dist)[to] = altdist+1.0;
+	  VECTOR(dist)[to] = altdist;
 	  IGRAPH_CHECK(igraph_indheap_push_with_index(&Q, to, -altdist));
-	} else if (altdist < curdist-1) {
+	} else if (altdist < curdist) {
 	  /* A shorter path */
-	  VECTOR(dist)[to] = altdist+1.0;
+	  VECTOR(dist)[to] = altdist;
 	  IGRAPH_CHECK(igraph_indheap_modify(&Q, to, -altdist));
 	}
       }
@@ -7272,7 +7273,7 @@ int igraph_i_is_graphical_degree_sequence_directed(
  * vertices of a simple graph. J SIAM Appl Math 10:496-506, 1962.
  *
  * </para><para>
- * PL Erdős, I Miklós and Z Toroczkai: A simple Havel-Hakimi type algorithm
+ * PL Erdos, I Miklos and Z Toroczkai: A simple Havel-Hakimi type algorithm
  * to realize graphical degree sequences of directed graphs. The Electronic
  * Journal of Combinatorics 17(1):R66, 2010.
  *

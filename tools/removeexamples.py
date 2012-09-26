@@ -16,7 +16,7 @@ def main():
     tree.parse(sys.argv[1])
     
     # Remove examples
-    examples=tree.findall("//example")
+    examples=tree.findall(".//example")
     for ex in examples:
         prog=ex.find("programlisting")
         ex.remove(prog)

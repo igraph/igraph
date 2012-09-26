@@ -105,7 +105,7 @@
   <xi:include href="bipartite.xml"/>
 
   <chapter>
-    <title>Advenced igraph programming</title>
+    <title>Advanced igraph programming</title>
     <xi:include href="threading.xml" />
     <xi:include href="progress.xml" />
     <xi:include href="status.xml" />
