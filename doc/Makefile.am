@@ -4,6 +4,7 @@ DOXROX=$(top_srcdir)/doc/doxrox.py
 REGEX=$(top_srcdir)/doc/c-docbook.re
 SRCDIR=$(top_srcdir)/src
 INCLUDEDIR=$(top_srcdir)/include
+BUILD_INCLUDEDIR=$(top_builddir)/include
 REMOVEEXAMPLES=$(top_srcdir)/tools/removeexamples.py
 
 DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
@@ -37,10 +38,11 @@ doctemplate: $(DOCINCLUDES)
 tags: $(DOCINCLUDES) $(DOCFIX)
 	cat $(DOCINCLUDES) $(DOCFIX)| grep 'id="[^-"]*">' | sed 's/.*id="\([^"]*\)">.*/\1@@/' | tr '@' '\t' | sort > tags
 
-EXAMPLES = $(patsubst %.c,%.c.xml,$(wildcard ../examples/simple/*.c))
+EXAMPLES = $(patsubst $(top_srcdir)/%.c,$(top_builddir)/%.c.xml,$(wildcard $(top_srcdir)/examples/simple/*.c))
 
-../examples/simple/%.c.xml: ../examples/simple/%.c tags
-	source-highlight --src-lang c --out-format docbook --input $< --output $@ --gen-references=inline --ctags="" --outlang-def=docbook.outlang
+$(top_builddir)/examples/simple/%.c.xml: $(top_srcdir)/examples/simple/%.c tags
+	if [ ! -d "$(top_builddir)/examples/simple" -a "x$(top_srcdir)" != "x$(top_builddir)" ]; then mkdir -p $(top_builddir)/examples/simple; fi
+	source-highlight --src-lang c --out-format docbook --input $< --output $@ --gen-references=inline --ctags="" --outlang-def=$(top_srcdir)/doc/docbook.outlang
 
 igraph-docs.xml: $(DOCINCLUDES) $(EXAMPLES)
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(top_srcdir)/doc/igraph-docs.xml . ; fi
@@ -178,8 +180,8 @@ spatialgames.xml: spatialgames.xxml \
 	$(DOXROX) -t $< -e $(REGEX) -o $@ \
 	$(SRCDIR)/microscopic_update.c
 
-threading.xml: threading.xxml $(INCLUDEDIR)/igraph_threading.h
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_threading.h
+threading.xml: threading.xxml $(BUILD_INCLUDEDIR)/igraph_threading.h
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(BUILD_INCLUDEDIR)/igraph_threading.h
 
 progress.xml: progress.xxml $(INCLUDEDIR)/igraph_progress.h $(SRCDIR)/progress.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_progress.h $(SRCDIR)/progress.c

@@ -7313,7 +7313,7 @@ int igraph_i_is_graphical_degree_sequence_directed(
  * vertices of a simple graph. J SIAM Appl Math 10:496-506, 1962.
  *
  * </para><para>
- * PL Erdős, I Miklós and Z Toroczkai: A simple Havel-Hakimi type algorithm
+ * PL Erdos, I Miklos and Z Toroczkai: A simple Havel-Hakimi type algorithm
  * to realize graphical degree sequences of directed graphs. The Electronic
  * Journal of Combinatorics 17(1):R66, 2010.
  *
