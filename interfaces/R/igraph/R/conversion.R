@@ -39,7 +39,17 @@ get.adjacency.dense <- function(graph, type=c("both", "upper", "lower"),
     if (! attr %in% list.edge.attributes(graph)) {
       stop("no such edge attribute")
     }
-    res <- matrix(0, nrow=vcount(graph), ncol=vcount(graph))
+    exattr <- get.edge.attribute(graph, attr)
+    if (is.logical(exattr)) {
+      res <- matrix(FALSE, nrow=vcount(graph), ncol=vcount(graph))
+    } else if (is.character(exattr)) {
+      res <- matrix("", nrow=vcount(graph), ncol=vcount(graph))
+    } else if (is.numeric(exattr)) {
+      res <- matrix(0, nrow=vcount(graph), ncol=vcount(graph))
+    } else {
+      stop("Sparse matrices must be either numeric or logical,",
+           "and the edge attribute is not")
+    }
     if (is.directed(graph)) {
       for (i in seq(length=ecount(graph))) {
         e <- get.edge(graph, i)
@@ -100,6 +110,10 @@ get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
       stop("no such edge attribute")
     }
     value <- get.edge.attribute(graph, name=attr)
+    if (!is.numeric(value) && !is.logical(value)) {
+      stop("Sparse matrices must be either numeric or logical,",
+           "and the edge attribute is not")
+    }
   } else {
     value <- rep(1, nrow(el))
   }

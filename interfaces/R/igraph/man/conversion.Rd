@@ -26,7 +26,15 @@ get.edgelist(graph, names=TRUE)
     attribute are included in the adjacency matrix. If the graph has
     multiple edges, the edge attribute of an arbitrarily chosen edge
     (for the multiple edges) is included. This argument is ignored if
-    \code{edges} is \code{TRUE}.}
+    \code{edges} is \code{TRUE}.
+
+    Note that this works only for certain attribute types. If the
+    \code{sparse} argumen is \code{TRUE}, then the attribute must be
+    either logical or numeric. If the \code{sparse} argument is
+    \code{FALSE}, then character is also allowed. The reason for the
+    difference is that the \code{Matrix} package does not support
+    character sparse matrices yet.
+  }
   \item{edges}{Logical scalar, whether to return the edge ids in the
     matrix. For non-existant edges zero is returned.}
   \item{names}{Logical constant.
