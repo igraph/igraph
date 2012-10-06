@@ -89,6 +89,24 @@ class CutTests(unittest.TestCase):
         self.failUnless(mc.value == 4)
         self.assertRaises(KeyError, g.mincut, "unknown")
 
+    def testStMinCut(self):
+        g = self.constructSimpleGraph()
+        mc = g.st_mincut(0, 3, "capacity")
+        self.failUnless(isinstance(mc, Cut))
+        self.failUnless(mc.cut == [3, 4])
+        self.failUnless(mc.value == 4)
+        self.failUnless(set(mc.partition[0]).union(mc.partition[1]) == \
+          set(range(g.vcount())))
+        mc = g.st_mincut(0, 3)
+        self.failUnless(isinstance(mc, Cut))
+        self.failUnless(mc.cut == [3, 4])
+        self.failUnless(mc.value == 2)
+        mc = g.st_mincut(2, 0, "capacity")
+        self.failUnless(isinstance(mc, Cut))
+        self.failUnless(mc.cut == [0, 1])
+        self.failUnless(mc.value == 6)
+
+
     def testAllSTCuts1(self):
         # Simple graph with four vertices
         g = self.constructSimpleGraph(directed=True)
