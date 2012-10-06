@@ -651,6 +651,23 @@ class Graph(GraphBase):
         """
         return Cut(self, *GraphBase.mincut(self, capacity))
 
+    def st_mincut(self, source, target, capacity=None):
+        """st_mincut(source, target, capacity=None)
+
+        Calculates the minimum cut between the source and target vertices in a
+        graph.
+
+        @param source: the source vertex ID
+        @param target: the target vertex ID
+        @param capacity: the capacity of the edges. It must be a list or a valid
+          attribute name or C{None}. In the latter case, every edge will have the
+          same capacity.
+        @return: the value of the minimum cut, the IDs of vertices in the
+          first and second partition, and the IDs of edges in the cut,
+          packed in a 4-tuple
+        """
+        return Cut(self, *GraphBase.st_mincut(self, source, target, capacity))
+
     def modularity(self, membership, weights=None):
         """modularity(membership, weights=None)
 
