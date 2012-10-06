@@ -9755,6 +9755,89 @@ PyObject *igraphmodule_Graph_mincut(igraphmodule_GraphObject * self,
   return result;
 }
 
+/** \ingroup python_interface_graph
+ * \brief Calculates a minimum s-t cut in a graph
+ */
+PyObject *igraphmodule_Graph_st_mincut(igraphmodule_GraphObject * self,
+                                       PyObject * args, PyObject * kwds)
+{
+  static char *kwlist[] = { "source", "target", "capacity", NULL };
+  igraph_integer_t source, target;
+  PyObject *cut_o, *part_o, *part2_o, *result;
+  PyObject *source_o, *target_o, *capacity_o = Py_None;
+  igraph_vector_t capacity_vector;
+  igraph_real_t value;
+  igraph_vector_t partition, partition2, cut;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOO", kwlist,
+                                   &source_o, &target_o, &capacity_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vid(source_o, &source, &self->g))
+    return NULL;
+  if (igraphmodule_PyObject_to_vid(target_o, &target, &self->g))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_attribute_values(capacity_o,
+                                                &capacity_vector,
+                                                self, ATTRHASH_IDX_EDGE, 1.0))
+    return igraphmodule_handle_igraph_error();
+
+  if (igraph_vector_init(&partition, 0)) {
+    igraph_vector_destroy(&capacity_vector);
+    return igraphmodule_handle_igraph_error();
+  }
+  if (igraph_vector_init(&partition2, 0)) {
+    igraph_vector_destroy(&partition);
+    igraph_vector_destroy(&capacity_vector);
+    return igraphmodule_handle_igraph_error();
+  }
+  if (igraph_vector_init(&cut, 0)) {
+    igraph_vector_destroy(&partition);
+    igraph_vector_destroy(&partition2);
+    igraph_vector_destroy(&capacity_vector);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (igraph_st_mincut(&self->g, &value, &cut, &partition, &partition2,
+        source, target, &capacity_vector)) {
+    igraph_vector_destroy(&cut);
+    igraph_vector_destroy(&partition);
+    igraph_vector_destroy(&partition2);
+    igraph_vector_destroy(&capacity_vector);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  igraph_vector_destroy(&capacity_vector);
+
+  cut_o=igraphmodule_vector_t_to_PyList(&cut, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&cut);
+  if (!cut_o) {
+    igraph_vector_destroy(&partition);
+    igraph_vector_destroy(&partition2);
+    return NULL;
+  }
+
+  part_o=igraphmodule_vector_t_to_PyList(&partition, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&partition);
+  if (!part_o) {
+    Py_DECREF(cut_o);
+    igraph_vector_destroy(&partition2);
+    return NULL;
+  }
+
+  part2_o=igraphmodule_vector_t_to_PyList(&partition2, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&partition2);
+  if (!part2_o) {
+    Py_DECREF(part_o);
+    Py_DECREF(cut_o);
+    return NULL;
+  }
+
+  result = Py_BuildValue("dNNN", (double)value, cut_o, part_o, part2_o);
+  return result;
+}
+
 /**********************************************************************
  * Vertex separators                                                  *
  **********************************************************************/
@@ -14219,6 +14302,24 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@ref: M. Stoer, F. Wagner: A simple min-cut algorithm. Journal of\n"
    "  the ACM 44(4):585-591, 1997.\n"
    },
+
+  {"st_mincut", (PyCFunction) igraphmodule_Graph_st_mincut,
+   METH_VARARGS | METH_KEYWORDS,
+   "st_mincut(source, target, capacity=None)\n\n"
+   "Calculates the minimum cut between the source and target vertices in a\n"
+   "graph.\n\n"
+   "@param source: the source vertex ID\n"
+   "@param target: the target vertex ID\n"
+   "@param capacity: the capacity of the edges. It must be a list or a valid\n"
+   "  attribute name or C{None}. In the latter case, every edge will have the\n"
+   "  same capacity.\n"
+   "@return: the value of the minimum cut, the IDs of vertices in the\n"
+   "  first and second partition, and the IDs of edges in the cut,\n"
+   "  packed in a 4-tuple\n\n"
+   "@attention: this function has a more convenient interface in class\n"
+   "  L{Graph} which wraps the result in a list of L{Cut} objects. It is\n"
+   "  advised to use that.\n"
+  },
 
   /*********************/
   /* VERTEX SEPARATORS */
