@@ -640,16 +640,33 @@ class Graph(GraphBase):
         """
         return Flow(self, *GraphBase.maxflow(self, source, target, capacity))
 
-    def mincut(self, capacity=None):
-        """mincut(capacity=None)
+    def mincut(self, source=None, target=None, capacity=None):
+        """mincut(source=None, target=None, capacity=None)
 
-        Returns a minimum cut in a graph.
+        Calculates the minimum cut between the given source and target vertices
+        or within the whole graph.
 
+        The minimum cut is the minimum set of edges that needs to be removed to
+        separate the source and the target (if they are given) or to disconnect the
+        graph (if neither the source nor the target are given). The minimum is
+        calculated using the weights (capacities) of the edges, so the cut with
+        the minimum total capacity is calculated.
+
+        For undirected graphs and no source and target, the method uses the
+        Stoer-Wagner algorithm. For a given source and target, the method uses the
+        push-relabel algorithm; see the references below.
+
+        @param source: the source vertex ID. If C{None}, the target must also be
+          C{None} and the calculation will be done for the entire graph (i.e.
+          all possible vertex pairs).
+        @param target: the target vertex ID. If C{None}, the source must also be
+          C{None} and the calculation will be done for the entire graph (i.e.
+          all possible vertex pairs).
         @param capacity: the edge capacities (weights). If C{None}, all
           edges have equal weight. May also be an attribute name.
         @return: a L{Cut} object describing the minimum cut
         """
-        return Cut(self, *GraphBase.mincut(self, capacity))
+        return Cut(self, *GraphBase.mincut(self, source, target, capacity))
 
     def st_mincut(self, source, target, capacity=None):
         """st_mincut(source, target, capacity=None)

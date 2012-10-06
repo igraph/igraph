@@ -9685,14 +9685,23 @@ PyObject *igraphmodule_Graph_mincut_value(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_mincut(igraphmodule_GraphObject * self,
                                     PyObject * args, PyObject * kwds)
 {
-  static char *kwlist[] = { "capacity", NULL };
+  static char *kwlist[] = { "source", "target", "capacity", NULL };
   PyObject *capacity_object = Py_None, *cut_o, *part_o, *part2_o, *result;
+  PyObject *source_o = Py_None, *target_o = Py_None;
+  int retval;
   igraph_vector_t capacity_vector;
-  igraph_real_t value;
+  igraph_real_t value, best;
   igraph_vector_t partition, partition2, cut;
+  igraph_integer_t source = -1, target = -1;
+  long int i, n;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist,
-                                   &capacity_object))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist,
+                                   &source_o, &target_o, &capacity_object))
+    return NULL;
+
+  if (source_o != Py_None && igraphmodule_PyObject_to_vid(source_o, &source, &self->g))
+    return NULL;
+  if (target_o != Py_None && igraphmodule_PyObject_to_vid(target_o, &target, &self->g))
     return NULL;
 
   if (igraphmodule_PyObject_to_attribute_values(capacity_object,
@@ -9716,13 +9725,26 @@ PyObject *igraphmodule_Graph_mincut(igraphmodule_GraphObject * self,
 	return igraphmodule_handle_igraph_error();
   }
 
-  if (igraph_mincut(&self->g, &value, &partition, &partition2,
-      &cut, &capacity_vector)) {
+  if (source == -1 && target == -1) {
+    retval = igraph_mincut(&self->g, &value, &partition, &partition2,
+      &cut, &capacity_vector);
+  } else if (source == -1 || target == -1) {
+    retval = IGRAPH_UNIMPLEMENTED;
+    PyErr_SetString(PyExc_ValueError, "if you specify one of 'source' and 'target', "
+        "you must specify the other one as well");
+  } else {
+    retval = igraph_st_mincut(&self->g, &value, &cut, &partition, &partition2,
+        source, target, &capacity_vector);
+  }
+  
+  if (retval) {
     igraph_vector_destroy(&cut);
     igraph_vector_destroy(&partition);
     igraph_vector_destroy(&partition2);
     igraph_vector_destroy(&capacity_vector);
-    return igraphmodule_handle_igraph_error();
+    if (!PyErr_Occurred())
+      igraphmodule_handle_igraph_error();
+    return NULL;
   }
 
   igraph_vector_destroy(&capacity_vector);
@@ -14272,7 +14294,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"mincut_value", (PyCFunction) igraphmodule_Graph_mincut_value,
    METH_VARARGS | METH_KEYWORDS,
    "mincut_value(source=-1, target=-1, capacity=None)\n\n"
-   "Returns the minimum cut between the source and target vertices.\n\n"
+   "Returns the minimum cut between the source and target vertices or within\n"
+   "the whole graph.\n\n"
    "@param source: the source vertex ID. If negative, the calculation is\n"
    "  done for every vertex except the target and the minimum is returned.\n"
    "@param target: the target vertex ID. If negative, the calculation is\n"
@@ -14284,24 +14307,36 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
 
   {"mincut", (PyCFunction) igraphmodule_Graph_mincut,
    METH_VARARGS | METH_KEYWORDS,
-   "mincut(capacity=None)\n\n"
-   "Calculates the minimum cut in a graph.\n\n"
+   "mincut(source=None, target=None, capacity=None)\n\n"
+   "Calculates the minimum cut between the source and target vertices or\n"
+   "within the value graph.\n\n"
    "The minimum cut is the minimum set of edges which needs to be removed\n"
-   "to disconnect the graph. The minimum is calculated using the weights\n"
-   "(capacities) of the edges, so the cut with the minimum total capacity\n"
-   "is calculated.\n"
-   "For undirected graphs, it uses the Stoer-Wagner algorithm as described\n"
-   "in the reference given below.\n\n"
+   "to separate the source or target (if they are given) or to disconnect\n"
+   "the graph (if the source and target are not given). The minimum is\n"
+   "calculated using the weights (capacities) of the edges, so the cut with\n"
+   "the minimum total capacity is calculated.\n"
+   "For undirected graphs and no source and target, the method uses the Stoer-Wagner\n"
+   "algorithm. For a given source and target, the method uses the push-relabel\n"
+   "algorithm; see the references below.\n\n"
    "@attention: this function has a more convenient interface in class\n"
    "  L{Graph} which wraps the result in a L{Cut} object. It is advised\n"
    "  to use that.\n"
+   "@param source: the source vertex ID. If negative, the calculation is\n"
+   "  done for every vertex except the target and the minimum is returned.\n"
+   "@param target: the target vertex ID. If negative, the calculation is\n"
+   "  done for every vertex except the source and the minimum is returned.\n"
+   "@param capacity: the capacity of the edges. It must be a list or a valid\n"
+   "  attribute name or C{None}. In the latter case, every edge will have the\n"
+   "  same capacity.\n"
    "@return: the value of the minimum cut, the IDs of vertices in the\n"
    "  first and second partition, and the IDs of edges in the cut,\n"
    "  packed in a 4-tuple\n\n"
    "@newfield ref: Reference\n"
    "@ref: M. Stoer, F. Wagner: A simple min-cut algorithm. Journal of\n"
    "  the ACM 44(4):585-591, 1997.\n"
-   },
+   "@ref: A. V. Goldberg, R. E. Tarjan: A new approach to the maximum-flow problem.\n"
+   "  Journal of the ACM 35(4):921-940, 1988.\n"
+  },
 
   {"st_mincut", (PyCFunction) igraphmodule_Graph_st_mincut,
    METH_VARARGS | METH_KEYWORDS,
