@@ -21,12 +21,13 @@ S3method("-", "igraph")
 
 # Attributes
 
-export(get.graph.attribute, set.graph.attribute,
-       get.vertex.attribute, set.vertex.attribute,
-       get.edge.attribute, set.edge.attribute,
+export(get.graph.attribute, set.graph.attribute, graph.attributes,
+       get.vertex.attribute, set.vertex.attribute, vertex.attributes,
+       get.edge.attribute, set.edge.attribute, edge.attributes,
        list.graph.attributes, list.vertex.attributes,
        list.edge.attributes, remove.graph.attribute,
-       remove.vertex.attribute, remove.edge.attribute)
+       remove.vertex.attribute, remove.edge.attribute,
+       "graph.attributes<-", "vertex.attributes<-", "edge.attributes<-")
 
 # iterators
 

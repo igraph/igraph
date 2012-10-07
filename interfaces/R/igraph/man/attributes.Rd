@@ -4,14 +4,20 @@
 \alias{get.graph.attribute}
 \alias{remove.graph.attribute}
 \alias{list.graph.attributes}
+\alias{graph.attributes}
+\alias{graph.attributes<-}
 \alias{set.vertex.attribute}
 \alias{get.vertex.attribute}
 \alias{remove.vertex.attribute}
 \alias{list.vertex.attributes}
+\alias{vertex.attributes}
+\alias{vertex.attributes<-}
 \alias{set.edge.attribute}
 \alias{get.edge.attribute}
 \alias{remove.edge.attribute}
 \alias{list.edge.attributes}
+\alias{edge.attributes}
+\alias{edge.attributes<-}
 \concept{Vertex/edge/graph attributes}
 \title{Graph, vertex and edge attributes}
 \description{Attributes are associated values belonging to a graph,
@@ -22,13 +28,16 @@
 \usage{
 get.graph.attribute(graph, name)
 set.graph.attribute(graph, name, value)
+graph.attributes(graph)
 remove.graph.attribute(graph, name)
 get.vertex.attribute(graph, name, index=V(graph))
 set.vertex.attribute(graph, name, index=V(graph), value)
 remove.vertex.attribute(graph, name)
+vertex.attributes(graph)
 get.edge.attribute(graph, name, index=E(graph))
 set.edge.attribute(graph, name, index=E(graph), value)
 remove.edge.attribute(graph, name)
+edge.attributes(graph)
 }
 \arguments{
   \item{graph}{The graph object to work on. Note that the original graph
@@ -75,6 +84,10 @@ remove.edge.attribute(graph, name)
   assigned graph attributes are listed with
   \code{list.graph.attributes}.
 
+  The function \code{graph.attributes} returns all graph attributes in a
+  named list. This function has a counterpart that sets all graph
+  attributes at once, see an example below.
+
   There is a simpler notation for using graph attributes: the
   \sQuote{\code{$}} operator. It can be used both to query and set graph
   attributes, see an example below.
@@ -85,6 +98,10 @@ remove.edge.attribute(graph, name)
   for edge attributes they are \code{set.edge.attribute},
   \code{get.edge.attribute}, \code{remove.edge.attribute} and
   \code{list.edge.attributes}.
+
+  Similarly to graph attributes, \code{vertex.attributes} returns all
+  vertex attributes, in a named list, and \code{edge.attributes} returns
+  all edge attributes, in a named list.
   
   There is however a (syntactically) much simpler way to handle vertex
   and edge attribute by using vertex and edge selectors, it works like this:
@@ -138,7 +155,6 @@ g <- set.edge.attribute(g, "weight", value=runif(ecount(g)))
 get.edge.attribute(g, "weight")
 
 # The following notation is more convenient
-
 g <- graph.star(10)
 
 V(g)$color <- c("red", "green")
@@ -147,6 +163,18 @@ V(g)$color
 E(g)$weight <- runif(ecount(g))
 E(g)$weight
 
-print(g, g=TRUE, v=TRUE, e=TRUE)
+str(g, g=TRUE, v=TRUE, e=TRUE)
+
+# Setting all attributes at once
+g2 <- graph.empty(10)
+g2
+
+graph.attributes(g2) <- graph.attributes(g)
+vertex.attributes(g2) <- vertex.attributes(g)
+edge.attributes(g2) <- list()
+g2
+
+edge.attributes(g2) <- list(weight=numeric())
+g2
 }
 \keyword{graphs}
