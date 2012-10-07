@@ -553,7 +553,8 @@ int FUNCTION(igraph_vector,push_back) (TYPE(igraph_vector)* v, BASE e) {
  * the given position. The size of the vector will increase by one.
  *
  * \param v The vector object.
- * \param pos The position where the new element is inserted.
+ * \param pos The position where the new element is to be inserted.
+ * \param value The new element to be inserted.
  */
 int FUNCTION(igraph_vector,insert)(TYPE(igraph_vector) *v, long int pos,
 				   BASE value) {
