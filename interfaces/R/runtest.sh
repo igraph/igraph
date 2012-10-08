@@ -19,4 +19,5 @@ else
 fi
 
 ## Run the tests
-cd $tmpdir && echo "tools:::.runPackageTestsR()" | R --no-save && echo
+echo Running tests in $tmpdir
+cd $tmpdir && echo "tools:::.runPackageTestsR()" | R --no-save -q && echo
