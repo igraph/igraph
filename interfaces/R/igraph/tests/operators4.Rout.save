@@ -1,0 +1,59 @@
+
+R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph) 
+> 
+> g1 <- g2 <- graph.ring(10)
+> g1$foo <- "bar"
+> V(g1)$name <- letters[ 1:10]
+> V(g2)$name <- letters[11:20]
+> E(g1)$weight <- 1:10
+> E(g2)$weight <- 10:1
+> 
+> V(g1)$a1 <- 1:10
+> V(g2)$a2 <- 11:20
+> 
+> E(g1)$b1 <- 1:10
+> E(g2)$b2 <- 11:20
+> 
+> g1 + g2
+IGRAPH UNW- 20 20 -- 
++ attr: name_1 (g/c), name_2 (g/c), mutual_1 (g/l), mutual_2 (g/l),
+  circular_1 (g/l), circular_2 (g/l), foo (g/c), name (v/c), a1 (v/n),
+  a2 (v/n), weight (e/n), b1 (e/n), b2 (e/n)
+> 
+> V(g1+g2)$name
+ [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
+[20] "t"
+> V(g1+g2)$a1
+ [1]  1  2  3  4  5  6  7  8  9 10 NA NA NA NA NA NA NA NA NA NA
+> V(g1+g2)$a2
+ [1] NA NA NA NA NA NA NA NA NA NA 11 12 13 14 15 16 17 18 19 20
+> 
+> E(g1+g2)$weight
+ [1]  1  2  3  4  5  6  7  8  9 10 10  9  8  7  6  5  4  3  2  1
+> E(g1+g2)$b1
+ [1]  1  2  3  4  5  6  7  8  9 10 NA NA NA NA NA NA NA NA NA NA
+> E(g1+g2)$b2
+ [1] NA NA NA NA NA NA NA NA NA NA 11 12 13 14 15 16 17 18 19 20
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  0.299   0.038   0.324 

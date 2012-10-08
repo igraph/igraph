@@ -21,7 +21,7 @@
 ###################################################################
 
 graph.disjoint.union <- function(...) {
-
+  
   graphs <- unlist(recursive=FALSE, lapply(list(...), function(l) {
     if (is.igraph(l)) list(l) else l
   } ))
@@ -30,8 +30,70 @@ graph.disjoint.union <- function(...) {
   }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_disjoint_union", graphs,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_disjoint_union", graphs,
+               PACKAGE="igraph")
+
+  ## Graph attributes
+  galist <- lapply(graphs, list.graph.attributes)
+  gan <- unique(unlist(galist))
+
+  attr <- list()
+  for (name in gan) { 
+    w <- which(sapply(galist, function(x) name %in% x))
+    if (length(w)==1) {
+      attr[[name]] <- get.graph.attribute(graphs[[w]], name)
+    } else {
+      for (w2 in w) {
+        nname <- paste(name, sep="_", w2)
+        attr[[nname]] <- get.graph.attribute(graphs[[w2]], name)
+      }      
+    }
+  }
+  graph.attributes(res) <- attr
+    
+  ## Vertex attributes
+  attr <- list()
+  vc <- sapply(graphs, vcount)
+  cumvc <- c(0, cumsum(vc))
+  for (i in seq_along(graphs)) {
+    va <- vertex.attributes(graphs[[i]])
+    exattr <- intersect(names(va), names(attr))   # existing and present
+    noattr <- setdiff(names(attr), names(va))     # existint and missing
+    newattr <- setdiff(names(va), names(attr))    # new
+    for (a in seq_along(exattr)) {
+      attr[[ exattr[a] ]] <- c(attr[[ exattr[a] ]], va[[ exattr[a] ]])
+    }
+    for (a in seq_along(noattr)) {
+      attr[[ noattr[a] ]] <- c(attr[[ noattr[a] ]], rep(NA, vc[i]))
+    }
+    for (a in seq_along(newattr)) {
+      attr[[ newattr[a] ]] <- c(rep(NA, cumvc[i]), va[[ newattr[a] ]])
+    }
+  }
+  vertex.attributes(res) <- attr
+
+  ## Edge attributes
+  attr <- list()
+  ec <- sapply(graphs, ecount)
+  cumec <- c(0, cumsum(ec))
+  for (i in seq_along(graphs)) {
+    ea <- edge.attributes(graphs[[i]])
+    exattr <- intersect(names(ea), names(attr))   # existing and present
+    noattr <- setdiff(names(attr), names(ea))     # existint and missing
+    newattr <- setdiff(names(ea), names(attr))    # new
+    for (a in seq_along(exattr)) {
+      attr[[ exattr[a] ]] <- c(attr[[ exattr[a] ]], ea[[ exattr[a] ]])
+    }
+    for (a in seq_along(noattr)) {
+      attr[[ noattr[a] ]] <- c(attr[[ noattr[a] ]], rep(NA, ec[i]))
+    }
+    for (a in seq_along(newattr)) {
+      attr[[ newattr[a] ]] <- c(rep(NA, cumec[i]), ea[[ newattr[a] ]])
+    }
+  }
+  edge.attributes(res) <- attr
+  
+  res
 }
 
 "%du%" <- function(x,y) {
