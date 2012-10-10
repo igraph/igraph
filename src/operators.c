@@ -462,39 +462,12 @@ int igraph_i_order_edgelist_cmp(void *edges, const void *e1,
   }
 }
 
-/**
- * \function igraph_union
- * \brief Calculates the union of two graphs.
- * 
- * </para><para>
- * The number of vertices in the result is that of the larger graph
- * from the two arguments. The result graph contains edges which are
- * present in at least one of the operand graphs.
- * 
- * \param res Pointer to an uninitialized graph object, the result
- *        will be stored here.
- * \param left The first graph.
- * \param right The second graph.
- * \param edge_map1 Pointer to an initialized vector or a null pointer. 
- *     If not a null pointer, it will contain a mapping from the edges 
- *     of the first argument graph (\p left) to the edges of the
- *     result graph. 
- * \param edge_map2 The same as \p edge_map1, but for the second
- *     graph, \p right.
- * \return Error code.
- * \sa \ref igraph_union_many() for the union of many graphs, 
- * \ref igraph_intersection() and \ref igraph_difference() for other
- * operators. 
- * 
- * Time complexity: O(|V|+|E|), |V| is the number of
- * vertices, |E| the number of edges in the result graph.
- * 
- * \example examples/simple/igraph_union.c
- */
+#define IGRAPH_MODE_UNION        1
+#define IGRAPH_MODE_INTERSECTION 2
 
-int igraph_union(igraph_t *res, 
-		 const igraph_t *left, const igraph_t *right, 
-		 igraph_vector_t *edge_map1, igraph_vector_t *edge_map2) {
+int igraph_i_merge(igraph_t *res, int mode, 
+		   const igraph_t *left, const igraph_t *right, 
+		   igraph_vector_t *edge_map1, igraph_vector_t *edge_map2) {
   
   long int no_of_nodes_left=igraph_vcount(left);
   long int no_of_nodes_right=igraph_vcount(right);
@@ -626,6 +599,43 @@ int igraph_union(igraph_t *res,
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
+}
+
+/**
+ * \function igraph_union
+ * \brief Calculates the union of two graphs.
+ * 
+ * </para><para>
+ * The number of vertices in the result is that of the larger graph
+ * from the two arguments. The result graph contains edges which are
+ * present in at least one of the operand graphs.
+ * 
+ * \param res Pointer to an uninitialized graph object, the result
+ *        will be stored here.
+ * \param left The first graph.
+ * \param right The second graph.
+ * \param edge_map1 Pointer to an initialized vector or a null pointer. 
+ *     If not a null pointer, it will contain a mapping from the edges 
+ *     of the first argument graph (\p left) to the edges of the
+ *     result graph. 
+ * \param edge_map2 The same as \p edge_map1, but for the second
+ *     graph, \p right.
+ * \return Error code.
+ * \sa \ref igraph_union_many() for the union of many graphs, 
+ * \ref igraph_intersection() and \ref igraph_difference() for other
+ * operators. 
+ * 
+ * Time complexity: O(|V|+|E|), |V| is the number of
+ * vertices, |E| the number of edges in the result graph.
+ * 
+ * \example examples/simple/igraph_union.c
+ */
+
+int igraph_union(igraph_t *res, 
+		 const igraph_t *left, const igraph_t *right, 
+		 igraph_vector_t *edge_map1, igraph_vector_t *edge_map2) {
+  return igraph_i_merge(res, IGRAPH_MODE_UNION, left, right, 
+			edge_map1, edge_map2);
 }
 	
 void igraph_i_union_many_free(igraph_vector_ptr_t *v) {
