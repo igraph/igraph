@@ -112,6 +112,7 @@ int igraph_vector_order2(igraph_vector_t *v) {
  * The smallest element will have order zero, the second smallest
  * order one, etc. 
  * \param v The original \type igraph_vector_t object.
+ * \param v2 A secondary key, another \type igraph_vector_t object.
  * \param res An initialized \type igraph_vector_t object, it will be
  *    resized to match the size of \p v. The
  *    result of the computation will be stored here.
