@@ -226,8 +226,8 @@ int igraph_i_merge(igraph_t *res, int mode,
   igraph_bool_t l;
 
   if (directed != igraph_is_directed(right)) {
-    IGRAPH_ERROR("Cannot make union of directed and undirected graph",
-		 IGRAPH_EINVAL);
+    IGRAPH_ERROR("Cannot make union or intersection of directed "
+		 "and undirected graph", IGRAPH_EINVAL);
   }
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
