@@ -717,6 +717,12 @@ int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs,
     }
   }
 
+  if (edgemaps) {
+    IGRAPH_CHECK(igraph_vector_ptr_resize(edgemaps, no_of_graphs));
+    igraph_vector_ptr_null(edgemaps);
+    IGRAPH_FINALLY(igraph_i_union_many_free3, edgemaps);
+  }
+
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   IGRAPH_CHECK(igraph_vector_long_init(&no_edges, no_of_graphs));
   IGRAPH_FINALLY(igraph_vector_long_destroy, &no_edges);
@@ -731,8 +737,6 @@ int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs,
   }
 
   if (edgemaps) {
-    IGRAPH_CHECK(igraph_vector_ptr_resize(edgemaps, no_of_graphs));
-    IGRAPH_FINALLY(igraph_i_union_many_free3, edgemaps);
     for (i=0; i<no_of_graphs; i++) {
       VECTOR(*edgemaps)[i]=igraph_Calloc(1, igraph_vector_t);
       if (!VECTOR(*edgemaps)[i]) {
@@ -828,12 +832,15 @@ int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs,
     igraph_i_union_many_free(&edge_vects);
     IGRAPH_FINALLY_CLEAN(2);
   }
+  
   igraph_vector_long_destroy(&no_edges);
   IGRAPH_FINALLY_CLEAN(1);
 
   IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
+  if (edgemaps) { IGRAPH_FINALLY_CLEAN(1); }    
+
   return 0;
 }
 
