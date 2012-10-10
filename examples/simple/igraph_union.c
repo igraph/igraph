@@ -34,12 +34,27 @@ int print_vector(igraph_vector_t *v) {
   printf("\n");
 }
 
+int print_free_vector_ptr(igraph_vector_ptr_t *v) {  
+  long int i, l=igraph_vector_ptr_size(v);
+  printf("---\n");
+  for (i=0; i<l; i++) {
+    print_vector(VECTOR(*v)[i]);
+  }
+  printf("===\n");
+  return 0;
+}
+
 int main() {
   
   igraph_t left, right, uni;
   igraph_vector_t v;
   igraph_vector_ptr_t glist;
-  long int i;
+  igraph_vector_t edge_map1, edge_map2;
+  igraph_vector_ptr_t edgemaps;
+  long int i;  
+
+  igraph_vector_init(&edge_map1, 0);
+  igraph_vector_init(&edge_map2, 0);
 
   igraph_vector_init_int_end(&v, -1, 0,1, 1,2, 2,2, 2,3, -1);
   igraph_create(&left, &v, 0, IGRAPH_DIRECTED);
@@ -49,19 +64,25 @@ int main() {
   igraph_create(&right, &v, 0, IGRAPH_DIRECTED);
   igraph_vector_destroy(&v);
   
-  igraph_union(&uni, &left, &right);
+  igraph_union(&uni, &left, &right, &edge_map1, &edge_map2);
   igraph_write_graph_edgelist(&uni, stdout);
+  igraph_vector_print(&edge_map1);
+  igraph_vector_print(&edge_map2);  
 
   igraph_destroy(&uni);
   igraph_destroy(&left);
   igraph_destroy(&right);
+  igraph_vector_destroy(&edge_map1);
+  igraph_vector_destroy(&edge_map2);
 
-  /* Empty graph list */
+  /* Empty graph list */  
   igraph_vector_ptr_init(&glist, 0);
-  igraph_union_many(&uni, &glist);
+  igraph_vector_ptr_init(&edgemaps, 0);
+  igraph_union_many(&uni, &glist, &edgemaps);
   if (!igraph_is_directed(&uni) || igraph_vcount(&uni) != 0) {
     return 1;
   }
+  print_free_vector_ptr(&edgemaps);
   igraph_vector_ptr_destroy(&glist);
   igraph_destroy(&uni);  
 
@@ -74,13 +95,14 @@ int main() {
     igraph_vector_destroy(&v);
   }
 
-  igraph_union_many(&uni, &glist);
+  igraph_union_many(&uni, &glist, &edgemaps);
   igraph_write_graph_edgelist(&uni, stdout);
 
   for (i=0; i<igraph_vector_ptr_size(&glist); i++) {
     igraph_destroy(VECTOR(glist)[i]);
     free(VECTOR(glist)[i]);
   }
+  print_free_vector_ptr(&edgemaps);
   igraph_vector_ptr_destroy(&glist);
   igraph_destroy(&uni);  
 
@@ -93,13 +115,14 @@ int main() {
     igraph_vector_destroy(&v);
   }
 
-  igraph_union_many(&uni, &glist);
+  igraph_union_many(&uni, &glist, &edgemaps);
   igraph_write_graph_edgelist(&uni, stdout);
 
   for (i=0; i<igraph_vector_ptr_size(&glist); i++) {
     igraph_destroy(VECTOR(glist)[i]);
     free(VECTOR(glist)[i]);
   }
+  print_free_vector_ptr(&edgemaps);
   igraph_vector_ptr_destroy(&glist);
   igraph_destroy(&uni);  
   
@@ -112,15 +135,18 @@ int main() {
     igraph_vector_destroy(&v);
   }
 
-  igraph_union_many(&uni, &glist);
+  igraph_union_many(&uni, &glist, &edgemaps);
   igraph_write_graph_edgelist(&uni, stdout);
 
   for (i=0; i<igraph_vector_ptr_size(&glist); i++) {
     igraph_destroy(VECTOR(glist)[i]);
     free(VECTOR(glist)[i]);
   }
+  print_free_vector_ptr(&edgemaps);
   igraph_vector_ptr_destroy(&glist);
   igraph_destroy(&uni);  
 
+  igraph_vector_ptr_destroy(&edgemaps);
+  
   return 0;
 }

@@ -29,6 +29,8 @@
 #include "igraph_constructors.h"
 #include "igraph_adjlist.h"
 #include "igraph_attributes.h"
+#include "igraph_conversion.h"
+#include "igraph_qsort.h"
 #include "config.h"
 
 /**
@@ -436,6 +438,30 @@ int igraph_intersection_many(igraph_t *res,
   return 0;
 }
 
+int igraph_i_order_edgelist_cmp(void *edges, const void *e1, 
+				const void *e2) {
+  igraph_vector_t *edgelist=edges;
+  long int edge1=(*(const long int*) e1) * 2;
+  long int edge2=(*(const long int*) e2) * 2;
+  long int from1=VECTOR(*edgelist)[edge1];
+  long int from2=VECTOR(*edgelist)[edge2];
+  if (from1 < from2) {
+    return -1;
+  } else if (from1 > from2) { 
+    return 1;
+  } else {
+    long int to1=VECTOR(*edgelist)[edge1+1];
+    long int to2=VECTOR(*edgelist)[edge2+1];
+    if (to1 < to2) { 
+      return -1;
+    } else if (to1 > to2) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+}
+
 /**
  * \function igraph_union
  * \brief Calculates the union of two graphs.
@@ -449,6 +475,12 @@ int igraph_intersection_many(igraph_t *res,
  *        will be stored here.
  * \param left The first graph.
  * \param right The second graph.
+ * \param edge_map1 Pointer to an initialized vector or a null pointer. 
+ *     If not a null pointer, it will contain a mapping from the edges 
+ *     of the first argument graph (\p left) to the edges of the
+ *     result graph. 
+ * \param edge_map2 The same as \p edge_map1, but for the second
+ *     graph, \p right.
  * \return Error code.
  * \sa \ref igraph_union_many() for the union of many graphs, 
  * \ref igraph_intersection() and \ref igraph_difference() for other
@@ -461,15 +493,20 @@ int igraph_intersection_many(igraph_t *res,
  */
 
 int igraph_union(igraph_t *res, 
-		 const igraph_t *left, const igraph_t *right) {
+		 const igraph_t *left, const igraph_t *right, 
+		 igraph_vector_t *edge_map1, igraph_vector_t *edge_map2) {
   
   long int no_of_nodes_left=igraph_vcount(left);
   long int no_of_nodes_right=igraph_vcount(right);
   long int no_of_nodes;
+  long int no_edges_left=igraph_ecount(left);
+  long int no_edges_right=igraph_ecount(right);
   igraph_bool_t directed=igraph_is_directed(left);
   igraph_vector_t edges;
-  igraph_vector_t nei1, nei2;
-  long int i;
+  igraph_vector_t edges1, edges2;
+  igraph_vector_long_t order1, order2;
+  long int i, j, eptr=0;
+  long int idx1, idx2, edge1=-1, edge2=-1, from1=-1, from2=-1, to1=-1, to2=-1;
 
   if (directed != igraph_is_directed(right)) {
     IGRAPH_ERROR("Cannot make union of directed and undirected graph",
@@ -477,53 +514,117 @@ int igraph_union(igraph_t *res,
   }
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-  IGRAPH_VECTOR_INIT_FINALLY(&nei1, 0);
-  IGRAPH_VECTOR_INIT_FINALLY(&nei2, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&edges1, no_edges_left*2);
+  IGRAPH_VECTOR_INIT_FINALLY(&edges2, no_edges_right*2);
+  IGRAPH_CHECK(igraph_vector_long_init(&order1, no_edges_left));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &order1);
+  IGRAPH_CHECK(igraph_vector_long_init(&order2, no_edges_right));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &order2);
+  
+  if (edge_map1) { 
+    IGRAPH_CHECK(igraph_vector_resize(edge_map1, no_edges_left));
+  }
+  if (edge_map2) { 
+    IGRAPH_CHECK(igraph_vector_resize(edge_map2, no_edges_right)); 
+  }
 
   no_of_nodes=no_of_nodes_left > no_of_nodes_right ?
     no_of_nodes_left : no_of_nodes_right;
-  
-  for (i=0; i<no_of_nodes; i++) {
-    long int n1=0, n2=0, p1=0, p2=0;
-    IGRAPH_ALLOW_INTERRUPTION();
-    if (i<no_of_nodes_left) {
-      IGRAPH_CHECK(igraph_neighbors(left, &nei1, i, IGRAPH_OUT));
-      if (!directed) {
-	igraph_vector_filter_smaller(&nei1, i);
+
+  /* We merge the two edge lists. We need to sort them first.
+     For undirected graphs, we also need to make sure that 
+     for every edge, that larger (non-smaller) vertex id is in the
+     second column. */
+
+  IGRAPH_CHECK(igraph_get_edgelist(left, &edges1, /*bycol=*/ 0));
+  IGRAPH_CHECK(igraph_get_edgelist(right, &edges2, /*bycol=*/ 0));
+  if (!directed) {
+    for (i=0, j=0; i<no_edges_left; i++, j+=2) {
+      if (VECTOR(edges1)[j] > VECTOR(edges1)[j+1]) {
+	long int tmp=VECTOR(edges1)[j];
+	VECTOR(edges1)[j]=VECTOR(edges1)[j+1];
+	VECTOR(edges1)[j+1]=tmp;
       }
-      n1=igraph_vector_size(&nei1);
     }
-    if (i<no_of_nodes_right) {
-      IGRAPH_CHECK(igraph_neighbors(right, &nei2, i, IGRAPH_OUT));
-      if (!directed) {
-	igraph_vector_filter_smaller(&nei2, i);
-      }
-      n2=igraph_vector_size(&nei2);
-    }
-    
-    while (p1<n1 || p2<n2) {
-      if (p2>=n2 || (p1<n1 && VECTOR(nei1)[p1] < VECTOR(nei2)[p2])) {
-	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	IGRAPH_CHECK(igraph_vector_push_back(&edges, VECTOR(nei1)[p1]));
-	p1++;
-      } else if (p1>=n1 || (p2<n2 && VECTOR(nei1)[p1] > VECTOR(nei2)[p2])) {
-	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	IGRAPH_CHECK(igraph_vector_push_back(&edges, VECTOR(nei2)[p2]));
-	p2++;
-      } else {
-	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	IGRAPH_CHECK(igraph_vector_push_back(&edges, VECTOR(nei1)[p1]));
-	p1++;
-	p2++;
+    for (i=0, j=0; i<no_edges_right; i++, j+=2) {
+      if (VECTOR(edges2)[j] > VECTOR(edges2)[j+1]) {
+	long int tmp=VECTOR(edges2)[j];
+	VECTOR(edges2)[j]=VECTOR(edges2)[j+1];
+	VECTOR(edges2)[j+1]=tmp;
       }
     }
   }
+
+  for (i=0; i<no_edges_left; i++) {
+    VECTOR(order1)[i]=i;
+  }
+  for (i=0; i<no_edges_right; i++) {
+    VECTOR(order2)[i]=i;
+  }
+
+  igraph_qsort_r(VECTOR(order1), no_edges_left, sizeof(VECTOR(order1)[0]),
+		 &edges1, igraph_i_order_edgelist_cmp);
+  igraph_qsort_r(VECTOR(order2), no_edges_right, sizeof(VECTOR(order2)[0]),
+		 &edges2, igraph_i_order_edgelist_cmp);
+
+#define INC1() if ( (++idx1) < no_edges_left) {			 \
+    edge1 = VECTOR(order1)[idx1];				 \
+    from1 = VECTOR(edges1)[2*edge1];				 \
+    to1 = VECTOR(edges1)[2*edge1+1];				 \
+  }
+#define INC2() if ( (++idx2) < no_edges_right) {		 \
+    edge2 = VECTOR(order2)[idx2];				 \
+    from2 = VECTOR(edges2)[2*edge2];				 \
+    to2 = VECTOR(edges2)[2*edge2+1];				 \
+  }
+
+  idx1 = idx2 = -1;
+  INC1();
+  INC2();
+  
+  while (idx1 < no_edges_left || idx2 < no_edges_right) {
+    if (idx2 >= no_edges_right || 
+	(idx1 < no_edges_left && from1 < from2) || 
+	(idx1 < no_edges_left && from1 == from2 && to1 < to2)) {
+      /* Edge from first graph */
+      IGRAPH_CHECK(igraph_vector_push_back(&edges, from1));
+      IGRAPH_CHECK(igraph_vector_push_back(&edges, to1));
+      if (edge_map1) { VECTOR(*edge_map1)[edge1]=eptr; }
+      eptr++;
+      INC1();
+    } else if (idx1 >= no_edges_left ||
+	       (idx2 < no_edges_right && from2 < from1) ||
+	       (idx2 < no_edges_right && from1 == from2 && to2 < to1)) {
+      /* Edge from second graph */
+      IGRAPH_CHECK(igraph_vector_push_back(&edges, from2));
+      IGRAPH_CHECK(igraph_vector_push_back(&edges, to2));
+      if (edge_map2) { VECTOR(*edge_map2)[edge2]=eptr; }
+      eptr++;
+      INC2();
+    } else {
+      /* Edge from both */
+      IGRAPH_CHECK(igraph_vector_push_back(&edges, from1));
+      IGRAPH_CHECK(igraph_vector_push_back(&edges, to1));
+      if (edge_map1) { VECTOR(*edge_map1)[edge1]=eptr; }
+      if (edge_map2) { VECTOR(*edge_map2)[edge2]=eptr; }
+      eptr++;
+      INC1();
+      INC2();
+    }
+  }
+  
+#undef INC1
+#undef INC2
+
+  igraph_vector_long_destroy(&order2);
+  igraph_vector_long_destroy(&order1);
+  igraph_vector_destroy(&edges2);
+  igraph_vector_destroy(&edges1);
+  IGRAPH_FINALLY_CLEAN(4);
   
   IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
   igraph_vector_destroy(&edges);
-  igraph_vector_destroy(&nei1);
-  igraph_vector_destroy(&nei2);
-  IGRAPH_FINALLY_CLEAN(3);
+  IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
 	
@@ -536,6 +637,27 @@ void igraph_i_union_many_free(igraph_vector_ptr_t *v) {
     }
   }
   igraph_vector_ptr_destroy(v);
+}
+
+void igraph_i_union_many_free2(igraph_vector_ptr_t *v) {
+  long int i, n=igraph_vector_ptr_size(v);
+  for (i=0; i<n; i++) { 
+    if (VECTOR(*v)[i] != 0) {
+      igraph_vector_long_destroy(VECTOR(*v)[i]);
+      igraph_Free(VECTOR(*v)[i]);
+    }
+  }
+  igraph_vector_ptr_destroy(v);
+}
+
+void igraph_i_union_many_free3(igraph_vector_ptr_t *v) {
+  long int i, n=igraph_vector_ptr_size(v);
+  for (i=0; i<n; i++) { 
+    if (VECTOR(*v)[i] != 0) {
+      igraph_vector_destroy(VECTOR(*v)[i]);
+      igraph_Free(VECTOR(*v)[i]);
+    }
+  }
 }
 
 /**
@@ -554,6 +676,11 @@ void igraph_i_union_many_free(igraph_vector_ptr_t *v) {
  *        contain the result.
  * \param graphs Pointer vector, contains pointers to the operands of
  *        the union operator, graph objects of course.
+ * \param edgemaps If not a null pointer, then it must be an initialized 
+ *        pointer vector and the mappings of edges from the graphs to the 
+ *        result graph will be stored here, in the same order as 
+ *        \p graphs. Each mapping is stored in a separate 
+ *        \type igraph_vector_t object.
  * \return Error code.
  * \sa \ref igraph_union() for the union of two graphs, \ref
  * igraph_intersection_many(), \ref igraph_intersection() and \ref
@@ -566,14 +693,17 @@ void igraph_i_union_many_free(igraph_vector_ptr_t *v) {
  * \example examples/simple/igraph_union.c
  */
 
-int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs) {
+int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs, 
+		      igraph_vector_ptr_t *edgemaps) {
   
   long int no_of_graphs=igraph_vector_ptr_size(graphs);
   long int no_of_nodes=0;
   igraph_bool_t directed=1;
   igraph_vector_t edges;
-  igraph_vector_ptr_t neivects;
-  long int i, j;
+  igraph_vector_ptr_t edge_vects, order_vects;
+  igraph_vector_long_t no_edges;
+  long int i, j, tailfrom= no_of_graphs > 0 ? 0 : -1, tailto=-1;
+  long int idx=0;  
   
   /* Check directedness */
   if (no_of_graphs != 0) {
@@ -587,95 +717,119 @@ int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs) {
     }
   }
 
-  /* Calculate number of nodes */
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_CHECK(igraph_vector_long_init(&no_edges, no_of_graphs));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &no_edges);
+
+  /* Calculate number of nodes, query number of edges */
   for (i=0; i<no_of_graphs; i++) {
     long int n=igraph_vcount(VECTOR(*graphs)[i]);
     if (n > no_of_nodes) {
       no_of_nodes=n;
     }
+    VECTOR(no_edges)[i] = igraph_ecount(VECTOR(*graphs)[i]);
   }
 
-  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  if (edgemaps) {
+    IGRAPH_CHECK(igraph_vector_ptr_resize(edgemaps, no_of_graphs));
+    IGRAPH_FINALLY(igraph_i_union_many_free3, edgemaps);
+    for (i=0; i<no_of_graphs; i++) {
+      VECTOR(*edgemaps)[i]=igraph_Calloc(1, igraph_vector_t);
+      if (!VECTOR(*edgemaps)[i]) {
+	IGRAPH_ERROR("Cannot union graphs", IGRAPH_ENOMEM);
+      }
+      IGRAPH_CHECK(igraph_vector_init(VECTOR(*edgemaps)[i],
+				      VECTOR(no_edges)[i]));
+    }
+  }
 
-  /* Init neighbor vectors */
+  /* Allocate memory for the edge lists and their index vectors */
   if (no_of_graphs != 0) {
-    IGRAPH_CHECK(igraph_vector_ptr_init(&neivects, no_of_graphs));
-    IGRAPH_FINALLY(igraph_i_union_many_free, &neivects);
+    IGRAPH_CHECK(igraph_vector_ptr_init(&edge_vects, no_of_graphs));
+    IGRAPH_FINALLY(igraph_i_union_many_free, &edge_vects);
+    IGRAPH_CHECK(igraph_vector_ptr_init(&order_vects, no_of_graphs));
+    IGRAPH_FINALLY(igraph_i_union_many_free2, &order_vects);
   }
   for (i=0; i<no_of_graphs; i++) {
-    VECTOR(neivects)[i]=igraph_Calloc(1, igraph_vector_t);
-    if (VECTOR(neivects)[i]==0) { 
+    VECTOR(edge_vects)[i]=igraph_Calloc(1, igraph_vector_t);
+    VECTOR(order_vects)[i]=igraph_Calloc(1, igraph_vector_long_t);
+    if (! VECTOR(edge_vects)[i] || ! VECTOR(order_vects)[i]) { 
       IGRAPH_ERROR("Cannot union graphs", IGRAPH_ENOMEM);
     }
-    IGRAPH_CHECK(igraph_vector_init(VECTOR(neivects)[i], 0));
+    IGRAPH_CHECK(igraph_vector_init(VECTOR(edge_vects)[i],
+				    2 * VECTOR(no_edges)[i]));
+    IGRAPH_CHECK(igraph_vector_long_init(VECTOR(order_vects)[i], 
+					 VECTOR(no_edges)[i]));
   }
-  
-  /* Main part */
-  for (i=0; i<no_of_nodes; i++) {
-    igraph_bool_t l=0;
-    long int bigtail;
-    
-    IGRAPH_ALLOW_INTERRUPTION();
 
-    /* get neighbors */
-    for (j=0; j<no_of_graphs; j++) {
-      if (i<igraph_vcount(VECTOR(*graphs)[j])) {
-	IGRAPH_CHECK(igraph_neighbors(VECTOR(*graphs)[j], VECTOR(neivects)[j], 
-				      i, IGRAPH_OUT));
-	if (!directed) {
-	  igraph_vector_filter_smaller(VECTOR(neivects)[j], i);
-	}
-	if (!igraph_vector_empty(VECTOR(neivects)[j])) {
-	  l=1;
+  /* Query and sort the edge lists */
+  for (i=0; i<no_of_graphs; i++) {
+    long int k, j, n=VECTOR(no_edges)[i];
+    igraph_vector_t *edges=VECTOR(edge_vects)[i];
+    igraph_vector_long_t *order=VECTOR(order_vects)[i];
+    IGRAPH_CHECK(igraph_get_edgelist(VECTOR(*graphs)[i], edges, /*bycol=*/0));
+    if (!directed) {
+      for (k=0, j=0; k<n; k++, j+=2) {
+	if (VECTOR(*edges)[j] > VECTOR(*edges)[j+1]) {
+	  long int tmp=VECTOR(*edges)[j];
+	  VECTOR(*edges)[j]=VECTOR(*edges)[j+1];
+	  VECTOR(*edges)[j+1]=tmp;
 	}
       }
     }
+    for (k=0; k<n; k++) { VECTOR(*order)[k]=k; }
+    igraph_qsort_r(VECTOR(*order), n, sizeof(VECTOR(*order)[0]), edges, 
+		   igraph_i_order_edgelist_cmp);
+  }
 
-    while (l) {
+  while (tailfrom >= 0) {
 
-      /* Get the largest tail element */
-      l=0; bigtail=0;
-      for (j=0; j<no_of_graphs; j++) {
-	if (!l && !igraph_vector_empty(VECTOR(neivects)[j])) {
-	  l=1; 
-	  bigtail=igraph_vector_tail(VECTOR(neivects)[j]);
-	} else if (l && !igraph_vector_empty(VECTOR(neivects)[j])) {
-	  long int tail=igraph_vector_tail(VECTOR(neivects)[j]);
-	  if (tail > bigtail) {
-	    bigtail=tail;
+    /* Get the largest tail element */
+    tailfrom = tailto = -1;
+    for (j=0; j<no_of_graphs; j++) {
+      if (!igraph_vector_long_empty(VECTOR(order_vects)[j])) {
+	long int edge=igraph_vector_long_tail(VECTOR(order_vects)[j]);
+	igraph_vector_t *ev=VECTOR(edge_vects)[j];
+	long int from=VECTOR(*ev)[2*edge];
+	long int to=VECTOR(*ev)[2*edge+1];
+	if (from > tailfrom || (from == tailfrom && to > tailto)) {
+	  tailfrom = from; tailto = to;
+	}
+      }
+    }
+    if (tailfrom < 0) { continue; }
+
+    /* add the edge */
+    IGRAPH_CHECK(igraph_vector_push_back(&edges, tailfrom));
+    IGRAPH_CHECK(igraph_vector_push_back(&edges, tailto));
+      
+    /* update edge lists, we just modify the 'order' vectors */
+    for (j=0; j<no_of_graphs; j++) {
+      if (!igraph_vector_long_empty(VECTOR(order_vects)[j])) {
+	long int edge=igraph_vector_long_tail(VECTOR(order_vects)[j]);
+	igraph_vector_t *ev=VECTOR(edge_vects)[j];
+	long int from=VECTOR(*ev)[2*edge];
+	long int to=VECTOR(*ev)[2*edge+1];
+	if (from == tailfrom && to == tailto) {
+	  igraph_vector_long_pop_back(VECTOR(order_vects)[j]);
+	  if (edgemaps) {
+	    igraph_vector_t *map=VECTOR(*edgemaps)[j];
+	    VECTOR(*map)[edge]=idx;
 	  }
 	}
       }
-      
-      /* add the edge */
-      IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-      IGRAPH_CHECK(igraph_vector_push_back(&edges, bigtail));
-      
-      /* update neighbors */
-      for (j=0; j<no_of_graphs; j++) {
-	if (!igraph_vector_empty(VECTOR(neivects)[j]) &&
-	    igraph_vector_tail(VECTOR(neivects)[j])==bigtail) {
-	  igraph_vector_pop_back(VECTOR(neivects)[j]);
-	}
-      }
-      
-      /* Check if there are more edges */
-      l=0; j=0;
-      while (!l && j<no_of_graphs) {
-	l=!igraph_vector_empty(VECTOR(neivects)[j]);
-	j++;
-      }
     }
+    idx++;
+
   }
   
-  if (no_of_graphs != 0) {
-    for (i=0; i<no_of_graphs; i++) {
-      igraph_vector_destroy(VECTOR(neivects)[i]);
-      igraph_Free(VECTOR(neivects)[i]);
-    }
-    igraph_vector_ptr_destroy(&neivects);
-    IGRAPH_FINALLY_CLEAN(1);
+  if (no_of_graphs > 0) {
+    igraph_i_union_many_free2(&order_vects);
+    igraph_i_union_many_free(&edge_vects);
+    IGRAPH_FINALLY_CLEAN(2);
   }
+  igraph_vector_long_destroy(&no_edges);
+  IGRAPH_FINALLY_CLEAN(1);
 
   IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
   igraph_vector_destroy(&edges);

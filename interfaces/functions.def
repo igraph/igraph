@@ -1405,11 +1405,13 @@ igraph_triad_census:
 #######################################
 
 igraph_disjoint_union:
-        PARAMS: OUT GRAPH res, GRAPH left, GRAPH right
+        PARAMS: OUT GRAPH res, GRAPH left, GRAPH right, \
+                OUT EDGESET edge_map_left, OUT EDGESET edge_map_right
+        DEPS: edge_map_left ON left, edge_map_right ON right      
         IGNORE: RR, RC, RNamespace
 
 igraph_disjoint_union_many:
-        PARAMS: OUT GRAPH res, GRAPHLIST graphs
+        PARAMS: OUT GRAPH res, GRAPHLIST graphs, OUT VECTORLIST edgemaps
         IGNORE: RR, RC, RNamespace
 
 igraph_union:

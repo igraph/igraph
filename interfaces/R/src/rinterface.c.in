@@ -4865,7 +4865,7 @@ SEXP R_igraph_union(SEXP pgraphs) {
     R_SEXP_to_igraph(VECTOR_ELT(pgraphs, i), &graphs[i]);
     VECTOR(ptrvec)[i]=&graphs[i];
   }
-  igraph_union_many(&res, &ptrvec);
+  igraph_union_many(&res, &ptrvec, /*edgemaps=*/ 0);
   igraph_vector_ptr_destroy(&ptrvec);
   PROTECT(result=R_igraph_to_SEXP(&res));
   igraph_destroy(&res);
