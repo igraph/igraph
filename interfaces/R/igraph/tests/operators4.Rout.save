@@ -19,6 +19,10 @@ Type 'q()' to quit R.
 > 
 > library(igraph) 
 > 
+> ########################################
+> ## Disjoint union, named graphs
+> 
+> 
 > g1 <- g2 <- graph.ring(10)
 > g1$foo <- "bar"
 > V(g1)$name <- letters[ 1:10]
@@ -53,7 +57,147 @@ IGRAPH UNW- 20 20 --
 > E(g1+g2)$b2
  [1] NA NA NA NA NA NA NA NA NA NA 11 12 13 14 15 16 17 18 19 20
 > 
+> ########################################
+> ## Union, unnamed graphs
+> 
+> library(igraph)
+> 
+> g1 <- graph.ring(10)
+> g2 <- graph.ring(13)
+> g1$foo <- "bar"
+> E(g1)$weight <- 1:10
+> E(g2)$weight <- 13:1
+> 
+> V(g1)$a1 <- 1:10
+> V(g2)$a2 <- 11:23
+> 
+> E(g1)$b1 <- letters[1:10]
+> E(g2)$b2 <- letters[11:23]
+> 
+> g <- graph.union(g1, g2)
+> g
+IGRAPH U--- 13 14 -- 
++ attr: name_1 (g/c), name_2 (g/c), mutual_1 (g/l), mutual_2 (g/l),
+  circular_1 (g/l), circular_2 (g/l), foo (g/c), a1 (v/n), a2 (v/n),
+  weight_1 (e/n), weight_2 (e/n), b1 (e/c), b2 (e/c)
+> 
+> V(g)$a1
+ [1]  1  2  3  4  5  6  7  8  9 10 NA NA NA
+> V(g)$a2
+ [1] 11 12 13 14 15 16 17 18 19 20 21 22 23
+> 
+> E(g)$b1
+ [1] NA  NA  NA  "i" "h" "g" "f" "e" "d" "c" "b" NA  "j" "a"
+> E(g)$b2
+ [1] "v" "u" "t" "s" "r" "q" "p" "o" "n" "m" "l" "w" NA  "k"
+> 
+> df1 <- get.data.frame(g)
+> df1 <- df1[ order(df1$from, df1$to), c(1,2,3,5,4,6)]
+> df2 <- merge(get.data.frame(g1), get.data.frame(g2),
++              by=c("from", "to"), all=TRUE)
+> all(is.na(df1) == is.na(df2)) && all(df1 == df2, na.rm=TRUE)
+[1] TRUE
+> 
+> ###########################################
+> ## Union named graphs
+> 
+> library(igraph)
+> 
+> g1 <- graph.ring(10)
+> g2 <- graph.ring(13)
+> V(g1)$name <- letters[seq_len(vcount(g1))]
+> V(g2)$name <- letters[seq_len(vcount(g2))]
+> 
+> g1$foo <- "bar"
+> E(g1)$weight <- 1:10
+> E(g2)$weight <- 13:1
+> 
+> V(g1)$a1 <- 1:10
+> V(g2)$a2 <- 11:23
+> 
+> E(g1)$b1 <- letters[1:10]
+> E(g2)$b2 <- letters[11:23]
+> 
+> g <- graph.union(g1, g2)
+> g
+IGRAPH UN-- 13 14 -- 
++ attr: name_1 (g/c), name_2 (g/c), mutual_1 (g/l), mutual_2 (g/l),
+  circular_1 (g/l), circular_2 (g/l), foo (g/c), a1 (v/n), a2 (v/n),
+  name (v/c), weight_1 (e/n), weight_2 (e/n), b1 (e/c), b2 (e/c)
+> V(g)$name
+ [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m"
+> 
+> gg <- graph.union(g1, g2, keep.all.vertices=FALSE)
+> gg
+IGRAPH UN-- 10 10 -- 
++ attr: name_1 (g/c), name_2 (g/c), mutual_1 (g/l), mutual_2 (g/l),
+  circular_1 (g/l), circular_2 (g/l), foo (g/c), a1 (v/n), a2 (v/n),
+  name (v/c), weight_1 (e/n), weight_2 (e/n), b1 (e/c), b2 (e/c)
+> V(gg)$name
+ [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j"
+> 
+> get.data.frame(g, what="both")
+$vertices
+  a1 a2 name
+a  1 11    a
+b  2 12    b
+c  3 13    c
+d  4 14    d
+e  5 15    e
+f  6 16    f
+g  7 17    g
+h  8 18    h
+i  9 19    i
+j 10 20    j
+k NA 21    k
+l NA 22    l
+m NA 23    m
+
+$edges
+   from to weight_1 weight_2   b1   b2
+1     l  m       NA        2 <NA>    v
+2     k  l       NA        3 <NA>    u
+3     j  k       NA        4 <NA>    t
+4     i  j        9        5    i    s
+5     h  i        8        6    h    r
+6     g  h        7        7    g    q
+7     f  g        6        8    f    p
+8     e  f        5        9    e    o
+9     d  e        4       10    d    n
+10    c  d        3       11    c    m
+11    b  c        2       12    b    l
+12    a  m       NA        1 <NA>    w
+13    a  j       10       NA    j <NA>
+14    a  b        1       13    a    k
+
+> get.data.frame(gg, what="both")
+$vertices
+  a1 a2 name
+a  1 11    a
+b  2 12    b
+c  3 13    c
+d  4 14    d
+e  5 15    e
+f  6 16    f
+g  7 17    g
+h  8 18    h
+i  9 19    i
+j 10 20    j
+
+$edges
+   from to weight_1 weight_2 b1   b2
+1     i  j        9        5  i    s
+2     h  i        8        6  h    r
+3     g  h        7        7  g    q
+4     f  g        6        8  f    p
+5     e  f        5        9  e    o
+6     d  e        4       10  d    n
+7     c  d        3       11  c    m
+8     b  c        2       12  b    l
+9     a  j       10       NA  j <NA>
+10    a  b        1       13  a    k
+
 > 
 > proc.time()
    user  system elapsed 
-  0.299   0.038   0.324 
+  0.340   0.040   0.367 

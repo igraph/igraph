@@ -20,6 +20,44 @@
 #
 ###################################################################
 
+rename.attr.if.needed <- function(type, graphs, newsize=NULL, maps=NULL,
+                                  ignore=character()) {
+  listfun <- switch(type, "g"=list.graph.attributes,
+                    "v"=list.vertex.attributes, "e"=list.edge.attributes,
+                    stop("Internal igraph error"))
+  getfun <- switch(type, "g"=get.graph.attribute, "v"=get.vertex.attribute,
+                   "e"=get.edge.attribute, stop("Internal igraph error"))
+  alist <- lapply(graphs, listfun)
+  an <- unique(unlist(alist))
+  an <- setdiff(an, ignore)
+
+  getval <- function(which, name) {
+    newval <- getfun(graphs[[which]], name)
+    if (!is.null(maps)) {
+      idx <- rep(NA, newsize)
+      idx[ maps[[which]] + 1 ] <- seq_along(maps[[which]])
+      newval <- newval[idx]
+    }
+    if (!is.null(newsize)) { length(newval) <- newsize }
+    newval
+  }
+  
+  attr <- list()
+  for (name in an) {
+    w <- which(sapply(alist, function(x) name %in% x))
+    if (length(w)==1) {
+      attr[[name]] <- getval(w, name)
+    } else {
+      for (w2 in w) {
+        nname <- paste(name, sep="_", w2)
+        newval <- getval(w2, name)
+        attr[[nname]] <-newval
+      }      
+    }
+  }
+  attr
+}
+
 graph.disjoint.union <- function(...) {
   
   graphs <- unlist(recursive=FALSE, lapply(list(...), function(l) {
@@ -34,22 +72,7 @@ graph.disjoint.union <- function(...) {
                PACKAGE="igraph")
 
   ## Graph attributes
-  galist <- lapply(graphs, list.graph.attributes)
-  gan <- unique(unlist(galist))
-
-  attr <- list()
-  for (name in gan) { 
-    w <- which(sapply(galist, function(x) name %in% x))
-    if (length(w)==1) {
-      attr[[name]] <- get.graph.attribute(graphs[[w]], name)
-    } else {
-      for (w2 in w) {
-        nname <- paste(name, sep="_", w2)
-        attr[[nname]] <- get.graph.attribute(graphs[[w2]], name)
-      }      
-    }
-  }
-  graph.attributes(res) <- attr
+  graph.attributes(res) <- rename.attr.if.needed("g", graphs)
     
   ## Vertex attributes
   attr <- list()
@@ -100,7 +123,7 @@ graph.disjoint.union <- function(...) {
   graph.disjoint.union(x,y)
 }
 
-graph.union <- function(...) {
+graph.union <- function(..., byname="auto", keep.all.vertices=TRUE) {
 
   graphs <- unlist(recursive=FALSE, lapply(list(...), function(l) {
     if (is.igraph(l)) list(l) else l
@@ -108,10 +131,73 @@ graph.union <- function(...) {
   if (!all(sapply(graphs, is.igraph))) {
     stop("Not a graph object")
   }
+  if (byname != "auto" && !is.logical(byname)) {
+    stop("`bynam' must be \"auto\", or logical")
+  }
+  nonamed <- sum(sapply(graphs, is.named))
+  if (byname == "auto") {
+    byname <- all(sapply(graphs, is.named))
+    if (nonamed != 0 && nonamed != length(graphs)) {
+      warning("Some, but not all graphs are named, not using vertex names")
+    }
+  } else if (byname && nonamed != 0 && nonamed != length(graphs)) {
+    stop("Some graphs are not named")
+  }
+
+  edgemaps <- length(unlist(lapply(graphs, list.edge.attributes))) != 0
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_union", graphs,
-        PACKAGE="igraph")
+  if (byname) {
+    allnames <- lapply(graphs, get.vertex.attribute, "name")
+    if (keep.all.vertices) {
+      uninames <- unique(unlist(allnames))
+      newgraphs <- lapply(graphs, function(g) {
+        g <- g + setdiff(uninames, V(g)$name)
+        permute.vertices(g, match(V(g)$name, uninames))
+      })
+    } else {
+      uninames <- Reduce(intersect, allnames)
+      newgraphs <- lapply(graphs, function(g) {
+        g <- g - setdiff(V(g)$name, uninames)
+        permute.vertices(g, match(V(g)$name, uninames))
+      })
+    }
+    
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    res <- .Call("R_igraph_union", newgraphs, edgemaps,
+                 PACKAGE="igraph")
+    maps <- res$edgemaps
+    res <- res$graph
+
+    ## We might need to rename all attributes
+    graph.attributes(res) <- rename.attr.if.needed("g", graphs)
+    vertex.attributes(res) <- rename.attr.if.needed("v", graphs, vcount(res),
+                                                    ignore="name")
+    V(res)$name <- uninames
+
+    ## Edges are a bit more difficult, we need a mapping
+    if (edgemaps) {
+      edge.attributes(res) <- rename.attr.if.needed("e", graphs, ecount(res),
+                                                    maps=maps)
+    }
+  } else {
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    res <- .Call("R_igraph_union", graphs, edgemaps,
+                 PACKAGE="igraph")
+    maps <- res$edgemaps
+    res <- res$graph
+
+    ## We might need to rename all attributes
+    graph.attributes(res) <- rename.attr.if.needed("g", graphs)
+    vertex.attributes(res) <- rename.attr.if.needed("v", graphs, vcount(res))
+
+    ## Edges are a bit more difficult, we need a mapping
+    if (edgemaps) {
+      edge.attributes(res) <- rename.attr.if.needed("e", graphs, ecount(res),
+                                                    maps=maps)
+    }
+  }
+
+  res
 }
 
 "%u%" <- function(x,y) {

@@ -4850,13 +4850,15 @@ SEXP R_igraph_disjoint_union(SEXP pgraphs) {
   return result;
 }
 
-SEXP R_igraph_union(SEXP pgraphs) {
+SEXP R_igraph_union(SEXP pgraphs, SEXP pedgemaps) {
   
   igraph_vector_ptr_t ptrvec;
   igraph_t *graphs;
   igraph_t res;
   long int i;
-  SEXP result;
+  igraph_bool_t edgemaps=LOGICAL(pedgemaps)[0];
+  igraph_vector_ptr_t v_edgemaps, *my_edgemaps=edgemaps ? &v_edgemaps : 0;
+  SEXP result, names;
 
   igraph_vector_ptr_init(&ptrvec, GET_LENGTH(pgraphs));
   graphs=(igraph_t *)R_alloc(GET_LENGTH(pgraphs),
@@ -4865,12 +4867,28 @@ SEXP R_igraph_union(SEXP pgraphs) {
     R_SEXP_to_igraph(VECTOR_ELT(pgraphs, i), &graphs[i]);
     VECTOR(ptrvec)[i]=&graphs[i];
   }
-  igraph_union_many(&res, &ptrvec, /*edgemaps=*/ 0);
+  if (edgemaps) {
+    igraph_vector_ptr_init(&v_edgemaps, 0);
+  }
+  igraph_union_many(&res, &ptrvec, my_edgemaps);
   igraph_vector_ptr_destroy(&ptrvec);
-  PROTECT(result=R_igraph_to_SEXP(&res));
+  PROTECT(result=NEW_LIST(2));
+  SET_VECTOR_ELT(result, 0, R_igraph_to_SEXP(&res));
+  SET_VECTOR_ELT(result, 1, R_igraph_0orvectorlist_to_SEXP(my_edgemaps));
+  PROTECT(names=NEW_CHARACTER(2));
+  SET_STRING_ELT(names, 0, mkChar("graph"));
+  SET_STRING_ELT(names, 1, mkChar("edgemaps"));
+  SET_NAMES(result, names);
   igraph_destroy(&res);
+  if (edgemaps) {
+    for (i=0; i<igraph_vector_ptr_size(my_edgemaps); i++) {
+      igraph_vector_destroy(VECTOR(*my_edgemaps)[i]);
+      igraph_free(VECTOR(*my_edgemaps)[i]);
+    }
+    igraph_vector_ptr_destroy(my_edgemaps);
+  }
   
-  UNPROTECT(1);
+  UNPROTECT(2);
   return result;
 }
 
