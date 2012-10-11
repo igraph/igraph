@@ -61,6 +61,10 @@
 
 #include "igraph_community.h"
 
+namespace igraph {
+
+namespace walktrap {
+
 using namespace std;
 
 class Edge {			// code an edge of a given vertex
@@ -97,7 +101,7 @@ public:
 			   const igraph_vector_t *weights);
 };
 
-
+} }        /* end of namespaces */
 
 #endif
 

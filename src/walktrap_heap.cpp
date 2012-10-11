@@ -59,6 +59,7 @@
 
 
 using namespace std;
+using namespace igraph::walktrap;
 
 void Neighbor_heap::move_up(int index) {
   while(H[index/2]->delta_sigma > H[index]->delta_sigma) {

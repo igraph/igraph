@@ -67,6 +67,7 @@
 #include "igraph_interrupt_internal.h"
 
 using namespace std;
+using namespace igraph::walktrap;
 
 /** 
  * \function igraph_community_walktrap
