@@ -61,6 +61,10 @@
 
 #include "config.h"
 
+namespace igraph {
+
+namespace walktrap {
+
 IGRAPH_THREAD_LOCAL int Probabilities::length = 0;
 IGRAPH_THREAD_LOCAL Communities* Probabilities::C = 0;
 IGRAPH_THREAD_LOCAL float* Probabilities::tmp_vector1 = 0;
@@ -833,3 +837,5 @@ double Communities::compute_delta_sigma(int community1, int community2) {
   
   return communities[community1].P->compute_distance(communities[community2].P)*double(communities[community1].size)*double(communities[community2].size)/double(communities[community1].size + communities[community2].size);
 }
+
+} }    /* end of namespaces */

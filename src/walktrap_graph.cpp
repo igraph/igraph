@@ -64,6 +64,9 @@
 
 using namespace std;
 
+namespace igraph {
+
+namespace walktrap {
 
 bool operator<(const Edge& E1, const Edge& E2) {
   return(E1.neighbor < E2.neighbor);
@@ -224,7 +227,7 @@ long Graph::memory() {
   return m;
 }
 
-
+} }
 
 
 

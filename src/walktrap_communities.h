@@ -63,6 +63,10 @@
 #include "igraph_community.h"
 #include "config.h"
 
+namespace igraph {
+
+namespace walktrap {
+
 class Communities;
 class Probabilities {
 public:
@@ -166,6 +170,6 @@ public:
   
 };
 
-
+} }       /* end of namespaces */
 
 #endif
