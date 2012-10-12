@@ -787,6 +787,7 @@ extern PyObject* igraphmodule_arpack_options_default;
   PyModule_AddIntConstant(m, "GET_ADJACENCY_BOTH", IGRAPH_GET_ADJACENCY_BOTH);
 
   PyModule_AddIntConstant(m, "REWIRING_SIMPLE", IGRAPH_REWIRING_SIMPLE);
+  PyModule_AddIntConstant(m, "REWIRING_SIMPLE_LOOPS", IGRAPH_REWIRING_SIMPLE_LOOPS);
 
   PyModule_AddIntConstant(m, "ADJ_DIRECTED", IGRAPH_ADJ_DIRECTED);
   PyModule_AddIntConstant(m, "ADJ_UNDIRECTED", IGRAPH_ADJ_UNDIRECTED);

@@ -519,14 +519,14 @@ reciprocity <- function(graph, ignore.loops=TRUE,
         as.numeric(mode), PACKAGE="igraph")
 }
 
-rewire <- function(graph, mode="simple", niter=100) {
+rewire <- function(graph, mode=c("simple", "loops"), niter=100) {
   
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
   
   mode <- igraph.match.arg(mode)
-  mode <- switch(mode, "simple"=0)
+  mode <- switch(mode, "simple"=0, "loops"=1)
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_rewire", graph, as.numeric(niter), as.numeric(mode),

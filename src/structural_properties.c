@@ -1433,10 +1433,17 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
  * \param graph The graph object to be rewired.
  * \param n Number of rewiring trials to perform.
  * \param mode The rewiring algorithm to be used. It can be one of the following:
- *         \c IGRAPH_REWIRING_SIMPLE: simple rewiring algorithm which
- *         chooses two arbitrary edges in each step (namely (a,b) and (c,d))
- *         and substitutes them with (a,d) and (c,b) if they don't exist.
- *         Time complexity: TODO.
+ *         \clist
+ *           \cli IGRAPH_REWIRING_SIMPLE
+ *                Simple rewiring algorithm which chooses two arbitrary edges
+ *                in each step (namely (a,b) and (c,d)) and substitutes them
+ *                with (a,d) and (c,b) if they don't exist.  The method will
+ *                neither destroy nor create self-loops.
+ *           \cli IGRAPH_REWIRING_SIMPLE_LOOPS
+ *                Same as \c IGRAPH_REWIRING_SIMPLE but allows the creation or
+ *                destruction of self-loops.
+ *         \endclist
+ *
  * \return Error code:
  *         \clist
  *           \cli IGRAPH_EINVMODE
@@ -1455,23 +1462,32 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
 
 int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
   long int no_of_nodes=igraph_vcount(graph);
-  long int i, a, b, c, d;
-  igraph_adjlist_t allneis;
-  igraph_vector_t *neis[2], edgevec;
-  igraph_bool_t directed;
+  long int no_of_edges=igraph_ecount(graph);
+  long int i;
+  igraph_integer_t a, b, c, d, dummy;
+  igraph_vector_t eids, edgevec;
+  igraph_bool_t directed, loops, ok;
   igraph_es_t es;
   
-  if (mode == IGRAPH_REWIRING_SIMPLE && no_of_nodes<4)
+  if ((mode == IGRAPH_REWIRING_SIMPLE || mode == IGRAPH_REWIRING_SIMPLE_LOOPS) &&
+      no_of_nodes<4)
     IGRAPH_ERROR("graph unsuitable for rewiring", IGRAPH_EINVAL);
   
   directed = igraph_is_directed(graph);
+  loops = (mode == IGRAPH_REWIRING_SIMPLE_LOOPS);
   
   RNG_BEGIN();
-  
-  igraph_adjlist_init(graph, &allneis, IGRAPH_OUT);
-  IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
-  igraph_vector_init(&edgevec, 4);
-  IGRAPH_FINALLY(igraph_vector_destroy, &edgevec);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&edgevec, 4);
+  IGRAPH_VECTOR_INIT_FINALLY(&eids, 2);
+  es = igraph_ess_vector(&eids);
+
+  /* We don't want the algorithm to get stuck in an infinite loop when
+   * it can't choose two edges satisfying the conditions. Instead of
+   * this, we choose two arbitrary edges and if they have endpoints
+   * in common, we just decrease the number of trials left and continue
+   * (so unsuccessful rewirings still count as a trial)
+   */
 
   while (n>0) {
     
@@ -1479,57 +1495,67 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
     
     switch (mode) {
     case IGRAPH_REWIRING_SIMPLE:
-      a=RNG_INTEGER(0, no_of_nodes-1);
-      do { c=RNG_INTEGER(0, no_of_nodes-1); } while (c==a);
-      
-      /* We don't want the algorithm to get stuck in an infinite loop when
-       * it can't choose two edges satisfying the conditions. Instead of
-       * this, we choose two arbitrary edges and if they have endpoints
-       * in common, we just decrease the number of trials left and continue
-       * (so unsuccessful rewirings still count as a trial)
-       */
-      neis[0]=igraph_adjlist_get(&allneis, a);
-      i=igraph_vector_size(neis[0]);
-      if (i==0) b=c;
-      else b=VECTOR(*neis[0])[RNG_INTEGER(0, i-1)];
-      
-      neis[1]=igraph_adjlist_get(&allneis, c);
-      i=igraph_vector_size(neis[1]);
-      if (i==0) d=a;
-      else d=VECTOR(*neis[1])[RNG_INTEGER(0, i-1)];
-      
-      /* Okay, we have two edges. Can they be rewired?
-       * neis[0] mustn't contain d and neis[1] mustn't contain b
-       */
-      if (!igraph_vector_search(neis[0], 0, d, NULL) &&
-	  !igraph_vector_search(neis[1], 0, b, NULL) &&
-	  b!=c && a!=d && a!=b && c!=d) {
-	/* printf("Deleting: %d -> %d, %d -> %d\n", a, b, c, d); */
-	IGRAPH_CHECK(igraph_es_pairs_small(&es, directed, a, b, c, d, -1));
-	IGRAPH_FINALLY(igraph_es_destroy, &es);
+    case IGRAPH_REWIRING_SIMPLE_LOOPS:
+      ok = 1;
+
+      /* Choose two edges randomly */
+      VECTOR(eids)[0]=RNG_INTEGER(0, no_of_edges-1);
+      do {
+        VECTOR(eids)[1]=RNG_INTEGER(0, no_of_edges-1);
+      } while (VECTOR(eids)[0] == VECTOR(eids)[1]);
+
+      /* Get the endpoints */
+      IGRAPH_CHECK(igraph_edge(graph, VECTOR(eids)[0], &a, &b));
+      IGRAPH_CHECK(igraph_edge(graph, VECTOR(eids)[1], &c, &d));
+
+      /* For an undirected graph, we have two "variants" of each edge, i.e.
+       * a -- b and b -- a. Since some rewirings can be performed only when we
+       * "swap" the endpoints, we do it now with probability 0.5 */
+      if (!directed && RNG_UNIF01() < 0.5) {
+        dummy = c; c = d; d = dummy;
+      }
+
+      /* If we do not touch loops, check whether a == b or c == d and disallow
+       * the swap if needed */
+      if (!loops && (a == b || c == d)) {
+        ok = 0;
+      } else {
+        /* Check whether they are suitable for rewiring */
+        if (a == c || b == d) {
+          /* Swapping would have no effect */
+          ok = 0;
+        } else {
+          /* a != c && b != d */
+          /* If a == d or b == c, the swap would generate at least one loop, so
+           * we disallow them unless we want to have loops */
+          ok = loops || (a != d && b != c);
+          /* Also, if a == b and c == d and we allow loops, doing the swap
+           * would result in a multiple edge if the graph is undirected */
+          ok = ok && (directed || a != b || c != d);
+        }
+      }
+
+      /* All good so far. Now check for the existence of a --> d and c --> b to
+       * disallow the creation of multiple edges */
+      if (ok) {
+        IGRAPH_CHECK(igraph_are_connected(graph, a, d, &ok));
+        ok = !ok;
+      }
+      if (ok) {
+        IGRAPH_CHECK(igraph_are_connected(graph, c, b, &ok));
+        ok = !ok;
+      }
+
+      /* If we are still okay, we can perform the rewiring */
+      if (ok) {
+	/* printf("Deleting: %ld -> %ld, %ld -> %ld\n",
+                  (long)a, (long)b, (long)c, (long)d); */
 	IGRAPH_CHECK(igraph_delete_edges(graph, es));	
-	igraph_es_destroy(&es);
-	IGRAPH_FINALLY_CLEAN(1);
 	VECTOR(edgevec)[0]=a; VECTOR(edgevec)[1]=d;
 	VECTOR(edgevec)[2]=c; VECTOR(edgevec)[3]=b;
-	/* printf("Adding: %d -> %d, %d -> %d\n", a, d, c, b); */
+	/* printf("Adding: %ld -> %ld, %ld -> %ld\n",
+                  (long)a, (long)d, (long)c, (long)b); */
 	igraph_add_edges(graph, &edgevec, 0);
-	/* We have to adjust the adjacency list view as well.
-	   It's a luck that we have the pointers in neis[0] and neis[1] */
-	for (i=igraph_vector_size(neis[0])-1; i>=0; i--)
-	  if (VECTOR(*neis[0])[i]==b) { VECTOR(*neis[0])[i]=d; break; }
-	for (i=igraph_vector_size(neis[1])-1; i>=0; i--)
-	  if (VECTOR(*neis[1])[i]==d) { VECTOR(*neis[1])[i]=b; break; }
-	/* In case of an undirected graph, we have to adjust the
-	 * adjacency view of vertices b and d as well */
-	if (!directed) {
-	  neis[0] = igraph_adjlist_get(&allneis, b);
-	  neis[1] = igraph_adjlist_get(&allneis, d);
-	  for (i=igraph_vector_size(neis[0])-1; i>=0; i--)
-	    if (VECTOR(*neis[0])[i]==a) { VECTOR(*neis[0])[i]=c; break; }
-	  for (i=igraph_vector_size(neis[1])-1; i>=0; i--)
-	    if (VECTOR(*neis[1])[i]==c) { VECTOR(*neis[1])[i]=a; break; }
-	}
       }
       break;
     default:
@@ -1539,7 +1565,7 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
     n--;
   }
   
-  igraph_adjlist_destroy(&allneis);
+  igraph_vector_destroy(&eids);
   igraph_vector_destroy(&edgevec);
   IGRAPH_FINALLY_CLEAN(2);
   

@@ -379,6 +379,8 @@ int igraphmodule_PyObject_to_reciprocity_t(PyObject *o, igraph_reciprocity_t *re
 int igraphmodule_PyObject_to_rewiring_t(PyObject *o, igraph_rewiring_t *result) {
   static igraphmodule_enum_translation_table_entry_t rewiring_tt[] = {
     {"simple", IGRAPH_REWIRING_SIMPLE},
+    {"simple_loops", IGRAPH_REWIRING_SIMPLE_LOOPS},
+    {"loops", IGRAPH_REWIRING_SIMPLE_LOOPS},
     {0,0}
   };
 
