@@ -2,7 +2,7 @@ Package: igraph
 Version: @VERSION@
 Date: Jun 20, 2012
 Title:  Network analysis and visualization
-Author: Gabor Csardi <csardi.gabor@gmail.com>
+Author: See AUTHORS file.
 Maintainer: Gabor Csardi <csardi.gabor@gmail.com>
 Description: Routines for simple graphs and network analysis. igraph can
   handle large graphs very well and provides functions for generating random
