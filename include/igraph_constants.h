@@ -90,7 +90,8 @@ typedef enum { IGRAPH_FILEFORMAT_EDGELIST=0,
                IGRAPH_FILEFORMAT_LGL,
                IGRAPH_FILEFORMAT_GRAPHML } igraph_fileformat_type_t;
 
-typedef enum { IGRAPH_REWIRING_SIMPLE=0 } igraph_rewiring_t;
+typedef enum { IGRAPH_REWIRING_SIMPLE=0,
+	       IGRAPH_REWIRING_SIMPLE_LOOPS } igraph_rewiring_t;
 
 typedef enum { IGRAPH_EDGEORDER_ID=0,
 	       IGRAPH_EDGEORDER_FROM,
