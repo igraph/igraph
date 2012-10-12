@@ -67,7 +67,7 @@ int main() {
 
   /* empty graph list */
   igraph_vector_ptr_init(&glist, 0);
-  igraph_intersection_many(&isec, &glist);
+  igraph_intersection_many(&isec, &glist, 0);
   if (igraph_vcount(&isec) != 0 || !igraph_is_directed(&isec)) {
     return 1;
   }
@@ -87,7 +87,7 @@ int main() {
   VECTOR(glist)[0]=&g1;
   VECTOR(glist)[1]=&g2;
   VECTOR(glist)[2]=&g3;
-  igraph_intersection_many(&isec, &glist);
+  igraph_intersection_many(&isec, &glist, 0);
   if (igraph_ecount(&isec) != 0 || igraph_vcount(&isec) != 10) {
     return 2;
   }
@@ -112,7 +112,7 @@ int main() {
   VECTOR(glist)[0]=&g1;
   VECTOR(glist)[1]=&g2;
   VECTOR(glist)[2]=&g3;
-  igraph_intersection_many(&isec, &glist);
+  igraph_intersection_many(&isec, &glist, 0);
   igraph_write_graph_edgelist(&isec, stdout);
   igraph_destroy(&g1);
   igraph_destroy(&g2);

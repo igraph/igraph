@@ -57,7 +57,9 @@ int igraph_intersection(igraph_t *res,
 			const igraph_t *left, const igraph_t *right, 
 			igraph_vector_t *edge_map1, 
 			igraph_vector_t *edge_map2);
-int igraph_intersection_many(igraph_t *res, const igraph_vector_ptr_t *graphs);
+int igraph_intersection_many(igraph_t *res,
+			     const igraph_vector_ptr_t *graphs,
+			     igraph_vector_ptr_t *edgemaps);
 int igraph_difference(igraph_t *res, 
 		      const igraph_t *orig, const igraph_t *sub);
 int igraph_complementer(igraph_t *res, const igraph_t *graph, 
