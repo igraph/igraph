@@ -9690,10 +9690,9 @@ PyObject *igraphmodule_Graph_mincut(igraphmodule_GraphObject * self,
   PyObject *source_o = Py_None, *target_o = Py_None;
   int retval;
   igraph_vector_t capacity_vector;
-  igraph_real_t value, best;
+  igraph_real_t value;
   igraph_vector_t partition, partition2, cut;
   igraph_integer_t source = -1, target = -1;
-  long int i, n;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist,
                                    &source_o, &target_o, &capacity_object))
@@ -14310,9 +14309,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    METH_VARARGS | METH_KEYWORDS,
    "mincut(source=None, target=None, capacity=None)\n\n"
    "Calculates the minimum cut between the source and target vertices or\n"
-   "within the value graph.\n\n"
-   "The minimum cut is the minimum set of edges which needs to be removed\n"
-   "to separate the source or target (if they are given) or to disconnect\n"
+   "within the whole graph.\n\n"
+   "The minimum cut is the minimum set of edges that needs to be removed\n"
+   "to separate the source and the target (if they are given) or to disconnect\n"
    "the graph (if the source and target are not given). The minimum is\n"
    "calculated using the weights (capacities) of the edges, so the cut with\n"
    "the minimum total capacity is calculated.\n"
@@ -14322,10 +14321,12 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@attention: this function has a more convenient interface in class\n"
    "  L{Graph} which wraps the result in a L{Cut} object. It is advised\n"
    "  to use that.\n"
-   "@param source: the source vertex ID. If negative, the calculation is\n"
-   "  done for every vertex except the target and the minimum is returned.\n"
-   "@param target: the target vertex ID. If negative, the calculation is\n"
-   "  done for every vertex except the source and the minimum is returned.\n"
+   "@param source: the source vertex ID. If C{None}, target must also be\n"
+   "  {None} and the calculation will be done for the entire graph (i.e. all\n"
+   "  possible vertex pairs).\n"
+   "@param target: the target vertex ID. If C{None}, source must also be\n"
+   "  {None} and the calculation will be done for the entire graph (i.e. all\n"
+   "  possible vertex pairs).\n"
    "@param capacity: the capacity of the edges. It must be a list or a valid\n"
    "  attribute name or C{None}. In the latter case, every edge will have the\n"
    "  same capacity.\n"
