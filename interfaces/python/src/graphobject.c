@@ -12650,14 +12650,15 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_rewire */
   {"rewire", (PyCFunction) igraphmodule_Graph_rewire,
    METH_VARARGS | METH_KEYWORDS,
-   "rewire(n=1000, mode=REWIRING_SIMPLE)\n\n"
+   "rewire(n=1000, mode=\"simple\")\n\n"
    "Randomly rewires the graph while preserving the degree distribution.\n\n"
    "Please note that the rewiring is done \"in-place\", so the original\n"
    "graph will be modified. If you want to preserve the original graph,\n"
    "use the L{copy} method before.\n\n"
    "@param n: the number of rewiring trials.\n"
-   "@param mode: the rewiring algorithm to use. As for now, only\n"
-   "  C{REWIRING_SIMPLE} is supported.\n"},
+   "@param mode: the rewiring algorithm to use. It can either be C{\"simple\"} or\n"
+   "  C{\"loops\"}; the former does not create or destroy loop edges while the\n"
+   "  latter does.\n"},
 
   /* interface to igraph_rewire_edges */
   {"rewire_edges", (PyCFunction) igraphmodule_Graph_rewire_edges,
