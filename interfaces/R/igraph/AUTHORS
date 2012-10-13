@@ -21,7 +21,6 @@ Aaron Clauset		Hierarchical random graphs
 J.T. Conklin		logbl function
 Topher Cooper		GSL random number generators (not used in R)
 Gabor Csardi		Most of igraph
-Trevor Croft		simpleraytracer
 Peter DalGaard		zeroin root finder
 Timothy A Davis		CXSPARSE: a Concise Sparse Matrix package - Extended
 	  		AMD library
@@ -83,7 +82,6 @@ Heinrich Schuchardt	GLPK
 J.K. Reid 		GLPK
 C. Sansone		VF2 graph isomorphism algorithm
 Michael Schmuhl		The graphopt layout generator
-Christine Solnon	LAD graph isomorphism library
 Danny Sorensen		ARPACK
 James Theiler		GSL random number generators (not used in R)
 Samuel Thiriot		Interconnected islands graph generator
