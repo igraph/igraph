@@ -84,8 +84,9 @@ using namespace igraph::walktrap;
  * source code.
  *
  * </para><para>
- * Note that the graph must not contain isolated vertices in order to
- * use this method.
+ * In contrast to the original implementation, isolated vertices are allowed
+ * in the graph and they are assumed to have a single incident loop edge with
+ * weight 1.
  *
  * \param graph The input graph, edge directions are ignored.
  * \param weights Numeric vector giving the weights of the edges. 
@@ -139,7 +140,7 @@ int igraph_community_walktrap(const igraph_t *graph,
 
   Graph* G = new Graph;
   if (G->convert_from_igraph(graph, weights))
-      IGRAPH_ERROR("isolated vertex found in graph", IGRAPH_EINVAL);
+      IGRAPH_ERROR("Cannot convert igraph graph into walktrap format", IGRAPH_EINVAL);
   
   if (merges) {
     igraph_integer_t no;

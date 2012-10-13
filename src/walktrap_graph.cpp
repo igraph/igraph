@@ -150,13 +150,15 @@ int Graph::convert_from_igraph(const igraph_t *graph,
   int max_vertex=(int)igraph_vcount(graph)-1;
   long int no_of_edges=(long int)igraph_ecount(graph); 
   long int i;
+  long int deg;
+  double w;
   
   Edge_list EL;
   
   for (i=0; i<no_of_edges; i++) {
     igraph_integer_t from, to;
     int v1, v2;
-    float w=weights ? (float)VECTOR(*weights)[i] : 1.0;
+    w=weights ? VECTOR(*weights)[i] : 1.0;
     igraph_edge(graph, i, &from, &to);
     v1=(int)from; v2=(int)to;
     EL.add(v1, v2, w);
@@ -177,14 +179,12 @@ int Graph::convert_from_igraph(const igraph_t *graph,
     }
 
   for(int i = 0; i < G.nb_vertices; i++) {
-    if(G.vertices[i].degree == 0) {
-      delete[] G.vertices;
-      return IGRAPH_EINVAL;
-    }
-    G.vertices[i].edges = new Edge[G.vertices[i].degree + 1];
+    deg = G.vertices[i].degree;
+    w = (deg == 0) ? 1.0 : (G.vertices[i].total_weight / double(deg));
+    G.vertices[i].edges = new Edge[deg + 1];
     G.vertices[i].edges[0].neighbor = i;
-    G.vertices[i].edges[0].weight = G.vertices[i].total_weight/double(G.vertices[i].degree);
-    G.vertices[i].total_weight+= G.vertices[i].total_weight/double(G.vertices[i].degree);
+    G.vertices[i].edges[0].weight = w;
+    G.vertices[i].total_weight += w;
     G.vertices[i].degree = 1;
   }
  
