@@ -444,6 +444,8 @@ Communities::Communities(Graph* graph, int random_walks_length,
 
 /*   int c = 0; */
   Neighbor* N = H->get_first();  
+  if (N == 0)
+    return;   /* this can happen if there are no edges */
   while(!N->exact) {
     update_neighbor(N, compute_delta_sigma(N->community1, N->community2));
     N->exact = true;
