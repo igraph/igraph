@@ -1089,7 +1089,7 @@ int igraph_degree_sequence_game_no_multiple_directed(igraph_t *graph,
           VECTOR(residual_out_degrees)[from]++;
           VECTOR(residual_in_degrees)[to]++;
           IGRAPH_CHECK(igraph_set_add(&incomplete_out_vertices, from));
-          IGRAPH_CHECK(igraph_set_add(&incomplete_in_vertices, from));
+          IGRAPH_CHECK(igraph_set_add(&incomplete_in_vertices, to));
         } else {
           /* Insert the edge */
           IGRAPH_CHECK(igraph_vector_insert(neis, j, to));
@@ -1109,7 +1109,7 @@ int igraph_degree_sequence_game_no_multiple_directed(igraph_t *graph,
           j = 0;
           while (igraph_set_iterate(&incomplete_in_vertices, &j, &to)) {
             neis = igraph_adjlist_get(&al, from);
-            if (!igraph_vector_binsearch(neis, to, 0)) {
+            if (from != to && !igraph_vector_binsearch(neis, to, 0)) {
               /* Found a suitable pair, so we can continue */
               failed = 0;
               break;
