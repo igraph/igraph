@@ -20,14 +20,4 @@ Copyright (C) 2003-2006 Tommi Junttila
 #ifndef BLISS_UTILS_HH
 #define BLISS_UTILS_HH
 
-using namespace std;
-
-#include <cstdio>
-
-namespace igraph {
-
-void print_permutation(FILE *, const unsigned int N, const unsigned int *perm);
-
-}
-
 #endif
