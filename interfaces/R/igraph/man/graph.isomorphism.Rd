@@ -256,6 +256,9 @@ graph.isocreate(size, number, directed=TRUE)
   An improved algorithm for matching large graphs,
   \emph{Proc. of the 3rd IAPR TC-15 Workshop on Graphbased
     Representations in Pattern Recognition}, 149--159, 2001.
+
+  C. Solnon: AllDifferent-based Filtering for Subgraph Isomorphism,
+  \emph{Artificial Intelligence} 174(12-13):850--864, 2010.
 }
 \author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{graph.motifs}}}
