@@ -257,42 +257,6 @@ Cell *Partition::aux_split_in_two(Cell * const cell,
   return new_cell;
 } 
 
-
-void Partition::print(FILE *fp)
-{
-  const char *cell_sep = "";
-  fprintf(fp, "[");
-  for(Cell *cell = first_cell; cell; cell = cell->next)
-    {
-      fprintf(fp, "%s", cell_sep);
-      cell_sep = ",";
-      /* Print cell */
-      const char *elem_sep = "";
-      fprintf(fp, "{");
-      for(unsigned int i = 0; i < cell->length; i++)
-	{
-	  fprintf(fp, "%s%u", elem_sep, elements[cell->first + i]);
-	  elem_sep = ",";
-	}
-      fprintf(fp, "}");
-    }
-  fprintf(fp, "]");
-}
-
-
-void Partition::print_signature(FILE *fp)
-{
-  const char *cell_sep = "";
-  fprintf(fp, "[");
-  for(Cell *cell = first_cell; cell; cell = cell->next)
-    {
-      fprintf(fp, "%s%u", cell_sep, cell->length);
-      cell_sep = ",";
-    }
-  fprintf(fp, "]");
-}
-
-
 void Partition::add_in_splitting_queue(Cell * const cell)
 {
   static const unsigned int smallish_cell_threshold = 1;
