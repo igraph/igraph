@@ -140,6 +140,13 @@ D. Morton de Lachapelle, D. Gfeller, and P. De Los Rios, Shrinking
   \code{\link{scgNormEps}}, \code{\link{scgGrouping}} and
   \code{\link{scgSemiProjectors}}.}
 \examples{
+
+## We are not running these examples any more, because they
+## take a long time (~20 seconds) to run and this is against the CRAN
+## repository policy. Copy and paste them by hand to your R prompt if
+## you want to run them.
+
+\dontrun{
 # SCG of a toy network
 g <- graph.full(5) \%du\% graph.full(5) \%du\% graph.full(5)
 g <- add.edges(g, c(1,6, 1,11, 6, 11))
@@ -151,7 +158,7 @@ nt <- vcount(cg$Xt)
 col <- rainbow(nt)
 vsize <- table(cg$groups)
 ewidth <- round(E(cg$Xt)$weight,2)
-\dontrun{
+
 op <- par(mfrow=c(1,2))
 plot(g, vertex.color = col[cg$groups], vertex.size = 20,
 		vertex.label = NA, layout = layout)
@@ -159,7 +166,6 @@ plot(cg$Xt, edge.width = ewidth, edge.label = ewidth,
 	vertex.color = col, vertex.size = 20*vsize/max(vsize),
 	vertex.label=NA, layout = layout.kamada.kawai)
 par(op)
-}
 
 ## SCG of real-world network
 library(igraphdata)
@@ -185,23 +191,23 @@ print(res)
 com <- scg(graph.laplacian(immuno), ev=n-c(1,2), nt=2)$groups
 col <- rainbow(max(com))
 layout <- layout.auto(immuno)
-\dontrun{
+
 plot(immuno, layout=layout, vertex.size=3, vertex.color=col[com],
                 vertex.label=NA)
-}
 
 ## display the coarse-grained graph
 gt <- simplify(as.undirected(gt))
 layout.cg <- layout.kamada.kawai(gt)
 com.cg <- scg(graph.laplacian(gt), nt-c(1,2), 2)$groups
 vsize <- sqrt(as.vector(table(cg$groups)))
-\dontrun{
+
 op <- par(mfrow=c(1,2))
 plot(immuno, layout=layout, vertex.size=3, vertex.color=col[com],
                 vertex.label=NA)
 plot(gt, layout=layout.cg, vertex.size=15*vsize/max(vsize), 
                 vertex.color=col[com.cg],vertex.label=NA)
 par(op)
+
 }
 }
 \keyword{graphs}
