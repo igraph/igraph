@@ -1,4 +1,4 @@
-library(igraph) ;library(Cairo)
+library(igraph)
 
 g <- read.graph("karate.net", format="pajek")
 l <- layout.kamada.kawai(g, niter=1000)
@@ -16,12 +16,12 @@ for (i in 1:20) {
   q <- modularity(g, cl)
 
   E(g2)$color <- "grey"
-  E(g2)[ order(eb, decreasing=TRUE)[1:5]-1 ]$color <- colbar2[1:5]
+  E(g2)[ order(eb, decreasing=TRUE)[1:5] ]$color <- colbar2[1:5]
 
   E(g2)$width <- 1
   E(g2)[ color != "grey" ]$width <- 2
 
-  # CairoPNG(sprintf("eb-community-%04d.png", i))
+  # png(sprintf("eb-community-%04d.png", i))
   plot(g2, layout=l, vertex.size=6, vertex.label=NA,
        edge.label.color="red", vertex.color=colbar[cl+2],
        edge.label.font=2)
@@ -31,5 +31,5 @@ for (i in 1:20) {
        font=2)
 
   # dev.off()
-  scan()
+  if (interactive()) Sys.sleep(1)
 }
