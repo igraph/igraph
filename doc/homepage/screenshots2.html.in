@@ -21,23 +21,7 @@ Cairo package installed, just remove the
 here</a>.</p>
 
 <pre class="programlisting condensed">
-library(igraph)
-library(Cairo)
-
-graphs &lt;- frgraphs()
-lay &lt;- lapply(graphs, layout.fruchterman.reingold, niter=3000)
-
-CairoX11()
-# CairoPNG(file="frplots.png")
-par(mai=c(0,0,0,0))
-layout(matrix(1:16, nr=4, byrow=TRUE))
-layout.show(16)
-for (i in seq(along=graphs)) {
-  plot(graphs[[i]], layout=lay[[i]],
-       vertex.label=NA, vertex.size=13, edge.color="black",
-       vertex.color="red")
-}
-# dev.off()
+<example language="R" file="fralgo.R" />
 </pre>
 </div>
 
@@ -54,21 +38,7 @@ for small graphs. It is a little toy only, but can be useful if you
 want to adjust the layout of small graphs. Here is how we generated 
 this picture:</p>
 <pre class="programlisting condensed">
-library(igraph)
-g &lt;- read.graph("karate.net", format="pajek")
-
-cs &lt;- leading.eigenvector.community.step(g)
-V(g)$color &lt;- ifelse(cs$membership==0, "lightblue", "green")
-
-scale &lt;- function(v, a, b) {
-  v &lt;- v-min(v) ; v &lt;- v/max(v) ; v &lt;- v * (b-a) ; v+a
-}
-
-V(g)$size &lt;- scale(abs(cs$eigenvector), 10, 20)
-E(g)$color &lt;- "grey"
-E(g)[ V(g)[ color=="lightblue" ] %--% V(g)[ color=="green" ] ]$color &lt;- "red"
-
-tkplot(g, layout=layout.kamada.kawai, vertex.label.font=2)
+<example language="R" file="tkplot.R" />
 </pre>
 <p>After hand-tuning the layout, you can obtain the new coordinates
 using the id of the plot, as shown on the window border:</p>
@@ -89,38 +59,7 @@ coords &lt;- tkplot.getcoords(7)
 <p>The graphics device from the Cairo R package handles 
 transparency, we use this to plot one graph on top of another.</p>
 <pre class="programlisting condensed">
-library(igraph) ; library(Cairo)
-
-g &lt;- barabasi.game(100, power=0.6, m=10)
-V(g)$name &lt;- seq(vcount(g))-1
-g &lt;- simplify(g)
-l &lt;- layout.fruchterman.reingold(g)
-l &lt;- layout.norm(l, -1,1, -1,1) 
-
-fcs &lt;- fastgreedy.community(simplify(as.undirected(g)))
-Q &lt;- round(max(fcs$modularity), 3)
-fcs &lt;- community.to.membership(g, fcs$merges, steps=which.max(fcs$modularity)-1 )
-
-CairoX11() # or CairoPNG(file="fastgreedy.png")
-
-plot(g, layout=l, vertex.size=3, vertex.label=NA, vertex.color="#ff000033",
-     vertex.frame.color="#ff000033", edge.color="#55555533", edge.arrow.size=0.3,
-     rescale=FALSE, xlim=range(l[,1]), ylim=range(l[,2]),
-     main=paste(sep="", "Fast greedy community detection,\nQ=", Q))
-
-g2 &lt;- subgraph(g, which(fcs$membership==fcs$membership[1])-1)
-l2 &lt;- l[ which(fcs$membership==fcs$membership[1]), ]
-
-plot(g2, layout=l2, vertex.size=3, vertex.label=V(g2)$name,
-     vertex.color="#ff0000", vertex.frame.color="#ff0000", edge.color="#555555",
-     vertex.label.dist=0.5, vertex.label.cex=0.8, vertex.label.font=2,
-     edge.arrow.size=0.3, add=TRUE, rescale=FALSE)
-
-nodes &lt;- which(fcs$membership==fcs$membership[1])-1
-nodes &lt;- paste(collapse=", ", nodes)
-text(0,-1.3, nodes, col="blue")
-
-# dev.off()
+<example language="R" file="transparency.R" />
 </pre>
 </div>
 
@@ -144,15 +83,7 @@ Components are colored with different colors according to their size,
 isolated vertices are colored with light gray.</p>
 
 <pre class="programlisting condensed">
-from igraph import *
-
-g = Graph.Erdos_Renyi(n=300, m=250)
-colors = ["lightgray", "cyan", "magenta", "yellow", "blue", "green", "red"]
-for component in g.components():
-  color = colors[min(6, len(component)-1)]
-  for vidx in component: g.vs[vidx]["color"] = color
-  
-plot(g, layout="fr", vertex_label=None)
+<example language="Python" file="ERcomps.py" />
 </pre>
 </div>
 
@@ -175,14 +106,7 @@ the inner structure of the graph. The adjacency matrix is shown as an
 inset in the upper right corner with opacity 0.7.</p>
 
 <pre class="programlisting condensed">
-from igraph import *
-
-g = Graph.Kautz(m=3, n=2)
-adj = g.get_adjacency()
-fig = Plot(bbox=(480, 480))
-fig.add(g, layout="fr", vertex_label=None)
-fig.add(adj, bbox=(360, 0, 480, 120), grid_width=0, opacity=0.7)
-fig.show()
+<example language="Python" file="kautz.py" />
 </pre>
 </div>
 
@@ -203,23 +127,7 @@ widths of the edges are proportional to the closeness of the endpoints
 calculated minimum weight spanning tree of the graph.</p>
 
 <pre class="programlisting condensed">
-from igraph import *
-
-def distance(p1, p2):
-    return ((p1[0]-p2[0]) ** 2 + (p1[1]-p2[1]) ** 2) ** 0.5
-    
-g, xs, ys = Graph.GRG(100, 0.2, return_coordinates=True)
-layout = Layout(zip(xs, ys))
-
-weights = [distance(layout[edge.source], layout[edge.target]) for edge in g.es]
-max_weight = max(weights)
-g.es["width"] = [6 - 5*weight/max_weight for weight in weights]
-mst = g.spanning_tree(weights)
-
-fig = Plot()
-fig.add(g, layout=layout, opacity=0.25, vertex_label=None)
-fig.add(mst, layout=layout, edge_color="red", vertex_label=None)
-fig.show()
+<example language="Python" file="mst.py" />
 </pre>
 </div>
 
@@ -235,26 +143,7 @@ fig.show()
 <p>This example shows how vertices along a path (the diameter in this case)
 can be selected. We use the igraph R package.</p>
 <pre class="programlisting condensed">
-library(igraph)
-
-g &lt;- read.graph("karate.net", format="pajek")
-d &lt;- get.diameter(g)
-
-E(g)$color &lt;- "grey"
-E(g)$width &lt;- 1
-E(g, path=d)$color &lt;- "red"
-E(g, path=d)$width &lt;- 2
-V(g)$label.color &lt;- "blue"
-V(g)$color  &lt;- "SkyBlue2"
-V(g)[ d ]$label.color &lt;- "black"
-V(g)[ d ]$color &lt;- "red"
-
-plot(g, layout=layout.fruchterman.reingold, 
-     vertex.label.dist=0, vertex.size=15)
-title(main="Diameter of the Zachary Karate Club network",
-      xlab="created by igraph 0.4")
-axis(1, labels=FALSE, tick=TRUE)
-axis(2, labels=FALSE, tick=TRUE)
+<example language="R" file="diameter.R" />
 </pre>
 <p>You can find the <a href="karate.net">karate.net file here.</a></p>
 </div>
@@ -271,24 +160,7 @@ axis(2, labels=FALSE, tick=TRUE)
 if we change the exponent of the preferential attachment process.
 We use the igraph R package.</p>
 <pre class="programlisting condensed">
-library(igraph)
-
-g &lt;- barabasi.game(100000)
-d &lt;- degree(g, mode="in")
-dd &lt;- degree.distribution(g, mode="in", cumulative=TRUE)
-alpha &lt;- power.law.fit(d, xmin=20)
-plot(dd, log="xy", xlab="degree", ylab="cumulative frequency",
-     col=1, main="Nonlinear preferential attachment")
-lines(10:500, 10*(10:500)^(-coef(alpha)+1))
-
-powers &lt;- c(0.9, 0.8, 0.7, 0.6)
-for (p in seq(powers)) {
-  g &lt;- barabasi.game(100000, power=powers[p])
-  dd &lt;- degree.distribution(g, mode="in", cumulative=TRUE)
-  points(dd, col=p+1, pch=p+1)
-}
-
-legend(1, 1e-5, c(1,powers), col=1:5, pch=1:5, ncol=1, yjust=0, lty=0)
+<example language="R" file="degreedist.R" />
 </pre>
 </div>
 
@@ -302,13 +174,7 @@ legend(1, 1e-5, c(1,powers), col=1:5, pch=1:5, ncol=1, yjust=0, lty=0)
 <p>We use the R package and convert the output of the Walktrap
 community finding algorithm to a dendrogram.</p>
 <pre class="programlisting condensed">
-library(igraph)
-g &lt;- read.graph("karate.net", format="pajek")
-
-wt &lt;- walktrap.community(g, modularity=TRUE)
-dend &lt;- as.dendrogram(wt, use.modularity=TRUE)
-plot(dend, nodePar=list(pch=c(NA, 20)))
-
+<example language="R" file="dendrogram.R" />
 </pre>
 <p>You can find the <a href="karate.net">karate.net file here.</a></p>
 </div>
@@ -333,40 +199,6 @@ Download the animation:
 <a href="images/screenshots/eb.mng">MNG file.</a>
 </p>
 <pre class="programlisting condensed">
-library(igraph) ;library(Cairo)
-
-g &lt;- read.graph("karate.net", format="pajek")
-l &lt;- layout.kamada.kawai(g, niter=1000)
-ebc &lt;- edge.betweenness.community(g)
-
-colbar &lt;- rainbow(6)
-colbar2 &lt;- c(rainbow(5), rep("black",15))
-
-for (i in 1:20) {
-
-  g2 &lt;- delete.edges(g, ebc$removed.edges[seq(length=i-1)])
-  
-  eb &lt;- edge.betweenness(g2)
-  cl &lt;- clusters(g2)$membership
-  q &lt;- modularity(g, cl)
-
-  E(g2)$color &lt;- "grey"
-  E(g2)[ order(eb, decreasing=TRUE)[1:5]-1 ]$color &lt;- colbar2[1:5]
-
-  E(g2)$width &lt;- 1
-  E(g2)[ color != "grey" ]$width &lt;- 2
-
-  # CairoPNG(sprintf("eb-community-%04d.png", i))
-  plot(g2, layout=l, vertex.size=6, vertex.label=NA,
-       edge.label.color="red", vertex.color=colbar[cl+2],
-       edge.label.font=2)
-  title(main=paste("Q=", round(q,3)), font=2)
-  ty &lt;- seq(1,by=-strheight("1")*1.5, length=20)
-  text(-1.3, ty, adj=c(0,0.5), round(sort(eb, dec=TRUE)[1:20],2), col=colbar2,
-       font=2)
-
-  # dev.off()
-  scan()
-}
+<example language="R" file="animation.R" />
 </pre>
 </div>
