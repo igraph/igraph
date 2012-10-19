@@ -161,4 +161,10 @@ tests:
 	cd igraph/tests && echo "tools:::.runPackageTestsR()" | \
 	R --no-save && echo
 
+homepagetests:
+	$(eval $@_TMP := $(shell mktemp -d -t igraph))
+	cp -r ../../doc/homepage/examples $($@_TMP) && \
+	cd $($@_TMP)/examples && echo "tools:::.runPackageTestsR()" | \
+	R --no-save && echo
+
 .PHONY: tests
