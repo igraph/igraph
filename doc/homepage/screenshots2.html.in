@@ -11,12 +11,6 @@
 visually appealing placements for vertices. It works well on unconnected 
 graphs and can be used up to a couple of thousand vertices.</p>
 
-<p>In this example we use the igraph R package, and its Cairo device, 
-as it can produce nice antialiased pictures. If you don't have the
-Cairo package installed, just remove the 
-<code>CairoX11()</code> line from the code.
-</p>
-
 <p>The <code>frgraphs()</code> function is <a href="frgraphs.R">available
 here</a>.</p>
 
@@ -51,13 +45,13 @@ coords &lt;- tkplot.getcoords(7)
 <hr style="clear:both"/>
 
 <a name="3"></a>
-<h3 style="clear:both">Transparency with the Cairo R package</h3>
+<h3 style="clear:both">Transparency</h3>
 
 <img class="float_right" width="497" height="596" alt="Illustration" src="images/screenshots/fastgreedy.png"/>
 
 <div style="border-right: 507px solid white">
-<p>The graphics device from the Cairo R package handles 
-transparency, we use this to plot one graph on top of another.</p>
+<p>The R graphics device handles transparency (on most platforms), we
+  use this to plot one graph on top of another.</p> 
 <pre class="programlisting condensed">
 <example language="R" file="transparency.R" />
 </pre>

@@ -15,7 +15,7 @@ V(g)[ d ]$color <- "red"
 plot(g, layout=layout.fruchterman.reingold, 
      vertex.label.dist=0, vertex.size=15)
 title(main="Diameter of the Zachary Karate Club network",
-      xlab="created by igraph 0.4")
+      xlab=paste("created by igraph", packageVersion("igraph")))
 axis(1, labels=FALSE, tick=TRUE)
 axis(2, labels=FALSE, tick=TRUE)
 
