@@ -1,11 +1,10 @@
 library(igraph)
-library(Cairo)
 
+source("frgraphs.R")
 graphs <- frgraphs()
 lay <- lapply(graphs, layout.fruchterman.reingold, niter=3000)
 
-CairoX11()
-# CairoPNG(file="frplots.png")
+# png(file="frplots.png")
 par(mai=c(0,0,0,0))
 layout(matrix(1:16, nr=4, byrow=TRUE))
 layout.show(16)
