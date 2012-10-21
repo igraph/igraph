@@ -2508,6 +2508,36 @@ PyObject *igraphmodule_Graph_Kautz(PyTypeObject *type, PyObject *args,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Generates a k-regular random graph
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_k_regular_game
+ */
+PyObject *igraphmodule_Graph_K_Regular(PyTypeObject * type,
+                                 PyObject * args, PyObject * kwds)
+{
+  igraphmodule_GraphObject *self;
+  igraph_t g;
+  long int n, k;
+  PyObject *directed_o = Py_False, *multiple_o = Py_False;
+
+  static char *kwlist[] = { "n", "k", "directed", "multiple", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|OO", kwlist,
+                                   &n, &k, &directed_o, &multiple_o))
+    return NULL;
+
+  if (igraph_k_regular_game(&g, (igraph_integer_t) n, (igraph_integer_t) k,
+                      PyObject_IsTrue(directed_o), PyObject_IsTrue(multiple_o))) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+
+  return (PyObject*)self;
+}
+
+/** \ingroup python_interface_graph
  * \brief Generates a regular lattice
  * \return a reference to the newly generated Python igraph object
  * \sa igraph_lattice
@@ -11335,6 +11365,21 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param m: the size of the alphabet minus one\n"
    "@param n: the length of the strings minus one\n"
    },
+
+  /* interface to igraph_k_regular */
+  {"K_Regular", (PyCFunction) igraphmodule_Graph_K_Regular,
+   METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+   "K_Regular(n, k, directed=False, multiple=False)\n\n"
+   "Generates a k-regular random graph\n\n"
+   "A k-regular random graph is a random graph where each vertex has degree k.\n"
+   "If the graph is directed, both the in-degree and the out-degree of each vertex\n"
+   "will be k.\n\n"
+   "@param n: The number of vertices in the graph\n\n"
+   "@param k: The degree of each vertex if the graph is undirected, or the in-degree\n"
+   "  and out-degree of each vertex if the graph is directed\n"
+   "@param directed: whether the graph should be directed.\n"
+   "@param multiple: whether it is allowed to create multiple edges.\n"
+  },
 
   /* interface to igraph_preference_game */
   {"Preference", (PyCFunction) igraphmodule_Graph_Preference,
