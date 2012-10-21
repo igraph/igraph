@@ -1,0 +1,103 @@
+
+R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> set.seed(42)
+> g1 <- bipartite.random.game(10, 5, type="gnp", p=.1)
+> str(g1)
+IGRAPH U--B 15 7 -- Bipartite Gnp random graph
++ attr: name (g/c), p (g/n), type (v/l)
++ edges:
+[1]  4--11  7--11 10--11  5--12  4--13  7--13  9--15
+> 
+> g2 <- bipartite.random.game(10, 5, type="gnp", p=.1, directed=TRUE)
+> str(g2)
+IGRAPH D--B 15 6 -- Bipartite Gnp random graph
++ attr: name (g/c), p (g/n), type (v/l)
++ edges:
+[1]  5->11  1->12  2->12  4->12  9->14 10->15
+> 
+> g3 <- bipartite.random.game(10, 5, type="gnp", p=.1, directed=TRUE, mode="in")
+> str(g3)
+IGRAPH D--B 15 7 -- Bipartite Gnp random graph
++ attr: name (g/c), p (g/n), type (v/l)
++ edges:
+[1] 11->3 11->6 12->2 13->6 13->9 14->9 15->2
+> 
+> g4 <- bipartite.random.game(10, 5, type="gnm", m=8)
+> str(g4)
+IGRAPH U--B 15 8 -- Bipartite Gnm random graph
++ attr: name (g/c), m (g/n), type (v/l)
++ edges:
+[1]  2--11  5--13  9--13  2--14  6--15  7--15  9--15 10--15
+> 
+> g5 <- bipartite.random.game(10, 5, type="gnm", m=8, directed=TRUE)
+> str(g5)
+IGRAPH D--B 15 8 -- Bipartite Gnm random graph
++ attr: name (g/c), m (g/n), type (v/l)
++ edges:
+[1] 2->11 6->11 5->12 8->13 8->14 2->15 4->15 5->15
+> 
+> g6 <- bipartite.random.game(10, 5, type="gnm", m=8, directed=TRUE, mode="in")
+> str(g6)
+IGRAPH D--B 15 8 -- Bipartite Gnm random graph
++ attr: name (g/c), m (g/n), type (v/l)
++ edges:
+[1] 11-> 1 11-> 2 11-> 5 12-> 4 12->10 13-> 3 13-> 9 15-> 3
+> 
+> #####
+> 
+> library(igraph)
+> 
+> g7 <- bipartite.random.game(10, 5, type="gnp", p=0.9999, directed=TRUE,
++                             mode="all")
+> str(g7)
+IGRAPH D--B 15 100 -- Bipartite Gnp random graph
++ attr: name (g/c), p (g/n), type (v/l)
++ edges:
+ 1 -> 11 12 13 14 15                   2 -> 11 12 13 14 15               
+ 3 -> 11 12 13 14 15                   4 -> 11 12 13 14 15               
+ 5 -> 11 12 13 14 15                   6 -> 11 12 13 14 15               
+ 7 -> 11 12 13 14 15                   8 -> 11 12 13 14 15               
+ 9 -> 11 12 13 14 15                  10 -> 11 12 13 14 15               
+11 ->  1  2  3  4  5  6  7  8  9 10   12 ->  1  2  3  4  5  6  7  8  9 10
+13 ->  1  2  3  4  5  6  7  8  9 10   14 ->  1  2  3  4  5  6  7  8  9 10
+15 ->  1  2  3  4  5  6  7  8  9 10
+> 
+> g8 <- bipartite.random.game(10, 5, type="gnm", m=99, directed=TRUE,
++                             mode="all")
+> str(g8)
+IGRAPH D--B 15 99 -- Bipartite Gnm random graph
++ attr: name (g/c), m (g/n), type (v/l)
++ edges:
+ 1 -> 11 12 13 14 15                   2 -> 11 12 13 14 15               
+ 3 -> 11 12 13 14 15                   4 -> 11 12 13 14 15               
+ 5 -> 11 12 13 14 15                   6 -> 11 12 13 14 15               
+ 7 -> 11 12 13 14 15                   8 -> 11 12 13 14 15               
+ 9 -> 11 12 13 14 15                  10 -> 11 12 13 14 15               
+11 ->  1  2  3  4  5  6  7  8  9 10   12 ->  1  2  3  4  5  6  7  8  9 10
+13 ->  1  2  3  4  5  6  7  8  9 10   14 ->  1  3  4  5  6  7  8  9 10   
+15 ->  1  2  3  4  5  6  7  8  9 10
+> 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  0.310   0.039   0.336 

@@ -461,3 +461,45 @@ simple.interconnected.islands.game <- function(islands.n, islands.size, islands.
 }
 
 
+bipartite.random.game <- function(n1, n2, type=c("gnp", "gnm"), p, m,
+                                  directed=FALSE, mode=c("out", "in",
+                                                    "all")) {
+  
+  n1 <- as.integer(n1)
+  n2 <- as.integer(n2)
+  type <- igraph.match.arg(type)
+  if (!missing(p)) { p <- as.numeric(p) }
+  if (!missing(m)) { m <- as.integer(m) }
+  directed <- as.logical(directed)
+  mode <- switch(igraph.match.arg(mode), "out"=1, "in"=2, "all"=3)
+
+  if (type=="gnp" && missing(p)) {
+    stop("Connection probability `p' is not given for Gnp graph")
+  }
+  if (type=="gnp" && !missing(m)) {
+    warning("Number of edges `m' is ignored for Gnp graph")
+  }
+  if (type=="gnm" && missing(m)) {
+    stop("Number of edges `m' is not given for Gnm graph")
+  }
+  if (type=="gnm" && !missing(p)) {
+    warning("Connection probability `p' is ignored for Gnp graph")
+  }
+  
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  if (type=="gnp") {      
+    res <- .Call("R_igraph_bipartite_game_gnp", n1, n2, p, directed, mode,
+                 PACKAGE="igraph")
+    res <- set.vertex.attribute(res$graph, "type", value=res$types)
+    res$name <- "Bipartite Gnp random graph"
+    res$p <- p
+  } else if (type=="gnm") {
+    res <- .Call("R_igraph_bipartite_game_gnm", n1, n2, m, directed, mode,
+                 PACKAGE="igraph")
+    res <- set.vertex.attribute(res$graph, "type", value=res$types)
+    res$name <- "Bipartite Gnm random graph"
+    res$m <- m
+  }
+
+  res
+}
