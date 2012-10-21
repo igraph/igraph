@@ -1239,8 +1239,9 @@ int igraph_degree_sequence_game_vl(igraph_t *graph,
  *           \p in_deg 
  *           should match for directed graphs.
  * 
- * Time complexity: O(|V|+|E|), the
- * number of vertices plus the number of edges.
+ * Time complexity: O(|V|+|E|), the number of vertices plus the number of edges
+ *                  for \c IGRAPH_DEGSEQ_SIMPLE. The time complexity of the
+ *                  other modes is not known.
  * 
  * \sa \ref igraph_barabasi_game(), \ref igraph_erdos_renyi_game(),
  *     \ref igraph_is_degree_sequence(),
@@ -1260,7 +1261,7 @@ int igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
   } else if (method==IGRAPH_DEGSEQ_VL) {
     retval=igraph_degree_sequence_game_vl(graph, out_deg, in_deg);
   } else if (method==IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE) {
-    if (in_deg == 0 || igraph_vector_empty(in_deg)) {
+    if (in_deg == 0 || (igraph_vector_empty(in_deg) && !igraph_vector_empty(out_deg))) {
       retval=igraph_degree_sequence_game_no_multiple_undirected(graph, out_deg);
     } else {
       retval=igraph_degree_sequence_game_no_multiple_directed(graph, out_deg, in_deg);
@@ -3805,4 +3806,62 @@ int igraph_static_power_law_game(igraph_t *graph,
 
   return IGRAPH_SUCCESS;
 }
+
+
+/**
+ * \ingroup generators
+ * \function igraph_k_regular_game
+ * \brief Generates a random graph where each vertex has the same degree.
+ *
+ * This game generates a directed or undirected random graph where the
+ * degrees of vertices are equal to a predefined constant k. For undirected
+ * graphs, at least one of k and the number of vertices must be even.
+ *
+ * </para><para>
+ * The game simply uses \ref igraph_degree_sequence_game with appropriately
+ * constructed degree sequences.
+ *
+ * \param graph        Pointer to an uninitialized graph object.
+ * \param no_of_nodes  The number of nodes in the generated graph.
+ * \param k            The degree of each vertex in an undirected graph, or
+ *                     the out-degree and in-degree of each vertex in a
+ *                     directed graph.
+ * \param directed     Whether the generated graph will be directed.
+ * \param multiple     Whether to allow multiple edges in the generated graph.
+ *
+ * \return Error code:
+ *         \c IGRAPH_EINVAL: invalid parameter; e.g., negative number of nodes,
+ *                           or odd number of nodes and odd k for undirected
+ *                           graphs.
+ *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.
+ * 
+ * Time complexity: O(|V|+|E|) if \c multiple is true, otherwise not known.
+ */
+int igraph_k_regular_game(igraph_t *graph,
+    igraph_integer_t no_of_nodes, igraph_integer_t k,
+    igraph_bool_t directed, igraph_bool_t multiple) {
+  igraph_vector_t degseq;
+  igraph_degseq_t mode = multiple ? IGRAPH_DEGSEQ_SIMPLE : IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE;
+
+  /* Note to self: we are not using IGRAPH_DEGSEQ_VL when multiple = false
+   * because the VL method is not really good at generating k-regular graphs.
+   * Actually, that's why we have added SIMPLE_NO_MULTIPLE. */
+
+  if (no_of_nodes < 0) {
+    IGRAPH_ERROR("number of nodes must be non-negative", IGRAPH_EINVAL);
+  }
+  if (k < 0) {
+    IGRAPH_ERROR("degree must be non-negative", IGRAPH_EINVAL);
+  }
+
+  IGRAPH_CHECK(igraph_vector_init(&degseq, no_of_nodes));
+  igraph_vector_fill(&degseq, k);
+  IGRAPH_CHECK(igraph_degree_sequence_game(graph, &degseq, directed ? &degseq : 0, mode));
+
+  igraph_vector_destroy(&degseq);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return IGRAPH_SUCCESS;
+}
+
 
