@@ -8,3 +8,23 @@ alpha.centrality(g.1)
 alpha.centrality(g.2)
 alpha.centrality(g.3,alpha=0.5)
 
+alpha.centrality(g.1, sparse=FALSE)
+alpha.centrality(g.2, sparse=FALSE)
+alpha.centrality(g.3, alpha=0.5, sparse=FALSE)
+
+##############################
+## weighted version
+
+set.seed(42)
+
+star <- graph.star(10)
+E(star)$weight <- runif(ecount(star))
+
+alpha.centrality(star, sparse=TRUE)
+alpha.centrality(star, sparse=FALSE)
+
+alpha.centrality(star, weights="weight", sparse=TRUE)
+alpha.centrality(star, weights="weight", sparse=FALSE)
+
+alpha.centrality(star, weights=NA, sparse=TRUE)
+alpha.centrality(star, weights=NA, sparse=FALSE)
