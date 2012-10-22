@@ -1982,7 +1982,7 @@ PyObject *igraphmodule_Graph_Degree_Sequence(PyTypeObject * type,
 }
 
 /** \ingroup python_interface_graph
- * \brief Generates a graph based on the Erdõs-Rényi model
+ * \brief Generates a graph based on the Erdos-Renyi model
  * \return a reference to the newly generated Python igraph object
  * \sa igraph_erdos_renyi_game
  */
@@ -1994,51 +1994,33 @@ PyObject *igraphmodule_Graph_Erdos_Renyi(PyTypeObject * type,
   long n, m = -1;
   double p = -1.0;
   igraph_erdos_renyi_t t;
-  PyObject *loops = NULL, *directed = NULL;
+  PyObject *loops = Py_False, *directed = Py_False;
 
   static char *kwlist[] = { "n", "p", "m", "directed", "loops", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|dlO!O!", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|dlOO", kwlist,
                                    &n, &p, &m,
-                                   &PyBool_Type, &directed,
-                                   &PyBool_Type, &loops))
+                                   &directed,
+                                   &loops))
     return NULL;
-
-  if (n < 0) {
-    PyErr_SetString(PyExc_ValueError, "Number of vertices must be positive.");
-    return NULL;
-  }
 
   if (m == -1 && p == -1.0) {
-    // no density parameters were given, throw exception
+    /* no density parameters were given, throw exception */
     PyErr_SetString(PyExc_TypeError, "Either m or p must be given.");
     return NULL;
   }
   if (m != -1 && p != -1.0) {
-    // both density parameters were given, throw exception
+    /* both density parameters were given, throw exception */
     PyErr_SetString(PyExc_TypeError, "Only one must be given from m and p.");
     return NULL;
   }
 
   t = (m == -1) ? IGRAPH_ERDOS_RENYI_GNP : IGRAPH_ERDOS_RENYI_GNM;
 
-  if (t == IGRAPH_ERDOS_RENYI_GNP) {
-    if (p < 0.0 || p > 1.0) {
-      // Invalid probability was given, throw exception
-      PyErr_SetString(PyExc_ValueError, "p must be between 0 and 1.");
-      return NULL;
-    }
-  } else {
-    if (m < 0 || ((double)m)/n > n ) {
-      // Invalid edge count was given, throw exception
-      PyErr_SetString(PyExc_ValueError, "m must be between 0 and n^2.");
-      return NULL;
-    }
-  }
-
   if (igraph_erdos_renyi_game(&g, t, (igraph_integer_t) n,
-                              (igraph_real_t) ((t == IGRAPH_ERDOS_RENYI_GNM) ? m : p),
-							  (directed == Py_True), (loops == Py_True))) {
+                              (igraph_real_t) (m == -1 ? p : m),
+                              PyObject_IsTrue(directed),
+                              PyObject_IsTrue(loops))) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -2811,6 +2793,70 @@ PyObject *igraphmodule_Graph_Asymmetric_Preference(PyTypeObject * type,
   igraph_matrix_destroy(&pm);
   igraph_matrix_destroy(&td);
   return (PyObject *) self;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Generates a bipartite graph based on the Erdos-Renyi model
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_bipartite_game
+ */
+PyObject *igraphmodule_Graph_Random_Bipartite(PyTypeObject * type,
+                                              PyObject * args, PyObject * kwds)
+{
+  igraphmodule_GraphObject *self;
+  igraph_t g;
+  long int n1, n2, m = -1;
+  double p = -1.0;
+  igraph_erdos_renyi_t t;
+  igraph_neimode_t neimode = IGRAPH_ALL;
+  PyObject *directed_o = Py_False, *neimode_o = NULL;
+  igraph_vector_bool_t vertex_types;
+  PyObject *vertex_types_o;
+
+  static char *kwlist[] = { "n1", "n2", "p", "m", "directed", "neimode", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|dlOO", kwlist,
+                                   &n1, &n2, &p, &m, &directed_o, &neimode_o))
+    return NULL;
+
+  if (m == -1 && p == -1.0) {
+    /* no density parameters were given, throw exception */
+    PyErr_SetString(PyExc_TypeError, "Either m or p must be given.");
+    return NULL;
+  }
+  if (m != -1 && p != -1.0) {
+    /* both density parameters were given, throw exception */
+    PyErr_SetString(PyExc_TypeError, "Only one must be given from m and p.");
+    return NULL;
+  }
+
+  t = (m == -1) ? IGRAPH_ERDOS_RENYI_GNP : IGRAPH_ERDOS_RENYI_GNM;
+
+  if (igraphmodule_PyObject_to_neimode_t(neimode_o, &neimode))
+    return NULL;
+
+  if (igraph_vector_bool_init(&vertex_types, n1+n2)) {
+	igraphmodule_handle_igraph_error();
+	return NULL;
+  }
+
+  if (igraph_bipartite_game(&g, &vertex_types, t,
+		(igraph_integer_t) n1, (igraph_integer_t) n2,
+		(igraph_real_t) p, (igraph_integer_t) m, 
+		PyObject_IsTrue(directed_o), neimode)) {
+	igraph_vector_bool_destroy(&vertex_types);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+
+  vertex_types_o = igraphmodule_vector_bool_t_to_PyList(&vertex_types);
+  igraph_vector_bool_destroy(&vertex_types);
+  if (vertex_types_o == 0)
+	return NULL;
+
+  return Py_BuildValue("NN", (PyObject *) self, vertex_types_o);
 }
 
 /** \ingroup python_interface_graph
@@ -11683,6 +11729,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  types. If C{None}, vertex types are not stored.\n"
    "@param directed: whether to generate a directed graph.\n"
    "@param loops: whether loop edges are allowed.\n"},
+
+  /* interface to igraph_bipartite_game */
+  {"_Random_Bipartite", (PyCFunction) igraphmodule_Graph_Random_Bipartite,
+   METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+   "_Random_Bipartite(n1, n2, p=None, m=None, directed=False, neimode=\"all\")\n\n"
+   "Internal function, undocumented.\n\n"
+   "@see: Graph.Random_Bipartite()\n\n"},
 
   /* interface to igraph_recent_degree_game */
   {"Recent_Degree", (PyCFunction) igraphmodule_Graph_Recent_Degree,

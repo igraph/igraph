@@ -2379,6 +2379,7 @@ class Graph(GraphBase):
 
     #############################################
     # Friendlier interface for bipartite methods
+    
     @classmethod
     def Bipartite(klass, types, *args, **kwds):
         """Bipartite(types, edges, directed=False)
@@ -2436,6 +2437,34 @@ class Graph(GraphBase):
           stores the vertex classes.
         """
         result, types = klass._Full_Bipartite(*args, **kwds)
+        result.vs["type"] = types
+        return result
+
+    @classmethod
+    def Random_Bipartite(klass, *args, **kwds):
+        """Generates a random bipartite graph with the given number of vertices and
+        edges (if m is given), or with the given number of vertices and the given
+        connection probability (if p is given).
+
+        If m is given but p is not, the generated graph will have n1 vertices of
+        type 1, n2 vertices of type 2 and m randomly selected edges between them. If
+        p is given but m is not, the generated graph will have n1 vertices of type 1
+        and n2 vertices of type 2, and each edge will exist between them with
+        probability p.
+
+        @param n1: the number of vertices of type 1.
+        @param n2: the number of vertices of type 2.
+        @param p: the probability of edges. If given, C{m} must be missing.
+        @param m: the number of edges. If given, C{p} must be missing.
+        @param directed: whether to generate a directed graph.
+        @param neimode: if the graph is directed, specifies how the edges will be
+          generated. If it is C{"all"}, edges will be generated in both directions
+          (from type 1 to type 2 and vice versa) independently. If it is C{"out"}
+          edges will always point from type 1 to type 2. If it is C{"in"}, edges
+          will always point from type 2 to type 1. This argument is ignored for
+          undirected graphs.
+        """
+        result, types = klass._Random_Bipartite(*args, **kwds)
         result.vs["type"] = types
         return result
 
