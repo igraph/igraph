@@ -75,7 +75,9 @@ using namespace drl3d;
  * The DrL layout generator, 3d version.
  * 
  * This function implements the force-directed DrL layout generator.
- * Please see more at http://www.cs.sandia.gov/~smartin/software.html
+ * Please see more in the technical report: Martin, S., Brown, W.M.,
+ * Klavans, R., Boyack, K.W., DrL: Distributed Recursive (Graph)
+ * Layout. SAND Reports, 2008. 2936: p. 1-10.
  *
  * </para><para> This function uses a modified DrL generator that does
  * the layout in three dimensions.
