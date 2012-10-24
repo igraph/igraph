@@ -1,0 +1,22 @@
+Here is how to run this simple proof-of-concept application:
+
+1 Go to igraphx/ and run a Python web server:
+  python -m SimpleHTTPServer
+
+2 Start R and run (=copy and paste to the R prompt) part 1 from the 
+  websock.R file
+
+3 Set 'mygraph' to the graph you want to plot, and run part 2 from websock.R.
+
+4 Start a web browser and go to http://127.0.0.1:8000/templates/basic.html
+  This should layout and plot the graph. The nodes can be dragged.
+
+5 Add vertices and edges from the R prompt, see part 3 in websock.R.
+  The vertices and edges show up on the plot in the browser windows as well.
+
+6 You can start another browser window or tab and using the same URL
+  (http://127.0.0.1:8000/templates/basic.html) you'll get the visuzalization 
+  of the updated graph.
+
+7 Run part 4 from websock.R to close down the connection between the 
+  server and the browser.
