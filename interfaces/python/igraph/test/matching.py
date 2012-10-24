@@ -26,20 +26,20 @@ class MatchingTests(unittest.TestCase):
         self.assertTrue(self.matching.is_maximal())
         self.matching.matching[0] = -1
         self.matching.matching[12] = -1
-        self.failIf(self.matching.is_maximal())
+        self.assertFalse(self.matching.is_maximal())
 
     def testMatchingRetrieval(self):
         m = [12, 10, 8, 13, -1, 14, 9, -1, 2, 6, 1, -1, 0, 3, 5]
         self.assertEqual(self.matching.matching, m)
         for i, mate in enumerate(m):
             if mate == -1:
-                self.failIf(self.matching.is_matched(i))
+                self.assertFalse(self.matching.is_matched(i))
                 self.assertEqual(self.matching.match_of(i), None)
             else:
                 self.assertTrue(self.matching.is_matched(i))
                 self.assertEqual(self.matching.match_of(i), mate)
                 self.assertEqual(self.matching.match_of(
-                    leda_graph.vs[i], leda_graph.vs[mate]))
+                    leda_graph.vs[i]).index, leda_graph.vs[mate].index)
 
 
 class MaximumBipartiteMatchingTests(unittest.TestCase):
@@ -66,8 +66,9 @@ class MaximumBipartiteMatchingTests(unittest.TestCase):
 
 
 def suite():
+    matching_suite = unittest.makeSuite(MatchingTests)
     bipartite_unweighted_suite = unittest.makeSuite(MaximumBipartiteMatchingTests)
-    return unittest.TestSuite([bipartite_unweighted_suite])
+    return unittest.TestSuite([matching_suite, bipartite_unweighted_suite])
 
 def test():
     runner = unittest.TextTestRunner()
