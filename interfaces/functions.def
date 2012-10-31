@@ -307,9 +307,9 @@ igraph_static_power_law_game:
 igraph_k_regular_game:
         PARAMS: OUT GRAPH graph, INTEGER no_of_nodes, INTEGER k, \
                 BOOLEAN directed=False, BOOLEAN multiple=False
-		NAME-R: k.regular.game
-		GATTR-R: k-regular graph
-		GATTR-PARAM-R: k
+        NAME-R: k.regular.game
+        GATTR-R: name IS k-regular graph
+        GATTR-PARAM-R: k
 
 #######################################
 # Basic query functions
