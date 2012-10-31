@@ -36,7 +36,7 @@ AC_LANG_POP([C++])
 
 LIBS_SAVE=$LIBS
 LIBS="$LIBS -lm"
-AC_CHECK_FUNCS([rintf finite expm1 rint log2 logbl snprintf log1p round fmin])
+AC_CHECK_FUNCS([rintf finite expm1 rint log2 logbl snprintf log1p round fmin stpcpy])
 LIBS=$LIBS_SAVE
 
 AC_CHECK_HEADER([sys/times.h], 

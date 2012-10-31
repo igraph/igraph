@@ -269,3 +269,7 @@ char* igraph_i_strdup(const char *s) {
     return result;
 }
 
+char* igraph_i_stpcpy(char* s1, const char* s2) {
+    char* result = strcpy(s1, s2);
+    return result + strlen(s1);
+}
