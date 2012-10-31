@@ -257,3 +257,7 @@ double igraph_i_fdiv(const double a, const double b)
    return a / b;
 }
 
+char* igraph_i_stpcpy(char* s1, const char* s2) {
+    char* result = strcpy(s1, s2);
+    return result + strlen(s1);
+}
