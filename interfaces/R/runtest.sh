@@ -20,3 +20,7 @@ fi
 
 ## Run the tests
 cd $tmpdir && echo "tools:::.runPackageTestsR()" | R --no-save && echo
+
+## Echo temporary directory name
+echo "Tests were run in"
+echo $tmpdir
