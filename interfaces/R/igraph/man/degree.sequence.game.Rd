@@ -6,7 +6,7 @@
 \description{It is often useful to create a graph with given vertex
   degrees. This is exactly what \code{degree.sequence.game} does.}
 \usage{
-degree.sequence.game(out.deg, in.deg = numeric(0),
+degree.sequence.game(out.deg, in.deg = NULL,
      method = c("simple", "vl"), \dots)
 }
 \arguments{
@@ -14,7 +14,8 @@ degree.sequence.game(out.deg, in.deg = numeric(0),
   graphs) or out-degrees (for directed graphs). For undirected graphs
   its sum should be even. For directed graphs its sum should be the same
   as the sum of \code{in.deg}.}
-  \item{in.deg}{For directed graph, the in-degree sequence.}
+  \item{in.deg}{For directed graph, the in-degree sequence. By default
+    this is \code{NULL} and an undirected graph is created.}
   \item{method}{Character, the method for generating the graph. Right
     now the \dQuote{simple} and \dQuote{vl} methods are implemented.}
   \item{\dots}{Additional arguments, these are used as graph

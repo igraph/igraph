@@ -11,7 +11,7 @@
   vertex shapes when plotting graphs.}
 \usage{
 vertex.shapes (shape = NULL)
-add.vertex.shape (shape, clip = igraph_shape.noclip,
+add.vertex.shape (shape, clip = igraph.shape.noclip,
        plot = igraph.shape.noplot, parameters = list())
 igraph.shape.noclip (coords, el, params, end = c("both", "from", "to"))
 igraph.shape.noplot (coords, v = NULL, params)
@@ -209,6 +209,8 @@ if (require(XML) && require(png) && require(jpeg)) {
         rast <- readPNG(bin, native=TRUE)
       } else if (grepl("\\\\.jpe?g$", img)) {
         rast <- readJPEG(bin, native=TRUE)
+      } else {
+        rast <- as.raster(matrix())
       }
     } else {
       rast <- as.raster(numeric())
@@ -218,7 +220,7 @@ if (require(XML) && require(png) && require(jpeg)) {
     list(name=artist, image=rast, similar=sim)
   }
 
-  ego <- getartist("Muse")
+  ego <- getartist("Placebo")
   similar <- lapply(ego$similar, getartist)
   
   edges1 <- cbind(ego$name, ego$similar)

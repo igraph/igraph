@@ -10,9 +10,8 @@
       xlim=c(-1,1), ylim=c(-1,1), main="", sub="",
       mark.groups=list(), mark.shape=1/2, 
       mark.col=rainbow(length(mark.groups), alpha=0.3),
-      mark.border=rainbow(length(mark.groups), alpha=1)
-      mark.expand=15, 
-      \dots)
+      mark.border=rainbow(length(mark.groups), alpha=1),
+      mark.expand=15, \dots)
 }
 \arguments{
   \item{x}{The graph to plot.}
