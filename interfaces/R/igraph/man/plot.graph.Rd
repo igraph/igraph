@@ -8,8 +8,9 @@
 \usage{
 \S3method{plot}{igraph}(x, axes=FALSE, xlab="", ylab="", add=FALSE,
       xlim=c(-1,1), ylim=c(-1,1), main="", sub="",
-      mark.groups=list(), mark.shape=1/2, mark.border=NA,
+      mark.groups=list(), mark.shape=1/2, 
       mark.col=rainbow(length(mark.groups), alpha=0.3),
+      mark.border=rainbow(length(mark.groups), alpha=1)
       mark.expand=15, 
       \dots)
 }
@@ -36,13 +37,13 @@
     parameter of the \code{\link[graphics]{xspline}} function, its
     possible values are between -1 and 1. If it is a vector, then a
     different value is used for the different vertex groups.}
-  \item{mark.border}{A scalar or vector giving the colors of the borders
-    of the vertex group marking polygons. If it is \code{NA}, then no
-    border is drawn.}
   \item{mark.col}{A scalar or vector giving the colors of marking the
     polygons, in any format accepted by
     \code{\link[graphics]{xspline}}; e.g. numeric color ids, symbolic
     color names, or colors in RGB.}
+  \item{mark.border}{A scalar or vector giving the colors of the borders
+    of the vertex group marking polygons. If it is \code{NA}, then no
+    border is drawn.}
   \item{mark.expand}{A numeric scalar or vector, the size of the border
     around the marked vertex groups. It is in the same units as the vertex
     sizes. If a vector is given, then different values are used for the
