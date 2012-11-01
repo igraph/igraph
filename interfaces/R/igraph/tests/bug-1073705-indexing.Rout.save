@@ -23,7 +23,7 @@ Type 'q()' to quit R.
 > g[1,2,attr="weight"] <- 0
 > g
 IGRAPH U-W- 10 10 -- Ring graph
-+ attr: name (g/c), mutual (g/l), circular (g/l), weight (e/n)
++ attr: name (g/c), mutual (g/x), circular (g/x), weight (e/n)
 > g[]
 Loading required package: Matrix
 Loading required package: lattice
@@ -44,7 +44,7 @@ Loading required package: lattice
 > g[from=el[,1], to=el[,2], attr="sim"] <- rep(0:1, length=ecount(g))
 > g
 IGRAPH U-W- 10 10 -- Ring graph
-+ attr: name (g/c), mutual (g/l), circular (g/l), weight (e/n), sim
++ attr: name (g/c), mutual (g/x), circular (g/x), weight (e/n), sim
   (e/n)
 > g[attr="sim"]
 10 x 10 sparse Matrix of class "dgCMatrix"
@@ -65,7 +65,7 @@ IGRAPH U-W- 10 10 -- Ring graph
 > g[from=el[,1], to=el[,2], attr="sim"] <- rep(1:0, length=ecount(g))
 > g
 IGRAPH UNW- 10 10 -- Ring graph
-+ attr: name (g/c), mutual (g/l), circular (g/l), name (v/c), weight
++ attr: name (g/c), mutual (g/x), circular (g/x), name (v/c), weight
   (e/n), sim (e/n)
 > g[attr="sim"]
 10 x 10 sparse Matrix of class "dgCMatrix"
@@ -85,4 +85,4 @@ j 0 . . . . . . . 1 .
 > 
 > proc.time()
    user  system elapsed 
-  2.558   0.078   2.623 
+  2.560   0.075   2.642 

@@ -1,6 +1,6 @@
 
-R version 2.12.0 (2010-10-15)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
@@ -26,15 +26,15 @@ Type 'q()' to quit R.
 > write.graph(g, format="pajek", file=tc)
 > cat(rawToChar(rawConnectionValue(tc)))
 *Vertices 9
-1 "1" ic red
-2 "2" ic green
-3 "3" ic yellow
-4 "4" ic red
-5 "5" ic green
-6 "6" ic yellow
-7 "7" ic red
-8 "8" ic green
-9 "9" ic yellow
+1 "1" ic "red"
+2 "2" ic "green"
+3 "3" ic "yellow"
+4 "4" ic "red"
+5 "5" ic "green"
+6 "6" ic "yellow"
+7 "7" ic "red"
+8 "8" ic "green"
+9 "9" ic "yellow"
 *Edges
 1 2
 2 3
@@ -48,3 +48,6 @@ Type 'q()' to quit R.
 > close(tc)
 > 
 > 
+> proc.time()
+   user  system elapsed 
+  0.283   0.039   0.308 
