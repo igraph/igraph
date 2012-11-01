@@ -132,7 +132,7 @@
       \dQuote{\code{circle}}, \dQuote{\code{square}},
       \dQuote{\code{csquare}}, \dQuote{\code{rectangle}},
       \dQuote{\code{crectangle}}, \dQuote{\code{vrectangle}},
-      \dQuote{\code{\link[vertex.shape.pie]{pie}}},
+      \dQuote{\code{pie}} (see \link{vertex.shape.pie}),
       \sQuote{\code{sphere}}, and \dQuote{\code{none}} are supported,
       and only by the \code{\link{plot.igraph}}
       command. \dQuote{\code{none}} does not draw the vertices at all,

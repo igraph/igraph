@@ -12,7 +12,7 @@
 \usage{
 vertex.shapes (shape = NULL)
 add.vertex.shape (shape, clip = igraph_shape.noclip,
-       plot = igraph.shape.noplot, parameters = character())
+       plot = igraph.shape.noplot, parameters = list())
 igraph.shape.noclip (coords, el, params, end = c("both", "from", "to"))
 igraph.shape.noplot (coords, v = NULL, params)
 }
@@ -22,11 +22,13 @@ igraph.shape.noplot (coords, v = NULL, params)
     vertex shapes are returned.} 
   \item{clip}{An R function object, the clipping function.}
   \item{plot}{An R function object, the plotting function.}
-  \item{parameters}{Character vector, additional plot/vertex/edge
-    parameters. Vertex parameters should have a prefix
+  \item{parameters}{Named list, additional plot/vertex/edge
+    parameters. The element named define the new parameters, and the
+    elements themselves define their default values.
+    Vertex parameters should have a prefix
     \sQuote{\code{vertex.}}, edge parameters a prefix
     \sQuote{\code{edge.}}. Other general plotting parameters should have
-    a prefix \sQuote{\code{plot.}}.}
+    a prefix \sQuote{\code{plot.}}. See Details below.}
   \item{coords,el,params,end,v}{See parameters of the clipping/plotting
     functions below.} 
 }
