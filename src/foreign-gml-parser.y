@@ -51,6 +51,7 @@
 #include "igraph_error.h"
 #include "igraph_memory.h"
 #include "config.h"
+#include "igraph_hacks_internal.h"
 #include "igraph_math.h"
 #include "igraph_gml_tree.h"
 #include "foreign-gml-header.h"
