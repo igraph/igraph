@@ -45,6 +45,7 @@
 */
 
 #include "config.h"
+#include "igraph_hacks_internal.h"
 #include "igraph_math.h"
 #include "igraph_types_internal.h"
 #include "foreign-dl-header.h"

@@ -91,10 +91,6 @@ int igraph_is_neginf(double x);
 #  define IGRAPH_NAN (igraph_i_fdiv(0.0, 0.0))
 #endif
 
-#ifndef HAVE_STPCPY
-#  define stpcpy igraph_i_stpcpy
-#endif
-
 __END_DECLS
 
 #endif
