@@ -944,6 +944,7 @@ void igraph_i_maximal_cliques_stack_destroy(igraph_stack_ptr_t *stack) {
 }
 
 int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func_t func, void* data) {
+  int directed=igraph_is_directed(graph);
   long int i, j, k, l;
   igraph_integer_t no_of_nodes, nodes_to_check, nodes_done;
   igraph_integer_t best_cand = 0, best_cand_degree = 0, best_fini_cand_degree;
@@ -954,7 +955,7 @@ int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func
   igraph_bool_t cont = 1;
   int assret;
 
-  if (igraph_is_directed(graph))
+  if (directed)
     IGRAPH_WARNING("directionality of edges is ignored for directed graphs");
 
   no_of_nodes = igraph_vcount(graph);
@@ -965,6 +966,7 @@ int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func
   IGRAPH_CHECK(igraph_adjlist_init(graph, &adj_list, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &adj_list);
   IGRAPH_CHECK(igraph_adjlist_simplify(&adj_list));
+  if (directed) igraph_adjlist_sort(&adj_list);
 
   /* Initialize stack */
   IGRAPH_CHECK(igraph_stack_ptr_init(&stack, 0));
