@@ -1,0 +1,32 @@
+
+R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> adj <- matrix(1, nrow=11, ncol=11) - diag(11)
+> g <- graph.adjacency(adj)
+> suppressWarnings(largest.cliques(g))
+[[1]]
+ [1]  1  2  3  4  5  6  7  8  9 10 11
+
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  0.280   0.038   0.305 
