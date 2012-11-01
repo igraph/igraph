@@ -21,7 +21,7 @@ k.regular.game (no.of.nodes, k, directed = FALSE, multiple = FALSE)
   degrees of vertices are equal to a predefined constant k. For undirected
   graphs, at least one of k and the number of vertices must be even.
 
-  The game simply uses \code{\link{degree.dequence.game}} with
+  The game simply uses \code{\link{degree.sequence.game}} with
   appropriately constructed degree sequences.
 }
 \value{
