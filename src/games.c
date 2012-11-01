@@ -1256,6 +1256,7 @@ int igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
 
   int retval;
 
+  if (in_deg && igraph_vector_size(in_deg)==0) { in_deg=0; }
   if (method==IGRAPH_DEGSEQ_SIMPLE) {
     retval=igraph_degree_sequence_game_simple(graph, out_deg, in_deg);
   } else if (method==IGRAPH_DEGSEQ_VL) {
