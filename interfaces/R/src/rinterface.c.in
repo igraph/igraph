@@ -4081,8 +4081,9 @@ SEXP R_igraph_degree_sequence_game(SEXP pout_seq, SEXP pin_seq,
   SEXP result;
 
   R_SEXP_to_vector(pout_seq, &outseq);
-  R_SEXP_to_vector(pin_seq, &inseq);
-  igraph_degree_sequence_game(&g, &outseq, &inseq, method);
+  if (!isNull(pin_seq)) { R_SEXP_to_vector(pin_seq, &inseq); }
+  igraph_degree_sequence_game(&g, &outseq, 
+			      isNull(pin_seq) ? 0 : &inseq, method);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   
