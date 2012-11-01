@@ -1,0 +1,88 @@
+
+R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph)
+> 
+> g <- graph.ring(10)
+> g[1,2,attr="weight"] <- 0
+> g
+IGRAPH U-W- 10 10 -- Ring graph
++ attr: name (g/c), mutual (g/l), circular (g/l), weight (e/n)
+> g[]
+Loading required package: Matrix
+Loading required package: lattice
+10 x 10 sparse Matrix of class "dgCMatrix"
+                                   
+ [1,]  .  0  .  .  .  .  .  .  . NA
+ [2,]  0  . NA  .  .  .  .  .  .  .
+ [3,]  . NA  . NA  .  .  .  .  .  .
+ [4,]  .  . NA  . NA  .  .  .  .  .
+ [5,]  .  .  . NA  . NA  .  .  .  .
+ [6,]  .  .  .  . NA  . NA  .  .  .
+ [7,]  .  .  .  .  . NA  . NA  .  .
+ [8,]  .  .  .  .  .  . NA  . NA  .
+ [9,]  .  .  .  .  .  .  . NA  . NA
+[10,] NA  .  .  .  .  .  .  . NA  .
+> 
+> el <- get.edgelist(g)
+> g[from=el[,1], to=el[,2], attr="sim"] <- rep(0:1, length=ecount(g))
+> g
+IGRAPH U-W- 10 10 -- Ring graph
++ attr: name (g/c), mutual (g/l), circular (g/l), weight (e/n), sim
+  (e/n)
+> g[attr="sim"]
+10 x 10 sparse Matrix of class "dgCMatrix"
+                         
+ [1,] . 0 . . . . . . . 1
+ [2,] 0 . 1 . . . . . . .
+ [3,] . 1 . 0 . . . . . .
+ [4,] . . 0 . 1 . . . . .
+ [5,] . . . 1 . 0 . . . .
+ [6,] . . . . 0 . 1 . . .
+ [7,] . . . . . 1 . 0 . .
+ [8,] . . . . . . 0 . 1 .
+ [9,] . . . . . . . 1 . 0
+[10,] 1 . . . . . . . 0 .
+> 
+> V(g)$name <- letters[seq_len(vcount(g))]
+> el <- get.edgelist(g)
+> g[from=el[,1], to=el[,2], attr="sim"] <- rep(1:0, length=ecount(g))
+> g
+IGRAPH UNW- 10 10 -- Ring graph
++ attr: name (g/c), mutual (g/l), circular (g/l), name (v/c), weight
+  (e/n), sim (e/n)
+> g[attr="sim"]
+10 x 10 sparse Matrix of class "dgCMatrix"
+   [[ suppressing 10 column names 'a', 'b', 'c' ... ]]
+                     
+a . 1 . . . . . . . 0
+b 1 . 0 . . . . . . .
+c . 0 . 1 . . . . . .
+d . . 1 . 0 . . . . .
+e . . . 0 . 1 . . . .
+f . . . . 1 . 0 . . .
+g . . . . . 0 . 1 . .
+h . . . . . . 1 . 0 .
+i . . . . . . . 0 . 1
+j 0 . . . . . . . 1 .
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  2.558   0.078   2.623 

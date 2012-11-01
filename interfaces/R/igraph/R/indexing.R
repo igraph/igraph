@@ -178,8 +178,8 @@
 
   if (!missing(from)) {    
     if (is.null(value) ||
-        (is.logical(value) && !value) ||
-        (is.numeric(value) && value==0)) {
+        (is.null(attr) && is.logical(value) && !value) ||
+        (is.null(attr) && is.numeric(value) && value==0)) {
       ## Delete edges
       todel <- x[from=from, to=to, ..., edges=TRUE]
       x <- delete.edges(x, todel)
@@ -195,8 +195,8 @@
       }
     }
   } else if (is.null(value) ||
-      (is.logical(value) && !value) ||
-      (is.numeric(value) && value==0)) {
+      (is.null(attr) && is.logical(value) && !value) ||
+      (is.null(attr) && is.numeric(value) && value==0)) {
     ## Delete edges
     if (missing(i) && missing(j)) {
       todel <- unlist(x[[ ,  , ..., edges=TRUE]])
