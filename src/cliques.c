@@ -970,7 +970,7 @@ int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func
   IGRAPH_CHECK(igraph_adjlist_init(graph, &adj_list, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &adj_list);
   IGRAPH_CHECK(igraph_adjlist_simplify(&adj_list));
-  if (directed) igraph_adjlist_sort(&adj_list);
+  igraph_adjlist_sort(&adj_list);
 
   /* Initialize stack */
   IGRAPH_CHECK(igraph_stack_ptr_init(&stack, 0));
