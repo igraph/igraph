@@ -112,7 +112,7 @@ benefit from the disk images in the Python Package Index.
 plat = get_platform()
 options = dict(
     name = 'python-igraph',
-    version = '0.6',
+    version = '0.6.1',
     description = 'High performance graph data structures and algorithms',
     long_description = description,
     license = 'GNU General Public License (GPL)',
