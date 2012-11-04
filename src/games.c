@@ -3857,7 +3857,7 @@ int igraph_k_regular_game(igraph_t *graph,
     IGRAPH_ERROR("degree must be non-negative", IGRAPH_EINVAL);
   }
 
-  IGRAPH_CHECK(igraph_vector_init(&degseq, no_of_nodes));
+  IGRAPH_VECTOR_INIT_FINALLY(&degseq, no_of_nodes);
   igraph_vector_fill(&degseq, k);
   IGRAPH_CHECK(igraph_degree_sequence_game(graph, &degseq, directed ? &degseq : 0, mode));
 
