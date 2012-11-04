@@ -70,10 +70,53 @@ int check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
   return 0;
 }
 
+int check_pred_inbound(const igraph_t* graph, const igraph_vector_long_t* pred,
+        const igraph_vector_long_t* inbound, int start, int error_code) {
+  long int i, n = igraph_vcount(graph);
+
+  if (igraph_vector_long_size(pred) != n ||
+      igraph_vector_long_size(inbound) != n) {
+    exit(error_code);
+  }
+
+  if (VECTOR(*pred)[start] != start || VECTOR(*inbound)[start] != -1)
+    exit(error_code+1);
+
+  for (i = 0; i < n; i++) {
+    if (VECTOR(*pred)[i] == -1) {
+      if (VECTOR(*inbound)[i] != -1) {
+        exit(error_code+2);
+      }
+    } else if (VECTOR(*pred)[i] == i) {
+      if (i != start) {
+        exit(error_code+3);
+      }
+      if (VECTOR(*inbound)[i] != -1) {
+        exit(error_code+4);
+      }
+    } else {
+      long int eid = VECTOR(*inbound)[i];
+      long int u = IGRAPH_FROM(graph, eid), v = IGRAPH_TO(graph, eid);
+      if (v != i && !igraph_is_directed(graph)) {
+        long int dummy = u;
+        u = v; v = dummy;
+      }
+      if (v != i) {
+        exit(error_code+5);
+      } else if (u != VECTOR(*pred)[i]) {
+        exit(error_code+6);
+      }
+    }
+  }
+
+  return 0;
+}
+
 int main() {
 
   igraph_t g;
   igraph_vector_ptr_t vecs, evecs;
+  igraph_vector_long_t pred, inbound;
   long int i;
   igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1, 1 }; 
   igraph_real_t weights2[] = { 0,2,1, 0,5,2, 1,1,0, 2,2,8, 1,1,3, 1,1,4, 2,1 };
@@ -86,6 +129,9 @@ int main() {
   
   igraph_vector_ptr_init(&vecs, 5);
   igraph_vector_ptr_init(&evecs, 5);
+  igraph_vector_long_init(&pred, 0);
+  igraph_vector_long_init(&inbound, 0);
+
   for (i=0; i<igraph_vector_ptr_size(&vecs); i++) {
     VECTOR(vecs)[i] = calloc(1, sizeof(igraph_vector_t));
     igraph_vector_init(VECTOR(vecs)[i], 0);
@@ -96,24 +142,32 @@ int main() {
   
   igraph_get_shortest_paths_dijkstra(&g, /*vertices=*/ &vecs, 
 				     /*edges=*/ &evecs, /*from=*/ 0, /*to=*/ vs, 
-				     /*weights=*/ 0, /*mode=*/ IGRAPH_OUT);
-  
-  for (i=0; i<igraph_vector_ptr_size(&vecs); i++) 
-    print_vector(VECTOR(vecs)[i]);
+				     /*weights=*/ 0, /*mode=*/ IGRAPH_OUT,
+				     /*predecessors=*/ &pred,
+				     /*inbound_edges=*/ &inbound);
 
   check_evecs(&g, &vecs, &evecs, 10);
+  check_pred_inbound(&g, &pred, &inbound, /* from= */ 0, 40);
+
+  for (i=0; i<igraph_vector_ptr_size(&vecs); i++) {
+    print_vector(VECTOR(vecs)[i]);
+  }
 
   /* Same ring, but with weights */
 
   igraph_vector_view(&weights_vec, weights, sizeof(weights)/sizeof(igraph_real_t));
   igraph_get_shortest_paths_dijkstra(&g, /*vertices=*/ &vecs, 
 				     /*edges=*/ &evecs, /*from=*/ 0, /*to=*/ vs, 
-				     &weights_vec, IGRAPH_OUT);
+				     &weights_vec, IGRAPH_OUT,
+				     /*predecessors=*/ &pred,
+				     /*inbound_edges=*/ &inbound);
   
-  for (i=0; i<igraph_vector_ptr_size(&vecs); i++) 
-    print_vector(VECTOR(vecs)[i]);
-
   check_evecs(&g, &vecs, &evecs, 20);
+  check_pred_inbound(&g, &pred, &inbound, /* from= */ 0, 50);
+
+  for (i=0; i<igraph_vector_ptr_size(&vecs); i++) {
+    print_vector(VECTOR(vecs)[i]);
+  }
 
   igraph_destroy(&g);
 
@@ -131,9 +185,12 @@ int main() {
   igraph_vector_view(&weights_vec, weights2, sizeof(weights2)/sizeof(igraph_real_t));
   igraph_get_shortest_paths_dijkstra(&g, /*vertices=*/ &vecs, 
 				     /*edges=*/ &evecs, /*from=*/ 0, /*to=*/ vs, 
-				     &weights_vec, IGRAPH_OUT);
+				     &weights_vec, IGRAPH_OUT,
+				     /*predecessors=*/ &pred,
+				     /*inbound_edges=*/ &inbound);
 
   check_evecs(&g, &vecs, &evecs, 30);
+  check_pred_inbound(&g, &pred, &inbound, /* from= */ 0, 60);
   
   for (i=0; i<igraph_vector_ptr_size(&vecs); i++) {
     print_vector(VECTOR(vecs)[i]);
@@ -145,6 +202,9 @@ int main() {
 
   igraph_vector_ptr_destroy(&vecs);
   igraph_vector_ptr_destroy(&evecs);
+  igraph_vector_long_destroy(&pred);
+  igraph_vector_long_destroy(&inbound);
+  
   igraph_vs_destroy(&vs);
   igraph_destroy(&g);
 

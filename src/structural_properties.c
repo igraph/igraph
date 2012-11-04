@@ -177,7 +177,7 @@ int igraph_diameter(const igraph_t *graph, igraph_integer_t *pres,
       IGRAPH_FINALLY(igraph_vector_ptr_destroy, &tmpptr);
       VECTOR(tmpptr)[0]=path;
       IGRAPH_CHECK(igraph_get_shortest_paths(graph, &tmpptr, 0, from, 
-					     igraph_vss_1(to), dirmode));
+					     igraph_vss_1(to), dirmode, 0, 0));
       igraph_vector_ptr_destroy(&tmpptr);
       IGRAPH_FINALLY_CLEAN(1);
     }
@@ -575,18 +575,14 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
  *        the function, which will properly clear and/or resize them
  *        and fill the ids of the vertices along the geodesics from/to
  *        the vertices. Supply a null pointer here if you don't need
- *        these vectors. Normally, either this argument, or the \c
- *        edges should be non-null, but no error or warning is given
- *        if they are both null pointers.
+ *        these vectors.
  * \param edges The result, the ids of the edges along the paths.
  *        This is a pointer vector, each element points to a vector
  *        object. These should be initialized before passing them to
  *        the function, which will properly clear and/or resize them
  *        and fill the ids of the vertices along the geodesics from/to
  *        the vertices. Supply a null pointer here if you don't need
- *        these vectors. Normally, either this argument, or the \c
- *        vertices should be non-null, but no error or warning is given
- *        if they are both null pointers.
+ *        these vectors.
  * \param from The id of the vertex from/to which the geodesics are
  *        calculated. 
  * \param to Vertex sequence with the ids of the vertices to/from which the 
@@ -603,6 +599,24 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
  *          the directed graph is considered as an
  *          undirected one for the computation.
  *        \endclist
+ * \param predecessors A pointer to an initialized igraph vector or null.
+ *        If not null, a vector containing the predecessor of each vertex in
+ *        the single source shortest path tree is returned here. The
+ *        predecessor of vertex i in the tree is the vertex from which vertex i
+ *        was reached. The predecessor of the start vertex (in the \c from
+ *        argument) is itself by definition. If the predecessor is -1, it means
+ *        that the given vertex was not reached from the source during the
+ *        search. Note that the search terminates if all the vertices in
+ *        \c to are reached.
+ * \param inbound_edges A pointer to an initialized igraph vector or null.
+ *        If not null, a vector containing the inbound edge of each vertex in
+ *        the single source shortest path tree is returned here. The
+ *        inbound edge of vertex i in the tree is the edge via which vertex i
+ *        was reached. The start vertex and vertices that were not reached
+ *        during the search will have -1 in the corresponding entry of the
+ *        vector. Note that the search terminates if all the vertices in
+ *        \c to are reached.
+ *
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM 
@@ -630,16 +644,18 @@ int igraph_get_shortest_paths(const igraph_t *graph,
 			      igraph_vector_ptr_t *vertices,
 			      igraph_vector_ptr_t *edges,
 			      igraph_integer_t from, const igraph_vs_t to, 
-			      igraph_neimode_t mode) {
+			      igraph_neimode_t mode,
+                              igraph_vector_long_t *predecessors,
+                              igraph_vector_long_t *inbound_edges) {
 
-  /* TODO: use adjlist_t if to is long (longer than 1?) */
+  /* TODO: use inclist_t if to is long (longer than 1?) */
 
   long int no_of_nodes=igraph_vcount(graph);
   long int *father;
   
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
 
-  long int j;
+  long int i, j;
   igraph_vector_t tmp=IGRAPH_VECTOR_NULL;
 
   igraph_vit_t vit;
@@ -683,6 +699,20 @@ int igraph_get_shortest_paths(const igraph_t *graph,
     }
   }
 
+  /* Meaning of father[i]:
+   *
+   * - If father[i] < 0, it means that vertex i has to be reached and has not
+   *   been reached yet.
+   *
+   * - If father[i] = 0, it means that vertex i does not have to be reached and
+   *   it has not been reached yet.
+   *
+   * - If father[i] = 1, it means that vertex i is the start vertex.
+   *
+   * - Otherwise, father[i] is the ID of the edge from which vertex i was
+   *   reached plus 2.
+   */
+
   IGRAPH_CHECK(igraph_dqueue_push(&q, from+1));
   if (father[ (long int) from ] < 0) { reached++; }
   father[ (long int)from ] = 1;
@@ -707,7 +737,41 @@ int igraph_get_shortest_paths(const igraph_t *graph,
   if (reached < to_reach) {
     IGRAPH_WARNING("Couldn't reach some vertices");
   }
+
+  /* Create `predecessors' if needed */
+  if (predecessors) {
+    IGRAPH_CHECK(igraph_vector_long_resize(predecessors, no_of_nodes));
+
+    for (i = 0; i < no_of_nodes; i++) {
+      if (father[i] <= 0) {
+        /* i was not reached */
+        VECTOR(*predecessors)[i] = -1;
+      } else if (father[i] == 1) {
+        /* i is the start vertex */
+        VECTOR(*predecessors)[i] = i;
+      } else {
+        /* i was reached via the edge with ID = father[i] - 2 */
+        VECTOR(*predecessors)[i] = IGRAPH_OTHER(graph, father[i]-2, i);
+      }
+    }
+  }
   
+  /* Create `inbound_edges' if needed */
+  if (inbound_edges) {
+    IGRAPH_CHECK(igraph_vector_long_resize(inbound_edges, no_of_nodes));
+
+    for (i = 0; i < no_of_nodes; i++) {
+      if (father[i] <= 1) {
+        /* i was not reached or i is the start vertex */
+        VECTOR(*inbound_edges)[i] = -1;
+      } else {
+        /* i was reached via the edge with ID = father[i] - 2 */
+        VECTOR(*inbound_edges)[i] = father[i]-2;
+      }
+    }
+  }
+  
+  /* Create `vertices' and `edges' if needed */
   if (vertices || edges) {
     for (IGRAPH_VIT_RESET(vit), j=0; 
 	 !IGRAPH_VIT_END(vit);
@@ -827,7 +891,7 @@ int igraph_get_shortest_path(const igraph_t *graph,
   }
 
   IGRAPH_CHECK(igraph_get_shortest_paths(graph, vp, ep, from, 
-					 igraph_vss_1(to),mode));
+					 igraph_vss_1(to), mode, 0, 0));
 
   if (edges) {
     igraph_vector_ptr_destroy(&edges2);
@@ -5167,6 +5231,23 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
  *          the directed graph is considered as an
  *          undirected one for the computation.
  *        \endclist
+ * \param predecessors A pointer to an initialized igraph vector or null.
+ *        If not null, a vector containing the predecessor of each vertex in
+ *        the single source shortest path tree is returned here. The
+ *        predecessor of vertex i in the tree is the vertex from which vertex i
+ *        was reached. The predecessor of the start vertex (in the \c from
+ *        argument) is itself by definition. If the predecessor is -1, it means
+ *        that the given vertex was not reached from the source during the
+ *        search. Note that the search terminates if all the vertices in
+ *        \c to are reached.
+ * \param inbound_edges A pointer to an initialized igraph vector or null.
+ *        If not null, a vector containing the inbound edge of each vertex in
+ *        the single source shortest path tree is returned here. The
+ *        inbound edge of vertex i in the tree is the edge via which vertex i
+ *        was reached. The start vertex and vertices that were not reached
+ *        during the search will have -1 in the corresponding entry of the
+ *        vector. Note that the search terminates if all the vertices in
+ *        \c to are reached.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM 
@@ -5193,7 +5274,9 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 				       igraph_integer_t from,
 				       igraph_vs_t to,
 				       const igraph_vector_t *weights,
-				       igraph_neimode_t mode) {
+				       igraph_neimode_t mode,
+                                       igraph_vector_long_t *predecessors,
+                                       igraph_vector_long_t *inbound_edges) {
   /* Implementation details. This is the basic Dijkstra algorithm, 
      with a binary heap. The heap is indexed, i.e. it stores not only
      the distances, but also which vertex they belong to. The other
@@ -5208,9 +5291,9 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
        computation, as IGRAPH_FINITE() might involve a function call 
        and we want to spare that. So we store distance+1.0 instead of 
        distance, and zero denotes infinity.
-     - `parents' assigns the predecessors of all vertices in the
+     - `parents' assigns the inbound edge IDs of all vertices in the
        shortest path tree to the vertices. In this implementation, the
-       vertex ID + 1 is stored, zero means unreachable vertices.
+       edge ID + 1 is stored, zero means unreachable vertices.
   */
   
   long int no_of_nodes=igraph_vcount(graph);
@@ -5224,7 +5307,8 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
   long int i,to_reach;
 
   if (!weights) {
-    return igraph_get_shortest_paths(graph, vertices, edges, from, to, mode);
+    return igraph_get_shortest_paths(graph, vertices, edges, from, to, mode,
+        predecessors, inbound_edges);
   }
   
   if (igraph_vector_size(weights) != no_of_edges) {
@@ -5309,6 +5393,39 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 
   if (to_reach > 0) IGRAPH_WARNING("Couldn't reach some vertices");
 
+  /* Create `predecessors' if needed */
+  if (predecessors) {
+    IGRAPH_CHECK(igraph_vector_long_resize(predecessors, no_of_nodes));
+
+    for (i = 0; i < no_of_nodes; i++) {
+      if (i == from) {
+        /* i is the start vertex */
+        VECTOR(*predecessors)[i] = i;
+      } else if (parents[i] <= 0) {
+        /* i was not reached */
+        VECTOR(*predecessors)[i] = -1;
+      } else {
+        /* i was reached via the edge with ID = parents[i] - 1 */
+        VECTOR(*predecessors)[i] = IGRAPH_OTHER(graph, parents[i]-1, i);
+      }
+    }
+  }
+  
+  /* Create `inbound_edges' if needed */
+  if (inbound_edges) {
+    IGRAPH_CHECK(igraph_vector_long_resize(inbound_edges, no_of_nodes));
+
+    for (i = 0; i < no_of_nodes; i++) {
+      if (parents[i] <= 0) {
+        /* i was not reached */
+        VECTOR(*inbound_edges)[i] = -1;
+      } else {
+        /* i was reached via the edge with ID = parents[i] - 1 */
+        VECTOR(*inbound_edges)[i] = parents[i]-1;
+      }
+    }
+  }
+  
   /* Reconstruct the shortest paths based on vertex and/or edge IDs */
   if (vertices || edges) {
     for (IGRAPH_VIT_RESET(vit), i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
@@ -5429,7 +5546,7 @@ int igraph_get_shortest_path_dijkstra(const igraph_t *graph,
   
   IGRAPH_CHECK(igraph_get_shortest_paths_dijkstra(graph, vp, ep, 
 						  from, igraph_vss_1(to),
-						  weights, mode));
+						  weights, mode, 0, 0));
 
   if (edges) { 
     igraph_vector_ptr_destroy(&edges2);
@@ -6881,7 +6998,9 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
 						      /*edges=*/ 0, 
 						      from,
 						      igraph_vss_1(to), 
-						      weights, dirmode));
+						      weights, dirmode,
+                                                      /*predecessors=*/ 0,
+                                                      /*inbound_edges=*/ 0));
       igraph_vector_ptr_destroy(&tmpptr);
       IGRAPH_FINALLY_CLEAN(1);
     }

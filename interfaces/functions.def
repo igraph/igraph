@@ -371,7 +371,8 @@ igraph_shortest_paths:
 igraph_get_shortest_paths:
         PARAMS: GRAPH graph, OUT VERTEXSETLIST_OR_0 vertices, 
                 OUT EDGESETLIST_OR_0 edges, VERTEX from, VERTEXSET to=ALL, \
-                NEIMODE mode=OUT
+                NEIMODE mode=OUT, OUT VECTOR_LONG_OR_0 predecessors=0, \
+                OUT VECTOR_LONG_OR_0 inbound_edges=0
         DEPS: vertices ON graph, edges ON graph, from ON graph, to ON graph
         IGNORE: RR, RC, RNamespace
 
@@ -389,7 +390,9 @@ igraph_shortest_paths_dijkstra:
 igraph_get_shortest_paths_dijkstra:
         PARAMS: GRAPH graph, OUT VERTEXSETLIST_OR_0 vertices, \
                 OUT EDGESETLIST_OR_0 edges, VERTEX from, VERTEXSET to=ALL, \
-                EDGEWEIGHTS weights=NULL, NEIMODE mode=ALL
+                EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT, \
+                OUT VECTOR_LONG_OR_0 predecessors=0, \
+                OUT VECTOR_LONG_OR_0 inbound_edges=0
         DEPS: vertices ON graph, edges ON graph, from ON graph, to ON graph,\
               weights ON graph
         IGNORE: RR, RC, RNamespace

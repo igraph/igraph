@@ -62,7 +62,9 @@ int igraph_get_shortest_paths(const igraph_t *graph,
 			      igraph_vector_ptr_t *vertices,
 			      igraph_vector_ptr_t *edges,
 			      igraph_integer_t from, const igraph_vs_t to, 
-			      igraph_neimode_t mode);
+			      igraph_neimode_t mode,
+			      igraph_vector_long_t *predecessors,
+			      igraph_vector_long_t *inbound_edges);
 int igraph_get_shortest_path(const igraph_t *graph, 
 			     igraph_vector_t *vertices,
 			     igraph_vector_t *edges, 
@@ -93,7 +95,9 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 				       igraph_integer_t from,
 				       igraph_vs_t to,
 				       const igraph_vector_t *weights,
-				       igraph_neimode_t mode); 
+				       igraph_neimode_t mode,
+				       igraph_vector_long_t *predecessors,
+				       igraph_vector_long_t *inbound_edges);
 int igraph_get_shortest_path_dijkstra(const igraph_t *graph,
 				      igraph_vector_t *vertices,
 				      igraph_vector_t *edges,
