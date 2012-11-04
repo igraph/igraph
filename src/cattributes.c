@@ -80,6 +80,7 @@ void igraph_i_cattribute_destroy(igraph_t *graph) {
   long int i, n, a;
   igraph_vector_t *num;
   igraph_strvector_t *str;
+  igraph_vector_bool_t *boolvec;
   igraph_attribute_record_t *rec;
   for (a=0; a<3; a++) {
     n=igraph_vector_ptr_size(als[a]);
@@ -94,6 +95,10 @@ void igraph_i_cattribute_destroy(igraph_t *graph) {
 	  str=(igraph_strvector_t*)rec->value;
 	  igraph_strvector_destroy(str);
 	  igraph_free(str);
+	} else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
+	  boolvec=(igraph_vector_bool_t*)rec->value;
+	  igraph_vector_bool_destroy(boolvec);
+	  igraph_free(boolvec);
 	}
 	igraph_free((char*)rec->name);
 	igraph_free(rec);
