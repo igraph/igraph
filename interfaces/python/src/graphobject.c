@@ -4361,7 +4361,7 @@ PyObject *igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *
   }
 
   if (igraph_get_shortest_paths_dijkstra(&self->g, use_edges ? 0 : ptrvec,
-        use_edges ? ptrvec : 0, from, to, weights, mode)) {
+        use_edges ? ptrvec : 0, from, to, weights, mode, 0, 0)) {
     igraphmodule_handle_igraph_error();
     for (j = 0; j < no_of_target_nodes; j++) igraph_vector_destroy(&res[j]);
     free(res);
