@@ -558,7 +558,7 @@ PyObject *igraphmodule_Graph_delete_edges(igraphmodule_GraphObject * self,
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &list))
     return NULL;
 	
-  if (igraphmodule_PyObject_to_es_t(list, &es, 0)) {
+  if (igraphmodule_PyObject_to_es_t(list, &es, &self->g, 0)) {
     /* something bad happened during conversion, return immediately */
     return NULL;
   }
@@ -853,7 +853,7 @@ PyObject *igraphmodule_Graph_is_loop(igraphmodule_GraphObject *self,
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &list))
     return NULL;
 
-  if (igraphmodule_PyObject_to_es_t(list, &es, &return_single)) {
+  if (igraphmodule_PyObject_to_es_t(list, &es, &self->g, &return_single)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -901,7 +901,7 @@ PyObject *igraphmodule_Graph_is_multiple(igraphmodule_GraphObject *self,
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &list))
     return NULL;
 
-  if (igraphmodule_PyObject_to_es_t(list, &es, &return_single)) {
+  if (igraphmodule_PyObject_to_es_t(list, &es, &self->g, &return_single)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -949,7 +949,7 @@ PyObject *igraphmodule_Graph_is_mutual(igraphmodule_GraphObject *self,
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &list))
     return NULL;
 
-  if (igraphmodule_PyObject_to_es_t(list, &es, &return_single)) {
+  if (igraphmodule_PyObject_to_es_t(list, &es, &self->g, &return_single)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -1015,7 +1015,7 @@ PyObject *igraphmodule_Graph_count_multiple(igraphmodule_GraphObject *self,
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &list))
     return NULL;
 
-  if (igraphmodule_PyObject_to_es_t(list, &es, &return_single)) {
+  if (igraphmodule_PyObject_to_es_t(list, &es, &self->g, &return_single)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -5291,7 +5291,7 @@ PyObject *igraphmodule_Graph_subgraph_edges(igraphmodule_GraphObject * self,
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &list, &delete_vertices))
     return NULL;
 
-  if (igraphmodule_PyObject_to_es_t(list, &es, 0))
+  if (igraphmodule_PyObject_to_es_t(list, &es, &self->g, 0))
     return NULL;
 
   if (igraph_subgraph_edges(&self->g, &sg, es, PyObject_IsTrue(delete_vertices))) {
