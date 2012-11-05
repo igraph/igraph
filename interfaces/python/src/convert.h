@@ -98,7 +98,8 @@ int igraphmodule_PyObject_to_vid(PyObject *o, igraph_integer_t *vid, igraph_t *g
 int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
                   igraph_t *graph, igraph_bool_t *return_single,
 				  igraph_integer_t *single_vid);
-int igraphmodule_PyObject_to_es_t(PyObject *o, igraph_es_t *vs,
+int igraphmodule_PyObject_to_eid(PyObject *o, igraph_integer_t *eid, igraph_t *graph);
+int igraphmodule_PyObject_to_es_t(PyObject *o, igraph_es_t *es, igraph_t *graph,
 				  igraph_bool_t *return_single);
 int igraphmodule_PyObject_to_attribute_values(PyObject *o,
 					      igraph_vector_t *v,
