@@ -3689,7 +3689,7 @@ SEXP R_igraph_get_shortest_paths(SEXP graph, SEXP pfrom, SEXP pto,
   igraph_get_shortest_paths_dijkstra(&g, 
 				     vects ? &ptrvec : 0, 
 				     edges ? &ptrevec : 0,
-				     from, to, pw, mode);
+				     from, to, pw, mode, 0, 0);
   if (!verts && !edges) { 
     /* nothing requested */
     PROTECT(result=R_NilValue);

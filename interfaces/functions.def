@@ -854,13 +854,13 @@ igraph_bipartite_game_gnp:
         PARAMS: OUT GRAPH graph, OUT VECTOR_BOOL_OR_0 types, \
                 INTEGER n1, INTEGER n2, REAL p, BOOLEAN directed, \
                 NEIMODE mode
-        IGNORE: RR, RNamespace
+        IGNORE: RR, RC, RNamespace
 
 igraph_bipartite_game_gnm:
         PARAMS: OUT GRAPH graph, OUT VECTOR_BOOL_OR_0 types, \
                 INTEGER n1, INTEGER n2, INTEGER m, BOOLEAN directed, \
                 NEIMODE mode
-        IGNORE: RR, RNamespace
+        IGNORE: RR, RC, RNamespace
 
 #######################################
 # Spectral properties
