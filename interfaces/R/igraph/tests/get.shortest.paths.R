@@ -24,6 +24,13 @@ all2 <- get.all.shortest.paths(g, "s", "t")$res
 s1 <- get.shortest.paths(g, "s", "t", weights=NA)
 s2 <- get.shortest.paths(g, "s", "t")
 
-s1 %in% all1
-s2 %in% all2
+s1$vpath %in% all1
+s2$vpath %in% all2
+
+s3 <- get.shortest.paths(g, "s", weights=NA, predecessors=TRUE,
+                         inbound.edges=TRUE)
+s4 <- get.shortest.paths(g, "s", predecessors=TRUE, inbound.edges=TRUE)
+
+s3$predecessors
+s4$predecessors
 

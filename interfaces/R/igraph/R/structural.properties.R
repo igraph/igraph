@@ -188,7 +188,8 @@ shortest.paths <- function(graph, v=V(graph), to=V(graph),
 get.shortest.paths <- function(graph, from, to=V(graph),
                                mode=c("out", "all", "in"),
                                weights=NULL,
-                               output=c("vpath", "epath", "both")) {
+                               output=c("vpath", "epath", "both"),
+                               predecessors=FALSE, inbound.edges=FALSE) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -213,15 +214,24 @@ get.shortest.paths <- function(graph, from, to=V(graph),
   to <- as.igraph.vs(graph, to)-1
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_get_shortest_paths", graph,
-               as.igraph.vs(graph, from)-1, to, as.numeric(mode), as.numeric(length(to)),
-               weights, as.numeric(output), PACKAGE="igraph")
+               as.igraph.vs(graph, from)-1, to, as.numeric(mode),
+               as.numeric(length(to)), weights, as.numeric(output),
+               as.logical(predecessors), as.logical(inbound.edges), 
+               PACKAGE="igraph")
 
-  if (output !=2 ) {
-    res <- lapply(res, function(x) x+1)
-  } else {
-    res <- list(vpath=lapply(res$vpath, function(x) x+1),
-                epath=lapply(res$epath, function(x) x+1))
+  if (!is.null(res$vpath)) {
+    res$vpath <- lapply(res$vpath, function(x) x+1)
   }
+  if (!is.null(res$epath)) {
+    res$epath <- lapply(res$epath, function(x) x+1)
+  }
+  if (!is.null(res$predecessors)) {
+    res$predecessors <- res$predecessors + 1
+  }
+  if (!is.null(res$inbound_edges)) {
+    res$inbound_edges <- res$inbound_edges + 1
+  }
+
   res
 }
 

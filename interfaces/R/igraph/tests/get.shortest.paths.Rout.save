@@ -1,6 +1,6 @@
 
-R version 2.12.0 (2010-10-15)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
@@ -42,9 +42,21 @@ Type 'q()' to quit R.
 > s1 <- get.shortest.paths(g, "s", "t", weights=NA)
 > s2 <- get.shortest.paths(g, "s", "t")
 > 
-> s1 %in% all1
+> s1$vpath %in% all1
 [1] TRUE
-> s2 %in% all2
+> s2$vpath %in% all2
 [1] TRUE
 > 
+> s3 <- get.shortest.paths(g, "s", weights=NA, predecessors=TRUE,
++                          inbound.edges=TRUE)
+> s4 <- get.shortest.paths(g, "s", predecessors=TRUE, inbound.edges=TRUE)
 > 
+> s3$predecessors
+[1] 1 1 1 2 2 2 2
+> s4$predecessors
+[1] 1 1 1 2 2 2 2
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  0.293   0.038   0.318 
