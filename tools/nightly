@@ -161,11 +161,19 @@ if [ $build_r = 1 ]; then
 
 	## Start compilation
 	make
-	# R_LIBS=~/.R/library R CMD check igraph_$version.tar.gz
-	RPACKAGE="igraph_nightly_$version-$revision-`date +'%Y%m%d'`.tar.gz"
-	rm -f $RPACKAGE
-	mv igraph_$RVERSION.tar.gz $RPACKAGE
+	
+	## check that package can be installed
+	R CMD check --no-codoc --no-examples --no-tests --no-manual \
+	    igraph_$RVERSION.tar.gz | grep -q "ERROR$"
+	error=$?
+	
+	if [ $error = 0 ]; then
 
+  	    # R_LIBS=~/.R/library R CMD check igraph_$version.tar.gz
+	    RPACKAGE="igraph_nightly_$version-$revision-`date +'%Y%m%d'`.tar.gz"
+	    rm -f $RPACKAGE
+	    mv igraph_$RVERSION.tar.gz $RPACKAGE
+	    
 	## sign and upload R package
 	#rm -rf $RPACKAGE.sig
 	#gpg -b --use-agent $RPACKAGE
@@ -173,15 +181,16 @@ if [ $build_r = 1 ]; then
 
 
 	## upload to google code
-	if [ x$upload = xyes ]; then
+	    if [ x$upload = xyes ]; then
 		googlecode_upload.py -s \
-		   "Nightly build, GNU R source package, $tree tree, revision $revision" \
-		   -p igraph -u $GC_USERNAME -l Type-Rsource,OpSys-All,Nightly \
-		   -w $GC_PASSWORD $RPACKAGE || exit 22
-	fi
-
+		    "Nightly build, GNU R source package, $tree tree, revision $revision" \
+		    -p igraph -u $GC_USERNAME -l Type-Rsource,OpSys-All,Nightly \
+		    -w $GC_PASSWORD $RPACKAGE || exit 22
+	    fi
+	    
 	## step back to the root
-	cd ../..
+	    cd ../..
+	fi
 fi
 
 if [ $build_python = 1 ]; then
