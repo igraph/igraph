@@ -839,7 +839,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
  * 
  * The modularity of a graph with respect to some division (or vertex
  * types) measures how good the division is, or how separated are the 
- * different vertex types from each other. It defined as 
+ * different vertex types from each other. It is defined as 
  * Q=1/(2m) * sum(Aij-ki*kj/(2m)delta(ci,cj),i,j), here `m' is the
  * number of edges, `Aij' is the element of the `A' adjacency matrix
  * in row `i' and column `j', `ki' is the degree of `i', `kj' is the
@@ -1719,7 +1719,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     extra.comm=comm;
 
     /* We try calling the solver twice, once from a random starting
-       point, onece from a fixed one. This is because for some hard
+       point, once from a fixed one. This is because for some hard
        cases it tends to fail. We need to suppress error handling for
        the first call. */
     {
