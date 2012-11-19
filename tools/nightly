@@ -174,13 +174,13 @@ if [ $build_r = 1 ]; then
 	    rm -f $RPACKAGE
 	    mv igraph_$RVERSION.tar.gz $RPACKAGE
 	    
-	## sign and upload R package
-	#rm -rf $RPACKAGE.sig
-	#gpg -b --use-agent $RPACKAGE
-	#cp $RPACKAGE $RPACKAGE.sig ~/savannah/nightly-builds/$version/R-package/
+	    ## sign and upload R package
+	    #rm -rf $RPACKAGE.sig
+	    #gpg -b --use-agent $RPACKAGE
+	    #cp $RPACKAGE $RPACKAGE.sig ~/savannah/nightly-builds/$version/R-package/
 
 
-	## upload to google code
+	    ## upload to google code
 	    if [ x$upload = xyes ]; then
 		googlecode_upload.py -s \
 		    "Nightly build, GNU R source package, $tree tree, revision $revision" \
@@ -188,7 +188,7 @@ if [ $build_r = 1 ]; then
 		    -w $GC_PASSWORD $RPACKAGE || exit 22
 	    fi
 	    
-	## step back to the root
+	    ## step back to the root
 	    cd ../..
 	fi
 fi
