@@ -22,8 +22,8 @@
 
 */
 
-#include "igraph_stack.h"
 #include "igraph_datatype.h"
+#include "igraph_dqueue.h"
 #include "igraph_iterators.h"
 #include "igraph_interrupt_internal.h"
 #include "igraph_vector.h"
@@ -37,14 +37,14 @@ int igraph_i_eccentricity(const igraph_t *graph,
 			  const igraph_adjlist_t *adjlist) {
 
   int no_of_nodes=igraph_vcount(graph);
-  igraph_stack_t stack;
+  igraph_dqueue_long_t q;
   igraph_vit_t vit;
   igraph_vector_int_t counted;
   int i, mark=1;
   igraph_vector_t vneis, *neis=&vneis;
 
-  IGRAPH_CHECK(igraph_stack_init(&stack, 100));
-  IGRAPH_FINALLY(igraph_stack_destroy, &stack);
+  IGRAPH_CHECK(igraph_dqueue_long_init(&q, 100));
+  IGRAPH_FINALLY(igraph_dqueue_long_destroy, &q);
   
   IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
   IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -63,17 +63,17 @@ int igraph_i_eccentricity(const igraph_t *graph,
        !IGRAPH_VIT_END(vit); 
        IGRAPH_VIT_NEXT(vit), mark++, i++) {
 
-    int source;
+    long int source;
     source=IGRAPH_VIT_GET(vit);
-    IGRAPH_CHECK(igraph_stack_push(&stack, 0));
-    IGRAPH_CHECK(igraph_stack_push(&stack, source));
+    IGRAPH_CHECK(igraph_dqueue_long_push(&q, source));
+    IGRAPH_CHECK(igraph_dqueue_long_push(&q, 0));
     VECTOR(counted)[source]=mark;
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    while (!igraph_stack_empty(&stack)) {
-      int act=igraph_stack_pop(&stack);
-      int dist=igraph_stack_pop(&stack);
+    while (!igraph_dqueue_long_empty(&q)) {
+      long int act=igraph_dqueue_long_pop(&q);
+      long int dist=igraph_dqueue_long_pop(&q);
       int j, n;
 
       if (dist > VECTOR(*res)[i]) {
@@ -90,11 +90,11 @@ int igraph_i_eccentricity(const igraph_t *graph,
 	int nei=VECTOR(*neis)[j];
 	if (VECTOR(counted)[nei] != mark) {
 	  VECTOR(counted)[nei]=mark;
-	  IGRAPH_CHECK(igraph_stack_push(&stack, dist+1));
-	  IGRAPH_CHECK(igraph_stack_push(&stack, nei));
+	  IGRAPH_CHECK(igraph_dqueue_long_push(&q, nei));
+	  IGRAPH_CHECK(igraph_dqueue_long_push(&q, dist+1));
 	}
       }      
-    } /* while !igraph_stack_empty(stack) */
+    } /* while !igraph_dqueue_long_empty(dqueue) */
 
   } /* for IGRAPH_VIT_NEXT(vit) */
 
@@ -104,7 +104,7 @@ int igraph_i_eccentricity(const igraph_t *graph,
   }
   igraph_vector_int_destroy(&counted);
   igraph_vit_destroy(&vit);
-  igraph_stack_destroy(&stack);
+  igraph_dqueue_long_destroy(&q);
   IGRAPH_FINALLY_CLEAN(3);
   
   return 0;
