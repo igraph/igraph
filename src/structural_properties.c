@@ -982,7 +982,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
   igraph_vector_t ptrlist;
   igraph_vector_t ptrhead;
   long int n, j, i;
-  long int to_reach, reached=0, maxdist=-1;
+  long int to_reach, reached=0, maxdist=0;
 
   igraph_vit_t vit;
 
@@ -1064,7 +1064,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
     IGRAPH_ALLOW_INTERRUPTION();
 
     if (reached >= to_reach) {
-	    /* all nodes were reached. Since we need all the shortest paths
+      /* all nodes were reached. Since we need all the shortest paths
        * to all these nodes, we can stop the search only if the distance
        * of the current node to the root is larger than the distance of
        * any of the nodes we wanted to reach */
@@ -5596,7 +5596,7 @@ int igraph_i_vector_tail_cmp(const void* path1, const void* path2) {
  *        shortest paths will be calculated. A vertex might be given multiple
  *        times.
  * \param weights a vector holding the edge weights. All weights must be
- *        positive.
+ *        non-negative.
  * \param mode The type of shortest paths to be use for the
  *        calculation in directed graphs. Possible values: 
  *        \clist
@@ -5750,12 +5750,16 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         parent_vec = (igraph_vector_t*)VECTOR(parents)[tto];
         IGRAPH_CHECK(igraph_vector_push_back(parent_vec, minnei));
         IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
-      } else if (altdist == curdist) {
-	      /* This is an alternative path with exactly the same length */
+      } else if (altdist == curdist && VECTOR(*weights)[edge] > 0) {
+	/* This is an alternative path with exactly the same length.
+         * Note that we consider this case only if the edge via which we
+         * reached the node has a nonzero weight; otherwise we could create
+         * infinite loops in undirected graphs by traversing zero-weight edges
+         * back-and-forth */
         parent_vec = (igraph_vector_t*)VECTOR(parents)[tto];
         IGRAPH_CHECK(igraph_vector_push_back(parent_vec, minnei));
       } else if (altdist < curdist) {
-	      /* This is a shorter path */
+	/* This is a shorter path */
         VECTOR(dists)[tto] = altdist;
         parent_vec = (igraph_vector_t*)VECTOR(parents)[tto];
         igraph_vector_clear(parent_vec);
@@ -5774,10 +5778,15 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(2);
 
   /*
+  printf("Order:\n");
+  igraph_vector_print(&order);
+
   printf("Parent vertices:\n");
   for (i = 0; i < no_of_nodes; i++) {
-    printf("[%ld]: ", (long int)i);
-    igraph_vector_print(VECTOR(parents)[i]);
+    if (igraph_vector_size(VECTOR(parents)[i]) > 0) {
+      printf("[%ld]: ", (long int)i);
+      igraph_vector_print(VECTOR(parents)[i]);
+    }
   }
   */
 
@@ -5916,6 +5925,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
       /* now, take the parent vertices */
       parent_vec = (igraph_vector_t*)VECTOR(parents)[node];
       m = igraph_vector_size(parent_vec);
+
       /*
       printf("Calculating shortest paths to vertex %ld\n", node);
       printf("Parents are: ");
