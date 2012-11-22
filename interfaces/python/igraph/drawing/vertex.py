@@ -73,6 +73,7 @@ class DefaultVertexDrawer(AbstractCairoVertexDrawer):
             _kwds_prefix = "vertex_"
             color = ("red", self.palette.get)
             frame_color = ("black", self.palette.get)
+            frame_width = 1.0
             label = None
             label_angle = -pi/2
             label_dist  = 0.0
@@ -91,6 +92,7 @@ class DefaultVertexDrawer(AbstractCairoVertexDrawer):
         context.set_source_rgba(*visual_vertex.color)
         context.fill_preserve()
         context.set_source_rgba(*visual_vertex.frame_color)
+        context.set_line_width(visual_vertex.frame_width)
         context.stroke()
 
 
