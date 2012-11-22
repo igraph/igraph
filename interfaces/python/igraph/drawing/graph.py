@@ -325,7 +325,7 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
             context.set_source_rgba(*vertex.color)
             context.fill_preserve()
             context.set_source_rgba(*vertex.frame_color)
-            context.set_line_width(*vertex.frame_width)
+            context.set_line_width(vertex.frame_width)
             context.stroke()
 
         # Draw the vertex labels
