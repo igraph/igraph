@@ -40,6 +40,7 @@
 #include "config.h"
 
 #include "bigint.h"
+#include "prpack.h"
 
 igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector) {
   /* Many of the centrality measures correspond to the eigenvector of some
@@ -1219,7 +1220,6 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph, igraph_vector_t *vect
  * \ref igraph_arpack_rssolve() and \ref igraph_arpack_rnsolve() for
  * the underlying machinery.
  */
-
 int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
 		    igraph_real_t *value, const igraph_vs_t vids,
 		    igraph_bool_t directed, igraph_real_t damping, 
@@ -1227,6 +1227,21 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
 		    const igraph_vector_t *weights,
 		    igraph_arpack_options_t *options) {
 
+    return igraph_personalized_pagerank_prpack(graph, vector, value, vids,
+        directed, damping, reset, weights);
+}
+
+/*
+ * ARPACK-based implementation of \c igraph_personalized_pagerank.
+ *
+ * See \c igraph_personalized_pagerank for the documentation of the parameters.
+ */
+int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *vector,
+		    igraph_real_t *value, const igraph_vs_t vids,
+		    igraph_bool_t directed, igraph_real_t damping, 
+		    igraph_vector_t *reset,
+		    const igraph_vector_t *weights,
+		    igraph_arpack_options_t *options) {
   igraph_matrix_t values;
   igraph_matrix_t vectors;
   igraph_integer_t dirmode;

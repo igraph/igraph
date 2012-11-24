@@ -107,7 +107,14 @@ if INTERNAL_GLPK
   GLPK_LIB = libglpk.la
 endif
 
-noinst_LTLIBRARIES = $(F2C_LIB) $(BLAS_LIB) $(LAPACK_LIB) $(ARPACK_LIB) $(GLPK_LIB)
+include prpack/prpack.inc
+
+libprpack_la_SOURCES = $(PRPACK)
+libprpack_la_CFLAGS = -I$(top_srcdir)/include -DPRPACK_IGRAPH_SUPPORT
+libprpack_la_CPPFLAGS = -I$(top_srcdir)/include -DPRPACK_IGRAPH_SUPPORT
+PRPACK_LIB = libprpack.la
+
+noinst_LTLIBRARIES = $(F2C_LIB) $(BLAS_LIB) $(LAPACK_LIB) $(ARPACK_LIB) $(GLPK_LIB) $(PRPACK_LIB)
 
 CS = cs/cs_add.c       cs/cs_happly.c    cs/cs_pvec.c         \
 	cs/cs_amd.c       cs/cs_house.c     cs/cs_qr.c        \
@@ -253,18 +260,22 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     distances.c fortran_intrinsics.c matching.c \
 			     scg.c scg_approximate_methods.c scg_exact_scg.c \
 			     scg_kmeans.c scg_utils.c scg_optimal_method.c \
-			     qsort.c qsort_r.c types.c lad.c
+			     qsort.c qsort_r.c types.c lad.c \
+				 prpack.cpp
 
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
 libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(F2C_LIB) $(BLAS_LIB) \
-				 $(LAPACK_LIB) $(ARPACK_LIB) $(GLPK_LIB)
+				 $(LAPACK_LIB) $(ARPACK_LIB) $(GLPK_LIB) $(PRPACK_LIB)
 
 if INTERNAL_GLPK
   libigraph_la_CFLAGS   += -I$(top_srcdir)/optional/glpk
   libigraph_la_CXXFLAGS += -I$(top_srcdir)/optional/glpk
 endif
+
+libigraph_la_CFLAGS += -I$(top_srcdir)/src/prpack -DPRPACK_IGRAPH_SUPPORT
+libigraph_la_CXXFLAGS += -I$(top_srcdir)/src/prpack -DPRPACK_IGRAPH_SUPPORT
 
 includedir = $(prefix)/include/igraph
 include_HEADERS = $(HEADERS_PUBLIC)
