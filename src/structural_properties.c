@@ -7299,7 +7299,7 @@ int igraph_i_is_graphical_degree_sequence_directed(
 /**
  * \function igraph_is_graphical_degree_sequence
  * Determines whether a sequence of integers can be a degree sequence of some
- * undirected simple graph.
+ * simple graph.
  *
  * </para><para>
  * References:
