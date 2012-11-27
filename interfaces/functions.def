@@ -776,14 +776,12 @@ igraph_diversity:
 #######################################
 
 igraph_is_degree_sequence:
-        PARAMS: VECTOR out_deg, VECTOR in_deg, OUT BOOLEANPTR res
+        PARAMS: VECTOR out_deg, VECTOR_OR_0 in_deg=NULL, OUT BOOLEANPTR res
         NAME-R: is.degree.sequence
-        IGNORE: RR, RC, RNamespace
 
 igraph_is_graphical_degree_sequence:
-        PARAMS: VECTOR out_deg, VECTOR in_deg, OUT BOOLEANPTR res
+        PARAMS: VECTOR out_deg, VECTOR_OR_0 in_deg=NULL, OUT BOOLEANPTR res
         NAME-R: is.graphical.degree.sequence
-        IGNORE: RR, RC, RNamespace
 
 #######################################
 # Visitors
