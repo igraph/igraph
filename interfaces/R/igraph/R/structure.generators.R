@@ -522,6 +522,12 @@ graph.data.frame <- function(d, directed=TRUE, vertices=NULL) {
     stop("the data frame should contain at least two columns")
   }
 
+  ## This is to avoid scientific notation in vertex names, if they
+  ## happen to be numbers
+  scipen <- getOption("scipen")
+  options("scipen"=999)
+  on.exit(options(scipen=scipen))
+  
   ## Handle if some elements are 'NA'
   if (any(is.na(d[,1:2]))) {
     warning("In `d' `NA' elements were replaced with string \"NA\"")
