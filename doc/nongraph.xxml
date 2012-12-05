@@ -23,4 +23,9 @@
 <!-- doxrox-include igraph_convex_hull -->
 </section>
 
+<section><title>Fitting power-law distributions to empirical data</title>
+<!-- doxrox-include igraph_plfit_result_t -->
+<!-- doxrox-include igraph_power_law_fit -->
+</section>
+
 </chapter>
