@@ -70,7 +70,7 @@ __BEGIN_DECLS
  *               that the original data could have been drawn from the fitted
  *               power-law distribution.
  */
-typedef struct {
+typedef struct igraph_plfit_result_t {
   igraph_bool_t continuous;
   double alpha;
   double xmin;
