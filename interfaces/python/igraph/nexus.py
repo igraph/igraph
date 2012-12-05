@@ -64,6 +64,7 @@ class NexusConnection(object):
       tags: social network; undirected; weighted
       ...
       >>> karate = Nexus.get("karate")
+      >>> from igraph import summary
       >>> summary(karate)
       IGRAPH UNW- 34 78 -- Zachary's karate club network
       + attr: Author (g), Citation (g), name (g), Faction (v), id (v), name (v), weight (e)
