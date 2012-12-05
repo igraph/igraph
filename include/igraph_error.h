@@ -335,6 +335,7 @@ igraph_set_error_handler(igraph_error_handler_t* new_handler);
  * \enumval IGRAPH_EOVERFLOW Integer or double overflow.
  * \enumval IGRAPH_EGLP Internal GLPK error.
  * \enumval IGRAPH_CPUTIME CPU time exceeded.
+ * \enumval IGRAPH_EUNDERFLOW Integer or double underflow.
  */
 
 typedef enum {
@@ -394,7 +395,8 @@ typedef enum {
   IGRAPH_EDRL             = 54,
   IGRAPH_EOVERFLOW        = 55,
   IGRAPH_EGLP             = 56,
-  IGRAPH_CPUTIME          = 57
+  IGRAPH_CPUTIME          = 57,
+  IGRAPH_EUNDERFLOW       = 58
 } igraph_error_type_t;
 
 /**

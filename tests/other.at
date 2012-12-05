@@ -25,3 +25,8 @@ AT_SETUP([Convex hull calculation (igraph_convex_hull):])
 AT_KEYWORDS([igraph_convex_hull other])
 AT_COMPILE_CHECK([simple/igraph_convex_hull.c], [simple/igraph_convex_hull.out])
 AT_CLEANUP
+
+AT_SETUP([Fitting power-law distributions (igraph_power_law_fit):])
+AT_KEYWORDS([igraph_power_law_fit other power law fitting])
+AT_COMPILE_CHECK([simple/igraph_power_law_fit.c], [simple/igraph_power_law_fit.out])
+AT_CLEANUP

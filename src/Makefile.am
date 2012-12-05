@@ -12,6 +12,7 @@ lib_LTLIBRARIES         = libigraph.la
 include lapack/blas.inc
 include lapack/lapack.inc
 include lapack/arpack.inc
+include plfit/plfit.inc
 
 F2C =	f2c/abort_.c	  f2c/dolio.c	    f2c/r_sin.c\
 	f2c/dummy.c	  f2c/dtime_.c	    f2c/iio.c	      f2c/r_sinh.c\
@@ -107,7 +108,11 @@ if INTERNAL_GLPK
   GLPK_LIB = libglpk.la
 endif
 
-noinst_LTLIBRARIES = $(F2C_LIB) $(BLAS_LIB) $(LAPACK_LIB) $(ARPACK_LIB) $(GLPK_LIB)
+libplfit_la_SOURCES = $(PLFIT)
+PLFIT_LIB = libplfit.la
+
+noinst_LTLIBRARIES = $(F2C_LIB) $(BLAS_LIB) $(LAPACK_LIB) $(ARPACK_LIB) \
+					 $(GLPK_LIB) $(PLFIT_LIB)
 
 CS = cs/cs_add.c       cs/cs_happly.c    cs/cs_pvec.c         \
 	cs/cs_amd.c       cs/cs_house.c     cs/cs_qr.c        \
@@ -259,7 +264,7 @@ libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include $
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
 libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(F2C_LIB) $(BLAS_LIB) \
-				 $(LAPACK_LIB) $(ARPACK_LIB) $(GLPK_LIB)
+				 $(LAPACK_LIB) $(ARPACK_LIB) $(GLPK_LIB) $(PLFIT_LIB)
 
 if INTERNAL_GLPK
   libigraph_la_CFLAGS   += -I$(top_srcdir)/optional/glpk

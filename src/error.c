@@ -95,7 +95,8 @@ static const char *igraph_i_error_strings[]=
     /* 54 */ "Internal DrL error",
     /* 55 */ "Integer or double overflow",
     /* 56 */ "Internal GPLK error",
-    /* 57 */ "CPU time exceeded"
+    /* 57 */ "CPU time exceeded",
+    /* 58 */ "Integer or double underflow"
 };
 
 const char* igraph_strerror(const int igraph_errno) {

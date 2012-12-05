@@ -45,6 +45,40 @@ __BEGIN_DECLS
 /* Other, not graph related                           */
 /* -------------------------------------------------- */
 
+/**
+ * \struct igraph_plfit_result_t
+ * \brief Result of fitting a power-law distribution to a vector
+ *
+ * This data structure contains the result of \ref igraph_power_law_fit(),
+ * which tries to fit a power-law distribution to a vector of numbers. The
+ * structure contains the following members:
+ *
+ * \member continuous Whether the fitted power-law distribution was continuous
+ *                    or discrete.
+ * \member alpha The exponent of the fitted power-law distribution.
+ * \member xmin  The minimum value from which the power-law distribution was
+ *               fitted. In other words, only the values larger than \c xmin
+ *               were used from the input vector.
+ * \member L     The log-likelihood of the fitted parameters; in other words,
+ *               the probability of observing the input vector given the
+ *               parameters.
+ * \member D     The test statistic of a Kolmogorov-Smirnov test that compares
+ *               the fitted distribution with the input vector. Smaller scores
+ *               denote better fit.
+ * \member p     The p-value of the Kolmogorov-Smirnov test. Small p-values
+ *               (less than 0.05) indicate that the test rejected the hypothesis
+ *               that the original data could have been drawn from the fitted
+ *               power-law distribution.
+ */
+typedef struct {
+  igraph_bool_t continuous;
+  double alpha;
+  double xmin;
+  double L;
+  double D;
+  double p;
+} igraph_plfit_result_t;
+
 int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res, 
 			igraph_integer_t binwidth);
 int igraph_fisher_yates_shuffle(igraph_vector_t *seq);
@@ -60,6 +94,8 @@ int igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
 		int maxit, int trace,
 		igraph_real_t abstol, igraph_real_t reltol, int nREPORT, void *ex,
 		igraph_integer_t *fncount, igraph_integer_t *grcount);
+int igraph_power_law_fit(const igraph_vector_t* vector, igraph_plfit_result_t* result,
+                         igraph_real_t xmin, igraph_bool_t force_continuous);
 
 __END_DECLS
 
