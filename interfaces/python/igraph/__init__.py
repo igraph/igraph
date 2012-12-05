@@ -120,7 +120,7 @@ class Graph(GraphBase):
       True
       >>> g["A", "B"] = 2
       >>> g["A", "B"]
-      2.0
+      2
       >>> g.es["weight"]
       [1.0, 1.0, 2]
     """
@@ -3514,7 +3514,7 @@ class EdgeSeq(_igraph.EdgeSeq):
         For instance, the following would calculate betweenness centralities
         twice:
 
-          >>> edges = g.es.select(_edge_betweenness_gt=10,
+          >>> edges = g.es.select(_edge_betweenness_gt=10,       # doctest:+SKIP
           ...                     _edge_betweenness_lt=30)
 
         It is advised to use this instead:
