@@ -522,7 +522,7 @@ def percentile(xs, p=(25, 50, 75), sort=True):
         return quantile(xs, (x/100.0 for x in p), sort)
     return quantile(xs, p/100.0, sort)
 
-def power_law_fit(data, xmin=None, method="auto"):
+def power_law_fit(data, xmin=None, method="auto", return_alpha_only=False):
     """Fitting a power-law distribution to empirical data
 
     @param data: the data to fit, a list containing integer values
@@ -570,7 +570,14 @@ def power_law_fit(data, xmin=None, method="auto"):
         raise ValueError("unknown method: %s" % method)
 
     force_continuous = method in ("continuous", "hill")
-    return FittedPowerLaw(*_power_law_fit(data, xmin, force_continuous))
+    fit = FittedPowerLaw(*_power_law_fit(data, xmin, force_continuous))
+    if return_alpha_only:
+        from igraph import deprecated
+        deprecated("The return_alpha_only keyword argument of power_law_fit is "\
+                "deprecated from igraph 0.7 and will be removed in igraph 0.8")
+        return fit.alpha
+    else:
+        return fit
 
 def quantile(xs, q=(0.25, 0.5, 0.75), sort=True):
     """Returns the qth quantile of an unsorted or sorted numeric vector.
