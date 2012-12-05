@@ -492,6 +492,32 @@ PyObject* igraphmodule_is_graphical_degree_sequence(PyObject *self,
 }
 
 
+PyObject* igraphmodule_power_law_fit(PyObject *self, PyObject *args, PyObject *kwds) {
+  static char* kwlist[] = { "data", "xmin", "force_continuous", NULL };
+  PyObject *data_o, *force_continuous_o = Py_False;
+  igraph_vector_t data;
+  igraph_plfit_result_t result;
+  double xmin = -1;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|dO", kwlist, &data_o,
+        &xmin, &force_continuous_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_float_to_vector_t(data_o, &data))
+    return NULL;
+
+  if (igraph_power_law_fit(&data, &result, xmin, PyObject_IsTrue(force_continuous_o))) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&data);
+    return NULL;
+  }
+
+  igraph_vector_destroy(&data);
+
+  return Py_BuildValue("Oddddd", result.continuous ? Py_True : Py_False,
+      result.alpha, result.xmin, result.L, result.D, result.p);
+}
+
 PyObject* igraphmodule_split_join_distance(PyObject *self,
   PyObject *args, PyObject *kwds) {
   static char* kwlist[] = { "comm1", "comm2", NULL };
@@ -534,6 +560,10 @@ static PyMethodDef igraphmodule_methods[] =
   {"_compare_communities", (PyCFunction)igraphmodule_compare_communities,
     METH_VARARGS | METH_KEYWORDS,
     "_compare_communities(comm1, comm2, method=\"vi\")\n\n@undocumented"
+  },
+  {"_power_law_fit", (PyCFunction)igraphmodule_power_law_fit,
+    METH_VARARGS | METH_KEYWORDS,
+    "_power_law_fit(data, xmin=-1, force_continuous=False)\n\n@undocumented"
   },
   {"convex_hull", (PyCFunction)igraphmodule_convex_hull,
     METH_VARARGS | METH_KEYWORDS,
