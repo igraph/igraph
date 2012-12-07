@@ -211,7 +211,7 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     structural_properties.c components.c layout.c \
 			     structure_generators.c conversion.c \
 			     type_indexededgelist.c spanning_trees.c \
-			     error.c interrupt.c other.c foreign.c random.c \
+			     igraph_error.c interrupt.c other.c foreign.c random.c \
 			     attributes.c \
 			     foreign-ncol-parser.y foreign-ncol-lexer.l \
 			     foreign-lgl-parser.y foreign-lgl-lexer.l \
