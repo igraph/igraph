@@ -913,3 +913,9 @@ VERTEXINDEX_OR_0:
     OUT: PROTECT(%I%=R_igraph_vector_to_SEXP(&%C%)); \
          igraph_vector_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
+
+PLFIT:
+  CTYPE: igraph_plfit_result_t
+  CALL: &%C%
+  OUTCONV: 
+    OUT: PROTECT(%I%=R_igraph_plfit_result_to_SEXP(&%C%));

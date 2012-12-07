@@ -322,3 +322,5 @@ CMATRIX_OR_0:
     if (!is.null(%I%)) { \
        INCONV: %I% <- as.matrix(structure(as.complex(%I%), dim=dim(%I%))) \
     }
+
+PLFIT:

@@ -1796,6 +1796,16 @@ igraph_maximum_bipartite_matching:
        IGNORE: RR
 
 #######################################
+# Fitting power laws
+#######################################
+
+igraph_power_law_fit:
+       PARAMS: VECTOR data, OUT PLFIT res, REAL xmin=-1, \
+               BOOLEAN force_continuous=False
+       NAME-R: power.law.fit.new
+       IGNORE: RNamespace
+
+#######################################
 # Other, not graph related
 #######################################
 
