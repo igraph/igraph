@@ -53,6 +53,7 @@ void R_igraph_vectorlist_destroy(igraph_vector_ptr_t *ptr);
 SEXP R_igraph_hrg_to_SEXP(const igraph_hrg_t *hrg);
 SEXP R_igraph_sparsemat_to_SEXP(igraph_sparsemat_t *sp);
 SEXP R_igraph_0orsparsemat_to_SEXP(igraph_sparsemat_t *sp);
+SEXP R_igraph_plfit_result_to_SEXP(const igraph_plfit_result_t *plfit);
 
 int R_igraph_SEXP_to_strvector(SEXP rval, igraph_strvector_t *sv);
 int R_igraph_SEXP_to_strvector_copy(SEXP rval, igraph_strvector_t *sv);
@@ -2212,6 +2213,30 @@ int R_SEXP_to_hrg_copy(SEXP shrg, igraph_hrg_t *hrg) {
   R_SEXP_to_vector_copy(VECTOR_ELT(shrg, 3), &hrg->edges);
   R_SEXP_to_vector_copy(VECTOR_ELT(shrg, 4), &hrg->vertices);
   return 0;
+}
+
+SEXP R_igraph_plfit_result_to_SEXP(const igraph_plfit_result_t *plfit) {
+  SEXP result, names;
+  
+  PROTECT(result=NEW_LIST(6));
+  SET_VECTOR_ELT(result, 0, ScalarLogical(plfit->continuous));
+  SET_VECTOR_ELT(result, 1, ScalarReal(plfit->alpha));
+  SET_VECTOR_ELT(result, 2, ScalarReal(plfit->xmin));
+  SET_VECTOR_ELT(result, 3, ScalarReal(plfit->L));
+  SET_VECTOR_ELT(result, 4, ScalarReal(plfit->D));
+  SET_VECTOR_ELT(result, 5, ScalarReal(plfit->p));
+  
+  PROTECT(names=NEW_CHARACTER(6));
+  SET_STRING_ELT(names, 0, mkChar("continuous"));
+  SET_STRING_ELT(names, 1, mkChar("alpha"));
+  SET_STRING_ELT(names, 2, mkChar("xmin"));
+  SET_STRING_ELT(names, 3, mkChar("logLik"));
+  SET_STRING_ELT(names, 4, mkChar("KS.stat"));
+  SET_STRING_ELT(names, 5, mkChar("KS.p"));
+  SET_NAMES(result, names);
+  
+  UNPROTECT(2);
+  return result;
 }
 
 int R_SEXP_to_sparsemat(SEXP pakl, igraph_sparsemat_t *akl) {
