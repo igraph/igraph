@@ -40,7 +40,7 @@ double plfit_kolmogorov(double z) {
 
     if (u < 6.8116) {
         double r[4] = { 0, 0, 0, 0 };
-        long int maxj = (long int)(round(3.0 / u));
+        long int maxj = (long int)(3.0 / u + 0.5);
         long int j;
 
         if (maxj < 1)
@@ -57,10 +57,10 @@ double plfit_kolmogorov(double z) {
     return 0;
 }
 
-double plfit_ks_test_one_sample_p(double d, int n) {
+double plfit_ks_test_one_sample_p(double d, size_t n) {
     return plfit_kolmogorov(d * sqrt(n));
 }
 
-double plfit_ks_test_two_sample_p(double d, int n1, int n2) {
+double plfit_ks_test_two_sample_p(double d, size_t n1, size_t n2) {
     return plfit_kolmogorov(d * sqrt(n1*n2 / ((double)(n1+n2))));
 }
