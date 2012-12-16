@@ -30,11 +30,13 @@
 # define __END_DECLS /* empty */
 #endif
 
+#include <stdlib.h>
+
 __BEGIN_DECLS
 
 double plfit_kolmogorov(double z);
-double plfit_ks_test_one_sample_p(double d, int n);
-double plfit_ks_test_two_sample_p(double d, int n1, int n2);
+double plfit_ks_test_one_sample_p(double d, size_t n);
+double plfit_ks_test_two_sample_p(double d, size_t n1, size_t n2);
 
 __END_DECLS
 

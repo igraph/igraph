@@ -30,10 +30,21 @@
 # define __END_DECLS /* empty */
 #endif
 
+#include <float.h>
+
 __BEGIN_DECLS
 
-#if WIN32
+#ifdef _MSC_VER
 #define snprintf sprintf_s
+#define isnan(x) _isnan(x)
+#ifndef INFINITY
+#  define INFINITY (DBL_MAX+DBL_MAX)
+#endif
+
+#ifndef NAN
+#  define NAN (INFINITY-INFINITY)
+#endif
+
 #endif
 
 __END_DECLS

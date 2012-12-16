@@ -22,6 +22,7 @@
 #include <string.h>
 #include "error.h"
 #include "gss.h"
+#include "platform.h"
 
 /**
  * \def PHI
@@ -43,8 +44,8 @@
  * Default parameters for the GSS algorithm.
  */
 static const gss_parameter_t _defparam = {
-    .epsilon = DBL_MIN,
-	.on_error = GSS_ERROR_STOP
+    /* .epsilon = */  DBL_MIN,
+	/* .on_error = */ GSS_ERROR_STOP
 };
 
 /**
