@@ -103,6 +103,10 @@ so they should work out of the box. Linux users should refer to the
 compilation instructions (but check your distribution first, maybe
 there are pre-compiled packages available). OS X Snow Leopard users may
 benefit from the disk images in the Python Package Index.
+
+Unofficial installers for 64-bit Windows machines and/or different Python
+versions can also be found `here <http://www.lfd.uci.edu/~gohlke/pythonlibs>`_.
+Many thanks to the maintainers of this page!
 """
 
 plat = get_platform()
