@@ -1106,6 +1106,9 @@ void graph::Solve_Analytic( int node_ind, float &pos_x, float &pos_y )
 		damping = 1.0 - damping_mult;
 		pos_x = damping*positions[ node_ind ].x + (1.0-damping) * x_cen;
 		pos_y = damping*positions[ node_ind ].y + (1.0-damping) * y_cen;
+   } else {
+		pos_x = positions[ node_ind ].x;
+		pos_y = positions[ node_ind ].y;
    }
    
    // No cut edge flag (?)

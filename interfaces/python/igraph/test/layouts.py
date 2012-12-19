@@ -211,6 +211,10 @@ class LayoutAlgorithmTests(unittest.TestCase):
         lo = g.layout("rt", root=[0, 100], rootlevel = [2, 10])
         self.assertEqual(lo[100][1]-lo[0][1], 8)
 
+    def testDRL(self):
+        # Regression test for bug #1091891
+        g = Graph.Ring(10, circular=False) + 1
+        lo = g.layout("drl")
 
 def suite():
     layout_suite = unittest.makeSuite(LayoutTests)
