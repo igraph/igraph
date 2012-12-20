@@ -1962,17 +1962,18 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
 
     IGRAPH_VECTOR_INIT_FINALLY(&myroots, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&membership, no_of_nodes);
 
     if (igraph_is_directed(graph) && mode != IGRAPH_ALL) {
       IGRAPH_CHECK(igraph_topological_sorting(graph, &order, mode2));
+      IGRAPH_CHECK(igraph_clusters(graph, &membership, /*csize=*/ 0, 
+        &no_comps, IGRAPH_STRONG));
     } else {
       IGRAPH_CHECK(igraph_sort_vertex_ids_by_degree(graph, &order,
             igraph_vss_all(), IGRAPH_ALL, 0, IGRAPH_ASCENDING, 0));
+      IGRAPH_CHECK(igraph_clusters(graph, &membership, /*csize=*/ 0, 
+        &no_comps, IGRAPH_WEAK));
     }
-    
-    IGRAPH_VECTOR_INIT_FINALLY(&membership, no_of_nodes);
-    IGRAPH_CHECK(igraph_clusters(graph, &membership, /*csize=*/ 0, 
-				 &no_comps, IGRAPH_WEAK));
     
     IGRAPH_CHECK(igraph_vector_resize(&myroots, no_comps));
     igraph_vector_null(&myroots);
