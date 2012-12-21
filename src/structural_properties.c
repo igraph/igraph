@@ -1532,7 +1532,7 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   long int i;
-  igraph_integer_t a, b, c, d, dummy;
+  igraph_integer_t a, b, c, d, dummy, num_swaps;
   igraph_vector_t eids, edgevec;
   igraph_bool_t directed, loops, ok;
   igraph_es_t es;
@@ -1557,9 +1557,13 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
    * (so unsuccessful rewirings still count as a trial)
    */
 
-  while (n>0) {
+  num_swaps = 0;
+  while (num_swaps < n) {
     
     IGRAPH_ALLOW_INTERRUPTION();
+    if (num_swaps % 1000 == 0) {
+      IGRAPH_PROGRESS("Random rewiring: ", (100.0 * num_swaps) / n, 0);
+    }
     
     switch (mode) {
     case IGRAPH_REWIRING_SIMPLE:
@@ -1630,9 +1634,11 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
       RNG_END();
       IGRAPH_ERROR("unknown rewiring mode", IGRAPH_EINVMODE);
     }
-    n--;
+    num_swaps++;
   }
   
+  IGRAPH_PROGRESS("Random rewiring: ", 100.0, 0);
+
   igraph_vector_destroy(&eids);
   igraph_vector_destroy(&edgevec);
   IGRAPH_FINALLY_CLEAN(2);
