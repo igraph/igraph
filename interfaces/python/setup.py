@@ -19,7 +19,7 @@ from os import mkdir
 from shutil import copy2
 from subprocess import Popen, PIPE
 
-LIBIGRAPH_FALLBACK_INCLUDE_DIRS = ['/usr/include', '/usr/local/include']
+LIBIGRAPH_FALLBACK_INCLUDE_DIRS = ['/usr/include/igraph', '/usr/local/include/igraph']
 LIBIGRAPH_FALLBACK_LIBRARIES = ['igraph']
 LIBIGRAPH_FALLBACK_LIBRARY_DIRS = []
 
