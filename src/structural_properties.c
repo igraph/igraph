@@ -1532,7 +1532,8 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   long int i;
-  igraph_integer_t a, b, c, d, dummy, num_swaps;
+  char message[256];
+  igraph_integer_t a, b, c, d, dummy, num_swaps, num_successful_swaps;
   igraph_vector_t eids, edgevec;
   igraph_bool_t directed, loops, ok;
   igraph_es_t es;
@@ -1557,12 +1558,15 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
    * (so unsuccessful rewirings still count as a trial)
    */
 
-  num_swaps = 0;
+  num_swaps = num_successful_swaps = 0;
   while (num_swaps < n) {
     
     IGRAPH_ALLOW_INTERRUPTION();
     if (num_swaps % 1000 == 0) {
-      IGRAPH_PROGRESS("Random rewiring: ", (100.0 * num_swaps) / n, 0);
+      snprintf(message, sizeof(message),
+          "Random rewiring (%.2f%% of the trials were successful)",
+          (100.0 * num_successful_swaps) / num_swaps);
+      IGRAPH_PROGRESS(message, (100.0 * num_swaps) / n, 0);
     }
     
     switch (mode) {
@@ -1628,6 +1632,7 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
 	/* printf("Adding: %ld -> %ld, %ld -> %ld\n",
                   (long)a, (long)d, (long)c, (long)b); */
 	igraph_add_edges(graph, &edgevec, 0);
+        num_successful_swaps++;
       }
       break;
     default:
