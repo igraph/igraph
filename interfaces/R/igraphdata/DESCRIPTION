@@ -9,6 +9,6 @@ Suggests: igraph0, igraph
 Description: A small collection of various network data sets, 
   to use with the igraph package. They also work with the igraph0 
   package.
-License: GPL (>= 2) + file LICENSE
+License: CC BY-SA 2.0 + file LICENSE
 URL: http://igraph.sourceforge.net
 BugReports: http://bugs.launchpad.net/igraph
