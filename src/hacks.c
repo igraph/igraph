@@ -23,6 +23,7 @@
 
 #include <memory.h>
 #include <string.h>
+#include <stdlib.h>
 #include "igraph_hacks_internal.h"
 
 /* These are implementations of common C functions that may be missing from some
