@@ -154,12 +154,14 @@ int igraph_i_find_k_cliques(const igraph_t *graph,
 	}
         /* See if new_member_storage is full. If so, reallocate */
         if (m == new_member_storage_size) {
+            IGRAPH_FINALLY_CLEAN(1);
             *new_member_storage = igraph_Realloc(*new_member_storage,
                                           new_member_storage_size*2,
                                           igraph_real_t);
             if (*new_member_storage == 0)
                 IGRAPH_ERROR("cliques failed", IGRAPH_ENOMEM);
             new_member_storage_size *= 2;
+            IGRAPH_FINALLY(igraph_free, *new_member_storage);
         }
       }
     }
@@ -196,7 +198,6 @@ int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
   igraph_vector_ptr_clear(res);
   
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
-  igraph_vector_ptr_clear(res);
   IGRAPH_FINALLY(igraph_i_cliques_free_res, res);
     
   /* Will be resized later, if needed. */
