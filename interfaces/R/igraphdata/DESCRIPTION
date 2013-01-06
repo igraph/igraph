@@ -1,5 +1,5 @@
 Package: igraphdata
-Version: 0.1
+Version: 0.1-1
 Date: 2012-05-11
 Title: A collection of network data sets for the igraph package
 Author: Gabor Csardi <csardi.gabor@gmail.com>
