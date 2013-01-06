@@ -30,7 +30,12 @@ static char *plfit_i_error_strings[] = {
     "Not enough memory"
 };
 
+#ifndef USING_R
 static plfit_error_handler_t* plfit_error_handler = plfit_error_handler_abort;
+#else
+/* This is overwritten, anyway */
+static plfit_error_handler_t* plfit_error_handler = plfit_error_handler_ignore;
+#endif
 
 const char* plfit_strerror(const int plfit_errno) {
   return plfit_i_error_strings[plfit_errno];
@@ -47,18 +52,22 @@ void plfit_error(const char *reason, const char *file, int line,
     plfit_error_handler(reason, file, line, plfit_errno);
 }
 
+#ifndef USING_R
 void plfit_error_handler_abort(const char *reason, const char *file, int line,
         int plfit_errno) {
     fprintf(stderr, "Error at %s:%i : %s, %s\n", file, line, reason,
             plfit_strerror(plfit_errno));
     abort();
 }
+#endif
 
+#ifndef USING_R
 void plfit_error_handler_printignore(const char *reason, const char *file, int line,
         int plfit_errno) {
     fprintf(stderr, "Error at %s:%i : %s, %s\n", file, line, reason,
             plfit_strerror(plfit_errno));
 }
+#endif
 
 void plfit_error_handler_ignore(const char *reason, const char *file, int line,
         int plfit_errno) {
