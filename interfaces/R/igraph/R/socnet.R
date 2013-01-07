@@ -36,11 +36,11 @@ tkigraph <- function() {
 
   options(scipen=10000)
   
-  if (!exists(".tkigraph.env", envir=.GlobalEnv)) {
-    assign(".tkigraph.env", new.env(parent=.GlobalEnv), envir=.GlobalEnv)
-    assign("graphs", list(), .tkigraph.env)
-    assign("selected", list(), .tkigraph.env)
-    assign("tklines", list(), .tkigraph.env)
+  if (!exists("window", envir=.tkigraph.env, inherits=FALSE)) {
+    assign("window", TRUE, envir=.tkigraph.env)
+    assign("graphs", list(), envir=.tkigraph.env)
+    assign("selected", list(), envir=.tkigraph.env)
+    assign("tklines", list(), envir=.tkigraph.env)
   } else {
     stop("tkigraph window is already open!")
   }
@@ -54,7 +54,7 @@ tkigraph <- function() {
   tkplace(topframe, x=0, y=0, relwidth=1.0)
   
   # Store myself in the environment if needed
-  if (!exists("top", envir=.tkigraph.env)) {
+  if (!exists("top", envir=.tkigraph.env, inherits=FALSE)) {
     assign("top", top, envir=.tkigraph.env)
     assign("topframe", topframe, envir=.tkigraph.env)
   }
@@ -294,7 +294,7 @@ tkigraph <- function() {
   top <- get("top", .tkigraph.env)
   tkbind(top, "<Destroy>", "")
   tkdestroy(top)
-  rm(.tkigraph.env, envir=.GlobalEnv)
+  rm(list=ls(envir=.tkigraph.env), envir=.tkigraph.env)
 }
 
 .tkigraph.get.selected <- function() {
