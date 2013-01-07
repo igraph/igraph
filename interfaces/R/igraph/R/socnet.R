@@ -2010,7 +2010,6 @@ tkigraph <- function() {
         stop("rownumbers argument must be TRUE, FALSE or have length nrow(dataframe)")
     oldwidth <- unlist(options("width"))
     options(width = 10000)
-    .tkigraph.ttt <- NULL
     conn <- textConnection(".tkigraph.ttt", open="w")
     sink(conn)
     options(max.print=10000000)
