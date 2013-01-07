@@ -7,7 +7,7 @@
   degrees. This is exactly what \code{degree.sequence.game} does.}
 \usage{
 degree.sequence.game(out.deg, in.deg = NULL,
-     method = c("simple", "vl"), \dots)
+     method = c("simple", "vl", "simple.no.multiple"), \dots)
 }
 \arguments{
   \item{out.deg}{Numeric vector, the sequence of degrees (for undirected
