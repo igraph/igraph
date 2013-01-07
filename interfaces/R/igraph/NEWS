@@ -1,3 +1,92 @@
+============
+igraph 0.6.4
+============
+
+Released January xx, 2013
+
+The version number is not a mistake, we jump to 0.6.4 from 0.6, 
+for technical reasons.
+
+==========================
+New features and bug fixes
+==========================
+
+- Added a vertex shape API for defining new vertex shapes, and also 
+  a couple of new vertex shapes.
+- Added the get.data.frame() function, opposite of graph.data.frame().
+- Added bipartite support to the Pajek reader and writer, closes bug
+  #1042298.
+- degree.sequence.game() has a new method now: "simple_no_multiple".
+- Added the is.degree.sequence() and is.graphical.degree.sequence()
+  functions.
+- rewire() has a new method: "loops", that can create loop edges.
+- Walktrap community detection now handles isolates.
+- layout.mds() returns a layout matrix now.
+- layout.mds() uses LAPACK instead of ARPACK.
+- Handle the '~' character in write.graph and read.graph. Bug
+  #1066986.
+- Added k.regular.game().
+- Use vertex names to plot if no labels are specified in the function
+  call or as vetex attributes. Fixes issue #1085431.
+- power.law.fit() can now use a C implementation.
+
+- Fixed a bug in barabasi.game() when out.seq was an empty vector.
+- Fixed a bug that made functions with a progress bar fail if called 
+  from another package.
+- Fixed a bug when creating graphs from a weighted integer adjacency 
+  matrix via graph.adjacency(). Bug #1019624.
+- Fixed overflow issues in centralization calculations.
+- Fixed a minimal.st.separators() bug, some vertex sets were incorrectly
+  reported as separators. Bug #1033045.
+- Fixed a bug that mishandled vertex colors in VF2 isomorphism
+  functions. Bug #1032819.
+- Pajek exporter now always quotes strings, thanks to Elena Tea Russo.
+- Fixed a bug with handling small edge weights in shortest paths 
+  calculation in shortest.paths() (Dijkstra's algorithm.) Thanks to 
+  Martin J Reed.
+- Weighted transitivity uses V(graph) as 'vids' if it is NULL.
+- Fixed a bug when 'pie' vertices were drawn together with other 
+  vertex shapes.
+- Speed up printing graphs.
+- Speed up attribute queries and other basic operations, by avoiding 
+  copying of the graph. Bug #1043616.
+- Fixed a bug in the NCV setting for ARPACK functions. It cannot be
+  bigger than the matrix size.
+- layout.merge()'s DLA mode has better defaults now.
+- Fixed a bug in layout.mds() that resulted vertices on top of each
+  other.
+- Fixed a bug in layout.spring(), it was not working properly.
+- Fixed layout.svd(), which was completely defunct.
+- Fixed a bug in layout.graphopt() that caused warnings and on 
+  some platforms crashes.
+- Fixed community.to.membership(). Bug #1022850.
+- Fixed a graph.incidence() crash if it was called with a non-matrix
+  argument.
+- Fixed a get.shortest.paths bug, when output was set to "both".
+- Motif finding functions return NA for isomorphism classes that are
+  not motifs (i.e. not connected). Fixes bug #1050859. 
+- Fixed get.adjacency() when attr is given, and the attribute has some
+  complex type. Bug #1025799. 
+- Fixed attribute name in graph.adjacency() for dense matrices. Bug
+  #1066952. 
+- Fixed erratic behavior of alpha.centrality().
+- Fixed igraph indexing, when attr is given. Bug #1073705.
+- Fixed a bug when calculating the largest cliques of a directed
+  graph. Bug #1073800.
+- Fixed a bug in the maximal clique search, closes #1074402.
+- Warn for negative weights when calculating PageRank.
+- Fixed dense, unweighted graph.adjacency when diag=FALSE. Closes
+  issue #1077425. 
+- Fixed a bug in eccentricity() and radius(), the results were often
+  simply wrong.
+- Fixed a bug in get.all.shortest.paths() when some edges had zero weight.
+- graph.data.frame() is more careful when vertex names are numbers, to
+  avoid their scientific notation. Fixes issue #1082221. 
+- Better check for NAs in vertex names. Fixes issue #1087215
+- Fixed a potential crash in the DrL layout generator.
+- Fixed a bug in the Reingold-Tilford layout when the graph is
+  directed and mode != ALL.
+
 ==========
 igraph 0.6
 ==========
