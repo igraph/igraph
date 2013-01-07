@@ -1,4 +1,15 @@
 ============
+igraph 0.5.6
+============
+
+Released January 5, 2013
+
+This is a minor update that fixes a bug in R's tkigraph(),
+that had a broken table viewer that left many features non-working. 
+Additionally, tkigraph() does not pollute the global environment
+any more.
+
+============
 igraph 0.5.4
 ============
 
