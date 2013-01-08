@@ -53,8 +53,8 @@ vector.xml: vector.xxml $(INCLUDEDIR)/igraph_vector_pmt.h $(SRCDIR)/vector.pmt $
 	$(SRCDIR)/vector.pmt $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.c \
 	$(INCLUDEDIR)/igraph_vector_ptr.h
 
-error.xml: error.xxml $(INCLUDEDIR)/igraph_error.h $(SRCDIR)/error.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_error.h $(SRCDIR)/error.c
+error.xml: error.xxml $(INCLUDEDIR)/igraph_error.h $(SRCDIR)/igraph_error.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_error.h $(SRCDIR)/igraph_error.c
 
 matrix.xml: matrix.xxml $(INCLUDEDIR)/igraph_matrix.h $(SRCDIR)/matrix.pmt
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_matrix.h $(SRCDIR)/matrix.pmt
