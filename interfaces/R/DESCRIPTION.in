@@ -1,5 +1,5 @@
 Package: igraph0
-Version: @VERSION@
+Version: @VERSION@-1
 Date: 2013-01-05
 Title:  Network analysis and visualization, old, deprecated package.
 Author: See AUTHORS file.
