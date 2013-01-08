@@ -264,7 +264,7 @@ static void igraph_i_plfit_error_handler_store(const char *reason, const char *f
  * This function fits a power-law distribution to a vector containing samples
  * from a distribution (that is assumed to follow a power-law of course). In
  * a power-law distribution, it is generally assumed that P(X=x) is
- * proportional to x<sup>-alpha</sup>, where x is a positive number and alpha
+ * proportional to x<superscript>-alpha</superscript>, where x is a positive number and alpha
  * is greater than 1. In many real-world cases, the power-law behaviour kicks
  * in only above a threshold value \em xmin. The goal of this functions is to
  * determine \em alpha if \em xmin is given, or to determine \em xmin and the
