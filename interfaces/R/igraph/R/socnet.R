@@ -1840,11 +1840,10 @@ tkigraph <- function() {
   tkinsert(txt, "end", paste("  Outer links:", comm$outer.links, "\n"))
 
   tkinsert(txt, "end", "\nThe community:\n")
-  .tkigraph.ttt <- NULL
-  con <- textConnection(".tkigraph.ttt", open="w")
+  con <- textConnection(NULL, open="w", local=TRUE)
   cat(sort(comm$community), file=con, fill=TRUE, sep=", ")
+  tkinsert(txt, "end", textConnectionValue(con))
   close(con)
-  tkinsert(txt, "end", .tkigraph.ttt)
   tkconfigure(txt, state="disabled")
 
   plot.communities <- function(simple=FALSE) {
@@ -1988,8 +1987,7 @@ tkigraph <- function() {
               inthis=NULL)
 {
     if (suppress.X11.warnings) { ## as in John Fox's Rcmdr package
-        messages.connection <- textConnection(".messages", open = "w",
-                                              local = TRUE)
+        messages.connection <- textConnection(NULL, open = "w", local = TRUE)
         sink(messages.connection, type = "message")
         on.exit({
             sink(type="message")
@@ -2010,13 +2008,13 @@ tkigraph <- function() {
         stop("rownumbers argument must be TRUE, FALSE or have length nrow(dataframe)")
     oldwidth <- unlist(options("width"))
     options(width = 10000)
-    conn <- textConnection(".tkigraph.ttt", open="w")
+    conn <- textConnection(NULL, open="w", local=TRUE)
     sink(conn)
     options(max.print=10000000)
     print(dataframe, right=right)
     sink()
+    zz <- strsplit(textConnectionValue(conn), "\n", fixed=TRUE)
     close(conn)
-    zz <- strsplit(.tkigraph.ttt, "\n", fixed=TRUE)
     if (length(zz) > 1 + nrow(dataframe)) stop(
        "data frame too wide")
     options(width = oldwidth)
