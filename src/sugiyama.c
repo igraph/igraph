@@ -569,13 +569,19 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
 static int igraph_i_layout_sugiyama_place_nodes_vertically(const igraph_t* graph,
     const igraph_vector_t* weights, igraph_vector_t* membership) {
   long int no_of_nodes = igraph_vcount(graph);
+  long int no_of_edges = igraph_ecount(graph);
   IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+
+  if (no_of_edges == 0) {
+    igraph_vector_fill(membership, 0);
+    return IGRAPH_SUCCESS;
+  }
 
 #ifdef HAVE_GLPK
   if (igraph_is_directed(graph) && no_of_nodes <= 1000) {
     /* Network simplex algorithm of Gansner et al, using the original linear
      * programming formulation */
-    long int i, j, no_of_edges = igraph_ecount(graph);
+    long int i, j;
     igraph_vector_t outdegs, indegs, feedback_edges;
     glp_prob *ip;
     glp_smcp parm;
