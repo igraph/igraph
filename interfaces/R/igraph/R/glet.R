@@ -53,7 +53,7 @@ project.net <- function(D, Bc, BB, Mu, iter) {
 ## on the Bc and finds Muc (using algorithm 2). Input D must be
 ## symettric with all nonnegative elements
 
-bsd.net <- function(D, iter) {  
+graphlets <- function(D, iter) {  
 
   print("Summary of the network:")
   Summary.net(D)
