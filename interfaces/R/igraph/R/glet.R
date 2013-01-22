@@ -102,3 +102,20 @@ bsd.net <- function(D, iter) {
 
   list(Bc=Bc[, Smb$ix], Muc=Mu[Smb$ix])
 }
+
+Summary.net <- function(Data.adj) {
+  ## print("Summary of network")
+  out=sprintf("Node= %d", nrow(Data.adj))
+  print(out)
+  out=sprintf("Edge= %f", sum(Data.adj > 0) / 2)
+  print(out)
+  ## out=sprintf("Toal msg= %f",sum(Data.adj)/2)
+  ## print(out)
+  out=sprintf("average weight per edge= %f", sum(Data.adj) / sum(Data.adj > 0))
+  print(out)
+  out=sprintf("max weight= %f", max(Data.adj))
+  print(out)
+  ## pdf("/n/airoldi_lab/azari/MsgFb/Results/Alg1/Weights.pdf")      
+  ## hist(Data.adj[which(Data.adj>0)])
+  ## dev.off() 
+}
