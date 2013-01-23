@@ -100,7 +100,8 @@ graphlets <- function(D, iter) {
   Mu <- project.net(D, Bc, BB, Mu, iter)
   Smb <- sort(Mu, decreasing=TRUE, index=TRUE)
 
-  list(Bc=Bc[, Smb$ix], Muc=Mu[Smb$ix])
+  list(Bc=apply(Bc[, Smb$ix], 2, function(x) which(x==1)),
+       Muc=Mu[Smb$ix])
 }
 
 Summary.net <- function(Data.adj) {
@@ -146,8 +147,8 @@ function() {
   co <- layout.kamada.kawai(g)
   par(mar=c(1,1,1,1))
   plot(g, layout=co)
-  for (i in 1:ncol(gl$Bc)) {
-    sel <- gl$Bc[,i] != 0
+  for (i in 1:length(gl$Bc)) {
+    sel <- gl$Bc[[i]]
     V(g)$color <- "white"
     V(g)[sel]$color <- "#E495A5"
     E(g)$width <- 1
