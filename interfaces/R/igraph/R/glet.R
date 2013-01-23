@@ -19,18 +19,23 @@ threshold.net <- function(graph, level) {
 ## D is NxN non negative weighted matrix
 ##  projects the network on the basis elements(Bc) and finds Mu
 
-project.net <- function(graph, Bc, Mu, iter) {
+project.net <- function(graph, Bc, iter) {
   K <- length(Bc)
-  a <- sapply(Bc, function(x) length(x)^2)
+  a <- sapply(Bc, function(x) length(x) * (length(x)+1) / 2)
   Mu <- rep(1, length(Bc))
 
-  D <- get.adjacency(graph, sparse=FALSE, attr="weight")
-  Bc2 <- sapply(Bc, function(i) { t <- numeric(ncol(D)); t[i] <- 1; t })
+  sele <- lapply(1:K, function(j) {
+    unique(as.vector(graph[ Bc[[j]], Bc[[j]], edges=TRUE, sparse=FALSE ]))
+  })
+  origw <- lapply(1:K, function(j) {
+    E(graph)$weight[sele[[j]]]
+  })
   for (i in 1:iter) {
-    Dh <- Bc2 %*% diag(Mu) %*% t(Bc2)
+    w <- numeric(ecount(graph))
+    for (j in 1:K) { w[sele[[j]]] <- w[sele[[j]]] + Mu[j] }
     for (j in 1:K) {
       Qt <- Bc[[j]]
-      Mu[j] <- Mu[j] * sum(D[Qt, Qt] / (Dh[Qt, Qt] + .0001)) / a[j]
+      Mu[j] <- Mu[j] * sum(origw[[j]] / (w[sele[[j]]] + .0001)) / a[j]
     }
   }
   Mu
@@ -62,7 +67,7 @@ graphlets <- function(graph, iter) {
     Bc <- unique(c(Bc, Bt))
   }
 
-  Mu <- project.net(graph, Bc, Mu, iter)
+  Mu <- project.net(graph, Bc, iter)
   Smb <- sort(Mu, decreasing=TRUE, index=TRUE)
 
   list(Bc=Bc[Smb$ix], Muc=Mu[Smb$ix])
