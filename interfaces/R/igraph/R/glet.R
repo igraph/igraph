@@ -5,25 +5,13 @@
 ## puts a Threshold on D at level and returns all maximal cliques of
 ## the binary network 
 
-threshold.net <- function(D, level) {
-  N <- nrow(D)
-  D.t <- data.matrix(D >= level)
-  El <- which(D.t > 0, arr.ind=TRUE)
-  Dth <- graph.edgelist(El, directed=FALSE)
+threshold.net <- function(graph, level) {
+  N <- vcount(graph)
+  graph.t <- delete.edges(graph, which(E(graph)$weight < level))
 
-  clqt <- maximal.cliques(Dth)
-  pobt <- length(clqt)
-
-  Bc <- matrix(0, N, pobt)
-  for (j in 1:pobt) { Bc[clqt[[j]], j] <- 1 }
-
-  W <- matrix(0, 1, pobt)
-  for (j in 1:pobt) { W[j] <- sum(Bc[, j]) }
-  WS <- sort(W, decreasing = TRUE, index.return = TRUE)
-  Bc <- Bc[, WS$ix[1:length(WS$ix)]]
-  if (pobt == 1) { Bc <- t(Bc) }
-
-  Bc
+  clqt <- maximal.cliques(graph.t)
+  clqt <- lapply(clqt, sort)
+  clqt[order(sapply(clqt, length), decreasing=TRUE)]
 }
 
 
@@ -31,16 +19,17 @@ threshold.net <- function(D, level) {
 ## D is NxN non negative weighted matrix
 ##  projects the network on the basis elements(Bc) and finds Mu
 
-project.net <- function(D, Bc, BB, Mu, iter) {
-  K <- ncol(Bc)
-  Qt <- list
-  a <- 0
-  for (j in 1:K) { a[j] <- sum(Bc[, j])^2 }
+project.net <- function(graph, Bc, Mu, iter) {
+  K <- length(Bc)
+  a <- sapply(Bc, function(x) length(x)^2)
+  Mu <- rep(1, length(Bc))
 
+  D <- get.adjacency(graph, sparse=FALSE, attr="weight")
+  Bc2 <- sapply(Bc, function(i) { t <- numeric(ncol(D)); t[i] <- 1; t })
   for (i in 1:iter) {
-    Dh <- Bc %*% diag(Mu) %*% t(Bc)
+    Dh <- Bc2 %*% diag(Mu) %*% t(Bc2)
     for (j in 1:K) {
-      Qt <- BB[which(BB[, 2] == j), 1]
+      Qt <- Bc[[j]]
       Mu[j] <- Mu[j] * sum(D[Qt, Qt] / (Dh[Qt, Qt] + .0001)) / a[j]
     }
   }
@@ -53,78 +42,37 @@ project.net <- function(D, Bc, BB, Mu, iter) {
 ## on the Bc and finds Muc (using algorithm 2). Input D must be
 ## symettric with all nonnegative elements
 
-graphlets <- function(D, iter) {  
+graphlets <- function(graph, iter) {  
 
-  print("Summary of the network:")
-  Summary.net(D)
-  print("Bit String Decomposition:")
-  N <- nrow(D)
-  Bc <- matrix(0, N, 1)
-  ls <- sort(D, decreasing=TRUE)
-  ldif <- diff(ls) < 0
-  L <- ls[which(ldif)]
-  L <- c(L, 0.0001)
-
-  for (level in L) {
-    Bt <- threshold.net(D, level)
-    pobt <- ncol(Bt)
-    W <- matrix(0, 1, pobt)
-    for (j in 1:pobt) { W[j] <- sum(Bt[, j]) }
-    WS <- sort(W, decreasing=TRUE, index.return=TRUE)
-    Bt <- Bt[, WS$ix[1:length(WS$ix)]]
-    ## Bt <- Bt[, which(WS$x > 1)]
-
-    Wc <- matrix(0, 1, ncol(Bc))
-    for (j in 1:ncol(Bc)) { Wc[j] <- sum(Bc[, j] * (1:N)) }
-
-    indic <- length(Bt) / N
-
-    if (indic > 1) {
-      for (j in 1:ncol(Bt)) {
-        flag <- 0
-        for (iij in which(Wc == sum(Bt[, j] * (1:N)))) {
-          if (sum(Bc[, iij] == Bt[, j]) == N) { flag <- 1 }
-        }
-        if ((flag == 0) & (sum(Bt[, j]) > 1) ) {
-          Bc <- matrix(c(Bc, Bt[, j]), nrow=N)
-        }
-      }
-    }
-    
+  if (!is.weighted(graph)) { stop("Graph not weighted") }
+  if (min(E(graph)$weight) <= 0 || !is.finite(E(graph)$weight)) {
+    stop("Edge weights must be non-negative and finite")
   }
-  
-  Bc <- Bc[, 2:ncol(Bc)]
-  BB <- which(Bc == 1, arr.ind=TRUE)
-  Mu <- array(1, ncol(Bc))
-  ## iter=10000
-  Mu <- project.net(D, Bc, BB, Mu, iter)
+  if (length(iter) != 1 || !is.numeric(iter) ||
+      !is.finite(iter) || iter != as.integer(iter)) {
+    stop("`iter' must be a non-negative finite integer scalar")
+  }
+
+  ## This is slow, but readable, will speed it up later
+  L <- c(unique(E(graph)$weight), 0.0001)
+  Bc <- list()
+  for (level in L) {
+    Bt <- threshold.net(graph, level)
+    Bt <- Bt[sapply(Bt, length) > 1]
+    Bc <- unique(c(Bc, Bt))
+  }
+
+  Mu <- project.net(graph, Bc, Mu, iter)
   Smb <- sort(Mu, decreasing=TRUE, index=TRUE)
 
-  list(Bc=apply(Bc[, Smb$ix], 2, function(x) which(x==1)),
-       Muc=Mu[Smb$ix])
-}
-
-Summary.net <- function(Data.adj) {
-  ## print("Summary of network")
-  out=sprintf("Node= %d", nrow(Data.adj))
-  print(out)
-  out=sprintf("Edge= %f", sum(Data.adj > 0) / 2)
-  print(out)
-  ## out=sprintf("Toal msg= %f",sum(Data.adj)/2)
-  ## print(out)
-  out=sprintf("average weight per edge= %f", sum(Data.adj) / sum(Data.adj > 0))
-  print(out)
-  out=sprintf("max weight= %f", max(Data.adj))
-  print(out)
-  ## pdf("/n/airoldi_lab/azari/MsgFb/Results/Alg1/Weights.pdf")      
-  ## hist(Data.adj[which(Data.adj>0)])
-  ## dev.off() 
+  list(Bc=Bc[Smb$ix], Muc=Mu[Smb$ix])
 }
 
 #################
 ## Example code
 
 function() {
+  library(igraph)
   D1 <- matrix(0, 5, 5)
   D2 <- matrix(0, 5, 5)
   D3 <- matrix(0, 5, 5)
@@ -132,11 +80,11 @@ function() {
   D2[3:5, 3:5] <- 3
   D3[2:5, 2:5] <- 1
   
-  D <- D1 + D2 + D3
+  g <- graph.adjacency(D1 + D2 + D3, mode="undirected", weighted=TRUE)
   
-  gl <- graphlets(D, iter=1000)
-  
-  g <- graph.adjacency(D, weighted=TRUE, mode="undirected", diag=FALSE)
+  gl <- graphlets(g, iter=1000)
+
+  g <- simplify(g)
   V(g)$color <- "white"
   E(g)$label <- E(g)$weight
   E(g)$label.cex <- 2
