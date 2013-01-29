@@ -1,4 +1,5 @@
 
+
 ## Algorithm 1:
 ## D is NxN non-negative weighted matrix
 ## level is a number between minimum and maximum element in D
@@ -14,40 +15,9 @@ threshold.net <- function(graph, level) {
   clqt[order(sapply(clqt, length), decreasing=TRUE)]
 }
 
+## Naive algorithm, do all thresholds for the whole graph
 
-## Algorithm 2:
-## D is NxN non negative weighted matrix
-##  projects the network on the basis elements(Bc) and finds Mu
-
-project.net <- function(graph, Bc, iter) {
-  K <- length(Bc)
-  a <- sapply(Bc, function(x) length(x) * (length(x)+1) / 2)
-  Mu <- rep(1, length(Bc))
-
-  sele <- lapply(1:K, function(j) {
-    unique(as.vector(graph[ Bc[[j]], Bc[[j]], edges=TRUE, sparse=FALSE ]))
-  })
-  origw <- lapply(1:K, function(j) {
-    E(graph)$weight[sele[[j]]]
-  })
-  for (i in 1:iter) {
-    w <- numeric(ecount(graph))
-    for (j in 1:K) { w[sele[[j]]] <- w[sele[[j]]] + Mu[j] }
-    for (j in 1:K) {
-      Qt <- Bc[[j]]
-      Mu[j] <- Mu[j] * sum(origw[[j]] / (w[sele[[j]]] + .0001)) / a[j]
-    }
-  }
-  Mu
-}
-
-
-## Main:
-## Finds all basis(Bc) for the network D (using algorithm 1), projects
-## on the Bc and finds Muc (using algorithm 2). Input D must be
-## symettric with all nonnegative elements
-
-graphlets <- function(graph, iter) {  
+graphlets <- function(graph, iter) {
 
   if (!is.weighted(graph)) { stop("Graph not weighted") }
   if (min(E(graph)$weight) <= 0 || !is.finite(E(graph)$weight)) {
@@ -58,19 +28,67 @@ graphlets <- function(graph, iter) {
     stop("`iter' must be a non-negative finite integer scalar")
   }
 
-  ## This is slow, but readable, will speed it up later
-  L <- c(unique(E(graph)$weight), 0.0001)
-  Bc <- list()
-  for (level in L) {
-    Bt <- threshold.net(graph, level)
-    Bt <- Bt[sapply(Bt, length) > 1]
-    Bc <- unique(c(Bc, Bt))
+  ## Do all thresholds
+  cl <- lapply(sort(unique(E(graph)$weight)), function(w) {
+    threshold.net(graph, w)
+  })
+
+  ## Put the cliques in one long list
+  clv <- unlist(cl, recursive=FALSE)
+
+  ## Sort the vertices within the cliques
+  cls <- lapply(clv, sort)
+
+  ## Delete duplicate cliques
+  clu <- unique(cls)
+
+  ## Delete cliques that consist of single vertices
+  clf <- clu[sapply(clu, length) != 1]
+
+  ## Create vertex-clique list first
+  vcl <- vector(length=vcount(graph), mode="list")
+  for (i in 1:length(clf)) {
+    for (j in clf[[i]]) {
+      vcl[[j]] <- c(vcl[[j]], i)
+    }
   }
 
-  Mu <- project.net(graph, Bc, iter)
-  Smb <- sort(Mu, decreasing=TRUE, index=TRUE)
+  ## Create edge-clique list from this, it is useful to have the edge list
+  ## of the graph at hand
+  el <- get.edgelist(graph, names=FALSE)
+  ecl <- vector(length=ecount(graph), mode="list")
+  for (i in 1:ecount(graph)) {
+    edge <- el[i,]
+    ecl[[i]] <- intersect(vcl[[edge[1]]], vcl[[edge[2]]])
+  }
 
-  list(Bc=Bc[Smb$ix], Muc=Mu[Smb$ix])
+  ## We will also need a clique-edge list, the edges in the cliques
+  system.time({
+    cel <- vector(length=length(clf), mode="list")
+    for (i in 1:length(ecl)) {
+      for (j in ecl[[i]]) {
+        cel[[j]] <- c(cel[[j]], i)
+      }
+    }
+  })
+
+  ## OK, we are ready to do the projection now
+  Mu <- rep(1, length(clf))
+  origw <- E(graph)$weight
+  w <- numeric(length(ecl))
+  a <- sapply(clf, function(x) length(x) * (length(x) + 1) / 2)
+  for (i in 1:iter) {
+    for (j in 1:length(ecl)) {
+      w[j] <- sum(Mu[ ecl[[j]] ])
+    }
+    for (j in 1:length(clf)) {
+      Mu[j] <- Mu[j] * sum(origw[cel[[j]]] / (w[cel[[j]]] + .0001)) / a[j]
+    }
+  }
+
+  ## Sort the cliques according to their weights
+  Smb <- sort(Mu, decreasing=TRUE, index=TRUE)
+  list(Bc=clf[Smb$ix], Muc=Mu[Smb$ix])
 }
 
 #################
