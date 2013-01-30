@@ -21,18 +21,18 @@
 #include "plfit.h"
 
 const plfit_continuous_options_t plfit_continuous_default_options = {
-	.finite_size_correction = 0,
-	.xmin_method = PLFIT_GSS_OR_LINEAR
+  /* .finite_size_correction = */ 0,
+  /* .xmin_method = */ PLFIT_GSS_OR_LINEAR
 };
 
 const plfit_discrete_options_t plfit_discrete_default_options = {
-	.finite_size_correction = 0,
-	.alpha_method = PLFIT_LBFGS,
-	.alpha = {
-		.min = 1.01,
-		.max = 5,
-		.step = 0.01
-	}
+  /* .finite_size_correction = */ 0,
+  /* .alpha_method = */ PLFIT_LBFGS,
+  /* .alpha = */ {
+    /* .min = */ 1.01,
+    /* .max = */ 5,
+    /* .step = */ 0.01
+  }
 };
 
 int plfit_continuous_options_init(plfit_continuous_options_t* options) {
