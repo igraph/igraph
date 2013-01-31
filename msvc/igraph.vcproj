@@ -624,7 +624,7 @@
 				RelativePath=".\src\f2c\err.c">
 			</File>
 			<File
-				RelativePath=".\src\error.c">
+				RelativePath=".\src\igraph_error.c">
 			</File>
 			<File
 				RelativePath=".\src\f2c\etime_.c">
@@ -968,6 +968,48 @@
 			<File
 				RelativePath=".\src\zeroin.c">
 			</File>
+			<File
+				RelativePath=".\src\scg.c">
+			</File>
+			<File
+				RelativePath=".\src\scg_approximate_methods.c">
+			</File>
+			<File
+				RelativePath=".\src\scg_exact_scg.c">
+			</File>
+			<File
+				RelativePath=".\src\scg_kmeans.c">
+			</File>
+			<File
+				RelativePath=".\src\scg_utils.c">
+			</File>
+			<File
+				RelativePath=".\src\scg_optimal_method.c">
+			</File>
+			<File
+				RelativePath=".\src\hacks.c">
+			</File>
+			<File
+				RelativePath=".\src\plfit\error.c">
+			</File>
+			<File
+				RelativePath=".\src\plfit\gss.c">
+			</File>
+			<File
+				RelativePath=".\src\plfit\kolmogorov.c">
+			</File>
+			<File
+				RelativePath=".\src\plfit\lbfgs.c">
+			</File>
+			<File
+				RelativePath=".\src\plfit\options.c">
+			</File>
+			<File
+				RelativePath=".\src\plfit\plfit.c">
+			</File>
+			<File
+				RelativePath=".\src\plfit\zeta.c">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -1238,6 +1280,36 @@
 			</File>
 			<File
 				RelativePath=".\src\walktrap_heap.h">
+			</File>
+			<File
+				RelativePath=".\src\plfit\arithmetic_ansi.h">
+			</File>
+			<File
+				RelativePath=".\src\plfit\arithmetic_sse_double.h">
+			</File>
+			<File
+				RelativePath=".\src\plfit\arithmetic_sse_float.h">
+			</File>
+			<File
+				RelativePath=".\src\plfit\error.h">
+			</File>
+			<File
+				RelativePath=".\src\plfit\gss.h">
+			</File>
+			<File
+				RelativePath=".\src\plfit\kolmogorov.h">
+			</File>
+			<File
+				RelativePath=".\src\plfit\lbfgs.h">
+			</File>
+			<File
+				RelativePath=".\src\plfit\platform.h">
+			</File>
+			<File
+				RelativePath=".\src\plfit\plfit.h">
+			</File>
+			<File
+				RelativePath=".\src\plfit\zeta.h">
 			</File>
 		</Filter>
 		<Filter
