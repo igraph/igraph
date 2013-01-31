@@ -247,5 +247,14 @@ arpack(f, options=list(n=10, nev=1, ncv=3), sym=TRUE)
 # double check
 eigen(graph.laplacian(graph.star(10, mode="undirected")))
 
+## First three eigenvalues of the adjacency matrix of a graph
+## We need the 'Matrix' package for this
+if (require(Matrix)) {
+  g <- erdos.renyi.game(1000, 5/1000)
+  M <- get.adjacency(g, sparse=TRUE)
+  f2 <- function(x, extra=NULL) { cat("."); as.vector(M \%*\% x) }
+  baev <- arpack(f2, options=list(n=vcount(g), nev=3, ncv=8, sym=TRUE,
+                                  which="LM", maxiter=200))
+}
 }
 \keyword{graphs}
