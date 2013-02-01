@@ -2159,10 +2159,10 @@ int igraph_community_label_propagation(const igraph_t *graph,
     }
     /* Check if the labels used are valid, initialize membership vector */
     for (i=0; i<no_of_nodes; i++) {
-      if (VECTOR(*initial)[i] < -1) {
+      if (VECTOR(*initial)[i] < 0) {
         VECTOR(*membership)[i] = 0;
       } else {
-        VECTOR(*membership)[i] = VECTOR(*initial)[i] + 1;
+        VECTOR(*membership)[i] = floor(VECTOR(*initial)[i]) + 1;
       }
     }
     if (fixed) {
