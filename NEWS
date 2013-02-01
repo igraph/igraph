@@ -88,6 +88,8 @@ R: new features and bug fixes
   directed and mode != ALL.
 - Fixed a bug in get.shortest.paths() when output="epath".
 - Fixed a bug in layout.sugiyama() when the graph had no edges.
+- Fixed a bug in label.propagation.community() when initial labels
+  contained -1 entries. Issue #1105460.
 
 =====================
 Python news and fixes
@@ -140,6 +142,8 @@ C library news and changes
 - Fixed a bug in the Reingold-Tilford layout when the graph is
   directed and mode != ALL.
 - Fixed a bug in igraph_layout_sugiyama() when the graph had no edges.
+- Fixed a bug in igraph_community_label_propagation() when initial labels
+  contained -1 entries. Issue #1105460.
 
 ==========
 igraph 0.6
