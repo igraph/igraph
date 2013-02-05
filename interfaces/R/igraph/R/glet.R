@@ -45,6 +45,23 @@ graphlets <- function(graph, iter) {
   ## Delete cliques that consist of single vertices
   clf <- clu[sapply(clu, length) != 1]
 
+  ## Project
+  graphlets.project(graph, clf, iter)
+}
+
+graphlets.project <- function(graph, cliques, iter, Mu=NULL) {
+
+  if (!is.weighted(graph)) { stop("Graph not weighted") }
+  if (min(E(graph)$weight) <= 0 || !is.finite(E(graph)$weight)) {
+    stop("Edge weights must be non-negative and finite")
+  }
+  if (length(iter) != 1 || !is.numeric(iter) ||
+      !is.finite(iter) || iter != as.integer(iter)) {
+    stop("`iter' must be a non-negative finite integer scalar")
+  }
+  
+  clf <- cliques
+  
   ## Create vertex-clique list first
   vcl <- vector(length=vcount(graph), mode="list")
   for (i in 1:length(clf)) {
@@ -73,7 +90,7 @@ graphlets <- function(graph, iter) {
   })
 
   ## OK, we are ready to do the projection now
-  Mu <- rep(1, length(clf))
+  if (is.null(Mu)) { Mu <- rep(1, length(clf)) }
   origw <- E(graph)$weight
   w <- numeric(length(ecl))
   a <- sapply(clf, function(x) length(x) * (length(x) + 1) / 2)
@@ -96,6 +113,32 @@ graphlets <- function(graph, iter) {
 
 function() {
   library(igraph)
+  
+  fitandplot <- function(g, gl) {
+    g <- simplify(g)
+    V(g)$color <- "white"
+    E(g)$label <- E(g)$weight
+    E(g)$label.cex <- 2
+    E(g)$color <- "black"
+    plot.new()
+    layout(matrix(1:6, nrow=2, byrow=TRUE))
+    co <- layout.kamada.kawai(g)
+    par(mar=c(1,1,1,1))
+    plot(g, layout=co)
+    for (i in 1:length(gl$Bc)) {
+      sel <- gl$Bc[[i]]
+      V(g)$color <- "white"
+      V(g)[sel]$color <- "#E495A5"
+      E(g)$width <- 1
+      E(g)[ V(g)[sel] %--% V(g)[sel] ]$width <- 2
+      E(g)$label <- ""
+      E(g)[ width == 2 ]$label <- round(gl$Muc[i], 2)
+      E(g)$color <- "black"
+      E(g)[ width == 2 ]$color <- "#E495A5"
+      plot(g, layout=co)
+    }
+  }
+
   D1 <- matrix(0, 5, 5)
   D2 <- matrix(0, 5, 5)
   D3 <- matrix(0, 5, 5)
@@ -104,31 +147,15 @@ function() {
   D3[2:5, 2:5] <- 1
   
   g <- graph.adjacency(D1 + D2 + D3, mode="undirected", weighted=TRUE)
-  
   gl <- graphlets(g, iter=1000)
 
-  g <- simplify(g)
-  V(g)$color <- "white"
-  E(g)$label <- E(g)$weight
-  E(g)$label.cex <- 2
-  E(g)$color <- "black"
+  fitandplot(g, gl)
 
-  plot.new()
-  layout(matrix(1:6, nrow=2, byrow=TRUE))
-  co <- layout.kamada.kawai(g)
-  par(mar=c(1,1,1,1))
-  plot(g, layout=co)
-  for (i in 1:length(gl$Bc)) {
-    sel <- gl$Bc[[i]]
-    V(g)$color <- "white"
-    V(g)[sel]$color <- "#E495A5"
-    E(g)$width <- 1
-    E(g)[ V(g)[sel] %--% V(g)[sel] ]$width <- 2
-    E(g)$label <- ""
-    E(g)[ width == 2 ]$label <- round(gl$Muc[i], 2)
-    E(g)$color <- "black"
-    E(g)[ width == 2 ]$color <- "#E495A5"
-    plot(g, layout=co)
-  }
+  ## Project another graph on the graphlets
+  set.seed(42)
+  g2 <- set.edge.attribute(g, "weight", value=sample(E(g)$weight))
+  gl2 <- graphlets.project(g2, gl$Bc, 1000)
+  fitandplot(g2, gl2)
+  
 }
 
