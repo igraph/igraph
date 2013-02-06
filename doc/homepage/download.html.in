@@ -84,7 +84,7 @@
     </li>
     <li class="download-source">
       <a onClick="javascript:urchinTracker ('/downloads/msvc'); "
-	 href="http://sourceforge.net/projects/igraph/files/Visual%20studio/${VERSION}/igraph-${VERSION}-msvc.tar.gz/download">Source code for Microsoft Visual Studio</a>
+	 href="http://sourceforge.net/projects/igraph/files/Visual%20studio/${VERSION}/igraph-${VERSION}-msvc.zip/download">Source code for Microsoft Visual Studio</a>
   </ul>
 </li>
 
