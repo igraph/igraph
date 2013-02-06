@@ -95,6 +95,59 @@ R: new features and bug fixes
 Python news and fixes
 =====================
 
+- Added bipartite support to the Pajek reader and writer, closes bug
+  #1042298.
+- Graph.Degree_Sequence() has a new method now: "no_multiple".
+- Added the is_degree_sequence() and is_graphical_degree_sequence()
+  functions.
+- rewire() has a new mode: "loops", that can create loop edges.
+- Walktrap community detection now handles isolates.
+- Added Graph.K_Regular().
+- power_law_fit() now uses a C implementation.
+- Added support for setting the frame (stroke) width of vertices using the
+  frame_width attribute or the vertex_frame_width keyword argument in plot()
+- Improved Inkscape-friendly SVG output from Graph.write_svg(), thanks to drlog
+- Better handling of named vertices in Graph.delete_vertices()
+- Added experimental Gephi graph streaming support; see igraph.remote.gephi and
+  igraph.drawing.graph.GephiGraphStreamingDrawer
+- Nicer __repr__ output for Flow and Cut instances
+- Arrows are now placed correctly around diamond-shaped nodes on plots
+- Added Graph.TupleList, a function that allows one to create graphs with
+  edge attributes quickly from a list of tuples.
+- plot() now also supports .eps as an extension, not only .ps
+
+- Fixed overflow issues in centralization calculations.
+- Fixed a bug that mishandled vertex colors in VF2 isomorphism
+  functions. Bug #1032819.
+- Pajek exporter now always quotes strings, thanks to Elena Tea Russo.
+- Fixed a bug with handling small edge weights in shortest paths 
+  calculation in Graph.shortest_paths() (Dijkstra's algorithm.) Thanks to 
+  Martin J Reed.
+- Fixed a bug in the NCV setting for ARPACK functions. It cannot be
+  bigger than the matrix size.
+- Fixed a bug in Graph.layout_mds() that resulted vertices on top of each
+  other.
+- Motif finding functions return nan for isomorphism classes that are
+  not motifs (i.e. not connected). Fixes bug #1050859. 
+- Fixed a bug when calculating the largest cliques of a directed
+  graph. Bug #1073800.
+- Warn for negative weights when calculating PageRank.
+- Fixed a bug in Graph.eccentricity() and Graph.radius(), the results were often
+  simply wrong.
+- Fixed a bug in Graph.get.all.shortest.paths() when some edges had zero weight.
+- Fixed a potential crash in the DrL layout generator.
+- Fixed a bug in the Reingold-Tilford layout when the graph is
+  directed and mode != ALL.
+- Fixed a bug in Graph.layout_sugiyama() when the graph had no edges.
+- Fixed a bug in Graph.community_label_propagation() when initial labels
+  contained -1 entries. Issue #1105460.
+- Repaired the DescartesCoordinateSystem class (which is not used too frequently
+  anyway)
+- Fixed a bug that caused segfaults when an igraph Graph was used in a thread
+  forked from the main Python interpreter thread
+- Fixed a bug that affected file handles created from Python strings in the
+  C layer
+
 ==========================
 C library news and changes
 ==========================
