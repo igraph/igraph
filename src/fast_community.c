@@ -659,8 +659,9 @@ int igraph_community_fastgreedy(const igraph_t *graph,
   debug("Sorting community neighbor lists\n");
   for (i=0, j=0; i<no_of_nodes; i++) {
 	igraph_vector_ptr_sort(&communities.e[i].neis, igraph_i_fastgreedy_commpair_cmp);
-    /* Isolated vertices won't be stored in the heap (to avoid maxdq == 0) */
-    if (VECTOR(a)[i] > 0) {
+    /* Isolated vertices and vertices with loop edges only won't be stored in
+     * the heap (to avoid maxdq == 0) */
+    if (communities.e[i].maxdq != 0) {
 	  communities.heap[j] = &communities.e[i];
       communities.heapindex[i] = j;
       j++;
