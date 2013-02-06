@@ -37,7 +37,7 @@ this picture:</p>
 <p>After hand-tuning the layout, you can obtain the new coordinates
 using the id of the plot, as shown on the window border:</p>
 <pre class="programlisting condensed">
-coords &lt;- tkplot.getcoords(7)
+coords &lt;- tkplot.getcoords(1)
 </pre>
 <p>You can find the <a href="karate.net">karate.net file here</a>.</p>
 </div>
