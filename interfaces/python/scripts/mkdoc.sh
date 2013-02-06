@@ -33,6 +33,14 @@ if [ x$1 != x ]; then
   cd $1 || exit 1
 fi
 
+echo "Checking symlinked _igraph.so in ${ROOT_FOLDER}/igraph..."
+if [ ! -e ${ROOT_FOLDER}/igraph/_igraph.so -o ! -L ${ROOT_FOLDER}/igraph/_igraph.so ]; then
+	rm -f ${ROOT_FOLDER}/igraph/_igraph.so
+	cd ${ROOT_FOLDER}/igraph
+	ln -s ../build/lib*/igraph/_igraph.so .
+	cd ${ROOT_FOLDER}
+fi
+
 echo "Removing existing documentation..."
 rm -rf html
 

@@ -1,6 +1,6 @@
 # vim:ts=4:sw=4:sts=4:et
 # -*- coding: utf-8 -*-
-"""Classes that help igraph communicate with Gephi (U{http://www.gephi.org})."""
+"""Classes that help igraph communicate with Gephi (http://www.gephi.org)."""
 
 from igraph.compat import property
 import urllib2

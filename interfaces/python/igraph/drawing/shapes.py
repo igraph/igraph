@@ -1,8 +1,5 @@
 # vim:ts=4:sw=4:sts=4:et
 # -*- coding: utf-8 -*-
-
-from __future__ import division
-
 """
 Shape drawing classes for igraph
 
@@ -18,6 +15,8 @@ implement a custom shape drawer, you must register it in
 L{ShapeDrawerDirectory} manually if you wish to refer to it by a
 name in the C{shape} attribute of vertices.
 """
+
+from __future__ import division
 
 __all__ = ["ShapeDrawerDirectory"]
 
