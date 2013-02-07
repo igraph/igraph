@@ -18,8 +18,8 @@ GCC_VERSION_PATCHLEVEL="4.2.1"
 BUILD_PPC=0
 
 # Mac OS X SDK versions for 32-bit and 64-bit builds go here
-SDK_VERSION_32="10.6"
-SDK_VERSION_64="10.6"
+SDK_VERSION_32="10.7"
+SDK_VERSION_64="10.7"
 
 # Generic configure flags you always want go here.
 CONFIG_GENERIC="--disable-gmp"
@@ -30,81 +30,99 @@ CFLAGS="-O3"
 # PowerPC 32-bit configure flags (10.4 runtime compatibility)
 CONFIG_PPC="--build=`uname -p`-apple-darwin --host=powerpc-apple-darwin"
 
+# Path leading to /Developer
+DEV_PATH="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform"
+if [ ! -d "${DEV_PATH}" ]; then
+	# SDKs for older version of XCode were placed in /Developer only
+	DEV_PATH=""
+fi
+
+# Determine gcc and g++ path
+GCC_PATH=`which gcc-${GCC_VERSION}`
+if [ "x${GCC_PATH}" = x ]; then
+	GCC_PATH=`which gcc`
+fi
+GCXX_PATH=`which g++-${GCC_VERSION}`
+if [ "x${GCXX_PATH}" = x ]; then
+	GCXX_PATH=`which g++`
+fi
+
 # PowerPC 32-bit compiler flags
-CC_PPC="gcc-${GCC_VERSION} -arch ppc"
-CXX_PPC="g++-${GCC_VERSION} -arch ppc"
+CC_PPC="${GCC_PATH} -arch ppc"
+CXX_PPC="${GCXX_PATH} -arch ppc"
 CFLAGS_PPC="-mmacosx-version-min=10.4"
 CPPFLAGS_PPC="-DMAC_OS_X_VERSION_MIN_REQUIRED=1040 \
--F/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/System/Library/Frameworks \
--I/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/usr/lib/gcc/powerpc-apple-darwin10/${GCC_VERSION_PATCHLEVEL}/include \
+-F${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/System/Library/Frameworks \
+-I${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/usr/lib/gcc/powerpc-apple-darwin11/${GCC_VERSION_PATCHLEVEL}/include \
 -isystem /Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/usr/include"
 
 # PowerPC 32-bit linker flags
 LFLAGS_PPC="-arch ppc -Wl,-headerpad_max_install_names -mmacosx-version-min=10.4 \
--F/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/System/Library/Frameworks \
--L/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/usr/lib/gcc/powerpc-apple-darwin10/${GCC_VERSION_PATCHLEVEL} \
--Wl,-syslibroot,/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk"
+-F${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/System/Library/Frameworks \
+-L${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/usr/lib/gcc/powerpc-apple-darwin11/${GCC_VERSION_PATCHLEVEL} \
+-Wl,-syslibroot,${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk"
 
 # PowerPC 64-bit configure flags (${SDK_VERSION_64} runtime compatibility)
 CONFIG_PPC64="--build=`uname -p`-apple-darwin --host=powerpc-apple-darwin"
 
 # PowerPC 64-bit compiler flags
-CC_PPC64="gcc-${GCC_VERSION} -arch ppc64"
-CXX_PPC64="g++-${GCC_VERSION} -arch ppc64"
+CC_PPC64="${GCC_PATH} -arch ppc64"
+CXX_PPC64="${GCXX_PATH} -arch ppc64"
 CFLAGS_PPC64="-mmacosx-version-min=${SDK_VERSION_64}"
 CPPFLAGS_PPC64="-DMAC_OS_X_VERSION_MIN_REQUIRED=1050 \
--F/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/System/Library/Frameworks \
--I/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/lib/gcc/powerpc-apple-darwin10/${GCC_VERSION_PATCHLEVEL}/include \
--isystem /Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/include"
+-F${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/System/Library/Frameworks \
+-I${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/lib/gcc/powerpc-apple-darwin11/${GCC_VERSION_PATCHLEVEL}/include \
+-isystem ${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/include"
 
 # PowerPC 64-bit linker flags
 LFLAGS_PPC64="-arch ppc64 -Wl,-headerpad_max_install_names -mmacosx-version-min=${SDK_VERSION_64} \
--F/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/System/Library/Frameworks \
--L/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/lib/gcc/powerpc-apple-darwin10/${GCC_VERSION_PATCHLEVEL}/ppc64 \
--Wl,-syslibroot,/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk"
+-F${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/System/Library/Frameworks \
+-L${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/lib/gcc/powerpc-apple-darwin11/${GCC_VERSION_PATCHLEVEL}/ppc64 \
+-Wl,-syslibroot,${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk"
 
 # Intel 32-bit configure flags (${SDK_VERSION_64} runtime compatibility)
 CONFIG_X86="--build=`uname -p`-apple-darwin --host=i386-apple-darwin"
 
-# They changed this to "darwin10" in Xcode 3.2 (Snow Leopard).
-GCCUSRPATH_X86="/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/lib/gcc/i686-apple-darwin10/${GCC_VERSION_PATCHLEVEL}"
+# They changed this to "darwin11" in Xcode 3.2 (Snow Leopard).
+GCCUSRPATH_X86="${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/lib/gcc/i686-apple-darwin11/${GCC_VERSION_PATCHLEVEL}"
 if [ ! -d "$GCCUSRPATH_X86" ]; then
     echo "Couldn't find any GCC usr path for x86"
+	echo "Tried: $GCCUSRPATH_X86"
     exit 1
 fi
 
 # Intel 32-bit compiler flags
-CC_X86="gcc-${GCC_VERSION} -arch i386"
-CXX_X86="g++-${GCC_VERSION} -arch i386"
+CC_X86="${GCC_PATH} -arch i386"
+CXX_X86="${GCXX_PATH} -arch i386"
 CFLAGS_X86="-mmacosx-version-min=10.4"
 CPPFLAGS_X86="-DMAC_OS_X_VERSION_MIN_REQUIRED=1040 \
--F/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/System/Library/Frameworks \
+-F${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/System/Library/Frameworks \
 -I$GCCUSRPATH_X86/include \
--isystem /Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/usr/include"
+-isystem ${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/usr/include"
 
 # Intel 32-bit linker flags
 LFLAGS_X86="-arch i386 -Wl,-headerpad_max_install_names -mmacosx-version-min=10.4 \
--F/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/System/Library/Frameworks \
+-F${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/System/Library/Frameworks \
 -L$GCCUSRPATH_X86 \
--Wl,-syslibroot,/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk"
+-Wl,-syslibroot,${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk"
 
 # Intel 64-bit configure flags (${SDK_VERSION_64} runtime compatibility)
 CONFIG_X64="--build=`uname -p`-apple-darwin --host=i386-apple-darwin"
 
 # Intel 64-bit compiler flags
-CC_X64="gcc-${GCC_VERSION} -arch x86_64"
-CXX_X64="g++-${GCC_VERSION} -arch x86_64"
+CC_X64="${GCC_PATH} -arch x86_64"
+CXX_X64="${GCXX_PATH} -arch x86_64"
 CFLAGS_X64="-mmacosx-version-min=${SDK_VERSION_64}"
 CPPFLAGS_X64="-DMAC_OS_X_VERSION_MIN_REQUIRED=1050 \
--F/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/System/Library/Frameworks \
--I/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/lib/gcc/i686-apple-darwin10/${GCC_VERSION_PATCHLEVEL}/include \
--isystem /Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/include"
+-F${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/System/Library/Frameworks \
+-I${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/lib/gcc/i686-apple-darwin11/${GCC_VERSION_PATCHLEVEL}/include \
+-isystem ${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/include"
 
 # Intel 64-bit linker flags
 LFLAGS_X64="-arch x86_64 -Wl,-headerpad_max_install_names -mmacosx-version-min=${SDK_VERSION_64} \
--F/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/System/Library/Frameworks \
--L/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/lib/gcc/i686-apple-darwin10/${GCC_VERSION_PATCHLEVEL}/x86_64 \
--Wl,-syslibroot,/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk"
+-F${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/System/Library/Frameworks \
+-L${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/lib/gcc/i686-apple-darwin11/${GCC_VERSION_PATCHLEVEL}/x86_64 \
+-Wl,-syslibroot,${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk"
 
 #
 # Find the configure script
