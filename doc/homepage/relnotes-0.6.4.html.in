@@ -34,6 +34,18 @@ that contain vertex and/or edge data.
 </p>
 
 <h3>
+  <img src="images/icon_python.png" />
+Convert lists of tuples to graphs in Python
+</h3>
+
+<p class="news">
+The <a href="doc-0.6.4/python/igraph.Graph-class.html#TupleList">Graph.TupleList()</a>
+static method in Python now allows easy conversion of lists of tuples (such as
+database records or contents of CSV files) into graphs with named vertices and
+edge attributes.
+</p>
+
+<h3>
   <img src="images/icon_c.png"/>
   <img src="images/icon_r.png" />
   <img src="images/icon_python.png" />
@@ -51,6 +63,7 @@ See more in the <a href="doc-0.6.4/R/read.graph.html">R manual</a>,
 <h3>
   <img src="images/icon_c.png"/>
   <img src="images/icon_r.png" />
+  <img src="images/icon_python.png" />
   Graphical degree sequences
 </h3>
 
@@ -58,6 +71,7 @@ See more in the <a href="doc-0.6.4/R/read.graph.html">R manual</a>,
 We added some new functions if a sequence of integers is graphial, i.e. it 
 can be the degree sequence of a simple graph. See more in
 the <a href="doc-0.6.4/R/is.degree.sequence.html">R manual</a>
+<a href="doc-0.6.4/python/igraph._igraph-module.html#is_graphical_degree_sequence">Python documentation</a>
 or in the 
 <a href="doc-0.6.4/html/ch13s05.html#igraph_is_graphical_degree_sequence"> 
   C reference</a>.
@@ -66,13 +80,15 @@ or in the
 <h3>
   <img src="images/icon_c.png"/>
   <img src="images/icon_r.png" />
+  <img src="images/icon_python.png" />
   k-regular random graphs
 </h3>
 
 <p class="news">
 It is possible now to generate regular random graphs, faster than 
 the general degree sequence based generator. See more in
-the <a href="doc-0.6.4/R/k.regular.game.html">R manual</a>
+the <a href="doc-0.6.4/R/k.regular.game.html">R manual</a>,
+<a href="doc-0.6.4/python/igraph.GraphBase-class.html#K_Regular">Python documentation</a>
 or the <a href="doc-0.6.4/html/ch09s02.html#igraph_k_regular_game">
     C reference</a>.
 </p>
@@ -80,13 +96,15 @@ or the <a href="doc-0.6.4/html/ch09s02.html#igraph_k_regular_game">
 <h3>
   <img src="images/icon_c.png"/>
   <img src="images/icon_r.png" />
+  <img src="images/icon_python.png" />
   Fitting power law distributions
 </h3>
 
 <p class="news">
 This release includes the plfit library to maximum likelihood fit 
 power laws to discrete or contiouous data. See more in
-the <a href="doc-0.6.4/R/power.law.fit.html">R manual</a>
+the <a href="doc-0.6.4/R/power.law.fit.html">R manual</a>,
+<a href="doc-0.6.4/python/igraph.statistics-module.html#power_law_fit">Python documentation</a>
 or the <a href="doc-0.6.4/html/ch29s05.html#igraph_power_law_fit">
 C reference</a>.
 </p>
