@@ -70,5 +70,17 @@ int main() {
     return 5;
   igraph_destroy(&graph);
 
+  igraph_small(&graph, 0, IGRAPH_UNDIRECTED, 0,1, 0,1, 1,2, -1);
+  igraph_has_multiple(&graph, &res);
+  if (!res)
+    return 6;
+  igraph_destroy(&graph);
+
+  igraph_small(&graph, 0, IGRAPH_UNDIRECTED, 0,0, 0,0, -1);
+  igraph_has_multiple(&graph, &res);
+  if (!res)
+    return 7;
+  igraph_destroy(&graph);
+
   return 0;
 }
