@@ -1438,7 +1438,8 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
  *                Simple rewiring algorithm which chooses two arbitrary edges
  *                in each step (namely (a,b) and (c,d)) and substitutes them
  *                with (a,d) and (c,b) if they don't exist.  The method will
- *                neither destroy nor create self-loops.
+ *                neither destroy nor create self-loops. Undirected edges may
+ *                be chosen for rewiring in either direction.
  *           \cli IGRAPH_REWIRING_SIMPLE_LOOPS
  *                Same as \c IGRAPH_REWIRING_SIMPLE but allows the creation or
  *                destruction of self-loops.
