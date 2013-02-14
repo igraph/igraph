@@ -890,8 +890,8 @@ void graph::update_nodes ( )
 		// compute node list for next update
 		for ( unsigned int j = 0; j < node_indices.size(); j++ )
 		  node_indices [j] += num_procs;
-		
-		while ( node_indices [ node_indices.size()-1] >= num_nodes )
+	
+		while ( !node_indices.empty() && node_indices.back() >= num_nodes )
 		  node_indices.pop_back ( );
 			
 	}
