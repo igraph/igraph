@@ -1625,6 +1625,8 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
       VECTOR(*res)[j] = VECTOR(*tmpres)[node];
     }
     
+    no_of_nodes = j;
+    
     igraph_vit_destroy(&vit);
     igraph_vector_destroy(tmpres);
     IGRAPH_FINALLY_CLEAN(2);
