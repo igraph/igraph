@@ -1464,7 +1464,6 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
 int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
-  long int i;
   char message[256];
   igraph_integer_t a, b, c, d, dummy, num_swaps, num_successful_swaps;
   igraph_vector_t eids, edgevec;
