@@ -1,7 +1,7 @@
 AC_INIT(igraph, 0.6.4, csardi.gabor@gmail.com)
 AC_CONFIG_SRCDIR(src/games.c)
-AM_INIT_AUTOMAKE(igraph, 0.6.4)
-AM_CONFIG_HEADER(config.h)
+AM_INIT_AUTOMAKE
+AC_CONFIG_HEADERS([config.h])
 
 m4_include(tools/autoconf/ax_tls.m4)
 
