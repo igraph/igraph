@@ -266,17 +266,17 @@ int igraph_is_chordal(const igraph_t *graph,
   igraph_bool_t calc_edges= fill_in || newgraph;
   igraph_vector_t *my_fill_in=fill_in, v_fill_in;
 
-  if (!chordal && !calc_edges) {
-    /* Nothing to calculate */
-    return 0;
-  }
-  
   /*****************/
   /* local v, w, x */
   /*****************/
 
   long int v, w, x;
 
+  if (!chordal && !calc_edges) {
+    /* Nothing to calculate */
+    return 0;
+  }
+  
   if (!alpha && !alpham1) {
     IGRAPH_VECTOR_INIT_FINALLY(&v_alpha, no_of_nodes);
     my_alpha=&v_alpha;
