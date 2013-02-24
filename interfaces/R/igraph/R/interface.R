@@ -51,14 +51,7 @@ add.edges <- function(graph, edges, ..., attr=list()) {
   eattrs <- .Call("R_igraph_mybracket2", graph, 9L, 4L, PACKAGE="igraph")
   for (i in seq(attrs)) { eattrs[[nam[i]]][idx] <- attrs[[nam[i]]] }
 
-  ## Trick to make R copy the graph
-  newgraph <- graph
-  attr(newgraph, "foo") <- NULL
-
-  ## !!! Modifies the graph in place
-  .Call("R_igraph_mybracket2_set", newgraph, 9L, 4L, eattrs, PACKAGE="igraph")
-  
-  newgraph
+  .Call("R_igraph_mybracket2_set", graph, 9L, 4L, eattrs, PACKAGE="igraph")
 }
 
 add.vertices <- function(graph, nv, ..., attr=list()) {
@@ -88,14 +81,7 @@ add.vertices <- function(graph, nv, ..., attr=list()) {
   vattrs <- .Call("R_igraph_mybracket2", graph, 9L, 3L, PACKAGE="igraph")
   for (i in seq(attrs)) { vattrs[[nam[i]]][idx] <- attrs[[nam[i]]] }
 
-  ## Trick to make R copy the graph
-  newgraph <- graph
-  attr(newgraph, "foo") <- NULL
-
-  ## !!! Modifies the graph in place
-  .Call("R_igraph_mybracket2_set", newgraph, 9L, 3L, vattrs, PACKAGE="igraph")
-  
-  newgraph
+  .Call("R_igraph_mybracket2_set", graph, 9L, 3L, vattrs, PACKAGE="igraph")
 }
 
 delete.edges <- function(graph, edges) {
