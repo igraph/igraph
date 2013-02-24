@@ -2707,32 +2707,25 @@ SEXP R_igraph_mybracket2(SEXP graph, SEXP pidx1, SEXP pidx2) {
 
 SEXP R_igraph_mybracket2_set(SEXP graph, SEXP pidx1, SEXP pidx2,
 			     SEXP value) {
-  int named=NAMED(graph);
+  SEXP newgraph;
   int idx1=INTEGER(pidx1)[0]-1;
   int idx2=INTEGER(pidx2)[0]-1;
-
-  if (named > 1) {
-    igraph_error("mybracket error", __FILE__, __LINE__, IGRAPH_EINTERNAL);
-  }
-  
-  SET_VECTOR_ELT(VECTOR_ELT(graph, idx1), idx2, value);
-  
-  return R_NilValue;
+  PROTECT(newgraph=duplicate(graph));
+  SET_VECTOR_ELT(VECTOR_ELT(newgraph, idx1), idx2, value);
+  UNPROTECT(1);
+  return newgraph;
 }
 
 SEXP R_igraph_mybracket3_set(SEXP graph, SEXP pidx1, SEXP pidx2, 
 			     SEXP pname, SEXP value) {
-  int named=NAMED(graph);
+  SEXP newgraph;
   int idx1=INTEGER(pidx1)[0]-1;
   int idx2=INTEGER(pidx2)[0]-1;
   const char *name=CHAR(STRING_ELT(pname, 0));
   SEXP attrs=VECTOR_ELT(VECTOR_ELT(graph, idx1), idx2);
   SEXP names=getAttrib(attrs, R_NamesSymbol);
   int i, n=length(attrs);
-
-  if (named > 1) { 
-    igraph_error("mybracket error", __FILE__, __LINE__, IGRAPH_EINTERNAL);
-  }
+  PROTECT(newgraph=duplicate(graph));
   
   for (i=0; i<n; i++) {
     if (strcmp(CHAR(STRING_ELT(names, i)), name) == 0) { break; }    
@@ -2749,14 +2742,15 @@ SEXP R_igraph_mybracket3_set(SEXP graph, SEXP pidx1, SEXP pidx2,
     SET_VECTOR_ELT(newattrs, i, value);
     SET_STRING_ELT(newnames, i, mkChar(name));
     SET_NAMES(newattrs, newnames);
-    SET_VECTOR_ELT(VECTOR_ELT(graph, idx1), idx2, newattrs);
+    SET_VECTOR_ELT(VECTOR_ELT(newgraph, idx1), idx2, newattrs);
     UNPROTECT(2);
   } else {
     /* Existing attribute, just set it */
     SET_VECTOR_ELT(attrs, i, value);
   }
   
-  return R_NilValue;
+  UNPROTECT(1);
+  return newgraph;
 }
 
 SEXP R_igraph_add_edges(SEXP graph, SEXP edges) {
