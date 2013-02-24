@@ -70,7 +70,11 @@ msvc: all
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/*~
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/include/*~
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc/winlib
-	cp $(top_srcdir)/msvc/igraph.{sln,vcproj} $(top_builddir)/igraph-$(VERSION)-msvc/
+	tools/create-msvc-projectfile.py		\
+		$(top_builddir)/igraph-$(VERSION)-msvc 	\
+		$(top_srcdir)/msvc/igraph.vcproj        \
+		$(top_srcdir)/src/Makefile
+	cp $(top_srcdir)/msvc/igraph.sln $(top_builddir)/igraph-$(VERSION)-msvc
 	cp -r $(top_srcdir)/msvc/igraphtest .
 	rm -rf igraph-$(VERSION)-msvc.zip
 	zip -r igraph-$(VERSION)-msvc.zip igraph-$(VERSION)-msvc igraphtest

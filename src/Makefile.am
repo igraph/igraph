@@ -206,8 +206,7 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_scg.h		../include/igraph_qsort.h \
 		../include/igraph_matching.h
 
-libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
-			     basic_query.c games.c cocitation.c iterators.c \
+SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     structural_properties.c components.c layout.c \
 			     structure_generators.c conversion.c \
 			     type_indexededgelist.c spanning_trees.c \
@@ -260,6 +259,7 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     scg_kmeans.c scg_utils.c scg_optimal_method.c \
 			     qsort.c qsort_r.c types.c hacks.c
 
+libigraph_la_SOURCES       = $(SOURCES) $(HEADERS_PRIVATE)
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
 libigraph_la_LDFLAGS       = -no-undefined
@@ -275,3 +275,15 @@ includedir = $(prefix)/include/igraph
 include_HEADERS = $(HEADERS_PUBLIC)
 
 MAINTAINERCLEANFILES = Makefile.in foreign-lgl-parser.h foreign-ncol-parser.h
+
+echosources:
+	$(info $(SOURCES) $(LAPACK) $(ARPACK) $(BLAS) $(libf2c_la_SOURCES) \
+	$(libdlamch_la_SOURCES) $(libplfit_la_SOURCES))
+
+echoheaders:
+	$(info $(HEADERS_PUBLIC))
+
+echoheadersprivate:
+	$(info $(HEADERS_PRIVATE))
+
+.PHONY: sources
