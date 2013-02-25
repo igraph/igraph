@@ -1,11 +1,30 @@
 ============
+igraph 0.6.5
+============
+
+Released February 24, 2013
+
+This is a minor release, to fix some very annoying bugs in 0.6.4:
+
+- igraph should now work well with older R versions.
+- Eliminate gap between vertex and edge when plotting an edge without an arrow.
+  Fixes #1118448.
+- Fixed an out-of-bounds array indexing error in the DrL layout, that
+  potentially caused crashes.
+- Fixed a crash in weighted betweenness calculation.
+- Plotting: fixed a bug that caused misplaced arrows at rectangle 
+  vertex shapes. 
+
+============
 igraph 0.6.4
 ============
 
 Released February 2, 2013
 
 The version number is not a mistake, we jump to 0.6.4 from 0.6, 
-for technical reasons.
+for technical reasons. This version was actually never really
+released, but some R packages of this version were uplodaded to 
+CRAN, so we include this version in this NEW file.
 
 ==========================
 New features and bug fixes
