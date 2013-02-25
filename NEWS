@@ -1,10 +1,10 @@
 ============
-igraph 0.6.4
+igraph 0.6.5
 ============
 
-Released February 2, 2013
+Released February 24, 2013
 
-The version number is not a mistake, we jump to 0.6.4 from 0.6, 
+The version number is not a mistake, we jump to 0.6.5 from 0.6, 
 for technical reasons.
 
 =============================
@@ -83,9 +83,16 @@ R: new features and bug fixes
 - graph.data.frame() is more careful when vertex names are numbers, to
   avoid their scientific notation. Fixes issue #1082221. 
 - Better check for NAs in vertex names. Fixes issue #1087215
-- Fixed a potential crash in the DrL layout generator.
+- Fixed some potential crashes in the DrL layout generator.
 - Fixed a bug in the Reingold-Tilford layout when the graph is
   directed and mode != ALL.
+- Eliminate gap between vertex and edge when plotting an edge without an arrow.
+  Fixes #1118448.
+- Fixed a bug in has.multiple() that resulted in false negatives for
+  some undirected graphs.
+- Fixed a crash in weighted betweenness calculation.
+- R plotting: fixed a bug that caused misplaced arrows at rectangle
+  vertex shapes.
 
 =====================
 Python news and fixes
@@ -131,7 +138,7 @@ Python news and fixes
 - Fixed a bug in Graph.eccentricity() and Graph.radius(), the results were often
   simply wrong.
 - Fixed a bug in Graph.get.all.shortest.paths() when some edges had zero weight.
-- Fixed a potential crash in the DrL layout generator.
+- Fixed some potential crashes in the DrL layout generator.
 - Fixed a bug in the Reingold-Tilford layout when the graph is
   directed and mode != ALL.
 - Fixed a bug in Graph.layout_sugiyama() when the graph had no edges.
@@ -143,6 +150,9 @@ Python news and fixes
   forked from the main Python interpreter thread
 - Fixed a bug that affected file handles created from Python strings in the
   C layer
+- Fixed a bug in has_multiple() that resulted in false negatives
+  for some undirected graphs.
+- Fixed a crash in weighted betweenness calculation.
 
 ==========================
 C library news and changes
@@ -187,9 +197,12 @@ C library news and changes
   the results were often simply wrong.
 - Fixed a bug in igraph_get_all_shortest_paths_dijkstra() when edges
   had zero weight.
-- Fixed a potential crash in the DrL layout generator.
+- Fixed some potential crashes in the DrL layout generator.
 - Fixed a bug in the Reingold-Tilford layout when the graph is
   directed and mode != ALL.
+- Fixed a bug in igraph_has_multiple() that resulted in false negatives
+  for some undirected graphs.
+- Fixed a crash in weighted betweenness calculation.
 
 ==========
 igraph 0.6
