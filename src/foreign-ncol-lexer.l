@@ -46,8 +46,8 @@
 
 #include "config.h"
 #include <stdlib.h>
-#include "foreign-ncol-parser.h"
 #include "foreign-ncol-header.h"
+#include "foreign-ncol-parser.h"
 #define YY_EXTRA_TYPE igraph_i_ncol_parsedata_t*
 #define YY_USER_ACTION yylloc->first_line = yylineno;
 /* We assume that 'file' is 'stderr' here. */
