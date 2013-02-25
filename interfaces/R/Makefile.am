@@ -169,7 +169,7 @@ igraph_$(VERSION).tar.gz: $(RFILES) $(SRCFILES)
 	R CMD build igraph
 
 tests:
-	cd igraph/tests && echo "tools:::.runPackageTestsR()" | \
+	cd tests && echo "tools:::.runPackageTestsR()" | \
 	R --no-save && echo
 
 homepagetests:
