@@ -2747,6 +2747,7 @@ SEXP R_igraph_mybracket3_set(SEXP graph, SEXP pidx1, SEXP pidx2,
   } else {
     /* Existing attribute, just set it */
     SET_VECTOR_ELT(attrs, i, value);
+    SET_VECTOR_ELT(VECTOR_ELT(newgraph, idx1), idx2, attrs);
   }
   
   UNPROTECT(1);
