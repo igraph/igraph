@@ -24,7 +24,9 @@ configure-stamp:
 	./configure --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --sysconfdir=/etc --with-external-blas --with-external-lapack --with-external-arpack --with-external-f2c --disable-tls
 	touch configure-stamp
 
-build: configure-stamp build-stamp
+build: configure-stamp build-arch build-indep
+build-arch: build-stamp
+build-indep: build-stamp
 build-stamp:
 	dh_testdir
 	$(MAKE)
