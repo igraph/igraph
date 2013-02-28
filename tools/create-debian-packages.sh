@@ -77,15 +77,10 @@ function create_igraph_debian_pkg {
   tar -xvvzf igraph_$1.orig.tar.gz
   cd igraph-$1
   cp -r ${BZR_IGRAPH_ROOT}/${BAZAAR_BRANCH}/debian .
-  if [ x$2 != x0 ]; then
-    cat debian/changelog.in | sed -e "s/@VERSION@/@VERSION@-$2/g" >debian/changelog.in.new
-    mv debian/changelog.in.new debian/changelog.in
-  fi
-  # debian/prepare
   cat debian/changelog | sed -e "s/unstable/${SERIES}/g" >debian/changelog.new
   mv debian/changelog.new debian/changelog
-  debuild -b ${SIGN_OPTIONS}
   debuild -S -sa ${SIGN_OPTIONS}
+  debuild -b ${SIGN_OPTIONS}
   cd ..
 }
 
