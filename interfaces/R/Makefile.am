@@ -160,7 +160,17 @@ igraph/src/%.h: $(top_srcdir)/optional/simpleraytracer/%.h
 igraph/src/%.h: $(top_srcdir)/include/%.h
 	cp $(top_srcdir)/include/$(@F) $@
 
-igraph_$(VERSION).tar.gz: $(RFILES) $(SRCFILES)
+DIRS: 
+	mkdir -p igraph/src
+	mkdir -p igraph/src/cs
+	mkdir -p igraph/src/glpk
+	mkdir -p igraph/src/glpk/amd
+	mkdir -p igraph/src/glpk/colamd
+	mkdir -p igraph/src/plfit
+
+.PHONY: DIRS
+
+igraph_$(VERSION).tar.gz: DIRS $(RFILES) $(SRCFILES)
 	echo $(top_scrdir)
 	rm -f igraph/R/config.R
 	rm -f igraph/src/config.h
