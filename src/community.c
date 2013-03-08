@@ -2926,6 +2926,21 @@ int igraph_community_multilevel(const igraph_t *graph,
     level++;
   }
 
+  /* It might happen that there are no merges, so every vertex is in its 
+     own community. We still might want the modularity score for that. */
+  if (modularity && igraph_vector_size(modularity) == 0) {
+    igraph_vector_t tmp;
+    igraph_real_t mod;
+    int i;
+    IGRAPH_VECTOR_INIT_FINALLY(&tmp, vcount);
+    for (i=0; i<vcount; i++) { VECTOR(tmp)[i]=i; }
+    IGRAPH_CHECK(igraph_modularity(graph, &tmp, &mod, weights));
+    igraph_vector_destroy(&tmp);
+    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_CHECK(igraph_vector_resize(modularity, 1));
+    VECTOR(*modularity)[0]=mod;
+  }
+
   /* If we need the final membership vector, copy it to the output */
   if (membership) {
     IGRAPH_CHECK(igraph_vector_resize(membership, vcount));   
