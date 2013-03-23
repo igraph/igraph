@@ -1,5 +1,5 @@
 Package: igraph
-Version: @VERSION@-1
+Version: @VERSION@
 Date: 2013-02-09
 Title:  Network analysis and visualization
 Author: See AUTHORS file.
