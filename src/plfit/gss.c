@@ -89,8 +89,8 @@ unsigned short int gss_get_warning_flag() {
 int gss(double a, double b, double *_min, double *_fmin,
         gss_evaluate_t proc_evaluate, gss_progress_t proc_progress,
         void* instance, const gss_parameter_t *_param) {
-    double c, d, min = NAN;
-    double fa, fb, fc, fd, fmin = INFINITY;
+    double c, d, min;
+    double fa, fb, fc, fd, fmin;
     int k = 0;
     int retval;
     unsigned short int successful = 1;
@@ -102,6 +102,9 @@ int gss(double a, double b, double *_min, double *_fmin,
     if (a > b) {
         c = a; a = b; b = c;
     }
+
+    min = a;
+    fmin = proc_evaluate(instance, a);
 
     c = a + RESPHI*(b-a);
 
