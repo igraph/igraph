@@ -42,7 +42,7 @@ __BEGIN_DECLS
 #endif
 
 #ifndef INFINITY
-#  define INFINITY (DBL_MAX+DBL_MAX)
+#  define INFINITY (1.0/0.0)
 #endif
 
 #ifndef NAN
