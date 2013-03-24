@@ -46,9 +46,12 @@ char* igraph_i_strdup(const char *s);
 #ifndef HAVE_STPCPY
 #  define stpcpy igraph_i_stpcpy
 char* igraph_i_stpcpy(char* s1, const char* s2);
+#else
+#  ifndef HAVE_STPCPY_SIGNATURE
+char* stpcpy(char* s1, const char* s2);
+#  endif
 #endif
 
 __END_DECLS
 
 #endif
-
