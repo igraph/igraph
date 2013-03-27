@@ -5091,10 +5091,11 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
   } /* r < igraph_vector_size(roots) */
 
+  igraph_vector_bool_destroy(&seen_edges);
   igraph_vector_bool_destroy(&seen_vertices);
   igraph_vector_destroy(&neis);
   igraph_dqueue_destroy(&Q);
-  IGRAPH_FINALLY_CLEAN(3);
+  IGRAPH_FINALLY_CLEAN(4);
 
   IGRAPH_CHECK(igraph_create(tree, &edges, no_of_edges+1, 
 			     igraph_is_directed(graph)));
