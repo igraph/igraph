@@ -185,7 +185,7 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
 
         # Contract the drawing area by the margin and fit the layout
         bbox = self.bbox.contract(margin)
-        layout.fit_into(bbox, keep_aspect_ratio=False)
+        layout.fit_into(bbox, keep_aspect_ratio=kwds.get("keep_aspect_ratio", False))
 
         # Decide whether we need to calculate the curvature of edges
         # automatically -- and calculate them if needed.
