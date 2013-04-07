@@ -547,6 +547,9 @@ extern igraph_warning_handler_t igraph_warning_handler_print;
 int igraph_warning(const char *reason, const char *file, int line,
 		   int igraph_errno);
 
+int igraph_warningf(const char *reason, const char *file, int line, 
+                    int igraph_errno, ...);
+
 #define IGRAPH_WARNING(reason) \
        do { \
          igraph_warning(reason, __FILE__, __LINE__, -1); \
