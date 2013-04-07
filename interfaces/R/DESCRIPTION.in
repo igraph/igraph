@@ -1,6 +1,6 @@
 Package: igraph0
-Version: @VERSION@-2
-Date: 2013-01-05
+Version: @VERSION@
+Date: 2013-03-31
 Title:  Network analysis and visualization, old, deprecated package.
 Author: See AUTHORS file.
 Maintainer: Gabor Csardi <csardi.gabor@gmail.com>
