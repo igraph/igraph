@@ -155,7 +155,7 @@ const TYPE(igraph_vector)*FUNCTION(igraph_vector,view) (const TYPE(igraph_vector
   TYPE(igraph_vector) *v2=(TYPE(igraph_vector)*)v;
   v2->stor_begin=(BASE*)data;
   v2->stor_end=(BASE*)data+length;
-  v2->end=v->stor_end;
+  v2->end=v2->stor_end;
   return v;
 }
 
