@@ -60,7 +60,7 @@
 int igraph_atlas(igraph_t *graph, int number) {
   
   long int pos, n, e;
-  const igraph_vector_t v=IGRAPH_VECTOR_NULL;
+  igraph_vector_t v=IGRAPH_VECTOR_NULL;
 
   if (number < 0 ||
       number >= sizeof(igraph_i_atlas_edges_pos)/sizeof(long int)) {
