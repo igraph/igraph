@@ -1291,7 +1291,7 @@ int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
 int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
 			     igraph_bool_t checks) {
   
-  igraph_bool_t ret;
+  igraph_bool_t ret=0;
   
   /* Use that vertex.connectivity(G) <= edge.connectivity(G) <= min(degree(G)) */
   if (checks) {
