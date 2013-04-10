@@ -294,7 +294,7 @@ if test "$use_gprof" = "yes"; then
   CXXFLAGS="${CFLAGS} -pg"
 fi
 
-AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile doc/book/Makefile interfaces/R/configure.in interfaces/R/Makefile interfaces/R/src/Makevars.win interfaces/R/DESCRIPTION interfaces/Makefile include/igraph_version.h include/igraph_threading.h])
+AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile interfaces/R/configure.in interfaces/R/Makefile interfaces/R/src/Makevars.win interfaces/R/DESCRIPTION interfaces/Makefile include/igraph_version.h include/igraph_threading.h])
 AC_OUTPUT
 
 AC_MSG_RESULT([igraph successfully configured.])
