@@ -2,8 +2,12 @@
 *.pyc
 *.so
 INSTALL
-Makefile
-Makefile.in
+/Makefile
+/src/Makefile
+/doc/Makefile
+/Makefile.in
+/src/Makefile.in
+/doc/Makefile.in
 aclocal.m4
 autom4te.cache
 build
