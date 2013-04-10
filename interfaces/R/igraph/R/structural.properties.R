@@ -130,7 +130,7 @@ degree.distribution <- function(graph, cumulative=FALSE, ...) {
     stop("Not a graph object")
   }
   cs <- degree(graph, ...)
-  hi <- hist(cs, -1:max(cs), plot=FALSE)$intensities
+  hi <- hist(cs, -1:max(cs), plot=FALSE)$density
   if (!cumulative) {
     res <- hi
   } else {
