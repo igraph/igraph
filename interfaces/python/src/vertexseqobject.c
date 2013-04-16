@@ -294,7 +294,6 @@ PyObject* igraphmodule_VertexSeq_get_attribute_values(igraphmodule_VertexSeqObje
 
 PyObject* igraphmodule_VertexSeq_get_attribute_values_mapping(igraphmodule_VertexSeqObject *self, PyObject *o) {
   long int index;
-  PyObject* o_as_int;
 
   /* Handle integer indices according to the sequence protocol */
   if (PyIndex_Check(o)) {
