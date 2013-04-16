@@ -2485,7 +2485,8 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
 
     } /* !igraph_2wheap_empty(&Q) */
 
-    VECTOR(*res)[i] += ((igraph_integer_t)no_of_nodes * (no_of_nodes-nodes_reached));
+    /* using igraph_real_t here instead of igraph_integer_t to avoid overflow */
+    VECTOR(*res)[i] += ((igraph_real_t)no_of_nodes * (no_of_nodes-nodes_reached));
     VECTOR(*res)[i] = (no_of_nodes-1) / VECTOR(*res)[i];
 
   } /* !IGRAPH_VIT_END(vit) */
@@ -2633,7 +2634,8 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
         IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
       }
     }
-    VECTOR(*res)[i] += ((igraph_integer_t)no_of_nodes * (no_of_nodes-nodes_reached));
+    /* using igraph_real_t here instead of igraph_integer_t to avoid overflow */
+    VECTOR(*res)[i] += ((igraph_real_t)no_of_nodes * (no_of_nodes-nodes_reached));
     VECTOR(*res)[i] = (no_of_nodes-1) / VECTOR(*res)[i];
   }
 
