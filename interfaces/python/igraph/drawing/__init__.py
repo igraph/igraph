@@ -39,6 +39,14 @@ except ImportError:
     from igraph.drawing.utils import FakeModule
     cairo = FakeModule()
 
+IN_IPYTHON = False
+try:
+    # If this calls succeed without importing, we are in IPython and we can use the display facilities available via IPython
+    get_ipython()
+    IN_IPYTHON = True
+except NameError:
+    pass
+
 #####################################################################
 
 class Plot(object):
@@ -338,6 +346,23 @@ class Plot(object):
                     # we wait here a little bit. Yes, this is quite hackish :(
                     time.sleep(5)
 
+    def _repr_svg_(self):
+        """return the svg value of this plot.
+
+        This method is used by IPython to display this plot inline
+        """
+        import StringIO
+        io = StringIO.StringIO()
+        # Create a new svg surface and use that to get the svg value, which will end up in io
+        surface = cairo.SVGSurface(io, self.bbox.width, self.bbox.height)
+        context = cairo.Context(surface)
+        # plot the graph on this context
+        self.redraw(context)
+        # No idea why this is needed but python crashes without
+        context.show_page()
+        surface.finish()
+        # display the raw svg value in notebook
+        return io.getvalue()
 
     @property
     def bounding_box(self):
@@ -364,7 +389,7 @@ class Plot(object):
 
 #####################################################################
 
-def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
+def plot(obj, target=None, inline=None, bbox=(0, 0, 600, 600), *args, **kwds):
     """Plots the given object to the given target.
 
     Positional and keyword arguments not explicitly mentioned here will be
@@ -431,6 +456,16 @@ def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
         bbox = bbox.contract(20)
     result.add(obj, bbox, *args, **kwds)
 
+    if inline is True:
+        # if inline is explicitly specified as True, just return
+        return result
+
+    if IN_IPYTHON is True and inline is None:
+        # we detected ipython and the user didn't explicitly specifiy whether the plot should be inlined or not
+        # As it should be easy in ipython, just use the ipython facilities
+        return result
+
+    # We are either not in ipython or the user didn't want the inlining, so just show the result
     if target is None:
         result.show()
 
