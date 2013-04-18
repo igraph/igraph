@@ -8225,11 +8225,19 @@ SEXP R_igraph_subisomorphic_lad(SEXP pattern, SEXP target, SEXP domains,
   PROTECT(names=NEW_CHARACTER(3));
   PROTECT(iso=NEW_LOGICAL(1)); 
   LOGICAL(iso)[0]=c_iso;
-  PROTECT(map=R_igraph_0orvector_to_SEXP(&c_map)); 
-  igraph_vector_destroy(&c_map); 
-  IGRAPH_FINALLY_CLEAN(1);
-  PROTECT(maps=R_igraph_0orvectorlist_to_SEXP(&c_maps)); 
-  R_igraph_vectorlist_destroy(&c_maps); 
+  if (!isNull(map)) {
+    PROTECT(map=R_igraph_0orvector_to_SEXP(&c_map));
+    igraph_vector_destroy(&c_map);
+    IGRAPH_FINALLY_CLEAN(1);
+  } else {
+    PROTECT(map=R_NilValue);
+  }
+  if (!isNull(maps)) {
+    PROTECT(maps=R_igraph_0orvectorlist_to_SEXP(&c_maps));
+    R_igraph_vectorlist_destroy(&c_maps);
+  } else {
+    PROTECT(maps=R_NilValue);
+  }
   IGRAPH_FINALLY_CLEAN(1);
   SET_VECTOR_ELT(result, 0, iso);
   SET_VECTOR_ELT(result, 1, map);
