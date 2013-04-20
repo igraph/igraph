@@ -1410,6 +1410,7 @@ int igraph_es_as_vector(const igraph_t *graph, igraph_es_t es,
   IGRAPH_FINALLY(igraph_eit_destroy, &eit);
   IGRAPH_CHECK(igraph_eit_as_vector(&eit, v));
   
+  igraph_eit_destroy(&eit);
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 } 
