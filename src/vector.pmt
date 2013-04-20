@@ -821,6 +821,7 @@ long int FUNCTION(igraph_vector,qsort_ind)(TYPE(igraph_vector) *v,
   BASE **vind, *first;
   long int n = FUNCTION(igraph_vector,size)(v);
   IGRAPH_CHECK(igraph_vector_resize(inds, n));
+  if (n==0) { return 0; }
   vind = igraph_Calloc(n, BASE*);
   if (vind == 0) {
     IGRAPH_ERROR("igraph_vector_qsort_ind failed", IGRAPH_ENOMEM);
