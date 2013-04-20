@@ -719,12 +719,16 @@ VERTEX_ATTRIBUTE_COMBINATION:
   CALL: &%C%
   INCONV:
     IN: R_SEXP_to_attr_comb(%I%, &%C%);
+  OUTCONV:
+    IN: igraph_attribute_combination_destroy(&%C%);
 
 EDGE_ATTRIBUTE_COMBINATION:
   CTYPE: igraph_attribute_combination_t
   CALL: &%C%
   INCONV:
     IN: R_SEXP_to_attr_comb(%I%, &%C%);
+  OUTCONV:
+    IN: igraph_attribute_combination_destroy(&%C%);
 
 HRG:
   CTYPE: igraph_hrg_t
