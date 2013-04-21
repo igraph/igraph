@@ -1714,7 +1714,7 @@ igraph_scg_grouping:
 igraph_scg_semiprojectors:
         PARAMS: VECTORM1 groups, SCGMAT mtype=Default, \
                 OUT MATRIX_OR_0 L, OUT MATRIX_OR_0 R, \
-                OUT SPARSEMAT_OR_0 Lsparse, OUT SPARSEMAT_OR_0 Rsparse, \
+                OUT SPARSEMATPTR_OR_0 Lsparse, OUT SPARSEMATPTR_OR_0 Rsparse, \
                 VECTOR_OR_0 p=NULL, SCGNORM norm=Default
         NAME-R: scgSemiProjectors
         IGNORE: RR, RC
@@ -1734,8 +1734,8 @@ igraph_scg_adjacency:
                 BOOLEAN use_arpack=False, INTEGER maxiter, \
                 OUT GRAPH_OR_0 scg_graph, OUT MATRIX_OR_0 scg_matrix, \
                 OUT SPARSEMAT_OR_0 scg_sparsemat, OUT MATRIX_OR_0 L, \
-                OUT MATRIX_OR_0 R, OUT SPARSEMAT_OR_0 Lsparse, \
-                OUT SPARSEMAT_OR_0 Rsparse
+                OUT MATRIX_OR_0 R, OUT SPARSEMATPTR_OR_0 Lsparse, \
+                OUT SPARSEMATPTR_OR_0 Rsparse
         IGNORE: RR, RC, RNamespace
 
 igraph_scg_stochastic:
@@ -1748,8 +1748,8 @@ igraph_scg_stochastic:
                 BOOLEAN use_arpack=False, INTEGER maxiter, \
                 OUT GRAPH_OR_0 scg_graph, OUT MATRIX_OR_0 scg_matrix, \
                 OUT SPARSEMAT_OR_0 scg_sparsemat, OUT MATRIX_OR_0 L, \
-                OUT MATRIX_OR_0 R, OUT SPARSEMAT_OR_0 Lsparse, \
-                OUT SPARSEMAT_OR_0 Rsparse
+                OUT MATRIX_OR_0 R, OUT SPARSEMATPTR_OR_0 Lsparse, \
+                OUT SPARSEMATPTR_OR_0 Rsparse
         IGNORE: RR, RC, RNamespace
 
 igraph_scg_laplacian:
@@ -1762,8 +1762,8 @@ igraph_scg_laplacian:
                 BOOLEAN use_arpack=False, INTEGER maxiter, \
                 OUT GRAPH_OR_0 scg_graph, OUT MATRIX_OR_0 scg_matrix, \
                 OUT SPARSEMAT_OR_0 scg_sparsemat, OUT MATRIX_OR_0 L, \
-                OUT MATRIX_OR_0 R, OUT SPARSEMAT_OR_0 Lsparse, \
-                OUT SPARSEMAT_OR_0 Rsparse
+                OUT MATRIX_OR_0 R, OUT SPARSEMATPTR_OR_0 Lsparse, \
+                OUT SPARSEMATPTR_OR_0 Rsparse
         IGNORE: RR, RC, RNamespace
 
 
