@@ -926,17 +926,13 @@ int igraph_scg_norm_eps(const igraph_matrix_t *V,
     IGRAPH_ERROR("Invalid `p' vector length, should match number of vertices",
 		 IGRAPH_EINVAL);
   }
-
-  IGRAPH_CHECK(igraph_sparsemat_init(&Lsparse, no_of_groups, no_of_nodes,
-				     no_of_nodes));
-  IGRAPH_FINALLY(igraph_sparsemat_destroy, &Lsparse);
-  IGRAPH_CHECK(igraph_sparsemat_init(&Rsparse, no_of_groups, no_of_nodes,
-				     no_of_nodes));
-  IGRAPH_FINALLY(igraph_sparsemat_destroy, &Rsparse);
   
   IGRAPH_CHECK(igraph_scg_semiprojectors(groups, mtype, /* L= */ 0, 
 					 /* R= */ 0, &Lsparse, &Rsparse, p,
 					 norm));
+
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &Lsparse);
+  IGRAPH_FINALLY(igraph_sparsemat_destroy, &Rsparse);
 
   IGRAPH_CHECK(igraph_sparsemat_compress(&Lsparse, &Lsparse2));
   IGRAPH_FINALLY(igraph_sparsemat_destroy, &Lsparse2);
