@@ -1308,7 +1308,7 @@ igraph_get_stochastic:
         IGNORE: RR
 
 igraph_get_stochastic_sparsemat:
-        PARAMS: GRAPH graph, OUT SPARSEMAT sparsemat, \
+        PARAMS: GRAPH graph, OUT SPARSEMATPTR sparsemat, \
                 BOOLEAN column_wise=False
         IGNORE: RR, RNamespace
 

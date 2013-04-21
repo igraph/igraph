@@ -790,6 +790,17 @@ SPARSEMAT:
          igraph_sparsemat_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
 
+SPARSEMATPTR:
+  CTYPE: igraph_sparsemat_t
+  CALL: &%C%
+  INCONV:
+    IN: R_SEXP_to_sparsemat(%I%, &%C%);
+    OUT: /* Don't need to init. */
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_sparsemat_to_SEXP(&%C%)); \
+         igraph_sparsemat_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
 SPARSEMAT_OR_0:
   CTYPE: igraph_sparsemat_t
   CALL: (isNull(%I%) ? 0 : &%C%)
