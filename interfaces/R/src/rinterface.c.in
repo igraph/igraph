@@ -2016,6 +2016,19 @@ SEXP R_igraph_0orvector_to_SEXP(const igraph_vector_t *v) {
   return result;
 }
 
+/* The same, plus destroy */
+SEXP R_igraph_0orvector_to_SEXP_d(igraph_vector_t *v) {
+  SEXP result;
+  if (v) {
+    PROTECT(result=R_igraph_vector_to_SEXP(v));
+    igraph_vector_destroy(v);
+  } else {
+    PROTECT(result=R_NilValue);
+  }
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_0orvector_to_SEXPp1(const igraph_vector_t *v) {
   SEXP result;
   if (v) {
@@ -7062,17 +7075,17 @@ SEXP R_igraph_bfs(SEXP graph, SEXP proot, SEXP proots, SEXP pneimode,
   }
   
   SET_STRING_ELT(names, 2, mkChar("order"));
-  SET_VECTOR_ELT(result, 2, R_igraph_0orvector_to_SEXP(p_order));
+  SET_VECTOR_ELT(result, 2, R_igraph_0orvector_to_SEXP_d(p_order));
   SET_STRING_ELT(names, 3, mkChar("rank"));
-  SET_VECTOR_ELT(result, 3, R_igraph_0orvector_to_SEXP(p_rank));
+  SET_VECTOR_ELT(result, 3, R_igraph_0orvector_to_SEXP_d(p_rank));
   SET_STRING_ELT(names, 4, mkChar("father"));
-  SET_VECTOR_ELT(result, 4, R_igraph_0orvector_to_SEXP(p_father));
+  SET_VECTOR_ELT(result, 4, R_igraph_0orvector_to_SEXP_d(p_father));
   SET_STRING_ELT(names, 5, mkChar("pred"));
-  SET_VECTOR_ELT(result, 5, R_igraph_0orvector_to_SEXP(p_pred));
+  SET_VECTOR_ELT(result, 5, R_igraph_0orvector_to_SEXP_d(p_pred));
   SET_STRING_ELT(names, 6, mkChar("succ"));
-  SET_VECTOR_ELT(result, 6, R_igraph_0orvector_to_SEXP(p_succ));
+  SET_VECTOR_ELT(result, 6, R_igraph_0orvector_to_SEXP_d(p_succ));
   SET_STRING_ELT(names, 7, mkChar("dist"));
-  SET_VECTOR_ELT(result, 7, R_igraph_0orvector_to_SEXP(p_dist));
+  SET_VECTOR_ELT(result, 7, R_igraph_0orvector_to_SEXP_d(p_dist));
 
   SET_NAMES(result, names);
   
