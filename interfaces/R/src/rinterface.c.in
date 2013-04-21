@@ -7497,14 +7497,8 @@ SEXP R_igraph_scg_semiprojectors(SEXP groups, SEXP matrix_type, SEXP p,
     } 
     IGRAPH_FINALLY(igraph_matrix_destroy, &c_R); 
   } else {
-    if (0 != igraph_sparsemat_init(&c_Lsparse, 1, 1, 0)) { 
-      igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
-    } 
-    IGRAPH_FINALLY(igraph_sparsemat_destroy, &c_Lsparse); 
-    if (0 != igraph_sparsemat_init(&c_Rsparse, 1, 1, 0)) { 
-      igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
-    } 
-    IGRAPH_FINALLY(igraph_sparsemat_destroy, &c_Rsparse); 
+    /* Nothing to do, because igraph_scg_semiprojectors 
+       expect uninitialized sparse matrices */
   }
   if (!isNull(p)) { R_SEXP_to_vector(p, &c_p); }
   c_norm=REAL(norm)[0];
@@ -7672,8 +7666,6 @@ SEXP R_igraph_scg_adjacency(SEXP graph, SEXP matrix, SEXP sparsmat, SEXP ev,
   if (do_R) { igraph_matrix_init(&c_R, 0, 0); }
 
   if (do_scg_sparsemat) { igraph_sparsemat_init(&c_scg_sparsemat, 0, 0, 0); }
-  if (do_Lsparse) { igraph_sparsemat_init(&c_Lsparse, 0, 0, 0); }
-  if (do_Rsparse) { igraph_sparsemat_init(&c_Rsparse, 0, 0, 0); }
 
                                         /* Call igraph */
   c_result=igraph_scg_adjacency((isNull(graph) ? 0 : &c_graph), 
