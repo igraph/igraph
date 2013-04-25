@@ -601,7 +601,11 @@ int igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
 
   IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, nconv-1));
   IGRAPH_FINALLY(igraph_vector_destroy, &order);
+#ifdef HAVE_GFORTRAN
+  igraphdsortr_(sort, &apply, &nconv, d, VECTOR(order), /*which_len=*/ 2);
+#else
   igraphdsortr_(sort, &apply, &nconv, d, VECTOR(order));
+#endif
 
   /* BE is special */
   if (which('B','E')) {
@@ -684,7 +688,11 @@ int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
   
   IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, nconv-1));
   IGRAPH_FINALLY(igraph_vector_destroy, &order);
+#ifdef HAVE_GFORTRAN
+  igraphdsortc_(sort, &apply, &nconv, dr, di, VECTOR(order), /*which_len=*/ 2);
+#else
   igraphdsortc_(sort, &apply, &nconv, dr, di, VECTOR(order));
+#endif
 
   if (values) {
     IGRAPH_CHECK(igraph_matrix_resize(values, nans, 2));
@@ -888,11 +896,20 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 
   /* Ok, we have everything */
   while (1) {
+#ifdef HAVE_GFORTRAN
+    igraphdsaupd_(&ido, options->bmat, &options->n, options->which,
+		  &options->nev, &options->tol,
+		  resid, &options->ncv, v, &options->ldv,
+		  options->iparam, options->ipntr,
+		  workd, workl, &options->lworkl, &options->info,
+		  /*bmat_len=*/ 1, /*which_len=*/ 2);
+#else
     igraphdsaupd_(&ido, options->bmat, &options->n, options->which,
     		  &options->nev, &options->tol,
     		  resid, &options->ncv, v, &options->ldv,
     		  options->iparam, options->ipntr,
     		  workd, workl, &options->lworkl, &options->info);
+#endif
 
     if (ido==-1 || ido==1) {
       igraph_real_t *from=workd+options->ipntr[0]-1;
@@ -912,12 +929,23 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   }
   
   options->ierr=0;
+#ifdef HAVE_GFORTRAN
+  igraphdseupd_(&rvec, all, select, d, v, &options->ldv,
+		&options->sigma, options->bmat, &options->n,
+		options->which, &options->nev, &options->tol,
+		resid, &options->ncv, v, &options->ldv, options->iparam,
+		options->ipntr, workd, workl, &options->lworkl,
+		&options->ierr, /*howmny_len=*/ 1, /*bmat_len=*/ 1,
+		/*which_len=*/ 2);
+#else
   igraphdseupd_(&rvec, all, select, d, v, &options->ldv,
   		&options->sigma, options->bmat, &options->n,
   		options->which, &options->nev, &options->tol,
   		resid, &options->ncv, v, &options->ldv, options->iparam,
   		options->ipntr, workd, workl, &options->lworkl,
   		&options->ierr);
+#endif
+
   
   if (options->ierr != 0) {
     IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dseupd(options->ierr));
@@ -1095,11 +1123,21 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   
   /* Ok, we have everything */
   while (1) {
+#ifdef HAVE_GFORTRAN
+    igraphdnaupd_(&ido, options->bmat, &options->n, options->which,
+		  &options->nev, &options->tol,
+		  resid, &options->ncv, v, &options->ldv,
+		  options->iparam, options->ipntr,
+		  workd, workl, &options->lworkl, &options->info,
+		  /*bmat_len=*/ 1, /*which_len=*/ 2);
+
+#else
     igraphdnaupd_(&ido, options->bmat, &options->n, options->which,
     		  &options->nev, &options->tol,
     		  resid, &options->ncv, v, &options->ldv,
     		  options->iparam, options->ipntr,
     		  workd, workl, &options->lworkl, &options->info);
+#endif
     
     if (ido==-1 || ido==1) {
       igraph_real_t *from=workd+options->ipntr[0]-1;
@@ -1119,12 +1157,22 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   }
 
   options->ierr=0;
+#ifdef HAVE_GFORTRAN
+  igraphdneupd_(&rvec, all, select, dr, di, v, &options->ldv,
+		&options->sigma, &options->sigmai, workev, options->bmat,
+		&options->n, options->which, &options->nev, &options->tol,
+		resid, &options->ncv, v, &options->ldv, options->iparam,
+		options->ipntr, workd, workl, &options->lworkl,
+		&options->ierr, /*howmny_len=*/ 1, /*bmat_len=*/ 1,
+		/*which_len=*/ 2);
+#else
   igraphdneupd_(&rvec, all, select, dr, di, v, &options->ldv,
   		&options->sigma, &options->sigmai, workev, options->bmat,
   		&options->n, options->which, &options->nev, &options->tol,
   		resid, &options->ncv, v, &options->ldv, options->iparam,
   		options->ipntr, workd, workl, &options->lworkl,
   		&options->ierr);
+#endif
 
   if (options->ierr != 0) {
     IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dneupd(options->info));

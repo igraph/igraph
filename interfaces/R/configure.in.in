@@ -19,7 +19,12 @@ FLIBS=`"${R_HOME}/bin/R" CMD config FLIBS`
 AC_LANG(C)
 AC_PROG_CC
 
+# Fortran compiler, we need to check if it is the GNU compiler
 AC_PROG_FC
+if test "x$ac_cv_fc_compiler_gnu" == xyes; then
+  AC_DEFINE([HAVE_GFORTRAN], [1], [Define to 1 if using the GNU fortran compiler])
+fi
+
 
 # Tricky check for C++ compiler, because Autoconf has a weird bug:
 # http://lists.gnu.org/archive/html/autoconf/2006-03/msg00067.html
