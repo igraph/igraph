@@ -1008,6 +1008,7 @@ int igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
   IGRAPH_CHECK(igraph_motifs_randesu(graph, &tmp, 3, &cut_prob));
   
   IGRAPH_CHECK(igraph_triad_census_24(graph, &m2, &m4));
+  VECTOR(tmp)[0]=0;
   VECTOR(tmp)[1]=m2;
   VECTOR(tmp)[3]=m4;
   VECTOR(tmp)[0]=vc*(vc-1)*(vc-2)/6 - igraph_vector_sum(&tmp);
