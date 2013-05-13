@@ -880,7 +880,8 @@ int igraph_modularity(const igraph_t *graph,
   long int types=igraph_vector_max(membership)+1;
   long int no_of_edges=igraph_ecount(graph);
   long int i;
-  igraph_integer_t from, to, m;
+  igraph_integer_t from, to;
+  igraph_real_t m;
   long int c1, c2;
 
   if (igraph_vector_size(membership) < igraph_vcount(graph)) {
