@@ -1898,7 +1898,7 @@ int igraph_revolver_ml_d(const igraph_t *graph,
     for (i=0; i<=maxdegree; i++) {
       if (VECTOR(*tokernel)[i] != 0) {
 	VECTOR(*tokernel)[i] = VECTOR(*mycites)[i] / VECTOR(*tokernel)[i];      
-	if ( (diff=abs(VECTOR(*tokernel)[i] - VECTOR(*fromkernel)[i])) > maxdelta) {
+	if ( (diff=fabs(VECTOR(*tokernel)[i] - VECTOR(*fromkernel)[i])) > maxdelta) {
 	  maxdelta=diff;
 	}
       }
@@ -2499,7 +2499,7 @@ int igraph_revolver_ml_ad(const igraph_t *graph,
     for (i=0; i<=maxdegree; i++) {
       for (j=0; j<agebins; j++) {
 	MATRIX(*tokernel, i, j) = MATRIX(*mycites, i, j) / MATRIX(*tokernel, i, j);
-	if ( (diff=abs(MATRIX(*tokernel,i,j) - MATRIX(*fromkernel,i,j))) > maxdelta){
+	if ( (diff=fabs(MATRIX(*tokernel,i,j) - MATRIX(*fromkernel,i,j))) > maxdelta){
 	  maxdelta=diff;
 	}
       }
@@ -2660,7 +2660,7 @@ int igraph_revolver_ml_de(const igraph_t *graph,
       for (j=0; j<=maxdegree; j++) {
 	if (MATRIX(*tokernel, i, j) != 0) {
 	  MATRIX(*tokernel, i, j) = MATRIX(*mycites, i, j) / MATRIX(*tokernel, i, j);
-	  if ( (diff=abs(MATRIX(*tokernel,i,j)-MATRIX(*fromkernel,i,j))) > maxdelta) {
+	  if ( (diff=fabs(MATRIX(*tokernel,i,j)-MATRIX(*fromkernel,i,j))) > maxdelta) {
 	    maxdelta=diff;
 	  }
 	}
@@ -2843,7 +2843,7 @@ int igraph_revolver_ml_ade(const igraph_t *graph,
       for (j=0; j<=maxdegree; j++) {
 	for (k=0; k<agebins; k++) {
 	  ARRAY3(*tokernel,i,j,k) = ARRAY3(*mycites,i,j,k) / ARRAY3(*tokernel,i,j,k);
-	  if ( (diff=abs(ARRAY3(*tokernel,i,j,k)-ARRAY3(*fromkernel,i,j,k))) > 
+	  if ( (diff=fabs(ARRAY3(*tokernel,i,j,k)-ARRAY3(*fromkernel,i,j,k))) > 
 	       maxdelta) {
 	    maxdelta=diff;
 	  }
@@ -2994,7 +2994,7 @@ int igraph_revolver_ml_l(const igraph_t *graph,
     maxdelta=0.0;
     for (i=0; i<agebins+1; i++) {
       VECTOR(*tokernel)[i] = VECTOR(*mycites)[i] / VECTOR(*tokernel)[i];
-      if ( (diff=abs(VECTOR(*tokernel)[i]-VECTOR(*fromkernel)[i])) > maxdelta) {
+      if ( (diff=fabs(VECTOR(*tokernel)[i]-VECTOR(*fromkernel)[i])) > maxdelta) {
 	maxdelta=diff;
       }
     }
