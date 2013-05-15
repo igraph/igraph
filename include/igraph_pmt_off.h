@@ -152,3 +152,7 @@
 #ifdef FPRINTFUNC
 #undef PRINTFUNC
 #endif
+
+#ifdef UNSIGNED
+#undef UNSIGNED
+#endif
