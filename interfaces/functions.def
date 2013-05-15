@@ -720,7 +720,7 @@ igraph_centralization_closeness:
 
 igraph_centralization_closeness_tmax:
         PARAMS: GRAPH_OR_0 graph=NULL, INTEGER nodes=0, \
-                BOOLEAN directed=True, OUT REALPTR res
+                NEIMODE mode=OUT, OUT REALPTR res
         NAME-R: centralization.closeness.tmax
 
 igraph_centralization_eigenvector_centrality:
