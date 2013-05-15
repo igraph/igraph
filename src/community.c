@@ -2724,7 +2724,7 @@ int igraph_i_community_multilevel_step(igraph_t *graph,
       igraph_real_t weight_inside = 0;
       igraph_real_t weight_loop = 0;
       igraph_real_t max_q_gain = 0;
-      igraph_integer_t max_weight;
+      igraph_real_t max_weight;
       long int old_id, new_id, n;
 
       igraph_i_multilevel_community_links(graph, &communities, i, &edges,
