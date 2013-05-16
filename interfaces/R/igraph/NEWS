@@ -1,4 +1,17 @@
 ==============
+igraph 0.6.5-2
+==============
+
+Released May 16, 2013
+
+Worked two CRAN check problems, one that is possibly a clang bug
+(since when do C compilers optimize based on constness?) and 
+a gfortran bug (string bound checking does not work if code is called 
+from C and without string length arguments at the "right" place).
+
+Otherwise identical to 0.6.5-1.
+
+==============
 igraph 0.6.5-1
 ==============
 
