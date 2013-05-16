@@ -148,11 +148,11 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
       /* ------------------------------------ */
       /* They are exactly the same */
       if (VECTOR(t->values)[i] != -1) {
-	*id=VECTOR(t->values)[i];
+	*id=(long int) VECTOR(t->values)[i];
 	return 0;
       } else {
 	VECTOR(t->values)[i]=newvalue;
-	*id=newvalue;
+	*id=(long int) newvalue;
 	return 0;
       }
 
@@ -177,7 +177,7 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
 
 	VECTOR(t->children)[i]=node;
 
-	*id=newvalue;
+	*id=(long int) newvalue;
 	IGRAPH_FINALLY_CLEAN(3);
 	return 0;
       } else {
@@ -216,7 +216,7 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
       VECTOR(t->values)[i]=newvalue;
       VECTOR(t->children)[i]=node;
       
-      *id=newvalue;
+      *id=(long int) newvalue;
       return 0;
 
     } else if (add) {
@@ -252,7 +252,7 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
       VECTOR(t->values)[i]=-1;
       VECTOR(t->children)[i]=node;
       
-      *id=newvalue;
+      *id=(long int) newvalue;
       return 0;
     } else {
       
@@ -274,7 +274,7 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
 
     igraph_vector_ptr_push_back(&t->children, 0); /* allocated */
     igraph_vector_push_back(&t->values, newvalue); /* allocated */
-    *id=newvalue;
+    *id=(long int) newvalue;
   } else {
     *id=-1;
   }

@@ -138,19 +138,19 @@ CONNECTEDNESS:
     IN: %C%=REAL(%I%)[0];
 
 NEIMODE:
-  CTYPE: igraph_integer_t
+  CTYPE: igraph_neimode_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_neimode_t) REAL(%I%)[0];
 
 INOUTMODE:
-  CTYPE: igraph_integer_t
+  CTYPE: igraph_neimode_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_neimode_t) REAL(%I%)[0];
 
 TOUNDIRECTED:
-  CTYPE: igraph_integer_t 
+  CTYPE: igraph_to_undirected_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_to_undirected_t) REAL(%I%)[0];
 
 BLISSSH:
   CTYPE: igraph_bliss_sh_t
@@ -583,7 +583,7 @@ ARRAY3_OR_0:
 VERTEX:
   CTYPE: igraph_integer_t
   INCONV: 
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_integer_t) REAL(%I%)[0];
 
 ##################################
 # Some vertices/edges of a graph
@@ -699,17 +699,17 @@ EDGE_COLOR:
 # Community comparison methods
 
 COMMCMP:
-  CTYPE: igraph_integer_t
+  CTYPE: igraph_community_comparison_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_community_comparison_t) REAL(%I%)[0];
 
 ##################################
 # Subgraph implementations
 
 SUBGRAPH_IMPL:
-  CTYPE: igraph_integer_t
+  CTYPE: igraph_subgraph_implementation_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_subgraph_implementation_t) REAL(%I%)[0];
 
 ##################################
 # Specification on what to do with the attributes
@@ -757,19 +757,19 @@ RECIP:
     IN: %C%=REAL(%I%)[0];
 
 SCGMAT:
-  CTYPE: igraph_integer_t
+  CTYPE: igraph_scg_matrix_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_scg_matrix_t) REAL(%I%)[0];
 
 SCGALGO:
-  CTYPE: igraph_integer_t
+  CTYPE: igraph_scg_algorithm_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_scg_algorithm_t) REAL(%I%)[0];
 
 SCGNORM:
-  CTYPE: igraph_integer_t 
+  CTYPE: igraph_scg_norm_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_scg_norm_t) REAL(%I%)[0];
 
 SCGDIR:
   CTYPE: igraph_integer_t

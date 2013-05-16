@@ -22,6 +22,10 @@
 *  along with GLPK. If not, see <http://www.gnu.org/licenses/>.
 ***********************************************************************/
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#endif
+
 #include "glpapi.h"
 
 struct var

@@ -112,7 +112,7 @@ igraph_bool_t igraph_i_graphml_parse_boolean(const char* char_data) {
     return 0;
   if (sscanf(char_data, "%d", &value) == 0)
     return 0;
-  return value != 0 && value == value;
+  return value != 0;
 }
 
 void igraph_i_graphml_destroy_state(struct igraph_i_graphml_parser_state* state) {
@@ -501,8 +501,8 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
     }
     
     igraph_empty_attrs(state->g, 0, state->edges_directed, &gattr);
-    igraph_add_vertices(state->g, igraph_trie_size(&state->node_trie),
-			&vattr);
+    igraph_add_vertices(state->g, (igraph_integer_t) 
+			igraph_trie_size(&state->node_trie), &vattr);
     igraph_add_edges(state->g, &state->edgelist, &eattr);
 
     igraph_vector_ptr_destroy(&vattr);
@@ -686,10 +686,11 @@ void igraph_i_graphml_attribute_data_add(struct igraph_i_graphml_parser_state *s
   if (!state->successful) return;
 
   if (state->data_char) {
-    data_char_new_start=strlen(state->data_char);
-    state->data_char=igraph_Realloc(state->data_char, data_char_new_start+len+1, char);
+    data_char_new_start=(long int) strlen(state->data_char);
+    state->data_char=igraph_Realloc(state->data_char, 
+				    (size_t)(data_char_new_start+len+1), char);
   } else {
-    state->data_char=igraph_Calloc(len+1, char);
+    state->data_char=igraph_Calloc((size_t) len+1, char);
   }
   if (state->data_char==0) {
     igraph_error("Cannot parse GraphML file", __FILE__, __LINE__, 
@@ -697,7 +698,8 @@ void igraph_i_graphml_attribute_data_add(struct igraph_i_graphml_parser_state *s
     igraph_i_graphml_sax_handler_error(state, "Cannot parse GraphML file");
     return;
   }
-  memcpy(state->data_char+data_char_new_start, data, len*sizeof(xmlChar));
+  memcpy(state->data_char+data_char_new_start, data, 
+	 (size_t) len*sizeof(xmlChar));
   state->data_char[data_char_new_start+len]='\0';
 }
 
@@ -1105,7 +1107,7 @@ int igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
   /* Create a progressive parser context */
   state.g=graph;
   state.index=index<0?0:index;
-  res=fread(buffer, 1, 4096, instream);
+  res=(int) fread(buffer, 1, 4096, instream);
   ctxt=xmlCreatePushParserCtxt(&igraph_i_graphml_sax_handler,
 			       &state,
 			       buffer,
@@ -1119,7 +1121,7 @@ int igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
     IGRAPH_ERROR("Can't create progressive parser context", IGRAPH_PARSEERROR);
 
   /* Parse the file */
-  while ((res=fread(buffer, 1, 4096, instream))>0) {
+  while ((res=(int) fread(buffer, 1, 4096, instream))>0) {
     xmlParseChunk(ctxt, buffer, res, 0);
     if (!state.successful) break;
   }
@@ -1369,7 +1371,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
     igraph_integer_t from, to;
     char *name, *name_escaped;
     long int edge=IGRAPH_EIT_GET(it);
-    igraph_edge(graph, edge, &from, &to);
+    igraph_edge(graph, (igraph_integer_t) edge, &from, &to);
     ret=fprintf(outstream, "    <edge source=\"n%ld\" target=\"n%ld\">\n", 
 		(long int)from, (long int)to);
     if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
@@ -1378,7 +1380,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
       if (VECTOR(etypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
         igraph_strvector_get(&enames, i, &name);
         IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(graph, name,
-                     igraph_ess_1(edge), &numv));
+			      igraph_ess_1((igraph_integer_t) edge), &numv));
         if (!isnan(VECTOR(numv)[0])) {
           IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
           ret=fprintf(outstream, "      <data key=\"%s%s\">%g</data>\n",
@@ -1394,7 +1396,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
 		    name_escaped);
         igraph_Free(name_escaped);
         IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph, name,
-                     igraph_ess_1(edge), &strv));
+			     igraph_ess_1((igraph_integer_t) edge), &strv));
         igraph_strvector_get(&strv, 0, &s);
         IGRAPH_CHECK(igraph_i_xml_escape(s, &s_escaped));
         ret=fprintf(outstream, "%s", s_escaped);
@@ -1405,7 +1407,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
       } else if (VECTOR(etypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
         igraph_strvector_get(&enames, i, &name);
         IGRAPH_CHECK(igraph_i_attribute_get_bool_edge_attr(graph, name,
-                     igraph_ess_1(edge), &boolv));
+			   igraph_ess_1((igraph_integer_t) edge), &boolv));
         IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
         ret=fprintf(outstream, "      <data key=\"%s%s\">%s</data>\n",
                     eprefix, name_escaped, VECTOR(boolv)[0] ? "true" : "false");

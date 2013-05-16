@@ -61,7 +61,7 @@
  */
 int igraph_atlas(igraph_t *graph, int number) {
   
-  long int pos, n, e;
+  igraph_integer_t pos, n, e;
   igraph_vector_t v=IGRAPH_VECTOR_NULL;
 
   if (number < 0 ||
@@ -69,9 +69,9 @@ int igraph_atlas(igraph_t *graph, int number) {
     IGRAPH_ERROR("No such graph in atlas", IGRAPH_EINVAL);
   }
 
-  pos=igraph_i_atlas_edges_pos[number];
-  n=igraph_i_atlas_edges[pos];
-  e=igraph_i_atlas_edges[pos+1];
+  pos=(igraph_integer_t) igraph_i_atlas_edges_pos[number];
+  n=(igraph_integer_t) igraph_i_atlas_edges[pos];
+  e=(igraph_integer_t) igraph_i_atlas_edges[pos+1];
   
   IGRAPH_CHECK(igraph_create(graph, 
 			     igraph_vector_view(&v,igraph_i_atlas_edges+pos+2, 

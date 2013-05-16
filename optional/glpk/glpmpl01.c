@@ -22,6 +22,12 @@
 *  along with GLPK. If not, see <http://www.gnu.org/licenses/>.
 ***********************************************************************/
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wlogical-op-parentheses"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#pragma clang diagnostic ignored "-Wsometimes-uninitialized"
+#endif
+
 #define _GLPSTD_STDIO
 #include "glpmpl.h"
 #define dmp_get_atomv dmp_get_atom

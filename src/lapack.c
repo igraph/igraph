@@ -53,8 +53,8 @@
 
 int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv, 
 			 int *info) {
-  int m=igraph_matrix_nrow(a);
-  int n=igraph_matrix_ncol(a);
+  int m=(int) igraph_matrix_nrow(a);
+  int n=(int) igraph_matrix_ncol(a);
   int lda=m > 0 ? m : 1;
   igraph_vector_int_t *myipiv=ipiv, vipiv;
 
@@ -125,8 +125,8 @@ int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
 int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
 			 igraph_vector_int_t *ipiv, igraph_matrix_t *b) {
   char trans = transpose ? 'T' : 'N';
-  int n=igraph_matrix_nrow(a);
-  int nrhs=igraph_matrix_ncol(b);
+  int n=(int) igraph_matrix_nrow(a);
+  int nrhs=(int) igraph_matrix_ncol(b);
   int lda= n > 0 ? n : 1;
   int ldb= n > 0 ? n : 1;
   int info;
@@ -217,8 +217,8 @@ int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
 int igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
 			igraph_matrix_t *b, int *info) {
 
-  int n=igraph_matrix_nrow(a);
-  int nrhs=igraph_matrix_ncol(b);
+  int n=(int) igraph_matrix_nrow(a);
+  int nrhs=(int) igraph_matrix_ncol(b);
   int lda= n > 0 ? n : 1;
   int ldb= n > 0 ? n : 1;
   igraph_vector_int_t *myipiv=ipiv, vipiv;
@@ -350,7 +350,7 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
 
   igraph_matrix_t Acopy;
   char jobz = vectors ? 'V' : 'N', range, uplo='U';
-  int n=igraph_matrix_nrow(A), lda=n, ldz=n;
+  int n=(int) igraph_matrix_nrow(A), lda=n, ldz=n;
   int m, info; 
   igraph_vector_t *myvalues=values, vvalues;
   igraph_vector_int_t *mysupport=support, vsupport;
@@ -413,7 +413,7 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
 		vectors ? &MATRIX(*vectors,0,0) : 0, &ldz, VECTOR(*mysupport),
 		VECTOR(work), &lwork, VECTOR(iwork), &liwork, &info);
   
-  lwork=VECTOR(work)[0];
+  lwork=(int) VECTOR(work)[0];
   liwork=VECTOR(iwork)[0];
   IGRAPH_CHECK(igraph_vector_resize(&work, lwork));
   IGRAPH_CHECK(igraph_vector_int_resize(&iwork, liwork));
@@ -517,7 +517,7 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
 
   char jobvl= vectorsleft  ? 'V' : 'N';
   char jobvr= vectorsright ? 'V' : 'N';
-  int n=igraph_matrix_nrow(A);
+  int n=(int) igraph_matrix_nrow(A);
   int lda=n, ldvl=n, ldvr=n, lwork=-1;
   igraph_vector_t work;
   igraph_vector_t *myreal=valuesreal, *myimag=valuesimag, vreal, vimag;
@@ -558,7 +558,7 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
 	       vectorsright ? &MATRIX(*vectorsright,0,0) : 0, &ldvr,
 	       VECTOR(work), &lwork, info);
 
-  lwork=VECTOR(work)[0];
+  lwork=(int) VECTOR(work)[0];
   IGRAPH_CHECK(igraph_vector_resize(&work, lwork));
   
   igraphdgeev_(&jobvl, &jobvr, &n, &MATRIX(Acopy,0,0), &lda, 
@@ -727,7 +727,7 @@ int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
   char jobvl= vectorsleft  ? 'V' : 'N';
   char jobvr= vectorsright ? 'V' : 'N';
   char sense;
-  int n=igraph_matrix_nrow(A);
+  int n=(int) igraph_matrix_nrow(A);
   int lda=n, ldvl=n, ldvr=n, lwork=-1;
   igraph_vector_t work;
   igraph_vector_int_t iwork;
@@ -809,7 +809,7 @@ int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
 		rcondv ? VECTOR(*rcondv) : 0, 
 		VECTOR(work), &lwork, VECTOR(iwork), info);
 		
-  lwork=VECTOR(work)[0];
+  lwork=(int) VECTOR(work)[0];
   IGRAPH_CHECK(igraph_vector_resize(&work, lwork));
   
   igraphdgeevx_(&balanc, &jobvl, &jobvr, &sense, &n, &MATRIX(Acopy,0,0), 
@@ -858,7 +858,7 @@ int igraph_lapack_dgehrd(const igraph_matrix_t *A,
 			 int ilo, int ihi, 
 			 igraph_matrix_t *result) {
   
-  int n=igraph_matrix_nrow(A);
+  int n=(int) igraph_matrix_nrow(A);
   int lda=n;
   int lwork=-1;
   igraph_vector_t work;
@@ -893,7 +893,7 @@ int igraph_lapack_dgehrd(const igraph_matrix_t *A,
 		 IGRAPH_EINTERNAL);
   }
   
-  lwork=optwork;
+  lwork=(int) optwork;
   IGRAPH_VECTOR_INIT_FINALLY(&work, lwork);
 
   igraphdgehrd_(&n, &ilo, &ihi, &MATRIX(Acopy, 0, 0), &lda, VECTOR(tau),

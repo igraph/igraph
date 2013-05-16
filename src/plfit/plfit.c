@@ -248,7 +248,7 @@ int plfit_estimate_alpha_continuous_sorted(double* xs, size_t n, double xmin,
 	end = xs + n;
     while (xs < end && *xs < xmin)
         xs++;
-    n = end - xs;
+    n = (size_t) (end - xs);
 
     PLFIT_CHECK(plfit_i_estimate_alpha_continuous_sorted(xs, n,
 				xmin, &result->alpha));
@@ -281,7 +281,7 @@ double plfit_i_continuous_xmin_opt_evaluate(void* instance, double x) {
 	printf("Trying with xmin = %.4f\n", *begin);
 #endif
 
-	plfit_i_estimate_alpha_continuous_sorted(begin, data->end-begin, *begin,
+	plfit_i_estimate_alpha_continuous_sorted(begin, (size_t) (data->end-begin), *begin,
 			&data->last.alpha);
 	plfit_i_ks_test_continuous(begin, data->end, data->last.alpha, *begin,
 			&data->last.D);
@@ -348,7 +348,7 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
 		 * the index in opt_data.uniques that we have to look up in order to
 		 * find the first element in the array that is included */
 		px = opt_data.uniques[(int)x];
-		best_n = opt_data.end-px+1;
+		best_n = (size_t) (opt_data.end-px+1);
 	} else {
 		/* GSS failed or skipped; try linear search */
 
@@ -362,7 +362,8 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
 			plfit_i_continuous_xmin_opt_evaluate(&opt_data, i);
 			if (opt_data.last.D < best_result.D) {
 				best_result = opt_data.last;
-				best_n = opt_data.end - opt_data.uniques[i] + 1;
+				best_n = (size_t) (opt_data.end - 
+						   opt_data.uniques[i] + 1);
 			}
 		}
 	}
@@ -681,7 +682,7 @@ int plfit_estimate_alpha_discrete(double* xs, size_t n, double xmin,
     xs = xs_copy; end = xs_copy + n;
     while (xs < end && *xs < xmin)
         xs++;
-    n = end - xs;
+    n = (size_t) (end - xs);
 
     PLFIT_CHECK(plfit_i_estimate_alpha_discrete(xs, n, xmin, &result->alpha,
 				options, /* sorted = */ 1));
@@ -704,7 +705,7 @@ int plfit_discrete(double* xs, size_t n, const plfit_discrete_options_t* options
     plfit_result_t best_result;
     double *xs_copy, *px, *end, *end_xmin, prev_x;
 	size_t best_n;
-    int m;
+    size_t m;
 
 	if (!options)
 		options = &plfit_discrete_default_options;
@@ -748,15 +749,15 @@ int plfit_discrete(double* xs, size_t n, const plfit_discrete_options_t* options
             px++; m++;
         }
 
-		plfit_i_estimate_alpha_discrete(px, n-m, *px, &curr_alpha, options,
-				/* sorted = */ 1);
+	plfit_i_estimate_alpha_discrete(px, n - m, *px,
+					&curr_alpha, options, /* sorted = */ 1);
         plfit_i_ks_test_discrete(px, end, curr_alpha, *px, &curr_D);
 
         if (curr_D < best_result.D) {
             best_result.alpha = curr_alpha;
             best_result.xmin = *px;
             best_result.D = curr_D;
-			best_n = n-m;
+	    best_n = n - m;
         }
 
         prev_x = *px;

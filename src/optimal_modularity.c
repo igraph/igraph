@@ -81,11 +81,11 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
 	       IGRAPH_UNIMPLEMENTED);    
 #else
 
-  long int no_of_nodes=igraph_vcount(graph);
-  long int no_of_edges=igraph_ecount(graph);
+  igraph_integer_t no_of_nodes=(igraph_integer_t) igraph_vcount(graph);
+  igraph_integer_t no_of_edges=(igraph_integer_t) igraph_ecount(graph);
   igraph_bool_t directed=igraph_is_directed(graph);
-  long int no_of_variables=no_of_nodes * (no_of_nodes+1)/2;
-  long int i, j, k, st;
+  int no_of_variables=no_of_nodes * (no_of_nodes+1)/2;
+  int i, j, k, st;
   int idx[] = { 0, 0, 0, 0 };
   double coef[] = { 0.0, 1.0, 1.0, -2.0 };
 
@@ -118,14 +118,14 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
 
   /* variables are binary */
   for (i=0; i<no_of_variables; i++) {
-    glp_set_col_kind(ip, st+i, GLP_BV);
+    glp_set_col_kind(ip, (st+i), GLP_BV);
   }
 
 #define IDX(a,b) ((b)*((b)+1)/2+(a))
 
   /* reflexivity */
   for (i=0; i<no_of_nodes; i++) {
-    glp_set_col_bnds(ip, st+IDX(i,i), GLP_FX, 1.0, 1.0);
+    glp_set_col_bnds(ip, (st+IDX(i,i)), GLP_FX, 1.0, 1.0);
   }
   
   /* transitivity */
@@ -135,10 +135,11 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
       IGRAPH_ALLOW_INTERRUPTION();
 
       for (k=j+1; k<no_of_nodes; k++) {
-	long int newrow=glp_add_rows(ip, 3);
+	int newrow=glp_add_rows(ip, 3);
 
 	glp_set_row_bnds(ip, newrow, GLP_UP, 0.0, 1.0);
-	idx[1]  = st+IDX(i,j); idx[2] = st+IDX(j,k); idx[3] = st+IDX(i,k);
+	idx[1] = (st+IDX(i,j)); idx[2] = (st+IDX(j,k)); 
+	idx[3] = (st+IDX(i,k));
 	glp_set_mat_row(ip, newrow, 3, idx, coef);
 
 	glp_set_row_bnds(ip, newrow+1, GLP_UP, 0.0, 1.0);
@@ -191,7 +192,7 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
       IGRAPH_ALLOW_INTERRUPTION();
       
       for (j=0; j<i; j++) {
-	int val=glp_mip_col_val(ip, st+IDX(j,i));
+	int val=(int) glp_mip_col_val(ip, st+IDX(j,i));
 	if (val==1) {
 	  VECTOR(*membership)[i]=VECTOR(*membership)[j];
 	  break;

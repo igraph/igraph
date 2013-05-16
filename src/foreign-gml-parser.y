@@ -44,6 +44,11 @@
 
 */
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wconversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#endif
+
 #include <stdio.h>
 #include <math.h>
 #include <string.h>

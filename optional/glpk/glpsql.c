@@ -24,6 +24,10 @@
 *  along with GLPK. If not, see <http://www.gnu.org/licenses/>.
 ***********************************************************************/
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wunused-function"
+#endif
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif

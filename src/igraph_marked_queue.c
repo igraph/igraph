@@ -81,7 +81,8 @@ int igraph_marked_queue_start_batch(igraph_marked_queue_t *q) {
 void igraph_marked_queue_pop_back_batch(igraph_marked_queue_t *q) {
   long int size=igraph_dqueue_size(&q->Q);
   long int elem;
-  while (size > 0 && (elem=igraph_dqueue_pop_back(&q->Q)) != BATCH_MARKER) {
+  while (size > 0 && 
+	 (elem=(long int) igraph_dqueue_pop_back(&q->Q)) != BATCH_MARKER) {
     VECTOR(q->set)[elem]=0;
     size--;
     q->size--;

@@ -663,6 +663,9 @@
 /* === Include files ======================================================== */
 /* ========================================================================== */
 
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+
 #include "colamd.h"
 
 #if 0 /* by mao */

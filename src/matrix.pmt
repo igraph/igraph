@@ -859,7 +859,7 @@ int FUNCTION(igraph_matrix,rbind)(TYPE(igraph_matrix) *to,
   offset=torows; offset2=0;
   for (c=0; c<tocols; c++) {
     memcpy(VECTOR(to->data)+offset, VECTOR(from->data)+offset2,
-	   sizeof(BASE)*fromrows);
+	   sizeof(BASE) * (size_t) fromrows);
     offset+=fromrows+torows;
     offset2+=fromrows;
   }

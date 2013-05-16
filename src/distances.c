@@ -83,11 +83,12 @@ int igraph_i_eccentricity(const igraph_t *graph,
       if (adjlist) {
 	neis=igraph_adjlist_get(adjlist, act);
       } else {
-	IGRAPH_CHECK(igraph_neighbors(graph, neis, act, mode));
+	IGRAPH_CHECK(igraph_neighbors(graph, neis, 
+				      (igraph_integer_t) act, mode));
       }
-      n=igraph_vector_size(neis);
+      n=(int) igraph_vector_size(neis);
       for (j=0; j<n; j++) {
-	int nei=VECTOR(*neis)[j];
+	int nei=(int) VECTOR(*neis)[j];
 	if (VECTOR(counted)[nei] != mark) {
 	  VECTOR(counted)[nei]=mark;
 	  IGRAPH_CHECK(igraph_dqueue_long_push(&q, nei));

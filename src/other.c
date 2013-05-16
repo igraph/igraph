@@ -127,7 +127,7 @@ int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
   igraph_indheap_t order;
   igraph_real_t px, py, cp;
   
-  no_of_nodes=igraph_matrix_nrow(data);
+  no_of_nodes=(igraph_integer_t) igraph_matrix_nrow(data);
   if (igraph_matrix_ncol(data) != 2) {
     IGRAPH_ERROR("matrix must have 2 columns", IGRAPH_EINVAL);
   }
@@ -192,8 +192,8 @@ int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
     j=2;
     while (!igraph_indheap_empty(&order)) {
       /* Determine whether we are at a left or right turn */
-      last_idx=VECTOR(stack)[j-1];
-      before_last_idx=VECTOR(stack)[j-2];
+      last_idx=(long int) VECTOR(stack)[j-1];
+      before_last_idx=(long int) VECTOR(stack)[j-2];
       next_idx=(long)igraph_indheap_max_index(&order)-1;
       igraph_indheap_delete_max(&order);
       cp=(MATRIX(*data, last_idx, 0)-MATRIX(*data, before_last_idx, 0))*
@@ -218,8 +218,8 @@ int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
 	while (cp >= 0 && j > 2) {
 	  igraph_vector_pop_back(&stack);
 	  j--;
-	  last_idx=VECTOR(stack)[j-1];
-	  before_last_idx=VECTOR(stack)[j-2];
+	  last_idx=(long int) VECTOR(stack)[j-1];
+	  before_last_idx=(long int) VECTOR(stack)[j-2];
 	  cp=(MATRIX(*data, last_idx, 0)-MATRIX(*data, before_last_idx, 0))*
 	    (MATRIX(*data, next_idx, 1)-MATRIX(*data, before_last_idx, 1))-
 	    (MATRIX(*data, next_idx, 0)-MATRIX(*data, before_last_idx, 0))*
@@ -332,7 +332,7 @@ int igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_result_t* res
   int retval;
   size_t i, n;
 
-  n = igraph_vector_size(data);
+  n = (size_t) igraph_vector_size(data);
   finite_size_correction = (n < 50);
 
   if (discrete) {
@@ -348,7 +348,7 @@ int igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_result_t* res
   plfit_stored_error_handler = plfit_set_error_handler(igraph_i_plfit_error_handler_store);
   if (discrete) {
     plfit_discrete_options_init(&disc_options);
-    disc_options.finite_size_correction = finite_size_correction;
+    disc_options.finite_size_correction = (plfit_bool_t) finite_size_correction;
 
     if (xmin >= 0) {
       retval = plfit_estimate_alpha_discrete(VECTOR(*data), n, xmin,
@@ -358,7 +358,7 @@ int igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_result_t* res
     }
   } else {
     plfit_continuous_options_init(&cont_options);
-    cont_options.finite_size_correction = finite_size_correction;
+    cont_options.finite_size_correction = (plfit_bool_t) finite_size_correction;
 
     if (xmin >= 0) {
       retval = plfit_estimate_alpha_continuous(VECTOR(*data), n, xmin,
