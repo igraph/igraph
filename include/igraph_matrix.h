@@ -89,7 +89,7 @@ __BEGIN_DECLS
  * \brief Accessing an element of a matrix.
  *
  * Note that there are no range checks right now. 
- * This functionality might be redefines as a proper function later. 
+ * This functionality might be redefined as a proper function later. 
  * \param m The matrix object.
  * \param i The index of the row, starting with zero.
  * \param j The index of the column, starting with zero.
