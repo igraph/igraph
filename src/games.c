@@ -2809,7 +2809,7 @@ int igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_real_t prob,
  * 
  * This function rewires the edges of a graph with a constant
  * probability. More precisely each end point of each edge is rewired
- * to an uniformly randomly chosen vertex with constant probability \p
+ * to a uniformly randomly chosen vertex with constant probability \p
  * prob.
  * 
  * </para><para> Note that this function modifies the input \p graph,
