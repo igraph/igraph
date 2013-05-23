@@ -194,7 +194,10 @@ plot(g, vertex.shape="star", vertex.color=rainbow(vcount(g)),
 # for this.
 
 if (require(XML) && require(png) && require(jpeg)) {
-  url <- 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=\%s&api_key=1784468ada3f544faf9172ee8b99fca3'
+  url <- paste(sep="",
+               'http://ws.audioscrobbler.com/',
+               '2.0/?method=artist.getinfo&artist=\%s',
+               '&api_key=1784468ada3f544faf9172ee8b99fca3')
   getartist <- function(artist) {
     cat("Downloading from last.fm. ... ")
     txt <- readLines(sprintf(url, URLencode(artist)))
