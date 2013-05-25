@@ -105,6 +105,11 @@ __BEGIN_DECLS
   do { IGRAPH_CHECK(igraph_vector_bool_init(v, size)); \
   IGRAPH_FINALLY(igraph_vector_bool_destroy, v); } while (0)
 #endif
+#ifndef IGRAPH_VECTOR_LONG_INIT_FINALLY
+#define IGRAPH_VECTOR_LONG_INIT_FINALLY(v, size) \
+  do { IGRAPH_CHECK(igraph_vector_long_init(v, size)); \
+  IGRAPH_FINALLY(igraph_vector_long_destroy, v); } while (0)
+#endif
 
 /* -------------------------------------------------- */
 /* Type-specific vector functions                     */
