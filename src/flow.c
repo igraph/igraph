@@ -1025,14 +1025,8 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
  *        every edge is considered to have capacity 1.0.
  * \return Error code.
  * 
- * Time complexity: O(|V|^3). In practice it is much faster, but i
- * cannot prove a better lower bound for the data structure i've
- * used. In fact, this implementation runs much faster than the
- * \c hi_pr implementation discussed in
- * B. V. Cherkassky and A. V. Goldberg: On implementing the 
- * push-relabel method for the maximum flow problem, (Algorithmica, 
- * 19:390--410, 1997) on all the graph classes i've tried.
- * 
+ * Time complexity: O(|V|^3).
+ *
  * \sa \ref igraph_maxflow() to calculate the actual flow. 
  * \ref igraph_mincut_value(), \ref igraph_edge_connectivity(),
  * \ref igraph_vertex_connectivity() for 
