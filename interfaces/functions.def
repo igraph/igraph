@@ -1468,12 +1468,12 @@ igraph_maxflow:
         PARAMS: GRAPH graph, OUT REALPTR value, OUT VECTOR_OR_0 flow, \
                 OUT VECTORM1_OR_0 cut, OUT VECTORM1_OR_0 partition1, \
                 OUT VECTORM1_OR_0 partition2, VERTEX source, VERTEX target, \
-                EDGECAPACITY capacity=NULL
+                EDGECAPACITY capacity=NULL, OUT MAXFLOW_STATS stats
         DEPS: capacity ON graph, source ON graph, target ON graph
 
 igraph_maxflow_value:
         PARAMS: GRAPH graph, OUT REALPTR value, VERTEX source, VERTEX target, \
-                VECTOR_OR_0 capacity
+                VECTOR_OR_0 capacity, OUT MAXFLOW_STATS stats
         DEPS: source ON graph, target ON graph
         IGNORE: RR, RC, RNamespace
 

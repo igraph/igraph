@@ -9454,6 +9454,7 @@ PyObject *igraphmodule_Graph_maxflow_value(igraphmodule_GraphObject * self,
   igraph_real_t result;
   long int vid1 = -1, vid2 = -1;
   igraph_integer_t v1, v2;
+  igraph_maxflow_stats_t stats;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|O", kwlist,
                                    &vid1, &vid2, &capacity_object))
@@ -9467,7 +9468,8 @@ PyObject *igraphmodule_Graph_maxflow_value(igraphmodule_GraphObject * self,
     return igraphmodule_handle_igraph_error();
 
 
-  if (igraph_maxflow_value(&self->g, &result, v1, v2, &capacity_vector)) {
+  if (igraph_maxflow_value(&self->g, &result, v1, v2, &capacity_vector, 
+			   &stats)) {
     igraph_vector_destroy(&capacity_vector);
     return igraphmodule_handle_igraph_error();
   }
@@ -9489,6 +9491,7 @@ PyObject *igraphmodule_Graph_maxflow(igraphmodule_GraphObject * self,
   long int vid1 = -1, vid2 = -1;
   igraph_integer_t v1, v2;
   igraph_vector_t flow, cut, partition;
+  igraph_maxflow_stats_t stats;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|O", kwlist,
                                    &vid1, &vid2, &capacity_object))
@@ -9520,7 +9523,7 @@ PyObject *igraphmodule_Graph_maxflow(igraphmodule_GraphObject * self,
   }
 
   if (igraph_maxflow(&self->g, &result, &flow, &cut, &partition, 0,
-        v1, v2, &capacity_vector)) {
+		     v1, v2, &capacity_vector, &stats)) {
     igraph_vector_destroy(&capacity_vector);
     igraph_vector_destroy(&flow);
     igraph_vector_destroy(&cut);

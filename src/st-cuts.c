@@ -1311,6 +1311,7 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
   igraph_vector_t revmap_ptr, revmap_next;
   igraph_vector_ptr_t closedsets;
   igraph_vector_ptr_t *mypartition1s=partition1s, vpartition1s;
+  igraph_maxflow_stats_t stats;
 
   /* -------------------------------------------------------------------- */
   /* Error checks */
@@ -1340,7 +1341,7 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
   IGRAPH_CHECK(igraph_maxflow(graph, value, &flow, /*cut=*/ 0, 
 			      /*partition1=*/ 0, /*partition2=*/ 0, 
 			      /*source=*/ source, /*target=*/ target, 
-			      capacity));
+			      capacity, &stats));
 
   /* -------------------------------------------------------------------- */
   /* Then we need the reverse residual graph */

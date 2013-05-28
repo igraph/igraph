@@ -653,6 +653,7 @@ int igraph_minimum_size_separators(const igraph_t *graph,
   igraph_vector_t phi;
   igraph_t graph_copy;
   igraph_vector_t capacity;
+  igraph_maxflow_stats_t stats;
 
   igraph_vector_ptr_clear(separators);
   IGRAPH_FINALLY(igraph_i_separators_free, separators);
@@ -764,7 +765,7 @@ int igraph_minimum_size_separators(const igraph_t *graph,
 				  /* source= */ 
 				  (igraph_integer_t) (ii+no_of_nodes),
 				  /* target= */ (igraph_integer_t) j,
-				  &capacity));
+				  &capacity, &stats));
 
       if (phivalue == k) {
 

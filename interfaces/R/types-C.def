@@ -934,3 +934,10 @@ PLFIT:
   CALL: &%C%
   OUTCONV: 
     OUT: PROTECT(%I%=R_igraph_plfit_result_to_SEXP(&%C%));
+
+MAXFLOW_STATS:
+  HEADER:
+  CTYPE: igraph_maxflow_stats_t
+  CALL: &%C%
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_maxflow_stats_to_SEXP(&%C%));

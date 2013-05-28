@@ -55,6 +55,7 @@ SEXP R_igraph_hrg_to_SEXP(const igraph_hrg_t *hrg);
 SEXP R_igraph_plfit_result_to_SEXP(const igraph_plfit_result_t *plfit);
 SEXP R_igraph_sparsemat_to_SEXP(const igraph_sparsemat_t *sp);
 SEXP R_igraph_0orsparsemat_to_SEXP(const igraph_sparsemat_t *sp);
+SEXP R_igraph_maxflow_stats_to_SEXP(const igraph_maxflow_stats_t *st);
 
 int R_igraph_SEXP_to_strvector(SEXP rval, igraph_strvector_t *sv);
 int R_igraph_SEXP_to_strvector_copy(SEXP rval, igraph_strvector_t *sv);
@@ -2380,6 +2381,28 @@ SEXP R_igraph_plfit_result_to_SEXP(const igraph_plfit_result_t *plfit) {
   SET_STRING_ELT(names, 5, mkChar("KS.p"));
   SET_NAMES(result, names);
   
+  UNPROTECT(2);
+  return result;
+}
+
+SEXP R_igraph_maxflow_stats_to_SEXP(const igraph_maxflow_stats_t *st) {
+  SEXP result, names;
+
+  PROTECT(result=NEW_LIST(5));
+  SET_VECTOR_ELT(result, 0, ScalarInteger(st->nopush));
+  SET_VECTOR_ELT(result, 1, ScalarInteger(st->norelabel));
+  SET_VECTOR_ELT(result, 2, ScalarInteger(st->nogap));
+  SET_VECTOR_ELT(result, 3, ScalarInteger(st->nogapnodes));
+  SET_VECTOR_ELT(result, 4, ScalarInteger(st->nobfs));
+
+  PROTECT(names=NEW_CHARACTER(5));
+  SET_STRING_ELT(names, 0, mkChar("nopush"));
+  SET_STRING_ELT(names, 1, mkChar("norelabel"));
+  SET_STRING_ELT(names, 2, mkChar("nogap"));
+  SET_STRING_ELT(names, 3, mkChar("nogapnodes"));
+  SET_STRING_ELT(names, 4, mkChar("nobfs"));
+  SET_NAMES(result, names);
+
   UNPROTECT(2);
   return result;
 }
