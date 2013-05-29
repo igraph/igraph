@@ -1,4 +1,4 @@
-AC_INIT(igraph, 0.6.5, csardi.gabor@gmail.com)
+AC_INIT(igraph, 0.6.6, csardi.gabor@gmail.com)
 AC_CONFIG_SRCDIR(src/games.c)
 AM_INIT_AUTOMAKE
 AC_CONFIG_HEADERS([config.h])
