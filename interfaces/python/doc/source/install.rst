@@ -43,7 +43,7 @@ though it might change in the future). To test the installed package, launch
 your favourite Python IDE and type the following:
 
   >>> import igraph.test
-  >>> igraph.test.test()
+  >>> igraph.test.run_tests()
 
 The above commands run the bundled test cases to ensure that everything
 is fine with your |igraph| installation.
@@ -119,7 +119,7 @@ installed package, launch your favourite Python IDE or the default
 command line interpreter and type the following:
 
   >>> import igraph.test
-  >>> igraph.test.test()
+  >>> igraph.test.run_tests()
 
 The above commands run the bundled test cases to ensure that everything
 is fine with your |igraph| installation.
@@ -133,10 +133,10 @@ publication-quality plots in |igraph| on Mac OS X, you must also install
 Cairo and its Python bindings. The Cairo project does not provide
 pre-compiled binaries for Mac OS X, but `MacPorts <http://www.macports.org>`_
 and `Fink <http://www.finkproject.org>`_ does, so you can use them to
-install Cairo. The `Cairo homepage <http://www.cairographics.org>` gives
+install Cairo. The `Cairo homepage <http://www.cairographics.org>`_ gives
 you some installation instructions. However, this is only one half of the
 job, you will also need the Python bindings of Cairo from the
-`PyCairo homepage <http://www.cairographics.org/pycairo>`. At the moment
+`PyCairo homepage <http://www.cairographics.org/pycairo>`_. At the moment
 there are no precompiled PyCairo packages for Mac OS X either.
 
 TODO: detailed compilation instructions for PyCairo
