@@ -137,8 +137,8 @@ int check_lattice(const lat_test_t *test) {
 		 test->mutual, test->circular);
 
   /* Check its properties */
-  if (ret=check_lattice_properties(&graph, &dimvector, test->directed, 
-				   test->mutual, test->circular)) {
+  if ((ret=check_lattice_properties(&graph, &dimvector, test->directed, 
+				    test->mutual, test->circular))) {
     igraph_destroy(&graph);
     printf("Lattice properties are not satisfied\n");
     return ret;

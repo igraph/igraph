@@ -64,9 +64,9 @@ int main() {
   igraph_sparsemat_dense_multiply(&B, &sC, &A2);
   igraph_matrix_init(&A3, 0, 0);
   igraph_sparsemat_multiply_by_dense(&sB, &C, &A3);
-  
-  if (!igraph_matrix_all_e(&A1, &A2) ||
-      !igraph_matrix_all_e(&A2, &A3)) {
+
+  if (igraph_matrix_maxdifference(&A1, &A2) > 1e-10 ||
+      igraph_matrix_maxdifference(&A2, &A3) > 1e-10) {
     return 1;
   }
 
