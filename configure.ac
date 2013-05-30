@@ -172,6 +172,11 @@ HAVE_TLS=0
 THREAD_LOCAL=
 AC_ARG_ENABLE(tls, AC_HELP_STRING([--enable-tls], [Compile with thread-local storage]))
 if test "x$enable_tls" != "xno"; then
+  keywords="__thread __declspec(thread)"
+  for kw in $keywords ; do
+      AC_TRY_COMPILE([int $kw test;], [], ac_cv_tls=$kw)
+      AC_TRY_COMPILE([int $kw test;], [], ac_cv_tls=$kw ; break ;)
+  done
   AX_TLS([
     AC_DEFINE([HAVE_TLS], [1], [Define to 1 if you want to use thread-local storage for global igraph structures])
     tls_support=yes
