@@ -451,8 +451,8 @@ int FUNCTION(igraph_vector,reserve)   (TYPE(igraph_vector)* v, long int size) {
  * \brief Decides whether the size of the vector is zero.
  *
  * \param v The vector object.
- * \return Non-zero number if the size of the vector is not zero and
- *         zero otherwise.
+ * \return Non-zero number (true) if the size of the vector is zero and
+ *         zero (false) otherwise.
  * 
  * Time complexity: O(1).
  */
