@@ -1,0 +1,115 @@
+
+R version 3.0.1 (2013-05-16) -- "Good Sport"
+Copyright (C) 2013 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin10.8.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(igraph) ; igraph.options(print.full=TRUE)
+> 
+> ## undirected
+> 
+> g1 <- graph.ring(10)
+> V(g1)$name <- rev(letters[1:10])
+> 
+> g2 <- graph.star(11, center=11, mode="undirected") %u% graph.ring(10)
+> V(g2)$name <- letters[1:11]
+> 
+> graph.union.by.name(g1, g2)
+IGRAPH UN-- 11 20 -- 
++ attr: name (v/c)
++ edges (vertex names):
+a -- b, j, k
+b -- a, c, k
+c -- b, d, k
+d -- c, e, k
+e -- d, f, k
+f -- e, g, k
+g -- f, h, k
+h -- g, i, k
+i -- h, j, k
+j -- a, i, k
+k -- a, b, c, d, e, f, g, h, i, j
+> graph.intersection.by.name(g1, g2)
+IGRAPH UN-- 10 10 -- 
++ attr: name (v/c)
++ edges (vertex names):
+ [1] a--b a--j b--c c--d d--e e--f f--g g--h h--i i--j
+> graph.difference.by.name(g2, g1)
+IGRAPH UN-- 11 10 -- 
++ attr: name (v/c)
++ edges (vertex names):
+ [1] a--k b--k c--k d--k e--k f--k g--k h--k i--k j--k
+> 
+> ## directed
+> 
+> g1 <- graph.ring(10, directed=TRUE)
+> V(g1)$name <- rev(letters[1:10])
+> 
+> g2 <- graph.star(11, center=11) %u% graph.ring(10, directed=TRUE, mutual=TRUE)
+> V(g2)$name <- letters[1:11]
+> 
+> graph.union.by.name(g1, g2)
+IGRAPH DN-- 11 30 -- 
++ attr: name (v/c)
++ edges (vertex names):
+a -> b, j, k
+b -> a, c, k
+c -> b, d, k
+d -> c, e, k
+e -> d, f, k
+f -> e, g, k
+g -> f, h, k
+h -> g, i, k
+i -> h, j, k
+j -> a, i, k
+k ->
+> graph.intersection.by.name(g1, g2)
+IGRAPH DN-- 10 10 -- 
++ attr: name (v/c)
++ edges (vertex names):
+ [1] a->j b->a c->b d->c e->d f->e g->f h->g i->h j->i
+> graph.difference.by.name(g2, g1)
+IGRAPH DN-- 11 20 -- 
++ attr: name (v/c)
++ edges (vertex names):
+ [1] a->b a->k b->c b->k c->d c->k d->e d->k e->f e->k f->g f->k g->h g->k h->i
+[16] h->k i->j i->k j->a j->k
+> 
+> ## empty graph
+> 
+> g1 <- graph.ring(10, directed=TRUE)
+> V(g1)$name <- letters[1:10]
+> 
+> g2 <- graph.empty(5, directed=TRUE)
+> V(g2)$name <- letters[1:5]
+> 
+> graph.union.by.name(g1, g2)
+IGRAPH DN-- 10 10 -- 
++ attr: name (v/c)
++ edges (vertex names):
+ [1] a->b b->c c->d d->e e->f f->g g->h h->i i->j j->a
+> graph.intersection.by.name(g1, g2)
+IGRAPH DN-- 5 0 -- 
++ attr: name (v/c)
+> graph.difference.by.name(g1, g2)
+IGRAPH DN-- 10 10 -- 
++ attr: name (v/c)
++ edges (vertex names):
+ [1] a->b b->c c->d d->e e->f f->g g->h h->i i->j j->a
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  0.566   0.050   0.598 
