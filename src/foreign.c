@@ -2127,7 +2127,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
       if (vtypes[V_ID] == IGRAPH_ATTRIBUTE_NUMERIC) {
 	igraph_i_attribute_get_numeric_vertex_attr(graph, vnames[V_ID], 
 						   igraph_vss_1(i), &numv);
-	fputc('"', outstream);
+	fputs(" \"", outstream);
 	igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
 	fputc('"', outstream);
       } else if (vtypes[V_ID] == IGRAPH_ATTRIBUTE_STRING) {
