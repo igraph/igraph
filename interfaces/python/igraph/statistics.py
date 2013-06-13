@@ -453,7 +453,7 @@ class RunningMean(object):
         return complex(self._mean)
 
     def __len__(self):
-        return self._nitems
+        return int(self._nitems)
 
 
 def mean(xs):

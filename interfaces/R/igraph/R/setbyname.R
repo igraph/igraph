@@ -51,30 +51,31 @@ safer.merge = function(
     {
         stopifnot( !("was.in" %in% names(x) ) )
         stopifnot( !("was.in" %in% names(y) ) )
-        x$was.in=TRUE
-        y$was.in=TRUE
+        x$was.in=rep(TRUE,nrow(x))
+        y$was.in=rep(TRUE,nrow(y))
     }
     
     result = merge(x, y, by=by, 
         by.x=by.x, by.y=by.y, all=all, all.x=all.x, all.y=all.y,
         sort=TRUE, suffixes=suffixes, incomparables=incomparables, ...)
     
-    if ( indicate.origin )
+    if ( indicate.origin & nrow(result) > 0 )
     {
-        was.in.x = paste("was.in", suffixes[1], sep="")
-        was.in.y = paste("was.in", suffixes[2], sep="")
+        was.in.x = paste0("was.in", suffixes[1])
+        was.in.y = paste0("was.in", suffixes[2])
         result[ is.na(result[,was.in.x]) , was.in.x] = FALSE
         result[ is.na(result[,was.in.y]) , was.in.y] = FALSE
     }
     
     return(result)
 }
-    
+
 # Return graph vertices as a data.frame.
 # If keep.attributes == TRUE, the data.frame contains all vertex attributes.
 get.vertices.as.data.frame = function(graph, keep.attributes=FALSE)
 {
     stopifnot( length(V(graph)$name) == length(unique(V(graph)$name))) # Vertex names must be unique
+    if ( is.null(V(graph)$name) ) return(data.frame(V=character()))
     d = data.frame(V=V(graph)$name)
     if ( keep.attributes )
     {
@@ -115,6 +116,16 @@ get.edges.as.data.frame = function(graph, keep.attributes=FALSE)
     return(d)
 }
 
+check.graphs.for.set.operations = function(g1, g2) {
+    if(is.directed(g1) & !is.directed(g2) ||
+              !is.directed(g1) & is.directed(g2))
+      stop("g1 and g2 must be both directed or both undirected")
+    if(vcount(g1) > 0 & is.null(V(g1)$name))
+      stop("g1 must have a vertex name attribute")
+    if(vcount(g2) > 0 & is.null(V(g2)$name))
+      stop("g2 must have a vertex name attribute")
+}
+
 # Create an intersection of two graphs.
 # This function correctly intersects the graphs based
 # on the name attributes, such that:
@@ -126,8 +137,7 @@ graph.intersection.by.name = function(g1, g2,
         keep.x.vertex.attributes = FALSE,
         keep.x.edge.attributes   = FALSE)
 {
-    # Only undirected graphs are supported
-    stopifnot(!is.directed(g1) & !is.directed(g2))
+    check.graphs.for.set.operations(g1, g2)
 
     # Construct data.frames of nodes and edges
     dv1 = get.vertices.as.data.frame(g1, keep.attributes=keep.x.vertex.attributes)
@@ -141,7 +151,7 @@ graph.intersection.by.name = function(g1, g2,
     else
         dv = safer.merge(dv1, dv2)
     de = safer.merge(de1, de2)
-    g  = graph.data.frame(de, directed=FALSE, vertices=dv)
+    g  = graph.data.frame(de, directed=is.directed(g1), vertices=dv)
     return(g)
 }
 
@@ -153,8 +163,7 @@ graph.intersection.by.name = function(g1, g2,
 # However, this function does NOT preserve other attributes.
 graph.union.by.name = function(g1, g2)
 {
-    # Only undirected graphs are supported
-    stopifnot(!is.directed(g1) & !is.directed(g2))
+    check.graphs.for.set.operations(g1, g2)
 
     # Construct data.frames of nodes and edges
     dv1 = get.vertices.as.data.frame(g1)
@@ -165,7 +174,7 @@ graph.union.by.name = function(g1, g2)
     # Merge data.frames and construct result
     dv = safer.merge(dv1, dv2, all=TRUE)
     de = safer.merge(de1, de2, all=TRUE)
-    g  = graph.data.frame(de, directed=FALSE, vertices=dv)
+    g = graph.data.frame(de, directed=is.directed(g1), vertices=dv)
     return(g)
 }
 
@@ -180,8 +189,7 @@ graph.difference.by.name = function(g1, g2,
             keep.x.vertex.attributes = FALSE,
             keep.x.edge.attributes   = FALSE)
 {
-    # Only undirected graphs are supported
-    stopifnot(!is.directed(g1) & !is.directed(g2))
+    check.graphs.for.set.operations(g1, g2)
 
     # Construct data.frames of nodes and edges
     dv = get.vertices.as.data.frame(g1, keep.attributes=keep.x.vertex.attributes)
@@ -190,9 +198,13 @@ graph.difference.by.name = function(g1, g2,
 
     # Merge data.frames and construct result
     de = safer.merge(de1, de2, all=TRUE, indicate.origin=TRUE) # All edges
-    de = de[ (de$was.in.x & !de$was.in.y) ,                    # Remove g2 edges
-             setdiff(names(de),c("was.in.x","was.in.y")) ]     # Keep attributes from g1     
-    g  = graph.data.frame(de, directed=FALSE, vertices=dv)     # The new graph
+    if( nrow(de) > 0 ) {
+      de = de[ (de$was.in.x & !de$was.in.y) ,                    # Remove g2 edges
+        setdiff(names(de),c("was.in.x","was.in.y")) ]     # Keep attributes from g1
+      g = graph.data.frame(de, directed=is.directed(g1), vertices=dv)     # The new graph 
+    } else {
+      g = delete.edges(g1, E(g1))
+    }
     return(g)
 }
 
