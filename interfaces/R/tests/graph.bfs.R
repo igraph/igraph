@@ -1,5 +1,0 @@
-
-library(igraph)
-
-## TODO
-
