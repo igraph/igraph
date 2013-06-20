@@ -354,6 +354,14 @@ PyObject* igraphmodule_Edge_get_tuple(igraphmodule_EdgeObject* self, void* closu
   return Py_BuildValue("(ii)", (long)from, (long)to);
 }
 
+/** \ingroup python_interface_edge
+ * Returns the graph where the edge belongs
+ */
+PyObject* igraphmodule_Edge_get_graph(igraphmodule_EdgeObject* self, void* closure) {
+  Py_INCREF(self->gref);
+  return (PyObject*)self->gref;
+}
+
 #define GRAPH_PROXY_METHOD(FUNC, METHODNAME) \
     PyObject* igraphmodule_Edge_##FUNC(igraphmodule_EdgeObject* self, PyObject* args, PyObject* kwds) { \
       PyObject *new_args, *item, *result;                     \
@@ -448,6 +456,9 @@ PyGetSetDef igraphmodule_Edge_getseters[] = {
   },
   {"index", (getter)igraphmodule_Edge_get_index, NULL,
       "Index of this edge", NULL,
+  },
+  {"graph", (getter)igraphmodule_Edge_get_graph, NULL,
+    "The graph the edge belongs to", NULL,
   },
   {NULL}
 };
