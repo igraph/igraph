@@ -890,7 +890,17 @@ int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
 
 	*mut = rec / 2;
 	*asym = nonrec / 2;
-	*null = vc*(vc-1)/2-(*mut)-(*asym);
+	if (vc % 2) { 
+		*null = vc * ((vc-1)/2);
+	} else {
+		*null = (vc/2) * (vc-1);
+	}
+	if (*null < vc) {
+		IGRAPH_WARNING("Integer overflow, returning zero");
+		*null = IGRAPH_NAN;
+	} else {
+		*null = *null-(*mut)-(*asym);
+	}
 
   return 0;
 }
