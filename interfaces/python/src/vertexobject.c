@@ -402,6 +402,16 @@ long igraphmodule_Vertex_get_index_long(igraphmodule_VertexObject* self) {
   return (long)self->idx;
 }
 
+/**
+ * \ingroup python_interface_vertexseq
+ * Returns the graph where the vertex belongs
+ */
+PyObject* igraphmodule_Vertex_get_graph(igraphmodule_VertexObject* self,
+  void* closure) {
+  Py_INCREF(self->gref);
+  return (PyObject*)self->gref;
+}
+
 /**************************************************************************/
 /* Implementing proxy method in Vertex that just forward the call to the
  * appropriate Graph method.
@@ -587,6 +597,9 @@ PyMappingMethods igraphmodule_Vertex_as_mapping = {
 PyGetSetDef igraphmodule_Vertex_getseters[] = {
   {"index", (getter)igraphmodule_Vertex_get_index, NULL,
       "Index of the vertex", NULL
+  },
+  {"graph", (getter)igraphmodule_Vertex_get_graph, NULL,
+      "The graph the vertex belongs to", NULL
   },
   {NULL}
 };
