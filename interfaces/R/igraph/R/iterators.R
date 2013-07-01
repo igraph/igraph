@@ -371,7 +371,7 @@ as.igraph.vs <- function(graph, v, na.ok=FALSE) {
   } else {
     if (is.logical(v)) {
       res <- as.vector(V(graph))[v]
-    } else if (is.numeric(v) && any(v<=0)){
+    } else if (is.numeric(v) && any(v<0)){
       res <- as.vector(V(graph))[v]
     } else {
       res <- as.numeric(v)

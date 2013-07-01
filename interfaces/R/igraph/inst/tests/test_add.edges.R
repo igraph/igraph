@@ -37,4 +37,9 @@ test_that("add.edges appends attributes properly", {
   expect_that(E(g5)$weight, equals(c(weights1, weights2)))
 })
 
-
+test_that("add.edges signals error for zero vertex ids", {
+  library(igraph)
+  g <- graph.full(5) %du% graph.full(5) %du% graph.full(5)
+  expect_that(add.edges(g, c(0,5, 0,10, 5,10)),
+              throws_error("Invalid vertex id"))
+})
