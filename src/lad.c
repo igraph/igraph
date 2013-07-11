@@ -608,6 +608,15 @@ void igraph_i_lad_addToDelete(int u, int* list, int* nb, int* marked) {
   }
 }
 
+#define ALLOC_ARRAY(VAR, SIZE, TYPE) { \
+  VAR = igraph_Calloc(SIZE, TYPE);   \
+  if (VAR == 0) {                    \
+    IGRAPH_ERROR("cannot allocate '" #VAR "' array in igraph_i_lad_updateMatching", IGRAPH_ENOMEM); \
+  }  \
+  IGRAPH_FINALLY(igraph_free, VAR);  \
+}
+
+
 int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV, 
 				igraph_vector_int_t *degree, 
 				igraph_vector_int_t *firstAdj, 
@@ -633,30 +642,43 @@ int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
     return 0; 
   }
 	
-  int matchedWithV[sizeOfV]; /* matchedWithV[matchedWithU[u]]=u */
-  int nbPred[sizeOfV]; /* nbPred[i] = nb of predecessors of the ith
-			  vertex of V in the DAG */
-  int pred[sizeOfV][sizeOfU]; /* pred[i][j] = jth predecessor the ith
-				 vertex of V in the DAG */
-  int nbSucc[sizeOfU]; /* nbSucc[i] = nb of successors of the ith
-			  vertex of U in the DAG */
-  int succ[sizeOfU][sizeOfV]; /* succ[i][j] = jth successor of the ith
-				 vertex of U in the DAG */
-  int listV[sizeOfV], listU[sizeOfU], listDV[sizeOfV], listDU[sizeOfU];
+  int *matchedWithV; /* matchedWithV[matchedWithU[u]]=u */
+  int *nbPred; /* nbPred[i] = nb of predecessors of the ith
+		  vertex of V in the DAG */
+  int *pred; /* pred[i][j] = jth predecessor the ith
+		 vertex of V in the DAG */
+  int *nbSucc; /* nbSucc[i] = nb of successors of the ith
+		  vertex of U in the DAG */
+  int *succ; /* succ[i][j] = jth successor of the ith
+		 vertex of U in the DAG */
+  int *listV, *listU, *listDV, *listDU;
   int nbV, nbU, nbDV, nbDU;
   int i, j, k, stop, u, v, w;
-  int markedV[sizeOfV], markedU[sizeOfU];
+  int *markedV, *markedU;
   /* markedX[i]=white if X[i] is not in the DAG
      markedX[i]=grey if X[i] has been added to the DAG, but not its successors
      markedX[i]=black if X[i] and its successors have been added to the DAG
      markedX[i]=toBeDeleted if X[i] must be deleted from the DAG
      markedX[i]=deleted if X[i] has been deleted from the DAG */
   int nbUnmatched = 0; /* number of vertices of U that are not matched */
-  int unmatched[sizeOfU]; /* vertices of U that are not matched */
-  int posInUnmatched[sizeOfU]; /* unmatched[posInUnmatched[u]]=u */
+  int *unmatched;      /* vertices of U that are not matched */
+  int *posInUnmatched; /* unmatched[posInUnmatched[u]]=u */
   igraph_vector_int_t path;
 
-  /* initialize 'path' array */
+  ALLOC_ARRAY(matchedWithV, sizeOfV, int);
+  ALLOC_ARRAY(nbPred, sizeOfV, int);
+  ALLOC_ARRAY(pred, sizeOfV*sizeOfU, int);
+  ALLOC_ARRAY(nbSucc, sizeOfU, int);
+  ALLOC_ARRAY(succ, sizeOfU*sizeOfV, int);
+  ALLOC_ARRAY(listV, sizeOfV, int);
+  ALLOC_ARRAY(listU, sizeOfU, int);
+  ALLOC_ARRAY(listDV, sizeOfV, int);
+  ALLOC_ARRAY(listDU, sizeOfU, int);
+  ALLOC_ARRAY(markedV, sizeOfV, int);
+  ALLOC_ARRAY(markedU, sizeOfU, int);
+  ALLOC_ARRAY(unmatched, sizeOfU, int);
+  ALLOC_ARRAY(posInUnmatched, sizeOfU, int);
+
   IGRAPH_CHECK(igraph_vector_int_init(&path, 0));
   IGRAPH_FINALLY(igraph_vector_int_destroy, &path);
 
@@ -703,8 +725,8 @@ int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
       for (i = VECTOR(*firstAdj)[u]; 
 	   i < VECTOR(*firstAdj)[u] + VECTOR(*degree)[u]; i++) {
 	v=VECTOR(*adj)[i]; /* add edge (u, v) to the DAG */
-	pred[v][nbPred[v]++]=u;
-	succ[u][nbSucc[u]++]=v;
+	pred[v*sizeOfU + (nbPred[v]++)]=u;
+	succ[u*sizeOfV + (nbSucc[u]++)]=v;
 	if (markedV[v]==white) { /* first time v is added to the DAG*/
 	  markedV[v]=grey; 
 	  listV[nbV++]=v;
@@ -733,8 +755,8 @@ int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
 	     i < VECTOR(*firstAdj)[u] + VECTOR(*degree)[u];i++) {
 	  v=VECTOR(*adj)[i]; 
 	  if (markedV[v]!=black) { /* add edge (u, v) to the DAG */
-	    pred[v][nbPred[v]++]=u;
-	    succ[u][nbSucc[u]++]=v;
+	    pred[v*sizeOfU + (nbPred[v]++)]=u;
+	    succ[u*sizeOfV + (nbSucc[u]++)]=v;
 	    if (markedV[v]==white) { /* first time v is added to the DAG */
 	      markedV[v]=grey; 
 	      listV[nbV++]=v;
@@ -763,7 +785,7 @@ int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
 	nbDU=0;
 	igraph_i_lad_addToDelete(v, listDV, &nbDV, markedV);
 	do{
-	  u=pred[v][0]; /* (u, v) belongs to the augmenting path */
+	  u=pred[v*sizeOfU + 0]; /* (u, v) belongs to the augmenting path */
 	  IGRAPH_CHECK(igraph_vector_int_push_back(&path, u));
 	  igraph_i_lad_addToDelete(u, listDU, &nbDU, markedU);
 	  if (VECTOR(*matchedWithU)[u]!=-1) {
@@ -784,9 +806,9 @@ int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
 	      igraph_i_lad_addToDelete(u, listDU, &nbDU, markedU); 
 	    }
 	    for (i=0; i<nbPred[v]; i++) {
-	      u=pred[v][i]; /* delete edge (u, v) */
-	      for (j=0; ((j<nbSucc[u]) && (v!=succ[u][j])); j++) { }
-	      succ[u][j]=succ[u][--nbSucc[u]];
+	      u=pred[v*sizeOfU + i]; /* delete edge (u, v) */
+	      for (j=0; ((j<nbSucc[u]) && (v!=succ[u*sizeOfV + j])); j++) { }
+	      succ[u*sizeOfV + j]=succ[u*sizeOfV + (--nbSucc[u])];
 	      if (nbSucc[u]==0) {
 		igraph_i_lad_addToDelete(u, listDU, &nbDU, markedU);
 	      }
@@ -800,9 +822,9 @@ int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
 	    }
 	    j=0;
 	    for (i=0; i<nbSucc[u]; i++) { /* delete edge (u, v) */
-	      v=succ[u][i];
-	      for (j=0; ((j<nbPred[v]) && (u!=pred[v][j])); j++) { }
-	      pred[v][j]=pred[v][--nbPred[v]];
+	      v=succ[u*sizeOfV + i];
+	      for (j=0; ((j<nbPred[v]) && (u!=pred[v*sizeOfU + j])); j++) { }
+	      pred[v*sizeOfU + j]=pred[v*sizeOfU + (--nbPred[v])];
 	      if (nbPred[v]==0) {
 		igraph_i_lad_addToDelete(v, listDV, &nbDV, markedV);
 	      }
@@ -829,11 +851,26 @@ int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
   *invalid=0;
 
 cleanup:
-  /* Free the 'path' array */
+  /* Free the allocated arrays */
   igraph_vector_int_destroy(&path);
-  IGRAPH_FINALLY_CLEAN(1);
+  igraph_free(posInUnmatched);
+  igraph_free(unmatched);
+  igraph_free(markedU);
+  igraph_free(markedV);
+  igraph_free(listDU);
+  igraph_free(listDV);
+  igraph_free(listU);
+  igraph_free(listV);
+  igraph_free(succ);
+  igraph_free(nbSucc);
+  igraph_free(pred);
+  igraph_free(nbPred);
+  igraph_free(matchedWithV);
+  IGRAPH_FINALLY_CLEAN(14);
   return 0;
 }
+
+#undef ALLOC_ARRAY
 
 void igraph_i_lad_DFS(int nbU, int nbV, int u, bool* marked, int* nbSucc, 
 		      int succ[nbV][nbU], igraph_vector_int_t * matchedWithU,
