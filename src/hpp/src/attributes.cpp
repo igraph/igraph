@@ -664,10 +664,13 @@ static igraph_attribute_table_t cpp_attribute_handler = {
     &AttributeHandlerImpl::gettype,
     &AttributeHandlerImpl::get_numeric_graph_attr,
     &AttributeHandlerImpl::get_string_graph_attr,
+		/* get_bool_graph_attr = */ 0,
     &AttributeHandlerImpl::get_numeric_vertex_attr,
     &AttributeHandlerImpl::get_string_vertex_attr,
+		/* get_bool_vertex_attr = */ 0,
     &AttributeHandlerImpl::get_numeric_edge_attr,
-    &AttributeHandlerImpl::get_string_edge_attr
+    &AttributeHandlerImpl::get_string_edge_attr,
+		/* get_bool_edge_attr = */ 0
 };
 
 void AttributeHandler::attach() {
