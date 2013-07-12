@@ -26,7 +26,7 @@ using namespace std;
 
 #if defined(BLISS_USE_GMP)
 
-namespace igraph {
+namespace igraph { namespace bliss {
 
 int BigNum::tostring(char **str) { 
   *str=igraph_Calloc(mpz_sizeinbase(v, 10)+2, char);
@@ -37,11 +37,11 @@ int BigNum::tostring(char **str) {
   return 0;
 }
 
-}
+} }
 
 #else
 
-namespace igraph {
+namespace igraph { namespace bliss {
 
 int BigNum::tostring(char **str) {
   int size=static_cast<int>( (log(abs(v))/log(10.0))+4 );
@@ -55,6 +55,6 @@ int BigNum::tostring(char **str) {
   return 0;
 }
 
-}
+} }
 
 #endif

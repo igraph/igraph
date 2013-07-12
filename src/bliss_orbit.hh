@@ -20,7 +20,7 @@ Copyright (C) 2003-2006 Tommi Junttila
 #ifndef BLISS_ORBIT_HH
 #define BLISS_ORBIT_HH
 
-namespace igraph {
+namespace igraph { namespace bliss {
 
 class Orbit
 {
@@ -48,6 +48,6 @@ public:
   unsigned int nof_orbits() const {return _nof_orbits; }
 };
 
-}
+} }
 
 #endif

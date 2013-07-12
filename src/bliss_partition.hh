@@ -20,12 +20,12 @@ Copyright (C) 2003-2006 Tommi Junttila
 #ifndef BLISS_PARTITION_HH
 #define BLISS_PARTITION_HH
 
-namespace igraph {
+namespace igraph { namespace bliss {
 
 class Cell;
 class Partition;
 
-}
+} }
 
 #include <cstdlib>
 #include "bliss_kstack.hh"
@@ -34,7 +34,7 @@ class Partition;
 #include "bliss_orbit.hh"
 #include "bliss_graph.hh"
 
-namespace igraph {
+namespace igraph { namespace bliss {
 
 class Cell
 {
@@ -122,6 +122,6 @@ private:
   Cell *split_cell(Cell * const cell);
 };
 
-}
+} }
 
 #endif

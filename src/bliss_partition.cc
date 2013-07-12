@@ -25,7 +25,7 @@ Copyright (C) 2003-2006 Tommi Junttila
 
 using namespace std;
 
-namespace igraph {
+namespace igraph { namespace bliss {
 
 static const bool should_not_happen = false;
 
@@ -914,4 +914,4 @@ void Partition::unrefine(unsigned int dest_split_level,
   consistency_check();
 }
 
-}
+} }

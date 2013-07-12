@@ -24,7 +24,7 @@ Copyright (C) 2003-2006 Tommi Junttila
 
 using namespace std;
 
-namespace igraph {
+namespace igraph { namespace bliss {
 
 Orbit::Orbit()
 {
@@ -150,4 +150,4 @@ unsigned int Orbit::orbit_size(unsigned int element)
   return(in_orbit[element]->size);
 }
 
-}
+} }

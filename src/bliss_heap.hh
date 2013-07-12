@@ -20,7 +20,7 @@ Copyright (C) 2003-2006 Tommi Junttila
 #ifndef BLISS_HEAP_HH
 #define BLISS_HEAP_HH
 
-namespace igraph {
+namespace igraph { namespace bliss {
 
 class Heap
 {
@@ -42,6 +42,6 @@ public:
   unsigned int remove();
 };
 
-}
+} }
 
 #endif

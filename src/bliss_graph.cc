@@ -39,7 +39,7 @@ using namespace std;
 extern bool bliss_verbose;
 // extern FILE *bliss_verbstr;
 
-namespace igraph {
+namespace igraph { namespace bliss {
 
 static const bool should_not_happen = false;
 
@@ -2492,4 +2492,4 @@ bool Graph::is_automorphism(unsigned int * const perm)
   return result;
 }
 
-}
+} }

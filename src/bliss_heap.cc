@@ -25,7 +25,7 @@ Copyright (C) 2003-2006 Tommi Junttila
 
 using namespace std;
 
-namespace igraph {
+namespace igraph { namespace bliss {
 
 Heap::~Heap()
 {
@@ -92,4 +92,4 @@ unsigned int Heap::remove()
   return v;
 }
 
-}
+} }

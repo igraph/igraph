@@ -40,7 +40,7 @@
 
 #include <gmp.h>
 
-namespace igraph {
+namespace igraph { namespace bliss {
 
 class BigNum
 {
@@ -53,11 +53,11 @@ public:
   int tostring(char **str); 
 };
 
-}
+} }
 
 #else
 
-namespace igraph {
+namespace igraph { namespace bliss {
 
 class BigNum
 {
@@ -69,7 +69,7 @@ public:
   int tostring(char **str); 
 };
 
-}
+} }
 
 #endif
 

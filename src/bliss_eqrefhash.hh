@@ -25,7 +25,7 @@ Copyright (C) 2003-2006 Tommi Junttila
 #define EqrefHash BuzzHash
 //#define EqrefHash PerfectHash
 
-namespace igraph {
+namespace igraph { namespace bliss {
 
 class BuzzHash
 {
@@ -53,6 +53,6 @@ public:
   bool is_equal(const PerfectHash &other) {return(cmp(other) == 0); }
 };
 
-}
+} }
 
 #endif

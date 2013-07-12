@@ -23,7 +23,7 @@ Copyright (C) 2003-2006 Tommi Junttila
 #include "bliss_defs.hh"
 #include <cstdlib>		// malloc
 
-namespace igraph {
+namespace igraph { namespace bliss {
 
 /* 
  * A queue with fixed capacity
@@ -139,6 +139,6 @@ void KQueue<Type>::push_back(Type e)
   DEBUG_ASSERT(head != tail);
 }
 
-}
+} }
 
 #endif

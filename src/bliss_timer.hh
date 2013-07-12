@@ -20,7 +20,7 @@ Copyright (C) 2003-2006 Tommi Junttila
 #ifndef BLISS_TIMER_HH
 #define BLISS_TIMER_HH
 
-namespace igraph {
+namespace igraph { namespace bliss {
 
 class Timer
 {
@@ -33,6 +33,6 @@ public:
   double get_duration();
 };
 
-}
+} }
 
 #endif

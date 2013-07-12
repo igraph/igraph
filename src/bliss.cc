@@ -27,7 +27,7 @@
 
 #include <string.h>
 
-using namespace igraph;
+using namespace igraph::bliss;
 using namespace std;
 
 /**
@@ -143,7 +143,7 @@ int igraph_automorphisms(const igraph_t *graph,
 bool bliss_verbose = false;
 // FILE *bliss_verbstr = stdout;
 
-namespace igraph {
+namespace igraph { namespace bliss {
 
 typedef enum {FORMAT_BIN = 0, FORMAT_ADJ} Format;
 // static Format input_format;
@@ -232,7 +232,7 @@ typedef enum {FORMAT_BIN = 0, FORMAT_ADJ} Format;
 //     }
 // }			    
 
-}
+} }
 
 // using namespace igraph;
 

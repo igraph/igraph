@@ -20,9 +20,9 @@ Copyright (C) 2003-2006 Tommi Junttila
 #ifndef BLISS_GRAPH_HH
 #define BLISS_GRAPH_HH
 
-namespace igraph {
+namespace igraph { namespace bliss {
   class AbstractGraph;
-}
+} }
 
 #include <cstdio>
 #include <vector>
@@ -36,7 +36,7 @@ namespace igraph {
 
 #include "igraph_datatype.h"
 
-namespace igraph {
+namespace igraph { namespace bliss {
 
 typedef struct t_Stats
 {
@@ -231,6 +231,6 @@ public:
   void set_splitting_heuristics(unsigned int shs) {sh = shs; }
 };
 
-}
+} }
 
 #endif

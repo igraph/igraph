@@ -23,7 +23,7 @@ Copyright (C) 2003-2006 Tommi Junttila
 #include "bliss_defs.hh"
 #include <cstdlib>		// malloc
 
-namespace igraph {
+namespace igraph { namespace bliss {
 
 /* 
  * A stack with fixed capacity
@@ -93,6 +93,6 @@ KStack<Type>::~KStack() {
   free(entries);
 }
 
-}
+} }
 
 #endif

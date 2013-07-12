@@ -27,7 +27,7 @@ Copyright (C) 2003-2006 Tommi Junttila
 
 using namespace std;
 
-namespace igraph {
+namespace igraph { namespace bliss {
 
 #ifdef HAVE_TIMES_H
 static const double numTicksPerSec = (double)(sysconf(_SC_CLK_TCK));
@@ -108,4 +108,4 @@ double Timer::get_duration()
   return(end_time - start_time);
 }
 
-}
+} }
