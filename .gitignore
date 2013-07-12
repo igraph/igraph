@@ -500,3 +500,4 @@ interfaces/R/igraph/src/glpk/colamd/colamd.h
 *~
 /interfaces/R/igraph/src/
 /interfaces/R/igraphdata_*.tar.gz
+/src/hpp/include/igraph/igraph*.h*

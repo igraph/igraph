@@ -1,7 +1,7 @@
 # This is to make sure that the headers get built before they are included
 BUILT_SOURCES = foreign-ncol-parser.h foreign-lgl-parser.h \
 		foreign-dl-parser.h foreign-gml-parser.h \
-		foreign-pajek-parser.h
+		foreign-pajek-parser.h hpp/include/igraph/igraph.h
 
 # This is needed to ensure that yacc (or bison) builds the header files
 # Unfortunately this is not the default behaviour in MinGW/MSYS
@@ -111,9 +111,6 @@ endif
 libplfit_la_SOURCES = $(PLFIT)
 PLFIT_LIB = libplfit.la
 
-noinst_LTLIBRARIES = $(F2C_LIB) $(BLAS_LIB) $(LAPACK_LIB) $(ARPACK_LIB) \
-					 $(GLPK_LIB) $(PLFIT_LIB)
-
 CS = cs/cs_add.c       cs/cs_happly.c    cs/cs_pvec.c         \
 	cs/cs_amd.c       cs/cs_house.c     cs/cs_qr.c        \
 	cs/cs_chol.c      cs/cs_ipvec.c     cs/cs_qrsol.c     \
@@ -132,6 +129,78 @@ CS = cs/cs_add.c       cs/cs_happly.c    cs/cs_pvec.c         \
 	cs/cs_fkeep.c     cs/cs_post.c      cs/cs_util.c      \
 	cs/cs_gaxpy.c     cs/cs_print.c     cs/cs_utsolve.c   \
 	cs/cs.h	    cs/UFconfig.h
+
+HPP = hpp/src/attributes.cpp									\
+			hpp/src/vector_bool.cpp 								\
+			hpp/src/edge.cpp												\
+			hpp/src/vector_long.cpp 								\
+			hpp/src/graph.cpp												\
+			hpp/src/vertex.cpp											\
+			hpp/src/matching.cpp										\
+			hpp/src/vertex_selector.cpp 						\
+			hpp/src/vector.cpp											\
+			hpp/src/analysis/components.cpp					\
+			hpp/src/analysis/non_simple.cpp 			  \
+			hpp/src/generators/degree_sequence.cpp	\
+			hpp/src/generators/grg.cpp							\
+			hpp/src/generators/erdos_renyi.cpp			\
+			hpp/src/generators/line_graph.cpp				\
+			hpp/src/generators/famous.cpp						\
+			hpp/src/generators/ring.cpp							\
+			hpp/src/generators/full.cpp							\
+			hpp/src/io/edgelist.cpp									\
+			hpp/src/io/graphml.cpp									\
+			hpp/src/io/lgl.cpp											\
+			hpp/src/io/gml.cpp											\
+			hpp/src/io/leda.cpp											\
+			hpp/src/io/ncol.cpp
+
+HEADERS_HPP = hpp/include/igraph/cpp/adjacency_list.h	 							\
+							hpp/include/igraph/cpp/matrix.h					 							\
+							hpp/include/igraph/cpp/analysis.h				 							\
+							hpp/include/igraph/cpp/ptr_vector.h			 							\
+							hpp/include/igraph/cpp/attributes.h			 							\
+							hpp/include/igraph/cpp/str_vector.h			 							\
+							hpp/include/igraph/cpp/edge.h						 							\
+							hpp/include/igraph/cpp/types.h					 							\
+							hpp/include/igraph/cpp/edge_iterator.h	 							\
+							hpp/include/igraph/cpp/util.h						 							\
+							hpp/include/igraph/cpp/edge_selector.h	 							\
+							hpp/include/igraph/cpp/vector.h					 							\
+							hpp/include/igraph/cpp/error.h					 							\
+							hpp/include/igraph/cpp/vector_bool.h		 							\
+							hpp/include/igraph/cpp/generators.h			 							\
+							hpp/include/igraph/cpp/vector_long.h		 							\
+							hpp/include/igraph/cpp/graph.h					 							\
+							hpp/include/igraph/cpp/vertex.h					 							\
+							hpp/include/igraph/cpp/io.h							 							\
+							hpp/include/igraph/cpp/vertex_selector.h 							\
+							hpp/include/igraph/cpp/matching.h											\
+							hpp/include/igraph/cpp/analysis/components.h					\
+							hpp/include/igraph/cpp/analysis/non_simple.h					\
+							hpp/include/igraph/cpp/generators/degree_sequence.h		\
+							hpp/include/igraph/cpp/generators/erdos_renyi.h				\
+							hpp/include/igraph/cpp/generators/famous.h						\
+							hpp/include/igraph/cpp/generators/full.h							\
+							hpp/include/igraph/cpp/generators/grg.h								\
+							hpp/include/igraph/cpp/generators/line_graph.h				\
+							hpp/include/igraph/cpp/generators/ring.h							\
+							hpp/include/igraph/cpp/io/edgelist.h									\
+							hpp/include/igraph/cpp/io/leda.h											\
+							hpp/include/igraph/cpp/io/gml.h												\
+							hpp/include/igraph/cpp/io/lgl.h												\
+							hpp/include/igraph/cpp/io/graphml.h										\
+							hpp/include/igraph/cpp/io/ncol.h
+
+hpp/include/igraph/igraph.h:
+				cp $(top_srcdir)/include/* $(top_builddir)/src/hpp/include/igraph/
+
+libhpp_la_SOURCES = $(HPP)
+libhpp_la_CXXFLAGS = -I$(top_srcdir)/src/hpp/include
+HPP_LIB = libhpp.la
+
+noinst_LTLIBRARIES = $(F2C_LIB) $(BLAS_LIB) $(LAPACK_LIB) $(ARPACK_LIB) \
+					 $(GLPK_LIB) $(PLFIT_LIB) $(HPP_LIB)
 
 HEADERS_PRIVATE = atlas-edges.h \
 		bliss_bignum.hh		bliss_defs.hh \
@@ -264,7 +333,7 @@ libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include $
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
 libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(F2C_LIB) $(BLAS_LIB) \
-				 $(LAPACK_LIB) $(ARPACK_LIB) $(GLPK_LIB) $(PLFIT_LIB)
+				 $(LAPACK_LIB) $(ARPACK_LIB) $(GLPK_LIB) $(PLFIT_LIB) $(HPP_LIB)
 
 if INTERNAL_GLPK
   libigraph_la_CFLAGS   += -I$(top_srcdir)/optional/glpk
