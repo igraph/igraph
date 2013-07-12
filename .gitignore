@@ -496,3 +496,7 @@ interfaces/R/igraph/src/glpk/glptsp.h
 interfaces/R/igraph/src/glpk/amd/amd.h
 interfaces/R/igraph/src/glpk/amd/amd_internal.h
 interfaces/R/igraph/src/glpk/colamd/colamd.h
+/src/*.o
+*~
+/interfaces/R/igraph/src/
+/interfaces/R/igraphdata_*.tar.gz
