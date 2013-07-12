@@ -13,7 +13,8 @@ Graph read_graphml(FILE* instream, int index) {
 }
 
 void write_graphml(const Graph& graph, FILE* outstream) {
-    IGRAPH_TRY(igraph_write_graph_graphml(graph.c_graph(), outstream));
+	  IGRAPH_TRY(igraph_write_graph_graphml(graph.c_graph(), outstream,
+																					/* prefixattr= */  0));
 }
 
 }         // end of namespace
