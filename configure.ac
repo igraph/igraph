@@ -1,7 +1,6 @@
 AC_INIT(igraph, 0.7, csardi.gabor@gmail.com)
 AC_CONFIG_SRCDIR(src/games.c)
 AM_INIT_AUTOMAKE
-AM_EXTRA_RECURSIVE_TARGETS([parsersources])
 AC_CONFIG_HEADERS([config.h])
 
 m4_include(tools/autoconf/ax_tls.m4)

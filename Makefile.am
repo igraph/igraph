@@ -56,7 +56,7 @@ test: all
 	 	fi; \
 	done
 
-msvc: parsersources
+msvc: all
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc/include
