@@ -2708,6 +2708,40 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
 /*   return 0; */
 /* } */
 
+/* This removes loop, multiple edges and edges that point
+	 "backwards" according to the rank vector. */
+
+int igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
+																const igraph_vector_int_t *rank) {
+	long int i;
+	long int n=al->length;
+	igraph_vector_int_t mark;
+	igraph_vector_int_init(&mark, n);
+	IGRAPH_FINALLY(igraph_vector_int_destroy, &mark);
+	for (i=0; i<n; i++) {
+    igraph_vector_t *v=&al->adjs[i];
+    int j, l=igraph_vector_size(v);
+		int irank=VECTOR(*rank)[i];
+    VECTOR(mark)[i] = i+1;
+    for (j=0; j<l; /* nothing */) {
+      long int e=(long int) VECTOR(*v)[j];
+      if (VECTOR(*rank)[e] > irank && VECTOR(mark)[e] != i+1) {
+				VECTOR(mark)[e]=i+1;
+				j++;
+      } else {
+				VECTOR(*v)[j] = igraph_vector_tail(v);
+				igraph_vector_pop_back(v);
+				l--;
+      }
+    }
+  }
+
+  igraph_vector_int_destroy(&mark);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+
+}
+
 int igraph_transitivity_local_undirected4(const igraph_t *graph,
 					  igraph_vector_t *res,
 					  const igraph_vs_t vids,
@@ -2717,7 +2751,7 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
   long int node, i, j, nn;
   igraph_adjlist_t allneis;
   igraph_vector_t *neis1, *neis2;
-  long int neilen1, neilen2;
+  long int neilen1, neilen2, deg1;
   igraph_integer_t triples;
   long int *neis;
   long int maxdegree;
@@ -2739,8 +2773,6 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
 			     IGRAPH_LOOPS));
   maxdegree=(long int) igraph_vector_max(&degree)+1;
   igraph_vector_order1_int(&degree, &order, maxdegree);
-  igraph_vector_destroy(&degree);
-  IGRAPH_FINALLY_CLEAN(1);
 	igraph_vector_int_init(&rank, no_of_nodes);
 	IGRAPH_FINALLY(igraph_vector_int_destroy, &rank);
   for (i=0; i<no_of_nodes; i++) {
@@ -2749,7 +2781,7 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
   
   IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
-  IGRAPH_CHECK(igraph_adjlist_simplify(&allneis));
+  IGRAPH_CHECK(igraph_i_trans4_al_simplify(&allneis, &rank));
   
   neis=igraph_Calloc(no_of_nodes, long int);
   if (neis==0) {
@@ -2767,7 +2799,8 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
     
     neis1=igraph_adjlist_get(&allneis, node);
     neilen1=igraph_vector_size(neis1);
-    triples=(igraph_integer_t) ((double)neilen1*(neilen1-1)/2);
+		deg1=(long int) VECTOR(degree)[node];
+    triples=(igraph_integer_t) ((double)deg1*(deg1-1)/2);
     /* Mark the neighbors of the node */
     for (i=0; i<neilen1; i++) {
       neis[ (long int) VECTOR(*neis1)[i] ] = node+1;
@@ -2775,20 +2808,15 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
     
     for (i=0; i<neilen1; i++) {
       long int nei=(long int) VECTOR(*neis1)[i];
-      if (VECTOR(rank)[nei] > VECTOR(rank)[node]) {
-	neis2=igraph_adjlist_get(&allneis, nei);
-	neilen2=igraph_vector_size(neis2);
-	for (j=0; j<neilen2; j++) {
-	  long int nei2=(long int) VECTOR(*neis2)[j];
-	  if (VECTOR(rank)[nei2] < VECTOR(rank)[nei]) {
-	    continue;
-	  }
-	  if (neis[nei2] == node+1) {
-	    VECTOR(*res)[nei2] += 1;
-	    VECTOR(*res)[nei] += 1;
-	    VECTOR(*res)[node] += 1;
-	  }
-	}
+			neis2=igraph_adjlist_get(&allneis, nei);
+			neilen2=igraph_vector_size(neis2);
+			for (j=0; j<neilen2; j++) {
+				long int nei2=(long int) VECTOR(*neis2)[j];
+				if (neis[nei2] == node+1) {
+					VECTOR(*res)[nei2] += 1;
+					VECTOR(*res)[nei] += 1;
+					VECTOR(*res)[node] += 1;
+				}
       }
     }
 
@@ -2801,8 +2829,9 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
   igraph_free(neis);
   igraph_adjlist_destroy(&allneis);
   igraph_vector_int_destroy(&rank);
+	igraph_vector_destroy(&degree);
   igraph_vector_int_destroy(&order);
-  IGRAPH_FINALLY_CLEAN(4);
+  IGRAPH_FINALLY_CLEAN(5);
   
   return 0;
 }
