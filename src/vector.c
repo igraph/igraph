@@ -230,6 +230,48 @@ int igraph_vector_order1(const igraph_vector_t* v,
   return 0;
 }
 
+int igraph_vector_order1_int(const igraph_vector_t* v,
+														 igraph_vector_int_t* res,
+														 igraph_real_t nodes) {
+  long int edges=igraph_vector_size(v);
+  igraph_vector_t ptr;
+  igraph_vector_t rad;
+  long int i, j;
+
+  assert(v!=NULL);
+  assert(v->stor_begin != NULL);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&ptr, (long int) nodes+1);
+  IGRAPH_VECTOR_INIT_FINALLY(&rad, edges);
+  IGRAPH_CHECK(igraph_vector_int_resize(res, edges));
+
+  for (i=0; i<edges; i++) {
+    long int radix=(long int) v->stor_begin[i];
+    if (VECTOR(ptr)[radix]!=0) {
+      VECTOR(rad)[i]=VECTOR(ptr)[radix];
+    }
+    VECTOR(ptr)[radix]=i+1;
+  }
+
+  j=0;
+  for (i=0; i<nodes+1; i++) {
+    if (VECTOR(ptr)[i] != 0) {
+      long int next=(long int) VECTOR(ptr)[i]-1;
+      res->stor_begin[j++]=next;
+      while (VECTOR(rad)[next] != 0) {
+				next=(long int) VECTOR(rad)[next]-1;
+				res->stor_begin[j++]=next;
+      }
+    }
+  }
+
+  igraph_vector_destroy(&ptr);
+  igraph_vector_destroy(&rad);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return 0;
+}
+
 int igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
 		       long int nodes) {
   

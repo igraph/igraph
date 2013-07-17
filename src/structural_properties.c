@@ -2722,8 +2722,8 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
   long int *neis;
   long int maxdegree;
 
-  igraph_vector_t order;
-  igraph_vector_t rank;
+  igraph_vector_int_t order;
+  igraph_vector_int_t rank;
   igraph_vector_t degree;
   
   if (!igraph_vs_is_all(&vids)) {
@@ -2731,18 +2731,20 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
 		 IGRAPH_EINVAL);
   }
 
-  IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
+	igraph_vector_int_init(&order, no_of_nodes);
+	IGRAPH_FINALLY(igraph_vector_int_destroy, &order);
   IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
   
   IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
 			     IGRAPH_LOOPS));
   maxdegree=(long int) igraph_vector_max(&degree)+1;
-  igraph_vector_order1(&degree, &order, maxdegree);
+  igraph_vector_order1_int(&degree, &order, maxdegree);
   igraph_vector_destroy(&degree);
   IGRAPH_FINALLY_CLEAN(1);
-  IGRAPH_VECTOR_INIT_FINALLY(&rank, no_of_nodes);
+	igraph_vector_int_init(&rank, no_of_nodes);
+	IGRAPH_FINALLY(igraph_vector_int_destroy, &rank);
   for (i=0; i<no_of_nodes; i++) {
-    VECTOR(rank)[ (long int)VECTOR(order)[i] ] = no_of_nodes-i-1;
+    VECTOR(rank)[ VECTOR(order)[i] ] = no_of_nodes-i-1;
   }
   
   IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL));
@@ -2759,7 +2761,7 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
   igraph_vector_null(res);
   
   for (nn=no_of_nodes-1; nn>=0; nn--) {
-    node=(long int) VECTOR(order)[nn];
+    node=VECTOR(order)[nn];
     
     IGRAPH_ALLOW_INTERRUPTION();
     
@@ -2795,11 +2797,11 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
     else
       VECTOR(*res)[node] /= triples;
   }
-  
+
   igraph_free(neis);
   igraph_adjlist_destroy(&allneis);
-  igraph_vector_destroy(&rank);
-  igraph_vector_destroy(&order);
+  igraph_vector_int_destroy(&rank);
+  igraph_vector_int_destroy(&order);
   IGRAPH_FINALLY_CLEAN(4);
   
   return 0;
