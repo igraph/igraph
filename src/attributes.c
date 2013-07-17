@@ -407,7 +407,7 @@ int igraph_attribute_combination(igraph_attribute_combination_t *comb, ...) {
   va_start(ap, comb);
   while (1) { 
     void *func=0;
-    int type;
+    igraph_attribute_combination_type_t type;
     const char *name;
     
     name=va_arg(ap, const char *);

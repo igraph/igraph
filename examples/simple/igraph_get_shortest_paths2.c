@@ -76,6 +76,8 @@ int main() {
     igraph_free(v1);
     igraph_free(v2);
   }
+  igraph_vector_ptr_destroy(&resedges);
+  igraph_vector_ptr_destroy(&resvertices);
   igraph_destroy(&g);
 
   return 0;

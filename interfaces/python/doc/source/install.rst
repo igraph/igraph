@@ -43,7 +43,7 @@ though it might change in the future). To test the installed package, launch
 your favourite Python IDE and type the following:
 
   >>> import igraph.test
-  >>> igraph.test.test()
+  >>> igraph.test.run_tests()
 
 The above commands run the bundled test cases to ensure that everything
 is fine with your |igraph| installation.
@@ -55,9 +55,17 @@ Graph plotting in |igraph| is implemented using a third-party package
 called `Cairo <http://www.cairographics.org>`_. If you want to create
 publication-quality plots in |igraph| on Windows, you must also install
 Cairo and its Python bindings. The Cairo project does not provide
-pre-compiled binaries for Windows, but other projects depending on
-Cairo do, so the preferred way to install Cairo on Windows along with
-its Python bindings is as follows:
+pre-compiled binaries for Windows, but Christoph Gohlke maintains a site
+containing unofficial Windows binaries for several Python extension packages,
+including Cairo itself. Therefore, the easiest way to install Cairo on Windows
+along with its Python bindings is simply to download it from
+`Christoph's site <http://www.lfd.uci.edu/~gohlke/pythonlibs/#pycairo>`_. Make
+sure you use an installer that is suitable for your Windows platform (32-bit or
+64-bit) and the version of Python you are using.
+
+In case you use a version of Python for which the above site does not provide
+an installer, you can install it from an alternative source in a slightly more
+complicated way by following the steps below:
 
 1. Get the latest PyCairo for Windows installer from
    http://ftp.gnome.org/pub/gnome/binaries/win32/pycairo/1.8. Make sure you
@@ -119,7 +127,7 @@ installed package, launch your favourite Python IDE or the default
 command line interpreter and type the following:
 
   >>> import igraph.test
-  >>> igraph.test.test()
+  >>> igraph.test.run_tests()
 
 The above commands run the bundled test cases to ensure that everything
 is fine with your |igraph| installation.
@@ -133,10 +141,10 @@ publication-quality plots in |igraph| on Mac OS X, you must also install
 Cairo and its Python bindings. The Cairo project does not provide
 pre-compiled binaries for Mac OS X, but `MacPorts <http://www.macports.org>`_
 and `Fink <http://www.finkproject.org>`_ does, so you can use them to
-install Cairo. The `Cairo homepage <http://www.cairographics.org>` gives
+install Cairo. The `Cairo homepage <http://www.cairographics.org>`_ gives
 you some installation instructions. However, this is only one half of the
 job, you will also need the Python bindings of Cairo from the
-`PyCairo homepage <http://www.cairographics.org/pycairo>`. At the moment
+`PyCairo homepage <http://www.cairographics.org/pycairo>`_. At the moment
 there are no precompiled PyCairo packages for Mac OS X either.
 
 TODO: detailed compilation instructions for PyCairo

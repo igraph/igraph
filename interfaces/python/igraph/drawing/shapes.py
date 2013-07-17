@@ -16,6 +16,8 @@ L{ShapeDrawerDirectory} manually if you wish to refer to it by a
 name in the C{shape} attribute of vertices.
 """
 
+from __future__ import division
+
 __all__ = ["ShapeDrawerDirectory"]
 
 __license__ = u"""\

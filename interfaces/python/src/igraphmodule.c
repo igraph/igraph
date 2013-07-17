@@ -492,6 +492,32 @@ PyObject* igraphmodule_is_graphical_degree_sequence(PyObject *self,
 }
 
 
+PyObject* igraphmodule_power_law_fit(PyObject *self, PyObject *args, PyObject *kwds) {
+  static char* kwlist[] = { "data", "xmin", "force_continuous", NULL };
+  PyObject *data_o, *force_continuous_o = Py_False;
+  igraph_vector_t data;
+  igraph_plfit_result_t result;
+  double xmin = -1;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|dO", kwlist, &data_o,
+        &xmin, &force_continuous_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_float_to_vector_t(data_o, &data))
+    return NULL;
+
+  if (igraph_power_law_fit(&data, &result, xmin, PyObject_IsTrue(force_continuous_o))) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&data);
+    return NULL;
+  }
+
+  igraph_vector_destroy(&data);
+
+  return Py_BuildValue("Oddddd", result.continuous ? Py_True : Py_False,
+      result.alpha, result.xmin, result.L, result.D, result.p);
+}
+
 PyObject* igraphmodule_split_join_distance(PyObject *self,
   PyObject *args, PyObject *kwds) {
   static char* kwlist[] = { "comm1", "comm2", NULL };
@@ -529,11 +555,15 @@ static PyMethodDef igraphmodule_methods[] =
 {
   {"community_to_membership", (PyCFunction)igraphmodule_community_to_membership,
     METH_VARARGS | METH_KEYWORDS,
-    "community_to_membership(merges, nodes, steps, return_csize=False)\n\n@undocumented"
+    "community_to_membership(merges, nodes, steps, return_csize=False)"
   },
   {"_compare_communities", (PyCFunction)igraphmodule_compare_communities,
     METH_VARARGS | METH_KEYWORDS,
-    "_compare_communities(comm1, comm2, method=\"vi\")\n\n@undocumented"
+    "_compare_communities(comm1, comm2, method=\"vi\")"
+  },
+  {"_power_law_fit", (PyCFunction)igraphmodule_power_law_fit,
+    METH_VARARGS | METH_KEYWORDS,
+    "_power_law_fit(data, xmin=-1, force_continuous=False)"
   },
   {"convex_hull", (PyCFunction)igraphmodule_convex_hull,
     METH_VARARGS | METH_KEYWORDS,
@@ -618,10 +648,16 @@ static PyMethodDef igraphmodule_methods[] =
   },
   {"_split_join_distance", (PyCFunction)igraphmodule_split_join_distance,
     METH_VARARGS | METH_KEYWORDS,
-    "_split_join_distance(comm1, comm2)\n\n@undocumented"
+    "_split_join_distance(comm1, comm2)"
   },
   {NULL, NULL, 0, NULL}
 };
+
+#define MODULE_DOCS \
+  "Low-level Python interface for the igraph library. " \
+  "Should not be used directly.\n\n"                    \
+  "@undocumented: community_to_membership, _compare_communities, _power_law_fit, " \
+  "_split_join_distance"
 
 /**
  * Module definition table (only for Python 3.x)
@@ -630,8 +666,7 @@ static PyMethodDef igraphmodule_methods[] =
 static struct PyModuleDef moduledef = {
   PyModuleDef_HEAD_INIT,
   "igraph._igraph",                   /* m_name */
-  "Low-level Python interface for the igraph library. "
-  "Should not be used directly.",     /* m_doc */
+  MODULE_DOCS,                        /* m_doc */
   sizeof(struct module_state),        /* m_size */
   igraphmodule_methods,               /* m_methods */
   0,                                  /* m_reload */
@@ -736,9 +771,7 @@ extern PyObject* igraphmodule_arpack_options_default;
 #ifdef IGRAPH_PYTHON3
   m = PyModule_Create(&moduledef);
 #else
-  m = Py_InitModule3("igraph._igraph", igraphmodule_methods,
-		     "Low-level Python interface for the igraph library. "
-		     "Should not be used directly.");
+  m = Py_InitModule3("igraph._igraph", igraphmodule_methods, MODULE_DOCS);
 #endif
 
   if (m == NULL)

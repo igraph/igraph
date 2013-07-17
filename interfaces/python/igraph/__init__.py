@@ -119,7 +119,7 @@ class Graph(GraphBase):
       True
       >>> g["A", "B"] = 2
       >>> g["A", "B"]
-      2.0
+      2
       >>> g.es["weight"]
       [1.0, 1.0, 2]
     """
@@ -2872,6 +2872,15 @@ class Graph(GraphBase):
             It is safe to omit this keyword argument unless you need to use
             a specific graph drawer.
 
+          - C{keep_aspect_ratio}: whether to keep the aspect ratio of the layout
+            that igraph calculates to place the nodes. C{True} means that the
+            layout will be scaled proportionally to fit into the bounding box
+            where the graph is to be drawn but the aspect ratio will be kept
+            the same (potentially leaving empty space next to, below or above
+            the graph). C{False} means that the layout will be scaled independently
+            along the X and Y axis in order to fill the entire bounding box.
+            The default is C{False}.
+
           - C{layout}: the layout to be used. If not an instance of
             L{Layout}, it will be passed to L{Graph.layout} to calculate
             the layout. Note that if you want a deterministic layout that
@@ -2920,6 +2929,11 @@ class Graph(GraphBase):
             vertices. The corresponding vertex attribute is C{frame_color},
             the default is black. See C{vertex_color} for the possible ways
             of specifying a color.
+
+          - C{vertex_frame_width}: the width of the frame (i.e. stroke) of the
+            vertices. The corresponding vertex attribute is C{frame_width}.
+            The default is 1. Vertex frame widths are measured in the unit of the
+            Cairo context on which igraph is drawing.
 
           - C{vertex_shape}: shape of the vertices. Alternatively it can
             be specified by the C{shape} vertex attribute. Possibilities
@@ -3566,7 +3580,7 @@ class EdgeSeq(_igraph.EdgeSeq):
         For instance, the following would calculate betweenness centralities
         twice:
 
-          >>> edges = g.es.select(_edge_betweenness_gt=10,
+          >>> edges = g.es.select(_edge_betweenness_gt=10,       # doctest:+SKIP
           ...                     _edge_betweenness_lt=30)
 
         It is advised to use this instead:

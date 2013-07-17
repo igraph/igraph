@@ -22,6 +22,11 @@
 *  along with GLPK. If not, see <http://www.gnu.org/licenses/>.
 ***********************************************************************/
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wsometimes-uninitialized"
+#endif
+
 #include "glpenv.h"
 #include "glplib.h"
 

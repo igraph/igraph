@@ -110,7 +110,7 @@ int igraph_set_reserve(igraph_set_t* set, long int size) {
   assert(set->stor_begin != NULL);
   if (size <= actual_size) return 0;
 
-  tmp=igraph_Realloc(set->stor_begin, size, igraph_integer_t);
+  tmp=igraph_Realloc(set->stor_begin, (size_t) size, igraph_integer_t);
   if (tmp==0) {
     IGRAPH_ERROR("cannot reserve space for set", IGRAPH_ENOMEM);
   }
@@ -226,7 +226,8 @@ int igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
 
     /* Element should be inserted at position 'left' */
     if (left < size)
-      memmove(set->stor_begin+left+1, set->stor_begin+left, (size-left)*sizeof(set->stor_begin[0]));
+      memmove(set->stor_begin+left+1, set->stor_begin+left, 
+	      (size_t) (size-left)*sizeof(set->stor_begin[0]));
 
     set->stor_begin[left] = e;
     set->end += 1;

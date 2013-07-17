@@ -90,7 +90,7 @@ int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
   /* maximum degree + degree of vertices */
   IGRAPH_CHECK(igraph_degree(graph, cores, igraph_vss_all(), mode, 
 			     IGRAPH_LOOPS));
-  maxdeg = igraph_vector_max(cores);
+  maxdeg = (long int) igraph_vector_max(cores);
 
   bin=igraph_Calloc(maxdeg+1, long int);
   if (bin==0) {
@@ -128,11 +128,11 @@ int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
   IGRAPH_VECTOR_INIT_FINALLY(&neis, maxdeg);
   for (i=0; i<no_of_nodes; i++) {
     long int v=vert[i];
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, omode));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) v, omode));
     for (j=0; j<igraph_vector_size(&neis); j++) {
-      long int u=VECTOR(neis)[j];
+      long int u=(long int) VECTOR(neis)[j];
       if (VECTOR(*cores)[u] > VECTOR(*cores)[v]) {
-	long int du=VECTOR(*cores)[u];
+	long int du=(long int) VECTOR(*cores)[u];
 	long int pu=pos[u];
 	long int pw=bin[du];
 	long int w=vert[pw];

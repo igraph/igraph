@@ -645,7 +645,7 @@ igraph_arpack_rnsolve:
         IGNORE: RR, RC, RNamespace
 
 igraph_arpack_unpack_complex:
-         PARAMS: INOUT MATRIX vectors, INOUT MATRIX values, REAL nev
+         PARAMS: INOUT MATRIX vectors, INOUT MATRIX values, INTEGER nev
          NAME-R: arpack.unpack.complex
 
 igraph_unfold_tree:
@@ -720,7 +720,7 @@ igraph_centralization_closeness:
 
 igraph_centralization_closeness_tmax:
         PARAMS: GRAPH_OR_0 graph=NULL, INTEGER nodes=0, \
-                BOOLEAN directed=True, OUT REALPTR res
+                NEIMODE mode=OUT, OUT REALPTR res
         NAME-R: centralization.closeness.tmax
 
 igraph_centralization_eigenvector_centrality:
@@ -776,14 +776,12 @@ igraph_diversity:
 #######################################
 
 igraph_is_degree_sequence:
-        PARAMS: VECTOR out_deg, VECTOR in_deg, OUT BOOLEANPTR res
+        PARAMS: VECTOR out_deg, VECTOR_OR_0 in_deg=NULL, OUT BOOLEANPTR res
         NAME-R: is.degree.sequence
-        IGNORE: RR, RC, RNamespace
 
 igraph_is_graphical_degree_sequence:
-        PARAMS: VECTOR out_deg, VECTOR in_deg, OUT BOOLEANPTR res
+        PARAMS: VECTOR out_deg, VECTOR_OR_0 in_deg=NULL, OUT BOOLEANPTR res
         NAME-R: is.graphical.degree.sequence
-        IGNORE: RR, RC, RNamespace
 
 #######################################
 # Visitors
@@ -854,13 +852,13 @@ igraph_bipartite_game_gnp:
         PARAMS: OUT GRAPH graph, OUT VECTOR_BOOL_OR_0 types, \
                 INTEGER n1, INTEGER n2, REAL p, BOOLEAN directed, \
                 NEIMODE mode
-        IGNORE: RR, RC, RNamespace
+        IGNORE: RR, RNamespace
 
 igraph_bipartite_game_gnm:
         PARAMS: OUT GRAPH graph, OUT VECTOR_BOOL_OR_0 types, \
                 INTEGER n1, INTEGER n2, INTEGER m, BOOLEAN directed, \
                 NEIMODE mode
-        IGNORE: RR, RC, RNamespace
+        IGNORE: RR, RNamespace
 
 #######################################
 # Spectral properties
@@ -1310,7 +1308,7 @@ igraph_get_stochastic:
         IGNORE: RR
 
 igraph_get_stochastic_sparsemat:
-        PARAMS: GRAPH graph, OUT SPARSEMAT sparsemat, \
+        PARAMS: GRAPH graph, OUT SPARSEMATPTR sparsemat, \
                 BOOLEAN column_wise=False
         IGNORE: RR, RNamespace
 
@@ -1470,12 +1468,12 @@ igraph_maxflow:
         PARAMS: GRAPH graph, OUT REALPTR value, OUT VECTOR_OR_0 flow, \
                 OUT VECTORM1_OR_0 cut, OUT VECTORM1_OR_0 partition1, \
                 OUT VECTORM1_OR_0 partition2, VERTEX source, VERTEX target, \
-                EDGECAPACITY capacity=NULL
+                EDGECAPACITY capacity=NULL, OUT MAXFLOW_STATS stats
         DEPS: capacity ON graph, source ON graph, target ON graph
 
 igraph_maxflow_value:
         PARAMS: GRAPH graph, OUT REALPTR value, VERTEX source, VERTEX target, \
-                VECTOR_OR_0 capacity
+                VECTOR_OR_0 capacity, OUT MAXFLOW_STATS stats
         DEPS: source ON graph, target ON graph
         IGNORE: RR, RC, RNamespace
 
@@ -1716,7 +1714,7 @@ igraph_scg_grouping:
 igraph_scg_semiprojectors:
         PARAMS: VECTORM1 groups, SCGMAT mtype=Default, \
                 OUT MATRIX_OR_0 L, OUT MATRIX_OR_0 R, \
-                OUT SPARSEMAT_OR_0 Lsparse, OUT SPARSEMAT_OR_0 Rsparse, \
+                OUT SPARSEMATPTR_OR_0 Lsparse, OUT SPARSEMATPTR_OR_0 Rsparse, \
                 VECTOR_OR_0 p=NULL, SCGNORM norm=Default
         NAME-R: scgSemiProjectors
         IGNORE: RR, RC
@@ -1736,8 +1734,8 @@ igraph_scg_adjacency:
                 BOOLEAN use_arpack=False, INTEGER maxiter, \
                 OUT GRAPH_OR_0 scg_graph, OUT MATRIX_OR_0 scg_matrix, \
                 OUT SPARSEMAT_OR_0 scg_sparsemat, OUT MATRIX_OR_0 L, \
-                OUT MATRIX_OR_0 R, OUT SPARSEMAT_OR_0 Lsparse, \
-                OUT SPARSEMAT_OR_0 Rsparse
+                OUT MATRIX_OR_0 R, OUT SPARSEMATPTR_OR_0 Lsparse, \
+                OUT SPARSEMATPTR_OR_0 Rsparse
         IGNORE: RR, RC, RNamespace
 
 igraph_scg_stochastic:
@@ -1750,8 +1748,8 @@ igraph_scg_stochastic:
                 BOOLEAN use_arpack=False, INTEGER maxiter, \
                 OUT GRAPH_OR_0 scg_graph, OUT MATRIX_OR_0 scg_matrix, \
                 OUT SPARSEMAT_OR_0 scg_sparsemat, OUT MATRIX_OR_0 L, \
-                OUT MATRIX_OR_0 R, OUT SPARSEMAT_OR_0 Lsparse, \
-                OUT SPARSEMAT_OR_0 Rsparse
+                OUT MATRIX_OR_0 R, OUT SPARSEMATPTR_OR_0 Lsparse, \
+                OUT SPARSEMATPTR_OR_0 Rsparse
         IGNORE: RR, RC, RNamespace
 
 igraph_scg_laplacian:
@@ -1764,8 +1762,8 @@ igraph_scg_laplacian:
                 BOOLEAN use_arpack=False, INTEGER maxiter, \
                 OUT GRAPH_OR_0 scg_graph, OUT MATRIX_OR_0 scg_matrix, \
                 OUT SPARSEMAT_OR_0 scg_sparsemat, OUT MATRIX_OR_0 L, \
-                OUT MATRIX_OR_0 R, OUT SPARSEMAT_OR_0 Lsparse, \
-                OUT SPARSEMAT_OR_0 Rsparse
+                OUT MATRIX_OR_0 R, OUT SPARSEMATPTR_OR_0 Lsparse, \
+                OUT SPARSEMATPTR_OR_0 Rsparse
         IGNORE: RR, RC, RNamespace
 
 
@@ -1796,6 +1794,16 @@ igraph_maximum_bipartite_matching:
        DEPS: types ON graph, weights ON graph
        NAME-R: maximum.bipartite.matching
        IGNORE: RR
+
+#######################################
+# Fitting power laws
+#######################################
+
+igraph_power_law_fit:
+       PARAMS: VECTOR data, OUT PLFIT res, REAL xmin=-1, \
+               BOOLEAN force_continuous=False
+       NAME-R: power.law.fit.new
+       IGNORE: RNamespace
 
 #######################################
 # Other, not graph related

@@ -57,13 +57,14 @@ class NexusConnection(object):
 
     Example:
 
-      >>> print Nexus.info("karate")
+      >>> print Nexus.info("karate")            #doctest:+ELLIPSIS
       Nexus dataset 'karate' (#1)
       vertices/edges: 34/78
       name: Zachary's karate club
       tags: social network; undirected; weighted
-      [...]
+      ...
       >>> karate = Nexus.get("karate")
+      >>> from igraph import summary
       >>> summary(karate)
       IGRAPH UNW- 34 78 -- Zachary's karate club network
       + attr: Author (g), Citation (g), name (g), Faction (v), id (v), name (v), weight (e)

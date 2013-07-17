@@ -43,6 +43,7 @@ int main() {
   igraph_integer_t source, target;
   FILE *infile;
   float t;
+  igraph_maxflow_stats_t stats;
 
   igraph_vector_init(&capacity, 0);
 
@@ -53,7 +54,7 @@ int main() {
   fclose(infile);
 
   t=timer();
-  igraph_maxflow_value(&g, &flow, source, target, &capacity);
+  igraph_maxflow_value(&g, &flow, source, target, &capacity, &stats);
   t=timer()-t;
 /*   printf("4102: %g (time %.10f)\n", flow, t); */
   if (flow != 8207) {
@@ -69,7 +70,7 @@ int main() {
 /*   fclose(infile); */
 
 /*   t=timer(); */
-/*   igraph_maxflow_value(&g, &flow, source, target, &capacity); */
+/*   igraph_maxflow_value(&g, &flow, source, target, &capacity, &stats); */
 /*   t=timer()-t; */
 /*   printf("8198: %g (time %.10f)\n", flow, t); */
 /*   igraph_destroy(&g); */
@@ -82,7 +83,7 @@ int main() {
 /*   fclose(infile); */
 
 /*   t=timer(); */
-/*   igraph_maxflow_value(&g, &flow, source, target, &capacity); */
+/*   igraph_maxflow_value(&g, &flow, source, target, &capacity, &stats); */
 /*   t=timer()-t; */
 /*   printf("16390: %g (time %.10f)\n", flow, t); */
 /*   igraph_destroy(&g); */
@@ -95,7 +96,7 @@ int main() {
 /*   fclose(infile); */
 
 /*   t=timer(); */
-/*   igraph_maxflow_value(&g, &flow, source, target, &capacity); */
+/*   igraph_maxflow_value(&g, &flow, source, target, &capacity, &stats); */
 /*   t=timer()-t; */
 /*   printf("32774: %g (time %.10f)\n", flow, t); */
 /*   igraph_destroy(&g); */
@@ -108,7 +109,7 @@ int main() {
 /*   fclose(infile); */
 
 /*   t=timer(); */
-/*   igraph_maxflow_value(&g, &flow, source, target, &capacity); */
+/*   igraph_maxflow_value(&g, &flow, source, target, &capacity, &stats); */
 /*   t=timer()-t; */
 /*   printf("65542: %g (time %.10f)\n", flow, t); */
 /*   igraph_destroy(&g); */

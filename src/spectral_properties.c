@@ -33,8 +33,8 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
                                 const igraph_vector_t *weights) {
   
   igraph_eit_t edgeit;
-  long int no_of_nodes=igraph_vcount(graph);
-  long int no_of_edges=igraph_ecount(graph);
+  int no_of_nodes=(int) igraph_vcount(graph);
+  int no_of_edges=(int) igraph_ecount(graph);
   igraph_bool_t directed=igraph_is_directed(graph);
   igraph_vector_t degree;
   long int i;
@@ -72,7 +72,7 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 	    MATRIX(*res, from, to) -= weight;
 	  }
 	  if (sparseres) {
-	    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, 
+	    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (int) from, (int)to, 
 						-weight));
 	  }
           VECTOR(degree)[from] += weight;
@@ -86,7 +86,7 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 	  MATRIX(*res, i, i) = VECTOR(degree)[i];
 	}
 	if (sparseres) {
-	  IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, 
+	  IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (int) i, (int) i, 
 					      VECTOR(degree)[i]));
 	}
       }
@@ -110,7 +110,7 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 	  MATRIX(*res, i, i) = t;
 	}
 	if (sparseres) {
-	  IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, t));
+	  IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (int) i, (int) i, t));
 	}
       }
       
@@ -126,7 +126,8 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 	    MATRIX(*res, from, to) -= t;
 	  }
 	  if (sparseres) {
-	    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, -t));
+	    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (int) from, (int) to,
+						-t));
 	  }
         }
         IGRAPH_EIT_NEXT(edgeit);
@@ -149,9 +150,9 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 	    MATRIX(*res, to, from) -= weight;
 	  }
 	  if (sparseres) {
-	    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to,
+	    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (int) from, (int) to,
 						-weight));
-	    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, to, from,
+	    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (int) to, (int) from,
 						-weight));
 	  }
           VECTOR(degree)[from] += weight;
@@ -166,7 +167,7 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 	  MATRIX(*res, i, i) = VECTOR(degree)[i];
 	}
 	if (sparseres) {
-	  IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, 
+	  IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (int) i, (int) i, 
 					      VECTOR(degree)[i]));
 	}
       }
@@ -191,7 +192,7 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 	  MATRIX(*res, i, i) = t;
 	}
 	if (sparseres) {
-	  IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, t));
+	  IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (int) i, (int) i, t));
 	}
         VECTOR(degree)[i] = sqrt(VECTOR(degree)[i]);
       }
@@ -209,8 +210,10 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 	    MATRIX(*res, to, from) -= diff;
 	  }
 	  if (sparseres) {
-	    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, -diff));
-	    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, to, from, -diff));
+	    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (int) from, (int) to,
+						-diff));
+	    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (int) to, (int) from,
+						-diff));
 	  }
         }
         IGRAPH_EIT_NEXT(edgeit);
@@ -272,10 +275,10 @@ int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
                      const igraph_vector_t *weights) {
   
   igraph_eit_t edgeit;
-  long int no_of_nodes=igraph_vcount(graph);
-  int no_of_edges=igraph_ecount(graph);
+  int no_of_nodes=(int) igraph_vcount(graph);
+  int no_of_edges=(int) igraph_ecount(graph);
   igraph_bool_t directed=igraph_is_directed(graph);
-  long int from, to;
+  int from, to;
   igraph_integer_t ffrom, fto;
   igraph_vector_t degree;  
   int i;

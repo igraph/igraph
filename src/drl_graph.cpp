@@ -891,8 +891,8 @@ void graph::update_nodes ( )
 		// compute node list for next update
 		for ( unsigned int j = 0; j < node_indices.size(); j++ )
 		  node_indices [j] += num_procs;
-		
-		while ( node_indices [ node_indices.size()-1] >= num_nodes )
+	
+		while ( !node_indices.empty() && node_indices.back() >= num_nodes )
 		  node_indices.pop_back ( );
 			
 	}
@@ -1107,6 +1107,9 @@ void graph::Solve_Analytic( int node_ind, float &pos_x, float &pos_y )
 		damping = 1.0 - damping_mult;
 		pos_x = damping*positions[ node_ind ].x + (1.0-damping) * x_cen;
 		pos_y = damping*positions[ node_ind ].y + (1.0-damping) * y_cen;
+   } else {
+		pos_x = positions[ node_ind ].x;
+		pos_y = positions[ node_ind ].y;
    }
    
    // No cut edge flag (?)

@@ -185,7 +185,7 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
 
         # Contract the drawing area by the margin and fit the layout
         bbox = self.bbox.contract(margin)
-        layout.fit_into(bbox, keep_aspect_ratio=False)
+        layout.fit_into(bbox, keep_aspect_ratio=kwds.get("keep_aspect_ratio", False))
 
         # Decide whether we need to calculate the curvature of edges
         # automatically -- and calculate them if needed.
@@ -780,7 +780,7 @@ class GephiGraphStreamingDrawer(AbstractGraphDrawer):
     straight into the Gephi window by using C{GephiGraphStreamingDrawer} with the
     appropriate URL where Gephi is listening.
 
-    The C{connection} property exposes the L{GephiGraphConnection} that the drawer
+    The C{connection} property exposes the L{GephiConnection} that the drawer
     uses. The drawer also has a property called C{streamer} which exposes the underlying
     L{GephiGraphStreamer} that is responsible for generating the JSON objects,
     encoding them and writing them to a file-like object. If you want to customize

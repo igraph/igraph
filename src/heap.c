@@ -97,7 +97,7 @@ int igraph_indheap_init_array     (igraph_indheap_t *h, igraph_real_t* data, lon
   h->end=h->stor_end;
   h->destroy=1;
 
-  memcpy(h->stor_begin, data, len*sizeof(igraph_real_t));
+  memcpy(h->stor_begin, data, (size_t) len*sizeof(igraph_real_t));
   for (i=0; i<len; i++) {
     h->index_begin[i]=i+1;
   }
@@ -285,8 +285,8 @@ int igraph_indheap_reserve        (igraph_indheap_t* h, long int size) {
     IGRAPH_ERROR("indheap reserve failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, tmp2);
-  memcpy(tmp1, h->stor_begin, actual_size*sizeof(igraph_real_t));
-  memcpy(tmp2, h->index_begin, actual_size*sizeof(long int));
+  memcpy(tmp1, h->stor_begin, (size_t) actual_size*sizeof(igraph_real_t));
+  memcpy(tmp2, h->index_begin, (size_t) actual_size*sizeof(long int));
   igraph_Free(h->stor_begin);
   igraph_Free(h->index_begin);
   
@@ -390,7 +390,7 @@ void igraph_indheap_i_switch(igraph_indheap_t* h, long int e1, long int e2) {
     
     tmp=h->index_begin[e1];
     h->index_begin[e1]=h->index_begin[e2];
-    h->index_begin[e2]=tmp;
+    h->index_begin[e2]=(long int) tmp;
   }
 }
 
@@ -571,9 +571,9 @@ int igraph_d_indheap_reserve        (igraph_d_indheap_t* h, long int size) {
   }
   IGRAPH_FINALLY(free, tmp3); 	/* TODO: hack */
 
-  memcpy(tmp1, h->stor_begin, actual_size*sizeof(igraph_real_t));
-  memcpy(tmp2, h->index_begin, actual_size*sizeof(long int));
-  memcpy(tmp3, h->index2_begin, actual_size*sizeof(long int));
+  memcpy(tmp1, h->stor_begin, (size_t) actual_size*sizeof(igraph_real_t));
+  memcpy(tmp2, h->index_begin, (size_t) actual_size*sizeof(long int));
+  memcpy(tmp3, h->index2_begin, (size_t) actual_size*sizeof(long int));
   igraph_Free(h->stor_begin);
   igraph_Free(h->index_begin);
   igraph_Free(h->index2_begin);
@@ -700,8 +700,8 @@ void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, long int e1, long int e2) 
 void igraph_i_cutheap_switch(igraph_i_cutheap_t *ch, 
 			    long int hidx1, long int hidx2) {
   if (hidx1 != hidx2) {
-    long int idx1=VECTOR(ch->index)[hidx1];
-    long int idx2=VECTOR(ch->index)[hidx2];
+    long int idx1=(long int) VECTOR(ch->index)[hidx1];
+    long int idx2=(long int) VECTOR(ch->index)[hidx2];
 
     igraph_real_t tmp=VECTOR(ch->heap)[hidx1];
     VECTOR(ch->heap)[hidx1]=VECTOR(ch->heap)[hidx2];
@@ -768,13 +768,13 @@ igraph_bool_t igraph_i_cutheap_empty(igraph_i_cutheap_t *ch) {
 /* Number of active vertices */
 
 igraph_integer_t igraph_i_cutheap_active_size(igraph_i_cutheap_t *ch) {
-  return igraph_vector_size(&ch->heap);
+  return (igraph_integer_t) igraph_vector_size(&ch->heap);
 }
 
 /* Number of all (defined) vertices */
 
 igraph_integer_t igraph_i_cutheap_size(igraph_i_cutheap_t *ch) {
-  return ch->dnodes;
+  return (igraph_integer_t) (ch->dnodes);
 }
 
 igraph_real_t igraph_i_cutheap_maxvalue(igraph_i_cutheap_t *ch) {
@@ -783,7 +783,7 @@ igraph_real_t igraph_i_cutheap_maxvalue(igraph_i_cutheap_t *ch) {
 
 igraph_integer_t igraph_i_cutheap_popmax(igraph_i_cutheap_t *ch) {
   long int size=igraph_vector_size(&ch->heap);
-  igraph_integer_t maxindex=VECTOR(ch->index)[0];
+  igraph_integer_t maxindex=(igraph_integer_t) VECTOR(ch->index)[0];
   /* put the last element to the top */
   igraph_i_cutheap_switch(ch, 0, size-1);
   /* remove the last element */
@@ -801,7 +801,7 @@ int igraph_i_cutheap_update(igraph_i_cutheap_t *ch, igraph_integer_t index,
 			    igraph_real_t add) {
   igraph_real_t hidx=VECTOR(ch->hptr)[(long int)index];
   if (hidx != INACTIVE && hidx != UNDEFINED) {
-    long int hidx2=hidx-INDEXINC;
+    long int hidx2=(long int) (hidx-INDEXINC);
 /*     printf("updating vertex %li, heap index %li\n", (long int) index, hidx2); */
     VECTOR(ch->heap)[hidx2] += add;
     igraph_i_cutheap_sink(ch, hidx2);

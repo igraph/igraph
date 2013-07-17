@@ -6,7 +6,8 @@
 # - a valid Google Code account with password and upload access to the
 #   igraph project
 # - googlecode_upload.py
-# - passwordless access to igraph's Bazaar repository at Launchpad
+# - passwordless access to igraph's Bazaar repository at Launchpad or
+#   igraph's git repository at Github
 #
 # TODO:
 # - collect output and put it online as well
@@ -84,13 +85,20 @@ done
 dir="$1"
 cd $dir
 
-## Bazaar tree
+## Bazaar or Github tree
 tree=`basename $dir`
 
-## update from Launchpad
-revisionbefore=`bzr revno`
-bzr pull || exit 2
-revision=`bzr revno`
+if [ -f .bzr ]; then
+	## update from Launchpad
+	revisionbefore=`bzr revno`
+	bzr pull || exit 2
+	revision=`bzr revno`
+else
+	## update from Github
+	revisionbefore=`git rev-parse HEAD`
+	git pull || exit 2
+	revision=`git rev-parse HEAD`
+fi
 
 if [ x"$force" != "xyes" ]; then
     if [ x"$revisionbefore" = x"$revision" ]; then
@@ -98,8 +106,11 @@ if [ x"$force" != "xyes" ]; then
     fi
 fi
 
+## short revision number
+shortrev=`echo $revision | cut -c 1-7`
+
 ## current version
-version=`head -1 configure.in | cut -f2 -d, | tr -d ' '`
+version=`head -1 configure.ac | cut -f2 -d, | tr -d ' '`
 
 ## mount savannah download area
 #mount | grep -q "^dl.sv.gnu.org:/releases/igraph" ||
@@ -128,9 +139,15 @@ if [ $build_c = 1 ]; then
 
 	## create tar.gz file
 	make dist || exit 20
-	CPACKAGE="igraph-nightly-$version-$revision-`date +'%Y%m%d'`.tar.gz"
+	CPACKAGE="igraph-nightly-$version-$shortrev-`date +'%Y%m%d'`.tar.gz"
 	rm -f $CPACKAGE
 	mv igraph-$version.tar.gz $CPACKAGE || exit 21
+
+	## create MSVC zip file
+	make msvc || exit 23
+	MSVCPACKAGE="igraph-nightly-$version-msvc-$shortrev-`date +'%Y%m%d'`.zip"
+	rm -f $MSVCPACKAGE
+	mv igraph-$version-msvc.zip $MSVCPACKAGE || exit 24
 
 	## sign and upload C package
 	#rm -rf $CPACKAGE.sig
@@ -140,9 +157,13 @@ if [ $build_c = 1 ]; then
 	## upload to google code
 	if [ x$upload = xyes ]; then
 		googlecode_upload.py -s \
-		   "Nightly build, C library, $tree tree, revision $revision" \
+		   "Nightly build, C library, $tree tree, commit $shortrev" \
 		   -p igraph -u $GC_USERNAME -l Type-Source,OpSys-All,Nightly \
 		   -w $GC_PASSWORD $CPACKAGE || exit 22
+		googlecode_upload.py -s \
+		   "Nightly build, C library for Microsoft Visual C, $tree tree, commit $shortrev" \
+		   -p igraph -u $GC_USERNAME -l Type-Source,OpSys-All,Nightly \
+		   -w $GC_PASSWORD $MSVCPACKAGE || exit 22
 	fi
 fi
 
@@ -161,16 +182,21 @@ if [ $build_r = 1 ]; then
 
 	## Start compilation
 	make
-	
+
+	## Ensure that R CMD check does not require suggested packages
+	export _R_CHECK_FORCE_SUGGESTS_=false
+
 	## check that package can be installed
 	R CMD check --no-codoc --no-examples --no-tests --no-manual \
 	    igraph_$RVERSION.tar.gz | grep -q "ERROR$"
 	error=$?
 	
-	if [ $error = 0 ]; then
+	## yes, the condition is correct. grep returns zero error code if
+	## there were matches
+	if [ $error != 0 ]; then
 
   	    # R_LIBS=~/.R/library R CMD check igraph_$version.tar.gz
-	    RPACKAGE="igraph_nightly_$version-$revision-`date +'%Y%m%d'`.tar.gz"
+	    RPACKAGE="igraph_nightly_$version-$shortrev-`date +'%Y%m%d'`.tar.gz"
 	    rm -f $RPACKAGE
 	    mv igraph_$RVERSION.tar.gz $RPACKAGE
 	    
@@ -183,14 +209,14 @@ if [ $build_r = 1 ]; then
 	    ## upload to google code
 	    if [ x$upload = xyes ]; then
 		googlecode_upload.py -s \
-		    "Nightly build, GNU R source package, $tree tree, revision $revision" \
+		    "Nightly build, GNU R source package, $tree tree, commit $shortrev" \
 		    -p igraph -u $GC_USERNAME -l Type-Rsource,OpSys-All,Nightly \
 		    -w $GC_PASSWORD $RPACKAGE || exit 22
 	    fi
-	    
-	    ## step back to the root
-	    cd ../..
 	fi
+	    
+	## step back to the root
+	cd ../..
 fi
 
 if [ $build_python = 1 ]; then
@@ -198,12 +224,12 @@ if [ $build_python = 1 ]; then
 	cd interfaces/python
 	LD_LIBRARY_PATH=../../src/.libs python setup.py build test
 	python setup.py sdist
-	PYPACKAGE=python-igraph_nightly_$version-$revision-`date +'%Y%m%d'`.tar.gz
+	PYPACKAGE=python-igraph_nightly_$version-$shortrev-`date +'%Y%m%d'`.tar.gz
 	mv dist/python-igraph-$version.tar.gz $PYPACKAGE
 	## upload to google code
 	if [ x$upload = xyes ]; then
 		googlecode_upload.py -s \
-		   "Nightly build, Python source package, $tree tree, revision $revision" \
+		   "Nightly build, Python source package, $tree tree, commit $shortrev" \
 		   -p igraph -u $GC_USERNAME -l Type-Pysource,OpSys-All,Nightly \
 		   -w $GC_PASSWORD $PYPACKAGE || exit 22
 	fi

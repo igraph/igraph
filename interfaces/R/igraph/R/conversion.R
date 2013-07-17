@@ -219,7 +219,9 @@ get.adjedgelist <- function(graph, mode=c("all", "out", "in", "total")) {
 igraph.from.graphNEL <- function(graphNEL, name=TRUE, weight=TRUE,
                                  unlist.attrs=TRUE) {
 
-  require(graph)
+  if (! "graph" %in% .packages()) {
+    library(graph, pos="package:base")
+  }
 
   if (!inherits(graphNEL, "graphNEL")) {
     stop("Not a graphNEL graph")
@@ -274,7 +276,9 @@ igraph.to.graphNEL <- function(graph) {
     stop("Not an igraph graph")
   }
   
-  require(graph)
+  if (! "graph" %in% .packages()) {
+    library(graph, pos="package:base")
+  }
 
   if ("name" %in% list.vertex.attributes(graph) &&
       is.character(V(graph)$name)) {

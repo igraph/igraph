@@ -129,6 +129,8 @@ graph.adjacency.dense <- function(adjmatrix, mode=c("directed", "undirected", "m
                  "lower"=3,
                  "min"=4,
                  "plus"=5)
+
+  mode(adjmatrix) <- "double"
   
   if (!is.null(weighted)) {
     if (is.logical(weighted) && weighted) {

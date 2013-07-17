@@ -1,6 +1,12 @@
 # vim:ts=4 sw=4 sts=4:
+
 import unittest
 from igraph import *
+
+try:
+    import numpy as np
+except ImportError:
+    np = None
 
 class VertexTests(unittest.TestCase):
     def setUp(self):
@@ -33,6 +39,24 @@ class VertexSeqTests(unittest.TestCase):
         self.assertRaises(ValueError, VertexSeq, self.g, 12)
         self.assertRaises(ValueError, VertexSeq, self.g, [12])
         self.failUnless(self.g.vs.graph == self.g)
+
+    def testIndexing(self):
+        for i in xrange(self.g.vcount()):
+            self.assertEquals(i, self.g.vs[i].index)
+        self.assertRaises(IndexError, self.g.vs.__getitem__, -1)
+        self.assertRaises(KeyError, self.g.vs.__getitem__, 1.5)
+
+    @unittest.skipIf(np is None, "test case depends on NumPy")
+    def testNumPyIndexing(self):
+        for i in xrange(self.g.vcount()):
+            arr = np.array([i])
+            self.assertEquals(i, self.g.vs[arr[0]].index)
+
+        arr = np.array([-1])
+        self.assertRaises(IndexError, self.g.vs.__getitem__, arr[0])
+
+        arr = np.array([1.5])
+        self.assertRaises(KeyError, self.g.vs.__getitem__, arr[0])
 
     def testPartialAttributeAssignment(self):
         only_even = self.g.vs.select(lambda v: (v.index % 2 == 0))

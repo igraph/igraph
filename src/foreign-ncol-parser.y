@@ -44,6 +44,11 @@
 
 */
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wconversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include "igraph_hacks_internal.h"
@@ -62,7 +67,7 @@ int igraph_ncol_yylex(YYSTYPE* lvalp, YYLTYPE* llocp,
 		      void* scanner);
 int igraph_ncol_yyerror(YYLTYPE* locp, 
 			igraph_i_ncol_parsedata_t *context, 
-			char *s);
+			const char *s);
 char *igraph_ncol_yyget_text (yyscan_t yyscanner );
 int igraph_ncol_yyget_leng (yyscan_t yyscanner );
 igraph_real_t igraph_ncol_get_number(const char *str, long int len);
@@ -122,7 +127,7 @@ weight : ALNUM  { $$=igraph_ncol_get_number(igraph_ncol_yyget_text(scanner),
 
 int igraph_ncol_yyerror(YYLTYPE* locp, 
 			igraph_i_ncol_parsedata_t *context, 
-			char *s) {
+			const char *s) {
   snprintf(context->errmsg, sizeof(context->errmsg)/sizeof(char)-1, 
 	   "Parse error in NCOL file, line %i (%s)", 
 	   locp->first_line, s);

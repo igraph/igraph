@@ -138,19 +138,19 @@ CONNECTEDNESS:
     IN: %C%=REAL(%I%)[0];
 
 NEIMODE:
-  CTYPE: igraph_integer_t
+  CTYPE: igraph_neimode_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_neimode_t) REAL(%I%)[0];
 
 INOUTMODE:
-  CTYPE: igraph_integer_t
+  CTYPE: igraph_neimode_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_neimode_t) REAL(%I%)[0];
 
 TOUNDIRECTED:
-  CTYPE: igraph_integer_t 
+  CTYPE: igraph_to_undirected_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_to_undirected_t) REAL(%I%)[0];
 
 BLISSSH:
   CTYPE: igraph_bliss_sh_t
@@ -583,7 +583,7 @@ ARRAY3_OR_0:
 VERTEX:
   CTYPE: igraph_integer_t
   INCONV: 
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_integer_t) REAL(%I%)[0];
 
 ##################################
 # Some vertices/edges of a graph
@@ -699,17 +699,17 @@ EDGE_COLOR:
 # Community comparison methods
 
 COMMCMP:
-  CTYPE: igraph_integer_t
+  CTYPE: igraph_community_comparison_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_community_comparison_t) REAL(%I%)[0];
 
 ##################################
 # Subgraph implementations
 
 SUBGRAPH_IMPL:
-  CTYPE: igraph_integer_t
+  CTYPE: igraph_subgraph_implementation_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_subgraph_implementation_t) REAL(%I%)[0];
 
 ##################################
 # Specification on what to do with the attributes
@@ -719,12 +719,16 @@ VERTEX_ATTRIBUTE_COMBINATION:
   CALL: &%C%
   INCONV:
     IN: R_SEXP_to_attr_comb(%I%, &%C%);
+  OUTCONV:
+    IN: igraph_attribute_combination_destroy(&%C%);
 
 EDGE_ATTRIBUTE_COMBINATION:
   CTYPE: igraph_attribute_combination_t
   CALL: &%C%
   INCONV:
     IN: R_SEXP_to_attr_comb(%I%, &%C%);
+  OUTCONV:
+    IN: igraph_attribute_combination_destroy(&%C%);
 
 HRG:
   CTYPE: igraph_hrg_t
@@ -753,19 +757,19 @@ RECIP:
     IN: %C%=REAL(%I%)[0];
 
 SCGMAT:
-  CTYPE: igraph_integer_t
+  CTYPE: igraph_scg_matrix_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_scg_matrix_t) REAL(%I%)[0];
 
 SCGALGO:
-  CTYPE: igraph_integer_t
+  CTYPE: igraph_scg_algorithm_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_scg_algorithm_t) REAL(%I%)[0];
 
 SCGNORM:
-  CTYPE: igraph_integer_t 
+  CTYPE: igraph_scg_norm_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_scg_norm_t) REAL(%I%)[0];
 
 SCGDIR:
   CTYPE: igraph_integer_t
@@ -781,6 +785,17 @@ SPARSEMAT:
            igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
          } \
          IGRAPH_FINALLY(igraph_sparsemat_destroy, &%C%);
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_sparsemat_to_SEXP(&%C%)); \
+         igraph_sparsemat_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
+SPARSEMATPTR:
+  CTYPE: igraph_sparsemat_t
+  CALL: &%C%
+  INCONV:
+    IN: R_SEXP_to_sparsemat(%I%, &%C%);
+    OUT: /* Don't need to init. */
   OUTCONV:
     OUT: PROTECT(%I%=R_igraph_sparsemat_to_SEXP(&%C%)); \
          igraph_sparsemat_destroy(&%C%); \
@@ -913,3 +928,16 @@ VERTEXINDEX_OR_0:
     OUT: PROTECT(%I%=R_igraph_vector_to_SEXP(&%C%)); \
          igraph_vector_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
+
+PLFIT:
+  CTYPE: igraph_plfit_result_t
+  CALL: &%C%
+  OUTCONV: 
+    OUT: PROTECT(%I%=R_igraph_plfit_result_to_SEXP(&%C%));
+
+MAXFLOW_STATS:
+  HEADER:
+  CTYPE: igraph_maxflow_stats_t
+  CALL: &%C%
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_maxflow_stats_to_SEXP(&%C%));

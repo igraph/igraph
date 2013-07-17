@@ -62,7 +62,8 @@ independence.number(graph)
 \seealso{\code{\link{cliques}}}
 \examples{
 # A quite dense graph
-g <- erdos.renyi.game(100, 0.8)
+set.seed(42)
+g <- erdos.renyi.game(100, 0.9)
 independence.number(g)
 independent.vertex.sets(g, min=independence.number(g))
 largest.independent.vertex.sets(g)

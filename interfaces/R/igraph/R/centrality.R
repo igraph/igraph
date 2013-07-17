@@ -26,6 +26,19 @@ igraph.arpack.default <- list(bmat="I", n=0, which="XX", nev=1, tol=0.0,
 
 arpack <- function(func, extra=NULL, sym=FALSE, options=igraph.arpack.default,
                    env=parent.frame(), complex=!sym) {
+
+  if (!is.list(options) ||
+      (is.null(names(options)) && length(options) != 0)) {
+    stop("options must be a named list")
+  }
+  if (any(names(options) == "")) {
+    stop("all options must be named")
+  }
+  if (any(! names(options) %in% names(igraph.arpack.default))) {
+    stop("unkown ARPACK option(s): ",
+         paste(setdiff(names(options), names(igraph.arpack.default)),
+                       collapse=", "))
+  }
   
   options.tmp <- igraph.arpack.default
   options.tmp[ names(options) ] <- options

@@ -25,6 +25,10 @@
 *  along with GLPK. If not, see <http://www.gnu.org/licenses/>.
 ***********************************************************************/
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#endif
+
 #define _GLPSTD_STDIO
 #define _GLPSTD_TIME
 #include "glpmpl.h"

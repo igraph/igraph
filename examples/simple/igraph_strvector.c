@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-int strvector_print(const igraph_strvector_t *sv) {
+void strvector_print(const igraph_strvector_t *sv) {
   long int i, s=igraph_strvector_size(sv);
   for (i=0; i<s; i++) {
     printf("---%s---\n", STR(*sv, i));

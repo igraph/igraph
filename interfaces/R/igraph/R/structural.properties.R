@@ -130,7 +130,7 @@ degree.distribution <- function(graph, cumulative=FALSE, ...) {
     stop("Not a graph object")
   }
   cs <- degree(graph, ...)
-  hi <- hist(cs, -1:max(cs), plot=FALSE)$intensities
+  hi <- hist(cs, -1:max(cs), plot=FALSE)$density
   if (!cumulative) {
     res <- hi
   } else {
@@ -586,7 +586,7 @@ bonpow.sparse <- function(graph, nodes=V(graph), loops=FALSE,
   id <- Diagonal(vg)
 
   ## solve it
-  ev <- solve(id - exponent * d, degree(graph, mode="out"), tol=tol)
+  ev <- Matrix::solve(id - exponent * d, degree(graph, mode="out"), tol=tol)
 
   if (rescale) {
     ev <- ev/sum(ev)
@@ -696,7 +696,7 @@ alpha.centrality.sparse <- function(graph, nodes=V(graph), alpha=1,
 
   ## Solve the equation
   M3 <- M2-alpha*M
-  r <- solve(M3, tol=tol, exo)
+  r <- Matrix::solve(M3, tol=tol, exo)
   
   r[ as.numeric(nodes)]
 }
