@@ -221,6 +221,8 @@ long int FUNCTION(igraph_vector,qsort_ind)(TYPE(igraph_vector) *v,
 /*-----------*/
 
 int FUNCTION(igraph_vector,print)(const TYPE(igraph_vector) *v);
+int FUNCTION(igraph_vector,printf)(const TYPE(igraph_vector) *v,
+																	 const char *format);
 int FUNCTION(igraph_vector,fprint)(const TYPE(igraph_vector) *v, FILE *file);
 
 #ifdef BASE_COMPLEX
