@@ -1304,6 +1304,56 @@ PyObject *igraphmodule_Graph_are_connected(igraphmodule_GraphObject * self,
   Py_RETURN_FALSE;
 }
 
+PyObject *igraphmodule_Graph_adjacency_spectral_embedding(
+  igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
+	static char *kwlist[] = { "no", "c", "arpack_options", NULL };
+	long int no=-1;
+	double c=0;
+  PyObject *arpack_options_o = igraphmodule_arpack_options_default;
+  igraphmodule_ARPACKOptionsObject *arpack_options;
+	igraph_vector_t D;
+	igraph_matrix_t U, V;
+	PyObject *D_o, *U_o, *V_o;
+	
+	if (!PyArg_ParseTupleAndKeywords(args, kwds, "ld|O!", kwlist, &no, &c,
+																	 &igraphmodule_ARPACKOptionsType,
+																	 &arpack_options)) {
+		return NULL;
+	}
+	
+	if (igraph_vector_init(&D, 0)) {
+		return igraphmodule_handle_igraph_error();
+  }
+	if (igraph_matrix_init(&U, 0, 0)) {
+		igraph_vector_destroy(&D);
+		return igraphmodule_handle_igraph_error();
+	}
+	if (igraph_matrix_init(&V, 0, 0)) {
+		igraph_vector_destroy(&D);
+		igraph_matrix_destroy(&U);
+		return igraphmodule_handle_igraph_error();
+	}	
+  arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
+	
+	if (igraph_adjacency_spectral_embedding(&self->g, no, &D, &U, &V, c,
+											igraphmodule_ARPACKOptions_get(arpack_options))) {
+		igraphmodule_handle_igraph_error();
+		igraph_vector_destroy(&D);
+		igraph_matrix_destroy(&U);
+		igraph_matrix_destroy(&V);
+		return NULL;
+	}
+
+	D_o = igraphmodule_vector_t_to_PyList(&D, IGRAPHMODULE_TYPE_FLOAT);
+	igraph_vector_destroy(&D);
+	U_o = igraphmodule_matrix_t_to_PyList(&U, IGRAPHMODULE_TYPE_FLOAT);
+	igraph_matrix_destroy(&U);
+	V_o = igraphmodule_matrix_t_to_PyList(&V, IGRAPHMODULE_TYPE_FLOAT);
+	igraph_matrix_destroy(&V);
+	
+	return Py_BuildValue("NNN", D_o, U_o, V_o);
+}
+
 /** \ingroup python_interface_graph
  * \brief Returns the ID of an arbitrary edge between the given two vertices
  * \sa igraph_get_eid
@@ -11977,6 +12027,11 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param v2: the second vertex\n"
    "@return: C{True} if there exists an edge from v1 to v2, C{False}\n"
    "  otherwise.\n"},
+
+	{"adjacency_spectral_embedding", (PyCFunction) igraphmodule_Graph_adjacency_spectral_embedding,
+	 METH_VARARGS | METH_KEYWORDS, 
+	 "adjacency_spectral_embedding(graph, no, c, arpack_options=None)\n\n"
+	},
 
   /* interface to igraph_articulation_points */
   {"articulation_points", (PyCFunction)igraphmodule_Graph_articulation_points,
