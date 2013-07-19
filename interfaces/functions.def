@@ -1796,6 +1796,16 @@ igraph_maximum_bipartite_matching:
        IGNORE: RR
 
 #######################################
+# Embedding
+#######################################
+
+igraph_adjacency_spectral_embedding:
+       PARAMS: GRAPH graph, INTEGER no, OUT VECTOR D, OUT MATRIX U, \
+               OUT MATRIX V, REAL c, \
+               INOUT ARPACKOPT options=igraph.arpack.default
+       NAME-R: adjacency.spectral.embedding
+
+#######################################
 # Fitting power laws
 #######################################
 
