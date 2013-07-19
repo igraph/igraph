@@ -117,6 +117,7 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
 	options->start=0;							/* random start vector */
 	options->nev=no;
   options->which[0]='L'; options->which[1]='A';
+	if (options->ncv <= options->nev) { options->ncv = 0; }
 	
 	IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_asembedding,
 																		 &data, options, 0, D, U));
