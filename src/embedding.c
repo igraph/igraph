@@ -26,8 +26,7 @@
 #include "igraph_adjlist.h"
 
 typedef struct {
-	igraph_real_t c;
-	igraph_vector_t *degree;
+	const igraph_vector_t *cvec;
 	igraph_adjlist_t *outlist, *inlist;
 	igraph_vector_t *tmp;
 } igraph_i_asembedding_data_t;
@@ -35,10 +34,9 @@ typedef struct {
 int igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
 												 int n, void *extra) {
 	igraph_i_asembedding_data_t *data=extra;
-	igraph_real_t c=data->c;
 	igraph_adjlist_t *outlist=data->outlist;
 	igraph_adjlist_t *inlist=data->inlist;
-	igraph_vector_t *degree=data->degree;
+	const igraph_vector_t *cvec=data->cvec;
 	igraph_vector_t *tmp=data->tmp;
 	igraph_vector_t *neis;
 	int i, j, nlen;
@@ -52,7 +50,7 @@ int igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
 			long int nei=(long int) VECTOR(*neis)[j];
 			VECTOR(*tmp)[i] += from[nei];
 		}
-		VECTOR(*tmp)[i] += c * VECTOR(*degree)[i] * from[i];
+		VECTOR(*tmp)[i] += VECTOR(*cvec)[i] * from[i];
 	}
 	
 	/* to = (A+cD) tmp */
@@ -64,7 +62,7 @@ int igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
 			long int nei=(long int) VECTOR(*neis)[j];
 			to[i] += VECTOR(*tmp)[nei];
 		}
-		to[i] += c * VECTOR(*degree)[i] * VECTOR(*tmp)[i];
+		to[i] += VECTOR(*cvec)[i] * VECTOR(*tmp)[i];
 	}
 	
 	return 0;
@@ -74,15 +72,15 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
 																				igraph_integer_t no,
 																				igraph_vector_t *D,
 																				igraph_matrix_t *U, 
-																				igraph_matrix_t *V, 
-																				igraph_real_t c,
+																				igraph_matrix_t *V,
+																				const igraph_vector_t *cvec,
 																				igraph_arpack_options_t *options) {
 
 	igraph_integer_t vc=igraph_vcount(graph);
-	igraph_vector_t deg, tmp;
+	igraph_vector_t tmp;
 	igraph_adjlist_t outlist, inlist;
-	int i;
-	igraph_i_asembedding_data_t data={ c, &deg, &outlist, &inlist, &tmp };
+	int i, cveclen=igraph_vector_size(cvec);
+	igraph_i_asembedding_data_t data={ cvec, &outlist, &inlist, &tmp };
 	
 	if (no > vc) { 
 		IGRAPH_ERROR("Too many singular values requested", IGRAPH_EINVAL);
@@ -91,12 +89,17 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
 		IGRAPH_ERROR("No singular values requested", IGRAPH_EINVAL);
 	}
 
+	if (cveclen != 1 && cveclen != vc) {
+		IGRAPH_ERROR("Augmentation vector size is invalid, it should be "
+								 "the number of vertices or scalar", IGRAPH_EINVAL);
+	}
+
 	IGRAPH_CHECK(igraph_vector_resize(D, no));
 	IGRAPH_CHECK(igraph_matrix_resize(U, vc, no));
 	IGRAPH_CHECK(igraph_matrix_resize(V, vc, no));
 
 	/* empty graph */
-	if (igraph_ecount(graph) == 0) {
+	if (vc == 1 && igraph_ecount(graph) == 0) {
 		igraph_vector_null(D);
 		igraph_matrix_null(U);
 		igraph_matrix_null(V);
@@ -105,11 +108,6 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
 
 	igraph_vector_init(&tmp, vc);
 	IGRAPH_FINALLY(igraph_vector_destroy, &tmp);
-	igraph_vector_init(&deg, vc);
-	IGRAPH_FINALLY(igraph_vector_destroy, &deg);
-	IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_ALL, 
-														 /*loops=*/ 0));
-	
 	IGRAPH_CHECK(igraph_adjlist_init(graph, &outlist, IGRAPH_OUT));
 	IGRAPH_CHECK(igraph_adjlist_init(graph, &inlist, IGRAPH_IN));
 
@@ -135,9 +133,8 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
 		VECTOR(*D)[i] = sqrt(VECTOR(*D)[i]);
 	}
 	
-	igraph_vector_destroy(&deg);
 	igraph_vector_destroy(&tmp);
-	IGRAPH_FINALLY_CLEAN(2);
+	IGRAPH_FINALLY_CLEAN(1);
 	
 	return 0;
 }

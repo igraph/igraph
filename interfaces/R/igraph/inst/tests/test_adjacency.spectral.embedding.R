@@ -4,14 +4,12 @@ context("adjacency spectral embedding")
 test_that("adjacency.spectral.embedding works", {
   library(igraph)
 
-  c <- 1/2
   no <- 3
-  
   g <- graph.tree(10, 3, mode="out")
-  asm <- adjacency.spectral.embedding(g, no=no, c=c)
+  asm <- adjacency.spectral.embedding(g, no=no, cvec=degree(g)/2)
 
   A <- get.adjacency(g)
-  A <- A + c * diag(degree(g))
+  A <- A + 1/2 * diag(degree(g))
   asm2 <- svd(A)
 
   std <- function(x) {

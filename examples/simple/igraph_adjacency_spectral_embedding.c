@@ -39,6 +39,7 @@ int main() {
 	igraph_vector_t D;
 	igraph_matrix_t U, V;
 	igraph_arpack_options_t options;
+	igraph_vector_t cvec;
 	
 	igraph_tree(&graph, /*n=*/ 10, /*children=*/ 3, IGRAPH_TREE_OUT);
 
@@ -47,16 +48,24 @@ int main() {
 	igraph_matrix_init(&V, 0, 0);
 	igraph_arpack_options_init(&options);
 
-	igraph_adjacency_spectral_embedding(&graph, 4, &D, &U, &V, /*c=*/ .5, 
+	igraph_vector_init(&cvec, 0);
+	igraph_degree(&graph, &cvec, igraph_vss_all(), IGRAPH_ALL,
+								IGRAPH_LOOPS);
+	igraph_vector_scale(&cvec, .5);
+
+	igraph_adjacency_spectral_embedding(&graph, 4, &D, &U, &V, &cvec,
 																			&options);
 	
 	igraph_vector_printf(&D, "%8.4f"); printf("--\n");
 	igraph_matrix_printf(&U, "%8.4f"); printf("--\n");
 	igraph_matrix_printf(&V, "%8.4f");
 	
+	igraph_vector_destroy(&cvec);
 	igraph_matrix_destroy(&V);
 	igraph_matrix_destroy(&U);
 	igraph_vector_destroy(&D);
+
+	igraph_destroy(&graph);
 
 	return 0;
 }

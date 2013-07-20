@@ -1306,44 +1306,66 @@ PyObject *igraphmodule_Graph_are_connected(igraphmodule_GraphObject * self,
 
 PyObject *igraphmodule_Graph_adjacency_spectral_embedding(
   igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
-	static char *kwlist[] = { "no", "c", "arpack_options", NULL };
+	static char *kwlist[] = { "no", "cvec", "arpack_options", NULL };
 	long int no=-1;
-	double c=0;
+	PyObject *cvec_o = Py_None;
   PyObject *arpack_options_o = igraphmodule_arpack_options_default;
   igraphmodule_ARPACKOptionsObject *arpack_options;
+	igraph_vector_t cvec;
 	igraph_vector_t D;
 	igraph_matrix_t U, V;
 	PyObject *D_o, *U_o, *V_o;
 	
-	if (!PyArg_ParseTupleAndKeywords(args, kwds, "ld|O!", kwlist, &no, &c,
-																	 &igraphmodule_ARPACKOptionsType,
+	if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|OO!", kwlist, &no,
+																	 &cvec_o, &igraphmodule_ARPACKOptionsType,
 																	 &arpack_options)) {
 		return NULL;
 	}
 	
+	if (cvec_o == Py_None) {
+		if (igraph_vector_init(&cvec, 0)) {
+			return igraphmodule_handle_igraph_error();
+		}
+		if (igraph_degree(&self->g, &cvec, igraph_vss_all(), IGRAPH_ALL,
+											IGRAPH_LOOPS)) {
+			igraph_vector_destroy(&cvec);
+			return igraphmodule_handle_igraph_error();
+		}
+		igraph_vector_scale(&cvec, 1.0/(igraph_vcount(&self->g)-1.0));
+	} else {
+		if (igraphmodule_PyObject_float_to_vector_t(cvec_o, &cvec)) {
+			return NULL;
+		}
+  }
+
 	if (igraph_vector_init(&D, 0)) {
+		if (cvec_o == Py_None) { igraph_vector_destroy(&cvec); }
 		return igraphmodule_handle_igraph_error();
   }
 	if (igraph_matrix_init(&U, 0, 0)) {
+		if (cvec_o == Py_None) { igraph_vector_destroy(&cvec); }
 		igraph_vector_destroy(&D);
 		return igraphmodule_handle_igraph_error();
 	}
 	if (igraph_matrix_init(&V, 0, 0)) {
+		if (cvec_o == Py_None) { igraph_vector_destroy(&cvec); }
 		igraph_vector_destroy(&D);
 		igraph_matrix_destroy(&U);
 		return igraphmodule_handle_igraph_error();
 	}	
   arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
 	
-	if (igraph_adjacency_spectral_embedding(&self->g, no, &D, &U, &V, c,
+	if (igraph_adjacency_spectral_embedding(&self->g, no, &D, &U, &V, &cvec,
 											igraphmodule_ARPACKOptions_get(arpack_options))) {
 		igraphmodule_handle_igraph_error();
+		if (cvec_o == Py_None) { igraph_vector_destroy(&cvec); }
 		igraph_vector_destroy(&D);
 		igraph_matrix_destroy(&U);
 		igraph_matrix_destroy(&V);
 		return NULL;
 	}
 
+	if (cvec_o == Py_None) { igraph_vector_destroy(&cvec); }
 	D_o = igraphmodule_vector_t_to_PyList(&D, IGRAPHMODULE_TYPE_FLOAT);
 	igraph_vector_destroy(&D);
 	U_o = igraphmodule_matrix_t_to_PyList(&U, IGRAPHMODULE_TYPE_FLOAT);
@@ -12030,7 +12052,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
 
 	{"adjacency_spectral_embedding", (PyCFunction) igraphmodule_Graph_adjacency_spectral_embedding,
 	 METH_VARARGS | METH_KEYWORDS, 
-	 "adjacency_spectral_embedding(graph, no, c, arpack_options=None)\n\n"
+	 "adjacency_spectral_embedding(no, cvec=None, arpack_options=None)\n\n"
 	},
 
   /* interface to igraph_articulation_points */

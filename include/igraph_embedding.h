@@ -39,12 +39,12 @@
 
 __BEGIN_DECLS
 
-int igraph_adjacency_spectral_embedding(const igraph_t *graph, 
+int igraph_adjacency_spectral_embedding(const igraph_t *graph,
 																				igraph_integer_t no,
 																				igraph_vector_t *D,
-																				igraph_matrix_t *U, 
-																				igraph_matrix_t *V, 
-																				igraph_real_t c,
+																				igraph_matrix_t *U,
+																				igraph_matrix_t *V,
+																				const igraph_vector_t *cvec,
 																				igraph_arpack_options_t *options);
 
 __END_DECLS

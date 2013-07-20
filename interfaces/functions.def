@@ -1801,9 +1801,10 @@ igraph_maximum_bipartite_matching:
 
 igraph_adjacency_spectral_embedding:
        PARAMS: GRAPH graph, INTEGER no, OUT VECTOR D, OUT MATRIX U, \
-               OUT MATRIX V, REAL c, \
+               OUT MATRIX V, VECTOR cvec=AsmDefaultCvec, \
                INOUT ARPACKOPT options=igraph.arpack.default
        NAME-R: adjacency.spectral.embedding
+       DEPS: cvec ON graph
 
 #######################################
 # Fitting power laws

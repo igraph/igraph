@@ -19,6 +19,8 @@ BOOLEAN:
 
 VECTOR:
     INCONV: %I% <- as.numeric(%I%)
+    DEFAULT:
+       AsmDefaultCvec: degree(%I1%)/(vcount(%I1%)-1)
 
 VERTEXINDEX:
     OUTCONV: 
