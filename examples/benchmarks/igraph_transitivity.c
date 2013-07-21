@@ -24,8 +24,6 @@
 #include <igraph.h>
 
 #include "bench.h"
-#undef  BENCH_THRESH
-#define BENCH_THRESH std::chrono::minutes(1)
 
 #define N 6000
 #define M 2000000
@@ -39,7 +37,7 @@ int main() {
 													IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
 	igraph_vector_init(&trans, igraph_vcount(&g));	
 
-	BENCH(1----TransitivityGNM,
+	BENCH("1 Transitivity GNM   ",
 				igraph_transitivity_local_undirected(&g, &trans, igraph_vss_all(),
 																						 IGRAPH_TRANSITIVITY_NAN);
 				);
@@ -49,7 +47,7 @@ int main() {
 											 /*outpref=*/ 0, /*A=*/ 1, IGRAPH_UNDIRECTED, 
 											 IGRAPH_BARABASI_PSUMTREE, /*start_from=*/ 0);
 
-	BENCH(2-TransitivitySkewed,
+	BENCH("2 Transitivity Skewed",
 				igraph_transitivity_local_undirected(&g, &trans, igraph_vss_all(),
 																						 IGRAPH_TRANSITIVITY_NAN);
 				);

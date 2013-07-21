@@ -1,122 +1,53 @@
-#pragma once
+/* -*- mode: C -*-  */
+/* 
+   IGraph library.
+   Copyright (C) 2013  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard st, Cambridge MA, 02139 USA
+   
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   02110-1301 USA
 
-// Copyright (c) 2012, Sebastian Jeltsch (sjeltsch@kip.uni-heidelberg.de)
-// Distributed under the terms of the GPLv2 or newer
+*/
 
-#include <chrono>
-#include <string>
+#ifndef IGRAPH_BENCH_H
+#define IGRAPH_BENCH_H
 
-#include <iostream>
-#include <iomanip>
-#include <map>
+inline void igraph_get_cpu_time(igraph_real_t *data) {
 
-#define BENCH_THRESH    std::chrono::seconds(1)
-#define BENCH_DURATION  std::chrono::nanoseconds
-#define BENCH_CLOCK     std::chrono::steady_clock
-#define BENCH_SPACING   12
-
-#define BENCH_QUOTE(STR) #STR
-#define BENCH_TO_STRING(STR) BENCH_QUOTE(STR)
-
-namespace bench {
-
-using namespace std::chrono;
-
-typedef time_point<BENCH_CLOCK> time_t;
-
-namespace detail {
-
-inline
-double reference_time(
-	std::string const& name,
-	double const measured_frequency)
-{
-	typedef std::map<std::string, double> type;
-	static type _m;
-
-	type::iterator it;
-	if ((it = _m.find(name)) != _m.end())
-		return it->second;
-
-	_m[name] = measured_frequency;
-	return measured_frequency;
+	struct rusage self, children;
+	getrusage(RUSAGE_SELF, &self);
+	getrusage(RUSAGE_CHILDREN, &children);
+	data[0] = (double) self.ru_utime.tv_sec +	
+		1e-3 * (self.ru_utime.tv_usec/1000);
+	data[1] = (double) self.ru_stime.tv_sec +
+		1e-3 * (self.ru_stime.tv_usec/1000);
+	data[2] = (double) children.ru_utime.tv_sec +
+		1e-3 * (children.ru_utime.tv_usec/1000);
+	data[3] = (double) children.ru_stime.tv_sec +
+		1e-3 * (children.ru_stime.tv_usec/1000);
 }
 
-inline
-double duration_to_frequency(
-	size_t const iterations,
-	BENCH_DURATION const duration)
-{
-	return double(iterations) / duration_cast<nanoseconds>(duration).count() *
-		nanoseconds::period::den;
-}
+#define BENCH(NAME, ...)	do {														 \
+	double start[4], stop[4];																 \
+	igraph_get_cpu_time(start);															 \
+	{ __VA_ARGS__; };																				 \
+	igraph_get_cpu_time(stop);															 \
+	printf("%s %.3gs\n", NAME,															 \
+				 stop[0]+stop[1]+stop[2]+stop[3] -								 \
+				 start[0]-start[1]-start[2]-start[3]);						 \
+	} while (0)
 
-template<typename Time>
-inline
-BENCH_DURATION delta_t(Time const t)
-{
-	return duration_cast<BENCH_DURATION>(BENCH_CLOCK::now() - t);
-}
+#endif
 
-inline
-void message(
-	std::string const& name,
-	size_t const iterations,
-	BENCH_DURATION const duration)
-{
-	double frequency = duration_to_frequency(iterations, duration);
-	double reference = reference_time(name, frequency);
-
-	using namespace std;
-	cout << setw(BENCH_SPACING) << left << name << right;
-	cout.precision(2);
-	cout << setw(BENCH_SPACING) << frequency   << " it/s    "
-	     << setw(BENCH_SPACING) << 1/frequency << " s/it    "
-	     << setw(BENCH_SPACING) << fixed << reference/frequency * 100 << "%"
-		 << std::endl;
-}
-
-} // namespace detail
-
-template <class T>
-inline
-void preserve(T&& val)
-{
-	  asm volatile("" : "+r" (val));
-}
-
-template<typename Lambda>
-void run(
-	std::string const& name,
-	Lambda const& code,
-	size_t const iterations = 1,
-	size_t const offset = 0,
-	time_t const time = BENCH_CLOCK::now())
-{
-	for (size_t ii = offset; ii < iterations ; ++ii)
-		code();
-
-	detail::message(name, iterations, detail::delta_t(time));
-}
-
-} // namespace bench
-
-#define BENCH(NAME, ...) \
-{ \
-	auto __lambda = [&](){ __VA_ARGS__ }; \
-	auto __t = BENCH_CLOCK::now(); \
-	__lambda(); \
-	auto __d = bench::detail::delta_t(__t); \
-	size_t __end = BENCH_THRESH / \
-		(__d.count() ? __d : std::chrono::nanoseconds(1)); \
-	bench::run(BENCH_TO_STRING(NAME), __lambda, __end, 1, __t); \
-}
-
-#define BENCH_N(NAME, N, ...) \
-{ \
-	auto __lambda = [&](){ __VA_ARGS__ }; \
-	bench::run(BENCH_TO_STRING(NAME), __lambda, N); \
-}
-
-#undef BENCH_DURATION
-#undef BENCH_SPACING
