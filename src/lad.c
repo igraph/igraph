@@ -645,11 +645,6 @@ int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
      for every u in 0..nbU-1, there exists a different v in 0..nb-1
      such that v is adjacent to u; returns false otherwise */
 	
-  if (sizeOfU>sizeOfV) {
-    *invalid = 1; /* trivial case of infeasibility */
-    return 0; 
-  }
-	
   int *matchedWithV; /* matchedWithV[matchedWithU[u]]=u */
   int *nbPred; /* nbPred[i] = nb of predecessors of the ith
 		  vertex of V in the DAG */
@@ -673,6 +668,11 @@ int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
   int *posInUnmatched; /* unmatched[posInUnmatched[u]]=u */
   igraph_vector_int_t path;
 
+  if (sizeOfU>sizeOfV) {
+    *invalid = 1; /* trivial case of infeasibility */
+    return 0; 
+  }
+	
   ALLOC_ARRAY(matchedWithV, sizeOfV, int);
   ALLOC_ARRAY(nbPred, sizeOfV, int);
   ALLOC_ARRAY(pred, sizeOfV*sizeOfU, int);
