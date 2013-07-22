@@ -95,15 +95,14 @@ structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 		$(SRCDIR)/centrality.c $(SRCDIR)/decomposition.c \
 		$(SRCDIR)/mixing.c $(INCLUDEDIR)/igraph_arpack.h \
 		$(SRCDIR)/distances.c $(SRCDIR)/feedback_arc_set.c \
-		$(SRCDIR)/matching.c
-
+		$(SRCDIR)/matching.c $(SRCDIR)/triangles.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ \
 	$(SRCDIR)/structural_properties.c $(SRCDIR)/spanning_trees.c \
 	$(SRCDIR)/conversion.c $(SRCDIR)/basic_query.c $(SRCDIR)/cocitation.c \
 	$(SRCDIR)/components.c $(SRCDIR)/spectral_properties.c $(SRCDIR)/cores.c \
 	$(SRCDIR)/centrality.c $(SRCDIR)/decomposition.c $(SRCDIR)/mixing.c \
 	$(INCLUDEDIR)/igraph_arpack.h  $(SRCDIR)/distances.c \
-	$(SRCDIR)/feedback_arc_set.c $(SRCDIR)/matching.c
+	$(SRCDIR)/feedback_arc_set.c $(SRCDIR)/matching.c $(SRCDIR)/triangles.c
 
 iterators.xml: iterators.xxml $(SRCDIR)/iterators.c $(INCLUDEDIR)/igraph_iterators.h
 	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/iterators.c \
