@@ -34,6 +34,10 @@
 # define __END_DECLS /* empty */
 #endif
 
+#include "igraph_datatype.h"
+#include "igraph_constants.h"
+#include "igraph_iterators.h"
+
 __BEGIN_DECLS
 
 int igraph_transitivity_undirected(const igraph_t *graph, 

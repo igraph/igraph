@@ -2573,6 +2573,20 @@ int FUNCTION(igraph_vector,print)(const TYPE(igraph_vector) *v) {
   printf("\n");
   return 0;
 }
+
+int FUNCTION(igraph_vector,printf)(const TYPE(igraph_vector) *v,
+																	 const char *format) {
+  long int i, n=FUNCTION(igraph_vector,size)(v);
+  if (n!=0) {
+    printf(format, VECTOR(*v)[0]);
+  }
+  for (i=1; i<n; i++) {
+    putchar(' '); printf(format, VECTOR(*v)[i]);
+  }
+  printf("\n");
+  return 0;
+}
+
 #endif
 
 int FUNCTION(igraph_vector,fprint)(const TYPE(igraph_vector) *v, FILE *file) {
