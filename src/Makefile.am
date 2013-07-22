@@ -167,7 +167,8 @@ HEADERS_PRIVATE = atlas-edges.h \
 		hrg_graph_simp.h foreign-gml-header.h \
 		foreign-ncol-header.h foreign-lgl-header.h \
 		foreign-pajek-header.h igraph_interrupt_internal.h \
-		scg_headers.h igraph_hacks_internal.h
+		scg_headers.h igraph_hacks_internal.h triangles_template.h \
+    triangles_template1.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \

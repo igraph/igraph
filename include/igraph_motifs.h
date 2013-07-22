@@ -36,6 +36,7 @@
 
 #include "igraph_types.h"
 #include "igraph_datatype.h"
+#include "igraph_iterators.h"
 
 __BEGIN_DECLS
 
@@ -92,6 +93,11 @@ int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
 int igraph_triad_census(const igraph_t *igraph, igraph_vector_t *res);
 int igraph_triad_census_24(const igraph_t *graph, igraph_integer_t *res2,
 			   igraph_integer_t *res4);
+
+int igraph_adjacenct_triangles(const igraph_t *graph,
+															 igraph_vector_t *res,
+															 const igraph_vs_t vids);
+
 
 __END_DECLS
 

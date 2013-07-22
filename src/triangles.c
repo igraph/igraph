@@ -28,6 +28,7 @@
 #include "igraph_memory.h"
 #include "igraph_interrupt_internal.h"
 #include "igraph_centrality.h"
+#include "igraph_motifs.h"
 
 /**
  * \function igraph_transitivity_avglocal_undirected
@@ -173,69 +174,14 @@ int igraph_transitivity_local_undirected1(const igraph_t *graph,
 					  igraph_vector_t *res,
 					  const igraph_vs_t vids,
 					  igraph_transitivity_mode_t mode) {
-  
-  long int no_of_nodes=igraph_vcount(graph);
-  igraph_vit_t vit;
-  long int nodes_to_calc;
-  igraph_vector_t *neis1, *neis2;
-  igraph_real_t triples, triangles;
-  long int i, j, k;
-  long int neilen1, neilen2;
-  long int *neis;
-  igraph_lazy_adjlist_t adjlist;
-
-  IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
-  IGRAPH_FINALLY(igraph_vit_destroy, &vit);
-  nodes_to_calc=IGRAPH_VIT_SIZE(vit);
-
-  neis=igraph_Calloc(no_of_nodes, long int);
-  if (neis==0) {
-    IGRAPH_ERROR("local undirected transitivity failed", IGRAPH_ENOMEM);
-  }
-  IGRAPH_FINALLY(igraph_free, neis);
-
-  IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
-
-  igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_SIMPLIFY);
-  IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);  
-
-  for (i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-    long int node=IGRAPH_VIT_GET(vit);
-    
-    IGRAPH_ALLOW_INTERRUPTION();
-    
-    neis1=igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) node);
-    neilen1=igraph_vector_size(neis1);
-    for (j=0; j<neilen1; j++) {
-      neis[ (long int)VECTOR(*neis1)[j] ] = i+1;
-    }
-    triples = (double)neilen1*(neilen1-1);
-    triangles = 0;
-
-    for (j=0; j<neilen1; j++) {
-      long int v=(long int) VECTOR(*neis1)[j];
-      neis2=igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) v);
-      neilen2=igraph_vector_size(neis2);
-      for (k=0; k<neilen2; k++) {
-				long int v2=(long int) VECTOR(*neis2)[k];
-				if (neis[v2] == i+1) {
-					triangles += 1.0;
-				}
-      }
-    }
-		
-    if (mode == IGRAPH_TRANSITIVITY_ZERO && triples == 0)
-      VECTOR(*res)[i] = 0.0;
-    else
-      VECTOR(*res)[i] = triangles/triples;
-/*     fprintf(stderr, "%f %f\n", triangles, triples); */
-  }
-
-  igraph_lazy_adjlist_destroy(&adjlist);
-  igraph_Free(neis);
-  igraph_vit_destroy(&vit);
-  IGRAPH_FINALLY_CLEAN(3);
-  return 0;
+	
+#define TRIPLES
+#define TRANSIT
+#include "triangles_template1.h"
+#undef TRIPLES
+#undef TRANSIT	
+	
+	return 0;
 }
 
 int igraph_transitivity_local_undirected2(const igraph_t *graph, 
@@ -486,91 +432,11 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
 					  const igraph_vs_t vids,
 					  igraph_transitivity_mode_t mode) {
 
-  long int no_of_nodes=igraph_vcount(graph);
-  long int node, i, j, nn;
-  igraph_adjlist_t allneis;
-  igraph_vector_t *neis1, *neis2;
-  long int neilen1, neilen2, deg1;
-  igraph_integer_t triples;
-  long int *neis;
-  long int maxdegree;
-
-  igraph_vector_int_t order;
-  igraph_vector_int_t rank;
-  igraph_vector_t degree;
-  
-  if (!igraph_vs_is_all(&vids)) {
-    IGRAPH_ERROR("Internal error, wrong transitivity function called", 
-		 IGRAPH_EINVAL);
-  }
-
-	igraph_vector_int_init(&order, no_of_nodes);
-	IGRAPH_FINALLY(igraph_vector_int_destroy, &order);
-  IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
-  
-  IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
-			     IGRAPH_LOOPS));
-  maxdegree=(long int) igraph_vector_max(&degree)+1;
-  igraph_vector_order1_int(&degree, &order, maxdegree);
-	igraph_vector_int_init(&rank, no_of_nodes);
-	IGRAPH_FINALLY(igraph_vector_int_destroy, &rank);
-  for (i=0; i<no_of_nodes; i++) {
-    VECTOR(rank)[ VECTOR(order)[i] ] = no_of_nodes-i-1;
-  }
-  
-  IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL));
-  IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
-  IGRAPH_CHECK(igraph_i_trans4_al_simplify(&allneis, &rank));
-  
-  neis=igraph_Calloc(no_of_nodes, long int);
-  if (neis==0) {
-    IGRAPH_ERROR("undirected local transitivity failed", IGRAPH_ENOMEM);
-  }
-  IGRAPH_FINALLY(igraph_free, neis);
-  
-  IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
-  igraph_vector_null(res);
-  
-  for (nn=no_of_nodes-1; nn>=0; nn--) {
-    node=VECTOR(order)[nn];
-    
-    IGRAPH_ALLOW_INTERRUPTION();
-    
-    neis1=igraph_adjlist_get(&allneis, node);
-    neilen1=igraph_vector_size(neis1);
-		deg1=(long int) VECTOR(degree)[node];
-    triples=(igraph_integer_t) ((double)deg1*(deg1-1)/2);
-    /* Mark the neighbors of the node */
-    for (i=0; i<neilen1; i++) {
-      neis[ (long int) VECTOR(*neis1)[i] ] = node+1;
-    }
-    
-    for (i=0; i<neilen1; i++) {
-      long int nei=(long int) VECTOR(*neis1)[i];
-			neis2=igraph_adjlist_get(&allneis, nei);
-			neilen2=igraph_vector_size(neis2);
-			for (j=0; j<neilen2; j++) {
-				long int nei2=(long int) VECTOR(*neis2)[j];
-				if (neis[nei2] == node+1) {
-					VECTOR(*res)[nei2] += 1;
-					VECTOR(*res)[nei] += 1;
-					VECTOR(*res)[node] += 1;
-				}
-      }
-    }
-
-    if (mode == IGRAPH_TRANSITIVITY_ZERO && triples == 0)
-      VECTOR(*res)[node] = 0.0;
-    else
-      VECTOR(*res)[node] /= triples;
-  }
-
-  igraph_free(neis);
-  igraph_adjlist_destroy(&allneis);
-  igraph_vector_int_destroy(&rank);
-	igraph_vector_destroy(&degree);
-  igraph_vector_int_destroy(&order);
-  IGRAPH_FINALLY_CLEAN(5);
+#define TRIPLES 1
+#define TRANSIT 1
+#include "triangles_template.h"
+#undef TRIPLES
+#undef TRANSIT
   
   return 0;
 }
@@ -636,6 +502,32 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
   }
   
   return 0;
+}
+
+int igraph_adjacent_triangles1(const igraph_t *graph,
+															 igraph_vector_t *res,
+															 const igraph_vs_t vids) {
+	#include "triangles_template1.h"
+	return 0;
+}
+
+int igraph_adjacent_triangles4(const igraph_t *graph,
+															 igraph_vector_t *res) {
+	#include "triangles_template.h"
+	return 0;
+}
+
+int igraph_adjacenct_triangles(const igraph_t *graph,
+															 igraph_vector_t *res,
+															 const igraph_vs_t vids) {
+  if (igraph_vs_is_all(&vids)) {
+    return igraph_adjacent_triangles4(graph, res);
+  } else {
+		return igraph_adjacent_triangles1(graph, res, vids);
+  }
+  
+  return 0;
+
 }
 
 /**
