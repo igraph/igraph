@@ -167,7 +167,8 @@ HEADERS_PRIVATE = atlas-edges.h \
 		hrg_graph_simp.h foreign-gml-header.h \
 		foreign-ncol-header.h foreign-lgl-header.h \
 		foreign-pajek-header.h igraph_interrupt_internal.h \
-		scg_headers.h igraph_hacks_internal.h
+		scg_headers.h igraph_hacks_internal.h triangles_template.h \
+    triangles_template1.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
@@ -257,7 +258,7 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     distances.c fortran_intrinsics.c matching.c \
 			     scg.c scg_approximate_methods.c scg_exact_scg.c \
 			     scg_kmeans.c scg_utils.c scg_optimal_method.c \
-			     qsort.c qsort_r.c types.c lad.c hacks.c embedding.c
+			     qsort.c qsort_r.c types.c lad.c hacks.c embedding.c triangles.c
 
 libigraph_la_SOURCES       = $(SOURCES) $(HEADERS_PRIVATE)
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
