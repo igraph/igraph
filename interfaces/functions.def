@@ -1429,6 +1429,15 @@ igraph_scan1:
         PARAMS: GRAPH graph, OUT VECTOR res
         NAME-R: scan1
 
+igraph_scan1_approximate:
+        PARAMS: GRAPH graph, OUT VECTOR res, INT noevals, \
+                INOUT ARPACKOPT options=igraph.arpack.default
+        NAME-R: scan1.approx
+
+igraph_scan1_approximate_eigen:
+        PARAMS: GRAPH graph, OUT VECTOR res, VECTOR values, MATRIX vectors
+        NAME-R: scan1.approx.eigen
+
 #######################################
 # Graph operators
 #######################################
