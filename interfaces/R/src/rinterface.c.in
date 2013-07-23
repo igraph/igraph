@@ -2864,6 +2864,67 @@ SEXP R_igraph_arpack_options_to_SEXP(const igraph_arpack_options_t *opt) {
   return result;  
 }
 
+int R_SEXP_to_igraph_eigen_which(SEXP in, igraph_eigen_which_t *out) {
+	SEXP pos=PROTECT(AS_CHARACTER(R_igraph_getListElement(in, "pos")));
+	SEXP balance=PROTECT(AS_CHARACTER(R_igraph_getListElement
+																		(in, "balance")));
+
+	if (!strcasecmp(CHAR(STRING_ELT(pos, 0)), "lm")) { 
+		out->pos=IGRAPH_EIGEN_LM; 
+	} else if (!strcasecmp(CHAR(STRING_ELT(pos, 0)), "sm")) {
+		out->pos=IGRAPH_EIGEN_SM;
+	} else if (!strcasecmp(CHAR(STRING_ELT(pos, 0)), "la")) {
+		out->pos=IGRAPH_EIGEN_LA;
+	} else if (!strcasecmp(CHAR(STRING_ELT(pos, 0)), "sa")) {
+		out->pos=IGRAPH_EIGEN_SA;
+	} else if (!strcasecmp(CHAR(STRING_ELT(pos, 0)), "be")) {
+		out->pos=IGRAPH_EIGEN_BE;
+	} else if (!strcasecmp(CHAR(STRING_ELT(pos, 0)), "lr")) {
+		out->pos=IGRAPH_EIGEN_LR;
+	} else if (!strcasecmp(CHAR(STRING_ELT(pos, 0)), "sr")) {
+		out->pos=IGRAPH_EIGEN_SR;
+	} else if (!strcasecmp(CHAR(STRING_ELT(pos, 0)), "li")) {
+		out->pos=IGRAPH_EIGEN_LI;
+	} else if (!strcasecmp(CHAR(STRING_ELT(pos, 0)), "si")) {
+		out->pos=IGRAPH_EIGEN_SI;
+	} else if (!strcasecmp(CHAR(STRING_ELT(pos, 0)), "all")) {
+		out->pos=IGRAPH_EIGEN_ALL;
+	} else if (!strcasecmp(CHAR(STRING_ELT(pos, 0)), "interval")) {
+		out->pos=IGRAPH_EIGEN_INTERVAL;
+	} else if (!strcasecmp(CHAR(STRING_ELT(pos, 0)), "select")) {
+		out->pos=IGRAPH_EIGEN_SELECT;
+	} else {
+		UNPROTECT(2);
+		IGRAPH_ERROR("Unknown eigenvalue position specification", 
+								 IGRAPH_EINVAL);
+	}
+	
+	out->howmany=INTEGER(AS_INTEGER(R_igraph_getListElement
+																	(in, "howmany")))[0];
+	out->il=INTEGER(AS_INTEGER(R_igraph_getListElement(in, "il")))[0];
+	out->iu=INTEGER(AS_INTEGER(R_igraph_getListElement(in, "iu")))[0];
+	out->vl=REAL(AS_NUMERIC(R_igraph_getListElement(in, "vl")))[0];
+	out->vu=REAL(AS_NUMERIC(R_igraph_getListElement(in, "vu")))[0];
+	out->vestimate=INTEGER(AS_INTEGER(R_igraph_getListElement
+																		(in, "vestimate")))[0];
+	
+	if (!strcasecmp(CHAR(STRING_ELT(balance, 0)), "none")) {
+		out->balance=IGRAPH_LAPACK_DGEEVX_BALANCE_NONE;
+	} else if (!strcasecmp(CHAR(STRING_ELT(balance, 0)), "perm")) {
+		out->balance=IGRAPH_LAPACK_DGEEVX_BALANCE_PERM;
+	} else if (!strcasecmp(CHAR(STRING_ELT(balance, 0)), "scale")) {
+		out->balance=IGRAPH_LAPACK_DGEEVX_BALANCE_SCALE;
+	} else if (!strcasecmp(CHAR(STRING_ELT(balance, 0)), "both")) {
+		out->balance=IGRAPH_LAPACK_DGEEVX_BALANCE_BOTH;
+	}	else {
+		UNPROTECT(2);
+		IGRAPH_ERROR("Unknown balance specification", IGRAPH_EINVAL);
+	}
+
+	UNPROTECT(2);
+	return 0;
+}
+
 SEXP R_igraph_bliss_info_to_SEXP(const igraph_bliss_info_t *info) {
   SEXP result, names;
   

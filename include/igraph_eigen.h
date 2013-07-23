@@ -40,14 +40,14 @@
 
 __BEGIN_DECLS
 
-typedef enum { IGRAPH_EIGEN_AUTO,
+typedef enum { IGRAPH_EIGEN_AUTO=0,
 	       IGRAPH_EIGEN_LAPACK,
 	       IGRAPH_EIGEN_ARPACK, 
 	       IGRAPH_EIGEN_COMP_AUTO,
 	       IGRAPH_EIGEN_COMP_LAPACK,
 	       IGRAPH_EIGEN_COMP_ARPACK } igraph_eigen_algorithm_t;
 
-typedef enum { IGRAPH_EIGEN_LM,
+typedef enum { IGRAPH_EIGEN_LM=0,
 	       IGRAPH_EIGEN_SM,
 	       IGRAPH_EIGEN_LA,
 	       IGRAPH_EIGEN_SA,
