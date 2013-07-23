@@ -1816,6 +1816,18 @@ igraph_adjacency_spectral_embedding:
        DEPS: cvec ON graph
 
 #######################################
+# Eigensolvers
+#######################################
+
+igraph_eigen_adjacency:
+       PARAMS: GRAPH graph, EIGENALGO algorithm=ARPACK, \
+               EIGENWHICH which=Default, \
+               INOUT ARPACKOPT options=igraph.arpack.default, \
+               NULL storage, OUT VECTOR values, OUT MATRIX vectors, \
+               NULL cmplxvalues, NULL cmplxvectors
+       NAME-R: graph.eigen
+
+#######################################
 # Fitting power laws
 #######################################
 

@@ -24,6 +24,8 @@
 #include "igraph_eigen.h"
 #include "igraph_qsort.h"
 #include "igraph_blas.h"
+#include "igraph_interface.h"
+#include "igraph_adjlist.h"
 #include <string.h>
 #include <math.h>
 #include <float.h>
@@ -1253,6 +1255,118 @@ int igraph_eigen_matrix(const igraph_matrix_t *A,
   return 0;
 }
 
+int igraph_i_eigen_adjacency_arpack_sym_cb(igraph_real_t *to,
+																					 const igraph_real_t *from,
+																					 int n, void *extra) {
+	igraph_adjlist_t *adjlist = (igraph_adjlist_t *) extra;
+	igraph_vector_t *neis;
+	int i, j, nlen;
+	
+	for (i=0; i<n; i++) {
+		neis=igraph_adjlist_get(adjlist, i);
+		nlen=igraph_vector_size(neis);
+		to[i] = 0.0;
+		for (j=0; j<nlen; j++) {
+			int nei=(int) VECTOR(*neis)[j];
+			to[i] += from[nei];
+		}
+	}
+	
+	return 0;
+}
+
+int igraph_i_eigen_adjacency_arpack(const igraph_t *graph, 
+							const igraph_eigen_which_t *which,
+							igraph_arpack_options_t *options,
+							igraph_arpack_storage_t* storage, 
+							igraph_vector_t *values,
+							igraph_matrix_t *vectors, 
+							igraph_vector_complex_t *cmplxvalues,
+							igraph_matrix_complex_t *cmplxvectors){
+
+	igraph_adjlist_t adjlist;
+	void *extra=(void*) &adjlist;
+	int n=igraph_vcount(graph);
+
+  if (!options) { 
+    IGRAPH_ERROR("`options' must be given for ARPACK algorithm",
+								 IGRAPH_EINVAL);
+  }
+	
+	if (igraph_is_directed(graph)) {
+		IGRAPH_ERROR("ARPACK adjacency eigensolver not implemented for "
+								 "directed graphs", IGRAPH_UNIMPLEMENTED);
+	}
+	if (which->pos == IGRAPH_EIGEN_INTERVAL) {
+		IGRAPH_ERROR("ARPACK adjacency eigensolver does not implement "
+								 "`INTERNAL' eigenvalues", IGRAPH_UNIMPLEMENTED);
+	}
+	if (which->pos == IGRAPH_EIGEN_SELECT) {
+		IGRAPH_ERROR("ARPACK adjacency eigensolver does not implement "
+								 "`SELECT' eigenvalues", IGRAPH_UNIMPLEMENTED);
+	}
+	if (which->pos == IGRAPH_EIGEN_ALL) {
+		IGRAPH_ERROR("ARPACK adjacency eigensolver does not implement "
+								 "`ALL' eigenvalues", IGRAPH_UNIMPLEMENTED);
+	}
+
+	switch (which->pos) {
+	case IGRAPH_EIGEN_LM:
+		options->which[0]='L'; options->which[1]='M';
+		options->nev=which->howmany;
+		break;
+	case IGRAPH_EIGEN_SM:
+		options->which[0]='S'; options->which[1]='M';
+		options->nev=which->howmany;
+		break;
+	case IGRAPH_EIGEN_LA:
+		options->which[0]='L'; options->which[1]='A';
+		options->nev=which->howmany;
+		break;
+	case IGRAPH_EIGEN_SA:
+		options->which[0]='S'; options->which[1]='A';
+		options->nev=which->howmany;
+		break;
+	case IGRAPH_EIGEN_ALL:
+		options->which[0]='L'; options->which[1]='M';
+		options->nev=n;
+		break;
+	case IGRAPH_EIGEN_BE:
+		IGRAPH_ERROR("Eigenvectors from both ends with ARPACK", 
+								 IGRAPH_UNIMPLEMENTED);
+		/* TODO */
+		break;
+	case IGRAPH_EIGEN_INTERVAL:
+		IGRAPH_ERROR("Interval of eigenvectors with ARPACK", 
+								 IGRAPH_UNIMPLEMENTED);
+		/* TODO */
+		break;
+	case IGRAPH_EIGEN_SELECT:
+		IGRAPH_ERROR("Selected eigenvalues with ARPACK",
+								 IGRAPH_UNIMPLEMENTED);
+		/* TODO */
+		break;
+	default:
+		/* This cannot happen */
+		break;
+	}
+	
+	options->n=n;
+	options->ncv= 2*options->nev < n ? 2*options->nev : n;
+
+	IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN));
+	IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+	
+	IGRAPH_CHECK(igraph_arpack_rssolve(
+													 igraph_i_eigen_adjacency_arpack_sym_cb, 
+													 extra, options, storage, values, vectors));
+	
+	igraph_adjlist_destroy(&adjlist);
+	IGRAPH_FINALLY_CLEAN(1);
+	
+	return 0;
+}
+
 /** 
  * \function igraph_eigen_adjacency
  *
@@ -1268,8 +1382,54 @@ int igraph_eigen_adjacency(const igraph_t *graph,
 			   igraph_vector_complex_t *cmplxvalues,
 			   igraph_matrix_complex_t *cmplxvectors) {
 
-  IGRAPH_ERROR("'igraph_eigen_adjacency'", IGRAPH_UNIMPLEMENTED);
-  /* TODO */
+  if (which->pos != IGRAPH_EIGEN_LM && 
+      which->pos != IGRAPH_EIGEN_SM && 
+      which->pos != IGRAPH_EIGEN_LA && 
+      which->pos != IGRAPH_EIGEN_SA && 
+      which->pos != IGRAPH_EIGEN_BE && 
+      which->pos != IGRAPH_EIGEN_SELECT &&
+      which->pos != IGRAPH_EIGEN_INTERVAL &&
+      which->pos != IGRAPH_EIGEN_ALL) {
+    IGRAPH_ERROR("Invalid 'pos' position in 'which'", IGRAPH_EINVAL);
+  }
+
+  switch (algorithm) {
+  case IGRAPH_EIGEN_AUTO:
+    IGRAPH_ERROR("'AUTO' algorithm not implemented yet", 
+								 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  case IGRAPH_EIGEN_LAPACK:
+    IGRAPH_ERROR("'LAPACK' algorithm not implemented yet",  
+								 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  case IGRAPH_EIGEN_ARPACK:
+		IGRAPH_CHECK(igraph_i_eigen_adjacency_arpack(graph, which, options,
+																								 storage, values, vectors,
+																								 cmplxvalues,
+																								 cmplxvectors));
+    break;
+  case IGRAPH_EIGEN_COMP_AUTO:
+    IGRAPH_ERROR("'COMP_AUTO' algorithm not implemented yet", 
+		 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  case IGRAPH_EIGEN_COMP_LAPACK:
+    IGRAPH_ERROR("'COMP_LAPACK' algorithm not implemented yet", 
+		 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  case IGRAPH_EIGEN_COMP_ARPACK:
+    IGRAPH_ERROR("'COMP_ARPACK' algorithm not implemented yet", 
+		 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  default:
+    IGRAPH_ERROR("Unknown `algorithm'", IGRAPH_EINVAL);
+  }
+	
+	
   return 0;
 }
 

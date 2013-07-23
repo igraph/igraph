@@ -89,3 +89,6 @@ subgraph.centrality <- function(graph, diag=FALSE) {
   res
 }
 
+igraph.eigen.default <- list(pos="LM", howmany=1L, il=-1L, iu=-1L,
+                             vl=-Inf, vu=Inf, vestimate=0L,
+                             balance="none")

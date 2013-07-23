@@ -344,3 +344,16 @@ PLFIT:
 MAXFLOW_STATS:
   CALL:
   HEADER:
+
+EIGENALGO:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "auto"=0, "lapack"=1, \
+                          "arpack"=2, "comp_auto"=3, "comp_lapack"=4, \
+                          "comp_arpack"=5)
+    DEFAULT: 
+      ARPACK: c("arpack", "auto", "lapack", "comp_auto", "comp_lapack", "comp_arpack")
+
+EIGENWHICH:
+    INCONV: %I%.tmp <- igraph.eigen.default; \
+            %I%.tmp[ names(%I%) ] <- %I% ; %I% <- %I%.tmp
+    DEFAULT: 
+      Default: list()

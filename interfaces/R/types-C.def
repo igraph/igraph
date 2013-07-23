@@ -941,3 +941,14 @@ MAXFLOW_STATS:
   CALL: &%C%
   OUTCONV:
     OUT: PROTECT(%I%=R_igraph_maxflow_stats_to_SEXP(&%C%));
+
+EIGENALGO:
+  CTYPE: igraph_integer_t
+  INCONV:
+    IN: %C%=REAL(%I%)[0];
+
+EIGENWHICH:
+  CTYPE: igraph_eigen_which_t
+  CALL: &%C%
+  INCONV:
+    IN: R_SEXP_to_igraph_eigen_which(%I%, &%C%);
