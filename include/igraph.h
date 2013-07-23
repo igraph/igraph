@@ -92,5 +92,6 @@
 #include "igraph_scg.h"
 #include "igraph_matching.h"
 #include "igraph_embedding.h"
+#include "igraph_scan.h"
 
 #endif
