@@ -237,6 +237,105 @@ int igraphmodule_PyObject_to_attribute_combination_type_t(PyObject* o,
   return igraphmodule_PyObject_to_enum(o, attribute_combination_type_tt, (int*)result);
 }
 
+int igraphmodule_PyObject_to_eigen_algorithm_t(PyObject *object,
+                                       igraph_eigen_algorithm_t *a) {
+  static igraphmodule_enum_translation_table_entry_t eigen_algorithm_tt[] =
+    {
+      {"auto", IGRAPH_EIGEN_AUTO},
+      {"lapack", IGRAPH_EIGEN_LAPACK},
+      {"arpack", IGRAPH_EIGEN_ARPACK},
+      {"comp_auto", IGRAPH_EIGEN_COMP_AUTO},
+      {"comp_lapack", IGRAPH_EIGEN_COMP_LAPACK},
+      {"comp_arpack", IGRAPH_EIGEN_COMP_ARPACK},
+      {0,0}
+    };
+
+  if (object == Py_None) {
+    *a = IGRAPH_EIGEN_ARPACK;
+    return 0;
+  } else {
+    return igraphmodule_PyObject_to_enum(object, eigen_algorithm_tt,
+                                         (int*)a);
+  }
+}
+
+int igraphmodule_PyObject_to_eigen_which_t(PyObject *object,
+                                           igraph_eigen_which_t *w) {
+  PyObject *key, *value;
+  Py_ssize_t pos = 0;
+
+  static igraphmodule_enum_translation_table_entry_t
+    eigen_which_position_tt[] = {
+    { "LM", IGRAPH_EIGEN_LM},
+    { "SM", IGRAPH_EIGEN_SM},
+    { "LA", IGRAPH_EIGEN_LA},
+    { "SA", IGRAPH_EIGEN_SA},
+    { "BE", IGRAPH_EIGEN_BE},
+    { "LR", IGRAPH_EIGEN_LR},
+    { "SR", IGRAPH_EIGEN_SR},
+    { "LI", IGRAPH_EIGEN_LI},
+    { "SI", IGRAPH_EIGEN_SI},
+    { "ALL", IGRAPH_EIGEN_ALL},
+    { "INTERVAL", IGRAPH_EIGEN_INTERVAL},
+    { "SELECT", IGRAPH_EIGEN_SELECT}
+  };
+
+  static igraphmodule_enum_translation_table_entry_t
+    lapack_dgeevc_balance_tt[] = {
+    { "none", IGRAPH_LAPACK_DGEEVX_BALANCE_NONE },
+    { "perm", IGRAPH_LAPACK_DGEEVX_BALANCE_PERM },
+    { "scale", IGRAPH_LAPACK_DGEEVX_BALANCE_SCALE },
+    { "both", IGRAPH_LAPACK_DGEEVX_BALANCE_BOTH }
+  };
+
+  w->pos = IGRAPH_EIGEN_LM;
+  w->howmany = 1;
+  w->il = w->iu = -1;
+  w->vl = IGRAPH_NEGINFINITY;
+  w->vu = IGRAPH_INFINITY;
+  w->vestimate = 0;
+  w->balance = IGRAPH_LAPACK_DGEEVX_BALANCE_NONE;
+
+  if (object != Py_None && !PyDict_Check(object)) {
+    PyErr_SetString(PyExc_TypeError, "Python dictionary expected");
+    return -1;
+  }
+
+  if (object != Py_None) {
+    while (PyDict_Next(object, &pos, &key, &value)) {
+      char *kv;
+      if (!PyString_Check(key)) {
+        PyErr_SetString(PyExc_TypeError, "Dict key must be string");
+        return -1;
+      }
+      kv=PyString_AsString(key);
+      if (!strcasecmp(kv, "pos")) {
+        igraphmodule_PyObject_to_enum(value, eigen_which_position_tt,
+                                      (int*) &w->pos);
+      } else if (!strcasecmp(kv, "howmany")) {
+        w->howmany = PyInt_AsLong(value);
+      } else if (!strcasecmp(kv, "il")) {
+        w->il = (int) PyInt_AsLong(value);
+      } else if (!strcasecmp(kv, "iu")) {
+        w->iu = (int) PyInt_AsLong(value);
+      } else if (!strcasecmp(kv, "vl")) {
+        w->vl = PyFloat_AsDouble(value);
+      } else if (!strcasecmp(kv, "vu")) {
+        w->vu = PyFloat_AsDouble(value);
+      } else if (!strcasecmp(kv, "vestimate")) {
+        w->vestimate = (int) PyInt_AsLong(value);
+      } else if (!strcasecmp(kv, "balance")) {
+        igraphmodule_PyObject_to_enum(value, lapack_dgeevc_balance_tt,
+                                      (int*) &w->balance);
+      } else {
+        PyErr_SetString(PyExc_TypeError, "Unknown eigen parameter");
+        return -1;
+      }
+    }
+  }
+  return 0;
+}
+
 /**
  * \ingroup python_interface_conversion
  * \brief Converts a Python object to an igraph \c igraph_barabasi_algorithm_t

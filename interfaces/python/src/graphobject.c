@@ -4158,6 +4158,60 @@ PyObject *igraphmodule_Graph_eccentricity(igraphmodule_GraphObject* self,
   return list;
 }
 
+PyObject* igraphmodule_Graph_eigen_adjacency(igraphmodule_GraphObject *self,
+                                             PyObject *args,
+                                             PyObject *kwds) {
+  static char *kwlist[] = { "algorithm", "which", "arpack_options", NULL };
+  PyObject *algorithm_o = Py_None, *which_o = Py_None;
+  PyObject *arpack_options_o = igraphmodule_arpack_options_default;
+  igraph_eigen_algorithm_t algorithm;
+  igraph_eigen_which_t which;
+  igraphmodule_ARPACKOptionsObject *arpack_options;
+  igraph_vector_t values;
+  igraph_matrix_t vectors;
+  PyObject *values_o, *vectors_o;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO!", kwlist,
+                                   &algorithm_o, &which_o,
+                                   &igraphmodule_ARPACKOptionsType,
+                                   &arpack_options)) {
+    return NULL;
+  }
+
+  if (igraphmodule_PyObject_to_eigen_algorithm_t(algorithm_o, &algorithm)) {
+    return NULL;
+  }
+  if (igraphmodule_PyObject_to_eigen_which_t(which_o, &which)) {
+    return NULL;
+  }
+
+  if (igraph_vector_init(&values, 0)) { return NULL; }
+  if (igraph_matrix_init(&vectors, 0, 0)) {
+    igraph_vector_destroy(&values);
+    return igraphmodule_handle_igraph_error();
+  }
+  arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
+
+  if (igraph_eigen_adjacency(&self->g, algorithm, &which,
+                             igraphmodule_ARPACKOptions_get(arpack_options),
+                             /*storage=*/ 0, &values, &vectors,
+                             /*cmplxvalues=*/ 0, /*cmplxvectors=*/ 0)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&values);
+    igraph_matrix_destroy(&vectors);
+    return NULL;
+  }
+
+  values_o = igraphmodule_vector_t_to_PyList(&values,
+                                             IGRAPHMODULE_TYPE_FLOAT);
+  igraph_vector_destroy(&values);
+  vectors_o = igraphmodule_matrix_t_to_PyList(&vectors,
+                                              IGRAPHMODULE_TYPE_FLOAT);
+  igraph_matrix_destroy(&vectors);
+
+  return Py_BuildValue("NN", values_o, vectors_o);
+}
+
 /** \ingroup python_interface_graph
  * \brief Calculates the edge betweennesses in the graph
  * \return a list containing the edge betweenness for every edge
@@ -4177,7 +4231,7 @@ PyObject *igraphmodule_Graph_edge_betweenness(igraphmodule_GraphObject * self,
     return NULL;
 
   if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
-	  ATTRIBUTE_TYPE_EDGE)) return NULL;
+    ATTRIBUTE_TYPE_EDGE)) return NULL;
 
   igraph_vector_init(&res, igraph_ecount(&self->g));
 
@@ -4235,7 +4289,7 @@ PyObject *igraphmodule_Graph_edge_connectivity(igraphmodule_GraphObject *self,
   if (source < 0 && target < 0) {
     if (igraph_edge_connectivity(&self->g, &res, PyObject_IsTrue(checks))) {
       igraphmodule_handle_igraph_error();
-	  return NULL;
+    return NULL;
     }
   } else if (source >= 0 && target >= 0) {
     if (igraph_st_edge_connectivity(&self->g, &res, (igraph_integer_t) source,
@@ -4244,8 +4298,8 @@ PyObject *igraphmodule_Graph_edge_connectivity(igraphmodule_GraphObject *self,
       return NULL;
     }
   } else {
-	PyErr_SetString(PyExc_ValueError, "if source or target is given, the other one must also be specified");
-	return NULL;
+  PyErr_SetString(PyExc_ValueError, "if source or target is given, the other one must also be specified");
+  return NULL;
   }
 
   result = res;
@@ -4279,7 +4333,7 @@ PyObject *igraphmodule_Graph_eigenvector_centrality(
     return NULL;
 
   if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
-	  ATTRIBUTE_TYPE_EDGE)) return NULL;
+    ATTRIBUTE_TYPE_EDGE)) return NULL;
 
   if (igraph_vector_init(&res, 0)) {
     if (weights) { igraph_vector_destroy(weights); free(weights); }
@@ -4334,7 +4388,7 @@ PyObject *igraphmodule_Graph_feedback_arc_set(
     return NULL;
 
   if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
-	  ATTRIBUTE_TYPE_EDGE))
+    ATTRIBUTE_TYPE_EDGE))
     return NULL;
 
   if (igraph_vector_init(&result, 0)) {
@@ -4408,14 +4462,14 @@ PyObject *igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *
   ptrvec = (igraph_vector_ptr_t *) calloc(1, sizeof(igraph_vector_ptr_t));
   if (!ptrvec) {
     PyErr_SetString(PyExc_MemoryError, "");
-	if (weights) { igraph_vector_destroy(weights); free(weights); }
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
     return NULL;
   }
 
   if (igraph_vector_ptr_init(ptrvec, no_of_target_nodes)) {
     PyErr_SetString(PyExc_MemoryError, "");
     free(ptrvec);
-	if (weights) { igraph_vector_destroy(weights); free(weights); }
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
     return NULL;
   }
 
@@ -4423,7 +4477,7 @@ PyObject *igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *
   if (!res) {
     PyErr_SetString(PyExc_MemoryError, "");
     igraph_vector_ptr_destroy(ptrvec); free(ptrvec);
-	if (weights) { igraph_vector_destroy(weights); free(weights); }
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
     return NULL;
   }
 
@@ -4437,7 +4491,7 @@ PyObject *igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *
     igraphmodule_handle_igraph_error();
     for (j = 0; j < no_of_target_nodes; j++) igraph_vector_destroy(&res[j]);
     free(res);
-	if (weights) { igraph_vector_destroy(weights); free(weights); }
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
     igraph_vector_ptr_destroy(ptrvec);
     free(ptrvec);
     return NULL;
@@ -4583,7 +4637,7 @@ PyObject *igraphmodule_Graph_hub_score(
   if (igraph_vector_init(&res, 0)) return igraphmodule_handle_igraph_error();
 
   if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
-	  ATTRIBUTE_TYPE_EDGE)) return NULL;
+    ATTRIBUTE_TYPE_EDGE)) return NULL;
 
   arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
   if (igraph_hub_score(&self->g, &res, &value, PyObject_IsTrue(scale_o),
@@ -4851,14 +4905,14 @@ PyObject *igraphmodule_Graph_path_length_hist(igraphmodule_GraphObject *self,
   igraph_vector_t res;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &directed))
-	return NULL;
+  return NULL;
 
   if (igraph_vector_init(&res, 0))
-	return igraphmodule_handle_igraph_error();
+  return igraphmodule_handle_igraph_error();
 
   if (igraph_path_length_hist(&self->g, &res, &unconn, PyObject_IsTrue(directed))) {
-	igraph_vector_destroy(&res);
-	return igraphmodule_handle_igraph_error();
+  igraph_vector_destroy(&res);
+  return igraphmodule_handle_igraph_error();
   }
   
   result=igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
@@ -5275,7 +5329,7 @@ PyObject *igraphmodule_Graph_spanning_tree(igraphmodule_GraphObject * self,
   }
 
   if (igraph_minimum_spanning_tree(&self->g, &res, ws)) {
-	if (ws != 0) { igraph_vector_destroy(ws); free(ws); }
+  if (ws != 0) { igraph_vector_destroy(ws); free(ws); }
     igraph_vector_destroy(&res);
     igraphmodule_handle_igraph_error();
     return NULL;
@@ -5304,11 +5358,11 @@ PyObject *igraphmodule_Graph_simplify(igraphmodule_GraphObject * self,
     return NULL;
 
   if (igraphmodule_PyObject_to_attribute_combination_t(comb_o, &comb))
-	return NULL;
+  return NULL;
 
   if (igraph_simplify(&self->g, PyObject_IsTrue(multiple),
                       PyObject_IsTrue(loops), &comb)) {
-	igraph_attribute_combination_destroy(&comb);
+  igraph_attribute_combination_destroy(&comb);
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -5390,6 +5444,116 @@ PyObject *igraphmodule_Graph_induced_subgraph(igraphmodule_GraphObject * self,
   CREATE_GRAPH(result, sg);
 
   return (PyObject *) result;
+}
+
+PyObject* igraphmodule_Graph_scan1(igraphmodule_GraphObject *self,
+                                   PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = { NULL };
+  PyObject *list = NULL;
+  igraph_vector_t result;
+  int retval;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "", kwlist)) { return NULL; }
+
+  if (igraph_vector_init(&result, 0)) {
+    return igraphmodule_handle_igraph_error();
+  }
+
+  retval=igraph_scan1(&self->g, &result);
+
+  if (retval) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&result);
+    return NULL;
+  }
+
+  list=igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_FLOAT);
+
+  igraph_vector_destroy(&result);
+
+  return list;
+}
+
+PyObject* igraphmodule_Graph_scan1_approx(igraphmodule_GraphObject *self,
+                                          PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = { "noevals", "arpack_options", NULL };
+  long int noevals=-1;
+  PyObject *arpack_options_o = igraphmodule_arpack_options_default;
+  PyObject *list = NULL;
+  igraphmodule_ARPACKOptionsObject *arpack_options;
+  igraph_vector_t result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|O!", kwlist, &noevals,
+                                   &igraphmodule_ARPACKOptionsType,
+                                   &arpack_options)) {
+    return NULL;
+  }
+
+  if (igraph_vector_init(&result, 0)) {
+    return igraphmodule_handle_igraph_error();
+  }
+  arpack_options = (igraphmodule_ARPACKOptionsObject*) arpack_options_o;
+
+  if (igraph_scan1_approximate(&self->g, &result, noevals,
+                       igraphmodule_ARPACKOptions_get(arpack_options))) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&result);
+    return NULL;
+  }
+
+  list=igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_FLOAT);
+
+  igraph_vector_destroy(&result);
+
+  return list;
+}
+
+PyObject* igraphmodule_Graph_scan1_approx_eigen(
+                           igraphmodule_GraphObject *self,
+                           PyObject *args, PyObject *kwds) {
+
+  static char *kwlist[] = { "values", "vectors", NULL };
+  PyObject *values, *vectors;
+  PyObject *list = NULL;
+  igraph_vector_t values0;
+  igraph_matrix_t vectors0;
+  igraph_vector_t result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!O!", kwlist,
+                                   &PyList_Type, &values, &PyList_Type,
+                                   &vectors)) {
+    return NULL;
+  }
+  if (igraphmodule_PyObject_float_to_vector_t(values, &values0)) {
+    return NULL;
+  }
+  if (igraphmodule_PyList_to_matrix_t(vectors, &vectors0)) {
+    igraph_vector_destroy(&values0);
+    return NULL;
+  }
+  if (igraph_vector_init(&result, 0)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&values0);
+    igraph_matrix_destroy(&vectors0);
+  }
+
+  if (igraph_scan1_approximate_eigen(&self->g, &result, &values0,
+                                     &vectors0)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&values0);
+    igraph_matrix_destroy(&vectors0);
+    igraph_vector_destroy(&result);
+    return NULL;
+  }
+
+  igraph_vector_destroy(&values0);
+  igraph_matrix_destroy(&vectors0);
+
+  list=igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_FLOAT);
+
+  igraph_vector_destroy(&result);
+
+  return list;
 }
 
 /** \ingroup python_interface_graph
@@ -12423,6 +12587,10 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@return: a list with the (exact or estimated) edge betweennesses of all\n"
    "  edges.\n"},
 
+	{"eigen_adjacency", (PyCFunction) igraphmodule_Graph_eigen_adjacency,
+	 METH_VARARGS | METH_KEYWORDS,
+	 "" },
+
   /* interface to igraph_[st_]edge_connectivity */
   {"edge_connectivity", (PyCFunction) igraphmodule_Graph_edge_connectivity,
    METH_VARARGS | METH_KEYWORDS,
@@ -12851,6 +13019,19 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param loops: whether the algorithm is allowed to create loop edges\n"
    "@param multiple: whether the algorithm is allowed to create multiple\n"
    "  edges.\n"},
+
+	{"scan1", (PyCFunction) igraphmodule_Graph_scan1,
+	 METH_VARARGS | METH_KEYWORDS,
+	 "" },
+
+	{"scan1_approx", (PyCFunction) igraphmodule_Graph_scan1_approx,
+	 METH_VARARGS | METH_KEYWORDS,
+	 "" },
+
+	{"scan1_approx_eigen",
+	 (PyCFunction) igraphmodule_Graph_scan1_approx_eigen,
+	 METH_VARARGS | METH_KEYWORDS,
+	 "" },
 
   /* interface to igraph_shortest_paths */
   {"shortest_paths", (PyCFunction) igraphmodule_Graph_shortest_paths,
