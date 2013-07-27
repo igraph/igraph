@@ -2351,13 +2351,29 @@ int igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
  * \brief Gomory-Hu tree of a graph.
  *
  * </para><para>
+ * The Gomory-Hu tree is a concise representation of the value of all the
+ * maximum flows (or minimum cuts) in a graph. The vertices of the tree
+ * correspond exactly to the vertices of the original graph in the same order.
+ * Edges of the Gomory-Hu tree are annotated by flow values.  The value of
+ * the maximum flow (or minimum cut) between an arbitrary (u,v) vertex
+ * pair in the original graph is then given by the minimum flow value (i.e.
+ * edge annotation) along the shortest path between u and v in the
+ * Gomory-Hu tree.
+ *
+ * </para><para>This implementation uses Gusfield's algorithm to construct the
+ * Gomory-Hu tree. See the following paper for more details:
+ * 
+ * </para><para>
+ * Gusfield D: Very simple methods for all pairs network flow analysis. SIAM J
+ * Comput 19(1):143-155, 1990.
  *
  * \param graph The input graph.
  * \param tree  Pointer to an uninitialized graph; the result will be
  *              stored here.
- * \param flows Pointer to an uninitialized vector; the flow value
+ * \param flows Pointer to an uninitialized vector; the flow values
  *              corresponding to each edge in the Gomory-Hu tree will
- *              be returned here. You may pass a null pointer here.
+ *              be returned here. You may pass a NULL pointer here if you are
+ *              not interested in the flow values.
  * \param capacity Vector containing the capacity of the edges. If NULL, then
  *        every edge is considered to have capacity 1.0.
  * \return Error code.
