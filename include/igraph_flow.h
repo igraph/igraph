@@ -168,6 +168,11 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
 			  igraph_integer_t target,
 			  const igraph_vector_t *capacity);
 
+int igraph_gomory_hu_tree(const igraph_t *graph,
+			  igraph_t *tree,
+			  igraph_vector_t *flows,
+			  const igraph_vector_t *capacity);
+
 __END_DECLS
 
 #endif
