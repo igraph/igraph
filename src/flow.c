@@ -29,6 +29,7 @@
 #include "igraph_adjlist.h"
 #include "igraph_conversion.h"
 #include "igraph_constructors.h"
+#include "igraph_progress.h"
 #include "igraph_structural.h"
 #include "igraph_components.h"
 #include "igraph_types_internal.h"
@@ -2413,6 +2414,9 @@ int igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
 
   /* For each source vertex except vertex zero... */
   for (source = 1; source < no_of_nodes; source++) {
+    IGRAPH_ALLOW_INTERRUPTION();
+    IGRAPH_PROGRESS("Gomory-Hu tree", (100.0 * (source - 1)) / (no_of_nodes-1), 0);
+
     /* Find its current neighbor in the tree */
     target = VECTOR(neighbors)[(long int)source];
 
@@ -2434,6 +2438,8 @@ int igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
     }
   }
 
+  IGRAPH_PROGRESS("Gomory-Hu tree", 100.0, 0);
+  
   /* Re-use the 'partition' vector as an edge list now */
   IGRAPH_CHECK(igraph_vector_resize(&partition, 2*(no_of_nodes-1)));
   for (i = 1, mid = 0; i < no_of_nodes; i++, mid += 2) {
