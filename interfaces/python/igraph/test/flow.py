@@ -204,7 +204,7 @@ class GomoryHuTests(unittest.TestCase):
         self.assertRaises(InternalError, g.gomory_hu_tree, "capacity")
 
     def testRandomGRG(self):
-        g = Graph.GRG(100, 0.2)
+        g = Graph.GRG(25, 0.4)
         self.validate_gomory_hu_tree(g, g.gomory_hu_tree())
         g.es["capacity"] = [randint(0, 10) for _ in xrange(g.ecount())]
         self.validate_gomory_hu_tree(g, g.gomory_hu_tree("capacity"))
