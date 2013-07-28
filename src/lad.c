@@ -1323,7 +1323,6 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
   /* Allocate memory */
   ALLOC_ARRAY(nbVal, Gp->nbVertices, int);
   ALLOC_ARRAY(globalMatching, Gp->nbVertices, int);
-  ALLOC_ARRAY(val, VECTOR(D->nbVal)[minDom], int);
 
   IGRAPH_CHECK(igraph_i_lad_filter(induced, D, Gp, Gt, &result));
   if (!result) { 
@@ -1374,6 +1373,7 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
   }
 	
   /* save the domain of minDom to iterate on its values */
+  ALLOC_ARRAY(val, VECTOR(D->nbVal)[minDom], int);
   for (i=0; i < VECTOR(D->nbVal)[minDom]; i++) {
     val[i]=VECTOR(D->val)[ VECTOR(D->firstVal)[minDom]+i ]; 
   }
@@ -1402,11 +1402,13 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
   }
   *invalid=0;
 
-cleanup:
-  igraph_free(nbVal);
-  igraph_free(globalMatching);
   igraph_free(val);
-  IGRAPH_FINALLY_CLEAN(3);
+  IGRAPH_FINALLY_CLEAN(1);
+
+cleanup:
+  igraph_free(globalMatching);
+  igraph_free(nbVal);
+  IGRAPH_FINALLY_CLEAN(2);
 
   return 0;
 }
