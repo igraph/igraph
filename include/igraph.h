@@ -91,5 +91,6 @@
 #include "igraph_interrupt.h"
 #include "igraph_scg.h"
 #include "igraph_matching.h"
+#include "igraph_graphlets.h"
 
 #endif
