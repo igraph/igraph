@@ -58,3 +58,9 @@ AT_KEYWORDS([minimal s-t cut])
 AT_COMPILE_CHECK([simple/igraph_all_st_mincuts.c], 
                  [simple/igraph_all_st_mincuts.out])
 AT_CLEANUP
+
+AT_SETUP([Gomory-Hu tree (igraph_gomory_hu_tree): ])
+AT_KEYWORDS([Gomory-Hu tree])
+AT_COMPILE_CHECK([simple/igraph_gomory_hu_tree.c])
+AT_CLEANUP
+

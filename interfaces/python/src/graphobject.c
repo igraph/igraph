@@ -10092,6 +10092,57 @@ PyObject *igraphmodule_Graph_mincut(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Calculates the Gomory-Hu tree of an undirected graph
+ */
+PyObject *igraphmodule_Graph_gomory_hu_tree(igraphmodule_GraphObject * self,
+                                            PyObject *args, PyObject *kwds)
+{
+  static char* kwlist[] = { "capacity", NULL };
+  igraph_vector_t capacity_vector;
+  igraph_vector_t flow_vector;
+  igraph_t tree;
+  PyObject *capacity_o = Py_None;
+  PyObject *flow_o;
+  igraphmodule_GraphObject *tree_o;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &capacity_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_attribute_values(capacity_o,
+                                                &capacity_vector,
+                                                self, ATTRHASH_IDX_EDGE, 1.0))
+    return igraphmodule_handle_igraph_error();
+
+  if (igraph_vector_init(&flow_vector, 0)) {
+    igraph_vector_destroy(&capacity_vector);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (igraph_gomory_hu_tree(&self->g, &tree, &flow_vector, &capacity_vector)) {
+    igraph_vector_destroy(&flow_vector);
+    igraph_vector_destroy(&capacity_vector);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  igraph_vector_destroy(&capacity_vector);
+
+  flow_o = igraphmodule_vector_t_to_PyList(&flow_vector, IGRAPHMODULE_TYPE_FLOAT);
+  igraph_vector_destroy(&flow_vector);
+  if (!flow_o) {
+    igraph_destroy(&tree);
+    return 0;
+  }
+
+  CREATE_GRAPH(tree_o, tree);
+  if (!tree_o) {
+    igraph_destroy(&tree);
+    return 0;
+  }
+
+  return Py_BuildValue("NN", tree_o, flow_o);
+}
+
+/** \ingroup python_interface_graph
  * \brief Calculates a minimum s-t cut in a graph
  */
 PyObject *igraphmodule_Graph_st_mincut(igraphmodule_GraphObject * self,
@@ -14715,6 +14766,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@attention: this function has a more convenient interface in class\n"
    "  L{Graph} which wraps the result in a list of L{Cut} objects. It is\n"
    "  advised to use that.\n"
+  },
+
+  {"gomory_hu_tree", (PyCFunction) igraphmodule_Graph_gomory_hu_tree,
+   METH_VARARGS | METH_KEYWORDS,
+   "gomory_hu_tree(capacity=None)\n\n"
+   "Internal function, undocumented.\n\n"
+   "@see: Graph.gomory_hu_tree()\n\n"
   },
 
   /*********************/

@@ -597,6 +597,31 @@ class Graph(GraphBase):
         """
         return [self.incident(idx, mode) for idx in xrange(self.vcount())]
 
+    def gomory_hu_tree(self, capacity=None, flow="flow"):
+        """gomory_hu_tree(capacity=None, flow="flow")
+
+        Calculates the Gomory-Hu tree of an undirected graph with optional
+        edge capacities.
+
+        The Gomory-Hu tree is a concise representation of the value of all the
+        maximum flows (or minimum cuts) in a graph. The vertices of the tree
+        correspond exactly to the vertices of the original graph in the same order.
+        Edges of the Gomory-Hu tree are annotated by flow values.  The value of
+        the maximum flow (or minimum cut) between an arbitrary (u,v) vertex
+        pair in the original graph is then given by the minimum flow value (i.e.
+        edge annotation) along the shortest path between u and v in the
+        Gomory-Hu tree.
+
+        @param capacity: the edge capacities (weights). If C{None}, all
+          edges have equal weight. May also be an attribute name.
+        @param flow: the name of the edge attribute in the returned graph
+          in which the flow values will be stored.
+        @return: the Gomory-Hu tree as a L{Graph} object.
+        """
+        graph, flow_values = GraphBase.gomory_hu_tree(self, capacity)
+        graph.es[flow] = flow_values
+        return graph
+
     def is_named(self):
         """is_named()
 

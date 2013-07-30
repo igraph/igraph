@@ -29,6 +29,7 @@
 #include "igraph_adjlist.h"
 #include "igraph_conversion.h"
 #include "igraph_constructors.h"
+#include "igraph_progress.h"
 #include "igraph_structural.h"
 #include "igraph_components.h"
 #include "igraph_types_internal.h"
@@ -486,6 +487,12 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
   long int i, j, idx;
   int npushsince=0, nrelabelsince=0;
+
+  igraph_maxflow_stats_t local_stats;   /* used if the user passed a null pointer for stats */
+
+  if (stats == 0) {
+    stats = &local_stats;
+  }
 
   if (!igraph_is_directed(graph)) {
     IGRAPH_CHECK(igraph_i_maxflow_undirected(graph, value, flow, cut,
@@ -1083,13 +1090,12 @@ int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *value,
 			   igraph_integer_t source, igraph_integer_t target,
 			   const igraph_vector_t *capacity) {
   
-  igraph_maxflow_stats_t stats;
   if (source == target) {
     IGRAPH_ERROR("source and target vertices are the same", IGRAPH_EINVAL);
   }
 
-  IGRAPH_CHECK(igraph_maxflow_value(graph, value, source, target, capacity,
-				    &stats));
+  IGRAPH_CHECK(igraph_maxflow_value(graph, value, source, target, capacity, 0));
+
   return 0;
 }			    
 
@@ -1132,11 +1138,9 @@ int igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
 		     igraph_integer_t source, igraph_integer_t target,
 		     const igraph_vector_t *capacity) {
 
-  igraph_maxflow_stats_t stats;
-
   return igraph_maxflow(graph, value, /*flow=*/ 0, 
 			cut, partition, partition2, 
-			source, target, capacity, &stats);
+			source, target, capacity, 0);
 }
 
 /* This is a flow-based version, but there is a better one
@@ -1458,7 +1462,6 @@ int igraph_i_mincut_directed(const igraph_t *graph,
   igraph_vector_t mypartition, mypartition2, mycut;
   igraph_vector_t *ppartition=0, *ppartition2=0, *pcut=0;
   igraph_vector_t bestpartition, bestpartition2, bestcut;
-  igraph_maxflow_stats_t stats;
 
   if (partition) {
     IGRAPH_VECTOR_INIT_FINALLY(&bestpartition, 0);
@@ -1486,8 +1489,7 @@ int igraph_i_mincut_directed(const igraph_t *graph,
   for (i=1; i<no_of_nodes; i++) {
     IGRAPH_CHECK(igraph_maxflow(graph, /*value=*/ &flow, /*flow=*/ 0, 
 				pcut, ppartition, ppartition2, /*source=*/ 0,
-				/*target=*/ (igraph_integer_t) i, capacity,
-				&stats));
+				/*target=*/ (igraph_integer_t) i, capacity, 0));
     if (flow < minmaxflow) {
       minmaxflow = flow;
       if (cut) { 
@@ -1505,7 +1507,7 @@ int igraph_i_mincut_directed(const igraph_t *graph,
     IGRAPH_CHECK(igraph_maxflow(graph, /*value=*/ &flow, /*flow=*/ 0,
 				pcut, ppartition, ppartition2, 
 				/*source=*/ (igraph_integer_t) i,
-				/*target=*/ 0, capacity, &stats));
+				/*target=*/ 0, capacity, 0));
     if (flow < minmaxflow) {
       minmaxflow = flow;
       if (cut) { 
@@ -1679,7 +1681,6 @@ int igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
   long int no_of_nodes=igraph_vcount(graph);
   igraph_real_t minmaxflow, flow;
   long int i;
-  igraph_maxflow_stats_t stats;
 
   minmaxflow=IGRAPH_INFINITY;
 
@@ -1692,13 +1693,13 @@ int igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
 
   for (i=1; i<no_of_nodes; i++) {
     IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, 0, (igraph_integer_t) i,
-				      capacity, &stats));
+				      capacity, 0));
     if (flow < minmaxflow) {
       minmaxflow = flow;
       if (flow==0) break;
     }
     IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, (igraph_integer_t) i, 0,
-				      capacity, &stats));
+				      capacity, 0));
     if (flow < minmaxflow) {
       minmaxflow = flow;
       if (flow==0) break;
@@ -1725,7 +1726,6 @@ int igraph_i_st_vertex_connectivity_directed(const igraph_t *graph,
   igraph_t newgraph;
   long int i;
   igraph_bool_t conn1;
-  igraph_maxflow_stats_t stats;
   
   if (source<0 || source>=no_of_nodes || target<0 || target>=no_of_nodes) {
     IGRAPH_ERROR("Invalid source or target vertex", IGRAPH_EINVAL);
@@ -1792,7 +1792,7 @@ int igraph_i_st_vertex_connectivity_directed(const igraph_t *graph,
   no_of_edges=igraph_ecount(&newgraph);
   
   IGRAPH_CHECK(igraph_maxflow_value(&newgraph, &real_res, 
-				    source, target, 0, &stats));
+				    source, target, 0, 0));
   *res = (igraph_integer_t)real_res;
 
   igraph_destroy(&newgraph);
@@ -2086,13 +2086,12 @@ int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
 				igraph_integer_t source, 
 				igraph_integer_t target) {
   igraph_real_t flow;
-  igraph_maxflow_stats_t stats;
 
   if (source == target) {
     IGRAPH_ERROR("source and target vertices are the same", IGRAPH_EINVAL);
   }
 
-  IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target, 0, &stats));
+  IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target, 0, 0));
   *res = (igraph_integer_t) flow;
 
   return 0;
@@ -2179,13 +2178,12 @@ int igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
 			       igraph_integer_t target) {
 
   igraph_real_t flow;
-  igraph_maxflow_stats_t stats;
 
   if (source == target) {
     IGRAPH_ERROR("Not implemented for source=target", IGRAPH_UNIMPLEMENTED);
   }
 
-  IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target, 0, &stats));
+  IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target, 0, 0));
 
   *res = (igraph_integer_t) flow;
   
@@ -2347,5 +2345,131 @@ int igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
   
   IGRAPH_CHECK(igraph_vertex_connectivity(graph, res, checks));
   return 0;
+}
+
+/**
+ * \function igraph_gomory_hu_tree
+ * \brief Gomory-Hu tree of a graph.
+ *
+ * </para><para>
+ * The Gomory-Hu tree is a concise representation of the value of all the
+ * maximum flows (or minimum cuts) in a graph. The vertices of the tree
+ * correspond exactly to the vertices of the original graph in the same order.
+ * Edges of the Gomory-Hu tree are annotated by flow values.  The value of
+ * the maximum flow (or minimum cut) between an arbitrary (u,v) vertex
+ * pair in the original graph is then given by the minimum flow value (i.e.
+ * edge annotation) along the shortest path between u and v in the
+ * Gomory-Hu tree.
+ *
+ * </para><para>This implementation uses Gusfield's algorithm to construct the
+ * Gomory-Hu tree. See the following paper for more details:
+ * 
+ * </para><para>
+ * Gusfield D: Very simple methods for all pairs network flow analysis. SIAM J
+ * Comput 19(1):143-155, 1990.
+ *
+ * \param graph The input graph.
+ * \param tree  Pointer to an uninitialized graph; the result will be
+ *              stored here.
+ * \param flows Pointer to an uninitialized vector; the flow values
+ *              corresponding to each edge in the Gomory-Hu tree will
+ *              be returned here. You may pass a NULL pointer here if you are
+ *              not interested in the flow values.
+ * \param capacity Vector containing the capacity of the edges. If NULL, then
+ *        every edge is considered to have capacity 1.0.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|^4) since it performs a max-flow calculation
+ * between vertex zero and every other vertex and max-flow is
+ * O(|V|^3).
+ *
+ * \sa \ref igraph_maxflow()
+ */
+int igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
+			  igraph_vector_t *flows, const igraph_vector_t *capacity) {
+
+  igraph_integer_t no_of_nodes = igraph_vcount(graph);
+  igraph_integer_t source, target, mid, i, n;
+  igraph_vector_t neighbors;
+  igraph_vector_t flow_values;
+  igraph_vector_t partition;
+  igraph_vector_t partition2;
+  igraph_vector_t *side_of_s;
+  igraph_real_t flow_value;
+
+  if (igraph_is_directed(graph)) {
+    IGRAPH_ERROR("Gomory-Hu tree can only be calculated for undirected graphs",
+	IGRAPH_EINVAL);
+  }
+  
+  /* Allocate memory */
+  IGRAPH_VECTOR_INIT_FINALLY(&neighbors, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&flow_values, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&partition, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&partition2, 0);
+
+  /* Initialize the tree: every edge points to node 0 */
+  /* Actually, this is done implicitly since both 'neighbors' and 'flow_values' are
+   * initialized to zero already */
+
+  /* For each source vertex except vertex zero... */
+  for (source = 1; source < no_of_nodes; source++) {
+    IGRAPH_ALLOW_INTERRUPTION();
+    IGRAPH_PROGRESS("Gomory-Hu tree", (100.0 * (source - 1)) / (no_of_nodes-1), 0);
+
+    /* Find its current neighbor in the tree */
+    target = VECTOR(neighbors)[(long int)source];
+
+    /* Find the maximum flow between source and target */
+    IGRAPH_CHECK(igraph_maxflow(graph, &flow_value, 0, 0, &partition, &partition2,
+	  source, target, capacity, 0));
+
+    /* Store the maximum flow and determine which side each node is on */
+    VECTOR(flow_values)[(long int)source] = flow_value;
+
+    /* Update the tree */
+    side_of_s = igraph_vector_contains(&partition, source) ? &partition : &partition2;
+    n = igraph_vector_size(side_of_s);
+    for (i = 0; i < n; i++) {
+      mid = VECTOR(*side_of_s)[i];
+      if (mid > source && VECTOR(neighbors)[(long int)mid] == target) {
+	VECTOR(neighbors)[(long int)mid] = source;
+      }
+    }
+  }
+
+  IGRAPH_PROGRESS("Gomory-Hu tree", 100.0, 0);
+  
+  /* Re-use the 'partition' vector as an edge list now */
+  IGRAPH_CHECK(igraph_vector_resize(&partition, 2*(no_of_nodes-1)));
+  for (i = 1, mid = 0; i < no_of_nodes; i++, mid += 2) {
+    VECTOR(partition)[(long int)mid]   = i;
+    VECTOR(partition)[(long int)mid+1] = VECTOR(neighbors)[(long int)i];
+  }
+
+  /* Create the tree graph; we use igraph_subgraph_edges here to keep the
+   * graph and vertex attributes */
+  IGRAPH_CHECK(igraph_subgraph_edges(graph, tree, igraph_ess_none(), 0));
+  IGRAPH_CHECK(igraph_add_edges(tree, &partition, 0));
+
+  /* Free the allocated memory */
+  igraph_vector_destroy(&partition2);
+  igraph_vector_destroy(&partition);
+  igraph_vector_destroy(&neighbors);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  /* Return the flow values to the caller */
+  if (flows != 0) {
+    IGRAPH_CHECK(igraph_vector_update(flows, &flow_values));
+    if (no_of_nodes > 0) {
+      igraph_vector_remove(flows, 0);
+    }
+  }
+
+  /* Free the remaining allocated memory */
+  igraph_vector_destroy(&flow_values);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return IGRAPH_SUCCESS;
 }
 
