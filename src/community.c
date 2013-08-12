@@ -1728,9 +1728,12 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
       int i;
       igraph_error_handler_t *errh=
 	igraph_set_error_handler(igraph_i_error_handler_none);
+      igraph_warning_handler_t *warnh=
+	igraph_set_warning_handler(igraph_warning_handler_ignore);
       igraph_arpack_rssolve(arpcb2, &extra, options, &storage,
 			    /*values=*/ 0, /*vectors=*/ 0);
       igraph_set_error_handler(errh);
+      igraph_set_warning_handler(warnh);
       if (options->nconv < 1) {
 	/* Call again, from a fixed starting point */
 	options->start=1;
