@@ -764,6 +764,19 @@ void igraph_i_arpack_auto_ncv(igraph_arpack_options_t* options) {
 }
 
 /**
+ * \function igraph_i_arpack_report_no_convergence
+ * \brief Prints a warning that informs the user that the ARPACK solver
+ *        did not converge.
+ */
+void igraph_i_arpack_report_no_convergence(const igraph_arpack_options_t* options) {
+  char buf[1024];
+  snprintf(buf, sizeof(buf), "ARPACK solver failed to converge (%d iterations, "
+      "%d/%d eigenvectors converged)", options->iparam[2],
+      options->iparam[4], options->nev);
+  IGRAPH_WARNING(buf);
+}
+
+/**
  * \function igraph_arpack_rssolve
  * \brief ARPACK solver for symmetric matrices
  *
@@ -924,6 +937,9 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     }
   }
   
+  if (options->info == 1) {
+    igraph_i_arpack_report_no_convergence(options);
+  }
   if (options->info != 0) {
     IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dsaupd(options->info));
   }
@@ -946,7 +962,6 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   		&options->ierr);
 #endif
 
-  
   if (options->ierr != 0) {
     IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dseupd(options->ierr));
   }
@@ -1152,7 +1167,10 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     }
   }
 
-  if (options->info != 0 && options->info != 1) {
+  if (options->info == 1) {
+    igraph_i_arpack_report_no_convergence(options);
+  }
+  if (options->info != 0) {
     IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dnaupd(options->info));
   }
 
