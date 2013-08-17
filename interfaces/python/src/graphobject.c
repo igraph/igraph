@@ -648,6 +648,7 @@ PyObject *igraphmodule_Graph_diversity(igraphmodule_GraphObject * self,
   igraph_vector_t result, *weights = 0;
   igraph_vs_t vs;
   igraph_bool_t return_single = 0;
+  igraph_integer_t no_of_nodes;
 
   static char *kwlist[] = { "vertices", "weights", NULL };
 
@@ -672,15 +673,33 @@ PyObject *igraphmodule_Graph_diversity(igraphmodule_GraphObject * self,
     return NULL;
   }
 
-  if (igraph_diversity(&self->g, weights, &result, vs)) {
-    igraphmodule_handle_igraph_error();
-    igraph_vs_destroy(&vs);
-    igraph_vector_destroy(&result);
-    if (weights) { igraph_vector_destroy(weights); free(weights); }
-    return NULL;
+  if (weights == 0) {
+    /* Handle this case here because igraph_diversity bails out when no weights
+     * are given. */
+    if (igraph_vs_size(&self->g, &vs, &no_of_nodes)) {
+      igraphmodule_handle_igraph_error();
+      igraph_vs_destroy(&vs);
+      igraph_vector_destroy(&result);
+      return NULL;
+    }
+    if (igraph_vector_resize(&result, no_of_nodes)) {
+      igraphmodule_handle_igraph_error();
+      igraph_vs_destroy(&vs);
+      igraph_vector_destroy(&result);
+      return NULL;
+    }
+    igraph_vector_fill(&result, 1.0);
+  } else {
+    if (igraph_diversity(&self->g, weights, &result, vs)) {
+      igraphmodule_handle_igraph_error();
+      igraph_vs_destroy(&vs);
+      igraph_vector_destroy(&result);
+      igraph_vector_destroy(weights); free(weights);
+      return NULL;
+    }
+    igraph_vector_destroy(weights); free(weights);
   }
 
-  if (weights) { igraph_vector_destroy(weights); free(weights); }
 
   if (!return_single)
     list = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_FLOAT);
@@ -3862,7 +3881,7 @@ PyObject *igraphmodule_Graph_clusters(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_constraint(igraphmodule_GraphObject * self,
                                         PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] = { "vertices", "weights", NULL };
+  static char *kwlist[] = { "vertices", "weights", NULL };
   PyObject *vids_obj = Py_None, *weight_obj = Py_None, *list;
   igraph_vector_t result, weights;
   igraph_vs_t vids;
@@ -3899,7 +3918,11 @@ PyObject *igraphmodule_Graph_constraint(igraphmodule_GraphObject * self,
     return NULL;
   }
 
-  list = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_FLOAT);
+  if (!return_single)
+    list = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_FLOAT);
+  else
+    list = PyFloat_FromDouble((double)VECTOR(result)[0]);
+
   igraph_vs_destroy(&vids);
   igraph_vector_destroy(&result);
   igraph_vector_destroy(&weights);

@@ -32,6 +32,38 @@ class EdgeTests(unittest.TestCase):
         e.update_attributes(dict(b=44, c=55))
         self.assertEquals(e.attributes(), dict(a=3, b=44, c=55, d=6))
 
+    def testProxyMethods(self):
+        g = Graph.GRG(10, 0.5)
+        e = g.es[0]
+
+        # - delete() is ignored because it mutates the graph
+        ignore = "delete"
+        ignore = set(ignore.split())
+
+        # Methods not listed here are expected to return an int or a float
+        return_types = {
+        }
+
+        for name in Edge.__dict__:
+            if name in ignore:
+                continue
+
+            func = getattr(e, name)
+            docstr = func.__doc__
+
+            if not docstr.startswith("Proxy method"):
+                continue
+
+            result = func()
+            self.assertEquals(getattr(g, name)(e.index), result,
+                    msg=("Edge.%s proxy method misbehaved" % name))
+
+            return_type = return_types.get(name, (int, float))
+            self.assertTrue(isinstance(result, return_type),
+                    msg=("Edge.%s proxy method did not return %s" % (name, return_type))
+            )
+
+
 
 class EdgeSeqTests(unittest.TestCase):
     def setUp(self):
