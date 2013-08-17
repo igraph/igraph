@@ -146,7 +146,7 @@ class TextDrawer(AbstractCairoDrawer):
     def draw_at(self, x = None, y = None, width = None, wrap = False):
         """Draws the text by setting up an appropriate path on the Cairo
         context and filling it. `x` and `y` denote the coordinates where the
-        drawing should start. If they are both C{None}, the current position
+        drawing should start. If they are both ``None``, the current position
         of the context will be used.
         
         Vertical alignment settings are not taken into account in this method
