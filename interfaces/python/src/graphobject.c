@@ -11045,20 +11045,41 @@ PyObject *igraphmodule_Graph_community_multilevel(igraphmodule_GraphObject *self
  * Optimal modularity by integer programming
  */
 PyObject *igraphmodule_Graph_community_optimal_modularity(
-	igraphmodule_GraphObject *self) {
+	igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = {"weights", NULL};
+  PyObject *weights_o = Py_None;
   igraph_real_t modularity;
   igraph_vector_t membership;
+  igraph_vector_t* weights = 0;
   PyObject *res;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist,
+        &weights_o))
+    return NULL;
 
   if (igraph_vector_init(&membership, igraph_vcount(&self->g))) {
 	igraphmodule_handle_igraph_error();
     return NULL;
   }
 
-  if (igraph_community_optimal_modularity(&self->g, &modularity, &membership)) {
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    igraph_vector_destroy(&membership);
+    return NULL;
+  }
+
+  if (igraph_community_optimal_modularity(&self->g, &modularity,
+        &membership, weights)) {
 	igraphmodule_handle_igraph_error();
 	igraph_vector_destroy(&membership);
+    if (weights != 0) {
+      igraph_vector_destroy(weights); free(weights);
+    }
     return NULL;
+  }
+
+  if (weights != 0) {
+    igraph_vector_destroy(weights); free(weights);
   }
 
   res = igraphmodule_vector_t_to_PyList(&membership, IGRAPHMODULE_TYPE_INT);
@@ -14896,8 +14917,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   },
   {"community_optimal_modularity",
    (PyCFunction) igraphmodule_Graph_community_optimal_modularity,
-   METH_NOARGS,
-   "community_optimal_modularity()\n\n"
+   METH_VARARGS | METH_KEYWORDS,
+   "community_optimal_modularity(weights=None)\n\n"
    "Calculates the optimal modularity score of the graph and the\n"
    "corresponding community structure.\n\n"
    "This function uses the GNU Linear Programming Kit to solve a large\n"
@@ -14906,6 +14927,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "unlikely to work for graphs larger than a few (less than a hundred)\n"
    "vertices. Consider using one of the heuristic approaches instead if\n"
    "you have such a large graph.\n\n"
+  "@param weights: name of an edge attribute or a list containing\n"
+  "  edge weights.\n\n"
    "@return: the calculated membership vector and the corresponding\n"
    "  modularity in a tuple.\n"
   },
