@@ -138,8 +138,8 @@ flows.xml: flows.xxml $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c $(SRCDIR)/cohesive_bl
 community.xml: community.xxml $(SRCDIR)/community.c $(SRCDIR)/clustertool.cpp $(SRCDIR)/walktrap.cpp $(SRCDIR)/fast_community.c $(SRCDIR)/optimal_modularity.c $(INCLUDEDIR)/igraph_community.h $(SRCDIR)/infomap.cc
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/community.c $(SRCDIR)/clustertool.cpp $(SRCDIR)/walktrap.cpp $(SRCDIR)/fast_community.c $(SRCDIR)/optimal_modularity.c $(INCLUDEDIR)/igraph_community.h $(SRCDIR)/infomap.cc
 
-cliques.xml: cliques.xxml $(SRCDIR)/cliques.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/cliques.c
+cliques.xml: cliques.xxml $(SRCDIR)/cliques.c $(SRCDIR)/maximal_cliques.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/cliques.c $(SRCDIR)/maximal_cliques.c
 
 stack.xml: stack.xxml $(SRCDIR)/stack.pmt
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/stack.pmt
