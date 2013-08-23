@@ -454,6 +454,7 @@ int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
   IGRAPH_FINALLY(igraph_vector_int_destroy, &rank);
   igraph_vector_init(&coreness, no_of_nodes);
   igraph_coreness(graph, &coreness, /*mode=*/ IGRAPH_ALL);
+  IGRAPH_FINALLY(igraph_vector_destroy, &coreness);
   igraph_vector_qsort_ind(&coreness, &order, /*descending=*/ 0);
   for (i=0; i<no_of_nodes; i++) {
     int v=VECTOR(order)[i];
@@ -562,6 +563,17 @@ int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
 				res, &nextv, &H, min_size, max_size);
 
   }
+
+  igraph_vector_int_destroy(&nextv);
+  igraph_vector_int_destroy(&pos);
+  igraph_vector_int_destroy(&H);
+  igraph_vector_int_destroy(&R);
+  igraph_vector_int_destroy(&PX);
+  igraph_adjlist_destroy(&fulladjlist);
+  igraph_adjlist_destroy(&adjlist);
+  igraph_vector_int_destroy(&rank);
+  igraph_vector_destroy(&order);
+  IGRAPH_FINALLY_CLEAN(9);
 
   return 0;
 }
