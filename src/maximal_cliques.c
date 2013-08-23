@@ -71,12 +71,13 @@
       printf("%i ", VECTOR(*PX)[j]);				       \
     }								       \
     printf("\n");						       \
-  } while (0);
+  } while (0)
 
-int igraph_i_maxcliques_reorder_adjlists(const igraph_vector_int_t *PX,
-					 int PS, int PE, int XS, int XE,
-					 const igraph_vector_int_t *pos,
-					 igraph_adjlist_t *adjlist) {
+int igraph_i_maximal_cliques_reorder_adjlists(
+			      const igraph_vector_int_t *PX,
+			      int PS, int PE, int XS, int XE,
+			      const igraph_vector_int_t *pos,
+			      igraph_adjlist_t *adjlist) {
   int j;
 
   for (j=PS; j<=XE; j++) {
@@ -96,6 +97,97 @@ int igraph_i_maxcliques_reorder_adjlists(const igraph_vector_int_t *PX,
       }
     }
   }
+  return 0;
+}
+
+int igraph_i_maximal_cliques_reorder_adjlists_down(
+				   const igraph_vector_int_t *PX,
+				   int PS, int PE, int XS, int XE,
+				   const igraph_vector_int_t *pos,
+				   igraph_adjlist_t *adjlist,
+				   int oldPS, int oldXE) {
+  int i;
+  for (i=PS; i<=XE; i++) {
+    int av=VECTOR(*PX)[i];
+    igraph_vector_t *avneis=igraph_adjlist_get(adjlist, av);
+    int pp=0, k, avlen=igraph_vector_size(avneis);
+
+    for (k=0; k<avlen; k++) {
+      int avnei=VECTOR(*avneis)[k];
+      int avneipos=VECTOR(*pos)[avnei]-1;
+      /* if (avneipos < oldPS || avneipos > oldXE) { break; } */
+      if (avneipos >= PS && avneipos <= PE) {
+	if (pp != k) {
+	  VECTOR(*avneis)[k]=VECTOR(*avneis)[pp];
+	  VECTOR(*avneis)[pp]=avnei;
+	}
+	pp++;
+      }
+    }
+  }
+
+  return 0;
+}
+
+int igraph_i_maximal_cliques_reorder_adjlists_vneis(
+				    const igraph_vector_int_t *PX,
+				    int PS, int PE, int XS, int XE,
+				    const igraph_vector_int_t *pos,
+				    igraph_adjlist_t *adjlist, int v) {
+
+  igraph_vector_t *vneis=igraph_adjlist_get(adjlist, v);
+  int i, vn=igraph_vector_size(vneis);
+
+  for (i=0; i<vn; i++) {
+    int av=VECTOR(*vneis)[i];
+    //    int avpos=VECTOR(*pos)[i]-1;
+    igraph_vector_t *avneis;
+    int j, n, vpos;
+    //    if (avpos < PS || avpos > XE) { break; }
+    avneis=igraph_adjlist_get(adjlist, av);
+    n=igraph_vector_size(avneis);
+    /* look for 'v' */
+    for (j=0; j<n; j++) {
+      int neinei=VECTOR(*avneis)[j];
+      if (neinei==v) { vpos=j; break; }
+    }
+    /* look for end of P vertices */
+    for (; j<n; j++) {
+      int neinei=VECTOR(*avneis)[j];
+      int neineipos=VECTOR(*pos)[neinei]-1;
+      if (neineipos < PS || neineipos > PE-1) { j++; break; }
+    }
+    if (j-1 != vpos) {
+      VECTOR(*avneis)[vpos] = VECTOR(*avneis)[j-1];
+      VECTOR(*avneis)[j-1] = v;
+    }
+  }
+
+  return 0;
+}
+
+int igraph_i_maximal_cliques_check_order(const igraph_vector_int_t *PX,
+					 int PS, int PE, int XS, int XE,
+					 const igraph_vector_int_t *pos,
+					 const igraph_adjlist_t *adjlist) {
+  int i;
+  for (i=PS; i<=XE; i++) {
+    int v=VECTOR(*PX)[i];
+    igraph_vector_t *neis=igraph_adjlist_get(adjlist, v);
+    int x=0, j, n=igraph_vector_size(neis);
+    for (j=0; j<n; j++) {
+      int nei=VECTOR(*neis)[j];
+      int neipos=VECTOR(*pos)[nei]-1;
+      if (x==0) {
+	if (neipos < PS || neipos > PE) { x=1; }
+      } else {
+	if (neipos >= PS && neipos <= PE) {
+	  IGRAPH_ERROR("Adjlist ordering error", IGRAPH_EINTERNAL);
+	}
+      }
+    }
+  }
+
   return 0;
 }
 
@@ -120,7 +212,7 @@ int igraph_i_maximal_cliques_select_pivot(const igraph_vector_int_t *PX,
       if (PS <= neipos && neipos <= PE) {
 	ucandsize++;		/* in P */
       } else {
-	continue;		/* not in P, TODO: could break */
+	break;
       }
     }
     if (ucandsize > usize) { *pivot=ucand; usize=ucandsize; }
@@ -137,7 +229,7 @@ int igraph_i_maximal_cliques_select_pivot(const igraph_vector_int_t *PX,
     for (k=0; k < pivotvectlen; k++) {
       int unv=VECTOR(*pivotvectneis)[k];
       int unvpos=VECTOR(*pos)[unv]-1;
-      if (unvpos < PS || unvpos > PE) { continue; } /* TODO: could break */
+      if (unvpos < PS || unvpos > PE) { break; }
       if (unv == vcand) { nei=1; break; }
     }
     if (!nei) { igraph_vector_int_push_back(nextv, vcand); }
@@ -187,8 +279,12 @@ int igraph_i_maximal_cliques_down(igraph_vector_int_t *PX,
     SWAP(vneipos, *newXE); 
   }
 
-  /* TODO: reorder adjacency lists */
-  
+  igraph_i_maximal_cliques_reorder_adjlists_down(PX, *newPS, PE, XS,
+						 *newXE, pos, adjlist,
+						 PS, XE);
+  /* igraph_i_maximal_cliques_check_order(PX, *newPS, PE, XS, *newXE, pos, */
+  /* 				       adjlist); */
+
   igraph_vector_int_push_back(R, mynextv);
   
   return 0;
@@ -218,7 +314,8 @@ int igraph_i_maximal_cliques_PX(igraph_vector_int_t *PX, int PS, int *PE,
   PRINT_PX1;
 #endif
 
-  /* TODO: reorder adjacency lists */
+  igraph_i_maximal_cliques_reorder_adjlists_vneis(PX, PS, *PE, *XS, XE,
+						  pos, adjlist, v);
 
   return 0;
 }
@@ -252,7 +349,8 @@ int igraph_i_maximal_cliques_up(igraph_vector_int_t *PX, int PS, int PE,
   printf("\n");
 #endif
 
-  /* TODO: reorder adjacency lists */
+  igraph_i_maximal_cliques_reorder_adjlists(PX, PS, PE, XS, XE, pos,
+					    adjlist);
 
   return 0;
 }
@@ -494,12 +592,15 @@ int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
     }
 
     /* Reorder the adjacency lists, according to P and X. */
-    igraph_i_maxcliques_reorder_adjlists(&PX, PS, PE, XS, XE, &pos, 
-					 &adjlist);
+    igraph_i_maximal_cliques_reorder_adjlists(&PX, PS, PE, XS, XE, &pos,
+					      &adjlist);
+
+    /* igraph_i_maximal_cliques_check_order(&PX, PS, PE, XS, XE, &pos, */
+    /* 					 &adjlist); */
 
     igraph_i_maximal_cliques_bk(&PX, PS, PE, XS, XE, &R, &pos, &adjlist,
 				res, &nextv, &H, min_size, max_size);
-    
+
   }
 
   return 0;
