@@ -8145,7 +8145,7 @@ PyObject *igraphmodule_Graph_isomorphic_vf2(igraphmodule_GraphObject * self,
 
   if (!PyArg_ParseTupleAndKeywords
       (args, kwds, "|O!OOOOOOOOO", kwlist, &igraphmodule_GraphType, &o,
-       &color1_o, &color2_o, &edge_color1, &edge_color2, &return1, &return2,
+       &color1_o, &color2_o, &edge_color1_o, &edge_color2_o, &return1, &return2,
        &callback_fn, &node_compat_fn, &edge_compat_fn))
     return NULL;
 
