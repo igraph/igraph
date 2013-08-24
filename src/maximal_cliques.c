@@ -242,9 +242,12 @@ int igraph_i_maximal_cliques_down(igraph_vector_int_t *PX,
     }
   }
 
-  igraph_i_maximal_cliques_reorder_adjlists_down(PX, *newPS, PE, XS,
-						 *newXE, pos, adjlist,
-						 PS, XE);
+  if (*newPS <= PE) {
+    /* Otherwise no pivot is selected in the recursive call */
+    igraph_i_maximal_cliques_reorder_adjlists_down(PX, *newPS, PE, XS,
+						   *newXE, pos, adjlist,
+						   PS, XE);
+  }
 
   igraph_vector_int_push_back(R, mynextv);
   
