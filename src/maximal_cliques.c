@@ -103,38 +103,6 @@ int igraph_i_maximal_cliques_reorder_adjlists(
   return 0;
 }
 
-int igraph_i_maximal_cliques_reorder_adjlists_down(
-				   const igraph_vector_int_t *PX,
-				   int PS, int PE, int XS, int XE,
-				   const igraph_vector_int_t *pos,
-				   igraph_adjlist_t *adjlist,
-				   int oldPS, int oldXE) {
-  int i;
-  for (i=PS; i<=XE; i++) {
-    int av=VECTOR(*PX)[i];
-    igraph_vector_t *avneis=igraph_adjlist_get(adjlist, av);
-    igraph_real_t *avp=VECTOR(*avneis);
-    int avlen=igraph_vector_size(avneis);
-    igraph_real_t *ave=avp+avlen;
-    igraph_real_t *avnei=avp, *pp=avp;
-
-    for (; avnei < ave; avnei++) {
-      int avneipos=VECTOR(*pos)[(int)(*avnei)]-1;
-      if (avneipos < oldPS || avneipos > oldXE) { break; }
-      if (avneipos >= PS && avneipos <= PE) {
-	if (pp != avnei) {
-	  igraph_real_t tmp=*avnei;
-	  *avnei = *pp;
-	  *pp = tmp;
-	}
-	pp++;
-      }
-    }
-  }
-
-  return 0;
-}
-
 int igraph_i_maximal_cliques_check_order(const igraph_vector_int_t *PX,
 					 int PS, int PE, int XS, int XE,
 					 const igraph_vector_int_t *pos,
@@ -164,26 +132,38 @@ int igraph_i_maximal_cliques_check_order(const igraph_vector_int_t *PX,
   return 0;
 }
 
-int igraph_i_maximal_cliques_select_pivot(const igraph_vector_int_t *PX, 
+int igraph_i_maximal_cliques_select_pivot(const igraph_vector_int_t *PX,
 					  int PS, int PE, int XS, int XE,
 					  const igraph_vector_int_t *pos,
 					  const igraph_adjlist_t *adjlist,
 					  int *pivot,
-					  igraph_vector_int_t *nextv) {
+					  igraph_vector_int_t *nextv,
+					  int oldPS, int oldXE) {
   igraph_vector_t *pivotvectneis;
-  int pivotvectlen, j, usize=-1;
+  int i, pivotvectlen, j, usize=-1;
 
-  /* Choose a pivotvect */
-  for (j = PS; j <= XE; j++) {
-    int ucand=VECTOR(*PX)[j];
-    igraph_vector_t *ucandneis=igraph_adjlist_get(adjlist, ucand);
-    int k, ucanddeg=igraph_vector_size(ucandneis);
-    for (k=0; k<ucanddeg; k++) {
-      int nei=VECTOR(*ucandneis)[k];
-      int neipos=VECTOR(*pos)[nei]-1;
-      if (neipos < PS || neipos > PE) { break; }
+  /* Choose a pivotvect, and bring up P vertices at the same time */
+  for (i=PS; i<=XE; i++) {
+    int av=VECTOR(*PX)[i];
+    igraph_vector_t *avneis=igraph_adjlist_get(adjlist, av);
+    igraph_real_t *avp=VECTOR(*avneis);
+    int avlen=igraph_vector_size(avneis);
+    igraph_real_t *ave=avp+avlen;
+    igraph_real_t *avnei=avp, *pp=avp;
+
+    for (; avnei < ave; avnei++) {
+      int avneipos=VECTOR(*pos)[(int)(*avnei)]-1;
+      if (avneipos < oldPS || avneipos > oldXE) { break; }
+      if (avneipos >= PS && avneipos <= PE) {
+	if (pp != avnei) {
+	  igraph_real_t tmp=*avnei;
+	  *avnei = *pp;
+	  *pp = tmp;
+	}
+	pp++;
+      }
     }
-    if (k > usize) { *pivot=ucand; usize=k; }
+    if ((j=pp-avp) > usize) { *pivot = av; usize=j; }
   }
 
   igraph_vector_int_push_back(nextv, -1);
@@ -240,13 +220,6 @@ int igraph_i_maximal_cliques_down(igraph_vector_int_t *PX,
       (*newXE)++;
       SWAP(vneipos, *newXE);
     }
-  }
-
-  if (*newPS <= PE) {
-    /* Otherwise no pivot is selected in the recursive call */
-    igraph_i_maximal_cliques_reorder_adjlists_down(PX, *newPS, PE, XS,
-						   *newXE, pos, adjlist,
-						   PS, XE);
   }
 
   igraph_vector_int_push_back(R, mynextv);
@@ -314,7 +287,8 @@ int igraph_i_maximal_cliques_up(igraph_vector_int_t *PX, int PS, int PE,
 }
 
 int igraph_i_maximal_cliques_bk(igraph_vector_int_t *PX, int PS, int PE, 
-				int XS, int XE, igraph_vector_int_t *R, 
+				int XS, int XE, int oldPS, int oldXE,
+				igraph_vector_int_t *R,
 				igraph_vector_int_t *pos,
 				igraph_adjlist_t *adjlist,
 				igraph_vector_ptr_t *res, 
@@ -349,7 +323,8 @@ int igraph_i_maximal_cliques_bk(igraph_vector_int_t *PX, int PS, int PE,
     /* Select a pivot element */
     int pivot, mynextv;
     igraph_i_maximal_cliques_select_pivot(PX, PS, PE, XS, XE, pos,
-					  adjlist, &pivot, nextv);
+					  adjlist, &pivot, nextv,
+					  oldPS, oldXE);
 #ifdef DEBUG
     printf("pivot: %i\n", pivot);
 #endif
@@ -360,8 +335,8 @@ int igraph_i_maximal_cliques_bk(igraph_vector_int_t *PX, int PS, int PE,
       igraph_i_maximal_cliques_down(PX, PS, PE, XS, XE, pos, adjlist,
 				    mynextv, R, &newPS, &newXE);
       /* Recursive call */
-      igraph_i_maximal_cliques_bk(PX, newPS, PE, XS, newXE, R, pos, 
-				  adjlist, res, nextv, H,
+      igraph_i_maximal_cliques_bk(PX, newPS, PE, XS, newXE, PS, XE, R,
+				  pos, adjlist, res, nextv, H,
 				  min_size, max_size);
 
       /* igraph_i_maximal_cliques_check_order(PX, PS, PE, XS, XE, pos, */
@@ -475,7 +450,7 @@ int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
   IGRAPH_FINALLY_CLEAN(1);
   
   igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL);
-  IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+
   igraph_adjlist_simplify(&adjlist);
   igraph_adjlist_init(graph, &fulladjlist, IGRAPH_ALL);
   IGRAPH_FINALLY(igraph_adjlist_destroy, &fulladjlist);
@@ -563,8 +538,9 @@ int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
     /* igraph_i_maximal_cliques_check_order(&PX, PS, PE, XS, XE, &pos, */
     /* 					 &adjlist); */
 
-    igraph_i_maximal_cliques_bk(&PX, PS, PE, XS, XE, &R, &pos, &adjlist,
-				res, &nextv, &H, min_size, max_size);
+    igraph_i_maximal_cliques_bk(&PX, PS, PE, XS, XE, PS, XE, &R, &pos,
+				&adjlist, res, &nextv, &H, min_size,
+				max_size);
 
   }
 
