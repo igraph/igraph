@@ -170,19 +170,14 @@ int igraph_i_maximal_cliques_select_pivot(const igraph_vector_int_t *PX,
   /* Choose a pivotvect */
   for (j = PS; j <= XE; j++) {
     int ucand=VECTOR(*PX)[j];
-    int ucandsize=0;
     igraph_vector_t *ucandneis=igraph_adjlist_get(adjlist, ucand);
     int k, ucanddeg=igraph_vector_size(ucandneis);
     for (k=0; k<ucanddeg; k++) {
       int nei=VECTOR(*ucandneis)[k];
       int neipos=VECTOR(*pos)[nei]-1;
-      if (PS <= neipos && neipos <= PE) {
-	ucandsize++;		/* in P */
-      } else {
-	break;
-      }
+      if (neipos < PS || neipos > PE) { break; }
     }
-    if (ucandsize > usize) { *pivot=ucand; usize=ucandsize; }
+    if (k > usize) { *pivot=ucand; usize=k; }
   }
 
   igraph_vector_int_push_back(nextv, -1);
@@ -341,7 +336,7 @@ int igraph_i_maximal_cliques_bk(igraph_vector_int_t *PX, int PS, int PE,
       igraph_vector_init(cl, clsize);
       for (j=0; j<clsize; j++) { VECTOR(*cl)[j] = VECTOR(*R)[j]; }
     }
-  } else {
+  } else if (PS <= PE) {
     /* Select a pivot element */
     int pivot, mynextv;
     igraph_i_maximal_cliques_select_pivot(PX, PS, PE, XS, XE, pos,
