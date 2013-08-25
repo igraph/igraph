@@ -79,6 +79,7 @@ int igraph_i_maximal_cliques_reorder_adjlists(
 			      const igraph_vector_int_t *pos,
 			      igraph_adjlist_t *adjlist) {
   int j;
+  int sPS=PS+1, sPE=PE+1;
 
   for (j=PS; j<=XE; j++) {
     int av=VECTOR(*PX)[j];
@@ -89,8 +90,8 @@ int igraph_i_maximal_cliques_reorder_adjlists(
     int *avnei=avp, *pp=avp;
 
     for (; avnei < ave; avnei++) {
-      int avneipos=VECTOR(*pos)[(int)(*avnei)]-1;
-      if (avneipos >= PS && avneipos <= PE) { 
+      int avneipos=VECTOR(*pos)[(int)(*avnei)];
+      if (avneipos >= sPS && avneipos <= sPE) {
 	if (pp != avnei) {
 	  int tmp=*avnei;
 	  *avnei = *pp;
@@ -107,18 +108,19 @@ int igraph_i_maximal_cliques_check_order(const igraph_vector_int_t *PX,
 					 int PS, int PE, int XS, int XE,
 					 const igraph_vector_int_t *pos,
 					 const igraph_adjlist_t *adjlist) {
-  int i;
+  int i, sPS=PS+1, sPE=PE+1;
+
   for (i=PS; i<=XE; i++) {
     int v=VECTOR(*PX)[i];
     igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, v);
     int x=0, j, n=igraph_vector_int_size(neis);
     for (j=0; j<n; j++) {
       int nei=VECTOR(*neis)[j];
-      int neipos=VECTOR(*pos)[nei]-1;
+      int neipos=VECTOR(*pos)[nei];
       if (x==0) {
-	if (neipos < PS || neipos > PE) { x=1; }
+	if (neipos < sPS || neipos > sPE) { x=1; }
       } else {
-	if (neipos >= PS && neipos <= PE) {
+	if (neipos >= sPS && neipos <= sPE) {
 #ifdef DEBUG
 	  PRINT_PX;
 	  printf("v: %i\n", v); igraph_vector_int_print(neis);
@@ -141,6 +143,7 @@ int igraph_i_maximal_cliques_select_pivot(const igraph_vector_int_t *PX,
 					  int oldPS, int oldXE) {
   igraph_vector_int_t *pivotvectneis;
   int i, pivotvectlen, j, usize=-1;
+  int soldPS=oldPS+1, soldXE=oldXE+1, sPS=PS+1, sPE=PE+1;
 
   /* Choose a pivotvect, and bring up P vertices at the same time */
   for (i=PS; i<=XE; i++) {
@@ -152,9 +155,9 @@ int igraph_i_maximal_cliques_select_pivot(const igraph_vector_int_t *PX,
     int *avnei=avp, *pp=avp;
 
     for (; avnei < ave; avnei++) {
-      int avneipos=VECTOR(*pos)[(int)(*avnei)]-1;
-      if (avneipos < oldPS || avneipos > oldXE) { break; }
-      if (avneipos >= PS && avneipos <= PE) {
+      int avneipos=VECTOR(*pos)[(int)(*avnei)];
+      if (avneipos < soldPS || avneipos > soldXE) { break; }
+      if (avneipos >= sPS && avneipos <= sPE) {
 	if (pp != avnei) {
 	  int tmp=*avnei;
 	  *avnei = *pp;
@@ -176,8 +179,8 @@ int igraph_i_maximal_cliques_select_pivot(const igraph_vector_int_t *PX,
     int k=0;
     for (k=0; k < pivotvectlen; k++) {
       int unv=VECTOR(*pivotvectneis)[k];
-      int unvpos=VECTOR(*pos)[unv]-1;
-      if (unvpos < PS || unvpos > PE) { break; }
+      int unvpos=VECTOR(*pos)[unv];
+      if (unvpos < sPS || unvpos > sPE) { break; }
       if (unv == vcand) { nei=1; break; }
     }
     if (!nei) { igraph_vector_int_push_back(nextv, vcand); }
@@ -208,17 +211,18 @@ int igraph_i_maximal_cliques_down(igraph_vector_int_t *PX,
 
   igraph_vector_int_t *vneis=igraph_adjlist_get(adjlist, mynextv);
   int j, vneislen=igraph_vector_int_size(vneis);
+  int sPS=PS+1, sPE=PE+1, sXS=XS+1, sXE=XE+1;
 
   *newPS=PE+1; *newXE=XS-1;
   for (j=0; j<vneislen; j++) {
     int vnei=VECTOR(*vneis)[j];
-    int vneipos=VECTOR(*pos)[vnei]-1;
-    if (vneipos >= PS && vneipos <= PE) {
+    int vneipos=VECTOR(*pos)[vnei];
+    if (vneipos >= sPS && vneipos <= sPE) {
       (*newPS)--;
-      SWAP(vneipos, *newPS);
-    } else if (vneipos >= XS && vneipos <= XE) {
+      SWAP(vneipos-1, *newPS);
+    } else if (vneipos >= sXS && vneipos <= sXE) {
       (*newXE)++;
-      SWAP(vneipos, *newXE);
+      SWAP(vneipos-1, *newXE);
     }
   }
 
@@ -267,12 +271,12 @@ int igraph_i_maximal_cliques_up(igraph_vector_int_t *PX, int PS, int PE,
 #endif
 
   while ((vv=igraph_vector_int_pop_back(H)) != -1) {
-    int vvpos=VECTOR(*pos)[vv]-1;
+    int vvpos=VECTOR(*pos)[vv];
     int tmp=VECTOR(*PX)[XS];
     VECTOR(*PX)[XS]=vv;
-    VECTOR(*PX)[vvpos]=tmp;
+    VECTOR(*PX)[vvpos-1]=tmp;
     VECTOR(*pos)[vv]=XS+1;
-    VECTOR(*pos)[tmp]=vvpos+1;
+    VECTOR(*pos)[tmp]=vvpos;
     PE++; XS++;
 #ifdef DEBUG
     printf("%i ", vv);
