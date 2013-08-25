@@ -1269,7 +1269,8 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
     igraph_real_t acut;
     long int a, n;
 
-    igraph_vector_t *edges, *neis, *edges2, *neis2;
+    igraph_vector_t *edges, *edges2;
+    igraph_vector_int_t *neis, *neis2;
    
     do {
       a=igraph_i_cutheap_popmax(&heap);
@@ -1317,7 +1318,7 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
       if (VECTOR(*neis)[i]==last) {
 	VECTOR(*neis)[i] = VECTOR(*neis)[n-1];
 	VECTOR(*edges)[i] = VECTOR(*edges)[n-1];
-	igraph_vector_pop_back(neis);
+	igraph_vector_int_pop_back(neis);
 	igraph_vector_pop_back(edges);
 	n--;
       } else {
@@ -1332,7 +1333,7 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
       if (VECTOR(*neis)[i] == a) {
 	VECTOR(*neis)[i] = VECTOR(*neis)[n-1];
 	VECTOR(*edges)[i] = VECTOR(*edges)[n-1];
-	igraph_vector_pop_back(neis);
+	igraph_vector_int_pop_back(neis);
 	igraph_vector_pop_back(edges);
 	n--;
       } else {
@@ -1342,12 +1343,12 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
 
     /* Now rewrite the edge lists of last's neighbors */
     neis=igraph_adjlist_get(&adjlist, last);
-    n=igraph_vector_size(neis);    
+    n=igraph_vector_int_size(neis);    
     for (i=0; i<n; i++) {     
       igraph_integer_t nei=(igraph_integer_t) VECTOR(*neis)[i];
       long int n2, j;
       neis2=igraph_adjlist_get(&adjlist, nei);
-      n2=igraph_vector_size(neis2);
+      n2=igraph_vector_int_size(neis2);
       for (j=0; j<n2; j++) {
 	if (VECTOR(*neis2)[j] == last) {
 	  VECTOR(*neis2)[j] = a;
@@ -1361,9 +1362,9 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
     edges2=igraph_inclist_get(&inclist, last);
     neis2=igraph_adjlist_get(&adjlist, last);
     IGRAPH_CHECK(igraph_vector_append(edges, edges2));
-    IGRAPH_CHECK(igraph_vector_append(neis, neis2));
+    IGRAPH_CHECK(igraph_vector_int_append(neis, neis2));
     igraph_vector_clear(edges2); /* TODO: free it */
-    igraph_vector_clear(neis2);	 /* TODO: free it */
+    igraph_vector_int_clear(neis2);	 /* TODO: free it */
 
     /* Remove the deleted vertex from the heap entirely */
     igraph_i_cutheap_reset_undefine(&heap, last);    

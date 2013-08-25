@@ -1966,7 +1966,7 @@ int igraph_revolver_ml_f(const igraph_t *graph,
   long int it, t;
   igraph_vector_long_t ptk;
   igraph_vector_t *mycites, vmycites;
-  igraph_vector_t *neis, *neis2;
+  igraph_vector_int_t *neis, *neis2;
   igraph_adjlist_t outadjlist, inadjlist;
   igraph_vector_long_t marked;
   
@@ -2021,7 +2021,7 @@ int igraph_revolver_ml_f(const igraph_t *graph,
     for (t=0; t<no_of_nodes; t++) {
       long int nneis, e;
       neis=igraph_adjlist_get(&outadjlist, t);
-      nneis=igraph_vector_size(neis);
+      nneis=igraph_vector_int_size(neis);
       igraph_vector_resize(&perm, nneis);
       igraph_random_permutation(&perm);
       
@@ -2058,7 +2058,7 @@ int igraph_revolver_ml_f(const igraph_t *graph,
 
 	/* Update ptk, check the neighbors of 'to' */
 	neis2=igraph_adjlist_get(&inadjlist, to);
-	nneis2=igraph_vector_size(neis2);
+	nneis2=igraph_vector_int_size(neis2);
 	for (j=0; j<nneis2; j++) {
 	  long int nei=(long int) VECTOR(*neis2)[j];
 	  if (nei >= t) { break; }
@@ -2069,7 +2069,7 @@ int igraph_revolver_ml_f(const igraph_t *graph,
 	  }
 	}
 	neis2=igraph_adjlist_get(&outadjlist, to);
-	nneis2=igraph_vector_size(neis2);
+	nneis2=igraph_vector_int_size(neis2);
 	for (j=0; j<nneis2; j++) {
 	  long int nei=(long int) VECTOR(*neis2)[j];
 	  if (VECTOR(marked)[nei] != t+1) {
@@ -2133,7 +2133,7 @@ int igraph_revolver_ml_df(const igraph_t *graph,
   long int it, t, i;
   igraph_matrix_long_t ptk;
   igraph_matrix_t *mycites, vmycites;
-  igraph_vector_t *neis, *neis2;
+  igraph_vector_int_t *neis, *neis2;
   igraph_adjlist_t outadjlist, inadjlist;
   igraph_vector_long_t marked;
   igraph_integer_t imaxdegree, omaxdegree;
@@ -2209,7 +2209,7 @@ int igraph_revolver_ml_df(const igraph_t *graph,
     for (t=0; t<no_of_nodes; t++) {
       long int nneis, e;
       neis=igraph_adjlist_get(&outadjlist, t);
-      nneis=igraph_vector_size(neis);
+      nneis=igraph_vector_int_size(neis);
       igraph_vector_resize(&perm, nneis);
       igraph_random_permutation(&perm);
       
@@ -2286,7 +2286,7 @@ int igraph_revolver_ml_df(const igraph_t *graph,
 	
 	/* neighbors of 'to' */
 	neis2=igraph_adjlist_get(&inadjlist, to);
-	nneis2=igraph_vector_size(neis2);
+	nneis2=igraph_vector_int_size(neis2);
 	for (j=0; j<nneis2; j++) {
 	  long int nei=(long int) VECTOR(*neis2)[j];
 	  if (nei >= t) { break; }
@@ -2300,7 +2300,7 @@ int igraph_revolver_ml_df(const igraph_t *graph,
 	  }
 	}
 	neis2=igraph_adjlist_get(&outadjlist, to);
-	nneis2=igraph_vector_size(neis2);
+	nneis2=igraph_vector_int_size(neis2);
 	for (j=0; j<nneis2; j++) {
 	  long int nei=(long int) VECTOR(*neis2)[j];
 	  if (VECTOR(marked)[nei] != t+1) {

@@ -1142,8 +1142,8 @@ int igraph_i_community_leading_eigenvector(igraph_real_t *to,
   /* Ax */
   for (j=0; j<size; j++) {
     long int oldid=(long int) VECTOR(*idx)[j];
-    igraph_vector_t *neis=igraph_adjlist_get(adjlist, oldid);
-    nlen=igraph_vector_size(neis);
+    igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, oldid);
+    nlen=igraph_vector_int_size(neis);
     to[j]=0.0;
     VECTOR(*tmp)[j]=0.0;
     for (k=0; k<nlen; k++) {
@@ -1160,8 +1160,8 @@ int igraph_i_community_leading_eigenvector(igraph_real_t *to,
   ktx=0.0; ktx2=0.0;
   for (j=0; j<size; j++) {
     long int oldid=(long int) VECTOR(*idx)[j];
-    igraph_vector_t *neis=igraph_adjlist_get(adjlist, oldid);
-    long int degree=igraph_vector_size(neis);
+    igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, oldid);
+    long int degree=igraph_vector_int_size(neis);
     ktx += from[j] * degree;
     ktx2 += degree;
   }
@@ -1171,8 +1171,8 @@ int igraph_i_community_leading_eigenvector(igraph_real_t *to,
   /* Now calculate Bx */
   for (j=0; j<size; j++) {
     long int oldid=(long int) VECTOR(*idx)[j];
-    igraph_vector_t *neis=igraph_adjlist_get(adjlist, oldid);
-    igraph_real_t degree=igraph_vector_size(neis);
+    igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, oldid);
+    igraph_real_t degree=igraph_vector_int_size(neis);
     to[j] = to[j] - ktx*degree;
     VECTOR(*tmp)[j] = VECTOR(*tmp)[j] - ktx2*degree;
   }
@@ -1203,8 +1203,8 @@ int igraph_i_community_leading_eigenvector2(igraph_real_t *to,
   /* Ax */
   for (j=0; j<size; j++) {
     long int oldid=(long int) VECTOR(*idx)[j];
-    igraph_vector_t *neis=igraph_adjlist_get(adjlist, oldid);
-    nlen=igraph_vector_size(neis);
+    igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, oldid);
+    nlen=igraph_vector_int_size(neis);
     to[j]=0.0;
     VECTOR(*tmp)[j]=0.0;
     for (k=0; k<nlen; k++) {
@@ -1224,8 +1224,8 @@ int igraph_i_community_leading_eigenvector2(igraph_real_t *to,
   ktx=0.0; ktx2=0.0;
   for (j=0; j<size+1; j++) {
     long int oldid=(long int) VECTOR(*idx)[j];
-    igraph_vector_t *neis=igraph_adjlist_get(adjlist, oldid);
-    long int degree=igraph_vector_size(neis);
+    igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, oldid);
+    long int degree=igraph_vector_int_size(neis);
     if (j<size) {
       ktx += from[j] * degree;
     }
@@ -1237,8 +1237,8 @@ int igraph_i_community_leading_eigenvector2(igraph_real_t *to,
   /* Now calculate Bx */
   for (j=0; j<size; j++) {
     long int oldid=(long int) VECTOR(*idx)[j];
-    igraph_vector_t *neis=igraph_adjlist_get(adjlist, oldid);
-    igraph_real_t degree=igraph_vector_size(neis);
+    igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, oldid);
+    igraph_real_t degree=igraph_vector_int_size(neis);
     to[j] = to[j] - ktx*degree;
     VECTOR(*tmp)[j] = VECTOR(*tmp)[j] - ktx2*degree;
   }
@@ -2231,7 +2231,8 @@ int igraph_community_label_propagation(const igraph_t *graph,
   while (running) {
     long int v1, num_neis;
     igraph_real_t max_count;
-    igraph_vector_t *neis;
+    igraph_vector_int_t *neis;
+    igraph_vector_t *ineis;
     igraph_bool_t was_zero;
 
     running = 0;
@@ -2247,15 +2248,15 @@ int igraph_community_label_propagation(const igraph_t *graph,
       igraph_vector_clear(&nonzero_labels);
       max_count = 0.0;
       if (weights) {
-        neis = igraph_inclist_get(&il, v1);
-        num_neis = igraph_vector_size(neis);
+        ineis = igraph_inclist_get(&il, v1);
+        num_neis = igraph_vector_size(ineis);
         for (j=0; j<num_neis; j++) {
           k = (long int) VECTOR(*membership)[
-		     (long)IGRAPH_OTHER(graph, VECTOR(*neis)[j], v1) ];
+		     (long)IGRAPH_OTHER(graph, VECTOR(*ineis)[j], v1) ];
           if (k == 0)
             continue;   /* skip if it has no label yet */
           was_zero = (VECTOR(label_counters)[k] == 0);
-          VECTOR(label_counters)[k] += VECTOR(*weights)[(long)VECTOR(*neis)[j]];
+          VECTOR(label_counters)[k] += VECTOR(*weights)[(long)VECTOR(*ineis)[j]];
           if (was_zero && VECTOR(label_counters)[k] != 0) {
             /* counter just became nonzero */
             IGRAPH_CHECK(igraph_vector_push_back(&nonzero_labels, k));
@@ -2270,7 +2271,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
         }
       } else {
         neis = igraph_adjlist_get(&al, v1);
-        num_neis = igraph_vector_size(neis);
+        num_neis = igraph_vector_int_size(neis);
         for (j=0; j<num_neis; j++) {
           k = (long int) VECTOR(*membership)[(long)VECTOR(*neis)[j]];
           if (k == 0)

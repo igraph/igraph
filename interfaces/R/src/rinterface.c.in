@@ -2641,11 +2641,11 @@ int R_SEXP_to_igraph_adjlist(SEXP vectorlist, igraph_adjlist_t *ptr) {
   int i;
 
   ptr->length=length;
-  ptr->adjs = (igraph_vector_t*) R_alloc((size_t) length,
-					 sizeof(igraph_vector_t));
+  ptr->adjs = (igraph_vector_int_t*) R_alloc((size_t) length,
+					     sizeof(igraph_vector_int_t));
   for (i=0; i<length; i++) {
     SEXP vec=VECTOR_ELT(vectorlist, i);
-    igraph_vector_view(&ptr->adjs[i], REAL(vec), GET_LENGTH(vec));
+    igraph_vector_int_view(&ptr->adjs[i], INTEGER(vec), GET_LENGTH(vec));
   }
   return 0;
 }

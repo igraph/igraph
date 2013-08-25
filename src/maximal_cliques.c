@@ -82,17 +82,17 @@ int igraph_i_maximal_cliques_reorder_adjlists(
 
   for (j=PS; j<=XE; j++) {
     int av=VECTOR(*PX)[j];
-    igraph_vector_t *avneis=igraph_adjlist_get(adjlist, av);
-    igraph_real_t *avp=VECTOR(*avneis);
-    int avlen=igraph_vector_size(avneis);
-    igraph_real_t *ave=avp+avlen;
-    igraph_real_t *avnei=avp, *pp=avp;
+    igraph_vector_int_t *avneis=igraph_adjlist_get(adjlist, av);
+    int *avp=VECTOR(*avneis);
+    int avlen=igraph_vector_int_size(avneis);
+    int *ave=avp+avlen;
+    int *avnei=avp, *pp=avp;
 
     for (; avnei < ave; avnei++) {
       int avneipos=VECTOR(*pos)[(int)(*avnei)]-1;
       if (avneipos >= PS && avneipos <= PE) { 
 	if (pp != avnei) {
-	  igraph_real_t tmp=*avnei;
+	  int tmp=*avnei;
 	  *avnei = *pp;
 	  *pp = tmp;
 	}
@@ -110,8 +110,8 @@ int igraph_i_maximal_cliques_check_order(const igraph_vector_int_t *PX,
   int i;
   for (i=PS; i<=XE; i++) {
     int v=VECTOR(*PX)[i];
-    igraph_vector_t *neis=igraph_adjlist_get(adjlist, v);
-    int x=0, j, n=igraph_vector_size(neis);
+    igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, v);
+    int x=0, j, n=igraph_vector_int_size(neis);
     for (j=0; j<n; j++) {
       int nei=VECTOR(*neis)[j];
       int neipos=VECTOR(*pos)[nei]-1;
@@ -121,7 +121,7 @@ int igraph_i_maximal_cliques_check_order(const igraph_vector_int_t *PX,
 	if (neipos >= PS && neipos <= PE) {
 #ifdef DEBUG
 	  PRINT_PX;
-	  printf("v: %i\n", v); igraph_vector_print(neis);
+	  printf("v: %i\n", v); igraph_vector_int_print(neis);
 #endif
 	  IGRAPH_ERROR("Adjlist ordering error", IGRAPH_EINTERNAL);
 	}
@@ -139,24 +139,24 @@ int igraph_i_maximal_cliques_select_pivot(const igraph_vector_int_t *PX,
 					  int *pivot,
 					  igraph_vector_int_t *nextv,
 					  int oldPS, int oldXE) {
-  igraph_vector_t *pivotvectneis;
+  igraph_vector_int_t *pivotvectneis;
   int i, pivotvectlen, j, usize=-1;
 
   /* Choose a pivotvect, and bring up P vertices at the same time */
   for (i=PS; i<=XE; i++) {
     int av=VECTOR(*PX)[i];
-    igraph_vector_t *avneis=igraph_adjlist_get(adjlist, av);
-    igraph_real_t *avp=VECTOR(*avneis);
-    int avlen=igraph_vector_size(avneis);
-    igraph_real_t *ave=avp+avlen;
-    igraph_real_t *avnei=avp, *pp=avp;
+    igraph_vector_int_t *avneis=igraph_adjlist_get(adjlist, av);
+    int *avp=VECTOR(*avneis);
+    int avlen=igraph_vector_int_size(avneis);
+    int *ave=avp+avlen;
+    int *avnei=avp, *pp=avp;
 
     for (; avnei < ave; avnei++) {
       int avneipos=VECTOR(*pos)[(int)(*avnei)]-1;
       if (avneipos < oldPS || avneipos > oldXE) { break; }
       if (avneipos >= PS && avneipos <= PE) {
 	if (pp != avnei) {
-	  igraph_real_t tmp=*avnei;
+	  int tmp=*avnei;
 	  *avnei = *pp;
 	  *pp = tmp;
 	}
@@ -168,7 +168,7 @@ int igraph_i_maximal_cliques_select_pivot(const igraph_vector_int_t *PX,
 
   igraph_vector_int_push_back(nextv, -1);
   pivotvectneis=igraph_adjlist_get(adjlist, *pivot);
-  pivotvectlen=igraph_vector_size(pivotvectneis);
+  pivotvectlen=igraph_vector_int_size(pivotvectneis);
 
   for (j=PS; j <= PE; j++) {
     int vcand=VECTOR(*PX)[j];
@@ -206,8 +206,8 @@ int igraph_i_maximal_cliques_down(igraph_vector_int_t *PX,
   printf("next v: %i\n", mynextv);
 #endif  
 
-  igraph_vector_t *vneis=igraph_adjlist_get(adjlist, mynextv);
-  int j, vneislen=igraph_vector_size(vneis);
+  igraph_vector_int_t *vneis=igraph_adjlist_get(adjlist, mynextv);
+  int j, vneislen=igraph_vector_int_size(vneis);
 
   *newPS=PE+1; *newXE=XS-1;
   for (j=0; j<vneislen; j++) {
@@ -471,8 +471,8 @@ int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
   for (i=0; i<no_of_nodes; i++) {
     int v=VECTOR(order)[i];
     int vrank=VECTOR(rank)[v];
-    igraph_vector_t *vneis=igraph_adjlist_get(&fulladjlist, v);
-    int vdeg=igraph_vector_size(vneis);
+    igraph_vector_int_t *vneis=igraph_adjlist_get(&fulladjlist, v);
+    int vdeg=igraph_vector_int_size(vneis);
     int Pptr=0, Xptr=vdeg-1, PS=0, PE, XS, XE=vdeg-1;
     int j;
 
@@ -514,19 +514,19 @@ int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
     /* Create an adjacency list that is specific to the 
        v vertex. It only contains 'v' and its neighbors. Moreover, we 
        only deal with the vertices in P and X (and R). */
-    igraph_vector_update(igraph_adjlist_get(&adjlist, v), 
-			 igraph_adjlist_get(&fulladjlist, v));
+    igraph_vector_int_update(igraph_adjlist_get(&adjlist, v), 
+			     igraph_adjlist_get(&fulladjlist, v));
     for (j=0; j<=vdeg-1; j++) {
       int vv=VECTOR(PX)[j];
-      igraph_vector_t *fadj=igraph_adjlist_get(&fulladjlist, vv);
-      igraph_vector_t *radj=igraph_adjlist_get(&adjlist, vv);
-      int k, fn=igraph_vector_size(fadj);
-      igraph_vector_clear(radj);
+      igraph_vector_int_t *fadj=igraph_adjlist_get(&fulladjlist, vv);
+      igraph_vector_int_t *radj=igraph_adjlist_get(&adjlist, vv);
+      int k, fn=igraph_vector_int_size(fadj);
+      igraph_vector_int_clear(radj);
       for (k=0; k<fn; k++) {
 	int nei=VECTOR(*fadj)[k];
 	int neipos=VECTOR(pos)[nei]-1;
 	if (neipos >= PS && neipos <= XE) {
-	  igraph_vector_push_back(radj, nei);
+	  igraph_vector_int_push_back(radj, nei);
 	}
       }
     }
