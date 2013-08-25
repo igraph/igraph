@@ -364,6 +364,19 @@ int igraph_i_maximal_cliques_bk(igraph_vector_int_t *PX, int PS, int PE,
   return 0;
 }
 
+void igraph_i_maximal_cliques_free(void *ptr) {
+  igraph_vector_ptr_t *res=(igraph_vector_ptr_t*) ptr;
+  int i, n=igraph_vector_ptr_size(res);
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v=VECTOR(*res)[i];
+    if (v) {
+      igraph_Free(v);
+      igraph_vector_destroy(v);
+    }
+  }
+  igraph_vector_ptr_clear(res);
+}
+
 /**
  * \function igraph_maximal_cliques
  * \brief Find all maximal cliques of a graph
@@ -467,6 +480,7 @@ int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
   IGRAPH_FINALLY(igraph_vector_int_destroy, &nextv);
   
   igraph_vector_ptr_clear(res);
+  IGRAPH_FINALLY(igraph_i_maximal_cliques_free, res);
 
   for (i=0; i<no_of_nodes; i++) {
     int v=VECTOR(order)[i];
@@ -553,7 +567,7 @@ int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
   igraph_adjlist_destroy(&adjlist);
   igraph_vector_int_destroy(&rank);
   igraph_vector_destroy(&order);
-  IGRAPH_FINALLY_CLEAN(9);
+  IGRAPH_FINALLY_CLEAN(10);	/* + res */
 
   return 0;
 }
