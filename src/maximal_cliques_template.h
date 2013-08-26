@@ -42,11 +42,6 @@ int FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
 				igraph_vector_int_t *H,
 				int min_size, int max_size) {
 
-#ifdef DEBUG
-  printf("<<<<\n");
-  PRINT_PX;
-#endif
-
   igraph_vector_int_push_back(H, -1); /* boundary */
   
   if (PS > PE && XS > XE) {
@@ -56,9 +51,6 @@ int FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
 #ifdef IGRAPH_MC_ORIG
       igraph_vector_t *cl=igraph_Calloc(1, igraph_vector_t);
       int j;
-#ifdef DEBUG
-      printf("clique: "); igraph_vector_int_print(R);
-#endif
       if (!cl) {
 	IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM);
       }
@@ -76,9 +68,6 @@ int FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
     igraph_i_maximal_cliques_select_pivot(PX, PS, PE, XS, XE, pos,
 					  adjlist, &pivot, nextv,
 					  oldPS, oldXE);
-#ifdef DEBUG
-    printf("pivot: %i\n", pivot);
-#endif
     while ((mynextv=igraph_vector_int_pop_back(nextv)) != -1) {
       int newPS, newXE;
 
@@ -90,14 +79,6 @@ int FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
 				  PX, newPS, PE, XS, newXE, PS, XE, R,
 				  pos, adjlist, res, nextv, H,
 				  min_size, max_size);
-
-      /* igraph_i_maximal_cliques_check_order(PX, PS, PE, XS, XE, pos, */
-      /* 					   adjlist); */
-
-#ifdef DEBUG
-      printf("Restored: ");
-      PRINT_PX;
-#endif
       /* Putting v from P to X */
       if (igraph_vector_int_tail(nextv) != -1) {
 	igraph_i_maximal_cliques_PX(PX, PS, &PE, &XS, XE, pos, adjlist,
@@ -108,10 +89,6 @@ int FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
   
   /* Putting back vertices from X to P, see notes in H */
   igraph_i_maximal_cliques_up(PX, PS, PE, XS, XE, pos, adjlist, R, H);
-
-#ifdef DEBUG
-  printf(">>>>\n");
-#endif
 
   return 0;
 }
@@ -164,12 +141,6 @@ int FUNCTION(igraph_maximal_cliques,SUFFIX)(
     VECTOR(rank)[v] = i;
   }
 
-#ifdef DEBUG
-  printf("coreness: "); igraph_vector_print(&coreness);
-  printf("order:    "); igraph_vector_print(&order);
-  printf("rank:     "); igraph_vector_int_print(&rank);
-#endif
-
   igraph_vector_destroy(&coreness);
   IGRAPH_FINALLY_CLEAN(1);
   
@@ -212,10 +183,6 @@ int FUNCTION(igraph_maximal_cliques,SUFFIX)(
       pg=pgreset;
     }
 
-#ifdef DEBUG
-    printf("----------- vertex %i\n", v);
-#endif
-    
     IGRAPH_ALLOW_INTERRUPTION();
     
     igraph_vector_int_resize(&PX, vdeg);
@@ -271,14 +238,10 @@ int FUNCTION(igraph_maximal_cliques,SUFFIX)(
     igraph_i_maximal_cliques_reorder_adjlists(&PX, PS, PE, XS, XE, &pos,
 					      &adjlist);
 
-    /* igraph_i_maximal_cliques_check_order(&PX, PS, PE, XS, XE, &pos, */
-    /* 					 &adjlist); */
-
     FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
 				&PX, PS, PE, XS, XE, PS, XE, &R, &pos,
 				&adjlist, res, &nextv, &H, min_size,
 				max_size);
-
   }
 
   IGRAPH_PROGRESS("Maximal cliques: ", 100.0, NULL);

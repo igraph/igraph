@@ -21,8 +21,6 @@
 
 */
 
-//#define DEBUG
-
 #include "igraph_cliques.h"
 #include "igraph_constants.h"
 #include "igraph_interface.h"
@@ -141,36 +139,6 @@ int igraph_i_maximal_cliques_reorder_adjlists(
   return 0;
 }
 
-int igraph_i_maximal_cliques_check_order(const igraph_vector_int_t *PX,
-					 int PS, int PE, int XS, int XE,
-					 const igraph_vector_int_t *pos,
-					 const igraph_adjlist_t *adjlist) {
-  int i, sPS=PS+1, sPE=PE+1;
-
-  for (i=PS; i<=XE; i++) {
-    int v=VECTOR(*PX)[i];
-    igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, v);
-    int x=0, j, n=igraph_vector_int_size(neis);
-    for (j=0; j<n; j++) {
-      int nei=VECTOR(*neis)[j];
-      int neipos=VECTOR(*pos)[nei];
-      if (x==0) {
-	if (neipos < sPS || neipos > sPE) { x=1; }
-      } else {
-	if (neipos >= sPS && neipos <= sPE) {
-#ifdef DEBUG
-	  PRINT_PX;
-	  printf("v: %i\n", v); igraph_vector_int_print(neis);
-#endif
-	  IGRAPH_ERROR("Adjlist ordering error", IGRAPH_EINTERNAL);
-	}
-      }
-    }
-  }
-
-  return 0;
-}
-
 int igraph_i_maximal_cliques_select_pivot(const igraph_vector_int_t *PX,
 					  int PS, int PE, int XS, int XE,
 					  const igraph_vector_int_t *pos,
@@ -242,10 +210,6 @@ int igraph_i_maximal_cliques_down(igraph_vector_int_t *PX,
 				  igraph_vector_int_t *R, 
 				  int *newPS, int *newXE) {
 
-#ifdef DEBUG
-  printf("next v: %i\n", mynextv);
-#endif  
-
   igraph_vector_int_t *vneis=igraph_adjlist_get(adjlist, mynextv);
   int j, vneislen=igraph_vector_int_size(vneis);
   int sPS=PS+1, sPE=PE+1, sXS=XS+1, sXE=XE+1;
@@ -275,10 +239,6 @@ int igraph_i_maximal_cliques_PX(igraph_vector_int_t *PX, int PS, int *PE,
 				igraph_adjlist_t *adjlist, int v, 
 				igraph_vector_int_t *H) {
 
-#ifdef DEBUG
-  printf("%i P->X\n", v);
-#endif
-
   int vpos=VECTOR(*pos)[v]-1;
   int tmp=VECTOR(*PX)[*PE];
   VECTOR(*PX)[vpos]=tmp;
@@ -287,10 +247,6 @@ int igraph_i_maximal_cliques_PX(igraph_vector_int_t *PX, int PS, int *PE,
   VECTOR(*pos)[tmp]=vpos+1;
   (*PE)--; (*XS)--;
   igraph_vector_int_push_back(H, v);
-
-#ifdef DEBUG
-  PRINT_PX1;
-#endif
 
   return 0;
 }
@@ -303,10 +259,6 @@ int igraph_i_maximal_cliques_up(igraph_vector_int_t *PX, int PS, int PE,
   int vv;
   igraph_vector_int_pop_back(R);
 
-#ifdef DEBUG
-  printf("Up, X->P: ");
-#endif
-
   while ((vv=igraph_vector_int_pop_back(H)) != -1) {
     int vvpos=VECTOR(*pos)[vv];
     int tmp=VECTOR(*PX)[XS];
@@ -315,15 +267,8 @@ int igraph_i_maximal_cliques_up(igraph_vector_int_t *PX, int PS, int PE,
     VECTOR(*pos)[vv]=XS+1;
     VECTOR(*pos)[tmp]=vvpos;
     PE++; XS++;
-#ifdef DEBUG
-    printf("%i ", vv);
-#endif
   }
   
-#ifdef DEBUG
-  printf("\n");
-#endif
-
   return 0;
 }
 
