@@ -31,6 +31,11 @@
 #define SUFFIX _count
 #endif
 
+#ifdef IGRAPH_MC_FILE
+#define RESTYPE FILE
+#define SUFFIX _file
+#endif
+
 int FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
 				igraph_vector_int_t *PX, int PS, int PE, 
 				int XS, int XE, int oldPS, int oldXE,
@@ -60,6 +65,9 @@ int FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
 #endif
 #ifdef IGRAPH_MC_COUNT
       (*res)++;
+#endif
+#ifdef IGRAPH_MC_FILE
+      igraph_vector_int_fprint(R, res);
 #endif
     }
   } else if (PS <= PE) {

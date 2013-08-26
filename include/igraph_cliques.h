@@ -50,6 +50,10 @@ int igraph_largest_cliques(const igraph_t *graph,
 			   igraph_vector_ptr_t *cliques);
 int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
                    igraph_integer_t min_size, igraph_integer_t max_size);
+int igraph_maximal_cliques_file(const igraph_t *graph,
+				FILE *outfile,
+				igraph_integer_t min_size, 
+				igraph_integer_t max_size);
 int igraph_maximal_cliques_count(const igraph_t *graph,
 				 igraph_integer_t *res, 
 				 igraph_integer_t min_size, 

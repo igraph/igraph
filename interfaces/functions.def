@@ -930,6 +930,12 @@ igraph_maximal_cliques_count:
                 INTEGER max_size=0
         NAME-R: maximal.cliques.count
 
+igraph_maximal_cliques_file:
+        PARAMS: GRAPH graph, OUTFILE res, INTEGER min_size=0, \
+                INTEGER max_size=0
+        NAME-R: maximal.cliques.file
+        IGNORE: RR, RC, RNamespace
+
 igraph_clique_number:
         PARAMS: GRAPH graph, OUT INTEGERPTR no
         IGNORE: RR, RC, RNamespace

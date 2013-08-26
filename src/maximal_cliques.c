@@ -368,3 +368,19 @@ int igraph_maximal_cliques_count(const igraph_t *graph,
 #include "maximal_cliques_template.h"
 #undef IGRAPH_MC_COUNT
 
+/**
+ * \function igraph_maximal_cliques_file
+ * Find maximal cliques and write them to a file
+ * 
+ * TODO
+ */ 
+
+int igraph_maximal_cliques_file(const igraph_t *graph,
+				FILE *outfile,
+				igraph_integer_t min_size, 
+				igraph_integer_t max_size);
+
+#define IGRAPH_MC_FILE
+#include "maximal_cliques_template.h"
+#undef IGRAPH_MC_FILE
+
