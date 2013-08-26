@@ -60,6 +60,7 @@ int print_and_destroy(igraph_vector_ptr_t *cliques) {
 int main() {
   igraph_t graph;
   igraph_vector_ptr_t cliques;
+  igraph_integer_t no;
 
   igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -69,6 +70,9 @@ int main() {
 
   igraph_maximal_cliques(&graph, &cliques, /*min_size=*/ 0,
   			 /*max_size=*/ 0);
+  igraph_maximal_cliques_count(&graph, &no, /*min_size=*/ 0, 
+       /*max_size=*/ 0 /*no limit*/);
+  if (no != igraph_vector_ptr_size(&cliques)) { return 1; }
 
   print_and_destroy(&cliques);
   igraph_destroy(&graph);
@@ -83,6 +87,9 @@ int main() {
   
   igraph_maximal_cliques(&graph, &cliques, /*min_size=*/ 8,
 			 /*max_size=*/ 0);
+  igraph_maximal_cliques_count(&graph, &no, /*min_size=*/ 8, 
+       /*max_size=*/ 0 /*no limit*/);
+  if (no != igraph_vector_ptr_size(&cliques)) { return 2; }
   
   print_and_destroy(&cliques);
   igraph_destroy(&graph);
