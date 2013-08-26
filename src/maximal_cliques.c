@@ -30,6 +30,7 @@
 #include "igraph_adjlist.h"
 #include "igraph_interrupt_internal.h"
 #include "igraph_memory.h"
+#include "igraph_progress.h"
 
 #define CONCAT2x(a,b) a ## b 
 #define CONCAT2(a,b) CONCAT2x(a,b)

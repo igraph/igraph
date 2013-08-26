@@ -144,6 +144,7 @@ int FUNCTION(igraph_maximal_cliques,SUFFIX)(
   igraph_vector_int_t rank;	/* TODO: this is not needed */
   int i, no_of_nodes=igraph_vcount(graph);
   igraph_adjlist_t adjlist, fulladjlist;
+  igraph_real_t pgreset=round(no_of_nodes / 100.0), pg=pgreset, pgc=0;
 
   if (igraph_is_directed(graph)) {
     IGRAPH_WARNING("Edge directions are ignored for maximal clique "
@@ -204,6 +205,12 @@ int FUNCTION(igraph_maximal_cliques,SUFFIX)(
     int vdeg=igraph_vector_int_size(vneis);
     int Pptr=0, Xptr=vdeg-1, PS=0, PE, XS, XE=vdeg-1;
     int j;
+
+    pg--;
+    if (pg <= 0) {
+      IGRAPH_PROGRESS("Maximal cliques: ", pgc++, NULL);
+      pg=pgreset;
+    }
 
 #ifdef DEBUG
     printf("----------- vertex %i\n", v);
@@ -273,6 +280,8 @@ int FUNCTION(igraph_maximal_cliques,SUFFIX)(
 				max_size);
 
   }
+
+  IGRAPH_PROGRESS("Maximal cliques: ", 100.0, NULL);
 
   igraph_vector_int_destroy(&nextv);
   igraph_vector_int_destroy(&pos);
